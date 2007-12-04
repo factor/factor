@@ -1,0 +1,242 @@
+<?xml version="1.0"?>
+
+<!-- Pike mode, contributed by
+                      Marco G?tze, <gomar@gmx.net> -->
+<!-- Small fixes and autodoc support contributed by
+                      Peter Lundqvist <peterl@update.uu.se> -->
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+  <PROPS>
+    <PROPERTY NAME="commentStart" VALUE="/*"/>
+    <PROPERTY NAME="commentEnd" VALUE="*/"/>
+    <PROPERTY NAME="lineComment" VALUE="//"/>
+    <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*`"/>
+
+    <!-- Auto indent -->
+    <PROPERTY NAME="indentOpenBrackets" VALUE="{"/>
+    <PROPERTY NAME="indentCloseBrackets" VALUE="}"/>
+    <PROPERTY NAME="indentNextLine" VALUE="\s*(((if|(for(each)?)|while|catch|gauge)\s*\(|(do|else)\s*|else\s+if\s*\()[^{;]*)"/>
+    <!-- set this to 'true' if you want to use GNU coding style -->
+    <PROPERTY NAME="doubleBracketIndent" VALUE="false"/>
+  </PROPS>
+  <RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[\p{XDigit}]+|[\p{Digit}]+|0[bB][01]+)[lLdDfF]?">
+
+    <!-- comments -->
+    <SPAN TYPE="COMMENT1" DELEGATE="COMMENT">
+      <BEGIN>/*</BEGIN>
+      <END>*/</END>
+    </SPAN>
+    <SEQ TYPE="INVALID">*/</SEQ>
+
+    <!-- Autodoc comment -->
+    <EOL_SPAN TYPE="COMMENT1" DELEGATE="AUTODOC">//!</EOL_SPAN>
+    <!-- C++ line comment -->
+    <EOL_SPAN TYPE="COMMENT1" DELEGATE="COMMENT">//</EOL_SPAN>
+
+    <!-- string, char literals -->
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" DELEGATE="STRING_LITERAL">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="LITERAL1" DELEGATE="STRING_LITERAL">
+      <BEGIN>#"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+
+    <!-- preprocessor statements -->
+    <SEQ_REGEXP TYPE="KEYWORD2" HASH_CHAR="#" AT_LINE_START="TRUE">#.*?(?=($|/\*|//))</SEQ_REGEXP>
+
+    <!-- operators -->
+    <SEQ TYPE="OPERATOR">({</SEQ>
+    <SEQ TYPE="OPERATOR">})</SEQ>
+    <SEQ TYPE="OPERATOR">([</SEQ>
+    <SEQ TYPE="OPERATOR">])</SEQ>
+    <SEQ TYPE="OPERATOR">(&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;)</SEQ>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">!</SEQ>
+    <SEQ TYPE="OPERATOR">+</SEQ>
+    <SEQ TYPE="OPERATOR">-</SEQ>
+    <SEQ TYPE="OPERATOR">/</SEQ>
+    <SEQ TYPE="OPERATOR">*</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">%</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;</SEQ>
+    <SEQ TYPE="OPERATOR">|</SEQ>
+    <SEQ TYPE="OPERATOR">^</SEQ>
+    <SEQ TYPE="OPERATOR">~</SEQ>
+    <SEQ TYPE="OPERATOR">@</SEQ>
+    <SEQ TYPE="OPERATOR">`</SEQ>
+    <SEQ TYPE="OPERATOR">.</SEQ>
+
+    <!-- function calls -->
+    <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+	<SEQ TYPE="OPERATOR">)</SEQ>
+
+    <KEYWORDS>
+      <!-- type modifiers -->
+      <KEYWORD1>constant</KEYWORD1>
+      <KEYWORD1>extern</KEYWORD1>
+      <KEYWORD1>final</KEYWORD1>
+      <KEYWORD1>inline</KEYWORD1>
+      <KEYWORD1>local</KEYWORD1>
+      <KEYWORD1>nomask</KEYWORD1>
+      <KEYWORD1>optional</KEYWORD1>
+      <KEYWORD1>private</KEYWORD1>
+      <KEYWORD1>protected</KEYWORD1>
+      <KEYWORD1>public</KEYWORD1>
+      <KEYWORD1>static</KEYWORD1>
+      <KEYWORD1>variant</KEYWORD1>
+
+      <!-- types -->
+      <KEYWORD3>array</KEYWORD3>
+      <KEYWORD3>class</KEYWORD3>
+      <KEYWORD3>float</KEYWORD3>
+      <KEYWORD3>function</KEYWORD3>
+      <KEYWORD3>int</KEYWORD3>
+      <KEYWORD3>mapping</KEYWORD3>
+      <KEYWORD3>mixed</KEYWORD3>
+      <KEYWORD3>multiset</KEYWORD3>
+      <KEYWORD3>object</KEYWORD3>
+      <KEYWORD3>program</KEYWORD3>
+      <KEYWORD3>string</KEYWORD3>
+      <KEYWORD3>void</KEYWORD3>
+
+      <!-- flow control and block-introducing keywords -->
+      <KEYWORD1>break</KEYWORD1>
+      <KEYWORD1>case</KEYWORD1>
+      <KEYWORD1>catch</KEYWORD1>
+      <KEYWORD1>continue</KEYWORD1>
+      <KEYWORD1>default</KEYWORD1>
+      <KEYWORD1>do</KEYWORD1>
+      <KEYWORD1>else</KEYWORD1>
+      <KEYWORD1>for</KEYWORD1>
+      <KEYWORD1>foreach</KEYWORD1>
+      <KEYWORD1>gauge</KEYWORD1>
+      <KEYWORD1>if</KEYWORD1>
+      <KEYWORD1>lambda</KEYWORD1>
+      <KEYWORD1>return</KEYWORD1>
+      <KEYWORD1>sscanf</KEYWORD1>
+      <KEYWORD1>switch</KEYWORD1>
+      <KEYWORD1>while</KEYWORD1>
+
+      <!-- special instructions -->
+      <KEYWORD2>import</KEYWORD2>
+      <KEYWORD2>inherit</KEYWORD2>
+    </KEYWORDS>
+  </RULES>
+
+  <RULES SET="COMMENT" IGNORE_CASE="FALSE" DEFAULT="COMMENT1">
+    <KEYWORDS>
+      <COMMENT2>FIXME</COMMENT2>
+      <COMMENT2>XXX</COMMENT2>
+    </KEYWORDS>
+  </RULES>
+
+  <RULES SET="AUTODOC" IGNORE_CASE="TRUE" DEFAULT="COMMENT1">
+
+		<EOL_SPAN TYPE="NULL" DELEGATE="MAIN" MATCH_TYPE="CONTEXT">@decl</EOL_SPAN>
+
+		<!-- XML tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS">
+		  <BEGIN>@xml{</BEGIN>
+			<END>@}</END>
+		</SPAN>
+		<!-- Cross references -->
+		<SPAN TYPE="FUNCTION" NO_LINE_BREAK="TRUE">
+  		<BEGIN>@[</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+		<!-- Brace keywords -->
+		<SEQ_REGEXP TYPE="FUNCTION" HASH_CHAR="@">@(b|i|u|tt|url|pre|ref|code|expr|image)?(\{.*@\})</SEQ_REGEXP>
+
+		<!-- Attempt to get syntax highlighting of @decl-ed functions
+		     inside of the autodoc-rule.
+
+		     It works - but jEdit 4.1 has problems keeping it highlighted
+		     (the syntax highlighting works depending on how you travel
+		     past the @decl-ed region).
+		     Can't figure aout how to to proper coloring of the @decl
+		     keyword either.
+
+		     If there are problems with what regions are highlighted -
+		     try to uncomment this first.
+		-->
+		<EOL_SPAN TYPE="NULL" DELEGATE="MAIN">@decl</EOL_SPAN>
+
+		<KEYWORDS>
+		  <!-- Meta keywords -->
+		  <LABEL>@appears</LABEL>
+		  <LABEL>@belongs</LABEL>
+		  <LABEL>@class</LABEL>
+		  <LABEL>@endclass</LABEL>
+		  <LABEL>@example</LABEL>
+		  <LABEL>@module</LABEL>
+		  <LABEL>@endmodule</LABEL>
+		  <LABEL>@namespace</LABEL>
+		  <LABEL>@endnamespace</LABEL>
+		  <!-- <LABEL>@decl</LABEL>
+		  -->
+
+		  <!-- Single keywords -->
+		  <LABEL>@deprecated</LABEL>
+
+		  <!-- Delimiter keywords -->
+		  <LABEL>@note</LABEL>
+		  <LABEL>@example</LABEL>
+		  <LABEL>@bugs</LABEL>
+		  <LABEL>@returns</LABEL>
+		  <LABEL>@throws</LABEL>
+		  <LABEL>@param</LABEL>
+		  <LABEL>@seealso</LABEL>
+		  <LABEL>@fixme</LABEL>
+		  <LABEL>@constant</LABEL>
+		  <LABEL>@member</LABEL>
+		  <LABEL>@index</LABEL>
+		  <LABEL>@elem</LABEL>
+		  <LABEL>@value</LABEL>
+		  <LABEL>@type</LABEL>
+		  <LABEL>@item</LABEL>
+
+		  <!-- Container keywords -->
+		  <LABEL>@section</LABEL>
+		  <LABEL>@mapping</LABEL>
+		  <LABEL>@endmapping</LABEL>
+		  <LABEL>@multiset</LABEL>
+		  <LABEL>@endmultiset</LABEL>
+		  <LABEL>@array</LABEL>
+		  <LABEL>@endarray</LABEL>
+		  <LABEL>@int</LABEL>
+		  <LABEL>@endint</LABEL>
+		  <LABEL>@string</LABEL>
+		  <LABEL>@endstring</LABEL>
+		  <LABEL>@mixed</LABEL>
+		  <LABEL>@endmixed</LABEL>
+		  <LABEL>@dl</LABEL>
+		  <LABEL>@enddl</LABEL>
+		  <LABEL>@ol</LABEL>
+		  <LABEL>@endol</LABEL>
+		  <LABEL>@ul</LABEL>
+		  <LABEL>@endol</LABEL>
+
+		  <!-- Special keywords -->
+		  <LABEL>@ignore</LABEL>
+		  <LABEL>@endignore</LABEL>
+
+		</KEYWORDS>
+
+	</RULES>
+
+  <RULES SET="STRING_LITERAL" ESCAPE="\" IGNORE_CASE="TRUE" DEFAULT="LITERAL1">
+    <SEQ_REGEXP TYPE="LITERAL2" HASH_CHAR="%">%([^ a-z]*[a-z]|\[[^\]]*\])</SEQ_REGEXP>
+    <SEQ TYPE="COMMENT2">DEBUG:</SEQ>
+  </RULES>
+</MODE>

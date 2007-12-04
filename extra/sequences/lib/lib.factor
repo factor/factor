@@ -62,3 +62,15 @@ IN: sequences.lib
 
 : delete-random ( seq -- value )
     [ length random ] keep [ nth ] 2keep delete-nth ;
+
+: (map-until) ( quot pred -- quot )
+    [ dup ] swap 3compose
+    [ [ drop t ] [ , f ] if ] compose [ find 2drop ] curry ;
+
+: map-until ( seq quot pred -- newseq )
+    (map-until) { } make ;
+
+: take-while ( seq quot -- newseq )
+    [ not ] compose
+    [ find drop [ head-slice ] when* ] curry
+    [ dup ] swap compose keep like ;

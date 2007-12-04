@@ -1,15 +1,21 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences strings namespaces math assocs shuffle vectors combinators.lib ;
+USING: kernel sequences strings namespaces math assocs shuffle 
+       vectors arrays combinators.lib memoize ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
 
-GENERIC: parse ( state parser -- result )
+GENERIC: (parse) ( state parser -- result )
 
 <PRIVATE
 
+SYMBOL: packrat-cache
 SYMBOL: ignore 
+SYMBOL: not-in-cache
+
+: not-in-cache? ( result -- ? )
+  not-in-cache = ;
 
 : <parse-result> ( remaining ast -- parse-result )
   parse-result construct-boa ;
@@ -24,18 +30,58 @@ TUPLE: parser id ;
 : init-parser ( parser -- parser )
   get-next-id parser construct-boa over set-delegate ;
 
+: from ( slice-or-string -- index )
+  dup slice? [ slice-from ] [ drop 0 ] if ;
+
+: get-cached ( input parser -- result )
+  [ from ] dip parser-id packrat-cache get at at* [ 
+    drop not-in-cache 
+  ] unless ;
+
+: put-cached ( result input parser -- )
+  parser-id dup packrat-cache get at [ 
+    nip
+  ] [ 
+    H{ } clone dup >r swap packrat-cache get set-at r>
+  ] if* 
+  [ from ] dip set-at ;
+
+PRIVATE>
+
+: parse ( input parser -- result )
+  packrat-cache get [
+    2dup get-cached dup not-in-cache? [ 
+!      "cache missed: " write over parser-id number>string write " - " write nl ! pick .
+      drop 
+      #! Protect against left recursion blowing the callstack
+      #! by storing a failed parse in the cache.
+      [ f ] dipd  [ put-cached ] 2keep
+      [ (parse) dup ] 2keep put-cached
+    ] [ 
+!      "cache hit: " write over parser-id number>string write " - " write nl ! pick . 
+      2nip
+    ] if
+  ] [
+    (parse)
+  ] if ;
+
+: packrat-parse ( input parser -- result )
+  H{ } clone packrat-cache [ parse ] with-variable ;
+
+<PRIVATE
+
 TUPLE: token-parser symbol ;
 
-M: token-parser parse ( state parser -- result )
+M: token-parser (parse) ( input parser -- result )
   token-parser-symbol 2dup head? [
     dup >r length tail-slice r> <parse-result>
   ] [
     2drop f
   ] if ;
-
+   
 TUPLE: satisfy-parser quot ;
 
-M: satisfy-parser parse ( state parser -- result )
+M: satisfy-parser (parse) ( state parser -- result )
   over empty? [
     2drop f 
   ] [
@@ -48,7 +94,7 @@ M: satisfy-parser parse ( state parser -- result )
 
 TUPLE: range-parser min max ;
 
-M: range-parser parse ( state parser -- result )
+M: range-parser (parse) ( state parser -- result )
   over empty? [
     2drop f
   ] [
@@ -77,7 +123,7 @@ TUPLE: seq-parser parsers ;
     drop   
   ] if ;
 
-M: seq-parser parse ( state parser -- result )
+M: seq-parser (parse) ( state parser -- result )
   seq-parser-parsers [ V{ } clone <parse-result> ] dip  (seq-parser) ;
 
 TUPLE: choice-parser parsers ;
@@ -93,7 +139,7 @@ TUPLE: choice-parser parsers ;
     ] if* 
   ] if ;
 
-M: choice-parser parse ( state parser -- result )
+M: choice-parser (parse) ( state parser -- result )
   choice-parser-parsers (choice-parser) ;
 
 TUPLE: repeat0-parser p1 ;
@@ -111,7 +157,7 @@ TUPLE: repeat0-parser p1 ;
   { parse-result-remaining parse-result-ast }
   get-slots 1vector  <parse-result> ;
 
-M: repeat0-parser parse ( state parser -- result )
+M: repeat0-parser (parse) ( state parser -- result )
      repeat0-parser-p1 2dup parse [ 
        nipd clone-result (repeat-parser) 
      ] [ 
@@ -120,17 +166,17 @@ M: repeat0-parser parse ( state parser -- result )
 
 TUPLE: repeat1-parser p1 ;
 
-M: repeat1-parser parse ( state parser -- result )
+M: repeat1-parser (parse) ( state parser -- result )
    repeat1-parser-p1 tuck parse dup [ clone-result (repeat-parser) ] [ nip ] if ;
 
 TUPLE: optional-parser p1 ;
 
-M: optional-parser parse ( state parser -- result )
+M: optional-parser (parse) ( state parser -- result )
    dupd optional-parser-p1 parse swap f <parse-result> or ;
 
 TUPLE: ensure-parser p1 ;
 
-M: ensure-parser parse ( state parser -- result )
+M: ensure-parser (parse) ( state parser -- result )
    dupd ensure-parser-p1 parse [
      ignore <parse-result>  
    ] [
@@ -139,7 +185,7 @@ M: ensure-parser parse ( state parser -- result )
 
 TUPLE: ensure-not-parser p1 ;
 
-M: ensure-not-parser parse ( state parser -- result )
+M: ensure-not-parser (parse) ( state parser -- result )
    dupd ensure-not-parser-p1 parse [
      drop f
    ] [
@@ -148,7 +194,7 @@ M: ensure-not-parser parse ( state parser -- result )
 
 TUPLE: action-parser p1 quot ;
 
-M: action-parser parse ( state parser -- result )
+M: action-parser (parse) ( state parser -- result )
    tuck action-parser-p1 parse dup [ 
      dup parse-result-ast rot action-parser-quot call
      swap [ set-parse-result-ast ] keep
@@ -165,23 +211,23 @@ M: action-parser parse ( state parser -- result )
 
 TUPLE: sp-parser p1 ;
 
-M: sp-parser parse ( state parser -- result )
+M: sp-parser (parse) ( state parser -- result )
   [ left-trim-slice ] dip sp-parser-p1 parse ;
 
 TUPLE: delay-parser quot ;
 
-M: delay-parser parse ( state parser -- result )
+M: delay-parser (parse) ( state parser -- result )
   delay-parser-quot call parse ;
 
 PRIVATE>
 
-: token ( string -- parser )
+MEMO: token ( string -- parser )
   token-parser construct-boa init-parser ;      
 
 : satisfy ( quot -- parser )
   satisfy-parser construct-boa init-parser ;
 
-: range ( min max -- parser )
+MEMO: range ( min max -- parser )
   range-parser construct-boa init-parser ;
 
 : seq ( seq -- parser )
@@ -190,32 +236,32 @@ PRIVATE>
 : choice ( seq -- parser )
   choice-parser construct-boa init-parser ;
 
-: repeat0 ( parser -- parser )
+MEMO: repeat0 ( parser -- parser )
   repeat0-parser construct-boa init-parser ;
 
-: repeat1 ( parser -- parser )
+MEMO: repeat1 ( parser -- parser )
   repeat1-parser construct-boa init-parser ;
 
-: optional ( parser -- parser )
+MEMO: optional ( parser -- parser )
   optional-parser construct-boa init-parser ;
 
-: ensure ( parser -- parser )
+MEMO: ensure ( parser -- parser )
   ensure-parser construct-boa init-parser ;
 
-: ensure-not ( parser -- parser )
+MEMO: ensure-not ( parser -- parser )
   ensure-not-parser construct-boa init-parser ;
 
 : action ( parser quot -- parser )
   action-parser construct-boa init-parser ;
 
-: sp ( parser -- parser )
+MEMO: sp ( parser -- parser )
   sp-parser construct-boa init-parser ;
 
-: hide ( parser -- parser )
+MEMO: hide ( parser -- parser )
   [ drop ignore ] action ;
 
-: delay ( parser -- parser )
+MEMO: delay ( parser -- parser )
   delay-parser construct-boa init-parser ;
 
-: list-of ( items separator -- parser )
+MEMO: list-of ( items separator -- parser )
   hide over 2array seq repeat0 [ concat ] action 2array seq [ unclip 1vector swap first append ] action ;

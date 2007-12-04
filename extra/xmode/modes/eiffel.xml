@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Eiffel mode, by Slava Pestov. Based on EiffelTokenMarker by
+     Artur Biesiadowski -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="--" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- Comment -->
+		<EOL_SPAN TYPE="COMMENT1">--</EOL_SPAN>
+
+		<!-- Standard literals -->
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<!-- some of these should be marked OPERATOR -->
+		<!-- <SEQ TYPE="NULL">)</SEQ>
+		<SEQ TYPE="NULL">(</SEQ>
+		<SEQ TYPE="NULL">=</SEQ>
+		<SEQ TYPE="NULL">!</SEQ>
+		<SEQ TYPE="NULL">&gt;=</SEQ>
+		<SEQ TYPE="NULL">&lt;=</SEQ>
+		<SEQ TYPE="NULL">+</SEQ>
+		<SEQ TYPE="NULL">-</SEQ>
+		<SEQ TYPE="NULL">/</SEQ>
+		<SEQ TYPE="NULL">*</SEQ>
+		<SEQ TYPE="NULL">&gt;</SEQ>
+		<SEQ TYPE="NULL">&lt;</SEQ>
+		<SEQ TYPE="NULL">%</SEQ>
+		<SEQ TYPE="NULL">&amp;</SEQ>
+		<SEQ TYPE="NULL">|</SEQ>
+		<SEQ TYPE="NULL">^</SEQ>
+		<SEQ TYPE="NULL">~</SEQ>
+		<SEQ TYPE="NULL">}</SEQ>
+		<SEQ TYPE="NULL">{</SEQ>
+		<SEQ TYPE="NULL">.</SEQ>
+		<SEQ TYPE="NULL">,</SEQ>
+		<SEQ TYPE="NULL">;</SEQ>
+		<SEQ TYPE="NULL">]</SEQ>
+		<SEQ TYPE="NULL">[</SEQ>
+		<SEQ TYPE="NULL">?</SEQ>
+		<SEQ TYPE="NULL">:</SEQ> -->
+
+		<KEYWORDS>
+			<KEYWORD1>alias</KEYWORD1>
+			<KEYWORD1>all</KEYWORD1>
+			<KEYWORD1>and</KEYWORD1>
+			<KEYWORD1>as</KEYWORD1>
+			<KEYWORD1>check</KEYWORD1>
+			<KEYWORD1>class</KEYWORD1>
+			<KEYWORD1>creation</KEYWORD1>
+			<KEYWORD1>debug</KEYWORD1>
+			<KEYWORD1>deferred</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>elseif</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>ensure</KEYWORD1>
+			<KEYWORD1>expanded</KEYWORD1>
+			<KEYWORD1>export</KEYWORD1>
+			<KEYWORD1>external</KEYWORD1>
+			<KEYWORD1>feature</KEYWORD1>
+			<KEYWORD1>from</KEYWORD1>
+			<KEYWORD1>frozen</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>implies</KEYWORD1>
+			<KEYWORD1>indexing</KEYWORD1>
+			<KEYWORD1>infix</KEYWORD1>
+			<KEYWORD1>inherit</KEYWORD1>
+			<KEYWORD1>inspect</KEYWORD1>
+			<KEYWORD1>invariant</KEYWORD1>
+			<KEYWORD1>is</KEYWORD1>
+			<KEYWORD1>like</KEYWORD1>
+			<KEYWORD1>local</KEYWORD1>
+			<KEYWORD1>loop</KEYWORD1>
+			<KEYWORD1>not</KEYWORD1>
+			<KEYWORD1>obsolete</KEYWORD1>
+			<KEYWORD1>old</KEYWORD1>
+			<KEYWORD1>once</KEYWORD1>
+			<KEYWORD1>or</KEYWORD1>
+			<KEYWORD1>prefix</KEYWORD1>
+			<KEYWORD1>redefine</KEYWORD1>
+			<KEYWORD1>rename</KEYWORD1>
+			<KEYWORD1>require</KEYWORD1>
+			<KEYWORD1>rescue</KEYWORD1>
+			<KEYWORD1>retry</KEYWORD1>
+			<KEYWORD1>select</KEYWORD1>
+			<KEYWORD1>separate</KEYWORD1>
+			<KEYWORD1>then</KEYWORD1>
+			<KEYWORD1>undefine</KEYWORD1>
+			<KEYWORD1>until</KEYWORD1>
+			<KEYWORD1>variant</KEYWORD1>
+			<KEYWORD1>when</KEYWORD1>
+			<KEYWORD1>xor</KEYWORD1>
+
+			<LITERAL2>current</LITERAL2>
+			<LITERAL2>false</LITERAL2>
+			<LITERAL2>precursor</LITERAL2>
+			<LITERAL2>result</LITERAL2>
+			<LITERAL2>strip</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+			<LITERAL2>unique</LITERAL2>
+			<LITERAL2>void</LITERAL2>
+		</KEYWORDS>
+	</RULES>
+</MODE>

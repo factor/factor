@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+<MODE NAME="myghty"			FILE="myghty.xml"
+				FILE_NAME_GLOB="*.myt"/>
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE">
+
+		<EOL_SPAN TYPE="COMMENT2" AT_LINE_START="TRUE">#</EOL_SPAN>
+		<!-- <SEQ TYPE="LITERAL4" AT_LINE_END="TRUE">\</SEQ> -->
+
+		<!-- attr block (python) -->
+		<SPAN DELEGATE="MYGHTY" TYPE="LITERAL4">
+			<BEGIN>&lt;%attr&gt;</BEGIN>
+			<END>&lt;/%attr&gt;</END>
+		</SPAN>
+
+		<!-- def, closure, method -->
+		<SPAN_REGEXP HASH_CHAR="&lt;%" TYPE="LITERAL4" DELEGATE="DEF">
+			<BEGIN>&lt;%(def|closure|method)</BEGIN>
+			<END>&gt;</END>
+		</SPAN_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="&lt;/%" TYPE="LITERAL4">&lt;/%(def|closure|method)&gt;</SEQ_REGEXP>
+
+		<!-- doc block -->
+		<SPAN TYPE="COMMENT4">
+			<BEGIN>&lt;%doc&gt;</BEGIN>
+			<END>&lt;/%doc&gt;</END>
+		</SPAN>
+
+		<!-- flags block (python) -->
+		<SPAN DELEGATE="MYGHTY" TYPE="LITERAL4">
+			<BEGIN>&lt;%flags&gt;</BEGIN>
+			<END>&lt;/%flags&gt;</END>
+		</SPAN>
+
+		<!-- python block -->
+		<SPAN_REGEXP HASH_CHAR="&lt;%python" DELEGATE="MYGHTY" TYPE="LITERAL4">
+			<BEGIN>&lt;%python[^&gt;]*&gt;</BEGIN>
+			<END>&lt;/%python&gt;</END>
+		</SPAN_REGEXP>
+
+		<!-- python block aliases - don't take args -->
+		<SPAN_REGEXP HASH_CHAR="&lt;%" DELEGATE="MYGHTY" TYPE="LITERAL4">
+			<BEGIN>&lt;%(args|cleanup|filter|global|init|once|requestlocal|requestonce|shared|threadlocal|threadonce)&gt;</BEGIN>
+			<END>&lt;/%$1&gt;</END>
+		</SPAN_REGEXP>
+
+		<!-- text block -->
+		<SPAN TYPE="LITERAL3">
+			<BEGIN>&lt;%text&gt;</BEGIN>
+			<END>&lt;/%text&gt;</END>
+		</SPAN>
+
+		<!-- calling component -->
+		<SEQ TYPE="LITERAL4">&lt;/&amp;&gt;</SEQ>
+		<SPAN_REGEXP HASH_CHAR="&lt;&amp;" TYPE="LITERAL4" DELEGATE="MYGHTY">
+			<BEGIN>&lt;&amp;[|]?</BEGIN>
+			<END>&amp;&gt;</END>
+		</SPAN_REGEXP>
+
+		<!-- substitutions -->
+		<SPAN TYPE="LITERAL3" DELEGATE="MYGHTY">
+			<BEGIN>&lt;%</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<EOL_SPAN 
+			AT_LINE_START="TRUE" 
+			DELEGATE="MYGHTY" 
+			TYPE="LITERAL4">%</EOL_SPAN>
+
+		<IMPORT DELEGATE="html::MAIN"/>
+
+		<KEYWORDS>
+			<!-- only here for complete-word -->
+			<NULL>args</NULL>
+			<NULL>attr</NULL>
+			<NULL>cleanup</NULL>
+			<NULL>closure</NULL>
+			<NULL>def</NULL>
+			<NULL>doc</NULL>
+			<NULL>filter</NULL>
+			<NULL>flags</NULL>
+			<NULL>global</NULL>
+			<NULL>init</NULL>
+			<NULL>method</NULL>
+			<NULL>once</NULL>
+			<NULL>python</NULL>
+			<NULL>requestlocal</NULL>
+			<NULL>requestonce</NULL>
+			<NULL>shared</NULL>
+			<NULL>threadlocal</NULL>
+			<NULL>threadonce</NULL>
+		</KEYWORDS>
+
+	</RULES>
+
+	<RULES IGNORE_CASE="FALSE" SET="MYGHTY">
+		<!-- alias for MODULE -->
+		<SEQ TYPE="KEYWORD4">@</SEQ>
+		<IMPORT DELEGATE="python::MAIN"/>
+		<KEYWORDS>
+			<KEYWORD4>ARGS</KEYWORD4>
+			<KEYWORD4>MODULE</KEYWORD4>
+			<KEYWORD4>SELF</KEYWORD4>
+			<KEYWORD4>m</KEYWORD4>
+			<!-- request -->
+			<KEYWORD4>r</KEYWORD4>
+			<!-- session -->
+			<KEYWORD4>s</KEYWORD4>
+			<!-- URL encode -->
+			<KEYWORD4>u</KEYWORD4>
+			<!-- HTML encode -->
+			<KEYWORD4>h</KEYWORD4>
+		</KEYWORDS>
+	</RULES>
+
+	<!-- only exists to color component name like a function -->
+	<RULES IGNORE_CASE="TRUE" SET="DEF" DEFAULT="FUNCTION">
+	</RULES>
+</MODE>

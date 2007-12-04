@@ -1,54 +1,121 @@
 USING: arrays combinators kernel lazy-lists math math.parser
 namespaces parser parser-combinators parser-combinators.simple
-promises quotations sequences sequences.lib strings ;
-USING: continuations io prettyprint ;
+promises quotations sequences combinators.lib strings macros
+assocs prettyprint.backend ;
 IN: regexp
 
-: 'any-char'
-    "." token [ drop any-char-parser ] <@ ;
+: or-predicates ( quots -- quot )
+    [ \ dup add* ] map [ [ t ] ] f short-circuit \ nip add ;
 
-: escaped-char
+MACRO: fast-member? ( str -- quot )
+    [ dup ] H{ } map>assoc [ key? ] curry ;
+
+: octal-digit? ( n -- ? )
+    CHAR: 0 CHAR: 7 between? ;
+
+: decimal-digit? ( n -- ? )
+    CHAR: 0 CHAR: 9 between? ;
+
+: hex-digit? ( n -- ? )
+    dup decimal-digit?
+    swap CHAR: a CHAR: f between? or ;
+
+: control-char? ( n -- ? )
+    dup 0 HEX: 1f between?
+    swap HEX: 7f = or ;
+
+: punct? ( n -- ? )
+    "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" fast-member? ;
+
+: c-identifier-char? ( ch -- ? )
+    dup alpha? swap CHAR: _ = or ;
+
+: java-blank? ( n -- ? )
     {
-        { CHAR: d [ [ digit? ] ] }
-        { CHAR: D [ [ digit? not ] ] }
-        { CHAR: s [ [ blank? ] ] }
-        { CHAR: S [ [ blank? not ] ] }
-        { CHAR: \\ [ [ CHAR: \\ = ] ] }
-        [ "bad \\, use \\\\ to match a literal \\" throw ]
-    } case ;
+        CHAR: \t CHAR: \n CHAR: \r
+        HEX: c HEX: 7 HEX: 1b
+    } fast-member? ;
 
-: 'escaped-char'
-    "\\" token any-char-parser &> [ escaped-char ] <@ ;
+: java-printable? ( n -- ? )
+    dup alpha? swap punct? or ;
 
-! Must escape to use as literals
-! : meta-chars "[\\^$.|?*+()" ;
+: 'ordinary-char' ( -- parser )
+    [ "\\^*+?|(){}[" fast-member? not ] satisfy
+    [ [ = ] curry ] <@ ;
 
-: 'ordinary-char'
-    [ "\\^*+?|(){}[" member? not ] satisfy ;
+: 'octal-digit' ( -- parser ) [ octal-digit? ] satisfy ;
 
-: 'char' 'escaped-char' 'ordinary-char' <|> ;
+: 'octal' ( -- parser )
+    "0" token 'octal-digit' 1 3 from-m-to-n &>
+    [ oct> ] <@ ;
 
-: 'string'
-    'char' <+> [
-        [ dup quotation? [ satisfy ] [ 1token ] if ] [ <&> ] map-reduce
-    ] <@ ;
+: 'hex-digit' ( -- parser ) [ hex-digit? ] satisfy ;
 
-: exactly-n ( parser n -- parser' )
-    swap <repetition> and-parser construct-boa ;
+: 'hex' ( -- parser )
+    "x" token 'hex-digit' 2 exactly-n &>
+    "u" token 'hex-digit' 4 exactly-n &> <|>
+    [ hex> ] <@ ;
 
-: at-most-n ( parser n -- parser' )
-    dup zero? [
-        2drop epsilon
-    ] [
-        2dup exactly-n
-        -rot 1- at-most-n <|>
-    ] if ;
+: satisfy-tokens ( assoc -- parser )
+    [ >r token r> [ nip ] curry <@ ] { } assoc>map <or-parser> ;
 
-: at-least-n ( parser n -- parser' )
-    dupd exactly-n swap <*> <&> ;
+: 'simple-escape-char' ( -- parser )
+    {
+        { "\\" CHAR: \\ }
+        { "t"  CHAR: \t }
+        { "n"  CHAR: \n }
+        { "r"  CHAR: \r }
+        { "f"  HEX: c   }
+        { "a"  HEX: 7   }
+        { "e"  HEX: 1b  }
+    } [ [ = ] curry ] assoc-map satisfy-tokens ;
 
-: from-m-to-n ( parser m n -- parser' )
-    >r [ exactly-n ] 2keep r> swap - at-most-n <&> ;
+: 'predefined-char-class' ( -- parser )
+    {
+        { "d" [ digit? ] }
+        { "D" [ digit? not ] }
+        { "s" [ java-blank? ] }
+        { "S" [ java-blank? not ] }
+        { "w" [ c-identifier-char? ] }
+        { "W" [ c-identifier-char? not ] }
+    } satisfy-tokens ;
+
+: 'posix-character-class' ( -- parser )
+    {
+        { "Lower" [ letter? ] }
+        { "Upper" [ LETTER? ] }
+        { "ASCII" [ 0 HEX: 7f between? ] }
+        { "Alpha" [ Letter? ] }
+        { "Digit" [ digit? ] }
+        { "Alnum" [ alpha? ] }
+        { "Punct" [ punct? ] }
+        { "Graph" [ java-printable? ] }
+        { "Print" [ java-printable? ] }
+        { "Blank" [ " \t" member? ] }
+        { "Cntrl" [ control-char? ] }
+        { "XDigit" [ hex-digit? ] }
+        { "Space" [ java-blank? ] }
+    } satisfy-tokens "p{" "}" surrounded-by ;
+
+: 'simple-escape' ( -- parser )
+    'octal'
+    'hex' <|>
+    "c" token [ LETTER? ] satisfy &> <|>
+    any-char-parser <|>
+    [ [ = ] curry ] <@ ;
+
+: 'escape' ( -- parser )
+    "\\" token
+    'simple-escape-char'
+    'predefined-char-class' <|>
+    'posix-character-class' <|>
+    'simple-escape' <|> &> ;
+
+: 'any-char'
+    "." token [ drop [ drop t ] ] <@ ;
+
+: 'char'
+    'any-char' 'escape' 'ordinary-char' <|> <|> [ satisfy ] <@ ;
 
 DEFER: 'regexp'
 
@@ -57,94 +124,103 @@ TUPLE: group-result str ;
 C: <group-result> group-result
 
 : 'grouping'
-    "(" token
     'regexp' [ [ <group-result> ] <@ ] <@
-    ")" token <& &> ;
+    "(" ")" surrounded-by ;
 
-! Special cases: ]\\^-
-: predicates>cond ( seq -- quot )
-    #! Takes an array of quotation predicates/objects and makes a cond
-    #! Makes a predicate of each obj like so:  [ dup obj = ]
-    #! Leaves quotations alone
-    #! The cond returns a boolean, t if one of the predicates matches
-    [
-        dup callable? [ [ = ] curry ] unless
-        [ dup ] swap compose [ drop t ] 2array
-    ] map { [ t ] [ drop f ] } add [ cond ] curry ;
-
-: 'range'
+: 'range' ( -- parser )
     any-char-parser "-" token <& any-char-parser <&>
     [ first2 [ between? ] 2curry ] <@ ;
 
-: 'character-class-contents'
-    'escaped-char'
-    'range' <|>
-    [ "\\]" member? not ] satisfy <|> ;
+: 'character-class-term' ( -- parser )
+    'range'
+    'escape' <|>
+    [ "\\]" member? not ] satisfy [ [ = ] curry ] <@ <|> ;
 
-: 'character-class'
-    "[" token
-    "^" token 'character-class-contents' <+> <&:>
-        [ predicates>cond [ not ] compose satisfy ] <@
-    "]" token [ first ] <@ 'character-class-contents' <*> <&:>
-        [ predicates>cond satisfy ] <@ <|>
-    'character-class-contents' <+> [ predicates>cond satisfy ] <@ <|>
-    &>
-    "]" token <& ;
+: 'positive-character-class' ( -- parser )
+    "]" token [ drop [ CHAR: ] = ] ] <@ 'character-class-term' <*> <&:>
+    'character-class-term' <+> <|>
+    [ or-predicates ] <@ ;
 
-: 'term'
-    'any-char'
-    'string' <|>
+: 'negative-character-class' ( -- parser )
+    "^" token 'positive-character-class' &>
+    [ [ not ] append ] <@ ;
+
+: 'character-class' ( -- parser )
+    'negative-character-class' 'positive-character-class' <|>
+    "[" "]" surrounded-by [ satisfy ] <@ ;
+
+: 'escaped-seq' ( -- parser )
+    any-char-parser <*> [ token ] <@ "\\Q" "\\E" surrounded-by ;
+
+: 'simple' ( -- parser )
+    'escaped-seq'
     'grouping' <|>
-    'character-class' <|>
-    <+> [
-        dup length 1 =
-        [ first ] [ and-parser construct-boa ] if
-    ] <@ ;
+    'char' <|>
+    'character-class' <|> ;
 
-: 'interval'
-    'term' "{" token <& 'integer' <&> "}" token <& [ first2 exactly-n ] <@
-    'term' "{" token <& 'integer' <&> "," token <& "}" token <&
-        [ first2 at-least-n ] <@ <|>
-    'term' "{" token <& "," token <& 'integer' <&> "}" token <&
-        [ first2 at-most-n ] <@ <|>
-    'term' "{" token <& 'integer' <&> "," token <& 'integer' <:&> "}" token <&
-        [ first3 from-m-to-n ] <@ <|> ;
+: 'interval' ( -- parser )
+    'simple' 'integer' "{" "}" surrounded-by <&> [ first2 exactly-n ] <@
+    'simple' 'integer' "{" ",}" surrounded-by <&> [ first2 at-least-n ] <@ <|>
+    'simple' 'integer' "{," "}" surrounded-by <&> [ first2 at-most-n ] <@ <|>
+    'simple' 'integer' "," token <& 'integer' <&> "{" "}" surrounded-by <&> [ first2 first2 from-m-to-n ] <@ <|> ;
 
-: 'repetition'
-    'term'
-    [ "*+?" member? ] satisfy <&> [
-        first2 {
-            { CHAR: * [ <*> ] }
-            { CHAR: + [ <+> ] }
-            { CHAR: ? [ <?> ] }
-        } case
-    ] <@ ;
+: 'repetition' ( -- parser )
+    'simple' "*" token <& [ <*> ] <@
+    'simple' "+" token <& [ <+> ] <@ <|>
+    'simple' "?" token <& [ <?> ] <@ <|> ;
 
-: 'simple' 'term' 'repetition' <|> 'interval' <|> ;
-
-LAZY: 'union' ( -- parser )
-    'simple'
-    'simple' "|" token 'union' &> <&> [ first2 <|> ] <@
-    <|> ;
+: 'term' ( -- parser )
+    'simple' 'repetition' 'interval' <|> <|>
+    <+> [ <and-parser> ] <@ ;
 
 LAZY: 'regexp' ( -- parser )
-    'repetition' 'union' <|> ;
+    'term' "|" token nonempty-list-of [ <or-parser> ] <@ ;
 
-: <regexp> 'regexp' just parse-1 ;
+TUPLE: regexp source parser ;
+
+: <regexp> dup 'regexp' just parse-1 regexp construct-boa ;
 
 GENERIC: >regexp ( obj -- parser )
-M: string >regexp 'regexp' just parse-1 ;
+
+M: string >regexp <regexp> ;
+
 M: object >regexp ;
 
-: matches? ( string regexp -- ? ) >regexp just parse nil? not ;
+: matches? ( string regexp -- ? )
+    >regexp regexp-parser just parse nil? not ;
 
+! Literal syntax for regexps
 : parse-regexp ( accum end -- accum )
     lexer get dup skip-blank [
         [ index* dup 1+ swap ] 2keep swapd subseq swap
     ] change-column  <regexp> parsed ;
 
-: R/ CHAR: / parse-regexp ; parsing
-: R| CHAR: | parse-regexp ; parsing
+: R! CHAR: ! parse-regexp ; parsing
 : R" CHAR: " parse-regexp ; parsing
+: R# CHAR: # parse-regexp ; parsing
 : R' CHAR: ' parse-regexp ; parsing
+: R( CHAR: ) parse-regexp ; parsing
+: R/ CHAR: / parse-regexp ; parsing
+: R@ CHAR: @ parse-regexp ; parsing
+: R[ CHAR: ] parse-regexp ; parsing
 : R` CHAR: ` parse-regexp ; parsing
+: R{ CHAR: } parse-regexp ; parsing
+: R| CHAR: | parse-regexp ; parsing
+
+: find-regexp-syntax ( string -- prefix suffix )
+    {
+        { "R/ "  "/"  }
+        { "R! "  "!"  }
+        { "R\" " "\"" }
+        { "R# "  "#"  }
+        { "R' "  "'"  }
+        { "R( "  ")"  }
+        { "R@ "  "@"  }
+        { "R[ "  "]"  }
+        { "R` "  "`"  }
+        { "R{ "  "}"  }
+        { "R| "  "|"  }
+    } swap [ subseq? not nip ] curry assoc-find drop ;
+
+M: regexp pprint*
+    dup regexp-source dup find-regexp-syntax pprint-string ;

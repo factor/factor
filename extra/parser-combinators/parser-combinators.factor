@@ -1,7 +1,7 @@
 ! Copyright (C) 2004 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lazy-lists promises kernel sequences strings math
-arrays splitting ;
+arrays splitting quotations combinators ;
 IN: parser-combinators
 
 ! Parser combinator protocol
@@ -20,6 +20,15 @@ TUPLE: parse-result parsed unparsed ;
     ] if ;
 
 C: <parse-result> parse-result
+
+: parse-result-parsed-slice ( parse-result -- slice )
+    dup parse-result-parsed empty? [
+        parse-result-unparsed 0 0 rot <slice>
+    ] [
+        dup parse-result-unparsed
+        dup slice-from [ rot parse-result-parsed length - ] keep
+        rot slice-seq <slice>
+    ] if ;
 
 TUPLE: token-parser string ;
 
@@ -280,3 +289,20 @@ LAZY: <(+)> ( parser -- parser )
 
 LAZY: surrounded-by ( parser start end -- parser' )
     [ token ] 2apply swapd pack ;
+
+: exactly-n ( parser n -- parser' )
+    swap <repetition> <and-parser> ;
+
+: at-most-n ( parser n -- parser' )
+    dup zero? [
+        2drop epsilon
+    ] [
+        2dup exactly-n
+        -rot 1- at-most-n <|>
+    ] if ;
+
+: at-least-n ( parser n -- parser' )
+    dupd exactly-n swap <*> <&> ;
+
+: from-m-to-n ( parser m n -- parser' )
+    >r [ exactly-n ] 2keep r> swap - at-most-n <&> ;

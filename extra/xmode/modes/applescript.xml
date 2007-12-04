@@ -1,0 +1,280 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- AppleScript mode by Kris Kopicki (21/8/2002) -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+		<PROPERTY NAME="commentStart" VALUE="(*" />
+		<PROPERTY NAME="commentEnd" VALUE="*)" />
+		<PROPERTY NAME="lineComment" VALUE="--" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>(*</BEGIN>
+			<END>*)</END>
+		</SPAN>
+		<EOL_SPAN TYPE="COMMENT1">--</EOL_SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">­</SEQ>
+
+	<!-- Constants -->
+		<SEQ_REGEXP
+			TYPE="LITERAL2"
+			HASH_CHAR="application"
+			AT_WORD_START="TRUE"
+		>application[\t\s]+responses</SEQ_REGEXP>
+		<SEQ_REGEXP
+			TYPE="LITERAL2"
+			HASH_CHAR="current"
+			AT_WORD_START="TRUE"
+		>current[\t\s]+application</SEQ_REGEXP>
+		<SEQ_REGEXP
+			TYPE="LITERAL2"
+			HASH_CHAR="white"
+			AT_WORD_START="TRUE"
+		>white[\t\s]+space</SEQ_REGEXP>
+		
+		<!-- Text Styles -->
+		<SEQ_REGEXP
+			TYPE="LITERAL2"
+			HASH_CHAR="all"
+		>all[\t\s]+caps</SEQ_REGEXP>
+		<SEQ_REGEXP
+			TYPE="LITERAL2"
+			HASH_CHAR="all"
+			AT_WORD_START="TRUE"
+		>all[\t\s]+lowercase</SEQ_REGEXP>
+		<SEQ_REGEXP
+			TYPE="LITERAL2"
+			HASH_CHAR="small"
+			AT_WORD_START="TRUE"
+		>small[\t\s]+caps</SEQ_REGEXP>
+	
+	<!-- Predefined Variables -->
+		<SEQ_REGEXP
+			TYPE="KEYWORD3"
+			HASH_CHAR="missing"
+			AT_WORD_START="TRUE"
+		>missing[\t\s]+value</SEQ_REGEXP>
+		
+		<KEYWORDS>
+		<!-- Keywords -->
+			<KEYWORD1>script</KEYWORD1>
+			<KEYWORD1>property</KEYWORD1>
+			<KEYWORD1>prop</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>copy</KEYWORD1>
+			<KEYWORD1>to</KEYWORD1>
+			<KEYWORD1>set</KEYWORD1>
+			<KEYWORD1>global</KEYWORD1>
+			<KEYWORD1>local</KEYWORD1>
+			<KEYWORD1>on</KEYWORD1>
+			<KEYWORD1>to</KEYWORD1>
+			<KEYWORD1>of</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>given</KEYWORD1>
+			<KEYWORD1>with</KEYWORD1>
+			<KEYWORD1>without</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>tell</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>then</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>repeat</KEYWORD1>
+			<KEYWORD1>times</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>until</KEYWORD1>
+			<KEYWORD1>from</KEYWORD1>
+			<KEYWORD1>exit</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>error</KEYWORD1>
+			<KEYWORD1>considering</KEYWORD1>
+			<KEYWORD1>ignoring</KEYWORD1>
+			<KEYWORD1>timeout</KEYWORD1>
+			<KEYWORD1>transaction</KEYWORD1>
+			<KEYWORD1>my</KEYWORD1>
+			<KEYWORD1>get</KEYWORD1>
+			<KEYWORD1>put</KEYWORD1>
+			<KEYWORD1>into</KEYWORD1>
+			<KEYWORD1>is</KEYWORD1>
+		
+		<!-- References -->
+			<KEYWORD2>each</KEYWORD2>
+			<KEYWORD2>some</KEYWORD2>
+			<KEYWORD2>every</KEYWORD2>
+			<KEYWORD2>whose</KEYWORD2>
+			<KEYWORD2>where</KEYWORD2>
+			<KEYWORD2>id</KEYWORD2>
+			<KEYWORD2>index</KEYWORD2>
+			<KEYWORD2>first</KEYWORD2>
+			<KEYWORD2>second</KEYWORD2>
+			<KEYWORD2>third</KEYWORD2>
+			<KEYWORD2>fourth</KEYWORD2>
+			<KEYWORD2>fifth</KEYWORD2>
+			<KEYWORD2>sixth</KEYWORD2>
+			<KEYWORD2>seventh</KEYWORD2>
+			<KEYWORD2>eighth</KEYWORD2>
+			<KEYWORD2>ninth</KEYWORD2>
+			<KEYWORD2>tenth</KEYWORD2>
+			<KEYWORD2>last</KEYWORD2>
+			<KEYWORD2>front</KEYWORD2>
+			<KEYWORD2>back</KEYWORD2>
+			<KEYWORD2>st</KEYWORD2>
+			<KEYWORD2>nd</KEYWORD2>
+			<KEYWORD2>rd</KEYWORD2>
+			<KEYWORD2>th</KEYWORD2>
+			<KEYWORD2>middle</KEYWORD2>
+			<KEYWORD2>named</KEYWORD2>
+			<KEYWORD2>through</KEYWORD2>
+			<KEYWORD2>thru</KEYWORD2>
+			<KEYWORD2>before</KEYWORD2>
+			<KEYWORD2>after</KEYWORD2>
+			<KEYWORD2>beginning</KEYWORD2>
+			<KEYWORD2>the</KEYWORD2>
+		
+		<!-- Commands -->
+			<KEYWORD3>close</KEYWORD3>
+			<KEYWORD3>copy</KEYWORD3>
+			<KEYWORD3>count</KEYWORD3>
+			<KEYWORD3>delete</KEYWORD3>
+			<KEYWORD3>duplicate</KEYWORD3>
+			<KEYWORD3>exists</KEYWORD3>
+			<KEYWORD3>launch</KEYWORD3>
+			<KEYWORD3>make</KEYWORD3>
+			<KEYWORD3>move</KEYWORD3>
+			<KEYWORD3>open</KEYWORD3>
+			<KEYWORD3>print</KEYWORD3>
+			<KEYWORD3>quit</KEYWORD3>
+			<KEYWORD3>reopen</KEYWORD3>
+			<KEYWORD3>run</KEYWORD3>
+			<KEYWORD3>save</KEYWORD3>
+			<KEYWORD3>saving</KEYWORD3>
+		
+		<!-- Predefined Variables -->
+			<LITERAL2>it</LITERAL2>
+			<LITERAL2>me</LITERAL2>
+			<LITERAL2>version</LITERAL2>
+			<LITERAL2>pi</LITERAL2>
+			<LITERAL2>result</LITERAL2>
+			<LITERAL2>space</LITERAL2>
+			<LITERAL2>tab</LITERAL2>
+			<LITERAL2>anything</LITERAL2>
+		
+		<!-- Constants -->
+			<LITERAL2>case</LITERAL2>
+			<LITERAL2>diacriticals</LITERAL2>
+			<LITERAL2>expansion</LITERAL2>
+			<LITERAL2>hyphens</LITERAL2>
+			<LITERAL2>punctuation</LITERAL2>
+			
+			<!-- Text Styles -->
+			<LITERAL2>bold</LITERAL2>
+			<LITERAL2>condensed</LITERAL2>
+			<LITERAL2>expanded</LITERAL2>
+			<LITERAL2>hidden</LITERAL2>
+			<LITERAL2>italic</LITERAL2>
+			<LITERAL2>outline</LITERAL2>
+			<LITERAL2>plain</LITERAL2>
+			<LITERAL2>shadow</LITERAL2>
+			<LITERAL2>strikethrough</LITERAL2>
+			<LITERAL2>subscript</LITERAL2>
+			<LITERAL2>superscript</LITERAL2>
+			<LITERAL2>underline</LITERAL2>
+			
+			<!-- Save options -->
+			<LITERAL2>ask</LITERAL2>
+			<LITERAL2>no</LITERAL2>
+			<LITERAL2>yes</LITERAL2>
+			
+			<!-- Booleans -->
+			<LITERAL2>false</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+			
+			<!-- Date & Time -->
+			<LITERAL2>weekday</LITERAL2>
+			<LITERAL2>monday</LITERAL2>
+			<LITERAL2>mon</LITERAL2>
+			<LITERAL2>tuesday</LITERAL2>
+			<LITERAL2>tue</LITERAL2>
+			<LITERAL2>wednesday</LITERAL2>
+			<LITERAL2>wed</LITERAL2>
+			<LITERAL2>thursday</LITERAL2>
+			<LITERAL2>thu</LITERAL2>
+			<LITERAL2>friday</LITERAL2>
+			<LITERAL2>fri</LITERAL2>
+			<LITERAL2>saturday</LITERAL2>
+			<LITERAL2>sat</LITERAL2>
+			<LITERAL2>sunday</LITERAL2>
+			<LITERAL2>sun</LITERAL2>
+			
+			<LITERAL2>month</LITERAL2>
+			<LITERAL2>january</LITERAL2>
+			<LITERAL2>jan</LITERAL2>
+			<LITERAL2>february</LITERAL2>
+			<LITERAL2>feb</LITERAL2>
+			<LITERAL2>march</LITERAL2>
+			<LITERAL2>mar</LITERAL2>
+			<LITERAL2>april</LITERAL2>
+			<LITERAL2>apr</LITERAL2>
+			<LITERAL2>may</LITERAL2>
+			<LITERAL2>june</LITERAL2>
+			<LITERAL2>jun</LITERAL2>
+			<LITERAL2>july</LITERAL2>
+			<LITERAL2>jul</LITERAL2>
+			<LITERAL2>august</LITERAL2>
+			<LITERAL2>aug</LITERAL2>
+			<LITERAL2>september</LITERAL2>
+			<LITERAL2>sep</LITERAL2>
+			<LITERAL2>october</LITERAL2>
+			<LITERAL2>oct</LITERAL2>
+			<LITERAL2>november</LITERAL2>
+			<LITERAL2>nov</LITERAL2>
+			<LITERAL2>december</LITERAL2>
+			<LITERAL2>dec</LITERAL2>
+			
+			<LITERAL2>minutes</LITERAL2>
+			<LITERAL2>hours</LITERAL2>
+			<LITERAL2>days</LITERAL2>
+			<LITERAL2>weeks</LITERAL2>
+			
+		<!-- Operators -->
+			<OPERATOR>div</OPERATOR>
+			<OPERATOR>mod</OPERATOR>
+			<OPERATOR>and</OPERATOR>
+			<OPERATOR>not</OPERATOR>
+			<OPERATOR>or</OPERATOR>
+			<OPERATOR>as</OPERATOR>
+			<OPERATOR>contains</OPERATOR>
+			<OPERATOR>equal</OPERATOR>
+			<OPERATOR>equals</OPERATOR>
+			<OPERATOR>isn't</OPERATOR>
+		</KEYWORDS>
+	</RULES>
+</MODE>

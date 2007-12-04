@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="%" />
+		<PROPERTY NAME="wordBreakChars" VALUE="{}" />
+	</PROPS>
+	<RULES IGNORE_CASE="FALSE">
+		<!-- $$...$$ -->
+		<SPAN TYPE="MARKUP" DELEGATE="MATH">
+			<BEGIN>$$</BEGIN>
+			<END>$$</END>
+		</SPAN>
+
+		<!-- $...$ -->
+		<SPAN TYPE="MARKUP" DELEGATE="MATH">
+			<BEGIN>$</BEGIN>
+			<END>$</END>
+		</SPAN>
+
+		<!-- \[...\] (LaTeX math mode) -->
+		<SPAN TYPE="MARKUP" DELEGATE="MATH">
+			<BEGIN>\[</BEGIN>
+			<END>\]</END>
+		</SPAN>
+
+		<!-- some commands must be handled specially -->
+		<SEQ TYPE="KEYWORD1">\$</SEQ>
+		<SEQ TYPE="KEYWORD1">\\</SEQ>
+		<SEQ TYPE="KEYWORD1">\%</SEQ>
+
+		<!-- \iffalse ... \fi - a block comment -->
+                <SPAN TYPE="COMMENT1">
+                        <BEGIN>\iffalse</BEGIN>
+                        <END>\fi</END>
+                </SPAN>
+
+		<!-- \begin{verbatim} ... \end{verbatim} -->
+                <SPAN TYPE="KEYWORD1" DELEGATE="VERBATIM">
+                        <BEGIN>\begin{verbatim}</BEGIN>
+                        <END>\end{verbatim}</END>
+                </SPAN>
+
+		<!-- \verb|sometext| -->
+		<SPAN TYPE="KEYWORD1" DELEGATE="VERBATIM"
+			NO_LINE_BREAK="TRUE">
+                        <BEGIN>\verb|</BEGIN>
+                        <END>|</END>
+                </SPAN>
+		<!-- \... commands -->
+		<MARK_FOLLOWING TYPE="KEYWORD1">\</MARK_FOLLOWING>
+
+		<!-- comments -->
+		<EOL_SPAN TYPE="COMMENT1">%</EOL_SPAN>
+
+		<!-- word separators -->
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+	</RULES>
+
+	<RULES SET="MATH" DEFAULT="MARKUP">
+		<!-- some commands must be handled specially -->
+		<SEQ TYPE="KEYWORD3">\$</SEQ>
+		<SEQ TYPE="KEYWORD3">\\</SEQ>
+		<SEQ TYPE="KEYWORD3">\%</SEQ>
+
+		<!-- \... commands -->
+		<MARK_FOLLOWING TYPE="KEYWORD3">\</MARK_FOLLOWING>
+
+		<!-- word separators -->
+		<SEQ TYPE="KEYWORD2">)</SEQ>
+		<SEQ TYPE="KEYWORD2">(</SEQ>
+		<SEQ TYPE="KEYWORD2">{</SEQ>
+		<SEQ TYPE="KEYWORD2">}</SEQ>
+		<SEQ TYPE="KEYWORD2">[</SEQ>
+		<SEQ TYPE="KEYWORD2">]</SEQ>
+		<SEQ TYPE="KEYWORD2">=</SEQ>
+		<SEQ TYPE="KEYWORD2">!</SEQ>
+		<SEQ TYPE="KEYWORD2">+</SEQ>
+		<SEQ TYPE="KEYWORD2">-</SEQ>
+		<SEQ TYPE="KEYWORD2">/</SEQ>
+		<SEQ TYPE="KEYWORD2">*</SEQ>
+		<SEQ TYPE="KEYWORD2">&gt;</SEQ>
+		<SEQ TYPE="KEYWORD2">&lt;</SEQ>
+		<SEQ TYPE="KEYWORD2">&amp;</SEQ>
+		<SEQ TYPE="KEYWORD2">|</SEQ>
+		<SEQ TYPE="KEYWORD2">^</SEQ>
+		<SEQ TYPE="KEYWORD2">~</SEQ>
+		<SEQ TYPE="KEYWORD2">.</SEQ>
+		<SEQ TYPE="KEYWORD2">,</SEQ>
+		<SEQ TYPE="KEYWORD2">;</SEQ>
+		<SEQ TYPE="KEYWORD2">?</SEQ>
+		<SEQ TYPE="KEYWORD2">:</SEQ>
+		<SEQ TYPE="KEYWORD2">'</SEQ>
+		<SEQ TYPE="KEYWORD2">"</SEQ>
+		<SEQ TYPE="KEYWORD2">`</SEQ>
+
+		<!-- comments -->
+		<EOL_SPAN TYPE="COMMENT1">%</EOL_SPAN>
+	</RULES>
+
+	<RULES SET="VERBATIM" DEFAULT="NULL" />
+</MODE>

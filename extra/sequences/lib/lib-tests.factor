@@ -39,3 +39,6 @@ math.functions tools.test ;
 
 [ 2 ] [ V{ 10 20 30 } [ delete-random drop ] keep length ] unit-test
 [ V{ } [ delete-random drop ] keep length ] unit-test-fails
+
+[ { 1 9 25 } ] [ { 1 3 5 6 } [ sq ] [ even? ] map-until ] unit-test
+[ { 2 4 } ] [ { 2 4 1 3 } [ even? ] take-while ] unit-test
