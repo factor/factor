@@ -105,6 +105,7 @@ find_architecture() {
 	   i386) ARCH=x86;;
 	   i686) ARCH=x86;;
 	   *86) ARCH=x86;;
+	   *86_64) ARCH=x86;;
 	   "Power Macintosh") ARCH=ppc;;
 	esac
 }
@@ -142,6 +143,9 @@ echo_build_info() {
 
 set_build_info() {
 	if ! [[ -n $OS && -n $ARCH && -n $WORD ]] ; then
+		echo "OS: $OS"
+		echo "ARCH: $ARCH"
+		echo "WORD: $WORD"
 		echo "OS, ARCH, or WORD is empty.  Please report this"
 		exit 5
 	fi
@@ -170,6 +174,7 @@ git_clone() {
 }
 
 git_pull_factorcode() {
+	echo "Updating the git repository from factorcode.org..."
 	git pull git://factorcode.org/git/factor.git
 	check_ret git
 }
@@ -216,7 +221,7 @@ bootstrap() {
 }
 
 usage() {
-	echo "usage: $0 install|update"
+	echo "usage: $0 install|install-x11|update"
 }
 
 install() {
@@ -244,8 +249,13 @@ update() {
 	bootstrap
 }
 
+install_libraries() {
+	sudo apt-get install libc6-dev libfreetype6-dev wget git-core git-doc libx11-dev glutg3-dev
+}
+
 case "$1" in
 	install) install ;;
+	install-x11) install_libraries; install ;;
 	update) update ;;
 	*) usage ;;
 esac
