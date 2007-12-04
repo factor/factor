@@ -1,4 +1,4 @@
-USING: assocs html.parser html.utils combinators
+USING: assocs html.parser html.parser.utils combinators
 continuations hashtables
 hashtables.private io kernel math
 namespaces prettyprint quotations sequences splitting
