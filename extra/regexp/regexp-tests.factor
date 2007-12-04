@@ -160,3 +160,15 @@ IN: regexp-tests
 [ f ] [ "y" "\\x78" matches? ] unit-test
 [ t ] [ "x" "\\u0078" matches? ] unit-test
 [ f ] [ "y" "\\u0078" matches? ] unit-test
+
+[ t ] [ "ab" "a+b" matches? ] unit-test
+[ f ] [ "b" "a+b" matches? ] unit-test
+[ t ] [ "aab" "a+b" matches? ] unit-test
+[ f ] [ "abb" "a+b" matches? ] unit-test
+
+[ t ] [ "abbbb" "ab*" matches? ] unit-test
+[ t ] [ "a" "ab*" matches? ] unit-test
+[ f ] [ "abab" "ab*" matches? ] unit-test
+
+[ f ] [ "x" "\\." matches? ] unit-test
+[ t ] [ "." "\\." matches? ] unit-test

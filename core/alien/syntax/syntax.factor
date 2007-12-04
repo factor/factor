@@ -59,4 +59,4 @@ M: alien pprint*
         { [ t ] [ \ ALIEN: [ alien-address pprint* ] pprint-prefix ] }
     } cond ;
 
-M: dll pprint* dll-path dup "DLL\" " pprint-string ;
+M: dll pprint* dll-path dup "DLL\" " "\"" pprint-string ;
