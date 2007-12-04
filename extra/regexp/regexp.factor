@@ -2,6 +2,7 @@ USING: arrays combinators kernel lazy-lists math math.parser
 namespaces parser parser-combinators parser-combinators.simple
 promises quotations sequences combinators.lib strings macros
 assocs prettyprint.backend ;
+USE: io
 IN: regexp
 
 : or-predicates ( quots -- quot )
@@ -158,16 +159,26 @@ C: <group-result> group-result
     'char' <|>
     'character-class' <|> ;
 
-: 'interval' ( -- parser )
+: 'greedy-interval' ( -- parser )
     'simple' 'integer' "{" "}" surrounded-by <&> [ first2 exactly-n ] <@
     'simple' 'integer' "{" ",}" surrounded-by <&> [ first2 at-least-n ] <@ <|>
     'simple' 'integer' "{," "}" surrounded-by <&> [ first2 at-most-n ] <@ <|>
     'simple' 'integer' "," token <& 'integer' <&> "{" "}" surrounded-by <&> [ first2 first2 from-m-to-n ] <@ <|> ;
 
-: 'repetition' ( -- parser )
+: 'interval' ( -- parser )
+    'greedy-interval'
+    'greedy-interval' "?" token <& [ "reluctant {}" print ] <@ <|>
+    'greedy-interval' "+" token <& [ "possessive {}" print ] <@ <|> ;
+
+: 'greedy-repetition' ( -- parser )
     'simple' "*" token <& [ <*> ] <@
     'simple' "+" token <& [ <+> ] <@ <|>
     'simple' "?" token <& [ <?> ] <@ <|> ;
+
+: 'repetition' ( -- parser )
+    'greedy-repetition'
+    'greedy-repetition' "?" token <& [ "reluctant" print ] <@ <|>
+    'greedy-repetition' "+" token <& [ "possessive" print ] <@ <|> ;
 
 : 'term' ( -- parser )
     'simple' 'repetition' 'interval' <|> <|>
