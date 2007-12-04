@@ -89,19 +89,20 @@ M: f pprint* drop \ f pprint-word ;
         { 0.3 0.3 0.3 1.0 } foreground set
     ] H{ } make-assoc ;
 
-: unparse-string ( str prefix -- str )
-    [
-        % do-string-limit [ unparse-ch ] each CHAR: " ,
-    ] "" make ;
+: unparse-string ( str prefix suffix -- str )
+    [ >r % do-string-limit [ unparse-ch ] each r> % ] "" make ;
 
-: pprint-string ( obj str prefix -- )
+: pprint-string ( obj str prefix suffix -- )
     unparse-string swap string-style styled-text ;
 
-M: string pprint* dup "\"" pprint-string ;
+M: string pprint*
+    dup "\"" "\"" pprint-string ;
 
-M: sbuf pprint* dup "SBUF\" " pprint-string ;
+M: sbuf pprint*
+    dup "SBUF\" " "\"" pprint-string ;
 
-M: pathname pprint* dup pathname-string "P\" " pprint-string ;
+M: pathname pprint*
+    dup pathname-string "P\" " "\"" pprint-string ;
 
 ! Sequences
 : nesting-limit? ( -- ? )
