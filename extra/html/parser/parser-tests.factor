@@ -1,4 +1,4 @@
-USING: browser.parser kernel tools.test ;
+USING: html.parser kernel tools.test ;
 IN: temporary
 
 [

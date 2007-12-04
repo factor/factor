@@ -1,5 +1,5 @@
-USING: assocs http.parser kernel math sequences strings ;
-IN: http.parser.analyzer
+USING: assocs html.parser kernel math sequences strings ;
+IN: html.parser.analyzer
 
 : remove-blank-text ( vector -- vector' )
     [
@@ -87,5 +87,5 @@ IN: http.parser.analyzer
 ! clear "/Users/erg/web/hostels.html" <file-reader> contents parse-html "Currency" "name" pick find-first-attribute-key-value
 
 ! clear "/Users/erg/web/hostels.html" <file-reader> contents parse-html
-! "Currency" "name" pick find-first-attribute-key-value 
+! "Currency" "name" pick find-first-attribute-key-value
 ! pick find-between remove-blank-text

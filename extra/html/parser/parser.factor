@@ -1,7 +1,7 @@
-USING: arrays http.parser.utils hashtables io kernel
+USING: arrays html.parser.utils hashtables io kernel
 namespaces prettyprint quotations
 sequences splitting state-parser strings ;
-IN: http.parser
+IN: html.parser
 
 TUPLE: tag name attributes text matched? closing? ;
 
@@ -120,7 +120,7 @@ SYMBOL: tagstack
     ] unless ;
 
 : parse-attributes ( -- hashtable )
-    [ (parse-attributes) ] { } make >hashtable ; 
+    [ (parse-attributes) ] { } make >hashtable ;
 
 : (parse-tag)
     [
