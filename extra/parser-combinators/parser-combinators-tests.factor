@@ -149,9 +149,3 @@ IN: scratchpad
 { { } } [
   "234" "1" token <+> parse list>array
 ] unit-test
-
-
-[ "a"  "a" token <!> parse-1 ] unit-test-fails
-[ t ] [ "b"  "a" token <!> parse-1 >boolean ] unit-test
-[ t ] [ "b"  "ab" token <!> parse-1 >boolean ] unit-test
-
