@@ -10,9 +10,9 @@ s64 current_millis(void)
 
 DEFINE_PRIMITIVE(cwd)
 {
-	F_CHAR buf[MAX_PATH + 4];
+	F_CHAR buf[MAX_UNICODE_PATH];
 
-	if(!GetCurrentDirectory(MAX_PATH + 4, buf))
+	if(!GetCurrentDirectory(MAX_UNICODE_PATH, buf))
 		io_error();
 
 	box_u16_string(buf);
