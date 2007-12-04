@@ -25,10 +25,7 @@ IN: xml.generator
 : make-xml ( name quot -- xml )
     f swap make-xml* ; inline
 
-SYMBOL: namespace-table
-: with-namespaces ( table quot -- )
-    >r H{ } assoc-like namespace-table r> with-variable ; inline
-
+! Word-based XML literal syntax
 : parsed-name ( accum -- accum )
     scan ":" split1 [ f <name> ] [ <name-tag> ] if* parsed ;
 
