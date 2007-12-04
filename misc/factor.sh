@@ -32,12 +32,16 @@ check_ret() {
 }
 
 check_gcc_version() {
+	echo -n "Checking gcc version..."
 	GCC_VERSION=`gcc --version`
+	check_ret gcc
 	if [[ $GCC_VERSION == *3.3.* ]] ; then
+		echo "bad!"
 		echo "You have a known buggy version of gcc (3.3)"
 		echo "Install gcc 3.4 or higher and try again."
 		exit 3
 	fi
+	echo "ok."
 }
 
 check_installed_programs() {
@@ -53,16 +57,20 @@ check_installed_programs() {
 check_library_exists() {
 	GCC_TEST=factor-library-test.c
 	GCC_OUT=factor-library-test.out
-	echo "Checking for library $1"
+	echo -n "Checking for library $1"
 	echo "int main(){return 0;}" > $GCC_TEST
 	gcc $GCC_TEST -o $GCC_OUT -l $1
 	if [[ $? -ne 0 ]] ; then
+		echo "not found!"
 		echo "Warning: library $1 not found."
 		echo "***Factor will compile NO_UI=1"
 		NO_UI=1
 	fi
 	rm -f $GCC_TEST
+	check_ret rm
 	rm -f $GCC_OUT
+	check_ret rm
+	echo "found."
 }
 
 check_X11_libraries() {
@@ -87,7 +95,9 @@ check_factor_exists() {
 }
 
 find_os() {
+	echo "Finding OS..."
 	uname_s=`uname -s`
+	check_ret uname
 	case $uname_s in
 		CYGWIN_NT-5.2-WOW64) OS=windows-nt;;
 		*CYGWIN_NT*) OS=windows-nt;;
@@ -100,7 +110,9 @@ find_os() {
 }
 
 find_architecture() {
+	echo "Finding ARCH..."
 	uname_m=`uname -m`
+	check_ret uname
 	case $uname_m in
 	   i386) ARCH=x86;;
 	   i686) ARCH=x86;;
@@ -116,6 +128,7 @@ write_test_program() {
 }
 
 find_word_size() {
+	echo "Finding WORD..."
 	C_WORD=factor-word-size
 	write_test_program
 	gcc -o $C_WORD $C_WORD.c
@@ -208,11 +221,11 @@ get_boot_image() {
 maybe_download_dlls() {
 	if [[ $OS == windows-nt ]] ; then
 		wget http://factorcode.org/dlls/freetype6.dll
-		check_ret
+		check_ret wget
 		wget http://factorcode.org/dlls/zlib1.dll
-		check_ret
+		check_ret wget
 		chmod 777 *.dll
-		check_ret
+		check_ret chmod
 	fi
 }
 
@@ -253,7 +266,7 @@ update_bootstrap() {
 }
 
 refresh_image() {
-	./factor-nt -e="refresh-all save 0 USE: system exit"
+	./$FACTOR_BINARY -e="refresh-all save 0 USE: system exit"
 }
 
 install_libraries() {
@@ -263,7 +276,7 @@ install_libraries() {
 case "$1" in
 	install) install ;;
 	install-x11) install_libraries; install ;;
-	quick-update) update; refresh_image;;
+	quick-update) update; refresh_image ;;
 	update) update; update_bootstrap ;;
 	*) usage ;;
 esac
