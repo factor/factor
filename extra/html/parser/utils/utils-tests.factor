@@ -2,7 +2,7 @@ USING: assocs combinators continuations hashtables
 hashtables.private io kernel math
 namespaces prettyprint quotations sequences splitting
 state-parser strings tools.test ;
-USING: browser.utils ;
+USING: html.utils ;
 IN: temporary
 
 [ "'Rome'" ] [ "Rome" single-quote ] unit-test
