@@ -67,6 +67,12 @@ MACRO: napply ( n -- )
 
 : map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
 
+MACRO: nfirst ( n -- )
+    [ [ swap nth ] curry [ keep ] curry ] map concat [ drop ] compose ;
+
+: seq>stack ( seq -- )
+    dup length nfirst ; inline
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : sigma ( seq quot -- n ) [ rot slip + ] curry 0 swap reduce ;

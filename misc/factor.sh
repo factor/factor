@@ -250,7 +250,7 @@ update() {
 }
 
 install_libraries() {
-	sudo apt-get install libc6-dev libfreetype6-dev wget git-core git-doc libx11-dev glutg3-dev
+	sudo apt-get install libc6-dev libfreetype6-dev wget git-core git-doc libx11-dev glutg3-dev rlwrap
 }
 
 case "$1" in
