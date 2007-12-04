@@ -221,7 +221,7 @@ bootstrap() {
 }
 
 usage() {
-	echo "usage: $0 install|install-x11|update"
+	echo "usage: $0 install|install-x11|update|quick-update"
 }
 
 install() {
@@ -244,9 +244,16 @@ update() {
 	git_pull_factorcode
 	make_clean
 	make_factor
+}
+
+update_bootstrap() {
 	delete_boot_images
 	get_boot_image
 	bootstrap
+}
+
+refresh_image() {
+	./factor-nt -e="refresh-all save 0 USE: system exit"
 }
 
 install_libraries() {
@@ -256,6 +263,7 @@ install_libraries() {
 case "$1" in
 	install) install ;;
 	install-x11) install_libraries; install ;;
-	update) update ;;
+	quick-update) update; refresh_image;;
+	update) update; update_bootstrap ;;
 	*) usage ;;
 esac
