@@ -1,9 +1,9 @@
-USING: assocs http.parser browser.utils combinators
+USING: assocs html.parser html.parser.utils combinators
 continuations hashtables
 hashtables.private io kernel math
 namespaces prettyprint quotations sequences splitting
 state-parser strings ;
-IN: http.parser.printer
+IN: html.parser.printer
 
 SYMBOL: no-section
 SYMBOL: html
@@ -42,7 +42,7 @@ HOOK: print-closing-named-tag printer ( tag -- )
 M: printer print-text-tag ( tag -- )
     tag-text write ;
 
-M: printer print-comment-tag ( tag -- ) 
+M: printer print-comment-tag ( tag -- )
     "<!--" write
     tag-text write
     "-->" write ;
@@ -67,7 +67,6 @@ M: printer print-closing-named-tag ( tag -- )
     [
         swap bl write "=" write ?quote write
     ] assoc-each ;
-        
 
 M: src-printer print-opening-named-tag ( tag -- )
     "<" write
@@ -102,7 +101,7 @@ SYMBOL: tablestack
     [
         V{ } clone tablestack set
     ] with-scope ;
-    
+
 ! { { 1 2 } { 3 4 } }
 ! H{ { table-gap { 10 10 } } } [
     ! [ [ [ [ . ] with-cell ] each ] with-row ] each
