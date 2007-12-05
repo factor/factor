@@ -4,7 +4,7 @@ IN: editors.wordpad
 
 : wordpad ( file line -- )
     [
-        \ wordpad get-global % drop " " % %
+        \ wordpad get-global % drop " " % "\"" % % "\"" %
     ] "" make run-detached ;
 
 program-files "\\Windows NT\\Accessories\\wordpad.exe" append
