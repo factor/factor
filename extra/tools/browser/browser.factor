@@ -303,10 +303,6 @@ C: <vocab-author> vocab-author
     "Authors" $heading
     all-authors authors. ;
 
-ARTICLE: "vocab-index" "Vocabulary index"
-{ $tags,authors }
-{ $describe-vocab "" } ;
-
 M: vocab-spec article-title vocab-name " vocabulary" append ;
 
 M: vocab-spec article-name vocab-name ;

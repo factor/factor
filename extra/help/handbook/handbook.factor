@@ -1,7 +1,7 @@
 USING: help help.markup help.syntax help.topics
 namespaces words sequences classes assocs vocabs kernel
 arrays prettyprint.backend kernel.private io tools.browser
-generic ;
+generic math tools.profiler system ui ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -222,6 +222,67 @@ ARTICLE: "handbook" "Factor documentation"
 USING: io.files io.sockets float-arrays inference ;
 
 ARTICLE: "changes" "Changes in the latest release"
+{ $heading "Factor 0.91" }
+{ $subheading "Performance" }
+{ $list
+    { "Continuations are now supported by the static stack effect system. This means that the " { $link infer } " word and the optimizing compiler now both support code which uses continuations." }
+    { "Many words which previously ran in the interpreter, such as error handling and I/O, are now compiled to optimized machine code." }
+    { "A non-optimizing, just-in-time compiler replaces the interpreter with no loss in functionality or introspective ability." }
+    { "The non-optimizing compiler compiles quotations the first time they are called, generating a series of stack pushes and subroutine calls. It offers a 33%-50% performance increase over the interpreter." }
+    { "The optimizing compiler now performs some more representation inference. Alien pointers are unboxed where possible. This improves performance of the " { $vocab-link "ogg.player" } " Ogg Theora video player." }
+    { "The queue of sleeping tasks is now a sorted priority queue. This reduces overhead for workloads involving large numbers of sleeping threads (Doug Coleman)" }
+    { "Improved hash code algorithm for sequences" }
+    { "New, efficient implementations of " { $link bit? } " and " { $link log2 } " runs in constant time for large bignums" }
+    { "New " { $link big-random } " word for generating large random numbers quickly" }
+    { "Improved profiler no longer has to be explicitly enabled and disabled with a full recompile; instead, the " { $link profile } " word can be used at any time, and it dynamically patches words to increment call counts. There is no overhead when the profiler is not in use." }
+}
+{ $subheading "IO" }
+{ $list
+    { "More robust Windows CE native I/O" }
+    { "New " { $link os-envs } " word to get the current set of environment variables" }
+    { "Redesigned " { $vocab-link "io.launcher" } " supports passing environment variables to the child process" }
+    { { $link <process-stream> } " implemented on Windows (Doug Coleman)" }
+    { "Updated " { $vocab-link "io.mmap" } " for new module system, now supports Windows CE (Doug Coleman)" }
+    { { $vocab-link "io.sniffer" } " - packet sniffer library (Doug Coleman, Elie Chaftari)" }
+    { { $vocab-link "io.server" } " - improved logging support, logs to a file by default" }
+    { { $vocab-link "io.files" } " - several new file system manipulation words added" }
+    { { $vocab-link "tar" } " - tar file extraction in pure Factor (Doug Coleman)" }
+    { { $vocab-link "unix.linux" } ", " { $vocab-link "raptor" } " - ``Raptor Linux'', a set of alien bindings to low-level Linux features, such as network interface configuration, file system mounting/unmounting, etc, together with experimental boot scripts intended to entirely replace " { $snippet "/sbin/init" } ", " { $vocab-link "/etc/inittab" } " and " { $snippet "/etc/init.d/" } " (Eduardo Cavazos)." }
+}
+{ $subheading "Tools" }
+{ $list
+    { "Graphical deploy tool added - see " { $link "ui.tools.deploy" } }
+    { "The deploy tool now supports Windows" }
+    { { $vocab-link "network-clipboard" } " - clipboard synchronization with a simple TCP/IP protocol" }
+}
+{ $subheading "UI" }
+{ $list
+    { { $vocab-link "cairo" } " - updated for new module system, new features (Sampo Vuori)" }
+    { { $vocab-link "springies" } " - physics simulation UI demo (Eduardo Cavazos)" }
+    { { $vocab-link "ui.gadgets.buttons" } " - added check box and radio button gadgets" }
+    { "Double- and triple-click-drag now supported in the editor gadget to select words or lines at a time" }
+    { "Windows can be closed on request now using " { $link close-window } }
+    { "New icons (Elie Chaftari)" }
+}
+{ $subheading "Other" }
+{ $list
+    { "The " { $snippet "queues" } " vocabulary has been removed because its functionality is a subset of " { $vocab-link "dlists" } }
+    { "The " { $vocab-link "webapps.cgi" } " vocabulary implements CGI support for the Factor HTTP server." }
+    { "The optimizing compiler no longer depends on the number tower and it is possible to bootstrap a minimal image by just passing " { $snippet "-include=compiler" } " to stage 2 bootstrap." }
+    { { $vocab-link "benchmark.knucleotide" } " - new benchmark (Eric Mertens)" }
+    { { $vocab-link "channels" } " - concurrent message passing over message channels" }
+    { { $vocab-link "destructors" } " - deterministic scope-based resource deallocation (Doug Coleman)" }
+    { { $vocab-link "dlists" } " - various updates (Doug Coleman)" }
+    { { $vocab-link "editors.emeditor" } " - EmEditor integration (Doug Coleman)" }
+    { { $vocab-link "editors.editplus" } " - EditPlus integration (Aaron Schaefer)" }
+    { { $vocab-link "editors.notepadpp" } " - Notepad++ integration (Doug Coleman)" }
+    { { $vocab-link "editors.ted-notepad" } " - TED Notepad integration (Doug Coleman)" }
+    { { $vocab-link "editors.ultraedit" } " - UltraEdit integration (Doug Coleman)" }
+    { { $vocab-link "heaps" } " - updated for new module system and cleaned up (Doug Coleman)" }
+    { { $vocab-link "peg" } " - Parser Expression Grammars, a new appoach to parser construction, similar to parser combinators (Chris Double)" }
+    { { $vocab-link "regexp" } " - revived from " { $snippet "unmaintained/" } " and completely redesigned (Doug Coleman)" }
+    { { $vocab-link "tuple.lib" } " - some utility words for working with tuples (Doug Coleman)" }
+}
 { $heading "Factor 0.90" }
 { $subheading "Core" }
 { $list
@@ -249,7 +310,7 @@ ARTICLE: "changes" "Changes in the latest release"
 "Most existing libraries were improved when ported to the new module system; the most notable changes include:"
 { $list
     { { $vocab-link "asn1" } ": ASN1 parser and writer. (Elie Chaftari)" }
-    { { $vocab-link "benchmarks" } ": new set of benchmarks." }
+    { { $vocab-link "benchmark" } ": new set of benchmarks." }
     { { $vocab-link "cfdg" } ": Context-free design grammar implementation; see " { $url "http://www.chriscoyne.com/cfdg/" } ". (Eduardo Cavazos)" }
     { { $vocab-link "cryptlib" } ": Cryptlib library binding. (Elie Chaftari)" }
     { { $vocab-link "cryptlib.streams" } ": Streams which perform SSL encryption and decryption. (Matthew Willis)" }

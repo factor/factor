@@ -257,14 +257,12 @@ M: windows-ui-backend (close-window)
 : prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
     nip >r mouse-event>gesture r> >lo-hi rot window ;
 
-: mouse-captured? ( -- ? )
-    mouse-captured get ;
-
 : set-capture ( hwnd -- )
     mouse-captured get [
         drop
     ] [
-        [ SetCapture drop ] keep mouse-captured set
+        [ SetCapture drop ] keep
+        mouse-captured set
     ] if ;
 
 : release-capture ( -- )
@@ -276,7 +274,7 @@ M: windows-ui-backend (close-window)
     prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
-    mouse-captured? [ release-capture ] when
+    mouse-captured get [ release-capture ] when
     prepare-mouse send-button-up ;
 
 : make-TRACKMOUSEEVENT ( hWnd -- alien )
@@ -434,7 +432,7 @@ M: windows-ui-backend flush-gl-context ( handle -- )
 ! Move window to front
 M: windows-ui-backend raise-window ( world -- )
     world-handle [
-        win-hWnd SetFocus drop release-capture
+        win-hWnd SetFocus drop
     ] when* ;
 
 M: windows-ui-backend set-title ( string world -- )

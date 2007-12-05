@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- fhtml (factor+html) mode -->
+
+<MODE>
+        <PROPS>
+                <PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+                <PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+                <PROPERTY NAME="commentStart" VALUE="&lt;%#" />
+                <PROPERTY NAME="commentEnd" VALUE="%&gt;" />
+                <PROPERTY NAME="tabSize" VALUE="4" />
+                <PROPERTY NAME="noTabs" VALUE="true" />
+        </PROPS>
+        <RULES IGNORE_CASE="TRUE">
+                <SPAN TYPE="MARKUP" DELEGATE="factor::MAIN">
+                        <BEGIN>&lt;%</BEGIN>
+                        <END>%&gt;</END>
+                </SPAN>
+
+                <IMPORT DELEGATE="html::MAIN" />
+        </RULES>
+</MODE>
+

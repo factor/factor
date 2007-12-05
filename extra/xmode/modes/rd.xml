@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd"> 
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<KEYWORDS>
+			<KEYWORD1>\name</KEYWORD1>
+			<KEYWORD1>\alias</KEYWORD1>
+			<KEYWORD1>\title</KEYWORD1>
+			<KEYWORD1>\description</KEYWORD1>
+			<KEYWORD1>\synopsis</KEYWORD1>
+			<KEYWORD1>\usage</KEYWORD1>
+			<KEYWORD1>\arguments</KEYWORD1>
+			<KEYWORD1>\details</KEYWORD1>
+			<KEYWORD1>\value</KEYWORD1>
+			<KEYWORD1>\references</KEYWORD1>
+			<KEYWORD1>\note</KEYWORD1>
+			<KEYWORD1>\author</KEYWORD1>
+			<KEYWORD1>\seealso</KEYWORD1>
+			<KEYWORD1>\examples</KEYWORD1>
+			<KEYWORD1>\keyword</KEYWORD1>
+			<KEYWORD2>\itemize</KEYWORD2>
+			<KEYWORD2>\method</KEYWORD2>
+			<KEYWORD2>\docType</KEYWORD2>
+			<KEYWORD2>\format</KEYWORD2>
+			<KEYWORD2>\source</KEYWORD2>
+			<KEYWORD2>\itemize</KEYWORD2>
+			<KEYWORD2>\section</KEYWORD2>
+			<KEYWORD2>\enumerate</KEYWORD2>
+			<KEYWORD2>\describe</KEYWORD2>
+			<KEYWORD2>\tabular</KEYWORD2>
+			<KEYWORD2>\link</KEYWORD2>
+			<KEYWORD2>\item</KEYWORD2>
+			<KEYWORD2>\eqn</KEYWORD2>
+			<KEYWORD2>\deqn</KEYWORD2>
+			<KEYWORD2>\concept</KEYWORD2>
+			<KEYWORD3>\emph</KEYWORD3>
+			<KEYWORD3>\strong</KEYWORD3>
+			<KEYWORD3>\bold</KEYWORD3>
+			<KEYWORD3>\sQuote</KEYWORD3>
+			<KEYWORD3>\dQuote</KEYWORD3>
+			<KEYWORD3>\code</KEYWORD3>
+			<KEYWORD3>\preformatted</KEYWORD3>
+			<KEYWORD3>\kbd</KEYWORD3>
+			<KEYWORD3>\samp</KEYWORD3>
+			<KEYWORD3>\pkg</KEYWORD3>
+			<KEYWORD3>\file</KEYWORD3>
+			<KEYWORD3>\email</KEYWORD3>
+			<KEYWORD3>\url</KEYWORD3>
+			<KEYWORD3>\var</KEYWORD3>
+			<KEYWORD3>\env</KEYWORD3>
+			<KEYWORD3>\option</KEYWORD3>
+			<KEYWORD3>\command</KEYWORD3>
+			<KEYWORD3>\dfn</KEYWORD3>
+			<KEYWORD3>\cite</KEYWORD3>
+			<KEYWORD3>\acronym</KEYWORD3>
+			<KEYWORD3>\tab</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+</MODE>

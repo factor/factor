@@ -1,0 +1,732 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="#" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="indentNextLine" VALUE="[^#]*\.\s*$" />
+	</PROPS>
+
+	<!-- no ESCAPE char because we need the backslash for references -->
+	<RULES HIGHLIGHT_DIGITS="TRUE" IGNORE_CASE="FALSE">
+		<!-- Comments -->
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+
+		<!-- TYPE is LABEL so that =head1 and =cut are highlighted as so -->
+		<SPAN TYPE="LABEL" DELEGATE="POD" AT_LINE_START="TRUE">
+			<BEGIN>=head1</BEGIN>
+			<END>=cut</END>
+		</SPAN>
+		<SPAN AT_LINE_START="TRUE" TYPE="LABEL" DELEGATE="POD">
+			<BEGIN>=head2</BEGIN>
+			<END>=cut</END>
+		</SPAN>
+        <SPAN TYPE="LABEL" DELEGATE="POD" AT_LINE_START="TRUE">
+			<BEGIN>=head3</BEGIN>
+			<END>=cut</END>
+		</SPAN>
+		<SPAN  AT_LINE_START="TRUE" TYPE="LABEL" DELEGATE="POD">
+			<BEGIN>=head4</BEGIN>
+			<END>=cut</END>
+		</SPAN>
+		<SPAN TYPE="LABEL"  AT_LINE_START="TRUE" DELEGATE="POD">
+			<BEGIN>=item</BEGIN>
+			<END>=cut</END>
+		</SPAN>
+		<SPAN  AT_LINE_START="TRUE" TYPE="LABEL" DELEGATE="POD">
+			<BEGIN>=over</BEGIN>
+			<END>=cut</END>
+		</SPAN>
+		<SPAN TYPE="LABEL" DELEGATE="POD" AT_LINE_START="TRUE">
+			<BEGIN>=back</BEGIN>
+			<END>=cut</END>
+		</SPAN>
+		<SPAN AT_LINE_START="TRUE" TYPE="LABEL" DELEGATE="POD">
+			<BEGIN>=pod</BEGIN>
+			<END>=cut</END>
+		</SPAN>
+		<SPAN TYPE="LABEL" DELEGATE="POD"  AT_LINE_START="TRUE">
+			<BEGIN>=for</BEGIN>
+			<END>=cut</END>
+		</SPAN>
+		<SPAN TYPE="LABEL" DELEGATE="POD" AT_LINE_START="TRUE">
+			<BEGIN>=begin</BEGIN>
+			<END>=cut</END>
+		</SPAN>
+		<SPAN AT_LINE_START="TRUE" TYPE="LABEL" DELEGATE="POD">
+			<BEGIN>=end</BEGIN>
+			<END>=cut</END>
+		</SPAN>
+
+		<!-- Some other things that confuse the mode file. -->
+		<SEQ TYPE="OPERATOR">*"</SEQ>
+		<SEQ TYPE="OPERATOR">*'</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;"</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;'</SEQ>
+
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<!-- Scalar variables -->
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD2">\$#?((\p{Alpha}\w*|_\w+)?::)*(\p{Alpha}\w*|_\w+|\d+)</SEQ_REGEXP>
+
+		<!-- Array variables -->
+		<SEQ_REGEXP HASH_CHAR="@" TYPE="KEYWORD2">@((\p{Alpha}\w*|_\w+)?::)*(\p{Alpha}\w*|_\w+|\d+)</SEQ_REGEXP>
+
+		<!-- Associative Array (= Hash) variables -->
+		<SEQ_REGEXP HASH_CHAR="%" TYPE="KEYWORD2">%((\p{Alpha}\w*|_\w+)?::)*(\p{Alpha}\w*|_\w+|\d+)</SEQ_REGEXP>
+
+		<!-- Dereferences -->
+		<SEQ_REGEXP HASH_CHAR="$$" TYPE="KEYWORD4">\$\$+((\p{Alpha}\w*|_\w+)?::)*(\p{Alpha}\w*|_\w+|\d+)</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="@$" TYPE="KEYWORD4">@\$((\p{Alpha}\w*|_\w+)?::)*(\p{Alpha}\w*|_\w+|\d+)</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="%$" TYPE="KEYWORD4">%\$((\p{Alpha}\w*|_\w+)?::)*(\p{Alpha}\w*|_\w+|\d+)</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="*" TYPE="KEYWORD4">\*((\p{Alpha}\w*|_\w+)?::)*(\p{Alpha}\w*|_\w+|\d+)</SEQ_REGEXP>
+
+		<!-- Perl predefined variables -->
+		<SEQ_REGEXP HASH_CHAR="$^" TYPE="KEYWORD2">\$\^\p{Alpha}</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD2">\$\p{Punct}</SEQ_REGEXP>
+
+		<!-- references to vars and code, starting with a backslash -->
+		<SEQ_REGEXP HASH_CHAR="\" TYPE="KEYWORD4">\\[@%\$&amp;]((\p{Alpha}\w*|_\w+)?::)*(\p{Alpha}\w*|_\w+|\d+)</SEQ_REGEXP>
+
+		<!-- complex code dereference -->
+		<SPAN TYPE="KEYWORD4" NO_LINE_BREAK="TRUE" DELEGATE="MAIN">
+			<BEGIN>&amp;{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<!-- Function calls from variables -->
+		<SEQ_REGEXP HASH_CHAR="&amp;$" TYPE="FUNCTION">&amp;\$((\p{Alpha}\w*|_\w+)?::)*(\p{Alpha}\w*|_\w+|\d+)</SEQ_REGEXP>
+
+		<!-- Special handling for subs, since they can have a ' in the name;
+			 try to do highlight as well as possible - this version will
+			 highlight both 'sub' and the opening '{' as KEYWORD1, so the
+			 opening bracket will be different than other brackets. -->
+		<SPAN_REGEXP HASH_CHAR="sub" TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="SUB_NAME">
+			<BEGIN>sub\s</BEGIN>
+			<END>{</END>
+		</SPAN_REGEXP>
+
+		<!-- Highlight calls to subs that contain ' in the name. -->
+		<SEQ_REGEXP HASH_CHAR="&amp;" TYPE="FUNCTION"
+		>&amp;\p{Alpha}[\p{Alnum}_]*'\p{Alpha}[\p{Alnum}_]*</SEQ_REGEXP>
+
+		<!-- Literals -->
+		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- apostroph literals -->
+		<SPAN TYPE="LITERAL1" DELEGATE="APOSTR">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<!-- options: -text -->
+		<SEQ_REGEXP HASH_CHAR="-" TYPE="LITERAL1">-[\p{Lower}]\w+</SEQ_REGEXP>
+
+		<!-- file stat expressions -->
+		<SEQ_REGEXP HASH_CHAR="-" TYPE="KEYWORD3">-[\p{Lower}]</SEQ_REGEXP>
+
+		<!-- non-quoted literals in hashes -->
+		<SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR="{" NO_LINE_BREAK="TRUE" DELEGATE="LITERAL">
+			<BEGIN>\{(?=\s*[\p{Alpha}_\-][\p{Alnum}_]*\s*\})</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
+
+		<!-- Code blocks. This is a hack to correctly highlight some
+			 complex expressions that can have arbitrary perl code
+			 inside brackets (like array deferences below). Declaring
+			 this *before* the other rules is needed to maintain
+			 correct bracket matching.
+		-->
+		<SPAN TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="MAIN">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<!-- Array dereference -->
+		<SPAN TYPE="KEYWORD4" NO_LINE_BREAK="TRUE" DELEGATE="MAIN">
+			<BEGIN>@{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<!-- Hash dereference -->
+		<SPAN TYPE="KEYWORD4" NO_LINE_BREAK="TRUE" DELEGATE="MAIN">
+			<BEGIN>%{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<!-- labels, catches also package prefixes at line start :( -->
+		<MARK_PREVIOUS TYPE="LABEL" AT_LINE_START="TRUE" MATCH_TYPE="OPERATOR">:</MARK_PREVIOUS>
+
+		<!-- __DATA__ and similar -->
+		<SEQ_REGEXP HASH_CHAR="__" TYPE="KEYWORD4">__\w+__</SEQ_REGEXP>
+
+		<!-- Exec -->
+		<SPAN TYPE="KEYWORD3" DELEGATE="EXEC">
+			<BEGIN>`</BEGIN>
+			<END>`</END>
+		</SPAN>
+
+		<!-- file globs / IO operators -->
+		<SEQ_REGEXP HASH_CHAR="&lt;" TYPE="KEYWORD4">&lt;[\p{Punct}\p{Alnum}_]*&gt;</SEQ_REGEXP>
+
+		<!-- Heredoc -->
+		<SPAN_REGEXP HASH_CHAR="&lt;&lt;" TYPE="LITERAL2" DELEGATE="LITERAL">
+		<BEGIN><![CDATA[<<\p{Space}*(['"])([\p{Space}\p{Alnum}_]*)\1;?\s*]]></BEGIN>
+		<END>$2</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="&lt;&lt;" TYPE="LITERAL2" DELEGATE="LITERAL">
+		<BEGIN><![CDATA[<<([\p{Alpha}_][\p{Alnum}_]*);?\s*]]></BEGIN>
+		<END>$1</END>
+		</SPAN_REGEXP>
+
+		<!-- jEdit 4.1 adds regular expression syntax rules so we can
+		     highlight this sort of crap. -->
+
+		<!-- /Regexp/, avoid confusion with a sequence of two divisions! -->
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="/"
+			AT_WORD_START="TRUE">/.*?[^\\]/[cgimosx]*(?!\s*[\d\$\@\(\-])</SEQ_REGEXP>
+
+        <!-- q//, qq//, qr//, qx// -->
+		<SPAN_REGEXP HASH_CHAR="q"
+					 TYPE="MARKUP"
+					 MATCH_TYPE="OPERATOR"
+					 DELEGATE="QUOTED"
+					 AT_WORD_START="TRUE"
+					 NO_LINE_BREAK="FALSE">
+			<BEGIN>q(?:|[qrxw])([#\[{(/|])</BEGIN>
+			<END>~1</END>
+		</SPAN_REGEXP>
+
+		<!-- tr/// transliteration -->
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="tr"
+            AT_WORD_START="TRUE">tr\s*\{.*?[^\\]\}\s*\{(?:.*?[^\\])*\}[cds]*</SEQ_REGEXP>
+
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="tr"
+            AT_WORD_START="TRUE">tr([^\p{Alnum}\p{Space}\}])(?:.*?)\1(?:.*?)\1[cds]*</SEQ_REGEXP>
+
+		<!-- y/// translation -->
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="y"
+            AT_WORD_START="TRUE">y\s*\{.*?[^\\]\}\s*\{(?:.*?[^\\])*\}[cds]*</SEQ_REGEXP>
+
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="y"
+            AT_WORD_START="TRUE">y([^\p{Alnum}\p{Space}\}])(?:.*?)\1(?:.*?)\1[cds]*</SEQ_REGEXP>
+
+		<!-- m// regular expression matching -->
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="m"
+			AT_WORD_START="TRUE">m\s*\{.*?[^\\]\}[cgimosx]*</SEQ_REGEXP>
+
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="m"
+			AT_WORD_START="TRUE">m([^\p{Alnum}\p{Space}\}])(?:.*?[^\\])\1[cgimosx]*</SEQ_REGEXP>
+
+		<!-- s/// regular expression substitution -->
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="s"
+            AT_WORD_START="TRUE">s\s*\{.*?\}\s*\{.*?\}[egimosx]*</SEQ_REGEXP>
+
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="s"
+            AT_WORD_START="TRUE">s([^\p{Alnum}\p{Space}\}])(?:.*?)\1(?:.*?)\1[egimosx]*</SEQ_REGEXP>
+
+		<!-- complex operators -->
+		<SEQ TYPE="OPERATOR">||</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">!=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">-&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">=&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">==</SEQ>
+		<SEQ TYPE="OPERATOR">=~</SEQ>
+		<SEQ TYPE="OPERATOR">!~</SEQ>
+
+		<SEQ TYPE="OPERATOR">+=</SEQ>
+		<SEQ TYPE="OPERATOR">-=</SEQ>
+		<SEQ TYPE="OPERATOR">/=</SEQ>
+		<SEQ TYPE="OPERATOR">*=</SEQ>
+		<SEQ TYPE="OPERATOR">.=</SEQ>
+		<SEQ TYPE="OPERATOR">%=</SEQ>
+
+		<SEQ TYPE="OPERATOR">&amp;=</SEQ>
+		<SEQ TYPE="OPERATOR">|=</SEQ>
+		<SEQ TYPE="OPERATOR">**=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;&amp;=</SEQ>
+		<SEQ TYPE="OPERATOR">||=</SEQ>
+		<SEQ TYPE="OPERATOR">^=</SEQ>
+		<SEQ TYPE="OPERATOR">x=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+
+		<!-- simple operators -->
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">**</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+
+		<!-- Keywords -->
+		<KEYWORDS>
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>until</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>elsif</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>unless</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>foreach</KEYWORD1>
+			<KEYWORD1>BEGIN</KEYWORD1>
+			<KEYWORD1>END</KEYWORD1>
+
+			<OPERATOR>cmp</OPERATOR>
+			<OPERATOR>eq</OPERATOR>
+			<OPERATOR>ne</OPERATOR>
+			<OPERATOR>le</OPERATOR>
+			<OPERATOR>ge</OPERATOR>
+			<OPERATOR>not</OPERATOR>
+			<OPERATOR>and</OPERATOR>
+			<OPERATOR>or</OPERATOR>
+			<OPERATOR>xor</OPERATOR>
+
+			<!-- At least attempt to highlight 'x', although this misses some -->
+			<OPERATOR>x</OPERATOR>
+
+			<!--
+				The following function list was derived from the perlfunc man
+				page, Perl version 5.00503
+
+				Certain keywords have been commented out where they appear more
+				than once, and the y///, qx//, etc. functions have been removed,
+				since they would are colorized not as keywords, but with separate
+				rules.
+			-->
+
+			<!-- Functions for SCALARs or strings -->
+			<KEYWORD3>chomp</KEYWORD3>
+			<KEYWORD3>chop</KEYWORD3>
+			<KEYWORD3>chr</KEYWORD3>
+			<KEYWORD3>crypt</KEYWORD3>
+			<KEYWORD3>hex</KEYWORD3>
+			<KEYWORD3>index</KEYWORD3>
+			<KEYWORD3>lc</KEYWORD3>
+			<KEYWORD3>lcfirst</KEYWORD3>
+			<KEYWORD3>length</KEYWORD3>
+			<KEYWORD3>oct</KEYWORD3>
+			<KEYWORD3>ord</KEYWORD3>
+			<KEYWORD3>pack</KEYWORD3>
+			<KEYWORD3>reverse</KEYWORD3>
+			<KEYWORD3>rindex</KEYWORD3>
+			<KEYWORD3>sprintf</KEYWORD3>
+			<KEYWORD3>substr</KEYWORD3>
+			<KEYWORD3>uc</KEYWORD3>
+			<KEYWORD3>ucfirst</KEYWORD3>
+
+			<!-- Regular expressions and pattern matching -->
+			<KEYWORD3>pos</KEYWORD3>
+			<KEYWORD3>quotemeta</KEYWORD3>
+			<KEYWORD3>split</KEYWORD3>
+			<KEYWORD3>study</KEYWORD3>
+
+			<!-- Numeric functions -->
+			<KEYWORD3>abs</KEYWORD3>
+			<KEYWORD3>atan2</KEYWORD3>
+			<KEYWORD3>cos</KEYWORD3>
+			<KEYWORD3>exp</KEYWORD3>
+			<!--<KEYWORD3>hex</KEYWORD3>-->
+			<KEYWORD3>int</KEYWORD3>
+			<KEYWORD3>log</KEYWORD3>
+			<!--<KEYWORD3>oct</KEYWORD3>-->
+			<KEYWORD3>rand</KEYWORD3>
+			<KEYWORD3>sin</KEYWORD3>
+			<KEYWORD3>sqrt</KEYWORD3>
+			<KEYWORD3>srand</KEYWORD3>
+
+			<!-- Functions for real @ARRAYs -->
+			<KEYWORD3>pop</KEYWORD3>
+			<KEYWORD3>push</KEYWORD3>
+			<KEYWORD3>shift</KEYWORD3>
+			<KEYWORD3>splice</KEYWORD3>
+			<KEYWORD3>unshift</KEYWORD3>
+
+			<!-- Functions for list data -->
+			<KEYWORD3>grep</KEYWORD3>
+			<KEYWORD3>join</KEYWORD3>
+			<KEYWORD3>map</KEYWORD3>
+			<!--<KEYWORD3>reverse</KEYWORD3>-->
+			<KEYWORD3>sort</KEYWORD3>
+			<KEYWORD3>unpack</KEYWORD3>
+
+			<!-- Functions for real %HASHes -->
+			<KEYWORD3>delete</KEYWORD3>
+			<KEYWORD3>each</KEYWORD3>
+			<KEYWORD3>exists</KEYWORD3>
+			<KEYWORD3>keys</KEYWORD3>
+			<KEYWORD3>values</KEYWORD3>
+
+			<!-- Input and output functions -->
+			<KEYWORD3>binmode</KEYWORD3>
+			<KEYWORD3>close</KEYWORD3>
+			<KEYWORD3>closedir</KEYWORD3>
+			<KEYWORD3>dbmclose</KEYWORD3>
+			<KEYWORD3>dbmopen</KEYWORD3>
+			<!--<KEYWORD3>die</KEYWORD3>-->
+			<KEYWORD3>eof</KEYWORD3>
+			<KEYWORD3>fileno</KEYWORD3>
+			<KEYWORD3>flock</KEYWORD3>
+			<KEYWORD3>format</KEYWORD3>
+			<KEYWORD3>getc</KEYWORD3>
+			<KEYWORD3>print</KEYWORD3>
+			<KEYWORD3>printf</KEYWORD3>
+			<KEYWORD3>read</KEYWORD3>
+			<KEYWORD3>readdir</KEYWORD3>
+			<KEYWORD3>rewinddir</KEYWORD3>
+			<KEYWORD3>seek</KEYWORD3>
+			<KEYWORD3>seekdir</KEYWORD3>
+			<KEYWORD3>select</KEYWORD3>
+			<KEYWORD3>syscall</KEYWORD3>
+			<KEYWORD3>sysread</KEYWORD3>
+			<KEYWORD3>sysseek</KEYWORD3>
+			<KEYWORD3>syswrite</KEYWORD3>
+			<KEYWORD3>tell</KEYWORD3>
+			<KEYWORD3>telldir</KEYWORD3>
+			<KEYWORD3>truncate</KEYWORD3>
+			<KEYWORD3>warn</KEYWORD3>
+			<KEYWORD3>write</KEYWORD3>
+
+			<!-- Functions for fixed length data or records -->
+			<!--<KEYWORD3>pack</KEYWORD3>-->
+			<!--<KEYWORD3>read</KEYWORD3>-->
+			<!--<KEYWORD3>syscall</KEYWORD3>-->
+			<!--<KEYWORD3>sysread</KEYWORD3>-->
+			<!--<KEYWORD3>syswrite</KEYWORD3>-->
+			<!--<KEYWORD3>unpack</KEYWORD3>-->
+			<KEYWORD3>vec</KEYWORD3>
+
+			<!-- Functions for filehandles, files, or directories -->
+			<KEYWORD3>chdir</KEYWORD3>
+			<KEYWORD3>chmod</KEYWORD3>
+			<KEYWORD3>chown</KEYWORD3>
+			<KEYWORD3>chroot</KEYWORD3>
+			<KEYWORD3>fcntl</KEYWORD3>
+			<KEYWORD3>glob</KEYWORD3>
+			<KEYWORD3>ioctl</KEYWORD3>
+			<KEYWORD3>link</KEYWORD3>
+			<KEYWORD3>lstat</KEYWORD3>
+			<KEYWORD3>mkdir</KEYWORD3>
+			<KEYWORD3>open</KEYWORD3>
+			<KEYWORD3>opendir</KEYWORD3>
+			<KEYWORD3>readlink</KEYWORD3>
+			<KEYWORD3>rename</KEYWORD3>
+			<KEYWORD3>rmdir</KEYWORD3>
+			<KEYWORD3>stat</KEYWORD3>
+			<KEYWORD3>symlink</KEYWORD3>
+			<KEYWORD3>umask</KEYWORD3>
+			<KEYWORD3>unlink</KEYWORD3>
+			<KEYWORD3>utime</KEYWORD3>
+
+			<!-- Keywords related to the control flow of your perl program -->
+			<KEYWORD1>caller</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>die</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>dump</KEYWORD1>
+			<KEYWORD1>eval</KEYWORD1>
+			<KEYWORD1>exit</KEYWORD1>
+			<KEYWORD1>goto</KEYWORD1>
+			<KEYWORD1>last</KEYWORD1>
+			<KEYWORD1>next</KEYWORD1>
+			<KEYWORD1>redo</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>wantarray</KEYWORD1>
+
+			<!-- Keywords related to scoping -->
+			<!--<KEYWORD1>caller</KEYWORD1>-->
+			<!--<KEYWORD1>import</KEYWORD1>-->
+			<KEYWORD1>local</KEYWORD1>
+			<KEYWORD1>my</KEYWORD1>
+			<KEYWORD1>our</KEYWORD1>
+			<KEYWORD1>package</KEYWORD1>
+			<KEYWORD1>use</KEYWORD1>
+
+			<!-- Miscellaneous functions -->
+			<KEYWORD3>defined</KEYWORD3>
+			<!--<KEYWORD3>dump</KEYWORD3>-->
+			<!--<KEYWORD3>eval</KEYWORD3>-->
+			<KEYWORD3>formline</KEYWORD3>
+			<!--<KEYWORD3>local</KEYWORD3>-->
+			<!--<KEYWORD3>my</KEYWORD3>-->
+			<KEYWORD3>reset</KEYWORD3>
+			<KEYWORD3>scalar</KEYWORD3>
+			<KEYWORD3>undef</KEYWORD3>
+			<!--<KEYWORD3>wantarray</KEYWORD3>-->
+
+			<!-- Functions for processes and process groups -->
+			<KEYWORD3>alarm</KEYWORD3>
+			<KEYWORD3>exec</KEYWORD3>
+			<KEYWORD3>fork</KEYWORD3>
+			<KEYWORD3>getpgrp</KEYWORD3>
+			<KEYWORD3>getppid</KEYWORD3>
+			<KEYWORD3>getpriority</KEYWORD3>
+			<KEYWORD3>kill</KEYWORD3>
+			<KEYWORD3>pipe</KEYWORD3>
+			<KEYWORD3>setpgrp</KEYWORD3>
+			<KEYWORD3>setpriority</KEYWORD3>
+			<KEYWORD3>sleep</KEYWORD3>
+			<KEYWORD3>system</KEYWORD3>
+			<KEYWORD3>times</KEYWORD3>
+			<KEYWORD3>wait</KEYWORD3>
+			<KEYWORD3>waitpid</KEYWORD3>
+
+			<!-- Keywords related to perl modules -->
+			<!--<KEYWORD1>do</KEYWORD1>-->
+			<KEYWORD1>import</KEYWORD1>
+			<KEYWORD1>no</KEYWORD1>
+			<!--<KEYWORD1>package</KEYWORD1>-->
+			<KEYWORD1>require</KEYWORD1>
+			<!--<KEYWORD1>use</KEYWORD1>-->
+
+			<!-- Keywords related to classes and object-orientedness -->
+			<KEYWORD3>bless</KEYWORD3>
+			<!--<KEYWORD3>dbmclose</KEYWORD3>-->
+			<!--<KEYWORD3>dbmopen</KEYWORD3>-->
+			<!--<KEYWORD3>package</KEYWORD3>-->
+			<KEYWORD3>ref</KEYWORD3>
+			<KEYWORD3>tie</KEYWORD3>
+			<KEYWORD3>tied</KEYWORD3>
+			<KEYWORD3>untie</KEYWORD3>
+			<!--<KEYWORD3>use</KEYWORD3>-->
+
+			<!-- Low-level socket functions -->
+			<KEYWORD3>accept</KEYWORD3>
+			<KEYWORD3>bind</KEYWORD3>
+			<KEYWORD3>connect</KEYWORD3>
+			<KEYWORD3>getpeername</KEYWORD3>
+			<KEYWORD3>getsockname</KEYWORD3>
+			<KEYWORD3>getsockopt</KEYWORD3>
+			<KEYWORD3>listen</KEYWORD3>
+			<KEYWORD3>recv</KEYWORD3>
+			<KEYWORD3>send</KEYWORD3>
+			<KEYWORD3>setsockopt</KEYWORD3>
+			<KEYWORD3>shutdown</KEYWORD3>
+			<KEYWORD3>socket</KEYWORD3>
+			<KEYWORD3>socketpair</KEYWORD3>
+
+			<!-- System V interprocess communication functions -->
+			<KEYWORD3>msgctl</KEYWORD3>
+			<KEYWORD3>msgget</KEYWORD3>
+			<KEYWORD3>msgrcv</KEYWORD3>
+			<KEYWORD3>msgsnd</KEYWORD3>
+			<KEYWORD3>semctl</KEYWORD3>
+			<KEYWORD3>semget</KEYWORD3>
+
+			<KEYWORD3>semop</KEYWORD3>
+			<KEYWORD3>shmctl</KEYWORD3>
+			<KEYWORD3>shmget</KEYWORD3>
+			<KEYWORD3>shmread</KEYWORD3>
+			<KEYWORD3>shmwrite</KEYWORD3>
+
+			<!-- Fetching user and group info -->
+			<KEYWORD3>endgrent</KEYWORD3>
+			<KEYWORD3>endhostent</KEYWORD3>
+			<KEYWORD3>endnetent</KEYWORD3>
+			<KEYWORD3>endpwent</KEYWORD3>
+			<KEYWORD3>getgrent</KEYWORD3>
+			<KEYWORD3>getgrgid</KEYWORD3>
+			<KEYWORD3>getgrnam</KEYWORD3>
+			<KEYWORD3>getlogin</KEYWORD3>
+			<KEYWORD3>getpwent</KEYWORD3>
+			<KEYWORD3>getpwnam</KEYWORD3>
+			<KEYWORD3>getpwuid</KEYWORD3>
+			<KEYWORD3>setgrent</KEYWORD3>
+			<KEYWORD3>setpwent</KEYWORD3>
+
+			<!-- Fetching network info -->
+			<KEYWORD3>endprotoent</KEYWORD3>
+			<KEYWORD3>endservent</KEYWORD3>
+			<KEYWORD3>gethostbyaddr</KEYWORD3>
+			<KEYWORD3>gethostbyname</KEYWORD3>
+			<KEYWORD3>gethostent</KEYWORD3>
+			<KEYWORD3>getnetbyaddr</KEYWORD3>
+			<KEYWORD3>getnetbyname</KEYWORD3>
+			<KEYWORD3>getnetent</KEYWORD3>
+			<KEYWORD3>getprotobyname</KEYWORD3>
+			<KEYWORD3>getprotobynumber</KEYWORD3>
+			<KEYWORD3>getprotoent</KEYWORD3>
+			<KEYWORD3>getservbyname</KEYWORD3>
+			<KEYWORD3>getservbyport</KEYWORD3>
+			<KEYWORD3>getservent</KEYWORD3>
+			<KEYWORD3>sethostent</KEYWORD3>
+			<KEYWORD3>setnetent</KEYWORD3>
+			<KEYWORD3>setprotoent</KEYWORD3>
+			<KEYWORD3>setservent</KEYWORD3>
+
+			<!-- Time-related functions -->
+			<KEYWORD3>gmtime</KEYWORD3>
+			<KEYWORD3>localtime</KEYWORD3>
+			<KEYWORD3>time</KEYWORD3>
+			<!--<KEYWORD3>times</KEYWORD3>-->
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="POD" DEFAULT="COMMENT2">
+		<MARK_FOLLOWING TYPE="LABEL" AT_LINE_START="TRUE">=</MARK_FOLLOWING>
+	</RULES>
+
+	<RULES SET="LITERAL" DEFAULT="LITERAL1" ESCAPE="\">
+		<!-- Variables inside a Literal -->
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<!-- object method inside a Literal -->
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
+			<BEGIN>->{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">$#</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
+			<BEGIN>@{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">@</MARK_FOLLOWING>
+
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
+			<BEGIN>%{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">%</MARK_FOLLOWING>
+
+		<SEQ TYPE="LITERAL1">|</SEQ>
+		<SEQ TYPE="LITERAL1">&amp;</SEQ>
+		<SEQ TYPE="LITERAL1">!</SEQ>
+		<SEQ TYPE="LITERAL1">&gt;</SEQ>
+		<SEQ TYPE="LITERAL1">&lt;</SEQ>
+		<SEQ TYPE="LITERAL1">)</SEQ>
+		<SEQ TYPE="LITERAL1">(</SEQ>
+		<SEQ TYPE="LITERAL1">=</SEQ>
+		<SEQ TYPE="LITERAL1">!</SEQ>
+		<SEQ TYPE="LITERAL1">+</SEQ>
+		<SEQ TYPE="LITERAL1">-</SEQ>
+		<SEQ TYPE="LITERAL1">/</SEQ>
+		<SEQ TYPE="LITERAL1">*</SEQ>
+		<SEQ TYPE="LITERAL1">^</SEQ>
+		<SEQ TYPE="LITERAL1">~</SEQ>
+		<SEQ TYPE="LITERAL1">}</SEQ>
+		<SEQ TYPE="LITERAL1">{</SEQ>
+		<SEQ TYPE="LITERAL1">.</SEQ>
+		<SEQ TYPE="LITERAL1">,</SEQ>
+		<SEQ TYPE="LITERAL1">;</SEQ>
+		<SEQ TYPE="LITERAL1">]</SEQ>
+		<SEQ TYPE="LITERAL1">[</SEQ>
+		<SEQ TYPE="LITERAL1">?</SEQ>
+		<SEQ TYPE="LITERAL1">:</SEQ>
+	</RULES>
+
+	<!-- Literals framed by apostrophs -->
+	<RULES SET="APOSTR" DEFAULT="LITERAL1" ESCAPE="\">
+
+		<!-- just a hack for sprintf -->
+		<SEQ_REGEXP HASH_CHAR="%" TYPE="LITERAL4">%\d*\.?\d*[dfis]</SEQ_REGEXP>
+
+	</RULES>
+
+	<RULES SET="EXEC" DEFAULT="KEYWORD3" ESCAPE="\">
+		<!-- Comments -->
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+
+		<!-- Variables -->
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">$#</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+			<BEGIN>@{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">@</MARK_FOLLOWING>
+
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+			<BEGIN>%{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">%</MARK_FOLLOWING>
+	</RULES>
+
+	<RULES SET="VARIABLE" DEFAULT="KEYWORD2" ESCAPE="\">
+ 		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">-&gt;</SEQ>
+	</RULES>
+
+	<RULES SET="REGEXP" DEFAULT="MARKUP" ESCAPE="\">
+		<!-- ??? -->
+		<SEQ TYPE="MARKUP">)(</SEQ>
+	</RULES>
+
+	<RULES SET="SUB_NAME" DEFAULT="FUNCTION">
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+		<SPAN TYPE="OPERATOR" DELEGATE="SUB_PROTO">
+			<BEGIN>(</BEGIN>
+			<END>)</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="SUB_PROTO" DEFAULT="LITERAL1">
+		<SEQ TYPE="LITERAL2">$</SEQ>
+		<SEQ TYPE="LITERAL2">@</SEQ>
+		<SEQ TYPE="LITERAL2">%</SEQ>
+		<SEQ TYPE="LITERAL2">&amp;</SEQ>
+		<SEQ TYPE="LITERAL2">*</SEQ>
+		<SEQ TYPE="LITERAL3">\</SEQ>
+	</RULES>
+
+	<!-- Used for quote-like operators; just makes sure the brackets are balanced. -->
+	<RULES SET="QUOTED" DEFAULT="LITERAL1">
+		<SPAN_REGEXP NO_LINE_BREAK="FALSE"
+					 TYPE="LITERAL1"
+					 MATCH_TYPE="OPERATOR"
+					 DELEGATE="QUOTED"
+					 HASH_CHARS="|[{(/">
+			<BEGIN>([\[{\(])</BEGIN>
+			<END>~1</END>
+		</SPAN_REGEXP>
+	</RULES>
+
+</MODE>

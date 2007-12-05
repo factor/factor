@@ -7,6 +7,7 @@ IN: windows
 
 : lo-word ( wparam -- lo ) <short> *short ; inline
 : hi-word ( wparam -- hi ) -16 shift lo-word ; inline
+: MAX_UNICODE_PATH 32768 ; inline
 
 ! You must LocalFree the return value!
 FUNCTION: void* error_message ( DWORD id ) ;

@@ -52,7 +52,7 @@ debugger "gestures" f {
 
 \ :help H{ { +nullary+ t } { +listener+ t } } define-command
 
-\ :edit H{ { +nullary+ t } } define-command
+\ :edit H{ { +nullary+ t } { +listener+ t } } define-command
 
 debugger "toolbar" f {
     { T{ key-down f f "s" } com-traceback }

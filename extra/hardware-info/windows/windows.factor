@@ -1,5 +1,6 @@
 USING: alien alien.c-types kernel libc math namespaces
-windows windows.kernel32 windows.advapi32 hardware-info ;
+windows windows.kernel32 windows.advapi32 hardware-info
+words ;
 IN: hardware-info.windows
 
 TUPLE: wince ;
@@ -52,6 +53,22 @@ M: windows cpus ( -- n )
 
 : sse3? ( -- ? )
     PF_SSE3_INSTRUCTIONS_AVAILABLE feature-present? ;
+
+: <u16-string-object> ( n -- obj )
+    "ushort" <c-array> ;
+
+: get-directory ( word -- str )
+    >r MAX_UNICODE_PATH [ <u16-string-object> ] keep dupd r>
+    execute win32-error=0/f alien>u16-string ; inline
+
+: windows-directory ( -- str )
+    \ GetWindowsDirectory get-directory ;
+
+: system-directory ( -- str )
+    \ GetSystemDirectory get-directory ;
+
+: system-windows-directory ( -- str )
+    \ GetSystemWindowsDirectory get-directory ;
 
 USE-IF: wince? hardware-info.windows.ce
 USE-IF: winnt? hardware-info.windows.nt

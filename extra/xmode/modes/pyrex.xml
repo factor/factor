@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="indentNextLines" VALUE="\s*[^#]{3,}:\s*(#.*)?" />
+		<PROPERTY NAME="lineComment" VALUE="#" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+
+		<IMPORT DELEGATE="python::MAIN"/>
+
+		<KEYWORDS>
+			<KEYWORD4>cdef</KEYWORD4>
+			<KEYWORD4>char</KEYWORD4>
+			<KEYWORD4>cinclude</KEYWORD4>
+			<KEYWORD4>ctypedef</KEYWORD4>
+			<KEYWORD4>double</KEYWORD4>
+			<KEYWORD4>enum</KEYWORD4>
+			<KEYWORD4>extern</KEYWORD4>
+			<KEYWORD4>float</KEYWORD4>
+			<KEYWORD4>include</KEYWORD4>
+			<KEYWORD4>private</KEYWORD4>
+			<KEYWORD4>public</KEYWORD4>
+			<KEYWORD4>short</KEYWORD4>
+			<KEYWORD4>signed</KEYWORD4>
+			<KEYWORD4>sizeof</KEYWORD4>
+			<KEYWORD4>struct</KEYWORD4>
+			<KEYWORD4>union</KEYWORD4>
+			<KEYWORD4>unsigned</KEYWORD4>
+			<KEYWORD4>void</KEYWORD4>
+
+			<LITERAL3>NULL</LITERAL3>
+		</KEYWORDS>
+	</RULES>
+</MODE>
+

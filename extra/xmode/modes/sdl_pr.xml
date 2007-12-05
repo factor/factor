@@ -1,0 +1,228 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+  sdl_pr.xml	K. J. Turner <kjt@cs.stir.ac.uk>	26th February 2004
+
+  SDL (Specification and Description Language) is an ITU standard (Z.100)
+  for a formal specification language used in communications and system specification generally.
+
+  This mode handles SDL/PR (Phrase Representation), but does not (yet) deal with SDL 2000.
+
+  Auto-indentation occurs if the following are at the start of a line (ignoring
+  leading white space): "block", "channel", "connection", "decision", "generator", "input", "macro", "newtype", "operator", "package", "procedure", "process", "refinement", "service", "start", "state", "substructure", "syntype", "system".
+
+  This also happens if the following appear on their own (i.e. also ignoring
+  trailing white space): "signal".
+-->
+
+<MODE>
+  <PROPS>
+    <PROPERTY NAME="commentStart" VALUE="/*"/>
+    <PROPERTY NAME="commentEnd" VALUE="*/"/>
+    <PROPERTY NAME="indentNextLines"
+      VALUE="\s*(block|channel|connection|decision|generator|input|macro|newtype|operator|package|procedure|process|refinement|service|start|state|substructure|syntype|system).*|\s*(signal)\s*"/>
+  </PROPS>
+
+  <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+    <!-- SDT/TAU Comments -->
+    <SPAN TYPE="COMMENT2">
+      <BEGIN>/*#SDTREF</BEGIN>
+      <END>*/</END>
+    </SPAN>
+
+    <!-- Standard Comments -->
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>/*</BEGIN>
+      <END>*/</END>
+    </SPAN>
+
+    <!-- String Literals -->
+    <SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+
+    <SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+
+    <!-- Standard Operators -->
+    <SEQ TYPE="OPERATOR">+</SEQ>
+    <SEQ TYPE="OPERATOR">-</SEQ>
+    <SEQ TYPE="OPERATOR">*</SEQ>
+    <SEQ TYPE="OPERATOR">/</SEQ>
+    <SEQ TYPE="OPERATOR">==</SEQ>
+    <SEQ TYPE="OPERATOR">/=</SEQ>
+    <SEQ TYPE="OPERATOR">:=</SEQ>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+    <SEQ TYPE="OPERATOR">.</SEQ>
+    <SEQ TYPE="OPERATOR">!</SEQ>
+    <SEQ TYPE="OPERATOR">//</SEQ>
+
+    <SEQ TYPE="OPERATOR" AT_WORD_START="TRUE">and</SEQ>
+    <SEQ TYPE="OPERATOR" AT_WORD_START="TRUE">mod</SEQ>
+    <SEQ TYPE="OPERATOR" AT_WORD_START="TRUE">not</SEQ>
+    <SEQ TYPE="OPERATOR" AT_WORD_START="TRUE">or</SEQ>
+    <SEQ TYPE="OPERATOR" AT_WORD_START="TRUE">rem</SEQ>
+    <SEQ TYPE="OPERATOR" AT_WORD_START="TRUE">xor</SEQ>
+
+    <KEYWORDS>
+      <!-- Reserved Words -->
+      <KEYWORD1>active</KEYWORD1>
+      <KEYWORD1>adding</KEYWORD1>
+      <KEYWORD1>all</KEYWORD1>
+      <KEYWORD1>alternative</KEYWORD1>
+      <KEYWORD1>any</KEYWORD1>
+      <KEYWORD1>as</KEYWORD1>
+      <KEYWORD1>atleast</KEYWORD1>
+      <KEYWORD1>axioms</KEYWORD1>
+      <KEYWORD1>block</KEYWORD1>
+      <KEYWORD1>call</KEYWORD1>
+      <KEYWORD1>channel</KEYWORD1>
+      <KEYWORD1>comment</KEYWORD1>
+      <KEYWORD1>connect</KEYWORD1>
+      <KEYWORD1>connection</KEYWORD1>
+      <KEYWORD1>constant</KEYWORD1>
+      <KEYWORD1>constants</KEYWORD1>
+      <KEYWORD1>create</KEYWORD1>
+      <KEYWORD1>dcl</KEYWORD1>
+      <KEYWORD1>decision</KEYWORD1>
+      <KEYWORD1>default</KEYWORD1>
+      <KEYWORD1>else</KEYWORD1>
+      <KEYWORD1>end</KEYWORD1>
+      <KEYWORD1>endalternative</KEYWORD1>
+      <KEYWORD1>endblock</KEYWORD1>
+      <KEYWORD1>endchannel</KEYWORD1>
+      <KEYWORD1>endconnection</KEYWORD1>
+      <KEYWORD1>enddecision</KEYWORD1>
+      <KEYWORD1>endgenerator</KEYWORD1>
+      <KEYWORD1>endmacro</KEYWORD1>
+      <KEYWORD1>endnewtype</KEYWORD1>
+      <KEYWORD1>endoperator</KEYWORD1>
+      <KEYWORD1>endpackage</KEYWORD1>
+      <KEYWORD1>endprocedure</KEYWORD1>
+      <KEYWORD1>endprocess</KEYWORD1>
+      <KEYWORD1>endrefinement</KEYWORD1>
+      <KEYWORD1>endselect</KEYWORD1>
+      <KEYWORD1>endservice</KEYWORD1>
+      <KEYWORD1>endstate</KEYWORD1>
+      <KEYWORD1>endsubstructure</KEYWORD1>
+      <KEYWORD1>endsyntype</KEYWORD1>
+      <KEYWORD1>endsystem</KEYWORD1>
+      <KEYWORD1>env</KEYWORD1>
+      <KEYWORD1>error</KEYWORD1>
+      <KEYWORD1>export</KEYWORD1>
+      <KEYWORD1>exported</KEYWORD1>
+      <KEYWORD1>external</KEYWORD1>
+      <KEYWORD1>fi</KEYWORD1>
+      <KEYWORD1>finalized</KEYWORD1>
+      <KEYWORD1>for</KEYWORD1>
+      <KEYWORD1>fpar</KEYWORD1>
+      <KEYWORD1>from</KEYWORD1>
+      <KEYWORD1>gate</KEYWORD1>
+      <KEYWORD1>generator</KEYWORD1>
+      <KEYWORD1>if</KEYWORD1>
+      <KEYWORD1>import</KEYWORD1>
+      <KEYWORD1>imported</KEYWORD1>
+      <KEYWORD1>in</KEYWORD1>
+      <KEYWORD1>inherits</KEYWORD1>
+      <KEYWORD1>input</KEYWORD1>
+      <KEYWORD1>interface</KEYWORD1>
+      <KEYWORD1>join</KEYWORD1>
+      <KEYWORD1>literal</KEYWORD1>
+      <KEYWORD1>literals</KEYWORD1>
+      <KEYWORD1>macro</KEYWORD1>
+      <KEYWORD1>macrodefinition</KEYWORD1>
+      <KEYWORD1>macroid</KEYWORD1>
+      <KEYWORD1>map</KEYWORD1>
+      <KEYWORD1>nameclass</KEYWORD1>
+      <KEYWORD1>newtype</KEYWORD1>
+      <KEYWORD1>nextstate</KEYWORD1>
+      <KEYWORD1>nodelay</KEYWORD1>
+      <KEYWORD1>noequality</KEYWORD1>
+      <KEYWORD1>none</KEYWORD1>
+      <KEYWORD1>now</KEYWORD1>
+      <KEYWORD1>offspring</KEYWORD1>
+      <KEYWORD1>operator</KEYWORD1>
+      <KEYWORD1>operators</KEYWORD1>
+      <KEYWORD1>ordering</KEYWORD1>
+      <KEYWORD1>out</KEYWORD1>
+      <KEYWORD1>output</KEYWORD1>
+      <KEYWORD1>package</KEYWORD1>
+      <KEYWORD1>parent</KEYWORD1>
+      <KEYWORD1>priority</KEYWORD1>
+      <KEYWORD1>procedure</KEYWORD1>
+      <KEYWORD1>process</KEYWORD1>
+      <KEYWORD1>provided</KEYWORD1>
+      <KEYWORD1>redefined</KEYWORD1>
+      <KEYWORD1>referenced</KEYWORD1>
+      <KEYWORD1>refinement</KEYWORD1>
+      <KEYWORD1>remote</KEYWORD1>
+      <KEYWORD1>reset</KEYWORD1>
+      <KEYWORD1>return</KEYWORD1>
+      <KEYWORD1>returns</KEYWORD1>
+      <KEYWORD1>revealed</KEYWORD1>
+      <KEYWORD1>reverse</KEYWORD1>
+      <KEYWORD1>route</KEYWORD1>
+      <KEYWORD1>save</KEYWORD1>
+      <KEYWORD1>select</KEYWORD1>
+      <KEYWORD1>self</KEYWORD1>
+      <KEYWORD1>sender</KEYWORD1>
+      <KEYWORD1>service</KEYWORD1>
+      <KEYWORD1>set</KEYWORD1>
+      <KEYWORD1>signal</KEYWORD1>
+      <KEYWORD1>signallist</KEYWORD1>
+      <KEYWORD1>signalroute</KEYWORD1>
+      <KEYWORD1>signalset</KEYWORD1>
+      <KEYWORD1>spelling</KEYWORD1>
+      <KEYWORD1>start</KEYWORD1>
+      <KEYWORD1>state</KEYWORD1>
+      <KEYWORD1>stop</KEYWORD1>
+      <KEYWORD1>struct</KEYWORD1>
+      <KEYWORD1>substructure</KEYWORD1>
+      <KEYWORD1>synonym</KEYWORD1>
+      <KEYWORD1>syntype</KEYWORD1>
+      <KEYWORD1>system</KEYWORD1>
+      <KEYWORD1>task</KEYWORD1>
+      <KEYWORD1>then</KEYWORD1>
+      <KEYWORD1>this</KEYWORD1>
+      <KEYWORD1>timer</KEYWORD1>
+      <KEYWORD1>to</KEYWORD1>
+      <KEYWORD1>type</KEYWORD1>
+      <KEYWORD1>use</KEYWORD1>
+      <KEYWORD1>via</KEYWORD1>
+      <KEYWORD1>view</KEYWORD1>
+      <KEYWORD1>viewed</KEYWORD1>
+      <KEYWORD1>virtual</KEYWORD1>
+      <KEYWORD1>with</KEYWORD1>
+
+      <!-- Standard Library Sorts -->
+      <KEYWORD2>Boolean</KEYWORD2>
+      <KEYWORD2>Character</KEYWORD2>
+      <KEYWORD2>Charstring</KEYWORD2>
+      <KEYWORD2>Duration</KEYWORD2>
+      <KEYWORD2>Integer</KEYWORD2>
+      <KEYWORD2>Natural</KEYWORD2>
+      <KEYWORD2>Real</KEYWORD2>
+      <KEYWORD2>PId</KEYWORD2>
+      <KEYWORD2>Time</KEYWORD2>
+
+      <!-- Standard Library Generators -->
+      <KEYWORD3>Array</KEYWORD3>
+      <KEYWORD3>String</KEYWORD3>
+      <KEYWORD3>Powerset</KEYWORD3>
+
+      <!-- Standard Library Literals -->
+      <LITERAL1>false</LITERAL1>
+      <LITERAL1>null</LITERAL1>
+      <LITERAL1>true</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+</MODE>

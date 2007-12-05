@@ -1,0 +1,266 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="%"/>
+	</PROPS>
+
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" ESCAPE="\">
+		<EOL_SPAN TYPE="COMMENT1">%</EOL_SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<MARK_PREVIOUS TYPE="LITERAL2" MATCH_TYPE="OPERATOR">:</MARK_PREVIOUS>
+
+		<SEQ_REGEXP HASH_CHAR="$"
+			TYPE="LITERAL3"
+			AT_WORD_START="TRUE"
+		>\$.\w*</SEQ_REGEXP>
+
+		<SEQ TYPE="LITERAL3">badarg</SEQ>
+		<SEQ TYPE="LITERAL3">nocookie</SEQ>
+		<SEQ TYPE="LITERAL3">false</SEQ>
+		<SEQ TYPE="LITERAL3">true</SEQ>
+
+		<SEQ TYPE="OPERATOR">-&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;-</SEQ>
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">#</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<!--
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		-->
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+
+		<!-- div -->
+		<SEQ_REGEXP HASH_CHAR="div"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\bdiv\b</SEQ_REGEXP>
+		<!-- rem -->
+		<SEQ_REGEXP HASH_CHAR="rem"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\brem\b</SEQ_REGEXP>
+		<!-- or -->
+		<SEQ_REGEXP HASH_CHAR="or"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\bor\b</SEQ_REGEXP>
+		<!-- xor -->
+		<SEQ_REGEXP HASH_CHAR="xor"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\bxor\b</SEQ_REGEXP>
+		<!-- bor -->
+		<SEQ_REGEXP HASH_CHAR="bor"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\bbor\b</SEQ_REGEXP>
+		<!-- bxor -->
+		<SEQ_REGEXP HASH_CHAR="bxor"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\bbxor\b</SEQ_REGEXP>
+		<!-- bsl -->
+		<SEQ_REGEXP HASH_CHAR="bsl"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\bbsl\b</SEQ_REGEXP>
+		<!-- bsr -->
+		<SEQ_REGEXP HASH_CHAR="bsr"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\bbsr\b</SEQ_REGEXP>
+		<!-- and -->
+		<SEQ_REGEXP HASH_CHAR="and"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\band\b</SEQ_REGEXP>
+		<!-- band -->
+		<SEQ_REGEXP HASH_CHAR="band"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\bband\b</SEQ_REGEXP>
+		<!-- not -->
+		<SEQ_REGEXP HASH_CHAR="not"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\bnot\b</SEQ_REGEXP>
+		<!-- bnot -->
+		<SEQ_REGEXP HASH_CHAR="bnot"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\bbnot\b</SEQ_REGEXP>
+
+		<KEYWORDS>
+			<!-- keywords -->
+			<KEYWORD1>after</KEYWORD1>
+			<KEYWORD1>begin</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD1>cond</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>fun</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>let</KEYWORD1>
+			<KEYWORD1>of</KEYWORD1>
+			<KEYWORD1>query</KEYWORD1>
+			<KEYWORD1>receive</KEYWORD1>
+			<KEYWORD1>when</KEYWORD1>
+
+			<!-- built-in-functions BIFs -->
+			<KEYWORD2>abs</KEYWORD2>
+			<KEYWORD2>alive</KEYWORD2>
+			<KEYWORD2>apply</KEYWORD2>
+			<KEYWORD2>atom_to_list</KEYWORD2>
+			<KEYWORD2>binary_to_list</KEYWORD2>
+			<KEYWORD2>binary_to_term</KEYWORD2>
+			<KEYWORD2>concat_binary</KEYWORD2>
+			<KEYWORD2>date</KEYWORD2>
+			<KEYWORD2>disconnect_node</KEYWORD2>
+			<KEYWORD2>element</KEYWORD2>
+			<KEYWORD2>erase</KEYWORD2>
+			<KEYWORD2>exit</KEYWORD2>
+			<KEYWORD2>float</KEYWORD2>
+			<KEYWORD2>float_to_list</KEYWORD2>
+			<KEYWORD2>get</KEYWORD2>
+			<KEYWORD2>get_keys</KEYWORD2>
+			<KEYWORD2>group_leader</KEYWORD2>
+			<KEYWORD2>halt</KEYWORD2>
+			<KEYWORD2>hd</KEYWORD2>
+			<KEYWORD2>integer_to_list</KEYWORD2>
+			<KEYWORD2>is_alive</KEYWORD2>
+			<KEYWORD2>length</KEYWORD2>
+			<KEYWORD2>link</KEYWORD2>
+			<KEYWORD2>list_to_atom</KEYWORD2>
+			<KEYWORD2>list_to_binary</KEYWORD2>
+			<KEYWORD2>list_to_float</KEYWORD2>
+			<KEYWORD2>list_to_integer</KEYWORD2>
+			<KEYWORD2>list_to_pid</KEYWORD2>
+			<KEYWORD2>list_to_tuple</KEYWORD2>
+			<KEYWORD2>load_module</KEYWORD2>
+			<KEYWORD2>make_ref</KEYWORD2>
+			<KEYWORD2>monitor_node</KEYWORD2>
+			<KEYWORD2>node</KEYWORD2>
+			<KEYWORD2>nodes</KEYWORD2>
+			<KEYWORD2>now</KEYWORD2>
+			<KEYWORD2>open_port</KEYWORD2>
+			<KEYWORD2>pid_to_list</KEYWORD2>
+			<KEYWORD2>process_flag</KEYWORD2>
+			<KEYWORD2>process_info</KEYWORD2>
+			<KEYWORD2>process</KEYWORD2>
+			<KEYWORD2>put</KEYWORD2>
+			<KEYWORD2>register</KEYWORD2>
+			<KEYWORD2>registered</KEYWORD2>
+			<KEYWORD2>round</KEYWORD2>
+			<KEYWORD2>self</KEYWORD2>
+			<KEYWORD2>setelement</KEYWORD2>
+			<KEYWORD2>size</KEYWORD2>
+			<KEYWORD2>spawn</KEYWORD2>
+			<KEYWORD2>spawn_link</KEYWORD2>
+			<KEYWORD2>split_binary</KEYWORD2>
+			<KEYWORD2>statistics</KEYWORD2>
+			<KEYWORD2>term_to_binary</KEYWORD2>
+			<KEYWORD2>throw</KEYWORD2>
+			<KEYWORD2>time</KEYWORD2>
+			<KEYWORD2>tl</KEYWORD2>
+			<KEYWORD2>trunc</KEYWORD2>
+			<KEYWORD2>tuple_to_list</KEYWORD2>
+			<KEYWORD2>unlink</KEYWORD2>
+			<KEYWORD2>unregister</KEYWORD2>
+			<KEYWORD2>whereis</KEYWORD2>
+
+			<!-- other BIFs -->
+			<KEYWORD2>atom</KEYWORD2>
+			<KEYWORD2>binary</KEYWORD2>
+			<KEYWORD2>constant</KEYWORD2>
+			<KEYWORD2>function</KEYWORD2>
+			<KEYWORD2>integer</KEYWORD2>
+			<KEYWORD2>list</KEYWORD2>
+			<KEYWORD2>number</KEYWORD2>
+			<KEYWORD2>pid</KEYWORD2>
+			<KEYWORD2>ports</KEYWORD2>
+			<KEYWORD2>port_close</KEYWORD2>
+			<KEYWORD2>port_info</KEYWORD2>
+			<KEYWORD2>reference</KEYWORD2>
+			<KEYWORD2>record</KEYWORD2>
+
+			<!-- erlang:BIFs -->
+			<KEYWORD2>check_process_code</KEYWORD2>
+			<KEYWORD2>delete_module</KEYWORD2>
+			<KEYWORD2>get_cookie</KEYWORD2>
+			<KEYWORD2>hash</KEYWORD2>
+			<KEYWORD2>math</KEYWORD2>
+			<KEYWORD2>module_loaded</KEYWORD2>
+			<KEYWORD2>preloaded</KEYWORD2>
+			<KEYWORD2>processes</KEYWORD2>
+			<KEYWORD2>purge_module</KEYWORD2>
+			<KEYWORD2>set_cookie</KEYWORD2>
+			<KEYWORD2>set_node</KEYWORD2>
+
+			<!-- math functions -->
+			<KEYWORD2>acos</KEYWORD2>
+			<KEYWORD2>asin</KEYWORD2>
+			<KEYWORD2>atan</KEYWORD2>
+			<KEYWORD2>atan2</KEYWORD2>
+			<KEYWORD2>cos</KEYWORD2>
+			<KEYWORD2>cosh</KEYWORD2>
+			<KEYWORD2>exp</KEYWORD2>
+			<KEYWORD2>log</KEYWORD2>
+			<KEYWORD2>log10</KEYWORD2>
+			<KEYWORD2>pi</KEYWORD2>
+			<KEYWORD2>pow</KEYWORD2>
+			<KEYWORD2>power</KEYWORD2>
+			<KEYWORD2>sin</KEYWORD2>
+			<KEYWORD2>sinh</KEYWORD2>
+			<KEYWORD2>sqrt</KEYWORD2>
+			<KEYWORD2>tan</KEYWORD2>
+			<KEYWORD2>tanh</KEYWORD2>
+
+			<!-- directives -->
+			<KEYWORD3>-behaviour</KEYWORD3>
+			<KEYWORD3>-compile</KEYWORD3>
+			<KEYWORD3>-define</KEYWORD3>
+			<KEYWORD3>-else</KEYWORD3>
+			<KEYWORD3>-endif</KEYWORD3>
+			<KEYWORD3>-export</KEYWORD3>
+			<KEYWORD3>-file</KEYWORD3>
+			<KEYWORD3>-ifdef</KEYWORD3>
+			<KEYWORD3>-ifndef</KEYWORD3>
+			<KEYWORD3>-import</KEYWORD3>
+			<KEYWORD3>-include</KEYWORD3>
+			<KEYWORD3>-include_lib</KEYWORD3>
+			<KEYWORD3>-module</KEYWORD3>
+			<KEYWORD3>-record</KEYWORD3>
+			<KEYWORD3>-undef</KEYWORD3>
+		</KEYWORDS>
+
+	</RULES>
+</MODE>

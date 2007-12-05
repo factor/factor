@@ -44,7 +44,10 @@ IN: raptor
   ! rcS.d
 
   "mountvirtfs"                     start-service
-  "hostname.sh"			    start-service
+
+  ! "hostname.sh"			    start-service
+  "narodnik"                        set-hostname
+
   "keymap.sh"			    start-service
   "linux-restricted-modules-common" start-service
   "udev"                            start-service

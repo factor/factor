@@ -11,7 +11,7 @@ TUPLE: posting author title date link body ;
 : fetch-feed ( pair -- feed )
     second
     dup "Fetching " diagnostic
-    dup news-get feed-entries
+    dup download-feed feed-entries
     swap "Done fetching " diagnostic ;
 
 : fetch-blogroll ( blogroll -- entries )
@@ -125,3 +125,15 @@ SYMBOL: last-update
     [ update-thread ] in-thread ;
 
 "planet" "planet-factor" "extra/webapps/planet" web-app
+
+: merge-feeds ( feeds -- feed )
+    [ feed-entries ] map concat sort-entries ;
+
+: planet-feed ( -- feed )
+    default-blogroll get [ second download-feed ] map merge-feeds 
+    >r "[ planet-factor ]" "http://planet.factorcode.org" r> <entry>
+    feed>xml ;
+
+: feed.xml planet-feed ;
+
+\ feed.xml { } define-action

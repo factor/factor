@@ -1,23 +1,13 @@
-! Copyright (C) 2006 Chris Double.
+! Copyright (C) 2006 Chris Double, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: rss
-! USING: kernel http-client xml xml-utils xml-data errors io strings
-!    sequences xml-writer parser-combinators lazy-lists entities ;
-USING: xml.utilities kernel promises parser-combinators assocs
-    parser-combinators.replace strings sequences xml.data xml.writer
+USING: xml.utilities kernel assocs
+    strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities io.files io
-    http.client ;
+    http.client namespaces xml.generator hashtables ;
 
 : ?children>string ( tag/f -- string/f )
     [ children>string ] [ f ] if* ;
-
-LAZY: '&amp;' ( -- parser )
-    "&" token
-    [ blank? ] satisfy &>
-    [ "&amp;" swap add ] <@ ;
-
-: &>&amp; ( string -- string )
-    '&amp;' replace ;
 
 TUPLE: feed title link entries ;
 
@@ -72,26 +62,42 @@ C: <entry> entry
         children>string <entry>
     ] map <feed> ;
 
-: feed ( xml -- feed )
+: xml>feed ( xml -- feed )
     dup name-tag {
         { "RDF" [ rss1.0 ] }
         { "rss" [ rss2.0 ] }
         { "feed" [ atom1.0 ] }
     } case ;
 
-: read-feed ( string -- feed )
-    ! &>&amp; ! this will be uncommented when parser-combinators are fixed
-    [ string>xml ] with-html-entities feed ;
+: read-feed ( stream -- feed )
+    [ read-xml ] with-html-entities xml>feed ;
 
-: load-news-file ( filename -- feed )
-    #! Load an news syndication file and process it, returning
-    #! it as an feed tuple.
-    <file-reader> [ contents read-feed ] keep stream-close ;
-
-: news-get ( url -- feed )
+: download-feed ( url -- feed )
     #! Retrieve an news syndication file, return as a feed tuple.
     http-get rot 200 = [
         nip read-feed
     ] [
         2drop "Error retrieving newsfeed file" throw
     ] if ;
+
+! Atom generation
+: simple-tag, ( content name -- )
+    [ , ] tag, ;
+
+: entry, ( entry -- )
+    "entry" [
+        dup entry-title "title" simple-tag,
+        "link" over entry-link "href" associate contained*,
+        dup entry-pub-date "published" simple-tag,
+        entry-description "content" simple-tag,
+    ] tag, ;
+
+: feed>xml ( feed -- xml )
+    "feed" { { "xmlns" "http://www.w3.org/2005/Atom" } } [
+        dup feed-title "title" simple-tag,
+        "link" over feed-link "href" associate contained*,
+        feed-entries [ entry, ] each
+    ] make-xml* ;
+
+: write-feed ( feed -- )
+    feed>xml write-xml ;

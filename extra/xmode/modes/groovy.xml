@@ -1,0 +1,262 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+<MODE NAME="groovy"			FILE="groovy.xml"
+				FILE_NAME_GLOB="*.{groovy,grv}"/>
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="indentNextLine"
+			VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+	</PROPS>
+
+	<RULES ESCAPE="\" HIGHLIGHT_DIGITS="TRUE" IGNORE_CASE="FALSE">
+		<!-- Silly comment -->
+		<SEQ TYPE="COMMENT1">/**/</SEQ>
+
+		<!-- Javadoc comment -->
+		<SPAN TYPE="COMMENT3" DELEGATE="GROOVYDOC">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<!-- Java comment (C style) -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<!-- heredoc -->
+		<SPAN_REGEXP HASH_CHAR="&lt;&lt;&lt;" TYPE="LITERAL1" DELEGATE="LITERAL">
+			<BEGIN><![CDATA[<<<([\p{Alpha}_][\p{Alnum}_]*)\s*]]></BEGIN>
+			<END>$1</END>
+		</SPAN_REGEXP>
+
+		<SEQ TYPE="OPERATOR">=~</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+
+		<!-- workaround to stop "*" from being colorized
+		     in import statements. -->
+		<SEQ TYPE="NULL">.*</SEQ>
+
+		<!-- Comments -->
+		<EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+
+		<!-- Function calls -->
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>abstract</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>extends</KEYWORD1>
+			<KEYWORD1>final</KEYWORD1>
+			<KEYWORD1>finally</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>implements</KEYWORD1>
+			<KEYWORD1>instanceof</KEYWORD1>
+			<KEYWORD1>native</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>private</KEYWORD1>
+			<KEYWORD1>protected</KEYWORD1>
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>static</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>synchronized</KEYWORD1>
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>throws</KEYWORD1>
+			<KEYWORD1>transient</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>volatile</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+
+			<KEYWORD1>strictfp</KEYWORD1>
+
+			<KEYWORD1>package</KEYWORD1>
+			<KEYWORD1>import</KEYWORD1>
+
+			<!-- groovy keywords -->
+			<KEYWORD2>as</KEYWORD2>
+			<KEYWORD2>assert</KEYWORD2>
+			<KEYWORD2>def</KEYWORD2>
+			<KEYWORD2>mixin</KEYWORD2>
+			<KEYWORD2>property</KEYWORD2>
+			<KEYWORD2>test</KEYWORD2>
+			<KEYWORD2>using</KEYWORD2>
+			<KEYWORD2>in</KEYWORD2>
+
+			<!-- types -->
+			<KEYWORD3>boolean</KEYWORD3>
+			<KEYWORD3>byte</KEYWORD3>
+			<KEYWORD3>char</KEYWORD3>
+			<KEYWORD3>class</KEYWORD3>
+			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD3>float</KEYWORD3>
+			<KEYWORD3>int</KEYWORD3>
+			<KEYWORD3>interface</KEYWORD3>
+			<KEYWORD3>long</KEYWORD3>
+			<KEYWORD3>short</KEYWORD3>
+			<KEYWORD3>void</KEYWORD3>
+
+			<!-- Groovy JDK stuff -->
+			<KEYWORD4>abs</KEYWORD4>
+			<KEYWORD4>any</KEYWORD4>
+			<KEYWORD4>append</KEYWORD4>
+			<KEYWORD4>asList</KEYWORD4>
+			<KEYWORD4>asWritable</KEYWORD4>
+			<KEYWORD4>call</KEYWORD4>
+			<KEYWORD4>collect</KEYWORD4>
+			<KEYWORD4>compareTo</KEYWORD4>
+			<KEYWORD4>count</KEYWORD4>
+			<KEYWORD4>div</KEYWORD4>
+			<KEYWORD4>dump</KEYWORD4>
+			<KEYWORD4>each</KEYWORD4>
+			<KEYWORD4>eachByte</KEYWORD4>
+			<KEYWORD4>eachFile</KEYWORD4>
+			<KEYWORD4>eachLine</KEYWORD4>
+			<KEYWORD4>every</KEYWORD4>
+			<KEYWORD4>find</KEYWORD4>
+			<KEYWORD4>findAll</KEYWORD4>
+			<KEYWORD4>flatten</KEYWORD4>
+			<KEYWORD4>getAt</KEYWORD4>
+			<KEYWORD4>getErr</KEYWORD4>
+			<KEYWORD4>getIn</KEYWORD4>
+			<KEYWORD4>getOut</KEYWORD4>
+			<KEYWORD4>getText</KEYWORD4>
+			<KEYWORD4>grep</KEYWORD4>
+			<KEYWORD4>immutable</KEYWORD4>
+			<KEYWORD4>inject</KEYWORD4>
+			<KEYWORD4>inspect</KEYWORD4>
+			<KEYWORD4>intersect</KEYWORD4>
+			<KEYWORD4>invokeMethods</KEYWORD4>
+			<KEYWORD4>isCase</KEYWORD4>
+			<KEYWORD4>join</KEYWORD4>
+			<KEYWORD4>leftShift</KEYWORD4>
+			<KEYWORD4>minus</KEYWORD4>
+			<KEYWORD4>multiply</KEYWORD4>
+			<KEYWORD4>newInputStream</KEYWORD4>
+			<KEYWORD4>newOutputStream</KEYWORD4>
+			<KEYWORD4>newPrintWriter</KEYWORD4>
+			<KEYWORD4>newReader</KEYWORD4>
+			<KEYWORD4>newWriter</KEYWORD4>
+			<KEYWORD4>next</KEYWORD4>
+			<KEYWORD4>plus</KEYWORD4>
+			<KEYWORD4>pop</KEYWORD4>
+			<KEYWORD4>power</KEYWORD4>
+			<KEYWORD4>previous</KEYWORD4>
+			<KEYWORD4>print</KEYWORD4>
+			<KEYWORD4>println</KEYWORD4>
+			<KEYWORD4>push</KEYWORD4>
+			<KEYWORD4>putAt</KEYWORD4>
+			<KEYWORD4>read</KEYWORD4>
+			<KEYWORD4>readBytes</KEYWORD4>
+			<KEYWORD4>readLines</KEYWORD4>
+			<KEYWORD4>reverse</KEYWORD4>
+			<KEYWORD4>reverseEach</KEYWORD4>
+			<KEYWORD4>round</KEYWORD4>
+			<KEYWORD4>size</KEYWORD4>
+			<KEYWORD4>sort</KEYWORD4>
+			<KEYWORD4>splitEachLine</KEYWORD4>
+			<KEYWORD4>step</KEYWORD4>
+			<KEYWORD4>subMap</KEYWORD4>
+			<KEYWORD4>times</KEYWORD4>
+			<KEYWORD4>toInteger</KEYWORD4>
+			<KEYWORD4>toList</KEYWORD4>
+			<KEYWORD4>tokenize</KEYWORD4>
+			<KEYWORD4>upto</KEYWORD4>
+			<KEYWORD4>waitForOrKill</KEYWORD4>
+			<KEYWORD4>withPrintWriter</KEYWORD4>
+			<KEYWORD4>withReader</KEYWORD4>
+			<KEYWORD4>withStream</KEYWORD4>
+			<KEYWORD4>withWriter</KEYWORD4>
+			<KEYWORD4>withWriterAppend</KEYWORD4>
+			<KEYWORD4>write</KEYWORD4>
+			<KEYWORD4>writeLine</KEYWORD4>
+
+			<LITERAL2>false</LITERAL2>
+			<LITERAL2>null</LITERAL2>
+			<LITERAL2>super</LITERAL2>
+			<LITERAL2>this</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+
+			<!-- this is specific to groovy, treat like `this`? -->
+			<LITERAL3>it</LITERAL3>
+
+			<INVALID>goto</INVALID>
+			<INVALID>const</INVALID>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="LITERAL" DEFAULT="LITERAL1" ESCAPE="\">
+		<!-- Variables -->
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+	</RULES>
+
+	<RULES SET="GROOVYDOC" DEFAULT="COMMENT3" IGNORE_CASE="TRUE">
+		<!-- so that @link{...} is highlighted -->
+		<SEQ TYPE="COMMENT3">{</SEQ>
+
+		<!-- so that *@param is highlighted -->
+		<SEQ TYPE="COMMENT3">*</SEQ>
+
+		<!-- HTML comments -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- Javadoc allows this -->
+		<SEQ TYPE="COMMENT3">&lt;&lt;</SEQ>
+		<SEQ TYPE="COMMENT3">&lt;=</SEQ>
+		<SEQ TYPE="COMMENT3">&lt; </SEQ>
+
+		<!-- HTML tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS"
+			NO_LINE_BREAK="TRUE">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="LABEL">@</MARK_FOLLOWING>
+	</RULES>
+
+</MODE>

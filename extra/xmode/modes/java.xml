@@ -1,0 +1,273 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="indentNextLine"
+			VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+		<PROPERTY NAME="unindentThisLine"
+			VALUE="^.*(default:\s*|case.*:.*)$" />
+		<PROPERTY NAME="electricKeys" VALUE=":" />
+	</PROPS>
+	<RULES ESCAPE="\"
+		IGNORE_CASE="FALSE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="(0[lL]?|[1-9]\d{0,9}(\d{0,9}[lL])?|0[xX]\p{XDigit}{1,8}(\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))">
+
+		<!-- Silly comment -->
+		<SEQ TYPE="COMMENT1">/**/</SEQ>
+
+		<!-- Javadoc comment -->
+		<SPAN TYPE="COMMENT3" DELEGATE="JAVADOC">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<!-- Java comment (C style) -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+
+		<!-- workaround to stop "*" from being colorized
+		     in import statements. -->
+		<SEQ TYPE="NULL">.*</SEQ>
+
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR"
+			AT_WHITESPACE_END="TRUE">:</MARK_PREVIOUS>
+
+		<!-- Function calls -->
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<!-- Annotation types -->
+		<MARK_FOLLOWING TYPE="KEYWORD4">@</MARK_FOLLOWING>
+
+		<KEYWORDS>
+			<KEYWORD1>abstract</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>extends</KEYWORD1>
+			<KEYWORD1>final</KEYWORD1>
+			<KEYWORD1>finally</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>implements</KEYWORD1>
+			<KEYWORD1>instanceof</KEYWORD1>
+			<KEYWORD1>native</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>private</KEYWORD1>
+			<KEYWORD1>protected</KEYWORD1>
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>static</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>synchronized</KEYWORD1>
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>throws</KEYWORD1>
+			<KEYWORD1>transient</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>volatile</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+
+			<KEYWORD2>package</KEYWORD2>
+			<KEYWORD2>import</KEYWORD2>
+
+			<KEYWORD3>boolean</KEYWORD3>
+			<KEYWORD3>byte</KEYWORD3>
+			<KEYWORD3>char</KEYWORD3>
+			<KEYWORD3>class</KEYWORD3>
+			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD3>float</KEYWORD3>
+			<KEYWORD3>int</KEYWORD3>
+			<KEYWORD3>interface</KEYWORD3>
+			<KEYWORD3>long</KEYWORD3>
+			<KEYWORD3>short</KEYWORD3>
+			<KEYWORD3>void</KEYWORD3>
+
+			<FUNCTION>assert</FUNCTION>
+			<KEYWORD1>strictfp</KEYWORD1>
+
+
+			<LITERAL2>false</LITERAL2>
+			<LITERAL2>null</LITERAL2>
+			<LITERAL2>super</LITERAL2>
+			<LITERAL2>this</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+
+			<INVALID>goto</INVALID>
+			<INVALID>const</INVALID>
+
+			<!-- Java 1.5 -->
+			<KEYWORD3>enum</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="JAVADOC" DEFAULT="COMMENT3" IGNORE_CASE="TRUE">
+
+		<!-- so that *@param is highlighted -->
+		<SEQ TYPE="COMMENT3">*</SEQ>
+
+		<!-- Javadoc ignores tags inside <pre> -->
+		<!-- XXX no it doesn't -->
+		<!-- SPAN TYPE="MARKUP" DELEGATE="JAVADOC_PRE">
+			<BEGIN>&lt;pre&gt;</BEGIN>
+			<END>&lt;/pre&gt;</END>
+		</SPAN -->
+
+		<!-- HTML comments -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- Javadoc allows this -->
+		<SEQ TYPE="COMMENT3">&lt;&lt;</SEQ>
+		<SEQ TYPE="COMMENT3">&lt;=</SEQ>
+		<SEQ TYPE="COMMENT3">&lt; </SEQ>
+
+		<!-- HTML tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS"
+			NO_LINE_BREAK="TRUE">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- so that @link{...} is highlighted -->
+		<!-- XXX: this is wrong, {@link ..} is correct, see below -->
+		<!--<SEQ TYPE="COMMENT3">{</SEQ>-->
+
+		<SPAN_REGEXP TYPE="LABEL" HASH_CHAR="{@" NO_WORD_BREAK="FALSE" DELEGATE="JAVADOC_PARAM">
+			<BEGIN>\{@(link|linkplain|docRoot|code|literal)\s</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
+
+		<!-- for the common usage of the cvs keyword $Id: java.xml 9228 2007-03-27 22:01:25Z ezust $ -->
+		<SPAN_REGEXP TYPE="LABEL" HASH_CHAR="@version" NO_WORD_BREAK="FALSE" DELEGATE="JAVADOC_PARAM">
+			<BEGIN>@version\s+\$</BEGIN>
+			<END>$</END>
+		</SPAN_REGEXP>
+
+		<!-- This works only when you use the same whitespace before and after the param's name,
+			 eg. a tab before and after, but mixing space and tab won't work.
+			 The reason is that you can't enter a regexp in END, except for the backreference operator $n -->
+		<SPAN_REGEXP TYPE="LABEL" HASH_CHAR="@" NO_WORD_BREAK="FALSE" DELEGATE="JAVADOC_PARAM">
+			<BEGIN>@(?:param|throws|exception|serialField)(\s)</BEGIN>
+			<END>$1</END>
+		</SPAN_REGEXP>
+
+		<KEYWORDS>
+		<!-- Note: the labels in comments are handled by SPANs above -->
+
+		<!-- Official javadoc tags:
+			 http://java.sun.com/j2se/1.5/docs/tooldocs/windows/javadoc.html#javadoctags -->
+			<LABEL>@author</LABEL>
+			<LABEL>@deprecated</LABEL>
+		<!--<LABEL>@docRoot</LABEL>-->
+		<!--<LABEL>@exception</LABEL>-->
+			<LABEL>{@inheritDoc}</LABEL>
+		<!--<LABEL>@link</LABEL>-->
+		<!--<LABEL>@linkplain</LABEL>-->
+		<!--<LABEL>@param</LABEL>-->
+			<LABEL>@return</LABEL>
+			<LABEL>@see</LABEL>
+			<LABEL>@serial</LABEL>
+			<LABEL>@serialData</LABEL>
+		<!--<LABEL>@serialField</LABEL>-->
+			<LABEL>@since</LABEL>
+		<!--<LABEL>@throws</LABEL>-->
+			<LABEL>{@value}</LABEL>
+			<LABEL>@version</LABEL>
+
+		<!-- new in 1.5 -->
+		<!--<LABEL>@code</LABEL>-->
+		<!--<LABEL>@literal</LABEL>-->
+
+		<!-- SUNs proposed tags:
+			 http://java.sun.com/j2se/javadoc/proposed-tags.html -->
+			<KEYWORD2>@category</KEYWORD2>
+			<KEYWORD2>@example</KEYWORD2>
+			<KEYWORD2>@exclude</KEYWORD2>
+			<KEYWORD2>@index</KEYWORD2>
+			<KEYWORD2>@internal</KEYWORD2>
+			<KEYWORD2>@obsolete</KEYWORD2>
+			<KEYWORD2>@threadsafety</KEYWORD2>
+			<KEYWORD2>@tutorial</KEYWORD2>
+			<KEYWORD2>@todo</KEYWORD2>
+
+		<!-- Custom tags -->
+			<KEYWORD4>@access</KEYWORD4>
+			<KEYWORD4>@beaninfo</KEYWORD4>
+			<KEYWORD4>@bon</KEYWORD4>
+			<KEYWORD4>@bug</KEYWORD4>
+			<KEYWORD4>@complexity</KEYWORD4>
+			<KEYWORD4>@design</KEYWORD4>
+			<KEYWORD4>@ensures</KEYWORD4>
+			<KEYWORD4>@equivalent</KEYWORD4>
+			<KEYWORD4>@generates</KEYWORD4>
+			<KEYWORD4>@guard</KEYWORD4>
+			<KEYWORD4>@hides</KEYWORD4>
+			<KEYWORD4>@history</KEYWORD4>
+			<KEYWORD4>@idea</KEYWORD4>
+			<KEYWORD4>@invariant</KEYWORD4>
+			<KEYWORD4>@modifies</KEYWORD4>
+			<KEYWORD4>@overrides</KEYWORD4>
+			<KEYWORD4>@post</KEYWORD4>
+			<KEYWORD4>@pre</KEYWORD4>
+			<KEYWORD4>@references</KEYWORD4>
+			<KEYWORD4>@requires</KEYWORD4>
+			<KEYWORD4>@review</KEYWORD4>
+			<KEYWORD4>@spec</KEYWORD4>
+			<KEYWORD4>@uses</KEYWORD4>
+			<KEYWORD4>@values</KEYWORD4>
+		</KEYWORDS>
+	</RULES>
+
+	<!-- just a dummy which makes use of the default token type COMMENT4 for highlighting the word after @param in javadoc -->
+	<RULES SET="JAVADOC_PARAM" DEFAULT="COMMENT4" IGNORE_CASE="TRUE" />
+</MODE>
