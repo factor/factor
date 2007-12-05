@@ -273,7 +273,11 @@ ARTICLE: "changes" "Changes in the latest release"
     { { $vocab-link "channels" } " - concurrent message passing over message channels" }
     { { $vocab-link "destructors" } " - deterministic scope-based resource deallocation (Doug Coleman)" }
     { { $vocab-link "dlists" } " - various updates (Doug Coleman)" }
+    { { $vocab-link "editors.emeditor" } " - EmEditor integration (Doug Coleman)" }
+    { { $vocab-link "editors.editplus" } " - EditPlus integration (Aaron Schaefer)" }
     { { $vocab-link "editors.notepadpp" } " - Notepad++ integration (Doug Coleman)" }
+    { { $vocab-link "editors.ted-notepad" } " - TED Notepad integration (Doug Coleman)" }
+    { { $vocab-link "editors.ultraedit" } " - UltraEdit integration (Doug Coleman)" }
     { { $vocab-link "heaps" } " - updated for new module system and cleaned up (Doug Coleman)" }
     { { $vocab-link "peg" } " - Parser Expression Grammars, a new appoach to parser construction, similar to parser combinators (Chris Double)" }
     { { $vocab-link "regexp" } " - revived from " { $snippet "unmaintained/" } " and completely redesigned (Doug Coleman)" }
