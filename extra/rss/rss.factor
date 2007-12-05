@@ -99,5 +99,5 @@ C: <entry> entry
         feed-entries [ entry, ] each
     ] make-xml* ;
 
-: write-feed ( feed -- xml )
+: write-feed ( feed -- )
     feed>xml write-xml ;
