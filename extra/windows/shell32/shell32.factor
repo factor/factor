@@ -1,5 +1,5 @@
 USING: alien alien.c-types alien.syntax combinators
-kernel windows ;
+kernel windows windows.user32 ;
 IN: windows.shell32
 
 : CSIDL_DESKTOP HEX: 00 ; inline
@@ -67,20 +67,6 @@ IN: windows.shell32
 : CSIDL_FLAG_CREATE HEX: 8000 ; inline
 : CSIDL_FLAG_MASK HEX: ff00 ; inline
 
-: SW_HIDE            0 ; inline
-: SW_SHOWNORMAL      1 ; inline
-: SW_NORMAL          1 ; inline
-: SW_SHOWMINIMIZED   2 ; inline
-: SW_SHOWMAXIMIZED   3 ; inline
-: SW_MAXIMIZE        3 ; inline
-: SW_SHOWNOACTIVATE  4 ; inline
-: SW_SHOW            5 ; inline
-: SW_MINIMIZE        6 ; inline
-: SW_SHOWMINNOACTIVE 7 ; inline
-: SW_SHOWNA          8 ; inline
-: SW_RESTORE         9 ; inline
-: SW_SHOWDEFAULT     10 ; inline
-: SW_MAX          10 ; inline
 
 : S_OK 0 ; inline
 : S_FALSE 1 ; inline
