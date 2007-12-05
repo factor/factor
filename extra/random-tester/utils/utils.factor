@@ -93,9 +93,9 @@ C: <p-list> p-list
     >r make-p-list r> (each-permutation) ;
 
 
-MEMO: builder-permutations ( n -- seq )
-    { compose curry } swap permutations
-    [ >quotation ] map ; foldable
+: builder-permutations ( n -- seq )
+    { [ compose ] [ swap curry ] } swap permutations
+    [ concat ] map ; foldable
 
 : all-quot-permutations ( seq -- newseq )
     dup length 1- builder-permutations
@@ -103,3 +103,4 @@ MEMO: builder-permutations ( n -- seq )
     [ swap [ >r seq>stack r> call ] curry* map ] curry* map ;
 
 ! clear { map sq 10 } all-quot-permutations [ [ [ [ [ call ] keep datastack length 2 = [ . .s nl ] when ] catch ] in-thread drop ] each ] each
+! clear { map sq sq 10 } all-quot-permutations [ [ [ [ [ call ] keep datastack length 2 = [ . .s nl ] when ] catch ] in-thread drop ] each ] each
