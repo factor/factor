@@ -3,8 +3,8 @@ io.windows.nt io.windows.nt.backend kernel libc math
 threads windows windows.kernel32 ;
 IN: io.windows.nt.files
 
-M: windows-nt-io CreateFile-flags ( -- DWORD )
-    FILE_FLAG_OVERLAPPED ;
+M: windows-nt-io CreateFile-flags ( DWORD -- DWORD )
+    FILE_FLAG_OVERLAPPED bitor ;
 
 M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
     make-overlapped ;
