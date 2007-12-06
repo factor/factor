@@ -1,7 +1,3 @@
-<% USING: xmode.catalog sequences kernel html.elements assocs io ; %>
+<% USING: xmode.code2html splitting namespaces ; %>
 
-<select name="mode">
-    <% modes keys [
-        <option dup "factor" = [ "true" =selected ] when option> write </option>
-    ] each %>
-</select>
+<pre><% "contents" get string-lines "mode" get htmlize-lines %></pre>

@@ -1,5 +1,5 @@
 USING: calendar furnace furnace.validator io.files kernel
-namespaces sequences store ;
+namespaces sequences store http.server.responders html ;
 IN: webapps.pastebin
 
 TUPLE: pastebin pastes ;
@@ -28,21 +28,25 @@ SYMBOL: store
     pastebin get pastebin-pastes nth ;
 
 : show-paste ( n -- )
-    get-paste "show-paste" render-component ;
+    serving-html
+    get-paste
+    [ "show-paste" render-component ] with-html-stream ;
 
 \ show-paste { { "n" v-number } } define-action
 
 : new-paste ( -- )
-    "new-paste" render-template ;
+    serving-html
+    [ "new-paste" render-template ] with-html-stream ;
 
 \ new-paste { } define-action
 
 : paste-list ( -- )
+    serving-html
     [
         [ show-paste ] "show-paste-quot" set
         [ new-paste ] "new-paste-quot" set
         pastebin get "paste-list" render-component
-    ] with-scope ;
+    ] with-html-stream ;
 
 \ paste-list { } define-action
 
@@ -68,7 +72,7 @@ SYMBOL: store
 
 \ submit-paste [ paste-list ] define-redirect
 
-: annotate-paste ( n summary author contents -- )
+: annotate-paste ( n summary author mode contents -- )
     <annotation> swap get-paste
     paste-annotations push
     save-pastebin-store ;

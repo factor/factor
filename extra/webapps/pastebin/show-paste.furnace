@@ -1,4 +1,4 @@
-<% USING: namespaces io furnace sequences ; %>
+<% USING: namespaces io furnace sequences xmode.code2html ; %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -9,6 +9,7 @@
 
 	<title>Paste: <% "summary" get write %></title>
 	<link rel="stylesheet" href="/responder/file/css/pastebin.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	<% default-stylesheet %>
 </head>
 
 <h1 class="pastebin-title">[ <% "summary" get write %> ]</h1>
@@ -20,7 +21,7 @@
 <tr><th>File type:</th><td><% "mode" get write %></td></tr>
 </table>
 
-<pre><% "contents" get write %></pre>
+<% "syntax" render-template %>
 
 <% "annotations" get [ "annotation" render-component ] each %>
 

@@ -24,7 +24,7 @@
 </tr>
 
 <tr>
-<th valign="top">Contents:</th>
+<th valign="top">Content:</th>
 <td><textarea rows="24" cols="60" name="contents"></textarea></td>
 </tr>
 </table>
