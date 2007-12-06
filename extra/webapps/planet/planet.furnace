@@ -8,7 +8,7 @@
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 
 	<title>planet-factor</title>
-	<link rel="stylesheet" href="/responder/file/css/news.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8" />
     <link rel="alternate" type="application/atom+xml" title="Planet Factor - Atom" href="feed.xml" />
 </head>
 
@@ -28,7 +28,7 @@
                     <a href="feed.xml"> Syndicate </a>
                 </p>
                 <p>
-                    This webapp is written in <a href="http://factorcode.org/">Factor</a>.<br>
+                    This webapp is written in <a href="http://factorcode.org/">Factor</a>.<br/>
                     <% "webapps.planet" browse-webapp-source %>
                 </p>
                 <h2 class="blogroll-title">Blogroll</h2>

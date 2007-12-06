@@ -50,11 +50,6 @@ IN: webapps.planet
 : print-postings ( postings -- )
     [ print-posting ] each ;
 
-: browse-webapp-source ( vocab -- )
-    <a f >vocab-link browser-link-href =href a>
-        "Browse source" write
-    </a> ;
-
 SYMBOL: default-blogroll
 SYMBOL: cached-postings
 
@@ -71,11 +66,17 @@ SYMBOL: cached-postings
     "http://planet.factorcode.org"
     cached-postings get 30 head <feed> ;
 
-: feed.xml
+: feed.xml ( -- )
     "text/xml" serving-content
     planet-feed feed>xml write-xml ;
 
 \ feed.xml { } define-action
+
+: style.css ( -- )
+    "text/css" serving-content
+    "style.css" send-resource ;
+
+\ style.css { } define-action
 
 SYMBOL: last-update
 
