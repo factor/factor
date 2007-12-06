@@ -1,29 +1,29 @@
 <% USING: namespaces furnace sequences ; %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<%
+    "Pastebin" "title" set
+    "header" render-template
+%>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<table width="100%" cellspacing="10">
+    <tr>
+        <td valign="top">
+            <table width="100%">
+                <tr align="left" class="pastebin-headings">
+                    <th width="50%">Summary:</th>
+                    <th width="100">Paste by:</th>
+                    <th width="200">Date:</th>
+                </tr>
+                <% "pastes" get <reversed> [ "paste-summary" render-component ] each %>
+            </table>
+        </td>
+        <td valign="top" width="25%" class="infobox">
+            <p>This pastebin is written in <a href="http://factorcode.org/">Factor</a>. It can be used for collaborative development over IRC. You can post code for review, and annotate other people's code. Syntax highlighting for over a hundred file types is supported.
+            </p>
+            <p>
+            <% "webapps.pastebin" browse-webapp-source %></p>
+        </td>
+    </tr>
+</table>
 
-	<title>Pastebin</title>
-	<link rel="stylesheet" href="/responder/file/css/pastebin.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-    <link rel="alternate" type="application/atom+xml" title="Pastebin - Atom" href="feed.xml" />
-</head>
-
-<body id="index">
-    <h1 class="pastebin-title">[ "paste" bin ]</h1>
-
-    <table width="100%">
-        <% "new-paste-quot" get "New paste" render-link %>
-        <tr align="left" class="pastebin-headings">
-            <th>&nbsp;</th>
-            <th>Summary:</th>
-            <th>Paste by:</th>
-            <th>Date:</th>
-        </tr>
-        <% "pastes" get <reversed> [ "paste-summary" render-component ] each %>
-    </table>
-</body>
-</html>
+<% "footer" render-template %>

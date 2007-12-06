@@ -1,7 +1,7 @@
-<% USING: xmode.catalog sequences kernel html.elements assocs io ; %>
+<% USING: xmode.catalog sequences kernel html.elements assocs io sorting ; %>
 
 <select name="mode">
-    <% modes keys [
+    <% modes keys natural-sort [
         <option dup "factor" = [ "true" =selected ] when option> write </option>
     ] each %>
 </select>

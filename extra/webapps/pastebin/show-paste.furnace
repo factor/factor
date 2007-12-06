@@ -1,18 +1,9 @@
 <% USING: namespaces io furnace sequences xmode.code2html ; %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-
-	<title>Paste: <% "summary" get write %></title>
-	<link rel="stylesheet" href="/responder/file/css/pastebin.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-	<% default-stylesheet %>
-</head>
-
-<h1 class="pastebin-title">[ <% "summary" get write %> ]</h1>
+<%
+    "Paste: " "summary" get append "title" set
+    "header" render-template
+%>
 
 <table>
 <tr><th>Paste by:</th><td><% "author" get write %></td></tr>
@@ -26,3 +17,5 @@
 <% "annotations" get [ "annotation" render-component ] each %>
 
 <% model get "annotate-paste" render-component %>
+
+<% "footer" render-template %>

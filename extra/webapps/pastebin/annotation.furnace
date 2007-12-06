@@ -8,4 +8,4 @@
 <tr><th>Created:</th><td><% "date" get write %></td></tr>
 </table>
 
-<% "syntax" render-template %
+<% "syntax" render-template %>

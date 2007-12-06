@@ -1,13 +1,11 @@
-<% USING: continuations namespaces io kernel math math.parser furnace ; %>
+<% USING: continuations namespaces io kernel math math.parser furnace webapps.pastebin ; %>
 
 <tr>
-    <td><% "n" get number>string write %></td>
-    <td><%
-        "n" get number>string
-        "show-paste-quot" get curry
-        "summary" get
-        render-link
-    %></td>
+    <td>
+        <a href="<% model get paste-link write %>">
+            <% "summary" get write %>
+        </a>
+    </td>
     <td><% "author" get write %></td>
     <td><% "date" get print %></td>
 </tr>

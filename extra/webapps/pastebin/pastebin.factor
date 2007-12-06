@@ -1,5 +1,6 @@
 USING: calendar furnace furnace.validator io.files kernel
-namespaces sequences store http.server.responders html ;
+namespaces sequences store http.server.responders html
+math.parser rss xml.writer ;
 IN: webapps.pastebin
 
 TUPLE: pastebin pastes ;
@@ -50,6 +51,26 @@ SYMBOL: store
 
 \ paste-list { } define-action
 
+: paste-link ( paste -- link )
+    paste-n number>string [ show-paste ] curry quot-link ;
+
+: paste-feed ( -- entries )
+    pastebin get pastebin-pastes [
+        {
+            paste-summary
+            paste-link
+            paste-date
+        } get-slots "" swap <entry>
+    ] map ;
+
+: feed.xml ( -- )
+    "text/xml" serving-content
+    "pastebin"
+    "http://pastebin.factorcode.org"
+    paste-feed <feed> feed>xml write-xml ;
+
+\ feed.xml { } define-action
+
 : save-pastebin-store ( -- )
     store get-global save-store ;
 
@@ -86,5 +107,11 @@ SYMBOL: store
 } define-action
 
 \ annotate-paste [ "n" show-paste ] define-redirect
+
+: style.css ( -- )
+    "text/css" serving-content
+    "style.css" send-resource ;
+
+\ style.css { } define-action
 
 "pastebin" "paste-list" "extra/webapps/pastebin" web-app
