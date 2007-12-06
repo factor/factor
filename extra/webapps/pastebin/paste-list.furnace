@@ -18,7 +18,9 @@
             </table>
         </td>
         <td valign="top" width="25%" class="infobox">
-            <p>This pastebin is written in <a href="http://factorcode.org/">Factor</a>. It can be used for collaborative development over IRC. You can post code for review, and annotate other people's code. Syntax highlighting for over a hundred file types is supported.
+            <p>This pastebin is written in <a href="http://factorcode.org/">Factor</a>. It is inspired by <a href="http://paste.lisp.org">lisppaste</a>.
+            </p>
+            <p>It can be used for collaborative development over IRC. You can post code for review, and annotate other people's code. Syntax highlighting for over a hundred file types is supported.
             </p>
             <p>
             <% "webapps.pastebin" browse-webapp-source %></p>
