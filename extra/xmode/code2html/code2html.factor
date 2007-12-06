@@ -16,9 +16,7 @@ IN: xmode.code2html
     tokenize-line htmlize-tokens ;
 
 : htmlize-lines ( lines mode -- )
-    <pre>
-        f swap load-mode [ htmlize-line nl ] curry reduce drop
-    </pre> ;
+    f swap load-mode [ htmlize-line nl ] curry reduce drop ;
 
 : default-stylesheet ( -- )
     <style>
@@ -34,9 +32,11 @@ IN: xmode.code2html
             <title> dup write </title>
         </head>
         <body>
-            over empty?
-            [ 2drop ]
-            [ over first find-mode htmlize-lines ] if
+            <pre>
+                over empty?
+                [ 2drop ]
+                [ over first find-mode htmlize-lines ] if
+            </pre>
         </body>
     </html> ;
 
