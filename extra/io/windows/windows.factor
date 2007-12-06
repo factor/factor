@@ -4,12 +4,22 @@ USING: alien alien.c-types arrays destructors io io.backend
 io.buffers io.files io.nonblocking io.sockets io.binary
 io.sockets.impl windows.errors strings io.streams.duplex kernel
 math namespaces sequences windows windows.kernel32
-windows.winsock splitting ;
+windows.shell32 windows.winsock splitting ;
 IN: io.windows
 
 TUPLE: windows-nt-io ;
 TUPLE: windows-ce-io ;
 UNION: windows-io windows-nt-io windows-ce-io ;
+
+M: windows-io library-roots ( -- seq )
+    [
+        windows ,
+    ] { } make ;
+
+M: windows-io binary-roots ( -- seq )
+    [
+        windows ,
+    ] { } make ;
 
 M: windows-io destruct-handle CloseHandle drop ;
 
