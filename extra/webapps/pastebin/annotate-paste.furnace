@@ -1,4 +1,4 @@
-<% USING: io math math.parser namespaces ; %>
+<% USING: io math math.parser namespaces furnace ; %>
 
 <h1>Annotate</h1>
 
@@ -16,6 +16,11 @@
 <tr>
 <th>Summary:</th>
 <td><input type="TEXT" name="summary" value="" /></td>
+</tr>
+
+<tr>
+<th>File type:</th>
+<td><% "modes" render-template %></td>
 </tr>
 
 <tr>

@@ -121,7 +121,7 @@ SYMBOL: last-update
 
 {
     { "Berlin Brown" "http://factorlang-fornovices.blogspot.com/feeds/posts/default" "http://factorlang-fornovices.blogspot.com" }
-    { "Chris Double" "http://www.bluishcoder.co.nz/atom.xml" "http://www.bluishcoder.co.nz/" }
+    { "Chris Double" "http://www.blogger.com/feeds/18561009/posts/full/-/factor" "http://www.bluishcoder.co.nz/" }
     { "Elie Chaftari" "http://fun-factor.blogspot.com/feeds/posts/default" "http://fun-factor.blogspot.com/" }
     { "Doug Coleman" "http://code-factor.blogspot.com/feeds/posts/default" "http://code-factor.blogspot.com/" }
     { "Daniel Ehrenberg" "http://useless-factor.blogspot.com/feeds/posts/default" "http://useless-factor.blogspot.com/" }

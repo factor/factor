@@ -101,36 +101,10 @@ SYMBOL: request-params
 
 : service-post ( url -- ) "response" get swap service-request ;
 
-: explode-tuple ( tuple -- )
-    dup tuple-slots swap class "slot-names" word-prop
-    [ set ] 2each ;
-
-SYMBOL: model
-
-: call-template ( model template -- )
-    [
-        >r [ dup model set explode-tuple ] when* r>
-        ".furnace" append resource-path run-template-file
-    ] with-scope ;
-
-: render-template ( model template -- )
-    template-path get swap path+ call-template ;
-
-: render-page* ( model body-template head-template -- )
-    [
-        [ render-template ] [ f rot render-template ] html-document 
-    ] serve-html ;
-
-: render-titled-page* ( model body-template head-template title -- )
-    [ 
-        [ render-template ] swap [ <title> write </title> f rot render-template ] curry html-document
-    ] serve-html ;
-
-
-: render-page ( model template title -- )
-    [
-        [ render-template ] simple-html-document
-    ] serve-html ;
+: render-template ( template -- )
+    template-path get swap path+
+    ".furnace" append resource-path
+    run-template-file ;
 
 : web-app ( name default path -- )
     [
@@ -141,3 +115,34 @@ SYMBOL: model
         [ service-post ] "post" set
         ! [ service-head ] "head" set
     ] make-responder ;
+
+: explode-tuple ( tuple -- )
+    dup tuple-slots swap class "slot-names" word-prop
+    [ set ] 2each ;
+
+SYMBOL: model
+
+: with-slots ( model quot -- )
+    [
+        >r [ dup model set explode-tuple ] when* r> call
+    ] with-scope ;
+
+: render-component ( model template -- )
+    swap [ render-template ] with-slots ;
+
+! Deprecated stuff
+
+: render-page* ( model body-template head-template -- )
+    [
+        [ render-component ] [ f rot render-component ] html-document 
+    ] serve-html ;
+
+: render-titled-page* ( model body-template head-template title -- )
+    [ 
+        [ render-component ] swap [ <title> write </title> f rot render-component ] curry html-document
+    ] serve-html ;
+
+: render-page ( model template title -- )
+    [
+        [ render-component ] simple-html-document
+    ] serve-html ;

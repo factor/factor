@@ -1,3 +1,5 @@
+<% USING: furnace ; %>
+
 <form method="POST" action="/responder/pastebin/submit-paste">
 
 <table>
@@ -10,6 +12,11 @@
 <tr>
 <th>Summary:</th>
 <td><input type="TEXT" name="summary" value="" /></td>
+</tr>
+
+<tr>
+<th>File type:</th>
+<td><% "modes" render-template %></td>
 </tr>
 
 <tr>

@@ -1,5 +1,5 @@
-USING: calendar furnace furnace.validator io.files kernel namespaces
-sequences store ;
+USING: calendar furnace furnace.validator io.files kernel
+namespaces sequences store ;
 IN: webapps.pastebin
 
 TUPLE: pastebin pastes ;
@@ -7,22 +7,16 @@ TUPLE: pastebin pastes ;
 : <pastebin> ( -- pastebin )
     V{ } clone pastebin construct-boa ;
 
-TUPLE: paste n summary article author channel contents date annotations ;
+TUPLE: paste
+summary author channel mode contents date
+annotations n ;
 
-: <paste> ( summary author channel contents -- paste )
-    V{ } clone
-    {
-        set-paste-summary
-        set-paste-author
-        set-paste-channel
-        set-paste-contents
-        set-paste-annotations
-    } paste construct ;
+: <paste> ( summary author channel mode contents -- paste )
+    f V{ } clone f paste construct-boa ;
 
-TUPLE: annotation summary author contents ;
+TUPLE: annotation summary author mode contents ;
 
 C: <annotation> annotation
-
 
 SYMBOL: store
 
@@ -34,12 +28,12 @@ SYMBOL: store
     pastebin get pastebin-pastes nth ;
 
 : show-paste ( n -- )
-    get-paste "show-paste" "Paste" render-page ;
+    get-paste "show-paste" render-component ;
 
 \ show-paste { { "n" v-number } } define-action
 
 : new-paste ( -- )
-    f "new-paste" "New paste" render-page ;
+    "new-paste" render-template ;
 
 \ new-paste { } define-action
 
@@ -47,22 +41,19 @@ SYMBOL: store
     [
         [ show-paste ] "show-paste-quot" set
         [ new-paste ] "new-paste-quot" set
-        pastebin get "paste-list" "Pastebin" render-page
+        pastebin get "paste-list" render-component
     ] with-scope ;
 
 \ paste-list { } define-action
-
-
 
 : save-pastebin-store ( -- )
     store get-global save-store ;
 
 : add-paste ( paste pastebin -- )
     >r now timestamp>http-string over set-paste-date r>
-    pastebin-pastes
-    [ length over set-paste-n ] keep push ;
+    pastebin-pastes 2dup length swap set-paste-n push ;
 
-: submit-paste ( summary author channel contents -- )
+: submit-paste ( summary author channel mode contents -- )
     <paste>
     \ pastebin get-global add-paste
     save-pastebin-store ;
@@ -71,6 +62,7 @@ SYMBOL: store
     { "summary" v-required }
     { "author" v-required }
     { "channel" "#concatenative" v-default }
+    { "mode" "factor" v-default }
     { "contents" v-required }
 } define-action
 
@@ -85,6 +77,7 @@ SYMBOL: store
     { "n" v-required v-number }
     { "summary" v-required }
     { "author" v-required }
+    { "mode" "factor" v-default }
     { "contents" v-required }
 } define-action
 

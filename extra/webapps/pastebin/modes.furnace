@@ -1,0 +1,7 @@
+<% USING: xmode.catalog sequences kernel html.elements assocs io ; %>
+
+<select name="mode">
+    <% modes keys [
+        <option dup "factor" = [ "true" =selected ] when option> write </option>
+    ] each %>
+</select>

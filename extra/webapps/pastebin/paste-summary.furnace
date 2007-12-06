@@ -1,9 +1,13 @@
 <% USING: continuations namespaces io kernel math math.parser furnace ; %>
 
 <tr>
-<td><% "n" get number>string write %></td>
-<td><% "summary" get write %></td>
-<td><% "author" get write %></td>
-<td><% "n" get number>string "show-paste-quot" get curry "Show" render-link %></td>
-<td><% "date" get print %></td>
+    <td><% "n" get number>string write %></td>
+    <td><%
+        "n" get number>string
+        "show-paste-quot" get curry
+        "summary" get
+        render-link
+    %></td>
+    <td><% "author" get write %></td>
+    <td><% "date" get print %></td>
 </tr>
