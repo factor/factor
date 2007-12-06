@@ -35,7 +35,6 @@ IN: webapps.file
 SYMBOL: serve-file-hook
 
 [
-    nip
     file-response
     stdio get stream-copy
 ] serve-file-hook set-global
@@ -47,7 +46,7 @@ SYMBOL: serve-file-hook
         "method" get "head" = [
             file-response
         ] [
-            >r dup <file-reader> r>
+            >r dup <file-reader> swap r>
             serve-file-hook get call
         ] if 
     ] if ;
