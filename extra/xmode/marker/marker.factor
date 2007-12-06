@@ -15,8 +15,8 @@ assocs combinators combinators.lib strings regexp splitting ;
         [ dup [ digit? ] contains? ]
         [
             dup [ digit? ] all? [
-                current-rule-set rule-set-digit-re dup
-                [ dupd 2drop f ] [ drop f ] if
+                current-rule-set rule-set-digit-re
+                dup [ dupd matches? ] [ drop f ] if
             ] unless*
         ]
     } && nip ;
@@ -26,7 +26,7 @@ assocs combinators combinators.lib strings regexp splitting ;
 
 : resolve-delegate ( name -- rules )
     dup string? [
-        "::" split1 [ swap load-mode at ] [ rule-sets get at ] if*
+        "::" split1 [ swap load-mode ] [ rule-sets get ] if* at
     ] when ;
 
 : rule-set-keyword-maps ( ruleset -- seq )
@@ -44,13 +44,6 @@ assocs combinators combinators.lib strings regexp splitting ;
     current-keyword
     dup mark-number [ ] [ mark-keyword ] ?if
     [ prev-token, ] when* ;
-
-: check-terminate-char ( -- )
-    current-rule-set rule-set-terminate-char [
-        position get <= [
-            terminated? on
-        ] when
-    ] when* ;
 
 : current-char ( -- char )
     position get line get nth ;
@@ -74,11 +67,22 @@ GENERIC: text-matches? ( position text -- match-count/f )
 M: f text-matches? 2drop f ;
 
 M: string text-matches?
-    ! XXX ignore case
     >r line get swap tail-slice r>
     [ head? ] keep length and ;
 
-! M: regexp text-matches? ... ;
+M: ignore-case text-matches?
+    >r line get swap tail-slice r>
+    ignore-case-string
+    2dup shorter? [
+        2drop f
+    ] [
+        [ length head-slice ] keep
+        [ [ >upper ] 2apply sequence= ] keep
+        length and
+    ] if ;
+
+M: regexp text-matches?
+    2drop f ; ! >r line get swap tail-slice r> match-head ;
 
 : rule-start-matches? ( rule -- match-count/f )
     dup rule-start tuck swap can-match-here? [
@@ -284,8 +288,6 @@ M: mark-previous-rule handle-rule-start
 
 : mark-token-loop ( -- )
     position get line get length < [
-        check-terminate-char
-
         {
             [ check-end-delegate ]
             [ check-every-rule ]
@@ -302,8 +304,7 @@ M: mark-previous-rule handle-rule-start
 
 : unwind-no-line-break ( -- )
     context get line-context-parent [
-        line-context-in-rule rule-no-line-break?
-        terminated? get or [
+        line-context-in-rule rule-no-line-break? [
             pop-context
             unwind-no-line-break
         ] when

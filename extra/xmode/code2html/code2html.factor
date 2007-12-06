@@ -15,8 +15,10 @@ IN: xmode.code2html
 : htmlize-line ( line-context line rules -- line-context' )
     tokenize-line htmlize-tokens ;
 
-: htmlize-lines ( lines rules -- )
-    <pre> f -rot [ htmlize-line nl ] curry each drop </pre> ;
+: htmlize-lines ( lines mode -- )
+    <pre>
+        f swap load-mode [ htmlize-line nl ] curry reduce drop
+    </pre> ;
 
 : default-stylesheet ( -- )
     <style>
@@ -24,22 +26,20 @@ IN: xmode.code2html
         resource-path <file-reader> contents write
     </style> ;
 
+: htmlize-stream ( path stream -- )
+    lines swap
+    <html>
+        <head>
+            default-stylesheet
+            <title> dup write </title>
+        </head>
+        <body>
+            over empty?
+            [ 2drop ]
+            [ over first find-mode htmlize-lines ] if
+        </body>
+    </html> ;
+
 : htmlize-file ( path -- )
-    dup <file-reader> lines dup empty? [ 2drop ] [
-        swap dup ".html" append <file-writer> [
-            [
-                <html>
-                    <head>
-                        <title> dup write </title>
-                        default-stylesheet
-                    </head>
-                    <body>
-                        over first
-                        find-mode
-                        load-mode
-                        htmlize-lines
-                    </body>
-                </html>
-            ] with-html-stream
-        ] with-stream
-    ] if ;
+    dup <file-reader> over ".html" append <file-writer>
+    [ htmlize-stream ] with-stream ;
