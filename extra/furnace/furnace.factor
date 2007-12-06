@@ -5,7 +5,7 @@ USING: kernel vectors io assocs quotations splitting strings
        continuations tuples classes io.files 
        http http.server.templating http.basic-authentication 
        webapps.callback html html.elements 
-       http.server.responders furnace.validator ;
+       http.server.responders furnace.validator vocabs ;
 IN: furnace
 
 SYMBOL: default-action
@@ -101,6 +101,10 @@ SYMBOL: request-params
 
 : service-post ( url -- ) "response" get swap service-request ;
 
+: send-resource ( name -- )
+    template-path get swap path+ resource-path <file-reader>
+    stdio get stream-copy ;
+
 : render-template ( template -- )
     template-path get swap path+
     ".furnace" append resource-path
@@ -130,19 +134,7 @@ SYMBOL: model
 : render-component ( model template -- )
     swap [ render-template ] with-slots ;
 
-! Deprecated stuff
-
-: render-page* ( model body-template head-template -- )
-    [
-        [ render-component ] [ f rot render-component ] html-document 
-    ] serve-html ;
-
-: render-titled-page* ( model body-template head-template title -- )
-    [ 
-        [ render-component ] swap [ <title> write </title> f rot render-component ] curry html-document
-    ] serve-html ;
-
-: render-page ( model template title -- )
-    [
-        [ render-component ] simple-html-document
-    ] serve-html ;
+: browse-webapp-source ( vocab -- )
+    <a f >vocab-link browser-link-href =href a>
+        "Browse source" write
+    </a> ;
