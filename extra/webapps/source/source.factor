@@ -12,7 +12,7 @@ global [
             [
                 drop
                 serving-html
-                htmlize-stream
+                swap htmlize-stream
             ] serve-file-hook set
             file-responder
         ] with-scope
