@@ -38,3 +38,21 @@ M: unix-io make-directory ( path -- )
 
 M: unix-io delete-directory ( path -- )
     rmdir io-error ;
+
+M: unix-io binary-roots ( -- seq )
+    {
+        "/bin" "/sbin"
+        "/usr/bin" "/usr/sbin"
+        "/usr/local/bin" "/usr/local/sbin"
+        "/opt/local/bin" "/opt/local/sbin"
+        "~/bin"
+    } ;
+
+M: unix-io library-roots ( -- seq )
+    {
+        "/lib"
+        "/usr/lib"
+        "/usr/local/lib"
+        "/opt/local/lib"
+        "/lib64"
+    } ;
