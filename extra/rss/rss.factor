@@ -74,7 +74,7 @@ C: <entry> entry
 
 : download-feed ( url -- feed )
     #! Retrieve an news syndication file, return as a feed tuple.
-    http-get rot 200 = [
+    http-get-stream rot 200 = [
         nip read-feed
     ] [
         2drop "Error retrieving newsfeed file" throw
@@ -84,12 +84,15 @@ C: <entry> entry
 : simple-tag, ( content name -- )
     [ , ] tag, ;
 
+: simple-tag*, ( content name attrs -- )
+    [ , ] tag*, ;
+
 : entry, ( entry -- )
     "entry" [
-        dup entry-title "title" simple-tag,
+        dup entry-title "title" { { "type" "html" } } simple-tag*,
         "link" over entry-link "href" associate contained*,
         dup entry-pub-date "published" simple-tag,
-        entry-description "content" simple-tag,
+        entry-description "content" { { "type" "html" } } simple-tag*,
     ] tag, ;
 
 : feed>xml ( feed -- xml )
