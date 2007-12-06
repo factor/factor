@@ -1,5 +1,5 @@
 
-USING: kernel parser namespaces threads sequences unix unix.process
+USING: kernel parser namespaces threads arrays sequences unix unix.process
        combinators.cleave bake ;
 
 IN: raptor
@@ -23,6 +23,8 @@ SYMBOL: networking-hook
   fork dup 0 = [ drop exec drop ] [ 2nip wait-for-pid drop ] if ;
 
 : fork-exec-args-wait ( args -- ) [ first ] [ ] bi fork-exec-wait ;
+
+: fork-exec-arg ( arg -- ) 1array [ fork-exec-args-wait ] curry in-thread ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

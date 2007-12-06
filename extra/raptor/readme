@@ -32,6 +32,12 @@ another Linux distribution.
 
   # cp -v /scratch/factor/factor.image /sbin/init.image
 
+*** Filesystems ***
+
+  # emacs /etc/raptor/config.factor
+
+Edit the root-device and swap-devices variables.
+
 *** Static IP networking ***
 
 If you use a static IP in your network then Factor can take care of
@@ -70,6 +76,8 @@ The items in boot-hook correspond to the things in '/etc/rcS.d' and
 '/etc/rc2.d'. Feel free to add and remove items from that hook. For
 example, I removed the printer services. I also removed other things
 that I didn't feel were necessary on my system.
+
+Look for the line with the call to 'set-hostname' and edit it appropriately.
 
 *** Grub ***
 
