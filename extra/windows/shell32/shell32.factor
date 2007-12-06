@@ -79,17 +79,14 @@ IN: windows.shell32
 
 LIBRARY: shell32
 
-TYPEDEF: void* PIDLIST_ABSOLUTE
 FUNCTION: HRESULT SHGetFolderPathW ( HWND hwndOwner, int nFolder, HANDLE hToken, DWORD dwReserved, LPTSTR pszPath ) ;
-! SHGetSpecialFolderLocation
-! SHGetSpecialFolderPath
+: SHGetFolderPath SHGetFolderPathW ; inline
+
 FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile, LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShowCmd ) ;
 : ShellExecute ShellExecuteW ; inline
 
 : open-in-explorer ( dir -- )
     f "open" rot f f SW_SHOWNORMAL ShellExecute drop ;
-
-: SHGetFolderPath SHGetFolderPathW ; inline
 
 : shell32-error ( n -- )
     dup S_OK = [
@@ -115,6 +112,9 @@ FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFi
 
 : application-data ( -- str )
     CSIDL_APPDATA shell32-directory ;
+
+: windows ( -- str )
+    CSIDL_WINDOWS shell32-directory ;
 
 : programs ( -- str )
     CSIDL_PROGRAMS shell32-directory ;
