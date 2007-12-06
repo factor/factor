@@ -4,7 +4,7 @@ USING: alien alien.c-types arrays assocs ui ui.gadgets
 ui.backend ui.clipboards ui.gadgets.worlds ui.gestures io kernel
 math math.vectors namespaces prettyprint sequences strings
 vectors words windows.kernel32 windows.gdi32 windows.user32
-windows.shell32 windows.opengl32 windows.messages windows.types
+windows.opengl32 windows.messages windows.types
 windows.nt windows threads timers libc combinators continuations
 command-line shuffle opengl ui.render ;
 IN: ui.windows
