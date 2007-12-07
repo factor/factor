@@ -16,7 +16,6 @@ SYMBOL: seen-whitespace-end?
 SYMBOL: escaped?
 SYMBOL: process-escape?
 SYMBOL: delegate-end-escaped?
-SYMBOL: terminated?
 
 : current-rule ( -- rule )
     context get line-context-in-rule ;

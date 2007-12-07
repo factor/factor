@@ -1,7 +1,31 @@
 <% USING: namespaces furnace sequences ; %>
 
-<table  width="100%">
-<% "new-paste-quot" get "New paste" render-link %>
-<tr align="left"><th>&nbsp;</th><th>Summary:</th><th>Paste by:</th><th>Link</th><th>Date</th></tr>
-<% "pastes" get <reversed> [ "paste-summary" render-template ] each %></table>
+<%
+    "Pastebin" "title" set
+    "header" render-template
+%>
 
+<table width="100%" cellspacing="10">
+    <tr>
+        <td valign="top">
+            <table width="100%">
+                <tr align="left" class="pastebin-headings">
+                    <th width="50%">Summary:</th>
+                    <th width="100">Paste by:</th>
+                    <th width="200">Date:</th>
+                </tr>
+                <% "pastes" get <reversed> [ "paste-summary" render-component ] each %>
+            </table>
+        </td>
+        <td valign="top" width="25%" class="infobox">
+            <p>This pastebin is written in <a href="http://factorcode.org/">Factor</a>. It is inspired by <a href="http://paste.lisp.org">lisppaste</a>.
+            </p>
+            <p>It can be used for collaborative development over IRC. You can post code for review, and annotate other people's code. Syntax highlighting for over a hundred file types is supported.
+            </p>
+            <p>
+            <% "webapps.pastebin" browse-webapp-source %></p>
+        </td>
+    </tr>
+</table>
+
+<% "footer" render-template %>

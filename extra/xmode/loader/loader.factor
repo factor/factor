@@ -32,10 +32,13 @@ IN: xmode.loader
     swap [ at string>boolean ] curry map first3 ;
 
 : parse-literal-matcher ( tag -- matcher )
-    dup children>string swap position-attrs <matcher> ;
+    dup children>string
+    \ ignore-case? get [ <ignore-case> ] when
+    swap position-attrs <matcher> ;
 
 : parse-regexp-matcher ( tag -- matcher )
-    dup children>string <regexp> swap position-attrs <matcher> ;
+    dup children>string <regexp>
+    swap position-attrs <matcher> ;
 
 ! SPAN's children
 <TAGS: parse-begin/end-tag
@@ -130,14 +133,17 @@ RULE: MARK_FOLLOWING mark-following-rule
 RULE: MARK_PREVIOUS mark-previous-rule
     shared-tag-attrs match-type-attr literal-start ;
 
-: parse-keyword-tag
-    dup name-tag string>token swap children>string rot set-at ;
+: parse-keyword-tag ( tag keyword-map -- )
+    >r dup name-tag string>token swap children>string r> set-at ;
 
 TAG: KEYWORDS ( rule-set tag -- key value )
-    >r rule-set-keywords r>
-    child-tags [ parse-keyword-tag ] curry* each ;
+    \ ignore-case? get <keyword-map>
+    swap child-tags [ over parse-keyword-tag ] each
+    swap set-rule-set-keywords ;
 
 TAGS>
+
+: ?<regexp> dup [ <regexp> ] when ;
 
 : (parse-rules-tag) ( tag -- rule-set )
     <rule-set>
@@ -145,7 +151,7 @@ TAGS>
         { "SET" string>rule-set-name set-rule-set-name }
         { "IGNORE_CASE" string>boolean set-rule-set-ignore-case? }
         { "HIGHLIGHT_DIGITS" string>boolean set-rule-set-highlight-digits? }
-        { "DIGIT_RE" <regexp> set-rule-set-digit-re } ! XXX
+        { "DIGIT_RE" ?<regexp> set-rule-set-digit-re }
         { "ESCAPE" f add-escape-rule }
         { "DEFAULT" string>token set-rule-set-default }
         { "NO_WORD_SEP" f set-rule-set-no-word-sep }
@@ -153,9 +159,10 @@ TAGS>
 
 : parse-rules-tag ( tag -- rule-set )
     dup (parse-rules-tag) [
-        swap child-tags [
-            parse-rule-tag
-        ] curry* each
+        [
+            dup rule-set-ignore-case? \ ignore-case? set
+            swap child-tags [ parse-rule-tag ] curry* each
+        ] with-scope
     ] keep ;
 
 : merge-rule-set-props ( props rule-set -- )

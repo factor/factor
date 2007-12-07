@@ -109,3 +109,21 @@ IN: temporary
 ] [
     f "$FOO" "shellscript" load-mode tokenize-line nip
 ] unit-test
+
+[
+    {
+        T{ token f "AND" KEYWORD1 }
+    }
+] [
+    f "AND" "pascal" load-mode tokenize-line nip
+] unit-test
+
+[
+    {
+        T{ token f "Comment {" COMMENT1 }
+        T{ token f "XXX" COMMENT1 }
+        T{ token f "}" COMMENT1 }
+    }
+] [
+    f "Comment {XXX}" "rebol" load-mode tokenize-line nip
+] unit-test

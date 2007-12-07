@@ -1,27 +1,41 @@
+<% USING: furnace namespaces ; %>
+
+<%
+    "new paste" "title" set
+    "header" render-template
+%>
+
 <form method="POST" action="/responder/pastebin/submit-paste">
 
 <table>
 
 <tr>
-<th>Your name:</th>
-<td><input type="TEXT" name="author" value="" /></td>
-</tr>
-
-<tr>
-<th>Summary:</th>
+<th align="right">Summary:</th>
 <td><input type="TEXT" name="summary" value="" /></td>
 </tr>
 
 <tr>
-<th>Channel:</th>
+<th align="right">Your name:</th>
+<td><input type="TEXT" name="author" value="" /></td>
+</tr>
+
+<tr>
+<th align="right">File type:</th>
+<td><% "modes" render-template %></td>
+</tr>
+
+<tr>
+<th align="right">Channel:</th>
 <td><input type="TEXT" name="channel" value="#concatenative" /></td>
 </tr>
 
 <tr>
-<th valign="top">Contents:</th>
+<th align="right" valign="top">Content:</th>
 <td><textarea rows="24" cols="60" name="contents"></textarea></td>
 </tr>
 </table>
 
 <input type="SUBMIT" value="Submit paste" />
 </form>
+
+<% "footer" render-template %>

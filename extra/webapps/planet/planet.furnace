@@ -1,4 +1,5 @@
-<% USING: namespaces html.elements webapps.planet sequences ; %>
+<% USING: namespaces html.elements webapps.planet sequences
+furnace ; %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -8,7 +9,8 @@
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 
 	<title>planet-factor</title>
-	<link rel="stylesheet" href="/responder/file/css/news.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+    <link rel="alternate" type="application/atom+xml" title="Planet Factor - Atom" href="feed.xml" />
 </head>
 
 <body id="index">
@@ -23,7 +25,11 @@
                     <a href="http://planet.lisp.org">Planet Lisp</a>.
                 </p>
                 <p>
-                    This webapp is written in <a href="http://factorcode.org/">Factor</a>.
+                    <img src="http://planet.lisp.org/feed-icon-14x14.png" />
+                    <a href="feed.xml"> Syndicate </a>
+                </p>
+                <p>
+                    This webapp is written in <a href="http://factorcode.org/">Factor</a>.<br/>
                     <% "webapps.planet" browse-webapp-source %>
                 </p>
                 <h2 class="blogroll-title">Blogroll</h2>

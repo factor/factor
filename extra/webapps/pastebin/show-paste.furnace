@@ -1,15 +1,21 @@
-<% USING: namespaces io furnace sequences ; %>
+<% USING: namespaces io furnace sequences xmode.code2html ; %>
 
-<h1>Paste: <% "summary" get write %></h1>
+<%
+    "Paste: " "summary" get append "title" set
+    "header" render-template
+%>
 
 <table>
 <tr><th>Paste by:</th><td><% "author" get write %></td></tr>
 <tr><th>Channel:</th><td><% "channel" get write %></td></tr>
 <tr><th>Created:</th><td><% "date" get write %></td></tr>
+<tr><th>File type:</th><td><% "mode" get write %></td></tr>
 </table>
 
-<pre><% "contents" get write %></pre>
+<% "syntax" render-template %>
 
-<% "annotations" get [ "annotation" render-template ] each %>
+<% "annotations" get [ "annotation" render-component ] each %>
 
-<% model get "annotate-paste" render-template %>
+<% model get "annotate-paste" render-component %>
+
+<% "footer" render-template %>
