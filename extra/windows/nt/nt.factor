@@ -13,5 +13,3 @@ USING: alien sequences ;
     { "glu"      "glu32.dll"    "stdcall" }
     { "freetype" "freetype6.dll" "cdecl"  }
 } [ first3 add-library ] each
-
-USING: windows.shell32 ;

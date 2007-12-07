@@ -1,5 +1,5 @@
 USING: arrays assocs combinators.lib continuations kernel
-math math.functions namespaces quotations random sequences
+math math.functions memoize namespaces quotations random sequences
 sequences.private shuffle ;
 
 IN: random-tester.utils
@@ -93,3 +93,14 @@ C: <p-list> p-list
     >r make-p-list r> (each-permutation) ;
 
 
+: builder-permutations ( n -- seq )
+    { [ compose ] [ swap curry ] } swap permutations
+    [ concat ] map ; foldable
+
+: all-quot-permutations ( seq -- newseq )
+    dup length 1- builder-permutations
+    swap [ 1quotation ] map dup length permutations
+    [ swap [ >r seq>stack r> call ] curry* map ] curry* map ;
+
+! clear { map sq 10 } all-quot-permutations [ [ [ [ [ call ] keep datastack length 2 = [ . .s nl ] when ] catch ] in-thread drop ] each ] each
+! clear { map sq sq 10 } all-quot-permutations [ [ [ [ [ call ] keep datastack length 2 = [ . .s nl ] when ] catch ] in-thread drop ] each ] each

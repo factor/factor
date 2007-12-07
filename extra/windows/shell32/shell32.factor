@@ -1,5 +1,5 @@
 USING: alien alien.c-types alien.syntax combinators
-kernel windows ;
+kernel windows windows.user32 ;
 IN: windows.shell32
 
 : CSIDL_DESKTOP HEX: 00 ; inline
@@ -67,24 +67,26 @@ IN: windows.shell32
 : CSIDL_FLAG_CREATE HEX: 8000 ; inline
 : CSIDL_FLAG_MASK HEX: ff00 ; inline
 
+
 : S_OK 0 ; inline
 : S_FALSE 1 ; inline
 : E_FAIL HEX: 80004005 ; inline
 : E_INVALIDARG HEX: 80070057 ; inline
 : ERROR_FILE_NOT_FOUND 2 ; inline
 
-
 : SHGFP_TYPE_CURRENT 0 ; inline
 : SHGFP_TYPE_DEFAULT 1 ; inline
 
 LIBRARY: shell32
 
-TYPEDEF: void* PIDLIST_ABSOLUTE
 FUNCTION: HRESULT SHGetFolderPathW ( HWND hwndOwner, int nFolder, HANDLE hToken, DWORD dwReserved, LPTSTR pszPath ) ;
-! SHGetSpecialFolderLocation
-! SHGetSpecialFolderPath
-
 : SHGetFolderPath SHGetFolderPathW ; inline
+
+FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile, LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShowCmd ) ;
+: ShellExecute ShellExecuteW ; inline
+
+: open-in-explorer ( dir -- )
+    f "open" rot f f SW_SHOWNORMAL ShellExecute drop ;
 
 : shell32-error ( n -- )
     dup S_OK = [
@@ -110,6 +112,9 @@ FUNCTION: HRESULT SHGetFolderPathW ( HWND hwndOwner, int nFolder, HANDLE hToken,
 
 : application-data ( -- str )
     CSIDL_APPDATA shell32-directory ;
+
+: windows ( -- str )
+    CSIDL_WINDOWS shell32-directory ;
 
 : programs ( -- str )
     CSIDL_PROGRAMS shell32-directory ;
