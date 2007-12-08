@@ -1,10 +1,11 @@
-USING: xmode.tokens xmode.rules
-xmode.keyword-map xml.data xml.utilities xml assocs
-kernel combinators sequences math.parser namespaces parser
-xmode.utilities regexp io.files ;
+USING: xmode.tokens xmode.rules xmode.keyword-map xml.data
+xml.utilities xml assocs kernel combinators sequences
+math.parser namespaces parser xmode.utilities regexp io.files ;
 IN: xmode.loader
 
 ! Based on org.gjt.sp.jedit.XModeHandler
+
+SYMBOL: ignore-case?
 
 ! Attribute utilities
 : string>boolean ( string -- ? ) "TRUE" = ;
@@ -33,11 +34,11 @@ IN: xmode.loader
 
 : parse-literal-matcher ( tag -- matcher )
     dup children>string
-    \ ignore-case? get [ <ignore-case> ] when
+    ignore-case? get <string-matcher>
     swap position-attrs <matcher> ;
 
 : parse-regexp-matcher ( tag -- matcher )
-    dup children>string <regexp>
+    dup children>string ignore-case? get <regexp>
     swap position-attrs <matcher> ;
 
 ! SPAN's children
@@ -137,13 +138,13 @@ RULE: MARK_PREVIOUS mark-previous-rule
     >r dup name-tag string>token swap children>string r> set-at ;
 
 TAG: KEYWORDS ( rule-set tag -- key value )
-    \ ignore-case? get <keyword-map>
+    ignore-case? get <keyword-map>
     swap child-tags [ over parse-keyword-tag ] each
     swap set-rule-set-keywords ;
 
 TAGS>
 
-: ?<regexp> dup [ <regexp> ] when ;
+: ?<regexp> dup [ ignore-case? get <regexp> ] when ;
 
 : (parse-rules-tag) ( tag -- rule-set )
     <rule-set>
@@ -159,10 +160,9 @@ TAGS>
 
 : parse-rules-tag ( tag -- rule-set )
     dup (parse-rules-tag) [
-        [
-            dup rule-set-ignore-case? \ ignore-case? set
+        dup rule-set-ignore-case? ignore-case? [
             swap child-tags [ parse-rule-tag ] curry* each
-        ] with-scope
+        ] with-variable
     ] keep ;
 
 : merge-rule-set-props ( props rule-set -- )
