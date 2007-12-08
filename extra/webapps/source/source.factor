@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files namespaces webapps.file http.server.responders
-xmode.code2html kernel ;
+xmode.code2html kernel html ;
 IN: webapps.source
 
 global [
@@ -12,7 +12,7 @@ global [
             [
                 drop
                 serving-html
-                swap htmlize-stream
+                [ swap htmlize-stream ] with-html-stream
             ] serve-file-hook set
             file-responder
         ] with-scope
