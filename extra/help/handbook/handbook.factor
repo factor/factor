@@ -235,6 +235,7 @@ ARTICLE: "changes" "Changes in the latest release"
     { "New, efficient implementations of " { $link bit? } " and " { $link log2 } " runs in constant time for large bignums" }
     { "New " { $link big-random } " word for generating large random numbers quickly" }
     { "Improved profiler no longer has to be explicitly enabled and disabled with a full recompile; instead, the " { $link profile } " word can be used at any time, and it dynamically patches words to increment call counts. There is no overhead when the profiler is not in use." }
+    { "Calls to " { $link member? } " with a literal sequence are now open-coded. If there are four or fewer elements, a series of conditionals are generated; if there are more than four elements, there is a hash dispatch followed by conditionals in each branch." }
 }
 { $subheading "IO" }
 { $list

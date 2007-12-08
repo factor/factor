@@ -111,7 +111,7 @@ optimizer.def-use generic.standard ;
 
 : post-process ( class interval node -- classes intervals )
     dupd won't-overflow?
-    [ >r dup { f integer } memq? [ drop fixnum ] when r> ] when
+    [ >r dup { f integer } member? [ drop fixnum ] when r> ] when
     [ dup [ 1array ] when ] 2apply ;
 
 : math-output-interval-1 ( node word -- interval )
