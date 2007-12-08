@@ -1,4 +1,5 @@
-<% USING: continuations namespaces io kernel math math.parser furnace webapps.pastebin ; %>
+<% USING: continuations namespaces io kernel math math.parser
+furnace webapps.pastebin calendar ; %>
 
 <tr>
     <td>
@@ -7,5 +8,5 @@
         </a>
     </td>
     <td><% "author" get write %></td>
-    <td><% "date" get print %></td>
+    <td><% "date" get timestamp>string print %></td>
 </tr>
