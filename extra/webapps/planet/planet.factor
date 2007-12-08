@@ -24,15 +24,7 @@ IN: webapps.planet
     </ul> ;
 
 : format-date ( date -- string )
-    10 head "-" split [ string>number ] map
-    first3 0 0 0 0 <timestamp>
-    [
-        dup timestamp-day #
-        " " %
-        dup timestamp-month month-abbreviations nth %
-        ", " %
-        timestamp-year #
-    ] "" make ;
+    rfc3339>timestamp timestamp>string ;
 
 : print-posting ( posting -- )
     <h2 "posting-title" =class h2>
@@ -53,8 +45,11 @@ IN: webapps.planet
 SYMBOL: default-blogroll
 SYMBOL: cached-postings
 
+: safe-head ( seq n -- seq' )
+    over length min head ;
+
 : mini-planet-factor ( -- )
-    cached-postings get 4 head print-posting-summaries ;
+    cached-postings get 4 safe-head print-posting-summaries ;
 
 : planet-factor ( -- )
     serving-html [ "planet" render-template ] with-html-stream ;
@@ -64,7 +59,7 @@ SYMBOL: cached-postings
 : planet-feed ( -- feed )
     "[ planet-factor ]"
     "http://planet.factorcode.org"
-    cached-postings get 30 head <feed> ;
+    cached-postings get 30 safe-head <feed> ;
 
 : feed.xml ( -- )
     "text/xml" serving-content
@@ -130,7 +125,7 @@ SYMBOL: last-update
     { "Kio M. Smallwood"
     "http://sekenre.wordpress.com/feed/atom/"
     "http://sekenre.wordpress.com/" }
-    ! { "Phil Dawes" "http://www.phildawes.net/blog/category/factor/feed/atom" "http://www.phildawes.net/blog/" }
+    { "Phil Dawes" "http://www.phildawes.net/blog/category/factor/feed/atom" "http://www.phildawes.net/blog/" }
     { "Samuel Tardieu" "http://www.rfc1149.net/blog/tag/factor/feed/atom/" "http://www.rfc1149.net/blog/tag/factor/" }
     { "Slava Pestov" "http://factor-language.blogspot.com/atom.xml" "http://factor-language.blogspot.com/" }
 } default-blogroll set-global
