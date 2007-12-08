@@ -65,7 +65,7 @@ M: rule match-position drop position get ;
 : rest-of-line ( -- str )
     line get position get tail-slice ;
 
-GENERIC: text-matches? ( position text -- match-count/f )
+GENERIC: text-matches? ( string text -- match-count/f )
 
 M: f text-matches?
     2drop f ;
@@ -78,7 +78,7 @@ M: string-matcher text-matches?
     ] keep string-matcher-string length and ;
 
 M: regexp text-matches?
-    match-head ;
+    >r >string r> match-head ;
 
 : rule-start-matches? ( rule -- match-count/f )
     dup rule-start tuck swap can-match-here? [
