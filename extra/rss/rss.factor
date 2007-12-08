@@ -93,7 +93,7 @@ C: <entry> entry
         dup entry-title "title" simple-tag,
         "link" over entry-link "href" associate contained*,
         dup entry-pub-date "published" simple-tag,
-        entry-description "content" simple-tag,
+        entry-description [ "content" simple-tag, ] when*
     ] tag, ;
 
 : feed>xml ( feed -- xml )
