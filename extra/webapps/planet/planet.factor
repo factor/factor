@@ -126,6 +126,7 @@ SYMBOL: last-update
     { "Elie Chaftari" "http://fun-factor.blogspot.com/feeds/posts/default" "http://fun-factor.blogspot.com/" }
     { "Doug Coleman" "http://code-factor.blogspot.com/feeds/posts/default" "http://code-factor.blogspot.com/" }
     { "Daniel Ehrenberg" "http://useless-factor.blogspot.com/feeds/posts/default" "http://useless-factor.blogspot.com/" }
+    { "Gavin Harrison" "http://gmh33.blogspot.com/feeds/posts/default" "http://gmh33.blogspot.com/" }
     { "Kio M. Smallwood"
     "http://sekenre.wordpress.com/feed/atom/"
     "http://sekenre.wordpress.com/" }
