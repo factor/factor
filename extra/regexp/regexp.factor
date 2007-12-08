@@ -1,6 +1,6 @@
 USING: arrays combinators kernel lazy-lists math math.parser
 namespaces parser parser-combinators parser-combinators.simple
-promises quotations sequences combinators.lib strings macros
+promises quotations sequences combinators.lib strings
 assocs prettyprint.backend ;
 USE: io
 IN: regexp
@@ -22,9 +22,6 @@ SYMBOL: ignore-case?
 
 : or-predicates ( quots -- quot )
     [ \ dup add* ] map [ [ t ] ] f short-circuit \ nip add ;
-
-MACRO: fast-member? ( str -- quot )
-    [ [ t ] 2array ] { } map-as [ drop f ] add [ case ] curry ;
 
 : <@literal [ nip ] curry <@ ;
 
@@ -51,7 +48,7 @@ PRIVATE>
     swap HEX: 7f = or ;
 
 : punct? ( n -- ? )
-    "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" fast-member? ;
+    "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" member? ;
 
 : c-identifier-char? ( ch -- ? )
     dup alpha? swap CHAR: _ = or ;
@@ -61,13 +58,13 @@ PRIVATE>
         CHAR: \s
         CHAR: \t CHAR: \n CHAR: \r
         HEX: c HEX: 7 HEX: 1b
-    } fast-member? ;
+    } member? ;
 
 : java-printable? ( n -- ? )
     dup alpha? swap punct? or ;
 
 : 'ordinary-char' ( -- parser )
-    [ "\\^*+?|(){}[$" fast-member? not ] satisfy
+    [ "\\^*+?|(){}[$" member? not ] satisfy
     [ char=-quot ] <@ ;
 
 : 'octal-digit' ( -- parser ) [ octal-digit? ] satisfy ;
