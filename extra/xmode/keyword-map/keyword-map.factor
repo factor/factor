@@ -22,8 +22,6 @@ M: keyword-map set-at
 M: keyword-map clear-assoc
     [ delegate clear-assoc ] keep invalid-no-word-sep ;
 
-M: keyword-map assoc-find >r delegate r> assoc-find ;
-
 M: keyword-map >alist delegate >alist ;
 
 : (keyword-map-no-word-sep)

@@ -57,7 +57,7 @@ check_installed_programs() {
 check_library_exists() {
 	GCC_TEST=factor-library-test.c
 	GCC_OUT=factor-library-test.out
-	echo -n "Checking for library $1"
+	echo -n "Checking for library $1..."
 	echo "int main(){return 0;}" > $GCC_TEST
 	gcc $GCC_TEST -o $GCC_OUT -l $1
 	if [[ $? -ne 0 ]] ; then

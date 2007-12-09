@@ -1,6 +1,6 @@
-USING: kernel math sequences namespaces hashtables words math.functions
-arrays parser compiler syntax io random prettyprint optimizer layouts 
-inference math.constants random-tester.utils ;
+USING: kernel math sequences namespaces hashtables words
+arrays parser compiler syntax io prettyprint optimizer
+random math.constants math.functions layouts random-tester.utils ;
 IN: random-tester
 
 ! Tweak me
@@ -26,7 +26,7 @@ IN: random-tester
 { } make \ special-floats set-global
 : special-complexes ( -- seq ) \ special-complexes get ;
 [ 
-    { -1 0 1 } % -1 sqrt dup , neg ,
+    { -1 0 1 C{ 0 1 } C{ 0 -1 } } %
     e , e neg , pi , pi neg ,
     0 pi rect> , 0 pi neg rect> , pi neg 0 rect> , pi pi rect> ,
     pi pi neg rect> , pi neg pi rect> , pi neg pi neg rect> ,
@@ -34,16 +34,16 @@ IN: random-tester
 ] { } make \ special-complexes set-global
 
 : random-fixnum ( -- fixnum )
-    most-positive-fixnum random 1+ coin-flip [ neg 1- ] when >fixnum ;
+    most-positive-fixnum random 1+ 50% [ neg 1- ] when >fixnum ;
 
 : random-bignum ( -- bignum )
-     400 random-bits first-bignum + coin-flip [ neg ] when ;
+     400 random-bits first-bignum + 50% [ neg ] when ;
     
 : random-integer ( -- n )
-    coin-flip [
+    50% [
         random-fixnum
     ] [
-        coin-flip [ random-bignum ] [ special-integers random ] if
+        50% [ random-bignum ] [ special-integers get random ] if
     ] if ;
 
 : random-positive-integer ( -- int )
@@ -54,12 +54,12 @@ IN: random-tester
     ] if ;
 
 : random-ratio ( -- ratio )
-    1000000000 dup [ random ] 2apply 1+ / coin-flip [ neg ] when dup [ drop random-ratio ] unless 10% [ drop 0 ] when ;
+    1000000000 dup [ random ] 2apply 1+ / 50% [ neg ] when dup [ drop random-ratio ] unless 10% [ drop 0 ] when ;
 
 : random-float ( -- float )
-    coin-flip [ random-ratio ] [ special-floats random ] if
-    coin-flip 
-    [ .0000000000000000001 /f ] [ coin-flip [ .00000000000000001 * ] when ] if
+    50% [ random-ratio ] [ special-floats get random ] if
+    50%
+    [ .0000000000000000001 /f ] [ 50% [ .00000000000000001 * ] when ] if
     >float ;
 
 : random-number ( -- number )

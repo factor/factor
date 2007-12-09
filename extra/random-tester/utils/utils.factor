@@ -1,5 +1,5 @@
 USING: arrays assocs combinators.lib continuations kernel
-math math.functions namespaces quotations random sequences
+math math.functions memoize namespaces quotations random sequences
 sequences.private shuffle ;
 IN: random-tester.utils
 

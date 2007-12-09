@@ -1,6 +1,10 @@
 USING: xmode.tokens xmode.keyword-map kernel
-sequences vectors assocs strings memoize ;
+sequences vectors assocs strings memoize regexp ;
 IN: xmode.rules
+
+TUPLE: string-matcher string ignore-case? ;
+
+C: <string-matcher> string-matcher
 
 ! Based on org.gjt.sp.jedit.syntax.ParserRuleSet
 TUPLE: rule-set
@@ -20,12 +24,11 @@ no-word-sep
 
 : init-rule-set ( ruleset -- )
     #! Call after constructor.
-    >r H{ } clone H{ } clone V{ } clone f <keyword-map> r>
+    >r H{ } clone H{ } clone V{ } clone r>
     {
         set-rule-set-rules
         set-rule-set-props
         set-rule-set-imports
-        set-rule-set-keywords
     } set-slots ;
 
 : <rule-set> ( -- ruleset )
@@ -46,8 +49,9 @@ MEMO: standard-rule-set ( id -- ruleset )
     ] when* ;
 
 : rule-set-no-word-sep* ( ruleset -- str )
-    dup rule-set-keywords keyword-map-no-word-sep*
-    swap rule-set-no-word-sep "_" 3append ;
+    dup rule-set-no-word-sep
+    swap rule-set-keywords dup [ keyword-map-no-word-sep* ] when
+    "_" 3append ;
 
 ! Match restrictions
 TUPLE: matcher text at-line-start? at-whitespace-end? at-word-start? ;
@@ -93,20 +97,32 @@ TUPLE: mark-previous-rule ;
 TUPLE: escape-rule ;
 
 : <escape-rule> ( string -- rule )
-    f f f <matcher>
+    f <string-matcher> f f f <matcher>
     escape-rule construct-rule
     [ set-rule-start ] keep ;
+
+GENERIC: text-hash-char ( text -- ch )
+
+M: f text-hash-char ;
+
+M: string-matcher text-hash-char string-matcher-string first ;
+
+M: regexp text-hash-char drop f ;
 
 : rule-chars* ( rule -- string )
     dup rule-chars
     swap rule-start matcher-text
-    dup string? [ first add ] [ drop ] if ;
+    text-hash-char [ add ] when* ;
 
 : add-rule ( rule ruleset -- )
     >r dup rule-chars* >upper swap
     r> rule-set-rules inverted-index ;
 
 : add-escape-rule ( string ruleset -- )
-    >r <escape-rule> r>
-    2dup set-rule-set-escape-rule
-    add-rule ;
+    over [
+        >r <escape-rule> r>
+        2dup set-rule-set-escape-rule
+        add-rule
+    ] [
+        2drop
+    ] if ;

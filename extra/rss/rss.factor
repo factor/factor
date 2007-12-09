@@ -88,12 +88,15 @@ C: <entry> entry
 : simple-tag, ( content name -- )
     [ , ] tag, ;
 
+: simple-tag*, ( content name attrs -- )
+    [ , ] tag*, ;
+
 : entry, ( entry -- )
     "entry" [
-        dup entry-title "title" simple-tag,
+        dup entry-title "title" { { "type" "html" } } simple-tag*,
         "link" over entry-link "href" associate contained*,
         dup entry-pub-date "published" simple-tag,
-        entry-description [ "content" simple-tag, ] when*
+        entry-description [ "content" { { "type" "html" } } simple-tag*, ] when*
     ] tag, ;
 
 : feed>xml ( feed -- xml )

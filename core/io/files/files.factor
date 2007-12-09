@@ -126,3 +126,17 @@ TUPLE: pathname string ;
 C: <pathname> pathname
 
 M: pathname <=> [ pathname-string ] compare ;
+
+HOOK: library-roots io-backend ( -- seq )
+HOOK: binary-roots io-backend ( -- seq )
+
+: find-file ( seq str -- path/f )
+    [
+        [ path+ exists? ] curry find nip
+    ] keep over [ path+ ] [ drop ] if ;
+
+: find-library ( str -- path/f )
+    library-roots swap find-file ;
+
+: find-binary ( str -- path/f )
+    binary-roots swap find-file ;

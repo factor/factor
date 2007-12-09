@@ -1,7 +1,7 @@
-USING: alien.c-types hardware-info kernel math namespaces windows windows.kernel32 ;
+USING: alien.c-types hardware-info hardware-info.windows
+kernel math namespaces windows windows.kernel32 ;
 IN: hardware-info.windows.ce
 
-TUPLE: wince ;
 T{ wince } os set-global
 
 : memory-status ( -- MEMORYSTATUS )
