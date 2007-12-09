@@ -4,7 +4,11 @@ furnace webapps.pastebin calendar ; %>
 <tr>
     <td>
         <a href="<% model get paste-link write %>">
-            <% "summary" get write %>
+        <%
+            "summary" get
+            dup empty? [ drop "- no title -" ] when
+            write
+        %>
         </a>
     </td>
     <td><% "author" get write %></td>
