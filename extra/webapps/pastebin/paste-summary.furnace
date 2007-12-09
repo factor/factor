@@ -1,5 +1,5 @@
 <% USING: continuations namespaces io kernel math math.parser
-furnace webapps.pastebin calendar ; %>
+furnace webapps.pastebin calendar sequences ; %>
 
 <tr>
     <td>
