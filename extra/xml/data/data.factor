@@ -65,7 +65,6 @@ M: attrs set-at
 
 M: attrs assoc-size length ;
 M: attrs new-assoc drop V{ } new <attrs> ;
-M: attrs assoc-find >r delegate r> assoc-find ;
 M: attrs >alist delegate >alist ;
 
 : >attrs ( assoc -- attrs )

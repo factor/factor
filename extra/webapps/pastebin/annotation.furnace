@@ -1,11 +1,11 @@
-<% USING: namespaces io ; %>
+<% USING: namespaces io furnace calendar ; %>
 
 <h2>Annotation: <% "summary" get write %></h2>
 
 <table>
 <tr><th>Annotation by:</th><td><% "author" get write %></td></tr>
 <tr><th>Channel:</th><td><% "channel" get write %></td></tr>
-<tr><th>Created:</th><td><% "date" get write %></td></tr>
+<tr><th>Created:</th><td><% "date" get timestamp>string write %></td></tr>
 </table>
 
-<pre><% "contents" get write %></pre>
+<% "syntax" render-template %>

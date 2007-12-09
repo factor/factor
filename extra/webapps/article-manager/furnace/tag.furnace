@@ -1,7 +1,7 @@
 <% USING: kernel io http.server namespaces sequences math html furnace webapps.article-manager.database webapps.article-manager html.elements ; %>
 
 	<div id="banner"><h1><% "arg1" get second tag-title write %></h1></div>
-    <% f "navigation" render-template %>
+    <% "navigation" render-component %>
 	<div id="article">
 	<h1><% "arg1" get second tag-title write %></h1>
         <% "arg1" get second tag-description write-html %>

@@ -5,7 +5,7 @@ USING: kernel vectors io assocs quotations splitting strings
        continuations tuples classes io.files 
        http http.server.templating http.basic-authentication 
        webapps.callback html html.elements 
-       http.server.responders furnace.validator ;
+       http.server.responders furnace.validator vocabs ;
 IN: furnace
 
 SYMBOL: default-action
@@ -101,36 +101,14 @@ SYMBOL: request-params
 
 : service-post ( url -- ) "response" get swap service-request ;
 
-: explode-tuple ( tuple -- )
-    dup tuple-slots swap class "slot-names" word-prop
-    [ set ] 2each ;
+: send-resource ( name -- )
+    template-path get swap path+ resource-path <file-reader>
+    stdio get stream-copy ;
 
-SYMBOL: model
-
-: call-template ( model template -- )
-    [
-        >r [ dup model set explode-tuple ] when* r>
-        ".furnace" append resource-path run-template-file
-    ] with-scope ;
-
-: render-template ( model template -- )
-    template-path get swap path+ call-template ;
-
-: render-page* ( model body-template head-template -- )
-    [
-        [ render-template ] [ f rot render-template ] html-document 
-    ] serve-html ;
-
-: render-titled-page* ( model body-template head-template title -- )
-    [ 
-        [ render-template ] swap [ <title> write </title> f rot render-template ] curry html-document
-    ] serve-html ;
-
-
-: render-page ( model template title -- )
-    [
-        [ render-template ] simple-html-document
-    ] serve-html ;
+: render-template ( template -- )
+    template-path get swap path+
+    ".furnace" append resource-path
+    run-template-file ;
 
 : web-app ( name default path -- )
     [
@@ -141,3 +119,22 @@ SYMBOL: model
         [ service-post ] "post" set
         ! [ service-head ] "head" set
     ] make-responder ;
+
+: explode-tuple ( tuple -- )
+    dup tuple-slots swap class "slot-names" word-prop
+    [ set ] 2each ;
+
+SYMBOL: model
+
+: with-slots ( model quot -- )
+    [
+        >r [ dup model set explode-tuple ] when* r> call
+    ] with-scope ;
+
+: render-component ( model template -- )
+    swap [ render-template ] with-slots ;
+
+: browse-webapp-source ( vocab -- )
+    <a f >vocab-link browser-link-href =href a>
+        "Browse source" write
+    </a> ;

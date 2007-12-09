@@ -2,7 +2,7 @@ USING: http.server help.markup help.syntax kernel prettyprint
 sequences parser namespaces words classes math tuples.private
 quotations arrays strings ;
 
-IN: furnace
+IN: furnace.scaffold
 
 TUPLE: furnace-model model ;
 C: <furnace-model> furnace-model
@@ -39,6 +39,11 @@ HELP: crud-lookup
 HELP: crud-lookup*
 { $values { "string" string } { "class" class } { "tuple" tuple } }
 "A CRUD utility function - same as crud-lookup, but always returns a tuple of the given class.  When the lookup fails, returns a tuple of the given class with all slots set to f." ;
+
+: render-page ( model template title -- )
+    [
+        [ render-component ] simple-html-document
+    ] serve-html ;
 
 : crud-page ( model template title -- )
     [ "libs/furnace/crud-templates" template-path set render-page ]

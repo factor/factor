@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: arrays hashtables io io.streams.string kernel math
-math.vectors math.functions math.parser
-namespaces sequences strings tuples system ;
+math.vectors math.functions math.parser namespaces sequences
+strings tuples system debugger ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
@@ -316,7 +316,28 @@ M: timestamp <=> ( ts1 ts2 -- n )
 : timestamp>rfc3339 ( timestamp -- str )
     >gmt [
         (timestamp>rfc3339)
-     ] string-out ;
+    ] string-out ;
+
+: expect read1 assert= ;
+
+: (rfc3339>timestamp) ( -- timestamp )
+    4 read string>number ! year
+    CHAR: - expect
+    2 read string>number ! month
+    CHAR: - expect
+    2 read string>number ! day
+    CHAR: T expect
+    2 read string>number ! hour
+    CHAR: : expect
+    2 read string>number ! minute
+    CHAR: : expect
+    2 read string>number ! second
+    0 <timestamp> ;
+
+: rfc3339>timestamp ( str -- timestamp )
+    [
+        (rfc3339>timestamp)
+    ] string-in ;
 
 : file-time-string ( timestamp -- string )
     [

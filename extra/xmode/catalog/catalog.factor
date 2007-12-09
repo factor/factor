@@ -26,7 +26,7 @@ TAGS>
     "extra/xmode/modes/catalog" resource-path
     <file-reader> read-xml parse-modes-tag ;
 
-: modes ( -- )
+: modes ( -- assoc )
     \ modes get-global [
         load-catalog dup \ modes set-global
     ] unless* ;
