@@ -50,7 +50,7 @@ IN: temporary
     global keys =
 ] unit-test
 
-[ 3 ] [ 1 2 [ curry [ 3 ] [ 4 ] if ] compile-1 ] unit-test
+[ 3 ] [ 1 [ 2 ] [ curry [ 3 ] [ 4 ] if ] compile-1 ] unit-test
 
 [ 3 ] [ t [ 3 [ ] curry 4 [ ] curry if ] compile-1 ] unit-test
 
