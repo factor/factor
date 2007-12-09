@@ -60,7 +60,7 @@ SYMBOL: store
             paste-summary
             paste-link
             paste-date
-        } get-slots "" swap <entry>
+        } get-slots timestamp>rfc3339 f swap <entry>
     ] map ;
 
 : feed.xml ( -- )
@@ -75,13 +75,14 @@ SYMBOL: store
     store get-global save-store ;
 
 : add-paste ( paste pastebin -- )
-    >r now timestamp>http-string over set-paste-date r>
+    >r now over set-paste-date r>
     pastebin-pastes 2dup length swap set-paste-n push ;
 
 : submit-paste ( summary author channel mode contents -- )
-    <paste>
-    \ pastebin get-global add-paste
-    save-pastebin-store ;
+    <paste> [
+        \ pastebin get-global add-paste
+        save-pastebin-store
+    ] keep paste-link permanent-redirect ;
 
 \ submit-paste {
     { "summary" v-required }
@@ -90,8 +91,6 @@ SYMBOL: store
     { "mode" "factor" v-default }
     { "contents" v-required }
 } define-action
-
-\ submit-paste [ paste-list ] define-redirect
 
 : annotate-paste ( n summary author mode contents -- )
     <annotation> swap get-paste

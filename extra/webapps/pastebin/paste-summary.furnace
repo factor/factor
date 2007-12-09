@@ -1,11 +1,16 @@
-<% USING: continuations namespaces io kernel math math.parser furnace webapps.pastebin ; %>
+<% USING: continuations namespaces io kernel math math.parser
+furnace webapps.pastebin calendar sequences ; %>
 
 <tr>
     <td>
         <a href="<% model get paste-link write %>">
-            <% "summary" get write %>
+        <%
+            "summary" get
+            dup empty? [ drop "- no title -" ] when
+            write
+        %>
         </a>
     </td>
     <td><% "author" get write %></td>
-    <td><% "date" get print %></td>
+    <td><% "date" get timestamp>string print %></td>
 </tr>

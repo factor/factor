@@ -1,4 +1,4 @@
-<% USING: namespaces io furnace sequences xmode.code2html ; %>
+<% USING: namespaces io furnace sequences xmode.code2html calendar ; %>
 
 <%
     "Paste: " "summary" get append "title" set
@@ -8,7 +8,7 @@
 <table>
 <tr><th>Paste by:</th><td><% "author" get write %></td></tr>
 <tr><th>Channel:</th><td><% "channel" get write %></td></tr>
-<tr><th>Created:</th><td><% "date" get write %></td></tr>
+<tr><th>Created:</th><td><% "date" get timestamp>string write %></td></tr>
 <tr><th>File type:</th><td><% "mode" get write %></td></tr>
 </table>
 

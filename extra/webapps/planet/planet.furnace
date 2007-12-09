@@ -17,7 +17,7 @@ furnace ; %>
     <h1 class="planet-title">[ planet-factor ]</h1>
     <table width="100%" cellpadding="10">
         <tr>
-            <td> <% cached-postings get 20 head print-postings %> </td>
+            <td> <% cached-postings get 20 safe-head print-postings %> </td>
             <td valign="top" width="25%" class="infobox">
                 <p>
                     <b>planet-factor</b> is an Atom/RSS aggregator that collects the

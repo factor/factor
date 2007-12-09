@@ -2,9 +2,9 @@ USING: xmode.tokens xmode.keyword-map kernel
 sequences vectors assocs strings memoize regexp ;
 IN: xmode.rules
 
-TUPLE: ignore-case string ;
+TUPLE: string-matcher string ignore-case? ;
 
-C: <ignore-case> ignore-case
+C: <string-matcher> string-matcher
 
 ! Based on org.gjt.sp.jedit.syntax.ParserRuleSet
 TUPLE: rule-set
@@ -97,7 +97,7 @@ TUPLE: mark-previous-rule ;
 TUPLE: escape-rule ;
 
 : <escape-rule> ( string -- rule )
-    f f f <matcher>
+    f <string-matcher> f f f <matcher>
     escape-rule construct-rule
     [ set-rule-start ] keep ;
 
@@ -105,9 +105,7 @@ GENERIC: text-hash-char ( text -- ch )
 
 M: f text-hash-char ;
 
-M: string text-hash-char first ;
-
-M: ignore-case text-hash-char ignore-case-string first ;
+M: string-matcher text-hash-char string-matcher-string first ;
 
 M: regexp text-hash-char drop f ;
 
@@ -121,6 +119,10 @@ M: regexp text-hash-char drop f ;
     r> rule-set-rules inverted-index ;
 
 : add-escape-rule ( string ruleset -- )
-    >r <escape-rule> r>
-    2dup set-rule-set-escape-rule
-    add-rule ;
+    over [
+        >r <escape-rule> r>
+        2dup set-rule-set-escape-rule
+        add-rule
+    ] [
+        2drop
+    ] if ;

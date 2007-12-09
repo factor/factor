@@ -8,7 +8,7 @@ assocs quotations sequences.private io.binary io.crc32
 io.streams.string layouts splitting math.intervals
 math.floats.private tuples tuples.private classes
 optimizer.def-use optimizer.backend optimizer.pattern-match
-float-arrays combinators.private ;
+float-arrays combinators.private combinators ;
 
 ! the output of <tuple> and <tuple-boa> has the class which is
 ! its second-to-last input
@@ -48,6 +48,20 @@ float-arrays combinators.private ;
 
 \ eq? {
     { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }
+} define-optimizers
+
+: literal-member? ( #call -- ? )
+    node-in-d peek dup value?
+    [ value-literal sequence? ] [ drop f ] if ;
+
+: member-quot ( seq -- newquot )
+    [ [ t ] ] { } map>assoc [ drop f ] add [ nip case ] curry ;
+
+: expand-member ( #call -- )
+    dup node-in-d peek value-literal member-quot splice-quot ;
+
+\ member? {
+    { [ dup literal-member? ] [ expand-member ] }
 } define-optimizers
 
 ! if the result of eq? is t and the second input is a literal,

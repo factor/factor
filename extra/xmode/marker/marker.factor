@@ -1,8 +1,8 @@
 IN: xmode.marker
 USING: kernel namespaces xmode.rules xmode.tokens
-xmode.marker.state xmode.marker.context
-xmode.utilities xmode.catalog sequences math
-assocs combinators combinators.lib strings regexp splitting ;
+xmode.marker.state xmode.marker.context xmode.utilities
+xmode.catalog sequences math assocs combinators combinators.lib
+strings regexp splitting parser-combinators ;
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 
@@ -62,31 +62,27 @@ M: rule match-position drop position get ;
         [ over matcher-at-word-start?     over last-offset get =    implies ]
     } && 2nip ;
 
-GENERIC: text-matches? ( position text -- match-count/f )
+: rest-of-line ( -- str )
+    line get position get tail-slice ;
 
-M: f text-matches? 2drop f ;
+GENERIC: text-matches? ( string text -- match-count/f )
 
-M: string text-matches?
-    >r line get swap tail-slice r>
-    [ head? ] keep length and ;
+M: f text-matches?
+    2drop f ;
 
-M: ignore-case text-matches?
-    >r line get swap tail-slice r>
-    ignore-case-string
-    2dup shorter? [
-        2drop f
-    ] [
-        [ length head-slice ] keep
-        [ [ >upper ] 2apply sequence= ] keep
-        length and
-    ] if ;
+M: string-matcher text-matches?
+    [
+        dup string-matcher-string
+        swap string-matcher-ignore-case?
+        string-head?
+    ] keep string-matcher-string length and ;
 
 M: regexp text-matches?
-    2drop f ; ! >r line get swap tail-slice r> match-head ;
+    >r >string r> match-head ;
 
 : rule-start-matches? ( rule -- match-count/f )
     dup rule-start tuck swap can-match-here? [
-        position get swap matcher-text text-matches?
+        rest-of-line swap matcher-text text-matches?
     ] [
         drop f
     ] if ;
@@ -96,8 +92,8 @@ M: regexp text-matches?
         dup rule-start swap can-match-here? 0 and
     ] [
         dup rule-end tuck swap can-match-here? [
-            position get swap matcher-text
-            context get line-context-end or
+            rest-of-line
+            swap matcher-text context get line-context-end or
             text-matches?
         ] [
             drop f

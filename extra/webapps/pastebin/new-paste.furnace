@@ -1,7 +1,7 @@
 <% USING: furnace namespaces ; %>
 
 <%
-    "new paste" "title" set
+    "New paste" "title" set
     "header" render-template
 %>
 

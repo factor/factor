@@ -51,10 +51,6 @@ SYMBOL: delegate-end-escaped?
     dup context set
     f swap set-line-context-in-rule ;
 
-: terminal-rule-set ( -- rule-set )
-    get-rule-set rule-set-default standard-rule-set
-    push-context ;
-
 : init-token-marker ( prev-context line rules -- )
     rule-sets set
     line set
