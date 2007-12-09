@@ -1,6 +1,6 @@
 USING: definitions kernel parser words sequences math.parser
 namespaces editors io.launcher windows.shell32 io.files
-strings ;
+io.paths strings ;
 IN: editors.editpadpro
 
 : editpadpro-path
