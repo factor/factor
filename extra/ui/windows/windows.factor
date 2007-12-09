@@ -211,7 +211,7 @@ SYMBOL: hWnd
     drop ;
 
 : handle-wm-syscommand ( hWnd uMsg wParam lParam -- n )
-    dup alpha? [ 3drop drop 0 ] [ DefWindowProc ] if ;
+    dup alpha? [ 4drop 0 ] [ DefWindowProc ] if ;
 
 : cleanup-window ( handle -- )
     dup win-title [ free ] when*
@@ -298,11 +298,11 @@ M: windows-ui-backend (close-window)
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
-    3drop drop release-capture ;
+    4drop release-capture ;
 
 : handle-wm-mouseleave ( hWnd uMsg wParam lParam -- )
     #! message sent if mouse leaves main application 
-    3drop drop forget-rollover ;
+    4drop forget-rollover ;
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
