@@ -29,4 +29,6 @@ MACRO: ntuck ( n -- ) 2 + [ dup , -nrot ] bake ;
 
 : 4dup ( a b c d -- a b c d a b c d ) 4 ndup ; inline
 
+: 4drop ( a b c d -- ) 3drop drop ; inline
+
 : tuckd ( x y z -- z x y z ) 2 ntuck ; inline

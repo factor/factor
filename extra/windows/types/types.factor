@@ -333,4 +333,8 @@ C-STRUCT: LVFINDINFO
     { "POINT" "pt" }
     { "uint" "vkDirection" } ;
 
-
+C-STRUCT: ACCEL
+    { "BYTE" "fVirt" }
+    { "WORD" "key" }
+    { "WORD" "cmd" } ;
+TYPEDEF: ACCEL* LPACCEL

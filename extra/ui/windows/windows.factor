@@ -210,6 +210,9 @@ SYMBOL: hWnd
     hWnd get window-focus send-gesture
     drop ;
 
+: handle-wm-syscommand ( hWnd uMsg wParam lParam -- n )
+    dup alpha? [ 4drop 0 ] [ DefWindowProc ] if ;
+
 : cleanup-window ( handle -- )
     dup win-title [ free ] when*
     dup win-hRC wglDeleteContext win32-error=0/f
@@ -295,17 +298,17 @@ M: windows-ui-backend (close-window)
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
-    3drop drop release-capture ;
+    4drop release-capture ;
 
 : handle-wm-mouseleave ( hWnd uMsg wParam lParam -- )
     #! message sent if mouse leaves main application 
-    3drop drop forget-rollover ;
+    4drop forget-rollover ;
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
         [
-        pick
+        pick ! global [ dup windows-message-name . ] bind
             {
                 { [ dup WM_CLOSE = ]    [ drop handle-wm-close 0 ] }
                 { [ dup WM_PAINT = ]
@@ -320,6 +323,7 @@ M: windows-ui-backend (close-window)
                 { [ dup WM_KEYUP = over WM_SYSKEYUP = or ]
                     [ drop 4dup handle-wm-keyup DefWindowProc ] }
 
+                { [ dup WM_SYSCOMMAND = ] [ drop handle-wm-syscommand ] }
                 { [ dup WM_SETFOCUS = ] [ drop handle-wm-set-focus 0 ] }
                 { [ dup WM_KILLFOCUS = ] [ drop handle-wm-kill-focus 0 ] }
 

@@ -98,21 +98,22 @@ const F_CHAR *vm_executable_path(void)
 	return safe_strdup(full_path);
 }
 
-DEFINE_PRIMITIVE(stat)
+void stat_not_found(void)
 {
+	dpush(F);
+	dpush(F);
+	dpush(F);
+	dpush(F);
+}
+
+void find_file_stat(F_CHAR *path)
+{
+	// FindFirstFile is the only call that can stat c:\pagefile.sys
 	WIN32_FIND_DATA st;
 	HANDLE h;
 
-	F_CHAR *path = unbox_u16_string();
-	if(INVALID_HANDLE_VALUE == (h = FindFirstFile(
-		path,
-		&st)))
-	{
-		dpush(F);
-		dpush(F);
-		dpush(F);
-		dpush(F);
-	}
+	if(INVALID_HANDLE_VALUE == (h = FindFirstFile(path, &st)))
+		stat_not_found();
 	else
 	{
 		box_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
@@ -127,6 +128,42 @@ DEFINE_PRIMITIVE(stat)
 		box_unsigned_8((modTime - EPOCH_OFFSET) / 10000000);
 		FindClose(h);
 	}
+}
+
+DEFINE_PRIMITIVE(stat)
+{
+	HANDLE h;
+	BY_HANDLE_FILE_INFORMATION bhfi;
+
+	F_CHAR *path = unbox_u16_string();
+	//wprintf(L"path = %s\n", path);
+	h = CreateFileW(path,
+					GENERIC_READ,
+					FILE_SHARE_READ,
+					NULL,
+					OPEN_EXISTING,
+					FILE_FLAG_BACKUP_SEMANTICS,
+					NULL);
+	if(h == INVALID_HANDLE_VALUE)
+	{
+		find_file_stat(path);
+		return;
+	}
+
+	if(!GetFileInformationByHandle(h, &bhfi))
+		stat_not_found();
+	else {
+		box_boolean(bhfi.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+		dpush(tag_fixnum(0));
+		box_unsigned_8(
+			(u64)bhfi.nFileSizeLow | (u64)bhfi.nFileSizeHigh << 32);
+		u64 lo = bhfi.ftLastWriteTime.dwLowDateTime;
+		u64 hi = bhfi.ftLastWriteTime.dwHighDateTime;
+		u64 modTime = (hi << 32) + lo;
+
+		box_unsigned_8((modTime - EPOCH_OFFSET) / 10000000);
+	}
+	CloseHandle(h);
 }
 
 DEFINE_PRIMITIVE(read_dir)

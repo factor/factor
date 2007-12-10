@@ -13,7 +13,7 @@ SYMBOL: windows-messages
     word [ word-name ] keep execute maybe-create-windows-messages
     windows-messages get set-at ; parsing
 
-: get-windows-message-name ( n -- name )
+: windows-message-name ( n -- name )
     windows-messages get at* [ drop "unknown message" ] unless ;
 
 : WM_NULL HEX: 0000 ; inline add-windows-message
@@ -107,6 +107,8 @@ SYMBOL: windows-messages
 : WM_NCXBUTTONDOWN HEX: 00AB ; inline add-windows-message
 : WM_NCXBUTTONUP HEX: 00AC ; inline add-windows-message
 : WM_NCXBUTTONDBLCLK HEX: 00AD ; inline add-windows-message
+: WM_NCUAHDRAWCAPTION HEX: 00AE ; inline add-windows-message ! undocumented
+: WM_NCUAHDRAWFRAME HEX: 00AF ; inline add-windows-message   ! undocumented
 : WM_INPUT HEX: 00FF ; inline add-windows-message
 : WM_KEYFIRST HEX: 0100 ; inline add-windows-message
 : WM_KEYDOWN HEX: 0100 ; inline add-windows-message

@@ -11,16 +11,6 @@ TUPLE: windows-nt-io ;
 TUPLE: windows-ce-io ;
 UNION: windows-io windows-nt-io windows-ce-io ;
 
-M: windows-io library-roots ( -- seq )
-    [
-        windows ,
-    ] { } make ;
-
-M: windows-io binary-roots ( -- seq )
-    [
-        windows ,
-    ] { } make ;
-
 M: windows-io destruct-handle CloseHandle drop ;
 
 M: windows-io destruct-socket closesocket drop ;

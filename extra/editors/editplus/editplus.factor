@@ -1,12 +1,15 @@
-USING: editors io.launcher math.parser namespaces ;
+USING: editors io.files io.launcher kernel math.parser
+namespaces sequences windows.shell32 ;
 IN: editors.editplus
+
+: editplus-path ( -- path )
+    \ editplus-path get-global [
+        program-files "\\EditPlus 2\\editplus.exe" append
+    ] unless* ;
 
 : editplus ( file line -- )
     [
-        \ editplus get-global % " -cursor " % # " " % %
+        editplus-path % " -cursor " % # " " % %
     ] "" make run-detached ;
-
-! Put in your .factor-boot-rc
-! "c:\\Program Files\\EditPlus\\editplus.exe" \ editplus set-global
 
 [ editplus ] edit-hook set-global
