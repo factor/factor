@@ -111,4 +111,4 @@ C: <faq> faq
     ] make-xml ;
 
 : read-write-faq ( xml-stream -- )
-    [ read-xml ] with-stream xml>faq faq>html write-xml ;
+    read-xml xml>faq faq>html write-xml ;
