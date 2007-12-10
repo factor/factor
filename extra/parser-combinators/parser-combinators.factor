@@ -21,6 +21,9 @@ TUPLE: parse-result parsed unparsed ;
 
 C: <parse-result> parse-result
 
+: <parse-results> ( parsed unparsed -- list )
+    <parse-result> 1list ;
+
 : parse-result-parsed-slice ( parse-result -- slice )
     dup parse-result-parsed empty? [
         parse-result-unparsed 0 0 rot <slice>
@@ -55,7 +58,7 @@ C: <token-parser> token-parser
 M: token-parser parse ( input parser -- list )
     dup token-parser-string swap token-parser-ignore-case?
     >r tuck r> ?string-head
-    [ <parse-result> 1list ] [ 2drop nil ] if ;
+    [ <parse-results> ] [ 2drop nil ] if ;
 
 : 1token ( n -- parser ) 1string token ;
 
@@ -70,11 +73,8 @@ M: satisfy-parser parse ( input parser -- list )
     over empty? [
         2drop nil
     ] [
-        satisfy-parser-quot >r unclip-slice dup r> call [
-            swap <parse-result> 1list
-        ] [
-            2drop nil
-        ] if
+        satisfy-parser-quot >r unclip-slice dup r> call
+        [ swap <parse-results> ] [ 2drop nil ] if
     ] if ;
 
 LAZY: any-char-parser ( -- parser )
@@ -89,7 +89,7 @@ M: epsilon-parser parse ( input parser -- list )
     #! does not consume any input and always returns
     #! an empty list as the parse tree with the
     #! unmodified input.
-    drop "" swap <parse-result> 1list ;
+    drop "" swap <parse-results> ;
 
 TUPLE: succeed-parser result ;
 
@@ -98,7 +98,7 @@ C: succeed succeed-parser ( result -- parser )
 M: succeed-parser parse ( input parser -- list )
     #! A parser that always returns 'result' as a
     #! successful parse with no input consumed.
-    succeed-parser-result swap <parse-result> 1list ;
+    succeed-parser-result swap <parse-results> ;
 
 TUPLE: fail-parser ;
 
@@ -108,6 +108,24 @@ M: fail-parser parse ( input parser -- list )
     #! A parser that always fails and returns
     #! an empty list of successes.
     2drop nil ;
+
+TUPLE: ensure-parser test ;
+
+: ensure ( parser -- ensure )
+    ensure-parser construct-boa ;
+
+M: ensure-parser parse ( input parser -- list )
+    2dup ensure-parser-test parse nil?
+    [ 2drop nil ] [ drop t swap <parse-results> ] if ;
+
+TUPLE: ensure-not-parser test ;
+
+: ensure-not ( parser -- ensure )
+    ensure-not-parser construct-boa ;
+
+M: ensure-not-parser parse ( input parser -- list )
+    2dup ensure-not-parser-test parse nil?
+    [ drop t swap <parse-results> ] [ 2drop nil ] if ;
 
 TUPLE: and-parser parsers ;
 
@@ -188,7 +206,7 @@ TUPLE: apply-parser p1 quot ;
 C: <@ apply-parser ( parser quot -- parser )
 
 M: apply-parser parse ( input parser -- result )
-    #! Calls the parser on the input. For each successfull
+    #! Calls the parser on the input. For each successful
     #! parse the quot is call with the parse result on the stack.
     #! The result of that quotation then becomes the new parse result.
     #! This allows modification of parse tree results (like
