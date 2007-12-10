@@ -27,7 +27,7 @@ C: <store> store
     get-global store-data at ;
 
 : set-persistent ( value key store -- )
-    get-global [ store-data set-at ] keep save-store ;
+    [ get-global store-data set-at ] keep save-store ;
 
 : init-persistent ( value key store -- )
     2dup get-persistent [ 3drop ] [ set-persistent ] if ;
