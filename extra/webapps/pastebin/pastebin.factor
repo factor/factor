@@ -8,6 +8,12 @@ TUPLE: pastebin pastes ;
 : <pastebin> ( -- pastebin )
     V{ } clone pastebin construct-boa ;
 
+! Persistence
+SYMBOL: store
+"pastebin.store" store define-store
+<pastebin> pastebin store get store-variable
+: save-pastebin-store ( -- ) store get-global save-store ;
+
 TUPLE: paste
 summary author channel mode contents date
 annotations n ;
@@ -18,12 +24,6 @@ annotations n ;
 TUPLE: annotation summary author mode contents ;
 
 C: <annotation> annotation
-
-SYMBOL: store
-
-"pastebin.store" resource-path load-store store set-global
-
-<pastebin> \ pastebin store get store-variable
 
 : get-paste ( n -- paste )
     pastebin get pastebin-pastes nth ;
@@ -71,9 +71,6 @@ SYMBOL: store
 
 \ feed.xml { } define-action
 
-: save-pastebin-store ( -- )
-    store get-global save-store ;
-
 : add-paste ( paste pastebin -- )
     >r now over set-paste-date r>
     pastebin-pastes 2dup length swap set-paste-n push ;
@@ -85,8 +82,8 @@ SYMBOL: store
     ] keep paste-link permanent-redirect ;
 
 \ submit-paste {
-    { "summary" v-required }
-    { "author" v-required }
+    { "summary" "- no summary -" v-default }
+    { "author" "- no author -" v-default }
     { "channel" "#concatenative" v-default }
     { "mode" "factor" v-default }
     { "contents" v-required }
@@ -99,7 +96,7 @@ SYMBOL: store
 
 \ annotate-paste {
     { "n" v-required v-number }
-    { "summary" v-required }
+    { "summary" "- no summary -" v-default }
     { "author" v-required }
     { "mode" "factor" v-default }
     { "contents" v-required }

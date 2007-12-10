@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs io io.files kernel namespaces serialize ;
+USING: assocs io io.files kernel namespaces serialize init ;
 IN: store
 
 TUPLE: store path data ;
@@ -30,3 +30,8 @@ C: <store> store
     ] [
         drop >r 2dup set-global r> set-at
     ] if ;
+
+: define-store ( path id -- )
+    over >r
+    [ >r resource-path load-store r> set-global ] 2curry
+    r> add-init-hook ;

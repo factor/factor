@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.files
 USING: io.backend io.files.private io hashtables kernel math
-memory namespaces sequences strings arrays definitions system
-combinators splitting ;
+memory namespaces sequences strings assocs arrays definitions
+system combinators splitting ;
 
 HOOK: <file-reader> io-backend ( path -- stream )
 
@@ -140,3 +140,20 @@ HOOK: binary-roots io-backend ( -- seq )
 
 : find-binary ( str -- path/f )
     binary-roots swap find-file ;
+
+<PRIVATE
+: append-path ( path files -- paths )
+    [ path+ ] curry* map ;
+
+: get-paths ( dir -- paths )
+    dup directory keys append-path ;
+
+: (walk-dir) ( path -- )
+    dup directory? [
+        get-paths dup % [ (walk-dir) ] each
+    ] [
+        drop
+    ] if ;
+PRIVATE>
+
+: walk-dir ( path -- seq ) [ (walk-dir) ] { } make ;

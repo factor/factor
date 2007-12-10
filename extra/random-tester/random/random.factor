@@ -18,13 +18,13 @@ IN: random-tester
 : random-string
     [ max-length random [ max-value random , ] times ] "" make ;
 
-SYMBOL: special-integers
+: special-integers ( -- seq ) \ special-integers get ;
 [ { -1 0 1 } % most-negative-fixnum , most-positive-fixnum , first-bignum , ] 
 { } make \ special-integers set-global
-SYMBOL: special-floats
+: special-floats ( -- seq ) \ special-floats get ;
 [ { 0.0 -0.0 } % e , pi , 1./0. , -1./0. , 0./0. , epsilon , epsilon neg , ]
 { } make \ special-floats set-global
-SYMBOL: special-complexes
+: special-complexes ( -- seq ) \ special-complexes get ;
 [ 
     { -1 0 1 C{ 0 1 } C{ 0 -1 } } %
     e , e neg , pi , pi neg ,

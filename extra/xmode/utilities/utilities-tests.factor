@@ -2,7 +2,7 @@ IN: temporary
 USING: xmode.utilities tools.test xml xml.data
 kernel strings vectors sequences io.files prettyprint assocs ;
 
-[ 3 "hi" ] [
+[ "hi" 3 ] [
     { 1 2 3 4 5 6 7 8 } [ H{ { 3 "hi" } } at ] map-find
 ] unit-test
 
