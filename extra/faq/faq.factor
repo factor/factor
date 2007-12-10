@@ -108,3 +108,6 @@ C: <faq> faq
         "header" [ dup faq-header , ] tag,
         faq-lists [ question-list>xml , nl, ] each
     ] make-xml ;
+
+: read-write-faq ( xml-stream -- )
+    [ read-xml ] with-stream xml>faq faq>html write-xml ;
