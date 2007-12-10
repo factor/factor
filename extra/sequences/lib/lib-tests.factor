@@ -1,5 +1,5 @@
 USING: arrays kernel sequences sequences.lib math
-math.functions tools.test ;
+math.functions tools.test strings ;
 
 [ 4 ] [ { 1 2 } [ sq ] [ * ] map-reduce ] unit-test
 [ 36 ] [ { 2 3 } [ sq ] [ * ] map-reduce ] unit-test
@@ -42,3 +42,7 @@ math.functions tools.test ;
 
 [ { 1 9 25 } ] [ { 1 3 5 6 } [ sq ] [ even? ] map-until ] unit-test
 [ { 2 4 } ] [ { 2 4 1 3 } [ even? ] take-while ] unit-test
+
+[ { { 0 0 } { 1 0 } { 0 1 } { 1 1 } } ] [ 2 2 exact-strings ] unit-test
+[ t ] [ "ab" 4 strings [ >string ] map "abab" swap member? ] unit-test
+[ { { } { 1 } { 2 } { 1 2 } } ] [ { 1 2 } power-set ] unit-test

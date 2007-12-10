@@ -32,10 +32,10 @@ to depend on:
   it inherits the value of the NO_WORD_SEP attribute from the previous
   RULES tag.
 
-  The Factor implementation does not duplicate this behavior.
+  The Factor implementation does not duplicate this behavior. If you
+  find a mode file which depends on this flaw, please fix it and submit
+  the changes to the jEdit project.
 
-This is still a work in progress. If you find any behavioral differences
-between the Factor implementation and the original jEdit code, please
-report them as bugs. Also, if you wish to contribute a new or improved
-mode file, please contact the jEdit project. Updated mode files in jEdit
-will be periodically imported into the Factor source tree.
+If you wish to contribute a new or improved mode file, please contact
+the jEdit project. Updated mode files in jEdit will be periodically
+imported into the Factor source tree.

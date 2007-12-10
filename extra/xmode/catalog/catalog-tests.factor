@@ -5,5 +5,7 @@ kernel sequences io ;
 [ t ] [ modes hashtable? ] unit-test
 
 [ ] [
-    modes keys [ dup print load-mode drop reset-modes ] each
+    modes keys [
+        dup print flush load-mode drop reset-modes
+    ] each
 ] unit-test

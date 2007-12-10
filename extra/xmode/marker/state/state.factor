@@ -16,7 +16,6 @@ SYMBOL: seen-whitespace-end?
 SYMBOL: escaped?
 SYMBOL: process-escape?
 SYMBOL: delegate-end-escaped?
-SYMBOL: terminated?
 
 : current-rule ( -- rule )
     context get line-context-in-rule ;
@@ -51,10 +50,6 @@ SYMBOL: terminated?
     context get line-context-parent
     dup context set
     f swap set-line-context-in-rule ;
-
-: terminal-rule-set ( -- rule-set )
-    get-rule-set rule-set-default standard-rule-set
-    push-context ;
 
 : init-token-marker ( prev-context line rules -- )
     rule-sets set

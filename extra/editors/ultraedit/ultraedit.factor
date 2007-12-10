@@ -1,12 +1,17 @@
-USING: editors io.launcher kernel math.parser namespaces ;
+USING: editors io.files io.launcher kernel math.parser
+namespaces sequences windows.shell32 ;
 IN: editors.ultraedit
+
+: ultraedit-path ( -- path )
+    \ ultraedit-path get-global [
+        program-files
+        "\\IDM Computer Solutions\\UltraEdit-32\\uedit32.exe" path+
+    ] unless* ;
 
 : ultraedit ( file line -- )
     [
-        \ ultraedit get-global % " " % swap % "/" % # "/1" %
+        ultraedit-path % " " % swap % "/" % # "/1" %
     ] "" make run-detached ;
 
-! Put the path in your .factor-boot-rc
-! "K:\\Program Files (x86)\\IDM Computer Solutions\\UltraEdit-32\\uedit32.exe" \ ultraedit set-global
 
 [ ultraedit ] edit-hook set-global

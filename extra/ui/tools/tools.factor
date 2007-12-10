@@ -67,11 +67,11 @@ M: workspace model-changed
 : com-profiler profiler-gadget select-tool ;
 
 workspace "tool-switching" f {
-    { T{ key-down f { C+ } "1" } com-listener }
-    { T{ key-down f { C+ } "2" } com-browser }
-    { T{ key-down f { C+ } "3" } com-inspector }
-    { T{ key-down f { C+ } "4" } com-walker }
-    { T{ key-down f { C+ } "5" } com-profiler }
+    { T{ key-down f { A+ } "1" } com-listener }
+    { T{ key-down f { A+ } "2" } com-browser }
+    { T{ key-down f { A+ } "3" } com-inspector }
+    { T{ key-down f { A+ } "4" } com-walker }
+    { T{ key-down f { A+ } "5" } com-profiler }
 } define-command-map
 
 \ workspace-window

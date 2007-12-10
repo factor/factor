@@ -1,7 +1,7 @@
 ! Copyright (C) 2004 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lazy-lists promises kernel sequences strings math
-arrays splitting quotations combinators ;
+arrays splitting quotations combinators namespaces ;
 IN: parser-combinators
 
 ! Parser combinator protocol
@@ -30,16 +30,32 @@ C: <parse-result> parse-result
         rot slice-seq <slice>
     ] if ;
 
-TUPLE: token-parser string ;
+: string= ( str1 str2 ignore-case -- ? )
+    [ [ >upper ] 2apply ] when sequence= ;
 
-C: token token-parser ( string -- parser )
+: string-head? ( str head ignore-case -- ? )
+    pick pick shorter? [
+        3drop f
+    ] [
+        >r [ length head-slice ] keep r> string=
+    ] if ;
+
+: ?string-head ( str head ignore-case -- newstr ? )
+    >r 2dup r> string-head?
+    [ length tail-slice t ] [ drop f ] if ;
+
+TUPLE: token-parser string ignore-case? ;
+
+C: <token-parser> token-parser
+
+: token ( string -- parser ) f <token-parser> ;
+
+: case-insensitive-token ( string -- parser ) t <token-parser> ;
 
 M: token-parser parse ( input parser -- list )
-    token-parser-string swap over ?head-slice [
-        <parse-result> 1list
-    ] [
-        2drop nil
-    ] if ;
+    dup token-parser-string swap token-parser-ignore-case?
+    >r tuck r> ?string-head
+    [ <parse-result> 1list ] [ 2drop nil ] if ;
 
 : 1token ( n -- parser ) 1string token ;
 
@@ -224,7 +240,7 @@ LAZY: <*> ( parser -- parser )
 
 LAZY: <?> ( parser -- parser )
     #! Return a parser that optionally uses the parser
-    #! if that parser would be successfull.
+    #! if that parser would be successful.
     [ 1array ] <@ f succeed <|> ;
 
 TUPLE: only-first-parser p1 ;
@@ -261,6 +277,10 @@ LAZY: <!?> ( parser -- parser )
     #! required.
     <?> only-first ;
 
+LAZY: <(?)> ( parser -- parser )
+    #! Like <?> but take shortest match first.
+    f succeed swap [ 1array ] <@ <|> ;
+
 LAZY: <(*)> ( parser -- parser )
     #! Like <*> but take shortest match first.
     #! Implementation by Matthew Willis.
@@ -290,8 +310,13 @@ LAZY: <(+)> ( parser -- parser )
 LAZY: surrounded-by ( parser start end -- parser' )
     [ token ] 2apply swapd pack ;
 
+: flatten* ( obj -- )
+    dup array? [ [ flatten* ] each ] [ , ] if ;
+
+: flatten [ flatten* ] { } make ;
+
 : exactly-n ( parser n -- parser' )
-    swap <repetition> <and-parser> ;
+    swap <repetition> <and-parser> [ flatten ] <@ ;
 
 : at-most-n ( parser n -- parser' )
     dup zero? [
@@ -305,4 +330,4 @@ LAZY: surrounded-by ( parser start end -- parser' )
     dupd exactly-n swap <*> <&> ;
 
 : from-m-to-n ( parser m n -- parser' )
-    >r [ exactly-n ] 2keep r> swap - at-most-n <&> ;
+    >r [ exactly-n ] 2keep r> swap - at-most-n <:&:> ;

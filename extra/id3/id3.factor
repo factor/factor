@@ -2,7 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 
-USING: arrays combinators io io.binary io.files io.utf16 kernel math math.parser namespaces sequences splitting strings assocs ;
+USING: arrays combinators io io.binary io.files io.paths
+io.utf16 kernel math math.parser namespaces sequences
+splitting strings assocs ;
 
 IN: id3
 
@@ -120,18 +122,6 @@ C: <extended-header> extended-header
 
 : id3v2 ( filename -- tag/f )
   <file-reader> [ read-tag ] with-stream ;
-
-: append-path ( path files -- paths )
-  [ path+ ] curry* map ;
-
-: get-paths ( dir -- paths )
-  dup directory keys append-path ;
-
-: (walk-dir) ( path -- )
-  dup directory? [ get-paths dup % [ (walk-dir) ] each ] [ drop ] if ;
-
-: walk-dir ( path -- seq )
-  [ (walk-dir) ] { } make ;
 
 : file? ( path -- ? )
   stat 3drop not ;

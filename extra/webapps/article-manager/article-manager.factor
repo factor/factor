@@ -4,11 +4,16 @@
 USING: kernel furnace sqlite.tuple-db webapps.article-manager.database 
        sequences namespaces math arrays assocs quotations io.files
        http.server http.basic-authentication http.server.responders 
-       webapps.file ;
+       webapps.file html html.elements io ;
 IN: webapps.article-manager
 
 : current-site ( -- site )
   host get-site* ;
+
+: render-titled-page* ( model body-template head-template title -- )
+  [ 
+      [ render-component ] swap [ <title> write </title> f rot render-component ] curry html-document
+  ] serve-html ;
 
 TUPLE: template-args arg1 ;
   

@@ -235,6 +235,7 @@ ARTICLE: "changes" "Changes in the latest release"
     { "New, efficient implementations of " { $link bit? } " and " { $link log2 } " runs in constant time for large bignums" }
     { "New " { $link big-random } " word for generating large random numbers quickly" }
     { "Improved profiler no longer has to be explicitly enabled and disabled with a full recompile; instead, the " { $link profile } " word can be used at any time, and it dynamically patches words to increment call counts. There is no overhead when the profiler is not in use." }
+    { "Calls to " { $link member? } " with a literal sequence are now open-coded. If there are four or fewer elements, a series of conditionals are generated; if there are more than four elements, there is a hash dispatch followed by conditionals in each branch." }
 }
 { $subheading "IO" }
 { $list
@@ -247,7 +248,7 @@ ARTICLE: "changes" "Changes in the latest release"
     { { $vocab-link "io.server" } " - improved logging support, logs to a file by default" }
     { { $vocab-link "io.files" } " - several new file system manipulation words added" }
     { { $vocab-link "tar" } " - tar file extraction in pure Factor (Doug Coleman)" }
-    { { $vocab-link "unix.linux" } ", " { $vocab-link "raptor" } " - ``Raptor Linux'', a set of alien bindings to low-level Linux features, such as network interface configuration, file system mounting/unmounting, etc, together with experimental boot scripts intended to entirely replace " { $snippet "/sbin/init" } ", " { $vocab-link "/etc/inittab" } " and " { $snippet "/etc/init.d/" } " (Eduardo Cavazos)." }
+    { { $vocab-link "unix.linux" } ", " { $vocab-link "raptor" } " - ``Raptor Linux'', a set of alien bindings to low-level Linux features, such as network interface configuration, file system mounting/unmounting, etc, together with experimental boot scripts intended to entirely replace " { $snippet "/sbin/init" } ", " { $snippet "/etc/inittab" } " and " { $snippet "/etc/init.d/" } " (Eduardo Cavazos)." }
 }
 { $subheading "Tools" }
 { $list
@@ -264,7 +265,7 @@ ARTICLE: "changes" "Changes in the latest release"
     { "Windows can be closed on request now using " { $link close-window } }
     { "New icons (Elie Chaftari)" }
 }
-{ $subheading "Other" }
+{ $subheading "Libraries" }
 { $list
     { "The " { $snippet "queues" } " vocabulary has been removed because its functionality is a subset of " { $vocab-link "dlists" } }
     { "The " { $vocab-link "webapps.cgi" } " vocabulary implements CGI support for the Factor HTTP server." }
@@ -273,11 +274,19 @@ ARTICLE: "changes" "Changes in the latest release"
     { { $vocab-link "channels" } " - concurrent message passing over message channels" }
     { { $vocab-link "destructors" } " - deterministic scope-based resource deallocation (Doug Coleman)" }
     { { $vocab-link "dlists" } " - various updates (Doug Coleman)" }
+    { { $vocab-link "editors.emeditor" } " - EmEditor integration (Doug Coleman)" }
+    { { $vocab-link "editors.editplus" } " - EditPlus integration (Aaron Schaefer)" }
     { { $vocab-link "editors.notepadpp" } " - Notepad++ integration (Doug Coleman)" }
+    { { $vocab-link "editors.ted-notepad" } " - TED Notepad integration (Doug Coleman)" }
+    { { $vocab-link "editors.ultraedit" } " - UltraEdit integration (Doug Coleman)" }
+    { { $vocab-link "globs" } " - simple Unix shell-style glob patterns" }
     { { $vocab-link "heaps" } " - updated for new module system and cleaned up (Doug Coleman)" }
     { { $vocab-link "peg" } " - Parser Expression Grammars, a new appoach to parser construction, similar to parser combinators (Chris Double)" }
     { { $vocab-link "regexp" } " - revived from " { $snippet "unmaintained/" } " and completely redesigned (Doug Coleman)" }
-    { { $vocab-link "tuple.lib" } " - some utility words for working with tuples (Doug Coleman)" }
+    { { $vocab-link "rss" } " - add Atom feed generation (Daniel Ehrenberg)" }
+    { { $vocab-link "tuples.lib" } " - some utility words for working with tuples (Doug Coleman)" }
+    { { $vocab-link "webapps.pastebin" } " - improved appearance, add Atom feed generation, add syntax highlighting using " { $vocab-link "xmode" } }
+    { { $vocab-link "webapps.planet" } " - add Atom feed generation" }
 }
 { $heading "Factor 0.90" }
 { $subheading "Core" }

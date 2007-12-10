@@ -32,7 +32,7 @@ M: nehe4-gadget draw-gadget* ( gadget -- )
   glLoadIdentity
   -1.5 0.0 -6.0 glTranslatef
   dup nehe4-gadget-rtri 0.0 1.0 0.0 glRotatef
-    
+
   GL_TRIANGLES [
     1.0 0.0 0.0 glColor3f
     0.0 1.0 0.0 glVertex3f
@@ -52,23 +52,23 @@ M: nehe4-gadget draw-gadget* ( gadget -- )
     1.0 1.0 0.0 glVertex3f
     1.0 -1.0 0.0 glVertex3f
     -1.0 -1.0 0.0 glVertex3f
-  ] do-state 
+  ] do-state
   dup nehe4-gadget-rtri 0.2 + over set-nehe4-gadget-rtri
   dup nehe4-gadget-rquad 0.15 - swap set-nehe4-gadget-rquad ;
-  
-: nehe4-update-thread ( gadget -- )  
-  dup nehe4-gadget-quit? [
-    redraw-interval sleep 
-    dup relayout-1  
-    nehe4-update-thread 
-  ] unless ;
+
+: nehe4-update-thread ( gadget -- )
+  dup nehe4-gadget-quit? [ drop ] [
+    redraw-interval sleep
+    dup relayout-1
+    nehe4-update-thread
+  ] if ;
 
 M: nehe4-gadget graft* ( gadget -- )
- [ f swap set-nehe4-gadget-quit? ] keep
- [ nehe4-update-thread ] in-thread drop ;
+  [ f swap set-nehe4-gadget-quit? ] keep
+  [ nehe4-update-thread ] in-thread drop ;
 
 M: nehe4-gadget ungraft* ( gadget -- )
- t swap set-nehe4-gadget-quit? ;
+  t swap set-nehe4-gadget-quit? ;
 
 : run4 ( -- )
   <nehe4-gadget> "NeHe Tutorial 4" open-window ;

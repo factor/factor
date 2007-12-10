@@ -87,9 +87,9 @@ TUPLE: CreateProcess-args
     pass-environment? [
         [
             get-environment
-            [ swap % "=" % % "\0" % ] assoc-each
+            [ "=" swap 3append string>u16-alien % ] assoc-each
             "\0" %
-        ] "" make >c-ushort-array
+        ] { } make >c-ushort-array
         over set-CreateProcess-args-lpEnvironment
     ] when ;
 

@@ -1,8 +1,8 @@
 IN: xmode.marker
 USING: kernel namespaces xmode.rules xmode.tokens
-xmode.marker.state xmode.marker.context
-xmode.utilities xmode.catalog sequences math
-assocs combinators combinators.lib strings regexp splitting ;
+xmode.marker.state xmode.marker.context xmode.utilities
+xmode.catalog sequences math assocs combinators combinators.lib
+strings regexp splitting parser-combinators ;
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 
@@ -15,8 +15,8 @@ assocs combinators combinators.lib strings regexp splitting ;
         [ dup [ digit? ] contains? ]
         [
             dup [ digit? ] all? [
-                current-rule-set rule-set-digit-re dup
-                [ dupd 2drop f ] [ drop f ] if
+                current-rule-set rule-set-digit-re
+                dup [ dupd matches? ] [ drop f ] if
             ] unless*
         ]
     } && nip ;
@@ -26,7 +26,7 @@ assocs combinators combinators.lib strings regexp splitting ;
 
 : resolve-delegate ( name -- rules )
     dup string? [
-        "::" split1 [ swap load-mode at ] [ rule-sets get at ] if*
+        "::" split1 [ swap load-mode ] [ rule-sets get ] if* at
     ] when ;
 
 : rule-set-keyword-maps ( ruleset -- seq )
@@ -45,13 +45,6 @@ assocs combinators combinators.lib strings regexp splitting ;
     dup mark-number [ ] [ mark-keyword ] ?if
     [ prev-token, ] when* ;
 
-: check-terminate-char ( -- )
-    current-rule-set rule-set-terminate-char [
-        position get <= [
-            terminated? on
-        ] when
-    ] when* ;
-
 : current-char ( -- char )
     position get line get nth ;
 
@@ -69,20 +62,27 @@ M: rule match-position drop position get ;
         [ over matcher-at-word-start?     over last-offset get =    implies ]
     } && 2nip ;
 
-GENERIC: text-matches? ( position text -- match-count/f )
+: rest-of-line ( -- str )
+    line get position get tail-slice ;
 
-M: f text-matches? 2drop f ;
+GENERIC: text-matches? ( string text -- match-count/f )
 
-M: string text-matches?
-    ! XXX ignore case
-    >r line get swap tail-slice r>
-    [ head? ] keep length and ;
+M: f text-matches?
+    2drop f ;
 
-! M: regexp text-matches? ... ;
+M: string-matcher text-matches?
+    [
+        dup string-matcher-string
+        swap string-matcher-ignore-case?
+        string-head?
+    ] keep string-matcher-string length and ;
+
+M: regexp text-matches?
+    >r >string r> match-head ;
 
 : rule-start-matches? ( rule -- match-count/f )
     dup rule-start tuck swap can-match-here? [
-        position get swap matcher-text text-matches?
+        rest-of-line swap matcher-text text-matches?
     ] [
         drop f
     ] if ;
@@ -92,8 +92,8 @@ M: string text-matches?
         dup rule-start swap can-match-here? 0 and
     ] [
         dup rule-end tuck swap can-match-here? [
-            position get swap matcher-text
-            context get line-context-end or
+            rest-of-line
+            swap matcher-text context get line-context-end or
             text-matches?
         ] [
             drop f
@@ -284,8 +284,6 @@ M: mark-previous-rule handle-rule-start
 
 : mark-token-loop ( -- )
     position get line get length < [
-        check-terminate-char
-
         {
             [ check-end-delegate ]
             [ check-every-rule ]
@@ -302,8 +300,7 @@ M: mark-previous-rule handle-rule-start
 
 : unwind-no-line-break ( -- )
     context get line-context-parent [
-        line-context-in-rule rule-no-line-break?
-        terminated? get or [
+        line-context-in-rule rule-no-line-break? [
             pop-context
             unwind-no-line-break
         ] when

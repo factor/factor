@@ -70,7 +70,6 @@
 			#elif defined(FACTOR_ARM)
 				#include "os-linux-arm.h"
 			#elif defined(FACTOR_AMD64)
-				#include "os-unix-ucontext.h"
 				#include "os-linux-x86-64.h"
 			#else
 				#error "Unsupported Linux flavor"
