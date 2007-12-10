@@ -24,10 +24,12 @@
 <td><% "modes" render-template %></td>
 </tr>
 
+<!--
 <tr>
 <th align="right">Channel:</th>
 <td><input type="TEXT" name="channel" value="#concatenative" /></td>
 </tr>
+-->
 
 <tr>
 <th align="right" valign="top">Content:</th>

@@ -85,8 +85,8 @@ SYMBOL: store
     ] keep paste-link permanent-redirect ;
 
 \ submit-paste {
-    { "summary" v-required }
-    { "author" v-required }
+    { "summary" "- no summary -" v-default }
+    { "author" "- no author -" v-default }
     { "channel" "#concatenative" v-default }
     { "mode" "factor" v-default }
     { "contents" v-required }
@@ -99,7 +99,7 @@ SYMBOL: store
 
 \ annotate-paste {
     { "n" v-required v-number }
-    { "summary" v-required }
+    { "summary" "- no summary -" v-default }
     { "author" v-required }
     { "mode" "factor" v-default }
     { "contents" v-required }
