@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml kernel sequences xml.utilities combinators.lib
-math xml.data arrays assocs xml.generator namespaces math.parser ;
+math xml.data arrays assocs xml.generator xml.writer namespaces
+math.parser io ;
 IN: faq
 
 : find-after ( seq quot -- elem after )
@@ -110,4 +111,4 @@ C: <faq> faq
     ] make-xml ;
 
 : read-write-faq ( xml-stream -- )
-    [ read-xml ] with-stream xml>faq faq>html write-xml ;
+    read-xml xml>faq faq>html write-xml ;

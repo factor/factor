@@ -1,6 +1,6 @@
 USING: xmode.loader xmode.utilities xmode.rules namespaces
 strings splitting assocs sequences kernel io.files xml memoize
-words globs ;
+words globs combinators ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
@@ -40,18 +40,15 @@ MEMO: (load-mode) ( name -- rule-sets )
     "extra/xmode/modes/" swap append
     resource-path <file-reader> parse-mode ;
 
-DEFER: load-mode
-
 SYMBOL: rule-sets
 
-: get-rule-set ( name -- rules )
-    dup string? [
-        "::" split1 [ swap load-mode ] [ rule-sets get ] if* at
-    ] when ;
+: get-rule-set ( name -- rule-sets rules )
+    "::" split1 [ swap (load-mode) ] [ rule-sets get ] if*
+    tuck at ;
 
 : resolve-delegate ( rule -- )
-    dup rule-delegate dup
-    [ get-rule-set swap set-rule-delegate ] [ 2drop ] if ;
+    dup rule-delegate dup string?
+    [ get-rule-set nip swap set-rule-delegate ] [ 2drop ] if ;
 
 : each-rule ( rule-set quot -- )
     >r rule-set-rules values concat r> each ; inline
@@ -71,23 +68,35 @@ SYMBOL: rule-sets
 
 : resolve-imports ( ruleset -- )
     dup rule-set-imports [
-        get-rule-set
-        dup resolve-delegates
-        2dup import-keywords
-        import-rules
+        get-rule-set dup [
+            swap rule-sets [
+                2dup import-keywords
+                import-rules
+            ] with-variable
+        ] [
+            3drop
+        ] if
     ] curry* each ;
 
 : finalize-rule-set ( ruleset -- )
-    dup rule-set-finalized? [ drop ] [
-        t over set-rule-set-finalized?
-        dup resolve-imports
-        resolve-delegates
-    ] if ;
+    dup rule-set-finalized? {
+        { f [
+            1 over set-rule-set-finalized?
+            dup resolve-imports
+            dup resolve-delegates
+            t swap set-rule-set-finalized?
+        ] }
+        { t [ drop ] }
+        { 1 [ "Mutually recursive rule sets" throw ] }
+    } case ;
 
-: load-mode ( name -- rule-sets )
-    (load-mode) dup rule-sets [
+: finalize-mode ( rulesets -- )
+    rule-sets [
         dup [ nip finalize-rule-set ] assoc-each
     ] with-variable ;
+
+: load-mode ( name -- rule-sets )
+    (load-mode) dup finalize-mode ;
 
 : reset-modes ( -- )
     \ load-mode "memoize" word-prop clear-assoc ;
