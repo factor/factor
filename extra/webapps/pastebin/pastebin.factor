@@ -8,6 +8,12 @@ TUPLE: pastebin pastes ;
 : <pastebin> ( -- pastebin )
     V{ } clone pastebin construct-boa ;
 
+! Persistence
+SYMBOL: store
+"pastebin.store" store define-store
+<pastebin> pastebin store get store-variable
+: save-pastebin-store ( -- ) store get-global save-store ;
+
 TUPLE: paste
 summary author channel mode contents date
 annotations n ;
@@ -18,12 +24,6 @@ annotations n ;
 TUPLE: annotation summary author mode contents ;
 
 C: <annotation> annotation
-
-SYMBOL: store
-
-"pastebin.store" resource-path load-store store set-global
-
-<pastebin> \ pastebin store get store-variable
 
 : get-paste ( n -- paste )
     pastebin get pastebin-pastes nth ;
@@ -70,9 +70,6 @@ SYMBOL: store
     paste-feed <feed> feed>xml write-xml ;
 
 \ feed.xml { } define-action
-
-: save-pastebin-store ( -- )
-    store get-global save-store ;
 
 : add-paste ( paste pastebin -- )
     >r now over set-paste-date r>
