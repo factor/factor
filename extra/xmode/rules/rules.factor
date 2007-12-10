@@ -20,6 +20,7 @@ escape-rule
 highlight-digits?
 digit-re
 no-word-sep
+finalized?
 ;
 
 : init-rule-set ( ruleset -- )

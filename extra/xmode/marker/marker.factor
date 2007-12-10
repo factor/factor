@@ -24,18 +24,8 @@ strings regexp splitting parser-combinators ;
 : mark-number ( keyword -- id )
     keyword-number? DIGIT and ;
 
-: resolve-delegate ( name -- rules )
-    dup string? [
-        "::" split1 [ swap load-mode ] [ rule-sets get ] if* at
-    ] when ;
-
-: rule-set-keyword-maps ( ruleset -- seq )
-    dup rule-set-imports
-    [ resolve-delegate rule-set-keyword-maps ] map concat
-    swap rule-set-keywords add ;
-
 : mark-keyword ( keyword -- id )
-    current-rule-set rule-set-keyword-maps assoc-stack ;
+    current-rule-set rule-set-keywords at ;
 
 : add-remaining-token ( -- )
     current-rule-set rule-set-default prev-token, ;
@@ -102,10 +92,6 @@ M: regexp text-matches?
 
 DEFER: get-rules
 
-: get-imported-rules ( vector/f char ruleset -- vector/f )
-    rule-set-imports
-    [ resolve-delegate get-rules ?push-all ] curry* each ;
-
 : get-always-rules ( vector/f ruleset -- vector/f )
     f swap rule-set-rules at ?push-all ;
 
@@ -113,10 +99,7 @@ DEFER: get-rules
     >r ch>upper r> rule-set-rules at ?push-all ;
 
 : get-rules ( char ruleset -- seq )
-    f -rot
-    [ get-char-rules ] 2keep
-    [ get-always-rules ] keep
-    get-imported-rules ;
+    f -rot [ get-char-rules ] keep get-always-rules ;
 
 GENERIC: handle-rule-start ( match-count rule -- )
 
@@ -173,7 +156,7 @@ M: seq-rule handle-rule-start
     mark-token
     add-remaining-token
     tuck rule-body-token next-token,
-    rule-delegate [ resolve-delegate push-context ] when* ;
+    rule-delegate [ push-context ] when* ;
 
 UNION: abstract-span-rule span-rule eol-span-rule ;
 
@@ -184,7 +167,7 @@ M: abstract-span-rule handle-rule-start
     tuck rule-match-token* next-token,
     ! ... end subst ...
     dup context get set-line-context-in-rule
-    rule-delegate resolve-delegate push-context ;
+    rule-delegate push-context ;
 
 M: span-rule handle-rule-end
     2drop ;
@@ -230,10 +213,12 @@ M: mark-previous-rule handle-rule-start
 
 : handle-no-word-break ( -- )
     context get line-context-parent [
-        line-context-in-rule dup rule-no-word-break? [
-            rule-match-token* prev-token,
-            pop-context
-        ] [ drop ] if
+        line-context-in-rule [
+            dup rule-no-word-break? [
+                rule-match-token* prev-token,
+                pop-context
+            ] [ drop ] if
+        ] when*
     ] when* ;
 
 : check-rule ( -- )
@@ -300,14 +285,17 @@ M: mark-previous-rule handle-rule-start
 
 : unwind-no-line-break ( -- )
     context get line-context-parent [
-        line-context-in-rule rule-no-line-break? [
-            pop-context
-            unwind-no-line-break
-        ] when
+        line-context-in-rule [
+            rule-no-line-break? [
+                pop-context
+                unwind-no-line-break
+            ] when
+        ] when*
     ] when* ;
 
 : tokenize-line ( line-context line rules -- line-context' seq )
     [
+        "MAIN" swap at -rot
         init-token-marker
         mark-token-loop
         mark-remaining

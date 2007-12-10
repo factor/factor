@@ -1,5 +1,6 @@
-USING: xmode.loader xmode.utilities namespaces
-assocs sequences kernel io.files xml memoize words globs ;
+USING: xmode.loader xmode.utilities xmode.rules namespaces
+strings splitting assocs sequences kernel io.files xml memoize
+words globs ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
@@ -34,10 +35,59 @@ TAGS>
 : reset-catalog ( -- )
     f \ modes set-global ;
 
-MEMO: load-mode ( name -- rule-sets )
+MEMO: (load-mode) ( name -- rule-sets )
     modes at mode-file
     "extra/xmode/modes/" swap append
     resource-path <file-reader> parse-mode ;
+
+DEFER: load-mode
+
+SYMBOL: rule-sets
+
+: get-rule-set ( name -- rules )
+    dup string? [
+        "::" split1 [ swap load-mode ] [ rule-sets get ] if* at
+    ] when ;
+
+: resolve-delegate ( rule -- )
+    dup rule-delegate dup
+    [ get-rule-set swap set-rule-delegate ] [ 2drop ] if ;
+
+: each-rule ( rule-set quot -- )
+    >r rule-set-rules values concat r> each ; inline
+
+: resolve-delegates ( ruleset -- )
+    [ resolve-delegate ] each-rule ;
+
+: ?update ( keyword-map/f keyword-map -- keyword-map )
+    over [ dupd update ] [ nip clone ] if ;
+
+: import-keywords ( parent child -- )
+    over >r [ rule-set-keywords ] 2apply ?update
+    r> set-rule-set-keywords ;
+
+: import-rules ( parent child -- )
+    swap [ add-rule ] curry each-rule ;
+
+: resolve-imports ( ruleset -- )
+    dup rule-set-imports [
+        get-rule-set
+        dup resolve-delegates
+        2dup import-keywords
+        import-rules
+    ] curry* each ;
+
+: finalize-rule-set ( ruleset -- )
+    dup rule-set-finalized? [ drop ] [
+        t over set-rule-set-finalized?
+        dup resolve-imports
+        resolve-delegates
+    ] if ;
+
+: load-mode ( name -- rule-sets )
+    (load-mode) dup rule-sets [
+        dup [ nip finalize-rule-set ] assoc-each
+    ] with-variable ;
 
 : reset-modes ( -- )
     \ load-mode "memoize" word-prop clear-assoc ;

@@ -4,7 +4,6 @@ IN: xmode.marker.state
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 
-SYMBOL: rule-sets
 SYMBOL: line
 SYMBOL: last-offset
 SYMBOL: position
@@ -37,12 +36,6 @@ SYMBOL: delegate-end-escaped?
     >r position get 2dup + r> token,
     position get + dup 1- position set last-offset set ;
 
-: get-rule-set ( name -- rule-set )
-    rule-sets get at ;
-
-: main-rule-set ( -- rule-set )
-    "MAIN" get-rule-set ;
-
 : push-context ( rules -- )
     context [ <line-context> ] change ;
 
@@ -51,12 +44,10 @@ SYMBOL: delegate-end-escaped?
     dup context set
     f swap set-line-context-in-rule ;
 
-: init-token-marker ( prev-context line rules -- )
-    rule-sets set
+: init-token-marker ( main prev-context line -- )
     line set
+    [ ] [ f <line-context> ] ?if context set
     0 position set
     0 last-offset set
     0 whitespace-end set
-    process-escape? on
-    [ clone ] [ main-rule-set f <line-context> ] if*
-    context set ;
+    process-escape? on ;
