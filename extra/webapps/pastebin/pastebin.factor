@@ -10,9 +10,9 @@ TUPLE: pastebin pastes ;
 
 ! Persistence
 SYMBOL: store
+
 "pastebin.store" store define-store
-<pastebin> pastebin store get store-variable
-: save-pastebin-store ( -- ) store get-global save-store ;
+<pastebin> pastebin store init-persistent
 
 TUPLE: paste
 summary author channel mode contents date
@@ -25,8 +25,11 @@ TUPLE: annotation summary author mode contents ;
 
 C: <annotation> annotation
 
+: get-pastebin ( -- pastebin )
+    pastebin store get-persistent ;
+
 : get-paste ( n -- paste )
-    pastebin get pastebin-pastes nth ;
+    get-pastebin pastebin-pastes nth ;
 
 : show-paste ( n -- )
     serving-html
@@ -46,7 +49,7 @@ C: <annotation> annotation
     [
         [ show-paste ] "show-paste-quot" set
         [ new-paste ] "new-paste-quot" set
-        pastebin get "paste-list" render-component
+        get-pastebin "paste-list" render-component
     ] with-html-stream ;
 
 \ paste-list { } define-action
@@ -55,7 +58,7 @@ C: <annotation> annotation
     paste-n number>string [ show-paste ] curry quot-link ;
 
 : paste-feed ( -- entries )
-    pastebin get pastebin-pastes [
+    get-pastebin pastebin-pastes [
         {
             paste-summary
             paste-link
@@ -77,8 +80,8 @@ C: <annotation> annotation
 
 : submit-paste ( summary author channel mode contents -- )
     <paste> [
-        \ pastebin get-global add-paste
-        save-pastebin-store
+        pastebin store get-persistent add-paste
+        store save-store
     ] keep paste-link permanent-redirect ;
 
 \ submit-paste {
@@ -92,7 +95,7 @@ C: <annotation> annotation
 : annotate-paste ( n summary author mode contents -- )
     <annotation> swap get-paste
     paste-annotations push
-    save-pastebin-store ;
+    store save-store ;
 
 \ annotate-paste {
     { "n" v-required v-number }
