@@ -199,3 +199,26 @@ IN: regexp-tests
     "(0[lL]?|[1-9]\\d{0,9}(\\d{0,9}[lL])?|0[xX]\\p{XDigit}{1,8}(\\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\\.[0-9]*|\\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))"
     f <regexp> drop
 ] unit-test
+
+[ t ] [ "fxxbar" "(?!foo).{3}bar" f <regexp> matches? ] unit-test
+[ f ] [ "foobar" "(?!foo).{3}bar" f <regexp> matches? ] unit-test
+
+[ 3 ] [ "foobar" "foo(?=bar)" f <regexp> match-head ] unit-test
+[ f ] [ "foobxr" "foo(?=bar)" f <regexp> match-head ] unit-test
+
+[ f ] [ "foobxr" "foo\\z" f <regexp> match-head ] unit-test
+[ 3 ] [ "foo" "foo\\z" f <regexp> match-head ] unit-test
+
+[ 3 ] [ "foo bar" "foo\\b" f <regexp> match-head ] unit-test
+[ f ] [ "fooxbar" "foo\\b" f <regexp> matches? ] unit-test
+[ t ] [ "foo" "foo\\b" f <regexp> matches? ] unit-test
+[ t ] [ "foo bar" "foo\\b bar" f <regexp> matches? ] unit-test
+[ f ] [ "fooxbar" "foo\\bxbar" f <regexp> matches? ] unit-test
+[ f ] [ "foo" "foo\\bbar" f <regexp> matches? ] unit-test
+
+[ f ] [ "foo bar" "foo\\B" f <regexp> matches? ] unit-test
+[ 3 ] [ "fooxbar" "foo\\B" f <regexp> match-head ] unit-test
+[ t ] [ "foo" "foo\\B" f <regexp> matches? ] unit-test
+[ f ] [ "foo bar" "foo\\B bar" f <regexp> matches? ] unit-test
+[ t ] [ "fooxbar" "foo\\Bxbar" f <regexp> matches? ] unit-test
+[ f ] [ "foo" "foo\\Bbar" f <regexp> matches? ] unit-test

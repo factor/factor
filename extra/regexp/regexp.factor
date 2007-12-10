@@ -1,7 +1,7 @@
 USING: arrays combinators kernel lazy-lists math math.parser
 namespaces parser parser-combinators parser-combinators.simple
 promises quotations sequences combinators.lib strings
-assocs prettyprint.backend ;
+assocs prettyprint.backend memoize ;
 USE: io
 IN: regexp
 
@@ -148,10 +148,22 @@ TUPLE: group-result str ;
 C: <group-result> group-result
 
 : 'non-capturing-group' ( -- parser )
-    'regexp' "(?:" ")" surrounded-by ;
+    "?:" token 'regexp' &> ;
+
+: 'positive-lookahead-group' ( -- parser )
+    "?=" token 'regexp' &> [ ensure ] <@ ;
+
+: 'negative-lookahead-group' ( -- parser )
+    "?!" token 'regexp' &> [ ensure-not ] <@ ;
+
+: 'simple-group' ( -- parser )
+    'regexp' [ [ <group-result> ] <@ ] <@ ;
 
 : 'group' ( -- parser )
-    'regexp' [ [ <group-result> ] <@ ] <@
+    'non-capturing-group'
+    'positive-lookahead-group'
+    'negative-lookahead-group'
+    'simple-group' <|> <|> <|>
     "(" ")" surrounded-by ;
 
 : 'range' ( -- parser )
@@ -181,12 +193,21 @@ C: <group-result> group-result
     [ ignore-case? get <token-parser> ] <@
     "\\Q" "\\E" surrounded-by ;
 
+: 'break' ( quot -- parser )
+    satisfy ensure epsilon just <|> ;
+
+: 'break-escape' ( -- parser )
+    "$" token [ "\r\n" member? ] 'break' <@literal
+    "\\b" token [ blank? ] 'break' <@literal <|>
+    "\\B" token [ blank? not ] 'break' <@literal <|>
+    "\\z" token epsilon just <@literal <|> ;
+
 : 'simple' ( -- parser )
     'escaped-seq'
-    'non-capturing-group' <|>
+    'break-escape' <|>
     'group' <|>
-    'char' <|>
-    'character-class' <|> ;
+    'character-class' <|>
+    'char' <|> ;
 
 : 'exactly-n' ( -- parser )
     'integer' [ exactly-n ] <@delay ;
@@ -226,7 +247,7 @@ C: <group-result> group-result
 : 'dummy' ( -- parser )
     epsilon [ ] <@literal ;
 
-: 'term' ( -- parser )
+MEMO: 'term' ( -- parser )
     'simple'
     'repetition' 'interval' 'dummy' <|> <|> <&> [ first2 call ] <@
     <!+> [ <and-parser> ] <@ ;
