@@ -1,5 +1,5 @@
 USING: io.backend io.files kernel math math.parser
-namespaces editors.vim sequences system windows.shell32 ;
+namespaces editors.vim sequences system ;
 IN: editors.gvim
 
 TUPLE: gvim ;
