@@ -58,7 +58,7 @@ C: <annotation> annotation
     paste-n number>string [ show-paste ] curry quot-link ;
 
 : paste-feed ( -- entries )
-    get-pastebin pastebin-pastes [
+    get-pastebin pastebin-pastes <reversed> [
         {
             paste-summary
             paste-link
