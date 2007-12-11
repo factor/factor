@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces parser kernel sequences words quotations ;
+USING: namespaces parser kernel sequences words quotations math ;
 IN: multiline
 
 : next-line-text ( -- str )
@@ -17,3 +17,19 @@ IN: multiline
 : STRING:
     CREATE dup reset-generic
     parse-here 1quotation define-compound ; parsing
+
+: (parse-literal) ( start-index end-text -- end-index )
+    lexer get line-text 2dup start
+    [ rot dupd >r >r swap subseq % r> r> length + ] [
+        rot tail % "\n" % 0
+        lexer get next-line swap (parse-literal)
+    ] if* ;
+
+: parse-literal ( end-text -- str )
+    [
+        lexer get lexer-column swap (parse-literal)
+        lexer get set-lexer-column
+    ] "" make 1 tail 1 head* ;
+
+: <"
+    "\">" parse-literal parsed ; parsing
