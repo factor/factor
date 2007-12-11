@@ -11,7 +11,7 @@ IN: multiline
     [ drop lexer get next-line ] [ % "\n" % (parse-here) ] if ;
 
 : parse-here ( -- str )
-    [ (parse-here) ] "" make
+    [ (parse-here) ] "" make 1 head*
     lexer get next-line ;
 
 : STRING:
