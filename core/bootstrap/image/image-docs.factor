@@ -14,7 +14,7 @@ $nl
 ABOUT: "bootstrap.image"
 
 HELP: make-image
-{ $values { "architecture" "a string" } }
+{ $values { "arch" "a string" } }
 { $description "Creates a bootstrap image from sources, where " { $snippet "architecture" } " is one of the following:"
 { $code "x86.32" "x86.64" "ppc" "arm" }
 "The new image file is written to the " { $link resource-path } " and is named " { $snippet "boot." { $emphasis "architecture" } ".image" } "." } ;

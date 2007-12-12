@@ -30,6 +30,8 @@
 			#include "os-macosx-x86.32.h"
 		#elif defined(FACTOR_PPC)
 			#include "os-macosx-ppc.h"
+		#elif defined(FACTOR_AMD64)
+			#include "os-macosx-x86.64.h"
 		#else
 			#error "Unsupported Mac OS X flavor"
 		#endif
@@ -70,6 +72,7 @@
 			#elif defined(FACTOR_ARM)
 				#include "os-linux-arm.h"
 			#elif defined(FACTOR_AMD64)
+				#include "os-unix-ucontext.h"
 				#include "os-linux-x86-64.h"
 			#else
 				#error "Unsupported Linux flavor"

@@ -57,12 +57,12 @@ default:
 	@echo "openbsd-x86-32"
 	@echo "openbsd-x86-64"
 	@echo "macosx-x86-32"
+	@echo "macosx-x86-64"
 	@echo "macosx-ppc"
 	@echo "solaris-x86-32"
 	@echo "solaris-x86-64"
 	@echo "windows-ce-arm"
 	@echo "windows-nt-x86-32"
-	@echo "windows-nt-x86-64"
 	@echo ""
 	@echo "Additional modifiers:"
 	@echo ""
@@ -93,6 +93,9 @@ macosx-ppc: macosx-freetype
 macosx-x86-32: macosx-freetype
 	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.x86.32
 
+macosx-x86-64: macosx-freetype
+	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.x86.64
+
 linux-x86-32:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.x86.32
 
@@ -113,9 +116,6 @@ solaris-x86-64:
 
 windows-nt-x86-32:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
-
-windows-nt-x86-64:
-	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.64
 
 windows-ce-arm:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.arm
@@ -142,7 +142,7 @@ clean:
 	rm -f vm/*.o
 
 vm/resources.o:
-	$(WINDRES) vm/factor.rs vm/resources.o
+	windres vm/factor.rs vm/resources.o
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<

@@ -4,9 +4,9 @@ USING: help.markup help.syntax peg ;
 
 HELP: parse
 { $values 
-  { "string" "a string" } 
-  { "parse" "a parser" } 
-  { "result" "a <parse-result> or f" } 
+  { "input" "a string" } 
+  { "parser" "a parser" } 
+  { "result" "a parse-result or f" } 
 }
 { $description 
     "Given the input string, parse it using the given parser. The result is a <parse-result> object if "
@@ -37,7 +37,7 @@ HELP: range
 }
 { $description 
     "Returns a parser that matches a single character that lies within the range of characters given, inclusive." }
-{ $example ": digit ( -- parser ) CHAR: 0 CHAR: 9 range ;" } ;
+{ $examples { $code ": digit ( -- parser ) CHAR: 0 CHAR: 9 range ;" } } ;
 
 HELP: seq
 { $values 
@@ -60,8 +60,7 @@ HELP: choice
 
 HELP: repeat0
 { $values 
-  { "p1" "a parser" } 
-  { "p2" "a parser" } 
+  { "parser" "a parser" } 
 }
 { $description 
     "Returns a parser that parses 0 or more instances of the 'p1' parser. The AST produced is "
@@ -70,8 +69,7 @@ HELP: repeat0
 
 HELP: repeat1
 { $values 
-  { "p1" "a parser" } 
-  { "p2" "a parser" } 
+  { "parser" "a parser" } 
 }
 { $description 
     "Returns a parser that parses 1 or more instances of the 'p1' parser. The AST produced is "
@@ -79,8 +77,7 @@ HELP: repeat1
 
 HELP: optional
 { $values 
-  { "p1" "a parser" } 
-  { "p2" "a parser" } 
+  { "parser" "a parser" } 
 }
 { $description 
     "Returns a parser that parses 0 or 1 instances of the 'p1' parser. The AST produced is "
@@ -88,29 +85,27 @@ HELP: optional
 
 HELP: ensure
 { $values 
-  { "p1" "a parser" } 
-  { "p2" "a parser" } 
+  { "parser" "a parser" } 
 }
 { $description 
     "Returns a parser that succeeds if the 'p1' parser succeeds but does not add anything to the "
     "AST and does not move the location in the input string. This can be used for lookahead and "
     "disambiguation, along with the " { $link ensure-not } " word." }
-{ $example "\"0\" token ensure octal-parser" } ;
+{ $examples { $code "\"0\" token ensure octal-parser" } } ;
 
 HELP: ensure-not
 { $values 
-  { "p1" "a parser" } 
-  { "p2" "a parser" } 
+  { "parser" "a parser" } 
 }
 { $description 
     "Returns a parser that succeeds if the 'p1' parser fails but does not add anything to the "
     "AST and does not move the location in the input string. This can be used for lookahead and "
     "disambiguation, along with the " { $link ensure } " word." }
-{ $example "\"+\" token \"=\" token ensure-not \"+=\" token 3array seq" } ;
+{ $code "\"+\" token \"=\" token ensure-not \"+=\" token 3array seq" } ;
 
 HELP: action
 { $values 
-  { "p1" "a parser" } 
+  { "parser" "a parser" } 
   { "quot" "a quotation with stack effect ( ast -- ast )" } 
 }
 { $description 
@@ -118,11 +113,10 @@ HELP: action
     "from that parse. The result of the quotation is then used as the final AST. This can be used "
     "for manipulating the parse tree to produce a AST better suited for the task at hand rather than "
     "the default AST." }
-{ $example "CHAR: 0 CHAR: 9 range [ to-digit ] action" } ;
+{ $code "CHAR: 0 CHAR: 9 range [ to-digit ] action" } ;
 
 HELP: sp
 { $values 
-  { "p1" "a parser" } 
   { "parser" "a parser" } 
 }
 { $description 
@@ -131,17 +125,15 @@ HELP: sp
 
 HELP: hide
 { $values 
-  { "p1" "a parser" } 
   { "parser" "a parser" } 
 }
 { $description 
     "Returns a parser that succeeds if the original parser succeeds, but does not " 
     "put any result in the AST. Useful for ignoring 'syntax' in the AST." }
-{ $example "\"[\" token hide number \"]\" token hide 3array seq" } ;
+{ $code "\"[\" token hide number \"]\" token hide 3array seq" } ;
 
 HELP: delay
 { $values 
-  { "quot" "a quotation with stack effect ( -- parser )" } 
   { "parser" "a parser" } 
 }
 { $description 

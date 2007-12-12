@@ -222,12 +222,12 @@ $nl
 HELP: bit?
 { $values { "x" integer } { "n" integer } { "?" "a boolean" } }
 { $description "Tests if the " { $snippet "n" } "th bit of " { $snippet "x" } " is set." }
-{ $examples { $example "BIN: 101 3 bit? ." "t" } } ;
+{ $examples { $example "BIN: 101 2 bit? ." "t" } } ;
 
 HELP: log2
-{ $values { "n" "a positive integer" } { "b" integer } }
-{ $description "Outputs the largest integer " { $snippet "b" } " such that " { $snippet "2^b" } " is less than " { $snippet "n" } "." }
-{ $errors "Throws an error if " { $snippet "n" } " is zero or negative." } ;
+{ $values { "x" "a positive integer" } { "n" integer } }
+{ $description "Outputs the largest integer " { $snippet "n" } " such that " { $snippet "2^n" } " is less than " { $snippet "x" } "." }
+{ $errors "Throws an error if " { $snippet "x" } " is zero or negative." } ;
 
 HELP: 1+
 { $values { "x" number } { "y" number } }
@@ -344,7 +344,7 @@ HELP: each-integer
 { $notes "This word is used to implement " { $link each } "." } ;
 
 HELP: all-integers?
-{ $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- ? )" } } { "i" "an integer or " { $link f } } }
+{ $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- ? )" } } { "?" "a boolean" } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iterationi stops when the quotation outputs " { $link f } " or the end is reached. If the quotation yields a false value for some integer, this word outputs " { $link f } ". Otherwise, this word outputs " { $link t } "." }
 { $notes "This word is used to implement " { $link all? } "." } ;
 
