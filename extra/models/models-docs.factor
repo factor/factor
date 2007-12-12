@@ -45,7 +45,7 @@ HELP: deactivate-model
 { $warning "Calls to " { $link activate-model } " and " { $link deactivate-model } " should be balanced to keep the reference counting consistent, otherwise " { $link model-changed } " might be called at the wrong time or not at all." } ;
 
 HELP: model-changed
-{ $values { "observer" object } }
+{ $values { "model" model } { "observer" object } }
 { $contract "Called to notify observers of a model that the model value has changed as a result of a call to " { $link set-model } ". Observers can be registered with " { $link add-connection } "." } ;
 
 { add-connection remove-connection model-changed } related-words
