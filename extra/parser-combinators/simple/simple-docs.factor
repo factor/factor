@@ -60,6 +60,6 @@ HELP: comma-list
     "'element' should be a parser that can parse the elements. The "
     "result of the parser is a sequence of the parsed elements." }
 { $examples
-{ $example "USING: lazy-lits parser-combinators ;" "\"1,2,3,4\" 'integer' comma-list parse-1 ." "{ 1 2 3 4 }" } } ;
+{ $example "USING: lazy-lists parser-combinators ;" "\"1,2,3,4\" 'integer' comma-list parse-1 ." "{ 1 2 3 4 }" } } ;
 
 { $see-also 'digit' 'integer' 'string' 'bold' 'italic' comma-list } related-words

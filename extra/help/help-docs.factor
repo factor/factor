@@ -1,5 +1,5 @@
 USING: help.markup help.crossref help.topics help.syntax
-definitions io prettyprint inspector ;
+definitions io prettyprint inspector help.lint ;
 IN: help
 
 ARTICLE: "printing-elements" "Printing markup elements"
@@ -81,7 +81,8 @@ $nl
 }
 { $subsection "element-types" }
 "Related words can be cross-referenced:"
-{ $subsection related-words } ;
+{ $subsection related-words }
+{ $see-also "help.lint" } ;
 
 ARTICLE: "help-impl" "Help system implementation"
 "Help topic protocol:"
@@ -108,6 +109,7 @@ ARTICLE: "help" "Help system"
 "The help system maintains documentation written in a simple markup language, along with cross-referencing and search. Documentation can either exist as free-standing " { $emphasis "articles" } " or be associated with words."
 { $subsection "browsing-help" }
 { $subsection "writing-help" }
+{ $subsection "help.lint" }
 { $subsection "help-impl" } ;
 
 ABOUT: "help"
@@ -143,7 +145,7 @@ HELP: $index
 { $description "Calls the quotation to generate a sequence of help topics, and outputs a " { $link $subsection } " for each one." } ;
 
 HELP: ($index)
-{ $values { "seq" "a sequence of help article names and words" } { "quot" "a quotation with stack effect " { $snippet "( topic -- )" } } }
+{ $values { "articles" "a sequence of help articles" } }
 { $description "Writes a list of " { $link $subsection } " elements to the " { $link stdio } " stream." } ;
 
 HELP: xref-help

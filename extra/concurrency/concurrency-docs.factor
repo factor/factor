@@ -25,9 +25,8 @@ HELP: mailbox-put
 
 HELP: (mailbox-block-unless-pred)
 { $values { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } } 
-          { "mailbox" "a mailbox object" } 
-	  { "pred2" "same object as 'pred'" }
-	  { "mailbox2" "same object as 'mailbox'" }
+          { "mailbox" "a mailbox object" }
+          { "timeout" "a timeout in milliseconds" }
 }
 { $description "Block the thread if there are no items in the mailbox that return true when the predicate is called with the item on the stack. The predicate must have stack effect " { $snippet "( X -- bool )" } "." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all while-mailbox-empty mailbox-get? } ;
@@ -35,6 +34,7 @@ HELP: (mailbox-block-unless-pred)
 HELP: (mailbox-block-if-empty)
 { $values { "mailbox" "a mailbox object" } 
 	  { "mailbox2" "same object as 'mailbox'" }
+      { "timeout" "a timeout in milliseconds" }
 }
 { $description "Block the thread if the mailbox is empty." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all while-mailbox-empty mailbox-get? } ;

@@ -4,7 +4,7 @@ IN: locals
 <PRIVATE
 
 : $with-locals-note
-    {
+    drop {
         "This form must appear either in a word defined by " { $link POSTPONE: :: } " or " { $link POSTPONE: MACRO:: } ", or alternatively, " { $link with-locals } " must be called on the top-level form of the word to perform closure conversion."
     } $notes ;
 
@@ -28,10 +28,10 @@ HELP: [let
 { $description "Introduces a set of lexical bindings and evaluates the body. The values are evaluated in parallel, and may not refer to other bindings within the same " { $link POSTPONE: [let } " form; for Lisp programmers, this means that Factor's " { $link POSTPONE: [let } " is equivalent to the Lisp " { $snippet "let" } ", not " { $snippet "let*" } "." }
 { $examples
     { $example
-        "USE: locals"
+        "USING: locals math.functions ;"
         ":: frobnicate | n seq |"
         "    [let | n' [ n 6 * ] |"
-        "        seq [ n' gcd ] map ] ;"
+        "        seq [ n' gcd nip ] map ] ;"
         "6 { 36 14 } frobnicate ."
         "{ 36 2 }"
     }

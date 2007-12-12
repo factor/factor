@@ -542,7 +542,7 @@ HELP: 3compose
 } ;
 
 HELP: while
-{ $values { "pred" "a quotation with stack effect " { $snippet "( -- ? )" } } { "quot" "a quotation" } { "tail" "a quotation" } }
+{ $values { "pred" "a quotation with stack effect " { $snippet "( -- ? )" } } { "body" "a quotation" } { "tail" "a quotation" } }
 { $description "Repeatedly calls " { $snippet "pred" } ". If it yields " { $link f } ", iteration stops, otherwise " { $snippet "quot" } " is called. After iteration stops, " { $snippet "tail" } " is called." }
 { $notes "In most cases, tail recursion should be used, because it is simpler both in terms of implementation and conceptually. However in some cases this combinator expresses intent better and should be used."
 $nl

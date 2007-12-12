@@ -25,7 +25,7 @@ HELP: memcpy
 { $warning "As per the BSD C library documentation, the behavior is undefined if the source and destination overlap." } ;
 
 HELP: check-ptr
-{ $values { "c-ptr" "an alien address, byte array, or " { $link f } } { "checked" "an alien address or byte array with non-zero address" } }
+{ $values { "c-ptr" "an alien address, byte array, or " { $link f } } }
 { $description "Throws an error if the input is " { $link f } ". Otherwise the object remains on the data stack." } ;
 
 HELP: free
