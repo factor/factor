@@ -14,8 +14,8 @@ HELP: parse-here
 { $values { "str" "a string" } }
 { $description "Parses a multiline string literal, as used by " { $link POSTPONE: STRING: } "." } ;
 
-HELP: parse-literal
+HELP: parse-multiline-string
 { $values { "end-text" "a string delineating the end" } { "str" "the parsed string" } }
 { $description "Parses a multiline string literal, as used by " { $link POSTPONE: <" } ". The end-text is the delimiter for the end." } ;
 
-{ parse-here parse-literal } related-words
+{ parse-here parse-multiline-string } related-words

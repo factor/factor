@@ -18,18 +18,18 @@ IN: multiline
     CREATE dup reset-generic
     parse-here 1quotation define-compound ; parsing
 
-: (parse-literal) ( start-index end-text -- end-index )
+: (parse-multiline-string) ( start-index end-text -- end-index )
     lexer get line-text 2dup start
     [ rot dupd >r >r swap subseq % r> r> length + ] [
         rot tail % "\n" % 0
-        lexer get next-line swap (parse-literal)
+        lexer get next-line swap (parse-multiline-string)
     ] if* ;
 
-: parse-literal ( end-text -- str )
+: parse-multiline-string ( end-text -- str )
     [
-        lexer get lexer-column swap (parse-literal)
+        lexer get lexer-column swap (parse-multiline-string)
         lexer get set-lexer-column
     ] "" make 1 tail 1 head* ;
 
 : <"
-    "\">" parse-literal parsed ; parsing
+    "\">" parse-multiline-string parsed ; parsing
