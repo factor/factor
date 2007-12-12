@@ -28,3 +28,6 @@ find core extra fonts misc unmaintained -type f \
 	-exec ./cp_dir {} $DISK_IMAGE_DIR/Factor/{} \;
 hdiutil create -srcfolder "$DISK_IMAGE_DIR" -fs HFS+ \
 	-volname "$DISK_IMAGE_DIR" "$DISK_IMAGE"
+
+ssh mkdir -p linode:w/downloads/$VERSION/
+scp $DISK_IMAGE linode:w/downloads/$VERSION/
