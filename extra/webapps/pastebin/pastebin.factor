@@ -79,7 +79,6 @@ C: <annotation> annotation
     pastebin-pastes 2dup length swap set-paste-n push ;
 
 : submit-paste ( summary author channel mode contents -- )
-    2dup global [ 2array . flush ] bind
     <paste> [
         pastebin store get-persistent add-paste
         store save-store
