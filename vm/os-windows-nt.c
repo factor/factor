@@ -87,8 +87,7 @@ void c_to_factor_toplevel(CELL quot)
 	if(!AddVectoredExceptionHandler(0, (void*)exception_handler))
 		fatal_error("AddVectoredExceptionHandler failed", 0);
 	c_to_factor(quot);
-	if(!RemoveVectoredExceptionHandler((void*)exception_handler))
-		fatal_error("RemoveVectoredExceptionHandler failed", 0);
+	RemoveVectoredExceptionHandler((void*)exception_handler);
 }
 
 void open_console(void)
