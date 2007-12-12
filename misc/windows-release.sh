@@ -1,5 +1,6 @@
+source misc/version.sh
+
 CPU=$1
-VERSION=0.91
 
 if [ "$CPU" = "x86" ]; then
     FLAGS="-no-sse2"
