@@ -1,5 +1,5 @@
 USING: help.markup help.crossref help.topics help.syntax
-definitions io prettyprint inspector help.lint ;
+definitions io prettyprint inspector help.lint arrays math ;
 IN: help
 
 ARTICLE: "printing-elements" "Printing markup elements"
@@ -156,3 +156,7 @@ HELP: sort-articles
 { $description "Sorts a sequence of help topics." } ;
 
 { article-children article-parent xref-help } related-words
+
+HELP: $predicate
+{ $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
+{ $description "Prints the boilerplate description of a class membership predicate word such as " { $link array? } " or " { $link integer? } "." } ;
