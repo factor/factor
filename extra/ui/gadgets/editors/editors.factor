@@ -320,11 +320,6 @@ M: editor gadget-text* editor-string % ;
 
 : end-of-document ( editor -- ) T{ doc-elt } editor-next ;
 
-: selected-word ( editor -- string )
-    dup gadget-selection? [
-        dup T{ one-word-elt } select-elt
-    ] unless gadget-selection ;
-
 : position-caret ( editor -- )
     mouse-elt dup T{ one-char-elt } =
     [ drop dup extend-selection dup editor-mark click-loc ]
@@ -407,6 +402,11 @@ editor "caret-motion" f {
 : select-line T{ one-line-elt } select-elt ;
 
 : select-word T{ one-word-elt } select-elt ;
+
+: selected-word ( editor -- string )
+    dup gadget-selection?
+    [ dup select-word ] unless
+    gadget-selection ;
 
 : select-previous-character T{ char-elt } editor-select-prev ;
 
