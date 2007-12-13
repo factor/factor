@@ -30,6 +30,16 @@ tools.test.inference tools.test.ui models ;
     ] with-grafted-gadget
 ] unit-test
 
+[ "bar" ] [
+    <editor> "editor" set
+    "editor" get [
+        "bar\nbaz quux" "editor" get set-editor-string
+        { 0 3 } "editor" get editor-caret set-model
+        "editor" get select-word
+        "editor" get gadget-selection
+    ] with-grafted-gadget
+] unit-test
+
 { 0 1 } [ <editor> ] unit-test-effect
 
 "hello" <model> <field> "field" set
