@@ -6,7 +6,7 @@ if [ "$CPU" = "x86" ]; then
     FLAGS="-no-sse2"
 fi
 
-make windows-nt-x86
+make windows-nt-x86-32
 
 wget http://factorcode.org/dlls/freetype6.dll
 wget http://factorcode.org/dlls/zlib1.dll
