@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- catalog entry:
+
+<MODE NAME="twiki"		FILE="twiki.xml"
+				FILE_NAME_GLOB="*.twiki"/>
+
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="noTabs" VALUE="true" />
+		<PROPERTY NAME="wrap" VALUE="soft" />
+	</PROPS>
+	<RULES ESCAPE="\" HIGHLIGHT_DIGITS="FALSE" IGNORE_CASE="FALSE">
+
+		<!-- though not encouraged, HTML is supported -->
+		<IMPORT DELEGATE="html::MAIN"/>
+
+		<!-- signature - a convention, not actual markup -->
+		<EOL_SPAN AT_LINE_START="TRUE" TYPE="COMMENT1">-- </EOL_SPAN>
+
+		<!-- header -->
+		<EOL_SPAN_REGEXP HASH_CHAR="---+" 
+			TYPE="KEYWORD1" 
+			AT_LINE_START="TRUE"
+			>-{3}[+]{1,6}(?:!!)?\s</EOL_SPAN_REGEXP>
+
+		<!-- bold -->
+		<SEQ_REGEXP
+			HASH_CHAR="*"
+			AT_LINE_START="FALSE"
+			TYPE="KEYWORD4"
+		>\*[^\s*][^*]*\*</SEQ_REGEXP>
+
+		<!-- bold and italic -->
+		<SEQ_REGEXP
+			HASH_CHAR="__"
+			AT_LINE_START="FALSE"
+			TYPE="KEYWORD4"
+		>__\w.*?\w__</SEQ_REGEXP>
+
+		<!-- italic -->
+		<SEQ_REGEXP
+			HASH_CHAR="_"
+			AT_LINE_START="FALSE"
+			TYPE="KEYWORD4"
+		>_\w.*?\w_</SEQ_REGEXP>
+
+		<!-- bold and fixed font -->
+		<SEQ_REGEXP
+			HASH_CHAR="=="
+			AT_LINE_START="FALSE"
+			TYPE="KEYWORD4"
+		>==\w.*?\w==</SEQ_REGEXP>
+
+		<!-- fixed font -->
+		<SEQ_REGEXP
+			HASH_CHAR="="
+			AT_LINE_START="FALSE"
+			TYPE="KEYWORD4"
+		>=\w.*?\w=</SEQ_REGEXP>
+
+		<!-- separator -->
+		<EOL_SPAN AT_LINE_START="TRUE" TYPE="KEYWORD4">---</EOL_SPAN>
+
+		<!-- wiki words -->
+		<SEQ_REGEXP HASH_CHARS="ABCDEFGHIJKLMNOPQRSTUVWXYZ" AT_WORD_START="TRUE" TYPE="KEYWORD2">[A-Z][A-Z.]*[a-z.]+(?:[A-Z][A-Z.]*[a-z.]*[a-z])+</SEQ_REGEXP>
+
+		<!-- links -->
+		<SPAN TYPE="KEYWORD3">
+			<BEGIN>[[</BEGIN>
+			<END>]]</END>
+		</SPAN>
+
+		<!-- verbatim -->
+		<SPAN TYPE="LITERAL2">
+			<BEGIN>&lt;verbatim&gt;</BEGIN>
+			<END>&lt;/verbatim&gt;</END>
+		</SPAN>
+
+		<!-- prevent a link -->
+		<SEQ TYPE="LITERAL2">&lt;nop&gt;</SEQ>
+
+		<!-- disable links -->
+		<SPAN TYPE="LITERAL2">
+			<BEGIN>&lt;noautolink&gt;</BEGIN>
+			<END>&lt;/noautolink&gt;</END>
+		</SPAN>
+
+		<!-- terms -->
+		<SEQ_REGEXP HASH_CHAR=" " TYPE="KEYWORD2" AT_LINE_START="FALSE"
+			>\s{3}\w(?:&amp;nbsp;|-|\w)*?\w+:\s</SEQ_REGEXP>
+
+		<!-- twiki variables -->
+		<SEQ_REGEXP HASH_CHAR="%" 
+			TYPE="FUNCTION"
+			>%[A-Z]+(?:\{[^\}]+\})?%</SEQ_REGEXP>
+
+		<KEYWORDS>
+			<!-- variables, just here for complete-word -->
+			<NULL>ATTACHURL</NULL>
+			<NULL>ATTACHURLPATH</NULL>
+			<NULL>BASETOPIC</NULL>
+			<NULL>BASEWEB</NULL>
+			<NULL>GMTIME</NULL>
+			<NULL>HOMETOPIC</NULL>
+			<NULL>HTTP_HOST</NULL>
+			<NULL>INCLUDE</NULL>
+			<NULL>INCLUDINGTOPIC</NULL>
+			<NULL>INCLUDINGWEB</NULL>
+			<NULL>MAINWEB</NULL>
+			<NULL>NOTIFYTOPIC</NULL>
+			<NULL>PUBURL</NULL>
+			<NULL>PUBURLPATH</NULL>
+			<NULL>REMOTE_ADDR</NULL>
+			<NULL>REMOTE_PORT</NULL>
+			<NULL>REMOTE_USER</NULL>
+			<NULL>SCRIPTSUFFIX</NULL>
+			<NULL>SCRIPTURL</NULL>
+			<NULL>SCRIPTURLPATH</NULL>
+			<NULL>SEARCH</NULL>
+			<NULL>SERVERTIME</NULL>
+			<NULL>SPACEDTOPIC</NULL>
+			<NULL>STARTINCLUDE</NULL>
+			<NULL>STATISTICSTOPIC</NULL>
+			<NULL>STOPINCLUDE</NULL>
+			<NULL>TOC</NULL>
+			<NULL>TOPIC</NULL>
+			<NULL>TOPICLIST</NULL>
+			<NULL>TWIKIWEB</NULL>
+			<NULL>URLENCODE</NULL>
+			<NULL>URLPARAM</NULL>
+			<NULL>USERNAME</NULL>
+			<NULL>WEB</NULL>
+			<NULL>WEBLIST</NULL>
+			<NULL>WEBPREFSTOPIC</NULL>
+			<NULL>WIKIHOMEURL</NULL>
+			<NULL>WIKINAME</NULL>
+			<NULL>WIKIPREFSTOPIC</NULL>
+			<NULL>WIKITOOLNAME</NULL>
+			<NULL>WIKIUSERNAME</NULL>
+			<NULL>WIKIUSERSTOPIC</NULL>
+			<NULL>WIKIVERSION</NULL>
+		</KEYWORDS>
+
+	</RULES>
+
+</MODE>
+
+

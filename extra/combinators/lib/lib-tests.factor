@@ -58,3 +58,5 @@ IN: temporary
         [ dup array? ] [ dup vector? ] [ dup float? ]
     } || nip
 ] unit-test
+
+[ 1 2 3 4 ] [ { 1 2 3 4 } 4 nfirst ] unit-test

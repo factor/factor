@@ -53,8 +53,11 @@ TUPLE: CreateProcess-args
         CreateProcess-args-lpProcessInformation
     } get-slots CreateProcess win32-error=0/f ;
 
+: escape-argument ( str -- newstr )
+    [ [ dup CHAR: " = [ CHAR: \\ , ] when , ] each ] "" make ;
+
 : join-arguments ( args -- cmd-line )
-    [ "\"" swap "\"" 3append ] map " " join ;
+    [ "\"" swap escape-argument "\"" 3append ] map " " join ;
 
 : app-name/cmd-line ( -- app-name cmd-line )
     +command+ get [
@@ -84,9 +87,9 @@ TUPLE: CreateProcess-args
     pass-environment? [
         [
             get-environment
-            [ swap % "=" % % "\0" % ] assoc-each
+            [ "=" swap 3append string>u16-alien % ] assoc-each
             "\0" %
-        ] "" make >c-ushort-array
+        ] { } make >c-ushort-array
         over set-CreateProcess-args-lpEnvironment
     ] when ;
 

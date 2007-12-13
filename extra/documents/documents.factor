@@ -167,6 +167,12 @@ M: char-elt prev-elt
 M: char-elt next-elt
     drop [ drop 1 +col ] (next-char) ;
 
+TUPLE: one-char-elt ;
+
+M: one-char-elt prev-elt 2drop ;
+
+M: one-char-elt next-elt 2drop ;
+
 : (word-elt) ( loc document quot -- loc )
     pick >r
     >r >r first2 swap r> doc-line r> call

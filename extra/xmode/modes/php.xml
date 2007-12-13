@@ -1,0 +1,4832 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Catalog entry:
+<MODE NAME="php" FILE="php.xml"
+				FILE_NAME_GLOB="*.{php3,php4,php5,php,phtml}"
+				FIRST_LINE_GLOB="&lt;?php*" />
+-->
+
+
+<!--
+Usage of keywords:
+ - COMMENT1: range comments  (/* ... */)
+ - COMMENT2: line comments   (using //)
+ - COMMENT3: phpdoc comments (/** .. */)
+ - COMMENT4: line comments   (using #)
+ - DIGIT:    numbers
+ - FUNCTION: custom functions and class/object methods, e.g. foo(), $foo->bar() and foo::bar()
+ - KEYWORD1: basic PHP keywords, e.g. true, false, extends, implements
+             language constructs, e.g. if .. then .. else
+ - KEYWORD2: internal PHP functions,
+ - KEYWORD3: variables, e.g. $foo
+ - KEYWORD4: class definitions, object members, internal PHP objects
+ - LABEL:    phpdoc labels, like @see
+             CDATA blocks
+ - LITERAL1: Strings in single quotes, e.g. 'foo'
+ - LITERAL2: Strings in double quotes, e.g. "foo"
+ - LITERAL3: Strings in backtick quotes, e.g. `foo`
+ - LITERAL4: heredocs, e.g. "<<< FOO .... FOO
+ - MARKUP:   tags, e.g. <?php .. ?>
+ - OPERATOR: normal operators, e.g. + - ( ) { } [ ]
+             PHP language types in phpdoc block (TODO: sane?!)
+-->
+
+<!--
+TODO:
+ - cleanup/factorize PHPDOC section
+-->
+
+
+<MODE>
+	<PROPS>
+		<!-- Default comment props (used when a ruleset has no other props) -->
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="indentNextLine"
+			VALUE="\s*(((if|while|else\s*(if)?|for(each)?|switch|declare)\s*\(.*\)[^{:;]*)|(do\s*[^\({:;]*))" />
+		<PROPERTY NAME="lineUpClosingBracket" VALUE="true" /><!-- @deprecated since 4.3pre2 -->
+		<PROPERTY NAME="unindentThisLine"
+			VALUE="^.*(default:\s*|case.*:.*)$" />
+		<PROPERTY NAME="electricKeys" VALUE=":" />
+	</PROPS>
+
+
+	<RULES IGNORE_CASE="TRUE">
+		<PROPS>
+			<!-- comment props for "HTML"/not-PHP: -->
+			<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+			<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+			<PROPERTY NAME="lineComment" VALUE="" />
+		</PROPS>
+
+		<!-- regular PHP tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="PHP">
+			<BEGIN>&lt;?php</BEGIN>
+			<END>?&gt;</END>
+		</SPAN>
+
+		<!-- short tags: -->
+		<SPAN TYPE="MARKUP" DELEGATE="PHP">
+			<BEGIN>&lt;?</BEGIN>
+			<END>?&gt;</END>
+		</SPAN>
+		<SPAN TYPE="MARKUP" DELEGATE="PHP">
+			<BEGIN>&lt;?=</BEGIN>
+			<END>?&gt;</END>
+		</SPAN>
+
+		<!-- ASP style tags: -->
+		<SPAN TYPE="MARKUP" DELEGATE="PHP">
+			<BEGIN>&lt;%</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+		<SPAN TYPE="MARKUP" DELEGATE="PHP">
+			<BEGIN>&lt;%=</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<!-- SSI? -->
+		<SPAN_REGEXP HASH_CHAR="&lt;SCRIPT" TYPE="MARKUP" DELEGATE="PHP">
+			<BEGIN>&lt;SCRIPT\s+LANGUAGE="?PHP"?&gt;</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN_REGEXP>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1" DELEGATE="COMMENT1+PHP">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="JAVASCRIPT_OPENTAG">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- CSS -->
+		<SPAN TYPE="MARKUP" DELEGATE="CSS_OPENTAG">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- CDATA -->
+		<SPAN TYPE="LABEL" DELEGATE="MAIN">
+			<BEGIN>&lt;![CDATA[</BEGIN>
+			<END>]]&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="MARKUP" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SEQ_REGEXP HASH_CHAR="&lt;" TYPE="MARKUP" DELEGATE="TAGS">&lt;/?\w+</SEQ_REGEXP>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+	</RULES>
+
+
+	<!-- HTML tags (from MAIN rule) -->
+	<RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
+		<SEQ TYPE="MARKUP" DELEGATE="MAIN">&gt;</SEQ><!-- from SEQ_REGEXP delegate -->
+
+		<IMPORT DELEGATE="TO_LITERAL+PHP" />
+		<IMPORT DELEGATE="TO_PHP" />
+		<IMPORT DELEGATE="INVALID_LT" />
+		<IMPORT DELEGATE="html::TAGS" />
+	</RULES>
+
+
+	<!-- CSS where PHP code may be injected -->
+	<RULES SET="CSS_OPENTAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="CSS">&gt;</SEQ>
+
+		<IMPORT DELEGATE="TO_LITERAL+PHP"/>
+	</RULES>
+
+	<RULES SET="CSS" DEFAULT="MARKUP">
+		<!-- CSS has no line comment: -->
+		<PROPS>
+			<PROPERTY NAME="lineComment" VALUE="" />
+		</PROPS>
+
+		<SPAN DELEGATE="CSS"><!-- give priority to PHP -->
+			<BEGIN>(</BEGIN>
+			<END>)</END>
+		</SPAN>
+		<IMPORT DELEGATE="TO_PHP"/>
+		<IMPORT DELEGATE="css::MAIN"/>
+	</RULES>
+
+
+	<!-- Helper for class references in rule PHP -->
+	<RULES SET="OBJECT_PHP" DEFAULT="KEYWORD4" ESCAPE="\"> <!-- TODO: ESCAPE should not be needed, see http://sourceforge.net/tracker/index.php?func=detail&aid=1600458&group_id=588&atid=100588 -->
+		<SPAN TYPE="OPERATOR" DELEGATE="PHP">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+		<!-- Keep brackets together and handle the expression therein with "PHP" -->
+		<SPAN TYPE="OPERATOR" DELEGATE="PHP">
+			<BEGIN>(</BEGIN>
+			<END>)</END>
+		</SPAN>
+
+		<!-- Recurse methods: -->
+		<SEQ_REGEXP HASH_CHAR="-&gt;" TYPE="FUNCTION" DELEGATE="OBJECT_PHP">-&gt;\s*\w+\s*(?=\()</SEQ_REGEXP>
+
+		<!-- Recurse members: -->
+		<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="-&gt;" DELEGATE="OBJECT_PHP">-&gt;\w*</SEQ_REGEXP>
+
+		<!-- Operators delegate back to PHP {{{ -->
+		<SEQ DELEGATE="PHP"> </SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">!</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">%</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">*</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">+</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">,</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">-</SEQ><!-- "->" gets handled before -->
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">.</SEQ>
+		<SEQ_REGEXP HASH_CHAR="/" TYPE="OPERATOR" DELEGATE="PHP">/(?!/)</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=":" TYPE="OPERATOR" DELEGATE="PHP">:(?!:)</SEQ_REGEXP><!-- not "::" -->
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">=</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">?</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">@</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">[</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">]</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">^</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">`</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">{</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">|</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">}</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">~</SEQ>
+		<!-- }}} -->
+
+		<IMPORT DELEGATE="PHP" />
+		<IMPORT DELEGATE="PHP_VAR" />
+		<IMPORT DELEGATE="PHP_KEYWORDS" />
+	</RULES>
+
+
+	<!-- PHP literal where variables get parsed -->
+	<RULES SET="PHP_LITERAL2" DEFAULT="LITERAL2" ESCAPE="\">
+		<SPAN_REGEXP HASH_CHAR="{" TYPE="LITERAL2" DELEGATE="OBJECT_PHP">
+			<BEGIN>\{(?=\$)</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
+		<IMPORT DELEGATE="PHP_VAR" />
+	</RULES>
+
+
+	<!-- PHP literal in backticks, where variables get parsed; see PHP_LITERAL2 -->
+	<RULES SET="PHP_LITERAL3" DEFAULT="LITERAL3" ESCAPE="\">
+		<SPAN_REGEXP HASH_CHAR="{" TYPE="LITERAL3" DELEGATE="OBJECT_PHP">
+			<BEGIN>\{(?=\$)</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
+		<IMPORT DELEGATE="PHP_VAR" />
+	</RULES>
+
+
+	<!-- PHP heredoc blocks, where variables get parsed; see PHP_LITERAL2 -->
+	<RULES SET="PHP_LITERAL4" DEFAULT="LITERAL4" ESCAPE="\">
+		<SPAN_REGEXP HASH_CHAR="{" TYPE="LITERAL4" DELEGATE="OBJECT_PHP">
+			<BEGIN>\{(?=\$)</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
+		<IMPORT DELEGATE="PHP_VAR" />
+	</RULES>
+
+
+	<!-- Helper for class / interface definition -->
+	<RULES SET="DEF_CLASS" DEFAULT="KEYWORD4">
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">{</SEQ>
+
+		<!-- TODO: redundant comments {{{ -->
+		<!-- Silly comment -->
+		<SEQ TYPE="COMMENT1">/**/</SEQ>
+
+		<!-- PHPdoc comment -->
+		<SPAN TYPE="COMMENT3" DELEGATE="PHPDOC">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT4">#</EOL_SPAN>
+		<!-- redundant }}} -->
+
+		<KEYWORDS>
+			<KEYWORD1>extends</KEYWORD1>
+			<KEYWORD1>implements</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+
+
+	<!-- PHP variables (PHPDOC_VAR for phpdoc blocks) -->
+	<RULES SET="PHP_VAR">
+		<!-- (Class-)Variables -->
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD4">\$\w+(?=\s*=\s*(&amp;\s*)?new)</SEQ_REGEXP>
+
+		<!-- Normal variables -->
+		<MARK_FOLLOWING TYPE="KEYWORD3">$</MARK_FOLLOWING>
+	</RULES>
+
+
+	<RULES SET="PHP" ESCAPE="\" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
+		<!-- Silly comment -->
+		<SEQ TYPE="COMMENT1">/**/</SEQ>
+
+		<!-- PHPdoc comment -->
+		<SPAN TYPE="COMMENT3" DELEGATE="PHPDOC">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL2" DELEGATE="PHP_LITERAL2">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL3" DELEGATE="PHP_LITERAL3">
+			<BEGIN>`</BEGIN>
+			<END>`</END>
+		</SPAN>
+
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT4">#</EOL_SPAN>
+
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR"> (</MARK_PREVIOUS>
+
+		<!-- Readins/Heredoc -->
+		<SPAN_REGEXP HASH_CHAR="&lt;&lt;&lt;" TYPE="LITERAL4" DELEGATE="PHP_LITERAL4">
+			<BEGIN><![CDATA[<<<[\p{Space}'"]*([\p{Alnum}_]+)[\p{Space}'"]*]]></BEGIN>
+			<END AT_LINE_START="TRUE">$1</END>
+		</SPAN_REGEXP>
+
+		<!-- operators -->
+		<!-- {{{ -->
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">(array)</SEQ>
+		<SEQ TYPE="OPERATOR">(bool)</SEQ>
+		<SEQ TYPE="OPERATOR">(boolean)</SEQ>
+		<SEQ TYPE="OPERATOR">(double)</SEQ>
+		<SEQ TYPE="OPERATOR">(float)</SEQ>
+		<SEQ TYPE="OPERATOR">(int)</SEQ>
+		<SEQ TYPE="OPERATOR">(integer)</SEQ>
+		<SEQ TYPE="OPERATOR">(object)</SEQ>
+		<SEQ TYPE="OPERATOR">(real)</SEQ>
+		<SEQ TYPE="OPERATOR">(string)</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ_REGEXP HASH_CHAR=":" TYPE="OPERATOR">:(?!:)</SEQ_REGEXP><!-- not "::" -->
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">@</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">`</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<!-- }}} -->
+
+		<!-- Fix this variables to not start class definitions -->
+		<SEQ_REGEXP HASH_CHAR="$class" TYPE="KEYWORD3">\$class\w*</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="$interface" TYPE="KEYWORD3">\$interface\w*</SEQ_REGEXP>
+
+		<!-- Class definitions -->
+		<SEQ_REGEXP HASH_CHAR="class" AT_WORD_START="TRUE" DELEGATE="DEF_CLASS" TYPE="KEYWORD1">class(\s+|$)</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="interface" AT_WORD_START="TRUE" DELEGATE="DEF_CLASS" TYPE="KEYWORD1">interface(\s+|$)</SEQ_REGEXP>
+
+
+		<!-- to OBJECT_PHP: (Class-)Variables/Methods -->
+		<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="$" DELEGATE="OBJECT_PHP">\$\w+(?=(\[\$?[\s\w'"]+\])?-&gt;)</SEQ_REGEXP>
+		<MARK_PREVIOUS TYPE="KEYWORD4">::</MARK_PREVIOUS>
+
+		<!-- Imports: -->
+		<IMPORT DELEGATE="PHP_KEYWORDS" />
+		<IMPORT DELEGATE="PHP_VAR" />
+	</RULES>
+
+
+	<RULES SET="PHP_BASIC_KEYWORD1">
+		<KEYWORDS>
+			<KEYWORD1>true</KEYWORD1>
+			<KEYWORD1>false</KEYWORD1>
+			<KEYWORD1>null</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+
+
+	<RULES SET="PHP_KEYWORDS">
+		<IMPORT DELEGATE="KEYWORDS_VISIBILITY" />
+		<IMPORT DELEGATE="PHP_BASIC_KEYWORD1" />
+
+		<KEYWORDS>
+			<!-- start: generated by buildfunctionlist.php -->
+			<!-- {{{ -->
+			<!-- Internal classes (61) -->
+			<KEYWORD4>arrayiterator</KEYWORD4>
+			<KEYWORD4>arrayobject</KEYWORD4>
+			<KEYWORD4>cachingiterator</KEYWORD4>
+			<KEYWORD4>cachingrecursiveiterator</KEYWORD4>
+			<KEYWORD4>collection</KEYWORD4>
+			<KEYWORD4>descriptor</KEYWORD4>
+			<KEYWORD4>directoryiterator</KEYWORD4>
+			<KEYWORD4>domattr</KEYWORD4>
+			<KEYWORD4>domattribute</KEYWORD4>
+			<KEYWORD4>domcharacterdata</KEYWORD4>
+			<KEYWORD4>domdocument</KEYWORD4>
+			<KEYWORD4>domdocumenttype</KEYWORD4>
+			<KEYWORD4>domelement</KEYWORD4>
+			<KEYWORD4>domimplementation</KEYWORD4>
+			<KEYWORD4>domnamednodemap</KEYWORD4>
+			<KEYWORD4>domnode</KEYWORD4>
+			<KEYWORD4>domnodelist</KEYWORD4>
+			<KEYWORD4>domprocessinginstruction</KEYWORD4>
+			<KEYWORD4>domtext</KEYWORD4>
+			<KEYWORD4>domxpath</KEYWORD4>
+			<KEYWORD4>domxsltstylesheet</KEYWORD4>
+			<KEYWORD4>filteriterator</KEYWORD4>
+			<KEYWORD4>hw_api</KEYWORD4>
+			<KEYWORD4>hw_api_attribute</KEYWORD4>
+			<KEYWORD4>hw_api_content</KEYWORD4>
+			<KEYWORD4>hw_api_error</KEYWORD4>
+			<KEYWORD4>hw_api_object</KEYWORD4>
+			<KEYWORD4>hw_api_reason</KEYWORD4>
+			<KEYWORD4>limititerator</KEYWORD4>
+			<KEYWORD4>lob</KEYWORD4>
+			<KEYWORD4>memcache</KEYWORD4>
+			<KEYWORD4>parentiterator</KEYWORD4>
+			<KEYWORD4>pdo</KEYWORD4>
+			<KEYWORD4>pdostatement</KEYWORD4>
+			<KEYWORD4>rar</KEYWORD4>
+			<KEYWORD4>recursivedirectoryiterator</KEYWORD4>
+			<KEYWORD4>recursiveiteratoriterator</KEYWORD4>
+			<KEYWORD4>simplexmlelement</KEYWORD4>
+			<KEYWORD4>simplexmliterator</KEYWORD4>
+			<KEYWORD4>soapclient</KEYWORD4>
+			<KEYWORD4>soapfault</KEYWORD4>
+			<KEYWORD4>soapheader</KEYWORD4>
+			<KEYWORD4>soapparam</KEYWORD4>
+			<KEYWORD4>soapserver</KEYWORD4>
+			<KEYWORD4>soapvar</KEYWORD4>
+			<KEYWORD4>swfaction</KEYWORD4>
+			<KEYWORD4>swfbitmap</KEYWORD4>
+			<KEYWORD4>swfbutton</KEYWORD4>
+			<KEYWORD4>swfdisplayitem</KEYWORD4>
+			<KEYWORD4>swffill</KEYWORD4>
+			<KEYWORD4>swffont</KEYWORD4>
+			<KEYWORD4>swfgradient</KEYWORD4>
+			<KEYWORD4>swfmorph</KEYWORD4>
+			<KEYWORD4>swfmovie</KEYWORD4>
+			<KEYWORD4>swfshape</KEYWORD4>
+			<KEYWORD4>swfsprite</KEYWORD4>
+			<KEYWORD4>swftext</KEYWORD4>
+			<KEYWORD4>swftextfield</KEYWORD4>
+			<KEYWORD4>tidy</KEYWORD4>
+			<KEYWORD4>tidy_node</KEYWORD4>
+			<KEYWORD4>variant</KEYWORD4>
+
+
+			<!-- Internal functions (3549) -->
+			<KEYWORD2>__call</KEYWORD2> <!-- soapclient -->
+			<KEYWORD2>__construct</KEYWORD2> <!-- arrayobject, directoryiterator, pdo, tidy -->
+			<KEYWORD2>__getfunctions</KEYWORD2> <!-- soapclient -->
+			<KEYWORD2>__getlastrequest</KEYWORD2> <!-- soapclient -->
+			<KEYWORD2>__getlastresponse</KEYWORD2> <!-- soapclient -->
+			<KEYWORD2>__gettypes</KEYWORD2> <!-- soapclient -->
+			<KEYWORD2>__tostring</KEYWORD2> <!-- cachingiterator -->
+			<KEYWORD2>abs</KEYWORD2>
+			<KEYWORD2>acos</KEYWORD2>
+			<KEYWORD2>acosh</KEYWORD2>
+			<KEYWORD2>add</KEYWORD2> <!-- memcache, swfmovie, swfsprite -->
+			<KEYWORD2>add_namespace</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>add_root</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>addaction</KEYWORD2> <!-- swfbutton -->
+			<KEYWORD2>addcolor</KEYWORD2> <!-- swfdisplayitem -->
+			<KEYWORD2>addcslashes</KEYWORD2>
+			<KEYWORD2>addentry</KEYWORD2> <!-- swfgradient -->
+			<KEYWORD2>addfill</KEYWORD2> <!-- swfshape -->
+			<KEYWORD2>addfunction</KEYWORD2> <!-- soapserver -->
+			<KEYWORD2>addshape</KEYWORD2> <!-- swfbutton -->
+			<KEYWORD2>addslashes</KEYWORD2>
+			<KEYWORD2>addstring</KEYWORD2> <!-- swftext, swftextfield -->
+			<KEYWORD2>aggregate</KEYWORD2>
+			<KEYWORD2>aggregate_info</KEYWORD2>
+			<KEYWORD2>aggregate_methods</KEYWORD2>
+			<KEYWORD2>aggregate_methods_by_list</KEYWORD2>
+			<KEYWORD2>aggregate_methods_by_regexp</KEYWORD2>
+			<KEYWORD2>aggregate_properties</KEYWORD2>
+			<KEYWORD2>aggregate_properties_by_list</KEYWORD2>
+			<KEYWORD2>aggregate_properties_by_regexp</KEYWORD2>
+			<KEYWORD2>aggregation_info</KEYWORD2>
+			<KEYWORD2>align</KEYWORD2> <!-- swftextfield -->
+			<KEYWORD2>apache_child_terminate</KEYWORD2>
+			<KEYWORD2>apache_get_modules</KEYWORD2>
+			<KEYWORD2>apache_get_version</KEYWORD2>
+			<KEYWORD2>apache_getenv</KEYWORD2>
+			<KEYWORD2>apache_lookup_uri</KEYWORD2>
+			<KEYWORD2>apache_note</KEYWORD2>
+			<KEYWORD2>apache_request_headers</KEYWORD2>
+			<KEYWORD2>apache_response_headers</KEYWORD2>
+			<KEYWORD2>apache_setenv</KEYWORD2>
+			<KEYWORD2>apd_breakpoint</KEYWORD2>
+			<KEYWORD2>apd_callstack</KEYWORD2>
+			<KEYWORD2>apd_clunk</KEYWORD2>
+			<KEYWORD2>apd_continue</KEYWORD2>
+			<KEYWORD2>apd_croak</KEYWORD2>
+			<KEYWORD2>apd_dump_function_table</KEYWORD2>
+			<KEYWORD2>apd_dump_persistent_resources</KEYWORD2>
+			<KEYWORD2>apd_dump_regular_resources</KEYWORD2>
+			<KEYWORD2>apd_echo</KEYWORD2>
+			<KEYWORD2>apd_get_active_symbols</KEYWORD2>
+			<KEYWORD2>apd_set_pprof_trace</KEYWORD2>
+			<KEYWORD2>apd_set_session</KEYWORD2>
+			<KEYWORD2>apd_set_session_trace</KEYWORD2>
+			<KEYWORD2>apd_set_socket_session_trace</KEYWORD2>
+			<KEYWORD2>append</KEYWORD2> <!-- arrayobject, collection, lob -->
+			<KEYWORD2>append_child</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>append_sibling</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>appendchild</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>appenddata</KEYWORD2> <!-- domcharacterdata -->
+			<KEYWORD2>array_change_key_case</KEYWORD2>
+			<KEYWORD2>array_chunk</KEYWORD2>
+			<KEYWORD2>array_combine</KEYWORD2>
+			<KEYWORD2>array_count_values</KEYWORD2>
+			<KEYWORD2>array_diff</KEYWORD2>
+			<KEYWORD2>array_diff_assoc</KEYWORD2>
+			<KEYWORD2>array_diff_key</KEYWORD2>
+			<KEYWORD2>array_diff_uassoc</KEYWORD2>
+			<KEYWORD2>array_diff_ukey</KEYWORD2>
+			<KEYWORD2>array_fill</KEYWORD2>
+			<KEYWORD2>array_filter</KEYWORD2>
+			<KEYWORD2>array_flip</KEYWORD2>
+			<KEYWORD2>array_intersect</KEYWORD2>
+			<KEYWORD2>array_intersect_assoc</KEYWORD2>
+			<KEYWORD2>array_intersect_key</KEYWORD2>
+			<KEYWORD2>array_intersect_uassoc</KEYWORD2>
+			<KEYWORD2>array_intersect_ukey</KEYWORD2>
+			<KEYWORD2>array_key_exists</KEYWORD2>
+			<KEYWORD2>array_keys</KEYWORD2>
+			<KEYWORD2>array_map</KEYWORD2>
+			<KEYWORD2>array_merge</KEYWORD2>
+			<KEYWORD2>array_merge_recursive</KEYWORD2>
+			<KEYWORD2>array_multisort</KEYWORD2>
+			<KEYWORD2>array_pad</KEYWORD2>
+			<KEYWORD2>array_pop</KEYWORD2>
+			<KEYWORD2>array_push</KEYWORD2>
+			<KEYWORD2>array_rand</KEYWORD2>
+			<KEYWORD2>array_reduce</KEYWORD2>
+			<KEYWORD2>array_reverse</KEYWORD2>
+			<KEYWORD2>array_search</KEYWORD2>
+			<KEYWORD2>array_shift</KEYWORD2>
+			<KEYWORD2>array_slice</KEYWORD2>
+			<KEYWORD2>array_splice</KEYWORD2>
+			<KEYWORD2>array_sum</KEYWORD2>
+			<KEYWORD2>array_udiff</KEYWORD2>
+			<KEYWORD2>array_udiff_assoc</KEYWORD2>
+			<KEYWORD2>array_udiff_uassoc</KEYWORD2>
+			<KEYWORD2>array_uintersect</KEYWORD2>
+			<KEYWORD2>array_uintersect_assoc</KEYWORD2>
+			<KEYWORD2>array_uintersect_uassoc</KEYWORD2>
+			<KEYWORD2>array_unique</KEYWORD2>
+			<KEYWORD2>array_unshift</KEYWORD2>
+			<KEYWORD2>array_values</KEYWORD2>
+			<KEYWORD2>array_walk</KEYWORD2>
+			<KEYWORD2>array_walk_recursive</KEYWORD2>
+			<KEYWORD2>arsort</KEYWORD2>
+			<KEYWORD2>ascii2ebcdic</KEYWORD2>
+			<KEYWORD2>asin</KEYWORD2>
+			<KEYWORD2>asinh</KEYWORD2>
+			<KEYWORD2>asort</KEYWORD2>
+			<KEYWORD2>aspell_check</KEYWORD2>
+			<KEYWORD2>aspell_check_raw</KEYWORD2>
+			<KEYWORD2>aspell_new</KEYWORD2>
+			<KEYWORD2>aspell_suggest</KEYWORD2>
+			<KEYWORD2>assert</KEYWORD2>
+			<KEYWORD2>assert_options</KEYWORD2>
+			<KEYWORD2>assign</KEYWORD2> <!-- collection, hw_api_object -->
+			<KEYWORD2>assignelem</KEYWORD2> <!-- collection -->
+			<KEYWORD2>asxml</KEYWORD2> <!-- simplexmlelement -->
+			<KEYWORD2>atan</KEYWORD2>
+			<KEYWORD2>atan2</KEYWORD2>
+			<KEYWORD2>atanh</KEYWORD2>
+			<KEYWORD2>attreditable</KEYWORD2> <!-- hw_api_object -->
+			<KEYWORD2>attributes</KEYWORD2> <!-- domnode, simplexmlelement, tidy_node -->
+			<KEYWORD2>base64_decode</KEYWORD2>
+			<KEYWORD2>base64_encode</KEYWORD2>
+			<KEYWORD2>base_convert</KEYWORD2>
+			<KEYWORD2>basename</KEYWORD2>
+			<KEYWORD2>bcadd</KEYWORD2>
+			<KEYWORD2>bccomp</KEYWORD2>
+			<KEYWORD2>bcdiv</KEYWORD2>
+			<KEYWORD2>bcmod</KEYWORD2>
+			<KEYWORD2>bcmul</KEYWORD2>
+			<KEYWORD2>bcpow</KEYWORD2>
+			<KEYWORD2>bcpowmod</KEYWORD2>
+			<KEYWORD2>bcscale</KEYWORD2>
+			<KEYWORD2>bcsqrt</KEYWORD2>
+			<KEYWORD2>bcsub</KEYWORD2>
+			<KEYWORD2>begintransaction</KEYWORD2> <!-- pdo -->
+			<KEYWORD2>bin2hex</KEYWORD2>
+			<KEYWORD2>bind_textdomain_codeset</KEYWORD2>
+			<KEYWORD2>bindcolumn</KEYWORD2> <!-- pdostatement -->
+			<KEYWORD2>bindec</KEYWORD2>
+			<KEYWORD2>bindparam</KEYWORD2> <!-- pdostatement -->
+			<KEYWORD2>bindtextdomain</KEYWORD2>
+			<KEYWORD2>bzclose</KEYWORD2>
+			<KEYWORD2>bzcompress</KEYWORD2>
+			<KEYWORD2>bzdecompress</KEYWORD2>
+			<KEYWORD2>bzerrno</KEYWORD2>
+			<KEYWORD2>bzerror</KEYWORD2>
+			<KEYWORD2>bzerrstr</KEYWORD2>
+			<KEYWORD2>bzflush</KEYWORD2>
+			<KEYWORD2>bzopen</KEYWORD2>
+			<KEYWORD2>bzread</KEYWORD2>
+			<KEYWORD2>bzwrite</KEYWORD2>
+			<KEYWORD2>cal_days_in_month</KEYWORD2>
+			<KEYWORD2>cal_from_jd</KEYWORD2>
+			<KEYWORD2>cal_info</KEYWORD2>
+			<KEYWORD2>cal_to_jd</KEYWORD2>
+			<KEYWORD2>call_user_func</KEYWORD2>
+			<KEYWORD2>call_user_func_array</KEYWORD2>
+			<KEYWORD2>call_user_method</KEYWORD2>
+			<KEYWORD2>call_user_method_array</KEYWORD2>
+			<KEYWORD2>ccvs_add</KEYWORD2>
+			<KEYWORD2>ccvs_auth</KEYWORD2>
+			<KEYWORD2>ccvs_command</KEYWORD2>
+			<KEYWORD2>ccvs_count</KEYWORD2>
+			<KEYWORD2>ccvs_delete</KEYWORD2>
+			<KEYWORD2>ccvs_done</KEYWORD2>
+			<KEYWORD2>ccvs_init</KEYWORD2>
+			<KEYWORD2>ccvs_lookup</KEYWORD2>
+			<KEYWORD2>ccvs_new</KEYWORD2>
+			<KEYWORD2>ccvs_report</KEYWORD2>
+			<KEYWORD2>ccvs_return</KEYWORD2>
+			<KEYWORD2>ccvs_reverse</KEYWORD2>
+			<KEYWORD2>ccvs_sale</KEYWORD2>
+			<KEYWORD2>ccvs_status</KEYWORD2>
+			<KEYWORD2>ccvs_textvalue</KEYWORD2>
+			<KEYWORD2>ccvs_void</KEYWORD2>
+			<KEYWORD2>ceil</KEYWORD2>
+			<KEYWORD2>chdir</KEYWORD2>
+			<KEYWORD2>checkdate</KEYWORD2>
+			<KEYWORD2>checkdnsrr</KEYWORD2>
+			<KEYWORD2>checkin</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>checkout</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>chgrp</KEYWORD2>
+			<KEYWORD2>child_nodes</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>children</KEYWORD2> <!-- hw_api, simplexmlelement, tidy_node -->
+			<KEYWORD2>chmod</KEYWORD2>
+			<KEYWORD2>chop</KEYWORD2>
+			<KEYWORD2>chown</KEYWORD2>
+			<KEYWORD2>chr</KEYWORD2>
+			<KEYWORD2>chroot</KEYWORD2>
+			<KEYWORD2>chunk_split</KEYWORD2>
+			<KEYWORD2>class_exists</KEYWORD2>
+			<KEYWORD2>class_implements</KEYWORD2>
+			<KEYWORD2>class_parents</KEYWORD2>
+			<KEYWORD2>classkit_import</KEYWORD2>
+			<KEYWORD2>classkit_method_add</KEYWORD2>
+			<KEYWORD2>classkit_method_copy</KEYWORD2>
+			<KEYWORD2>classkit_method_redefine</KEYWORD2>
+			<KEYWORD2>classkit_method_remove</KEYWORD2>
+			<KEYWORD2>classkit_method_rename</KEYWORD2>
+			<KEYWORD2>clearstatcache</KEYWORD2>
+			<KEYWORD2>clone_node</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>clonenode</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>close</KEYWORD2> <!-- lob, memcache -->
+			<KEYWORD2>closedir</KEYWORD2>
+			<KEYWORD2>closelog</KEYWORD2>
+			<KEYWORD2>com</KEYWORD2>
+			<KEYWORD2>com_addref</KEYWORD2>
+			<KEYWORD2>com_create_guid</KEYWORD2>
+			<KEYWORD2>com_event_sink</KEYWORD2>
+			<KEYWORD2>com_get</KEYWORD2>
+			<KEYWORD2>com_get_active_object</KEYWORD2>
+			<KEYWORD2>com_invoke</KEYWORD2>
+			<KEYWORD2>com_isenum</KEYWORD2>
+			<KEYWORD2>com_load</KEYWORD2>
+			<KEYWORD2>com_load_typelib</KEYWORD2>
+			<KEYWORD2>com_message_pump</KEYWORD2>
+			<KEYWORD2>com_print_typeinfo</KEYWORD2>
+			<KEYWORD2>com_propget</KEYWORD2>
+			<KEYWORD2>com_propput</KEYWORD2>
+			<KEYWORD2>com_propset</KEYWORD2>
+			<KEYWORD2>com_release</KEYWORD2>
+			<KEYWORD2>com_set</KEYWORD2>
+			<KEYWORD2>commit</KEYWORD2> <!-- pdo -->
+			<KEYWORD2>compact</KEYWORD2>
+			<KEYWORD2>connect</KEYWORD2> <!-- memcache -->
+			<KEYWORD2>connection_aborted</KEYWORD2>
+			<KEYWORD2>connection_status</KEYWORD2>
+			<KEYWORD2>connection_timeout</KEYWORD2>
+			<KEYWORD2>constant</KEYWORD2>
+			<KEYWORD2>content</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>convert_cyr_string</KEYWORD2>
+			<KEYWORD2>convert_uudecode</KEYWORD2>
+			<KEYWORD2>convert_uuencode</KEYWORD2>
+			<KEYWORD2>copy</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>cos</KEYWORD2>
+			<KEYWORD2>cosh</KEYWORD2>
+			<KEYWORD2>count</KEYWORD2> <!-- arrayobject, hw_api_error, hw_api_object -->
+			<KEYWORD2>count_chars</KEYWORD2>
+			<KEYWORD2>cpdf_add_annotation</KEYWORD2>
+			<KEYWORD2>cpdf_add_outline</KEYWORD2>
+			<KEYWORD2>cpdf_arc</KEYWORD2>
+			<KEYWORD2>cpdf_begin_text</KEYWORD2>
+			<KEYWORD2>cpdf_circle</KEYWORD2>
+			<KEYWORD2>cpdf_clip</KEYWORD2>
+			<KEYWORD2>cpdf_close</KEYWORD2>
+			<KEYWORD2>cpdf_closepath</KEYWORD2>
+			<KEYWORD2>cpdf_closepath_fill_stroke</KEYWORD2>
+			<KEYWORD2>cpdf_closepath_stroke</KEYWORD2>
+			<KEYWORD2>cpdf_continue_text</KEYWORD2>
+			<KEYWORD2>cpdf_curveto</KEYWORD2>
+			<KEYWORD2>cpdf_end_text</KEYWORD2>
+			<KEYWORD2>cpdf_fill</KEYWORD2>
+			<KEYWORD2>cpdf_fill_stroke</KEYWORD2>
+			<KEYWORD2>cpdf_finalize</KEYWORD2>
+			<KEYWORD2>cpdf_finalize_page</KEYWORD2>
+			<KEYWORD2>cpdf_global_set_document_limits</KEYWORD2>
+			<KEYWORD2>cpdf_import_jpeg</KEYWORD2>
+			<KEYWORD2>cpdf_lineto</KEYWORD2>
+			<KEYWORD2>cpdf_moveto</KEYWORD2>
+			<KEYWORD2>cpdf_newpath</KEYWORD2>
+			<KEYWORD2>cpdf_open</KEYWORD2>
+			<KEYWORD2>cpdf_output_buffer</KEYWORD2>
+			<KEYWORD2>cpdf_page_init</KEYWORD2>
+			<KEYWORD2>cpdf_place_inline_image</KEYWORD2>
+			<KEYWORD2>cpdf_rect</KEYWORD2>
+			<KEYWORD2>cpdf_restore</KEYWORD2>
+			<KEYWORD2>cpdf_rlineto</KEYWORD2>
+			<KEYWORD2>cpdf_rmoveto</KEYWORD2>
+			<KEYWORD2>cpdf_rotate</KEYWORD2>
+			<KEYWORD2>cpdf_rotate_text</KEYWORD2>
+			<KEYWORD2>cpdf_save</KEYWORD2>
+			<KEYWORD2>cpdf_save_to_file</KEYWORD2>
+			<KEYWORD2>cpdf_scale</KEYWORD2>
+			<KEYWORD2>cpdf_set_action_url</KEYWORD2>
+			<KEYWORD2>cpdf_set_char_spacing</KEYWORD2>
+			<KEYWORD2>cpdf_set_creator</KEYWORD2>
+			<KEYWORD2>cpdf_set_current_page</KEYWORD2>
+			<KEYWORD2>cpdf_set_font</KEYWORD2>
+			<KEYWORD2>cpdf_set_font_directories</KEYWORD2>
+			<KEYWORD2>cpdf_set_font_map_file</KEYWORD2>
+			<KEYWORD2>cpdf_set_horiz_scaling</KEYWORD2>
+			<KEYWORD2>cpdf_set_keywords</KEYWORD2>
+			<KEYWORD2>cpdf_set_leading</KEYWORD2>
+			<KEYWORD2>cpdf_set_page_animation</KEYWORD2>
+			<KEYWORD2>cpdf_set_subject</KEYWORD2>
+			<KEYWORD2>cpdf_set_text_matrix</KEYWORD2>
+			<KEYWORD2>cpdf_set_text_pos</KEYWORD2>
+			<KEYWORD2>cpdf_set_text_rendering</KEYWORD2>
+			<KEYWORD2>cpdf_set_text_rise</KEYWORD2>
+			<KEYWORD2>cpdf_set_title</KEYWORD2>
+			<KEYWORD2>cpdf_set_viewer_preferences</KEYWORD2>
+			<KEYWORD2>cpdf_set_word_spacing</KEYWORD2>
+			<KEYWORD2>cpdf_setdash</KEYWORD2>
+			<KEYWORD2>cpdf_setflat</KEYWORD2>
+			<KEYWORD2>cpdf_setgray</KEYWORD2>
+			<KEYWORD2>cpdf_setgray_fill</KEYWORD2>
+			<KEYWORD2>cpdf_setgray_stroke</KEYWORD2>
+			<KEYWORD2>cpdf_setlinecap</KEYWORD2>
+			<KEYWORD2>cpdf_setlinejoin</KEYWORD2>
+			<KEYWORD2>cpdf_setlinewidth</KEYWORD2>
+			<KEYWORD2>cpdf_setmiterlimit</KEYWORD2>
+			<KEYWORD2>cpdf_setrgbcolor</KEYWORD2>
+			<KEYWORD2>cpdf_setrgbcolor_fill</KEYWORD2>
+			<KEYWORD2>cpdf_setrgbcolor_stroke</KEYWORD2>
+			<KEYWORD2>cpdf_show</KEYWORD2>
+			<KEYWORD2>cpdf_show_xy</KEYWORD2>
+			<KEYWORD2>cpdf_stringwidth</KEYWORD2>
+			<KEYWORD2>cpdf_stroke</KEYWORD2>
+			<KEYWORD2>cpdf_text</KEYWORD2>
+			<KEYWORD2>cpdf_translate</KEYWORD2>
+			<KEYWORD2>crack_check</KEYWORD2>
+			<KEYWORD2>crack_closedict</KEYWORD2>
+			<KEYWORD2>crack_getlastmessage</KEYWORD2>
+			<KEYWORD2>crack_opendict</KEYWORD2>
+			<KEYWORD2>crc32</KEYWORD2>
+			<KEYWORD2>create_attribute</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>create_cdata_section</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>create_comment</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>create_element</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>create_element_ns</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>create_entity_reference</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>create_function</KEYWORD2>
+			<KEYWORD2>create_processing_instruction</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>create_text_node</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>createattribute</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>createattributens</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>createcdatasection</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>createcomment</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>createdocument</KEYWORD2> <!-- domimplementation -->
+			<KEYWORD2>createdocumentfragment</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>createdocumenttype</KEYWORD2> <!-- domimplementation -->
+			<KEYWORD2>createelement</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>createelementns</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>createentityreference</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>createprocessinginstruction</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>createtextnode</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>crypt</KEYWORD2>
+			<KEYWORD2>ctype_alnum</KEYWORD2>
+			<KEYWORD2>ctype_alpha</KEYWORD2>
+			<KEYWORD2>ctype_cntrl</KEYWORD2>
+			<KEYWORD2>ctype_digit</KEYWORD2>
+			<KEYWORD2>ctype_graph</KEYWORD2>
+			<KEYWORD2>ctype_lower</KEYWORD2>
+			<KEYWORD2>ctype_print</KEYWORD2>
+			<KEYWORD2>ctype_punct</KEYWORD2>
+			<KEYWORD2>ctype_space</KEYWORD2>
+			<KEYWORD2>ctype_upper</KEYWORD2>
+			<KEYWORD2>ctype_xdigit</KEYWORD2>
+			<KEYWORD2>curl_close</KEYWORD2>
+			<KEYWORD2>curl_copy_handle</KEYWORD2>
+			<KEYWORD2>curl_errno</KEYWORD2>
+			<KEYWORD2>curl_error</KEYWORD2>
+			<KEYWORD2>curl_exec</KEYWORD2>
+			<KEYWORD2>curl_getinfo</KEYWORD2>
+			<KEYWORD2>curl_init</KEYWORD2>
+			<KEYWORD2>curl_multi_add_handle</KEYWORD2>
+			<KEYWORD2>curl_multi_close</KEYWORD2>
+			<KEYWORD2>curl_multi_exec</KEYWORD2>
+			<KEYWORD2>curl_multi_getcontent</KEYWORD2>
+			<KEYWORD2>curl_multi_info_read</KEYWORD2>
+			<KEYWORD2>curl_multi_init</KEYWORD2>
+			<KEYWORD2>curl_multi_remove_handle</KEYWORD2>
+			<KEYWORD2>curl_multi_select</KEYWORD2>
+			<KEYWORD2>curl_setopt</KEYWORD2>
+			<KEYWORD2>curl_version</KEYWORD2>
+			<KEYWORD2>current</KEYWORD2> <!-- arrayiterator, directoryiterator, filteriterator, recursiveiteratoriterator, simplexmliterator -->
+			<KEYWORD2>cybercash_base64_decode</KEYWORD2>
+			<KEYWORD2>cybercash_base64_encode</KEYWORD2>
+			<KEYWORD2>cybercash_decr</KEYWORD2>
+			<KEYWORD2>cybercash_encr</KEYWORD2>
+			<KEYWORD2>cyrus_authenticate</KEYWORD2>
+			<KEYWORD2>cyrus_bind</KEYWORD2>
+			<KEYWORD2>cyrus_close</KEYWORD2>
+			<KEYWORD2>cyrus_connect</KEYWORD2>
+			<KEYWORD2>cyrus_query</KEYWORD2>
+			<KEYWORD2>cyrus_unbind</KEYWORD2>
+			<KEYWORD2>data</KEYWORD2> <!-- domprocessinginstruction -->
+			<KEYWORD2>date</KEYWORD2>
+			<KEYWORD2>date_sunrise</KEYWORD2>
+			<KEYWORD2>date_sunset</KEYWORD2>
+			<KEYWORD2>dba_close</KEYWORD2>
+			<KEYWORD2>dba_delete</KEYWORD2>
+			<KEYWORD2>dba_exists</KEYWORD2>
+			<KEYWORD2>dba_fetch</KEYWORD2>
+			<KEYWORD2>dba_firstkey</KEYWORD2>
+			<KEYWORD2>dba_handlers</KEYWORD2>
+			<KEYWORD2>dba_insert</KEYWORD2>
+			<KEYWORD2>dba_key_split</KEYWORD2>
+			<KEYWORD2>dba_list</KEYWORD2>
+			<KEYWORD2>dba_nextkey</KEYWORD2>
+			<KEYWORD2>dba_open</KEYWORD2>
+			<KEYWORD2>dba_optimize</KEYWORD2>
+			<KEYWORD2>dba_popen</KEYWORD2>
+			<KEYWORD2>dba_replace</KEYWORD2>
+			<KEYWORD2>dba_sync</KEYWORD2>
+			<KEYWORD2>dbase_add_record</KEYWORD2>
+			<KEYWORD2>dbase_close</KEYWORD2>
+			<KEYWORD2>dbase_create</KEYWORD2>
+			<KEYWORD2>dbase_delete_record</KEYWORD2>
+			<KEYWORD2>dbase_get_header_info</KEYWORD2>
+			<KEYWORD2>dbase_get_record</KEYWORD2>
+			<KEYWORD2>dbase_get_record_with_names</KEYWORD2>
+			<KEYWORD2>dbase_numfields</KEYWORD2>
+			<KEYWORD2>dbase_numrecords</KEYWORD2>
+			<KEYWORD2>dbase_open</KEYWORD2>
+			<KEYWORD2>dbase_pack</KEYWORD2>
+			<KEYWORD2>dbase_replace_record</KEYWORD2>
+			<KEYWORD2>dblist</KEYWORD2>
+			<KEYWORD2>dbmclose</KEYWORD2>
+			<KEYWORD2>dbmdelete</KEYWORD2>
+			<KEYWORD2>dbmexists</KEYWORD2>
+			<KEYWORD2>dbmfetch</KEYWORD2>
+			<KEYWORD2>dbmfirstkey</KEYWORD2>
+			<KEYWORD2>dbminsert</KEYWORD2>
+			<KEYWORD2>dbmnextkey</KEYWORD2>
+			<KEYWORD2>dbmopen</KEYWORD2>
+			<KEYWORD2>dbmreplace</KEYWORD2>
+			<KEYWORD2>dbplus_add</KEYWORD2>
+			<KEYWORD2>dbplus_aql</KEYWORD2>
+			<KEYWORD2>dbplus_chdir</KEYWORD2>
+			<KEYWORD2>dbplus_close</KEYWORD2>
+			<KEYWORD2>dbplus_curr</KEYWORD2>
+			<KEYWORD2>dbplus_errcode</KEYWORD2>
+			<KEYWORD2>dbplus_errno</KEYWORD2>
+			<KEYWORD2>dbplus_find</KEYWORD2>
+			<KEYWORD2>dbplus_first</KEYWORD2>
+			<KEYWORD2>dbplus_flush</KEYWORD2>
+			<KEYWORD2>dbplus_freealllocks</KEYWORD2>
+			<KEYWORD2>dbplus_freelock</KEYWORD2>
+			<KEYWORD2>dbplus_freerlocks</KEYWORD2>
+			<KEYWORD2>dbplus_getlock</KEYWORD2>
+			<KEYWORD2>dbplus_getunique</KEYWORD2>
+			<KEYWORD2>dbplus_info</KEYWORD2>
+			<KEYWORD2>dbplus_last</KEYWORD2>
+			<KEYWORD2>dbplus_lockrel</KEYWORD2>
+			<KEYWORD2>dbplus_next</KEYWORD2>
+			<KEYWORD2>dbplus_open</KEYWORD2>
+			<KEYWORD2>dbplus_prev</KEYWORD2>
+			<KEYWORD2>dbplus_rchperm</KEYWORD2>
+			<KEYWORD2>dbplus_rcreate</KEYWORD2>
+			<KEYWORD2>dbplus_rcrtexact</KEYWORD2>
+			<KEYWORD2>dbplus_rcrtlike</KEYWORD2>
+			<KEYWORD2>dbplus_resolve</KEYWORD2>
+			<KEYWORD2>dbplus_restorepos</KEYWORD2>
+			<KEYWORD2>dbplus_rkeys</KEYWORD2>
+			<KEYWORD2>dbplus_ropen</KEYWORD2>
+			<KEYWORD2>dbplus_rquery</KEYWORD2>
+			<KEYWORD2>dbplus_rrename</KEYWORD2>
+			<KEYWORD2>dbplus_rsecindex</KEYWORD2>
+			<KEYWORD2>dbplus_runlink</KEYWORD2>
+			<KEYWORD2>dbplus_rzap</KEYWORD2>
+			<KEYWORD2>dbplus_savepos</KEYWORD2>
+			<KEYWORD2>dbplus_setindex</KEYWORD2>
+			<KEYWORD2>dbplus_setindexbynumber</KEYWORD2>
+			<KEYWORD2>dbplus_sql</KEYWORD2>
+			<KEYWORD2>dbplus_tcl</KEYWORD2>
+			<KEYWORD2>dbplus_tremove</KEYWORD2>
+			<KEYWORD2>dbplus_undo</KEYWORD2>
+			<KEYWORD2>dbplus_undoprepare</KEYWORD2>
+			<KEYWORD2>dbplus_unlockrel</KEYWORD2>
+			<KEYWORD2>dbplus_unselect</KEYWORD2>
+			<KEYWORD2>dbplus_update</KEYWORD2>
+			<KEYWORD2>dbplus_xlockrel</KEYWORD2>
+			<KEYWORD2>dbplus_xunlockrel</KEYWORD2>
+			<KEYWORD2>dbstat</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>dbx_close</KEYWORD2>
+			<KEYWORD2>dbx_compare</KEYWORD2>
+			<KEYWORD2>dbx_connect</KEYWORD2>
+			<KEYWORD2>dbx_error</KEYWORD2>
+			<KEYWORD2>dbx_escape_string</KEYWORD2>
+			<KEYWORD2>dbx_fetch_row</KEYWORD2>
+			<KEYWORD2>dbx_query</KEYWORD2>
+			<KEYWORD2>dbx_sort</KEYWORD2>
+			<KEYWORD2>dcgettext</KEYWORD2>
+			<KEYWORD2>dcngettext</KEYWORD2>
+			<KEYWORD2>dcstat</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>deaggregate</KEYWORD2>
+			<KEYWORD2>debug_backtrace</KEYWORD2>
+			<KEYWORD2>debug_print_backtrace</KEYWORD2>
+			<KEYWORD2>debug_zval_dump</KEYWORD2>
+			<KEYWORD2>debugger_off</KEYWORD2>
+			<KEYWORD2>debugger_on</KEYWORD2>
+			<KEYWORD2>decbin</KEYWORD2>
+			<KEYWORD2>dechex</KEYWORD2>
+			<KEYWORD2>decoct</KEYWORD2>
+			<KEYWORD2>decrement</KEYWORD2> <!-- memcache -->
+			<KEYWORD2>define</KEYWORD2>
+			<KEYWORD2>define_syslog_variables</KEYWORD2>
+			<KEYWORD2>defined</KEYWORD2>
+			<KEYWORD2>deg2rad</KEYWORD2>
+			<KEYWORD2>delete</KEYWORD2> <!-- memcache -->
+			<KEYWORD2>deletedata</KEYWORD2> <!-- domcharacterdata -->
+			<KEYWORD2>description</KEYWORD2> <!-- hw_api_reason -->
+			<KEYWORD2>dgettext</KEYWORD2>
+			<KEYWORD2>dio_close</KEYWORD2>
+			<KEYWORD2>dio_fcntl</KEYWORD2>
+			<KEYWORD2>dio_open</KEYWORD2>
+			<KEYWORD2>dio_read</KEYWORD2>
+			<KEYWORD2>dio_seek</KEYWORD2>
+			<KEYWORD2>dio_stat</KEYWORD2>
+			<KEYWORD2>dio_tcsetattr</KEYWORD2>
+			<KEYWORD2>dio_truncate</KEYWORD2>
+			<KEYWORD2>dio_write</KEYWORD2>
+			<KEYWORD2>dir</KEYWORD2>
+			<KEYWORD2>dirname</KEYWORD2>
+			<KEYWORD2>disk_free_space</KEYWORD2>
+			<KEYWORD2>disk_total_space</KEYWORD2>
+			<KEYWORD2>diskfreespace</KEYWORD2>
+			<KEYWORD2>dl</KEYWORD2>
+			<KEYWORD2>dngettext</KEYWORD2>
+			<KEYWORD2>dns_check_record</KEYWORD2>
+			<KEYWORD2>dns_get_mx</KEYWORD2>
+			<KEYWORD2>dns_get_record</KEYWORD2>
+			<KEYWORD2>doctype</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>document_element</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>dom_import_simplexml</KEYWORD2>
+			<KEYWORD2>domxml_new_doc</KEYWORD2>
+			<KEYWORD2>domxml_open_file</KEYWORD2>
+			<KEYWORD2>domxml_open_mem</KEYWORD2>
+			<KEYWORD2>domxml_version</KEYWORD2>
+			<KEYWORD2>domxml_xmltree</KEYWORD2>
+			<KEYWORD2>domxml_xslt_stylesheet</KEYWORD2>
+			<KEYWORD2>domxml_xslt_stylesheet_doc</KEYWORD2>
+			<KEYWORD2>domxml_xslt_stylesheet_file</KEYWORD2>
+			<KEYWORD2>dotnet</KEYWORD2>
+			<KEYWORD2>dotnet_load</KEYWORD2>
+			<KEYWORD2>doubleval</KEYWORD2>
+			<KEYWORD2>drawcurve</KEYWORD2> <!-- swfshape -->
+			<KEYWORD2>drawcurveto</KEYWORD2> <!-- swfshape -->
+			<KEYWORD2>drawline</KEYWORD2> <!-- swfshape -->
+			<KEYWORD2>drawlineto</KEYWORD2> <!-- swfshape -->
+			<KEYWORD2>dstanchors</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>dstofsrcanchors</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>dump_file</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>dump_mem</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>dump_node</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>each</KEYWORD2>
+			<KEYWORD2>easter_date</KEYWORD2>
+			<KEYWORD2>easter_days</KEYWORD2>
+			<KEYWORD2>ebcdic2ascii</KEYWORD2>
+			<KEYWORD2>end</KEYWORD2>
+			<KEYWORD2>entities</KEYWORD2> <!-- domdocumenttype -->
+			<KEYWORD2>eof</KEYWORD2> <!-- lob -->
+			<KEYWORD2>erase</KEYWORD2> <!-- lob -->
+			<KEYWORD2>ereg</KEYWORD2>
+			<KEYWORD2>ereg_replace</KEYWORD2>
+			<KEYWORD2>eregi</KEYWORD2>
+			<KEYWORD2>eregi_replace</KEYWORD2>
+			<KEYWORD2>error_log</KEYWORD2>
+			<KEYWORD2>error_reporting</KEYWORD2>
+			<KEYWORD2>errorcode</KEYWORD2> <!-- pdo, pdostatement -->
+			<KEYWORD2>errorinfo</KEYWORD2> <!-- pdo, pdostatement -->
+			<KEYWORD2>escapeshellarg</KEYWORD2>
+			<KEYWORD2>escapeshellcmd</KEYWORD2>
+			<KEYWORD2>exec</KEYWORD2> <!-- pdo -->
+			<KEYWORD2>execute</KEYWORD2> <!-- pdostatement -->
+			<KEYWORD2>exif_imagetype</KEYWORD2>
+			<KEYWORD2>exif_read_data</KEYWORD2>
+			<KEYWORD2>exif_tagname</KEYWORD2>
+			<KEYWORD2>exif_thumbnail</KEYWORD2>
+			<KEYWORD2>exp</KEYWORD2>
+			<KEYWORD2>explode</KEYWORD2>
+			<KEYWORD2>expm1</KEYWORD2>
+			<KEYWORD2>export</KEYWORD2> <!-- lob -->
+			<KEYWORD2>extension_loaded</KEYWORD2>
+			<KEYWORD2>extract</KEYWORD2> <!-- rar -->
+			<KEYWORD2>ezmlm_hash</KEYWORD2>
+			<KEYWORD2>fam_cancel_monitor</KEYWORD2>
+			<KEYWORD2>fam_close</KEYWORD2>
+			<KEYWORD2>fam_monitor_collection</KEYWORD2>
+			<KEYWORD2>fam_monitor_directory</KEYWORD2>
+			<KEYWORD2>fam_monitor_file</KEYWORD2>
+			<KEYWORD2>fam_next_event</KEYWORD2>
+			<KEYWORD2>fam_open</KEYWORD2>
+			<KEYWORD2>fam_pending</KEYWORD2>
+			<KEYWORD2>fam_resume_monitor</KEYWORD2>
+			<KEYWORD2>fam_suspend_monitor</KEYWORD2>
+			<KEYWORD2>fbsql_affected_rows</KEYWORD2>
+			<KEYWORD2>fbsql_autocommit</KEYWORD2>
+			<KEYWORD2>fbsql_blob_size</KEYWORD2>
+			<KEYWORD2>fbsql_change_user</KEYWORD2>
+			<KEYWORD2>fbsql_clob_size</KEYWORD2>
+			<KEYWORD2>fbsql_close</KEYWORD2>
+			<KEYWORD2>fbsql_commit</KEYWORD2>
+			<KEYWORD2>fbsql_connect</KEYWORD2>
+			<KEYWORD2>fbsql_create_blob</KEYWORD2>
+			<KEYWORD2>fbsql_create_clob</KEYWORD2>
+			<KEYWORD2>fbsql_create_db</KEYWORD2>
+			<KEYWORD2>fbsql_data_seek</KEYWORD2>
+			<KEYWORD2>fbsql_database</KEYWORD2>
+			<KEYWORD2>fbsql_database_password</KEYWORD2>
+			<KEYWORD2>fbsql_db_query</KEYWORD2>
+			<KEYWORD2>fbsql_db_status</KEYWORD2>
+			<KEYWORD2>fbsql_drop_db</KEYWORD2>
+			<KEYWORD2>fbsql_errno</KEYWORD2>
+			<KEYWORD2>fbsql_error</KEYWORD2>
+			<KEYWORD2>fbsql_fetch_array</KEYWORD2>
+			<KEYWORD2>fbsql_fetch_assoc</KEYWORD2>
+			<KEYWORD2>fbsql_fetch_field</KEYWORD2>
+			<KEYWORD2>fbsql_fetch_lengths</KEYWORD2>
+			<KEYWORD2>fbsql_fetch_object</KEYWORD2>
+			<KEYWORD2>fbsql_fetch_row</KEYWORD2>
+			<KEYWORD2>fbsql_field_flags</KEYWORD2>
+			<KEYWORD2>fbsql_field_len</KEYWORD2>
+			<KEYWORD2>fbsql_field_name</KEYWORD2>
+			<KEYWORD2>fbsql_field_seek</KEYWORD2>
+			<KEYWORD2>fbsql_field_table</KEYWORD2>
+			<KEYWORD2>fbsql_field_type</KEYWORD2>
+			<KEYWORD2>fbsql_free_result</KEYWORD2>
+			<KEYWORD2>fbsql_get_autostart_info</KEYWORD2>
+			<KEYWORD2>fbsql_hostname</KEYWORD2>
+			<KEYWORD2>fbsql_insert_id</KEYWORD2>
+			<KEYWORD2>fbsql_list_dbs</KEYWORD2>
+			<KEYWORD2>fbsql_list_fields</KEYWORD2>
+			<KEYWORD2>fbsql_list_tables</KEYWORD2>
+			<KEYWORD2>fbsql_next_result</KEYWORD2>
+			<KEYWORD2>fbsql_num_fields</KEYWORD2>
+			<KEYWORD2>fbsql_num_rows</KEYWORD2>
+			<KEYWORD2>fbsql_password</KEYWORD2>
+			<KEYWORD2>fbsql_pconnect</KEYWORD2>
+			<KEYWORD2>fbsql_query</KEYWORD2>
+			<KEYWORD2>fbsql_read_blob</KEYWORD2>
+			<KEYWORD2>fbsql_read_clob</KEYWORD2>
+			<KEYWORD2>fbsql_result</KEYWORD2>
+			<KEYWORD2>fbsql_rollback</KEYWORD2>
+			<KEYWORD2>fbsql_select_db</KEYWORD2>
+			<KEYWORD2>fbsql_set_lob_mode</KEYWORD2>
+			<KEYWORD2>fbsql_set_password</KEYWORD2>
+			<KEYWORD2>fbsql_set_transaction</KEYWORD2>
+			<KEYWORD2>fbsql_start_db</KEYWORD2>
+			<KEYWORD2>fbsql_stop_db</KEYWORD2>
+			<KEYWORD2>fbsql_tablename</KEYWORD2>
+			<KEYWORD2>fbsql_username</KEYWORD2>
+			<KEYWORD2>fbsql_warnings</KEYWORD2>
+			<KEYWORD2>fclose</KEYWORD2>
+			<KEYWORD2>fdf_add_doc_javascript</KEYWORD2>
+			<KEYWORD2>fdf_add_template</KEYWORD2>
+			<KEYWORD2>fdf_close</KEYWORD2>
+			<KEYWORD2>fdf_create</KEYWORD2>
+			<KEYWORD2>fdf_enum_values</KEYWORD2>
+			<KEYWORD2>fdf_errno</KEYWORD2>
+			<KEYWORD2>fdf_error</KEYWORD2>
+			<KEYWORD2>fdf_get_ap</KEYWORD2>
+			<KEYWORD2>fdf_get_attachment</KEYWORD2>
+			<KEYWORD2>fdf_get_encoding</KEYWORD2>
+			<KEYWORD2>fdf_get_file</KEYWORD2>
+			<KEYWORD2>fdf_get_flags</KEYWORD2>
+			<KEYWORD2>fdf_get_opt</KEYWORD2>
+			<KEYWORD2>fdf_get_status</KEYWORD2>
+			<KEYWORD2>fdf_get_value</KEYWORD2>
+			<KEYWORD2>fdf_get_version</KEYWORD2>
+			<KEYWORD2>fdf_header</KEYWORD2>
+			<KEYWORD2>fdf_next_field_name</KEYWORD2>
+			<KEYWORD2>fdf_open</KEYWORD2>
+			<KEYWORD2>fdf_open_string</KEYWORD2>
+			<KEYWORD2>fdf_remove_item</KEYWORD2>
+			<KEYWORD2>fdf_save</KEYWORD2>
+			<KEYWORD2>fdf_save_string</KEYWORD2>
+			<KEYWORD2>fdf_set_ap</KEYWORD2>
+			<KEYWORD2>fdf_set_encoding</KEYWORD2>
+			<KEYWORD2>fdf_set_file</KEYWORD2>
+			<KEYWORD2>fdf_set_flags</KEYWORD2>
+			<KEYWORD2>fdf_set_javascript_action</KEYWORD2>
+			<KEYWORD2>fdf_set_on_import_javascript</KEYWORD2>
+			<KEYWORD2>fdf_set_opt</KEYWORD2>
+			<KEYWORD2>fdf_set_status</KEYWORD2>
+			<KEYWORD2>fdf_set_submit_form_action</KEYWORD2>
+			<KEYWORD2>fdf_set_target_frame</KEYWORD2>
+			<KEYWORD2>fdf_set_value</KEYWORD2>
+			<KEYWORD2>fdf_set_version</KEYWORD2>
+			<KEYWORD2>feof</KEYWORD2>
+			<KEYWORD2>fetch</KEYWORD2> <!-- pdostatement -->
+			<KEYWORD2>fetchall</KEYWORD2> <!-- pdostatement -->
+			<KEYWORD2>fetchsingle</KEYWORD2> <!-- pdostatement -->
+			<KEYWORD2>fflush</KEYWORD2>
+			<KEYWORD2>fgetc</KEYWORD2>
+			<KEYWORD2>fgetcsv</KEYWORD2>
+			<KEYWORD2>fgets</KEYWORD2>
+			<KEYWORD2>fgetss</KEYWORD2>
+			<KEYWORD2>file</KEYWORD2>
+			<KEYWORD2>file_exists</KEYWORD2>
+			<KEYWORD2>file_get_contents</KEYWORD2>
+			<KEYWORD2>file_put_contents</KEYWORD2>
+			<KEYWORD2>fileatime</KEYWORD2>
+			<KEYWORD2>filectime</KEYWORD2>
+			<KEYWORD2>filegroup</KEYWORD2>
+			<KEYWORD2>fileinode</KEYWORD2>
+			<KEYWORD2>filemtime</KEYWORD2>
+			<KEYWORD2>fileowner</KEYWORD2>
+			<KEYWORD2>fileperms</KEYWORD2>
+			<KEYWORD2>filepro</KEYWORD2>
+			<KEYWORD2>filepro_fieldcount</KEYWORD2>
+			<KEYWORD2>filepro_fieldname</KEYWORD2>
+			<KEYWORD2>filepro_fieldtype</KEYWORD2>
+			<KEYWORD2>filepro_fieldwidth</KEYWORD2>
+			<KEYWORD2>filepro_retrieve</KEYWORD2>
+			<KEYWORD2>filepro_rowcount</KEYWORD2>
+			<KEYWORD2>filesize</KEYWORD2>
+			<KEYWORD2>filetype</KEYWORD2>
+			<KEYWORD2>find</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>first_child</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>floatval</KEYWORD2>
+			<KEYWORD2>flock</KEYWORD2>
+			<KEYWORD2>floor</KEYWORD2>
+			<KEYWORD2>flush</KEYWORD2> <!-- lob, memcache -->
+			<KEYWORD2>fmod</KEYWORD2>
+			<KEYWORD2>fnmatch</KEYWORD2>
+			<KEYWORD2>fopen</KEYWORD2>
+			<KEYWORD2>fpassthru</KEYWORD2>
+			<KEYWORD2>fprintf</KEYWORD2>
+			<KEYWORD2>fputcsv</KEYWORD2>
+			<KEYWORD2>fputs</KEYWORD2>
+			<KEYWORD2>fread</KEYWORD2>
+			<KEYWORD2>free</KEYWORD2> <!-- collection, descriptor -->
+			<KEYWORD2>frenchtojd</KEYWORD2>
+			<KEYWORD2>fribidi_log2vis</KEYWORD2>
+			<KEYWORD2>fscanf</KEYWORD2>
+			<KEYWORD2>fseek</KEYWORD2>
+			<KEYWORD2>fsockopen</KEYWORD2>
+			<KEYWORD2>fstat</KEYWORD2>
+			<KEYWORD2>ftell</KEYWORD2>
+			<KEYWORD2>ftok</KEYWORD2>
+			<KEYWORD2>ftp_alloc</KEYWORD2>
+			<KEYWORD2>ftp_cdup</KEYWORD2>
+			<KEYWORD2>ftp_chdir</KEYWORD2>
+			<KEYWORD2>ftp_chmod</KEYWORD2>
+			<KEYWORD2>ftp_close</KEYWORD2>
+			<KEYWORD2>ftp_connect</KEYWORD2>
+			<KEYWORD2>ftp_delete</KEYWORD2>
+			<KEYWORD2>ftp_exec</KEYWORD2>
+			<KEYWORD2>ftp_fget</KEYWORD2>
+			<KEYWORD2>ftp_fput</KEYWORD2>
+			<KEYWORD2>ftp_get</KEYWORD2>
+			<KEYWORD2>ftp_get_option</KEYWORD2>
+			<KEYWORD2>ftp_login</KEYWORD2>
+			<KEYWORD2>ftp_mdtm</KEYWORD2>
+			<KEYWORD2>ftp_mkdir</KEYWORD2>
+			<KEYWORD2>ftp_nb_continue</KEYWORD2>
+			<KEYWORD2>ftp_nb_fget</KEYWORD2>
+			<KEYWORD2>ftp_nb_fput</KEYWORD2>
+			<KEYWORD2>ftp_nb_get</KEYWORD2>
+			<KEYWORD2>ftp_nb_put</KEYWORD2>
+			<KEYWORD2>ftp_nlist</KEYWORD2>
+			<KEYWORD2>ftp_pasv</KEYWORD2>
+			<KEYWORD2>ftp_put</KEYWORD2>
+			<KEYWORD2>ftp_pwd</KEYWORD2>
+			<KEYWORD2>ftp_quit</KEYWORD2>
+			<KEYWORD2>ftp_raw</KEYWORD2>
+			<KEYWORD2>ftp_rawlist</KEYWORD2>
+			<KEYWORD2>ftp_rename</KEYWORD2>
+			<KEYWORD2>ftp_rmdir</KEYWORD2>
+			<KEYWORD2>ftp_set_option</KEYWORD2>
+			<KEYWORD2>ftp_site</KEYWORD2>
+			<KEYWORD2>ftp_size</KEYWORD2>
+			<KEYWORD2>ftp_ssl_connect</KEYWORD2>
+			<KEYWORD2>ftp_systype</KEYWORD2>
+			<KEYWORD2>ftruncate</KEYWORD2>
+			<KEYWORD2>ftstat</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>func_get_arg</KEYWORD2>
+			<KEYWORD2>func_get_args</KEYWORD2>
+			<KEYWORD2>func_num_args</KEYWORD2>
+			<KEYWORD2>function_exists</KEYWORD2>
+			<KEYWORD2>fwrite</KEYWORD2>
+			<KEYWORD2>gd_info</KEYWORD2>
+			<KEYWORD2>get</KEYWORD2> <!-- memcache -->
+			<KEYWORD2>get_attr</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>get_attribute</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>get_attribute_node</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>get_browser</KEYWORD2>
+			<KEYWORD2>get_cfg_var</KEYWORD2>
+			<KEYWORD2>get_class</KEYWORD2>
+			<KEYWORD2>get_class_methods</KEYWORD2>
+			<KEYWORD2>get_class_vars</KEYWORD2>
+			<KEYWORD2>get_content</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>get_current_user</KEYWORD2>
+			<KEYWORD2>get_declared_classes</KEYWORD2>
+			<KEYWORD2>get_declared_interfaces</KEYWORD2>
+			<KEYWORD2>get_defined_constants</KEYWORD2>
+			<KEYWORD2>get_defined_functions</KEYWORD2>
+			<KEYWORD2>get_defined_vars</KEYWORD2>
+			<KEYWORD2>get_element_by_id</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>get_elements_by_tagname</KEYWORD2> <!-- domdocument, domelement -->
+			<KEYWORD2>get_extension_funcs</KEYWORD2>
+			<KEYWORD2>get_headers</KEYWORD2>
+			<KEYWORD2>get_html_translation_table</KEYWORD2>
+			<KEYWORD2>get_include_path</KEYWORD2>
+			<KEYWORD2>get_included_files</KEYWORD2>
+			<KEYWORD2>get_loaded_extensions</KEYWORD2>
+			<KEYWORD2>get_magic_quotes_gpc</KEYWORD2>
+			<KEYWORD2>get_magic_quotes_runtime</KEYWORD2>
+			<KEYWORD2>get_meta_tags</KEYWORD2>
+			<KEYWORD2>get_nodes</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>get_object_vars</KEYWORD2>
+			<KEYWORD2>get_parent_class</KEYWORD2>
+			<KEYWORD2>get_required_files</KEYWORD2>
+			<KEYWORD2>get_resource_type</KEYWORD2>
+			<KEYWORD2>getallheaders</KEYWORD2>
+			<KEYWORD2>getatime</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getattr</KEYWORD2> <!-- rar -->
+			<KEYWORD2>getattribute</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>getattributenode</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>getattributenodens</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>getattributens</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>getbuffering</KEYWORD2> <!-- lob -->
+			<KEYWORD2>getchildren</KEYWORD2> <!-- cachingrecursiveiterator, directoryiterator, parentiterator, recursivedirectoryiterator, simplexmliterator -->
+			<KEYWORD2>getcrc</KEYWORD2> <!-- rar -->
+			<KEYWORD2>getctime</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getcwd</KEYWORD2>
+			<KEYWORD2>getdate</KEYWORD2>
+			<KEYWORD2>getdepth</KEYWORD2> <!-- recursiveiteratoriterator -->
+			<KEYWORD2>getelem</KEYWORD2> <!-- collection -->
+			<KEYWORD2>getelementbyid</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>getelementsbytagname</KEYWORD2> <!-- domdocument, domelement -->
+			<KEYWORD2>getelementsbytagnamens</KEYWORD2> <!-- domdocument, domelement -->
+			<KEYWORD2>getenv</KEYWORD2>
+			<KEYWORD2>getfilename</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getfiletime</KEYWORD2> <!-- rar -->
+			<KEYWORD2>getfunctions</KEYWORD2> <!-- soapserver -->
+			<KEYWORD2>getgroup</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getheight</KEYWORD2> <!-- swfbitmap -->
+			<KEYWORD2>gethostbyaddr</KEYWORD2>
+			<KEYWORD2>gethostbyname</KEYWORD2>
+			<KEYWORD2>gethostbynamel</KEYWORD2>
+			<KEYWORD2>gethostos</KEYWORD2> <!-- rar -->
+			<KEYWORD2>getimagesize</KEYWORD2>
+			<KEYWORD2>getinneriterator</KEYWORD2> <!-- filteriterator -->
+			<KEYWORD2>getinode</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getiterator</KEYWORD2> <!-- arrayobject -->
+			<KEYWORD2>getlastmod</KEYWORD2>
+			<KEYWORD2>getmethod</KEYWORD2> <!-- rar -->
+			<KEYWORD2>getmtime</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getmxrr</KEYWORD2>
+			<KEYWORD2>getmygid</KEYWORD2>
+			<KEYWORD2>getmyinode</KEYWORD2>
+			<KEYWORD2>getmypid</KEYWORD2>
+			<KEYWORD2>getmyuid</KEYWORD2>
+			<KEYWORD2>getname</KEYWORD2> <!-- rar -->
+			<KEYWORD2>getnameditem</KEYWORD2> <!-- domnamednodemap -->
+			<KEYWORD2>getnameditemns</KEYWORD2> <!-- domnamednodemap -->
+			<KEYWORD2>getopt</KEYWORD2>
+			<KEYWORD2>getowner</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getpackedsize</KEYWORD2> <!-- rar -->
+			<KEYWORD2>getpath</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getpathname</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getperms</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getposition</KEYWORD2> <!-- limititerator -->
+			<KEYWORD2>getprotobyname</KEYWORD2>
+			<KEYWORD2>getprotobynumber</KEYWORD2>
+			<KEYWORD2>getrandmax</KEYWORD2>
+			<KEYWORD2>getrusage</KEYWORD2>
+			<KEYWORD2>getservbyname</KEYWORD2>
+			<KEYWORD2>getservbyport</KEYWORD2>
+			<KEYWORD2>getshape1</KEYWORD2> <!-- swfmorph -->
+			<KEYWORD2>getshape2</KEYWORD2> <!-- swfmorph -->
+			<KEYWORD2>getsize</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getstats</KEYWORD2> <!-- memcache -->
+			<KEYWORD2>getsubiterator</KEYWORD2> <!-- recursiveiteratoriterator -->
+			<KEYWORD2>gettext</KEYWORD2>
+			<KEYWORD2>gettimeofday</KEYWORD2>
+			<KEYWORD2>gettype</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>getunpackedsize</KEYWORD2> <!-- rar -->
+			<KEYWORD2>getversion</KEYWORD2> <!-- memcache, rar -->
+			<KEYWORD2>getwidth</KEYWORD2> <!-- swfbitmap, swffont, swftext -->
+			<KEYWORD2>glob</KEYWORD2>
+			<KEYWORD2>gmdate</KEYWORD2>
+			<KEYWORD2>gmmktime</KEYWORD2>
+			<KEYWORD2>gmp_abs</KEYWORD2>
+			<KEYWORD2>gmp_add</KEYWORD2>
+			<KEYWORD2>gmp_and</KEYWORD2>
+			<KEYWORD2>gmp_clrbit</KEYWORD2>
+			<KEYWORD2>gmp_cmp</KEYWORD2>
+			<KEYWORD2>gmp_com</KEYWORD2>
+			<KEYWORD2>gmp_div</KEYWORD2>
+			<KEYWORD2>gmp_div_q</KEYWORD2>
+			<KEYWORD2>gmp_div_qr</KEYWORD2>
+			<KEYWORD2>gmp_div_r</KEYWORD2>
+			<KEYWORD2>gmp_divexact</KEYWORD2>
+			<KEYWORD2>gmp_fact</KEYWORD2>
+			<KEYWORD2>gmp_gcd</KEYWORD2>
+			<KEYWORD2>gmp_gcdext</KEYWORD2>
+			<KEYWORD2>gmp_hamdist</KEYWORD2>
+			<KEYWORD2>gmp_init</KEYWORD2>
+			<KEYWORD2>gmp_intval</KEYWORD2>
+			<KEYWORD2>gmp_invert</KEYWORD2>
+			<KEYWORD2>gmp_jacobi</KEYWORD2>
+			<KEYWORD2>gmp_legendre</KEYWORD2>
+			<KEYWORD2>gmp_mod</KEYWORD2>
+			<KEYWORD2>gmp_mul</KEYWORD2>
+			<KEYWORD2>gmp_neg</KEYWORD2>
+			<KEYWORD2>gmp_or</KEYWORD2>
+			<KEYWORD2>gmp_perfect_square</KEYWORD2>
+			<KEYWORD2>gmp_popcount</KEYWORD2>
+			<KEYWORD2>gmp_pow</KEYWORD2>
+			<KEYWORD2>gmp_powm</KEYWORD2>
+			<KEYWORD2>gmp_prob_prime</KEYWORD2>
+			<KEYWORD2>gmp_random</KEYWORD2>
+			<KEYWORD2>gmp_scan0</KEYWORD2>
+			<KEYWORD2>gmp_scan1</KEYWORD2>
+			<KEYWORD2>gmp_setbit</KEYWORD2>
+			<KEYWORD2>gmp_sign</KEYWORD2>
+			<KEYWORD2>gmp_sqrt</KEYWORD2>
+			<KEYWORD2>gmp_sqrtrem</KEYWORD2>
+			<KEYWORD2>gmp_strval</KEYWORD2>
+			<KEYWORD2>gmp_sub</KEYWORD2>
+			<KEYWORD2>gmp_xor</KEYWORD2>
+			<KEYWORD2>gmstrftime</KEYWORD2>
+			<KEYWORD2>gregoriantojd</KEYWORD2>
+			<KEYWORD2>gzclose</KEYWORD2>
+			<KEYWORD2>gzcompress</KEYWORD2>
+			<KEYWORD2>gzdeflate</KEYWORD2>
+			<KEYWORD2>gzencode</KEYWORD2>
+			<KEYWORD2>gzeof</KEYWORD2>
+			<KEYWORD2>gzfile</KEYWORD2>
+			<KEYWORD2>gzgetc</KEYWORD2>
+			<KEYWORD2>gzgets</KEYWORD2>
+			<KEYWORD2>gzgetss</KEYWORD2>
+			<KEYWORD2>gzinflate</KEYWORD2>
+			<KEYWORD2>gzopen</KEYWORD2>
+			<KEYWORD2>gzpassthru</KEYWORD2>
+			<KEYWORD2>gzputs</KEYWORD2>
+			<KEYWORD2>gzread</KEYWORD2>
+			<KEYWORD2>gzrewind</KEYWORD2>
+			<KEYWORD2>gzseek</KEYWORD2>
+			<KEYWORD2>gztell</KEYWORD2>
+			<KEYWORD2>gzuncompress</KEYWORD2>
+			<KEYWORD2>gzwrite</KEYWORD2>
+			<KEYWORD2>handle</KEYWORD2> <!-- soapserver -->
+			<KEYWORD2>has_attribute</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>has_attributes</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>has_child_nodes</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>hasattribute</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>hasattributens</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>hasattributes</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>haschildnodes</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>haschildren</KEYWORD2> <!-- cachingrecursiveiterator, parentiterator, recursivedirectoryiterator, simplexmliterator, tidy_node -->
+			<KEYWORD2>hasfeature</KEYWORD2> <!-- domimplementation -->
+			<KEYWORD2>hasnext</KEYWORD2> <!-- cachingiterator -->
+			<KEYWORD2>hassiblings</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>header</KEYWORD2>
+			<KEYWORD2>headers_list</KEYWORD2>
+			<KEYWORD2>headers_sent</KEYWORD2>
+			<KEYWORD2>hebrev</KEYWORD2>
+			<KEYWORD2>hebrevc</KEYWORD2>
+			<KEYWORD2>hexdec</KEYWORD2>
+			<KEYWORD2>highlight_file</KEYWORD2>
+			<KEYWORD2>highlight_string</KEYWORD2>
+			<KEYWORD2>html_dump_mem</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>html_entity_decode</KEYWORD2>
+			<KEYWORD2>htmlentities</KEYWORD2>
+			<KEYWORD2>htmlspecialchars</KEYWORD2>
+			<KEYWORD2>http_build_query</KEYWORD2>
+			<KEYWORD2>hw_array2objrec</KEYWORD2>
+			<KEYWORD2>hw_changeobject</KEYWORD2>
+			<KEYWORD2>hw_children</KEYWORD2>
+			<KEYWORD2>hw_childrenobj</KEYWORD2>
+			<KEYWORD2>hw_close</KEYWORD2>
+			<KEYWORD2>hw_connect</KEYWORD2>
+			<KEYWORD2>hw_connection_info</KEYWORD2>
+			<KEYWORD2>hw_cp</KEYWORD2>
+			<KEYWORD2>hw_deleteobject</KEYWORD2>
+			<KEYWORD2>hw_docbyanchor</KEYWORD2>
+			<KEYWORD2>hw_docbyanchorobj</KEYWORD2>
+			<KEYWORD2>hw_document_attributes</KEYWORD2>
+			<KEYWORD2>hw_document_bodytag</KEYWORD2>
+			<KEYWORD2>hw_document_content</KEYWORD2>
+			<KEYWORD2>hw_document_setcontent</KEYWORD2>
+			<KEYWORD2>hw_document_size</KEYWORD2>
+			<KEYWORD2>hw_dummy</KEYWORD2>
+			<KEYWORD2>hw_edittext</KEYWORD2>
+			<KEYWORD2>hw_error</KEYWORD2>
+			<KEYWORD2>hw_errormsg</KEYWORD2>
+			<KEYWORD2>hw_free_document</KEYWORD2>
+			<KEYWORD2>hw_getanchors</KEYWORD2>
+			<KEYWORD2>hw_getanchorsobj</KEYWORD2>
+			<KEYWORD2>hw_getandlock</KEYWORD2>
+			<KEYWORD2>hw_getchildcoll</KEYWORD2>
+			<KEYWORD2>hw_getchildcollobj</KEYWORD2>
+			<KEYWORD2>hw_getchilddoccoll</KEYWORD2>
+			<KEYWORD2>hw_getchilddoccollobj</KEYWORD2>
+			<KEYWORD2>hw_getobject</KEYWORD2>
+			<KEYWORD2>hw_getobjectbyquery</KEYWORD2>
+			<KEYWORD2>hw_getobjectbyquerycoll</KEYWORD2>
+			<KEYWORD2>hw_getobjectbyquerycollobj</KEYWORD2>
+			<KEYWORD2>hw_getobjectbyqueryobj</KEYWORD2>
+			<KEYWORD2>hw_getparents</KEYWORD2>
+			<KEYWORD2>hw_getparentsobj</KEYWORD2>
+			<KEYWORD2>hw_getrellink</KEYWORD2>
+			<KEYWORD2>hw_getremote</KEYWORD2>
+			<KEYWORD2>hw_getremotechildren</KEYWORD2>
+			<KEYWORD2>hw_getsrcbydestobj</KEYWORD2>
+			<KEYWORD2>hw_gettext</KEYWORD2>
+			<KEYWORD2>hw_getusername</KEYWORD2>
+			<KEYWORD2>hw_identify</KEYWORD2>
+			<KEYWORD2>hw_incollections</KEYWORD2>
+			<KEYWORD2>hw_info</KEYWORD2>
+			<KEYWORD2>hw_inscoll</KEYWORD2>
+			<KEYWORD2>hw_insdoc</KEYWORD2>
+			<KEYWORD2>hw_insertanchors</KEYWORD2>
+			<KEYWORD2>hw_insertdocument</KEYWORD2>
+			<KEYWORD2>hw_insertobject</KEYWORD2>
+			<KEYWORD2>hw_mapid</KEYWORD2>
+			<KEYWORD2>hw_modifyobject</KEYWORD2>
+			<KEYWORD2>hw_mv</KEYWORD2>
+			<KEYWORD2>hw_new_document</KEYWORD2>
+			<KEYWORD2>hw_objrec2array</KEYWORD2>
+			<KEYWORD2>hw_output_document</KEYWORD2>
+			<KEYWORD2>hw_pconnect</KEYWORD2>
+			<KEYWORD2>hw_pipedocument</KEYWORD2>
+			<KEYWORD2>hw_root</KEYWORD2>
+			<KEYWORD2>hw_setlinkroot</KEYWORD2>
+			<KEYWORD2>hw_stat</KEYWORD2>
+			<KEYWORD2>hw_unlock</KEYWORD2>
+			<KEYWORD2>hw_who</KEYWORD2>
+			<KEYWORD2>hwapi_hgcsp</KEYWORD2>
+			<KEYWORD2>hwstat</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>hypot</KEYWORD2>
+			<KEYWORD2>ibase_add_user</KEYWORD2>
+			<KEYWORD2>ibase_affected_rows</KEYWORD2>
+			<KEYWORD2>ibase_backup</KEYWORD2>
+			<KEYWORD2>ibase_blob_add</KEYWORD2>
+			<KEYWORD2>ibase_blob_cancel</KEYWORD2>
+			<KEYWORD2>ibase_blob_close</KEYWORD2>
+			<KEYWORD2>ibase_blob_create</KEYWORD2>
+			<KEYWORD2>ibase_blob_echo</KEYWORD2>
+			<KEYWORD2>ibase_blob_get</KEYWORD2>
+			<KEYWORD2>ibase_blob_import</KEYWORD2>
+			<KEYWORD2>ibase_blob_info</KEYWORD2>
+			<KEYWORD2>ibase_blob_open</KEYWORD2>
+			<KEYWORD2>ibase_close</KEYWORD2>
+			<KEYWORD2>ibase_commit</KEYWORD2>
+			<KEYWORD2>ibase_commit_ret</KEYWORD2>
+			<KEYWORD2>ibase_connect</KEYWORD2>
+			<KEYWORD2>ibase_db_info</KEYWORD2>
+			<KEYWORD2>ibase_delete_user</KEYWORD2>
+			<KEYWORD2>ibase_drop_db</KEYWORD2>
+			<KEYWORD2>ibase_errcode</KEYWORD2>
+			<KEYWORD2>ibase_errmsg</KEYWORD2>
+			<KEYWORD2>ibase_execute</KEYWORD2>
+			<KEYWORD2>ibase_fetch_assoc</KEYWORD2>
+			<KEYWORD2>ibase_fetch_object</KEYWORD2>
+			<KEYWORD2>ibase_fetch_row</KEYWORD2>
+			<KEYWORD2>ibase_field_info</KEYWORD2>
+			<KEYWORD2>ibase_free_event_handler</KEYWORD2>
+			<KEYWORD2>ibase_free_query</KEYWORD2>
+			<KEYWORD2>ibase_free_result</KEYWORD2>
+			<KEYWORD2>ibase_gen_id</KEYWORD2>
+			<KEYWORD2>ibase_maintain_db</KEYWORD2>
+			<KEYWORD2>ibase_modify_user</KEYWORD2>
+			<KEYWORD2>ibase_name_result</KEYWORD2>
+			<KEYWORD2>ibase_num_fields</KEYWORD2>
+			<KEYWORD2>ibase_num_params</KEYWORD2>
+			<KEYWORD2>ibase_param_info</KEYWORD2>
+			<KEYWORD2>ibase_pconnect</KEYWORD2>
+			<KEYWORD2>ibase_prepare</KEYWORD2>
+			<KEYWORD2>ibase_query</KEYWORD2>
+			<KEYWORD2>ibase_restore</KEYWORD2>
+			<KEYWORD2>ibase_rollback</KEYWORD2>
+			<KEYWORD2>ibase_rollback_ret</KEYWORD2>
+			<KEYWORD2>ibase_server_info</KEYWORD2>
+			<KEYWORD2>ibase_service_attach</KEYWORD2>
+			<KEYWORD2>ibase_service_detach</KEYWORD2>
+			<KEYWORD2>ibase_set_event_handler</KEYWORD2>
+			<KEYWORD2>ibase_timefmt</KEYWORD2>
+			<KEYWORD2>ibase_trans</KEYWORD2>
+			<KEYWORD2>ibase_wait_event</KEYWORD2>
+			<KEYWORD2>iconv</KEYWORD2>
+			<KEYWORD2>iconv_get_encoding</KEYWORD2>
+			<KEYWORD2>iconv_mime_decode</KEYWORD2>
+			<KEYWORD2>iconv_mime_decode_headers</KEYWORD2>
+			<KEYWORD2>iconv_mime_encode</KEYWORD2>
+			<KEYWORD2>iconv_set_encoding</KEYWORD2>
+			<KEYWORD2>iconv_strlen</KEYWORD2>
+			<KEYWORD2>iconv_strpos</KEYWORD2>
+			<KEYWORD2>iconv_strrpos</KEYWORD2>
+			<KEYWORD2>iconv_substr</KEYWORD2>
+			<KEYWORD2>id3_get_genre_id</KEYWORD2>
+			<KEYWORD2>id3_get_genre_list</KEYWORD2>
+			<KEYWORD2>id3_get_genre_name</KEYWORD2>
+			<KEYWORD2>id3_get_tag</KEYWORD2>
+			<KEYWORD2>id3_get_version</KEYWORD2>
+			<KEYWORD2>id3_remove_tag</KEYWORD2>
+			<KEYWORD2>id3_set_tag</KEYWORD2>
+			<KEYWORD2>idate</KEYWORD2>
+			<KEYWORD2>identify</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>ifx_affected_rows</KEYWORD2>
+			<KEYWORD2>ifx_blobinfile_mode</KEYWORD2>
+			<KEYWORD2>ifx_byteasvarchar</KEYWORD2>
+			<KEYWORD2>ifx_close</KEYWORD2>
+			<KEYWORD2>ifx_connect</KEYWORD2>
+			<KEYWORD2>ifx_copy_blob</KEYWORD2>
+			<KEYWORD2>ifx_create_blob</KEYWORD2>
+			<KEYWORD2>ifx_create_char</KEYWORD2>
+			<KEYWORD2>ifx_do</KEYWORD2>
+			<KEYWORD2>ifx_error</KEYWORD2>
+			<KEYWORD2>ifx_errormsg</KEYWORD2>
+			<KEYWORD2>ifx_fetch_row</KEYWORD2>
+			<KEYWORD2>ifx_fieldproperties</KEYWORD2>
+			<KEYWORD2>ifx_fieldtypes</KEYWORD2>
+			<KEYWORD2>ifx_free_blob</KEYWORD2>
+			<KEYWORD2>ifx_free_char</KEYWORD2>
+			<KEYWORD2>ifx_free_result</KEYWORD2>
+			<KEYWORD2>ifx_get_blob</KEYWORD2>
+			<KEYWORD2>ifx_get_char</KEYWORD2>
+			<KEYWORD2>ifx_getsqlca</KEYWORD2>
+			<KEYWORD2>ifx_htmltbl_result</KEYWORD2>
+			<KEYWORD2>ifx_nullformat</KEYWORD2>
+			<KEYWORD2>ifx_num_fields</KEYWORD2>
+			<KEYWORD2>ifx_num_rows</KEYWORD2>
+			<KEYWORD2>ifx_pconnect</KEYWORD2>
+			<KEYWORD2>ifx_prepare</KEYWORD2>
+			<KEYWORD2>ifx_query</KEYWORD2>
+			<KEYWORD2>ifx_textasvarchar</KEYWORD2>
+			<KEYWORD2>ifx_update_blob</KEYWORD2>
+			<KEYWORD2>ifx_update_char</KEYWORD2>
+			<KEYWORD2>ifxus_close_slob</KEYWORD2>
+			<KEYWORD2>ifxus_create_slob</KEYWORD2>
+			<KEYWORD2>ifxus_free_slob</KEYWORD2>
+			<KEYWORD2>ifxus_open_slob</KEYWORD2>
+			<KEYWORD2>ifxus_read_slob</KEYWORD2>
+			<KEYWORD2>ifxus_seek_slob</KEYWORD2>
+			<KEYWORD2>ifxus_tell_slob</KEYWORD2>
+			<KEYWORD2>ifxus_write_slob</KEYWORD2>
+			<KEYWORD2>ignore_user_abort</KEYWORD2>
+			<KEYWORD2>image2wbmp</KEYWORD2>
+			<KEYWORD2>image_type_to_extension</KEYWORD2>
+			<KEYWORD2>image_type_to_mime_type</KEYWORD2>
+			<KEYWORD2>imagealphablending</KEYWORD2>
+			<KEYWORD2>imageantialias</KEYWORD2>
+			<KEYWORD2>imagearc</KEYWORD2>
+			<KEYWORD2>imagechar</KEYWORD2>
+			<KEYWORD2>imagecharup</KEYWORD2>
+			<KEYWORD2>imagecolorallocate</KEYWORD2>
+			<KEYWORD2>imagecolorallocatealpha</KEYWORD2>
+			<KEYWORD2>imagecolorat</KEYWORD2>
+			<KEYWORD2>imagecolorclosest</KEYWORD2>
+			<KEYWORD2>imagecolorclosestalpha</KEYWORD2>
+			<KEYWORD2>imagecolorclosesthwb</KEYWORD2>
+			<KEYWORD2>imagecolordeallocate</KEYWORD2>
+			<KEYWORD2>imagecolorexact</KEYWORD2>
+			<KEYWORD2>imagecolorexactalpha</KEYWORD2>
+			<KEYWORD2>imagecolormatch</KEYWORD2>
+			<KEYWORD2>imagecolorresolve</KEYWORD2>
+			<KEYWORD2>imagecolorresolvealpha</KEYWORD2>
+			<KEYWORD2>imagecolorset</KEYWORD2>
+			<KEYWORD2>imagecolorsforindex</KEYWORD2>
+			<KEYWORD2>imagecolorstotal</KEYWORD2>
+			<KEYWORD2>imagecolortransparent</KEYWORD2>
+			<KEYWORD2>imagecopy</KEYWORD2>
+			<KEYWORD2>imagecopymerge</KEYWORD2>
+			<KEYWORD2>imagecopymergegray</KEYWORD2>
+			<KEYWORD2>imagecopyresampled</KEYWORD2>
+			<KEYWORD2>imagecopyresized</KEYWORD2>
+			<KEYWORD2>imagecreate</KEYWORD2>
+			<KEYWORD2>imagecreatefromgd</KEYWORD2>
+			<KEYWORD2>imagecreatefromgd2</KEYWORD2>
+			<KEYWORD2>imagecreatefromgd2part</KEYWORD2>
+			<KEYWORD2>imagecreatefromgif</KEYWORD2>
+			<KEYWORD2>imagecreatefromjpeg</KEYWORD2>
+			<KEYWORD2>imagecreatefrompng</KEYWORD2>
+			<KEYWORD2>imagecreatefromstring</KEYWORD2>
+			<KEYWORD2>imagecreatefromwbmp</KEYWORD2>
+			<KEYWORD2>imagecreatefromxbm</KEYWORD2>
+			<KEYWORD2>imagecreatefromxpm</KEYWORD2>
+			<KEYWORD2>imagecreatetruecolor</KEYWORD2>
+			<KEYWORD2>imagedashedline</KEYWORD2>
+			<KEYWORD2>imagedestroy</KEYWORD2>
+			<KEYWORD2>imageellipse</KEYWORD2>
+			<KEYWORD2>imagefill</KEYWORD2>
+			<KEYWORD2>imagefilledarc</KEYWORD2>
+			<KEYWORD2>imagefilledellipse</KEYWORD2>
+			<KEYWORD2>imagefilledpolygon</KEYWORD2>
+			<KEYWORD2>imagefilledrectangle</KEYWORD2>
+			<KEYWORD2>imagefilltoborder</KEYWORD2>
+			<KEYWORD2>imagefilter</KEYWORD2>
+			<KEYWORD2>imagefontheight</KEYWORD2>
+			<KEYWORD2>imagefontwidth</KEYWORD2>
+			<KEYWORD2>imageftbbox</KEYWORD2>
+			<KEYWORD2>imagefttext</KEYWORD2>
+			<KEYWORD2>imagegammacorrect</KEYWORD2>
+			<KEYWORD2>imagegd</KEYWORD2>
+			<KEYWORD2>imagegd2</KEYWORD2>
+			<KEYWORD2>imagegif</KEYWORD2>
+			<KEYWORD2>imageinterlace</KEYWORD2>
+			<KEYWORD2>imageistruecolor</KEYWORD2>
+			<KEYWORD2>imagejpeg</KEYWORD2>
+			<KEYWORD2>imagelayereffect</KEYWORD2>
+			<KEYWORD2>imageline</KEYWORD2>
+			<KEYWORD2>imageloadfont</KEYWORD2>
+			<KEYWORD2>imagepalettecopy</KEYWORD2>
+			<KEYWORD2>imagepng</KEYWORD2>
+			<KEYWORD2>imagepolygon</KEYWORD2>
+			<KEYWORD2>imagepsbbox</KEYWORD2>
+			<KEYWORD2>imagepscopyfont</KEYWORD2>
+			<KEYWORD2>imagepsencodefont</KEYWORD2>
+			<KEYWORD2>imagepsextendfont</KEYWORD2>
+			<KEYWORD2>imagepsfreefont</KEYWORD2>
+			<KEYWORD2>imagepsloadfont</KEYWORD2>
+			<KEYWORD2>imagepsslantfont</KEYWORD2>
+			<KEYWORD2>imagepstext</KEYWORD2>
+			<KEYWORD2>imagerectangle</KEYWORD2>
+			<KEYWORD2>imagerotate</KEYWORD2>
+			<KEYWORD2>imagesavealpha</KEYWORD2>
+			<KEYWORD2>imagesetbrush</KEYWORD2>
+			<KEYWORD2>imagesetpixel</KEYWORD2>
+			<KEYWORD2>imagesetstyle</KEYWORD2>
+			<KEYWORD2>imagesetthickness</KEYWORD2>
+			<KEYWORD2>imagesettile</KEYWORD2>
+			<KEYWORD2>imagestring</KEYWORD2>
+			<KEYWORD2>imagestringup</KEYWORD2>
+			<KEYWORD2>imagesx</KEYWORD2>
+			<KEYWORD2>imagesy</KEYWORD2>
+			<KEYWORD2>imagetruecolortopalette</KEYWORD2>
+			<KEYWORD2>imagettfbbox</KEYWORD2>
+			<KEYWORD2>imagettftext</KEYWORD2>
+			<KEYWORD2>imagetypes</KEYWORD2>
+			<KEYWORD2>imagewbmp</KEYWORD2>
+			<KEYWORD2>imagexbm</KEYWORD2>
+			<KEYWORD2>imap_8bit</KEYWORD2>
+			<KEYWORD2>imap_alerts</KEYWORD2>
+			<KEYWORD2>imap_append</KEYWORD2>
+			<KEYWORD2>imap_base64</KEYWORD2>
+			<KEYWORD2>imap_binary</KEYWORD2>
+			<KEYWORD2>imap_body</KEYWORD2>
+			<KEYWORD2>imap_bodystruct</KEYWORD2>
+			<KEYWORD2>imap_check</KEYWORD2>
+			<KEYWORD2>imap_clearflag_full</KEYWORD2>
+			<KEYWORD2>imap_close</KEYWORD2>
+			<KEYWORD2>imap_createmailbox</KEYWORD2>
+			<KEYWORD2>imap_delete</KEYWORD2>
+			<KEYWORD2>imap_deletemailbox</KEYWORD2>
+			<KEYWORD2>imap_errors</KEYWORD2>
+			<KEYWORD2>imap_expunge</KEYWORD2>
+			<KEYWORD2>imap_fetch_overview</KEYWORD2>
+			<KEYWORD2>imap_fetchbody</KEYWORD2>
+			<KEYWORD2>imap_fetchheader</KEYWORD2>
+			<KEYWORD2>imap_fetchstructure</KEYWORD2>
+			<KEYWORD2>imap_get_quota</KEYWORD2>
+			<KEYWORD2>imap_get_quotaroot</KEYWORD2>
+			<KEYWORD2>imap_getacl</KEYWORD2>
+			<KEYWORD2>imap_getmailboxes</KEYWORD2>
+			<KEYWORD2>imap_getsubscribed</KEYWORD2>
+			<KEYWORD2>imap_header</KEYWORD2>
+			<KEYWORD2>imap_headerinfo</KEYWORD2>
+			<KEYWORD2>imap_headers</KEYWORD2>
+			<KEYWORD2>imap_last_error</KEYWORD2>
+			<KEYWORD2>imap_list</KEYWORD2>
+			<KEYWORD2>imap_listmailbox</KEYWORD2>
+			<KEYWORD2>imap_listscan</KEYWORD2>
+			<KEYWORD2>imap_listsubscribed</KEYWORD2>
+			<KEYWORD2>imap_lsub</KEYWORD2>
+			<KEYWORD2>imap_mail</KEYWORD2>
+			<KEYWORD2>imap_mail_compose</KEYWORD2>
+			<KEYWORD2>imap_mail_copy</KEYWORD2>
+			<KEYWORD2>imap_mail_move</KEYWORD2>
+			<KEYWORD2>imap_mailboxmsginfo</KEYWORD2>
+			<KEYWORD2>imap_mime_header_decode</KEYWORD2>
+			<KEYWORD2>imap_msgno</KEYWORD2>
+			<KEYWORD2>imap_num_msg</KEYWORD2>
+			<KEYWORD2>imap_num_recent</KEYWORD2>
+			<KEYWORD2>imap_open</KEYWORD2>
+			<KEYWORD2>imap_ping</KEYWORD2>
+			<KEYWORD2>imap_qprint</KEYWORD2>
+			<KEYWORD2>imap_renamemailbox</KEYWORD2>
+			<KEYWORD2>imap_reopen</KEYWORD2>
+			<KEYWORD2>imap_rfc822_parse_adrlist</KEYWORD2>
+			<KEYWORD2>imap_rfc822_parse_headers</KEYWORD2>
+			<KEYWORD2>imap_rfc822_write_address</KEYWORD2>
+			<KEYWORD2>imap_scanmailbox</KEYWORD2>
+			<KEYWORD2>imap_search</KEYWORD2>
+			<KEYWORD2>imap_set_quota</KEYWORD2>
+			<KEYWORD2>imap_setacl</KEYWORD2>
+			<KEYWORD2>imap_setflag_full</KEYWORD2>
+			<KEYWORD2>imap_sort</KEYWORD2>
+			<KEYWORD2>imap_status</KEYWORD2>
+			<KEYWORD2>imap_subscribe</KEYWORD2>
+			<KEYWORD2>imap_thread</KEYWORD2>
+			<KEYWORD2>imap_timeout</KEYWORD2>
+			<KEYWORD2>imap_uid</KEYWORD2>
+			<KEYWORD2>imap_undelete</KEYWORD2>
+			<KEYWORD2>imap_unsubscribe</KEYWORD2>
+			<KEYWORD2>imap_utf7_decode</KEYWORD2>
+			<KEYWORD2>imap_utf7_encode</KEYWORD2>
+			<KEYWORD2>imap_utf8</KEYWORD2>
+			<KEYWORD2>implode</KEYWORD2>
+			<KEYWORD2>import</KEYWORD2> <!-- lob -->
+			<KEYWORD2>import_request_variables</KEYWORD2>
+			<KEYWORD2>importnode</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>in_array</KEYWORD2>
+			<KEYWORD2>increment</KEYWORD2> <!-- memcache -->
+			<KEYWORD2>inet_ntop</KEYWORD2>
+			<KEYWORD2>inet_pton</KEYWORD2>
+			<KEYWORD2>info</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>ingres_autocommit</KEYWORD2>
+			<KEYWORD2>ingres_close</KEYWORD2>
+			<KEYWORD2>ingres_commit</KEYWORD2>
+			<KEYWORD2>ingres_connect</KEYWORD2>
+			<KEYWORD2>ingres_fetch_array</KEYWORD2>
+			<KEYWORD2>ingres_fetch_object</KEYWORD2>
+			<KEYWORD2>ingres_fetch_row</KEYWORD2>
+			<KEYWORD2>ingres_field_length</KEYWORD2>
+			<KEYWORD2>ingres_field_name</KEYWORD2>
+			<KEYWORD2>ingres_field_nullable</KEYWORD2>
+			<KEYWORD2>ingres_field_precision</KEYWORD2>
+			<KEYWORD2>ingres_field_scale</KEYWORD2>
+			<KEYWORD2>ingres_field_type</KEYWORD2>
+			<KEYWORD2>ingres_num_fields</KEYWORD2>
+			<KEYWORD2>ingres_num_rows</KEYWORD2>
+			<KEYWORD2>ingres_pconnect</KEYWORD2>
+			<KEYWORD2>ingres_query</KEYWORD2>
+			<KEYWORD2>ingres_rollback</KEYWORD2>
+			<KEYWORD2>ini_alter</KEYWORD2>
+			<KEYWORD2>ini_get</KEYWORD2>
+			<KEYWORD2>ini_get_all</KEYWORD2>
+			<KEYWORD2>ini_restore</KEYWORD2>
+			<KEYWORD2>ini_set</KEYWORD2>
+			<KEYWORD2>insert</KEYWORD2> <!-- hw_api, hw_api_object -->
+			<KEYWORD2>insert_before</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>insertanchor</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>insertbefore</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>insertcollection</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>insertdata</KEYWORD2> <!-- domcharacterdata -->
+			<KEYWORD2>insertdocument</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>interface_exists</KEYWORD2>
+			<KEYWORD2>internal_subset</KEYWORD2> <!-- domdocumenttype -->
+			<KEYWORD2>intval</KEYWORD2>
+			<KEYWORD2>ip2long</KEYWORD2>
+			<KEYWORD2>iptcembed</KEYWORD2>
+			<KEYWORD2>iptcparse</KEYWORD2>
+			<KEYWORD2>ircg_channel_mode</KEYWORD2>
+			<KEYWORD2>ircg_disconnect</KEYWORD2>
+			<KEYWORD2>ircg_eval_ecmascript_params</KEYWORD2>
+			<KEYWORD2>ircg_fetch_error_msg</KEYWORD2>
+			<KEYWORD2>ircg_get_username</KEYWORD2>
+			<KEYWORD2>ircg_html_encode</KEYWORD2>
+			<KEYWORD2>ircg_ignore_add</KEYWORD2>
+			<KEYWORD2>ircg_ignore_del</KEYWORD2>
+			<KEYWORD2>ircg_invite</KEYWORD2>
+			<KEYWORD2>ircg_is_conn_alive</KEYWORD2>
+			<KEYWORD2>ircg_join</KEYWORD2>
+			<KEYWORD2>ircg_kick</KEYWORD2>
+			<KEYWORD2>ircg_list</KEYWORD2>
+			<KEYWORD2>ircg_lookup_format_messages</KEYWORD2>
+			<KEYWORD2>ircg_lusers</KEYWORD2>
+			<KEYWORD2>ircg_msg</KEYWORD2>
+			<KEYWORD2>ircg_names</KEYWORD2>
+			<KEYWORD2>ircg_nick</KEYWORD2>
+			<KEYWORD2>ircg_nickname_escape</KEYWORD2>
+			<KEYWORD2>ircg_nickname_unescape</KEYWORD2>
+			<KEYWORD2>ircg_notice</KEYWORD2>
+			<KEYWORD2>ircg_oper</KEYWORD2>
+			<KEYWORD2>ircg_part</KEYWORD2>
+			<KEYWORD2>ircg_pconnect</KEYWORD2>
+			<KEYWORD2>ircg_register_format_messages</KEYWORD2>
+			<KEYWORD2>ircg_set_current</KEYWORD2>
+			<KEYWORD2>ircg_set_file</KEYWORD2>
+			<KEYWORD2>ircg_set_on_die</KEYWORD2>
+			<KEYWORD2>ircg_topic</KEYWORD2>
+			<KEYWORD2>ircg_who</KEYWORD2>
+			<KEYWORD2>ircg_whois</KEYWORD2>
+			<KEYWORD2>is_a</KEYWORD2>
+			<KEYWORD2>is_array</KEYWORD2>
+			<KEYWORD2>is_blank_node</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>is_bool</KEYWORD2>
+			<KEYWORD2>is_callable</KEYWORD2>
+			<KEYWORD2>is_dir</KEYWORD2>
+			<KEYWORD2>is_double</KEYWORD2>
+			<KEYWORD2>is_executable</KEYWORD2>
+			<KEYWORD2>is_file</KEYWORD2>
+			<KEYWORD2>is_finite</KEYWORD2>
+			<KEYWORD2>is_float</KEYWORD2>
+			<KEYWORD2>is_infinite</KEYWORD2>
+			<KEYWORD2>is_int</KEYWORD2>
+			<KEYWORD2>is_integer</KEYWORD2>
+			<KEYWORD2>is_link</KEYWORD2>
+			<KEYWORD2>is_long</KEYWORD2>
+			<KEYWORD2>is_nan</KEYWORD2>
+			<KEYWORD2>is_null</KEYWORD2>
+			<KEYWORD2>is_numeric</KEYWORD2>
+			<KEYWORD2>is_object</KEYWORD2>
+			<KEYWORD2>is_readable</KEYWORD2>
+			<KEYWORD2>is_real</KEYWORD2>
+			<KEYWORD2>is_resource</KEYWORD2>
+			<KEYWORD2>is_scalar</KEYWORD2>
+			<KEYWORD2>is_soap_fault</KEYWORD2>
+			<KEYWORD2>is_string</KEYWORD2>
+			<KEYWORD2>is_subclass_of</KEYWORD2>
+			<KEYWORD2>is_uploaded_file</KEYWORD2>
+			<KEYWORD2>is_writable</KEYWORD2>
+			<KEYWORD2>is_writeable</KEYWORD2>
+			<KEYWORD2>isasp</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>iscomment</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>isdir</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>isdot</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>isexecutable</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>isfile</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>ishtml</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>isid</KEYWORD2> <!-- domattr -->
+			<KEYWORD2>isjste</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>islink</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>isphp</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>isreadable</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>issamenode</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>issupported</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>istext</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>iswhitespaceinelementcontent</KEYWORD2> <!-- domtext -->
+			<KEYWORD2>iswritable</KEYWORD2> <!-- directoryiterator -->
+			<KEYWORD2>isxhtml</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>isxml</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>item</KEYWORD2> <!-- domnamednodemap, domnodelist -->
+			<KEYWORD2>iterator_count</KEYWORD2>
+			<KEYWORD2>iterator_to_array</KEYWORD2>
+			<KEYWORD2>java_last_exception_clear</KEYWORD2>
+			<KEYWORD2>java_last_exception_get</KEYWORD2>
+			<KEYWORD2>jddayofweek</KEYWORD2>
+			<KEYWORD2>jdmonthname</KEYWORD2>
+			<KEYWORD2>jdtofrench</KEYWORD2>
+			<KEYWORD2>jdtogregorian</KEYWORD2>
+			<KEYWORD2>jdtojewish</KEYWORD2>
+			<KEYWORD2>jdtojulian</KEYWORD2>
+			<KEYWORD2>jdtounix</KEYWORD2>
+			<KEYWORD2>jewishtojd</KEYWORD2>
+			<KEYWORD2>join</KEYWORD2>
+			<KEYWORD2>jpeg2wbmp</KEYWORD2>
+			<KEYWORD2>juliantojd</KEYWORD2>
+			<KEYWORD2>key</KEYWORD2> <!-- arrayiterator, directoryiterator, filteriterator, hw_api_attribute, recursivedirectoryiterator, recursiveiteratoriterator, simplexmliterator -->
+			<KEYWORD2>krsort</KEYWORD2>
+			<KEYWORD2>ksort</KEYWORD2>
+			<KEYWORD2>langdepvalue</KEYWORD2> <!-- hw_api_attribute -->
+			<KEYWORD2>last_child</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>lastinsertid</KEYWORD2> <!-- pdo -->
+			<KEYWORD2>lcg_value</KEYWORD2>
+			<KEYWORD2>ldap_8859_to_t61</KEYWORD2>
+			<KEYWORD2>ldap_add</KEYWORD2>
+			<KEYWORD2>ldap_bind</KEYWORD2>
+			<KEYWORD2>ldap_close</KEYWORD2>
+			<KEYWORD2>ldap_compare</KEYWORD2>
+			<KEYWORD2>ldap_connect</KEYWORD2>
+			<KEYWORD2>ldap_count_entries</KEYWORD2>
+			<KEYWORD2>ldap_delete</KEYWORD2>
+			<KEYWORD2>ldap_dn2ufn</KEYWORD2>
+			<KEYWORD2>ldap_err2str</KEYWORD2>
+			<KEYWORD2>ldap_errno</KEYWORD2>
+			<KEYWORD2>ldap_error</KEYWORD2>
+			<KEYWORD2>ldap_explode_dn</KEYWORD2>
+			<KEYWORD2>ldap_first_attribute</KEYWORD2>
+			<KEYWORD2>ldap_first_entry</KEYWORD2>
+			<KEYWORD2>ldap_first_reference</KEYWORD2>
+			<KEYWORD2>ldap_free_result</KEYWORD2>
+			<KEYWORD2>ldap_get_attributes</KEYWORD2>
+			<KEYWORD2>ldap_get_dn</KEYWORD2>
+			<KEYWORD2>ldap_get_entries</KEYWORD2>
+			<KEYWORD2>ldap_get_option</KEYWORD2>
+			<KEYWORD2>ldap_get_values</KEYWORD2>
+			<KEYWORD2>ldap_get_values_len</KEYWORD2>
+			<KEYWORD2>ldap_list</KEYWORD2>
+			<KEYWORD2>ldap_mod_add</KEYWORD2>
+			<KEYWORD2>ldap_mod_del</KEYWORD2>
+			<KEYWORD2>ldap_mod_replace</KEYWORD2>
+			<KEYWORD2>ldap_modify</KEYWORD2>
+			<KEYWORD2>ldap_next_attribute</KEYWORD2>
+			<KEYWORD2>ldap_next_entry</KEYWORD2>
+			<KEYWORD2>ldap_next_reference</KEYWORD2>
+			<KEYWORD2>ldap_parse_reference</KEYWORD2>
+			<KEYWORD2>ldap_parse_result</KEYWORD2>
+			<KEYWORD2>ldap_read</KEYWORD2>
+			<KEYWORD2>ldap_rename</KEYWORD2>
+			<KEYWORD2>ldap_sasl_bind</KEYWORD2>
+			<KEYWORD2>ldap_search</KEYWORD2>
+			<KEYWORD2>ldap_set_option</KEYWORD2>
+			<KEYWORD2>ldap_set_rebind_proc</KEYWORD2>
+			<KEYWORD2>ldap_sort</KEYWORD2>
+			<KEYWORD2>ldap_start_tls</KEYWORD2>
+			<KEYWORD2>ldap_t61_to_8859</KEYWORD2>
+			<KEYWORD2>ldap_unbind</KEYWORD2>
+			<KEYWORD2>levenshtein</KEYWORD2>
+			<KEYWORD2>link</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>linkinfo</KEYWORD2>
+			<KEYWORD2>load</KEYWORD2> <!-- domdocument, lob -->
+			<KEYWORD2>loadhtml</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>loadhtmlfile</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>loadxml</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>localeconv</KEYWORD2>
+			<KEYWORD2>localtime</KEYWORD2>
+			<KEYWORD2>lock</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>log</KEYWORD2>
+			<KEYWORD2>log10</KEYWORD2>
+			<KEYWORD2>log1p</KEYWORD2>
+			<KEYWORD2>long2ip</KEYWORD2>
+			<KEYWORD2>lookupnamespaceuri</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>lookupprefix</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>lstat</KEYWORD2>
+			<KEYWORD2>ltrim</KEYWORD2>
+			<KEYWORD2>lzf_compress</KEYWORD2>
+			<KEYWORD2>lzf_decompress</KEYWORD2>
+			<KEYWORD2>lzf_optimized_for</KEYWORD2>
+			<KEYWORD2>mail</KEYWORD2>
+			<KEYWORD2>mailparse_determine_best_xfer_encoding</KEYWORD2>
+			<KEYWORD2>mailparse_msg_create</KEYWORD2>
+			<KEYWORD2>mailparse_msg_extract_part</KEYWORD2>
+			<KEYWORD2>mailparse_msg_extract_part_file</KEYWORD2>
+			<KEYWORD2>mailparse_msg_free</KEYWORD2>
+			<KEYWORD2>mailparse_msg_get_part</KEYWORD2>
+			<KEYWORD2>mailparse_msg_get_part_data</KEYWORD2>
+			<KEYWORD2>mailparse_msg_get_structure</KEYWORD2>
+			<KEYWORD2>mailparse_msg_parse</KEYWORD2>
+			<KEYWORD2>mailparse_msg_parse_file</KEYWORD2>
+			<KEYWORD2>mailparse_rfc822_parse_addresses</KEYWORD2>
+			<KEYWORD2>mailparse_stream_encode</KEYWORD2>
+			<KEYWORD2>mailparse_uudecode_all</KEYWORD2>
+			<KEYWORD2>main</KEYWORD2>
+			<KEYWORD2>max</KEYWORD2> <!-- collection -->
+			<KEYWORD2>mb_convert_case</KEYWORD2>
+			<KEYWORD2>mb_convert_encoding</KEYWORD2>
+			<KEYWORD2>mb_convert_kana</KEYWORD2>
+			<KEYWORD2>mb_convert_variables</KEYWORD2>
+			<KEYWORD2>mb_decode_mimeheader</KEYWORD2>
+			<KEYWORD2>mb_decode_numericentity</KEYWORD2>
+			<KEYWORD2>mb_detect_encoding</KEYWORD2>
+			<KEYWORD2>mb_detect_order</KEYWORD2>
+			<KEYWORD2>mb_encode_mimeheader</KEYWORD2>
+			<KEYWORD2>mb_encode_numericentity</KEYWORD2>
+			<KEYWORD2>mb_ereg</KEYWORD2>
+			<KEYWORD2>mb_ereg_match</KEYWORD2>
+			<KEYWORD2>mb_ereg_replace</KEYWORD2>
+			<KEYWORD2>mb_ereg_search</KEYWORD2>
+			<KEYWORD2>mb_ereg_search_getpos</KEYWORD2>
+			<KEYWORD2>mb_ereg_search_getregs</KEYWORD2>
+			<KEYWORD2>mb_ereg_search_init</KEYWORD2>
+			<KEYWORD2>mb_ereg_search_pos</KEYWORD2>
+			<KEYWORD2>mb_ereg_search_regs</KEYWORD2>
+			<KEYWORD2>mb_ereg_search_setpos</KEYWORD2>
+			<KEYWORD2>mb_eregi</KEYWORD2>
+			<KEYWORD2>mb_eregi_replace</KEYWORD2>
+			<KEYWORD2>mb_get_info</KEYWORD2>
+			<KEYWORD2>mb_http_input</KEYWORD2>
+			<KEYWORD2>mb_http_output</KEYWORD2>
+			<KEYWORD2>mb_internal_encoding</KEYWORD2>
+			<KEYWORD2>mb_language</KEYWORD2>
+			<KEYWORD2>mb_list_encodings</KEYWORD2>
+			<KEYWORD2>mb_output_handler</KEYWORD2>
+			<KEYWORD2>mb_parse_str</KEYWORD2>
+			<KEYWORD2>mb_preferred_mime_name</KEYWORD2>
+			<KEYWORD2>mb_regex_encoding</KEYWORD2>
+			<KEYWORD2>mb_regex_set_options</KEYWORD2>
+			<KEYWORD2>mb_send_mail</KEYWORD2>
+			<KEYWORD2>mb_split</KEYWORD2>
+			<KEYWORD2>mb_strcut</KEYWORD2>
+			<KEYWORD2>mb_strimwidth</KEYWORD2>
+			<KEYWORD2>mb_strlen</KEYWORD2>
+			<KEYWORD2>mb_strpos</KEYWORD2>
+			<KEYWORD2>mb_strrpos</KEYWORD2>
+			<KEYWORD2>mb_strtolower</KEYWORD2>
+			<KEYWORD2>mb_strtoupper</KEYWORD2>
+			<KEYWORD2>mb_strwidth</KEYWORD2>
+			<KEYWORD2>mb_substitute_character</KEYWORD2>
+			<KEYWORD2>mb_substr</KEYWORD2>
+			<KEYWORD2>mb_substr_count</KEYWORD2>
+			<KEYWORD2>mcal_append_event</KEYWORD2>
+			<KEYWORD2>mcal_close</KEYWORD2>
+			<KEYWORD2>mcal_create_calendar</KEYWORD2>
+			<KEYWORD2>mcal_date_compare</KEYWORD2>
+			<KEYWORD2>mcal_date_valid</KEYWORD2>
+			<KEYWORD2>mcal_day_of_week</KEYWORD2>
+			<KEYWORD2>mcal_day_of_year</KEYWORD2>
+			<KEYWORD2>mcal_days_in_month</KEYWORD2>
+			<KEYWORD2>mcal_delete_calendar</KEYWORD2>
+			<KEYWORD2>mcal_delete_event</KEYWORD2>
+			<KEYWORD2>mcal_event_add_attribute</KEYWORD2>
+			<KEYWORD2>mcal_event_init</KEYWORD2>
+			<KEYWORD2>mcal_event_set_alarm</KEYWORD2>
+			<KEYWORD2>mcal_event_set_category</KEYWORD2>
+			<KEYWORD2>mcal_event_set_class</KEYWORD2>
+			<KEYWORD2>mcal_event_set_description</KEYWORD2>
+			<KEYWORD2>mcal_event_set_end</KEYWORD2>
+			<KEYWORD2>mcal_event_set_recur_daily</KEYWORD2>
+			<KEYWORD2>mcal_event_set_recur_monthly_mday</KEYWORD2>
+			<KEYWORD2>mcal_event_set_recur_monthly_wday</KEYWORD2>
+			<KEYWORD2>mcal_event_set_recur_none</KEYWORD2>
+			<KEYWORD2>mcal_event_set_recur_weekly</KEYWORD2>
+			<KEYWORD2>mcal_event_set_recur_yearly</KEYWORD2>
+			<KEYWORD2>mcal_event_set_start</KEYWORD2>
+			<KEYWORD2>mcal_event_set_title</KEYWORD2>
+			<KEYWORD2>mcal_expunge</KEYWORD2>
+			<KEYWORD2>mcal_fetch_current_stream_event</KEYWORD2>
+			<KEYWORD2>mcal_fetch_event</KEYWORD2>
+			<KEYWORD2>mcal_is_leap_year</KEYWORD2>
+			<KEYWORD2>mcal_list_alarms</KEYWORD2>
+			<KEYWORD2>mcal_list_events</KEYWORD2>
+			<KEYWORD2>mcal_next_recurrence</KEYWORD2>
+			<KEYWORD2>mcal_open</KEYWORD2>
+			<KEYWORD2>mcal_popen</KEYWORD2>
+			<KEYWORD2>mcal_rename_calendar</KEYWORD2>
+			<KEYWORD2>mcal_reopen</KEYWORD2>
+			<KEYWORD2>mcal_snooze</KEYWORD2>
+			<KEYWORD2>mcal_store_event</KEYWORD2>
+			<KEYWORD2>mcal_time_valid</KEYWORD2>
+			<KEYWORD2>mcal_week_of_year</KEYWORD2>
+			<KEYWORD2>mcrypt_cbc</KEYWORD2>
+			<KEYWORD2>mcrypt_cfb</KEYWORD2>
+			<KEYWORD2>mcrypt_create_iv</KEYWORD2>
+			<KEYWORD2>mcrypt_decrypt</KEYWORD2>
+			<KEYWORD2>mcrypt_ecb</KEYWORD2>
+			<KEYWORD2>mcrypt_enc_get_algorithms_name</KEYWORD2>
+			<KEYWORD2>mcrypt_enc_get_block_size</KEYWORD2>
+			<KEYWORD2>mcrypt_enc_get_iv_size</KEYWORD2>
+			<KEYWORD2>mcrypt_enc_get_key_size</KEYWORD2>
+			<KEYWORD2>mcrypt_enc_get_modes_name</KEYWORD2>
+			<KEYWORD2>mcrypt_enc_get_supported_key_sizes</KEYWORD2>
+			<KEYWORD2>mcrypt_enc_is_block_algorithm</KEYWORD2>
+			<KEYWORD2>mcrypt_enc_is_block_algorithm_mode</KEYWORD2>
+			<KEYWORD2>mcrypt_enc_is_block_mode</KEYWORD2>
+			<KEYWORD2>mcrypt_enc_self_test</KEYWORD2>
+			<KEYWORD2>mcrypt_encrypt</KEYWORD2>
+			<KEYWORD2>mcrypt_generic</KEYWORD2>
+			<KEYWORD2>mcrypt_generic_deinit</KEYWORD2>
+			<KEYWORD2>mcrypt_generic_end</KEYWORD2>
+			<KEYWORD2>mcrypt_generic_init</KEYWORD2>
+			<KEYWORD2>mcrypt_get_block_size</KEYWORD2>
+			<KEYWORD2>mcrypt_get_cipher_name</KEYWORD2>
+			<KEYWORD2>mcrypt_get_iv_size</KEYWORD2>
+			<KEYWORD2>mcrypt_get_key_size</KEYWORD2>
+			<KEYWORD2>mcrypt_list_algorithms</KEYWORD2>
+			<KEYWORD2>mcrypt_list_modes</KEYWORD2>
+			<KEYWORD2>mcrypt_module_close</KEYWORD2>
+			<KEYWORD2>mcrypt_module_get_algo_block_size</KEYWORD2>
+			<KEYWORD2>mcrypt_module_get_algo_key_size</KEYWORD2>
+			<KEYWORD2>mcrypt_module_get_supported_key_sizes</KEYWORD2>
+			<KEYWORD2>mcrypt_module_is_block_algorithm</KEYWORD2>
+			<KEYWORD2>mcrypt_module_is_block_algorithm_mode</KEYWORD2>
+			<KEYWORD2>mcrypt_module_is_block_mode</KEYWORD2>
+			<KEYWORD2>mcrypt_module_open</KEYWORD2>
+			<KEYWORD2>mcrypt_module_self_test</KEYWORD2>
+			<KEYWORD2>mcrypt_ofb</KEYWORD2>
+			<KEYWORD2>mcve_adduser</KEYWORD2>
+			<KEYWORD2>mcve_adduserarg</KEYWORD2>
+			<KEYWORD2>mcve_bt</KEYWORD2>
+			<KEYWORD2>mcve_checkstatus</KEYWORD2>
+			<KEYWORD2>mcve_chkpwd</KEYWORD2>
+			<KEYWORD2>mcve_chngpwd</KEYWORD2>
+			<KEYWORD2>mcve_completeauthorizations</KEYWORD2>
+			<KEYWORD2>mcve_connect</KEYWORD2>
+			<KEYWORD2>mcve_connectionerror</KEYWORD2>
+			<KEYWORD2>mcve_deleteresponse</KEYWORD2>
+			<KEYWORD2>mcve_deletetrans</KEYWORD2>
+			<KEYWORD2>mcve_deleteusersetup</KEYWORD2>
+			<KEYWORD2>mcve_deluser</KEYWORD2>
+			<KEYWORD2>mcve_destroyconn</KEYWORD2>
+			<KEYWORD2>mcve_destroyengine</KEYWORD2>
+			<KEYWORD2>mcve_disableuser</KEYWORD2>
+			<KEYWORD2>mcve_edituser</KEYWORD2>
+			<KEYWORD2>mcve_enableuser</KEYWORD2>
+			<KEYWORD2>mcve_force</KEYWORD2>
+			<KEYWORD2>mcve_getcell</KEYWORD2>
+			<KEYWORD2>mcve_getcellbynum</KEYWORD2>
+			<KEYWORD2>mcve_getcommadelimited</KEYWORD2>
+			<KEYWORD2>mcve_getheader</KEYWORD2>
+			<KEYWORD2>mcve_getuserarg</KEYWORD2>
+			<KEYWORD2>mcve_getuserparam</KEYWORD2>
+			<KEYWORD2>mcve_gft</KEYWORD2>
+			<KEYWORD2>mcve_gl</KEYWORD2>
+			<KEYWORD2>mcve_gut</KEYWORD2>
+			<KEYWORD2>mcve_initconn</KEYWORD2>
+			<KEYWORD2>mcve_initengine</KEYWORD2>
+			<KEYWORD2>mcve_initusersetup</KEYWORD2>
+			<KEYWORD2>mcve_iscommadelimited</KEYWORD2>
+			<KEYWORD2>mcve_liststats</KEYWORD2>
+			<KEYWORD2>mcve_listusers</KEYWORD2>
+			<KEYWORD2>mcve_maxconntimeout</KEYWORD2>
+			<KEYWORD2>mcve_monitor</KEYWORD2>
+			<KEYWORD2>mcve_numcolumns</KEYWORD2>
+			<KEYWORD2>mcve_numrows</KEYWORD2>
+			<KEYWORD2>mcve_override</KEYWORD2>
+			<KEYWORD2>mcve_parsecommadelimited</KEYWORD2>
+			<KEYWORD2>mcve_ping</KEYWORD2>
+			<KEYWORD2>mcve_preauth</KEYWORD2>
+			<KEYWORD2>mcve_preauthcompletion</KEYWORD2>
+			<KEYWORD2>mcve_qc</KEYWORD2>
+			<KEYWORD2>mcve_responseparam</KEYWORD2>
+			<KEYWORD2>mcve_return</KEYWORD2>
+			<KEYWORD2>mcve_returncode</KEYWORD2>
+			<KEYWORD2>mcve_returnstatus</KEYWORD2>
+			<KEYWORD2>mcve_sale</KEYWORD2>
+			<KEYWORD2>mcve_setblocking</KEYWORD2>
+			<KEYWORD2>mcve_setdropfile</KEYWORD2>
+			<KEYWORD2>mcve_setip</KEYWORD2>
+			<KEYWORD2>mcve_setssl</KEYWORD2>
+			<KEYWORD2>mcve_setssl_files</KEYWORD2>
+			<KEYWORD2>mcve_settimeout</KEYWORD2>
+			<KEYWORD2>mcve_settle</KEYWORD2>
+			<KEYWORD2>mcve_text_avs</KEYWORD2>
+			<KEYWORD2>mcve_text_code</KEYWORD2>
+			<KEYWORD2>mcve_text_cv</KEYWORD2>
+			<KEYWORD2>mcve_transactionauth</KEYWORD2>
+			<KEYWORD2>mcve_transactionavs</KEYWORD2>
+			<KEYWORD2>mcve_transactionbatch</KEYWORD2>
+			<KEYWORD2>mcve_transactioncv</KEYWORD2>
+			<KEYWORD2>mcve_transactionid</KEYWORD2>
+			<KEYWORD2>mcve_transactionitem</KEYWORD2>
+			<KEYWORD2>mcve_transactionssent</KEYWORD2>
+			<KEYWORD2>mcve_transactiontext</KEYWORD2>
+			<KEYWORD2>mcve_transinqueue</KEYWORD2>
+			<KEYWORD2>mcve_transnew</KEYWORD2>
+			<KEYWORD2>mcve_transparam</KEYWORD2>
+			<KEYWORD2>mcve_transsend</KEYWORD2>
+			<KEYWORD2>mcve_ub</KEYWORD2>
+			<KEYWORD2>mcve_uwait</KEYWORD2>
+			<KEYWORD2>mcve_verifyconnection</KEYWORD2>
+			<KEYWORD2>mcve_verifysslcert</KEYWORD2>
+			<KEYWORD2>mcve_void</KEYWORD2>
+			<KEYWORD2>md5</KEYWORD2>
+			<KEYWORD2>md5_file</KEYWORD2>
+			<KEYWORD2>mdecrypt_generic</KEYWORD2>
+			<KEYWORD2>memcache_debug</KEYWORD2>
+			<KEYWORD2>memory_get_usage</KEYWORD2>
+			<KEYWORD2>metaphone</KEYWORD2>
+			<KEYWORD2>method_exists</KEYWORD2>
+			<KEYWORD2>mhash</KEYWORD2>
+			<KEYWORD2>mhash_count</KEYWORD2>
+			<KEYWORD2>mhash_get_block_size</KEYWORD2>
+			<KEYWORD2>mhash_get_hash_name</KEYWORD2>
+			<KEYWORD2>mhash_keygen_s2k</KEYWORD2>
+			<KEYWORD2>microtime</KEYWORD2>
+			<KEYWORD2>mime_content_type</KEYWORD2>
+			<KEYWORD2>mimetype</KEYWORD2> <!-- hw_api_content -->
+			<KEYWORD2>min</KEYWORD2>
+			<KEYWORD2>ming_setcubicthreshold</KEYWORD2>
+			<KEYWORD2>ming_setscale</KEYWORD2>
+			<KEYWORD2>ming_useswfversion</KEYWORD2>
+			<KEYWORD2>mkdir</KEYWORD2>
+			<KEYWORD2>mktime</KEYWORD2>
+			<KEYWORD2>money_format</KEYWORD2>
+			<KEYWORD2>move</KEYWORD2> <!-- hw_api, swfdisplayitem -->
+			<KEYWORD2>move_uploaded_file</KEYWORD2>
+			<KEYWORD2>movepen</KEYWORD2> <!-- swfshape -->
+			<KEYWORD2>movepento</KEYWORD2> <!-- swfshape -->
+			<KEYWORD2>moveto</KEYWORD2> <!-- swfdisplayitem, swffill, swftext -->
+			<KEYWORD2>msession_connect</KEYWORD2>
+			<KEYWORD2>msession_count</KEYWORD2>
+			<KEYWORD2>msession_create</KEYWORD2>
+			<KEYWORD2>msession_destroy</KEYWORD2>
+			<KEYWORD2>msession_disconnect</KEYWORD2>
+			<KEYWORD2>msession_find</KEYWORD2>
+			<KEYWORD2>msession_get</KEYWORD2>
+			<KEYWORD2>msession_get_array</KEYWORD2>
+			<KEYWORD2>msession_get_data</KEYWORD2>
+			<KEYWORD2>msession_inc</KEYWORD2>
+			<KEYWORD2>msession_list</KEYWORD2>
+			<KEYWORD2>msession_listvar</KEYWORD2>
+			<KEYWORD2>msession_lock</KEYWORD2>
+			<KEYWORD2>msession_plugin</KEYWORD2>
+			<KEYWORD2>msession_randstr</KEYWORD2>
+			<KEYWORD2>msession_set</KEYWORD2>
+			<KEYWORD2>msession_set_array</KEYWORD2>
+			<KEYWORD2>msession_set_data</KEYWORD2>
+			<KEYWORD2>msession_timeout</KEYWORD2>
+			<KEYWORD2>msession_uniq</KEYWORD2>
+			<KEYWORD2>msession_unlock</KEYWORD2>
+			<KEYWORD2>msg_get_queue</KEYWORD2>
+			<KEYWORD2>msg_receive</KEYWORD2>
+			<KEYWORD2>msg_remove_queue</KEYWORD2>
+			<KEYWORD2>msg_send</KEYWORD2>
+			<KEYWORD2>msg_set_queue</KEYWORD2>
+			<KEYWORD2>msg_stat_queue</KEYWORD2>
+			<KEYWORD2>msql</KEYWORD2>
+			<KEYWORD2>msql_affected_rows</KEYWORD2>
+			<KEYWORD2>msql_close</KEYWORD2>
+			<KEYWORD2>msql_connect</KEYWORD2>
+			<KEYWORD2>msql_create_db</KEYWORD2>
+			<KEYWORD2>msql_createdb</KEYWORD2>
+			<KEYWORD2>msql_data_seek</KEYWORD2>
+			<KEYWORD2>msql_db_query</KEYWORD2>
+			<KEYWORD2>msql_dbname</KEYWORD2>
+			<KEYWORD2>msql_drop_db</KEYWORD2>
+			<KEYWORD2>msql_error</KEYWORD2>
+			<KEYWORD2>msql_fetch_array</KEYWORD2>
+			<KEYWORD2>msql_fetch_field</KEYWORD2>
+			<KEYWORD2>msql_fetch_object</KEYWORD2>
+			<KEYWORD2>msql_fetch_row</KEYWORD2>
+			<KEYWORD2>msql_field_flags</KEYWORD2>
+			<KEYWORD2>msql_field_len</KEYWORD2>
+			<KEYWORD2>msql_field_name</KEYWORD2>
+			<KEYWORD2>msql_field_seek</KEYWORD2>
+			<KEYWORD2>msql_field_table</KEYWORD2>
+			<KEYWORD2>msql_field_type</KEYWORD2>
+			<KEYWORD2>msql_fieldflags</KEYWORD2>
+			<KEYWORD2>msql_fieldlen</KEYWORD2>
+			<KEYWORD2>msql_fieldname</KEYWORD2>
+			<KEYWORD2>msql_fieldtable</KEYWORD2>
+			<KEYWORD2>msql_fieldtype</KEYWORD2>
+			<KEYWORD2>msql_free_result</KEYWORD2>
+			<KEYWORD2>msql_list_dbs</KEYWORD2>
+			<KEYWORD2>msql_list_fields</KEYWORD2>
+			<KEYWORD2>msql_list_tables</KEYWORD2>
+			<KEYWORD2>msql_num_fields</KEYWORD2>
+			<KEYWORD2>msql_num_rows</KEYWORD2>
+			<KEYWORD2>msql_numfields</KEYWORD2>
+			<KEYWORD2>msql_numrows</KEYWORD2>
+			<KEYWORD2>msql_pconnect</KEYWORD2>
+			<KEYWORD2>msql_query</KEYWORD2>
+			<KEYWORD2>msql_regcase</KEYWORD2>
+			<KEYWORD2>msql_result</KEYWORD2>
+			<KEYWORD2>msql_select_db</KEYWORD2>
+			<KEYWORD2>msql_tablename</KEYWORD2>
+			<KEYWORD2>mssql_bind</KEYWORD2>
+			<KEYWORD2>mssql_close</KEYWORD2>
+			<KEYWORD2>mssql_connect</KEYWORD2>
+			<KEYWORD2>mssql_data_seek</KEYWORD2>
+			<KEYWORD2>mssql_execute</KEYWORD2>
+			<KEYWORD2>mssql_fetch_array</KEYWORD2>
+			<KEYWORD2>mssql_fetch_assoc</KEYWORD2>
+			<KEYWORD2>mssql_fetch_batch</KEYWORD2>
+			<KEYWORD2>mssql_fetch_field</KEYWORD2>
+			<KEYWORD2>mssql_fetch_object</KEYWORD2>
+			<KEYWORD2>mssql_fetch_row</KEYWORD2>
+			<KEYWORD2>mssql_field_length</KEYWORD2>
+			<KEYWORD2>mssql_field_name</KEYWORD2>
+			<KEYWORD2>mssql_field_seek</KEYWORD2>
+			<KEYWORD2>mssql_field_type</KEYWORD2>
+			<KEYWORD2>mssql_free_result</KEYWORD2>
+			<KEYWORD2>mssql_free_statement</KEYWORD2>
+			<KEYWORD2>mssql_get_last_message</KEYWORD2>
+			<KEYWORD2>mssql_guid_string</KEYWORD2>
+			<KEYWORD2>mssql_init</KEYWORD2>
+			<KEYWORD2>mssql_min_error_severity</KEYWORD2>
+			<KEYWORD2>mssql_min_message_severity</KEYWORD2>
+			<KEYWORD2>mssql_next_result</KEYWORD2>
+			<KEYWORD2>mssql_num_fields</KEYWORD2>
+			<KEYWORD2>mssql_num_rows</KEYWORD2>
+			<KEYWORD2>mssql_pconnect</KEYWORD2>
+			<KEYWORD2>mssql_query</KEYWORD2>
+			<KEYWORD2>mssql_result</KEYWORD2>
+			<KEYWORD2>mssql_rows_affected</KEYWORD2>
+			<KEYWORD2>mssql_select_db</KEYWORD2>
+			<KEYWORD2>mt_getrandmax</KEYWORD2>
+			<KEYWORD2>mt_rand</KEYWORD2>
+			<KEYWORD2>mt_srand</KEYWORD2>
+			<KEYWORD2>multcolor</KEYWORD2> <!-- swfdisplayitem -->
+			<KEYWORD2>muscat_close</KEYWORD2>
+			<KEYWORD2>muscat_get</KEYWORD2>
+			<KEYWORD2>muscat_give</KEYWORD2>
+			<KEYWORD2>muscat_setup</KEYWORD2>
+			<KEYWORD2>muscat_setup_net</KEYWORD2>
+			<KEYWORD2>mysql_affected_rows</KEYWORD2>
+			<KEYWORD2>mysql_change_user</KEYWORD2>
+			<KEYWORD2>mysql_client_encoding</KEYWORD2>
+			<KEYWORD2>mysql_close</KEYWORD2>
+			<KEYWORD2>mysql_connect</KEYWORD2>
+			<KEYWORD2>mysql_create_db</KEYWORD2>
+			<KEYWORD2>mysql_data_seek</KEYWORD2>
+			<KEYWORD2>mysql_db_name</KEYWORD2>
+			<KEYWORD2>mysql_db_query</KEYWORD2>
+			<KEYWORD2>mysql_drop_db</KEYWORD2>
+			<KEYWORD2>mysql_errno</KEYWORD2>
+			<KEYWORD2>mysql_error</KEYWORD2>
+			<KEYWORD2>mysql_escape_string</KEYWORD2>
+			<KEYWORD2>mysql_fetch_array</KEYWORD2>
+			<KEYWORD2>mysql_fetch_assoc</KEYWORD2>
+			<KEYWORD2>mysql_fetch_field</KEYWORD2>
+			<KEYWORD2>mysql_fetch_lengths</KEYWORD2>
+			<KEYWORD2>mysql_fetch_object</KEYWORD2>
+			<KEYWORD2>mysql_fetch_row</KEYWORD2>
+			<KEYWORD2>mysql_field_flags</KEYWORD2>
+			<KEYWORD2>mysql_field_len</KEYWORD2>
+			<KEYWORD2>mysql_field_name</KEYWORD2>
+			<KEYWORD2>mysql_field_seek</KEYWORD2>
+			<KEYWORD2>mysql_field_table</KEYWORD2>
+			<KEYWORD2>mysql_field_type</KEYWORD2>
+			<KEYWORD2>mysql_free_result</KEYWORD2>
+			<KEYWORD2>mysql_get_client_info</KEYWORD2>
+			<KEYWORD2>mysql_get_host_info</KEYWORD2>
+			<KEYWORD2>mysql_get_proto_info</KEYWORD2>
+			<KEYWORD2>mysql_get_server_info</KEYWORD2>
+			<KEYWORD2>mysql_info</KEYWORD2>
+			<KEYWORD2>mysql_insert_id</KEYWORD2>
+			<KEYWORD2>mysql_list_dbs</KEYWORD2>
+			<KEYWORD2>mysql_list_fields</KEYWORD2>
+			<KEYWORD2>mysql_list_processes</KEYWORD2>
+			<KEYWORD2>mysql_list_tables</KEYWORD2>
+			<KEYWORD2>mysql_num_fields</KEYWORD2>
+			<KEYWORD2>mysql_num_rows</KEYWORD2>
+			<KEYWORD2>mysql_pconnect</KEYWORD2>
+			<KEYWORD2>mysql_ping</KEYWORD2>
+			<KEYWORD2>mysql_query</KEYWORD2>
+			<KEYWORD2>mysql_real_escape_string</KEYWORD2>
+			<KEYWORD2>mysql_result</KEYWORD2>
+			<KEYWORD2>mysql_select_db</KEYWORD2>
+			<KEYWORD2>mysql_stat</KEYWORD2>
+			<KEYWORD2>mysql_tablename</KEYWORD2>
+			<KEYWORD2>mysql_thread_id</KEYWORD2>
+			<KEYWORD2>mysql_unbuffered_query</KEYWORD2>
+			<KEYWORD2>mysqli_affected_rows</KEYWORD2>
+			<KEYWORD2>mysqli_autocommit</KEYWORD2>
+			<KEYWORD2>mysqli_bind_param</KEYWORD2>
+			<KEYWORD2>mysqli_bind_result</KEYWORD2>
+			<KEYWORD2>mysqli_change_user</KEYWORD2>
+			<KEYWORD2>mysqli_character_set_name</KEYWORD2>
+			<KEYWORD2>mysqli_client_encoding</KEYWORD2>
+			<KEYWORD2>mysqli_close</KEYWORD2>
+			<KEYWORD2>mysqli_commit</KEYWORD2>
+			<KEYWORD2>mysqli_connect</KEYWORD2>
+			<KEYWORD2>mysqli_connect_errno</KEYWORD2>
+			<KEYWORD2>mysqli_connect_error</KEYWORD2>
+			<KEYWORD2>mysqli_data_seek</KEYWORD2>
+			<KEYWORD2>mysqli_debug</KEYWORD2>
+			<KEYWORD2>mysqli_disable_reads_from_master</KEYWORD2>
+			<KEYWORD2>mysqli_disable_rpl_parse</KEYWORD2>
+			<KEYWORD2>mysqli_dump_debug_info</KEYWORD2>
+			<KEYWORD2>mysqli_embedded_connect</KEYWORD2>
+			<KEYWORD2>mysqli_enable_reads_from_master</KEYWORD2>
+			<KEYWORD2>mysqli_enable_rpl_parse</KEYWORD2>
+			<KEYWORD2>mysqli_errno</KEYWORD2>
+			<KEYWORD2>mysqli_error</KEYWORD2>
+			<KEYWORD2>mysqli_escape_string</KEYWORD2>
+			<KEYWORD2>mysqli_execute</KEYWORD2>
+			<KEYWORD2>mysqli_fetch</KEYWORD2>
+			<KEYWORD2>mysqli_fetch_array</KEYWORD2>
+			<KEYWORD2>mysqli_fetch_assoc</KEYWORD2>
+			<KEYWORD2>mysqli_fetch_field</KEYWORD2>
+			<KEYWORD2>mysqli_fetch_field_direct</KEYWORD2>
+			<KEYWORD2>mysqli_fetch_fields</KEYWORD2>
+			<KEYWORD2>mysqli_fetch_lengths</KEYWORD2>
+			<KEYWORD2>mysqli_fetch_object</KEYWORD2>
+			<KEYWORD2>mysqli_fetch_row</KEYWORD2>
+			<KEYWORD2>mysqli_field_count</KEYWORD2>
+			<KEYWORD2>mysqli_field_seek</KEYWORD2>
+			<KEYWORD2>mysqli_field_tell</KEYWORD2>
+			<KEYWORD2>mysqli_free_result</KEYWORD2>
+			<KEYWORD2>mysqli_get_client_info</KEYWORD2>
+			<KEYWORD2>mysqli_get_client_version</KEYWORD2>
+			<KEYWORD2>mysqli_get_host_info</KEYWORD2>
+			<KEYWORD2>mysqli_get_metadata</KEYWORD2>
+			<KEYWORD2>mysqli_get_proto_info</KEYWORD2>
+			<KEYWORD2>mysqli_get_server_info</KEYWORD2>
+			<KEYWORD2>mysqli_get_server_version</KEYWORD2>
+			<KEYWORD2>mysqli_info</KEYWORD2>
+			<KEYWORD2>mysqli_init</KEYWORD2>
+			<KEYWORD2>mysqli_insert_id</KEYWORD2>
+			<KEYWORD2>mysqli_kill</KEYWORD2>
+			<KEYWORD2>mysqli_master_query</KEYWORD2>
+			<KEYWORD2>mysqli_more_results</KEYWORD2>
+			<KEYWORD2>mysqli_multi_query</KEYWORD2>
+			<KEYWORD2>mysqli_next_result</KEYWORD2>
+			<KEYWORD2>mysqli_num_fields</KEYWORD2>
+			<KEYWORD2>mysqli_num_rows</KEYWORD2>
+			<KEYWORD2>mysqli_options</KEYWORD2>
+			<KEYWORD2>mysqli_param_count</KEYWORD2>
+			<KEYWORD2>mysqli_ping</KEYWORD2>
+			<KEYWORD2>mysqli_prepare</KEYWORD2>
+			<KEYWORD2>mysqli_query</KEYWORD2>
+			<KEYWORD2>mysqli_real_connect</KEYWORD2>
+			<KEYWORD2>mysqli_real_escape_string</KEYWORD2>
+			<KEYWORD2>mysqli_real_query</KEYWORD2>
+			<KEYWORD2>mysqli_report</KEYWORD2>
+			<KEYWORD2>mysqli_rollback</KEYWORD2>
+			<KEYWORD2>mysqli_rpl_parse_enabled</KEYWORD2>
+			<KEYWORD2>mysqli_rpl_probe</KEYWORD2>
+			<KEYWORD2>mysqli_rpl_query_type</KEYWORD2>
+			<KEYWORD2>mysqli_select_db</KEYWORD2>
+			<KEYWORD2>mysqli_send_long_data</KEYWORD2>
+			<KEYWORD2>mysqli_send_query</KEYWORD2>
+			<KEYWORD2>mysqli_server_end</KEYWORD2>
+			<KEYWORD2>mysqli_server_init</KEYWORD2>
+			<KEYWORD2>mysqli_set_opt</KEYWORD2>
+			<KEYWORD2>mysqli_sqlstate</KEYWORD2>
+			<KEYWORD2>mysqli_ssl_set</KEYWORD2>
+			<KEYWORD2>mysqli_stat</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_affected_rows</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_bind_param</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_bind_result</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_close</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_data_seek</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_errno</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_error</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_execute</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_fetch</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_free_result</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_init</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_num_rows</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_param_count</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_prepare</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_reset</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_result_metadata</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_send_long_data</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_sqlstate</KEYWORD2>
+			<KEYWORD2>mysqli_stmt_store_result</KEYWORD2>
+			<KEYWORD2>mysqli_store_result</KEYWORD2>
+			<KEYWORD2>mysqli_thread_id</KEYWORD2>
+			<KEYWORD2>mysqli_thread_safe</KEYWORD2>
+			<KEYWORD2>mysqli_use_result</KEYWORD2>
+			<KEYWORD2>mysqli_warning_count</KEYWORD2>
+			<KEYWORD2>name</KEYWORD2> <!-- domattribute, domdocumenttype -->
+			<KEYWORD2>natcasesort</KEYWORD2>
+			<KEYWORD2>natsort</KEYWORD2>
+			<KEYWORD2>ncurses_addch</KEYWORD2>
+			<KEYWORD2>ncurses_addchnstr</KEYWORD2>
+			<KEYWORD2>ncurses_addchstr</KEYWORD2>
+			<KEYWORD2>ncurses_addnstr</KEYWORD2>
+			<KEYWORD2>ncurses_addstr</KEYWORD2>
+			<KEYWORD2>ncurses_assume_default_colors</KEYWORD2>
+			<KEYWORD2>ncurses_attroff</KEYWORD2>
+			<KEYWORD2>ncurses_attron</KEYWORD2>
+			<KEYWORD2>ncurses_attrset</KEYWORD2>
+			<KEYWORD2>ncurses_baudrate</KEYWORD2>
+			<KEYWORD2>ncurses_beep</KEYWORD2>
+			<KEYWORD2>ncurses_bkgd</KEYWORD2>
+			<KEYWORD2>ncurses_bkgdset</KEYWORD2>
+			<KEYWORD2>ncurses_border</KEYWORD2>
+			<KEYWORD2>ncurses_bottom_panel</KEYWORD2>
+			<KEYWORD2>ncurses_can_change_color</KEYWORD2>
+			<KEYWORD2>ncurses_cbreak</KEYWORD2>
+			<KEYWORD2>ncurses_clear</KEYWORD2>
+			<KEYWORD2>ncurses_clrtobot</KEYWORD2>
+			<KEYWORD2>ncurses_clrtoeol</KEYWORD2>
+			<KEYWORD2>ncurses_color_content</KEYWORD2>
+			<KEYWORD2>ncurses_color_set</KEYWORD2>
+			<KEYWORD2>ncurses_curs_set</KEYWORD2>
+			<KEYWORD2>ncurses_def_prog_mode</KEYWORD2>
+			<KEYWORD2>ncurses_def_shell_mode</KEYWORD2>
+			<KEYWORD2>ncurses_define_key</KEYWORD2>
+			<KEYWORD2>ncurses_del_panel</KEYWORD2>
+			<KEYWORD2>ncurses_delay_output</KEYWORD2>
+			<KEYWORD2>ncurses_delch</KEYWORD2>
+			<KEYWORD2>ncurses_deleteln</KEYWORD2>
+			<KEYWORD2>ncurses_delwin</KEYWORD2>
+			<KEYWORD2>ncurses_doupdate</KEYWORD2>
+			<KEYWORD2>ncurses_echo</KEYWORD2>
+			<KEYWORD2>ncurses_echochar</KEYWORD2>
+			<KEYWORD2>ncurses_end</KEYWORD2>
+			<KEYWORD2>ncurses_erase</KEYWORD2>
+			<KEYWORD2>ncurses_erasechar</KEYWORD2>
+			<KEYWORD2>ncurses_filter</KEYWORD2>
+			<KEYWORD2>ncurses_flash</KEYWORD2>
+			<KEYWORD2>ncurses_flushinp</KEYWORD2>
+			<KEYWORD2>ncurses_getch</KEYWORD2>
+			<KEYWORD2>ncurses_getmaxyx</KEYWORD2>
+			<KEYWORD2>ncurses_getmouse</KEYWORD2>
+			<KEYWORD2>ncurses_getyx</KEYWORD2>
+			<KEYWORD2>ncurses_halfdelay</KEYWORD2>
+			<KEYWORD2>ncurses_has_colors</KEYWORD2>
+			<KEYWORD2>ncurses_has_ic</KEYWORD2>
+			<KEYWORD2>ncurses_has_il</KEYWORD2>
+			<KEYWORD2>ncurses_has_key</KEYWORD2>
+			<KEYWORD2>ncurses_hide_panel</KEYWORD2>
+			<KEYWORD2>ncurses_hline</KEYWORD2>
+			<KEYWORD2>ncurses_inch</KEYWORD2>
+			<KEYWORD2>ncurses_init</KEYWORD2>
+			<KEYWORD2>ncurses_init_color</KEYWORD2>
+			<KEYWORD2>ncurses_init_pair</KEYWORD2>
+			<KEYWORD2>ncurses_insch</KEYWORD2>
+			<KEYWORD2>ncurses_insdelln</KEYWORD2>
+			<KEYWORD2>ncurses_insertln</KEYWORD2>
+			<KEYWORD2>ncurses_insstr</KEYWORD2>
+			<KEYWORD2>ncurses_instr</KEYWORD2>
+			<KEYWORD2>ncurses_isendwin</KEYWORD2>
+			<KEYWORD2>ncurses_keyok</KEYWORD2>
+			<KEYWORD2>ncurses_keypad</KEYWORD2>
+			<KEYWORD2>ncurses_killchar</KEYWORD2>
+			<KEYWORD2>ncurses_longname</KEYWORD2>
+			<KEYWORD2>ncurses_meta</KEYWORD2>
+			<KEYWORD2>ncurses_mouse_trafo</KEYWORD2>
+			<KEYWORD2>ncurses_mouseinterval</KEYWORD2>
+			<KEYWORD2>ncurses_mousemask</KEYWORD2>
+			<KEYWORD2>ncurses_move</KEYWORD2>
+			<KEYWORD2>ncurses_move_panel</KEYWORD2>
+			<KEYWORD2>ncurses_mvaddch</KEYWORD2>
+			<KEYWORD2>ncurses_mvaddchnstr</KEYWORD2>
+			<KEYWORD2>ncurses_mvaddchstr</KEYWORD2>
+			<KEYWORD2>ncurses_mvaddnstr</KEYWORD2>
+			<KEYWORD2>ncurses_mvaddstr</KEYWORD2>
+			<KEYWORD2>ncurses_mvcur</KEYWORD2>
+			<KEYWORD2>ncurses_mvdelch</KEYWORD2>
+			<KEYWORD2>ncurses_mvgetch</KEYWORD2>
+			<KEYWORD2>ncurses_mvhline</KEYWORD2>
+			<KEYWORD2>ncurses_mvinch</KEYWORD2>
+			<KEYWORD2>ncurses_mvvline</KEYWORD2>
+			<KEYWORD2>ncurses_mvwaddstr</KEYWORD2>
+			<KEYWORD2>ncurses_napms</KEYWORD2>
+			<KEYWORD2>ncurses_new_panel</KEYWORD2>
+			<KEYWORD2>ncurses_newpad</KEYWORD2>
+			<KEYWORD2>ncurses_newwin</KEYWORD2>
+			<KEYWORD2>ncurses_nl</KEYWORD2>
+			<KEYWORD2>ncurses_nocbreak</KEYWORD2>
+			<KEYWORD2>ncurses_noecho</KEYWORD2>
+			<KEYWORD2>ncurses_nonl</KEYWORD2>
+			<KEYWORD2>ncurses_noqiflush</KEYWORD2>
+			<KEYWORD2>ncurses_noraw</KEYWORD2>
+			<KEYWORD2>ncurses_pair_content</KEYWORD2>
+			<KEYWORD2>ncurses_panel_above</KEYWORD2>
+			<KEYWORD2>ncurses_panel_below</KEYWORD2>
+			<KEYWORD2>ncurses_panel_window</KEYWORD2>
+			<KEYWORD2>ncurses_pnoutrefresh</KEYWORD2>
+			<KEYWORD2>ncurses_prefresh</KEYWORD2>
+			<KEYWORD2>ncurses_putp</KEYWORD2>
+			<KEYWORD2>ncurses_qiflush</KEYWORD2>
+			<KEYWORD2>ncurses_raw</KEYWORD2>
+			<KEYWORD2>ncurses_refresh</KEYWORD2>
+			<KEYWORD2>ncurses_replace_panel</KEYWORD2>
+			<KEYWORD2>ncurses_reset_prog_mode</KEYWORD2>
+			<KEYWORD2>ncurses_reset_shell_mode</KEYWORD2>
+			<KEYWORD2>ncurses_resetty</KEYWORD2>
+			<KEYWORD2>ncurses_savetty</KEYWORD2>
+			<KEYWORD2>ncurses_scr_dump</KEYWORD2>
+			<KEYWORD2>ncurses_scr_init</KEYWORD2>
+			<KEYWORD2>ncurses_scr_restore</KEYWORD2>
+			<KEYWORD2>ncurses_scr_set</KEYWORD2>
+			<KEYWORD2>ncurses_scrl</KEYWORD2>
+			<KEYWORD2>ncurses_show_panel</KEYWORD2>
+			<KEYWORD2>ncurses_slk_attr</KEYWORD2>
+			<KEYWORD2>ncurses_slk_attroff</KEYWORD2>
+			<KEYWORD2>ncurses_slk_attron</KEYWORD2>
+			<KEYWORD2>ncurses_slk_attrset</KEYWORD2>
+			<KEYWORD2>ncurses_slk_clear</KEYWORD2>
+			<KEYWORD2>ncurses_slk_color</KEYWORD2>
+			<KEYWORD2>ncurses_slk_init</KEYWORD2>
+			<KEYWORD2>ncurses_slk_noutrefresh</KEYWORD2>
+			<KEYWORD2>ncurses_slk_refresh</KEYWORD2>
+			<KEYWORD2>ncurses_slk_restore</KEYWORD2>
+			<KEYWORD2>ncurses_slk_set</KEYWORD2>
+			<KEYWORD2>ncurses_slk_touch</KEYWORD2>
+			<KEYWORD2>ncurses_standend</KEYWORD2>
+			<KEYWORD2>ncurses_standout</KEYWORD2>
+			<KEYWORD2>ncurses_start_color</KEYWORD2>
+			<KEYWORD2>ncurses_termattrs</KEYWORD2>
+			<KEYWORD2>ncurses_termname</KEYWORD2>
+			<KEYWORD2>ncurses_timeout</KEYWORD2>
+			<KEYWORD2>ncurses_top_panel</KEYWORD2>
+			<KEYWORD2>ncurses_typeahead</KEYWORD2>
+			<KEYWORD2>ncurses_ungetch</KEYWORD2>
+			<KEYWORD2>ncurses_ungetmouse</KEYWORD2>
+			<KEYWORD2>ncurses_update_panels</KEYWORD2>
+			<KEYWORD2>ncurses_use_default_colors</KEYWORD2>
+			<KEYWORD2>ncurses_use_env</KEYWORD2>
+			<KEYWORD2>ncurses_use_extended_names</KEYWORD2>
+			<KEYWORD2>ncurses_vidattr</KEYWORD2>
+			<KEYWORD2>ncurses_vline</KEYWORD2>
+			<KEYWORD2>ncurses_waddch</KEYWORD2>
+			<KEYWORD2>ncurses_waddstr</KEYWORD2>
+			<KEYWORD2>ncurses_wattroff</KEYWORD2>
+			<KEYWORD2>ncurses_wattron</KEYWORD2>
+			<KEYWORD2>ncurses_wattrset</KEYWORD2>
+			<KEYWORD2>ncurses_wborder</KEYWORD2>
+			<KEYWORD2>ncurses_wclear</KEYWORD2>
+			<KEYWORD2>ncurses_wcolor_set</KEYWORD2>
+			<KEYWORD2>ncurses_werase</KEYWORD2>
+			<KEYWORD2>ncurses_wgetch</KEYWORD2>
+			<KEYWORD2>ncurses_whline</KEYWORD2>
+			<KEYWORD2>ncurses_wmouse_trafo</KEYWORD2>
+			<KEYWORD2>ncurses_wmove</KEYWORD2>
+			<KEYWORD2>ncurses_wnoutrefresh</KEYWORD2>
+			<KEYWORD2>ncurses_wrefresh</KEYWORD2>
+			<KEYWORD2>ncurses_wstandend</KEYWORD2>
+			<KEYWORD2>ncurses_wstandout</KEYWORD2>
+			<KEYWORD2>ncurses_wvline</KEYWORD2>
+			<KEYWORD2>next</KEYWORD2> <!-- arrayiterator, cachingiterator, directoryiterator, filteriterator, limititerator, parentiterator, recursivedirectoryiterator, recursiveiteratoriterator, simplexmliterator, tidy_node -->
+			<KEYWORD2>next_sibling</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>nextframe</KEYWORD2> <!-- swfmovie, swfsprite -->
+			<KEYWORD2>ngettext</KEYWORD2>
+			<KEYWORD2>nl2br</KEYWORD2>
+			<KEYWORD2>nl_langinfo</KEYWORD2>
+			<KEYWORD2>node_name</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>node_type</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>node_value</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>normalize</KEYWORD2> <!-- domdocument, domnode -->
+			<KEYWORD2>notations</KEYWORD2> <!-- domdocumenttype -->
+			<KEYWORD2>notes_body</KEYWORD2>
+			<KEYWORD2>notes_copy_db</KEYWORD2>
+			<KEYWORD2>notes_create_db</KEYWORD2>
+			<KEYWORD2>notes_create_note</KEYWORD2>
+			<KEYWORD2>notes_drop_db</KEYWORD2>
+			<KEYWORD2>notes_find_note</KEYWORD2>
+			<KEYWORD2>notes_header_info</KEYWORD2>
+			<KEYWORD2>notes_list_msgs</KEYWORD2>
+			<KEYWORD2>notes_mark_read</KEYWORD2>
+			<KEYWORD2>notes_mark_unread</KEYWORD2>
+			<KEYWORD2>notes_nav_create</KEYWORD2>
+			<KEYWORD2>notes_search</KEYWORD2>
+			<KEYWORD2>notes_unread</KEYWORD2>
+			<KEYWORD2>notes_version</KEYWORD2>
+			<KEYWORD2>nsapi_request_headers</KEYWORD2>
+			<KEYWORD2>nsapi_response_headers</KEYWORD2>
+			<KEYWORD2>nsapi_virtual</KEYWORD2>
+			<KEYWORD2>number_format</KEYWORD2>
+			<KEYWORD2>ob_clean</KEYWORD2>
+			<KEYWORD2>ob_end_clean</KEYWORD2>
+			<KEYWORD2>ob_end_flush</KEYWORD2>
+			<KEYWORD2>ob_flush</KEYWORD2>
+			<KEYWORD2>ob_get_clean</KEYWORD2>
+			<KEYWORD2>ob_get_contents</KEYWORD2>
+			<KEYWORD2>ob_get_flush</KEYWORD2>
+			<KEYWORD2>ob_get_length</KEYWORD2>
+			<KEYWORD2>ob_get_level</KEYWORD2>
+			<KEYWORD2>ob_get_status</KEYWORD2>
+			<KEYWORD2>ob_gzhandler</KEYWORD2>
+			<KEYWORD2>ob_iconv_handler</KEYWORD2>
+			<KEYWORD2>ob_implicit_flush</KEYWORD2>
+			<KEYWORD2>ob_list_handlers</KEYWORD2>
+			<KEYWORD2>ob_start</KEYWORD2>
+			<KEYWORD2>ob_tidyhandler</KEYWORD2>
+			<KEYWORD2>object</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>objectbyanchor</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>oci_bind_by_name</KEYWORD2>
+			<KEYWORD2>oci_cancel</KEYWORD2>
+			<KEYWORD2>oci_close</KEYWORD2>
+			<KEYWORD2>oci_commit</KEYWORD2>
+			<KEYWORD2>oci_connect</KEYWORD2>
+			<KEYWORD2>oci_define_by_name</KEYWORD2>
+			<KEYWORD2>oci_error</KEYWORD2>
+			<KEYWORD2>oci_execute</KEYWORD2>
+			<KEYWORD2>oci_fetch</KEYWORD2>
+			<KEYWORD2>oci_fetch_all</KEYWORD2>
+			<KEYWORD2>oci_fetch_array</KEYWORD2>
+			<KEYWORD2>oci_fetch_assoc</KEYWORD2>
+			<KEYWORD2>oci_fetch_object</KEYWORD2>
+			<KEYWORD2>oci_fetch_row</KEYWORD2>
+			<KEYWORD2>oci_field_is_null</KEYWORD2>
+			<KEYWORD2>oci_field_name</KEYWORD2>
+			<KEYWORD2>oci_field_precision</KEYWORD2>
+			<KEYWORD2>oci_field_scale</KEYWORD2>
+			<KEYWORD2>oci_field_size</KEYWORD2>
+			<KEYWORD2>oci_field_type</KEYWORD2>
+			<KEYWORD2>oci_field_type_raw</KEYWORD2>
+			<KEYWORD2>oci_free_statement</KEYWORD2>
+			<KEYWORD2>oci_internal_debug</KEYWORD2>
+			<KEYWORD2>oci_lob_copy</KEYWORD2>
+			<KEYWORD2>oci_lob_is_equal</KEYWORD2>
+			<KEYWORD2>oci_new_collection</KEYWORD2>
+			<KEYWORD2>oci_new_connect</KEYWORD2>
+			<KEYWORD2>oci_new_cursor</KEYWORD2>
+			<KEYWORD2>oci_new_descriptor</KEYWORD2>
+			<KEYWORD2>oci_num_fields</KEYWORD2>
+			<KEYWORD2>oci_num_rows</KEYWORD2>
+			<KEYWORD2>oci_parse</KEYWORD2>
+			<KEYWORD2>oci_password_change</KEYWORD2>
+			<KEYWORD2>oci_pconnect</KEYWORD2>
+			<KEYWORD2>oci_result</KEYWORD2>
+			<KEYWORD2>oci_rollback</KEYWORD2>
+			<KEYWORD2>oci_server_version</KEYWORD2>
+			<KEYWORD2>oci_set_prefetch</KEYWORD2>
+			<KEYWORD2>oci_statement_type</KEYWORD2>
+			<KEYWORD2>ocibindbyname</KEYWORD2>
+			<KEYWORD2>ocicancel</KEYWORD2>
+			<KEYWORD2>ocicloselob</KEYWORD2>
+			<KEYWORD2>ocicollappend</KEYWORD2>
+			<KEYWORD2>ocicollassign</KEYWORD2>
+			<KEYWORD2>ocicollassignelem</KEYWORD2>
+			<KEYWORD2>ocicollgetelem</KEYWORD2>
+			<KEYWORD2>ocicollmax</KEYWORD2>
+			<KEYWORD2>ocicollsize</KEYWORD2>
+			<KEYWORD2>ocicolltrim</KEYWORD2>
+			<KEYWORD2>ocicolumnisnull</KEYWORD2>
+			<KEYWORD2>ocicolumnname</KEYWORD2>
+			<KEYWORD2>ocicolumnprecision</KEYWORD2>
+			<KEYWORD2>ocicolumnscale</KEYWORD2>
+			<KEYWORD2>ocicolumnsize</KEYWORD2>
+			<KEYWORD2>ocicolumntype</KEYWORD2>
+			<KEYWORD2>ocicolumntyperaw</KEYWORD2>
+			<KEYWORD2>ocicommit</KEYWORD2>
+			<KEYWORD2>ocidefinebyname</KEYWORD2>
+			<KEYWORD2>ocierror</KEYWORD2>
+			<KEYWORD2>ociexecute</KEYWORD2>
+			<KEYWORD2>ocifetch</KEYWORD2>
+			<KEYWORD2>ocifetchinto</KEYWORD2>
+			<KEYWORD2>ocifetchstatement</KEYWORD2>
+			<KEYWORD2>ocifreecollection</KEYWORD2>
+			<KEYWORD2>ocifreecursor</KEYWORD2>
+			<KEYWORD2>ocifreedesc</KEYWORD2>
+			<KEYWORD2>ocifreestatement</KEYWORD2>
+			<KEYWORD2>ociinternaldebug</KEYWORD2>
+			<KEYWORD2>ociloadlob</KEYWORD2>
+			<KEYWORD2>ocilogoff</KEYWORD2>
+			<KEYWORD2>ocilogon</KEYWORD2>
+			<KEYWORD2>ocinewcollection</KEYWORD2>
+			<KEYWORD2>ocinewcursor</KEYWORD2>
+			<KEYWORD2>ocinewdescriptor</KEYWORD2>
+			<KEYWORD2>ocinlogon</KEYWORD2>
+			<KEYWORD2>ocinumcols</KEYWORD2>
+			<KEYWORD2>ociparse</KEYWORD2>
+			<KEYWORD2>ociplogon</KEYWORD2>
+			<KEYWORD2>ociresult</KEYWORD2>
+			<KEYWORD2>ocirollback</KEYWORD2>
+			<KEYWORD2>ocirowcount</KEYWORD2>
+			<KEYWORD2>ocisavelob</KEYWORD2>
+			<KEYWORD2>ocisavelobfile</KEYWORD2>
+			<KEYWORD2>ociserverversion</KEYWORD2>
+			<KEYWORD2>ocisetprefetch</KEYWORD2>
+			<KEYWORD2>ocistatementtype</KEYWORD2>
+			<KEYWORD2>ociwritelobtofile</KEYWORD2>
+			<KEYWORD2>ociwritetemporarylob</KEYWORD2>
+			<KEYWORD2>octdec</KEYWORD2>
+			<KEYWORD2>odbc_autocommit</KEYWORD2>
+			<KEYWORD2>odbc_binmode</KEYWORD2>
+			<KEYWORD2>odbc_close</KEYWORD2>
+			<KEYWORD2>odbc_close_all</KEYWORD2>
+			<KEYWORD2>odbc_columnprivileges</KEYWORD2>
+			<KEYWORD2>odbc_columns</KEYWORD2>
+			<KEYWORD2>odbc_commit</KEYWORD2>
+			<KEYWORD2>odbc_connect</KEYWORD2>
+			<KEYWORD2>odbc_cursor</KEYWORD2>
+			<KEYWORD2>odbc_data_source</KEYWORD2>
+			<KEYWORD2>odbc_do</KEYWORD2>
+			<KEYWORD2>odbc_error</KEYWORD2>
+			<KEYWORD2>odbc_errormsg</KEYWORD2>
+			<KEYWORD2>odbc_exec</KEYWORD2>
+			<KEYWORD2>odbc_execute</KEYWORD2>
+			<KEYWORD2>odbc_fetch_array</KEYWORD2>
+			<KEYWORD2>odbc_fetch_into</KEYWORD2>
+			<KEYWORD2>odbc_fetch_object</KEYWORD2>
+			<KEYWORD2>odbc_fetch_row</KEYWORD2>
+			<KEYWORD2>odbc_field_len</KEYWORD2>
+			<KEYWORD2>odbc_field_name</KEYWORD2>
+			<KEYWORD2>odbc_field_num</KEYWORD2>
+			<KEYWORD2>odbc_field_precision</KEYWORD2>
+			<KEYWORD2>odbc_field_scale</KEYWORD2>
+			<KEYWORD2>odbc_field_type</KEYWORD2>
+			<KEYWORD2>odbc_foreignkeys</KEYWORD2>
+			<KEYWORD2>odbc_free_result</KEYWORD2>
+			<KEYWORD2>odbc_gettypeinfo</KEYWORD2>
+			<KEYWORD2>odbc_longreadlen</KEYWORD2>
+			<KEYWORD2>odbc_next_result</KEYWORD2>
+			<KEYWORD2>odbc_num_fields</KEYWORD2>
+			<KEYWORD2>odbc_num_rows</KEYWORD2>
+			<KEYWORD2>odbc_pconnect</KEYWORD2>
+			<KEYWORD2>odbc_prepare</KEYWORD2>
+			<KEYWORD2>odbc_primarykeys</KEYWORD2>
+			<KEYWORD2>odbc_procedurecolumns</KEYWORD2>
+			<KEYWORD2>odbc_procedures</KEYWORD2>
+			<KEYWORD2>odbc_result</KEYWORD2>
+			<KEYWORD2>odbc_result_all</KEYWORD2>
+			<KEYWORD2>odbc_rollback</KEYWORD2>
+			<KEYWORD2>odbc_setoption</KEYWORD2>
+			<KEYWORD2>odbc_specialcolumns</KEYWORD2>
+			<KEYWORD2>odbc_statistics</KEYWORD2>
+			<KEYWORD2>odbc_tableprivileges</KEYWORD2>
+			<KEYWORD2>odbc_tables</KEYWORD2>
+			<KEYWORD2>offsetexists</KEYWORD2> <!-- arrayobject -->
+			<KEYWORD2>offsetget</KEYWORD2> <!-- arrayobject -->
+			<KEYWORD2>offsetset</KEYWORD2> <!-- arrayobject -->
+			<KEYWORD2>offsetunset</KEYWORD2> <!-- arrayobject -->
+			<KEYWORD2>openal_buffer_create</KEYWORD2>
+			<KEYWORD2>openal_buffer_data</KEYWORD2>
+			<KEYWORD2>openal_buffer_destroy</KEYWORD2>
+			<KEYWORD2>openal_buffer_get</KEYWORD2>
+			<KEYWORD2>openal_buffer_loadwav</KEYWORD2>
+			<KEYWORD2>openal_context_create</KEYWORD2>
+			<KEYWORD2>openal_context_current</KEYWORD2>
+			<KEYWORD2>openal_context_destroy</KEYWORD2>
+			<KEYWORD2>openal_context_process</KEYWORD2>
+			<KEYWORD2>openal_context_suspend</KEYWORD2>
+			<KEYWORD2>openal_device_close</KEYWORD2>
+			<KEYWORD2>openal_device_open</KEYWORD2>
+			<KEYWORD2>openal_listener_get</KEYWORD2>
+			<KEYWORD2>openal_listener_set</KEYWORD2>
+			<KEYWORD2>openal_source_create</KEYWORD2>
+			<KEYWORD2>openal_source_destroy</KEYWORD2>
+			<KEYWORD2>openal_source_get</KEYWORD2>
+			<KEYWORD2>openal_source_pause</KEYWORD2>
+			<KEYWORD2>openal_source_play</KEYWORD2>
+			<KEYWORD2>openal_source_rewind</KEYWORD2>
+			<KEYWORD2>openal_source_set</KEYWORD2>
+			<KEYWORD2>openal_source_stop</KEYWORD2>
+			<KEYWORD2>openal_stream</KEYWORD2>
+			<KEYWORD2>opendir</KEYWORD2>
+			<KEYWORD2>openlog</KEYWORD2>
+			<KEYWORD2>openssl_csr_export</KEYWORD2>
+			<KEYWORD2>openssl_csr_export_to_file</KEYWORD2>
+			<KEYWORD2>openssl_csr_new</KEYWORD2>
+			<KEYWORD2>openssl_csr_sign</KEYWORD2>
+			<KEYWORD2>openssl_error_string</KEYWORD2>
+			<KEYWORD2>openssl_free_key</KEYWORD2>
+			<KEYWORD2>openssl_get_privatekey</KEYWORD2>
+			<KEYWORD2>openssl_get_publickey</KEYWORD2>
+			<KEYWORD2>openssl_open</KEYWORD2>
+			<KEYWORD2>openssl_pkcs7_decrypt</KEYWORD2>
+			<KEYWORD2>openssl_pkcs7_encrypt</KEYWORD2>
+			<KEYWORD2>openssl_pkcs7_sign</KEYWORD2>
+			<KEYWORD2>openssl_pkcs7_verify</KEYWORD2>
+			<KEYWORD2>openssl_pkey_export</KEYWORD2>
+			<KEYWORD2>openssl_pkey_export_to_file</KEYWORD2>
+			<KEYWORD2>openssl_pkey_get_private</KEYWORD2>
+			<KEYWORD2>openssl_pkey_get_public</KEYWORD2>
+			<KEYWORD2>openssl_pkey_new</KEYWORD2>
+			<KEYWORD2>openssl_private_decrypt</KEYWORD2>
+			<KEYWORD2>openssl_private_encrypt</KEYWORD2>
+			<KEYWORD2>openssl_public_decrypt</KEYWORD2>
+			<KEYWORD2>openssl_public_encrypt</KEYWORD2>
+			<KEYWORD2>openssl_seal</KEYWORD2>
+			<KEYWORD2>openssl_sign</KEYWORD2>
+			<KEYWORD2>openssl_verify</KEYWORD2>
+			<KEYWORD2>openssl_x509_check_private_key</KEYWORD2>
+			<KEYWORD2>openssl_x509_checkpurpose</KEYWORD2>
+			<KEYWORD2>openssl_x509_export</KEYWORD2>
+			<KEYWORD2>openssl_x509_export_to_file</KEYWORD2>
+			<KEYWORD2>openssl_x509_free</KEYWORD2>
+			<KEYWORD2>openssl_x509_parse</KEYWORD2>
+			<KEYWORD2>openssl_x509_read</KEYWORD2>
+			<KEYWORD2>ora_bind</KEYWORD2>
+			<KEYWORD2>ora_close</KEYWORD2>
+			<KEYWORD2>ora_columnname</KEYWORD2>
+			<KEYWORD2>ora_columnsize</KEYWORD2>
+			<KEYWORD2>ora_columntype</KEYWORD2>
+			<KEYWORD2>ora_commit</KEYWORD2>
+			<KEYWORD2>ora_commitoff</KEYWORD2>
+			<KEYWORD2>ora_commiton</KEYWORD2>
+			<KEYWORD2>ora_do</KEYWORD2>
+			<KEYWORD2>ora_error</KEYWORD2>
+			<KEYWORD2>ora_errorcode</KEYWORD2>
+			<KEYWORD2>ora_exec</KEYWORD2>
+			<KEYWORD2>ora_fetch</KEYWORD2>
+			<KEYWORD2>ora_fetch_into</KEYWORD2>
+			<KEYWORD2>ora_getcolumn</KEYWORD2>
+			<KEYWORD2>ora_logoff</KEYWORD2>
+			<KEYWORD2>ora_logon</KEYWORD2>
+			<KEYWORD2>ora_numcols</KEYWORD2>
+			<KEYWORD2>ora_numrows</KEYWORD2>
+			<KEYWORD2>ora_open</KEYWORD2>
+			<KEYWORD2>ora_parse</KEYWORD2>
+			<KEYWORD2>ora_plogon</KEYWORD2>
+			<KEYWORD2>ora_rollback</KEYWORD2>
+			<KEYWORD2>ord</KEYWORD2>
+			<KEYWORD2>output</KEYWORD2> <!-- swfmovie -->
+			<KEYWORD2>output_add_rewrite_var</KEYWORD2>
+			<KEYWORD2>output_reset_rewrite_vars</KEYWORD2>
+			<KEYWORD2>overload</KEYWORD2>
+			<KEYWORD2>override_function</KEYWORD2>
+			<KEYWORD2>ovrimos_close</KEYWORD2>
+			<KEYWORD2>ovrimos_commit</KEYWORD2>
+			<KEYWORD2>ovrimos_connect</KEYWORD2>
+			<KEYWORD2>ovrimos_cursor</KEYWORD2>
+			<KEYWORD2>ovrimos_exec</KEYWORD2>
+			<KEYWORD2>ovrimos_execute</KEYWORD2>
+			<KEYWORD2>ovrimos_fetch_into</KEYWORD2>
+			<KEYWORD2>ovrimos_fetch_row</KEYWORD2>
+			<KEYWORD2>ovrimos_field_len</KEYWORD2>
+			<KEYWORD2>ovrimos_field_name</KEYWORD2>
+			<KEYWORD2>ovrimos_field_num</KEYWORD2>
+			<KEYWORD2>ovrimos_field_type</KEYWORD2>
+			<KEYWORD2>ovrimos_free_result</KEYWORD2>
+			<KEYWORD2>ovrimos_longreadlen</KEYWORD2>
+			<KEYWORD2>ovrimos_num_fields</KEYWORD2>
+			<KEYWORD2>ovrimos_num_rows</KEYWORD2>
+			<KEYWORD2>ovrimos_prepare</KEYWORD2>
+			<KEYWORD2>ovrimos_result</KEYWORD2>
+			<KEYWORD2>ovrimos_result_all</KEYWORD2>
+			<KEYWORD2>ovrimos_rollback</KEYWORD2>
+			<KEYWORD2>owner_document</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>pack</KEYWORD2>
+			<KEYWORD2>parent_node</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>parents</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>parse_ini_file</KEYWORD2>
+			<KEYWORD2>parse_str</KEYWORD2>
+			<KEYWORD2>parse_url</KEYWORD2>
+			<KEYWORD2>parsekit_compile_file</KEYWORD2>
+			<KEYWORD2>parsekit_compile_string</KEYWORD2>
+			<KEYWORD2>parsekit_func_arginfo</KEYWORD2>
+			<KEYWORD2>passthru</KEYWORD2>
+			<KEYWORD2>pathinfo</KEYWORD2>
+			<KEYWORD2>pclose</KEYWORD2>
+			<KEYWORD2>pcntl_alarm</KEYWORD2>
+			<KEYWORD2>pcntl_exec</KEYWORD2>
+			<KEYWORD2>pcntl_fork</KEYWORD2>
+			<KEYWORD2>pcntl_getpriority</KEYWORD2>
+			<KEYWORD2>pcntl_setpriority</KEYWORD2>
+			<KEYWORD2>pcntl_signal</KEYWORD2>
+			<KEYWORD2>pcntl_wait</KEYWORD2>
+			<KEYWORD2>pcntl_waitpid</KEYWORD2>
+			<KEYWORD2>pcntl_wexitstatus</KEYWORD2>
+			<KEYWORD2>pcntl_wifexited</KEYWORD2>
+			<KEYWORD2>pcntl_wifsignaled</KEYWORD2>
+			<KEYWORD2>pcntl_wifstopped</KEYWORD2>
+			<KEYWORD2>pcntl_wstopsig</KEYWORD2>
+			<KEYWORD2>pcntl_wtermsig</KEYWORD2>
+			<KEYWORD2>pconnect</KEYWORD2> <!-- memcache -->
+			<KEYWORD2>pdf_add_annotation</KEYWORD2>
+			<KEYWORD2>pdf_add_bookmark</KEYWORD2>
+			<KEYWORD2>pdf_add_launchlink</KEYWORD2>
+			<KEYWORD2>pdf_add_locallink</KEYWORD2>
+			<KEYWORD2>pdf_add_note</KEYWORD2>
+			<KEYWORD2>pdf_add_outline</KEYWORD2>
+			<KEYWORD2>pdf_add_pdflink</KEYWORD2>
+			<KEYWORD2>pdf_add_thumbnail</KEYWORD2>
+			<KEYWORD2>pdf_add_weblink</KEYWORD2>
+			<KEYWORD2>pdf_arc</KEYWORD2>
+			<KEYWORD2>pdf_arcn</KEYWORD2>
+			<KEYWORD2>pdf_attach_file</KEYWORD2>
+			<KEYWORD2>pdf_begin_page</KEYWORD2>
+			<KEYWORD2>pdf_begin_pattern</KEYWORD2>
+			<KEYWORD2>pdf_begin_template</KEYWORD2>
+			<KEYWORD2>pdf_circle</KEYWORD2>
+			<KEYWORD2>pdf_clip</KEYWORD2>
+			<KEYWORD2>pdf_close</KEYWORD2>
+			<KEYWORD2>pdf_close_image</KEYWORD2>
+			<KEYWORD2>pdf_close_pdi</KEYWORD2>
+			<KEYWORD2>pdf_close_pdi_page</KEYWORD2>
+			<KEYWORD2>pdf_closepath</KEYWORD2>
+			<KEYWORD2>pdf_closepath_fill_stroke</KEYWORD2>
+			<KEYWORD2>pdf_closepath_stroke</KEYWORD2>
+			<KEYWORD2>pdf_concat</KEYWORD2>
+			<KEYWORD2>pdf_continue_text</KEYWORD2>
+			<KEYWORD2>pdf_curveto</KEYWORD2>
+			<KEYWORD2>pdf_delete</KEYWORD2>
+			<KEYWORD2>pdf_end_page</KEYWORD2>
+			<KEYWORD2>pdf_end_pattern</KEYWORD2>
+			<KEYWORD2>pdf_end_template</KEYWORD2>
+			<KEYWORD2>pdf_endpath</KEYWORD2>
+			<KEYWORD2>pdf_fill</KEYWORD2>
+			<KEYWORD2>pdf_fill_stroke</KEYWORD2>
+			<KEYWORD2>pdf_findfont</KEYWORD2>
+			<KEYWORD2>pdf_fit_pdi_page</KEYWORD2>
+			<KEYWORD2>pdf_get_buffer</KEYWORD2>
+			<KEYWORD2>pdf_get_font</KEYWORD2>
+			<KEYWORD2>pdf_get_fontname</KEYWORD2>
+			<KEYWORD2>pdf_get_fontsize</KEYWORD2>
+			<KEYWORD2>pdf_get_image_height</KEYWORD2>
+			<KEYWORD2>pdf_get_image_width</KEYWORD2>
+			<KEYWORD2>pdf_get_majorversion</KEYWORD2>
+			<KEYWORD2>pdf_get_minorversion</KEYWORD2>
+			<KEYWORD2>pdf_get_parameter</KEYWORD2>
+			<KEYWORD2>pdf_get_pdi_parameter</KEYWORD2>
+			<KEYWORD2>pdf_get_pdi_value</KEYWORD2>
+			<KEYWORD2>pdf_get_value</KEYWORD2>
+			<KEYWORD2>pdf_initgraphics</KEYWORD2>
+			<KEYWORD2>pdf_lineto</KEYWORD2>
+			<KEYWORD2>pdf_load_font</KEYWORD2>
+			<KEYWORD2>pdf_makespotcolor</KEYWORD2>
+			<KEYWORD2>pdf_moveto</KEYWORD2>
+			<KEYWORD2>pdf_new</KEYWORD2>
+			<KEYWORD2>pdf_open</KEYWORD2>
+			<KEYWORD2>pdf_open_ccitt</KEYWORD2>
+			<KEYWORD2>pdf_open_file</KEYWORD2>
+			<KEYWORD2>pdf_open_gif</KEYWORD2>
+			<KEYWORD2>pdf_open_image</KEYWORD2>
+			<KEYWORD2>pdf_open_image_file</KEYWORD2>
+			<KEYWORD2>pdf_open_jpeg</KEYWORD2>
+			<KEYWORD2>pdf_open_memory_image</KEYWORD2>
+			<KEYWORD2>pdf_open_pdi</KEYWORD2>
+			<KEYWORD2>pdf_open_pdi_page</KEYWORD2>
+			<KEYWORD2>pdf_open_png</KEYWORD2>
+			<KEYWORD2>pdf_open_tiff</KEYWORD2>
+			<KEYWORD2>pdf_place_image</KEYWORD2>
+			<KEYWORD2>pdf_place_pdi_page</KEYWORD2>
+			<KEYWORD2>pdf_rect</KEYWORD2>
+			<KEYWORD2>pdf_restore</KEYWORD2>
+			<KEYWORD2>pdf_rotate</KEYWORD2>
+			<KEYWORD2>pdf_save</KEYWORD2>
+			<KEYWORD2>pdf_scale</KEYWORD2>
+			<KEYWORD2>pdf_set_border_color</KEYWORD2>
+			<KEYWORD2>pdf_set_border_dash</KEYWORD2>
+			<KEYWORD2>pdf_set_border_style</KEYWORD2>
+			<KEYWORD2>pdf_set_char_spacing</KEYWORD2>
+			<KEYWORD2>pdf_set_duration</KEYWORD2>
+			<KEYWORD2>pdf_set_font</KEYWORD2>
+			<KEYWORD2>pdf_set_horiz_scaling</KEYWORD2>
+			<KEYWORD2>pdf_set_info</KEYWORD2>
+			<KEYWORD2>pdf_set_info_author</KEYWORD2>
+			<KEYWORD2>pdf_set_info_creator</KEYWORD2>
+			<KEYWORD2>pdf_set_info_keywords</KEYWORD2>
+			<KEYWORD2>pdf_set_info_subject</KEYWORD2>
+			<KEYWORD2>pdf_set_info_title</KEYWORD2>
+			<KEYWORD2>pdf_set_leading</KEYWORD2>
+			<KEYWORD2>pdf_set_parameter</KEYWORD2>
+			<KEYWORD2>pdf_set_text_matrix</KEYWORD2>
+			<KEYWORD2>pdf_set_text_pos</KEYWORD2>
+			<KEYWORD2>pdf_set_text_rendering</KEYWORD2>
+			<KEYWORD2>pdf_set_text_rise</KEYWORD2>
+			<KEYWORD2>pdf_set_value</KEYWORD2>
+			<KEYWORD2>pdf_set_word_spacing</KEYWORD2>
+			<KEYWORD2>pdf_setcolor</KEYWORD2>
+			<KEYWORD2>pdf_setdash</KEYWORD2>
+			<KEYWORD2>pdf_setflat</KEYWORD2>
+			<KEYWORD2>pdf_setfont</KEYWORD2>
+			<KEYWORD2>pdf_setgray</KEYWORD2>
+			<KEYWORD2>pdf_setgray_fill</KEYWORD2>
+			<KEYWORD2>pdf_setgray_stroke</KEYWORD2>
+			<KEYWORD2>pdf_setlinecap</KEYWORD2>
+			<KEYWORD2>pdf_setlinejoin</KEYWORD2>
+			<KEYWORD2>pdf_setlinewidth</KEYWORD2>
+			<KEYWORD2>pdf_setmatrix</KEYWORD2>
+			<KEYWORD2>pdf_setmiterlimit</KEYWORD2>
+			<KEYWORD2>pdf_setpolydash</KEYWORD2>
+			<KEYWORD2>pdf_setrgbcolor</KEYWORD2>
+			<KEYWORD2>pdf_setrgbcolor_fill</KEYWORD2>
+			<KEYWORD2>pdf_setrgbcolor_stroke</KEYWORD2>
+			<KEYWORD2>pdf_show</KEYWORD2>
+			<KEYWORD2>pdf_show_boxed</KEYWORD2>
+			<KEYWORD2>pdf_show_xy</KEYWORD2>
+			<KEYWORD2>pdf_skew</KEYWORD2>
+			<KEYWORD2>pdf_stringwidth</KEYWORD2>
+			<KEYWORD2>pdf_stroke</KEYWORD2>
+			<KEYWORD2>pdf_translate</KEYWORD2>
+			<KEYWORD2>pfpro_cleanup</KEYWORD2>
+			<KEYWORD2>pfpro_init</KEYWORD2>
+			<KEYWORD2>pfpro_process</KEYWORD2>
+			<KEYWORD2>pfpro_process_raw</KEYWORD2>
+			<KEYWORD2>pfpro_version</KEYWORD2>
+			<KEYWORD2>pfsockopen</KEYWORD2>
+			<KEYWORD2>pg_affected_rows</KEYWORD2>
+			<KEYWORD2>pg_cancel_query</KEYWORD2>
+			<KEYWORD2>pg_client_encoding</KEYWORD2>
+			<KEYWORD2>pg_close</KEYWORD2>
+			<KEYWORD2>pg_connect</KEYWORD2>
+			<KEYWORD2>pg_connection_busy</KEYWORD2>
+			<KEYWORD2>pg_connection_reset</KEYWORD2>
+			<KEYWORD2>pg_connection_status</KEYWORD2>
+			<KEYWORD2>pg_convert</KEYWORD2>
+			<KEYWORD2>pg_copy_from</KEYWORD2>
+			<KEYWORD2>pg_copy_to</KEYWORD2>
+			<KEYWORD2>pg_dbname</KEYWORD2>
+			<KEYWORD2>pg_delete</KEYWORD2>
+			<KEYWORD2>pg_end_copy</KEYWORD2>
+			<KEYWORD2>pg_escape_bytea</KEYWORD2>
+			<KEYWORD2>pg_escape_string</KEYWORD2>
+			<KEYWORD2>pg_fetch_all</KEYWORD2>
+			<KEYWORD2>pg_fetch_array</KEYWORD2>
+			<KEYWORD2>pg_fetch_assoc</KEYWORD2>
+			<KEYWORD2>pg_fetch_object</KEYWORD2>
+			<KEYWORD2>pg_fetch_result</KEYWORD2>
+			<KEYWORD2>pg_fetch_row</KEYWORD2>
+			<KEYWORD2>pg_field_is_null</KEYWORD2>
+			<KEYWORD2>pg_field_name</KEYWORD2>
+			<KEYWORD2>pg_field_num</KEYWORD2>
+			<KEYWORD2>pg_field_prtlen</KEYWORD2>
+			<KEYWORD2>pg_field_size</KEYWORD2>
+			<KEYWORD2>pg_field_type</KEYWORD2>
+			<KEYWORD2>pg_free_result</KEYWORD2>
+			<KEYWORD2>pg_get_notify</KEYWORD2>
+			<KEYWORD2>pg_get_pid</KEYWORD2>
+			<KEYWORD2>pg_get_result</KEYWORD2>
+			<KEYWORD2>pg_host</KEYWORD2>
+			<KEYWORD2>pg_insert</KEYWORD2>
+			<KEYWORD2>pg_last_error</KEYWORD2>
+			<KEYWORD2>pg_last_notice</KEYWORD2>
+			<KEYWORD2>pg_last_oid</KEYWORD2>
+			<KEYWORD2>pg_lo_close</KEYWORD2>
+			<KEYWORD2>pg_lo_create</KEYWORD2>
+			<KEYWORD2>pg_lo_export</KEYWORD2>
+			<KEYWORD2>pg_lo_import</KEYWORD2>
+			<KEYWORD2>pg_lo_open</KEYWORD2>
+			<KEYWORD2>pg_lo_read</KEYWORD2>
+			<KEYWORD2>pg_lo_read_all</KEYWORD2>
+			<KEYWORD2>pg_lo_seek</KEYWORD2>
+			<KEYWORD2>pg_lo_tell</KEYWORD2>
+			<KEYWORD2>pg_lo_unlink</KEYWORD2>
+			<KEYWORD2>pg_lo_write</KEYWORD2>
+			<KEYWORD2>pg_meta_data</KEYWORD2>
+			<KEYWORD2>pg_num_fields</KEYWORD2>
+			<KEYWORD2>pg_num_rows</KEYWORD2>
+			<KEYWORD2>pg_options</KEYWORD2>
+			<KEYWORD2>pg_parameter_status</KEYWORD2>
+			<KEYWORD2>pg_pconnect</KEYWORD2>
+			<KEYWORD2>pg_ping</KEYWORD2>
+			<KEYWORD2>pg_port</KEYWORD2>
+			<KEYWORD2>pg_put_line</KEYWORD2>
+			<KEYWORD2>pg_query</KEYWORD2>
+			<KEYWORD2>pg_result_error</KEYWORD2>
+			<KEYWORD2>pg_result_seek</KEYWORD2>
+			<KEYWORD2>pg_result_status</KEYWORD2>
+			<KEYWORD2>pg_select</KEYWORD2>
+			<KEYWORD2>pg_send_query</KEYWORD2>
+			<KEYWORD2>pg_set_client_encoding</KEYWORD2>
+			<KEYWORD2>pg_trace</KEYWORD2>
+			<KEYWORD2>pg_tty</KEYWORD2>
+			<KEYWORD2>pg_unescape_bytea</KEYWORD2>
+			<KEYWORD2>pg_untrace</KEYWORD2>
+			<KEYWORD2>pg_update</KEYWORD2>
+			<KEYWORD2>pg_version</KEYWORD2>
+			<KEYWORD2>php_check_syntax</KEYWORD2>
+			<KEYWORD2>php_ini_scanned_files</KEYWORD2>
+			<KEYWORD2>php_logo_guid</KEYWORD2>
+			<KEYWORD2>php_sapi_name</KEYWORD2>
+			<KEYWORD2>php_strip_whitespace</KEYWORD2>
+			<KEYWORD2>php_uname</KEYWORD2>
+			<KEYWORD2>phpcredits</KEYWORD2>
+			<KEYWORD2>phpinfo</KEYWORD2>
+			<KEYWORD2>phpversion</KEYWORD2>
+			<KEYWORD2>pi</KEYWORD2>
+			<KEYWORD2>png2wbmp</KEYWORD2>
+			<KEYWORD2>popen</KEYWORD2>
+			<KEYWORD2>pos</KEYWORD2>
+			<KEYWORD2>posix_ctermid</KEYWORD2>
+			<KEYWORD2>posix_get_last_error</KEYWORD2>
+			<KEYWORD2>posix_getcwd</KEYWORD2>
+			<KEYWORD2>posix_getegid</KEYWORD2>
+			<KEYWORD2>posix_geteuid</KEYWORD2>
+			<KEYWORD2>posix_getgid</KEYWORD2>
+			<KEYWORD2>posix_getgrgid</KEYWORD2>
+			<KEYWORD2>posix_getgrnam</KEYWORD2>
+			<KEYWORD2>posix_getgroups</KEYWORD2>
+			<KEYWORD2>posix_getlogin</KEYWORD2>
+			<KEYWORD2>posix_getpgid</KEYWORD2>
+			<KEYWORD2>posix_getpgrp</KEYWORD2>
+			<KEYWORD2>posix_getpid</KEYWORD2>
+			<KEYWORD2>posix_getppid</KEYWORD2>
+			<KEYWORD2>posix_getpwnam</KEYWORD2>
+			<KEYWORD2>posix_getpwuid</KEYWORD2>
+			<KEYWORD2>posix_getrlimit</KEYWORD2>
+			<KEYWORD2>posix_getsid</KEYWORD2>
+			<KEYWORD2>posix_getuid</KEYWORD2>
+			<KEYWORD2>posix_isatty</KEYWORD2>
+			<KEYWORD2>posix_kill</KEYWORD2>
+			<KEYWORD2>posix_mkfifo</KEYWORD2>
+			<KEYWORD2>posix_setegid</KEYWORD2>
+			<KEYWORD2>posix_seteuid</KEYWORD2>
+			<KEYWORD2>posix_setgid</KEYWORD2>
+			<KEYWORD2>posix_setpgid</KEYWORD2>
+			<KEYWORD2>posix_setsid</KEYWORD2>
+			<KEYWORD2>posix_setuid</KEYWORD2>
+			<KEYWORD2>posix_strerror</KEYWORD2>
+			<KEYWORD2>posix_times</KEYWORD2>
+			<KEYWORD2>posix_ttyname</KEYWORD2>
+			<KEYWORD2>posix_uname</KEYWORD2>
+			<KEYWORD2>pow</KEYWORD2>
+			<KEYWORD2>prefix</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>preg_grep</KEYWORD2>
+			<KEYWORD2>preg_match</KEYWORD2>
+			<KEYWORD2>preg_match_all</KEYWORD2>
+			<KEYWORD2>preg_quote</KEYWORD2>
+			<KEYWORD2>preg_replace</KEYWORD2>
+			<KEYWORD2>preg_replace_callback</KEYWORD2>
+			<KEYWORD2>preg_split</KEYWORD2>
+			<KEYWORD2>prepare</KEYWORD2> <!-- pdo -->
+			<KEYWORD2>prev</KEYWORD2> <!-- tidy_node -->
+			<KEYWORD2>previous_sibling</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>print_r</KEYWORD2>
+			<KEYWORD2>printer_abort</KEYWORD2>
+			<KEYWORD2>printer_close</KEYWORD2>
+			<KEYWORD2>printer_create_brush</KEYWORD2>
+			<KEYWORD2>printer_create_dc</KEYWORD2>
+			<KEYWORD2>printer_create_font</KEYWORD2>
+			<KEYWORD2>printer_create_pen</KEYWORD2>
+			<KEYWORD2>printer_delete_brush</KEYWORD2>
+			<KEYWORD2>printer_delete_dc</KEYWORD2>
+			<KEYWORD2>printer_delete_font</KEYWORD2>
+			<KEYWORD2>printer_delete_pen</KEYWORD2>
+			<KEYWORD2>printer_draw_bmp</KEYWORD2>
+			<KEYWORD2>printer_draw_chord</KEYWORD2>
+			<KEYWORD2>printer_draw_elipse</KEYWORD2>
+			<KEYWORD2>printer_draw_line</KEYWORD2>
+			<KEYWORD2>printer_draw_pie</KEYWORD2>
+			<KEYWORD2>printer_draw_rectangle</KEYWORD2>
+			<KEYWORD2>printer_draw_roundrect</KEYWORD2>
+			<KEYWORD2>printer_draw_text</KEYWORD2>
+			<KEYWORD2>printer_end_doc</KEYWORD2>
+			<KEYWORD2>printer_end_page</KEYWORD2>
+			<KEYWORD2>printer_get_option</KEYWORD2>
+			<KEYWORD2>printer_list</KEYWORD2>
+			<KEYWORD2>printer_logical_fontheight</KEYWORD2>
+			<KEYWORD2>printer_open</KEYWORD2>
+			<KEYWORD2>printer_select_brush</KEYWORD2>
+			<KEYWORD2>printer_select_font</KEYWORD2>
+			<KEYWORD2>printer_select_pen</KEYWORD2>
+			<KEYWORD2>printer_set_option</KEYWORD2>
+			<KEYWORD2>printer_start_doc</KEYWORD2>
+			<KEYWORD2>printer_start_page</KEYWORD2>
+			<KEYWORD2>printer_write</KEYWORD2>
+			<KEYWORD2>printf</KEYWORD2>
+			<KEYWORD2>proc_close</KEYWORD2>
+			<KEYWORD2>proc_get_status</KEYWORD2>
+			<KEYWORD2>proc_nice</KEYWORD2>
+			<KEYWORD2>proc_open</KEYWORD2>
+			<KEYWORD2>proc_terminate</KEYWORD2>
+			<KEYWORD2>process</KEYWORD2> <!-- domxsltstylesheet -->
+			<KEYWORD2>pspell_add_to_personal</KEYWORD2>
+			<KEYWORD2>pspell_add_to_session</KEYWORD2>
+			<KEYWORD2>pspell_check</KEYWORD2>
+			<KEYWORD2>pspell_clear_session</KEYWORD2>
+			<KEYWORD2>pspell_config_create</KEYWORD2>
+			<KEYWORD2>pspell_config_data_dir</KEYWORD2>
+			<KEYWORD2>pspell_config_dict_dir</KEYWORD2>
+			<KEYWORD2>pspell_config_ignore</KEYWORD2>
+			<KEYWORD2>pspell_config_mode</KEYWORD2>
+			<KEYWORD2>pspell_config_personal</KEYWORD2>
+			<KEYWORD2>pspell_config_repl</KEYWORD2>
+			<KEYWORD2>pspell_config_runtogether</KEYWORD2>
+			<KEYWORD2>pspell_config_save_repl</KEYWORD2>
+			<KEYWORD2>pspell_new</KEYWORD2>
+			<KEYWORD2>pspell_new_config</KEYWORD2>
+			<KEYWORD2>pspell_new_personal</KEYWORD2>
+			<KEYWORD2>pspell_save_wordlist</KEYWORD2>
+			<KEYWORD2>pspell_store_replacement</KEYWORD2>
+			<KEYWORD2>pspell_suggest</KEYWORD2>
+			<KEYWORD2>public_id</KEYWORD2> <!-- domdocumenttype -->
+			<KEYWORD2>putenv</KEYWORD2>
+			<KEYWORD2>qdom_error</KEYWORD2>
+			<KEYWORD2>qdom_tree</KEYWORD2>
+			<KEYWORD2>query</KEYWORD2> <!-- domxpath -->
+			<KEYWORD2>quoted_printable_decode</KEYWORD2>
+			<KEYWORD2>quotemeta</KEYWORD2>
+			<KEYWORD2>rad2deg</KEYWORD2>
+			<KEYWORD2>rand</KEYWORD2>
+			<KEYWORD2>range</KEYWORD2>
+			<KEYWORD2>rar_close</KEYWORD2>
+			<KEYWORD2>rar_entry_get</KEYWORD2>
+			<KEYWORD2>rar_list</KEYWORD2>
+			<KEYWORD2>rar_open</KEYWORD2>
+			<KEYWORD2>rawurldecode</KEYWORD2>
+			<KEYWORD2>rawurlencode</KEYWORD2>
+			<KEYWORD2>read</KEYWORD2> <!-- hw_api_content, lob -->
+			<KEYWORD2>read_exif_data</KEYWORD2>
+			<KEYWORD2>readdir</KEYWORD2>
+			<KEYWORD2>readfile</KEYWORD2>
+			<KEYWORD2>readgzfile</KEYWORD2>
+			<KEYWORD2>readline</KEYWORD2>
+			<KEYWORD2>readline_add_history</KEYWORD2>
+			<KEYWORD2>readline_callback_handler_install</KEYWORD2>
+			<KEYWORD2>readline_callback_handler_remove</KEYWORD2>
+			<KEYWORD2>readline_callback_read_char</KEYWORD2>
+			<KEYWORD2>readline_clear_history</KEYWORD2>
+			<KEYWORD2>readline_completion_function</KEYWORD2>
+			<KEYWORD2>readline_info</KEYWORD2>
+			<KEYWORD2>readline_list_history</KEYWORD2>
+			<KEYWORD2>readline_on_new_line</KEYWORD2>
+			<KEYWORD2>readline_read_history</KEYWORD2>
+			<KEYWORD2>readline_redisplay</KEYWORD2>
+			<KEYWORD2>readline_write_history</KEYWORD2>
+			<KEYWORD2>readlink</KEYWORD2>
+			<KEYWORD2>realpath</KEYWORD2>
+			<KEYWORD2>reason</KEYWORD2> <!-- hw_api_error -->
+			<KEYWORD2>recode</KEYWORD2>
+			<KEYWORD2>recode_file</KEYWORD2>
+			<KEYWORD2>recode_string</KEYWORD2>
+			<KEYWORD2>register_shutdown_function</KEYWORD2>
+			<KEYWORD2>register_tick_function</KEYWORD2>
+			<KEYWORD2>registernamespace</KEYWORD2> <!-- domxpath -->
+			<KEYWORD2>relaxngvalidate</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>relaxngvalidatesource</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>remove</KEYWORD2> <!-- hw_api, hw_api_object, swfdisplayitem, swfmovie, swfsprite -->
+			<KEYWORD2>remove_attribute</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>remove_child</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>removeattribute</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>removeattributenode</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>removeattributens</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>removechild</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>rename</KEYWORD2>
+			<KEYWORD2>rename_function</KEYWORD2>
+			<KEYWORD2>replace</KEYWORD2> <!-- hw_api, memcache -->
+			<KEYWORD2>replace_child</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>replace_node</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>replacechild</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>replacedata</KEYWORD2> <!-- domcharacterdata -->
+			<KEYWORD2>reset</KEYWORD2>
+			<KEYWORD2>restore_error_handler</KEYWORD2>
+			<KEYWORD2>restore_exception_handler</KEYWORD2>
+			<KEYWORD2>restore_include_path</KEYWORD2>
+			<KEYWORD2>result_dump_file</KEYWORD2> <!-- domxsltstylesheet -->
+			<KEYWORD2>result_dump_mem</KEYWORD2> <!-- domxsltstylesheet -->
+			<KEYWORD2>rewind</KEYWORD2> <!-- arrayiterator, cachingiterator, directoryiterator, filteriterator, limititerator, lob, parentiterator, recursivedirectoryiterator, recursiveiteratoriterator, simplexmliterator -->
+			<KEYWORD2>rewinddir</KEYWORD2>
+			<KEYWORD2>rmdir</KEYWORD2>
+			<KEYWORD2>rollback</KEYWORD2> <!-- pdo -->
+			<KEYWORD2>rotate</KEYWORD2> <!-- swfdisplayitem -->
+			<KEYWORD2>rotateto</KEYWORD2> <!-- swfdisplayitem, swffill -->
+			<KEYWORD2>round</KEYWORD2>
+			<KEYWORD2>rowcount</KEYWORD2> <!-- pdostatement -->
+			<KEYWORD2>rsort</KEYWORD2>
+			<KEYWORD2>rtrim</KEYWORD2>
+			<KEYWORD2>save</KEYWORD2> <!-- domdocument, lob, swfmovie -->
+			<KEYWORD2>savehtml</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>savehtmlfile</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>savexml</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>scale</KEYWORD2> <!-- swfdisplayitem -->
+			<KEYWORD2>scaleto</KEYWORD2> <!-- swfdisplayitem, swffill -->
+			<KEYWORD2>scandir</KEYWORD2>
+			<KEYWORD2>schemavalidate</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>schemavalidatesource</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>seek</KEYWORD2> <!-- arrayiterator, limititerator, lob -->
+			<KEYWORD2>sem_acquire</KEYWORD2>
+			<KEYWORD2>sem_get</KEYWORD2>
+			<KEYWORD2>sem_release</KEYWORD2>
+			<KEYWORD2>sem_remove</KEYWORD2>
+			<KEYWORD2>serialize</KEYWORD2>
+			<KEYWORD2>sesam_affected_rows</KEYWORD2>
+			<KEYWORD2>sesam_commit</KEYWORD2>
+			<KEYWORD2>sesam_connect</KEYWORD2>
+			<KEYWORD2>sesam_diagnostic</KEYWORD2>
+			<KEYWORD2>sesam_disconnect</KEYWORD2>
+			<KEYWORD2>sesam_errormsg</KEYWORD2>
+			<KEYWORD2>sesam_execimm</KEYWORD2>
+			<KEYWORD2>sesam_fetch_array</KEYWORD2>
+			<KEYWORD2>sesam_fetch_result</KEYWORD2>
+			<KEYWORD2>sesam_fetch_row</KEYWORD2>
+			<KEYWORD2>sesam_field_array</KEYWORD2>
+			<KEYWORD2>sesam_field_name</KEYWORD2>
+			<KEYWORD2>sesam_free_result</KEYWORD2>
+			<KEYWORD2>sesam_num_fields</KEYWORD2>
+			<KEYWORD2>sesam_query</KEYWORD2>
+			<KEYWORD2>sesam_rollback</KEYWORD2>
+			<KEYWORD2>sesam_seek_row</KEYWORD2>
+			<KEYWORD2>sesam_settransaction</KEYWORD2>
+			<KEYWORD2>session_cache_expire</KEYWORD2>
+			<KEYWORD2>session_cache_limiter</KEYWORD2>
+			<KEYWORD2>session_commit</KEYWORD2>
+			<KEYWORD2>session_decode</KEYWORD2>
+			<KEYWORD2>session_destroy</KEYWORD2>
+			<KEYWORD2>session_encode</KEYWORD2>
+			<KEYWORD2>session_get_cookie_params</KEYWORD2>
+			<KEYWORD2>session_id</KEYWORD2>
+			<KEYWORD2>session_is_registered</KEYWORD2>
+			<KEYWORD2>session_module_name</KEYWORD2>
+			<KEYWORD2>session_name</KEYWORD2>
+			<KEYWORD2>session_regenerate_id</KEYWORD2>
+			<KEYWORD2>session_register</KEYWORD2>
+			<KEYWORD2>session_save_path</KEYWORD2>
+			<KEYWORD2>session_set_cookie_params</KEYWORD2>
+			<KEYWORD2>session_set_save_handler</KEYWORD2>
+			<KEYWORD2>session_start</KEYWORD2>
+			<KEYWORD2>session_unregister</KEYWORD2>
+			<KEYWORD2>session_unset</KEYWORD2>
+			<KEYWORD2>session_write_close</KEYWORD2>
+			<KEYWORD2>set</KEYWORD2> <!-- memcache -->
+			<KEYWORD2>set_attribute</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>set_content</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>set_error_handler</KEYWORD2>
+			<KEYWORD2>set_exception_handler</KEYWORD2>
+			<KEYWORD2>set_file_buffer</KEYWORD2>
+			<KEYWORD2>set_include_path</KEYWORD2>
+			<KEYWORD2>set_magic_quotes_runtime</KEYWORD2>
+			<KEYWORD2>set_name</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>set_namespace</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>set_time_limit</KEYWORD2>
+			<KEYWORD2>setaction</KEYWORD2> <!-- swfbutton -->
+			<KEYWORD2>setattribute</KEYWORD2> <!-- domelement, pdo -->
+			<KEYWORD2>setattributenode</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>setattributenodens</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>setattributens</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>setbackground</KEYWORD2> <!-- swfmovie -->
+			<KEYWORD2>setbounds</KEYWORD2> <!-- swftextfield -->
+			<KEYWORD2>setbuffering</KEYWORD2> <!-- lob -->
+			<KEYWORD2>setclass</KEYWORD2> <!-- soapserver -->
+			<KEYWORD2>setcolor</KEYWORD2> <!-- swftext, swftextfield -->
+			<KEYWORD2>setcommitedversion</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>setcookie</KEYWORD2>
+			<KEYWORD2>setdepth</KEYWORD2> <!-- swfdisplayitem -->
+			<KEYWORD2>setdimension</KEYWORD2> <!-- swfmovie -->
+			<KEYWORD2>setdown</KEYWORD2> <!-- swfbutton -->
+			<KEYWORD2>setfont</KEYWORD2> <!-- swftext, swftextfield -->
+			<KEYWORD2>setframes</KEYWORD2> <!-- swfmovie, swfsprite -->
+			<KEYWORD2>setheight</KEYWORD2> <!-- swftext, swftextfield -->
+			<KEYWORD2>sethit</KEYWORD2> <!-- swfbutton -->
+			<KEYWORD2>setindentation</KEYWORD2> <!-- swftextfield -->
+			<KEYWORD2>setleftfill</KEYWORD2> <!-- swfshape -->
+			<KEYWORD2>setleftmargin</KEYWORD2> <!-- swftextfield -->
+			<KEYWORD2>setline</KEYWORD2> <!-- swfshape -->
+			<KEYWORD2>setlinespacing</KEYWORD2> <!-- swftextfield -->
+			<KEYWORD2>setlocale</KEYWORD2>
+			<KEYWORD2>setmargins</KEYWORD2> <!-- swftextfield -->
+			<KEYWORD2>setname</KEYWORD2> <!-- swfdisplayitem, swftextfield -->
+			<KEYWORD2>setover</KEYWORD2> <!-- swfbutton -->
+			<KEYWORD2>setpersistence</KEYWORD2> <!-- soapserver -->
+			<KEYWORD2>setrate</KEYWORD2> <!-- swfmovie -->
+			<KEYWORD2>setratio</KEYWORD2> <!-- swfdisplayitem -->
+			<KEYWORD2>setrawcookie</KEYWORD2>
+			<KEYWORD2>setrightfill</KEYWORD2> <!-- swfshape -->
+			<KEYWORD2>setrightmargin</KEYWORD2> <!-- swftextfield -->
+			<KEYWORD2>setspacing</KEYWORD2> <!-- swftext -->
+			<KEYWORD2>settype</KEYWORD2>
+			<KEYWORD2>setup</KEYWORD2> <!-- swfbutton -->
+			<KEYWORD2>sha1</KEYWORD2>
+			<KEYWORD2>sha1_file</KEYWORD2>
+			<KEYWORD2>shell_exec</KEYWORD2>
+			<KEYWORD2>shm_attach</KEYWORD2>
+			<KEYWORD2>shm_detach</KEYWORD2>
+			<KEYWORD2>shm_get_var</KEYWORD2>
+			<KEYWORD2>shm_put_var</KEYWORD2>
+			<KEYWORD2>shm_remove</KEYWORD2>
+			<KEYWORD2>shm_remove_var</KEYWORD2>
+			<KEYWORD2>shmop_close</KEYWORD2>
+			<KEYWORD2>shmop_delete</KEYWORD2>
+			<KEYWORD2>shmop_open</KEYWORD2>
+			<KEYWORD2>shmop_read</KEYWORD2>
+			<KEYWORD2>shmop_size</KEYWORD2>
+			<KEYWORD2>shmop_write</KEYWORD2>
+			<KEYWORD2>show_source</KEYWORD2>
+			<KEYWORD2>shuffle</KEYWORD2>
+			<KEYWORD2>similar_text</KEYWORD2>
+			<KEYWORD2>simplexml_import_dom</KEYWORD2>
+			<KEYWORD2>simplexml_load_file</KEYWORD2>
+			<KEYWORD2>simplexml_load_string</KEYWORD2>
+			<KEYWORD2>sin</KEYWORD2>
+			<KEYWORD2>sinh</KEYWORD2>
+			<KEYWORD2>size</KEYWORD2> <!-- collection, lob -->
+			<KEYWORD2>sizeof</KEYWORD2>
+			<KEYWORD2>skewx</KEYWORD2> <!-- swfdisplayitem -->
+			<KEYWORD2>skewxto</KEYWORD2> <!-- swfdisplayitem, swffill -->
+			<KEYWORD2>skewy</KEYWORD2> <!-- swfdisplayitem -->
+			<KEYWORD2>skewyto</KEYWORD2> <!-- swfdisplayitem, swffill -->
+			<KEYWORD2>sleep</KEYWORD2>
+			<KEYWORD2>snmp_get_quick_print</KEYWORD2>
+			<KEYWORD2>snmp_get_valueretrieval</KEYWORD2>
+			<KEYWORD2>snmp_read_mib</KEYWORD2>
+			<KEYWORD2>snmp_set_enum_print</KEYWORD2>
+			<KEYWORD2>snmp_set_oid_numeric_print</KEYWORD2>
+			<KEYWORD2>snmp_set_quick_print</KEYWORD2>
+			<KEYWORD2>snmp_set_valueretrieval</KEYWORD2>
+			<KEYWORD2>snmpget</KEYWORD2>
+			<KEYWORD2>snmpgetnext</KEYWORD2>
+			<KEYWORD2>snmprealwalk</KEYWORD2>
+			<KEYWORD2>snmpset</KEYWORD2>
+			<KEYWORD2>snmpwalk</KEYWORD2>
+			<KEYWORD2>snmpwalkoid</KEYWORD2>
+			<KEYWORD2>socket_accept</KEYWORD2>
+			<KEYWORD2>socket_bind</KEYWORD2>
+			<KEYWORD2>socket_clear_error</KEYWORD2>
+			<KEYWORD2>socket_close</KEYWORD2>
+			<KEYWORD2>socket_connect</KEYWORD2>
+			<KEYWORD2>socket_create</KEYWORD2>
+			<KEYWORD2>socket_create_listen</KEYWORD2>
+			<KEYWORD2>socket_create_pair</KEYWORD2>
+			<KEYWORD2>socket_get_option</KEYWORD2>
+			<KEYWORD2>socket_get_status</KEYWORD2>
+			<KEYWORD2>socket_getpeername</KEYWORD2>
+			<KEYWORD2>socket_getsockname</KEYWORD2>
+			<KEYWORD2>socket_last_error</KEYWORD2>
+			<KEYWORD2>socket_listen</KEYWORD2>
+			<KEYWORD2>socket_read</KEYWORD2>
+			<KEYWORD2>socket_recv</KEYWORD2>
+			<KEYWORD2>socket_recvfrom</KEYWORD2>
+			<KEYWORD2>socket_select</KEYWORD2>
+			<KEYWORD2>socket_send</KEYWORD2>
+			<KEYWORD2>socket_sendto</KEYWORD2>
+			<KEYWORD2>socket_set_block</KEYWORD2>
+			<KEYWORD2>socket_set_blocking</KEYWORD2>
+			<KEYWORD2>socket_set_nonblock</KEYWORD2>
+			<KEYWORD2>socket_set_option</KEYWORD2>
+			<KEYWORD2>socket_set_timeout</KEYWORD2>
+			<KEYWORD2>socket_shutdown</KEYWORD2>
+			<KEYWORD2>socket_strerror</KEYWORD2>
+			<KEYWORD2>socket_write</KEYWORD2>
+			<KEYWORD2>sort</KEYWORD2>
+			<KEYWORD2>soundex</KEYWORD2>
+			<KEYWORD2>specified</KEYWORD2> <!-- domattribute -->
+			<KEYWORD2>spl_classes</KEYWORD2>
+			<KEYWORD2>split</KEYWORD2>
+			<KEYWORD2>spliti</KEYWORD2>
+			<KEYWORD2>splittext</KEYWORD2> <!-- domtext -->
+			<KEYWORD2>sprintf</KEYWORD2>
+			<KEYWORD2>sql_regcase</KEYWORD2>
+			<KEYWORD2>sqlite_array_query</KEYWORD2>
+			<KEYWORD2>sqlite_busy_timeout</KEYWORD2>
+			<KEYWORD2>sqlite_changes</KEYWORD2>
+			<KEYWORD2>sqlite_close</KEYWORD2>
+			<KEYWORD2>sqlite_column</KEYWORD2>
+			<KEYWORD2>sqlite_create_aggregate</KEYWORD2>
+			<KEYWORD2>sqlite_create_function</KEYWORD2>
+			<KEYWORD2>sqlite_current</KEYWORD2>
+			<KEYWORD2>sqlite_error_string</KEYWORD2>
+			<KEYWORD2>sqlite_escape_string</KEYWORD2>
+			<KEYWORD2>sqlite_exec</KEYWORD2>
+			<KEYWORD2>sqlite_factory</KEYWORD2>
+			<KEYWORD2>sqlite_fetch_all</KEYWORD2>
+			<KEYWORD2>sqlite_fetch_array</KEYWORD2>
+			<KEYWORD2>sqlite_fetch_column_types</KEYWORD2>
+			<KEYWORD2>sqlite_fetch_object</KEYWORD2>
+			<KEYWORD2>sqlite_fetch_single</KEYWORD2>
+			<KEYWORD2>sqlite_fetch_string</KEYWORD2>
+			<KEYWORD2>sqlite_field_name</KEYWORD2>
+			<KEYWORD2>sqlite_has_more</KEYWORD2>
+			<KEYWORD2>sqlite_has_prev</KEYWORD2>
+			<KEYWORD2>sqlite_last_error</KEYWORD2>
+			<KEYWORD2>sqlite_last_insert_rowid</KEYWORD2>
+			<KEYWORD2>sqlite_libencoding</KEYWORD2>
+			<KEYWORD2>sqlite_libversion</KEYWORD2>
+			<KEYWORD2>sqlite_next</KEYWORD2>
+			<KEYWORD2>sqlite_num_fields</KEYWORD2>
+			<KEYWORD2>sqlite_num_rows</KEYWORD2>
+			<KEYWORD2>sqlite_open</KEYWORD2>
+			<KEYWORD2>sqlite_popen</KEYWORD2>
+			<KEYWORD2>sqlite_prev</KEYWORD2>
+			<KEYWORD2>sqlite_query</KEYWORD2>
+			<KEYWORD2>sqlite_rewind</KEYWORD2>
+			<KEYWORD2>sqlite_seek</KEYWORD2>
+			<KEYWORD2>sqlite_single_query</KEYWORD2>
+			<KEYWORD2>sqlite_udf_decode_binary</KEYWORD2>
+			<KEYWORD2>sqlite_udf_encode_binary</KEYWORD2>
+			<KEYWORD2>sqlite_unbuffered_query</KEYWORD2>
+			<KEYWORD2>sqrt</KEYWORD2>
+			<KEYWORD2>srand</KEYWORD2>
+			<KEYWORD2>srcanchors</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>srcsofdst</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>sscanf</KEYWORD2>
+			<KEYWORD2>stat</KEYWORD2>
+			<KEYWORD2>str_ireplace</KEYWORD2>
+			<KEYWORD2>str_pad</KEYWORD2>
+			<KEYWORD2>str_repeat</KEYWORD2>
+			<KEYWORD2>str_replace</KEYWORD2>
+			<KEYWORD2>str_rot13</KEYWORD2>
+			<KEYWORD2>str_shuffle</KEYWORD2>
+			<KEYWORD2>str_split</KEYWORD2>
+			<KEYWORD2>str_word_count</KEYWORD2>
+			<KEYWORD2>strcasecmp</KEYWORD2>
+			<KEYWORD2>strchr</KEYWORD2>
+			<KEYWORD2>strcmp</KEYWORD2>
+			<KEYWORD2>strcoll</KEYWORD2>
+			<KEYWORD2>strcspn</KEYWORD2>
+			<KEYWORD2>stream_context_create</KEYWORD2>
+			<KEYWORD2>stream_context_get_default</KEYWORD2>
+			<KEYWORD2>stream_context_get_options</KEYWORD2>
+			<KEYWORD2>stream_context_set_option</KEYWORD2>
+			<KEYWORD2>stream_context_set_params</KEYWORD2>
+			<KEYWORD2>stream_copy_to_stream</KEYWORD2>
+			<KEYWORD2>stream_filter_append</KEYWORD2>
+			<KEYWORD2>stream_filter_prepend</KEYWORD2>
+			<KEYWORD2>stream_filter_register</KEYWORD2>
+			<KEYWORD2>stream_filter_remove</KEYWORD2>
+			<KEYWORD2>stream_get_contents</KEYWORD2>
+			<KEYWORD2>stream_get_filters</KEYWORD2>
+			<KEYWORD2>stream_get_line</KEYWORD2>
+			<KEYWORD2>stream_get_meta_data</KEYWORD2>
+			<KEYWORD2>stream_get_transports</KEYWORD2>
+			<KEYWORD2>stream_get_wrappers</KEYWORD2>
+			<KEYWORD2>stream_register_wrapper</KEYWORD2>
+			<KEYWORD2>stream_select</KEYWORD2>
+			<KEYWORD2>stream_set_blocking</KEYWORD2>
+			<KEYWORD2>stream_set_timeout</KEYWORD2>
+			<KEYWORD2>stream_set_write_buffer</KEYWORD2>
+			<KEYWORD2>stream_socket_accept</KEYWORD2>
+			<KEYWORD2>stream_socket_client</KEYWORD2>
+			<KEYWORD2>stream_socket_enable_crypto</KEYWORD2>
+			<KEYWORD2>stream_socket_get_name</KEYWORD2>
+			<KEYWORD2>stream_socket_recvfrom</KEYWORD2>
+			<KEYWORD2>stream_socket_sendto</KEYWORD2>
+			<KEYWORD2>stream_socket_server</KEYWORD2>
+			<KEYWORD2>stream_wrapper_register</KEYWORD2>
+			<KEYWORD2>stream_wrapper_restore</KEYWORD2>
+			<KEYWORD2>stream_wrapper_unregister</KEYWORD2>
+			<KEYWORD2>streammp3</KEYWORD2> <!-- swfmovie -->
+			<KEYWORD2>strftime</KEYWORD2>
+			<KEYWORD2>strip_tags</KEYWORD2>
+			<KEYWORD2>stripcslashes</KEYWORD2>
+			<KEYWORD2>stripos</KEYWORD2>
+			<KEYWORD2>stripslashes</KEYWORD2>
+			<KEYWORD2>stristr</KEYWORD2>
+			<KEYWORD2>strlen</KEYWORD2>
+			<KEYWORD2>strnatcasecmp</KEYWORD2>
+			<KEYWORD2>strnatcmp</KEYWORD2>
+			<KEYWORD2>strncasecmp</KEYWORD2>
+			<KEYWORD2>strncmp</KEYWORD2>
+			<KEYWORD2>strpbrk</KEYWORD2>
+			<KEYWORD2>strpos</KEYWORD2>
+			<KEYWORD2>strptime</KEYWORD2>
+			<KEYWORD2>strrchr</KEYWORD2>
+			<KEYWORD2>strrev</KEYWORD2>
+			<KEYWORD2>strripos</KEYWORD2>
+			<KEYWORD2>strrpos</KEYWORD2>
+			<KEYWORD2>strspn</KEYWORD2>
+			<KEYWORD2>strstr</KEYWORD2>
+			<KEYWORD2>strtok</KEYWORD2>
+			<KEYWORD2>strtolower</KEYWORD2>
+			<KEYWORD2>strtotime</KEYWORD2>
+			<KEYWORD2>strtoupper</KEYWORD2>
+			<KEYWORD2>strtr</KEYWORD2>
+			<KEYWORD2>strval</KEYWORD2>
+			<KEYWORD2>substr</KEYWORD2>
+			<KEYWORD2>substr_compare</KEYWORD2>
+			<KEYWORD2>substr_count</KEYWORD2>
+			<KEYWORD2>substr_replace</KEYWORD2>
+			<KEYWORD2>substringdata</KEYWORD2> <!-- domcharacterdata -->
+			<KEYWORD2>swf_actiongeturl</KEYWORD2>
+			<KEYWORD2>swf_actiongotoframe</KEYWORD2>
+			<KEYWORD2>swf_actiongotolabel</KEYWORD2>
+			<KEYWORD2>swf_actionnextframe</KEYWORD2>
+			<KEYWORD2>swf_actionplay</KEYWORD2>
+			<KEYWORD2>swf_actionprevframe</KEYWORD2>
+			<KEYWORD2>swf_actionsettarget</KEYWORD2>
+			<KEYWORD2>swf_actionstop</KEYWORD2>
+			<KEYWORD2>swf_actiontogglequality</KEYWORD2>
+			<KEYWORD2>swf_actionwaitforframe</KEYWORD2>
+			<KEYWORD2>swf_addbuttonrecord</KEYWORD2>
+			<KEYWORD2>swf_addcolor</KEYWORD2>
+			<KEYWORD2>swf_closefile</KEYWORD2>
+			<KEYWORD2>swf_definebitmap</KEYWORD2>
+			<KEYWORD2>swf_definefont</KEYWORD2>
+			<KEYWORD2>swf_defineline</KEYWORD2>
+			<KEYWORD2>swf_definepoly</KEYWORD2>
+			<KEYWORD2>swf_definerect</KEYWORD2>
+			<KEYWORD2>swf_definetext</KEYWORD2>
+			<KEYWORD2>swf_endbutton</KEYWORD2>
+			<KEYWORD2>swf_enddoaction</KEYWORD2>
+			<KEYWORD2>swf_endshape</KEYWORD2>
+			<KEYWORD2>swf_endsymbol</KEYWORD2>
+			<KEYWORD2>swf_fontsize</KEYWORD2>
+			<KEYWORD2>swf_fontslant</KEYWORD2>
+			<KEYWORD2>swf_fonttracking</KEYWORD2>
+			<KEYWORD2>swf_getbitmapinfo</KEYWORD2>
+			<KEYWORD2>swf_getfontinfo</KEYWORD2>
+			<KEYWORD2>swf_getframe</KEYWORD2>
+			<KEYWORD2>swf_labelframe</KEYWORD2>
+			<KEYWORD2>swf_lookat</KEYWORD2>
+			<KEYWORD2>swf_modifyobject</KEYWORD2>
+			<KEYWORD2>swf_mulcolor</KEYWORD2>
+			<KEYWORD2>swf_nextid</KEYWORD2>
+			<KEYWORD2>swf_oncondition</KEYWORD2>
+			<KEYWORD2>swf_openfile</KEYWORD2>
+			<KEYWORD2>swf_ortho</KEYWORD2>
+			<KEYWORD2>swf_ortho2</KEYWORD2>
+			<KEYWORD2>swf_perspective</KEYWORD2>
+			<KEYWORD2>swf_placeobject</KEYWORD2>
+			<KEYWORD2>swf_polarview</KEYWORD2>
+			<KEYWORD2>swf_popmatrix</KEYWORD2>
+			<KEYWORD2>swf_posround</KEYWORD2>
+			<KEYWORD2>swf_pushmatrix</KEYWORD2>
+			<KEYWORD2>swf_removeobject</KEYWORD2>
+			<KEYWORD2>swf_rotate</KEYWORD2>
+			<KEYWORD2>swf_scale</KEYWORD2>
+			<KEYWORD2>swf_setfont</KEYWORD2>
+			<KEYWORD2>swf_setframe</KEYWORD2>
+			<KEYWORD2>swf_shapearc</KEYWORD2>
+			<KEYWORD2>swf_shapecurveto</KEYWORD2>
+			<KEYWORD2>swf_shapecurveto3</KEYWORD2>
+			<KEYWORD2>swf_shapefillbitmapclip</KEYWORD2>
+			<KEYWORD2>swf_shapefillbitmaptile</KEYWORD2>
+			<KEYWORD2>swf_shapefilloff</KEYWORD2>
+			<KEYWORD2>swf_shapefillsolid</KEYWORD2>
+			<KEYWORD2>swf_shapelinesolid</KEYWORD2>
+			<KEYWORD2>swf_shapelineto</KEYWORD2>
+			<KEYWORD2>swf_shapemoveto</KEYWORD2>
+			<KEYWORD2>swf_showframe</KEYWORD2>
+			<KEYWORD2>swf_startbutton</KEYWORD2>
+			<KEYWORD2>swf_startdoaction</KEYWORD2>
+			<KEYWORD2>swf_startshape</KEYWORD2>
+			<KEYWORD2>swf_startsymbol</KEYWORD2>
+			<KEYWORD2>swf_textwidth</KEYWORD2>
+			<KEYWORD2>swf_translate</KEYWORD2>
+			<KEYWORD2>swf_viewport</KEYWORD2>
+			<KEYWORD2>swfbutton_keypress</KEYWORD2>
+			<KEYWORD2>sybase_affected_rows</KEYWORD2>
+			<KEYWORD2>sybase_close</KEYWORD2>
+			<KEYWORD2>sybase_connect</KEYWORD2>
+			<KEYWORD2>sybase_data_seek</KEYWORD2>
+			<KEYWORD2>sybase_deadlock_retry_count</KEYWORD2>
+			<KEYWORD2>sybase_fetch_array</KEYWORD2>
+			<KEYWORD2>sybase_fetch_assoc</KEYWORD2>
+			<KEYWORD2>sybase_fetch_field</KEYWORD2>
+			<KEYWORD2>sybase_fetch_object</KEYWORD2>
+			<KEYWORD2>sybase_fetch_row</KEYWORD2>
+			<KEYWORD2>sybase_field_seek</KEYWORD2>
+			<KEYWORD2>sybase_free_result</KEYWORD2>
+			<KEYWORD2>sybase_get_last_message</KEYWORD2>
+			<KEYWORD2>sybase_min_client_severity</KEYWORD2>
+			<KEYWORD2>sybase_min_error_severity</KEYWORD2>
+			<KEYWORD2>sybase_min_message_severity</KEYWORD2>
+			<KEYWORD2>sybase_min_server_severity</KEYWORD2>
+			<KEYWORD2>sybase_num_fields</KEYWORD2>
+			<KEYWORD2>sybase_num_rows</KEYWORD2>
+			<KEYWORD2>sybase_pconnect</KEYWORD2>
+			<KEYWORD2>sybase_query</KEYWORD2>
+			<KEYWORD2>sybase_result</KEYWORD2>
+			<KEYWORD2>sybase_select_db</KEYWORD2>
+			<KEYWORD2>sybase_set_message_handler</KEYWORD2>
+			<KEYWORD2>sybase_unbuffered_query</KEYWORD2>
+			<KEYWORD2>symlink</KEYWORD2>
+			<KEYWORD2>syslog</KEYWORD2>
+			<KEYWORD2>system</KEYWORD2>
+			<KEYWORD2>system_id</KEYWORD2> <!-- domdocumenttype -->
+			<KEYWORD2>tagname</KEYWORD2> <!-- domelement -->
+			<KEYWORD2>tan</KEYWORD2>
+			<KEYWORD2>tanh</KEYWORD2>
+			<KEYWORD2>target</KEYWORD2> <!-- domprocessinginstruction -->
+			<KEYWORD2>tcpwrap_check</KEYWORD2>
+			<KEYWORD2>tell</KEYWORD2> <!-- lob -->
+			<KEYWORD2>tempnam</KEYWORD2>
+			<KEYWORD2>textdomain</KEYWORD2>
+			<KEYWORD2>tidy_access_count</KEYWORD2>
+			<KEYWORD2>tidy_clean_repair</KEYWORD2>
+			<KEYWORD2>tidy_config_count</KEYWORD2>
+			<KEYWORD2>tidy_diagnose</KEYWORD2>
+			<KEYWORD2>tidy_error_count</KEYWORD2>
+			<KEYWORD2>tidy_get_body</KEYWORD2>
+			<KEYWORD2>tidy_get_config</KEYWORD2>
+			<KEYWORD2>tidy_get_error_buffer</KEYWORD2>
+			<KEYWORD2>tidy_get_head</KEYWORD2>
+			<KEYWORD2>tidy_get_html</KEYWORD2>
+			<KEYWORD2>tidy_get_html_ver</KEYWORD2>
+			<KEYWORD2>tidy_get_output</KEYWORD2>
+			<KEYWORD2>tidy_get_release</KEYWORD2>
+			<KEYWORD2>tidy_get_root</KEYWORD2>
+			<KEYWORD2>tidy_get_status</KEYWORD2>
+			<KEYWORD2>tidy_getopt</KEYWORD2>
+			<KEYWORD2>tidy_is_xhtml</KEYWORD2>
+			<KEYWORD2>tidy_is_xml</KEYWORD2>
+			<KEYWORD2>tidy_load_config</KEYWORD2>
+			<KEYWORD2>tidy_parse_file</KEYWORD2>
+			<KEYWORD2>tidy_parse_string</KEYWORD2>
+			<KEYWORD2>tidy_repair_file</KEYWORD2>
+			<KEYWORD2>tidy_repair_string</KEYWORD2>
+			<KEYWORD2>tidy_reset_config</KEYWORD2>
+			<KEYWORD2>tidy_save_config</KEYWORD2>
+			<KEYWORD2>tidy_set_encoding</KEYWORD2>
+			<KEYWORD2>tidy_setopt</KEYWORD2>
+			<KEYWORD2>tidy_warning_count</KEYWORD2>
+			<KEYWORD2>time</KEYWORD2>
+			<KEYWORD2>time_nanosleep</KEYWORD2>
+			<KEYWORD2>title</KEYWORD2> <!-- hw_api_object -->
+			<KEYWORD2>tmpfile</KEYWORD2>
+			<KEYWORD2>token_get_all</KEYWORD2>
+			<KEYWORD2>token_name</KEYWORD2>
+			<KEYWORD2>touch</KEYWORD2>
+			<KEYWORD2>trigger_error</KEYWORD2>
+			<KEYWORD2>trim</KEYWORD2> <!-- collection -->
+			<KEYWORD2>truncate</KEYWORD2> <!-- lob -->
+			<KEYWORD2>type</KEYWORD2> <!-- hw_api_reason -->
+			<KEYWORD2>uasort</KEYWORD2>
+			<KEYWORD2>ucfirst</KEYWORD2>
+			<KEYWORD2>ucwords</KEYWORD2>
+			<KEYWORD2>udm_add_search_limit</KEYWORD2>
+			<KEYWORD2>udm_alloc_agent</KEYWORD2>
+			<KEYWORD2>udm_alloc_agent_array</KEYWORD2>
+			<KEYWORD2>udm_api_version</KEYWORD2>
+			<KEYWORD2>udm_cat_list</KEYWORD2>
+			<KEYWORD2>udm_cat_path</KEYWORD2>
+			<KEYWORD2>udm_check_charset</KEYWORD2>
+			<KEYWORD2>udm_check_stored</KEYWORD2>
+			<KEYWORD2>udm_clear_search_limits</KEYWORD2>
+			<KEYWORD2>udm_close_stored</KEYWORD2>
+			<KEYWORD2>udm_crc32</KEYWORD2>
+			<KEYWORD2>udm_errno</KEYWORD2>
+			<KEYWORD2>udm_error</KEYWORD2>
+			<KEYWORD2>udm_find</KEYWORD2>
+			<KEYWORD2>udm_free_agent</KEYWORD2>
+			<KEYWORD2>udm_free_ispell_data</KEYWORD2>
+			<KEYWORD2>udm_free_res</KEYWORD2>
+			<KEYWORD2>udm_get_doc_count</KEYWORD2>
+			<KEYWORD2>udm_get_res_field</KEYWORD2>
+			<KEYWORD2>udm_get_res_param</KEYWORD2>
+			<KEYWORD2>udm_hash32</KEYWORD2>
+			<KEYWORD2>udm_load_ispell_data</KEYWORD2>
+			<KEYWORD2>udm_open_stored</KEYWORD2>
+			<KEYWORD2>udm_set_agent_param</KEYWORD2>
+			<KEYWORD2>uksort</KEYWORD2>
+			<KEYWORD2>umask</KEYWORD2>
+			<KEYWORD2>uniqid</KEYWORD2>
+			<KEYWORD2>unixtojd</KEYWORD2>
+			<KEYWORD2>unlink</KEYWORD2>
+			<KEYWORD2>unlink_node</KEYWORD2> <!-- domnode -->
+			<KEYWORD2>unlock</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>unpack</KEYWORD2>
+			<KEYWORD2>unregister_tick_function</KEYWORD2>
+			<KEYWORD2>unserialize</KEYWORD2>
+			<KEYWORD2>urldecode</KEYWORD2>
+			<KEYWORD2>urlencode</KEYWORD2>
+			<KEYWORD2>user</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>user_error</KEYWORD2>
+			<KEYWORD2>userlist</KEYWORD2> <!-- hw_api -->
+			<KEYWORD2>usleep</KEYWORD2>
+			<KEYWORD2>usort</KEYWORD2>
+			<KEYWORD2>utf8_decode</KEYWORD2>
+			<KEYWORD2>utf8_encode</KEYWORD2>
+			<KEYWORD2>valid</KEYWORD2> <!-- arrayiterator, cachingiterator, directoryiterator, filteriterator, limititerator, recursiveiteratoriterator, simplexmliterator -->
+			<KEYWORD2>validate</KEYWORD2> <!-- domdocument -->
+			<KEYWORD2>value</KEYWORD2> <!-- domattribute, hw_api_attribute, hw_api_object -->
+			<KEYWORD2>values</KEYWORD2> <!-- hw_api_attribute -->
+			<KEYWORD2>var_dump</KEYWORD2>
+			<KEYWORD2>var_export</KEYWORD2>
+			<KEYWORD2>variant_abs</KEYWORD2>
+			<KEYWORD2>variant_add</KEYWORD2>
+			<KEYWORD2>variant_and</KEYWORD2>
+			<KEYWORD2>variant_cast</KEYWORD2>
+			<KEYWORD2>variant_cat</KEYWORD2>
+			<KEYWORD2>variant_cmp</KEYWORD2>
+			<KEYWORD2>variant_date_from_timestamp</KEYWORD2>
+			<KEYWORD2>variant_date_to_timestamp</KEYWORD2>
+			<KEYWORD2>variant_div</KEYWORD2>
+			<KEYWORD2>variant_eqv</KEYWORD2>
+			<KEYWORD2>variant_fix</KEYWORD2>
+			<KEYWORD2>variant_get_type</KEYWORD2>
+			<KEYWORD2>variant_idiv</KEYWORD2>
+			<KEYWORD2>variant_imp</KEYWORD2>
+			<KEYWORD2>variant_int</KEYWORD2>
+			<KEYWORD2>variant_mod</KEYWORD2>
+			<KEYWORD2>variant_mul</KEYWORD2>
+			<KEYWORD2>variant_neg</KEYWORD2>
+			<KEYWORD2>variant_not</KEYWORD2>
+			<KEYWORD2>variant_or</KEYWORD2>
+			<KEYWORD2>variant_pow</KEYWORD2>
+			<KEYWORD2>variant_round</KEYWORD2>
+			<KEYWORD2>variant_set</KEYWORD2>
+			<KEYWORD2>variant_set_type</KEYWORD2>
+			<KEYWORD2>variant_sub</KEYWORD2>
+			<KEYWORD2>variant_xor</KEYWORD2>
+			<KEYWORD2>version_compare</KEYWORD2>
+			<KEYWORD2>vfprintf</KEYWORD2>
+			<KEYWORD2>virtual</KEYWORD2>
+			<KEYWORD2>vpopmail_add_alias_domain</KEYWORD2>
+			<KEYWORD2>vpopmail_add_alias_domain_ex</KEYWORD2>
+			<KEYWORD2>vpopmail_add_domain</KEYWORD2>
+			<KEYWORD2>vpopmail_add_domain_ex</KEYWORD2>
+			<KEYWORD2>vpopmail_add_user</KEYWORD2>
+			<KEYWORD2>vpopmail_alias_add</KEYWORD2>
+			<KEYWORD2>vpopmail_alias_del</KEYWORD2>
+			<KEYWORD2>vpopmail_alias_del_domain</KEYWORD2>
+			<KEYWORD2>vpopmail_alias_get</KEYWORD2>
+			<KEYWORD2>vpopmail_alias_get_all</KEYWORD2>
+			<KEYWORD2>vpopmail_auth_user</KEYWORD2>
+			<KEYWORD2>vpopmail_del_domain</KEYWORD2>
+			<KEYWORD2>vpopmail_del_domain_ex</KEYWORD2>
+			<KEYWORD2>vpopmail_del_user</KEYWORD2>
+			<KEYWORD2>vpopmail_error</KEYWORD2>
+			<KEYWORD2>vpopmail_passwd</KEYWORD2>
+			<KEYWORD2>vpopmail_set_user_quota</KEYWORD2>
+			<KEYWORD2>vprintf</KEYWORD2>
+			<KEYWORD2>vsprintf</KEYWORD2>
+			<KEYWORD2>w32api_deftype</KEYWORD2>
+			<KEYWORD2>w32api_init_dtype</KEYWORD2>
+			<KEYWORD2>w32api_invoke_function</KEYWORD2>
+			<KEYWORD2>w32api_register_function</KEYWORD2>
+			<KEYWORD2>w32api_set_call_method</KEYWORD2>
+			<KEYWORD2>wddx_add_vars</KEYWORD2>
+			<KEYWORD2>wddx_deserialize</KEYWORD2>
+			<KEYWORD2>wddx_packet_end</KEYWORD2>
+			<KEYWORD2>wddx_packet_start</KEYWORD2>
+			<KEYWORD2>wddx_serialize_value</KEYWORD2>
+			<KEYWORD2>wddx_serialize_vars</KEYWORD2>
+			<KEYWORD2>wordwrap</KEYWORD2>
+			<KEYWORD2>write</KEYWORD2> <!-- lob -->
+			<KEYWORD2>writetemporary</KEYWORD2> <!-- lob -->
+			<KEYWORD2>xattr_get</KEYWORD2>
+			<KEYWORD2>xattr_list</KEYWORD2>
+			<KEYWORD2>xattr_remove</KEYWORD2>
+			<KEYWORD2>xattr_set</KEYWORD2>
+			<KEYWORD2>xattr_supported</KEYWORD2>
+			<KEYWORD2>xdiff_file_diff</KEYWORD2>
+			<KEYWORD2>xdiff_file_diff_binary</KEYWORD2>
+			<KEYWORD2>xdiff_file_merge3</KEYWORD2>
+			<KEYWORD2>xdiff_file_patch</KEYWORD2>
+			<KEYWORD2>xdiff_file_patch_binary</KEYWORD2>
+			<KEYWORD2>xdiff_string_diff</KEYWORD2>
+			<KEYWORD2>xdiff_string_diff_binary</KEYWORD2>
+			<KEYWORD2>xdiff_string_merge3</KEYWORD2>
+			<KEYWORD2>xdiff_string_patch</KEYWORD2>
+			<KEYWORD2>xdiff_string_patch_binary</KEYWORD2>
+			<KEYWORD2>xinclude</KEYWORD2> <!-- domdocument, domdocument -->
+			<KEYWORD2>xml_error_string</KEYWORD2>
+			<KEYWORD2>xml_get_current_byte_index</KEYWORD2>
+			<KEYWORD2>xml_get_current_column_number</KEYWORD2>
+			<KEYWORD2>xml_get_current_line_number</KEYWORD2>
+			<KEYWORD2>xml_get_error_code</KEYWORD2>
+			<KEYWORD2>xml_parse</KEYWORD2>
+			<KEYWORD2>xml_parse_into_struct</KEYWORD2>
+			<KEYWORD2>xml_parser_create</KEYWORD2>
+			<KEYWORD2>xml_parser_create_ns</KEYWORD2>
+			<KEYWORD2>xml_parser_free</KEYWORD2>
+			<KEYWORD2>xml_parser_get_option</KEYWORD2>
+			<KEYWORD2>xml_parser_set_option</KEYWORD2>
+			<KEYWORD2>xml_set_character_data_handler</KEYWORD2>
+			<KEYWORD2>xml_set_default_handler</KEYWORD2>
+			<KEYWORD2>xml_set_element_handler</KEYWORD2>
+			<KEYWORD2>xml_set_end_namespace_decl_handler</KEYWORD2>
+			<KEYWORD2>xml_set_external_entity_ref_handler</KEYWORD2>
+			<KEYWORD2>xml_set_notation_decl_handler</KEYWORD2>
+			<KEYWORD2>xml_set_object</KEYWORD2>
+			<KEYWORD2>xml_set_processing_instruction_handler</KEYWORD2>
+			<KEYWORD2>xml_set_start_namespace_decl_handler</KEYWORD2>
+			<KEYWORD2>xml_set_unparsed_entity_decl_handler</KEYWORD2>
+			<KEYWORD2>xmlrpc_decode</KEYWORD2>
+			<KEYWORD2>xmlrpc_decode_request</KEYWORD2>
+			<KEYWORD2>xmlrpc_encode</KEYWORD2>
+			<KEYWORD2>xmlrpc_encode_request</KEYWORD2>
+			<KEYWORD2>xmlrpc_get_type</KEYWORD2>
+			<KEYWORD2>xmlrpc_is_fault</KEYWORD2>
+			<KEYWORD2>xmlrpc_parse_method_descriptions</KEYWORD2>
+			<KEYWORD2>xmlrpc_server_add_introspection_data</KEYWORD2>
+			<KEYWORD2>xmlrpc_server_call_method</KEYWORD2>
+			<KEYWORD2>xmlrpc_server_create</KEYWORD2>
+			<KEYWORD2>xmlrpc_server_destroy</KEYWORD2>
+			<KEYWORD2>xmlrpc_server_register_introspection_callback</KEYWORD2>
+			<KEYWORD2>xmlrpc_server_register_method</KEYWORD2>
+			<KEYWORD2>xmlrpc_set_type</KEYWORD2>
+			<KEYWORD2>xpath</KEYWORD2> <!-- simplexmlelement -->
+			<KEYWORD2>xpath_eval</KEYWORD2>
+			<KEYWORD2>xpath_eval_expression</KEYWORD2>
+			<KEYWORD2>xpath_new_context</KEYWORD2>
+			<KEYWORD2>xptr_eval</KEYWORD2>
+			<KEYWORD2>xptr_new_context</KEYWORD2>
+			<KEYWORD2>xsl_xsltprocessor_get_parameter</KEYWORD2>
+			<KEYWORD2>xsl_xsltprocessor_has_exslt_support</KEYWORD2>
+			<KEYWORD2>xsl_xsltprocessor_import_stylesheet</KEYWORD2>
+			<KEYWORD2>xsl_xsltprocessor_register_php_functions</KEYWORD2>
+			<KEYWORD2>xsl_xsltprocessor_remove_parameter</KEYWORD2>
+			<KEYWORD2>xsl_xsltprocessor_set_parameter</KEYWORD2>
+			<KEYWORD2>xsl_xsltprocessor_transform_to_doc</KEYWORD2>
+			<KEYWORD2>xsl_xsltprocessor_transform_to_uri</KEYWORD2>
+			<KEYWORD2>xsl_xsltprocessor_transform_to_xml</KEYWORD2>
+			<KEYWORD2>xslt_backend_info</KEYWORD2>
+			<KEYWORD2>xslt_backend_name</KEYWORD2>
+			<KEYWORD2>xslt_backend_version</KEYWORD2>
+			<KEYWORD2>xslt_create</KEYWORD2>
+			<KEYWORD2>xslt_errno</KEYWORD2>
+			<KEYWORD2>xslt_error</KEYWORD2>
+			<KEYWORD2>xslt_free</KEYWORD2>
+			<KEYWORD2>xslt_getopt</KEYWORD2>
+			<KEYWORD2>xslt_process</KEYWORD2>
+			<KEYWORD2>xslt_set_base</KEYWORD2>
+			<KEYWORD2>xslt_set_encoding</KEYWORD2>
+			<KEYWORD2>xslt_set_error_handler</KEYWORD2>
+			<KEYWORD2>xslt_set_log</KEYWORD2>
+			<KEYWORD2>xslt_set_object</KEYWORD2>
+			<KEYWORD2>xslt_set_sax_handler</KEYWORD2>
+			<KEYWORD2>xslt_set_sax_handlers</KEYWORD2>
+			<KEYWORD2>xslt_set_scheme_handler</KEYWORD2>
+			<KEYWORD2>xslt_set_scheme_handlers</KEYWORD2>
+			<KEYWORD2>xslt_setopt</KEYWORD2>
+			<KEYWORD2>yaz_addinfo</KEYWORD2>
+			<KEYWORD2>yaz_ccl_conf</KEYWORD2>
+			<KEYWORD2>yaz_ccl_parse</KEYWORD2>
+			<KEYWORD2>yaz_close</KEYWORD2>
+			<KEYWORD2>yaz_connect</KEYWORD2>
+			<KEYWORD2>yaz_database</KEYWORD2>
+			<KEYWORD2>yaz_element</KEYWORD2>
+			<KEYWORD2>yaz_errno</KEYWORD2>
+			<KEYWORD2>yaz_error</KEYWORD2>
+			<KEYWORD2>yaz_es_result</KEYWORD2>
+			<KEYWORD2>yaz_get_option</KEYWORD2>
+			<KEYWORD2>yaz_hits</KEYWORD2>
+			<KEYWORD2>yaz_itemorder</KEYWORD2>
+			<KEYWORD2>yaz_present</KEYWORD2>
+			<KEYWORD2>yaz_range</KEYWORD2>
+			<KEYWORD2>yaz_record</KEYWORD2>
+			<KEYWORD2>yaz_scan</KEYWORD2>
+			<KEYWORD2>yaz_scan_result</KEYWORD2>
+			<KEYWORD2>yaz_schema</KEYWORD2>
+			<KEYWORD2>yaz_search</KEYWORD2>
+			<KEYWORD2>yaz_set_option</KEYWORD2>
+			<KEYWORD2>yaz_sort</KEYWORD2>
+			<KEYWORD2>yaz_syntax</KEYWORD2>
+			<KEYWORD2>yaz_wait</KEYWORD2>
+			<KEYWORD2>yp_all</KEYWORD2>
+			<KEYWORD2>yp_cat</KEYWORD2>
+			<KEYWORD2>yp_err_string</KEYWORD2>
+			<KEYWORD2>yp_errno</KEYWORD2>
+			<KEYWORD2>yp_first</KEYWORD2>
+			<KEYWORD2>yp_get_default_domain</KEYWORD2>
+			<KEYWORD2>yp_master</KEYWORD2>
+			<KEYWORD2>yp_match</KEYWORD2>
+			<KEYWORD2>yp_next</KEYWORD2>
+			<KEYWORD2>yp_order</KEYWORD2>
+			<KEYWORD2>zend_logo_guid</KEYWORD2>
+			<KEYWORD2>zend_version</KEYWORD2>
+			<KEYWORD2>zip_close</KEYWORD2>
+			<KEYWORD2>zip_entry_close</KEYWORD2>
+			<KEYWORD2>zip_entry_compressedsize</KEYWORD2>
+			<KEYWORD2>zip_entry_compressionmethod</KEYWORD2>
+			<KEYWORD2>zip_entry_filesize</KEYWORD2>
+			<KEYWORD2>zip_entry_name</KEYWORD2>
+			<KEYWORD2>zip_entry_open</KEYWORD2>
+			<KEYWORD2>zip_entry_read</KEYWORD2>
+			<KEYWORD2>zip_open</KEYWORD2>
+			<KEYWORD2>zip_read</KEYWORD2>
+			<KEYWORD2>zlib_get_coding_type</KEYWORD2>
+
+
+			<!-- Alias functions (343)
+				http://zend.com/phpfunc/all_aliases.php -->
+			<KEYWORD2>apache_request_headers</KEYWORD2>
+			<KEYWORD2>apache_response_headers</KEYWORD2>
+			<KEYWORD2>attr_get</KEYWORD2>
+			<KEYWORD2>attr_set</KEYWORD2>
+			<KEYWORD2>autocommit</KEYWORD2>
+			<KEYWORD2>bind_param</KEYWORD2>
+			<KEYWORD2>bind_result</KEYWORD2>
+			<KEYWORD2>bzclose</KEYWORD2>
+			<KEYWORD2>bzflush</KEYWORD2>
+			<KEYWORD2>bzwrite</KEYWORD2>
+			<KEYWORD2>change_user</KEYWORD2>
+			<KEYWORD2>character_set_name</KEYWORD2>
+			<KEYWORD2>checkdnsrr</KEYWORD2>
+			<KEYWORD2>chop</KEYWORD2>
+			<KEYWORD2>client_encoding</KEYWORD2>
+			<KEYWORD2>close</KEYWORD2>
+			<KEYWORD2>commit</KEYWORD2>
+			<KEYWORD2>connect</KEYWORD2>
+			<KEYWORD2>data_seek</KEYWORD2>
+			<KEYWORD2>debug</KEYWORD2>
+			<KEYWORD2>disable_reads_from_master</KEYWORD2>
+			<KEYWORD2>disable_rpl_parse</KEYWORD2>
+			<KEYWORD2>diskfreespace</KEYWORD2>
+			<KEYWORD2>doubleval</KEYWORD2>
+			<KEYWORD2>dump_debug_info</KEYWORD2>
+			<KEYWORD2>enable_reads_from_master</KEYWORD2>
+			<KEYWORD2>enable_rpl_parse</KEYWORD2>
+			<KEYWORD2>escape_string</KEYWORD2>
+			<KEYWORD2>execute</KEYWORD2>
+			<KEYWORD2>fbird_add_user</KEYWORD2>
+			<KEYWORD2>fbird_affected_rows</KEYWORD2>
+			<KEYWORD2>fbird_backup</KEYWORD2>
+			<KEYWORD2>fbird_blob_add</KEYWORD2>
+			<KEYWORD2>fbird_blob_cancel</KEYWORD2>
+			<KEYWORD2>fbird_blob_close</KEYWORD2>
+			<KEYWORD2>fbird_blob_create</KEYWORD2>
+			<KEYWORD2>fbird_blob_echo</KEYWORD2>
+			<KEYWORD2>fbird_blob_get</KEYWORD2>
+			<KEYWORD2>fbird_blob_import</KEYWORD2>
+			<KEYWORD2>fbird_blob_info</KEYWORD2>
+			<KEYWORD2>fbird_blob_open</KEYWORD2>
+			<KEYWORD2>fbird_close</KEYWORD2>
+			<KEYWORD2>fbird_commit</KEYWORD2>
+			<KEYWORD2>fbird_commit_ret</KEYWORD2>
+			<KEYWORD2>fbird_connect</KEYWORD2>
+			<KEYWORD2>fbird_db_info</KEYWORD2>
+			<KEYWORD2>fbird_delete_user</KEYWORD2>
+			<KEYWORD2>fbird_drop_db</KEYWORD2>
+			<KEYWORD2>fbird_errcode</KEYWORD2>
+			<KEYWORD2>fbird_errmsg</KEYWORD2>
+			<KEYWORD2>fbird_execute</KEYWORD2>
+			<KEYWORD2>fbird_fetch_assoc</KEYWORD2>
+			<KEYWORD2>fbird_fetch_object</KEYWORD2>
+			<KEYWORD2>fbird_fetch_row</KEYWORD2>
+			<KEYWORD2>fbird_field_info</KEYWORD2>
+			<KEYWORD2>fbird_free_event_handler</KEYWORD2>
+			<KEYWORD2>fbird_free_query</KEYWORD2>
+			<KEYWORD2>fbird_free_result</KEYWORD2>
+			<KEYWORD2>fbird_gen_id</KEYWORD2>
+			<KEYWORD2>fbird_maintain_db</KEYWORD2>
+			<KEYWORD2>fbird_modify_user</KEYWORD2>
+			<KEYWORD2>fbird_name_result</KEYWORD2>
+			<KEYWORD2>fbird_num_fields</KEYWORD2>
+			<KEYWORD2>fbird_num_params</KEYWORD2>
+			<KEYWORD2>fbird_num_rows</KEYWORD2>
+			<KEYWORD2>fbird_param_info</KEYWORD2>
+			<KEYWORD2>fbird_pconnect</KEYWORD2>
+			<KEYWORD2>fbird_prepare</KEYWORD2>
+			<KEYWORD2>fbird_query</KEYWORD2>
+			<KEYWORD2>fbird_restore</KEYWORD2>
+			<KEYWORD2>fbird_rollback</KEYWORD2>
+			<KEYWORD2>fbird_rollback_ret</KEYWORD2>
+			<KEYWORD2>fbird_server_info</KEYWORD2>
+			<KEYWORD2>fbird_service_attach</KEYWORD2>
+			<KEYWORD2>fbird_service_detach</KEYWORD2>
+			<KEYWORD2>fbird_set_event_handler</KEYWORD2>
+			<KEYWORD2>fbird_trans</KEYWORD2>
+			<KEYWORD2>fbird_wait_event</KEYWORD2>
+			<KEYWORD2>fbsql</KEYWORD2>
+			<KEYWORD2>fbsql_tablename</KEYWORD2>
+			<KEYWORD2>fetch</KEYWORD2>
+			<KEYWORD2>fetch_array</KEYWORD2>
+			<KEYWORD2>fetch_assoc</KEYWORD2>
+			<KEYWORD2>fetch_field</KEYWORD2>
+			<KEYWORD2>fetch_field_direct</KEYWORD2>
+			<KEYWORD2>fetch_fields</KEYWORD2>
+			<KEYWORD2>fetch_object</KEYWORD2>
+			<KEYWORD2>fetch_row</KEYWORD2>
+			<KEYWORD2>field_count</KEYWORD2>
+			<KEYWORD2>field_seek</KEYWORD2>
+			<KEYWORD2>fputs</KEYWORD2>
+			<KEYWORD2>free</KEYWORD2>
+			<KEYWORD2>free_result</KEYWORD2>
+			<KEYWORD2>ftp_quit</KEYWORD2>
+			<KEYWORD2>get_client_info</KEYWORD2>
+			<KEYWORD2>get_required_files</KEYWORD2>
+			<KEYWORD2>get_server_info</KEYWORD2>
+			<KEYWORD2>getallheaders</KEYWORD2>
+			<KEYWORD2>getmxrr</KEYWORD2>
+			<KEYWORD2>gmp_div</KEYWORD2>
+			<KEYWORD2>gzclose</KEYWORD2>
+			<KEYWORD2>gzeof</KEYWORD2>
+			<KEYWORD2>gzgetc</KEYWORD2>
+			<KEYWORD2>gzgets</KEYWORD2>
+			<KEYWORD2>gzgetss</KEYWORD2>
+			<KEYWORD2>gzpassthru</KEYWORD2>
+			<KEYWORD2>gzputs</KEYWORD2>
+			<KEYWORD2>gzread</KEYWORD2>
+			<KEYWORD2>gzrewind</KEYWORD2>
+			<KEYWORD2>gzseek</KEYWORD2>
+			<KEYWORD2>gztell</KEYWORD2>
+			<KEYWORD2>gzwrite</KEYWORD2>
+			<KEYWORD2>imap_create</KEYWORD2>
+			<KEYWORD2>imap_fetchtext</KEYWORD2>
+			<KEYWORD2>imap_header</KEYWORD2>
+			<KEYWORD2>imap_listmailbox</KEYWORD2>
+			<KEYWORD2>imap_listsubscribed</KEYWORD2>
+			<KEYWORD2>imap_rename</KEYWORD2>
+			<KEYWORD2>ini_alter</KEYWORD2>
+			<KEYWORD2>init</KEYWORD2>
+			<KEYWORD2>is_double</KEYWORD2>
+			<KEYWORD2>is_int</KEYWORD2>
+			<KEYWORD2>is_integer</KEYWORD2>
+			<KEYWORD2>is_real</KEYWORD2>
+			<KEYWORD2>is_writeable</KEYWORD2>
+			<KEYWORD2>join</KEYWORD2>
+			<KEYWORD2>key_exists</KEYWORD2>
+			<KEYWORD2>kill</KEYWORD2>
+			<KEYWORD2>ldap_close</KEYWORD2>
+			<KEYWORD2>ldap_modify</KEYWORD2>
+			<KEYWORD2>magic_quotes_runtime</KEYWORD2>
+			<KEYWORD2>master_query</KEYWORD2>
+			<KEYWORD2>ming_keypress</KEYWORD2>
+			<KEYWORD2>ming_setcubicthreshold</KEYWORD2>
+			<KEYWORD2>ming_setscale</KEYWORD2>
+			<KEYWORD2>ming_useconstants</KEYWORD2>
+			<KEYWORD2>ming_useswfversion</KEYWORD2>
+			<KEYWORD2>more_results</KEYWORD2>
+			<KEYWORD2>msql</KEYWORD2>
+			<KEYWORD2>msql_affected_rows</KEYWORD2>
+			<KEYWORD2>msql_createdb</KEYWORD2>
+			<KEYWORD2>msql_dbname</KEYWORD2>
+			<KEYWORD2>msql_dropdb</KEYWORD2>
+			<KEYWORD2>msql_fieldflags</KEYWORD2>
+			<KEYWORD2>msql_fieldlen</KEYWORD2>
+			<KEYWORD2>msql_fieldname</KEYWORD2>
+			<KEYWORD2>msql_fieldtable</KEYWORD2>
+			<KEYWORD2>msql_fieldtype</KEYWORD2>
+			<KEYWORD2>msql_freeresult</KEYWORD2>
+			<KEYWORD2>msql_listdbs</KEYWORD2>
+			<KEYWORD2>msql_listfields</KEYWORD2>
+			<KEYWORD2>msql_listtables</KEYWORD2>
+			<KEYWORD2>msql_numfields</KEYWORD2>
+			<KEYWORD2>msql_numrows</KEYWORD2>
+			<KEYWORD2>msql_regcase</KEYWORD2>
+			<KEYWORD2>msql_selectdb</KEYWORD2>
+			<KEYWORD2>msql_tablename</KEYWORD2>
+			<KEYWORD2>mssql_affected_rows</KEYWORD2>
+			<KEYWORD2>mssql_close</KEYWORD2>
+			<KEYWORD2>mssql_connect</KEYWORD2>
+			<KEYWORD2>mssql_data_seek</KEYWORD2>
+			<KEYWORD2>mssql_deadlock_retry_count</KEYWORD2>
+			<KEYWORD2>mssql_fetch_array</KEYWORD2>
+			<KEYWORD2>mssql_fetch_assoc</KEYWORD2>
+			<KEYWORD2>mssql_fetch_field</KEYWORD2>
+			<KEYWORD2>mssql_fetch_object</KEYWORD2>
+			<KEYWORD2>mssql_fetch_row</KEYWORD2>
+			<KEYWORD2>mssql_field_seek</KEYWORD2>
+			<KEYWORD2>mssql_free_result</KEYWORD2>
+			<KEYWORD2>mssql_get_last_message</KEYWORD2>
+			<KEYWORD2>mssql_min_client_severity</KEYWORD2>
+			<KEYWORD2>mssql_min_error_severity</KEYWORD2>
+			<KEYWORD2>mssql_min_message_severity</KEYWORD2>
+			<KEYWORD2>mssql_min_server_severity</KEYWORD2>
+			<KEYWORD2>mssql_num_fields</KEYWORD2>
+			<KEYWORD2>mssql_num_rows</KEYWORD2>
+			<KEYWORD2>mssql_pconnect</KEYWORD2>
+			<KEYWORD2>mssql_query</KEYWORD2>
+			<KEYWORD2>mssql_result</KEYWORD2>
+			<KEYWORD2>mssql_select_db</KEYWORD2>
+			<KEYWORD2>mssql_set_message_handler</KEYWORD2>
+			<KEYWORD2>mssql_unbuffered_query</KEYWORD2>
+			<KEYWORD2>multi_query</KEYWORD2>
+			<KEYWORD2>mysql</KEYWORD2>
+			<KEYWORD2>mysql_createdb</KEYWORD2>
+			<KEYWORD2>mysql_db_name</KEYWORD2>
+			<KEYWORD2>mysql_dbname</KEYWORD2>
+			<KEYWORD2>mysql_dropdb</KEYWORD2>
+			<KEYWORD2>mysql_fieldflags</KEYWORD2>
+			<KEYWORD2>mysql_fieldlen</KEYWORD2>
+			<KEYWORD2>mysql_fieldname</KEYWORD2>
+			<KEYWORD2>mysql_fieldtable</KEYWORD2>
+			<KEYWORD2>mysql_fieldtype</KEYWORD2>
+			<KEYWORD2>mysql_freeresult</KEYWORD2>
+			<KEYWORD2>mysql_listdbs</KEYWORD2>
+			<KEYWORD2>mysql_listfields</KEYWORD2>
+			<KEYWORD2>mysql_listtables</KEYWORD2>
+			<KEYWORD2>mysql_numfields</KEYWORD2>
+			<KEYWORD2>mysql_numrows</KEYWORD2>
+			<KEYWORD2>mysql_selectdb</KEYWORD2>
+			<KEYWORD2>mysql_table_name</KEYWORD2>
+			<KEYWORD2>mysql_tablename</KEYWORD2>
+			<KEYWORD2>mysqli</KEYWORD2>
+			<KEYWORD2>mysqli_execute</KEYWORD2>
+			<KEYWORD2>mysqli_fetch</KEYWORD2>
+			<KEYWORD2>mysqli_set_opt</KEYWORD2>
+			<KEYWORD2>next_result</KEYWORD2>
+			<KEYWORD2>num_rows</KEYWORD2>
+			<KEYWORD2>oci_free_cursor</KEYWORD2>
+			<KEYWORD2>ocibindbyname</KEYWORD2>
+			<KEYWORD2>ocicancel</KEYWORD2>
+			<KEYWORD2>ocicollappend</KEYWORD2>
+			<KEYWORD2>ocicollassignelem</KEYWORD2>
+			<KEYWORD2>ocicollgetelem</KEYWORD2>
+			<KEYWORD2>ocicollmax</KEYWORD2>
+			<KEYWORD2>ocicollsize</KEYWORD2>
+			<KEYWORD2>ocicolltrim</KEYWORD2>
+			<KEYWORD2>ocicolumnisnull</KEYWORD2>
+			<KEYWORD2>ocicolumnname</KEYWORD2>
+			<KEYWORD2>ocicolumnprecision</KEYWORD2>
+			<KEYWORD2>ocicolumnscale</KEYWORD2>
+			<KEYWORD2>ocicolumnsize</KEYWORD2>
+			<KEYWORD2>ocicolumntype</KEYWORD2>
+			<KEYWORD2>ocicolumntyperaw</KEYWORD2>
+			<KEYWORD2>ocicommit</KEYWORD2>
+			<KEYWORD2>ocidefinebyname</KEYWORD2>
+			<KEYWORD2>ocierror</KEYWORD2>
+			<KEYWORD2>ociexecute</KEYWORD2>
+			<KEYWORD2>ocifetch</KEYWORD2>
+			<KEYWORD2>ocifetchstatement</KEYWORD2>
+			<KEYWORD2>ocifreecollection</KEYWORD2>
+			<KEYWORD2>ocifreecursor</KEYWORD2>
+			<KEYWORD2>ocifreedesc</KEYWORD2>
+			<KEYWORD2>ocifreestatement</KEYWORD2>
+			<KEYWORD2>ociinternaldebug</KEYWORD2>
+			<KEYWORD2>ociloadlob</KEYWORD2>
+			<KEYWORD2>ocilogoff</KEYWORD2>
+			<KEYWORD2>ocilogon</KEYWORD2>
+			<KEYWORD2>ocinewcollection</KEYWORD2>
+			<KEYWORD2>ocinewcursor</KEYWORD2>
+			<KEYWORD2>ocinewdescriptor</KEYWORD2>
+			<KEYWORD2>ocinlogon</KEYWORD2>
+			<KEYWORD2>ocinumcols</KEYWORD2>
+			<KEYWORD2>ociparse</KEYWORD2>
+			<KEYWORD2>ocipasswordchange</KEYWORD2>
+			<KEYWORD2>ociplogon</KEYWORD2>
+			<KEYWORD2>ociresult</KEYWORD2>
+			<KEYWORD2>ocirollback</KEYWORD2>
+			<KEYWORD2>ocirowcount</KEYWORD2>
+			<KEYWORD2>ocisavelob</KEYWORD2>
+			<KEYWORD2>ocisavelobfile</KEYWORD2>
+			<KEYWORD2>ociserverversion</KEYWORD2>
+			<KEYWORD2>ocisetprefetch</KEYWORD2>
+			<KEYWORD2>ocistatementtype</KEYWORD2>
+			<KEYWORD2>ociwritelobtofile</KEYWORD2>
+			<KEYWORD2>odbc_do</KEYWORD2>
+			<KEYWORD2>odbc_field_precision</KEYWORD2>
+			<KEYWORD2>openssl_free_key</KEYWORD2>
+			<KEYWORD2>openssl_get_privatekey</KEYWORD2>
+			<KEYWORD2>openssl_get_publickey</KEYWORD2>
+			<KEYWORD2>options</KEYWORD2>
+			<KEYWORD2>pg_clientencoding</KEYWORD2>
+			<KEYWORD2>pg_cmdtuples</KEYWORD2>
+			<KEYWORD2>pg_errormessage</KEYWORD2>
+			<KEYWORD2>pg_exec</KEYWORD2>
+			<KEYWORD2>pg_fieldisnull</KEYWORD2>
+			<KEYWORD2>pg_fieldname</KEYWORD2>
+			<KEYWORD2>pg_fieldnum</KEYWORD2>
+			<KEYWORD2>pg_fieldprtlen</KEYWORD2>
+			<KEYWORD2>pg_fieldsize</KEYWORD2>
+			<KEYWORD2>pg_fieldtype</KEYWORD2>
+			<KEYWORD2>pg_freeresult</KEYWORD2>
+			<KEYWORD2>pg_getlastoid</KEYWORD2>
+			<KEYWORD2>pg_loclose</KEYWORD2>
+			<KEYWORD2>pg_locreate</KEYWORD2>
+			<KEYWORD2>pg_loexport</KEYWORD2>
+			<KEYWORD2>pg_loimport</KEYWORD2>
+			<KEYWORD2>pg_loopen</KEYWORD2>
+			<KEYWORD2>pg_loread</KEYWORD2>
+			<KEYWORD2>pg_loreadall</KEYWORD2>
+			<KEYWORD2>pg_lounlink</KEYWORD2>
+			<KEYWORD2>pg_lowrite</KEYWORD2>
+			<KEYWORD2>pg_numfields</KEYWORD2>
+			<KEYWORD2>pg_numrows</KEYWORD2>
+			<KEYWORD2>pg_result</KEYWORD2>
+			<KEYWORD2>pg_setclientencoding</KEYWORD2>
+			<KEYWORD2>ping</KEYWORD2>
+			<KEYWORD2>pos</KEYWORD2>
+			<KEYWORD2>posix_errno</KEYWORD2>
+			<KEYWORD2>prepare</KEYWORD2>
+			<KEYWORD2>query</KEYWORD2>
+			<KEYWORD2>read_exif_data</KEYWORD2>
+			<KEYWORD2>real_connect</KEYWORD2>
+			<KEYWORD2>real_escape_string</KEYWORD2>
+			<KEYWORD2>real_query</KEYWORD2>
+			<KEYWORD2>recode</KEYWORD2>
+			<KEYWORD2>reset</KEYWORD2>
+			<KEYWORD2>result_metadata</KEYWORD2>
+			<KEYWORD2>rollback</KEYWORD2>
+			<KEYWORD2>rpl_parse_enabled</KEYWORD2>
+			<KEYWORD2>rpl_probe</KEYWORD2>
+			<KEYWORD2>rpl_query_type</KEYWORD2>
+			<KEYWORD2>select_db</KEYWORD2>
+			<KEYWORD2>send_long_data</KEYWORD2>
+			<KEYWORD2>session_commit</KEYWORD2>
+			<KEYWORD2>set_file_buffer</KEYWORD2>
+			<KEYWORD2>set_local_infile_default</KEYWORD2>
+			<KEYWORD2>set_local_infile_handler</KEYWORD2>
+			<KEYWORD2>set_opt</KEYWORD2>
+			<KEYWORD2>show_source</KEYWORD2>
+			<KEYWORD2>sizeof</KEYWORD2>
+			<KEYWORD2>slave_query</KEYWORD2>
+			<KEYWORD2>snmpwalkoid</KEYWORD2>
+			<KEYWORD2>socket_get_status</KEYWORD2>
+			<KEYWORD2>socket_getopt</KEYWORD2>
+			<KEYWORD2>socket_set_blocking</KEYWORD2>
+			<KEYWORD2>socket_set_timeout</KEYWORD2>
+			<KEYWORD2>socket_setopt</KEYWORD2>
+			<KEYWORD2>sqlite_fetch_string</KEYWORD2>
+			<KEYWORD2>sqlite_has_more</KEYWORD2>
+			<KEYWORD2>ssl_set</KEYWORD2>
+			<KEYWORD2>stat</KEYWORD2>
+			<KEYWORD2>stmt</KEYWORD2>
+			<KEYWORD2>stmt_init</KEYWORD2>
+			<KEYWORD2>store_result</KEYWORD2>
+			<KEYWORD2>strchr</KEYWORD2>
+			<KEYWORD2>stream_register_wrapper</KEYWORD2>
+			<KEYWORD2>thread_safe</KEYWORD2>
+			<KEYWORD2>use_result</KEYWORD2>
+			<KEYWORD2>user_error</KEYWORD2>
+			<KEYWORD2>velocis_autocommit</KEYWORD2>
+			<KEYWORD2>velocis_close</KEYWORD2>
+			<KEYWORD2>velocis_commit</KEYWORD2>
+			<KEYWORD2>velocis_connect</KEYWORD2>
+			<KEYWORD2>velocis_exec</KEYWORD2>
+			<KEYWORD2>velocis_fetch</KEYWORD2>
+			<KEYWORD2>velocis_fieldname</KEYWORD2>
+			<KEYWORD2>velocis_fieldnum</KEYWORD2>
+			<KEYWORD2>velocis_freeresult</KEYWORD2>
+			<KEYWORD2>velocis_off_autocommit</KEYWORD2>
+			<KEYWORD2>velocis_result</KEYWORD2>
+			<KEYWORD2>velocis_rollback</KEYWORD2>
+			<KEYWORD2>virtual</KEYWORD2>
+
+
+			<!-- Language constructs (69)
+				http://www.php.net/manual/en/reserved.php -->
+			<KEYWORD1>__CLASS__</KEYWORD1>
+			<KEYWORD1>__FILE__</KEYWORD1>
+			<KEYWORD1>__FUNCTION__</KEYWORD1>
+			<KEYWORD1>__LINE__</KEYWORD1>
+			<KEYWORD1>__METHOD__</KEYWORD1>
+			<KEYWORD1>abstract</KEYWORD1>
+			<OPERATOR>and</OPERATOR>
+			<KEYWORD1>array</KEYWORD1>
+			<KEYWORD1>as</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD1>cfunction</KEYWORD1>
+			<KEYWORD1>class</KEYWORD1>
+			<KEYWORD1>clone</KEYWORD1>
+			<KEYWORD1>const</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>declare</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>die</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>echo</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>elseif</KEYWORD1>
+			<KEYWORD1>empty</KEYWORD1>
+			<KEYWORD1>enddeclare</KEYWORD1>
+			<KEYWORD1>endfor</KEYWORD1>
+			<KEYWORD1>endforeach</KEYWORD1>
+			<KEYWORD1>endif</KEYWORD1>
+			<KEYWORD1>endswitch</KEYWORD1>
+			<KEYWORD1>endwhile</KEYWORD1>
+			<KEYWORD1>eval</KEYWORD1>
+			<KEYWORD1>exception</KEYWORD1>
+			<KEYWORD1>exit</KEYWORD1>
+			<KEYWORD1>extends</KEYWORD1>
+			<KEYWORD1>false</KEYWORD1>
+			<KEYWORD1>final</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>foreach</KEYWORD1>
+			<KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>global</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>implements</KEYWORD1>
+			<KEYWORD1>include</KEYWORD1>
+			<KEYWORD1>include_once</KEYWORD1>
+			<KEYWORD1>instanceof</KEYWORD1>
+			<KEYWORD1>interface</KEYWORD1>
+			<KEYWORD1>isset</KEYWORD1>
+			<KEYWORD1>list</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>null</KEYWORD1>
+			<KEYWORD1>old_function</KEYWORD1>
+			<OPERATOR>or</OPERATOR>
+			<KEYWORD1>php_user_filter</KEYWORD1>
+			<KEYWORD1>print</KEYWORD1>
+			<KEYWORD1>private</KEYWORD1>
+			<KEYWORD1>protected</KEYWORD1>
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>require</KEYWORD1>
+			<KEYWORD1>require_once</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>static</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>true</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>unset</KEYWORD1>
+			<KEYWORD1>use</KEYWORD1>
+			<KEYWORD1>var</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<OPERATOR>xor</OPERATOR>
+			<!-- end: generated by buildfunctionlist.php -->
+			<!-- }}} -->
+
+			<!-- xdebug functions -->
+			<!-- {{{ -->
+			<KEYWORD2>xdebug_break</KEYWORD2>
+			<KEYWORD2>xdebug_call_class</KEYWORD2>
+			<KEYWORD2>xdebug_call_file</KEYWORD2>
+			<KEYWORD2>xdebug_call_function</KEYWORD2>
+			<KEYWORD2>xdebug_call_line</KEYWORD2>
+			<KEYWORD2>xdebug_disable</KEYWORD2>
+			<KEYWORD2>xdebug_dump_function_profile</KEYWORD2><!-- version 1 only -->
+			<KEYWORD2>xdebug_dump_function_trace</KEYWORD2><!-- version 1 only -->
+			<KEYWORD2>xdebug_dump_superglobals</KEYWORD2>
+			<KEYWORD2>xdebug_enable</KEYWORD2>
+			<KEYWORD2>xdebug_get_code_coverage</KEYWORD2>
+			<KEYWORD2>xdebug_get_function_count</KEYWORD2>
+			<KEYWORD2>xdebug_get_function_profile</KEYWORD2><!-- version 1 only -->
+			<KEYWORD2>xdebug_get_function_stack</KEYWORD2>
+			<KEYWORD2>xdebug_get_function_trace</KEYWORD2><!-- version 1 only -->
+			<KEYWORD2>xdebug_get_stack_depth</KEYWORD2>
+			<KEYWORD2>xdebug_is_enabled</KEYWORD2>
+			<KEYWORD2>xdebug_memory_usage</KEYWORD2>
+			<KEYWORD2>xdebug_peak_memory_usage</KEYWORD2>
+			<KEYWORD2>xdebug_start_code_coverage</KEYWORD2>
+			<KEYWORD2>xdebug_start_profiling</KEYWORD2><!-- version 1 only -->
+			<KEYWORD2>xdebug_start_trace</KEYWORD2><!-- version 1 only -->
+			<KEYWORD2>xdebug_stop_code_coverage</KEYWORD2>
+			<KEYWORD2>xdebug_stop_profiling</KEYWORD2><!-- version 1 only -->
+			<KEYWORD2>xdebug_stop_trace</KEYWORD2><!-- version 1 only -->
+			<KEYWORD2>xdebug_time_index</KEYWORD2>
+			<KEYWORD2>xdebug_var_dump</KEYWORD2>
+			<!-- }}} -->
+
+			<!-- Basic SimpleTest methods -->
+			<!-- {{{ -->
+			<KEYWORD2>assertCopy</KEYWORD2>
+			<KEYWORD2>assertEqual</KEYWORD2>
+			<KEYWORD2>assertError</KEYWORD2>
+			<KEYWORD2>assertErrorPattern</KEYWORD2>
+			<KEYWORD2>assertFalse</KEYWORD2>
+			<KEYWORD2>assertIdentical</KEYWORD2>
+			<KEYWORD2>assertIsA</KEYWORD2>
+			<KEYWORD2>assertNoErrors</KEYWORD2>
+			<KEYWORD2>assertNoUnwantedPattern</KEYWORD2>
+			<KEYWORD2>assertNotA</KEYWORD2>
+			<KEYWORD2>assertNotEqual</KEYWORD2>
+			<KEYWORD2>assertNotIdentical</KEYWORD2>
+			<KEYWORD2>assertNotNull</KEYWORD2>
+			<KEYWORD2>assertNull</KEYWORD2>
+			<KEYWORD2>assertReference</KEYWORD2>
+			<KEYWORD2>assertTrue</KEYWORD2>
+			<KEYWORD2>assertWantedPattern</KEYWORD2>
+
+			<KEYWORD2>setReturnValue</KEYWORD2>
+			<KEYWORD2>setReturnValueAt</KEYWORD2>
+			<KEYWORD2>setReturnReference</KEYWORD2>
+			<KEYWORD2>setReturnReferenceAt</KEYWORD2>
+			<KEYWORD2>expectArguments</KEYWORD2>
+			<KEYWORD2>expectArgumentsAt</KEYWORD2>
+			<KEYWORD2>expectCallCount</KEYWORD2>
+			<KEYWORD2>expectMaximumCallCount</KEYWORD2>
+			<KEYWORD2>expectMinimumCallCount</KEYWORD2>
+			<KEYWORD2>expectNever</KEYWORD2>
+			<KEYWORD2>expectOnce</KEYWORD2>
+			<KEYWORD2>expectAtLeastOnce</KEYWORD2>
+			<KEYWORD2>tally</KEYWORD2>
+
+			<KEYWORD2>dump</KEYWORD2>
+			<KEYWORD2>error</KEYWORD2>
+			<KEYWORD2>fail</KEYWORD2>
+			<KEYWORD2>pass</KEYWORD2>
+			<KEYWORD2>sendMessage</KEYWORD2>
+			<KEYWORD2>setUp</KEYWORD2>
+			<KEYWORD2>signal</KEYWORD2>
+			<KEYWORD2>swallowErrors</KEYWORD2>
+			<KEYWORD2>tearDown</KEYWORD2>
+			<!-- }}} -->
+
+			<!-- more magical functions -->
+			<KEYWORD2>__autoload</KEYWORD2>
+			<KEYWORD2>__destruct</KEYWORD2>
+			<KEYWORD2>__get</KEYWORD2>
+			<KEYWORD2>__set</KEYWORD2>
+			<KEYWORD2>__sleep</KEYWORD2>
+			<KEYWORD2>__wakeup</KEYWORD2>
+
+			<!-- more constructs -->
+			<KEYWORD4>parent</KEYWORD4>
+			<KEYWORD4>self</KEYWORD4>
+			<KEYWORD4>stdClass</KEYWORD4>
+		</KEYWORDS>
+	</RULES>
+
+
+	<RULES SET="KEYWORDS_VISIBILITY">
+		<KEYWORDS>
+			<KEYWORD1>private</KEYWORD1>
+			<KEYWORD1>protected</KEYWORD1>
+			<KEYWORD1>public</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+
+
+	<!-- Javascript -->
+	<RULES SET="JAVASCRIPT_OPENTAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="JAVASCRIPT">&gt;</SEQ>
+		<IMPORT DELEGATE="TO_LITERAL+PHP"/> <!-- handle PHP in <script> tag -->
+		<IMPORT DELEGATE="html::TAGS" /> <!-- handle e.g. 'style="width:1px"' -->
+	</RULES>
+
+
+	<!-- Handle literals, but allow switching to PHP therein, e.g. from html TAGS -->
+	<RULES SET="TO_LITERAL+PHP">
+		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL1+PHP">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL2" DELEGATE="LITERAL2+PHP">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<IMPORT DELEGATE="TO_PHP"/>
+	</RULES>
+
+
+	<RULES SET="JAVASCRIPT" DEFAULT="MARKUP" ESCAPE="\">
+		<IMPORT DELEGATE="TO_LITERAL+PHP"/>
+		<IMPORT DELEGATE="TO_PHP"/>
+		<IMPORT DELEGATE="javascript::MAIN"/>
+	</RULES>
+
+
+	<!-- Handle PHP tags in LITERAL1, e.g. in the "type" attribute of a <SCRIPT> tag -->
+	<RULES SET="LITERAL1+PHP" DEFAULT="LITERAL1">
+		<IMPORT DELEGATE="TO_PHP"/>
+	</RULES>
+
+
+	<!-- Handle PHP tags in LITERAL2, e.g. in the "type" attribute of a <SCRIPT> tag -->
+	<RULES SET="LITERAL2+PHP" DEFAULT="LITERAL2">
+		<IMPORT DELEGATE="TO_PHP"/>
+	</RULES>
+
+
+	<!-- Handle PHP tags in comments -->
+	<RULES SET="COMMENT1+PHP" DEFAULT="COMMENT1">
+		<IMPORT DELEGATE="TO_PHP"/>
+	</RULES>
+
+
+	<!-- Go to PHP mode again -->
+	<RULES SET="TO_PHP" DEFAULT="MARKUP">
+		<SPAN TYPE="MARKUP" DELEGATE="PHP">
+			<BEGIN>&lt;?php</BEGIN>
+			<END>?&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="MARKUP" DELEGATE="PHP">
+			<BEGIN>&lt;?</BEGIN>
+			<END>?&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="MARKUP" DELEGATE="PHP">
+			<BEGIN>&lt;%=</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+	</RULES>
+
+
+	<!-- Extended label block, also uses "|" as seperator -->
+	<RULES SET="PHPDOC_LABEL_BLOCK_EXTENDED" DEFAULT="COMMENT3"
+		HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
+		<SEQ TYPE="OPERATOR">|</SEQ>
+
+		<!-- Delegate back (gets not caught from PHPDOC_LABEL_BLOCK): -->
+		<IMPORT DELEGATE="PHPDOC_DELEGATE_LABEL_BLOCKS" />
+		<IMPORT DELEGATE="PHPDOC_LABEL_BLOCK" />
+
+		<IMPORT DELEGATE="PHPDOC_LABEL_KEYWORDS" />
+		<IMPORT DELEGATE="PHPDOC" />
+		<IMPORT DELEGATE="PHPDOC_VAR" />
+		<IMPORT DELEGATE="PHP_BASIC_KEYWORD1" />
+	</RULES>
+
+	<!-- A block after a label tag like "@see" -->
+	<RULES SET="PHPDOC_LABEL_BLOCK" DEFAULT="COMMENT3"
+		HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
+
+		<!-- Delegate back -->
+		<!-- <IMPORT DELEGATE="PHPDOC_DELEGATE_LABEL_BLOCKS" /> -->
+
+		<SEQ TYPE="COMMENT3" DELEGATE="PHPDOC">*/</SEQ>
+
+		<MARK_PREVIOUS TYPE="FUNCTION">()</MARK_PREVIOUS>
+
+		<IMPORT DELEGATE="PHPDOC_LABEL_KEYWORDS" />
+		<IMPORT DELEGATE="PHPDOC" />
+		<IMPORT DELEGATE="PHPDOC_VAR" />
+		<IMPORT DELEGATE="PHP_BASIC_KEYWORD1" />
+
+		<!-- Taken from: http://php.net/manual/en/language.types.php -->
+		<KEYWORDS>
+			<OPERATOR>array</OPERATOR>
+			<OPERATOR>bool</OPERATOR>
+			<OPERATOR>boolean</OPERATOR>
+			<OPERATOR>callback</OPERATOR>
+			<OPERATOR>double</OPERATOR>
+			<OPERATOR>float</OPERATOR>
+			<OPERATOR>int</OPERATOR>
+			<OPERATOR>integer</OPERATOR>
+			<OPERATOR>mixed</OPERATOR>
+			<OPERATOR>number</OPERATOR>
+			<OPERATOR>NULL</OPERATOR>
+			<OPERATOR>object</OPERATOR>
+			<OPERATOR>real</OPERATOR><!-- not listed, but valid in a typecast -->
+			<OPERATOR>resource</OPERATOR>
+			<OPERATOR>string</OPERATOR>
+		</KEYWORDS>
+	</RULES>
+
+
+	<!-- A block after @access -->
+	<RULES SET="PHPDOC_LABEL_BLOCK_ACCESS" DEFAULT="COMMENT3"
+		HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
+		<IMPORT DELEGATE="KEYWORDS_VISIBILITY" />
+
+		<!-- Delegate back: -->
+		<IMPORT DELEGATE="PHPDOC_DELEGATE_LABEL_BLOCKS"/>
+	</RULES>
+
+
+	<RULES SET="PHPDOC_BLOCK" DEFAULT="COMMENT3"
+		HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
+		<!-- highlight function/method name as token type FUNCTION -->
+		<MARK_PREVIOUS TYPE="FUNCTION">()</MARK_PREVIOUS>
+
+		<!-- Delegate back: -->
+		<IMPORT DELEGATE="PHPDOC_DELEGATE_LABEL_BLOCKS"/>
+		<IMPORT DELEGATE="PHPDOC"/>
+		<IMPORT DELEGATE="PHPDOC_VAR"/>
+	</RULES>
+
+
+	<!-- Helper for class references in rule PHPDOC -->
+	<RULES SET="OBJECT_PHPDOC">
+		<SPAN TYPE="OPERATOR" DELEGATE="PHP">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+		<SEQ_REGEXP TYPE="FUNCTION" HASH_CHAR="-&gt;" DELEGATE="PHPDOC">-&gt;\w+\s*(?=\()</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="-&gt;" DELEGATE="OBJECT_PHPDOC">-&gt;\w+(?=(\[[\s\w'"]+\])?-&gt;)</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="-&gt;" DELEGATE="PHPDOC">-&gt;\w*</SEQ_REGEXP>
+
+		<IMPORT DELEGATE="PHP_KEYWORDS" />
+	</RULES>
+
+
+	<!-- Almost like PHP_VAR - but with another delegate -->
+	<RULES SET="PHPDOC_VAR">
+		<!-- (Class-)Variables -->
+		<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="$" DELEGATE="OBJECT_PHPDOC">\$\w+(?=(\[[\s\w'"]+\])?-&gt;)</SEQ_REGEXP>
+
+		<MARK_PREVIOUS TYPE="KEYWORD4">::</MARK_PREVIOUS>
+
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD4">\$\w+(?=\s*=\s*(&amp;\s*)?new)</SEQ_REGEXP>
+
+		<!-- Normal variables -->
+		<MARK_FOLLOWING TYPE="KEYWORD3">$</MARK_FOLLOWING>
+	</RULES>
+
+
+	<!-- phpdoc / phpDocumentor label tags -->
+	<RULES SET="PHPDOC_LABEL_KEYWORDS">
+		<!-- {{{
+			Some (@global, @param, ..) are here just for complete-word -->
+		<KEYWORDS>
+			<LABEL>@abstract</LABEL>
+			<LABEL>@access</LABEL>
+			<LABEL>@author</LABEL>
+			<LABEL>@category</LABEL>
+			<LABEL>@const</LABEL>
+			<LABEL>@constant</LABEL>
+			<LABEL>@copyright</LABEL>
+			<LABEL>@deprecated</LABEL>
+			<LABEL>@example</LABEL>
+			<LABEL>@filesource</LABEL>
+			<LABEL>@final</LABEL>
+			<LABEL>@global</LABEL>
+			<LABEL>@ignore</LABEL>
+			<LABEL>@internal</LABEL>
+			<LABEL>@license</LABEL>
+			<LABEL>@link</LABEL>
+			<LABEL>@name</LABEL>
+			<LABEL>@package</LABEL>
+			<LABEL>@param</LABEL>
+			<LABEL>@return</LABEL>
+			<LABEL>@see</LABEL>
+			<LABEL>@since</LABEL>
+			<LABEL>@static</LABEL>
+			<LABEL>@staticvar</LABEL>
+			<LABEL>@subpackage</LABEL>
+			<LABEL>@todo</LABEL>
+			<LABEL>@tutorial</LABEL>
+			<LABEL>@uses</LABEL>
+			<LABEL>@var</LABEL>
+			<LABEL>@version</LABEL>
+		</KEYWORDS>
+		<!-- }}} -->
+	</RULES>
+
+
+	<!-- Delegate to PHPDOC_LABEL_BLOCK[_EXTENDED|_ACCESS] or back to PHPDOC -->
+	<RULES SET="PHPDOC_DELEGATE_LABEL_BLOCKS" DEFAULT="COMMENT3">
+		<!-- Delegate empty line (just an asterisk) back to PHPDOC -->
+		<SEQ_REGEXP TYPE="COMMENT3" AT_WHITESPACE_END="TRUE" DELEGATE="PHPDOC" HASH_CHAR="*">\*\s*$</SEQ_REGEXP>
+
+		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="@"
+			DELEGATE="PHPDOC_LABEL_BLOCK_EXTENDED">@(global|param|return|staticvar|var)</SEQ_REGEXP>
+
+		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="@"
+			DELEGATE="PHPDOC_LABEL_BLOCK">@(deprecated|see|uses)</SEQ_REGEXP>
+
+		<SEQ TYPE="LABEL" DELEGATE="PHPDOC_LABEL_BLOCK_ACCESS">@access</SEQ>
+
+		<!-- Delegate the remaining phpdoc tags back to PHPDOC_BLOCK: -->
+		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="@"
+			DELEGATE="PHPDOC_BLOCK">@(abstract|author|category|const|constant|copyright|example|filesource|final|ignore|internal|license|link|name|package|since|static|subpackage|todo|tutorial|version)</SEQ_REGEXP>
+	</RULES>
+
+
+	<!-- The main phpdoc rules -->
+	<RULES SET="PHPDOC" DEFAULT="COMMENT3" IGNORE_CASE="TRUE"
+		HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
+		<!-- HTML comments -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="PHPDOC_BLOCK">
+			<BEGIN>{@internal</BEGIN>
+			<END>}}</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="PHPDOC_BLOCK">
+			<BEGIN>{@link</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<!-- PHPdoc allows this -->
+		<SEQ TYPE="COMMENT3">&lt;&lt;</SEQ>
+		<SEQ TYPE="COMMENT3">&lt;=</SEQ>
+		<SEQ TYPE="COMMENT3">&lt; </SEQ>
+
+		<SPAN DELEGATE="PHP" TYPE="MARKUP">
+			<BEGIN>&lt;code&gt;</BEGIN>
+			<END>&lt;/code&gt;</END>
+		</SPAN>
+
+		<!-- HTML tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS" NO_LINE_BREAK="TRUE">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- Imports: -->
+		<IMPORT DELEGATE="PHPDOC_DELEGATE_LABEL_BLOCKS" />
+		<IMPORT DELEGATE="PHPDOC_LABEL_KEYWORDS" />
+		<IMPORT DELEGATE="PHPDOC_VAR" />
+		<IMPORT DELEGATE="PHP_BASIC_KEYWORD1" />
+	</RULES>
+
+
+	<RULES SET="INVALID_LT" DEFAULT="INVALID">
+		<SEQ TYPE="INVALID">&lt;</SEQ>
+	</RULES>
+</MODE>

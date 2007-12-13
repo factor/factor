@@ -1,5 +1,6 @@
 
-USING: kernel threads sequences calendar combinators.cleave combinators.lib ;
+USING: kernel namespaces threads sequences calendar
+       combinators.cleave combinators.lib ;
 
 IN: raptor.cron
 
@@ -45,4 +46,17 @@ C: <when> when
   [ swap when=now? [ call ] [ drop ] if 60000 sleep ] [ recurring-job ] 2bi ;
 
 : schedule ( when quot -- ) [ recurring-job ] curry curry in-thread ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: cron-jobs-hourly
+SYMBOL: cron-jobs-daily
+SYMBOL: cron-jobs-weekly
+SYMBOL: cron-jobs-monthly
+
+: schedule-cron-jobs ( -- )
+  { 17 } f f f f         <when> [ cron-jobs-hourly  get call ] schedule
+  { 25 } { 6 } f f f     <when> [ cron-jobs-daily   get call ] schedule
+  { 47 } { 6 } f f { 7 } <when> [ cron-jobs-weekly  get call ] schedule
+  { 52 } { 6 } { 1 } f f <when> [ cron-jobs-monthly get call ] schedule ;
 

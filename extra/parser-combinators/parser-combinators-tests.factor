@@ -149,5 +149,3 @@ IN: scratchpad
 { { } } [
   "234" "1" token <+> parse list>array
 ] unit-test
-
-

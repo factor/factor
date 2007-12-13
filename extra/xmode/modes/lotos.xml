@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+  lotos.xml	K. J. Turner <kjt@cs.stir.ac.uk>	24th April 2003
+
+  LOTOS (Language Of Temporal Ordering Specification) is an ISO standard
+  (8807) for a formal specification language used in communications and system
+  specification generally.
+
+  This mode does not (yet) deal with ISO 15437 (E-LOTOS, Enhanced LOTOS).
+
+  Auto-indentation occurs if the following are at the start of a line
+  (ignoring leading white space): "let", "library", "process", "specification",
+  "type", , ">>". This also happens if the following appear on their own (i.e.
+  also ignoring trailing white space): "(", "[]", "[>", "||" "|||", "|[...]|",
+  "[...]->".
+-->
+
+<MODE>
+  <PROPS>
+    <PROPERTY NAME="commentStart" VALUE="(*"/>
+    <PROPERTY NAME="commentEnd" VALUE="*)"/>
+    <PROPERTY NAME="indentNextLines"
+      VALUE="\s*(let|library|process|specification|type|>>).*|\s*(\(|\[\]|\[>|\|\||\|\|\||\|\[.*\]\||\[.*\]\s*->)\s*"/>
+  </PROPS>
+
+  <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+    <!-- Comments -->
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>(*</BEGIN>
+      <END>*)</END>
+    </SPAN>
+
+    <!-- Standard Operators -->
+    <SEQ TYPE="OPERATOR">&gt;&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">[&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">|||</SEQ>
+    <SEQ TYPE="OPERATOR">||</SEQ>
+    <SEQ TYPE="OPERATOR">|[</SEQ>
+    <SEQ TYPE="OPERATOR">]|</SEQ>
+    <SEQ TYPE="OPERATOR">[]</SEQ>
+
+    <KEYWORDS>
+      <!-- Reserved Words -->
+      <KEYWORD1>accept</KEYWORD1>
+      <KEYWORD1>actualizedby</KEYWORD1>
+      <KEYWORD1>any</KEYWORD1>
+      <KEYWORD1>behavior</KEYWORD1>
+      <KEYWORD1>behaviour</KEYWORD1>
+      <KEYWORD1>choice</KEYWORD1>
+      <KEYWORD1>endlib</KEYWORD1>
+      <KEYWORD1>endproc</KEYWORD1>
+      <KEYWORD1>endspec</KEYWORD1>
+      <KEYWORD1>endtype</KEYWORD1>
+      <KEYWORD1>eqns</KEYWORD1>
+      <KEYWORD1>exit</KEYWORD1>
+      <KEYWORD1>for</KEYWORD1>
+      <KEYWORD1>forall</KEYWORD1>
+      <KEYWORD1>formaleqns</KEYWORD1>
+      <KEYWORD1>formalopns</KEYWORD1>
+      <KEYWORD1>formalsorts</KEYWORD1>
+      <KEYWORD1>hide</KEYWORD1>
+      <KEYWORD1>i</KEYWORD1>
+      <KEYWORD1>in</KEYWORD1>
+      <KEYWORD1>is</KEYWORD1>
+      <KEYWORD1>let</KEYWORD1>
+      <KEYWORD1>library</KEYWORD1>
+      <KEYWORD1>noexit</KEYWORD1>
+      <KEYWORD1>of</KEYWORD1>
+      <KEYWORD1>ofsort</KEYWORD1>
+      <KEYWORD1>opnnames</KEYWORD1>
+      <KEYWORD1>opns</KEYWORD1>
+      <KEYWORD1>par</KEYWORD1>
+      <KEYWORD1>process</KEYWORD1>
+      <KEYWORD1>renamedby</KEYWORD1>
+      <KEYWORD1>sortnames</KEYWORD1>
+      <KEYWORD1>sorts</KEYWORD1>
+      <KEYWORD1>specification</KEYWORD1>
+      <KEYWORD1>stop</KEYWORD1>
+      <KEYWORD1>type</KEYWORD1>
+      <KEYWORD1>using</KEYWORD1>
+      <KEYWORD1>where</KEYWORD1>
+
+      <!-- Standard Library Sorts -->
+      <KEYWORD2>Bit</KEYWORD2>
+      <KEYWORD2>BitString</KEYWORD2>
+      <KEYWORD2>Bool</KEYWORD2>
+      <KEYWORD2>DecDigit</KEYWORD2>
+      <KEYWORD2>DecString</KEYWORD2>
+      <KEYWORD2>Element</KEYWORD2>
+      <KEYWORD2>FBool</KEYWORD2>
+      <KEYWORD2>HexDigit</KEYWORD2>
+      <KEYWORD2>HexString</KEYWORD2>
+      <KEYWORD2>OctDigit</KEYWORD2>
+      <KEYWORD2>Octet</KEYWORD2>
+      <KEYWORD2>OctString</KEYWORD2>
+      <KEYWORD2>Nat</KEYWORD2>
+      <KEYWORD2>NonEmptyString</KEYWORD2>
+      <KEYWORD2>OctetString</KEYWORD2>
+      <KEYWORD2>Set</KEYWORD2>
+      <KEYWORD2>String</KEYWORD2>
+
+      <!-- Standard Library Types (where differing from Sorts) -->
+      <KEYWORD2>BasicNaturalNumber</KEYWORD2>
+      <KEYWORD2>BasicNonEmptyString</KEYWORD2>
+      <KEYWORD2>BitNatRepr</KEYWORD2>
+      <KEYWORD2>Boolean</KEYWORD2>
+      <KEYWORD2>FBoolean</KEYWORD2>
+      <KEYWORD2>DecNatRepr</KEYWORD2>
+      <KEYWORD2>HexNatRepr</KEYWORD2>
+      <KEYWORD2>NatRepresentations</KEYWORD2>
+      <KEYWORD2>NaturalNumber</KEYWORD2>
+      <KEYWORD2>OctNatRepr</KEYWORD2>
+      <KEYWORD2>RicherNonEmptyString</KEYWORD2>
+      <KEYWORD2>String0</KEYWORD2>
+      <KEYWORD2>String1</KEYWORD2>
+
+      <!-- Standard Library Literals -->
+      <LITERAL1>false</LITERAL1>
+      <LITERAL1>true</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+</MODE>

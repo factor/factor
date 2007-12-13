@@ -7,7 +7,8 @@ IN: windows.ce.files
 ! M: windows-ce-io normalize-pathname ( string -- string )
     ! dup 1 tail* CHAR: \\ = [ "*" append ] [ "\\*" append ] if ;
 
-M: windows-ce-io CreateFile-flags ( -- DWORD ) FILE_ATTRIBUTE_NORMAL ;
+M: windows-ce-io CreateFile-flags ( DWORD -- DWORD )
+    FILE_ATTRIBUTE_NORMAL bitor ;
 M: windows-ce-io FileArgs-overlapped ( port -- f ) drop f ;
 
 : finish-read ( port status bytes-ret -- )

@@ -3,17 +3,6 @@
 USING: help.syntax help.markup parser-combinators
 parser-combinators.simple ;
 
-HELP: 'any-char'
-{ $values 
-  { "parser" "a parser object" } }
-{ $description 
-    "Return a parser that consumes a single value "
-    "from the input string. The value consumed is the "  
-    "result of the parse." }
-{ $examples
-{ $example "USING: lazy-lists parser-combinators ;" "\"foo\" 'any-char' parse car parse-result-parsed ." "102" } }
-{ $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
-
 HELP: 'digit'
 { $values 
   { "parser" "a parser object" } }
@@ -22,8 +11,7 @@ HELP: 'digit'
     "the input string. The numeric value of the digit "
     " consumed is the result of the parse." }
 { $examples
-{ $example "USING: lazy-lists parser-combinators ;" "\"123\" 'digit' parse car parse-result-parsed ." "1" } }
-{ $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
+{ $example "USING: lazy-lists parser-combinators ;" "\"123\" 'digit' parse-1 ." "1" } } ;
 
 HELP: 'integer'
 { $values 
@@ -33,9 +21,7 @@ HELP: 'integer'
     "the input string. The numeric value of the integer "
     " consumed is the result of the parse." }
 { $examples
-{ $example "USING: lazy-lists parser-combinators ;" "\"123\" 'integer' parse car parse-result-parsed ." "123" } }
-{ $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
-
+{ $example "USING: lazy-lists parser-combinators ;" "\"123\" 'integer' parse-1 ." "123" } } ;
 HELP: 'string'
 { $values 
   { "parser" "a parser object" } }
@@ -44,9 +30,7 @@ HELP: 'string'
     "quotations from the input string. The string value "
     " consumed is the result of the parse." }
 { $examples
-{ $example "USING: lazy-lists parser-combinators ;" "\"\\\"foo\\\"\" 'string' parse car parse-result-parsed ." "\"foo\"" } }
-{ $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
-
+{ $example "USING: lazy-lists parser-combinators ;" "\"\\\"foo\\\"\" 'string' parse-1 ." "\"foo\"" } } ;
 HELP: 'bold'
 { $values 
   { "parser" "a parser object" } }
@@ -55,10 +39,8 @@ HELP: 'bold'
     "the '*' character from the input string. This is "
     "commonly used in markup languages to indicate bold "
     "faced text." }
-{ $example "USE: parser-combinators" "\"*foo*\" 'bold' parse car parse-result-parsed ." "\"foo\"" }
-{ $example "USE: parser-combinators" "\"*foo*\" 'bold' [ \"<strong>\" swap \"</strong>\" 3append ] <@ parse car parse-result-parsed ." "\"<strong>foo</strong>\"" }
-{ $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
-
+{ $example "USE: parser-combinators" "\"*foo*\" 'bold' parse-1 ." "\"foo\"" }
+{ $example "USE: parser-combinators" "\"*foo*\" 'bold' [ \"<strong>\" swap \"</strong>\" 3append ] <@ parse-1 ." "\"<strong>foo</strong>\"" } ;
 HELP: 'italic'
 { $values 
   { "parser" "a parser object" } }
@@ -68,10 +50,8 @@ HELP: 'italic'
     "commonly used in markup languages to indicate italic "
     "faced text." }
 { $examples
-{ $example "USING: lazy-lists parser-combinators ;" "\"_foo_\" 'italic' parse car parse-result-parsed ." "\"foo\"" }
-{ $example "USING: lazy-lists parser-combinators ;" "\"_foo_\" 'italic' [ \"<emphasis>\" swap \"</emphasis>\" 3append ] <@ parse car parse-result-parsed ." "\"<emphasis>foo</emphasis>\"" } }
-{ $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
-
+{ $example "USING: lazy-lists parser-combinators ;" "\"_foo_\" 'italic' parse-1 ." "\"foo\"" }
+{ $example "USING: lazy-lists parser-combinators ;" "\"_foo_\" 'italic' [ \"<emphasis>\" swap \"</emphasis>\" 3append ] <@ parse-1 ." "\"<emphasis>foo</emphasis>\"" } } ;
 HELP: comma-list
 { $values 
   { "element" "a parser object" } { "parser" "a parser object" } }
@@ -80,5 +60,6 @@ HELP: comma-list
     "'element' should be a parser that can parse the elements. The "
     "result of the parser is a sequence of the parsed elements." }
 { $examples
-{ $example "USING: lazy-lists parser-combinators ;" "\"1,2,3,4\" 'integer' comma-list parse car parse-result-parsed ." "{ 1 2 3 4 }" } }
-{ $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
+{ $example "USING: lazy-lits parser-combinators ;" "\"1,2,3,4\" 'integer' comma-list parse-1 ." "{ 1 2 3 4 }" } } ;
+
+{ $see-also 'digit' 'integer' 'string' 'bold' 'italic' comma-list } related-words

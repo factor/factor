@@ -580,18 +580,6 @@ IN: cpu.ppc.intrinsics
     { +output+ { "vector" } }
 } define-intrinsic
 
-\ curry [
-    \ curry 3 cells %allot
-    "obj" operand 11 1 cells STW
-    "quot" operand 11 2 cells STW
-    ! Store tagged ptr in reg
-    "curry" get object %store-tagged
-] H{
-    { +input+ { { f "obj" } { f "quot" } } }
-    { +scratch+ { { f "curry" } } }
-    { +output+ { "curry" } }
-} define-intrinsic
-
 ! Alien intrinsics
 : %alien-accessor ( quot -- )
     "offset" operand dup %untag-fixnum

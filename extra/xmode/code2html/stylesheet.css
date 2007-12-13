@@ -1,0 +1,63 @@
+.NULL {
+color: #000000;
+}
+.COMMENT1 {
+color: #cc0000;
+}
+.COMMENT2 {
+color: #ff8400;
+}
+.COMMENT3 {
+color: #6600cc;
+}
+.COMMENT4 {
+color: #cc6600;
+}
+.DIGIT {
+color: #ff0000;
+}
+.FUNCTION {
+color: #9966ff;
+}
+.INVALID {
+background: #ffffcc;
+color: #ff0066;
+}
+.KEYWORD1 {
+color: #006699;
+font-weight: bold;
+}
+.KEYWORD2 {
+color: #009966;
+font-weight: bold;
+}
+.KEYWORD3 {
+color: #0099ff;
+font-weight: bold;
+}
+.KEYWORD4 {
+color: #66ccff;
+font-weight: bold;
+}
+.LABEL {
+color: #02b902;
+}
+.LITERAL1 {
+color: #ff00cc;
+}
+.LITERAL2 {
+color: #cc00cc;
+}
+.LITERAL3 {
+color: #9900cc;
+}
+.LITERAL4 {
+color: #6600cc;
+}
+.MARKUP {
+color: #0000ff;
+}
+.OPERATOR {
+color: #000000;
+font-weight: bold;
+}

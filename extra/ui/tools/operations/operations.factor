@@ -64,6 +64,7 @@ V{ } clone operations set-global
     { +keyboard+ T{ key-down f { C+ } "E" } }
     { +primary+ t }
     { +secondary+ t }
+    { +listener+ t }
 } define-operation
 
 UNION: definition word method-spec link ;
@@ -72,6 +73,7 @@ UNION: editable-definition definition vocab vocab-link ;
 
 [ editable-definition? ] \ edit H{
     { +keyboard+ T{ key-down f { C+ } "E" } }
+    { +listener+ t }
 } define-operation
 
 UNION: reloadable-definition definition pathname ;

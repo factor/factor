@@ -57,6 +57,7 @@ default:
 	@echo "openbsd-x86-32"
 	@echo "openbsd-x86-64"
 	@echo "macosx-x86-32"
+	@echo "macosx-x86-64"
 	@echo "macosx-ppc"
 	@echo "solaris-x86-32"
 	@echo "solaris-x86-64"
@@ -91,6 +92,9 @@ macosx-ppc: macosx-freetype
 
 macosx-x86-32: macosx-freetype
 	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.x86.32
+
+macosx-x86-64: macosx-freetype
+	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.x86.64
 
 linux-x86-32:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.x86.32

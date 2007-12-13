@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!--  
+      JCL edit mode by Bill McMilleon (bill@mcmilleon.com)
+      March 19, 2003
+
+      Suggested catalog file entry:
+
+      <MODE NAME="JCL"		FILE="JCL.xml"
+				FILE_NAME_GLOB="*.{jcl}" />
+
+-->
+ 
+ 
+<MODE>
+
+    <PROPS>
+        <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+    </PROPS>
+
+    
+    <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+
+<!-- In fixed form, column 72 is the last column parsed, unless the
+\extend_source option is invoked -->
+    <!-- TERMINATE AT_CHAR="72" / -->
+
+
+    <EOL_SPAN AT_LINE_START="TRUE" TYPE="COMMENT1">//*</EOL_SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+<!-- Highlighted Operators -->
+<SEQ TYPE="OPERATOR">=</SEQ>
+<SEQ TYPE="OPERATOR">&lt;</SEQ>
+<SEQ TYPE="OPERATOR">&gt;</SEQ>
+<SEQ TYPE="OPERATOR">&amp;</SEQ>
+<SEQ TYPE="OPERATOR">|</SEQ>
+<SEQ TYPE="OPERATOR">,</SEQ>
+
+<KEYWORDS>
+  <KEYWORD2>COMMAND</KEYWORD2>
+  <KEYWORD2>CNTL</KEYWORD2>
+  <KEYWORD2>DD</KEYWORD2>
+  <KEYWORD2>ENCNTL</KEYWORD2>
+  <KEYWORD2>EXEC</KEYWORD2>
+  <KEYWORD2>IF</KEYWORD2>
+  <KEYWORD2>THEN</KEYWORD2>
+  <KEYWORD2>ELSE</KEYWORD2>
+  <KEYWORD2>ENDIF</KEYWORD2>
+  <KEYWORD2>INCLUDE</KEYWORD2>
+  <KEYWORD2>JCLIB</KEYWORD2>
+  <KEYWORD2>JOB</KEYWORD2>
+  <KEYWORD2>MSG</KEYWORD2>
+  <KEYWORD2>OUTPUT</KEYWORD2>
+  <KEYWORD2>PEND</KEYWORD2>
+  <KEYWORD2>PROC</KEYWORD2>
+  <KEYWORD2>SET</KEYWORD2>
+  <KEYWORD2>XMIT</KEYWORD2>
+</KEYWORDS>
+
+    </RULES>
+</MODE>

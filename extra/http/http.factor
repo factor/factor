@@ -20,7 +20,7 @@ IN: http
     dup letter?
     over LETTER? or
     over digit? or
-    swap "/_?." member? or ; foldable
+    swap "/_-?." member? or ; foldable
 
 : url-encode ( str -- str )
     [

@@ -58,8 +58,9 @@ SYMBOL: super-sent-messages
     "NSSavePanel"
     "NSView"
     "NSWindow"
+    "NSWorkspace"
 } [
-    f import-objc-class
+    [ ] import-objc-class
 ] each
 
 : <NSString> ( str -- alien ) <CFString> -> autorelease ;

@@ -2,7 +2,7 @@ IN: temporary
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
 namespaces models kernel tools.test.inference dlists math
 math.parser ui sequences hashtables assocs io arrays
-prettyprint io.streams.string ui.private ;
+prettyprint io.streams.string ;
 
 [ T{ rect f { 10 10 } { 20 20 } } ]
 [

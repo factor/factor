@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+        <PROPS>
+                <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+                <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+                <PROPERTY NAME="indentPrevLine"
+                        VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+                <!-- set this to 'true' if you want to use GNU coding style -->
+                <PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+                <PROPERTY NAME="commentStart" VALUE="/*" />
+                <PROPERTY NAME="commentEnd" VALUE="*/" />
+                <PROPERTY NAME="lineComment" VALUE="//" />
+                <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+        </PROPS>
+        <RULES ESCAPE="\"
+                IGNORE_CASE="FALSE"
+                HIGHLIGHT_DIGITS="TRUE"
+                DIGIT_RE="(0x)?[\p{XDigit}]+[lLdDfF]?">
+
+                <!-- Silly comment -->
+                <SEQ TYPE="COMMENT1">/**/</SEQ>
+
+                <!-- Javadoc comment -->
+                <SPAN TYPE="COMMENT3" DELEGATE="java::JAVADOC">
+                        <BEGIN>/**</BEGIN>
+                        <END>*/</END>
+                </SPAN>
+
+                <!-- Java comment (C style) -->
+                <SPAN TYPE="COMMENT1">
+                        <BEGIN>/*</BEGIN>
+                        <END>*/</END>
+                </SPAN>
+
+                <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+                        <BEGIN>"</BEGIN>
+                        <END>"</END>
+                </SPAN>
+                <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+                        <BEGIN>'</BEGIN>
+                        <END>'</END>
+                </SPAN>
+
+                <EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+
+                <SEQ TYPE="OPERATOR">=</SEQ>
+                <SEQ TYPE="OPERATOR">!</SEQ>
+                <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+                <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+                <SEQ TYPE="OPERATOR">+</SEQ>
+                <SEQ TYPE="OPERATOR">-</SEQ>
+                <SEQ TYPE="OPERATOR">/</SEQ>
+
+                <!-- workaround to stop "*" from being colorized
+                     in import statements. -->
+                <SEQ TYPE="NULL">.*</SEQ>
+
+                <SEQ TYPE="OPERATOR">*</SEQ>
+                <SEQ TYPE="OPERATOR">&gt;</SEQ>
+                <SEQ TYPE="OPERATOR">&lt;</SEQ>
+                <SEQ TYPE="OPERATOR">%</SEQ>
+                <SEQ TYPE="OPERATOR">&amp;</SEQ>
+                <SEQ TYPE="OPERATOR">|</SEQ>
+                <SEQ TYPE="OPERATOR">^</SEQ>
+                <SEQ TYPE="OPERATOR">~</SEQ>
+                <SEQ TYPE="OPERATOR">}</SEQ>
+                <SEQ TYPE="OPERATOR">{</SEQ>
+                <MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR"
+                        AT_WHITESPACE_END="TRUE">:</MARK_PREVIOUS>
+
+                <!-- Function calls -->
+                <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+				<SEQ TYPE="OPERATOR">)</SEQ>
+
+                <KEYWORDS>
+                        <KEYWORD1>abstract</KEYWORD1>
+						<KEYWORD1>break</KEYWORD1>
+						<KEYWORD1>case</KEYWORD1>
+						<KEYWORD1>catch</KEYWORD1>
+						<KEYWORD1>continue</KEYWORD1>
+						<KEYWORD1>default</KEYWORD1>
+						<KEYWORD1>do</KEYWORD1>
+						<KEYWORD1>else</KEYWORD1>
+						<KEYWORD1>extends</KEYWORD1>
+						<KEYWORD1>final</KEYWORD1>
+						<KEYWORD1>finally</KEYWORD1>
+						<KEYWORD1>for</KEYWORD1>
+						<KEYWORD1>if</KEYWORD1>
+						<KEYWORD1>implements</KEYWORD1>
+						<KEYWORD1>instanceof</KEYWORD1>
+						<KEYWORD1>native</KEYWORD1>
+						<KEYWORD1>new</KEYWORD1>
+						<KEYWORD1>private</KEYWORD1>
+						<KEYWORD1>protected</KEYWORD1>
+						<KEYWORD1>public</KEYWORD1>
+						<KEYWORD1>return</KEYWORD1>
+						<KEYWORD1>static</KEYWORD1>
+						<KEYWORD1>switch</KEYWORD1>
+						<KEYWORD1>synchronized</KEYWORD1>
+						<KEYWORD1>throw</KEYWORD1>
+						<KEYWORD1>throws</KEYWORD1>
+						<KEYWORD1>transient</KEYWORD1>
+						<KEYWORD1>try</KEYWORD1>
+						<KEYWORD1>volatile</KEYWORD1>
+						<KEYWORD1>while</KEYWORD1>
+
+						<KEYWORD2>package</KEYWORD2>
+						<KEYWORD2>import</KEYWORD2>
+
+						<KEYWORD3>boolean</KEYWORD3>
+						<KEYWORD3>byte</KEYWORD3>
+						<KEYWORD3>char</KEYWORD3>
+						<KEYWORD3>class</KEYWORD3>
+						<KEYWORD3>double</KEYWORD3>
+						<KEYWORD3>float</KEYWORD3>
+						<KEYWORD3>int</KEYWORD3>
+						<KEYWORD3>interface</KEYWORD3>
+						<KEYWORD3>long</KEYWORD3>
+						<KEYWORD3>short</KEYWORD3>
+						<KEYWORD3>void</KEYWORD3>
+
+						<FUNCTION>assert</FUNCTION>
+						<KEYWORD1>strictfp</KEYWORD1>
+
+						<LITERAL2>false</LITERAL2>
+						<LITERAL2>null</LITERAL2>
+						<LITERAL2>super</LITERAL2>
+						<LITERAL2>this</LITERAL2>
+						<LITERAL2>true</LITERAL2>
+
+						<INVALID>goto</INVALID>
+						<INVALID>const</INVALID>
+
+                        <KEYWORD4>args</KEYWORD4>
+                        <KEYWORD4>percflow</KEYWORD4>
+                        <KEYWORD4>get</KEYWORD4>
+                        <KEYWORD4>set</KEYWORD4>
+                        <KEYWORD4>preinitialization</KEYWORD4>
+                        <KEYWORD4>handler</KEYWORD4>
+                        <KEYWORD4>adviceexecution</KEYWORD4>
+                        <KEYWORD4>cflow</KEYWORD4>
+                        <KEYWORD4>target</KEYWORD4>
+                        <KEYWORD4>cflowbelow</KEYWORD4>
+                        <KEYWORD4>withincode</KEYWORD4>
+                        <KEYWORD4>declare</KEYWORD4>
+                        <KEYWORD4>precedence</KEYWORD4>
+                        <KEYWORD4>issingleton</KEYWORD4>
+                        <KEYWORD4>perthis</KEYWORD4>
+                        <KEYWORD4>pertarget</KEYWORD4>
+                        <KEYWORD4>privileged</KEYWORD4>
+                        <KEYWORD4>after</KEYWORD4>
+                        <KEYWORD4>around</KEYWORD4>
+                        <KEYWORD4>aspect</KEYWORD4>
+                        <KEYWORD4>before</KEYWORD4>
+                        <KEYWORD4>call</KEYWORD4>
+                        <KEYWORD4>execution</KEYWORD4>
+                        <KEYWORD4>initialization</KEYWORD4>
+                        <KEYWORD4>pointcut</KEYWORD4>
+                        <KEYWORD4>proceed</KEYWORD4>
+                        <KEYWORD4>staticinitialization</KEYWORD4>
+                        <KEYWORD4>within</KEYWORD4>
+                        <KEYWORD4>..</KEYWORD4>
+                </KEYWORDS>
+        </RULES>
+</MODE>

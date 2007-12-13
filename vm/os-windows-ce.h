@@ -24,3 +24,4 @@ char *getenv(char *name);
 
 s64 current_millis(void);
 void c_to_factor_toplevel(CELL quot);
+void open_console(void);

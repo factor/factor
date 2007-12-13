@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+  JHTML mode by Will Sargent <wsargent@atg.com>
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+				<!-- Indent droplets and oparams -->
+				<PROPERTY NAME="indentNextLines"
+				 VALUE="\s*(&lt;\s*(droplet|oparam))\s+.*" />
+				<!-- Sadly, there doesn't seem to be a way to
+					 undent when we see a /oparam> tag... -->
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE">
+				<!-- Allow for Dynamo SSI -->
+				<SPAN TYPE="NULL">
+			<BEGIN>&lt;!--#</BEGIN>
+			<END>--&gt;</END>
+				</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="java::MAIN">
+			<BEGIN>`</BEGIN>
+			<END>`</END>
+		</SPAN>
+
+				<!-- Embedded Java -->
+		<SPAN TYPE="MARKUP" DELEGATE="java::MAIN">
+			<BEGIN>&lt;java&gt;</BEGIN>
+			<END>&lt;/java&gt;</END>
+		</SPAN>
+
+				<!-- Don't know how to do this correctly.
+				<SPAN TYPE="MARKUP" DELEGATE="java::MAIN">
+						<BEGIN>&lt;java type=</BEGIN>
+						<END>&lt;/java&gt;</END>
+				</SPAN>
+				-->
+
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- stylesheet -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::CSS">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+				<!-- All markup defaults to JHTML. -->
+		<SPAN TYPE="MARKUP" DELEGATE="JHTML">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="JHTML" DEFAULT="MARKUP">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="ATTRVALUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="ATTRVALUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="MARKUP">/</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>importbean</KEYWORD1>
+			<KEYWORD1>droplet</KEYWORD1>
+			<KEYWORD1>param</KEYWORD1>
+			<KEYWORD1>oparam</KEYWORD1>
+			<KEYWORD1>valueof</KEYWORD1>
+			<KEYWORD1>setvalue</KEYWORD1>
+			<KEYWORD1>servlet</KEYWORD1>
+			<KEYWORD2>bean</KEYWORD2>
+			<KEYWORD2>submitvalue</KEYWORD2>
+			<KEYWORD2>declareparam</KEYWORD2>
+			<KEYWORD2>synchronized</KEYWORD2>
+			<KEYWORD2>priority</KEYWORD2>
+
+			<!-- standard converters -->
+			<KEYWORD2>converter</KEYWORD2>
+			<KEYWORD2>date</KEYWORD2>
+			<KEYWORD2>number</KEYWORD2>
+			<KEYWORD2>required</KEYWORD2>
+			<KEYWORD2>nullable</KEYWORD2>
+			<KEYWORD2>currency</KEYWORD2>
+			<KEYWORD2>currencyConversion</KEYWORD2>
+			<KEYWORD2>euro</KEYWORD2>
+			<KEYWORD2>locale</KEYWORD2>
+			<KEYWORD2>symbol</KEYWORD2>
+
+			<!-- Can't use this because of image src... -->
+			<!-- <KEYWORD2>src</KEYWORD2> -->
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="ATTRVALUE" DEFAULT="LITERAL1" HIGHLIGHT_DIGITS="TRUE">
+		<!-- backticks are java -->
+		<SPAN TYPE="MARKUP" DELEGATE="java::MAIN">
+			<BEGIN>`</BEGIN>
+			<END>`</END>
+		</SPAN>
+
+				<!-- Allow param: and bean: properties to be marked up -->
+				<SEQ TYPE="LABEL">param:</SEQ>
+				<SEQ TYPE="LABEL">bean:</SEQ>
+	</RULES>
+
+</MODE>

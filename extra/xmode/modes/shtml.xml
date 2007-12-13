@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE">
+		<!-- SSI -->
+		<!-- SSI directives should ALWAYS end like this, with a space
+			before the tag end, so let's make it colorize poorly otherwise -->
+		<!-- ... or really? see bug report 964860 -->
+		<SPAN TYPE="KEYWORD3" DELEGATE="SSI">
+			<BEGIN>&lt;!--#</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- stylesheet -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::CSS">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="TAGS" DEFAULT="MARKUP">
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+	</RULES>
+
+	<RULES SET="SSI" DEFAULT="KEYWORD3">
+		<SPAN TYPE="LITERAL1" MATCH_TYPE="OPERATOR" DELEGATE="SSI-EXPRESSION">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- MD: i don't think this is valid
+		<SPAN TYPE="LITERAL1" MATCH_TYPE="OPERATOR" DELEGATE="SSI-EXPRESSION">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		-->
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>config</KEYWORD1>
+			<KEYWORD1>echo</KEYWORD1>
+			<KEYWORD1>exec</KEYWORD1>
+			<KEYWORD1>flastmod</KEYWORD1>
+			<KEYWORD1>fsize</KEYWORD1>
+			<KEYWORD1>include</KEYWORD1>
+
+			<KEYWORD2>cgi</KEYWORD2>
+			<KEYWORD2>errmsg</KEYWORD2>
+			<KEYWORD2>file</KEYWORD2>
+			<KEYWORD2>sizefmt</KEYWORD2>
+			<KEYWORD2>timefmt</KEYWORD2>
+			<KEYWORD2>var</KEYWORD2>
+			<KEYWORD2>cmd</KEYWORD2>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="SSI-EXPRESSION" DEFAULT="LITERAL1" ESCAPE="\">
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">||</SEQ>
+	</RULES>
+</MODE>

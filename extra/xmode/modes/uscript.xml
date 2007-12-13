@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="indentNextLine"
+			VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+		<!-- set this to 'true' if you want to use GNU coding style -->
+		<PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+	</PROPS>
+	<RULES ESCAPE="\"
+		IGNORE_CASE="TRUE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
+
+		<!-- Silly comment -->
+		<SEQ TYPE="COMMENT1">/**/</SEQ>
+
+		<!-- Java comment (C style) -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+
+        <SEQ TYPE="OPERATOR">~</SEQ>
+        <SEQ TYPE="OPERATOR">!</SEQ>
+        <SEQ TYPE="OPERATOR">@</SEQ>
+        <SEQ TYPE="OPERATOR">#</SEQ>
+        <SEQ TYPE="OPERATOR">$</SEQ>
+        <SEQ TYPE="OPERATOR">^</SEQ>
+        <SEQ TYPE="OPERATOR">&amp;</SEQ>
+        <SEQ TYPE="OPERATOR">*</SEQ>
+        <SEQ TYPE="OPERATOR">-</SEQ>
+        <SEQ TYPE="OPERATOR">=</SEQ>
+        <SEQ TYPE="OPERATOR">+</SEQ>
+        <SEQ TYPE="OPERATOR">|</SEQ>
+        <SEQ TYPE="OPERATOR">\\</SEQ>
+        <SEQ TYPE="OPERATOR">:</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;</SEQ>
+        <SEQ TYPE="OPERATOR">/</SEQ>
+        <SEQ TYPE="OPERATOR">?</SEQ>
+        <SEQ TYPE="OPERATOR">`</SEQ>
+
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR"
+			AT_WHITESPACE_END="TRUE">:</MARK_PREVIOUS>
+
+		<!-- Function calls -->
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<KEYWORDS>
+            <KEYWORD1>abstract</KEYWORD1>
+            <KEYWORD1>auto</KEYWORD1>
+            <KEYWORD1>array</KEYWORD1>
+            <KEYWORD1>case</KEYWORD1>
+            <KEYWORD1>class</KEYWORD1>
+            <KEYWORD1>coerce</KEYWORD1>
+            <KEYWORD1>collapscategories</KEYWORD1>
+            <KEYWORD1>config</KEYWORD1>
+            <KEYWORD1>const</KEYWORD1>
+            <KEYWORD1>default</KEYWORD1>
+            <KEYWORD1>defaultproperties</KEYWORD1>
+            <KEYWORD1>deprecated</KEYWORD1>
+            <KEYWORD1>do</KEYWORD1>
+            <KEYWORD1>dontcollapsecategories</KEYWORD1>
+            <KEYWORD1>edfindable</KEYWORD1>
+            <KEYWORD1>editconst</KEYWORD1>
+            <KEYWORD1>editinline</KEYWORD1>
+            <KEYWORD1>editinlinenew</KEYWORD1>
+            <KEYWORD1>else</KEYWORD1>
+            <KEYWORD1>enum</KEYWORD1>
+            <KEYWORD1>event</KEYWORD1>
+            <KEYWORD1>exec</KEYWORD1>
+            <KEYWORD1>export</KEYWORD1>
+            <KEYWORD1>exportstructs</KEYWORD1>
+            <KEYWORD1>extends</KEYWORD1>
+            <KEYWORD1>false</KEYWORD1>
+            <KEYWORD1>final</KEYWORD1>
+            <KEYWORD1>for</KEYWORD1>
+            <KEYWORD1>foreach</KEYWORD1>
+            <KEYWORD1>function</KEYWORD1>
+            <KEYWORD1>globalconfig</KEYWORD1>
+            <KEYWORD1>hidecategories</KEYWORD1>
+            <KEYWORD1>if</KEYWORD1>
+            <KEYWORD1>ignores</KEYWORD1>
+            <KEYWORD1>input</KEYWORD1>
+            <KEYWORD1>iterator</KEYWORD1>
+            <KEYWORD1>latent</KEYWORD1>
+            <KEYWORD1>local</KEYWORD1>
+            <KEYWORD1>localized</KEYWORD1>
+            <KEYWORD1>native</KEYWORD1>
+            <KEYWORD1>nativereplication</KEYWORD1>
+            <KEYWORD1>noexport</KEYWORD1>
+            <KEYWORD1>noteditinlinenew</KEYWORD1>
+			<KEYWORD1>notplaceable</KEYWORD1>
+            <KEYWORD1>operator</KEYWORD1>
+            <KEYWORD1>optional</KEYWORD1>
+            <KEYWORD1>out</KEYWORD1>
+            <KEYWORD1>perobjectconfig</KEYWORD1>
+            <KEYWORD1>placeable</KEYWORD1>
+            <KEYWORD1>postoperator</KEYWORD1>
+            <KEYWORD1>preoperator</KEYWORD1>
+            <KEYWORD1>private</KEYWORD1>
+            <KEYWORD1>protected</KEYWORD1>
+            <KEYWORD1>reliable</KEYWORD1>
+            <KEYWORD1>replication</KEYWORD1>
+            <KEYWORD1>return</KEYWORD1>
+            <KEYWORD1>safereplace</KEYWORD1>
+            <KEYWORD1>showcategories</KEYWORD1>
+            <KEYWORD1>simulated</KEYWORD1>
+            <KEYWORD1>singular</KEYWORD1>
+            <KEYWORD1>state</KEYWORD1>
+            <KEYWORD1>static</KEYWORD1>
+            <KEYWORD1>struct</KEYWORD1>
+            <KEYWORD1>switch</KEYWORD1>
+            <KEYWORD1>transient</KEYWORD1>
+            <KEYWORD1>travel</KEYWORD1>
+            <KEYWORD1>true</KEYWORD1>
+            <KEYWORD1>unreliable</KEYWORD1>
+            <KEYWORD1>until</KEYWORD1>
+            <KEYWORD1>var</KEYWORD1>
+            <KEYWORD1>while</KEYWORD1>
+            <KEYWORD1>within</KEYWORD1>
+
+            <KEYWORD2>default</KEYWORD2>
+            <KEYWORD2>global</KEYWORD2>
+            <KEYWORD2>none</KEYWORD2>
+            <KEYWORD2>self</KEYWORD2>
+            <KEYWORD2>static</KEYWORD2>
+            <KEYWORD2>super</KEYWORD2>
+
+            <KEYWORD3>bool</KEYWORD3>
+            <KEYWORD3>byte</KEYWORD3>
+            <KEYWORD3>float</KEYWORD3>
+            <KEYWORD3>int</KEYWORD3>
+            <KEYWORD3>name</KEYWORD3>
+            <KEYWORD3>string</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+</MODE>

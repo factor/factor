@@ -32,7 +32,7 @@ $nl
 { $subsection >r }
 { $subsection r> }
 "The top of the data stack is ``hidden'' between " { $link >r } " and " { $link r> } ":"
-{ $example "1 2 3 >r .s r>" "2\n1" }
+{ $example "1 2 3 >r .s r>" "1\n2" }
 "Words must not leave objects on the retain stack, nor expect values to be there on entry. The retain stack is for local storage within a word only, and occurrences of " { $link >r } " and " { $link r> } " must be balanced inside a single quotation. One exception is the following trick involving " { $link if } "; values may be pushed on the retain stack before the condition value is computed, as long as both branches of the " { $link if } " pop the values off the retain stack before returning:"
 { $code
     ": foo ( m ? n -- m+n/n )"

@@ -213,6 +213,7 @@ void dump_objects(F_FIXNUM type)
 void factorbug(void)
 {
 	reset_stdio();
+	open_console();
 
 	printf("Starting low level debugger...\n");
 	printf("  Basic commands:\n");

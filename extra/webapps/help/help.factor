@@ -82,4 +82,4 @@ PREDICATE: pathname resource-pathname
 M: resource-pathname browser-link-href
     pathname-string
     "resource:" ?head drop
-    "/responder/resources/" swap append ;
+    "/responder/source/" swap append ;

@@ -166,6 +166,10 @@ FUNCTION: time_t time ( time_t* t ) ;
 FUNCTION: int unlink ( char* path ) ;
 FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! wait and waitpid
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 ! Flags for waitpid
 
 : WNOHANG   1 ;
@@ -176,7 +180,27 @@ FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 : WCONTINUED 8 ;
 : WNOWAIT    HEX: 1000000 ;
 
+! Examining status
+
+: WTERMSIG ( status -- value ) HEX: 7f bitand ;
+
+: WIFEXITED ( status -- ? ) WTERMSIG zero? ;
+
+: WEXITSTATUS ( status -- value ) HEX: ff00 bitand -8 shift ;
+
+: WIFSIGNALED ( status -- ? ) HEX: 7f bitand 1+ -1 shift 0 > ;
+
+: WCOREFLAG ( -- value ) HEX: 80 ;
+
+: WCOREDUMP ( status -- ? ) WCOREFLAG bitand zero? not ;
+
+: WIFSTOPPED ( status -- ? ) HEX: ff bitand HEX: 7f = ;
+
+: WSTOPSIG ( status -- value ) WEXITSTATUS ;
+
 FUNCTION: pid_t wait ( int* status ) ;
 FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;

@@ -1,0 +1,462 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+		<PROPERTY NAME="commentStart" VALUE="(:" />
+		<PROPERTY NAME="commentEnd" VALUE=":)" />
+		<PROPERTY NAME="wordBreakChars" VALUE=":,+=&lt;&gt;/?^&amp;*" />
+
+		<!-- Auto indent -->
+		<!-- <PROPERTY NAME="indentOpenBrackets" VALUE="{" /> -->
+		<!-- <PROPERTY NAME="indentCloseBrackets" VALUE="}" /> -->
+		<PROPERTY NAME="indentNextLine"
+			VALUE="\s*(((if)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+		<!-- set this to 'true' if you want to use GNU coding style -->
+		<PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+		<PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
+	</PROPS>
+	<RULES>
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+
+		<!-- DTD Entity declarations -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="ENTITY-TAGS">
+			<BEGIN>&lt;!ENTITY</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- CDATA sections -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="CDATA">
+			<BEGIN>&lt;![CDATA[</BEGIN>
+			<END>]]&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- PI directives -->
+		<SPAN TYPE="KEYWORD3">
+			<BEGIN>&lt;?</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN_REGEXP HASH_CHAR="&lt;" TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN><![CDATA[<[a-zA-Z/]\w*]]></BEGIN>
+			<END>&gt;</END>
+		</SPAN_REGEXP>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="TAGS" DEFAULT="MARKUP" NO_WORD_SEP="-_">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+
+		<SEQ TYPE="MARKUP">/</SEQ>
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR">:</MARK_PREVIOUS>
+	</RULES>
+
+	<RULES SET="DTD-TAGS" DEFAULT="KEYWORD2" IGNORE_CASE="FALSE">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>--</BEGIN>
+			<END>--</END>
+		</SPAN>
+
+		<!-- Parameter entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>%</BEGIN>
+			<END>;</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<!-- This appears in some SGML documents -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="MAIN">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>CDATA</KEYWORD1>
+			<KEYWORD1>EMPTY</KEYWORD1>
+			<KEYWORD1>INCLUDE</KEYWORD1>
+			<KEYWORD1>IGNORE</KEYWORD1>
+			<KEYWORD1>NDATA</KEYWORD1>
+			<KEYWORD1>#IMPLIED</KEYWORD1>
+			<KEYWORD1>#PCDATA</KEYWORD1>
+			<KEYWORD1>#REQUIRED</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="ENTITY-TAGS" DEFAULT="KEYWORD2">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>--</BEGIN>
+			<END>--</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<SEQ TYPE="OPERATOR">%</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>SYSTEM</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="CDATA" DEFAULT="COMMENT2">
+		<!-- no rules -->
+	</RULES>
+
+	<RULES ESCAPE="\"
+		IGNORE_CASE="FALSE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="(0x\p{XDigit}+[lL]?|\d+(e\d*)?[lLdDfF]?)">
+
+		<!-- XQuery style comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>(:</BEGIN>
+			<END>:)</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+
+
+
+		<!-- Function calls -->
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<SEQ TYPE="OPERATOR">,</SEQ>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+
+		<SEQ TYPE="OPERATOR">&lt;&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;&gt;</SEQ>
+
+		<SEQ TYPE="OPERATOR">+</SEQ>
+<!--
+		<SEQ TYPE="OPERATOR">-</SEQ>
+ -->
+ 		<SEQ TYPE="OPERATOR">*</SEQ>
+
+		<!-- unary -/+ ? -->
+
+		<SEQ TYPE="OPERATOR">|</SEQ>
+
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">//</SEQ>
+
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+
+		<KEYWORDS>
+			<OPERATOR>some</OPERATOR>
+			<OPERATOR>every</OPERATOR>
+
+			<OPERATOR>or</OPERATOR>
+			<OPERATOR>and</OPERATOR>
+
+			<OPERATOR>instance of</OPERATOR>
+
+			<OPERATOR>treat as</OPERATOR>
+
+			<OPERATOR>castable as</OPERATOR>
+
+			<OPERATOR>cast as</OPERATOR>
+
+			<OPERATOR>eq</OPERATOR>
+			<OPERATOR>ne</OPERATOR>
+			<OPERATOR>lt</OPERATOR>
+			<OPERATOR>gt</OPERATOR>
+			<OPERATOR>ge</OPERATOR>
+			<OPERATOR>is</OPERATOR>
+
+			<OPERATOR>to</OPERATOR>
+
+			<OPERATOR>div</OPERATOR>
+			<OPERATOR>idiv</OPERATOR>
+			<OPERATOR>mod</OPERATOR>
+
+			<OPERATOR>union</OPERATOR>
+
+			<OPERATOR>intersect</OPERATOR>
+			<OPERATOR>except</OPERATOR>
+
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>to</KEYWORD1>
+			<KEYWORD1>at</KEYWORD1>
+
+			<KEYWORD1>let</KEYWORD1>
+			<KEYWORD1>:=</KEYWORD1>
+
+			<KEYWORD1>where</KEYWORD1>
+
+			<KEYWORD1>stable</KEYWORD1>
+			<KEYWORD1>order</KEYWORD1>
+			<KEYWORD1>by</KEYWORD1>
+
+			<LITERAL2>ascending</LITERAL2>
+			<LITERAL2>descending</LITERAL2>
+
+			<LITERAL2>greatest</LITERAL2>
+			<LITERAL2>least</LITERAL2>
+			<LITERAL2>collation</LITERAL2>
+
+			<KEYWORD3>typeswitch</KEYWORD3>
+			<KEYWORD3>default</KEYWORD3>
+
+			<KEYWORD1>cast</KEYWORD1>
+			<KEYWORD1>as</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>then</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+
+			<LITERAL2>true</LITERAL2>
+			<LITERAL2>false</LITERAL2>
+
+			<KEYWORD3>xquery</KEYWORD3>
+			<KEYWORD3>version</KEYWORD3>
+
+			<KEYWORD3>declare</KEYWORD3>
+			<KEYWORD3>function</KEYWORD3>
+			<KEYWORD3>library</KEYWORD3>
+			<KEYWORD3>variable</KEYWORD3>
+			<KEYWORD3>module</KEYWORD3>
+			<KEYWORD3>namespace</KEYWORD3>
+			<KEYWORD3>local</KEYWORD3>
+
+			<KEYWORD3>validate</KEYWORD3>
+			<KEYWORD3>import</KEYWORD3>
+			<KEYWORD3>schema</KEYWORD3>
+			<KEYWORD3>validation</KEYWORD3>
+			<KEYWORD3>collection</KEYWORD3>
+
+			<KEYWORD3>ancestor</KEYWORD3>
+			<KEYWORD3>descendant</KEYWORD3>
+			<KEYWORD3>self</KEYWORD3>
+			<KEYWORD3>parent</KEYWORD3>
+			<KEYWORD3>child</KEYWORD3>
+			<KEYWORD3>self</KEYWORD3>
+			<KEYWORD3>descendant-or-self</KEYWORD3>
+			<KEYWORD3>ancestor-or-self</KEYWORD3>
+			<KEYWORD3>preceding-sibling</KEYWORD3>
+			<KEYWORD3>following-sibling</KEYWORD3>
+			<KEYWORD3>following</KEYWORD3>
+			<KEYWORD3>preceding</KEYWORD3>
+
+			<KEYWORD4>xs:integer</KEYWORD4>
+			<KEYWORD4>xs:decimal</KEYWORD4>
+			<KEYWORD4>xs:double</KEYWORD4>
+			<KEYWORD4>xs:string</KEYWORD4>
+			<KEYWORD4>xs:date</KEYWORD4>
+			<KEYWORD4>xs:time</KEYWORD4>
+			<KEYWORD4>xs:dateTime</KEYWORD4>
+			<KEYWORD4>xs:boolean</KEYWORD4>
+
+			<KEYWORD4>item</KEYWORD4>
+			<KEYWORD4>element</KEYWORD4>
+			<KEYWORD4>attribute</KEYWORD4>
+			<KEYWORD4>comment</KEYWORD4>
+			<KEYWORD4>document</KEYWORD4>
+			<KEYWORD4>document-node</KEYWORD4>
+			<KEYWORD4>node</KEYWORD4>
+			<KEYWORD4>empty</KEYWORD4>
+
+			<FUNCTION>zero-or-one</FUNCTION>
+			<FUNCTION>avg</FUNCTION>
+			<FUNCTION>base-uri</FUNCTION>
+			<FUNCTION>boolean</FUNCTION>
+			<FUNCTION>ceiling</FUNCTION>
+			<FUNCTION>codepoints-to-string</FUNCTION>
+			<FUNCTION>collection</FUNCTION>
+			<FUNCTION>compare</FUNCTION>
+			<FUNCTION>concat</FUNCTION>
+			<FUNCTION>contains</FUNCTION>
+			<FUNCTION>count</FUNCTION>
+			<FUNCTION>current-date</FUNCTION>
+			<FUNCTION>current-dateTime</FUNCTION>
+			<FUNCTION>current-time</FUNCTION>
+			<FUNCTION>data</FUNCTION>
+			<FUNCTION>day-from-date</FUNCTION>
+			<FUNCTION>day-from-dateTime</FUNCTION>
+			<FUNCTION>days-from-duration</FUNCTION>
+			<FUNCTION>deep-equal</FUNCTION>
+			<FUNCTION>distinct-values</FUNCTION>
+			<FUNCTION>doc</FUNCTION>
+			<FUNCTION>adjust-time-to-timezone</FUNCTION>
+			<FUNCTION>adjust-dateTime-to-timezone</FUNCTION>
+			<FUNCTION>string-length</FUNCTION>
+			<FUNCTION>string-join</FUNCTION>
+			<FUNCTION>string</FUNCTION>
+			<FUNCTION>starts-with</FUNCTION>
+			<FUNCTION>seconds-from-time</FUNCTION>
+			<FUNCTION>seconds-from-duration</FUNCTION>
+			<FUNCTION>seconds-from-dateTime</FUNCTION>
+			<FUNCTION>round-half-to-even</FUNCTION>
+			<FUNCTION>round</FUNCTION>
+			<FUNCTION>root</FUNCTION>
+			<FUNCTION>reverse</FUNCTION>
+			<FUNCTION>replace</FUNCTION>
+			<FUNCTION>remove</FUNCTION>
+			<FUNCTION>prefix-from-QName</FUNCTION>
+			<FUNCTION>position</FUNCTION>
+			<FUNCTION>one-or-more</FUNCTION>
+			<FUNCTION>number</FUNCTION>
+			<FUNCTION>QName</FUNCTION>
+			<FUNCTION>abs</FUNCTION>
+			<FUNCTION>adjust-date-to-timezone</FUNCTION>
+			<FUNCTION>doc-available</FUNCTION>
+			<FUNCTION>doctype</FUNCTION>
+			<FUNCTION>document</FUNCTION>
+			<FUNCTION>last</FUNCTION>
+			<FUNCTION>local-name</FUNCTION>
+			<FUNCTION>local-name-from-QName</FUNCTION>
+			<FUNCTION>lower-case</FUNCTION>
+			<FUNCTION>match-all</FUNCTION>
+			<FUNCTION>match-any</FUNCTION>
+			<FUNCTION>matches</FUNCTION>
+			<FUNCTION>max</FUNCTION>
+			<FUNCTION>min</FUNCTION>
+			<FUNCTION>minutes-from-dateTime</FUNCTION>
+			<FUNCTION>minutes-from-duration</FUNCTION>
+			<FUNCTION>minutes-from-time</FUNCTION>
+			<FUNCTION>month-from-date</FUNCTION>
+			<FUNCTION>month-from-dateTime</FUNCTION>
+			<FUNCTION>name</FUNCTION>
+			<FUNCTION>namespace-uri</FUNCTION>
+			<FUNCTION>namespace-uri-for-prefix</FUNCTION>
+			<FUNCTION>namespace-uri-from-QName</FUNCTION>
+			<FUNCTION>node-name</FUNCTION>
+			<FUNCTION>normalize-space</FUNCTION>
+			<FUNCTION>lang</FUNCTION>
+			<FUNCTION>item-at</FUNCTION>
+			<FUNCTION>document-uri</FUNCTION>
+			<FUNCTION>empty</FUNCTION>
+			<FUNCTION>encode-for-uri</FUNCTION>
+			<FUNCTION>ends-with</FUNCTION>
+			<FUNCTION>error</FUNCTION>
+			<FUNCTION>escape-html-uri</FUNCTION>
+			<FUNCTION>escape-uri</FUNCTION>
+			<FUNCTION>exactly-one</FUNCTION>
+			<FUNCTION>exists</FUNCTION>
+			<FUNCTION>false</FUNCTION>
+			<FUNCTION>floor</FUNCTION>
+			<FUNCTION>hours-from-dateTime</FUNCTION>
+			<FUNCTION>hours-from-duration</FUNCTION>
+			<FUNCTION>hours-from-time</FUNCTION>
+			<FUNCTION>id</FUNCTION>
+			<FUNCTION>implicit-timezone</FUNCTION>
+			<FUNCTION>in-scope-prefixes</FUNCTION>
+			<FUNCTION>index-of</FUNCTION>
+			<FUNCTION>insert-before</FUNCTION>
+			<FUNCTION>iri-to-uri</FUNCTION>
+			<FUNCTION>string-pad</FUNCTION>
+			<FUNCTION>string-to-codepoints</FUNCTION>
+			<FUNCTION>sum</FUNCTION>
+			<FUNCTION>timezone-from-date</FUNCTION>
+			<FUNCTION>timezone-from-dateTime</FUNCTION>
+			<FUNCTION>timezone-from-time</FUNCTION>
+			<FUNCTION>not</FUNCTION>
+			<FUNCTION>tokenize</FUNCTION>
+			<FUNCTION>translate</FUNCTION>
+			<FUNCTION>true</FUNCTION>
+			<FUNCTION>unordered</FUNCTION>
+			<FUNCTION>upper-case</FUNCTION>
+			<FUNCTION>xcollection</FUNCTION>
+			<FUNCTION>year-from-date</FUNCTION>
+			<FUNCTION>year-from-dateTime</FUNCTION>
+			<FUNCTION>substring-before</FUNCTION>
+			<FUNCTION>subsequence</FUNCTION>
+			<FUNCTION>substring</FUNCTION>
+			<FUNCTION>substring-after</FUNCTION>
+
+		</KEYWORDS>
+	</RULES>
+
+</MODE>

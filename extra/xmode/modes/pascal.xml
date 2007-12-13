@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Pascal mode by Kristian Ovaska.
+     Delphi 3 was used as reference.
+     Modified by Barry Carr (Ixian Software Components Ltd)
+     Delphi 6 was used as reference.
+     Modified by Barry Carr (Ixian Software Components Ltd) Feb '04
+     Delphi 8 (for .NET) was used as reference
+     Keywords   = KEYWORD1
+     Directives = KEYWORD2.
+     Everything else as is-->
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="commentStart" VALUE="{" />
+        <PROPERTY NAME="commentEnd" VALUE="}" />
+        <PROPERTY NAME="lineComment" VALUE="//" />
+    </PROPS>
+
+    <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+        <!-- Compiler directives. -->
+        <SPAN TYPE="COMMENT3">
+            <BEGIN>{$</BEGIN>
+            <END>}</END>
+        </SPAN>
+        <SPAN TYPE="COMMENT3">
+            <BEGIN>(*$</BEGIN>
+            <END>*)</END>
+        </SPAN>
+
+        <!-- Normal comments. -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>{</BEGIN>
+            <END>}</END>
+        </SPAN>
+
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>(*</BEGIN>
+            <END>*)</END>
+        </SPAN>
+
+        <EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+        <SEQ TYPE="OPERATOR">)</SEQ>
+        <SEQ TYPE="OPERATOR">(</SEQ>
+        <SEQ TYPE="OPERATOR">]</SEQ>
+        <SEQ TYPE="OPERATOR">[</SEQ>
+        <SEQ TYPE="OPERATOR">.</SEQ>
+        <SEQ TYPE="OPERATOR">,</SEQ>
+        <SEQ TYPE="OPERATOR">;</SEQ>
+        <SEQ TYPE="OPERATOR">^</SEQ>
+        <SEQ TYPE="OPERATOR">@</SEQ>
+        <SEQ TYPE="OPERATOR">:=</SEQ>
+        <SEQ TYPE="OPERATOR">:</SEQ>
+        <SEQ TYPE="OPERATOR">=</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;&gt;</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+        <SEQ TYPE="OPERATOR">+</SEQ>
+        <SEQ TYPE="OPERATOR">-</SEQ>
+        <SEQ TYPE="OPERATOR">/</SEQ>
+        <SEQ TYPE="OPERATOR">*</SEQ>
+
+        <KEYWORDS>
+            <!-- Reserved words. Standard directives are not included, except
+                 private, protected, public, published, and automated. -->
+            <KEYWORD1>and</KEYWORD1>
+            <KEYWORD1>array</KEYWORD1>
+            <KEYWORD1>as</KEYWORD1>
+            <KEYWORD1>at</KEYWORD1>
+            <KEYWORD1>asm</KEYWORD1>
+            <KEYWORD1>begin</KEYWORD1>
+            <KEYWORD1>case</KEYWORD1>
+            <KEYWORD1>class</KEYWORD1>
+            <KEYWORD1>const</KEYWORD1>
+            <KEYWORD1>constructor</KEYWORD1>
+            <KEYWORD1>destructor</KEYWORD1>
+            <KEYWORD1>dispinterface</KEYWORD1>
+            <KEYWORD1>div</KEYWORD1>
+            <KEYWORD1>do</KEYWORD1>
+            <KEYWORD1>downto</KEYWORD1>
+            <KEYWORD1>else</KEYWORD1>
+            <KEYWORD1>end</KEYWORD1>
+            <KEYWORD1>except</KEYWORD1>
+            <KEYWORD1>exports</KEYWORD1>
+            <KEYWORD1>file</KEYWORD1>
+            <KEYWORD1>final</KEYWORD1>
+            <KEYWORD1>finalization</KEYWORD1>
+            <KEYWORD1>finally</KEYWORD1>
+            <KEYWORD1>for</KEYWORD1>
+            <KEYWORD1>function</KEYWORD1>
+            <KEYWORD1>goto</KEYWORD1>
+            <KEYWORD1>if</KEYWORD1>
+            <KEYWORD1>implementation</KEYWORD1>
+            <KEYWORD1>in</KEYWORD1>
+            <KEYWORD1>inherited</KEYWORD1>
+            <KEYWORD1>initialization</KEYWORD1>
+            <KEYWORD1>inline</KEYWORD1>
+            <KEYWORD1>interface</KEYWORD1>
+            <KEYWORD1>is</KEYWORD1>
+            <KEYWORD1>label</KEYWORD1>
+            <KEYWORD1>mod</KEYWORD1>
+            <KEYWORD1>not</KEYWORD1>
+            <KEYWORD1>object</KEYWORD1>
+            <KEYWORD1>of</KEYWORD1>
+            <KEYWORD1>on</KEYWORD1>
+            <KEYWORD1>or</KEYWORD1>
+            <KEYWORD1>out</KEYWORD1>
+            <KEYWORD1>packed</KEYWORD1>
+            <KEYWORD1>procedure</KEYWORD1>
+            <KEYWORD1>program</KEYWORD1>
+            <KEYWORD1>property</KEYWORD1>
+            <KEYWORD1>raise</KEYWORD1>
+            <KEYWORD1>record</KEYWORD1>
+            <KEYWORD1>repeat</KEYWORD1>
+            <KEYWORD1>resourcestring</KEYWORD1>
+            <KEYWORD1>set</KEYWORD1>
+            <KEYWORD1>sealed</KEYWORD1>
+            <KEYWORD1>shl</KEYWORD1>
+            <KEYWORD1>shr</KEYWORD1>
+            <KEYWORD1>static</KEYWORD1>
+            <KEYWORD1>string</KEYWORD1>
+            <KEYWORD1>then</KEYWORD1>
+            <KEYWORD1>threadvar</KEYWORD1>
+            <KEYWORD1>to</KEYWORD1>
+            <KEYWORD1>try</KEYWORD1>
+            <KEYWORD1>type</KEYWORD1>
+            <KEYWORD1>unit</KEYWORD1>
+            <KEYWORD1>unsafe</KEYWORD1>
+            <KEYWORD1>until</KEYWORD1>
+            <KEYWORD1>uses</KEYWORD1>
+            <KEYWORD1>var</KEYWORD1>
+            <KEYWORD1>while</KEYWORD1>
+            <KEYWORD1>with</KEYWORD1>
+            <KEYWORD1>xor</KEYWORD1>
+
+            <KEYWORD2>absolute</KEYWORD2>
+            <KEYWORD2>abstract</KEYWORD2>
+            <KEYWORD2>assembler</KEYWORD2>
+            <KEYWORD2>automated</KEYWORD2>
+            <KEYWORD2>cdecl</KEYWORD2>
+            <KEYWORD2>contains</KEYWORD2>
+            <KEYWORD2>default</KEYWORD2>
+            <KEYWORD2>deprecated</KEYWORD2>
+            <KEYWORD2>dispid</KEYWORD2>
+            <KEYWORD2>dynamic</KEYWORD2>
+            <KEYWORD2>export</KEYWORD2>
+            <KEYWORD2>external</KEYWORD2>
+            <KEYWORD2>far</KEYWORD2>
+            <KEYWORD2>forward</KEYWORD2>
+            <KEYWORD2>implements</KEYWORD2>
+            <KEYWORD2>index</KEYWORD2>
+            <KEYWORD2>library</KEYWORD2>
+            <KEYWORD2>local</KEYWORD2>
+            <KEYWORD2>message</KEYWORD2>
+            <KEYWORD2>name</KEYWORD2>
+            <KEYWORD2>namespaces</KEYWORD2>
+            <KEYWORD2>near</KEYWORD2>
+            <KEYWORD2>nodefault</KEYWORD2>
+            <KEYWORD2>overload</KEYWORD2>
+            <KEYWORD2>override</KEYWORD2>
+            <KEYWORD2>package</KEYWORD2>
+            <KEYWORD2>pascal</KEYWORD2>
+            <KEYWORD2>platform</KEYWORD2>
+            <KEYWORD2>private</KEYWORD2>
+            <KEYWORD2>protected</KEYWORD2>
+            <KEYWORD2>public</KEYWORD2>
+            <KEYWORD2>published</KEYWORD2>
+            <KEYWORD2>read</KEYWORD2>
+            <KEYWORD2>readonly</KEYWORD2>
+            <KEYWORD2>register</KEYWORD2>
+            <KEYWORD2>reintroduce</KEYWORD2>
+            <KEYWORD2>requires</KEYWORD2>
+            <KEYWORD2>resident</KEYWORD2>
+            <KEYWORD2>safecall</KEYWORD2>
+            <KEYWORD2>stdcall</KEYWORD2>
+            <KEYWORD2>stored</KEYWORD2>
+            <KEYWORD2>varargs</KEYWORD2>
+            <KEYWORD2>virtual</KEYWORD2>
+            <KEYWORD2>write</KEYWORD2>
+            <KEYWORD2>writeonly</KEYWORD2>
+
+            <!-- Ordinal types. -->
+            <KEYWORD3>shortint</KEYWORD3>
+            <KEYWORD3>byte</KEYWORD3>
+            <KEYWORD3>char</KEYWORD3>
+            <KEYWORD3>smallint</KEYWORD3>
+            <KEYWORD3>integer</KEYWORD3>
+            <KEYWORD3>word</KEYWORD3>
+            <KEYWORD3>longint</KEYWORD3>
+            <KEYWORD3>cardinal</KEYWORD3>
+            <!-- Boolean types. -->
+            <KEYWORD3>boolean</KEYWORD3>
+            <KEYWORD3>bytebool</KEYWORD3>
+            <KEYWORD3>wordbool</KEYWORD3>
+            <KEYWORD3>longbool</KEYWORD3>
+            <!-- Real types. -->
+            <KEYWORD3>real</KEYWORD3>
+            <KEYWORD3>single</KEYWORD3>
+            <KEYWORD3>double</KEYWORD3>
+            <KEYWORD3>extended</KEYWORD3>
+            <KEYWORD3>comp</KEYWORD3>
+            <KEYWORD3>currency</KEYWORD3>
+            <!-- Untyped pointer. -->
+            <KEYWORD3>pointer</KEYWORD3>
+
+            <LITERAL2>false</LITERAL2>
+            <LITERAL2>nil</LITERAL2>
+            <LITERAL2>self</LITERAL2>
+            <LITERAL2>true</LITERAL2>
+        </KEYWORDS>
+    </RULES>
+</MODE>

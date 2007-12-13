@@ -1,0 +1,205 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- A JEdit mode configuration file for FTL (FreeMarker Template Language)
+     Note that this version will only work with JEdit 4.1pre6 or later.
+     by Jonathan Revusky, revusky@users.sourceforge.net -->
+
+<MODE>
+  <RULES IGNORE_CASE="FALSE">
+
+    <!-- JavaScript -->
+    <SPAN TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+    <BEGIN>&lt;script</BEGIN>
+    <END>&lt;/script&gt;</END>
+    </SPAN>
+    <SPAN TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+    <BEGIN>&lt;Script</BEGIN>
+    <END>&lt;/Script&gt;</END>
+    </SPAN>
+    <SPAN TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+    <BEGIN>&lt;SCRIPT</BEGIN>
+    <END>&lt;/SCRIPT&gt;</END>
+    </SPAN>
+
+    <!-- stylesheet -->
+    <SPAN TYPE="MARKUP" DELEGATE="html::CSS">
+    <BEGIN>&lt;style</BEGIN>
+    <END>&lt;/style&gt;</END>
+    </SPAN>
+    <SPAN TYPE="MARKUP" DELEGATE="html::CSS">
+    <BEGIN>&lt;Style</BEGIN>
+    <END>&lt;/Style&gt;</END>
+    </SPAN>
+    <SPAN TYPE="MARKUP" DELEGATE="html::CSS">
+    <BEGIN>&lt;STYLE</BEGIN>
+    <END>&lt;/STYLE&gt;</END>
+    </SPAN>
+
+    <!-- XML/HTML comment -->
+    <SPAN TYPE="COMMENT2" DELEGATE="xml::DTD-TAGS">
+    <BEGIN>&lt;!--</BEGIN>
+    <END>--&gt;</END>
+    </SPAN>
+
+    <!-- DTD instructions -->
+    <SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+    <BEGIN>&lt;!</BEGIN>
+    <END>&gt;</END>
+    </SPAN>
+
+    <!-- FTL markup starts here. -->
+
+    <SPAN TYPE="KEYWORD1" DELEGATE="EXPRESSION">
+      <BEGIN>${</BEGIN>
+      <END>}</END>
+    </SPAN>
+
+    <SPAN TYPE="KEYWORD1" DELEGATE="EXPRESSION">
+      <BEGIN>#{</BEGIN>
+      <END>}</END>
+    </SPAN>
+
+    <SPAN_REGEXP TYPE="KEYWORD1" HASH_CHAR="&lt;#ftl" DELEGATE="EXPRESSION">
+      <BEGIN>&lt;#ftl\b</BEGIN>
+      <END>&gt;</END>
+    </SPAN_REGEXP>
+
+    <SPAN_REGEXP TYPE="KEYWORD1" DELEGATE="EXPRESSION" HASH_CHAR="&lt;">
+      <BEGIN>&lt;#?(if|elseif|switch|foreach|list|case|assign|local|global|setting|include|import|stop|escape|macro|function|transform|call|visit|recurse)(\s|/|$)</BEGIN>
+      <END>&gt;</END>
+    </SPAN_REGEXP>
+
+    <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="&lt;/"
+	>&lt;/#?(assign|local|global|if|switch|foreach|list|escape|macro|function|transform|compress|noescape)&gt;</SEQ_REGEXP>
+
+    <SPAN_REGEXP TYPE="KEYWORD1" DELEGATE="INVALID" HASH_CHAR="&lt;">
+      <BEGIN>&lt;#?(else|compress|noescape|default|break|flush|nested|t|rt|lt|return|recurse)\b</BEGIN>
+      <END>&gt;</END>
+    </SPAN_REGEXP>
+
+    <SPAN_REGEXP TYPE="KEYWORD1" DELEGATE="INVALID" HASH_CHAR="&lt;/@">
+      <BEGIN>&lt;/@(([_@\p{Alpha}][_@\p{Alnum}]*)(\.[_@\p{Alpha}][_@\p{Alnum}]*)*?)?</BEGIN>
+      <END>&gt;</END>
+    </SPAN_REGEXP>
+
+    <SPAN_REGEXP TYPE="KEYWORD1" DELEGATE="EXPRESSION" HASH_CHAR="&lt;@">
+      <BEGIN>&lt;@([_@\p{Alpha}][_@\p{Alnum}]*)(\.[_@\p{Alpha}][_@\p{Alnum}]*?)*</BEGIN>
+      <END>&gt;</END>
+    </SPAN_REGEXP>
+
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>&lt;#--</BEGIN>
+      <END>--&gt;</END>
+    </SPAN>
+
+    <SEQ TYPE="KEYWORD1">&lt;stop&gt;</SEQ>
+     <SPAN TYPE="COMMENT1">
+    <BEGIN>&lt;comment&gt;</BEGIN>
+    <END>&lt;/comment&gt;</END>
+    </SPAN>
+    <SPAN TYPE="INVALID">
+      <BEGIN>&lt;#</BEGIN>
+      <END>&gt;</END>
+    </SPAN>
+    <SPAN TYPE="INVALID">
+      <BEGIN>&lt;/#</BEGIN>
+      <END>&gt;</END>
+    </SPAN>
+
+    <!-- non-FTL markup -->
+    <SPAN TYPE="MARKUP" DELEGATE="TAGS">
+    <BEGIN>&lt;</BEGIN>
+    <END>&gt;</END>
+    </SPAN>
+  </RULES>
+
+  <RULES SET="EXPRESSION"
+      DEFAULT="KEYWORD2"
+      HIGHLIGHT_DIGITS="TRUE"
+      ESCAPE="\"
+      IGNORE_CASE="FALSE"
+    >
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>&lt;#--</BEGIN>
+      <END>--&gt;</END>
+    </SPAN>
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>&lt;!--</BEGIN>
+      <END>--&gt;</END>
+    </SPAN>
+
+    <SPAN TYPE="LITERAL1">
+    <BEGIN>"</BEGIN>
+    <END>"</END>
+    </SPAN>
+    <SPAN TYPE="OPERATOR" DELEGATE="EXPRESSION">
+      <BEGIN>(</BEGIN><END>)</END>
+    </SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">!</SEQ>
+    <SEQ TYPE="OPERATOR">|</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">*</SEQ>
+    <SEQ TYPE="OPERATOR">/</SEQ>
+    <SEQ TYPE="OPERATOR">-</SEQ>
+    <SEQ TYPE="OPERATOR">+</SEQ>
+    <SEQ TYPE="OPERATOR">%</SEQ>
+    <SEQ TYPE="OPERATOR">.</SEQ>
+    <SEQ TYPE="OPERATOR">:</SEQ>
+    <SEQ TYPE="OPERATOR">.</SEQ>
+    <SEQ TYPE="OPERATOR">.</SEQ>
+    <SEQ TYPE="OPERATOR">[</SEQ>
+    <SEQ TYPE="OPERATOR">]</SEQ>
+    <SEQ TYPE="OPERATOR">{</SEQ>
+    <SEQ TYPE="OPERATOR">}</SEQ>
+    <SEQ TYPE="OPERATOR">;</SEQ>
+    <!-- Builtins -->
+    <MARK_FOLLOWING TYPE="FUNCTION">?</MARK_FOLLOWING>
+    <KEYWORDS>
+      <KEYWORD1>true</KEYWORD1>
+      <KEYWORD1>false</KEYWORD1>
+      <KEYWORD1>as</KEYWORD1>
+      <KEYWORD1>in</KEYWORD1>
+      <KEYWORD1>using</KEYWORD1>
+      <OPERATOR>gt</OPERATOR>
+      <OPERATOR>gte</OPERATOR>
+      <OPERATOR>lt</OPERATOR>
+      <OPERATOR>lte</OPERATOR>
+    </KEYWORDS>
+  </RULES>
+
+  <RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
+    <SPAN TYPE="LITERAL1" DELEGATE="INQUOTE">
+    <BEGIN>"</BEGIN>
+    <END>"</END>
+    </SPAN>
+
+    <SPAN TYPE="LITERAL1" DELEGATE="INQUOTE">
+    <BEGIN>'</BEGIN>
+    <END>'</END>
+    </SPAN>
+
+    <SEQ TYPE="OPERATOR">=</SEQ>
+  </RULES>
+
+
+  <!-- a ruleset for when we are within a quoted string within an SGML tag
+       It can contain FTL interpolations -->
+  <RULES SET="INQUOTE">
+    <SPAN TYPE="KEYWORD1" DELEGATE="EXPRESSION">
+    <BEGIN>${</BEGIN>
+    <END>}</END>
+    </SPAN>
+    <SPAN TYPE="KEYWORD1" DELEGATE="EXPRESSION">
+    <BEGIN>#{</BEGIN>
+    <END>}</END>
+    </SPAN>
+  </RULES>
+
+  <!-- empty ruleset to delegate to for spots where any non-whitespace is invalid -->
+  <RULES SET="INVALID" DEFAULT="INVALID" />
+</MODE>

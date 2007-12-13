@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar html io io.files kernel math math.parser
 http.server.responders http.server.templating namespaces parser
@@ -31,15 +31,23 @@ IN: webapps.file
     "304 Not Modified" response
     now timestamp>http-string "Date" associate print-header ;  
 
+! You can override how files are served in a custom responder
+SYMBOL: serve-file-hook
+
+[
+    file-response
+    stdio get stream-copy
+] serve-file-hook set-global
+
 : serve-static ( filename mime-type -- )
     over last-modified-matches? [
         2drop not-modified-response
     ] [
-        dupd file-response
         "method" get "head" = [
-            drop
+            file-response
         ] [
-            <file-reader> stdio get stream-copy
+            >r dup <file-reader> swap r>
+            serve-file-hook get call
         ] if 
     ] if ;
 
@@ -53,9 +61,13 @@ SYMBOL: page
 : include-page ( filename -- )
     "doc-root" get swap path+ run-page ;
 
+: serve-fhtml ( filename -- )
+    serving-html
+    "method" get "head" = [ drop ] [ run-page ] if ;
+
 : serve-file ( filename -- )
     dup mime-type dup "application/x-factor-server-page" =
-    [ drop serving-html run-page ] [ serve-static ] if ;
+    [ drop serve-fhtml ] [ serve-static ] if ;
 
 : file. ( name dirp -- )
     [ "/" append ] when
@@ -107,7 +119,7 @@ SYMBOL: page
 
 global [
     ! Serve up our own source code
-    "resources" [ 
+    "resources" [
         [
             "" resource-path "doc-root" set
             file-responder

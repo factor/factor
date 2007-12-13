@@ -1,0 +1,262 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- pop11 mode by David S. Moss -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE=";;;" />
+    </PROPS>
+
+	<RULES SET="MAIN" ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- Normal comments. -->
+		<SPAN TYPE="COMMENT1" DELEGATE="COMMENT">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+        <EOL_SPAN TYPE="COMMENT1">;;;</EOL_SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" DELEGATE="STRING">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" DELEGATE="STRING">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" DELEGATE="STRING">
+			<BEGIN>`</BEGIN>
+			<END>`</END>
+		</SPAN>
+
+        <SPAN TYPE="LITERAL1" DELEGATE="LIST">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+        <SPAN TYPE="LITERAL1" DELEGATE="LIST">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+        <SPAN TYPE="LITERAL1" DELEGATE="LIST">
+			<BEGIN>![</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+        <!-- Functions -->
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<MARK_PREVIOUS AT_LINE_START="TRUE" TYPE="LABEL" MATCH_TYPE="OPERATOR">:</MARK_PREVIOUS>
+
+        <!-- Needs to be before conditional compilation or won't work -->
+        <SEQ TYPE="NULL">#_&lt;</SEQ>
+        <SEQ TYPE="NULL">&gt;_#</SEQ>
+
+        <!-- Conditional compilation -->
+        <MARK_FOLLOWING AT_LINE_START="TRUE" TYPE="LABEL">#_</MARK_FOLLOWING>
+
+		<SEQ TYPE="NULL">)</SEQ>
+		<SEQ TYPE="NULL">(</SEQ>
+		<SEQ TYPE="NULL">.</SEQ>
+		<SEQ TYPE="NULL">,</SEQ>
+		<SEQ TYPE="NULL">;</SEQ>
+		<SEQ TYPE="NULL">^</SEQ>
+		<SEQ TYPE="NULL">@</SEQ>
+		<SEQ TYPE="NULL">:</SEQ>
+		<SEQ TYPE="NULL">|</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+
+		<KEYWORDS>
+		    <LITERAL2>false</LITERAL2>
+		    <LITERAL2>true</LITERAL2>
+		    <LITERAL2>database</LITERAL2>
+		    <LITERAL2>it</LITERAL2>
+		    <LITERAL2>undef</LITERAL2>
+
+            <!-- keywords -->
+            <KEYWORD1>define</KEYWORD1>
+            <KEYWORD1>class</KEYWORD1>
+            <KEYWORD1>enddefine</KEYWORD1>
+            <KEYWORD1>dlocal</KEYWORD1>
+            <KEYWORD1>lvars</KEYWORD1>
+            <KEYWORD1>vars</KEYWORD1>
+            <KEYWORD1>slot</KEYWORD1>
+            <KEYWORD1>instance</KEYWORD1>
+            <KEYWORD1>endinstance</KEYWORD1>
+            <KEYWORD1>method</KEYWORD1>
+		    <KEYWORD1>syntax</KEYWORD1>
+            <KEYWORD1>biginteger</KEYWORD1>
+            <KEYWORD1>boolean</KEYWORD1>
+            <KEYWORD1>complex</KEYWORD1>
+            <KEYWORD1>ddecimal</KEYWORD1>
+            <KEYWORD1>decimal</KEYWORD1>
+            <KEYWORD1>device</KEYWORD1>
+            <KEYWORD1>ident</KEYWORD1>
+            <KEYWORD1>integer</KEYWORD1>
+            <KEYWORD1>intvec</KEYWORD1>
+            <KEYWORD1>key</KEYWORD1>
+            <KEYWORD1>nil</KEYWORD1>
+            <KEYWORD1>pair</KEYWORD1>
+            <KEYWORD1>procedure</KEYWORD1>
+            <KEYWORD1>process</KEYWORD1>
+            <KEYWORD1>prologterm</KEYWORD1>
+            <KEYWORD1>prologvar</KEYWORD1>
+            <KEYWORD1>ratio</KEYWORD1>
+            <KEYWORD1>ref</KEYWORD1>
+            <KEYWORD1>section</KEYWORD1>
+            <KEYWORD1>string</KEYWORD1>
+            <KEYWORD1>termin</KEYWORD1>
+            <KEYWORD1>vector</KEYWORD1>
+            <KEYWORD1>word</KEYWORD1>
+
+            <!-- flow control -->
+            <KEYWORD3>if</KEYWORD3>
+            <KEYWORD3>forevery</KEYWORD3>
+            <KEYWORD3>endforevery</KEYWORD3>
+            <KEYWORD3>then</KEYWORD3>
+            <KEYWORD3>switchon</KEYWORD3>
+            <KEYWORD3>endswitchon</KEYWORD3>
+            <KEYWORD3>case</KEYWORD3>
+            <KEYWORD3>elseif</KEYWORD3>
+            <KEYWORD3>else</KEYWORD3>
+            <KEYWORD3>endif</KEYWORD3>
+            <KEYWORD3>for</KEYWORD3>
+            <KEYWORD3>repeat</KEYWORD3>
+            <KEYWORD3>from</KEYWORD3>
+            <KEYWORD3>till</KEYWORD3>
+            <KEYWORD3>step</KEYWORD3>
+            <KEYWORD3>while</KEYWORD3>
+            <KEYWORD3>endfor</KEYWORD3>
+            <KEYWORD3>endrepeat</KEYWORD3>
+            <KEYWORD3>endwhile</KEYWORD3>
+            <KEYWORD3>times</KEYWORD3>
+            <KEYWORD3>to</KEYWORD3>
+            <KEYWORD3>do</KEYWORD3>
+            <KEYWORD3>by</KEYWORD3>
+            <KEYWORD3>in</KEYWORD3>
+            <KEYWORD3>return</KEYWORD3>
+
+            <!-- other statements -->
+            <KEYWORD2>and</KEYWORD2>
+            <KEYWORD2>or</KEYWORD2>
+            <KEYWORD2>matches</KEYWORD2>
+            <KEYWORD2>quitloop</KEYWORD2>
+            <KEYWORD2>goto</KEYWORD2>
+            <KEYWORD2>uses</KEYWORD2>
+            <KEYWORD2>trace</KEYWORD2>
+            <KEYWORD2>cons_with</KEYWORD2>
+            <KEYWORD2>consstring</KEYWORD2>
+
+            <!-- Built in functions -->
+            <LITERAL2>interrupt</LITERAL2>
+            <LITERAL2>partapply</LITERAL2>
+            <LITERAL2>consclosure</LITERAL2>
+            <LITERAL2>max</LITERAL2>
+            <LITERAL2>add</LITERAL2>
+            <LITERAL2>remove</LITERAL2>
+            <LITERAL2>alladd</LITERAL2>
+            <LITERAL2>quitif</LITERAL2>
+            <LITERAL2>copydata</LITERAL2>
+            <LITERAL2>copytree</LITERAL2>
+            <LITERAL2>copylist</LITERAL2>
+            <LITERAL2>length</LITERAL2>
+            <LITERAL2>hd</LITERAL2>
+            <LITERAL2>tl</LITERAL2>
+            <LITERAL2>rev</LITERAL2>
+            <LITERAL2>shuffle</LITERAL2>
+            <LITERAL2>oneof</LITERAL2>
+            <LITERAL2>sort</LITERAL2>
+            <LITERAL2>syssort</LITERAL2>
+            <LITERAL2>random</LITERAL2>
+            <LITERAL2>readline</LITERAL2>
+            <LITERAL2>not</LITERAL2>
+            <LITERAL2>pr</LITERAL2>
+            <LITERAL2>nl</LITERAL2>
+            <LITERAL2>present</LITERAL2>
+            <LITERAL2>subword</LITERAL2>
+            <LITERAL2>member</LITERAL2>
+            <LITERAL2>length</LITERAL2>
+            <LITERAL2>listlength</LITERAL2>
+            <LITERAL2>datalength</LITERAL2>
+            <LITERAL2>mishap</LITERAL2>
+            <LITERAL2>last</LITERAL2>
+            <LITERAL2>delete</LITERAL2>
+            <LITERAL2>valof</LITERAL2>
+            <LITERAL2>dataword</LITERAL2>
+
+            <!-- input validation functions -->
+            <LITERAL2>isnumber</LITERAL2>
+            <LITERAL2>isinteger</LITERAL2>
+            <LITERAL2>islist</LITERAL2>
+            <LITERAL2>isboolean</LITERAL2>
+		</KEYWORDS>
+	</RULES>
+
+    <RULES SET="LIST" DEFAULT="LITERAL1" HIGHLIGHT_DIGITS="TRUE">
+        <SPAN TYPE="LITERAL1" DELEGATE="LIST">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+        <SPAN TYPE="LITERAL1" DELEGATE="LIST">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+        <SPAN TYPE="LITERAL1" DELEGATE="LIST">
+			<BEGIN>![</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" DELEGATE="STRING">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" DELEGATE="STRING">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+        <SPAN DELEGATE="MAIN" TYPE="NULL">
+			<BEGIN>%</BEGIN>
+			<END>%</END>
+		</SPAN>
+
+		<SPAN TYPE="COMMENT1" DELEGATE="COMMENT">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+        <EOL_SPAN TYPE="COMMENT1">;;;</EOL_SPAN>
+		<SEQ TYPE="LITERAL2">=</SEQ>
+		<SEQ TYPE="LITERAL2">==</SEQ>
+
+        <MARK_FOLLOWING TYPE="LITERAL2">^</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="LITERAL2">?</MARK_FOLLOWING>
+	</RULES>
+
+    <RULES SET="STRING" ESCAPE="\" DEFAULT="LITERAL1" HIGHLIGHT_DIGITS="FALSE">
+    </RULES>
+
+    <RULES NO_WORD_SEP="." SET="COMMENT" DEFAULT="COMMENT1" HIGHLIGHT_DIGITS="FALSE">
+        <MARK_PREVIOUS TYPE="LABEL">:</MARK_PREVIOUS>
+		<SEQ TYPE="COMMENT1">*</SEQ>
+    </RULES>
+</MODE>

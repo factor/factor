@@ -27,7 +27,7 @@ M: windows-nt-io normalize-pathname ( string -- string )
         { [ dup ".\\" head? ] [
             >r unicode-prefix cwd r> 1 tail 3append
         ] }
-        ! c:\\
+        ! c:\\foo
         { [ dup 1 tail ":" head? ] [ >r unicode-prefix r> append ] }
         ! \\\\?\\c:\\foo
         { [ dup unicode-prefix head? ] [ ] }
@@ -38,7 +38,8 @@ M: windows-nt-io normalize-pathname ( string -- string )
                 dup first CHAR: \\ = [ CHAR: \\ , ] unless %
             ] "" make
         ] }
-    } cond [ "/\\." member? ] right-trim ;
+    } cond [ "/\\." member? ] right-trim
+    dup peek CHAR: : = [ "\\" append ] when ;
 
 SYMBOL: io-hash
 

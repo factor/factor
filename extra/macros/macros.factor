@@ -19,7 +19,7 @@ IN: macros
 : MACRO:
     (:) (MACRO:) ; parsing
 
-PREDICATE: word macro
+PREDICATE: compound macro
     "macro" word-prop >boolean ;
 
 M: macro definer drop \ MACRO: \ ; ;

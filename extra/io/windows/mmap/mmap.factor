@@ -62,7 +62,7 @@ M: windows-ce-io with-privileges
 
 : mmap-open ( path access-mode create-mode flProtect access -- handle handle address )
     { "SeCreateGlobalPrivilege" "SeLockMemoryPrivilege" } [
-        >r >r open-file dup f r> 0 0 f
+        >r >r 0 open-file dup f r> 0 0 f
         CreateFileMapping [ win32-error=0/f ] keep
         dup close-later
         dup
