@@ -22,5 +22,10 @@ rm -f Makefile
 rm -f cp_dir
 rm -f boot.*.image
 
+FILE=Factor-$VERSION-win32-$CPU.zip
+
 cd ..
-zip -r Factor-$VERSION-win32-$CPU.zip Factor/
+zip -r $FILE Factor/
+
+ssh linode mkdir -p w/downloads/$VERSION/
+scp $FILE linode:w/downloads/$VERSION/

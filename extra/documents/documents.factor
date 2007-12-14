@@ -195,11 +195,11 @@ TUPLE: one-word-elt ;
 
 M: one-word-elt prev-elt
     drop
-    [ [ f -rot >r 1- r> (prev-word) ] (word-elt) ] (prev-char) ;
+    [ f -rot >r 1- r> (prev-word) ] (word-elt) ;
 
 M: one-word-elt next-elt
     drop
-    [ [ f -rot (next-word) ] (word-elt) ] (next-char) ;
+    [ f -rot (next-word) ] (word-elt) ;
 
 TUPLE: word-elt ;
 
