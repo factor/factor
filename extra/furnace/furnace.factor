@@ -20,6 +20,13 @@ SYMBOL: template-path
 : define-action ( word params -- )
     f define-authenticated-action ;
 
+: code>quotation ( word/quot -- quot )
+    dup word? [ 1quotation ] when ;
+
+: define-form ( formword actionword params -- )
+    dupd define-action
+    swap code>quotation "form-quotation" set-word-prop ;
+
 : define-redirect ( word quot -- )
     "action-redirect" set-word-prop ;
 
