@@ -4,7 +4,8 @@ USING: sequences parser kernel help help.markup help.topics
 words strings classes tools.browser namespaces io
 io.streams.string prettyprint definitions arrays vectors
 combinators splitting debugger hashtables sorting effects vocabs
-vocabs.loader assocs editors continuations classes.predicate ;
+vocabs.loader assocs editors continuations classes.predicate
+macros combinators.lib ;
 IN: help.lint
 
 : check-example ( element -- )
@@ -29,7 +30,7 @@ IN: help.lint
     stack-effect dup effect-in swap effect-out
     append [ string? ] subset prune natural-sort ;
 
-: check-values ( word element -- )
+: contains-funky-elements? ( element -- ? )
     {
         $shuffle
         $values-x/y
@@ -38,11 +39,20 @@ IN: help.lint
         $predicate
         $class-description
         $error-description
-    }
-    over [ elements empty? ] curry all?
-    pick "declared-effect" word-prop and
-    [ extract-values >array >r effect-values >array r> assert= ]
-    [ 2drop ] if ;
+    } swap [ elements f like ] curry contains? ;
+
+: check-values ( word element -- )
+    {
+        [ over "declared-effect" word-prop ]
+        [ dup contains-funky-elements? not ]
+        [ over macro? not ]
+        [
+            2dup extract-values >array
+            >r effect-values >array
+            r> assert=
+            t
+        ]
+    } && 3drop ;
 
 : check-see-also ( word element -- )
     nip \ $see-also swap elements [
@@ -61,55 +71,59 @@ IN: help.lint
 : check-rendering ( word element -- )
     [ help ] string-out drop ;
 
-: all-word-help ( -- seq )
-    all-words [ word-help ] subset ;
+: all-word-help ( words -- seq )
+    [ word-help ] subset ;
 
 TUPLE: help-error topic ;
 
 : <help-error> ( topic delegate -- error )
     { set-help-error-topic set-delegate } help-error construct ;
 
-: fix-help ( error -- )
-    dup delegate error.
-    help-error-topic >link edit
-    "Press ENTER when done." print flush readln drop
-    refresh-all ;
+M: help-error error.
+    "In " write dup help-error-topic ($link) nl
+    delegate error. ;
+
+: check-something ( obj quot -- )
+    over . flush [ <help-error> , ] recover ; inline
 
 : check-word ( word -- )
-    dup . flush
-    [
-        dup word-help [
-            2dup check-examples
-            2dup check-values
-            2dup check-see-also
-            2dup check-modules
-            2dup drop check-rendering
-        ] assert-depth 2drop
-    ] [
-        dupd <help-error> fix-help check-word
-    ] recover ;
+    dup word-help [
+        [
+            dup word-help [
+                2dup check-examples
+                2dup check-values
+                2dup check-see-also
+                2dup check-modules
+                2dup drop check-rendering
+            ] assert-depth 2drop
+        ] check-something
+    ] [ drop ] if ;
 
-: check-words ( -- )
-    [
-        all-vocabs-seq [ vocab-name ] map
-        "all-vocabs" set
-        all-word-help [ check-word ] each
-    ] with-scope ;
+: check-words ( words -- ) [ check-word ] each ;
 
 : check-article ( article -- )
-    dup . flush
     [
         [ dup check-rendering ] assert-depth drop
-    ] [
-        dupd <help-error> fix-help check-article
-    ] recover ;
+    ] check-something ;
 
 : check-articles ( -- )
     articles get keys [ check-article ] each ;
 
-: check-help ( -- ) check-words check-articles ;
+: with-help-lint ( quot -- )
+    [
+        all-vocabs-seq [ vocab-name ] map "all-vocabs" set
+        call
+    ] { } make [ nl error. ] each ; inline
 
-: unlinked-words ( -- seq )
+: check-help ( -- )
+    [ all-words check-words check-articles ] with-help-lint ;
+
+: check-vocab-help ( vocab -- )
+    [
+        child-vocabs [ words check-words ] each
+    ] with-help-lint ;
+
+: unlinked-words ( words -- seq )
     all-word-help [ article-parent not ] subset ;
 
 : linked-undocumented-words ( -- seq )

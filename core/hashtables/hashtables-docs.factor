@@ -96,7 +96,7 @@ HELP: hash-deleted+
 { $side-effects "hash" } ;
 
 HELP: (set-hash)
-{ $values { "value" "a value" } { "key" "a key to add" } { "hash" hashtable } }
+{ $values { "value" "a value" } { "key" "a key to add" } { "hash" hashtable } { "new?" "a boolean" } }
 { $description "Stores the key/value pair into the hashtable. This word does not grow the hashtable if it exceeds capacity, therefore a hang can result. User code should use " { $link set-at } " instead, which grows the hashtable if necessary." }
 { $side-effects "hash" } ;
 

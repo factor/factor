@@ -55,6 +55,6 @@ HELP: find-world
 { $description "Finds the " { $link world } " containing the gadget, or outputs " { $link f } " if the gadget is not grafted." } ;
 
 HELP: draw-world
-{ $values { "rect" "a clipping rectangle" } { "world" world } }
+{ $values { "world" world } }
 { $description "Redraws a world." }
 { $notes "This word should only be called by the UI backend. To force a gadget to redraw from user code, call " { $link relayout-1 } "." } ;

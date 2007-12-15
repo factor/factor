@@ -35,8 +35,9 @@ IN: webapps.file
 SYMBOL: serve-file-hook
 
 [
+    dupd
     file-response
-    stdio get stream-copy
+    <file-reader> stdio get stream-copy
 ] serve-file-hook set-global
 
 : serve-static ( filename mime-type -- )
@@ -46,7 +47,6 @@ SYMBOL: serve-file-hook
         "method" get "head" = [
             file-response
         ] [
-            >r dup <file-reader> swap r>
             serve-file-hook get call
         ] if 
     ] if ;
@@ -118,14 +118,6 @@ SYMBOL: page
     ] if ;
 
 global [
-    ! Serve up our own source code
-    "resources" [
-        [
-            "" resource-path "doc-root" set
-            file-responder
-        ] with-scope
-    ] add-simple-responder
-    
     ! Serves files from a directory stored in the "doc-root"
     ! variable. You can set the variable in the global
     ! namespace, or inside the responder.

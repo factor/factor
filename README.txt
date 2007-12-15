@@ -74,6 +74,10 @@ following command line:
 
 ./factor -i=boot.<cpu>.image
 
+Or this command for Mac OS X systems:
+
+./Factor.app/Contents/MacOS/factor -i=boot.<cpu>.image
+
 Bootstrap can take a while, depending on your system. When the process
 completes, a 'factor.image' file will be generated. Note that this image
 is both CPU and OS-specific, so in general cannot be shared between
