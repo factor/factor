@@ -95,7 +95,7 @@ deploy-gadget "toolbar" f {
     { f com-help }
     { f com-revert }
     { f com-save }
-    { T{ key-down f f "RETURN" } com-deploy }
+    { T{ key-down f f "RET" } com-deploy }
 } define-command-map
 
 : buttons,
