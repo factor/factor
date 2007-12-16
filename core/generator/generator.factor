@@ -36,6 +36,8 @@ t compiled-stack-traces? set-global
     compiled-stack-traces? get compiling-word get f ?
     literal-table get push ;
 
+: 6array 3array >r 3array r> append ;
+
 : generate-1 ( word label node quot -- )
     pick f save-xt [
         roll compiling-word set
@@ -44,7 +46,7 @@ t compiled-stack-traces? set-global
         call
         literal-table get >array
         word-table get >array
-    ] { } make fixup add-compiled-block save-xt ;
+    ] { } make fixup 6array save-xt ;
 
 : generate-profiler-prologue ( -- )
     compiled-stack-traces? get [
@@ -65,6 +67,7 @@ GENERIC: generate-node ( node -- next )
         current-label-start define-label
         current-label-start resolve-label
         [ generate-nodes ] with-node-iterator
+        profiler-prologue get
     ] generate-1 ;
 
 : word-dataflow ( word -- dataflow )
@@ -84,11 +87,7 @@ SYMBOL: batch-mode
 
 : compile-begins ( word -- )
     compiler-hook get call
-    "quiet" get batch-mode get or [
-        drop
-    ] [
-        "Compiling " write . flush
-    ] if ;
+    "quiet" get [ drop ] [ "Compiling " write . flush ] if ;
 
 : (compile) ( word -- )
     dup compiling? not over compound? and [
@@ -192,6 +191,7 @@ M: #if generate-node
             %save-dispatch-xt
             %prologue-later
             [ generate-nodes ] with-node-iterator
+            0
         ] generate-1
     ] keep ;
 

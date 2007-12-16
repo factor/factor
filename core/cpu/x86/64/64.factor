@@ -201,4 +201,4 @@ M: struct-type flatten-value-type ( type -- seq )
         ] each
     ] if ;
 
-12 set-profiler-prologues
+12 profiler-prologue set-global

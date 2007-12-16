@@ -52,7 +52,6 @@ typedef enum {
 
 	/* Profiler support */    
 	PROFILING_ENV       = 38, /* is the profiler on? */
-	PROFILER_PROLOGUE_ENV     /* length of optimizing compiler's profiler prologue */
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV

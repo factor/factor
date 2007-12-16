@@ -11,7 +11,7 @@ global [ { "compiler" } add-use ] bind
 
 "-no-stack-traces" cli-args member? [
     f compiled-stack-traces? set-global
-    0 set-profiler-prologues
+    0 profiler-prologue set-global
 ] when
 
 ! Compile a set of words ahead of our general
@@ -33,12 +33,14 @@ global [ { "compiler" } add-use ] bind
 
     delegate
 
-    underlying
+    underlying2
 
     find-pair-next namestack*
 
     bitand bitor bitxor bitnot
+} compile-batch
 
+{
     + 1+ 1- 2/ < <= > >= shift min
 
     new nth push pop peek hashcode* = get set

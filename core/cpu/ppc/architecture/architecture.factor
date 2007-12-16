@@ -134,7 +134,7 @@ M: ppc-backend %jump-t ( label -- )
         "offset" operand "n" operand 1 SRAWI
         0 11 LOAD32 rc-absolute-ppc-2/2 rel-dispatch
         11 dup "offset" operand LWZX
-        11 dup compiled-header-size ADDI
+        11 dup word-xt-offset LWZ
         r> call
     ] H{
         { +input+ { { f "n" } } }
