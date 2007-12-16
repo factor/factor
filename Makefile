@@ -140,6 +140,7 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 
 clean:
 	rm -f vm/*.o
+	rm libfactor.a
 
 vm/resources.o:
 	windres vm/factor.rs vm/resources.o
