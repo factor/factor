@@ -39,6 +39,9 @@ bool jit_stack_frame_p(F_ARRAY *array)
 
 void set_quot_xt(F_QUOTATION *quot, F_COMPILED *code)
 {
+	if(code->type != QUOTATION_TYPE)
+		critical_error("bad param to set_word_xt",(CELL)code);
+
 	quot->code = code;
 	quot->xt = (XT)(code + 1);
 	quot->compiledp = T;

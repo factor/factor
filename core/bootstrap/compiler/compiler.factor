@@ -33,7 +33,7 @@ global [ { "compiler" } add-use ] bind
 
     delegate
 
-    underlying2
+    underlying
 
     find-pair-next namestack*
 

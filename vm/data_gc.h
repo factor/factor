@@ -239,9 +239,6 @@ DEFPUSHPOP(root_,extra_roots)
 #define REGISTER_UNTAGGED(obj) root_push(obj ? tag_object(obj) : 0)
 #define UNREGISTER_UNTAGGED(obj) obj = untag_object(root_pop())
 
-#define REGISTER_STRING(obj) REGISTER_UNTAGGED(obj)
-#define UNREGISTER_STRING(obj) UNREGISTER_UNTAGGED(obj)
-
 /* We ignore strings which point outside the data heap, but we might be given
 a char* which points inside the data heap, in which case it is a root, for
 example if we call unbox_char_string() the result is placed in a byte array */

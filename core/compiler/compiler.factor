@@ -8,14 +8,13 @@ IN: compiler
 M: object inference-error-major? drop t ;
 
 : compile-error ( word error -- )
-    batch-mode get [
-        2array compile-errors get push
+    compile-errors get [
+        >r 2array r> push
     ] [
-        "quiet" get [ drop ] [ print-error flush ] if drop
-    ] if ;
+        "quiet" get [ 2drop ] [ print-error flush drop ] if
+    ] if* ;
 
 : begin-batch ( -- )
-    batch-mode on
     V{ } clone compile-errors set-global ;
 
 : compile-error. ( pair -- )
@@ -37,7 +36,6 @@ M: object inference-error-major? drop t ;
 : :warnings (:warnings) [ compile-error. ] each ;
 
 : end-batch ( -- )
-    batch-mode off
     "quiet" get [
         "Compile finished." print
         nl
@@ -48,6 +46,9 @@ M: object inference-error-major? drop t ;
         nl
     ] unless ;
 
+: with-compile-errors ( quot -- )
+    [ begin-batch call end-batch ] with-scope ; inline
+
 : compile ( word -- )
     H{ } clone [
         compiled-xts [ (compile) ] with-variable
@@ -56,15 +57,10 @@ M: object inference-error-major? drop t ;
 : compile-failed ( word error -- )
     dupd compile-error dup update-xt unchanged-word ;
 
-: forget-errors ( seq -- )
-    [ f "no-effect" set-word-prop ] each ;
-
 : (compile-batch) ( words -- )
     H{ } clone [
         compiled-xts [
-            [
-                [ (compile) ] [ compile-failed ] recover
-            ] each
+            [ [ (compile) ] [ compile-failed ] recover ] each
         ] with-variable
     ] keep [ swap add* ] { } assoc>map modify-code-heap ;
 
@@ -72,15 +68,10 @@ M: object inference-error-major? drop t ;
     dup empty? [
         drop
     ] [
-        dup begin-batch
-        dup forget-errors
-        (compile-batch)
-        end-batch
+        [ (compile-batch) ] with-compile-errors
     ] if ;
 
 : compile-vocabs ( seq -- ) [ words ] map concat compile-batch ;
-
-: compile-all ( -- ) vocabs compile-vocabs ;
 
 : compile-quot ( quot -- word ) define-temp dup compile ;
 
@@ -91,5 +82,8 @@ M: object inference-error-major? drop t ;
         dup keys compile-batch clear-assoc
     ] when* ;
 
-: recompile-all ( -- )
-    all-words [ changed-word ] each recompile ;
+: forget-errors ( seq -- )
+    [ f "no-effect" set-word-prop ] each ;
+
+: compile-all ( -- )
+    all-words dup forget-errors [ changed-word ] each recompile ;

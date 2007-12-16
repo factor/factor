@@ -102,7 +102,7 @@ M: x86-backend %jump-t ( label -- )
     ! x86, this is redundant.
     "scratch" operand HEX: ffffffff MOV rc-absolute-cell rel-dispatch
     "n" operand "n" operand "scratch" operand [+] MOV
-    "n" operand compiled-header-size ADD ;
+    "n" operand dup word-xt-offset [+] MOV ;
 
 : dispatch-template ( word-table# quot -- )
     [

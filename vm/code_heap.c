@@ -317,6 +317,9 @@ F_COMPILED *add_compiled_block(
 
 void set_word_xt(F_WORD *word, F_COMPILED *compiled)
 {
+	if(compiled->type != WORD_TYPE)
+		critical_error("bad param to set_word_xt",(CELL)compiled);
+
 	word->code = compiled;
 	word->xt = (XT)(compiled + 1);
 

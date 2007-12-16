@@ -285,9 +285,9 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, u16 fill)
 	if(capacity < to_copy)
 		to_copy = capacity;
 
-	REGISTER_STRING(string);
+	REGISTER_UNTAGGED(string);
 	F_STRING *new_string = allot_string_internal(capacity);
-	UNREGISTER_STRING(string);
+	UNREGISTER_UNTAGGED(string);
 
 	memcpy(new_string + 1,string + 1,to_copy * CHARS);
 	fill_string(new_string,to_copy,capacity,fill);
@@ -381,9 +381,9 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 		F_BYTE_ARRAY *_c_str; \
 		if(check && !check_string(s,sizeof(type))) \
 			general_error(ERROR_C_STRING,tag_object(s),F,NULL); \
-		REGISTER_STRING(s); \
+		REGISTER_UNTAGGED(s); \
 		_c_str = allot_c_string(capacity,sizeof(type)); \
-		UNREGISTER_STRING(s); \
+		UNREGISTER_UNTAGGED(s); \
 		type *c_str = (type*)(_c_str + 1); \
 		type##_string_to_memory(s,c_str); \
 		c_str[capacity] = 0; \

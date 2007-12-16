@@ -150,6 +150,10 @@ DEFINE_PRIMITIVE(save_image)
 
 DEFINE_PRIMITIVE(save_image_and_exit)
 {
+	F_CHAR *path = unbox_native_string();
+
+	REGISTER_C_STRING(path);
+
 	/* strip out userenv data which is set on startup anyway */
 	CELL i;
 	for(i = 0; i < FIRST_SAVE_ENV; i++)
@@ -158,8 +162,10 @@ DEFINE_PRIMITIVE(save_image_and_exit)
 	/* do a full GC + code heap compaction */
 	compact_code_heap();
 
+	UNREGISTER_C_STRING(path);
+
 	/* Save the image */
-	save_image(unbox_native_string());
+	save_image(path);
 
 	/* now exit; we cannot continue executing like this */
 	exit(0);

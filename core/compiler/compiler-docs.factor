@@ -11,7 +11,6 @@ ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 "Three utility words for bulk compilation:"
 { $subsection compile-batch }
 { $subsection compile-vocabs }
-{ $subsection compile-all }
 "Bulk compilation saves compile warnings and errors in a global variable, instead of printing them as they arise:"
 { $subsection compile-errors }
 "The warnings and errors can be viewed later:"
@@ -113,9 +112,6 @@ HELP: recompile
 { $description "Recompiles words whose compiled definitions have become out of date as a result of dependent words being redefined." } ;
 
 HELP: compile-all
-{ $description "Compiles all words which have not been compiled yet." } ;
-
-HELP: recompile-all
 { $description "Recompiles all words." } ;
 
 HELP: changed-words
