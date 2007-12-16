@@ -5,8 +5,7 @@ namespaces sequences layouts system hashtables classes alien
 byte-arrays bit-arrays float-arrays combinators words ;
 IN: cpu.architecture
 
-: set-profiler-prologues ( n -- )
-    39 setenv ;
+SYMBOL: profiler-prologue
 
 SYMBOL: compiler-backend
 

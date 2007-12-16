@@ -42,6 +42,8 @@ static CELL xt_offset;
 INLINE CELL compute_code_rel(F_REL *rel,
 	CELL code_start, CELL literals_start, CELL words_start)
 {
+	F_WORD *word;
+
 	switch(REL_TYPE(rel))
 	{
 	case RT_PRIMITIVE:
@@ -53,11 +55,11 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	case RT_DISPATCH:
 		return CREF(words_start,REL_ARGUMENT(rel));
 	case RT_XT:
-		return get(CREF(words_start,REL_ARGUMENT(rel)))
-			+ sizeof(F_COMPILED) + xt_offset;
+		word = untag_word(get(CREF(words_start,REL_ARGUMENT(rel))));
+		return (CELL)word->code + sizeof(F_COMPILED) + xt_offset;
 	case RT_XT_PROFILING:
-		return get(CREF(words_start,REL_ARGUMENT(rel)))
-			+ sizeof(F_COMPILED);
+		word = untag_word(get(CREF(words_start,REL_ARGUMENT(rel))));
+		return (CELL)word->code + sizeof(F_COMPILED);
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
 	default:
@@ -133,7 +135,7 @@ void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
-	xt_offset = (profiling_p() ? 0 : profiler_prologue());
+	xt_offset = (profiling_p() ? 0 : relocating->profiler_prologue);
 
 	F_REL *rel = (F_REL *)reloc_start;
 	F_REL *rel_end = (F_REL *)literals_start;
@@ -174,16 +176,6 @@ direct XT references, and perform fixups */
 void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
-	CELL scan;
-
-	if(relocating->finalized != false)
-		critical_error("Finalizing a finalized block",(CELL)relocating);
-
-	for(scan = words_start; scan < words_end; scan += CELLS)
-		put(scan,(CELL)(untag_word(get(scan))->code));
-
-	relocating->finalized = true;
-
 	if(reloc_start != literals_start)
 	{
 		relocate_code_block(relocating,code_start,reloc_start,
@@ -242,8 +234,10 @@ CELL allot_code_block(CELL size)
 	return start;
 }
 
+/* Might GC */
 F_COMPILED *add_compiled_block(
 	CELL type,
+	CELL profiler_prologue,
 	F_ARRAY *code,
 	F_ARRAY *labels,
 	F_ARRAY *rel,
@@ -279,7 +273,7 @@ F_COMPILED *add_compiled_block(
 	header->reloc_length = rel_length;
 	header->literals_length = literals_length;
 	header->words_length = words_length;
-	header->finalized = false;
+	header->profiler_prologue = profiler_prologue;
 
 	here += sizeof(F_COMPILED);
 
@@ -327,49 +321,46 @@ void set_word_xt(F_WORD *word, F_COMPILED *compiled)
 	word->xt = (XT)(compiled + 1);
 
 	if(!profiling_p())
-		word->xt += profiler_prologue();
+		word->xt += compiled->profiler_prologue;
 
 	word->compiledp = T;
 }
 
-DEFINE_PRIMITIVE(add_compiled_block)
+DEFINE_PRIMITIVE(modify_code_heap)
 {
-	F_ARRAY *code = untag_array(dpop());
-	F_ARRAY *labels = untag_array(dpop());
-	F_ARRAY *rel = untag_array(dpop());
-	F_ARRAY *words = untag_array(dpop());
-	F_ARRAY *literals = untag_array(dpop());
+	F_ARRAY *alist = untag_array(dpop());
 
-	F_COMPILED *compiled = add_compiled_block(WORD_TYPE,code,labels,rel,words,literals);
-
-	/* push a new word whose XT points to this code block on the stack */
-	F_WORD *word = allot_word(F,F);
-	set_word_xt(word,compiled);
-	dpush(tag_object(word));
-}
-
-/* After batch compiling a bunch of words, perform various fixups to make them
-executable */
-DEFINE_PRIMITIVE(finalize_compile)
-{
-	F_ARRAY *array = untag_array(dpop());
-
-	/* set word XT's */
-	CELL count = untag_fixnum_fast(array->capacity);
+	CELL count = untag_fixnum_fast(alist->capacity);
 	CELL i;
 	for(i = 0; i < count; i++)
 	{
-		F_ARRAY *pair = untag_array(array_nth(array,i));
-		F_WORD *word = untag_word(array_nth(pair,0));
-		F_COMPILED *compiled = untag_word(array_nth(pair,1))->code;
+		F_ARRAY *data = untag_array(array_nth(alist,i));
+
+		F_WORD *word = untag_word(array_nth(data,0));
+		CELL profiler_prologue = to_cell(array_nth(data,1));
+		F_ARRAY *literals = untag_array(array_nth(data,2));
+		F_ARRAY *words = untag_array(array_nth(data,3));
+		F_ARRAY *rel = untag_array(array_nth(data,4));
+		F_ARRAY *labels = untag_array(array_nth(data,5));
+		F_ARRAY *code = untag_array(array_nth(data,6));
+
+		REGISTER_UNTAGGED(alist);
+		REGISTER_UNTAGGED(word);
+
+		F_COMPILED *compiled = add_compiled_block(
+			WORD_TYPE,
+			profiler_prologue,
+			code,
+			labels,
+			rel,
+			words,
+			literals);
+
+		UNREGISTER_UNTAGGED(word);
+		UNREGISTER_UNTAGGED(alist);
+
 		set_word_xt(word,compiled);
 	}
 
-	/* perform relocation */
-	for(i = 0; i < count; i++)
-	{
-		F_ARRAY *pair = untag_array(array_nth(array,i));
-		F_WORD *word = untag_word(array_nth(pair,0));
-		iterate_code_heap_step(word->code,finalize_code_block);
-	}
+	iterate_code_heap(finalize_code_block);
 }

@@ -155,7 +155,7 @@ void jit_compile(F_QUOTATION *quot)
 	F_ARRAY *literals = allot_array(ARRAY_TYPE,1,tag_object(quot));
 	UNREGISTER_UNTAGGED(result);
 
-	F_COMPILED *compiled = add_compiled_block(QUOTATION_TYPE,result,NULL,NULL,NULL,literals);
+	F_COMPILED *compiled = add_compiled_block(QUOTATION_TYPE,0,result,NULL,NULL,NULL,literals);
 	iterate_code_heap_step(compiled,finalize_code_block);
 
 	UNREGISTER_UNTAGGED(quot);

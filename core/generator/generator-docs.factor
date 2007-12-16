@@ -15,25 +15,20 @@ $nl
 "The main entry point into the code generator:"
 { $subsection generate }
 "Primitive compiler interface exported by the Factor VM:"
-{ $subsection add-compiled-block }
-{ $subsection finalize-compile } ;
+{ $subsection modify-code-heap } ;
 
 ABOUT: "generator"
 
 HELP: compiled-xts
-{ $var-description "During compilation, holds a hashtable mapping words to temporary uninterned words. The XT of each value points to the compiled code block of each key; at the end of compilation, the XT of each key is set to the XT of the value." } ;
+{ $var-description "During compilation, holds a hashtable mapping words to 5-element arrays holding compiled code." } ;
 
 HELP: compiling?
 { $values { "word" word } { "?" "a boolean" } }
 { $description "Tests if a word is going to be or already is compiled." } ;
 
-HELP: finalize-compile ( xts -- )
-{ $values { "xts" "an association list mapping words to uninterned words" } }
-{ $description "Performs relocation, atomically changes the XT of each key to the XT of each value, and flushes the CPU instruction cache on architectures where this has to be done manually." } ;
-
-HELP: add-compiled-block ( literals words rel labels code -- xt )
-{ $values { "literals" vector } { "words" "a vector of words" } { "rel" "a vector of integers" } { "labels" "an array of integers" } { "code" "a vector of integers" } { "xt" "an uninterned word" } }
-{ $description "Adds a new compiled block and outputs an uninterned word whose XT points at this block. This uninterned word can then be passed to " { $link finalize-compile } "." } ;
+HELP: modify-code-heap ( array -- )
+{ $values { "array" "an array of 6-element arrays having shape " { $snippet "{ word code labels rel words literals }" } } }
+{ $description "Stores compiled code definitions in the code heap and updates words to point at those definitions." } ;
 
 HELP: compiling-word
 { $var-description "The word currently being compiled, set by " { $link generate-1 } "." } ;

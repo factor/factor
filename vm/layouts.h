@@ -152,7 +152,7 @@ typedef struct
 	CELL reloc_length; /* # bytes */
 	CELL literals_length; /* # bytes */
 	CELL words_length; /* # bytes */
-	CELL finalized; /* has finalize_code_block() been called on this yet? */
+	CELL profiler_prologue; /* # bytes */
 	CELL padding[2];
 } F_COMPILED;
 

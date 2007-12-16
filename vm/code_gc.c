@@ -254,19 +254,8 @@ void collect_literals_step(F_COMPILED *compiled, CELL code_start,
 	for(scan = literals_start; scan < literal_end; scan += CELLS)
 		copy_handle((CELL*)scan);
 
-	/* If the block is not finalized, the words area contains pointers to
-	words in the data heap rather than XTs in the code heap */
-	switch(compiled->finalized)
-	{
-	case false:
-		for(scan = words_start; scan < words_end; scan += CELLS)
-			copy_handle((CELL*)scan);
-		break;
-	case true:
-		break;
-	default:
-		critical_error("Invalid compiled->finalized",(CELL)compiled);
-	}
+	for(scan = words_start; scan < words_end; scan += CELLS)
+		copy_handle((CELL*)scan);
 }
 
 /* Copy literals referenced from all code blocks to newspace */
@@ -305,18 +294,6 @@ void recursive_mark(F_BLOCK *block)
 
 	F_COMPILED *compiled = block_to_compiled(block);
 	iterate_code_heap_step(compiled,collect_literals_step);
-
-	switch(compiled->finalized)
-	{
-	case false:
-		break;
-	case true:
-		iterate_code_heap_step(compiled,mark_sweep_step);
-		break;
-	default:
-		critical_error("Invalid compiled->finalized",(CELL)compiled);
-		break;
-	}
 }
 
 /* Push the free space and total size of the code heap */

@@ -387,7 +387,6 @@ TUPLE: callback-context ;
 : generate-callback ( node -- )
     dup alien-callback-xt dup rot [
         init-templates
-        generate-profiler-prologue
         %save-word-xt
         %prologue-later
         dup alien-stack-frame [
@@ -395,6 +394,7 @@ TUPLE: callback-context ;
             dup wrap-callback-quot %alien-callback
             %callback-return
         ] with-stack-frame
+        0
     ] generate-1 ;
 
 M: alien-callback generate-node

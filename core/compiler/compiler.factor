@@ -14,12 +14,8 @@ M: object inference-error-major? drop t ;
         "quiet" get [ drop ] [ print-error flush ] if drop
     ] if ;
 
-: begin-batch ( seq -- )
+: begin-batch ( -- )
     batch-mode on
-    "quiet" get [ drop ] [
-        [ "Compiling " % length # " words..." % ] "" make
-        print flush
-    ] if
     V{ } clone compile-errors set-global ;
 
 : compile-error. ( pair -- )
@@ -55,16 +51,22 @@ M: object inference-error-major? drop t ;
 : compile ( word -- )
     H{ } clone [
         compiled-xts [ (compile) ] with-variable
-    ] keep >alist finalize-compile ;
+    ] keep [ swap add* ] { } assoc>map modify-code-heap ;
 
 : compile-failed ( word error -- )
     dupd compile-error dup update-xt unchanged-word ;
 
-: try-compile ( word -- )
-    [ compile ] [ compile-failed ] recover ;
-
 : forget-errors ( seq -- )
     [ f "no-effect" set-word-prop ] each ;
+
+: (compile-batch) ( words -- )
+    H{ } clone [
+        compiled-xts [
+            [
+                [ (compile) ] [ compile-failed ] recover
+            ] each
+        ] with-variable
+    ] keep [ swap add* ] { } assoc>map modify-code-heap ;
 
 : compile-batch ( seq -- )
     dup empty? [
@@ -72,7 +74,7 @@ M: object inference-error-major? drop t ;
     ] [
         dup begin-batch
         dup forget-errors
-        [ try-compile ] each
+        (compile-batch)
         end-batch
     ] if ;
 

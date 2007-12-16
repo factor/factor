@@ -275,12 +275,7 @@ void fixup_code_block(F_COMPILED *relocating, CELL code_start,
 		data_fixup((CELL*)scan);
 
 	for(scan = words_start; scan < words_end; scan += CELLS)
-	{
-		if(relocating->finalized)
-			code_fixup(scan);
-		else
-			data_fixup((CELL*)scan);
-	}
+		data_fixup((CELL*)scan);
 
 	if(reloc_start != literals_start)
 	{

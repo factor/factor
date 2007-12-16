@@ -189,7 +189,7 @@ H{ } clone update-map set
     { "tag" "kernel.private" }
     { "cwd" "io.files" }
     { "cd" "io.files" }
-    { "add-compiled-block" "generator" }
+    { "modify-code-heap" "generator" }
     { "dlopen" "alien" }
     { "dlsym" "alien" }
     { "dlclose" "alien" }
@@ -243,7 +243,6 @@ H{ } clone update-map set
     { "end-scan" "memory" }
     { "size" "memory" }
     { "die" "kernel" }
-    { "finalize-compile" "generator" }
     { "fopen" "io.streams.c" }
     { "fgetc" "io.streams.c" }
     { "fread" "io.streams.c" }

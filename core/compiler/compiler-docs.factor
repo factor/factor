@@ -5,8 +5,6 @@ IN: compiler
 ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 "The main entry point to the optimizing compiler is a single word taking a word as input:"
 { $subsection compile }
-"The above word throws an error if the word did not compile. Another variant simply prints the error and returns:"
-{ $subsection try-compile }
 "The optimizing compiler can also compile a single quotation:"
 { $subsection compile-quot }
 { $subsection compile-1 }
@@ -76,17 +74,11 @@ $low-level-note ;
 
 HELP: compile
 { $values { "word" word } }
-{ $description "Compiles a word together with any uncompiled dependencies. Does nothing if the word is already compiled." }
-{ $errors "If compilation fails, this word can throw an error. In particular, if the word's stack effect cannot be inferred, this word will throw an error. The related " { $link try-compile } " word logs errors and returns rather than throwing." } ;
+{ $description "Compiles a word together with any uncompiled dependencies. Does nothing if the word is already compiled." } ;
 
 HELP: compile-failed
 { $values { "word" word } { "error" "an error" } }
 { $description "Called when the optimizing compiler fails to compile a word. The word is removed from the set of words pending compilation, and it's un-optimized compiled definition will be used. The error is reported by calling " { $link compile-error } "." } ;
-
-HELP: try-compile
-{ $values { "word" word } }
-{ $description "Compiles a word together with any uncompiled dependencies. Does nothing if the word is already compiled." }
-{ $errors "If compilation fails, this calls " { $link compile-failed } "." } ;
 
 HELP: forget-errors
 { $values { "seq" "a sequence of words" } }

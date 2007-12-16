@@ -5,11 +5,6 @@ bool profiling_p(void)
 	return to_boolean(userenv[PROFILING_ENV]);
 }
 
-F_FIXNUM profiler_prologue(void)
-{
-	return to_fixnum(userenv[PROFILER_PROLOGUE_ENV]);
-}
-
 void profiling_word(F_WORD *word)
 {
 	/* If we just enabled the profiler, reset call count */

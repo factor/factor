@@ -94,7 +94,6 @@ M: word uses ( word -- seq )
     word-def quot-uses keys ;
 
 M: compound redefined* ( word -- )
-    dup changed-word
     { "inferred-effect" "base-case" "no-effect" } reset-props ;
 
 <PRIVATE

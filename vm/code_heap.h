@@ -63,6 +63,7 @@ void set_word_xt(F_WORD *word, F_COMPILED *compiled);
 
 F_COMPILED *add_compiled_block(
 	CELL type,
+	CELL profiler_prologue,
 	F_ARRAY *code,
 	F_ARRAY *labels,
 	F_ARRAY *rel,
@@ -71,5 +72,4 @@ F_COMPILED *add_compiled_block(
 
 CELL compiled_code_format(void);
 
-DECLARE_PRIMITIVE(add_compiled_block);
-DECLARE_PRIMITIVE(finalize_compile);
+DECLARE_PRIMITIVE(modify_code_heap);
