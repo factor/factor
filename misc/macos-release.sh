@@ -2,16 +2,18 @@ source misc/version.sh
 
 TARGET=$1
 
-if [ "$TARGET" = "x86" ]; then
+if [ "$1" = "x86" ]; then
 	CPU="x86.32"
+	TARGET=macosx-x86-32
 else
 	CPU="macosx-ppc"
+	TARGET=macosx-ppc
 fi
 
 BOOT_IMAGE=boot.$CPU.image
 wget http://factorcode.org/images/$VERSION/$BOOT_IMAGE
 
-make macosx-$TARGET
+make $TARGET
 Factor.app/Contents/MacOS/factor -i=$BOOT_IMAGE -no-user-init
 
 DISK_IMAGE_DIR=Factor-$VERSION
@@ -28,3 +30,6 @@ find core extra fonts misc unmaintained -type f \
 	-exec ./cp_dir {} $DISK_IMAGE_DIR/Factor/{} \;
 hdiutil create -srcfolder "$DISK_IMAGE_DIR" -fs HFS+ \
 	-volname "$DISK_IMAGE_DIR" "$DISK_IMAGE"
+
+ssh linode mkdir -p w/downloads/$VERSION/
+scp $DISK_IMAGE linode:w/downloads/$VERSION/

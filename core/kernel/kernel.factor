@@ -3,7 +3,7 @@
 USING: kernel.private ;
 IN: kernel
 
-: version ( -- str ) "0.91" ; foldable
+: version ( -- str ) "0.92" ; foldable
 
 ! Stack stuff
 : roll ( x y z t -- y z t x ) >r rot r> swap ; inline
