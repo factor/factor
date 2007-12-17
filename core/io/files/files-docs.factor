@@ -104,7 +104,7 @@ HELP: file-modified
 HELP: parent-directory
 { $values { "path" "a pathname string" } { "parent" "a pathname string" } }
 { $description "Strips the last component off a pathname." }
-{ $examples { $example "USE: io.files" "\"/etc/passwd\" parent-directory print" "/etc" } } ;
+{ $examples { $example "USE: io.files" "\"/etc/passwd\" parent-directory print" "/etc/" } } ;
 
 HELP: file-name
 { $values { "path" "a pathname string" } { "string" string } }

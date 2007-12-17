@@ -191,12 +191,13 @@ XT quot_offset_to_pc(F_QUOTATION *quot, F_FIXNUM offset)
 
 DEFINE_PRIMITIVE(curry)
 {
-	F_CURRY *curry = allot_object(CURRY_TYPE,sizeof(F_CURRY));
+	F_CURRY *curry;
 
 	switch(type_of(dpeek()))
 	{
 	case QUOTATION_TYPE:
 	case CURRY_TYPE:
+		curry = allot_object(CURRY_TYPE,sizeof(F_CURRY));
 		curry->quot = dpop();
 		curry->obj = dpop();
 		dpush(tag_object(curry));

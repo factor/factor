@@ -13,7 +13,7 @@ HELP: <remote-channel>
 "returned by " { $link publish }
 }
 { $examples 
-  { $example "\"localhost\" 9000 <node> \"ID123456\" <remote-channel> \"foo\" over to" }
+  { $code "\"localhost\" 9000 <node> \"ID123456\" <remote-channel> \"foo\" over to" }
 }
 { $see-also publish unpublish } ;
 
@@ -24,7 +24,7 @@ HELP: unpublish
 "accessible by remote nodes."
 }
 { $examples 
-  { $example "<channel> publish unpublish" }
+  { $code "<channel> publish unpublish" }
 }
 { $see-also <remote-channel> publish } ;
 
@@ -37,7 +37,7 @@ HELP: publish
 { $link to } " and " { $link from } " to access the channel."
 }
 { $examples 
-  { $example "<channel> publish" }
+  { $code "<channel> publish" }
 }
 { $see-also <remote-channel> unpublish } ;
 

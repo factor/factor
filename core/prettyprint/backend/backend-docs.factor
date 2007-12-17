@@ -31,7 +31,7 @@ HELP: do-string-limit
 { $description "If " { $link string-limit } " is on, trims the string such that it does not exceed the margin, appending \"...\" if trimming took place." } ;
 
 HELP: pprint-string
-{ $values { "obj" object } { "str" string } { "prefix" "a prefix string" } }
+{ $values { "obj" object } { "str" string } { "prefix" string } { "suffix" string } }
 { $description "Outputs a text section consisting of the prefix, the string, and a final quote (\")." }
 $prettyprinting-note ;
 

@@ -3,9 +3,9 @@
 <h2>Annotation: <% "summary" get write %></h2>
 
 <table>
-<tr><th>Annotation by:</th><td><% "author" get write %></td></tr>
-<tr><th>Channel:</th><td><% "channel" get write %></td></tr>
-<tr><th>Created:</th><td><% "date" get timestamp>string write %></td></tr>
+<tr><th align="right">Annotation by:</th><td><% "author" get write %></td></tr>
+<tr><th align="right">File type:</th><td><% "mode" get write %></td></tr>
+<tr><th align="right">Created:</th><td><% "date" get timestamp>string write %></td></tr>
 </table>
 
 <% "syntax" render-template %>
