@@ -669,16 +669,11 @@ PRIVATE>
         [ <column> dup like ] curry* map
     ] unless ;
 
-! : sequence-hashcode ( n seq -- x )
-!    0 -rot [
-!        hashcode* >fixnum swap 31 fixnum*fast fixnum+fast
-!    ] curry* each ; inline
-
 : sequence-hashcode-step ( oldhash newpart -- newhash )
     swap [
-        dup -2 shift swap 5 shift
+        dup -2 fixnum-shift >fixnum swap 5 fixnum-shift >fixnum
         fixnum+fast fixnum+fast
-    ] keep bitxor ;
+    ] keep bitxor ; inline
 
 : sequence-hashcode ( n seq -- x )
     0 -rot [
