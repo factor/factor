@@ -674,9 +674,13 @@ PRIVATE>
 !        hashcode* >fixnum swap 31 fixnum*fast fixnum+fast
 !    ] curry* each ; inline
 
+: sequence-hashcode-step ( oldhash newpart -- newhash )
+    swap [
+        dup -2 shift swap 5 shift
+        fixnum+fast fixnum+fast
+    ] keep bitxor ;
+
 : sequence-hashcode ( n seq -- x )
     0 -rot [
-        hashcode* >fixnum swap
-        [ -2 shift fixnum+fast ] keep [ 5 shift fixnum+fast ] keep
-        bitxor
+        hashcode* >fixnum sequence-hashcode-step
     ] curry* each ; inline
