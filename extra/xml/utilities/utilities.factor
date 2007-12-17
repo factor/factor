@@ -36,14 +36,16 @@ M: process-missing error.
 ! * Common utility functions
 
 : build-tag* ( items name -- tag )
-    "" swap "" <name>
-    swap >r { } r> <tag> ;
+    assure-name swap >r f r> <tag> ;
 
 : build-tag ( item name -- tag )
     >r 1array r> build-tag* ;
 
+: standard-prolog ( -- prolog )
+    T{ prolog f "1.0" "iso-8859-1" f } ;
+
 : build-xml ( tag -- xml )
-    T{ prolog f "1.0" "iso-8859-1" f } { } rot { } <xml> ;
+    standard-prolog { } rot { } <xml> ;
 
 : children>string ( tag -- string )
     tag-children
@@ -138,3 +140,10 @@ M: xml xml-inject >r delegate >r xml-inject ;
 
 : assert-tag ( name name -- )
     names-match? [ "Unexpected XML tag found" throw ] unless ;
+
+: insert-children ( children tag -- )
+    dup tag-children [ push-all ]
+    [ >r V{ } like r> set-tag-children ] if ;
+
+: insert-child ( child tag -- )
+    >r 1vector r> insert-children ;
