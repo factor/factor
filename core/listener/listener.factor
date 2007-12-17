@@ -47,7 +47,8 @@ M: duplex-stream parse-interactive
 : listen ( -- )
     listener-hook get call prompt.
     [
-        stdio get parse-interactive [ call ] [ bye ] if*
+        stdio get parse-interactive
+        [ do-parse-hook call ] [ bye ] if*
     ] try ;
 
 : until-quit ( -- )

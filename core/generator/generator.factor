@@ -83,8 +83,6 @@ SYMBOL: compiler-hook
 
 SYMBOL: compile-errors
 
-SYMBOL: batch-mode
-
 : compile-begins ( word -- )
     compiler-hook get call
     "quiet" get [ drop ] [ "Compiling " write . flush ] if ;

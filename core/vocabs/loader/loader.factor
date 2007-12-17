@@ -154,7 +154,7 @@ SYMBOL: load-help?
     2dup
     [ f swap set-vocab-docs-loaded? ] each
     [ f swap set-vocab-source-loaded? ] each
-    append prune [ [ require ] each ] no-parse-hook ;
+    append prune [ require ] each ;
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 

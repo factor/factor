@@ -20,9 +20,7 @@ ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 
 ARTICLE: "recompile" "Automatic recompilation"
 "When a word is redefined, you can recompile all affected words automatically:"
-{ $subsection recompile }
-"Normally loading a source file or a module also calls " { $link recompile } ". This can be disabled by wrapping file loading in a combinator:"
-{ $subsection no-parse-hook } ;
+{ $subsection recompile } ;
 
 ARTICLE: "compiler" "Optimizing compiler"
 "Factor is a fully compiled language implementation with two distinct compilers:"

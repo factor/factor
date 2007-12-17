@@ -528,11 +528,7 @@ HELP: eval
 HELP: parse-hook
 { $var-description "A quotation called by " { $link parse-stream } " after parsing the input stream. The default value recompiles new word definitions; see " { $link "recompile" } " for details." } ;
 
-{ parse-hook no-parse-hook } related-words
-
-HELP: no-parse-hook
-{ $values { "quot" "a quotation" } }
-{ $description "Runs the quotation in a new dynamic scope where " { $link parse-hook } " is set to " { $link f } ", then calls the outer " { $link parse-hook } " after the quotation returns. This has the effect of postponing any recompilation to the end of a quotation." } ;
+{ parse-hook do-parse-hook } related-words
 
 HELP: start-parsing
 { $values { "stream" "an input stream" } { "name" "a pathname string" } }

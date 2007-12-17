@@ -40,12 +40,14 @@ IN: bootstrap.stage2
         "listener" use+
     ] if
 
-    [
+    f parse-hook [
         "exclude" "include"
         [ get-global " " split [ empty? not ] subset ] 2apply
         seq-diff
         [ "bootstrap." swap append require ] each
-    ] no-parse-hook
+    ] with-variable
+
+    do-parse-hook
 
     init-io
     init-stdio

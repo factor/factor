@@ -372,9 +372,6 @@ SYMBOL: parse-hook
         "Loading " write <pathname> . flush
     ] if ;
 
-: no-parse-hook ( quot -- )
-    >r f parse-hook r> with-variable do-parse-hook ; inline
-
 : start-parsing ( stream name -- )
     H{ } clone new-definitions set
     dup [
@@ -445,8 +442,9 @@ SYMBOL: parse-hook
             start-parsing
             \ contents get string-lines parse-fresh
             dup finish-parsing
-        ] [ ] [ undo-parsing ] cleanup
-    ] no-parse-hook ;
+            do-parse-hook
+        ] with-scope
+    ] [ ] [ undo-parsing ] cleanup ;
 
 : parse-file-restarts ( file -- restarts )
     "Load " swap " again" 3append t 2array 1array ;
