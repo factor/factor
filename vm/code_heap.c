@@ -38,6 +38,11 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 
 static CELL xt_offset;
 
+void incompatible_call_error(void)
+{
+	critical_error("Calling non-optimized word from optimized word",0);
+}
+
 /* Compute an address to store at a relocation */
 INLINE CELL compute_code_rel(F_REL *rel,
 	CELL code_start, CELL literals_start, CELL words_start)
@@ -56,10 +61,16 @@ INLINE CELL compute_code_rel(F_REL *rel,
 		return CREF(words_start,REL_ARGUMENT(rel));
 	case RT_XT:
 		word = untag_word(get(CREF(words_start,REL_ARGUMENT(rel))));
-		return (CELL)word->code + sizeof(F_COMPILED) + xt_offset;
+		if(word->compiledp == F)
+			return (CELL)incompatible_call_error;
+		else
+			return (CELL)word->code + sizeof(F_COMPILED) + xt_offset;
 	case RT_XT_PROFILING:
 		word = untag_word(get(CREF(words_start,REL_ARGUMENT(rel))));
-		return (CELL)word->code + sizeof(F_COMPILED);
+		if(word->compiledp == F)
+			return (CELL)incompatible_call_error;
+		else
+			return (CELL)word->code + sizeof(F_COMPILED);
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
 	default:
@@ -365,5 +376,6 @@ DEFINE_PRIMITIVE(modify_code_heap)
 		set_word_xt(word,compiled);
 	}
 
-	iterate_code_heap(finalize_code_block);
+	if(count != 0)
+		iterate_code_heap(finalize_code_block);
 }

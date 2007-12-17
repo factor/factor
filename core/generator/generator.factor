@@ -4,13 +4,20 @@ USING: arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
 inference inference.backend inference.dataflow io kernel
 kernel.private layouts math namespaces optimizer prettyprint
-quotations sequences system threads words ;
+quotations sequences system threads words dlists ;
 IN: generator
+
+SYMBOL: compile-queue
 
 SYMBOL: compiled-xts
 
-: save-xt ( word xt -- )
-    swap dup unchanged-word compiled-xts get set-at ;
+: 6array 3array >r 3array r> append ;
+
+: begin-compiling ( word -- )
+    f swap compiled-xts get set-at ;
+
+: finish-compiling ( word literals words rel labels code -- )
+    6array swap dup unchanged-word compiled-xts get set-at ;
 
 : compiling? ( word -- ? )
     {
@@ -18,6 +25,9 @@ SYMBOL: compiled-xts
         { [ dup word-changed? ] [ drop f ] }
         { [ t ] [ compiled? ] }
     } cond ;
+
+: queue-compile ( word -- )
+    compile-queue get push-front ;
 
 SYMBOL: compiling-word
 
@@ -36,17 +46,15 @@ t compiled-stack-traces? set-global
     compiled-stack-traces? get compiling-word get f ?
     literal-table get push ;
 
-: 6array 3array >r 3array r> append ;
-
 : generate-1 ( word label node quot -- )
-    pick f save-xt [
+    pick begin-compiling [
         roll compiling-word set
         pick compiling-label set
         init-generator
         call
         literal-table get >array
         word-table get >array
-    ] { } make fixup 6array save-xt ;
+    ] { } make fixup finish-compiling ;
 
 : generate-profiler-prologue ( -- )
     compiled-stack-traces? get [
@@ -70,30 +78,12 @@ GENERIC: generate-node ( node -- next )
         profiler-prologue get
     ] generate-1 ;
 
-: word-dataflow ( word -- dataflow )
+: word-dataflow ( word -- effect dataflow )
     [
         dup "no-effect" word-prop [ no-effect ] when
         dup specialized-def over dup 2array 1array infer-quot
         finish-word
-    ] with-infer nip ;
-
-SYMBOL: compiler-hook
-
-[ ] compiler-hook set-global
-
-SYMBOL: compile-errors
-
-: compile-begins ( word -- )
-    compiler-hook get call
-    "quiet" get [ drop ] [ "Compiling " write . flush ] if ;
-
-: (compile) ( word -- )
-    dup compiling? not over compound? and [
-        dup compile-begins
-        dup dup word-dataflow optimize generate
-    ] [
-        drop
-    ] if ;
+    ] with-infer ;
 
 : intrinsics ( #call -- quot )
     node-param "intrinsics" word-prop ;
@@ -140,7 +130,7 @@ M: node generate-node drop iterate-next ;
     } cond ;
 
 : generate-call ( label -- next )
-    dup (compile)
+    dup queue-compile
     end-basic-block
     tail-call? [
         %jump f

@@ -443,8 +443,8 @@ SYMBOL: parse-hook
             \ contents get string-lines parse-fresh
             dup finish-parsing
             do-parse-hook
-        ] with-scope
-    ] [ ] [ undo-parsing ] cleanup ;
+        ] [ ] [ undo-parsing ] cleanup
+    ] with-scope ;
 
 : parse-file-restarts ( file -- restarts )
     "Load " swap " again" 3append t 2array 1array ;
