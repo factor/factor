@@ -5,7 +5,7 @@ sequences strings vectors words quotations effects tools.test
 continuations generic.standard sorting assocs definitions
 prettyprint io inspector bootstrap.image tuples
 classes.union classes.predicate debugger bootstrap.image
-bootstrap.image.private io.launcher threads.private
+bootstrap.image.private threads.private
 io.streams.string combinators.private tools.test.inference ;
 IN: temporary
 
@@ -454,7 +454,6 @@ DEFER: bar
 ! Test odds and ends
 { 1 1 } [ ' ] unit-test-effect
 { 2 0 } [ write-image ] unit-test-effect
-{ 1 1 } [ <process-stream> ] unit-test-effect
 { 0 0 } [ idle-thread ] unit-test-effect
 
 ! Incorrect stack declarations on inline recursive words should
