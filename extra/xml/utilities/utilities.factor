@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences words io assocs
 quotations strings parser arrays xml.data xml.writer debugger
-splitting ;
+splitting vectors ;
 IN: xml.utilities
 
 ! * System for words specialized on tag names
@@ -113,30 +113,25 @@ M: object xml-inject 2drop ;
 M: xml xml-inject >r delegate >r xml-inject ;
 
 ! * Accessing part of an XML document
+! for tag- words, a start means that it searches all children
+! and no star searches only direct children
 
-: get-id ( tag id -- elem ) ! elem=tag.getElementById(id)
-    swap [
-        dup tag?
-        [ "id" swap at over = ]
-        [ drop f ] if
-    ] xml-find nip ;
-
-: (get-tag) ( name elem -- ? )
+: tag-named? ( name elem -- ? )
     dup tag? [ names-match? ] [ 2drop f ] if ;
 
 : tag-named* ( tag name/string -- matching-tag )
-    assure-name swap [ dupd (get-tag) ] xml-find nip ;
+    assure-name swap [ dupd tag-matches? ] xml-find nip ;
 
 : tags-named* ( tag name/string -- tags-seq )
-    assure-name swap [ dupd (get-tag) ] xml-subset nip ;
+    assure-name swap [ dupd tag-matches? ] xml-subset nip ;
 
 : tag-named ( tag name/string -- matching-tag )
     ! like get-name-tag but only looks at direct children,
     ! not all the children down the tree.
-    assure-name swap [ (get-tag) ] curry* find nip ;
+    assure-name swap [ tag-matches? ] curry* find nip ;
 
 : tags-named ( tag name/string -- tags-seq )
-    assure-name swap [ (get-tag) ] curry* subset ;
+    assure-name swap [ tag-matches? ] curry* subset ;
 
 : assert-tag ( name name -- )
     names-match? [ "Unexpected XML tag found" throw ] unless ;
@@ -147,3 +142,25 @@ M: xml xml-inject >r delegate >r xml-inject ;
 
 : insert-child ( child tag -- )
     >r 1vector r> insert-children ;
+
+: tag-with-attr? ( elem attr-value attr-name -- ? )
+    rot dup tag? [ at = ] [ drop f ] if ;
+
+: tag-with-attr ( tag attr-value attr-name -- matching-tag )
+    assure-name [ tag-with-attr? ] 2curry find nip ;
+
+: tags-with-attr ( tag attr-value attr-name -- tags-seq )
+    assure-name [ tag-with-attr? ] 2curry subset ;
+
+: tag-with-attr* ( tag attr-value attr-name -- matching-tag )
+    assure-name [ tag-with-attr? ] 2curry xml-find nip ;
+
+: tags-with-attr* ( tag attr-value attr-name -- tags-seq )
+    assure-name [ tag-with-attr? ] 2curry xml-subset ;
+
+: get-id ( tag id -- elem ) ! elem=tag.getElementById(id)
+    "id" tag-with-attr ;
+
+: tags-named-with-attr* ( tag tag-name attr-value attr-name -- tags )
+    >r >r tags-named* r> r> tags-with-attr ;
+
