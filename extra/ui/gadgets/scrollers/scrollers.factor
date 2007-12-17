@@ -89,7 +89,7 @@ scroller H{
         3drop
     ] if ;
 
-: (scroll>gadget) ( rect scroller -- )
+: (scroll>gadget) ( gadget scroller -- )
     >r { 0 0 } over pref-dim <rect> swap r>
     [ relative-scroll-rect ] keep
     (scroll>rect) ;

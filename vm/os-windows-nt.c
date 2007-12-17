@@ -10,9 +10,9 @@ s64 current_millis(void)
 
 DEFINE_PRIMITIVE(cwd)
 {
-	F_CHAR buf[MAX_PATH + 4];
+	F_CHAR buf[MAX_UNICODE_PATH];
 
-	if(!GetCurrentDirectory(MAX_PATH + 4, buf))
+	if(!GetCurrentDirectory(MAX_UNICODE_PATH, buf))
 		io_error();
 
 	box_u16_string(buf);
@@ -84,7 +84,22 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 
 void c_to_factor_toplevel(CELL quot)
 {
-	AddVectoredExceptionHandler(0, (void*)exception_handler);
+	if(!AddVectoredExceptionHandler(0, (void*)exception_handler))
+		fatal_error("AddVectoredExceptionHandler failed", 0);
 	c_to_factor(quot);
 	RemoveVectoredExceptionHandler((void*)exception_handler);
+}
+
+void open_console(void)
+{
+	/*
+	// Do this: http://www.cygwin.com/ml/cygwin/2007-11/msg00432.html
+	if(console_open)
+		return;
+
+	if(AttachConsole(ATTACH_PARENT_PROCESS) || AllocConsole())
+	{
+		console_open = true;
+	}
+	*/
 }

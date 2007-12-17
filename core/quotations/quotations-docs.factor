@@ -22,7 +22,7 @@ $nl
 ABOUT: "quotations"
 
 HELP: callable
-{ $class-description "The class whose instances can be passed to " { $link call } ". This includes quotations, " { $link f } " (which behaves like an empty quotation), and composed quotations built up with " { $link curry } "." } ;
+{ $class-description "The class whose instances can be passed to " { $link call } ". This includes quotations and composed quotations built up with " { $link curry } " or " { $link compose } "." } ;
 
 HELP: quotation
 { $description "The class of quotations. See " { $link "syntax-quots" } " for syntax and " { $link "quotations" } " for general information." } ;

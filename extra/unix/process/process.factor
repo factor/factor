@@ -31,11 +31,23 @@ IN: unix.process
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! This is kludgy. We need a better implementation.
+USING: kernel alien.c-types namespaces continuations threads assocs unix
+       combinators.cleave ;
 
-USE: threads
+SYMBOL: pid-wait
 
-: wait-for-pid ( pid -- )
-  dup "int" <c-object> WNOHANG waitpid
-  0 = [ 100 sleep wait-for-pid ] [ drop ] if ;
+! KEY | VALUE
+! -----------
+! pid | continuation
 
+: init-pid-wait ( -- ) H{ } clone pid-wait set-global ;
+
+: wait-for-pid ( pid -- status ) [ pid-wait get set-at stop ] curry callcc1 ;
+
+: wait-loop ( -- )
+  -1 0 <int> tuck WNOHANG waitpid               ! &status return
+  [ *int ] [ pid-wait get delete-at* drop ] bi* ! status ?
+  dup [ schedule-thread-with ] [ 2drop ] if
+  250 sleep wait-loop ;
+
+: start-wait-loop ( -- ) init-pid-wait [ wait-loop ] in-thread ;

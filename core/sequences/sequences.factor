@@ -44,7 +44,7 @@ M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
 TUPLE: bounds-error index seq ;
 
 : bounds-error ( n seq -- * )
-    die \ bounds-error construct-boa throw ;
+    \ bounds-error construct-boa throw ;
 
 : bounds-check ( n seq -- n seq )
     2dup bounds-check? [ bounds-error ] unless ; inline
@@ -221,7 +221,8 @@ TUPLE: column seq col ;
 C: <column> column
 
 M: column virtual-seq column-seq ;
-M: column virtual@ dup column-col -rot column-seq nth ;
+M: column virtual@
+    dup column-col -rot column-seq nth bounds-check ;
 M: column length column-seq length ;
 
 INSTANCE: column virtual-sequence
@@ -546,11 +547,6 @@ M: sequence <=>
 
 : all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
 
-: flip ( matrix -- newmatrix )
-    dup empty? [
-        dup first length [ <column> dup like ] curry* map
-    ] unless ;
-
 : exchange ( m n seq -- )
     pick over bounds-check 2drop 2dup bounds-check 2drop
     exchange-unsafe ;
@@ -667,7 +663,19 @@ PRIVATE>
 : infimum ( seq -- n ) dup first [ min ] reduce ;
 : supremum ( seq -- n ) dup first [ max ] reduce ;
 
+: flip ( matrix -- newmatrix )
+    dup empty? [
+        dup [ length ] map infimum
+        [ <column> dup like ] curry* map
+    ] unless ;
+
+: sequence-hashcode-step ( oldhash newpart -- newhash )
+    swap [
+        dup -2 fixnum-shift >fixnum swap 5 fixnum-shift >fixnum
+        fixnum+fast fixnum+fast
+    ] keep bitxor ; inline
+
 : sequence-hashcode ( n seq -- x )
     0 -rot [
-        hashcode* >fixnum swap 31 fixnum*fast fixnum+fast
+        hashcode* >fixnum sequence-hashcode-step
     ] curry* each ; inline

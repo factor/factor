@@ -38,8 +38,11 @@ IN: units.si
 : cd/m^2 { cd } { m m } <dimensioned> ;
 : kg/kg { kg } { kg } <dimensioned> ;
 
-: radians ( n -- radian ) { m } { m } <dimensioned> ;
-: sr ( n -- steradian ) { m m } { m m } <dimensioned> ;
+! Radians are really m/m, and steradians are m^2/m^2
+! but they need to be in reduced form here.
+: radians ( n -- radian ) scalar ;
+: sr ( n -- steradian ) scalar ;
+
 : Hz ( n -- hertz ) { } { s } <dimensioned> ;
 : N ( n -- newton ) { kg m } { s s } <dimensioned> ;
 : Pa ( n -- pascal ) { kg } { m s s } <dimensioned> ;

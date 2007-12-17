@@ -6,7 +6,7 @@
 </head>
     <body>
 	<div id="banner"><h1><% "title" get write %></h1></div>
-    <% f "navigation" render-template %>
+    <% "navigation" render-template %>
 <div id="article">
   <% "intro" get write-html %>
     <h1>Recent Articles</h1>
@@ -23,7 +23,7 @@
 	    but in the meantime, Google is likely to provide
 	    reasonable results.
 	</p>
-        <% host all-tags <template-args> "tags" render-template %>
+        <% host all-tags <template-args> "tags" render-component %>
 </div>
 <p class="footer"></p>
 <p id="copyright"><% "footer" get write %></p>

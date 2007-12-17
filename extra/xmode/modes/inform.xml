@@ -1,0 +1,205 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+      <!-- Syntax highlighting mode for the Inform language. You can find out more about inform at
+           http://www.gnelson.demon.co.uk/inform.html
+           And an inform language guide at
+           http://www.gnelson.demon.co.uk/dman/index.html
+        -->
+    <PROPS>
+        <!--
+        <PROPERTY NAME="commentStart" VALUE="/*" />
+        <PROPERTY NAME="commentEnd" VALUE="*/" />
+        -->
+        <PROPERTY NAME="lineComment" VALUE="!" />
+        <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+        <!-- Auto indent -->
+        <PROPERTY NAME="indentOpenBrackets" VALUE="{[" />
+        <PROPERTY NAME="indentCloseBrackets" VALUE="}]" />
+        <PROPERTY NAME="indentNextLine"
+            VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+        <!-- set this to 'true' if you want to use GNU coding style -->
+        <PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+
+        <PROPERTY NAME="filenameGlob" VALUE="*.(inf|h)" />
+    </PROPS>
+
+    <RULES
+            IGNORE_CASE="FALSE"
+            HIGHLIGHT_DIGITS="TRUE"
+            DIGIT_RE="(\$[\p{XDigit}]|[\p{Digit}])">
+        <EOL_SPAN TYPE="COMMENT1">!</EOL_SPAN>
+
+        <!-- strings can span lines -->
+        <SPAN TYPE="LITERAL1" DELEGATE="InformInnerText">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL2">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+        <!-- preprocessor statements -->
+        <EOL_SPAN TYPE="KEYWORD2">#</EOL_SPAN>
+        <EOL_SPAN TYPE="COMMENT1">!</EOL_SPAN>
+
+        <!-- special sequences that require special highlighting -->
+        <SEQ TYPE="OPERATOR">=</SEQ>
+        <SEQ TYPE="OPERATOR">==</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+        <SEQ TYPE="OPERATOR">~=</SEQ>
+        <SEQ TYPE="OPERATOR">+</SEQ>
+        <SEQ TYPE="OPERATOR">-</SEQ>
+        <SEQ TYPE="OPERATOR">$</SEQ>
+        <SEQ TYPE="OPERATOR">/</SEQ>
+        <SEQ TYPE="OPERATOR">*</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;</SEQ>
+        <SEQ TYPE="OPERATOR">%</SEQ>
+        <SEQ TYPE="OPERATOR">&amp;</SEQ>
+        <SEQ TYPE="OPERATOR">|</SEQ>
+        <SEQ TYPE="OPERATOR">^</SEQ>
+        <SEQ TYPE="OPERATOR">~</SEQ>
+        <SEQ TYPE="OPERATOR">}</SEQ>
+        <SEQ TYPE="OPERATOR">{</SEQ>
+        <SEQ TYPE="OPERATOR">]</SEQ>
+        <SEQ TYPE="OPERATOR">[</SEQ>
+
+        <SEQ TYPE="OPERATOR">.&amp;</SEQ>
+        <SEQ TYPE="OPERATOR">.#</SEQ>
+        <SEQ TYPE="OPERATOR">--></SEQ>
+
+        <!-- Function calls -->
+        <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+        <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">::</MARK_PREVIOUS>
+
+        <MARK_PREVIOUS AT_WHITESPACE_END="FALSE"
+            MATCH_TYPE="OPERATOR"
+            TYPE="LABEL">:</MARK_PREVIOUS>
+
+        <KEYWORDS>
+            <!-- operators -->
+            <KEYWORD1>has</KEYWORD1>
+            <KEYWORD1>hasnt</KEYWORD1>
+            <KEYWORD1>in</KEYWORD1>
+            <KEYWORD1>notin</KEYWORD1>
+            <KEYWORD1>ofclass</KEYWORD1>
+            <KEYWORD1>provides</KEYWORD1>
+            <KEYWORD1>or</KEYWORD1>
+
+            <!-- text-base conversion functions -->
+            <LITERAL2>char</LITERAL2>
+            <LITERAL2>string</LITERAL2>
+            <LITERAL2>address</LITERAL2>
+            <LITERAL2>name</LITERAL2>
+            <LITERAL2>a</LITERAL2>
+            <LITERAL2>an</LITERAL2>
+            <LITERAL2>the</LITERAL2>
+            <LITERAL2>The</LITERAL2>
+            <LITERAL2>property</LITERAL2>
+            <LITERAL2>object</LITERAL2>
+
+            <!-- language semantics -->
+            <KEYWORD1>break</KEYWORD1>
+            <KEYWORD1>continue</KEYWORD1>
+            <KEYWORD1>do</KEYWORD1>
+                <KEYWORD1>until</KEYWORD1>
+            <KEYWORD1>for</KEYWORD1>
+            <KEYWORD1>give</KEYWORD1>
+            <KEYWORD1>if</KEYWORD1>
+                <KEYWORD1>else</KEYWORD1>
+            <KEYWORD1>inversion</KEYWORD1>
+            <KEYWORD1>jump</KEYWORD1>
+            <KEYWORD1>move</KEYWORD1>
+                <KEYWORD2>to</KEYWORD2>
+            <KEYWORD1>objectloop</KEYWORD1>
+            <KEYWORD1>remove</KEYWORD1>
+            <KEYWORD1>return</KEYWORD1>
+            <KEYWORD1>rfalse</KEYWORD1>
+            <KEYWORD1>rtrue</KEYWORD1>
+            <KEYWORD1>string</KEYWORD1>
+            <KEYWORD1>switch</KEYWORD1>
+            <KEYWORD1>while</KEYWORD1>
+
+            <!-- class keyworks -->
+            <KEYWORD1>with</KEYWORD1>
+<!--			<KEYWORD1>has</KEYWORD1> -->
+
+            <!-- built-in functions -->
+            <FUNCTION>new_line</FUNCTION>
+            <FUNCTION>print</FUNCTION>
+            <FUNCTION>print_ret</FUNCTION>
+            <FUNCTION>box</FUNCTION>
+            <FUNCTION>font</FUNCTION>
+                <KEYWORD2>on</KEYWORD2>
+                <KEYWORD2>off</KEYWORD2>
+            <FUNCTION>quit</FUNCTION>
+            <FUNCTION>read</FUNCTION>
+            <FUNCTION>restore</FUNCTION>
+            <FUNCTION>save</FUNCTION>
+            <FUNCTION>spaces</FUNCTION>
+            <FUNCTION>style</FUNCTION>
+                <KEYWORD2>roman</KEYWORD2>
+                <KEYWORD2>bold</KEYWORD2>
+                <KEYWORD2>underline</KEYWORD2>
+                <KEYWORD2>reverse</KEYWORD2>
+                <KEYWORD2>fixed</KEYWORD2>
+            <FUNCTION>score</FUNCTION>
+            <FUNCTION>time</FUNCTION>
+
+            <!-- Top-level keyworks -->
+            <KEYWORD3>Abbreviate</KEYWORD3>
+            <KEYWORD3>Array</KEYWORD3>
+            <KEYWORD3>Attribute</KEYWORD3>
+            <KEYWORD3>Class</KEYWORD3>
+            <KEYWORD3>Constant</KEYWORD3>
+            <KEYWORD3>Default</KEYWORD3>
+            <KEYWORD3>End</KEYWORD3>
+            <KEYWORD3>Endif</KEYWORD3>
+            <KEYWORD3>Extend</KEYWORD3>
+            <KEYWORD3>Global</KEYWORD3>
+            <KEYWORD3>Ifdef</KEYWORD3>
+            <KEYWORD3>Ifndef</KEYWORD3>
+            <KEYWORD3>Ifnot</KEYWORD3>
+            <KEYWORD3>Iftrue</KEYWORD3>
+            <KEYWORD3>Iffalse</KEYWORD3>
+            <KEYWORD3>Import</KEYWORD3>
+            <KEYWORD3>Include</KEYWORD3>
+            <KEYWORD3>Link</KEYWORD3>
+            <KEYWORD3>Lowstring</KEYWORD3>
+            <KEYWORD3>Message</KEYWORD3>
+            <KEYWORD3>Object</KEYWORD3>
+            <KEYWORD3>Property</KEYWORD3>
+            <KEYWORD3>Replace</KEYWORD3>
+            <KEYWORD3>Serial</KEYWORD3>
+            <KEYWORD3>Switches</KEYWORD3>
+            <KEYWORD3>Statusline</KEYWORD3>
+            <KEYWORD3>System_file</KEYWORD3>
+            <KEYWORD3>Verb</KEYWORD3>
+            <KEYWORD3>private</KEYWORD3>
+
+            <LITERAL2>false</LITERAL2>
+            <LITERAL2>true</LITERAL2>
+            <LITERAL2>null</LITERAL2>
+            <LITERAL2>super</LITERAL2>
+            <LITERAL2>self</LITERAL2>
+
+            <INVALID>this</INVALID>
+        </KEYWORDS>
+    </RULES>
+    <RULES SET="InformInnerText" IGNORE_CASE="FALSE" DEFAULT="LITERAL1">
+        <SEQ TYPE="OPERATOR">^</SEQ>
+        <SEQ TYPE="OPERATOR">~</SEQ>
+        <SEQ TYPE="OPERATOR">@</SEQ>
+        <SEQ TYPE="OPERATOR">\</SEQ>
+
+        <!-- escaping the @ symbol -->
+        <SEQ TYPE="LITERAL2">@@</SEQ>
+    </RULES>
+</MODE>

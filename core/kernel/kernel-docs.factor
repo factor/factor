@@ -32,7 +32,7 @@ $nl
 { $subsection >r }
 { $subsection r> }
 "The top of the data stack is ``hidden'' between " { $link >r } " and " { $link r> } ":"
-{ $example "1 2 3 >r .s r>" "2\n1" }
+{ $example "1 2 3 >r .s r>" "1\n2" }
 "Words must not leave objects on the retain stack, nor expect values to be there on entry. The retain stack is for local storage within a word only, and occurrences of " { $link >r } " and " { $link r> } " must be balanced inside a single quotation. One exception is the following trick involving " { $link if } "; values may be pushed on the retain stack before the condition value is computed, as long as both branches of the " { $link if } " pop the values off the retain stack before returning:"
 { $code
     ": foo ( m ? n -- m+n/n )"
@@ -542,7 +542,7 @@ HELP: 3compose
 } ;
 
 HELP: while
-{ $values { "pred" "a quotation with stack effect " { $snippet "( -- ? )" } } { "quot" "a quotation" } { "tail" "a quotation" } }
+{ $values { "pred" "a quotation with stack effect " { $snippet "( -- ? )" } } { "body" "a quotation" } { "tail" "a quotation" } }
 { $description "Repeatedly calls " { $snippet "pred" } ". If it yields " { $link f } ", iteration stops, otherwise " { $snippet "quot" } " is called. After iteration stops, " { $snippet "tail" } " is called." }
 { $notes "In most cases, tail recursion should be used, because it is simpler both in terms of implementation and conceptually. However in some cases this combinator expresses intent better and should be used."
 $nl

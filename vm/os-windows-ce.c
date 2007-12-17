@@ -46,3 +46,5 @@ void c_to_factor_toplevel(CELL quot)
 {
 	c_to_factor(quot);
 }
+
+void open_console(void) { }

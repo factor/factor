@@ -1,5 +1,7 @@
 
-USING: namespaces unix.linux.if unix.linux.ifreq unix.linux.route ;
+USING: namespaces threads
+       unix.process unix.linux.if unix.linux.ifreq unix.linux.route
+       raptor.cron ;
 
 IN: raptor
 
@@ -25,20 +27,39 @@ IN: raptor
 ] networking-hook set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Filesystems
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+"/dev/hda1"     root-device     set-global
+
+{ "/dev/hda5" } swap-devices	set-global
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! boot-hook
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 [
+                                    start-wait-loop
 
   ! rcS.d
 
   "mountvirtfs"                     start-service
-  "hostname.sh"			    start-service
+
+  ! "hostname.sh"			    start-service
+  "narodnik"                        set-hostname
+
   "keymap.sh"			    start-service
   "linux-restricted-modules-common" start-service
   "udev"                            start-service
   "mountdevsubfs" 		    start-service
   "module-init-tools" 		    start-service
   "procps.sh" 			    start-service
-  "checkroot.sh"		    start-service
+
+  !  "checkroot.sh"		    start-service
+
+     				    activate-swap
+				    mount-root
+
   "mtab"			    start-service
   "checkfs.sh" 			    start-service
   "mountall.sh"			    start-service
@@ -76,11 +97,17 @@ IN: raptor
   "rmnologin"			    start-service
 
   				    schedule-cron-jobs
-  				    start-listeners
-				    start-gettys
-				    
+
+  [ [ "/dev/tty2" tty-listener ] forever ] in-thread
+  [ [ "/dev/tty3" tty-listener ] forever ] in-thread
+  [ [ "/dev/tty4" tty-listener ] forever ] in-thread
+  [ [ "/dev/tty5" getty        ] forever ] in-thread
+  [ [ "/dev/tty6" getty        ] forever ] in-thread
+
 ] boot-hook set-global
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! reboot-hook
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 [
@@ -108,6 +135,8 @@ IN: raptor
   "reboot" 			    stop-service
 ] reboot-hook set-global
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! shutdown-hook
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 [

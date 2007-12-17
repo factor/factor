@@ -79,6 +79,10 @@ M: sequence hashcode*
     dup empty? [
         drop
     ] [
-        hash-case-table hash-dispatch-quot
-        [ dup hashcode >fixnum ] swap append
+        dup length 4 <= [
+            case>quot
+        ] [
+            hash-case-table hash-dispatch-quot
+            [ dup hashcode >fixnum ] swap append
+        ] if
     ] if ;

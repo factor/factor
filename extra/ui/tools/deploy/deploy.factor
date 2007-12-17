@@ -77,7 +77,8 @@ TUPLE: deploy-gadget vocab settings ;
 
 : com-deploy ( gadget -- )
     dup com-save
-    find-deploy-vocab [ deploy ] curry call-listener ;
+    dup find-deploy-vocab [ deploy ] curry call-listener
+    close-window ;
 
 : com-help ( -- )
     "ui-deploy" help-window ;
@@ -86,11 +87,15 @@ TUPLE: deploy-gadget vocab settings ;
     { +nullary+ t }
 } define-command
 
+: com-close ( gadget -- )
+    close-window ;
+
 deploy-gadget "toolbar" f {
+    { f com-close }
     { f com-help }
     { f com-revert }
     { f com-save }
-    { T{ key-down f f "RETURN" } com-deploy }
+    { T{ key-down f f "RET" } com-deploy }
 } define-command-map
 
 : buttons,

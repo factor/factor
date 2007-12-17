@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Icon mode by Silas Smith (smiths@cs.arizona.edu) -->
+<!-- Updated 08/07/2003 -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="#" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="wordBreakChars" VALUE="|.\\:,+-*/=?^!@%&lt;&gt;&amp;" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE"
+	    HIGHLIGHT_DIGITS="TRUE"
+	    DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
+		<!-- comments -->
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+
+		<!-- string literals -->
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- cset literals -->
+		<SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">~===</SEQ>
+		<SEQ TYPE="OPERATOR">===</SEQ>
+		<SEQ TYPE="OPERATOR">|||</SEQ> <!-- list concatenation -->
+
+		<!-- lexical operators -->
+		<SEQ TYPE="OPERATOR">&gt;&gt;=</SEQ> <!-- ">>=" -->
+		<SEQ TYPE="OPERATOR">&gt;&gt;</SEQ> <!-- ">>" -->
+		<SEQ TYPE="OPERATOR">&lt;&lt;=</SEQ> <!-- "<<=" -->
+		<SEQ TYPE="OPERATOR">&lt;&lt;</SEQ> <!-- "<<" -->
+		<SEQ TYPE="OPERATOR">~==</SEQ>
+		<SEQ TYPE="OPERATOR">==</SEQ>
+		<SEQ TYPE="OPERATOR">||</SEQ>
+
+		<!-- set operators -->
+		<SEQ TYPE="OPERATOR">++</SEQ> <!-- union -->
+		<SEQ TYPE="OPERATOR">**</SEQ> <!-- intersection -->
+		<SEQ TYPE="OPERATOR">--</SEQ> <!-- difference -->
+
+		<SEQ TYPE="OPERATOR">&lt;-&gt;</SEQ> <!-- "<->" -->
+		<SEQ TYPE="OPERATOR">&lt;-</SEQ> <!-- "<-" -->
+		<SEQ TYPE="OPERATOR">op:=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">~=</SEQ>
+		<SEQ TYPE="OPERATOR">:=:</SEQ>
+		<SEQ TYPE="OPERATOR">:=</SEQ>
+		<SEQ TYPE="OPERATOR">-:</SEQ>
+		<SEQ TYPE="OPERATOR">+:</SEQ>
+
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">not</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">@</SEQ>
+
+		<!-- numerical operators -->
+				<!-- NOTE: '*' defined above -->
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+
+		<!-- Function calls -->
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>by</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>create</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>every</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>initial</KEYWORD1>
+			<KEYWORD1>next</KEYWORD1>
+			<KEYWORD1>of</KEYWORD1>
+			<KEYWORD1>repeat</KEYWORD1>
+			<KEYWORD1>then</KEYWORD1>
+			<KEYWORD1>to</KEYWORD1>
+			<KEYWORD1>until</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+
+			<KEYWORD2>break</KEYWORD2>
+			<KEYWORD2>end</KEYWORD2>
+			<KEYWORD2>fail</KEYWORD2>
+			<KEYWORD2>global</KEYWORD2>
+			<KEYWORD2>invocable</KEYWORD2>
+			<KEYWORD2>link</KEYWORD2>
+			<KEYWORD2>local</KEYWORD2>
+			<KEYWORD2>procedure</KEYWORD2>
+			<KEYWORD2>record</KEYWORD2>
+			<KEYWORD2>return</KEYWORD2>
+			<KEYWORD2>static</KEYWORD2>
+			<KEYWORD2>suspend</KEYWORD2>
+
+			<KEYWORD3>&amp;allocated</KEYWORD3>
+			<KEYWORD3>&amp;ascii</KEYWORD3>
+			<KEYWORD3>&amp;clock</KEYWORD3>
+			<KEYWORD3>&amp;collections</KEYWORD3>
+			<KEYWORD3>&amp;cset</KEYWORD3>
+			<KEYWORD3>&amp;current</KEYWORD3>
+			<KEYWORD3>&amp;date</KEYWORD3>
+			<KEYWORD3>&amp;dateline</KEYWORD3>
+			<KEYWORD3>&amp;digits</KEYWORD3>
+			<KEYWORD3>&amp;dump</KEYWORD3>
+			<KEYWORD3>&amp;e</KEYWORD3>
+			<KEYWORD3>&amp;error</KEYWORD3>
+			<KEYWORD3>&amp;errornumber</KEYWORD3>
+			<KEYWORD3>&amp;errortext</KEYWORD3>
+			<KEYWORD3>&amp;errorvalue</KEYWORD3>
+			<KEYWORD3>&amp;errout</KEYWORD3>
+			<KEYWORD3>&amp;fail</KEYWORD3>
+			<KEYWORD3>&amp;features</KEYWORD3>
+			<KEYWORD3>&amp;file</KEYWORD3>
+			<KEYWORD3>&amp;host</KEYWORD3>
+			<KEYWORD3>&amp;input</KEYWORD3>
+			<KEYWORD3>&amp;lcase</KEYWORD3>
+			<KEYWORD3>&amp;letters</KEYWORD3>
+			<KEYWORD3>&amp;level</KEYWORD3>
+			<KEYWORD3>&amp;line</KEYWORD3>
+			<KEYWORD3>&amp;main</KEYWORD3>
+			<KEYWORD3>&amp;null</KEYWORD3>
+			<KEYWORD3>&amp;output</KEYWORD3>
+			<KEYWORD3>&amp;phi</KEYWORD3>
+			<KEYWORD3>&amp;pi</KEYWORD3>
+			<KEYWORD3>&amp;pos</KEYWORD3>
+			<KEYWORD3>&amp;progname</KEYWORD3>
+			<KEYWORD3>&amp;random</KEYWORD3>
+			<KEYWORD3>&amp;regions</KEYWORD3>
+			<KEYWORD3>&amp;source</KEYWORD3>
+			<KEYWORD3>&amp;storage</KEYWORD3>
+			<KEYWORD3>&amp;subject</KEYWORD3>
+			<KEYWORD3>&amp;time</KEYWORD3>
+			<KEYWORD3>&amp;trace</KEYWORD3>
+			<KEYWORD3>&amp;ucase</KEYWORD3>
+			<KEYWORD3>&amp;version</KEYWORD3>
+
+			<!-- preprocessor directives -->
+			<KEYWORD3>$define</KEYWORD3>
+			<KEYWORD3>$else</KEYWORD3>
+			<KEYWORD3>$endif</KEYWORD3>
+			<KEYWORD3>$error</KEYWORD3>
+			<KEYWORD3>$ifdef</KEYWORD3>
+			<KEYWORD3>$ifndef</KEYWORD3>
+			<KEYWORD3>$include</KEYWORD3>
+			<KEYWORD3>$line</KEYWORD3>
+			<KEYWORD3>$undef</KEYWORD3>
+
+			<!-- predefined prepocessor symbols -->
+			<KEYWORD3>_MACINTOSH</KEYWORD3>
+			<KEYWORD3>_MS_WINDOWS_NT</KEYWORD3>
+			<KEYWORD3>_MS_WINDOWS</KEYWORD3>
+			<KEYWORD3>_MSDOS_386</KEYWORD3>
+			<KEYWORD3>_MSDOS</KEYWORD3>
+			<KEYWORD3>_OS2</KEYWORD3>
+			<KEYWORD3>_PIPES</KEYWORD3>
+			<KEYWORD3>_PRESENTATION_MGR</KEYWORD3>
+			<KEYWORD3>_SYSTEM_FUNCTION</KEYWORD3>
+			<KEYWORD3>_UNIX</KEYWORD3>
+			<KEYWORD3>_VMS</KEYWORD3>
+			<KEYWORD3>_WINDOW_FUNCTIONS</KEYWORD3>
+			<KEYWORD3>_X_WINDOW_SYSTEM</KEYWORD3>
+
+			<KEYWORD4>co-expression</KEYWORD4>
+			<KEYWORD4>cset</KEYWORD4>
+			<KEYWORD4>file</KEYWORD4>
+			<KEYWORD4>integer</KEYWORD4>
+			<KEYWORD4>list</KEYWORD4>
+			<KEYWORD4>null</KEYWORD4>
+			<KEYWORD4>real</KEYWORD4>
+			<KEYWORD4>set</KEYWORD4>
+			<KEYWORD4>string</KEYWORD4>
+			<KEYWORD4>table</KEYWORD4>
+			<KEYWORD4>window</KEYWORD4>
+		</KEYWORDS>
+	</RULES>
+</MODE>
+

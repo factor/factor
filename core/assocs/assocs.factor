@@ -135,7 +135,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ 0 or + ] change-at ;
 
 : map>assoc ( seq quot exemplar -- assoc )
-    >r [ 2array ] compose map r> assoc-like ; inline
+    >r [ 2array ] compose { } map-as r> assoc-like ; inline
 
 M: assoc >alist [ 2array ] { } assoc>map ;
 

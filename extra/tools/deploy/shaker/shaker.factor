@@ -111,6 +111,10 @@ SYMBOL: deploy-vocab
         builtins ,
         strip-io? [ io-backend , ] unless
 
+        deploy-compiler? get [
+            "callbacks" "alien.compiler" lookup ,
+        ] when
+
         strip-dictionary? [
             {
                 dictionary

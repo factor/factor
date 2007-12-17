@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+	Haskell mode by Kristian Ovaska (kristian.ovaska@helsinki.fi)
+	Based on Haskell 98
+-->
+
+<MODE>
+
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="{-" />
+		<PROPERTY NAME="commentEnd" VALUE="-}" />
+		<PROPERTY NAME="lineComment" VALUE="--" />
+		<!-- apparently, this is required... -->
+		<PROPERTY NAME="tabSize" VALUE="8" />
+		<PROPERTY NAME="indentSize" VALUE="8" />
+	</PROPS>
+
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" ESCAPE="\">
+		<!-- Pragmas. -->
+		<SPAN TYPE="COMMENT2">
+			<BEGIN>{-#</BEGIN>
+			<END>#-}</END>
+		</SPAN>
+
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>{-</BEGIN>
+			<END>-}</END>
+		</SPAN>
+
+		<EOL_SPAN TYPE="COMMENT1">--</EOL_SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- ' causes problems because not all ' are character
+		definitions. I implemented an ugly and partial workaround. -->
+		<SEQ TYPE="LITERAL1">' '</SEQ>
+		<SEQ TYPE="LITERAL1">'!'</SEQ>
+		<SEQ TYPE="LITERAL1">'"'</SEQ>
+		<SEQ TYPE="LITERAL1">'$'</SEQ>
+		<SEQ TYPE="LITERAL1">'%'</SEQ>
+		<SEQ TYPE="LITERAL1">'/'</SEQ>
+		<SEQ TYPE="LITERAL1">'('</SEQ>
+		<SEQ TYPE="LITERAL1">')'</SEQ>
+		<SEQ TYPE="LITERAL1">'['</SEQ>
+		<SEQ TYPE="LITERAL1">']'</SEQ>
+		<SEQ TYPE="LITERAL1">'+'</SEQ>
+		<SEQ TYPE="LITERAL1">'-'</SEQ>
+		<SEQ TYPE="LITERAL1">'*'</SEQ>
+		<SEQ TYPE="LITERAL1">'='</SEQ>
+		<SEQ TYPE="LITERAL1">'/'</SEQ>
+		<SEQ TYPE="LITERAL1">'^'</SEQ>
+		<SEQ TYPE="LITERAL1">'.'</SEQ>
+		<SEQ TYPE="LITERAL1">','</SEQ>
+		<SEQ TYPE="LITERAL1">':'</SEQ>
+		<SEQ TYPE="LITERAL1">';'</SEQ>
+		<SEQ TYPE="LITERAL1">'&lt;'</SEQ>
+		<SEQ TYPE="LITERAL1">'&gt;'</SEQ>
+		<SEQ TYPE="LITERAL1">'|'</SEQ>
+		<SEQ TYPE="LITERAL1">'@'</SEQ>
+
+		<SPAN TYPE="LITERAL1" NO_WORD_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">..</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">::</SEQ>
+
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">@</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">$</SEQ>
+
+		<!-- Defining this as OPERATOR causes float numbers not to be
+		highlighted... Which is more important? -->
+		<!-- <SEQ TYPE="NULL">.</SEQ> -->
+
+		<KEYWORDS>
+			<!-- Reserved words. -->
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>class</KEYWORD1>
+			<KEYWORD1>data</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>deriving</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>import</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>infix</KEYWORD1>
+			<KEYWORD1>infixl</KEYWORD1>
+			<KEYWORD1>infixr</KEYWORD1>
+			<KEYWORD1>instance</KEYWORD1>
+			<KEYWORD1>let</KEYWORD1>
+			<KEYWORD1>module</KEYWORD1>
+			<KEYWORD1>newtype</KEYWORD1>
+			<KEYWORD1>of</KEYWORD1>
+			<KEYWORD1>then</KEYWORD1>
+			<KEYWORD1>type</KEYWORD1>
+			<KEYWORD1>where</KEYWORD1>
+			<KEYWORD1>_</KEYWORD1>
+			<KEYWORD1>as</KEYWORD1>
+			<KEYWORD1>qualified</KEYWORD1>
+			<KEYWORD1>hiding</KEYWORD1>
+
+			<KEYWORD3>Addr</KEYWORD3>
+			<KEYWORD3>Bool</KEYWORD3>
+			<KEYWORD3>Bounded</KEYWORD3>
+			<KEYWORD3>Char</KEYWORD3>
+			<KEYWORD3>Double</KEYWORD3>
+			<KEYWORD3>Either</KEYWORD3>
+			<KEYWORD3>Enum</KEYWORD3>
+			<KEYWORD3>Eq</KEYWORD3>
+			<KEYWORD3>FilePath</KEYWORD3>
+			<KEYWORD3>Float</KEYWORD3>
+			<KEYWORD3>Floating</KEYWORD3>
+			<KEYWORD3>Fractional</KEYWORD3>
+			<KEYWORD3>Functor</KEYWORD3>
+			<KEYWORD3>IO</KEYWORD3>
+			<KEYWORD3>IOError</KEYWORD3>
+			<KEYWORD3>IOResult</KEYWORD3>
+			<KEYWORD3>Int</KEYWORD3>
+			<KEYWORD3>Integer</KEYWORD3>
+			<KEYWORD3>Integral</KEYWORD3>
+			<KEYWORD3>Ix</KEYWORD3>
+			<KEYWORD3>Maybe</KEYWORD3>
+			<KEYWORD3>Monad</KEYWORD3>
+			<KEYWORD3>Num</KEYWORD3>
+			<KEYWORD3>Ord</KEYWORD3>
+			<KEYWORD3>Ordering</KEYWORD3>
+			<KEYWORD3>Ratio</KEYWORD3>
+			<KEYWORD3>Rational</KEYWORD3>
+			<KEYWORD3>Read</KEYWORD3>
+			<KEYWORD3>ReadS</KEYWORD3>
+			<KEYWORD3>Real</KEYWORD3>
+			<KEYWORD3>RealFloat</KEYWORD3>
+			<KEYWORD3>RealFrac</KEYWORD3>
+			<KEYWORD3>Show</KEYWORD3>
+			<KEYWORD3>ShowS</KEYWORD3>
+			<KEYWORD3>String</KEYWORD3>
+
+			<LITERAL2>:</LITERAL2>
+			<LITERAL2>EQ</LITERAL2>
+			<LITERAL2>False</LITERAL2>
+			<LITERAL2>GT</LITERAL2>
+			<LITERAL2>Just</LITERAL2>
+			<LITERAL2>LT</LITERAL2>
+			<LITERAL2>Left</LITERAL2>
+			<LITERAL2>Nothing</LITERAL2>
+			<LITERAL2>Right</LITERAL2>
+			<LITERAL2>True</LITERAL2>
+
+			<OPERATOR>quot</OPERATOR>
+			<OPERATOR>rem</OPERATOR>
+			<OPERATOR>div</OPERATOR>
+			<OPERATOR>mod</OPERATOR>
+			<OPERATOR>elem</OPERATOR>
+			<OPERATOR>notElem</OPERATOR>
+			<OPERATOR>seq</OPERATOR>
+		</KEYWORDS>
+	</RULES>
+
+</MODE>

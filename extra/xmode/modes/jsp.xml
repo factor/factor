@@ -1,0 +1,257 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;%--" />
+		<PROPERTY NAME="commentEnd" VALUE="--%&gt;" />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE">
+		<!-- JSP comment -->
+		<SPAN TYPE="COMMENT2">
+			<BEGIN>&lt;%--</BEGIN>
+			<END>--%&gt;</END>
+		</SPAN>
+
+		<!-- JSP directive -->
+		<SPAN TYPE="KEYWORD1" DELEGATE="DIRECTIVES">
+			<BEGIN>&lt;%@</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD1" DELEGATE="DIRECTIVES">
+			<BEGIN>&lt;jsp:directive&gt;</BEGIN>
+			<END>&lt;/jsp:directive&gt;</END>
+		</SPAN>
+
+		<!-- JSP scriptlet expression -->
+		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%=</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+			<BEGIN>&lt;jsp:expression&gt;</BEGIN>
+			<END>&lt;/jsp:expression&gt;</END>
+		</SPAN>
+
+
+		<!-- JSP scriptlet code block -->
+		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%!</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+			<BEGIN>&lt;jsp:declaration&gt;</BEGIN>
+			<END>&lt;/jsp:declaration&gt;</END>
+		</SPAN>
+
+		<!-- JSP scriptlet -->
+		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+			<BEGIN>&lt;jsp:scriptlet&gt;</BEGIN>
+			<END>&lt;/jsp:scriptlet&gt;</END>
+		</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1" DELEGATE="COMMENT">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- stylesheet -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::CSS">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+
+		<SPAN TYPE="KEYWORD2" DELEGATE="EL">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+	</RULES>
+	<RULES SET="COMMENT" DEFAULT="COMMENT1" IGNORE_CASE="TRUE">
+		<!-- JSP comment -->
+		<SPAN TYPE="COMMENT2">
+			<BEGIN>&lt;%--</BEGIN>
+			<END>--%&gt;</END>
+		</SPAN>
+
+		<!-- JSP scriptlet expression -->
+		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%=</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<!-- JSP scriptlet -->
+		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+	</RULES>
+	<RULES SET="DIRECTIVES" DEFAULT="MARKUP">
+		<!-- JSP scriptlet expression -->
+		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%=</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="ATTRVALUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="ATTRVALUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="MARKUP">/</SEQ>
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR">:</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>taglib</KEYWORD1>
+			<KEYWORD1>include</KEYWORD1>
+			<KEYWORD1>page</KEYWORD1>
+			<KEYWORD1>tag</KEYWORD1>
+			<KEYWORD1>tagAttribute</KEYWORD1>
+			<KEYWORD1>tagVariable</KEYWORD1>
+
+			<KEYWORD2>language</KEYWORD2>
+			<KEYWORD2>session</KEYWORD2>
+			<KEYWORD2>contentType</KEYWORD2>
+			<KEYWORD2>charset</KEYWORD2>
+			<KEYWORD2>import</KEYWORD2>
+			<KEYWORD2>buffer</KEYWORD2>
+			<KEYWORD2>autoflush</KEYWORD2>
+			<KEYWORD2>isThreadSafe</KEYWORD2>
+			<KEYWORD2>info</KEYWORD2>
+			<KEYWORD2>errorPage</KEYWORD2>
+			<KEYWORD2>isErrorpage</KEYWORD2>
+			<KEYWORD2>extends</KEYWORD2>
+			<KEYWORD2>file</KEYWORD2>
+			<KEYWORD2>uri</KEYWORD2>
+			<KEYWORD2>prefix</KEYWORD2>
+			<KEYWORD2>method</KEYWORD2>
+			<KEYWORD2>name</KEYWORD2>
+			<KEYWORD2>default</KEYWORD2>
+			<KEYWORD2>required</KEYWORD2>
+			<KEYWORD2>rtexprvalue</KEYWORD2>
+			<KEYWORD2>id</KEYWORD2>
+			<KEYWORD2>type</KEYWORD2>
+			<KEYWORD2>scope</KEYWORD2>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="TAGS" DEFAULT="MARKUP">
+		<!-- JSP comment -->
+		<SPAN TYPE="COMMENT2">
+			<BEGIN>&lt;%--</BEGIN>
+			<END>--%&gt;</END>
+		</SPAN>
+
+		<!-- JSP scriptlet expression -->
+		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%=</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="MARKUP" DELEGATE="CSS+JSP">
+			<BEGIN>style='</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SPAN TYPE="MARKUP" DELEGATE="CSS+JSP">
+			<BEGIN>style="</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="ATTRVALUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="ATTRVALUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="MARKUP">/</SEQ>
+		<MARK_FOLLOWING TYPE="FUNCTION" MATCH_TYPE="OPERATOR">:</MARK_FOLLOWING>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+	</RULES>
+
+
+
+	<RULES SET="CSS+JSP" DEFAULT="LITERAL1">
+		<SPAN TYPE="KEYWORD2" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%=</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD2" DELEGATE="EL">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<IMPORT DELEGATE="css::MAIN"/>
+	</RULES>
+
+	<RULES SET="ATTRVALUE" DEFAULT="LITERAL1" ESCAPE="\">
+		<!-- JSP scriptlet expression -->
+		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%=</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD2" DELEGATE="EL">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<SEQ TYPE="LITERAL1" DELEGATE="JAVASCRIPT+JSP">javascript:</SEQ>
+	</RULES>
+
+
+	<RULES SET="JAVASCRIPT+JSP">
+		<!-- JSP scriptlet expression -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%=</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD2" DELEGATE="EL">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<IMPORT DELEGATE="javascript::MAIN"/>
+	</RULES>
+
+	<RULES SET="EL" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0[lL]?|[1-9]\d{0,9}(\d{0,9}[lL])?|0[xX]\p{XDigit}{1,8}(\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))">
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR">:</MARK_PREVIOUS>
+		<IMPORT DELEGATE="java::MAIN"/>
+	</RULES>
+</MODE>
+<!-- :noTabs=false: -->

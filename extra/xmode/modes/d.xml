@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="commentStart" VALUE="/*" />
+        <PROPERTY NAME="commentEnd" VALUE="*/" />
+        <PROPERTY NAME="lineComment" VALUE="//" />
+        <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+	<!-- Auto indent -->
+	<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+	<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+	<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+	<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+	<PROPERTY NAME="indentNextLine"
+		VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+	<PROPERTY NAME="unindentThisLine"
+		VALUE="^.*(default:\s*|case.*:.*)$" />
+	<PROPERTY NAME="electricKeys" VALUE=":" />
+    </PROPS>
+
+    <RULES ESCAPE="\"
+        IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE"
+        DIGIT_RE="(0x[0-9a-fA-F_]+[uUlL]?|[0-9_]+(e[0-9_]*)?[uUlLdDfF]?)">
+
+        <!-- Silly comment -->
+        <SEQ TYPE="COMMENT1">/**/</SEQ>
+
+        <!-- Doxygen comment, Javadoc style -->
+        <SPAN TYPE="COMMENT3" DELEGATE="doxygen::DOXYGEN">
+            <BEGIN>/**</BEGIN>
+            <END>*/</END>
+        </SPAN>
+
+        <!-- Doxygen comment, Qt style -->
+        <SPAN TYPE="COMMENT3" DELEGATE="doxygen::DOXYGEN">
+            <BEGIN>/*!</BEGIN>
+            <END>*/</END>
+        </SPAN>
+
+        <!-- C style comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>/*</BEGIN>
+            <END>*/</END>
+        </SPAN>
+
+        <!-- Nested comment -->
+        <SPAN TYPE="COMMENT1" DELEGATE="NESTED_COMMENT">
+            <BEGIN>/+</BEGIN>
+            <END>+/</END>
+        </SPAN>
+
+        <EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+
+        <!-- Wysiwyg string literal -->
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" NO_ESCAPE="TRUE">
+            <BEGIN>r"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <!-- Alternate Wysiwyg string literal -->
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" NO_ESCAPE="TRUE">
+            <BEGIN>`</BEGIN>
+            <END>`</END>
+        </SPAN>
+        <!-- Doublequoted string literal -->
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <!-- Hex string literal -->
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>x"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <!-- Character literal -->
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+        <SEQ TYPE="OPERATOR">=</SEQ>
+        <SEQ TYPE="OPERATOR">!</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+        <SEQ TYPE="OPERATOR">+</SEQ>
+        <SEQ TYPE="OPERATOR">-</SEQ>
+        <SEQ TYPE="OPERATOR">/</SEQ>
+
+        <SEQ TYPE="OPERATOR">*</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;</SEQ>
+        <SEQ TYPE="OPERATOR">%</SEQ>
+        <SEQ TYPE="OPERATOR">&amp;</SEQ>
+        <SEQ TYPE="OPERATOR">|</SEQ>
+        <SEQ TYPE="OPERATOR">^</SEQ>
+        <SEQ TYPE="OPERATOR">~</SEQ>
+        <SEQ TYPE="OPERATOR">}</SEQ>
+        <SEQ TYPE="OPERATOR">{</SEQ>
+
+        <MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR"
+            AT_WHITESPACE_END="TRUE">:</MARK_PREVIOUS>
+
+        <!-- Function calls -->
+        <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+        <!-- Annotation types -->
+        <MARK_FOLLOWING TYPE="KEYWORD4">@</MARK_FOLLOWING>
+
+        <KEYWORDS>
+            <KEYWORD1>abstract</KEYWORD1>
+            <KEYWORD3>alias</KEYWORD3>
+            <KEYWORD4>align</KEYWORD4>
+            <KEYWORD2>asm</KEYWORD2>
+            <KEYWORD2>assert</KEYWORD2>
+            <KEYWORD3>auto</KEYWORD3>
+            <KEYWORD3>bit</KEYWORD3>
+            <KEYWORD4>body</KEYWORD4>
+            <KEYWORD1>break</KEYWORD1>
+            <KEYWORD3>byte</KEYWORD3>
+            <KEYWORD1>case</KEYWORD1>
+            <KEYWORD3>cast</KEYWORD3>
+            <KEYWORD1>catch</KEYWORD1>
+            <KEYWORD3>cent</KEYWORD3>
+            <KEYWORD3>char</KEYWORD3>
+            <KEYWORD3>class</KEYWORD3>
+            <KEYWORD3>cfloat</KEYWORD3>
+            <KEYWORD3>cdouble</KEYWORD3>
+            <KEYWORD3>creal</KEYWORD3>
+            <INVALID>const</INVALID>
+            <KEYWORD1>continue</KEYWORD1>
+            <KEYWORD3>dchar</KEYWORD3>
+            <KEYWORD2>debug</KEYWORD2>
+            <KEYWORD1>default</KEYWORD1>
+            <KEYWORD4>delegate</KEYWORD4>
+            <KEYWORD1>delete</KEYWORD1>
+            <KEYWORD2>deprecated</KEYWORD2>
+            <KEYWORD1>do</KEYWORD1>
+            <KEYWORD3>double</KEYWORD3>
+            <KEYWORD1>else</KEYWORD1>
+            <KEYWORD3>enum</KEYWORD3>
+            <KEYWORD2>export</KEYWORD2>
+            <KEYWORD2>extern</KEYWORD2>
+            <LITERAL2>false</LITERAL2>
+            <KEYWORD1>final</KEYWORD1>
+            <KEYWORD1>finally</KEYWORD1>
+            <KEYWORD3>float</KEYWORD3>
+            <KEYWORD1>for</KEYWORD1>
+            <KEYWORD1>foreach</KEYWORD1>
+            <KEYWORD4>function</KEYWORD4>
+            <INVALID>goto</INVALID>
+            <KEYWORD3>idouble</KEYWORD3>
+            <KEYWORD1>if</KEYWORD1>
+            <KEYWORD3>ifloat</KEYWORD3>
+            <KEYWORD2>import</KEYWORD2>
+            <INVALID>in</INVALID>
+            <INVALID>inout</INVALID>
+            <KEYWORD3>int</KEYWORD3>
+            <KEYWORD2>interface</KEYWORD2>
+            <KEYWORD2>invariant</KEYWORD2>
+            <KEYWORD3>ireal</KEYWORD3>
+            <OPERATOR>is</OPERATOR>
+            <KEYWORD3>long</KEYWORD3>
+            <KEYWORD4>module</KEYWORD4>
+            <KEYWORD1>new</KEYWORD1>
+            <LITERAL2>null</LITERAL2>
+            <INVALID>out</INVALID>
+            <KEYWORD4>override</KEYWORD4>
+            <KEYWORD2>package</KEYWORD2>
+            <KEYWORD2>pragma</KEYWORD2>
+            <KEYWORD1>private</KEYWORD1>
+            <KEYWORD1>protected</KEYWORD1>
+            <KEYWORD1>public</KEYWORD1>
+            <KEYWORD3>real</KEYWORD3>
+            <KEYWORD1>return</KEYWORD1>
+            <KEYWORD3>short</KEYWORD3>
+            <KEYWORD1>static</KEYWORD1>
+            <KEYWORD3>struct</KEYWORD3>
+            <LITERAL2>super</LITERAL2>
+            <KEYWORD1>switch</KEYWORD1>
+            <KEYWORD1>synchronized</KEYWORD1>
+            <KEYWORD3>template</KEYWORD3>
+            <LITERAL2>this</LITERAL2>
+            <KEYWORD1>throw</KEYWORD1>
+            <LITERAL2>true</LITERAL2>
+            <KEYWORD1>try</KEYWORD1>
+            <KEYWORD3>typedef</KEYWORD3>
+            <KEYWORD1>typeof</KEYWORD1>
+            <KEYWORD3>ubyte</KEYWORD3>
+            <KEYWORD3>ucent</KEYWORD3>
+            <KEYWORD3>uint</KEYWORD3>
+            <KEYWORD3>ulong</KEYWORD3>
+            <KEYWORD3>union</KEYWORD3>
+            <KEYWORD2>unittest</KEYWORD2>
+            <KEYWORD3>ushort</KEYWORD3>
+            <KEYWORD2>version</KEYWORD2>
+            <KEYWORD3>void</KEYWORD3>
+            <KEYWORD1>volatile</KEYWORD1>
+            <KEYWORD3>wchar</KEYWORD3>
+            <KEYWORD1>while</KEYWORD1>
+            <KEYWORD2>with</KEYWORD2>
+        </KEYWORDS>
+    </RULES>
+    <RULES SET="NESTED_COMMENT" DEFAULT="COMMENT1" ESCAPE="\">
+        <SPAN TYPE="COMMENT1" DELEGATE="NESTED_COMMENT">
+            <BEGIN>/+</BEGIN>
+            <END>+/</END>
+        </SPAN>
+    </RULES>
+</MODE>

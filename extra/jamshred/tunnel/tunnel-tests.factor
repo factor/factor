@@ -12,4 +12,4 @@ IN: temporary
 
 [ 3 ] [ <straight-tunnel> T{ oint f { 0 0 -3.25 } } 0 nearest-segment-forward segment-number ] unit-test
 
-[ { 0 0 0 } ] [ <straight-tunnel> T{ oint f { 0 0 -0.25 } } over first nearest-segment oint-location ] unit-test
+[ F{ 0 0 0 } ] [ <straight-tunnel> T{ oint f { 0 0 -0.25 } } over first nearest-segment oint-location ] unit-test

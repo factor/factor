@@ -18,9 +18,7 @@ SYMBOL: this-test
 : (unit-test) ( what quot -- )
     swap dup . flush this-test set
     [ time ] curry failures get [
-        [
-            this-test get <failure> failures get push
-        ] recover
+        [ this-test get failure ] recover
     ] [
         call
     ] if ;

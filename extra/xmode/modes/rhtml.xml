@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- rhtml (ruby+html) mode -->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+		<PROPERTY NAME="commentStart" VALUE="&lt;%#" />
+		<PROPERTY NAME="commentEnd" VALUE="%&gt;" />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE">
+		
+		<!-- eRuby comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;%#</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<!-- eRuby assignment -->
+		<SPAN TYPE="MARKUP" DELEGATE="ruby::MAIN">
+			<BEGIN>&lt;%=</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<!-- eRuby statement -->
+		<SPAN TYPE="MARKUP" DELEGATE="ruby::MAIN">
+			<BEGIN>&lt;%</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- stylesheet -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::CSS">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="TAGS" DEFAULT="MARKUP">
+
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;%#</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="TAGS_LITERAL">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="TAGS_LITERAL">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+	</RULES>
+
+	<RULES SET="TAGS_LITERAL" DEFAULT="LITERAL1">
+
+		<SPAN TYPE="MARKUP">
+			<BEGIN>&lt;%</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="MARKUP">
+			<BEGIN>&lt;%=</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+	</RULES>
+</MODE>

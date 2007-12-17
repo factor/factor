@@ -64,7 +64,7 @@ SYMBOL: cols
         building get >string
     ] with-scope ;
 
-: mandel-main ( file -- )
+: mandel-main ( -- )
     "mandel.ppm" resource-path <file-writer>
     [ mandel write ] with-stream ;
 

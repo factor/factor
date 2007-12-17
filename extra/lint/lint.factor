@@ -13,7 +13,7 @@ SYMBOL: def-hash-keys
     2dup at -rot >r >r ?push r> r> set-at ;
 
 : add-word-def ( word quot -- )
-    dup quotation? [
+    dup callable? [
         def-hash get-global set-hash-vector
     ] [
         2drop
@@ -33,6 +33,7 @@ SYMBOL: def-hash-keys
         { [ drop drop drop ] 3drop }
         { [ 0 = ] zero? }
         { [ pop drop ] pop* }
+        { [ [ ] if ] when }
     } [ first2 swap add-word-def ] each ;
 
 : accessor-words ( -- seq )
@@ -108,13 +109,13 @@ M: object lint ( obj -- seq )
 : subseq/member? ( subseq/member seq -- ? )
     { [ 2dup start ] [ 2dup member? ] } || 2nip ;
 
-M: quotation lint ( quot -- seq )
+M: callable lint ( quot -- seq )
     def-hash-keys get [
         swap subseq/member?
     ] curry* subset ;
 
 M: word lint ( word -- seq )
-    word-def dup quotation? [ lint ] [ drop f ] if ;
+    word-def dup callable? [ lint ] [ drop f ] if ;
 
 : word-path. ( word -- )
     [ word-vocabulary ":" ] keep unparse 3append write nl ;

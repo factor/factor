@@ -4,7 +4,7 @@ USING: arrays documents ui.clipboards ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
 ui.gadgets.scrollers ui.gadgets.theme ui.render ui.gestures io
 kernel math models namespaces opengl opengl.gl sequences strings
-io.styles math.vectors sorting colors combinators ;
+io.styles math.vectors sorting colors combinators assocs ;
 IN: ui.gadgets.editors
 
 TUPLE: editor
@@ -34,13 +34,9 @@ focused? ;
 : field-theme ( gadget -- )
     gray <solid> swap set-gadget-boundary ;
 
-: construct-editor ( class -- tuple )
-    >r <editor> { set-gadget-delegate } r> construct
+: construct-editor ( object class -- tuple )
+    >r { set-gadget-delegate } r> construct
     dup dup set-editor-self ; inline
-
-TUPLE: source-editor ;
-
-: <source-editor> source-editor construct-editor ;
 
 : activate-editor-model ( editor model -- )
     2dup add-connection
@@ -94,8 +90,11 @@ M: editor ungraft*
         rot editor-line x>offset ,
     ] { } make ;
 
+: clicked-loc ( editor -- loc )
+    [ hand-rel ] keep point>loc ;
+
 : click-loc ( editor model -- )
-    >r [ hand-rel ] keep point>loc r> set-model ;
+    >r clicked-loc r> set-model ;
 
 : focus-editor ( editor -- )
     t over set-editor-focused? relayout-1 ;
@@ -244,11 +243,37 @@ M: editor user-input*
 
 M: editor gadget-text* editor-string % ;
 
-: start-selection ( editor -- )
-    dup editor-caret click-loc ;
-
 : extend-selection ( editor -- )
-    dup request-focus start-selection ;
+    dup request-focus dup editor-caret click-loc ;
+
+: mouse-elt ( -- elelement )
+    hand-click# get {
+        { 2 T{ one-word-elt } }
+        { 3 T{ one-line-elt } }
+    } at T{ one-char-elt } or ;
+
+: drag-direction? ( loc editor -- ? )
+    editor-mark* <=> 0 < ;
+
+: drag-selection-caret ( loc editor element -- loc )
+    >r [ drag-direction? ] 2keep
+    gadget-model
+    r> prev/next-elt ? ;
+
+: drag-selection-mark ( loc editor element -- loc )
+    >r [ drag-direction? not ] 2keep
+    nip dup editor-mark* swap gadget-model
+    r> prev/next-elt ? ;
+
+: drag-caret&mark ( editor -- caret mark )
+    dup clicked-loc swap mouse-elt
+    [ drag-selection-caret ] 3keep
+    drag-selection-mark ;
+
+: drag-selection ( editor -- )
+    dup drag-caret&mark
+    pick editor-mark set-model
+    swap editor-caret set-model ;
 
 : editor-cut ( editor clipboard -- )
     dupd gadget-copy remove-selection ;
@@ -291,22 +316,10 @@ M: editor gadget-text* editor-string % ;
 
 : end-of-document ( editor -- ) T{ doc-elt } editor-next ;
 
-: selected-word ( editor -- string )
-    dup gadget-selection? [
-        dup T{ one-word-elt } select-elt
-    ] unless gadget-selection ;
-
-: (position-caret) ( editor -- )
-    dup extend-selection
-    dup editor-mark click-loc ;
-
 : position-caret ( editor -- )
-    hand-click# get {
-        { 1 [ (position-caret) ] }
-        { 2 [ T{ one-word-elt } select-elt ] }
-        { 3 [ T{ one-line-elt } select-elt ] }
-        [ 2drop ]
-    } case ;
+    mouse-elt dup T{ one-char-elt } =
+    [ drop dup extend-selection dup editor-mark click-loc ]
+    [ select-elt ] if ;
 
 : insert-newline "\n" swap user-input ;
 
@@ -323,9 +336,6 @@ M: editor gadget-text* editor-string % ;
 : delete-to-end-of-line T{ one-line-elt } editor-backspace ;
 
 editor "general" f {
-    { T{ key-down f f "RET" } insert-newline }
-    { T{ key-down f { S+ } "RET" } insert-newline }
-    { T{ key-down f f "ENTER" } insert-newline }
     { T{ key-down f f "DELETE" } delete-next-character }
     { T{ key-down f { S+ } "DELETE" } delete-next-character }
     { T{ key-down f f "BACKSPACE" } delete-previous-character }
@@ -386,6 +396,11 @@ editor "caret-motion" f {
 
 : select-word T{ one-word-elt } select-elt ;
 
+: selected-word ( editor -- string )
+    dup gadget-selection?
+    [ dup select-word ] unless
+    gadget-selection ;
+
 : select-previous-character T{ char-elt } editor-select-prev ;
 
 : select-next-character T{ char-elt } editor-select-next ;
@@ -408,7 +423,7 @@ editor "caret-motion" f {
 
 editor "selection" f {
     { T{ button-down f { S+ } } extend-selection }
-    { T{ drag } start-selection }
+    { T{ drag } drag-selection }
     { T{ gain-focus } focus-editor }
     { T{ lose-focus } unfocus-editor }
     { T{ delete-action } remove-selection }
@@ -425,6 +440,23 @@ editor "selection" f {
     { T{ key-down f { S+ C+ } "HOME" } select-start-of-document }
     { T{ key-down f { S+ C+ } "END" } select-end-of-document }
 } define-command-map
+
+! Multi-line editors
+TUPLE: multiline-editor ;
+
+: <multiline-editor> ( -- editor )
+    <editor> multiline-editor construct-editor ;
+
+multiline-editor "general" f {
+    { T{ key-down f f "RET" } insert-newline }
+    { T{ key-down f { S+ } "RET" } insert-newline }
+    { T{ key-down f f "ENTER" } insert-newline }
+} define-command-map
+
+TUPLE: source-editor ;
+
+: <source-editor> ( -- editor )
+    <multiline-editor> source-editor construct-editor ;
 
 ! Fields are like editors except they edit an external model
 TUPLE: field model editor ;

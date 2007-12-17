@@ -13,7 +13,7 @@ IN: io.unix.mmap
 M: unix-io <mapped-file> ( path length -- obj )
     swap >r
     dup PROT_READ PROT_WRITE bitor MAP_FILE MAP_SHARED bitor
-    r> mmap-open \ mapped-file construct-boa ;
+    r> mmap-open f mapped-file construct-boa ;
 
 M: unix-io (close-mapped-file) ( mmap -- )
     [ mapped-file-address ] keep
