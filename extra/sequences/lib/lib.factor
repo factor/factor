@@ -104,3 +104,12 @@ PRIVATE>
 
 : power-set ( seq -- subsets )
     2 over length exact-number-strings swap [ nths ] curry map ;
+
+: push-either ( elt quot accum1 accum2 -- )
+    >r >r keep swap r> r> ? push ; inline
+
+: 2pusher ( quot -- quot accum1 accum2 )
+    V{ } clone V{ } clone [ [ push-either ] 3curry ] 2keep ; inline
+
+: partition ( seq quot -- trueseq falseseq )
+    over >r 2pusher >r >r each r> r> r> drop ; inline
