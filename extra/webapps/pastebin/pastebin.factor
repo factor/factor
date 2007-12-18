@@ -84,28 +84,37 @@ C: <annotation> annotation
         store save-store
     ] keep paste-link permanent-redirect ;
 
+\ new-paste
 \ submit-paste {
-    { "summary" "- no summary -" v-default }
-    { "author" "- no author -" v-default }
-    { "channel" "#concatenative" v-default }
-    { "mode" "factor" v-default }
+    { "summary" v-required }
+    { "author" v-required }
+    { "channel" }
+    { "mode" v-required }
     { "contents" v-required }
-} define-action
+} define-form
+
+\ new-paste {
+    { "channel" "#concatenative" }
+    { "mode" "factor" }
+} default-values
 
 : annotate-paste ( n summary author mode contents -- )
     <annotation> swap get-paste
-    paste-annotations push
-    store save-store ;
+    [ paste-annotations push store save-store ] keep
+    paste-link permanent-redirect ;
 
+[ "n" show-paste ]
 \ annotate-paste {
     { "n" v-required v-number }
-    { "summary" "- no summary -" v-default }
-    { "author" "- no author -" v-default }
-    { "mode" "factor" v-default }
+    { "summary" v-required }
+    { "author" v-required }
+    { "mode" v-required }
     { "contents" v-required }
-} define-action
+} define-form
 
-\ annotate-paste [ "n" show-paste ] define-redirect
+\ show-paste {
+    { "mode" "factor" }
+} default-values
 
 : style.css ( -- )
     "text/css" serving-content

@@ -33,9 +33,8 @@ help ;
 
 : <interactor> ( output -- gadget )
     <source-editor>
-    { set-interactor-output set-gadget-delegate }
-    interactor construct
-    dup dup set-editor-self
+    interactor construct-editor
+    tuck set-interactor-output
     dup init-interactor-history
     dup init-caret-help ;
 
