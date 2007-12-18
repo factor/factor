@@ -120,18 +120,18 @@ M: xml xml-inject >r delegate >r xml-inject ;
     dup tag? [ names-match? ] [ 2drop f ] if ;
 
 : tag-named* ( tag name/string -- matching-tag )
-    assure-name swap [ dupd tag-matches? ] xml-find nip ;
+    assure-name swap [ dupd tag-named? ] xml-find nip ;
 
 : tags-named* ( tag name/string -- tags-seq )
-    assure-name swap [ dupd tag-matches? ] xml-subset nip ;
+    assure-name swap [ dupd tag-named? ] xml-subset nip ;
 
 : tag-named ( tag name/string -- matching-tag )
     ! like get-name-tag but only looks at direct children,
     ! not all the children down the tree.
-    assure-name swap [ tag-matches? ] curry* find nip ;
+    assure-name swap [ tag-named? ] curry* find nip ;
 
 : tags-named ( tag name/string -- tags-seq )
-    assure-name swap [ tag-matches? ] curry* subset ;
+    assure-name swap [ tag-named? ] curry* subset ;
 
 : assert-tag ( name name -- )
     names-match? [ "Unexpected XML tag found" throw ] unless ;
