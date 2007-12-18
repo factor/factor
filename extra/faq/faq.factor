@@ -9,7 +9,7 @@ IN: faq
     over >r find r> rot 1+ tail ; inline
 
 : tag-named? ( tag name -- ? )
-    assure-name swap (get-tag) ;
+    assure-name swap tag-named? ;
 
 ! Questions
 TUPLE: q/a question answer ;
