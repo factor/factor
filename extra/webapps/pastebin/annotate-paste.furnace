@@ -6,16 +6,16 @@
 
 <table>
 
-<input type="hidden" name="n" value="<% "n" get number>string write %>" />
-
 <tr>
 <th align="right">Summary:</th>
-<td><input type="TEXT" name="summary" value="" /></td>
+<td><input type="TEXT" name="summary" value="<% "summary" render %>" /></td>
+<td align="left" class="error"><% "summary" "*Required" render-error %></td>
 </tr>
 
 <tr>
 <th align="right">Your name:</th>
-<td><input type="TEXT" name="author" value="" /></td>
+<td><input type="TEXT" name="author" value="<% "author" render  %>" /></td>
+<td class="error"><% "author" "*Required" render-error %></td>
 </tr>
 
 <tr>
@@ -23,11 +23,25 @@
 <td><% "modes" render-template %></td>
 </tr>
 
+<!--
+<tr>
+<th align="right">Channel:</th>
+<td><input type="TEXT" name="channel" value="#concatenative" /></td>
+</tr>
+-->
+
+<tr>
+<td></td>
+<td colspan="2" class="error" align="left"><% "contents" "*Required" render-error %></td>
+</tr>
+
 <tr>
 <th align="right" valign="top">Content:</th>
-<td><textarea rows="24" cols="60" name="contents"></textarea></td>
+<td colspan="2"><textarea rows="24" cols="60" name="contents"><% "contents" render %></textarea></td>
 </tr>
 </table>
 
+<input type="hidden" name="n" value="<% "n" get number>string write %>" />
+<input type="hidden" name="furnace-form-submitted" value="annotate-paste"/>
 <input type="SUBMIT" value="Annotate" />
 </form>
