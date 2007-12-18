@@ -1,5 +1,6 @@
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions mirrors ;
+USING: arrays math.parser sorting strings ;
 IN: sequences.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -104,3 +105,20 @@ PRIVATE>
 
 : power-set ( seq -- subsets )
     2 over length exact-number-strings swap [ nths ] curry map ;
+
+: cut-find ( seq pred -- before after )
+    dupd find drop dup [ cut ] when ;
+
+: cut3 ( seq pred -- first mid last )
+    [ cut-find ] keep [ not ] compose cut-find ;
+
+: (cut-all) ( seq pred quot -- )
+    [ >r cut3 r> dip >r >r , r> [ , ] when* r> ] 2keep
+    pick [ (cut-all) ] [ 3drop ] if ;
+
+: cut-all ( seq pred quot -- first mid last )
+    [ (cut-all) ] { } make ;
+
+: human-sort ( seq -- newseq )
+    [ dup [ digit? ] [ string>number ] cut-all ] { } map>assoc
+    sort-values keys ;
