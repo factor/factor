@@ -120,10 +120,10 @@ M: xml xml-inject >r delegate >r xml-inject ;
     dup tag? [ names-match? ] [ 2drop f ] if ;
 
 : tag-named* ( tag name/string -- matching-tag )
-    assure-name swap [ dupd tag-named? ] xml-find nip ;
+    assure-name [ swap tag-named? ] curry xml-find ;
 
 : tags-named* ( tag name/string -- tags-seq )
-    assure-name swap [ dupd tag-named? ] xml-subset nip ;
+    assure-name [ swap tag-named? ] curry xml-subset ;
 
 : tag-named ( tag name/string -- matching-tag )
     ! like get-name-tag but only looks at direct children,
@@ -144,7 +144,7 @@ M: xml xml-inject >r delegate >r xml-inject ;
     >r 1vector r> insert-children ;
 
 : tag-with-attr? ( elem attr-value attr-name -- ? )
-    rot dup tag? [ at = ] [ drop f ] if ;
+    rot dup tag? [ at = ] [ 3drop f ] if ;
 
 : tag-with-attr ( tag attr-value attr-name -- matching-tag )
     assure-name [ tag-with-attr? ] 2curry find nip ;
@@ -153,7 +153,7 @@ M: xml xml-inject >r delegate >r xml-inject ;
     assure-name [ tag-with-attr? ] 2curry subset ;
 
 : tag-with-attr* ( tag attr-value attr-name -- matching-tag )
-    assure-name [ tag-with-attr? ] 2curry xml-find nip ;
+    assure-name [ tag-with-attr? ] 2curry xml-find ;
 
 : tags-with-attr* ( tag attr-value attr-name -- tags-seq )
     assure-name [ tag-with-attr? ] 2curry xml-subset ;
