@@ -48,11 +48,10 @@ HELP: literal-table
 { $var-description "Holds a vector of literal objects referenced from the currently compiling word. If " { $link compiled-stack-traces? } " is on, " { $link init-generator } " ensures that the first entry is the word being compiled." } ;
 
 HELP: init-generator
-{ $values { "word" word } }
 { $description "Prepares to generate machine code for a word." } ;
 
 HELP: generate-1
-{ $values { "label" word } { "node" "a dataflow node" } { "quot" "a quotation with stack effect " { $snippet "( node -- )" } } }
+{ $values { "word" word } { "label" word } { "node" "a dataflow node" } { "quot" "a quotation with stack effect " { $snippet "( node -- )" } } }
 { $description "Generates machine code for " { $snippet "label" } " by applying the quotation to the dataflow node." } ;
 
 HELP: generate-node

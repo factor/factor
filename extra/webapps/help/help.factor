@@ -6,18 +6,19 @@ USING: kernel furnace furnace.validator http.server.responders
        arrays io.files ;
 IN: webapps.help 
 
+! : string>topic ( string -- topic )
+    ! " " split dup length 1 = [ first ] when ;
+
 : show-help ( topic -- )
     serving-html
     dup article-title [
         [ help ] with-html-stream
     ] simple-html-document ;
 
-: string>topic ( string -- topic )
-    " " split dup length 1 = [ first ] when ;
-
 \ show-help {
-    { "topic" "handbook" v-default string>topic }
+    { "topic" }
 } define-action
+\ show-help { { "topic" "handbook" } } default-values
 
 M: link browser-link-href
     link-name
@@ -32,9 +33,10 @@ M: link browser-link-href
     lookup show-help ;
 
 \ show-word {
-    { "word" "call" v-default }
-    { "vocab" "kernel" v-default }
+    { "word" }
+    { "vocab" }
 } define-action
+\ show-word { { "word" "call" } { "vocab" "kernel" } } default-values
 
 M: f browser-link-href
     drop \ f browser-link-href ;
@@ -47,8 +49,10 @@ M: word browser-link-href
     f >vocab-link show-help ;
 
 \ show-vocab {
-    { "vocab" "kernel" v-default }
+    { "vocab" }
 } define-action
+
+\ show-vocab { { "vocab" "kernel" } } default-values
 
 M: vocab-spec browser-link-href
     vocab-name [ show-vocab ] curry quot-link ;
@@ -82,4 +86,4 @@ PREDICATE: pathname resource-pathname
 M: resource-pathname browser-link-href
     pathname-string
     "resource:" ?head drop
-    "/responder/resources/" swap append ;
+    "/responder/source/" swap append ;

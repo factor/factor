@@ -1,22 +1,18 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser-combinators regexp lazy-lists sequences kernel
-promises ;
+promises strings ;
 IN: globs
 
 <PRIVATE
 
-: 'char'
-    [ ",*?" member? not ] satisfy ;
+: 'char' [ ",*?" member? not ] satisfy ;
 
-: 'string'
-    'char' <+> [ token ] <@ ;
+: 'string' 'char' <+> [ >lower token ] <@ ;
 
-: 'escaped-char'
-    "\\" token any-char-parser &> [ 1token ] <@ ;
+: 'escaped-char' "\\" token any-char-parser &> [ 1token ] <@ ;
 
-: 'escaped-string'
-    'string' 'escaped-char' <|> ;
+: 'escaped-string' 'string' 'escaped-char' <|> ;
 
 DEFER: 'term'
 
@@ -39,4 +35,4 @@ PRIVATE>
 : <glob> 'glob' just parse-1 just ;
 
 : glob-matches? ( input glob -- ? )
-    <glob> parse nil? not ;
+    >r >lower r> <glob> parse nil? not ;

@@ -219,6 +219,9 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 		ret = sigaction(signum, act, oldact);
 	}
 	while(ret == -1 && errno == EINTR);
+
+	if(ret == -1)
+		fatal_error("sigaction failed", 0);
 }
 
 void unix_init_signals(void)

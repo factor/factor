@@ -1010,7 +1010,8 @@ FUNCTION: HANDLE GetStdHandle ( DWORD nStdHandle ) ;
 ! FUNCTION: GetSystemDefaultLCID
 ! FUNCTION: GetSystemDefaultUILanguage
 ! FUNCTION: GetSystemDirectoryA
-! FUNCTION: GetSystemDirectoryW
+FUNCTION: UINT GetSystemDirectoryW ( LPTSTR lpBuffer, UINT uSize ) ;
+: GetSystemDirectory GetSystemDirectoryW ; inline
 FUNCTION: void GetSystemInfo ( LPSYSTEM_INFO lpSystemInfo ) ;
 ! FUNCTION: GetSystemPowerStatus
 ! FUNCTION: GetSystemRegistryQuota
@@ -1019,7 +1020,8 @@ FUNCTION: void GetSystemTime ( LPSYSTEMTIME lpSystemTime ) ;
 FUNCTION: void GetSystemTimeAsFileTime ( LPFILETIME lpSystemTimeAsFileTime ) ;
 ! FUNCTION: GetSystemTimes
 ! FUNCTION: GetSystemWindowsDirectoryA
-! FUNCTION: GetSystemWindowsDirectoryW
+FUNCTION: UINT GetSystemWindowsDirectoryW ( LPTSTR lpBuffer, UINT uSize ) ;
+: GetSystemWindowsDirectory GetSystemWindowsDirectoryW ; inline
 ! FUNCTION: GetSystemWow64DirectoryA
 ! FUNCTION: GetSystemWow64DirectoryW
 ! FUNCTION: GetTapeParameters
@@ -1057,7 +1059,8 @@ FUNCTION: BOOL GetVersionExW ( LPOSVERSIONINFO lpVersionInfo ) ;
 ! FUNCTION: GetVolumePathNamesForVolumeNameW
 ! FUNCTION: GetVolumePathNameW
 ! FUNCTION: GetWindowsDirectoryA
-! FUNCTION: GetWindowsDirectoryW
+FUNCTION: UINT GetWindowsDirectoryW ( LPTSTR lpBuffer, UINT uSize ) ;
+: GetWindowsDirectory GetWindowsDirectoryW ; inline
 ! FUNCTION: GetWriteWatch
 ! FUNCTION: GlobalAddAtomA
 ! FUNCTION: GlobalAddAtomW

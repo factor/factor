@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+<MODE NAME="ptl"			FILE="ptl.xml"
+				FILE_NAME_GLOB="*.ptl"/>
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="indentNextLines" VALUE="\s*[^#]{3,}:\s*(#.*)?" />
+		<PROPERTY NAME="lineComment" VALUE="#" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+
+		<IMPORT DELEGATE="python::MAIN"/>
+
+		<SEQ TYPE="KEYWORD4">[html]</SEQ>
+		<SEQ TYPE="KEYWORD4">[plain]</SEQ>
+
+		<KEYWORDS>
+			<LITERAL4>_q_access</LITERAL4>
+			<LITERAL4>_q_exports</LITERAL4>
+			<LITERAL4>_q_index</LITERAL4>
+			<LITERAL4>_q_lookup</LITERAL4>
+			<LITERAL4>_q_resolve</LITERAL4>
+			<LITERAL4>_q_exception_handler</LITERAL4>
+		</KEYWORDS>
+
+	</RULES>
+</MODE>

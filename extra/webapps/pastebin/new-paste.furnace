@@ -1,27 +1,51 @@
+<% USING: continuations furnace namespaces ; %>
+
+<%
+    "New paste" "title" set
+    "header" render-template
+%>
+
 <form method="POST" action="/responder/pastebin/submit-paste">
 
 <table>
 
 <tr>
-<th>Your name:</th>
-<td><input type="TEXT" name="author" value="" /></td>
+<th align="right">Summary:</th>
+<td><input type="TEXT" name="summary" value="<% "summary" render %>" /></td>
+<td align="left" class="error"><% "summary" "*Required" render-error %></td>
 </tr>
 
 <tr>
-<th>Summary:</th>
-<td><input type="TEXT" name="summary" value="" /></td>
+<th align="right">Your name:</th>
+<td><input type="TEXT" name="author" value="<% "author" render  %>" /></td>
+<td class="error"><% "author" "*Required" render-error %></td>
 </tr>
 
 <tr>
-<th>Channel:</th>
+<th align="right">File type:</th>
+<td><% "modes" render-template %></td>
+</tr>
+
+<!--
+<tr>
+<th align="right">Channel:</th>
 <td><input type="TEXT" name="channel" value="#concatenative" /></td>
 </tr>
+-->
 
 <tr>
-<th valign="top">Contents:</th>
-<td><textarea rows="24" cols="60" name="contents"></textarea></td>
+<td></td>
+<td colspan="2" class="error" align="left"><% "contents" "*Required" render-error %></td>
+</tr>
+
+<tr>
+<th align="right" valign="top">Content:</th>
+<td colspan="2"><textarea rows="24" cols="60" name="contents"><% "contents" render %></textarea></td>
 </tr>
 </table>
 
+<input type="hidden" name="furnace-form-submitted" value="new-paste"/>
 <input type="SUBMIT" value="Submit paste" />
 </form>
+
+<% "footer" render-template %>

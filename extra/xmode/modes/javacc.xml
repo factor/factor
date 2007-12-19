@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+    <PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+		<!-- Auto indent -->
+		 <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="indentNextLine"
+			VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+		<PROPERTY NAME="unindentThisLine"
+			VALUE="^.*(default:\s*|case.*:.*)$" />
+		<PROPERTY NAME="electricKeys" VALUE=":" />
+	</PROPS>
+    <RULES IGNORE_CASE="FALSE">
+        <IMPORT DELEGATE="java::MAIN"/>
+        
+        <KEYWORDS>
+            <KEYWORD1>EOF</KEYWORD1>
+            <KEYWORD1>IGNORE_CASE</KEYWORD1>
+            <KEYWORD1>JAVACODE</KEYWORD1>
+            <KEYWORD1>LOOKAHEAD</KEYWORD1>
+            <KEYWORD1>MORE</KEYWORD1>
+            <KEYWORD1>PARSER_BEGIN</KEYWORD1>
+            <KEYWORD1>PARSER_END</KEYWORD1>
+            <KEYWORD1>SKIP</KEYWORD1>
+            <KEYWORD1>SPECIAL_TOKEN</KEYWORD1>
+            <KEYWORD1>TOKEN</KEYWORD1>
+            <KEYWORD1>TOKEN_MGR_DECLS</KEYWORD1>
+            <KEYWORD1>options</KEYWORD1>
+        </KEYWORDS>
+    </RULES>
+</MODE>

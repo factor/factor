@@ -1,0 +1,829 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+	ActionScript mode by Ben Glazer <ben@enspire.com>
+	Adapted from JavaScript mode by Andre Kaplan
+	Updated for Flash MX 2004 by Nahuel Foronda <www.asfusion.com>
+-->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<!-- the ; hack is there so that stuff like if(bob) fred();
+		     does not indent the next line -->
+		<PROPERTY NAME="indentPrevLine" VALUE="\s*(if|while)\s*(|else|case|default:)[^;]*|for\s*\(.*)" />
+		<!-- set this to 'true' if you want to use GNU coding style -->
+		<PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+	</PROPS>
+
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- whitespace: (space and tab) -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+		<SEQ TYPE="NULL">)</SEQ>
+		<SEQ TYPE="NULL">(</SEQ>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR"
+			AT_LINE_START="TRUE">:</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+
+		<KEYWORDS>
+			<!-- ActionScript's reserved words (see AS:TDG p.332) -->
+			<KEYWORD1>add</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>and</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>delete</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>eq</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>ge</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>gt</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>ifFrameLoaded</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>le</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>lt</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>ne</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>not</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>on</KEYWORD1>
+			<KEYWORD1>onClipEvent</KEYWORD1>
+			<KEYWORD1>or</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>return</KEYWORD1>
+			<LITERAL2>this</LITERAL2>
+			<KEYWORD1>tellTarget</KEYWORD1>   <!-- deprecated -->
+			<KEYWORD1>typeof</KEYWORD1>
+			<KEYWORD1>var</KEYWORD1>
+			<KEYWORD3>void</KEYWORD3>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>with</KEYWORD1>
+
+			<!-- Built-in objects (good idea not to use these names!)-->
+			<KEYWORD3>Array</KEYWORD3>
+			<KEYWORD3>Boolean</KEYWORD3>
+			<KEYWORD3>Color</KEYWORD3>
+			<KEYWORD3>Date</KEYWORD3>
+			<KEYWORD3>Function</KEYWORD3>
+			<KEYWORD3>Key</KEYWORD3>
+			<KEYWORD3>MovieClip</KEYWORD3>
+			<KEYWORD3>Math</KEYWORD3>
+			<KEYWORD3>Mouse</KEYWORD3>
+			<KEYWORD3>Number</KEYWORD3>
+			<KEYWORD3>Object</KEYWORD3>
+			<KEYWORD3>Selection</KEYWORD3>
+			<KEYWORD3>Sound</KEYWORD3>
+			<KEYWORD3>String</KEYWORD3>
+			<KEYWORD3>XML</KEYWORD3>
+			<KEYWORD3>XMLNode</KEYWORD3>
+			<KEYWORD3>XMLSocket</KEYWORD3>
+
+			<!-- Literals -->
+			<LITERAL2>NaN</LITERAL2>
+			<LITERAL2>Infinity</LITERAL2>
+			<LITERAL2>false</LITERAL2>
+			<LITERAL2>null</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+			<LITERAL2>undefined</LITERAL2>
+
+			<!-- Global functions -->
+			<LITERAL2>Boolean</LITERAL2>
+			<LITERAL2>call</LITERAL2>
+			<LITERAL2>Date</LITERAL2>
+			<LITERAL2>escape</LITERAL2>
+			<LITERAL2>eval</LITERAL2>
+			<LITERAL2>fscommand</LITERAL2>
+			<LITERAL2>getProperty</LITERAL2>
+			<LITERAL2>getTimer</LITERAL2>
+			<LITERAL2>getURL</LITERAL2>
+			<LITERAL2>getVersion</LITERAL2>
+			<LITERAL2>gotoAndPlay</LITERAL2>
+			<LITERAL2>gotoAndStop</LITERAL2>
+			<LITERAL2>#include</LITERAL2>
+			<LITERAL2>int</LITERAL2>   <!-- deprecated -->
+			<LITERAL2>isFinite</LITERAL2>
+			<LITERAL2>isNaN</LITERAL2>
+			<LITERAL2>loadMovie</LITERAL2>
+			<LITERAL2>loadMovieNum</LITERAL2>
+			<LITERAL2>loadVariables</LITERAL2>
+			<LITERAL2>loadVariablesNum</LITERAL2>
+			<LITERAL2>maxscroll</LITERAL2>
+			<LITERAL2>newline</LITERAL2>
+			<LITERAL2>nextFrame</LITERAL2>
+			<LITERAL2>nextScene</LITERAL2>
+			<LITERAL2>Number</LITERAL2>
+			<LITERAL2>parseFloat</LITERAL2>
+			<LITERAL2>parseInt</LITERAL2>
+			<LITERAL2>play</LITERAL2>
+			<LITERAL2>prevFrame</LITERAL2>
+			<LITERAL2>prevScene</LITERAL2>
+			<LITERAL2>print</LITERAL2>
+			<LITERAL2>printAsBitmap</LITERAL2>
+			<LITERAL2>printAsBitmapNum</LITERAL2>
+			<LITERAL2>printNum</LITERAL2>
+			<LITERAL2>random</LITERAL2>   <!-- deprecated -->
+			<LITERAL2>removeMovieClip</LITERAL2>
+			<LITERAL2>scroll</LITERAL2>
+			<LITERAL2>setProperty</LITERAL2>
+			<LITERAL2>startDrag</LITERAL2>
+			<LITERAL2>stop</LITERAL2>
+			<LITERAL2>stopAllSounds</LITERAL2>
+			<LITERAL2>stopDrag</LITERAL2>
+			<LITERAL2>String</LITERAL2>
+			<LITERAL2>targetPath</LITERAL2>
+			<LITERAL2>tellTarget</LITERAL2>   <!-- deprecated -->
+			<LITERAL2>toggleHighQuality</LITERAL2>   <!-- deprecated -->
+			<LITERAL2>trace</LITERAL2>
+			<LITERAL2>unescape</LITERAL2>
+			<LITERAL2>unloadMovie</LITERAL2>
+			<LITERAL2>unloadMovieNum</LITERAL2>
+			<LITERAL2>updateAfterEvent</LITERAL2>
+
+			 <!-- Start Update -->
+			<LITERAL2>prototype</LITERAL2>
+			<LITERAL2>clearInterval</LITERAL2>
+			<LITERAL2>getVersion</LITERAL2>
+			<LITERAL2>length</LITERAL2>
+			<LITERAL2>__proto__</LITERAL2>
+			<LITERAL2>__constructor__</LITERAL2>
+			<LITERAL2>ASSetPropFlags</LITERAL2>
+			<LITERAL2>setInterval</LITERAL2>
+			<LITERAL2>setI</LITERAL2>
+			<KEYWORD3>MMExecute</KEYWORD3>
+
+			 <!-- MovieCLip methods-->
+			<LITERAL2>attachMovie</LITERAL2>
+			<LITERAL2>createEmptyMovieClip</LITERAL2>
+			<LITERAL2>createTextField</LITERAL2>
+			<LITERAL2>duplicateMovieClip</LITERAL2>
+			<LITERAL2>getBounds</LITERAL2>
+			<LITERAL2>getBytesLoaded</LITERAL2>
+			<LITERAL2>getBytesTotal</LITERAL2>
+			<LITERAL2>getDepth</LITERAL2>
+			<LITERAL2>globalToLocal</LITERAL2>
+			<LITERAL2>hitTest</LITERAL2>
+			<LITERAL2>localToGlobal</LITERAL2>
+			<LITERAL2>setMask</LITERAL2>
+			<LITERAL2>swapDepths</LITERAL2>
+			<LITERAL2>attachAudio</LITERAL2>
+			<LITERAL2>getInstanceAtDepth</LITERAL2>
+			<LITERAL2>getNextHighestDepth</LITERAL2>
+			<LITERAL2>getSWFVersion</LITERAL2>
+			<LITERAL2>getTextSnapshot</LITERAL2>
+			<LITERAL2>getSWFVersion</LITERAL2>
+			<LITERAL2>getSWFVersion</LITERAL2>
+
+			<!-- MovieCLip drawing methods  -->
+			<LITERAL2>beginFill</LITERAL2>
+			<LITERAL2>beginGradientFill</LITERAL2>
+			<LITERAL2>clear</LITERAL2>
+			<LITERAL2>curveTo</LITERAL2>
+			<LITERAL2>endFill</LITERAL2>
+			<LITERAL2>lineStyle</LITERAL2>
+			<LITERAL2>lineTo</LITERAL2>
+			<LITERAL2>moveTo</LITERAL2>
+
+			<!-- MovieCLip properties  -->
+			<LITERAL2>enabled</LITERAL2>
+			<LITERAL2>focusEnabled</LITERAL2>
+			<LITERAL2>hitArea</LITERAL2>
+			<LITERAL2>tabChildren</LITERAL2>
+			<LITERAL2>tabEnabled</LITERAL2>
+			<LITERAL2>tabIndex</LITERAL2>
+			<LITERAL2>trackAsMenu</LITERAL2>
+			<LITERAL2>menu</LITERAL2>
+			<LITERAL2>useHandCursor</LITERAL2>
+
+			<!-- MovieCLip Events  -->
+			<LITERAL2>onData</LITERAL2>
+			<LITERAL2>onDragOut</LITERAL2>
+			<LITERAL2>onDragOver</LITERAL2>
+			<LITERAL2>onEnterFrame</LITERAL2>
+			<LITERAL2>onKeyDown</LITERAL2>
+			<LITERAL2>onKeyUp</LITERAL2>
+			<LITERAL2>onKillFocus</LITERAL2>
+			<LITERAL2>onLoad</LITERAL2>
+			<LITERAL2>onMouseDown</LITERAL2>
+			<LITERAL2>onMouseMove</LITERAL2>
+			<LITERAL2>onMouseUp</LITERAL2>
+			<LITERAL2>onPress</LITERAL2>
+			<LITERAL2>onRelease</LITERAL2>
+			<LITERAL2>onReleaseOutside</LITERAL2>
+			<LITERAL2>onRollOut</LITERAL2>
+			<LITERAL2>onRollOver</LITERAL2>
+			<LITERAL2>onSetFocus</LITERAL2>
+			<LITERAL2>onUnload</LITERAL2>
+
+			<!-- MovieClipLoader class -->
+			<LITERAL2>MovieClipLoader</LITERAL2>
+			<LITERAL2>getProgress</LITERAL2>
+			<LITERAL2>loadClip</LITERAL2>
+			<LITERAL2>onLoadComplete</LITERAL2>
+			<LITERAL2>onLoadError</LITERAL2>
+			<LITERAL2>onLoadInit</LITERAL2>
+			<LITERAL2>onLoadProgress</LITERAL2>
+			<LITERAL2>onLoadStart</LITERAL2>
+			<LITERAL2>unloadClip</LITERAL2>
+
+			<!-- PrintJob class -->
+			<LITERAL2>PrintJob</LITERAL2>
+			<LITERAL2>addPage</LITERAL2>
+
+			<!-- Camera class -->
+			<LITERAL2>Camera</LITERAL2>
+			<LITERAL2>activityLevel</LITERAL2>
+			<LITERAL2>bandwidth</LITERAL2>
+			<LITERAL2>currentFps</LITERAL2>
+			<LITERAL2>fps</LITERAL2>
+			<LITERAL2>index</LITERAL2>
+			<LITERAL2>motionLevel</LITERAL2>
+			<LITERAL2>motionTimeOut</LITERAL2>
+			<LITERAL2>muted</LITERAL2>
+			<LITERAL2>name</LITERAL2>
+			<LITERAL2>names</LITERAL2>
+			<LITERAL2>onActivity</LITERAL2>
+			<LITERAL2>onStatus</LITERAL2>
+			<LITERAL2>quality</LITERAL2>
+			<LITERAL2>setMode</LITERAL2>
+			<LITERAL2>setMotionLevel</LITERAL2>
+			<LITERAL2>setQuality</LITERAL2>
+
+			<!-- Microphone class -->
+			<LITERAL2>Microphone</LITERAL2>
+			<LITERAL2>gain</LITERAL2>
+			<LITERAL2>rate</LITERAL2>
+			<LITERAL2>setGain</LITERAL2>
+			<LITERAL2>setRate</LITERAL2>
+			<LITERAL2>setSilenceLevel</LITERAL2>
+			<LITERAL2>setUseEchoSuppression</LITERAL2>
+			<LITERAL2>silenceLevel</LITERAL2>
+			<LITERAL2>silenceTimeout</LITERAL2>
+			<LITERAL2>useEchoSuppression</LITERAL2>
+
+			<!-- ContextMenu Class -->
+			<LITERAL2>ContextMenu</LITERAL2>
+			<LITERAL2>builtInItems</LITERAL2>
+			<LITERAL2>copy</LITERAL2>
+			<LITERAL2>customItems</LITERAL2>
+			<LITERAL2>hideBuiltInItems</LITERAL2>
+			<LITERAL2>onSelect</LITERAL2>
+			<LITERAL2>caption</LITERAL2>
+			<LITERAL2>ContextMenuItem</LITERAL2>
+			<LITERAL2>separatorBefore</LITERAL2>
+			<LITERAL2>visible</LITERAL2>
+
+			<!-- Error class -->
+			<LITERAL2>Error</LITERAL2>
+			<LITERAL2>visible</LITERAL2>
+			<LITERAL2>message</LITERAL2>
+
+			<!-- operators grenn-->
+			<KEYWORD1>instanceof</KEYWORD1>
+			<KEYWORD1>#endinitclip</KEYWORD1>
+			<KEYWORD1>#initclip</KEYWORD1>
+
+			<!-- properties -->
+			<LITERAL2>_alpha</LITERAL2>
+			<LITERAL2>_currentframe</LITERAL2>
+			<LITERAL2>_droptarget</LITERAL2>
+			<LITERAL2>_focusrect</LITERAL2>
+			<LITERAL2>_framesloaded</LITERAL2>
+			<LITERAL2>_height</LITERAL2>
+			<LITERAL2>_name</LITERAL2>
+			<LITERAL2>_quality</LITERAL2>
+			<LITERAL2>_rotation</LITERAL2>
+			<LITERAL2>_soundbuftime</LITERAL2>
+			<LITERAL2>_target</LITERAL2>
+			<LITERAL2>_totalframes</LITERAL2>
+			<LITERAL2>_url</LITERAL2>
+			<LITERAL2>_visible</LITERAL2>
+			<LITERAL2>_width</LITERAL2>
+			<LITERAL2>_x</LITERAL2>
+			<LITERAL2>_xmouse</LITERAL2>
+			<LITERAL2>_xscale</LITERAL2>
+			<LITERAL2>_y</LITERAL2>
+			<LITERAL2>_ymouse</LITERAL2>
+			<LITERAL2>_yscale</LITERAL2>
+			<LITERAL2>_parent</LITERAL2>
+			<LITERAL2>_root</LITERAL2>
+			<LITERAL2>_level</LITERAL2>
+			<LITERAL2>_lockroot</LITERAL2>
+			<LITERAL2>_accProps</LITERAL2>
+
+
+			<!-- Array -->
+			<LITERAL2>sortOn</LITERAL2>
+			<LITERAL2>toString</LITERAL2>
+			<LITERAL2>splice</LITERAL2>
+			<LITERAL2>sort</LITERAL2>
+			<LITERAL2>slice</LITERAL2>
+			<LITERAL2>shift</LITERAL2>
+			<LITERAL2>reverse</LITERAL2>
+			<LITERAL2>push</LITERAL2>
+			<LITERAL2>join</LITERAL2>
+			<LITERAL2>pop</LITERAL2>
+			<LITERAL2>concat</LITERAL2>
+			<LITERAL2>unshift</LITERAL2>
+
+			<!-- Arguments -->
+			<LITERAL2>arguments</LITERAL2>
+			<LITERAL2>callee</LITERAL2>
+			<LITERAL2>caller</LITERAL2>
+			<LITERAL2>valueOf</LITERAL2>
+
+			<!-- Date Class -->
+			<LITERAL2>getDate</LITERAL2>
+			<LITERAL2>getDay</LITERAL2>
+			<LITERAL2>getFullYear</LITERAL2>
+			<LITERAL2>getHours</LITERAL2>
+			<LITERAL2>getMilliseconds</LITERAL2>
+			<LITERAL2>getMinutes</LITERAL2>
+			<LITERAL2>getMonth</LITERAL2>
+			<LITERAL2>getSeconds</LITERAL2>
+			<LITERAL2>getTime</LITERAL2>
+			<LITERAL2>getTimezoneOffset</LITERAL2>
+			<LITERAL2>getUTCDate</LITERAL2>
+			<LITERAL2>getUTCDay</LITERAL2>
+			<LITERAL2>getUTCFullYear</LITERAL2>
+			<LITERAL2>getUTCHours</LITERAL2>
+			<LITERAL2>getUTCMilliseconds</LITERAL2>
+			<LITERAL2>getUTCMinutes</LITERAL2>
+			<LITERAL2>getUTCMonth</LITERAL2>
+			<LITERAL2>getUTCSeconds</LITERAL2>
+			<LITERAL2>getYear</LITERAL2>
+			<LITERAL2>setDate</LITERAL2>
+			<LITERAL2>setFullYear</LITERAL2>
+			<LITERAL2>setHours</LITERAL2>
+			<LITERAL2>setMilliseconds</LITERAL2>
+			<LITERAL2>setMinutes</LITERAL2>
+			<LITERAL2>setMonth</LITERAL2>
+			<LITERAL2>setSeconds</LITERAL2>
+			<LITERAL2>setTime</LITERAL2>
+			<LITERAL2>setUTCDate</LITERAL2>
+			<LITERAL2>setUTCFullYear</LITERAL2>
+			<LITERAL2>setUTCHours</LITERAL2>
+			<LITERAL2>setUTCMilliseconds</LITERAL2>
+			<LITERAL2>setUTCMinutes</LITERAL2>
+			<LITERAL2>setUTCMonth</LITERAL2>
+			<LITERAL2>setUTCSeconds</LITERAL2>
+			<LITERAL2>setYear</LITERAL2>
+			<LITERAL2>UTC</LITERAL2>
+
+			<!-- Function -->
+			<LITERAL2>_global</LITERAL2>
+			<LITERAL2>apply</LITERAL2>
+
+			<!--  Math Class -->
+			<LITERAL2>abs</LITERAL2>
+			<LITERAL2>acos</LITERAL2>
+			<LITERAL2>asin</LITERAL2>
+			<LITERAL2>atan</LITERAL2>
+			<LITERAL2>atan2</LITERAL2>
+			<LITERAL2>ceil</LITERAL2>
+			<LITERAL2>cos</LITERAL2>
+			<LITERAL2>exp</LITERAL2>
+			<LITERAL2>floor</LITERAL2>
+			<LITERAL2>log</LITERAL2>
+			<LITERAL2>max</LITERAL2>
+			<LITERAL2>min</LITERAL2>
+			<LITERAL2>pow</LITERAL2>
+			<LITERAL2>round</LITERAL2>
+			<LITERAL2>sin</LITERAL2>
+			<LITERAL2>sqrt</LITERAL2>
+			<LITERAL2>tan</LITERAL2>
+
+			<LITERAL2>E</LITERAL2>
+			<LITERAL2>LN2</LITERAL2>
+			<LITERAL2>LN10</LITERAL2>
+			<LITERAL2>LOG2E</LITERAL2>
+			<LITERAL2>LOG10E</LITERAL2>
+			<LITERAL2>PI</LITERAL2>
+			<LITERAL2>SQRT1_2</LITERAL2>
+			<LITERAL2>SQRT2</LITERAL2>
+
+			<!-- Number -->
+			<LITERAL2>MAX_VALUE</LITERAL2>
+			<LITERAL2>MIN_VALUE</LITERAL2>
+			<LITERAL2>NEGATIVE_INFINITY</LITERAL2>
+			<LITERAL2>POSITIVE_INFINITY</LITERAL2>
+
+			<!-- Object -->
+			<LITERAL2>addProperty</LITERAL2>
+			<LITERAL2>registerClass</LITERAL2>
+			<LITERAL2>unwatch</LITERAL2>
+			<LITERAL2>watch</LITERAL2>
+
+			<!-- String -->
+			<LITERAL2>charAt</LITERAL2>
+			<LITERAL2>charCodeAt</LITERAL2>
+			<LITERAL2>fromCharCode</LITERAL2>
+			<LITERAL2>lastIndexOf</LITERAL2>
+			<LITERAL2>indexOf</LITERAL2>
+			<LITERAL2>split</LITERAL2>
+			<LITERAL2>substr</LITERAL2>
+			<LITERAL2>substring</LITERAL2>
+			<LITERAL2>toLowerCase</LITERAL2>
+			<LITERAL2>toUpperCase</LITERAL2>
+
+			<!-- Accessibility -->
+			<LITERAL2>Accessibility</LITERAL2>
+			<LITERAL2>isActive</LITERAL2>
+			<LITERAL2>updateProperties</LITERAL2>
+
+
+			<!-- System capabilities Class-->
+			<LITERAL2>System</LITERAL2>
+			<LITERAL2>capabilities</LITERAL2>
+			<LITERAL2>exactSettings</LITERAL2>
+			<LITERAL2>setClipboard</LITERAL2>
+			<LITERAL2>showSettings</LITERAL2>
+			<LITERAL2>useCodepage</LITERAL2>
+			<LITERAL2>avHardwareDisable</LITERAL2>
+			<LITERAL2>hasAccessibility</LITERAL2>
+			<LITERAL2>hasAudio</LITERAL2>
+			<LITERAL2>hasAudioEncoder</LITERAL2>
+			<LITERAL2>hasMP3</LITERAL2>
+			<LITERAL2>hasVideoEncoder</LITERAL2>
+			<LITERAL2>pixelAspectRatio</LITERAL2>
+			<LITERAL2>screenColor</LITERAL2>
+			<LITERAL2>screenDPI</LITERAL2>
+			<LITERAL2>screenResolutionX</LITERAL2>
+			<LITERAL2>screenResolutionY</LITERAL2>
+			<LITERAL2>hasEmbeddedVideo</LITERAL2>
+			<LITERAL2>hasPrinting</LITERAL2>
+			<LITERAL2>hasScreenBroadcast</LITERAL2>
+			<LITERAL2>hasScreenPlayback</LITERAL2>
+			<LITERAL2>hasStreamingAudio</LITERAL2>
+			<LITERAL2>hasStreamingVideo</LITERAL2>
+			<LITERAL2>isDebugger</LITERAL2>
+			<LITERAL2>language</LITERAL2>
+			<LITERAL2>manufacturer</LITERAL2>
+			<LITERAL2>os</LITERAL2>
+			<LITERAL2>playerType</LITERAL2>
+			<LITERAL2>serverString</LITERAL2>
+			<LITERAL2>localFileReadDisable</LITERAL2>
+			<LITERAL2>version</LITERAL2>
+			<!-- System security Class -->
+			<LITERAL2>security</LITERAL2>
+
+			<!-- Color Class -->
+			<LITERAL2>getRGB</LITERAL2>
+			<LITERAL2>getTransform</LITERAL2>
+			<LITERAL2>setRGB</LITERAL2>
+			<LITERAL2>setTransform</LITERAL2>
+
+			<!-- Key Class -->
+			<LITERAL2>addListener</LITERAL2>
+			<LITERAL2>getAscii</LITERAL2>
+			<LITERAL2>isDown</LITERAL2>
+			<LITERAL2>getCode</LITERAL2>
+			<LITERAL2>isToggled</LITERAL2>
+			<LITERAL2>removeListener</LITERAL2>
+			<LITERAL2>BACKSPACE</LITERAL2>
+			<LITERAL2>CAPSLOCK</LITERAL2>
+			<LITERAL2>CONTROL</LITERAL2>
+			<LITERAL2>DELETEKEY</LITERAL2>
+			<LITERAL2>DOWN</LITERAL2>
+			<LITERAL2>END</LITERAL2>
+			<LITERAL2>ENTER</LITERAL2>
+			<LITERAL2>ESCAPE</LITERAL2>
+			<LITERAL2>HOME</LITERAL2>
+			<LITERAL2>INSERT</LITERAL2>
+			<LITERAL2>LEFT</LITERAL2>
+			<LITERAL2>PGDN</LITERAL2>
+			<LITERAL2>PGUP</LITERAL2>
+			<LITERAL2>SHIFT</LITERAL2>
+			<LITERAL2>RIGHT</LITERAL2>
+			<LITERAL2>SPACE</LITERAL2>
+			<LITERAL2>TAB</LITERAL2>
+			<LITERAL2>UP</LITERAL2>
+
+			<!-- Mouse -->
+			<LITERAL2>hide</LITERAL2>
+			<LITERAL2>show</LITERAL2>
+			<LITERAL2>onMouseWheel</LITERAL2>
+
+			<!-- Selection Class-->
+			<LITERAL2>getBeginIndex</LITERAL2>
+			<LITERAL2>getCaretIndex</LITERAL2>
+			<LITERAL2>getEndIndex</LITERAL2>
+			<LITERAL2>getFocus</LITERAL2>
+			<LITERAL2>setFocus</LITERAL2>
+			<LITERAL2>setSelection</LITERAL2>
+
+			<!-- SharedObject Class-->
+			<LITERAL2>SharedObject</LITERAL2>
+			<LITERAL2>data</LITERAL2>
+			<LITERAL2>flush</LITERAL2>
+			<LITERAL2>getLocal</LITERAL2>
+			<LITERAL2>getSize</LITERAL2>
+
+			<!-- Sound Class -->
+			<LITERAL2>attachSound</LITERAL2>
+			<LITERAL2>getVolume</LITERAL2>
+			<LITERAL2>loadSound</LITERAL2>
+			<LITERAL2>setPan</LITERAL2>
+			<LITERAL2>getPan</LITERAL2>
+			<LITERAL2>setVolume</LITERAL2>
+			<LITERAL2>start</LITERAL2>
+			<LITERAL2>duration</LITERAL2>
+			<LITERAL2>position</LITERAL2>
+			<LITERAL2>onSoundComplete</LITERAL2>
+			<LITERAL2>id3</LITERAL2>
+			<LITERAL2>onID3</LITERAL2>
+
+			<!-- Video Class -->
+			<LITERAL2>Video</LITERAL2>
+			<LITERAL2>deblocking</LITERAL2>
+			<LITERAL2>smoothing</LITERAL2>
+
+			<!--  Stage Class -->
+			<LITERAL2>Stage</LITERAL2>
+			<LITERAL2>align</LITERAL2>
+			<LITERAL2>height</LITERAL2>
+			<LITERAL2>scaleMode</LITERAL2>
+			<LITERAL2>showMenu</LITERAL2>
+			<LITERAL2>width</LITERAL2>
+			<LITERAL2>onResize</LITERAL2>
+
+			<!-- TextField Class -->
+			<LITERAL2>getFontList</LITERAL2>
+			<LITERAL2>getNewTextFormat</LITERAL2>
+			<LITERAL2>getTextFormat</LITERAL2>
+			<LITERAL2>removeTextField</LITERAL2>
+			<LITERAL2>replaceSel</LITERAL2>
+			<LITERAL2>setNewTextFormat</LITERAL2>
+			<LITERAL2>setTextFormat</LITERAL2>
+			<LITERAL2>autoSize</LITERAL2>
+			<LITERAL2>background</LITERAL2>
+			<LITERAL2>backgroundColor</LITERAL2>
+			<LITERAL2>border</LITERAL2>
+			<LITERAL2>borderColor</LITERAL2>
+			<LITERAL2>bottomScroll</LITERAL2>
+			<LITERAL2>embedFonts</LITERAL2>
+			<LITERAL2>hscroll</LITERAL2>
+			<LITERAL2>html</LITERAL2>
+			<LITERAL2>htmlText</LITERAL2>
+			<LITERAL2>maxChars</LITERAL2>
+			<LITERAL2>maxhscroll</LITERAL2>
+			<LITERAL2>multiline</LITERAL2>
+			<LITERAL2>password</LITERAL2>
+			<LITERAL2>restrict</LITERAL2>
+			<LITERAL2>selectable</LITERAL2>
+			<LITERAL2>text</LITERAL2>
+			<LITERAL2>textColor</LITERAL2>
+			<LITERAL2>textHeight</LITERAL2>
+			<LITERAL2>textWidth</LITERAL2>
+			<LITERAL2>type</LITERAL2>
+			<LITERAL2>variable</LITERAL2>
+			<LITERAL2>wordWrap</LITERAL2>
+			<LITERAL2>onChanged</LITERAL2>
+			<LITERAL2>onScroller</LITERAL2>
+			<LITERAL2>TextField</LITERAL2>
+			<LITERAL2>mouseWheelEnabled</LITERAL2>
+			<LITERAL2>replaceText</LITERAL2>
+
+			<!-- StyleSheet Class -->
+			<LITERAL2>StyleSheet</LITERAL2>
+			<LITERAL2>getStyle</LITERAL2>
+			<LITERAL2>getStyleNames</LITERAL2>
+			<LITERAL2>parseCSS</LITERAL2>
+			<LITERAL2>setStyle</LITERAL2>
+			<LITERAL2>styleSheet</LITERAL2>
+
+			<!-- TextFormat Class -->
+			<LITERAL2>TextFormat</LITERAL2>
+			<LITERAL2>getTextExtent</LITERAL2>
+			<LITERAL2>blockIndent</LITERAL2>
+			<LITERAL2>bold</LITERAL2>
+			<LITERAL2>bullet</LITERAL2>
+			<LITERAL2>color</LITERAL2>
+			<LITERAL2>font</LITERAL2>
+			<LITERAL2>indent</LITERAL2>
+			<LITERAL2>italic</LITERAL2>
+			<LITERAL2>leading</LITERAL2>
+			<LITERAL2>leftMargin</LITERAL2>
+			<LITERAL2>rightMargin</LITERAL2>
+			<LITERAL2>size</LITERAL2>
+			<LITERAL2>tabStops</LITERAL2>
+			<LITERAL2>target</LITERAL2>
+			<LITERAL2>underline</LITERAL2>
+			<LITERAL2>url</LITERAL2>
+
+			<!-- TextSnapshot object -->
+			<LITERAL2>TextSnapshot</LITERAL2>
+			<LITERAL2>findText</LITERAL2>
+			<LITERAL2>getCount</LITERAL2>
+			<LITERAL2>getSelected</LITERAL2>
+			<LITERAL2>getSelectedText</LITERAL2>
+			<LITERAL2>hitTestTextNearPos</LITERAL2>
+			<LITERAL2>getText</LITERAL2>
+			<LITERAL2>setSelectColor</LITERAL2>
+			<LITERAL2>setSelected</LITERAL2>
+
+			<!-- LoadVars Class-->
+			<LITERAL2>LoadVars</LITERAL2>
+			<LITERAL2>load</LITERAL2>
+			<LITERAL2>send</LITERAL2>
+			<LITERAL2>sendAndLoad</LITERAL2>
+			<LITERAL2>contentType</LITERAL2>
+			<LITERAL2>loaded</LITERAL2>
+			<LITERAL2>addRequestHeader</LITERAL2>
+
+			<!-- LocalConnection Class-->
+			<LITERAL2>LocalConnection</LITERAL2>
+			<LITERAL2>allowDomain</LITERAL2>
+			<LITERAL2>allowInsecureDomain</LITERAL2>
+			<LITERAL2>domain</LITERAL2>
+
+			<!-- XML Class -->
+			<LITERAL2>appendChild</LITERAL2>
+			<LITERAL2>cloneNode</LITERAL2>
+			<LITERAL2>createElement</LITERAL2>
+			<LITERAL2>createTextNode</LITERAL2>
+			<LITERAL2>hasChildNodes</LITERAL2>
+			<LITERAL2>insertBefore</LITERAL2>
+			<LITERAL2>parseXML</LITERAL2>
+			<LITERAL2>removeNode</LITERAL2>
+			<LITERAL2>attributes</LITERAL2>
+			<LITERAL2>childNodes</LITERAL2>
+			<LITERAL2>docTypeDecl</LITERAL2>
+			<LITERAL2>firstChild</LITERAL2>
+			<LITERAL2>ignoreWhite</LITERAL2>
+			<LITERAL2>lastChild</LITERAL2>
+			<LITERAL2>nextSibling</LITERAL2>
+			<LITERAL2>nodeName</LITERAL2>
+			<LITERAL2>nodeType</LITERAL2>
+			<LITERAL2>nodeValue</LITERAL2>
+			<LITERAL2>parentNode</LITERAL2>
+			<LITERAL2>previousSibling</LITERAL2>
+			<LITERAL2>status</LITERAL2>
+			<LITERAL2>xmlDecl</LITERAL2>
+			<LITERAL2>close</LITERAL2>
+			<LITERAL2>connect</LITERAL2>
+			<LITERAL2>onClose</LITERAL2>
+			<LITERAL2>onConnect</LITERAL2>
+			<LITERAL2>onXML</LITERAL2>
+
+			<!-- CustomActions Class -->
+			<LITERAL2>CustomActions</LITERAL2>
+			<LITERAL2>onUpdate</LITERAL2>
+			<LITERAL2>uninstall</LITERAL2>
+			<LITERAL2>list</LITERAL2>
+			<LITERAL2>install</LITERAL2>
+			<LITERAL2>get</LITERAL2>
+
+			<!-- NetConnection Class -->
+			<LITERAL2>NetConnection</LITERAL2>
+
+			<!-- NetStream Class-->
+			<LITERAL2>NetStream</LITERAL2>
+			<LITERAL2>bufferLength</LITERAL2>
+			<LITERAL2>bufferTime</LITERAL2>
+			<LITERAL2>bytesLoaded</LITERAL2>
+			<LITERAL2>bytesTotal</LITERAL2>
+			<LITERAL2>pause</LITERAL2>
+			<LITERAL2>seek</LITERAL2>
+			<LITERAL2>setBufferTime</LITERAL2>
+			<LITERAL2>time</LITERAL2>
+
+			<!-- RecordSet Class -->
+			<LITERAL2>DataGlue</LITERAL2>
+			<LITERAL2>bindFormatFunction</LITERAL2>
+			<LITERAL2>bindFormatStrings</LITERAL2>
+			<LITERAL2>getDebugConfig</LITERAL2>
+			<LITERAL2>getDebugID</LITERAL2>
+			<LITERAL2>getService</LITERAL2>
+			<LITERAL2>setCredentials</LITERAL2>
+			<LITERAL2>setDebugID</LITERAL2>
+			<LITERAL2>getDebug</LITERAL2>
+			<LITERAL2>setDebug</LITERAL2>
+			<LITERAL2>createGatewayConnection</LITERAL2>
+			<LITERAL2>NetServices</LITERAL2>
+			<LITERAL2>setDefaultGatewayURL</LITERAL2>
+			<LITERAL2>addItem</LITERAL2>
+			<LITERAL2>addItemAt</LITERAL2>
+			<LITERAL2>addView</LITERAL2>
+			<LITERAL2>filter</LITERAL2>
+			<LITERAL2>getColumnNames</LITERAL2>
+			<LITERAL2>getItemAt</LITERAL2>
+			<LITERAL2>getLength</LITERAL2>
+			<LITERAL2>getNumberAvailable</LITERAL2>
+			<LITERAL2>isFullyPopulated</LITERAL2>
+			<LITERAL2>isLocal</LITERAL2>
+			<LITERAL2>removeAll</LITERAL2>
+			<LITERAL2>removeItemAt</LITERAL2>
+			<LITERAL2>replaceItemAt</LITERAL2>
+			<LITERAL2>setDeliveryMode</LITERAL2>
+			<LITERAL2>setField</LITERAL2>
+			<LITERAL2>sortItemsBy</LITERAL2>
+
+			<!-- deprecated-->
+			<KEYWORD2>chr</KEYWORD2>
+			<KEYWORD2>mbchr</KEYWORD2>
+			<KEYWORD2>mblength</KEYWORD2>
+			<KEYWORD2>mbord</KEYWORD2>
+			<KEYWORD2>mbsubstring</KEYWORD2>
+			<KEYWORD2>ord</KEYWORD2>
+			<KEYWORD2>_highquality</KEYWORD2>
+
+			<!-- END-->
+
+			<!--ECMAScript keywords-->
+			<!-- Reserved for future use
+				(some are already used in some Javascript Engines)
+			-->
+			<KEYWORD1>abstract</KEYWORD1>
+			<KEYWORD3>boolean</KEYWORD3>
+			<KEYWORD3>byte</KEYWORD3>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD3>char</KEYWORD3>
+			<KEYWORD1>class</KEYWORD1>
+			<KEYWORD1>const</KEYWORD1>
+			<KEYWORD1>debugger</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+
+			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD1>enum</KEYWORD1>
+			<KEYWORD2>export</KEYWORD2>
+			<KEYWORD1>extends</KEYWORD1>
+			<KEYWORD1>final</KEYWORD1>
+			<KEYWORD1>finally</KEYWORD1>
+			<KEYWORD3>float</KEYWORD3>
+			<KEYWORD1>goto</KEYWORD1>
+			<KEYWORD1>implements</KEYWORD1>
+
+			<KEYWORD2>import</KEYWORD2>
+			<KEYWORD1>instanceof</KEYWORD1>
+			<KEYWORD3>int</KEYWORD3>
+			<KEYWORD1>interface</KEYWORD1>
+			<KEYWORD3>long</KEYWORD3>
+			<KEYWORD1>native</KEYWORD1>
+			<KEYWORD2>package</KEYWORD2>
+			<KEYWORD1>private</KEYWORD1>
+			<KEYWORD1>Void</KEYWORD1>
+			<KEYWORD1>protected</KEYWORD1>
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>dynamic</KEYWORD1>
+
+			<KEYWORD3>short</KEYWORD3>
+			<KEYWORD1>static</KEYWORD1>
+			<LITERAL2>super</LITERAL2>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>synchronized</KEYWORD1>
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>throws</KEYWORD1>
+			<KEYWORD1>transient</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>volatile</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+</MODE>

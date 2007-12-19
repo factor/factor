@@ -4,7 +4,7 @@
 USING: kernel furnace fjsc  parser-combinators namespaces
        lazy-lists io io.files furnace.validator sequences
        http.client http.server http.server.responders
-       webapps.file ;
+       webapps.file html ;
 IN: webapps.fjsc
 
 : compile ( code -- )
@@ -30,6 +30,11 @@ IN: webapps.fjsc
 \ compile-url {
   { "url" v-required }
 } define-action
+
+: render-page* ( model body-template head-template -- )
+  [
+      [ render-component ] [ f rot render-component ] html-document 
+  ] serve-html ;
 
 : repl ( -- )
   #! The main 'repl' page.

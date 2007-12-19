@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+        <PROPS>
+                <PROPERTY NAME="lineComment" VALUE="#" />
+        </PROPS>
+        <RULES IGNORE_CASE="FALSE"
+                HIGHLIGHT_DIGITS="TRUE"
+                DIGIT_RE="(0x[\p{XDigit}]+|[\p{Digit}]+)"
+        >
+
+                <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+                        <BEGIN>"</BEGIN>
+                        <END>"</END>
+                </SPAN>
+
+                <EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+
+                <MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR"
+                                AT_LINE_START="TRUE">:</MARK_PREVIOUS>
+
+                <SEQ TYPE="OPERATOR">,</SEQ>
+
+                <SEQ_REGEXP TYPE="LITERAL2"
+                        HASH_CHARS="ISNP"
+                        AT_WORD_START="TRUE"
+                >[ISNP]\d{1,2}</SEQ_REGEXP>
+
+                <KEYWORDS>
+                        <KEYWORD1>abs</KEYWORD1>
+                        <KEYWORD1>acos</KEYWORD1>
+                        <KEYWORD1>add</KEYWORD1>
+                        <KEYWORD1>and</KEYWORD1>
+                        <KEYWORD1>asec</KEYWORD1>
+                        <KEYWORD1>asin</KEYWORD1>
+                        <KEYWORD1>atan</KEYWORD1>
+                        <KEYWORD1>bounds</KEYWORD1>
+                        <KEYWORD1>branch</KEYWORD1>
+                        <KEYWORD1>bsr</KEYWORD1>
+                        <KEYWORD1>chopm</KEYWORD1>
+                        <KEYWORD1>cleari</KEYWORD1>
+                        <KEYWORD1>clearn</KEYWORD1>
+                        <KEYWORD1>clearp</KEYWORD1>
+                        <KEYWORD1>clears</KEYWORD1>
+                        <KEYWORD1>clone</KEYWORD1>
+                        <KEYWORD1>close</KEYWORD1>
+                        <KEYWORD1>cmod</KEYWORD1>
+                        <KEYWORD1>concat</KEYWORD1>
+                        <KEYWORD1>cos</KEYWORD1>
+                        <KEYWORD1>cosh</KEYWORD1>
+                        <KEYWORD1>debug</KEYWORD1>
+                        <KEYWORD1>dec</KEYWORD1>
+                        <KEYWORD1>div</KEYWORD1>
+                        <KEYWORD1>end</KEYWORD1>
+                        <KEYWORD1>entrytype</KEYWORD1>
+                        <KEYWORD1>eq</KEYWORD1>
+                        <KEYWORD1>err</KEYWORD1>
+                        <KEYWORD1>exp</KEYWORD1>
+                        <KEYWORD1>find_global</KEYWORD1>
+                        <KEYWORD1>find_type</KEYWORD1>
+                        <KEYWORD1>ge</KEYWORD1>
+                        <KEYWORD1>getfile</KEYWORD1>
+                        <KEYWORD1>getline</KEYWORD1>
+                        <KEYWORD1>getpackage</KEYWORD1>
+                        <KEYWORD1>gt</KEYWORD1>
+                        <KEYWORD1>if</KEYWORD1>
+                        <KEYWORD1>inc</KEYWORD1>
+                        <KEYWORD1>index</KEYWORD1>
+                        <KEYWORD1>jsr</KEYWORD1>
+                        <KEYWORD1>jump</KEYWORD1>
+                        <KEYWORD1>le</KEYWORD1>
+                        <KEYWORD1>length</KEYWORD1>
+                        <KEYWORD1>ln</KEYWORD1>
+                        <KEYWORD1>log2</KEYWORD1>
+                        <KEYWORD1>log10</KEYWORD1>
+                        <KEYWORD1>lt</KEYWORD1>
+                        <KEYWORD1>mod</KEYWORD1>
+                        <KEYWORD1>mul</KEYWORD1>
+                        <KEYWORD1>ne</KEYWORD1>
+                        <KEYWORD1>new</KEYWORD1>
+                        <KEYWORD1>newinterp</KEYWORD1>
+                        <KEYWORD1>noop</KEYWORD1>
+                        <KEYWORD1>not</KEYWORD1>
+                        <KEYWORD1>not</KEYWORD1>
+                        <KEYWORD1>open</KEYWORD1>
+                        <KEYWORD1>or</KEYWORD1>
+                        <KEYWORD1>ord</KEYWORD1>
+                        <KEYWORD1>pack</KEYWORD1>
+                        <KEYWORD1>pop</KEYWORD1>
+                        <KEYWORD1>popi</KEYWORD1>
+                        <KEYWORD1>popn</KEYWORD1>
+                        <KEYWORD1>popp</KEYWORD1>
+                        <KEYWORD1>pops</KEYWORD1>
+                        <KEYWORD1>pow</KEYWORD1>
+                        <KEYWORD1>print</KEYWORD1>
+                        <KEYWORD1>profile</KEYWORD1>
+                        <KEYWORD1>push</KEYWORD1>
+                        <KEYWORD1>pushi</KEYWORD1>
+                        <KEYWORD1>pushn</KEYWORD1>
+                        <KEYWORD1>pushp</KEYWORD1>
+                        <KEYWORD1>pushs</KEYWORD1>
+                        <KEYWORD1>read</KEYWORD1>
+                        <KEYWORD1>readline</KEYWORD1>
+                        <KEYWORD1>repeat</KEYWORD1>
+                        <KEYWORD1>restore</KEYWORD1>
+                        <KEYWORD1>ret</KEYWORD1>
+                        <KEYWORD1>rotate_up</KEYWORD1>
+                        <KEYWORD1>runinterp</KEYWORD1>
+                        <KEYWORD1>save</KEYWORD1>
+                        <KEYWORD1>sec</KEYWORD1>
+                        <KEYWORD1>sech</KEYWORD1>
+                        <KEYWORD1>set</KEYWORD1>
+                        <KEYWORD1>set_keyed</KEYWORD1>
+                        <KEYWORD1>setfile</KEYWORD1>
+                        <KEYWORD1>setline</KEYWORD1>
+                        <KEYWORD1>setpackage</KEYWORD1>
+                        <KEYWORD1>shl</KEYWORD1>
+                        <KEYWORD1>shr</KEYWORD1>
+                        <KEYWORD1>sin</KEYWORD1>
+                        <KEYWORD1>sinh</KEYWORD1>
+                        <KEYWORD1>sleep</KEYWORD1>
+                        <KEYWORD1>sub</KEYWORD1>
+                        <KEYWORD1>substr</KEYWORD1>
+                        <KEYWORD1>tan</KEYWORD1>
+                        <KEYWORD1>tanh</KEYWORD1>
+                        <KEYWORD1>time</KEYWORD1>
+                        <KEYWORD1>trace</KEYWORD1>
+                        <KEYWORD1>typeof</KEYWORD1>
+                        <KEYWORD1>unless</KEYWORD1>
+                        <KEYWORD1>warningsoff</KEYWORD1>
+                        <KEYWORD1>warningson</KEYWORD1>
+                        <KEYWORD1>write</KEYWORD1>
+                        <KEYWORD1>xor</KEYWORD1>
+                </KEYWORDS>
+        </RULES>
+</MODE>

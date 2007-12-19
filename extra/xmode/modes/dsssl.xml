@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- DSSSL is the Document Style Semantics Specification Language,
+     used by the Jade SGML documentation generation tool -->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+		<PROPERTY NAME="lineComment" VALUE=";" />
+	</PROPS>
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- EOL comment -->
+		<EOL_SPAN TYPE="COMMENT1">;</EOL_SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- LISP stuff -->
+		<SEQ TYPE="NULL">'(</SEQ>
+
+		<MARK_FOLLOWING TYPE="LITERAL1">'</MARK_FOLLOWING>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- DSSSL stuff -->
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+			<BEGIN>$</BEGIN>
+			<END>$</END>
+		</SPAN>
+
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+			<BEGIN>%</BEGIN>
+			<END>%</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="LITERAL2">#</MARK_FOLLOWING>
+
+		<!-- DTD Entity declarations -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::ENTITY-TAGS">
+			<BEGIN>&lt;!ENTITY</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- CDATA sections -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::CDATA">
+			<BEGIN>&lt;![CDATA[</BEGIN>
+			<END>]]&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SEQ TYPE="NULL">&lt;=</SEQ>
+
+		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS">
+			<BEGIN>&lt;/style-specification</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS">
+			<BEGIN>&lt;/style-sheet</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS">
+			<BEGIN>&lt;style-specification</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS">
+			<BEGIN>&lt;external-specification</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS">
+			<BEGIN>&lt;style-sheet</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+
+		<KEYWORDS>
+			<KEYWORD1>and</KEYWORD1>
+			<KEYWORD1>cond</KEYWORD1>
+			<KEYWORD1>define</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>lambda</KEYWORD1>
+			<KEYWORD1>or</KEYWORD1>
+			<KEYWORD1>quote</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>let</KEYWORD1>
+			<KEYWORD1>let*</KEYWORD1>
+			<KEYWORD1>loop</KEYWORD1>
+			<KEYWORD1>not</KEYWORD1>
+			<KEYWORD1>list</KEYWORD1>
+			<KEYWORD1>append</KEYWORD1>
+			<KEYWORD1>children</KEYWORD1>
+			<KEYWORD1>normalize</KEYWORD1>
+
+			<KEYWORD2>car</KEYWORD2>
+			<KEYWORD2>cdr</KEYWORD2>
+			<KEYWORD2>cons</KEYWORD2>
+			<KEYWORD2>node-list-first</KEYWORD2>
+			<KEYWORD2>node-list-rest</KEYWORD2>
+
+			<KEYWORD3>eq?</KEYWORD3>
+			<KEYWORD3>null?</KEYWORD3>
+			<KEYWORD3>pair?</KEYWORD3>
+			<KEYWORD3>zero?</KEYWORD3>
+			<KEYWORD3>equal?</KEYWORD3>
+			<KEYWORD3>node-list-empty?</KEYWORD3>
+
+			<FUNCTION>external-procedure</FUNCTION>
+			<FUNCTION>root</FUNCTION>
+			<FUNCTION>make</FUNCTION>
+			<FUNCTION>process-children</FUNCTION>
+			<FUNCTION>current-node</FUNCTION>
+			<FUNCTION>node</FUNCTION>
+			<FUNCTION>empty-sosofo</FUNCTION>
+			<FUNCTION>default</FUNCTION>
+			<FUNCTION>attribute-string</FUNCTION>
+			<FUNCTION>select-elements</FUNCTION>
+			<FUNCTION>with-mode</FUNCTION>
+			<FUNCTION>literal</FUNCTION>
+			<FUNCTION>process-node-list</FUNCTION>
+			<FUNCTION>element</FUNCTION>
+			<FUNCTION>mode</FUNCTION>
+			<FUNCTION>gi</FUNCTION>
+			<FUNCTION>sosofo-append</FUNCTION>
+			<FUNCTION>sequence</FUNCTION>
+
+			<LABEL>attributes:</LABEL>
+			<LABEL>gi:</LABEL>
+		</KEYWORDS>
+	</RULES>
+</MODE>

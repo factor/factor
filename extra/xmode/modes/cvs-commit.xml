@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+<MODE NAME="cvs-commit"		FILE="cvs-commit.xml"
+				FILE_NAME_GLOB="cvs*.tmp"/>
+-->
+
+<MODE>
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<EOL_SPAN TYPE="COMMENT1" 
+			DELEGATE="CHANGED" 
+			AT_LINE_START="TRUE"
+		>CVS:</EOL_SPAN>
+	</RULES>
+	<RULES SET="CHANGED" DEFAULT="COMMENT2">
+		<SEQ TYPE="COMMENT1" AT_LINE_START="TRUE">CVS:</SEQ>
+		<SEQ TYPE="KEYWORD1">Committing in</SEQ>
+		<SEQ TYPE="KEYWORD1">Added Files:</SEQ>
+		<SEQ TYPE="KEYWORD1">Modified Files:</SEQ>
+		<SEQ TYPE="KEYWORD1">Removed Files:</SEQ>
+	</RULES>
+</MODE>
+

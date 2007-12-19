@@ -28,7 +28,7 @@ TUPLE: test-tuple m n ;
     [
         H{
             { "bar" "hello" }
-        } \ foo query>quot
+        } \ foo query>seq
     ] with-scope
 ] unit-test
 

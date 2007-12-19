@@ -4,8 +4,6 @@ IN: temporary
 
 SYMBOL: store
 SYMBOL: foo
-SYMBOL: bar
-
 
 : the-store ( -- path )
     "store-test.store" resource-path ;
@@ -14,28 +12,24 @@ SYMBOL: bar
     [ the-store delete-file ] catch drop ;
 
 : load-the-store ( -- )
-    the-store load-store store set ;
+    the-store load-store store set-global ;
 
 : save-the-store ( -- )
-    store get save-store ;
+    store save-store ;
 
 delete-the-store
-the-store load-store store set
+load-the-store
 
-[ f ] [ foo store get store-data at ] unit-test
+[ f ] [ foo store get-persistent ] unit-test
 
-[ ] [ 100 foo store get store-variable ] unit-test
+USE: prettyprint
+store get-global store-data .
+
+[ ] [ 100 foo store set-persistent ] unit-test
 
 [ ] [ save-the-store ] unit-test
 
-[ 100 ] [ foo store get store-data at ] unit-test
-
-1000 foo set
-
-[ ] [ save-the-store ] unit-test
-
-[ ] [ load-the-store ] unit-test
-
-[ 1000 ] [ foo store get store-data at ] unit-test
+[ 100 ] [ foo store get-persistent ] unit-test
 
 delete-the-store
+f store set-global

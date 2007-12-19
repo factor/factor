@@ -273,20 +273,20 @@ HELP: mod-inv
 { $description "Outputs an integer " { $snippet "y" } " such that " { $snippet "xy = 1 (mod n)" } "." }
 { $errors "Throws an error if " { $snippet "n" } " is not invertible modulo " { $snippet "n" } "." }
 { $examples
-    { $example "173 1119 mod-inv ." "815" }
-    { $example "173 815 * 1119 mod ." "1" }
+    { $example "USE: math.functions" "173 1119 mod-inv ." "815" }
+    { $example "USE: math.functions" "173 815 * 1119 mod ." "1" }
 } ;
 
 HELP: each-bit
 { $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( ? -- )" } } }
 { $description "Applies the quotation to each bit of the integer, starting from the least significant bit, and stopping at the last bit from which point on all bits are either clear (if the integer is positive) or all bits are set (if the integer is negataive)." }
 { $examples
-    { $example "[ BIN: 1101 [ , ] each-bit ] { } make ." "{ t f t t }" }
-    { $example "[ -3 [ , ] each-bit ] { } make ." "{ f t }" }
+    { $example "USE: math.functions" "[ BIN: 1101 [ , ] each-bit ] { } make ." "{ t f t t }" }
+    { $example "USE: math.functions" "[ -3 [ , ] each-bit ] { } make ." "{ t f }" }
 } ;
 
 HELP: ~
-{ $values { "x" real } { "y" real } { "epsilon" real } }
+{ $values { "x" real } { "y" real } { "epsilon" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " and " { $snippet "y" } " are approximately equal to each other. There are three possible comparison tests, chosen based on the sign of " { $snippet "epsilon" } ":"
     { $list
         { { $snippet "epsilon" } " is zero: exact comparison." }

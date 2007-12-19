@@ -1,13 +1,15 @@
-USING: editors io.launcher math.parser namespaces ;
+USING: editors io.files io.launcher kernel math.parser
+namespaces windows.shell32 ;
 IN: editors.notepadpp
+
+: notepadpp-path
+    \ notepadpp-path get-global [
+        program-files "notepad++\\notepad++.exe" path+
+    ] unless* ;
 
 : notepadpp ( file line -- )
     [
-        \ notepadpp get-global % " -n" % # " " % %
+        notepadpp-path % " -n" % # " " % %
     ] "" make run-detached ;
-
-! Put in your .factor-boot-rc
-! "c:\\Program Files\\notepad++\\notepad++.exe" \ notepadpp set-global
-! "k:\\Program Files (x86)\\notepad++\\notepad++.exe" \ notepadpp set-global
 
 [ notepadpp ] edit-hook set-global

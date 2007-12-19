@@ -1,0 +1,960 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--  BibTeX mode, by Thomas Alspaugh alspaugh@ics.uci.edu, 2004Mar25  v1.1  -->
+<!--  Catalog entry (suggested)
+<MODE NAME="BibTeX"		FILE="bibtex.xml"
+				FILE_NAME_GLOB="*.bib" />
+  -->
+<!--
+      This BibTeX mode highlights the fields for each entry type to distinguish
+      required, optional, or other fields from Lamport.  
+      I have added several commonly-accepted fields (highlighted in yet another
+      color);  these are
+
+        abstract
+        annotation
+        day
+        keywords
+        lccn
+        location
+        references
+        url
+
+      The month name abbreviations are highlighted (jan, feb, mar, ...).
+      Escaped quotes (as in {\"o}) are treated correctly.
+      Text may be quoted "" or braced {} and may contain \{\}.
+      Entries may be braced {} or parenthesized ().
+      @strings are highlighted correctly.
+      .
+      Comments and suggestions are welcome.
+      Enjoy!
+  -->
+<!--  Things BibTeX mode does not do:
+        - highlight keys, which must appear after the { or ( 
+          and match [a-zA-Z0-9.:;?!`'()[\]\-/*@]+
+  -->
+<!--  Use of token types:
+        COMMENT1   % comments
+        FUNCTION   entries
+        KEYWORD1   additional fields
+        KEYWORD2   Lamport fields neither required nor optional
+        KEYWORD3   Lamport fields optional
+        KEYWORD4   Lamport fields required
+        LITERAL1   "text", months, unquoted numbers
+        LITERAL2   {text}
+        LITERAL3  \{text\}
+        OPERATOR   = ,
+  -->
+<!--  bibtex.xml is generated automatically from a summary of Lamport 
+      "LaTeX : A document preparation system : User guide and reference manual",
+      1994 (LaTeX2e) edition, appendix B, using a Perl scripts.  -->
+
+<MODE>
+  <PROPS>
+    <PROPERTY NAME="lineComment" VALUE="%"/>
+  </PROPS>
+
+  <RULES IGNORE_CASE="TRUE">
+    <EOL_SPAN TYPE="COMMENT1">%</EOL_SPAN>
+    
+    <!-- Entry types.  Each entry type has its own ruleset. -->
+    <!-- entry: FUNCTION -->
+    <SPAN TYPE="FUNCTION" DELEGATE="article"      ><BEGIN>@article{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="article"      ><BEGIN>@article(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="book"         ><BEGIN>@book{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="book"         ><BEGIN>@book(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="booklet"      ><BEGIN>@booklet{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="booklet"      ><BEGIN>@booklet(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="conference"   ><BEGIN>@conference{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="conference"   ><BEGIN>@conference(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="inbook"       ><BEGIN>@inbook{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="inbook"       ><BEGIN>@inbook(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="incollection" ><BEGIN>@incollection{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="incollection" ><BEGIN>@incollection(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="inproceedings"><BEGIN>@inproceedings{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="inproceedings"><BEGIN>@inproceedings(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="manual"       ><BEGIN>@manual{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="manual"       ><BEGIN>@manual(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="mastersthesis"><BEGIN>@mastersthesis{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="mastersthesis"><BEGIN>@mastersthesis(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="misc"         ><BEGIN>@misc{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="misc"         ><BEGIN>@misc(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="phdthesis"    ><BEGIN>@phdthesis{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="phdthesis"    ><BEGIN>@phdthesis(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="proceedings"  ><BEGIN>@proceedings{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="proceedings"  ><BEGIN>@proceedings(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="techreport"   ><BEGIN>@techreport{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="techreport"   ><BEGIN>@techreport(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="unpublished"  ><BEGIN>@unpublished{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="unpublished"  ><BEGIN>@unpublished(</BEGIN><END>)</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="string"       ><BEGIN>@string{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="FUNCTION" DELEGATE="string"       ><BEGIN>@string(</BEGIN><END>)</END></SPAN>
+    
+  </RULES>
+
+<RULES SET="article">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>author</KEYWORD4>
+      <KEYWORD4>journal</KEYWORD4>
+      <KEYWORD4>title</KEYWORD4>
+      <KEYWORD4>year</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>number</KEYWORD3>
+      <KEYWORD3>pages</KEYWORD3>
+      <KEYWORD3>volume</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>address</KEYWORD2>
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>booktitle</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>edition</KEYWORD2>
+      <KEYWORD2>editor</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>organization</KEYWORD2>
+      <KEYWORD2>publisher</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <KEYWORD2>series</KEYWORD2>
+      <KEYWORD2>type</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="book">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>author</KEYWORD4>
+      <KEYWORD4>editor</KEYWORD4>
+      <KEYWORD4>publisher</KEYWORD4>
+      <KEYWORD4>title</KEYWORD4>
+      <KEYWORD4>year</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>address</KEYWORD3>
+      <KEYWORD3>edition</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>number</KEYWORD3>
+      <KEYWORD3>series</KEYWORD3>
+      <KEYWORD3>volume</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>booktitle</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>organization</KEYWORD2>
+      <KEYWORD2>pages</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <KEYWORD2>type</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="booklet">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>title</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>address</KEYWORD3>
+      <KEYWORD3>author</KEYWORD3>
+      <KEYWORD3>howpublished</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>year</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>booktitle</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>edition</KEYWORD2>
+      <KEYWORD2>editor</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>number</KEYWORD2>
+      <KEYWORD2>organization</KEYWORD2>
+      <KEYWORD2>pages</KEYWORD2>
+      <KEYWORD2>publisher</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <KEYWORD2>series</KEYWORD2>
+      <KEYWORD2>type</KEYWORD2>
+      <KEYWORD2>volume</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="conference">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>author</KEYWORD4>
+      <KEYWORD4>booktitle</KEYWORD4>
+      <KEYWORD4>title</KEYWORD4>
+      <KEYWORD4>year</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>address</KEYWORD3>
+      <KEYWORD3>editor</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>number</KEYWORD3>
+      <KEYWORD3>organization</KEYWORD3>
+      <KEYWORD3>pages</KEYWORD3>
+      <KEYWORD3>publisher</KEYWORD3>
+      <KEYWORD3>series</KEYWORD3>
+      <KEYWORD3>volume</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>edition</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <KEYWORD2>type</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="inbook">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>author</KEYWORD4>
+      <KEYWORD4>chapter</KEYWORD4>
+      <KEYWORD4>editor</KEYWORD4>
+      <KEYWORD4>pages</KEYWORD4>
+      <KEYWORD4>publisher</KEYWORD4>
+      <KEYWORD4>title</KEYWORD4>
+      <KEYWORD4>year</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>address</KEYWORD3>
+      <KEYWORD3>edition</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>number</KEYWORD3>
+      <KEYWORD3>series</KEYWORD3>
+      <KEYWORD3>type</KEYWORD3>
+      <KEYWORD3>volume</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>booktitle</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>organization</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="incollection">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>author</KEYWORD4>
+      <KEYWORD4>booktitle</KEYWORD4>
+      <KEYWORD4>publisher</KEYWORD4>
+      <KEYWORD4>title</KEYWORD4>
+      <KEYWORD4>year</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>address</KEYWORD3>
+      <KEYWORD3>chapter</KEYWORD3>
+      <KEYWORD3>edition</KEYWORD3>
+      <KEYWORD3>editor</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>number</KEYWORD3>
+      <KEYWORD3>pages</KEYWORD3>
+      <KEYWORD3>series</KEYWORD3>
+      <KEYWORD3>type</KEYWORD3>
+      <KEYWORD3>volume</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>organization</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="inproceedings">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>author</KEYWORD4>
+      <KEYWORD4>booktitle</KEYWORD4>
+      <KEYWORD4>title</KEYWORD4>
+      <KEYWORD4>year</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>address</KEYWORD3>
+      <KEYWORD3>editor</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>number</KEYWORD3>
+      <KEYWORD3>organization</KEYWORD3>
+      <KEYWORD3>pages</KEYWORD3>
+      <KEYWORD3>publisher</KEYWORD3>
+      <KEYWORD3>series</KEYWORD3>
+      <KEYWORD3>volume</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>edition</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <KEYWORD2>type</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="manual">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>title</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>address</KEYWORD3>
+      <KEYWORD3>author</KEYWORD3>
+      <KEYWORD3>edition</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>organization</KEYWORD3>
+      <KEYWORD3>year</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>booktitle</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>editor</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>number</KEYWORD2>
+      <KEYWORD2>pages</KEYWORD2>
+      <KEYWORD2>publisher</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <KEYWORD2>series</KEYWORD2>
+      <KEYWORD2>type</KEYWORD2>
+      <KEYWORD2>volume</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="mastersthesis">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>author</KEYWORD4>
+      <KEYWORD4>school</KEYWORD4>
+      <KEYWORD4>title</KEYWORD4>
+      <KEYWORD4>year</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>address</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>type</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>booktitle</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>edition</KEYWORD2>
+      <KEYWORD2>editor</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>number</KEYWORD2>
+      <KEYWORD2>organization</KEYWORD2>
+      <KEYWORD2>pages</KEYWORD2>
+      <KEYWORD2>publisher</KEYWORD2>
+      <KEYWORD2>series</KEYWORD2>
+      <KEYWORD2>volume</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="misc">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <!-- optional -->
+      <KEYWORD3>author</KEYWORD3>
+      <KEYWORD3>howpublished</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>title</KEYWORD3>
+      <KEYWORD3>year</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>address</KEYWORD2>
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>booktitle</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>edition</KEYWORD2>
+      <KEYWORD2>editor</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>number</KEYWORD2>
+      <KEYWORD2>organization</KEYWORD2>
+      <KEYWORD2>pages</KEYWORD2>
+      <KEYWORD2>publisher</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <KEYWORD2>series</KEYWORD2>
+      <KEYWORD2>type</KEYWORD2>
+      <KEYWORD2>volume</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="phdthesis">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>author</KEYWORD4>
+      <KEYWORD4>school</KEYWORD4>
+      <KEYWORD4>title</KEYWORD4>
+      <KEYWORD4>year</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>address</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>type</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>booktitle</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>edition</KEYWORD2>
+      <KEYWORD2>editor</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>number</KEYWORD2>
+      <KEYWORD2>organization</KEYWORD2>
+      <KEYWORD2>pages</KEYWORD2>
+      <KEYWORD2>publisher</KEYWORD2>
+      <KEYWORD2>series</KEYWORD2>
+      <KEYWORD2>volume</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="proceedings">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>title</KEYWORD4>
+      <KEYWORD4>year</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>address</KEYWORD3>
+      <KEYWORD3>editor</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>number</KEYWORD3>
+      <KEYWORD3>organization</KEYWORD3>
+      <KEYWORD3>publisher</KEYWORD3>
+      <KEYWORD3>series</KEYWORD3>
+      <KEYWORD3>volume</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>author</KEYWORD2>
+      <KEYWORD2>booktitle</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>edition</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>pages</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <KEYWORD2>type</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="techreport">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>author</KEYWORD4>
+      <KEYWORD4>institution</KEYWORD4>
+      <KEYWORD4>title</KEYWORD4>
+      <KEYWORD4>year</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>address</KEYWORD3>
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>note</KEYWORD3>
+      <KEYWORD3>number</KEYWORD3>
+      <KEYWORD3>type</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>booktitle</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>edition</KEYWORD2>
+      <KEYWORD2>editor</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>organization</KEYWORD2>
+      <KEYWORD2>pages</KEYWORD2>
+      <KEYWORD2>publisher</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <KEYWORD2>series</KEYWORD2>
+      <KEYWORD2>volume</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+<RULES SET="unpublished">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ_REGEXP TYPE="LITERAL1" HASH_CHARS="123456789" AT_WORD_START="TRUE">[1-9][0-9]*</SEQ_REGEXP>
+    <KEYWORDS>
+      <!-- required -->
+      <KEYWORD4>author</KEYWORD4>
+      <KEYWORD4>note</KEYWORD4>
+      <KEYWORD4>title</KEYWORD4>
+      <!-- optional -->
+      <KEYWORD3>month</KEYWORD3>
+      <KEYWORD3>year</KEYWORD3>
+      <!-- others -->
+      <KEYWORD2>address</KEYWORD2>
+      <KEYWORD2>annote</KEYWORD2>
+      <KEYWORD2>booktitle</KEYWORD2>
+      <KEYWORD2>chapter</KEYWORD2>
+      <KEYWORD2>crossref</KEYWORD2>
+      <KEYWORD2>edition</KEYWORD2>
+      <KEYWORD2>editor</KEYWORD2>
+      <KEYWORD2>howpublished</KEYWORD2>
+      <KEYWORD2>institution</KEYWORD2>
+      <KEYWORD2>journal</KEYWORD2>
+      <KEYWORD2>key</KEYWORD2>
+      <KEYWORD2>number</KEYWORD2>
+      <KEYWORD2>organization</KEYWORD2>
+      <KEYWORD2>pages</KEYWORD2>
+      <KEYWORD2>publisher</KEYWORD2>
+      <KEYWORD2>school</KEYWORD2>
+      <KEYWORD2>series</KEYWORD2>
+      <KEYWORD2>type</KEYWORD2>
+      <KEYWORD2>volume</KEYWORD2>
+      <!-- not in Lamport but widely accepted -->
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>annotation</KEYWORD1>
+      <KEYWORD1>day</KEYWORD1>
+      <KEYWORD1>keywords</KEYWORD1>
+      <KEYWORD1>lccn</KEYWORD1>
+      <KEYWORD1>location</KEYWORD1>
+      <KEYWORD1>references</KEYWORD1>
+      <KEYWORD1>url</KEYWORD1>
+      <!-- total: 32 fields -->
+      <LITERAL1>jan</LITERAL1>
+      <LITERAL1>feb</LITERAL1>
+      <LITERAL1>mar</LITERAL1>
+      <LITERAL1>apr</LITERAL1>
+      <LITERAL1>may</LITERAL1>
+      <LITERAL1>jun</LITERAL1>
+      <LITERAL1>jul</LITERAL1>
+      <LITERAL1>aug</LITERAL1>
+      <LITERAL1>sep</LITERAL1>
+      <LITERAL1>oct</LITERAL1>
+      <LITERAL1>nov</LITERAL1>
+      <LITERAL1>dec</LITERAL1>
+    </KEYWORDS>
+  </RULES>
+
+
+  <RULES SET="textbraced" DEFAULT="LITERAL2">
+    <SPAN TYPE="LITERAL3" NO_LINE_BREAK="FALSE"><BEGIN>\{</BEGIN><END>\}</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SEQ  TYPE="LITERAL3">\"</SEQ>
+  </RULES>
+
+  <RULES SET="textquoted" DEFAULT="LITERAL1">
+    <SPAN TYPE="LITERAL3" NO_LINE_BREAK="FALSE"><BEGIN>\{</BEGIN><END>\}</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SEQ  TYPE="LITERAL3">\"</SEQ>
+  </RULES>
+
+  <RULES SET="string" DEFAULT="LITERAL1">
+    <SPAN TYPE="LITERAL1" DELEGATE="textquoted" NO_LINE_BREAK="FALSE"><BEGIN>"</BEGIN><END>"</END></SPAN>
+    <SPAN TYPE="LITERAL2" DELEGATE="textbraced" NO_LINE_BREAK="FALSE"><BEGIN>{</BEGIN><END>}</END></SPAN>
+    <SPAN TYPE="LITERAL3" NO_LINE_BREAK="FALSE"><BEGIN>\{</BEGIN><END>\}</END></SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ TYPE="LITERAL3">\"</SEQ>
+  </RULES>
+
+</MODE>
+

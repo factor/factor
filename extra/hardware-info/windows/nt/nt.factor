@@ -1,8 +1,8 @@
-USING: alien alien.c-types hardware-info kernel libc math namespaces
+USING: alien alien.c-types hardware-info hardware-info.windows
+kernel libc math namespaces
 windows windows.advapi32 windows.kernel32 ;
 IN: hardware-info.windows.nt
 
-TUPLE: winnt ;
 T{ winnt } os set-global
 
 : memory-status ( -- MEMORYSTATUSEX )

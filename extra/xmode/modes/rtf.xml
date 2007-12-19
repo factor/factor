@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- contributed by Lionel Fiol <lio-sand@ifrance.com>  -->
+<!-- 30/MAR/2004: initial contribution                  -->
+
+<MODE>
+  <RULES ESCAPE="\\">
+    <!-- groups -->
+    <SEQ TYPE="OPERATOR">{</SEQ>
+    <SEQ TYPE="OPERATOR">}</SEQ>
+    <!-- characters as hexadecimal values - eg "\'e9" -->
+    <SEQ_REGEXP HASH_CHAR="\'" TYPE="LITERAL2">\\'\w\d</SEQ_REGEXP>
+    <!-- control words added after the RTF Specification published in March 1987 - eg "\*\panose" -->
+    <MARK_FOLLOWING TYPE="KEYWORD2">\*\</MARK_FOLLOWING>
+    <!-- control words - eg "\par" -->
+    <MARK_FOLLOWING TYPE="KEYWORD1">\</MARK_FOLLOWING>
+  </RULES>
+</MODE>

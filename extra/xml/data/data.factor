@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private assocs arrays delegate ;
+USING: kernel sequences sequences.private assocs arrays delegate vectors ;
 IN: xml.data
 
 TUPLE: name space tag url ;
@@ -60,23 +60,24 @@ M: attrs set-at
     2dup attr@ nip [
         2nip set-second
     ] [
-        >r assure-name swap 2array r> push
+        [ >r assure-name swap 2array r> ?push ] keep
+        set-delegate
     ] if* ;
 
 M: attrs assoc-size length ;
 M: attrs new-assoc drop V{ } new <attrs> ;
-M: attrs assoc-find >r delegate r> assoc-find ;
 M: attrs >alist delegate >alist ;
 
 : >attrs ( assoc -- attrs )
-    V{ } assoc-clone-like
-    [ >r assure-name r> ] assoc-map
-    <attrs> ;
+    dup [
+        V{ } assoc-clone-like
+        [ >r assure-name r> ] assoc-map
+    ] when <attrs> ;
 M: attrs assoc-like
     drop dup attrs? [ >attrs ] unless ;
 
 M: attrs clear-assoc
-    delete-all ;
+    f swap set-delegate ;
 M: attrs delete-at
     tuck attr@ drop [ swap delete-nth ] [ drop ] if* ;
 

@@ -85,7 +85,7 @@ HELP: continuation
 { $description "Reifies the current continuation from the point immediately after which the caller returns." } ;
 
 HELP: >continuation<
-{ $values { "continuation" continuation } { "data" vector } { "retain" vector } { "call" vector } { "name" vector } { "catch" vector } { "c" array } }
+{ $values { "continuation" continuation } { "data" vector } { "retain" vector } { "call" vector } { "name" vector } { "catch" vector } }
 { $description "Takes a continuation apart into its constituents." } ;
 
 HELP: ifcc

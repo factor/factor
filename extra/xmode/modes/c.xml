@@ -1,0 +1,401 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- This is based on ISO C++ Standard, 2003 and ISO C Standard, 1999.
+     The C++ keywords have been removed from this mode file, though. -->
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="commentStart" VALUE="/*" />
+        <PROPERTY NAME="commentEnd" VALUE="*/" />
+        <PROPERTY NAME="lineComment" VALUE="//" />
+        <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+        <!-- Auto indent -->
+        <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+        <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+        <PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+        <PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+        <PROPERTY NAME="indentNextLine"
+            VALUE="(?!^\s*(#|//)).*(\b(if|while|for)\s*\(.*\)|\b(else|do)\b)[^{;]*$" />
+        <PROPERTY NAME="unindentThisLine"
+            VALUE="^\s*((case\b.*|[\p{Alpha}_][\p{Alnum}_]*)\s*:(?!:)).*$" />
+        <PROPERTY NAME="electricKeys" VALUE=":" />
+    </PROPS>
+
+    <RULES
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <EOL_SPAN TYPE="KEYWORD2" AT_WHITESPACE_END="TRUE" DELEGATE="CPP">#</EOL_SPAN>
+
+        <IMPORT DELEGATE="LEX"/>
+        <IMPORT DELEGATE="CORE"/>
+    </RULES>
+
+    <!-- Comments, Trigraph, Alternate-Tokens -->
+    <RULES SET="LEX"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+
+        <!-- Doxygen comment, Javadoc style -->
+        <SEQ TYPE="COMMENT1">/**/</SEQ>
+        <SPAN TYPE="COMMENT3" DELEGATE="doxygen::DOXYGEN">
+            <BEGIN>/**&lt;</BEGIN>
+            <END>*/</END>
+        </SPAN>
+        <SPAN TYPE="COMMENT3" DELEGATE="doxygen::DOXYGEN">
+            <BEGIN>/**</BEGIN>
+            <END>*/</END>
+        </SPAN>
+        <EOL_SPAN TYPE="COMMENT3" DELEGATE="doxygen::DOXYGEN">///&lt;</EOL_SPAN>
+        <EOL_SPAN TYPE="COMMENT3" DELEGATE="doxygen::DOXYGEN">///</EOL_SPAN>
+
+        <!-- Doxygen comment, Qt style -->
+        <SPAN TYPE="COMMENT3" DELEGATE="doxygen::DOXYGEN">
+            <BEGIN>/*!&lt;</BEGIN>
+            <END>*/</END>
+        </SPAN>
+        <SPAN TYPE="COMMENT3" DELEGATE="doxygen::DOXYGEN">
+            <BEGIN>/*!</BEGIN>
+            <END>*/</END>
+        </SPAN>
+        <EOL_SPAN TYPE="COMMENT3" DELEGATE="doxygen::DOXYGEN">//!&lt;</EOL_SPAN>
+        <EOL_SPAN TYPE="COMMENT3" DELEGATE="doxygen::DOXYGEN">//!</EOL_SPAN>
+
+        <!-- C style comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>/*</BEGIN>
+            <END>*/</END>
+        </SPAN>
+        <EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>L"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>L'</BEGIN>
+            <END>'</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+        <!-- Trigraphs -->
+        <SEQ TYPE="LITERAL4">??(</SEQ>
+        <SEQ TYPE="LITERAL4">??/</SEQ>
+        <SEQ TYPE="LITERAL4">??)</SEQ>
+        <SEQ TYPE="LITERAL4">??'</SEQ>
+        <SEQ TYPE="LITERAL4">??&lt;</SEQ>
+        <SEQ TYPE="LITERAL4">??!</SEQ>
+        <SEQ TYPE="LITERAL4">??&gt;</SEQ>
+        <SEQ TYPE="LITERAL4">??-</SEQ>
+        <SEQ TYPE="LITERAL4">??=</SEQ>
+
+        <!-- Alternate tokens -->
+        <SEQ TYPE="LITERAL4">&lt;:</SEQ>
+        <SEQ TYPE="LITERAL4">:&gt;</SEQ>
+        <SEQ TYPE="LITERAL4">&lt;%</SEQ>
+        <SEQ TYPE="LITERAL4">%&gt;</SEQ>
+        <SEQ TYPE="LITERAL4">%:</SEQ>
+
+        <!-- Labels.
+            This is a part of core language syntax, but must be here
+            because it can't work after SEQ for ':'. -->
+        <MARK_PREVIOUS AT_WHITESPACE_END="TRUE"
+            MATCH_TYPE="OPERATOR"
+            TYPE="LABEL">:</MARK_PREVIOUS>
+
+        <!-- Function-like macro or function calls.
+            This can't work after SEQ for '('. -->
+        <MARK_PREVIOUS
+            TYPE="FUNCTION"
+            MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+
+        <SEQ TYPE="OPERATOR">=</SEQ>
+        <SEQ TYPE="OPERATOR">!</SEQ>
+        <SEQ TYPE="OPERATOR">+</SEQ>
+        <SEQ TYPE="OPERATOR">-</SEQ>
+        <SEQ TYPE="OPERATOR">/</SEQ>
+        <SEQ TYPE="OPERATOR">*</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;</SEQ>
+        <SEQ TYPE="OPERATOR">%</SEQ>
+        <SEQ TYPE="OPERATOR">&amp;</SEQ>
+        <SEQ TYPE="OPERATOR">|</SEQ>
+        <SEQ TYPE="OPERATOR">^</SEQ>
+        <SEQ TYPE="OPERATOR">~</SEQ>
+        <SEQ TYPE="OPERATOR">?</SEQ>
+        <SEQ TYPE="OPERATOR">:</SEQ>
+        <SEQ TYPE="OPERATOR">.</SEQ>
+        <SEQ TYPE="OPERATOR">,</SEQ>
+        <SEQ TYPE="OPERATOR">[</SEQ>
+        <SEQ TYPE="OPERATOR">]</SEQ>
+        <SEQ TYPE="OPERATOR">)</SEQ>
+        <SEQ TYPE="OPERATOR">}</SEQ>
+        <SEQ TYPE="OPERATOR">{</SEQ>
+        <SEQ TYPE="OPERATOR">;</SEQ>
+
+        <KEYWORDS>
+            <!-- Predefined macro names from ISO C++ Standard 2003 -->
+            <LITERAL2>__DATE__</LITERAL2>
+            <LITERAL2>__FILE__</LITERAL2>
+            <LITERAL2>__LINE__</LITERAL2>
+            <LITERAL2>__STDC_HOSTED__</LITERAL2>
+            <LITERAL2>__STDC_ISO_10646__</LITERAL2>
+            <LITERAL2>__STDC_VERSION__</LITERAL2>
+            <LITERAL2>__STDC__</LITERAL2>
+            <LITERAL2>__TIME__</LITERAL2>
+            <LITERAL2>__cplusplus</LITERAL2>
+            <!-- Standard library macro names from ISO C++ Standard 2003 -->
+            <!-- Hilight these to indicate accidental use of them
+                in user source. They may be valid, but should cause
+                future conflicts. -->
+            <LITERAL2>BUFSIZ</LITERAL2>
+            <LITERAL2>CLOCKS_PER_SEC</LITERAL2>
+            <LITERAL2>EDOM</LITERAL2>
+            <LITERAL2>EILSEQ</LITERAL2>
+            <LITERAL2>EOF</LITERAL2>
+            <LITERAL2>ERANGE</LITERAL2>
+            <LITERAL2>EXIT_FAILURE</LITERAL2>
+            <LITERAL2>EXIT_SUCCESS</LITERAL2>
+            <LITERAL2>FILENAME_MAX</LITERAL2>
+            <LITERAL2>FOPEN_MAX</LITERAL2>
+            <LITERAL2>HUGE_VAL</LITERAL2>
+            <LITERAL2>LC_ALL</LITERAL2>
+            <LITERAL2>LC_COLLATE</LITERAL2>
+            <LITERAL2>LC_CTYPE</LITERAL2>
+            <LITERAL2>LC_MONETARY</LITERAL2>
+            <LITERAL2>LC_NUMERIC</LITERAL2>
+            <LITERAL2>LC_TIME</LITERAL2>
+            <LITERAL2>L_tmpnam</LITERAL2>
+            <LITERAL2>MB_CUR_MAX</LITERAL2>
+            <LITERAL2>NULL</LITERAL2>
+            <LITERAL2>RAND_MAX</LITERAL2>
+            <LITERAL2>SEEK_CUR</LITERAL2>
+            <LITERAL2>SEEK_END</LITERAL2>
+            <LITERAL2>SEEK_SET</LITERAL2>
+            <LITERAL2>SIGABRT</LITERAL2>
+            <LITERAL2>SIGFPE</LITERAL2>
+            <LITERAL2>SIGILL</LITERAL2>
+            <LITERAL2>SIGINT</LITERAL2>
+            <LITERAL2>SIGSEGV</LITERAL2>
+            <LITERAL2>SIGTERM</LITERAL2>
+            <LITERAL2>SIG_DFL</LITERAL2>
+            <LITERAL2>SIG_ERR</LITERAL2>
+            <LITERAL2>SIG_IGN</LITERAL2>
+            <LITERAL2>TMP_MAX</LITERAL2>
+            <LITERAL2>WCHAR_MAX</LITERAL2>
+            <LITERAL2>WCHAR_MIN</LITERAL2>
+            <LITERAL2>WEOF</LITERAL2>
+            <LITERAL2>_IOFBF</LITERAL2>
+            <LITERAL2>_IOLBF</LITERAL2>
+            <LITERAL2>_IONBF</LITERAL2>
+            <LITERAL2>assert</LITERAL2>
+            <LITERAL2>errno</LITERAL2>
+            <LITERAL2>offsetof</LITERAL2>
+            <LITERAL2>setjmp</LITERAL2>
+            <LITERAL2>stderr</LITERAL2>
+            <LITERAL2>stdin</LITERAL2>
+            <LITERAL2>stdout</LITERAL2>
+            <LITERAL2>va_arg</LITERAL2>
+            <LITERAL2>va_end</LITERAL2>
+            <LITERAL2>va_start</LITERAL2>
+            <!-- Standard C library values from ISO C++ Standard 2003 -->
+            <!-- These are not explicitly defined as macro. But they like
+                to be due to compatibility with C library implementation.
+                So, treat them like standard library macro names. -->
+            <LITERAL2>CHAR_BIT</LITERAL2>
+            <LITERAL2>CHAR_MAX</LITERAL2>
+            <LITERAL2>CHAR_MIN</LITERAL2>
+            <LITERAL2>DBL_DIG</LITERAL2>
+            <LITERAL2>DBL_EPSILON</LITERAL2>
+            <LITERAL2>DBL_MANT_DIG</LITERAL2>
+            <LITERAL2>DBL_MAX</LITERAL2>
+            <LITERAL2>DBL_MAX_10_EXP</LITERAL2>
+            <LITERAL2>DBL_MAX_EXP</LITERAL2>
+            <LITERAL2>DBL_MIN</LITERAL2>
+            <LITERAL2>DBL_MIN_10_EXP</LITERAL2>
+            <LITERAL2>DBL_MIN_EXP</LITERAL2>
+            <LITERAL2>FLT_DIG</LITERAL2>
+            <LITERAL2>FLT_EPSILON</LITERAL2>
+            <LITERAL2>FLT_MANT_DIG</LITERAL2>
+            <LITERAL2>FLT_MAX</LITERAL2>
+            <LITERAL2>FLT_MAX_10_EXP</LITERAL2>
+            <LITERAL2>FLT_MAX_EXP</LITERAL2>
+            <LITERAL2>FLT_MIN</LITERAL2>
+            <LITERAL2>FLT_MIN_10_EXP</LITERAL2>
+            <LITERAL2>FLT_MIN_EXP</LITERAL2>
+            <LITERAL2>FLT_RADIX</LITERAL2>
+            <LITERAL2>FLT_ROUNDS</LITERAL2>
+            <LITERAL2>INT_MAX</LITERAL2>
+            <LITERAL2>INT_MIN</LITERAL2>
+            <LITERAL2>LDBL_DIG</LITERAL2>
+            <LITERAL2>LDBL_EPSILON</LITERAL2>
+            <LITERAL2>LDBL_MANT_DIG</LITERAL2>
+            <LITERAL2>LDBL_MAX</LITERAL2>
+            <LITERAL2>LDBL_MAX_10_EXP</LITERAL2>
+            <LITERAL2>LDBL_MAX_EXP</LITERAL2>
+            <LITERAL2>LDBL_MIN</LITERAL2>
+            <LITERAL2>LDBL_MIN_10_EXP</LITERAL2>
+            <LITERAL2>LDBL_MIN_EXP</LITERAL2>
+            <LITERAL2>LONG_MAX</LITERAL2>
+            <LITERAL2>LONG_MIN</LITERAL2>
+            <LITERAL2>MB_LEN_MAX</LITERAL2>
+            <LITERAL2>SCHAR_MAX</LITERAL2>
+            <LITERAL2>SCHAR_MIN</LITERAL2>
+            <LITERAL2>SHRT_MAX</LITERAL2>
+            <LITERAL2>SHRT_MIN</LITERAL2>
+            <LITERAL2>UCHAR_MAX</LITERAL2>
+            <LITERAL2>UINT_MAX</LITERAL2>
+            <LITERAL2>ULONG_MAX</LITERAL2>
+            <LITERAL2>USRT_MAX</LITERAL2>
+            <!-- Alternative representations of some operators
+                from ISO C++ Standard 2003 -->
+            <!-- These are separated from CORE because they are
+                available in the constant expressions after
+                #if and #elif preprocessor directives. -->
+            <KEYWORD3>and</KEYWORD3>
+            <KEYWORD3>and_eq</KEYWORD3>
+            <KEYWORD3>bitand</KEYWORD3>
+            <KEYWORD3>bitor</KEYWORD3>
+            <KEYWORD3>compl</KEYWORD3>
+            <KEYWORD3>not</KEYWORD3>
+            <KEYWORD3>not_eq</KEYWORD3>
+            <KEYWORD3>or</KEYWORD3>
+            <KEYWORD3>or_eq</KEYWORD3>
+            <KEYWORD3>xor</KEYWORD3>
+            <KEYWORD3>xor_eq</KEYWORD3>
+        </KEYWORDS>
+    </RULES>
+
+    <!-- Core language -->
+    <RULES SET="CORE"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <KEYWORDS>
+            <!-- Types -->
+            <KEYWORD3>bool</KEYWORD3>
+            <KEYWORD3>char</KEYWORD3>
+            <KEYWORD3>double</KEYWORD3>
+            <KEYWORD3>enum</KEYWORD3>
+            <KEYWORD3>float</KEYWORD3>
+            <KEYWORD3>int</KEYWORD3>
+            <KEYWORD3>long</KEYWORD3>
+            <KEYWORD3>short</KEYWORD3>
+            <KEYWORD3>signed</KEYWORD3>
+            <KEYWORD3>struct</KEYWORD3>
+            <KEYWORD3>union</KEYWORD3>
+            <KEYWORD3>unsigned</KEYWORD3>
+            <!-- Keywords from ISO C++ Standard 2003 -->
+            <KEYWORD2>asm</KEYWORD2>
+            <KEYWORD1>auto</KEYWORD1>
+            <KEYWORD1>break</KEYWORD1>
+            <KEYWORD1>case</KEYWORD1>
+            <KEYWORD1>const</KEYWORD1>
+            <KEYWORD1>continue</KEYWORD1>
+            <KEYWORD1>default</KEYWORD1>
+            <KEYWORD1>do</KEYWORD1>
+            <KEYWORD1>else</KEYWORD1>
+            <KEYWORD2>extern</KEYWORD2>
+            <LITERAL2>false</LITERAL2>
+            <KEYWORD1>for</KEYWORD1>
+            <KEYWORD1>goto</KEYWORD1>
+            <KEYWORD1>if</KEYWORD1>
+            <KEYWORD1>inline</KEYWORD1>
+            <KEYWORD1>register</KEYWORD1>
+            <KEYWORD1>return</KEYWORD1>
+            <KEYWORD1>sizeof</KEYWORD1>
+            <KEYWORD1>static</KEYWORD1>
+            <KEYWORD1>switch</KEYWORD1>
+            <LITERAL2>true</LITERAL2>
+            <KEYWORD3>typedef</KEYWORD3>
+            <KEYWORD1>void</KEYWORD1>
+            <KEYWORD1>volatile</KEYWORD1>
+            <KEYWORD1>while</KEYWORD1>
+            <!-- Additional keywords from ISO C Standard(C99) -->
+            <KEYWORD3>restrict</KEYWORD3>
+            <KEYWORD3>_Bool</KEYWORD3>
+            <KEYWORD3>_Complex</KEYWORD3>
+            <KEYWORD3>_Pragma</KEYWORD3>
+            <KEYWORD3>_Imaginary</KEYWORD3>
+        </KEYWORDS>
+    </RULES>
+
+    <!-- Preprocessor specific rules -->
+    <RULES SET="CPP"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+
+        <EOL_SPAN_REGEXP HASH_CHAR="include" TYPE="MARKUP" DELEGATE="INCLUDE">include\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="define" TYPE="MARKUP" DELEGATE="DEFINE">define\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="endif" TYPE="MARKUP" DELEGATE="LEX">endif\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="elif" TYPE="MARKUP" DELEGATE="CONDITION">elif\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="if" TYPE="MARKUP" DELEGATE="CONDITION">if\b</EOL_SPAN_REGEXP>
+
+        <IMPORT DELEGATE="LEX"/>
+
+        <!-- Directives -->
+        <KEYWORDS>
+            <MARKUP>ifdef</MARKUP>
+            <MARKUP>ifndef</MARKUP>
+            <MARKUP>else</MARKUP>
+            <MARKUP>error</MARKUP>
+            <MARKUP>line</MARKUP>
+            <MARKUP>pragma</MARKUP>
+            <MARKUP>undef</MARKUP>
+            <MARKUP>warning</MARKUP>
+        </KEYWORDS>
+    </RULES>
+
+    <!-- After #include directive -->
+    <!-- "\"s are not escaped. -->
+    <RULES SET="INCLUDE"
+        IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>&lt;</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <IMPORT DELEGATE="LEX"/>
+    </RULES>
+
+    <!-- After #define directive -->
+    <!-- Almost same as the normal code,
+        except two additional operators # and ##. -->
+    <RULES SET="DEFINE"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <SEQ TYPE="OPERATOR">#</SEQ>
+        <IMPORT DELEGATE="LEX"/>
+        <IMPORT DELEGATE="CORE"/>
+    </RULES>
+
+    <!-- After #if or #elif directive -->
+    <!-- All constant expressions and a special operator
+        'defined' is available. But the core language elements
+        (such as operator 'sizeof', type casting, etc...) are not. -->
+    <RULES SET="CONDITION"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <IMPORT DELEGATE="LEX"/>
+        <KEYWORDS>
+            <KEYWORD2>defined</KEYWORD2>
+            <!-- Both true and false are specially permitted by
+                ISO C++ Standard 2003 16.1p4 -->
+            <KEYWORD2>true</KEYWORD2>
+            <KEYWORD2>false</KEYWORD2>
+        </KEYWORDS>
+    </RULES>
+
+</MODE>
+

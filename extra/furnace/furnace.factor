@@ -1,48 +1,39 @@
-! Copyright (C) 2006 Slava Pestov
+! Copyright (C) 2006 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel vectors io assocs quotations splitting strings 
-       words sequences namespaces arrays hashtables debugger
-       continuations tuples classes io.files 
-       http http.server.templating http.basic-authentication 
-       webapps.callback html html.elements 
-       http.server.responders furnace.validator ;
+USING: arrays assocs debugger furnace.sessions furnace.validator
+hashtables html.elements http http.server.responders
+http.server.templating
+io.files kernel namespaces quotations sequences splitting words
+strings vectors webapps.callback ;
+USING: continuations io prettyprint ;
 IN: furnace
 
-SYMBOL: default-action
+: code>quotation ( word/quot -- quot )
+    dup word? [ 1quotation ] when ;
 
+SYMBOL: default-action
 SYMBOL: template-path
 
-: define-authenticated-action ( word params realm -- )
-    pick swap "action-realm" set-word-prop
+: render-template ( template -- )
+    template-path get swap path+
+    ".furnace" append resource-path
+    run-template-file ;
+
+: define-action ( word hash -- )
     over t "action" set-word-prop
     "action-params" set-word-prop ;
 
-: define-action ( word params -- )
-    f define-authenticated-action ;
+: define-form ( word1 word2 hash -- )
+    dupd define-action
+    swap code>quotation "form-failed" set-word-prop ;
 
-: define-redirect ( word quot -- )
-    "action-redirect" set-word-prop ;
+: default-values ( word hash -- )
+    "default-values" set-word-prop ;
 
-: responder-vocab ( name -- vocab )
-    "webapps." swap append ;
-
-: lookup-action ( name webapp -- word )
-    responder-vocab lookup dup [
-        dup "action" word-prop [ drop f ] unless
-    ] when ;
-
-: truncate-url ( url -- action-name )
-  CHAR: / over index [ head ] when* ;
-
-: current-action ( url -- word/f )
-    dup empty? [ drop default-action get ] when
-    truncate-url "responder" get lookup-action ;
-
-PREDICATE: word action "action" word-prop ;
-
-: quot>query ( seq action -- hash )
-    >r >array r> "action-params" word-prop
-    [ first swap 2array ] 2map >hashtable ;
+SYMBOL: request-params
+SYMBOL: current-action
+SYMBOL: validators-errored
+SYMBOL: validation-errors
 
 : action-link ( query action -- url )
     [
@@ -51,6 +42,34 @@ PREDICATE: word action "action" word-prop ;
         "/" %
         word-name %
     ] "" make swap build-url ;
+
+: action-param ( hash paramsepc -- obj error/f )
+    unclip rot at swap >quotation apply-validators ;
+
+: query>seq ( hash word -- seq )
+    "action-params" word-prop [
+        dup first -rot
+        action-param [
+            t validators-errored >session
+            rot validation-errors session> set-at
+        ] [
+            nip
+        ] if*
+    ] curry* map ;
+
+: lookup-session ( hash -- session )
+    "furnace-session-id" over at* [
+        sessions get-global at
+        [ nip ] [ "furnace-session-id" over delete-at lookup-session ] if*
+    ] [
+        drop new-session rot "furnace-session-id" swap set-at
+    ] if ;
+
+: quot>query ( seq action -- hash )
+    >r >array r> "action-params" word-prop
+    [ first swap 2array ] 2map >hashtable ;
+
+PREDICATE: word action "action" word-prop ;
 
 : action-call? ( quot -- ? )
     >vector dup pop action? >r [ word? not ] all? r> and ;
@@ -64,80 +83,130 @@ PREDICATE: word action "action" word-prop ;
         t register-html-callback
     ] if ;
 
-: render-link ( quot name -- )
-    <a swap quot-link =href a> write </a> ;
+: replace-variables ( quot -- quot )
+    [ dup string? [ request-params session> at ] when ] map ;
 
-: action-param ( params paramspec -- obj error/f )
-    unclip rot at swap >quotation apply-validators ;
+: furnace-session-id ( -- hash )
+    "furnace-session-id" request-params session> at
+    "furnace-session-id" associate ;
 
-: query>quot ( params action -- seq )
-    "action-params" word-prop [ action-param drop ] curry* map ;
+: redirect-to-action ( -- )
+    current-action session>
+    "form-failed" word-prop replace-variables
+    quot-link furnace-session-id build-url permanent-redirect ;
 
-SYMBOL: request-params
+: if-form-page ( if then -- )
+    current-action session> "form-failed" word-prop -rot if ;
 
-: perform-redirect ( action -- )
-    "action-redirect" word-prop
-    [ dup string? [ request-params get at ] when ] map
-    [ quot-link permanent-redirect ] when* ;
+: do-action
+    current-action session> [ query>seq ] keep add >quotation call ;
 
-: (call-action) ( params action -- )
-    over request-params set
-    [ query>quot ] keep [ add >quotation call ] keep
-    perform-redirect ;
+: process-form ( -- )
+    H{ } clone validation-errors >session
+    request-params session> current-action session> query>seq
+    validators-errored session> [
+        drop redirect-to-action
+    ] [
+        current-action session> add >quotation call
+    ] if ;
 
-: call-action ( params action -- )
-    dup "action-realm" word-prop [
-        [ (call-action) ] with-basic-authentication
-    ] [ (call-action) ] if* ;
+: page-submitted ( -- )
+    [ process-form ] [ request-params session> do-action ] if-form-page ;
 
-: service-request ( params url -- )
-    current-action [
+: action-first-time ( -- )
+    request-params session> current-action session>
+    [ "default-values" word-prop swap union request-params >session ] keep
+    request-params session> do-action ;
+
+: page-not-submitted ( -- )
+    [ redirect-to-action ] [ action-first-time ] if-form-page ;
+
+: setup-call-action ( hash word -- )
+    over lookup-session session set
+    current-action >session
+    request-params session> swap union
+    request-params >session
+    f validators-errored >session ;
+
+: call-action ( hash word -- )
+    setup-call-action
+    "furnace-form-submitted" request-params session> at
+    [ page-submitted ] [ page-not-submitted ] if ;
+
+: responder-vocab ( str -- newstr )
+    "webapps." swap append ;
+
+: lookup-action ( str webapp -- word )
+    responder-vocab lookup dup [
+        dup "action" word-prop [ drop f ] unless
+    ] when ;
+
+: truncate-url ( str -- newstr )
+    CHAR: / over index [ head ] when* ;
+
+: parse-action ( str -- word/f )
+    dup empty? [ drop default-action get ] when
+    truncate-url "responder" get lookup-action ;
+
+: service-request ( hash str -- )
+    parse-action [
         [ call-action ] [ <pre> print-error </pre> ] recover
     ] [
         "404 no such action: " "argument" get append httpd-error
     ] if* ;
 
-: service-get ( url -- ) "query" get swap service-request ;
+: service-get
+    "query" get swap service-request ;
 
-: service-post ( url -- ) "response" get swap service-request ;
+: service-post
+    "response" get swap service-request ;
 
-: explode-tuple ( tuple -- )
-    dup tuple-slots swap class "slot-names" word-prop
-    [ set ] 2each ;
-
-SYMBOL: model
-
-: call-template ( model template -- )
-    [
-        >r [ dup model set explode-tuple ] when* r>
-        ".furnace" append resource-path run-template-file
-    ] with-scope ;
-
-: render-template ( model template -- )
-    template-path get swap path+ call-template ;
-
-: render-page* ( model body-template head-template -- )
-    [
-        [ render-template ] [ f rot render-template ] html-document 
-    ] serve-html ;
-
-: render-titled-page* ( model body-template head-template title -- )
-    [ 
-        [ render-template ] swap [ <title> write </title> f rot render-template ] curry html-document
-    ] serve-html ;
-
-
-: render-page ( model template title -- )
-    [
-        [ render-template ] simple-html-document
-    ] serve-html ;
-
-: web-app ( name default path -- )
+: web-app ( name defaul path -- )
     [
         template-path set
         default-action set
         "responder" set
         [ service-get ] "get" set
         [ service-post ] "post" set
-        ! [ service-head ] "head" set
     ] make-responder ;
+
+USING: classes html tuples vocabs ;
+: explode-tuple ( tuple -- )
+    dup tuple-slots swap class "slot-names" word-prop
+    [ set ] 2each ;
+
+SYMBOL: model
+
+: with-slots ( model quot -- )
+    [
+        >r [ dup model set explode-tuple ] when* r> call
+    ] with-scope ;
+
+: render-component ( model template -- )
+    swap [ render-template ] with-slots ;
+
+: browse-webapp-source ( vocab -- )
+    <a f >vocab-link browser-link-href =href a>
+        "Browse source" write
+    </a> ;
+
+: send-resource ( name -- )
+    template-path get swap path+ resource-path <file-reader>
+    stdio get stream-copy ;
+
+: render-link ( quot name -- )
+    <a swap quot-link =href a> write </a> ;
+
+: session-var ( str -- newstr )
+    request-params session> at ;
+
+: render ( str -- )
+    request-params session> at [ write ] when* ;
+
+: render-error ( str error-str -- )
+    swap validation-errors session> at validation-error? [
+        write
+    ] [
+        drop
+    ] if ;
+

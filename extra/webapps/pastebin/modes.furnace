@@ -1,0 +1,7 @@
+<% USING: furnace xmode.catalog sequences kernel html.elements assocs io sorting continuations ; %>
+
+<select name="mode">
+    <% modes keys natural-sort [
+        <option dup "mode" session-var = [ "true" =selected ] when option> write </option>
+    ] each %>
+</select>

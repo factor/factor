@@ -26,6 +26,8 @@ HINTS: do-trans-map string ;
         over push
     ] if ;
 
+HINTS: do-line vector string ;
+
 : (reverse-complement) ( seq -- )
     readln [ do-line (reverse-complement) ] [ show-seq ] if* ;
 

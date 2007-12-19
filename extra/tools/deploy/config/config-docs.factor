@@ -43,7 +43,7 @@ $nl
 HELP: deploy-word-defs?
 { $description "Deploy flag. If set, the deploy tool retains word definition quotations for words compiled with the optimizing compiler. Otherwise, word definitions are stripped from words compiled with the optimizing compiler."
 $nl
-"Off by default. During normal execution, the word definition quotation of a word compiled with the optimizing compiler is not used, so disabling this flag can save space. However, some libraries introspect word definitions dynamically (for example, " { $link "inverse" } ") and so programs using these libraries must retain word definition quotations." } ;
+"Off by default. During normal execution, the word definition quotation of a word compiled with the optimizing compiler is not used, so disabling this flag can save space. However, some libraries introspect word definitions dynamically (for example, " { $vocab-link "inverse" } ") and so programs using these libraries must retain word definition quotations." } ;
 
 HELP: deploy-c-types?
 { $description "Deploy flag. If set, the deploy tool retains the " { $link c-types } " table, otherwise this table is stripped out, saving space."

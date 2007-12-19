@@ -1,5 +1,6 @@
-USING: combinators.lib kernel sequences math namespaces
-random sequences.private shuffle ;
+USING: combinators.lib kernel sequences math namespaces assocs 
+random sequences.private shuffle math.functions mirrors ;
+USING: arrays math.parser sorting strings ;
 IN: sequences.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -66,3 +67,62 @@ IN: sequences.lib
 : split-around ( seq quot -- before elem after )
     dupd find over [ "Element not found" throw ] unless
     >r cut-slice 1 tail r> swap ; inline
+
+: (map-until) ( quot pred -- quot )
+    [ dup ] swap 3compose
+    [ [ drop t ] [ , f ] if ] compose [ find 2drop ] curry ;
+
+: map-until ( seq quot pred -- newseq )
+    (map-until) { } make ;
+
+: take-while ( seq quot -- newseq )
+    [ not ] compose
+    [ find drop [ head-slice ] when* ] curry
+    [ dup ] swap compose keep like ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+<PRIVATE
+: translate-string ( n alphabet out-len -- seq )
+    [ drop /mod ] curry* map nip  ;
+
+: map-alphabet ( alphabet seq[seq] -- seq[seq] )
+    [ [ swap nth ] curry* map ] curry* map ;
+
+: exact-number-strings ( n out-len -- seqs )
+    [ ^ ] 2keep [ translate-string ] 2curry map ;
+
+: number-strings ( n max-length -- seqs )
+    1+ [ exact-number-strings ] curry* map concat ;
+PRIVATE>
+
+: exact-strings ( alphabet length -- seqs )
+    >r dup length r> exact-number-strings map-alphabet ;
+
+: strings ( alphabet length -- seqs )
+    >r dup length r> number-strings map-alphabet ;
+
+: nths ( nths seq -- subseq )
+    ! nths is a sequence of ones and zeroes
+    >r [ length ] keep [ nth 1 = ] curry subset r>
+    [ nth ] curry { } map-as ;
+
+: power-set ( seq -- subsets )
+    2 over length exact-number-strings swap [ nths ] curry map ;
+
+: cut-find ( seq pred -- before after )
+    dupd find drop dup [ cut ] when ;
+
+: cut3 ( seq pred -- first mid last )
+    [ cut-find ] keep [ not ] compose cut-find ;
+
+: (cut-all) ( seq pred quot -- )
+    [ >r cut3 r> dip >r >r , r> [ , ] when* r> ] 2keep
+    pick [ (cut-all) ] [ 3drop ] if ;
+
+: cut-all ( seq pred quot -- first mid last )
+    [ (cut-all) ] { } make ;
+
+: human-sort ( seq -- newseq )
+    [ dup [ digit? ] [ string>number ] cut-all ] { } map>assoc
+    sort-values keys ;

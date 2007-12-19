@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+	09-10-2003 - Mirco Bova
+	Added some new batch commands using win2K help as reference.
+
+	04-12-2001 - Mirco Bova
+	this file is based on the original JEdit batch.xml mode.
+	The main upgrade consisting in adding the standard MS-DOS
+	commands as keywords and functions:
+	- keywords =		internal shell commands;
+	-	functions =		standard MS-DOS commands (.exe or .com in DOS or
+									windows\command directory).
+
+	Minor enhancements by Alex Jacoby on 28-feb-2003
+-->
+
+<!-- The keywords and functions here defined are those of MS-DOS 6.22,
+		 plus a few as of Windows XP.
+ -->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="rem" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE=")" />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<!-- 'echo off' statements -->
+		<SEQ TYPE="KEYWORD3">@</SEQ>
+
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+
+		<!-- labels - eg ":test" or "goto :test" -->
+		<MARK_FOLLOWING AT_WORD_START="TRUE" TYPE="LABEL">:</MARK_FOLLOWING>
+
+		<!-- comments -->
+		<EOL_SPAN_REGEXP AT_WHITESPACE_END="TRUE" HASH_CHAR="REM" TYPE="COMMENT1">REM\s</EOL_SPAN_REGEXP>
+
+		<!-- literals -->
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- variables -->
+		<SEQ TYPE="KEYWORD2">%0</SEQ>
+		<SEQ TYPE="KEYWORD2">%1</SEQ>
+		<SEQ TYPE="KEYWORD2">%2</SEQ>
+		<SEQ TYPE="KEYWORD2">%3</SEQ>
+		<SEQ TYPE="KEYWORD2">%4</SEQ>
+		<SEQ TYPE="KEYWORD2">%5</SEQ>
+		<SEQ TYPE="KEYWORD2">%6</SEQ>
+		<SEQ TYPE="KEYWORD2">%7</SEQ>
+		<SEQ TYPE="KEYWORD2">%8</SEQ>
+		<SEQ TYPE="KEYWORD2">%9</SEQ>
+		<!-- for-loop variable (one char after %%) -->
+		<SEQ_REGEXP TYPE="KEYWORD2"
+					HASH_CHAR="%%"
+					AT_WORD_START="TRUE"
+					>%%[\p{Alpha}]</SEQ_REGEXP>
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+			<BEGIN>%</BEGIN>
+			<END>%</END>
+		</SPAN>
+
+		<KEYWORDS>
+			<!-- KEYWORD1 are internal MS-DOS shell commands -->
+			<KEYWORD1>cd</KEYWORD1>
+			<KEYWORD1>chdir</KEYWORD1>
+			<KEYWORD1>md</KEYWORD1>
+			<KEYWORD1>mkdir</KEYWORD1>
+
+			<KEYWORD1>cls</KEYWORD1>
+
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+
+			<KEYWORD1>echo</KEYWORD1>
+			<KEYWORD1>echo.</KEYWORD1>
+
+			<KEYWORD1>move</KEYWORD1>
+			<KEYWORD1>copy</KEYWORD1>
+			<KEYWORD1>move</KEYWORD1>
+			<KEYWORD1>ren</KEYWORD1>
+			<KEYWORD1>del</KEYWORD1>
+			<KEYWORD1>set</KEYWORD1>
+
+			<!-- new KEYWORDS from Win2K help -->
+			<KEYWORD1>call</KEYWORD1>
+			<KEYWORD1>exit</KEYWORD1>
+			<KEYWORD1>setlocal</KEYWORD1>
+			<KEYWORD1>shift</KEYWORD1>
+			<KEYWORD1>endlocal</KEYWORD1>
+			<KEYWORD1>pause</KEYWORD1>
+
+			<!-- KEYWORD2 are commands options -->
+
+			<KEYWORD2>defined</KEYWORD2>
+			<KEYWORD2>exist</KEYWORD2>
+			<KEYWORD2>errorlevel</KEYWORD2>
+
+			<!-- new KEYWORD options from Win2K help -->
+			<KEYWORD2>else</KEYWORD2>
+
+			<KEYWORD2>in</KEYWORD2>
+			<KEYWORD2>do</KEYWORD2>
+
+			<KEYWORD2>NUL</KEYWORD2>
+			<KEYWORD2>AUX</KEYWORD2>
+			<KEYWORD2>PRN</KEYWORD2>
+
+			<KEYWORD1>not</KEYWORD1>
+
+			<!-- goto is a special case we want to distinguish it -->
+			<KEYWORD3>goto</KEYWORD3>
+
+			<!-- FUNCTION are standard MS-DOS commands -->
+			<!-- (those you find as stand-alone .exe or .com) in win95 %windows_root%\command folder -->
+			<FUNCTION>APPEND</FUNCTION>
+			<FUNCTION>ATTRIB</FUNCTION>
+			<FUNCTION>CHKDSK</FUNCTION>
+			<FUNCTION>CHOICE</FUNCTION>
+			<FUNCTION>DEBUG</FUNCTION>
+			<FUNCTION>DEFRAG</FUNCTION>
+			<FUNCTION>DELTREE</FUNCTION>
+			<FUNCTION>DISKCOMP</FUNCTION>
+			<FUNCTION>DISKCOPY</FUNCTION>
+			<FUNCTION>DOSKEY</FUNCTION>
+			<FUNCTION>DRVSPACE</FUNCTION>
+			<FUNCTION>EMM386</FUNCTION>
+			<FUNCTION>EXPAND</FUNCTION>
+			<FUNCTION>FASTOPEN</FUNCTION>
+			<FUNCTION>FC</FUNCTION>
+			<FUNCTION>FDISK</FUNCTION>
+			<FUNCTION>FIND</FUNCTION>
+			<FUNCTION>FORMAT</FUNCTION>
+			<FUNCTION>GRAPHICS</FUNCTION>
+			<FUNCTION>KEYB</FUNCTION>
+			<FUNCTION>LABEL</FUNCTION>
+			<FUNCTION>LOADFIX</FUNCTION>
+			<FUNCTION>MEM</FUNCTION>
+			<FUNCTION>MODE</FUNCTION>
+			<FUNCTION>MORE</FUNCTION>
+			<FUNCTION>MOVE</FUNCTION>
+			<FUNCTION>MSCDEX</FUNCTION>
+			<FUNCTION>NLSFUNC</FUNCTION>
+			<FUNCTION>POWER</FUNCTION>
+			<FUNCTION>PRINT</FUNCTION>
+			<FUNCTION>RD</FUNCTION>
+			<FUNCTION>REPLACE</FUNCTION>
+			<FUNCTION>RESTORE</FUNCTION>
+			<FUNCTION>SETVER</FUNCTION>
+			<FUNCTION>SHARE</FUNCTION>
+			<FUNCTION>SORT</FUNCTION>
+			<FUNCTION>SUBST</FUNCTION>
+			<FUNCTION>SYS</FUNCTION>
+			<FUNCTION>TREE</FUNCTION>
+			<FUNCTION>UNDELETE</FUNCTION>
+			<FUNCTION>UNFORMAT</FUNCTION>
+			<FUNCTION>VSAFE</FUNCTION>
+			<FUNCTION>XCOPY</FUNCTION>
+		</KEYWORDS>
+	</RULES>
+</MODE>
