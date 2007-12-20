@@ -1,4 +1,5 @@
 USING: delegate kernel arrays tools.test ;
+IN: temporary
 
 TUPLE: hello this that ;
 C: <hello> hello
