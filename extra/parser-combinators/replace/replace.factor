@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math io io.streams.string sequences strings
-lazy-lists combinators parser-combinators.simple ;
+lazy-lists combinators parser-combinators parser-combinators.simple ;
 IN: parser-combinators.replace 
 
 : tree-write ( object -- )
