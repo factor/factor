@@ -5,22 +5,42 @@ generator debugger math.parser prettyprint words continuations
 vocabs assocs alien.compiler dlists optimizer ;
 IN: compiler
 
+: finish-compilation-unit ( assoc -- )
+    [ swap add* ] { } assoc>map modify-code-heap ;
+
 SYMBOL: compiler-hook
 
 : compile-begins ( word -- )
     compiler-hook get [ call ] when*
     "quiet" get [ drop ] [ "Compiling " write . flush ] if ;
 
+: compiled-usage ( word -- seq )
+    #! XXX
+    usage [ word? ] subset ;
+
+: ripple-up ( word effect -- )
+    over "compiled-effect" word-prop =
+    [ drop ] [
+        compiled-usage
+        [ "was-compiled" word-prop ] subset
+        [ dup changed-word queue-compile ] each
+    ] if ;
+
+: save-effect ( word effect -- )
+    over t "was-compiled" set-word-prop
+    "compiled-effect" set-word-prop ;
+
 : (compile) ( word -- )
     dup compiling? not over compound? and [
         [
             dup compile-begins
-            dup dup word-dataflow nip optimize generate
-        ] curry [ print-error ] recover
+            dup word-dataflow optimize >r over dup r> generate
+        ] [
+            print-error
+            dup update-xt dup unchanged-word f
+        ] recover
+        2dup ripple-up save-effect
     ] [ drop ] if ;
-
-: finish-compilation-unit ( assoc -- )
-    [ swap add* ] { } assoc>map modify-code-heap ;
 
 : with-compilation-unit ( quot -- )
     [
