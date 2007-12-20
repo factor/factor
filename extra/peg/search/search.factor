@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math io io.streams.string sequences strings
 combinators peg memoize arrays ;
-IN: peg.replace 
+IN: peg.search 
 
 : tree-write ( object -- )
   { 
