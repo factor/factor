@@ -3,7 +3,7 @@
 !
 ! Based on pattern matching code from Paul Graham's book 'On Lisp'.
 USING: parser kernel words namespaces sequences tuples
-combinators macros assocs ;
+combinators macros assocs math ;
 IN: match
 
 SYMBOL: _
