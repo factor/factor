@@ -1,6 +1,7 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2007 Aaron Schaefer, Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.functions math.ranges namespaces sequences ;
+USING: arrays kernel lazy-lists math math.erato math.functions math.ranges
+       namespaces sequences ;
 IN: project-euler.010
 
 ! http://projecteuler.net/index.php?section=problems&id=10
@@ -16,42 +17,15 @@ IN: project-euler.010
 ! SOLUTION
 ! --------
 
-! Sieve of Eratosthenes
-
-<PRIVATE
-
-: candidates ( n -- seq )
-    3 swap 2 <range> ;
-
-: multiples ( max n -- seq )
-    dup sq -rot <range> ;
-
-: remove-multiples ( n seq -- seq )
-    dup supremum rot multiples swap seq-diff ;
-
-: keep-going? ( limit index seq -- ? )
-    nth swap sqrt < ;
-
-: (primes-below) ( limit index seq -- seq )
-    3dup keep-going? [
-        2dup nth swap remove-multiples
-        >r 1+ r> (primes-below)
-    ] [
-        2nip
-    ] if ;
-
-PRIVATE>
-
-: primes-below ( n -- seq )
-    [ candidates ] keep 0 rot (primes-below) 2 add* ;
+! Sieve of Eratosthenes and lazy summing
 
 : euler010 ( -- answer )
-    1000000 primes-below sum ;
+    0 1000000 lerato [ + ] leach ;
 
 ! TODO: solution is still too slow for 1000000, probably due to seq-diff
 ! calling member? for each number that we want to remove
 
 ! [ euler010 ] time
-! ? ms run / ? ms GC time
+! 2401 ms run / 10 ms GC time
 
 MAIN: euler010
