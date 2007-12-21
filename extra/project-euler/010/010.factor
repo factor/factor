@@ -26,6 +26,6 @@ IN: project-euler.010
 ! calling member? for each number that we want to remove
 
 ! [ euler010 ] time
-! 2401 ms run / 10 ms GC time
+! 765 ms run / 7 ms GC time
 
 MAIN: euler010
