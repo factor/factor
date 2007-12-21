@@ -3,32 +3,36 @@
 USING: bit-arrays kernel lazy-lists math math.functions math.ranges sequences ;
 IN: math.erato
 
-TUPLE: erato limit bits latest ;
-
 <PRIVATE
 
-: mark-multiples ( n erato -- )
-  over sqrt over erato-limit <=
-  [
-    [ erato-limit over <range> ] keep
-    erato-bits [ set-nth ] curry f -rot curry* each
-  ] [
-    2drop
-  ] if ;
+TUPLE: erato limit bits latest ;
 
-PRIVATE>
+: ind ( n -- i )
+  2/ 1- ; inline
+
+: is-prime ( n erato -- bool )
+  >r ind r> erato-bits nth ; inline
+
+: indices ( n erato -- range )
+  erato-limit ind over 3 * ind swap rot <range> ;
+
+: mark-multiples ( n erato -- )
+  over sq over erato-limit <=
+  [ [ indices ] keep erato-bits [ f -rot set-nth ] curry each ] [ 2drop ] if ;
 
 : <erato> ( n -- erato )
-  dup 1 + <bit-array> 1 over set-bits erato construct-boa ;
+  dup ind 1+ <bit-array> 1 over set-bits erato construct-boa ;
 
 : next-prime ( erato -- prime/f )
-  [ erato-latest 1+ ] keep [ set-erato-latest ] 2keep
+  [ erato-latest 2 + ] keep [ set-erato-latest ] 2keep
   2dup erato-limit <=
   [
-    2dup erato-bits nth [ dupd mark-multiples ] [ nip next-prime ] if
+    2dup is-prime [ dupd mark-multiples ] [ nip next-prime ] if
   ] [
     2drop f
   ] if ;
 
+PRIVATE>
+
 : lerato ( n -- lazy-list )
-  <erato> [ next-prime ] keep [ nip next-prime ] curry lfrom-by [ ] lwhile ;
+  <erato> 2 [ drop next-prime ] curry* lfrom-by [ ] lwhile ;
