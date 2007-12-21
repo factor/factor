@@ -206,6 +206,48 @@ M: lazy-take nil? ( lazy-take -- bool )
 M: lazy-take list? ( object -- bool )
   drop t ;
 
+TUPLE: lazy-until cons quot ;
+
+C: <lazy-until> lazy-until
+
+: luntil ( list quot -- result )
+  <lazy-until> ;
+
+M: lazy-until car ( lazy-until -- car )
+   lazy-until-cons car ;
+
+M: lazy-until cdr ( lazy-until -- cdr )
+   [ lazy-until-cons uncons ] keep lazy-until-quot
+   rot over call [ 2drop nil ] [ luntil ] if ;
+
+M: lazy-until nil? ( lazy-until -- bool )
+   lazy-until-cons nil? ;
+
+M: lazy-until list? ( lazy-until -- bool )
+   drop t ;
+
+TUPLE: lazy-while cons quot ;
+
+C: <lazy-while> lazy-while
+
+: lwhile ( list quot -- result )
+  <lazy-while>
+;
+
+M: lazy-while car ( lazy-while -- car )
+   lazy-while-cons car ;
+
+M: lazy-while cdr ( lazy-while -- cdr )
+   dup lazy-while-cons cdr dup nil?
+   [ 2drop nil ] [ swap lazy-while-quot lwhile ] if ;
+
+M: lazy-while nil? ( lazy-while -- bool )
+   dup lazy-while-cons nil?
+   [ nip ] [ [ car ] keep lazy-while-quot call not ] if* ;
+
+M: lazy-while list? ( lazy-while -- bool )
+   drop t ;
+
 TUPLE: lazy-subset cons quot ;
 
 C: <lazy-subset> lazy-subset
