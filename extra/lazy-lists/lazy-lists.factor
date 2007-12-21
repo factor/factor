@@ -100,11 +100,7 @@ M: lazy-cons list? ( object -- bool )
     dup car swap cdr ;
 
 : leach ( list quot -- )
-  swap dup nil? [
-    2drop
-  ] [
-    uncons swap pick call swap leach
-  ] if ;
+  swap dup nil? [ 2drop ] [ uncons swapd over 2slip leach ] if ; inline
 
 TUPLE: memoized-cons original car cdr nil? ;
 
