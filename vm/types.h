@@ -187,7 +187,6 @@ DECLARE_PRIMITIVE(hashtable);
 
 F_WORD *allot_word(CELL vocab, CELL name);
 DECLARE_PRIMITIVE(word);
-DECLARE_PRIMITIVE(update_xt);
 DECLARE_PRIMITIVE(word_xt);
 
 DECLARE_PRIMITIVE(wrapper);

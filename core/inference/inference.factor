@@ -25,3 +25,6 @@ M: callable dataflow-with
         V{ } like meta-d set
         f infer-quot
     ] with-infer nip ;
+
+: forget-errors ( seq -- )
+    [ f "no-effect" set-word-prop ] each ;

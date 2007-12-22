@@ -126,12 +126,6 @@ DEFER: x
 [ ] [ "IN: temporary : test-last ( -- ) ;" eval ] unit-test
 [ "test-last" ] [ word word-name ] unit-test
 
-[ t ] [
-    changed-words get assoc-size
-    [ ] define-temp drop
-    changed-words get assoc-size =
-] unit-test
-
 ! regression
 SYMBOL: quot-uses-a
 SYMBOL: quot-uses-b

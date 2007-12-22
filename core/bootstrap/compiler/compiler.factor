@@ -7,8 +7,6 @@ generator command-line vocabs io prettyprint libc ;
 
 "cpu." cpu append require
 
-global [ { "compiler" } add-use ] bind
-
 "-no-stack-traces" cli-args member? [
     f compiled-stack-traces? set-global
     0 profiler-prologue set-global
@@ -38,16 +36,22 @@ global [ { "compiler" } add-use ] bind
     find-pair-next namestack*
 
     bitand bitor bitxor bitnot
-} compile-batch
+} compile
 
 {
     + 1+ 1- 2/ < <= > >= shift min
+} compile
 
+{
     new nth push pop peek hashcode* = get set
+} compile
 
+{
     . lines
+} compile
 
+{
     malloc free memcpy
-} [ compile ] each
+} compile
 
-[ recompile ] parse-hook set-global
+[ compile-batch ] recompile-hook set-global

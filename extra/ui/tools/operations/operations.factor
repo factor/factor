@@ -67,24 +67,14 @@ V{ } clone operations set-global
     { +listener+ t }
 } define-operation
 
-UNION: definition word method-spec link ;
+UNION: definition word method-spec link vocab vocab-link ;
 
-UNION: editable-definition definition vocab vocab-link ;
-
-[ editable-definition? ] \ edit H{
+[ definition? ] \ edit H{
     { +keyboard+ T{ key-down f { C+ } "E" } }
     { +listener+ t }
 } define-operation
 
-UNION: reloadable-definition definition pathname ;
-
-[ reloadable-definition? ] \ reload H{
-    { +keyboard+ T{ key-down f { C+ } "R" } }
-    { +listener+ t }
-} define-operation
-
-[ dup reloadable-definition? swap vocab-spec? or ] \ forget
-H{ } define-operation
+[ definition? ] \ forget H{ } define-operation
 
 ! Words
 [ word? ] \ insert-word H{

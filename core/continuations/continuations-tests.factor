@@ -41,7 +41,7 @@ IN: temporary
 
 "!!! The following error is part of the test" print
 
-[ [ "2 car" ] parse ] catch print-error
+[ [ "2 car" ] eval ] catch print-error
 
 [ f throw ] unit-test-fails
 

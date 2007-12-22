@@ -231,22 +231,6 @@ HELP: location
 { $values { "loc" "a " { $snippet "{ path line# }" } " pair" } }
 { $description "Outputs the current parser location. This value can be passed to " { $link set-where } " or " { $link (save-location) } "." } ;
 
-HELP: redefine-error
-{ $values { "definition" "a definition specifier" } }
-{ $description "Throws a " { $link redefine-error } "." }
-{ $error-description "Indicates that a single source file contains two definitions for the same artifact, one of which shadows the other. This is an error since it indicates a likely mistake, such as two words accidentally named the same by the developer; the error is restartable." } ;
-
-HELP: redefinition?
-{ $values { "definition" "a definition specifier" } { "?" "a boolean" } }
-{ $description "Tests if this definition is already present in the current source file." }
-$parsing-note ;
-
-HELP: (save-location)
-{ $values { "definition" "a definition specifier" } { "loc" "a " { $snippet "{ path line# }" } " pair" } }
-{ $description "Saves the location of a definition and associates this definition with the current source file."
-$nl
-"This is the book-keeping required to detect " { $link redefine-error } " and " { $link forward-error } "." } ;
-
 HELP: save-location
 { $values { "definition" "a definition specifier" } }
 { $description "Saves the location of a definition and associates this definition with the current source file."
@@ -263,15 +247,6 @@ HELP: parser-notes?
 HELP: next-line
 { $values { "lexer" lexer } }
 { $description "Advances the lexer to the next input line, discarding the remainder of the current line." } ;
-
-HELP: file
-{ $var-description "Stores the " { $link source-file } " being parsed. The " { $link source-file-path } " of this object comes from the input parameter to " { $link parse-stream } "." } ;
-
-HELP: old-definitions
-{ $var-description "Stores an assoc where the keys form the set of definitions which were defined by " { $link file } " the most recent time it was loaded." } ;
-
-HELP: new-definitions
-{ $var-description "Stores an assoc where the keys form the set of definitions which were defined so far by the current parsing of " { $link file } "." } ;
 
 HELP: parse-error
 { $error-description "Thrown when the parser encounters invalid input. A parse error wraps an underlying error and holds the file being parsed, line number, and column number." } ;
@@ -417,11 +392,6 @@ HELP: search
 { $description "Searches for a word by name in the current vocabulary search path. If no such word could be found, throws a " { $link no-word } " error. If the search path does not contain a word with this name but other vocabularies do, the error will have restarts offering to add vocabularies to the search path." }
 $parsing-note ;
 
-HELP: forward-error
-{ $values { "word" word } } 
-{ $description "Throws a " { $link forward-error } "." }
-{ $description "Indicates a word is being referenced prior to the location of its most recent definition. This can only happen if a source file is loaded, and subsequently edited such that two dependent definitions are reversed." } ;
-
 HELP: scan-word
 { $values { "word/number/f" "a word, number or " { $link f } } }
 { $description "Reads the next token from parser input. If the token is a valid number literal, it is converted to a number, otherwise the dictionary is searched for a word named by the token. Outputs " { $link f } " if the end of the input has been reached." }
@@ -510,11 +480,6 @@ HELP: bootstrap-syntax
 HELP: file-vocabs
 { $description "Installs the initial the vocabulary search path for parsing a file. This consists of the " { $snippet "syntax" } " vocabulary together with the " { $snippet "scratchpad" } " vocabulary." } ;
 
-HELP: parse
-{ $values { "str" string } { "quot" quotation } }
-{ $description "Parses Factor source code from a string. The current vocabulary search path is used." }
-{ $errors "Throws a parse error if the input is malformed." } ;
-
 HELP: parse-fresh
 { $values { "lines" "a sequence of strings" } { "quot" quotation } }
 { $description "Parses Factor source code in a sequence of lines. The initial vocabulary search path is used (see " { $link file-vocabs } ")." }
@@ -524,17 +489,6 @@ HELP: eval
 { $values { "str" string } }
 { $description "Parses Factor source code from a string, and calls the resulting quotation. The current vocabulary search path is used." }
 { $errors "Throws an error if the input is malformed, or if the quotation throws an error." } ;
-
-HELP: parse-hook
-{ $var-description "A quotation called by " { $link parse-stream } " after parsing the input stream. The default value recompiles new word definitions; see " { $link "recompile" } " for details." } ;
-
-{ parse-hook do-parse-hook } related-words
-
-HELP: start-parsing
-{ $values { "stream" "an input stream" } { "name" "a pathname string" } }
-{ $description "Prepares to parse a source file by reading the entire contents of the stream and setting some variables. The pathname identifies the stream for cross-referencing purposes." }
-{ $errors "Throws an I/O error if there was an error reading from the stream." }
-{ $notes "This is one of the factors of " { $link parse-stream } "." } ;
 
 HELP: outside-usages
 { $values { "seq" "a sequence of definitions" } { "usages" "an association list mapping definitions to sequences of definitions" } }
@@ -551,17 +505,10 @@ HELP: smudged-usage
 HELP: forget-smudged
 { $description "Forgets removed definitions and prints a warning message if any of them are still referenced from other source files." } ;
 
-HELP: record-definitions
-{ $values { "file" source-file } }
-{ $description "Records that all " { $link new-definitions } " were defined in " { $snippet "file" } "." } ;
-
 HELP: finish-parsing
 { $values { "quot" "the quotation just parsed" } }
 { $description "Records information to the current " { $link file } " and prints warnings about any removed definitions which are still in use." }
 { $notes "This is one of the factors of " { $link parse-stream } "." } ;
-
-HELP: undo-parsing
-{ $description "Records information to the current " { $link file } " after an incomplete parse which ended with an error." } ;
 
 HELP: parse-stream
 { $values { "stream" "an input stream" } { "name" "a file name for error reporting and cross-referencing" } { "quot" quotation } }
@@ -581,20 +528,6 @@ HELP: run-file
 HELP: ?run-file
 { $values { "path" "a pathname string" } }
 { $description "If the file exists, runs it with " { $link run-file } ", otherwise does nothing." } ;
-
-HELP: reload
-{ $values { "defspec" "a definition specifier" } }
-{ $description "Reloads the source file containing the definition." }
-{ $examples
-    "Reloading a word definition:"
-    { $code "\\ foo reload" }
-    "A word's documentation:"
-    { $code "\\ foo >link reload" }
-    "A method definition:"
-    { $code "{ editor draw-gadget* } reload" }
-    "A help article:"
-    { $code "\"handbook\" >link reload" }
-} ;
 
 HELP: bootstrap-file
 { $values { "path" "a pathname string" } }

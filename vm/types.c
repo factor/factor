@@ -474,13 +474,6 @@ DEFINE_PRIMITIVE(word)
 	dpush(tag_object(allot_word(vocab,name)));
 }
 
-DEFINE_PRIMITIVE(update_xt)
-{
-	F_WORD *word = untag_word(dpop());
-	word->compiledp = F;
-	word->xt = default_word_xt(word);
-}
-
 DEFINE_PRIMITIVE(word_xt)
 {
 	F_WORD *word = untag_word(dpeek());

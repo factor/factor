@@ -7,7 +7,7 @@ ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 { $subsection compile }
 "The optimizing compiler can also compile a single quotation:"
 { $subsection compile-quot }
-{ $subsection compile-1 }
+{ $subsection compile-call }
 "Three utility words for bulk compilation:"
 { $subsection compile-batch }
 { $subsection compile-vocabs }
@@ -111,9 +111,6 @@ HELP: recompile
 
 HELP: compile-all
 { $description "Recompiles all words." } ;
-
-HELP: changed-words
-{ $var-description "Global variable holding words which need to be recompiled. Implemented as a hashtable where a key equals its value. This hashtable is updated by " { $link define } " when words are redefined, and inspected and cleared by " { $link recompile } "." } ;
 
 HELP: compile-begins
 { $values { "word" word } }

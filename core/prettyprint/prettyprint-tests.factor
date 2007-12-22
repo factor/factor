@@ -53,10 +53,6 @@ unit-test
 
 [ "W{ \\ + }" ] [ [ W{ \ + } ] first unparse ] unit-test
 
-[ t ] [
-    "[ >r \"alloc\" add 0 0 r> ]" dup parse first unparse =
-] unit-test
-
 [ ] [ \ fixnum see ] unit-test
 
 [ ] [ \ integer see ] unit-test

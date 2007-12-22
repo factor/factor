@@ -26,10 +26,6 @@ HELP: compiling?
 { $values { "word" word } { "?" "a boolean" } }
 { $description "Tests if a word is going to be or already is compiled." } ;
 
-HELP: modify-code-heap ( array -- )
-{ $values { "array" "an array of 6-element arrays having shape " { $snippet "{ word code labels rel words literals }" } } }
-{ $description "Stores compiled code definitions in the code heap and updates words to point at those definitions." } ;
-
 HELP: compiling-word
 { $var-description "The word currently being compiled, set by " { $link generate-1 } "." } ;
 

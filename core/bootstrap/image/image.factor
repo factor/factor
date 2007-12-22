@@ -444,7 +444,7 @@ PRIVATE>
 
 : make-image ( arch -- )
     [
-        parse-hook off
+        [ drop ] recompile-hook set
         prepare-image
         begin-image
         "resource:/core/bootstrap/stage1.factor" run-file

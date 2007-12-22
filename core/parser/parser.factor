@@ -8,8 +8,6 @@ io.files io.streams.string io.streams.lines vocabs
 source-files classes hashtables ;
 IN: parser
 
-SYMBOL: file
-
 TUPLE: lexer text line column ;
 
 : <lexer> ( text -- lexer ) 1 0 lexer construct-boa ;
@@ -20,27 +18,6 @@ TUPLE: lexer text line column ;
 : location ( -- loc )
     file get lexer get lexer-line 2dup and
     [ >r source-file-path r> 2array ] [ 2drop f ] if ;
-
-SYMBOL: old-definitions
-SYMBOL: new-definitions
-
-TUPLE: redefine-error def ;
-
-M: redefine-error error.
-    "Re-definition of " write
-    redefine-error-def . ;
-
-: redefine-error ( definition -- )
-    \ redefine-error construct-boa
-    { { "Continue" t } } throw-restarts drop ;
-
-: redefinition? ( definition -- ? )
-    dup class? [ drop f ] [ new-definitions get key? ] if ;
-
-: (save-location) ( definition loc -- )
-    over redefinition? [ over redefine-error ] when
-    over set-where
-    dup new-definitions get dup [ set-at ] [ 3drop ] if ;
 
 : save-location ( definition -- )
     location (save-location) ;
@@ -119,7 +96,8 @@ M: lexer skip-word ( lexer -- )
 
 TUPLE: bad-escape ;
 
-: bad-escape ( -- * ) \ bad-escape construct-empty throw ;
+: bad-escape ( -- * )
+    \ bad-escape construct-empty throw ;
 
 M: bad-escape summary drop "Bad escape code" ;
 
@@ -238,7 +216,9 @@ PREDICATE: unexpected unexpected-eof
 : CREATE ( -- word ) scan create-in ;
 
 : CREATE-CLASS ( -- word )
-    scan create-in dup predicate-word save-location ;
+    scan in get create
+    dup <class-definition> save-location
+    dup predicate-word save-location ;
 
 : word-restarts ( possibilities -- restarts )
     natural-sort [
@@ -256,16 +236,12 @@ M: no-word summary
     dup word-vocabulary (use+) ;
 
 : forward-reference? ( word -- ? )
-    dup old-definitions get key?
-    swap new-definitions get key? not and ;
-
-TUPLE: forward-error word ;
-
-M: forward-error error.
-    "Forward reference to " write forward-error-word . ;
-
-: forward-error ( word -- )
-    \ forward-error construct-boa throw ;
+    {
+        { [ dup old-definitions get key? not ] [ f ] }
+        { [ dup new-definitions get key? ] [ f ] }
+        { [ dup <class-definition> new-definitions get key? ] [ f ] }
+        { [ t ] [ t ] }
+    } cond nip ;
 
 : check-forward ( str word -- word )
     dup forward-reference? [
@@ -284,12 +260,25 @@ M: forward-error error.
 : scan-word ( -- word/number/f )
     scan dup [ dup string>number [ ] [ search ] ?if ] when ;
 
+TUPLE: staging-violation word ;
+
+: staging-violation ( word -- * )
+    \ staging-violation construct-boa throw ;
+
+M: staging-violation summary
+    drop
+    "A parsing word cannot be used in the same file it is defined in." ;
+
+: execute-parsing ( word -- )
+    dup new-definitions get key? [ staging-violation ] when
+    execute ;
+
 : parse-step ( accum end -- accum ? )
     scan-word {
         { [ 2dup eq? ] [ 2drop f ] }
         { [ dup not ] [ drop unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
-        { [ dup parsing? ] [ nip execute t ] }
+        { [ dup parsing? ] [ nip execute-parsing t ] }
         { [ t ] [ pick push drop t ] }
     } cond ;
 
@@ -361,25 +350,12 @@ SYMBOL: bootstrap-syntax
 : parse-fresh ( lines -- quot )
     [ file-vocabs parse-lines ] with-scope ;
 
-SYMBOL: parse-hook
-
-: do-parse-hook ( -- ) parse-hook get [ call ] when* ;
-
 : parsing-file ( file -- )
     "quiet" get [
         drop
     ] [
         "Loading " write <pathname> . flush
     ] if ;
-
-: start-parsing ( stream name -- )
-    H{ } clone new-definitions set
-    dup [
-        source-file
-        dup file set
-        source-file-definitions clone old-definitions set
-    ] [ drop ] if
-    contents \ contents set ;
 
 : smudged-usage-warning ( usages removed -- )
     parser-notes? [
@@ -416,35 +392,22 @@ SYMBOL: parse-hook
     smudged-usage forget-all
     over empty? [ 2dup smudged-usage-warning ] unless 2drop ;
 
-: record-definitions ( file -- )
-    new-definitions get swap set-source-file-definitions ;
-
-: finish-parsing ( quot -- )
-    file get dup [
-        [ record-form ] keep
-        [ record-modified ] keep
-        [ \ contents get record-checksum ] keep
-        record-definitions
-        forget-smudged
-    ] [
-        2drop
-    ] if ;
-
-: undo-parsing ( -- )
-    file get [
-        dup source-file-definitions new-definitions get union
-        swap set-source-file-definitions
-    ] when* ;
+: finish-parsing ( contents quot -- )
+    file get
+    [ record-form ] keep
+    [ record-modified ] keep
+    [ record-definitions ] keep
+    record-checksum ;
 
 : parse-stream ( stream name -- quot )
     [
         [
-            start-parsing
-            \ contents get string-lines parse-fresh
-            dup finish-parsing
-            do-parse-hook
-        ] [ ] [ undo-parsing ] cleanup
-    ] with-scope ;
+            contents
+            dup string-lines parse-fresh
+            tuck finish-parsing
+            forget-smudged
+        ] with-source-file
+    ] with-compilation-unit ;
 
 : parse-file-restarts ( file -- restarts )
     "Load " swap " again" 3append t 2array 1array ;
@@ -462,9 +425,6 @@ SYMBOL: parse-hook
 : run-file ( file -- )
     [ [ parse-file call ] keep ] assert-depth drop ;
 
-: reload ( defspec -- )
-    where first [ run-file ] when* ;
-
 : ?run-file ( path -- )
     dup ?resource-path exists? [ run-file ] [ drop ] if ;
 
@@ -478,9 +438,8 @@ SYMBOL: parse-hook
 : ?bootstrap-file ( path -- )
     dup ?resource-path exists? [ bootstrap-file ] [ drop ] if ;
 
-: parse ( str -- quot ) string-lines parse-lines ;
-
-: eval ( str -- ) parse call ;
+: eval ( str -- )
+    [ string-lines parse-fresh ] with-compilation-unit call ;
 
 : eval>string ( str -- output )
     [

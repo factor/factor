@@ -17,7 +17,7 @@ SYMBOL: compiled-xts
     f swap compiled-xts get set-at ;
 
 : finish-compiling ( word literals words rel labels code -- )
-    6array swap dup unchanged-word compiled-xts get set-at ;
+    6array swap compiled-xts get set-at ;
 
 : compiling? ( word -- ? )
     {

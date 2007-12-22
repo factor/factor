@@ -14,7 +14,6 @@ slots classes.union words.private ;
 
 load-help? off
 crossref off
-changed-words off
 
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab vocab-words bootstrap-syntax set
@@ -144,7 +143,6 @@ H{ } clone update-map set
     { "float>" "math.private" }
     { "float>=" "math.private" }
     { "<word>" "words" }
-    { "update-xt" "words" }
     { "word-xt" "words" }
     { "drop" "kernel" }
     { "2drop" "kernel" }
@@ -189,7 +187,7 @@ H{ } clone update-map set
     { "tag" "kernel.private" }
     { "cwd" "io.files" }
     { "cd" "io.files" }
-    { "modify-code-heap" "generator" }
+    { "modify-code-heap" "words.private" }
     { "dlopen" "alien" }
     { "dlsym" "alien" }
     { "dlclose" "alien" }

@@ -4,6 +4,8 @@ USING: kernel words parser io inspector quotations sequences
 prettyprint continuations effects ;
 IN: tools.annotations
 
+: reset "not implemented yet" throw ;
+
 : annotate ( word quot -- )
     over >r >r word-def r> call r>
     swap define-compound do-parse-hook ;

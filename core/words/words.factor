@@ -14,18 +14,6 @@ GENERIC: execute ( word -- )
 
 M: word execute (execute) ;
 
-! Used by the compiler
-SYMBOL: changed-words
-
-: word-changed? ( word -- ? )
-    changed-words get [ key? ] [ drop f ] if* ;
-
-: changed-word ( word -- )
-    dup changed-words get [ set-at ] [ 2drop ] if* ;
-
-: unchanged-word ( word -- )
-    changed-words get [ delete-at ] [ drop ] if* ;
-
 M: word <=>
     [ dup word-name swap word-vocabulary 2array ] compare ;
 
@@ -98,21 +86,14 @@ M: compound redefined* ( word -- )
 
 <PRIVATE
 
-: definition-changed? ( word def -- ? )
-    swap word-def = not ;
+: changed-word ( word -- ) dup changed-words get set-at ;
 
 : define ( word def -- )
-    2dup definition-changed? [
-        over redefined
-        over unxref
-        over set-word-def
-        dup update-xt
-        dup word-vocabulary [
-            dup changed-word dup xref
-        ] when drop
-    ] [
-        2drop
-    ] if ;
+    over unxref
+    over redefined
+    over set-word-def
+    dup changed-word
+    dup word-vocabulary [ dup xref ] when drop ;
 
 PRIVATE>
 
@@ -153,9 +134,6 @@ PRIVATE>
 
 : gensym ( -- word )
     "G:" \ gensym counter number>string append f <word> ;
-
-: define-temp ( quot -- word )
-    gensym [ swap define-compound ] keep ;
 
 : reveal ( word -- )
     dup word-name over word-vocabulary vocab-words set-at ;
@@ -201,7 +179,6 @@ M: word (forget-word)
 
 : forget-word ( word -- )
     dup delete-xref
-    dup unchanged-word
     (forget-word) ;
 
 M: word forget forget-word ;
@@ -214,3 +191,7 @@ M: word literalize <wrapper> ;
 : ?word-name dup word? [ word-name ] when ;
 
 : xref-words ( -- ) all-words [ xref ] each ;
+
+recompile-hook global
+[ [ [ f ] { } map>assoc modify-code-heap ] or ]
+change-at

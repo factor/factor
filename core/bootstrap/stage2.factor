@@ -19,8 +19,6 @@ IN: bootstrap.stage2
 
     parse-command-line
 
-    all-words [ dup ] H{ } map>assoc changed-words set-global
-
     "-no-crossref" cli-args member? [
         "Cross-referencing..." print flush
         H{ } clone crossref set-global
@@ -40,19 +38,13 @@ IN: bootstrap.stage2
         "listener" use+
     ] if
 
-    f parse-hook [
-        "exclude" "include"
-        [ get-global " " split [ empty? not ] subset ] 2apply
-        seq-diff
-        [ "bootstrap." swap append require ] each
-    ] with-variable
-
-    do-parse-hook
+    "exclude" "include"
+    [ get-global " " split [ empty? not ] subset ] 2apply
+    seq-diff
+    [ "bootstrap." swap append require ] each
 
     init-io
     init-stdio
-
-    changed-words get clear-assoc
 
     "compile-errors" "generator" lookup [
         f swap set-global

@@ -344,8 +344,6 @@ t over set-effect-terminated?
 \ <word> { object object } { word } <effect> "inferred-effect" set-word-prop
 \ <word> make-flushable
 
-\ update-xt { word } { } <effect> "inferred-effect" set-word-prop
-
 \ word-xt { word } { integer } <effect> "inferred-effect" set-word-prop
 \ word-xt make-flushable
 

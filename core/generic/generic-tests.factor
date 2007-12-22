@@ -120,7 +120,7 @@ TUPLE: delegating ;
 
 [ t ] [ \ + math-generic? ] unit-test
 
-[ "SYMBOL: not-a-class C: not-a-class ;" parse ] unit-test-fails
+[ "SYMBOL: not-a-class C: not-a-class ;" eval ] unit-test-fails
 
 ! Test math-combination
 [ [ [ >float ] dip ] ] [ \ real \ float math-upgrade ] unit-test

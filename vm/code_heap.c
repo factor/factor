@@ -348,32 +348,44 @@ DEFINE_PRIMITIVE(modify_code_heap)
 	CELL i;
 	for(i = 0; i < count; i++)
 	{
-		F_ARRAY *data = untag_array(array_nth(alist,i));
+		F_ARRAY *pair = untag_array(array_nth(alist,i));
 
-		F_WORD *word = untag_word(array_nth(data,0));
-		CELL profiler_prologue = to_cell(array_nth(data,1));
-		F_ARRAY *literals = untag_array(array_nth(data,2));
-		F_ARRAY *words = untag_array(array_nth(data,3));
-		F_ARRAY *rel = untag_array(array_nth(data,4));
-		F_ARRAY *labels = untag_array(array_nth(data,5));
-		F_ARRAY *code = untag_array(array_nth(data,6));
+		F_WORD *word = untag_word(array_nth(pair,0));
+		CELL data = array_nth(pair,1);
 
-		REGISTER_UNTAGGED(alist);
-		REGISTER_UNTAGGED(word);
+		if(data == F)
+		{
+			word->compiledp = F;
+			word->xt = default_word_xt(word);
+		}
+		else
+		{
+			F_ARRAY *compiled_code = untag_array(data);
 
-		F_COMPILED *compiled = add_compiled_block(
-			WORD_TYPE,
-			profiler_prologue,
-			code,
-			labels,
-			rel,
-			words,
-			literals);
+			CELL profiler_prologue = to_cell(array_nth(compiled_code,0));
+			F_ARRAY *literals = untag_array(array_nth(compiled_code,1));
+			F_ARRAY *words = untag_array(array_nth(compiled_code,2));
+			F_ARRAY *rel = untag_array(array_nth(compiled_code,3));
+			F_ARRAY *labels = untag_array(array_nth(compiled_code,4));
+			F_ARRAY *code = untag_array(array_nth(compiled_code,5));
 
-		UNREGISTER_UNTAGGED(word);
-		UNREGISTER_UNTAGGED(alist);
+			REGISTER_UNTAGGED(alist);
+			REGISTER_UNTAGGED(word);
 
-		set_word_xt(word,compiled);
+			F_COMPILED *compiled = add_compiled_block(
+				WORD_TYPE,
+				profiler_prologue,
+				code,
+				labels,
+				rel,
+				words,
+				literals);
+
+			UNREGISTER_UNTAGGED(word);
+			UNREGISTER_UNTAGGED(alist);
+
+			set_word_xt(word,compiled);
+		}
 	}
 
 	if(count != 0)

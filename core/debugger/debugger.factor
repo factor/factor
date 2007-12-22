@@ -221,3 +221,10 @@ M: condition error-help drop f ;
 M: assert summary drop "Assertion failed" ;
 
 M: immutable summary drop "Sequence is immutable" ;
+
+M: redefine-error error.
+    "Re-definition of " write
+    redefine-error-def . ;
+
+M: forward-error error.
+    "Forward reference to " write forward-error-word . ;

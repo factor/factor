@@ -3,6 +3,12 @@ namespaces parser tools.test words kernel sequences arrays io
 effects tools.test.inference ;
 IN: temporary
 
+[ t ] [
+    changed-words get assoc-size
+    [ ] define-temp drop
+    changed-words get assoc-size =
+] unit-test
+
 parse-hook get [
     DEFER: foo \ foo reset-generic
     DEFER: bar \ bar reset-generic

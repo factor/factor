@@ -63,6 +63,8 @@ f swap set-vocab-source-loaded?
     "{"
     "}"
     "CS{"
+    "<<"
+    ">>"
 } [ "syntax" create drop ] each
 
 "t" "syntax" lookup define-symbol

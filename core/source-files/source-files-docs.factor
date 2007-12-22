@@ -80,3 +80,14 @@ HELP: reset-checksums
 HELP: forget-source
 { $values { "path" "a pathname string" } }
 { $description "Forgets all information known about a source file." } ;
+
+HELP: record-definitions
+{ $values { "file" source-file } }
+{ $description "Records that all " { $link new-definitions } " were defined in " { $snippet "file" } "." } ;
+
+HELP: rollback-source-file
+{ $values { "file" source-file } }
+{ $description "Records information to the source file after an incomplete parse which ended with an error." } ;
+
+HELP: file
+{ $var-description "Stores the " { $link source-file } " being parsed. The " { $link source-file-path } " of this object comes from the input parameter to " { $link with-source-file } "." } ;

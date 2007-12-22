@@ -143,8 +143,7 @@ ARTICLE: "word.private" "Word implementation details"
 { $subsection word-def }
 { $subsection set-word-def }
 "An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
-{ $subsection word-xt }
-{ $subsection update-xt } ;
+{ $subsection word-xt } ;
 
 ARTICLE: "words" "Words"
 "Words are the Factor equivalent of functions or procedures; a word is a body of code with a unique name and some additional meta-data. Words are defined in the " { $vocab-link "words" } " vocabulary."
@@ -278,15 +277,6 @@ HELP: gensym
 { $examples { $unchecked-example "gensym ." "G:260561" } }
 { $notes "Gensyms are often used as placeholder values that have no meaning of their own but must be unique. For example, the compiler uses gensyms to label sections of code." } ;
 
-HELP: define-temp
-{ $values { "quot" quotation } { "word" word } }
-{ $description "Creates an uninterned word that will call " { $snippet "quot" } " when executed." }
-{ $notes
-    "The following phrases are equivalent:"
-    { $code "[ 2 2 + . ] call" }
-    { $code "[ 2 2 + . ] define-temp execute" }
-} ;
-
 HELP: bootstrapping?
 { $var-description "Set by the library while bootstrap is in progress. Some parsing words need to behave differently during bootstrap." } ;
 
@@ -337,29 +327,10 @@ HELP: bootstrap-word
 { $values { "word" word } { "target" word } }
 { $description "Looks up a word with the same name and vocabulary as the given word, performing a transformation to handle parsing words in the target dictionary. Used during bootstrap to transfer host words to the target dictionary." } ;
 
-HELP: update-xt ( word -- )
-{ $values { "word" word } }
-{ $description "Updates a word's execution token based on the value of the " { $link word-def } " slot. If the word was compiled by the optimizing compiler, this forces the word to revert to its unoptimized definition." }
-{ $side-effects "word" } ;
-
 HELP: parsing?
 { $values { "obj" object } { "?" "a boolean" } }
 { $description "Tests if an object is a parsing word declared by " { $link POSTPONE: parsing } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
-
-HELP: word-changed?
-{ $values { "word" word } { "?" "a boolean" } }
-{ $description "Tests if a word needs to be recompiled." } ;
-
-HELP: changed-word
-{ $values { "word" word } }
-{ $description "Marks a word as needing recompilation by adding it to the " { $link changed-words } " assoc." }
-$low-level-note ;
-
-HELP: unchanged-word
-{ $values { "word" word } }
-{ $description "Marks a word as no longer needing recompilation by removing it from the " { $link changed-words } " assoc." }
-$low-level-note ;
 
 HELP: define-declared
 { $values { "word" word } { "def" quotation } { "effect" effect } }
