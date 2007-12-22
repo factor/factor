@@ -237,7 +237,7 @@ M: no-word summary
 
 : forward-reference? ( word -- ? )
     {
-        { [ dup old-definitions get key? not ] [ f ] }
+        { [ dup old-definitions get key? over <class-definition> old-definitions get key? or not ] [ f ] }
         { [ dup new-definitions get key? ] [ f ] }
         { [ dup <class-definition> new-definitions get key? ] [ f ] }
         { [ t ] [ t ] }

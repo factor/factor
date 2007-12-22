@@ -343,16 +343,26 @@ IN: temporary
         ] catch [ redefine-error? ] is?
     ] unit-test
 
-    [ t ] [
-        [
-            "IN: temporary \\ class-fwd-test TUPLE: class-fwd-test ;"
-            <string-reader> "redefining-a-class-3" parse-stream drop
-        ] catch [ forward-error? ] is?
+    [ ] [
+        "IN: temporary TUPLE: class-fwd-test ;"
+        <string-reader> "redefining-a-class-3" parse-stream drop
     ] unit-test
 
     [ t ] [
         [
-            "IN: temporary \\ class-fwd-test TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
+            "IN: temporary \\ class-fwd-test"
+            <string-reader> "redefining-a-class-3" parse-stream drop
+        ] catch [ forward-error? ] is?
+    ] unit-test
+
+    [ ] [
+        "IN: temporary TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
+        <string-reader> "redefining-a-class-3" parse-stream drop
+    ] unit-test
+
+    [ t ] [
+        [
+            "IN: temporary \\ class-fwd-test"
             <string-reader> "redefining-a-class-3" parse-stream drop
         ] catch [ forward-error? ] is?
     ] unit-test
