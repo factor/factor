@@ -1,10 +1,10 @@
 ! Copyright (C) 2006 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs debugger furnace.sessions furnace.validator
-hashtables html.elements http http.server.responders
-http.server.templating
-io.files kernel namespaces quotations sequences splitting words
-strings vectors webapps.callback ;
+USING: arrays assocs calendar debugger furnace.sessions furnace.validator
+hashtables heaps html.elements http http.server.responders
+http.server.templating io.files kernel math namespaces
+quotations sequences splitting words strings vectors
+webapps.callback ;
 USING: continuations io prettyprint ;
 IN: furnace
 
@@ -57,13 +57,17 @@ SYMBOL: validation-errors
         ] if*
     ] curry* map ;
 
+: expire-sessions ( -- )
+    sessions get-global
+    [ nip session-last-seen 20 minutes ago <=> 0 > ]
+    [ 2drop ] heap-pop-while ;
+
 : lookup-session ( hash -- session )
-    "furnace-session-id" over at* [
-        sessions get-global at
-        [ nip ] [ "furnace-session-id" over delete-at lookup-session ] if*
+    "furnace-session-id" over at sessions get-global at [
+        nip
     ] [
-        drop new-session rot "furnace-session-id" swap set-at
-    ] if ;
+        new-session rot "furnace-session-id" swap set-at
+    ] if* ;
 
 : quot>query ( seq action -- hash )
     >r >array r> "action-params" word-prop

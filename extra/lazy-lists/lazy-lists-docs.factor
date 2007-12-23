@@ -114,6 +114,16 @@ HELP: lsubset
 { $description "Perform a similar functionality to that of the " { $link subset } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-subset> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } 
 { $see-also leach lmap lmap-with ltake lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge } ;
 
+HELP: lwhile
+{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( X -- bool )" } { "result" "resulting cons object" } }
+{ $description "Outputs a lazy list containing the first items in the list as long as " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link <lazy-while> } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." }
+{ $see-also luntil } ;
+
+HELP: luntil
+{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( X -- bool )" } { "result" "resulting cons object" } }
+{ $description "Outputs a lazy list containing the first items in the list until after " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link <lazy-while> } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." }
+{ $see-also lwhile } ;
+
 HELP: list>vector
 { $values { "list" "a cons object" } { "vector" "the list converted to a vector" } }
 { $description "Convert a list to a vector. If the list is a lazy infinite list then this will enter an infinite loop." } 

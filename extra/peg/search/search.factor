@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math io io.streams.string sequences strings
-lazy-lists combinators parser-combinators.simple ;
-IN: parser-combinators 
+combinators peg memoize arrays ;
+IN: peg.search 
 
 : tree-write ( object -- )
   { 
@@ -12,26 +12,21 @@ IN: parser-combinators
     { [ t             ] [ write ] }
   } cond ;
 
+MEMO: any-char-parser ( -- parser )
+  [ drop t ] satisfy ;
+
 : search ( string parser -- seq )
-  any-char-parser [ drop f ] <@ <|> <*> parse dup nil? [
-    drop { }
+  any-char-parser [ drop f ] action 2array choice repeat0 parse dup [
+    parse-result-ast [ ] subset 
   ] [
-    car parse-result-parsed [ ] subset 
+    drop { }
   ] if ;
 
-: search* ( string parsers -- seq )
-  unclip [ <|> ] reduce any-char-parser [ drop f ] <@ <|> <*> parse dup nil? [
-    drop { }
-  ] [
-    car parse-result-parsed [ ] subset 
-  ] if ;
 
 : (replace) ( string parser -- seq )
-  any-char-parser <|> <*> parse-1 ;
+  any-char-parser 2array choice repeat0 parse parse-result-ast [ ] subset ;
 
 : replace ( string parser -- result )
  [  (replace) [ tree-write ] each ] string-out ;
 
-: replace* ( string parsers -- result )
-  swap [ replace ] reduce ;
 
