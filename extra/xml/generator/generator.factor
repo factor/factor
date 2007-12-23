@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel xml.data xml.utilities assocs splitting
-sequences parser quotations sequences.lib ;
+sequences parser quotations sequences.lib xml.utilities ;
 IN: xml.generator
 
 : comment, ( string -- ) <comment> , ;

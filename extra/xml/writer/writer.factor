@@ -22,14 +22,14 @@ IN: xml.writer
     [ write CHAR: : write1 ] when*
     name-tag write ;
 
-: print-attrs ( hash -- )
+: print-attrs ( assoc -- )
     [
-        first2 " " write
+        " " write
         swap print-name
         "=\"" write
         chars>entities write
         "\"" write
-    ] each ;
+    ] assoc-each ;
 
 GENERIC: write-item ( object -- )
 
@@ -38,8 +38,7 @@ M: string write-item
 
 M: contained-tag write-item
     CHAR: < write1
-    dup print-name
-    tag-attrs print-attrs
+    dup print-name tag-attrs print-attrs
     "/>" write ;
 
 M: open-tag write-item

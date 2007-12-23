@@ -41,17 +41,13 @@ C: <instruction> instruction
 TUPLE: prolog version encoding standalone ;
 C: <prolog> prolog
 
-TUPLE: xml prolog before after ;
-: <xml> ( prolog before main after -- xml )
-    { set-xml-prolog set-xml-before set-delegate set-xml-after }
-    xml construct ;
+TUPLE: tag attrs children ;
 
-TUPLE: attrs ;
-: <attrs> ( alist -- attrs )
-    attrs construct-delegate ;
+TUPLE: attrs alist ;
+C: <attrs> attrs
 
 : attr@ ( key alist -- index {key,value} )
-    >r assure-name r>
+    >r assure-name r> attrs-alist
     [ first names-match? ] curry* find ;
 
 M: attrs at*
@@ -60,13 +56,13 @@ M: attrs set-at
     2dup attr@ nip [
         2nip set-second
     ] [
-        [ >r assure-name swap 2array r> ?push ] keep
-        set-delegate
+        >r assure-name swap 2array r>
+        [ attrs-alist ?push ] keep set-attrs-alist
     ] if* ;
 
-M: attrs assoc-size length ;
+M: attrs assoc-size attrs-alist length ;
 M: attrs new-assoc drop V{ } new <attrs> ;
-M: attrs >alist delegate >alist ;
+M: attrs >alist attrs-alist >alist ;
 
 : >attrs ( assoc -- attrs )
     dup [
@@ -77,13 +73,15 @@ M: attrs assoc-like
     drop dup attrs? [ >attrs ] unless ;
 
 M: attrs clear-assoc
-    f swap set-delegate ;
+    f swap set-attrs-alist ;
 M: attrs delete-at
-    tuck attr@ drop [ swap delete-nth ] [ drop ] if* ;
+    tuck attr@ drop [ swap attrs-alist delete-nth ] [ drop ] if* ;
+
+M: attrs clone
+    attrs-alist clone <attrs> ;
 
 INSTANCE: attrs assoc
 
-TUPLE: tag attrs children ;
 : <tag> ( name attrs children -- tag )
     >r >r assure-name r> T{ attrs } assoc-like r>
     { set-delegate set-tag-attrs set-tag-children }
@@ -96,6 +94,45 @@ INSTANCE: tag assoc
 ! They also follow the sequence protocol (for children)
 CONSULT: sequence-protocol tag tag-children ;
 INSTANCE: tag sequence
+
+M: tag like
+    over tag? [
+        [ delegate ] keep tag-attrs
+        rot dup [ V{ } like ] when <tag>
+    ] unless ;
+
+M: tag clone
+    [ delegate clone ] keep [ tag-attrs clone ] keep
+    tag-children clone
+    { set-delegate set-tag-attrs set-tag-children } tag construct ;
+
+TUPLE: xml prolog before main after ;
+: <xml> ( prolog before main after -- xml )
+    { set-xml-prolog set-xml-before set-delegate set-xml-after }
+    xml construct ;
+
+CONSULT: sequence-protocol xml delegate ;
+INSTANCE: xml sequence
+
+CONSULT: assoc-protocol xml delegate ;
+INSTANCE: xml assoc
+
+<PRIVATE
+: tag>xml ( xml tag -- newxml )
+    swap [ dup xml-prolog swap xml-before rot ] keep xml-after <xml> ;
+
+: seq>xml ( xml seq -- newxml )
+    over delegate like tag>xml ;
+PRIVATE>
+
+M: xml clone
+    [ xml-prolog clone ] keep [ xml-before clone ] keep
+    [ delegate clone ] keep xml-after clone <xml> ;
+
+M: xml like
+    swap dup xml? [
+        dup tag? [ tag>xml ] [ seq>xml ] if
+    ] unless ;
 
 ! tag with children=f is contained
 : <contained-tag> ( name attrs -- tag )
