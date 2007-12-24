@@ -76,8 +76,10 @@ SYMBOL: load-vocab-hook
     [ ] subset ;
 
 : forget-vocab ( vocab -- )
-    dup vocab-words values forget-all
-    vocab-name dictionary get delete-at ;
+    [
+        dup vocab-words values forget-all
+        vocab-name dictionary get delete-at
+    ] with-compilation-unit ;
 
 : child-vocab? ( prefix name -- ? )
     2dup = pick empty? or

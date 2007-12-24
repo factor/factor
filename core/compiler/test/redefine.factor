@@ -32,7 +32,7 @@ parse-hook get [
     [ f ] [ \ bar changed-words get key? ] unit-test
     [   ] [ \ bar [ 1 2 3 ] define-compound ] unit-test
     [ t ] [ \ bar changed-words get key? ] unit-test
-    [   ] [ \ bar forget ] unit-test
+    [   ] [ [ \ bar forget ] with-compilation-unit ] unit-test
     [ f ] [ \ bar changed-words get key? ] unit-test
 
     : xy ;

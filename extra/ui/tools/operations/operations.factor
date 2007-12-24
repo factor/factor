@@ -74,7 +74,10 @@ UNION: definition word method-spec link vocab vocab-link ;
     { +listener+ t }
 } define-operation
 
-[ definition? ] \ forget H{ } define-operation
+: com-forget ( defspec -- )
+    [ forget ] with-compilation-unit ;
+
+[ definition? ] \ com-forget H{ } define-operation
 
 ! Words
 [ word? ] \ insert-word H{

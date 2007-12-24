@@ -6,7 +6,9 @@ parser source-files words assocs tuples definitions
 debugger ;
 
 ! This vocab should not exist, but just in case...
-[ ] [ "vocabs.loader.test" forget-vocab ] unit-test
+[ ] [
+    "vocabs.loader.test" forget-vocab
+] unit-test
 
 [ T{ vocab-link f "vocabs.loader.test" } ]
 [ "vocabs.loader.test" f >vocab-link ] unit-test
@@ -78,12 +80,12 @@ IN: temporary
 
 0 "count-me" set-global
 
-[ ] [ "vocabs.loader.test.b" forget-vocab ] unit-test
+[ ] [
+    "vocabs.loader.test.b" forget-vocab
+] unit-test
 
 [ ] [
-    "vocabs.loader.test.b" vocab-files [
-        forget-source
-    ] each
+    "vocabs.loader.test.b" vocab-files [ forget-source ] each
 ] unit-test
 
 [ "vocabs.loader.test.b" require ] unit-test-fails
@@ -101,9 +103,7 @@ IN: temporary
 [ t ] [ "fred" "vocabs.loader.test.b" lookup compound? ] unit-test
 
 [ ] [
-    "vocabs.loader.test.b" vocab-files [
-        forget-source
-    ] each
+    "vocabs.loader.test.b" vocab-files [ forget-source ] each
 ] unit-test
 
 [ ] [ "vocabs.loader.test.b" refresh ] unit-test

@@ -26,11 +26,15 @@ IN: temporary
     ] unit-test
 ] with-scope
 
-[ ] [ "vocabs.loader.test.c" forget-vocab ] unit-test
+[ ] [
+    "vocabs.loader.test.c" forget-vocab
+] unit-test
 
 [
     "USE: vocabs.loader.test.c" <string-reader>
     parse-interactive
 ] unit-test-fails
 
-[ ] [ "vocabs.loader.test.c" forget-vocab ] unit-test
+[ ] [
+    "vocabs.loader.test.c" forget-vocab
+] unit-test

@@ -120,11 +120,13 @@ TUPLE: yo-momma ;
 [ f ] [ \ <yo-momma> generic? ] unit-test
 
 ! Test forget
-[ t ] [ \ yo-momma class? ] unit-test
-[ ] [ \ yo-momma forget ] unit-test
-[ f ] [ \ yo-momma typemap get values memq? ] unit-test
+[
+    [ t ] [ \ yo-momma class? ] unit-test
+    [ ] [ \ yo-momma forget ] unit-test
+    [ f ] [ \ yo-momma typemap get values memq? ] unit-test
 
-[ f ] [ \ yo-momma interned? ] unit-test
+    [ f ] [ \ yo-momma interned? ] unit-test
+] with-compilation-unit
 
 TUPLE: loc-recording ;
 
@@ -140,9 +142,11 @@ M: forget-robustness forget-robustness-generic ;
 
 M: integer forget-robustness-generic ;
 
-[ ] [ \ forget-robustness-generic forget ] unit-test
-[ ] [ \ forget-robustness forget ] unit-test
-[ ] [ { forget-robustness forget-robustness-generic } forget ] unit-test
+[
+    [ ] [ \ forget-robustness-generic forget ] unit-test
+    [ ] [ \ forget-robustness forget ] unit-test
+    [ ] [ { forget-robustness forget-robustness-generic } forget ] unit-test
+] with-compilation-unit
 
 ! rapido found this one
 GENERIC# m1 0 ( s n -- n )

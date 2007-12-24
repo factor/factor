@@ -74,10 +74,12 @@ uses definitions ;
 M: pathname where pathname-string 1 2array ;
 
 : forget-source ( path -- )
-    dup source-file
-    dup unxref-source
-    source-file-definitions [ keys forget-all ] each
-    source-files get delete-at ;
+    [
+        dup source-file
+        dup unxref-source
+        source-file-definitions [ keys forget-all ] each
+        source-files get delete-at
+    ] with-compilation-unit ;
 
 M: pathname forget pathname-string forget-source ;
 

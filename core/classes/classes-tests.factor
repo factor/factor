@@ -137,7 +137,7 @@ INSTANCE: integer mx1
 
 [ mx1 ] [ array integer class-or ] unit-test
 
-\ mx1 forget
+[ \ mx1 forget ] with-compilation-unit
 
 [ f ] [ array integer class-or mx1 = ] unit-test
 
