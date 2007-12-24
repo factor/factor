@@ -95,7 +95,7 @@ IN: bootstrap.syntax
 
     "DEFER:" [
         scan in get create
-        dup old-definitions get delete-at
+        dup old-definitions get first delete-at
         set-word
     ] define-syntax
 
@@ -128,7 +128,7 @@ IN: bootstrap.syntax
         location >r
         scan-word bootstrap-word scan-word
         [ parse-definition <method> -rot define-method ] 2keep
-        2array r> (save-location)
+        2array r> remember-definition
     ] define-syntax
 
     "UNION:" [

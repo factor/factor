@@ -54,26 +54,37 @@ TUPLE: redefine-error def ;
     \ redefine-error construct-boa
     { { "Continue" t } } throw-restarts drop ;
 
-: redefinition? ( definition -- ? )
-    new-definitions get key? ;
+: add-once ( key assoc -- )
+    2dup key? [ drop redefine-error ] when dupd set-at ;
 
-: (save-location) ( definition loc -- )
-    over redefinition? [ over redefine-error ] when
-    over set-where
-    dup new-definitions get set-at ;
+: (remember-definition) ( definition loc assoc -- )
+    >r over set-where r> add-once ;
+
+: remember-definition ( definition loc -- )
+    new-definitions get first (remember-definition) ;
+
+: remember-class ( class loc -- )
+    new-definitions get second (remember-definition) ;
 
 TUPLE: forward-error word ;
 
 : forward-error ( word -- )
     \ forward-error construct-boa throw ;
 
+: forward-reference? ( word -- ? )
+    dup old-definitions get assoc-stack
+    [ new-definitions get assoc-stack not ]
+    [ drop f ] if ;
+
 SYMBOL: recompile-hook
+
+: <definitions> ( -- pair ) { H{ } H{ } } [ clone ] map ;
 
 : with-compilation-unit ( quot -- new-defs )
     [
         H{ } clone changed-words set
-        H{ } clone new-definitions set
-        old-definitions off
+        <definitions> new-definitions set
+        <definitions> old-definitions set
         call
         changed-words get keys recompile-hook get call
     ] with-scope ; inline

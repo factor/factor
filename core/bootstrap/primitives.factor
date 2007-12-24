@@ -19,7 +19,11 @@ crossref off
 "syntax" vocab vocab-words bootstrap-syntax set
 
 "resource:core/bootstrap/syntax.factor" parse-file
+
 H{ } clone dictionary set
+H{ } clone changed-words set
+[ drop ] recompile-hook set
+
 call
 
 ! Create some empty vocabs where the below primitives and

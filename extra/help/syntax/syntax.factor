@@ -13,7 +13,7 @@ IN: help.syntax
 : ARTICLE:
     location >r
     \ ; parse-until >array [ first2 ] keep 2 tail <article>
-    over add-article >link r> (save-location) ; parsing
+    over add-article >link r> remember-definition ; parsing
 
 : ABOUT:
     scan-word dup parsing? [

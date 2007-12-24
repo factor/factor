@@ -229,7 +229,7 @@ HELP: <lexer>
 
 HELP: location
 { $values { "loc" "a " { $snippet "{ path line# }" } " pair" } }
-{ $description "Outputs the current parser location. This value can be passed to " { $link set-where } " or " { $link (save-location) } "." } ;
+{ $description "Outputs the current parser location. This value can be passed to " { $link set-where } " or " { $link remember-definition } "." } ;
 
 HELP: save-location
 { $values { "definition" "a definition specifier" } }

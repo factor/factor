@@ -20,7 +20,10 @@ TUPLE: lexer text line column ;
     [ >r source-file-path r> 2array ] [ 2drop f ] if ;
 
 : save-location ( definition -- )
-    location (save-location) ;
+    location remember-definition ;
+
+: save-class-location ( class -- )
+    location remember-class ;
 
 SYMBOL: parser-notes
 
@@ -217,7 +220,7 @@ PREDICATE: unexpected unexpected-eof
 
 : CREATE-CLASS ( -- word )
     scan in get create
-    dup <class-definition> save-location
+    dup save-class-location
     dup predicate-word save-location ;
 
 : word-restarts ( possibilities -- restarts )
@@ -234,14 +237,6 @@ M: no-word summary
     dup \ no-word construct-boa
     swap words-named word-restarts throw-restarts
     dup word-vocabulary (use+) ;
-
-: forward-reference? ( word -- ? )
-    {
-        { [ dup old-definitions get key? over <class-definition> old-definitions get key? or not ] [ f ] }
-        { [ dup new-definitions get key? ] [ f ] }
-        { [ dup <class-definition> new-definitions get key? ] [ f ] }
-        { [ t ] [ t ] }
-    } cond nip ;
 
 : check-forward ( str word -- word )
     dup forward-reference? [
@@ -270,7 +265,8 @@ M: staging-violation summary
     "A parsing word cannot be used in the same file it is defined in." ;
 
 : execute-parsing ( word -- )
-    dup new-definitions get key? [ staging-violation ] when
+    dup
+    new-definitions get first key? [ staging-violation ] when
     execute ;
 
 : parse-step ( accum end -- accum ? )
@@ -380,9 +376,10 @@ SYMBOL: bootstrap-syntax
         file get source-file-path =
     ] assoc-subset ;
 
+: removed-definitions ( -- definitions ) new-definitions get old-definitions get [ first2 union ] 2apply diff ;
+
 : smudged-usage ( -- usages referenced removed )
-    new-definitions get old-definitions get diff filter-moved
-    keys [
+    removed-definitions filter-moved keys [
         outside-usages
         [ empty? swap pathname? or not ] assoc-subset
         dup values concat prune swap keys

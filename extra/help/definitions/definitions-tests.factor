@@ -12,7 +12,7 @@ IN: temporary
         "IN: temporary USING: help.syntax ; : hello ; HELP: hello \"test\" ; ARTICLE: \"hello\" \"world\" ; ARTICLE: \"hello2\" \"world\" ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions assoc-size
+        "foo" source-file source-file-definitions first assoc-size
     ] unit-test
 
     [ t ] [ "hello" articles get key? ] unit-test
@@ -25,7 +25,7 @@ IN: temporary
         "IN: temporary USING: help.syntax ; : hello ; ARTICLE: \"hello\" \"world\" ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions assoc-size
+        "foo" source-file source-file-definitions first assoc-size
     ] unit-test
 
     [ t ] [ "hello" articles get key? ] unit-test

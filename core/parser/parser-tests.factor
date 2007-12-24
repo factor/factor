@@ -141,7 +141,7 @@ IN: temporary
         "IN: temporary : smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions assoc-size
+        "foo" source-file source-file-definitions first assoc-size
     ] unit-test
 
     [ t ] [ "smudge-me" "temporary" lookup >boolean ] unit-test
@@ -158,21 +158,21 @@ IN: temporary
         "IN: temporary USING: math strings ; GENERIC: smudge-me M: integer smudge-me ; M: string smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions assoc-size
+        "foo" source-file source-file-definitions first assoc-size
     ] unit-test
 
     [ 1 ] [
         "IN: temporary USING: arrays ; M: array smudge-me ;" <string-reader> "bar"
         parse-stream drop
 
-        "bar" source-file source-file-definitions assoc-size
+        "bar" source-file source-file-definitions first assoc-size
     ] unit-test
 
     [ 2 ] [
         "IN: temporary USING: math strings ; GENERIC: smudge-me M: integer smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions assoc-size
+        "foo" source-file source-file-definitions first assoc-size
     ] unit-test
     
     [ t ] [
@@ -217,7 +217,7 @@ IN: temporary
 
     [ t ] [
         [
-            "IN: temporary : x ; : y 3 throw ; parsing y"
+            "IN: temporary : x ; : y 3 throw ; this is an error"
             <string-reader> "a" parse-stream
         ] catch parse-error?
     ] unit-test
@@ -376,9 +376,9 @@ IN: temporary
     : ~c ;
     : ~d ;
 
-    H{ { ~a ~a } { ~c ~c } { ~d ~d } } old-definitions set
+    { H{ { ~a ~a } { ~c ~c } { ~d ~d } } H{ } } old-definitions set
     
-    H{ { ~d ~d } } new-definitions set
+    { H{ { ~d ~d } } H{ } } new-definitions set
     
     [ V{ ~b } { ~a } { ~a ~c } ] [
         smudged-usage

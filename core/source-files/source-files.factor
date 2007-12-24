@@ -58,7 +58,9 @@ uses definitions ;
     new-definitions get swap set-source-file-definitions ;
 
 : <source-file> ( path -- source-file )
-    { set-source-file-path } \ source-file construct ;
+    <definitions>
+    { set-source-file-path set-source-file-definitions }
+    \ source-file construct ;
 
 : source-file ( path -- source-file )
     source-files get [ <source-file> ] cache ;
@@ -74,13 +76,13 @@ M: pathname where pathname-string 1 2array ;
 : forget-source ( path -- )
     dup source-file
     dup unxref-source
-    source-file-definitions keys forget-all
+    source-file-definitions [ keys forget-all ] each
     source-files get delete-at ;
 
 M: pathname forget pathname-string forget-source ;
 
 : rollback-source-file ( source-file -- )
-    dup source-file-definitions new-definitions get union
+    dup source-file-definitions new-definitions get [ union ] 2map
     swap set-source-file-definitions ;
 
 SYMBOL: file

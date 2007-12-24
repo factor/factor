@@ -351,12 +351,18 @@ M: curry '
 : emit-words ( -- )
     all-words [ emit-word ] each ;
 
+: fix-source-files
+    [
+        clone dup source-file-definitions H{ } clone 2array
+        over set-source-file-definitions
+    ] assoc-map ;
+
 : emit-global ( -- )
     [
         {
             dictionary source-files
             typemap builtins class<map update-map
-        } [ dup get swap bootstrap-word set ] each
+        } [ dup get swap [ source-files eq? [ fix-source-files ] when ] keep bootstrap-word set ] each
     ] H{ } make-assoc
     bootstrap-global set
     bootstrap-global emit-userenv ;
@@ -444,7 +450,6 @@ PRIVATE>
 
 : make-image ( arch -- )
     [
-        [ drop ] recompile-hook set
         prepare-image
         begin-image
         "resource:/core/bootstrap/stage1.factor" run-file
