@@ -1,6 +1,7 @@
 ! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.ranges math.text namespaces sequences strings ;
+USING: combinators.lib kernel math math.ranges math.text namespaces sequences
+    strings ;
 IN: project-euler.017
 
 ! http://projecteuler.net/index.php?section=problems&id=17
@@ -68,7 +69,7 @@ PRIVATE>
 ! -------------------
 
 : euler017a ( -- answer )
-    1000 [1,b] SBUF" " clone [ number>text over push-all ] reduce [ alpha? ] count ;
+    1000 [1,b] SBUF" " clone [ number>text over push-all ] reduce [ Letter? ] count ;
 
 ! [ euler017a ] 100 ave-time
 ! 14 ms run / 1 ms GC ave time - 100 trials
