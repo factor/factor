@@ -1,6 +1,6 @@
-! Copyright (c) 2007 Samuel Tardieu.
+! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math namespaces sequences strings ;
+USING: kernel math math.text namespaces ranges sequences strings ;
 IN: project-euler.017
 
 ! http://projecteuler.net/index.php?section=problems&id=17
@@ -17,6 +17,7 @@ IN: project-euler.017
 ! NOTE: Do not count spaces or hyphens. For example, 342 (three hundred and
 ! forty-two) contains 23 letters and 115 (one hundred and fifteen) contains
 ! 20 letters.
+
 
 ! SOLUTION
 ! --------
@@ -38,18 +39,18 @@ IN: project-euler.017
 DEFER: make-english
 
 : maybe-add ( n sep -- )
-  over 0 = [ 2drop ] [ % make-english ] if ;
+  over zero? [ 2drop ] [ % make-english ] if ;
 
 : 0-99 ( n -- )
   dup 20 < [ units ] [ 10 /mod swap tenths "-" maybe-add ] if ;
 
 : 0-999 ( n -- )
   100 /mod swap
-  dup 0 = [ drop 0-99 ] [ units " hundred" % " and " maybe-add ] if ;
+  dup zero? [ drop 0-99 ] [ units " hundred" % " and " maybe-add ] if ;
 
 : make-english ( n -- )
   1000 /mod swap
-  dup 0 = [ drop 0-999 ] [ 0-999 " thousand" % " and " maybe-add ] if ;
+  dup zero? [ drop 0-999 ] [ 0-999 " thousand" % " and " maybe-add ] if ;
 
 PRIVATE>
 
@@ -57,9 +58,19 @@ PRIVATE>
   [ make-english ] "" make ;
 
 : euler017 ( -- answer )
-  1000 [ 1 + >english [ letter? ] subset length ] map sum ;
+  1000 [1,b] [ >english [ letter? ] subset length ] map sum ;
 
 ! [ euler017 ] 100 ave-time
 ! 9 ms run / 0 ms GC ave time - 100 trials
+
+
+! ALTERNATE SOLUTIONS
+! -------------------
+
+: euler017a ( -- answer )
+    1000 [1,b] SBUF" " clone [ number>text over push-all ] reduce [ alpha? ] count ;
+
+! [ euler017a ] 100 ave-time
+! 14 ms run / 1 ms GC ave time - 100 trials
 
 MAIN: euler017
