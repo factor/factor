@@ -16,11 +16,8 @@ IN: project-euler.016
 ! SOLUTION
 ! --------
 
-: number>digits ( n -- seq )
-    number>string string>digits ;
-
 : euler016 ( -- answer )
-    2 1000 ^ number>digits sum ;
+    2 1000 ^ number>string string>digits sum ;
 
 ! [ euler016 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials

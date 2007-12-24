@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer, Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel lazy-lists math math.erato math.functions math.ranges
-       namespaces sequences ;
+    namespaces sequences ;
 IN: project-euler.010
 
 ! http://projecteuler.net/index.php?section=problems&id=10
@@ -21,9 +21,6 @@ IN: project-euler.010
 
 : euler010 ( -- answer )
     0 1000000 lerato [ + ] leach ;
-
-! TODO: solution is still too slow for 1000000, probably due to seq-diff
-! calling member? for each number that we want to remove
 
 ! [ euler010 ] time
 ! 765 ms run / 7 ms GC time
