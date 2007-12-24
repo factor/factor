@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.text namespaces ranges sequences strings ;
+USING: kernel math math.ranges math.text namespaces sequences strings ;
 IN: project-euler.017
 
 ! http://projecteuler.net/index.php?section=problems&id=17
