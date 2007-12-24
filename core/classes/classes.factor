@@ -277,9 +277,3 @@ M: object class type type>class ;
     2 slot { word } declare ; inline
 
 PRIVATE>
-
-! A dummy
-TUPLE: class-definition ;
-
-: <class-definition> ( word -- defspec )
-    class-definition construct-delegate ;
