@@ -62,7 +62,7 @@ M: attrs set-at
 
 M: attrs assoc-size attrs-alist length ;
 M: attrs new-assoc drop V{ } new <attrs> ;
-M: attrs >alist attrs-alist >alist ;
+M: attrs >alist attrs-alist ;
 
 : >attrs ( assoc -- attrs )
     dup [
@@ -130,9 +130,9 @@ M: xml clone
     [ delegate clone ] keep xml-after clone <xml> ;
 
 M: xml like
-    swap dup xml? [
+    swap dup xml? [ nip ] [
         dup tag? [ tag>xml ] [ seq>xml ] if
-    ] unless ;
+    ] if ;
 
 ! tag with children=f is contained
 : <contained-tag> ( name attrs -- tag )
