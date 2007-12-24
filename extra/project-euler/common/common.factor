@@ -1,8 +1,11 @@
 USING: arrays kernel hashtables math math.functions math.miller-rabin
-    math.ranges namespaces sequences combinators.lib ;
+    math.parser math.ranges namespaces sequences combinators.lib ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution.
+
+: nth-pair ( n seq -- nth next )
+    over 1+ over nth >r nth r> ;
 
 <PRIVATE
 
@@ -23,19 +26,28 @@ IN: project-euler.common
 : tau-limit ( n -- n )
     sqrt floor >fixnum ;
 
+: max-children ( seq -- seq )
+    [ dup length 1- [ over nth-pair max , ] each ] { } make nip ;
+
 PRIVATE>
-
-
-: divisor? ( n m -- ? )
-    mod zero? ;
-
-: perfect-square? ( n -- ? )
-    dup sqrt mod zero? ;
 
 : collect-consecutive ( seq width -- seq )
     [
         2dup count-shifts [ 2dup head shift-3rd , ] times
     ] { } make 2nip ;
+
+: divisor? ( n m -- ? )
+    mod zero? ;
+
+: max-path ( triangle -- n )
+    dup length 1 > [
+        2 cut* first2 max-children [ + ] 2map add max-path
+    ] [
+        first first
+    ] if ;
+
+: perfect-square? ( n -- ? )
+    dup sqrt mod zero? ;
 
 : prime-factorization ( n -- seq )
     [
