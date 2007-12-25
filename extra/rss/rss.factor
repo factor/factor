@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: rss
-USING: xml.utilities kernel assocs
+USING: xml.utilities kernel assocs xml.generator
     strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities io.files io
     http.client namespaces xml.generator hashtables ;
@@ -85,26 +85,22 @@ C: <entry> entry
     ] if ;
 
 ! Atom generation
-: simple-tag, ( content name -- )
-    [ , ] tag, ;
-
-: simple-tag*, ( content name attrs -- )
-    [ , ] tag*, ;
-
 : entry, ( entry -- )
-    "entry" [
-        dup entry-title "title" { { "type" "html" } } simple-tag*,
-        "link" over entry-link "href" associate contained*,
-        dup entry-pub-date "published" simple-tag,
-        entry-description [ "content" { { "type" "html" } } simple-tag*, ] when*
-    ] tag, ;
+    << entry >> [
+        << title >> [ dup entry-title , ]
+        << link [ dup entry-link ] == href // >>
+        << published >> [ dup entry-pub-date , ]
+        << content >> [ entry-description , ]
+    ] ;
 
 : feed>xml ( feed -- xml )
-    "feed" { { "xmlns" "http://www.w3.org/2005/Atom" } } [
-        dup feed-title "title" simple-tag,
-        "link" over feed-link "href" associate contained*,
-        feed-entries [ entry, ] each
-    ] make-xml* ;
+    <XML
+        << feed [ "http://www.w3.org/2005/Atom" ] == xmlns >> [
+            << title >> [ dup feed-title , ]
+            << link [ dup feed-link ] == href // >>
+            feed-entries [ entry, ] each
+        ]
+    XML> ;
 
 : write-feed ( feed -- )
     feed>xml write-xml ;

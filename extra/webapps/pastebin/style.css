@@ -35,3 +35,7 @@ pre.code {
 	border: 1px solid #C1DAD7;
 	padding: 10px;
 }
+
+.error {
+	color: red;
+}

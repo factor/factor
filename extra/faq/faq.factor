@@ -8,16 +8,16 @@ IN: faq
 : find-after ( seq quot -- elem after )
     over >r find r> rot 1+ tail ; inline
 
-: tag-named? ( tag name -- ? )
-    assure-name swap (get-tag) ;
+: tag-named*? ( tag name -- ? )
+    assure-name swap tag-named? ;
 
 ! Questions
 TUPLE: q/a question answer ;
 C: <q/a> q/a
 
 : li>q/a ( li -- q/a )
-    [ "br" tag-named? not ] subset
-    [ "strong" tag-named? ] find-after
+    [ "br" tag-named*? not ] subset
+    [ "strong" tag-named*? ] find-after
     >r tag-children r> <q/a> ;
 
 : q/a>li ( q/a -- li )
