@@ -54,4 +54,4 @@ generator command-line vocabs io prettyprint libc ;
     malloc free memcpy
 } compile
 
-[ compile-batch ] recompile-hook set-global
+[ compile ] recompile-hook set-global

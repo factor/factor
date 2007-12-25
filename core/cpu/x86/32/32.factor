@@ -279,7 +279,7 @@ T{ x86-backend f 4 } compiler-backend set-global
 
 "-no-sse2" cli-args member? [
     "Checking if your CPU supports SSE2..." print flush
-    [ sse2? ] compile-1 [
+    [ sse2? ] compile-call [
         " - yes" print
         "cpu.x86.sse2" require
     ] [

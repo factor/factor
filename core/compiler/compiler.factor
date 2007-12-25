@@ -29,27 +29,34 @@ SYMBOL: compiler-hook
     "compiled-effect" set-word-prop ;
 
 : (compile) ( word -- )
-    dup compiling? not over compound? and [
-        [
-            dup compile-begins
-            dup word-dataflow optimize >r over dup r> generate
-        ] [
-            print-error f
-        ] recover
-        2dup ripple-up save-effect
-    ] [ drop ] if ;
+    [
+        dup compile-begins
+        dup word-dataflow optimize >r over dup r> generate
+    ] [
+        print-error f
+    ] recover
+    2dup ripple-up save-effect ;
+
+: delete-any ( assoc -- element )
+    [ [ 2drop t ] assoc-find 2drop dup ] keep delete-at ;
+
+: compile-loop ( assoc -- )
+    dup assoc-empty?
+    [ drop ] [ dup delete-any (compile) compile-loop ] if ;
 
 : compile ( words -- )
     [
-        <dlist> compile-queue set
-        H{ } clone compiled-xts set
+        H{ } clone compile-queue set
+        H{ } clone compiled set
         [ queue-compile ] each
-        compile-queue get [ (compile) ] dlist-slurp
-        compiled-xts get >alist modify-code-heap
+        compile-queue get compile-loop
+        compiled get >alist modify-code-heap
     ] with-scope ; inline
 
 : compile-quot ( quot -- word )
-    [ define-temp ] with-compilation-unit ;
+    H{ } clone changed-words [
+        define-temp dup 1array compile
+    ] with-variable ;
 
 : compile-call ( quot -- )
     compile-quot execute ;

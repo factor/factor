@@ -19,12 +19,8 @@ $nl
 
 ABOUT: "generator"
 
-HELP: compiled-xts
+HELP: compiled
 { $var-description "During compilation, holds a hashtable mapping words to 5-element arrays holding compiled code." } ;
-
-HELP: compiling?
-{ $values { "word" word } { "?" "a boolean" } }
-{ $description "Tests if a word is going to be or already is compiled." } ;
 
 HELP: compiling-word
 { $var-description "The word currently being compiled, set by " { $link generate-1 } "." } ;

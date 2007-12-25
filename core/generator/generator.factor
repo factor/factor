@@ -4,24 +4,29 @@ USING: arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
 inference inference.backend inference.dataflow io kernel
 kernel.private layouts math namespaces optimizer prettyprint
-quotations sequences system threads words dlists ;
+quotations sequences system threads words ;
 IN: generator
 
 SYMBOL: compile-queue
-
-SYMBOL: compiled-xts
+SYMBOL: compiled
 
 : 6array 3array >r 3array r> append ;
 
-: finish-compiling ( word literals words rel labels code -- )
-    6array swap compiled-xts get set-at ;
+: begin-compiling ( word -- )
+    f swap compiled get set-at ;
 
-: compiling? ( word -- ? )
-    dup compiled-xts get key? swap compiled? ;
+: finish-compiling ( word literals words rel labels code -- )
+    6array swap compiled get set-at ;
 
 : queue-compile ( word -- )
-    dup f compiled-xts get set-at
-    compile-queue get push-front ;
+    {
+        { [ dup compound? not ] [ drop ] }
+        { [ dup compiled get key? ] [ drop ] }
+        { [ t ] [ dup compile-queue get set-at ] }
+    } cond ;
+
+: maybe-compile ( word -- )
+    dup compiled? [ drop ] [ queue-compile ] if ;
 
 SYMBOL: compiling-word
 
@@ -41,7 +46,7 @@ t compiled-stack-traces? set-global
     literal-table get push ;
 
 : generate-1 ( word label node quot -- )
-    [
+    pick begin-compiling [
         roll compiling-word set
         pick compiling-label set
         init-generator
@@ -124,7 +129,7 @@ M: node generate-node drop iterate-next ;
     } cond ;
 
 : generate-call ( label -- next )
-    dup queue-compile
+    dup maybe-compile
     end-basic-block
     tail-call? [
         %jump f
