@@ -22,9 +22,6 @@ IN: project-euler.010
 : euler010 ( -- answer )
     0 1000000 lerato [ + ] leach ;
 
-! TODO: solution is still too slow for 1000000, probably due to seq-diff
-! calling member? for each number that we want to remove
-
 ! [ euler010 ] time
 ! 765 ms run / 7 ms GC time
 
