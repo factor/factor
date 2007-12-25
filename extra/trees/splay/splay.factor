@@ -5,9 +5,12 @@ prettyprint.backend trees generic ;
 IN: trees.splay
 
 TUPLE: splay ;
+
 : <splay> ( -- splay-tree )
-    splay construct-empty
+    \ splay construct-empty
     <tree> over set-delegate ;
+
+INSTANCE: splay assoc
 
 : rotate-right ( node -- node )
     dup node-left
@@ -74,7 +77,7 @@ DEFER: (splay)
         nip dup node-right swap f over set-node-right swap
     ] if ;
 
-: (get-splay) ( key tree -- node ? )
+: get-splay ( key tree -- node ? )
     2dup splay tree-root cmp 0 = [
         nip t
     ] [
@@ -94,36 +97,36 @@ DEFER: (splay)
         drop f
     ] if* ;
 
-: (remove-splay) ( key tree -- )
-    tuck (get-splay) nip [
-        dup tree-count 1- over set-tree-count
+: remove-splay ( key tree -- )
+    tuck get-splay nip [
+        dup dec-count
         dup node-right swap node-left splay-join
         swap set-tree-root
     ] [ drop ] if* ;
 
-: (set-splay) ( value key tree -- )
-    2dup (get-splay) [ 2nip set-node-value ] [
-       drop dup tree-count 1+ over set-tree-count
+: set-splay ( value key tree -- )
+    2dup get-splay [ 2nip set-node-value ] [
+       drop dup inc-count
        2dup splay-split rot
-       >r node construct-boa r> set-tree-root
+       >r >r swapd r> node construct-boa r> set-tree-root
     ] if ;
 
 : new-root ( value key tree -- )
     [ 1 swap set-tree-count ] keep
-    >r <node> r> set-tree-root ;
+    >r swap <node> r> set-tree-root ;
 
 M: splay set-at ( value key tree -- )
-    dup tree-root [ (set-splay) ] [ new-root ] if ;
+    dup tree-root [ set-splay ] [ new-root ] if ;
 
 M: splay at* ( key tree -- value ? )
     dup tree-root [
-        (get-splay) >r dup [ node-value ] when r>
+        get-splay >r dup [ node-value ] when r>
     ] [
         2drop f f
     ] if ;
 
 M: splay delete-at ( key tree -- )
-    dup tree-root [ (remove-splay) ] [ 2drop ] if ;
+    dup tree-root [ remove-splay ] [ 2drop ] if ;
 
 M: splay new-assoc
     2drop <splay> ;
@@ -140,3 +143,10 @@ M: splay assoc-like
     ] unless ;
 
 M: splay pprint-delims drop \ SPLAY{ \ } ;
+M: splay >pprint-sequence >alist ;
+M: splay pprint-narrow? drop t ;
+
+! When tuple inheritance is used, the following lines won't be necessary
+M: splay assoc-size tree-count ;
+M: splay clear-assoc delegate clear-assoc ;
+M: splay assoc-find >r tree-root r> find-node ;

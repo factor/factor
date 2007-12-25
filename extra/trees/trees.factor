@@ -8,6 +8,8 @@ TUPLE: tree root count ;
 : <tree> ( -- tree )
     f 0 tree construct-boa ;
 
+INSTANCE: tree assoc
+
 TUPLE: node key value left right ;
 : <node> ( key value -- node )
     f f node construct-boa ;
@@ -18,6 +20,12 @@ SYMBOL: current-side
 : right 1 ; inline
 
 : go-left? ( -- ? ) current-side get left = ;
+
+: inc-count ( tree -- )
+    dup tree-count 1+ swap set-tree-count ;
+
+: dec-count ( tree -- )
+    dup tree-count 1- swap set-tree-count ;
 
 : node-link@ ( node ? -- node )
     go-left? xor [ node-left ] [ node-right ] if ;
@@ -60,7 +68,7 @@ SYMBOL: current-side
         ] [
             choose-branch node-at*
         ] if
-    ] [ f f ] if* ;
+    ] [ drop f f ] if* ;
 
 M: tree at* ( key tree -- value ? )
     tree-root node-at* ;
