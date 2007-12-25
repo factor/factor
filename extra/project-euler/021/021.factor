@@ -32,13 +32,13 @@ IN: project-euler.021
         [ 2dup divisor? [ 2dup / + , ] [ drop ] if ] each drop
     ] { } make sum 1+ ;
 
-: amicable-pair? ( n m -- ? )
-    { [ 2dup = not ] [ 2dup d = ] } && 2nip ;
-
 PRIVATE>
 
+: amicable? ( n -- ? )
+    dup d { [ 2dup = not ] [ 2dup d = ] } && 2nip ;
+
 : euler021 ( -- answer )
-    10000 [1,b] [ dup dup d amicable-pair? [ drop 0 ] unless ] sigma ;
+    10000 [1,b] [ dup amicable? [ drop 0 ] unless ] sigma ;
 
 ! [ euler021 ] 100 ave-time
 ! 328 ms run / 10 ms GC ave time - 100 trials
