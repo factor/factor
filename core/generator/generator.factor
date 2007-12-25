@@ -13,19 +13,14 @@ SYMBOL: compiled-xts
 
 : 6array 3array >r 3array r> append ;
 
-: begin-compiling ( word -- )
-    f swap compiled-xts get set-at ;
-
 : finish-compiling ( word literals words rel labels code -- )
     6array swap compiled-xts get set-at ;
 
 : compiling? ( word -- ? )
-    {
-        { [ dup compiled-xts get key? ] [ drop t ] }
-        { [ t ] [ compiled? ] }
-    } cond ;
+    dup compiled-xts get key? swap compiled? ;
 
 : queue-compile ( word -- )
+    dup f compiled-xts get set-at
     compile-queue get push-front ;
 
 SYMBOL: compiling-word
@@ -46,7 +41,7 @@ t compiled-stack-traces? set-global
     literal-table get push ;
 
 : generate-1 ( word label node quot -- )
-    pick begin-compiling [
+    [
         roll compiling-word set
         pick compiling-label set
         init-generator

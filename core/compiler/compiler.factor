@@ -34,8 +34,7 @@ SYMBOL: compiler-hook
             dup compile-begins
             dup word-dataflow optimize >r over dup r> generate
         ] [
-            print-error
-            dup f compiled-xts get set-at f
+            print-error f
         ] recover
         2dup ripple-up save-effect
     ] [ drop ] if ;

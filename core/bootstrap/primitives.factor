@@ -22,6 +22,7 @@ crossref off
 
 H{ } clone dictionary set
 H{ } clone changed-words set
+H{ } clone changed-generics set
 [ drop ] recompile-hook set
 
 call
@@ -608,3 +609,6 @@ builtins get num-tags get tail f union-class define-class
 
 ! Bump build number
 "build" "kernel" create build 1+ 1quotation define-compound
+
+! Make generics
+changed-generics get keys [ make-generic ] each

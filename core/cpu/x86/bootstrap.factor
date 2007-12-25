@@ -21,7 +21,8 @@ big-endian off
     stack-frame-size PUSH                      ! save stack frame size       
     xt-reg PUSH                                ! save XT
     arg0 PUSH                                  ! save array
-    stack-reg 4 bootstrap-cells SUB            ! reserve space for scan-save
+    scan-reg PUSH                              ! initial scan
+    stack-reg 3 bootstrap-cells SUB            ! reserved
 ] { } make jit-prolog set                      
                                                
 : advance-scan scan-reg bootstrap-cell ADD ;   

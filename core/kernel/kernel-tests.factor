@@ -102,3 +102,9 @@ IN: temporary
 
 [ 3drop datastack ] unit-test-fails
 [ ] [ :c ] unit-test
+
+! Doesn't compile; important
+: foo 5 + 0 [ ] each ;
+
+[ drop foo ] unit-test-fails
+[ ] [ :c ] unit-test

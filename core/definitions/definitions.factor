@@ -45,6 +45,7 @@ M: object redefined* drop ;
     dup unxref crossref get delete-at ;
 
 SYMBOL: changed-words
+SYMBOL: changed-generics
 SYMBOL: old-definitions
 SYMBOL: new-definitions
 
@@ -77,14 +78,18 @@ TUPLE: forward-error word ;
     [ drop f ] if ;
 
 SYMBOL: recompile-hook
+SYMBOL: make-generic-hook
 
 : <definitions> ( -- pair ) { H{ } H{ } } [ clone ] map ;
 
 : with-compilation-unit ( quot -- new-defs )
     [
         H{ } clone changed-words set
+        H{ } clone changed-generics set
         <definitions> new-definitions set
         <definitions> old-definitions set
-        [ changed-words get keys recompile-hook get call ] [ ]
-        cleanup
+        [
+            changed-generics get keys make-generic-hook get call
+            changed-words get keys recompile-hook get call
+        ] [ ] cleanup
     ] with-scope ; inline

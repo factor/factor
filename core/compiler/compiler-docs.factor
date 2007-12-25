@@ -109,5 +109,5 @@ HELP: compile-begins
 
 HELP: (compile)
 { $values { "word" word } }
-{ $description "Compile a word. This word recursively calls itself to compile all dependencies." }
+{ $description "Compile a single word." }
 { $notes "This is an internal word, and user code should call " { $link compile } " instead." } ;

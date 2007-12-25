@@ -28,8 +28,11 @@ M: object perform-combination
     dup "combination" word-prop perform-combination
     define-compound ;
 
+[ [ make-generic ] each ] make-generic-hook set-global
+
 : ?make-generic ( word -- )
-    [ [ ] define-compound ] [ make-generic ] if-bootstrapping ;
+    dup compound? [ dup [ ] define-compound ] unless
+    dup changed-generics get set-at ;
 
 : init-methods ( word -- )
      dup "methods" word-prop
@@ -111,6 +114,4 @@ M: class forget ( class -- )
     forget-word ;
 
 M: class update-methods ( class -- )
-    [ drop ]
-    [ class-usages implementors* [ make-generic ] each ]
-    if-bootstrapping ;
+    class-usages implementors* [ ?make-generic ] each ;

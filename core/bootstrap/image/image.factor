@@ -390,8 +390,6 @@ M: curry '
     heap-size data-heap-size-offset fixup ;
 
 : end-image ( -- )
-    "Building generic words..." print flush
-    all-words [ generic? ] subset [ make-generic ] each
     "Serializing words..." print flush
     emit-words
     "Serializing JIT data..." print flush

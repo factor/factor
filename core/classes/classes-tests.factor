@@ -78,9 +78,7 @@ M: union-1 generic-update-test drop "union-1" ;
 
 [ union-1 ] [ fixnum float class-or ] unit-test
 
-"IN: temporary UNION: union-1 rational array ;" eval
-
-do-parse-hook
+"IN: temporary USE: math USE: arrays UNION: union-1 rational array ;" eval
 
 [ t ] [ bignum union-1 class< ] unit-test
 [ f ] [ union-1 number class< ] unit-test
@@ -88,9 +86,7 @@ do-parse-hook
 
 [ object ] [ fixnum float class-or ] unit-test
 
-"IN: temporary PREDICATE: integer union-1 even? ;" eval
-
-do-parse-hook
+"IN: temporary USE: math PREDICATE: integer union-1 even? ;" eval
 
 [ f ] [ union-1 union-class? ] unit-test
 [ t ] [ union-1 predicate-class? ] unit-test
@@ -130,7 +126,7 @@ INSTANCE: integer mx1
 [ t ] [ mx1 integer class< ] unit-test
 [ t ] [ mx1 number class< ] unit-test
 
-"INSTANCE: array mx1" eval
+"IN: temporary USE: arrays INSTANCE: array mx1" eval
 
 [ t ] [ array mx1 class< ] unit-test
 [ f ] [ mx1 number class< ] unit-test
@@ -161,7 +157,7 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 [ t ] [ quotation redefine-bug-2 class< ] unit-test
 [ redefine-bug-2 ] [ fixnum quotation class-or ] unit-test
 
-"IN: temporary UNION: redefine-bug-1 bignum ;" eval
+"IN: temporary USE: math UNION: redefine-bug-1 bignum ;" eval
 
 [ t ] [ bignum redefine-bug-1 class< ] unit-test
 [ f ] [ fixnum redefine-bug-2 class< ] unit-test
