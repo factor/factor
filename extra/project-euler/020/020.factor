@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.combinatorics math.parser sequences ;
+USING: kernel math.combinatorics math.parser project-euler.common sequences ;
 IN: project-euler.020
 
 ! http://projecteuler.net/index.php?section=problems&id=20
@@ -17,7 +17,7 @@ IN: project-euler.020
 ! --------
 
 : euler020 ( -- answer )
-    100 factorial number>string string>digits sum ;
+    100 factorial number>digits sum ;
 
 ! [ euler020 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials

@@ -15,6 +15,9 @@ IN: project-euler.common
 : shift-3rd ( seq obj obj -- seq obj obj )
     rot 1 tail -rot ;
 
+: max-children ( seq -- seq )
+    [ dup length 1- [ over nth-pair max , ] each ] { } make nip ;
+
 : >multiplicity ( seq -- seq )
     dup prune [
         [ 2dup [ = ] curry count 2array , ] each
@@ -22,12 +25,6 @@ IN: project-euler.common
 
 : reduce-2s ( n -- r s )
     dup even? [ factor-2s >r 1+ r> ] [ 1 swap ] if ;
-
-: tau-limit ( n -- n )
-    sqrt floor >fixnum ;
-
-: max-children ( seq -- seq )
-    [ dup length 1- [ over nth-pair max , ] each ] { } make nip ;
 
 PRIVATE>
 
@@ -46,8 +43,11 @@ PRIVATE>
         first first
     ] if ;
 
+: number>digits ( n -- seq )
+    number>string string>digits ;
+
 : perfect-square? ( n -- ? )
-    dup sqrt mod zero? ;
+    dup sqrt divisor? ;
 
 : prime-factorization ( n -- seq )
     [
@@ -68,6 +68,7 @@ PRIVATE>
 
 ! Optimized brute-force, is often faster than prime factorization
 : tau* ( n -- n )
-    reduce-2s [ perfect-square? -1 0 ? ] keep dup tau-limit [1,b] [
+    reduce-2s [ perfect-square? -1 0 ? ] keep
+    dup sqrt >fixnum [1,b] [
         dupd divisor? [ >r 2 + r> ] when
     ] each drop * ;

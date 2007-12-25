@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.functions math.parser sequences ;
+USING: kernel math.functions math.parser project-euler.common sequences ;
 IN: project-euler.016
 
 ! http://projecteuler.net/index.php?section=problems&id=16
@@ -17,7 +17,7 @@ IN: project-euler.016
 ! --------
 
 : euler016 ( -- answer )
-    2 1000 ^ number>string string>digits sum ;
+    2 1000 ^ number>digits sum ;
 
 ! [ euler016 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials
