@@ -253,8 +253,8 @@ PRIVATE>
 
 : (define-class) ( word props -- )
     over reset-class
+    over define-symbol
     >r dup word-props r> union over set-word-props
-    dup intern-symbol
     t "class" set-word-prop ;
 
 : define-class ( word members superclass metaclass -- )

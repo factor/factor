@@ -104,11 +104,6 @@ IN: temporary
     [ "OCT: 999" eval ] unit-test-fails
     [ "BIN: --0" eval ] unit-test-fails
 
-    [ f ] [
-        "IN: temporary : foo ; TUPLE: foo ;" eval
-        "foo" "temporary" lookup symbol?
-    ] unit-test
-
     ! Another funny bug
     [ t ] [
         [
@@ -365,6 +360,13 @@ IN: temporary
             "IN: temporary \\ class-fwd-test"
             <string-reader> "redefining-a-class-3" parse-stream drop
         ] catch [ forward-error? ] is?
+    ] unit-test
+
+    [ t ] [
+        [
+            "IN: temporary : foo ; TUPLE: foo ;"
+            <string-reader> "redefining-a-class-4" parse-stream drop
+        ] catch [ redefine-error? ] is?
     ] unit-test
 ] with-scope
 

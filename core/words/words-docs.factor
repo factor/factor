@@ -241,10 +241,6 @@ HELP: define-symbol
 { $description "Defines the word to push itself on the stack when executed." }
 { $side-effects "word" } ;
 
-HELP: intern-symbol
-{ $values { "word" word } }
-{ $description "If the word is undefined, makes it into a symbol which pushes itself on the stack when executed. If the word already has a definition, does nothing." } ;
-
 HELP: define-compound
 { $values { "word" word } { "def" quotation } }
 { $description "Defines the word to call a quotation when executed." }

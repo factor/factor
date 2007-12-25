@@ -56,7 +56,7 @@ TUPLE: redefine-error def ;
     { { "Continue" t } } throw-restarts drop ;
 
 : add-once ( key assoc -- )
-    2dup key? [ drop redefine-error ] when dupd set-at ;
+    2dup key? [ over redefine-error ] when dupd set-at ;
 
 : (remember-definition) ( definition loc assoc -- )
     >r over set-where r> add-once ;
@@ -65,6 +65,7 @@ TUPLE: redefine-error def ;
     new-definitions get first (remember-definition) ;
 
 : remember-class ( class loc -- )
+    over new-definitions get first key? [ dup redefine-error ] when
     new-definitions get second (remember-definition) ;
 
 TUPLE: forward-error word ;

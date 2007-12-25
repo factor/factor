@@ -207,29 +207,28 @@ M: word declarations.
 : pprint-; \ ; pprint-word ;
 
 : (see) ( spec -- )
-    [
-        <colon dup synopsis*
-        <block dup definition pprint-elements block>
-        dup definer nip [ pprint-word ] when* declarations.
-        block>
-    ] with-use nl ;
+    <colon dup synopsis*
+    <block dup definition pprint-elements block>
+    dup definer nip [ pprint-word ] when* declarations.
+    block> ;
 
-M: object see (see) ;
+M: object see
+    [ (see) ] with-use nl ;
 
 GENERIC: see-class* ( word -- )
 
 M: union-class see-class*
-    \ UNION: pprint-word
+    <colon \ UNION: pprint-word
     dup pprint-word
-    members pprint-elements pprint-; ;
+    members pprint-elements pprint-; block> ;
 
 M: mixin-class see-class*
-    \ MIXIN: pprint-word
+    <block \ MIXIN: pprint-word
     dup pprint-word <block
     dup members [
         hard line-break
         \ INSTANCE: pprint-word pprint-word pprint-word
-    ] curry* each block> ;
+    ] curry* each block> block> ;
 
 M: predicate-class see-class*
     <colon \ PREDICATE: pprint-word
@@ -240,10 +239,10 @@ M: predicate-class see-class*
     pprint-; block> block> ;
 
 M: tuple-class see-class*
-    \ TUPLE: pprint-word
+    <colon \ TUPLE: pprint-word
     dup pprint-word
     "slot-names" word-prop [ text ] each
-    pprint-; ;
+    pprint-; block> ;
 
 M: word see-class* drop ;
 
@@ -265,8 +264,10 @@ M: builtin-class see-class*
     [ 2array ] curry map ;
 
 M: word see
-    dup (see)
-    dup see-class
+    [
+        dup see-class*
+        dup class? over symbol? and not [ dup (see) ] when
+    ] with-use nl
     [
         dup class? [ dup see-implementors % ] when
         dup generic? [ dup see-methods % ] when

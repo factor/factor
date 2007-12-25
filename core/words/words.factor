@@ -97,10 +97,8 @@ M: compound redefined* ( word -- )
 
 PRIVATE>
 
-: define-symbol ( word -- ) t define ;
-
-: intern-symbol ( word -- )
-    dup undefined? [ define-symbol ] [ drop ] if ;
+: define-symbol ( word -- )
+    t define ;
 
 : define-compound ( word def -- )
     [ ] like define ;
