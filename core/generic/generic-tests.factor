@@ -184,7 +184,11 @@ M: debug-combination perform-combination
 
 SYMBOL: redefinition-test-generic
 
-redefinition-test-generic T{ debug-combination } define-generic
+[
+    redefinition-test-generic
+    T{ debug-combination }
+    define-generic
+] with-compilation-unit
 
 TUPLE: redefinition-test-tuple ;
 

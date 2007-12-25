@@ -113,10 +113,10 @@ unit-test
         use [ clone ] change
 
         [
-             parse-lines drop
-             [
-                 "USE: temporary \\ " swap " see" 3append eval
-             ] string-out "\n" split 1 head*
+            [ parse-fresh drop ] with-compilation-unit
+            [
+                "temporary" lookup see
+            ] string-out "\n" split 1 head*
         ] keep =
     ] with-scope ;
 

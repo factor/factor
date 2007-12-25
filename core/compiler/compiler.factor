@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces arrays sequences io inference.backend
-generator debugger math.parser prettyprint words continuations
-vocabs assocs alien.compiler dlists optimizer definitions ;
+generator debugger math.parser prettyprint words words.private
+continuations vocabs assocs alien.compiler dlists optimizer
+definitions ;
 IN: compiler
 
 SYMBOL: compiler-hook
@@ -45,14 +46,14 @@ SYMBOL: compiler-hook
         H{ } clone compiled-xts set
         [ queue-compile ] each
         compile-queue get [ (compile) ] dlist-slurp
-        compiled-xts get finish-compilation-unit
+        compiled-xts get >alist modify-code-heap
     ] with-scope ; inline
 
 : compile-quot ( quot -- word )
-    [ gensym dup rot define-compound ] with-compilation-unit ;
+    [ define-temp ] with-compilation-unit ;
 
 : compile-call ( quot -- )
     compile-quot execute ;
 
 : compile-all ( -- )
-    all-words compile-batch ;
+    all-words compile ;

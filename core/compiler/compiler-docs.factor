@@ -77,15 +77,6 @@ HELP: compile-failed
 { $values { "word" word } { "error" "an error" } }
 { $description "Called when the optimizing compiler fails to compile a word. The word is removed from the set of words pending compilation, and it's un-optimized compiled definition will be used. The error is reported by calling " { $link compile-error } "." } ;
 
-HELP: forget-errors
-{ $values { "seq" "a sequence of words" } }
-{ $description "If any of the words in the sequence previously failed to compile, removes the marker indicating such."
-$nl
-"The compiler remembers which words failed to compile as an optimization, so that it does not try to infer the stack effect of words which do not have one over and over again." }
-{ $notes "Usually this word does not need to be called directly; if a word failed to compile because of a stack effect error, fixing the word definition clears the flag automatically. However, if words failed to compile due to external factors which were subsequently rectified, such as an unavailable C library or a missing or broken compiler transform, this flag can be cleared for all words:"
-{ $code "all-words forget-errors" }
-"Subsequent invocations of the compiler will consider all words for compilation." } ;
-
 HELP: compile-batch
 { $values { "seq" "a sequence of words" } }
 { $description "Compiles a batch of words. Any compile errors are summarized at the end and can be viewed with " { $link :warnings } " and " { $link :errors } "." } ;

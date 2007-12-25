@@ -221,7 +221,7 @@ PREDICATE: unexpected unexpected-eof
 : CREATE-CLASS ( -- word )
     scan in get create
     dup save-class-location
-    dup predicate-word save-location ;
+    dup predicate-word dup set-word save-location ;
 
 : word-restarts ( possibilities -- restarts )
     natural-sort [

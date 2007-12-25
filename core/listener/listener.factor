@@ -15,7 +15,9 @@ SYMBOL: listener-hook
 GENERIC: stream-read-quot ( stream -- quot/f )
 
 : read-quot-step ( lines -- quot/f )
-    [ parse-lines ] catch {
+    [
+        [ parse-lines in get ] with-compilation-unit in set
+    ] catch {
         { [ dup delegate unexpected-eof? ] [ 2drop f ] }
         { [ dup not ] [ drop ] }
         { [ t ] [ rethrow ] }
@@ -36,10 +38,7 @@ M: line-reader stream-read-quot
 M: duplex-stream stream-read-quot
     duplex-stream-in stream-read-quot ;
 
-: read-quot ( -- quot )
-    [
-        stdio get stream-read-quot in get
-    ] with-compilation-unit in set ;
+: read-quot ( -- quot ) stdio get stream-read-quot ;
 
 : bye ( -- ) quit-flag on ;
 

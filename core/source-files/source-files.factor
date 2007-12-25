@@ -73,15 +73,15 @@ uses definitions ;
 
 M: pathname where pathname-string 1 2array ;
 
-: forget-source ( path -- )
-    [
-        dup source-file
-        dup unxref-source
-        source-file-definitions [ keys forget-all ] each
-        source-files get delete-at
-    ] with-compilation-unit ;
+M: pathname forget
+    pathname-string
+    dup source-file
+    dup unxref-source
+    source-file-definitions [ keys forget-all ] each
+    source-files get delete-at ;
 
-M: pathname forget pathname-string forget-source ;
+: forget-source ( path -- )
+    [ <pathname> forget ] with-compilation-unit ;
 
 : rollback-source-file ( source-file -- )
     dup source-file-definitions new-definitions get [ union ] 2map

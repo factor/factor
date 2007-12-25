@@ -3,7 +3,8 @@
 IN: inference
 USING: inference.backend inference.dataflow
 inference.known-words inference.transforms inference.errors
-sequences prettyprint io effects kernel namespaces quotations ;
+sequences prettyprint io effects kernel namespaces quotations
+words vocabs ;
 
 GENERIC: infer ( quot -- effect )
 
@@ -26,5 +27,5 @@ M: callable dataflow-with
         f infer-quot
     ] with-infer nip ;
 
-: forget-errors ( seq -- )
-    [ f "no-effect" set-word-prop ] each ;
+: forget-errors ( -- )
+    all-words [ f "no-effect" set-word-prop ] each ;

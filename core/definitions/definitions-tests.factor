@@ -7,9 +7,11 @@ M: combination-1 perform-combination 2drop { } [ ] each [ ] ;
 
 SYMBOL: generic-1
 
-generic-1 T{ combination-1 } define-generic
+[
+    generic-1 T{ combination-1 } define-generic
 
-[ ] <method> object \ generic-1 define-method
+    [ ] <method> object \ generic-1 define-method
+] with-compilation-unit
 
 [ ] [
     [

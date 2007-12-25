@@ -85,6 +85,6 @@ SYMBOL: recompile-hook
         H{ } clone changed-words set
         <definitions> new-definitions set
         <definitions> old-definitions set
-        call
-        changed-words get keys recompile-hook get call
+        [ changed-words get keys recompile-hook get call ] [ ]
+        cleanup
     ] with-scope ; inline

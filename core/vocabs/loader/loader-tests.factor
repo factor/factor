@@ -63,7 +63,7 @@ IN: temporary
         "resource:core/vocabs/loader/test/a/a.factor"
         source-file source-file-definitions dup USE: prettyprint .
         "v-l-t-a-hello" "vocabs.loader.test.a" lookup dup .
-        swap key?
+        swap first key?
     ] unit-test
 ] times
 
@@ -93,7 +93,9 @@ IN: temporary
 [ 1 ] [ "count-me" get-global ] unit-test
 
 [ ] [
-    "bob" "vocabs.loader.test.b" create [ ] define-compound
+    [
+        "bob" "vocabs.loader.test.b" create [ ] define-compound
+    ] with-compilation-unit
 ] unit-test
 
 [ ] [ "vocabs.loader.test.b" refresh ] unit-test

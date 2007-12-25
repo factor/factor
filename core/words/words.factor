@@ -102,7 +102,8 @@ PRIVATE>
 : intern-symbol ( word -- )
     dup undefined? [ define-symbol ] [ drop ] if ;
 
-: define-compound ( word def -- ) [ ] like define ;
+: define-compound ( word def -- )
+    [ ] like define ;
 
 : define-declared ( word def effect -- )
     pick swap "declared-effect" set-word-prop
@@ -134,6 +135,9 @@ PRIVATE>
 
 : gensym ( -- word )
     "G:" \ gensym counter number>string append f <word> ;
+
+: define-temp ( quot -- word )
+    gensym dup rot define-compound ;
 
 : reveal ( word -- )
     dup word-name over word-vocabulary vocab-words set-at ;

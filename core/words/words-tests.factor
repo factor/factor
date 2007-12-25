@@ -4,8 +4,10 @@ vocabs continuations ;
 IN: temporary
 
 [ 4 ] [
-    "poo" "scratchpad" create [ 2 2 + ] define-compound
-    "poo" "scratchpad" lookup execute
+    [
+        "poo" "temporary" create [ 2 2 + ] define-compound
+    ] with-compilation-unit
+    "poo" "temporary" lookup execute
 ] unit-test
 
 [ t ] [ t vocabs [ words [ word? and ] each ] each ] unit-test
@@ -88,14 +90,23 @@ FORGET: another-forgotten
 FORGET: foe
 
 ! xref should not retain references to gensyms
-gensym [ * ] define-compound
+[ ] [
+    [ gensym [ * ] define-compound ] with-compilation-unit
+] unit-test
 
 [ t ] [
     \ * usage [ word? ] subset [ interned? not ] subset empty?
 ] unit-test
 
 DEFER: calls-a-gensym
-\ calls-a-gensym gensym dup "x" set 1quotation define-compound
+[ ] [
+    [
+        \ calls-a-gensym
+        gensym dup "x" set 1quotation
+        define-compound
+    ] with-compilation-unit
+] unit-test
+
 [ f ] [ "x" get crossref get at ] unit-test
 
 ! more xref buggery
@@ -130,10 +141,18 @@ DEFER: x
 SYMBOL: quot-uses-a
 SYMBOL: quot-uses-b
 
-quot-uses-a [ 2 3 + ] define-compound
+[ ] [
+    [
+        quot-uses-a [ 2 3 + ] define-compound
+    ] with-compilation-unit
+] unit-test
 
 [ { + } ] [ \ quot-uses-a uses ] unit-test
 
-quot-uses-b 2 [ 3 + ] curry define-compound
+[ ] [
+    [
+        quot-uses-b 2 [ 3 + ] curry define-compound
+    ] with-compilation-unit
+] unit-test
 
 [ { + } ] [ \ quot-uses-b uses ] unit-test

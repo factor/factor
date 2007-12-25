@@ -337,6 +337,15 @@ HELP: define-declared
 { $description "Defines a compound word and declares its stack effect." }
 { $side-effects "word" } ;
 
+HELP: define-temp
+{ $values { "quot" quotation } { "word" word } }
+{ $description "Creates an uninterned word that will call " { $snippet "quot" } " when executed." }
+{ $notes
+    "The following phrases are equivalent:"
+    { $code "[ 2 2 + . ] call" }
+    { $code "[ 2 2 + . ] define-temp execute" }
+} ;
+
 HELP: quot-uses
 { $values { "quot" quotation } { "assoc" "an assoc with words as keys" } }
 { $description "Outputs a set of words referenced by the quotation and any quotations it contains." } ;

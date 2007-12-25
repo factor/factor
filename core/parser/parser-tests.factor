@@ -385,3 +385,11 @@ IN: temporary
         natural-sort
     ] unit-test
 ] with-scope
+
+[ ] [
+    "IN: temporary USE: kernel PREDICATE: object foo ( x -- y ) ;" eval
+] unit-test
+
+[ t ] [
+    "foo?" "temporary" lookup word eq?
+] unit-test

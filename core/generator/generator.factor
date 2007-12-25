@@ -22,7 +22,6 @@ SYMBOL: compiled-xts
 : compiling? ( word -- ? )
     {
         { [ dup compiled-xts get key? ] [ drop t ] }
-        { [ dup word-changed? ] [ drop f ] }
         { [ t ] [ compiled? ] }
     } cond ;
 
