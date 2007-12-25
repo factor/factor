@@ -92,7 +92,7 @@ HELP: compile-quot
 { $description "Creates a new uninterned word having the given quotation as its definition, and compiles it. The returned word can be passed to " { $link execute } "." }
 { $errors "Throws an error if the stack effect of the quotation cannot be inferred." } ;
 
-HELP: compile-1
+HELP: compile-call
 { $values { "quot" "a quotation" } }
 { $description "Compiles and runs a quotation." }
 { $errors "Throws an error if the stack effect of the quotation cannot be inferred." } ;

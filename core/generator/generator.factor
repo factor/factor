@@ -15,13 +15,13 @@ SYMBOL: compiled
 : begin-compiling ( word -- )
     f swap compiled get set-at ;
 
-: finish-compiling ( word literals words rel labels code -- )
+: finish-compiling ( word literals words rel labels code profiler-prologue -- )
     6array swap compiled get set-at ;
 
 : queue-compile ( word -- )
     {
-        { [ dup compound? not ] [ drop ] }
         { [ dup compiled get key? ] [ drop ] }
+        { [ dup compound? not ] [ f swap compiled get set-at ] }
         { [ t ] [ dup compile-queue get set-at ] }
     } cond ;
 

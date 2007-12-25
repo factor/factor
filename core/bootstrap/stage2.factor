@@ -46,14 +46,12 @@ IN: bootstrap.stage2
     init-io
     init-stdio
 
-    "compile-errors" "generator" lookup [
-        f swap set-global
-    ] when*
-
     run-bootstrap-init
 
     f error set-global
     f error-continuation set-global
+
+    all-words [ compiled? not ] subset recompile-hook get call
 
     "deploy-vocab" get [
         "tools.deploy.shaker" run

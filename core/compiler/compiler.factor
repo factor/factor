@@ -33,7 +33,7 @@ SYMBOL: compiler-hook
         dup compile-begins
         dup word-dataflow optimize >r over dup r> generate
     ] [
-        print-error f
+        print-error f over compiled get set-at f
     ] recover
     2dup ripple-up save-effect ;
 

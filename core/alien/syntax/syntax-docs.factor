@@ -38,7 +38,6 @@ $nl
 { $unchecked-example
     "LIBRARY: foo\nFUNCTION: void the_answer ( char* question, int value ) ;"
     "USE: compiler"
-    "\\ the_answer compile"
     "\"the question\" 42 the_answer"
     "The answer to the question is 42."
 } }

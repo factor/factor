@@ -3,7 +3,8 @@ namespaces parser kernel kernel.private classes classes.private
 arrays hashtables vectors tuples sbufs inference.dataflow
 hashtables.private sequences.private math tuples.private
 growable namespaces.private alien.remote-control assocs words
-generator command-line vocabs io prettyprint libc ;
+generator command-line vocabs io prettyprint libc definitions ;
+IN: bootstrap.compiler
 
 "cpu." cpu append require
 
@@ -11,6 +12,8 @@ generator command-line vocabs io prettyprint libc ;
     f compiled-stack-traces? set-global
     0 profiler-prologue set-global
 ] when
+
+: compile* [ compiled? not ] subset compile ;
 
 ! Compile a set of words ahead of our general
 ! compile-all. This set of words was determined
@@ -36,22 +39,24 @@ generator command-line vocabs io prettyprint libc ;
     find-pair-next namestack*
 
     bitand bitor bitxor bitnot
-} compile
+} compile*
 
 {
     + 1+ 1- 2/ < <= > >= shift min
-} compile
+} compile*
 
 {
     new nth push pop peek hashcode* = get set
-} compile
+} compile*
 
 {
     . lines
-} compile
+} compile*
 
 {
     malloc free memcpy
-} compile
+} compile*
 
 [ compile ] recompile-hook set-global
+
+FORGET: compile*

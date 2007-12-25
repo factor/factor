@@ -98,7 +98,7 @@ DEFER: countdown-b
             { [ dup 2 mod 0 = ] [ drop "even" ] }
             { [ dup 2 mod 1 = ] [ drop "odd" ] }
         } cond
-    ] compile-1
+    ] compile-call
 ] unit-test
 
 [ "odd" ] [
@@ -107,7 +107,7 @@ DEFER: countdown-b
             { [ dup 2 mod 0 = ] [ drop "even" ] }
             { [ dup 2 mod 1 = ] [ drop "odd" ] }
         } cond
-    ] compile-1
+    ] compile-call
 ] unit-test
 
 [ "neither" ] [
@@ -118,7 +118,7 @@ DEFER: countdown-b
             { [ dup alien? ] [ drop "alien" ] }
             { [ t ] [ drop "neither" ] }
         } cond
-    ] compile-1
+    ] compile-call
 ] unit-test
 
 [ 3 ] [
@@ -127,5 +127,5 @@ DEFER: countdown-b
             { [ dup fixnum? ] [ ] }
             { [ t ] [ drop t ] }
         } cond
-    ] compile-1
+    ] compile-call
 ] unit-test
