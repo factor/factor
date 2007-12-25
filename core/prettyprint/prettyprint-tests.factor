@@ -272,6 +272,20 @@ unit-test
     "another-narrow-layout" another-narrow-test check-see
 ] unit-test
 
+: class-see-test
+    {
+        "IN: temporary"
+        "TUPLE: class-see-layout bar ;"
+        "GENERIC: class-see-layout"
+        ""
+        "USING: temporary ;"
+        "M: class-see-layout class-see-layout ;"
+    } ;
+
+[ t ] [
+    "class-see-layout" class-see-test check-see
+] unit-test
+
 [ ] [ \ effect-in synopsis drop ] unit-test
 
 [ [ + ] ] [
