@@ -15,7 +15,7 @@ SYMBOL: compiled
 : begin-compiling ( word -- )
     f swap compiled get set-at ;
 
-: finish-compiling ( word literals words rel labels code profiler-prologue -- )
+: finish-compiling ( word literals words relocation labels code profiler-prologue -- )
     6array swap compiled get set-at ;
 
 : queue-compile ( word -- )
@@ -39,10 +39,10 @@ SYMBOL: compiled-stack-traces?
 
 t compiled-stack-traces? set-global
 
-: init-generator ( -- )
+: init-generator ( compiling -- )
     V{ } clone literal-table set
     V{ } clone word-table set
-    compiled-stack-traces? get compiling-word get f ?
+    compiled-stack-traces? get swap f ?
     literal-table get push ;
 
 : generate-1 ( word label node quot -- )

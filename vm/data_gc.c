@@ -126,6 +126,9 @@ void init_data_heap(CELL gens,
 {
 	set_data_heap(alloc_data_heap(gens,young_size,aging_size));
 
+	gc_locals_region = alloc_segment(getpagesize());
+	gc_locals = gc_locals_region->start - CELLS;
+
 	extra_roots_region = alloc_segment(getpagesize());
 	extra_roots = extra_roots_region->start - CELLS;
 
@@ -369,10 +372,9 @@ void collect_cards(void)
 /* Copy all tagged pointers in a range of memory */
 void collect_stack(F_SEGMENT *region, CELL top)
 {
-	CELL bottom = region->start;
-	CELL ptr;
+	CELL ptr = region->start;
 
-	for(ptr = bottom; ptr <= top; ptr += CELLS)
+	for(; ptr <= top; ptr += CELLS)
 		copy_handle((CELL*)ptr);
 }
 
@@ -398,6 +400,14 @@ void collect_callstack(F_CONTEXT *stacks)
 	iterate_callstack(top,bottom,collect_stack_frame);
 }
 
+void collect_gc_locals(void)
+{
+	CELL ptr = gc_locals_region->start;
+
+	for(; ptr <= gc_locals; ptr += CELLS)
+		copy_handle(*(CELL **)ptr);
+}
+
 /* Copy roots over at the start of GC, namely various constants, stacks,
 the user environment and extra roots registered with REGISTER_ROOT */
 void collect_roots(void)
@@ -407,6 +417,7 @@ void collect_roots(void)
 	copy_handle(&bignum_pos_one);
 	copy_handle(&bignum_neg_one);
 
+	collect_gc_locals();
 	collect_stack(extra_roots_region,extra_roots);
 
 	save_stacks();

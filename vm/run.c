@@ -54,8 +54,6 @@ void nest_stacks(void)
 	new_stacks->datastack_region = alloc_segment(ds_size);
 	new_stacks->retainstack_region = alloc_segment(rs_size);
 
-	new_stacks->extra_roots = extra_roots;
-
 	new_stacks->next = stack_chain;
 	stack_chain = new_stacks;
 
@@ -75,8 +73,6 @@ void unnest_stacks(void)
 	/* restore per-callback userenv */
 	userenv[CURRENT_CALLBACK_ENV] = stack_chain->current_callback_save;
 	userenv[CATCHSTACK_ENV] = stack_chain->catchstack_save;
-
-	extra_roots = stack_chain->extra_roots;
 
 	F_CONTEXT *old_stacks = stack_chain;
 	stack_chain = old_stacks->next;

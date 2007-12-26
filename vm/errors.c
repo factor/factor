@@ -23,7 +23,8 @@ void throw_error(CELL error, F_STACK_FRAME *callstack_top)
 		gc_off = false;
 
 		/* Reset local roots */
-		extra_roots = stack_chain->extra_roots;
+		gc_locals = gc_locals_region->start - CELLS;
+		extra_roots = extra_roots_region->start - CELLS;
 
 		/* If we had an underflow or overflow, stack pointers might be
 		out of bounds */
@@ -104,10 +105,14 @@ void memory_protection_error(CELL addr, F_STACK_FRAME *native_stack)
 		general_error(ERROR_RS_OVERFLOW,F,F,native_stack);
 	else if(in_page(addr, nursery->end, 0, 0))
 		critical_error("allot_object() missed GC check",0);
+	else if(in_page(addr, gc_locals_region->start, 0, -1))
+		critical_error("gc locals underflow",0);
+	else if(in_page(addr, gc_locals_region->end, 0, 0))
+		critical_error("gc locals overflow",0);
 	else if(in_page(addr, extra_roots_region->start, 0, -1))
-		critical_error("local root underflow",0);
+		critical_error("extra roots underflow",0);
 	else if(in_page(addr, extra_roots_region->end, 0, 0))
-		critical_error("local root overflow",0);
+		critical_error("extra roots overflow",0);
 	else
 		general_error(ERROR_MEMORY,allot_cell(addr),F,native_stack);
 }

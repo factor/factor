@@ -258,9 +258,9 @@ F_COMPILED *add_compiled_block(
 	CELL code_format = compiled_code_format();
 
 	CELL code_length = align8(array_capacity(code) * code_format);
-	CELL rel_length = (relocation ? array_capacity(relocation) * sizeof(unsigned int) : 0);
-	CELL words_length = (words ? array_capacity(words) * CELLS : 0);
-	CELL literals_length = (literals ? array_capacity(literals) * CELLS : 0);
+	CELL rel_length = array_capacity(relocation) * sizeof(unsigned int);
+	CELL words_length = array_capacity(words) * CELLS;
+	CELL literals_length = array_capacity(literals) * CELLS;
 
 	REGISTER_UNTAGGED(code);
 	REGISTER_UNTAGGED(labels);
@@ -295,25 +295,16 @@ F_COMPILED *add_compiled_block(
 	here += code_length;
 
 	/* relation info */
-	if(relocation)
-	{
-		deposit_integers(here,relocation,sizeof(unsigned int));
-		here += rel_length;
-	}
+	deposit_integers(here,relocation,sizeof(unsigned int));
+	here += rel_length;
 
 	/* literals */
-	if(literals)
-	{
-		deposit_objects(here,literals);
-		here += literals_length;
-	}
+	deposit_objects(here,literals);
+	here += literals_length;
 
 	/* words */
-	if(words)
-	{
-		deposit_objects(here,words);
-		here += words_length;
-	}
+	deposit_objects(here,words);
+	here += words_length;
 
 	/* fixup labels */
 	if(labels)

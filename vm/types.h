@@ -194,7 +194,7 @@ DECLARE_PRIMITIVE(wrapper);
 /* Macros to simulate a vector in C */
 #define GROWABLE_ARRAY(result) \
 	CELL result##_count = 0; \
-	F_ARRAY *result = allot_array(ARRAY_TYPE,100,F)
+	CELL result = tag_object(allot_array(ARRAY_TYPE,100,F))
 
 INLINE F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count)
 {
@@ -214,7 +214,7 @@ INLINE F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count)
 }
 
 #define GROWABLE_ADD(result,elt) \
-	result = growable_add(result,elt,&result##_count)
+	result = tag_object(growable_add(untag_object(result),elt,&result##_count))
 
 INLINE F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
 {
@@ -236,6 +236,7 @@ INLINE F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_cou
 }
 
 #define GROWABLE_APPEND(result,elts) \
-	result = growable_append(result,elts,&result##_count)
-	
-#define GROWABLE_TRIM(result) result = reallot_array(result,result##_count,F)
+	result = tag_object(growable_append(untag_object(result),elts,&result##_count))
+
+#define GROWABLE_TRIM(result) \
+	result = tag_object(reallot_array(untag_object(result),result##_count,F))

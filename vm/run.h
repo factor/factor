@@ -183,9 +183,6 @@ typedef struct _F_CONTEXT {
 	CELL catchstack_save;
 	CELL current_callback_save;
 
-	/* saved extra_roots pointer on entry to callback */
-	CELL extra_roots;
-
 	struct _F_CONTEXT *next;
 } F_CONTEXT;
 

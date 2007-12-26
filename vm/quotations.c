@@ -5,7 +5,7 @@ the second one is written in Factor and performs a lot of optimizations.
 See core/compiler/compiler.factor */
 bool jit_fast_if_p(F_ARRAY *array, CELL i)
 {
-	return (i + 3) <= array_capacity(array)
+	return (i + 3) == array_capacity(array)
 		&& type_of(array_nth(array,i)) == QUOTATION_TYPE
 		&& type_of(array_nth(array,i + 1)) == QUOTATION_TYPE
 		&& array_nth(array,i + 2) == userenv[JIT_IF_WORD];
@@ -14,6 +14,7 @@ bool jit_fast_if_p(F_ARRAY *array, CELL i)
 bool jit_fast_dispatch_p(F_ARRAY *array, CELL i)
 {
 	return (i + 2) == array_capacity(array)
+		&& type_of(array_nth(array,i)) == ARRAY_TYPE
 		&& array_nth(array,i + 1) == userenv[JIT_DISPATCH_WORD];
 }
 
@@ -22,10 +23,44 @@ F_ARRAY *code_to_emit(CELL name)
 	return untag_object(array_nth(untag_object(userenv[name]),0));
 }
 
-#define EMIT(name) { \
-		REGISTER_UNTAGGED(array); \
+F_REL rel_to_emit(CELL name, CELL code_format, CELL code_length,
+	CELL rel_argument, bool *rel_p)
+{
+	F_ARRAY *quadruple = untag_object(userenv[name]);
+	CELL rel_class = array_nth(quadruple,1);
+	CELL rel_type = array_nth(quadruple,2);
+	CELL offset = array_nth(quadruple,3);
+
+	F_REL rel;
+
+	if(rel_class == F)
+	{
+		*rel_p = false;
+		rel.type = 0;
+		rel.offset = 0;
+	}
+	else
+	{
+		*rel_p = true;
+		rel.type = to_fixnum(rel_type)
+			| (to_fixnum(rel_class) << 8)
+			| (rel_argument << 16);
+		rel.offset = code_length * code_format + to_fixnum(offset);
+	}
+
+	return rel;
+}
+
+#define EMIT(name,rel_argument) { \
+		bool rel_p; \
+		F_REL rel = rel_to_emit(name,code_format,code_count, \
+			rel_argument,&rel_p); \
+		if(rel_p) \
+		{ \
+			GROWABLE_ADD(relocation,allot_cell(rel.type)); \
+			GROWABLE_ADD(relocation,allot_cell(rel.offset)); \
+		} \
 		GROWABLE_APPEND(code,code_to_emit(name)); \
-		UNREGISTER_UNTAGGED(array); \
 	}
 
 bool jit_stack_frame_p(F_ARRAY *array)
@@ -52,32 +87,47 @@ void set_quot_xt(F_QUOTATION *quot, F_COMPILED *code)
 	quot->compiledp = T;
 }
 
-void jit_compile(F_QUOTATION *quot)
+/* Might GC */
+void jit_compile(CELL quot)
 {
-	F_ARRAY *array = untag_object(quot->array);
+	CELL code_format = compiled_code_format();
 
-	REGISTER_UNTAGGED(quot);
+	REGISTER_ROOT(quot);
 
-	REGISTER_UNTAGGED(array);
+	CELL array = untag_quotation(quot)->array;
+	REGISTER_ROOT(array);
+
 	GROWABLE_ARRAY(code);
-	UNREGISTER_UNTAGGED(array);
+	REGISTER_ROOT(code);
 
-	bool stack_frame = jit_stack_frame_p(array);
+	GROWABLE_ARRAY(relocation);
+	REGISTER_ROOT(relocation);
 
-	EMIT(JIT_SETUP);
+	GROWABLE_ARRAY(literals);
+	REGISTER_ROOT(literals);
+
+	GROWABLE_ARRAY(words);
+	REGISTER_ROOT(words);
+
+	GROWABLE_ADD(literals,quot);
+
+	bool stack_frame = jit_stack_frame_p(untag_object(array));
+
+	EMIT(JIT_SETUP,0);
 
 	if(stack_frame)
-		EMIT(JIT_PROLOG);
+		EMIT(JIT_PROLOG,0);
 
 	CELL i;
-	CELL length = array_capacity(array);
+	CELL length = array_capacity(untag_object(array));
 	bool tail_call = false;
 
 	for(i = 0; i < length; i++)
 	{
-		CELL obj = array_nth(array,i);
+		CELL obj = array_nth(untag_object(array),i);
 		F_WORD *word;
 		bool primitive_p;
+		F_WRAPPER *wrapper;
 
 		switch(type_of(obj))
 		{
@@ -91,57 +141,65 @@ void jit_compile(F_QUOTATION *quot)
 			if(i == length - 1)
 			{
 				if(stack_frame)
-					EMIT(JIT_EPILOG);
+					EMIT(JIT_EPILOG,0);
 
 				if(primitive_p)
-					EMIT(JIT_WORD_PRIMITIVE_JUMP);
-
-				EMIT(JIT_WORD_JUMP);
+				{
+					EMIT(JIT_WORD_PRIMITIVE_JUMP,
+						to_fixnum(word->def));
+				}
+				else
+					EMIT(JIT_WORD_JUMP,0);
 				tail_call = true;
 			}
 			else
 			{
 				if(primitive_p)
-					EMIT(JIT_WORD_PRIMITIVE_CALL);
-
-				EMIT(JIT_WORD_CALL);
+				{
+					EMIT(JIT_WORD_PRIMITIVE_CALL,
+						to_fixnum(word->def));
+				}
+				else
+					EMIT(JIT_WORD_CALL,0);
 			}
 			break;
 		case WRAPPER_TYPE:
-			EMIT(JIT_PUSH_WRAPPER);
+			wrapper = untag_object(obj);
+			GROWABLE_ADD(literals,wrapper->object);
+			EMIT(JIT_PUSH_LITERAL,literals_count - 1);
 			break;
 		case QUOTATION_TYPE:
-			if(jit_fast_if_p(array,i))
+			if(jit_fast_if_p(untag_object(array),i))
 			{
+				if(stack_frame)
+					EMIT(JIT_EPILOG,0);
+
+				GROWABLE_ADD(literals,array_nth(untag_object(array),i));
+				GROWABLE_ADD(literals,array_nth(untag_object(array),i + 1));
+				EMIT(JIT_IF_JUMP,literals_count - 2);
+
 				i += 2;
 
-				if(i == length - 1)
-				{
-					if(stack_frame)
-						EMIT(JIT_EPILOG);
-					EMIT(JIT_IF_JUMP);
-					tail_call = true;
-				}
-				else
-					EMIT(JIT_IF_CALL);
-
+				tail_call = true;
 				break;
 			}
 		case ARRAY_TYPE:
-			if(jit_fast_dispatch_p(array,i))
+			if(jit_fast_dispatch_p(untag_object(array),i))
 			{
-				i++;
-
 				if(stack_frame)
-					EMIT(JIT_EPILOG);
+					EMIT(JIT_EPILOG,0);
 
-				EMIT(JIT_DISPATCH);
+				GROWABLE_ADD(literals,array_nth(untag_object(array),i));
+				EMIT(JIT_DISPATCH,literals_count - 1);
+
+				i++;
 
 				tail_call = true;
 				break;
 			}
 		default:
-			EMIT(JIT_PUSH_LITERAL);
+			GROWABLE_ADD(literals,obj);
+			EMIT(JIT_PUSH_LITERAL,literals_count - 1);
 			break;
 		}
 	}
@@ -149,52 +207,44 @@ void jit_compile(F_QUOTATION *quot)
 	if(!tail_call)
 	{
 		if(stack_frame)
-			EMIT(JIT_EPILOG);
+			EMIT(JIT_EPILOG,0);
 
-		EMIT(JIT_RETURN);
+		EMIT(JIT_RETURN,0);
 	}
 
 	GROWABLE_TRIM(code);
+	GROWABLE_TRIM(relocation);
+	GROWABLE_TRIM(literals);
+	GROWABLE_TRIM(words);
 
-	UNREGISTER_UNTAGGED(quot);
-	REGISTER_UNTAGGED(quot);
+	F_COMPILED *compiled = add_compiled_block(
+		QUOTATION_TYPE,
+		0,
+		untag_object(code),
+		NULL,
+		untag_object(relocation),
+		untag_object(words),
+		untag_object(literals));
 
-	REGISTER_UNTAGGED(code);
-	F_ARRAY *literals = allot_array(ARRAY_TYPE,1,tag_object(quot));
-	UNREGISTER_UNTAGGED(code);
-
-	F_COMPILED *compiled = add_compiled_block(QUOTATION_TYPE,0,code,NULL,NULL,NULL,literals);
 	iterate_code_heap_step(compiled,finalize_code_block);
 
-	UNREGISTER_UNTAGGED(quot);
-	set_quot_xt(quot,compiled);
+	set_quot_xt(untag_object(quot),compiled);
+
+	UNREGISTER_ROOT(words);
+	UNREGISTER_ROOT(literals);
+	UNREGISTER_ROOT(relocation);
+	UNREGISTER_ROOT(code);
+	UNREGISTER_ROOT(array);
+	UNREGISTER_ROOT(quot);
 }
 
-F_FASTCALL CELL primitive_jit_compile(CELL tagged, F_STACK_FRAME *stack)
+F_FASTCALL CELL primitive_jit_compile(CELL quot, F_STACK_FRAME *stack)
 {
 	stack_chain->callstack_top = stack;
-	REGISTER_ROOT(tagged);
-	jit_compile(untag_quotation(tagged));
-	UNREGISTER_ROOT(tagged);
-	return tagged;
-}
-
-XT quot_offset_to_pc(F_QUOTATION *quot, F_FIXNUM offset)
-{
-	if(offset != -1)
-		critical_error("Not yet implemented",0);
-
-	CELL xt = 0;
-
-	xt += array_capacity(code_to_emit(JIT_SETUP));
-
-	bool stack_frame = jit_stack_frame_p(untag_array(quot->array));
-	if(stack_frame)
-		xt += array_capacity(code_to_emit(JIT_PROLOG));
-
-	xt *= compiled_code_format();
-
-	return quot->xt + xt;
+	REGISTER_ROOT(quot);
+	jit_compile(quot);
+	UNREGISTER_ROOT(quot);
+	return quot;
 }
 
 DEFINE_PRIMITIVE(curry)

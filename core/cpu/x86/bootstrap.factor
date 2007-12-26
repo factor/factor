@@ -13,11 +13,11 @@ big-endian off
 : scan-save stack-reg 3 bootstrap-cells [+] ;
 
 [
-    ! arg0 0 MOV                                 ! load quotation
+    arg0 0 [] MOV                              ! load quotation
     arg1 arg0 quot-xt@ [+] MOV                 ! load XT
     arg0 arg0 quot-array@ [+] MOV              ! load array
     scan-reg arg0 scan@ [+] LEA                ! initialize scan pointer
-] rc-absolute-cell rt-literal 1 jit-setup jit-define
+] rc-absolute-cell rt-literal 2 jit-setup jit-define
 
 [
     stack-frame-size PUSH                      ! save stack frame size
@@ -30,27 +30,24 @@ big-endian off
 : advance-scan scan-reg bootstrap-cell ADD ;
 
 [
+    arg0 0 [] MOV                              ! load literal
     advance-scan
     ds-reg bootstrap-cell ADD                  ! increment datastack pointer
-    arg0 scan-reg [] MOV                       ! load literal
     ds-reg [] arg0 MOV                         ! store literal on datastack
-] f f f jit-push-literal jit-define
-
-[
-    advance-scan
-    ds-reg bootstrap-cell ADD                  ! increment datastack pointer
-    arg0 scan-reg [] MOV                       ! load wrapper
-    arg0 dup wrapper@ [+] MOV                  ! load wrapper-obj slot
-    ds-reg [] arg0 MOV                         ! store literal on datastack
-] f f f jit-push-wrapper jit-define
+] rc-absolute-cell rt-literal 2 jit-push-literal jit-define
 
 [
     arg1 stack-reg MOV                         ! pass callstack pointer as arg 2
-] f f f jit-word-primitive-jump jit-define
+    (JMP) drop                                 ! go
+] rc-relative rt-primitive 3 jit-word-primitive-jump jit-define
 
 [
+    advance-scan
     arg1 stack-reg bootstrap-cell neg [+] LEA  ! pass callstack pointer as arg 2
-] f f f jit-word-primitive-call jit-define
+    scan-save scan-reg MOV                     ! save scan pointer
+    (CALL) drop                                ! go
+    scan-reg scan-save MOV                     ! restore scan pointer
+] rc-relative rt-primitive 12 jit-word-primitive-call jit-define
 
 [
     arg0 scan-reg bootstrap-cell [+] MOV       ! load word
@@ -65,35 +62,25 @@ big-endian off
     scan-reg scan-save MOV                     ! restore scan pointer
 ] f f f jit-word-call jit-define
 
-: load-branch
+[
+    arg1 0 MOV                                 ! load addr of true quotation
     arg0 ds-reg [] MOV                         ! load boolean
     ds-reg bootstrap-cell SUB                  ! pop boolean
     arg0 \ f tag-number CMP                    ! compare it with f
-    arg0 scan-reg 2 bootstrap-cells [+] CMOVE  ! load false branch if equal
-    arg0 scan-reg 1 bootstrap-cells [+] CMOVNE ! load true branch if not equal
-    scan-reg 3 bootstrap-cells ADD             ! advance scan pointer
-    arg0 quot-xt@ [+]                          ! load quotation-xt
-    ;
+    arg0 arg1 [] CMOVNE                        ! load true branch if not equal
+    arg0 arg1 bootstrap-cell [+] CMOVE         ! load false branch if equal
+    arg0 quot-xt@ [+] JMP                      ! jump to quotation-xt
+] rc-absolute-cell rt-literal 1 jit-if-jump jit-define
 
 [
-    load-branch JMP
-] f f f jit-if-jump jit-define
-
-[
-    load-branch
-    scan-save scan-reg MOV                     ! save scan pointer
-    CALL                                       ! call quotation
-    scan-reg scan-save MOV                     ! restore scan pointer
-] f f f jit-if-call jit-define
-
-[
+    arg1 0 [] MOV                              ! load dispatch table
     arg0 ds-reg [] MOV                         ! load index
     fixnum>slot@                               ! turn it into an array offset
     ds-reg bootstrap-cell SUB                  ! pop index
-    arg0 scan-reg bootstrap-cell [+] ADD       ! compute quotation location
+    arg0 arg1 ADD                              ! compute quotation location
     arg0 arg0 array-start [+] MOV              ! load quotation
-    arg0 quot-xt@ [+] JMP                      ! jump to quotation-xt
-] f f f jit-dispatch jit-define
+    arg0 quot-xt@ [+] JMP                      ! execute branch
+] rc-absolute-cell rt-literal 2 jit-dispatch jit-define
 
 [
     stack-reg stack-frame-size bootstrap-cell - ADD ! unwind stack frame
