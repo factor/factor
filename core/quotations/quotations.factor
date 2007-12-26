@@ -12,9 +12,6 @@ UNION: callable quotation curry ;
 M: callable equal?
     over callable? [ sequence= ] [ 2drop f ] if ;
 
-: <quotation> ( n -- quot )
-    f <array> array>quotation ; inline
-
 M: quotation length quotation-array length ;
 
 M: quotation nth-unsafe quotation-array nth-unsafe ;

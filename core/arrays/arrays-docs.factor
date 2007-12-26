@@ -34,7 +34,7 @@ HELP: <array> ( n elt -- array )
 { $values { "n" "a non-negative integer" } { "elt" "an initial element" } { "array" "a new array" } }
 { $description "Creates a new array with the given length and all elements initially set to " { $snippet "elt" } "." } ;
 
-{ <array> <quotation> <string> <sbuf> <vector> <byte-array> <bit-array> }
+{ <array> <string> <sbuf> <vector> <byte-array> <bit-array> }
 related-words
 
 HELP: >array
