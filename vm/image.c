@@ -189,7 +189,7 @@ void fixup_word(F_WORD *word)
 		}
 		else
 		{
-			/* Primitive or undefined */
+			/* Primitive */
 			default_word_xt(word);
 			return;
 		}

@@ -75,13 +75,6 @@ void not_implemented_error(void)
 	general_error(ERROR_NOT_IMPLEMENTED,F,F,NULL);
 }
 
-/* This function is called from the undefined function in cpu_*.S */
-F_FASTCALL void undefined_error(CELL word, F_STACK_FRAME *callstack_top)
-{
-	stack_chain->callstack_top = callstack_top;
-	general_error(ERROR_UNDEFINED_WORD,word,F,NULL);
-}
-
 /* Test if 'fault' is in the guard page at the top or bottom (depending on
 offset being 0 or -1) of area+area_size */
 bool in_page(CELL fault, CELL area, CELL area_size, int offset)

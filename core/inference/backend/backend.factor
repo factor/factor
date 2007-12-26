@@ -465,9 +465,6 @@ M: compound apply-object
         [ declared-infer ] [ apply-word ] if
     ] if-inline ;
 
-M: undefined apply-object
-    drop "Undefined word" time-bomb ;
-
 : with-infer ( quot -- effect dataflow )
     [
         [

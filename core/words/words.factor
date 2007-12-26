@@ -19,14 +19,22 @@ M: word <=>
 
 M: word definition drop f ;
 
-PREDICATE: word undefined ( obj -- ? ) word-def not ;
-M: undefined definer drop \ DEFER: f ;
-
 PREDICATE: word compound  ( obj -- ? ) word-def quotation? ;
 
 M: compound definer drop \ : \ ; ;
 
 M: compound definition word-def ;
+
+TUPLE: undefined word ;
+
+: undefined ( word -- * ) \ undefined construct-boa throw ;
+
+PREDICATE: compound deferred ( obj -- ? )
+    dup [ undefined ] curry swap word-def sequence= ;
+
+M: deferred definer drop \ DEFER: f ;
+
+M: deferred definition drop f ;
 
 PREDICATE: compound symbol ( obj -- ? )
     dup <wrapper> 1array swap word-def sequence= ;
@@ -102,6 +110,9 @@ PRIVATE>
 : define-compound ( word def -- )
     [ ] like define ;
 
+: undefine ( word -- )
+    dup [ undefined ] curry define-compound ;
+
 : define-declared ( word def effect -- )
     pick swap "declared-effect" set-word-prop
     define-compound ;
@@ -133,8 +144,11 @@ PRIVATE>
 : reset-generic ( word -- )
     dup reset-word { "methods" "combination" } reset-props ;
 
+: <uninterned> ( name -- word )
+    f <word> dup undefine ;
+
 : gensym ( -- word )
-    "G:" \ gensym counter number>string append f <word> ;
+    "G:" \ gensym counter number>string append <uninterned> ;
 
 : define-temp ( quot -- word )
     gensym dup rot define-compound ;
@@ -151,7 +165,7 @@ TUPLE: check-create name vocab ;
 
 : create ( name vocab -- word )
     check-create 2dup lookup
-    dup [ 2nip ] [ drop <word> dup reveal ] if ;
+    dup [ 2nip ] [ drop <word> dup reveal dup undefine ] if ;
 
 : constructor-word ( name vocab -- word )
     >r "<" swap ">" 3append r> create ;

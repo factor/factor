@@ -50,8 +50,8 @@ ARTICLE: "deferred" "Deferred words and mutual recursion"
 "Words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. This is done to simplify the implementation, facilitate better parse-time checking and remove some odd corner cases; it also encourages better coding style. Sometimes this restriction gets in the way, for example when defining mutually-recursive words; one way to get around this limitation is to make a forward definition."
 { $subsection POSTPONE: DEFER: }
 "The class of forward word definitions:"
-{ $subsection undefined }
-{ $subsection undefined? } ;
+{ $subsection deferred }
+{ $subsection deferred? } ;
 
 ARTICLE: "declarations" "Declarations"
 "Declarations give special behavior to a word. Declarations are parsing words that set a word property in the most recently defined word."
@@ -197,10 +197,10 @@ HELP: set-word-def ( obj word -- )
 $low-level-note
 { $side-effects "word" } ;
 
-HELP: undefined
-{ $class-description "The class of undefined words created by " { $link POSTPONE: DEFER: } "." } ;
+HELP: deferred
+{ $class-description "The class of deferred words created by " { $link POSTPONE: DEFER: } "." } ;
 
-{ undefined POSTPONE: DEFER: } related-words
+{ deferred POSTPONE: DEFER: } related-words
 
 HELP: compound
 { $description "The class of compound words created by " { $link POSTPONE: : } "." } ;

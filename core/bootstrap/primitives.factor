@@ -476,7 +476,7 @@ builtins get num-tags get tail f union-class define-class
     { "float<=" "math.private" }
     { "float>" "math.private" }
     { "float>=" "math.private" }
-    { "<word>" "words" }
+    { "<word>" "words.private" }
     { "word-xt" "words" }
     { "drop" "kernel" }
     { "2drop" "kernel" }

@@ -14,10 +14,6 @@ DEF(F_FASTCALL void,c_to_factor,(CELL quot)):
 	POP_NONVOLATILE
 	ret
 
-DEF(F_FASTCALL void,undefined,(CELL word)):
-	mov STACK_REG,ARG1                    /* Pass callstack pointer */
-	jmp MANGLE(undefined_error)           /* This throws an error */
-
 DEF(F_FASTCALL void,primitive_call,(void)):
         mov (DS_REG),ARG0                     /* Load quotation from data stack */
 	sub $CELL_SIZE,DS_REG                 /* Pop data stack */

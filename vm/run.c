@@ -268,16 +268,9 @@ void default_word_xt(F_WORD *word)
 			critical_error("default_word_xt invariant lost",0);
 		word->xt = quot->xt;
 		word->code = quot->code;
-
-		//if(profiling_p())
-		//	word->xt = docol_profiling;
-		//else
-		//	word->xt = docol;
 	}
 	else if(type_of(word->def) == FIXNUM_TYPE)
 		word->xt = primitives[to_fixnum(word->def)];
-	else if(word->def == F)
-		word->xt = undefined;
 	else
 		critical_error("bad word-def",tag_object(word));
 }

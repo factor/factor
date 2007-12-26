@@ -374,11 +374,9 @@ M: curry '
         jit-word-primitive-call
         jit-word-jump
         jit-word-call
-        jit-push-wrapper
         jit-push-literal
         jit-if-word
         jit-if-jump
-        jit-if-call
         jit-dispatch-word
         jit-dispatch
         jit-epilog
