@@ -67,11 +67,9 @@ SYMBOL: jit-word-primitive-jump
 SYMBOL: jit-word-primitive-call
 SYMBOL: jit-word-jump
 SYMBOL: jit-word-call
-SYMBOL: jit-push-wrapper
 SYMBOL: jit-push-literal
 SYMBOL: jit-if-word
 SYMBOL: jit-if-jump
-SYMBOL: jit-if-call
 SYMBOL: jit-dispatch-word
 SYMBOL: jit-dispatch
 SYMBOL: jit-epilog
@@ -88,11 +86,9 @@ SYMBOL: jit-return
         { jit-word-primitive-call 26 }
         { jit-word-jump 27 }
         { jit-word-call 28 }
-        { jit-push-wrapper 29 }
         { jit-push-literal 30 }
         { jit-if-word 31 }
         { jit-if-jump 32 }
-        { jit-if-call 33 }
         { jit-dispatch-word 34 }
         { jit-dispatch 35 }
         { jit-epilog 36 }
