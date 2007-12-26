@@ -28,11 +28,13 @@ M: compound definer drop \ : \ ; ;
 
 M: compound definition word-def ;
 
+PREDICATE: compound symbol ( obj -- ? )
+    dup <wrapper> 1array swap word-def sequence= ;
+M: symbol definer drop \ SYMBOL: f ;
+M: symbol definition drop f ;
+
 PREDICATE: word primitive ( obj -- ? ) word-def fixnum? ;
 M: primitive definer drop \ PRIMITIVE: f ;
-
-PREDICATE: word symbol    ( obj -- ? ) word-def t eq? ;
-M: symbol definer drop \ SYMBOL: f ;
 
 : word-prop ( word name -- value ) swap word-props at ;
 
@@ -97,9 +99,6 @@ M: compound redefined* ( word -- )
 
 PRIVATE>
 
-: define-symbol ( word -- )
-    t define ;
-
 : define-compound ( word def -- )
     [ ] like define ;
 
@@ -118,6 +117,9 @@ PRIVATE>
 
 : define-inline ( word quot -- )
     dupd define-compound make-inline ;
+
+: define-symbol ( word -- )
+    dup [ ] curry define-inline ;
 
 : reset-word ( word -- )
     {

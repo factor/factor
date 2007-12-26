@@ -393,8 +393,6 @@ M: compound infer-word
 
 M: word apply-object apply-word ;
 
-M: symbol apply-object apply-literal ;
-
 TUPLE: recursive-declare-error word ;
 
 : declared-infer ( word -- )

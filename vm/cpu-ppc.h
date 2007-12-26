@@ -5,7 +5,6 @@ register CELL ds asm("r14");
 register CELL rs asm("r15");
 
 void c_to_factor(CELL quot);
-void dosym(CELL word);
 void docol_profiling(CELL word);
 void docol(CELL word);
 void undefined(CELL word);

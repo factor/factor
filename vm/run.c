@@ -265,9 +265,7 @@ DEFINE_PRIMITIVE(set_retainstack)
 
 XT default_word_xt(F_WORD *word)
 {
-	if(word->def == T)
-		return dosym;
-	else if(type_of(word->def) == QUOTATION_TYPE)
+	if(type_of(word->def) == QUOTATION_TYPE)
 	{
 		if(profiling_p())
 			return docol_profiling;

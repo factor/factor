@@ -21,11 +21,6 @@ DEF(F_FASTCALL void,undefined,(CELL word)):
 	mov STACK_REG,ARG1                    /* Pass callstack pointer */
 	jmp MANGLE(undefined_error)           /* This throws an error */
 
-DEF(F_FASTCALL void,dosym,(CELL word)):
-	add $CELL_SIZE,DS_REG                 /* Increment stack pointer */
-	mov ARG0,(DS_REG)                     /* Store word on stack */
-	ret
-
 /* Here we have two entry points. The first one is taken when profiling is
 enabled */
 DEF(F_FASTCALL void,docol_profiling,(CELL word)):

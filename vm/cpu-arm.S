@@ -81,10 +81,6 @@ DEF(void,undefined,(CELL word)):
 	sub r1,sp,#4
 	b MANGLE(undefined_error)
 
-DEF(void,dosym,(CELL word)):
-	str r0,[r5, #4]!     /* push word to stack */
-	mov pc,lr            /* return */
-
 /* Here we have two entry points. The first one is taken when profiling is
 enabled */
 DEF(void,docol_profiling,(CELL word)):
