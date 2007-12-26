@@ -7,7 +7,7 @@ USING: io io.files kernel math.parser namespaces sequences strings
     project-euler.009 project-euler.010 project-euler.011 project-euler.012
     project-euler.013 project-euler.014 project-euler.015 project-euler.016
     project-euler.017 project-euler.018 project-euler.019 project-euler.020
-    project-euler.021 project-euler.067 ;
+    project-euler.021 project-euler.022 project-euler.067 ;
 IN: project-euler
 
 <PRIVATE
