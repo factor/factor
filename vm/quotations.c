@@ -90,6 +90,9 @@ void set_quot_xt(F_QUOTATION *quot, F_COMPILED *code)
 /* Might GC */
 void jit_compile(CELL quot)
 {
+	if(untag_quotation(quot)->compiledp != F)
+		return;
+
 	CELL code_format = compiled_code_format();
 
 	REGISTER_ROOT(quot);
@@ -149,7 +152,11 @@ void jit_compile(CELL quot)
 						to_fixnum(word->def));
 				}
 				else
-					EMIT(JIT_WORD_JUMP,0);
+				{
+					GROWABLE_ADD(words,array_nth(untag_object(array),i));
+					EMIT(JIT_WORD_JUMP,words_count - 1);
+				}
+
 				tail_call = true;
 			}
 			else
@@ -160,7 +167,10 @@ void jit_compile(CELL quot)
 						to_fixnum(word->def));
 				}
 				else
-					EMIT(JIT_WORD_CALL,0);
+				{
+					GROWABLE_ADD(words,array_nth(untag_object(array),i));
+					EMIT(JIT_WORD_CALL,words_count - 1);
+				}
 			}
 			break;
 		case WRAPPER_TYPE:

@@ -109,6 +109,11 @@ INLINE F_QUOTATION *untag_quotation(CELL tagged)
 	return untag_object(tagged);
 }
 
+INLINE bool word_references_code_heap_p(F_WORD *word)
+{
+	return (word->compiledp != F || type_of(word->def) == QUOTATION_TYPE);
+}
+
 INLINE F_WORD *untag_word(CELL tagged)
 {
 	type_check(WORD_TYPE,tagged);

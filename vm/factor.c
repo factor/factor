@@ -29,6 +29,39 @@ void default_parameters(F_PARAMETERS *p)
 	p->console = false;
 }
 
+/* Do some initialization that we do once only */
+void do_stage1_init(void)
+{
+	fprintf(stderr,"*** Starting stage 2 early init...\n");
+	fflush(stderr);
+
+	begin_scan();
+
+	CELL obj;
+	while((obj = next_object()) != F)
+	{
+		if(type_of(obj) == WORD_TYPE)
+		{
+			F_WORD *word = untag_object(obj);
+			if(type_of(word->def) == QUOTATION_TYPE)
+			{
+				jit_compile(word->def);
+				default_word_xt(word);
+			}
+		}
+	}
+
+	/* End heap scan */
+	gc_off = false;
+
+	iterate_code_heap(finalize_code_block);
+
+	userenv[STAGE2_ENV] = T;
+
+	fprintf(stderr,"*** Finished stage 2 early init\n");
+	fflush(stderr);
+}
+
 /* Get things started */
 void init_factor(F_PARAMETERS *p)
 {
@@ -69,6 +102,9 @@ void init_factor(F_PARAMETERS *p)
 
 	/* We can GC now */
 	gc_off = false;
+
+	if(!stage2)
+		do_stage1_init();
 }
 
 INLINE bool factor_arg(const F_CHAR* str, const F_CHAR* arg, CELL* value)

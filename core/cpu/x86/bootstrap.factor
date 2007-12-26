@@ -50,17 +50,15 @@ big-endian off
 ] rc-relative rt-primitive 12 jit-word-primitive-call jit-define
 
 [
-    arg0 scan-reg bootstrap-cell [+] MOV       ! load word
-    arg0 word-xt@ [+] JMP                      ! jump to word XT
-] f f f jit-word-jump jit-define
+    (JMP) drop
+] rc-relative rt-xt 1 jit-word-jump jit-define
 
 [
     advance-scan
     scan-save scan-reg MOV                     ! save scan pointer
-    arg0 scan-reg [] MOV                       ! load word
-    arg0 word-xt@ [+] CALL                     ! call word XT
+    (CALL) drop
     scan-reg scan-save MOV                     ! restore scan pointer
-] f f f jit-word-call jit-define
+] rc-relative rt-xt 8 jit-word-call jit-define
 
 [
     arg1 0 MOV                                 ! load addr of true quotation

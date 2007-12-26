@@ -8,16 +8,13 @@ bool profiling_p(void)
 void profiling_word(F_WORD *word)
 {
 	/* If we just enabled the profiler, reset call count */
-	if(profiling_p())
-		word->counter = tag_fixnum(0);
-
-	if(word->compiledp == F)
-	{
-		if(type_of(word->def) == QUOTATION_TYPE)
-			word->xt = default_word_xt(word);
-	}
-	else
-		set_word_xt(word,word->code);
+	// if(profiling_p())
+	// 	word->counter = tag_fixnum(0);
+        //
+	// if(word->compiledp == F)
+	// 	default_word_xt(word);
+	// else
+	// 	set_word_xt(word,word->code);
 }
 
 void set_profiling(bool profiling)

@@ -9,6 +9,8 @@ void init_objects(F_HEADER *h)
 	bignum_zero = h->bignum_zero;
 	bignum_pos_one = h->bignum_pos_one;
 	bignum_neg_one = h->bignum_neg_one;
+
+	stage2 = (userenv[STAGE2_ENV] != F);
 }
 
 INLINE void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
@@ -176,12 +178,25 @@ void fixup_word(F_WORD *word)
 	/* If this is a compiled word, relocate the code pointer. Otherwise,
 	reset it based on the primitive number of the word. */
 	if(word->compiledp == F)
-		word->xt = default_word_xt(word);
-	else
 	{
-		code_fixup((CELL)&word->xt);
-		code_fixup((CELL)&word->code);
+		if(type_of(word->def) == QUOTATION_TYPE)
+		{
+			if(!stage2)
+			{
+				/* Word XTs are fixed up in do_stage1_init() */
+				return;
+			}
+		}
+		else
+		{
+			/* Primitive or undefined */
+			default_word_xt(word);
+			return;
+		}
 	}
+
+	code_fixup((CELL)&word->xt);
+	code_fixup((CELL)&word->code);
 }
 
 void fixup_quotation(F_QUOTATION *quot)

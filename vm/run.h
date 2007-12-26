@@ -7,21 +7,21 @@ typedef enum {
 	CURRENT_CALLBACK_ENV = 2, /* used by library only, per-callback */
 	WALKER_HOOK_ENV,          /* non-local exit hook, used by library only */
 	CALLCC_1_ENV,             /* used to pass the value in callcc1 */
-                                  
+
 	BREAK_ENV            = 5, /* quotation called by throw primitive */
 	ERROR_ENV,                /* a marker consed onto kernel errors */
-                                  
+
 	CELL_SIZE_ENV        = 7, /* sizeof(CELL) */
 	CPU_ENV,                  /* CPU architecture */
 	OS_ENV,                   /* operating system name */
-                                  
+
 	ARGS_ENV            = 10, /* command line arguments */
 	IN_ENV,                   /* stdin FILE* handle */
 	OUT_ENV,                  /* stdout FILE* handle */
-                                  
+
 	IMAGE_ENV           = 13, /* image path name */
 	EXECUTABLE_ENV,		  /* runtime executable path name */
-                                  
+
 	EMBEDDED_ENV 	    = 15, /* are we embedded in another app? */
 	EVAL_CALLBACK_ENV,        /* used when Factor is embedded in a C app */
 	YIELD_CALLBACK_ENV,       /* used when Factor is embedded in a C app */
@@ -40,18 +40,20 @@ typedef enum {
 	JIT_WORD_PRIMITIVE_CALL,
 	JIT_WORD_JUMP,
 	JIT_WORD_CALL,
-	JIT_PUSH_WRAPPER,
+	UNUSED_1,
 	JIT_PUSH_LITERAL,
 	JIT_IF_WORD,
 	JIT_IF_JUMP,
-	JIT_IF_CALL,
+	UNUSED_2,
 	JIT_DISPATCH_WORD,
 	JIT_DISPATCH,
 	JIT_EPILOG,
 	JIT_RETURN,
 
-	/* Profiler support */    
+	/* Profiler support */
 	PROFILING_ENV       = 38, /* is the profiler on? */
+
+	STAGE2_ENV          = 39  /* Have we bootstrapped? */
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV
@@ -223,7 +225,7 @@ DECLARE_PRIMITIVE(from_r);
 DECLARE_PRIMITIVE(datastack);
 DECLARE_PRIMITIVE(retainstack);
 
-XT default_word_xt(F_WORD *word);
+void default_word_xt(F_WORD *word);
 
 DECLARE_PRIMITIVE(execute);
 DECLARE_PRIMITIVE(call);
@@ -240,3 +242,5 @@ DECLARE_PRIMITIVE(tag);
 DECLARE_PRIMITIVE(class_hash);
 DECLARE_PRIMITIVE(slot);
 DECLARE_PRIMITIVE(set_slot);
+
+bool stage2;

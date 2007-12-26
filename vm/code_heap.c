@@ -38,11 +38,6 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 
 static CELL xt_offset;
 
-void incompatible_call_error(void)
-{
-	critical_error("Calling non-optimized word from optimized word",0);
-}
-
 /* Compute an address to store at a relocation */
 INLINE CELL compute_code_rel(F_REL *rel,
 	CELL code_start, CELL literals_start, CELL words_start)
@@ -62,15 +57,12 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	case RT_XT:
 		word = untag_word(get(CREF(words_start,REL_ARGUMENT(rel))));
 		if(word->compiledp == F)
-			return (CELL)incompatible_call_error;
+			return (CELL)word->code + sizeof(F_COMPILED);
 		else
 			return (CELL)word->code + sizeof(F_COMPILED) + xt_offset;
 	case RT_XT_PROFILING:
 		word = untag_word(get(CREF(words_start,REL_ARGUMENT(rel))));
-		if(word->compiledp == F)
-			return (CELL)incompatible_call_error;
-		else
-			return (CELL)word->code + sizeof(F_COMPILED);
+		return (CELL)word->code + sizeof(F_COMPILED);
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
 	default:
@@ -347,7 +339,19 @@ DEFINE_PRIMITIVE(modify_code_heap)
 		if(data == F)
 		{
 			word->compiledp = F;
-			word->xt = default_word_xt(word);
+
+			if(type_of(word->def) == QUOTATION_TYPE)
+			{
+				REGISTER_UNTAGGED(alist);
+				REGISTER_UNTAGGED(word);
+
+				jit_compile(word->def);
+
+				UNREGISTER_UNTAGGED(word);
+				UNREGISTER_UNTAGGED(alist);
+			}
+
+			default_word_xt(word);
 		}
 		else
 		{

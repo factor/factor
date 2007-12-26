@@ -557,7 +557,7 @@ CELL collect_next(CELL scan)
 	{
 	case WORD_TYPE:
 		word = (F_WORD *)scan;
-		if(collecting_code && word->compiledp != F)
+		if(collecting_code && word_references_code_heap_p(word))
 			recursive_mark(compiled_to_block(word->code));
 		break;
 	case QUOTATION_TYPE:

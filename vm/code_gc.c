@@ -378,7 +378,7 @@ void forward_object_xts(void)
 		{
 			F_WORD *word = untag_object(obj);
 
-			if(word->compiledp != F)
+			if(word_references_code_heap_p(word))
 				word->code = forward_xt(word->code);
 		}
 		else if(type_of(obj) == QUOTATION_TYPE)
@@ -414,6 +414,8 @@ void fixup_object_xts(void)
 
 			if(word->compiledp != F)
 				set_word_xt(word,word->code);
+			else
+				word->xt = word->code + sizeof(F_COMPILED);
 		}
 		else if(type_of(obj) == QUOTATION_TYPE)
 		{
