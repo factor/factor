@@ -43,33 +43,18 @@ IN: project-euler.022
 : alpha-value ( str -- n )
     string>digits [ 9 - ] sigma ;
 
-: name-score ( str seq -- n )
-    over alpha-value -rot index 1+ * ;
+: name-scores ( seq -- seq )
+    dup length [ 1+ swap alpha-value * ] 2map ;
 
 PRIVATE>
 
 : euler022 ( -- answer )
-    source-022 natural-sort dup [ over name-score ] sigma nip ;
+    source-022 natural-sort name-scores sum ;
 
 ! [ euler022 ] 100 ave-time
-! 906 ms run / 1 ms GC ave time - 100 trials
+! 59 ms run / 1 ms GC ave time - 100 trials
 
-! source-022 [ natural-sort dup [ over name-score ] sigma nip ] curry 100 ave-time
-! 850 ms run / 0 ms GC ave time - 100 trials
+! source-022 [ natural-sort name-scores sum ] curry 100 ave-time
+! 45 ms run / 1 ms GC ave time - 100 trials
 
-
-! ALTERNATE SOLUTIONS
-! -------------------
-
-! Take advantage of the names being ordered and eliminate calls to name-score
-
-: euler022a ( -- answer )
-    source-022 natural-sort dup length [ 1+ swap alpha-value * ] 2map sum ;
-
-! [ euler022 ] 100 ave-time
-! 60 ms run / 1 ms GC ave time - 100 trials
-
-! source-022 [ natural-sort dup length [ 1+ swap alpha-value * ] 2map sum ] curry 100 ave-time
-! 47 ms run / 1 ms GC ave time - 100 trials
-
-MAIN: euler022a
+MAIN: euler022
