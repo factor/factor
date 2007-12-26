@@ -17,9 +17,14 @@ bool jit_fast_dispatch_p(F_ARRAY *array, CELL i)
 		&& array_nth(array,i + 1) == userenv[JIT_DISPATCH_WORD];
 }
 
+F_ARRAY *code_to_emit(CELL name)
+{
+	return untag_object(array_nth(untag_object(userenv[name]),0));
+}
+
 #define EMIT(name) { \
 		REGISTER_UNTAGGED(array); \
-		GROWABLE_APPEND(result,untag_object(userenv[name])); \
+		GROWABLE_APPEND(code,code_to_emit(name)); \
 		UNREGISTER_UNTAGGED(array); \
 	}
 
@@ -54,7 +59,7 @@ void jit_compile(F_QUOTATION *quot)
 	REGISTER_UNTAGGED(quot);
 
 	REGISTER_UNTAGGED(array);
-	GROWABLE_ARRAY(result);
+	GROWABLE_ARRAY(code);
 	UNREGISTER_UNTAGGED(array);
 
 	bool stack_frame = jit_stack_frame_p(array);
@@ -149,16 +154,16 @@ void jit_compile(F_QUOTATION *quot)
 		EMIT(JIT_RETURN);
 	}
 
-	GROWABLE_TRIM(result);
+	GROWABLE_TRIM(code);
 
 	UNREGISTER_UNTAGGED(quot);
 	REGISTER_UNTAGGED(quot);
 
-	REGISTER_UNTAGGED(result);
+	REGISTER_UNTAGGED(code);
 	F_ARRAY *literals = allot_array(ARRAY_TYPE,1,tag_object(quot));
-	UNREGISTER_UNTAGGED(result);
+	UNREGISTER_UNTAGGED(code);
 
-	F_COMPILED *compiled = add_compiled_block(QUOTATION_TYPE,0,result,NULL,NULL,NULL,literals);
+	F_COMPILED *compiled = add_compiled_block(QUOTATION_TYPE,0,code,NULL,NULL,NULL,literals);
 	iterate_code_heap_step(compiled,finalize_code_block);
 
 	UNREGISTER_UNTAGGED(quot);
@@ -181,11 +186,11 @@ XT quot_offset_to_pc(F_QUOTATION *quot, F_FIXNUM offset)
 
 	CELL xt = 0;
 
-	xt += array_capacity(untag_array(userenv[JIT_SETUP]));
+	xt += array_capacity(code_to_emit(JIT_SETUP));
 
 	bool stack_frame = jit_stack_frame_p(untag_array(quot->array));
 	if(stack_frame)
-		xt += array_capacity(untag_array(userenv[JIT_PROLOG]));
+		xt += array_capacity(code_to_emit(JIT_PROLOG));
 
 	xt *= compiled_code_format();
 

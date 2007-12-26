@@ -11,7 +11,6 @@ IN: bootstrap.x86
 : stack-reg ESP ;
 : ds-reg ESI ;
 : scan-reg EBX ;
-: xt-reg ECX ;
 : fixnum>slot@ arg0 1 SAR ;
 
 "resource:core/cpu/x86/bootstrap.factor" run-file

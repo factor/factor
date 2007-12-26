@@ -38,6 +38,9 @@ IN: bootstrap.image
 : quot-array@ bootstrap-cell object tag-number - ;
 : quot-xt@ 3 bootstrap-cells object tag-number - ;
 
+: jit-define ( quot rc rt offset name -- )
+    >r >r >r >r { } make r> r> r> 4array r> set ;
+
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
 

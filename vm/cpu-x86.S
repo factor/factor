@@ -1,6 +1,4 @@
-#define JUMP_QUOT \
-	mov QUOT_XT_OFFSET(ARG0),XT_REG ;     /* Load quot-xt */ \
-	jmp *XT_REG                           /* Jump to quot-xt */
+#define JUMP_QUOT jmp *QUOT_XT_OFFSET(ARG0)
 
 DEF(F_FASTCALL void,c_to_factor,(CELL quot)):
 	PUSH_NONVOLATILE
@@ -10,8 +8,7 @@ DEF(F_FASTCALL void,c_to_factor,(CELL quot)):
 	call MANGLE(save_callstack_bottom)
 
 	mov (STACK_REG),ARG0                  /* Pass quot as arg 1 */
-	mov QUOT_XT_OFFSET(ARG0),XT_REG
-	call *XT_REG                          /* Call quot-xt */
+	call *QUOT_XT_OFFSET(ARG0)            /* Call quot-xt */
 
 	POP ARG0
 	POP_NONVOLATILE
@@ -40,8 +37,7 @@ callstack top parameter to primitives. */
 DEF(F_FASTCALL void,primitive_execute,(void)):
 	mov (DS_REG),ARG0                     /* Load word from data stack */
 	sub $CELL_SIZE,DS_REG                 /* Pop data stack */
-        mov WORD_XT_OFFSET(ARG0),XT_REG       /* Load word-xt slot */
-	jmp *XT_REG                           /* Go */
+        jmp *WORD_XT_OFFSET(ARG0)             /* Load word-xt slot */
 
 DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
 	mov ARG1,STACK_REG                    /* rewind_to */
@@ -49,14 +45,14 @@ DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
 
 DEF(FASTCALL void,lazy_jit_compile,(CELL quot)):
 	mov STACK_REG,ARG1           /* Save stack pointer */
-	push XT_REG                  /* Alignment */
-	push XT_REG
-	push XT_REG
+	push ARG1                    /* Alignment */
+	push ARG1
+	push ARG1
 	call MANGLE(primitive_jit_compile)
 	mov RETURN_REG,ARG0          /* No-op on 32-bit */
-	pop XT_REG                   /* OK to clobber XT_REG here */
-	pop XT_REG
-	pop XT_REG
+	pop ARG1                     /* OK to clobber ARG1 here */
+	pop ARG1
+	pop ARG1
         JUMP_QUOT                    /* Call the quotation */
 
 #ifdef WINDOWS

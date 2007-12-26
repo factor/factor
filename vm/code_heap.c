@@ -251,20 +251,20 @@ F_COMPILED *add_compiled_block(
 	CELL profiler_prologue,
 	F_ARRAY *code,
 	F_ARRAY *labels,
-	F_ARRAY *rel,
+	F_ARRAY *relocation,
 	F_ARRAY *words,
 	F_ARRAY *literals)
 {
 	CELL code_format = compiled_code_format();
 
 	CELL code_length = align8(array_capacity(code) * code_format);
-	CELL rel_length = (rel ? array_capacity(rel) * sizeof(unsigned int) : 0);
+	CELL rel_length = (relocation ? array_capacity(relocation) * sizeof(unsigned int) : 0);
 	CELL words_length = (words ? array_capacity(words) * CELLS : 0);
 	CELL literals_length = (literals ? array_capacity(literals) * CELLS : 0);
 
 	REGISTER_UNTAGGED(code);
 	REGISTER_UNTAGGED(labels);
-	REGISTER_UNTAGGED(rel);
+	REGISTER_UNTAGGED(relocation);
 	REGISTER_UNTAGGED(words);
 	REGISTER_UNTAGGED(literals);
 
@@ -273,7 +273,7 @@ F_COMPILED *add_compiled_block(
 
 	UNREGISTER_UNTAGGED(literals);
 	UNREGISTER_UNTAGGED(words);
-	UNREGISTER_UNTAGGED(rel);
+	UNREGISTER_UNTAGGED(relocation);
 	UNREGISTER_UNTAGGED(labels);
 	UNREGISTER_UNTAGGED(code);
 
@@ -295,9 +295,9 @@ F_COMPILED *add_compiled_block(
 	here += code_length;
 
 	/* relation info */
-	if(rel)
+	if(relocation)
 	{
-		deposit_integers(here,rel,sizeof(unsigned int));
+		deposit_integers(here,relocation,sizeof(unsigned int));
 		here += rel_length;
 	}
 
@@ -365,7 +365,7 @@ DEFINE_PRIMITIVE(modify_code_heap)
 			CELL profiler_prologue = to_cell(array_nth(compiled_code,0));
 			F_ARRAY *literals = untag_array(array_nth(compiled_code,1));
 			F_ARRAY *words = untag_array(array_nth(compiled_code,2));
-			F_ARRAY *rel = untag_array(array_nth(compiled_code,3));
+			F_ARRAY *relocation = untag_array(array_nth(compiled_code,3));
 			F_ARRAY *labels = untag_array(array_nth(compiled_code,4));
 			F_ARRAY *code = untag_array(array_nth(compiled_code,5));
 
@@ -377,7 +377,7 @@ DEFINE_PRIMITIVE(modify_code_heap)
 				profiler_prologue,
 				code,
 				labels,
-				rel,
+				relocation,
 				words,
 				literals);
 
