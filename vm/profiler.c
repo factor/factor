@@ -27,7 +27,7 @@ void set_profiling(bool profiling)
 	/* Push everything to tenured space so that we can heap scan */
 	data_gc();
 
-	/* Step 1 - Update word XTs and saved callstack objects */
+	/* Update word XTs and saved callstack objects */
 	begin_scan();
 
 	CELL obj;
@@ -39,11 +39,8 @@ void set_profiling(bool profiling)
 
 	gc_off = false; /* end heap scan */
 
-	/* Step 2 - Update XTs in code heap */
+	/* Update XTs in code heap */
 	iterate_code_heap(relocate_code_block);
-
-	/* Step 3 - flush instruction cache */
-	flush_icache(code_heap.segment->start,code_heap.segment->size);
 }
 
 DEFINE_PRIMITIVE(profiling)

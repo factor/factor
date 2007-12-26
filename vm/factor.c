@@ -54,7 +54,7 @@ void do_stage1_init(void)
 	/* End heap scan */
 	gc_off = false;
 
-	iterate_code_heap(finalize_code_block);
+	iterate_code_heap(relocate_code_block);
 
 	userenv[STAGE2_ENV] = T;
 

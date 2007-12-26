@@ -236,7 +236,7 @@ void jit_compile(CELL quot)
 		untag_object(words),
 		untag_object(literals));
 
-	iterate_code_heap_step(compiled,finalize_code_block);
+	iterate_code_heap_step(compiled,relocate_code_block);
 
 	set_quot_xt(untag_object(quot),compiled);
 

@@ -201,44 +201,12 @@ DECLARE_PRIMITIVE(wrapper);
 	CELL result##_count = 0; \
 	CELL result = tag_object(allot_array(ARRAY_TYPE,100,F))
 
-INLINE F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count)
-{
-	REGISTER_ROOT(elt);
-
-	if(*result_count == array_capacity(result))
-	{
-		result = reallot_array(result,
-			*result_count * 2,F);
-	}
-
-	UNREGISTER_ROOT(elt);
-	set_array_nth(result,*result_count,elt);
-	*result_count = *result_count + 1;
-
-	return result;
-}
+F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count);
 
 #define GROWABLE_ADD(result,elt) \
 	result = tag_object(growable_add(untag_object(result),elt,&result##_count))
 
-INLINE F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
-{
-	REGISTER_UNTAGGED(elts);
-
-	CELL elts_size = array_capacity(elts);
-	CELL new_size = *result_count + elts_size;
-
-	if(new_size >= array_capacity(result))
-		result = reallot_array(result,new_size * 2,F);
-
-	UNREGISTER_UNTAGGED(elts);
-
-	memcpy((void*)AREF(result,*result_count),(void*)AREF(elts,0),elts_size * CELLS);
-
-	*result_count += elts_size;
-
-	return result;
-}
+F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count);
 
 #define GROWABLE_APPEND(result,elts) \
 	result = tag_object(growable_append(untag_object(result),elts,&result##_count))

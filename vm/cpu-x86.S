@@ -18,22 +18,12 @@ DEF(F_FASTCALL void,undefined,(CELL word)):
 	mov STACK_REG,ARG1                    /* Pass callstack pointer */
 	jmp MANGLE(undefined_error)           /* This throws an error */
 
-/* Here we have two entry points. The first one is taken when profiling is
-enabled */
-DEF(F_FASTCALL void,docol_profiling,(CELL word)):
-	add $8,PROFILING_OFFSET(ARG0)         /* Increment profile-count slot */
-DEF(F_FASTCALL void,docol,(CELL word)):
-	mov WORD_DEF_OFFSET(ARG0),ARG0        /* Load word-def slot */
-	JUMP_QUOT
-
-/* We must pass the XT to the quotation in ECX. */
 DEF(F_FASTCALL void,primitive_call,(void)):
         mov (DS_REG),ARG0                     /* Load quotation from data stack */
 	sub $CELL_SIZE,DS_REG                 /* Pop data stack */
 	JUMP_QUOT
 
-/* We pass the word in EAX and the XT in ECX. Don't mess up EDX, it's the
-callstack top parameter to primitives. */
+/* Don't mess up EDX, it's the callstack top parameter to primitives. */
 DEF(F_FASTCALL void,primitive_execute,(void)):
 	mov (DS_REG),ARG0                     /* Load word from data stack */
 	sub $CELL_SIZE,DS_REG                 /* Pop data stack */

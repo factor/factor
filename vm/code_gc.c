@@ -415,7 +415,7 @@ void fixup_object_xts(void)
 			if(word->compiledp != F)
 				set_word_xt(word,word->code);
 			else
-				word->xt = word->code + sizeof(F_COMPILED);
+				word->xt = (void *)(word->code + 1);
 		}
 		else if(type_of(obj) == QUOTATION_TYPE)
 		{

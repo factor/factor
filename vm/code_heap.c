@@ -138,22 +138,27 @@ void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
-	xt_offset = (profiling_p() ? 0 : relocating->profiler_prologue);
-
-	F_REL *rel = (F_REL *)reloc_start;
-	F_REL *rel_end = (F_REL *)literals_start;
-
-	while(rel < rel_end)
+	if(reloc_start != literals_start)
 	{
-		CELL offset = rel->offset + code_start;
+		xt_offset = (profiling_p() ? 0 : relocating->profiler_prologue);
 
-		F_FIXNUM absolute_value = compute_code_rel(rel,
-			code_start,literals_start,words_start);
+		F_REL *rel = (F_REL *)reloc_start;
+		F_REL *rel_end = (F_REL *)literals_start;
 
-		apply_relocation(REL_CLASS(rel),offset,absolute_value);
+		while(rel < rel_end)
+		{
+			CELL offset = rel->offset + code_start;
 
-		rel++;
+			F_FIXNUM absolute_value = compute_code_rel(rel,
+				code_start,literals_start,words_start);
+
+			apply_relocation(REL_CLASS(rel),offset,absolute_value);
+
+			rel++;
+		}
 	}
+
+	flush_icache(code_start,reloc_start - code_start);
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
@@ -384,5 +389,5 @@ DEFINE_PRIMITIVE(modify_code_heap)
 	}
 
 	if(count != 0)
-		iterate_code_heap(finalize_code_block);
+		iterate_code_heap(relocate_code_block);
 }
