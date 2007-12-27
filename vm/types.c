@@ -495,11 +495,11 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->hashcode = tag_fixnum(rand());
 	word->vocabulary = vocab;
 	word->name = name;
-	word->def = F;
+	word->def = userenv[UNDEFINED_ENV];
 	word->props = F;
 	word->counter = tag_fixnum(0);
 	word->compiledp = F;
-	word->xt = NULL;
+	default_word_xt(word);
 	return word;
 }
 

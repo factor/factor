@@ -1,6 +1,6 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
-vocabs continuations ;
+vocabs continuations tuples ;
 IN: temporary
 
 [ 4 ] [
@@ -34,7 +34,7 @@ DEFER: plist-test
 [
     [ t ] [ \ array? "array?" "arrays" lookup = ] unit-test
 
-    "test-scope" "scratchpad" create drop
+    [ ] [ "test-scope" "scratchpad" create drop ] unit-test
 ] with-scope
 
 [ "test-scope" ] [
@@ -52,7 +52,7 @@ DEFER: plist-test
 [ t ] [ \ colon-def compound? ] unit-test
 
 SYMBOL: a-symbol
-[ f ] [ \ a-symbol compound? ] unit-test
+[ t ] [ \ a-symbol compound? ] unit-test
 [ t ] [ \ a-symbol symbol? ] unit-test
 
 ! See if redefining a generic as a colon def clears some
@@ -126,7 +126,7 @@ M: array freakish ;
 [ t ] [ \ bar \ freakish usage member? ] unit-test
 
 DEFER: x
-[ t ] [ [ x ] catch third \ x eq? ] unit-test
+[ t ] [ [ x ] catch undefined? ] unit-test
 
 [ ] [ "no-loc" "temporary" create drop ] unit-test
 [ f ] [ "no-loc" "temporary" lookup where ] unit-test
@@ -156,3 +156,8 @@ SYMBOL: quot-uses-b
 ] unit-test
 
 [ { + } ] [ \ quot-uses-b uses ] unit-test
+
+[ t ] [
+    [ "IN: temporary : undef-test ; << undef-test >>" eval ] catch
+    [ undefined? ] is?
+] unit-test

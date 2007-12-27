@@ -74,23 +74,27 @@ SYMBOL: jit-dispatch
 SYMBOL: jit-epilog
 SYMBOL: jit-return
 
+! Default definition for undefined words
+SYMBOL: undefined-quot
+
 : userenv-offset ( symbol -- n )
     {
         { bootstrap-boot-quot 20 }
         { bootstrap-global 21 }
         { jit-code-format 22 }
-        { jit-prolog 24 }
-        { jit-word-primitive-jump 25 }
-        { jit-word-primitive-call 26 }
-        { jit-word-jump 27 }
-        { jit-word-call 28 }
-        { jit-push-literal 30 }
-        { jit-if-word 31 }
-        { jit-if-jump 32 }
-        { jit-dispatch-word 34 }
-        { jit-dispatch 35 }
-        { jit-epilog 36 }
-        { jit-return 37 }
+        { jit-prolog 23 }
+        { jit-word-primitive-jump 24 }
+        { jit-word-primitive-call 25 }
+        { jit-word-jump 26 }
+        { jit-word-call 27 }
+        { jit-push-literal 28 }
+        { jit-if-word 29 }
+        { jit-if-jump 30 }
+        { jit-dispatch-word 31 }
+        { jit-dispatch 32 }
+        { jit-epilog 33 }
+        { jit-return 34 }
+        { undefined-quot 37 }
     } at header-size + ;
 
 : emit ( cell -- ) image get push ;
@@ -364,6 +368,7 @@ M: curry '
 : emit-jit-data ( -- )
     \ if jit-if-word set
     \ dispatch jit-dispatch-word set
+    [ undefined ] undefined-quot set
     {
         jit-code-format
         jit-prolog
@@ -378,6 +383,7 @@ M: curry '
         jit-dispatch
         jit-epilog
         jit-return
+        undefined-quot
     } [ emit-userenv ] each ;
 
 : fixup-header ( -- )

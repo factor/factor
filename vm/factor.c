@@ -35,6 +35,8 @@ void do_stage1_init(void)
 	fprintf(stderr,"*** Starting stage 2 early init...\n");
 	fflush(stderr);
 
+	jit_compile(userenv[UNDEFINED_ENV]);
+
 	begin_scan();
 
 	CELL obj;

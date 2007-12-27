@@ -34,26 +34,22 @@ typedef enum {
 
 	/* Used by the JIT compiler */
 	JIT_CODE_FORMAT     = 22,
-	UNUSED_0,
 	JIT_PROLOG,
 	JIT_WORD_PRIMITIVE_JUMP,
 	JIT_WORD_PRIMITIVE_CALL,
 	JIT_WORD_JUMP,
 	JIT_WORD_CALL,
-	UNUSED_1,
 	JIT_PUSH_LITERAL,
 	JIT_IF_WORD,
 	JIT_IF_JUMP,
-	UNUSED_2,
 	JIT_DISPATCH_WORD,
 	JIT_DISPATCH,
 	JIT_EPILOG,
 	JIT_RETURN,
 
-	/* Profiler support */
+	UNDEFINED_ENV       = 37, /* default quotation for undefined words */
 	PROFILING_ENV       = 38, /* is the profiler on? */
-
-	STAGE2_ENV          = 39  /* Have we bootstrapped? */
+	STAGE2_ENV          = 39  /* have we bootstrapped? */
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV
