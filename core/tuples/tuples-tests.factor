@@ -78,8 +78,6 @@ M: circle area circle-radius sq pi * ;
 
 [ 200 ] [ T{ rect f 0 0 10 20 } area ] unit-test
 
-[ ] [ "IN: temporary  SYMBOL: #x  TUPLE: #x ;" eval ] unit-test
-
 ! Hashcode breakage
 TUPLE: empty ;
 
@@ -216,24 +214,9 @@ SYMBOL: not-a-tuple-class
 [ not-a-tuple-class construct-boa ] unit-test-fails
 [ not-a-tuple-class construct-empty ] unit-test-fails
 
-TUPLE: erg's-reshape-problem a b c ;
+TUPLE: erg's-reshape-problem a b c d ;
 
 C: <erg's-reshape-problem> erg's-reshape-problem
-
-[ ] [
-    ! <erg's-reshape-problem> hasn't been recompiled yet, so
-    ! we just created a tuple using an obsolete layout
-    "IN: temporary USE: namespaces TUPLE: erg's-reshape-problem a b c d ; 1 2 3 <erg's-reshape-problem> \"a\" set" eval
-] unit-test
-
-[ 1 2 ] [
-    ! that's ok, but... this shouldn't fail:
-    "IN: temporary TUPLE: erg's-reshape-problem a b d c ;" eval
-
-    "a" get
-    { erg's-reshape-problem-a erg's-reshape-problem-b }
-    get-slots
-] unit-test
 
 ! We want to make sure constructors are recompiled when
 ! tuples are reshaped

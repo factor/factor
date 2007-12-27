@@ -66,7 +66,7 @@ IN: bootstrap.stage2
         ] set-boot-quot
 
         : count-words all-words swap subset length pprint ;
-    
+
         [ compiled? ] count-words " compiled words" print
         [ symbol? ] count-words " symbol words" print
         [ ] count-words " words total" print

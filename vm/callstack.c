@@ -123,8 +123,9 @@ F_STACK_FRAME *frame_successor(F_STACK_FRAME *frame)
 
 CELL frame_scan(F_STACK_FRAME *frame)
 {
+	//XXX
 	if(frame_type(frame) == QUOTATION_TYPE)
-		return tag_fixnum(UNAREF(UNTAG(frame->array),frame->scan));
+		return tag_fixnum(0); //UNAREF(UNTAG(frame->array),frame->scan));
 	else
 		return F;
 }
@@ -213,11 +214,13 @@ DEFINE_PRIMITIVE(set_innermost_stack_frame_quot)
 	F_STACK_FRAME *inner = innermost_stack_frame(callstack);
 	type_check(QUOTATION_TYPE,frame_executing(inner));
 
-	CELL scan = inner->scan - inner->array;
+	//XXX
+
+	//CELL scan = inner->scan - inner->array;
 	CELL offset = FRAME_RETURN_ADDRESS(inner) - inner->xt;
 
-	inner->array = quot->array;
-	inner->scan = quot->array + scan;
+	//inner->array = quot->array;
+	//inner->scan = quot->array + scan;
 
 	inner->xt = quot->xt;
 

@@ -90,8 +90,6 @@ IN: tools.deploy.shaker
     { } set-retainstack
     V{ } set-namestack
     V{ } set-catchstack
-    "Stripping compiled quotations" show
-    strip-compiled-quotations
     "Saving final image" show
     [ save-image-and-exit ] call-clear ;
 

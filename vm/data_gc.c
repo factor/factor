@@ -380,24 +380,19 @@ void collect_stack(F_SEGMENT *region, CELL top)
 
 void collect_stack_frame(F_STACK_FRAME *frame)
 {
-	if(frame_type(frame) == QUOTATION_TYPE)
-	{
-		CELL scan = frame->scan - frame->array;
-		copy_handle(&frame->array);
-		frame->scan = scan + frame->array;
-	}
-
-	if(collecting_code)
-		recursive_mark(compiled_to_block(frame_code(frame)));
+	recursive_mark(compiled_to_block(frame_code(frame)));
 }
 
 /* The base parameter allows us to adjust for a heap-allocated
 callstack snapshot */
 void collect_callstack(F_CONTEXT *stacks)
 {
-	CELL top = (CELL)stacks->callstack_top;
-	CELL bottom = (CELL)stacks->callstack_bottom;
-	iterate_callstack(top,bottom,collect_stack_frame);
+	if(collecting_code)
+	{
+		CELL top = (CELL)stacks->callstack_top;
+		CELL bottom = (CELL)stacks->callstack_bottom;
+		iterate_callstack(top,bottom,collect_stack_frame);
+	}
 }
 
 void collect_gc_locals(void)
@@ -541,7 +536,8 @@ CELL binary_payload_start(CELL pointer)
 
 void collect_callstack_object(F_CALLSTACK *callstack)
 {
-	iterate_callstack_object(callstack,collect_stack_frame);
+	if(collecting_code)
+		iterate_callstack_object(callstack,collect_stack_frame);
 }
 
 CELL collect_next(CELL scan)

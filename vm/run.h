@@ -34,7 +34,7 @@ typedef enum {
 
 	/* Used by the JIT compiler */
 	JIT_CODE_FORMAT     = 22,
-	JIT_SETUP,
+	UNUSED_0,
 	JIT_PROLOG,
 	JIT_WORD_PRIMITIVE_JUMP,
 	JIT_WORD_PRIMITIVE_CALL,

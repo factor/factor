@@ -116,8 +116,6 @@ void jit_compile(CELL quot)
 
 	bool stack_frame = jit_stack_frame_p(untag_object(array));
 
-	EMIT(JIT_SETUP,0);
-
 	if(stack_frame)
 		EMIT(JIT_PROLOG,0);
 
@@ -315,24 +313,4 @@ DEFINE_PRIMITIVE(quotation_xt)
 {
 	F_QUOTATION *quot = untag_quotation(dpeek());
 	drepl(allot_cell((CELL)quot->xt));
-}
-
-DEFINE_PRIMITIVE(strip_compiled_quotations)
-{
-	data_gc();
-	begin_scan();
-
-	CELL obj;
-	while((obj = next_object()) != F)
-	{
-		if(type_of(obj) == QUOTATION_TYPE)
-		{
-			F_QUOTATION *quot = untag_object(obj);
-			quot->compiledp = F;
-			quot->xt = lazy_jit_compile;
-		}
-	}
-
-	/* end scan */
-	gc_off = false;
 }

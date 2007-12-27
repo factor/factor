@@ -8,30 +8,18 @@ big-endian off
 
 1 jit-code-format set
 
-: stack-frame-size 8 bootstrap-cells ;
-
-: scan-save stack-reg 3 bootstrap-cells [+] ;
+: stack-frame-size 4 bootstrap-cells ;
 
 [
     arg0 0 [] MOV                              ! load quotation
     arg1 arg0 quot-xt@ [+] MOV                 ! load XT
-    arg0 arg0 quot-array@ [+] MOV              ! load array
-    scan-reg arg0 scan@ [+] LEA                ! initialize scan pointer
-] rc-absolute-cell rt-literal 2 jit-setup jit-define
-
-[
     stack-frame-size PUSH                      ! save stack frame size
     arg1 PUSH                                  ! save XT
-    arg0 PUSH                                  ! save array
-    scan-reg PUSH                              ! initial scan
-    stack-reg 3 bootstrap-cells SUB            ! reserved
-] f f f jit-prolog jit-define
-
-: advance-scan scan-reg bootstrap-cell ADD ;
+    arg1 PUSH                                  ! alignment
+] rc-absolute-cell rt-literal 2 jit-prolog jit-define
 
 [
     arg0 0 [] MOV                              ! load literal
-    advance-scan
     ds-reg bootstrap-cell ADD                  ! increment datastack pointer
     ds-reg [] arg0 MOV                         ! store literal on datastack
 ] rc-absolute-cell rt-literal 2 jit-push-literal jit-define
@@ -42,23 +30,17 @@ big-endian off
 ] rc-relative rt-primitive 3 jit-word-primitive-jump jit-define
 
 [
-    advance-scan
     arg1 stack-reg bootstrap-cell neg [+] LEA  ! pass callstack pointer as arg 2
-    scan-save scan-reg MOV                     ! save scan pointer
     (CALL) drop                                ! go
-    scan-reg scan-save MOV                     ! restore scan pointer
-] rc-relative rt-primitive 12 jit-word-primitive-call jit-define
+] rc-relative rt-primitive 5 jit-word-primitive-call jit-define
 
 [
     (JMP) drop
 ] rc-relative rt-xt 1 jit-word-jump jit-define
 
 [
-    advance-scan
-    scan-save scan-reg MOV                     ! save scan pointer
     (CALL) drop
-    scan-reg scan-save MOV                     ! restore scan pointer
-] rc-relative rt-xt 8 jit-word-call jit-define
+] rc-relative rt-xt 1 jit-word-call jit-define
 
 [
     arg1 0 MOV                                 ! load addr of true quotation

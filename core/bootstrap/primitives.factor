@@ -602,7 +602,6 @@ builtins get num-tags get tail f union-class define-class
     { "innermost-frame-scan" "kernel.private" }
     { "set-innermost-frame-quot" "kernel.private" }
     { "call-clear" "kernel" }
-    { "strip-compiled-quotations" "quotations" }
     { "(os-envs)" "system" }
 }
 dup length [ >r first2 r> make-primitive ] 2each

@@ -218,14 +218,6 @@ void fixup_alien(F_ALIEN *d)
 void fixup_stack_frame(F_STACK_FRAME *frame)
 {
 	code_fixup((CELL)&frame->xt);
-
-	if(frame_type(frame) == QUOTATION_TYPE)
-	{
-		CELL scan = frame->scan - frame->array;
-		data_fixup(&frame->array);
-		frame->scan = scan + frame->array;
-	}
-
 	code_fixup((CELL)&FRAME_RETURN_ADDRESS(frame));
 }
 

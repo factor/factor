@@ -61,7 +61,6 @@ SYMBOL: bootstrap-boot-quot
 
 ! JIT parameters
 SYMBOL: jit-code-format
-SYMBOL: jit-setup
 SYMBOL: jit-prolog
 SYMBOL: jit-word-primitive-jump
 SYMBOL: jit-word-primitive-call
@@ -80,7 +79,6 @@ SYMBOL: jit-return
         { bootstrap-boot-quot 20 }
         { bootstrap-global 21 }
         { jit-code-format 22 }
-        { jit-setup 23 }
         { jit-prolog 24 }
         { jit-word-primitive-jump 25 }
         { jit-word-primitive-call 26 }
@@ -368,7 +366,6 @@ M: curry '
     \ dispatch jit-dispatch-word set
     {
         jit-code-format
-        jit-setup
         jit-prolog
         jit-word-primitive-jump
         jit-word-primitive-call
