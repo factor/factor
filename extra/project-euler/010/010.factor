@@ -1,7 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer, Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel lazy-lists math math.erato math.functions math.ranges
-       namespaces sequences ;
+USING: math.primes sequences ;
 IN: project-euler.010
 
 ! http://projecteuler.net/index.php?section=problems&id=10
@@ -17,12 +16,12 @@ IN: project-euler.010
 ! SOLUTION
 ! --------
 
-! Sieve of Eratosthenes and lazy summing
+! Summing of prime numbers
 
 : euler010 ( -- answer )
-    0 1000000 lerato [ + ] leach ;
+  1000000 primes-upto sum ;
 
-! [ euler010 ] time
-! 765 ms run / 7 ms GC time
+! [ euler010 ] 100 ave-time
+! 14 ms run / 0 ms GC ave time - 100 trials
 
 MAIN: euler010

@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math project-euler.common sequences ;
+USING: math.primes.factors sequences ;
 IN: project-euler.003
 
 ! http://projecteuler.net/index.php?section=problems&id=3
@@ -17,12 +17,12 @@ IN: project-euler.003
 ! --------
 
 : largest-prime-factor ( n -- factor )
-    prime-factors supremum ;
+  factors supremum ;
 
 : euler003 ( -- answer )
-    317584931803 largest-prime-factor ;
+  317584931803 largest-prime-factor ;
 
-! [ euler003 ] 100 ave-time
-! 404 ms run / 9 ms GC ave time - 100 trials
+! [ euler003 ] time
+! 2 ms run / 0 ms GC time
 
 MAIN: euler003

@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math.algebra math math.functions math.primes.list
+USING: arrays kernel lazy-lists math.algebra math math.functions math.primes
        math.ranges sequences ;
 IN: project-euler.134
 
@@ -23,9 +23,9 @@ IN: project-euler.134
 ! SOLUTION
 ! --------
 
-! Compute the smallest power of 10 greater than m
+! Compute the smallest power of 10 greater than m or equal to it
 : next-power-of-10 ( m -- n )
-  10 swap log 10 log / >integer [ 10 * ] times ; foldable
+  10 swap log 10 log / ceiling >integer ^ ; foldable
 
 ! Compute S for a given pair (p1, p2) -- that is the smallest positive
 ! number such that X = p1 [npt] and X = 0 [p2] (npt being the smallest
@@ -34,7 +34,7 @@ IN: project-euler.134
   over 0 2array rot next-power-of-10 rot 2array chinese-remainder ;
 
 : euler134 ( -- answer )
-  primes-under-million 2 tail dup 1 tail 1000003 add  [ s ] 2map sum ;
+  5 lprimes-from [ 1000000 > ] luntil [ [ s + ] keep ] leach drop ;
 
 ! [ euler134 ] 10 ave-time
 ! 6743 ms run / 79 ms GC ave time - 10 trials
