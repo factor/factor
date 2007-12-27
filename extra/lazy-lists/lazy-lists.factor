@@ -310,11 +310,7 @@ M: lazy-append cdr ( lazy-append -- cdr )
   lazy-append-list2 lappend ;
 
 M: lazy-append nil? ( lazy-append -- bool )
-  dup lazy-append-list1 nil? [
-    lazy-append-list2 nil?
-  ] [
-    drop f
-  ] if ;
+   drop f ;
 
 M: lazy-append list? ( object -- bool )
   drop t ;
