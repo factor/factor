@@ -82,11 +82,15 @@ HELP: uncons
 { $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
 { $description "Put the head and tail of the list on the stack." } ;
 
-{ leach lmap lmap-with ltake lsubset lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lreduce lwhile luntil } related-words
+{ leach lreduce lmap lmap-with ltake lsubset lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lreduce lwhile luntil } related-words
 
 HELP: leach
 { $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- )" } }
 { $description "Call the quotation for each item in the list." } ;
+
+HELP: lreduce
+{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" "a quotation with stack effect ( prev elt -- next )" } { "result" "the final result" } }
+{ $description "Combines successive elements of the list using a binary operation, and outputs the final result." } ;
 
 HELP: lmap
 { $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- X )" } { "result" "resulting cons object" } }

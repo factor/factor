@@ -102,6 +102,9 @@ M: lazy-cons list? ( object -- bool )
 : leach ( list quot -- )
   swap dup nil? [ 2drop ] [ uncons swapd over 2slip leach ] if ; inline
 
+: lreduce ( list identity quot -- result )
+  swapd leach ; inline
+
 TUPLE: memoized-cons original car cdr nil? ;
 
 : not-memoized ( -- obj )
