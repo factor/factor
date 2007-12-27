@@ -105,7 +105,7 @@ M: real absq sq ;
 : power-of-2? ( n -- ? )
     dup 0 < [ drop f ] [ dup 1- bitand zero? ] if ; foldable
 
-: >rect ( z -- x y ) dup real swap imaginary ; inline
+: >rect ( z -- x y ) dup real-part swap imaginary-part ; inline
 
 : conjugate ( z -- z* ) >rect neg rect> ; inline
 

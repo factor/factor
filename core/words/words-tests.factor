@@ -161,3 +161,25 @@ SYMBOL: quot-uses-b
     [ "IN: temporary : undef-test ; << undef-test >>" eval ] catch
     [ undefined? ] is?
 ] unit-test
+
+[ ] [
+    "IN: temporary GENERIC: symbol-generic" eval
+] unit-test
+
+[ ] [
+    "IN: temporary SYMBOL: symbol-generic" eval
+] unit-test
+
+[ t ] [ "symbol-generic" "temporary" lookup symbol? ] unit-test
+[ f ] [ "symbol-generic" "temporary" lookup generic? ] unit-test
+
+[ ] [
+    "IN: temporary GENERIC: symbol-generic" eval
+] unit-test
+
+[ ] [
+    "IN: temporary TUPLE: symbol-generic ;" eval
+] unit-test
+
+[ t ] [ "symbol-generic" "temporary" lookup symbol? ] unit-test
+[ f ] [ "symbol-generic" "temporary" lookup generic? ] unit-test

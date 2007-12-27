@@ -57,13 +57,13 @@ SYMBOL: compiler-hook
 : compile ( words -- )
     [ compiled? not ] subset recompile ;
 
-: compile-quot ( quot -- word )
+: compile-call ( quot -- )
     H{ } clone changed-words [
         define-temp dup 1array recompile
-    ] with-variable ;
+    ] with-variable execute ;
 
-: compile-call ( quot -- )
-    compile-quot execute ;
-
-: compile-all ( -- )
+: recompile-all ( -- )
     all-words recompile ;
+
+: decompile ( word -- )
+    f 2array 1array modify-code-heap ;

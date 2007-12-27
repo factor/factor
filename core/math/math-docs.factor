@@ -322,14 +322,16 @@ HELP: fp-nan?
 { $values { "x" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is an IEEE Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
 
-HELP: real ( z -- x )
+HELP: real-part ( z -- x )
 { $values { "z" number } { "x" real } }
-{ $description "Outputs the real part of a complex number. This acts as the identity on real numbers." }
-{ $class-description "The class of real numbers, which is a disjoint union of rationals and floats." } ;
+{ $description "Outputs the real part of a complex number. This acts as the identity on real numbers." } ;
 
-HELP: imaginary ( z -- y )
+HELP: imaginary-part ( z -- y )
 { $values { "z" number } { "y" real } }
 { $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." } ;
+
+HELP: real
+{ $class-description "The class of real numbers, which is a disjoint union of rationals and floats." } ;
 
 HELP: number
 { $class-description "The class of numbers." } ;

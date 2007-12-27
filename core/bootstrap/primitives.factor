@@ -149,16 +149,16 @@ num-types get f <array> builtins set
 {
     {
         { "real" "math" }
-        "real"
+        "real-part"
         1
-        { "real" "math" }
+        { "real-part" "math" }
         f
     }
     {
         { "real" "math" }
-        "imaginary"
+        "imaginary-part"
         2
-        { "imaginary" "math" }
+        { "imaginary-part" "math" }
         f
     }
 } define-builtin

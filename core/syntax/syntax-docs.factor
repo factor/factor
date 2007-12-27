@@ -286,8 +286,8 @@ HELP: H{
 { $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
 
 HELP: C{
-{ $syntax "C{ real imaginary }" }
-{ $values { "real" "a real number" } { "imaginary" "a real number" } }
+{ $syntax "C{ real-part imaginary-part }" }
+{ $values { "real-part" "a real number" } { "imaginary-part" "a real number" } }
 { $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: T{

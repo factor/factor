@@ -1,9 +1,8 @@
 ! Black box testing of templating optimization
-
 USING: arrays compiler kernel kernel.private math
 hashtables.private math.private namespaces sequences
 sequences.private tools.test namespaces.private slots.private
-combinators.private byte-arrays alien layouts ;
+combinators.private byte-arrays alien layouts words definitions ;
 IN: temporary
 
 ! Oops!
@@ -102,7 +101,7 @@ unit-test
 [ ] [
     [
         [ 200 dup [ 200 3array ] curry map drop ] times
-    ] compile-quot drop
+    ] [ define-temp ] with-compilation-unit drop
 ] unit-test
 
 

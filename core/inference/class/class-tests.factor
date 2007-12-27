@@ -136,9 +136,16 @@ M: object xyz ;
     ] set-constraints
 ] "constraints" set-word-prop
 
+DEFER: blah
+
 [ t ] [
-    [ dup V{ } eq? [ foo ] when ] dup second dup push
-    compile-quot word?
+    [
+        \ blah
+        [ dup V{ } eq? [ foo ] when ] dup second dup push
+        define-compound
+    ] with-compilation-unit
+
+    \ blah compiled?
 ] unit-test
 
 GENERIC: detect-fx ( n -- n )

@@ -170,7 +170,9 @@ GENERIC: void-generic ( obj -- * )
 ] unit-test
 
 ! compiling <tuple> with a non-literal class failed
-[ t ] [ [ <tuple> ] compile-quot word? ] unit-test
+: <tuple>-regression <tuple> ;
+
+[ t ] [ \ <tuple>-regression compiled? ] unit-test
 
 GENERIC: foozul
 M: reversed foozul ;

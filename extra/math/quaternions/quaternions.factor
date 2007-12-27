@@ -56,7 +56,7 @@ PRIVATE>
 : q>v ( q -- v )
     #! Get the vector part of a quaternion, discarding the real
     #! part.
-    first2 >r imaginary r> >rect 3array ;
+    first2 >r imaginary-part r> >rect 3array ;
 
 ! Zero
 : q0 { 0 0 } ;

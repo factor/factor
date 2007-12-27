@@ -6,7 +6,7 @@ quotations arrays vocabs ;
 IN: generic
 
 PREDICATE: compound generic ( word -- ? )
-    "combination" word-prop ;
+    "combination" word-prop >boolean ;
 
 M: generic definer drop f f ;
 

@@ -5,8 +5,7 @@ IN: compiler
 ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 "The main entry point to the optimizing compiler is a single word taking a word as input:"
 { $subsection compile }
-"The optimizing compiler can also compile a single quotation:"
-{ $subsection compile-quot }
+"The optimizing compiler can also compile and call a single quotation:"
 { $subsection compile-call }
 "Three utility words for bulk compilation:"
 { $subsection compile-batch }
@@ -86,11 +85,6 @@ HELP: compile-batch
 HELP: compile-vocabs
 { $values { "seq" "a sequence of strings" } }
 { $description "Compiles all words which have not been compiled yet from the given vocabularies." } ;
-
-HELP: compile-quot
-{ $values { "quot" "a quotation" } { "word" "a new, uninterned word" } }
-{ $description "Creates a new uninterned word having the given quotation as its definition, and compiles it. The returned word can be passed to " { $link execute } "." }
-{ $errors "Throws an error if the stack effect of the quotation cannot be inferred." } ;
 
 HELP: compile-call
 { $values { "quot" "a quotation" } }

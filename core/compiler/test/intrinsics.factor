@@ -324,7 +324,8 @@ cell 8 = [
 ] unit-test
 
 [ 1 2 ] [
-    1 2 [ <complex> ] compile-call dup real swap imaginary
+    1 2 [ <complex> ] compile-call
+    dup real-part swap imaginary-part
 ] unit-test
 
 [ 1 2 ] [
