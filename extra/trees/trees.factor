@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic math sequences arrays io namespaces
-prettyprint.private kernel.private assocs random combinators ;
+prettyprint.private kernel.private assocs random combinators
+parser prettyprint.backend ;
 IN: trees
 
 TUPLE: tree root count ;
@@ -179,3 +180,13 @@ DEFER: delete-node
 
 M: tree delete-at
     [ delete-bst-node ] change-root ;
+
+: >tree ( assoc -- bst )
+    T{ tree f f 0 } assoc-clone-like ;
+
+: TREE{
+    \ } [ >tree ] parse-literal ; parsing
+
+M: tree pprint-delims drop \ TREE{ \ } ;
+M: tree >pprint-sequence >alist ;
+M: tree pprint-narrow? drop t ;
