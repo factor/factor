@@ -22,7 +22,6 @@ crossref off
 
 H{ } clone dictionary set
 H{ } clone changed-words set
-H{ } clone changed-generics set
 [ drop ] recompile-hook set
 
 call
@@ -608,6 +607,3 @@ dup length [ >r first2 r> make-primitive ] 2each
 
 ! Bump build number
 "build" "kernel" create build 1+ 1quotation define-compound
-
-! Make generics
-changed-generics get keys [ make-generic ] each
