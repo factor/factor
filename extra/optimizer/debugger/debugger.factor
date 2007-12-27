@@ -73,8 +73,8 @@ M: #push node>quot nip pushed-literals % ;
 DEFER: dataflow>quot
 
 : #call>quot ( ? node -- )
-    dup node-param dup
-    [ , dup effect-str comment, ] [ 3drop ] if ;
+    dup node-param dup ,
+    [ dup effect-str ] [ "empty call" ] if comment, ;
 
 M: #call node>quot #call>quot ;
 
