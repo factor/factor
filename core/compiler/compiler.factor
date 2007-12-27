@@ -44,7 +44,7 @@ SYMBOL: compiler-hook
     dup assoc-empty?
     [ drop ] [ dup delete-any (compile) compile-loop ] if ;
 
-: compile ( words -- )
+: recompile ( words -- )
     [
         H{ } clone compile-queue set
         H{ } clone compiled set
@@ -53,13 +53,16 @@ SYMBOL: compiler-hook
         compiled get >alist modify-code-heap
     ] with-scope ; inline
 
+: compile ( words -- )
+    [ compiled? not ] subset recompile ;
+
 : compile-quot ( quot -- word )
     H{ } clone changed-words [
-        define-temp dup 1array compile
+        define-temp dup 1array recompile
     ] with-variable ;
 
 : compile-call ( quot -- )
     compile-quot execute ;
 
 : compile-all ( -- )
-    all-words compile ;
+    all-words recompile ;

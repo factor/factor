@@ -21,7 +21,8 @@ SYMBOL: compiled
 : queue-compile ( word -- )
     {
         { [ dup compiled get key? ] [ drop ] }
-        { [ dup compound? not ] [ f swap compiled get set-at ] }
+        { [ dup primitive? ] [ drop ] }
+        { [ dup deferred? ] [ drop ] }
         { [ t ] [ dup compile-queue get set-at ] }
     } cond ;
 
@@ -49,7 +50,7 @@ t compiled-stack-traces? set-global
     pick begin-compiling [
         roll compiling-word set
         pick compiling-label set
-        init-generator
+        compiling-word get init-generator
         call
         literal-table get >array
         word-table get >array

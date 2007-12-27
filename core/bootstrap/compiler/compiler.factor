@@ -13,15 +13,12 @@ IN: bootstrap.compiler
     0 profiler-prologue set-global
 ] when
 
-: compile* [ compiled? not ] subset compile ;
-
-! Compile a set of words ahead of our general
-! compile-all. This set of words was determined
-! semi-empirically using the profiler. It improves
-! bootstrap time significantly, because frequenly
-! called words which are also quick to compile
-! are replaced by compiled definitions as soon as
-! possible.
+! Compile a set of words ahead of the full compile.
+! This set of words was determined semi-empirically
+! using the profiler. It improves bootstrap time
+! significantly, because frequenly called words
+! which are also quick to compile are replaced by
+! compiled definitions as soon as possible.
 {
     roll -roll declare not
 
@@ -39,24 +36,22 @@ IN: bootstrap.compiler
     find-pair-next namestack*
 
     bitand bitor bitxor bitnot
-} compile*
+} compile
 
 {
     + 1+ 1- 2/ < <= > >= shift min
-} compile*
+} compile
 
 {
     new nth push pop peek hashcode* = get set
-} compile*
+} compile
 
 {
     . lines
-} compile*
+} compile
 
 {
     malloc free memcpy
-} compile*
+} compile
 
-[ compile ] recompile-hook set-global
-
-FORGET: compile*
+[ recompile ] recompile-hook set-global

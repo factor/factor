@@ -10,7 +10,7 @@ namespaces namespaces.private parser prettyprint quotations
 quotations.private sbufs sbufs.private sequences
 sequences.private slots.private strings strings.private system
 threads.private tuples tuples.private vectors vectors.private
-words assocs ;
+words words.private assocs ;
 
 ! Shuffle words
 : infer-shuffle-inputs ( shuffle node -- )
