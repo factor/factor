@@ -407,7 +407,8 @@ builtins get num-tags get tail f union-class define-class
 2array >tuple 1quotation define-inline
 
 ! Primitive words
-: make-primitive ( word vocab n -- ) >r create r> define ;
+: make-primitive ( word vocab n -- )
+    >r create dup reset-word r> define ;
 
 {
     { "(execute)" "words.private" }

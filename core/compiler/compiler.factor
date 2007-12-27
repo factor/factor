@@ -35,7 +35,8 @@ SYMBOL: compiler-hook
     ] [
         print-error f over compiled get set-at f
     ] recover
-    2dup ripple-up save-effect ;
+    2drop ;
+!    2dup ripple-up save-effect ;
 
 : delete-any ( assoc -- element )
     [ [ 2drop t ] assoc-find 2drop dup ] keep delete-at ;

@@ -72,8 +72,8 @@ IN: bootstrap.stage2
         [ ] count-words " words total" print
 
         "Bootstrapping is complete." print
-        "Now, you can run ./factor -i=" write
-        "output-image" get print flush
+        "Now, you can run Factor:" print
+        vm write " -i=" write "output-image" get print flush
 
         "output-image" get resource-path save-image-and-exit
     ] if

@@ -59,3 +59,7 @@ IN: temporary
 
 [ [ dup ] compile-call ] unit-test-fails
 [ [ drop ] compile-call ] unit-test-fails
+
+! Regression
+
+[ ] [ [ callstack ] compile-call drop ] unit-test
