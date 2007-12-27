@@ -28,12 +28,6 @@ M: object perform-combination
     dup "combination" word-prop perform-combination
     define-compound ;
 
-[ [ make-generic ] each ] make-generic-hook set-global
-
-: ?make-generic ( word -- )
-    dup compound? [ dup [ ] define-compound ] unless
-    dup changed-generics get set-at ;
-
 : init-methods ( word -- )
      dup "methods" word-prop
      H{ } assoc-like
@@ -41,7 +35,7 @@ M: object perform-combination
 
 : define-generic ( word combination -- )
     dupd "combination" set-word-prop
-    dup init-methods ?make-generic ;
+    dup init-methods make-generic ;
 
 TUPLE: method loc def ;
 
@@ -77,7 +71,7 @@ TUPLE: check-method class generic ;
     ] unless ;
 
 : with-methods ( word quot -- )
-    swap [ "methods" word-prop swap call ] keep ?make-generic ;
+    swap [ "methods" word-prop swap call ] keep make-generic ;
     inline
 
 : define-method ( method class generic -- )
@@ -114,4 +108,4 @@ M: class forget ( class -- )
     forget-word ;
 
 M: class update-methods ( class -- )
-    class-usages implementors* [ ?make-generic ] each ;
+    class-usages implementors* [ make-generic ] each ;
