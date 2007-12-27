@@ -14,7 +14,7 @@ IN: cocoa.messages
     [ % "_" % unparse % ] "" make ;
 
 : sender-stub ( method function -- word )
-    [ sender-stub-name <uninterned> dup ] 2keep
+    [ sender-stub-name f <word> dup ] 2keep
     over first large-struct? [ "_stret" append ] when
     make-sender define-compound dup compile ;
 

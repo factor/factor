@@ -27,22 +27,22 @@ PREDICATE: word local "local?" word-prop ;
 
 : <local> ( name -- word )
     #! Create a local variable identifier
-    <uninterned> dup t "local?" set-word-prop ;
+    f <word> dup t "local?" set-word-prop ;
 
 PREDICATE: word local-word "local-word?" word-prop ;
 
 : <local-word> ( name -- word )
-    <uninterned> dup t "local-word?" set-word-prop ;
+    f <word> dup t "local-word?" set-word-prop ;
 
 PREDICATE: word local-reader "local-reader?" word-prop ;
 
 : <local-reader> ( name -- word )
-    <uninterned> dup t "local-reader?" set-word-prop ;
+    f <word> dup t "local-reader?" set-word-prop ;
 
 PREDICATE: word local-writer "local-writer?" word-prop ;
 
 : <local-writer> ( reader -- word )
-    dup word-name "!" append <uninterned>
+    dup word-name "!" append f <word>
     [ t "local-writer?" set-word-prop ] keep
     [ "local-writer" set-word-prop ] 2keep
     [ swap "local-reader" set-word-prop ] keep ;
