@@ -211,17 +211,17 @@ TUPLE: lazy-until cons quot ;
 C: <lazy-until> lazy-until
 
 : luntil ( list quot -- result )
-  <lazy-until> ;
+  over nil? [ drop ] [ <lazy-until> ] if ;
 
 M: lazy-until car ( lazy-until -- car )
    lazy-until-cons car ;
 
 M: lazy-until cdr ( lazy-until -- cdr )
-   [ lazy-until-cons uncons ] keep lazy-until-quot
-   rot over call [ 2drop nil ] [ luntil ] if ;
+   [ lazy-until-cons uncons swap ] keep lazy-until-quot tuck call
+   [ 2drop nil ] [ luntil ] if ;
 
 M: lazy-until nil? ( lazy-until -- bool )
-   lazy-until-cons nil? ;
+   drop f ;
 
 M: lazy-until list? ( lazy-until -- bool )
    drop t ;
@@ -231,19 +231,16 @@ TUPLE: lazy-while cons quot ;
 C: <lazy-while> lazy-while
 
 : lwhile ( list quot -- result )
-  <lazy-while>
-;
+  over nil? [ drop ] [ <lazy-while> ] if ;
 
 M: lazy-while car ( lazy-while -- car )
    lazy-while-cons car ;
 
 M: lazy-while cdr ( lazy-while -- cdr )
-   dup lazy-while-cons cdr dup nil?
-   [ 2drop nil ] [ swap lazy-while-quot lwhile ] if ;
+   [ lazy-while-cons cdr ] keep lazy-while-quot lwhile ;
 
 M: lazy-while nil? ( lazy-while -- bool )
-   dup lazy-while-cons nil?
-   [ nip ] [ [ car ] keep lazy-while-quot call not ] if* ;
+   [ car ] keep lazy-while-quot call not ;
 
 M: lazy-while list? ( lazy-while -- bool )
    drop t ;
