@@ -34,9 +34,9 @@ IN: project-euler.134
   over 0 2array rot next-power-of-10 rot 2array chinese-remainder ;
 
 : euler134 ( -- answer )
-  5 lprimes-from [ 1000000 > ] luntil [ [ s + ] keep ] leach drop ;
+  0 5 lprimes-from uncons [ 1000000 > ] luntil [ [ s + ] keep ] leach drop ;
 
 ! [ euler134 ] 10 ave-time
-! 6743 ms run / 79 ms GC ave time - 10 trials
+! 3797 ms run / 30 ms GC ave time - 10 trials
 
 MAIN: euler134
