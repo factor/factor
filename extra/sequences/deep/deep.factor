@@ -5,11 +5,10 @@ IN: sequences.deep
 
 ! All traversal goes in postorder
 
-GENERIC: branch? ( object -- ? )
-M: sequence branch? drop t ;
-M: string branch? drop f ;
-M: number branch? drop f ;
-M: object branch? drop f ;
+: branch? ( object -- ? )
+    dup sequence? [
+        dup string? swap number? or not
+    ] [ drop f ] if ;
 
 : deep-each ( obj quot -- )
     [ call ] 2keep over branch?
