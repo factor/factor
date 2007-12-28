@@ -143,10 +143,11 @@ M: splay assoc-like
     ] unless ;
 
 M: splay pprint-delims drop \ SPLAY{ \ } ;
-M: splay >pprint-sequence >alist ;
-M: splay pprint-narrow? drop t ;
 
 ! When tuple inheritance is used, the following lines won't be necessary
 M: splay assoc-size tree-count ;
 M: splay clear-assoc delegate clear-assoc ;
 M: splay assoc-find >r tree-root r> find-node ;
+M: splay clone dup assoc-clone-like ;
+M: splay >pprint-sequence >alist ;
+M: splay pprint-narrow? drop t ;

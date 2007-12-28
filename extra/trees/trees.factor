@@ -79,13 +79,13 @@ M: tree at* ( key tree -- value ? )
         drop nip [ set-node-value ] keep
     ] [
         [
-            [ node-link [ node-set ] [ <node> ] if* ] keep
+            [ node-link [ node-set ] [ swap <node> ] if* ] keep
             [ set-node-link ] keep
         ] with-side
     ] if ;
 
 M: tree set-at ( value key tree -- )
-    [ [ node-set ] [ <node> ] if* ] change-root ;
+    [ [ node-set ] [ swap <node> ] if* ] change-root ;
 
 : valid-node? ( node -- ? )
     [
@@ -181,8 +181,20 @@ DEFER: delete-node
 M: tree delete-at
     [ delete-bst-node ] change-root ;
 
-: >tree ( assoc -- bst )
+M: tree new-assoc
+    2drop <tree> ;
+
+M: tree clone dup assoc-clone-like ;
+
+: >tree ( assoc -- tree )
     T{ tree f f 0 } assoc-clone-like ;
+
+GENERIC: tree-assoc-like ( assoc -- tree )
+M: tuple tree-assoc-like ! will need changes for tuple inheritance
+    dup delegate dup tree? [ nip ] [ drop >tree ] if ;
+M: tree tree-assoc-like ;
+M: assoc tree-assoc-like >tree ;
+M: tree assoc-like drop tree-assoc-like ;
 
 : TREE{
     \ } [ >tree ] parse-literal ; parsing

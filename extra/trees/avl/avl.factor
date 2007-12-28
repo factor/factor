@@ -52,22 +52,22 @@ TUPLE: avl-node balance ;
 
 DEFER: avl-set
 
-: (avl-insert) ( value key node -- node taller? )
-    [ avl-set ] [ <avl-node> t ] if* ;
-
 : avl-insert ( value key node -- node taller? )
     2dup node-key key< left right ? [
-        [ node-link (avl-insert) ] keep swap
+        [ node-link avl-set ] keep swap
         >r tuck set-node-link r>
         [ dup current-side get change-balance balance-insert ] [ f ] if
     ] with-side ;
 
-: avl-set ( value key node -- node taller? )
+: (avl-set) ( value key node -- node taller? )
     2dup node-key key= [
         -rot pick set-node-key over set-node-value f
     ] [ avl-insert ] if ;
 
-M: avl-node set-at ( value key node -- node )
+: avl-set ( value key node -- node taller? )
+    [ (avl-set) ] [ <avl-node> t ] if* ;
+
+M: avl set-at ( value key node -- node )
     [ avl-set drop ] change-root ;
 
 : delete-select-rotate ( node -- node shorter? )
@@ -136,20 +136,23 @@ M: avl-node avl-delete ( key node -- node shorter? deleted? )
 M: avl delete-at ( key node -- )
     [ avl-delete 2drop ] change-root ;
 
-M: avl new-assoc
-    2drop <avl> ;
+M: avl new-assoc 2drop <avl> ;
 
 : >avl ( assoc -- avl )
     T{ avl T{ tree f f 0 } } assoc-clone-like ;
+
+M: avl assoc-like
+    drop dup avl? [ >avl ] unless ;
 
 : AVL{
     \ } [ >avl ] parse-literal ; parsing
 
 M: avl pprint-delims drop \ AVL{ \ } ;
-M: avl >pprint-sequence >alist ;
-M: avl pprint-narrow? drop t ;
 
 ! When tuple inheritance is used, the following lines won't be necessary
 M: avl assoc-size tree-count ;
 M: avl clear-assoc delegate clear-assoc ;
 M: avl assoc-find >r tree-root r> find-node ;
+M: avl clone dup assoc-clone-like ;
+M: avl >pprint-sequence >alist ;
+M: avl pprint-narrow? drop t ;

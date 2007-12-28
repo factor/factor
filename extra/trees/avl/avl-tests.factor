@@ -91,21 +91,22 @@ IN: temporary
     tree-root node-value
 ] unit-test
 
-[ "another eight" ] [
+[ "another eight" ] [ ! ERROR!
     <avl> "seven" 7 pick set-at
     "another eight" 8 pick set-at 8 swap at
 ] unit-test
 
-! borrowed from tests/bst.factor
 : test-tree ( -- tree )
-    <avl>
-    "seven"          7 pick set-at
-    "nine"           9 pick set-at
-    "four"           4 pick set-at
-    "replaced four"  4 pick set-at
-    "replaced seven" 7 pick set-at ;
+    AVL{
+        { 7 "seven" }
+        { 9 "nine" }
+        { 4 "four" } 
+        { 4 "replaced four" } 
+        { 7 "replaced seven" }
+    } clone ;
 
 ! test set-at, at, at*
+[ t ] [ test-tree avl? ] unit-test
 [ "seven" ] [ <avl> "seven" 7 pick set-at 7 swap at ] unit-test
 [ "seven" t ] [ <avl> "seven" 7 pick set-at 7 swap at* ] unit-test
 [ f f ] [ <avl> "seven" 7 pick set-at 8 swap at* ] unit-test
@@ -115,7 +116,7 @@ IN: temporary
 [ "replaced four" ] [ test-tree 4 swap at ] unit-test
 [ "replaced seven" ] [ test-tree 7 swap at ] unit-test
 
-! test delete-at
+! test delete-at--all errors!
 [ f ] [ test-tree 9 over delete-at 9 swap at ] unit-test
 [ "replaced seven" ] [ test-tree 9 over delete-at 7 swap at ] unit-test
 [ "nine" ] [ test-tree 7 over delete-at 4 over delete-at 9 swap at ] unit-test
