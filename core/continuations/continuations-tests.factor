@@ -104,5 +104,5 @@ SYMBOL: error-counter
     ] unit-test
 
     [ 3 ] [ always-counter get ] unit-test
-    [ 2 ] [ error-counter get ] unit-test
+    [ 1 ] [ error-counter get ] unit-test
 ] with-scope
