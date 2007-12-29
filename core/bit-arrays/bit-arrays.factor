@@ -20,7 +20,7 @@ IN: bit-arrays
 
 : (set-bits) ( bit-array n -- )
     over length bits>cells -rot [
-        swap rot 4 * set-alien-unsigned-4
+        spin 4 * set-alien-unsigned-4
     ] 2curry each ; inline
 
 PRIVATE>

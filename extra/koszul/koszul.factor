@@ -199,7 +199,7 @@ DEFER: (d)
 : bigraded-ker/im-d ( bigraded-basis -- seq )
     dup length [
         over first length [
-            >r 2dup r> swap rot (bigraded-ker/im-d)
+            >r 2dup r> spin (bigraded-ker/im-d)
         ] map 2nip
     ] curry* map ;
 
@@ -277,7 +277,7 @@ DEFER: (d)
 : bigraded-triples ( grid -- triples )
     dup length [
         over first length [
-            >r 2dup r> swap rot bigraded-triple
+            >r 2dup r> spin bigraded-triple
         ] map 2nip
     ] curry* map ;
 

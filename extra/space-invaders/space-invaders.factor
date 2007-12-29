@@ -293,7 +293,7 @@ M: invaders-gadget draw-gadget* ( gadget -- )
 
 : plot-bitmap-pixel ( bitmap point color -- )
   #! point is a {x y}. color is a {r g b}.
-  swap rot set-bitmap-pixel ;
+  spin set-bitmap-pixel ;
 
 : within ( n a b -- bool )
   #! n >= a and n <= b

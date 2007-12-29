@@ -100,7 +100,7 @@ IN: unicode
     [ dup CHAR: A CHAR: Z between? [ HEX: 20 + ] when ] map ;
 
 : replace ( seq old new -- newseq )
-    swap rot [ 2dup = [ drop over ] when ] map 2nip ;
+    spin [ 2dup = [ drop over ] when ] map 2nip ;
 
 : process-names ( data -- names-hash )
     1 swap (process-data)
@@ -382,7 +382,7 @@ SYMBOL: locale ! Just casing locale, or overall?
     ] if ; inline
 
 : insert ( seq quot elt n -- )
-    swap rot >r -rot [ swap set-nth ] 2keep r> (insert) ; inline
+    spin >r -rot [ swap set-nth ] 2keep r> (insert) ; inline
 
 : insertion-sort ( seq quot -- )
     ! quot is a transformation on elements

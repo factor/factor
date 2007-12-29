@@ -84,7 +84,7 @@ SYMBOL: matrix
 : basis-vector ( row col# -- )
     >r clone r>
     [ swap nth neg recip ] 2keep
-    [ 0 swap rot set-nth ] 2keep
+    [ 0 spin set-nth ] 2keep
     >r n*v r>
     matrix get set-nth ;
 

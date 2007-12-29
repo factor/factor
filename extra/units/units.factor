@@ -69,7 +69,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 : d-sq ( d -- d ) dup d* ;
 
 : d-recip ( d -- d' )
-    >dimensioned< swap rot recip dimension-op> ;
+    >dimensioned< spin recip dimension-op> ;
 
 : d/ ( d d -- d ) d-recip d* ;
 

@@ -6,6 +6,8 @@ IN: kernel
 : version ( -- str ) "0.92" ; foldable
 
 ! Stack stuff
+: spin ( x y z -- z y x ) swap rot ; inline
+
 : roll ( x y z t -- y z t x ) >r rot r> swap ; inline
 
 : -roll ( x y z t -- t x y z ) swap >r -rot r> ; inline
@@ -49,7 +51,7 @@ DEFER: if
 
 : 3slip ( quot x y z -- x y z ) >r >r >r call r> r> r> ; inline
 
-: dip ( obj callable -- obj ) swap slip ; inline
+: dip ( obj quot -- obj ) swap slip ; inline
 
 : keep ( x quot -- x ) over slip ; inline
 

@@ -75,8 +75,8 @@ M: xml xml-each
 
 GENERIC# xml-map 1 ( quot tag -- tag ) inline
 M: tag xml-map
-    swap clone over >r swap call r> 
-    swap [ tag-children [ swap xml-map ] curry* map ] keep 
+    swap clone over >r swap call r>
+    swap [ tag-children [ swap xml-map ] curry* map ] keep
     [ set-tag-children ] keep ;
 M: object xml-map
     call ;
@@ -91,7 +91,7 @@ M: xml xml-map
 
 GENERIC# xml-find 1 ( quot tag -- tag ) inline
 M: tag xml-find
-    [ call ] 2keep swap rot [
+    [ call ] 2keep spin [
         f swap
         [ nip over >r swap xml-find r> swap dup ] find
         2drop ! leaves result of quot

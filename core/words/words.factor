@@ -94,8 +94,6 @@ M: compound redefined* ( word -- )
 
 <PRIVATE
 
-: changed-word ( word -- ) dup changed-words get set-at ;
-
 : define ( word def -- )
     over unxref
     over redefined

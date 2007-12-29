@@ -115,7 +115,7 @@ INSTANCE: integer immutable-sequence
     [ tuck nth-unsafe >r nth-unsafe r> ] 3keep tuck
     >r >r set-nth-unsafe r> r> set-nth-unsafe ; inline
 
-: (head) ( seq n -- from to seq ) 0 swap rot ; inline
+: (head) ( seq n -- from to seq ) 0 spin ; inline
 
 : (tail) ( seq n -- from to seq ) over length rot ; inline
 
@@ -270,7 +270,7 @@ PRIVATE>
 : tail* ( seq n -- tailseq ) from-end tail ;
 
 : copy ( src i dst -- )
-    pick length >r 3dup check-copy swap rot 0 r>
+    pick length >r 3dup check-copy spin 0 r>
     (copy) drop ; inline
 
 M: sequence clone-like
@@ -579,7 +579,7 @@ M: sequence <=>
 
 : join ( seq glue -- newseq )
     [
-        2dup joined-length over new-resizable -rot swap
+        2dup joined-length over new-resizable spin
         [ dup pick push-all ] [ pick push-all ] interleave drop
     ] keep like ;
 

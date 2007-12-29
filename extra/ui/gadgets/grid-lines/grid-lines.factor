@@ -14,8 +14,8 @@ SYMBOL: grid-dim
 
 : grid-line-from/to ( orientation point -- from to )
     half-gap v-
-    [ half-gap swap rot set-axis ] 2keep
-    grid-dim get swap rot set-axis ;
+    [ half-gap spin set-axis ] 2keep
+    grid-dim get spin set-axis ;
 
 : draw-grid-lines ( gaps orientation -- )
     grid get rot grid-positions grid get rect-dim add [

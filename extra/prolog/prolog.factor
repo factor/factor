@@ -79,6 +79,6 @@ SYMBOL: plchoice
     ] if ;
 
 : binding-resolve ( binds name pat -- binds )
-    tuck lookup-rule dup backtrace? swap rot add-bindings ;
+    tuck lookup-rule dup backtrace? spin add-bindings ;
 
 : is ( binds val var -- binds ) rot [ set-at ] keep ;

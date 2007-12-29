@@ -120,7 +120,7 @@ MACRO: ifte ( quot quot quot -- )
 
 : preserving ( predicate -- quot )
   dup infer effect-in
-  dup 1+ swap rot
+  dup 1+ spin
   [ , , nkeep , nrot ]
   bake ;
 
