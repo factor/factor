@@ -382,6 +382,7 @@ SYMBOL: bootstrap-syntax
             "tools.test"
             "tools.time"
             "editors"
+            "listener"
         } set-use
         call
     ] with-scope ; inline

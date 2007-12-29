@@ -35,7 +35,6 @@ IN: bootstrap.stage2
     ] [
         "listener" require
         "none" require
-        "listener" use+
     ] if
 
     "exclude" "include"
