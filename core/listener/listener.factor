@@ -60,7 +60,6 @@ M: duplex-stream stream-read-quot
     " on " write os write "/" write cpu print ;
 
 : listener ( -- )
-    print-banner
-    [ use [ clone ] change until-quit ] with-scope ;
+    print-banner [ until-quit ] with-interactive-vocabs ;
 
 MAIN: listener

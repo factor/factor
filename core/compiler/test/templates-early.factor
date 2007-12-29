@@ -76,7 +76,7 @@ SYMBOL: template-chosen
             1 template-chosen get push
         ] H{
             { +input+ { { f "obj" } { [ ] "n" } } }
-            { +output+ { "obj" "n" } }
+            { +output+ { "obj" "obj" } }
         }
     }
     {

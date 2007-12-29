@@ -5,8 +5,6 @@ sorting tuples ;
 IN: temporary
 
 [
-    file-vocabs
-
     [ 1 CHAR: a ]
     [ 0 "abcd" next-char ] unit-test
 
@@ -111,8 +109,7 @@ IN: temporary
             { "scratchpad" "arrays" } set-use
             [
                 ! This shouldn't modify in/use in the outer scope!
-                file-vocabs
-            ] with-scope
+            ] with-file-vocabs
 
             use get { "scratchpad" "arrays" } set-use use get =
         ] with-scope
@@ -368,7 +365,7 @@ IN: temporary
             <string-reader> "redefining-a-class-4" parse-stream drop
         ] catch [ redefine-error? ] is?
     ] unit-test
-] with-scope
+] with-file-vocabs
 
 [
     << file get parsed >> file set

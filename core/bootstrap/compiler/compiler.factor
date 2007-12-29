@@ -13,6 +13,9 @@ IN: bootstrap.compiler
     0 profiler-prologue set-global
 ] when
 
+nl
+"Compiling some words to speed up bootstrap..." write
+
 ! Compile a set of words ahead of the full compile.
 ! This set of words was determined semi-empirically
 ! using the profiler. It improves bootstrap time
@@ -38,20 +41,35 @@ IN: bootstrap.compiler
     bitand bitor bitxor bitnot
 } compile
 
+"." write flush
+
 {
     + 1+ 1- 2/ < <= > >= shift min
 } compile
 
+"." write flush
+
 {
-    new nth push pop peek hashcode* = get set
+    new nth push pop peek
+} compile
+
+"." write flush
+
+{
+    hashcode* = get set
 } compile
 
 {
     . lines
 } compile
 
+"." write flush
+
 {
     malloc free memcpy
 } compile
+
+" done" print
+nl
 
 [ recompile ] recompile-hook set-global

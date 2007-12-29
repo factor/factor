@@ -79,8 +79,8 @@ M: curried infer-call
 
 M: composed infer-call
     infer-uncurry
-    infer->r peek-d infer-call infer-r>
-    peek-d infer-call ;
+    infer->r peek-d infer-call
+    terminated? get [ infer-r> peek-d infer-call ] unless ;
 
 M: object infer-call
     \ literal-expected inference-warning ;

@@ -45,7 +45,6 @@ f swap set-vocab-source-loaded?
     "TUPLE:"
     "T{"
     "UNION:"
-    "USE-IF:"
     "USE:"
     "USING:"
     "V{"

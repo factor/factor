@@ -327,7 +327,7 @@ HELP: still-parsing?
 HELP: use
 { $var-description "A variable holding the current vocabulary search path as a sequence of assocs." } ;
 
-{ use in use+ (use+) set-use set-in POSTPONE: USING: POSTPONE: USE: file-vocabs } related-words
+{ use in use+ (use+) set-use set-in POSTPONE: USING: POSTPONE: USE: with-with-default-vocabs } related-words
 
 HELP: in
 { $var-description "A variable holding the name of the current vocabulary for new definitions." } ;
@@ -477,12 +477,13 @@ $parsing-note ;
 HELP: bootstrap-syntax
 { $var-description "Only set during bootstrap. Stores a copy of the " { $link vocab-words } " of the host's syntax vocabulary; this allows the host's parsing words to be used during bootstrap source parsing, not the target's." } ;
 
-HELP: file-vocabs
-{ $description "Installs the initial the vocabulary search path for parsing a file. This consists of the " { $snippet "syntax" } " vocabulary together with the " { $snippet "scratchpad" } " vocabulary." } ;
+HELP: with-file-vocabs
+{ $values { "quot" quotation } }
+{ $description "Calls the quotation in a scope with the initial the vocabulary search path for parsing a file. This consists of the " { $snippet "syntax" } " vocabulary together with the " { $snippet "scratchpad" } " vocabulary." } ;
 
 HELP: parse-fresh
 { $values { "lines" "a sequence of strings" } { "quot" quotation } }
-{ $description "Parses Factor source code in a sequence of lines. The initial vocabulary search path is used (see " { $link file-vocabs } ")." }
+{ $description "Parses Factor source code in a sequence of lines. The initial vocabulary search path is used (see " { $link with-file-vocabs } ")." }
 { $errors "Throws a parse error if the input is malformed." } ;
 
 HELP: eval
@@ -532,10 +533,6 @@ HELP: ?run-file
 HELP: bootstrap-file
 { $values { "path" "a pathname string" } }
 { $description "If bootstrapping, parses the source file and adds its top level form to the quotation being constructed with " { $link make } "; the bootstrap code uses this to build up a boot quotation to be run on image startup. If not bootstrapping, just runs the file normally." } ;
-
-HELP: ?bootstrap-file
-{ $values { "path" "a pathname string" } }
-{ $description "If the file exists, loads it with " { $link bootstrap-file } ", otherwise does nothing." } ;
 
 HELP: eval>string
 { $values { "str" string } { "output" string } }

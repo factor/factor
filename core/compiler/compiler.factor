@@ -8,9 +8,8 @@ IN: compiler
 
 SYMBOL: compiler-hook
 
-: compile-begins ( word -- )
-    compiler-hook get [ call ] when*
-    "quiet" get [ drop ] [ "Compiling " write . flush ] if ;
+: compile-begins ( -- )
+    compiler-hook get [ ] or call ;
 
 : compiled-usage ( word -- seq )
     #! XXX
@@ -29,10 +28,11 @@ SYMBOL: compiler-hook
     "compiled-effect" set-word-prop ;
 
 : (compile) ( word -- )
+    compile-begins
     [
-        dup compile-begins
         dup word-dataflow optimize >r over dup r> generate
     ] [
+        dup inference-error? [ rethrow ] unless
         print-error f over compiled get set-at f
     ] recover
     2drop ;

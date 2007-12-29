@@ -75,13 +75,13 @@ SYMBOL: load-help?
 
 : docs-were-loaded t swap set-vocab-docs-loaded? ;
 
-: docs-were't-loaded f swap set-vocab-docs-loaded? ;
+: docs-weren't-loaded f swap set-vocab-docs-loaded? ;
 
 : load-docs ( root name -- )
     load-help? get [
         [ docs-were-loaded ] keep [
-            [ vocab-docs path+ ?bootstrap-file ]
-            [ ] [ docs-were't-loaded ]
+            [ vocab-docs path+ ?run-file ]
+            [ ] [ docs-weren't-loaded ]
             cleanup
         ] keep source-was-loaded
     ] [

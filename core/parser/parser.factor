@@ -338,13 +338,56 @@ M: bad-number summary
 
 SYMBOL: bootstrap-syntax
 
-: file-vocabs ( -- )
-    "scratchpad" in set
-    { "syntax" "scratchpad" } set-use
-    bootstrap-syntax get [ use get push ] when* ;
+: with-file-vocabs ( quot -- )
+    [
+        "scratchpad" in set
+        { "syntax" "scratchpad" } set-use
+        bootstrap-syntax get [ use get push ] when*
+        call
+    ] with-scope ; inline
+
+: with-interactive-vocabs ( quot -- )
+    [
+        "scratchpad" in set
+        {
+            "scratchpad"
+            "arrays"
+            "assocs"
+            "combinators"
+            "compiler"
+            "continuations"
+            "debugger"
+            "definitions"
+            "generic"
+            "inspector"
+            "io"
+            "io.files"
+            "kernel"
+            "math"
+            "memory"
+            "namespaces"
+            "prettyprint"
+            "sequences"
+            "slicing"
+            "sorting"
+            "strings"
+            "syntax"
+            "vocabs"
+            "vocabs.loader"
+            "words"
+            "tools.annotations"
+            "tools.crossref"
+            "tools.memory"
+            "tools.profiler"
+            "tools.test"
+            "tools.time"
+            "editors"
+        } set-use
+        call
+    ] with-scope ; inline
 
 : parse-fresh ( lines -- quot )
-    [ file-vocabs parse-lines ] with-scope ;
+    [ parse-lines ] with-file-vocabs ;
 
 : parsing-file ( file -- )
     "quiet" get [
@@ -426,14 +469,7 @@ SYMBOL: bootstrap-syntax
     dup ?resource-path exists? [ run-file ] [ drop ] if ;
 
 : bootstrap-file ( path -- )
-    [
-        parse-file [ call ] curry %
-    ] [
-        run-file
-    ] if-bootstrapping ;
-
-: ?bootstrap-file ( path -- )
-    dup ?resource-path exists? [ bootstrap-file ] [ drop ] if ;
+    [ parse-file % ] [ run-file ] if-bootstrapping ;
 
 : eval ( str -- )
     [ string-lines parse-fresh ] with-compilation-unit call ;
@@ -443,34 +479,3 @@ SYMBOL: bootstrap-syntax
         parser-notes off
         [ [ eval ] keep ] try drop
     ] string-out ;
-
-global [
-    {
-        "scratchpad"
-        "arrays"
-        "assocs"
-        "combinators"
-        "compiler"
-        "continuations"
-        "debugger"
-        "definitions"
-        "generic"
-        "inspector"
-        "io"
-        "kernel"
-        "math"
-        "memory"
-        "namespaces"
-        "parser"
-        "prettyprint"
-        "sequences"
-        "slicing"
-        "sorting"
-        "strings"
-        "syntax"
-        "vocabs"
-        "vocabs.loader"
-        "words"
-    } set-use
-    "scratchpad" set-in
-] bind

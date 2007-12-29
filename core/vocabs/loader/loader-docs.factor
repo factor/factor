@@ -73,7 +73,7 @@ HELP: vocab-files
 HELP: no-vocab
 { $values { "name" "a vocabulary name" } } 
 { $description "Throws a " { $link no-vocab } "." }
-{ $error-description "Thrown when a " { $link POSTPONE: USE: } ", " { $link POSTPONE: USING: } " or " { $link POSTPONE: USE-IF: } " form refers to a non-existent vocabulary." } ;
+{ $error-description "Thrown when a " { $link POSTPONE: USE: } " or " { $link POSTPONE: USING: } " form refers to a non-existent vocabulary." } ;
 
 HELP: load-help?
 { $var-description "If set to a true value, documentation will be automatically loaded when vocabularies are loaded. This variable is usually on, except when Factor has been bootstrapped without the help system." } ;

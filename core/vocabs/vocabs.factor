@@ -13,8 +13,8 @@ main help
 source-loaded? docs-loaded? ;
 
 : <vocab> ( name -- vocab )
-    H{ } clone
-    { set-vocab-name set-vocab-words }
+    H{ } clone t
+    { set-vocab-name set-vocab-words set-vocab-source-loaded? }
     \ vocab construct ;
 
 GENERIC: vocab ( vocab-spec -- vocab )
@@ -54,8 +54,7 @@ M: f vocab-docs-loaded? ;
 M: f set-vocab-docs-loaded? 2drop ;
 
 : create-vocab ( name -- vocab )
-    dictionary get [ <vocab> ] cache
-    t over set-vocab-source-loaded? ;
+    dictionary get [ <vocab> ] cache ;
 
 SYMBOL: load-vocab-hook
 

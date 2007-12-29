@@ -12,7 +12,6 @@ IN: temporary
 ] unit-test
 
 [
-    file-vocabs
     "debugger" use+
 
     [ [ \ + 1 2 3 4 ] ]
@@ -26,7 +25,7 @@ IN: temporary
             "USE: debugger :1" eval
         ] callcc1
     ] unit-test
-] with-scope
+] with-file-vocabs
 
 [ ] [
     "vocabs.loader.test.c" forget-vocab

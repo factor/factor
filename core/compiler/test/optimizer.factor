@@ -1,7 +1,8 @@
 USING: arrays compiler generic hashtables inference kernel
 kernel.private math optimizer prettyprint sequences sbufs
 strings tools.test vectors words sequences.private quotations
-optimizer.backend classes inference.dataflow tuples.private ;
+optimizer.backend classes inference.dataflow tuples.private
+continuations ;
 IN: temporary
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
@@ -101,14 +102,14 @@ TUPLE: pred-test ;
 
 ! regression
 
-: bad-kill-1 [ 3 f ] [ dup bad-kill-1 ] if ; inline
+: bad-kill-1 ( a b -- c d e ) [ 3 f ] [ dup bad-kill-1 ] if ; inline
 : bad-kill-2 bad-kill-1 drop ;
 
 [ 3 ] [ t bad-kill-2 ] unit-test
 
 ! regression
-: (the-test) ( n -- ) dup 0 > [ 1- (the-test) ] when ; inline
-: the-test ( -- n ) 2 dup (the-test) ;
+: (the-test) ( x -- y ) dup 0 > [ 1- (the-test) ] when ; inline
+: the-test ( -- x y ) 2 dup (the-test) ;
 
 [ 2 0 ] [ the-test ] unit-test
 
@@ -145,10 +146,10 @@ GENERIC: void-generic ( obj -- * )
 
 [ f ] [ f test-2 ] unit-test
 
-: branch-fold-regression-0 ( n -- )
+: branch-fold-regression-0 ( m -- n )
     t [ ] [ 1+ branch-fold-regression-0 ] if ; inline
 
-: branch-fold-regression-1 ( -- )
+: branch-fold-regression-1 ( -- m )
     10 branch-fold-regression-0 ;
 
 [ 10 ] [ branch-fold-regression-1 ] unit-test
@@ -174,7 +175,7 @@ GENERIC: void-generic ( obj -- * )
 
 [ t ] [ \ <tuple>-regression compiled? ] unit-test
 
-GENERIC: foozul
+GENERIC: foozul ( a -- b )
 M: reversed foozul ;
 M: integer foozul ;
 M: slice foozul ;
@@ -279,3 +280,11 @@ TUPLE: silly-tuple a b ;
         { silly-tuple-a silly-tuple-b } [ get-slots ] keep
     ] compile-call
 ] unit-test
+
+! Regression
+: empty-compound ;
+
+: node-successor-f-bug ( x -- * )
+    [ 3 throw ] [ empty-compound ] compose [ 3 throw ] if ;
+
+[ t ] [ \ node-successor-f-bug compiled? ] unit-test
