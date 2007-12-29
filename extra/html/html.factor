@@ -142,7 +142,7 @@ M: html-block-stream stream-close ( quot style stream -- )
     table-style " border-collapse: collapse;" append =style ;
 
 : do-escaping ( string style -- string )
-    html swap at [ chars>entities ] unless ;
+    html swap at [ escape-string ] unless ;
 
 PRIVATE>
 
@@ -151,13 +151,13 @@ M: html-stream stream-write1 ( char stream -- )
     >r 1string r> stream-write ;
 
 M: html-stream stream-write ( str stream -- )
-    >r chars>entities r> delegate stream-write ;
+    >r escape-string r> delegate stream-write ;
 
 M: html-stream make-span-stream ( style stream -- stream' )
     html-span-stream <html-sub-stream> ;
 
 M: html-stream stream-format ( str style stream -- )
-    >r html over at [ >r chars>entities r> ] unless r>
+    >r html over at [ >r escape-string r> ] unless r>
     format-html-span ;
 
 M: html-stream make-block-stream ( style stream -- stream' )

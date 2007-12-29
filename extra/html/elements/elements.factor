@@ -4,7 +4,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: io kernel namespaces prettyprint quotations
-sequences strings words ;
+sequences strings words xml.writer ;
 
 IN: html.elements
 
@@ -123,7 +123,7 @@ SYMBOL: html
     " " write-html
     write-html
     "='" write-html
-    write
+    escape-quoted-string write
     "'" write-html ;
 
 : define-attribute-word ( name -- )
