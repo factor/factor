@@ -36,7 +36,7 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 		return undefined_symbol;
 }
 
-static CELL xt_offset;
+bool profiling_p_;
 
 /* Compute an address to store at a relocation */
 INLINE CELL compute_code_rel(F_REL *rel,
@@ -56,10 +56,9 @@ INLINE CELL compute_code_rel(F_REL *rel,
 		return CREF(words_start,REL_ARGUMENT(rel));
 	case RT_XT:
 		word = untag_word(get(CREF(words_start,REL_ARGUMENT(rel))));
-		if(word->compiledp == F)
-			return (CELL)word->code + sizeof(F_COMPILED);
-		else
-			return (CELL)word->code + sizeof(F_COMPILED) + xt_offset;
+		return (CELL)word->code
+			+ sizeof(F_COMPILED)
+			+ (profiling_p_ ? 0 : word->code->profiler_prologue);
 	case RT_XT_PROFILING:
 		word = untag_word(get(CREF(words_start,REL_ARGUMENT(rel))));
 		return (CELL)word->code + sizeof(F_COMPILED);
@@ -140,7 +139,7 @@ void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 {
 	if(reloc_start != literals_start)
 	{
-		xt_offset = (profiling_p() ? 0 : relocating->profiler_prologue);
+		profiling_p_ = profiling_p();
 
 		F_REL *rel = (F_REL *)reloc_start;
 		F_REL *rel_end = (F_REL *)literals_start;
