@@ -71,3 +71,38 @@ IN: temporary
 [ t ] [ \ bar word-def "c" get innermost-frame-quot = ] unit-test
 
 [ 1 ] [ "c" get innermost-frame-scan ] unit-test
+
+SYMBOL: always-counter
+SYMBOL: error-counter
+
+[
+    0 always-counter set
+    0 error-counter set
+
+    [ ] [ always-counter inc ] [ error-counter inc ] cleanup
+
+    [ 1 ] [ always-counter get ] unit-test
+    [ 0 ] [ error-counter get ] unit-test
+
+    [ "a" ] [
+        [
+            [ "a" throw ]
+            [ always-counter inc ]
+            [ error-counter inc ] cleanup
+        ] catch
+    ] unit-test
+
+    [ 2 ] [ always-counter get ] unit-test
+    [ 1 ] [ error-counter get ] unit-test
+
+    [ "a" ] [
+        [
+            [ ]
+            [ always-counter inc "a" throw ]
+            [ error-counter inc ] cleanup
+        ] catch
+    ] unit-test
+
+    [ 3 ] [ always-counter get ] unit-test
+    [ 2 ] [ error-counter get ] unit-test
+] with-scope

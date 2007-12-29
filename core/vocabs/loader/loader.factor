@@ -3,7 +3,8 @@
 USING: namespaces splitting sequences io.files kernel assocs
 words vocabs definitions parser continuations inspector debugger
 io io.styles io.streams.lines hashtables sorting prettyprint
-source-files arrays combinators strings system math.parser ;
+source-files arrays combinators strings system math.parser
+compiler.errors ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -108,7 +109,8 @@ SYMBOL: load-help?
         drop no-vocab
     ] if ;
 
-: require ( vocab -- ) load-vocab drop ;
+: require ( vocab -- )
+    load-vocab drop ;
 
 : run ( vocab -- )
     dup load-vocab vocab-main [
@@ -150,11 +152,14 @@ SYMBOL: load-help?
     dup update-roots
     dup modified-sources swap modified-docs ;
 
+: require-each ( seq -- )
+    [ [ require ] each ] with-compiler-errors ;
+
 : do-refresh ( modified-sources modified-docs -- )
     2dup
     [ f swap set-vocab-docs-loaded? ] each
     [ f swap set-vocab-source-loaded? ] each
-    append prune [ require ] each ;
+    append prune require-each ;
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 
@@ -172,7 +177,7 @@ M: string (load-vocab)
 M: vocab-link (load-vocab)
     vocab-name (load-vocab) ;
 
-[ dup vocab [ ] [ ] ?if (load-vocab) ]
+[ [ dup vocab [ ] [ ] ?if (load-vocab) ] with-compiler-errors ]
 load-vocab-hook set-global
 
 : vocab-where ( vocab -- loc )

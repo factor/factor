@@ -5,7 +5,7 @@ namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger 
 io.files io.streams.string io.streams.lines vocabs
-source-files classes hashtables ;
+source-files classes hashtables compiler.errors ;
 IN: parser
 
 TUPLE: lexer text line column ;
@@ -354,7 +354,7 @@ SYMBOL: bootstrap-syntax
             "arrays"
             "assocs"
             "combinators"
-            "compiler"
+            "compiler.errors"
             "continuations"
             "debugger"
             "definitions"
@@ -455,9 +455,11 @@ SYMBOL: bootstrap-syntax
 
 : parse-file ( file -- quot )
     [
-        [ parsing-file ] keep
-        [ ?resource-path <file-reader> ] keep
-        parse-stream
+        [
+            [ parsing-file ] keep
+            [ ?resource-path <file-reader> ] keep
+            parse-stream
+        ] with-compiler-errors
     ] [
         over parse-file-restarts rethrow-restarts
         drop parse-file

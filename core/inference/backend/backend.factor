@@ -4,7 +4,7 @@ IN: inference.backend
 USING: inference.dataflow arrays generic io io.streams.string
 kernel math namespaces parser prettyprint sequences
 strings vectors words quotations effects classes continuations
-debugger assocs combinators ;
+debugger assocs combinators compiler.errors ;
 
 : recursive-label ( word -- label/f )
     recursive-state get at ;
@@ -21,6 +21,9 @@ debugger assocs combinators ;
     local-recursive-state [ first eq? ] curry* contains? ;
 
 TUPLE: inference-error rstate major? ;
+
+M: inference-error compiler-warning?
+    inference-error-major? not ;
 
 : (inference-error) ( ... class important? -- * )
     >r construct-boa r>

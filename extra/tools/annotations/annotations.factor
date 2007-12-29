@@ -6,7 +6,7 @@ IN: tools.annotations
 
 <PRIVATE
 
-: check-compound ( word -- word )
+: check-compound ( word -- )
     compound? [
         "Annotations can only be used with compound words" throw
     ] unless ;

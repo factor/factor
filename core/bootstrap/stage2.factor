@@ -4,7 +4,7 @@ USING: init command-line namespaces words debugger io
 kernel.private math memory continuations kernel io.files
 io.backend system parser vocabs sequences prettyprint
 vocabs.loader combinators splitting source-files strings
-definitions assocs ;
+definitions assocs compiler.errors ;
 IN: bootstrap.stage2
 
 ! Wrap everything in a catch which starts a listener so
@@ -37,20 +37,24 @@ IN: bootstrap.stage2
         "none" require
     ] if
 
-    "exclude" "include"
-    [ get-global " " split [ empty? not ] subset ] 2apply
-    seq-diff
-    [ "bootstrap." swap append require ] each
+    [
+        "exclude" "include"
+        [ get-global " " split [ empty? not ] subset ] 2apply
+        seq-diff
+        [ "bootstrap." swap append require ] each
 
-    init-io
-    init-stdio
+        init-io
+        init-stdio
 
-    run-bootstrap-init
+        run-bootstrap-init
+
+        "Compiling remaining words..." print
+
+        all-words [ compiled? not ] subset recompile-hook get call
+    ] with-compiler-errors
 
     f error set-global
     f error-continuation set-global
-
-    all-words [ compiled? not ] subset recompile-hook get call
 
     "deploy-vocab" get [
         "tools.deploy.shaker" run

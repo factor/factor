@@ -3,7 +3,7 @@
 USING: kernel namespaces arrays sequences io inference.backend
 generator debugger math.parser prettyprint words words.private
 continuations vocabs assocs alien.compiler dlists optimizer
-definitions ;
+definitions math compiler.errors ;
 IN: compiler
 
 SYMBOL: compiler-hook
@@ -33,7 +33,7 @@ SYMBOL: compiler-hook
         dup word-dataflow optimize >r over dup r> generate
     ] [
         dup inference-error? [ rethrow ] unless
-        print-error f over compiled get set-at f
+        over compiler-error f over compiled get set-at f
     ] recover
     2drop ;
 !    2dup ripple-up save-effect ;
@@ -63,7 +63,7 @@ SYMBOL: compiler-hook
     ] with-variable execute ;
 
 : recompile-all ( -- )
-    all-words recompile ;
+    [ all-words recompile ] with-compiler-errors ;
 
 : decompile ( word -- )
     f 2array 1array modify-code-heap ;
