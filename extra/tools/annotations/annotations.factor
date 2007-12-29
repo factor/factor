@@ -1,15 +1,25 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words parser io inspector quotations sequences
-prettyprint continuations effects ;
+prettyprint continuations effects definitions ;
 IN: tools.annotations
 
-: reset "not implemented yet" throw ;
+<PRIVATE
+
+: check-compound ( word -- word )
+    compound? [
+        "Annotations can only be used with compound words" throw
+    ] unless ;
+
+: reset ( word -- )
+    dup check-compound
+    dup "unannotated-def" word-prop define-compound ;
 
 : annotate ( word quot -- )
-    over >r >r word-def r> call r>
-    swap define-compound do-parse-hook ;
-    inline
+    over check-compound
+    [
+        >r dup word-def r> call define-compound
+    ] with-compilation-unit ; inline
 
 : entering ( str -- )
     "/-- Entering: " write dup .
@@ -32,11 +42,13 @@ IN: tools.annotations
     rot [ leaving ] curry
     swapd 3append ;
 
+PRIVATE>
+
 : watch ( word -- )
     dup [ (watch) ] annotate ;
 
 : breakpoint ( word -- )
     [ \ break add* ] annotate ;
 
-: breakpoint-if ( quot word -- )
-    [ [ [ break ] when ] swap 3append ] annotate ;
+: breakpoint-if ( word quot -- )
+    [ [ [ break ] when ] rot 3append ] curry annotate ;

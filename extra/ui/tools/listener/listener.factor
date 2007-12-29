@@ -74,8 +74,7 @@ M: listener-operation invoke-command ( target command -- )
     dup empty? [
         drop
     ] [
-        [ [ [ run-file ] each ] no-parse-hook ] curry
-        call-listener
+        [ [ run-file ] each ] curry call-listener
     ] if ;
 
 : com-EOF ( listener -- )

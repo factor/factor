@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations io.backend kernel quotations sequences
-system alien sequences.private ;
+system alien sequences.private combinators vocabs.loader ;
 IN: io.mmap
 
 TUPLE: mapped-file length address handle closed? ;
@@ -35,5 +35,7 @@ HOOK: (close-mapped-file) io-backend ( mmap -- )
     [ keep ] curry
     [ close-mapped-file ] [ ] cleanup ; inline
 
-USE-IF: unix? io.unix.mmap
-USE-IF: windows? io.windows.mmap
+{
+    { [ unix? ] [ "io.unix.mmap" ] }
+    { [ windows? ] [ "io.windows.mmap" ] }
+} cond require

@@ -64,6 +64,5 @@ SYMBOL: deploy-implementation
 
 HOOK: deploy deploy-implementation ( vocab -- )
 
-USE-IF: macosx? tools.deploy.macosx
-
-USE-IF: winnt? tools.deploy.windows
+macosx? [ "tools.deploy.macosx" require ] when
+winnt? [ "tools.deploy.windows" require ] when

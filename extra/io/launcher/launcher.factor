@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend system kernel namespaces strings hashtables
-sequences assocs combinators ;
+sequences assocs combinators vocabs.loader ;
 IN: io.launcher
 
 SYMBOL: +command+
@@ -57,6 +57,6 @@ HOOK: process-stream* io-backend ( desc -- stream )
 : <process-stream> ( obj -- stream )
     >descriptor process-stream* ;
 
-USE-IF: unix? io.unix.launcher
-USE-IF: windows? io.windows.launcher
-USE-IF: winnt? io.windows.nt.launcher
+unix? [ "io.unix.launcher" require ] when
+windows? [ "io.windows.launcher" require ] when
+winnt? [ "io.windows.nt.launcher" require ] when

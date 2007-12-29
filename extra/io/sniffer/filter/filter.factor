@@ -1,6 +1,6 @@
-USING: alien.c-types byte-arrays combinators hexdump io io.backend
-io.streams.string io.sockets.headers kernel math prettyprint
-io.sniffer sequences system ;
+USING: alien.c-types byte-arrays combinators hexdump io
+io.backend io.streams.string io.sockets.headers kernel math
+prettyprint io.sniffer sequences system vocabs.loader ;
 IN: io.sniffer.filter
 
 HOOK: sniffer-loop io-backend ( stream -- )
@@ -14,9 +14,6 @@ HOOK: packet. io-backend ( string -- )
         ! HEX: 800 [ ] ! IP
         ! HEX: 806 [ ] ! ARP
         [ "Unknown type: " write .h ]
-    } case
-    
-    drop drop ;
+    } case 2drop ;
 
-USE-IF: bsd? io.sniffer.filter.bsd
-
+bsd? [ "io.sniffer.filter.bsd" require ] when
