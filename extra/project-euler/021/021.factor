@@ -25,17 +25,9 @@ IN: project-euler.021
 ! SOLUTION
 ! --------
 
-<PRIVATE
-
-: d ( n -- sum )
-    dup sqrt >fixnum 2 swap [a,b] [
-        [ 2dup divisor? [ 2dup / + , ] [ drop ] if ] each drop
-    ] { } make sum 1+ ;
-
-PRIVATE>
-
 : amicable? ( n -- ? )
-    dup d { [ 2dup = not ] [ 2dup d = ] } && 2nip ;
+    dup sum-proper-divisors
+    { [ 2dup = not ] [ 2dup sum-proper-divisors = ] } && 2nip ;
 
 : euler021 ( -- answer )
     10000 [1,b] [ dup amicable? [ drop 0 ] unless ] sigma ;

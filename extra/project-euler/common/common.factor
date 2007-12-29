@@ -62,6 +62,18 @@ PRIVATE>
 : prime-factors ( n -- seq )
     prime-factorization prune >array ;
 
+: (sum-divisors) ( n -- sum )
+    dup sqrt >fixnum [1,b] [
+        [ 2dup divisor? [ 2dup / + , ] [ drop ] if ] each
+        dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
+    ] { } make sum ;
+
+: sum-divisors ( n -- sum )
+    dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;
+
+: sum-proper-divisors ( n -- sum )
+    dup sum-divisors swap - ;
+
 ! The divisor function, counts the number of divisors
 : tau ( n -- n )
     prime-factorization* flip second 1 [ 1+ * ] reduce ;
