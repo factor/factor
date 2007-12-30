@@ -3,9 +3,9 @@
 USING: arrays assocs combinators continuations documents
 ui.tools.workspace hashtables io io.styles kernel math
 math.vectors models namespaces parser prettyprint quotations
-sequences strings threads listener tuples ui.commands
-ui.gadgets ui.gadgets.editors
-ui.gadgets.presentations ui.gadgets.worlds ui.gestures ;
+sequences strings threads listener tuples ui.commands ui.gadgets
+ui.gadgets.editors ui.gadgets.presentations ui.gadgets.worlds
+ui.gestures definitions ;
 IN: ui.tools.interactor
 
 TUPLE: interactor
@@ -129,7 +129,7 @@ M: interactor stream-read-partial
 : try-parse ( str interactor -- quot/error/f )
     [
         [
-            [ restore-vars parse ] keep save-vars
+            [ restore-vars [ parse ] with-compilation-unit ] keep save-vars
         ] [
             >r f swap set-interactor-busy? drop r>
             dup delegate unexpected-eof? [ drop f ] when
@@ -143,7 +143,7 @@ M: interactor stream-read-partial
         { [ t ] [ handle-parse-error ] }
     } cond ;
 
-M: interactor parse-interactive
+M: interactor stream-read-quot
     [ save-vars ] keep
     [ [ handle-interactive ] interactor-yield ] keep
     restore-vars ;

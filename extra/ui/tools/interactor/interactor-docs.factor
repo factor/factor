@@ -6,4 +6,4 @@ HELP: interactor
 $nl
 "Interactors are created by calling " { $link <interactor> } "."
 $nl
-"Interactors implement the " { $link stream-readln } ", " { $link stream-read } " and " { $link parse-interactive } " generic words." } ;
+"Interactors implement the " { $link stream-readln } ", " { $link stream-read } " and " { $link read-quot } " generic words." } ;
