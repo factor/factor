@@ -3,23 +3,14 @@ assocs words.private sequences ;
 IN: compiler
 
 ARTICLE: "compiler-usage" "Calling the optimizing compiler"
-"The main entry point to the optimizing compiler is a single word taking a word as input:"
+"The main entry points to the optimizing compiler:"
 { $subsection compile }
+{ $subsection recompile }
+{ $subsection recompile-all }
+"Removing a word's optimized definition:"
+{ $subsection decompile }
 "The optimizing compiler can also compile and call a single quotation:"
-{ $subsection compile-call }
-"Three utility words for bulk compilation:"
-{ $subsection compile-batch }
-{ $subsection compile-vocabs }
-"Bulk compilation saves compile warnings and errors in a global variable, instead of printing them as they arise:"
-{ $subsection compile-errors }
-"The warnings and errors can be viewed later:"
-{ $subsection :warnings }
-{ $subsection :errors }
-{ $subsection forget-errors } ;
-
-ARTICLE: "recompile" "Automatic recompilation"
-"When a word is redefined, you can recompile all affected words automatically:"
-{ $subsection recompile } ;
+{ $subsection compile-call } ;
 
 ARTICLE: "compiler" "Optimizing compiler"
 "Factor is a fully compiled language implementation with two distinct compilers:"
@@ -27,79 +18,31 @@ ARTICLE: "compiler" "Optimizing compiler"
     { "The " { $emphasis "non-optimizing quotation compiler" } " compiles quotations to naive machine code very quickly. The non-optimizing quotation compiler is part of the VM." }
     { "The " { $emphasis "optimizing word compiler" } " compiles whole words at a time while performing extensive data and control flow analysis. This provides greater performance for generated code, but incurs a much longer compile time. The optimizing compiler is written in Factor." }
 }
-"While the quotation compiler is transparent to the developer, the optimizing compiler is invoked explicitly. It differs in two important ways from the non-optimizing compiler:"
-{ $list
-    { "The optimizing compiler only compiles words which have a static stack effect. This means that methods defined on fundamental generic words such as " { $link nth } " should have a static stack effect; for otherwise, most of the system would be compiled with the non-optimizing compiler. See " { $link "inference" } " and " { $link "cookbook-pitfalls" } "." }
-    { "The optimizing compiler performs " { $emphasis "early binding" } "; if a compiled word " { $snippet "A" } " calls another compiled word " { $snippet "B" } " and " { $snippet "B" } " is subsequently redefined, the compiled definition of " { $snippet "A" } " will still refer to the earlier compiled definition of " { $snippet "B" } ", until " { $snippet "A" } " explicitly recompiled." }
-}
+"The optimizing compiler only compiles words which have a static stack effect. This means that methods defined on fundamental generic words such as " { $link nth } " should have a static stack effect; for otherwise, most of the system would be compiled with the non-optimizing compiler. See " { $link "inference" } " and " { $link "cookbook-pitfalls" } "."
 { $subsection "compiler-usage" }
-{ $subsection "recompile" } ;
+{ $subsection "compiler-errors" } ;
 
 ABOUT: "compiler"
 
-HELP: compile-error
-{ $values { "word" word } { "error" "an error" } }
-{ $description "If inside a " { $link compile-batch } ", saves the error for future persual via " { $link :errors } " and " { $link :warnings } ", otherwise reports the error to the " { $link stdio } " stream." } ;
-
-HELP: begin-batch
-{ $values { "seq" "a sequence of words" } }
-{ $description "Begins batch compilation. Any compile errors reported until a call to " { $link end-batch } " are stored in the " { $link compile-errors } " global variable." }
-$low-level-note ;
-
-HELP: compile-error.
-{ $values { "pair" "a " { $snippet "{ word error }" } " pair" } }
-{ $description "Prints a compiler error to the " { $link stdio } " stream." } ;
-
-HELP: (:errors)
-{ $values { "seq" "an alist" } }
-{ $description "Outputs all serious compiler errors from the most recent compile batch as a sequence of " { $snippet "{ word error }" } " pairs."  } ;
-
-HELP: :errors
-{ $description "Prints all serious compiler errors from the most recent compile batch to the " { $link stdio } " stream." } ;
-
-HELP: (:warnings)
-{ $values { "seq" "an alist" } }
-{ $description "Outputs all ignorable compiler warnings from the most recent compile batch as a sequence of " { $snippet "{ word error }" } " pairs."  } ;
-
-HELP: :warnings
-{ $description "Prints all ignorable compiler warnings from the most recent compile batch to the " { $link stdio } " stream." } ;
-
-HELP: end-batch
-{ $description "Ends batch compilation, printing a summary of the errors and warnings produced to the " { $link stdio } " stream." }
-$low-level-note ;
-
 HELP: compile
-{ $values { "word" word } }
-{ $description "Compiles a word together with any uncompiled dependencies. Does nothing if the word is already compiled." } ;
-
-HELP: compile-failed
-{ $values { "word" word } { "error" "an error" } }
-{ $description "Called when the optimizing compiler fails to compile a word. The word is removed from the set of words pending compilation, and it's un-optimized compiled definition will be used. The error is reported by calling " { $link compile-error } "." } ;
-
-HELP: compile-batch
 { $values { "seq" "a sequence of words" } }
-{ $description "Compiles a batch of words. Any compile errors are summarized at the end and can be viewed with " { $link :warnings } " and " { $link :errors } "." } ;
+{ $description "Compiles a set of words. Ignores words which are already compiled." } ;
 
-{ :errors (:errors) :warnings (:warnings) } related-words
-
-HELP: compile-vocabs
-{ $values { "seq" "a sequence of strings" } }
-{ $description "Compiles all words which have not been compiled yet from the given vocabularies." } ;
+HELP: recompile
+{ $values { "seq" "a sequence of words" } }
+{ $description "Compiles a set of words. Re-compiles words which are already compiled." } ;
 
 HELP: compile-call
 { $values { "quot" "a quotation" } }
 { $description "Compiles and runs a quotation." }
 { $errors "Throws an error if the stack effect of the quotation cannot be inferred." } ;
 
-HELP: recompile
-{ $description "Recompiles words whose compiled definitions have become out of date as a result of dependent words being redefined." } ;
-
-HELP: compile-all
+HELP: recompile-all
 { $description "Recompiles all words." } ;
 
-HELP: compile-begins
+HELP: decompile
 { $values { "word" word } }
-{ $description "Prints a message stating the word is being compiled, unless we are inside a " { $link compile-batch } "." } ;
+{ $description "Removes a word's optimized definition. The word will be compiled with the non-optimizing compiler until recompiled with the optimizing compiler again." } ;
 
 HELP: (compile)
 { $values { "word" word } }

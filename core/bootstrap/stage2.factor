@@ -14,7 +14,7 @@ IN: bootstrap.stage2
     vm file-name windows? [ >lower ".exe" ?tail drop ] when
     ".image" append "output-image" set-global
 
-    "math compiler tools help ui ui.tools io" "include" set-global
+    "math tools compiler help ui ui.tools io" "include" set-global
     "" "exclude" set-global
 
     parse-command-line
@@ -42,9 +42,6 @@ IN: bootstrap.stage2
         [ get-global " " split [ empty? not ] subset ] 2apply
         seq-diff
         [ "bootstrap." swap append require ] each
-
-        init-io
-        init-stdio
 
         run-bootstrap-init
 

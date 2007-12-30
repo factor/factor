@@ -6,7 +6,7 @@ kernel models namespaces parser quotations sequences ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
-prettyprint listener debugger threads compiler ;
+prettyprint listener debugger threads ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;
@@ -129,7 +129,6 @@ M: stack-display tool-scroller
         dup [ ui-listener-hook ] curry listener-hook set
         dup [ ui-error-hook ] curry error-hook set
         [ ui-inspector-hook ] curry inspector-hook set
-        [ yield ] compiler-hook set
         welcome.
         listener
     ] with-stream* ;

@@ -3,13 +3,8 @@
 USING: kernel namespaces arrays sequences io inference.backend
 generator debugger math.parser prettyprint words words.private
 continuations vocabs assocs alien.compiler dlists optimizer
-definitions math compiler.errors ;
+definitions math compiler.errors threads ;
 IN: compiler
-
-SYMBOL: compiler-hook
-
-: compile-begins ( -- )
-    compiler-hook get [ ] or call ;
 
 : compiled-usage ( word -- seq )
     #! XXX
@@ -28,7 +23,7 @@ SYMBOL: compiler-hook
     "compiled-effect" set-word-prop ;
 
 : (compile) ( word -- )
-    compile-begins
+    yield
     [
         dup word-dataflow optimize >r over dup r> generate
     ] [
