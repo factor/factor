@@ -121,6 +121,8 @@ $nl
 { $code ": hello \"Hello world\" print ; parsing" }
 "Parsing words must have stack effect " { $snippet "( accum -- accum )" } ", where " { $snippet "accum" } " is the accumulator vector supplied by the parser. Parsing words can read input, add word definitions to the dictionary, and do anything an ordinary word can."
 $nl
+"Parsing words cannot be called from the same source file where they are defined, because new definitions are only compiled at the end of the source file. An attempt to use a parsing word in its own source file raises an error:"
+{ $link staging-violation }
 "Tools for implementing parsing words:"
 { $subsection "reading-ahead" }
 { $subsection "parsing-word-nest" }
@@ -456,8 +458,8 @@ HELP: parse-fresh
 
 HELP: eval
 { $values { "str" string } }
-{ $description "Parses Factor source code from a string, and calls the resulting quotation. The current vocabulary search path is used." }
-{ $errors "Throws an error if the input is malformed, or if the quotation throws an error." } ;
+{ $description "Parses Factor source code from a string, and calls the resulting quotation." }
+{ $errors "Throws an error if the input is malformed, or if the evaluation itself throws an error." } ;
 
 HELP: outside-usages
 { $values { "seq" "a sequence of definitions" } { "usages" "an association list mapping definitions to sequences of definitions" } }
@@ -505,3 +507,9 @@ HELP: bootstrap-file
 HELP: eval>string
 { $values { "str" string } { "output" string } }
 { $description "Evaluates the Factor code in " { $snippet "str" } " with the " { $link stdio } " stream rebound to a string output stream, then outputs the resulting string." } ;
+
+HELP: staging-violation
+{ $values { "word" word } }
+{ $description "Throws a " { $link staging-violation } " error." }
+{ $error-description "Thrown by the parser if a parsing word is used in the same compilation unit as where it was defined; see " { $link "compilation-units" } "." }
+{ $notes "One possible workaround is to use the " { $link POSTPONE: << } " word to execute code at parse time. However, executing words defined in the same source file at parse time is still prohibited." } ;

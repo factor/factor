@@ -144,7 +144,7 @@ HELP: check-tuple
 
 HELP: define-tuple-class
 { $values { "class" word } { "slots" "a sequence of strings" } }
-{ $description "Defines a tuple class with slots named by " { $snippet "slots" } ". This is the run-time equivalent of " { $link POSTPONE: TUPLE: } "." }
+{ $description "Defines a tuple class with slots named by " { $snippet "slots" } ". This is the run time equivalent of " { $link POSTPONE: TUPLE: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;
 

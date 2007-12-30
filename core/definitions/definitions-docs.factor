@@ -62,7 +62,9 @@ $nl
 ARTICLE: "compilation-units" "Compilation units"
 "A " { $emphasis "compilation unit" } " scopes a group of related definitions. They are compiled and entered into the system in one atomic operation."
 $nl
-"The parser groups all definitions in a source file into one compilation unit, and parsing words do not need to concern themselves with compilation units. However, if definitions are being created at run-time, a compilation unit must be created explicitly:"
+"Words defined in a compilation unit may not be called until the compilation unit is finished. The parser detects this case for parsing words and throws a " { $link staging-violation } "; calling any other word from within its own compilation unit throws an " { $link undefined } " error."
+$nl
+"The parser groups all definitions in a source file into one compilation unit, and parsing words do not need to concern themselves with compilation units. However, if definitions are being created at run time, a compilation unit must be created explicitly:"
 { $subsection with-compilation-unit }
 "Words called to associate a definition with a source file location:"
 { $subsection remember-definition }
@@ -163,8 +165,17 @@ HELP: forward-error
 
 HELP: with-compilation-unit
 { $values { "quot" quotation } }
-{ $description "Calls a quotation in a new compilation unit. The quotation can define new words and classes, as well as forget words. When the quotation returns, any changed words are recompiled and applied atomically." }
-{ $notes "Compilation units may be nested. The parser wraps every source file in a compilation unit, so parsing words may define new words without having to perform extra work; to define new words at any other time, you must wrap your defining code with this combinator." } ;
+{ $description "Calls a quotation in a new compilation unit. The quotation can define new words and classes, as well as forget words. When the quotation returns, any changed words are recompiled, and changes are applied atomically." }
+{ $notes "Compilation units may be nested."
+$nl
+"The parser wraps every source file in a compilation unit, so parsing words may define new words without having to perform extra work; to define new words at any other time, you must wrap your defining code with this combinator."
+$nl
+"Since compilation is relatively expensive, you should try to batch up as many definitions into one compilation unit as possible." } ;
 
 HELP: recompile-hook
 { $var-description "Quotation with stack effect " { $snippet "( words -- )" } ", called at the end of " { $link with-compilation-unit } "." } ;
+
+HELP: no-compilation-unit
+{ $values { "word" word } }
+{ $description "Throws a " { $link no-compilation-unit } " error." }
+{ $error-description "Thrown when an attempt is made to define a word outside of a " { $link with-compilation-unit } " combinator." } ;

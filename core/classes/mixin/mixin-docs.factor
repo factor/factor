@@ -16,13 +16,13 @@ HELP: mixin-class
 
 HELP: define-mixin-class
 { $values { "class" word } }
-{ $description "Defines a mixin class. This is the run-time equivalent of " { $link POSTPONE: MIXIN: } "." }
+{ $description "Defines a mixin class. This is the run time equivalent of " { $link POSTPONE: MIXIN: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;
 
 HELP: add-mixin-instance
 { $values { "class" class } { "mixin" class } }
-{ $description "Defines a class to be an instance of a mixin class. This is the run-time equivalent of " { $link POSTPONE: INSTANCE: } "." }
+{ $description "Defines a class to be an instance of a mixin class. This is the run time equivalent of " { $link POSTPONE: INSTANCE: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;
 

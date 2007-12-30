@@ -17,7 +17,7 @@ ABOUT: "unions"
 
 HELP: define-union-class
 { $values { "class" class } { "members" "a sequence of classes" } }
-{ $description "Defines a union class with specified members. This is the run-time equivalent of " { $link POSTPONE: UNION: } "." }
+{ $description "Defines a union class with specified members. This is the run time equivalent of " { $link POSTPONE: UNION: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;
 

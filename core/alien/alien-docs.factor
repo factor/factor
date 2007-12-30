@@ -70,7 +70,18 @@ HELP: load-library
 HELP: add-library
 { $values { "name" "a string" } { "path" "a string" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }
 { $description "Defines a new logical library named " { $snippet "name" } " located in the file system at " { $snippet "path" } "and the specified ABI." }
-{ $examples { $code "\"gif\" \"libgif.so\" \"cdecl\" add-library" } } ;
+{ $notes "Because the entire source file is parsed before top-level forms are executed, " { $link add-library } " cannot be used in the same file as " { $link POSTPONE: FUNCTION: } " definitions from that library. The " { $link add-library } " call will happen too late, after compilation, and the alien calls will not work."
+$nl
+"Instead, " { $link add-library } " calls must either be placed in different source files from those that use that library, or alternatively, " { $link "syntax-immediate" } " can be used to load the library before compilation." }
+{ $examples "Here is a typical usage of " { $link add-library } ":"
+{ $code
+    "<< \"freetype\" {"
+    "    { [ macosx? ] [ \"libfreetype.6.dylib\" \"cdecl\" add-library ] }"
+    "    { [ windows? ] [ \"freetype6.dll\" \"cdecl\" add-library ] }"
+    "    { [ t ] [ drop ] }"
+    "} cond >>"
+}
+"Note the parse time evaluation with " { $link POSTPONE: << } "." } ;
 
 HELP: alien-invoke-error
 { $error-description "Thrown if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"

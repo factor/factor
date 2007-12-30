@@ -54,7 +54,7 @@ ARTICLE: "primitives" "Primitives"
 { $subsection primitive? } ;
 
 ARTICLE: "deferred" "Deferred words and mutual recursion"
-"Words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. This is done to simplify the implementation, facilitate better parse-time checking and remove some odd corner cases; it also encourages better coding style. Sometimes this restriction gets in the way, for example when defining mutually-recursive words; one way to get around this limitation is to make a forward definition."
+"Words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. This is done to simplify the implementation, facilitate better parse time checking and remove some odd corner cases; it also encourages better coding style. Sometimes this restriction gets in the way, for example when defining mutually-recursive words; one way to get around this limitation is to make a forward definition."
 { $subsection POSTPONE: DEFER: }
 "The class of forward word definitions:"
 { $subsection deferred }
@@ -248,13 +248,13 @@ $low-level-note
 
 HELP: define-symbol
 { $values { "word" word } }
-{ $description "Defines the word to push itself on the stack when executed. This is the run-time equivalent of " { $link POSTPONE: SYMBOL: } "." }
+{ $description "Defines the word to push itself on the stack when executed. This is the run time equivalent of " { $link POSTPONE: SYMBOL: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
 
 HELP: define-compound
 { $values { "word" word } { "def" quotation } }
-{ $description "Defines the word to call a quotation when executed. This is the run-time equivalent of " { $link POSTPONE: : } "." }
+{ $description "Defines the word to call a quotation when executed. This is the run time equivalent of " { $link POSTPONE: : } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
 

@@ -23,7 +23,6 @@ IN: compiler
     "compiled-effect" set-word-prop ;
 
 : (compile) ( word -- )
-    yield
     [
         dup word-dataflow optimize >r over dup r> generate
     ] [
@@ -37,8 +36,11 @@ IN: compiler
     [ [ 2drop t ] assoc-find 2drop dup ] keep delete-at ;
 
 : compile-loop ( assoc -- )
-    dup assoc-empty?
-    [ drop ] [ dup delete-any (compile) compile-loop ] if ;
+    dup assoc-empty? [ drop ] [
+        dup delete-any (compile)
+        yield
+        compile-loop
+    ] if ;
 
 : recompile ( words -- )
     [

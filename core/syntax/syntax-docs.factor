@@ -28,6 +28,11 @@ ARTICLE: "syntax-comments" "Comments"
 { $subsection POSTPONE: ! }
 { $subsection POSTPONE: #! } ;
 
+ARTICLE: "syntax-immediate" "Parse time evaluation"
+"Code can be evaluated at parse time. This is a rarely-used feature; one use-case is " { $link "loading-libs" } ", where you want to execute some code before the words in a source file are compiled."
+{ $subsection POSTPONE: << }
+{ $subsection POSTPONE: >> } ;
+
 ARTICLE: "syntax-integers" "Integer syntax"
 "The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign."
 { $code
@@ -173,7 +178,8 @@ ARTICLE: "syntax" "Syntax"
 "Factor has two main forms of syntax: " { $emphasis "definition" } " syntax and " { $emphasis "literal" } " syntax. Code is data, so the syntax for code is a special case of object literal syntax. This section documents literal syntax. Definition syntax is covered in " { $link "words" } ". Extending the parser is the main topic of " { $link "parser" } "."
 { $subsection "parser-algorithm" }
 { $subsection "syntax-comments" }
-{ $subsection "syntax-literals" } ;
+{ $subsection "syntax-literals" }
+{ $subsection "syntax-immediate" } ;
 
 ABOUT: "syntax"
 
@@ -567,3 +573,14 @@ HELP: PRIVATE>
 { $description "Marks the end of a block of private word definitions." } ;
 
 { POSTPONE: <PRIVATE POSTPONE: PRIVATE> } related-words
+
+HELP: <<
+{ $syntax "<< ... >>" }
+{ $description "Evaluates some code at parse time." }
+{ $notes "Calling words defined in the same source file at parse time is prohibited; see compilation unit as where it was defined; see " { $link "compilation-units" } "." } ;
+
+HELP: >>
+{ $syntax ">>" }
+{ $description "Marks the end of a parse time code block." } ;
+
+{ POSTPONE: << POSTPONE: >> } related-words

@@ -227,3 +227,6 @@ M: forward-error error.
 
 M: undefined summary
     drop "Calling a deferred word before it has been defined" ;
+
+M: no-compilation-unit summary
+    drop "Defining a word outside of a compilation unit" ;
