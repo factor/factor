@@ -350,7 +350,6 @@ SYMBOL: bootstrap-syntax
     [
         "scratchpad" in set
         {
-            "scratchpad"
             "arrays"
             "assocs"
             "combinators"
@@ -358,11 +357,14 @@ SYMBOL: bootstrap-syntax
             "continuations"
             "debugger"
             "definitions"
+            "editors"
             "generic"
+            "help"
             "inspector"
             "io"
             "io.files"
             "kernel"
+            "listener"
             "math"
             "memory"
             "namespaces"
@@ -372,17 +374,16 @@ SYMBOL: bootstrap-syntax
             "sorting"
             "strings"
             "syntax"
-            "vocabs"
-            "vocabs.loader"
-            "words"
             "tools.annotations"
             "tools.crossref"
             "tools.memory"
             "tools.profiler"
             "tools.test"
             "tools.time"
-            "editors"
-            "listener"
+            "vocabs"
+            "vocabs.loader"
+            "words"
+            "scratchpad"
         } set-use
         call
     ] with-scope ; inline

@@ -17,8 +17,6 @@ IN: bootstrap.help
         ] if
     ] each
 
-    "help.handbook" require
-
-    global [ "help" use+ ] bind ;
+    "help.handbook" require ;
 
 load-help
