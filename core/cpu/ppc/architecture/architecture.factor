@@ -295,7 +295,7 @@ M: ppc-backend %cleanup ( alien-node -- ) drop ;
 M: ppc-backend value-structs?
     #! On Linux/PPC, value structs are passed in the same way
     #! as reference structs, we just have to make a copy first.
-    os "linux" = not ;
+    linux? not ;
 
 M: ppc-backend fp-shadows-int? ( -- ? ) macosx? ;
 
