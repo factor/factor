@@ -129,7 +129,7 @@ M: interactor stream-read-partial
 : try-parse ( str interactor -- quot/error/f )
     [
         [
-            [ restore-vars [ parse ] with-compilation-unit ] keep save-vars
+            [ restore-vars parse ] keep save-vars
         ] [
             >r f swap set-interactor-busy? drop r>
             dup delegate unexpected-eof? [ drop f ] when

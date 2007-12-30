@@ -16,8 +16,6 @@ M: link forget link-name remove-article ;
 
 M: link definition article-content ;
 
-M: link see (see) ;
-
 M: link synopsis*
     \ ARTICLE: pprint-word
     dup link-name pprint*

@@ -256,7 +256,7 @@ M: builtin-class see-class*
 
 : see-class ( class -- )
     dup class? [
-        nl [ dup see-class* ] with-pprint nl
+        dup seeing-word dup see-class*
     ] when drop ;
 
 : see-methods ( generic -- seq )
@@ -265,7 +265,7 @@ M: builtin-class see-class*
 
 M: word see
     [
-        dup see-class*
+        dup see-class
         dup class? over symbol? and not [ dup (see) ] when
     ] with-use nl
     [

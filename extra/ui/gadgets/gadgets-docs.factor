@@ -306,5 +306,3 @@ $nl
 { $subsection control-value }
 { $subsection set-control-value }
 { $see-also "models" } ;
-
-ABOUT: "ui-control-impl"

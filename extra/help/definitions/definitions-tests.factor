@@ -1,13 +1,11 @@
 USING: math definitions help.topics help tools.test
 prettyprint parser io.streams.string kernel source-files
-assocs namespaces words io ;
+assocs namespaces words io sequences ;
 IN: temporary
 
 [ ] [ \ + >link see ] unit-test
 
 [
-    file-vocabs
-
     [ 4 ] [
         "IN: temporary USING: help.syntax ; : hello ; HELP: hello \"test\" ; ARTICLE: \"hello\" \"world\" ; ARTICLE: \"hello2\" \"world\" ;" <string-reader> "foo"
         parse-stream drop
@@ -34,9 +32,9 @@ IN: temporary
         "hello" "temporary" lookup "help" word-prop
     ] unit-test
 
-    [ [ ] ] [ "IN: temporary USING: help.syntax ; : xxx ; HELP: xxx ;" parse ] unit-test
+    [ ] [ "IN: temporary USING: help.syntax ; : xxx ; HELP: xxx ;" eval ] unit-test
 
     [ ] [ "xxx" "temporary" lookup help ] unit-test
 
     [ ] [ "xxx" "temporary" lookup >link synopsis print ] unit-test
-] with-scope
+] with-file-vocabs

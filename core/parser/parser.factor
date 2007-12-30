@@ -265,8 +265,9 @@ M: staging-violation summary
     "A parsing word cannot be used in the same file it is defined in." ;
 
 : execute-parsing ( word -- )
-    dup
-    new-definitions get first key? [ staging-violation ] when
+    new-definitions get [
+        dupd first key? [ staging-violation ] when
+    ] when*
     execute ;
 
 : parse-step ( accum end -- accum ? )
@@ -299,6 +300,9 @@ SYMBOL: lexer-factory
 
 : parse-lines ( lines -- quot )
     lexer-factory get call (parse-lines) ;
+
+: parse ( str -- quot )
+    [ string-lines parse-lines ] with-compilation-unit ;
 
 ! Parsing word utilities
 : parse-effect ( -- effect )
@@ -421,7 +425,9 @@ SYMBOL: bootstrap-syntax
         file get source-file-path =
     ] assoc-subset ;
 
-: removed-definitions ( -- definitions ) new-definitions get old-definitions get [ first2 union ] 2apply diff ;
+: removed-definitions ( -- definitions )
+    new-definitions old-definitions
+    [ get first2 union ] 2apply diff ;
 
 : smudged-usage ( -- usages referenced removed )
     removed-definitions filter-moved keys [

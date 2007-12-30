@@ -34,7 +34,7 @@ f <workspace> dup [
         workspace-listener
         listener-gadget-input
         "ok" on
-        parse-interactive
+        stream-read-quot
         "c" get continue-with
     ] in-thread drop
 

@@ -62,7 +62,7 @@ UNION: bah fixnum alien ;
 [ bah ] [ \ bah? "predicating" word-prop ] unit-test
 
 ! Test generic see and parsing
-[ "IN: temporary\nSYMBOL: bah\n\nUNION: bah fixnum alien ;\n" ]
+[ "USING: alien math ;\nIN: temporary\nUNION: bah fixnum alien ;\n" ]
 [ [ \ bah see ] string-out ] unit-test
 
 ! Test redefinition of classes

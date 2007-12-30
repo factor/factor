@@ -233,3 +233,9 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 [ t ] [ cons-test-1 array-capacity "a" get array-capacity = ] unit-test
 
 [ t ] [ 1 cons-test-3 array-capacity "a" get array-capacity = ] unit-test
+
+[ t ] [
+    [
+        "IN: temporary SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
+    ] catch [ check-tuple? ] is?
+] unit-test
