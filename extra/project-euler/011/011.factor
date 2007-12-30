@@ -72,13 +72,13 @@ IN: project-euler.011
 
 : pad-front ( matrix -- matrix )
     [
-        length [ 0 <repetition> ] each
-    ] keep [ append ] map ;
+        length [ 0 <repetition> ] map
+    ] keep [ append ] 2map ;
 
 : pad-back ( matrix -- matrix )
     <reversed> [
-        length [ 0 <repetition> ] each
-    ] keep [ <reversed> append ] map ;
+        length [ 0 <repetition> ] map
+    ] keep [ <reversed> append ] 2map ;
 
 : diagonal/ ( -- matrix )
     horizontal reverse pad-front pad-back flip ;
@@ -97,9 +97,6 @@ PRIVATE>
         { [ horizontal ] [ vertical ] [ diagonal/ ] [ diagonal\ ] }
         [ call 4 max-product , ] each
     ] { } make supremum ;
-
-! TODO: solution works but doesn't completely compile due to the creation of
-! the diagonal matrices, there must be a cleaner way to generate those
 
 ! [ euler011 ] 100 ave-time
 ! 4 ms run / 0 ms GC ave time - 100 trials
