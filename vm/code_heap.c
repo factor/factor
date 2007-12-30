@@ -56,9 +56,17 @@ INLINE CELL compute_code_rel(F_REL *rel,
 		return CREF(words_start,REL_ARGUMENT(rel));
 	case RT_XT:
 		word = untag_word(get(CREF(words_start,REL_ARGUMENT(rel))));
-		return (CELL)word->code
-			+ sizeof(F_COMPILED)
-			+ (profiling_p_ ? 0 : word->code->profiler_prologue);
+		if(word->code)
+		{
+			return (CELL)word->code
+				+ sizeof(F_COMPILED)
+				+ (profiling_p_ ? 0 : word->code->profiler_prologue);
+		}
+		else
+		{
+			/* Its only NULL in stage 2 early init */
+			return 0;
+		}
 	case RT_XT_PROFILING:
 		word = untag_word(get(CREF(words_start,REL_ARGUMENT(rel))));
 		return (CELL)word->code + sizeof(F_COMPILED);

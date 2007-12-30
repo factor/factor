@@ -32,7 +32,7 @@ void default_parameters(F_PARAMETERS *p)
 /* Do some initialization that we do once only */
 void do_stage1_init(void)
 {
-	fprintf(stderr,"*** Starting stage 2 early init...\n");
+	fprintf(stderr,"*** Stage 2 early init... ");
 	fflush(stderr);
 
 	jit_compile(userenv[UNDEFINED_ENV]);
@@ -60,7 +60,7 @@ void do_stage1_init(void)
 
 	userenv[STAGE2_ENV] = T;
 
-	fprintf(stderr,"*** Finished stage 2 early init\n");
+	fprintf(stderr,"done\n");
 	fflush(stderr);
 }
 
