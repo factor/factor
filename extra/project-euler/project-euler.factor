@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: definitions io io.files kernel math.parser sequences strings
+USING: definitions io io.files kernel math math.parser sequences strings
     vocabs vocabs.loader
     project-euler.001 project-euler.002 project-euler.003 project-euler.004
     project-euler.005 project-euler.006 project-euler.007 project-euler.008
@@ -32,7 +32,7 @@ PRIVATE>
 : run-project-euler ( -- )
     problem-prompt dup problem-solved? [
         dup number>euler "project-euler." swap append run
-        "Answer: " swap number>string append print
+        "Answer: " swap dup number? [ number>string ] when append print
         "Source: " swap solution-path append print
     ] [
         drop "That problem has not been solved yet..." print
