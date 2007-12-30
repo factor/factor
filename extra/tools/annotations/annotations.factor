@@ -4,8 +4,6 @@ USING: kernel words parser io inspector quotations sequences
 prettyprint continuations effects definitions ;
 IN: tools.annotations
 
-<PRIVATE
-
 : check-compound ( word -- )
     compound? [
         "Annotations can only be used with compound words" throw
@@ -17,6 +15,7 @@ IN: tools.annotations
 
 : annotate ( word quot -- )
     over check-compound
+    over dup word-def "unannotated-def" set-word-prop
     [
         >r dup word-def r> call define-compound
     ] with-compilation-unit ; inline
@@ -41,8 +40,6 @@ IN: tools.annotations
     over [ entering ] curry
     rot [ leaving ] curry
     swapd 3append ;
-
-PRIVATE>
 
 : watch ( word -- )
     dup [ (watch) ] annotate ;

@@ -154,44 +154,11 @@ ARTICLE: "parser-files" "Parsing source files"
 { $subsection parse-file }
 { $subsection bootstrap-file }
 "The parser cross-references source files and definitions. This allows it to keep track of removed definitions, and prevent forward references and accidental redefinitions."
-$nl
-"When a source file is reloaded, the parser compares the previous list of definitions with the current list; any definitions which are no longer present in the file are removed by a call to " { $link forget } ". A warning message is printed if any other definitions still depend on the removed definitions."
-$nl
-"The parser also catches forward references when reloading source files. This is best illustrated with an example. Suppose we load a source file " { $snippet "a.factor" } ":"
-{ $code
-    "USING: io sequences ;"
-    "IN: a"
-    ": hello \"Hello\" ;"
-    ": world \"world\" ;"
-    ": hello-world hello " " world 3append print ;"
-}
-"The definitions for " { $snippet "hello" } ", " { $snippet "world" } ", and " { $snippet "hello-world" } " are in the dictionary."
-$nl
-"Now, after some heavily editing and refactoring, the file looks like this:"
-{ $code
-    "USING: namespaces ;"
-    "IN: a"
-    ": hello \"Hello\" % ;"
-    ": hello-world [ hello " " % world ] \"\" make ;"
-    ": world \"world\" % ;"
-}
-"Note that the developer has made a mistake, placing the definition of " { $snippet "world" } " " { $emphasis "after" } " its usage in " { $snippet "hello-world" } "."
-$nl
-"If the parser did not have special checks for this case, then the modified source file would still load, because when the definition of " { $snippet "hello-world" } " on line 4 is being parsed, the " { $snippet "world" } " word is already present in the dictionary from an earlier run. The developer would then not discover this mistake until attempting to load the source file into a fresh image."
-$nl
-"Since this is undesirable, the parser explicitly raises an error if a source file refers to a word which is in the dictionary, but defined after it is used."
-{ $subsection forward-error }
-"If a source file raises a " { $link forward-error } " when loaded into a development image, then it would have raised a " { $link no-word } " error when loaded into a fresh image."
-$nl
-"The parser also catches duplicate definitions. If an artifact is defined twice in the same source file, the earlier definition will never be accessible, and this is almost always a mistake, perhaps due to a bad choice of word names, or a copy and paste error. The parser raises an error in this case."
-{ $subsection redefine-error }
 { $see-also "source-files" } ;
 
 ARTICLE: "parser-usage" "Reflective parser usage"
 "The parser can be called on a string:"
 { $subsection eval }
-{ $subsection parse }
-{ $subsection parse-fresh }
 "The parser can also parse from a stream:"
 { $subsection parse-stream } ;
 
@@ -204,7 +171,8 @@ $nl
 { $subsection "parser-usage" }
 "The parser can be extended."
 { $subsection "parsing-words" }
-{ $subsection "parser-lexer" } ;
+{ $subsection "parser-lexer" }
+{ $see-also "definitions" "definition-checking" } ;
 
 ABOUT: "parser"
 
@@ -327,7 +295,7 @@ HELP: still-parsing?
 HELP: use
 { $var-description "A variable holding the current vocabulary search path as a sequence of assocs." } ;
 
-{ use in use+ (use+) set-use set-in POSTPONE: USING: POSTPONE: USE: with-with-default-vocabs } related-words
+{ use in use+ (use+) set-use set-in POSTPONE: USING: POSTPONE: USE: with-file-vocabs with-interactive-vocabs } related-words
 
 HELP: in
 { $var-description "A variable holding the name of the current vocabulary for new definitions." } ;
@@ -465,7 +433,7 @@ $parsing-note ;
 HELP: parse-literal
 { $values { "accum" vector } { "end" word } { "quot" "a quotation with stack effect " { $snippet "( seq -- obj )" } } }
 { $description "Parses objects from parser input until " { $snippet "end" } ", applies the quotation to the resulting sequence, and adds the output value to the accumulator." }
-{ $examples "This word is used to implement " { $link POSTPONE: C{ } "." }
+{ $examples "This word is used to implement " { $link POSTPONE: [ } "." }
 $parsing-note ;
 
 HELP: parse-definition

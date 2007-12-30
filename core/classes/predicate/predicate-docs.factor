@@ -1,6 +1,6 @@
 USING: generic help.markup help.syntax kernel kernel.private
 namespaces sequences words arrays layouts help effects math
-layouts classes.private classes ;
+layouts classes.private classes definitions ;
 IN: classes.predicate
 
 ARTICLE: "predicates" "Predicate classes"
@@ -15,7 +15,9 @@ ABOUT: "predicates"
 
 HELP: define-predicate-class
 { $values { "superclass" class } { "class" class } { "definition" "a quotation with stack effect " { $snippet "( superclass -- ? )" } } }
-{ $description "Defines a predicate class." } ;
+{ $description "Defines a predicate class. This is the run-time equivalent of " { $link POSTPONE: PREDICATE: } "." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
+{ $side-effects "class" } ;
 
 { predicate-class define-predicate-class POSTPONE: PREDICATE: } related-words
 

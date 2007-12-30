@@ -564,7 +564,3 @@ $nl
     "[ P ] [ Q ] [ ] while T"
 }
 "However, depending on the stack effects of " { $snippet "pred" } " and " { $snippet "quot" } ", the " { $snippet "tail" } " quotation might need to be non-empty in order to balance out the stack effect of branches for stack effect inference." } ;
-
-HELP: modify-code-heap ( array -- )
-{ $values { "array" "an array of 6-element arrays having shape " { $snippet "{ word code labels rel words literals }" } } }
-{ $description "Stores compiled code definitions in the code heap and updates words to point at those definitions." } ;

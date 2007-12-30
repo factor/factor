@@ -81,7 +81,17 @@ SYMBOL: recompile-hook
 
 : <definitions> ( -- pair ) { H{ } H{ } } [ clone ] map ;
 
-: with-compilation-unit ( quot -- new-defs )
+TUPLE: no-compilation-unit word ;
+
+: no-compilation-unit ( word -- * )
+    \ no-compilation-unit construct-boa throw ;
+
+: changed-word ( word -- )
+    dup changed-words get
+    [ no-compilation-unit ] unless*
+    set-at ;
+
+: with-compilation-unit ( quot -- )
     [
         H{ } clone changed-words set
         <definitions> new-definitions set

@@ -13,9 +13,7 @@ $nl
 { $subsection define-if-intrinsic }
 { $subsection define-if-intrinsics }
 "The main entry point into the code generator:"
-{ $subsection generate }
-"Primitive compiler interface exported by the Factor VM:"
-{ $subsection modify-code-heap } ;
+{ $subsection generate } ;
 
 ABOUT: "generator"
 

@@ -127,6 +127,7 @@ PRIVATE>
 
 : reset-word ( word -- )
     {
+        "unannotated-def"
         "parsing" "inline" "foldable"
         "predicating"
         "reading" "writing"

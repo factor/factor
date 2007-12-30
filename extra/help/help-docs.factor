@@ -1,5 +1,5 @@
 USING: help.markup help.crossref help.topics help.syntax
-definitions io prettyprint inspector help.lint arrays math ;
+definitions io prettyprint inspector arrays math ;
 IN: help
 
 ARTICLE: "printing-elements" "Printing markup elements"
@@ -160,3 +160,5 @@ HELP: sort-articles
 HELP: $predicate
 { $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
 { $description "Prints the boilerplate description of a class membership predicate word such as " { $link array? } " or " { $link integer? } "." } ;
+
+USE: help.lint

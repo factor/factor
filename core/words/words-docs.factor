@@ -11,13 +11,20 @@ $nl
 "Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to " { $vocab-link "scratchpad" } ". The current vocabulary may be changed with the " { $link POSTPONE: IN: } " parsing word (see " { $link "vocabulary-search" } ")."
 { $subsection create }
 { $subsection create-in }
-{ $subsection gensym }
 { $subsection lookup }
 "Words can output their name and vocabulary:"
 { $subsection word-name }
 { $subsection word-vocabulary }
 "Testing if a word object is part of a vocabulary:"
 { $subsection interned? } ;
+
+ARTICLE: "uninterned-words" "Uninterned words"
+"A word that is not a member of any vocabulary is said to be " { $emphasis "uninterned" } "."
+$nl
+"There are several ways of creating an uninterned word:"
+{ $subsection <word> }
+{ $subsection gensym }
+{ $subsection define-temp } ;
 
 ARTICLE: "colon-definition" "Compound definitions"
 "A compound definition associates a word name with a quotation that is called when the word is executed."
@@ -143,7 +150,9 @@ ARTICLE: "word.private" "Word implementation details"
 { $subsection word-def }
 { $subsection set-word-def }
 "An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
-{ $subsection word-xt } ;
+{ $subsection word-xt }
+"Low-level compiler interface exported by the Factor VM:"
+{ $subsection modify-code-heap } ;
 
 ARTICLE: "words" "Words"
 "Words are the Factor equivalent of functions or procedures; a word is a body of code with a unique name and some additional meta-data. Words are defined in the " { $vocab-link "words" } " vocabulary."
@@ -159,6 +168,7 @@ $nl
 { $subsection word }
 { $subsection word? }
 { $subsection "interned-words" }
+{ $subsection "uninterned-words" }
 { $subsection "word-definition" }
 { $subsection "word-props" }
 { $subsection "word.private" }
@@ -238,12 +248,14 @@ $low-level-note
 
 HELP: define-symbol
 { $values { "word" word } }
-{ $description "Defines the word to push itself on the stack when executed." }
+{ $description "Defines the word to push itself on the stack when executed. This is the run-time equivalent of " { $link POSTPONE: SYMBOL: } "." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
 
 HELP: define-compound
 { $values { "word" word } { "def" quotation } }
-{ $description "Defines the word to call a quotation when executed." }
+{ $description "Defines the word to call a quotation when executed. This is the run-time equivalent of " { $link POSTPONE: : } "." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
 
 HELP: reset-props
@@ -340,6 +352,7 @@ HELP: define-temp
     "The following phrases are equivalent:"
     { $code "[ 2 2 + . ] call" }
     { $code "[ 2 2 + . ] define-temp execute" }
+    "This word must be called from inside " { $link with-compilation-unit } "."
 } ;
 
 HELP: quot-uses
@@ -382,3 +395,12 @@ HELP: define-inline
 { $values { "word" word } { "quot" quotation } }
 { $description "Defines a compound word and makes it " { $link POSTPONE: inline } "." }
 { $side-effects "word" } ;
+
+HELP: modify-code-heap ( alist -- )
+{ $values { "alist" "an alist" } }
+{ $description "Stores compiled code definitions in the code heap. The alist maps words to the following:"
+{ $list
+    { { $link f } " - in this case, the word is compiled with the non-optimizing compiler part of the VM." }
+    { { $snippet "{ code labels rel words literals profiler-prologue }" } " - in this case, a code heap block is allocated with the given data." }
+} }
+{ $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;
