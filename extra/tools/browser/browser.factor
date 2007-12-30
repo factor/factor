@@ -117,7 +117,7 @@ M: vocab-link summary vocab-summary ;
 : load-everything ( -- )
     all-vocabs-seq
     [ vocab-name dangerous? not ] subset
-    require-each ;
+    require-all ;
 
 : unrooted-child-vocabs ( prefix -- seq )
     dup empty? [ CHAR: . add ] unless
@@ -137,7 +137,7 @@ M: vocab-link summary vocab-summary ;
 
 : load-children ( prefix -- )
     all-child-vocabs values concat
-    require-each ;
+    require-all ;
 
 : vocab-status-string ( vocab -- string )
     {

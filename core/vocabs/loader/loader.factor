@@ -84,7 +84,7 @@ SYMBOL: load-help?
             [ vocab-docs path+ ?run-file ]
             [ ] [ docs-weren't-loaded ]
             cleanup
-        ] keep source-was-loaded
+        ] keep docs-were-loaded
     ] [
         2drop
     ] if ;
@@ -152,14 +152,14 @@ SYMBOL: load-help?
     dup update-roots
     dup modified-sources swap modified-docs ;
 
-: require-each ( seq -- )
+: require-all ( seq -- )
     [ [ require ] each ] with-compiler-errors ;
 
 : do-refresh ( modified-sources modified-docs -- )
     2dup
     [ f swap set-vocab-docs-loaded? ] each
     [ f swap set-vocab-source-loaded? ] each
-    append prune require-each ;
+    append prune require-all ;
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 
