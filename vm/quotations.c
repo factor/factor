@@ -246,6 +246,108 @@ void jit_compile(CELL quot)
 	UNREGISTER_ROOT(quot);
 }
 
+/* Crappy code duplication. If C had closures (not just function pointers)
+it would be easy to get rid of, but I can't think of a good way to deal
+with it right now that doesn't involve lots of boilerplate that would be
+worse than the duplication itself (eg, putting all state in some global
+struct.) */
+#define COUNT(name,scan) \
+	{ \
+		if(offset == 0) return scan - 1; \
+		offset -= array_capacity(code_to_emit(name)) * code_format; \
+	}
+
+F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
+{
+	CELL code_format = compiled_code_format();
+
+	CELL array = untag_quotation(quot)->array;
+
+	bool stack_frame = jit_stack_frame_p(untag_object(array));
+
+	if(stack_frame)
+		COUNT(JIT_PROLOG,0)
+
+	CELL i;
+	CELL length = array_capacity(untag_object(array));
+	bool tail_call = false;
+
+	for(i = 0; i < length; i++)
+	{
+		CELL obj = array_nth(untag_object(array),i);
+		F_WORD *word;
+
+		switch(type_of(obj))
+		{
+		case WORD_TYPE:
+			word = untag_object(obj);
+
+			if(i == length - 1)
+			{
+				if(stack_frame)
+					COUNT(JIT_EPILOG,i);
+
+				if(type_of(word->def) == FIXNUM_TYPE)
+					COUNT(JIT_WORD_PRIMITIVE_JUMP,i)
+				else
+					COUNT(JIT_WORD_JUMP,i)
+
+				tail_call = true;
+			}
+			else
+			{
+				if(type_of(word->def) == FIXNUM_TYPE)
+					COUNT(JIT_WORD_PRIMITIVE_CALL,i)
+				else
+					COUNT(JIT_WORD_CALL,i)
+			}
+			break;
+		case WRAPPER_TYPE:
+			COUNT(JIT_PUSH_LITERAL,i)
+			break;
+		case QUOTATION_TYPE:
+			if(jit_fast_if_p(untag_object(array),i))
+			{
+				if(stack_frame)
+					COUNT(JIT_EPILOG,i)
+
+				i += 2;
+
+				COUNT(JIT_IF_JUMP,i)
+
+				tail_call = true;
+				break;
+			}
+		case ARRAY_TYPE:
+			if(jit_fast_dispatch_p(untag_object(array),i))
+			{
+				if(stack_frame)
+					COUNT(JIT_EPILOG,i)
+
+				i++;
+
+				COUNT(JIT_DISPATCH,i)
+
+				tail_call = true;
+				break;
+			}
+		default:
+			COUNT(JIT_PUSH_LITERAL,i)
+			break;
+		}
+	}
+
+	if(!tail_call)
+	{
+		if(stack_frame)
+			COUNT(JIT_EPILOG,length)
+
+		COUNT(JIT_RETURN,length)
+	}
+
+	return -1;
+}
+
 F_FASTCALL CELL primitive_jit_compile(CELL quot, F_STACK_FRAME *stack)
 {
 	stack_chain->callstack_top = stack;
