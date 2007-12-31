@@ -11,19 +11,8 @@ IN: ui.tools.interactor
 TUPLE: interactor
 history output
 continuation quot busy?
-vars
+use
 help ;
-
-: interactor-use ( interactor -- seq )
-    use swap interactor-vars at ;
-
-: word-at-loc ( loc interactor -- word )
-    over [
-        [ gadget-model T{ one-word-elt } elt-string ] keep
-        interactor-use assoc-stack
-    ] [
-        2drop f
-    ] if ;
 
 : init-caret-help ( interactor -- )
     dup editor-caret 100 <delay> swap set-interactor-help ;
@@ -46,6 +35,14 @@ M: interactor graft*
 M: interactor ungraft*
     dup dup interactor-help remove-connection
     delegate ungraft* ;
+
+: word-at-loc ( loc interactor -- word )
+    over [
+        [ gadget-model T{ one-word-elt } elt-string ] keep
+        interactor-use assoc-stack
+    ] [
+        2drop f
+    ] if ;
 
 M: interactor model-changed
     2dup interactor-help eq? [
@@ -70,34 +67,36 @@ M: interactor model-changed
     t over set-interactor-busy?
     interactor-continuation schedule-thread-with ;
 
-: interactor-finish ( obj interactor -- )
+: interactor-finish ( interactor -- )
     [ editor-string ] keep
     [ interactor-input. ] 2keep
     [ add-interactor-history ] keep
-    dup gadget-model clear-doc
-    interactor-continue ;
-
-: interactor-eval ( interactor -- )
-    [
-        [ editor-string ] keep dup interactor-quot call
-    ] in-thread drop ;
+    gadget-model clear-doc ;
 
 : interactor-eof ( interactor -- )
-    f swap interactor-continue ;
+    dup interactor-busy? [
+        f over interactor-continue
+    ] unless drop ;
 
 : evaluate-input ( interactor -- )
-    dup interactor-busy? [ drop ] [ interactor-eval ] if ;
+    dup interactor-busy? [
+        [
+            [ control-value ] keep interactor-continue
+        ] in-thread
+    ] unless drop ;
 
-: interactor-yield ( interactor quot -- obj )
-    over set-interactor-quot
+: interactor-yield ( interactor -- obj )
     f over set-interactor-busy?
     [ set-interactor-continuation stop ] curry callcc1 ;
 
 M: interactor stream-readln
-    [ interactor-finish ] interactor-yield ;
+    [ interactor-yield ] keep interactor-finish first ;
 
 : interactor-call ( quot interactor -- )
-    2dup interactor-input. interactor-continue ;
+    dup interactor-busy? [
+        2dup interactor-input.
+        2dup interactor-continue
+    ] unless 2drop ;
 
 M: interactor stream-read
     swap dup zero? [
@@ -109,44 +108,41 @@ M: interactor stream-read
 M: interactor stream-read-partial
     stream-read ;
 
-: save-vars ( interactor -- )
-    { use in stdio lexer-factory } [ dup get ] H{ } map>assoc
-    swap set-interactor-vars ;
-
-: restore-vars ( interactor -- )
-    namespace swap interactor-vars update ;
+: save-use ( interactor -- )
+    use get swap set-interactor-use ;
 
 : go-to-error ( interactor error -- )
     dup parse-error-line 1- swap parse-error-col 2array
-    over [ gadget-model validate-loc ] keep
-    editor-caret set-model
+    over set-caret
     mark>caret ;
 
 : handle-parse-error ( interactor error -- )
     dup parse-error? [ 2dup go-to-error delegate ] when
     swap find-workspace debugger-popup ;
 
-: try-parse ( str interactor -- quot/error/f )
+: try-parse ( lines interactor -- quot/error/f )
     [
-        [
-            [ restore-vars parse ] keep save-vars
-        ] [
-            >r f swap set-interactor-busy? drop r>
-            dup delegate unexpected-eof? [ drop f ] when
-        ] recover
-    ] with-scope ;
+        >r parse-lines-interactive r> save-use
+    ] [
+        >r f swap set-interactor-busy? drop r>
+        dup delegate unexpected-eof? [ drop f ] when
+    ] recover ;
 
-: handle-interactive ( str/f interactor -- )
+: handle-interactive ( lines interactor -- quot/f ? )
     tuck try-parse {
-        { [ dup quotation? ] [ swap interactor-finish ] }
-        { [ dup not ] [ drop "\n" swap user-input ] }
-        { [ t ] [ handle-parse-error ] }
+        { [ dup quotation? ] [ nip t ] }
+        { [ dup not ] [ drop "\n" swap user-input f f ] }
+        { [ t ] [ handle-parse-error f f ] }
     } cond ;
 
 M: interactor stream-read-quot
-    [ save-vars ] keep
-    [ [ handle-interactive ] interactor-yield ] keep
-    restore-vars ;
+    [ save-use ] keep
+    [ interactor-yield ] keep over quotation? [
+        drop
+    ] [
+        [ handle-interactive ] keep swap
+        [ interactor-finish ] [ nip stream-read-quot ] if
+    ] if ;
 
 M: interactor pref-dim*
     0 over line-height 4 * 2array swap delegate pref-dim* vmax ;

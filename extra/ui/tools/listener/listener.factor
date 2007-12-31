@@ -96,8 +96,8 @@ M: listener-operation invoke-command ( target command -- )
     get-listener [ word-completion-string ] keep
     listener-gadget-input user-input ;
 
-: quot-action ( interactor -- quot )
-    dup editor-string swap
+: quot-action ( interactor -- lines )
+    dup control-value swap
     2dup add-interactor-history
     select-all ;
 

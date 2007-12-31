@@ -196,5 +196,5 @@ interactor
 "These commands operate on the entire contents of the input area."
 [ ]
 [ quot-action ]
-[ parse ]
+[ [ parse-lines ] with-compilation-unit ]
 define-operation-map

@@ -14,10 +14,11 @@ SYMBOL: listener-hook
 
 GENERIC: stream-read-quot ( stream -- quot/f )
 
+: parse-lines-interactive ( lines -- quot/f )
+    [ parse-lines in get ] with-compilation-unit in set ;
+
 : read-quot-step ( lines -- quot/f )
-    [
-        [ parse-lines in get ] with-compilation-unit in set
-    ] catch {
+    [ parse-lines-interactive ] catch {
         { [ dup delegate unexpected-eof? ] [ 2drop f ] }
         { [ dup not ] [ drop ] }
         { [ t ] [ rethrow ] }

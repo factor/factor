@@ -301,9 +301,6 @@ SYMBOL: lexer-factory
 : parse-lines ( lines -- quot )
     lexer-factory get call (parse-lines) ;
 
-: parse ( str -- quot )
-    [ string-lines parse-lines ] with-compilation-unit ;
-
 ! Parsing word utilities
 : parse-effect ( -- effect )
     ")" parse-tokens { "--" } split1 dup [
