@@ -81,11 +81,11 @@ IN: html.parser.analyzer
     ! ] if ;
 
 
-! clear "/Users/erg/web/fark.html" <file-reader> contents parse-html find-links [ "go.pl" swap start ] subset [ "=" split peek ] map
+! clear "/Users/erg/web/fark.html" file-contents parse-html find-links [ "go.pl" swap start ] subset [ "=" split peek ] map
 ! clear "http://fark.com" http-get parse-html find-links [ "go.pl" swap start ] subset [ "=" split peek ] map
 
-! clear "/Users/erg/web/hostels.html" <file-reader> contents parse-html "Currency" "name" pick find-first-attribute-key-value
+! clear "/Users/erg/web/hostels.html" file-contents parse-html "Currency" "name" pick find-first-attribute-key-value
 
-! clear "/Users/erg/web/hostels.html" <file-reader> contents parse-html
+! clear "/Users/erg/web/hostels.html" file-contents parse-html
 ! "Currency" "name" pick find-first-attribute-key-value
 ! pick find-between remove-blank-text

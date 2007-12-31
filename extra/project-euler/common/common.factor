@@ -74,6 +74,15 @@ PRIVATE>
 : sum-proper-divisors ( n -- sum )
     dup sum-divisors swap - ;
 
+: abundant? ( n -- ? )
+    dup sum-proper-divisors < ;
+
+: deficient? ( n -- ? )
+    dup sum-proper-divisors > ;
+
+: perfect? ( n -- ? )
+    dup sum-proper-divisors = ;
+
 ! The divisor function, counts the number of divisors
 : tau ( n -- n )
     prime-factorization* flip second 1 [ 1+ * ] reduce ;

@@ -38,12 +38,12 @@ IN: project-euler.067
 <PRIVATE
 
 : pyramid ( -- seq )
-  "resource:extra/project-euler/067/triangle.txt" ?resource-path <file-reader>
-  lines [ " " split [ string>number ] map ] map ;
+    "resource:extra/project-euler/067/triangle.txt" ?resource-path
+    <file-reader> lines [ " " split [ string>number ] map ] map ;
 
 PRIVATE>
 
-: euler067 ( -- best )
+: euler067 ( -- answer )
     pyramid propagate-all first first ;
 
 ! [ euler067 ] 100 ave-time

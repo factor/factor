@@ -1,4 +1,4 @@
-USING: cryptlib.libcl cryptlib prettyprint kernel alien sequences libc math 
+USING: cryptlib.libcl cryptlib prettyprint kernel alien sequences libc math
 tools.test io io.files continuations alien.c-types splitting generic.math ;
 
 "=========================================================" print
@@ -53,12 +53,12 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
         ! de-envelope
     CRYPT_FORMAT_AUTO [
         [ envelope-handle get-pop-buffer get-bytes-copied push-data ] [
-            dup CRYPT_ENVELOPE_RESOURCE = [ 
+            dup CRYPT_ENVELOPE_RESOURCE = [
                 envelope-handle CRYPT_ENVINFO_PASSWORD
-                "password" set-attribute-string 
-            ] [ 
+                "password" set-attribute-string
+            ] [
                 rethrow
-            ] if 
+            ] if
         ] recover drop
         get-bytes-copied .
         envelope-handle flush-data
@@ -124,17 +124,17 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
     ! de-envelope
     CRYPT_FORMAT_AUTO [
         [ envelope-handle get-pop-buffer get-bytes-copied push-data ] [
-            dup CRYPT_ENVELOPE_RESOURCE = [ 
+            dup CRYPT_ENVELOPE_RESOURCE = [
                 CRYPT_ALGO_IDEA create-context
                 context-handle CRYPT_CTXINFO_KEY "0123456789ABCDEF"
                 set-attribute-string
-                envelope-handle CRYPT_ENVINFO_SESSIONKEY context-handle *int 
+                envelope-handle CRYPT_ENVINFO_SESSIONKEY context-handle *int
                 set-attribute
-            ] [ 
-                rethrow 
-            ] if 
+            ] [
+                rethrow
+            ] if
         ] recover drop
-        
+
         get-bytes-copied .
         destroy-context
         envelope-handle flush-data
@@ -151,8 +151,8 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
 [
     ! envelope
     CRYPT_FORMAT_CRYPTLIB [
-        "extra/cryptlib/test/large_data.txt" resource-path <file-reader>
-        contents set-pop-buffer
+        "extra/cryptlib/test/large_data.txt" resource-path
+        file-contents set-pop-buffer
         envelope-handle CRYPT_ATTRIBUTE_BUFFERSIZE
         get-pop-buffer alien>char-string length 10000 + set-attribute
         envelope-handle CRYPT_ENVINFO_DATASIZE
@@ -175,9 +175,9 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
         envelope-handle get-bytes-copied pop-data
         get-bytes-copied .
         ! pop-buffer-string .
-        [ "/opt/local/lib/libcl.dylib(dylib1.o):" ] 
+        [ "/opt/local/lib/libcl.dylib(dylib1.o):" ]
         [ pop-buffer-string "\n" split first ] unit-test
-        [ "00000000 t __mh_dylib_header" ] 
+        [ "00000000 t __mh_dylib_header" ]
         [ pop-buffer-string "\n" split last/first first ] unit-test
     ] with-envelope
 ] with-cryptlib
@@ -192,7 +192,7 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
     CRYPT_FORMAT_CRYPTLIB [
         envelope-handle CRYPT_ENVINFO_PASSWORD "password" set-attribute-string
         "extra/cryptlib/test/large_data.txt" resource-path
-        <file-reader> contents set-pop-buffer
+        file-contents set-pop-buffer
         envelope-handle CRYPT_ATTRIBUTE_BUFFERSIZE
         get-pop-buffer alien>char-string length 10000 + set-attribute
         envelope-handle CRYPT_ENVINFO_DATASIZE
@@ -204,17 +204,17 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
         get-bytes-copied .
         pop-buffer-string .
     ] with-envelope
-    
+
     ! de-envelope
     CRYPT_FORMAT_AUTO [
         envelope-handle CRYPT_ATTRIBUTE_BUFFERSIZE 130000 set-attribute
         [ envelope-handle get-pop-buffer get-bytes-copied push-data ] [
-            dup CRYPT_ENVELOPE_RESOURCE = [ 
+            dup CRYPT_ENVELOPE_RESOURCE = [
                 envelope-handle CRYPT_ENVINFO_PASSWORD
                 "password" set-attribute-string
-            ] [ 
-                rethrow 
-            ] if 
+            ] [
+                rethrow
+            ] if
         ] recover drop
 
         get-bytes-copied .
@@ -226,7 +226,7 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
         [ "/opt/local/lib/libcl.dylib(dylib1.o):" ]
         [ pop-buffer-string "\n" split first ] unit-test
 
-        [ "00000000 t __mh_dylib_header" ] 
+        [ "00000000 t __mh_dylib_header" ]
         [ pop-buffer-string "\n" split last/first first ] unit-test
     ] with-envelope
 ] with-cryptlib
@@ -274,7 +274,7 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
                 check-certificate
                 add-public-key
                 f 0 CRYPT_CERTFORMAT_TEXT_CERTIFICATE export-certificate
-                get-cert-length *int dup malloc swap 
+                get-cert-length *int dup malloc swap
                 CRYPT_CERTFORMAT_TEXT_CERTIFICATE export-certificate
                 get-cert-buffer alien>char-string print
             ] with-certificate
@@ -295,15 +295,15 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
     ! ...
     ! <at> localhost's password: (any password will be accepted)
 
-    ! If you want to run the test again you should clean the [localhost]:3000 
-    ! ssh-rsa entry in the known_hosts file, in your home directory under the .ssh 
+    ! If you want to run the test again you should clean the [localhost]:3000
+    ! ssh-rsa entry in the known_hosts file, in your home directory under the .ssh
     ! folder, since the test generates a new RSA certificate on every run.
 
     [
         CRYPT_KEYSET_FILE "extra/cryptlib/test/keys.p15" resource-path
         CRYPT_KEYOPT_READONLY [
             CRYPT_KEYID_NAME "private key" "password" get-private-key
-        
+
             CRYPT_SESSION_SSH_SERVER [
 
                 session-handle CRYPT_SESSINFO_SERVER_NAME "localhost"
@@ -312,7 +312,7 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
                 session-handle CRYPT_SESSINFO_SERVER_PORT 3000 set-attribute
 
                 session-handle CRYPT_SESSINFO_PRIVATEKEY
-            
+
                 context-handle *int set-attribute
 
                 [ session-handle CRYPT_SESSINFO_ACTIVE 1 set-attribute ] [
@@ -328,9 +328,9 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
                         length push-data
 
                         session-handle flush-data
-                    ] [ 
-                        rethrow 
-                    ] if 
+                    ] [
+                        rethrow
+                    ] if
                 ] recover drop
             ] with-session
         ] with-keyset
