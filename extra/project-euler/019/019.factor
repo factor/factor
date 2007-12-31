@@ -1,6 +1,7 @@
-! Copyright (c) 2007 Samuel Tardieu.
+! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar combinators combinators.lib kernel math.ranges sequences ;
+USING: calendar combinators combinators.lib kernel math math.ranges namespaces
+    sequences ;
 IN: project-euler.019
 
 ! http://projecteuler.net/index.php?section=problems&id=19
@@ -12,17 +13,15 @@ IN: project-euler.019
 ! research for yourself.
 
 !     * 1 Jan 1900 was a Monday.
-!     * Thirty days has September,
-!       April, June and November.
-!       All the rest have thirty-one,
-!       Saving February alone,
-!       Which has twenty-eight, rain or shine.
-!       And on leap years, twenty-nine.
-!     * A leap year occurs on any year evenly divisible by 4, but not
-!       on a century unless it is divisible by 400.
+!     * Thirty days has September, April, June and November.  All the rest have
+!       thirty-one, Saving February alone, Which has twenty-eight, rain or
+!       shine.  And on leap years, twenty-nine.
+!     * A leap year occurs on any year evenly divisible by 4, but not on a
+!       century unless it is divisible by 400.
 
-! How many Sundays fell on the first of the month during the twentieth
-! century (1 Jan 1901 to 31 Dec 2000)?
+! How many Sundays fell on the first of the month during the twentieth century
+! (1 Jan 1901 to 31 Dec 2000)?
+
 
 ! SOLUTION
 ! --------
@@ -37,5 +36,35 @@ IN: project-euler.019
 
 ! [ euler019 ] 100 ave-time
 ! 1 ms run / 0 ms GC ave time - 100 trials
+
+
+! ALTERNATE SOLUTIONS
+! -------------------
+
+<PRIVATE
+
+: start-date ( -- timestamp )
+    1901 1 1 0 0 0 0 make-timestamp ;
+
+: end-date ( -- timestamp )
+    2000 12 31 0 0 0 0 make-timestamp ;
+
+: (first-days) ( end-date start-date -- )
+    2dup timestamp- 0 >= [
+        dup day-of-week , 1 +month (first-days)
+    ] [
+        2drop
+    ] if ;
+
+: first-days ( start-date end-date -- seq )
+    [ swap (first-days) ] { } make ;
+
+PRIVATE>
+
+: euler019a ( -- answer )
+    start-date end-date first-days [ zero? ] count ;
+
+! [ euler019a ] 100 ave-time
+! 131 ms run / 3 ms GC ave time - 100 trials
 
 MAIN: euler019
