@@ -339,6 +339,8 @@ DEFINE_PRIMITIVE(modify_code_heap)
 {
 	F_ARRAY *alist = untag_array(dpop());
 
+	bool rescan_code_heap = false;
+
 	CELL count = untag_fixnum_fast(alist->capacity);
 	CELL i;
 	for(i = 0; i < count; i++)
@@ -346,6 +348,10 @@ DEFINE_PRIMITIVE(modify_code_heap)
 		F_ARRAY *pair = untag_array(array_nth(alist,i));
 
 		F_WORD *word = untag_word(array_nth(pair,0));
+
+		if(word->vocabulary != F)
+			rescan_code_heap = true;
+
 		CELL data = array_nth(pair,1);
 
 		if(data == F)
@@ -395,6 +401,21 @@ DEFINE_PRIMITIVE(modify_code_heap)
 		}
 	}
 
-	if(count != 0)
+	/* If there were any interned words in the set, we relocate all XT
+	references in the entire code heap. But if all the words are
+	uninterned, it is impossible that other words reference them, so we
+	only have to relocate the new words. This makes compile-call much
+	more efficient */
+	if(rescan_code_heap)
 		iterate_code_heap(relocate_code_block);
+	else
+	{
+		for(i = 0; i < count; i++)
+		{
+			F_ARRAY *pair = untag_array(array_nth(alist,i));
+			F_WORD *word = untag_word(array_nth(pair,0));
+
+			iterate_code_heap_step(word->code,relocate_code_block);
+		}
+	}
 }

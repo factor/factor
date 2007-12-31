@@ -55,9 +55,7 @@ IN: compiler
     [ compiled? not ] subset recompile ;
 
 : compile-call ( quot -- )
-    H{ } clone changed-words [
-        define-temp dup 1array recompile
-    ] with-variable execute ;
+    [ define-temp ] with-compilation-unit execute ;
 
 : recompile-all ( -- )
     [ all-words recompile ] with-compiler-errors ;
