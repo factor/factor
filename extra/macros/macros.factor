@@ -2,18 +2,18 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: parser kernel sequences words effects inference.transforms
-       combinators assocs definitions quotations namespaces ;
+combinators assocs definitions quotations namespaces memoize ;
 
 IN: macros
 
-: (:)
+: (:) ( -- word definition effect-in )
     CREATE dup reset-generic parse-definition
     over "declared-effect" word-prop effect-in length ;
 
-: (MACRO:)
-    >r
-    2dup "macro" set-word-prop
-    2dup [ call ] append define-compound
+: (MACRO:) ( word definition effect-in -- )
+    >r 2dup "macro" set-word-prop
+    2dup over "declared-effect" word-prop memoize-quot
+    [ call ] append define-compound 
     r> define-transform ;
 
 : MACRO:
