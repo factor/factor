@@ -96,10 +96,10 @@ CONSULT: sequence-protocol tag tag-children ;
 INSTANCE: tag sequence
 
 M: tag like
-    over tag? [
+    over tag? [ drop ] [
         [ delegate ] keep tag-attrs
         rot dup [ V{ } like ] when <tag>
-    ] unless ;
+    ] if ;
 
 M: tag clone
     [ delegate clone ] keep [ tag-attrs clone ] keep

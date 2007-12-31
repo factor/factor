@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.miller-rabin ;
+USING: lazy-lists math math.primes ;
 IN: project-euler.007
 
 ! http://projecteuler.net/index.php?section=problems&id=7
@@ -18,12 +18,12 @@ IN: project-euler.007
 ! --------
 
 : nth-prime ( n -- n )
-    2 swap 1- [ next-prime ] times ;
+  1 - lprimes lnth ;
 
 : euler007 ( -- answer )
-    10001 nth-prime ;
+  10001 nth-prime ;
 
 ! [ euler007 ] time
-! 19230 ms run / 487 ms GC time
+! 22 ms run / 0 ms GC time
 
 MAIN: euler007

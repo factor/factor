@@ -1,7 +1,7 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files kernel math.parser namespaces project-euler.common sequences
-    splitting system vocabs ;
+USING: io io.files kernel math.parser namespaces project-euler.018
+    project-euler.common sequences splitting system vocabs ;
 IN: project-euler.067
 
 ! http://projecteuler.net/index.php?section=problems&id=67
@@ -32,9 +32,30 @@ IN: project-euler.067
 ! SOLUTION
 ! --------
 
+! Propagate from bottom to top the longest cumulative path as is done in
+! problem 18.
+
 <PRIVATE
 
-: (source-067) ( -- path )
+: pyramid ( -- seq )
+  "resource:extra/project-euler/067/triangle.txt" ?resource-path <file-reader>
+  lines [ " " split [ string>number ] map ] map ;
+
+PRIVATE>
+
+: euler067 ( -- best )
+    pyramid propagate-all first first ;
+
+! [ euler067 ] 100 ave-time
+! 18 ms run / 0 ms GC time
+
+
+! ALTERNATE SOLUTIONS
+! -------------------
+
+<PRIVATE
+
+: (source-067a) ( -- path )
     [
         "project-euler.067" vocab-root ?resource-path %
         os "windows" = [
@@ -44,18 +65,18 @@ IN: project-euler.067
         ] if
     ] "" make ;
 
-: source-067 ( -- triangle )
-    (source-067) <file-reader> lines [ " " split [ string>number ] map ] map ;
+: source-067a ( -- triangle )
+    (source-067a) <file-reader> lines [ " " split [ string>number ] map ] map ;
 
 PRIVATE>
 
-: euler067 ( -- answer )
-    source-067 max-path ;
+: euler067a ( -- answer )
+    source-067a max-path ;
 
-! [ euler067 ] 100 ave-time
+! [ euler067a ] 100 ave-time
 ! 15 ms run / 0 ms GC ave time - 100 trials
 
-! source-067 [ max-path ] curry 100 ave-time
+! source-067a [ max-path ] curry 100 ave-time
 ! 3 ms run / 0 ms GC ave time - 100 trials
 
-MAIN: euler067
+MAIN: euler067a
