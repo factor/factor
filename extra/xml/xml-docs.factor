@@ -7,14 +7,29 @@ strings sequences io ;
 HELP: string>xml
 { $values { "string" "a string" } { "xml" "an xml document" } }
 { $description "converts a string into an " { $link xml }
-    " datatype for further processing" }
-{ $see-also xml>string xml-reprint } ;
+    " datatype for further processing" } ;
+
+HELP: read-xml
+{ $values { "stream" "a stream that supports readln" }
+    { "xml" "an XML document" } }
+{ $description "exausts the given stream, reading an XML document from it" } ;
+
+HELP: file>xml
+{ $values { "filename" "a string representing a filename" }
+    { "xml" "an XML document" } }
+{ $description "opens the given file, reads it in as XML, closes the file and returns the corresponding XML tree" } ;
+
+{ string>xml read-xml file>xml } related-words
 
 HELP: xml>string
 { $values { "xml" "an xml document" } { "string" "a string" } }
 { $description "converts an xml document (" { $link xml } ") into a string" }
-{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
-{ $see-also string>xml xml-reprint write-xml } ;
+{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
+
+HELP: pprint-xml>string
+{ $values { "xml" "an xml document" } { "string" "a string" } }
+{ $description "converts an xml document (" { $link xml } ") into a string in a prettyprinted form." }
+{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
 
 HELP: xml-parse-error
 { $class-description "the exception class that all parsing errors in XML documents are in." } ;
@@ -22,20 +37,34 @@ HELP: xml-parse-error
 HELP: xml-reprint
 { $values { "string" "a string of XML" } }
 { $description "parses XML and prints it out again, for testing purposes" }
-{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
-{ $see-also write-xml xml>string string>xml } ;
+{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
 
 HELP: write-xml
 { $values { "xml" "an XML document" } }
 { $description "prints the contents of an XML document (" { $link xml } ") to stdio" }
-{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
-{ $see-also xml>string xml-reprint read-xml } ;
+{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
 
-HELP: read-xml
-{ $values { "stream" "a stream that supports readln" }
-    { "xml" "an XML document" } }
-{ $description "exausts the given stream, reading an XML document from it" }
-{ $see-also write-xml string>xml } ;
+HELP: print-xml
+{ $values { "xml" "an XML document" } }
+{ $description "prints the contents of an XML document (" { $link xml } ") to stdio, followed by a newline" }
+{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
+
+HELP: pprint-xml
+{ $values { "xml" "an XML document" } }
+{ $description "prints the contents of an XML document (" { $link xml } ") to stdio in a prettyprinted form." }
+{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
+
+HELP: pprint-xml-but
+{ $values { "xml" "an XML document" } { "sensitive-tags" "a sequence of names" } }
+{ $description "Prettyprints an XML document, leaving the whitespace of the tags with names in sensitive-tags intact." }
+{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
+
+HELP: pprint-xml>string-but
+{ $values { "xml" "an XML document" } { "sensitive-tags" "a sequence of names" } { "string" string } }
+{ $description "Prettyprints an XML document, returning the result as a string and leaving the whitespace of the tags with names in sensitive-tags intact." }
+{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
+
+{ xml>string print-xml write-xml pprint-xml xml-reprint pprint-xml>string pprint-xml>string-but pprint-xml-but } related-words
 
 HELP: PROCESS:
 { $syntax "PROCESS: word" }
@@ -318,26 +347,27 @@ HELP: with-html-entities
 { $description "calls the given quotation using HTML entity values" }
 { $see-also html-entities with-entities } ;
 
-HELP: file>xml
-{ $values { "filename" "a string representing a filename" }
-    { "xml" "an XML document" } }
-{ $description "opens the given file, reads it in as XML, closes the file and returns the corresponding XML tree" }
-{ $see-also string>xml read-xml } ;
-
-ARTICLE: { "xml" "basic" } "Basic words for XML processing"
-    "These are the most basic words needed for processing an XML document"
-    $nl
-    "Parsing XML:"
+ARTICLE: { "xml" "reading" } "Reading XML"
+    "The following words are used to read something into an XML document"
     { $subsection string>xml }
     { $subsection read-xml }
     { $subsection xml-chunk }
-    { $subsection file>xml }
-    "Printing XML"
-    { $subsection xml>string }
-    { $subsection write-xml }
+    { $subsection file>xml } ;
+
+ARTICLE: { "xml" "writing" } "Writing XML"
+    "These words are used in implementing prettyprint"
     { $subsection write-item }
     { $subsection write-chunk }
-    "Other"
+    "These words are used to print XML normally"
+    { $subsection xml>string }
+    { $subsection write-xml }
+    { $subsection print-xml }
+    "These words are used to prettyprint XML"
+    { $subsection pprint-xml>string }
+    { $subsection pprint-xml>string-but }
+    { $subsection pprint-xml }
+    { $subsection pprint-xml-but }
+    "This word reads and writes XML"
     { $subsection xml-reprint } ;
 
 ARTICLE: { "xml" "classes" } "XML data classes"
@@ -433,7 +463,8 @@ ARTICLE: { "xml" "intro" } "XML"
     "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress."
     $nl
     "The XML module was implemented by Daniel Ehrenberg, with contributions from the Factor community"
-    { $subsection { "xml" "basic" } }
+    { $subsection { "xml" "reading" } }
+    { $subsection { "xml" "writing" } }
     { $subsection { "xml" "classes" } }
     { $subsection { "xml" "construct" } }
     { $subsection { "xml" "utils" } }
