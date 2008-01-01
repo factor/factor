@@ -1,16 +1,16 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: inference.known-words
 USING: alien arrays bit-arrays byte-arrays classes
 combinators.private continuations.private effects float-arrays
-generic hashtables hashtables.private inference.backend
-inference.dataflow io io.backend io.files io.files.private
-io.streams.c kernel kernel.private math math.private memory
-namespaces namespaces.private parser prettyprint quotations
-quotations.private sbufs sbufs.private sequences
-sequences.private slots.private strings strings.private system
-threads.private tuples tuples.private vectors vectors.private
-words words.private assocs ;
+generic hashtables hashtables.private inference.state
+inference.backend inference.dataflow io io.backend io.files
+io.files.private io.streams.c kernel kernel.private math
+math.private memory namespaces namespaces.private parser
+prettyprint quotations quotations.private sbufs sbufs.private
+sequences sequences.private slots.private strings
+strings.private system threads.private tuples tuples.private
+vectors vectors.private words words.private assocs ;
+IN: inference.known-words
 
 ! Shuffle words
 : infer-shuffle-inputs ( shuffle node -- )

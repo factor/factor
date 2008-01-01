@@ -1,3 +1,5 @@
+! Copyright (C) 2007, 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: compiler cpu.architecture vocabs.loader system sequences
 namespaces parser kernel kernel.private classes classes.private
 arrays hashtables vectors tuples sbufs inference.dataflow
@@ -59,6 +61,8 @@ nl
     hashcode* = get set
 } compile
 
+"." write flush
+
 {
     . lines
 } compile
@@ -69,7 +73,6 @@ nl
     malloc free memcpy
 } compile
 
-" done" print
-nl
+[ compiled-usages recompile ] recompile-hook set-global
 
-[ recompile ] recompile-hook set-global
+" done" print flush

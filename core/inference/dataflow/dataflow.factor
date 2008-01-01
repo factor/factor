@@ -1,11 +1,9 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: arrays generic assocs kernel math namespaces parser
+sequences words vectors math.intervals effects classes
+inference.state ;
 IN: inference.dataflow
-USING: arrays generic assocs kernel math
-namespaces parser sequences words vectors math.intervals
-effects classes ;
-
-SYMBOL: recursive-state
 
 ! Computed value
 : <computed> \ <computed> counter ;
@@ -30,19 +28,7 @@ TUPLE: composed quot1 quot2 ;
 
 C: <composed> composed
 
-SYMBOL: d-in
-SYMBOL: meta-d
-SYMBOL: meta-r
-
 UNION: special curried composed ;
-
-: push-d meta-d get push ;
-: pop-d meta-d get pop ;
-: peek-d meta-d get peek ;
-
-: push-r meta-r get push ;
-: pop-r meta-r get pop ;
-: peek-r meta-r get peek ;
 
 TUPLE: node param
 in-d out-d in-r out-r
@@ -184,9 +170,6 @@ UNION: #branch #if #dispatch ;
     tuck
     >r r-tail flatten-curries r> set-node-out-r
     >r d-tail flatten-curries r> set-node-out-d ;
-
-SYMBOL: dataflow-graph
-SYMBOL: current-node
 
 : node, ( node -- )
     dataflow-graph get [

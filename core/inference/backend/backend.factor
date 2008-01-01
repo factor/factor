@@ -1,10 +1,10 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: inference.dataflow inference.state arrays generic io
+io.streams.string kernel math namespaces parser prettyprint
+sequences strings vectors words quotations effects classes
+continuations debugger assocs combinators compiler.errors ;
 IN: inference.backend
-USING: inference.dataflow arrays generic io io.streams.string
-kernel math namespaces parser prettyprint sequences
-strings vectors words quotations effects classes continuations
-debugger assocs combinators compiler.errors ;
 
 : recursive-label ( word -- label/f )
     recursive-state get at ;
@@ -57,13 +57,9 @@ M: object value-literal \ literal-expected inference-warning ;
 : ensure-values ( seq -- )
     meta-d [ add-inputs ] change d-in [ + ] change ;
 
-SYMBOL: terminated?
-
 : current-effect ( -- effect )
     d-in get meta-d get length <effect>
     terminated? get over set-effect-terminated? ;
-
-SYMBOL: recorded
 
 : init-inference ( -- )
     terminated? off
@@ -340,6 +336,7 @@ TUPLE: unbalanced-branches-error quots in out ;
         recursive-label #call-label [ consume/produce ] keep
         set-node-in-d
     ] [
+        dup depends-on
         over effect-in length reify-curries
         #call consume/produce
     ] if ;
@@ -370,6 +367,7 @@ TUPLE: effect-error word effect ;
 : infer-compound ( word -- effect )
     [
         init-inference
+        dependencies off
         dup word-def over dup infer-quot-recursive
         finish-word
         current-effect
@@ -446,7 +444,8 @@ M: #call-label collect-recursion*
     [ swap [ at ] curry map ] keep
     [ set ] 2each ;
 
-: inline-closure ( word -- )
+: inline-word ( word -- )
+    dup depends-on
     dup inline-block over recursive-label? [
         flatten-meta-d >r
         drop join-values inline-block apply-infer
@@ -462,7 +461,7 @@ M: #call-label collect-recursion*
 M: compound apply-object
     [
         dup inline-recursive-label
-        [ declared-infer ] [ inline-closure ] if
+        [ declared-infer ] [ inline-word ] if
     ] [
         dup recursive-label
         [ declared-infer ] [ apply-word ] if

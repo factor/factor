@@ -1,7 +1,25 @@
 USING: compiler definitions generic assocs inference math
 namespaces parser tools.test words kernel sequences arrays io
-effects tools.test.inference ;
+effects tools.test.inference words.private ;
 IN: temporary
+
+DEFER: x-1
+DEFER: x-2
+
+[ [ f ] { } map>assoc modify-code-heap ] recompile-hook [
+    "IN: temporary USE: math GENERIC: x-1 ( x -- y ) M: integer x-1 ;" eval
+    "IN: temporary : x-2 3 x-1 ;" eval
+
+    [ t ] [
+        { x-2 } compile
+
+        \ x-2 word-xt
+
+        { x-1 } compile
+
+        \ x-2 word-xt eq?
+    ] unit-test
+] with-variable
 
 DEFER: b
 DEFER: c
@@ -49,3 +67,79 @@ DEFER: c
 [ ] [ "IN: temporary : d 4 ; inline" eval ] unit-test
 
 [ 4 4 ] [ "USE: temporary e" eval ] unit-test
+
+DEFER: x-3
+
+[ ] [ "IN: temporary : x-3 3 ;" eval ] unit-test
+
+DEFER: x-4
+
+[ ] [ "IN: temporary : x-4 x-3 ;" eval ] unit-test
+
+[ t ] [ \ x-4 compiled? ] unit-test
+
+[ ] [ "IN: temporary USE: sequences : x-3 { } [ ] each ;" eval ] unit-test
+
+[ f ] [ \ x-3 compiled? ] unit-test
+
+[ f ] [ \ x-4 compiled? ] unit-test
+
+[ ] [ "IN: temporary USING: kernel sequences ; : x-3 { } [ drop ] each ;" eval ] unit-test
+
+[ t ] [ \ x-3 compiled? ] unit-test
+
+[ t ] [ \ x-4 compiled? ] unit-test
+
+[ t ] [ \ x-3 "compiled-uses" word-prop >boolean ] unit-test
+
+[ t ] [ \ x-3 "compiled-uses" word-prop [ interned? ] all? ] unit-test
+
+DEFER: g-test-1
+
+DEFER: g-test-3
+
+[ ] [ "IN: temporary USE: math GENERIC: g-test-1 ( x -- y ) M: integer g-test-1 sq ;" eval ] unit-test
+
+[ ] [ "IN: temporary : g-test-2 ( -- y ) 3 g-test-1 ;" eval ] unit-test
+
+[ ] [ "IN: temporary : g-test-3 ( -- y ) g-test-2 ;" eval ] unit-test
+
+[ 25 ] [ 5 g-test-1 ] unit-test
+
+[ ] [ "IN: temporary USE: math GENERIC: g-test-1 ( x -- y ) M: integer g-test-1 ;" eval ] unit-test
+
+[ 5 ] [ 5 g-test-1 ] unit-test
+
+[ t ] [
+    \ g-test-3 word-xt
+
+    "IN: temporary USE: math GENERIC: g-test-1 ( x -- y ) M: integer g-test-1 3 + ;" eval
+
+    \ g-test-3 word-xt eq?
+] unit-test
+
+DEFER: g-test-5
+
+[ ] [ "IN: temporary : g-test-4 ( -- y ) 3 g-test-1 ; inline" eval ] unit-test
+
+[ ] [ "IN: temporary : g-test-5 ( -- y ) g-test-4 ;" eval ] unit-test
+
+[ 6 ] [ g-test-5 ] unit-test
+
+[ ] [ "IN: temporary USE: math GENERIC: g-test-1 ( x -- y ) M: integer g-test-1 10 + ;" eval ] unit-test
+
+[ 13 ] [ g-test-5 ] unit-test
+
+DEFER: g-test-6
+
+[ ] [ "IN: temporary USING: arrays kernel ; GENERIC: g-test-6 ( x -- y ) M: array g-test-6 drop 123 g-test-1 ;" eval ] unit-test
+
+DEFER: g-test-7
+
+[ ] [ "IN: temporary : g-test-7 { } g-test-6 ;" eval ] unit-test
+
+[ 133 ] [ g-test-7 ] unit-test
+
+[ ] [ "IN: temporary USE: math GENERIC: g-test-1 ( x -- y ) M: integer g-test-1 15 + ;" eval ] unit-test
+
+[ 138 ] [ g-test-7 ] unit-test

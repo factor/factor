@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: inference
-USING: inference.backend inference.dataflow
+USING: inference.backend inference.state inference.dataflow
 inference.known-words inference.transforms inference.errors
 sequences prettyprint io effects kernel namespaces quotations
 words vocabs ;
+IN: inference
 
 GENERIC: infer ( quot -- effect )
 

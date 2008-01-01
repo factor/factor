@@ -1,36 +1,63 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces arrays sequences io inference.backend
-generator debugger math.parser prettyprint words words.private
-continuations vocabs assocs alien.compiler dlists optimizer
-definitions math compiler.errors threads ;
+inference.state generator debugger math.parser prettyprint words
+words.private continuations vocabs assocs alien.compiler dlists
+optimizer definitions math compiler.errors threads graphs
+generic ;
 IN: compiler
 
-: compiled-usage ( word -- seq )
-    #! XXX
-    usage [ word? ] subset ;
+SYMBOL: compiled-crossref
 
-: ripple-up ( word effect -- )
-    over "compiled-effect" word-prop =
-    [ drop ] [
-        compiled-usage
-        [ "was-compiled" word-prop ] subset
-        [ queue-compile ] each
-    ] if ;
+compiled-crossref global [ H{ } assoc-like ] change-at
+
+: compiled-xref ( word dependencies -- )
+    2dup "compiled-uses" set-word-prop
+    compiled-crossref get add-vertex ;
+
+: compiled-unxref ( word -- )
+    dup "compiled-uses" word-prop
+    compiled-crossref get remove-vertex ;
+
+: compiled-usage ( word -- seq )
+    compiled-crossref get at keys ;
+
+: compiled-usages ( words -- seq )
+    compiled-crossref get [
+        [
+            over dup set
+            over "inline" word-prop pick generic? or
+            [ at namespace swap update ] [ 2drop ] if
+        ] curry each
+    ] H{ } make-assoc keys ;
+
+: ripple-up ( word -- )
+    compiled-usage [ queue-compile ] each ;
 
 : save-effect ( word effect -- )
-    over t "was-compiled" set-word-prop
+    over "compiled-uses" word-prop [
+        2dup swap "compiled-effect" word-prop =
+        [ over ripple-up ] unless
+    ] when
     "compiled-effect" set-word-prop ;
 
-: (compile) ( word -- )
+: finish-compile ( word effect dependencies -- )
+    >r dupd save-effect r> over compiled-unxref compiled-xref ;
+
+: compile-succeeded ( word -- effect dependencies )
     [
-        dup word-dataflow optimize >r over dup r> generate
-    ] [
-        dup inference-error? [ rethrow ] unless
-        over compiler-error f over compiled get set-at f
-    ] recover
-    2drop ;
-!    2dup ripple-up save-effect ;
+        dup word-dataflow >r swap dup r> optimize generate
+    ] computing-dependencies ;
+
+: compile-failed ( word error -- )
+    dup inference-error? [ rethrow ] unless
+    f pick compiled get set-at
+    swap compiler-error ;
+
+: (compile) ( word -- )
+    [ dup compile-succeeded finish-compile ]
+    [ dupd compile-failed f save-effect ]
+    recover ;
 
 : delete-any ( assoc -- element )
     [ [ 2drop t ] assoc-find 2drop dup ] keep delete-at ;
@@ -55,7 +82,9 @@ IN: compiler
     [ compiled? not ] subset recompile ;
 
 : compile-call ( quot -- )
-    [ define-temp ] with-compilation-unit execute ;
+    H{ } clone changed-words
+    [ define-temp dup 1array compile ] with-variable
+    execute ;
 
 : recompile-all ( -- )
     [ all-words recompile ] with-compiler-errors ;

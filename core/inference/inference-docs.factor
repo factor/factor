@@ -1,6 +1,6 @@
 USING: help.syntax help.markup kernel sequences words io
 effects inference.dataflow inference.backend
-math combinators inference.transforms ;
+math combinators inference.transforms inference.state ;
 IN: inference
 
 ARTICLE: "inference-simple" "Straight-line stack effects"
