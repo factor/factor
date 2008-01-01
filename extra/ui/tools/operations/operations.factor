@@ -5,7 +5,7 @@ ui.tools.interactor ui.tools.listener ui.tools.profiler
 ui.tools.search ui.tools.traceback ui.tools.workspace generic
 help.topics inference inspector io.files io.styles kernel
 namespaces parser prettyprint quotations tools.annotations
-editors tools.profiler tools.test tools.time tools.walker
+editors tools.profiler tools.test tools.time tools.interpreter
 ui.commands ui.gadgets.editors ui.gestures ui.operations
 ui.tools.deploy vocabs vocabs.loader words sequences
 tools.browser classes ;

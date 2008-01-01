@@ -9,6 +9,5 @@ USING: vocabs.loader sequences ;
     "tools.profiler"
     "tools.test"
     "tools.time"
-    "tools.walker"
     "editors"
 } [ require ] each

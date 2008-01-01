@@ -1,5 +1,5 @@
 USING: editors help.markup help.syntax inspector io listener
-parser prettyprint tools.profiler tools.walker ui.commands
+parser prettyprint tools.profiler tools.interpreter ui.commands
 ui.gadgets.editors ui.gadgets.panes ui.gadgets.presentations
 ui.gadgets.slots ui.operations ui.tools.browser
 ui.tools.interactor ui.tools.listener ui.tools.operations
