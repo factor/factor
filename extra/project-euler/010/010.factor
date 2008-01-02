@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer, Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.primes sequences ;
+USING: kernel math.primes sequences ;
 IN: project-euler.010
 
 ! http://projecteuler.net/index.php?section=problems&id=10
@@ -16,10 +16,8 @@ IN: project-euler.010
 ! SOLUTION
 ! --------
 
-! Summing of prime numbers
-
 : euler010 ( -- answer )
-  1000000 primes-upto sum ;
+    1000000 primes-upto sum ;
 
 ! [ euler010 ] 100 ave-time
 ! 14 ms run / 0 ms GC ave time - 100 trials

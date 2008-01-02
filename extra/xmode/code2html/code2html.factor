@@ -1,6 +1,5 @@
-USING: xmode.tokens xmode.marker
-xmode.catalog kernel html html.elements io io.files
-sequences words ;
+USING: xmode.tokens xmode.marker xmode.catalog kernel html html.elements io
+    io.files sequences words ;
 IN: xmode.code2html
 
 : htmlize-tokens ( tokens -- )
@@ -21,7 +20,7 @@ IN: xmode.code2html
 : default-stylesheet ( -- )
     <style>
         "extra/xmode/code2html/stylesheet.css"
-        resource-path <file-reader> contents write
+        resource-path file-contents write
     </style> ;
 
 : htmlize-stream ( path stream -- )

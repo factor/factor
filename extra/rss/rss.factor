@@ -85,22 +85,26 @@ C: <entry> entry
     ] if ;
 
 ! Atom generation
+: simple-tag, ( content name -- )
+    [ , ] tag, ;
+
+: simple-tag*, ( content name attrs -- )
+    [ , ] tag*, ;
+
 : entry, ( entry -- )
-    << entry >> [
-        << title >> [ dup entry-title , ]
-        << link [ dup entry-link ] == href // >>
-        << published >> [ dup entry-pub-date , ]
-        << content >> [ entry-description , ]
-    ] ;
+    "entry" [
+        dup entry-title "title" { { "type" "html" } } simple-tag*,
+        "link" over entry-link "href" associate contained*,
+        dup entry-pub-date "published" simple-tag,
+        entry-description [ "content" { { "type" "html" } } simple-tag*, ] when*
+    ] tag, ;
 
 : feed>xml ( feed -- xml )
-    <XML
-        << feed [ "http://www.w3.org/2005/Atom" ] == xmlns >> [
-            << title >> [ dup feed-title , ]
-            << link [ dup feed-link ] == href // >>
-            feed-entries [ entry, ] each
-        ]
-    XML> ;
+    "feed" { { "xmlns" "http://www.w3.org/2005/Atom" } } [
+        dup feed-title "title" simple-tag,
+        "link" over feed-link "href" associate contained*,
+        feed-entries [ entry, ] each
+    ] make-xml* ;
 
 : write-feed ( feed -- )
     feed>xml write-xml ;

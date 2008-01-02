@@ -82,7 +82,7 @@ DEFER: <% delimiter
             templating-vocab use+
             dup source-file file set ! so that reload works properly
             [
-                ?resource-path <file-reader> contents
+                ?resource-path file-contents
                 [ eval-template ] [ html-error. drop ] recover
             ] keep
         ] with-scope

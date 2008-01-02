@@ -1,8 +1,11 @@
 USING: arrays kernel hashtables math math.functions math.miller-rabin
-    math.ranges namespaces sequences combinators.lib ;
+    math.parser math.ranges namespaces sequences combinators.lib ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution.
+
+: nth-pair ( n seq -- nth next )
+    over 1+ over nth >r nth r> ;
 
 <PRIVATE
 
@@ -12,6 +15,9 @@ IN: project-euler.common
 : shift-3rd ( seq obj obj -- seq obj obj )
     rot 1 tail -rot ;
 
+: max-children ( seq -- seq )
+    [ dup length 1- [ over nth-pair max , ] each ] { } make nip ;
+
 : >multiplicity ( seq -- seq )
     dup prune [
         [ 2dup [ = ] curry count 2array , ] each
@@ -20,22 +26,28 @@ IN: project-euler.common
 : reduce-2s ( n -- r s )
     dup even? [ factor-2s >r 1+ r> ] [ 1 swap ] if ;
 
-: tau-limit ( n -- n )
-    sqrt floor >fixnum ;
-
 PRIVATE>
-
-
-: divisor? ( n m -- ? )
-    mod zero? ;
-
-: perfect-square? ( n -- ? )
-    dup sqrt mod zero? ;
 
 : collect-consecutive ( seq width -- seq )
     [
         2dup count-shifts [ 2dup head shift-3rd , ] times
     ] { } make 2nip ;
+
+: divisor? ( n m -- ? )
+    mod zero? ;
+
+: max-path ( triangle -- n )
+    dup length 1 > [
+        2 cut* first2 max-children [ + ] 2map add max-path
+    ] [
+        first first
+    ] if ;
+
+: number>digits ( n -- seq )
+    number>string string>digits ;
+
+: perfect-square? ( n -- ? )
+    dup sqrt divisor? ;
 
 : prime-factorization ( n -- seq )
     [
@@ -50,12 +62,34 @@ PRIVATE>
 : prime-factors ( n -- seq )
     prime-factorization prune >array ;
 
+: (sum-divisors) ( n -- sum )
+    dup sqrt >fixnum [1,b] [
+        [ 2dup divisor? [ 2dup / + , ] [ drop ] if ] each
+        dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
+    ] { } make sum ;
+
+: sum-divisors ( n -- sum )
+    dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;
+
+: sum-proper-divisors ( n -- sum )
+    dup sum-divisors swap - ;
+
+: abundant? ( n -- ? )
+    dup sum-proper-divisors < ;
+
+: deficient? ( n -- ? )
+    dup sum-proper-divisors > ;
+
+: perfect? ( n -- ? )
+    dup sum-proper-divisors = ;
+
 ! The divisor function, counts the number of divisors
 : tau ( n -- n )
     prime-factorization* flip second 1 [ 1+ * ] reduce ;
 
 ! Optimized brute-force, is often faster than prime factorization
 : tau* ( n -- n )
-    reduce-2s [ perfect-square? -1 0 ? ] keep dup tau-limit [1,b] [
+    reduce-2s [ perfect-square? -1 0 ? ] keep
+    dup sqrt >fixnum [1,b] [
         dupd divisor? [ >r 2 + r> ] when
     ] each drop * ;
