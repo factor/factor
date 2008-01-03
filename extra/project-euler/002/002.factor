@@ -20,13 +20,13 @@ IN: project-euler.002
 ! --------
 
 : last2 ( seq -- elt last )
-    reverse first2 swap ;
+    2 tail* first2 ;
 
-: fib-up-to ( n -- seq )
+: fib-upto ( n -- seq )
     { 0 } 1 [ pick dupd < ] [ add dup last2 + ] [ ] while drop nip ;
 
 : euler002 ( -- answer )
-    1000000 fib-up-to [ even? ] subset sum ;
+    1000000 fib-upto [ even? ] subset sum ;
 
 ! [ euler002 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials
