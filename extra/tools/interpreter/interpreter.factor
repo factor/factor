@@ -41,10 +41,10 @@ M: pair restore
     dup "step-into" word-prop [
         call
     ] [
-        dup compound? [
-            word-def walk
-        ] [
+        dup primitive? [
             execute break
+        ] [
+            word-def walk
         ] if
     ] ?if ;
 

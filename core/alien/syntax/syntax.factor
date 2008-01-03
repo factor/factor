@@ -49,7 +49,7 @@ PRIVATE>
 : C-ENUM:
     ";" parse-tokens
     dup length
-    [ >r create-in r> 1quotation define-compound ] 2each ;
+    [ >r create-in r> 1quotation define ] 2each ;
     parsing
 
 M: alien pprint*

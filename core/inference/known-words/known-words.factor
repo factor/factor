@@ -9,7 +9,7 @@ math.private memory namespaces namespaces.private parser
 prettyprint quotations quotations.private sbufs sbufs.private
 sequences sequences.private slots.private strings
 strings.private system threads.private tuples tuples.private
-vectors vectors.private words words.private assocs ;
+vectors vectors.private words words.private assocs inspector ;
 IN: inference.known-words
 
 ! Shuffle words
@@ -577,3 +577,5 @@ t over set-effect-terminated?
 \ set-innermost-frame-quot { quotation callstack } { } <effect> "inferred-effect" set-word-prop
 
 \ (os-envs) { } { array } <effect> "inferred-effect" set-word-prop
+
+\ do-primitive [ \ do-primitive no-effect ] "infer" set-word-prop

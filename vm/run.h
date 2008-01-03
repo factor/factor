@@ -35,8 +35,8 @@ typedef enum {
 	/* Used by the JIT compiler */
 	JIT_CODE_FORMAT     = 22,
 	JIT_PROLOG,
-	JIT_WORD_PRIMITIVE_JUMP,
-	JIT_WORD_PRIMITIVE_CALL,
+	JIT_PRIMITIVE_WORD,
+	JIT_PRIMITIVE,
 	JIT_WORD_JUMP,
 	JIT_WORD_CALL,
 	JIT_PUSH_LITERAL,
@@ -46,9 +46,9 @@ typedef enum {
 	JIT_DISPATCH,
 	JIT_EPILOG,
 	JIT_RETURN,
+	JIT_PROFILING,
 
 	UNDEFINED_ENV       = 37, /* default quotation for undefined words */
-	PROFILING_ENV       = 38, /* is the profiler on? */
 	STAGE2_ENV          = 39  /* have we bootstrapped? */
 } F_ENVTYPE;
 
@@ -220,9 +220,6 @@ DECLARE_PRIMITIVE(to_r);
 DECLARE_PRIMITIVE(from_r);
 DECLARE_PRIMITIVE(datastack);
 DECLARE_PRIMITIVE(retainstack);
-
-void default_word_xt(F_WORD *word);
-
 DECLARE_PRIMITIVE(execute);
 DECLARE_PRIMITIVE(call);
 DECLARE_PRIMITIVE(getenv);

@@ -26,18 +26,19 @@ $nl
 { $subsection gensym }
 { $subsection define-temp } ;
 
-ARTICLE: "colon-definition" "Compound definitions"
-"A compound definition associates a word name with a quotation that is called when the word is executed."
-{ $subsection compound }
-{ $subsection compound? }
-"Defining compound words at parse time:"
+ARTICLE: "colon-definition" "Word definitions"
+"Every word has an associated quotation definition that is called when the word is executed."
+$nl
+"Defining words at parse time:"
 { $subsection POSTPONE: : }
 { $subsection POSTPONE: ; }
-"Defining compound words at run time:"
-{ $subsection define-compound }
+"Defining words at run time:"
+{ $subsection define }
 { $subsection define-declared }
 { $subsection define-inline }
-"Compound definitions should declare their stack effect, unless the definition is completely trivial. See " { $link "effect-declaration" } "." ;
+"Word definitions should declare their stack effect, unless the definition is completely trivial. See " { $link "effect-declaration" } "."
+$nl
+"All other types of word definitions, such as " { $link "symbols" } " and " { $link "generic" } ", are just special cases of the above." ;
 
 ARTICLE: "symbols" "Symbols"
 "A symbol pushes itself on the stack when executed. By convention, symbols are used as variable names (" { $link "namespaces" } ")."
@@ -46,7 +47,12 @@ ARTICLE: "symbols" "Symbols"
 "Defining symbols at parse time:"
 { $subsection POSTPONE: SYMBOL: }
 "Defining symbols at run time:"
-{ $subsection define-symbol } ;
+{ $subsection define-symbol }
+"Symbols are just compound definitions in disguise. The following two lines are equivalent:"
+{ $code
+    "SYMBOL: foo"
+    ": foo \\ foo ;"
+} ;
 
 ARTICLE: "primitives" "Primitives"
 "Primitives are words defined in the Factor VM. They provide the essential low-level services to the rest of the system."
@@ -54,11 +60,20 @@ ARTICLE: "primitives" "Primitives"
 { $subsection primitive? } ;
 
 ARTICLE: "deferred" "Deferred words and mutual recursion"
-"Words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. This is done to simplify the implementation, facilitate better parse time checking and remove some odd corner cases; it also encourages better coding style. Sometimes this restriction gets in the way, for example when defining mutually-recursive words; one way to get around this limitation is to make a forward definition."
+"Words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. This is done to simplify the implementation, facilitate better parse time checking and remove some odd corner cases; it also encourages better coding style."
+$nl
+"Sometimes this restriction gets in the way, for example when defining mutually-recursive words; one way to get around this limitation is to make a forward definition."
 { $subsection POSTPONE: DEFER: }
-"The class of forward word definitions:"
+"The class of deferred word definitions:"
 { $subsection deferred }
-{ $subsection deferred? } ;
+{ $subsection deferred? }
+"Deferred words throw an error when called:"
+{ $subsection undefined }
+"Deferred words are just compound definitions in disguise. The following two lines are equivalent:"
+{ $code
+    "DEFER: foo"
+    ": foo undefined ;"
+} ;
 
 ARTICLE: "declarations" "Declarations"
 "Declarations give special behavior to a word. Declarations are parsing words that set a word property in the most recently defined word."
@@ -155,13 +170,15 @@ ARTICLE: "word.private" "Word implementation details"
 { $subsection modify-code-heap } ;
 
 ARTICLE: "words" "Words"
-"Words are the Factor equivalent of functions or procedures; a word is a body of code with a unique name and some additional meta-data. Words are defined in the " { $vocab-link "words" } " vocabulary."
+"Words are the Factor equivalent of functions or procedures; a word is essentially a named quotation."
+$nl
+"Word introspection facilities and implementation details are found in the " { $vocab-link "words" } " vocabulary."
 $nl
 "A word consists of several parts:"
 { $list
     "a word name,"
     "a vocabulary name,"
-    "a definition, specifying the behavior of the word when executed,"
+    "a definition quotation, called when the word when executed,"
     "a set of word properties, including documentation and other meta-data."
 }
 "Words are instances of a class."
@@ -212,9 +229,6 @@ HELP: deferred
 
 { deferred POSTPONE: DEFER: } related-words
 
-HELP: compound
-{ $description "The class of compound words created by " { $link POSTPONE: : } "." } ;
-
 HELP: primitive
 { $description "The class of primitive words." } ;
 
@@ -239,20 +253,13 @@ HELP: word-xt
 { $values { "word" word } { "xt" "an execution token integer" } }
 { $description "Outputs the machine code address of the word's definition." } ;
 
-HELP: define
-{ $values { "word" word } { "def" object } }
-{ $description "Defines a word and updates cross-referencing." }
-$low-level-note
-{ $side-effects "word" }
-{ $see-also define-symbol define-compound } ;
-
 HELP: define-symbol
 { $values { "word" word } }
 { $description "Defines the word to push itself on the stack when executed. This is the run time equivalent of " { $link POSTPONE: SYMBOL: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
 
-HELP: define-compound
+HELP: define
 { $values { "word" word } { "def" quotation } }
 { $description "Defines the word to call a quotation when executed. This is the run time equivalent of " { $link POSTPONE: : } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
@@ -342,7 +349,7 @@ HELP: parsing?
 
 HELP: define-declared
 { $values { "word" word } { "def" quotation } { "effect" effect } }
-{ $description "Defines a compound word and declares its stack effect." }
+{ $description "Defines a word and declares its stack effect." }
 { $side-effects "word" } ;
 
 HELP: define-temp
@@ -393,7 +400,7 @@ HELP: make-inline
 
 HELP: define-inline
 { $values { "word" word } { "quot" quotation } }
-{ $description "Defines a compound word and makes it " { $link POSTPONE: inline } "." }
+{ $description "Defines a word and makes it " { $link POSTPONE: inline } "." }
 { $side-effects "word" } ;
 
 HELP: modify-code-heap ( alist -- )
@@ -401,6 +408,6 @@ HELP: modify-code-heap ( alist -- )
 { $description "Stores compiled code definitions in the code heap. The alist maps words to the following:"
 { $list
     { { $link f } " - in this case, the word is compiled with the non-optimizing compiler part of the VM." }
-    { { $snippet "{ code labels rel words literals profiler-prologue }" } " - in this case, a code heap block is allocated with the given data." }
+    { { $snippet "{ code labels rel words literals }" } " - in this case, a code heap block is allocated with the given data." }
 } }
 { $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;

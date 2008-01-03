@@ -12,7 +12,6 @@ IN: bootstrap.compiler
 
 "-no-stack-traces" cli-args member? [
     f compiled-stack-traces? set-global
-    0 profiler-prologue set-global
 ] when
 
 nl

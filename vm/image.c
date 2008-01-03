@@ -175,28 +175,12 @@ DEFINE_PRIMITIVE(save_image_and_exit)
 
 void fixup_word(F_WORD *word)
 {
-	/* If this is a compiled word, relocate the code pointer. Otherwise,
-	reset it based on the primitive number of the word. */
-	if(word->compiledp == F)
+	if(stage2)
 	{
-		if(type_of(word->def) == QUOTATION_TYPE)
-		{
-			if(!stage2)
-			{
-				/* Word XTs are fixed up in do_stage1_init() */
-				return;
-			}
-		}
-		else
-		{
-			/* Primitive */
-			default_word_xt(word);
-			return;
-		}
+		code_fixup((CELL)&word->code);
+		if(word->profiling) code_fixup((CELL)&word->profiling);
+		update_word_xt(word);
 	}
-
-	code_fixup((CELL)&word->xt);
-	code_fixup((CELL)&word->code);
 }
 
 void fixup_quotation(F_QUOTATION *quot)

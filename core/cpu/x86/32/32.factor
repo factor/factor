@@ -275,8 +275,6 @@ T{ x86-backend f 4 } compiler-backend set-global
     JNE
 ] { } define-if-intrinsic
 
-10 profiler-prologue set-global
-
 "-no-sse2" cli-args member? [
     "Checking if your CPU supports SSE2..." print flush
     [ sse2? ] compile-call [

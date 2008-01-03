@@ -5,8 +5,6 @@ namespaces sequences layouts system hashtables classes alien
 byte-arrays bit-arrays float-arrays combinators words ;
 IN: cpu.architecture
 
-SYMBOL: profiler-prologue
-
 SYMBOL: compiler-backend
 
 ! A pseudo-register class for parameters spilled on the stack
@@ -45,9 +43,6 @@ HOOK: %epilogue compiler-backend ( n -- )
 
 : %epilogue-later \ %epilogue-later , ;
 
-! Bump profiling counter
-HOOK: %profiler-prologue compiler-backend ( word -- )
-
 ! Store word XT in stack frame
 HOOK: %save-word-xt compiler-backend ( -- )
 
@@ -59,14 +54,8 @@ M: object %save-dispatch-xt %save-word-xt ;
 ! Call another label
 HOOK: %call-label compiler-backend ( label -- )
 
-! Call C primitive
-HOOK: %call-primitive compiler-backend ( label -- )
-
 ! Local jump for branches
 HOOK: %jump-label compiler-backend ( label -- )
-
-! Far jump to C primitive
-HOOK: %jump-primitive compiler-backend ( label -- )
 
 ! Test if vreg is 'f' or not
 HOOK: %jump-t compiler-backend ( label -- )
@@ -159,7 +148,7 @@ M: stack-params param-reg drop ;
 
 GENERIC: v>operand ( obj -- operand )
 
-M: integer v>operand tag-bits get shift ;
+M: integer v>operand tag-fixnum ;
 
 M: f v>operand drop \ f tag-number ;
 

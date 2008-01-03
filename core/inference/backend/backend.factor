@@ -345,10 +345,6 @@ TUPLE: no-effect word ;
 
 : no-effect ( word -- * ) \ no-effect inference-warning ;
 
-GENERIC: infer-word ( word -- effect )
-
-M: word infer-word no-effect ;
-
 TUPLE: effect-error word effect ;
 
 : effect-error ( word effect -- * )
@@ -364,18 +360,16 @@ TUPLE: effect-error word effect ;
     over recorded get push
     "inferred-effect" set-word-prop ;
 
-: infer-compound ( word -- effect )
+: infer-word ( word -- effect )
     [
-        init-inference
-        dependencies off
-        dup word-def over dup infer-quot-recursive
-        finish-word
-        current-effect
-    ] with-scope ;
-
-M: compound infer-word
-    [ infer-compound ] [ ] [ t "no-effect" set-word-prop ]
-    cleanup ;
+        [
+            init-inference
+            dependencies off
+            dup word-def over dup infer-quot-recursive
+            finish-word
+            current-effect
+        ] with-scope
+    ] [ ] [ t "no-effect" set-word-prop ] cleanup ;
 
 : custom-infer ( word -- )
     #! Customized inference behavior
@@ -391,8 +385,6 @@ M: compound infer-word
         { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
         { [ t ] [ dup infer-word make-call-node ] }
     } cond ;
-
-M: word apply-object apply-word ;
 
 TUPLE: recursive-declare-error word ;
 
@@ -458,7 +450,7 @@ M: #call-label collect-recursion*
         apply-infer node-child node-successor splice-node drop
     ] if ;
 
-M: compound apply-object
+M: word apply-object
     [
         dup inline-recursive-label
         [ declared-infer ] [ inline-word ] if

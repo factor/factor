@@ -3,6 +3,13 @@
 /* Simple JIT compiler. This is one of the two compilers implementing Factor;
 the second one is written in Factor and performs a lot of optimizations.
 See core/compiler/compiler.factor */
+bool jit_primitive_call_p(F_ARRAY *array, CELL i)
+{
+	return (i + 2) == array_capacity(array)
+		&& type_of(array_nth(array,i)) == FIXNUM_TYPE
+		&& array_nth(array,i + 1) == userenv[JIT_PRIMITIVE_WORD];
+}
+
 bool jit_fast_if_p(F_ARRAY *array, CELL i)
 {
 	return (i + 3) == array_capacity(array)
@@ -80,7 +87,7 @@ bool jit_stack_frame_p(F_ARRAY *array)
 void set_quot_xt(F_QUOTATION *quot, F_COMPILED *code)
 {
 	if(code->type != QUOTATION_TYPE)
-		critical_error("bad param to set_word_xt",(CELL)code);
+		critical_error("bad param to set_quot_xt",(CELL)code);
 
 	quot->code = code;
 	quot->xt = (XT)(code + 1);
@@ -113,6 +120,7 @@ void jit_compile(CELL quot)
 	REGISTER_ROOT(words);
 
 	GROWABLE_ADD(literals,quot);
+	GROWABLE_ADD(words,quot);
 
 	bool stack_frame = jit_stack_frame_p(untag_object(array));
 
@@ -127,7 +135,6 @@ void jit_compile(CELL quot)
 	{
 		CELL obj = array_nth(untag_object(array),i);
 		F_WORD *word;
-		bool primitive_p;
 		F_WRAPPER *wrapper;
 
 		switch(type_of(obj))
@@ -137,45 +144,36 @@ void jit_compile(CELL quot)
 			so that we save the C stack pointer minus the
 			current stack frame. */
 			word = untag_object(obj);
-			primitive_p = type_of(word->def) == FIXNUM_TYPE;
+
+			GROWABLE_ADD(words,array_nth(untag_object(array),i));
 
 			if(i == length - 1)
 			{
 				if(stack_frame)
 					EMIT(JIT_EPILOG,0);
 
-				if(primitive_p)
-				{
-					EMIT(JIT_WORD_PRIMITIVE_JUMP,
-						to_fixnum(word->def));
-				}
-				else
-				{
-					GROWABLE_ADD(words,array_nth(untag_object(array),i));
-					EMIT(JIT_WORD_JUMP,words_count - 1);
-				}
+				EMIT(JIT_WORD_JUMP,words_count - 1);
 
 				tail_call = true;
 			}
 			else
-			{
-				if(primitive_p)
-				{
-					EMIT(JIT_WORD_PRIMITIVE_CALL,
-						to_fixnum(word->def));
-				}
-				else
-				{
-					GROWABLE_ADD(words,array_nth(untag_object(array),i));
-					EMIT(JIT_WORD_CALL,words_count - 1);
-				}
-			}
+				EMIT(JIT_WORD_CALL,words_count - 1);
 			break;
 		case WRAPPER_TYPE:
 			wrapper = untag_object(obj);
 			GROWABLE_ADD(literals,wrapper->object);
 			EMIT(JIT_PUSH_LITERAL,literals_count - 1);
 			break;
+		case FIXNUM_TYPE:
+			if(jit_primitive_call_p(untag_object(array),i))
+			{
+				EMIT(JIT_PRIMITIVE,to_fixnum(obj));
+
+				i++;
+
+				tail_call = true;
+				break;
+			}
 		case QUOTATION_TYPE:
 			if(jit_fast_if_p(untag_object(array),i))
 			{
@@ -227,16 +225,17 @@ void jit_compile(CELL quot)
 
 	F_COMPILED *compiled = add_compiled_block(
 		QUOTATION_TYPE,
-		0,
 		untag_object(code),
 		NULL,
 		untag_object(relocation),
 		untag_object(words),
 		untag_object(literals));
 
-	iterate_code_heap_step(compiled,relocate_code_block);
-
+	/* We must do this before relocate_code_block(), so that
+	relocation knows the quotation's XT. */
 	set_quot_xt(untag_object(quot),compiled);
+
+	iterate_code_heap_step(compiled,relocate_code_block);
 
 	UNREGISTER_ROOT(words);
 	UNREGISTER_ROOT(literals);
@@ -287,24 +286,26 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				if(stack_frame)
 					COUNT(JIT_EPILOG,i);
 
-				if(type_of(word->def) == FIXNUM_TYPE)
-					COUNT(JIT_WORD_PRIMITIVE_JUMP,i)
-				else
-					COUNT(JIT_WORD_JUMP,i)
+				COUNT(JIT_WORD_JUMP,i)
 
 				tail_call = true;
 			}
 			else
-			{
-				if(type_of(word->def) == FIXNUM_TYPE)
-					COUNT(JIT_WORD_PRIMITIVE_CALL,i)
-				else
-					COUNT(JIT_WORD_CALL,i)
-			}
+				COUNT(JIT_WORD_CALL,i)
 			break;
 		case WRAPPER_TYPE:
 			COUNT(JIT_PUSH_LITERAL,i)
 			break;
+		case FIXNUM_TYPE:
+			if(jit_primitive_call_p(untag_object(array),i))
+			{
+				COUNT(JIT_PRIMITIVE,i);
+
+				i++;
+
+				tail_call = true;
+				break;
+			}
 		case QUOTATION_TYPE:
 			if(jit_fast_if_p(untag_object(array),i))
 			{

@@ -56,11 +56,12 @@ typedef struct {
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end);
 
-void set_word_xt(F_WORD *word, F_COMPILED *compiled);
+void default_word_code(F_WORD *word);
+
+void set_word_code(F_WORD *word, F_COMPILED *compiled);
 
 F_COMPILED *add_compiled_block(
 	CELL type,
-	CELL profiler_prologue,
 	F_ARRAY *code,
 	F_ARRAY *labels,
 	F_ARRAY *rel,

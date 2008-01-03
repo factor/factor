@@ -141,8 +141,7 @@ DEFER: blah
 [ t ] [
     [
         \ blah
-        [ dup V{ } eq? [ foo ] when ] dup second dup push
-        define-compound
+        [ dup V{ } eq? [ foo ] when ] dup second dup push define
     ] with-compilation-unit
 
     \ blah compiled?

@@ -4,21 +4,13 @@ USING: kernel words parser io inspector quotations sequences
 prettyprint continuations effects definitions ;
 IN: tools.annotations
 
-: check-compound ( word -- )
-    compound? [
-        "Annotations can only be used with compound words" throw
-    ] unless ;
-
 : reset ( word -- )
-    dup check-compound
-    dup "unannotated-def" word-prop define-compound ;
+    dup "unannotated-def" word-prop define ;
 
 : annotate ( word quot -- )
-    over check-compound
     over dup word-def "unannotated-def" set-word-prop
-    [
-        >r dup word-def r> call define-compound
-    ] with-compilation-unit ; inline
+    [ >r dup word-def r> call define ] with-compilation-unit ;
+    inline
 
 : entering ( str -- )
     "/-- Entering: " write dup .

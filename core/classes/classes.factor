@@ -27,8 +27,7 @@ PREDICATE: class tuple-class
 
 : predicate-effect 1 { "?" } <effect> ;
 
-PREDICATE: compound predicate
-    "predicating" word-prop >boolean ;
+PREDICATE: word predicate "predicating" word-prop >boolean ;
 
 : define-predicate ( class predicate quot -- )
     over [

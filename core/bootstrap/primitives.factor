@@ -314,7 +314,7 @@ define-builtin
         { "set-word-vocabulary" "words" }
     }
     {
-        { "object" "kernel" }
+        { "quotation" "quotations" }
         "def"
         4
         { "word-def" "words" }
@@ -408,7 +408,7 @@ builtins get num-tags get tail f union-class define-class
 
 ! Primitive words
 : make-primitive ( word vocab n -- )
-    >r create dup reset-word r> define ;
+    >r create dup reset-word r> [ do-primitive ] curry [ ] like define ;
 
 {
     { "(execute)" "words.private" }
@@ -607,4 +607,4 @@ builtins get num-tags get tail f union-class define-class
 dup length [ >r first2 r> make-primitive ] 2each
 
 ! Bump build number
-"build" "kernel" create build 1+ 1quotation define-compound
+"build" "kernel" create build 1+ 1quotation define

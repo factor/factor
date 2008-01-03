@@ -36,8 +36,8 @@ UNION: both first-one union-class ;
 [ f ] [ \ integer \ null class< ] unit-test
 [ t ] [ \ null \ object class< ] unit-test
 
-[ t ] [ \ generic \ compound class< ] unit-test
-[ f ] [ \ compound \ generic class< ] unit-test
+[ t ] [ \ generic \ word class< ] unit-test
+[ f ] [ \ word \ generic class< ] unit-test
 
 [ f ] [ \ reversed \ slice class< ] unit-test
 [ f ] [ \ slice \ reversed class< ] unit-test

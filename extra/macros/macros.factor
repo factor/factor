@@ -13,14 +13,13 @@ IN: macros
 : (MACRO:)
     >r
     2dup "macro" set-word-prop
-    2dup [ call ] append define-compound
+    2dup [ call ] append define
     r> define-transform ;
 
 : MACRO:
     (:) (MACRO:) ; parsing
 
-PREDICATE: compound macro
-    "macro" word-prop >boolean ;
+PREDICATE: word macro "macro" word-prop >boolean ;
 
 M: macro definer drop \ MACRO: \ ; ;
 

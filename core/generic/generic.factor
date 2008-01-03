@@ -5,8 +5,7 @@ definitions kernel.private classes classes.private
 quotations arrays vocabs ;
 IN: generic
 
-PREDICATE: compound generic ( word -- ? )
-    "combination" word-prop >boolean ;
+PREDICATE: word generic "combination" word-prop >boolean ;
 
 M: generic definer drop f f ;
 
@@ -24,9 +23,7 @@ M: object perform-combination
     nip [ "Invalid method combination" throw ] curry [ ] like ;
 
 : make-generic ( word -- )
-    dup
-    dup "combination" word-prop perform-combination
-    define-compound ;
+    dup dup "combination" word-prop perform-combination define ;
 
 : init-methods ( word -- )
      dup "methods" word-prop

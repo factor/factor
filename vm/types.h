@@ -109,11 +109,6 @@ INLINE F_QUOTATION *untag_quotation(CELL tagged)
 	return untag_object(tagged);
 }
 
-INLINE bool word_references_code_heap_p(F_WORD *word)
-{
-	return (word->compiledp != F || type_of(word->def) == QUOTATION_TYPE);
-}
-
 INLINE F_WORD *untag_word(CELL tagged)
 {
 	type_check(WORD_TYPE,tagged);
@@ -133,6 +128,7 @@ F_ARRAY *allot_array_internal(CELL type, CELL capacity);
 F_ARRAY *allot_array(CELL type, CELL capacity, CELL fill);
 F_BYTE_ARRAY *allot_byte_array(CELL size);
 
+CELL allot_array_1(CELL obj);
 CELL allot_array_2(CELL v1, CELL v2);
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 

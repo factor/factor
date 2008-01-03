@@ -159,4 +159,6 @@ GENERIC: construct-boa ( ... class -- tuple )
 
 : declare ( spec -- ) drop ;
 
+: do-primitive ( number -- ) "Improper primitive call" throw ;
+
 PRIVATE>

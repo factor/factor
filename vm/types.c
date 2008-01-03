@@ -164,6 +164,15 @@ DEFINE_PRIMITIVE(to_tuple)
 	drepl(object);
 }
 
+CELL allot_array_1(CELL obj)
+{
+	REGISTER_ROOT(obj);
+	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,1);
+	UNREGISTER_ROOT(obj);
+	set_array_nth(a,0,obj);
+	return tag_object(a);
+}
+
 CELL allot_array_2(CELL v1, CELL v2)
 {
 	REGISTER_ROOT(v1);
@@ -198,7 +207,7 @@ F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill)
 {
 	int i;
 	F_ARRAY* new_array;
-	
+
 	CELL to_copy = array_capacity(array);
 	if(capacity < to_copy)
 		to_copy = capacity;
@@ -212,7 +221,7 @@ F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill)
 	UNREGISTER_UNTAGGED(array);
 
 	memcpy(new_array + 1,array + 1,to_copy * CELLS);
-	
+
 	for(i = to_copy; i < capacity; i++)
 		set_array_nth(new_array,i,fill);
 
@@ -484,7 +493,6 @@ DEFINE_PRIMITIVE(hashtable)
 	dpush(tag_object(hash));
 }
 
-/* <word> ( name vocabulary -- word ) */
 F_WORD *allot_word(CELL vocab, CELL name)
 {
 	REGISTER_ROOT(vocab);
@@ -492,6 +500,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	F_WORD *word = allot_object(WORD_TYPE,sizeof(F_WORD));
 	UNREGISTER_ROOT(name);
 	UNREGISTER_ROOT(vocab);
+
 	word->hashcode = tag_fixnum(rand());
 	word->vocabulary = vocab;
 	word->name = name;
@@ -499,10 +508,20 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->props = F;
 	word->counter = tag_fixnum(0);
 	word->compiledp = F;
-	default_word_xt(word);
+	word->profiling = NULL;
+
+	REGISTER_UNTAGGED(word);
+	default_word_code(word);
+	UNREGISTER_UNTAGGED(word);
+
+	REGISTER_UNTAGGED(word);
+	update_word_xt(word);
+	UNREGISTER_UNTAGGED(word);
+
 	return word;
 }
 
+/* <word> ( name vocabulary -- word ) */
 DEFINE_PRIMITIVE(word)
 {
 	CELL vocab = dpop();
@@ -510,6 +529,7 @@ DEFINE_PRIMITIVE(word)
 	dpush(tag_object(allot_word(vocab,name)));
 }
 
+/* word-xt ( word -- xt ) */
 DEFINE_PRIMITIVE(word_xt)
 {
 	F_WORD *word = untag_word(dpeek());

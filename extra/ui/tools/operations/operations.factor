@@ -115,7 +115,7 @@ M: quotation com-stack-effect infer. ;
 
 M: word com-stack-effect word-def com-stack-effect ;
 
-[ compound? ] \ com-stack-effect H{
+[ word? ] \ com-stack-effect H{
     { +listener+ t }
 } define-operation
 

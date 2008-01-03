@@ -58,10 +58,7 @@ $nl
 ARTICLE: "evaluator" "Evaluation semantics"
 { $link "quotations" } " are evaluated sequentially from beginning to end. When the end is reached, the quotation returns to its caller. As each object in the quotation is evaluated in turn, an action is taken based on its type:"
 { $list
-    { "a " { $link symbol } " - pushed on the data stack. See " { $link "symbols" } }
-    { "a " { $link compound } " - the associated definition is called. See " { $link "colon-definition" } }
-    { "a" { $link primitive } " - a primitive in the Factor VM is called. See " { $link "primitives" } }
-    { "an " { $link undefined } " -  an error is raised. See " { $link "deferred" } }
+    { "a " { $link word } " - the word's definition quotation is called. See " { $link "words" } }
     { "a " { $link wrapper } " - the wrapped object is pushed on the data stack. Wrappers are used to push word objects directly on the stack when they would otherwise execute. See the " { $link POSTPONE: \ } " parsing word." }
     { "All other types of objects are pushed on the data stack." }
 }

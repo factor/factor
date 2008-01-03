@@ -17,7 +17,7 @@ IN: cpu.arm.allot
     R11 R11 pick ADD ! increment r11
     R11 R12 cell <+> STR ! r11 -> nursery.here
     R11 R11 rot SUB ! old value
-    R12 swap type-number tag-header MOV ! compute header
+    R12 swap type-number tag-fixnum MOV ! compute header
     R12 R11 0 <+> STR ! store header
     ;
     

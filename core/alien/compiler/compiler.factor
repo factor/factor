@@ -394,7 +394,6 @@ TUPLE: callback-context ;
             dup wrap-callback-quot %alien-callback
             %callback-return
         ] with-stack-frame
-        0
     ] generate-1 ;
 
 M: alien-callback generate-node

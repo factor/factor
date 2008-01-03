@@ -94,7 +94,7 @@ IN: temporary
 
 [ ] [
     [
-        "bob" "vocabs.loader.test.b" create [ ] define-compound
+        "bob" "vocabs.loader.test.b" create [ ] define
     ] with-compilation-unit
 ] unit-test
 
@@ -102,7 +102,7 @@ IN: temporary
 
 [ 2 ] [ "count-me" get-global ] unit-test
 
-[ t ] [ "fred" "vocabs.loader.test.b" lookup compound? ] unit-test
+[ f ] [ "fred" "vocabs.loader.test.b" lookup undefined? ] unit-test
 
 [ ] [
     "vocabs.loader.test.b" vocab-files [ forget-source ] each

@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays bit-arrays byte-arrays generic assocs
 hashtables assocs hashtables.private io kernel kernel.private
@@ -62,8 +62,8 @@ SYMBOL: bootstrap-boot-quot
 ! JIT parameters
 SYMBOL: jit-code-format
 SYMBOL: jit-prolog
-SYMBOL: jit-word-primitive-jump
-SYMBOL: jit-word-primitive-call
+SYMBOL: jit-primitive-word
+SYMBOL: jit-primitive
 SYMBOL: jit-word-jump
 SYMBOL: jit-word-call
 SYMBOL: jit-push-literal
@@ -73,6 +73,7 @@ SYMBOL: jit-dispatch-word
 SYMBOL: jit-dispatch
 SYMBOL: jit-epilog
 SYMBOL: jit-return
+SYMBOL: jit-profiling
 
 ! Default definition for undefined words
 SYMBOL: undefined-quot
@@ -83,8 +84,8 @@ SYMBOL: undefined-quot
         { bootstrap-global 21 }
         { jit-code-format 22 }
         { jit-prolog 23 }
-        { jit-word-primitive-jump 24 }
-        { jit-word-primitive-call 25 }
+        { jit-primitive-word 24 }
+        { jit-primitive 25 }
         { jit-word-jump 26 }
         { jit-word-call 27 }
         { jit-push-literal 28 }
@@ -94,6 +95,7 @@ SYMBOL: undefined-quot
         { jit-dispatch 32 }
         { jit-epilog 33 }
         { jit-return 34 }
+        { jit-profiling 35 }
         { undefined-quot 37 }
     } at header-size + ;
 
@@ -121,10 +123,10 @@ SYMBOL: undefined-quot
 : align-here ( -- )
     here 8 mod 4 = [ 0 emit ] when ;
 
-: emit-fixnum ( n -- ) tag-bits get shift emit ;
+: emit-fixnum ( n -- ) tag-fixnum emit ;
 
 : emit-object ( header tag quot -- addr )
-    swap here-as >r swap tag-header emit call align-here r> ;
+    swap here-as >r swap tag-fixnum emit call align-here r> ;
     inline
 
 ! Write an object to the image.
@@ -174,7 +176,7 @@ M: fixnum '
     #! When generating a 32-bit image on a 64-bit system,
     #! some fixnums should be bignums.
     dup most-negative-fixnum most-positive-fixnum between?
-    [ tag-bits get shift ] [ >bignum ' ] if ;
+    [ tag-fixnum ] [ >bignum ' ] if ;
 
 ! Floats
 
@@ -214,6 +216,7 @@ M: f '
         0 , ! count
         0 , ! xt
         0 , ! code
+        0 , ! profiling
     ] { } make
     \ word type-number object tag-number
     [ emit-seq ] emit-object
@@ -368,12 +371,13 @@ M: curry '
 : emit-jit-data ( -- )
     \ if jit-if-word set
     \ dispatch jit-dispatch-word set
+    \ do-primitive jit-primitive-word set
     [ undefined ] undefined-quot set
     {
         jit-code-format
         jit-prolog
-        jit-word-primitive-jump
-        jit-word-primitive-call
+        jit-primitive-word
+        jit-primitive
         jit-word-jump
         jit-word-call
         jit-push-literal
@@ -383,6 +387,7 @@ M: curry '
         jit-dispatch
         jit-epilog
         jit-return
+        jit-profiling
         undefined-quot
     } [ emit-userenv ] each ;
 

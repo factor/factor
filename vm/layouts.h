@@ -152,8 +152,7 @@ typedef struct
 	CELL reloc_length; /* # bytes */
 	CELL literals_length; /* # bytes */
 	CELL words_length; /* # bytes */
-	CELL profiler_prologue; /* # bytes */
-	CELL padding[2];
+	CELL padding[3];
 } F_COMPILED;
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -178,6 +177,8 @@ typedef struct {
 	XT xt;
 	/* UNTAGGED compiled code block */
 	F_COMPILED *code;
+	/* UNTAGGED profiler stub */
+	F_COMPILED *profiling;
 } F_WORD;
 
 /* Assembly code makes assumptions about the layout of this struct */

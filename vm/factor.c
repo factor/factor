@@ -35,8 +35,6 @@ void do_stage1_init(void)
 	fprintf(stderr,"*** Stage 2 early init... ");
 	fflush(stderr);
 
-	jit_compile(userenv[UNDEFINED_ENV]);
-
 	begin_scan();
 
 	CELL obj;
@@ -45,11 +43,8 @@ void do_stage1_init(void)
 		if(type_of(obj) == WORD_TYPE)
 		{
 			F_WORD *word = untag_object(obj);
-			if(type_of(word->def) == QUOTATION_TYPE)
-			{
-				jit_compile(word->def);
-				default_word_xt(word);
-			}
+			default_word_code(word);
+			update_word_xt(word);
 		}
 	}
 
@@ -79,6 +74,7 @@ void init_factor(F_PARAMETERS *p)
 	/* Disable GC during init as a sanity check */
 	gc_off = true;
 
+	/* OS-specific initialization */
 	early_init();
 
 	if(p->image == NULL)
@@ -92,15 +88,14 @@ void init_factor(F_PARAMETERS *p)
 	init_signals();
 
 	stack_chain = NULL;
+	profiling_p = false;
+	performing_gc = false;
+	last_code_heap_scan = NURSERY;
+	collecting_aging_again = false;
 
 	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
-
-	performing_gc = false;
-	last_code_heap_scan = NURSERY;
-	collecting_aging_again = false;
-	stack_chain = NULL;
 
 	/* We can GC now */
 	gc_off = false;

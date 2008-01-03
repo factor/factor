@@ -333,7 +333,7 @@ M: ppc-backend %unbox-any-c-ptr ( dst src -- )
     "end" get BEQ
     ! Is the object an alien?
     0 11 header-offset LWZ
-    0 0 alien type-number tag-header CMPI
+    0 0 alien type-number tag-fixnum CMPI
     "is-byte-array" get BNE
     ! If so, load the offset
     0 11 alien-offset LWZ

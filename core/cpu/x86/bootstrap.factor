@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
-cpu.x86.assembler layouts vocabs math generator.fixup ;
+cpu.x86.assembler layouts vocabs math generator.fixup
+compiler.constants ;
 IN: bootstrap.x86
 
 big-endian off
@@ -11,12 +12,23 @@ big-endian off
 : stack-frame-size 4 bootstrap-cells ;
 
 [
-    arg0 0 [] MOV                              ! load quotation
-    arg1 arg0 quot-xt@ [+] MOV                 ! load XT
+    ! Load word
+    arg0 0 [] MOV
+    ! Bump profiling counter
+    arg0 profile-count-offset [+] 1 tag-fixnum ADD
+    ! Load word->code
+    arg0 arg0 word-code-offset [+] MOV
+    ! Compute word XT
+    arg0 compiled-header-size ADD
+    ! Jump to XT
+    arg0 JMP
+] rc-absolute-cell rt-literal 2 jit-profiling jit-define
+
+[
     stack-frame-size PUSH                      ! save stack frame size
-    arg1 PUSH                                  ! save XT
+    0 PUSH                                     ! push XT
     arg1 PUSH                                  ! alignment
-] rc-absolute-cell rt-literal 2 jit-prolog jit-define
+] rc-absolute-cell rt-xt 6 jit-prolog jit-define
 
 [
     arg0 0 [] MOV                              ! load literal
@@ -27,12 +39,7 @@ big-endian off
 [
     arg1 stack-reg MOV                         ! pass callstack pointer as arg 2
     (JMP) drop                                 ! go
-] rc-relative rt-primitive 3 jit-word-primitive-jump jit-define
-
-[
-    arg1 stack-reg bootstrap-cell neg [+] LEA  ! pass callstack pointer as arg 2
-    (CALL) drop                                ! go
-] rc-relative rt-primitive 5 jit-word-primitive-call jit-define
+] rc-relative rt-primitive 3 jit-primitive jit-define
 
 [
     (JMP) drop

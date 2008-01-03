@@ -521,7 +521,7 @@ CELL binary_payload_start(CELL pointer)
 		return 0;
 	/* these objects have some binary data at the end */
 	case WORD_TYPE:
-		return sizeof(F_WORD) - CELLS * 2;
+		return sizeof(F_WORD) - CELLS * 3;
 	case ALIEN_TYPE:
 		return CELLS * 3;
 	case DLL_TYPE:
@@ -534,17 +534,8 @@ CELL binary_payload_start(CELL pointer)
 	}
 }
 
-void collect_callstack_object(F_CALLSTACK *callstack)
+void do_code_slots(CELL scan)
 {
-	if(collecting_code)
-		iterate_callstack_object(callstack,collect_stack_frame);
-}
-
-CELL collect_next(CELL scan)
-{
-	do_slots(scan,copy_handle);
-
-	/* Special behaviors */
 	F_WORD *word;
 	F_QUOTATION *quot;
 	F_CALLSTACK *stack;
@@ -553,19 +544,28 @@ CELL collect_next(CELL scan)
 	{
 	case WORD_TYPE:
 		word = (F_WORD *)scan;
-		if(collecting_code && word_references_code_heap_p(word))
-			recursive_mark(compiled_to_block(word->code));
+		recursive_mark(compiled_to_block(word->code));
+		if(word->profiling)
+			recursive_mark(compiled_to_block(word->profiling));
 		break;
 	case QUOTATION_TYPE:
 		quot = (F_QUOTATION *)scan;
-		if(collecting_code && quot->compiledp != F)
+		if(quot->compiledp != F)
 			recursive_mark(compiled_to_block(quot->code));
 		break;
 	case CALLSTACK_TYPE:
 		stack = (F_CALLSTACK *)scan;
-		collect_callstack_object(stack);
+		iterate_callstack_object(stack,collect_stack_frame);
 		break;
 	}
+}
+
+CELL collect_next(CELL scan)
+{
+	do_slots(scan,copy_handle);
+
+	if(collecting_code)
+		do_code_slots(scan);
 
 	return scan + untagged_object_size(scan);
 }

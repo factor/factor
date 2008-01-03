@@ -5,7 +5,7 @@ IN: temporary
 
 [ 4 ] [
     [
-        "poo" "temporary" create [ 2 2 + ] define-compound
+        "poo" "temporary" create [ 2 2 + ] define
     ] with-compilation-unit
     "poo" "temporary" lookup execute
 ] unit-test
@@ -23,8 +23,6 @@ DEFER: plist-test
     \ plist-test f "sample-property" set-word-prop
     \ plist-test "sample-property" word-prop
 ] unit-test
-
-[ f ] [ 5 compound? ] unit-test
 
 "create-test" "scratchpad" create { 1 2 } "testing" set-word-prop
 [ { 1 2 } ] [
@@ -46,13 +44,7 @@ DEFER: plist-test
 
 [ f ] [ gensym gensym = ] unit-test
 
-[ f ] [ 123 compound? ] unit-test
-
-: colon-def ;
-[ t ] [ \ colon-def compound? ] unit-test
-
 SYMBOL: a-symbol
-[ t ] [ \ a-symbol compound? ] unit-test
 [ t ] [ \ a-symbol symbol? ] unit-test
 
 ! See if redefining a generic as a colon def clears some
@@ -91,7 +83,7 @@ FORGET: foe
 
 ! xref should not retain references to gensyms
 [ ] [
-    [ gensym [ * ] define-compound ] with-compilation-unit
+    [ gensym [ * ] define ] with-compilation-unit
 ] unit-test
 
 [ t ] [
@@ -103,7 +95,7 @@ DEFER: calls-a-gensym
     [
         \ calls-a-gensym
         gensym dup "x" set 1quotation
-        define-compound
+        define
     ] with-compilation-unit
 ] unit-test
 
@@ -143,7 +135,7 @@ SYMBOL: quot-uses-b
 
 [ ] [
     [
-        quot-uses-a [ 2 3 + ] define-compound
+        quot-uses-a [ 2 3 + ] define
     ] with-compilation-unit
 ] unit-test
 
@@ -151,7 +143,7 @@ SYMBOL: quot-uses-b
 
 [ ] [
     [
-        quot-uses-b 2 [ 3 + ] curry define-compound
+        quot-uses-b 2 [ 3 + ] curry define
     ] with-compilation-unit
 ] unit-test
 

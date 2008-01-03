@@ -17,30 +17,28 @@ M: word execute (execute) ;
 M: word <=>
     [ dup word-name swap word-vocabulary 2array ] compare ;
 
-M: word definition drop f ;
+M: word definer drop \ : \ ; ;
 
-PREDICATE: word compound  ( obj -- ? ) word-def quotation? ;
-
-M: compound definer drop \ : \ ; ;
-
-M: compound definition word-def ;
+M: word definition word-def ;
 
 TUPLE: undefined ;
 
 : undefined ( -- * ) \ undefined construct-empty throw ;
 
-PREDICATE: compound deferred ( obj -- ? )
+PREDICATE: word deferred ( obj -- ? )
     word-def [ undefined ] = ;
 M: deferred definer drop \ DEFER: f ;
 M: deferred definition drop f ;
 
-PREDICATE: compound symbol ( obj -- ? )
+PREDICATE: word symbol ( obj -- ? )
     dup <wrapper> 1array swap word-def sequence= ;
 M: symbol definer drop \ SYMBOL: f ;
 M: symbol definition drop f ;
 
-PREDICATE: word primitive ( obj -- ? ) word-def fixnum? ;
+PREDICATE: word primitive ( obj -- ? )
+    word-def [ do-primitive ] tail? ;
 M: primitive definer drop \ PRIMITIVE: f ;
+M: primitive definition drop f ;
 
 : word-prop ( word name -- value ) swap word-props at ;
 
@@ -89,26 +87,20 @@ M: wrapper (quot-uses) >r wrapped r> (quot-uses) ;
 M: word uses ( word -- seq )
     word-def quot-uses keys ;
 
-M: compound redefined* ( word -- )
+M: word redefined* ( word -- )
     { "inferred-effect" "base-case" "no-effect" } reset-props ;
 
-<PRIVATE
-
 : define ( word def -- )
+    [ ] like
     over unxref
     over redefined
     over set-word-def
     dup changed-word
     dup word-vocabulary [ dup xref ] when drop ;
 
-PRIVATE>
-
-: define-compound ( word def -- )
-    [ ] like define ;
-
 : define-declared ( word def effect -- )
     pick swap "declared-effect" set-word-prop
-    define-compound ;
+    define ;
 
 : make-inline ( word -- )
     t "inline" set-word-prop ;
@@ -120,7 +112,7 @@ PRIVATE>
     dup make-flushable t "foldable" set-word-prop ;
 
 : define-inline ( word quot -- )
-    dupd define-compound make-inline ;
+    dupd define make-inline ;
 
 : define-symbol ( word -- )
     dup [ ] curry define-inline ;
@@ -142,7 +134,7 @@ PRIVATE>
     "G:" \ gensym counter number>string append f <word> ;
 
 : define-temp ( quot -- word )
-    gensym dup rot define-compound ;
+    gensym dup rot define ;
 
 : reveal ( word -- )
     dup word-name over word-vocabulary vocab-words set-at ;

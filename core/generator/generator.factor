@@ -10,13 +10,13 @@ IN: generator
 SYMBOL: compile-queue
 SYMBOL: compiled
 
-: 6array 3array >r 3array r> append ;
+: 5array 3array >r 2array r> append ;
 
 : begin-compiling ( word -- )
     f swap compiled get set-at ;
 
-: finish-compiling ( word literals words relocation labels code profiler-prologue -- )
-    6array swap compiled get set-at ;
+: finish-compiling ( word literals words relocation labels code -- )
+    5array swap compiled get set-at ;
 
 : queue-compile ( word -- )
     {
@@ -56,11 +56,6 @@ t compiled-stack-traces? set-global
         word-table get >array
     ] { } make fixup finish-compiling ;
 
-: generate-profiler-prologue ( -- )
-    compiled-stack-traces? get [
-        compiling-word get %profiler-prologue
-    ] when ;
-
 GENERIC: generate-node ( node -- next )
 
 : generate-nodes ( node -- )
@@ -69,13 +64,11 @@ GENERIC: generate-node ( node -- next )
 : generate ( word label node -- )
     [
         init-templates
-        generate-profiler-prologue
         %save-word-xt
         %prologue-later
         current-label-start define-label
         current-label-start resolve-label
         [ generate-nodes ] with-node-iterator
-        profiler-prologue get
     ] generate-1 ;
 
 : word-dataflow ( word -- effect dataflow )
@@ -113,21 +106,14 @@ UNION: #terminal
 ! node
 M: node generate-node drop iterate-next ;
 
-: %call ( word -- )
-    dup primitive? [ %call-primitive ] [ %call-label ] if ;
+: %call ( word -- ) %call-label ;
 
 : %jump ( word -- )
-    {
-        { [ dup compiling-label get eq? ] [
-            drop current-label-start get %jump-label
-        ] }
-        { [ dup primitive? ] [
-            %epilogue-later %jump-primitive
-        ] }
-        { [ t ] [
-            %epilogue-later %jump-label
-        ] }
-    } cond ;
+    dup compiling-label get eq? [
+        drop current-label-start get %jump-label
+    ] [
+        %epilogue-later %jump-label
+    ] if ;
 
 : generate-call ( label -- next )
     dup maybe-compile
@@ -179,7 +165,6 @@ M: #if generate-node
             %save-dispatch-xt
             %prologue-later
             [ generate-nodes ] with-node-iterator
-            0
         ] generate-1
     ] keep ;
 
@@ -286,20 +271,3 @@ M: #r> generate-node
 
 ! #return
 M: #return generate-node drop end-basic-block %return f ;
-
-! These constants must match vm/memory.h
-: card-bits 6 ;
-: card-mark HEX: 40 HEX: 80 bitor ;
-
-! These constants must match vm/layouts.h
-: header-offset object tag-number neg ;
-: float-offset 8 float tag-number - ;
-: string-offset 3 cells object tag-number - ;
-: profile-count-offset 7 cells object tag-number - ;
-: byte-array-offset 2 cells object tag-number - ;
-: alien-offset 3 cells object tag-number - ;
-: underlying-alien-offset cell object tag-number - ;
-: tuple-class-offset 2 cells tuple tag-number - ;
-: class-hash-offset cell object tag-number - ;
-: word-xt-offset 8 cells object tag-number - ;
-: compiled-header-size 8 cells ;

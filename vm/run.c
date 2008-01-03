@@ -259,22 +259,6 @@ DEFINE_PRIMITIVE(set_retainstack)
 	rs = array_to_stack(untag_array(dpop()),rs_bot);
 }
 
-void default_word_xt(F_WORD *word)
-{
-	if(type_of(word->def) == QUOTATION_TYPE)
-	{
-		F_QUOTATION *quot = untag_quotation(word->def);
-		if(quot->compiledp == F)
-			critical_error("default_word_xt invariant lost",0);
-		word->xt = quot->xt;
-		word->code = quot->code;
-	}
-	else if(type_of(word->def) == FIXNUM_TYPE)
-		word->xt = primitives[to_fixnum(word->def)];
-	else
-		critical_error("bad word-def",tag_object(word));
-}
-
 DEFINE_PRIMITIVE(getenv)
 {
 	F_FIXNUM e = untag_fixnum_fast(dpeek());

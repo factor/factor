@@ -19,8 +19,7 @@ IN: bootstrap.syntax
     "syntax" lookup t "delimiter" set-word-prop ;
 
 : define-syntax ( name quot -- )
-    >r "syntax" lookup dup r> define-compound
-    t "parsing" set-word-prop ;
+    >r "syntax" lookup dup r> define t "parsing" set-word-prop ;
 
 [
     { "]" "}" ";" ">>" } [ define-delimiter ] each
@@ -96,7 +95,7 @@ IN: bootstrap.syntax
     ] define-syntax
 
     ":" [
-        CREATE dup reset-generic parse-definition define-compound
+        CREATE dup reset-generic parse-definition define
     ] define-syntax
 
     "GENERIC:" [

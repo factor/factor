@@ -2,7 +2,7 @@ USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
-continuations ;
+continuations generic ;
 IN: temporary
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -59,7 +59,7 @@ unit-test
 
 [ ] [ \ general-t see ] unit-test
 
-[ ] [ \ compound see ] unit-test
+[ ] [ \ generic see ] unit-test
 
 [ ] [ \ duplex-stream see ] unit-test
 
@@ -150,8 +150,8 @@ unit-test
         "IN: temporary"
         ": retain-stack-layout"
         "    dup stream-readln stream-readln"
-        "    >r [ define-compound ] map r>"
-        "    define-compound ;"
+        "    >r [ define ] map r>"
+        "    define ;"
     } ;
 
 [ t ] [

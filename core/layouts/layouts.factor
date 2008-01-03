@@ -21,7 +21,7 @@ SYMBOL: type-numbers
 : type-number ( class -- n )
     type-numbers get at ;
 
-: tag-header ( n -- tagged )
+: tag-fixnum ( n -- tagged )
     tag-bits get shift ;
 
 : first-bignum ( -- n )

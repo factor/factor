@@ -194,7 +194,7 @@ M: long-long-type box-return ( type -- )
     >r ">c-" swap "-array" 3append r> create ;
 
 : define-to-array ( type vocab -- )
-    [ to-array-word ] 2keep >c-array-quot define-compound ;
+    [ to-array-word ] 2keep >c-array-quot define ;
 
 : c-array>quot ( type vocab -- quot )
     [
@@ -207,7 +207,7 @@ M: long-long-type box-return ( type -- )
     >r "c-" swap "-array>" 3append r> create ;
 
 : define-from-array ( type vocab -- )
-    [ from-array-word ] 2keep c-array>quot define-compound ;
+    [ from-array-word ] 2keep c-array>quot define ;
 
 : <primitive-type> ( getter setter width boxer unboxer -- type )
     <c-type>
