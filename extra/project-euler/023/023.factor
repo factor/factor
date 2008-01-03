@@ -31,25 +31,29 @@ IN: project-euler.023
 ! SOLUTION
 ! --------
 
-<PRIVATE
-
 ! The upper limit can be dropped to 20161 which reduces our search space
 ! and every even number > 46 can be expressed as a sum of two abundants
+
+<PRIVATE
+
 : source-023 ( -- seq )
     46 [1,b] 47 20161 2 <range> append ;
 
-: abundants-below ( n -- seq )
+: abundants-upto ( n -- seq )
     [1,b] [ abundant? ] subset ;
 
 : possible-sums ( seq -- seq )
     dup { } -rot [
-        dupd [ + ] curry map rot append prune swap 1 tail
+        dupd [ + ] curry map
+        rot append prune swap 1 tail
     ] each drop natural-sort ;
 
 PRIVATE>
 
 : euler023 ( -- answer )
-    20161 abundants-below possible-sums source-023 seq-diff sum ;
+    20161 abundants-upto possible-sums source-023 seq-diff sum ;
+
+! TODO: solution is still too slow, although it takes under 1 minute
 
 ! [ euler023 ] time
 ! 52780 ms run / 3839 ms GC
