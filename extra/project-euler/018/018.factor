@@ -68,7 +68,7 @@ IN: project-euler.018
       63 66 04 68 89 53 67 30 73 16 69 87 40 31
     04 62 98 27 23 09 70 98 73 93 38 53 60 04 23
   }
-  15 [ 1+ cut swap ] map nip ;
+  15 [ 1+ cut-slice swap ] map nip ;
 
 PRIVATE>
 
