@@ -76,7 +76,7 @@ GENERIC: apply-object ( obj -- )
 
 M: object apply-object apply-literal ;
 
-M: wrapper apply-object wrapped apply-literal ;
+M: wrapper apply-object wrapped dup depends-on apply-literal ;
 
 : terminate ( -- )
     terminated? on #terminate node, ;
@@ -336,7 +336,6 @@ TUPLE: unbalanced-branches-error quots in out ;
         recursive-label #call-label [ consume/produce ] keep
         set-node-in-d
     ] [
-        dup depends-on
         over effect-in length reify-curries
         #call consume/produce
     ] if ;
@@ -437,7 +436,6 @@ M: #call-label collect-recursion*
     [ set ] 2each ;
 
 : inline-word ( word -- )
-    dup depends-on
     dup inline-block over recursive-label? [
         flatten-meta-d >r
         drop join-values inline-block apply-infer
@@ -451,7 +449,7 @@ M: #call-label collect-recursion*
     ] if ;
 
 M: word apply-object
-    [
+    dup depends-on [
         dup inline-recursive-label
         [ declared-infer ] [ inline-word ] if
     ] [

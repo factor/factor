@@ -143,3 +143,33 @@ DEFER: g-test-7
 [ ] [ "IN: temporary USE: math GENERIC: g-test-1 ( x -- y ) M: integer g-test-1 15 + ;" eval ] unit-test
 
 [ 138 ] [ g-test-7 ] unit-test
+
+USE: macros
+
+DEFER: macro-test-3
+
+[ ] [ "IN: temporary USING: macros math ; : macro-test-1 sq ;" eval ] unit-test
+
+[ ] [ "IN: temporary USING: macros arrays quotations ; MACRO: macro-test-2 ( n word -- quot ) <array> >quotation ;" eval ] unit-test
+
+[ ] [ "IN: temporary : macro-test-3 2 \\ macro-test-1 macro-test-2 ;" eval ] unit-test
+
+[ 625 ] [ 5 macro-test-3 ] unit-test
+
+[ ] [ "IN: temporary USING: macros arrays quotations kernel math ; MACRO: macro-test-2 ( n word -- quot ) 2drop [ 3 + ] ;" eval ] unit-test
+
+[ 8 ] [ 5 macro-test-3 ] unit-test
+
+USE: hints
+
+DEFER: hints-test-2
+
+[ ] [ "IN: temporary USING: math hints ; : hints-test-1 3 + ; HINTS: hints-test-1 fixnum ;" eval ] unit-test
+
+[ ] [ "IN: temporary : hints-test-2 5 hints-test-1 ;" eval ] unit-test
+
+[ 8 ] [ hints-test-2 ] unit-test
+
+[ ] [ "IN: temporary USE: math : hints-test-1 5 + ;" eval ] unit-test
+
+[ 10 ] [ hints-test-2 ] unit-test

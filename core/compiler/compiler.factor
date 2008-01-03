@@ -22,11 +22,18 @@ compiled-crossref global [ H{ } assoc-like ] change-at
 : compiled-usage ( word -- seq )
     compiled-crossref get at keys ;
 
+: sensitive? ( word -- ? )
+    dup "inline" word-prop
+    over "infer" word-prop
+    pick "specializer" word-prop
+    roll generic?
+    or or or ;
+
 : compiled-usages ( words -- seq )
     compiled-crossref get [
         [
             over dup set
-            over "inline" word-prop pick generic? or
+            over sensitive?
             [ at namespace swap update ] [ 2drop ] if
         ] curry each
     ] H{ } make-assoc keys ;
