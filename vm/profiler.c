@@ -46,8 +46,6 @@ void update_word_xt(F_WORD *word)
 		}
 
 		word->xt = (XT)(word->profiling + 1);
-
-		printf("%x\n",word->xt);
 	}
 	else
 		word->xt = (XT)(word->code + 1);

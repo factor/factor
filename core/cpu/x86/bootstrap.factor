@@ -13,15 +13,15 @@ big-endian off
 
 [
     ! Load word
-    arg0 0 [] MOV
+    temp-reg 0 [] MOV
     ! Bump profiling counter
-    arg0 profile-count-offset [+] 1 tag-fixnum ADD
+    temp-reg profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
-    arg0 arg0 word-code-offset [+] MOV
+    temp-reg temp-reg word-code-offset [+] MOV
     ! Compute word XT
-    arg0 compiled-header-size ADD
+    temp-reg compiled-header-size ADD
     ! Jump to XT
-    arg0 JMP
+    temp-reg JMP
 ] rc-absolute-cell rt-literal 2 jit-profiling jit-define
 
 [

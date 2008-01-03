@@ -8,6 +8,7 @@ IN: bootstrap.x86
 
 : arg0 EAX ;
 : arg1 EDX ;
+: temp-reg EBX ;
 : stack-reg ESP ;
 : ds-reg ESI ;
 : fixnum>slot@ arg0 1 SAR ;
