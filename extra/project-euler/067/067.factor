@@ -37,14 +37,14 @@ IN: project-euler.067
 
 <PRIVATE
 
-: pyramid ( -- seq )
-    "resource:extra/project-euler/067/triangle.txt" ?resource-path
+: source-067 ( -- seq )
+    "extra/project-euler/067/triangle.txt" resource-path
     <file-reader> lines [ " " split [ string>number ] map ] map ;
 
 PRIVATE>
 
 : euler067 ( -- answer )
-    pyramid propagate-all first first ;
+    source-067 propagate-all first first ;
 
 ! [ euler067 ] 100 ave-time
 ! 18 ms run / 0 ms GC time
@@ -53,30 +53,13 @@ PRIVATE>
 ! ALTERNATE SOLUTIONS
 ! -------------------
 
-<PRIVATE
-
-: (source-067a) ( -- path )
-    [
-        "project-euler.067" vocab-root ?resource-path %
-        os "windows" = [
-            "\\project-euler\\067\\triangle.txt" %
-        ] [
-            "/project-euler/067/triangle.txt" %
-        ] if
-    ] "" make ;
-
-: source-067a ( -- triangle )
-    (source-067a) <file-reader> lines [ " " split [ string>number ] map ] map ;
-
-PRIVATE>
-
 : euler067a ( -- answer )
-    source-067a max-path ;
+    source-067 max-path ;
 
 ! [ euler067a ] 100 ave-time
 ! 15 ms run / 0 ms GC ave time - 100 trials
 
-! source-067a [ max-path ] curry 100 ave-time
+! source-067 [ max-path ] curry 100 ave-time
 ! 3 ms run / 0 ms GC ave time - 100 trials
 
 MAIN: euler067a

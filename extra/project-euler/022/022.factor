@@ -27,18 +27,9 @@ IN: project-euler.022
 
 <PRIVATE
 
-: (source-022) ( -- path )
-    [
-        "project-euler.022" vocab-root ?resource-path %
-        os "windows" = [
-            "\\project-euler\\022\\names.txt" %
-        ] [
-            "/project-euler/022/names.txt" %
-        ] if
-    ] "" make ;
-
 : source-022 ( -- seq )
-    (source-022) file-contents [ quotable? ] subset "," split ;
+    "extra/project-euler/022/names.txt" resource-path
+    file-contents [ quotable? ] subset "," split ;
 
 : alpha-value ( str -- n )
     string>digits [ 9 - ] sigma ;
