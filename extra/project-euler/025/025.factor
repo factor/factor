@@ -1,6 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser memoize sequences ;
+USING: alien.syntax kernel math math.functions math.parser math.ranges memoize
+    sequences ;
 IN: project-euler.025
 
 ! http://projecteuler.net/index.php?section=problems&id=25
@@ -35,6 +36,8 @@ IN: project-euler.025
 ! SOLUTION
 ! --------
 
+! Memoized brute force
+
 MEMO: fib ( m -- n )
     dup 1 > [ 1 - dup fib swap 1 - fib + ] when ;
 
@@ -54,4 +57,30 @@ PRIVATE>
 ! [ euler025 ] 10 ave-time
 ! 5237 ms run / 72 ms GC ave time - 10 trials
 
-MAIN: euler025
+
+! ALTERNATE SOLUTIONS
+! -------------------
+
+! A number containing 1000 digits is the same as saying it's greater than 10**999
+! The nth Fibonacci number is Phi**n / sqrt(5) rounded to the nearest integer
+! Thus we need we need "Phi**n / sqrt(5) > 10**999", and we just solve for n
+
+<PRIVATE
+
+FUNCTION: double log10 ( double x ) ;
+
+: phi ( -- phi )
+    5 sqrt 1+ 2 / ;
+
+: digit-fib* ( n -- term )
+    1- 5 log10 2 / + phi log10 / ceiling >integer ;
+
+PRIVATE>
+
+: euler025a ( -- answer )
+    1000 digit-fib* ;
+
+! [ euler025a ] 100 ave-time
+! 0 ms run / 0 ms GC ave time - 100 trials
+
+MAIN: euler025a
