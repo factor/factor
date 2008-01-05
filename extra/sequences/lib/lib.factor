@@ -126,3 +126,8 @@ PRIVATE>
 : human-sort ( seq -- newseq )
     [ dup [ digit? ] [ string>number ] cut-all ] { } map>assoc
     sort-values keys ;
+
+: ?first ( seq -- first/f ) 0 swap ?nth ; inline
+: ?second ( seq -- second/f ) 1 swap ?nth ; inline
+: ?third ( seq -- third/f ) 2 swap ?nth ; inline
+: ?fourth ( seq -- fourth/f ) 3 swap ?nth ; inline

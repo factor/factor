@@ -6,7 +6,6 @@ IN: heaps
 MIXIN: priority-queue
 
 GENERIC: heap-push ( value key heap -- )
-GENERIC: heap-push-all ( assoc heap -- )
 GENERIC: heap-peek ( heap -- value key )
 GENERIC: heap-pop* ( heap -- )
 GENERIC: heap-pop ( heap -- value key )
@@ -107,7 +106,7 @@ M: priority-queue heap-push ( value key heap -- )
     [ heap-data ] keep
     up-heap ;
 
-M: priority-queue heap-push-all ( assoc heap -- )
+: heap-push-all ( assoc heap -- )
     [ swapd heap-push ] curry assoc-each ;
 
 M: priority-queue heap-peek ( heap -- value key )
