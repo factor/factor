@@ -1,5 +1,6 @@
-USING: help.syntax help.markup ui.freetype strings kernel
-alien opengl quotations ui.render io.styles ;
+USING: help.syntax help.markup strings kernel alien opengl
+quotations ui.render io.styles freetype ;
+IN: ui.freetype
 
 HELP: freetype
 { $values { "alien" alien } }
@@ -13,8 +14,6 @@ HELP: open-fonts
 HELP: init-freetype
 { $description "Initializes the FreeType library." }
 { $notes "Do not call this word if you are using the UI." } ;
-
-USE: ui.freetype
 
 HELP: font
 { $class-description "A font which has been loaded by FreeType. Font instances have the following slots:"

@@ -1,6 +1,6 @@
-USING: help.syntax ui.gadgets kernel arrays quotations tuples
-ui.gadgets.grids ui.gadgets.frames ;
-IN: help.markup
+USING: help.syntax help.markup ui.gadgets kernel arrays
+quotations tuples ui.gadgets.grids ;
+IN: ui.gadgets.frames
 
 : $ui-frame-constant ( element -- )
     drop

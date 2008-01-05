@@ -1,7 +1,8 @@
 USING: help help.markup help.syntax help.topics
 namespaces words sequences classes assocs vocabs kernel
 arrays prettyprint.backend kernel.private io tools.browser
-generic math tools.profiler system ui ;
+generic math tools.profiler system ui strings sbufs vectors
+byte-arrays bit-arrays float-arrays quotations ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -345,3 +346,9 @@ ARTICLE: "changes" "Changes in the latest release"
     "Solaris/x86 fixes. (Samuel Tardieu)"
     "Linux/AMD64 port works again."
 } ;
+
+{ <array> <string> <sbuf> <vector> <byte-array> <bit-array> <float-array> }
+related-words
+
+{ >array >quotation >string >sbuf >vector >byte-array >bit-array >float-array }
+related-words

@@ -68,11 +68,9 @@ SYMBOL: load-help?
 : source-wasn't-loaded f swap set-vocab-source-loaded? ;
 
 : load-source ( root name -- )
-    [ source-was-loaded ] keep [
-        [ vocab-source path+ bootstrap-file ]
-        [ ] [ source-wasn't-loaded ]
-        cleanup
-    ] keep source-was-loaded ;
+    [ source-wasn't-loaded ] keep
+    [ vocab-source path+ bootstrap-file ] keep
+    source-was-loaded ;
 
 : docs-were-loaded t swap set-vocab-docs-loaded? ;
 
@@ -80,14 +78,10 @@ SYMBOL: load-help?
 
 : load-docs ( root name -- )
     load-help? get [
-        [ docs-were-loaded ] keep [
-            [ vocab-docs path+ ?run-file ]
-            [ ] [ docs-weren't-loaded ]
-            cleanup
-        ] keep docs-were-loaded
-    ] [
-        2drop
-    ] if ;
+        [ docs-weren't-loaded ] keep
+        [ vocab-docs path+ ?run-file ] keep
+        docs-were-loaded
+    ] [ 2drop ] if ;
 
 : amend-vocab-from-root ( root name -- vocab )
     dup vocab-source-loaded? [ 2dup load-source ] unless

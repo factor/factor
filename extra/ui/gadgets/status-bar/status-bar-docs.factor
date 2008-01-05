@@ -1,5 +1,6 @@
-USING: ui.gadgets.status-bar ui.gadgets.presentations
-help.markup help.syntax models ui.gadgets ui.gadgets.worlds ;
+USING: ui.gadgets.presentations help.markup help.syntax models
+ui.gadgets ui.gadgets.worlds ;
+IN: ui.gadgets.status-bar
 
 HELP: <status-bar>
 { $values { "model" model } { "gadget" "a new " { $link gadget } } }
