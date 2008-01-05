@@ -382,7 +382,7 @@ SYMBOL: parse-hook
         dup file set
         source-file-definitions clone old-definitions set
     ] [ drop ] if
-    contents \ contents set ;
+    lines \ lines set ;
 
 : smudged-usage-warning ( usages removed -- )
     parser-notes? [
@@ -426,7 +426,7 @@ SYMBOL: parse-hook
     file get dup [
         [ record-form ] keep
         [ record-modified ] keep
-        [ \ contents get record-checksum ] keep
+        [ \ lines get record-checksum ] keep
         record-definitions
         forget-smudged
     ] [
@@ -443,7 +443,7 @@ SYMBOL: parse-hook
     [
         [
             start-parsing
-            \ contents get string-lines parse-fresh
+            \ lines get parse-fresh
             dup finish-parsing
         ] [ ] [ undo-parsing ] cleanup
     ] no-parse-hook ;
