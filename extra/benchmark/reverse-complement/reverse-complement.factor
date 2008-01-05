@@ -38,7 +38,7 @@ HINTS: do-line vector string ;
 
 : reverse-complement-main ( -- )
     "extra/benchmark/reverse-complement-test-in.txt"
-    "extra/benchmark/reverse-complement-out.txt"
+    "extra/benchmark/reverse-complement-test-out.txt"
     [ resource-path ] 2apply
     reverse-complement ;
 
