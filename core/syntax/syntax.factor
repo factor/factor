@@ -134,7 +134,11 @@ IN: bootstrap.syntax
         CREATE-CLASS define-mixin-class
     ] define-syntax
 
-    "INSTANCE:" [ scan-word scan-word add-mixin-instance ] define-syntax
+    "INSTANCE:" [
+        location >r
+        scan-word scan-word 2dup add-mixin-instance
+        <mixin-instance> r> remember-definition
+    ] define-syntax
 
     "PREDICATE:" [
         scan-word

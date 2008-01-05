@@ -97,9 +97,9 @@ M: listener-operation invoke-command ( target command -- )
     listener-gadget-input user-input ;
 
 : quot-action ( interactor -- lines )
-    dup control-value swap
-    2dup add-interactor-history
-    select-all ;
+    dup control-value
+    dup "\n" join pick add-interactor-history
+    swap select-all ;
 
 TUPLE: stack-display ;
 

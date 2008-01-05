@@ -148,7 +148,7 @@ unit-test
     {
         "USING: io kernel sequences words ;"
         "IN: temporary"
-        ": retain-stack-layout"
+        ": retain-stack-layout ( x -- )"
         "    dup stream-readln stream-readln"
         "    >r [ define ] map r>"
         "    define ;"
@@ -162,7 +162,7 @@ unit-test
     {
         "USING: kernel math sequences strings ;"
         "IN: temporary"
-        ": soft-break-layout"
+        ": soft-break-layout ( x y -- ? )"
         "    over string? ["
         "        over hashcode over hashcode number="
         "        [ sequence= ] [ 2drop f ] if"
@@ -204,7 +204,7 @@ unit-test
     {
         "USING: io kernel parser ;"
         "IN: temporary"
-        ": string-layout-test"
+        ": string-layout-test ( error -- )"
         "    \"Expected \" write dup unexpected-want expected>string write"
         "    \" but got \" write unexpected-got expected>string print ;"
     } ;
@@ -256,7 +256,7 @@ unit-test
 : another-narrow-test
     {
         "IN: temporary"
-        ": another-narrow-layout"
+        ": another-narrow-layout ( -- obj )"
         "    H{"
         "        { 1 2 }"
         "        { 3 4 }"
@@ -275,8 +275,10 @@ unit-test
 : class-see-test
     {
         "IN: temporary"
-        "TUPLE: class-see-layout bar ;"
-        "GENERIC: class-see-layout"
+        "TUPLE: class-see-layout ;"
+        ""
+        "IN: temporary"
+        "GENERIC: class-see-layout ( x -- y )"
         ""
         "USING: temporary ;"
         "M: class-see-layout class-see-layout ;"

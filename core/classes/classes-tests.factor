@@ -157,7 +157,7 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 [ t ] [ quotation redefine-bug-2 class< ] unit-test
 [ redefine-bug-2 ] [ fixnum quotation class-or ] unit-test
 
-"IN: temporary USE: math UNION: redefine-bug-1 bignum ;" eval
+[ ] [ "IN: temporary USE: math UNION: redefine-bug-1 bignum ;" eval ] unit-test
 
 [ t ] [ bignum redefine-bug-1 class< ] unit-test
 [ f ] [ fixnum redefine-bug-2 class< ] unit-test
@@ -173,3 +173,35 @@ FORGET: forget-class-bug-1
 FORGET: forget-class-bug-2
 
 [ t ] [ integer dll class-or interned? ] unit-test
+
+DEFER: mixin-forget-test-g
+
+[ ] [
+    {
+        "USING: sequences ;"
+        "IN: temporary"
+        "MIXIN: mixin-forget-test"
+        "INSTANCE: sequence mixin-forget-test"
+        "GENERIC: mixin-forget-test-g ( x -- y )"
+        "M: mixin-forget-test mixin-forget-test-g ;"
+    } "\n" join <string-reader> "mixin-forget-test"
+    parse-stream drop
+] unit-test
+
+[ { } ] [ { } mixin-forget-test-g ] unit-test
+[ H{ } mixin-forget-test-g ] unit-test-fails
+
+[ ] [
+    {
+        "USING: hashtables ;"
+        "IN: temporary"
+        "MIXIN: mixin-forget-test"
+        "INSTANCE: hashtable mixin-forget-test"
+        "GENERIC: mixin-forget-test-g ( x -- y )"
+        "M: mixin-forget-test mixin-forget-test-g ;"
+    } "\n" join <string-reader> "mixin-forget-test"
+    parse-stream drop
+] unit-test
+
+[ { } mixin-forget-test-g ] unit-test-fails
+[ H{ } ] [ H{ } mixin-forget-test-g ] unit-test

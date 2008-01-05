@@ -249,14 +249,17 @@ M: word see-class* drop ;
 M: builtin-class see-class*
     drop "! Built-in class" comment. ;
 
-: see-all ( seq -- ) natural-sort [ nl see ] each ;
+: see-all ( seq -- )
+    natural-sort [ nl see ] each ;
 
 : see-implementors ( class -- seq )
     dup implementors [ 2array ] curry* map ;
 
 : see-class ( class -- )
     dup class? [
-        dup seeing-word dup see-class*
+        [
+            dup seeing-word dup see-class*
+        ] with-use nl
     ] when drop ;
 
 : see-methods ( generic -- seq )
@@ -264,10 +267,13 @@ M: builtin-class see-class*
     [ 2array ] curry map ;
 
 M: word see
-    [
-        dup see-class
-        dup class? over symbol? and not [ dup (see) ] when
-    ] with-use nl
+    dup see-class
+    dup class? over symbol? not and [
+        nl
+    ] when
+    dup class? over symbol? and not [
+        [ dup (see) ] with-use nl
+    ] when
     [
         dup class? [ dup see-implementors % ] when
         dup generic? [ dup see-methods % ] when

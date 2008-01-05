@@ -44,7 +44,10 @@ M: object redefined* drop ;
 : delete-xref ( defspec -- )
     dup unxref crossref get delete-at ;
 
+GENERIC: update-methods ( class -- )
+
 SYMBOL: changed-words
+SYMBOL: changed-classes
 SYMBOL: old-definitions
 SYMBOL: new-definitions
 
@@ -91,12 +94,19 @@ TUPLE: no-compilation-unit word ;
     [ no-compilation-unit ] unless*
     set-at ;
 
+: changed-class ( class -- )
+    dup changed-classes get
+    [ no-compilation-unit ] unless*
+    set-at ;
+
 : with-compilation-unit ( quot -- )
     [
         H{ } clone changed-words set
+        H{ } clone changed-classes set
         <definitions> new-definitions set
         <definitions> old-definitions set
         [
+            changed-classes get keys [ update-methods ] each
             changed-words get keys recompile-hook get call
         ] [ ] cleanup
     ] with-scope ; inline

@@ -239,8 +239,6 @@ M: word uncache-class drop ;
 : uncache-classes ( assoc -- )
     [ drop uncache-class ] assoc-each ;
 
-GENERIC: update-methods ( class -- )
-
 PRIVATE>
 
 : define-class-props ( members superclass metaclass -- assoc )
@@ -265,7 +263,7 @@ PRIVATE>
         uncache-classes
         dupd (define-class)
     ] keep cache-classes
-    r> [ update-methods ] [ drop ] if ;
+    r> [ changed-class ] [ drop ] if ;
 
 GENERIC: class ( object -- class ) inline
 

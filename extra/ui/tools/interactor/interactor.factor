@@ -11,8 +11,12 @@ IN: ui.tools.interactor
 TUPLE: interactor
 history output
 continuation quot busy?
-use
 help ;
+
+: interactor-use ( interactor -- seq )
+    use swap
+    interactor-continuation continuation-name
+    assoc-stack ;
 
 : init-caret-help ( interactor -- )
     dup editor-caret 100 <delay> swap set-interactor-help ;
@@ -67,11 +71,13 @@ M: interactor model-changed
     t over set-interactor-busy?
     interactor-continuation schedule-thread-with ;
 
+: clear-input ( interactor -- ) gadget-model clear-doc ;
+
 : interactor-finish ( interactor -- )
     [ editor-string ] keep
     [ interactor-input. ] 2keep
     [ add-interactor-history ] keep
-    gadget-model clear-doc ;
+    clear-input ;
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
@@ -108,9 +114,6 @@ M: interactor stream-read
 M: interactor stream-read-partial
     stream-read ;
 
-: save-use ( interactor -- )
-    use get swap set-interactor-use ;
-
 : go-to-error ( interactor error -- )
     dup parse-error-line 1- swap parse-error-col 2array
     over set-caret
@@ -122,7 +125,7 @@ M: interactor stream-read-partial
 
 : try-parse ( lines interactor -- quot/error/f )
     [
-        >r parse-lines-interactive r> save-use
+        drop parse-lines-interactive
     ] [
         >r f swap set-interactor-busy? drop r>
         dup delegate unexpected-eof? [ drop f ] when
@@ -136,18 +139,17 @@ M: interactor stream-read-partial
     } cond ;
 
 M: interactor stream-read-quot
-    [ save-use ] keep
-    [ interactor-yield ] keep over quotation? [
-        drop
-    ] [
-        [ handle-interactive ] keep swap
-        [ interactor-finish ] [ nip stream-read-quot ] if
-    ] if ;
+    [ interactor-yield ] keep {
+        { [ over not ] [ drop ] }
+        { [ over callable? ] [ drop ] }
+        { [ t ] [
+            [ handle-interactive ] keep swap
+            [ interactor-finish ] [ nip stream-read-quot ] if
+        ] }
+    } cond ;
 
 M: interactor pref-dim*
     0 over line-height 4 * 2array swap delegate pref-dim* vmax ;
-
-: clear-input gadget-model clear-doc ;
 
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }

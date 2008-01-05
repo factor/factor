@@ -14,7 +14,7 @@ $nl
 { $subsection uses }
 "When a definition is changed, all definitions which depend on it are notified via a hook:"
 { $subsection redefined* }
-"Definitions must implement a few operations used for printing them in human and computer-readable form:"
+"Definitions must implement a few operations used for printing them in source form:"
 { $subsection synopsis* }
 { $subsection definer }
 { $subsection definition } ;
