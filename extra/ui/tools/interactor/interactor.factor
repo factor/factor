@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators continuations documents
 ui.tools.workspace hashtables io io.styles kernel math
@@ -74,10 +74,11 @@ M: interactor model-changed
 : clear-input ( interactor -- ) gadget-model clear-doc ;
 
 : interactor-finish ( interactor -- )
+    #! The in-thread is a kludge to make it infer. Stupid.
     [ editor-string ] keep
     [ interactor-input. ] 2keep
     [ add-interactor-history ] keep
-    clear-input ;
+    [ clear-input ] curry in-thread ;
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
