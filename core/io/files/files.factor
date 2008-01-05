@@ -3,7 +3,7 @@
 IN: io.files
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
-system combinators splitting ;
+system combinators splitting sbufs ;
 
 HOOK: <file-reader> io-backend ( path -- stream )
 
@@ -157,3 +157,8 @@ HOOK: binary-roots io-backend ( -- seq )
 PRIVATE>
 
 : walk-dir ( path -- seq ) [ (walk-dir) ] { } make ;
+
+: file-lines ( path -- seq ) <file-reader> lines ;
+
+: file-contents ( path -- str )
+    dup <file-reader> swap file-length <sbuf> [ stream-copy ] keep >string ;
