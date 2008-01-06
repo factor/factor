@@ -30,4 +30,6 @@ DEFER: crc32-table inline
 : file-crc32 ( path -- n ) file-contents crc32 ;
 
 : lines-crc32 ( seq -- n )
-    HEX: ffffffff tuck [ [ (crc32) ] each ] reduce bitxor ;
+    HEX: ffffffff tuck [
+        [ (crc32) ] each CHAR: \n (crc32)
+    ] reduce bitxor ;
