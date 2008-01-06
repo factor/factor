@@ -5,12 +5,17 @@ prettyprint continuations effects definitions ;
 IN: tools.annotations
 
 : reset ( word -- )
-    dup "unannotated-def" word-prop define ;
+    dup "unannotated-def" word-prop [
+        [
+            dup "unannotated-def" word-prop define
+        ] with-compilation-unit
+    ] [ drop ] if ;
 
 : annotate ( word quot -- )
-    over dup word-def "unannotated-def" set-word-prop
-    [ >r dup word-def r> call define ] with-compilation-unit ;
-    inline
+    [
+        over dup word-def "unannotated-def" set-word-prop
+        >r dup word-def r> call define
+    ] with-compilation-unit ; inline
 
 : entering ( str -- )
     "/-- Entering: " write dup .
