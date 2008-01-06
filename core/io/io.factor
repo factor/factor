@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables generic kernel math namespaces sequences strings
-    continuations assocs io.files io.styles sbufs ;
+    continuations assocs io.styles sbufs ;
 IN: io
 
 GENERIC: stream-close ( stream -- )
@@ -90,6 +90,3 @@ SYMBOL: stdio
 
 : contents ( stream -- str )
     2048 <sbuf> [ stream-copy ] keep >string ;
-
-: file-contents ( path -- str )
-    dup <file-reader> swap file-length <sbuf> [ stream-copy ] keep >string ;

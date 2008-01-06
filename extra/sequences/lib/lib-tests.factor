@@ -46,3 +46,10 @@ math.functions tools.test strings ;
 [ { { 0 0 } { 1 0 } { 0 1 } { 1 1 } } ] [ 2 2 exact-strings ] unit-test
 [ t ] [ "ab" 4 strings [ >string ] map "abab" swap member? ] unit-test
 [ { { } { 1 } { 2 } { 1 2 } } ] [ { 1 2 } power-set ] unit-test
+
+[ f ] [ { } ?first ] unit-test
+[ f ] [ { } ?fourth ] unit-test
+[ 1 ] [ { 1 2 3 } ?first ] unit-test
+[ 2 ] [ { 1 2 3 } ?second ] unit-test
+[ 3 ] [ { 1 2 3 } ?third ] unit-test
+[ f ] [ { 1 2 3 } ?fourth ] unit-test
