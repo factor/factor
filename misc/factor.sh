@@ -152,6 +152,7 @@ echo_build_info() {
 	echo FACTOR_BINARY=$FACTOR_BINARY
 	echo MAKE_TARGET=$MAKE_TARGET
 	echo BOOT_IMAGE=$BOOT_IMAGE
+	echo MAKE_IMAGE_TARGET=$MAKE_IMAGE_TARGET
 }
 
 set_build_info() {
@@ -162,12 +163,19 @@ set_build_info() {
 		echo "OS, ARCH, or WORD is empty.  Please report this"
 		exit 5
 	fi
-	
+
 	MAKE_TARGET=$OS-$ARCH-$WORD
+	MAKE_IMAGE_TARGET=$ARCH.$WORD
 	BOOT_IMAGE=boot.$ARCH.$WORD.image
 	if [[ $OS == macosx && $ARCH == ppc ]] ; then
+		MAKE_IMAGE_TARGET=$OS-$ARCH
 		MAKE_TARGET=$OS-$ARCH
 		BOOT_IMAGE=boot.macosx-ppc.image
+	fi
+	if [[ $OS == linux && $ARCH == ppc ]] ; then
+		MAKE_IMAGE_TARGET=$OS-$ARCH
+		MAKE_TARGET=$OS-$ARCH
+		BOOT_IMAGE=boot.linux-ppc.image
 	fi
 }
 
@@ -266,16 +274,24 @@ update_bootstrap() {
 }
 
 refresh_image() {
-	./$FACTOR_BINARY -e="refresh-all save 0 USE: system exit"
+	./$FACTOR_BINARY -script -e="refresh-all save 0 USE: system exit"
+	check_ret factor
+}
+
+make_boot_image() {
+	./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USE: bootstrap.image make-image save 0 USE: system exit"
+	check_ret factor
+
 }
 
 install_libraries() {
-	sudo apt-get install libc6-dev libfreetype6-dev wget git-core git-doc libx11-dev glutg3-dev rlwrap
+	sudo apt-get install libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap
 }
 
 case "$1" in
 	install) install ;;
 	install-x11) install_libraries; install ;;
+	self-update) update; make_boot_image; bootstrap;;
 	quick-update) update; refresh_image ;;
 	update) update; update_bootstrap ;;
 	*) usage ;;

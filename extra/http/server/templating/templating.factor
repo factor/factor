@@ -76,6 +76,7 @@ DEFER: <% delimiter
 : run-template-file ( filename -- )
     [
         [
+            "quiet" on
             file-vocabs
             parser-notes off
             templating-vocab use+

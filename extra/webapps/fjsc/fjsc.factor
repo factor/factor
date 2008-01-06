@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel furnace fjsc  parser-combinators namespaces
+USING: kernel furnace fjsc  peg namespaces
        lazy-lists io io.files furnace.validator sequences
        http.client http.server http.server.responders
        webapps.file html ;
@@ -11,7 +11,7 @@ IN: webapps.fjsc
   #! Compile the factor code as a string, outputting the http
   #! response containing the javascript.
   serving-text
-  'expression' parse-1 fjsc-compile
+  'expression' parse parse-result-ast fjsc-compile
   write flush ;
 
 ! The 'compile' action results in an URL that looks like
@@ -25,7 +25,7 @@ IN: webapps.fjsc
 : compile-url ( url -- )
   #! Compile the factor code at the given url, return the javascript.
   dup "http:" head? [ "Unable to access remote sites." throw ] when
-  "http://" host rot 3append http-get 2nip compile "();" write flush ;
+  "http://" "Host" header-param rot 3append http-get 2nip compile "();" write flush ;
 
 \ compile-url {
   { "url" v-required }

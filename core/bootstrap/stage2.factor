@@ -59,10 +59,12 @@ IN: bootstrap.stage2
         [
             boot
             do-init-hooks
-            [ parse-command-line ] try
-            [ run-user-init ] try
-            [ "run" get run ] try
-            stdio get [ stream-flush ] when*
+            [
+                parse-command-line
+                run-user-init
+                "run" get run
+                stdio get [ stream-flush ] when*
+            ] [ print-error 1 exit ] recover
         ] set-boot-quot
 
         : count-words all-words swap subset length pprint ;

@@ -513,6 +513,12 @@ factor.add_word("alien", "set-alien-property", "primitive", function(next) {
   factor.call_next(next);
 });
 
+factor.add_word("alien", "uneval", "primitive", function(next) {
+  var stack = factor.cont.data_stack;
+  stack.push(uneval(stack.pop()));
+  factor.call_next(next);
+});
+
 factor.add_word("words", "vocabs", "primitive", function(next) {   
   var stack = factor.cont.data_stack;
   var result = [];

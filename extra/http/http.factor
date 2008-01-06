@@ -60,11 +60,18 @@ IN: http
 : url-decode ( str -- str )
     [ 0 swap url-decode-iter ] "" make ;
 
-: build-url ( path query-params -- str )
+: hash>query ( hash -- str )
+    [ [ url-encode ] 2apply "=" swap 3append ] { } assoc>map
+    "&" join ;
+
+: build-url ( str query-params -- newstr )
     [
-        swap % dup assoc-empty? [
-            "?" % dup
-            [ [ url-encode ] 2apply "=" swap 3append ] { } assoc>map
-            "&" join %
-        ] unless drop
+        over %
+        dup assoc-empty? [
+            2drop
+        ] [
+            CHAR: ? rot member? "&" "?" ? %
+            hash>query %
+        ] if
     ] "" make ;
+

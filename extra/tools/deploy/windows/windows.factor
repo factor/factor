@@ -40,6 +40,5 @@ M: windows-deploy-implementation deploy*
         [
             [ deploy-name get create-exe-dir ] keep
             [ deploy-name get image-name ] keep
-            deploy-name get
         ] bind
     ] keep stage2 open-in-explorer ;
