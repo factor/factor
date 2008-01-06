@@ -400,5 +400,3 @@ HELP: ABOUT:
 HELP: vocab-help
 { $values { "vocab" "a vocabulary specifier" } { "help" "a help article" } }
 { $description "Outputs the main help article for a vocabulary. The main help article can be set with " { $link POSTPONE: ABOUT:  } "." } ;
-
-USE: help.lint

@@ -56,7 +56,3 @@ HOOK: process-stream* io-backend ( desc -- stream )
 
 : <process-stream> ( obj -- stream )
     >descriptor process-stream* ;
-
-unix? [ "io.unix.launcher" require ] when
-windows? [ "io.windows.launcher" require ] when
-winnt? [ "io.windows.nt.launcher" require ] when

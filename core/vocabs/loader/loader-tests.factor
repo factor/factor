@@ -136,21 +136,4 @@ forget-junk
 
 "xabbabbja" forget-vocab
 
-"bootstrap.help" vocab [
-    [
-        "again" off
-        
-        [ "vocabs.loader.test.e" require ] catch drop
-        
-        [ 3 ] [ restarts get length ] unit-test
-        
-        [ ] [
-            "again" get not restarts get length 3 = and [
-                "again" on
-                :2
-            ] when
-        ] unit-test
-    ] with-scope
-] when
-
 forget-junk

@@ -14,7 +14,7 @@ IN: bootstrap.stage2
     vm file-name windows? [ >lower ".exe" ?tail drop ] when
     ".image" append "output-image" set-global
 
-    "math tools compiler help ui ui.tools io" "include" set-global
+    "math tools help compiler ui ui.tools io" "include" set-global
     "" "exclude" set-global
 
     parse-command-line

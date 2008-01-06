@@ -4,6 +4,9 @@ parser vocabs.loader ;
 IN: bootstrap.help
 
 : load-help
+    "alien.syntax" require
+    "compiler" require
+
     t load-help? set-global
 
     [ vocab ] load-vocab-hook [

@@ -1,7 +1,7 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.union words kernel sequences
-definitions prettyprint.backend ;
+definitions prettyprint.backend combinators ;
 IN: classes.mixin
 
 PREDICATE: union-class mixin-class "mixin" word-prop ;
@@ -43,6 +43,14 @@ TUPLE: check-mixin-class mixin ;
 ! Definition protocol implementation ensures that removing an
 ! INSTANCE: declaration from a source file updates the mixin.
 TUPLE: mixin-instance loc class mixin ;
+
+M: mixin-instance equal?
+    {
+        { [ over mixin-instance? not ] [ f ] }
+        { [ 2dup [ mixin-instance-class ] 2apply = not ] [ f ] }
+        { [ 2dup [ mixin-instance-mixin ] 2apply = not ] [ f ] }
+        { [ t ] [ t ] }
+    } cond 2nip ;
 
 : <mixin-instance> ( class mixin -- definition )
     { set-mixin-instance-class set-mixin-instance-mixin }

@@ -19,11 +19,6 @@ $nl
 
 ABOUT: "tools.deploy"
 
-HELP: deploy*
-{ $values { "vm" "a pathname string" } { "image" "a pathname string" } { "vocab" "a vocabulary specifier" } { "config" assoc } }
-{ $description "Deploys " { $snippet "vocab" } ", which must have a " { $link POSTPONE: MAIN: } " hook, using the specified VM and configuration. The deployed image is saved as " { $snippet "image" } "." }
-{ $notes "This is a low-level word and in most cases " { $link deploy } " should be called instead." } ;
-
 HELP: deploy
 { $values { "vocab" "a vocabulary specifier" } }
 { $description "Deploys " { $snippet "vocab" } ", saving the deployed image as " { $snippet { $emphasis "vocab" } ".image" } "." } ;

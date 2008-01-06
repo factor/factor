@@ -2,7 +2,7 @@ USING: help help.markup help.syntax help.topics
 namespaces words sequences classes assocs vocabs kernel
 arrays prettyprint.backend kernel.private io tools.browser
 generic math tools.profiler system ui strings sbufs vectors
-byte-arrays bit-arrays float-arrays quotations ;
+byte-arrays bit-arrays float-arrays quotations help.lint ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
