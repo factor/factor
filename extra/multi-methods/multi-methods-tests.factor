@@ -1,6 +1,7 @@
 IN: temporary
 USING: multi-methods tools.test kernel math arrays sequences
-prettyprint strings classes hashtables assocs namespaces ;
+prettyprint strings classes hashtables assocs namespaces
+debugger continuations ;
 
 [ { 1 2 3 4 5 6 } ] [
     { 6 4 5 1 3 2 } [ <=> ] topological-sort
@@ -52,6 +53,8 @@ METHOD: beats? { thing thing } f ;
 : play ( obj1 obj2 -- ? ) beats? 2nip ;
 
 [ { } 3 play ] unit-test-fails
+[ t ] [ error get no-method? ] unit-test
+[ ] [ error get error. ] unit-test
 [ t ] [ T{ paper } T{ scissors } play ] unit-test
 [ f ] [ T{ scissors } T{ paper } play ] unit-test
 

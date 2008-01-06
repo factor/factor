@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences vectors classes combinators
 arrays words assocs parser namespaces definitions
-prettyprint prettyprint.backend quotations ;
+prettyprint prettyprint.backend quotations arrays.lib
+debugger io ;
 IN: multi-methods
 
 TUPLE: method loc def ;
@@ -38,47 +39,80 @@ TUPLE: method loc def ;
         [ 1- picker [ >r ] swap [ r> swap ] 3append ]
     } case ;
 
+: (multi-predicate) ( class picker -- quot )
+    swap "predicate" word-prop append ;
+
 : multi-predicate ( classes -- quot )
-    dup length <reversed> [
-        >r "predicate" word-prop r>
-        picker swap [ not ] 3append [ f ] 2array
-    ] 2map [ t ] swap alist>quot ;
-
-: method-defs ( methods -- methods' )
-    [ method-def ] assoc-map ;
-
-: multi-dispatch-quot ( methods -- quot )
-    [ >r multi-predicate r> ] assoc-map
-    [ "No method" throw ] swap reverse alist>quot ;
+    dup length <reversed>
+    [ picker 2array ] 2map
+    [ drop object eq? not ] assoc-subset
+    dup empty? [ drop [ t ] ] [
+        [ (multi-predicate) ] { } assoc>map
+        unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
+    ] if ;
 
 : methods ( word -- alist )
     "multi-methods" word-prop >alist ;
 
+: method-defs ( methods -- methods' )
+    [ method-def ] assoc-map ;
+
+TUPLE: no-method arguments generic ;
+
+: no-method ( argument-count generic -- * )
+    >r narray r> \ no-method construct-boa throw ; inline
+
+: argument-count ( methods -- n )
+    dup assoc-empty? [ drop 0 ] [
+        keys [ length ] map supremum
+    ] if ;
+
+: multi-dispatch-quot ( methods generic -- quot )
+    >r
+    [ [ >r multi-predicate r> ] assoc-map ] keep argument-count
+    r> [ no-method ] 2curry
+    swap reverse alist>quot ;
+
 : congruify-methods ( alist -- alist' )
-    dup empty? [
-        dup [ first length ] map supremum [
-            swap >r object pad-left [ \ f or ] map r>
-        ] curry assoc-map
-    ] unless ;
+    dup argument-count [
+        swap >r object pad-left [ \ f or ] map r>
+    ] curry assoc-map ;
 
 : sorted-methods ( alist -- alist' )
     [ [ first ] 2apply classes< ] topological-sort ;
+
+: niceify-method [ dup \ f eq? [ drop f ] when ] map ;
+
+M: no-method error.
+    "Type check error" print
+    nl
+    "Generic word " write dup no-method-generic pprint
+    " does not have a method applicable to inputs:" print
+    dup no-method-arguments short.
+    nl
+    "Inputs have signature:" print
+    dup no-method-arguments [ class ] map niceify-method .
+    nl
+    "Defined methods in topological order: " print
+    no-method-generic
+    methods congruify-methods sorted-methods keys
+    [ niceify-method ] map stack. ;
 
 GENERIC: perform-combination ( word combination -- quot )
 
 TUPLE: standard-combination ;
 
-: standard-combination ( methods -- quot )
-    congruify-methods sorted-methods multi-dispatch-quot ;
+: standard-combination ( methods generic -- quot )
+    >r congruify-methods sorted-methods r> multi-dispatch-quot ;
 
 M: standard-combination perform-combination
-    drop methods method-defs standard-combination ;
+    drop [ methods method-defs ] keep standard-combination ;
 
 TUPLE: hook-combination var ;
 
 M: hook-combination perform-combination
-    hook-combination-var [ get ] curry
-    swap methods method-defs [ [ drop ] swap append ] assoc-map
+    hook-combination-var [ get ] curry swap methods
+    [ method-defs [ [ drop ] swap append ] assoc-map ] keep
     standard-combination append ;
 
 : make-generic ( word -- )
@@ -158,7 +192,9 @@ syntax:M: hook-generic definer drop \ HOOK: f ;
 syntax:M: hook-generic definition drop f ;
 
 syntax:M: hook-generic synopsis*
-    dup seeing-word \ HOOK: pprint-word dup pprint-word
+    dup definer.
+    dup seeing-word
+    dup pprint-word
     dup "multi-combination" word-prop
     hook-combination-var pprint-word stack-effect. ;
 
@@ -178,7 +214,7 @@ syntax:M: method-spec definition
     unclip method method-def ;
 
 syntax:M: method-spec synopsis*
-    dup definer drop pprint-word
+    dup definer.
     unclip pprint* pprint* ;
 
 syntax:M: method-spec forget
