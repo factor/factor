@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.union words kernel sequences
-definitions prettyprint.backend combinators arrays ;
+definitions combinators arrays ;
 IN: classes.mixin
 
 PREDICATE: union-class mixin-class "mixin" word-prop ;
@@ -63,11 +63,6 @@ M: mixin-instance hashcode*
 M: mixin-instance where mixin-instance-loc ;
 
 M: mixin-instance set-where set-mixin-instance-loc ;
-
-M: mixin-instance synopsis*
-    \ INSTANCE: pprint-word
-    dup mixin-instance-class pprint-word
-    mixin-instance-mixin pprint-word ;
 
 M: mixin-instance definer drop \ INSTANCE: f ;
 

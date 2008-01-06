@@ -146,39 +146,44 @@ GENERIC: see ( defspec -- )
 : seeing-word ( word -- )
     word-vocabulary pprinter-in set ;
 
+: definer. ( defspec -- )
+    definer drop pprint-word ;
+
 : stack-effect. ( word -- )
     dup parsing? over symbol? or not swap stack-effect and
     [ effect>string comment. ] when* ;
 
-: word-synopsis ( word name -- )
+: word-synopsis ( word -- )
     dup seeing-word
-    over definer drop pprint-word
-    pprint-word
+    dup definer.
+    dup pprint-word
     stack-effect. ;
 
-M: word synopsis*
-    dup word-synopsis ;
+M: word synopsis* word-synopsis ;
 
-M: simple-generic synopsis*
-    dup word-synopsis ;
+M: simple-generic synopsis* word-synopsis ;
 
 M: standard-generic synopsis*
+    dup definer.
     dup seeing-word
-    \ GENERIC# pprint-word
     dup pprint-word
     dup dispatch# pprint*
     stack-effect. ;
 
 M: hook-generic synopsis*
+    dup definer.
     dup seeing-word
-    \ HOOK: pprint-word
     dup pprint-word
     dup "combination" word-prop hook-combination-var pprint-word
     stack-effect. ;
 
 M: method-spec synopsis*
-    dup definer drop pprint-word
-    [ pprint-word ] each ;
+    dup definer. [ pprint-word ] each ;
+
+M: mixin-instance synopsis*
+    dup definer.
+    dup mixin-instance-class pprint-word
+    mixin-instance-mixin pprint-word ;
 
 M: pathname synopsis* pprint* ;
 

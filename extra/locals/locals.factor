@@ -314,14 +314,16 @@ M: lambda-word definer drop \ :: \ ; ;
 M: lambda-word definition
     "lambda" word-prop lambda-body ;
 
-: lambda-word-synopsis ( word prop definer -- )
-    pick seeing-word pprint-word over pprint-word
+: lambda-word-synopsis ( word prop -- )
+    over definer.
+    over seeing-word
+    over pprint-word
     \ | pprint-word
     word-prop lambda-vars pprint-vars
     \ | pprint-word ;
 
 M: lambda-word synopsis*
-    "lambda" \ :: lambda-word-synopsis ;
+    "lambda" lambda-word-synopsis ;
 
 PREDICATE: macro lambda-macro
     "lambda-macro" word-prop >boolean ;
@@ -332,6 +334,6 @@ M: lambda-macro definition
     "lambda-macro" word-prop lambda-body ;
 
 M: lambda-macro synopsis*
-    "lambda-macro" \ MACRO:: lambda-word-synopsis ;
+    "lambda-macro" lambda-word-synopsis ;
 
 PRIVATE>

@@ -182,3 +182,7 @@ M: standard-combination dispatch# standard-combination-# ;
 M: hook-combination dispatch# drop 0 ;
 
 M: simple-generic definer drop \ GENERIC: f ;
+
+M: standard-generic definer drop \ GENERIC# f ;
+
+M: hook-generic definer drop \ HOOK: f ;
