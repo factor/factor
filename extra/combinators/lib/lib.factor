@@ -72,9 +72,9 @@ MACRO: nfirst ( n -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: sigma ( seq quot -- n ) [ rot slip + ] curry 0 swap reduce ;
+: sigma ( seq quot -- n ) [ rot slip + ] curry 0 swap reduce ; inline
 
-: count ( seq quot -- n ) [ 1 0 ? ] compose sigma ;
+: count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
 
 : all-unique? ( seq -- ? ) [ prune ] keep [ length ] 2apply = ;
 
@@ -161,3 +161,8 @@ MACRO: map-call-with2 ( quots -- )
   r> length [ narray ] curry append ;
 
 MACRO: map-exec-with ( words -- ) [ 1quotation ] map [ map-call-with ] curry ;
+
+MACRO: construct-slots ( assoc tuple-class -- tuple ) 
+    [ construct-empty ] curry swap [
+        [ dip ] curry swap 1quotation [ keep ] curry compose
+    ] { } assoc>map concat compose ;

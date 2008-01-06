@@ -5,7 +5,7 @@ USING: sequences xml kernel arrays xml.utilities io.files tools.test ;
     [ tag-named children>string ] curry* map ;
 
 : parse-result ( xml -- seq )
-    "resultElements" tag-named* "item" tags-named
+    "resultElements" deep-tag-named "item" tags-named
     [ assemble-data ] map ;
 
 [ "http://www.foxnews.com/oreilly/" ] [

@@ -40,9 +40,6 @@ M: assoc-heap heap-peek ( assoc-heap -- value key )
 M: assoc-heap heap-push ( value key assoc-heap -- )
     set-at ;
 
-M: assoc-heap heap-push-all ( assoc assoc-heap -- )
-    swap [ rot set-at ] curry* each ;
-
 M: assoc-heap heap-pop ( assoc-heap -- value key )
     dup assoc-heap-heap heap-pop swap
     rot dupd assoc-heap-assoc delete-at ;

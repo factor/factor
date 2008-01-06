@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: bootstrap.primitives
 USING: alien arrays byte-arrays generic hashtables
@@ -476,7 +476,7 @@ builtins get num-tags get tail f union-class define-class
     { "float<=" "math.private" }
     { "float>" "math.private" }
     { "float>=" "math.private" }
-    { "<word>" "words.private" }
+    { "<word>" "words" }
     { "word-xt" "words" }
     { "drop" "kernel" }
     { "2drop" "kernel" }

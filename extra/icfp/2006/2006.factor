@@ -1,9 +1,7 @@
 ! Copyright (C) 2007 Gavin Harrison
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: kernel math sequences kernel.private namespaces arrays
-io io.files splitting io.binary math.functions vectors
-quotations combinators.private ;
+USING: kernel math sequences kernel.private namespaces arrays io io.files
+    splitting io.binary math.functions vectors quotations combinators.private ;
 IN: icfp.2006
 
 SYMBOL: regs
@@ -58,7 +56,7 @@ SYMBOL: open-arrays
     >r get-cba r>
     swap >r >r [ reg-val ] 2apply swap r> call r>
     set-reg f ; inline
-    
+
 : op1 ( opcode -- ? )
     [ swap arr-val ] binary-op ;
 
@@ -89,7 +87,7 @@ SYMBOL: open-arrays
 
 : op8 ( opcode -- ? )
     ?grow-storage
-    get-cb >r reg-val open-arrays get pop [ new-array ] keep r> 
+    get-cb >r reg-val open-arrays get pop [ new-array ] keep r>
     set-reg f ;
 
 : op9 ( opcode -- ? )
@@ -111,7 +109,7 @@ SYMBOL: open-arrays
 
 : op13 ( opcode -- ? )
     [ get-value ] keep get-special set-reg f ;
-    
+
 : advance ( -- val opcode )
     finger get arrays get first nth
     finger inc dup get-op ;
@@ -129,7 +127,7 @@ SYMBOL: open-arrays
     [ run-op exec-loop ] unless ;
 
 : load-platters ( path -- )
-    <file-reader> contents 4 group [ be> ] map
+    file-contents 4 group [ be> ] map
     0 arrays get set-nth ;
 
 : init ( path -- )

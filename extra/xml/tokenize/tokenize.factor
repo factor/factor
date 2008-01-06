@@ -124,7 +124,8 @@ SYMBOL: ns-stack
     [ parse-attr (middle-tag) ] when ;
 
 : middle-tag ( -- attrs-alist )
-    [ (middle-tag) ] V{ } make pass-blank ;
+    ! f make will make a vector if it has any elements
+    [ (middle-tag) ] f make pass-blank ;
 
 : end-tag ( name attrs-alist -- tag )
     tag-ns pass-blank get-char CHAR: / =

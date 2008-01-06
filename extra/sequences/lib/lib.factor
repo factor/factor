@@ -64,6 +64,10 @@ IN: sequences.lib
 : delete-random ( seq -- value )
     [ length random ] keep [ nth ] 2keep delete-nth ;
 
+: split-around ( seq quot -- before elem after )
+    dupd find over [ "Element not found" throw ] unless
+    >r cut-slice 1 tail r> swap ; inline
+
 : (map-until) ( quot pred -- quot )
     [ dup ] swap 3compose
     [ [ drop t ] [ , f ] if ] compose [ find 2drop ] curry ;
@@ -131,3 +135,8 @@ PRIVATE>
 : human-sort ( seq -- newseq )
     [ dup [ digit? ] [ string>number ] cut-all ] { } map>assoc
     sort-values keys ;
+
+: ?first ( seq -- first/f ) 0 swap ?nth ; inline
+: ?second ( seq -- second/f ) 1 swap ?nth ; inline
+: ?third ( seq -- third/f ) 2 swap ?nth ; inline
+: ?fourth ( seq -- fourth/f ) 3 swap ?nth ; inline

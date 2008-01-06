@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: rss
-USING: xml.utilities kernel assocs
+USING: xml.utilities kernel assocs xml.generator
     strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities io.files io
     http.client namespaces xml.generator hashtables ;

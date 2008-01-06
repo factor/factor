@@ -23,4 +23,4 @@ IN: io.crc32
 : crc32 ( seq -- n )
     >r HEX: ffffffff dup r> [ (crc32) ] each bitxor ;
 
-: file-crc32 ( path -- n ) <file-reader> contents crc32 ;
+: file-crc32 ( path -- n ) file-contents crc32 ;

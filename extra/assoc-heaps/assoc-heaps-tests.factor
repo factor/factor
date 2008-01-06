@@ -44,3 +44,12 @@ T{
     T{ max-heap T{ heap f V{ { 1 2 } { 0 1 } } } }
 } heap-pop
 ] unit-test
+
+[
+T{
+    assoc-heap
+    f
+    H{ { 1 2 } { 3 4 } }
+    T{ min-heap T{ heap f V{ { 2 1 } { 4 3 } } } }
+}
+] [ H{ { 1 2 } { 3 4 } } H{ } clone <assoc-min-heap> [ heap-push-all ] keep ] unit-test

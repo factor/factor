@@ -1,6 +1,6 @@
 IN: templating
 USING: kernel xml sequences assocs tools.test io arrays namespaces
-    xml.data xml.utilities xml.writer generic ;
+    xml.data xml.utilities xml.writer generic sequences.deep ;
 
 : sub-tag
     T{ name f f "sub" "http://littledan.onigirihouse.com/namespaces/replace" } ;
@@ -16,7 +16,7 @@ M: tag (r-ref)
 M: object (r-ref) drop ;
 
 : template ( xml -- )
-    [ (r-ref) ] xml-each ;
+    [ (r-ref) ] deep-each ;
 
 ! Example
 
@@ -40,4 +40,4 @@ M: object (r-ref) drop ;
         sample-doc string>xml dup template xml>string
     ] with-scope ;
 
-[ "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><html xmlns:f=\"http://littledan.onigirihouse.com/namespaces/replace\"><body><span f:sub=\"foo\">foo</span><div f:sub=\"bar\">blah<a/></div><p f:sub=\"baz\"/></body></html>" ] [ test-refs ] unit-test
+[ "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<html xmlns:f=\"http://littledan.onigirihouse.com/namespaces/replace\"><body><span f:sub=\"foo\">foo</span><div f:sub=\"bar\">blah<a/></div><p f:sub=\"baz\"/></body></html>" ] [ test-refs ] unit-test

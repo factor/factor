@@ -23,11 +23,11 @@ USING: tools.test io.files io threads kernel ;
 ] unit-test
 
 [ "Hello world.\nHello appender.\n" ] [
-    "test-foo.txt" resource-path <file-reader> contents
+    "test-foo.txt" resource-path file-contents
 ] unit-test
 
 [ "Hello appender.\n" ] [
-    "test-bar.txt" resource-path <file-reader> contents
+    "test-bar.txt" resource-path file-contents
 ] unit-test
 
 [ ] [ "test-foo.txt" resource-path delete-file ] unit-test
