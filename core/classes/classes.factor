@@ -263,7 +263,7 @@ PRIVATE>
         uncache-classes
         dupd (define-class)
     ] keep cache-classes
-    r> [ changed-class ] [ drop ] if ;
+    r> [ update-methods ] [ drop ] if ;
 
 GENERIC: class ( object -- class ) inline
 

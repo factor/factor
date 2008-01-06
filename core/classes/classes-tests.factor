@@ -2,7 +2,7 @@ USING: alien arrays definitions generic assocs hashtables io
 kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes io.streams.string
 classes.private classes.union classes.mixin classes.predicate
-vectors definitions ;
+vectors definitions source-files ;
 IN: temporary
 
 H{ } "s" set
@@ -175,6 +175,8 @@ FORGET: forget-class-bug-2
 [ t ] [ integer dll class-or interned? ] unit-test
 
 DEFER: mixin-forget-test-g
+
+[ "mixin-forget-test" forget-source ] with-compilation-unit
 
 [ ] [
     {
