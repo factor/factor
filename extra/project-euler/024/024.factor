@@ -27,10 +27,10 @@ IN: project-euler.024
 : (>permutation) ( seq n -- seq )
     [ [ dupd >= [ 1+ ] when ] curry map ] keep add* ;
 
+PRIVATE>
+
 : >permutation ( factoradic -- permutation )
     reverse 1 cut [ (>permutation) ] each ;
-
-PRIVATE>
 
 : factoradic ( k order -- factoradic )
     [ [1,b] [ 2dup mod , /i ] each ] { } make reverse nip ;

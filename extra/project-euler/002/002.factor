@@ -19,11 +19,15 @@ IN: project-euler.002
 ! SOLUTION
 ! --------
 
-: last2 ( seq -- elt last )
-    2 tail* first2 ;
+<PRIVATE
+
+: (fib-upto) ( seq n limit -- seq )
+    2dup <= [ >r add dup 2 tail* sum r> (fib-upto) ] [ 2drop ] if ;
+
+PRIVATE>
 
 : fib-upto ( n -- seq )
-    { 0 } 1 [ pick dupd < ] [ add dup last2 + ] [ ] while drop nip ;
+    { 0 } 1 rot (fib-upto) ;
 
 : euler002 ( -- answer )
     1000000 fib-upto [ even? ] subset sum ;

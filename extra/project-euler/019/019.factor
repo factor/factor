@@ -30,9 +30,10 @@ IN: project-euler.019
 ! already, as "zeller-congruence ( year month day -- n )" where n is
 ! the day of the week (Sunday is 0).
 
-: euler019 ( -- count )
-  1901 2000 [a,b] [ 12 [1,b] [ 1 zeller-congruence ] 1 map-withn ] map concat
-  [ 0 = ] subset length ;
+: euler019 ( -- answer )
+    1901 2000 [a,b] [
+        12 [1,b] [ 1 zeller-congruence ] 1 map-withn
+    ] map concat [ zero? ] count ;
 
 ! [ euler019 ] 100 ave-time
 ! 1 ms run / 0 ms GC ave time - 100 trials

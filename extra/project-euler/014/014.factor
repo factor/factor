@@ -39,7 +39,7 @@ IN: project-euler.014
     dup even? [ 2 / ] [ 3 * 1+ ] if ;
 
 : longest ( seq seq -- seq )
-    2dup length swap length > [ nip ] [ drop ] if ;
+    2dup [ length ] 2apply > [ drop ] [ nip ] if ;
 
 PRIVATE>
 
@@ -47,7 +47,7 @@ PRIVATE>
     [ [ dup 1 > ] [ dup , next-collatz ] [ ] while , ] { } make ;
 
 : euler014 ( -- answer )
-    1000000 0 [ 1+ collatz longest ] reduce first ;
+    1000000 [1,b] 0 [ collatz longest ] reduce first ;
 
 ! [ euler014 ] time
 ! 52868 ms run / 483 ms GC time
@@ -59,10 +59,7 @@ PRIVATE>
 <PRIVATE
 
 : worth-calculating? ( n -- ? )
-    {
-        [ dup 1- 3 mod zero? ]
-        [ dup 1- 3 / even? ]
-    } && nip ;
+    { [ dup 1- 3 mod zero? ] [ dup 1- 3 / even? ] } && nip ;
 
 PRIVATE>
 
@@ -72,7 +69,7 @@ PRIVATE>
     ] reduce first ;
 
 ! [ euler014a ] 10 ave-time
-! 5109 ms run / 44 ms GC time
+! 4821 ms run / 41 ms GC time
 
 ! TODO: try using memoization
 

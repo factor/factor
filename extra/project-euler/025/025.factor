@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax kernel math math.functions math.parser math.ranges memoize
-    sequences ;
+    project-euler.common sequences ;
 IN: project-euler.025
 
 ! http://projecteuler.net/index.php?section=problems&id=25
@@ -39,7 +39,7 @@ IN: project-euler.025
 ! Memoized brute force
 
 MEMO: fib ( m -- n )
-    dup 1 > [ 1 - dup fib swap 1 - fib + ] when ;
+    dup 1 > [ 1- dup fib swap 1- fib + ] when ;
 
 <PRIVATE
 
@@ -66,8 +66,6 @@ PRIVATE>
 ! Thus we need we need "Phi**n / sqrt(5) > 10**999", and we just solve for n
 
 <PRIVATE
-
-FUNCTION: double log10 ( double x ) ;
 
 : phi ( -- phi )
     5 sqrt 1+ 2 / ;
