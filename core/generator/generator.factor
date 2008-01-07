@@ -36,14 +36,12 @@ SYMBOL: compiling-label
 ! Label of current word, after prologue, makes recursion faster
 SYMBOL: current-label-start
 
-SYMBOL: compiled-stack-traces?
-
-t compiled-stack-traces? set-global
+: compiled-stack-traces? ( -- ? ) 36 getenv ;
 
 : init-generator ( compiling -- )
     V{ } clone literal-table set
     V{ } clone word-table set
-    compiled-stack-traces? get swap f ?
+    compiled-stack-traces? swap f ?
     literal-table get push ;
 
 : generate-1 ( word label node quot -- )
@@ -152,10 +150,6 @@ M: #if generate-node
     H{ { +input+ { { f "flag" } } } }
     with-template
     generate-if ;
-
-: rel-current-word ( class -- )
-    compiling-label get add-word
-    swap rt-xt-profiling rel-fixup ;
 
 ! #dispatch
 : dispatch-branch ( node word -- label )

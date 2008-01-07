@@ -119,8 +119,7 @@ void jit_compile(CELL quot)
 	GROWABLE_ARRAY(words);
 	REGISTER_ROOT(words);
 
-	GROWABLE_ADD(literals,quot);
-	GROWABLE_ADD(words,quot);
+	GROWABLE_ADD(literals,stack_traces_p() ? quot : F);
 
 	bool stack_frame = jit_stack_frame_p(untag_object(array));
 

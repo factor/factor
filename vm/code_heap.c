@@ -40,10 +40,6 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 INLINE CELL compute_code_rel(F_REL *rel,
 	CELL code_start, CELL literals_start, CELL words_start)
 {
-	CELL obj;
-	F_WORD *word;
-	F_QUOTATION *quot;
-
 	switch(REL_TYPE(rel))
 	{
 	case RT_PRIMITIVE:
@@ -55,22 +51,7 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	case RT_DISPATCH:
 		return CREF(words_start,REL_ARGUMENT(rel));
 	case RT_XT:
-		obj = get(CREF(words_start,REL_ARGUMENT(rel)));
-		switch(type_of(obj))
-		{
-		case WORD_TYPE:
-			word = untag_object(obj);
-			return (CELL)word->xt;
-		case QUOTATION_TYPE:
-			quot = untag_object(obj);
-			return (CELL)quot->xt;
-		default:
-			critical_error("Bad parameter to rt-xt relocation",obj);
-			return -1; /* Can't happen */
-		}
-	case RT_XT_PROFILING:
-		word = untag_word(get(CREF(words_start,REL_ARGUMENT(rel))));
-		return (CELL)(word->code + 1);
+		return (CELL)untag_word(get(CREF(words_start,REL_ARGUMENT(rel))))->xt;
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
 	default:
@@ -211,6 +192,11 @@ void deposit_objects(CELL here, F_ARRAY *array)
 	memcpy((void*)here,array + 1,array_capacity(array) * CELLS);
 }
 
+bool stack_traces_p(void)
+{
+	return to_boolean(userenv[STACK_TRACES_ENV]);
+}
+
 CELL compiled_code_format(void)
 {
 	return untag_fixnum_fast(userenv[JIT_CODE_FORMAT]);
@@ -349,7 +335,9 @@ DEFINE_PRIMITIVE(modify_code_heap)
 		if(data == F)
 		{
 			REGISTER_UNTAGGED(alist);
+			REGISTER_UNTAGGED(word);
 			default_word_code(word);
+			UNREGISTER_UNTAGGED(word);
 			UNREGISTER_UNTAGGED(alist);
 		}
 		else

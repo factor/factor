@@ -45,7 +45,7 @@ M: x86-backend stack-frame ( n -- i )
     3 cells + 16 align cell - ;
 
 M: x86-backend %save-word-xt ( -- )
-    xt-reg 0 MOV rc-absolute-cell rel-current-word ;
+    xt-reg 0 MOV rc-absolute-cell rel-this ;
 
 : factor-area-size 4 cells ;
 

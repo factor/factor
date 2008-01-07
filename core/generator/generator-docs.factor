@@ -28,7 +28,8 @@ HELP: compiling-label
 { $var-description "The label currently being compiled, set by " { $link generate-1 } "." } ;
 
 HELP: compiled-stack-traces?
-{ $var-description "If set to true, compiled code blocks will retain what word they were compiled from. This information is used by " { $link :c } " to display call stack traces after an error is thrown from compiled code. This variable is on by default; the deployment tool switches it off to save some space in the deployed image." } ;
+{ $values { "?" "a boolean" } }
+{ $description "Iftrue, compiled code blocks will retain what word they were compiled from. This information is used by " { $link :c } " to display call stack traces after an error is thrown from compiled code. This is on by default; the deployment tool switches it off to save some space in the deployed image." } ;
 
 HELP: literal-table
 { $var-description "Holds a vector of literal objects referenced from the currently compiling word. If " { $link compiled-stack-traces? } " is on, " { $link init-generator } " ensures that the first entry is the word being compiled." } ;

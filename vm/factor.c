@@ -27,6 +27,7 @@ void default_parameters(F_PARAMETERS *p)
 	p->secure_gc = false;
 	p->fep = false;
 	p->console = false;
+	p->stack_traces = true;
 }
 
 /* Do some initialization that we do once only */
@@ -96,6 +97,7 @@ void init_factor(F_PARAMETERS *p)
 	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
+	userenv[STACK_TRACES_ENV] = tag_boolean(p->stack_traces);
 
 	/* We can GC now */
 	gc_off = false;
@@ -145,7 +147,9 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 		else if(STRNCMP(argv[i],STR_FORMAT("-i="),3) == 0)
 			p.image = argv[i] + 3;
 		else if(STRCMP(argv[i],STR_FORMAT("-console")) == 0)
-			p.console = true ;
+			p.console = true;
+		else if(STRCMP(argv[i],STR_FORMAT("-no-stack-traces")) == 0)
+			p.stack_traces = false;
 	}
 
 	init_factor(&p);

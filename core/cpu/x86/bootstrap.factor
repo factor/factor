@@ -28,7 +28,7 @@ big-endian off
     stack-frame-size PUSH                      ! save stack frame size
     0 PUSH                                     ! push XT
     arg1 PUSH                                  ! alignment
-] rc-absolute-cell rt-xt 6 jit-prolog jit-define
+] rc-absolute-cell rt-label 6 jit-prolog jit-define
 
 [
     arg0 0 [] MOV                              ! load literal

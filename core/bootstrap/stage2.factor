@@ -45,7 +45,7 @@ IN: bootstrap.stage2
 
         run-bootstrap-init
 
-        "Compiling remaining words..." print
+        "Compiling remaining words..." print flush
 
         all-words [ compiled? not ] subset recompile-hook get call
     ] with-compiler-errors

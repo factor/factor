@@ -9,8 +9,8 @@ typedef enum {
 	RT_DISPATCH,
 	/* a compiled word reference */
 	RT_XT,
-	/* a compiled word reference, pointing at the profiling prologue */
-	RT_XT_PROFILING,
+	/* reserved */
+	RT_RESERVED,
 	/* a local label */
 	RT_LABEL
 } F_RELTYPE;
@@ -69,5 +69,6 @@ F_COMPILED *add_compiled_block(
 	F_ARRAY *literals);
 
 CELL compiled_code_format(void);
+bool stack_traces_p(void);
 
 DECLARE_PRIMITIVE(modify_code_heap);

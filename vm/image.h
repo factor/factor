@@ -33,6 +33,7 @@ typedef struct {
 	bool secure_gc;
 	bool fep;
 	bool console;
+	bool stack_traces;
 } F_PARAMETERS;
 
 void load_image(F_PARAMETERS *p);
