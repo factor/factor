@@ -37,12 +37,12 @@ IN: memoize
     over check-memoized
     2dup "memo-quot" set-word-prop
     over H{ } clone "memoize" set-word-prop
-    over make-memoizer define-compound ;
+    over make-memoizer define ;
 
 : MEMO:
     CREATE dup reset-generic parse-definition define-memoized ; parsing
 
-PREDICATE: compound memoized "memoize" word-prop ;
+PREDICATE: word memoized "memoize" word-prop ;
 
 M: memoized definer drop \ MEMO: \ ; ;
 M: memoized definition "memo-quot" word-prop ;
