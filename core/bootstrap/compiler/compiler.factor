@@ -4,15 +4,17 @@ USING: compiler cpu.architecture vocabs.loader system sequences
 namespaces parser kernel kernel.private classes classes.private
 arrays hashtables vectors tuples sbufs inference.dataflow
 hashtables.private sequences.private math tuples.private
-growable namespaces.private alien.remote-control assocs words
-generator command-line vocabs io prettyprint libc definitions ;
+growable namespaces.private assocs words generator command-line
+vocabs io prettyprint libc definitions ;
 IN: bootstrap.compiler
 
-"cpu." cpu append require
+! Don't bring this in when deploying, since it will store a
+! reference to 'eval' in a global variable
+"deploy-vocab" get [
+    "alien.remote-control" require
+] unless
 
-"-no-stack-traces" cli-args member? [
-    f compiled-stack-traces? set-global
-] when
+"cpu." cpu append require
 
 nl
 "Compiling some words to speed up bootstrap..." write

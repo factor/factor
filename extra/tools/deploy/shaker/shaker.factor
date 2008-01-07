@@ -48,8 +48,8 @@ IN: tools.deploy.shaker
     [ f over set-word-name f swap set-word-vocabulary ] each ;
 
 : strip-word-defs ( words -- )
-    "Stripping unoptimized definitions from optimized words" show
-    [ compiled? ] subset [ [ ] swap set-word-def ] each ;
+    "Stripping symbolic word definitions" show
+    [ [ ] swap set-word-def ] each ;
 
 : strip-word-props ( retain-props words -- )
     "Stripping word properties" show
@@ -109,10 +109,6 @@ SYMBOL: deploy-vocab
         builtins ,
         strip-io? [ io-backend , ] unless
 
-        deploy-compiler? get [
-            "callbacks" "alien.compiler" lookup ,
-        ] when
-
         strip-dictionary? [
             {
                 dictionary
@@ -154,11 +150,14 @@ SYMBOL: deploy-vocab
         ] when
     ] { } make dup . ;
 
-: strip ( hook -- )
-    >r strip-libc
+: strip-recompile-hook ( -- )
+    [ [ f ] { } map>assoc ] recompile-hook set-global ;
+
+: strip ( -- )
+    strip-libc
     strip-cocoa
     strip-debugger
-    r> [ call ] when*
+    strip-recompile-hook
     strip-init-hooks
     deploy-vocab get vocab-main set-boot-quot*
     retained-props >r
@@ -171,8 +170,6 @@ SYMBOL: deploy-vocab
     [
         [
             deploy-vocab set
-            parse-hook get
-            parse-hook off
             deploy-vocab get require
             strip
             finish-deploy

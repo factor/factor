@@ -48,6 +48,8 @@ typedef enum {
 	JIT_RETURN,
 	JIT_PROFILING,
 
+	STACK_TRACES_ENV    = 36,
+
 	UNDEFINED_ENV       = 37, /* default quotation for undefined words */
 	STAGE2_ENV          = 39  /* have we bootstrapped? */
 } F_ENVTYPE;

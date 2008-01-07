@@ -37,8 +37,8 @@ M: windows-deploy-implementation deploy*
     stage1
     "." resource-path cd
     dup deploy-config [
-        [
-            [ deploy-name get create-exe-dir ] keep
-            [ deploy-name get image-name ] keep
-        ] bind
-    ] keep stage2 open-in-explorer ;
+        [ deploy-name get create-exe-dir ] keep
+        [ deploy-name get image-name ] keep
+        [ namespace stage2 ] keep
+        open-in-explorer
+    ] bind ;
