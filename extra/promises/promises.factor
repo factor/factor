@@ -42,4 +42,4 @@ TUPLE: promise quot forced? value ;
 : LAZY:
   CREATE dup reset-generic
   dup parse-definition
-  make-lazy-quot define-compound ; parsing
+  make-lazy-quot define ; parsing

@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: help.markup help.syntax promises ;
+USING: help.markup help.syntax ;
+IN: promises
 
 HELP: promise 
 { $values { "quot" "a quotation with stack effect ( -- X )" } { "promise" "a promise object" } }
