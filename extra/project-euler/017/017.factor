@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib kernel math.ranges math.text sequences strings ;
+USING: combinators.lib kernel math.ranges math.text.english sequences strings ;
 IN: project-euler.017
 
 ! http://projecteuler.net/index.php?section=problems&id=17
