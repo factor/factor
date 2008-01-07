@@ -1,6 +1,6 @@
-USING: continuations destructors io.buffers io.nonblocking io.windows
-io.windows.nt io.windows.nt.backend kernel libc math
-threads windows windows.kernel32 ;
+USING: continuations destructors io.buffers io.nonblocking
+io.windows io.windows.nt.backend kernel libc math threads
+windows windows.kernel32 ;
 IN: io.windows.nt.files
 
 M: windows-nt-io CreateFile-flags ( DWORD -- DWORD )

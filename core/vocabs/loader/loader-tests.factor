@@ -6,7 +6,9 @@ parser source-files words assocs tuples definitions
 debugger ;
 
 ! This vocab should not exist, but just in case...
-[ ] [ "vocabs.loader.test" forget-vocab ] unit-test
+[ ] [
+    "vocabs.loader.test" forget-vocab
+] unit-test
 
 [ T{ vocab-link f "vocabs.loader.test" } ]
 [ "vocabs.loader.test" f >vocab-link ] unit-test
@@ -61,7 +63,7 @@ IN: temporary
         "resource:core/vocabs/loader/test/a/a.factor"
         source-file source-file-definitions dup USE: prettyprint .
         "v-l-t-a-hello" "vocabs.loader.test.a" lookup dup .
-        swap key?
+        swap first key?
     ] unit-test
 ] times
 
@@ -78,12 +80,12 @@ IN: temporary
 
 0 "count-me" set-global
 
-[ ] [ "vocabs.loader.test.b" forget-vocab ] unit-test
+[ ] [
+    "vocabs.loader.test.b" forget-vocab
+] unit-test
 
 [ ] [
-    "vocabs.loader.test.b" vocab-files [
-        forget-source
-    ] each
+    "vocabs.loader.test.b" vocab-files [ forget-source ] each
 ] unit-test
 
 [ "vocabs.loader.test.b" require ] unit-test-fails
@@ -91,19 +93,19 @@ IN: temporary
 [ 1 ] [ "count-me" get-global ] unit-test
 
 [ ] [
-    "bob" "vocabs.loader.test.b" create [ ] define-compound
+    [
+        "bob" "vocabs.loader.test.b" create [ ] define
+    ] with-compilation-unit
 ] unit-test
 
 [ ] [ "vocabs.loader.test.b" refresh ] unit-test
 
 [ 2 ] [ "count-me" get-global ] unit-test
 
-[ t ] [ "fred" "vocabs.loader.test.b" lookup compound? ] unit-test
+[ f ] [ "fred" "vocabs.loader.test.b" lookup undefined? ] unit-test
 
 [ ] [
-    "vocabs.loader.test.b" vocab-files [
-        forget-source
-    ] each
+    "vocabs.loader.test.b" vocab-files [ forget-source ] each
 ] unit-test
 
 [ ] [ "vocabs.loader.test.b" refresh ] unit-test
@@ -133,22 +135,5 @@ forget-junk
 ] unit-test
 
 "xabbabbja" forget-vocab
-
-"bootstrap.help" vocab [
-    [
-        "again" off
-        
-        [ "vocabs.loader.test.e" require ] catch drop
-        
-        [ 3 ] [ restarts get length ] unit-test
-        
-        [ ] [
-            "again" get not restarts get length 3 = and [
-                "again" on
-                :2
-            ] when
-        ] unit-test
-    ] with-scope
-] when
 
 forget-junk

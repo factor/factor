@@ -350,7 +350,7 @@ M: arm-backend %unbox-any-c-ptr ( dst src -- )
     "end" get EQ B
     ! Is the object an alien?
     R14 R12 header-offset <+/-> LDR
-    R14 alien type-number tag-header CMP
+    R14 alien type-number tag-fixnum CMP
     ! Add byte array address to address being computed
     R11 R11 R12 NE ADD
     ! Add an offset to start of byte array's data area

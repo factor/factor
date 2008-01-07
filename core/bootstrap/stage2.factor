@@ -4,7 +4,7 @@ USING: init command-line namespaces words debugger io
 kernel.private math memory continuations kernel io.files
 io.backend system parser vocabs sequences prettyprint
 vocabs.loader combinators splitting source-files strings
-definitions assocs ;
+definitions assocs compiler.errors ;
 IN: bootstrap.stage2
 
 ! Wrap everything in a catch which starts a listener so
@@ -14,12 +14,10 @@ IN: bootstrap.stage2
     vm file-name windows? [ >lower ".exe" ?tail drop ] when
     ".image" append "output-image" set-global
 
-    "math compiler tools help ui ui.tools io" "include" set-global
+    "math tools help compiler ui ui.tools io" "include" set-global
     "" "exclude" set-global
 
     parse-command-line
-
-    all-words [ dup ] H{ } map>assoc changed-words set-global
 
     "-no-crossref" cli-args member? [
         "Cross-referencing..." print flush
@@ -37,7 +35,6 @@ IN: bootstrap.stage2
     ] [
         "listener" require
         "none" require
-        "listener" use+
     ] if
 
     [
@@ -45,18 +42,13 @@ IN: bootstrap.stage2
         [ get-global " " split [ empty? not ] subset ] 2apply
         seq-diff
         [ "bootstrap." swap append require ] each
-    ] no-parse-hook
 
-    init-io
-    init-stdio
+        run-bootstrap-init
 
-    changed-words get clear-assoc
+        "Compiling remaining words..." print
 
-    "compile-errors" "generator" lookup [
-        f swap set-global
-    ] when*
-
-    run-bootstrap-init
+        all-words [ compiled? not ] subset recompile-hook get call
+    ] with-compiler-errors
 
     f error set-global
     f error-continuation set-global
@@ -76,14 +68,14 @@ IN: bootstrap.stage2
         ] set-boot-quot
 
         : count-words all-words swap subset length pprint ;
-    
+
         [ compiled? ] count-words " compiled words" print
         [ symbol? ] count-words " symbol words" print
         [ ] count-words " words total" print
 
         "Bootstrapping is complete." print
-        "Now, you can run ./factor -i=" write
-        "output-image" get print flush
+        "Now, you can run Factor:" print
+        vm write " -i=" write "output-image" get print flush
 
         "output-image" get resource-path save-image-and-exit
     ] if

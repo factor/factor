@@ -63,7 +63,7 @@ M: sequence hashcode*
     next-power-of-2 swap [ nip clone ] curry map ;
 
 : distribute-buckets ( assoc initial quot -- buckets )
-    swap rot [ length <buckets> ] keep
+    spin [ length <buckets> ] keep
     [ >r 2dup r> dup first roll call (distribute-buckets) ] each
     nip ; inline
 

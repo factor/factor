@@ -13,14 +13,13 @@ IN: macros
 : (MACRO:) ( word definition effect-in -- )
     >r 2dup "macro" set-word-prop
     2dup over "declared-effect" word-prop memoize-quot
-    [ call ] append define-compound 
+    [ call ] append define
     r> define-transform ;
 
 : MACRO:
     (:) (MACRO:) ; parsing
 
-PREDICATE: compound macro
-    "macro" word-prop >boolean ;
+PREDICATE: word macro "macro" word-prop >boolean ;
 
 M: macro definer drop \ MACRO: \ ; ;
 

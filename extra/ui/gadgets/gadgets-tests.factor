@@ -193,12 +193,12 @@ M: mock-gadget ungraft*
     { { f f } { f t } { t f } { t t } } [ notify-combo ] assoc-each
 ] string-out print
 
-{ 0 1 } [ <gadget> ] unit-test-effect
-{ 1 0 } [ unparent ] unit-test-effect
-{ 2 0 } [ add-gadget ] unit-test-effect
-{ 2 0 } [ add-gadgets ] unit-test-effect
-{ 1 0 } [ clear-gadget ] unit-test-effect
+\ <gadget> must-infer
+\ unparent must-infer
+\ add-gadget must-infer
+\ add-gadgets must-infer
+\ clear-gadget must-infer
 
-{ 1 0 } [ relayout ] unit-test-effect
-{ 1 0 } [ relayout-1 ] unit-test-effect
-{ 1 1 } [ pref-dim ] unit-test-effect
+\ relayout must-infer
+\ relayout-1 must-infer
+\ pref-dim must-infer

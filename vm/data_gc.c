@@ -126,6 +126,9 @@ void init_data_heap(CELL gens,
 {
 	set_data_heap(alloc_data_heap(gens,young_size,aging_size));
 
+	gc_locals_region = alloc_segment(getpagesize());
+	gc_locals = gc_locals_region->start - CELLS;
+
 	extra_roots_region = alloc_segment(getpagesize());
 	extra_roots = extra_roots_region->start - CELLS;
 
@@ -369,33 +372,35 @@ void collect_cards(void)
 /* Copy all tagged pointers in a range of memory */
 void collect_stack(F_SEGMENT *region, CELL top)
 {
-	CELL bottom = region->start;
-	CELL ptr;
+	CELL ptr = region->start;
 
-	for(ptr = bottom; ptr <= top; ptr += CELLS)
+	for(; ptr <= top; ptr += CELLS)
 		copy_handle((CELL*)ptr);
 }
 
 void collect_stack_frame(F_STACK_FRAME *frame)
 {
-	if(frame_type(frame) == QUOTATION_TYPE)
-	{
-		CELL scan = frame->scan - frame->array;
-		copy_handle(&frame->array);
-		frame->scan = scan + frame->array;
-	}
-
-	if(collecting_code)
-		recursive_mark(compiled_to_block(frame_code(frame)));
+	recursive_mark(compiled_to_block(frame_code(frame)));
 }
 
 /* The base parameter allows us to adjust for a heap-allocated
 callstack snapshot */
 void collect_callstack(F_CONTEXT *stacks)
 {
-	CELL top = (CELL)stacks->callstack_top;
-	CELL bottom = (CELL)stacks->callstack_bottom;
-	iterate_callstack(top,bottom,collect_stack_frame);
+	if(collecting_code)
+	{
+		CELL top = (CELL)stacks->callstack_top;
+		CELL bottom = (CELL)stacks->callstack_bottom;
+		iterate_callstack(top,bottom,collect_stack_frame);
+	}
+}
+
+void collect_gc_locals(void)
+{
+	CELL ptr = gc_locals_region->start;
+
+	for(; ptr <= gc_locals; ptr += CELLS)
+		copy_handle(*(CELL **)ptr);
 }
 
 /* Copy roots over at the start of GC, namely various constants, stacks,
@@ -407,6 +412,7 @@ void collect_roots(void)
 	copy_handle(&bignum_pos_one);
 	copy_handle(&bignum_neg_one);
 
+	collect_gc_locals();
 	collect_stack(extra_roots_region,extra_roots);
 
 	save_stacks();
@@ -515,7 +521,7 @@ CELL binary_payload_start(CELL pointer)
 		return 0;
 	/* these objects have some binary data at the end */
 	case WORD_TYPE:
-		return sizeof(F_WORD) - CELLS * 2;
+		return sizeof(F_WORD) - CELLS * 3;
 	case ALIEN_TYPE:
 		return CELLS * 3;
 	case DLL_TYPE:
@@ -528,16 +534,8 @@ CELL binary_payload_start(CELL pointer)
 	}
 }
 
-void collect_callstack_object(F_CALLSTACK *callstack)
+void do_code_slots(CELL scan)
 {
-	iterate_callstack_object(callstack,collect_stack_frame);
-}
-
-CELL collect_next(CELL scan)
-{
-	do_slots(scan,copy_handle);
-
-	/* Special behaviors */
 	F_WORD *word;
 	F_QUOTATION *quot;
 	F_CALLSTACK *stack;
@@ -546,19 +544,28 @@ CELL collect_next(CELL scan)
 	{
 	case WORD_TYPE:
 		word = (F_WORD *)scan;
-		if(collecting_code && word->compiledp != F)
-			recursive_mark(compiled_to_block(word->code));
+		recursive_mark(compiled_to_block(word->code));
+		if(word->profiling)
+			recursive_mark(compiled_to_block(word->profiling));
 		break;
 	case QUOTATION_TYPE:
 		quot = (F_QUOTATION *)scan;
-		if(collecting_code && quot->compiledp != F)
+		if(quot->compiledp != F)
 			recursive_mark(compiled_to_block(quot->code));
 		break;
 	case CALLSTACK_TYPE:
 		stack = (F_CALLSTACK *)scan;
-		collect_callstack_object(stack);
+		iterate_callstack_object(stack,collect_stack_frame);
 		break;
 	}
+}
+
+CELL collect_next(CELL scan)
+{
+	do_slots(scan,copy_handle);
+
+	if(collecting_code)
+		do_code_slots(scan);
 
 	return scan + untagged_object_size(scan);
 }

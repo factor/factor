@@ -9,6 +9,8 @@ void init_objects(F_HEADER *h)
 	bignum_zero = h->bignum_zero;
 	bignum_pos_one = h->bignum_pos_one;
 	bignum_neg_one = h->bignum_neg_one;
+
+	stage2 = (userenv[STAGE2_ENV] != F);
 }
 
 INLINE void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
@@ -150,6 +152,10 @@ DEFINE_PRIMITIVE(save_image)
 
 DEFINE_PRIMITIVE(save_image_and_exit)
 {
+	F_CHAR *path = unbox_native_string();
+
+	REGISTER_C_STRING(path);
+
 	/* strip out userenv data which is set on startup anyway */
 	CELL i;
 	for(i = 0; i < FIRST_SAVE_ENV; i++)
@@ -158,8 +164,10 @@ DEFINE_PRIMITIVE(save_image_and_exit)
 	/* do a full GC + code heap compaction */
 	compact_code_heap();
 
+	UNREGISTER_C_STRING(path);
+
 	/* Save the image */
-	save_image(unbox_native_string());
+	save_image(path);
 
 	/* now exit; we cannot continue executing like this */
 	exit(0);
@@ -167,14 +175,11 @@ DEFINE_PRIMITIVE(save_image_and_exit)
 
 void fixup_word(F_WORD *word)
 {
-	/* If this is a compiled word, relocate the code pointer. Otherwise,
-	reset it based on the primitive number of the word. */
-	if(word->compiledp == F)
-		word->xt = default_word_xt(word);
-	else
+	if(stage2)
 	{
-		code_fixup((CELL)&word->xt);
 		code_fixup((CELL)&word->code);
+		if(word->profiling) code_fixup((CELL)&word->profiling);
+		update_word_xt(word);
 	}
 }
 
@@ -197,14 +202,6 @@ void fixup_alien(F_ALIEN *d)
 void fixup_stack_frame(F_STACK_FRAME *frame)
 {
 	code_fixup((CELL)&frame->xt);
-
-	if(frame_type(frame) == QUOTATION_TYPE)
-	{
-		CELL scan = frame->scan - frame->array;
-		data_fixup(&frame->array);
-		frame->scan = scan + frame->array;
-	}
-
 	code_fixup((CELL)&FRAME_RETURN_ADDRESS(frame));
 }
 
@@ -275,12 +272,7 @@ void fixup_code_block(F_COMPILED *relocating, CELL code_start,
 		data_fixup((CELL*)scan);
 
 	for(scan = words_start; scan < words_end; scan += CELLS)
-	{
-		if(relocating->finalized)
-			code_fixup(scan);
-		else
-			data_fixup((CELL*)scan);
-	}
+		data_fixup((CELL*)scan);
 
 	if(reloc_start != literals_start)
 	{

@@ -29,6 +29,36 @@ void default_parameters(F_PARAMETERS *p)
 	p->console = false;
 }
 
+/* Do some initialization that we do once only */
+void do_stage1_init(void)
+{
+	fprintf(stderr,"*** Stage 2 early init... ");
+	fflush(stderr);
+
+	begin_scan();
+
+	CELL obj;
+	while((obj = next_object()) != F)
+	{
+		if(type_of(obj) == WORD_TYPE)
+		{
+			F_WORD *word = untag_object(obj);
+			default_word_code(word);
+			update_word_xt(word);
+		}
+	}
+
+	/* End heap scan */
+	gc_off = false;
+
+	iterate_code_heap(relocate_code_block);
+
+	userenv[STAGE2_ENV] = T;
+
+	fprintf(stderr,"done\n");
+	fflush(stderr);
+}
+
 /* Get things started */
 void init_factor(F_PARAMETERS *p)
 {
@@ -44,6 +74,7 @@ void init_factor(F_PARAMETERS *p)
 	/* Disable GC during init as a sanity check */
 	gc_off = true;
 
+	/* OS-specific initialization */
 	early_init();
 
 	if(p->image == NULL)
@@ -57,18 +88,20 @@ void init_factor(F_PARAMETERS *p)
 	init_signals();
 
 	stack_chain = NULL;
+	profiling_p = false;
+	performing_gc = false;
+	last_code_heap_scan = NURSERY;
+	collecting_aging_again = false;
 
 	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
 
-	performing_gc = false;
-	last_code_heap_scan = NURSERY;
-	collecting_aging_again = false;
-	stack_chain = NULL;
-
 	/* We can GC now */
 	gc_off = false;
+
+	if(!stage2)
+		do_stage1_init();
 }
 
 INLINE bool factor_arg(const F_CHAR* str, const F_CHAR* arg, CELL* value)

@@ -1,5 +1,5 @@
-USING: ui.gadgets help.markup help.syntax arrays
-ui.gadgets.grids ;
+USING: ui.gadgets help.markup help.syntax arrays ;
+IN: ui.gadgets.grids
 
 HELP: grid
 { $class-description "A grid gadget lays out its children so that all gadgets in a column have equal width and all gadgets in a row have equal height."

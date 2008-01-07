@@ -3,7 +3,7 @@
 USING: arrays hashtables io kernel math memory namespaces
 parser sequences strings io.styles io.streams.lines
 io.streams.duplex vectors words generic system combinators
-tuples continuations debugger ;
+tuples continuations debugger definitions ;
 IN: listener
 
 SYMBOL: quit-flag
@@ -12,31 +12,34 @@ SYMBOL: listener-hook
 
 [ ] listener-hook set-global
 
-GENERIC: parse-interactive ( stream -- quot/f )
+GENERIC: stream-read-quot ( stream -- quot/f )
 
-: parse-interactive-step ( lines -- quot/f )
-    [ parse-lines ] catch {
+: parse-lines-interactive ( lines -- quot/f )
+    [ parse-lines in get ] with-compilation-unit in set ;
+
+: read-quot-step ( lines -- quot/f )
+    [ parse-lines-interactive ] catch {
         { [ dup delegate unexpected-eof? ] [ 2drop f ] }
         { [ dup not ] [ drop ] }
         { [ t ] [ rethrow ] }
     } cond ;
 
-: parse-interactive-loop  ( stream accum -- quot/f )
+: read-quot-loop  ( stream accum -- quot/f )
     over stream-readln dup [
         over push
-        dup parse-interactive-step dup
-        [ 2nip ] [ drop parse-interactive-loop ] if
+        dup read-quot-step dup
+        [ 2nip ] [ drop read-quot-loop ] if
     ] [
         3drop f
     ] if ;
 
-M: line-reader parse-interactive
-    [
-        V{ } clone parse-interactive-loop in get
-    ] with-scope in set ;
+M: line-reader stream-read-quot
+    V{ } clone read-quot-loop ;
 
-M: duplex-stream parse-interactive
-    duplex-stream-in parse-interactive ;
+M: duplex-stream stream-read-quot
+    duplex-stream-in stream-read-quot ;
+
+: read-quot ( -- quot ) stdio get stream-read-quot ;
 
 : bye ( -- ) quit-flag on ;
 
@@ -46,9 +49,7 @@ M: duplex-stream parse-interactive
 
 : listen ( -- )
     listener-hook get call prompt.
-    [
-        stdio get parse-interactive [ call ] [ bye ] if*
-    ] try ;
+    [ read-quot [ call ] [ bye ] if* ] try ;
 
 : until-quit ( -- )
     quit-flag get
@@ -60,7 +61,6 @@ M: duplex-stream parse-interactive
     " on " write os write "/" write cpu print ;
 
 : listener ( -- )
-    print-banner
-    [ use [ clone ] change until-quit ] with-scope ;
+    print-banner [ until-quit ] with-interactive-vocabs ;
 
 MAIN: listener

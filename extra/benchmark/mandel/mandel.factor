@@ -34,9 +34,9 @@ SYMBOL: cols
 
 : c ( i j -- c )
     >r
-    x-inc * center real x-inc width 2 / * - + >float
+    x-inc * center real-part x-inc width 2 / * - + >float
     r>
-    y-inc * center imaginary y-inc height 2 / * - + >float
+    y-inc * center imaginary-part y-inc height 2 / * - + >float
     rect> ; inline
 
 : render ( -- )

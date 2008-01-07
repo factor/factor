@@ -22,9 +22,5 @@ global [
 
     ! We need this for strip-stack-traces to work fully
     { message-senders super-message-senders }
-    [
-        get values [
-            dup update-xt compile
-        ] each
-    ] each
+    [ get values compile ] each
 ] bind

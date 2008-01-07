@@ -33,8 +33,8 @@ uses definitions ;
     dup source-file-path ?resource-path file-modified
     swap set-source-file-modified ;
 
-: record-checksum ( source-file contents -- )
-    crc32 swap set-source-file-checksum ;
+: record-checksum ( contents source-file -- )
+    >r crc32 r> set-source-file-checksum ;
 
 : (xref-source) ( source-file -- pathname uses )
     dup source-file-path <pathname> swap source-file-uses
@@ -54,8 +54,13 @@ uses definitions ;
     swap quot-uses keys over set-source-file-uses
     xref-source ;
 
+: record-definitions ( file -- )
+    new-definitions get swap set-source-file-definitions ;
+
 : <source-file> ( path -- source-file )
-    { set-source-file-path } \ source-file construct ;
+    <definitions>
+    { set-source-file-path set-source-file-definitions }
+    \ source-file construct ;
 
 : source-file ( path -- source-file )
     source-files get [ <source-file> ] cache ;
@@ -68,10 +73,27 @@ uses definitions ;
 
 M: pathname where pathname-string 1 2array ;
 
-: forget-source ( path -- )
+M: pathname forget
+    pathname-string
     dup source-file
     dup unxref-source
-    source-file-definitions keys forget-all
+    source-file-definitions [ keys forget-all ] each
     source-files get delete-at ;
 
-M: pathname forget pathname-string forget-source ;
+: forget-source ( path -- )
+    [ <pathname> forget ] with-compilation-unit ;
+
+: rollback-source-file ( source-file -- )
+    dup source-file-definitions new-definitions get [ union ] 2map
+    swap set-source-file-definitions ;
+
+SYMBOL: file
+
+: with-source-file ( name quot -- )
+    #! Should be called from inside with-compilation-unit.
+    [
+        swap source-file
+        dup file set
+        source-file-definitions old-definitions set
+        [ ] [ file get rollback-source-file ] cleanup
+    ] with-scope ; inline

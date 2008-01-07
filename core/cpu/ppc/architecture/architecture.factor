@@ -134,7 +134,7 @@ M: ppc-backend %jump-t ( label -- )
         "offset" operand "n" operand 1 SRAWI
         0 11 LOAD32 rc-absolute-ppc-2/2 rel-dispatch
         11 dup "offset" operand LWZX
-        11 dup compiled-header-size ADDI
+        11 dup word-xt-offset LWZ
         r> call
     ] H{
         { +input+ { { f "n" } } }
@@ -295,7 +295,7 @@ M: ppc-backend %cleanup ( alien-node -- ) drop ;
 M: ppc-backend value-structs?
     #! On Linux/PPC, value structs are passed in the same way
     #! as reference structs, we just have to make a copy first.
-    os "linux" = not ;
+    linux? not ;
 
 M: ppc-backend fp-shadows-int? ( -- ? ) macosx? ;
 
@@ -333,7 +333,7 @@ M: ppc-backend %unbox-any-c-ptr ( dst src -- )
     "end" get BEQ
     ! Is the object an alien?
     0 11 header-offset LWZ
-    0 0 alien type-number tag-header CMPI
+    0 0 alien type-number tag-fixnum CMPI
     "is-byte-array" get BNE
     ! If so, load the offset
     0 11 alien-offset LWZ

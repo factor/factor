@@ -1,6 +1,6 @@
-USING: ui.gadgets.worlds ui.gadgets ui.render ui.gestures
-ui.backend help.markup help.syntax models ui.freetype opengl
-strings ui.gadgets.worlds ;
+USING: ui.gadgets ui.render ui.gestures ui.backend help.markup
+help.syntax models opengl strings ;
+IN: ui.gadgets.worlds
 
 HELP: origin
 { $var-description "Within the dynamic extent of " { $link draw-world } ", holds the co-ordinate system origin for the gadget currently being drawn." } ;
@@ -40,7 +40,7 @@ HELP: world
         { { $link world-status } " - a " { $link model } " holding a string to be displayed in the world's status bar." }
         { { $link world-focus } " - the current owner of the keyboard focus in the world." }
         { { $link world-focused? } " - a boolean indicating if the native window containing the world has keyboard focus." }
-        { { $link world-fonts } " - a hashtable mapping " { $link font } " instances to vectors of " { $link sprite } " instances." }
+        { { $link world-fonts } " - a hashtable mapping font instances to vectors of " { $link sprite } " instances." }
         { { $link world-handle } " - a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
         { { $link world-loc } " - the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
     }

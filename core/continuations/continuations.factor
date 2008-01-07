@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
-namespaces tuples math splitting sorting quotations assocs ;
+namespaces math splitting sorting quotations assocs ;
 IN: continuations
 
 SYMBOL: error
@@ -127,8 +127,8 @@ PRIVATE>
     >r (catch) r> ifcc ; inline
 
 : cleanup ( try cleanup-always cleanup-error -- )
-    >r [ compose (catch) ] keep r> compose
-    [ dip rethrow ] curry ifcc ; inline
+    over >r compose [ dip rethrow ] curry
+    >r (catch) r> ifcc r> call ; inline
 
 : attempt-all ( seq quot -- obj )
     [

@@ -1,9 +1,7 @@
 USING: namespaces parser ;
 IN: vocabs.loader.test.a
 
-: COUNT-ME global [ "count-me" inc ] bind ; parsing
-
-COUNT-ME
+<< global [ "count-me" inc ] bind >>
 
 : v-l-t-a-hello 4 ;
 

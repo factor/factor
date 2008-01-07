@@ -1,13 +1,14 @@
-! Inspired by
-! http://cat-language.googlecode.com/svn/trunk/CatPointFreeForm.cs
-
+! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences sequences.private assocs
        math inference.transforms parser words quotations debugger
        macros arrays macros splitting combinators prettyprint.backend
        definitions prettyprint hashtables combinators.lib
        prettyprint.sections ;
-
 IN: locals
+
+! Inspired by
+! http://cat-language.googlecode.com/svn/trunk/CatPointFreeForm.cs
 
 <PRIVATE
 
@@ -259,7 +260,7 @@ PRIVATE>
 
 MACRO: with-locals ( form -- quot ) lambda-rewrite ;
 
-: :: "lambda" (::) drop define-compound ; parsing
+: :: "lambda" (::) drop define ; parsing
 
 : MACRO:: "lambda-macro" (::) (MACRO:) ; parsing
 
@@ -306,7 +307,7 @@ M: wlet pprint*
     { wlet-body wlet-vars wlet-bindings } get-slots pprint-let
     \ ] pprint-word ;
 
-PREDICATE: compound lambda-word
+PREDICATE: word lambda-word
     "lambda" word-prop >boolean ;
 
 M: lambda-word definer drop \ :: \ ; ;
@@ -314,14 +315,16 @@ M: lambda-word definer drop \ :: \ ; ;
 M: lambda-word definition
     "lambda" word-prop lambda-body ;
 
-: lambda-word-synopsis ( word prop definer -- )
-    pick seeing-word pprint-word over pprint-word
+: lambda-word-synopsis ( word prop -- )
+    over definer.
+    over seeing-word
+    over pprint-word
     \ | pprint-word
     word-prop lambda-vars pprint-vars
     \ | pprint-word ;
 
 M: lambda-word synopsis*
-    "lambda" \ :: lambda-word-synopsis ;
+    "lambda" lambda-word-synopsis ;
 
 PREDICATE: macro lambda-macro
     "lambda-macro" word-prop >boolean ;
@@ -332,6 +335,6 @@ M: lambda-macro definition
     "lambda-macro" word-prop lambda-body ;
 
 M: lambda-macro synopsis*
-    "lambda-macro" \ MACRO:: lambda-word-synopsis ;
+    "lambda-macro" lambda-word-synopsis ;
 
 PRIVATE>

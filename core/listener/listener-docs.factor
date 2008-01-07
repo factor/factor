@@ -20,7 +20,7 @@ $nl
 "The following variables can be rebound inside a nested scope to customize the behavior of a listener; this can be done to create a development tool with a custom interaction loop:"
 { $subsection listener-hook }
 "Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
-{ $subsection parse-interactive } ;
+{ $subsection read-quot } ;
 
 ABOUT: "listener"
 
@@ -30,7 +30,7 @@ HELP: quit-flag
 HELP: listener-hook
 { $var-description "Variable holding a quotation called by the listener before reading an input expression. The UI sets this variable to a quotation which updates the stack display in a listener gadget." } ;
 
-HELP: parse-interactive
+HELP: read-quot
 { $values { "stream" "an input stream" } { "quot/f" "a parsed quotation, or " { $link f } " indicating end of file" } }
 { $description "Reads a Factor expression from the stream, possibly spanning more than line. Additional lines of input are read while the parser stack height is greater than one. Since structural parsing words push partial quotations on the stack, this will keep on reading input until all delimited parsing words are terminated." } ;
 

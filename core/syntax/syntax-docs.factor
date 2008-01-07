@@ -28,6 +28,11 @@ ARTICLE: "syntax-comments" "Comments"
 { $subsection POSTPONE: ! }
 { $subsection POSTPONE: #! } ;
 
+ARTICLE: "syntax-immediate" "Parse time evaluation"
+"Code can be evaluated at parse time. This is a rarely-used feature; one use-case is " { $link "loading-libs" } ", where you want to execute some code before the words in a source file are compiled."
+{ $subsection POSTPONE: << }
+{ $subsection POSTPONE: >> } ;
+
 ARTICLE: "syntax-integers" "Integer syntax"
 "The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign."
 { $code
@@ -173,7 +178,8 @@ ARTICLE: "syntax" "Syntax"
 "Factor has two main forms of syntax: " { $emphasis "definition" } " syntax and " { $emphasis "literal" } " syntax. Code is data, so the syntax for code is a special case of object literal syntax. This section documents literal syntax. Definition syntax is covered in " { $link "words" } ". Extending the parser is the main topic of " { $link "parser" } "."
 { $subsection "parser-algorithm" }
 { $subsection "syntax-comments" }
-{ $subsection "syntax-literals" } ;
+{ $subsection "syntax-literals" }
+{ $subsection "syntax-immediate" } ;
 
 ABOUT: "syntax"
 
@@ -286,8 +292,8 @@ HELP: H{
 { $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
 
 HELP: C{
-{ $syntax "C{ real imaginary }" }
-{ $values { "real" "a real number" } { "imaginary" "a real number" } }
+{ $syntax "C{ real-part imaginary-part }" }
+{ $values { "real-part" "a real number" } { "imaginary-part" "a real number" } }
 { $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: T{
@@ -312,10 +318,10 @@ HELP: POSTPONE:
 HELP: :
 { $syntax ": word definition... ;" }
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
-{ $description "Defines a compound word in the current vocabulary." }
+{ $description "Defines a word in the current vocabulary." }
 { $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )\n    \"Greetings, \" write print ;\n: friend ( -- )\n    ask-name greet ;" } } ;
 
-{ POSTPONE: : POSTPONE: ; define-compound } related-words
+{ POSTPONE: : POSTPONE: ; define } related-words
 
 HELP: ;
 { $syntax ";" }
@@ -355,12 +361,6 @@ HELP: USE:
 { $syntax "USE: vocabulary" }
 { $values { "vocabulary" "a vocabulary name" } }
 { $description "Adds a new vocabulary at the front of the search path. Subsequent word lookups by the parser will search this vocabulary first." }
-{ $errors "Throws an error if the vocabulary does not exist." } ;
-
-HELP: USE-IF:
-{ $syntax "USE-IF: word vocabulary" }
-{ $values { "word" "a word with stack effect " { $snippet "( -- ? )" } } { "vocabulary" "a vocabulary name" } }
-{ $description "Adds a vocabulary at the front of the search path if the word evaluates to a true value." }
 { $errors "Throws an error if the vocabulary does not exist." } ;
 
 HELP: USING:
@@ -573,3 +573,14 @@ HELP: PRIVATE>
 { $description "Marks the end of a block of private word definitions." } ;
 
 { POSTPONE: <PRIVATE POSTPONE: PRIVATE> } related-words
+
+HELP: <<
+{ $syntax "<< ... >>" }
+{ $description "Evaluates some code at parse time." }
+{ $notes "Calling words defined in the same source file at parse time is prohibited; see compilation unit as where it was defined; see " { $link "compilation-units" } "." } ;
+
+HELP: >>
+{ $syntax ">>" }
+{ $description "Marks the end of a parse time code block." } ;
+
+{ POSTPONE: << POSTPONE: >> } related-words

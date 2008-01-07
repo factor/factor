@@ -18,7 +18,9 @@ io.streams.string continuations debugger ;
 
 [ "foo" ] [ "foo" "temporary" lookup article-parent ] unit-test
 
-[ ] [ "foo" "temporary" lookup forget ] unit-test
+[ ] [
+    [ "foo" "temporary" lookup forget ] with-compilation-unit
+] unit-test
 
 [ ] [
     "IN: temporary USING: help.syntax help.markup ; : bar ; HELP: bar \"bar is great\" ; ARTICLE: \"bar\" \"Bar\" { $subsection bar } ;" eval

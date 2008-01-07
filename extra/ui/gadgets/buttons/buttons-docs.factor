@@ -1,6 +1,6 @@
-USING: ui.gadgets.buttons help.markup help.syntax ui.gadgets
-ui.gadgets.labels ui.gadgets.menus ui.render kernel models
-classes ;
+USING: help.markup help.syntax ui.gadgets ui.gadgets.labels
+ui.render kernel models classes ;
+IN: ui.gadgets.buttons
 
 HELP: button
 { $class-description "A button is a " { $link gadget } " which responds to mouse clicks by invoking a quotation."
@@ -53,10 +53,6 @@ HELP: <command-button>
 HELP: <toolbar>
 { $values { "target" object } { "toolbar" gadget } }
 { $description "Creates a row of " { $link <command-button> } " gadgets invoking commands on " { $snippet "target" } ". The commands are taken from the " { $snippet "\"toolbar\"" } " command group of each class in " { $snippet "classes" } "." } ;
-
-HELP: <commands-menu>
-{ $values { "hook" "a quotation with stack effect " { $snippet "( button -- )" } } { "target" object } { "commands" "a sequence of commands" } { "gadget" "a new " { $link gadget } } }
-{ $description "Creates a popup menu of commands which are to be invoked on " { $snippet "target" } ". The " { $snippet "hook" } " quotation is run before a command is invoked." } ;
 
 ARTICLE: "ui.gadgets.buttons" "Button gadgets"
 "Buttons respond to mouse clicks by invoking a quotation."

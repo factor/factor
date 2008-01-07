@@ -1,5 +1,6 @@
 USING: io.backend io.files kernel math math.parser
-namespaces editors.vim sequences system ;
+namespaces editors.vim sequences system combinators
+vocabs.loader ;
 IN: editors.gvim
 
 TUPLE: gvim ;
@@ -14,5 +15,7 @@ t vim-detach set-global ! don't block the ui
 
 T{ gvim } vim-editor set-global
 
-USE-IF: unix? editors.gvim.unix
-USE-IF: windows? editors.gvim.windows
+{
+    { [ unix? ] [ "editors.gvim.unix" ] }
+    { [ windows? ] [ "editors.gvim.windows" ] }
+} cond require

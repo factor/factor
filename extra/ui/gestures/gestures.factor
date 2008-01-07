@@ -115,7 +115,7 @@ drag-timer construct-empty drag-timer set-global
 
 : start-drag-timer ( -- )
     hand-buttons get-global empty? [
-        drag-timer get-global 100 100 add-timer
+        drag-timer get-global 100 300 add-timer
     ] when ;
 
 : stop-drag-timer ( -- )

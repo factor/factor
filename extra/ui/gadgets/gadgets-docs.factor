@@ -1,5 +1,6 @@
-USING: ui.gadgets help.markup help.syntax opengl kernel strings
+USING: help.markup help.syntax opengl kernel strings
 tuples classes quotations models ;
+IN: ui.gadgets
 
 HELP: rect
 { $class-description "A rectangle with the following slots:"
@@ -306,5 +307,3 @@ $nl
 { $subsection control-value }
 { $subsection set-control-value }
 { $see-also "models" } ;
-
-ABOUT: "ui-control-impl"

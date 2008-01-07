@@ -11,7 +11,6 @@ $nl
 "Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to " { $vocab-link "scratchpad" } ". The current vocabulary may be changed with the " { $link POSTPONE: IN: } " parsing word (see " { $link "vocabulary-search" } ")."
 { $subsection create }
 { $subsection create-in }
-{ $subsection gensym }
 { $subsection lookup }
 "Words can output their name and vocabulary:"
 { $subsection word-name }
@@ -19,18 +18,27 @@ $nl
 "Testing if a word object is part of a vocabulary:"
 { $subsection interned? } ;
 
-ARTICLE: "colon-definition" "Compound definitions"
-"A compound definition associates a word name with a quotation that is called when the word is executed."
-{ $subsection compound }
-{ $subsection compound? }
-"Defining compound words at parse time:"
+ARTICLE: "uninterned-words" "Uninterned words"
+"A word that is not a member of any vocabulary is said to be " { $emphasis "uninterned" } "."
+$nl
+"There are several ways of creating an uninterned word:"
+{ $subsection <word> }
+{ $subsection gensym }
+{ $subsection define-temp } ;
+
+ARTICLE: "colon-definition" "Word definitions"
+"Every word has an associated quotation definition that is called when the word is executed."
+$nl
+"Defining words at parse time:"
 { $subsection POSTPONE: : }
 { $subsection POSTPONE: ; }
-"Defining compound words at run time:"
-{ $subsection define-compound }
+"Defining words at run time:"
+{ $subsection define }
 { $subsection define-declared }
 { $subsection define-inline }
-"Compound definitions should declare their stack effect, unless the definition is completely trivial. See " { $link "effect-declaration" } "." ;
+"Word definitions should declare their stack effect, unless the definition is completely trivial. See " { $link "effect-declaration" } "."
+$nl
+"All other types of word definitions, such as " { $link "symbols" } " and " { $link "generic" } ", are just special cases of the above." ;
 
 ARTICLE: "symbols" "Symbols"
 "A symbol pushes itself on the stack when executed. By convention, symbols are used as variable names (" { $link "namespaces" } ")."
@@ -39,7 +47,12 @@ ARTICLE: "symbols" "Symbols"
 "Defining symbols at parse time:"
 { $subsection POSTPONE: SYMBOL: }
 "Defining symbols at run time:"
-{ $subsection define-symbol } ;
+{ $subsection define-symbol }
+"Symbols are just compound definitions in disguise. The following two lines are equivalent:"
+{ $code
+    "SYMBOL: foo"
+    ": foo \\ foo ;"
+} ;
 
 ARTICLE: "primitives" "Primitives"
 "Primitives are words defined in the Factor VM. They provide the essential low-level services to the rest of the system."
@@ -47,11 +60,20 @@ ARTICLE: "primitives" "Primitives"
 { $subsection primitive? } ;
 
 ARTICLE: "deferred" "Deferred words and mutual recursion"
-"Words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. This is done to simplify the implementation, facilitate better parse-time checking and remove some odd corner cases; it also encourages better coding style. Sometimes this restriction gets in the way, for example when defining mutually-recursive words; one way to get around this limitation is to make a forward definition."
+"Words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. This is done to simplify the implementation, facilitate better parse time checking and remove some odd corner cases; it also encourages better coding style."
+$nl
+"Sometimes this restriction gets in the way, for example when defining mutually-recursive words; one way to get around this limitation is to make a forward definition."
 { $subsection POSTPONE: DEFER: }
-"The class of forward word definitions:"
+"The class of deferred word definitions:"
+{ $subsection deferred }
+{ $subsection deferred? }
+"Deferred words throw an error when called:"
 { $subsection undefined }
-{ $subsection undefined? } ;
+"Deferred words are just compound definitions in disguise. The following two lines are equivalent:"
+{ $code
+    "DEFER: foo"
+    ": foo undefined ;"
+} ;
 
 ARTICLE: "declarations" "Declarations"
 "Declarations give special behavior to a word. Declarations are parsing words that set a word property in the most recently defined word."
@@ -144,22 +166,26 @@ ARTICLE: "word.private" "Word implementation details"
 { $subsection set-word-def }
 "An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
 { $subsection word-xt }
-{ $subsection update-xt } ;
+"Low-level compiler interface exported by the Factor VM:"
+{ $subsection modify-code-heap } ;
 
 ARTICLE: "words" "Words"
-"Words are the Factor equivalent of functions or procedures; a word is a body of code with a unique name and some additional meta-data. Words are defined in the " { $vocab-link "words" } " vocabulary."
+"Words are the Factor equivalent of functions or procedures; a word is essentially a named quotation."
+$nl
+"Word introspection facilities and implementation details are found in the " { $vocab-link "words" } " vocabulary."
 $nl
 "A word consists of several parts:"
 { $list
     "a word name,"
     "a vocabulary name,"
-    "a definition, specifying the behavior of the word when executed,"
+    "a definition quotation, called when the word when executed,"
     "a set of word properties, including documentation and other meta-data."
 }
 "Words are instances of a class."
 { $subsection word }
 { $subsection word? }
 { $subsection "interned-words" }
+{ $subsection "uninterned-words" }
 { $subsection "word-definition" }
 { $subsection "word-props" }
 { $subsection "word.private" }
@@ -198,13 +224,10 @@ HELP: set-word-def ( obj word -- )
 $low-level-note
 { $side-effects "word" } ;
 
-HELP: undefined
-{ $class-description "The class of undefined words created by " { $link POSTPONE: DEFER: } "." } ;
+HELP: deferred
+{ $class-description "The class of deferred words created by " { $link POSTPONE: DEFER: } "." } ;
 
-{ undefined POSTPONE: DEFER: } related-words
-
-HELP: compound
-{ $description "The class of compound words created by " { $link POSTPONE: : } "." } ;
+{ deferred POSTPONE: DEFER: } related-words
 
 HELP: primitive
 { $description "The class of primitive words." } ;
@@ -230,25 +253,16 @@ HELP: word-xt
 { $values { "word" word } { "xt" "an execution token integer" } }
 { $description "Outputs the machine code address of the word's definition." } ;
 
-HELP: define
-{ $values { "word" word } { "def" object } }
-{ $description "Defines a word and updates cross-referencing." }
-$low-level-note
-{ $side-effects "word" }
-{ $see-also define-symbol define-compound } ;
-
 HELP: define-symbol
 { $values { "word" word } }
-{ $description "Defines the word to push itself on the stack when executed." }
+{ $description "Defines the word to push itself on the stack when executed. This is the run time equivalent of " { $link POSTPONE: SYMBOL: } "." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
 
-HELP: intern-symbol
-{ $values { "word" word } }
-{ $description "If the word is undefined, makes it into a symbol which pushes itself on the stack when executed. If the word already has a definition, does nothing." } ;
-
-HELP: define-compound
+HELP: define
 { $values { "word" word } { "def" quotation } }
-{ $description "Defines the word to call a quotation when executed." }
+{ $description "Defines the word to call a quotation when executed. This is the run time equivalent of " { $link POSTPONE: : } "." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
 
 HELP: reset-props
@@ -277,15 +291,6 @@ HELP: gensym
 { $description "Creates an uninterned word that is not equal to any other word in the system. Gensyms have an automatically-generated name based on a prefix and an incrementing counter." }
 { $examples { $unchecked-example "gensym ." "G:260561" } }
 { $notes "Gensyms are often used as placeholder values that have no meaning of their own but must be unique. For example, the compiler uses gensyms to label sections of code." } ;
-
-HELP: define-temp
-{ $values { "quot" quotation } { "word" word } }
-{ $description "Creates an uninterned word that will call " { $snippet "quot" } " when executed." }
-{ $notes
-    "The following phrases are equivalent:"
-    { $code "[ 2 2 + . ] call" }
-    { $code "[ 2 2 + . ] define-temp execute" }
-} ;
 
 HELP: bootstrapping?
 { $var-description "Set by the library while bootstrap is in progress. Some parsing words need to behave differently during bootstrap." } ;
@@ -337,34 +342,25 @@ HELP: bootstrap-word
 { $values { "word" word } { "target" word } }
 { $description "Looks up a word with the same name and vocabulary as the given word, performing a transformation to handle parsing words in the target dictionary. Used during bootstrap to transfer host words to the target dictionary." } ;
 
-HELP: update-xt ( word -- )
-{ $values { "word" word } }
-{ $description "Updates a word's execution token based on the value of the " { $link word-def } " slot. If the word was compiled by the optimizing compiler, this forces the word to revert to its unoptimized definition." }
-{ $side-effects "word" } ;
-
 HELP: parsing?
 { $values { "obj" object } { "?" "a boolean" } }
 { $description "Tests if an object is a parsing word declared by " { $link POSTPONE: parsing } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
-HELP: word-changed?
-{ $values { "word" word } { "?" "a boolean" } }
-{ $description "Tests if a word needs to be recompiled." } ;
-
-HELP: changed-word
-{ $values { "word" word } }
-{ $description "Marks a word as needing recompilation by adding it to the " { $link changed-words } " assoc." }
-$low-level-note ;
-
-HELP: unchanged-word
-{ $values { "word" word } }
-{ $description "Marks a word as no longer needing recompilation by removing it from the " { $link changed-words } " assoc." }
-$low-level-note ;
-
 HELP: define-declared
 { $values { "word" word } { "def" quotation } { "effect" effect } }
-{ $description "Defines a compound word and declares its stack effect." }
+{ $description "Defines a word and declares its stack effect." }
 { $side-effects "word" } ;
+
+HELP: define-temp
+{ $values { "quot" quotation } { "word" word } }
+{ $description "Creates an uninterned word that will call " { $snippet "quot" } " when executed." }
+{ $notes
+    "The following phrases are equivalent:"
+    { $code "[ 2 2 + . ] call" }
+    { $code "[ 2 2 + . ] define-temp execute" }
+    "This word must be called from inside " { $link with-compilation-unit } "."
+} ;
 
 HELP: quot-uses
 { $values { "quot" quotation } { "assoc" "an assoc with words as keys" } }
@@ -404,5 +400,14 @@ HELP: make-inline
 
 HELP: define-inline
 { $values { "word" word } { "quot" quotation } }
-{ $description "Defines a compound word and makes it " { $link POSTPONE: inline } "." }
+{ $description "Defines a word and makes it " { $link POSTPONE: inline } "." }
 { $side-effects "word" } ;
+
+HELP: modify-code-heap ( alist -- )
+{ $values { "alist" "an alist" } }
+{ $description "Stores compiled code definitions in the code heap. The alist maps words to the following:"
+{ $list
+    { { $link f } " - in this case, the word is compiled with the non-optimizing compiler part of the VM." }
+    { { $snippet "{ code labels rel words literals }" } " - in this case, a code heap block is allocated with the given data." }
+} }
+{ $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;

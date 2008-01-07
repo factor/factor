@@ -27,10 +27,6 @@ HELP: callable
 HELP: quotation
 { $description "The class of quotations. See " { $link "syntax-quots" } " for syntax and " { $link "quotations" } " for general information." } ;
 
-HELP: <quotation>
-{ $values { "n" "a non-negative integer" } { "quot" quotation } }
-{ $description "Creates a new quotation with the given length and all elements initially set to " { $link f } "." } ;
-
 HELP: >quotation
 { $values { "seq" "a sequence" } { "quot" quotation } }
 { $description "Outputs a freshly-allocated quotation with the same elements as a given sequence." } ;

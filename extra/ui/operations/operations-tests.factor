@@ -13,10 +13,10 @@ io.streams.string math help help.markup ;
 
 [ "3" ] [ [ 3 "op" get invoke-command ] string-out ] unit-test
 
-[ drop t ] \ my-pprint [ parse ] [ editor-string ] f operation construct-boa
+[ drop t ] \ my-pprint [ ] [ editor-string ] f operation construct-boa
 "op" set
 
-[ "[ 4 ]" ] [
+[ "\"4\"" ] [
     [
         "4" <editor> [ set-editor-string ] keep
         "op" get invoke-command

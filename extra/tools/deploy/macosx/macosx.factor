@@ -1,8 +1,8 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files io.launcher kernel namespaces sequences
-system tools.deploy tools.deploy.config assocs hashtables
-prettyprint io.unix.backend cocoa cocoa.plists
+system tools.deploy.backend tools.deploy.config assocs
+hashtables prettyprint io.unix.backend cocoa cocoa.plists
 cocoa.application cocoa.classes qualified ;
 QUALIFIED: unix
 IN: tools.deploy.macosx
@@ -71,13 +71,14 @@ T{ macosx-deploy-implementation } deploy-implementation set-global
     over <NSString> rot parent-directory <NSString>
     -> selectFile:inFileViewerRootedAtPath: drop ;
 
-M: macosx-deploy-implementation deploy ( vocab -- )
+M: macosx-deploy-implementation deploy* ( vocab -- )
+    stage1
     ".app deploy tool" assert.app
     "." resource-path cd
     dup deploy-config [
         bundle-name rm
         [ bundle-name create-app-dir ] keep
         [ bundle-name deploy.app-image ] keep
-        namespace deploy*
+        namespace stage2
         bundle-name show-in-finder
     ] bind ;

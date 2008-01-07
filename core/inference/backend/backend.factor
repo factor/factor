@@ -1,10 +1,10 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: inference.dataflow inference.state arrays generic io
+io.streams.string kernel math namespaces parser prettyprint
+sequences strings vectors words quotations effects classes
+continuations debugger assocs combinators compiler.errors ;
 IN: inference.backend
-USING: inference.dataflow arrays generic io io.streams.string
-kernel math namespaces parser prettyprint sequences
-strings vectors words quotations effects classes continuations
-debugger assocs combinators ;
 
 : recursive-label ( word -- label/f )
     recursive-state get at ;
@@ -21,6 +21,9 @@ debugger assocs combinators ;
     local-recursive-state [ first eq? ] curry* contains? ;
 
 TUPLE: inference-error rstate major? ;
+
+M: inference-error compiler-warning?
+    inference-error-major? not ;
 
 : (inference-error) ( ... class important? -- * )
     >r construct-boa r>
@@ -54,13 +57,9 @@ M: object value-literal \ literal-expected inference-warning ;
 : ensure-values ( seq -- )
     meta-d [ add-inputs ] change d-in [ + ] change ;
 
-SYMBOL: terminated?
-
 : current-effect ( -- effect )
     d-in get meta-d get length <effect>
     terminated? get over set-effect-terminated? ;
-
-SYMBOL: recorded
 
 : init-inference ( -- )
     terminated? off
@@ -77,7 +76,7 @@ GENERIC: apply-object ( obj -- )
 
 M: object apply-object apply-literal ;
 
-M: wrapper apply-object wrapped apply-literal ;
+M: wrapper apply-object wrapped dup depends-on apply-literal ;
 
 : terminate ( -- )
     terminated? on #terminate node, ;
@@ -345,10 +344,6 @@ TUPLE: no-effect word ;
 
 : no-effect ( word -- * ) \ no-effect inference-warning ;
 
-GENERIC: infer-word ( word -- effect )
-
-M: word infer-word no-effect ;
-
 TUPLE: effect-error word effect ;
 
 : effect-error ( word effect -- * )
@@ -364,17 +359,16 @@ TUPLE: effect-error word effect ;
     over recorded get push
     "inferred-effect" set-word-prop ;
 
-: infer-compound ( word -- effect )
+: infer-word ( word -- effect )
     [
-        init-inference
-        dup word-def over dup infer-quot-recursive
-        finish-word
-        current-effect
-    ] with-scope ;
-
-M: compound infer-word
-    [ infer-compound ] [ ] [ t "no-effect" set-word-prop ]
-    cleanup ;
+        [
+            init-inference
+            dependencies off
+            dup word-def over dup infer-quot-recursive
+            finish-word
+            current-effect
+        ] with-scope
+    ] [ ] [ t "no-effect" set-word-prop ] cleanup ;
 
 : custom-infer ( word -- )
     #! Customized inference behavior
@@ -390,10 +384,6 @@ M: compound infer-word
         { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
         { [ t ] [ dup infer-word make-call-node ] }
     } cond ;
-
-M: word apply-object apply-word ;
-
-M: symbol apply-object apply-literal ;
 
 TUPLE: recursive-declare-error word ;
 
@@ -445,7 +435,7 @@ M: #call-label collect-recursion*
     [ swap [ at ] curry map ] keep
     [ set ] 2each ;
 
-: inline-closure ( word -- )
+: inline-word ( word -- )
     dup inline-block over recursive-label? [
         flatten-meta-d >r
         drop join-values inline-block apply-infer
@@ -458,17 +448,14 @@ M: #call-label collect-recursion*
         apply-infer node-child node-successor splice-node drop
     ] if ;
 
-M: compound apply-object
-    [
+M: word apply-object
+    dup depends-on [
         dup inline-recursive-label
-        [ declared-infer ] [ inline-closure ] if
+        [ declared-infer ] [ inline-word ] if
     ] [
         dup recursive-label
         [ declared-infer ] [ apply-word ] if
     ] if-inline ;
-
-M: undefined apply-object
-    drop "Undefined word" time-bomb ;
 
 : with-infer ( quot -- effect dataflow )
     [

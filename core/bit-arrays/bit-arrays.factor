@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math alien kernel kernel.private sequences
 sequences.private ;
@@ -20,7 +20,7 @@ IN: bit-arrays
 
 : (set-bits) ( bit-array n -- )
     over length bits>cells -rot [
-        swap rot 4 * set-alien-unsigned-4
+        spin 4 * set-alien-unsigned-4
     ] 2curry each ; inline
 
 PRIVATE>
@@ -49,3 +49,5 @@ M: bit-array equal?
     over bit-array? [ sequence= ] [ 2drop f ] if ;
 
 INSTANCE: bit-array sequence
+INSTANCE: bit-array simple-c-ptr
+INSTANCE: bit-array c-ptr

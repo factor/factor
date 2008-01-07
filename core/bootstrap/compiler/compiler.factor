@@ -1,26 +1,28 @@
+! Copyright (C) 2007, 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: compiler cpu.architecture vocabs.loader system sequences
 namespaces parser kernel kernel.private classes classes.private
 arrays hashtables vectors tuples sbufs inference.dataflow
 hashtables.private sequences.private math tuples.private
 growable namespaces.private alien.remote-control assocs words
-generator command-line vocabs io prettyprint libc ;
+generator command-line vocabs io prettyprint libc definitions ;
+IN: bootstrap.compiler
 
 "cpu." cpu append require
 
-global [ { "compiler" } add-use ] bind
-
 "-no-stack-traces" cli-args member? [
     f compiled-stack-traces? set-global
-    0 set-profiler-prologues
 ] when
 
-! Compile a set of words ahead of our general
-! compile-all. This set of words was determined
-! semi-empirically using the profiler. It improves
-! bootstrap time significantly, because frequenly
-! called words which are also quick to compile
-! are replaced by compiled definitions as soon as
-! possible.
+nl
+"Compiling some words to speed up bootstrap..." write
+
+! Compile a set of words ahead of the full compile.
+! This set of words was determined semi-empirically
+! using the profiler. It improves bootstrap time
+! significantly, because frequenly called words
+! which are also quick to compile are replaced by
+! compiled definitions as soon as possible.
 {
     roll -roll declare not
 
@@ -38,14 +40,38 @@ global [ { "compiler" } add-use ] bind
     find-pair-next namestack*
 
     bitand bitor bitxor bitnot
+} compile
 
+"." write flush
+
+{
     + 1+ 1- 2/ < <= > >= shift min
+} compile
 
-    new nth push pop peek hashcode* = get set
+"." write flush
 
+{
+    new nth push pop peek
+} compile
+
+"." write flush
+
+{
+    hashcode* = get set
+} compile
+
+"." write flush
+
+{
     . lines
+} compile
 
+"." write flush
+
+{
     malloc free memcpy
-} [ compile ] each
+} compile
 
-[ recompile ] parse-hook set-global
+[ compiled-usages recompile ] recompile-hook set-global
+
+" done" print flush

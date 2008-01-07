@@ -7,11 +7,17 @@ M: combination-1 perform-combination 2drop { } [ ] each [ ] ;
 
 SYMBOL: generic-1
 
-generic-1 T{ combination-1 } define-generic
+[
+    generic-1 T{ combination-1 } define-generic
 
-[ ] <method> object \ generic-1 define-method
+    [ ] <method> object \ generic-1 define-method
+] with-compilation-unit
 
-[ ] [ { combination-1 { object generic-1 } } forget-all ] unit-test
+[ ] [
+    [
+        { combination-1 { object generic-1 } } forget-all
+    ] with-compilation-unit
+] unit-test
 
 GENERIC: some-generic
 
@@ -34,6 +40,11 @@ M: some-class some-generic ;
 TUPLE: another-class some-generic ;
 
 [ ] [
-    { some-generic some-class { another-class some-generic } }
-    forget-all
+    [
+        {
+            some-generic
+            some-class
+            { another-class some-generic }
+        } forget-all
+    ] with-compilation-unit
 ] unit-test

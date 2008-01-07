@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files kernel namespaces sequences system
-tools.deploy tools.deploy.config assocs hashtables prettyprint
-windows.shell32 windows.user32 ;
+tools.deploy.backend tools.deploy.config assocs hashtables
+prettyprint windows.shell32 windows.user32 ;
 IN: tools.deploy.windows
 
 : copy-vm ( executable bundle-name -- vm )
@@ -33,11 +33,12 @@ TUPLE: windows-deploy-implementation ;
 
 T{ windows-deploy-implementation } deploy-implementation set-global
 
-M: windows-deploy-implementation deploy
+M: windows-deploy-implementation deploy*
+    stage1
     "." resource-path cd
     dup deploy-config [
-        [ deploy-name get create-exe-dir ] keep
-        [ deploy-name get image-name ] keep
-        namespace
-        deploy-name get open-in-explorer
-    ] bind deploy* ;
+        [
+            [ deploy-name get create-exe-dir ] keep
+            [ deploy-name get image-name ] keep
+        ] bind
+    ] keep stage2 open-in-explorer ;

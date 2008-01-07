@@ -1,16 +1,10 @@
 USING: help.syntax help.markup words effects inference.dataflow
-inference.backend kernel sequences kernel.private
-combinators combinators.private ;
-
-HELP: recursive-state
-{ $var-description "During inference, holds an association list mapping words to labels." } ;
+inference.state inference.backend kernel sequences
+kernel.private combinators combinators.private ;
 
 HELP: literal-expected
 { $error-description "Thrown when inference encounters a " { $link call } " or " { $link if } " being applied to a value which is not known to be a literal. Such a form can have an arbitrary stack effect, and does not compile." }
 { $notes "This error will be thrown when compiling any combinator, such as " { $link each } ". However, words calling combinators can compile of the combinator is declared " { $link POSTPONE: inline } " and the quotation being passed in is a literal." } ;
-
-HELP: terminated?
-{ $var-description "During inference, a flag set to " { $link t } " if the current control flow path unconditionally throws an error." } ;
 
 HELP: too-many->r
 { $error-description "Thrown if inference notices a quotation pushing elements on the retain stack without popping them at the end." }
@@ -57,7 +51,7 @@ HELP: collect-recursion
 { $values { "#label" "a " { $link #label } " node" } { "seq" "a new sequence" } }
 { $description "Collect the input stacks of all child " { $link #call-label } " nodes that call the given label." } ;
 
-HELP: inline-closure
+HELP: inline-word
 { $values { "word" word } }
 { $description "Called during inference to infer stack effects of inline words."
 $nl

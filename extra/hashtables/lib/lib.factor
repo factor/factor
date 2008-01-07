@@ -9,7 +9,7 @@ IN: hashtables.lib
 
 ! set-hash with alternative stack effects
 
-: put-hash* ( table key value -- ) swap rot set-at ;
+: put-hash* ( table key value -- ) spin set-at ;
 
 : put-hash ( table key value -- table ) swap pick set-at ;
 

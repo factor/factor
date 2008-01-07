@@ -25,8 +25,7 @@ C: <slot-spec> slot-spec
         [ drop ] [ 1array , \ declare , ] if
     ] [ ] make ;
 
-PREDICATE: compound slot-reader
-    "reading" word-prop >boolean ;
+PREDICATE: word slot-reader "reading" word-prop >boolean ;
 
 : set-reader-props ( class spec -- )
     2dup reader-effect
@@ -48,8 +47,7 @@ PREDICATE: compound slot-reader
 : writer-effect ( class spec -- effect )
     slot-spec-name swap ?word-name 2array 0 <effect> ;
 
-PREDICATE: compound slot-writer
-    "writing" word-prop >boolean ;
+PREDICATE: word slot-writer "writing" word-prop >boolean ;
 
 : set-writer-props ( class spec -- )
     2dup writer-effect

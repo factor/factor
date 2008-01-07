@@ -32,7 +32,7 @@ SYMBOL: super-sent-messages
 
 {
     "cocoa" "cocoa.runtime" "cocoa.messages" "cocoa.subclassing"
-} compile-vocabs
+} [ words ] map concat compile-batch
 
 "Importing Cocoa classes..." print
 {

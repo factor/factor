@@ -1,6 +1,6 @@
 USING: generic help.markup help.syntax kernel
 tuples.private classes slots quotations words arrays
-generic.standard sequences ;
+generic.standard sequences definitions ;
 IN: tuples
 
 ARTICLE: "tuple-constructors" "Constructors and slots"
@@ -144,7 +144,9 @@ HELP: check-tuple
 
 HELP: define-tuple-class
 { $values { "class" word } { "slots" "a sequence of strings" } }
-{ $description "Defines a tuple class with slots named by " { $snippet "slots" } "." } ;
+{ $description "Defines a tuple class with slots named by " { $snippet "slots" } ". This is the run time equivalent of " { $link POSTPONE: TUPLE: } "." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
+{ $side-effects "class" } ;
 
 { tuple-class define-tuple-class POSTPONE: TUPLE: } related-words
 

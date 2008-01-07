@@ -27,8 +27,7 @@ PREDICATE: class tuple-class
 
 : predicate-effect 1 { "?" } <effect> ;
 
-PREDICATE: compound predicate
-    "predicating" word-prop >boolean ;
+PREDICATE: word predicate "predicating" word-prop >boolean ;
 
 : define-predicate ( class predicate quot -- )
     over [
@@ -240,8 +239,6 @@ M: word uncache-class drop ;
 : uncache-classes ( assoc -- )
     [ drop uncache-class ] assoc-each ;
 
-GENERIC: update-methods ( class -- )
-
 PRIVATE>
 
 : define-class-props ( members superclass metaclass -- assoc )
@@ -253,8 +250,9 @@ PRIVATE>
 
 : (define-class) ( word props -- )
     over reset-class
+    over reset-generic
+    over define-symbol
     >r dup word-props r> union over set-word-props
-    dup intern-symbol
     t "class" set-word-prop ;
 
 : define-class ( word members superclass metaclass -- )

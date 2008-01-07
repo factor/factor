@@ -53,4 +53,4 @@ T{ arm-backend } compiler-backend set-global
     t have-BLX? set-global
 ] when
 
-7 cells set-profiler-prologues
+7 cells profiler-prologues set-global

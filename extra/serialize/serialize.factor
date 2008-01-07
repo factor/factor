@@ -58,8 +58,8 @@ M: float (serialize) ( obj -- )
 
 M: complex (serialize) ( obj -- )
     "c" write
-    dup real (serialize)
-    imaginary (serialize) ;
+    dup real-part (serialize)
+    imaginary-part (serialize) ;
 
 M: ratio (serialize) ( obj -- )
     "r" write

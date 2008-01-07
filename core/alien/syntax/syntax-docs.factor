@@ -38,7 +38,6 @@ $nl
 { $unchecked-example
     "LIBRARY: foo\nFUNCTION: void the_answer ( char* question, int value ) ;"
     "USE: compiler"
-    "\\ the_answer compile"
     "\"the question\" 42 the_answer"
     "The answer to the question is 42."
 } }
@@ -70,7 +69,7 @@ HELP: C-UNION:
 HELP: C-ENUM:
 { $syntax "C-ENUM: words... ;" }
 { $values { "words" "a sequence of word names" } }
-{ $description "Creates a sequence of compound definitions in the current vocabulary. Each word pushes an integer according to its index in the enumeration definition. The first word pushes 0." }
+{ $description "Creates a sequence of word definitions in the current vocabulary. Each word pushes an integer according to its index in the enumeration definition. The first word pushes 0." }
 { $notes "This word emulates a C-style " { $snippet "enum" } " in Factor. While this feature can be used for any purpose, using integer constants is discouraged unless it is for interfacing with C libraries. Factor code should use symbolic constants instead." }
 { $examples
     "The following two lines are equivalent:"

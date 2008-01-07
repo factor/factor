@@ -27,9 +27,6 @@ M: tuple-class group-words
     dup [ slot-spec-reader ] map
     swap [ slot-spec-writer ] map append ;
 
-: spin ( x y z -- z y x )
-    swap rot ;
-
 : define-consult-method ( word class quot -- )
     pick add <method> spin define-method ;
 

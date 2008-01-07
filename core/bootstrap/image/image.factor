@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays bit-arrays byte-arrays generic assocs
 hashtables assocs hashtables.private io kernel kernel.private
@@ -38,6 +38,9 @@ IN: bootstrap.image
 : quot-array@ bootstrap-cell object tag-number - ;
 : quot-xt@ 3 bootstrap-cells object tag-number - ;
 
+: jit-define ( quot rc rt offset name -- )
+    >r >r >r >r { } make r> r> r> 4array r> set ;
+
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
 
@@ -58,42 +61,42 @@ SYMBOL: bootstrap-boot-quot
 
 ! JIT parameters
 SYMBOL: jit-code-format
-SYMBOL: jit-setup
 SYMBOL: jit-prolog
-SYMBOL: jit-word-primitive-jump
-SYMBOL: jit-word-primitive-call
+SYMBOL: jit-primitive-word
+SYMBOL: jit-primitive
 SYMBOL: jit-word-jump
 SYMBOL: jit-word-call
-SYMBOL: jit-push-wrapper
 SYMBOL: jit-push-literal
 SYMBOL: jit-if-word
 SYMBOL: jit-if-jump
-SYMBOL: jit-if-call
 SYMBOL: jit-dispatch-word
 SYMBOL: jit-dispatch
 SYMBOL: jit-epilog
 SYMBOL: jit-return
+SYMBOL: jit-profiling
+
+! Default definition for undefined words
+SYMBOL: undefined-quot
 
 : userenv-offset ( symbol -- n )
     {
         { bootstrap-boot-quot 20 }
         { bootstrap-global 21 }
         { jit-code-format 22 }
-        { jit-setup 23 }
-        { jit-prolog 24 }
-        { jit-word-primitive-jump 25 }
-        { jit-word-primitive-call 26 }
-        { jit-word-jump 27 }
-        { jit-word-call 28 }
-        { jit-push-wrapper 29 }
-        { jit-push-literal 30 }
-        { jit-if-word 31 }
-        { jit-if-jump 32 }
-        { jit-if-call 33 }
-        { jit-dispatch-word 34 }
-        { jit-dispatch 35 }
-        { jit-epilog 36 }
-        { jit-return 37 }
+        { jit-prolog 23 }
+        { jit-primitive-word 24 }
+        { jit-primitive 25 }
+        { jit-word-jump 26 }
+        { jit-word-call 27 }
+        { jit-push-literal 28 }
+        { jit-if-word 29 }
+        { jit-if-jump 30 }
+        { jit-dispatch-word 31 }
+        { jit-dispatch 32 }
+        { jit-epilog 33 }
+        { jit-return 34 }
+        { jit-profiling 35 }
+        { undefined-quot 37 }
     } at header-size + ;
 
 : emit ( cell -- ) image get push ;
@@ -120,10 +123,10 @@ SYMBOL: jit-return
 : align-here ( -- )
     here 8 mod 4 = [ 0 emit ] when ;
 
-: emit-fixnum ( n -- ) tag-bits get shift emit ;
+: emit-fixnum ( n -- ) tag-fixnum emit ;
 
 : emit-object ( header tag quot -- addr )
-    swap here-as >r swap tag-header emit call align-here r> ;
+    swap here-as >r swap tag-fixnum emit call align-here r> ;
     inline
 
 ! Write an object to the image.
@@ -173,7 +176,7 @@ M: fixnum '
     #! When generating a 32-bit image on a 64-bit system,
     #! some fixnums should be bignums.
     dup most-negative-fixnum most-positive-fixnum between?
-    [ tag-bits get shift ] [ >bignum ' ] if ;
+    [ tag-fixnum ] [ >bignum ' ] if ;
 
 ! Floats
 
@@ -213,6 +216,7 @@ M: f '
         0 , ! count
         0 , ! xt
         0 , ! code
+        0 , ! profiling
     ] { } make
     \ word type-number object tag-number
     [ emit-seq ] emit-object
@@ -367,31 +371,30 @@ M: curry '
 : emit-jit-data ( -- )
     \ if jit-if-word set
     \ dispatch jit-dispatch-word set
+    \ do-primitive jit-primitive-word set
+    [ undefined ] undefined-quot set
     {
         jit-code-format
-        jit-setup
         jit-prolog
-        jit-word-primitive-jump
-        jit-word-primitive-call
+        jit-primitive-word
+        jit-primitive
         jit-word-jump
         jit-word-call
-        jit-push-wrapper
         jit-push-literal
         jit-if-word
         jit-if-jump
-        jit-if-call
         jit-dispatch-word
         jit-dispatch
         jit-epilog
         jit-return
+        jit-profiling
+        undefined-quot
     } [ emit-userenv ] each ;
 
 : fixup-header ( -- )
     heap-size data-heap-size-offset fixup ;
 
 : end-image ( -- )
-    "Building generic words..." print flush
-    all-words [ generic? ] subset [ make-generic ] each
     "Serializing words..." print flush
     emit-words
     "Serializing JIT data..." print flush
@@ -444,7 +447,6 @@ PRIVATE>
 
 : make-image ( arch -- )
     [
-        parse-hook off
         prepare-image
         begin-image
         "resource:/core/bootstrap/stage1.factor" run-file

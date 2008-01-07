@@ -127,12 +127,7 @@ SYMBOL: word-table
 
 : rel-dispatch ( word-table# class -- ) rt-dispatch rel-fixup ;
 
-GENERIC# rel-word 1 ( word class -- )
-
-M: primitive rel-word ( word class -- )
-    >r word-def r> rt-primitive rel-fixup ;
-
-M: word rel-word ( word class -- )
+: rel-word ( word class -- )
     >r add-word r> rt-xt rel-fixup ;
 
 : rel-literal ( literal class -- )

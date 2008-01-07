@@ -32,7 +32,7 @@ M: assoc-heap heap-empty? ( assoc-heap -- ? )
     assoc-heap-assoc assoc-empty? ;
 
 M: assoc-heap heap-length ( assoc-heap -- n )
-    assoc-heap-assoc assoc-size ; 
+    assoc-heap-assoc assoc-size ;
 
 M: assoc-heap heap-peek ( assoc-heap -- value key )
     assoc-heap-heap heap-peek ;

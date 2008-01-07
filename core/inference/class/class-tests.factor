@@ -3,7 +3,7 @@ USING: arrays math.private kernel math compiler inference
 inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
-slots.private combinators ;
+slots.private combinators definitions ;
 
 ! Make sure these compile even though this is invalid code
 [ ] [ [ 10 mod 3.0 /i ] dataflow optimize drop ] unit-test
@@ -136,9 +136,15 @@ M: object xyz ;
     ] set-constraints
 ] "constraints" set-word-prop
 
+DEFER: blah
+
 [ t ] [
-    [ dup V{ } eq? [ foo ] when ] dup second dup push
-    compile-quot word?
+    [
+        \ blah
+        [ dup V{ } eq? [ foo ] when ] dup second dup push define
+    ] with-compilation-unit
+
+    \ blah compiled?
 ] unit-test
 
 GENERIC: detect-fx ( n -- n )

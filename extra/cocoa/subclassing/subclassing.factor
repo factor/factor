@@ -83,7 +83,7 @@ IN: cocoa.subclassing
 : prepare-method ( ret types quot -- type imp )
     >r [ encode-types ] 2keep r> [
         "cdecl" swap 4array % \ alien-callback ,
-    ] [ ] make compile-quot ;
+    ] [ ] make define-temp ;
 
 : prepare-methods ( methods -- methods )
     [ first4 prepare-method 3array ] map ;

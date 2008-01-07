@@ -74,7 +74,7 @@ dup XKeyEvent-state swap event>keyname 2array ;
   [ $keymap swap resolve-key-event call ]
 
 "grab-key" !( wm-root modifiers keyname -- wm-root modifiers keyname ) [
-  3dup name>keysym keysym-to-keycode swap rot
+  3dup name>keysym keysym-to-keycode spin
   False GrabModeAsync GrabModeAsync grab-key ]
 
 "set-key-action" !( wm-root modifiers keyname action -- wm-root ) [

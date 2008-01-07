@@ -62,4 +62,4 @@ M: object (flatten-tree) , ;
     { 0 1 } { 2 0 1 } { { "a" "b" "c" "d" } { "e" "f" "g" } { { "h" "i" } "j" } } gadgets-in-range
 ] unit-test
 
-{ array gadget-children } forget
+[ { array gadget-children } forget ] with-compilation-unit

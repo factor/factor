@@ -13,8 +13,8 @@ main help
 source-loaded? docs-loaded? ;
 
 : <vocab> ( name -- vocab )
-    H{ } clone
-    { set-vocab-name set-vocab-words }
+    H{ } clone t
+    { set-vocab-name set-vocab-words set-vocab-source-loaded? }
     \ vocab construct ;
 
 GENERIC: vocab ( vocab-spec -- vocab )
@@ -54,8 +54,7 @@ M: f vocab-docs-loaded? ;
 M: f set-vocab-docs-loaded? 2drop ;
 
 : create-vocab ( name -- vocab )
-    dictionary get [ <vocab> ] cache
-    t over set-vocab-source-loaded? ;
+    dictionary get [ <vocab> ] cache ;
 
 SYMBOL: load-vocab-hook
 
@@ -75,10 +74,6 @@ SYMBOL: load-vocab-hook
     [ vocab-words at ] curry* map
     [ ] subset ;
 
-: forget-vocab ( vocab -- )
-    dup vocab-words values forget-all
-    vocab-name dictionary get delete-at ;
-
 : child-vocab? ( prefix name -- ? )
     2dup = pick empty? or
     [ 2drop t ] [ swap CHAR: . add head? ] if ;
@@ -96,4 +91,9 @@ M: vocab-link vocab-name vocab-link-name ;
 
 UNION: vocab-spec vocab vocab-link ;
 
-M: vocab-spec forget vocab-name forget-vocab ;
+M: vocab-spec forget
+    dup vocab-words values forget-all
+    vocab-name dictionary get delete-at ;
+
+: forget-vocab ( vocab -- )
+    [ f >vocab-link forget ] with-compilation-unit ;

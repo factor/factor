@@ -5,8 +5,7 @@ definitions kernel.private classes classes.private
 quotations arrays vocabs ;
 IN: generic
 
-PREDICATE: compound generic ( word -- ? )
-    "combination" word-prop ;
+PREDICATE: word generic "combination" word-prop >boolean ;
 
 M: generic definer drop f f ;
 
@@ -24,12 +23,7 @@ M: object perform-combination
     nip [ "Invalid method combination" throw ] curry [ ] like ;
 
 : make-generic ( word -- )
-    dup
-    dup "combination" word-prop perform-combination
-    define-compound ;
-
-: ?make-generic ( word -- )
-    [ [ ] define-compound ] [ make-generic ] if-bootstrapping ;
+    dup dup "combination" word-prop perform-combination define ;
 
 : init-methods ( word -- )
      dup "methods" word-prop
@@ -38,7 +32,7 @@ M: object perform-combination
 
 : define-generic ( word combination -- )
     dupd "combination" set-word-prop
-    dup init-methods ?make-generic ;
+    dup init-methods make-generic ;
 
 TUPLE: method loc def ;
 
@@ -74,7 +68,7 @@ TUPLE: check-method class generic ;
     ] unless ;
 
 : with-methods ( word quot -- )
-    swap [ "methods" word-prop swap call ] keep ?make-generic ;
+    swap [ "methods" word-prop swap call ] keep make-generic ;
     inline
 
 : define-method ( method class generic -- )
@@ -111,6 +105,4 @@ M: class forget ( class -- )
     forget-word ;
 
 M: class update-methods ( class -- )
-    [ drop ]
-    [ class-usages implementors* [ make-generic ] each ]
-    if-bootstrapping ;
+    class-usages implementors* [ make-generic ] each ;

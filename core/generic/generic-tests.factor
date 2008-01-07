@@ -120,8 +120,6 @@ TUPLE: delegating ;
 
 [ t ] [ \ + math-generic? ] unit-test
 
-[ "SYMBOL: not-a-class C: not-a-class ;" parse ] unit-test-fails
-
 ! Test math-combination
 [ [ [ >float ] dip ] ] [ \ real \ float math-upgrade ] unit-test
 [ [ >float ] ] [ \ float \ real math-upgrade ] unit-test
@@ -184,7 +182,11 @@ M: debug-combination perform-combination
 
 SYMBOL: redefinition-test-generic
 
-redefinition-test-generic T{ debug-combination } define-generic
+[
+    redefinition-test-generic
+    T{ debug-combination }
+    define-generic
+] with-compilation-unit
 
 TUPLE: redefinition-test-tuple ;
 

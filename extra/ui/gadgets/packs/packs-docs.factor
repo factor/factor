@@ -1,5 +1,6 @@
-USING: ui.gadgets ui.gadgets.packs help.markup help.syntax
-generic kernel tuples quotations ;
+USING: ui.gadgets help.markup help.syntax generic kernel tuples
+quotations ;
+IN: ui.gadgets.packs
 
 HELP: pack
 { $class-description "A gadget which lays out its children along a single axis stored in the " { $link gadget-orientation } " slot. Can be constructed with one of the following words:"

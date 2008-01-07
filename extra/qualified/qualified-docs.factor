@@ -1,4 +1,5 @@
-USING: qualified help.markup help.syntax ;
+USING: help.markup help.syntax ;
+IN: qualified
 
 HELP: QUALIFIED:
 { $syntax "QUALIFIED: vocab" }

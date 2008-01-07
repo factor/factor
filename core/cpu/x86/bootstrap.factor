@@ -1,103 +1,78 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
-cpu.x86.assembler layouts vocabs math ;
+cpu.x86.assembler layouts vocabs math generator.fixup
+compiler.constants ;
 IN: bootstrap.x86
 
 big-endian off
 
 1 jit-code-format set
 
-: stack-frame-size 8 bootstrap-cells ;
-
-: scan-save stack-reg 3 bootstrap-cells [+] ;
+: stack-frame-size 4 bootstrap-cells ;
 
 [
-    arg0 arg0 quot-array@ [+] MOV              ! load array
-    scan-reg arg0 scan@ [+] LEA                ! initialize scan pointer
-] { } make jit-setup set                       
+    ! Load word
+    temp-reg 0 [] MOV
+    ! Bump profiling counter
+    temp-reg profile-count-offset [+] 1 tag-fixnum ADD
+    ! Load word->code
+    temp-reg temp-reg word-code-offset [+] MOV
+    ! Compute word XT
+    temp-reg compiled-header-size ADD
+    ! Jump to XT
+    temp-reg JMP
+] rc-absolute-cell rt-literal 2 jit-profiling jit-define
 
-[                                       
-    stack-frame-size PUSH                      ! save stack frame size       
-    xt-reg PUSH                                ! save XT
-    arg0 PUSH                                  ! save array
-    stack-reg 4 bootstrap-cells SUB            ! reserve space for scan-save
-] { } make jit-prolog set                      
-                                               
-: advance-scan scan-reg bootstrap-cell ADD ;   
-                                               
-[                                              
-    advance-scan                               
-    ds-reg bootstrap-cell ADD                  ! increment datastack pointer
-    arg0 scan-reg [] MOV                       ! load literal
-    ds-reg [] arg0 MOV                         ! store literal on datastack
-] { } make jit-push-literal set                
+[
+    stack-frame-size PUSH                      ! save stack frame size
+    0 PUSH                                     ! push XT
+    arg1 PUSH                                  ! alignment
+] rc-absolute-cell rt-xt 6 jit-prolog jit-define
 
-[                                              
-    advance-scan                               
+[
+    arg0 0 [] MOV                              ! load literal
     ds-reg bootstrap-cell ADD                  ! increment datastack pointer
-    arg0 scan-reg [] MOV                       ! load wrapper
-    arg0 dup wrapper@ [+] MOV                  ! load wrapper-obj slot
     ds-reg [] arg0 MOV                         ! store literal on datastack
-] { } make jit-push-wrapper set                
-                                               
-[                                              
+] rc-absolute-cell rt-literal 2 jit-push-literal jit-define
+
+[
     arg1 stack-reg MOV                         ! pass callstack pointer as arg 2
-] { } make jit-word-primitive-jump set         
-                                               
-[                                              
-    arg1 stack-reg bootstrap-cell neg [+] LEA  ! pass callstack pointer as arg 2
-] { } make jit-word-primitive-call set         
-                                               
-[                                              
-    arg0 scan-reg bootstrap-cell [+] MOV       ! load word
-    arg0 word-xt@ [+] JMP                      ! jump to word XT
-] { } make jit-word-jump set                   
-                                               
-[                                              
-    advance-scan                               
-    scan-save scan-reg MOV                     ! save scan pointer
-    arg0 scan-reg [] MOV                       ! load word
-    arg0 word-xt@ [+] CALL                     ! call word XT
-    scan-reg scan-save MOV                     ! restore scan pointer
-] { } make jit-word-call set                   
-                                               
-: load-branch                                  
+    (JMP) drop                                 ! go
+] rc-relative rt-primitive 3 jit-primitive jit-define
+
+[
+    (JMP) drop
+] rc-relative rt-xt 1 jit-word-jump jit-define
+
+[
+    (CALL) drop
+] rc-relative rt-xt 1 jit-word-call jit-define
+
+[
+    arg1 0 MOV                                 ! load addr of true quotation
     arg0 ds-reg [] MOV                         ! load boolean
     ds-reg bootstrap-cell SUB                  ! pop boolean
     arg0 \ f tag-number CMP                    ! compare it with f
-    arg0 scan-reg 2 bootstrap-cells [+] CMOVE  ! load false branch if equal
-    arg0 scan-reg 1 bootstrap-cells [+] CMOVNE ! load true branch if not equal
-    scan-reg 3 bootstrap-cells ADD             ! advance scan pointer
-    xt-reg arg0 quot-xt@ [+] MOV               ! load quotation-xt
-    ;
+    arg0 arg1 [] CMOVNE                        ! load true branch if not equal
+    arg0 arg1 bootstrap-cell [+] CMOVE         ! load false branch if equal
+    arg0 quot-xt@ [+] JMP                      ! jump to quotation-xt
+] rc-absolute-cell rt-literal 1 jit-if-jump jit-define
 
 [
-    load-branch
-    xt-reg JMP
-] { } make jit-if-jump set
-
-[
-    load-branch
-    scan-save scan-reg MOV                     ! save scan pointer
-    xt-reg CALL                                ! call quotation
-    scan-reg scan-save MOV                     ! restore scan pointer
-] { } make jit-if-call set
-
-[
+    arg1 0 [] MOV                              ! load dispatch table
     arg0 ds-reg [] MOV                         ! load index
     fixnum>slot@                               ! turn it into an array offset
     ds-reg bootstrap-cell SUB                  ! pop index
-    arg0 scan-reg bootstrap-cell [+] ADD       ! compute quotation location
+    arg0 arg1 ADD                              ! compute quotation location
     arg0 arg0 array-start [+] MOV              ! load quotation
-    xt-reg arg0 quot-xt@ [+] MOV               ! load quotation-xt
-    xt-reg JMP                                 ! execute quotation
-] { } make jit-dispatch set
+    arg0 quot-xt@ [+] JMP                      ! execute branch
+] rc-absolute-cell rt-literal 2 jit-dispatch jit-define
 
 [
     stack-reg stack-frame-size bootstrap-cell - ADD ! unwind stack frame
-] { } make jit-epilog set
+] f f f jit-epilog jit-define
 
-[ 0 RET ] { } make jit-return set
+[ 0 RET ] f f f jit-return jit-define
 
 "bootstrap.x86" forget-vocab
