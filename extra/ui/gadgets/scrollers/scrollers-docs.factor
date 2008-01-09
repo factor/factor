@@ -1,5 +1,5 @@
-USING: ui.gadgets help.markup help.syntax
-ui.gadgets.viewports ui.gadgets.sliders ;
+USING: ui.gadgets help.markup help.syntax ui.gadgets.viewports
+ui.gadgets.sliders ;
 IN: ui.gadgets.scrollers
 
 HELP: scroller

@@ -98,9 +98,6 @@ HELP: expired-error.
 HELP: io-error.
 { $error-description "Thrown by the C streams I/O primitives if an I/O error occurs." } ;
 
-HELP: undefined-word-error.
-{ $error-description "Thrown if an attempt is made to call a word which was defined by " { $link POSTPONE: DEFER: } "." } ;
-
 HELP: type-check-error.
 { $error-description "Thrown by various primitives if one of the inputs does not have the expected type. Generic words throw " { $link no-method } " and " { $link no-math-method } " errors in such cases instead." } ;
 

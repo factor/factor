@@ -10,7 +10,7 @@ IN: tuple-syntax
 : parse-slot-writer ( tuple -- slot-setter )
     scan dup "}" = [ 2drop f ] [
         1 head* swap class "slots" word-prop
-        [ slot-spec-name = ] curry* find nip slot-spec-writer
+        [ slot-spec-name = ] with find nip slot-spec-writer
     ] if ;
 
 : parse-slots ( accum tuple -- accum tuple )

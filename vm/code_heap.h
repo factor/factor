@@ -9,8 +9,8 @@ typedef enum {
 	RT_DISPATCH,
 	/* a compiled word reference */
 	RT_XT,
-	/* a compiled word reference, pointing at the profiling prologue */
-	RT_XT_PROFILING,
+	/* reserved */
+	RT_RESERVED,
 	/* a local label */
 	RT_LABEL
 } F_RELTYPE;
@@ -56,10 +56,9 @@ typedef struct {
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end);
 
-void finalize_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end);
+void default_word_code(F_WORD *word, bool relocate);
 
-void set_word_xt(F_WORD *word, F_COMPILED *compiled);
+void set_word_code(F_WORD *word, F_COMPILED *compiled);
 
 F_COMPILED *add_compiled_block(
 	CELL type,
@@ -70,6 +69,6 @@ F_COMPILED *add_compiled_block(
 	F_ARRAY *literals);
 
 CELL compiled_code_format(void);
+bool stack_traces_p(void);
 
-DECLARE_PRIMITIVE(add_compiled_block);
-DECLARE_PRIMITIVE(finalize_compile);
+DECLARE_PRIMITIVE(modify_code_heap);

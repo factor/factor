@@ -3,10 +3,9 @@ inference.dataflow kernel classes kernel.private math
 math.parser math.private namespaces namespaces.private parser
 sequences strings vectors words quotations effects tools.test
 continuations generic.standard sorting assocs definitions
-prettyprint io inspector bootstrap.image tuples
-classes.union classes.predicate debugger bootstrap.image
-bootstrap.image.private io.launcher threads.private
-io.streams.string combinators.private tools.test.inference ;
+prettyprint io inspector tuples classes.union classes.predicate
+debugger threads.private io.streams.string combinators.private
+tools.test.inference ;
 IN: temporary
 
 { 0 2 } [ 2 "Hello" ] unit-test-effect
@@ -352,69 +351,69 @@ DEFER: bar
 [ [ 3 [ ] curry 1 2 [ ] 2curry if ] infer ] unit-test-fails
 
 ! Test number protocol
-{ 2 1 } [ bitor ] unit-test-effect
-{ 2 1 } [ bitand ] unit-test-effect
-{ 2 1 } [ bitxor ] unit-test-effect
-{ 2 1 } [ mod ] unit-test-effect
-{ 2 1 } [ /i ] unit-test-effect
-{ 2 1 } [ /f ] unit-test-effect
-{ 2 2 } [ /mod ] unit-test-effect
-{ 2 1 } [ + ] unit-test-effect
-{ 2 1 } [ - ] unit-test-effect
-{ 2 1 } [ * ] unit-test-effect
-{ 2 1 } [ / ] unit-test-effect
-{ 2 1 } [ < ] unit-test-effect
-{ 2 1 } [ <= ] unit-test-effect
-{ 2 1 } [ > ] unit-test-effect
-{ 2 1 } [ >= ] unit-test-effect
-{ 2 1 } [ number= ] unit-test-effect
+\ bitor must-infer
+\ bitand must-infer
+\ bitxor must-infer
+\ mod must-infer
+\ /i must-infer
+\ /f must-infer
+\ /mod must-infer
+\ + must-infer
+\ - must-infer
+\ * must-infer
+\ / must-infer
+\ < must-infer
+\ <= must-infer
+\ > must-infer
+\ >= must-infer
+\ number= must-infer
 
 ! Test object protocol
-{ 2 1 } [ = ] unit-test-effect
-{ 1 1 } [ clone ] unit-test-effect
-{ 2 1 } [ hashcode* ] unit-test-effect
+\ = must-infer
+\ clone must-infer
+\ hashcode* must-infer
 
 ! Test sequence protocol
-{ 1 1 } [ length ] unit-test-effect
-{ 2 1 } [ nth ] unit-test-effect
-{ 2 0 } [ set-length ] unit-test-effect
-{ 3 0 } [ set-nth ] unit-test-effect
-{ 2 1 } [ new ] unit-test-effect
-{ 2 1 } [ new-resizable ] unit-test-effect
-{ 2 1 } [ like ] unit-test-effect
-{ 2 0 } [ lengthen ] unit-test-effect
+\ length must-infer
+\ nth must-infer
+\ set-length must-infer
+\ set-nth must-infer
+\ new must-infer
+\ new-resizable must-infer
+\ like must-infer
+\ lengthen must-infer
 
 ! Test assoc protocol
-{ 2 2 } [ at* ] unit-test-effect
-{ 3 0 } [ set-at ] unit-test-effect
-{ 2 1 } [ new-assoc ] unit-test-effect
-{ 2 0 } [ delete-at ] unit-test-effect
-{ 1 0 } [ clear-assoc ] unit-test-effect
-{ 1 1 } [ assoc-size ] unit-test-effect
-{ 2 1 } [ assoc-like ] unit-test-effect
-{ 2 1 } [ assoc-clone-like ] unit-test-effect
-{ 1 1 } [ >alist ] unit-test-effect
+\ at* must-infer
+\ set-at must-infer
+\ new-assoc must-infer
+\ delete-at must-infer
+\ clear-assoc must-infer
+\ assoc-size must-infer
+\ assoc-like must-infer
+\ assoc-clone-like must-infer
+\ >alist must-infer
 { 1 3 } [ [ 2drop f ] assoc-find ] unit-test-effect
 
 ! Test some random library words
-{ 1 1 } [ 1quotation ] unit-test-effect
-{ 1 1 } [ string>number ] unit-test-effect
-{ 1 1 } [ get ] unit-test-effect
+\ 1quotation must-infer
+\ string>number must-infer
+\ get must-infer
 
-{ 2 0 } [ push ] unit-test-effect
-{ 2 1 } [ append ] unit-test-effect
-{ 1 1 } [ peek ] unit-test-effect
+\ push must-infer
+\ append must-infer
+\ peek must-infer
 
-{ 1 1 } [ reverse ] unit-test-effect
-{ 2 1 } [ member? ] unit-test-effect
-{ 2 1 } [ remove ] unit-test-effect
-{ 1 1 } [ natural-sort ] unit-test-effect
+\ reverse must-infer
+\ member? must-infer
+\ remove must-infer
+\ natural-sort must-infer
 
-{ 1 0 } [ forget ] unit-test-effect
-{ 4 0 } [ define-class ] unit-test-effect
-{ 2 0 } [ define-tuple-class ] unit-test-effect
-{ 2 0 } [ define-union-class ] unit-test-effect
-{ 3 0 } [ define-predicate-class ] unit-test-effect
+\ forget must-infer
+\ define-class must-infer
+\ define-tuple-class must-infer
+\ define-union-class must-infer
+\ define-predicate-class must-infer
 
 ! Test words with continuations
 { 0 0 } [ [ drop ] callcc0 ] unit-test-effect
@@ -423,39 +422,36 @@ DEFER: bar
 { 2 1 } [ [ + ] [ 3drop 0 ] recover ] unit-test-effect
 
 ! Test stream protocol
-{ 2 0 } [ set-timeout ] unit-test-effect
-{ 2 1 } [ stream-read ] unit-test-effect
-{ 1 1 } [ stream-read1 ] unit-test-effect
-{ 1 1 } [ stream-readln ] unit-test-effect
-{ 2 2 } [ stream-read-until ] unit-test-effect
-{ 2 0 } [ stream-write ] unit-test-effect
-{ 2 0 } [ stream-write1 ] unit-test-effect
-{ 1 0 } [ stream-nl ] unit-test-effect
-{ 1 0 } [ stream-close ] unit-test-effect
-{ 3 0 } [ stream-format ] unit-test-effect
-{ 3 0 } [ stream-write-table ] unit-test-effect
-{ 1 0 } [ stream-flush ] unit-test-effect
-{ 2 1 } [ make-span-stream ] unit-test-effect
-{ 2 1 } [ make-block-stream ] unit-test-effect
-{ 2 1 } [ make-cell-stream ] unit-test-effect
+\ set-timeout must-infer
+\ stream-read must-infer
+\ stream-read1 must-infer
+\ stream-readln must-infer
+\ stream-read-until must-infer
+\ stream-write must-infer
+\ stream-write1 must-infer
+\ stream-nl must-infer
+\ stream-close must-infer
+\ stream-format must-infer
+\ stream-write-table must-infer
+\ stream-flush must-infer
+\ make-span-stream must-infer
+\ make-block-stream must-infer
+\ make-cell-stream must-infer
 
 ! Test stream utilities
-{ 1 1 } [ lines ] unit-test-effect
-{ 1 1 } [ contents ] unit-test-effect
+\ lines must-infer
+\ contents must-infer
 
 ! Test prettyprinting
-{ 1 0 } [ . ] unit-test-effect
-{ 1 0 } [ short. ] unit-test-effect
-{ 1 1 } [ unparse ] unit-test-effect
+\ . must-infer
+\ short. must-infer
+\ unparse must-infer
 
-{ 1 0 } [ describe ] unit-test-effect
-{ 1 0 } [ error. ] unit-test-effect
+\ describe must-infer
+\ error. must-infer
 
 ! Test odds and ends
-{ 1 1 } [ ' ] unit-test-effect
-{ 2 0 } [ write-image ] unit-test-effect
-{ 1 1 } [ <process-stream> ] unit-test-effect
-{ 0 0 } [ idle-thread ] unit-test-effect
+\ idle-thread must-infer
 
 ! Incorrect stack declarations on inline recursive words should
 ! be caught

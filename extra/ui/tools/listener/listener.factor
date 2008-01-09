@@ -6,7 +6,7 @@ kernel models namespaces parser quotations sequences ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
-prettyprint listener debugger threads generator ;
+prettyprint listener debugger threads ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;
@@ -74,8 +74,7 @@ M: listener-operation invoke-command ( target command -- )
     dup empty? [
         drop
     ] [
-        [ [ [ run-file ] each ] no-parse-hook ] curry
-        call-listener
+        [ [ run-file ] each ] curry call-listener
     ] if ;
 
 : com-EOF ( listener -- )
@@ -97,10 +96,10 @@ M: listener-operation invoke-command ( target command -- )
     get-listener [ word-completion-string ] keep
     listener-gadget-input user-input ;
 
-: quot-action ( interactor -- quot )
-    dup editor-string swap
-    2dup add-interactor-history
-    select-all ;
+: quot-action ( interactor -- lines )
+    dup control-value
+    dup "\n" join pick add-interactor-history
+    swap select-all ;
 
 TUPLE: stack-display ;
 
@@ -130,7 +129,6 @@ M: stack-display tool-scroller
         dup [ ui-listener-hook ] curry listener-hook set
         dup [ ui-error-hook ] curry error-hook set
         [ ui-inspector-hook ] curry inspector-hook set
-        [ yield ] compiler-hook set
         welcome.
         listener
     ] with-stream* ;

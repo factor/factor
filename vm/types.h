@@ -128,6 +128,7 @@ F_ARRAY *allot_array_internal(CELL type, CELL capacity);
 F_ARRAY *allot_array(CELL type, CELL capacity, CELL fill);
 F_BYTE_ARRAY *allot_byte_array(CELL size);
 
+CELL allot_array_1(CELL obj);
 CELL allot_array_2(CELL v1, CELL v2);
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 
@@ -187,7 +188,6 @@ DECLARE_PRIMITIVE(hashtable);
 
 F_WORD *allot_word(CELL vocab, CELL name);
 DECLARE_PRIMITIVE(word);
-DECLARE_PRIMITIVE(update_xt);
 DECLARE_PRIMITIVE(word_xt);
 
 DECLARE_PRIMITIVE(wrapper);
@@ -195,48 +195,17 @@ DECLARE_PRIMITIVE(wrapper);
 /* Macros to simulate a vector in C */
 #define GROWABLE_ARRAY(result) \
 	CELL result##_count = 0; \
-	F_ARRAY *result = allot_array(ARRAY_TYPE,100,F)
+	CELL result = tag_object(allot_array(ARRAY_TYPE,100,F))
 
-INLINE F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count)
-{
-	REGISTER_ROOT(elt);
-
-	if(*result_count == array_capacity(result))
-	{
-		result = reallot_array(result,
-			*result_count * 2,F);
-	}
-
-	UNREGISTER_ROOT(elt);
-	set_array_nth(result,*result_count,elt);
-	*result_count = *result_count + 1;
-
-	return result;
-}
+F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count);
 
 #define GROWABLE_ADD(result,elt) \
-	result = growable_add(result,elt,&result##_count)
+	result = tag_object(growable_add(untag_object(result),elt,&result##_count))
 
-INLINE F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
-{
-	REGISTER_UNTAGGED(elts);
-
-	CELL elts_size = array_capacity(elts);
-	CELL new_size = *result_count + elts_size;
-
-	if(new_size >= array_capacity(result))
-		result = reallot_array(result,new_size * 2,F);
-
-	UNREGISTER_UNTAGGED(elts);
-
-	memcpy((void*)AREF(result,*result_count),(void*)AREF(elts,0),elts_size * CELLS);
-
-	*result_count += elts_size;
-
-	return result;
-}
+F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count);
 
 #define GROWABLE_APPEND(result,elts) \
-	result = growable_append(result,elts,&result##_count)
-	
-#define GROWABLE_TRIM(result) result = reallot_array(result,result##_count,F)
+	result = tag_object(growable_append(untag_object(result),elts,&result##_count))
+
+#define GROWABLE_TRIM(result) \
+	result = tag_object(reallot_array(untag_object(result),result##_count,F))

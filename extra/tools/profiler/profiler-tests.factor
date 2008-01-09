@@ -1,6 +1,12 @@
 IN: temporary
 USING: tools.profiler tools.test kernel memory math threads
-alien tools.profiler.private ;
+alien tools.profiler.private sequences ;
+
+[ t ] [
+    \ length profile-counter
+    10 [ { } length drop ] times
+    \ length profile-counter =
+] unit-test
 
 [ ] [ [ 10 [ data-gc ] times ] profile ] unit-test
 
@@ -26,3 +32,13 @@ alien tools.profiler.private ;
 ] profile
 
 [ 1 ] [ \ foobar profile-counter ] unit-test
+
+: fooblah { } [ ] each ;
+
+: foobaz fooblah fooblah ;
+
+[ foobaz ] profile
+
+[ 1 ] [ \ foobaz profile-counter ] unit-test
+
+[ 2 ] [ \ fooblah profile-counter ] unit-test

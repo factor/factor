@@ -228,19 +228,40 @@ void garbage_collection(volatile CELL gen,
 /* If a runtime function needs to call another function which potentially
 allocates memory, it must store any local variable references to Factor
 objects on the root stack */
+
+/* GC locals: stores addresses of pointers to objects. The GC updates these
+pointers, so you can do
+
+REGISTER_ROOT(some_local);
+
+... allocate memory ...
+
+foo(some_local);
+
+...
+
+UNREGISTER_ROOT(some_local); */
+F_SEGMENT *gc_locals_region;
+CELL gc_locals;
+
+DEFPUSHPOP(gc_local_,gc_locals)
+
+#define REGISTER_ROOT(obj) gc_local_push((CELL)&obj)
+#define UNREGISTER_ROOT(obj) \
+	{ \
+		if(gc_local_pop() != (CELL)&obj) \
+			critical_error("Mismatched REGISTER_ROOT/UNREGISTER_ROOT",0); \
+	}
+
+/* Extra roots: stores pointers to objects in the heap. Requires extra work
+(you have to unregister before accessing the object) but more flexible. */
 F_SEGMENT *extra_roots_region;
 CELL extra_roots;
 
 DEFPUSHPOP(root_,extra_roots)
 
-#define REGISTER_ROOT(obj) root_push(obj)
-#define UNREGISTER_ROOT(obj) obj = root_pop()
-
 #define REGISTER_UNTAGGED(obj) root_push(obj ? tag_object(obj) : 0)
 #define UNREGISTER_UNTAGGED(obj) obj = untag_object(root_pop())
-
-#define REGISTER_STRING(obj) REGISTER_UNTAGGED(obj)
-#define UNREGISTER_STRING(obj) UNREGISTER_UNTAGGED(obj)
 
 /* We ignore strings which point outside the data heap, but we might be given
 a char* which points inside the data heap, in which case it is a root, for

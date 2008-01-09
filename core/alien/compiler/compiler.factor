@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generator generator.registers generator.fixup
 hashtables kernel math namespaces sequences words
-inference.backend inference.dataflow system
+inference.state inference.backend inference.dataflow system
 math.parser classes alien.arrays alien.c-types alien.structs
 alien.syntax cpu.architecture alien inspector quotations assocs
 kernel.private threads continuations.private libc combinators ;
@@ -387,7 +387,6 @@ TUPLE: callback-context ;
 : generate-callback ( node -- )
     dup alien-callback-xt dup rot [
         init-templates
-        generate-profiler-prologue
         %save-word-xt
         %prologue-later
         dup alien-stack-frame [

@@ -70,14 +70,14 @@ M: vocab-link summary vocab-summary ;
     dup empty? [
         drop
     ] [
-        swap [ "." swap 3append ] curry* map
+        swap [ "." swap 3append ] with map
     ] if ;
 
 : vocabs-in-dir ( root name -- )
     dupd (all-child-vocabs) [
         2dup vocab-dir? [ 2dup swap >vocab-link , ] when
         vocabs-in-dir
-    ] curry* each ;
+    ] with each ;
 
 : sane-vocab-roots "." vocab-roots get remove ;
 
@@ -117,7 +117,7 @@ M: vocab-link summary vocab-summary ;
 : load-everything ( -- )
     all-vocabs-seq
     [ vocab-name dangerous? not ] subset
-    [ [ require ] each ] no-parse-hook ;
+    require-all ;
 
 : unrooted-child-vocabs ( prefix -- seq )
     dup empty? [ CHAR: . add ] unless
@@ -125,19 +125,19 @@ M: vocab-link summary vocab-summary ;
     [ vocab-root not ] subset
     [
         vocab-name swap ?head CHAR: . rot member? not and
-    ] curry* subset
+    ] with subset
     [ vocab ] map ;
 
 : all-child-vocabs ( prefix -- assoc )
     sane-vocab-roots [
         dup pick dupd (all-child-vocabs)
-        [ swap >vocab-link ] curry* map
+        [ swap >vocab-link ] with map
     ] { } map>assoc
     f rot unrooted-child-vocabs 2array add ;
 
 : load-children ( prefix -- )
     all-child-vocabs values concat
-    [ [ require ] each ] no-parse-hook ;
+    require-all ;
 
 : vocab-status-string ( vocab -- string )
     {

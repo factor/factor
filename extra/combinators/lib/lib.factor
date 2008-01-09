@@ -35,7 +35,7 @@ MACRO: nkeep ( n -- )
 
 MACRO: ncurry ( n -- ) [ curry ] n*quot ;
 
-MACRO: ncurry* ( quot n -- )
+MACRO: nwith ( quot n -- )
   tuck 1+ dup
   [ , -nrot [ , nrot , call ] , ncurry ]
   bake ;
@@ -53,17 +53,17 @@ MACRO: napply ( n -- )
 
 ! each-with
 
-: each-withn ( seq quot n -- ) ncurry* each ; inline
+: each-withn ( seq quot n -- ) nwith each ; inline
 
-: each-with ( seq quot -- ) curry* each ; inline
+: each-with ( seq quot -- ) with each ; inline
 
 : each-with2 ( obj obj list quot -- ) 2 each-withn ; inline
 
 ! map-with
 
-: map-withn ( seq quot n -- newseq ) ncurry* map ; inline
+: map-withn ( seq quot n -- newseq ) nwith map ; inline
 
-: map-with ( seq quot -- ) curry* map ; inline
+: map-with ( seq quot -- ) with map ; inline
 
 : map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
 
@@ -120,7 +120,7 @@ MACRO: ifte ( quot quot quot -- )
 
 : preserving ( predicate -- quot )
   dup infer effect-in
-  dup 1+ swap rot
+  dup 1+ spin
   [ , , nkeep , nrot ]
   bake ;
 

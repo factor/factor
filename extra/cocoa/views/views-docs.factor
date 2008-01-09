@@ -1,4 +1,5 @@
-USING: cocoa.views help.syntax help.markup ;
+USING: help.syntax help.markup ;
+IN: cocoa.views
 
 HELP: <PixelFormat>
 { $values { "pixelfmt" "an " { $snippet "NSOpenGLPixelFormat" } } }

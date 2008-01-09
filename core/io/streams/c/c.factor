@@ -61,7 +61,7 @@ M: object init-io ;
 : stdout 12 getenv ;
 
 M: object init-stdio
-    stdin stdout <duplex-c-stream> stdio set ;
+    stdin stdout <duplex-c-stream> stdio set-global ;
 
 M: object io-multiplex (sleep) ;
 

@@ -325,13 +325,13 @@ M: #dispatch optimize-node*
 
 : partial-eval? ( #call -- ? )
     dup node-param "foldable" word-prop [
-        dup node-in-d [ node-literal? ] curry* all?
+        dup node-in-d [ node-literal? ] with all?
     ] [
         drop f
     ] if ;
 
 : literal-in-d ( #call -- inputs )
-    dup node-in-d [ node-literal ] curry* map ;
+    dup node-in-d [ node-literal ] with map ;
 
 : partial-eval ( #call -- node )
     dup literal-in-d over node-param 1quotation

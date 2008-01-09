@@ -34,6 +34,3 @@ HOOK: (close-mapped-file) io-backend ( mmap -- )
     >r <mapped-file> r>
     [ keep ] curry
     [ close-mapped-file ] [ ] cleanup ; inline
-
-USE-IF: unix? io.unix.mmap
-USE-IF: windows? io.windows.mmap

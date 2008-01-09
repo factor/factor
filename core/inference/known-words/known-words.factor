@@ -1,16 +1,16 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: inference.known-words
 USING: alien arrays bit-arrays byte-arrays classes
 combinators.private continuations.private effects float-arrays
-generic hashtables hashtables.private inference.backend
-inference.dataflow io io.backend io.files io.files.private
-io.streams.c kernel kernel.private math math.private memory
-namespaces namespaces.private parser prettyprint quotations
-quotations.private sbufs sbufs.private sequences
-sequences.private slots.private strings strings.private system
-threads.private tuples tuples.private vectors vectors.private
-words assocs ;
+generic hashtables hashtables.private inference.state
+inference.backend inference.dataflow io io.backend io.files
+io.files.private io.streams.c kernel kernel.private math
+math.private memory namespaces namespaces.private parser
+prettyprint quotations quotations.private sbufs sbufs.private
+sequences sequences.private slots.private strings
+strings.private system threads.private tuples tuples.private
+vectors vectors.private words words.private assocs inspector ;
+IN: inference.known-words
 
 ! Shuffle words
 : infer-shuffle-inputs ( shuffle node -- )
@@ -79,8 +79,8 @@ M: curried infer-call
 
 M: composed infer-call
     infer-uncurry
-    infer->r peek-d infer-call infer-r>
-    peek-d infer-call ;
+    infer->r peek-d infer-call
+    terminated? get [ infer-r> peek-d infer-call ] unless ;
 
 M: object infer-call
     \ literal-expected inference-warning ;
@@ -344,8 +344,6 @@ t over set-effect-terminated?
 \ <word> { object object } { word } <effect> "inferred-effect" set-word-prop
 \ <word> make-flushable
 
-\ update-xt { word } { } <effect> "inferred-effect" set-word-prop
-
 \ word-xt { word } { integer } <effect> "inferred-effect" set-word-prop
 \ word-xt make-flushable
 
@@ -579,3 +577,5 @@ t over set-effect-terminated?
 \ set-innermost-frame-quot { quotation callstack } { } <effect> "inferred-effect" set-word-prop
 
 \ (os-envs) { } { array } <effect> "inferred-effect" set-word-prop
+
+\ do-primitive [ \ do-primitive no-effect ] "infer" set-word-prop

@@ -26,6 +26,7 @@ DEFINE_PRIMITIVE(cd)
 DEFINE_PRIMITIVE(os_envs)
 {
 	GROWABLE_ARRAY(result);
+	REGISTER_ROOT(result);
 
 	TCHAR *env = GetEnvironmentStrings();
 	TCHAR *finger = env;
@@ -38,9 +39,7 @@ DEFINE_PRIMITIVE(os_envs)
 		if(scan == finger)
 			break;
 
-		REGISTER_UNTAGGED(result);
 		CELL string = tag_object(from_u16_string(finger));
-		UNREGISTER_UNTAGGED(result);
 		GROWABLE_ADD(result,string);
 
 		finger = scan + 1;
@@ -48,8 +47,9 @@ DEFINE_PRIMITIVE(os_envs)
 
 	FreeEnvironmentStrings(env);
 
+	UNREGISTER_ROOT(result);
 	GROWABLE_TRIM(result);
-	dpush(tag_object(result));
+	dpush(result);
 }
 
 long exception_handler(PEXCEPTION_POINTERS pe)

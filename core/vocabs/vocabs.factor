@@ -12,9 +12,11 @@ words
 main help
 source-loaded? docs-loaded? ;
 
+M: vocab equal? 2drop f ;
+
 : <vocab> ( name -- vocab )
-    H{ } clone
-    { set-vocab-name set-vocab-words }
+    H{ } clone t
+    { set-vocab-name set-vocab-words set-vocab-source-loaded? }
     \ vocab construct ;
 
 GENERIC: vocab ( vocab-spec -- vocab )
@@ -54,8 +56,7 @@ M: f vocab-docs-loaded? ;
 M: f set-vocab-docs-loaded? 2drop ;
 
 : create-vocab ( name -- vocab )
-    dictionary get [ <vocab> ] cache
-    t over set-vocab-source-loaded? ;
+    dictionary get [ <vocab> ] cache ;
 
 SYMBOL: load-vocab-hook
 
@@ -72,28 +73,36 @@ SYMBOL: load-vocab-hook
 
 : words-named ( str -- seq )
     dictionary get values
-    [ vocab-words at ] curry* map
+    [ vocab-words at ] with map
     [ ] subset ;
-
-: forget-vocab ( vocab -- )
-    dup vocab-words values forget-all
-    vocab-name dictionary get delete-at ;
 
 : child-vocab? ( prefix name -- ? )
     2dup = pick empty? or
     [ 2drop t ] [ swap CHAR: . add head? ] if ;
 
 : child-vocabs ( vocab -- seq )
-    vocab-name vocabs [ child-vocab? ] curry* subset ;
+    vocab-name vocabs [ child-vocab? ] with subset ;
 
 TUPLE: vocab-link name root ;
+
+C: <vocab-link> vocab-link
+
+M: vocab-link equal?
+    over vocab-link?
+    [ [ vocab-link-name ] 2apply = ] [ 2drop f ] if ;
+
+M: vocab-link hashcode*
+    vocab-link-name hashcode* ;
 
 M: vocab-link vocab-name vocab-link-name ;
 
 : >vocab-link ( name root -- vocab )
-    over vocab dup
-    [ 2nip ] [ drop \ vocab-link construct-boa ] if ;
+    over vocab dup [ 2nip ] [ drop <vocab-link> ] if ;
 
 UNION: vocab-spec vocab vocab-link ;
 
-M: vocab-spec forget vocab-name forget-vocab ;
+: forget-vocab ( vocab -- )
+    dup vocab-words values forget-all
+    vocab-name dictionary get delete-at ;
+
+M: vocab-spec forget* forget-vocab ;

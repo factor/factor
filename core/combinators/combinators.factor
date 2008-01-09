@@ -63,13 +63,13 @@ M: sequence hashcode*
     next-power-of-2 swap [ nip clone ] curry map ;
 
 : distribute-buckets ( assoc initial quot -- buckets )
-    swap rot [ length <buckets> ] keep
+    spin [ length <buckets> ] keep
     [ >r 2dup r> dup first roll call (distribute-buckets) ] each
     nip ; inline
 
 : hash-case-table ( default assoc -- array )
     V{ } [ 1array ] distribute-buckets
-    [ case>quot ] curry* map ;
+    [ case>quot ] with map ;
 
 : hash-dispatch-quot ( table -- quot )
     [ length 1- [ fixnum-bitand ] curry ] keep

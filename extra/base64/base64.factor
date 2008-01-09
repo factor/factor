@@ -20,7 +20,7 @@ IN: base64
     } nth ;
 
 : encode3 ( seq -- seq )
-    be> 4 [ 3 swap - -6 * shift HEX: 3f bitand ch>base64 ] curry* map ;
+    be> 4 [ 3 swap - -6 * shift HEX: 3f bitand ch>base64 ] with map ;
 
 : decode4 ( str -- str )
     [ base64>ch ] map 0 [ swap 6 shift bitor ] reduce 3 >be ;

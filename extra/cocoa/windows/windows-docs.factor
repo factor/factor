@@ -1,4 +1,5 @@
-USING: cocoa.windows help.markup help.syntax ;
+USING: help.markup help.syntax ;
+IN: cocoa.windows
 
 HELP: <NSWindow>
 { $values { "rect" "an " { $snippet "NSRect" } } { "window" "an " { $snippet "NSWindow" } } }

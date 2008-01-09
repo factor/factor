@@ -1,6 +1,5 @@
 USING: arrays bit-arrays help.markup help.syntax
-sequences.private vectors strings sbufs kernel math math.vectors
-;
+sequences.private vectors strings sbufs kernel math ;
 IN: sequences
 
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
@@ -483,14 +482,12 @@ HELP: 2reduce
                    { $snippet "( prev elt1 elt2 -- next )" } }
           { "result" "the final result" } }
 { $description "Combines successive pairs of elements from the two sequences using a ternary operation. The first input value at each iteration except the first one is the result of the previous iteration. The first input value at the first iteration is " { $snippet "identity" } "." }
-{ $examples "The " { $link v. } " word provides a particularly elegant implementation of the dot product." }
 { $notes "If one sequence is shorter than the other, then only the prefix having the length of the minimum of the two is examined." } ;
 
 HELP: 2map
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt1 elt2 -- new )" } } { "newseq" "a new sequence" } }
 { $description "Applies the quotation to each pair of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "seq1" } "." }
-{ $notes "If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined." }
-{ $see-also v+ v- v* v/ } ;
+{ $notes "If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined." } ;
 
 HELP: 2all?
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt1 elt2 -- ? )" } } { "?" "a boolean" } }

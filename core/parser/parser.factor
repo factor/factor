@@ -5,10 +5,8 @@ namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger 
 io.files io.streams.string io.streams.lines vocabs
-source-files classes hashtables ;
+source-files classes hashtables compiler.errors compiler.units ;
 IN: parser
-
-SYMBOL: file
 
 TUPLE: lexer text line column ;
 
@@ -21,29 +19,11 @@ TUPLE: lexer text line column ;
     file get lexer get lexer-line 2dup and
     [ >r source-file-path r> 2array ] [ 2drop f ] if ;
 
-SYMBOL: old-definitions
-SYMBOL: new-definitions
-
-TUPLE: redefine-error def ;
-
-M: redefine-error error.
-    "Re-definition of " write
-    redefine-error-def . ;
-
-: redefine-error ( definition -- )
-    \ redefine-error construct-boa
-    { { "Continue" t } } throw-restarts drop ;
-
-: redefinition? ( definition -- ? )
-    dup class? [ drop f ] [ new-definitions get key? ] if ;
-
-: (save-location) ( definition loc -- )
-    over redefinition? [ over redefine-error ] when
-    over set-where
-    dup new-definitions get dup [ set-at ] [ 3drop ] if ;
-
 : save-location ( definition -- )
-    location (save-location) ;
+    location remember-definition ;
+
+: save-class-location ( class -- )
+    location remember-class ;
 
 SYMBOL: parser-notes
 
@@ -119,7 +99,8 @@ M: lexer skip-word ( lexer -- )
 
 TUPLE: bad-escape ;
 
-: bad-escape ( -- * ) \ bad-escape construct-empty throw ;
+: bad-escape ( -- * )
+    \ bad-escape construct-empty throw ;
 
 M: bad-escape summary drop "Bad escape code" ;
 
@@ -238,7 +219,9 @@ PREDICATE: unexpected unexpected-eof
 : CREATE ( -- word ) scan create-in ;
 
 : CREATE-CLASS ( -- word )
-    scan create-in dup predicate-word save-location ;
+    scan in get create
+    dup save-class-location
+    dup predicate-word dup set-word save-location ;
 
 : word-restarts ( possibilities -- restarts )
     natural-sort [
@@ -255,23 +238,11 @@ M: no-word summary
     swap words-named word-restarts throw-restarts
     dup word-vocabulary (use+) ;
 
-: forward-reference? ( word -- ? )
-    dup old-definitions get key?
-    swap new-definitions get key? not and ;
-
-TUPLE: forward-error word ;
-
-M: forward-error error.
-    "Forward reference to " write forward-error-word . ;
-
-: forward-error ( word -- )
-    \ forward-error construct-boa throw ;
-
 : check-forward ( str word -- word )
     dup forward-reference? [
         drop
         dup use get
-        [ at ] curry* map [ ] subset
+        [ at ] with map [ ] subset
         [ forward-reference? not ] find nip
         [ ] [ forward-error ] ?if
     ] [
@@ -284,12 +255,27 @@ M: forward-error error.
 : scan-word ( -- word/number/f )
     scan dup [ dup string>number [ ] [ search ] ?if ] when ;
 
+TUPLE: staging-violation word ;
+
+: staging-violation ( word -- * )
+    \ staging-violation construct-boa throw ;
+
+M: staging-violation summary
+    drop
+    "A parsing word cannot be used in the same file it is defined in." ;
+
+: execute-parsing ( word -- )
+    new-definitions get [
+        dupd first key? [ staging-violation ] when
+    ] when*
+    execute ;
+
 : parse-step ( accum end -- accum ? )
     scan-word {
         { [ 2dup eq? ] [ 2drop f ] }
         { [ dup not ] [ drop unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
-        { [ dup parsing? ] [ nip execute t ] }
+        { [ dup parsing? ] [ nip execute-parsing t ] }
         { [ t ] [ pick push drop t ] }
     } cond ;
 
@@ -353,17 +339,58 @@ M: bad-number summary
 
 SYMBOL: bootstrap-syntax
 
-: file-vocabs ( -- )
-    "scratchpad" in set
-    { "syntax" "scratchpad" } set-use
-    bootstrap-syntax get [ use get push ] when* ;
+: with-file-vocabs ( quot -- )
+    [
+        "scratchpad" in set
+        { "syntax" "scratchpad" } set-use
+        bootstrap-syntax get [ use get push ] when*
+        call
+    ] with-scope ; inline
+
+: with-interactive-vocabs ( quot -- )
+    [
+        "scratchpad" in set
+        {
+            "arrays"
+            "assocs"
+            "combinators"
+            "compiler.errors"
+            "continuations"
+            "debugger"
+            "definitions"
+            "editors"
+            "generic"
+            "help"
+            "inspector"
+            "io"
+            "io.files"
+            "kernel"
+            "listener"
+            "math"
+            "memory"
+            "namespaces"
+            "prettyprint"
+            "sequences"
+            "slicing"
+            "sorting"
+            "strings"
+            "syntax"
+            "tools.annotations"
+            "tools.crossref"
+            "tools.memory"
+            "tools.profiler"
+            "tools.test"
+            "tools.time"
+            "vocabs"
+            "vocabs.loader"
+            "words"
+            "scratchpad"
+        } set-use
+        call
+    ] with-scope ; inline
 
 : parse-fresh ( lines -- quot )
-    [ file-vocabs parse-lines ] with-scope ;
-
-SYMBOL: parse-hook
-
-: do-parse-hook ( -- ) parse-hook get [ call ] when* ;
+    [ parse-lines ] with-file-vocabs ;
 
 : parsing-file ( file -- )
     "quiet" get [
@@ -372,6 +399,7 @@ SYMBOL: parse-hook
         "Loading " write <pathname> . flush
     ] if ;
 
+<<<<<<< HEAD:core/parser/parser.factor
 : no-parse-hook ( quot -- )
     >r f parse-hook r> with-variable do-parse-hook ; inline
 
@@ -407,9 +435,12 @@ SYMBOL: parse-hook
         file get source-file-path =
     ] assoc-subset ;
 
+: removed-definitions ( -- definitions )
+    new-definitions old-definitions
+    [ get first2 union ] 2apply diff ;
+
 : smudged-usage ( -- usages referenced removed )
-    new-definitions get old-definitions get diff filter-moved
-    keys [
+    removed-definitions filter-moved keys [
         outside-usages
         [ empty? swap pathname? or not ] assoc-subset
         dup values concat prune swap keys
@@ -419,43 +450,33 @@ SYMBOL: parse-hook
     smudged-usage forget-all
     over empty? [ 2dup smudged-usage-warning ] unless 2drop ;
 
-: record-definitions ( file -- )
-    new-definitions get swap set-source-file-definitions ;
-
-: finish-parsing ( quot -- )
-    file get dup [
-        [ record-form ] keep
-        [ record-modified ] keep
-        [ \ lines get record-checksum ] keep
-        record-definitions
-        forget-smudged
-    ] [
-        2drop
-    ] if ;
-
-: undo-parsing ( -- )
-    file get [
-        dup source-file-definitions new-definitions get union
-        swap set-source-file-definitions
-    ] when* ;
+: finish-parsing ( contents quot -- )
+    file get
+    [ record-form ] keep
+    [ record-modified ] keep
+    [ record-definitions ] keep
+    record-checksum ;
 
 : parse-stream ( stream name -- quot )
     [
         [
-            start-parsing
-            \ lines get parse-fresh
-            dup finish-parsing
-        ] [ ] [ undo-parsing ] cleanup
-    ] no-parse-hook ;
+            contents
+            dup string-lines parse-fresh
+            tuck finish-parsing
+            forget-smudged
+        ] with-source-file
+    ] with-compilation-unit ;
 
 : parse-file-restarts ( file -- restarts )
     "Load " swap " again" 3append t 2array 1array ;
 
 : parse-file ( file -- quot )
     [
-        [ parsing-file ] keep
-        [ ?resource-path <file-reader> ] keep
-        parse-stream
+        [
+            [ parsing-file ] keep
+            [ ?resource-path <file-reader> ] keep
+            parse-stream
+        ] with-compiler-errors
     ] [
         over parse-file-restarts rethrow-restarts
         drop parse-file
@@ -464,59 +485,17 @@ SYMBOL: parse-hook
 : run-file ( file -- )
     [ [ parse-file call ] keep ] assert-depth drop ;
 
-: reload ( defspec -- )
-    where first [ run-file ] when* ;
-
 : ?run-file ( path -- )
     dup ?resource-path exists? [ run-file ] [ drop ] if ;
 
 : bootstrap-file ( path -- )
-    [
-        parse-file [ call ] curry %
-    ] [
-        run-file
-    ] if-bootstrapping ;
+    [ parse-file % ] [ run-file ] if-bootstrapping ;
 
-: ?bootstrap-file ( path -- )
-    dup ?resource-path exists? [ bootstrap-file ] [ drop ] if ;
-
-: parse ( str -- quot ) string-lines parse-lines ;
-
-: eval ( str -- ) parse call ;
+: eval ( str -- )
+    [ string-lines parse-fresh ] with-compilation-unit call ;
 
 : eval>string ( str -- output )
     [
         parser-notes off
         [ [ eval ] keep ] try drop
     ] string-out ;
-
-global [
-    {
-        "scratchpad"
-        "arrays"
-        "assocs"
-        "combinators"
-        "compiler"
-        "continuations"
-        "debugger"
-        "definitions"
-        "generic"
-        "inspector"
-        "io"
-        "kernel"
-        "math"
-        "memory"
-        "namespaces"
-        "parser"
-        "prettyprint"
-        "sequences"
-        "slicing"
-        "sorting"
-        "strings"
-        "syntax"
-        "vocabs"
-        "vocabs.loader"
-        "words"
-    } set-use
-    "scratchpad" set-in
-] bind

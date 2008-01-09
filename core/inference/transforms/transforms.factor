@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel words sequences generic math namespaces
 quotations assocs combinators math.bitfields inference.backend
-inference.dataflow tuples.private ;
+inference.dataflow inference.state tuples.private ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )

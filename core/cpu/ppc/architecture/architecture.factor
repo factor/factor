@@ -3,7 +3,8 @@
 USING: alien.c-types cpu.ppc.assembler cpu.architecture generic
 kernel kernel.private math memory namespaces sequences words
 assocs generator generator.registers generator.fixup system
-layouts classes words.private alien combinators ;
+layouts classes words.private alien combinators
+compiler.constants ;
 IN: cpu.ppc.architecture
 
 TUPLE: ppc-backend ;
@@ -37,7 +38,7 @@ TUPLE: ppc-backend ;
 : local@ ( n -- x )
     reserved-area-size param-save-size + + ; inline
 
-: factor-area-size 4 cells ;
+: factor-area-size 2 cells ;
 
 : next-save ( n -- i ) cell - ;
 
@@ -77,7 +78,7 @@ M: ppc-backend load-indirect ( obj reg -- )
     dup 0 LWZ ;
 
 M: ppc-backend %save-word-xt ( -- )
-    0 11 LOAD32 rc-absolute-ppc-2/2 rel-current-word ;
+    0 11 LOAD32 rc-absolute-ppc-2/2 rel-this ;
 
 M: ppc-backend %prologue ( n -- )
     0 MFLR
@@ -99,34 +100,14 @@ M: ppc-backend %epilogue ( n -- )
 : %load-dlsym ( symbol dll register -- )
     0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
 
-M: ppc-backend %profiler-prologue ( word -- )
-    3 load-indirect
-    4 3 profile-count-offset LWZ
-    4 4 1 v>operand ADDI
-    4 3 profile-count-offset STW ;
-
 M: ppc-backend %call-label ( label -- ) BL ;
 
 M: ppc-backend %jump-label ( label -- ) B ;
 
-: %prepare-primitive ( word -- )
-    #! Save stack pointer to stack_chain->callstack_top, load XT
-    4 1 MR
-    0 11 LOAD32
-    rc-absolute-ppc-2/2 rel-word ;
-
-: (%call) 11 MTLR BLRL ;
-
-M: ppc-backend %call-primitive ( word -- )
-    %prepare-primitive (%call) ;
-
-: (%jump) 11 MTCTR BCTR ;
-
-M: ppc-backend %jump-primitive ( word -- )
-    %prepare-primitive (%jump) ;
-
 M: ppc-backend %jump-t ( label -- )
     0 "flag" operand f v>operand CMPI BNE ;
+
+: (%call) 11 MTLR BLRL ;
 
 : dispatch-template ( word-table# quot -- )
     [
@@ -134,7 +115,7 @@ M: ppc-backend %jump-t ( label -- )
         "offset" operand "n" operand 1 SRAWI
         0 11 LOAD32 rc-absolute-ppc-2/2 rel-dispatch
         11 dup "offset" operand LWZX
-        11 dup compiled-header-size ADDI
+        11 dup word-xt-offset LWZ
         r> call
     ] H{
         { +input+ { { f "n" } } }
@@ -145,7 +126,7 @@ M: ppc-backend %call-dispatch ( word-table# -- )
     [ (%call) ] dispatch-template ;
 
 M: ppc-backend %jump-dispatch ( word-table# -- )
-    [ %epilogue-later (%jump) ] dispatch-template ;
+    [ %epilogue-later 11 MTCTR BCTR ] dispatch-template ;
 
 M: ppc-backend %return ( -- ) %epilogue-later BLR ;
 
@@ -295,7 +276,7 @@ M: ppc-backend %cleanup ( alien-node -- ) drop ;
 M: ppc-backend value-structs?
     #! On Linux/PPC, value structs are passed in the same way
     #! as reference structs, we just have to make a copy first.
-    os "linux" = not ;
+    linux? not ;
 
 M: ppc-backend fp-shadows-int? ( -- ? ) macosx? ;
 
@@ -333,7 +314,7 @@ M: ppc-backend %unbox-any-c-ptr ( dst src -- )
     "end" get BEQ
     ! Is the object an alien?
     0 11 header-offset LWZ
-    0 0 alien type-number tag-header CMPI
+    0 0 alien type-number tag-fixnum CMPI
     "is-byte-array" get BNE
     ! If so, load the offset
     0 11 alien-offset LWZ

@@ -68,7 +68,7 @@ TUPLE: faq header lists ;
 C: <faq> faq
 
 : html>faq ( div -- faq )
-    unclip swap { "h3" "ol" } [ tags-named ] curry* map
+    unclip swap { "h3" "ol" } [ tags-named ] with map
     first2 >r f add* r> [ html>question-list ] 2map <faq> ;
 
 : header, ( faq -- )

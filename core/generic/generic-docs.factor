@@ -44,7 +44,6 @@ $nl
 { $subsection implementors }
 "Low-level words which rebuilds the generic word after methods are added or removed, or the method combination is changed:"
 { $subsection make-generic }
-{ $subsection ?make-generic }
 "A " { $emphasis "method specifier" } " refers to a method and implements the " { $link "definition-protocol" } ":"
 { $subsection method-spec } ;
 
@@ -106,11 +105,6 @@ HELP: generic
 HELP: make-generic
 { $values { "word" generic } }
 { $description "Regenerates the definition of a generic word by applying the method combination to the set of defined methods." }
-$low-level-note ;
-
-HELP: ?make-generic
-{ $values { "word" generic } }
-{ $description "Regenerates the definition of a generic word, unless bootstrap is in progress, in which case nothing is done. This avoids regenerating generic words multiple times during bootstrap as methods are defined. Instead, all generic words are built once at the end of the process, resulting in a performance improvement." }
 $low-level-note ;
 
 HELP: init-methods

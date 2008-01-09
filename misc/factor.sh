@@ -163,7 +163,7 @@ set_build_info() {
 		echo "OS, ARCH, or WORD is empty.  Please report this"
 		exit 5
 	fi
-	
+
 	MAKE_TARGET=$OS-$ARCH-$WORD
 	MAKE_IMAGE_TARGET=$ARCH.$WORD
 	BOOT_IMAGE=boot.$ARCH.$WORD.image
@@ -281,7 +281,7 @@ refresh_image() {
 make_boot_image() {
 	./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USE: bootstrap.image make-image save 0 USE: system exit"
 	check_ret factor
-	
+
 }
 
 install_libraries() {

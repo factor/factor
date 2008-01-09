@@ -1,93 +1,103 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces arrays sequences io inference.backend
-generator debugger math.parser prettyprint words continuations
-vocabs assocs alien.compiler ;
+inference.state generator debugger math.parser prettyprint words
+compiler.units continuations vocabs assocs alien.compiler dlists
+optimizer definitions math compiler.errors threads graphs
+generic ;
 IN: compiler
 
-M: object inference-error-major? drop t ;
+SYMBOL: compiled-crossref
 
-: compile-error ( word error -- )
-    batch-mode get [
-        2array compile-errors get push
-    ] [
-        "quiet" get [ drop ] [ print-error flush ] if drop
-    ] if ;
+compiled-crossref global [ H{ } assoc-like ] change-at
 
-: begin-batch ( seq -- )
-    batch-mode on
-    "quiet" get [ drop ] [
-        [ "Compiling " % length # " words..." % ] "" make
-        print flush
-    ] if
-    V{ } clone compile-errors set-global ;
+: compiled-xref ( word dependencies -- )
+    2dup "compiled-uses" set-word-prop
+    compiled-crossref get add-vertex ;
 
-: compile-error. ( pair -- )
-    nl
-    "While compiling " write dup first pprint ": " print
-    nl
-    second print-error ;
+: compiled-unxref ( word -- )
+    dup "compiled-uses" word-prop
+    compiled-crossref get remove-vertex ;
 
-: (:errors) ( -- seq )
-    compile-errors get-global
-    [ second inference-error-major? ] subset ;
+: compiled-usage ( word -- seq )
+    compiled-crossref get at keys ;
 
-: :errors (:errors) [ compile-error. ] each ;
+: sensitive? ( word -- ? )
+    dup "inline" word-prop
+    over "infer" word-prop
+    pick "specializer" word-prop
+    roll generic?
+    or or or ;
 
-: (:warnings) ( -- seq )
-    compile-errors get-global
-    [ second inference-error-major? not ] subset ;
+: compiled-usages ( words -- seq )
+    compiled-crossref get [
+        [
+            over dup set
+            over sensitive?
+            [ at namespace swap update ] [ 2drop ] if
+        ] curry each
+    ] H{ } make-assoc keys ;
 
-: :warnings (:warnings) [ compile-error. ] each ;
+: ripple-up ( word -- )
+    compiled-usage [ queue-compile ] each ;
 
-: end-batch ( -- )
-    batch-mode off
-    "quiet" get [
-        "Compile finished." print
-        nl
-        ":errors - print " write (:errors) length pprint
-        " compiler errors." print
-        ":warnings - print " write (:warnings) length pprint
-        " compiler warnings." print
-        nl
-    ] unless ;
+: save-effect ( word effect -- )
+    over "compiled-uses" word-prop [
+        2dup swap "compiled-effect" word-prop =
+        [ over ripple-up ] unless
+    ] when
+    "compiled-effect" set-word-prop ;
 
-: compile ( word -- )
-    H{ } clone [
-        compiled-xts [ (compile) ] with-variable
-    ] keep >alist finalize-compile ;
+: finish-compile ( word effect dependencies -- )
+    >r dupd save-effect r>
+    f pick compiler-error
+    over compiled-unxref
+    compiled-xref ;
+
+: compile-succeeded ( word -- effect dependencies )
+    [
+        dup word-dataflow >r swap dup r> optimize generate
+    ] computing-dependencies ;
 
 : compile-failed ( word error -- )
-    dupd compile-error dup update-xt unchanged-word ;
+    ! dup inference-error? [ rethrow ] unless
+    f pick compiled get set-at
+    swap compiler-error ;
 
-: try-compile ( word -- )
-    [ compile ] [ compile-failed ] recover ;
+: (compile) ( word -- )
+    [ dup compile-succeeded finish-compile ]
+    [ dupd compile-failed f save-effect ]
+    recover ;
 
-: forget-errors ( seq -- )
-    [ f "no-effect" set-word-prop ] each ;
+: delete-any ( assoc -- element )
+    [ [ 2drop t ] assoc-find 2drop dup ] keep delete-at ;
 
-: compile-batch ( seq -- )
-    dup empty? [
-        drop
-    ] [
-        dup begin-batch
-        dup forget-errors
-        [ try-compile ] each
-        end-batch
+: compile-loop ( assoc -- )
+    dup assoc-empty? [ drop ] [
+        dup delete-any (compile)
+        yield
+        compile-loop
     ] if ;
 
-: compile-vocabs ( seq -- ) [ words ] map concat compile-batch ;
+: recompile ( words -- )
+    [
+        H{ } clone compile-queue set
+        H{ } clone compiled set
+        [ queue-compile ] each
+        compile-queue get compile-loop
+        compiled get >alist modify-code-heap
+    ] with-scope ; inline
 
-: compile-all ( -- ) vocabs compile-vocabs ;
+: compile ( words -- )
+    [ compiled? not ] subset recompile ;
 
-: compile-quot ( quot -- word ) define-temp dup compile ;
-
-: compile-1 ( quot -- ) compile-quot execute ;
-
-: recompile ( -- )
-    changed-words get [
-        dup keys compile-batch clear-assoc
-    ] when* ;
+: compile-call ( quot -- )
+    H{ } clone changed-words
+    [ define-temp dup 1array compile ] with-variable
+    execute ;
 
 : recompile-all ( -- )
-    all-words [ changed-word ] each recompile ;
+    [ all-words recompile ] with-compiler-errors ;
+
+: decompile ( word -- )
+    f 2array 1array modify-code-heap ;

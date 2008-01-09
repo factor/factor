@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel peg strings promises sequences math math.parser 
-       namespaces words quotations arrays hashtables io 
+USING: kernel peg strings promises sequences math math.parser
+       namespaces words quotations arrays hashtables io
        io.streams.string assocs memoize ;
 IN: fjsc
 
@@ -63,8 +63,8 @@ MEMO: 'identifier' ( -- parser )
     'identifier-ends' ,
     'identifier-middle' ,
     'identifier-ends' ,
-  ] { } make seq [ 
-    concat >string f <ast-identifier> 
+  ] { } make seq [
+    concat >string f <ast-identifier>
   ] action ;
 
 
@@ -85,14 +85,14 @@ MEMO: 'stack-effect' ( -- parser )
     "--" token sp hide ,
     'effect-name' sp repeat0 ,
     ")" token sp hide ,
-  ] { } make seq [ 
-    first2 <ast-stack-effect> 
+  ] { } make seq [
+    first2 <ast-stack-effect>
   ] action ;
 
 MEMO: 'define' ( -- parser )
   [
     ":" token sp hide ,
-    'identifier' sp [ ast-identifier-value ] action , 
+    'identifier' sp [ ast-identifier-value ] action ,
     'stack-effect' sp optional ,
     'expression' ,
     ";" token sp hide ,
@@ -101,7 +101,7 @@ MEMO: 'define' ( -- parser )
 MEMO: 'quotation' ( -- parser )
   [
     "[" token sp hide ,
-    'expression' [ ast-expression-values ] action , 
+    'expression' [ ast-expression-values ] action ,
     "]" token sp hide ,
   ] { } make seq [ first <ast-quotation> ] action ;
 
@@ -115,12 +115,12 @@ MEMO: 'array' ( -- parser )
 MEMO: 'word' ( -- parser )
   [
     "\\" token sp hide ,
-    'identifier' sp , 
+    'identifier' sp ,
   ] { } make seq [ first ast-identifier-value f <ast-word> ] action ;
 
 MEMO: 'atom' ( -- parser )
   [
-    'identifier' , 
+    'identifier' ,
     'integer' [ <ast-number> ] action ,
     'string' [ <ast-string> ] action ,
   ] { } make choice ;
@@ -129,7 +129,7 @@ MEMO: 'comment' ( -- parser )
   [
     [
       "#!" token sp ,
-      "!" token sp , 
+      "!" token sp ,
     ] { } make choice hide ,
     [
       dup CHAR: \n = swap CHAR: \r = or not
@@ -139,7 +139,7 @@ MEMO: 'comment' ( -- parser )
 MEMO: 'USE:' ( -- parser )
   [
     "USE:" token sp hide ,
-    'identifier' sp , 
+    'identifier' sp ,
   ] { } make seq [ first ast-identifier-value <ast-use> ] action ;
 
 MEMO: 'IN:' ( -- parser )
@@ -158,7 +158,7 @@ MEMO: 'USING:' ( -- parser )
 MEMO: 'hashtable' ( -- parser )
   [
     "H{" token sp hide ,
-    'expression' [ ast-expression-values ] action , 
+    'expression' [ ast-expression-values ] action ,
     "}" token sp hide ,
   ] { } make seq [ first <ast-hashtable> ] action ;
 
@@ -170,7 +170,7 @@ MEMO: 'parsing-word' ( -- parser )
   ] { } make choice ;
 
 MEMO: 'expression' ( -- parser )
-  [ 
+  [
     [
       'comment' ,
       'parsing-word' sp ,
@@ -180,7 +180,7 @@ MEMO: 'expression' ( -- parser )
       'hashtable' sp ,
       'word' sp ,
       'atom' sp ,
-    ] { } make choice repeat0 [ <ast-expression> ] action 
+    ] { } make choice repeat0 [ <ast-expression> ] action
   ] delay ;
 
 MEMO: 'statement' ( -- parser )

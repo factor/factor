@@ -31,7 +31,7 @@ M: tuple class class-of-tuple ;
 
 : reshape-tuple ( oldtuple permutation -- newtuple )
     >r tuple>array 2 cut r>
-    [ [ swap ?nth ] [ drop f ] if* ] curry* map
+    [ [ swap ?nth ] [ drop f ] if* ] with map
     append (>tuple) ;
 
 : reshape-tuples ( class newslots -- )
@@ -41,14 +41,14 @@ M: tuple class class-of-tuple ;
 
 : old-slots ( class newslots -- seq )
     swap "slots" word-prop 1 tail-slice
-    [ slot-spec-name swap member? not ] curry* subset ;
+    [ slot-spec-name swap member? not ] with subset ;
 
 : forget-slots ( class newslots -- )
     dupd old-slots [
         2dup
         slot-spec-reader 2array forget
         slot-spec-writer 2array forget
-    ] curry* each ;
+    ] with each ;
 
 : check-shape ( class newslots -- )
     over tuple-class? [
@@ -131,7 +131,7 @@ M: tuple-class reset-class
     } reset-props ;
 
 M: object get-slots ( obj slots -- ... )
-    [ execute ] curry* each ;
+    [ execute ] with each ;
 
 M: object set-slots ( ... obj slots -- )
     <reversed> get-slots ;

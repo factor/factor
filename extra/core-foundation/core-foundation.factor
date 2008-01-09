@@ -34,7 +34,7 @@ FUNCTION: bool CFBundleLoadExecutable ( void* bundle ) ;
 FUNCTION: void CFRelease ( void* cf ) ;
 
 : CF>array ( alien -- array )
-    dup CFArrayGetCount [ CFArrayGetValueAtIndex ] curry* map ;
+    dup CFArrayGetCount [ CFArrayGetValueAtIndex ] with map ;
 
 : <CFArray> ( seq -- alien )
     [ f swap length f CFArrayCreateMutable ] keep

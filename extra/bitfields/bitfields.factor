@@ -80,7 +80,7 @@ M: check< summary drop "Number exceeds upper bound" ;
     [ ":" split1 string>number [ dup length ] unless* ] { } map>assoc ;
 
 : define-slots ( prefix names quots -- )
-    >r [ "-" swap 3append create-in ] curry* map r>
+    >r [ "-" swap 3append create-in ] with map r>
     [ define-compound ] 2each ;
 
 : define-accessors ( classname slots -- )

@@ -2,11 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays io.backend io.binary io.sockets
 kernel math math.parser sequences splitting system
-alien.c-types combinators namespaces alien ;
+alien.c-types combinators namespaces alien parser ;
 IN: io.sockets.impl
 
-USE-IF: windows? windows.winsock
-USE-IF: unix? unix
+<< {
+    { [ windows? ] [ "windows.winsock" ] }
+    { [ unix? ] [ "unix" ] }
+} cond use+ >>
 
 GENERIC: protocol-family ( addrspec -- af )
 

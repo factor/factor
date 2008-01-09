@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel parser sequences words help help.topics
-namespaces vocabs ;
+namespaces vocabs definitions compiler.units ;
 IN: help.syntax
 
 : HELP:
@@ -13,7 +13,7 @@ IN: help.syntax
 : ARTICLE:
     location >r
     \ ; parse-until >array [ first2 ] keep 2 tail <article>
-    over add-article >link r> (save-location) ; parsing
+    over add-article >link r> remember-definition ; parsing
 
 : ABOUT:
     scan-word dup parsing? [

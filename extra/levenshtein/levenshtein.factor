@@ -4,7 +4,7 @@ USING: arrays help io kernel math namespaces sequences ;
 IN: levenshtein
 
 : <matrix> ( m n -- matrix )
-    [ drop 0 <array> ] curry* map ; inline
+    [ drop 0 <array> ] with map ; inline
 
 : matrix-> nth nth ; inline
 : ->matrix nth set-nth ; inline
@@ -23,7 +23,7 @@ SYMBOL: costs
 
 : compute-costs ( str1 str2 -- )
     swap [
-        [ = 0 1 ? ] curry* { } map-as
+        [ = 0 1 ? ] with { } map-as
     ] curry { } map-as costs set ; inline
 
 : levenshtein-step ( i j -- )
@@ -41,6 +41,6 @@ SYMBOL: costs
         2dup compute-costs
         [ length ] 2apply [
             [ levenshtein-step ] curry each
-        ] curry* each
+        ] with each
         levenshtein-result
     ] with-scope ;

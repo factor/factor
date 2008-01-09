@@ -41,7 +41,7 @@ M: mirror delete-at ( key mirror -- )
 
 M: mirror >alist ( mirror -- alist )
     >mirror<
-    [ [ slot-spec-offset slot ] curry* map ] keep
+    [ [ slot-spec-offset slot ] with map ] keep
     [ slot-spec-reader ] map swap 2array flip ;
 
 M: mirror assoc-size mirror-slots length ;

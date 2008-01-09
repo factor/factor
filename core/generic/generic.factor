@@ -5,8 +5,7 @@ definitions kernel.private classes classes.private
 quotations arrays vocabs ;
 IN: generic
 
-PREDICATE: compound generic ( word -- ? )
-    "combination" word-prop ;
+PREDICATE: word generic "combination" word-prop >boolean ;
 
 M: generic definer drop f f ;
 
@@ -24,12 +23,7 @@ M: object perform-combination
     nip [ "Invalid method combination" throw ] curry [ ] like ;
 
 : make-generic ( word -- )
-    dup
-    dup "combination" word-prop perform-combination
-    define-compound ;
-
-: ?make-generic ( word -- )
-    [ [ ] define-compound ] [ make-generic ] if-bootstrapping ;
+    dup dup "combination" word-prop perform-combination define ;
 
 : init-methods ( word -- )
      dup "methods" word-prop
@@ -38,7 +32,7 @@ M: object perform-combination
 
 : define-generic ( word combination -- )
     dupd "combination" set-word-prop
-    dup init-methods ?make-generic ;
+    dup init-methods make-generic ;
 
 TUPLE: method loc def ;
 
@@ -74,7 +68,7 @@ TUPLE: check-method class generic ;
     ] unless ;
 
 : with-methods ( word quot -- )
-    swap [ "methods" word-prop swap call ] keep ?make-generic ;
+    swap [ "methods" word-prop swap call ] keep make-generic ;
     inline
 
 : define-method ( method class generic -- )
@@ -91,13 +85,13 @@ M: method-spec definer drop \ M: \ ; ;
 
 M: method-spec definition first2 method method-def ;
 
-M: method-spec forget first2 [ delete-at ] with-methods ;
+M: method-spec forget* first2 [ delete-at ] with-methods ;
 
 : implementors* ( classes -- words )
     all-words [
         "methods" word-prop keys
         swap [ key? ] curry contains?
-    ] curry* subset ;
+    ] with subset ;
 
 : implementors ( class -- seq )
     dup associate implementors* ;
@@ -105,12 +99,10 @@ M: method-spec forget first2 [ delete-at ] with-methods ;
 : forget-methods ( class -- )
     [ implementors ] keep [ swap 2array ] curry map forget-all ;
 
-M: class forget ( class -- )
+M: class forget* ( class -- )
     dup forget-methods
     dup uncache-class
     forget-word ;
 
 M: class update-methods ( class -- )
-    [ drop ]
-    [ class-usages implementors* [ make-generic ] each ]
-    if-bootstrapping ;
+    class-usages implementors* [ make-generic ] each ;

@@ -3,8 +3,12 @@
 
 USING: arrays hashtables io io.streams.string kernel math
 math.vectors math.functions math.parser namespaces sequences
-strings tuples system debugger ;
+strings tuples system debugger combinators vocabs.loader ;
 IN: calendar
+
+SYMBOL: calendar-impl
+
+HOOK: gmt-offset calendar-impl ( -- n )
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
 
@@ -13,8 +17,6 @@ C: <timestamp> timestamp
 TUPLE: dt year month day hour minute second ;
 
 C: <dt> dt
-
-DEFER: gmt-offset
 
 : month-names
     {
@@ -276,10 +278,10 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [
         [ 1+ print-day ] keep
         1+ + 7 mod zero? [ nl ] [ bl ] if
-    ] curry* each nl ;
+    ] with each nl ;
 
 : print-year ( year -- )
-    12 [ 1+ print-month nl ] curry* each ;
+    12 [ 1+ print-month nl ] with each ;
 
 : pad-00 number>string 2 CHAR: 0 pad-left write ;
 
@@ -351,9 +353,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
         ] if
     ] string-out ;
 
-SYMBOL: calendar-impl
-
-HOOK: gmt-offset calendar-impl ( -- n )
-
-USE-IF: unix? calendar.unix
-USE-IF: windows? calendar.windows
+{
+    { [ unix? ] [ "calendar.unix" ] }
+    { [ windows? ] [ "calendar.windows" ] }
+} cond require

@@ -5,7 +5,7 @@ namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger
 io.files io.crc32 io.streams.string io.streams.lines vocabs
-hashtables graphs ;
+hashtables graphs compiler.units ;
 IN: source-files
 
 SYMBOL: source-files
@@ -54,8 +54,13 @@ uses definitions ;
     swap quot-uses keys over set-source-file-uses
     xref-source ;
 
+: record-definitions ( file -- )
+    new-definitions get swap set-source-file-definitions ;
+
 : <source-file> ( path -- source-file )
-    { set-source-file-path } \ source-file construct ;
+    <definitions>
+    { set-source-file-path set-source-file-definitions }
+    \ source-file construct ;
 
 : source-file ( path -- source-file )
     source-files get [ <source-file> ] cache ;
@@ -68,10 +73,27 @@ uses definitions ;
 
 M: pathname where pathname-string 1 2array ;
 
-: forget-source ( path -- )
+M: pathname forget*
+    pathname-string
     dup source-file
     dup unxref-source
-    source-file-definitions keys forget-all
+    source-file-definitions [ keys forget-all ] each
     source-files get delete-at ;
 
-M: pathname forget pathname-string forget-source ;
+: forget-source ( path -- )
+    [ <pathname> forget ] with-compilation-unit ;
+
+: rollback-source-file ( source-file -- )
+    dup source-file-definitions new-definitions get [ union ] 2map
+    swap set-source-file-definitions ;
+
+SYMBOL: file
+
+: with-source-file ( name quot -- )
+    #! Should be called from inside with-compilation-unit.
+    [
+        swap source-file
+        dup file set
+        source-file-definitions old-definitions set
+        [ ] [ file get rollback-source-file ] cleanup
+    ] with-scope ; inline

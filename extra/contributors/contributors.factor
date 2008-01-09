@@ -10,7 +10,7 @@ IN: contributors
 
 : patch-counts ( authors -- assoc )
     dup prune
-    [ dup rot [ = ] curry* count ] curry*
+    [ dup rot [ = ] with count ] with
     { } map>assoc ;
 
 : contributors ( -- )

@@ -1,6 +1,6 @@
 USING: generic help.markup help.syntax kernel kernel.private
 namespaces sequences words arrays layouts help effects math
-layouts classes.private classes ;
+layouts classes.private classes compiler.units ;
 IN: classes.union
 
 ARTICLE: "unions" "Union classes"
@@ -17,7 +17,9 @@ ABOUT: "unions"
 
 HELP: define-union-class
 { $values { "class" class } { "members" "a sequence of classes" } }
-{ $description "Defines a union class with specified members." } ;
+{ $description "Defines a union class with specified members. This is the run time equivalent of " { $link POSTPONE: UNION: } "." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
+{ $side-effects "class" } ;
 
 { union-class define-union-class POSTPONE: UNION: } related-words
 

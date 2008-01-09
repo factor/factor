@@ -5,10 +5,10 @@ ui.tools.interactor ui.tools.listener ui.tools.profiler
 ui.tools.search ui.tools.traceback ui.tools.workspace generic
 help.topics inference inspector io.files io.styles kernel
 namespaces parser prettyprint quotations tools.annotations
-editors tools.profiler tools.test tools.time tools.walker
+editors tools.profiler tools.test tools.time tools.interpreter
 ui.commands ui.gadgets.editors ui.gestures ui.operations
 ui.tools.deploy vocabs vocabs.loader words sequences
-tools.browser classes ;
+tools.browser classes compiler.units ;
 IN: ui.tools.operations
 
 V{ } clone operations set-global
@@ -67,24 +67,17 @@ V{ } clone operations set-global
     { +listener+ t }
 } define-operation
 
-UNION: definition word method-spec link ;
+UNION: definition word method-spec link vocab vocab-link ;
 
-UNION: editable-definition definition vocab vocab-link ;
-
-[ editable-definition? ] \ edit H{
+[ definition? ] \ edit H{
     { +keyboard+ T{ key-down f { C+ } "E" } }
     { +listener+ t }
 } define-operation
 
-UNION: reloadable-definition definition pathname ;
+: com-forget ( defspec -- )
+    [ forget ] with-compilation-unit ;
 
-[ reloadable-definition? ] \ reload H{
-    { +keyboard+ T{ key-down f { C+ } "R" } }
-    { +listener+ t }
-} define-operation
-
-[ dup reloadable-definition? swap vocab-spec? or ] \ forget
-H{ } define-operation
+[ definition? ] \ com-forget H{ } define-operation
 
 ! Words
 [ word? ] \ insert-word H{
@@ -122,7 +115,7 @@ M: quotation com-stack-effect infer. ;
 
 M: word com-stack-effect word-def com-stack-effect ;
 
-[ compound? ] \ com-stack-effect H{
+[ word? ] \ com-stack-effect H{
     { +listener+ t }
 } define-operation
 
@@ -203,5 +196,5 @@ interactor
 "These commands operate on the entire contents of the input area."
 [ ]
 [ quot-action ]
-[ parse ]
+[ [ parse-lines ] with-compilation-unit ]
 define-operation-map

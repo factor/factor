@@ -64,13 +64,12 @@ SYMBOL: label-table
     rot rc-absolute-ppc-2/2 = or or ;
 
 ! Relocation types
-: rt-primitive    0 ;
-: rt-dlsym        1 ;
-: rt-literal      2 ;
-: rt-dispatch     3 ;
-: rt-xt           4 ;
-: rt-xt-profiling 5 ;
-: rt-label        6 ;
+: rt-primitive 0 ;
+: rt-dlsym     1 ;
+: rt-literal   2 ;
+: rt-dispatch  3 ;
+: rt-xt        4 ;
+: rt-label     6 ;
 
 TUPLE: label-fixup label class ;
 
@@ -127,16 +126,14 @@ SYMBOL: word-table
 
 : rel-dispatch ( word-table# class -- ) rt-dispatch rel-fixup ;
 
-GENERIC# rel-word 1 ( word class -- )
-
-M: primitive rel-word ( word class -- )
-    >r word-def r> rt-primitive rel-fixup ;
-
-M: word rel-word ( word class -- )
+: rel-word ( word class -- )
     >r add-word r> rt-xt rel-fixup ;
 
 : rel-literal ( literal class -- )
     >r add-literal r> rt-literal rel-fixup ;
+
+: rel-this ( class -- )
+    0 swap rt-label rel-fixup ;
 
 : init-fixup ( -- )
     V{ } clone relocation-table set

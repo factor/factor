@@ -84,16 +84,16 @@ IN: sequences.lib
 
 <PRIVATE
 : translate-string ( n alphabet out-len -- seq )
-    [ drop /mod ] curry* map nip  ;
+    [ drop /mod ] with map nip  ;
 
 : map-alphabet ( alphabet seq[seq] -- seq[seq] )
-    [ [ swap nth ] curry* map ] curry* map ;
+    [ [ swap nth ] with map ] with map ;
 
 : exact-number-strings ( n out-len -- seqs )
     [ ^ ] 2keep [ translate-string ] 2curry map ;
 
 : number-strings ( n max-length -- seqs )
-    1+ [ exact-number-strings ] curry* map concat ;
+    1+ [ exact-number-strings ] with map concat ;
 PRIVATE>
 
 : exact-strings ( alphabet length -- seqs )
@@ -109,6 +109,15 @@ PRIVATE>
 
 : power-set ( seq -- subsets )
     2 over length exact-number-strings swap [ nths ] curry map ;
+
+: push-either ( elt quot accum1 accum2 -- )
+    >r >r keep swap r> r> ? push ; inline
+
+: 2pusher ( quot -- quot accum1 accum2 )
+    V{ } clone V{ } clone [ [ push-either ] 3curry ] 2keep ; inline
+
+: partition ( seq quot -- trueseq falseseq )
+    over >r 2pusher >r >r each r> r> r> drop ; inline
 
 : cut-find ( seq pred -- before after )
     dupd find drop dup [ cut ] when ;

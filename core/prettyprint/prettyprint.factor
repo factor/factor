@@ -146,39 +146,44 @@ GENERIC: see ( defspec -- )
 : seeing-word ( word -- )
     word-vocabulary pprinter-in set ;
 
+: definer. ( defspec -- )
+    definer drop pprint-word ;
+
 : stack-effect. ( word -- )
     dup parsing? over symbol? or not swap stack-effect and
     [ effect>string comment. ] when* ;
 
-: word-synopsis ( word name -- )
+: word-synopsis ( word -- )
     dup seeing-word
-    over definer drop pprint-word
-    pprint-word
+    dup definer.
+    dup pprint-word
     stack-effect. ;
 
-M: word synopsis*
-    dup word-synopsis ;
+M: word synopsis* word-synopsis ;
 
-M: simple-generic synopsis*
-    dup word-synopsis ;
+M: simple-generic synopsis* word-synopsis ;
 
 M: standard-generic synopsis*
+    dup definer.
     dup seeing-word
-    \ GENERIC# pprint-word
     dup pprint-word
     dup dispatch# pprint*
     stack-effect. ;
 
 M: hook-generic synopsis*
+    dup definer.
     dup seeing-word
-    \ HOOK: pprint-word
     dup pprint-word
     dup "combination" word-prop hook-combination-var pprint-word
     stack-effect. ;
 
 M: method-spec synopsis*
-    dup definer drop pprint-word
-    [ pprint-word ] each ;
+    dup definer. [ pprint-word ] each ;
+
+M: mixin-instance synopsis*
+    dup definer.
+    dup mixin-instance-class pprint-word
+    mixin-instance-mixin pprint-word ;
 
 M: pathname synopsis* pprint* ;
 
@@ -202,34 +207,33 @@ M: word declarations.
         POSTPONE: delimiter
         POSTPONE: inline
         POSTPONE: foldable
-    } [ declaration. ] curry* each ;
+    } [ declaration. ] with each ;
 
 : pprint-; \ ; pprint-word ;
 
 : (see) ( spec -- )
-    [
-        <colon dup synopsis*
-        <block dup definition pprint-elements block>
-        dup definer nip [ pprint-word ] when* declarations.
-        block>
-    ] with-use nl ;
+    <colon dup synopsis*
+    <block dup definition pprint-elements block>
+    dup definer nip [ pprint-word ] when* declarations.
+    block> ;
 
-M: object see (see) ;
+M: object see
+    [ (see) ] with-use nl ;
 
 GENERIC: see-class* ( word -- )
 
 M: union-class see-class*
-    \ UNION: pprint-word
+    <colon \ UNION: pprint-word
     dup pprint-word
-    members pprint-elements pprint-; ;
+    members pprint-elements pprint-; block> ;
 
 M: mixin-class see-class*
-    \ MIXIN: pprint-word
+    <block \ MIXIN: pprint-word
     dup pprint-word <block
     dup members [
         hard line-break
         \ INSTANCE: pprint-word pprint-word pprint-word
-    ] curry* each block> ;
+    ] with each block> block> ;
 
 M: predicate-class see-class*
     <colon \ PREDICATE: pprint-word
@@ -240,24 +244,27 @@ M: predicate-class see-class*
     pprint-; block> block> ;
 
 M: tuple-class see-class*
-    \ TUPLE: pprint-word
+    <colon \ TUPLE: pprint-word
     dup pprint-word
     "slot-names" word-prop [ text ] each
-    pprint-; ;
+    pprint-; block> ;
 
 M: word see-class* drop ;
 
 M: builtin-class see-class*
     drop "! Built-in class" comment. ;
 
-: see-all ( seq -- ) natural-sort [ nl see ] each ;
+: see-all ( seq -- )
+    natural-sort [ nl see ] each ;
 
 : see-implementors ( class -- seq )
-    dup implementors [ 2array ] curry* map ;
+    dup implementors [ 2array ] with map ;
 
 : see-class ( class -- )
     dup class? [
-        nl [ dup see-class* ] with-pprint nl
+        [
+            dup seeing-word dup see-class*
+        ] with-use nl
     ] when drop ;
 
 : see-methods ( generic -- seq )
@@ -265,8 +272,13 @@ M: builtin-class see-class*
     [ 2array ] curry map ;
 
 M: word see
-    dup (see)
     dup see-class
+    dup class? over symbol? not and [
+        nl
+    ] when
+    dup class? over symbol? and not [
+        [ dup (see) ] with-use nl
+    ] when
     [
         dup class? [ dup see-implementors % ] when
         dup generic? [ dup see-methods % ] when

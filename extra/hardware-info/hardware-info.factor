@@ -1,4 +1,5 @@
-USING: alien.syntax math prettyprint system ;
+USING: alien.syntax math prettyprint system combinators
+vocabs.loader ;
 IN: hardware-info
 
 SYMBOL: os
@@ -17,7 +18,9 @@ HOOK: available-virtual-extended-mem os ( -- n )
 : megs. ( x -- ) 20 2^ /f . ;
 : gigs. ( x -- ) 30 2^ /f . ;
 
-USE-IF: windows? hardware-info.windows
-USE-IF: linux? hardware-info.linux
-USE-IF: macosx? hardware-info.macosx
+{
+    { [ windows? ] [ "hardware-info.windows" ] }
+    { [ linux? ] [ "hardware-info.linux" ] }
+    { [ macosx? ] [ "hardware-info.macosx" ] }
+} cond require
 

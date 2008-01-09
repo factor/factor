@@ -4,21 +4,24 @@ parser vocabs.loader ;
 IN: bootstrap.help
 
 : load-help
+    "alien.syntax" require
+    "compiler" require
+
     t load-help? set-global
 
-    vocabs
-    [ vocab-root ] subset
-    [ vocab-source-loaded? ] subset
-    [
-        dup vocab-docs-loaded? [
-            drop
-        ] [
-            dup vocab-root swap load-docs
-        ] if
-    ] each
+    [ vocab ] load-vocab-hook [
+        vocabs
+        [ vocab-root ] subset
+        [ vocab-source-loaded? ] subset
+        [
+            dup vocab-docs-loaded? [
+                drop
+            ] [
+                dup vocab-root swap load-docs
+            ] if
+        ] each
+    ] with-variable
 
-    "help.handbook" require
-
-    global [ "help" use+ ] bind ;
+    "help.handbook" require ;
 
 load-help

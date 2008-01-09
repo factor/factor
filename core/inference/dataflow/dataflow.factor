@@ -1,11 +1,9 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: arrays generic assocs kernel math namespaces parser
+sequences words vectors math.intervals effects classes
+inference.state ;
 IN: inference.dataflow
-USING: arrays generic assocs kernel math
-namespaces parser sequences words vectors math.intervals
-effects classes ;
-
-SYMBOL: recursive-state
 
 ! Computed value
 : <computed> \ <computed> counter ;
@@ -30,19 +28,7 @@ TUPLE: composed quot1 quot2 ;
 
 C: <composed> composed
 
-SYMBOL: d-in
-SYMBOL: meta-d
-SYMBOL: meta-r
-
 UNION: special curried composed ;
-
-: push-d meta-d get push ;
-: pop-d meta-d get pop ;
-: peek-d meta-d get peek ;
-
-: push-r meta-r get push ;
-: pop-r meta-r get pop ;
-: peek-r meta-r get peek ;
 
 TUPLE: node param
 in-d out-d in-r out-r
@@ -185,9 +171,6 @@ UNION: #branch #if #dispatch ;
     >r r-tail flatten-curries r> set-node-out-r
     >r d-tail flatten-curries r> set-node-out-d ;
 
-SYMBOL: dataflow-graph
-SYMBOL: current-node
-
 : node, ( node -- )
     dataflow-graph get [
         dup current-node [ set-node-successor ] change
@@ -234,7 +217,7 @@ M: node calls-label* 2drop f ;
 M: #call-label calls-label* node-param eq? ;
 
 : calls-label? ( label node -- ? )
-    [ calls-label* ] curry* node-exists? ;
+    [ calls-label* ] with node-exists? ;
 
 : recursive-label? ( node -- ? )
     dup node-param swap calls-label? ;
@@ -287,10 +270,10 @@ SYMBOL: node-stack
     swap node-classes at object or ;
 
 : node-input-classes ( node -- seq )
-    dup node-in-d [ node-class ] curry* map ;
+    dup node-in-d [ node-class ] with map ;
 
 : node-input-intervals ( node -- seq )
-    dup node-in-d [ node-interval ] curry* map ;
+    dup node-in-d [ node-interval ] with map ;
 
 : node-class-first ( node -- class )
     dup node-in-d first node-class ;

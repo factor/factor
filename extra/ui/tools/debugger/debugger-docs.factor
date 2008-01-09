@@ -1,5 +1,6 @@
-USING: ui.tools.debugger ui.gadgets help.markup help.syntax
-kernel quotations continuations debugger ui ;
+USING: ui.gadgets help.markup help.syntax kernel quotations
+continuations debugger ui ;
+IN: ui.tools.debugger
 
 HELP: <debugger>
 { $values { "error" "an error" } { "restarts" "a sequence of " { $link restart } " instances" } { "restart-hook" "a quotation with stack effect " { $snippet "( list -- )" } } { "gadget" "a new " { $link gadget } } }

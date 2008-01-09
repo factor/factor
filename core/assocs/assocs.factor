@@ -143,7 +143,7 @@ M: assoc >alist [ 2array ] { } assoc>map ;
     swap [ = nip ] curry assoc-find 2drop ;
 
 : search-alist ( key alist -- pair i )
-    [ first = ] curry* find swap ; inline
+    [ first = ] with find swap ; inline
 
 M: sequence at*
     search-alist [ second t ] [ f ] if ;

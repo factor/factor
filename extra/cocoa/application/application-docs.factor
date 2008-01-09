@@ -1,5 +1,18 @@
-USING: cocoa.application debugger quotations help.markup
-help.syntax strings alien core-foundation ;
+USING: debugger quotations help.markup help.syntax strings alien
+core-foundation ;
+IN: cocoa.application
+
+HELP: <NSString>
+{ $values { "str" string } { "alien" alien } }
+{ $description "Allocates an autoreleased " { $snippet "CFString" } "." } ;
+
+{ <NSString> <CFString> CF>string } related-words
+
+HELP: <NSArray>
+{ $values { "seq" "a sequence of " { $link alien } " instances" } { "alien" alien } }
+{ $description "Allocates an autoreleased " { $snippet "CFArray" } "." } ;
+
+{ <NSArray> <CFArray> } related-words
 
 HELP: with-autorelease-pool
 { $values { "quot" quotation } }

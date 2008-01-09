@@ -170,8 +170,8 @@ M: html-stream stream-write-table ( grid style stream -- )
                 <td "top" =valign swap table-style =style td>
                     >string write-html
                 </td>
-            ] curry* each </tr>
-        ] curry* each </table>
+            ] with each </tr>
+        ] with each </table>
     ] with-stream* ;
 
 M: html-stream make-cell-stream ( style stream -- stream' )

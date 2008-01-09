@@ -2,8 +2,6 @@ IN: temporary
 USING: tools.test parser vocabs help.syntax namespaces ;
 
 [
-    file-vocabs
-
     [ "foobar" ] [
         "IN: temporary USE: help.syntax ABOUT: \"foobar\"" eval
         "temporary" vocab vocab-help
@@ -20,4 +18,4 @@ USING: tools.test parser vocabs help.syntax namespaces ;
         "IN: temporary USE: help.syntax ABOUT: xyz" eval
         "temporary" vocab vocab-help
     ] unit-test
-] with-scope
+] with-file-vocabs

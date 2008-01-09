@@ -254,37 +254,14 @@ void collect_literals_step(F_COMPILED *compiled, CELL code_start,
 	for(scan = literals_start; scan < literal_end; scan += CELLS)
 		copy_handle((CELL*)scan);
 
-	/* If the block is not finalized, the words area contains pointers to
-	words in the data heap rather than XTs in the code heap */
-	switch(compiled->finalized)
-	{
-	case false:
-		for(scan = words_start; scan < words_end; scan += CELLS)
-			copy_handle((CELL*)scan);
-		break;
-	case true:
-		break;
-	default:
-		critical_error("Invalid compiled->finalized",(CELL)compiled);
-	}
+	for(scan = words_start; scan < words_end; scan += CELLS)
+		copy_handle((CELL*)scan);
 }
 
 /* Copy literals referenced from all code blocks to newspace */
 void collect_literals(void)
 {
 	iterate_code_heap(collect_literals_step);
-}
-
-/* Mark all XTs referenced from a code block */
-void mark_sweep_step(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
-{
-	F_COMPILED **start = (F_COMPILED **)words_start;
-	F_COMPILED **end = (F_COMPILED **)words_end;
-	F_COMPILED **iter = start;
-
-	while(iter < end)
-		recursive_mark(compiled_to_block(*iter++));
 }
 
 /* Mark all XTs and literals referenced from a word XT */
@@ -305,18 +282,6 @@ void recursive_mark(F_BLOCK *block)
 
 	F_COMPILED *compiled = block_to_compiled(block);
 	iterate_code_heap_step(compiled,collect_literals_step);
-
-	switch(compiled->finalized)
-	{
-	case false:
-		break;
-	case true:
-		iterate_code_heap_step(compiled,mark_sweep_step);
-		break;
-	default:
-		critical_error("Invalid compiled->finalized",(CELL)compiled);
-		break;
-	}
 }
 
 /* Push the free space and total size of the code heap */
@@ -413,15 +378,14 @@ void forward_object_xts(void)
 		{
 			F_WORD *word = untag_object(obj);
 
-			if(word->compiledp != F)
-				set_word_xt(word,forward_xt(word->code));
+			word->code = forward_xt(word->code);
 		}
 		else if(type_of(obj) == QUOTATION_TYPE)
 		{
 			F_QUOTATION *quot = untag_object(obj);
 
 			if(quot->compiledp != F)
-				set_quot_xt(quot,forward_xt(quot->code));
+				quot->code = forward_xt(quot->code);
 		}
 		else if(type_of(obj) == CALLSTACK_TYPE)
 		{
@@ -434,33 +398,31 @@ void forward_object_xts(void)
 	gc_off = false;
 }
 
-void compaction_code_block_fixup(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
+/* Set the XT fields now that the heap has been compacted */
+void fixup_object_xts(void)
 {
-	F_COMPILED **iter = (F_COMPILED **)words_start;
-	F_COMPILED **end = (F_COMPILED **)words_end;
+	begin_scan();
 
-	while(iter < end)
+	CELL obj;
+
+	while((obj = next_object()) != F)
 	{
-		*iter = forward_xt(*iter);
-		iter++;
-	}
-}
-
-void forward_block_xts(void)
-{
-	F_BLOCK *scan = first_block(&code_heap);
-
-	while(scan)
-	{
-		if(scan->status == B_ALLOCATED)
+		if(type_of(obj) == WORD_TYPE)
 		{
-			iterate_code_heap_step(block_to_compiled(scan),
-				compaction_code_block_fixup);
+			F_WORD *word = untag_object(obj);
+			update_word_xt(word);
 		}
+		else if(type_of(obj) == QUOTATION_TYPE)
+		{
+			F_QUOTATION *quot = untag_object(obj);
 
-		scan = next_block(&code_heap,scan);
+			if(quot->compiledp != F)
+				set_quot_xt(quot,quot->code);
+		}
 	}
+
+	/* End the heap scan */
+	gc_off = false;
 }
 
 void compact_heap(F_HEAP *heap)
@@ -473,7 +435,6 @@ void compact_heap(F_HEAP *heap)
 
 		if(scan->status == B_ALLOCATED && scan != scan->forwarding)
 			memcpy(scan->forwarding,scan,scan->size);
-
 		scan = next;
 	}
 }
@@ -488,18 +449,19 @@ void compact_code_heap(void)
 	code_gc();
 
 	fprintf(stderr,"*** Code heap compaction...\n");
+	fflush(stderr);
 
 	/* Figure out where the code heap blocks are going to end up */
 	CELL size = compute_heap_forwarding(&code_heap);
 
-	/* Update word and quotation XTs to point to the new locations */
+	/* Update word and quotation code pointers */
 	forward_object_xts();
-
-	/* Update code block XTs to point to the new locations */
-	forward_block_xts();
 
 	/* Actually perform the compaction */
 	compact_heap(&code_heap);
+
+	/* Update word and quotation XTs */
+	fixup_object_xts();
 
 	/* Now update the free list; there will be a single free block at
 	the end */

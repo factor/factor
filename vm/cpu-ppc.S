@@ -103,35 +103,6 @@ DEF(void,c_to_factor,(CELL quot)):
         EPILOGUE
         blr
 
-/* The JIT compiles an 'mr r4,r1' in front of every primitive call, since a
-word which was defined as a primitive will not change its definition for the
-lifetime of the image -- adding new primitives requires a bootstrap. However,
-an undefined word can certainly become defined,
-
-DEFER: foo
-...
-: foo ... ;
-
-And calls to non-primitives do not have this one-instruction prologue, so we
-set the XT of undefined words to this symbol. */
-DEF(void,undefined,(CELL word)):
-	mr r4,r1
-	b MANGLE(undefined_error)
-
-DEF(void,dosym,(CELL word)):
-	stwu r3,4(r14)     /* push word to stack */
-	blr                /* return */
-
-/* Here we have two entry points. The first one is taken when profiling is
-enabled */
-DEF(void,docol_profiling,(CELL word)):
-        lwz r4,25(r3)      /* load profile-count slot */
-        addi r4,r4,8       /* increment count */
-        stw r4,25(r3)      /* store profile-count slot */
-DEF(void,docol,(CELL word)):
-        lwz r3,13(r3)      /* load word-def slot */
-        JUMP_QUOT
-
 /* We must pass the XT to the quotation in r11. */
 DEF(void,primitive_call,(void)):
         lwz r3,0(r14)      /* load quotation from data stack */
@@ -142,7 +113,7 @@ DEF(void,primitive_call,(void)):
 DEF(void,primitive_execute,(void)):
         lwz r3,0(r14)      /* load word from data stack */
         lwz r11,29(r3)     /* load word-xt slot */
-        mtctr r11          /* prepare to call XT with word in r3 */
+        mtctr r11          /* prepare to call XT */
         subi r14,r14,4     /* pop word from data stack */
         bctr               /* go */
 

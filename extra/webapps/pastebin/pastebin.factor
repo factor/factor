@@ -57,8 +57,11 @@ C: <annotation> annotation
 : paste-link ( paste -- link )
     paste-n number>string [ show-paste ] curry quot-link ;
 
+: safe-head ( seq n -- seq' )
+    over length min head ;
+
 : paste-feed ( -- entries )
-    get-pastebin pastebin-pastes <reversed> [
+    get-pastebin pastebin-pastes <reversed> 20 safe-head [
         {
             paste-summary
             paste-link

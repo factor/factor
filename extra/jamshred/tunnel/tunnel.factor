@@ -89,7 +89,7 @@ TUPLE: segment number color radius ;
     rot dup length swap <slice> find-nearest-segment ;
 
 : nearest-segment-backward ( segments oint start -- segment )
-    swapd 1+ 0 swap rot <slice> <reversed> find-nearest-segment ;
+    swapd 1+ 0 spin <slice> <reversed> find-nearest-segment ;
 
 : nearest-segment ( segments oint start-segment -- segment )
     #! find the segment nearest to 'oint', and return it.

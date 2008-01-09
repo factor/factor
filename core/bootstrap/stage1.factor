@@ -13,14 +13,15 @@ vocabs.loader system ;
 
 "resource:core/bootstrap/primitives.factor" run-file
 
-! Create a boot quotation
+! Create a boot quotation for the target
 [
-    ! Rehash hashtables, since core/tools/image creates them
-    ! using the host image's hashing algorithms
+    [
+        ! Rehash hashtables, since bootstrap.image creates them
+        ! using the host image's hashing algorithms
+        [ hashtable? ] instances [ rehash ] each
 
-    [ [ hashtable? ] instances [ rehash ] each ] %
-
-    \ boot ,
+        boot
+    ] %
 
     "math.integers" require
     "math.floats" require

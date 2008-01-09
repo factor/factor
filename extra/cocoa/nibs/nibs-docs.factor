@@ -1,4 +1,5 @@
-USING: help.markup help.syntax cocoa.nibs strings ;
+USING: help.markup help.syntax strings ;
+IN: cocoa.nibs
 
 HELP: load-nib
 { $values { "name" string } }

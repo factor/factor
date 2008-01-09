@@ -1,4 +1,5 @@
-USING: help.markup help.syntax ui.tools.deploy ;
+USING: help.markup help.syntax ;
+IN: ui.tools.deploy
 
 HELP: deploy-tool
 { $values { "vocab" "a vocabulary specifier" } }

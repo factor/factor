@@ -6,6 +6,8 @@ IN: kernel
 : version ( -- str ) "0.92" ; foldable
 
 ! Stack stuff
+: spin ( x y z -- z y x ) swap rot ; inline
+
 : roll ( x y z t -- y z t x ) >r rot r> swap ; inline
 
 : -roll ( x y z t -- t x y z ) swap >r -rot r> ; inline
@@ -49,7 +51,7 @@ DEFER: if
 
 : 3slip ( quot x y z -- x y z ) >r >r >r call r> r> r> ; inline
 
-: dip ( obj callable -- obj ) swap slip ; inline
+: dip ( obj quot -- obj ) swap slip ; inline
 
 : keep ( x quot -- x ) over slip ; inline
 
@@ -73,7 +75,7 @@ DEFER: if
 : 3curry ( obj1 obj2 obj3 quot -- curry )
     curry curry curry ; inline
 
-: curry* ( param obj quot -- obj curry )
+: with ( param obj quot -- obj curry )
     swapd [ swapd call ] 2curry ; inline
 
 : compose ( quot1 quot2 -- curry )
@@ -156,5 +158,7 @@ GENERIC: construct-boa ( ... class -- tuple )
 <PRIVATE
 
 : declare ( spec -- ) drop ;
+
+: do-primitive ( number -- ) "Improper primitive call" throw ;
 
 PRIVATE>

@@ -30,7 +30,7 @@ IN: cpu.x86.allot
     allot-reg cell [+] swap 8 align ADD ;
 
 : store-header ( header -- )
-    0 object@ swap type-number tag-header MOV ;
+    0 object@ swap type-number tag-fixnum MOV ;
 
 : %allot ( header size quot -- )
     allot-reg PUSH

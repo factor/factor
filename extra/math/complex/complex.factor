@@ -5,13 +5,14 @@ USING: kernel kernel.private math math.private
 math.libm math.functions prettyprint.backend arrays
 math.functions.private sequences parser ;
 
-M: real real ;
-M: real imaginary drop 0 ;
+M: real real-part ;
+M: real imaginary-part drop 0 ;
 
 M: complex absq >rect [ sq ] 2apply + ;
 
 : 2>rect ( x y -- xr yr xi yi )
-    [ [ real ] 2apply ] 2keep [ imaginary ] 2apply ; inline
+    [ [ real-part ] 2apply ] 2keep
+    [ imaginary-part ] 2apply ; inline
 
 M: complex number=
     2>rect number= [ number= ] [ 2drop f ] if ;

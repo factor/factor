@@ -65,7 +65,7 @@ SYMBOL: mt
 : init-mt-rest ( seq -- )
     mt-n 1 head* [
         [ init-mt-formula ] 2keep 1+ swap set-nth
-    ] curry* each ;
+    ] with each ;
 
 : mt-temper ( y -- yt )
     dup -11 shift bitxor

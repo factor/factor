@@ -1,5 +1,5 @@
 USING: system vocabs vocabs.loader kernel combinators
-namespaces sequences ;
+namespaces sequences io.backend ;
 IN: bootstrap.io
 
 "bootstrap.compiler" vocab [
@@ -10,3 +10,6 @@ IN: bootstrap.io
         { [ wince? ] [ "windows.ce" ] }
     } cond append require
 ] when
+
+init-io
+init-stdio

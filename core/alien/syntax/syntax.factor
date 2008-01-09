@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2007 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien alien.c-types alien.structs kernel math
-namespaces parser sequences words quotations math.parser
-splitting effects prettyprint prettyprint.sections
+USING: arrays alien alien.c-types alien.structs alien.arrays
+kernel math namespaces parser sequences words quotations
+math.parser splitting effects prettyprint prettyprint.sections
 prettyprint.backend assocs combinators ;
 IN: alien.syntax
 
@@ -49,7 +49,7 @@ PRIVATE>
 : C-ENUM:
     ";" parse-tokens
     dup length
-    [ >r create-in r> 1quotation define-compound ] 2each ;
+    [ >r create-in r> 1quotation define ] 2each ;
     parsing
 
 M: alien pprint*

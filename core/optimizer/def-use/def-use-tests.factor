@@ -73,10 +73,10 @@ namespaces assocs kernel sequences math tools.test words ;
 : p3 drop 3 ;
 
 : regression-0
-    [ 2drop ] curry* assoc-find ;
+    [ 2drop ] with assoc-find ;
 
 [ t ] [
-    [ [ 2drop ] curry* assoc-find ] kill-set
+    [ [ 2drop ] with assoc-find ] kill-set
     [ 2drop ] swap member?
 ] unit-test
 
@@ -104,7 +104,7 @@ namespaces assocs kernel sequences math tools.test words ;
             rot
             [ 2swap [ swapd * -rot p2 +@ ] 2keep ]
             assoc-each 2drop
-        ] curry* assoc-each
+        ] with assoc-each
     ] H{ } make-assoc p3 ;
 
 [ { t t t t t } ] [
@@ -122,7 +122,7 @@ namespaces assocs kernel sequences math tools.test words ;
                 rot
                 [ 2swap [ swapd * -rot p2 +@ ] 2keep ]
                 assoc-each 2drop
-            ] curry* assoc-each
+            ] with assoc-each
         ]
     }
     \ regression-2 word-def kill-set

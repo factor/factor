@@ -62,10 +62,13 @@ M: editor ungraft*
 
 : editor-mark* ( editor -- loc ) editor-mark model-value ;
 
+: set-caret ( loc editor -- )
+    [ gadget-model validate-loc ] keep
+    editor-caret set-model ;
+
 : change-caret ( editor quot -- )
     over >r >r dup editor-caret* swap gadget-model r> call r>
-    [ gadget-model validate-loc ] keep
-    editor-caret set-model ; inline
+    set-caret ; inline
 
 : mark>caret ( editor -- )
     dup editor-caret* swap editor-mark set-model ;
@@ -175,7 +178,7 @@ M: editor ungraft*
     \ first-visible-line get [
         editor get dup editor-color gl-color
         dup visible-lines
-        [ draw-line 1 translate-lines ] curry* each
+        [ draw-line 1 translate-lines ] with each
     ] with-editor-translation ;
 
 : selection-start/end ( editor -- start end )

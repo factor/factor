@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.compiler arrays
 cpu.x86.assembler cpu.architecture kernel kernel.private math
 memory namespaces sequences words generator generator.registers
-generator.fixup system layouts combinators ;
+generator.fixup system layouts combinators compiler.constants ;
 IN: cpu.x86.architecture
 
 TUPLE: x86-backend cell ;
@@ -45,7 +45,7 @@ M: x86-backend stack-frame ( n -- i )
     3 cells + 16 align cell - ;
 
 M: x86-backend %save-word-xt ( -- )
-    xt-reg 0 MOV rc-absolute-cell rel-current-word ;
+    xt-reg 0 MOV rc-absolute-cell rel-this ;
 
 : factor-area-size 4 cells ;
 
@@ -70,26 +70,9 @@ M: x86-backend %prepare-alien-invoke
     temp-reg v>operand 2 cells [+] ds-reg MOV
     temp-reg v>operand 3 cells [+] rs-reg MOV ;
 
-M: x86-backend %profiler-prologue ( word -- )
-    temp-reg load-literal
-    temp-reg v>operand profile-count-offset [+] 1 v>operand ADD ;
-
 M: x86-backend %call-label ( label -- ) CALL ;
 
 M: x86-backend %jump-label ( label -- ) JMP ;
-
-: %prepare-primitive ( word -- operand )
-    ! Save stack pointer to stack_chain->callstack_top, load XT
-    ! in register
-    stack-save-reg stack-reg MOV address-operand ;
-
-M: x86-backend %call-primitive ( word -- )
-    stack-save-reg stack-reg cell neg [+] LEA
-    address-operand CALL ;
-
-M: x86-backend %jump-primitive ( word -- )
-    stack-save-reg stack-reg MOV
-    address-operand JMP ;
 
 M: x86-backend %jump-t ( label -- )
     "flag" operand f v>operand CMP JNE ;
@@ -102,7 +85,7 @@ M: x86-backend %jump-t ( label -- )
     ! x86, this is redundant.
     "scratch" operand HEX: ffffffff MOV rc-absolute-cell rel-dispatch
     "n" operand "n" operand "scratch" operand [+] MOV
-    "n" operand compiled-header-size ADD ;
+    "n" operand dup word-xt-offset [+] MOV ;
 
 : dispatch-template ( word-table# quot -- )
     [
@@ -195,7 +178,7 @@ M: x86-backend %unbox-any-c-ptr ( dst src -- )
     rs-reg f v>operand CMP
     "end" get JE
     ! Is the object an alien?
-    rs-reg header-offset [+] alien type-number tag-header CMP
+    rs-reg header-offset [+] alien type-number tag-fixnum CMP
     "is-byte-array" get JNE
     ! If so, load the offset and add it to the address
     ds-reg rs-reg alien-offset [+] ADD

@@ -114,7 +114,7 @@ $nl
     "{ -12 -1 -3 -9 }"
 }
 { $references
-    { "Since quotations are real objects, they can be constructed and taken apart at will. You can write code that writes code. Arrays are just one of the various types of sequences, and the sequence operations such as " { $link each } " and " { $link map } " operate on all types of sequences. There are many more sequence iteration operations than the ones above, too." }
+    { "Since quotations are objects, they can be constructed and taken apart at will. You can write code that writes code. Arrays are just one of the various types of sequences, and the sequence operations such as " { $link each } " and " { $link map } " operate on all types of sequences. There are many more sequence iteration operations than the ones above, too." }
     "dataflow"
     "sequences"
 } ;

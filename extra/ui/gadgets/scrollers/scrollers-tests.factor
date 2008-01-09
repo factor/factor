@@ -86,4 +86,4 @@ dup layout
 [ t ] [ "s" get @right grid-child slider? ] unit-test
 [ f ] [ "s" get @right grid-child find-scroller* ] unit-test
 
-{ 1 1 } [ <scroller> ] unit-test-effect
+\ <scroller> must-infer
