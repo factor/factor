@@ -37,9 +37,9 @@ HINTS: do-line vector string ;
     ] with-stream ;
 
 : reverse-complement-main ( -- )
-    "reverse-complement-in.txt"
-    "reverse-complement-out.txt"
-    [ home swap path+ ] 2apply
+    "extra/benchmark/reverse-complement/reverse-complement-test-in.txt"
+    "extra/benchmark/reverse-complement/reverse-complement-test-out.txt"
+    [ resource-path ] 2apply
     reverse-complement ;
 
 MAIN: reverse-complement-main
