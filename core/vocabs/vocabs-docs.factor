@@ -42,7 +42,7 @@ HELP: vocabs
 { $description "Outputs a sequence of all defined vocabulary names." } ;
 
 HELP: vocab
-{ $values { "name" string } { "vocab" vocab } }
+{ $values { "vocab-spec" "a vocabulary specifier" } { "vocab" vocab } }
 { $description "Outputs a named vocabulary, or " { $link f } " if no vocabulary with this name exists." }
 { $class-description "Instances represent vocabularies." } ;
 
