@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
 cpu.x86.assembler layouts compiler.units math generator.fixup
-compiler.constants ;
+compiler.constants vocabs ;
 IN: bootstrap.x86
 
 big-endian off

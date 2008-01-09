@@ -105,4 +105,4 @@ UNION: vocab-spec vocab vocab-link ;
     dup vocab-words values forget-all
     vocab-name dictionary get delete-at ;
 
-M: vocab-spec forget forget-vocab ;
+M: vocab-spec forget* forget-vocab ;

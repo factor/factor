@@ -73,7 +73,7 @@ uses definitions ;
 
 M: pathname where pathname-string 1 2array ;
 
-M: pathname forget
+M: pathname forget*
     pathname-string
     dup source-file
     dup unxref-source

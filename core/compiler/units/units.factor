@@ -56,16 +56,17 @@ GENERIC: definitions-changed ( assoc obj -- )
     definition-observers get
     [ definitions-changed ] curry* each ;
 
-: changed-vocabs ( -- assoc )
-    changed-words get
+: changed-vocabs ( assoc -- vocabs )
+    [ drop word? ] assoc-subset
     [ drop word-vocabulary dup [ vocab ] when dup ] assoc-map ;
 
 : changed-definitions ( -- assoc )
     H{ } clone
+    dup forgotten-definitions get update
     dup new-definitions get first update
     dup new-definitions get second update
     dup changed-words get update
-    dup changed-vocabs update ;
+    dup dup changed-vocabs update ;
 
 : finish-compilation-unit ( -- )
     changed-words get keys recompile-hook get call
@@ -74,6 +75,7 @@ GENERIC: definitions-changed ( assoc obj -- )
 : with-compilation-unit ( quot -- )
     [
         H{ } clone changed-words set
+        H{ } clone forgotten-definitions set
         <definitions> new-definitions set
         <definitions> old-definitions set
         [ finish-compilation-unit ]

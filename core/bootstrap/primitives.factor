@@ -5,7 +5,7 @@ USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes tuples
 kernel.private vocabs vocabs.loader source-files definitions
-slots classes.union words.private ;
+slots classes.union words.private compiler.units ;
 
 ! Some very tricky code creating a bootstrap embryo in the
 ! host image.

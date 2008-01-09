@@ -12,7 +12,7 @@ M: link where link-name article article-loc ;
 
 M: link set-where link-name article set-article-loc ;
 
-M: link forget link-name remove-article ;
+M: link forget* link-name remove-article ;
 
 M: link definition article-content ;
 
@@ -34,4 +34,4 @@ M: word-link synopsis*
     link-name dup pprint-word
     stack-effect. ;
 
-M: word-link forget link-name remove-word-help ;
+M: word-link forget* link-name remove-word-help ;

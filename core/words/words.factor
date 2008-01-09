@@ -92,11 +92,6 @@ M: word redefined* ( word -- )
 
 SYMBOL: changed-words
 
-TUPLE: no-compilation-unit word ;
-
-: no-compilation-unit ( word -- * )
-    \ no-compilation-unit construct-boa throw ;
-
 : changed-word ( word -- )
     dup changed-words get
     [ no-compilation-unit ] unless*
@@ -194,7 +189,7 @@ M: word (forget-word)
     dup delete-xref
     (forget-word) ;
 
-M: word forget forget-word ;
+M: word forget* forget-word ;
 
 M: word hashcode*
     nip 1 slot { fixnum } declare ;

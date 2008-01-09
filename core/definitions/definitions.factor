@@ -3,15 +3,29 @@
 IN: definitions
 USING: kernel sequences namespaces assocs graphs ;
 
+TUPLE: no-compilation-unit definition ;
+
+: no-compilation-unit ( definition -- * )
+    \ no-compilation-unit construct-boa throw ;
+
 GENERIC: where ( defspec -- loc )
 
 M: object where drop f ;
 
 GENERIC: set-where ( loc defspec -- )
 
-GENERIC: forget ( defspec -- )
+GENERIC: forget* ( defspec -- )
 
-M: object forget drop ;
+M: object forget* drop ;
+
+SYMBOL: forgotten-definitions
+
+: forgotten-definition ( defspec -- )
+    dup forgotten-definitions get
+    [ no-compilation-unit ] unless*
+    set-at ;
+
+: forget ( defspec -- ) dup forgotten-definition forget* ;
 
 : forget-all ( definitions -- ) [ forget ] each ;
 
