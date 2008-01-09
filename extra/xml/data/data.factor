@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private assocs arrays delegate vectors ;
+USING: kernel sequences sequences.private assocs arrays
+delegate.protocols delegate vectors ;
 IN: xml.data
 
 TUPLE: name space tag url ;
