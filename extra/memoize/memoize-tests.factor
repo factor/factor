@@ -7,4 +7,4 @@ MEMO: fib ( m -- n )
 
 [ 89 ] [ 10 fib ] unit-test
 
-[ "USE: memoize MEMO: x ( a b c d e -- f g h i j ) >r >r >r >r 1+ r> r> r> r> ;" parse ] unit-test-fails
+[ "USING: kernel math memoize ; MEMO: x ( a b c d e -- f g h i j ) >r >r >r >r 1+ r> r> r> r> ;" eval ] unit-test-fails

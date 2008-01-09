@@ -3,7 +3,7 @@
 USING: arrays hashtables io kernel math memory namespaces
 parser sequences strings io.styles io.streams.lines
 io.streams.duplex vectors words generic system combinators
-tuples continuations debugger definitions ;
+tuples continuations debugger definitions compiler.units ;
 IN: listener
 
 SYMBOL: quit-flag

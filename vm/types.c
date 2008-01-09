@@ -511,7 +511,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->profiling = NULL;
 
 	REGISTER_UNTAGGED(word);
-	default_word_code(word);
+	default_word_code(word,true);
 	UNREGISTER_UNTAGGED(word);
 
 	REGISTER_UNTAGGED(word);

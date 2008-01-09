@@ -216,8 +216,7 @@ DEFINE_PRIMITIVE(set_innermost_stack_frame_quot)
 	REGISTER_UNTAGGED(callstack);
 	REGISTER_UNTAGGED(quot);
 
-	if(quot->compiledp == F)
-		jit_compile(tag_object(quot));
+	jit_compile(tag_object(quot),true);
 
 	UNREGISTER_UNTAGGED(quot);
 	UNREGISTER_UNTAGGED(callstack);

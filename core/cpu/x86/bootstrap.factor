@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
-cpu.x86.assembler layouts vocabs math generator.fixup
+cpu.x86.assembler layouts compiler.units math generator.fixup
 compiler.constants ;
 IN: bootstrap.x86
 
@@ -75,4 +75,4 @@ big-endian off
 
 [ 0 RET ] f f f jit-return jit-define
 
-"bootstrap.x86" forget-vocab
+[ "bootstrap.x86" forget-vocab ] with-compilation-unit

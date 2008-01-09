@@ -1,8 +1,8 @@
-! Copyright (C) 2006, 2007 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays assocs combinators compiler
 hashtables kernel libc math namespaces parser sequences words
-cocoa.messages cocoa.runtime ;
+cocoa.messages cocoa.runtime compiler.units ;
 IN: cocoa.subclassing
 
 : init-method ( method alien -- )
@@ -86,7 +86,9 @@ IN: cocoa.subclassing
     ] [ ] make define-temp ;
 
 : prepare-methods ( methods -- methods )
-    [ first4 prepare-method 3array ] map ;
+    [
+        [ first4 prepare-method 3array ] map
+    ] with-compilation-unit ;
 
 : redefine-objc-methods ( imeth name -- )
     dup class-exists? [
@@ -102,16 +104,13 @@ SYMBOL: +superclass+
 : define-objc-class ( imeth hash -- )
     clone [
         prepare-methods
+        +name+ get "cocoa.classes" create drop
         +name+ get 2dup redefine-objc-methods swap [
             +protocols+ get , +superclass+ get , +name+ get , ,
             \ (define-objc-class) ,
         ] [ ] make import-objc-class
     ] bind ;
 
-: define-objc-class-early ( hash -- )
-    +name+ swap at "cocoa.classes" create drop ;
-
 : CLASS:
-    parse-definition unclip >r parsed r>
-    >hashtable dup define-objc-class-early parsed
-    \ define-objc-class parsed ; parsing
+    parse-definition unclip
+    >hashtable define-objc-class ; parsing

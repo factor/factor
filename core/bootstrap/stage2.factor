@@ -4,7 +4,7 @@ USING: init command-line namespaces words debugger io
 kernel.private math memory continuations kernel io.files
 io.backend system parser vocabs sequences prettyprint
 vocabs.loader combinators splitting source-files strings
-definitions assocs compiler.errors ;
+definitions assocs compiler.errors compiler.units ;
 IN: bootstrap.stage2
 
 ! Wrap everything in a catch which starts a listener so

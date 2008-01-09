@@ -8,7 +8,7 @@ namespaces parser prettyprint quotations tools.annotations
 editors tools.profiler tools.test tools.time tools.interpreter
 ui.commands ui.gadgets.editors ui.gestures ui.operations
 ui.tools.deploy vocabs vocabs.loader words sequences
-tools.browser classes ;
+tools.browser classes compiler.units ;
 IN: ui.tools.operations
 
 V{ } clone operations set-global

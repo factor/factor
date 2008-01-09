@@ -13,7 +13,7 @@ F_COMPILED *compile_profiling_stub(F_WORD *word)
 
 	CELL rel_type = allot_cell(to_fixnum(array_nth(quadruple,2))
 		| (to_fixnum(array_nth(quadruple,1)) << 8));
-	CELL rel_offset = array_nth(quadruple,3);
+	CELL rel_offset = array_nth(quadruple,3) * compiled_code_format();
 
 	CELL relocation = allot_array_2(rel_type,rel_offset);
 

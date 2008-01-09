@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces assocs prettyprint io sequences
 sorting continuations debugger math ;
@@ -23,6 +23,8 @@ SYMBOL: with-compiler-errors?
     >alist sort-keys [ swap compiler-error. ] assoc-each ;
 
 GENERIC: compiler-warning? ( error -- ? )
+
+M: object compiler-warning? drop f ;
 
 : (:errors) ( -- assoc )
     compiler-errors get-global

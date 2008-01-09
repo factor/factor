@@ -4,7 +4,8 @@ USING: alien arrays bit-arrays byte-arrays definitions generic
 hashtables kernel math namespaces parser sequences strings sbufs
 vectors words quotations io assocs splitting tuples
 generic.standard generic.math classes io.files vocabs
-float-arrays classes.union classes.mixin classes.predicate ;
+float-arrays classes.union classes.mixin classes.predicate
+compiler.units ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with

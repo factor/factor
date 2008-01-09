@@ -5,7 +5,7 @@ namespaces parser kernel kernel.private classes classes.private
 arrays hashtables vectors tuples sbufs inference.dataflow
 hashtables.private sequences.private math tuples.private
 growable namespaces.private assocs words generator command-line
-vocabs io prettyprint libc definitions ;
+vocabs io prettyprint libc compiler.units ;
 IN: bootstrap.compiler
 
 ! Don't bring this in when deploying, since it will store a

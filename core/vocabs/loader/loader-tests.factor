@@ -7,7 +7,9 @@ debugger ;
 
 ! This vocab should not exist, but just in case...
 [ ] [
-    "vocabs.loader.test" forget-vocab
+    [
+        "vocabs.loader.test" forget-vocab
+    ] with-compilation-unit
 ] unit-test
 
 [ T{ vocab-link f "vocabs.loader.test" } ]
@@ -17,7 +19,7 @@ debugger ;
 [ "kernel" f >vocab-link "kernel" vocab = ] unit-test
 
 ! This vocab should not exist, but just in case...
-[ ] [ "core" forget-vocab ] unit-test
+[ ] [ [ "core" forget-vocab ] with-compilation-unit ] unit-test
 
 2 [
     [ T{ no-vocab f "core" } ]
@@ -50,7 +52,7 @@ IN: temporary
 
 "resource:core/vocabs/loader/test/a/a.factor" forget-source
 
-"vocabs.loader.test.a" forget-vocab
+[ "vocabs.loader.test.a" forget-vocab ] with-compilation-unit
 
 0 "count-me" set-global
 
@@ -81,7 +83,9 @@ IN: temporary
 0 "count-me" set-global
 
 [ ] [
-    "vocabs.loader.test.b" forget-vocab
+    [
+        "vocabs.loader.test.b" forget-vocab
+    ] with-compilation-unit
 ] unit-test
 
 [ ] [
@@ -125,8 +129,12 @@ IN: temporary
 ] unit-test
 
 : forget-junk
-    { "2" "a" "b" "d" "e" "f" }
-    [ "vocabs.loader.test." swap append forget-vocab ] each ;
+    [
+        { "2" "a" "b" "d" "e" "f" }
+        [
+            "vocabs.loader.test." swap append forget-vocab
+        ] each
+    ] with-compilation-unit ;
 
 forget-junk
 
@@ -134,6 +142,6 @@ forget-junk
     "IN: xabbabbja" eval "xabbabbja" vocab-files
 ] unit-test
 
-"xabbabbja" forget-vocab
+[ "xabbabbja" forget-vocab ] with-compilation-unit
 
 forget-junk

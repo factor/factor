@@ -459,5 +459,8 @@ PRIVATE>
 
 : make-images ( -- )
     {
-        "x86.32" "x86.64" "linux-ppc" "macosx-ppc" "arm"
+        "x86.32"
+        ! "x86.64"
+        "linux-ppc" "macosx-ppc"
+        ! "arm"
     } [ make-image ] each ;

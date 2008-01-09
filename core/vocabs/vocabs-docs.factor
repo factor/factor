@@ -1,4 +1,4 @@
-USING: help.markup help.syntax strings words ;
+USING: help.markup help.syntax strings words compiler.units ;
 IN: vocabs
 
 ARTICLE: "vocabularies" "Vocabularies"
@@ -42,7 +42,7 @@ HELP: vocabs
 { $description "Outputs a sequence of all defined vocabulary names." } ;
 
 HELP: vocab
-{ $values { "name" string } { "vocab" vocab } }
+{ $values { "vocab-spec" "a vocabulary specifier" } { "vocab" vocab } }
 { $description "Outputs a named vocabulary, or " { $link f } " if no vocabulary with this name exists." }
 { $class-description "Instances represent vocabularies." } ;
 
@@ -76,7 +76,8 @@ HELP: all-words
 
 HELP: forget-vocab
 { $values { "vocab" string } }
-{ $description "Removes a vocabulary. All words in the vocabulary become uninterned." } ;
+{ $description "Removes a vocabulary. All words in the vocabulary become uninterned." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: load-vocab-hook
 { $var-description "a quotation with stack effect " { $snippet "( name -- vocab )" } " which loads a vocabulary. This quotation is called by " { $link load-vocab } ". The default value should not need to be changed; this functinality is implemented via a hook stored in a variable to break a circular dependency which would otherwise exist from " { $vocab-link "vocabs" } " to " { $vocab-link "vocabs.loader" } " to " { $vocab-link "parser" } " back to " { $vocab-link "vocabs" } "." } ;
