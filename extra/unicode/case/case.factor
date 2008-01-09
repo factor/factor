@@ -1,5 +1,5 @@
-USING: kernel unicode.load sequences sequences.next namespaces assocs.lib
-unicode.normalize math unicode combinators assocs ;
+USING: kernel unicode.data sequences sequences.next namespaces assocs.lib
+unicode.normalize math unicode.categories combinators assocs ;
 IN: unicode.case
 
 : ch>lower ( ch -- lower ) simple-lower at-default ;

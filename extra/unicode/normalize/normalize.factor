@@ -1,4 +1,4 @@
-USING: sequences namespaces unicode.load kernel combinators.lib math
+USING: sequences namespaces unicode.data kernel combinators.lib math
 unicode arrays ;
 IN: unicode.normalize
 

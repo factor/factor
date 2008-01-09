@@ -1,7 +1,7 @@
 USING: assocs math kernel sequences io.files hashtables quotations
 splitting arrays math.parser combinators.lib hash2 byte-arrays words
 namespaces ;
-IN: unicode.load
+IN: unicode.data
 
 ! Convenience functions
 : 1+* ( n/f _ -- n+1 )
@@ -112,11 +112,6 @@ C: <code-point> code-point
     4 head [ multihex ] map first4
     <code-point> swap first set ;
 
-: load-special-casing ( -- special-casing )
-    "extra/unicode/SpecialCasing.txt" resource-path data
-    [ length 5 = ] subset
-    [ [ set-code-point ] each ] H{ } make-assoc ;
-
 DEFER: simple-lower
 DEFER: simple-upper
 DEFER: simple-title
@@ -126,7 +121,6 @@ DEFER: class-map
 DEFER: compat-map
 DEFER: category-map
 DEFER: name-map
-DEFER: special-casing
 
 <<
     load-data
@@ -139,5 +133,22 @@ DEFER: special-casing
         \ combine-map define-value
     dup process-compat \ compat-map define-value
     process-category \ category-map define-value
-    load-special-casing \ special-casing define-value
 >>
+
+: canonical-entry ( char -- seq ) canonical-map at ;
+: combine-chars ( a b -- char/f ) combine-map hash2 ;
+: compat-entry ( char -- seq ) compat-map at  ;
+: combining-class ( char -- n ) class-map at ;
+: non-starter? ( char -- ? ) class-map key? ;
+: name>char ( string -- char ) name-map at ;
+: char>name ( char -- string ) name-map value-at ;
+
+! Special casing data
+: load-special-casing ( -- special-casing )
+    "extra/unicode/SpecialCasing.txt" resource-path data
+    [ length 5 = ] subset
+    [ [ set-code-point ] each ] H{ } make-assoc ;
+
+DEFER: special-casing
+
+<< load-special-casing \ special-casing define-value >>
