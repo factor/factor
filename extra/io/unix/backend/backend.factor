@@ -187,4 +187,4 @@ M: unix-io init-io ( -- )
     ] bind ;
 
 M: unix-io init-stdio ( -- )
-    0 1 handle>duplex-stream stdio set ;
+    0 1 handle>duplex-stream stdio set-global ;
