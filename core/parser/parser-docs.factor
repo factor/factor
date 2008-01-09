@@ -1,7 +1,7 @@
 USING: help.markup help.syntax kernel sequences words
 math strings vectors quotations generic effects classes
 vocabs.loader definitions io vocabs source-files
-quotations namespaces ;
+quotations namespaces compiler.units ;
 IN: parser
 
 ARTICLE: "vocabulary-search-shadow" "Shadowing word names"

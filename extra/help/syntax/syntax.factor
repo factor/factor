@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel parser sequences words help help.topics
-namespaces vocabs definitions ;
+namespaces vocabs definitions compiler.units ;
 IN: help.syntax
 
 : HELP:

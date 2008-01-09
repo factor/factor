@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files io.launcher kernel namespaces sequences
 system tools.deploy.backend tools.deploy.config assocs
-hashtables prettyprint io.unix.backend cocoa cocoa.plists
+hashtables prettyprint io.unix.backend cocoa
 cocoa.application cocoa.classes qualified ;
 QUALIFIED: unix
 IN: tools.deploy.macosx
@@ -43,7 +43,7 @@ IN: tools.deploy.macosx
 
         dup "CFBundleExecutable" set
         "org.factor." swap append "CFBundleIdentifier" set
-    ] H{ } make-assoc print-plist ;
+    ] H{ } make-assoc drop ; ! print-plist ;
 
 : create-app-plist ( vocab bundle-name -- )
     dup "Contents/Info.plist" path+ <file-writer>

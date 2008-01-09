@@ -12,6 +12,8 @@ words
 main help
 source-loaded? docs-loaded? ;
 
+M: vocab equal? 2drop f ;
+
 : <vocab> ( name -- vocab )
     H{ } clone t
     { set-vocab-name set-vocab-words set-vocab-source-loaded? }
@@ -91,9 +93,8 @@ M: vocab-link vocab-name vocab-link-name ;
 
 UNION: vocab-spec vocab vocab-link ;
 
-M: vocab-spec forget
+: forget-vocab ( vocab -- )
     dup vocab-words values forget-all
     vocab-name dictionary get delete-at ;
 
-: forget-vocab ( vocab -- )
-    [ f >vocab-link forget ] with-compilation-unit ;
+M: vocab-spec forget forget-vocab ;

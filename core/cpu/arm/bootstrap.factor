@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
-cpu.arm.assembler math layouts words vocabs ;
+cpu.arm.assembler math layouts words compiler.units ;
 IN: bootstrap.arm
 
 ! We generate ARM3 code
@@ -116,4 +116,4 @@ big-endian off
 
 [ LR BX ] { } make jit-return set
 
-"bootstrap.arm" forget-vocab
+[ "bootstrap.arm" forget-vocab ] with-compilation-unit

@@ -4,7 +4,7 @@ USING: arrays definitions generic hashtables inspector io kernel
 math namespaces prettyprint sequences assocs sequences.private
 strings io.styles vectors words system splitting math.parser
 tuples continuations continuations.private combinators
-generic.math io.streams.duplex classes
+generic.math io.streams.duplex classes compiler.units
 generic.standard ;
 IN: debugger
 
@@ -228,5 +228,7 @@ M: forward-error error.
 M: undefined summary
     drop "Calling a deferred word before it has been defined" ;
 
-M: no-compilation-unit summary
-    drop "Defining a word outside of a compilation unit" ;
+M: no-compilation-unit error.
+    "Attempting to define " write
+    no-compilation-unit-word pprint
+    " outside of a compilation unit" print ;

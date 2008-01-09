@@ -1,4 +1,5 @@
-USING: help.markup help.syntax help words definitions classes ;
+USING: help.markup help.syntax help words compiler.units
+classes ;
 IN: classes.mixin
 
 ARTICLE: "mixins" "Mixin classes"

@@ -5,7 +5,7 @@ namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger
 io.files io.crc32 io.streams.string io.streams.lines vocabs
-hashtables graphs ;
+hashtables graphs compiler.units ;
 IN: source-files
 
 SYMBOL: source-files

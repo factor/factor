@@ -255,6 +255,8 @@ PRIVATE>
     >r dup word-props r> union over set-word-props
     t "class" set-word-prop ;
 
+GENERIC: update-methods ( class -- )
+
 : define-class ( word members superclass metaclass -- )
     #! If it was already a class, update methods after.
     define-class-props

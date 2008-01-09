@@ -1,6 +1,6 @@
 USING: generic help.markup help.syntax kernel
 tuples.private classes slots quotations words arrays
-generic.standard sequences definitions ;
+generic.standard sequences definitions compiler.units ;
 IN: tuples
 
 ARTICLE: "tuple-constructors" "Constructors and slots"

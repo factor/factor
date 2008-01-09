@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces arrays sequences io inference.backend
 inference.state generator debugger math.parser prettyprint words
-words.private continuations vocabs assocs alien.compiler dlists
+compiler.units continuations vocabs assocs alien.compiler dlists
 optimizer definitions math compiler.errors threads graphs
 generic ;
 IN: compiler
@@ -49,7 +49,10 @@ compiled-crossref global [ H{ } assoc-like ] change-at
     "compiled-effect" set-word-prop ;
 
 : finish-compile ( word effect dependencies -- )
-    >r dupd save-effect r> over compiled-unxref compiled-xref ;
+    >r dupd save-effect r>
+    f pick compiler-error
+    over compiled-unxref
+    compiled-xref ;
 
 : compile-succeeded ( word -- effect dependencies )
     [

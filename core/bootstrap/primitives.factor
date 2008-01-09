@@ -34,6 +34,7 @@ call
     "bit-arrays"
     "byte-arrays"
     "classes.private"
+    "compiler.units"
     "continuations.private"
     "float-arrays"
     "generator"
@@ -521,7 +522,7 @@ builtins get num-tags get tail f union-class define-class
     { "tag" "kernel.private" }
     { "cwd" "io.files" }
     { "cd" "io.files" }
-    { "modify-code-heap" "words.private" }
+    { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
     { "dlsym" "alien" }
     { "dlclose" "alien" }
