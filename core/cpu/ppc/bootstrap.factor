@@ -29,7 +29,7 @@ big-endian on
     temp-reg dup 0 LWZ
     ! Bump profiling counter
     aux-reg temp-reg profile-count-offset LWZ
-    aux-reg dup 1 tag-fixnum ADD
+    aux-reg dup 1 tag-fixnum ADDI
     aux-reg temp-reg profile-count-offset STW
     ! Load word->code
     aux-reg temp-reg word-code-offset LWZ

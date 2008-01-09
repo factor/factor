@@ -13,5 +13,3 @@ namespaces alien.c-types kernel system combinators ;
 } cond
 
 T{ ppc-backend } compiler-backend set-global
-
-6 cells profiler-prologue set-global

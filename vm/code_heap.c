@@ -303,10 +303,10 @@ void set_word_code(F_WORD *word, F_COMPILED *compiled)
 }
 
 /* Allocates memory */
-void default_word_code(F_WORD *word)
+void default_word_code(F_WORD *word, bool relocate)
 {
 	REGISTER_UNTAGGED(word);
-	jit_compile(word->def);
+	jit_compile(word->def,relocate);
 	UNREGISTER_UNTAGGED(word);
 
 	word->code = untag_quotation(word->def)->code;
@@ -336,7 +336,7 @@ DEFINE_PRIMITIVE(modify_code_heap)
 		{
 			REGISTER_UNTAGGED(alist);
 			REGISTER_UNTAGGED(word);
-			default_word_code(word);
+			default_word_code(word,false);
 			UNREGISTER_UNTAGGED(word);
 			UNREGISTER_UNTAGGED(alist);
 		}
