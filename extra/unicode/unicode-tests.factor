@@ -16,7 +16,7 @@ USING: unicode kernel tools.test words sequences namespaces ;
 [ { f f t t f t t f f t } ] [ CHAR: A { 
     blank? letter? LETTER? Letter? digit? 
     printable? alpha? control? uncased? character? 
-} [ execute ] curry* map ] unit-test
+} [ execute ] with map ] unit-test
 [ "Nd" ] [ CHAR: 3 category ] unit-test
 [ CHAR: ! ] [ UNICHAR: exclamation-mark ] unit-test
 [ "ab\u0323\u0302cd" ] [ "ab\u0302" "\u0323cd" string-append ] unit-test

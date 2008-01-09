@@ -91,7 +91,7 @@ M: method-spec forget* first2 [ delete-at ] with-methods ;
     all-words [
         "methods" word-prop keys
         swap [ key? ] curry contains?
-    ] curry* subset ;
+    ] with subset ;
 
 : implementors ( class -- seq )
     dup associate implementors* ;

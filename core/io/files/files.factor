@@ -46,7 +46,7 @@ M: object root-directory? ( path -- ? ) path-separator? ;
     [
         dup string?
         [ tuck path+ directory? 2array ] [ nip ] if
-    ] curry* map
+    ] with map
     [ first special-directory? not ] subset ;
 
 : directory ( path -- seq )
@@ -143,7 +143,7 @@ HOOK: binary-roots io-backend ( -- seq )
 
 <PRIVATE
 : append-path ( path files -- paths )
-    [ path+ ] curry* map ;
+    [ path+ ] with map ;
 
 : get-paths ( dir -- paths )
     dup directory keys append-path ;

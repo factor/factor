@@ -27,4 +27,4 @@ GENERIC: tick ( object -- )
     [ [ advance-timer ] keep timer-object tick ] [ 2drop ] if ;
 
 : do-timers ( -- )
-    millis timers values [ do-timer ] curry* each ;
+    millis timers values [ do-timer ] with each ;

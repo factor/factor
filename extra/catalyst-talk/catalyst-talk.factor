@@ -40,7 +40,7 @@ IN: catalyst-talk
 : strip-tease ( data -- seq )
     dup third length 1 - [
         2 + (strip-tease)
-    ] curry* map ;
+    ] with map ;
 
 : STRIP-TEASE:
     parse-definition strip-tease [ parsed ] each ; parsing

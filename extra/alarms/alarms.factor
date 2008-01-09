@@ -19,7 +19,7 @@ SYMBOL: alarm-looper
     alarms get-global push ;
 
 : remove-alarm ( alarm -- )
-    alarms get-global remove alarms set-global ;
+    alarms get-global delete ;
 
 : handle-alarm ( alarm -- )
     dup delegate {
@@ -29,11 +29,11 @@ SYMBOL: alarm-looper
 
 : expired-alarms ( -- seq )
     now alarms get-global
-    [ alarm-time <=> 0 > ] curry* subset ;
+    [ alarm-time <=> 0 > ] with subset ;
 
 : unexpired-alarms ( -- seq )
     now alarms get-global
-    [ alarm-time <=> 0 <= ] curry* subset ;
+    [ alarm-time <=> 0 <= ] with subset ;
 
 : call-alarm ( alarm -- )
     alarm-quot spawn drop ;

@@ -65,14 +65,14 @@ M: node draw-selection ( loc node -- )
     2dup node-value swap offset-rect [
         drop 2dup
         [ node-value rect-loc v+ ] keep
-        node-children [ draw-selection ] curry* each
+        node-children [ draw-selection ] with each
     ] if-fits 2drop ;
 
 M: pane draw-gadget*
     dup gadget-selection? [
         dup pane-selection-color gl-color
         origin get over rect-loc v- swap selected-children
-        [ draw-selection ] curry* each
+        [ draw-selection ] with each
     ] [
         drop
     ] if ;
@@ -342,7 +342,7 @@ M: pack sloppy-pick-up*
     (fast-children-on) ;
 
 M: gadget sloppy-pick-up*
-    gadget-children [ inside? ] curry* find-last drop ;
+    gadget-children [ inside? ] with find-last drop ;
 
 M: f sloppy-pick-up*
     2drop f ;

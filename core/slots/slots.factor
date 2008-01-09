@@ -70,7 +70,7 @@ PREDICATE: word slot-writer "writing" word-prop >boolean ;
     2dup define-reader define-writer ;
 
 : define-slots ( class specs -- )
-    [ define-slot ] curry* each ;
+    [ define-slot ] with each ;
 
 : reader-word ( class name vocab -- word )
     >r >r "-" r> 3append r> create ;
@@ -93,11 +93,11 @@ PREDICATE: word slot-writer "writing" word-prop >boolean ;
     rot rot simple-writer-word over set-slot-spec-writer ;
 
 : simple-slots ( class slots base -- specs )
-    over length [ + ] curry* map
+    over length [ + ] with map
     [ >r >r dup r> r> simple-slot ] 2map nip ;
 
 : slot-of-reader ( reader specs -- spec/f )
-    [ slot-spec-reader eq? ] curry* find nip ;
+    [ slot-spec-reader eq? ] with find nip ;
 
 : slot-of-writer ( writer specs -- spec/f )
-    [ slot-spec-writer eq? ] curry* find nip ;
+    [ slot-spec-writer eq? ] with find nip ;

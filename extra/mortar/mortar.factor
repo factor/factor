@@ -180,7 +180,7 @@ empty-method-table empty-method-table 4array dup first set-global ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: add-methods ( class seq -- ) 2 group [ first2 add-method ] curry* each ;
+: add-methods ( class seq -- ) 2 group [ first2 add-method ] with each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

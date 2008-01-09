@@ -36,7 +36,7 @@ TAGS>
         init-from-tag dup
     ] keep
     tag-children [ tag? ] subset
-    [ parse-employee-tag ] curry* each ;
+    [ parse-employee-tag ] with each ;
 
 [
     T{ company f

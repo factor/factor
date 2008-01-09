@@ -7,7 +7,7 @@ IN: ui.gadgets.packs
 TUPLE: pack align fill gap ;
 
 : packed-dim-2 ( gadget sizes -- list )
-    [ over rect-dim over v- rot pack-fill v*n v+ ] curry* map ;
+    [ over rect-dim over v- rot pack-fill v*n v+ ] with map ;
 
 : packed-dims ( gadget sizes -- seq )
     2dup packed-dim-2 swap orient ;
@@ -16,7 +16,7 @@ TUPLE: pack align fill gap ;
     { 0 0 } [ v+ over v+ ] accumulate 2nip ;
 
 : aligned-locs ( gadget sizes -- seq )
-    [ >r dup pack-align swap rect-dim r> v- n*v ] curry* map ;
+    [ >r dup pack-align swap rect-dim r> v- n*v ] with map ;
 
 : packed-locs ( gadget sizes -- seq )
     over pack-gap over gap-locs >r dupd aligned-locs r> orient ;

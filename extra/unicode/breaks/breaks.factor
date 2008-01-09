@@ -64,13 +64,13 @@ SYMBOL: table
 : disconnect ( class1 class2 -- ) 0 set-table ;
 
 : connect-before ( class classes -- )
-    [ connect ] curry* each ;
+    [ connect ] with each ;
 
 : connect-after ( classes class -- )
     [ connect ] curry each ;
 
 : break-around ( classes1 classes2 -- )
-    [ [ 2dup disconnect swap disconnect ] curry* each ] curry each ;
+    [ [ 2dup disconnect swap disconnect ] with each ] curry each ;
 
 : make-grapheme-table ( -- )
     CR LF connect

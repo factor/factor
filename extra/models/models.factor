@@ -44,7 +44,7 @@ DEFER: remove-connection
 : deactivate-model ( model -- )
     dup unref-model zero? [
         dup model-dependencies
-        [ dup deactivate-model remove-connection ] curry* each
+        [ dup deactivate-model remove-connection ] with each
     ] [
         drop
     ] if ;
@@ -71,7 +71,7 @@ GENERIC: update-model ( model -- )
 M: model update-model drop ;
 
 : notify-connections ( model -- )
-    dup model-connections [ model-changed ] curry* each ;
+    dup model-connections [ model-changed ] with each ;
 
 : set-model ( value model -- )
     dup model-locked? [

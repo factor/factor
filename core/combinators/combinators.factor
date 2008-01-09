@@ -69,7 +69,7 @@ M: sequence hashcode*
 
 : hash-case-table ( default assoc -- array )
     V{ } [ 1array ] distribute-buckets
-    [ case>quot ] curry* map ;
+    [ case>quot ] with map ;
 
 : hash-dispatch-quot ( table -- quot )
     [ length 1- [ fixnum-bitand ] curry ] keep

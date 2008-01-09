@@ -59,7 +59,7 @@ SYMBOL: K
 
 : make-w ( str -- )
     #! compute w, steps a-b of RFC 3174, section 6.1
-    16 [ nth-int-be w get push ] curry* each
+    16 [ nth-int-be w get push ] with each
     16 80 dup <slice> [ sha1-W w get push ] each ;
 
 : init-letters ( -- )

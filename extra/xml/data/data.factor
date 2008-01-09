@@ -48,7 +48,7 @@ C: <attrs> attrs
 
 : attr@ ( key alist -- index {key,value} )
     >r assure-name r> attrs-alist
-    [ first names-match? ] curry* find ;
+    [ first names-match? ] with find ;
 
 M: attrs at*
     attr@ nip [ second t ] [ f f ] if* ;

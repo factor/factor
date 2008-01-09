@@ -525,7 +525,7 @@ M: loc lazy-store
 : clash? ( seq -- ? )
     phantoms append [
         dup cached? [ cached-vreg ] when swap member?
-    ] curry* contains? ;
+    ] with contains? ;
 
 : outputs-clash? ( -- ? )
     output-vregs append clash? ;

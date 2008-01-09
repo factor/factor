@@ -54,7 +54,7 @@ SYMBOL: query-res
 
 : result>seq ( -- seq )
     query-res get [ PQnfields ] keep PQntuples
-    [ swap [ query-res get -rot PQgetvalue ] curry* map ] curry* map ;
+    [ swap [ query-res get -rot PQgetvalue ] with map ] with map ;
 
 : print-table ( seq -- )
     [ [ write bl ] each "\n" write ] each ;

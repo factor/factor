@@ -12,7 +12,7 @@ SYMBOL: def-use
     used-by empty? ;
 
 : uses-values ( node seq -- )
-    [ def-use get [ ?push ] change-at ] curry* each ;
+    [ def-use get [ ?push ] change-at ] with each ;
 
 : defs-values ( seq -- )
     #! If there is no value, set it to a new empty vector,

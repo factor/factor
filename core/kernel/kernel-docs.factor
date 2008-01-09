@@ -69,7 +69,7 @@ $nl
 { $subsection curry }
 { $subsection 2curry }
 { $subsection 3curry }
-{ $subsection curry* }
+{ $subsection with }
 { $subsection compose }
 { $subsection 3compose }
 "Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } "."
@@ -509,16 +509,16 @@ HELP: 3curry
 { $description "Outputs a " { $link callable } " which pushes " { $snippet "obj1" } ", " { $snippet "obj2" } " and " { $snippet "obj3" } ", and then calls " { $snippet "quot" } "." }
 { $notes "This operation is efficient and does not copy the quotation." } ;
 
-HELP: curry*
+HELP: with
 { $values { "param" object } { "obj" object } { "quot" "a quotation with stack effect " { $snippet "( param elt -- ... )" } } { "obj" object } { "curry" curry } }
 { $description "Partial application on the left. The following two lines are equivalent:"
     { $code "swap [ swap A ] curry B" }
-    { $code "[ A ] curry* B" }
+    { $code "[ A ] with B" }
     
 }
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
-    { $example "2 { 1 2 3 } [ - ] curry* map ." "{ 1 0 -1 }" }
+    { $example "2 { 1 2 3 } [ - ] with map ." "{ 1 0 -1 }" }
 } ;
 
 HELP: compose

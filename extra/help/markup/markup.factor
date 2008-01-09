@@ -341,12 +341,12 @@ M: word slot-specs "slots" word-prop ;
 
 GENERIC: elements* ( elt-type element -- )
 
-M: simple-element elements* [ elements* ] curry* each ;
+M: simple-element elements* [ elements* ] with each ;
 
 M: object elements* 2drop ;
 
 M: array elements*
-    [ [ elements* ] curry* each ] 2keep
+    [ [ elements* ] with each ] 2keep
     [ first eq? ] keep swap [ , ] [ drop ] if ;
 
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;

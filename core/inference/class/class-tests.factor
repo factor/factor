@@ -14,7 +14,7 @@ slots.private combinators definitions ;
 
 : inlined? ( quot word -- ? )
     swap dataflow optimize
-    [ node-param eq? ] curry* node-exists? not ;
+    [ node-param eq? ] with node-exists? not ;
 
 GENERIC: mynot ( x -- y )
 

@@ -97,7 +97,7 @@ DEFER: (class<)
 
 : union-class< ( cls1 cls2 -- ? )
     [ flatten-union-class ] 2apply keys
-    [ nip [ (class<) ] curry* contains? ] curry assoc-all? ;
+    [ nip [ (class<) ] with contains? ] curry assoc-all? ;
 
 : (class<) ( class1 class2 -- ? )
     {
@@ -123,7 +123,7 @@ DEFER: (class<)
 : largest-class ( seq -- n elt )
     dup [
         [ 2dup class< >r swap class< not r> and ]
-        curry* subset empty?
+        with subset empty?
     ] curry find [ "Topological sort failed" throw ] unless* ;
 
 PRIVATE>
@@ -156,7 +156,7 @@ PRIVATE>
     [ dupd classes-intersect? ] subset dup empty? [
         2drop f
     ] [
-        tuck [ class< ] curry* all? [ peek ] [ drop f ] if
+        tuck [ class< ] with all? [ peek ] [ drop f ] if
     ] if ;
 
 GENERIC: reset-class ( class -- )
@@ -167,7 +167,7 @@ M: word reset-class drop ;
 
 ! class<map
 : bigger-classes ( class -- seq )
-    classes [ (class<) ] curry* subset ;
+    classes [ (class<) ] with subset ;
 
 : bigger-classes+ ( class -- )
     [ bigger-classes [ dup ] H{ } map>assoc ] keep

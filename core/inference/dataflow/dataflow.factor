@@ -217,7 +217,7 @@ M: node calls-label* 2drop f ;
 M: #call-label calls-label* node-param eq? ;
 
 : calls-label? ( label node -- ? )
-    [ calls-label* ] curry* node-exists? ;
+    [ calls-label* ] with node-exists? ;
 
 : recursive-label? ( node -- ? )
     dup node-param swap calls-label? ;
@@ -270,10 +270,10 @@ SYMBOL: node-stack
     swap node-classes at object or ;
 
 : node-input-classes ( node -- seq )
-    dup node-in-d [ node-class ] curry* map ;
+    dup node-in-d [ node-class ] with map ;
 
 : node-input-intervals ( node -- seq )
-    dup node-in-d [ node-interval ] curry* map ;
+    dup node-in-d [ node-interval ] with map ;
 
 : node-class-first ( node -- class )
     dup node-in-d first node-class ;

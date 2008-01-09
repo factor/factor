@@ -16,7 +16,7 @@ IN: math.analysis
     } ; inline
 
 : gamma-z ( x n -- seq )
-    [ + recip ] curry* map 1.0 0 pick set-nth ;
+    [ + recip ] with map 1.0 0 pick set-nth ;
 
 : (gamma-lanczos6) ( x -- log[gamma[x+1]] )
     #! log(gamma(x+1)

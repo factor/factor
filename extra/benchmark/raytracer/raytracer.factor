@@ -136,23 +136,23 @@ DEFER: create ( level c r -- scene )
     [ oversampling /f ] 2apply 0.0 3float-array ;
 
 : ss-grid ( -- ss-grid )
-    oversampling [ oversampling [ ss-point ] curry* map ] map ;
+    oversampling [ oversampling [ ss-point ] with map ] map ;
 
 : ray-grid ( point ss-grid -- ray-grid )
     [
-        [ v+ normalize { 0.0 0.0 -4.0 } swap <ray> ] curry* map
-    ] curry* map ;
+        [ v+ normalize { 0.0 0.0 -4.0 } swap <ray> ] with map
+    ] with map ;
 
 : ray-pixel ( scene point -- n )
     ss-grid ray-grid 0.0 -rot
-    [ [ swap cast-ray + ] curry* each ] curry* each ;
+    [ [ swap cast-ray + ] with each ] with each ;
 
 : pixel-grid ( -- grid )
     size reverse [
         size [
             [ size 0.5 * - ] 2apply swap size
             3float-array
-        ] curry* map
+        ] with map
     ] map ;
 
 : pgm-header ( w h -- )
@@ -161,7 +161,7 @@ DEFER: create ( level c r -- scene )
 : pgm-pixel ( n -- ) 255 * 0.5 + >fixnum , ;
 
 : ray-trace ( scene -- pixels )
-    pixel-grid [ [ ray-pixel ] curry* map ] curry* map ;
+    pixel-grid [ [ ray-pixel ] with map ] with map ;
 
 : run ( -- string )
     levels { 0.0 -1.0 0.0 } 1.0 create ray-trace [

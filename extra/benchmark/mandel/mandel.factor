@@ -21,7 +21,7 @@ math.functions math.parser io.files colors.hsv ;
     dup [
         360 * swap 1+ / sat val
         3array hsv>rgb first3 scale-rgb
-    ] curry* map ;
+    ] with map ;
 
 : iter ( c z nb-iter -- x )
     over absq 4.0 >= over zero? or

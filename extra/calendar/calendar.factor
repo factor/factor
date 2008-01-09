@@ -278,10 +278,10 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [
         [ 1+ print-day ] keep
         1+ + 7 mod zero? [ nl ] [ bl ] if
-    ] curry* each nl ;
+    ] with each nl ;
 
 : print-year ( year -- )
-    12 [ 1+ print-month nl ] curry* each ;
+    12 [ 1+ print-month nl ] with each ;
 
 : pad-00 number>string 2 CHAR: 0 pad-left write ;
 

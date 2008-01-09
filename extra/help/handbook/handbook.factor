@@ -334,7 +334,7 @@ ARTICLE: "changes" "Changes in the latest release"
 }
 { $subheading "Performance" }
 { $list
-    { "The " { $link curry } " word now runs in constant time, and curried quotations can be called from compiled code; this allows for abstractions and idioms which were previously impractical due to performance issues. In particular, words such as " { $snippet "each-with" } " and " { $snippet "map-with" } " are gone; " { $snippet "each-with" } " can now be written as " { $snippet "curry* each" } ", and similarly for other " { $snippet "-with" } " combinators." }
+    { "The " { $link curry } " word now runs in constant time, and curried quotations can be called from compiled code; this allows for abstractions and idioms which were previously impractical due to performance issues. In particular, words such as " { $snippet "each-with" } " and " { $snippet "map-with" } " are gone; " { $snippet "each-with" } " can now be written as " { $snippet "with each" } ", and similarly for other " { $snippet "-with" } " combinators." }
     "Improved generational promotion strategy in garbage collector reduces the amount of junk which makes its way into tenured space, which in turn reduces the frequency of full garbage collections."
     "Faster generic word dispatch and union membership testing."
     { "Alien memory accessors (" { $link "reading-writing-memory" } ") are compiled as intrinsics where possible, which improves performance in code which iteroperates with C libraries." }

@@ -70,7 +70,7 @@ IN: opengl
 
 : adjust-points [ [ 1 + 0.5 * ] map ] 2apply ;
 
-: scale-points 2array flip [ v* ] curry* map [ v+ ] curry* map ;
+: scale-points 2array flip [ v* ] with map [ v+ ] with map ;
 
 : circle-points ( loc dim steps -- points )
     circle-steps unit-circle adjust-points scale-points ;

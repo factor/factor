@@ -7,9 +7,9 @@ IN: math.vectors
 : vneg ( u -- v ) [ neg ] map ;
 
 : v*n ( u n -- v ) [ * ] curry map ;
-: n*v ( n u -- v ) [ * ] curry* map ;
+: n*v ( n u -- v ) [ * ] with map ;
 : v/n ( u n -- v ) [ / ] curry map ;
-: n/v ( n u -- v ) [ / ] curry* map ;
+: n/v ( n u -- v ) [ / ] with map ;
 
 : v+   ( u v -- w ) [ + ] 2map ;
 : v-   ( u v -- w ) [ - ] 2map ;

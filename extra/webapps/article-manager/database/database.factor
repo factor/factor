@@ -115,4 +115,4 @@ tag default-mapping set-mapping
 : articles-for-tag ( tag -- seq )
   [ tag-name ] keep tag-hostname all-articles [
     tags-for-article member?
-  ] curry* subset ;
+  ] with subset ;

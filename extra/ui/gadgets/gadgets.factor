@@ -119,7 +119,7 @@ M: gadget children-on nip gadget-children ;
     dup gadget-visible? [ intersects? ] [ 2drop f ] if ;
 
 : (pick-up) ( point gadget -- gadget )
-    dupd children-on [ inside? ] curry* find-last nip ;
+    dupd children-on [ inside? ] with find-last nip ;
 
 : pick-up ( point gadget -- child/f )
     2dup (pick-up) dup
@@ -137,7 +137,7 @@ M: gadget children-on nip gadget-children ;
 
 : set-gadget-delegate ( gadget tuple -- )
     over [
-        dup pick [ set-gadget-parent ] curry* each-child
+        dup pick [ set-gadget-parent ] with each-child
     ] when set-delegate ;
 
 : construct-control ( model gadget class -- control )

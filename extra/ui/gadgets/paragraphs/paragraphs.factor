@@ -62,7 +62,7 @@ SYMBOL: margin
 : do-wrap ( paragraph quot -- dim )
     [
         swap dup init-wrap
-        [ wrap-step ] curry* each-child wrap-dim
+        [ wrap-step ] with each-child wrap-dim
     ] with-scope ; inline
 
 M: paragraph pref-dim*

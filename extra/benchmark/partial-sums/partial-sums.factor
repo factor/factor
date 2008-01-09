@@ -54,7 +54,7 @@ HINTS: gregory fixnum ;
     standard-table-style [
         functions [
             [ tuck execute pprint-cell pprint-cell ] with-row
-        ] curry* each
+        ] with each
     ] tabular-output ;
 
 : partial-sums-main 2500000 partial-sums ;

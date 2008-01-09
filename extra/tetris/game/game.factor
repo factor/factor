@@ -68,7 +68,7 @@ TUPLE: tetris pieces last-update update-interval rows score game-state paused? r
     over tetris-rows + swap set-tetris-rows ;
 
 : lock-piece ( tetris -- )
-    [ dup tetris-current-piece piece-blocks [ add-block ] curry* each ] keep
+    [ dup tetris-current-piece piece-blocks [ add-block ] with each ] keep
     dup new-current-piece dup check-rows score-rows ;
 
 : can-rotate? ( tetris -- ? )

@@ -161,7 +161,7 @@ H{
 
 : method-arg-types ( method -- args )
     dup method_getNumberOfArguments
-    [ method-arg-type parse-objc-type ] curry* map ;
+    [ method-arg-type parse-objc-type ] with map ;
 
 : method-return-type ( method -- ctype )
     #! Undocumented hack! Apple does not support this feature!

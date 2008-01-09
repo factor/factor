@@ -207,7 +207,7 @@ M: word declarations.
         POSTPONE: delimiter
         POSTPONE: inline
         POSTPONE: foldable
-    } [ declaration. ] curry* each ;
+    } [ declaration. ] with each ;
 
 : pprint-; \ ; pprint-word ;
 
@@ -233,7 +233,7 @@ M: mixin-class see-class*
     dup members [
         hard line-break
         \ INSTANCE: pprint-word pprint-word pprint-word
-    ] curry* each block> block> ;
+    ] with each block> block> ;
 
 M: predicate-class see-class*
     <colon \ PREDICATE: pprint-word
@@ -258,7 +258,7 @@ M: builtin-class see-class*
     natural-sort [ nl see ] each ;
 
 : see-implementors ( class -- seq )
-    dup implementors [ 2array ] curry* map ;
+    dup implementors [ 2array ] with map ;
 
 : see-class ( class -- )
     dup class? [

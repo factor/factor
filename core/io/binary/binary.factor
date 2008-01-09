@@ -10,7 +10,7 @@ IN: io.binary
 
 : nth-byte ( x n -- b ) -8 * shift mask-byte ; inline
 
-: >le ( x n -- str ) [ nth-byte ] curry* "" map-as ;
+: >le ( x n -- str ) [ nth-byte ] with "" map-as ;
 : >be ( x n -- str ) >le dup reverse-here ;
 
 : d>w/w ( d -- w1 w2 )

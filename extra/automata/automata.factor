@@ -69,7 +69,7 @@ VARS: width height ;
 
 : center-i ( -- i ) width> 2 / >fixnum ;
 
-: center-line ( -- line ) center-i width> [ = 1 0 ? ] curry* map ;
+: center-line ( -- line ) center-i width> [ = 1 0 ? ] with map ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

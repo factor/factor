@@ -5,7 +5,7 @@ sequences random ;
 IN: temporary
 
 : randomize-numeric-splay-tree ( splay-tree -- )
-    100 [ drop 100 random swap at drop ] curry* each ;
+    100 [ drop 100 random swap at drop ] with each ;
 
 : make-numeric-splay-tree ( n -- splay-tree )
     <splay> [ [ dupd set-at ] curry each ] keep ;

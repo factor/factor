@@ -22,7 +22,7 @@ IN: unicode
     pick [ between? ] [ 3drop f ] if ;
 
 : range ( from to -- seq )
-    1+ over - [ + ] curry* map ;
+    1+ over - [ + ] with map ;
 
 ! Loading data from UnicodeData.txt
 
@@ -33,7 +33,7 @@ IN: unicode
     "extra/unicode/UnicodeData.txt" resource-path data ;
 
 : (process-data) ( index data -- newdata )
-    [ [ nth ] keep first swap 2array ] curry* map
+    [ [ nth ] keep first swap 2array ] with map
     [ second empty? not ] subset
     [ >r hex> r> ] assoc-map ;
 
@@ -44,7 +44,7 @@ IN: unicode
     [
         2dup swap at
         [ (chain-decomposed) ] [ 1array nip ] ?if
-    ] curry* map concat ;
+    ] with map concat ;
 
 : chain-decomposed ( hash -- newhash )
     dup [ swap (chain-decomposed) ] curry assoc-map ;
@@ -157,7 +157,7 @@ load-tables
     category# categories nth ;
 
 : >category-array ( categories -- bitarray )
-    categories [ swap member? ] curry* map >bit-array ;
+    categories [ swap member? ] with map >bit-array ;
 
 : as-string ( strings -- bit-array )
     concat "\"" tuck 3append parse first ;
@@ -416,7 +416,7 @@ SYMBOL: locale ! Just casing locale, or overall?
         swap [ [
             dup hangul? [ hangul>jamo % drop ]
             [ dup rot call [ % ] [ , ] ?if ] if
-        ] curry* each ] "" make*
+        ] with each ] "" make*
         dup reorder
     ] if ; inline
 

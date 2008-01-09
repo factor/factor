@@ -24,7 +24,7 @@ GENERIC: tool-scroller ( tool -- scroller )
 M: gadget tool-scroller drop f ;
 
 : find-tool ( class workspace -- index tool )
-    workspace-book gadget-children [ class eq? ] curry* find ;
+    workspace-book gadget-children [ class eq? ] with find ;
 
 : show-tool ( class workspace -- tool )
     [ find-tool swap ] keep workspace-book gadget-model

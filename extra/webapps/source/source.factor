@@ -10,7 +10,7 @@ IN: webapps.source
 
 : check-source-path ( path -- ? )
     { "vm/" "core/" "extra/" "misc/" }
-    [ head? ] curry* contains? ;
+    [ head? ] with contains? ;
 
 : source-responder ( path mime-type -- )
     drop

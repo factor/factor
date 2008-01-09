@@ -178,7 +178,7 @@ M: editor ungraft*
     \ first-visible-line get [
         editor get dup editor-color gl-color
         dup visible-lines
-        [ draw-line 1 translate-lines ] curry* each
+        [ draw-line 1 translate-lines ] with each
     ] with-editor-translation ;
 
 : selection-start/end ( editor -- start end )

@@ -56,7 +56,7 @@ IN: tools.deploy.shaker
     [
         [ word-props strip-assoc f assoc-like ] keep
         set-word-props
-    ] curry* each ;
+    ] with each ;
 
 : retained-props ( -- seq )
     [

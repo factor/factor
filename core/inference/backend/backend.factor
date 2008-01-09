@@ -18,7 +18,7 @@ IN: inference.backend
     local-recursive-state at ;
 
 : recursive-quotation? ( quot -- ? )
-    local-recursive-state [ first eq? ] curry* contains? ;
+    local-recursive-state [ first eq? ] with contains? ;
 
 TUPLE: inference-error rstate major? ;
 
@@ -318,7 +318,7 @@ TUPLE: unbalanced-branches-error quots in out ;
     ] H{ } make-assoc ; inline
 
 : (infer-branches) ( last branches -- list )
-    [ infer-branch ] curry* map
+    [ infer-branch ] with map
     dup unify-effects unify-dataflow ; inline
 
 : infer-branches ( last branches node -- )

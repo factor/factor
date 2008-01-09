@@ -50,7 +50,7 @@ M: primitive definition drop f ;
     [ pick word-props ?set-at swap set-word-props ]
     [ nip remove-word-prop ] if ;
 
-: reset-props ( word seq -- ) [ remove-word-prop ] curry* each ;
+: reset-props ( word seq -- ) [ remove-word-prop ] with each ;
 
 : lookup ( name vocab -- word ) vocab-words at ;
 

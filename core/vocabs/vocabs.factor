@@ -73,7 +73,7 @@ SYMBOL: load-vocab-hook
 
 : words-named ( str -- seq )
     dictionary get values
-    [ vocab-words at ] curry* map
+    [ vocab-words at ] with map
     [ ] subset ;
 
 : child-vocab? ( prefix name -- ? )
@@ -81,7 +81,7 @@ SYMBOL: load-vocab-hook
     [ 2drop t ] [ swap CHAR: . add head? ] if ;
 
 : child-vocabs ( vocab -- seq )
-    vocab-name vocabs [ child-vocab? ] curry* subset ;
+    vocab-name vocabs [ child-vocab? ] with subset ;
 
 TUPLE: vocab-link name root ;
 

@@ -75,7 +75,7 @@ DEFER: if
 : 3curry ( obj1 obj2 obj3 quot -- curry )
     curry curry curry ; inline
 
-: curry* ( param obj quot -- obj curry )
+: with ( param obj quot -- obj curry )
     swapd [ swapd call ] 2curry ; inline
 
 : compose ( quot1 quot2 -- curry )

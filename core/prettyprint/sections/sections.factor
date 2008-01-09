@@ -173,7 +173,7 @@ M: block section-fits? ( section -- ? )
     swap block-sections [ line-break? not ] subset
     unclip pprint-section [
         dup rot call pprint-section
-    ] curry* each ; inline
+    ] with each ; inline
 
 M: block short-section ( block -- )
     [ advance ] pprint-sections ;
@@ -311,7 +311,7 @@ M: f section-end-group? drop f ;
             2dup 1- swap ?nth prev set
             2dup 1+ swap ?nth next set
             swap nth dup split-before dup , split-after
-        ] curry* each
+        ] with each
     ] { } make { t } split [ empty? not ] subset ;
 
 : break-group? ( seq -- ? )

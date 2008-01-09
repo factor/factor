@@ -421,13 +421,13 @@ PRIVATE>
     ] keep { } like ; inline
 
 : index ( obj seq -- n )
-    [ = ] curry* find drop ;
+    [ = ] with find drop ;
 
 : index* ( obj i seq -- n )
     rot [ = ] curry find* drop ;
 
 : last-index ( obj seq -- n )
-    [ = ] curry* find-last drop ;
+    [ = ] with find-last drop ;
 
 : last-index* ( obj i seq -- n )
     rot [ = ] curry find-last* drop ;
@@ -436,13 +436,13 @@ PRIVATE>
     find drop >boolean ; inline
 
 : member? ( obj seq -- ? )
-    [ = ] curry* contains? ;
+    [ = ] with contains? ;
 
 : memq? ( obj seq -- ? )
-    [ eq? ] curry* contains? ;
+    [ eq? ] with contains? ;
 
 : remove ( obj seq -- newseq )
-    [ = not ] curry* subset ;
+    [ = not ] with subset ;
 
 : cache-nth ( i seq quot -- elt )
     pick pick ?nth dup [
@@ -666,7 +666,7 @@ PRIVATE>
 : flip ( matrix -- newmatrix )
     dup empty? [
         dup [ length ] map infimum
-        [ <column> dup like ] curry* map
+        [ <column> dup like ] with map
     ] unless ;
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
@@ -678,4 +678,4 @@ PRIVATE>
 : sequence-hashcode ( n seq -- x )
     0 -rot [
         hashcode* >fixnum sequence-hashcode-step
-    ] curry* each ; inline
+    ] with each ; inline

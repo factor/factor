@@ -16,4 +16,4 @@ IN: hashtables.lib
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : set-hash-stack ( value key seq -- )
-  dupd [ key? ] curry* find-last nip set-at ;
+  dupd [ key? ] with find-last nip set-at ;

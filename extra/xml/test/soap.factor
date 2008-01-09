@@ -2,7 +2,7 @@ USING: sequences xml kernel arrays xml.utilities io.files tools.test ;
 
 : assemble-data ( tag -- 3array )
     { "URL" "snippet" "title" }
-    [ tag-named children>string ] curry* map ;
+    [ tag-named children>string ] with map ;
 
 : parse-result ( xml -- seq )
     "resultElements" deep-tag-named "item" tags-named

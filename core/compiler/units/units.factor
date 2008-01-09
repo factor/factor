@@ -54,7 +54,7 @@ GENERIC: definitions-changed ( assoc obj -- )
 
 : notify-definition-observers ( assoc -- )
     definition-observers get
-    [ definitions-changed ] curry* each ;
+    [ definitions-changed ] with each ;
 
 : changed-vocabs ( assoc -- vocabs )
     [ drop word? ] assoc-subset

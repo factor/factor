@@ -20,7 +20,7 @@ TAGS>
 
 : parse-modes-tag ( tag -- modes )
     H{ } clone [
-        swap child-tags [ parse-mode-tag ] curry* each
+        swap child-tags [ parse-mode-tag ] with each
     ] keep ;
 
 : load-catalog ( -- modes )
@@ -76,7 +76,7 @@ SYMBOL: rule-sets
         ] [
             3drop
         ] if
-    ] curry* each ;
+    ] with each ;
 
 : finalize-rule-set ( ruleset -- )
     dup rule-set-finalized? {

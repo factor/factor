@@ -19,7 +19,7 @@ IN: tools.deploy.windows
         "factor-nt.dll"
     } [
         dup resource-path -rot path+ copy-file
-    ] curry* each ;
+    ] with each ;
 
 : create-exe-dir ( vocab bundle-name -- vm )
     dup copy-dlls
