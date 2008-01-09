@@ -8,5 +8,3 @@ USING: kernel vocabs vocabs.loader sequences system ;
         "ui.cocoa.tools" require
     ] when
 ] when
-
-macosx? [ "ui.tools.deploy" require ] when

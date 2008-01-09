@@ -1,4 +1,5 @@
-USING: cocoa.types math help.markup help.syntax ;
+USING: math help.markup help.syntax ;
+IN: cocoa.types
 
 HELP: <NSRect>
 { $values { "x" real } { "y" real } { "w" real } { "h" real } { "rect" "an " { $snippet "NSRect" } } }

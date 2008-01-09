@@ -16,7 +16,7 @@ IN: cocoa.messages
 : sender-stub ( method function -- word )
     [ sender-stub-name f <word> dup ] 2keep
     over first large-struct? [ "_stret" append ] when
-    make-sender define-compound dup compile ;
+    make-sender define ;
 
 SYMBOL: message-senders
 SYMBOL: super-message-senders
@@ -196,7 +196,7 @@ H{
 : define-objc-class-word ( name quot -- )
     [
         over , , \ unless-defined , dup , \ objc-class ,
-    ] [ ] make >r "cocoa.classes" create r> define-compound ;
+    ] [ ] make >r "cocoa.classes" create r> define ;
 
 : import-objc-class ( name quot -- )
     2dup unless-defined

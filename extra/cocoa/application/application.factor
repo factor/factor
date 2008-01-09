@@ -5,6 +5,10 @@ cocoa cocoa.classes cocoa.runtime sequences threads debugger
 init inspector kernel.private ;
 IN: cocoa.application
 
+: <NSString> ( str -- alien ) <CFString> -> autorelease ;
+
+: <NSArray> ( seq -- alien ) <CFArray> -> autorelease ;
+
 : NSApplicationDelegateReplySuccess 0 ;
 : NSApplicationDelegateReplyCancel  1 ;
 : NSApplicationDelegateReplyFailure 2 ;

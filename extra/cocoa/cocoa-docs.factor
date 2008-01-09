@@ -1,5 +1,6 @@
-USING: cocoa cocoa.messages help.markup help.syntax strings
+USING: cocoa.messages help.markup help.syntax strings
 alien core-foundation ;
+IN: cocoa
 
 HELP: ->
 { $syntax "-> selector" }
@@ -14,18 +15,6 @@ HELP: SUPER->
 { $code "\"selector\" send-super" } ;
 
 { send super-send POSTPONE: -> POSTPONE: SUPER-> } related-words
-
-HELP: <NSString>
-{ $values { "str" string } { "alien" alien } }
-{ $description "Allocates an autoreleased " { $snippet "CFString" } "." } ;
-
-{ <NSString> <CFString> CF>string } related-words
-
-HELP: <NSArray>
-{ $values { "seq" "a sequence of " { $link alien } " instances" } { "alien" alien } }
-{ $description "Allocates an autoreleased " { $snippet "CFArray" } "." } ;
-
-{ <NSArray> <CFArray> } related-words
 
 ARTICLE: "objc-calling" "Calling Objective C code"
 "Before an Objective C class can be used, it must be imported; by default, a small set of common classes are imported automatically, but additional classes can be imported as needed."
