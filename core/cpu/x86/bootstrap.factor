@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
 cpu.x86.assembler layouts compiler.units math generator.fixup

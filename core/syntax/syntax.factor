@@ -157,7 +157,11 @@ IN: bootstrap.syntax
         [ construct-boa ] curry define-inline
     ] define-syntax
 
-    "FORGET:" [ scan use get assoc-stack forget ] define-syntax
+    "FORGET:" [
+        scan-word
+        dup parsing? [ V{ } clone swap execute first ] when
+        forget
+    ] define-syntax
 
     "(" [
         parse-effect word
