@@ -68,8 +68,8 @@ GENERIC: definitions-changed ( assoc obj -- )
     dup changed-vocabs update ;
 
 : finish-compilation-unit ( -- )
-    changed-definitions notify-definition-observers
-    changed-words get keys recompile-hook get call ;
+    changed-words get keys recompile-hook get call
+    changed-definitions notify-definition-observers ;
 
 : with-compilation-unit ( quot -- )
     [

@@ -3,7 +3,7 @@
 USING: debugger ui.tools.workspace help help.topics kernel
 models ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
-ui.gadgets.buttons compiler.units assocs words ;
+ui.gadgets.buttons compiler.units assocs words vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget pane history ;
@@ -42,9 +42,10 @@ M: browser-gadget ungraft*
     remove-definition-observer ;
 
 : showing-definition? ( defspec assoc -- ? )
-    2dup key? >r
-    >r dup word-link? [ link-name ] when r> key?
-    r> or ;
+    [ key? ] 2keep
+    [ >r dup word-link? [ link-name ] when r> key? ] 2keep
+    >r dup vocab-link? [ vocab ] when r> key?
+    or or ;
 
 M: browser-gadget definitions-changed ( assoc browser -- )
     browser-gadget-history

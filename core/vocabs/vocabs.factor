@@ -85,11 +85,19 @@ SYMBOL: load-vocab-hook
 
 TUPLE: vocab-link name root ;
 
+C: <vocab-link> vocab-link
+
+M: vocab-link equal?
+    over vocab-link?
+    [ [ vocab-link-name ] 2apply = ] [ 2drop f ] if ;
+
+M: vocab-link hashcode*
+    vocab-link-name hashcode* ;
+
 M: vocab-link vocab-name vocab-link-name ;
 
 : >vocab-link ( name root -- vocab )
-    over vocab dup
-    [ 2nip ] [ drop \ vocab-link construct-boa ] if ;
+    over vocab dup [ 2nip ] [ drop <vocab-link> ] if ;
 
 UNION: vocab-spec vocab vocab-link ;
 

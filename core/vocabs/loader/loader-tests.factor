@@ -31,7 +31,7 @@ debugger ;
 [ t ] [
     "kernel" vocab-files
     "kernel" vocab vocab-files
-    "kernel" f \ vocab-link construct-boa vocab-files
+    "kernel" f <vocab-link> vocab-files
     3array all-equal?
 ] unit-test
 
@@ -46,7 +46,7 @@ IN: temporary
 [ { 3 3 3 } ] [
     "vocabs.loader.test.2" run
     "vocabs.loader.test.2" vocab run
-    "vocabs.loader.test.2" f \ vocab-link construct-boa run
+    "vocabs.loader.test.2" f <vocab-link> run
     3array
 ] unit-test
 
@@ -117,7 +117,7 @@ IN: temporary
 [ 3 ] [ "count-me" get-global ] unit-test
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
-[ "kernel" f \ vocab-link construct-boa where ] unit-test
+[ "kernel" f <vocab-link> where ] unit-test
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
 [ "kernel" vocab where ] unit-test
