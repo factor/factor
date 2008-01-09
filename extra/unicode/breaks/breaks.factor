@@ -1,6 +1,6 @@
 USING: unicode kernel math const combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
-;
+math.ranges unicode.normalize unicode.syntax ;
 IN: unicode.breaks
 
 ENUM: Any L V T Extend Control CR LF graphemes ;
@@ -25,7 +25,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 : process-other-extend ( lines -- set )
     [ "#" split1 drop ";" split1 drop trim-blank ] map
     [ empty? not ] subset
-    [ ".." split1 [ dup ] unless* [ hex> ] 2apply range ] map
+    [ ".." split1 [ dup ] unless* [ hex> ] 2apply [a,b] ] map
     concat >set ;
 
 : other-extend-lines ( -- lines )
