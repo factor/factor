@@ -96,12 +96,14 @@ SYMBOL: load-help?
         nip no-vocab
     ] if ;
 
-: reload-vocab ( name -- )
-    dup find-vocab-root dup [
-        swap load-vocab-from-root
-    ] [
-        drop no-vocab
-    ] if ;
+: reload ( name -- )
+    [
+        dup find-vocab-root dup [
+            swap load-vocab-from-root
+        ] [
+            drop no-vocab
+        ] if
+    ] with-compiler-errors ;
 
 : require ( vocab -- )
     load-vocab drop ;
@@ -166,7 +168,7 @@ M: vocab (load-vocab)
     [ swap vocab-name amend-vocab-from-root ] when* ;
 
 M: string (load-vocab)
-    [ ".private" ?tail drop reload-vocab ] keep vocab ;
+    [ ".private" ?tail drop reload ] keep vocab ;
 
 M: vocab-link (load-vocab)
     vocab-name (load-vocab) ;

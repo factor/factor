@@ -19,7 +19,7 @@ $nl
 "While " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " load vocabularies which have not been loaded before adding them to the search path, it is also possible to load a vocabulary without adding it to the search path:"
 { $subsection require }
 "Forcing a reload of a vocabulary, even if it has already been loaded:"
-{ $subsection reload-vocab }
+{ $subsection reload }
 "Application vocabularies can define a main entry point, giving the user a convenient way to run the application:"
 { $subsection POSTPONE: MAIN: }
 { $subsection run }
@@ -94,7 +94,7 @@ HELP: load-vocab-from-root
 { $values { "root" "a pathname string" } { "name" "a vocabulary name" } }
 { $description "Loads a vocabulary's source code and documentation." } ;
 
-HELP: reload-vocab
+HELP: reload
 { $values { "name" "a vocabulary name" } }
 { $description "Loads it's source code and documentation." }
 { $errors "Throws a " { $link no-vocab } " error if the vocabulary does not exist on disk." } ;
@@ -102,7 +102,7 @@ HELP: reload-vocab
 HELP: require
 { $values { "vocab" "a vocabulary specifier" } }
 { $description "Loads a vocabulary if it has not already been loaded." }
-{ $notes "To unconditionally reload a vocabulary, use " { $link reload-vocab } ". To reload changed source files, use " { $link refresh } " or " { $link refresh-all } "." } ;
+{ $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files, use " { $link refresh } " or " { $link refresh-all } "." } ;
 
 HELP: run
 { $values { "vocab" "a vocabulary specifier" } }
