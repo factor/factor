@@ -106,4 +106,4 @@ big-endian on
 
 [ BLR ] f f f jit-return jit-define
 
-"bootstrap.ppc" forget-vocab
+[ "bootstrap.ppc" forget-vocab ] with-compilation-unit

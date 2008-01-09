@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler io kernel cocoa.runtime cocoa.subclassing
 cocoa.messages cocoa.types sequences words vocabs parser
-core-foundation namespaces assocs hashtables definitions ;
+core-foundation namespaces assocs hashtables compiler.units ;
 IN: cocoa
 
 : (remember-send) ( selector variable -- )

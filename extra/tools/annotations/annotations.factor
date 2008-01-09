@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words parser io inspector quotations sequences
-prettyprint continuations effects definitions ;
+prettyprint continuations effects definitions compiler.units ;
 IN: tools.annotations
 
 : reset ( word -- )

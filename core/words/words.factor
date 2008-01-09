@@ -90,6 +90,18 @@ M: word uses ( word -- seq )
 M: word redefined* ( word -- )
     { "inferred-effect" "base-case" "no-effect" } reset-props ;
 
+SYMBOL: changed-words
+
+TUPLE: no-compilation-unit word ;
+
+: no-compilation-unit ( word -- * )
+    \ no-compilation-unit construct-boa throw ;
+
+: changed-word ( word -- )
+    dup changed-words get
+    [ no-compilation-unit ] unless*
+    set-at ;
+
 : define ( word def -- )
     [ ] like
     over unxref
@@ -192,7 +204,3 @@ M: word literalize <wrapper> ;
 : ?word-name dup word? [ word-name ] when ;
 
 : xref-words ( -- ) all-words [ xref ] each ;
-
-recompile-hook global
-[ [ [ f ] { } map>assoc modify-code-heap ] or ]
-change-at

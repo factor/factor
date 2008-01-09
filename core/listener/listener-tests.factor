@@ -1,5 +1,6 @@
 USING: io io.streams.string io.streams.duplex listener
-tools.test parser math namespaces continuations vocabs kernel ;
+tools.test parser math namespaces continuations vocabs kernel
+compiler.units ;
 IN: temporary
 
 : hello "Hi" print ; parsing
@@ -28,7 +29,9 @@ IN: temporary
 ] with-file-vocabs
 
 [ ] [
-    "vocabs.loader.test.c" forget-vocab
+    [
+        "vocabs.loader.test.c" forget-vocab
+    ] with-compilation-unit
 ] unit-test
 
 [
@@ -36,7 +39,9 @@ IN: temporary
 ] unit-test-fails
 
 [ ] [
-    "vocabs.loader.test.c" forget-vocab
+    [
+        "vocabs.loader.test.c" forget-vocab
+    ] with-compilation-unit
 ] unit-test
 
 [ ] [

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax vocabs.loader io.files strings
-definitions quotations ;
+definitions quotations compiler.units ;
 IN: source-files
 
 ARTICLE: "source-files" "Source files"

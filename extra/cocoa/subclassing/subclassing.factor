@@ -1,8 +1,8 @@
-! Copyright (C) 2006, 2007 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays assocs combinators compiler
 hashtables kernel libc math namespaces parser sequences words
-cocoa.messages cocoa.runtime definitions ;
+cocoa.messages cocoa.runtime compiler.units ;
 IN: cocoa.subclassing
 
 : init-method ( method alien -- )

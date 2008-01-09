@@ -1,6 +1,6 @@
 USING: definitions help.markup help.syntax kernel
 kernel.private parser words.private vocabs classes quotations
-strings effects ;
+strings effects compiler.units ;
 IN: words
 
 ARTICLE: "interned-words" "Looking up and creating words"
@@ -165,9 +165,7 @@ ARTICLE: "word.private" "Word implementation details"
 { $subsection word-def }
 { $subsection set-word-def }
 "An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
-{ $subsection word-xt }
-"Low-level compiler interface exported by the Factor VM:"
-{ $subsection modify-code-heap } ;
+{ $subsection word-xt } ;
 
 ARTICLE: "words" "Words"
 "Words are the Factor equivalent of functions or procedures; a word is essentially a named quotation."
@@ -402,12 +400,3 @@ HELP: define-inline
 { $values { "word" word } { "quot" quotation } }
 { $description "Defines a word and makes it " { $link POSTPONE: inline } "." }
 { $side-effects "word" } ;
-
-HELP: modify-code-heap ( alist -- )
-{ $values { "alist" "an alist" } }
-{ $description "Stores compiled code definitions in the code heap. The alist maps words to the following:"
-{ $list
-    { { $link f } " - in this case, the word is compiled with the non-optimizing compiler part of the VM." }
-    { { $snippet "{ code labels rel words literals }" } " - in this case, a code heap block is allocated with the given data." }
-} }
-{ $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;

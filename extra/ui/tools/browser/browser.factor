@@ -1,9 +1,9 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: debugger ui.tools.workspace help help.topics kernel
 models ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
-ui.gadgets.buttons ;
+ui.gadgets.buttons compiler.units assocs words ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget pane history ;
@@ -17,7 +17,7 @@ TUPLE: browser-gadget pane history ;
     [ [ dup help ] try drop ] <pane-control> ;
 
 : init-history ( browser-gadget -- )
-    "handbook" <history>
+    "handbook" >link <history>
     swap set-browser-gadget-history ;
 
 : <browser-gadget> ( -- gadget )
@@ -32,6 +32,24 @@ M: browser-gadget call-tool* show-help ;
 
 M: browser-gadget tool-scroller
     browser-gadget-pane find-scroller ;
+
+M: browser-gadget graft*
+    dup add-definition-observer
+    delegate graft* ;
+
+M: browser-gadget ungraft*
+    dup delegate ungraft*
+    remove-definition-observer ;
+
+: showing-definition? ( defspec assoc -- ? )
+    2dup key? >r
+    >r dup word-link? [ link-name ] when r> key?
+    r> or ;
+
+M: browser-gadget definitions-changed ( assoc browser -- )
+    browser-gadget-history
+    dup model-value rot showing-definition?
+    [ notify-connections ] [ drop ] if ;
 
 : help-action ( browser-gadget -- link )
     browser-gadget-history model-value >link ;
