@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
-cpu.ppc.assembler generator.fixup compiler.constants math
-layouts words vocabs ;
+cpu.ppc.assembler generator.fixup compiler.units
+compiler.constants math layouts words vocabs ;
 IN: bootstrap.ppc
 
 4 \ cell set

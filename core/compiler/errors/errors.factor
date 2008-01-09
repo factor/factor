@@ -10,7 +10,8 @@ SYMBOL: with-compiler-errors?
 
 : compiler-error ( error word -- )
     with-compiler-errors? get [
-        compiler-errors get set-at
+        compiler-errors get pick
+        [ set-at ] [ delete-at drop ] if
     ] [ 2drop ] if ;
 
 : compiler-error. ( error word -- )
