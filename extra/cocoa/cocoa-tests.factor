@@ -12,8 +12,6 @@ CLASS: {
     [ data-gc "x" set 2drop ]
 } ;
 
-recompile
-
 : test-foo
     Foo -> alloc -> init
     dup 1.0 2.0 101.0 102.0 <NSRect> -> foo:
@@ -36,13 +34,11 @@ CLASS: {
     [ 2drop test-foo "x" get ]
 } ;
 
-recompile
-
 Bar [
     -> alloc -> init
     dup -> bar "x" set
     -> release
-] compile-1
+] compile-call
 
 [ 1 ] [ "x" get NSRect-x ] unit-test
 [ 2 ] [ "x" get NSRect-y ] unit-test

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler io kernel cocoa.runtime cocoa.subclassing
 cocoa.messages cocoa.types sequences words vocabs parser
-core-foundation namespaces assocs hashtables ;
+core-foundation namespaces assocs hashtables definitions ;
 IN: cocoa
 
 : (remember-send) ( selector variable -- )
@@ -32,37 +32,36 @@ SYMBOL: super-sent-messages
 
 {
     "cocoa" "cocoa.runtime" "cocoa.messages" "cocoa.subclassing"
-} [ words ] map concat compile-batch
+} [ words ] map concat compile
 
 "Importing Cocoa classes..." print
-{
-    "NSApplication"
-    "NSArray"
-    "NSAutoreleasePool"
-    "NSBundle"
-    "NSError"
-    "NSEvent"
-    "NSException"
-    "NSMenu"
-    "NSMenuItem"
-    "NSNib"
-    "NSNotification"
-    "NSNotificationCenter"
-    "NSObject"
-    "NSOpenGLContext"
-    "NSOpenGLPixelFormat"
-    "NSOpenGLView"
-    "NSOpenPanel"
-    "NSPasteboard"
-    "NSResponder"
-    "NSSavePanel"
-    "NSView"
-    "NSWindow"
-    "NSWorkspace"
-} [
-    [ ] import-objc-class
-] each
 
-: <NSString> ( str -- alien ) <CFString> -> autorelease ;
-
-: <NSArray> ( seq -- alien ) <CFArray> -> autorelease ;
+[
+    {
+        "NSApplication"
+        "NSArray"
+        "NSAutoreleasePool"
+        "NSBundle"
+        "NSError"
+        "NSEvent"
+        "NSException"
+        "NSMenu"
+        "NSMenuItem"
+        "NSNib"
+        "NSNotification"
+        "NSNotificationCenter"
+        "NSObject"
+        "NSOpenGLContext"
+        "NSOpenGLPixelFormat"
+        "NSOpenGLView"
+        "NSOpenPanel"
+        "NSPasteboard"
+        "NSResponder"
+        "NSSavePanel"
+        "NSView"
+        "NSWindow"
+        "NSWorkspace"
+    } [
+        [ ] import-objc-class
+    ] each
+] with-compilation-unit

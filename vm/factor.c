@@ -44,7 +44,7 @@ void do_stage1_init(void)
 		if(type_of(obj) == WORD_TYPE)
 		{
 			F_WORD *word = untag_object(obj);
-			default_word_code(word);
+			default_word_code(word,false);
 			update_word_xt(word);
 		}
 	}

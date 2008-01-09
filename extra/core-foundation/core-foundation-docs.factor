@@ -1,5 +1,5 @@
-USING: core-foundation alien strings arrays help.markup
-help.syntax ;
+USING: alien strings arrays help.markup help.syntax ;
+IN: core-foundation
 
 HELP: CF>array
 { $values { "alien" "a " { $snippet "CFArray" } } { "array" "an array of " { $link alien } " instances" } }

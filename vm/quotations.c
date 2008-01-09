@@ -52,7 +52,7 @@ F_REL rel_to_emit(CELL name, CELL code_format, CELL code_length,
 		rel.type = to_fixnum(rel_type)
 			| (to_fixnum(rel_class) << 8)
 			| (rel_argument << 16);
-		rel.offset = code_length * code_format + to_fixnum(offset);
+		rel.offset = (code_length + to_fixnum(offset)) * code_format;
 	}
 
 	return rel;
@@ -95,7 +95,7 @@ void set_quot_xt(F_QUOTATION *quot, F_COMPILED *code)
 }
 
 /* Might GC */
-void jit_compile(CELL quot)
+void jit_compile(CELL quot, bool relocate)
 {
 	if(untag_quotation(quot)->compiledp != F)
 		return;
@@ -230,11 +230,10 @@ void jit_compile(CELL quot)
 		untag_object(words),
 		untag_object(literals));
 
-	/* We must do this before relocate_code_block(), so that
-	relocation knows the quotation's XT. */
 	set_quot_xt(untag_object(quot),compiled);
 
-	iterate_code_heap_step(compiled,relocate_code_block);
+	if(relocate)
+		iterate_code_heap_step(compiled,relocate_code_block);
 
 	UNREGISTER_ROOT(words);
 	UNREGISTER_ROOT(literals);
@@ -352,7 +351,7 @@ F_FASTCALL CELL primitive_jit_compile(CELL quot, F_STACK_FRAME *stack)
 {
 	stack_chain->callstack_top = stack;
 	REGISTER_ROOT(quot);
-	jit_compile(quot);
+	jit_compile(quot,true);
 	UNREGISTER_ROOT(quot);
 	return quot;
 }

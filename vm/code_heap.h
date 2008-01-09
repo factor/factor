@@ -56,7 +56,7 @@ typedef struct {
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end);
 
-void default_word_code(F_WORD *word);
+void default_word_code(F_WORD *word, bool relocate);
 
 void set_word_code(F_WORD *word, F_COMPILED *compiled);
 

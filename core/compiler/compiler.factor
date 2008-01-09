@@ -57,7 +57,7 @@ compiled-crossref global [ H{ } assoc-like ] change-at
     ] computing-dependencies ;
 
 : compile-failed ( word error -- )
-    dup inference-error? [ rethrow ] unless
+    ! dup inference-error? [ rethrow ] unless
     f pick compiled get set-at
     swap compiler-error ;
 

@@ -1,4 +1,5 @@
-USING: cocoa.pasteboard help.markup help.syntax strings ;
+USING: help.markup help.syntax strings ;
+IN: cocoa.pasteboard
 
 HELP: pasteboard-string?
 { $values { "pasteboard" "an " { $snippet "NSPasteBoard" } } { "?" "a boolean" } }
