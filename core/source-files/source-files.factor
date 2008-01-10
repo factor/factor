@@ -33,8 +33,8 @@ uses definitions ;
     dup source-file-path ?resource-path file-modified
     swap set-source-file-modified ;
 
-: record-checksum ( source-file lines -- )
-    lines-crc32 swap set-source-file-checksum ;
+: record-checksum ( lines source-file -- )
+    swap lines-crc32 swap set-source-file-checksum ;
 
 : (xref-source) ( source-file -- pathname uses )
     dup source-file-path <pathname> swap source-file-uses

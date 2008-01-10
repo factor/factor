@@ -399,18 +399,6 @@ SYMBOL: bootstrap-syntax
         "Loading " write <pathname> . flush
     ] if ;
 
-: no-parse-hook ( quot -- )
-    >r f parse-hook r> with-variable do-parse-hook ; inline
-
-: start-parsing ( stream name -- )
-    H{ } clone new-definitions set
-    dup [
-        source-file
-        dup file set
-        source-file-definitions clone old-definitions set
-    ] [ drop ] if
-    lines \ lines set ;
-
 : smudged-usage-warning ( usages removed -- )
     parser-notes? [
         "Warning: the following definitions were removed from sources," print
