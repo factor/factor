@@ -1,6 +1,6 @@
 USING: compiler definitions generic assocs inference math
 namespaces parser tools.test words kernel sequences arrays io
-effects tools.test.inference words.private ;
+effects tools.test.inference compiler.units ;
 IN: temporary
 
 DEFER: x-1
@@ -173,3 +173,15 @@ DEFER: hints-test-2
 [ ] [ "IN: temporary USE: math : hints-test-1 5 + ;" eval ] unit-test
 
 [ 10 ] [ hints-test-2 ] unit-test
+
+DEFER: inline-then-not-inline-test-2
+
+[ ] [ "IN: temporary : inline-then-not-inline-test-1 1 2 3 ; inline" eval ] unit-test
+
+[ ] [ "IN: temporary : inline-then-not-inline-test-2 inline-then-not-inline-test-1 ;" eval ] unit-test
+
+[ 1 2 3 ] [ inline-then-not-inline-test-2 ] unit-test
+
+[ ] [ "IN: temporary : inline-then-not-inline-test-1 6 9 ;" eval ] unit-test
+
+[ 6 9 ] [ inline-then-not-inline-test-2 ] unit-test

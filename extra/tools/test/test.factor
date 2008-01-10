@@ -1,9 +1,9 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces arrays prettyprint sequences kernel
 vectors quotations words parser assocs combinators
 continuations debugger io io.files vocabs tools.time
-vocabs.loader source-files ;
+vocabs.loader source-files compiler.units ;
 IN: tools.test
 
 SYMBOL: failures
@@ -35,14 +35,15 @@ TUPLE: expected-error ;
     [ t ] swap unit-test ;
 
 : run-test ( path -- failures )
-    "temporary" forget-vocab
+    [ "temporary" forget-vocab ] with-compilation-unit
     [
         V{ } clone [
             failures [
                 [ run-file ] [ swap failure ] recover
             ] with-variable
         ] keep
-    ] keep forget-source ;
+    ] keep
+    [ forget-source ] with-compilation-unit ;
 
 : failure. ( triple -- )
     dup second .

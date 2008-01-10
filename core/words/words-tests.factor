@@ -1,6 +1,6 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
-vocabs continuations tuples ;
+vocabs continuations tuples compiler.units ;
 IN: temporary
 
 [ 4 ] [

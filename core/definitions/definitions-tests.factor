@@ -1,5 +1,6 @@
 IN: temporary
-USING: tools.test generic kernel definitions sequences ;
+USING: tools.test generic kernel definitions sequences
+compiler.units ;
 
 TUPLE: combination-1 ;
 

@@ -2,7 +2,7 @@
 IN: temporary
 USING: compiler generator generator.registers
 generator.registers.private tools.test namespaces sequences
-words kernel math effects definitions ;
+words kernel math effects definitions compiler.units ;
 
 : <int-vreg> ( n -- vreg ) T{ int-regs } <vreg> ;
 

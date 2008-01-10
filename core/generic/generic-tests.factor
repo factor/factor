@@ -1,7 +1,8 @@
 USING: alien arrays definitions generic generic.standard
 generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
-quotations classes continuations layouts classes.union sorting ;
+quotations classes continuations layouts classes.union sorting
+compiler.units ;
 IN: temporary
 
 GENERIC: foobar ( x -- y )
