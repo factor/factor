@@ -12,14 +12,11 @@ USING: alien alien.syntax combinators system ;
 
 IN: cairo
 
-: load-cairo-library ( -- )
-  "cairo" {
+<< "cairo" {
 	{ [ win32? ] [ "cairo.dll" ] }
 	{ [ macosx? ] [ "libcairo.dylib" ] }
 	{ [ unix? ] [ "libcairo.so.2" ] }
-  } cond "cdecl" add-library ; parsing
-
-load-cairo-library
+  } cond "cdecl" add-library >>
 
 ! cairo_status_t
 C-ENUM:
