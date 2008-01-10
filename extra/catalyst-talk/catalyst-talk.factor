@@ -34,17 +34,6 @@ IN: catalyst-talk
         "For CLOS buffs: we allow custom method combination, classes are objects too, there's a MOP"
     }
     
-: (strip-tease) ( data n -- data )
-    >r first3 r> head 3array ;
-
-: strip-tease ( data -- seq )
-    dup third length 1 - [
-        2 + (strip-tease)
-    ] with map ;
-
-: STRIP-TEASE:
-    parse-definition strip-tease [ parsed ] each ; parsing
-
     STRIP-TEASE:
         $slide "Primary school geometry recap"
         { $code
