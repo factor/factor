@@ -1,6 +1,6 @@
 USING: parser kernel math sequences namespaces assocs inspector
 words splitting math.parser arrays sequences.next mirrors
-shuffle ;
+shuffle compiler.units ;
 IN: bitfields
 
 ! Example:
@@ -51,7 +51,7 @@ M: check< summary drop "Number exceeds upper bound" ;
 : define-constructor ( classname slots -- )
     [ keys ] keep values [constructor]
     >r in get constructor-word dup save-location r>
-    define-compound ;
+    define ;
 
 : range>accessor ( range -- quot )
     [
@@ -81,7 +81,7 @@ M: check< summary drop "Number exceeds upper bound" ;
 
 : define-slots ( prefix names quots -- )
     >r [ "-" swap 3append create-in ] with map r>
-    [ define-compound ] 2each ;
+    [ define ] 2each ;
 
 : define-accessors ( classname slots -- )
     dup values [accessors]
@@ -96,8 +96,10 @@ M: check< summary drop "Number exceeds upper bound" ;
     [ drop padding-name? not ] assoc-subset ;
 
 : define-bitfield ( classname slots -- ) 
-    [ define-constructor ] 2keep
-    >ranges filter-pad [ define-setters ] 2keep define-accessors ;
+    [
+        [ define-constructor ] 2keep
+        >ranges filter-pad [ define-setters ] 2keep define-accessors
+    ] with-compilation-unit ;
 
 : parse-bitfield 
     scan ";" parse-tokens parse-slots define-bitfield ;
