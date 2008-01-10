@@ -166,3 +166,6 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
     [ construct-empty ] curry swap [
         [ dip ] curry swap 1quotation [ keep ] curry compose
     ] { } assoc>map concat compose ;
+
+: either ( object first second -- ? )
+    >r over slip swap [ r> drop ] [ r> call ] ?if ; inline
