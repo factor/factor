@@ -1,6 +1,6 @@
 USING: assocs math kernel sequences io.files hashtables quotations
 splitting arrays math.parser combinators.lib hash2 byte-arrays words
-namespaces ;
+namespaces words ;
 IN: unicode.data
 
 ! Convenience functions
@@ -8,15 +8,10 @@ IN: unicode.data
     drop [ 1+ ] [ 0 ] if* ;
 
 : define-value ( value word -- )
-    swap 1quotation define-compound ;
+    swap 1quotation define ;
 
 : ?between? ( n/f from to -- ? )
     pick [ between? ] [ 3drop f ] if ;
-
-! Remove this soon
-USE: parser
-DEFER: >>
-: << \ >> parse-until >quotation call ; parsing
 
 ! Loading data from UnicodeData.txt
 
@@ -27,7 +22,7 @@ DEFER: >>
     "extra/unicode/UnicodeData.txt" resource-path data ;
 
 : (process-data) ( index data -- newdata )
-    [ [ nth ] keep first swap 2array ] curry* map
+    [ [ nth ] keep first swap 2array ] with map
     [ second empty? not ] subset
     [ >r hex> r> ] assoc-map ;
 
@@ -38,7 +33,7 @@ DEFER: >>
     [
         2dup swap at
         [ (chain-decomposed) ] [ 1array nip ] ?if
-    ] curry* map concat ;
+    ] with map concat ;
 
 : chain-decomposed ( hash -- newhash )
     dup [ swap (chain-decomposed) ] curry assoc-map ;

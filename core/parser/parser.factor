@@ -399,7 +399,6 @@ SYMBOL: bootstrap-syntax
         "Loading " write <pathname> . flush
     ] if ;
 
-<<<<<<< HEAD:core/parser/parser.factor
 : no-parse-hook ( quot -- )
     >r f parse-hook r> with-variable do-parse-hook ; inline
 
