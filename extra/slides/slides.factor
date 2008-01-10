@@ -1,7 +1,6 @@
 USING: arrays hashtables help.markup help.stylesheet io
 io.styles kernel math models namespaces sequences ui ui.gadgets
-ui.gadgets.books ui.gadgets.panes
-ui.gestures ui.render ;
+ui.gadgets.books ui.gadgets.panes ui.gestures ui.render ;
 IN: slides
 
 : stylesheet
@@ -80,6 +79,17 @@ TUPLE: slides ;
 : next-page ( book -- ) 1 change-page ;
 
 : prev-page ( book -- ) -1 change-page ;
+
+: (strip-tease) ( data n -- data )
+    >r first3 r> head 3array ;
+
+: strip-tease ( data -- seq )
+    dup third length 1 - [
+        2 + (strip-tease)
+    ] with map ;
+
+: STRIP-TEASE:
+    parse-definition strip-tease [ parsed ] each ; parsing
 
 \ slides H{
     { T{ key-down f f "DOWN" } [ next-page ] }
