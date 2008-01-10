@@ -1,6 +1,7 @@
 USING: arrays hashtables help.markup help.stylesheet io
 io.styles kernel math models namespaces sequences ui ui.gadgets
-ui.gadgets.books ui.gadgets.panes ui.gestures ui.render ;
+ui.gadgets.books ui.gadgets.panes ui.gestures ui.render
+parser ;
 IN: slides
 
 : stylesheet
