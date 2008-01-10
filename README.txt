@@ -15,6 +15,7 @@ implementation. It is not an introduction to the language itself.
 - Running Factor on Mac OS X - X11 UI
 - Running Factor on Windows
 - Command line usage
+- The Factor FAQ
 - Source organization
 - Community
 
@@ -159,6 +160,10 @@ Once bootstrapped, double-clicking factor.exe starts the Factor UI.
 To run the listener in the command prompt:
 
   factor-nt.exe -run=listener
+
+* The Factor FAQ
+
+The Factor FAQ lives online at http://factorcode.org/faq.fhtml
 
 * Command line usage
 
