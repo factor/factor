@@ -1,4 +1,5 @@
-USING: help.markup help.syntax hexdump kernel ;
+USING: help.markup help.syntax kernel ;
+IN: hexdump
 
 HELP: hexdump.
 { $values { "seq" "a sequence" } }
