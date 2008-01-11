@@ -190,4 +190,4 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
     ] { } assoc>map concat compose ;
 
 : either ( object first second -- ? )
-    >r over slip swap [ r> drop ] [ r> call ] ?if ; inline
+    >r keep swap [ r> drop ] [ r> call ] ?if ; inline
