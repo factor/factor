@@ -4,7 +4,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: io kernel namespaces prettyprint quotations
-sequences strings words xml.writer ;
+sequences strings words xml.writer compiler.units ;
 
 IN: html.elements
 
@@ -60,7 +60,9 @@ SYMBOL: html
 : html-word ( name def -- )
     #! Define 'word creating' word to allow
     #! dynamically creating words.
-    >r elements-vocab create r> define-compound ;
+    [
+        >r elements-vocab create r> define
+    ] with-compilation-unit ;
  
 : <foo> "<" swap ">" 3append ;
 
