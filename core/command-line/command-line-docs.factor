@@ -4,7 +4,7 @@ IN: command-line
 ARTICLE: "runtime-cli-args" "Command line switches for the VM"
 "A handful of command line switches are processed by the VM and not the library. They control low-level features."
 { $table
-    { { $snippet "-i=" { $emphasis "image" } } "Specifies the image file to use" }
+    { { $snippet "-i=" { $emphasis "image" } } { "Specifies the image file to use; see " { $link "images" } } }
     { { $snippet "-datastack=" { $emphasis "n" } } "Data stack size, kilobytes" }
     { { $snippet "-retainstack=" { $emphasis "n" } } "Retain stack size, kilobytes" }
     { { $snippet "-generations=" { $emphasis "n" } } "Number of generations, must be >= 2" }

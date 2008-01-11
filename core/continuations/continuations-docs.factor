@@ -3,7 +3,7 @@ continuations.private parser vectors arrays namespaces
 threads assocs words quotations ;
 IN: continuations
 
-ARTICLE: "errors-restartable" "Restartable error handling"
+ARTICLE: "errors-restartable" "Restartable errors"
 "Support for restartable errors is built on top of the basic error handling facility. The following words signals recoverable errors:"
 { $subsection throw-restarts }
 { $subsection rethrow-restarts }

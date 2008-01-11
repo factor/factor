@@ -1,5 +1,6 @@
 USING: help.markup help.syntax io kernel math namespaces parser
 prettyprint sequences vocabs.loader namespaces inference ;
+IN: help.cookbook
 
 ARTICLE: "cookbook-syntax" "Basic syntax cookbook"
 "The following is a simple snippet of Factor code:"
@@ -176,16 +177,7 @@ $nl
     "parser"
 } ;
 
-ARTICLE: "cookbook-sources" "Source file cookbook"
-"By convention, code  is stored in files with the " { $snippet ".factor" } " filename extension. You can load source files using " { $link run-file } ":"
-{ $code "\"hello.factor\" run-file" }
-{ $references
-    "Programs larger than one source file or programs which depend on other libraries should be loaded via the vocabulary system instead. Advanced functionality can be implemented by calling the parser and source reader at run time."
-    "parser-files"
-    "vocabs.loader"
-} ;
-
-ARTICLE: "cookbook-io" "I/O cookbook"
+ARTICLE: "cookbook-io" "Input and output cookbook"
 "Ask the user for their age, and print it back:"
 { $code
     ": ask-age ( -- ) \"How old are you?\" print ;"
@@ -205,6 +197,12 @@ ARTICLE: "cookbook-io" "I/O cookbook"
 { $code
     "\"data.bin\" <file-reader> [ 1024 read ] with-stream"
 }
+"Convert a file of 4-byte cells from little to big endian or vice versa, by directly mapping it into memory:"
+{ $code
+    "\"mydata.dat\" dup file-length ["
+    "    4 <sliced-groups> [ reverse-here ] change-each"
+    "] with-mapped-file"
+}
 "Send some bytes to a remote host:"
 { $code
     "\"myhost\" 1033 <inet> <client>"
@@ -214,6 +212,58 @@ ARTICLE: "cookbook-io" "I/O cookbook"
     { }
     "number-strings"
     "io"
+} ;
+
+ARTICLE: "cookbook-compiler" "Compiler cookbook"
+"Factor includes two compilers which work behind the scenes. Words are always compiled, and the compilers do not have to be invoked explicitly. For the most part, compilation is a fully transparent process. However, there are a few things worth knowing about the compilation process."
+$nl
+"The optimizing compiler trades off compile time for performance of generated code, so loading certain vocabularies might take a while. Saving the image after loading vocabularies can save you a lot of time that you would spend waiting for the same code to load in every coding session; see " { $link "images" } " for information."
+$nl
+"After loading a vocabulary, you might see messages like:"
+{ $code
+    ":errors - print 2 compiler errors."
+    ":warnings - print 50 compiler warnings."
+}
+"These warnings arise from the compiler's stack effect checker. Warnings are non-fatal conditions -- not all code has a static stack effect, so you try to minimize warnings but understand that in many cases they cannot be eliminated. Errors indicate programming mistakes, such as erronous stack effect declarations."
+{ $references
+    "To learn more about the compiler and static stack effect inference, read these articles:"
+    "compiler"
+    "compiler-errors"
+    "inference"
+} ;
+
+ARTICLE: "cookbook-application" "Application cookbook"
+"Vocabularies can define a main entry point:"
+{ $code "IN: game-of-life"
+"..."
+": play-life ... ;"
+""
+"MAIN: play-life"
+}
+"See " { $link POSTPONE: MAIN: } " for details. The " { $link run } " word loads a vocabulary if necessary, and calls its main entry point; try the following, it's fun:"
+{ $code "\"tetris\" run" }
+"On Mac OS X and Windows, stand-alone applications can also be deployed; these are genuine, 100% native code double-clickable executables:"
+{ $code "\"tetris\" deploy-tool" }
+{ $references
+    { }
+    "vocabs.loader"
+    "tools.deploy"
+    "ui.tools.deploy"
+    "cookbook-scripts"
+} ;
+
+ARTICLE: "cookbook-scripts" "Scripting cookbook"
+"Factor can be used for command-line scripting on Unix-like systems."
+$nl
+"A text file can begin with a comment like the following, and made executable:"
+{ $code "#! /usr/bin/env factor -script" }
+"Running the text file will run it through Factor, assuming the " { $snippet "factor" } " binary is in your " { $snippet "$PATH" } "."
+$nl
+"The space between " { $snippet "#!" } " and " { $snippet "/usr/bin/env" } " is necessary, since " { $link POSTPONE: #! } " is a parsing word, and a syntax error would otherwise result. The " { $snippet "-script" } " switch supresses compiler messages, and exits Factor when the script finishes."
+{ $references
+    { }
+    "cli"
+    "cookbook-application"
 } ;
 
 ARTICLE: "cookbook-philosophy" "Factor philosophy"
@@ -251,28 +301,17 @@ ARTICLE: "cookbook-pitfalls" "Pitfalls to avoid"
 } ;
 
 ARTICLE: "cookbook" "Factor cookbook"
-{ $list
-    { "Factor is a dynamically-typed, stack-based language." }
-    { { $link .s } " prints the contents of the stack." }
-    { { $link . } " prints the object at the top of the stack." }
-    { { "You can load vocabularies from " { $snippet "core/" } ", " { $snippet "extra/" } " or " { $snippet "work/" } " with " { $link require } ":" }
-    { $code "\"http.server\" require" } }
-    { { "Some vocabularies have a defined main entry point, and can be run just like applications in an operating system:" }
-        { $code "\"tetris\" run" }
-    }
-    { "Make sure to browse the " { $link "vocab-index" } "." }
-    
-    { "You can load source files with " { $link run-file } ":"
-    { $code "\"my-program.factor\" run-file" }
-    "However, the vocabulary system should be used instead of loading source files directly; it provides automatic code organization and dependency management." }
-    { "If you are reading this from the Factor UI, take a look at " { $link "ui-tools" } "." }
-}
+"The Factor cookbook is a high-level overview of the most important concepts required to program in Factor."
 { $subsection "cookbook-syntax" }
 { $subsection "cookbook-colon-defs" }
 { $subsection "cookbook-combinators" }
 { $subsection "cookbook-variables" }
 { $subsection "cookbook-vocabs" }
-{ $subsection "cookbook-sources" }
 { $subsection "cookbook-io" }
+{ $subsection "cookbook-application" }
+{ $subsection "cookbook-scripts" }
+{ $subsection "cookbook-compiler" }
 { $subsection "cookbook-philosophy" }
 { $subsection "cookbook-pitfalls" } ;
+
+ABOUT: "cookbook"
