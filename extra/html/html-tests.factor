@@ -54,10 +54,16 @@ M: funky browser-link-href
     ] make-html-string
 ] unit-test
 
-[ "<div style='background-color: #ff00ff; '>cdr</div>" ]
+[ "<div style='background-color: #ff00ff; white-space: pre; font-family: monospace; '>cdr</div>" ]
 [
     [
         H{ { page-color { 1 0 1 1 } } }
         [ "cdr" write ] with-nesting
     ] make-html-string
+] unit-test
+
+[
+    "<div style='white-space: pre; font-family: monospace; '></div>"
+] [
+    [ H{ } [ ] with-nesting nl ] make-html-string
 ] unit-test
