@@ -55,7 +55,7 @@ SYMBOL: validation-errors
         ] [
             nip
         ] if*
-    ] curry* map ;
+    ] with map ;
 
 : expire-sessions ( -- )
     sessions get-global

@@ -68,7 +68,7 @@ M: mixin-instance definer drop \ INSTANCE: f ;
 
 M: mixin-instance definition drop f ;
 
-M: mixin-instance forget
+M: mixin-instance forget*
     dup mixin-instance-class
     swap mixin-instance-mixin dup mixin-class?
     [ remove-mixin-instance ] [ 2drop ] if ;

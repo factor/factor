@@ -109,7 +109,7 @@ RULE: SEQ_REGEXP seq-rule
 : parse-begin/end-tags
     [
         ! XXX: handle position attrs on span tag itself
-        child-tags [ parse-begin/end-tag ] curry* each
+        child-tags [ parse-begin/end-tag ] with each
     ] , ;
 
 : init-span-tag [ drop init-span ] , ;
@@ -161,7 +161,7 @@ TAGS>
 : parse-rules-tag ( tag -- rule-set )
     dup (parse-rules-tag) [
         dup rule-set-ignore-case? ignore-case? [
-            swap child-tags [ parse-rule-tag ] curry* each
+            swap child-tags [ parse-rule-tag ] with each
         ] with-variable
     ] keep ;
 
@@ -175,7 +175,7 @@ TAGS>
     ] H{ } map>assoc
     swap "PROPS" tag-named [
         parse-props-tag over values
-        [ merge-rule-set-props ] curry* each
+        [ merge-rule-set-props ] with each
     ] when* ;
 
 : parse-mode ( stream -- rule-sets )

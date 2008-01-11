@@ -255,7 +255,7 @@ C: <lazy-subset> lazy-subset
 : lsubset ( list quot -- result )
     over nil? [ 2drop nil ] [ <lazy-subset> <memoized-cons> ] if ;
 
-: car-subset?  ( lazy-subset -- )
+: car-subset?  ( lazy-subset -- ? )
   [ lazy-subset-cons car ] keep
   lazy-subset-quot call ;
 
@@ -264,11 +264,7 @@ C: <lazy-subset> lazy-subset
   set-lazy-subset-cons ;
 
 M: lazy-subset car ( lazy-subset -- car )
-  dup car-subset? [
-    lazy-subset-cons car
-  ] [
-    dup skip car
-  ] if ;
+  dup car-subset? [ lazy-subset-cons ] [ dup skip ] if car ;
 
 M: lazy-subset cdr ( lazy-subset -- cdr )
   dup car-subset? [

@@ -2,7 +2,7 @@ USING: alien arrays definitions generic assocs hashtables io
 kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes io.streams.string
 classes.private classes.union classes.mixin classes.predicate
-vectors definitions source-files ;
+vectors definitions source-files compiler.units ;
 IN: temporary
 
 H{ } "s" set

@@ -1,10 +1,10 @@
 USING: alien alien.c-types kernel math
-windows windows.kernel32 calendar namespaces ;
+windows windows.kernel32 namespaces ;
 IN: calendar.windows
 
 TUPLE: windows-calendar ;
 
-T{ windows-calendar } calendar-impl set-global
+T{ windows-calendar } calendar-backend set-global
 
 M: windows-calendar gmt-offset ( -- float )
     "TIME_ZONE_INFORMATION" <c-object>
@@ -45,4 +45,3 @@ M: windows-calendar gmt-offset ( -- float )
 
 : FILETIME>timestamp ( FILETIME -- timestamp/f )
     FILETIME>windows-time windows-time>timestamp ;
-

@@ -94,7 +94,7 @@ SYMBOL: last-update
 : fetch-blogroll ( blogroll -- entries )
     dup 0 <column>
     swap [ ?fetch-feed ] parallel-map
-    [ [ <posting> ] curry* map ] 2map concat ;
+    [ [ <posting> ] with map ] 2map concat ;
 
 : sort-entries ( entries -- entries' )
     [ [ entry-pub-date ] compare ] sort <reversed> ;

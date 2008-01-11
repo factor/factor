@@ -50,7 +50,7 @@ M: primitive definition drop f ;
     [ pick word-props ?set-at swap set-word-props ]
     [ nip remove-word-prop ] if ;
 
-: reset-props ( word seq -- ) [ remove-word-prop ] curry* each ;
+: reset-props ( word seq -- ) [ remove-word-prop ] with each ;
 
 : lookup ( name vocab -- word ) vocab-words at ;
 
@@ -91,11 +91,6 @@ M: word redefined* ( word -- )
     { "inferred-effect" "base-case" "no-effect" } reset-props ;
 
 SYMBOL: changed-words
-
-TUPLE: no-compilation-unit word ;
-
-: no-compilation-unit ( word -- * )
-    \ no-compilation-unit construct-boa throw ;
 
 : changed-word ( word -- )
     dup changed-words get
@@ -194,7 +189,7 @@ M: word (forget-word)
     dup delete-xref
     (forget-word) ;
 
-M: word forget forget-word ;
+M: word forget* forget-word ;
 
 M: word hashcode*
     nip 1 slot { fixnum } declare ;

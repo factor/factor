@@ -42,7 +42,7 @@ dup color gl-color dup radius swap center disk ;
 
 : dot ( quadric i -- ) 2dup rim inner ;
 
-: golden-section ( quadric -- ) 720 [ dot ] curry* each ;
+: golden-section ( quadric -- ) 720 [ dot ] with each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

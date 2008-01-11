@@ -12,7 +12,7 @@ TUPLE: test-tuple m n ;
     { 3 }
 ] [
     H{ { "n" "3" } } { { "n" v-number } }
-    [ action-param drop ] curry* map
+    [ action-param drop ] with map
 ] unit-test
 
 : foo ;

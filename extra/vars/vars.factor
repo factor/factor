@@ -2,20 +2,22 @@
 
 ! Thanks to Mackenzie Straight for the idea
 
-USING: kernel parser words namespaces sequences quotations ;
+USING: compiler.units kernel parser words namespaces
+sequences quotations ;
 
 IN: vars
 
 : define-var-symbol ( str -- ) create-in define-symbol ;
 
 : define-var-getter ( str -- )
-dup ">" append create-in swap in get lookup [ get ] curry define-compound ;
+dup ">" append create-in swap in get lookup [ get ] curry define ;
 
 : define-var-setter ( str -- )
-">" over append create-in swap in get lookup [ set ] curry define-compound ;
+">" over append create-in swap in get lookup [ set ] curry define ;
 
-: define-var ( str -- )
-dup define-var-symbol dup define-var-getter define-var-setter ;
+: define-var ( str -- ) [
+dup define-var-symbol dup define-var-getter define-var-setter
+] with-compilation-unit ;
 
 : VAR: ! var
     scan define-var ; parsing

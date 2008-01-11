@@ -8,12 +8,12 @@ IN: shufflers
     first2 "-" swap 3append >string ;
 
 : make-shuffles ( max-out max-in -- shuffles )
-    [ 1+ dup rot strings [ 2array ] curry* map ]
-    curry* map concat ;
+    [ 1+ dup rot strings [ 2array ] with map ]
+    with map concat ;
 
 : shuffle>quot ( shuffle -- quot )
     [
-        first2 2dup [ - ] curry* map
+        first2 2dup [ - ] with map
         reverse [ , \ npick , \ >r , ] each
         swap , \ ndrop , length [ \ r> , ] times
     ] [ ] make ;
@@ -30,7 +30,7 @@ IN: shufflers
     in-shuffle over length make-shuffles [
         [ shuffle>string create-in ] keep
         shuffle>quot dupd define-compound put-effect
-    ] curry* each out-shuffle ;
+    ] with each out-shuffle ;
 
 : SHUFFLE:
     scan scan string>number define-shuffles ; parsing

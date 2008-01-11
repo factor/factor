@@ -35,7 +35,7 @@ MACRO: nkeep ( n -- )
 
 MACRO: ncurry ( n -- ) [ curry ] n*quot ;
 
-MACRO: ncurry* ( quot n -- )
+MACRO: nwith ( quot n -- )
   tuck 1+ dup
   [ , -nrot [ , nrot , call ] , ncurry ]
   bake ;
@@ -53,17 +53,17 @@ MACRO: napply ( n -- )
 
 ! each-with
 
-: each-withn ( seq quot n -- ) ncurry* each ; inline
+: each-withn ( seq quot n -- ) nwith each ; inline
 
-: each-with ( seq quot -- ) curry* each ; inline
+: each-with ( seq quot -- ) with each ; inline
 
 : each-with2 ( obj obj list quot -- ) 2 each-withn ; inline
 
 ! map-with
 
-: map-withn ( seq quot n -- newseq ) ncurry* map ; inline
+: map-withn ( seq quot n -- newseq ) nwith map ; inline
 
-: map-with ( seq quot -- ) curry* map ; inline
+: map-with ( seq quot -- ) with map ; inline
 
 : map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
 
@@ -166,3 +166,6 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
     [ construct-empty ] curry swap [
         [ dip ] curry swap 1quotation [ keep ] curry compose
     ] { } assoc>map concat compose ;
+
+: either ( object first second -- ? )
+    >r over slip swap [ r> drop ] [ r> call ] ?if ; inline

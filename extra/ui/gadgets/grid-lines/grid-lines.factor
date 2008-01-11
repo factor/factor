@@ -20,7 +20,7 @@ SYMBOL: grid-dim
 : draw-grid-lines ( gaps orientation -- )
     grid get rot grid-positions grid get rect-dim add [
         grid-line-from/to gl-line
-    ] curry* each ;
+    ] with each ;
 
 M: grid-lines draw-boundary
     origin get [

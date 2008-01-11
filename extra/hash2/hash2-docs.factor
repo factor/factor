@@ -1,4 +1,5 @@
-USING: hash2 help.syntax help.markup ;
+USING: help.syntax help.markup ;
+IN: hash2
 
 ARTICLE: { "hash2" "intro" }
 "The hash2 vocabulary specifies a simple minimal datastructure for hash tables with two integers as keys. These hash tables are fixed size and do not conform to the associative mapping protocol. Words used in creating and manipulating these hash tables include:"

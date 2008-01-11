@@ -85,13 +85,13 @@ M: method-spec definer drop \ M: \ ; ;
 
 M: method-spec definition first2 method method-def ;
 
-M: method-spec forget first2 [ delete-at ] with-methods ;
+M: method-spec forget* first2 [ delete-at ] with-methods ;
 
 : implementors* ( classes -- words )
     all-words [
         "methods" word-prop keys
         swap [ key? ] curry contains?
-    ] curry* subset ;
+    ] with subset ;
 
 : implementors ( class -- seq )
     dup associate implementors* ;
@@ -99,7 +99,7 @@ M: method-spec forget first2 [ delete-at ] with-methods ;
 : forget-methods ( class -- )
     [ implementors ] keep [ swap 2array ] curry map forget-all ;
 
-M: class forget ( class -- )
+M: class forget* ( class -- )
     dup forget-methods
     dup uncache-class
     forget-word ;

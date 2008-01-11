@@ -14,10 +14,10 @@ SYMBOL: graph
     graph get [ drop H{ } clone ] cache ;
 
 : add-vertex ( vertex edges graph -- )
-    [ [ dupd nest set-at ] curry* each ] if-graph ; inline
+    [ [ dupd nest set-at ] with each ] if-graph ; inline
 
 : remove-vertex ( vertex edges graph -- )
-    [ [ graph get at delete-at ] curry* each ] if-graph ; inline
+    [ [ graph get at delete-at ] with each ] if-graph ; inline
 
 SYMBOL: previous
 

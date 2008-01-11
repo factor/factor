@@ -159,14 +159,14 @@ HOOK: free-fonts font-renderer ( world -- )
     dup string? [
         string-height
     ] [
-        [ string-height ] curry* map sum
+        [ string-height ] with map sum
     ] if ;
 
 : text-width ( open-font text -- n )
     dup string? [
         string-width
     ] [
-        0 -rot [ string-width max ] curry* each
+        0 -rot [ string-width max ] with each
     ] if ;
 
 : text-dim ( open-font text -- dim )
@@ -181,6 +181,6 @@ HOOK: free-fonts font-renderer ( world -- )
                 2dup { 0 0 } draw-string
                 >r open-font r> string-height
                 0.0 swap 0.0 glTranslated
-            ] curry* each
+            ] with each
         ] with-translation
     ] if ;

@@ -230,5 +230,5 @@ M: undefined summary
 
 M: no-compilation-unit error.
     "Attempting to define " write
-    no-compilation-unit-word pprint
+    no-compilation-unit-definition pprint
     " outside of a compilation unit" print ;

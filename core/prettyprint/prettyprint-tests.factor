@@ -2,7 +2,7 @@ USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
-continuations generic ;
+continuations generic compiler.units ;
 IN: temporary
 
 [ "4" ] [ 4 unparse ] unit-test

@@ -86,5 +86,5 @@ TUPLE: miller-rabin-bounds ;
 : unique-primes ( numbits n -- seq )
     #! generate two primes
     over 5 < [ "not enough primes below 5 bits" throw ] when
-    [ [ drop random-prime ] curry* map ] [ all-unique? ] generate ;
+    [ [ drop random-prime ] with map ] [ all-unique? ] generate ;
 

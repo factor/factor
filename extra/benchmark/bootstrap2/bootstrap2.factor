@@ -1,4 +1,5 @@
-USING: tools.deploy.private io.files system ;
+USING: tools.deploy.private io.files system
+tools.deploy.backend ;
 IN: benchmark.bootstrap2
 
 : bootstrap-benchmark

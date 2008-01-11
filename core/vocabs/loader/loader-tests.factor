@@ -3,7 +3,7 @@ IN: temporary
 USING: vocabs.loader tools.test continuations vocabs math
 kernel arrays sequences namespaces io.streams.string
 parser source-files words assocs tuples definitions
-debugger ;
+debugger compiler.units ;
 
 ! This vocab should not exist, but just in case...
 [ ] [
@@ -31,7 +31,7 @@ debugger ;
 [ t ] [
     "kernel" vocab-files
     "kernel" vocab vocab-files
-    "kernel" f \ vocab-link construct-boa vocab-files
+    "kernel" f <vocab-link> vocab-files
     3array all-equal?
 ] unit-test
 
@@ -46,13 +46,15 @@ IN: temporary
 [ { 3 3 3 } ] [
     "vocabs.loader.test.2" run
     "vocabs.loader.test.2" vocab run
-    "vocabs.loader.test.2" f \ vocab-link construct-boa run
+    "vocabs.loader.test.2" f <vocab-link> run
     3array
 ] unit-test
 
-"resource:core/vocabs/loader/test/a/a.factor" forget-source
 
-[ "vocabs.loader.test.a" forget-vocab ] with-compilation-unit
+[
+    "resource:core/vocabs/loader/test/a/a.factor" forget-source
+    "vocabs.loader.test.a" forget-vocab
+] with-compilation-unit
 
 0 "count-me" set-global
 
@@ -89,7 +91,10 @@ IN: temporary
 ] unit-test
 
 [ ] [
-    "vocabs.loader.test.b" vocab-files [ forget-source ] each
+    [
+        "vocabs.loader.test.b" vocab-files
+        [ forget-source ] each
+    ] with-compilation-unit
 ] unit-test
 
 [ "vocabs.loader.test.b" require ] unit-test-fails
@@ -109,7 +114,10 @@ IN: temporary
 [ f ] [ "fred" "vocabs.loader.test.b" lookup undefined? ] unit-test
 
 [ ] [
-    "vocabs.loader.test.b" vocab-files [ forget-source ] each
+    [
+        "vocabs.loader.test.b" vocab-files
+        [ forget-source ] each
+    ] with-compilation-unit
 ] unit-test
 
 [ ] [ "vocabs.loader.test.b" refresh ] unit-test
@@ -117,7 +125,7 @@ IN: temporary
 [ 3 ] [ "count-me" get-global ] unit-test
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
-[ "kernel" f \ vocab-link construct-boa where ] unit-test
+[ "kernel" f <vocab-link> where ] unit-test
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
 [ "kernel" vocab where ] unit-test

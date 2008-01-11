@@ -1,7 +1,7 @@
 IN: temporary
 USING: ui.gadgets ui.gadgets.labels namespaces sequences kernel
 math arrays tools.test io ui.gadgets.panes ui.traverse
-definitions ;
+definitions compiler.units ;
 
 M: array gadget-children ;
 

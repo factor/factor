@@ -33,8 +33,8 @@ uses definitions ;
     dup source-file-path ?resource-path file-modified
     swap set-source-file-modified ;
 
-: record-checksum ( contents source-file -- )
-    >r crc32 r> set-source-file-checksum ;
+: record-checksum ( lines source-file -- )
+    swap lines-crc32 swap set-source-file-checksum ;
 
 : (xref-source) ( source-file -- pathname uses )
     dup source-file-path <pathname> swap source-file-uses
@@ -68,20 +68,19 @@ uses definitions ;
 : reset-checksums ( -- )
     source-files get [
         swap ?resource-path dup exists?
-        [ file-contents record-checksum ] [ 2drop ] if
+        [ file-lines record-checksum ] [ 2drop ] if
     ] assoc-each ;
 
 M: pathname where pathname-string 1 2array ;
 
-M: pathname forget
-    pathname-string
+: forget-source ( path -- )
     dup source-file
     dup unxref-source
     source-file-definitions [ keys forget-all ] each
     source-files get delete-at ;
 
-: forget-source ( path -- )
-    [ <pathname> forget ] with-compilation-unit ;
+M: pathname forget*
+    pathname-string forget-source ;
 
 : rollback-source-file ( source-file -- )
     dup source-file-definitions new-definitions get [ union ] 2map

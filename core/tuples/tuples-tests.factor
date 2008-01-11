@@ -2,7 +2,7 @@ USING: definitions generic kernel kernel.private math
 math.constants parser sequences tools.test words assocs
 namespaces quotations sequences.private classes continuations
 generic.standard effects tuples tuples.private arrays vectors
-strings ;
+strings compiler.units ;
 IN: temporary
 
 [ t ] [ \ tuple-class \ class class< ] unit-test

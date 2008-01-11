@@ -10,7 +10,7 @@ USING: xml.utilities kernel assocs xml.generator
     [ children>string ] [ f ] if* ;
 
 : any-tag-named ( tag names -- tag-inside )
-    f -rot [ tag-named nip dup ] curry* find 2drop ;
+    f -rot [ tag-named nip dup ] with find 2drop ;
 
 TUPLE: feed title link entries ;
 

@@ -252,7 +252,7 @@ C: <field> field
   [
     dup odbc-number-of-columns [
       1+ odbc-get-field field-value ,
-    ] curry* each 
+    ] with each 
   ] { } make ;
 
 : (odbc-get-all-rows) ( statement -- )

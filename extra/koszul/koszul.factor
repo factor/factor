@@ -75,7 +75,7 @@ SYMBOL: terms
     [ natural-sort ] keep [ index ] curry map ;
 
 : (inversions) ( n seq -- n )
-    [ > ] curry* subset length ;
+    [ > ] with subset length ;
 
 : inversions ( seq -- n )
     0 swap [ length ] keep [
@@ -155,15 +155,15 @@ DEFER: (d)
     ] map [ ] subset 2nip ;
 
 : basis ( generators -- seq )
-    natural-sort dup length 2^ [ nth-basis-elt ] curry* map ;
+    natural-sort dup length 2^ [ nth-basis-elt ] with map ;
 
 : (tensor) ( seq1 seq2 -- seq )
     [
         [ swap append natural-sort ] curry map
-    ] curry* map concat ;
+    ] with map concat ;
 
 : tensor ( graded-basis1 graded-basis2 -- bigraded-basis )
-    [ [ swap (tensor) ] curry map ] curry* map ;
+    [ [ swap (tensor) ] curry map ] with map ;
 
 ! Computing cohomology
 : (op-matrix) ( range quot basis-elt -- row )
@@ -201,7 +201,7 @@ DEFER: (d)
         over first length [
             >r 2dup r> spin (bigraded-ker/im-d)
         ] map 2nip
-    ] curry* map ;
+    ] with map ;
 
 : bigraded-betti ( u-generators z-generators -- seq )
     [ basis graded ] 2apply tensor bigraded-ker/im-d
@@ -241,14 +241,14 @@ DEFER: (d)
     ] [
         nullspace [
             [ [ wedge (alt+) ] 2each ] with-terms
-        ] curry* map
+        ] with map
     ] if ;
 
 : graded-triple ( seq n -- triple )
-    3 [ 1- + ] curry* map swap [ ?nth ] curry map ;
+    3 [ 1- + ] with map swap [ ?nth ] curry map ;
 
 : graded-triples ( seq -- triples )
-    dup length [ graded-triple ] curry* map ;
+    dup length [ graded-triple ] with map ;
 
 : graded-laplacian ( generators quot -- seq )
     >r basis graded graded-triples [ first3 ] r> compose map ;
@@ -279,7 +279,7 @@ DEFER: (d)
         over first length [
             >r 2dup r> spin bigraded-triple
         ] map 2nip
-    ] curry* map ;
+    ] with map ;
 
 : bigraded-laplacian ( u-generators z-generators quot -- seq )
     >r [ basis graded ] 2apply tensor bigraded-triples r>

@@ -96,7 +96,7 @@ TUPLE: no-method object generic ;
     num-tags get [
         vtable-class
         [ swap first classes-intersect? ] curry subset
-    ] curry* map ;
+    ] with map ;
 
 : build-type-vtable ( alist-seq -- alist-seq )
     dup length [

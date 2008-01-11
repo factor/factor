@@ -47,7 +47,6 @@ IN: temporary
     sort-classes min-class
 ] unit-test
 
-FORGET: xyz
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 

@@ -57,7 +57,7 @@ C: <quote> quote
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : local-index ( obj args -- n )
-    [ dup quote? [ quote-local ] when eq? ] curry* find drop ;
+    [ dup quote? [ quote-local ] when eq? ] with find drop ;
 
 : read-local ( obj args -- quot )
     local-index 1+

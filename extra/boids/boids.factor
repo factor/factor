@@ -117,7 +117,7 @@ over boid-vel -rot relative-position angle-between ;
   <--&& ;
 
 : cohesion-neighborhood ( self -- boids )
-  boids> [ within-cohesion-neighborhood? ] curry* subset ;
+  boids> [ within-cohesion-neighborhood? ] with subset ;
 
 : cohesion-force ( self -- force )
   dup cohesion-neighborhood
@@ -137,7 +137,7 @@ over boid-vel -rot relative-position angle-between ;
   <--&& ;
 
 : separation-neighborhood ( self -- boids )
-  boids> [ within-separation-neighborhood? ] curry* subset ;
+  boids> [ within-separation-neighborhood? ] with subset ;
 
 : separation-force ( self -- force )
   dup separation-neighborhood
@@ -157,7 +157,7 @@ over boid-vel -rot relative-position angle-between ;
   <--&& ;
 
 : alignment-neighborhood ( self -- boids )
-boids> [ within-alignment-neighborhood? ] curry* subset ;
+boids> [ within-alignment-neighborhood? ] with subset ;
 
 : alignment-force ( self -- force )
   alignment-neighborhood

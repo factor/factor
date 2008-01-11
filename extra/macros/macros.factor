@@ -10,9 +10,12 @@ IN: macros
     CREATE dup reset-generic parse-definition
     over "declared-effect" word-prop effect-in length ;
 
+: real-macro-effect ( word -- effect' )
+    "declared-effect" word-prop effect-in 1 <effect> ;
+
 : (MACRO:) ( word definition effect-in -- )
     >r 2dup "macro" set-word-prop
-    2dup over "declared-effect" word-prop memoize-quot
+    2dup over real-macro-effect memoize-quot
     [ call ] append define
     r> define-transform ;
 

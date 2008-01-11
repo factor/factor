@@ -242,7 +242,7 @@ M: no-word summary
     dup forward-reference? [
         drop
         dup use get
-        [ at ] curry* map [ ] subset
+        [ at ] with map [ ] subset
         [ forward-reference? not ] find nip
         [ ] [ forward-error ] ?if
     ] [

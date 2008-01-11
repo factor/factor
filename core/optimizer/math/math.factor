@@ -89,7 +89,7 @@ optimizer.def-use generic.standard ;
 
 : math-closure ( class -- newclass )
     { fixnum integer rational real }
-    [ class< ] curry* find nip number or ;
+    [ class< ] with find nip number or ;
 
 : fits? ( interval class -- ? )
     "interval" word-prop dup

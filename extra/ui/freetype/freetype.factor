@@ -109,7 +109,7 @@ M: freetype-renderer open-font ( font -- open-font )
     ] cache-nth nip ;
 
 M: freetype-renderer string-width ( open-font string -- w )
-    0 -rot [ char-width + ] curry* each ;
+    0 -rot [ char-width + ] with each ;
 
 M: freetype-renderer string-height ( open-font string -- h )
     drop font-height ;
@@ -179,11 +179,11 @@ M: freetype-renderer draw-string ( font string loc -- )
     >r >r world get font-sprites first2 r> r> (draw-string) ;
 
 : run-char-widths ( open-font string -- widths )
-    [ char-width ] curry* { } map-as
+    [ char-width ] with { } map-as
     dup 0 [ + ] accumulate nip swap 2 v/n v+ ;
 
 M: freetype-renderer x>offset ( x open-font string -- n )
-    dup >r run-char-widths [ <= ] curry* find drop
+    dup >r run-char-widths [ <= ] with find drop
     [ r> drop ] [ r> length ] if* ;
 
 T{ freetype-renderer } font-renderer set-global

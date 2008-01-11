@@ -3,12 +3,9 @@
 
 USING: arrays hashtables io io.streams.string kernel math
 math.vectors math.functions math.parser namespaces sequences
-strings tuples system debugger combinators vocabs.loader ;
+strings tuples system debugger combinators vocabs.loader
+calendar.backend structs alien.c-types unix ;
 IN: calendar
-
-SYMBOL: calendar-impl
-
-HOOK: gmt-offset calendar-impl ( -- n )
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
 
@@ -225,6 +222,24 @@ M: timestamp <=> ( ts1 ts2 -- n )
 : timestamp>unix-time ( timestamp -- n )
     unix-1970 timestamp- >bignum ;
 
+: timestamp>timeval ( timestamp -- timeval ) 
+    timestamp>unix-time 1000 * make-timeval ; 
+
+: timeval>timestamp ( timeval -- timestamp ) 
+    [ timeval-sec ] keep
+    timeval-usec 1000000 / + unix-time>timestamp ; 
+
+: timestamp>timespec ( timestamp -- timespec ) 
+    timestamp>unix-time "timespec" <c-object>
+    [ set-timespec-sec ] keep ; 
+
+: timespec>timestamp ( timespec -- timestamp ) 
+    [ timespec-sec ] keep
+    timespec-nsec 1000000000 / + 
+    unix-time>timestamp ; 
+
+
+
 : gmt ( -- timestamp )
     #! GMT time, right now
     unix-1970 millis 1000 /f seconds +dt ; 
@@ -278,10 +293,10 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [
         [ 1+ print-day ] keep
         1+ + 7 mod zero? [ nl ] [ bl ] if
-    ] curry* each nl ;
+    ] with each nl ;
 
 : print-year ( year -- )
-    12 [ 1+ print-month nl ] curry* each ;
+    12 [ 1+ print-month nl ] with each ;
 
 : pad-00 number>string 2 CHAR: 0 pad-left write ;
 
@@ -352,6 +367,37 @@ M: timestamp <=> ( ts1 ts2 -- n )
             timestamp-year number>string 5 32 pad-left write
         ] if
     ] string-out ;
+
+: day-offset ( timestamp m -- timestamp n )
+    over day-of-week - ; inline
+    
+: day-this-week ( timestamp n -- timestamp )
+    day-offset days +dt ;
+    
+: sunday ( timestamp -- timestamp ) 0 day-this-week ;
+: monday ( timestamp -- timestamp ) 1 day-this-week ;
+: tuesday ( timestamp -- timestamp ) 2 day-this-week ;
+: wednesday ( timestamp -- timestamp ) 3 day-this-week ;
+: thursday ( timestamp -- timestamp ) 4 day-this-week ;
+: friday ( timestamp -- timestamp ) 5 day-this-week ; 
+: saturday ( timestamp -- timestamp ) 6 day-this-week ;
+
+: beginning-of-day ( timestamp -- new-timestamp )
+    clone dup >r 0 0 0 r>
+    { set-timestamp-hour set-timestamp-minute set-timestamp-second }
+    set-slots ; inline
+
+: beginning-of-month ( timestamp -- new-timestamp )
+    clone dup beginning-of-day dup >r 1 r> { set-timestamp-day } set-slots ;
+
+: beginning-of-week ( timestamp -- new-timestamp )
+    clone dup sunday beginning-of-day ;
+
+: beginning-of-year ( timestamp -- new-timestamp )
+    clone dup beginning-of-month dup >r 1 r> { set-timestamp-month } set-slots ;
+
+: seconds-since-midnight ( timestamp -- x )
+    dup beginning-of-day timestamp- ;
 
 {
     { [ unix? ] [ "calendar.unix" ] }

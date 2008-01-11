@@ -79,7 +79,8 @@ HELP: reset-checksums
 
 HELP: forget-source
 { $values { "path" "a pathname string" } }
-{ $description "Forgets all information known about a source file." } ;
+{ $description "Forgets all information known about a source file." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: record-definitions
 { $values { "file" source-file } }

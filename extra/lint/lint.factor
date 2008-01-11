@@ -112,7 +112,7 @@ M: object lint ( obj -- seq )
 M: callable lint ( quot -- seq )
     def-hash-keys get [
         swap subseq/member?
-    ] curry* subset ;
+    ] with subset ;
 
 M: word lint ( word -- seq )
     word-def dup callable? [ lint ] [ drop f ] if ;

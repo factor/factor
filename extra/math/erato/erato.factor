@@ -39,5 +39,5 @@ PRIVATE>
   dup 1000003 < [
     0 primes-under-million seq>list swap [ <= ] curry lwhile
   ] [
-    <erato> 2 [ drop next-prime ] curry* lfrom-by [ ] lwhile
+    <erato> 2 [ drop next-prime ] with lfrom-by [ ] lwhile
   ] if ;

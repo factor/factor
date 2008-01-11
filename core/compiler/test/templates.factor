@@ -2,7 +2,8 @@
 USING: arrays compiler kernel kernel.private math
 hashtables.private math.private namespaces sequences
 sequences.private tools.test namespaces.private slots.private
-combinators.private byte-arrays alien layouts words definitions ;
+combinators.private byte-arrays alien layouts words definitions
+compiler.units ;
 IN: temporary
 
 ! Oops!

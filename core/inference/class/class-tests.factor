@@ -3,7 +3,7 @@ USING: arrays math.private kernel math compiler inference
 inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
-slots.private combinators definitions ;
+slots.private combinators definitions compiler.units ;
 
 ! Make sure these compile even though this is invalid code
 [ ] [ [ 10 mod 3.0 /i ] dataflow optimize drop ] unit-test
@@ -14,7 +14,7 @@ slots.private combinators definitions ;
 
 : inlined? ( quot word -- ? )
     swap dataflow optimize
-    [ node-param eq? ] curry* node-exists? not ;
+    [ node-param eq? ] with node-exists? not ;
 
 GENERIC: mynot ( x -- y )
 
@@ -33,8 +33,6 @@ M: f detect-f ;
 [ ] [ [ fixnum< ] dataflow optimize drop ] unit-test
 
 [ ] [ [ fixnum< [ ] [ ] if ] dataflow optimize drop ] unit-test
-
-FORGET: xyz
 
 GENERIC: xyz ( n -- n )
 

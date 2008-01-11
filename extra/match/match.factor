@@ -11,7 +11,7 @@ SYMBOL: _
 : define-match-var ( name -- )
     create-in
     dup t "match-var" set-word-prop
-    dup [ get ] curry define-compound ;
+    dup [ get ] curry define ;
 
 : define-match-vars ( seq -- )
     [ define-match-var ] each ;

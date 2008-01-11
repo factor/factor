@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup concurrency concurrency.private match ;
+USING: help.syntax help.markup concurrency.private match ;
 IN: concurrency
 
 HELP: make-mailbox

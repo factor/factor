@@ -26,10 +26,10 @@ SYMBOL: windows
     [ [ length 1- dup 1- ] keep exchange ] [ drop ] if ;
 
 : unregister-window ( handle -- )
-    windows global [ [ first = not ] curry* subset ] change-at ;
+    windows global [ [ first = not ] with subset ] change-at ;
 
 : raised-window ( world -- )
-    windows get-global [ second eq? ] curry* find drop
+    windows get-global [ second eq? ] with find drop
     windows get-global [ length 1- ] keep exchange ;
 
 : focus-gestures ( new old -- )
@@ -67,7 +67,7 @@ M: world ungraft*
 
 : find-window ( quot -- world )
     windows get values
-    [ gadget-child swap call ] curry* find-last nip ; inline
+    [ gadget-child swap call ] with find-last nip ; inline
 
 SYMBOL: ui-hook
 

@@ -17,7 +17,7 @@ M: link uses
     [ dup ] [ [ article-parent ] keep ] [ ] unfold nip 1 tail ;
 
 : set-article-parents ( parent article -- )
-    article-children [ set-article-parent ] curry* each ;
+    article-children [ set-article-parent ] with each ;
 
 : xref-article ( topic -- )
     dup >link xref dup set-article-parents ;

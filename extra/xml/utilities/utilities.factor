@@ -23,7 +23,7 @@ M: process-missing error.
 : PROCESS:
     CREATE
     dup H{ } clone "xtable" set-word-prop
-    dup [ run-process ] curry define-compound ; parsing
+    dup [ run-process ] curry define ; parsing
 
 : TAG:
     scan scan-word
@@ -78,10 +78,10 @@ M: process-missing error.
 : tag-named ( tag name/string -- matching-tag )
     ! like get-name-tag but only looks at direct children,
     ! not all the children down the tree.
-    assure-name swap [ tag-named? ] curry* find nip ;
+    assure-name swap [ tag-named? ] with find nip ;
 
 : tags-named ( tag name/string -- tags-seq )
-    tags@ swap [ tag-named? ] curry* subset ;
+    tags@ swap [ tag-named? ] with subset ;
 
 : tag-with-attr? ( elem attr-value attr-name -- ? )
     rot dup tag? [ at = ] [ 3drop f ] if ;

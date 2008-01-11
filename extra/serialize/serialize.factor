@@ -22,7 +22,7 @@ SYMBOL: serialized
 
 : object-id ( obj -- id )
     #! Return the id of an already serialized object 
-    serialized get [ eq? ] curry* find [ drop f ] unless ;
+    serialized get [ eq? ] with find [ drop f ] unless ;
 
 USE: prettyprint 
 

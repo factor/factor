@@ -25,7 +25,7 @@ TUPLE: document locs ;
 : remove-loc document-locs delete ;
 
 : update-locs ( loc document -- )
-    document-locs [ set-model ] curry* each ;
+    document-locs [ set-model ] with each ;
 
 : doc-line ( n document -- string ) model-value nth ;
 

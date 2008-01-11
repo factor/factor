@@ -36,10 +36,10 @@ TUPLE: grid children gap fill? ;
     >r first r> second 2array ;
 
 : pair-up ( horiz vert -- dims )
-    [ [ (pair-up) ] curry map ] curry* map ;
+    [ [ (pair-up) ] curry map ] with map ;
 
 : add-gaps ( gap seq -- newseq )
-    [ v+ ] curry* map ;
+    [ v+ ] with map ;
 
 : gap-sum ( gap seq -- newseq )
     dupd add-gaps dim-sum v+ ;

@@ -32,7 +32,7 @@ IN: math.statistics
     dup length 1 <= [
         drop 0
     ] [
-        [ [ mean ] keep [ - sq ] curry* sigma ] keep
+        [ [ mean ] keep [ - sq ] with sigma ] keep
         length 1- /
     ] if ;
 

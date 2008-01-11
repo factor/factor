@@ -71,7 +71,7 @@ SYMBOL: >word
     word-size get group [ be> ] map block-size get 0 pad-right
     dup 16 64 dup <slice> [
         process-M-256
-    ] curry* each ;
+    ] with each ;
 
 : ch ( x y z -- x' )
     [ bitxor bitand ] keep bitxor ;
@@ -115,7 +115,7 @@ SYMBOL: >word
     H get clone vars set
     prepare-message-schedule block-size get [
         T1 T2 update-vars
-    ] curry* each vars get H get [ w+ ] 2map H set ;
+    ] with each vars get H get [ w+ ] 2map H set ;
 
 : seq>string ( n seq -- string )
     [ swap [ >be % ] curry each ] "" make ;
