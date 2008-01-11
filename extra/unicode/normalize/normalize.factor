@@ -1,5 +1,5 @@
-USING: sequences namespaces unicode.data kernel combinators.lib math
-unicode arrays ;
+USING: sequences namespaces unicode.data kernel combinators.lib
+math arrays ;
 IN: unicode.normalize
 
 ! Utility word
@@ -89,7 +89,7 @@ IN: unicode.normalize
         swap [ [
             dup hangul? [ hangul>jamo % drop ]
             [ dup rot call [ % ] [ , ] ?if ] if
-        ] curry* each ] "" make*
+        ] with each ] "" make*
         dup reorder
     ] if ; inline
 

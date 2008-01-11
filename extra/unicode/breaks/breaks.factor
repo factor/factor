@@ -30,10 +30,9 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
     concat >set ;
 
 : other-extend-lines ( -- lines )
-    "extra/unicode/PropList.txt" resource-path <file-reader> lines ;
+    "extra/unicode/PropList.txt" resource-path file-lines ;
 
 DEFER: other-extend
-<< other-extend-lines process-other-extend \ other-extend define-value >>
 
 CATEGORY: (extend) Me Mn ;
 : extend? ( ch -- ? )
@@ -79,11 +78,6 @@ SYMBOL: table
     graphemes Extend connect-after ;
 
 DEFER: grapheme-table
-<<
-    init-grapheme-table table
-    [ make-grapheme-table finish-table ] with-variable
-    \ grapheme-table define-value
->>
 
 : grapheme-break? ( class1 class2 -- ? )
     grapheme-table nth nth not ;
@@ -125,3 +119,11 @@ DEFER: grapheme-table
 
 : prev-grapheme ( i str -- prev-i )
     prev-grapheme-step (prev-grapheme) ;
+
+[
+    other-extend-lines process-other-extend \ other-extend define-value
+
+    init-grapheme-table table
+    [ make-grapheme-table finish-table ] with-variable
+    \ grapheme-table define-value
+] with-compilation-unit

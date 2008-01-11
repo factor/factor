@@ -20,10 +20,10 @@ IN: unicode.syntax
     category# categories nth ;
 
 : >category-array ( categories -- bitarray )
-    categories [ swap member? ] curry* map >bit-array ;
+    categories [ swap member? ] with map >bit-array ;
 
 : as-string ( strings -- bit-array )
-    concat "\"" tuck 3append parse first ;
+    concat "\"" tuck 3append eval ;
 
 : [category] ( categories -- quot )
     [

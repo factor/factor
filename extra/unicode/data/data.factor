@@ -1,6 +1,6 @@
-USING: assocs math kernel sequences io.files hashtables quotations
-splitting arrays math.parser combinators.lib hash2 byte-arrays words
-namespaces words ;
+USING: assocs math kernel sequences io.files hashtables
+quotations splitting arrays math.parser combinators.lib hash2
+byte-arrays words namespaces words compiler.units ;
 IN: unicode.data
 
 ! Convenience functions
@@ -116,19 +116,7 @@ DEFER: class-map
 DEFER: compat-map
 DEFER: category-map
 DEFER: name-map
-
-<<
-    load-data
-    dup process-names \ name-map define-value
-    13 over process-data \ simple-lower define-value
-    12 over process-data tuck \ simple-upper define-value
-    14 over process-data swapd union \ simple-title define-value
-    dup process-combining \ class-map define-value
-    dup process-canonical \ canonical-map define-value
-        \ combine-map define-value
-    dup process-compat \ compat-map define-value
-    process-category \ category-map define-value
->>
+DEFER: special-casing
 
 : canonical-entry ( char -- seq ) canonical-map at ;
 : combine-chars ( a b -- char/f ) combine-map hash2 ;
@@ -144,6 +132,16 @@ DEFER: name-map
     [ length 5 = ] subset
     [ [ set-code-point ] each ] H{ } make-assoc ;
 
-DEFER: special-casing
-
-<< load-special-casing \ special-casing define-value >>
+[
+    load-data
+    dup process-names \ name-map define-value
+    13 over process-data \ simple-lower define-value
+    12 over process-data tuck \ simple-upper define-value
+    14 over process-data swapd union \ simple-title define-value
+    dup process-combining \ class-map define-value
+    dup process-canonical \ canonical-map define-value
+        \ combine-map define-value
+    dup process-compat \ compat-map define-value
+    process-category \ category-map define-value
+    load-special-casing \ special-casing define-value
+] with-compilation-unit
