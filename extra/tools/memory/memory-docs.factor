@@ -1,4 +1,4 @@
-USING: help.markup help.syntax memory ;
+USING: help.markup help.syntax memory sequences ;
 IN: tools.memory
 
 ARTICLE: "tools.memory" "Object memory tools"
@@ -6,7 +6,18 @@ ARTICLE: "tools.memory" "Object memory tools"
 { $subsection room. }
 { $subsection heap-stats. }
 { $subsection heap-stats }
-{ $see-also "memory" } ;
+"You can query memory status:"
+{ $subsection data-room }
+{ $subsection code-room }
+"There are a pair of combinators, analogous to " { $link each } " and " { $link subset } ", which operate on the entire collection of objects in the object heap:"
+{ $subsection each-object }
+{ $subsection instances }
+"You can check an object's the heap memory usage:"
+{ $subsection size }
+"The garbage collector can be invoked manually:"
+{ $subsection data-gc }
+{ $subsection code-gc }
+{ $see-also "image" } ;
 
 ABOUT: "tools.memory"
 

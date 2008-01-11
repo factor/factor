@@ -174,6 +174,7 @@ DEFER: hints-test-2
 
 [ 10 ] [ hints-test-2 ] unit-test
 
+DEFER: inline-then-not-inline-test-1
 DEFER: inline-then-not-inline-test-2
 
 [ ] [ "IN: temporary : inline-then-not-inline-test-1 1 2 3 ; inline" eval ] unit-test
@@ -182,6 +183,10 @@ DEFER: inline-then-not-inline-test-2
 
 [ 1 2 3 ] [ inline-then-not-inline-test-2 ] unit-test
 
-[ ] [ "IN: temporary : inline-then-not-inline-test-1 6 9 ;" eval ] unit-test
+\ inline-then-not-inline-test-2 word-xt "a" set
 
-[ 6 9 ] [ inline-then-not-inline-test-2 ] unit-test
+[ ] [ "IN: temporary : inline-then-not-inline-test-1 6 6 9 ;" eval ] unit-test
+
+[ f ] [ \ inline-then-not-inline-test-2 word-xt "a" get = ] unit-test
+
+[ 6 6 9 ] [ inline-then-not-inline-test-2 ] unit-test

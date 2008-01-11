@@ -181,14 +181,15 @@ ARTICLE: "program-org" "Program organization"
 { $subsection "parser" }
 { $subsection "vocabs.loader" } ;
 
-USE: help.cookbook
+USING: help.cookbook help.tutorial ;
 
 ARTICLE: "handbook" "Factor documentation"
+"Welcome to Factor. Factor is dynamically-typed, stack-based, and very expressive. It is one of the most powerful and flexible programming languages ever invented. Have fun with Factor!"
 { $heading "Starting points" }
 { $subsection "cookbook" }
+{ $subsection "first-program" }
 { $subsection "vocab-index" }
 { $subsection "changes" }
-{ $subsection "cli" }
 { $heading "Language reference" }
 { $subsection "conventions" }
 { $subsection "syntax" }
@@ -202,6 +203,8 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "os" }
 { $subsection "alien" }
 { $heading "Environment reference" }
+{ $subsection "cli" }
+{ $subsection "images" }
 { $subsection "prettyprint" }
 { $subsection "tools" }
 { $subsection "help" }

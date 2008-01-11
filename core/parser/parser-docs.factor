@@ -49,7 +49,7 @@ ARTICLE: "vocabulary-search-errors" "Word lookup errors"
 }
 "When writing a new vocabulary, one approach is to ignore " { $link POSTPONE: USING: } " declarations altogether, then to load the vocabulary and observe any parser notes and restarts and use this information to write the correct " { $link POSTPONE: USING: } " declaration." ;
 
-ARTICLE: "vocabulary-search" "Vocabulary search"
+ARTICLE: "vocabulary-search" "Vocabulary search path"
 "When the parser reads a token, it attempts to look up a word named by that token. The lookup is performed by searching each vocabulary in the search path, in order."
 $nl
 "For a source file the vocabulary search path starts off with two vocabularies:"
