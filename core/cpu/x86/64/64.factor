@@ -4,7 +4,7 @@ USING: alien.c-types arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.sse2
 cpu.x86.allot cpu.architecture kernel kernel.private math
 namespaces sequences generator.registers generator.fixup system
-alien alien.compiler alien.structs slots splitting ;
+alien alien.compiler alien.structs slots splitting assocs ;
 IN: cpu.x86.64
 
 PREDICATE: x86-backend amd64-backend
@@ -183,7 +183,7 @@ T{ stack-params } "__stack_value" c-type set-c-type-reg-class
 
 : split-struct ( pairs -- seq )
     [
-        [ first2 8 mod zero? [ t , ] when , ] each
+        [ 8 mod zero? [ t , ] when , ] assoc-each
     ] { } make { t } split [ empty? not ] subset ;
 
 : flatten-large-struct ( type -- )
