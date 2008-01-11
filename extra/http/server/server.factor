@@ -28,10 +28,6 @@ IN: http.server
         { "HEAD" "head" }
     } at "bad" or ;
 
-: host ( -- string )
-    #! The host the current responder was called from.
-    "Host" header-param ":" split1 drop ;
-
 : (handle-request) ( arg cmd -- method path host )
     request-method dup "method" set swap
     prepare-url prepare-header host ;

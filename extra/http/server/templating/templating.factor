@@ -77,7 +77,6 @@ DEFER: <% delimiter
     [
         [
             "quiet" on
-            file-vocabs
             parser-notes off
             templating-vocab use+
             dup source-file file set ! so that reload works properly
@@ -85,7 +84,7 @@ DEFER: <% delimiter
                 ?resource-path file-contents
                 [ eval-template ] [ html-error. drop ] recover
             ] keep
-        ] with-scope
+        ] with-file-vocabs
     ] assert-depth drop ;
 
 : run-relative-template-file ( filename -- )

@@ -109,7 +109,10 @@ M: html-span-stream stream-close
         page-color   [ bg-css,      ] apply-style
         border-color [ border-css,  ] apply-style
         border-width [ padding-css, ] apply-style
-        wrap-margin  [ pre-css,     ] apply-style
+        ! FIXME: This is a hack for webapps.help
+        building get empty? [
+            wrap-margin over at pre-css,
+        ] unless
     ] make-css ;
 
 : div-tag ( style quot -- )

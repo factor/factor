@@ -1,11 +1,11 @@
-! Copyright (C) 2006 Slava Pestov, Doug Coleman
+! Copyright (C) 2006, 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs calendar debugger furnace.sessions furnace.validator
-hashtables heaps html.elements http http.server.responders
-http.server.templating io.files kernel math namespaces
-quotations sequences splitting words strings vectors
-webapps.callback ;
-USING: continuations io prettyprint ;
+USING: arrays assocs calendar debugger furnace.sessions
+furnace.validator hashtables heaps html.elements http
+http.server.responders http.server.templating io.files kernel
+math namespaces quotations sequences splitting words strings
+vectors webapps.callback continuations tuples classes vocabs
+html io ;
 IN: furnace
 
 : code>quotation ( word/quot -- quot )
@@ -174,7 +174,6 @@ PREDICATE: word action "action" word-prop ;
         [ service-post ] "post" set
     ] make-responder ;
 
-USING: classes html tuples vocabs ;
 : explode-tuple ( tuple -- )
     dup tuple-slots swap class "slot-names" word-prop
     [ set ] 2each ;
