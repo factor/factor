@@ -19,14 +19,18 @@ IN: project-euler.002
 ! SOLUTION
 ! --------
 
-: last2 ( seq -- elt last )
-    reverse first2 swap ;
+<PRIVATE
 
-: fib-up-to ( n -- seq )
-    { 0 } 1 [ pick dupd < ] [ add dup last2 + ] [ ] while drop nip ;
+: (fib-upto) ( seq n limit -- seq )
+    2dup <= [ >r add dup 2 tail* sum r> (fib-upto) ] [ 2drop ] if ;
+
+PRIVATE>
+
+: fib-upto ( n -- seq )
+    { 0 } 1 rot (fib-upto) ;
 
 : euler002 ( -- answer )
-    1000000 fib-up-to [ even? ] subset sum ;
+    1000000 fib-upto [ even? ] subset sum ;
 
 ! [ euler002 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials

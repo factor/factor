@@ -1,4 +1,4 @@
-USING: math.functions math.text tools.test ;
+USING: math.functions math.text.english tools.test ;
 IN: temporary
 
 [ "Zero" ] [ 0 number>text ] unit-test

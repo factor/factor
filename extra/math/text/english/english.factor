@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel math math.functions math.parser namespaces
     sequences splitting sequences.lib ;
-IN: math.text
+IN: math.text.english
 
 <PRIVATE
 
@@ -26,10 +26,7 @@ IN: math.text
 
 SYMBOL: and-needed?
 : set-conjunction ( seq -- )
-    first {
-        [ dup 100 < ]
-        [ dup 0 > ]
-    } && and-needed? set drop ;
+    first { [ dup 100 < ] [ dup 0 > ] } && and-needed? set drop ;
 
 : negative-text ( n -- str )
     0 < "Negative " "" ? ;
@@ -100,4 +97,3 @@ PRIVATE>
     ] [
         [ (number>text) ] with-scope
     ] if ;
-

@@ -26,14 +26,16 @@ IN: project-euler.004
 
 <PRIVATE
 
+: source-004 ( -- seq )
+    100 999 [a,b] [ 10 mod zero? not ] subset ;
+
 : max-palindrome ( seq -- palindrome )
     natural-sort [ palindrome? ] find-last nip ;
 
 PRIVATE>
 
 : euler004 ( -- answer )
-    100 999 [a,b] [ 10 mod zero? not ] subset dup
-    cartesian-product [ product ] map prune max-palindrome ;
+    source-004 dup cartesian-product [ product ] map prune max-palindrome ;
 
 ! [ euler004 ] 100 ave-time
 ! 1608 ms run / 102 ms GC ave time - 100 trials
