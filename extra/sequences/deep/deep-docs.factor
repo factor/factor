@@ -1,4 +1,5 @@
-USING: help.syntax help.markup sequences.deep ;
+USING: help.syntax help.markup ;
+IN: sequences.deep
 
 HELP: deep-each
 { $values { "obj" "an object" } { "quot" "a quotation ( elt -- ) " } }
