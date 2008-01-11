@@ -239,7 +239,7 @@ PRIVATE>
     [
         (spawn-server)
         "Exiting process: " write self process-pid print
-    ] curry spawn ;
+    ] curry spawn ; inline
 
 : spawn-linked-server ( quot -- process )
     #! Similar to 'spawn-server' but the parent process will be linked
@@ -247,7 +247,7 @@ PRIVATE>
     [
         (spawn-server)
         "Exiting process: " write self process-pid print
-    ] curry spawn-link ;
+    ] curry spawn-link ; inline
 
 : server-cc ( -- cc|process )
     #! Captures the current continuation and returns the value.
