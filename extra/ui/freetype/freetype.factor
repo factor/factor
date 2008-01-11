@@ -1,9 +1,9 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays io kernel libc math
 math.vectors namespaces opengl opengl.gl prettyprint assocs
 sequences io.files io.styles continuations freetype
-ui.gadgets.worlds ui.render ui.backend ;
+ui.gadgets.worlds ui.render ui.backend io.mmap ;
 IN: ui.freetype
 
 TUPLE: freetype-renderer ;
@@ -63,9 +63,16 @@ M: freetype-renderer free-fonts ( world -- )
 : ttf-path ( name -- string )
     "/fonts/" swap ".ttf" 3append resource-path ;
 
+: (open-face) ( mapped-file -- face )
+    #! We use FT_New_Memory_Face, not FT_New_Face, since
+    #! FT_New_Face only takes an ASCII path name and causes
+    #! problems on localized versions of Windows
+    freetype swap dup mapped-file-address swap length 0 f
+    <void*> [ FT_New_Memory_Face freetype-error ] keep *void* ;
+
 : open-face ( font style -- face )
-    ttf-name ttf-path >r freetype r>
-    0 f <void*> [ FT_New_Face freetype-error ] keep *void* ;
+    ttf-name ttf-path dup file-length
+    <mapped-file> (open-face) ;
 
 : dpi 72 ; inline
 

@@ -50,11 +50,11 @@ C-STRUCT: glyph
 
     { "FT_Pos" "width" }
     { "FT_Pos" "height" }
-                  
+
     { "FT_Pos" "hori-bearing-x" }
     { "FT_Pos" "hori-bearing-y" }
     { "FT_Pos" "hori-advance" }
-                  
+
     { "FT_Pos" "vert-bearing-x" }
     { "FT_Pos" "vert-bearing-y" }
     { "FT_Pos" "vert-advance" }
@@ -63,9 +63,9 @@ C-STRUCT: glyph
     { "FT_Fixed" "linear-vert-advance" }
     { "FT_Pos" "advance-x" }
     { "FT_Pos" "advance-y" }
-                    
+
     { "long" "format" }
-                    
+
     { "int" "bitmap-rows" }
     { "int" "bitmap-width" }
     { "int" "bitmap-pitch" }
@@ -86,16 +86,16 @@ C-STRUCT: glyph
     { "short*" "contours" }
 
     { "int" "outline-flags" }
-                    
+
     { "FT_UInt" "num_subglyphs" }
     { "void*" "subglyphs" }
-                    
+
     { "void*" "control-data" }
     { "long" "control-len" }
-                    
+
     { "FT_Pos" "lsb-delta" }
     { "FT_Pos" "rsb-delta" }
-                    
+
     { "void*" "other" } ;
 
 C-STRUCT: face-size
@@ -105,10 +105,10 @@ C-STRUCT: face-size
 
     { "FT_UShort" "x-ppem" }
     { "FT_UShort" "y-ppem" }
-                     
+
     { "FT_Fixed" "x-scale" }
     { "FT_Fixed" "y-scale" }
-                     
+
     { "FT_Pos" "ascender" }
     { "FT_Pos" "descender" }
     { "FT_Pos" "height" }
@@ -117,45 +117,47 @@ C-STRUCT: face-size
 C-STRUCT: face
     { "FT_Long" "num-faces" }
     { "FT_Long" "index" }
-                      
+
     { "FT_Long" "flags" }
     { "FT_Long" "style-flags" }
-                      
+
     { "FT_Long" "num-glyphs" }
-                      
+
     { "FT_Char*" "family-name" }
     { "FT_Char*" "style-name" }
-                      
+
     { "FT_Int" "num-fixed-sizes" }
     { "void*" "available-sizes" }
-                      
+
     { "FT_Int" "num-charmaps" }
     { "void*" "charmaps" }
-                      
+
     { "void*" "generic" }
     { "void*" "generic" }
-                      
+
     { "FT_Pos" "x-min" }
     { "FT_Pos" "y-min" }
     { "FT_Pos" "x-max" }
     { "FT_Pos" "y-max" }
-                      
+
     { "FT_UShort" "units-per-em" }
     { "FT_Short" "ascender" }
     { "FT_Short" "descender" }
     { "FT_Short" "height" }
-                      
+
     { "FT_Short" "max-advance-width" }
     { "FT_Short" "max-advance-height" }
-                      
+
     { "FT_Short" "underline-position" }
     { "FT_Short" "underline-thickness" }
-                      
+
     { "glyph*" "glyph" }
     { "face-size*" "size" }
     { "void*" "charmap" } ;
 
 FUNCTION: FT_Error FT_New_Face ( void* library, FT_Char* font, FT_Long index, face* face ) ;
+
+FUNCTION: FT_Error FT_New_Memory_Face ( void* library, FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face* aface ) ;
 
 FUNCTION: FT_Error FT_Set_Char_Size ( face* face, FT_F26Dot6 char_width, FT_F26Dot6 char_height, FT_UInt horizontal_dpi, FT_UInt vertical_dpi ) ;
 
