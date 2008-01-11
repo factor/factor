@@ -85,7 +85,7 @@ C: <interval> interval
 
 : interval-integer-op ( i1 i2 quot -- i3 )
     >r 2dup
-    [ interval>points [ first integer? ] 2apply and ] 2apply and
+    [ interval>points [ first integer? ] both? ] both?
     r> [ 2drop f ] if ; inline
 
 : interval-shift ( i1 i2 -- i3 )
