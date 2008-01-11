@@ -194,7 +194,7 @@ TUPLE: slice-error reason ;
 : check-slice ( from to seq -- from to seq )
     pick 0 < [ "start < 0" slice-error ] when
     dup length pick < [ "end > sequence" slice-error ] when
-    pick pick > [ "start > end" slice-error ] when ; inline
+    2over > [ "start > end" slice-error ] when ; inline
 
 : <slice> ( from to seq -- slice )
     dup slice? [ collapse-slice ] when
@@ -445,7 +445,7 @@ PRIVATE>
     [ = not ] with subset ;
 
 : cache-nth ( i seq quot -- elt )
-    pick pick ?nth dup [
+    2over ?nth dup [
         >r 3drop r>
     ] [
         drop swap >r over >r call dup r> r> set-nth
@@ -465,7 +465,7 @@ M: sequence <=>
     [ mismatch not ] [ 2drop f ] if ; inline
 
 : move ( to from seq -- )
-    pick pick number=
+    2over number=
     [ 3drop ] [ [ nth swap ] keep set-nth ] if ; inline
 
 : (delete) ( elt store scan seq -- elt store scan seq )
@@ -499,15 +499,15 @@ M: sequence <=>
 : pop* ( seq -- ) dup length 1- swap set-length ;
 
 : move-backward ( shift from to seq -- )
-    pick pick number= [
+    2over number= [
         2drop 2drop
     ] [
-        [ >r pick pick + pick r> move >r 1+ r> ] keep
+        [ >r 2over + pick r> move >r 1+ r> ] keep
         move-backward
     ] if ;
 
 : move-forward ( shift from to seq -- )
-    pick pick number= [
+    2over number= [
         2drop 2drop
     ] [
         [ >r pick >r dup dup r> + swap r> move 1- ] keep

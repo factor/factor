@@ -12,6 +12,8 @@ IN: kernel
 
 : -roll ( x y z t -- t x y z ) swap >r -rot r> ; inline
 
+: 2over ( x y z -- x y z x y ) pick pick ; inline
+
 : clear ( -- ) { } set-datastack ;
 
 ! Combinators
@@ -55,7 +57,7 @@ DEFER: if
 
 : keep ( x quot -- x ) over slip ; inline
 
-: 2keep ( x y quot -- x y ) pick pick 2slip ; inline
+: 2keep ( x y quot -- x y ) 2over 2slip ; inline
 
 : 3keep ( x y z quot -- x y z )
     >r 3dup r> -roll 3slip ; inline

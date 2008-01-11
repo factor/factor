@@ -19,6 +19,7 @@ $nl
 { $subsection 3dup }
 { $subsection dupd }
 { $subsection over }
+{ $subsection 2over }
 { $subsection pick }
 { $subsection tuck }
 "Permuting stack elements:"
@@ -160,6 +161,7 @@ HELP: nip   ( x y -- y )             $shuffle ;
 HELP: 2nip  ( x y z -- z )           $shuffle ;
 HELP: tuck  ( x y -- y x y )         $shuffle ;
 HELP: over  ( x y -- x y x )         $shuffle ;
+HELP: 2over                          $shuffle ;
 HELP: pick  ( x y z -- x y z x )     $shuffle ;
 HELP: swap  ( x y -- y x )           $shuffle ;
 HELP: spin                           $shuffle ;

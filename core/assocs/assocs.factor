@@ -43,7 +43,7 @@ M: assoc assoc-find
     inline
 
 : assoc-push-if ( key value quot accum -- )
-    >r pick pick 2slip r> roll
+    >r 2over 2slip r> roll
     [ >r 2array r> push ] [ 3drop ] if ; inline
 
 : assoc-pusher ( quot -- quot' accum )
@@ -122,7 +122,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     swap [ dupd at* [ nip ] [ drop ] if ] curry change-each ;
 
 : cache ( key assoc quot -- value )
-    pick pick at [
+    2over at [
         >r 3drop r>
     ] [
         pick rot >r >r call dup r> r> set-at

@@ -89,8 +89,8 @@ PREDICATE: word slot-writer "writing" word-prop >boolean ;
 
 : simple-slot ( class name # -- spec )
     >r object bootstrap-word over r> f f <slot-spec>
-    pick pick simple-reader-word over set-slot-spec-reader
-    rot rot simple-writer-word over set-slot-spec-writer ;
+    2over simple-reader-word over set-slot-spec-reader
+    -rot simple-writer-word over set-slot-spec-writer ;
 
 : simple-slots ( class slots base -- specs )
     over length [ + ] with map

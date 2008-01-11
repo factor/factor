@@ -66,9 +66,9 @@ C: <interval> interval
     [ endpoint-max ] reduce <interval> ;
 
 : (interval-op) ( p1 p2 quot -- p3 )
-    pick pick >r >r
-    >r >r first r> first r> call
-    r> second r> second and 2array ; inline
+    2over >r >r
+    >r [ first ] 2apply r> call
+    r> r> [ second ] 2apply and 2array ; inline
 
 : interval-op ( i1 i2 quot -- i3 )
     pick interval-from pick interval-from pick (interval-op) >r

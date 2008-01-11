@@ -225,7 +225,7 @@ M: #dispatch optimize-node*
     #! t indicates failure
     {
         { [ dup t eq? ] [ 3drop t ] }
-        { [ pick pick swap node-history member? ] [ 3drop t ] }
+        { [ 2over swap node-history member? ] [ 3drop t ] }
         { [ t ] [ (splice-method) ] }
     } cond ;
 
