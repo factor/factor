@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.parser sequences ;
+USING: math.parser sequences ;
 IN: project-euler.013
 
 ! http://projecteuler.net/index.php?section=problems&id=13

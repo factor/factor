@@ -26,20 +26,18 @@ IN: project-euler.009
 
 : next-pq ( p1 q1 -- p2 q2 )
     ! p > q and both are odd integers
-    dup 1 = [ swap 2 + nip dup 2 - ] [ 2 - ] if ;
+    dup 1 = [ drop 2 + dup ] when 2 - ;
 
 : abc ( p q -- triplet )
     [
-        2dup * ,                      ! a = p * q
-        2dup sq swap sq swap - 2 / ,  ! b = (p² - q²) / 2
-        sq swap sq swap + 2 / ,       ! c = (p² + q²) / 2
+        2dup * ,                    ! a = p * q
+        [ sq ] 2apply 2dup - 2 / ,  ! b = (p² - q²) / 2
+        + 2 / ,                     ! c = (p² + q²) / 2
     ] { } make natural-sort ;
 
 : (ptriplet) ( target p q triplet -- target p q )
-    roll dup >r swap sum = r> -roll
-    [
-        next-pq 2dup abc (ptriplet)
-    ] unless ;
+    roll [ swap sum = ] keep -roll
+    [ next-pq 2dup abc (ptriplet) ] unless ;
 
 : ptriplet ( target -- triplet )
    3 1 { 3 4 5 } (ptriplet) abc nip ;

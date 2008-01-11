@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer, Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.primes sequences ;
+USING: math.primes sequences ;
 IN: project-euler.010
 
 ! http://projecteuler.net/index.php?section=problems&id=10

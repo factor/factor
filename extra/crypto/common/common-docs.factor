@@ -1,5 +1,6 @@
 USING: help.markup help.syntax kernel math sequences quotations
-crypto.common math.private ;
+math.private ;
+IN: crypto.common
 
 HELP: >32-bit
 { $values { "x" "an integer" } { "y" "an integer" } }

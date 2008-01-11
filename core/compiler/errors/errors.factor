@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces assocs prettyprint io sequences
-sorting continuations debugger math ;
+sorting continuations debugger math math.parser ;
 IN: compiler.errors
 
 SYMBOL: compiler-errors
@@ -41,8 +41,9 @@ M: object compiler-warning? drop f ;
 
 : (compiler-report) ( what assoc -- )
     length dup zero? [ 2drop ] [
-        ":" write over write " - print " write pprint
-        " compiler " write write "." print
+        [
+            ":" % over % " - print " % # " compiler " % % "." %
+        ] "" make print
     ] if ;
 
 : compiler-report ( -- )

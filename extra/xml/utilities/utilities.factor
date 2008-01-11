@@ -23,7 +23,7 @@ M: process-missing error.
 : PROCESS:
     CREATE
     dup H{ } clone "xtable" set-word-prop
-    dup [ run-process ] curry define-compound ; parsing
+    dup [ run-process ] curry define ; parsing
 
 : TAG:
     scan scan-word

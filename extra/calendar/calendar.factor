@@ -4,7 +4,7 @@
 USING: arrays hashtables io io.streams.string kernel math
 math.vectors math.functions math.parser namespaces sequences
 strings tuples system debugger combinators vocabs.loader
-calendar.backend structs alien.c-types unix ;
+calendar.backend structs alien.c-types ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
@@ -158,7 +158,7 @@ M: integer +minute ( timestamp n -- timestamp )
     over timestamp-minute + 60 /rem pick
     set-timestamp-minute +hour ;
 M: real +minute ( timestamp n -- timestamp )
-    float>whole-part rot swap 60 * +second swap +minute ; 
+    float>whole-part rot swap 60 * +second swap +minute ;
 
 M: number +second ( timestamp n -- timestamp )
     over timestamp-second + 60 /rem >r >bignum r>
@@ -217,32 +217,22 @@ M: timestamp <=> ( ts1 ts2 -- n )
     1970 1 1 0 0 0 0 <timestamp> ;
 
 : unix-time>timestamp ( n -- timestamp )
-    >r unix-1970 r> seconds +dt ; 
+    >r unix-1970 r> seconds +dt ;
 
 : timestamp>unix-time ( timestamp -- n )
     unix-1970 timestamp- >bignum ;
 
-: timestamp>timeval ( timestamp -- timeval ) 
-    timestamp>unix-time 1000 * make-timeval ; 
+: timestamp>timeval ( timestamp -- timeval )
+    timestamp>unix-time 1000 * make-timeval ;
 
-: timeval>timestamp ( timeval -- timestamp ) 
+: timeval>timestamp ( timeval -- timestamp )
     [ timeval-sec ] keep
-    timeval-usec 1000000 / + unix-time>timestamp ; 
-
-: timestamp>timespec ( timestamp -- timespec ) 
-    timestamp>unix-time "timespec" <c-object>
-    [ set-timespec-sec ] keep ; 
-
-: timespec>timestamp ( timespec -- timestamp ) 
-    [ timespec-sec ] keep
-    timespec-nsec 1000000000 / + 
-    unix-time>timestamp ; 
-
+    timeval-usec 1000000 / + unix-time>timestamp ;
 
 
 : gmt ( -- timestamp )
     #! GMT time, right now
-    unix-1970 millis 1000 /f seconds +dt ; 
+    unix-1970 millis 1000 /f seconds +dt ;
 
 : now ( -- timestamp ) gmt >local-time ;
 : before ( dt -- -dt ) tuple-slots [ neg ] map array>dt ;
@@ -278,7 +268,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
         [ timestamp-year leap-year? ] keep
         [ >date< 3array ] keep timestamp-year 3 1 3array <=>
         0 >= and 1 0 ?
-    ] keep 
+    ] keep
     [ timestamp-month day-counts swap head-slice sum + ] keep
     timestamp-day + ;
 
@@ -370,34 +360,17 @@ M: timestamp <=> ( ts1 ts2 -- n )
 
 : day-offset ( timestamp m -- timestamp n )
     over day-of-week - ; inline
-    
+
 : day-this-week ( timestamp n -- timestamp )
     day-offset days +dt ;
-    
+
 : sunday ( timestamp -- timestamp ) 0 day-this-week ;
 : monday ( timestamp -- timestamp ) 1 day-this-week ;
 : tuesday ( timestamp -- timestamp ) 2 day-this-week ;
 : wednesday ( timestamp -- timestamp ) 3 day-this-week ;
 : thursday ( timestamp -- timestamp ) 4 day-this-week ;
-: friday ( timestamp -- timestamp ) 5 day-this-week ; 
+: friday ( timestamp -- timestamp ) 5 day-this-week ;
 : saturday ( timestamp -- timestamp ) 6 day-this-week ;
-
-: beginning-of-day ( timestamp -- new-timestamp )
-    clone dup >r 0 0 0 r>
-    { set-timestamp-hour set-timestamp-minute set-timestamp-second }
-    set-slots ; inline
-
-: beginning-of-month ( timestamp -- new-timestamp )
-    clone dup beginning-of-day dup >r 1 r> { set-timestamp-day } set-slots ;
-
-: beginning-of-week ( timestamp -- new-timestamp )
-    clone dup sunday beginning-of-day ;
-
-: beginning-of-year ( timestamp -- new-timestamp )
-    clone dup beginning-of-month dup >r 1 r> { set-timestamp-month } set-slots ;
-
-: seconds-since-midnight ( timestamp -- x )
-    dup beginning-of-day timestamp- ;
 
 {
     { [ unix? ] [ "calendar.unix" ] }

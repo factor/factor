@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel xml xml.data xml.errors
+USING: help.markup help.syntax kernel xml.data xml.errors
 xml.writer state-parser xml.tokenize xml.utilities xml.entities
 strings sequences io ;
+IN: xml
 
 HELP: string>xml
 { $values { "string" "a string" } { "xml" "an xml document" } }

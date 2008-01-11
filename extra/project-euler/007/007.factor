@@ -18,12 +18,12 @@ IN: project-euler.007
 ! --------
 
 : nth-prime ( n -- n )
-  1 - lprimes lnth ;
+    1- lprimes lnth ;
 
 : euler007 ( -- answer )
-  10001 nth-prime ;
+    10001 nth-prime ;
 
-! [ euler007 ] time
-! 22 ms run / 0 ms GC time
+! [ euler007 ] 100 ave-time
+! 10 ms run / 0 ms GC ave time - 100 trials
 
 MAIN: euler007

@@ -44,7 +44,7 @@ M: f print-element drop ;
 : with-default-style ( quot -- )
     default-style get [
         last-element off
-        H{ } swap with-nesting
+        default-style get swap with-nesting
     ] with-style ; inline
 
 : print-content ( element -- )

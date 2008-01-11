@@ -18,7 +18,7 @@ IN: assocs.lib
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : set-hash-stack ( value key seq -- )
-  dupd [ key? ] curry* find-last nip set-at ;
+  dupd [ key? ] when find-last nip set-at ;
 
 : at-default ( key assoc -- value/key )
     dupd at [ nip ] when* ;

@@ -16,13 +16,10 @@ IN: project-euler.003
 ! SOLUTION
 ! --------
 
-: largest-prime-factor ( n -- factor )
-  factors supremum ;
-
 : euler003 ( -- answer )
-  317584931803 largest-prime-factor ;
+    317584931803 factors supremum ;
 
-! [ euler003 ] time
-! 2 ms run / 0 ms GC time
+! [ euler003 ] 100 ave-time
+! 1 ms run / 0 ms GC ave time - 100 trials
 
 MAIN: euler003

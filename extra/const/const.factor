@@ -2,7 +2,7 @@ USING: kernel parser words sequences ;
 IN: const
 
 : define-const ( word value -- )
-    [ parsed ] curry dupd define-compound
+    [ parsed ] curry dupd define
     t "parsing" set-word-prop ;
 
 : CONST:

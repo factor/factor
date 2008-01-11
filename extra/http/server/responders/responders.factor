@@ -124,6 +124,10 @@ SYMBOL: max-post-request
 
 : header-param ( key -- value ) "header" get at ;
 
+: host ( -- string )
+    #! The host the current responder was called from.
+    "Host" header-param ":" split1 drop ;
+
 : add-responder ( responder -- )
     #! Add a responder object to the list.
     "responder" over at  responders get set-at ;

@@ -48,7 +48,7 @@ SYMBOL: log-stream
     dup log-client
     [ swap with-stream ] 2curry concurrency:spawn drop ; inline
 
-: accept-loop ( server quot -- )
+: accept-loop ( server quot -- server quot )
     [ swap accept with-client ] 2keep accept-loop ; inline
 
 : server-loop ( server quot -- )
@@ -62,6 +62,7 @@ SYMBOL: log-stream
     ] [
         "Cannot spawn server: " print
         print-error
+        2drop
     ] recover ; inline
 
 : local-server ( port -- seq )

@@ -199,7 +199,7 @@ ARTICLE: "cookbook-io" "I/O cookbook"
 }
 "Print the lines of a file in sorted order:"
 { $code
-    "\"lines.txt\" <file-reader> lines natural-sort [ print ] each"
+    "\"lines.txt\" file-lines natural-sort [ print ] each"
 }
 "Read 1024 bytes from a file:"
 { $code

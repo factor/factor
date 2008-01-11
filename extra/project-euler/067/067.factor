@@ -1,7 +1,6 @@
 ! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files kernel math.parser namespaces project-euler.018
-    project-euler.common sequences splitting system vocabs ;
+USING: io.files math.parser namespaces project-euler.common sequences splitting ;
 IN: project-euler.067
 
 ! http://projecteuler.net/index.php?section=problems&id=67
@@ -37,14 +36,14 @@ IN: project-euler.067
 
 <PRIVATE
 
-: pyramid ( -- seq )
-    "resource:extra/project-euler/067/triangle.txt" ?resource-path
-    <file-reader> lines [ " " split [ string>number ] map ] map ;
+: source-067 ( -- seq )
+    "extra/project-euler/067/triangle.txt" resource-path
+    file-lines [ " " split [ string>number ] map ] map ;
 
 PRIVATE>
 
 : euler067 ( -- answer )
-    pyramid propagate-all first first ;
+    source-067 propagate-all first first ;
 
 ! [ euler067 ] 100 ave-time
 ! 18 ms run / 0 ms GC time
@@ -53,30 +52,13 @@ PRIVATE>
 ! ALTERNATE SOLUTIONS
 ! -------------------
 
-<PRIVATE
-
-: (source-067a) ( -- path )
-    [
-        "project-euler.067" vocab-root ?resource-path %
-        os "windows" = [
-            "\\project-euler\\067\\triangle.txt" %
-        ] [
-            "/project-euler/067/triangle.txt" %
-        ] if
-    ] "" make ;
-
-: source-067a ( -- triangle )
-    (source-067a) <file-reader> lines [ " " split [ string>number ] map ] map ;
-
-PRIVATE>
-
 : euler067a ( -- answer )
-    source-067a max-path ;
+    source-067 max-path ;
 
 ! [ euler067a ] 100 ave-time
-! 15 ms run / 0 ms GC ave time - 100 trials
+! 14 ms run / 0 ms GC ave time - 100 trials
 
-! source-067a [ max-path ] curry 100 ave-time
+! source-067 [ max-path ] curry 100 ave-time
 ! 3 ms run / 0 ms GC ave time - 100 trials
 
 MAIN: euler067a

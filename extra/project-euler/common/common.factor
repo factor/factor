@@ -1,30 +1,50 @@
-USING: arrays kernel hashtables math math.functions math.miller-rabin
-    math.parser math.ranges namespaces sequences combinators.lib ;
+USING: kernel math math.functions math.miller-rabin math.parser
+    math.primes.factors math.ranges namespaces sequences ;
 IN: project-euler.common
 
-! A collection of words used by more than one Project Euler solution.
+! A collection of words used by more than one Project Euler solution
+! and/or related words that could be useful for future problems.
+
+! Problems using each public word
+! -------------------------------
+! collect-consecutive - #8, #11
+! log10 - #25, #134
+! max-path - #18, #67
+! number>digits - #16, #20
+! propagate-all - #18, #67
+! sum-proper-divisors - #21
+! tau* - #12
+
 
 : nth-pair ( n seq -- nth next )
     over 1+ over nth >r nth r> ;
+
+: perfect-square? ( n -- ? )
+    dup sqrt mod zero? ;
 
 <PRIVATE
 
 : count-shifts ( seq width -- n )
     >r length 1+ r> - ;
 
-: shift-3rd ( seq obj obj -- seq obj obj )
-    rot 1 tail -rot ;
-
 : max-children ( seq -- seq )
     [ dup length 1- [ over nth-pair max , ] each ] { } make nip ;
 
-: >multiplicity ( seq -- seq )
-    dup prune [
-        [ 2dup [ = ] curry count 2array , ] each
-    ] { } make nip ; inline
+! Propagate one row into the upper one
+: propagate ( bottom top -- newtop )
+    [ over 1 tail rot first2 max rot + ] map nip ;
 
 : reduce-2s ( n -- r s )
     dup even? [ factor-2s >r 1+ r> ] [ 1 swap ] if ;
+
+: shift-3rd ( seq obj obj -- seq obj obj )
+    rot 1 tail -rot ;
+
+: (sum-divisors) ( n -- sum )
+    dup sqrt >fixnum [1,b] [
+        [ 2dup mod zero? [ 2dup / + , ] [ drop ] if ] each
+        dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
+    ] { } make sum ;
 
 PRIVATE>
 
@@ -33,8 +53,8 @@ PRIVATE>
         2dup count-shifts [ 2dup head shift-3rd , ] times
     ] { } make 2nip ;
 
-: divisor? ( n m -- ? )
-    mod zero? ;
+: log10 ( m -- n )
+    log 10 log / ;
 
 : max-path ( triangle -- n )
     dup length 1 > [
@@ -46,27 +66,10 @@ PRIVATE>
 : number>digits ( n -- seq )
     number>string string>digits ;
 
-: perfect-square? ( n -- ? )
-    dup sqrt divisor? ;
-
-: prime-factorization ( n -- seq )
-    [
-        2 [ over 1 > ]
-        [ 2dup divisor? [ dup , [ / ] keep ] [ next-prime ] if ]
-        [ ] while 2drop
-    ] { } make ;
-
-: prime-factorization* ( n -- seq )
-    prime-factorization >multiplicity ;
-
-: prime-factors ( n -- seq )
-    prime-factorization prune >array ;
-
-: (sum-divisors) ( n -- sum )
-    dup sqrt >fixnum [1,b] [
-        [ 2dup divisor? [ 2dup / + , ] [ drop ] if ] each
-        dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
-    ] { } make sum ;
+! Not strictly needed, but it is nice to be able to dump the triangle after the
+! propagation
+: propagate-all ( triangle -- newtriangle )
+    reverse [ first dup ] keep 1 tail [ propagate dup ] map nip reverse swap add ;
 
 : sum-divisors ( n -- sum )
     dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;
@@ -84,12 +87,12 @@ PRIVATE>
     dup sum-proper-divisors = ;
 
 ! The divisor function, counts the number of divisors
-: tau ( n -- n )
-    prime-factorization* flip second 1 [ 1+ * ] reduce ;
+: tau ( m -- n )
+    count-factors flip second 1 [ 1+ * ] reduce ;
 
 ! Optimized brute-force, is often faster than prime factorization
-: tau* ( n -- n )
+: tau* ( m -- n )
     reduce-2s [ perfect-square? -1 0 ? ] keep
     dup sqrt >fixnum [1,b] [
-        dupd divisor? [ >r 2 + r> ] when
+        dupd mod zero? [ >r 2 + r> ] when
     ] each drop * ;

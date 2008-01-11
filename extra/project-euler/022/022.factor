@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib io io.files kernel math math.parser namespaces sequences
-    sorting splitting strings system vocabs ;
+USING: io.files kernel math math.parser namespaces sequences sorting splitting
+    strings system vocabs ;
 IN: project-euler.022
 
 ! http://projecteuler.net/index.php?section=problems&id=22
@@ -27,21 +27,12 @@ IN: project-euler.022
 
 <PRIVATE
 
-: (source-022) ( -- path )
-    [
-        "project-euler.022" vocab-root ?resource-path %
-        os "windows" = [
-            "\\project-euler\\022\\names.txt" %
-        ] [
-            "/project-euler/022/names.txt" %
-        ] if
-    ] "" make ;
-
 : source-022 ( -- seq )
-    (source-022) file-contents [ quotable? ] subset "," split ;
+    "extra/project-euler/022/names.txt" resource-path
+    file-contents [ quotable? ] subset "," split ;
 
 : alpha-value ( str -- n )
-    string>digits [ 9 - ] sigma ;
+    [ string>digits sum ] keep length 9 * - ;
 
 : name-scores ( seq -- seq )
     dup length [ 1+ swap alpha-value * ] 2map ;
