@@ -56,7 +56,7 @@ io.files ;
 [ "hell" ] [ "hell" step5 "" like ] unit-test
 [ "mate" ] [ "mate" step5 "" like ] unit-test
 
-: resource-lines resource-path <file-reader> lines ;
+: resource-lines resource-path file-lines ;
 
 [ { } ] [
     "extra/porter-stemmer/test/voc.txt" resource-lines

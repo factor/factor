@@ -39,7 +39,7 @@ IN: project-euler.067
 
 : pyramid ( -- seq )
     "resource:extra/project-euler/067/triangle.txt" ?resource-path
-    <file-reader> lines [ " " split [ string>number ] map ] map ;
+    file-lines [ " " split [ string>number ] map ] map ;
 
 PRIVATE>
 
@@ -66,7 +66,7 @@ PRIVATE>
     ] "" make ;
 
 : source-067a ( -- triangle )
-    (source-067a) <file-reader> lines [ " " split [ string>number ] map ] map ;
+    (source-067a) file-lines [ " " split [ string>number ] map ] map ;
 
 PRIVATE>
 
