@@ -1,4 +1,5 @@
-USING: math.statistics help.markup help.syntax debugger ;
+USING: help.markup help.syntax debugger ;
+IN: math.statistics 
 
 HELP: geometric-mean
 { $values { "seq" "a sequence of numbers" } { "n" "a non-negative real number"} }
