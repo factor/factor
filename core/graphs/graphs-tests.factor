@@ -16,3 +16,35 @@ H{
 [ { 2 3 4 5 } ] [
     2 [ "g" get at ] closure keys natural-sort 
 ] unit-test
+
+H{ } "g" set
+
+[ ] [
+    "mary"
+    H{ { "billy" "one" } { "joey" "two" } }
+    "g" get add-vertex*
+] unit-test
+
+[ H{ { "mary" "one" } } ] [
+    "billy" "g" get at
+] unit-test
+
+[ ] [
+    "liz"
+    H{ { "billy" "four" } { "fred" "three" } }
+    "g" get add-vertex*
+] unit-test
+
+[ H{ { "mary" "one" } { "liz" "four" } } ] [
+    "billy" "g" get at
+] unit-test
+
+[ ] [
+    "mary"
+    H{ { "billy" "one" } { "joey" "two" } }
+    "g" get remove-vertex*
+] unit-test
+
+[ H{ { "liz" "four" } } ] [
+    "billy" "g" get at
+] unit-test

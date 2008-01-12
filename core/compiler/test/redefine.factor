@@ -92,7 +92,7 @@ DEFER: x-4
 
 [ t ] [ \ x-3 "compiled-uses" word-prop >boolean ] unit-test
 
-[ t ] [ \ x-3 "compiled-uses" word-prop [ interned? ] all? ] unit-test
+[ t ] [ \ x-3 "compiled-uses" word-prop [ drop interned? ] assoc-all? ] unit-test
 
 DEFER: g-test-1
 
@@ -190,3 +190,18 @@ DEFER: inline-then-not-inline-test-2
 [ f ] [ \ inline-then-not-inline-test-2 word-xt "a" get = ] unit-test
 
 [ 6 6 9 ] [ inline-then-not-inline-test-2 ] unit-test
+
+DEFER: generic-then-not-generic-test-1
+DEFER: generic-then-not-generic-test-2
+
+[ ] [ "IN: temporary GENERIC: generic-then-not-generic-test-1 ( a -- b )" eval ] unit-test
+
+[ ] [ "IN: temporary USE: math M: integer generic-then-not-generic-test-1 sq ;" eval ] unit-test
+
+[ ] [ "IN: temporary : generic-then-not-generic-test-2 3 generic-then-not-generic-test-1 ;" eval ] unit-test
+
+[ 9 ] [ generic-then-not-generic-test-2 ] unit-test
+
+[ ] [ "IN: temporary USE: math : generic-then-not-generic-test-1 1 + ;" eval ] unit-test
+
+[ 4 ] [ generic-then-not-generic-test-2 ] unit-test
