@@ -13,7 +13,8 @@ big-endian off
 
 [
     ! Load word
-    temp-reg 0 [] MOV
+    temp-reg 0 MOV
+    temp-reg dup [] MOV
     ! Bump profiling counter
     temp-reg profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
@@ -22,7 +23,7 @@ big-endian off
     temp-reg compiled-header-size ADD
     ! Jump to XT
     temp-reg JMP
-] rc-absolute-cell rt-literal 2 jit-profiling jit-define
+] rc-absolute-cell rt-literal 1 jit-profiling jit-define
 
 [
     stack-frame-size PUSH                      ! save stack frame size
@@ -31,10 +32,11 @@ big-endian off
 ] rc-absolute-cell rt-label 6 jit-prolog jit-define
 
 [
-    arg0 0 [] MOV                              ! load literal
+    arg0 0 MOV                                 ! load literal
+    arg0 dup [] MOV
     ds-reg bootstrap-cell ADD                  ! increment datastack pointer
     ds-reg [] arg0 MOV                         ! store literal on datastack
-] rc-absolute-cell rt-literal 2 jit-push-literal jit-define
+] rc-absolute-cell rt-literal 1 jit-push-literal jit-define
 
 [
     arg1 stack-reg MOV                         ! pass callstack pointer as arg 2
@@ -60,14 +62,15 @@ big-endian off
 ] rc-absolute-cell rt-literal 1 jit-if-jump jit-define
 
 [
-    arg1 0 [] MOV                              ! load dispatch table
+    arg1 0 MOV                                 ! load dispatch table
+    arg1 dup [] MOV
     arg0 ds-reg [] MOV                         ! load index
     fixnum>slot@                               ! turn it into an array offset
     ds-reg bootstrap-cell SUB                  ! pop index
     arg0 arg1 ADD                              ! compute quotation location
     arg0 arg0 array-start [+] MOV              ! load quotation
     arg0 quot-xt@ [+] JMP                      ! execute branch
-] rc-absolute-cell rt-literal 2 jit-dispatch jit-define
+] rc-absolute-cell rt-literal 1 jit-dispatch jit-define
 
 [
     stack-reg stack-frame-size bootstrap-cell - ADD ! unwind stack frame
