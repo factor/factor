@@ -15,7 +15,7 @@ M: tuple class class-of-tuple ;
 <PRIVATE
 
 : tuple= ( tuple1 tuple2 -- ? )
-    over array-capacity over array-capacity dup -rot number= [
+    over array-capacity over array-capacity tuck number= [
         -rot
         [ >r over r> array-nth >r array-nth r> = ] 2curry
         all-integers?
