@@ -43,7 +43,7 @@ IN: visitor
 PREDICATE: standard-generic visitor "visitors" word-prop ;
 PREDICATE: array triple length 3 = ;
 PREDICATE: triple visitor-spec
-    first3 visitor? >r [ class? ] 2apply and r> and ;
+    first3 visitor? >r [ class? ] both? r> and ;
 
 M: visitor-spec definer drop \ V: \ ; ;
 M: visitor definer drop \ VISITOR: f ;

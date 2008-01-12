@@ -83,7 +83,8 @@ def-hash get-global [
 ! Remove n m shift defs
 [
     drop dup length 3 = [
-        dup first2 [ number? ] 2apply and swap third \ shift = and not
+        dup first2 [ number? ] both?
+        swap third \ shift = and not
     ] [ drop t ] if
 ] assoc-subset 
 
@@ -132,22 +133,21 @@ M: word lint ( word -- seq )
 
 GENERIC: run-lint ( obj -- obj )
 
+: (trim-self)
+    def-hash get-global at* [
+        dupd remove empty? not
+    ] [
+        drop f
+    ] if ;
+
 : trim-self ( seq -- newseq )
-    [
-        first2 [
-            def-hash get-global at* [
-                dupd remove empty? not
-            ] [
-                drop f
-            ] if
-        ] subset 2array
-    ] map ;
+    [ [ (trim-self) ] subset ] assoc-map ;
 
 M: sequence run-lint ( seq -- seq )
     [
         global [ dup . flush ] bind
-        dup lint 2array
-    ] map
+        dup lint
+    ] { } map>assoc
     trim-self
     [ second empty? not ] subset ;
 
@@ -155,5 +155,9 @@ M: word run-lint ( word -- seq )
     1array run-lint ;
 
 : lint-all ( -- seq )
-    all-words run-lint dup [ lint. ] each ;
-
+    all-words run-lint
+    [
+        nip first dup def-hash get at
+        [ first ] 2apply literalize = not
+    ] assoc-subset
+    dup [ lint. ] each ;

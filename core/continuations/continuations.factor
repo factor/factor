@@ -128,7 +128,7 @@ PRIVATE>
 
 : cleanup ( try cleanup-always cleanup-error -- )
     over >r compose [ dip rethrow ] curry
-    >r (catch) r> ifcc r> call ; inline
+    recover r> call ; inline
 
 : attempt-all ( seq quot -- obj )
     [
