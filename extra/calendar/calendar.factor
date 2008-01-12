@@ -4,7 +4,7 @@
 USING: arrays hashtables io io.streams.string kernel math
 math.vectors math.functions math.parser namespaces sequences
 strings tuples system debugger combinators vocabs.loader
-calendar.backend structs alien.c-types ;
+calendar.backend structs alien.c-types math.vectors ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
@@ -186,7 +186,8 @@ M: number +second ( timestamp n -- timestamp )
     #! data
     tuple-slots
     { 1 12 365.2425 8765.82 525949.2 31556952.0 }
-    [ / ] 2map sum ;
+    v/ sum ;
+
 : dt>months ( dt -- x ) dt>years 12 * ;
 : dt>days ( dt -- x ) dt>years 365.2425 * ;
 : dt>hours ( dt -- x ) dt>years 8765.82 * ;
@@ -235,7 +236,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
     unix-1970 millis 1000 /f seconds +dt ;
 
 : now ( -- timestamp ) gmt >local-time ;
-: before ( dt -- -dt ) tuple-slots [ neg ] map array>dt ;
+: before ( dt -- -dt ) tuple-slots vneg array>dt ;
 : from-now ( dt -- timestamp ) now swap +dt ;
 : ago ( dt -- timestamp ) before from-now ;
 

@@ -319,7 +319,7 @@ TUPLE: lazy-from-by n quot ;
 C: lfrom-by lazy-from-by ( n quot -- list )
 
 : lfrom ( n -- list )
-  [ 1 + ] lfrom-by ;
+  [ 1+ ] lfrom-by ;
 
 M: lazy-from-by car ( lazy-from-by -- car )
   lazy-from-by-n ;

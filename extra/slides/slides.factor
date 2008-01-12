@@ -85,7 +85,7 @@ TUPLE: slides ;
     >r first3 r> head 3array ;
 
 : strip-tease ( data -- seq )
-    dup third length 1 - [
+    dup third length 1- [
         2 + (strip-tease)
     ] with map ;
 
