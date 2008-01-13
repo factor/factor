@@ -185,22 +185,21 @@ IN: cpu.ppc.intrinsics
     {
         [
             { "positive" "end" } [ define-label ] each
-            { "x" "y" } %untag-fixnums
+            "y" operand "out" operand swap %untag-fixnum
             0 "y" operand 0 CMPI
             "positive" get BGE
             "y" operand dup NEG
-            "out" operand "x" operand "y" operand SRAW
+            "out" operand "x" operand "out" operand SRAW
             "end" get B
             "positive" resolve-label
-            "out" operand "x" operand "y" operand SLW
+            "out" operand "x" operand "out" operand SLW
             "end" resolve-label
             ! Mask off low bits
-            "out" operand dup %tag-fixnum
+            "out" operand dup %untag
         ] H{
             { +input+ { { f "x" } { f "y" } } }
             { +scratch+ { { f "out" } } }
             { +output+ { "out" } }
-            { +clobber+ { "x" "y" } }
         }
     }
 } define-intrinsics
