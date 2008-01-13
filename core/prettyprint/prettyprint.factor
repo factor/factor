@@ -207,6 +207,7 @@ M: word declarations.
         POSTPONE: delimiter
         POSTPONE: inline
         POSTPONE: foldable
+        POSTPONE: flushable
     } [ declaration. ] with each ;
 
 : pprint-; \ ; pprint-word ;
