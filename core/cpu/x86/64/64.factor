@@ -173,8 +173,8 @@ USE: cpu.x86.intrinsics
 T{ x86-backend f 8 } compiler-backend set-global
 
 ! The ABI for passing structs by value is pretty messed up
-"void*" c-type clone "__stack_value" define-primitive-type
-T{ stack-params } "__stack_value" c-type set-c-type-reg-class
+<< "void*" c-type clone "__stack_value" define-primitive-type
+T{ stack-params } "__stack_value" c-type set-c-type-reg-class >>
 
 : struct-types&offset ( struct-type -- pairs )
     struct-type-fields [
@@ -200,5 +200,3 @@ M: struct-type flatten-value-type ( type -- seq )
             "void*" "double" ? c-type ,
         ] each
     ] if ;
-
-12 profiler-prologue set-global
