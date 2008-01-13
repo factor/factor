@@ -8,12 +8,14 @@ implementation. It is not an introduction to the language itself.
 
 - Platform support
 - Compiling the Factor VM
+- Libraries needed for compilation
 - Bootstrapping the Factor image
 - Running Factor on Unix with X11
 - Running Factor on Mac OS X - Cocoa UI
 - Running Factor on Mac OS X - X11 UI
 - Running Factor on Windows
 - Command line usage
+- The Factor FAQ
 - Source organization
 - Community
 
@@ -58,6 +60,17 @@ for your platform.
 
 Compilation will yield an executable named 'factor' on Unix,
 'factor-nt.exe' on Windows XP/Vista, and 'factor-ce.exe' on Windows CE.
+
+* Libraries needed for compilation
+
+For X11 support, you need recent development libraries for libc, Freetype,
+X11, OpenGL and GLUT. On a Debian-derived Linux distribution (like Ubuntu),
+you can use the line
+
+sudo apt-get install libc6-dev libfreetype6-dev libx11-dev glutg3-dev
+
+to grab everything (if you're on a non-debian-derived distro please tell us
+what the equivalent command is on there and it can be added :)
 
 * Bootstrapping the Factor image
 
@@ -147,6 +160,10 @@ Once bootstrapped, double-clicking factor.exe starts the Factor UI.
 To run the listener in the command prompt:
 
   factor-nt.exe -run=listener
+
+* The Factor FAQ
+
+The Factor FAQ lives online at http://factorcode.org/faq.fhtml
 
 * Command line usage
 

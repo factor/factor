@@ -301,7 +301,7 @@ IN: temporary
     ] unit-test
 
     [ ] [
-        "IN: temporary GENERIC: killer?"
+        "IN: temporary GENERIC: killer? ( a -- b )"
         <string-reader> "removing-the-predicate" parse-stream drop
     ] unit-test
     

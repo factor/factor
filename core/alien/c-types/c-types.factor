@@ -3,7 +3,7 @@
 USING: byte-arrays arrays generator.registers assocs
 kernel kernel.private libc math namespaces parser sequences
 strings words assocs splitting math.parser cpu.architecture
-alien quotations system ;
+alien quotations system compiler.units ;
 IN: alien.c-types
 
 TUPLE: c-type
@@ -227,130 +227,135 @@ M: long-long-type box-return ( type -- )
     define-out ;
 
 : expand-constants ( c-type -- c-type' )
+    #! We use word-def call instead of execute to get around
+    #! staging violations
     dup array? [
-        unclip >r [ dup word? [ execute ] when ] map r> add*
+        unclip >r [ dup word? [ word-def call ] when ] map
+        r> add*
     ] when ;
 
-[ alien-cell ]
-[ set-alien-cell ]
-bootstrap-cell
-"box_alien"
-"alien_offset" <primitive-type>
-"void*" define-primitive-type
+[
+    [ alien-cell ]
+    [ set-alien-cell ]
+    bootstrap-cell
+    "box_alien"
+    "alien_offset" <primitive-type>
+    "void*" define-primitive-type
 
-[ alien-signed-8 ]
-[ set-alien-signed-8 ]
-8
-"box_signed_8"
-"to_signed_8" <primitive-type> <long-long-type>
-"longlong" define-primitive-type
+    [ alien-signed-8 ]
+    [ set-alien-signed-8 ]
+    8
+    "box_signed_8"
+    "to_signed_8" <primitive-type> <long-long-type>
+    "longlong" define-primitive-type
 
-[ alien-unsigned-8 ]
-[ set-alien-unsigned-8 ]
-8
-"box_unsigned_8"
-"to_unsigned_8" <primitive-type> <long-long-type>
-"ulonglong" define-primitive-type
+    [ alien-unsigned-8 ]
+    [ set-alien-unsigned-8 ]
+    8
+    "box_unsigned_8"
+    "to_unsigned_8" <primitive-type> <long-long-type>
+    "ulonglong" define-primitive-type
 
-[ alien-signed-cell ]
-[ set-alien-signed-cell ]
-bootstrap-cell
-"box_signed_cell"
-"to_fixnum" <primitive-type>
-"long" define-primitive-type
+    [ alien-signed-cell ]
+    [ set-alien-signed-cell ]
+    bootstrap-cell
+    "box_signed_cell"
+    "to_fixnum" <primitive-type>
+    "long" define-primitive-type
 
-[ alien-unsigned-cell ]
-[ set-alien-unsigned-cell ]
-bootstrap-cell
-"box_unsigned_cell"
-"to_cell" <primitive-type>
-"ulong" define-primitive-type
+    [ alien-unsigned-cell ]
+    [ set-alien-unsigned-cell ]
+    bootstrap-cell
+    "box_unsigned_cell"
+    "to_cell" <primitive-type>
+    "ulong" define-primitive-type
 
-[ alien-signed-4 ]
-[ set-alien-signed-4 ]
-4
-"box_signed_4"
-"to_fixnum" <primitive-type>
-"int" define-primitive-type
+    [ alien-signed-4 ]
+    [ set-alien-signed-4 ]
+    4
+    "box_signed_4"
+    "to_fixnum" <primitive-type>
+    "int" define-primitive-type
 
-[ alien-unsigned-4 ]
-[ set-alien-unsigned-4 ]
-4
-"box_unsigned_4"
-"to_cell" <primitive-type>
-"uint" define-primitive-type
+    [ alien-unsigned-4 ]
+    [ set-alien-unsigned-4 ]
+    4
+    "box_unsigned_4"
+    "to_cell" <primitive-type>
+    "uint" define-primitive-type
 
-[ alien-signed-2 ]
-[ set-alien-signed-2 ]
-2
-"box_signed_2"
-"to_fixnum" <primitive-type>
-"short" define-primitive-type
+    [ alien-signed-2 ]
+    [ set-alien-signed-2 ]
+    2
+    "box_signed_2"
+    "to_fixnum" <primitive-type>
+    "short" define-primitive-type
 
-[ alien-unsigned-2 ]
-[ set-alien-unsigned-2 ]
-2
-"box_unsigned_2"
-"to_cell" <primitive-type>
-"ushort" define-primitive-type
+    [ alien-unsigned-2 ]
+    [ set-alien-unsigned-2 ]
+    2
+    "box_unsigned_2"
+    "to_cell" <primitive-type>
+    "ushort" define-primitive-type
 
-[ alien-signed-1 ]
-[ set-alien-signed-1 ]
-1
-"box_signed_1"
-"to_fixnum" <primitive-type>
-"char" define-primitive-type
+    [ alien-signed-1 ]
+    [ set-alien-signed-1 ]
+    1
+    "box_signed_1"
+    "to_fixnum" <primitive-type>
+    "char" define-primitive-type
 
-[ alien-unsigned-1 ]
-[ set-alien-unsigned-1 ]
-1
-"box_unsigned_1"
-"to_cell" <primitive-type>
-"uchar" define-primitive-type
+    [ alien-unsigned-1 ]
+    [ set-alien-unsigned-1 ]
+    1
+    "box_unsigned_1"
+    "to_cell" <primitive-type>
+    "uchar" define-primitive-type
 
-[ alien-unsigned-4 zero? not ]
-[ 1 0 ? set-alien-unsigned-4 ]
-4
-"box_boolean"
-"to_boolean" <primitive-type>
-"bool" define-primitive-type
+    [ alien-unsigned-4 zero? not ]
+    [ 1 0 ? set-alien-unsigned-4 ]
+    4
+    "box_boolean"
+    "to_boolean" <primitive-type>
+    "bool" define-primitive-type
 
-[ alien-float ]
-[ >r >r >float r> r> set-alien-float ]
-4
-"box_float"
-"to_float" <primitive-type>
-"float" define-primitive-type
+    [ alien-float ]
+    [ >r >r >float r> r> set-alien-float ]
+    4
+    "box_float"
+    "to_float" <primitive-type>
+    "float" define-primitive-type
 
-T{ float-regs f 4 } "float" c-type set-c-type-reg-class
-[ >float ] "float" c-type set-c-type-prep
+    T{ float-regs f 4 } "float" c-type set-c-type-reg-class
+    [ >float ] "float" c-type set-c-type-prep
 
-[ alien-double ]
-[ >r >r >float r> r> set-alien-double ]
-8
-"box_double"
-"to_double" <primitive-type>
-"double" define-primitive-type
+    [ alien-double ]
+    [ >r >r >float r> r> set-alien-double ]
+    8
+    "box_double"
+    "to_double" <primitive-type>
+    "double" define-primitive-type
 
-T{ float-regs f 8 } "double" c-type set-c-type-reg-class
-[ >float ] "double" c-type set-c-type-prep
+    T{ float-regs f 8 } "double" c-type set-c-type-reg-class
+    [ >float ] "double" c-type set-c-type-prep
 
-[ alien-cell alien>char-string ]
-[ set-alien-cell ]
-bootstrap-cell
-"box_char_string"
-"alien_offset" <primitive-type>
-"char*" define-primitive-type
+    [ alien-cell alien>char-string ]
+    [ set-alien-cell ]
+    bootstrap-cell
+    "box_char_string"
+    "alien_offset" <primitive-type>
+    "char*" define-primitive-type
 
-"char*" "uchar*" typedef
+    "char*" "uchar*" typedef
 
-[ string>char-alien ] "char*" c-type set-c-type-prep
+    [ string>char-alien ] "char*" c-type set-c-type-prep
 
-[ alien-cell alien>u16-string ]
-[ set-alien-cell ]
-4
-"box_u16_string"
-"alien_offset" <primitive-type>
-"ushort*" define-primitive-type
+    [ alien-cell alien>u16-string ]
+    [ set-alien-cell ]
+    4
+    "box_u16_string"
+    "alien_offset" <primitive-type>
+    "ushort*" define-primitive-type
 
-[ string>u16-alien ] "ushort*" c-type set-c-type-prep
+    [ string>u16-alien ] "ushort*" c-type set-c-type-prep
+] with-compilation-unit

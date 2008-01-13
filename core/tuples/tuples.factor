@@ -59,7 +59,7 @@ M: tuple class class-of-tuple ;
         ] unless
     ] when 2drop ;
 
-GENERIC: tuple-size ( class -- size ) foldable
+GENERIC: tuple-size ( class -- size )
 
 M: tuple-class tuple-size "slot-names" word-prop length 2 + ;
 
