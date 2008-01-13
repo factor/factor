@@ -23,25 +23,27 @@ big-endian off
     temp-reg compiled-header-size ADD
     ! Jump to XT
     temp-reg JMP
-] rc-absolute-cell rt-literal 1 jit-profiling jit-define
+] rc-absolute-cell rt-literal 1 rex-length + jit-profiling jit-define
 
 [
+    temp-reg 0 MOV                             ! load XT
     stack-frame-size PUSH                      ! save stack frame size
-    0 PUSH                                     ! push XT
+    temp-reg PUSH                              ! push XT
     arg1 PUSH                                  ! alignment
-] rc-absolute-cell rt-label 6 jit-prolog jit-define
+] rc-absolute-cell rt-label 1 rex-length + jit-prolog jit-define
 
 [
     arg0 0 MOV                                 ! load literal
     arg0 dup [] MOV
     ds-reg bootstrap-cell ADD                  ! increment datastack pointer
     ds-reg [] arg0 MOV                         ! store literal on datastack
-] rc-absolute-cell rt-literal 1 jit-push-literal jit-define
+] rc-absolute-cell rt-literal 1 rex-length + jit-push-literal jit-define
 
 [
+    arg0 0 MOV                                 ! load XT
     arg1 stack-reg MOV                         ! pass callstack pointer as arg 2
-    (JMP) drop                                 ! go
-] rc-relative rt-primitive 3 jit-primitive jit-define
+    arg0 JMP                                   ! go
+] rc-absolute-cell rt-primitive 1 rex-length + jit-primitive jit-define
 
 [
     (JMP) drop
@@ -59,7 +61,7 @@ big-endian off
     arg0 arg1 [] CMOVNE                        ! load true branch if not equal
     arg0 arg1 bootstrap-cell [+] CMOVE         ! load false branch if equal
     arg0 quot-xt@ [+] JMP                      ! jump to quotation-xt
-] rc-absolute-cell rt-literal 1 jit-if-jump jit-define
+] rc-absolute-cell rt-literal 1 rex-length + jit-if-jump jit-define
 
 [
     arg1 0 MOV                                 ! load dispatch table
@@ -70,7 +72,7 @@ big-endian off
     arg0 arg1 ADD                              ! compute quotation location
     arg0 arg0 array-start [+] MOV              ! load quotation
     arg0 quot-xt@ [+] JMP                      ! execute branch
-] rc-absolute-cell rt-literal 1 jit-dispatch jit-define
+] rc-absolute-cell rt-literal 1 rex-length + jit-dispatch jit-define
 
 [
     stack-reg stack-frame-size bootstrap-cell - ADD ! unwind stack frame

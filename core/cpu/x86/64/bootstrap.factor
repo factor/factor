@@ -12,5 +12,6 @@ IN: bootstrap.x86
 : stack-reg RSP ;
 : ds-reg R14 ;
 : fixnum>slot@ ;
+: rex-length 1 ;
 
 "resource:core/cpu/x86/bootstrap.factor" run-file
