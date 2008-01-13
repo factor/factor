@@ -43,7 +43,7 @@ M: assoc assoc-find
     inline
 
 : assoc-push-if ( key value quot accum -- )
-    >r 2over 2slip r> roll
+    >r 2keep r> roll
     [ >r 2array r> push ] [ 3drop ] if ; inline
 
 : assoc-pusher ( quot -- quot' accum )
@@ -53,7 +53,7 @@ M: assoc assoc-find
     over >r assoc-pusher >r assoc-each r> r> assoc-like ; inline
 
 : assoc-all? ( assoc quot -- ? )
-    [ not ] compose assoc-find 2nip not ; inline
+    [ not ] compose assoc-contains? not ; inline
 
 : assoc-contains? ( assoc quot -- ? )
     assoc-find 2nip ; inline

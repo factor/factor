@@ -102,7 +102,7 @@ M: vocab-link vocab-name vocab-link-name ;
 UNION: vocab-spec vocab vocab-link ;
 
 : forget-vocab ( vocab -- )
-    dup vocab-words values forget-all
+    dup words forget-all
     vocab-name dictionary get delete-at ;
 
 M: vocab-spec forget* forget-vocab ;

@@ -96,12 +96,12 @@ SYMBOL: m
 : zero-dt ( -- <dt> ) 0 0 0 0 0 0 <dt> ;
 : years ( n -- dt ) zero-dt [ set-dt-year ] keep ;
 : months ( n -- dt ) zero-dt [ set-dt-month ] keep ;
-: weeks ( n -- dt ) 7 * zero-dt [ set-dt-day ] keep ;
 : days ( n -- dt ) zero-dt [ set-dt-day ] keep ;
+: weeks ( n -- dt ) 7 * days ;
 : hours ( n -- dt ) zero-dt [ set-dt-hour ] keep ;
 : minutes ( n -- dt ) zero-dt [ set-dt-minute ] keep ;
 : seconds ( n -- dt ) zero-dt [ set-dt-second ] keep ;
-: milliseconds ( n -- dt ) 1000 /f zero-dt [ set-dt-second ] keep ;
+: milliseconds ( n -- dt ) 1000 /f seconds ;
 
 : julian-day-number>timestamp ( n -- timestamp )
     julian-day-number>date 0 0 0 0 <timestamp> ;
@@ -259,10 +259,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
     1+ + 7 mod ;
 
 : day-of-week ( timestamp -- n )
-    [ timestamp-year ] keep
-    [ timestamp-month ] keep
-    timestamp-day
-    zeller-congruence ;
+    >date< zeller-congruence ;
 
 : day-of-year ( timestamp -- n )
     [

@@ -40,7 +40,7 @@ SYMBOL: big-endian?
     ] "" make 64 group ;
 
 : shift-mod ( n s w -- n )
-    >r shift r> 1 swap shift 1 - bitand ; inline
+    >r shift r> 2^ 1- bitand ; inline
 
 : update-old-new ( old new -- )
     [ get >r get r> ] 2keep >r >r w+ dup r> set r> set ; inline
