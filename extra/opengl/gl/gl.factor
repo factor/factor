@@ -1469,8 +1469,6 @@ GL-FUNCTION: void glWindowPos3sv ( GLshort* p ) ;
 : GL_SRC2_ALPHA GL_SOURCE2_ALPHA ; inline
 : GL_SRC2_RGB GL_SOURCE2_RGB ; inline
 
-TYPEDEF: long ptrdiff_t
-
 TYPEDEF: ptrdiff_t GLsizeiptr
 TYPEDEF: ptrdiff_t GLintptr
 

@@ -46,6 +46,9 @@ PRIVATE>
 : TYPEDEF:
     scan scan typedef ; parsing
 
+: TYPEDEF-IF:
+    scan-word execute scan scan rot [ typedef ] [ 2drop ] if ; parsing
+
 : C-STRUCT:
     scan in get
     parse-definition
