@@ -52,11 +52,11 @@ M: assoc assoc-find
 : assoc-subset ( assoc quot -- subassoc )
     over >r assoc-pusher >r assoc-each r> r> assoc-like ; inline
 
-: assoc-all? ( assoc quot -- ? )
-    [ not ] compose assoc-contains? not ; inline
-
 : assoc-contains? ( assoc quot -- ? )
     assoc-find 2nip ; inline
+
+: assoc-all? ( assoc quot -- ? )
+    [ not ] compose assoc-contains? not ; inline
 
 : at ( key assoc -- value/f )
     at* drop ; inline
