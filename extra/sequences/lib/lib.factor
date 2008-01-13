@@ -59,7 +59,7 @@ IN: sequences.lib
     ] { } make ;
 
 : singleton? ( seq -- ? )
-    length 1 = ; foldable
+    length 1 = ;
 
 : delete-random ( seq -- value )
     [ length random ] keep [ nth ] 2keep delete-nth ;
