@@ -76,7 +76,8 @@ GENERIC: apply-object ( obj -- )
 
 M: object apply-object apply-literal ;
 
-M: wrapper apply-object wrapped dup depends-on apply-literal ;
+M: wrapper apply-object
+    wrapped dup +called+ depends-on apply-literal ;
 
 : terminate ( -- )
     terminated? on #terminate node, ;
@@ -372,6 +373,7 @@ TUPLE: effect-error word effect ;
 
 : custom-infer ( word -- )
     #! Customized inference behavior
+    dup +inlined+ depends-on
     "infer" word-prop call ;
 
 : cached-infer ( word -- )
@@ -449,10 +451,12 @@ M: #call-label collect-recursion*
     ] if ;
 
 M: word apply-object
-    dup depends-on [
+    [
+        dup +inlined+ depends-on
         dup inline-recursive-label
         [ declared-infer ] [ inline-word ] if
     ] [
+        dup +called+ depends-on
         dup recursive-label
         [ declared-infer ] [ apply-word ] if
     ] if-inline ;

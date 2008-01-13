@@ -13,3 +13,5 @@ $nl
 { $subsection deploy-tool }
 "Alternatively, right-click on a vocabulary presentation in the UI and choose " { $strong "Deploy tool" } " from the resulting popup menu."
 { $see-also "tools.deploy" } ;
+
+ABOUT: "ui.tools.deploy"

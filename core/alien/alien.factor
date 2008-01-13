@@ -93,4 +93,4 @@ TUPLE: alien-invoke library function return parameters ;
 TUPLE: alien-invoke-error library symbol ;
 
 : alien-invoke ( ... return library function parameters -- ... )
-    pick pick \ alien-invoke-error construct-boa throw ;
+    2over \ alien-invoke-error construct-boa throw ;

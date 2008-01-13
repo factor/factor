@@ -166,15 +166,43 @@ IN: cpu.ppc.intrinsics
     }
 } define-intrinsics
 
-\ fixnum-shift [
-    "out" operand "x" operand "y" get neg SRAWI
-    ! Mask off low bits
-    "out" operand dup %untag
-] H{
-    { +input+ { { f "x" } { [ -31 0 between? ] "y" } } }
-    { +scratch+ { { f "out" } } }
-    { +output+ { "out" } }
-} define-intrinsic
+: %untag-fixnums ( seq -- )
+    [ dup %untag-fixnum ] unique-operands ;
+
+\ fixnum-shift-fast {
+    {
+        [
+            "out" operand "x" operand "y" get
+            dup 0 < [ neg SRAWI ] [ swapd SLWI ] if
+            ! Mask off low bits
+            "out" operand dup %untag
+        ] H{
+            { +input+ { { f "x" } { [ ] "y" } } }
+            { +scratch+ { { f "out" } } }
+            { +output+ { "out" } }
+        }
+    }
+    {
+        [
+            { "positive" "end" } [ define-label ] each
+            "y" operand "out" operand swap %untag-fixnum
+            0 "y" operand 0 CMPI
+            "positive" get BGE
+            "y" operand dup NEG
+            "out" operand "x" operand "out" operand SRAW
+            "end" get B
+            "positive" resolve-label
+            "out" operand "x" operand "out" operand SLW
+            "end" resolve-label
+            ! Mask off low bits
+            "out" operand dup %untag
+        ] H{
+            { +input+ { { f "x" } { f "y" } } }
+            { +scratch+ { { f "out" } } }
+            { +output+ { "out" } }
+        }
+    }
+} define-intrinsics
 
 : generate-fixnum-mod
     #! PowerPC doesn't have a MOD instruction; so we compute
@@ -221,9 +249,6 @@ IN: cpu.ppc.intrinsics
 } [
     first2 define-fixnum-jump
 ] each
-
-: %untag-fixnums ( seq -- )
-    [ dup %untag-fixnum ] unique-operands ;
 
 : overflow-check ( insn1 insn2 -- )
     [
@@ -335,9 +360,10 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 : define-float-op ( word op -- )
-    [ "x" operand "x" operand "y" operand ] swap add H{
+    [ "z" operand "x" operand "y" operand ] swap add H{
         { +input+ { { float "x" } { float "y" } } }
-        { +output+ { "x" } }
+        { +scratch+ { { float "z" } } }
+        { +output+ { "z" } }
     } define-intrinsic ;
 
 {
@@ -373,6 +399,23 @@ IN: cpu.ppc.intrinsics
     { +scratch+ { { float "scratch" } { f "out" } } }
     { +output+ { "out" } }
 } define-intrinsic
+
+\ fixnum>float [
+    HEX: 4330 "scratch" operand LIS
+    "scratch" operand 1 0 param@ STW
+    "scratch" operand "in" operand %untag-fixnum
+    "scratch" operand dup HEX: 8000 XORIS
+    "scratch" operand 1 cell param@ STW
+    "f1" operand 1 0 param@ LFD
+    4503601774854144.0 "scratch" operand load-indirect
+    "f2" operand "scratch" operand float-offset LFD
+    "f1" operand "f1" operand "f2" operand FSUB
+] H{
+    { +input+ { { f "in" } } }
+    { +scratch+ { { f "scratch" } { float "f1" } { float "f2" } } }
+    { +output+ { "f1" } }
+} define-intrinsic
+
 
 \ tag [
     "out" operand "in" operand tag-mask get ANDI

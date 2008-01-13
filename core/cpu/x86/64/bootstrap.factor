@@ -8,10 +8,10 @@ IN: bootstrap.x86
 
 : arg0 RDI ;
 : arg1 RSI ;
+: temp-reg RBX ;
 : stack-reg RSP ;
 : ds-reg R14 ;
-: scan-reg RBX ;
-: xt-reg RCX ;
 : fixnum>slot@ ;
+: rex-length 1 ;
 
 "resource:core/cpu/x86/bootstrap.factor" run-file

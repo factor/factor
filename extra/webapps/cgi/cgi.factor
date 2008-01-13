@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs io.files combinators
-arrays io.launcher io http.server http.server.responders
-webapps.file sequences strings ;
+arrays io.launcher io http.server.responders webapps.file
+sequences strings ;
 IN: webapps.cgi
 
 SYMBOL: cgi-root

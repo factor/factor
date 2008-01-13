@@ -55,12 +55,17 @@ TUPLE: expected-error ;
     [ nl failure. nl ] each ;
 
 : run-tests ( seq -- )
-    [ dup run-test ] { } map>assoc
-    [ second empty? not ] subset
-    dup empty? [ drop ] [
+    dup empty? [ drop "==== NOTHING TO TEST" print ] [
+        [ dup run-test ] { } map>assoc
+        [ second empty? not ] subset
         nl
-        "==== FAILING TESTS:" print
-        [ nl failures. ] assoc-each
+        dup empty? [
+            drop
+            "==== ALL TESTS PASSED" print
+        ] [
+            "==== FAILING TESTS:" print
+            [ nl failures. ] assoc-each
+        ] if
     ] if ;
 
 : run-vocab-tests ( vocabs -- )

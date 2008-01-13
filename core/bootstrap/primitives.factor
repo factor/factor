@@ -441,6 +441,7 @@ builtins get num-tags get tail f union-class define-class
     { "fixnum-bitxor" "math.private" }
     { "fixnum-bitnot" "math.private" }
     { "fixnum-shift" "math.private" }
+    { "fixnum-shift-fast" "math.private" }
     { "fixnum<" "math.private" }
     { "fixnum<=" "math.private" }
     { "fixnum>" "math.private" }

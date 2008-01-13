@@ -4,17 +4,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: io kernel namespaces prettyprint quotations
-sequences strings words xml.writer ;
+sequences strings words xml.writer compiler.units effects ;
 
 IN: html.elements
 
 ! These words are used to provide a means of writing
 ! formatted HTML to standard output with a familiar 'html' look
-! and feel in the code. 
+! and feel in the code.
 !
 ! HTML tags can be used in a number of different ways. The highest
 ! level involves a similar syntax to HTML:
-! 
+!
 ! <p> "someoutput" write </p>
 !
 ! <p> will output the opening tag and </p> will output the closing
@@ -28,7 +28,7 @@ IN: html.elements
 ! in that namespace. Before the attribute word should come the
 ! value of that attribute.
 ! The finishing word will print out the operning tag including
-! attributes. 
+! attributes.
 ! Any writes after this will appear after the opening tag.
 !
 ! Values for attributes can be used directly without any stack
@@ -57,54 +57,59 @@ SYMBOL: html
 : print-html ( str -- )
     write-html "\n" write-html ;
 
-: html-word ( name def -- )
+: html-word ( name def effect -- )
     #! Define 'word creating' word to allow
     #! dynamically creating words.
-    >r elements-vocab create r> define-compound ;
- 
+    >r >r elements-vocab create r> r> define-declared ;
+
 : <foo> "<" swap ">" 3append ;
+
+: empty-effect T{ effect f 0 0 } ;
 
 : def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned
     #! word.
-    dup <foo> swap [ <foo> write-html ] curry html-word ;
+    dup <foo> swap [ <foo> write-html ] curry
+    empty-effect html-word ;
 
 : <foo "<" swap append ;
 
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
     #! word.
-    <foo dup [ write-html ] curry html-word ;
+    <foo dup [ write-html ] curry
+    empty-effect html-word ;
 
 : foo> ">" append ;
 
 : def-for-html-word-foo> ( name -- )
     #! Return the name and code for the foo> patterned
     #! word.
-    foo> [ ">" write-html ] html-word ;
+    foo> [ ">" write-html ] empty-effect html-word ;
 
 : </foo> [ "</" % % ">" % ] "" make ;
 
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
-    #! word.    
-    </foo> dup [ write-html ] curry html-word ;
+    #! word.
+    </foo> dup [ write-html ] curry empty-effect html-word ;
 
 : <foo/> [ "<" % % "/>" % ] "" make ;
 
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
     #! word.
-    dup <foo/> swap [ <foo/> write-html ] curry html-word ;
+    dup <foo/> swap [ <foo/> write-html ] curry
+    empty-effect html-word ;
 
 : foo/> "/>" append ;
 
 : def-for-html-word-foo/> ( name -- )
     #! Return the name and code for the foo/> patterned
-    #! word.    
-    foo/> [ "/>" write-html ] html-word ;
+    #! word.
+    foo/> [ "/>" write-html ] empty-effect html-word ;
 
-: define-closed-html-word ( name -- ) 
+: define-closed-html-word ( name -- )
     #! Given an HTML tag name, define the words for
     #! that closable HTML tag.
     dup def-for-html-word-<foo>
@@ -112,7 +117,7 @@ SYMBOL: html
     dup def-for-html-word-foo>
     def-for-html-word-</foo> ;
 
-: define-open-html-word ( name -- ) 
+: define-open-html-word ( name -- )
     #! Given an HTML tag name, define the words for
     #! that open HTML tag.
     dup def-for-html-word-<foo/>
@@ -123,34 +128,38 @@ SYMBOL: html
     " " write-html
     write-html
     "='" write-html
-    escape-quoted-string write
+    escape-quoted-string write-html
     "'" write-html ;
+
+: attribute-effect T{ effect f { "string" } 0 } ;
 
 : define-attribute-word ( name -- )
     dup "=" swap append swap
-    [ write-attr ] curry html-word ;
+    [ write-attr ] curry attribute-effect html-word ;
 
-! Define some closed HTML tags
 [
-    "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9"    
-    "ol" "li" "form" "a" "p" "html" "head" "body" "title"
-    "b" "i" "ul" "table" "tbody" "tr" "td" "th" "pre" "textarea"
-    "script" "div" "span" "select" "option" "style"
-] [ define-closed-html-word ] each
+    ! Define some closed HTML tags
+    [
+        "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9"
+        "ol" "li" "form" "a" "p" "html" "head" "body" "title"
+        "b" "i" "ul" "table" "tbody" "tr" "td" "th" "pre" "textarea"
+        "script" "div" "span" "select" "option" "style"
+    ] [ define-closed-html-word ] each
 
-! Define some open HTML tags
-[ 
-    "input" 
-    "br" 
-    "link"
-    "img"
-] [ define-open-html-word ] each
+    ! Define some open HTML tags
+    [
+        "input"
+        "br"
+        "link"
+        "img"
+    ] [ define-open-html-word ] each
 
-! Define some attributes
-[ 
-    "method" "action" "type" "value" "name" 
-    "size" "href" "class" "border" "rows" "cols" 
-    "id" "onclick" "style" "valign" "accesskey"
-    "src" "language" "colspan" "onchange" "rel"
-    "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
-] [ define-attribute-word ] each 
+    ! Define some attributes
+    [
+        "method" "action" "type" "value" "name"
+        "size" "href" "class" "border" "rows" "cols"
+        "id" "onclick" "style" "valign" "accesskey"
+        "src" "language" "colspan" "onchange" "rel"
+        "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
+    ] [ define-attribute-word ] each
+] with-compilation-unit

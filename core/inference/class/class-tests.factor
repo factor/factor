@@ -50,7 +50,7 @@ M: object xyz ;
 ] unit-test
 
 : (fx-repeat) ( i n quot -- )
-    pick pick fixnum>= [
+    2over fixnum>= [
         3drop
     ] [
         [ swap >r call 1 fixnum+fast r> ] keep (fx-repeat)
@@ -66,7 +66,7 @@ M: object xyz ;
 ] unit-test
 
 : (i-repeat) ( i n quot -- )
-    pick pick dup xyz drop >= [
+    2over dup xyz drop >= [
         3drop
     ] [
         [ swap >r call 1+ r> ] keep (i-repeat)
@@ -214,7 +214,7 @@ GENERIC: annotate-entry-test-1 ( x -- )
 M: fixnum annotate-entry-test-1 drop ;
 
 : (annotate-entry-test-2) ( from to quot -- )
-    pick pick >= [
+    2over >= [
         3drop
     ] [
         [ swap >r call dup annotate-entry-test-1 1+ r> ] keep (annotate-entry-test-2)
@@ -234,4 +234,29 @@ M: fixnum annotate-entry-test-1 drop ;
 
 [ t ] [
     [ 3 + = ] \ equal? inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare 7 bitand neg shift ]
+    \ shift inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare 7 bitand neg shift ]
+    \ fixnum-shift inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare 1 swap 7 bitand shift ]
+    \ fixnum-shift inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
+    \ shift inlined?
+] unit-test
+
+[ f ] [
+    [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
+    \ fixnum-shift inlined?
 ] unit-test

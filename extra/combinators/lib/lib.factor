@@ -67,6 +67,28 @@ MACRO: napply ( n -- )
 
 : map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
 
+: 2with ( param1 param2 obj quot -- obj curry )
+    with with ; inline
+
+: 3with ( param1 param2 param3 obj quot -- obj curry )
+    with with with ; inline
+
+: with* ( obj assoc quot -- assoc curry )
+    swapd [ [ -rot ] dip call ] 2curry ; inline
+
+: 2with* ( obj1 obj2 assoc quot -- assoc curry )
+    with* with* ; inline
+
+: 3with* ( obj1 obj2 obj3 assoc quot -- assoc curry )
+    with* with* with* ; inline
+
+: assoc-each-with ( obj assoc quot -- )
+    with* assoc-each ; inline
+
+: assoc-map-with ( obj assoc quot -- assoc )
+    with* assoc-map ; inline
+
+
 MACRO: nfirst ( n -- )
     [ [ swap nth ] curry [ keep ] curry ] map concat [ drop ] compose ;
 
@@ -168,4 +190,4 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
     ] { } assoc>map concat compose ;
 
 : either ( object first second -- ? )
-    >r over slip swap [ r> drop ] [ r> call ] ?if ; inline
+    >r keep swap [ r> drop ] [ r> call ] ?if ; inline

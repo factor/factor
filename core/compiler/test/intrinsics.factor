@@ -441,3 +441,23 @@ cell 8 = [
         ] keep 2 fixnum+fast
     ] compile-call
 ] unit-test
+
+[ 1 ] [
+    8 -3 [ fixnum-shift-fast ] compile-call
+] unit-test
+
+[ 2 ] [
+    16 -3 [ fixnum-shift-fast ] compile-call
+] unit-test
+
+[ 2 ] [
+    16 [ -3 fixnum-shift-fast ] compile-call
+] unit-test
+
+[ 8 ] [
+    1 3 [ fixnum-shift-fast ] compile-call
+] unit-test
+
+[ 8 ] [
+    1 [ 3 fixnum-shift-fast ] compile-call
+] unit-test

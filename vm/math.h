@@ -22,6 +22,7 @@ DECLARE_PRIMITIVE(fixnum_and);
 DECLARE_PRIMITIVE(fixnum_or);
 DECLARE_PRIMITIVE(fixnum_xor);
 DECLARE_PRIMITIVE(fixnum_shift);
+DECLARE_PRIMITIVE(fixnum_shift_fast);
 DECLARE_PRIMITIVE(fixnum_less);
 DECLARE_PRIMITIVE(fixnum_lesseq);
 DECLARE_PRIMITIVE(fixnum_greater);

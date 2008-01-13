@@ -27,7 +27,7 @@ IN: opengl
     swap glBegin call glEnd ; inline
 
 : do-enabled ( what quot -- )
-    over glEnable swap slip glDisable ; inline
+    over glEnable dip glDisable ; inline
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep

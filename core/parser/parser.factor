@@ -437,7 +437,7 @@ SYMBOL: bootstrap-syntax
     smudged-usage forget-all
     over empty? [ 2dup smudged-usage-warning ] unless 2drop ;
 
-: finish-parsing ( contents quot -- )
+: finish-parsing ( lines quot -- )
     file get
     [ record-form ] keep
     [ record-modified ] keep
@@ -447,8 +447,7 @@ SYMBOL: bootstrap-syntax
 : parse-stream ( stream name -- quot )
     [
         [
-            contents
-            dup string-lines parse-fresh
+            lines dup parse-fresh
             tuck finish-parsing
             forget-smudged
         ] with-source-file

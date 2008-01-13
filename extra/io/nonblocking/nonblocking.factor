@@ -113,7 +113,7 @@ M: input-port stream-read
     ] if ;
 
 : read-until-loop ( seps port sbuf -- separator/f )
-    pick pick read-until-step over [
+    2over read-until-step over [
         >r over push-all r> dup [
             >r 3drop r>
         ] [

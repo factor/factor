@@ -3,6 +3,8 @@ assocs words.private sequences ;
 IN: compiler
 
 ARTICLE: "compiler-usage" "Calling the optimizing compiler"
+"Normally, new word definitions are recompiled automatically, however in some circumstances the optimizing compiler may need to be called directly."
+$nl
 "The main entry points to the optimizing compiler:"
 { $subsection compile }
 { $subsection recompile }

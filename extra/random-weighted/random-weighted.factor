@@ -4,7 +4,7 @@ USING: kernel namespaces arrays quotations sequences assocs combinators
 
 IN: random-weighted
 
-: probabilities ( weights -- probabilities ) dup sum [ / ] curry map ;
+: probabilities ( weights -- probabilities ) dup sum v/n ;
 
 : layers ( probabilities -- layers )
 dup length 1+ [ head ] with map 1 tail [ sum ] map ;

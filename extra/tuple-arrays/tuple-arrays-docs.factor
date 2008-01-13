@@ -1,4 +1,5 @@
-USING: help.syntax help.markup tuple-arrays splitting kernel ;
+USING: help.syntax help.markup splitting kernel ;
+IN: tuple-arrays
 
 HELP: tuple-array
 { $description "The class of packed homogeneous tuple arrays. They are created with " { $link <tuple-array> } ". All elements are of the same tuple class. Mutations done to an element are not copied back to the packed array unless it is explicitly written back. Packed follows the sequence protocol and is implemented using the " { $link groups } " class." } ;

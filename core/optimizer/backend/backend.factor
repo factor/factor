@@ -1,9 +1,9 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs inference inference.class
-inference.dataflow inference.backend io kernel math namespaces
-sequences vectors words quotations hashtables combinators
-classes generic.math continuations optimizer.def-use
+inference.dataflow inference.backend inference.state io kernel
+math namespaces sequences vectors words quotations hashtables
+combinators classes generic.math continuations optimizer.def-use
 optimizer.pattern-match generic.standard ;
 IN: optimizer.backend
 
@@ -173,8 +173,8 @@ M: node remember-method*
     2drop ;
 
 : remember-method ( method-spec node -- )
-    swap dup
-    [ [ swap remember-method* ] curry each-node ] [ 2drop ] if ;
+    swap dup second +inlined+ depends-on
+    [ swap remember-method* ] curry each-node ;
 
 : (splice-method) ( #call method-spec quot -- node )
     #! Must remember the method before splicing in, otherwise
@@ -184,7 +184,10 @@ M: node remember-method*
     [ swap infer-classes/node ] 2keep
     [ substitute-node ] keep ;
 
-: splice-quot ( #call quot -- node ) f swap (splice-method) ;
+: splice-quot ( #call quot -- node )
+    over node-in-d dataflow-with
+    [ swap infer-classes/node ] 2keep
+    [ substitute-node ] keep ;
 
 : drop-inputs ( node -- #shuffle )
     node-in-d clone \ #shuffle in-node ;
@@ -225,7 +228,7 @@ M: #dispatch optimize-node*
     #! t indicates failure
     {
         { [ dup t eq? ] [ 3drop t ] }
-        { [ pick pick swap node-history member? ] [ 3drop t ] }
+        { [ 2over swap node-history member? ] [ 3drop t ] }
         { [ t ] [ (splice-method) ] }
     } cond ;
 
@@ -358,7 +361,8 @@ M: #dispatch optimize-node*
     ] if ;
 
 : optimistic-inline ( #call -- node )
-    dup node-param word-def splice-quot ;
+    dup node-param dup +inlined+ depends-on
+    word-def splice-quot ;
 
 M: #call optimize-node*
     {

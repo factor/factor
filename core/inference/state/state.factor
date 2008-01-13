@@ -31,11 +31,16 @@ SYMBOL: current-node
 ! Words that the current dataflow IR depends on
 SYMBOL: dependencies
 
-: depends-on ( word -- )
-    dup dependencies get dup [ set-at ] [ 3drop ] if ;
+SYMBOL: +inlined+
+SYMBOL: +called+
+
+: depends-on ( word how -- )
+    swap dependencies get dup [
+        2dup at +inlined+ eq? [ 3drop ] [ set-at ] if
+    ] [ 3drop ] if ;
 
 : computing-dependencies ( quot -- dependencies )
-    H{ } clone [ dependencies rot with-variable ] keep keys ;
+    H{ } clone [ dependencies rot with-variable ] keep ;
     inline
 
 ! Did the current control-flow path throw an error?

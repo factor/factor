@@ -105,7 +105,7 @@ C: <pane-stream> pane-stream
 
 : pane-format ( style pane seq -- )
     [ dup pane-nl ]
-    [ pick pick pane-current stream-format ]
+    [ 2over pane-current stream-format ]
     interleave 2drop ;
 
 GENERIC: write-gadget ( gadget stream -- )
@@ -327,7 +327,7 @@ M: paragraph stream-format
     ] [
         rot " " split
         [ 2dup gadget-bl ]
-        [ pick pick gadget-format ] interleave
+        [ 2over gadget-format ] interleave
         2drop
     ] if ;
 

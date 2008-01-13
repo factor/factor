@@ -81,7 +81,7 @@ TUPLE: deploy-gadget vocab settings ;
     close-window ;
 
 : com-help ( -- )
-    "ui-deploy" help-window ;
+    "ui.tools.deploy" help-window ;
 
 \ com-help H{
     { +nullary+ t }

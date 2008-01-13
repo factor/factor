@@ -85,7 +85,10 @@ M: method-spec definer drop \ M: \ ; ;
 
 M: method-spec definition first2 method method-def ;
 
-M: method-spec forget* first2 [ delete-at ] with-methods ;
+: forget-method ( class generic -- )
+    check-method [ delete-at ] with-methods ;
+
+M: method-spec forget* first2 forget-method ;
 
 : implementors* ( classes -- words )
     all-words [

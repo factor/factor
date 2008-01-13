@@ -61,6 +61,11 @@ M: pair (bitfield-quot) ( spec -- quot )
 
 \ set-slots [ <reversed> [get-slots] ] 1 define-transform
 
-\ construct-boa [
-    dup tuple-size [ <tuple-boa> ] 2curry
-] 1 define-transform
+: [construct] ( word quot -- newquot )
+    >r dup +inlined+ depends-on dup tuple-size r> 2curry ;
+
+\ construct-boa
+[ [ <tuple-boa> ] [construct] ] 1 define-transform
+
+\ construct-empty
+[ [ <tuple> ] [construct] ] 1 define-transform

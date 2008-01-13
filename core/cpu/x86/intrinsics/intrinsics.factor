@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays cpu.x86.assembler cpu.x86.allot
 cpu.x86.architecture cpu.architecture kernel kernel.private math
@@ -240,17 +240,18 @@ IN: cpu.x86.intrinsics
     }
 } define-intrinsics
 
-\ fixnum-shift [
-    "x" operand "y" get neg SAR
+: %untag-fixnums ( seq -- )
+    [ %untag-fixnum ] unique-operands ;
+
+\ fixnum-shift-fast [
+    "x" operand "y" get
+    dup 0 < [ neg SAR ] [ SHL ] if
     ! Mask off low bits
     "x" operand %untag
 ] H{
-    { +input+ { { f "x" } { [ -31 0 between? ] "y" } } }
+    { +input+ { { f "x" } { [ ] "y" } } }
     { +output+ { "x" } }
 } define-intrinsic
-
-: %untag-fixnums ( seq -- )
-    [ %untag-fixnum ] unique-operands ;
 
 : overflow-check ( word -- )
     "end" define-label

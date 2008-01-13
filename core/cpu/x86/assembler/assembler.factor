@@ -81,7 +81,7 @@ SYMBOL: XMM15 \ XMM15 15 128 define-register
 : n, >le % ; inline
 : 4, 4 n, ; inline
 : 2, 2 n, ; inline
-: cell, cell n, ; inline
+: cell, bootstrap-cell n, ; inline
 
 #! Extended AMD64 registers (R8-R15) return true.
 GENERIC: extended? ( op -- ? )
@@ -232,14 +232,14 @@ UNION: operand register indirect ;
 
 : rex-prefix ( reg r/m rex.w -- )
     #! Compile an AMD64 REX prefix.
-    pick pick rex.w? BIN: 01001000 BIN: 01000000 ?
+    2over rex.w? BIN: 01001000 BIN: 01000000 ?
     swap rex.r swap rex.b
     dup BIN: 01000000 = [ drop ] [ , ] if ;
 
 : 16-prefix ( reg r/m -- )
     [ register-16? ] either? [ HEX: 66 , ] when ;
 
-: prefix ( reg r/m rex.w -- ) pick pick 16-prefix rex-prefix ;
+: prefix ( reg r/m rex.w -- ) 2over 16-prefix rex-prefix ;
 
 : prefix-1 ( reg rex.w -- ) f swap prefix ;
 
@@ -290,7 +290,7 @@ UNION: operand register indirect ;
 : 2-operand ( dst src op -- )
     #! Sets the opcode's direction bit. It is set if the
     #! destination is a direct register operand.
-    pick pick 16-prefix
+    2over 16-prefix
     direction-bit
     operand-size-bit
     (2-operand) ;
