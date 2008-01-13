@@ -20,17 +20,12 @@ SYMBOL: trials
 
 : random-bits ( m -- n ) 2^ random ; foldable
 
-: (factor-2s) ( s n -- s n )
-    dup even? [ -1 shift >r 1+ r> (factor-2s) ] when ;
-
 : factor-2s ( n -- r s )
     #! factor an even number into 2 ^ s * m
-    dup even? over 0 > and [
-        "input must be positive and even" throw
-    ] unless 0 swap (factor-2s) ;
+    dup even? [ -1 shift >r 1+ r> factor-2s ] when ;
 
 :: (miller-rabin) | n prime?! |
-    n 1- factor-2s s set r set
+    0 n 1- factor-2s s set r set
     trials get [
         n 1- [1,b] random a set
         a get s get n ^mod 1 = [
