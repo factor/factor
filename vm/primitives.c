@@ -33,6 +33,7 @@ void *primitives[] = {
 	primitive_fixnum_xor,
 	primitive_fixnum_not,
 	primitive_fixnum_shift,
+	primitive_fixnum_shift_fast,
 	primitive_fixnum_less,
 	primitive_fixnum_lesseq,
 	primitive_fixnum_greater,

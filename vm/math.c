@@ -166,6 +166,12 @@ DEFINE_PRIMITIVE(fixnum_shift)
 		fixnum_to_bignum(x),y)));
 }
 
+DEFINE_PRIMITIVE(fixnum_shift_fast)
+{
+	POP_FIXNUMS(x,y)
+	dpush(tag_fixnum(y < 0 ? (x >> -y) : (x << y)));
+}
+
 DEFINE_PRIMITIVE(fixnum_less)
 {
 	POP_FIXNUMS(x,y)
