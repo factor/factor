@@ -17,7 +17,7 @@ IN: bootstrap.compiler
 "cpu." cpu append require
 
 nl
-"Compiling some words to speed up bootstrap..." write
+"Compiling some words to speed up bootstrap..." write flush
 
 ! Compile a set of words ahead of the full compile.
 ! This set of words was determined semi-empirically

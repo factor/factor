@@ -172,7 +172,8 @@ IN: cpu.ppc.intrinsics
 \ fixnum-shift-fast {
     {
         [
-            "out" operand "x" operand "y" get neg SRAWI
+            "out" operand "x" operand "y" get
+            dup 0 < [ neg SRAWI ] [ swapd SLWI ] if
             ! Mask off low bits
             "out" operand dup %untag
         ] H{
@@ -199,6 +200,7 @@ IN: cpu.ppc.intrinsics
             { +input+ { { f "x" } { f "y" } } }
             { +scratch+ { { f "out" } } }
             { +output+ { "out" } }
+            { +clobber+ { "x" "y" } }
         }
     }
 } define-intrinsics

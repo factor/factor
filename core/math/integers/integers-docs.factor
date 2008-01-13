@@ -120,7 +120,7 @@ HELP: fixnum-shift ( x y -- z )
 { $description "Primitive version of " { $link shift } ". The result may overflow to a bignum." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link shift } " instead." } ;
 
-HELP: fixnum-shift-shift ( x y -- z )
+HELP: fixnum-shift-fast ( x y -- z )
 { $values { "x" fixnum } { "y" fixnum } { "z" fixnum } }
 { $description "Primitive version of " { $link shift } ". Unlike " { $link fixnum-shift } ", does not perform an overflow check, so the result may be incorrect." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link shift } " instead." } ;
