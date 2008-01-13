@@ -77,7 +77,7 @@ TUPLE: miller-rabin-bounds ;
     >odd (find-relative-prime) ;
 
 : find-relative-prime ( n -- p )
-    dup random (find-relative-prime*) ;
+    dup random find-relative-prime* ;
 
 : unique-primes ( numbits n -- seq )
     #! generate two primes
