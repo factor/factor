@@ -20,12 +20,19 @@ SYMBOL: trials
 
 : random-bits ( m -- n ) 2^ random ; foldable
 
-: factor-2s ( zero n -- r s )
-    #! factor an even number into 2 ^ s * m
-    dup even? [ -1 shift >r 1+ r> factor-2s ] when ;
+TUPLE: positive-even-expected n ;
+
+: (factor-2s) ( r s -- r s )
+    dup even? [ -1 shift >r 1+ r> (factor-2s) ] when ;
+
+: factor-2s ( n -- r s )
+    #! factor an even number into s * 2 ^ r
+    dup even? over 0 > and [
+        positive-even-expected construct-boa throw
+    ] unless 0 swap (factor-2s) ;
 
 :: (miller-rabin) | n prime?! |
-    0 n 1- factor-2s s set r set
+    n 1- factor-2s s set r set
     trials get [
         n 1- [1,b] random a set
         a get s get n ^mod 1 = [
@@ -70,7 +77,7 @@ TUPLE: miller-rabin-bounds ;
     >odd (find-relative-prime) ;
 
 : find-relative-prime ( n -- p )
-    dup random >odd (find-relative-prime) ;
+    dup random find-relative-prime* ;
 
 : unique-primes ( numbits n -- seq )
     #! generate two primes

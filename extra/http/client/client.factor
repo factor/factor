@@ -29,7 +29,7 @@ IN: http.client
 : crlf "\r\n" write ;
 
 : http-request ( host resource method -- )
-    write " " write write " HTTP/1.0" write crlf
+    write bl write " HTTP/1.0" write crlf
     "Host: " write write crlf ;
 
 : get-request ( host resource -- )

@@ -1,12 +1,9 @@
 USING: io.backend io.files kernel math math.parser
-namespaces editors.vim sequences system combinators
-vocabs.loader ;
+namespaces sequences system combinators
+editors.vim editors.gvim.backend vocabs.loader ;
 IN: editors.gvim
 
 TUPLE: gvim ;
-
-HOOK: gvim-path io-backend ( -- path )
-
 
 M: gvim vim-command ( file line -- string )
     [ "\"" % gvim-path % "\" \"" % swap % "\" +" % # ] "" make ;
