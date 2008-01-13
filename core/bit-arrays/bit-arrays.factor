@@ -6,15 +6,13 @@ IN: bit-arrays
 
 <PRIVATE
 
-: n>cell -5 shift 4 * ; inline
+: n>byte -3 shift ; inline
 
-: cell/bit ( n alien -- byte bit )
-    over n>cell alien-unsigned-4 swap 31 bitand ; inline
+: byte/bit ( n alien -- byte bit )
+    over n>byte alien-unsigned-1 swap 7 bitand ; inline
 
 : set-bit ( ? byte bit -- byte )
     2^ rot [ bitor ] [ bitnot bitand ] if ; inline
-
-: bits>bytes 7 + -3 shift ; inline
 
 : bits>cells 31 + -5 shift ; inline
 
@@ -27,11 +25,13 @@ PRIVATE>
 
 M: bit-array length array-capacity ;
 
-M: bit-array nth-unsafe cell/bit bit? ;
+M: bit-array nth-unsafe
+    >r >fixnum r> byte/bit bit? ;
 
 M: bit-array set-nth-unsafe
-    [ cell/bit set-bit ] 2keep
-    swap n>cell set-alien-unsigned-4 ;
+    >r >fixnum r>
+    [ byte/bit set-bit ] 2keep
+    swap n>byte set-alien-unsigned-1 ;
 
 : clear-bits ( bit-array -- ) 0 (set-bits) ;
 

@@ -6,11 +6,11 @@ bit-arrays namespaces io ;
     2dup length >= [
         3drop
     ] [
-        f pick pick set-nth-unsafe >r over + r> clear-flags
+        f 2over set-nth-unsafe >r over + r> clear-flags
     ] if ; inline
 
 : (nsieve-bits) ( count i seq -- count )
-    2dup length <= [
+    2dup length < [
         2dup nth-unsafe [
             over dup 2 * pick clear-flags
             rot 1+ -rot ! increment count

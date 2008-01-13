@@ -10,7 +10,7 @@ arrays namespaces io ;
     ] if ; inline
 
 : (nsieve) ( count i seq -- count )
-    2dup length <= [
+    2dup length < [
         2dup nth-unsafe [
             over dup 2 * pick clear-flags
             rot 1+ -rot ! increment count

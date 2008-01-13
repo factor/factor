@@ -240,14 +240,30 @@ IN: cpu.x86.intrinsics
     }
 } define-intrinsics
 
-\ fixnum-shift [
-    "x" operand "y" get neg SAR
-    ! Mask off low bits
-    "x" operand %untag
-] H{
-    { +input+ { { f "x" } { [ -31 0 between? ] "y" } } }
-    { +output+ { "x" } }
-} define-intrinsic
+\ fixnum-shift-fast {
+    {
+        [
+            "y" operand NEG
+            "y" operand %untag-fixnum
+            "x" operand "y" operand SAR
+            ! Mask off low bits
+            "x" operand %untag
+        ] H{
+            { +input+ { { f "x" } { f "y" } } }
+            { +output+ { "x" } }
+            { +clobber+ { "y" } }
+        }
+    } {
+        [
+            "x" operand "y" get neg SAR
+            ! Mask off low bits
+            "x" operand %untag
+        ] H{
+            { +input+ { { f "x" } { [ ] "y" } } }
+            { +output+ { "x" } }
+        }
+    }
+} define-intrinsics
 
 : %untag-fixnums ( seq -- )
     [ %untag-fixnum ] unique-operands ;

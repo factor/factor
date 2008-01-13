@@ -235,3 +235,28 @@ M: fixnum annotate-entry-test-1 drop ;
 [ t ] [
     [ 3 + = ] \ equal? inlined?
 ] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare 7 bitand neg shift ]
+    \ shift inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare 7 bitand neg shift ]
+    \ fixnum-shift inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare 1 swap 7 bitand shift ]
+    \ fixnum-shift inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
+    \ shift inlined?
+] unit-test
+
+[ f ] [
+    [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
+    \ fixnum-shift inlined?
+] unit-test

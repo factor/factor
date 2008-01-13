@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer.math
 USING: alien arrays generic hashtables kernel assocs math
@@ -7,7 +7,7 @@ inference.class inference.dataflow vectors strings sbufs io
 namespaces assocs quotations math.intervals sequences.private
 combinators splitting layouts math.parser classes
 generic.math optimizer.pattern-match optimizer.backend
-optimizer.def-use generic.standard ;
+optimizer.def-use generic.standard system ;
 
 { + bignum+ float+ fixnum+fast } {
     { { number 0 } [ drop ] }
@@ -82,7 +82,7 @@ optimizer.def-use generic.standard ;
     { { @ @ } [ 2drop 0 ] }
 } define-identities
 
-{ shift fixnum-shift bignum-shift } {
+{ shift fixnum-shift fixnum-shift-fast bignum-shift } {
     { { 0 number } [ drop ] }
     { { number 0 } [ drop ] }
 } define-identities
@@ -196,7 +196,7 @@ optimizer.def-use generic.standard ;
     ] 2curry "output-classes" set-word-prop
 ] each
 
-{ fixnum-shift shift } [
+{ fixnum-shift fixnum-shift-fast shift } [
     [
         dup
         node-in-d second value-interval*
@@ -439,3 +439,28 @@ most-negative-fixnum most-positive-fixnum [a,b]
         [ splice-quot ] curry ,
     ] { } make 1array define-optimizers
 ] assoc-each
+
+: fixnum-shift-fast-pos? ( node -- ? )
+    #! Shifting 1 to the left won't overflow if the shift
+    #! count is small enough
+    dup dup node-in-d first node-literal 1 = [
+        dup node-in-d second node-interval
+        0 cell-bits tag-bits get - 2 - [a,b] interval-subset?
+    ] [ drop f ] if ;
+
+: fixnum-shift-fast-neg? ( node -- ? )
+    #! Shifting any number to the right won't overflow if the
+    #! shift count is small enough
+    dup node-in-d second node-interval
+    cell-bits 1- neg 0 [a,b] interval-subset? ;
+
+: fixnum-shift-fast? ( node -- ? )
+    dup fixnum-shift-fast-pos?
+    [ drop t ] [ fixnum-shift-fast-neg? ] if ;
+
+\ fixnum-shift {
+    {
+        [ dup fixnum-shift-fast? ]
+        [ [ fixnum-shift-fast ] splice-quot ]
+    }
+} define-optimizers

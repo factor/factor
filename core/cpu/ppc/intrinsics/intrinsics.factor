@@ -166,15 +166,42 @@ IN: cpu.ppc.intrinsics
     }
 } define-intrinsics
 
-\ fixnum-shift [
-    "out" operand "x" operand "y" get neg SRAWI
-    ! Mask off low bits
-    "out" operand dup %untag
-] H{
-    { +input+ { { f "x" } { [ -31 0 between? ] "y" } } }
-    { +scratch+ { { f "out" } } }
-    { +output+ { "out" } }
-} define-intrinsic
+: %untag-fixnums ( seq -- )
+    [ dup %untag-fixnum ] unique-operands ;
+
+\ fixnum-shift-fast {
+    {
+        [
+            "out" operand "x" operand "y" get neg SRAWI
+            ! Mask off low bits
+            "out" operand dup %untag
+        ] H{
+            { +input+ { { f "x" } { [ ] "y" } } }
+            { +scratch+ { { f "out" } } }
+            { +output+ { "out" } }
+        }
+    }
+    {
+        [
+            { "positive" "end" } [ define-label ] each
+            { "x" "y" } %untag-fixnums
+            0 "y" operand 0 CMPI
+            "positive" get BGE
+            "y" operand dup NEG
+            "out" operand "x" operand "y" operand SRAW
+            "end" get B
+            "positive" resolve-label
+            "out" operand "x" operand "y" operand SLW
+            "end" resolve-label
+            ! Mask off low bits
+            "out" operand dup %tag-fixnum
+        ] H{
+            { +input+ { { f "x" } { f "y" } } }
+            { +scratch+ { { f "out" } } }
+            { +output+ { "out" } }
+        }
+    }
+} define-intrinsics
 
 : generate-fixnum-mod
     #! PowerPC doesn't have a MOD instruction; so we compute
@@ -221,9 +248,6 @@ IN: cpu.ppc.intrinsics
 } [
     first2 define-fixnum-jump
 ] each
-
-: %untag-fixnums ( seq -- )
-    [ dup %untag-fixnum ] unique-operands ;
 
 : overflow-check ( insn1 insn2 -- )
     [

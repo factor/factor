@@ -81,7 +81,7 @@ SYMBOL: XMM15 \ XMM15 15 128 define-register
 : n, >le % ; inline
 : 4, 4 n, ; inline
 : 2, 2 n, ; inline
-: cell, cell n, ; inline
+: cell, bootstrap-cell n, ; inline
 
 #! Extended AMD64 registers (R8-R15) return true.
 GENERIC: extended? ( op -- ? )

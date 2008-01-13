@@ -254,6 +254,9 @@ t over set-effect-terminated?
 \ fixnum-shift { fixnum fixnum } { integer } <effect> "inferred-effect" set-word-prop
 \ fixnum-shift make-foldable
 
+\ fixnum-shift-fast { fixnum fixnum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum-shift-fast make-foldable
+
 \ bignum= { bignum bignum } { object } <effect> "inferred-effect" set-word-prop
 \ bignum= make-foldable
 
