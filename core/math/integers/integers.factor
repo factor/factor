@@ -32,7 +32,7 @@ M: fixnum shift >fixnum fixnum-shift ;
 
 M: fixnum bitnot fixnum-bitnot ;
 
-M: fixnum bit? 2^ bitand 0 > ;
+M: fixnum bit? neg shift 1 bitand 0 > ;
 
 : (fixnum-log2) ( accum n -- accum )
     dup 1 number= [ drop ] [ >r 1+ r> 2/ (fixnum-log2) ] if ;
