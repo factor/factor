@@ -185,22 +185,21 @@ IN: cpu.ppc.intrinsics
     {
         [
             { "positive" "end" } [ define-label ] each
-            { "x" "y" } %untag-fixnums
+            "y" operand "out" operand swap %untag-fixnum
             0 "y" operand 0 CMPI
             "positive" get BGE
             "y" operand dup NEG
-            "out" operand "x" operand "y" operand SRAW
+            "out" operand "x" operand "out" operand SRAW
             "end" get B
             "positive" resolve-label
-            "out" operand "x" operand "y" operand SLW
+            "out" operand "x" operand "out" operand SLW
             "end" resolve-label
             ! Mask off low bits
-            "out" operand dup %tag-fixnum
+            "out" operand dup %untag
         ] H{
             { +input+ { { f "x" } { f "y" } } }
             { +scratch+ { { f "out" } } }
             { +output+ { "out" } }
-            { +clobber+ { "x" "y" } }
         }
     }
 } define-intrinsics
@@ -361,9 +360,10 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 : define-float-op ( word op -- )
-    [ "x" operand "x" operand "y" operand ] swap add H{
+    [ "z" operand "x" operand "y" operand ] swap add H{
         { +input+ { { float "x" } { float "y" } } }
-        { +output+ { "x" } }
+        { +scratch+ { { float "z" } } }
+        { +output+ { "z" } }
     } define-intrinsic ;
 
 {
@@ -399,6 +399,23 @@ IN: cpu.ppc.intrinsics
     { +scratch+ { { float "scratch" } { f "out" } } }
     { +output+ { "out" } }
 } define-intrinsic
+
+\ fixnum>float [
+    HEX: 4330 "scratch" operand LIS
+    "scratch" operand 1 0 param@ STW
+    "scratch" operand "in" operand %untag-fixnum
+    "scratch" operand dup HEX: 8000 XORIS
+    "scratch" operand 1 cell param@ STW
+    "f1" operand 1 0 param@ LFD
+    4503601774854144.0 "scratch" operand load-indirect
+    "f2" operand "scratch" operand float-offset LFD
+    "f1" operand "f1" operand "f2" operand FSUB
+] H{
+    { +input+ { { f "in" } } }
+    { +scratch+ { { f "scratch" } { float "f1" } { float "f2" } } }
+    { +output+ { "f1" } }
+} define-intrinsic
+
 
 \ tag [
     "out" operand "in" operand tag-mask get ANDI
