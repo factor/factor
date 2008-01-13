@@ -20,7 +20,7 @@ SYMBOL: trials
 
 : random-bits ( m -- n ) 2^ random ; foldable
 
-: factor-2s ( n -- r s )
+: factor-2s ( zero n -- r s )
     #! factor an even number into 2 ^ s * m
     dup even? [ -1 shift >r 1+ r> factor-2s ] when ;
 
