@@ -1,4 +1,4 @@
-USING: kernel opengl arrays sequences jamshred jamshred.tunnel
+USING: kernel opengl arrays sequences jamshred.tunnel
 jamshred.player math.vectors ;
 IN: jamshred.game
 

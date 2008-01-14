@@ -1,5 +1,6 @@
 USING: alien.c-types hardware-info hardware-info.windows
-kernel math namespaces windows windows.kernel32 ;
+kernel math namespaces windows windows.kernel32
+hardware-info.backend ;
 IN: hardware-info.windows.ce
 
 T{ wince } os set-global
@@ -29,5 +30,3 @@ M: wince total-virtual-mem ( -- n )
 
 M: wince available-virtual-mem ( -- n )
     memory-status MEMORYSTATUS-dwAvailVirtual ;
-
-

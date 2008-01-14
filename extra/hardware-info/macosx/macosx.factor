@@ -1,5 +1,5 @@
 USING: alien alien.c-types alien.syntax byte-arrays kernel
-namespaces sequences unix hardware-info ;
+namespaces sequences unix hardware-info.backend ;
 IN: hardware-info.macosx
 
 TUPLE: macosx ;

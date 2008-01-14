@@ -12,14 +12,11 @@ USING: alien kernel system combinators alien.syntax ;
 
 IN: cryptlib.libcl
 
-: load-libcl ( -- )
-    "libcl" {
+<< "libcl" {
         { [ win32? ] [ "cl32.dll" "stdcall" ] }
         { [ macosx? ] [ "libcl.dylib" "cdecl" ] }
         { [ unix? ] [ "libcl.so" "cdecl" ] }
-    } cond add-library ; parsing
-
-load-libcl
+    } cond add-library >>
 
 ! ===============================================
 ! Machine-dependant types
