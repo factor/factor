@@ -1,5 +1,5 @@
 
-USING: kernel arrays math.vectors mortar x.gc slot-accessors geom.pos ;
+USING: kernel arrays math.vectors mortar mortar.sugar x.gc slot-accessors geom.pos ;
 
 IN: x.pen
 

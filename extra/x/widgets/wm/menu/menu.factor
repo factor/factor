@@ -1,5 +1,5 @@
 
-USING: kernel x11.constants mortar slot-accessors x.widgets.keymenu ;
+USING: kernel x11.constants mortar mortar.sugar slot-accessors x.widgets.keymenu ;
 
 IN: x.widgets.wm.menu
 

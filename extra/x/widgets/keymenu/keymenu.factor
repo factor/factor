@@ -1,6 +1,6 @@
 
 USING: kernel strings arrays sequences sequences.lib math x11.xlib
-       mortar slot-accessors x x.pen x.widgets ;
+       mortar mortar.sugar slot-accessors x x.pen x.widgets ;
 
 IN: x.widgets.keymenu
 
