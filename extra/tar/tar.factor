@@ -35,7 +35,7 @@ linkname magic version uname gname devmajor devminor prefix ;
 
 : header-checksum ( seq -- x )
     148 cut-slice 8 tail-slice
-    [ 0 [ + ] reduce ] 2apply + 256 + ;
+    [ sum ] 2apply + 256 + ;
 
 TUPLE: checksum-error ;
 TUPLE: malformed-block-error ;
@@ -164,7 +164,7 @@ TUPLE: unimplemented-typeflag header ;
 ! Long file name
 : typeflag-L ( header -- )
     <string-writer> [ read-data-blocks ] keep
-    >string [ CHAR: \0 = ] right-trim filename set
+    >string [ zero? ] right-trim filename set
     global [ "long filename: " write filename get . flush ] bind
     filename get tar-path+ make-directories ;
 
@@ -196,7 +196,7 @@ TUPLE: unimplemented-typeflag header ;
         ! global [ dup tar-header-name [ print flush ] when* ] bind 
         dup tar-header-typeflag
         {
-            { CHAR: \0 [ typeflag-0 ] }
+            { 0 [ typeflag-0 ] }
             { CHAR: 0 [ typeflag-0 ] }
             { CHAR: 1 [ typeflag-1 ] }
             { CHAR: 2 [ typeflag-2 ] }

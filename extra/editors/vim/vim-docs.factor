@@ -1,5 +1,6 @@
-USING: definitions editors.vim help help.markup help.syntax io io.files
+USING: definitions help help.markup help.syntax io io.files
 editors words ;
+IN: editors.vim
 
 ARTICLE: { "vim" "vim" } "Vim support"
 "This module makes the " { $link edit } " word work with Vim by setting the " { $link edit-hook } " global variable to call " { $link vim-location } ". The " { $link vim-path } " variable contains the name of the vim executable.  The default " { $link vim-path } " is " { $snippet "\"gvim\"" } "."

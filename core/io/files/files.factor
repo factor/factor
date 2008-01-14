@@ -35,7 +35,11 @@ M: object root-directory? ( path -- ? ) path-separator? ;
 : stat ( path -- directory? permissions length modified )
     normalize-pathname (stat) ;
 
-: exists? ( path -- ? ) stat >r 3drop r> >boolean ;
+: file-length ( path -- n ) stat 4array third ;
+
+: file-modified ( path -- n ) stat >r 3drop r> ; inline
+
+: exists? ( path -- ? ) file-modified >boolean ;
 
 : directory? ( path -- ? ) stat 3drop ;
 
@@ -51,10 +55,6 @@ M: object root-directory? ( path -- ? ) path-separator? ;
 
 : directory ( path -- seq )
     normalize-directory dup (directory) fixup-directory ;
-
-: file-length ( path -- n ) stat 4array third ;
-
-: file-modified ( path -- n ) stat >r 3drop r> ;
 
 : last-path-separator ( path -- n ? )
     [ length 2 [-] ] keep [ path-separator? ] find-last* ;

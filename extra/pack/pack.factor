@@ -2,16 +2,13 @@ USING: alien alien.c-types arrays assocs byte-arrays inference
 inference.transforms io io.binary io.streams.string kernel
 math math.parser namespaces parser prettyprint
 quotations sequences strings threads vectors
-words macros ;
+words macros math.functions ;
 IN: pack
 
 SYMBOL: big-endian
 
 : big-endian? ( -- ? )
     1 <int> *char zero? ;
-
-: clear-bit ( m n -- o )
-    2^ bitnot bitand ;
 
 : >endian ( obj n -- str )
     big-endian get [ >be ] [ >le ] if ; inline
@@ -88,7 +85,7 @@ M: string b, ( n string -- ) heap-size b, ;
     "\0" read-until [ drop f ] unless ;
 
 : read-c-string* ( n -- str/f )
-    read [ 0 = ] right-trim dup empty? [ drop f ] when ;
+    read [ zero? ] right-trim dup empty? [ drop f ] when ;
 
 : (read-128-ber) ( n -- n )
     1 read first

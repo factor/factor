@@ -69,7 +69,7 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     } cond ;
 
 : math-exp? ( n n word -- ? )
-    { + - * / ^ } member? -rot [ number? ] 2apply and and ;
+    { + - * / ^ } member? -rot [ number? ] both? and ;
 
 : (fold-constants) ( quot -- )
     dup length 3 < [ % ] [

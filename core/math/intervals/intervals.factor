@@ -68,7 +68,7 @@ C: <interval> interval
 : (interval-op) ( p1 p2 quot -- p3 )
     2over >r >r
     >r [ first ] 2apply r> call
-    r> r> [ second ] 2apply and 2array ; inline
+    r> r> [ second ] both? 2array ; inline
 
 : interval-op ( i1 i2 quot -- i3 )
     pick interval-from pick interval-from pick (interval-op) >r

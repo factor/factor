@@ -126,7 +126,7 @@ SYMBOL: K
 : string>sha1-bignum ( string -- n ) string>sha1 be> ;
 : file>sha1 ( file -- sha1 ) <file-reader> stream>sha1 ;
 
-: string>sha1-interleave ( string -- )
+: string>sha1-interleave ( string -- seq )
     [ zero? ] left-trim
     dup length odd? [ 1 tail ] when
     seq>2seq [ string>sha1 ] 2apply

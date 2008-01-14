@@ -46,7 +46,7 @@ M: float-regs push-return-reg
 
 : FLD 4 = [ FLDS ] [ FLDL ] if ;
 
-: load/store-float-return reg-size >r stack-reg swap [+] r> ;
+: load/store-float-return reg-size >r stack@ r> ;
 M: float-regs load-return-reg load/store-float-return FLD ;
 M: float-regs store-return-reg load/store-float-return FSTP ;
 

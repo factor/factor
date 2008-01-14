@@ -170,7 +170,7 @@ DEFER: 'choice'
              [
                get-parser [
                  swap , \ in , \ get , \ create ,
-                 1quotation , \ define-compound , 
+                 1quotation , \ define , 
                ] [
                  drop
                ] if*
