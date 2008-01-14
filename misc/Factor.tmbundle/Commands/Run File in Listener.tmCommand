@@ -8,7 +8,7 @@
 	<string>#!/usr/bin/env ruby
 
 require "#{ENV["TM_BUNDLE_SUPPORT"]}/lib/tm_factor"
-factor_run(%Q("#{ENV["TM_FILEPATH"]}" run-file))</string>
+factor_run(%Q(USE: parser\n "#{ENV["TM_FILEPATH"]}" run-file))</string>
 	<key>input</key>
 	<string>none</string>
 	<key>keyEquivalent</key>
