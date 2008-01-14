@@ -241,6 +241,44 @@
 			</array>
 		</dict>
 		<dict>
+			<key>begin</key>
+			<string>&lt;"</string>
+			<key>end</key>
+			<string>"&gt;</string>
+			<key>name</key>
+			<string>string.quoted.double.multiline.factor</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#escaped_characters</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>(^|(?&lt;=\s))(STRING:)\s+(\S+)</string>
+			<key>captures</key>
+			<dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.colon.factor</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.heredoc.factor</string>
+				</dict>
+			</dict>
+			<key>contentName</key>
+			<string>string.unquoted.heredoc.factor</string>
+			<key>end</key>
+			<string>^;$</string>
+			<key>name</key>
+			<string>definition.word.heredoc.factor</string>
+		</dict>
+		<dict>
 			<key>match</key>
 			<string>inline|foldable</string>
 			<key>name</key>
