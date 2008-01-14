@@ -88,7 +88,7 @@ PRIVATE>
 
 ! The divisor function, counts the number of divisors
 : tau ( m -- n )
-    count-factors flip second 1 [ 1+ * ] reduce ;
+    group-factors flip second 1 [ 1+ * ] reduce ;
 
 ! Optimized brute-force, is often faster than prime factorization
 : tau* ( m -- n )

@@ -27,7 +27,7 @@ PRIVATE>
 : factors ( n -- seq )
     [ (factor) ] (decompose) ; foldable
 
-: count-factors ( n -- seq )
+: group-factors ( n -- seq )
     [ (count) ] (decompose) ; foldable
 
 : unique-factors ( n -- seq )
