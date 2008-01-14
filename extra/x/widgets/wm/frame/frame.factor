@@ -2,7 +2,7 @@
 USING: kernel io combinators namespaces quotations arrays sequences
        math math.vectors
        x11.xlib x11.constants
-       mortar slot-accessors
+       mortar mortar.sugar slot-accessors
        geom.rect
        x x.gc x.widgets
        x.widgets.button
