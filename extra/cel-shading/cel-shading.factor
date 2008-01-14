@@ -1,5 +1,5 @@
 USING: arrays bunny io io.files kernel
-       math math.functions math.vectors
+       math math.functions math.vectors multiline
        namespaces
        opengl opengl.gl
        prettyprint
@@ -47,47 +47,47 @@ M: cel-shading-gadget pref-dim* ( gadget -- dim )
     FOV-RATIO NEAR-PLANE FOV / v*n
     first2 [ -+ ] 2apply NEAR-PLANE FAR-PLANE ;
 
-: cel-shading-vertex-shader-source
-    {
-        "varying vec3 position, normal;"
-        ""
-        "void"
-        "main()"
-        "{"
-            "gl_Position = ftransform();"
-            ""
-            "position = gl_Vertex.xyz;"
-            "normal = gl_Normal;"
-        "}"
-    } "\n" join ;
+STRING: cel-shading-vertex-shader-source
+varying vec3 position, normal;
 
-: cel-shading-fragment-shader-source
-    {
-        "varying vec3 position, normal;"
-        "uniform vec3 light_direction;"
-        "uniform vec4 color;"
-        "uniform vec4 ambient, diffuse;"
-        ""
-        "float"
-        "smooth_modulate(vec3 direction, vec3 normal)"
-        "{"
-            "return clamp(dot(direction, normal), 0.0, 1.0);"
-        "}"
-        ""
-        "float"
-        "modulate(vec3 direction, vec3 normal)"
-        "{"
-            "float m = smooth_modulate(direction, normal);"
-            "return smoothstep(0.0, 0.01, m) * 0.4 + smoothstep(0.49, 0.5, m) * 0.5;"
-        "}"
-        ""
-        "void"
-        "main()"
-        "{"
-            "vec3 direction = normalize(light_direction - position);"
-            "gl_FragColor = ambient + diffuse * color * vec4(vec3(modulate(direction, normal)), 1); "
-        "}"
-    } "\n" join ;
+void
+main()
+{
+    gl_Position = ftransform();
+    
+    position = gl_Vertex.xyz;
+    normal = gl_Normal;
+}
+
+;
+
+STRING: cel-shading-fragment-shader-source
+varying vec3 position, normal;
+uniform vec3 light_direction;
+uniform vec4 color;
+uniform vec4 ambient, diffuse;
+
+float
+smooth_modulate(vec3 direction, vec3 normal)
+{
+    return clamp(dot(direction, normal), 0.0, 1.0);
+}
+
+float
+modulate(vec3 direction, vec3 normal)
+{
+    float m = smooth_modulate(direction, normal);
+    return smoothstep(0.0, 0.01, m) * 0.4 + smoothstep(0.49, 0.5, m) * 0.5;
+}
+
+void
+main()
+{
+    vec3 direction = normalize(light_direction - position);
+    gl_FragColor = ambient + diffuse * color * vec4(vec3(modulate(direction, normal)), 1); 
+}
+
+;
 
 : cel-shading-program ( -- program )
     cel-shading-vertex-shader-source <vertex-shader> check-gl-shader
