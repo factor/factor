@@ -1,5 +1,6 @@
 USING: help.markup help.syntax kernel math sequences quotations
-crypto.common crypto.md5 ;
+crypto.common ;
+IN: crypto.md5
 
 HELP: stream>md5
 { $values { "stream" "a stream" } { "byte-array" "md5 hash" } }

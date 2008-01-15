@@ -4,14 +4,11 @@
 USING: alien alien.c-types alien.syntax combinators kernel math system ;
 IN: mad
 
-: load-mad-library ( -- )
-  "mad" {
+<< "mad" {
     { [ macosx? ] [ "libmad.0.dylib" ] }
     { [ unix? ] [ "libmad.so" ] }
     { [ windows? ] [ "mad.dll" ] }
-  } cond "cdecl" add-library ; parsing
-
-load-mad-library
+  } cond "cdecl" add-library >>
 
 LIBRARY: mad
 

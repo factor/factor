@@ -1,5 +1,4 @@
-USING: definitions help help.markup help.syntax io io.files
-editors words ;
+USING: definitions help help.markup help.syntax io io.files editors words ;
 IN: editors.vim
 
 ARTICLE: { "vim" "vim" } "Vim support"

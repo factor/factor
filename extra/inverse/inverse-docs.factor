@@ -1,4 +1,5 @@
-USING: inverse help.syntax help.markup ;
+USING: help.syntax help.markup ;
+IN: inverse
 
 HELP: [undo]
 { $values { "quot" "a quotation" } { "undo" "the inverse of the quotation" } }

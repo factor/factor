@@ -24,14 +24,18 @@ IN: project-euler.006
 ! SOLUTION
 ! --------
 
+<PRIVATE
+
 : sum-of-squares ( seq -- n )
     0 [ sq + ] reduce ;
 
-: square-of-sums ( seq -- n )
-    0 [ + ] reduce sq ;
+: square-of-sum ( seq -- n )
+    sum sq ;
+
+PRIVATE>
 
 : euler006 ( -- answer )
-    1 100 [a,b] dup sum-of-squares swap square-of-sums - abs ;
+    1 100 [a,b] dup sum-of-squares swap square-of-sum - abs ;
 
 ! [ euler006 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials

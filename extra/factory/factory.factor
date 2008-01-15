@@ -1,6 +1,6 @@
 
 USING: kernel parser io io.files namespaces sequences editors threads vars
-       mortar slot-accessors
+       mortar mortar.sugar slot-accessors
        x
        x.widgets.wm.root
        x.widgets.wm.frame 

@@ -128,7 +128,7 @@ over object-class class-methods 1 head* assoc-stack call ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: new* ( class -- object ) <<- create ;
+! : new* ( class -- object ) <<- create ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -136,13 +136,20 @@ IN: slot-accessors
 
 IN: mortar
 
+! : generate-slot-getter ( name -- )
+! "$" over append "slot-accessors" create swap [ slot-value ] curry
+! define-compound ;
+
 : generate-slot-getter ( name -- )
-"$" over append "slot-accessors" create swap [ slot-value ] curry
-define-compound ;
+"$" over append "slot-accessors" create swap [ slot-value ] curry define ;
+
+! : generate-slot-setter ( name -- )
+! ">>" over append "slot-accessors" create swap [ swap set-slot-value ] curry
+! define-compound ;
 
 : generate-slot-setter ( name -- )
 ">>" over append "slot-accessors" create swap [ swap set-slot-value ] curry
-define-compound ;
+define ;
 
 : generate-slot-accessors ( name -- )
 dup

@@ -1,5 +1,6 @@
 
-USING: kernel namespaces arrays x11.xlib mortar slot-accessors x x.font ;
+USING: kernel namespaces arrays x11.xlib mortar mortar.sugar
+       slot-accessors x x.font ;
 
 IN: x.gc
 

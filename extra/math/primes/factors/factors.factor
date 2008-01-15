@@ -6,36 +6,36 @@ IN: math.primes.factors
 <PRIVATE
 
 : (factor) ( n d -- n' )
-  2dup mod zero? [ [ / ] keep dup , (factor) ] [ drop ] if ;
+    2dup mod zero? [ [ / ] keep dup , (factor) ] [ drop ] if ;
 
 : (count) ( n d -- n' )
-  [ (factor) ] { } make
-  dup empty? [ drop ] [ [ first ] keep length 2array , ] if ;
+    [ (factor) ] { } make
+    dup empty? [ drop ] [ [ first ] keep length 2array , ] if ;
 
 : (unique) ( n d -- n' )
-  [ (factor) ] { } make
-  dup empty? [ drop ] [ first , ] if ;
+    [ (factor) ] { } make
+    dup empty? [ drop ] [ first , ] if ;
 
 : (factors) ( quot list n -- )
-  dup 1 > [ swap uncons >r pick call r> swap (factors) ] [ 3drop ] if ;
+    dup 1 > [ swap uncons >r pick call r> swap (factors) ] [ 3drop ] if ;
 
 : (decompose) ( n quot -- seq )
-  [ lprimes rot (factors) ] { } make ;
+    [ lprimes rot (factors) ] { } make ;
 
 PRIVATE>
 
 : factors ( n -- seq )
-  [ (factor) ] (decompose) ; foldable
+    [ (factor) ] (decompose) ; foldable
 
-: count-factors ( n -- seq )
-  [ (count) ] (decompose) ; foldable
+: group-factors ( n -- seq )
+    [ (count) ] (decompose) ; foldable
 
 : unique-factors ( n -- seq )
-  [ (unique) ] (decompose) ; foldable
+    [ (unique) ] (decompose) ; foldable
 
 : totient ( n -- t )
-  dup 2 < [
-    drop 0
-  ] [
-   [ unique-factors dup 1 [ 1- * ] reduce swap product / ] keep *
-  ] if ; foldable
+    dup 2 < [
+        drop 0
+    ] [
+        dup unique-factors dup 1 [ 1- * ] reduce swap product / *
+    ] if ; foldable

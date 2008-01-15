@@ -1,6 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax http.basic-authentication crypto.sha2 ;
+USING: help.markup help.syntax crypto.sha2 ;
+IN: http.basic-authentication
 
 HELP: realms
 { $description 
