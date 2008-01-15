@@ -9,7 +9,7 @@ IN: io.sniffer.filter.bsd
 
 : bpf-align ( n -- n' )
     #! Align to next higher word size
-    "long" heap-size 1- [ + ] keep bitnot bitand ;
+    "long" heap-size align ;
 
 M: unix-io packet. ( string -- )
     18 cut swap >byte-array bpfh.
