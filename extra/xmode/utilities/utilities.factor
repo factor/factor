@@ -55,4 +55,4 @@ SYMBOL: tag-handler-word
 : TAGS>
     tag-handler-word get
     tag-handlers get >alist [ >r dup name-tag r> case ] curry
-    define-compound ; parsing
+    define ; parsing
