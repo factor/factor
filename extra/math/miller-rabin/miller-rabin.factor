@@ -26,10 +26,8 @@ TUPLE: positive-even-expected n ;
     dup even? [ -1 shift >r 1+ r> (factor-2s) ] when ;
 
 : factor-2s ( n -- r s )
-    #! factor an even number into s * 2 ^ r
-    dup even? over 0 > and [
-        positive-even-expected construct-boa throw
-    ] unless 0 swap (factor-2s) ;
+    #! factor an integer into s * 2^r
+    0 swap (factor-2s) ;
 
 :: (miller-rabin) | n prime?! |
     n 1- factor-2s s set r set

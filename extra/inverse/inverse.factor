@@ -63,7 +63,9 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     {
         { [ dup word? not over symbol? or ] [ , ] }
         { [ dup explicit-inverse? ] [ , ] }
-        { [ dup compound? over { if dispatch } member? not and ]
+        ! { [ dup compound? over { if dispatch } member? not and ]
+          ! [ word-def [ inline-word ] each ] }
+        { [ dup word? over { if dispatch } member? not and ]
           [ word-def [ inline-word ] each ] }
         { [ drop t ] [ "Quotation is not invertible" throw ] }
     } cond ;

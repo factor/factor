@@ -51,8 +51,14 @@ HOOK: %save-dispatch-xt compiler-backend ( -- )
 
 M: object %save-dispatch-xt %save-word-xt ;
 
+! Call C primitive
+HOOK: %call-primitive compiler-backend ( label -- )
+
 ! Call another label
 HOOK: %call-label compiler-backend ( label -- )
+
+! Far jump to C primitive
+HOOK: %jump-primitive compiler-backend ( label -- )
 
 ! Local jump for branches
 HOOK: %jump-label compiler-backend ( label -- )
@@ -60,10 +66,13 @@ HOOK: %jump-label compiler-backend ( label -- )
 ! Test if vreg is 'f' or not
 HOOK: %jump-t compiler-backend ( label -- )
 
-! We pass the offset of the jump table start in the world table
-HOOK: %call-dispatch compiler-backend ( word-table# -- )
+HOOK: %call-dispatch compiler-backend ( -- label )
 
-HOOK: %jump-dispatch compiler-backend ( word-table# -- )
+HOOK: %jump-dispatch compiler-backend ( -- )
+
+HOOK: %dispatch-label compiler-backend ( word -- )
+
+HOOK: %end-dispatch compiler-backend ( label -- )
 
 ! Return to caller
 HOOK: %return compiler-backend ( -- )

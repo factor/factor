@@ -13,7 +13,7 @@ GENERIC: json-print ( obj -- )
   [ json-print ] string-out ;
 
 M: f json-print ( f -- )
-  "false" write ;
+  drop "false" write ;
 
 M: string json-print ( obj -- )
   CHAR: " write1 "\"" split "\\\"" join CHAR: \r swap remove "\n" split "\\r\\n" join write CHAR: " write1 ;

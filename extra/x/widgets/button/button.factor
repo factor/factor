@@ -1,6 +1,6 @@
 
 USING: kernel combinators math x11.xlib
-       mortar slot-accessors x.gc x.widgets.label ;
+       mortar mortar.sugar slot-accessors x.gc x.widgets.label ;
 
 IN: x.widgets.button
 
@@ -11,7 +11,7 @@ SYMBOL: <button>
   { "action-1" "action-2" "action-3" } accessors
 define-simple-class
 
-<button> "create" ( <button> -- button ) [
+<button> "create" !( <button> -- button ) [
 new-empty
 <gc> new* >>gc ExposureMask ButtonPressMask bitor >>mask <- init-widget
 ] add-class-method

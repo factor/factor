@@ -3,7 +3,8 @@ USING: arrays math.private kernel math compiler inference
 inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
-slots.private combinators definitions compiler.units ;
+slots.private combinators definitions compiler.units
+system ;
 
 ! Make sure these compile even though this is invalid code
 [ ] [ [ 10 mod 3.0 /i ] dataflow optimize drop ] unit-test
@@ -251,12 +252,14 @@ M: fixnum annotate-entry-test-1 drop ;
     \ fixnum-shift inlined?
 ] unit-test
 
-[ t ] [
-    [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
-    \ shift inlined?
-] unit-test
+cell-bits 32 = [
+    [ t ] [
+        [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
+        \ shift inlined?
+    ] unit-test
 
-[ f ] [
-    [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
-    \ fixnum-shift inlined?
-] unit-test
+    [ f ] [
+        [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
+        \ fixnum-shift inlined?
+    ] unit-test
+] when

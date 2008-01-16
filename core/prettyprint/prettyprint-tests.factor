@@ -290,6 +290,14 @@ unit-test
 
 [ ] [ \ effect-in synopsis drop ] unit-test
 
+! Regression
+[ t ] [
+    "IN: temporary\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
+    dup eval
+    "generic-decl-test" "temporary" lookup
+    [ see ] string-out =
+] unit-test
+
 [ [ + ] ] [
     [ \ + (step-into) ] (remove-breakpoints)
 ] unit-test
@@ -313,4 +321,3 @@ unit-test
 [ [ 2 . ] ] [
     [ 2 \ break (step-into) . ] (remove-breakpoints)
 ] unit-test
-
