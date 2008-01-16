@@ -8,14 +8,13 @@
 USING: alien alien.syntax combinators system ;
 IN: postgresql.libpq
 
-: load-postgresql-library ( -- )
-    "postgresql" {
-        { [ win32? ]  [ "libpq.dll" ] }
-        { [ macosx? ] [ "/opt/local/lib/postgresql81/libpq.dylib" ] }
-        { [ unix?  ]  [ "libpq.so" ] }
-    } cond "cdecl" add-library ; parsing
-
-load-postgresql-library
+<<
+"postgresql" {
+    { [ win32? ]  [ "libpq.dll" ] }
+    { [ macosx? ] [ "/opt/local/lib/postgresql81/libpq.dylib" ] }
+    { [ unix?  ]  [ "libpq.so" ] }
+} cond "cdecl" add-library
+>>
 
 ! ConnSatusType
 : CONNECTION_OK 					HEX: 0 ; inline
