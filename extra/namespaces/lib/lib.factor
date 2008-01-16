@@ -1,8 +1,8 @@
 
-! USING: kernel quotations namespaces sequences hashtables.lib ;
+! USING: kernel quotations namespaces sequences assocs.lib ;
 
 USING: kernel namespaces namespaces.private quotations sequences
-       hashtables.lib ;
+       assocs.lib ;
 
 IN: namespaces.lib
 
