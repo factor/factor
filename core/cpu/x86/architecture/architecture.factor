@@ -70,6 +70,14 @@ M: x86-backend %prepare-alien-invoke
     temp-reg v>operand 2 cells [+] ds-reg MOV
     temp-reg v>operand 3 cells [+] rs-reg MOV ;
 
+M: x86-backend %call-primitive ( word -- )
+    stack-save-reg stack-reg cell neg [+] LEA
+    address-operand CALL ;
+
+M: x86-backend %jump-primitive ( word -- )
+    stack-save-reg stack-reg MOV
+    address-operand JMP ;
+
 M: x86-backend %call-label ( label -- ) CALL ;
 
 M: x86-backend %jump-label ( label -- ) JMP ;
@@ -77,30 +85,31 @@ M: x86-backend %jump-label ( label -- ) JMP ;
 M: x86-backend %jump-t ( label -- )
     "flag" operand f v>operand CMP JNE ;
 
-: (%dispatch) ( word-table# -- )
-    ! Untag and multiply to get a jump table offset
-    "n" operand fixnum>slot@
-    ! Add to jump table base. We use a temporary register
+: (%dispatch) ( -- operand )
+    ! Load jump table base. We use a temporary register
     ! since on AMD64 we have to load a 64-bit immediate. On
     ! x86, this is redundant.
-    "scratch" operand HEX: ffffffff MOV rc-absolute-cell rel-dispatch
-    "n" operand "n" operand "scratch" operand [+] MOV
-    "n" operand dup word-xt-offset [+] MOV ;
-
-: dispatch-template ( word-table# quot -- )
-    [
-        >r (%dispatch) "n" operand r> call
-    ] H{
-        { +input+ { { f "n" } } }
-        { +scratch+ { { f "scratch" } } }
-        { +clobber+ { "n" } }
-    } with-template ; inline
+    ! Untag and multiply to get a jump table offset
+    "n" operand fixnum>slot@
+    ! Add jump table base
+    "offset" operand HEX: ffffffff MOV rc-absolute-cell rel-here
+    "n" operand "offset" operand ADD
+    "n" operand bootstrap-cell 8 = 14 9 ? [+] ;
 
 M: x86-backend %call-dispatch ( word-table# -- )
-    [ CALL ] dispatch-template ;
+    [ (%dispatch) CALL <label> dup JMP ] H{
+        { +input+ { { f "n" } } }
+        { +scratch+ { { f "offset" } } }
+    } with-template ;
 
-M: x86-backend %jump-dispatch ( word-table# -- )
-    [ %epilogue-later JMP ] dispatch-template ;
+M: x86-backend %jump-dispatch ( -- )
+    [ %epilogue-later (%dispatch) JMP ] H{
+        { +input+ { { f "n" } } }
+        { +scratch+ { { f "offset" } } }
+    } with-template ;
+
+M: x86-backend %dispatch-label ( word -- )
+    0 cell, rc-absolute-cell rel-word ;
 
 M: x86-backend %unbox-float ( dst src -- )
     [ v>operand ] 2apply float-offset [+] MOVSD ;

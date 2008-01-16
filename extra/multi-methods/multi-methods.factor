@@ -3,7 +3,7 @@
 USING: kernel math sequences vectors classes combinators
 arrays words assocs parser namespaces definitions
 prettyprint prettyprint.backend quotations arrays.lib
-debugger io ;
+debugger io compiler.units ;
 IN: multi-methods
 
 TUPLE: method loc def ;
@@ -217,5 +217,5 @@ syntax:M: method-spec synopsis*
     dup definer.
     unclip pprint* pprint* ;
 
-syntax:M: method-spec forget
+syntax:M: method-spec forget*
     unclip [ delete-at ] with-methods ;
