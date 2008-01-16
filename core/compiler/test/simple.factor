@@ -63,3 +63,9 @@ IN: temporary
 ! Regression
 
 [ ] [ [ callstack ] compile-call drop ] unit-test
+
+! Regression
+
+: empty ;
+
+[ "b" ] [ 1 [ empty { [ "a" ] [ "b" ] } dispatch ] compile-call ] unit-test

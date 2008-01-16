@@ -9,8 +9,8 @@ typedef enum {
 	RT_DISPATCH,
 	/* a compiled word reference */
 	RT_XT,
-	/* reserved */
-	RT_RESERVED,
+	/* current offset */
+	RT_HERE,
 	/* a local label */
 	RT_LABEL
 } F_RELTYPE;
