@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup channels channels.remote concurrency.distributed ;
+USING: help.syntax help.markup channels concurrency.distributed ;
 IN: channels.remote
 
 HELP: <remote-channel>

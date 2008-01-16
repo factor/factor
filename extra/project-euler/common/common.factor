@@ -34,9 +34,6 @@ IN: project-euler.common
 : propagate ( bottom top -- newtop )
     [ over 1 tail rot first2 max rot + ] map nip ;
 
-: reduce-2s ( n -- r s )
-    dup even? [ factor-2s >r 1+ r> ] [ 1 swap ] if ;
-
 : shift-3rd ( seq obj obj -- seq obj obj )
     rot 1 tail -rot ;
 
@@ -88,11 +85,11 @@ PRIVATE>
 
 ! The divisor function, counts the number of divisors
 : tau ( m -- n )
-    count-factors flip second 1 [ 1+ * ] reduce ;
+    group-factors flip second 1 [ 1+ * ] reduce ;
 
 ! Optimized brute-force, is often faster than prime factorization
 : tau* ( m -- n )
-    reduce-2s [ perfect-square? -1 0 ? ] keep
+    factor-2s [ 1+ ] dip [ perfect-square? -1 0 ? ] keep
     dup sqrt >fixnum [1,b] [
-        dupd mod zero? [ >r 2 + r> ] when
+        dupd mod zero? [ [ 2 + ] dip ] when
     ] each drop * ;

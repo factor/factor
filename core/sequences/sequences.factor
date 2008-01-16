@@ -199,7 +199,7 @@ TUPLE: slice-error reason ;
 : <slice> ( from to seq -- slice )
     dup slice? [ collapse-slice ] when
     check-slice
-    slice construct-boa ;
+    slice construct-boa ; inline
 
 M: slice virtual-seq slice-seq ;
 M: slice virtual@ [ slice-from + ] keep slice-seq ;

@@ -69,6 +69,7 @@ SYMBOL: label-table
 : rt-literal   2 ;
 : rt-dispatch  3 ;
 : rt-xt        4 ;
+: rt-here      5 ;
 : rt-label     6 ;
 
 TUPLE: label-fixup label class ;
@@ -129,11 +130,17 @@ SYMBOL: word-table
 : rel-word ( word class -- )
     >r add-word r> rt-xt rel-fixup ;
 
+: rel-primitive ( word class -- )
+    >r word-def first r> rt-primitive rel-fixup ;
+
 : rel-literal ( literal class -- )
     >r add-literal r> rt-literal rel-fixup ;
 
 : rel-this ( class -- )
     0 swap rt-label rel-fixup ;
+
+: rel-here ( class -- )
+    0 swap rt-here rel-fixup ;
 
 : init-fixup ( -- )
     V{ } clone relocation-table set

@@ -7,7 +7,7 @@ IN: vectors
 
 : <vector> ( n -- vector ) f <array> 0 array>vector ; inline
 
-: >vector ( seq -- vector ) V{ } clone-like ; inline
+: >vector ( seq -- vector ) V{ } clone-like ;
 
 M: vector like
     drop dup vector? [

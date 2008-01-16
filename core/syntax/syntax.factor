@@ -170,5 +170,8 @@ IN: bootstrap.syntax
 
     "MAIN:" [ scan-word in get vocab set-vocab-main ] define-syntax
 
-    "<<" [ \ >> parse-until >quotation call ] define-syntax
+    "<<" [
+        [ \ >> parse-until >quotation ] with-compilation-unit
+        call
+    ] define-syntax
 ] with-compilation-unit

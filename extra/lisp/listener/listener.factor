@@ -5,7 +5,7 @@ USING: kernel parser namespaces io prettyprint math arrays sequences
 
 IN: lisp.listener
 
-: parse-stdio ( -- quot/f ) stdio get parse-interactive ;
+: parse-stdio ( -- quot/f ) stdio get read-quot ;
 
 : stuff? ( -- ? ) datastack length 0 > ;
 

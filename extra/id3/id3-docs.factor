@@ -1,6 +1,7 @@
 ! Coyright (C) 2007 Adam Wendt
 ! See http://factorcode.org/license.txt for BSD license.
-USING: id3 help.syntax help.markup ;
+USING: help.syntax help.markup ;
+IN: id3
 
 ARTICLE: "id3-tags" "ID3 Tags"
 "The " { $vocab-link "id3" } " vocabulary is used to read ID3 tags from MP3 audio streams."

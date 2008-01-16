@@ -104,14 +104,21 @@ UNION: #terminal
 ! node
 M: node generate-node drop iterate-next ;
 
-: %call ( word -- ) %call-label ;
+: %call ( word -- )
+    dup primitive? [ %call-primitive ] [ %call-label ] if ;
 
 : %jump ( word -- )
-    dup compiling-label get eq? [
-        drop current-label-start get %jump-label
-    ] [
-        %epilogue-later %jump-label
-    ] if ;
+    {
+        { [ dup compiling-label get eq? ] [
+            drop current-label-start get %jump-label
+        ] }
+        { [ dup primitive? ] [
+            %epilogue-later %jump-primitive
+        ] }
+        { [ t ] [
+            %epilogue-later %jump-label
+        ] }
+    } cond ;
 
 : generate-call ( label -- next )
     dup maybe-compile
@@ -162,22 +169,22 @@ M: #if generate-node
         ] generate-1
     ] keep ;
 
-: dispatch-branches ( node -- syms )
-    node-children
-    [ compiling-word get dispatch-branch ] map
-    word-table get push-all ;
-
-: %dispatch ( word-table# -- )
-    tail-call? [
-        %jump-dispatch
-    ] [
-        0 frame-required
-        %call-dispatch
-    ] if ;
+: dispatch-branches ( node -- )
+    node-children [
+        compiling-word get dispatch-branch %dispatch-label
+    ] each ;
 
 M: #dispatch generate-node
-    word-table get length %dispatch
-    dispatch-branches init-templates iterate-next ;
+    #! The order here is important, dispatch-branches must
+    #! run after %dispatch, so that each branch gets the
+    #! correct register state
+    tail-call? [
+        %jump-dispatch dispatch-branches
+    ] [
+        0 frame-required
+        %call-dispatch >r dispatch-branches r> %end-dispatch
+    ] if
+    init-templates iterate-next ;
 
 ! #call
 : define-intrinsics ( word intrinsics -- )

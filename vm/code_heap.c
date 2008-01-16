@@ -52,6 +52,8 @@ INLINE CELL compute_code_rel(F_REL *rel,
 		return CREF(words_start,REL_ARGUMENT(rel));
 	case RT_XT:
 		return (CELL)untag_word(get(CREF(words_start,REL_ARGUMENT(rel))))->xt;
+	case RT_HERE:
+		return rel->offset + code_start;
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
 	default:
