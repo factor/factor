@@ -72,8 +72,6 @@ HOOK: %jump-dispatch compiler-backend ( -- )
 
 HOOK: %dispatch-label compiler-backend ( word -- )
 
-HOOK: %end-dispatch compiler-backend ( label -- )
-
 ! Return to caller
 HOOK: %return compiler-backend ( -- )
 
