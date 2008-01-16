@@ -192,7 +192,12 @@ INLINE F_STACK_FRAME *uap_stack_pointer(void *uap)
 	from Factor to C is a sign of things seriously gone wrong, not just
 	a divide by zero or stack underflow in the listener */
 	if(in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
-		return ucontext_stack_pointer(uap);
+	{
+		F_STACK_FRAME *ptr = ucontext_stack_pointer(uap);
+		if(!ptr)
+			critical_error("Invalid uap",(CELL)uap);
+		return ptr;
+	}
 	else
 		return NULL;
 }
