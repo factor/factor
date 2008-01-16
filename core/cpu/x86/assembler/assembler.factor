@@ -11,77 +11,41 @@ IN: cpu.x86.assembler
 ! In 64-bit mode, { 1234 } is RIP-relative.
 ! Beware!
 
-! Register operands -- eg, ECX
-: define-register ( symbol num size -- )
-    >r dupd "register" set-word-prop r>
-    "register-size" set-word-prop ;
-
-! x86 registers
-SYMBOL: AL \ AL 0 8 define-register
-SYMBOL: CL \ CL 1 8 define-register
-SYMBOL: DL \ DL 2 8 define-register
-SYMBOL: BL \ BL 3 8 define-register
-
-SYMBOL: AX \ AX 0 16 define-register
-SYMBOL: CX \ CX 1 16 define-register
-SYMBOL: DX \ DX 2 16 define-register
-SYMBOL: BX \ BX 3 16 define-register
-SYMBOL: SP \ SP 4 16 define-register
-SYMBOL: BP \ BP 5 16 define-register
-SYMBOL: SI \ SI 6 16 define-register
-SYMBOL: DI \ DI 7 16 define-register
-
-SYMBOL: EAX \ EAX 0 32 define-register
-SYMBOL: ECX \ ECX 1 32 define-register
-SYMBOL: EDX \ EDX 2 32 define-register
-SYMBOL: EBX \ EBX 3 32 define-register
-SYMBOL: ESP \ ESP 4 32 define-register
-SYMBOL: EBP \ EBP 5 32 define-register
-SYMBOL: ESI \ ESI 6 32 define-register
-SYMBOL: EDI \ EDI 7 32 define-register
-
-SYMBOL: XMM0 \ XMM0 0 128 define-register
-SYMBOL: XMM1 \ XMM1 1 128 define-register
-SYMBOL: XMM2 \ XMM2 2 128 define-register
-SYMBOL: XMM3 \ XMM3 3 128 define-register
-SYMBOL: XMM4 \ XMM4 4 128 define-register
-SYMBOL: XMM5 \ XMM5 5 128 define-register
-SYMBOL: XMM6 \ XMM6 6 128 define-register
-SYMBOL: XMM7 \ XMM7 7 128 define-register
-
-! AMD64 registers
-SYMBOL: RAX \ RAX 0  64 define-register
-SYMBOL: RCX \ RCX 1  64 define-register
-SYMBOL: RDX \ RDX 2  64 define-register
-SYMBOL: RBX \ RBX 3  64 define-register
-SYMBOL: RSP \ RSP 4  64 define-register
-SYMBOL: RBP \ RBP 5  64 define-register
-SYMBOL: RSI \ RSI 6  64 define-register
-SYMBOL: RDI \ RDI 7  64 define-register
-SYMBOL: R8  \ R8  8  64 define-register
-SYMBOL: R9  \ R9  9  64 define-register
-SYMBOL: R10 \ R10 10 64 define-register
-SYMBOL: R11 \ R11 11 64 define-register
-SYMBOL: R12 \ R12 12 64 define-register
-SYMBOL: R13 \ R13 13 64 define-register
-SYMBOL: R14 \ R14 14 64 define-register
-SYMBOL: R15 \ R15 15 64 define-register
-
-SYMBOL: XMM8 \ XMM8 8 128 define-register
-SYMBOL: XMM9 \ XMM9 9 128 define-register
-SYMBOL: XMM10 \ XMM10 10 128 define-register
-SYMBOL: XMM11 \ XMM11 11 128 define-register
-SYMBOL: XMM12 \ XMM12 12 128 define-register
-SYMBOL: XMM13 \ XMM13 13 128 define-register
-SYMBOL: XMM14 \ XMM14 14 128 define-register
-SYMBOL: XMM15 \ XMM15 15 128 define-register
-
-<PRIVATE
-
 : n, >le % ; inline
 : 4, 4 n, ; inline
 : 2, 2 n, ; inline
 : cell, bootstrap-cell n, ; inline
+
+! Register operands -- eg, ECX
+<<
+
+: define-register ( name num size -- )
+    >r >r "cpu.x86.assembler" create dup define-symbol r> r>
+    >r dupd "register" set-word-prop r>
+    "register-size" set-word-prop ;
+
+: define-registers ( names size -- )
+    >r dup length r> [ define-register ] curry 2each ;
+
+: REGISTERS:
+    scan-word ";" parse-tokens swap define-registers ; parsing
+
+>>
+
+REGISTERS: 8 AL CL DL BL ;
+
+REGISTERS: 16 AX CX DX BX SP BP SI DI ;
+
+REGISTERS: 32 EAX ECX EDX EBX ESP EBP ESI EDI ;
+
+REGISTERS: 64
+RAX RCX RDX RBX RSP RBP RSI RDI R8 R9 R10 R11 R12 R13 R14 R15 ;
+
+REGISTERS: 128
+XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
+XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15 ;
+
+<PRIVATE
 
 #! Extended AMD64 registers (R8-R15) return true.
 GENERIC: extended? ( op -- ? )
