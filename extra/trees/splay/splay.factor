@@ -1,5 +1,5 @@
 ! Copyright (c) 2005 Mackenzie Straight.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces sequences assocs parser
 prettyprint.backend trees generic ;
 IN: trees.splay
@@ -7,10 +7,9 @@ IN: trees.splay
 TUPLE: splay ;
 
 : <splay> ( -- splay-tree )
-    \ splay construct-empty
-    <tree> over set-delegate ;
+    splay construct-tree ;
 
-INSTANCE: splay assoc
+INSTANCE: splay tree-mixin
 
 : rotate-right ( node -- node )
     dup node-left
@@ -138,16 +137,6 @@ M: splay new-assoc
     \ } [ >splay ] parse-literal ; parsing
 
 M: splay assoc-like
-    drop dup splay? [
-        dup tree? [ <splay> tuck set-delegate ] [ >splay ] if
-    ] unless ;
+    drop dup splay? [ >splay ] unless ;
 
 M: splay pprint-delims drop \ SPLAY{ \ } ;
-
-! When tuple inheritance is used, the following lines won't be necessary
-M: splay assoc-size tree-count ;
-M: splay clear-assoc delegate clear-assoc ;
-M: splay assoc-find >r tree-root r> find-node ;
-M: splay clone dup assoc-clone-like ;
-M: splay >pprint-sequence >alist ;
-M: splay pprint-narrow? drop t ;
