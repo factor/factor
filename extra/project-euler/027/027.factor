@@ -36,10 +36,15 @@ IN: project-euler.027
 ! SOLUTION
 ! --------
 
+! b must be prime since n = 0 must return a prime
+! a + b + 1 must be prime since n = 1 must return a prime
+! a < b
+
 <PRIVATE
 
 : source-027 ( -- seq )
-    1000 [ prime? ] subset dup [ neg ] map append dup cartesian-product ;
+    1000 [ prime? ] subset [ dup [ neg ] map append ] keep
+    cartesian-product [ first2 < ] subset ;
 
 : quadratic ( b a n -- m )
     dup sq -rot * + + ;
@@ -60,7 +65,7 @@ PRIVATE>
     source-027 max-consecutive drop product ;
 
 ! [ euler027 ] 100 ave-time
-! 1306 ms run / 58 ms GC ave time - 100 trials
+! 687 ms run / 23 ms GC ave time - 100 trials
 
 ! TODO: generalize max-consecutive/max-product (from #26) into a new word
 
