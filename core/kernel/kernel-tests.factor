@@ -1,6 +1,6 @@
 USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
-continuations prettyprint io.streams.string debugger ;
+continuations prettyprint io.streams.string debugger assocs ;
 IN: temporary
 
 [ 0 ] [ f size ] unit-test
