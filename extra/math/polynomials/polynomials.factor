@@ -1,5 +1,5 @@
 USING: arrays kernel sequences vectors math math.vectors namespaces
-shuffle splitting ;
+shuffle splitting sequences.lib ;
 IN: math.polynomials
 
 ! Polynomials are vectors with the highest powers on the right:
@@ -22,7 +22,7 @@ PRIVATE>
 : p= ( p p -- ? ) pextend = ;
 
 : ptrim ( p -- p )
-    dup length 1 = [ [ zero? ] right-trim ] unless ;
+    dup singleton? [ [ zero? ] right-trim ] unless ;
 
 : 2ptrim ( p p -- p p ) [ ptrim ] 2apply ;
 : p+ ( p p -- p ) pextend v+ ;
