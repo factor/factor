@@ -85,7 +85,7 @@ M: x86-backend %jump-label ( label -- ) JMP ;
 M: x86-backend %jump-t ( label -- )
     "flag" operand f v>operand CMP JNE ;
 
-: (%dispatch) ( -- operand )
+: (%dispatch) ( n -- operand )
     ! Load jump table base. We use a temporary register
     ! since on AMD64 we have to load a 64-bit immediate. On
     ! x86, this is redundant.
@@ -94,18 +94,20 @@ M: x86-backend %jump-t ( label -- )
     ! Add jump table base
     "offset" operand HEX: ffffffff MOV rc-absolute-cell rel-here
     "n" operand "offset" operand ADD
-    "n" operand bootstrap-cell 8 = 14 9 ? [+] ;
+    "n" operand swap bootstrap-cell 8 = 14 9 ? + [+] ;
 
 M: x86-backend %call-dispatch ( word-table# -- )
-    [ (%dispatch) CALL <label> dup JMP ] H{
+    [ 5 (%dispatch) CALL <label> dup JMP ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "offset" } } }
+        { +clobber+ { "n" } }
     } with-template ;
 
 M: x86-backend %jump-dispatch ( -- )
-    [ %epilogue-later (%dispatch) JMP ] H{
+    [ %epilogue-later 0 (%dispatch) JMP ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "offset" } } }
+        { +clobber+ { "n" } }
     } with-template ;
 
 M: x86-backend %dispatch-label ( word -- )

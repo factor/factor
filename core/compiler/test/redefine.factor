@@ -17,7 +17,7 @@ DEFER: x-2
 
         { x-1 } compile
 
-        \ x-2 word-xt eq?
+        \ x-2 word-xt =
     ] unit-test
 ] with-variable
 
