@@ -20,7 +20,7 @@ USING: kernel namespaces
        ui.gadgets.grids
        ui.gestures
        combinators.cleave
-       hashtables.lib vars rewrite-closures boids ;
+       assocs.lib vars rewrite-closures boids ;
 
 IN: boids.ui
 
