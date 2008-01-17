@@ -100,12 +100,14 @@ M: x86-backend %call-dispatch ( word-table# -- )
     [ 5 (%dispatch) CALL <label> dup JMP ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "offset" } } }
+        { +clobber+ { "n" } }
     } with-template ;
 
 M: x86-backend %jump-dispatch ( -- )
     [ %epilogue-later 0 (%dispatch) JMP ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "offset" } } }
+        { +clobber+ { "n" } }
     } with-template ;
 
 M: x86-backend %dispatch-label ( word -- )
