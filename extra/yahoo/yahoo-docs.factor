@@ -1,4 +1,5 @@
-USING: yahoo help.syntax help.markup ;
+USING: help.syntax help.markup ;
+IN: yahoo
 
 HELP: search-yahoo
 { $values { "search" "a string" } { "num" "a positive integer" } { "seq" "sequence of arrays of length 3" } }

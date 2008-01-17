@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: cpu.8080 openal math alien.c-types sequences kernel
+USING: cpu.8080 cpu.8080.emulator openal math alien.c-types sequences kernel
        shuffle arrays io.files combinators kernel.private
        ui.gestures ui.gadgets ui.render opengl.gl system 
        threads concurrency match ui byte-arrays combinators.lib

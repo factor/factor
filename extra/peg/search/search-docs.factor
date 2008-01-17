@@ -1,6 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup peg peg.search ;
+USING: help.syntax help.markup peg ;
+IN: peg.search
 
 HELP: tree-write
 { $values
