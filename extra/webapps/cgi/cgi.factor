@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs io.files combinators
 arrays io.launcher io http.server.responders webapps.file
-sequences strings ;
+sequences strings math.parser ;
 IN: webapps.cgi
 
 SYMBOL: cgi-root
@@ -12,6 +12,8 @@ SYMBOL: cgi-root
 : cgi-variables ( name -- assoc )
     #! This needs some work.
     [
+        cgi-root get over path+ "PATH_TRANSLATED" set
+        cgi-root get over path+ "SCRIPT_FILENAME" set
         "SCRIPT_NAME" set
 
         "CGI/1.0" "GATEWAY_INTERFACE" set
@@ -29,13 +31,14 @@ SYMBOL: cgi-root
 
         "method" get >upper "REQUEST_METHOD" set
         "raw-query" get "QUERY_STRING" set
+	"Cookie" "header" get at "HTTP_COOKIE" set 
 
         "User-Agent" header-param "HTTP_USER_AGENT" set
         "Accept" header-param "HTTP_ACCEPT" set
 
         post? [
             "Content-Type" header-param "CONTENT_TYPE" set
-            "raw-response" get length "CONTENT_LENGTH" set
+            "raw-response" get length number>string "CONTENT_LENGTH" set
         ] when
     ] H{ } make-assoc ;
 
@@ -49,8 +52,7 @@ SYMBOL: cgi-root
     "200 CGI output follows" response
     stdio get swap cgi-descriptor <process-stream> [
         post? [
-            "raw-response" get
-            stream-write stream-flush
+            "raw-response" get write flush
         ] when
         stdio get swap (stream-copy)
     ] with-stream ;
