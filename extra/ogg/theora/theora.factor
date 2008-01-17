@@ -4,14 +4,13 @@
 USING: kernel system combinators alien alien.syntax ;
 IN: ogg.theora
 
-: load-theora-library ( -- )
-    "theora" {
-        { [ win32? ]  [ "libtheora.dll" ] }
-        { [ macosx? ] [ "libtheora.0.dylib" ] }
-        { [ unix? ]   [ "libtheora.so" ] }
-    } cond "cdecl" add-library ; parsing
-
-load-theora-library
+<<
+"theora" {
+    { [ win32? ]  [ "libtheora.dll" ] }
+    { [ macosx? ] [ "libtheora.0.dylib" ] }
+    { [ unix? ]   [ "libtheora.so" ] }
+} cond "cdecl" add-library
+>>
 
 LIBRARY: theora
 

@@ -144,9 +144,6 @@ M: ppc-backend %jump-dispatch ( -- )
 M: ppc-backend %dispatch-label ( word -- )
     0 , rc-absolute-cell rel-word ;
 
-M: ppc-backend %end-dispatch ( label -- )
-    resolve-label ;
-
 M: ppc-backend %return ( -- ) %epilogue-later BLR ;
 
 M: ppc-backend %unwind drop %return ;

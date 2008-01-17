@@ -116,9 +116,6 @@ void jit_compile(CELL quot, bool relocate)
 	GROWABLE_ARRAY(literals);
 	REGISTER_ROOT(literals);
 
-	GROWABLE_ARRAY(words);
-	REGISTER_ROOT(words);
-
 	GROWABLE_ADD(literals,stack_traces_p() ? quot : F);
 
 	bool stack_frame = jit_stack_frame_p(untag_object(array));
@@ -144,19 +141,19 @@ void jit_compile(CELL quot, bool relocate)
 			current stack frame. */
 			word = untag_object(obj);
 
-			GROWABLE_ADD(words,array_nth(untag_object(array),i));
+			GROWABLE_ADD(literals,array_nth(untag_object(array),i));
 
 			if(i == length - 1)
 			{
 				if(stack_frame)
 					EMIT(JIT_EPILOG,0);
 
-				EMIT(JIT_WORD_JUMP,words_count - 1);
+				EMIT(JIT_WORD_JUMP,literals_count - 1);
 
 				tail_call = true;
 			}
 			else
-				EMIT(JIT_WORD_CALL,words_count - 1);
+				EMIT(JIT_WORD_CALL,literals_count - 1);
 			break;
 		case WRAPPER_TYPE:
 			wrapper = untag_object(obj);
@@ -220,14 +217,12 @@ void jit_compile(CELL quot, bool relocate)
 	GROWABLE_TRIM(code);
 	GROWABLE_TRIM(relocation);
 	GROWABLE_TRIM(literals);
-	GROWABLE_TRIM(words);
 
 	F_COMPILED *compiled = add_compiled_block(
 		QUOTATION_TYPE,
 		untag_object(code),
 		NULL,
 		untag_object(relocation),
-		untag_object(words),
 		untag_object(literals));
 
 	set_quot_xt(untag_object(quot),compiled);
@@ -235,7 +230,6 @@ void jit_compile(CELL quot, bool relocate)
 	if(relocate)
 		iterate_code_heap_step(compiled,relocate_code_block);
 
-	UNREGISTER_ROOT(words);
 	UNREGISTER_ROOT(literals);
 	UNREGISTER_ROOT(relocation);
 	UNREGISTER_ROOT(code);
