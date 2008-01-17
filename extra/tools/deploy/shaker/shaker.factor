@@ -5,7 +5,7 @@ assocs kernel vocabs words sequences memory io system arrays
 continuations math definitions mirrors splitting parser classes
 inspector layouts vocabs.loader prettyprint.config prettyprint
 debugger io.streams.c io.streams.duplex io.files io.backend
-quotations words.private tools.deploy.config ;
+quotations words.private tools.deploy.config compliler.units ;
 IN: tools.deploy.shaker
 
 : show ( msg -- )
