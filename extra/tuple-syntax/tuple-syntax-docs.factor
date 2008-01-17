@@ -1,4 +1,5 @@
-USING: help.markup help.syntax tuple-syntax ;
+USING: help.markup help.syntax ;
+IN: tuple-syntax
 
 HELP: TUPLE{
 { $syntax "TUPLE{ class slot-name: value... }" }

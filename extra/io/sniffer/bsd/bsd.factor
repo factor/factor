@@ -17,7 +17,7 @@ TUPLE: sniffer-spec path ifname ;
 C: <sniffer-spec> sniffer-spec
 
 : IOCPARM_MASK   HEX: 1fff ; inline
-: IOCPARM_MAX    IOCPARM_MASK 1 + ; inline
+: IOCPARM_MAX    IOCPARM_MASK 1+ ; inline
 : IOC_VOID       HEX: 20000000 ; inline
 : IOC_OUT        HEX: 40000000 ; inline
 : IOC_IN         HEX: 80000000 ; inline
