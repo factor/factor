@@ -38,7 +38,10 @@ IN: project-euler.027
 
 ! b must be prime since n = 0 must return a prime
 ! a + b + 1 must be prime since n = 1 must return a prime
-! a < b
+! 1 - a + b must be prime as well, hence >= 2. Therefore:
+!    1 - a + b >= 2
+!        b - a >= 1
+!            a < b
 
 <PRIVATE
 
