@@ -1,5 +1,4 @@
-USING: alien alien.c-types alien.structs alien.syntax
-alien.syntax.private help.markup help.syntax ;
+USING: alien alien.c-types alien.structs alien.syntax help.markup help.syntax ;
 IN: alien.syntax
 
 HELP: DLL"
