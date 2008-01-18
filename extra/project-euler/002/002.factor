@@ -22,12 +22,12 @@ IN: project-euler.002
 <PRIVATE
 
 : (fib-upto) ( seq n limit -- seq )
-    2dup <= [ >r add dup 2 tail* sum r> (fib-upto) ] [ 2drop ] if ;
+    2dup <= [ [ over push dup 2 tail* sum ] dip (fib-upto) ] [ 2drop ] if ;
 
 PRIVATE>
 
 : fib-upto ( n -- seq )
-    { 0 } 1 rot (fib-upto) ;
+    V{ 0 } clone 1 rot (fib-upto) ;
 
 : euler002 ( -- answer )
     1000000 fib-upto [ even? ] subset sum ;
