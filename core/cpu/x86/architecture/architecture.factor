@@ -70,15 +70,7 @@ M: x86-backend %prepare-alien-invoke
     temp-reg v>operand 2 cells [+] ds-reg MOV
     temp-reg v>operand 3 cells [+] rs-reg MOV ;
 
-M: x86-backend %call-primitive ( word -- )
-    stack-save-reg stack-reg cell neg [+] LEA
-    address-operand CALL ;
-
-M: x86-backend %jump-primitive ( word -- )
-    stack-save-reg stack-reg MOV
-    address-operand JMP ;
-
-M: x86-backend %call-label ( label -- ) CALL ;
+M: x86-backend %call ( label -- ) CALL ;
 
 M: x86-backend %jump-label ( label -- ) JMP ;
 

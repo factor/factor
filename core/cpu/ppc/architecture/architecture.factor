@@ -97,26 +97,14 @@ M: ppc-backend %epilogue ( n -- )
     1 1 rot ADDI
     0 MTLR ;
 
-: %prepare-primitive ( word -- )
-    #! Save stack pointer to stack_chain->callstack_top, load XT
-    4 1 MR
-    0 11 LOAD32
-    rc-absolute-ppc-2/2 rel-primitive ;
-
 : (%call) 11 MTLR BLRL ;
 
-M: ppc-backend %call-primitive ( word -- )
-    %prepare-primitive (%call) ;
-
 : (%jump) 11 MTCTR BCTR ;
-
-M: ppc-backend %jump-primitive ( word -- )
-    %prepare-primitive (%jump) ;
 
 : %load-dlsym ( symbol dll register -- )
     0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
 
-M: ppc-backend %call-label ( label -- ) BL ;
+M: ppc-backend %call ( label -- ) BL ;
 
 M: ppc-backend %jump-label ( label -- ) B ;
 
