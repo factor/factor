@@ -85,7 +85,7 @@ HELP: run-detached
 
 HELP: <process-stream>
 { $values { "obj" object } { "stream" "a bidirectional stream" } }
-{ $description "Launches a process and redirects its input and output via a paper of pipes which may be read and written as a stream." }
+{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream." }
 { $notes "Closing the stream will block until the process exits." } ;
 
 { run-process run-detached <process-stream> } related-words
