@@ -9,8 +9,8 @@ USING: definitions io io.files kernel math.parser sequences vocabs
     project-euler.017 project-euler.018 project-euler.019 project-euler.020
     project-euler.021 project-euler.022 project-euler.023 project-euler.024
     project-euler.025 project-euler.026 project-euler.027 project-euler.028
-    project-euler.067 project-euler.134 project-euler.169 project-euler.173
-    project-euler.175 ;
+    project-euler.029 project-euler.067 project-euler.134 project-euler.169
+    project-euler.173 project-euler.175 ;
 IN: project-euler
 
 <PRIVATE

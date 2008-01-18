@@ -40,7 +40,7 @@ PRIVATE>
 : euler028 ( -- answer )
     1001 sum-diags ;
 
-! [ euler027 ] 100 ave-time
+! [ euler028 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials
 
 MAIN: euler028
