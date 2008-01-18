@@ -1,20 +1,13 @@
 
 USING: kernel namespaces
        math math.constants math.functions math.matrices math.vectors
-       sequences splitting self ;
+       sequences splitting self math.trig ;
 
 IN: ori
 
 TUPLE: ori val ;
 
 C: <ori> ori
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! Temporarily defined here until math-contrib gets moved to extra/
-
-: deg>rad pi * 180 / ; inline
-: rad>deg 180 * pi / ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

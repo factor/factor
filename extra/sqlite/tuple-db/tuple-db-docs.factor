@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help sqlite sqlite.tuple-db help.syntax help.markup ;
+USING: help sqlite help.syntax help.markup ;
 IN: sqlite.tuple-db
 
 ARTICLE: { "sqlite" "tuple-db-loading" } "Loading"

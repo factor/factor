@@ -14,8 +14,8 @@ float-arrays combinators.private combinators ;
 ! its second-to-last input
 { <tuple> <tuple-boa> } [
     [
-        node-in-d dup length 2 - swap nth dup value?
-        [ value-literal ] [ drop tuple ] if 1array f
+        dup node-in-d dup length 2 - swap nth node-literal
+        dup class? [ drop tuple ] unless 1array f
     ] "output-classes" set-word-prop
 ] each
 

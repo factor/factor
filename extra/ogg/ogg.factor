@@ -4,14 +4,13 @@
 USING: kernel system combinators alien alien.syntax ;
 IN: ogg
 
-: load-ogg-library ( -- )
-    "ogg" {
-        { [ win32? ]  [ "ogg.dll" ] }
-        { [ macosx? ] [ "libogg.0.dylib" ] }
-        { [ unix? ]   [ "libogg.so" ] }
-    } cond "cdecl" add-library ; parsing
-
-load-ogg-library
+<<
+"ogg" {
+    { [ win32? ]  [ "ogg.dll" ] }
+    { [ macosx? ] [ "libogg.0.dylib" ] }
+    { [ unix? ]   [ "libogg.so" ] }
+} cond "cdecl" add-library
+>>
 
 LIBRARY: ogg
 

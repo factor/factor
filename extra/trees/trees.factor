@@ -5,11 +5,19 @@ prettyprint.private kernel.private assocs random combinators
 parser prettyprint.backend ;
 IN: trees
 
+MIXIN: tree-mixin
+
 TUPLE: tree root count ;
+
 : <tree> ( -- tree )
     f 0 tree construct-boa ;
 
-INSTANCE: tree assoc
+: construct-tree ( class -- tree )
+    construct-empty <tree> over set-delegate ; inline
+
+INSTANCE: tree tree-mixin
+
+INSTANCE: tree-mixin assoc
 
 TUPLE: node key value left right ;
 : <node> ( key value -- node )
@@ -111,15 +119,12 @@ M: tree set-at ( value key tree -- )
         { [ t ] [ >r node-right r> find-node ] }
     } cond ; inline
 
-M: tree assoc-find ( tree quot -- key value ? )
+M: tree-mixin assoc-find ( tree quot -- key value ? )
     >r tree-root r> find-node ;
 
-M: tree clear-assoc
+M: tree-mixin clear-assoc
     0 over set-tree-count
     f swap set-tree-root ;
-
-M: tree assoc-size
-    tree-count ;
 
 : copy-node-contents ( new old -- )
     dup node-key pick set-node-key node-value swap set-node-value ;
@@ -189,16 +194,14 @@ M: tree clone dup assoc-clone-like ;
 : >tree ( assoc -- tree )
     T{ tree f f 0 } assoc-clone-like ;
 
-GENERIC: tree-assoc-like ( assoc -- tree )
-M: tuple tree-assoc-like ! will need changes for tuple inheritance
-    dup delegate dup tree? [ nip ] [ drop >tree ] if ;
-M: tree tree-assoc-like ;
-M: assoc tree-assoc-like >tree ;
-M: tree assoc-like drop tree-assoc-like ;
+M: tree-mixin assoc-like drop dup tree? [ >tree ] unless ;
 
 : TREE{
     \ } [ >tree ] parse-literal ; parsing
 
 M: tree pprint-delims drop \ TREE{ \ } ;
-M: tree >pprint-sequence >alist ;
-M: tree pprint-narrow? drop t ;
+
+M: tree-mixin assoc-size tree-count ;
+M: tree-mixin clone dup assoc-clone-like ;
+M: tree-mixin >pprint-sequence >alist ;
+M: tree-mixin pprint-narrow? drop t ;

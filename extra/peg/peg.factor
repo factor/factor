@@ -1,12 +1,16 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
-       vectors arrays combinators.lib memoize math.parser ;
+       vectors arrays combinators.lib memoize math.parser match ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
 
-GENERIC: (parse) ( state parser -- result )
+GENERIC: compile ( parser -- quot )
+
+: (parse) ( state parser -- result )
+  compile call ;
+
 
 <PRIVATE
 
@@ -72,135 +76,199 @@ PRIVATE>
 
 TUPLE: token-parser symbol ;
 
-M: token-parser (parse) ( input parser -- result )
-  token-parser-symbol 2dup head? [
-    dup >r length tail-slice r> <parse-result>
-  ] [
-    2drop f
-  ] if ;
-   
-TUPLE: satisfy-parser quot ;
+MATCH-VARS: ?token ;
 
-M: satisfy-parser (parse) ( state parser -- result )
-  over empty? [
-    2drop f 
-  ] [
-    satisfy-parser-quot [ unclip-slice dup ] dip call [  
-      <parse-result>
+: token-pattern ( -- quot )
+  [
+    ?token 2dup head? [
+      dup >r length tail-slice r> <parse-result>
     ] [
       2drop f
-    ] if
-  ] if ;
+    ] if 
+  ] ;
+  
+M: token-parser compile ( parser -- quot )
+  token-parser-symbol \ ?token token-pattern match-replace ;
+      
+TUPLE: satisfy-parser quot ;
+
+MATCH-VARS: ?quot ;
+
+: satisfy-pattern ( -- quot )
+  [
+    dup empty? [
+      drop f 
+    ] [
+      unclip-slice dup ?quot call [  
+        <parse-result>
+      ] [
+        2drop f
+      ] if
+    ] if 
+  ] ;
+
+M: satisfy-parser compile ( parser -- quot )
+  satisfy-parser-quot \ ?quot satisfy-pattern match-replace ;
 
 TUPLE: range-parser min max ;
 
-M: range-parser (parse) ( state parser -- result )
-  over empty? [
-    2drop f
-  ] [
-    0 pick nth dup rot 
-    { range-parser-min range-parser-max } get-slots between? [
-      [ 1 tail-slice ] dip <parse-result>
+MATCH-VARS: ?min ?max ;
+
+: range-pattern ( -- quot )
+  [
+    dup empty? [
+      drop f
     ] [
-      2drop f
-    ] if
-  ] if ;
+      0 over nth dup 
+      ?min ?max between? [
+         [ 1 tail-slice ] dip <parse-result>
+      ] [
+        2drop f
+      ] if
+    ] if 
+  ] ;
+
+M: range-parser compile ( parser -- quot )
+  T{ range-parser _ ?min ?max } range-pattern match-replace ;
 
 TUPLE: seq-parser parsers ;
 
-: do-seq-parser ( result parser -- result )
-  [ dup parse-result-remaining ] dip parse [
-    [ parse-result-remaining swap set-parse-result-remaining ] 2keep  
-    parse-result-ast dup ignore = [ drop ] [ swap [ parse-result-ast push ] keep ] if
-  ] [
-    drop f
-  ] if* ;
+: seq-pattern ( -- quot )
+  [
+    dup [
+      dup parse-result-remaining ?quot call [
+        [ parse-result-remaining swap set-parse-result-remaining ] 2keep
+        parse-result-ast dup ignore = [ 
+          drop  
+        ] [ 
+          swap [ parse-result-ast push ] keep 
+        ] if
+      ] [
+        drop f 
+      ] if*
+    ] [
+      drop f
+    ] if  
+  ] ;
 
-: (seq-parser) ( result parsers -- result )
-  dup empty? not pick and [
-    unclip swap [ do-seq-parser ] dip (seq-parser)
-  ] [
-    drop   
-  ] if ;
-
-M: seq-parser (parse) ( state parser -- result )
-  seq-parser-parsers [ V{ } clone <parse-result> ] dip  (seq-parser) ;
+M: seq-parser compile ( parser -- quot )
+  [
+    [ V{ } clone <parse-result> ] %
+    seq-parser-parsers [ compile \ ?quot seq-pattern match-replace % ] each 
+  ] [ ] make ;
 
 TUPLE: choice-parser parsers ;
-  
-: (choice-parser) ( state parsers -- result )
-  dup empty? [
-    2drop f
-  ] [
-    unclip pick swap parse [
-      2nip 
-    ] [
-      (choice-parser)
-    ] if* 
-  ] if ;
 
-M: choice-parser (parse) ( state parser -- result )
-  choice-parser-parsers (choice-parser) ;
+: choice-pattern ( -- quot )
+  [
+    dup [
+          
+    ] [
+      drop dup ?quot call   
+    ] if
+  ] ;
+
+M: choice-parser compile ( parser -- quot )
+  [
+    f ,
+    choice-parser-parsers [ compile \ ?quot choice-pattern match-replace % ] each
+    \ nip ,
+  ] [ ] make ;
 
 TUPLE: repeat0-parser p1 ;
 
-: (repeat-parser) ( parser result -- result )
-  2dup parse-result-remaining swap parse [
+: (repeat0) ( quot result -- result )
+  2dup parse-result-remaining swap call [
     [ parse-result-remaining swap set-parse-result-remaining ] 2keep 
     parse-result-ast swap [ parse-result-ast push ] keep
-    (repeat-parser) 
+    (repeat0) 
  ] [
     nip
-  ] if* ;
+  ] if* ; inline
 
-: clone-result ( result -- result )
-  { parse-result-remaining parse-result-ast }
-  get-slots 1vector  <parse-result> ;
+: repeat0-pattern ( -- quot )
+  [
+    ?quot swap (repeat0) 
+  ] ;
 
-M: repeat0-parser (parse) ( state parser -- result )
-     repeat0-parser-p1 2dup parse [ 
-       nipd clone-result (repeat-parser) 
-     ] [ 
-       drop V{ } clone <parse-result> 
-     ] if* ;
+M: repeat0-parser compile ( parser -- quot )
+  [
+    [ V{ } clone <parse-result> ] %
+    repeat0-parser-p1 compile \ ?quot repeat0-pattern match-replace %        
+  ] [ ] make ;
 
 TUPLE: repeat1-parser p1 ;
 
-M: repeat1-parser (parse) ( state parser -- result )
-   repeat1-parser-p1 tuck parse dup [ clone-result (repeat-parser) ] [ nip ] if ;
+: repeat1-pattern ( -- quot )
+  [
+    ?quot swap (repeat0) [
+      dup parse-result-ast empty? [
+        drop f
+      ] when  
+    ] [
+      f 
+    ] if*
+  ] ;
+
+M: repeat1-parser compile ( parser -- quot )
+  [
+    [ V{ } clone <parse-result> ] %
+    repeat1-parser-p1 compile \ ?quot repeat1-pattern match-replace % 
+  ] [ ] make ;
 
 TUPLE: optional-parser p1 ;
 
-M: optional-parser (parse) ( state parser -- result )
-   dupd optional-parser-p1 parse swap f <parse-result> or ;
+: optional-pattern ( -- quot )
+  [
+    dup ?quot call swap f <parse-result> or 
+  ] ;
+
+M: optional-parser compile ( parser -- quot )
+  optional-parser-p1 compile \ ?quot optional-pattern match-replace ;
 
 TUPLE: ensure-parser p1 ;
 
-M: ensure-parser (parse) ( state parser -- result )
-   dupd ensure-parser-p1 parse [
-     ignore <parse-result>  
-   ] [
-     drop f
-   ] if ;
+: ensure-pattern ( -- quot )
+  [
+    dup ?quot call [
+      ignore <parse-result>
+    ] [
+      drop f
+    ] if
+  ] ;
+
+M: ensure-parser compile ( parser -- quot )
+  ensure-parser-p1 compile \ ?quot ensure-pattern match-replace ;
 
 TUPLE: ensure-not-parser p1 ;
 
-M: ensure-not-parser (parse) ( state parser -- result )
-   dupd ensure-not-parser-p1 parse [
-     drop f
-   ] [
-     ignore <parse-result>  
-   ] if ;
+: ensure-not-pattern ( -- quot )
+  [
+    dup ?quot call [
+      drop f
+    ] [
+      ignore <parse-result>
+    ] if
+  ] ;
+
+M: ensure-not-parser compile ( parser -- quot )
+  ensure-not-parser-p1 compile \ ?quot ensure-not-pattern match-replace ;
 
 TUPLE: action-parser p1 quot ;
 
-M: action-parser (parse) ( state parser -- result )
-   tuck action-parser-p1 parse dup [ 
-     dup parse-result-ast rot action-parser-quot call
-     swap [ set-parse-result-ast ] keep
-   ] [
-     nip
-   ] if ;
+MATCH-VARS: ?action ;
+
+: action-pattern ( -- quot )
+  [
+    ?quot call dup [ 
+      dup parse-result-ast ?action call
+      swap [ set-parse-result-ast ] keep
+    ] when 
+  ] ;
+
+M: action-parser compile ( parser -- quot )
+  { action-parser-p1 action-parser-quot } get-slots [ compile ] dip 
+  2array { ?quot ?action } action-pattern match-replace ;
 
 : left-trim-slice ( string -- string )
   #! Return a new string without any leading whitespace
@@ -211,13 +279,17 @@ M: action-parser (parse) ( state parser -- result )
 
 TUPLE: sp-parser p1 ;
 
-M: sp-parser (parse) ( state parser -- result )
-  [ left-trim-slice ] dip sp-parser-p1 parse ;
+M: sp-parser compile ( parser -- quot )
+  [
+    \ left-trim-slice , sp-parser-p1 compile % 
+  ] [ ] make ;
 
 TUPLE: delay-parser quot ;
 
-M: delay-parser (parse) ( state parser -- result )
-  delay-parser-quot call parse ;
+M: delay-parser compile ( parser -- quot )
+  [
+    delay-parser-quot % \ compile , \ call ,
+  ] [ ] make ;
 
 PRIVATE>
 

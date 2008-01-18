@@ -1,4 +1,5 @@
-USING: help.syntax help.markup trees.avl assocs ;
+USING: help.syntax help.markup assocs ;
+IN: trees.avl 
 
 HELP: AVL{
 { $syntax "AVL{ { key value }... }" }
@@ -23,5 +24,4 @@ ARTICLE: { "avl" "intro" } "AVL trees"
 { $subsection >avl }
 { $subsection POSTPONE: AVL{ } ;
 
-IN: trees.avl
 ABOUT: { "avl" "intro" }

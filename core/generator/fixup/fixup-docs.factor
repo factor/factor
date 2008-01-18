@@ -13,13 +13,6 @@ HELP: add-literal
 { $values { "obj" object } { "n" integer } }
 { $description "Adds a literal to the " { $link literal-table } ", if it is not already there, and outputs the index of the literal in the table. This literal can then be used as an argument for a " { $link rt-literal } " relocation with " { $link rel-fixup } "." } ;
 
-HELP: word-table
-{ $var-description "Holds a vector of words called from the currently compiling word." } ;
-
-HELP: add-word
-{ $values { "word" word } { "n" integer } }
-{ $description "Adds a word to the " { $link word-table } ", if it is not already there, and outputs the index of the word in the table. This literal can then be used as an argument for a " { $link rt-xt } " relocation with " { $link rel-fixup } "." } ;
-
 HELP: string>symbol
 { $values { "str" string } { "alien" alien } }
 { $description "Converts the string to a format which is a valid symbol name for the Factor VM's compiled code linker. By performing this conversion ahead of time, the image loader can run without allocating memory."

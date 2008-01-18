@@ -6,10 +6,10 @@ IN: trees.avl
 
 TUPLE: avl ;
 
-INSTANCE: avl assoc
+INSTANCE: avl tree-mixin
 
 : <avl> ( -- tree )
-    avl construct-empty <tree> over set-delegate ;
+    avl construct-tree ;
 
 TUPLE: avl-node balance ;
 
@@ -148,11 +148,3 @@ M: avl assoc-like
     \ } [ >avl ] parse-literal ; parsing
 
 M: avl pprint-delims drop \ AVL{ \ } ;
-
-! When tuple inheritance is used, the following lines won't be necessary
-M: avl assoc-size tree-count ;
-M: avl clear-assoc delegate clear-assoc ;
-M: avl assoc-find >r tree-root r> find-node ;
-M: avl clone dup assoc-clone-like ;
-M: avl >pprint-sequence >alist ;
-M: avl pprint-narrow? drop t ;
