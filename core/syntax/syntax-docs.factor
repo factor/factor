@@ -363,12 +363,6 @@ HELP: USE:
 { $description "Adds a new vocabulary at the front of the search path. Subsequent word lookups by the parser will search this vocabulary first." }
 { $errors "Throws an error if the vocabulary does not exist." } ;
 
-HELP: USE-IF:
-{ $syntax "USE-IF: word vocabulary" }
-{ $values { "word" "a word with stack effect " { $snippet "( -- ? )" } } { "vocabulary" "a vocabulary name" } }
-{ $description "Adds " { $snippet "vocabulary" } " at the front of the search path if " { $snippet "word" } " evaluates to a true value." }
-{ $errors "Throws an error if the vocabulary does not exist." } ;
-
 HELP: USING:
 { $syntax "USING: vocabularies... ;" }
 { $values { "vocabularies" "a list of vocabulary names" } }

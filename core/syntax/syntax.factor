@@ -46,7 +46,6 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "USE:" [ scan use+ ] define-syntax
-    "USE-IF:" [ scan-word execute scan swap [ use+ ] [ drop ] if ] define-syntax
 
     "USING:" [ ";" parse-tokens add-use ] define-syntax
 

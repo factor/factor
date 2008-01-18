@@ -3,9 +3,8 @@
 
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 
-USING: alien alien.syntax kernel sequences system words ;
-USE-IF: windows? opengl.gl.windows
-USE-IF: unix? opengl.gl.unix
+USING: alien alien.syntax kernel parser sequences system words ;
+<< windows? "opengl.gl.windows" "opengl.gl.unix" ? use+ >>
 
 IN: opengl.gl
 
