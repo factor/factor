@@ -25,35 +25,20 @@ IN: project-euler.028
 ! SOLUTION
 ! --------
 
-! Noticed patterns in the diagnoal numbers starting from the origin going to
-! the corners and used these instead of generating the entire spiral:
-!     ne -> (2n + 1)²                from 0 .. n
-!     se -> (4 * n²) - (10 * n) + 7  from 1 .. n
-!     sw -> (4 * n²) + 1             from 0 .. n
-!     nw -> (4 * n²) - (6 * n) + 3   from 1 .. n
+! For a square sized n by n, the sum of corners is 4n² - 6n + 6
 
 <PRIVATE
 
-: ne ( m -- n )
-    2 * 1+ sq ;
+: sum-corners ( n -- sum )
+    dup 1 = [ [ sq 4 * ] keep 6 * - 6 + ] unless ;
 
-: se ( m -- n )
-    [ sq 4 * ] keep 10 * - 7 + ;
-
-: sw ( m -- n )
-    sq 4 * 1+ ;
-
-: nw ( m -- n )
-    [ sq 4 * ] keep 6 * - 3 + ;
-
-: spiral-diags ( n -- sum )
-    1+ 2 / [ [ ne ] sigma ] keep [ [ sw ] sigma ] keep
-    [1,b] [ [ se ] sigma ] keep [ nw ] sigma 3 - [ + ] 3apply ;
+: sum-diags ( n -- sum )
+    1 swap 2 <range> [ sum-corners ] sigma ;
 
 PRIVATE>
 
 : euler028 ( -- answer )
-    1001 spiral-diags ;
+    1001 sum-diags ;
 
 ! [ euler027 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials
