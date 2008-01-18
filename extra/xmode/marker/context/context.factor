@@ -10,6 +10,7 @@ end
 ;
 
 : <line-context> ( ruleset parent -- line-context )
+    over [ "no context" throw ] unless
     { set-line-context-in-rule-set set-line-context-parent }
     line-context construct ;
 
