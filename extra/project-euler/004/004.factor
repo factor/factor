@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators.lib hashtables kernel math math.parser math.ranges
+USING: hashtables kernel math math.parser math.ranges project-euler.common
     sequences sorting ;
 IN: project-euler.004
 
@@ -20,9 +20,6 @@ IN: project-euler.004
 
 : palindrome? ( n -- ? )
     number>string dup reverse = ;
-
-: cartesian-product ( seq1 seq2 -- seq1xseq2 )
-    swap [ swap [ 2array ] map-with ] map-with concat ;
 
 <PRIVATE
 
