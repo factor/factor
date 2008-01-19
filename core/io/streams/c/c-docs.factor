@@ -14,9 +14,10 @@ ARTICLE: "io.streams.c" "ANSI C streams"
 { $subsection fclose }
 { $subsection fgetc }
 { $subsection fread }
-"Two standard file handles:"
-{ $subsection stdin }
-{ $subsection stdout } ;
+"The three standard file handles:"
+{ $subsection stdin-handle }
+{ $subsection stdout-handle }
+{ $subsection stderr-handle } ;
 
 ABOUT: "io.streams.c"
 
@@ -64,10 +65,14 @@ HELP: fread ( n alien -- str/f )
 { $description "Reads a sequence of characters from a C FILE* handle, and outputs " { $link f } " on end of file." }
 { $errors "Throws an error if the input operation failed." } ;
 
-HELP: stdin
+HELP: stdin-handle
 { $values { "in" "a C FILE* handle" } }
 { $description "Outputs the console standard input file handle." } ;
 
-HELP: stdout
+HELP: stdout-handle
 { $values { "out" "a C FILE* handle" } }
 { $description "Outputs the console standard output file handle." } ;
+
+HELP: stderr-handle
+{ $values { "out" "a C FILE* handle" } }
+{ $description "Outputs the console standard error file handle." } ;
