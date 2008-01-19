@@ -45,7 +45,7 @@ C-STRUCT: timespec
     1000 /mod 1000000 *
     "timespec" <c-object>
     [ set-timespec-nsec ] keep
-    [ set-timespec-usec ] keep ;
+    [ set-timespec-sec ] keep ;
 
 ! ! ! Unix constants
 
