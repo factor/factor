@@ -1,4 +1,4 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2007 Aaron Schaefer, Alexander Solovyov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences shuffle ;
 IN: project-euler.002
