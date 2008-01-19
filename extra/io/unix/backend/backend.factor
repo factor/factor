@@ -154,7 +154,7 @@ M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: unix-io io-multiplex ( ms -- )
-    make-timeval unix-io-multiplex ;
+    unix-io-multiplex ;
 
 M: unix-io init-io ( -- )
     H{ } clone read-tasks set-global
@@ -162,4 +162,8 @@ M: unix-io init-io ( -- )
     init-unix-io ;
 
 M: unix-io init-stdio ( -- )
-    0 1 handle>duplex-stream io:stdio set-global ;
+    0 1 handle>duplex-stream io:stdio set-global
+    2 <writer> io:stderr set-global ;
+
+: multiplexer-error ( n -- )
+    0 < [ err_no ignorable-error? [ (io-error) ] unless ] when ;

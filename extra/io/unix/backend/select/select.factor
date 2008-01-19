@@ -44,9 +44,8 @@ M: unix-select-io register-io-task ( task -- ) drop ;
 M: unix-select-io unregister-io-task ( task -- ) drop ;
 
 M: unix-select-io unix-io-multiplex ( timeval -- )
-    >r FD_SETSIZE init-fdsets r> select 0 < [
-        err_no ignorable-error? [ (io-error) ] unless
-    ] when
+    make-timeval >r FD_SETSIZE init-fdsets r>
+    select multiplexer-error
     read-fdset/tasks handle-fdset
     write-fdset/tasks handle-fdset ;
 

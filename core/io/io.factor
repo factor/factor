@@ -35,6 +35,9 @@ GENERIC: stream-write-table ( table-cells style stream -- )
 ! Default stream
 SYMBOL: stdio
 
+! Default error stream
+SYMBOL: stderr
+
 : close ( -- ) stdio get stream-close ;
 
 : readln ( -- str/f ) stdio get stream-readln ;

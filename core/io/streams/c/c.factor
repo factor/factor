@@ -57,11 +57,12 @@ M: c-reader stream-close
 M: object init-io ;
 
 : stdin 11 getenv ;
-
 : stdout 12 getenv ;
+: stderr 38 getenv ;
 
 M: object init-stdio
-    stdin stdout <duplex-c-stream> stdio set-global ;
+    stdin stdout <duplex-c-stream> stdio set-global
+    stderr <c-writer> stderr set-global ;
 
 M: object io-multiplex (sleep) ;
 
