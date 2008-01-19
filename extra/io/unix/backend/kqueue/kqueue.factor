@@ -1,14 +1,16 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel io.nonblocking io.unix.backend
-sequences assocs unix unix.kqueue math namespaces ;
+USING: alien.c-types kernel io.nonblocking io.unix.backend
+io.unix.sockets sequences assocs unix unix.kqueue math
+namespaces classes combinators ;
 IN: io.unix.backend.kqueue
 
 TUPLE: unix-kqueue-io ;
 
 ! Global variables
 SYMBOL: kqueue-fd
-SYMBOL: kqueue-changes
+SYMBOL: kqueue-added
+SYMBOL: kqueue-deleted
 SYMBOL: kqueue-events
 
 : max-events ( -- n )
@@ -17,26 +19,43 @@ SYMBOL: kqueue-events
     256 ; inline
 
 M: unix-kqueue-io init-unix-io ( -- )
-    V{ } clone kqueue-changes set-global
+    H{ } clone kqueue-added set-global
+    H{ } clone kqueue-deleted set-global
     max-events "kevent" <c-array> kqueue-events set-global
-    kqueue kqueue-fd dup io-error set-global ;
+    kqueue dup io-error kqueue-fd set-global ;
 
-: add-change ( event -- ) kqueue-changes get-global push ;
+M: unix-kqueue-io register-io-task ( task -- )
+    dup io-task-fd kqueue-added get-global key? [ drop ] [
+        dup io-task-fd kqueue-deleted get-global key? [
+            io-task-fd kqueue-deleted get-global delete-at
+        ] [
+            dup io-task-fd kqueue-added get-global set-at
+        ] if
+    ] if ;
+
+M: unix-kqueue-io unregister-io-task ( task -- )
+    dup io-task-fd kqueue-deleted get-global key? [ drop ] [
+        dup io-task-fd kqueue-added get-global key? [
+            io-task-fd kqueue-added get-global delete-at
+        ] [
+            dup io-task-fd kqueue-deleted get-global set-at
+        ] if
+    ] if ;
 
 : io-task-filter ( task -- n )
     class {
-        { read-task    EVFILT_READ  }
-        { accept-task  EVFILT_READ  }
-        { receive-task EVFILT_READ  }
-        { write-task   EVFILT_WRITE }
-        { connect-task EVFILT_WRITE }
-        { send-task    EVFILT_WRITE }
+        { read-task    [ EVFILT_READ  ] }
+        { accept-task  [ EVFILT_READ  ] }
+        { receive-task [ EVFILT_READ  ] }
+        { write-task   [ EVFILT_WRITE ] }
+        { connect-task [ EVFILT_WRITE ] }
+        { send-task    [ EVFILT_WRITE ] }
     } case ;
 
 : make-kevent ( task -- event )
     "kevent" <c-object>
     over io-task-fd over set-kevent-ident
-    over io-task-filter over set-kevent-filter ;
+    swap io-task-filter over set-kevent-filter ;
 
 : make-add-kevent ( task -- event )
     make-kevent
@@ -46,15 +65,19 @@ M: unix-kqueue-io init-unix-io ( -- )
     make-kevent
     EV_DELETE over set-kevent-flags ;
 
-M: unix-select-io register-io-task ( task -- )
-    make-add-kevent add-change ;
+: kqueue-additions ( -- kevents )
+    kqueue-added get-global
+    dup clear-assoc values
+    [ make-add-kevent ] map ;
 
-M: unix-select-io unregister-io-task ( task -- )
-    make-delete-kevent add-change ;
+: kqueue-deletions ( -- kevents )
+    kqueue-deleted get-global
+    dup clear-assoc values
+    [ make-delete-kevent ] map ;
 
 : kqueue-changelist ( -- byte-array n )
-    kqueue-changes get-global
-    dup concat f like over length rot delete-all ;
+    kqueue-additions kqueue-deletions append
+    dup concat f like swap length ;
 
 : kqueue-eventlist ( -- byte-array n )
     kqueue-events get-global max-events ;
@@ -67,15 +90,15 @@ M: unix-select-io unregister-io-task ( task -- )
     r> kevent dup multiplexer-error ;
 
 : kevent-task ( kevent -- task )
-    dup kevent-filter {
+    dup kevent-ident swap kevent-filter {
         { [ dup EVFILT_READ = ] [ read-tasks ] }
         { [ dup EVFILT_WRITE = ] [ write-tasks ] }
-    } cond get at ;
+    } cond nip get at ;
 
 : handle-kevents ( n eventlist -- )
     [ kevent-nth kevent-task handle-fd ] curry each ;
 
-M: unix-select-io unix-io-multiplex ( ms -- )
+M: unix-kqueue-io unix-io-multiplex ( ms -- )
     make-timespec
     do-kevent
     kqueue-events get-global handle-kevents ;

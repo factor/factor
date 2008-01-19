@@ -3,8 +3,9 @@ io.unix.launcher io.unix.mmap io.backend combinators namespaces
 system vocabs.loader ;
 
 {
-    { [ macosx? ] [ "io.unix.backend.kqueue" ] }
-    { [ bsd? ] [ "io.unix.backend.kqueue" ] }
+    ! kqueue is a work in progress
+    ! { [ macosx? ] [ "io.unix.backend.kqueue" ] }
+    ! { [ bsd? ] [ "io.unix.backend.kqueue" ] }
     { [ unix? ] [ "io.unix.backend.select" ] }
 } cond require
 
