@@ -41,6 +41,12 @@ C-STRUCT: timespec
     { "time_t" "sec" }
     { "long" "nsec" } ;
 
+: make-timespec ( ms -- timespec )
+    1000 /mod 1000000 *
+    "timespec" <c-object>
+    [ set-timespec-nsec ] keep
+    [ set-timespec-sec ] keep ;
+
 ! ! ! Unix constants
 
 ! File type

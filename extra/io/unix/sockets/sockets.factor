@@ -33,7 +33,8 @@ M: unix-io addrinfo-error ( n -- )
 
 TUPLE: connect-task ;
 
-: <connect-task> ( port -- task ) connect-task <io-task> ;
+: <connect-task> ( port continuation -- task )
+    connect-task <io-task> ;
 
 M: connect-task do-io-task
     io-task-port dup port-handle f 0 write
@@ -42,7 +43,7 @@ M: connect-task do-io-task
 M: connect-task task-container drop write-tasks get-global ;
 
 : wait-to-connect ( port -- )
-    [ swap <connect-task> add-io-task stop ] callcc0 drop ;
+    [ <connect-task> add-io-task stop ] callcc0 drop ;
 
 M: unix-io (client) ( addrspec -- stream )
     dup make-sockaddr/size >r >r
@@ -66,7 +67,8 @@ USE: unix
 
 TUPLE: accept-task ;
 
-: <accept-task> ( port -- task ) accept-task <io-task> ;
+: <accept-task> ( port continuation  -- task )
+    accept-task <io-task> ;
 
 M: accept-task task-container drop read-tasks get ;
 
@@ -85,7 +87,7 @@ M: accept-task do-io-task
     over 0 >= [ do-accept t ] [ 2drop defer-error ] if ;
 
 : wait-to-accept ( server -- )
-    [ swap <accept-task> add-io-task stop ] callcc0 drop ;
+    [ <accept-task> add-io-task stop ] callcc0 drop ;
 
 USE: io.sockets
 
@@ -136,7 +138,8 @@ packet-size <byte-array> receive-buffer set-global
 
 TUPLE: receive-task ;
 
-: <receive-task> ( stream -- task ) receive-task <io-task> ;
+: <receive-task> ( stream continuation  -- task )
+    receive-task <io-task> ;
 
 M: receive-task do-io-task
     io-task-port
@@ -152,7 +155,7 @@ M: receive-task do-io-task
 M: receive-task task-container drop read-tasks get ;
 
 : wait-receive ( stream -- )
-    [ swap <receive-task> add-io-task stop ] callcc0 drop ;
+    [ <receive-task> add-io-task stop ] callcc0 drop ;
 
 M: unix-io receive ( datagram -- packet addrspec )
     dup check-datagram-port
@@ -166,7 +169,7 @@ M: unix-io receive ( datagram -- packet addrspec )
 
 TUPLE: send-task packet sockaddr len ;
 
-: <send-task> ( packet sockaddr len port -- task )
+: <send-task> ( packet sockaddr len stream continuation -- task )
     send-task <io-task> [
         {
             set-send-task-packet
@@ -185,8 +188,7 @@ M: send-task do-io-task
 M: send-task task-container drop write-tasks get ;
 
 : wait-send ( packet sockaddr len stream -- )
-    [ >r <send-task> r> swap add-io-task stop ] callcc0
-    2drop 2drop ;
+    [ <send-task> add-io-task stop ] callcc0 2drop 2drop ;
 
 M: unix-io send ( packet addrspec datagram -- )
     3dup check-datagram-send
