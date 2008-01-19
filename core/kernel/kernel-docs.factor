@@ -49,7 +49,7 @@ ARTICLE: "basic-combinators" "Basic combinators"
 { $subsection execute }
 "These words are used to implement " { $emphasis "combinators" } ", which are words that take code from the stack. Note that combinator definitions must be followed by the " { $link POSTPONE: inline } " declaration in order to compile in the optimizing compiler; for example:"
 { $code
-    ": keep ( x quot -- x | quot: x -- )"
+    ": keep ( x quot -- x )"
     "    over >r call r> ; inline"
 }
 "Word inlining is documented in " { $link "declarations" } "."
