@@ -3,9 +3,8 @@ io.unix.launcher io.unix.mmap io.backend combinators namespaces
 system vocabs.loader ;
 
 {
-    { [ macosx? ] [ "io.unix.backend.kqueue" ] }
-    { [ bsd? ] [ "io.unix.backend.kqueue" ] }
-    { [ unix? ] [ "io.unix.backend.select" ] }
+    { [ bsd? ] [ "io.unix.bsd" ] }
+    { [ macosx? ] [ "io.unix.bsd" ] }
+    { [ linux? ] [ "io.unix.backend.linux" ] }
+    { [ solaris? ] [ "io.unix.backend.solaris" ] }
 } cond require
-
-T{ unix-io } io-backend set-global

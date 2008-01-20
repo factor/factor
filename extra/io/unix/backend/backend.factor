@@ -7,19 +7,46 @@ continuations system libc qualified namespaces ;
 QUALIFIED: io
 IN: io.unix.backend
 
-! Multiplexer protocol
-SYMBOL: unix-io-backend
+MIXIN: unix-io
 
-HOOK: init-unix-io unix-io-backend ( -- )
-HOOK: register-io-task unix-io-backend ( task -- )
-HOOK: unregister-io-task unix-io-backend ( task -- )
-HOOK: unix-io-multiplex unix-io-backend ( timeval -- )
+! I/O tasks
+TUPLE: io-task port callbacks ;
 
-TUPLE: unix-io ;
+: io-task-fd io-task-port port-handle ;
 
-! Global variables
-SYMBOL: read-tasks
-SYMBOL: write-tasks
+: <io-task> ( port continuation class -- task )
+    >r 1vector io-task construct-boa r> construct-delegate ;
+    inline
+
+GENERIC: do-io-task ( task -- ? )
+GENERIC: io-task-container ( mx task -- hashtable )
+
+! I/O multiplexers
+TUPLE: mx fd reads writes ;
+
+: <mx> ( -- mx ) f H{ } clone H{ } clone mx construct-boa ;
+
+: construct-mx ( class -- obj ) <mx> swap construct-delegate ;
+
+GENERIC: register-io-task ( task mx -- )
+GENERIC: unregister-io-task ( task mx -- )
+GENERIC: unix-io-multiplex ( ms mx -- )
+
+: fd/container ( task mx -- task fd container )
+    over io-task-container >r dup io-task-fd r> ; inline
+
+: check-io-task ( task mx -- )
+    fd/container key? nip [
+        "Cannot perform multiple reads from the same port" throw
+    ] when ;
+
+M: mx register-io-task ( task mx -- )
+    2dup check-io-task fd/container set-at ;
+
+: add-io-task ( task -- ) mx get-global register-io-task ;
+
+M: mx unregister-io-task ( task mx -- )
+    fd/container delete-at drop ;
 
 ! Some general stuff
 : file-mode OCT: 0666 ;
@@ -52,43 +79,15 @@ M: integer close-handle ( fd -- )
     err_no dup ignorable-error?
     [ 2drop f ] [ strerror swap report-error t ] if ;
 
-! Associates a port with a list of continuations waiting on the
-! port to finish I/O
-TUPLE: io-task port callbacks ;
-
-: <io-task> ( port continuation class -- task )
-    >r 1vector io-task construct-boa r> construct-delegate ;
-    inline
-
-! Multiplexer
-GENERIC: do-io-task ( task -- ? )
-GENERIC: task-container ( task -- vector )
-
-: io-task-fd io-task-port port-handle ;
-
-: check-io-task ( task -- )
-    dup io-task-fd swap task-container at [
-        "Cannot perform multiple reads from the same port" throw
-    ] when ;
-
-: add-io-task ( task -- )
-    dup check-io-task
-    dup register-io-task
-    dup io-task-fd over task-container set-at ;
-
-: remove-io-task ( task -- )
-    dup io-task-fd over task-container delete-at
-    unregister-io-task ;
-
-: pop-callbacks ( task -- )
-    dup remove-io-task
+: pop-callbacks ( mx task -- )
+    dup rot unregister-io-task
     io-task-callbacks [ schedule-thread ] each ;
 
-: handle-fd ( task -- )
+: handle-io-task ( mx task -- )
     dup io-task-port touch-port
-    dup do-io-task [ pop-callbacks ] [ drop ] if ;
+    dup do-io-task [ pop-callbacks ] [ 2drop ] if ;
 
-: handle-timeout ( task -- )
+: handle-timeout ( mx task -- )
     "Timeout" over io-task-port report-error pop-callbacks ;
 
 ! Readers
@@ -119,8 +118,7 @@ M: read-task do-io-task
     io-task-port dup refill
     [ [ reader-eof ] [ drop ] if ] keep ;
 
-M: read-task task-container
-    drop read-tasks get-global ;
+M: read-task io-task-container drop mx-reads ;
 
 M: input-port (wait-to-read)
     [ <read-task> add-io-task stop ] callcc0 pending-error ;
@@ -139,13 +137,12 @@ M: write-task do-io-task
     io-task-port dup buffer-empty? over port-error or
     [ 0 swap buffer-reset t ] [ write-step ] if ;
 
-M: write-task task-container
-    drop write-tasks get-global ;
+M: write-task io-task-container drop mx-writes ;
 
 : add-write-io-task ( port continuation -- )
-    over port-handle write-tasks get-global at
+    over port-handle mx get-global mx-writes at*
     [ io-task-callbacks push drop ]
-    [ <write-task> add-io-task ] if* ;
+    [ drop <write-task> add-io-task ] if ;
 
 : (wait-to-write) ( port -- )
     [ add-write-io-task stop ] callcc0 drop ;
@@ -154,16 +151,27 @@ M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: unix-io io-multiplex ( ms -- )
-    unix-io-multiplex ;
-
-M: unix-io init-io ( -- )
-    H{ } clone read-tasks set-global
-    H{ } clone write-tasks set-global
-    init-unix-io ;
+    mx get-global unix-io-multiplex ;
 
 M: unix-io init-stdio ( -- )
     0 1 handle>duplex-stream io:stdio set-global
     2 <writer> io:stderr set-global ;
+
+! mx io-task for embedding an fd-based mx inside another mx
+TUPLE: mx-port mx ;
+
+: <mx-port> ( mx -- port )
+    dup mx-fd f <port>
+    mx-port over set-port-type
+    { set-mx-port-mx set-delegate } mx-port construct ;
+
+TUPLE: mx-task ;
+
+: <mx-task> ( port -- task )
+    f io-task construct-boa mx-task construct-delegate ;
+
+M: mx-task do-io-task
+    io-task-port mx-port-mx 0 swap unix-io-multiplex f ;
 
 : multiplexer-error ( n -- )
     0 < [ err_no ignorable-error? [ (io-error) ] unless ] when ;

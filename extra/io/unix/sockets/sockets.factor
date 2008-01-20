@@ -40,7 +40,7 @@ M: connect-task do-io-task
     io-task-port dup port-handle f 0 write
     0 < [ defer-error ] [ drop t ] if ;
 
-M: connect-task task-container drop write-tasks get-global ;
+M: connect-task io-task-container drop mx-writes ;
 
 : wait-to-connect ( port -- )
     [ <connect-task> add-io-task stop ] callcc0 drop ;
@@ -70,7 +70,7 @@ TUPLE: accept-task ;
 : <accept-task> ( port continuation  -- task )
     accept-task <io-task> ;
 
-M: accept-task task-container drop read-tasks get ;
+M: accept-task io-task-container drop mx-reads ;
 
 : accept-sockaddr ( port -- fd sockaddr )
     dup port-handle swap server-port-addr sockaddr-type
@@ -152,7 +152,7 @@ M: receive-task do-io-task
         2drop defer-error
     ] if ;
 
-M: receive-task task-container drop read-tasks get ;
+M: receive-task io-task-container drop mx-reads ;
 
 : wait-receive ( stream -- )
     [ <receive-task> add-io-task stop ] callcc0 drop ;
@@ -185,7 +185,7 @@ M: send-task do-io-task
     [ send-task-len do-send ] keep
     swap 0 < [ io-task-port defer-error ] [ drop t ] if ;
 
-M: send-task task-container drop write-tasks get ;
+M: send-task io-task-container drop mx-writes ;
 
 : wait-send ( packet sockaddr len stream -- )
     [ <send-task> add-io-task stop ] callcc0 2drop 2drop ;
