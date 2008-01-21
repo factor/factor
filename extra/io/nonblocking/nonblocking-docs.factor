@@ -55,7 +55,7 @@ HELP: init-handle
 { $contract "Prepares a native handle for use by the port; called by " { $link <port> } "." } ;
 
 HELP: <port>
-{ $values { "handle" "a native handle identifying an I/O resource" } { "buffer" "a " { $link buffer } " or " { $link f } } { "port" "a new " { $link port } } }
+{ $values { "handle" "a native handle identifying an I/O resource" } { "buffer" "a " { $link buffer } " or " { $link f } } { "type" symbol } { "port" "a new " { $link port } } }
 { $description "Creates a new " { $link port } " using the specified native handle and I/O buffer." }
 $low-level-note ;
 

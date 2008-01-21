@@ -16,19 +16,15 @@ TUPLE: epoll-mx events ;
     max-events epoll_create dup io-error over set-mx-fd
     max-events "epoll-event" <c-array> over set-epoll-mx-events ;
 
-: io-task-filter ( task -- n )
-    class {
-        { read-task    [ EVFILT_READ  ] }
-        { accept-task  [ EVFILT_READ  ] }
-        { receive-task [ EVFILT_READ  ] }
-        { write-task   [ EVFILT_WRITE ] }
-        { connect-task [ EVFILT_WRITE ] }
-        { send-task    [ EVFILT_WRITE ] }
-    } case ;
+GENERIC: io-task-events ( task -- n )
+
+M: input-task drop EPOLLIN ;
+
+M: output-task drop EPOLLOUT ;
 
 : make-event ( task -- event )
     "epoll-event" <c-object>
-    tuck set-epoll-event-events
+    over io-task-events over set-epoll-event-events
     over io-task-fd over set-epoll-fd ;
 
 : do-epoll-ctl ( task mx what -- )
@@ -57,5 +53,5 @@ M: epoll-mx unregister-io-task ( task mx -- )
 : handle-events ( mx n -- )
     [ over epoll-mx-events kevent-nth handle-kevent ] with each ;
 
-M: epoll-mx unix-io-multiplex ( ms mx -- )
+M: epoll-mx wait-for-events ( ms mx -- )
     dup rot wait-kevent handle-kevents ;

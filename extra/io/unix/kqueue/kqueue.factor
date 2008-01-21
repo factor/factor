@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel io.nonblocking io.unix.backend
-io.unix.sockets sequences assocs unix unix.kqueue unix.process
-math namespaces classes combinators threads vectors ;
+sequences assocs unix unix.kqueue unix.process math namespaces
+combinators threads vectors ;
 IN: io.unix.kqueue
 
 TUPLE: kqueue-mx events processes ;
@@ -18,15 +18,11 @@ TUPLE: kqueue-mx events processes ;
     H{ } clone over set-kqueue-mx-processes
     max-events "kevent" <c-array> over set-kqueue-mx-events ;
 
-: io-task-filter ( task -- n )
-    class {
-        { read-task    [ EVFILT_READ  ] }
-        { accept-task  [ EVFILT_READ  ] }
-        { receive-task [ EVFILT_READ  ] }
-        { write-task   [ EVFILT_WRITE ] }
-        { connect-task [ EVFILT_WRITE ] }
-        { send-task    [ EVFILT_WRITE ] }
-    } case ;
+GENERIC: io-task-filter ( task -- n )
+
+M: input-task io-task-filter drop EVFILT_READ ;
+
+M: output-task io-task-filter drop EVFILT_WRITE ;
 
 : make-kevent ( task flags -- event )
     "kevent" <c-object>
@@ -70,7 +66,7 @@ M: kqueue-mx unregister-io-task ( task mx -- )
 : handle-kevents ( mx n -- )
     [ over kqueue-mx-events kevent-nth handle-kevent ] with each ;
 
-M: kqueue-mx unix-io-multiplex ( ms mx -- )
+M: kqueue-mx wait-for-events ( ms mx -- )
     swap make-timespec dupd wait-kevent handle-kevents ;
 
 : make-proc-kevent ( pid -- kevent )

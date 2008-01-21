@@ -12,38 +12,36 @@ SYMBOL: default-buffer-size
 ! Common delegate of native stream readers and writers
 TUPLE: port handle error timeout cutoff type eof? ;
 
-SYMBOL: input
-SYMBOL: output
 SYMBOL: closed
 
-PREDICATE: port input-port port-type input eq? ;
-PREDICATE: port output-port port-type output eq? ;
+PREDICATE: port input-port port-type input-port eq? ;
+PREDICATE: port output-port port-type output-port eq? ;
 
 GENERIC: init-handle ( handle -- )
 GENERIC: close-handle ( handle -- )
 
-: <port> ( handle buffer -- port )
-    over init-handle
+: <port> ( handle buffer type -- port )
+    pick init-handle
     0 0 {
         set-port-handle
         set-delegate
+        set-port-type
         set-port-timeout
         set-port-cutoff
     } port construct ;
 
-: <buffered-port> ( handle -- port )
-    default-buffer-size get <buffer> <port> ;
+: <buffered-port> ( handle type -- port )
+    default-buffer-size get <buffer> swap <port> ;
 
 : <reader> ( handle -- stream )
-    <buffered-port> input over set-port-type <line-reader> ;
+    input-port <buffered-port> <line-reader> ;
 
 : <writer> ( handle -- stream )
-    <buffered-port> output over set-port-type <plain-writer> ;
+    output-port <buffered-port> <plain-writer> ;
 
 : handle>duplex-stream ( in-handle out-handle -- stream )
     <writer>
-    [ >r <reader> r> <duplex-stream> ]
-    [ ] [ stream-close ]
+    [ >r <reader> r> <duplex-stream> ] [ ] [ stream-close ]
     cleanup ;
 
 : touch-port ( port -- )
@@ -170,8 +168,8 @@ M: port stream-close
 
 TUPLE: server-port addr client ;
 
-: <server-port> ( port addr -- server )
-    server-port pick set-port-type
+: <server-port> ( handle addr -- server )
+    >r f server-port <port> r>
     { set-delegate set-server-port-addr }
     server-port construct ;
 
@@ -180,8 +178,8 @@ TUPLE: server-port addr client ;
 
 TUPLE: datagram-port addr packet packet-addr ;
 
-: <datagram-port> ( port addr -- datagram )
-    datagram-port pick set-port-type
+: <datagram-port> ( handle addr -- datagram )
+    >r f datagram-port <port> r>
     { set-delegate set-datagram-port-addr }
     datagram-port construct ;
 

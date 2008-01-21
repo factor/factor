@@ -18,11 +18,25 @@ TUPLE: io-task port callbacks ;
     >r 1vector io-task construct-boa r> construct-delegate ;
     inline
 
+TUPLE: input-task ;
+
+: <input-task> ( port continuation class -- task )
+    >r input-task <io-task> r> construct-delegate ; inline
+
+TUPLE: output-task ;
+
+: <output-task> ( port continuation class -- task )
+    >r output-task <io-task> r> construct-delegate ; inline
+
 GENERIC: do-io-task ( task -- ? )
 GENERIC: io-task-container ( mx task -- hashtable )
 
 ! I/O multiplexers
 TUPLE: mx fd reads writes ;
+
+M: input-task io-task-container drop mx-reads ;
+
+M: output-task io-task-container drop mx-writes ;
 
 : <mx> ( -- mx ) f H{ } clone H{ } clone mx construct-boa ;
 
@@ -30,7 +44,7 @@ TUPLE: mx fd reads writes ;
 
 GENERIC: register-io-task ( task mx -- )
 GENERIC: unregister-io-task ( task mx -- )
-GENERIC: unix-io-multiplex ( ms mx -- )
+GENERIC: wait-for-events ( ms mx -- )
 
 : fd/container ( task mx -- task fd container )
     over io-task-container >r dup io-task-fd r> ; inline
@@ -112,13 +126,11 @@ M: integer close-handle ( fd -- )
 TUPLE: read-task ;
 
 : <read-task> ( port continuation -- task )
-    read-task <io-task> ;
+    read-task <input-task> ;
 
 M: read-task do-io-task
     io-task-port dup refill
     [ [ reader-eof ] [ drop ] if ] keep ;
-
-M: read-task io-task-container drop mx-reads ;
 
 M: input-port (wait-to-read)
     [ <read-task> add-io-task stop ] callcc0 pending-error ;
@@ -131,13 +143,11 @@ M: input-port (wait-to-read)
 TUPLE: write-task ;
 
 : <write-task> ( port continuation -- task )
-    write-task <io-task> ;
+    write-task <output-task> ;
 
 M: write-task do-io-task
     io-task-port dup buffer-empty? over port-error or
     [ 0 swap buffer-reset t ] [ write-step ] if ;
-
-M: write-task io-task-container drop mx-writes ;
 
 : add-write-io-task ( port continuation -- )
     over port-handle mx get-global mx-writes at*
@@ -151,7 +161,7 @@ M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: unix-io io-multiplex ( ms -- )
-    mx get-global unix-io-multiplex ;
+    mx get-global wait-for-events ;
 
 M: unix-io init-stdio ( -- )
     0 1 handle>duplex-stream io:stdio set-global
@@ -161,8 +171,7 @@ M: unix-io init-stdio ( -- )
 TUPLE: mx-port mx ;
 
 : <mx-port> ( mx -- port )
-    dup mx-fd f <port>
-    mx-port over set-port-type
+    dup mx-fd f mx-port <port>
     { set-mx-port-mx set-delegate } mx-port construct ;
 
 TUPLE: mx-task ;
@@ -171,7 +180,7 @@ TUPLE: mx-task ;
     f io-task construct-boa mx-task construct-delegate ;
 
 M: mx-task do-io-task
-    io-task-port mx-port-mx 0 swap unix-io-multiplex f ;
+    io-task-port mx-port-mx 0 swap wait-for-events f ;
 
 : multiplexer-error ( n -- )
     0 < [ err_no ignorable-error? [ (io-error) ] unless ] when ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2007 Slava Pestov, Ivan Tikhonov.
+! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov.
 ! See http://factorcode.org/license.txt for BSD license.
 
 ! We need to fiddle with the exact search order here, since
@@ -34,13 +34,11 @@ M: unix-io addrinfo-error ( n -- )
 TUPLE: connect-task ;
 
 : <connect-task> ( port continuation -- task )
-    connect-task <io-task> ;
+    connect-task <output-task> ;
 
 M: connect-task do-io-task
     io-task-port dup port-handle f 0 write
     0 < [ defer-error ] [ drop t ] if ;
-
-M: connect-task io-task-container drop mx-writes ;
 
 : wait-to-connect ( port -- )
     [ <connect-task> add-io-task stop ] callcc0 drop ;
@@ -68,9 +66,7 @@ USE: unix
 TUPLE: accept-task ;
 
 : <accept-task> ( port continuation  -- task )
-    accept-task <io-task> ;
-
-M: accept-task io-task-container drop mx-reads ;
+    accept-task <input-task> ;
 
 : accept-sockaddr ( port -- fd sockaddr )
     dup port-handle swap server-port-addr sockaddr-type
@@ -101,7 +97,6 @@ M: unix-io <server> ( addrspec -- stream )
     [
         SOCK_STREAM server-fd
         dup 10 listen zero? [ dup close (io-error) ] unless
-        f <port>
     ] keep <server-port> ;
 
 M: unix-io accept ( server -- client )
@@ -113,7 +108,7 @@ M: unix-io accept ( server -- client )
 
 ! Datagram sockets - UDP and Unix domain
 M: unix-io <datagram>
-    [ SOCK_DGRAM server-fd f <port> ] keep <datagram-port> ;
+    [ SOCK_DGRAM server-fd ] keep <datagram-port> ;
 
 SYMBOL: receive-buffer
 
@@ -139,7 +134,7 @@ packet-size <byte-array> receive-buffer set-global
 TUPLE: receive-task ;
 
 : <receive-task> ( stream continuation  -- task )
-    receive-task <io-task> ;
+    receive-task <input-task> ;
 
 M: receive-task do-io-task
     io-task-port
@@ -151,8 +146,6 @@ M: receive-task do-io-task
     ] [
         2drop defer-error
     ] if ;
-
-M: receive-task io-task-container drop mx-reads ;
 
 : wait-receive ( stream -- )
     [ <receive-task> add-io-task stop ] callcc0 drop ;
@@ -170,7 +163,7 @@ M: unix-io receive ( datagram -- packet addrspec )
 TUPLE: send-task packet sockaddr len ;
 
 : <send-task> ( packet sockaddr len stream continuation -- task )
-    send-task <io-task> [
+    send-task <output-task> [
         {
             set-send-task-packet
             set-send-task-sockaddr
@@ -184,8 +177,6 @@ M: send-task do-io-task
     [ send-task-sockaddr ] keep
     [ send-task-len do-send ] keep
     swap 0 < [ io-task-port defer-error ] [ drop t ] if ;
-
-M: send-task io-task-container drop mx-writes ;
 
 : wait-send ( packet sockaddr len stream -- )
     [ <send-task> add-io-task stop ] callcc0 2drop 2drop ;

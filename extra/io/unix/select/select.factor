@@ -40,7 +40,7 @@ TUPLE: select-mx read-fdset write-fdset ;
     write-fdset/tasks tuck init-fdset
     f ;
 
-M: select-mx unix-io-multiplex ( ms mx -- )
+M: select-mx wait-for-events ( ms mx -- )
     swap >r FD_SETSIZE over init-fdsets r> make-timeval
     select multiplexer-error
     dup read-fdset/tasks pick handle-fdset
