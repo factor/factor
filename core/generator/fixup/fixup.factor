@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs hashtables
 kernel kernel.private math namespaces sequences words
@@ -69,6 +69,7 @@ SYMBOL: label-table
 : rt-literal   2 ;
 : rt-dispatch  3 ;
 : rt-xt        4 ;
+: rt-here      5 ;
 : rt-label     6 ;
 
 TUPLE: label-fixup label class ;
@@ -109,10 +110,6 @@ SYMBOL: literal-table
 
 : add-literal ( obj -- n ) literal-table get push-new* ;
 
-SYMBOL: word-table
-
-: add-word ( word -- n ) word-table get push-new* ;
-
 : string>symbol ( str -- alien )
     wince? [ string>u16-alien ] [ string>char-alien ] if ;
 
@@ -124,16 +121,20 @@ SYMBOL: word-table
     add-dlsym-literals
     r> r> rt-dlsym rel-fixup ;
 
-: rel-dispatch ( word-table# class -- ) rt-dispatch rel-fixup ;
-
 : rel-word ( word class -- )
-    >r add-word r> rt-xt rel-fixup ;
+    >r add-literal r> rt-xt rel-fixup ;
+
+: rel-primitive ( word class -- )
+    >r word-def first r> rt-primitive rel-fixup ;
 
 : rel-literal ( literal class -- )
     >r add-literal r> rt-literal rel-fixup ;
 
 : rel-this ( class -- )
     0 swap rt-label rel-fixup ;
+
+: rel-here ( class -- )
+    0 swap rt-here rel-fixup ;
 
 : init-fixup ( -- )
     V{ } clone relocation-table set

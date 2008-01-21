@@ -358,4 +358,7 @@ M: long-long-type box-return ( type -- )
     "ushort*" define-primitive-type
 
     [ string>u16-alien ] "ushort*" c-type set-c-type-prep
+    
+    win64? "longlong" "long" ? "ptrdiff_t" typedef
+    
 ] with-compilation-unit

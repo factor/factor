@@ -1,6 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup odbc threads ;
+USING: help.syntax help.markup threads ;
+
+IN: odbc
 
 HELP: odbc-init 
 { $values { "env" "an ODBC environment handle" } } 

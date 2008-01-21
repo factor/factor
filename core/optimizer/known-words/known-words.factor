@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer.known-words
 USING: alien arrays generic hashtables inference.dataflow
@@ -14,8 +14,8 @@ float-arrays combinators.private combinators ;
 ! its second-to-last input
 { <tuple> <tuple-boa> } [
     [
-        node-in-d dup length 2 - swap nth dup value?
-        [ value-literal ] [ drop tuple ] if 1array f
+        dup node-in-d dup length 2 - swap nth node-literal
+        dup class? [ drop tuple ] unless 1array f
     ] "output-classes" set-word-prop
 ] each
 
@@ -148,6 +148,10 @@ float-arrays combinators.private combinators ;
 \ >string { sbuf } "specializer" set-word-prop
 
 \ >array { { string vector } } "specializer" set-word-prop
+
+\ >vector { { array vector } } "specializer" set-word-prop
+
+\ >sbuf { string } "specializer" set-word-prop
 
 \ crc32 { string } "specializer" set-word-prop
 

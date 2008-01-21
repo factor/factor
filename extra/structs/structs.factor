@@ -10,4 +10,3 @@ C-STRUCT: timeval
     "timeval" <c-object>
     [ set-timeval-usec ] keep
     [ set-timeval-sec ] keep ;
-

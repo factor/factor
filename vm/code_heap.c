@@ -38,7 +38,7 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 
 /* Compute an address to store at a relocation */
 INLINE CELL compute_code_rel(F_REL *rel,
-	CELL code_start, CELL literals_start, CELL words_start)
+	CELL code_start, CELL literals_start)
 {
 	switch(REL_TYPE(rel))
 	{
@@ -48,10 +48,10 @@ INLINE CELL compute_code_rel(F_REL *rel,
 		return (CELL)get_rel_symbol(rel,literals_start);
 	case RT_LITERAL:
 		return CREF(literals_start,REL_ARGUMENT(rel));
-	case RT_DISPATCH:
-		return CREF(words_start,REL_ARGUMENT(rel));
 	case RT_XT:
-		return (CELL)untag_word(get(CREF(words_start,REL_ARGUMENT(rel))))->xt;
+		return (CELL)untag_word(get(CREF(literals_start,REL_ARGUMENT(rel))))->xt;
+	case RT_HERE:
+		return rel->offset + code_start;
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
 	default:
@@ -125,7 +125,7 @@ void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
 
 /* Perform all fixups on a code block */
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
+	CELL reloc_start, CELL literals_start)
 {
 	if(reloc_start != literals_start)
 	{
@@ -136,8 +136,8 @@ void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 		{
 			CELL offset = rel->offset + code_start;
 
-			F_FIXNUM absolute_value = compute_code_rel(rel,
-				code_start,literals_start,words_start);
+			F_FIXNUM absolute_value = compute_code_rel(
+				rel,code_start,literals_start);
 
 			apply_relocation(REL_CLASS(rel),offset,absolute_value);
 
@@ -226,27 +226,23 @@ F_COMPILED *add_compiled_block(
 	F_ARRAY *code,
 	F_ARRAY *labels,
 	F_ARRAY *relocation,
-	F_ARRAY *words,
 	F_ARRAY *literals)
 {
 	CELL code_format = compiled_code_format();
 
 	CELL code_length = align8(array_capacity(code) * code_format);
 	CELL rel_length = array_capacity(relocation) * sizeof(unsigned int);
-	CELL words_length = (words ? array_capacity(words) * CELLS : 0);
 	CELL literals_length = array_capacity(literals) * CELLS;
 
 	REGISTER_UNTAGGED(code);
 	REGISTER_UNTAGGED(labels);
 	REGISTER_UNTAGGED(relocation);
-	REGISTER_UNTAGGED(words);
 	REGISTER_UNTAGGED(literals);
 
 	CELL here = allot_code_block(sizeof(F_COMPILED) + code_length
-		+ rel_length + literals_length + words_length);
+		+ rel_length + literals_length);
 
 	UNREGISTER_UNTAGGED(literals);
-	UNREGISTER_UNTAGGED(words);
 	UNREGISTER_UNTAGGED(relocation);
 	UNREGISTER_UNTAGGED(labels);
 	UNREGISTER_UNTAGGED(code);
@@ -257,7 +253,6 @@ F_COMPILED *add_compiled_block(
 	header->code_length = code_length;
 	header->reloc_length = rel_length;
 	header->literals_length = literals_length;
-	header->words_length = words_length;
 
 	here += sizeof(F_COMPILED);
 
@@ -274,13 +269,6 @@ F_COMPILED *add_compiled_block(
 	/* literals */
 	deposit_objects(here,literals);
 	here += literals_length;
-
-	/* words */
-	if(words)
-	{
-		deposit_objects(here,words);
-		here += words_length;
-	}
 
 	/* fixup labels */
 	if(labels)
@@ -345,10 +333,9 @@ DEFINE_PRIMITIVE(modify_code_heap)
 			F_ARRAY *compiled_code = untag_array(data);
 
 			F_ARRAY *literals = untag_array(array_nth(compiled_code,0));
-			F_ARRAY *words = untag_array(array_nth(compiled_code,1));
-			F_ARRAY *relocation = untag_array(array_nth(compiled_code,2));
-			F_ARRAY *labels = untag_array(array_nth(compiled_code,3));
-			F_ARRAY *code = untag_array(array_nth(compiled_code,4));
+			F_ARRAY *relocation = untag_array(array_nth(compiled_code,1));
+			F_ARRAY *labels = untag_array(array_nth(compiled_code,2));
+			F_ARRAY *code = untag_array(array_nth(compiled_code,3));
 
 			REGISTER_UNTAGGED(alist);
 			REGISTER_UNTAGGED(word);
@@ -358,7 +345,6 @@ DEFINE_PRIMITIVE(modify_code_heap)
 				code,
 				labels,
 				relocation,
-				words,
 				literals);
 
 			UNREGISTER_UNTAGGED(word);

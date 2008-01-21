@@ -1,22 +1,20 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
 inference inference.backend inference.dataflow io kernel
 kernel.private layouts math namespaces optimizer prettyprint
-quotations sequences system threads words ;
+quotations sequences system threads words vectors ;
 IN: generator
 
 SYMBOL: compile-queue
 SYMBOL: compiled
 
-: 5array 3array >r 2array r> append ;
-
 : begin-compiling ( word -- )
     f swap compiled get set-at ;
 
-: finish-compiling ( word literals words relocation labels code -- )
-    5array swap compiled get set-at ;
+: finish-compiling ( word literals relocation labels code -- )
+    4array swap compiled get set-at ;
 
 : queue-compile ( word -- )
     {
@@ -38,20 +36,18 @@ SYMBOL: current-label-start
 
 : compiled-stack-traces? ( -- ? ) 36 getenv ;
 
-: init-generator ( compiling -- )
-    V{ } clone literal-table set
-    V{ } clone word-table set
-    compiled-stack-traces? swap f ?
-    literal-table get push ;
+: init-generator ( -- )
+    compiled-stack-traces?
+    compiling-word get  f ?
+    1vector literal-table set ;
 
 : generate-1 ( word label node quot -- )
     pick begin-compiling [
         roll compiling-word set
         pick compiling-label set
-        compiling-word get init-generator
+        init-generator
         call
         literal-table get >array
-        word-table get >array
     ] { } make fixup finish-compiling ;
 
 GENERIC: generate-node ( node -- next )
@@ -104,14 +100,10 @@ UNION: #terminal
 ! node
 M: node generate-node drop iterate-next ;
 
-: %call ( word -- ) %call-label ;
-
 : %jump ( word -- )
-    dup compiling-label get eq? [
-        drop current-label-start get %jump-label
-    ] [
-        %epilogue-later %jump-label
-    ] if ;
+    dup compiling-label get eq?
+    [ drop current-label-start get ] [ %epilogue-later ] if
+    %jump-label ;
 
 : generate-call ( label -- next )
     dup maybe-compile
@@ -162,22 +154,22 @@ M: #if generate-node
         ] generate-1
     ] keep ;
 
-: dispatch-branches ( node -- syms )
-    node-children
-    [ compiling-word get dispatch-branch ] map
-    word-table get push-all ;
-
-: %dispatch ( word-table# -- )
-    tail-call? [
-        %jump-dispatch
-    ] [
-        0 frame-required
-        %call-dispatch
-    ] if ;
+: dispatch-branches ( node -- )
+    node-children [
+        compiling-word get dispatch-branch %dispatch-label
+    ] each ;
 
 M: #dispatch generate-node
-    word-table get length %dispatch
-    dispatch-branches init-templates iterate-next ;
+    #! The order here is important, dispatch-branches must
+    #! run after %dispatch, so that each branch gets the
+    #! correct register state
+    tail-call? [
+        %jump-dispatch dispatch-branches
+    ] [
+        0 frame-required
+        %call-dispatch >r dispatch-branches r> resolve-label
+    ] if
+    init-templates iterate-next ;
 
 ! #call
 : define-intrinsics ( word intrinsics -- )

@@ -19,4 +19,4 @@ IN: compiler.constants
 : class-hash-offset bootstrap-cell object tag-number - ;
 : word-xt-offset 8 bootstrap-cells object tag-number - ;
 : word-code-offset 9 bootstrap-cells object tag-number - ;
-: compiled-header-size 8 bootstrap-cells ;
+: compiled-header-size 4 bootstrap-cells ;

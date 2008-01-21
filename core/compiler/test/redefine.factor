@@ -17,7 +17,7 @@ DEFER: x-2
 
         { x-1 } compile
 
-        \ x-2 word-xt eq?
+        \ x-2 word-xt =
     ] unit-test
 ] with-variable
 
@@ -115,7 +115,7 @@ DEFER: g-test-3
 
     "IN: temporary USE: math GENERIC: g-test-1 ( x -- y ) M: integer g-test-1 3 + ;" eval
 
-    \ g-test-3 word-xt eq?
+    \ g-test-3 word-xt =
 ] unit-test
 
 DEFER: g-test-5

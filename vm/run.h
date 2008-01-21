@@ -16,8 +16,8 @@ typedef enum {
 	OS_ENV,                   /* operating system name */
 
 	ARGS_ENV            = 10, /* command line arguments */
-	IN_ENV,                   /* stdin FILE* handle */
-	OUT_ENV,                  /* stdout FILE* handle */
+	STDIN_ENV,                /* stdin FILE* handle */
+	STDOUT_ENV,               /* stdout FILE* handle */
 
 	IMAGE_ENV           = 13, /* image path name */
 	EXECUTABLE_ENV,		  /* runtime executable path name */
@@ -51,6 +51,9 @@ typedef enum {
 	STACK_TRACES_ENV    = 36,
 
 	UNDEFINED_ENV       = 37, /* default quotation for undefined words */
+
+	STDERR_ENV          = 38, /* stderr FILE* handle */
+
 	STAGE2_ENV          = 39  /* have we bootstrapped? */
 } F_ENVTYPE;
 

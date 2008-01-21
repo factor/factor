@@ -139,7 +139,8 @@ TUPLE: no-method object generic ;
 
 M: standard-combination perform-combination
     standard-combination-# (dispatch#) [
-        standard-methods single-combination
+        [ standard-methods ] keep "inline" word-prop
+        [ small-generic ] [ single-combination ] if
     ] with-variable ;
 
 : default-hook-method ( word -- pair )

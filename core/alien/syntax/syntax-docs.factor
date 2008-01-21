@@ -1,5 +1,6 @@
-USING: alien alien.c-types alien.structs alien.syntax
-alien.syntax.private help.markup help.syntax ;
+IN: alien.syntax
+USING: alien alien.c-types alien.structs alien.syntax.private
+help.markup help.syntax ;
 
 HELP: DLL"
 { $syntax "DLL\" path\"" }
@@ -50,7 +51,13 @@ $nl
 HELP: TYPEDEF:
 { $syntax "TYPEDEF: old new" }
 { $values { "old" "a C type" } { "new" "a C type" } }
-{ $description "Alises the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
+{ $description "Aliases the C type " { $snippet "old" } " under the name " { $snippet "new" } " if ." }
+{ $notes "This word differs from " { $link typedef } " in that it runs at parse time, to ensure correct ordering of operations when loading source files. Words defined in source files are compiled before top-level forms are run, so if a source file defines C binding words and uses " { $link typedef } ", the type alias won't be available at compile time." } ;
+
+HELP: TYPEDEF-IF:
+{ $syntax "TYPEDEF-IF: word old new" }
+{ $values { "word" "a word with stack effect " { $snippet "( -- ? )" } } { "old" "a C type" } { "new" "a C type" } }
+{ $description "Aliases the C type " { $snippet "old" } " under the name " { $snippet "new" } " if " { $snippet "word" } " evaluates to a true value." }
 { $notes "This word differs from " { $link typedef } " in that it runs at parse time, to ensure correct ordering of operations when loading source files. Words defined in source files are compiled before top-level forms are run, so if a source file defines C binding words and uses " { $link typedef } ", the type alias won't be available at compile time." } ;
 
 HELP: C-STRUCT:
@@ -81,7 +88,9 @@ HELP: typedef
 { $description "Alises the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
 { $notes "Using this word in the same source file which defines C bindings can cause problems, because words are compiled before top-level forms are run. Use the " { $link POSTPONE: TYPEDEF: } " word instead." } ;
 
-{ typedef POSTPONE: TYPEDEF: } related-words
+{ typedef POSTPONE: TYPEDEF: POSTPONE: TYPEDEF-IF: } related-words
+{ POSTPONE: TYPEDEF: typedef POSTPONE: TYPEDEF-IF: } related-words
+{ POSTPONE: TYPEDEF-IF: POSTPONE: TYPEDEF: typedef } related-words
 
 HELP: c-struct?
 { $values { "type" "a string" } { "?" "a boolean" } }

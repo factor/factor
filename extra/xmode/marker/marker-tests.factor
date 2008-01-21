@@ -133,3 +133,11 @@ IN: temporary
 ] [
     f "font:75%/1.6em \"Lucida Grande\", \"Lucida Sans Unicode\", verdana, geneva, sans-serif;" "css" load-mode tokenize-line 2drop
 ] unit-test
+
+[
+    {
+        T{ token f "<" MARKUP }
+        T{ token f "aaa" MARKUP }
+        T{ token f ">" MARKUP }
+    }
+] [ f "<aaa>" "html" load-mode tokenize-line nip ] unit-test

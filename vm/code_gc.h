@@ -48,17 +48,15 @@ INLINE F_BLOCK *next_block(F_HEAP *heap, F_BLOCK *block)
 F_HEAP code_heap;
 
 typedef void (*CODE_HEAP_ITERATOR)(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end);
+	CELL reloc_start, CELL literals_start);
 
 INLINE void iterate_code_heap_step(F_COMPILED *compiled, CODE_HEAP_ITERATOR iter)
 {
 	CELL code_start = (CELL)(compiled + 1);
 	CELL reloc_start = code_start + compiled->code_length;
 	CELL literals_start = reloc_start + compiled->reloc_length;
-	CELL words_start = literals_start + compiled->literals_length;
-	CELL words_end = words_start + compiled->words_length;
 
-	iter(compiled,code_start,reloc_start,literals_start,words_start,words_end);
+	iter(compiled,code_start,reloc_start,literals_start);
 }
 
 INLINE F_BLOCK *compiled_to_block(F_COMPILED *compiled)

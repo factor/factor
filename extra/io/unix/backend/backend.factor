@@ -1,21 +1,24 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien bit-arrays generic assocs io kernel
-kernel.private math io.nonblocking sequences strings structs
-sbufs threads unix vectors io.buffers io.backend
-io.streams.duplex math.parser continuations system libc ;
+USING: alien generic assocs kernel kernel.private math
+io.nonblocking sequences strings structs sbufs threads unix
+vectors io.buffers io.backend io.streams.duplex math.parser
+continuations system libc qualified namespaces ;
+QUALIFIED: io
 IN: io.unix.backend
+
+! Multiplexer protocol
+SYMBOL: unix-io-backend
+
+HOOK: init-unix-io unix-io-backend ( -- )
+HOOK: register-io-task unix-io-backend ( task -- )
+HOOK: unregister-io-task unix-io-backend ( task -- )
+HOOK: unix-io-multiplex unix-io-backend ( timeval -- )
 
 TUPLE: unix-io ;
 
-! We want namespaces::bind to shadow the bind system call from
-! unix
-USING: namespaces ;
-
 ! Global variables
-SYMBOL: read-fdset
 SYMBOL: read-tasks
-SYMBOL: write-fdset
 SYMBOL: write-tasks
 
 ! Some general stuff
@@ -53,9 +56,9 @@ M: integer close-handle ( fd -- )
 ! port to finish I/O
 TUPLE: io-task port callbacks ;
 
-: <io-task> ( port class -- task )
-    >r V{ } clone io-task construct-boa
-    { set-delegate } r> construct ; inline
+: <io-task> ( port continuation class -- task )
+    >r 1vector io-task construct-boa r> construct-delegate ;
+    inline
 
 ! Multiplexer
 GENERIC: do-io-task ( task -- ? )
@@ -63,58 +66,30 @@ GENERIC: task-container ( task -- vector )
 
 : io-task-fd io-task-port port-handle ;
 
-: add-io-task ( callback task -- )
-    [ io-task-callbacks push ] keep
-    dup io-task-fd over task-container 2dup at [
+: check-io-task ( task -- )
+    dup io-task-fd swap task-container at [
         "Cannot perform multiple reads from the same port" throw
-    ] when set-at ;
+    ] when ;
+
+: add-io-task ( task -- )
+    dup check-io-task
+    dup register-io-task
+    dup io-task-fd over task-container set-at ;
 
 : remove-io-task ( task -- )
-    dup io-task-fd swap task-container delete-at ;
+    dup io-task-fd over task-container delete-at
+    unregister-io-task ;
 
 : pop-callbacks ( task -- )
-    dup io-task-callbacks swap remove-io-task
-    [ schedule-thread ] each ;
+    dup remove-io-task
+    io-task-callbacks [ schedule-thread ] each ;
 
 : handle-fd ( task -- )
     dup io-task-port touch-port
     dup do-io-task [ pop-callbacks ] [ drop ] if ;
 
-: handle-fdset ( fdset tasks -- )
-    swap [
-        swap dup io-task-port timeout? [
-            dup io-task-port "Timeout" swap report-error
-            nip pop-callbacks
-        ] [
-            tuck io-task-fd swap nth
-            [ handle-fd ] [ drop ] if
-        ] if drop
-    ] curry assoc-each ;
-
-: init-fdset ( fdset tasks -- )
-    swap dup clear-bits
-    [ >r drop t swap r> set-nth ] curry assoc-each ;
-
-: read-fdset/tasks
-    read-fdset get-global read-tasks get-global ;
-
-: write-fdset/tasks
-    write-fdset get-global write-tasks get-global ;
-
-: init-fdsets ( -- read write except )
-    read-fdset/tasks dupd init-fdset
-    write-fdset/tasks dupd init-fdset
-    f ;
-
-: (io-multiplex) ( ms -- )
-    >r FD_SETSIZE init-fdsets r> make-timeval select 0 < [
-        err_no ignorable-error? [ (io-error) ] unless
-    ] when ;
-
-M: unix-io io-multiplex ( ms -- )
-    (io-multiplex)
-    read-fdset/tasks handle-fdset
-    write-fdset/tasks handle-fdset ;
+: handle-timeout ( task -- )
+    "Timeout" over io-task-port report-error pop-callbacks ;
 
 ! Readers
 : reader-eof ( reader -- )
@@ -137,17 +112,18 @@ M: unix-io io-multiplex ( ms -- )
 
 TUPLE: read-task ;
 
-: <read-task> ( port -- task ) read-task <io-task> ;
+: <read-task> ( port continuation -- task )
+    read-task <io-task> ;
 
 M: read-task do-io-task
     io-task-port dup refill
     [ [ reader-eof ] [ drop ] if ] keep ;
 
-M: read-task task-container drop read-tasks get-global ;
+M: read-task task-container
+    drop read-tasks get-global ;
 
 M: input-port (wait-to-read)
-    [ swap <read-task> add-io-task stop ] callcc0
-    pending-error ;
+    [ <read-task> add-io-task stop ] callcc0 pending-error ;
 
 ! Writers
 : write-step ( port -- ? )
@@ -156,35 +132,38 @@ M: input-port (wait-to-read)
 
 TUPLE: write-task ;
 
-: <write-task> ( port -- task ) write-task <io-task> ;
+: <write-task> ( port continuation -- task )
+    write-task <io-task> ;
 
 M: write-task do-io-task
     io-task-port dup buffer-empty? over port-error or
     [ 0 swap buffer-reset t ] [ write-step ] if ;
 
-M: write-task task-container drop write-tasks get-global ;
+M: write-task task-container
+    drop write-tasks get-global ;
 
-: add-write-io-task ( callback task -- )
-    dup io-task-fd write-tasks get-global at
-    [ io-task-callbacks push ] [ add-io-task ] ?if ;
+: add-write-io-task ( port continuation -- )
+    over port-handle write-tasks get-global at
+    [ io-task-callbacks push drop ]
+    [ <write-task> add-io-task ] if* ;
 
 : (wait-to-write) ( port -- )
-    [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
+    [ add-write-io-task stop ] callcc0 drop ;
 
 M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
-USE: io
+M: unix-io io-multiplex ( ms -- )
+    unix-io-multiplex ;
 
 M: unix-io init-io ( -- )
-    #! Should only be called on startup. Calling this at any
-    #! other time can have unintended consequences.
-    global [
-        H{ } clone read-tasks set
-        FD_SETSIZE 8 * <bit-array> read-fdset set
-        H{ } clone write-tasks set
-        FD_SETSIZE 8 * <bit-array> write-fdset set
-    ] bind ;
+    H{ } clone read-tasks set-global
+    H{ } clone write-tasks set-global
+    init-unix-io ;
 
 M: unix-io init-stdio ( -- )
-    0 1 handle>duplex-stream stdio set-global ;
+    0 1 handle>duplex-stream io:stdio set-global
+    2 <writer> io:stderr set-global ;
+
+: multiplexer-error ( n -- )
+    0 < [ err_no ignorable-error? [ (io-error) ] unless ] when ;

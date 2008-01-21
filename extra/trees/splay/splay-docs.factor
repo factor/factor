@@ -1,4 +1,5 @@
-USING: help.syntax help.markup trees.splay assocs ;
+USING: help.syntax help.markup assocs ;
+IN: trees.splay 
 
 HELP: SPLAY{
 { $syntax "SPLAY{ { key value }... }" }
@@ -23,5 +24,4 @@ ARTICLE: { "splay" "intro" } "Splay trees"
 { $subsection >splay }
 { $subsection POSTPONE: SPLAY{ } ;
 
-IN: trees.splay
 ABOUT: { "splay" "intro" }

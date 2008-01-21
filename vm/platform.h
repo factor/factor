@@ -41,7 +41,6 @@
 		#ifdef __FreeBSD__
 			#define FACTOR_OS_STRING "freebsd"
 			#include "os-freebsd.h"
-			#include "os-unix-ucontext.h"
 			
 			#if defined(FACTOR_X86)
 				#include "os-freebsd-x86.32.h"
@@ -64,7 +63,6 @@
 			#include "os-linux.h"
 
 			#if defined(FACTOR_X86)
-				#include "os-unix-ucontext.h"
 				#include "os-linux-x86-32.h"
 			#elif defined(FACTOR_PPC)
 				#include "os-unix-ucontext.h"

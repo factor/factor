@@ -23,6 +23,15 @@ IN: alien.syntax
 
 PRIVATE>
 
+: indirect-quot ( function-ptr-quot return types abi -- quot )
+    [ alien-indirect ] 3curry compose ;
+
+: define-indirect ( abi return function-ptr-quot function-name parameters -- )
+    >r pick r> parse-arglist
+    rot create-in dup reset-generic
+    >r >r swapd roll indirect-quot r> r>
+    -rot define-declared ;
+
 : DLL" skip-blank parse-string dlopen parsed ; parsing
 
 : ALIEN: scan string>number <alien> parsed ; parsing
@@ -36,6 +45,9 @@ PRIVATE>
 
 : TYPEDEF:
     scan scan typedef ; parsing
+
+: TYPEDEF-IF:
+    scan-word execute scan scan rot [ typedef ] [ 2drop ] if ; parsing
 
 : C-STRUCT:
     scan in get

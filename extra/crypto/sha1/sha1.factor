@@ -78,7 +78,7 @@ SYMBOL: K
         K get nth ,
         A get 5 bitroll-32 ,
         E get ,
-    ] { } make sum 4294967295 bitand ; inline
+    ] { } make sum >32-bit ; inline
 
 : set-vars ( temp -- )
     ! E = D;  D = C;  C = S^30(B);  B = A; A = TEMP;

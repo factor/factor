@@ -97,36 +97,40 @@ M: ppc-backend %epilogue ( n -- )
     1 1 rot ADDI
     0 MTLR ;
 
+: (%call) 11 MTLR BLRL ;
+
+: (%jump) 11 MTCTR BCTR ;
+
 : %load-dlsym ( symbol dll register -- )
     0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
 
-M: ppc-backend %call-label ( label -- ) BL ;
+M: ppc-backend %call ( label -- ) BL ;
 
 M: ppc-backend %jump-label ( label -- ) B ;
 
 M: ppc-backend %jump-t ( label -- )
     0 "flag" operand f v>operand CMPI BNE ;
 
-: (%call) 11 MTLR BLRL ;
-
-: dispatch-template ( word-table# quot -- )
-    [
-        >r
-        "offset" operand "n" operand 1 SRAWI
-        0 11 LOAD32 rc-absolute-ppc-2/2 rel-dispatch
-        11 dup "offset" operand LWZX
-        11 dup word-xt-offset LWZ
-        r> call
-    ] H{
-        { +input+ { { f "n" } } }
-        { +scratch+ { { f "offset" } } }
-    } with-template ; inline
+: (%dispatch) ( len -- )
+    0 11 LOAD32 rc-absolute-ppc-2/2 rel-here
+    "offset" operand "n" operand 1 SRAWI
+    11 11 "offset" operand ADD
+    11 dup rot cells LWZ ;
 
 M: ppc-backend %call-dispatch ( word-table# -- )
-    [ (%call) ] dispatch-template ;
+    [ 7 (%dispatch) (%call) <label> dup B ] H{
+        { +input+ { { f "n" } } }
+        { +scratch+ { { f "offset" } } }
+    } with-template ;
 
-M: ppc-backend %jump-dispatch ( word-table# -- )
-    [ %epilogue-later 11 MTCTR BCTR ] dispatch-template ;
+M: ppc-backend %jump-dispatch ( -- )
+    [ %epilogue-later 6 (%dispatch) (%jump) ] H{
+        { +input+ { { f "n" } } }
+        { +scratch+ { { f "offset" } } }
+    } with-template ;
+
+M: ppc-backend %dispatch-label ( word -- )
+    0 , rc-absolute-cell rel-word ;
 
 M: ppc-backend %return ( -- ) %epilogue-later BLR ;
 
@@ -271,7 +275,7 @@ M: ppc-backend %cleanup ( alien-node -- ) drop ;
 
 : %tag-fixnum ( src dest -- ) tag-bits get SLWI ;
 
-: %untag-fixnum ( src dest -- ) tag-bits get SRAWI ;
+: %untag-fixnum ( dest src -- ) tag-bits get SRAWI ;
 
 M: ppc-backend value-structs?
     #! On Linux/PPC, value structs are passed in the same way

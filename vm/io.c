@@ -13,8 +13,9 @@ normal operation. */
 
 void init_c_io(void)
 {
-	userenv[IN_ENV] = allot_alien(F,(CELL)stdin);
-	userenv[OUT_ENV] = allot_alien(F,(CELL)stdout);
+	userenv[STDIN_ENV] = allot_alien(F,(CELL)stdin);
+	userenv[STDOUT_ENV] = allot_alien(F,(CELL)stdout);
+	userenv[STDERR_ENV] = allot_alien(F,(CELL)stderr);
 }
 
 void io_error(void)

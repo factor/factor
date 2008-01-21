@@ -44,7 +44,7 @@ words kernel math effects definitions compiler.units ;
 [
     [ ] [ init-templates ] unit-test
 
-    [ ] [ \ + init-generator ] unit-test
+    [ ] [ init-generator ] unit-test
 
     [ t ] [ [ end-basic-block ] { } make empty? ] unit-test
 

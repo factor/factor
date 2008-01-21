@@ -23,8 +23,8 @@ IN: cpu.ppc.intrinsics
 
 : %slot-any
     "obj" operand "scratch" operand %untag
-    "n" operand dup 1 SRAWI
-    "scratch" operand "val" operand "n" operand ;
+    "offset" operand "n" operand 1 SRAWI
+    "scratch" operand "val" operand "offset" operand ;
 
 \ slot {
     ! Slot number is literal and the tag is known
@@ -47,9 +47,8 @@ IN: cpu.ppc.intrinsics
     {
         [ %slot-any LWZX ] H{
             { +input+ { { f "obj" } { f "n" } } }
-            { +scratch+ { { f "val" } { f "scratch" } } }
+            { +scratch+ { { f "val" } { f "scratch" } { f "offset" } } }
             { +output+ { "val" } }
-            { +clobber+ { "n" } }
         }
     }
 } define-intrinsics
@@ -88,33 +87,34 @@ IN: cpu.ppc.intrinsics
     {
         [ %slot-any STWX %write-barrier ] H{
             { +input+ { { f "val" } { f "obj" } { f "n" } } }
-            { +scratch+ { { f "scratch" } } }
-            { +clobber+ { "val" "n" } }
+            { +scratch+ { { f "scratch" } { f "offset" } } }
+            { +clobber+ { "val" } }
         }
     }
 } define-intrinsics
 
+: (%char-slot)
+    "offset" operand "n" operand 2 SRAWI
+    "offset" operand dup "obj" operand ADD ;
+
 \ char-slot [
-    "out" operand "obj" operand MR
-    "n" operand dup 2 SRAWI
-    "n" operand "obj" operand "n" operand ADD
-    "out" operand "n" operand string-offset LHZ
+    (%char-slot)
+    "out" operand "offset" operand string-offset LHZ
     "out" operand dup %tag-fixnum
 ] H{
     { +input+ { { f "n" } { f "obj" } } }
-    { +scratch+ { { f "out" } } }
+    { +scratch+ { { f "out" } { f "offset" } } }
     { +output+ { "out" } }
-    { +clobber+ { "n" } }
 } define-intrinsic
 
 \ set-char-slot [
+    (%char-slot)
     "val" operand dup %untag-fixnum
-    "slot" operand dup 2 SRAWI
-    "slot" operand dup "obj" operand ADD
-    "val" operand "slot" operand string-offset STH
+    "val" operand "offset" operand string-offset STH
 ] H{
-    { +input+ { { f "val" } { f "slot" } { f "obj" } } }
-    { +clobber+ { "val" "slot" } }
+    { +input+ { { f "val" } { f "n" } { f "obj" } } }
+    { +scratch+ { { f "offset" } } }
+    { +clobber+ { "val" } }
 } define-intrinsic
 
 : fixnum-register-op ( op -- pair )
@@ -185,10 +185,10 @@ IN: cpu.ppc.intrinsics
     {
         [
             { "positive" "end" } [ define-label ] each
-            "y" operand "out" operand swap %untag-fixnum
+            "out" operand "y" operand %untag-fixnum
             0 "y" operand 0 CMPI
             "positive" get BGE
-            "y" operand dup NEG
+            "out" operand dup NEG
             "out" operand "x" operand "out" operand SRAW
             "end" get B
             "positive" resolve-label

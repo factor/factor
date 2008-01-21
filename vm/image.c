@@ -179,7 +179,7 @@ void fixup_word(F_WORD *word)
 	{
 		code_fixup((CELL)&word->code);
 		if(word->profiling) code_fixup((CELL)&word->profiling);
-		update_word_xt(word);
+		code_fixup((CELL)&word->xt);
 	}
 }
 
@@ -262,7 +262,7 @@ void relocate_data()
 }
 
 void fixup_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
+	CELL reloc_start, CELL literals_start)
 {
 	/* relocate literal table data */
 	CELL scan;
@@ -271,14 +271,8 @@ void fixup_code_block(F_COMPILED *relocating, CELL code_start,
 	for(scan = literals_start; scan < literal_end; scan += CELLS)
 		data_fixup((CELL*)scan);
 
-	for(scan = words_start; scan < words_end; scan += CELLS)
-		data_fixup((CELL*)scan);
-
 	if(reloc_start != literals_start)
-	{
-		relocate_code_block(relocating,code_start,reloc_start,
-			literals_start,words_start,words_end);
-	}
+		relocate_code_block(relocating,code_start,reloc_start,literals_start);
 }
 
 void relocate_code()

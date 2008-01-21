@@ -1,9 +1,9 @@
 ! Copyright (C) 2007 Elie Chaftari, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax destructors hexdump io
-io.buffers io.nonblocking io.sniffer io.sockets io.streams.lines
+io.buffers io.nonblocking io.sockets io.streams.lines
 io.unix.backend io.unix.files kernel libc locals math qualified
-sequences ;
+sequences io.sniffer.backend ;
 QUALIFIED: unix
 IN: io.sniffer.bsd
 
@@ -17,7 +17,7 @@ TUPLE: sniffer-spec path ifname ;
 C: <sniffer-spec> sniffer-spec
 
 : IOCPARM_MASK   HEX: 1fff ; inline
-: IOCPARM_MAX    IOCPARM_MASK 1 + ; inline
+: IOCPARM_MAX    IOCPARM_MASK 1+ ; inline
 : IOC_VOID       HEX: 20000000 ; inline
 : IOC_OUT        HEX: 40000000 ; inline
 : IOC_IN         HEX: 80000000 ; inline

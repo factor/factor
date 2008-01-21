@@ -1,5 +1,6 @@
 ! Copyright (C) 2005 Chris Double, 2007 Clemens Hofreither.
-USING: help.markup help.syntax coroutines ;
+USING: help.markup help.syntax ;
+IN: coroutines
 
 HELP: cocreate
 { $values { "quot" "a quotation with stack effect ( value -- )" } { "co" "a coroutine" } }

@@ -1,5 +1,5 @@
 USING: alien alien.c-types hardware-info hardware-info.windows
-kernel libc math namespaces
+kernel libc math namespaces hardware-info.backend
 windows windows.advapi32 windows.kernel32 ;
 IN: hardware-info.windows.nt
 

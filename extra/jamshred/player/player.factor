@@ -1,4 +1,4 @@
-USING: colors jamshred.game jamshred.oint jamshred.tunnel kernel
+USING: colors jamshred.oint jamshred.tunnel kernel
 math math.constants sequences ;
 IN: jamshred.player
 

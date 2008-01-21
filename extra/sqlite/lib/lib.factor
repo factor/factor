@@ -12,14 +12,13 @@ IN: sqlite.lib
 USING: alien compiler kernel math namespaces sequences strings alien.syntax
     system combinators ;
 
-: load-sqlite-library ( -- )
-  "sqlite" {
-    { [ win32? ]  [ "sqlite3.dll" ] }
-    { [ macosx? ] [ "/usr/lib/libsqlite3.dylib" ] }
-    { [ unix? ]  [ "libsqlite3.so" ] }
-  } cond "cdecl" add-library ; parsing
-
-load-sqlite-library
+<<
+"sqlite" {
+  { [ win32? ]  [ "sqlite3.dll" ] }
+  { [ macosx? ] [ "/usr/lib/libsqlite3.dylib" ] }
+  { [ unix? ]  [ "libsqlite3.so" ] }
+} cond "cdecl" add-library
+>>
 
 ! Return values from sqlite functions
 : SQLITE_OK           0   ; inline ! Successful result

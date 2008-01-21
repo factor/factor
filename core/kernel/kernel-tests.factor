@@ -1,6 +1,6 @@
 USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
-continuations prettyprint io.streams.string debugger ;
+continuations prettyprint io.streams.string debugger assocs ;
 IN: temporary
 
 [ 0 ] [ f size ] unit-test
@@ -108,3 +108,13 @@ IN: temporary
 
 [ drop foo ] unit-test-fails
 [ ] [ :c ] unit-test
+
+! Regression
+: (loop) ( a b c d -- )
+    >r pick r> swap >r pick r> swap
+    < [ >r >r >r 1+ r> r> r> (loop) ] [ 2drop 2drop ] if ; inline
+
+: loop ( obj obj -- )
+    H{ } values swap >r dup length swap r> 0 -roll (loop) ;
+
+[ loop ] unit-test-fails

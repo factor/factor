@@ -151,8 +151,6 @@ typedef struct
 	CELL code_length; /* # bytes */
 	CELL reloc_length; /* # bytes */
 	CELL literals_length; /* # bytes */
-	CELL words_length; /* # bytes */
-	CELL padding[3];
 } F_COMPILED;
 
 /* Assembly code makes assumptions about the layout of this struct */
