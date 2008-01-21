@@ -11,14 +11,17 @@ IN: assocs.lib
 
 ! set-hash with alternative stack effects
 
-: put-hash* ( table key value -- ) swap rot set-at ;
+: put-hash* ( table key value -- ) spin set-at ;
 
 : put-hash ( table key value -- table ) swap pick set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : set-hash-stack ( value key seq -- )
-  dupd [ key? ] when find-last nip set-at ;
+    dupd [ key? ] with find-last nip set-at ;
 
 : at-default ( key assoc -- value/key )
     dupd at [ nip ] when* ;
+
+: at-peek ( key assoc -- value ? )
+    at* dup >r [ peek ] when r> ;

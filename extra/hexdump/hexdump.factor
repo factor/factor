@@ -1,4 +1,6 @@
-USING: arrays io io.streams.string kernel math math.parser namespaces prettyprint sequences splitting strings ;
+USING: arrays combinators.lib io io.streams.string
+kernel math math.parser namespaces prettyprint
+sequences splitting strings ;
 IN: hexdump
 
 <PRIVATE
@@ -6,12 +8,16 @@ IN: hexdump
 : header. ( len -- )
     "Length: " write dup unparse write ", " write >hex write "h" write nl ;
 
-: offset. ( lineno -- ) 16 * >hex 8 CHAR: 0 pad-left write "h: " write ;
-: h-pad. ( digit -- ) >hex 2 CHAR: 0 pad-left write ;
+: offset. ( lineno -- )
+    16 * >hex 8 CHAR: 0 pad-left write "h: " write ;
+
+: h-pad. ( digit -- )
+    >hex 2 CHAR: 0 pad-left write ;
+
 : line. ( str n -- )
     offset.
     dup [ h-pad. " " write ] each
-    16 over length - "   " <array> concat write
+    16 over length - 3 * CHAR: \s <string> write
     [ dup printable? [ drop CHAR: . ] unless write1 ] each
     nl ;
 
@@ -19,9 +25,8 @@ PRIVATE>
 : hexdump ( seq -- str )
     [
         dup length header.
-        16 <sliced-groups> dup length [ line. ] 2each
+        16 <sliced-groups> [ line. ] each-index
     ] string-out ;
 
 : hexdump. ( seq -- )
     hexdump write ;
-

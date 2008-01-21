@@ -4,7 +4,8 @@
 USING: arrays hashtables io io.streams.string kernel math
 math.vectors math.functions math.parser namespaces sequences
 strings tuples system debugger combinators vocabs.loader
-calendar.backend structs alien.c-types math.vectors ;
+calendar.backend structs alien.c-types math.vectors
+math.ranges shuffle ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
@@ -115,13 +116,17 @@ GENERIC: +second ( timestamp x -- timestamp )
 
 : /rem ( f n -- q r )
     #! q is positive or negative, r is positive from 0 <= r < n
-    [ /f floor >bignum ] 2keep rem ;
+    [ /f floor >integer ] 2keep rem ;
 
 : float>whole-part ( float -- int float )
-    [ floor >bignum ] keep over - ;
+    [ floor >integer ] keep over - ;
 
-: leap-year? ( year -- ? )
+GENERIC: leap-year? ( obj -- ? )
+M: integer leap-year? ( year -- ? )
     dup 100 mod zero? 400 4 ? mod zero? ;
+
+M: timestamp leap-year? ( timestamp -- ? )
+    timestamp-year leap-year? ;
 
 : adjust-leap-year ( timestamp -- timestamp )
     dup >date< 29 = swap 2 = and swap leap-year? not and [
@@ -161,7 +166,7 @@ M: real +minute ( timestamp n -- timestamp )
     float>whole-part rot swap 60 * +second swap +minute ;
 
 M: number +second ( timestamp n -- timestamp )
-    over timestamp-second + 60 /rem >r >bignum r>
+    over timestamp-second + 60 /rem >r >integer r>
     pick set-timestamp-second +minute ;
 
 : +dt ( timestamp dt -- timestamp )
@@ -177,6 +182,9 @@ M: number +second ( timestamp n -- timestamp )
 : make-timestamp ( year month day hour minute second gmt-offset -- timestamp )
     <timestamp> [ 0 seconds +dt ] keep
     [ = [ "invalid timestamp" throw ] unless ] keep ;
+
+: make-date ( year month day -- timestamp )
+    0 0 0 gmt-offset make-timestamp ;
 
 : array>dt ( vec -- dt ) { dt f } swap append >tuple ;
 : +dts ( dt dt -- dt ) [ tuple-slots ] 2apply v+ array>dt ;
@@ -214,14 +222,14 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [ [ >date< julian-day-number ] 2apply - 86400 * ] 2keep
     [ >time< >r >r 3600 * r> 60 * r> + + ] 2apply - + ;
 
-: unix-1970
+: unix-1970 ( -- timestamp )
     1970 1 1 0 0 0 0 <timestamp> ;
 
 : unix-time>timestamp ( n -- timestamp )
     >r unix-1970 r> seconds +dt ;
 
 : timestamp>unix-time ( timestamp -- n )
-    unix-1970 timestamp- >bignum ;
+    unix-1970 timestamp- >integer ;
 
 : timestamp>timeval ( timestamp -- timeval )
     timestamp>unix-time 1000 * make-timeval ;
@@ -240,14 +248,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
 : from-now ( dt -- timestamp ) now swap +dt ;
 : ago ( dt -- timestamp ) before from-now ;
 
-: days-in-year ( year -- n ) leap-year? 366 365 ? ;
 : day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 } ;
-: days-in-month ( year month -- n )
-    swap leap-year? [
-        [ day-counts nth ] keep 2 = [ 1+ ] when
-    ] [
-        day-counts nth
-    ] if ;
 
 : zeller-congruence ( year month day -- n )
     #! Zeller Congruence
@@ -258,33 +259,79 @@ M: timestamp <=> ( ts1 ts2 -- n )
         [ 1+ 3 * 5 /i + ] keep 2 * + r>
     1+ + 7 mod ;
 
-: day-of-week ( timestamp -- n )
+GENERIC: days-in-year ( obj -- n )
+
+M: integer days-in-year ( year -- n ) leap-year? 366 365 ? ;
+M: timestamp days-in-year ( timestamp -- n ) timestamp-year days-in-year ;
+
+GENERIC: days-in-month ( obj -- n )
+
+M: array days-in-month ( obj -- n )
+    first2 dup 2 = [
+        drop leap-year? 29 28 ?
+    ] [
+        nip day-counts nth
+    ] if ;
+
+M: timestamp days-in-month ( timestamp -- n )
+    { timestamp-year timestamp-month } get-slots 2array days-in-month ;
+
+GENERIC: day-of-week ( obj -- n )
+
+M: timestamp day-of-week ( timestamp -- n )
     >date< zeller-congruence ;
 
-: day-of-year ( timestamp -- n )
-    [
-        [ timestamp-year leap-year? ] keep
-        [ >date< 3array ] keep timestamp-year 3 1 3array <=>
-        0 >= and 1 0 ?
-    ] keep
-    [ timestamp-month day-counts swap head-slice sum + ] keep
-    timestamp-day + ;
+M: array day-of-week ( array -- n )
+    first3 zeller-congruence ;
 
-: print-day ( n -- )
+GENERIC: day-of-year ( obj -- n )
+
+M: array day-of-year ( array -- n )
+    first3
+    3dup day-counts rot head-slice sum +
+    swap leap-year? [
+        -roll
+        pick 3 1 make-date >r make-date r>
+        <=> 0 >= [ 1+ ] when
+    ] [
+        3nip
+    ] if ;
+
+M: timestamp day-of-year ( timestamp -- n )
+    { timestamp-year timestamp-month timestamp-day } get-slots
+    3array day-of-year ;
+
+GENERIC: day. ( obj -- )
+
+M: integer day. ( n -- )
     number>string dup length 2 < [ bl ] when write ;
 
-: print-month ( year month -- )
+M: timestamp day. ( timestamp -- )
+    timestamp-day day. ;
+
+GENERIC: month. ( obj -- )
+
+M: array month. ( pair -- )
+    first2
     [ month-names nth write bl number>string print ] 2keep
     [ 1 zeller-congruence ] 2keep
-    days-in-month day-abbreviations2 " " join print
+    2array days-in-month day-abbreviations2 " " join print
     over "   " <repetition> concat write
     [
-        [ 1+ print-day ] keep
+        [ 1+ day. ] keep
         1+ + 7 mod zero? [ nl ] [ bl ] if
     ] with each nl ;
 
-: print-year ( year -- )
-    12 [ 1+ print-month nl ] with each ;
+M: timestamp month. ( timestamp -- )
+    { timestamp-year timestamp-month } get-slots 2array month. ;
+
+GENERIC: year. ( obj -- )
+
+M: integer year. ( n -- )
+    12 [ 1+ 2array month. nl ] with each ;
+
+M: timestamp year. ( timestamp -- )
+    timestamp-year year. ;
 
 : pad-00 number>string 2 CHAR: 0 pad-left write ;
 
@@ -298,9 +345,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
     timestamp-second >fixnum pad-00 ;
 
 : timestamp>string ( timestamp -- str )
-    [
-        (timestamp>string)
-    ] string-out ;
+    [ (timestamp>string) ] string-out ;
 
 : timestamp>http-string ( timestamp -- str )
     #! http timestamp format
@@ -319,9 +364,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
     timestamp-second >fixnum pad-00 CHAR: Z write1 ;
 
 : timestamp>rfc3339 ( timestamp -- str )
-    >gmt [
-        (timestamp>rfc3339)
-    ] string-out ;
+    >gmt [ (timestamp>rfc3339) ] string-out ;
 
 : expect read1 assert= ;
 
@@ -340,9 +383,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
     0 <timestamp> ;
 
 : rfc3339>timestamp ( str -- timestamp )
-    [
-        (rfc3339>timestamp)
-    ] string-in ;
+    [ (rfc3339>timestamp) ] string-in ;
 
 : file-time-string ( timestamp -- string )
     [
@@ -369,6 +410,23 @@ M: timestamp <=> ( ts1 ts2 -- n )
 : thursday ( timestamp -- timestamp ) 4 day-this-week ;
 : friday ( timestamp -- timestamp ) 5 day-this-week ;
 : saturday ( timestamp -- timestamp ) 6 day-this-week ;
+
+: beginning-of-day ( timestamp -- new-timestamp )
+    clone dup >r 0 0 0 r>
+    { set-timestamp-hour set-timestamp-minute set-timestamp-second }
+    set-slots ; inline
+
+: beginning-of-month ( timestamp -- new-timestamp )
+    beginning-of-day 1 over set-timestamp-day ;
+
+: beginning-of-week ( timestamp -- new-timestamp )
+    beginning-of-day sunday ;
+
+: beginning-of-year ( timestamp -- new-timestamp )
+    beginning-of-month 1 over set-timestamp-month ;
+
+: seconds-since-midnight ( timestamp -- x )
+    dup beginning-of-day timestamp- ;
 
 {
     { [ unix? ] [ "calendar.unix" ] }
