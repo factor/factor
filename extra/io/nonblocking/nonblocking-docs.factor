@@ -40,7 +40,7 @@ $nl
     { { $link port-error } " - the most recent I/O error, if any. This error is thrown to the waiting thread when " { $link pending-error } " is called by stream operations" }
     { { $link port-timeout } " - a timeout, specifying the maximum length of time, in milliseconds, for which input operations can block before throwing an error. A value of 0 denotes no timeout is desired." }
     { { $link port-cutoff } " - the time when the current timeout expires; if no input data arrives before this time, an error is thrown" }
-    { { $link port-type } " - a symbol identifying the port's intended purpose. Can be " { $link input } ", " { $link output } ", " { $link closed } ", or any other symbol" }
+    { { $link port-type } " - a symbol identifying the port's intended purpose" }
     { { $link port-eof? } " - a flag indicating if the port has reached the end of file while reading" }
 } } ;
 

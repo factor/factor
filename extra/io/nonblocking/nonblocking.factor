@@ -160,7 +160,7 @@ M: output-port stream-flush ( port -- )
 M: port stream-close
     dup port-type closed eq? [
         dup port-type >r closed over set-port-type r>
-        output eq? [ dup port-flush ] when
+        output-port eq? [ dup port-flush ] when
         dup port-handle close-handle
         dup delegate [ buffer-free ] when*
         f over set-delegate
