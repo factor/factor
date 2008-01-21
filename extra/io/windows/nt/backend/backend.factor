@@ -132,7 +132,11 @@ M: windows-nt-io add-completion ( handle -- )
             ] if
         ] if
     ] [
-        lookup-callback io-callback-continuation
+        lookup-callback [
+            io-callback-continuation
+        ] [
+            "unhandled io event" print flush f
+        ] if*
     ] if ;
 
 : maybe-expire ( io-callbck -- )
