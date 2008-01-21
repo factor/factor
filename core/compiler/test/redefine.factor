@@ -205,3 +205,27 @@ DEFER: generic-then-not-generic-test-2
 [ ] [ "IN: temporary USE: math : generic-then-not-generic-test-1 1 + ;" eval ] unit-test
 
 [ 4 ] [ generic-then-not-generic-test-2 ] unit-test
+
+DEFER: foldable-test-2
+
+[ ] [ "IN: temporary : foldable-test-1 3 ; foldable" eval ] unit-test
+
+[ ] [ "IN: temporary : foldable-test-2 foldable-test-1 ;" eval ] unit-test
+
+[ 3 ] [ foldable-test-2 ] unit-test
+
+[ ] [ "IN: temporary : foldable-test-1 4 ; foldable" eval ] unit-test
+
+[ 4 ] [ foldable-test-2 ] unit-test
+
+DEFER: flushable-test-2
+
+[ ] [ "IN: temporary USE: kernel : flushable-test-1 drop 3 ; flushable" eval ] unit-test
+
+[ ] [ "IN: temporary USE: kernel : flushable-test-2 V{ } dup flushable-test-1 drop ;" eval ] unit-test
+
+[ V{ } ] [ flushable-test-2 ] unit-test
+
+[ ] [ "IN: temporary USING: kernel sequences ; : flushable-test-1 3 over push ;" eval ] unit-test
+
+[ V{ 3 } ] [ flushable-test-2 ] unit-test

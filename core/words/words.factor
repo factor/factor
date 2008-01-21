@@ -127,7 +127,7 @@ SYMBOL: changed-words
 : reset-word ( word -- )
     {
         "unannotated-def"
-        "parsing" "inline" "foldable"
+        "parsing" "inline" "foldable" "flushable"
         "predicating"
         "reading" "writing"
         "constructing"

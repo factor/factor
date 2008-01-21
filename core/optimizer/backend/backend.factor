@@ -17,17 +17,17 @@ SYMBOL: optimizer-changed
 
 GENERIC: optimize-node* ( node -- node/t changed? )
 
-: ?union ( hash/f hash -- hash )
+: ?union ( assoc/f assoc -- hash )
     over [ union ] [ nip ] if ;
 
-: add-node-literals ( hash node -- )
+: add-node-literals ( assoc node -- )
     over assoc-empty? [
         2drop
     ] [
         [ node-literals ?union ] keep set-node-literals
     ] if ;
 
-: add-node-classes ( hash node -- )
+: add-node-classes ( assoc node -- )
     over assoc-empty? [
         2drop
     ] [
@@ -324,6 +324,7 @@ M: #dispatch optimize-node*
     ] if ;
 
 : flush-eval ( #call -- node )
+    dup node-param +inlined+ depends-on
     dup node-out-d length f <repetition> inline-literals ;
 
 : partial-eval? ( #call -- ? )
@@ -337,9 +338,9 @@ M: #dispatch optimize-node*
     dup node-in-d [ node-literal ] with map ;
 
 : partial-eval ( #call -- node )
+    dup node-param +inlined+ depends-on
     dup literal-in-d over node-param 1quotation
-    [ with-datastack ] catch
-    [ 3drop t ] [ inline-literals ] if ;
+    [ with-datastack inline-literals ] [ 2drop 2drop t ] recover ;
 
 : define-identities ( words identities -- )
     [ "identities" set-word-prop ] curry each ;
