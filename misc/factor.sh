@@ -237,19 +237,19 @@ maybe_download_dlls() {
 	fi
 }
 
+get_config_info() {
+	check_installed_programs
+	find_build_info
+	check_libraries
+}
+
 bootstrap() {
 	./$FACTOR_BINARY -i=$BOOT_IMAGE
 }
 
-usage() {
-	echo "usage: $0 install|install-x11|update|quick-update"
-}
-
 install() {
 	check_factor_exists
-	check_installed_programs
-	find_build_info
-	check_libraries
+	get_config_info
 	git_clone
 	cd_factor
 	make_factor
@@ -259,9 +259,7 @@ install() {
 }
 
 update() {
-	check_installed_programs
-	find_build_info
-	check_libraries
+	get_config_info
 	git_pull_factorcode
 	make_clean
 	make_factor
@@ -288,11 +286,16 @@ install_libraries() {
 	sudo apt-get install libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap
 }
 
+usage() {
+	echo "usage: $0 install|install-x11|self-update|quick-update|update|bootstrap"
+}
+
 case "$1" in
 	install) install ;;
 	install-x11) install_libraries; install ;;
 	self-update) update; make_boot_image; bootstrap;;
 	quick-update) update; refresh_image ;;
 	update) update; update_bootstrap ;;
+	bootstrap) get_config_info; bootstrap ;;
 	*) usage ;;
 esac

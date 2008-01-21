@@ -14,7 +14,7 @@ USING: kernel namespaces math quotations arrays hashtables sequences threads
        ui.gadgets.packs
        ui.gadgets.grids
        ui.gadgets.theme
-       namespaces.lib hashtables.lib vars
+       namespaces.lib assocs.lib vars
        rewrite-closures automata ;
 
 IN: automata.ui

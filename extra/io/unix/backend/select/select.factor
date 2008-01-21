@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax kernel io.nonblocking io.unix.backend
-bit-arrays sequences assocs unix math namespaces ;
+bit-arrays sequences assocs unix math namespaces structs ;
 IN: io.unix.backend.select
 
 TUPLE: unix-select-io ;

@@ -191,3 +191,23 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
 
 : either ( object first second -- ? )
     >r keep swap [ r> drop ] [ r> call ] ?if ; inline
+
+: 2quot-with ( obj seq quot1 quot2 -- seq quot1 quot2 )
+    >r pick >r with r> r> swapd with ;
+
+: or? ( obj quot1 quot2 -- ? )
+    >r keep r> rot [ 2nip ] [ call ] if* ; inline
+
+: and? ( obj quot1 quot2 -- ? )
+    >r keep r> rot [ call ] [ 2drop f ] if ; inline
+
+: prepare-index ( seq quot -- seq n quot )
+    >r dup length r> ; inline
+
+: each-index ( seq quot -- )
+    #! quot: ( elt index -- )
+    prepare-index 2each ; inline
+
+: map-index ( seq quot -- )
+    #! quot: ( elt index -- obj )
+    prepare-index 2map ; inline
