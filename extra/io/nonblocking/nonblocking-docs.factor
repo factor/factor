@@ -1,5 +1,5 @@
 USING: io io.buffers io.backend help.markup help.syntax kernel
-strings sbufs ;
+strings sbufs words ;
 IN: io.nonblocking
 
 ARTICLE: "io.nonblocking" "Non-blocking I/O implementation"
