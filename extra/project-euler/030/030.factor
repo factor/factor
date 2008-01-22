@@ -1,4 +1,4 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel math math.functions project-euler.common sequences ;
 IN: project-euler.030

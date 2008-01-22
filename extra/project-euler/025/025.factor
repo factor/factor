@@ -1,4 +1,4 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax kernel math math.functions math.parser math.ranges memoize
     project-euler.common sequences ;
