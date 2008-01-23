@@ -9,7 +9,8 @@ FUNCTION: int epoll_ctl ( int epfd, int op, int fd, epoll_event* event ) ;
 
 C-STRUCT: epoll-event
     { "uint" "events" }
-    { "uint" "fd" } ;
+    { "uint" "fd" }
+    { "uint" "padding" } ;
 
 FUNCTION: int epoll_wait ( int epfd, epoll_event* events, int maxevents, int timeout ) ;
 

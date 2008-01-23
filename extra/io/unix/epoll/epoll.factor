@@ -29,13 +29,15 @@ M: output-task io-task-events drop EPOLLOUT ;
     swap io-task-fd over set-epoll-event-fd ;
 
 : do-epoll-ctl ( task mx what -- )
-    >r >r make-event r> mx-fd r> pick epoll-event-fd roll
+    >r mx-fd r> rot dup io-task-fd swap make-event
     epoll_ctl io-error ;
 
 M: epoll-mx register-io-task ( task mx -- )
-    EPOLL_CTL_ADD do-epoll-ctl ;
+    2dup EPOLL_CTL_ADD do-epoll-ctl 
+    delegate register-io-task ;
 
 M: epoll-mx unregister-io-task ( task mx -- )
+    2dup delegate unregister-io-task
     EPOLL_CTL_DEL do-epoll-ctl ;
 
 : wait-event ( mx timeout -- n )
@@ -46,7 +48,7 @@ M: epoll-mx unregister-io-task ( task mx -- )
     over mx-reads at* [ handle-io-task ] [ 2drop ] if ;
 
 : epoll-write-task ( mx fd -- )
-    over mx-reads at* [ handle-io-task ] [ 2drop ] if ;
+    over mx-writes at* [ handle-io-task ] [ 2drop ] if ;
 
 : handle-event ( mx kevent -- )
     epoll-event-fd 2dup epoll-read-task epoll-write-task ;

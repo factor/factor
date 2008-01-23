@@ -1,6 +1,6 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: init kernel system ;
+USING: init kernel system namespaces ;
 IN: io.backend
 
 SYMBOL: io-backend
