@@ -48,7 +48,11 @@ IN: bootstrap.stage2
 
         "Compiling remaining words..." print flush
 
-        all-words [ compiled? not ] subset recompile-hook get call
+        "bootstrap.compiler" vocab [
+            vocabs [
+                words "compile" "compiler" lookup execute
+            ] each
+        ] when
     ] with-compiler-errors
 
     f error set-global

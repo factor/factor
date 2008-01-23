@@ -83,7 +83,7 @@ M: unix-io <sniffer> ( obj -- sniffer )
         ] keep
         dupd sniffer-spec-ifname ioctl-sniffer-fd
         dup make-ioctl-buffer
-        <port> input over set-port-type <line-reader>
+        input-port <port> <line-reader>
         \ sniffer construct-delegate
     ] with-destructors ;
 

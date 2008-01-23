@@ -1,13 +1,17 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.launcher io.unix.backend io.nonblocking
-sequences kernel namespaces math system alien.c-types
-debugger continuations arrays assocs combinators unix.process
+USING: io io.backend io.launcher io.unix.backend io.nonblocking
+sequences kernel namespaces math system alien.c-types debugger
+continuations arrays assocs combinators unix.process
 parser-combinators memoize promises strings ;
 IN: io.unix.launcher
 
 ! Search unix first
 USE: unix
+
+HOOK: wait-for-process io-backend ( pid -- status )
+
+M: unix-io wait-for-process ( pid -- status ) wait-for-pid ;
 
 ! Our command line parser. Supported syntax:
 ! foo bar baz -- simple tokens
@@ -44,28 +48,26 @@ MEMO: 'arguments' ( -- parser )
 
 : (spawn-process) ( -- )
     [
-        pass-environment? [
-	    get-arguments get-environment assoc>env exec-args-with-env
-        ] [
-	    get-arguments exec-args-with-path
-        ] if io-error
+        get-arguments
+        pass-environment?
+        [ get-environment assoc>env exec-args-with-env ]
+        [ exec-args-with-path ] if
+        io-error
     ] [ error. :c flush ] recover 1 exit ;
-
-: wait-for-process ( pid -- )
-    0 <int> 0 waitpid drop ;
 
 : spawn-process ( -- pid )
     [ (spawn-process) ] [ ] with-fork ;
 
 : spawn-detached ( -- )
-    [ spawn-process 0 exit ] [ ] with-fork wait-for-process ;
+    [ spawn-process 0 exit ] [ ] with-fork
+    wait-for-process drop ;
 
 M: unix-io run-process* ( desc -- )
     [
         +detached+ get [
             spawn-detached
         ] [
-            spawn-process wait-for-process
+            spawn-process wait-for-process drop
         ] if
     ] with-descriptor ;
 
@@ -85,15 +87,16 @@ M: unix-io run-process* ( desc -- )
         -rot 2dup second close first close
     ] with-fork first swap second rot ;
 
-TUPLE: pipe-stream pid ;
+TUPLE: pipe-stream pid status ;
 
 : <pipe-stream> ( in out pid -- stream )
-    pipe-stream construct-boa
+    f pipe-stream construct-boa
     -rot handle>duplex-stream over set-delegate ;
 
 M: pipe-stream stream-close
     dup delegate stream-close
-    pipe-stream-pid wait-for-process ;
+    dup pipe-stream-pid wait-for-process
+    swap set-pipe-stream-status ;
 
 M: unix-io process-stream*
     [ spawn-process-stream <pipe-stream> ] with-descriptor ;
