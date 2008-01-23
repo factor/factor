@@ -15,4 +15,4 @@ M: linux-io init-io ( -- )
 M: linux-io wait-for-process ( pid -- status )
     wait-for-pid ;
 
-T{ linux-io } io-backend set-global
+T{ linux-io } set-io-backend
