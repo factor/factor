@@ -1,3 +1,5 @@
+! Copyright (C) 2007 Alex Chapman
+! See http://factorcode.org/license.txt for BSD license.
 USING: colors jamshred.oint jamshred.tunnel kernel
 math math.constants sequences ;
 IN: jamshred.player

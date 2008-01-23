@@ -1,3 +1,5 @@
+! Copyright (C) 2007 Alex Chapman
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays jamshred.game jamshred.gl kernel math math.constants
 namespaces sequences timers ui ui.gadgets ui.gestures ui.render
 math.vectors ;
