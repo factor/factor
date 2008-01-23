@@ -5,6 +5,6 @@ system vocabs.loader ;
 {
     { [ bsd? ] [ "io.unix.bsd" ] }
     { [ macosx? ] [ "io.unix.bsd" ] }
-    { [ linux? ] [ "io.unix.backend.linux" ] }
-    { [ solaris? ] [ "io.unix.backend.solaris" ] }
+    { [ linux? ] [ "io.unix.linux" ] }
+    { [ solaris? ] [ "io.unix.solaris" ] }
 } cond require

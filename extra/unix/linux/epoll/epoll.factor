@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: unix.linux.epoll
-USING: alien.syntax ;
+USING: alien.syntax math ;
 
 FUNCTION: int epoll_create ( int size ) ;
 
