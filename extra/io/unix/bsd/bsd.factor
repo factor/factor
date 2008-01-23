@@ -26,4 +26,4 @@ M: bsd-io init-io ( -- )
 M: bsd-io wait-for-process ( pid -- status )
     [ kqueue-mx get-global add-pid-task stop ] curry callcc1 ;
 
-T{ bsd-io } io-backend set-global
+T{ bsd-io } set-io-backend

@@ -14,4 +14,4 @@ M: linux-io init-io ( -- )
 M: linux-io wait-for-pid ( pid -- status )
     [ kqueue-mx get-global add-pid-task stop ] curry callcc1 ;
 
-T{ linux-io } io-backend set-global
+T{ linux-io } set-io-backend
