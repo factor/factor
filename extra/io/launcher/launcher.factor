@@ -1,12 +1,25 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.backend system kernel namespaces strings hashtables
-sequences assocs combinators vocabs.loader ;
+sequences assocs combinators vocabs.loader init threads
+continuations ;
 IN: io.launcher
+
+! Non-blocking process exit notification facility
+SYMBOL: processes
+
+[ H{ } clone processes set-global ] "io.launcher" add-init-hook
 
 TUPLE: process handle status ;
 
-: <process> ( handle -- process ) f process construct-boa ;
+HOOK: register-process io-backend ( process -- )
+
+M: object register-process drop ;
+
+: <process> ( handle -- process )
+    f process construct-boa
+    V{ } clone over processes get set-at
+    dup register-process ;
 
 M: process equal? 2drop f ;
 
@@ -54,11 +67,10 @@ M: assoc >descriptor ;
 
 HOOK: run-process* io-backend ( desc -- handle )
 
-HOOK: wait-for-process* io-backend ( process -- )
-
 : wait-for-process ( process -- status )
-    dup process-handle [ dup wait-for-process* ] when
-    process-status ;
+    dup process-handle [
+        dup [ processes get at push stop ] curry callcc0
+    ] when process-status ;
 
 : run-process ( obj -- process )
     >descriptor
@@ -81,3 +93,8 @@ TUPLE: process-stream process ;
     swap <process-stream>
     [ swap with-stream ] keep
     process-stream-process ; inline
+
+: notify-exit ( status process -- )
+    [ set-process-status ] keep
+    [ processes get delete-at* drop [ schedule-thread ] each ] keep
+    f swap set-process-handle ;

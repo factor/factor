@@ -9,10 +9,6 @@ IN: io.unix.launcher
 ! Search unix first
 USE: unix
 
-HOOK: wait-for-process io-backend ( pid -- status )
-
-M: unix-io wait-for-process ( pid -- status ) wait-for-pid ;
-
 ! Our command line parser. Supported syntax:
 ! foo bar baz -- simple tokens
 ! foo\ bar -- escaping the space
@@ -46,7 +42,7 @@ MEMO: 'arguments' ( -- parser )
 : assoc>env ( assoc -- env )
     [ "=" swap 3append ] { } assoc>map ;
 
-: (spawn-process) ( -- )
+: spawn-process ( -- )
     [
         get-arguments
         pass-environment?
@@ -55,20 +51,9 @@ MEMO: 'arguments' ( -- parser )
         io-error
     ] [ error. :c flush ] recover 1 exit ;
 
-: spawn-process ( -- pid )
-    [ (spawn-process) ] [ ] with-fork ;
-
-: spawn-detached ( -- )
-    [ spawn-process 0 exit ] [ ] with-fork
-    wait-for-process drop ;
-
-M: unix-io run-process* ( desc -- )
+M: unix-io run-process* ( desc -- pid )
     [
-        +detached+ get [
-            spawn-detached
-        ] [
-            spawn-process wait-for-process drop
-        ] if
+        [ spawn-process ] [ ] with-fork <process>
     ] with-descriptor ;
 
 : open-pipe ( -- pair )
@@ -82,21 +67,35 @@ M: unix-io run-process* ( desc -- )
 : spawn-process-stream ( -- in out pid )
     open-pipe open-pipe [
         setup-stdio-pipe
-        (spawn-process)
+        spawn-process
     ] [
         -rot 2dup second close first close
-    ] with-fork first swap second rot ;
-
-TUPLE: pipe-stream pid status ;
-
-: <pipe-stream> ( in out pid -- stream )
-    f pipe-stream construct-boa
-    -rot handle>duplex-stream over set-delegate ;
-
-M: pipe-stream stream-close
-    dup delegate stream-close
-    dup pipe-stream-pid wait-for-process
-    swap set-pipe-stream-status ;
+    ] with-fork first swap second rot <process> ;
 
 M: unix-io process-stream*
-    [ spawn-process-stream <pipe-stream> ] with-descriptor ;
+    [
+        spawn-process-stream >r handle>duplex-stream r>
+    ] with-descriptor ;
+
+: find-process ( handle -- process )
+    f process construct-boa processes get at ;
+
+! Inefficient process wait polling, used on Linux and Solaris.
+! On BSD and Mac OS X, we use kqueue() which scales better.
+: wait-for-processes ( -- ? )
+    -1 0 <int> tuck WNOHANG waitpid
+    dup zero? [
+        2drop t
+    ] [
+        find-process dup [
+            >r *uint r> notify-exit f
+        ] [
+            2drop f
+        ] if
+    ] if ;
+
+: wait-loop ( -- )
+    wait-for-processes [ 250 sleep ] when wait-loop ;
+
+: start-wait-thread ( -- )
+    [ wait-loop ] in-thread ;

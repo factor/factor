@@ -23,7 +23,7 @@ M: bsd-io init-io ( -- )
     2dup mx get-global mx-reads set-at
     mx get-global mx-writes set-at ;
 
-M: bsd-io wait-for-process ( pid -- status )
-    [ kqueue-mx get-global add-pid-task stop ] curry callcc1 ;
+M: bsd-io register-process ( process -- )
+    process-handle kqueue-mx get-global add-pid-task ;
 
 T{ bsd-io } set-io-backend

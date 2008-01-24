@@ -6,14 +6,6 @@ math windows.kernel32 windows namespaces io.launcher kernel
 sequences windows.errors assocs splitting system threads init ;
 IN: io.windows.launcher
 
-SYMBOL: processes
-
-[ H{ } clone processes set-global ]
-"io.windows.launcher" add-init-hook
-
-: <win32-process> ( handle -- process )
-    <process> V{ } clone over processes get set-at ;
-
 TUPLE: CreateProcess-args
        lpApplicationName
        lpCommandLine
@@ -104,11 +96,8 @@ M: windows-io run-process* ( desc -- handle )
     [
         make-CreateProcess-args
         dup call-CreateProcess
-        CreateProcess-args-lpProcessInformation <win32-process>
+        CreateProcess-args-lpProcessInformation <process>
     ] with-descriptor ;
-
-M: windows-io wait-for-process*
-    [ processes get at push stop ] curry callcc0 ;
 
 : dispose-process ( process-information -- )
     #! From MSDN: "Handles in PROCESS_INFORMATION must be closed
@@ -121,11 +110,10 @@ M: windows-io wait-for-process*
     0 <ulong> [ GetExitCodeProcess ] keep *ulong
     swap win32-error=0/f ;
 
-: notify-exit ( process -- )
-    dup process-handle exit-code over set-process-status
-    dup process-handle dispose-process
-    dup processes get delete-at* drop [ schedule-thread ] each
-    f swap set-process-handle ;
+: process-exited ( process -- )
+    dup process-handle exit-code
+    over process-handle dispose-process
+    swap notify-exit ;
 
 : wait-for-processes ( processes -- ? )
     keys dup
@@ -133,7 +121,7 @@ M: windows-io wait-for-process*
     dup length swap >c-void*-array 0 0
     WaitForMultipleObjects
     dup HEX: ffffffff = [ win32-error ] when
-    dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth notify-exit f ] if ;
+    dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth process-exited f ] if ;
 
 : wait-loop ( -- )
     processes get dup assoc-empty?
@@ -143,3 +131,5 @@ M: windows-io wait-for-process*
 
 : start-wait-thread ( -- )
     [ wait-loop ] in-thread ;
+
+[ start-wait-thread ] "io.windows.launcher" add-init-hook

@@ -59,6 +59,6 @@ M: windows-io process-stream*
             dup CreateProcess-args-stdout-pipe pipe-in
             over CreateProcess-args-stdin-pipe pipe-out <win32-duplex-stream>
 
-            swap CreateProcess-args-lpProcessInformation <win32-process>
+            swap CreateProcess-args-lpProcessInformation <process>
         ] with-destructors
     ] with-descriptor ;
