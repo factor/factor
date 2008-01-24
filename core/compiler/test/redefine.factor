@@ -1,6 +1,6 @@
 USING: compiler definitions generic assocs inference math
 namespaces parser tools.test words kernel sequences arrays io
-effects tools.test.inference compiler.units ;
+effects tools.test.inference compiler.units inference.state ;
 IN: temporary
 
 DEFER: x-1
@@ -206,11 +206,14 @@ DEFER: generic-then-not-generic-test-2
 
 [ 4 ] [ generic-then-not-generic-test-2 ] unit-test
 
+DEFER: foldable-test-1
 DEFER: foldable-test-2
 
 [ ] [ "IN: temporary : foldable-test-1 3 ; foldable" eval ] unit-test
 
 [ ] [ "IN: temporary : foldable-test-2 foldable-test-1 ;" eval ] unit-test
+
+[ +inlined+ ] [ \ foldable-test-2 \ foldable-test-1 compiled-usage at ] unit-test
 
 [ 3 ] [ foldable-test-2 ] unit-test
 
@@ -229,3 +232,9 @@ DEFER: flushable-test-2
 [ ] [ "IN: temporary USING: kernel sequences ; : flushable-test-1 3 over push ;" eval ] unit-test
 
 [ V{ 3 } ] [ flushable-test-2 ] unit-test
+
+: ax ;
+: bx ax ;
+[ \ bx forget ] with-compilation-unit
+
+[ t ] [ \ ax compiled-usage [ drop interned? ] assoc-all? ] unit-test
