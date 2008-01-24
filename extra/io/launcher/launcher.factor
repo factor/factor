@@ -1,8 +1,16 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.backend system kernel namespaces strings hashtables
+USING: io io.backend system kernel namespaces strings hashtables
 sequences assocs combinators vocabs.loader ;
 IN: io.launcher
+
+TUPLE: process handle status ;
+
+: <process> ( handle -- process ) f process construct-boa ;
+
+M: process equal? 2drop f ;
+
+M: process hashcode* process-handle hashcode* ;
 
 SYMBOL: +command+
 SYMBOL: +arguments+
@@ -44,15 +52,32 @@ M: string >descriptor +command+ associate ;
 M: sequence >descriptor +arguments+ associate ;
 M: assoc >descriptor ;
 
-HOOK: run-process* io-backend ( desc -- )
+HOOK: run-process* io-backend ( desc -- handle )
 
-: run-process ( obj -- )
-    >descriptor run-process* ;
+HOOK: wait-for-process* io-backend ( process -- )
 
-: run-detached ( obj -- )
-    >descriptor H{ { +detached+ t } } union run-process* ;
+: wait-for-process ( process -- status )
+    dup process-handle [ dup wait-for-process* ] when
+    process-status ;
 
-HOOK: process-stream* io-backend ( desc -- stream )
+: run-process ( obj -- process )
+    >descriptor
+    dup run-process*
+    +detached+ rot at [ dup wait-for-process drop ] unless ;
+
+: run-detached ( obj -- process )
+    >descriptor H{ { +detached+ t } } union run-process ;
+
+HOOK: process-stream* io-backend ( desc -- stream process )
+
+TUPLE: process-stream process ;
 
 : <process-stream> ( obj -- stream )
-    >descriptor process-stream* ;
+    >descriptor process-stream*
+    { set-delegate set-process-stream-process }
+    process-stream construct ;
+
+: with-process-stream ( obj quot -- process )
+    swap <process-stream>
+    [ swap with-stream ] keep
+    process-stream-process ; inline

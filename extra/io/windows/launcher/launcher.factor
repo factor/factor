@@ -1,10 +1,18 @@
-! Copyright (C) 2007 Doug Coleman, Slava Pestov.
+! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays continuations destructors io
 io.windows libc io.nonblocking io.streams.duplex windows.types
 math windows.kernel32 windows namespaces io.launcher kernel
-sequences windows.errors assocs splitting system ;
+sequences windows.errors assocs splitting system threads init ;
 IN: io.windows.launcher
+
+SYMBOL: processes
+
+[ H{ } clone processes set-global ]
+"io.windows.launcher" add-init-hook
+
+: <win32-process> ( handle -- process )
+    <process> V{ } clone over processes get set-at ;
 
 TUPLE: CreateProcess-args
        lpApplicationName
@@ -18,13 +26,6 @@ TUPLE: CreateProcess-args
        lpStartupInfo
        lpProcessInformation
        stdout-pipe stdin-pipe ;
-
-: dispose-CreateProcess-args ( args -- )
-    #! From MSDN: "Handles in PROCESS_INFORMATION must be closed
-    #! with CloseHandle when they are no longer needed."
-    CreateProcess-args-lpProcessInformation dup
-    PROCESS_INFORMATION-hProcess [ CloseHandle drop ] when*
-    PROCESS_INFORMATION-hThread [ CloseHandle drop ] when* ;
 
 : default-CreateProcess-args ( -- obj )
     0
@@ -93,21 +94,52 @@ TUPLE: CreateProcess-args
         over set-CreateProcess-args-lpEnvironment
     ] when ;
 
-: wait-for-process ( args -- )
-    CreateProcess-args-lpProcessInformation
-    PROCESS_INFORMATION-hProcess INFINITE
-    WaitForSingleObject drop ;
-
 : make-CreateProcess-args ( -- args )
     default-CreateProcess-args
     wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
     fill-dwCreateFlags
     fill-lpEnvironment ;
 
-M: windows-io run-process* ( desc -- )
+M: windows-io run-process* ( desc -- handle )
     [
         make-CreateProcess-args
         dup call-CreateProcess
-        +detached+ get [ dup wait-for-process ] unless
-        dispose-CreateProcess-args
+        CreateProcess-args-lpProcessInformation <win32-process>
     ] with-descriptor ;
+
+M: windows-io wait-for-process*
+    [ processes get at push stop ] curry callcc0 ;
+
+: dispose-process ( process-information -- )
+    #! From MSDN: "Handles in PROCESS_INFORMATION must be closed
+    #! with CloseHandle when they are no longer needed."
+    dup PROCESS_INFORMATION-hProcess [ CloseHandle drop ] when*
+    PROCESS_INFORMATION-hThread [ CloseHandle drop ] when* ;
+
+: exit-code ( process -- n )
+    PROCESS_INFORMATION-hProcess
+    0 <ulong> [ GetExitCodeProcess ] keep *ulong
+    swap win32-error=0/f ;
+
+: notify-exit ( process -- )
+    dup process-handle exit-code over set-process-status
+    dup process-handle dispose-process
+    dup processes get delete-at* drop [ schedule-thread ] each
+    f swap set-process-handle ;
+
+: wait-for-processes ( processes -- ? )
+    keys dup
+    [ process-handle PROCESS_INFORMATION-hProcess ] map
+    dup length swap >c-void*-array 0 0
+    WaitForMultipleObjects
+    dup HEX: ffffffff = [ win32-error ] when
+    dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth notify-exit f ] if ;
+
+: wait-loop ( -- )
+    processes get dup assoc-empty?
+    [ drop t ] [ wait-for-processes ] if
+    [ 250 sleep ] when
+    wait-loop ;
+
+: start-wait-thread ( -- )
+    [ wait-loop ] in-thread ;
