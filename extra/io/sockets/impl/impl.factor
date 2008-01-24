@@ -106,9 +106,14 @@ M: f parse-sockaddr nip ;
     [ ] unfold nip [ ] subset ;
 
 : prepare-resolve-host ( host serv passive? -- host' serv' flags )
+    #! If the port is a number, we resolve for 'http' then
+    #! change it later. This is a workaround for a FreeBSD
+    #! getaddrinfo() limitation -- on Windows, Linux and Mac,
+    #! we can convert a number to a string and pass that as the
+    #! service name, but on FreeBSD this gives us an unknown
+    #! service error.
     >r
-    >r string>char-alien r>
-    dup integer? [ port-override set f ] [ string>char-alien ] if
+    dup integer? [ port-override set "http" ] when
     r> AI_PASSIVE 0 ? ;
 
 M: object resolve-host ( host serv passive? -- seq )
