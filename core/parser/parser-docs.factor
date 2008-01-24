@@ -44,8 +44,7 @@ ARTICLE: "vocabulary-search-errors" "Word lookup errors"
 "If the parser cannot not find a word in the current vocabulary search path, it attempts to look for the word in all loaded vocabularies. Then, one of three things happen:"
 { $list
     { "If there are no words having this name at all, an error is thrown and parsing stops." }
-    { "If there is exactly one vocabulary having a word with this name, the vocabulary is automatically added to the search path. This behavior is intended for interactive use and exploratory programming only, and production code should contain full " { $link POSTPONE: USING: } " declarations." }
-    { "If there is more than one vocabulary which contains a word with this name, a restartable error is thrown, with a restart for each vocabulary in question. The restarts add the vocabulary to the search path and continue parsing." }
+    { "If there are vocabularies which contain words with this name, a restartable error is thrown, with a restart for each vocabulary in question. The restarts add the vocabulary to the search path and continue parsing." }
 }
 "When writing a new vocabulary, one approach is to ignore " { $link POSTPONE: USING: } " declarations altogether, then to load the vocabulary and observe any parser notes and restarts and use this information to write the correct " { $link POSTPONE: USING: } " declaration." ;
 

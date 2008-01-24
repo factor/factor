@@ -8,8 +8,6 @@ IN: editors.wordpad
     ] unless* ;
 
 : wordpad ( file line -- )
-    [
-        wordpad-path % drop " " % "\"" % % "\"" %
-    ] "" make run-detached ;
+    drop wordpad-path swap 2array run-detached drop ;
 
 [ wordpad ] edit-hook set-global

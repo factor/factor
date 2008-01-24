@@ -4,6 +4,7 @@ namespaces prettyprint editors ;
 IN: editors.textmate
 
 : textmate-location ( file line -- )
-    [ "mate -a -l " % # " " % unparse % ] "" make run-process ;
+    [ "mate" , "-a" , "-l" , number>string , , ] { } make
+    run-process drop ;
 
 [ textmate-location ] edit-hook set-global

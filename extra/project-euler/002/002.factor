@@ -1,6 +1,6 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2007 Aaron Schaefer, Alexander Solovyov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences ;
+USING: kernel math sequences shuffle ;
 IN: project-euler.002
 
 ! http://projecteuler.net/index.php?section=problems&id=2
@@ -22,12 +22,12 @@ IN: project-euler.002
 <PRIVATE
 
 : (fib-upto) ( seq n limit -- seq )
-    2dup <= [ >r add dup 2 tail* sum r> (fib-upto) ] [ 2drop ] if ;
+    2dup <= [ [ over push dup 2 tail* sum ] dip (fib-upto) ] [ 2drop ] if ;
 
 PRIVATE>
 
 : fib-upto ( n -- seq )
-    { 0 } 1 rot (fib-upto) ;
+    V{ 0 } clone 1 rot (fib-upto) ;
 
 : euler002 ( -- answer )
     1000000 fib-upto [ even? ] subset sum ;
@@ -35,4 +35,18 @@ PRIVATE>
 ! [ euler002 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials
 
-MAIN: euler002
+
+! ALTERNATE SOLUTIONS
+! -------------------
+
+: fib-upto* ( n -- seq )
+    0 1 [ pick over >= ] [ tuck + dup ] [ ] unfold 3nip
+    1 head-slice* { 0 1 } swap append ;
+
+: euler002a ( -- answer )
+    1000000 fib-upto* [ even? ] subset sum ;
+
+! [ euler002a ] 100 ave-time
+! 0 ms run / 0 ms GC ave time - 100 trials
+
+MAIN: euler002a

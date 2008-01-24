@@ -116,28 +116,26 @@ M: windows-nt-io add-completion ( handle -- )
 : lookup-callback ( GetQueuedCompletion-args -- callback )
     io-hash get-global delete-at* drop ;
 
-: wait-for-io ( timeout -- continuation/f )
+: handle-overlapped ( timeout -- ? )
     wait-for-overlapped [
         GetLastError dup expected-io-error? [
-            2drop f
+            2drop t
         ] [
             dup eof? [
                 drop lookup-callback
                 dup io-callback-port t swap set-port-eof?
-                io-callback-continuation
             ] [
                 (win32-error-string) swap lookup-callback
                 [ io-callback-port set-port-error ] keep
-                io-callback-continuation
-            ] if
+            ] if io-callback-continuation schedule-thread f
         ] if
     ] [
-        lookup-callback [
-            io-callback-continuation
-        ] [
-            "unhandled io event" print flush f
-        ] if*
+        lookup-callback
+        io-callback-continuation schedule-thread f
     ] if ;
+
+: drain-overlapped ( timeout -- )
+    handle-overlapped [ 0 drain-overlapped ] unless ;
 
 : maybe-expire ( io-callbck -- )
     io-callback-port
@@ -148,10 +146,10 @@ M: windows-nt-io add-completion ( handle -- )
     ] if ;
 
 : cancel-timeout ( -- )
-    io-hash get-global values [ maybe-expire ] each ;
+    io-hash get-global [ nip maybe-expire ] assoc-each ;
 
 M: windows-nt-io io-multiplex ( ms -- )
-    cancel-timeout wait-for-io [ schedule-thread ] when* ;
+    cancel-timeout drain-overlapped ;
 
 M: windows-nt-io init-io ( -- )
     <master-completion-port> master-completion-port set-global

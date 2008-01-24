@@ -9,4 +9,4 @@ USE: io.windows.mmap
 USE: io.backend
 USE: namespaces
 
-T{ windows-nt-io } io-backend set-global
+T{ windows-nt-io } set-io-backend

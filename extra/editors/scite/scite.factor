@@ -18,14 +18,13 @@ SYMBOL: scite-path
 
 : scite-command ( file line -- cmd )
   swap
-  [ scite-path get %
-    " \"" %
-    %
-    "\" -goto:" %
-    #
-  ] "" make ;
+  [
+    scite-path get ,
+    ,
+    "-goto:" swap number>string append ,
+  ] { } make ;
 
 : scite-location ( file line -- )
-  scite-command run-detached ;
+  scite-command run-detached drop ;
 
 [ scite-location ] edit-hook set-global

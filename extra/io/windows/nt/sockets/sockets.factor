@@ -149,7 +149,7 @@ M: windows-nt-io <server> ( addrspec -- server )
         [
             SOCK_STREAM server-fd dup listen-on-socket
             dup add-completion
-            <win32-socket> f <port>
+            <win32-socket>
         ] keep <server-port>
     ] with-destructors ;
 
@@ -158,7 +158,7 @@ M: windows-nt-io <datagram> ( addrspec -- datagram )
         [
             SOCK_DGRAM server-fd
             dup add-completion
-            <win32-socket> f <port>
+            <win32-socket>
         ] keep <datagram-port>
     ] with-destructors ;
 

@@ -4,6 +4,8 @@ IN: math.constants
 ARTICLE: "math-constants" "Constants"
 "Standard mathematical constants:"
 { $subsection e }
+{ $subsection gamma }
+{ $subsection phi }
 { $subsection pi }
 "Various limits:"
 { $subsection most-positive-fixnum }
@@ -14,6 +16,13 @@ ABOUT: "math-constants"
 
 HELP: e
 { $values { "e" "base of natural logarithm" } } ;
+
+HELP: gamma
+{ $values { "gamma" "Euler-Mascheroni constant" } }
+{ $description "The Euler-Mascheroni constant, also called \"Euler's constant\" or \"the Euler constant\"." } ;
+
+HELP: phi
+{ $values { "phi" "golden ratio" } } ;
 
 HELP: pi
 { $values { "pi" "circumference of circle with diameter 1" } } ;
