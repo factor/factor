@@ -4,8 +4,11 @@ IN: editors.emacs
 
 : emacsclient ( file line -- )
     [
-        "emacsclient --no-wait +" % # " " % %
-    ] "" make run-process ;
+        "emacsclient" ,
+        "--no-wait" ,
+        "+" swap number>string append ,
+        ,
+    ] { } make run-process drop ;
 
 : emacs ( word -- )
     where first2 emacsclient ;
