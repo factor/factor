@@ -154,9 +154,14 @@ $nl
 { $subsection +detached+ }
 { $subsection +environment+ }
 { $subsection +environment-mode+ }
+"Redirecting standard input and output to files:"
+{ $subsection +stdin+ }
+{ $subsection +stdout+ }
+{ $subsection +stderr+ }
 "The following words are used to launch processes:"
 { $subsection run-process }
 { $subsection run-detached }
+"Redirecting standard input and output to a pipe:"
 { $subsection <process-stream> }
 { $subsection with-process-stream }
 "A class representing an active or finished process:"

@@ -22,13 +22,11 @@ TUPLE: CreateProcess-args
 
 : default-CreateProcess-args ( -- obj )
     0
-    0
     "STARTUPINFO" <c-object>
     "STARTUPINFO" heap-size over set-STARTUPINFO-cb
     "PROCESS_INFORMATION" <c-object>
     TRUE
     {
-        set-CreateProcess-args-bInheritHandles
         set-CreateProcess-args-dwCreateFlags
         set-CreateProcess-args-lpStartupInfo
         set-CreateProcess-args-lpProcessInformation
@@ -103,9 +101,11 @@ TUPLE: CreateProcess-args
 : redirect ( obj access-mode create-mode -- handle )
     {
         { [ pick not ] [ 3drop f ] }
-        { [ pick +closed+ eq? ] [ 3drop f ] }
+        { [ pick +closed+ eq? ] [ 3drop t ] }
         { [ pick string? ] [ (redirect) ] }
     } cond ;
+
+: ?closed or dup t eq? [ drop f ] when ;
 
 : inherited-stdout ( args -- handle )
     CreateProcess-args-stdout-pipe
@@ -113,15 +113,14 @@ TUPLE: CreateProcess-args
 
 : redirect-stdout ( args -- handle )
     +stdout+ get GENERIC_WRITE CREATE_ALWAYS redirect
-    swap inherited-stdout or ;
+    swap inherited-stdout ?closed ;
 
 : inherited-stderr ( args -- handle )
-    CreateProcess-args-stdout-pipe
-    [ pipe-out ] [ STD_ERROR_HANDLE GetStdHandle ] if* ;
+    drop STD_ERROR_HANDLE GetStdHandle ;
 
 : redirect-stderr ( args -- handle )
     +stderr+ get GENERIC_WRITE CREATE_ALWAYS redirect
-    swap inherited-stderr or ;
+    swap inherited-stderr ?closed ;
 
 : inherited-stdin ( args -- handle )
     CreateProcess-args-stdin-pipe
@@ -129,7 +128,7 @@ TUPLE: CreateProcess-args
 
 : redirect-stdin ( args -- handle )
     +stdin+ get GENERIC_READ OPEN_EXISTING redirect
-    swap inherited-stdin or ;
+    swap inherited-stdin ?closed ;
 
 : fill-startup-info
     dup CreateProcess-args-lpStartupInfo
