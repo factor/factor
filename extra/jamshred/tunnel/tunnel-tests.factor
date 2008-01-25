@@ -1,3 +1,5 @@
+! Copyright (C) 2007 Alex Chapman
+! See http://factorcode.org/license.txt for BSD license.
 USING: jamshred.oint jamshred.tunnel kernel sequences tools.test ;
 IN: temporary
 

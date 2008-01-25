@@ -1,3 +1,5 @@
+! Copyright (C) 2007 Alex Chapman
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types colors jamshred.game jamshred.oint
 jamshred.player jamshred.tunnel kernel math math.vectors opengl
 opengl.gl opengl.glu sequences ;
