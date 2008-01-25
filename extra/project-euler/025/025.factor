@@ -1,7 +1,7 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel math math.functions math.parser math.ranges memoize
-    project-euler.common sequences ;
+USING: alien.syntax kernel math math.constants math.functions math.parser
+    math.ranges memoize project-euler.common sequences ;
 IN: project-euler.025
 
 ! http://projecteuler.net/index.php?section=problems&id=25
@@ -66,9 +66,6 @@ PRIVATE>
 ! Thus we need we need "Phi**n / sqrt(5) > 10**999", and we just solve for n
 
 <PRIVATE
-
-: phi ( -- phi )
-    5 sqrt 1+ 2 / ;
 
 : digit-fib* ( n -- term )
     1- 5 log10 2 / + phi log10 / ceiling >integer ;

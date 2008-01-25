@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.unix.bsd
 USING: io.backend io.unix.backend io.unix.kqueue io.unix.select
-io.unix.launcher namespaces kernel assocs threads continuations
-;
+io.launcher io.unix.launcher namespaces kernel assocs threads 
+continuations ;
 
 ! On *BSD and Mac OS X, we use select() for the top-level
 ! multiplexer, and we hang a kqueue off of it but file change
@@ -23,7 +23,7 @@ M: bsd-io init-io ( -- )
     2dup mx get-global mx-reads set-at
     mx get-global mx-writes set-at ;
 
-M: bsd-io wait-for-process ( pid -- status )
-    [ kqueue-mx get-global add-pid-task stop ] curry callcc1 ;
+M: bsd-io register-process ( process -- )
+    process-handle kqueue-mx get-global add-pid-task ;
 
-T{ bsd-io } io-backend set-global
+T{ bsd-io } set-io-backend

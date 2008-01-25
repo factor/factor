@@ -78,7 +78,8 @@ PRIVATE>
 
 : pop-front ( dlist -- obj )
     dup dlist-front [
-        dlist-node-next
+        dup dlist-node-next
+        f rot set-dlist-node-next
         f over set-prev-when
         swap set-dlist-front
     ] 2keep dlist-node-obj
@@ -87,13 +88,13 @@ PRIVATE>
 : pop-front* ( dlist -- ) pop-front drop ;
 
 : pop-back ( dlist -- obj )
-    [
-        dlist-back dup dlist-node-prev f over set-next-when
-    ] keep
-    [ set-dlist-back ] keep
-    [ normalize-front ] keep
-    dec-length
-    dlist-node-obj ;
+    dup dlist-back [
+        dup dlist-node-prev
+        f rot set-dlist-node-prev
+        f over set-next-when
+        swap set-dlist-back
+    ] 2keep dlist-node-obj
+    swap [ normalize-front ] keep dec-length ;
 
 : pop-back* ( dlist -- ) pop-back drop ;
 

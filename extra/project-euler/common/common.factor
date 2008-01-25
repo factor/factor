@@ -11,7 +11,7 @@ IN: project-euler.common
 ! collect-consecutive - #8, #11
 ! log10 - #25, #134
 ! max-path - #18, #67
-! number>digits - #16, #20
+! number>digits - #16, #20, #30
 ! propagate-all - #18, #67
 ! sum-proper-divisors - #21
 ! tau* - #12

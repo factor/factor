@@ -38,8 +38,6 @@ SYMBOL: stdio
 ! Default error stream
 SYMBOL: stderr
 
-: close ( -- ) stdio get stream-close ;
-
 : readln ( -- str/f ) stdio get stream-readln ;
 : read1 ( -- ch/f ) stdio get stream-read1 ;
 : read ( n -- str/f ) stdio get stream-read ;
@@ -56,7 +54,9 @@ SYMBOL: stderr
     stdio swap with-variable ; inline
 
 : with-stream ( stream quot -- )
-    swap [ [ close ] [ ] cleanup ] with-stream* ; inline
+    swap [
+        [ stdio get stream-close ] [ ] cleanup
+    ] with-stream* ; inline
 
 : tabular-output ( style quot -- )
     swap >r { } make r> stdio get stream-write-table ; inline

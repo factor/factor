@@ -3,18 +3,10 @@
 USING: alien alien.c-types arrays destructors io io.windows libc
 windows.types math windows.kernel32 windows namespaces kernel
 sequences windows.errors assocs math.parser system random ;
-IN: io.windows.nt.pipes
+IN: io.windows.pipes
 
 ! This code is based on
 ! http://twistedmatrix.com/trac/browser/trunk/twisted/internet/iocpreactor/process.py
-
-: default-security-attributes ( -- obj )
-    "SECURITY_ATTRIBUTES" <c-object>
-    "SECURITY_ATTRIBUTES" heap-size over set-SECURITY_ATTRIBUTES-nLength ;
-
-: security-attributes-inherit ( -- obj )
-    default-security-attributes
-    TRUE over set-SECURITY_ATTRIBUTES-bInheritHandle ; foldable
 
 : create-named-pipe ( name mode -- handle )
     FILE_FLAG_OVERLAPPED bitor

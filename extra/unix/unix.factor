@@ -13,7 +13,7 @@ TYPEDEF: longlong quad_t
 TYPEDEF: uint gid_t
 TYPEDEF: uint in_addr_t
 TYPEDEF: uint ino_t
-TYPEDEF: uint pid_t
+TYPEDEF: int pid_t
 TYPEDEF: uint socklen_t
 TYPEDEF: uint time_t
 TYPEDEF: uint uid_t

@@ -9,7 +9,8 @@ IN: editors.notepadpp
 
 : notepadpp ( file line -- )
     [
-        notepadpp-path % " -n" % # " " % %
-    ] "" make run-detached ;
+        notepadpp-path ,
+        "-n" swap number>string append , ,
+    ] "" make run-detached drop ;
 
 [ notepadpp ] edit-hook set-global

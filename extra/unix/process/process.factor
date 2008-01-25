@@ -31,25 +31,5 @@ IN: unix.process
 : with-fork ( child parent -- )
     fork dup zero? -roll swap curry if ; inline
 
-! Lame polling strategy for getting process exit codes. On
-! BSD, we use kqueue which is more efficient.
-
-SYMBOL: pid-wait
-
-: (wait-for-pid) ( pid -- status )
-    0 <int> [ 0 waitpid drop ] keep *int ;
-
 : wait-for-pid ( pid -- status )
-    [ pid-wait get-global [ ?push ] change-at stop ] curry
-    callcc1 ;
-
-: wait-loop ( -- )
-    -1 0 <int> tuck WNOHANG waitpid               ! &status return
-    [ *int ] [ pid-wait get delete-at* drop ] bi* ! status ?
-    [ schedule-thread-with ] with each
-    250 sleep
-    wait-loop ;
-
-: start-wait-loop ( -- )
-    H{ } clone pid-wait set-global
-    [ wait-loop ] in-thread ;
+    0 <int> [ 0 waitpid drop ] keep *int ;

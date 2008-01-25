@@ -10,13 +10,15 @@ HOOK: vim-command vim-editor
 
 TUPLE: vim ;
 
-M: vim vim-command ( file line -- string )
-    [ "\"" % vim-path get % "\" \"" % swap % "\" +" % # ] "" make ;
+M: vim vim-command ( file line -- array )
+    [
+        vim-path get , swap , "+" swap number>string append ,
+    ] { } make ;
 
 : vim-location ( file line -- )
     vim-command
     vim-detach get-global
-    [ run-detached ] [ run-process ] if ;
+    [ run-detached ] [ run-process ] if drop ;
 
 "vim" vim-path set-global
 [ vim-location ] edit-hook set-global

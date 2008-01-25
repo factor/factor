@@ -87,6 +87,25 @@ M: wrapper (quot-uses) >r wrapped r> (quot-uses) ;
 M: word uses ( word -- seq )
     word-def quot-uses keys ;
 
+SYMBOL: compiled-crossref
+
+compiled-crossref global [ H{ } assoc-like ] change-at
+
+: compiled-xref ( word dependencies -- )
+    2dup "compiled-uses" set-word-prop
+    compiled-crossref get add-vertex* ;
+
+: compiled-unxref ( word -- )
+    dup "compiled-uses" word-prop
+    compiled-crossref get remove-vertex* ;
+
+: delete-compiled-xref ( word -- )
+    dup compiled-unxref
+    compiled-crossref get delete-at ;
+
+: compiled-usage ( word -- assoc )
+    compiled-crossref get at ;
+
 M: word redefined* ( word -- )
     { "inferred-effect" "base-case" "no-effect" } reset-props ;
 
@@ -187,6 +206,7 @@ M: word (forget-word)
 
 : forget-word ( word -- )
     dup delete-xref
+    dup delete-compiled-xref
     (forget-word) ;
 
 M: word forget* forget-word ;
