@@ -42,11 +42,15 @@ MEMO: 'arguments' ( -- parser )
 : assoc>env ( assoc -- env )
     [ "=" swap 3append ] { } assoc>map ;
 
+: (redirect)
+    >r file-mode open dup io-error dup
+    r> dup2 io-error close drop ;
+
 : redirect ( obj mode fd -- )
     {
         { [ pick not ] [ 3drop ] }
         { [ pick +closed+ eq? ] [ close 3drop ] }
-        { [ t ] [ >r file-mode open dup io-error r> dup2 io-error ] }
+        { [ t ] [ (redirect) ] }
     } cond ;
 
 : setup-redirection ( -- )
