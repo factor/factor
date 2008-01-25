@@ -3,7 +3,7 @@
 USING: io io.backend io.launcher io.unix.backend io.nonblocking
 sequences kernel namespaces math system alien.c-types debugger
 continuations arrays assocs combinators unix.process
-parser-combinators memoize promises strings ;
+parser-combinators memoize promises strings threads ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -78,7 +78,8 @@ M: unix-io process-stream*
     ] with-descriptor ;
 
 : find-process ( handle -- process )
-    f process construct-boa processes get at ;
+    processes get swap [ nip swap process-handle = ] curry
+    assoc-find 2drop ;
 
 ! Inefficient process wait polling, used on Linux and Solaris.
 ! On BSD and Mac OS X, we use kqueue() which scales better.

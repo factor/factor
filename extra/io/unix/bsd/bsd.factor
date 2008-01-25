@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.unix.bsd
 USING: io.backend io.unix.backend io.unix.kqueue io.unix.select
-io.unix.launcher namespaces kernel assocs threads continuations
-;
+io.launcher io.unix.launcher namespaces kernel assocs threads 
+continuations ;
 
 ! On *BSD and Mac OS X, we use select() for the top-level
 ! multiplexer, and we hang a kqueue off of it but file change
