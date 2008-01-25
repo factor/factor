@@ -67,7 +67,7 @@ GENERIC: >descriptor ( obj -- desc )
 
 M: string >descriptor +command+ associate ;
 M: sequence >descriptor +arguments+ associate ;
-M: assoc >descriptor ;
+M: assoc >descriptor >hashtable ;
 
 HOOK: run-process* io-backend ( desc -- handle )
 
