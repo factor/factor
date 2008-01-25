@@ -31,6 +31,36 @@ HELP: +environment-mode+
 "Default value is " { $link append-environment } "."
 } ;
 
+HELP: +stdin+
+{ $description "Launch descriptor key. Must equal one of the following:"
+    { $list
+        { { $link f } " - standard input is inherited" }
+        { { $link +closed+ } " - standard input is closed" }
+        { "a path name - standard input is read from the given file, which must exist" }
+    }
+} ;
+
+HELP: +stdout+
+{ $description "Launch descriptor key. Must equal one of the following:"
+    { $list
+        { { $link f } " - standard output is inherited" }
+        { { $link +closed+ } " - standard output is closed" }
+        { "a path name - standard output is written to the given file, which is overwritten if it already exists" }
+    }
+} ;
+
+HELP: +stderr+
+{ $description "Launch descriptor key. Must equal one of the following:"
+    { $list
+        { { $link f } " - standard error is inherited" }
+        { { $link +closed+ } " - standard error is closed" }
+        { "a path name - standard error is written to the given file, which is overwritten if it already exists" }
+    }
+} ;
+
+HELP: +closed+
+{ $description "Possible value for " { $link +stdin+ } ", " { $link +stdout+ } ", and " { $link +stderr+ } " launch descriptors." } ;
+
 HELP: prepend-environment
 { $description "Possible value of " { $link +environment-mode+ } " launch descriptor key. The child process environment consists of the value of the " { $link +environment+ } " key together with the current environment, with entries from the current environment taking precedence."
 $nl

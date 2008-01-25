@@ -42,8 +42,21 @@ MEMO: 'arguments' ( -- parser )
 : assoc>env ( assoc -- env )
     [ "=" swap 3append ] { } assoc>map ;
 
+: redirect ( obj mode fd -- )
+    {
+        { [ pick not ] [ 3drop ] }
+        { [ pick +closed+ eq? ] [ close 3drop ] }
+        { [ t ] [ >r file-mode open dup io-error r> dup2 io-error ] }
+    } cond ;
+
+: setup-redirection ( -- )
+    +stdin+ get read-flags 0 redirect
+    +stdout+ get write-flags 1 redirect
+    +stderr+ get read-flags 2 redirect ;
+
 : spawn-process ( -- )
     [
+        setup-redirection
         get-arguments
         pass-environment?
         [ get-environment assoc>env exec-args-with-env ]

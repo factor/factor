@@ -30,6 +30,10 @@ SYMBOL: +arguments+
 SYMBOL: +detached+
 SYMBOL: +environment+
 SYMBOL: +environment-mode+
+SYMBOL: +stdin+
+SYMBOL: +stdout+
+SYMBOL: +stderr+
+SYMBOL: +closed+
 
 SYMBOL: prepend-environment
 SYMBOL: replace-environment
