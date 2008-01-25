@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.backend io.launcher io.unix.backend io.nonblocking
-sequences kernel namespaces math system alien.c-types debugger
-continuations arrays assocs combinators unix.process
-parser-combinators memoize promises strings ;
+USING: io io.backend io.launcher io.unix.backend io.unix.files
+io.nonblocking sequences kernel namespaces math system
+ alien.c-types debugger continuations arrays assocs 
+combinators unix.process parser-combinators memoize 
+promises strings threads ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -42,8 +43,25 @@ MEMO: 'arguments' ( -- parser )
 : assoc>env ( assoc -- env )
     [ "=" swap 3append ] { } assoc>map ;
 
+: (redirect) ( path mode fd -- )
+    >r file-mode open dup io-error dup
+    r> dup2 io-error close ;
+
+: redirect ( obj mode fd -- )
+    {
+        { [ pick not ] [ 3drop ] }
+        { [ pick +closed+ eq? ] [ close 2drop ] }
+        { [ pick string? ] [ (redirect) ] }
+    } cond ;
+
+: setup-redirection ( -- )
+    +stdin+ get read-flags 0 redirect
+    +stdout+ get write-flags 1 redirect
+    +stderr+ get write-flags 2 redirect ;
+
 : spawn-process ( -- )
     [
+        setup-redirection
         get-arguments
         pass-environment?
         [ get-environment assoc>env exec-args-with-env ]
@@ -78,13 +96,14 @@ M: unix-io process-stream*
     ] with-descriptor ;
 
 : find-process ( handle -- process )
-    f process construct-boa processes get at ;
+    processes get swap [ nip swap process-handle = ] curry
+    assoc-find 2drop ;
 
 ! Inefficient process wait polling, used on Linux and Solaris.
 ! On BSD and Mac OS X, we use kqueue() which scales better.
 : wait-for-processes ( -- ? )
     -1 0 <int> tuck WNOHANG waitpid
-    dup zero? [
+    dup 0 <= [
         2drop t
     ] [
         find-process dup [

@@ -12,10 +12,10 @@ IN: math.text.english
     "Seventeen" "Eighteen" "Nineteen" } nth ;
 
 : tens ( n -- str )
-    { "" "" "Twenty" "Thirty" "Forty" "Fifty" "Sixty" "Seventy" "Eighty" "Ninety" } nth ;
+    { f f "Twenty" "Thirty" "Forty" "Fifty" "Sixty" "Seventy" "Eighty" "Ninety" } nth ;
 
 : scale-numbers ( n -- str )  ! up to 10^99
-    { "" "Thousand" "Million" "Billion" "Trillion" "Quadrillion" "Quintillion"
+    { f "Thousand" "Million" "Billion" "Trillion" "Quadrillion" "Quintillion"
     "Sextillion" "Septillion" "Octillion" "Nonillion" "Decillion" "Undecillion"
     "Duodecillion" "Tredecillion" "Quattuordecillion" "Quindecillion"
     "Sexdecillion" "Septendecillion" "Octodecillion" "Novemdecillion"
@@ -45,7 +45,7 @@ SYMBOL: and-needed?
 
 : tens-place ( n -- str )
     100 mod dup 20 >= [
-        10 /mod >r tens r>
+        10 /mod [ tens ] dip
         dup zero? [ drop ] [ "-" swap small-numbers 3append ] if
     ] [
         dup zero? [ drop "" ] [ small-numbers ] if
@@ -97,3 +97,4 @@ PRIVATE>
     ] [
         [ (number>text) ] with-scope
     ] if ;
+

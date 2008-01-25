@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel io.nonblocking io.unix.backend
 sequences assocs unix unix.kqueue unix.process math namespaces
-combinators threads vectors ;
+combinators threads vectors io.launcher io.unix.launcher ;
 IN: io.unix.kqueue
 
 TUPLE: kqueue-mx events ;
@@ -50,15 +50,15 @@ M: kqueue-mx unregister-io-task ( task mx -- )
 : kevent-write-task ( mx fd -- )
     over mx-reads at handle-io-task ;
 
-: kevent-proc-task ( mx pid -- )
-    dup (wait-for-pid) swap find-process
+: kevent-proc-task ( pid -- )
+    dup wait-for-pid swap find-process
     dup [ notify-exit ] [ 2drop ] if ;
 
 : handle-kevent ( mx kevent -- )
     dup kevent-ident swap kevent-filter {
         { [ dup EVFILT_READ = ] [ drop kevent-read-task ] }
         { [ dup EVFILT_WRITE = ] [ drop kevent-write-task ] }
-        { [ dup EVFILT_PROC = ] [ drop kevent-proc-task ] }
+        { [ dup EVFILT_PROC = ] [ drop kevent-proc-task drop ] }
     } cond ;
 
 : handle-kevents ( mx n -- )

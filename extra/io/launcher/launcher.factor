@@ -30,6 +30,10 @@ SYMBOL: +arguments+
 SYMBOL: +detached+
 SYMBOL: +environment+
 SYMBOL: +environment-mode+
+SYMBOL: +stdin+
+SYMBOL: +stdout+
+SYMBOL: +stderr+
+SYMBOL: +closed+
 
 SYMBOL: prepend-environment
 SYMBOL: replace-environment
@@ -63,7 +67,7 @@ GENERIC: >descriptor ( obj -- desc )
 
 M: string >descriptor +command+ associate ;
 M: sequence >descriptor +arguments+ associate ;
-M: assoc >descriptor ;
+M: assoc >descriptor >hashtable ;
 
 HOOK: run-process* io-backend ( desc -- handle )
 

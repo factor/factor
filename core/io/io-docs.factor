@@ -29,7 +29,6 @@ ARTICLE: "stdio" "The default stream"
 "Various words take an implicit stream parameter from a variable to reduce stack shuffling."
 { $subsection stdio }
 "Unless rebound in a child namespace, this variable will be set to a console stream for interacting with the user."
-{ $subsection close }
 { $subsection read1 }
 { $subsection read }
 { $subsection read-until }
@@ -177,10 +176,6 @@ $io-error ;
 
 HELP: stdio
 { $var-description "Holds a stream, used for various implicit stream operations. Rebound using " { $link with-stream } " and " { $link with-stream* } "." } ;
-
-HELP: close
-{ $contract "Closes the " { $link stdio } " stream." } 
-$io-error ;
 
 HELP: readln
 { $values { "str/f" "a string or " { $link f } } }
