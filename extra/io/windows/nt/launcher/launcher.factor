@@ -34,10 +34,10 @@ M: windows-io process-stream*
     [
         [
             make-CreateProcess-args
-            TRUE over set-CreateProcess-args-bInheritHandles
 
             fill-stdout-pipe
             fill-stdin-pipe
+            fill-startup-info
 
             dup call-CreateProcess
 

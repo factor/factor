@@ -26,11 +26,13 @@ TUPLE: CreateProcess-args
     "STARTUPINFO" <c-object>
     "STARTUPINFO" heap-size over set-STARTUPINFO-cb
     "PROCESS_INFORMATION" <c-object>
+    TRUE
     {
         set-CreateProcess-args-bInheritHandles
         set-CreateProcess-args-dwCreateFlags
         set-CreateProcess-args-lpStartupInfo
         set-CreateProcess-args-lpProcessInformation
+        set-CreateProcess-args-bInheritHandles
     } \ CreateProcess-args construct ;
 
 : call-CreateProcess ( CreateProcess-args -- )
@@ -143,13 +145,12 @@ TUPLE: CreateProcess-args
     default-CreateProcess-args
     wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
     fill-dwCreateFlags
-    fill-lpEnvironment
-    fill-startup-info ;
+    fill-lpEnvironment ;
 
 M: windows-io run-process* ( desc -- handle )
     [
         [
-            make-CreateProcess-args
+            make-CreateProcess-args fill-startup-info
             dup call-CreateProcess
             CreateProcess-args-lpProcessInformation <process>
         ] with-descriptor
