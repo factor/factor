@@ -88,7 +88,7 @@ PRIVATE>
 : dot ( -- ch ) CHAR: . ;
 : dash ( -- ch ) CHAR: - ;
 : char-gap ( -- ch ) CHAR: \s ;
-: word-gap ( -- ch ) " / " ;
+: word-gap ( -- ch ) CHAR: / ;
 
 : =parser ( obj -- parser )
     [ = ] curry satisfy ;
@@ -103,7 +103,7 @@ LAZY: 'char-gap' ( -- parser )
     char-gap =parser ;
 
 LAZY: 'word-gap' ( -- parser )
-    word-gap token ;
+    word-gap =parser ;
 
 LAZY: 'morse-char' ( -- parser )
     'dot' 'dash' <|> <+> ;
