@@ -29,7 +29,7 @@ IN: shufflers
 : define-shuffles ( names max-out -- )
     in-shuffle over length make-shuffles [
         [ shuffle>string create-in ] keep
-        shuffle>quot dupd define-compound put-effect
+        shuffle>quot dupd define put-effect
     ] with each out-shuffle ;
 
 : SHUFFLE:

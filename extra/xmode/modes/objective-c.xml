@@ -89,7 +89,7 @@
         <EOL_SPAN_REGEXP HASH_CHAR="elif" TYPE="MARKUP" DELEGATE="c::CONDITION">elif\b</EOL_SPAN_REGEXP>
         <EOL_SPAN_REGEXP HASH_CHAR="if" TYPE="MARKUP" DELEGATE="c::CONDITION">if\b</EOL_SPAN_REGEXP>
 
-        <IMPORT DELEGATE="LEX"/>
+        <IMPORT DELEGATE="c::LEX"/>
 
         <!-- Directives -->
         <KEYWORDS>

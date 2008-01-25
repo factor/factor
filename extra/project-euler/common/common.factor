@@ -1,5 +1,5 @@
-USING: kernel math math.functions math.miller-rabin math.parser
-    math.primes.factors math.ranges namespaces sequences ;
+USING: arrays combinators.lib kernel math math.functions math.miller-rabin
+    math.parser math.primes.factors math.ranges namespaces sequences ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -7,10 +7,11 @@ IN: project-euler.common
 
 ! Problems using each public word
 ! -------------------------------
+! cartesian-product - #4, #27
 ! collect-consecutive - #8, #11
 ! log10 - #25, #134
 ! max-path - #18, #67
-! number>digits - #16, #20
+! number>digits - #16, #20, #30
 ! propagate-all - #18, #67
 ! sum-proper-divisors - #21
 ! tau* - #12
@@ -44,6 +45,9 @@ IN: project-euler.common
     ] { } make sum ;
 
 PRIVATE>
+
+: cartesian-product ( seq1 seq2 -- seq1xseq2 )
+    swap [ swap [ 2array ] map-with ] map-with concat ;
 
 : collect-consecutive ( seq width -- seq )
     [

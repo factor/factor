@@ -101,7 +101,7 @@
 			HIGHLIGHT_DIGITS="TRUE"
 			DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
 
-		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
 			<BEGIN>${</BEGIN>
 			<END>}</END>
 		</SPAN>

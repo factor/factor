@@ -1,6 +1,6 @@
 IN: temporary
 USING: sequences inference.transforms tools.test math kernel
-quotations ;
+quotations tools.test.inference ;
 
 : compose-n-quot <repetition> >quotation ;
 : compose-n compose-n-quot call ;
@@ -18,3 +18,5 @@ quotations ;
 [ 268 ] [ 1 { 8 { 3 2 } } bitfield-quot call ] unit-test
 
 [ 512 ] [ 1 { { 1+ 8 } } bitfield-quot call ] unit-test
+
+\ construct-empty must-infer

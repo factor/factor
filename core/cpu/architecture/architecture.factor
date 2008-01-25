@@ -51,14 +51,8 @@ HOOK: %save-dispatch-xt compiler-backend ( -- )
 
 M: object %save-dispatch-xt %save-word-xt ;
 
-! Call C primitive
-HOOK: %call-primitive compiler-backend ( label -- )
-
-! Call another label
-HOOK: %call-label compiler-backend ( label -- )
-
-! Far jump to C primitive
-HOOK: %jump-primitive compiler-backend ( label -- )
+! Call another word
+HOOK: %call compiler-backend ( word -- )
 
 ! Local jump for branches
 HOOK: %jump-label compiler-backend ( label -- )

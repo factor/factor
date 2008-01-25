@@ -33,7 +33,7 @@
 		</SPAN>
 		
 		<!-- List literals -->
-		<SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE" DELEGATE="LIST">
+		<SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE">
 			<BEGIN>[</BEGIN>
 			<END>]</END>
 		</SPAN>

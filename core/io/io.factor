@@ -35,7 +35,8 @@ GENERIC: stream-write-table ( table-cells style stream -- )
 ! Default stream
 SYMBOL: stdio
 
-: close ( -- ) stdio get stream-close ;
+! Default error stream
+SYMBOL: stderr
 
 : readln ( -- str/f ) stdio get stream-readln ;
 : read1 ( -- ch/f ) stdio get stream-read1 ;
@@ -53,7 +54,9 @@ SYMBOL: stdio
     stdio swap with-variable ; inline
 
 : with-stream ( stream quot -- )
-    swap [ [ close ] [ ] cleanup ] with-stream* ; inline
+    swap [
+        [ stdio get stream-close ] [ ] cleanup
+    ] with-stream* ; inline
 
 : tabular-output ( style quot -- )
     swap >r { } make r> stdio get stream-write-table ; inline

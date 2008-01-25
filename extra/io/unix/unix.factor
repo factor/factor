@@ -1,9 +1,10 @@
-USE: io.unix.backend
-USE: io.unix.files
-USE: io.unix.sockets
-USE: io.unix.launcher
-USE: io.unix.mmap
-USE: io.backend
-USE: namespaces
+USING: io.unix.backend io.unix.files io.unix.sockets
+io.unix.launcher io.unix.mmap io.backend combinators namespaces
+system vocabs.loader ;
 
-T{ unix-io } io-backend set-global
+{
+    { [ bsd? ] [ "io.unix.bsd" ] }
+    { [ macosx? ] [ "io.unix.bsd" ] }
+    { [ linux? ] [ "io.unix.linux" ] }
+    { [ solaris? ] [ "io.unix.solaris" ] }
+} cond require

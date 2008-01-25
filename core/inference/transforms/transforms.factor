@@ -1,8 +1,8 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel words sequences generic math namespaces
 quotations assocs combinators math.bitfields inference.backend
-inference.dataflow inference.state tuples.private ;
+inference.dataflow inference.state tuples.private effects ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )
@@ -61,11 +61,21 @@ M: pair (bitfield-quot) ( spec -- quot )
 
 \ set-slots [ <reversed> [get-slots] ] 1 define-transform
 
-: [construct] ( word quot -- newquot )
-    >r dup +inlined+ depends-on dup tuple-size r> 2curry ;
+\ construct-boa [
+    dup +inlined+ depends-on
+    dup tuple-size [ <tuple-boa> ] 2curry
+] 1 define-transform
 
-\ construct-boa
-[ [ <tuple-boa> ] [construct] ] 1 define-transform
+\ construct-empty [
+    1 ensure-values
+    peek-d value? [
+        pop-literal
+        dup +inlined+ depends-on
+        dup tuple-size [ <tuple> ] 2curry
+        swap infer-quot
+    ] [
+        \ construct-empty 1 1 <effect> make-call-node
+    ] if
+] "infer" set-word-prop
 
-\ construct-empty
-[ [ <tuple> ] [construct] ] 1 define-transform
+\ construct-empty 1 1 <effect> "inferred-effect" set-word-prop

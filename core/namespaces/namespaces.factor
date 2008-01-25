@@ -15,16 +15,16 @@ IN: namespaces
 PRIVATE>
 
 : namespace ( -- namespace ) namestack* peek ;
-: namestack ( -- namestack ) namestack* clone ; inline
-: set-namestack ( namestack -- ) >vector 0 setenv ; inline
+: namestack ( -- namestack ) namestack* clone ;
+: set-namestack ( namestack -- ) >vector 0 setenv ;
 : global ( -- g ) 21 getenv { hashtable } declare ; inline
 : init-namespaces ( -- ) global 1array set-namestack ;
 : get ( variable -- value ) namestack* assoc-stack ; flushable
 : set ( value variable -- ) namespace set-at ;
 : on ( variable -- ) t swap set ; inline
 : off ( variable -- ) f swap set ; inline
-: get-global ( variable -- value ) global at ; inline
-: set-global ( value variable -- ) global set-at ; inline
+: get-global ( variable -- value ) global at ;
+: set-global ( value variable -- ) global set-at ;
 
 : change ( variable quot -- )
     >r dup get r> rot slip set ; inline

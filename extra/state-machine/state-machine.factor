@@ -7,7 +7,7 @@ IN: state-machine
     ";" parse-tokens
     [ length ] keep
     unclip add
-    [ create-in swap 1quotation define-compound ] 2each ; parsing
+    [ create-in swap 1quotation define ] 2each ; parsing
 
 TUPLE: state place data ;
 
@@ -27,7 +27,7 @@ M: missing-state error.
 
 : define-machine ( word state-class -- )
     execute make-machine
-    >r over r> define-compound
+    >r over r> define
     "state-table" set-word-prop ;
 
 : MACHINE:
