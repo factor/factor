@@ -74,7 +74,7 @@ M: pair (bitfield-quot) ( spec -- quot )
         dup tuple-size [ <tuple> ] 2curry
         swap infer-quot
     ] [
-        \ construct-empty declared-infer
+        \ construct-empty 1 1 <effect> make-call-node
     ] if
 ] "infer" set-word-prop
 
