@@ -5,7 +5,7 @@ sequences assocs unix unix.kqueue unix.process math namespaces
 combinators threads vectors ;
 IN: io.unix.kqueue
 
-TUPLE: kqueue-mx events processes ;
+TUPLE: kqueue-mx events ;
 
 : max-events ( -- n )
     #! We read up to 256 events at a time. This is an arbitrary
@@ -15,7 +15,6 @@ TUPLE: kqueue-mx events processes ;
 : <kqueue-mx> ( -- mx )
     kqueue-mx construct-mx
     kqueue dup io-error over set-mx-fd
-    H{ } clone over set-kqueue-mx-processes
     max-events "kevent" <c-array> over set-kqueue-mx-events ;
 
 GENERIC: io-task-filter ( task -- n )
@@ -52,9 +51,8 @@ M: kqueue-mx unregister-io-task ( task mx -- )
     over mx-reads at handle-io-task ;
 
 : kevent-proc-task ( mx pid -- )
-    dup (wait-for-pid) spin kqueue-mx-processes delete-at* [
-        [ schedule-thread-with ] with each
-    ] [ 2drop ] if ;
+    dup (wait-for-pid) swap find-process
+    dup [ notify-exit ] [ 2drop ] if ;
 
 : handle-kevent ( mx kevent -- )
     dup kevent-ident swap kevent-filter {
@@ -76,11 +74,5 @@ M: kqueue-mx wait-for-events ( ms mx -- )
     EVFILT_PROC over set-kevent-filter
     NOTE_EXIT over set-kevent-fflags ;
 
-: add-pid-task ( continuation pid mx -- )
-    2dup kqueue-mx-processes at* [
-        2nip push
-    ] [
-        drop
-        over make-proc-kevent over register-kevent
-        >r >r 1vector r> r> kqueue-mx-processes set-at
-    ] if ;
+: add-pid-task ( pid mx -- )
+    swap make-proc-kevent swap register-kevent ;

@@ -10,9 +10,6 @@ INSTANCE: linux-io unix-io
 
 M: linux-io init-io ( -- )
     <select-mx> mx set-global
-    start-wait-loop ;
-
-M: linux-io wait-for-process ( pid -- status )
-    wait-for-pid ;
+    start-wait-thread ;
 
 T{ linux-io } set-io-backend
