@@ -84,7 +84,7 @@ M: unix-io process-stream*
 ! On BSD and Mac OS X, we use kqueue() which scales better.
 : wait-for-processes ( -- ? )
     -1 0 <int> tuck WNOHANG waitpid
-    dup zero? [
+    dup 0 <= [
         2drop t
     ] [
         find-process dup [
