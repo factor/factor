@@ -98,8 +98,6 @@ MACRO: nfirst ( n -- )
 
 : count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
 
-: all-unique? ( seq -- ? ) [ prune ] keep [ length ] 2apply = ;
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! short circuiting words
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
