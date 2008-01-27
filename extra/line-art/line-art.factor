@@ -11,7 +11,7 @@ TUPLE: line-art-gadget
     framebuffer color-texture normal-texture depth-texture framebuffer-dim ;
 
 : <line-art-gadget> ( -- line-art-gadget )
-    0.0 0.0 0.375 <demo-gadget>
+    40.0 -5.0 0.275 <demo-gadget>
     maybe-download read-model
     { set-delegate set-line-art-gadget-model } line-art-gadget construct ;
 
@@ -57,62 +57,79 @@ uniform sampler2D colormap, normalmap, depthmap;
 uniform vec4 line_color;
 varying vec2 coord;
 
-const float DEPTH_RATIO_THRESHOLD = 2.0, NORMAL_DOT_THRESHOLD = 0.95, SAMPLE_SPREAD = 1.0/1024.0;
+const float DEPTH_RATIO_THRESHOLD = 1.001, NORMAL_DOT_THRESHOLD = 1.0, SAMPLE_SPREAD = 1.0/512.0;
 
 bool
 is_normal_border(vec3 norm1, vec3 norm2)
 {
     return dot(norm1, norm2) < NORMAL_DOT_THRESHOLD;
 }
-bool
-is_depth_border(float depth1, float depth2)
+
+float
+depth_sample(vec2 c)
 {
-    float ratio = depth1/depth2;
-    return 1.0/DEPTH_RATIO_THRESHOLD > ratio || ratio > DEPTH_RATIO_THRESHOLD;
+    return texture2D(depthmap, c).x;
+}
+bool
+are_depths_border(vec3 depths)
+{
+    return any(lessThan(depths, vec3(1.0/DEPTH_RATIO_THRESHOLD)))
+        || any(greaterThan(depths, vec3(DEPTH_RATIO_THRESHOLD)));
 }
 
-bool
-is_border(vec2 coord)
+vec3
+normal_sample(vec2 c)
 {
-    vec2 coord1 = coord + vec2(-SAMPLE_SPREAD, -SAMPLE_SPREAD),
-         coord2 = coord + vec2( SAMPLE_SPREAD, -SAMPLE_SPREAD),
-         coord3 = coord + vec2(-SAMPLE_SPREAD,  SAMPLE_SPREAD),
-         coord4 = coord + vec2( SAMPLE_SPREAD,  SAMPLE_SPREAD);
+    return texture2D(normalmap, c).xyz;
+}
+
+float
+min6(float a, float b, float c, float d, float e, float f)
+{
+    return min(min(min(min(min(a, b), c), d), e), f);
+}
+
+float
+border_factor(vec2 c)
+{
+    vec2 coord1 = c + vec2(-SAMPLE_SPREAD, -SAMPLE_SPREAD),
+         coord2 = c + vec2( SAMPLE_SPREAD, -SAMPLE_SPREAD),
+         coord3 = c + vec2(-SAMPLE_SPREAD,  SAMPLE_SPREAD),
+         coord4 = c + vec2( SAMPLE_SPREAD,  SAMPLE_SPREAD);
     
-    /* This border checking code is meant to be easy to follow rather than blazingly fast.
-     * The normal/depth checks could be easily parallelized into matrix or vector operations to
-     * improve performance. */
-    vec3 normal1 = texture2D(normalmap, coord1).xyz,
-         normal2 = texture2D(normalmap, coord2).xyz,
-         normal3 = texture2D(normalmap, coord3).xyz,
-         normal4 = texture2D(normalmap, coord4).xyz;
-    float depth1 = texture2D(depthmap, coord1).x,
-          depth2 = texture2D(depthmap, coord2).x,
-          depth3 = texture2D(depthmap, coord3).x,
-          depth4 = texture2D(depthmap, coord4).x;
+    vec4 depths = vec4(depth_sample(coord1),
+                       depth_sample(coord2),
+                       depth_sample(coord3),
+                       depth_sample(coord4));
+    if (depths == vec4(1, 1, 1, 1))
+        return 0.0;
     
-    return (depth1 < 1.0 || depth2 < 1.0 || depth3 < 1.0 || depth4 < 1.0)
-        && (is_normal_border(normal1, normal2)
-            || is_normal_border(normal1, normal3)
-            || is_normal_border(normal1, normal4)
-            || is_normal_border(normal2, normal3)
-            || is_normal_border(normal2, normal4)
-            || is_normal_border(normal3, normal4)
-            /* || is_depth_border(depth1, depth2)
-            || is_depth_border(depth1, depth3)
-            || is_depth_border(depth1, depth4)
-            || is_depth_border(depth2, depth3)
-            || is_depth_border(depth2, depth4)
-            || is_depth_border(depth3, depth4) */
-        );
+    vec3 ratios1 = depths.xxx/depths.yzw, ratios2 = depths.yyz/depths.zww;
+    
+    if (are_depths_border(ratios1) || are_depths_border(ratios2))
+        return 1.0;
+    
+    vec3 normal1 = normal_sample(coord1),
+         normal2 = normal_sample(coord2),
+         normal3 = normal_sample(coord3),
+         normal4 = normal_sample(coord4);
+    
+    float normal_border = 1.0 - min6(
+        dot(normal1, normal2),
+        dot(normal1, normal3),
+        dot(normal1, normal4),
+        dot(normal2, normal3),
+        dot(normal2, normal4),
+        dot(normal3, normal4)
+    );
+    
+    return normal_border;
 }
 
 void
 main()
 {
-    gl_FragColor = is_border(coord)
-        ? line_color
-        : texture2D(colormap, coord);
+    gl_FragColor = mix(texture2D(colormap, coord), line_color, border_factor(coord));
 }
 
 ;
@@ -191,7 +208,8 @@ M: line-art-gadget ungraft* ( gadget -- )
     0.0 0.0 0.0 1.0 glClearColor
     GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
     dup demo-gadget-set-matrices
-    dup line-art-remake-framebuffer-if-needed gl-error ;
+    dup line-art-remake-framebuffer-if-needed
+    gl-error ;
 
 : line-art-clear-framebuffer ( -- )
     GL_COLOR_ATTACHMENT0_EXT glDrawBuffer
@@ -219,7 +237,8 @@ M: line-art-gadget draw-gadget* ( gadget -- )
     line-art-gadget-step2-program dup [
         { [ "colormap"  glGetUniformLocation 0 glUniform1i ]
           [ "normalmap" glGetUniformLocation 1 glUniform1i ]
-          [ "depthmap"  glGetUniformLocation 2 glUniform1i ] } call-with
+          [ "depthmap"  glGetUniformLocation 2 glUniform1i ]
+          [ "line_color" glGetUniformLocation 0.2 0.0 0.0 1.0 glUniform4f ] } call-with
         { -1.0 -1.0 } { 1.0 1.0 } draw-rectangle
     ] with-gl-program ;
 

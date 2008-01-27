@@ -135,8 +135,8 @@ IN: opengl
 
 : with-framebuffer ( id quot -- )
     GL_FRAMEBUFFER_EXT rot glBindFramebufferEXT
-    call
-    GL_FRAMEBUFFER_EXT 0 glBindFramebufferEXT ; inline
+    [ call ]
+    [ GL_FRAMEBUFFER_EXT 0 glBindFramebufferEXT ] [ ] cleanup ; inline
 
 : bind-texture-unit ( id target unit -- )
     glActiveTexture swap glBindTexture gl-error ;
