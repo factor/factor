@@ -202,7 +202,7 @@ TUPLE: WSARecvFrom-args port
 : parse-WSARecvFrom ( n WSARecvFrom -- packet addrspec )
     [
         WSARecvFrom-args-lpBuffers* WSABUF-buf
-        swap memory>string >byte-array
+        swap memory>byte-array
     ] keep
     [ WSARecvFrom-args-lpFrom* ] keep
     WSARecvFrom-args-port datagram-port-addr parse-sockaddr ;

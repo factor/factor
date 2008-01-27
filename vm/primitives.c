@@ -150,8 +150,6 @@ void *primitives[] = {
 	primitive_alien_to_u16_string,
 	primitive_string_to_u16_alien,
 	primitive_throw,
-	primitive_char_string_to_memory,
-	primitive_memory_to_char_string,
 	primitive_alien_address,
 	primitive_slot,
 	primitive_set_slot,

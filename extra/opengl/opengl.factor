@@ -191,7 +191,7 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 : c-true? ( int -- ? ) zero? not ; inline
 
 : with-gl-shader-source-ptr ( string quot -- )
-    swap dup length 1+ [ tuck string>memory <void*> swap call ] with-malloc ; inline
+    swap dup length 1+ [ tuck string>char-memory <void*> swap call ] with-malloc ; inline
 
 : <gl-shader> ( source kind -- shader )
     glCreateShader dup rot [ 1 swap f glShaderSource ] with-gl-shader-source-ptr

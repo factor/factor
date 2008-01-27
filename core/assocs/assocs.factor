@@ -77,8 +77,11 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : rename-at ( newkey key assoc -- )
     tuck delete-at* [ -rot set-at ] [ 3drop ] if ;
 
-: delete-any ( assoc -- element )
-    [ [ 2drop t ] assoc-find 2drop dup ] keep delete-at ;
+: delete-any ( assoc -- key value )
+    [
+        [ 2drop t ] assoc-find
+        [ "Assoc is empty" throw ] unless over
+    ] keep delete-at ;
 
 : assoc-empty? ( assoc -- ? )
     assoc-size zero? ;

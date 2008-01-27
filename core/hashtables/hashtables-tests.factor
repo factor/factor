@@ -160,3 +160,6 @@ H{ } "x" set
     H{ { 1 "one" } { 2 "two" } }
     { 1 2 3 } clone [ substitute ] keep
 ] unit-test
+
+[ f ] [ { 0 1 1 2 3 5 } all-unique? ] unit-test
+[ t ] [ { 0 1 2 3 4 5 } all-unique? ] unit-test
