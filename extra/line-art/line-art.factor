@@ -223,7 +223,7 @@ M: line-art-gadget draw-gadget* ( gadget -- )
     line-art-draw-setup
     dup line-art-gadget-framebuffer [
         line-art-clear-framebuffer
-        GL_COLOR_ATTACHMENT0_EXT GL_COLOR_ATTACHMENT1_EXT 2array set-draw-buffers
+        { GL_COLOR_ATTACHMENT0_EXT GL_COLOR_ATTACHMENT1_EXT } set-draw-buffers
         dup line-art-gadget-step1-program dup [
             "color" glGetUniformLocation 0.6 0.5 0.5 1.0 glUniform4f
             0.0 -0.12 0.0 glTranslatef
@@ -239,7 +239,7 @@ M: line-art-gadget draw-gadget* ( gadget -- )
           [ "normalmap" glGetUniformLocation 1 glUniform1i ]
           [ "depthmap"  glGetUniformLocation 2 glUniform1i ]
           [ "line_color" glGetUniformLocation 0.2 0.0 0.0 1.0 glUniform4f ] } call-with
-        { -1.0 -1.0 } { 1.0 1.0 } draw-rectangle
+        { -1.0 -1.0 } { 1.0 1.0 } rect-vertices
     ] with-gl-program ;
 
 : line-art-window ( -- )

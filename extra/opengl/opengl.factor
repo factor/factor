@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types continuations kernel libc math namespaces sequences
-math.vectors math.constants math.functions opengl.gl opengl.glu
-combinators arrays ;
+USING: alien alien.c-types continuations kernel libc math macros namespaces
+math.vectors math.constants math.functions opengl.gl opengl.glu words
+combinators arrays sequences ;
 IN: opengl
 
 : coordinates [ first2 ] 2apply ;
@@ -115,7 +115,7 @@ IN: opengl
 : delete-buffer ( id -- )
     [ glDeleteBuffers ] (delete-gl-object) ;
 
-: framebuffer-incomplete? ( -- ? )
+: framebuffer-incomplete? ( -- status/f )
     GL_FRAMEBUFFER_EXT glCheckFramebufferStatusEXT
     dup GL_FRAMEBUFFER_COMPLETE_EXT = f rot ? ;
 
@@ -145,8 +145,11 @@ IN: opengl
     GL_FRAMEBUFFER_EXT swap GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT
     0 <uint> [ glGetFramebufferAttachmentParameterivEXT ] keep *uint ;
     
-: set-draw-buffers ( buffers -- )
+: (set-draw-buffers) ( buffers -- )
     dup length swap >c-uint-array glDrawBuffers ;
+
+MACRO: set-draw-buffers ( buffers -- )
+    [ dup word? [ execute ] [ ] if ] map [ (set-draw-buffers) ] curry ;
 
 : do-attribs ( bits quot -- )
     swap glPushAttrib call glPopAttrib ; inline
@@ -206,7 +209,7 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     swap sprite-loc v- gl-translate
     GL_TEXTURE_2D 0 glBindTexture ;
 
-: draw-rectangle ( lower-left upper-right -- )
+: rect-vertices ( lower-left upper-right -- )
     GL_QUADS [
         over first2 glVertex2d
         dup first pick second glVertex2d
