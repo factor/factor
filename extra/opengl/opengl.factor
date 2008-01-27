@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! Portions copyright (C) 2007 Eduardo Cavazos.
+! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types kernel libc math namespaces sequences
-math.vectors math.constants math.functions opengl.gl opengl.glu
-combinators arrays ;
+USING: alien alien.c-types byte-arrays kernel libc math
+namespaces sequences math.vectors math.constants math.functions
+opengl.gl opengl.glu combinators arrays ;
 IN: opengl
 
 : coordinates [ first2 ] 2apply ;
@@ -191,10 +192,13 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 : c-true? ( int -- ? ) zero? not ; inline
 
 : with-gl-shader-source-ptr ( string quot -- )
-    swap dup length 1+ [ tuck string>char-memory <void*> swap call ] with-malloc ; inline
+    swap >byte-array malloc-byte-array [
+        <void*> swap call
+    ] keep free ; inline
 
 : <gl-shader> ( source kind -- shader )
-    glCreateShader dup rot [ 1 swap f glShaderSource ] with-gl-shader-source-ptr
+    glCreateShader dup rot
+    [ 1 swap f glShaderSource ] with-gl-shader-source-ptr
     [ glCompileShader ] keep
     gl-error ;
 
@@ -211,19 +215,27 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     GL_VERTEX_SHADER <gl-shader> ; inline
 
 : (vertex-shader?) ( object -- ? )
-    dup (gl-shader?) [ GL_SHADER_TYPE gl-shader-get-int GL_VERTEX_SHADER = ] [ drop f ] if ;
+    dup (gl-shader?)
+    [ GL_SHADER_TYPE gl-shader-get-int GL_VERTEX_SHADER = ]
+    [ drop f ] if ;
 
 : <fragment-shader> ( source -- fragment-shader )
     GL_FRAGMENT_SHADER <gl-shader> ; inline
 
 : (fragment-shader?) ( object -- ? )
-    dup (gl-shader?) [ GL_SHADER_TYPE gl-shader-get-int GL_FRAGMENT_SHADER = ] [ drop f ] if ;
+    dup (gl-shader?)
+    [ GL_SHADER_TYPE gl-shader-get-int GL_FRAGMENT_SHADER = ]
+    [ drop f ] if ;
 
 : gl-shader-info-log-length ( shader -- log-length )
     GL_INFO_LOG_LENGTH gl-shader-get-int ; inline
 
 : gl-shader-info-log ( shader -- log )
-    dup gl-shader-info-log-length dup [ [ 0 <int> swap glGetShaderInfoLog ] keep alien>char-string ] with-malloc ;
+    dup gl-shader-info-log-length
+    dup [
+        0 <int> over glGetShaderInfoLog
+        alien>char-string
+    ] with-malloc ;
 
 : check-gl-shader ( shader -- shader* )
     dup gl-shader-ok? [ dup gl-shader-info-log throw ] unless ;
@@ -266,17 +278,20 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
     GL_ATTACHED_SHADERS gl-program-get-int ; inline
 
 : gl-program-shaders ( program -- shaders )
-    dup gl-program-shaders-length
-    [ dup "GLuint" <c-array> [ 0 <int> swap glGetAttachedShaders ] keep ] keep
-    c-uint-array> ;
+    dup gl-program-shaders-length [
+        dup "GLuint" <c-array> 0 <int> over glGetAttachedShaders
+    ] keep c-uint-array> ;
 
-: delete-gl-program-only ( program -- ) glDeleteProgram ; inline
+: delete-gl-program-only ( program -- )
+    glDeleteProgram ; inline
 
-: detach-gl-program-shader ( program shader -- ) glDetachShader ; inline
+: detach-gl-program-shader ( program shader -- )
+    glDetachShader ; inline
 
 : delete-gl-program ( program -- )
-    dup gl-program-shaders [ 2dup detach-gl-program-shader delete-gl-shader ] each
-    delete-gl-program-only ;
+    dup gl-program-shaders [
+        2dup detach-gl-program-shader delete-gl-shader
+    ] each delete-gl-program-only ;
 
 : with-gl-program ( program quot -- )
     swap glUseProgram call 0 glUseProgram ; inline
