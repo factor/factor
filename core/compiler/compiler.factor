@@ -42,9 +42,6 @@ IN: compiler
     [ dupd compile-failed f save-effect ]
     recover ;
 
-: delete-any ( assoc -- element )
-    [ [ 2drop t ] assoc-find 2drop dup ] keep delete-at ;
-
 : compile-loop ( assoc -- )
     dup assoc-empty? [ drop ] [
         dup delete-any (compile)
