@@ -7,18 +7,18 @@ IN: assocs.lib
 : >set ( seq -- hash )
     [ dup ] H{ } map>assoc ;
 
-: ref-hash ( table key -- value ) swap at ;
+: ref-at ( table key -- value ) swap at ;
 
-! set-hash with alternative stack effects
+! set-at with alternative stack effects
 
-: put-hash* ( table key value -- ) spin set-at ;
+: put-at* ( table key value -- ) swap rot set-at ;
 
-: put-hash ( table key value -- table ) swap pick set-at ;
+: put-at ( table key value -- table ) swap pick set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: set-hash-stack ( value key seq -- )
-    dupd [ key? ] with find-last nip set-at ;
+: set-assoc-stack ( value key seq -- )
+  dupd [ key? ] with find-last nip set-at ;
 
 : at-default ( key assoc -- value/key )
     dupd at [ nip ] when* ;
