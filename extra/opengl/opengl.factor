@@ -2,9 +2,9 @@
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types byte-arrays kernel libc math
-namespaces sequences math.vectors math.constants math.functions
-opengl.gl opengl.glu combinators arrays ;
+USING: alien alien.c-types continuations kernel libc math macros namespaces
+math.vectors math.constants math.functions math.parser opengl.gl opengl.glu
+combinators arrays sequences splitting words ;
 IN: opengl
 
 : coordinates [ first2 ] 2apply ;
@@ -94,8 +94,63 @@ IN: opengl
         ] 2each 2drop
     ] do-state ;
 
+: (gen-gl-object) ( quot -- id )
+    >r 1 0 <uint> r> keep *uint ; inline
 : gen-texture ( -- id )
-    1 0 <uint> [ glGenTextures ] keep *uint ;
+    [ glGenTextures ] (gen-gl-object) ;
+: gen-framebuffer ( -- id )
+    [ glGenFramebuffersEXT ] (gen-gl-object) ;
+: gen-renderbuffer ( -- id )
+    [ glGenRenderbuffersEXT ] (gen-gl-object) ;
+: gen-buffer ( -- id )
+    [ glGenBuffers ] (gen-gl-object) ;
+
+: (delete-gl-object) ( id quot -- )
+    >r 1 swap <uint> r> call ; inline
+: delete-texture ( id -- )
+    [ glDeleteTextures ] (delete-gl-object) ;
+: delete-framebuffer ( id -- )
+    [ glDeleteFramebuffersEXT ] (delete-gl-object) ;
+: delete-renderbuffer ( id -- )
+    [ glDeleteRenderbuffersEXT ] (delete-gl-object) ;
+: delete-buffer ( id -- )
+    [ glDeleteBuffers ] (delete-gl-object) ;
+
+: framebuffer-incomplete? ( -- status/f )
+    GL_FRAMEBUFFER_EXT glCheckFramebufferStatusEXT
+    dup GL_FRAMEBUFFER_COMPLETE_EXT = f rot ? ;
+
+: framebuffer-error ( status -- * )
+    { { GL_FRAMEBUFFER_COMPLETE_EXT [ "framebuffer complete" ] }
+      { GL_FRAMEBUFFER_UNSUPPORTED_EXT [ "framebuffer configuration unsupported" ] }
+      { GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT [ "framebuffer incomplete (incomplete attachment)" ] }
+      { GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT [ "framebuffer incomplete (missing attachment)" ] }
+      { GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT [ "framebuffer incomplete (dimension mismatch)" ] }
+      { GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT [ "framebuffer incomplete (format mismatch)" ] }
+      { GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT [ "framebuffer incomplete (draw buffer(s) have no attachment)" ] }
+      { GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT [ "framebuffer incomplete (read buffer has no attachment)" ] }
+      [ drop gl-error "unknown framebuffer error" ] } case throw ;
+
+: check-framebuffer ( -- )
+    framebuffer-incomplete? [ framebuffer-error ] when* ;
+
+: with-framebuffer ( id quot -- )
+    GL_FRAMEBUFFER_EXT rot glBindFramebufferEXT
+    [ call ]
+    [ GL_FRAMEBUFFER_EXT 0 glBindFramebufferEXT ] [ ] cleanup ; inline
+
+: bind-texture-unit ( id target unit -- )
+    glActiveTexture swap glBindTexture gl-error ;
+
+: framebuffer-attachment ( attachment -- id )
+    GL_FRAMEBUFFER_EXT swap GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT
+    0 <uint> [ glGetFramebufferAttachmentParameterivEXT ] keep *uint ;
+    
+: (set-draw-buffers) ( buffers -- )
+    dup length swap >c-uint-array glDrawBuffers ;
+
+MACRO: set-draw-buffers ( buffers -- )
+    [ dup word? [ execute ] [ ] if ] map [ (set-draw-buffers) ] curry ;
 
 : do-attribs ( bits quot -- )
     swap glPushAttrib call glPopAttrib ; inline
@@ -121,7 +176,7 @@ TUPLE: sprite loc dim dim2 dlist texture ;
             GL_UNSIGNED_BYTE r> glTexImage2D
         ] do-attribs
     ] keep ;
-
+    
 : gen-dlist ( -- id ) 1 glGenLists ;
 
 : make-dlist ( type quot -- id )
@@ -155,6 +210,14 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     swap sprite-loc v- gl-translate
     GL_TEXTURE_2D 0 glBindTexture ;
 
+: rect-vertices ( lower-left upper-right -- )
+    GL_QUADS [
+        over first2 glVertex2d
+        dup first pick second glVertex2d
+        dup first2 glVertex2d
+        swap first swap second glVertex2d
+    ] do-state ;
+
 : make-sprite-dlist ( sprite -- id )
     GL_MODELVIEW [
         GL_COMPILE [ draw-sprite ] make-dlist
@@ -168,7 +231,7 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 
 : free-sprite ( sprite -- )
     dup sprite-dlist delete-dlist
-    sprite-texture <uint> 1 swap glDeleteTextures ;
+    sprite-texture delete-texture ;
 
 : free-sprites ( sprites -- ) [ [ free-sprite ] when* ] each ;
 
@@ -253,7 +316,7 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
     [ dupd glAttachShader ] each
     [ glLinkProgram ] keep
     gl-error ;
-
+    
 : (gl-program?) ( object -- ? )
     dup integer? [ glIsProgram c-true? ] [ drop f ] if ;
 
@@ -294,6 +357,70 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
     ] each delete-gl-program-only ;
 
 : with-gl-program ( program quot -- )
-    swap glUseProgram call 0 glUseProgram ; inline
+    swap glUseProgram [ call ] [ 0 glUseProgram ] [ ] cleanup ; inline
 
 PREDICATE: integer gl-program (gl-program?) ;
+
+: <simple-gl-program> ( vertex-shader-source fragment-shader-source -- program )
+    >r <vertex-shader> check-gl-shader
+    r> <fragment-shader> check-gl-shader
+    2array <gl-program> check-gl-program ;
+
+: (require-gl) ( thing require-quot make-error-quot -- )
+    >r dupd call
+    [ r> 2drop ]
+    [ r> " " make throw ]
+    if ; inline
+
+: gl-extensions ( -- seq )
+    GL_EXTENSIONS glGetString " " split ;
+: has-gl-extensions? ( extensions -- ? )
+    gl-extensions subseq? ;
+: (make-gl-extensions-error) ( required-extensions -- )
+    gl-extensions swap seq-diff
+    "Required OpenGL extensions not supported:\n" %
+    [ "    " % % "\n" % ] each ;
+: require-gl-extensions ( extensions -- )
+    [ has-gl-extensions? ]
+    [ (make-gl-extensions-error) ]
+    (require-gl) ;
+
+: version-seq ( version-string -- version-seq )
+    "." split [ string>number ] map ;
+
+: version<=> ( version1 version2 -- n )
+    swap version-seq swap version-seq <=> ;
+
+: (gl-version) ( -- version vendor )
+    GL_VERSION glGetString " " split1 ;
+: gl-version ( -- version )
+    (gl-version) drop ;
+: gl-vendor-version ( -- version )
+    (gl-version) nip ;
+: has-gl-version? ( version -- ? )
+    gl-version version<=> 0 <= ;
+: (make-gl-version-error) ( required-version -- )
+    "Required OpenGL version " % % " not supported (" % gl-version % " available)" % ;
+: require-gl-version ( version -- )
+    [ has-gl-version? ]
+    [ (make-gl-version-error) ]
+    (require-gl) ;
+
+: (glsl-version) ( -- version vendor )
+    GL_SHADING_LANGUAGE_VERSION glGetString " " split1 ;
+: glsl-version ( -- version )
+    (glsl-version) drop ;
+: glsl-vendor-version ( -- version )
+    (glsl-version) nip ;
+: has-glsl-version? ( version -- ? )
+    glsl-version version<=> 0 <= ;
+: require-glsl-version ( version -- )
+    [ has-glsl-version? ]
+    [ "Required GLSL version " % % " not supported (" % glsl-version % " available)" % ]
+    (require-gl) ;
+
+: require-gl-version-or-extensions ( version extensions -- )
+    2array [ first2 has-gl-extensions? swap has-gl-version? or ]
+    [ dup first (make-gl-version-error) "\n" %
+      second (make-gl-extensions-error) "\n" % ]
+    (require-gl) ;
