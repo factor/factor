@@ -48,12 +48,7 @@ TUPLE: io-callback port continuation ;
 C: <io-callback> io-callback
 
 : (make-overlapped) ( -- overlapped-ext )
-    "OVERLAPPED" malloc-object dup free-always
-    0 over set-OVERLAPPED-internal
-    0 over set-OVERLAPPED-internal-high
-    0 over set-OVERLAPPED-offset-high
-    0 over set-OVERLAPPED-offset
-    f over set-OVERLAPPED-event ;
+    "OVERLAPPED" malloc-object dup free-always ;
 
 : make-overlapped ( port -- overlapped-ext )
     >r (make-overlapped) r> port-handle win32-file-ptr

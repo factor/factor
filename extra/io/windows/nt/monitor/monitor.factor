@@ -37,21 +37,20 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
 M: windows-nt-io close-monitor ( monitor -- ) stream-close ;
 
 : begin-reading-changes ( monitor -- overlapped )
-    [
-        dup port-handle win32-file-handle
-        over buffer-ptr
-        pick buffer-size
-        roll monitor-recursive? 1 0 ?
-        FILE_NOTIFY_CHANGE_ALL
-        0 <uint>
-        f
-        (make-overlapped)
-        [ ReadDirectoryChangesW win32-error=0/f ] keep
-    ] with-destructors ;
+    dup port-handle win32-file-handle
+    over buffer-ptr
+    pick buffer-size
+    roll monitor-recursive? 1 0 ?
+    FILE_NOTIFY_CHANGE_ALL
+    0 <uint>
+    (make-overlapped)
+    [ f ReadDirectoryChangesW win32-error=0/f ] keep ;
 
 : read-changes ( monitor -- bytes )
-    dup begin-reading-changes swap [ save-callback ] 2keep
-    get-overlapped-result ;
+    [
+        dup begin-reading-changes swap [ save-callback ] 2keep
+        get-overlapped-result
+    ] with-destructors ;
 
 : parse-action-flag ( action mask symbol -- action )
     >r over bitand 0 > [ r> , ] [ r> drop ] if ;
