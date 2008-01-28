@@ -162,6 +162,11 @@ TUPLE: WSARecvFrom-args port
        s* lpBuffers* dwBufferCount* lpNumberOfBytesRecvd*
        lpFlags* lpFrom* lpFromLen* lpOverlapped* lpCompletionRoutine* ;
 
+: make-receive-buffer ( -- WSABUF )
+    "WSABUF" malloc-object dup free-always
+    default-buffer-size get over set-WSABUF-len
+    default-buffer-size get malloc dup free-always over set-WSABUF-buf ;
+
 : init-WSARecvFrom ( datagram WSARecvFrom -- )
     [ set-WSARecvFrom-args-port ] 2keep
     [
@@ -172,11 +177,7 @@ TUPLE: WSARecvFrom-args port
         2dup >r malloc dup free-always r> set-WSARecvFrom-args-lpFrom*
         >r malloc-int dup free-always r> set-WSARecvFrom-args-lpFromLen*
     ] keep
-    "WSABUF" malloc-object dup free-always
-    2dup swap set-WSARecvFrom-args-lpBuffers*
-    default-buffer-size get [ malloc dup free-always ] keep
-    pick set-WSABUF-len
-    swap set-WSABUF-buf
+    make-receive-buffer over set-WSARecvFrom-args-lpBuffers*
     1 over set-WSARecvFrom-args-dwBufferCount*
     0 malloc-int dup free-always over set-WSARecvFrom-args-lpFlags*
     0 malloc-int dup free-always over set-WSARecvFrom-args-lpNumberOfBytesRecvd*
@@ -215,26 +216,29 @@ TUPLE: WSASendTo-args port
        s* lpBuffers* dwBufferCount* lpNumberOfBytesSent*
        dwFlags* lpTo* iToLen* lpOverlapped* lpCompletionRoutine* ;
 
+: make-send-buffer ( packet -- WSABUF )
+    "WSABUF" malloc-object dup free-always
+    over malloc-byte-array dup free-always over set-WSABUF-buf
+    swap length over set-WSABUF-len ;
+
 : init-WSASendTo ( packet addrspec datagram WSASendTo -- )
     [ set-WSASendTo-args-port ] 2keep
     [
-        >r delegate port-handle win32-file-handle r>
-        set-WSASendTo-args-s*
-    ] keep [
+        >r port-handle win32-file-handle r> set-WSASendTo-args-s*
+    ] keep
+    [
         >r make-sockaddr/size >r
         malloc-byte-array dup free-always
         r> r>
         [ set-WSASendTo-args-iToLen* ] keep
         set-WSASendTo-args-lpTo*
-    ] keep [
-        "WSABUF" malloc-object dup free-always
-        dup rot set-WSASendTo-args-lpBuffers*
-        swap [ malloc-byte-array dup free-always ] keep length
-        rot [ set-WSABUF-len ] keep
-        set-WSABUF-buf
+    ] keep
+    [
+        >r make-send-buffer r> set-WSASendTo-args-lpBuffers*
     ] keep
     1 over set-WSASendTo-args-dwBufferCount*
     0 over set-WSASendTo-args-dwFlags*
+    0 <uint> over set-WSASendTo-args-lpNumberOfBytesSent*
     (make-overlapped) swap set-WSASendTo-args-lpOverlapped* ;
 
 : WSASendTo-continuation ( WSASendTo -- )
