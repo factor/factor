@@ -39,7 +39,7 @@ HELP: gl-rect
 
 HELP: rect-vertices
 { $values { "lower-left" "A pair of numbers indicating the lower-left coordinates of the rectangle." } { "upper-right" "The upper-right coordinates of the rectangle." } }
-{ $description "Emits" { $link glVertex2d } " calls outlining the axis-aligned rectangle from " { $snippet "lower-left" } to { $snippet "upper-right" } " on the z=0 plane in counterclockwise order." } ;
+{ $description "Emits" { $link glVertex2d } " calls outlining the axis-aligned rectangle from " { $snippet "lower-left" } " to " { $snippet "upper-right" } " on the z=0 plane in counterclockwise order." } ;
 
 HELP: gl-fill-poly
 { $values { "points" "a sequence of pairs of integers" } }
@@ -99,14 +99,14 @@ HELP: check-framebuffer
 
 HELP: with-framebuffer
 { $values { "id" "The id of a framebuffer object." } { "quot" "a quotation" } }
-{ $description "Binds framebuffer " { $snippet "id" } " while calling " { $snippet "quot" } ", restoring the window framebuffer when finished." } ;
+{ $description "Binds framebuffer " { $snippet "id" } " in the dynamic extent of " { $snippet "quot" } ", restoring the window framebuffer when finished." } ;
 
 HELP: bind-texture-unit
 { $values { "id" "The id of a texture object." } { "target" "The texture target (e.g., " { $snippet "GL_TEXTURE_2D" } ")" } { "unit" "The texture unit to bind (e.g., " { $snippet "GL_TEXTURE0" } ")" } }
 { $description "Binds texture " { $snippet "id" } " to texture target " { $snippet "target" } " of texture unit " { $snippet "unit" } ". Equivalent to " { $snippet "unit glActiveTexture target id glBindTexture" } "." } ;
 
 HELP: set-draw-buffers
-{ $values { "buffers" "A sequence of buffer words (e.g. " { $snippet GL_BACK } ", " { $snippet GL_COLOR_ATTACHMENT0_EXT } ")"} }
+{ $values { "buffers" "A sequence of buffer words (e.g. " { $snippet "GL_BACK" } ", " { $snippet "GL_COLOR_ATTACHMENT0_EXT" } ")"} }
 { $description "Wrapper for " { $link glDrawBuffers } ". Sets up the buffers named in the sequence for simultaneous drawing." } ;
 
 HELP: do-attribs
@@ -242,11 +242,66 @@ HELP: delete-gl-program
 
 HELP: with-gl-program
 { $values { "program" "A " { $link gl-program } " object" } { "quot" "A quotation" } }
-{ $description "Enables " { $snippet "program" } " for all OpenGL calls made in " { $snippet "quot" } ". The fixed-function pipeline is restored at the end of " { $snippet "quot" } "." } ;
+{ $description "Enables " { $snippet "program" } " for all OpenGL calls made in the dynamic extent of " { $snippet "quot" } ". The fixed-function pipeline is restored at the end of " { $snippet "quot" } "." } ;
+
+HELP: gl-version
+{ $values { "version" "The version string from the OpenGL implementation" } }
+{ $description "Wrapper for " { $snippet "GL_VERSION glGetString" } " that removes the vendor-specific information from the version string." } ;
+
+HELP: gl-vendor-version
+{ $values { "version" "The vendor-specific version information from the OpenGL implementation" } }
+{ $description "Wrapper for " { $snippet "GL_VERSION glGetString" } " that returns only the vendor-specific information from the version string." } ;
+
+HELP: has-gl-version?
+{ $values { "version" "A version string" } { "?" "A boolean value" } }
+{ $description "Compares the version string returned by " { $link gl-version } " to " { $snippet "version" } ". Returns true if the implementation version meets or exceeds " { $snippet "version" } "." } ;
+
+HELP: require-gl-version
+{ $values { "version" "A version string" } }
+{ $description "Throws an exception if " { $link has-gl-version? } " returns false for " { $snippet "version" } "." } ;
+
+HELP: glsl-version
+{ $values { "version" "The GLSL version string from the OpenGL implementation" } }
+{ $description "Wrapper for " { $snippet "GL_SHADING_LANGUAGE_VERSION glGetString" } " that removes the vendor-specific information from the version string." } ;
+
+HELP: glsl-vendor-version
+{ $values { "version" "The vendor-specific GLSL version information from the OpenGL implementation" } }
+{ $description "Wrapper for " { $snippet "GL_SHADING_LANGUAGE_VERSION glGetString" } " that returns only the vendor-specific information from the version string." } ;
+
+HELP: has-glsl-version?
+{ $values { "version" "A version string" } { "?" "A boolean value" } }
+{ $description "Compares the version string returned by " { $link glsl-version } " to " { $snippet "version" } ". Returns true if the implementation version meets or exceeds " { $snippet "version" } "." } ;
+
+HELP: require-glsl-version
+{ $values { "version" "A version string" } }
+{ $description "Throws an exception if " { $link has-glsl-version? } " returns false for " { $snippet "version" } "." } ;
+
+HELP: gl-extensions
+{ $values { "seq" "A sequence of strings naming the implementation-supported OpenGL extensions" } }
+{ $description "Wrapper for " { $snippet "GL_EXTENSIONS glGetString" } " that returns a sequence of extension names supported by the OpenGL implementation." } ;
+
+HELP: has-gl-extensions?
+{ $values { "extensions" "A sequence of extension name strings" } { "?" "A boolean value" } }
+{ $description "Returns true if the set of " { $snippet "extensions" } " is a subset of the implementation-supported extensions returned by " { $link gl-extensions } "." } ;
+
+HELP: require-gl-extensions
+{ $values { "extensions" "A sequence of extension name strings" } }
+{ $description "Throws an exception if " { $link has-gl-extensions? } " returns false for " { $snippet "extensions" } "." } ;
+
+HELP: require-gl-version-or-extensions
+{ $values { "version" "A version string" } { "extensions" "A sequence of extension name strings" } }
+{ $description "Throws an exception if neither " { $link has-gl-version? } " nor " { $link has-gl-extensions? } " returns true for " { $snippet "version" } " or " { $snippet "extensions" } ", respectively. Intended for use when required OpenGL functionality can be verified either by a minimum version, or a set of equivalent extensions." } ;
+
+{ require-gl-version require-glsl-version require-gl-extensions require-gl-version-or-extensions has-gl-version? has-glsl-version? has-gl-extensions? gl-version glsl-version gl-extensions } related-words
 
 ARTICLE: "gl-utilities" "OpenGL utility words"
 "In addition to the full OpenGL API, the " { $vocab-link "opengl" } " vocabulary includes some utility words to give OpenGL a more Factor-like feel."
 $nl
+"Checking implementation capabilities:"
+{ $subsection require-gl-version }
+{ $subsection require-gl-extensions }
+{ $subsection require-glsl-version }
+{ $subsection require-gl-version-or-extensions }
 "Wrappers:"
 { $subsection gl-color }
 { $subsection gl-vertex }

@@ -58,6 +58,7 @@ main()
     <simple-gl-program> ;
 
 M: cel-shading-gadget graft* ( gadget -- )
+    "2.0" { "GL_ARB_shader_objects" } require-gl-version-or-extensions
     0.0 0.0 0.0 1.0 glClearColor
     GL_CULL_FACE glEnable
     GL_DEPTH_TEST glEnable

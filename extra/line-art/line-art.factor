@@ -187,6 +187,9 @@ main()
     ] if ;
     
 M: line-art-gadget graft* ( gadget -- )
+    "2.0" { "GL_ARB_draw_buffers" "GL_ARB_shader_objects" "GL_ARB_multitexture" }
+    require-gl-version-or-extensions
+    { "GL_EXT_framebuffer_object" } require-gl-extensions
     GL_CULL_FACE glEnable
     GL_DEPTH_TEST glEnable
     (line-art-step1-program) over set-line-art-gadget-step1-program
