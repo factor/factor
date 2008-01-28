@@ -17,7 +17,7 @@ TUPLE: live-search field list ;
 
 : search-gesture ( gesture live-search -- operation/f )
     search-value object-operations
-    [ operation-gesture = ] curry* find nip ;
+    [ operation-gesture = ] with find nip ;
 
 M: live-search handle-gesture* ( gadget gesture delegate -- ? )
     drop over search-gesture dup [
@@ -33,7 +33,8 @@ M: live-search handle-gesture* ( gadget gesture delegate -- ? )
 
 TUPLE: search-field ;
 
-: <search-field> ( -- gadget ) search-field construct-editor ;
+: <search-field> ( -- gadget )
+    <editor> search-field construct-editor ;
 
 search-field H{
     { T{ key-down f f "UP" } [ find-search-list select-previous ] }

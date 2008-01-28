@@ -43,7 +43,7 @@ vectors words assocs combinators sorting ;
         runs [
             [ 0 [ pick score-1 max ] reduce nip ] keep
             length * +
-        ] curry* each
+        ] with each
     ] [
         2drop 0
     ] if ;
@@ -51,7 +51,7 @@ vectors words assocs combinators sorting ;
 : rank-completions ( results -- newresults )
     sort-keys <reversed>
     [ 0 [ first max ] reduce 3 /f ] keep
-    [ first < ] curry* subset
+    [ first < ] with subset
     [ second ] map ;
 
 : complete ( full short -- score )
@@ -66,7 +66,7 @@ vectors words assocs combinators sorting ;
     over empty? [
         nip [ first ] map
     ] [
-        >r >lower r> [ completion ] curry* map rank-completions
+        >r >lower r> [ completion ] with map rank-completions
     ] if ;
 
 : string-completions ( short strs -- seq )

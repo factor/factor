@@ -4,14 +4,13 @@
 USING: kernel system combinators alien alien.syntax ;
 IN: ogg.vorbis
 
-: load-vorbis-library ( -- )
-    "vorbis" {
-        { [ win32? ]  [ "vorbis.dll" ] }
-        { [ macosx? ] [ "libvorbis.0.dylib" ] }
-        { [ unix? ]   [ "libvorbis.so" ] }
-    } cond "cdecl" add-library ; parsing
-
-load-vorbis-library
+<<
+"vorbis" {
+    { [ win32? ]  [ "vorbis.dll" ] }
+    { [ macosx? ] [ "libvorbis.0.dylib" ] }
+    { [ unix? ]   [ "libvorbis.so" ] }
+} cond "cdecl" add-library 
+>>
 
 LIBRARY: vorbis
 

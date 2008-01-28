@@ -1,25 +1,15 @@
 USING: help.markup help.syntax debugger sequences kernel ;
 IN: memory
 
-ARTICLE: "memory" "Object memory"
-"You can query memory status:"
-{ $subsection data-room }
-{ $subsection code-room }
-"There are a pair of combinators, analogous to " { $link each } " and " { $link subset } ", which operate on the entire collection of objects in the object heap:"
-{ $subsection each-object }
-{ $subsection instances }
-"You can check an object's the heap memory usage:"
-{ $subsection size }
-"The garbage collector can be invoked manually:"
-{ $subsection data-gc }
-{ $subsection code-gc }
-"The current image can be saved:"
+ARTICLE: "images" "Images"
+"The current image can be saved; the image contains a complete dump of all data and code in the current Factor instance:"
 { $subsection save }
 { $subsection save-image }
 { $subsection save-image-and-exit }
+"To start Factor with a custom image, use the " { $snippet "-i=" { $emphasis "image" } } " command line switch; see " { $link "runtime-cli-args" } "."
 { $see-also "tools.memory" } ;
 
-ABOUT: "memory"
+ABOUT: "image"
 
 HELP: begin-scan ( -- )
 { $description "Moves all objects to tenured space, disables the garbage collector, and resets the heap scan pointer to point at the first object in the heap. The " { $link next-object } " word can then be called to advance the heap scan pointer and return successive objects."

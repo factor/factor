@@ -1,6 +1,7 @@
-USING: unicode kernel math const combinators splitting
+USING: unicode.categories kernel math const combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
-;
+combinators.lib assocs.lib math.ranges unicode.normalize
+unicode.syntax unicode.data ;
 IN: unicode.breaks
 
 ENUM: Any L V T Extend Control CR LF graphemes ;
@@ -25,17 +26,13 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 : process-other-extend ( lines -- set )
     [ "#" split1 drop ";" split1 drop trim-blank ] map
     [ empty? not ] subset
-    [ ".." split1 [ dup ] unless* [ hex> ] 2apply range ] map
+    [ ".." split1 [ dup ] unless* [ hex> ] 2apply [a,b] ] map
     concat >set ;
 
 : other-extend-lines ( -- lines )
-    "extra/unicode/PropList.txt" resource-path <file-reader> lines ;
+    "extra/unicode/PropList.txt" resource-path file-lines ;
 
 DEFER: other-extend
-: load-other-extend 
-    other-extend-lines process-other-extend
-    \ other-extend define-value ; parsing
-load-other-extend
 
 CATEGORY: (extend) Me Mn ;
 : extend? ( ch -- ? )
@@ -64,13 +61,13 @@ SYMBOL: table
 : disconnect ( class1 class2 -- ) 0 set-table ;
 
 : connect-before ( class classes -- )
-    [ connect ] curry* each ;
+    [ connect ] with each ;
 
 : connect-after ( classes class -- )
     [ connect ] curry each ;
 
 : break-around ( classes1 classes2 -- )
-    [ [ 2dup disconnect swap disconnect ] curry* each ] curry each ;
+    [ [ 2dup disconnect swap disconnect ] with each ] curry each ;
 
 : make-grapheme-table ( -- )
     CR LF connect
@@ -81,11 +78,6 @@ SYMBOL: table
     graphemes Extend connect-after ;
 
 DEFER: grapheme-table
-: load-grapheme-table
-    init-grapheme-table table
-    [ make-grapheme-table finish-table ] with-variable
-    \ grapheme-table define-value ; parsing
-load-grapheme-table
 
 : grapheme-break? ( class1 class2 -- ? )
     grapheme-table nth nth not ;
@@ -127,3 +119,11 @@ load-grapheme-table
 
 : prev-grapheme ( i str -- prev-i )
     prev-grapheme-step (prev-grapheme) ;
+
+[
+    other-extend-lines process-other-extend \ other-extend define-value
+
+    init-grapheme-table table
+    [ make-grapheme-table finish-table ] with-variable
+    \ grapheme-table define-value
+] with-compilation-unit

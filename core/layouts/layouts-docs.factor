@@ -23,9 +23,9 @@ HELP: type-number
 { $description "Outputs the built-in type number instances of " { $link class } ". Will output " { $link f } " if this is not a built-in class." }
 { $see-also builtin-class } ;
 
-HELP: tag-header
-{ $values { "n" "a built-in type number" } { "tagged" integer } }
-{ $description "Outputs the header for objects of type " { $snippet "n" } "." } ;
+HELP: tag-fixnum
+{ $values { "n" integer } { "tagged" integer } }
+{ $description "Outputs a tagged fixnum." } ;
 
 HELP: first-bignum
 { $values { "n" "smallest positive integer not representable by a fixnum" } } ;

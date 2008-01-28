@@ -1,5 +1,5 @@
 
-USING: kernel x11.xlib mortar slot-accessors x.gc x.widgets ;
+USING: kernel x11.xlib mortar mortar.sugar slot-accessors x.gc x.widgets ;
 
 IN: x.widgets.label
 

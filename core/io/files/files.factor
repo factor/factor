@@ -3,7 +3,7 @@
 IN: io.files
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
-system combinators splitting ;
+system combinators splitting sbufs ;
 
 HOOK: <file-reader> io-backend ( path -- stream )
 
@@ -35,7 +35,11 @@ M: object root-directory? ( path -- ? ) path-separator? ;
 : stat ( path -- directory? permissions length modified )
     normalize-pathname (stat) ;
 
-: exists? ( path -- ? ) stat >r 3drop r> >boolean ;
+: file-length ( path -- n ) stat 4array third ;
+
+: file-modified ( path -- n ) stat >r 3drop r> ; inline
+
+: exists? ( path -- ? ) file-modified >boolean ;
 
 : directory? ( path -- ? ) stat 3drop ;
 
@@ -46,15 +50,11 @@ M: object root-directory? ( path -- ? ) path-separator? ;
     [
         dup string?
         [ tuck path+ directory? 2array ] [ nip ] if
-    ] curry* map
+    ] with map
     [ first special-directory? not ] subset ;
 
 : directory ( path -- seq )
     normalize-directory dup (directory) fixup-directory ;
-
-: file-length ( path -- n ) stat 4array third ;
-
-: file-modified ( path -- n ) stat >r 3drop r> ;
 
 : last-path-separator ( path -- n ? )
     [ length 2 [-] ] keep [ path-separator? ] find-last* ;
@@ -143,7 +143,7 @@ HOOK: binary-roots io-backend ( -- seq )
 
 <PRIVATE
 : append-path ( path files -- paths )
-    [ path+ ] curry* map ;
+    [ path+ ] with map ;
 
 : get-paths ( dir -- paths )
     dup directory keys append-path ;
@@ -157,3 +157,8 @@ HOOK: binary-roots io-backend ( -- seq )
 PRIVATE>
 
 : walk-dir ( path -- seq ) [ (walk-dir) ] { } make ;
+
+: file-lines ( path -- seq ) <file-reader> lines ;
+
+: file-contents ( path -- str )
+    dup <file-reader> swap file-length <sbuf> [ stream-copy ] keep >string ;

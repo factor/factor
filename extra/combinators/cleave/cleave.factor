@@ -7,7 +7,7 @@ IN: combinators.cleave
 ! The cleaver family
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: bi ( obj quot quot -- val val ) >r over slip r> call ; inline
+: bi ( obj quot quot -- val val ) >r keep r> call ; inline
 
 : tri ( obj quot quot quot -- val val val )
   >r pick >r bi r> r> call ; inline
@@ -23,7 +23,7 @@ IN: combinators.cleave
 ! The spread family
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: bi* ( obj obj quot quot -- val val ) >r swap >r call r> r> call ; inline
+: bi* ( obj obj quot quot -- val val ) >r swap slip r> call ; inline
 
 : tri* ( obj obj obj quot quot quot -- val val val )
   >r rot >r bi* r> r> call ; inline

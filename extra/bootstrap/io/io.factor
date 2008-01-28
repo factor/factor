@@ -1,5 +1,5 @@
 USING: system vocabs vocabs.loader kernel combinators
-namespaces sequences ;
+namespaces sequences io.backend ;
 IN: bootstrap.io
 
 "bootstrap.compiler" vocab [

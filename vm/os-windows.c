@@ -173,25 +173,25 @@ DEFINE_PRIMITIVE(read_dir)
 	F_CHAR *path = unbox_u16_string();
 
 	GROWABLE_ARRAY(result);
+	REGISTER_ROOT(result);
 
 	if(INVALID_HANDLE_VALUE != (dir = FindFirstFile(path, &find_data)))
 	{
 		do
 		{
-			REGISTER_UNTAGGED(result);
 			CELL name = tag_object(from_u16_string(find_data.cFileName));
 			CELL dirp = tag_boolean(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 			CELL pair = allot_array_2(name,dirp);
-			UNREGISTER_UNTAGGED(result);
 			GROWABLE_ADD(result,pair);
 		}
 		while (FindNextFile(dir, &find_data));
 		CloseHandle(dir);
 	}
 
+	UNREGISTER_ROOT(result);
 	GROWABLE_TRIM(result);
 
-	dpush(tag_object(result));
+	dpush(result);
 }
 
 F_SEGMENT *alloc_segment(CELL size)

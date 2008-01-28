@@ -10,7 +10,7 @@ USING: rss io kernel io.files tools.test ;
     f
     "Meerkat"
     "http://meerkat.oreillynet.com"
-    V{
+    {
         T{
             entry
             f
@@ -26,7 +26,7 @@ USING: rss io kernel io.files tools.test ;
     f
     "dive into mark"
     "http://example.org/"
-    V{
+    {
         T{
             entry
             f

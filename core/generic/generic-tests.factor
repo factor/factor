@@ -1,7 +1,8 @@
 USING: alien arrays definitions generic generic.standard
 generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
-quotations classes continuations layouts classes.union sorting ;
+quotations classes continuations layouts classes.union sorting
+compiler.units ;
 IN: temporary
 
 GENERIC: foobar ( x -- y )
@@ -120,8 +121,6 @@ TUPLE: delegating ;
 
 [ t ] [ \ + math-generic? ] unit-test
 
-[ "SYMBOL: not-a-class C: not-a-class ;" parse ] unit-test-fails
-
 ! Test math-combination
 [ [ [ >float ] dip ] ] [ \ real \ float math-upgrade ] unit-test
 [ [ >float ] ] [ \ float \ real math-upgrade ] unit-test
@@ -184,7 +183,11 @@ M: debug-combination perform-combination
 
 SYMBOL: redefinition-test-generic
 
-redefinition-test-generic T{ debug-combination } define-generic
+[
+    redefinition-test-generic
+    T{ debug-combination }
+    define-generic
+] with-compilation-unit
 
 TUPLE: redefinition-test-tuple ;
 

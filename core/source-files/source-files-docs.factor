@@ -1,5 +1,5 @@
 USING: help.markup help.syntax vocabs.loader io.files strings
-definitions quotations ;
+definitions quotations compiler.units ;
 IN: source-files
 
 ARTICLE: "source-files" "Source files"
@@ -37,7 +37,7 @@ HELP: source-file
         { { $link source-file-modified } " - the result of " { $link file-modified } " at the time the source file was most recently loaded." }
         { { $link source-file-checksum } " - the CRC32 checksum of the source file's contents at the time it was most recently loaded." }
         { { $link source-file-uses } " - an assoc whose keys are words referenced from this source file's top level form." }
-        { { $link source-file-definitions } " - an assoc whose keys are definitions defined in this source file." }
+        { { $link source-file-definitions } " - a pair of assocs, containing definitions and classes defined in this source file, respectively" }
     }
 } ;
 
@@ -79,4 +79,16 @@ HELP: reset-checksums
 
 HELP: forget-source
 { $values { "path" "a pathname string" } }
-{ $description "Forgets all information known about a source file." } ;
+{ $description "Forgets all information known about a source file." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
+
+HELP: record-definitions
+{ $values { "file" source-file } }
+{ $description "Records that all " { $link new-definitions } " were defined in " { $snippet "file" } "." } ;
+
+HELP: rollback-source-file
+{ $values { "file" source-file } }
+{ $description "Records information to the source file after an incomplete parse which ended with an error." } ;
+
+HELP: file
+{ $var-description "Stores the " { $link source-file } " being parsed. The " { $link source-file-path } " of this object comes from the input parameter to " { $link with-source-file } "." } ;

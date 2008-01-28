@@ -164,6 +164,15 @@ DEFINE_PRIMITIVE(to_tuple)
 	drepl(object);
 }
 
+CELL allot_array_1(CELL obj)
+{
+	REGISTER_ROOT(obj);
+	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,1);
+	UNREGISTER_ROOT(obj);
+	set_array_nth(a,0,obj);
+	return tag_object(a);
+}
+
 CELL allot_array_2(CELL v1, CELL v2)
 {
 	REGISTER_ROOT(v1);
@@ -198,7 +207,7 @@ F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill)
 {
 	int i;
 	F_ARRAY* new_array;
-	
+
 	CELL to_copy = array_capacity(array);
 	if(capacity < to_copy)
 		to_copy = capacity;
@@ -212,7 +221,7 @@ F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill)
 	UNREGISTER_UNTAGGED(array);
 
 	memcpy(new_array + 1,array + 1,to_copy * CELLS);
-	
+
 	for(i = to_copy; i < capacity; i++)
 		set_array_nth(new_array,i,fill);
 
@@ -232,6 +241,42 @@ DEFINE_PRIMITIVE(array_to_vector)
 	vector->top = dpop();
 	vector->array = dpop();
 	dpush(tag_object(vector));
+}
+
+F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count)
+{
+	REGISTER_ROOT(elt);
+
+	if(*result_count == array_capacity(result))
+	{
+		result = reallot_array(result,
+			*result_count * 2,F);
+	}
+
+	UNREGISTER_ROOT(elt);
+	set_array_nth(result,*result_count,elt);
+	*result_count = *result_count + 1;
+
+	return result;
+}
+
+F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
+{
+	REGISTER_UNTAGGED(elts);
+
+	CELL elts_size = array_capacity(elts);
+	CELL new_size = *result_count + elts_size;
+
+	if(new_size >= array_capacity(result))
+		result = reallot_array(result,new_size * 2,F);
+
+	UNREGISTER_UNTAGGED(elts);
+
+	memcpy((void*)AREF(result,*result_count),(void*)AREF(elts,0),elts_size * CELLS);
+
+	*result_count += elts_size;
+
+	return result;
 }
 
 /* untagged */
@@ -285,9 +330,9 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, u16 fill)
 	if(capacity < to_copy)
 		to_copy = capacity;
 
-	REGISTER_STRING(string);
+	REGISTER_UNTAGGED(string);
 	F_STRING *new_string = allot_string_internal(capacity);
-	UNREGISTER_STRING(string);
+	UNREGISTER_UNTAGGED(string);
 
 	memcpy(new_string + 1,string + 1,to_copy * CHARS);
 	fill_string(new_string,to_copy,capacity,fill);
@@ -381,9 +426,9 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 		F_BYTE_ARRAY *_c_str; \
 		if(check && !check_string(s,sizeof(type))) \
 			general_error(ERROR_C_STRING,tag_object(s),F,NULL); \
-		REGISTER_STRING(s); \
+		REGISTER_UNTAGGED(s); \
 		_c_str = allot_c_string(capacity,sizeof(type)); \
-		UNREGISTER_STRING(s); \
+		UNREGISTER_UNTAGGED(s); \
 		type *c_str = (type*)(_c_str + 1); \
 		type##_string_to_memory(s,c_str); \
 		c_str[capacity] = 0; \
@@ -448,7 +493,6 @@ DEFINE_PRIMITIVE(hashtable)
 	dpush(tag_object(hash));
 }
 
-/* <word> ( name vocabulary -- word ) */
 F_WORD *allot_word(CELL vocab, CELL name)
 {
 	REGISTER_ROOT(vocab);
@@ -456,17 +500,28 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	F_WORD *word = allot_object(WORD_TYPE,sizeof(F_WORD));
 	UNREGISTER_ROOT(name);
 	UNREGISTER_ROOT(vocab);
+
 	word->hashcode = tag_fixnum(rand());
 	word->vocabulary = vocab;
 	word->name = name;
-	word->def = F;
+	word->def = userenv[UNDEFINED_ENV];
 	word->props = F;
 	word->counter = tag_fixnum(0);
 	word->compiledp = F;
-	word->xt = default_word_xt(word);
+	word->profiling = NULL;
+
+	REGISTER_UNTAGGED(word);
+	default_word_code(word,true);
+	UNREGISTER_UNTAGGED(word);
+
+	REGISTER_UNTAGGED(word);
+	update_word_xt(word);
+	UNREGISTER_UNTAGGED(word);
+
 	return word;
 }
 
+/* <word> ( name vocabulary -- word ) */
 DEFINE_PRIMITIVE(word)
 {
 	CELL vocab = dpop();
@@ -474,13 +529,7 @@ DEFINE_PRIMITIVE(word)
 	dpush(tag_object(allot_word(vocab,name)));
 }
 
-DEFINE_PRIMITIVE(update_xt)
-{
-	F_WORD *word = untag_word(dpop());
-	word->compiledp = F;
-	word->xt = default_word_xt(word);
-}
-
+/* word-xt ( word -- xt ) */
 DEFINE_PRIMITIVE(word_xt)
 {
 	F_WORD *word = untag_word(dpeek());

@@ -3,10 +3,14 @@ IN: temporary
 USING: vocabs.loader tools.test continuations vocabs math
 kernel arrays sequences namespaces io.streams.string
 parser source-files words assocs tuples definitions
-debugger ;
+debugger compiler.units ;
 
 ! This vocab should not exist, but just in case...
-[ ] [ "vocabs.loader.test" forget-vocab ] unit-test
+[ ] [
+    [
+        "vocabs.loader.test" forget-vocab
+    ] with-compilation-unit
+] unit-test
 
 [ T{ vocab-link f "vocabs.loader.test" } ]
 [ "vocabs.loader.test" f >vocab-link ] unit-test
@@ -15,7 +19,7 @@ debugger ;
 [ "kernel" f >vocab-link "kernel" vocab = ] unit-test
 
 ! This vocab should not exist, but just in case...
-[ ] [ "core" forget-vocab ] unit-test
+[ ] [ [ "core" forget-vocab ] with-compilation-unit ] unit-test
 
 2 [
     [ T{ no-vocab f "core" } ]
@@ -27,7 +31,7 @@ debugger ;
 [ t ] [
     "kernel" vocab-files
     "kernel" vocab vocab-files
-    "kernel" f \ vocab-link construct-boa vocab-files
+    "kernel" f <vocab-link> vocab-files
     3array all-equal?
 ] unit-test
 
@@ -42,13 +46,15 @@ IN: temporary
 [ { 3 3 3 } ] [
     "vocabs.loader.test.2" run
     "vocabs.loader.test.2" vocab run
-    "vocabs.loader.test.2" f \ vocab-link construct-boa run
+    "vocabs.loader.test.2" f <vocab-link> run
     3array
 ] unit-test
 
-"resource:core/vocabs/loader/test/a/a.factor" forget-source
 
-"vocabs.loader.test.a" forget-vocab
+[
+    "resource:core/vocabs/loader/test/a/a.factor" forget-source
+    "vocabs.loader.test.a" forget-vocab
+] with-compilation-unit
 
 0 "count-me" set-global
 
@@ -61,7 +67,7 @@ IN: temporary
         "resource:core/vocabs/loader/test/a/a.factor"
         source-file source-file-definitions dup USE: prettyprint .
         "v-l-t-a-hello" "vocabs.loader.test.a" lookup dup .
-        swap key?
+        swap first key?
     ] unit-test
 ] times
 
@@ -78,12 +84,17 @@ IN: temporary
 
 0 "count-me" set-global
 
-[ ] [ "vocabs.loader.test.b" forget-vocab ] unit-test
+[ ] [
+    [
+        "vocabs.loader.test.b" forget-vocab
+    ] with-compilation-unit
+] unit-test
 
 [ ] [
-    "vocabs.loader.test.b" vocab-files [
-        forget-source
-    ] each
+    [
+        "vocabs.loader.test.b" vocab-files
+        [ forget-source ] each
+    ] with-compilation-unit
 ] unit-test
 
 [ "vocabs.loader.test.b" require ] unit-test-fails
@@ -91,19 +102,22 @@ IN: temporary
 [ 1 ] [ "count-me" get-global ] unit-test
 
 [ ] [
-    "bob" "vocabs.loader.test.b" create [ ] define-compound
+    [
+        "bob" "vocabs.loader.test.b" create [ ] define
+    ] with-compilation-unit
 ] unit-test
 
 [ ] [ "vocabs.loader.test.b" refresh ] unit-test
 
 [ 2 ] [ "count-me" get-global ] unit-test
 
-[ t ] [ "fred" "vocabs.loader.test.b" lookup compound? ] unit-test
+[ f ] [ "fred" "vocabs.loader.test.b" lookup undefined? ] unit-test
 
 [ ] [
-    "vocabs.loader.test.b" vocab-files [
-        forget-source
-    ] each
+    [
+        "vocabs.loader.test.b" vocab-files
+        [ forget-source ] each
+    ] with-compilation-unit
 ] unit-test
 
 [ ] [ "vocabs.loader.test.b" refresh ] unit-test
@@ -111,7 +125,7 @@ IN: temporary
 [ 3 ] [ "count-me" get-global ] unit-test
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
-[ "kernel" f \ vocab-link construct-boa where ] unit-test
+[ "kernel" f <vocab-link> where ] unit-test
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
 [ "kernel" vocab where ] unit-test
@@ -123,8 +137,12 @@ IN: temporary
 ] unit-test
 
 : forget-junk
-    { "2" "a" "b" "d" "e" "f" }
-    [ "vocabs.loader.test." swap append forget-vocab ] each ;
+    [
+        { "2" "a" "b" "d" "e" "f" }
+        [
+            "vocabs.loader.test." swap append forget-vocab
+        ] each
+    ] with-compilation-unit ;
 
 forget-junk
 
@@ -132,23 +150,6 @@ forget-junk
     "IN: xabbabbja" eval "xabbabbja" vocab-files
 ] unit-test
 
-"xabbabbja" forget-vocab
-
-"bootstrap.help" vocab [
-    [
-        "again" off
-        
-        [ "vocabs.loader.test.e" require ] catch drop
-        
-        [ 3 ] [ restarts get length ] unit-test
-        
-        [ ] [
-            "again" get not restarts get length 3 = and [
-                "again" on
-                :2
-            ] when
-        ] unit-test
-    ] with-scope
-] when
+[ "xabbabbja" forget-vocab ] with-compilation-unit
 
 forget-junk

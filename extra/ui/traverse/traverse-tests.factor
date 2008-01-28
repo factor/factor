@@ -1,7 +1,7 @@
 IN: temporary
 USING: ui.gadgets ui.gadgets.labels namespaces sequences kernel
 math arrays tools.test io ui.gadgets.panes ui.traverse
-definitions ;
+definitions compiler.units ;
 
 M: array gadget-children ;
 
@@ -62,4 +62,4 @@ M: object (flatten-tree) , ;
     { 0 1 } { 2 0 1 } { { "a" "b" "c" "d" } { "e" "f" "g" } { { "h" "i" } "j" } } gadgets-in-range
 ] unit-test
 
-{ array gadget-children } forget
+[ { array gadget-children } forget ] with-compilation-unit

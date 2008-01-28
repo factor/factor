@@ -9,9 +9,9 @@ TUPLE: result title url summary ;
 C: <result> result
 
 : parse-yahoo ( xml -- seq )
-    "Result" tags-named* [
+    "Result" deep-tags-named [
         { "Title" "Url" "Summary" }
-        [ tag-named children>string ] curry* map
+        [ tag-named children>string ] with map
         first3 <result>
     ] map ;
 

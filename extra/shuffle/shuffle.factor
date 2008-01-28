@@ -21,8 +21,6 @@ MACRO: ntuck ( n -- ) 2 + [ dup , -nrot ] bake ;
 
 : 2swap ( x y z t -- z t x y ) rot >r rot r> ; inline
 
-: 2over ( a b c -- a b c a b ) pick pick ; inline
-
 : nipd ( a b c -- b c ) rot drop ; inline
 
 : 3nip ( a b c d -- d ) 3 nnip ; inline

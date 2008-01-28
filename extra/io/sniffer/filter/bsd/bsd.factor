@@ -1,14 +1,15 @@
 USING: alien.c-types hexdump io io.backend io.sockets.headers
 io.sockets.headers.bsd kernel io.sniffer io.sniffer.bsd
-io.sniffer.filter io.streams.string io.unix.backend math
-sequences system byte-arrays ;
+io.streams.string io.unix.backend math
+sequences system byte-arrays io.sniffer.filter.backend
+io.sniffer.filter.backend io.sniffer.backend ;
 IN: io.sniffer.filter.bsd
 
 ! http://www.iana.org/assignments/ethernet-numbers
 
 : bpf-align ( n -- n' )
     #! Align to next higher word size
-    "long" heap-size 1- [ + ] keep bitnot bitand ;
+    "long" heap-size align ;
 
 M: unix-io packet. ( string -- )
     18 cut swap >byte-array bpfh.

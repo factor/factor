@@ -18,7 +18,7 @@ IN: cpu.ppc.allot
     11 11 pick ADDI ! increment r11
     11 12 cell STW ! r11 -> nursery.here
     11 11 rot SUBI ! old value
-    type-number tag-header 12 LI ! compute header
+    type-number tag-fixnum 12 LI ! compute header
     12 11 0 STW ! store header
     ;
 

@@ -83,7 +83,8 @@ def-hash get-global [
 ! Remove n m shift defs
 [
     drop dup length 3 = [
-        dup first2 [ number? ] 2apply and swap third \ shift = and not
+        dup first2 [ number? ] both?
+        swap third \ shift = and not
     ] [ drop t ] if
 ] assoc-subset 
 
@@ -112,7 +113,7 @@ M: object lint ( obj -- seq )
 M: callable lint ( quot -- seq )
     def-hash-keys get [
         swap subseq/member?
-    ] curry* subset ;
+    ] with subset ;
 
 M: word lint ( word -- seq )
     word-def dup callable? [ lint ] [ drop f ] if ;
@@ -120,7 +121,7 @@ M: word lint ( word -- seq )
 : word-path. ( word -- )
     [ word-vocabulary ":" ] keep unparse 3append write nl ;
 
-: lint. ( array -- )
+: (lint.) ( pair -- )
     first2 >r word-path. r> [
         bl bl bl bl
         dup .
@@ -128,32 +129,46 @@ M: word lint ( word -- seq )
         def-hash get at [ bl bl bl bl word-path. ] each
         nl
     ] each nl nl ;
+
+: lint. ( alist -- )
+    [ (lint.) ] each ;
     
 
 GENERIC: run-lint ( obj -- obj )
 
+: (trim-self)
+    def-hash get-global at* [
+        dupd remove empty? not
+    ] [
+        drop f
+    ] if ;
+
 : trim-self ( seq -- newseq )
+    [ [ (trim-self) ] subset ] assoc-map ;
+
+: filter-symbols ( alist -- alist )
     [
-        first2 [
-            def-hash get-global at* [
-                dupd remove empty? not
-            ] [
-                drop f
-            ] if
-        ] subset 2array
-    ] map ;
+        nip first dup def-hash get at
+        [ first ] 2apply literalize = not
+    ] assoc-subset ;
 
 M: sequence run-lint ( seq -- seq )
     [
         global [ dup . flush ] bind
-        dup lint 2array
-    ] map
+        dup lint
+    ] { } map>assoc
     trim-self
-    [ second empty? not ] subset ;
+    [ second empty? not ] subset
+    filter-symbols ;
 
 M: word run-lint ( word -- seq )
     1array run-lint ;
 
 : lint-all ( -- seq )
-    all-words run-lint dup [ lint. ] each ;
+    all-words run-lint dup lint. ;
 
+: lint-vocab ( vocab -- seq )
+    words run-lint dup lint. ;
+
+: lint-word ( word -- seq )
+    1array run-lint dup lint. ;

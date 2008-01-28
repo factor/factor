@@ -4,7 +4,9 @@ USE: io.windows
 USE: io.windows.nt.backend
 USE: io.windows.nt.files
 USE: io.windows.nt.sockets
+USE: io.windows.nt.launcher
+USE: io.windows.mmap
 USE: io.backend
 USE: namespaces
 
-T{ windows-nt-io } io-backend set-global
+T{ windows-nt-io } set-io-backend

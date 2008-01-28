@@ -6,12 +6,10 @@ namespaces alien.c-types kernel system combinators ;
         4 "longlong" c-type set-c-type-align
         4 "ulonglong" c-type set-c-type-align
     ] }
-    { [ os "linux" = ] [
+    { [ linux? ] [
         t "longlong" c-type set-c-type-stack-align?
         t "ulonglong" c-type set-c-type-stack-align?
     ] }
 } cond
 
 T{ ppc-backend } compiler-backend set-global
-
-6 cells set-profiler-prologues

@@ -2,7 +2,7 @@ USING: help.markup help.syntax words parser ;
 IN: tools.annotations
 
 ARTICLE: "tools.annotations" "Word annotations"
-"The word annotation feature modifies word definitions to add debugging code. You can restore the old definition by calling " { $link reload } " on the word in question."
+"The word annotation feature modifies word definitions to add debugging code. You can restore the old definition by calling " { $link reset } " on the word in question."
 { $subsection watch }
 { $subsection breakpoint }
 { $subsection breakpoint-if }

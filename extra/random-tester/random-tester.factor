@@ -22,7 +22,7 @@ TUPLE: random-tester-error ;
     datastack clone after set
     clear
     before get [ ] each
-    quot get [ compile-1 ] [ errored on ] recover ;
+    quot get [ compile-call ] [ errored on ] recover ;
 
 : do-test ! ( data... quot -- )
     .s flush test-compiler

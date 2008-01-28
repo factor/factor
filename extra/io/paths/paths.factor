@@ -8,7 +8,7 @@ IN: io.paths
 
 <PRIVATE
 : append-path ( path files -- paths )
-    [ path+ ] curry* map ;
+    [ path+ ] with map ;
 
 : get-paths ( dir -- paths )
     dup directory keys append-path ;

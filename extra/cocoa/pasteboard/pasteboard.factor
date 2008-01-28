@@ -24,7 +24,7 @@ IN: cocoa.pasteboard
 
 : pasteboard-error ( error -- f )
     "Pasteboard does not hold a string" <NSString>
-    0 swap rot set-void*-nth f ;
+    0 spin set-void*-nth f ;
 
 : ?pasteboard-string ( pboard error -- str/f )
     over pasteboard-string? [

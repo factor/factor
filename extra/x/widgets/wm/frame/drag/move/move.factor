@@ -1,6 +1,6 @@
 
 USING: kernel combinators namespaces math.vectors x11.xlib x11.constants 
-       mortar slot-accessors x x.gc x.widgets.wm.frame.drag ;
+       mortar mortar.sugar slot-accessors x x.gc x.widgets.wm.frame.drag ;
 
 IN: x.widgets.wm.frame.drag.move
 

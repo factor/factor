@@ -1,23 +1,31 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
 inference inference.backend inference.dataflow io kernel
 kernel.private layouts math namespaces optimizer prettyprint
-quotations sequences system threads words ;
+quotations sequences system threads words vectors ;
 IN: generator
 
-SYMBOL: compiled-xts
+SYMBOL: compile-queue
+SYMBOL: compiled
 
-: save-xt ( word xt -- )
-    swap dup unchanged-word compiled-xts get set-at ;
+: begin-compiling ( word -- )
+    f swap compiled get set-at ;
 
-: compiling? ( word -- ? )
+: finish-compiling ( word literals relocation labels code -- )
+    4array swap compiled get set-at ;
+
+: queue-compile ( word -- )
     {
-        { [ dup compiled-xts get key? ] [ drop t ] }
-        { [ dup word-changed? ] [ drop f ] }
-        { [ t ] [ compiled? ] }
+        { [ dup compiled get key? ] [ drop ] }
+        { [ dup primitive? ] [ drop ] }
+        { [ dup deferred? ] [ drop ] }
+        { [ t ] [ dup compile-queue get set-at ] }
     } cond ;
+
+: maybe-compile ( word -- )
+    dup compiled? [ drop ] [ queue-compile ] if ;
 
 SYMBOL: compiling-word
 
@@ -26,30 +34,21 @@ SYMBOL: compiling-label
 ! Label of current word, after prologue, makes recursion faster
 SYMBOL: current-label-start
 
-SYMBOL: compiled-stack-traces?
-
-t compiled-stack-traces? set-global
+: compiled-stack-traces? ( -- ? ) 36 getenv ;
 
 : init-generator ( -- )
-    V{ } clone literal-table set
-    V{ } clone word-table set
-    compiled-stack-traces? get compiling-word get f ?
-    literal-table get push ;
+    compiled-stack-traces?
+    compiling-word get  f ?
+    1vector literal-table set ;
 
 : generate-1 ( word label node quot -- )
-    pick f save-xt [
+    pick begin-compiling [
         roll compiling-word set
         pick compiling-label set
         init-generator
         call
         literal-table get >array
-        word-table get >array
-    ] { } make fixup add-compiled-block save-xt ;
-
-: generate-profiler-prologue ( -- )
-    compiled-stack-traces? get [
-        compiling-word get %profiler-prologue
-    ] when ;
+    ] { } make fixup finish-compiling ;
 
 GENERIC: generate-node ( node -- next )
 
@@ -59,7 +58,6 @@ GENERIC: generate-node ( node -- next )
 : generate ( word label node -- )
     [
         init-templates
-        generate-profiler-prologue
         %save-word-xt
         %prologue-later
         current-label-start define-label
@@ -67,36 +65,12 @@ GENERIC: generate-node ( node -- next )
         [ generate-nodes ] with-node-iterator
     ] generate-1 ;
 
-: word-dataflow ( word -- dataflow )
+: word-dataflow ( word -- effect dataflow )
     [
         dup "no-effect" word-prop [ no-effect ] when
         dup specialized-def over dup 2array 1array infer-quot
         finish-word
-    ] with-infer nip ;
-
-SYMBOL: compiler-hook
-
-[ ] compiler-hook set-global
-
-SYMBOL: compile-errors
-
-SYMBOL: batch-mode
-
-: compile-begins ( word -- )
-    compiler-hook get call
-    "quiet" get batch-mode get or [
-        drop
-    ] [
-        "Compiling " write . flush
-    ] if ;
-
-: (compile) ( word -- )
-    dup compiling? not over compound? and [
-        dup compile-begins
-        dup dup word-dataflow optimize generate
-    ] [
-        drop
-    ] if ;
+    ] with-infer ;
 
 : intrinsics ( #call -- quot )
     node-param "intrinsics" word-prop ;
@@ -126,24 +100,13 @@ UNION: #terminal
 ! node
 M: node generate-node drop iterate-next ;
 
-: %call ( word -- )
-    dup primitive? [ %call-primitive ] [ %call-label ] if ;
-
 : %jump ( word -- )
-    {
-        { [ dup compiling-label get eq? ] [
-            drop current-label-start get %jump-label
-        ] }
-        { [ dup primitive? ] [
-            %epilogue-later %jump-primitive
-        ] }
-        { [ t ] [
-            %epilogue-later %jump-label
-        ] }
-    } cond ;
+    dup compiling-label get eq?
+    [ drop current-label-start get ] [ %epilogue-later ] if
+    %jump-label ;
 
 : generate-call ( label -- next )
-    dup (compile)
+    dup maybe-compile
     end-basic-block
     tail-call? [
         %jump f
@@ -180,10 +143,6 @@ M: #if generate-node
     with-template
     generate-if ;
 
-: rel-current-word ( class -- )
-    compiling-label get add-word
-    swap rt-xt-profiling rel-fixup ;
-
 ! #dispatch
 : dispatch-branch ( node word -- label )
     gensym [
@@ -195,22 +154,22 @@ M: #if generate-node
         ] generate-1
     ] keep ;
 
-: dispatch-branches ( node -- syms )
-    node-children
-    [ compiling-word get dispatch-branch ] map
-    word-table get push-all ;
-
-: %dispatch ( word-table# -- )
-    tail-call? [
-        %jump-dispatch
-    ] [
-        0 frame-required
-        %call-dispatch
-    ] if ;
+: dispatch-branches ( node -- )
+    node-children [
+        compiling-word get dispatch-branch %dispatch-label
+    ] each ;
 
 M: #dispatch generate-node
-    word-table get length %dispatch
-    dispatch-branches init-templates iterate-next ;
+    #! The order here is important, dispatch-branches must
+    #! run after %dispatch, so that each branch gets the
+    #! correct register state
+    tail-call? [
+        %jump-dispatch dispatch-branches
+    ] [
+        0 frame-required
+        %call-dispatch >r dispatch-branches r> resolve-label
+    ] if
+    init-templates iterate-next ;
 
 ! #call
 : define-intrinsics ( word intrinsics -- )
@@ -298,20 +257,3 @@ M: #r> generate-node
 
 ! #return
 M: #return generate-node drop end-basic-block %return f ;
-
-! These constants must match vm/memory.h
-: card-bits 6 ;
-: card-mark HEX: 40 HEX: 80 bitor ;
-
-! These constants must match vm/layouts.h
-: header-offset object tag-number neg ;
-: float-offset 8 float tag-number - ;
-: string-offset 3 cells object tag-number - ;
-: profile-count-offset 7 cells object tag-number - ;
-: byte-array-offset 2 cells object tag-number - ;
-: alien-offset 3 cells object tag-number - ;
-: underlying-alien-offset cell object tag-number - ;
-: tuple-class-offset 2 cells tuple tag-number - ;
-: class-hash-offset cell object tag-number - ;
-: word-xt-offset 8 cells object tag-number - ;
-: compiled-header-size 8 cells ;

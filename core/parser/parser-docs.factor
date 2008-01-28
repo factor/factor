@@ -1,7 +1,7 @@
 USING: help.markup help.syntax kernel sequences words
 math strings vectors quotations generic effects classes
 vocabs.loader definitions io vocabs source-files
-quotations namespaces ;
+quotations namespaces compiler.units ;
 IN: parser
 
 ARTICLE: "vocabulary-search-shadow" "Shadowing word names"
@@ -44,12 +44,11 @@ ARTICLE: "vocabulary-search-errors" "Word lookup errors"
 "If the parser cannot not find a word in the current vocabulary search path, it attempts to look for the word in all loaded vocabularies. Then, one of three things happen:"
 { $list
     { "If there are no words having this name at all, an error is thrown and parsing stops." }
-    { "If there is exactly one vocabulary having a word with this name, the vocabulary is automatically added to the search path. This behavior is intended for interactive use and exploratory programming only, and production code should contain full " { $link POSTPONE: USING: } " declarations." }
-    { "If there is more than one vocabulary which contains a word with this name, a restartable error is thrown, with a restart for each vocabulary in question. The restarts add the vocabulary to the search path and continue parsing." }
+    { "If there are vocabularies which contain words with this name, a restartable error is thrown, with a restart for each vocabulary in question. The restarts add the vocabulary to the search path and continue parsing." }
 }
 "When writing a new vocabulary, one approach is to ignore " { $link POSTPONE: USING: } " declarations altogether, then to load the vocabulary and observe any parser notes and restarts and use this information to write the correct " { $link POSTPONE: USING: } " declaration." ;
 
-ARTICLE: "vocabulary-search" "Vocabulary search"
+ARTICLE: "vocabulary-search" "Vocabulary search path"
 "When the parser reads a token, it attempts to look up a word named by that token. The lookup is performed by searching each vocabulary in the search path, in order."
 $nl
 "For a source file the vocabulary search path starts off with two vocabularies:"
@@ -121,6 +120,8 @@ $nl
 { $code ": hello \"Hello world\" print ; parsing" }
 "Parsing words must have stack effect " { $snippet "( accum -- accum )" } ", where " { $snippet "accum" } " is the accumulator vector supplied by the parser. Parsing words can read input, add word definitions to the dictionary, and do anything an ordinary word can."
 $nl
+"Parsing words cannot be called from the same source file where they are defined, because new definitions are only compiled at the end of the source file. An attempt to use a parsing word in its own source file raises an error:"
+{ $link staging-violation }
 "Tools for implementing parsing words:"
 { $subsection "reading-ahead" }
 { $subsection "parsing-word-nest" }
@@ -154,44 +155,11 @@ ARTICLE: "parser-files" "Parsing source files"
 { $subsection parse-file }
 { $subsection bootstrap-file }
 "The parser cross-references source files and definitions. This allows it to keep track of removed definitions, and prevent forward references and accidental redefinitions."
-$nl
-"When a source file is reloaded, the parser compares the previous list of definitions with the current list; any definitions which are no longer present in the file are removed by a call to " { $link forget } ". A warning message is printed if any other definitions still depend on the removed definitions."
-$nl
-"The parser also catches forward references when reloading source files. This is best illustrated with an example. Suppose we load a source file " { $snippet "a.factor" } ":"
-{ $code
-    "USING: io sequences ;"
-    "IN: a"
-    ": hello \"Hello\" ;"
-    ": world \"world\" ;"
-    ": hello-world hello " " world 3append print ;"
-}
-"The definitions for " { $snippet "hello" } ", " { $snippet "world" } ", and " { $snippet "hello-world" } " are in the dictionary."
-$nl
-"Now, after some heavily editing and refactoring, the file looks like this:"
-{ $code
-    "USING: namespaces ;"
-    "IN: a"
-    ": hello \"Hello\" % ;"
-    ": hello-world [ hello " " % world ] \"\" make ;"
-    ": world \"world\" % ;"
-}
-"Note that the developer has made a mistake, placing the definition of " { $snippet "world" } " " { $emphasis "after" } " its usage in " { $snippet "hello-world" } "."
-$nl
-"If the parser did not have special checks for this case, then the modified source file would still load, because when the definition of " { $snippet "hello-world" } " on line 4 is being parsed, the " { $snippet "world" } " word is already present in the dictionary from an earlier run. The developer would then not discover this mistake until attempting to load the source file into a fresh image."
-$nl
-"Since this is undesirable, the parser explicitly raises an error if a source file refers to a word which is in the dictionary, but defined after it is used."
-{ $subsection forward-error }
-"If a source file raises a " { $link forward-error } " when loaded into a development image, then it would have raised a " { $link no-word } " error when loaded into a fresh image."
-$nl
-"The parser also catches duplicate definitions. If an artifact is defined twice in the same source file, the earlier definition will never be accessible, and this is almost always a mistake, perhaps due to a bad choice of word names, or a copy and paste error. The parser raises an error in this case."
-{ $subsection redefine-error }
 { $see-also "source-files" } ;
 
 ARTICLE: "parser-usage" "Reflective parser usage"
 "The parser can be called on a string:"
 { $subsection eval }
-{ $subsection parse }
-{ $subsection parse-fresh }
 "The parser can also parse from a stream:"
 { $subsection parse-stream } ;
 
@@ -204,7 +172,8 @@ $nl
 { $subsection "parser-usage" }
 "The parser can be extended."
 { $subsection "parsing-words" }
-{ $subsection "parser-lexer" } ;
+{ $subsection "parser-lexer" }
+{ $see-also "definitions" "definition-checking" } ;
 
 ABOUT: "parser"
 
@@ -229,23 +198,7 @@ HELP: <lexer>
 
 HELP: location
 { $values { "loc" "a " { $snippet "{ path line# }" } " pair" } }
-{ $description "Outputs the current parser location. This value can be passed to " { $link set-where } " or " { $link (save-location) } "." } ;
-
-HELP: redefine-error
-{ $values { "definition" "a definition specifier" } }
-{ $description "Throws a " { $link redefine-error } "." }
-{ $error-description "Indicates that a single source file contains two definitions for the same artifact, one of which shadows the other. This is an error since it indicates a likely mistake, such as two words accidentally named the same by the developer; the error is restartable." } ;
-
-HELP: redefinition?
-{ $values { "definition" "a definition specifier" } { "?" "a boolean" } }
-{ $description "Tests if this definition is already present in the current source file." }
-$parsing-note ;
-
-HELP: (save-location)
-{ $values { "definition" "a definition specifier" } { "loc" "a " { $snippet "{ path line# }" } " pair" } }
-{ $description "Saves the location of a definition and associates this definition with the current source file."
-$nl
-"This is the book-keeping required to detect " { $link redefine-error } " and " { $link forward-error } "." } ;
+{ $description "Outputs the current parser location. This value can be passed to " { $link set-where } " or " { $link remember-definition } "." } ;
 
 HELP: save-location
 { $values { "definition" "a definition specifier" } }
@@ -263,15 +216,6 @@ HELP: parser-notes?
 HELP: next-line
 { $values { "lexer" lexer } }
 { $description "Advances the lexer to the next input line, discarding the remainder of the current line." } ;
-
-HELP: file
-{ $var-description "Stores the " { $link source-file } " being parsed. The " { $link source-file-path } " of this object comes from the input parameter to " { $link parse-stream } "." } ;
-
-HELP: old-definitions
-{ $var-description "Stores an assoc where the keys form the set of definitions which were defined by " { $link file } " the most recent time it was loaded." } ;
-
-HELP: new-definitions
-{ $var-description "Stores an assoc where the keys form the set of definitions which were defined so far by the current parsing of " { $link file } "." } ;
 
 HELP: parse-error
 { $error-description "Thrown when the parser encounters invalid input. A parse error wraps an underlying error and holds the file being parsed, line number, and column number." } ;
@@ -352,7 +296,7 @@ HELP: still-parsing?
 HELP: use
 { $var-description "A variable holding the current vocabulary search path as a sequence of assocs." } ;
 
-{ use in use+ (use+) set-use set-in POSTPONE: USING: POSTPONE: USE: file-vocabs } related-words
+{ use in use+ (use+) set-use set-in POSTPONE: USING: POSTPONE: USE: with-file-vocabs with-interactive-vocabs } related-words
 
 HELP: in
 { $var-description "A variable holding the name of the current vocabulary for new definitions." } ;
@@ -416,11 +360,6 @@ HELP: search
 { $values { "str" string } { "word" word } }
 { $description "Searches for a word by name in the current vocabulary search path. If no such word could be found, throws a " { $link no-word } " error. If the search path does not contain a word with this name but other vocabularies do, the error will have restarts offering to add vocabularies to the search path." }
 $parsing-note ;
-
-HELP: forward-error
-{ $values { "word" word } } 
-{ $description "Throws a " { $link forward-error } "." }
-{ $description "Indicates a word is being referenced prior to the location of its most recent definition. This can only happen if a source file is loaded, and subsequently edited such that two dependent definitions are reversed." } ;
 
 HELP: scan-word
 { $values { "word/number/f" "a word, number or " { $link f } } }
@@ -495,7 +434,7 @@ $parsing-note ;
 HELP: parse-literal
 { $values { "accum" vector } { "end" word } { "quot" "a quotation with stack effect " { $snippet "( seq -- obj )" } } }
 { $description "Parses objects from parser input until " { $snippet "end" } ", applies the quotation to the resulting sequence, and adds the output value to the accumulator." }
-{ $examples "This word is used to implement " { $link POSTPONE: C{ } "." }
+{ $examples "This word is used to implement " { $link POSTPONE: [ } "." }
 $parsing-note ;
 
 HELP: parse-definition
@@ -507,38 +446,19 @@ $parsing-note ;
 HELP: bootstrap-syntax
 { $var-description "Only set during bootstrap. Stores a copy of the " { $link vocab-words } " of the host's syntax vocabulary; this allows the host's parsing words to be used during bootstrap source parsing, not the target's." } ;
 
-HELP: file-vocabs
-{ $description "Installs the initial the vocabulary search path for parsing a file. This consists of the " { $snippet "syntax" } " vocabulary together with the " { $snippet "scratchpad" } " vocabulary." } ;
-
-HELP: parse
-{ $values { "str" string } { "quot" quotation } }
-{ $description "Parses Factor source code from a string. The current vocabulary search path is used." }
-{ $errors "Throws a parse error if the input is malformed." } ;
+HELP: with-file-vocabs
+{ $values { "quot" quotation } }
+{ $description "Calls the quotation in a scope with the initial the vocabulary search path for parsing a file. This consists of the " { $snippet "syntax" } " vocabulary together with the " { $snippet "scratchpad" } " vocabulary." } ;
 
 HELP: parse-fresh
 { $values { "lines" "a sequence of strings" } { "quot" quotation } }
-{ $description "Parses Factor source code in a sequence of lines. The initial vocabulary search path is used (see " { $link file-vocabs } ")." }
+{ $description "Parses Factor source code in a sequence of lines. The initial vocabulary search path is used (see " { $link with-file-vocabs } ")." }
 { $errors "Throws a parse error if the input is malformed." } ;
 
 HELP: eval
 { $values { "str" string } }
-{ $description "Parses Factor source code from a string, and calls the resulting quotation. The current vocabulary search path is used." }
-{ $errors "Throws an error if the input is malformed, or if the quotation throws an error." } ;
-
-HELP: parse-hook
-{ $var-description "A quotation called by " { $link parse-stream } " after parsing the input stream. The default value recompiles new word definitions; see " { $link "recompile" } " for details." } ;
-
-{ parse-hook no-parse-hook } related-words
-
-HELP: no-parse-hook
-{ $values { "quot" "a quotation" } }
-{ $description "Runs the quotation in a new dynamic scope where " { $link parse-hook } " is set to " { $link f } ", then calls the outer " { $link parse-hook } " after the quotation returns. This has the effect of postponing any recompilation to the end of a quotation." } ;
-
-HELP: start-parsing
-{ $values { "stream" "an input stream" } { "name" "a pathname string" } }
-{ $description "Prepares to parse a source file by reading the entire contents of the stream and setting some variables. The pathname identifies the stream for cross-referencing purposes." }
-{ $errors "Throws an I/O error if there was an error reading from the stream." }
-{ $notes "This is one of the factors of " { $link parse-stream } "." } ;
+{ $description "Parses Factor source code from a string, and calls the resulting quotation." }
+{ $errors "Throws an error if the input is malformed, or if the evaluation itself throws an error." } ;
 
 HELP: outside-usages
 { $values { "seq" "a sequence of definitions" } { "usages" "an association list mapping definitions to sequences of definitions" } }
@@ -555,17 +475,10 @@ HELP: smudged-usage
 HELP: forget-smudged
 { $description "Forgets removed definitions and prints a warning message if any of them are still referenced from other source files." } ;
 
-HELP: record-definitions
-{ $values { "file" source-file } }
-{ $description "Records that all " { $link new-definitions } " were defined in " { $snippet "file" } "." } ;
-
 HELP: finish-parsing
 { $values { "quot" "the quotation just parsed" } }
 { $description "Records information to the current " { $link file } " and prints warnings about any removed definitions which are still in use." }
 { $notes "This is one of the factors of " { $link parse-stream } "." } ;
-
-HELP: undo-parsing
-{ $description "Records information to the current " { $link file } " after an incomplete parse which ended with an error." } ;
 
 HELP: parse-stream
 { $values { "stream" "an input stream" } { "name" "a file name for error reporting and cross-referencing" } { "quot" quotation } }
@@ -586,28 +499,16 @@ HELP: ?run-file
 { $values { "path" "a pathname string" } }
 { $description "If the file exists, runs it with " { $link run-file } ", otherwise does nothing." } ;
 
-HELP: reload
-{ $values { "defspec" "a definition specifier" } }
-{ $description "Reloads the source file containing the definition." }
-{ $examples
-    "Reloading a word definition:"
-    { $code "\\ foo reload" }
-    "A word's documentation:"
-    { $code "\\ foo >link reload" }
-    "A method definition:"
-    { $code "{ editor draw-gadget* } reload" }
-    "A help article:"
-    { $code "\"handbook\" >link reload" }
-} ;
-
 HELP: bootstrap-file
 { $values { "path" "a pathname string" } }
 { $description "If bootstrapping, parses the source file and adds its top level form to the quotation being constructed with " { $link make } "; the bootstrap code uses this to build up a boot quotation to be run on image startup. If not bootstrapping, just runs the file normally." } ;
 
-HELP: ?bootstrap-file
-{ $values { "path" "a pathname string" } }
-{ $description "If the file exists, loads it with " { $link bootstrap-file } ", otherwise does nothing." } ;
-
 HELP: eval>string
 { $values { "str" string } { "output" string } }
 { $description "Evaluates the Factor code in " { $snippet "str" } " with the " { $link stdio } " stream rebound to a string output stream, then outputs the resulting string." } ;
+
+HELP: staging-violation
+{ $values { "word" word } }
+{ $description "Throws a " { $link staging-violation } " error." }
+{ $error-description "Thrown by the parser if a parsing word is used in the same compilation unit as where it was defined; see " { $link "compilation-units" } "." }
+{ $notes "One possible workaround is to use the " { $link POSTPONE: << } " word to execute code at parse time. However, executing words defined in the same source file at parse time is still prohibited." } ;

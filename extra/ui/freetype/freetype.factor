@@ -1,9 +1,9 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays io kernel libc math
 math.vectors namespaces opengl opengl.gl prettyprint assocs
 sequences io.files io.styles continuations freetype
-ui.gadgets.worlds ui.render ui.backend ;
+ui.gadgets.worlds ui.render ui.backend io.mmap ;
 IN: ui.freetype
 
 TUPLE: freetype-renderer ;
@@ -63,9 +63,16 @@ M: freetype-renderer free-fonts ( world -- )
 : ttf-path ( name -- string )
     "/fonts/" swap ".ttf" 3append resource-path ;
 
+: (open-face) ( mapped-file -- face )
+    #! We use FT_New_Memory_Face, not FT_New_Face, since
+    #! FT_New_Face only takes an ASCII path name and causes
+    #! problems on localized versions of Windows
+    freetype swap dup mapped-file-address swap length 0 f
+    <void*> [ FT_New_Memory_Face freetype-error ] keep *void* ;
+
 : open-face ( font style -- face )
-    ttf-name ttf-path >r freetype r>
-    0 f <void*> [ FT_New_Face freetype-error ] keep *void* ;
+    ttf-name ttf-path dup file-length
+    <mapped-file> (open-face) ;
 
 : dpi 72 ; inline
 
@@ -109,7 +116,7 @@ M: freetype-renderer open-font ( font -- open-font )
     ] cache-nth nip ;
 
 M: freetype-renderer string-width ( open-font string -- w )
-    0 -rot [ char-width + ] curry* each ;
+    0 -rot [ char-width + ] with each ;
 
 M: freetype-renderer string-height ( open-font string -- h )
     drop font-height ;
@@ -179,11 +186,11 @@ M: freetype-renderer draw-string ( font string loc -- )
     >r >r world get font-sprites first2 r> r> (draw-string) ;
 
 : run-char-widths ( open-font string -- widths )
-    [ char-width ] curry* { } map-as
+    [ char-width ] with { } map-as
     dup 0 [ + ] accumulate nip swap 2 v/n v+ ;
 
 M: freetype-renderer x>offset ( x open-font string -- n )
-    dup >r run-char-widths [ <= ] curry* find drop
+    dup >r run-char-widths [ <= ] with find drop
     [ r> drop ] [ r> length ] if* ;
 
 T{ freetype-renderer } font-renderer set-global

@@ -9,10 +9,10 @@ IN: lcd
     } nth >r 4 * dup 4 + r> subseq ;
 
 : lcd-row ( num row -- )
-    swap [ CHAR: 0 - swap lcd-digit write ] curry* each ;
+    swap [ CHAR: 0 - swap lcd-digit write ] with each ;
 
 : lcd ( digit-str -- )
-    3 [ lcd-row nl ] curry* each ;
+    3 [ lcd-row nl ] with each ;
 
 : lcd-demo ( -- ) "31337" lcd ;
 

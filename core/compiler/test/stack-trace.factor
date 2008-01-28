@@ -10,7 +10,6 @@ words splitting ;
 : foo 3 throw 7 ;
 : bar foo 4 ;
 : baz bar 5 ;
-\ baz compile
 [ 3 ] [ [ baz ] catch ] unit-test
 [ t ] [
     symbolic-stack-trace
@@ -19,7 +18,6 @@ words splitting ;
 ] unit-test
 
 : bleh [ 3 + ] map [ 0 > ] subset ;
-\ bleh compile
 
 : stack-trace-contains? symbolic-stack-trace memq? ;
 
@@ -34,7 +32,6 @@ words splitting ;
 ] unit-test
 
 : quux [ t [ "hi" throw ] when ] times ;
-\ quux compile
 
 [ t ] [
     [ 10 quux ] catch drop

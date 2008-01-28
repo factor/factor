@@ -16,7 +16,7 @@ IN: cocoa.messages
 : sender-stub ( method function -- word )
     [ sender-stub-name f <word> dup ] 2keep
     over first large-struct? [ "_stret" append ] when
-    make-sender define-compound dup compile ;
+    make-sender define ;
 
 SYMBOL: message-senders
 SYMBOL: super-message-senders
@@ -79,11 +79,11 @@ MACRO: (send) ( selector super? -- quot )
     super-message-senders message-senders ? get at
     [ slip execute ] 2curry ;
 
-: send ( args... receiver selector -- return... ) f (send) ; inline
+: send ( receiver args... selector -- return... ) f (send) ; inline
 
 \ send soft "break-after" set-word-prop
 
-: super-send ( args... receiver selector -- return... ) t (send) ; inline
+: super-send ( receiver args... selector -- return... ) t (send) ; inline
 
 \ super-send soft "break-after" set-word-prop
 
@@ -161,7 +161,7 @@ H{
 
 : method-arg-types ( method -- args )
     dup method_getNumberOfArguments
-    [ method-arg-type parse-objc-type ] curry* map ;
+    [ method-arg-type parse-objc-type ] with map ;
 
 : method-return-type ( method -- ctype )
     #! Undocumented hack! Apple does not support this feature!
@@ -196,7 +196,7 @@ H{
 : define-objc-class-word ( name quot -- )
     [
         over , , \ unless-defined , dup , \ objc-class ,
-    ] [ ] make >r "cocoa.classes" create r> define-compound ;
+    ] [ ] make >r "cocoa.classes" create r> define ;
 
 : import-objc-class ( name quot -- )
     2dup unless-defined

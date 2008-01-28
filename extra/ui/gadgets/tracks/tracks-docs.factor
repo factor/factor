@@ -1,5 +1,6 @@
-USING: ui.gadgets.tracks ui.gadgets.packs help.markup
-help.syntax ui.gadgets arrays kernel quotations tuples ;
+USING: ui.gadgets.packs help.markup help.syntax ui.gadgets
+arrays kernel quotations tuples ;
+IN: ui.gadgets.tracks
 
 HELP: track
 { $class-description "A track is like a " { $link pack } " except each child is resized to a fixed multiple of the track's dimension in the direction of " { $link gadget-orientation } ". Tracks are created by calling " { $link <track> } "." } ;

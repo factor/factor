@@ -99,12 +99,6 @@ unit-test
     "int" { "int" "int" "int" "int" } "stdcall" alien-indirect
     data-gc ;
 
-! This is a hack -- words are compiled before top-level forms
-! run.
-
-DEFER: >> delimiter
-: << \ >> parse-until >quotation call ; parsing
-
 << "f-stdcall" f "stdcall" add-library >>
 
 [ f ] [ "f-stdcall" load-library ] unit-test

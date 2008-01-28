@@ -2,7 +2,7 @@ USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
-continuations ;
+continuations generic compiler.units ;
 IN: temporary
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -53,17 +53,13 @@ unit-test
 
 [ "W{ \\ + }" ] [ [ W{ \ + } ] first unparse ] unit-test
 
-[ t ] [
-    "[ >r \"alloc\" add 0 0 r> ]" dup parse first unparse =
-] unit-test
-
 [ ] [ \ fixnum see ] unit-test
 
 [ ] [ \ integer see ] unit-test
 
 [ ] [ \ general-t see ] unit-test
 
-[ ] [ \ compound see ] unit-test
+[ ] [ \ generic see ] unit-test
 
 [ ] [ \ duplex-stream see ] unit-test
 
@@ -117,10 +113,10 @@ unit-test
         use [ clone ] change
 
         [
-             parse-lines drop
-             [
-                 "USE: temporary \\ " swap " see" 3append eval
-             ] string-out "\n" split 1 head*
+            [ parse-fresh drop ] with-compilation-unit
+            [
+                "temporary" lookup see
+            ] string-out "\n" split 1 head*
         ] keep =
     ] with-scope ;
 
@@ -152,10 +148,10 @@ unit-test
     {
         "USING: io kernel sequences words ;"
         "IN: temporary"
-        ": retain-stack-layout"
+        ": retain-stack-layout ( x -- )"
         "    dup stream-readln stream-readln"
-        "    >r [ define-compound ] map r>"
-        "    define-compound ;"
+        "    >r [ define ] map r>"
+        "    define ;"
     } ;
 
 [ t ] [
@@ -166,7 +162,7 @@ unit-test
     {
         "USING: kernel math sequences strings ;"
         "IN: temporary"
-        ": soft-break-layout"
+        ": soft-break-layout ( x y -- ? )"
         "    over string? ["
         "        over hashcode over hashcode number="
         "        [ sequence= ] [ 2drop f ] if"
@@ -208,7 +204,7 @@ unit-test
     {
         "USING: io kernel parser ;"
         "IN: temporary"
-        ": string-layout-test"
+        ": string-layout-test ( error -- )"
         "    \"Expected \" write dup unexpected-want expected>string write"
         "    \" but got \" write unexpected-got expected>string print ;"
     } ;
@@ -260,7 +256,7 @@ unit-test
 : another-narrow-test
     {
         "IN: temporary"
-        ": another-narrow-layout"
+        ": another-narrow-layout ( -- obj )"
         "    H{"
         "        { 1 2 }"
         "        { 3 4 }"
@@ -276,7 +272,31 @@ unit-test
     "another-narrow-layout" another-narrow-test check-see
 ] unit-test
 
+: class-see-test
+    {
+        "IN: temporary"
+        "TUPLE: class-see-layout ;"
+        ""
+        "IN: temporary"
+        "GENERIC: class-see-layout ( x -- y )"
+        ""
+        "USING: temporary ;"
+        "M: class-see-layout class-see-layout ;"
+    } ;
+
+[ t ] [
+    "class-see-layout" class-see-test check-see
+] unit-test
+
 [ ] [ \ effect-in synopsis drop ] unit-test
+
+! Regression
+[ t ] [
+    "IN: temporary\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
+    dup eval
+    "generic-decl-test" "temporary" lookup
+    [ see ] string-out =
+] unit-test
 
 [ [ + ] ] [
     [ \ + (step-into) ] (remove-breakpoints)
@@ -301,4 +321,3 @@ unit-test
 [ [ 2 . ] ] [
     [ 2 \ break (step-into) . ] (remove-breakpoints)
 ] unit-test
-

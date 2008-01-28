@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel strings math sequences lazy-lists words
-math.parser promises ;
-IN: parser-combinators 
+math.parser promises parser-combinators ;
+IN: parser-combinators.simple
 
 : 'digit' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;

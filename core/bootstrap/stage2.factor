@@ -4,7 +4,8 @@ USING: init command-line namespaces words debugger io
 kernel.private math memory continuations kernel io.files
 io.backend system parser vocabs sequences prettyprint
 vocabs.loader combinators splitting source-files strings
-definitions assocs ;
+definitions assocs compiler.errors compiler.units
+math.parser ;
 IN: bootstrap.stage2
 
 ! Wrap everything in a catch which starts a listener so
@@ -14,12 +15,10 @@ IN: bootstrap.stage2
     vm file-name windows? [ >lower ".exe" ?tail drop ] when
     ".image" append "output-image" set-global
 
-    "math compiler tools help ui ui.tools io" "include" set-global
+    "math tools help compiler ui ui.tools io" "include" set-global
     "" "exclude" set-global
 
     parse-command-line
-
-    all-words [ dup ] H{ } map>assoc changed-words set-global
 
     "-no-crossref" cli-args member? [
         "Cross-referencing..." print flush
@@ -37,7 +36,6 @@ IN: bootstrap.stage2
     ] [
         "listener" require
         "none" require
-        "listener" use+
     ] if
 
     [
@@ -45,18 +43,17 @@ IN: bootstrap.stage2
         [ get-global " " split [ empty? not ] subset ] 2apply
         seq-diff
         [ "bootstrap." swap append require ] each
-    ] no-parse-hook
 
-    init-io
-    init-stdio
+        run-bootstrap-init
 
-    changed-words get clear-assoc
+        "Compiling remaining words..." print flush
 
-    "compile-errors" "generator" lookup [
-        f swap set-global
-    ] when*
-
-    run-bootstrap-init
+        "bootstrap.compiler" vocab [
+            vocabs [
+                words "compile" "compiler" lookup execute
+            ] each
+        ] when
+    ] with-compiler-errors
 
     f error set-global
     f error-continuation set-global
@@ -67,24 +64,27 @@ IN: bootstrap.stage2
         [
             boot
             do-init-hooks
-            [ parse-command-line ] try
-            [ run-user-init ] try
-            [ "run" get run ] try
-            stdio get [ stream-flush ] when*
+            [
+                parse-command-line
+                run-user-init
+                "run" get run
+                stdio get [ stream-flush ] when*
+            ] [ print-error 1 exit ] recover
         ] set-boot-quot
 
-        : count-words all-words swap subset length pprint ;
-    
+        : count-words ( pred -- )
+            all-words swap subset length number>string write ;
+
         [ compiled? ] count-words " compiled words" print
         [ symbol? ] count-words " symbol words" print
         [ ] count-words " words total" print
 
         "Bootstrapping is complete." print
-        "Now, you can run ./factor -i=" write
-        "output-image" get print flush
+        "Now, you can run Factor:" print
+        vm write " -i=" write "output-image" get print flush
 
         "output-image" get resource-path save-image-and-exit
     ] if
 ] [
-    error-hook get call "listener" vocab-main execute
+    error. :c "listener" vocab-main execute
 ] recover

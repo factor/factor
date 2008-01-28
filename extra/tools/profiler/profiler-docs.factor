@@ -3,13 +3,13 @@ quotations io strings words definitions ;
 IN: tools.profiler
 
 ARTICLE: "profiling" "Profiling code" 
-"The " { $vocab-link "tools.profiler" } " vocabulary implements a simple call counting profiler. The profiler has three main limitations:"
+"The " { $vocab-link "tools.profiler" } " vocabulary implements a simple call counting profiler. The profiler is completely accurate with words which are compiled with the non-optimizing compiler. Some optimizations performed by the optimizing compiler can inhibit accurate call counting, however:"
 { $list
-    "Calls to primitives are not counted."
-    { "Calls to " { $link POSTPONE: inline } " words from words compiled with the optimizing compiler are not counted." }
-    "Certain types of tail-recursive words compiled with the optimizing compiler will only count the initial invocation of the word, not every tail call."
+    "The optimizing compiler open-codes certain primitives with inline machine code, and in some cases optimizes them out altogether; this includes stack shuffling operations, conditionals, and many object allocation operations."
+    { "Calls to " { $link POSTPONE: inline } " words are not counted.." }
+    "Tail-recursive loops will only count the initial invocation of the word, not every tail call."
 }
-"Quotations can be passed to a combinator which calls them with word call counting enabled:"
+"Quotations can be passed to a combinator which calls them with the profiler enabled:"
 { $subsection profile }
 "After a quotation has been profiled, call counts can be presented in various ways:"
 { $subsection profile. }

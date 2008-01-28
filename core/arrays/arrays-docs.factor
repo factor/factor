@@ -1,6 +1,5 @@
-USING: byte-arrays bit-arrays help.markup help.syntax
-kernel kernel.private prettyprint strings sbufs vectors
-quotations sequences.private ;
+USING: help.markup help.syntax
+kernel kernel.private prettyprint sequences.private ;
 IN: arrays
 
 ARTICLE: "arrays" "Arrays"
@@ -34,15 +33,9 @@ HELP: <array> ( n elt -- array )
 { $values { "n" "a non-negative integer" } { "elt" "an initial element" } { "array" "a new array" } }
 { $description "Creates a new array with the given length and all elements initially set to " { $snippet "elt" } "." } ;
 
-{ <array> <quotation> <string> <sbuf> <vector> <byte-array> <bit-array> }
-related-words
-
 HELP: >array
 { $values { "seq" "a sequence" } { "array" array } }
 { $description "Outputs a freshly-allocated array with the same elements as a given sequence." } ;
-
-{ >array >quotation >string >sbuf >vector >byte-array >bit-array }
-related-words
 
 HELP: 1array
 { $values { "x" object } { "array" array } }

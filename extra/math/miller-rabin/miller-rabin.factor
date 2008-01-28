@@ -18,43 +18,36 @@ SYMBOL: trials
 : next-odd ( m -- n )
     dup even? [ 1+ ] [ 2 + ] if ;
 
-: random-bits ( m -- n )
-    #! Top bit is always set
-    2^ [ random ] keep -1 shift bitor ; foldable
+: random-bits ( m -- n ) 2^ random ; foldable
 
-: (factor-2s) ( s n -- s n )
+TUPLE: positive-even-expected n ;
+
+: (factor-2s) ( r s -- r s )
     dup even? [ -1 shift >r 1+ r> (factor-2s) ] when ;
 
 : factor-2s ( n -- r s )
-    #! factor an even number into 2 ^ s * m
-    dup even? over 0 > and [
-        "input must be positive and even" throw
-    ] unless 0 swap (factor-2s) ;
+    #! factor an integer into s * 2^r
+    0 swap (factor-2s) ;
 
 :: (miller-rabin) | n prime?! |
-    n dup 1 = over even? or [
-        drop f
-    ] [
-        1- factor-2s s set r set
-        trials get [
-            n 1- [1,b] random a set
-            a get s get n ^mod 1 = [
-                0 count set
-                r get [
-                    2^ s get * a get swap n ^mod n - -1 = [
-                        count [ 1+ ] change
-                        r get +
-                    ] when
-                ] each
-                count get zero? [
-                    f prime?!
-                    trials get +
+    n 1- factor-2s s set r set
+    trials get [
+        n 1- [1,b] random a set
+        a get s get n ^mod 1 = [
+            0 count set
+            r get [
+                2^ s get * a get swap n ^mod n - -1 = [
+                    count [ 1+ ] change
+                    r get +
                 ] when
-            ] unless
-            drop
-        ] each
-        prime?
-    ] if ;
+            ] each
+            count get zero? [
+                f prime?!
+                trials get +
+            ] when
+        ] unless
+        drop
+    ] each prime? ;
 
 TUPLE: miller-rabin-bounds ;
 
@@ -62,6 +55,7 @@ TUPLE: miller-rabin-bounds ;
     over {
         { [ dup 1 <= ] [ 3drop f ] }
         { [ dup 2 = ] [ 3drop t ] }
+        { [ dup even? ] [ 3drop f ] }
         { [ t ] [ [ drop trials set t (miller-rabin) ] with-scope ] }
     } cond ;
 
@@ -81,10 +75,9 @@ TUPLE: miller-rabin-bounds ;
     >odd (find-relative-prime) ;
 
 : find-relative-prime ( n -- p )
-    dup random >odd (find-relative-prime) ;
+    dup random find-relative-prime* ;
 
 : unique-primes ( numbits n -- seq )
     #! generate two primes
     over 5 < [ "not enough primes below 5 bits" throw ] when
-    [ [ drop random-prime ] curry* map ] [ all-unique? ] generate ;
-
+    [ [ drop random-prime ] with map ] [ all-unique? ] generate ;

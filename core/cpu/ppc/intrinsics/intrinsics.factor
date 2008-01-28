@@ -8,7 +8,7 @@ generator generator.registers generator.fixup sequences.private
 sbufs vectors system layouts math.floats.private
 classes tuples tuples.private sbufs.private vectors.private
 strings.private slots.private combinators bit-arrays
-float-arrays ;
+float-arrays compiler.constants ;
 IN: cpu.ppc.intrinsics
 
 : %slot-literal-known-tag
@@ -23,8 +23,8 @@ IN: cpu.ppc.intrinsics
 
 : %slot-any
     "obj" operand "scratch" operand %untag
-    "n" operand dup 1 SRAWI
-    "scratch" operand "val" operand "n" operand ;
+    "offset" operand "n" operand 1 SRAWI
+    "scratch" operand "val" operand "offset" operand ;
 
 \ slot {
     ! Slot number is literal and the tag is known
@@ -47,9 +47,8 @@ IN: cpu.ppc.intrinsics
     {
         [ %slot-any LWZX ] H{
             { +input+ { { f "obj" } { f "n" } } }
-            { +scratch+ { { f "val" } { f "scratch" } } }
+            { +scratch+ { { f "val" } { f "scratch" } { f "offset" } } }
             { +output+ { "val" } }
-            { +clobber+ { "n" } }
         }
     }
 } define-intrinsics
@@ -88,33 +87,34 @@ IN: cpu.ppc.intrinsics
     {
         [ %slot-any STWX %write-barrier ] H{
             { +input+ { { f "val" } { f "obj" } { f "n" } } }
-            { +scratch+ { { f "scratch" } } }
-            { +clobber+ { "val" "n" } }
+            { +scratch+ { { f "scratch" } { f "offset" } } }
+            { +clobber+ { "val" } }
         }
     }
 } define-intrinsics
 
+: (%char-slot)
+    "offset" operand "n" operand 2 SRAWI
+    "offset" operand dup "obj" operand ADD ;
+
 \ char-slot [
-    "out" operand "obj" operand MR
-    "n" operand dup 2 SRAWI
-    "n" operand "obj" operand "n" operand ADD
-    "out" operand "n" operand string-offset LHZ
+    (%char-slot)
+    "out" operand "offset" operand string-offset LHZ
     "out" operand dup %tag-fixnum
 ] H{
     { +input+ { { f "n" } { f "obj" } } }
-    { +scratch+ { { f "out" } } }
+    { +scratch+ { { f "out" } { f "offset" } } }
     { +output+ { "out" } }
-    { +clobber+ { "n" } }
 } define-intrinsic
 
 \ set-char-slot [
+    (%char-slot)
     "val" operand dup %untag-fixnum
-    "slot" operand dup 2 SRAWI
-    "slot" operand dup "obj" operand ADD
-    "val" operand "slot" operand string-offset STH
+    "val" operand "offset" operand string-offset STH
 ] H{
-    { +input+ { { f "val" } { f "slot" } { f "obj" } } }
-    { +clobber+ { "val" "slot" } }
+    { +input+ { { f "val" } { f "n" } { f "obj" } } }
+    { +scratch+ { { f "offset" } } }
+    { +clobber+ { "val" } }
 } define-intrinsic
 
 : fixnum-register-op ( op -- pair )
@@ -166,15 +166,43 @@ IN: cpu.ppc.intrinsics
     }
 } define-intrinsics
 
-\ fixnum-shift [
-    "out" operand "x" operand "y" get neg SRAWI
-    ! Mask off low bits
-    "out" operand dup %untag
-] H{
-    { +input+ { { f "x" } { [ -31 0 between? ] "y" } } }
-    { +scratch+ { { f "out" } } }
-    { +output+ { "out" } }
-} define-intrinsic
+: %untag-fixnums ( seq -- )
+    [ dup %untag-fixnum ] unique-operands ;
+
+\ fixnum-shift-fast {
+    {
+        [
+            "out" operand "x" operand "y" get
+            dup 0 < [ neg SRAWI ] [ swapd SLWI ] if
+            ! Mask off low bits
+            "out" operand dup %untag
+        ] H{
+            { +input+ { { f "x" } { [ ] "y" } } }
+            { +scratch+ { { f "out" } } }
+            { +output+ { "out" } }
+        }
+    }
+    {
+        [
+            { "positive" "end" } [ define-label ] each
+            "out" operand "y" operand %untag-fixnum
+            0 "y" operand 0 CMPI
+            "positive" get BGE
+            "out" operand dup NEG
+            "out" operand "x" operand "out" operand SRAW
+            "end" get B
+            "positive" resolve-label
+            "out" operand "x" operand "out" operand SLW
+            "end" resolve-label
+            ! Mask off low bits
+            "out" operand dup %untag
+        ] H{
+            { +input+ { { f "x" } { f "y" } } }
+            { +scratch+ { { f "out" } } }
+            { +output+ { "out" } }
+        }
+    }
+} define-intrinsics
 
 : generate-fixnum-mod
     #! PowerPC doesn't have a MOD instruction; so we compute
@@ -221,9 +249,6 @@ IN: cpu.ppc.intrinsics
 } [
     first2 define-fixnum-jump
 ] each
-
-: %untag-fixnums ( seq -- )
-    [ dup %untag-fixnum ] unique-operands ;
 
 : overflow-check ( insn1 insn2 -- )
     [
@@ -335,9 +360,10 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 : define-float-op ( word op -- )
-    [ "x" operand "x" operand "y" operand ] swap add H{
+    [ "z" operand "x" operand "y" operand ] swap add H{
         { +input+ { { float "x" } { float "y" } } }
-        { +output+ { "x" } }
+        { +scratch+ { { float "z" } } }
+        { +output+ { "z" } }
     } define-intrinsic ;
 
 {
@@ -373,6 +399,23 @@ IN: cpu.ppc.intrinsics
     { +scratch+ { { float "scratch" } { f "out" } } }
     { +output+ { "out" } }
 } define-intrinsic
+
+\ fixnum>float [
+    HEX: 4330 "scratch" operand LIS
+    "scratch" operand 1 0 param@ STW
+    "scratch" operand "in" operand %untag-fixnum
+    "scratch" operand dup HEX: 8000 XORIS
+    "scratch" operand 1 cell param@ STW
+    "f1" operand 1 0 param@ LFD
+    4503601774854144.0 "scratch" operand load-indirect
+    "f2" operand "scratch" operand float-offset LFD
+    "f1" operand "f1" operand "f2" operand FSUB
+] H{
+    { +input+ { { f "in" } } }
+    { +scratch+ { { f "scratch" } { float "f1" } { float "f2" } } }
+    { +output+ { "f1" } }
+} define-intrinsic
+
 
 \ tag [
     "out" operand "in" operand tag-mask get ANDI

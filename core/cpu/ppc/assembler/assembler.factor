@@ -126,6 +126,10 @@ words math.bitfields io.binary ;
 : (XOR) 316 x-form 31 insn ;
 : XOR 0 (XOR) ;  : XOR. 1 (XOR) ;
 
+: (NEG) 0 -rot 104 xo-form 31 insn ;
+: NEG 0 0 (NEG) ;  : NEG. 0 1 (NEG) ;
+: NEGO 1 0 (NEG) ; : NEGO. 1 1 (NEG) ;
+
 : CMPI d-form 11 insn ;
 : CMPLI d-form 10 insn ;
 

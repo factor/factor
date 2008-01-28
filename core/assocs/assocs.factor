@@ -43,7 +43,7 @@ M: assoc assoc-find
     inline
 
 : assoc-push-if ( key value quot accum -- )
-    >r pick pick 2slip r> roll
+    >r 2keep r> roll
     [ >r 2array r> push ] [ 3drop ] if ; inline
 
 : assoc-pusher ( quot -- quot' accum )
@@ -52,11 +52,11 @@ M: assoc assoc-find
 : assoc-subset ( assoc quot -- subassoc )
     over >r assoc-pusher >r assoc-each r> r> assoc-like ; inline
 
-: assoc-all? ( assoc quot -- ? )
-    [ not ] compose assoc-find 2nip not ; inline
-
 : assoc-contains? ( assoc quot -- ? )
     assoc-find 2nip ; inline
+
+: assoc-all? ( assoc quot -- ? )
+    [ not ] compose assoc-contains? not ; inline
 
 : at ( key assoc -- value/f )
     at* drop ; inline
@@ -76,6 +76,9 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 
 : rename-at ( newkey key assoc -- )
     tuck delete-at* [ -rot set-at ] [ 3drop ] if ;
+
+: delete-any ( assoc -- element )
+    [ [ 2drop t ] assoc-find 2drop dup ] keep delete-at ;
 
 : assoc-empty? ( assoc -- ? )
     assoc-size zero? ;
@@ -122,7 +125,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     swap [ dupd at* [ nip ] [ drop ] if ] curry change-each ;
 
 : cache ( key assoc quot -- value )
-    pick pick at [
+    2over at [
         >r 3drop r>
     ] [
         pick rot >r >r call dup r> r> set-at
@@ -143,7 +146,7 @@ M: assoc >alist [ 2array ] { } assoc>map ;
     swap [ = nip ] curry assoc-find 2drop ;
 
 : search-alist ( key alist -- pair i )
-    [ first = ] curry* find swap ; inline
+    [ first = ] with find swap ; inline
 
 M: sequence at*
     search-alist [ second t ] [ f ] if ;

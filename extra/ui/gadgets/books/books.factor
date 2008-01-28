@@ -23,6 +23,6 @@ M: book pref-dim* gadget-children pref-dims max-dim ;
 
 M: book layout*
     dup rect-dim swap gadget-children
-    [ set-layout-dim ] curry* each ;
+    [ set-layout-dim ] with each ;
 
 M: book focusable-child* current-page ;

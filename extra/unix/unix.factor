@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: unix
 USING: alien alien.c-types alien.syntax kernel libc structs
-math namespaces system ;
+math namespaces system combinators vocabs.loader ;
 
 ! ! ! Unix types
 TYPEDEF: int blksize_t
@@ -13,7 +13,7 @@ TYPEDEF: longlong quad_t
 TYPEDEF: uint gid_t
 TYPEDEF: uint in_addr_t
 TYPEDEF: uint ino_t
-TYPEDEF: uint pid_t
+TYPEDEF: int pid_t
 TYPEDEF: uint socklen_t
 TYPEDEF: uint time_t
 TYPEDEF: uint uid_t
@@ -23,10 +23,6 @@ TYPEDEF: ulonglong off_t
 TYPEDEF: ushort mode_t
 TYPEDEF: ushort nlink_t
 TYPEDEF: void* caddr_t
-
-USE-IF: linux? unix.linux
-USE-IF: bsd? unix.bsd
-USE-IF: solaris? unix.solaris
 
 C-STRUCT: tm
     { "int" "sec" }    ! Seconds: 0-59 (K&R says 0-61?)
@@ -44,6 +40,12 @@ C-STRUCT: tm
 C-STRUCT: timespec
     { "time_t" "sec" }
     { "long" "nsec" } ;
+
+: make-timespec ( ms -- timespec )
+    1000 /mod 1000000 *
+    "timespec" <c-object>
+    [ set-timespec-nsec ] keep
+    [ set-timespec-sec ] keep ;
 
 ! ! ! Unix constants
 
@@ -204,3 +206,9 @@ FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
+
+{
+    { [ linux? ] [ "unix.linux" ] }
+    { [ bsd? ] [ "unix.bsd" ] }
+    { [ solaris? ] [ "unix.solaris" ] }
+} cond require

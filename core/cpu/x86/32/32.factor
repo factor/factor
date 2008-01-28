@@ -46,7 +46,7 @@ M: float-regs push-return-reg
 
 : FLD 4 = [ FLDS ] [ FLDL ] if ;
 
-: load/store-float-return reg-size >r stack-reg swap [+] r> ;
+: load/store-float-return reg-size >r stack@ r> ;
 M: float-regs load-return-reg load/store-float-return FLD ;
 M: float-regs store-return-reg load/store-float-return FSTP ;
 
@@ -275,11 +275,9 @@ T{ x86-backend f 4 } compiler-backend set-global
     JNE
 ] { } define-if-intrinsic
 
-10 set-profiler-prologues
-
 "-no-sse2" cli-args member? [
     "Checking if your CPU supports SSE2..." print flush
-    [ sse2? ] compile-1 [
+    [ sse2? ] compile-call [
         " - yes" print
         "cpu.x86.sse2" require
     ] [

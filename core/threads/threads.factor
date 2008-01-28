@@ -32,7 +32,7 @@ PRIVATE>
 
 : stop ( -- )
     walker-hook [
-        f swap continue-with
+        continue
     ] [
         run-queue pop-back dup array?
         [ first2 continue-with ] [ continue ] if

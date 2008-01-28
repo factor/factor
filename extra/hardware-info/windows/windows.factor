@@ -1,6 +1,6 @@
 USING: alien alien.c-types kernel libc math namespaces
-windows windows.kernel32 windows.advapi32 hardware-info
-words ;
+windows windows.kernel32 windows.advapi32
+words combinators vocabs.loader hardware-info.backend ;
 IN: hardware-info.windows
 
 TUPLE: wince ;
@@ -70,6 +70,8 @@ M: windows cpus ( -- n )
 : system-windows-directory ( -- str )
     \ GetSystemWindowsDirectory get-directory ;
 
-USE-IF: wince? hardware-info.windows.ce
-USE-IF: winnt? hardware-info.windows.nt
-
+<< {
+    { [ wince? ] [ "hardware-info.windows.ce" ] }
+    { [ winnt? ] [ "hardware-info.windows.nt" ] }
+    { [ t ] [ f ] }
+} cond [ require ] when* >>

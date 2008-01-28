@@ -3,6 +3,18 @@
 USING: kernel math sequences arrays assocs ;
 IN: heaps
 
+MIXIN: priority-queue
+
+GENERIC: heap-push ( value key heap -- )
+GENERIC: heap-peek ( heap -- value key )
+GENERIC: heap-pop* ( heap -- )
+GENERIC: heap-pop ( heap -- value key )
+GENERIC: heap-delete ( key heap -- )
+GENERIC: heap-delete* ( key heap -- old ? )
+GENERIC: heap-empty? ( heap -- ? )
+GENERIC: heap-length ( heap -- n )
+GENERIC# heap-pop-while 2 ( heap pred quot -- )
+
 <PRIVATE
 TUPLE: heap data ;
 
@@ -18,6 +30,9 @@ TUPLE: min-heap ;
 TUPLE: max-heap ;
 
 : <max-heap> ( -- max-heap ) max-heap <heap> ;
+
+INSTANCE: min-heap priority-queue
+INSTANCE: max-heap priority-queue
 
 <PRIVATE
 : left ( n -- m ) 2 * 1+ ; inline
@@ -85,7 +100,7 @@ DEFER: down-heap
 
 PRIVATE>
 
-: heap-push ( value key heap -- )
+M: priority-queue heap-push ( value key heap -- )
     >r swap 2array r>
     [ heap-data push ] keep
     [ heap-data ] keep
@@ -94,10 +109,10 @@ PRIVATE>
 : heap-push-all ( assoc heap -- )
     [ swapd heap-push ] curry assoc-each ;
 
-: heap-peek ( heap -- value key )
+M: priority-queue heap-peek ( heap -- value key )
     heap-data first first2 swap ;
 
-: heap-pop* ( heap -- )
+M: priority-queue heap-pop* ( heap -- )
     dup heap-data length 1 > [
         [ heap-data pop ] keep
         [ heap-data set-first ] keep
@@ -106,8 +121,19 @@ PRIVATE>
         heap-data pop*
     ] if ;
 
-: heap-pop ( heap -- value key ) dup heap-peek rot heap-pop* ;
+M: priority-queue heap-pop ( heap -- value key ) dup heap-peek rot heap-pop* ;
 
-: heap-empty? ( heap -- ? ) heap-data empty? ;
+M: priority-queue heap-empty? ( heap -- ? ) heap-data empty? ;
 
-: heap-length ( heap -- n ) heap-data length ;
+M: priority-queue heap-length ( heap -- n ) heap-data length ;
+
+: (heap-pop-while) ( heap pred quot -- )
+    pick heap-empty? [
+        3drop
+    ] [
+        [ >r >r dup heap-peek r> call r> [ drop f ] if ] 3keep
+        roll [ (heap-pop-while) ] [ 3drop ] if
+    ] if ;
+
+M: priority-queue heap-pop-while ( heap pred quot -- )
+    [ heap-pop ] swap [ t ] 3compose (heap-pop-while) ;

@@ -3,7 +3,8 @@ USING: arrays math.private kernel math compiler inference
 inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
-slots.private combinators ;
+slots.private combinators definitions compiler.units
+system ;
 
 ! Make sure these compile even though this is invalid code
 [ ] [ [ 10 mod 3.0 /i ] dataflow optimize drop ] unit-test
@@ -14,7 +15,7 @@ slots.private combinators ;
 
 : inlined? ( quot word -- ? )
     swap dataflow optimize
-    [ node-param eq? ] curry* node-exists? not ;
+    [ node-param eq? ] with node-exists? not ;
 
 GENERIC: mynot ( x -- y )
 
@@ -34,8 +35,6 @@ M: f detect-f ;
 
 [ ] [ [ fixnum< [ ] [ ] if ] dataflow optimize drop ] unit-test
 
-FORGET: xyz
-
 GENERIC: xyz ( n -- n )
 
 M: integer xyz ;
@@ -52,7 +51,7 @@ M: object xyz ;
 ] unit-test
 
 : (fx-repeat) ( i n quot -- )
-    pick pick fixnum>= [
+    2over fixnum>= [
         3drop
     ] [
         [ swap >r call 1 fixnum+fast r> ] keep (fx-repeat)
@@ -68,7 +67,7 @@ M: object xyz ;
 ] unit-test
 
 : (i-repeat) ( i n quot -- )
-    pick pick dup xyz drop >= [
+    2over dup xyz drop >= [
         3drop
     ] [
         [ swap >r call 1+ r> ] keep (i-repeat)
@@ -136,9 +135,15 @@ M: object xyz ;
     ] set-constraints
 ] "constraints" set-word-prop
 
+DEFER: blah
+
 [ t ] [
-    [ dup V{ } eq? [ foo ] when ] dup second dup push
-    compile-quot word?
+    [
+        \ blah
+        [ dup V{ } eq? [ foo ] when ] dup second dup push define
+    ] with-compilation-unit
+
+    \ blah compiled?
 ] unit-test
 
 GENERIC: detect-fx ( n -- n )
@@ -210,7 +215,7 @@ GENERIC: annotate-entry-test-1 ( x -- )
 M: fixnum annotate-entry-test-1 drop ;
 
 : (annotate-entry-test-2) ( from to quot -- )
-    pick pick >= [
+    2over >= [
         3drop
     ] [
         [ swap >r call dup annotate-entry-test-1 1+ r> ] keep (annotate-entry-test-2)
@@ -231,3 +236,30 @@ M: fixnum annotate-entry-test-1 drop ;
 [ t ] [
     [ 3 + = ] \ equal? inlined?
 ] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare 7 bitand neg shift ]
+    \ shift inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare 7 bitand neg shift ]
+    \ fixnum-shift inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare 1 swap 7 bitand shift ]
+    \ fixnum-shift inlined?
+] unit-test
+
+cell-bits 32 = [
+    [ t ] [
+        [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
+        \ shift inlined?
+    ] unit-test
+
+    [ f ] [
+        [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
+        \ fixnum-shift inlined?
+    ] unit-test
+] when

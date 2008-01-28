@@ -1,4 +1,5 @@
-USING: delegate help.syntax help.markup ;
+USING: help.syntax help.markup ;
+IN: delegate
 
 HELP: define-protocol
 { $values { "wordlist" "a sequence of words" } { "protocol" "a word for the new protocol" } }

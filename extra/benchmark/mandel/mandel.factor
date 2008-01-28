@@ -21,7 +21,7 @@ math.functions math.parser io.files colors.hsv ;
     dup [
         360 * swap 1+ / sat val
         3array hsv>rgb first3 scale-rgb
-    ] curry* map ;
+    ] with map ;
 
 : iter ( c z nb-iter -- x )
     over absq 4.0 >= over zero? or
@@ -34,9 +34,9 @@ SYMBOL: cols
 
 : c ( i j -- c )
     >r
-    x-inc * center real x-inc width 2 / * - + >float
+    x-inc * center real-part x-inc width 2 / * - + >float
     r>
-    y-inc * center imaginary y-inc height 2 / * - + >float
+    y-inc * center imaginary-part y-inc height 2 / * - + >float
     rect> ; inline
 
 : render ( -- )

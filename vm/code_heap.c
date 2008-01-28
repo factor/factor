@@ -36,11 +36,9 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 		return undefined_symbol;
 }
 
-static CELL xt_offset;
-
 /* Compute an address to store at a relocation */
 INLINE CELL compute_code_rel(F_REL *rel,
-	CELL code_start, CELL literals_start, CELL words_start)
+	CELL code_start, CELL literals_start)
 {
 	switch(REL_TYPE(rel))
 	{
@@ -50,19 +48,15 @@ INLINE CELL compute_code_rel(F_REL *rel,
 		return (CELL)get_rel_symbol(rel,literals_start);
 	case RT_LITERAL:
 		return CREF(literals_start,REL_ARGUMENT(rel));
-	case RT_DISPATCH:
-		return CREF(words_start,REL_ARGUMENT(rel));
 	case RT_XT:
-		return get(CREF(words_start,REL_ARGUMENT(rel)))
-			+ sizeof(F_COMPILED) + xt_offset;
-	case RT_XT_PROFILING:
-		return get(CREF(words_start,REL_ARGUMENT(rel)))
-			+ sizeof(F_COMPILED);
+		return (CELL)untag_word(get(CREF(literals_start,REL_ARGUMENT(rel))))->xt;
+	case RT_HERE:
+		return rel->offset + code_start;
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
 	default:
 		critical_error("Bad rel type",rel->type);
-		return -1;
+		return -1; /* Can't happen */
 	}
 }
 
@@ -131,24 +125,27 @@ void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
 
 /* Perform all fixups on a code block */
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
+	CELL reloc_start, CELL literals_start)
 {
-	xt_offset = (profiling_p() ? 0 : profiler_prologue());
-
-	F_REL *rel = (F_REL *)reloc_start;
-	F_REL *rel_end = (F_REL *)literals_start;
-
-	while(rel < rel_end)
+	if(reloc_start != literals_start)
 	{
-		CELL offset = rel->offset + code_start;
+		F_REL *rel = (F_REL *)reloc_start;
+		F_REL *rel_end = (F_REL *)literals_start;
 
-		F_FIXNUM absolute_value = compute_code_rel(rel,
-			code_start,literals_start,words_start);
+		while(rel < rel_end)
+		{
+			CELL offset = rel->offset + code_start;
 
-		apply_relocation(REL_CLASS(rel),offset,absolute_value);
+			F_FIXNUM absolute_value = compute_code_rel(
+				rel,code_start,literals_start);
 
-		rel++;
+			apply_relocation(REL_CLASS(rel),offset,absolute_value);
+
+			rel++;
+		}
 	}
+
+	flush_icache(code_start,reloc_start - code_start);
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
@@ -167,30 +164,6 @@ void fixup_labels(F_ARRAY *labels, CELL code_format, CELL code_start)
 			offset + code_start,
 			target + code_start);
 	}
-}
-
-/* After compiling a batch of words, we replace all mutual word references with
-direct XT references, and perform fixups */
-void finalize_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
-{
-	CELL scan;
-
-	if(relocating->finalized != false)
-		critical_error("Finalizing a finalized block",(CELL)relocating);
-
-	for(scan = words_start; scan < words_end; scan += CELLS)
-		put(scan,(CELL)(untag_word(get(scan))->code));
-
-	relocating->finalized = true;
-
-	if(reloc_start != literals_start)
-	{
-		relocate_code_block(relocating,code_start,reloc_start,
-			literals_start,words_start,words_end);
-	}
-
-	flush_icache(code_start,reloc_start - code_start);
 }
 
 /* Write a sequence of integers to memory, with 'format' bytes per integer */
@@ -219,6 +192,11 @@ void deposit_objects(CELL here, F_ARRAY *array)
 	memcpy((void*)here,array + 1,array_capacity(array) * CELLS);
 }
 
+bool stack_traces_p(void)
+{
+	return to_boolean(userenv[STACK_TRACES_ENV]);
+}
+
 CELL compiled_code_format(void)
 {
 	return untag_fixnum_fast(userenv[JIT_CODE_FORMAT]);
@@ -242,33 +220,30 @@ CELL allot_code_block(CELL size)
 	return start;
 }
 
+/* Might GC */
 F_COMPILED *add_compiled_block(
 	CELL type,
 	F_ARRAY *code,
 	F_ARRAY *labels,
-	F_ARRAY *rel,
-	F_ARRAY *words,
+	F_ARRAY *relocation,
 	F_ARRAY *literals)
 {
 	CELL code_format = compiled_code_format();
 
 	CELL code_length = align8(array_capacity(code) * code_format);
-	CELL rel_length = (rel ? array_capacity(rel) * sizeof(unsigned int) : 0);
-	CELL words_length = (words ? array_capacity(words) * CELLS : 0);
-	CELL literals_length = (literals ? array_capacity(literals) * CELLS : 0);
+	CELL rel_length = array_capacity(relocation) * sizeof(unsigned int);
+	CELL literals_length = array_capacity(literals) * CELLS;
 
 	REGISTER_UNTAGGED(code);
 	REGISTER_UNTAGGED(labels);
-	REGISTER_UNTAGGED(rel);
-	REGISTER_UNTAGGED(words);
+	REGISTER_UNTAGGED(relocation);
 	REGISTER_UNTAGGED(literals);
 
 	CELL here = allot_code_block(sizeof(F_COMPILED) + code_length
-		+ rel_length + literals_length + words_length);
+		+ rel_length + literals_length);
 
 	UNREGISTER_UNTAGGED(literals);
-	UNREGISTER_UNTAGGED(words);
-	UNREGISTER_UNTAGGED(rel);
+	UNREGISTER_UNTAGGED(relocation);
 	UNREGISTER_UNTAGGED(labels);
 	UNREGISTER_UNTAGGED(code);
 
@@ -278,8 +253,6 @@ F_COMPILED *add_compiled_block(
 	header->code_length = code_length;
 	header->reloc_length = rel_length;
 	header->literals_length = literals_length;
-	header->words_length = words_length;
-	header->finalized = false;
 
 	here += sizeof(F_COMPILED);
 
@@ -290,25 +263,12 @@ F_COMPILED *add_compiled_block(
 	here += code_length;
 
 	/* relation info */
-	if(rel)
-	{
-		deposit_integers(here,rel,sizeof(unsigned int));
-		here += rel_length;
-	}
+	deposit_integers(here,relocation,sizeof(unsigned int));
+	here += rel_length;
 
 	/* literals */
-	if(literals)
-	{
-		deposit_objects(here,literals);
-		here += literals_length;
-	}
-
-	/* words */
-	if(words)
-	{
-		deposit_objects(here,words);
-		here += words_length;
-	}
+	deposit_objects(here,literals);
+	here += literals_length;
 
 	/* fixup labels */
 	if(labels)
@@ -321,55 +281,98 @@ F_COMPILED *add_compiled_block(
 	return header;
 }
 
-void set_word_xt(F_WORD *word, F_COMPILED *compiled)
+void set_word_code(F_WORD *word, F_COMPILED *compiled)
 {
+	if(compiled->type != WORD_TYPE)
+		critical_error("bad param to set_word_xt",(CELL)compiled);
+
 	word->code = compiled;
-	word->xt = (XT)(compiled + 1);
-
-	if(!profiling_p())
-		word->xt += profiler_prologue();
-
 	word->compiledp = T;
 }
 
-DEFINE_PRIMITIVE(add_compiled_block)
+/* Allocates memory */
+void default_word_code(F_WORD *word, bool relocate)
 {
-	F_ARRAY *code = untag_array(dpop());
-	F_ARRAY *labels = untag_array(dpop());
-	F_ARRAY *rel = untag_array(dpop());
-	F_ARRAY *words = untag_array(dpop());
-	F_ARRAY *literals = untag_array(dpop());
+	REGISTER_UNTAGGED(word);
+	jit_compile(word->def,relocate);
+	UNREGISTER_UNTAGGED(word);
 
-	F_COMPILED *compiled = add_compiled_block(WORD_TYPE,code,labels,rel,words,literals);
-
-	/* push a new word whose XT points to this code block on the stack */
-	F_WORD *word = allot_word(F,F);
-	set_word_xt(word,compiled);
-	dpush(tag_object(word));
+	word->code = untag_quotation(word->def)->code;
+	word->compiledp = F;
 }
 
-/* After batch compiling a bunch of words, perform various fixups to make them
-executable */
-DEFINE_PRIMITIVE(finalize_compile)
+DEFINE_PRIMITIVE(modify_code_heap)
 {
-	F_ARRAY *array = untag_array(dpop());
+	F_ARRAY *alist = untag_array(dpop());
 
-	/* set word XT's */
-	CELL count = untag_fixnum_fast(array->capacity);
+	bool rescan_code_heap = false;
+
+	CELL count = untag_fixnum_fast(alist->capacity);
 	CELL i;
 	for(i = 0; i < count; i++)
 	{
-		F_ARRAY *pair = untag_array(array_nth(array,i));
+		F_ARRAY *pair = untag_array(array_nth(alist,i));
+
 		F_WORD *word = untag_word(array_nth(pair,0));
-		F_COMPILED *compiled = untag_word(array_nth(pair,1))->code;
-		set_word_xt(word,compiled);
+
+		if(word->vocabulary != F)
+			rescan_code_heap = true;
+
+		CELL data = array_nth(pair,1);
+
+		if(data == F)
+		{
+			REGISTER_UNTAGGED(alist);
+			REGISTER_UNTAGGED(word);
+			default_word_code(word,false);
+			UNREGISTER_UNTAGGED(word);
+			UNREGISTER_UNTAGGED(alist);
+		}
+		else
+		{
+			F_ARRAY *compiled_code = untag_array(data);
+
+			F_ARRAY *literals = untag_array(array_nth(compiled_code,0));
+			F_ARRAY *relocation = untag_array(array_nth(compiled_code,1));
+			F_ARRAY *labels = untag_array(array_nth(compiled_code,2));
+			F_ARRAY *code = untag_array(array_nth(compiled_code,3));
+
+			REGISTER_UNTAGGED(alist);
+			REGISTER_UNTAGGED(word);
+
+			F_COMPILED *compiled = add_compiled_block(
+				WORD_TYPE,
+				code,
+				labels,
+				relocation,
+				literals);
+
+			UNREGISTER_UNTAGGED(word);
+			UNREGISTER_UNTAGGED(alist);
+
+			set_word_code(word,compiled);
+		}
+
+		REGISTER_UNTAGGED(alist);
+		update_word_xt(word);
+		UNREGISTER_UNTAGGED(alist);
 	}
 
-	/* perform relocation */
-	for(i = 0; i < count; i++)
+	/* If there were any interned words in the set, we relocate all XT
+	references in the entire code heap. But if all the words are
+	uninterned, it is impossible that other words reference them, so we
+	only have to relocate the new words. This makes compile-call much
+	more efficient */
+	if(rescan_code_heap)
+		iterate_code_heap(relocate_code_block);
+	else
 	{
-		F_ARRAY *pair = untag_array(array_nth(array,i));
-		F_WORD *word = untag_word(array_nth(pair,0));
-		iterate_code_heap_step(word->code,finalize_code_block);
+		for(i = 0; i < count; i++)
+		{
+			F_ARRAY *pair = untag_array(array_nth(alist,i));
+			F_WORD *word = untag_word(array_nth(pair,0));
+
+			iterate_code_heap_step(word->code,relocate_code_block);
+		}
 	}
 }

@@ -1,4 +1,5 @@
-USING: xml-rpc help.syntax help.markup ;
+USING: help.syntax help.markup ;
+IN: xml-rpc
 
 HELP: send-rpc
 { $values { "rpc" "an RPC data type" } { "xml" "an XML document" } }

@@ -37,7 +37,7 @@ M: operation command-word operation-command command-word ;
 SYMBOL: operations
 
 : object-operations ( obj -- operations )
-    operations get [ operation-predicate call ] curry* subset ;
+    operations get [ operation-predicate call ] with subset ;
 
 : find-operation ( obj quot -- command )
     >r object-operations r> find-last nip ; inline

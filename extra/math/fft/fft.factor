@@ -4,7 +4,7 @@ USING: arrays sequences math math.vectors math.constants
 math.functions kernel splitting ;
 IN: math.fft
 
-: n^v ( n v -- w ) [ ^ ] curry* map ;
+: n^v ( n v -- w ) [ ^ ] with map ;
 : even ( seq -- seq ) 2 group 0 <column> ;
 : odd ( seq -- seq ) 2 group 1 <column> ;
 DEFER: fft

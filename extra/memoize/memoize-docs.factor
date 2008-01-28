@@ -1,6 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: memoize help.syntax help.markup ;
+USING: help.syntax help.markup ;
+IN: memoize
 
 HELP: define-memoized
 { $values { "word" "the word to be defined" } { "quot" "a quotation" } }

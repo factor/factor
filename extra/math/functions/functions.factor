@@ -30,6 +30,11 @@ M: real sqrt
         2dup >r >r >r odd? r> call r> 2/ r> each-bit
     ] if ; inline
 
+: clear-bit ( x n -- y ) 2^ bitnot bitand ; foldable
+: set-bit ( x n -- y ) 2^ bitor ; foldable
+: bit-clear? ( x n -- ? ) 2^ bitand zero? ; foldable
+: bit-set? ( x n -- ? ) bit-clear? not ; foldable
+
 GENERIC: (^) ( x y -- z ) foldable
 
 : ^n ( z w -- z^w )
@@ -105,7 +110,7 @@ M: real absq sq ;
 : power-of-2? ( n -- ? )
     dup 0 < [ drop f ] [ dup 1- bitand zero? ] if ; foldable
 
-: >rect ( z -- x y ) dup real swap imaginary ; inline
+: >rect ( z -- x y ) dup real-part swap imaginary-part ; inline
 
 : conjugate ( z -- z* ) >rect neg rect> ; inline
 

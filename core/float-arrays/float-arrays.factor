@@ -1,8 +1,8 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: float-arrays
 USING: kernel kernel.private alien sequences
 sequences.private math math.private ;
+IN: float-arrays
 
 <PRIVATE
 
@@ -30,6 +30,8 @@ M: float-array equal?
     over float-array? [ sequence= ] [ 2drop f ] if ;
 
 INSTANCE: float-array sequence
+INSTANCE: float-array simple-c-ptr
+INSTANCE: float-array c-ptr
 
 : 1float-array ( x -- array ) 1 swap <float-array> ; flushable
 

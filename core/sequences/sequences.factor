@@ -115,7 +115,7 @@ INSTANCE: integer immutable-sequence
     [ tuck nth-unsafe >r nth-unsafe r> ] 3keep tuck
     >r >r set-nth-unsafe r> r> set-nth-unsafe ; inline
 
-: (head) ( seq n -- from to seq ) 0 swap rot ; inline
+: (head) ( seq n -- from to seq ) 0 spin ; inline
 
 : (tail) ( seq n -- from to seq ) over length rot ; inline
 
@@ -194,12 +194,12 @@ TUPLE: slice-error reason ;
 : check-slice ( from to seq -- from to seq )
     pick 0 < [ "start < 0" slice-error ] when
     dup length pick < [ "end > sequence" slice-error ] when
-    pick pick > [ "start > end" slice-error ] when ; inline
+    2over > [ "start > end" slice-error ] when ; inline
 
 : <slice> ( from to seq -- slice )
     dup slice? [ collapse-slice ] when
     check-slice
-    slice construct-boa ;
+    slice construct-boa ; inline
 
 M: slice virtual-seq slice-seq ;
 M: slice virtual@ [ slice-from + ] keep slice-seq ;
@@ -221,7 +221,8 @@ TUPLE: column seq col ;
 C: <column> column
 
 M: column virtual-seq column-seq ;
-M: column virtual@ dup column-col -rot column-seq nth ;
+M: column virtual@
+    dup column-col -rot column-seq nth bounds-check ;
 M: column length column-seq length ;
 
 INSTANCE: column virtual-sequence
@@ -270,7 +271,7 @@ PRIVATE>
 : tail* ( seq n -- tailseq ) from-end tail ;
 
 : copy ( src i dst -- )
-    pick length >r 3dup check-copy swap rot 0 r>
+    pick length >r 3dup check-copy spin 0 r>
     (copy) drop ; inline
 
 M: sequence clone-like
@@ -420,13 +421,13 @@ PRIVATE>
     ] keep { } like ; inline
 
 : index ( obj seq -- n )
-    [ = ] curry* find drop ;
+    [ = ] with find drop ;
 
 : index* ( obj i seq -- n )
     rot [ = ] curry find* drop ;
 
 : last-index ( obj seq -- n )
-    [ = ] curry* find-last drop ;
+    [ = ] with find-last drop ;
 
 : last-index* ( obj i seq -- n )
     rot [ = ] curry find-last* drop ;
@@ -435,16 +436,16 @@ PRIVATE>
     find drop >boolean ; inline
 
 : member? ( obj seq -- ? )
-    [ = ] curry* contains? ;
+    [ = ] with contains? ;
 
 : memq? ( obj seq -- ? )
-    [ eq? ] curry* contains? ;
+    [ eq? ] with contains? ;
 
 : remove ( obj seq -- newseq )
-    [ = not ] curry* subset ;
+    [ = not ] with subset ;
 
 : cache-nth ( i seq quot -- elt )
-    pick pick ?nth dup [
+    2over ?nth dup [
         >r 3drop r>
     ] [
         drop swap >r over >r call dup r> r> set-nth
@@ -464,7 +465,7 @@ M: sequence <=>
     [ mismatch not ] [ 2drop f ] if ; inline
 
 : move ( to from seq -- )
-    pick pick number=
+    2over number=
     [ 3drop ] [ [ nth swap ] keep set-nth ] if ; inline
 
 : (delete) ( elt store scan seq -- elt store scan seq )
@@ -498,15 +499,15 @@ M: sequence <=>
 : pop* ( seq -- ) dup length 1- swap set-length ;
 
 : move-backward ( shift from to seq -- )
-    pick pick number= [
+    2over number= [
         2drop 2drop
     ] [
-        [ >r pick pick + pick r> move >r 1+ r> ] keep
+        [ >r 2over + pick r> move >r 1+ r> ] keep
         move-backward
     ] if ;
 
 : move-forward ( shift from to seq -- )
-    pick pick number= [
+    2over number= [
         2drop 2drop
     ] [
         [ >r pick >r dup dup r> + swap r> move 1- ] keep
@@ -546,11 +547,6 @@ M: sequence <=>
 
 : all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
 
-: flip ( matrix -- newmatrix )
-    dup empty? [
-        dup first length [ <column> dup like ] curry* map
-    ] unless ;
-
 : exchange ( m n seq -- )
     pick over bounds-check 2drop 2dup bounds-check 2drop
     exchange-unsafe ;
@@ -579,7 +575,7 @@ M: sequence <=>
 
 : join ( seq glue -- newseq )
     [
-        2dup joined-length over new-resizable -rot swap
+        2dup joined-length over new-resizable spin
         [ dup pick push-all ] [ pick push-all ] interleave drop
     ] keep like ;
 
@@ -667,7 +663,19 @@ PRIVATE>
 : infimum ( seq -- n ) dup first [ min ] reduce ;
 : supremum ( seq -- n ) dup first [ max ] reduce ;
 
+: flip ( matrix -- newmatrix )
+    dup empty? [
+        dup [ length ] map infimum
+        [ <column> dup like ] with map
+    ] unless ;
+
+: sequence-hashcode-step ( oldhash newpart -- newhash )
+    swap [
+        dup -2 fixnum-shift >fixnum swap 5 fixnum-shift >fixnum
+        fixnum+fast fixnum+fast
+    ] keep bitxor ; inline
+
 : sequence-hashcode ( n seq -- x )
     0 -rot [
-        hashcode* >fixnum swap 31 fixnum*fast fixnum+fast
-    ] curry* each ; inline
+        hashcode* >fixnum sequence-hashcode-step
+    ] with each ; inline

@@ -4,51 +4,100 @@ USING: hashtables kernel math namespaces sequences strings
 io io.streams.string xml.data assocs ;
 IN: xml.writer
 
-: write-entities
+SYMBOL: xml-pprint?
+SYMBOL: sensitive-tags
+SYMBOL: indentation
+SYMBOL: indenter
+"  " indenter set-global
+
+: sensitive? ( tag -- ? )
+    sensitive-tags get swap [ names-match? ] curry contains? ;
+
+: ?indent ( -- )
+    xml-pprint? get [
+        nl indentation get indenter get <repetition> [ write ] each
+    ] when ;
+
+: indent ( -- )
+    xml-pprint? get [ 1 indentation +@ ] when ;
+
+: unindent ( -- )
+    xml-pprint? get [ -1 indentation +@ ] when ;
+
+: trim-whitespace ( string -- no-whitespace )
+    [ [ blank? not ] find drop 0 or ] keep
+    [ [ blank? not ] find-last drop [ 1+ ] [ 0 ] if* ] keep
+    subseq ;
+
+: ?filter-children ( children -- no-whitespace )
+    xml-pprint? get [
+        [ dup string? [ trim-whitespace ] when ] map
+        [ dup empty? swap string? and not ] subset
+    ] when ;
+
+: entities-out
     H{
         { CHAR: < "&lt;"   }
         { CHAR: > "&gt;"   }
+        { CHAR: & "&amp;"  }
+    } ;
+
+: quoted-entities-out
+    H{
         { CHAR: & "&amp;"  }
         { CHAR: ' "&apos;" }
         { CHAR: " "&quot;" }
     } ;
 
-: chars>entities ( str -- str )
+: escape-string-by ( str table -- escaped )
     #! Convert <, >, &, ' and " to HTML entities.
-    [ [ dup write-entities at [ % ] [ , ] ?if ] each ] "" make ;
+    [ [ dupd at [ % ] [ , ] ?if ] curry each ] "" make ;
+
+: escape-string ( str -- newstr )
+    entities-out escape-string-by ;
+
+: escape-quoted-string ( str -- newstr )
+    quoted-entities-out escape-string-by ;
 
 : print-name ( name -- )
     dup name-space f like
     [ write CHAR: : write1 ] when*
     name-tag write ;
 
-: print-attrs ( hash -- )
+: print-attrs ( assoc -- )
     [
-        first2 " " write
+        " " write
         swap print-name
         "=\"" write
-        chars>entities write
+        escape-quoted-string write
         "\"" write
-    ] each ;
+    ] assoc-each ;
 
 GENERIC: write-item ( object -- )
 
 M: string write-item
-    chars>entities write ;
+    escape-string write ;
+
+: write-tag ( tag -- )
+    CHAR: < write1
+    dup print-name tag-attrs print-attrs ;
 
 M: contained-tag write-item
-    CHAR: < write1
-    dup print-name
-    tag-attrs print-attrs
-    "/>" write ;
+    write-tag "/>" write ;
+
+: write-children ( tag -- )
+    indent tag-children ?filter-children
+    [ ?indent write-item ] each unindent ;
+
+: write-end-tag ( tag -- )
+    ?indent "</" write print-name CHAR: > write1 ;
 
 M: open-tag write-item
-    CHAR: < write1
-    dup print-name
-    dup tag-attrs print-attrs
-    CHAR: > write1
-    dup tag-children [ write-item ] each
-    "</" write print-name CHAR: > write1 ;
+    xml-pprint? [ [
+        over sensitive? not and xml-pprint? set
+        dup write-tag CHAR: > write1
+        dup write-children write-end-tag
+    ] keep ] change ;
 
 M: comment write-item
     "<!--" write comment-text write "-->" write ;
@@ -63,7 +112,7 @@ M: instruction write-item
     "<?xml version=\"" write dup prolog-version write
     "\" encoding=\"" write dup prolog-encoding write
     prolog-standalone [ "\" standalone=\"yes" write ] when
-    "\"?>" write ;
+    "\"?>\n" write ;
 
 : write-chunk ( seq -- )
     [ write-item ] each ;
@@ -80,3 +129,22 @@ M: instruction write-item
 : xml>string ( xml -- string )
     [ write-xml ] string-out ;
 
+: with-xml-pprint ( sensitive-tags quot -- )
+    [
+        swap [ assure-name ] map sensitive-tags set
+        0 indentation set
+        xml-pprint? on
+        call
+    ] with-scope ; inline
+
+: pprint-xml-but ( xml sensitive-tags -- )
+    [ print-xml ] with-xml-pprint ;
+
+: pprint-xml ( xml -- )
+    f pprint-xml-but ;
+
+: pprint-xml>string-but ( xml sensitive-tags -- string )
+    [ xml>string ] with-xml-pprint ;
+
+: pprint-xml>string ( xml -- string )
+    f pprint-xml>string-but ;

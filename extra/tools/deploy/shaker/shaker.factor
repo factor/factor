@@ -5,13 +5,13 @@ assocs kernel vocabs words sequences memory io system arrays
 continuations math definitions mirrors splitting parser classes
 inspector layouts vocabs.loader prettyprint.config prettyprint
 debugger io.streams.c io.streams.duplex io.files io.backend
-quotations words.private tools.deploy.config ;
+quotations words.private tools.deploy.config compiler.units ;
 IN: tools.deploy.shaker
 
 : show ( msg -- )
     #! Use primitives directly so that we can print stuff even
     #! after most of the image has been stripped away
-    "\r\n" append stdout fwrite stdout fflush ;
+    "\r\n" append stdout-handle fwrite stdout-handle fflush ;
 
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
@@ -48,15 +48,15 @@ IN: tools.deploy.shaker
     [ f over set-word-name f swap set-word-vocabulary ] each ;
 
 : strip-word-defs ( words -- )
-    "Stripping unoptimized definitions from optimized words" show
-    [ compiled? ] subset [ [ ] swap set-word-def ] each ;
+    "Stripping symbolic word definitions" show
+    [ [ ] swap set-word-def ] each ;
 
 : strip-word-props ( retain-props words -- )
     "Stripping word properties" show
     [
         [ word-props strip-assoc f assoc-like ] keep
         set-word-props
-    ] curry* each ;
+    ] with each ;
 
 : retained-props ( -- seq )
     [
@@ -90,8 +90,6 @@ IN: tools.deploy.shaker
     { } set-retainstack
     V{ } set-namestack
     V{ } set-catchstack
-    "Stripping compiled quotations" show
-    strip-compiled-quotations
     "Saving final image" show
     [ save-image-and-exit ] call-clear ;
 
@@ -110,10 +108,6 @@ SYMBOL: deploy-vocab
     [
         builtins ,
         strip-io? [ io-backend , ] unless
-
-        deploy-compiler? get [
-            "callbacks" "alien.compiler" lookup ,
-        ] when
 
         strip-dictionary? [
             {
@@ -156,11 +150,14 @@ SYMBOL: deploy-vocab
         ] when
     ] { } make dup . ;
 
-: strip ( hook -- )
-    >r strip-libc
+: strip-recompile-hook ( -- )
+    [ [ f ] { } map>assoc ] recompile-hook set-global ;
+
+: strip ( -- )
+    strip-libc
     strip-cocoa
     strip-debugger
-    r> [ call ] when*
+    strip-recompile-hook
     strip-init-hooks
     deploy-vocab get vocab-main set-boot-quot*
     retained-props >r
@@ -173,8 +170,6 @@ SYMBOL: deploy-vocab
     [
         [
             deploy-vocab set
-            parse-hook get
-            parse-hook off
             deploy-vocab get require
             strip
             finish-deploy

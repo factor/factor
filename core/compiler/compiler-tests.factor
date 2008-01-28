@@ -1,4 +1,5 @@
-USING: io.files tools.test sequences namespaces kernel ;
+USING: io.files tools.test sequences namespaces kernel
+compiler.units ;
 
 {
     "templates-early"

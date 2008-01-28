@@ -3,12 +3,9 @@
 !
 ! Wrap a sniffer in a channel
 USING: kernel channels concurrency io io.backend
-io.sniffer system ;
+io.sniffer io.sniffer.backend system vocabs.loader ;
 
 : (sniff-channel) ( stream channel -- ) 
   4096 pick stream-read-partial over to (sniff-channel) ;
 
-HOOK: sniff-channel io-backend ( -- channel ) 
-
-USE-IF: bsd? channels.sniffer.bsd
-
+bsd? [ "channels.sniffer.bsd" require ] when

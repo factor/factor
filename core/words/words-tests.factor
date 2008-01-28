@@ -1,11 +1,13 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
-vocabs continuations ;
+vocabs continuations tuples compiler.units ;
 IN: temporary
 
 [ 4 ] [
-    "poo" "scratchpad" create [ 2 2 + ] define-compound
-    "poo" "scratchpad" lookup execute
+    [
+        "poo" "temporary" create [ 2 2 + ] define
+    ] with-compilation-unit
+    "poo" "temporary" lookup execute
 ] unit-test
 
 [ t ] [ t vocabs [ words [ word? and ] each ] each ] unit-test
@@ -22,8 +24,6 @@ DEFER: plist-test
     \ plist-test "sample-property" word-prop
 ] unit-test
 
-[ f ] [ 5 compound? ] unit-test
-
 "create-test" "scratchpad" create { 1 2 } "testing" set-word-prop
 [ { 1 2 } ] [
     "create-test" "scratchpad" lookup "testing" word-prop
@@ -32,7 +32,7 @@ DEFER: plist-test
 [
     [ t ] [ \ array? "array?" "arrays" lookup = ] unit-test
 
-    "test-scope" "scratchpad" create drop
+    [ ] [ "test-scope" "scratchpad" create drop ] unit-test
 ] with-scope
 
 [ "test-scope" ] [
@@ -44,13 +44,7 @@ DEFER: plist-test
 
 [ f ] [ gensym gensym = ] unit-test
 
-[ f ] [ 123 compound? ] unit-test
-
-: colon-def ;
-[ t ] [ \ colon-def compound? ] unit-test
-
 SYMBOL: a-symbol
-[ f ] [ \ a-symbol compound? ] unit-test
 [ t ] [ \ a-symbol symbol? ] unit-test
 
 ! See if redefining a generic as a colon def clears some
@@ -88,14 +82,23 @@ FORGET: another-forgotten
 FORGET: foe
 
 ! xref should not retain references to gensyms
-gensym [ * ] define-compound
+[ ] [
+    [ gensym [ * ] define ] with-compilation-unit
+] unit-test
 
 [ t ] [
     \ * usage [ word? ] subset [ interned? not ] subset empty?
 ] unit-test
 
 DEFER: calls-a-gensym
-\ calls-a-gensym gensym dup "x" set 1quotation define-compound
+[ ] [
+    [
+        \ calls-a-gensym
+        gensym dup "x" set 1quotation
+        define
+    ] with-compilation-unit
+] unit-test
+
 [ f ] [ "x" get crossref get at ] unit-test
 
 ! more xref buggery
@@ -115,7 +118,7 @@ M: array freakish ;
 [ t ] [ \ bar \ freakish usage member? ] unit-test
 
 DEFER: x
-[ t ] [ [ x ] catch third \ x eq? ] unit-test
+[ t ] [ [ x ] catch undefined? ] unit-test
 
 [ ] [ "no-loc" "temporary" create drop ] unit-test
 [ f ] [ "no-loc" "temporary" lookup where ] unit-test
@@ -126,20 +129,60 @@ DEFER: x
 [ ] [ "IN: temporary : test-last ( -- ) ;" eval ] unit-test
 [ "test-last" ] [ word word-name ] unit-test
 
-[ t ] [
-    changed-words get assoc-size
-    [ ] define-temp drop
-    changed-words get assoc-size =
-] unit-test
-
 ! regression
 SYMBOL: quot-uses-a
 SYMBOL: quot-uses-b
 
-quot-uses-a [ 2 3 + ] define-compound
+[ ] [
+    [
+        quot-uses-a [ 2 3 + ] define
+    ] with-compilation-unit
+] unit-test
 
 [ { + } ] [ \ quot-uses-a uses ] unit-test
 
-quot-uses-b 2 [ 3 + ] curry define-compound
+[ ] [
+    [
+        quot-uses-b 2 [ 3 + ] curry define
+    ] with-compilation-unit
+] unit-test
 
 [ { + } ] [ \ quot-uses-b uses ] unit-test
+
+[ t ] [
+    [ "IN: temporary : undef-test ; << undef-test >>" eval ] catch
+    [ undefined? ] is?
+] unit-test
+
+[ ] [
+    "IN: temporary GENERIC: symbol-generic" eval
+] unit-test
+
+[ ] [
+    "IN: temporary SYMBOL: symbol-generic" eval
+] unit-test
+
+[ t ] [ "symbol-generic" "temporary" lookup symbol? ] unit-test
+[ f ] [ "symbol-generic" "temporary" lookup generic? ] unit-test
+
+[ ] [
+    "IN: temporary GENERIC: symbol-generic" eval
+] unit-test
+
+[ ] [
+    "IN: temporary TUPLE: symbol-generic ;" eval
+] unit-test
+
+[ t ] [ "symbol-generic" "temporary" lookup symbol? ] unit-test
+[ f ] [ "symbol-generic" "temporary" lookup generic? ] unit-test
+
+! Regressions
+[ ] [ "IN: temporary : decl-forget-test ; foldable" eval ] unit-test
+[ t ] [ "decl-forget-test" "temporary" lookup "foldable" word-prop ] unit-test
+[ ] [ "IN: temporary : decl-forget-test ;" eval ] unit-test
+[ f ] [ "decl-forget-test" "temporary" lookup "foldable" word-prop ] unit-test
+
+[ ] [ "IN: temporary : decl-forget-test ; flushable" eval ] unit-test
+[ t ] [ "decl-forget-test" "temporary" lookup "flushable" word-prop ] unit-test
+[ ] [ "IN: temporary : decl-forget-test ;" eval ] unit-test
+[ f ] [ "decl-forget-test" "temporary" lookup "flushable" word-prop ] unit-test

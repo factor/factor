@@ -1,7 +1,7 @@
 IN: temporary
 USING: help.crossref help.topics help.markup tools.test words
 definitions assocs sequences kernel namespaces parser arrays
-io.streams.string continuations debugger ;
+io.streams.string continuations debugger compiler.units ;
 
 [ ] [
     "IN: temporary USING: help.syntax help.markup ; : foo ; HELP: foo \"foo is great\" ; ARTICLE: \"foo\" \"Foo\" { $subsection foo } ;" eval
@@ -18,7 +18,9 @@ io.streams.string continuations debugger ;
 
 [ "foo" ] [ "foo" "temporary" lookup article-parent ] unit-test
 
-[ ] [ "foo" "temporary" lookup forget ] unit-test
+[ ] [
+    [ "foo" "temporary" lookup forget ] with-compilation-unit
+] unit-test
 
 [ ] [
     "IN: temporary USING: help.syntax help.markup ; : bar ; HELP: bar \"bar is great\" ; ARTICLE: \"bar\" \"Bar\" { $subsection bar } ;" eval

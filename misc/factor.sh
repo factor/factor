@@ -152,6 +152,7 @@ echo_build_info() {
 	echo FACTOR_BINARY=$FACTOR_BINARY
 	echo MAKE_TARGET=$MAKE_TARGET
 	echo BOOT_IMAGE=$BOOT_IMAGE
+	echo MAKE_IMAGE_TARGET=$MAKE_IMAGE_TARGET
 }
 
 set_build_info() {
@@ -162,12 +163,19 @@ set_build_info() {
 		echo "OS, ARCH, or WORD is empty.  Please report this"
 		exit 5
 	fi
-	
+
 	MAKE_TARGET=$OS-$ARCH-$WORD
+	MAKE_IMAGE_TARGET=$ARCH.$WORD
 	BOOT_IMAGE=boot.$ARCH.$WORD.image
 	if [[ $OS == macosx && $ARCH == ppc ]] ; then
+		MAKE_IMAGE_TARGET=$OS-$ARCH
 		MAKE_TARGET=$OS-$ARCH
 		BOOT_IMAGE=boot.macosx-ppc.image
+	fi
+	if [[ $OS == linux && $ARCH == ppc ]] ; then
+		MAKE_IMAGE_TARGET=$OS-$ARCH
+		MAKE_TARGET=$OS-$ARCH
+		BOOT_IMAGE=boot.linux-ppc.image
 	fi
 }
 
@@ -229,19 +237,19 @@ maybe_download_dlls() {
 	fi
 }
 
+get_config_info() {
+	check_installed_programs
+	find_build_info
+	check_libraries
+}
+
 bootstrap() {
 	./$FACTOR_BINARY -i=$BOOT_IMAGE
 }
 
-usage() {
-	echo "usage: $0 install|install-x11|update|quick-update"
-}
-
 install() {
 	check_factor_exists
-	check_installed_programs
-	find_build_info
-	check_libraries
+	get_config_info
 	git_clone
 	cd_factor
 	make_factor
@@ -251,9 +259,7 @@ install() {
 }
 
 update() {
-	check_installed_programs
-	find_build_info
-	check_libraries
+	get_config_info
 	git_pull_factorcode
 	make_clean
 	make_factor
@@ -266,17 +272,30 @@ update_bootstrap() {
 }
 
 refresh_image() {
-	./$FACTOR_BINARY -e="refresh-all save 0 USE: system exit"
+	./$FACTOR_BINARY -script -e="refresh-all save 0 USE: system exit"
+	check_ret factor
+}
+
+make_boot_image() {
+	./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USE: bootstrap.image make-image save 0 USE: system exit"
+	check_ret factor
+
 }
 
 install_libraries() {
-	sudo apt-get install libc6-dev libfreetype6-dev wget git-core git-doc libx11-dev glutg3-dev rlwrap
+	sudo apt-get install libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap
+}
+
+usage() {
+	echo "usage: $0 install|install-x11|self-update|quick-update|update|bootstrap"
 }
 
 case "$1" in
 	install) install ;;
 	install-x11) install_libraries; install ;;
+	self-update) update; make_boot_image; bootstrap;;
 	quick-update) update; refresh_image ;;
 	update) update; update_bootstrap ;;
+	bootstrap) get_config_info; bootstrap ;;
 	*) usage ;;
 esac

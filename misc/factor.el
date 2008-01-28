@@ -102,7 +102,7 @@
   (setq font-lock-defaults
 	'(factor-font-lock-keywords nil nil nil nil))
   (set-syntax-table factor-mode-syntax-table)
-  (run-hooks 'factor-mode-hooks))
+  (run-hooks 'factor-mode-hook))
 
 (add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
 

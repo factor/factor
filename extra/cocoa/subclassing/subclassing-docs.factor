@@ -1,5 +1,5 @@
-USING: cocoa.subclassing help.markup help.syntax strings alien
-hashtables ;
+USING: help.markup help.syntax strings alien hashtables ;
+IN: cocoa.subclassing
 
 HELP: define-objc-class
 { $values { "hash" hashtable } { "imeth" "a sequence of instance method definitions" } }

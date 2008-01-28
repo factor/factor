@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel hashtables sequences arrays words namespaces
-parser math assocs effects definitions ;
+parser math assocs effects definitions quotations ;
 IN: memoize
 
 : packer ( n -- quot )
@@ -37,12 +37,16 @@ IN: memoize
     over check-memoized
     2dup "memo-quot" set-word-prop
     over H{ } clone "memoize" set-word-prop
-    over make-memoizer define-compound ;
+    over make-memoizer define ;
 
 : MEMO:
     CREATE dup reset-generic parse-definition define-memoized ; parsing
 
-PREDICATE: compound memoized "memoize" word-prop ;
+PREDICATE: word memoized "memoize" word-prop ;
 
 M: memoized definer drop \ MEMO: \ ; ;
 M: memoized definition "memo-quot" word-prop ;
+
+: memoize-quot ( quot effect -- memo-quot )
+    gensym swap dupd "declared-effect" set-word-prop
+    dup rot define-memoized 1quotation ;

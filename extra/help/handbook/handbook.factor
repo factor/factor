@@ -1,7 +1,8 @@
 USING: help help.markup help.syntax help.topics
 namespaces words sequences classes assocs vocabs kernel
 arrays prettyprint.backend kernel.private io tools.browser
-generic math tools.profiler system ui ;
+generic math tools.profiler system ui strings sbufs vectors
+byte-arrays bit-arrays float-arrays quotations help.lint ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -58,10 +59,7 @@ $nl
 ARTICLE: "evaluator" "Evaluation semantics"
 { $link "quotations" } " are evaluated sequentially from beginning to end. When the end is reached, the quotation returns to its caller. As each object in the quotation is evaluated in turn, an action is taken based on its type:"
 { $list
-    { "a " { $link symbol } " - pushed on the data stack. See " { $link "symbols" } }
-    { "a " { $link compound } " - the associated definition is called. See " { $link "colon-definition" } }
-    { "a" { $link primitive } " - a primitive in the Factor VM is called. See " { $link "primitives" } }
-    { "an " { $link undefined } " -  an error is raised. See " { $link "deferred" } }
+    { "a " { $link word } " - the word's definition quotation is called. See " { $link "words" } }
     { "a " { $link wrapper } " - the wrapped object is pushed on the data stack. Wrappers are used to push word objects directly on the stack when they would otherwise execute. See the " { $link POSTPONE: \ } " parsing word." }
     { "All other types of objects are pushed on the data stack." }
 }
@@ -183,14 +181,15 @@ ARTICLE: "program-org" "Program organization"
 { $subsection "parser" }
 { $subsection "vocabs.loader" } ;
 
-USE: help.cookbook
+USING: help.cookbook help.tutorial ;
 
 ARTICLE: "handbook" "Factor documentation"
+"Welcome to Factor. Factor is dynamically-typed, stack-based, and very expressive. It is one of the most powerful and flexible programming languages ever invented. Have fun with Factor!"
 { $heading "Starting points" }
 { $subsection "cookbook" }
+{ $subsection "first-program" }
 { $subsection "vocab-index" }
 { $subsection "changes" }
-{ $subsection "cli" }
 { $heading "Language reference" }
 { $subsection "conventions" }
 { $subsection "syntax" }
@@ -204,6 +203,8 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "os" }
 { $subsection "alien" }
 { $heading "Environment reference" }
+{ $subsection "cli" }
+{ $subsection "images" }
 { $subsection "prettyprint" }
 { $subsection "tools" }
 { $subsection "help" }
@@ -336,7 +337,7 @@ ARTICLE: "changes" "Changes in the latest release"
 }
 { $subheading "Performance" }
 { $list
-    { "The " { $link curry } " word now runs in constant time, and curried quotations can be called from compiled code; this allows for abstractions and idioms which were previously impractical due to performance issues. In particular, words such as " { $snippet "each-with" } " and " { $snippet "map-with" } " are gone; " { $snippet "each-with" } " can now be written as " { $snippet "curry* each" } ", and similarly for other " { $snippet "-with" } " combinators." }
+    { "The " { $link curry } " word now runs in constant time, and curried quotations can be called from compiled code; this allows for abstractions and idioms which were previously impractical due to performance issues. In particular, words such as " { $snippet "each-with" } " and " { $snippet "map-with" } " are gone; " { $snippet "each-with" } " can now be written as " { $snippet "with each" } ", and similarly for other " { $snippet "-with" } " combinators." }
     "Improved generational promotion strategy in garbage collector reduces the amount of junk which makes its way into tenured space, which in turn reduces the frequency of full garbage collections."
     "Faster generic word dispatch and union membership testing."
     { "Alien memory accessors (" { $link "reading-writing-memory" } ") are compiled as intrinsics where possible, which improves performance in code which iteroperates with C libraries." }
@@ -348,3 +349,9 @@ ARTICLE: "changes" "Changes in the latest release"
     "Solaris/x86 fixes. (Samuel Tardieu)"
     "Linux/AMD64 port works again."
 } ;
+
+{ <array> <string> <sbuf> <vector> <byte-array> <bit-array> <float-array> }
+related-words
+
+{ >array >quotation >string >sbuf >vector >byte-array >bit-array >float-array }
+related-words

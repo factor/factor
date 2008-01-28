@@ -2,7 +2,7 @@ USING: alien arrays definitions generic assocs hashtables io
 kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes io.streams.string
 classes.private classes.union classes.mixin classes.predicate
-vectors ;
+vectors definitions source-files compiler.units ;
 IN: temporary
 
 H{ } "s" set
@@ -36,8 +36,8 @@ UNION: both first-one union-class ;
 [ f ] [ \ integer \ null class< ] unit-test
 [ t ] [ \ null \ object class< ] unit-test
 
-[ t ] [ \ generic \ compound class< ] unit-test
-[ f ] [ \ compound \ generic class< ] unit-test
+[ t ] [ \ generic \ word class< ] unit-test
+[ f ] [ \ word \ generic class< ] unit-test
 
 [ f ] [ \ reversed \ slice class< ] unit-test
 [ f ] [ \ slice \ reversed class< ] unit-test
@@ -62,7 +62,7 @@ UNION: bah fixnum alien ;
 [ bah ] [ \ bah? "predicating" word-prop ] unit-test
 
 ! Test generic see and parsing
-[ "IN: temporary\nSYMBOL: bah\n\nUNION: bah fixnum alien ;\n" ]
+[ "USING: alien math ;\nIN: temporary\nUNION: bah fixnum alien ;\n" ]
 [ [ \ bah see ] string-out ] unit-test
 
 ! Test redefinition of classes
@@ -78,9 +78,7 @@ M: union-1 generic-update-test drop "union-1" ;
 
 [ union-1 ] [ fixnum float class-or ] unit-test
 
-"IN: temporary UNION: union-1 rational array ;" eval
-
-do-parse-hook
+"IN: temporary USE: math USE: arrays UNION: union-1 rational array ;" eval
 
 [ t ] [ bignum union-1 class< ] unit-test
 [ f ] [ union-1 number class< ] unit-test
@@ -88,9 +86,7 @@ do-parse-hook
 
 [ object ] [ fixnum float class-or ] unit-test
 
-"IN: temporary PREDICATE: integer union-1 even? ;" eval
-
-do-parse-hook
+"IN: temporary USE: math PREDICATE: integer union-1 even? ;" eval
 
 [ f ] [ union-1 union-class? ] unit-test
 [ t ] [ union-1 predicate-class? ] unit-test
@@ -130,14 +126,14 @@ INSTANCE: integer mx1
 [ t ] [ mx1 integer class< ] unit-test
 [ t ] [ mx1 number class< ] unit-test
 
-"INSTANCE: array mx1" eval
+"IN: temporary USE: arrays INSTANCE: array mx1" eval
 
 [ t ] [ array mx1 class< ] unit-test
 [ f ] [ mx1 number class< ] unit-test
 
 [ mx1 ] [ array integer class-or ] unit-test
 
-\ mx1 forget
+[ \ mx1 forget ] with-compilation-unit
 
 [ f ] [ array integer class-or mx1 = ] unit-test
 
@@ -161,7 +157,7 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 [ t ] [ quotation redefine-bug-2 class< ] unit-test
 [ redefine-bug-2 ] [ fixnum quotation class-or ] unit-test
 
-"IN: temporary UNION: redefine-bug-1 bignum ;" eval
+[ ] [ "IN: temporary USE: math UNION: redefine-bug-1 bignum ;" eval ] unit-test
 
 [ t ] [ bignum redefine-bug-1 class< ] unit-test
 [ f ] [ fixnum redefine-bug-2 class< ] unit-test
@@ -177,3 +173,37 @@ FORGET: forget-class-bug-1
 FORGET: forget-class-bug-2
 
 [ t ] [ integer dll class-or interned? ] unit-test
+
+DEFER: mixin-forget-test-g
+
+[ "mixin-forget-test" forget-source ] with-compilation-unit
+
+[ ] [
+    {
+        "USING: sequences ;"
+        "IN: temporary"
+        "MIXIN: mixin-forget-test"
+        "INSTANCE: sequence mixin-forget-test"
+        "GENERIC: mixin-forget-test-g ( x -- y )"
+        "M: mixin-forget-test mixin-forget-test-g ;"
+    } "\n" join <string-reader> "mixin-forget-test"
+    parse-stream drop
+] unit-test
+
+[ { } ] [ { } mixin-forget-test-g ] unit-test
+[ H{ } mixin-forget-test-g ] unit-test-fails
+
+[ ] [
+    {
+        "USING: hashtables ;"
+        "IN: temporary"
+        "MIXIN: mixin-forget-test"
+        "INSTANCE: hashtable mixin-forget-test"
+        "GENERIC: mixin-forget-test-g ( x -- y )"
+        "M: mixin-forget-test mixin-forget-test-g ;"
+    } "\n" join <string-reader> "mixin-forget-test"
+    parse-stream drop
+] unit-test
+
+[ { } mixin-forget-test-g ] unit-test-fails
+[ H{ } ] [ H{ } mixin-forget-test-g ] unit-test

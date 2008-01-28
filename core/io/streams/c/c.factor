@@ -56,12 +56,13 @@ M: c-reader stream-close
 
 M: object init-io ;
 
-: stdin 11 getenv ;
-
-: stdout 12 getenv ;
+: stdin-handle 11 getenv ;
+: stdout-handle 12 getenv ;
+: stderr-handle 38 getenv ;
 
 M: object init-stdio
-    stdin stdout <duplex-c-stream> stdio set ;
+    stdin-handle stdout-handle <duplex-c-stream> stdio set-global
+    stderr-handle <c-writer> <plain-writer> stderr set-global ;
 
 M: object io-multiplex (sleep) ;
 

@@ -9,7 +9,6 @@ ARTICLE: "slots" "Slots"
 $nl
 { $link "tuples" } " are composed entirely of slots, and instances of " { $link "builtin-classes" } " consist of slots together with intrinsic data."
 $nl
-"The " 
 "The " { $snippet "\"slots\"" } " word property of built-in and tuple classes holds an array of " { $emphasis "slot specifiers" } " describing the slot layout of each instance."
 { $subsection slot-spec }
 "Each slot has a reader word; mutable slots have an optional writer word. All tuple slots are mutable, but some slots on built-in classes are not."

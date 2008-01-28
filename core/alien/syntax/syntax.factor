@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2007 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien alien.c-types alien.structs kernel math
-namespaces parser sequences words quotations math.parser
-splitting effects prettyprint prettyprint.sections
+USING: arrays alien alien.c-types alien.structs alien.arrays
+kernel math namespaces parser sequences words quotations
+math.parser splitting effects prettyprint prettyprint.sections
 prettyprint.backend assocs combinators ;
 IN: alien.syntax
 
@@ -23,6 +23,15 @@ IN: alien.syntax
 
 PRIVATE>
 
+: indirect-quot ( function-ptr-quot return types abi -- quot )
+    [ alien-indirect ] 3curry compose ;
+
+: define-indirect ( abi return function-ptr-quot function-name parameters -- )
+    >r pick r> parse-arglist
+    rot create-in dup reset-generic
+    >r >r swapd roll indirect-quot r> r>
+    -rot define-declared ;
+
 : DLL" skip-blank parse-string dlopen parsed ; parsing
 
 : ALIEN: scan string>number <alien> parsed ; parsing
@@ -37,6 +46,9 @@ PRIVATE>
 : TYPEDEF:
     scan scan typedef ; parsing
 
+: TYPEDEF-IF:
+    scan-word execute scan scan rot [ typedef ] [ 2drop ] if ; parsing
+
 : C-STRUCT:
     scan in get
     parse-definition
@@ -49,7 +61,7 @@ PRIVATE>
 : C-ENUM:
     ";" parse-tokens
     dup length
-    [ >r create-in r> 1quotation define-compound ] 2each ;
+    [ >r create-in r> 1quotation define ] 2each ;
     parsing
 
 M: alien pprint*

@@ -2,7 +2,7 @@ USING: definitions generic kernel kernel.private math
 math.constants parser sequences tools.test words assocs
 namespaces quotations sequences.private classes continuations
 generic.standard effects tuples tuples.private arrays vectors
-strings ;
+strings compiler.units ;
 IN: temporary
 
 [ t ] [ \ tuple-class \ class class< ] unit-test
@@ -45,7 +45,7 @@ C: <point> point
 100 200 <point> "p" set
 
 ! Use eval to sequence parsing explicitly
-"IN: temporary TUPLE: point x y z ; do-parse-hook" eval
+"IN: temporary TUPLE: point x y z ;" eval
 
 [ 100 ] [ "p" get point-x ] unit-test
 [ 200 ] [ "p" get point-y ] unit-test
@@ -53,7 +53,7 @@ C: <point> point
 
 300 "p" get "set-point-z" "temporary" lookup execute
 
-"IN: temporary TUPLE: point z y ; do-parse-hook" eval
+"IN: temporary TUPLE: point z y ;" eval
 
 [ "p" get point-x ] unit-test-fails
 [ 200 ] [ "p" get point-y ] unit-test
@@ -77,8 +77,6 @@ TUPLE: circle radius ;
 M: circle area circle-radius sq pi * ;
 
 [ 200 ] [ T{ rect f 0 0 10 20 } area ] unit-test
-
-[ ] [ "IN: temporary  SYMBOL: #x  TUPLE: #x ;" eval ] unit-test
 
 ! Hashcode breakage
 TUPLE: empty ;
@@ -120,11 +118,13 @@ TUPLE: yo-momma ;
 [ f ] [ \ <yo-momma> generic? ] unit-test
 
 ! Test forget
-[ t ] [ \ yo-momma class? ] unit-test
-[ ] [ \ yo-momma forget ] unit-test
-[ f ] [ \ yo-momma typemap get values memq? ] unit-test
+[
+    [ t ] [ \ yo-momma class? ] unit-test
+    [ ] [ \ yo-momma forget ] unit-test
+    [ f ] [ \ yo-momma typemap get values memq? ] unit-test
 
-[ f ] [ \ yo-momma interned? ] unit-test
+    [ f ] [ \ yo-momma interned? ] unit-test
+] with-compilation-unit
 
 TUPLE: loc-recording ;
 
@@ -140,9 +140,11 @@ M: forget-robustness forget-robustness-generic ;
 
 M: integer forget-robustness-generic ;
 
-[ ] [ \ forget-robustness-generic forget ] unit-test
-[ ] [ \ forget-robustness forget ] unit-test
-[ ] [ { forget-robustness forget-robustness-generic } forget ] unit-test
+[
+    [ ] [ \ forget-robustness-generic forget ] unit-test
+    [ ] [ \ forget-robustness forget ] unit-test
+    [ ] [ { forget-robustness forget-robustness-generic } forget ] unit-test
+] with-compilation-unit
 
 ! rapido found this one
 GENERIC# m1 0 ( s n -- n )
@@ -212,46 +214,28 @@ SYMBOL: not-a-tuple-class
 [ not-a-tuple-class construct-boa ] unit-test-fails
 [ not-a-tuple-class construct-empty ] unit-test-fails
 
-! Reshaping bug. It's only an issue when optimizer compiler is
-! enabled.
-parse-hook get [
-    TUPLE: erg's-reshape-problem a b c ;
+TUPLE: erg's-reshape-problem a b c d ;
 
-    C: <erg's-reshape-problem> erg's-reshape-problem
-
-    [ ] [
-        "IN: temporary TUPLE: erg's-reshape-problem a b c d ;" eval
-    ] unit-test
-
-
-    [ 1 2 ] [
-        ! <erg's-reshape-problem> hasn't been recompiled yet, so
-        ! we just created a tuple using an obsolete layout
-        1 2 3 <erg's-reshape-problem>
-
-        ! that's ok, but... this shouldn't fail:
-        "IN: temporary TUPLE: erg's-reshape-problem a b d c ;" eval
-
-        { erg's-reshape-problem-a erg's-reshape-problem-b }
-        get-slots
-    ] unit-test
-] when
+C: <erg's-reshape-problem> erg's-reshape-problem
 
 ! We want to make sure constructors are recompiled when
 ! tuples are reshaped
 : cons-test-1 \ erg's-reshape-problem construct-empty ;
 : cons-test-2 \ erg's-reshape-problem construct-boa ;
 : cons-test-3
-    { erg's-reshape-problem-a }
+    { set-erg's-reshape-problem-a }
     \ erg's-reshape-problem construct ;
 
 "IN: temporary TUPLE: erg's-reshape-problem a b c d e f ;" eval
 
+[ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
+
+[ t ] [ cons-test-1 array-capacity "a" get array-capacity = ] unit-test
+
+[ t ] [ 1 cons-test-3 array-capacity "a" get array-capacity = ] unit-test
+
 [ t ] [
-    {
-        <erg's-reshape-problem>
-        cons-test-1
-        cons-test-2
-        cons-test-3
-    } [ changed-words get key? ] all?
+    [
+        "IN: temporary SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
+    ] catch [ check-tuple? ] is?
 ] unit-test

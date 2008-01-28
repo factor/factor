@@ -36,7 +36,7 @@ SYMBOL: mt
 
 : set-mt-ith ( y i-get i-set -- )
     >r mt-nth >r
-    [ -1 shift ] keep odd? mt-a 0 ? r> bitxor bitxor r>
+    [ 2/ ] keep odd? mt-a 0 ? r> bitxor bitxor r>
     mt-seq set-nth ; inline
 
 : mt-y ( y1 y2 -- y )
@@ -65,7 +65,7 @@ SYMBOL: mt
 : init-mt-rest ( seq -- )
     mt-n 1 head* [
         [ init-mt-formula ] 2keep 1+ swap set-nth
-    ] curry* each ;
+    ] with each ;
 
 : mt-temper ( y -- yt )
     dup -11 shift bitxor

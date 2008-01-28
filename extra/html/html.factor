@@ -10,7 +10,19 @@ GENERIC: browser-link-href ( presented -- href )
 
 M: object browser-link-href drop f ;
 
-TUPLE: html-stream ;
+TUPLE: html-stream last-div? ;
+
+! A hack: stream-nl after with-nesting or tabular-output is
+! ignored, so that HTML stream output looks like UI pane output
+: test-last-div? ( stream -- ? )
+    dup html-stream-last-div?
+    f rot set-html-stream-last-div? ;
+
+: not-a-div ( stream -- stream )
+    dup test-last-div? drop ; inline
+
+: a-div ( stream -- straem )
+    t over set-html-stream-last-div? ; inline
 
 : <html-stream> ( stream -- stream )
     html-stream construct-delegate ;
@@ -94,7 +106,7 @@ TUPLE: html-sub-stream style stream ;
 TUPLE: html-span-stream ;
 
 M: html-span-stream stream-close
-    end-sub-stream format-html-span ;
+    end-sub-stream not-a-div format-html-span ;
 
 : border-css, ( border -- )
     "border: 1px solid #" % hex-color, "; " % ;
@@ -109,7 +121,7 @@ M: html-span-stream stream-close
         page-color   [ bg-css,      ] apply-style
         border-color [ border-css,  ] apply-style
         border-width [ padding-css, ] apply-style
-        wrap-margin  [ pre-css,     ] apply-style
+        wrap-margin over at pre-css,
     ] make-css ;
 
 : div-tag ( style quot -- )
@@ -127,7 +139,7 @@ M: html-span-stream stream-close
 TUPLE: html-block-stream ;
 
 M: html-block-stream stream-close ( quot style stream -- )
-    end-sub-stream format-html-div ;
+    end-sub-stream a-div format-html-div ;
 
 : border-spacing-css,
     "padding: " % first2 max 2 /i # "px; " % ;
@@ -142,7 +154,7 @@ M: html-block-stream stream-close ( quot style stream -- )
     table-style " border-collapse: collapse;" append =style ;
 
 : do-escaping ( string style -- string )
-    html swap at [ chars>entities ] unless ;
+    html swap at [ escape-string ] unless ;
 
 PRIVATE>
 
@@ -151,34 +163,34 @@ M: html-stream stream-write1 ( char stream -- )
     >r 1string r> stream-write ;
 
 M: html-stream stream-write ( str stream -- )
-    >r chars>entities r> delegate stream-write ;
+    not-a-div >r escape-string r> delegate stream-write ;
 
 M: html-stream make-span-stream ( style stream -- stream' )
     html-span-stream <html-sub-stream> ;
 
 M: html-stream stream-format ( str style stream -- )
-    >r html over at [ >r chars>entities r> ] unless r>
+    >r html over at [ >r escape-string r> ] unless r>
     format-html-span ;
 
 M: html-stream make-block-stream ( style stream -- stream' )
     html-block-stream <html-sub-stream> ;
 
 M: html-stream stream-write-table ( grid style stream -- )
-    [
+    a-div [
         <table dup table-attrs table> swap [
             <tr> [
                 <td "top" =valign swap table-style =style td>
                     >string write-html
                 </td>
-            ] curry* each </tr>
-        ] curry* each </table>
+            ] with each </tr>
+        ] with each </table>
     ] with-stream* ;
 
 M: html-stream make-cell-stream ( style stream -- stream' )
     (html-sub-stream) ;
 
 M: html-stream stream-nl ( stream -- )
-    [ <br/> ] with-stream* ;
+    dup test-last-div? [ drop ] [ [ <br/> ] with-stream* ] if ;
 
 ! Utilities
 : with-html-stream ( quot -- )

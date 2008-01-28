@@ -3,7 +3,7 @@
 IN: temporary
 USING: kernel xml tools.test io namespaces sequences xml.errors xml.entities
     parser strings xml.data io.files xml.writer xml.utilities state-parser 
-    continuations assocs ;
+    continuations assocs sequences.deep ;
 
 ! This is insufficient
 SYMBOL: xml-file
@@ -26,20 +26,25 @@ SYMBOL: xml-file
 ] unit-test
 [ V{ "fa&g" } ] [ xml-file get "x" get-id tag-children ] unit-test
 [ "that" ] [ xml-file get "this" swap at ] unit-test
-[ "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><a b=\"c\"/>" ]
+[ "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<a b=\"c\"/>" ]
     [ "<a b='c'/>" string>xml xml>string ] unit-test
 [ "abcd" ] [
     "<main>a<sub>bc</sub>d<nothing/></main>" string>xml
-    [ [ dup string? [ % ] [ drop ] if ] xml-each ] "" make
+    [ [ dup string? [ % ] [ drop ] if ] deep-each ] "" make
 ] unit-test
 [ "abcd" ] [
     "<main>a<sub>bc</sub>d<nothing/></main>" string>xml
-    [ string? ] xml-subset concat
+    [ string? ] deep-subset concat
 ] unit-test
 [ "foo" ] [
     "<a><b id='c'>foo</b><d id='e'/></a>" string>xml
     "c" get-id children>string
 ] unit-test
-[ "foo" ] [ "<x y='foo'/>" string>xml "y" <name-tag> over
-at swap "z" <name-tag> >r tuck r> swap set-at T{ name f "blah" "z" f } swap at ] unit-test
+[ "foo" ] [ "<x y='foo'/>" string>xml "y" over
+    at swap "z" >r tuck r> swap set-at
+    T{ name f "blah" "z" f } swap at ] unit-test
 [ "foo" ] [ "<boo><![CDATA[foo]]></boo>" string>xml children>string ] unit-test
+[ "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<foo>bar baz</foo>" ]
+[ "<foo>bar</foo>" string>xml [ " baz" append ] map xml>string ] unit-test
+[ "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<foo>\n  bar\n</foo>" ]
+[ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test

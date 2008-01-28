@@ -1,6 +1,6 @@
 USING: alien alien.c-types byte-arrays continuations destructors
 io.nonblocking io io.sockets io.sockets.impl namespaces
-io.streams.duplex io.windows io.windows.nt io.windows.nt.backend
+io.streams.duplex io.windows io.windows.nt.backend
 windows.winsock kernel libc math sequences threads tuples.lib ;
 IN: io.windows.nt.sockets
 
@@ -149,7 +149,7 @@ M: windows-nt-io <server> ( addrspec -- server )
         [
             SOCK_STREAM server-fd dup listen-on-socket
             dup add-completion
-            <win32-socket> f <port>
+            <win32-socket>
         ] keep <server-port>
     ] with-destructors ;
 
@@ -158,7 +158,7 @@ M: windows-nt-io <datagram> ( addrspec -- datagram )
         [
             SOCK_DGRAM server-fd
             dup add-completion
-            <win32-socket> f <port>
+            <win32-socket>
         ] keep <datagram-port>
     ] with-destructors ;
 

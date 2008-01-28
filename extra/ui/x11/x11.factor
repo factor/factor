@@ -126,7 +126,7 @@ M: world selection-notify-event
 
 : supported-type? ( atom -- ? )
     { "UTF8_STRING" "STRING" "TEXT" }
-    [ x-atom = ] curry* contains? ;
+    [ x-atom = ] with contains? ;
 
 : clipboard-for-atom ( atom -- clipboard )
     {

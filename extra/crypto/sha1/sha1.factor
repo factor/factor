@@ -59,7 +59,7 @@ SYMBOL: K
 
 : make-w ( str -- )
     #! compute w, steps a-b of RFC 3174, section 6.1
-    16 [ nth-int-be w get push ] curry* each
+    16 [ nth-int-be w get push ] with each
     16 80 dup <slice> [ sha1-W w get push ] each ;
 
 : init-letters ( -- )
@@ -78,7 +78,7 @@ SYMBOL: K
         K get nth ,
         A get 5 bitroll-32 ,
         E get ,
-    ] { } make sum 4294967295 bitand ; inline
+    ] { } make sum >32-bit ; inline
 
 : set-vars ( temp -- )
     ! E = D;  D = C;  C = S^30(B);  B = A; A = TEMP;
@@ -126,7 +126,7 @@ SYMBOL: K
 : string>sha1-bignum ( string -- n ) string>sha1 be> ;
 : file>sha1 ( file -- sha1 ) <file-reader> stream>sha1 ;
 
-: string>sha1-interleave ( string -- )
+: string>sha1-interleave ( string -- seq )
     [ zero? ] left-trim
     dup length odd? [ 1 tail ] when
     seq>2seq [ string>sha1 ] 2apply

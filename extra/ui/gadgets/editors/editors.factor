@@ -34,13 +34,9 @@ focused? ;
 : field-theme ( gadget -- )
     gray <solid> swap set-gadget-boundary ;
 
-: construct-editor ( class -- tuple )
-    >r <editor> { set-gadget-delegate } r> construct
+: construct-editor ( object class -- tuple )
+    >r { set-gadget-delegate } r> construct
     dup dup set-editor-self ; inline
-
-TUPLE: source-editor ;
-
-: <source-editor> source-editor construct-editor ;
 
 : activate-editor-model ( editor model -- )
     2dup add-connection
@@ -66,10 +62,13 @@ M: editor ungraft*
 
 : editor-mark* ( editor -- loc ) editor-mark model-value ;
 
+: set-caret ( loc editor -- )
+    [ gadget-model validate-loc ] keep
+    editor-caret set-model ;
+
 : change-caret ( editor quot -- )
     over >r >r dup editor-caret* swap gadget-model r> call r>
-    [ gadget-model validate-loc ] keep
-    editor-caret set-model ; inline
+    set-caret ; inline
 
 : mark>caret ( editor -- )
     dup editor-caret* swap editor-mark set-model ;
@@ -179,7 +178,7 @@ M: editor ungraft*
     \ first-visible-line get [
         editor get dup editor-color gl-color
         dup visible-lines
-        [ draw-line 1 translate-lines ] curry* each
+        [ draw-line 1 translate-lines ] with each
     ] with-editor-translation ;
 
 : selection-start/end ( editor -- start end )
@@ -340,9 +339,6 @@ M: editor gadget-text* editor-string % ;
 : delete-to-end-of-line T{ one-line-elt } editor-backspace ;
 
 editor "general" f {
-    { T{ key-down f f "RET" } insert-newline }
-    { T{ key-down f { S+ } "RET" } insert-newline }
-    { T{ key-down f f "ENTER" } insert-newline }
     { T{ key-down f f "DELETE" } delete-next-character }
     { T{ key-down f { S+ } "DELETE" } delete-next-character }
     { T{ key-down f f "BACKSPACE" } delete-previous-character }
@@ -447,6 +443,23 @@ editor "selection" f {
     { T{ key-down f { S+ C+ } "HOME" } select-start-of-document }
     { T{ key-down f { S+ C+ } "END" } select-end-of-document }
 } define-command-map
+
+! Multi-line editors
+TUPLE: multiline-editor ;
+
+: <multiline-editor> ( -- editor )
+    <editor> multiline-editor construct-editor ;
+
+multiline-editor "general" f {
+    { T{ key-down f f "RET" } insert-newline }
+    { T{ key-down f { S+ } "RET" } insert-newline }
+    { T{ key-down f f "ENTER" } insert-newline }
+} define-command-map
+
+TUPLE: source-editor ;
+
+: <source-editor> ( -- editor )
+    <multiline-editor> source-editor construct-editor ;
 
 ! Fields are like editors except they edit an external model
 TUPLE: field model editor ;

@@ -9,11 +9,14 @@ IN: http.client
     #! Extract the host name and port number from an HTTP URL.
     ":" split1 [ string>number ] [ 80 ] if* ;
 
+SYMBOL: domain
+
 : parse-url ( url -- host resource )
-    "http://" ?head [
-        "URL must begin with http://" throw
-    ] unless
-    "/" split1 [ "/" swap append ] [ "/" ] if* ;
+    dup "https://" head? [
+        "ssl not yet supported: " swap append throw
+    ] when "http://" ?head drop
+    "/" split1 [ "/" swap append ] [ "/" ] if*
+    >r dup empty? [ drop domain get ] [ dup domain set ] if r> ;
 
 : parse-response ( line -- code )
     "HTTP/" ?head [ " " split1 nip ] when
@@ -29,7 +32,7 @@ IN: http.client
 : crlf "\r\n" write ;
 
 : http-request ( host resource method -- )
-    write " " write write " HTTP/1.0" write crlf
+    write bl write " HTTP/1.0" write crlf
     "Host: " write write crlf ;
 
 : get-request ( host resource -- )
@@ -52,7 +55,9 @@ DEFER: http-get-stream
 
 : http-get ( url -- code headers string )
     #! Opens a stream for reading from an HTTP URL.
-    http-get-stream [ stdio get contents ] with-stream ;
+    [
+        http-get-stream [ stdio get contents ] with-stream
+    ] with-scope ;
 
 : download ( url file -- )
     #! Downloads the contents of a URL to a file.

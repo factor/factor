@@ -3,7 +3,7 @@ typedef enum
 {
 	ERROR_EXPIRED = 0,
 	ERROR_IO,
-	ERROR_UNDEFINED_WORD,
+	ERROR_NOT_IMPLEMENTED,
 	ERROR_TYPE,
 	ERROR_DIVIDE_BY_ZERO,
 	ERROR_SIGNAL,
@@ -17,7 +17,6 @@ typedef enum
 	ERROR_RS_UNDERFLOW,
 	ERROR_RS_OVERFLOW,
 	ERROR_MEMORY,
-	ERROR_NOT_IMPLEMENTED,
 } F_ERRORTYPE;
 
 void fatal_error(char* msg, CELL tagged);
@@ -31,8 +30,6 @@ void memory_protection_error(CELL addr, F_STACK_FRAME *native_stack);
 void signal_error(int signal, F_STACK_FRAME *native_stack);
 void type_error(CELL type, CELL tagged);
 void not_implemented_error(void);
-
-F_FASTCALL void undefined_error(CELL word, F_STACK_FRAME *callstack_top);
 
 DECLARE_PRIMITIVE(throw);
 DECLARE_PRIMITIVE(call_clear);

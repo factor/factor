@@ -5,7 +5,7 @@ ui.gadgets.packs vectors ui.tools tools.interpreter
 tools.interpreter.debug tools.test.inference tools.test.ui ;
 IN: temporary
 
-{ 0 1 } [ <walker> ] unit-test-effect
+\ <walker> must-infer
 
 [ ] [ <walker> "walker" set ] unit-test
 
@@ -34,7 +34,7 @@ f <workspace> dup [
         workspace-listener
         listener-gadget-input
         "ok" on
-        parse-interactive
+        stream-read-quot
         "c" get continue-with
     ] in-thread drop
 

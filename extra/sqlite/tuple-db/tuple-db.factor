@@ -144,7 +144,7 @@ M: mapping select-sql ( tuple mapping -- select )
       ] [
         drop f
       ] if
-    ] curry* map [ ] subset dup length 0 > [
+    ] with map [ ] subset dup length 0 > [
       " where " % 
       " and " join % 
     ] [
@@ -173,7 +173,7 @@ M: mapping select-sql ( tuple mapping -- select )
     [ db-field-slot slot ] keep ! statement value field
     db-field-bind-name swap ! statement name value
     >r dupd r> sqlite-bind-text-by-name     
-  ] curry* each drop ;  
+  ] with each drop ;  
 
 : bind-for-select ( statement tuple -- )
   #! Bind the fields in the tuple to the fields in the 
@@ -186,7 +186,7 @@ M: mapping select-sql ( tuple mapping -- select )
     ] [ 
       2drop 
     ] if
-  ] curry* each drop ;  
+  ] with each drop ;  
 
 : bind-for-update ( statement tuple -- )
   #! Bind the fields in the tuple to the fields in the 

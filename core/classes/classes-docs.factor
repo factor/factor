@@ -5,7 +5,7 @@ classes.predicate ;
 IN: classes
 
 ARTICLE: "builtin-classes" "Built-in classes"
-"Every object is an instance of to exactly one canonical " { $emphasis "built-in class" } " which defines its layout in memory and basic behavior."
+"Every object is an instance of exactly one canonical " { $emphasis "built-in class" } " which defines its layout in memory and basic behavior."
 $nl
 "Corresponding to every built-in class is a built-in type number. An object can be asked for its built-in type number:"
 { $subsection type }
@@ -122,7 +122,7 @@ HELP: predicate-word
 HELP: define-predicate
 { $values { "class" class } { "predicate" "a predicate word" } { "quot" "a quotation" } }
 { $description
-    "Defines a predicate word. This is identical to a compound definition associating " { $snippet "quot" } " with " { $snippet "predicate" } " with the added perk that three word properties are set:"
+    "Defines a predicate word. This is identical to a word definition associating " { $snippet "quot" } " with " { $snippet "predicate" } " with the added perk that three word properties are set:"
     { $list
         { "the class word's " { $snippet "\"predicate\"" } " property is set to a quotation that calls the predicate" }
         { "the predicate word's " { $snippet "\"predicating\"" } " property is set to the class word" }

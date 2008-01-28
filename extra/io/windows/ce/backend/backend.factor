@@ -42,4 +42,4 @@ M: windows-ce-io init-stdio ( -- )
             0 _getstdfilex _fileno
             1 _getstdfilex _fileno
         ] if <win32-duplex-stream>
-    ] with-variable stdio set ;
+    ] with-variable stdio set-global ;

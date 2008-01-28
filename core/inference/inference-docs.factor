@@ -1,6 +1,6 @@
 USING: help.syntax help.markup kernel sequences words io
 effects inference.dataflow inference.backend
-math combinators inference.transforms ;
+math combinators inference.transforms inference.state ;
 IN: inference
 
 ARTICLE: "inference-simple" "Straight-line stack effects"
@@ -139,3 +139,11 @@ HELP: dataflow-with
 { $values { "quot" "a quotation" } { "stack" "a vector" } { "dataflow" "a dataflow node" } }
 { $description "Attempts to construct a dataflow graph showing stack flow in the quotation, starting with an initial data stack of values." }
 { $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
+
+HELP: forget-errors
+{ $description "Removes markers indicating which words do not have stack effects."
+$nl
+"The stack effect inference code remembers which words failed to infer as an optimization, so that it does not try to infer the stack effect of words which do not have one over and over again." }
+{ $notes "Usually this word does not need to be called directly; if a word failed to compile because of a stack effect error, fixing the word definition clears the flag automatically. However, if words failed to compile due to external factors which were subsequently rectified, such as an unavailable C library or a missing or broken compiler transform, this flag can be cleared for all words:"
+{ $code "forget-errors" }
+"Subsequent invocations of the compiler will consider all words for compilation." } ;

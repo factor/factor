@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays cpu.x86.assembler cpu.x86.allot
 cpu.x86.architecture cpu.architecture kernel kernel.private math
@@ -6,7 +6,7 @@ math.private namespaces quotations sequences
 words generic byte-arrays hashtables hashtables.private
 generator generator.registers generator.fixup sequences.private
 sbufs sbufs.private vectors vectors.private layouts system
-tuples.private strings.private slots.private ;
+tuples.private strings.private slots.private compiler.constants ;
 IN: cpu.x86.intrinsics
 
 ! Type checks
@@ -27,7 +27,7 @@ IN: cpu.x86.intrinsics
     ! Tag the tag
     "x" operand %tag-fixnum
     ! Compare with object tag number (3).
-    "x" operand object tag-number tag-bits get shift CMP
+    "x" operand object tag-number tag-fixnum CMP
     "end" get JNE
     ! If we have equality, load type from header
     "x" operand "obj" operand -3 [+] MOV
@@ -49,10 +49,10 @@ IN: cpu.x86.intrinsics
     ! Tag the tag
     "x" operand %tag-fixnum
     ! Compare with tuple tag number (2).
-    "x" operand tuple tag-number tag-bits get shift CMP
+    "x" operand tuple tag-number tag-fixnum CMP
     "tuple" get JE
     ! Compare with object tag number (3).
-    "x" operand object tag-number tag-bits get shift CMP
+    "x" operand object tag-number tag-fixnum CMP
     "object" get JE
     "end" get JMP
     "object" get resolve-label
@@ -240,17 +240,18 @@ IN: cpu.x86.intrinsics
     }
 } define-intrinsics
 
-\ fixnum-shift [
-    "x" operand "y" get neg SAR
+: %untag-fixnums ( seq -- )
+    [ %untag-fixnum ] unique-operands ;
+
+\ fixnum-shift-fast [
+    "x" operand "y" get
+    dup 0 < [ neg SAR ] [ SHL ] if
     ! Mask off low bits
     "x" operand %untag
 ] H{
-    { +input+ { { f "x" } { [ -31 0 between? ] "y" } } }
+    { +input+ { { f "x" } { [ ] "y" } } }
     { +output+ { "x" } }
 } define-intrinsic
-
-: %untag-fixnums ( seq -- )
-    [ %untag-fixnum ] unique-operands ;
 
 : overflow-check ( word -- )
     "end" define-label

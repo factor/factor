@@ -1,12 +1,10 @@
 USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
-sorting tuples ;
+sorting tuples compiler.units ;
 IN: temporary
 
 [
-    file-vocabs
-
     [ 1 CHAR: a ]
     [ 0 "abcd" next-char ] unit-test
 
@@ -19,46 +17,46 @@ IN: temporary
     [ 6 CHAR: \s ]
     [ 0 "\\u0020hello" next-char ] unit-test
 
-    [ [ 1 [ 2 [ 3 ] 4 ] 5 ] ]
-    [ "1\n[\n2\n[\n3\n]\n4\n]\n5" parse ]
+    [ 1 [ 2 [ 3 ] 4 ] 5 ]
+    [ "1\n[\n2\n[\n3\n]\n4\n]\n5" eval ]
     unit-test
 
-    [ [ t t f f ] ]
-    [ "t t f f" parse ]
+    [ t t f f ]
+    [ "t t f f" eval ]
     unit-test
 
-    [ [ "hello world" ] ]
-    [ "\"hello world\"" parse ]
+    [ "hello world" ]
+    [ "\"hello world\"" eval ]
     unit-test
 
-    [ [ "\n\r\t\\" ] ]
-    [ "\"\\n\\r\\t\\\\\"" parse ]
+    [ "\n\r\t\\" ]
+    [ "\"\\n\\r\\t\\\\\"" eval ]
     unit-test
 
     [ "hello world" ]
     [
         "IN: temporary : hello \"hello world\" ;"
-        parse call "USE: scratchpad hello" eval
+        eval "USE: temporary hello" eval
     ] unit-test
 
     [ ]
-    [ "! This is a comment, people." parse call ]
+    [ "! This is a comment, people." eval ]
     unit-test
 
     ! Test escapes
 
-    [ [ " " ] ]
-    [ "\"\\u0020\"" parse ]
+    [ " " ]
+    [ "\"\\u0020\"" eval ]
     unit-test
 
-    [ [ "'" ] ]
-    [ "\"\\u0027\"" parse ]
+    [ "'" ]
+    [ "\"\\u0027\"" eval ]
     unit-test
 
-    [ "\\u123" parse ] unit-test-fails
+    [ "\\u123" eval ] unit-test-fails
 
     ! Test EOL comments in multiline strings.
-    [ [ "Hello" ] ] [ "#! This calls until-eol.\n\"Hello\"" parse ] unit-test
+    [ "Hello" ] [ "#! This calls until-eol.\n\"Hello\"" eval ] unit-test
 
     [ word ] [ \ f class ] unit-test
 
@@ -80,7 +78,7 @@ IN: temporary
     [ \ baz "declared-effect" word-prop effect-terminated? ]
     unit-test
 
-    [ [ ] ] [ "IN: temporary USE: math : effect-parsing-test ( a b -- d ) - ;" parse ] unit-test
+    [ ] [ "IN: temporary USE: math : effect-parsing-test ( a b -- d ) - ;" eval ] unit-test
 
     [ t ] [
         "effect-parsing-test" "temporary" lookup
@@ -90,7 +88,7 @@ IN: temporary
     [ T{ effect f { "a" "b" } { "d" } f } ]
     [ \ effect-parsing-test "declared-effect" word-prop ] unit-test
 
-    [ [ ] ] [ "IN: temporary : effect-parsing-test ;" parse ] unit-test
+    [ ] [ "IN: temporary : effect-parsing-test ;" eval ] unit-test
 
     [ f ] [ \ effect-parsing-test "declared-effect" word-prop ] unit-test
 
@@ -100,14 +98,9 @@ IN: temporary
     [ "IN: temporary : missing-- ( a b ) ;" eval ] unit-test-fails
 
     ! These should throw errors
-    [ "HEX: zzz" parse ] unit-test-fails
-    [ "OCT: 999" parse ] unit-test-fails
-    [ "BIN: --0" parse ] unit-test-fails
-
-    [ f ] [
-        "IN: temporary : foo ; TUPLE: foo ;" parse drop
-        "foo" "temporary" lookup symbol?
-    ] unit-test
+    [ "HEX: zzz" eval ] unit-test-fails
+    [ "OCT: 999" eval ] unit-test-fails
+    [ "BIN: --0" eval ] unit-test-fails
 
     ! Another funny bug
     [ t ] [
@@ -116,8 +109,7 @@ IN: temporary
             { "scratchpad" "arrays" } set-use
             [
                 ! This shouldn't modify in/use in the outer scope!
-                file-vocabs
-            ] with-scope
+            ] with-file-vocabs
 
             use get { "scratchpad" "arrays" } set-use use get =
         ] with-scope
@@ -126,13 +118,13 @@ IN: temporary
 
     "IN: temporary USING: math prettyprint ; : foo 2 2 + . ; parsing" eval
 
-    [ [ ] ] [ "USE: temporary foo" parse ] unit-test
+    [ ] [ "USE: temporary foo" eval ] unit-test
 
     "IN: temporary USING: math prettyprint ; : foo 2 2 + . ;" eval
 
     [ t ] [
-        "USE: temporary foo" parse
-        first "foo" "temporary" lookup eq?
+        "USE: temporary \\ foo" eval
+        "foo" "temporary" lookup eq?
     ] unit-test
 
     ! Test smudging
@@ -141,7 +133,7 @@ IN: temporary
         "IN: temporary : smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions assoc-size
+        "foo" source-file source-file-definitions first assoc-size
     ] unit-test
 
     [ t ] [ "smudge-me" "temporary" lookup >boolean ] unit-test
@@ -158,21 +150,21 @@ IN: temporary
         "IN: temporary USING: math strings ; GENERIC: smudge-me M: integer smudge-me ; M: string smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions assoc-size
+        "foo" source-file source-file-definitions first assoc-size
     ] unit-test
 
     [ 1 ] [
         "IN: temporary USING: arrays ; M: array smudge-me ;" <string-reader> "bar"
         parse-stream drop
 
-        "bar" source-file source-file-definitions assoc-size
+        "bar" source-file source-file-definitions first assoc-size
     ] unit-test
 
     [ 2 ] [
         "IN: temporary USING: math strings ; GENERIC: smudge-me M: integer smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions assoc-size
+        "foo" source-file source-file-definitions first assoc-size
     ] unit-test
     
     [ t ] [
@@ -217,7 +209,7 @@ IN: temporary
 
     [ t ] [
         [
-            "IN: temporary : x ; : y 3 throw ; parsing y"
+            "IN: temporary : x ; : y 3 throw ; this is an error"
             <string-reader> "a" parse-stream
         ] catch parse-error?
     ] unit-test
@@ -309,7 +301,7 @@ IN: temporary
     ] unit-test
 
     [ ] [
-        "IN: temporary GENERIC: killer?"
+        "IN: temporary GENERIC: killer? ( a -- b )"
         <string-reader> "removing-the-predicate" parse-stream drop
     ] unit-test
     
@@ -323,24 +315,80 @@ IN: temporary
             <string-reader> "removing-the-predicate" parse-stream
         ] catch [ redefine-error? ] is?
     ] unit-test
-] with-scope
+
+    [ t ] [
+        [
+            "IN: temporary TUPLE: class-redef-test ; TUPLE: class-redef-test ;"
+            <string-reader> "redefining-a-class-1" parse-stream
+        ] catch [ redefine-error? ] is?
+    ] unit-test
+
+    [ ] [
+        "IN: temporary TUPLE: class-redef-test ; SYMBOL: class-redef-test"
+        <string-reader> "redefining-a-class-2" parse-stream drop
+    ] unit-test
+
+    [ t ] [
+        [
+            "IN: temporary TUPLE: class-redef-test ; SYMBOL: class-redef-test : class-redef-test ;"
+            <string-reader> "redefining-a-class-3" parse-stream drop
+        ] catch [ redefine-error? ] is?
+    ] unit-test
+
+    [ ] [
+        "IN: temporary TUPLE: class-fwd-test ;"
+        <string-reader> "redefining-a-class-3" parse-stream drop
+    ] unit-test
+
+    [ t ] [
+        [
+            "IN: temporary \\ class-fwd-test"
+            <string-reader> "redefining-a-class-3" parse-stream drop
+        ] catch [ forward-error? ] is?
+    ] unit-test
+
+    [ ] [
+        "IN: temporary TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
+        <string-reader> "redefining-a-class-3" parse-stream drop
+    ] unit-test
+
+    [ t ] [
+        [
+            "IN: temporary \\ class-fwd-test"
+            <string-reader> "redefining-a-class-3" parse-stream drop
+        ] catch [ forward-error? ] is?
+    ] unit-test
+
+    [ t ] [
+        [
+            "IN: temporary : foo ; TUPLE: foo ;"
+            <string-reader> "redefining-a-class-4" parse-stream drop
+        ] catch [ redefine-error? ] is?
+    ] unit-test
+] with-file-vocabs
 
 [
-    : FILE file get parsed ; parsing
-
-    FILE file set
+    << file get parsed >> file set
 
     : ~a ;
     : ~b ~a ;
     : ~c ;
     : ~d ;
 
-    H{ { ~a ~a } { ~c ~c } { ~d ~d } } old-definitions set
+    { H{ { ~a ~a } { ~c ~c } { ~d ~d } } H{ } } old-definitions set
     
-    H{ { ~d ~d } } new-definitions set
+    { H{ { ~d ~d } } H{ } } new-definitions set
     
     [ V{ ~b } { ~a } { ~a ~c } ] [
         smudged-usage
         natural-sort
     ] unit-test
 ] with-scope
+
+[ ] [
+    "IN: temporary USE: kernel PREDICATE: object foo ( x -- y ) ;" eval
+] unit-test
+
+[ t ] [
+    "foo?" "temporary" lookup word eq?
+] unit-test

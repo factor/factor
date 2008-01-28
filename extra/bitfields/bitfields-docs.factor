@@ -1,4 +1,5 @@
-USING: help.markup help.syntax bitfields ;
+USING: help.markup help.syntax ;
+IN: bitfields
 
 HELP: BITFIELD:
 { $syntax "BITFIELD: name slot:size... ;" }

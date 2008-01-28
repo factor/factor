@@ -6,6 +6,8 @@ kernel.private math namespaces namespaces.private prettyprint
 quotations sequences splitting strings threads vectors words ;
 IN: tools.interpreter
 
+: walk ( quot -- ) \ break add* call ;
+
 TUPLE: interpreter continuation ;
 
 : <interpreter> interpreter construct-empty ;
@@ -30,21 +32,19 @@ M: pair restore
 
 <PRIVATE
 
-: (step-into-call) \ break add* call ;
-
-: (step-into-if) ? (step-into-call) ;
+: (step-into-if) ? walk ;
 
 : (step-into-dispatch)
-    nth (step-into-call) ;
+    nth walk ;
 
 : (step-into-execute) ( word -- )
     dup "step-into" word-prop [
         call
     ] [
-        dup compound? [
-            word-def (step-into-call)
-        ] [
+        dup primitive? [
             execute break
+        ] [
+            word-def walk
         ] if
     ] ?if ;
 
@@ -54,8 +54,8 @@ M: pair restore
 M: word (step-into) (step-into-execute) ;
 
 {
-    { call [ (step-into-call) ] }
-    { (throw) [ (step-into-call) ] }
+    { call [ walk ] }
+    { (throw) [ walk ] }
     { execute [ (step-into-execute) ] }
     { if [ (step-into-if) ] }
     { dispatch [ (step-into-dispatch) ] }

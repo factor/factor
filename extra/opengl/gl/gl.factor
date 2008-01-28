@@ -3,7 +3,9 @@
 
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 
-USING: alien alien.syntax kernel sequences words ;
+USING: alien alien.syntax kernel parser sequences system words ;
+<< windows? "opengl.gl.windows" "opengl.gl.unix" ? use+ >>
+
 IN: opengl.gl
 
 TYPEDEF: uint    GLenum
@@ -1118,195 +1120,688 @@ FUNCTION: void glPushName ( GLuint name ) ;
 FUNCTION: void glPopName ( ) ;
 
 
+! OpenGL extension functions
+
+
+
+
+
 ! OpenGL 1.2
 
-: GL_PACK_SKIP_IMAGES               HEX: 806B ; inline
-: GL_PACK_IMAGE_HEIGHT              HEX: 806C ; inline
-: GL_UNPACK_SKIP_IMAGES             HEX: 806D ; inline
-: GL_UNPACK_IMAGE_HEIGHT            HEX: 806E ; inline
-: GL_TEXTURE_3D                     HEX: 806F ; inline
-: GL_PROXY_TEXTURE_3D               HEX: 8070 ; inline
-: GL_TEXTURE_DEPTH                  HEX: 8071 ; inline
-: GL_TEXTURE_WRAP_R                 HEX: 8072 ; inline
-: GL_MAX_3D_TEXTURE_SIZE            HEX: 8073 ; inline
-: GL_BGR                            HEX: 80E0 ; inline
-: GL_BGRA                           HEX: 80E1 ; inline
-: GL_UNSIGNED_BYTE_3_3_2            HEX: 8032 ; inline
-: GL_UNSIGNED_BYTE_2_3_3_REV        HEX: 8362 ; inline
-: GL_UNSIGNED_SHORT_5_6_5           HEX: 8363 ; inline
-: GL_UNSIGNED_SHORT_5_6_5_REV       HEX: 8364 ; inline
-: GL_UNSIGNED_SHORT_4_4_4_4         HEX: 8033 ; inline
-: GL_UNSIGNED_SHORT_4_4_4_4_REV     HEX: 8365 ; inline
-: GL_UNSIGNED_SHORT_5_5_5_1         HEX: 8034 ; inline
-: GL_UNSIGNED_SHORT_1_5_5_5_REV     HEX: 8366 ; inline
-: GL_UNSIGNED_INT_8_8_8_8           HEX: 8035 ; inline
-: GL_UNSIGNED_INT_8_8_8_8_REV       HEX: 8367 ; inline
-: GL_UNSIGNED_INT_10_10_10_2        HEX: 8036 ; inline
-: GL_UNSIGNED_INT_2_10_10_10_REV    HEX: 8368 ; inline
-: GL_RESCALE_NORMAL                 HEX: 803A ; inline
-: GL_LIGHT_MODEL_COLOR_CONTROL      HEX: 81F8 ; inline
-: GL_SINGLE_COLOR                   HEX: 81F9 ; inline
-: GL_SEPARATE_SPECULAR_COLOR        HEX: 81FA ; inline
-: GL_CLAMP_TO_EDGE                  HEX: 812F ; inline
-: GL_TEXTURE_MIN_LOD                HEX: 813A ; inline
-: GL_TEXTURE_MAX_LOD                HEX: 813B ; inline
-: GL_TEXTURE_BASE_LEVEL             HEX: 813C ; inline
-: GL_TEXTURE_MAX_LEVEL              HEX: 813D ; inline
-: GL_MAX_ELEMENTS_VERTICES          HEX: 80E8 ; inline
-: GL_MAX_ELEMENTS_INDICES           HEX: 80E9 ; inline
-: GL_ALIASED_POINT_SIZE_RANGE       HEX: 846D ; inline
-: GL_ALIASED_LINE_WIDTH_RANGE       HEX: 846E ; inline
 
+: GL_SMOOTH_POINT_SIZE_RANGE HEX: 0B12 ; inline
+: GL_SMOOTH_POINT_SIZE_GRANULARITY HEX: 0B13 ; inline
+: GL_SMOOTH_LINE_WIDTH_RANGE HEX: 0B22 ; inline
+: GL_SMOOTH_LINE_WIDTH_GRANULARITY HEX: 0B23 ; inline
+: GL_UNSIGNED_BYTE_3_3_2 HEX: 8032 ; inline
+: GL_UNSIGNED_SHORT_4_4_4_4 HEX: 8033 ; inline
+: GL_UNSIGNED_SHORT_5_5_5_1 HEX: 8034 ; inline
+: GL_UNSIGNED_INT_8_8_8_8 HEX: 8035 ; inline
+: GL_UNSIGNED_INT_10_10_10_2 HEX: 8036 ; inline
+: GL_RESCALE_NORMAL HEX: 803A ; inline
+: GL_TEXTURE_BINDING_3D HEX: 806A ; inline
+: GL_PACK_SKIP_IMAGES HEX: 806B ; inline
+: GL_PACK_IMAGE_HEIGHT HEX: 806C ; inline
+: GL_UNPACK_SKIP_IMAGES HEX: 806D ; inline
+: GL_UNPACK_IMAGE_HEIGHT HEX: 806E ; inline
+: GL_TEXTURE_3D HEX: 806F ; inline
+: GL_PROXY_TEXTURE_3D HEX: 8070 ; inline
+: GL_TEXTURE_DEPTH HEX: 8071 ; inline
+: GL_TEXTURE_WRAP_R HEX: 8072 ; inline
+: GL_MAX_3D_TEXTURE_SIZE HEX: 8073 ; inline
+: GL_BGR HEX: 80E0 ; inline
+: GL_BGRA HEX: 80E1 ; inline
+: GL_MAX_ELEMENTS_VERTICES HEX: 80E8 ; inline
+: GL_MAX_ELEMENTS_INDICES HEX: 80E9 ; inline
+: GL_CLAMP_TO_EDGE HEX: 812F ; inline
+: GL_TEXTURE_MIN_LOD HEX: 813A ; inline
+: GL_TEXTURE_MAX_LOD HEX: 813B ; inline
+: GL_TEXTURE_BASE_LEVEL HEX: 813C ; inline
+: GL_TEXTURE_MAX_LEVEL HEX: 813D ; inline
+: GL_LIGHT_MODEL_COLOR_CONTROL HEX: 81F8 ; inline
+: GL_SINGLE_COLOR HEX: 81F9 ; inline
+: GL_SEPARATE_SPECULAR_COLOR HEX: 81FA ; inline
+: GL_UNSIGNED_BYTE_2_3_3_REV HEX: 8362 ; inline
+: GL_UNSIGNED_SHORT_5_6_5 HEX: 8363 ; inline
+: GL_UNSIGNED_SHORT_5_6_5_REV HEX: 8364 ; inline
+: GL_UNSIGNED_SHORT_4_4_4_4_REV HEX: 8365 ; inline
+: GL_UNSIGNED_SHORT_1_5_5_5_REV HEX: 8366 ; inline
+: GL_UNSIGNED_INT_8_8_8_8_REV HEX: 8367 ; inline
+: GL_UNSIGNED_INT_2_10_10_10_REV HEX: 8368 ; inline
+: GL_ALIASED_POINT_SIZE_RANGE HEX: 846D ; inline
+: GL_ALIASED_LINE_WIDTH_RANGE HEX: 846E ; inline
 
-! Not present on Windows
-! FUNCTION: void glDrawRangeElements ( GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, GLvoid* indices ) ;
+GL-FUNCTION: void glCopyTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height ) ;
+GL-FUNCTION: void glDrawRangeElements ( GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, GLvoid* indices ) ;
+GL-FUNCTION: void glTexImage3D ( GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, GLvoid* pixels ) ;
+GL-FUNCTION: void glTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLvoid* pixels ) ;
 
-! FUNCTION: void glTexImage3D ( GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, GLvoid* pixels ) ;
-
-! FUNCTION: void glTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLvoid* pixels ) ;
-
-! FUNCTION: void glCopyTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height ) ;
-
-! TODO: the rest. looks fiddly
 
 ! OpenGL 1.3
 
-: GL_ACTIVE_TEXTURE                 HEX: 84E0 ; inline
-: GL_CLIENT_ACTIVE_TEXTURE          HEX: 84E1 ; inline
-: GL_MAX_TEXTURE_UNITS              HEX: 84E2 ; inline
-: GL_TEXTURE0                       HEX: 84C0 ; inline
-: GL_TEXTURE1                       HEX: 84C1 ; inline
-: GL_TEXTURE2                       HEX: 84C2 ; inline
-: GL_TEXTURE3                       HEX: 84C3 ; inline
-: GL_TEXTURE4                       HEX: 84C4 ; inline
-: GL_TEXTURE5                       HEX: 84C5 ; inline
-: GL_TEXTURE6                       HEX: 84C6 ; inline
-: GL_TEXTURE7                       HEX: 84C7 ; inline
-: GL_TEXTURE8                       HEX: 84C8 ; inline
-: GL_TEXTURE9                       HEX: 84C9 ; inline
-: GL_TEXTURE10                      HEX: 84CA ; inline
-: GL_TEXTURE11                      HEX: 84CB ; inline
-: GL_TEXTURE12                      HEX: 84CC ; inline
-: GL_TEXTURE13                      HEX: 84CD ; inline
-: GL_TEXTURE14                      HEX: 84CE ; inline
-: GL_TEXTURE15                      HEX: 84CF ; inline
-: GL_TEXTURE16                      HEX: 84D0 ; inline
-: GL_TEXTURE17                      HEX: 84D1 ; inline
-: GL_TEXTURE18                      HEX: 84D2 ; inline
-: GL_TEXTURE19                      HEX: 84D3 ; inline
-: GL_TEXTURE20                      HEX: 84D4 ; inline
-: GL_TEXTURE21                      HEX: 84D5 ; inline
-: GL_TEXTURE22                      HEX: 84D6 ; inline
-: GL_TEXTURE23                      HEX: 84D7 ; inline
-: GL_TEXTURE24                      HEX: 84D8 ; inline
-: GL_TEXTURE25                      HEX: 84D9 ; inline
-: GL_TEXTURE26                      HEX: 84DA ; inline
-: GL_TEXTURE27                      HEX: 84DB ; inline
-: GL_TEXTURE28                      HEX: 84DC ; inline
-: GL_TEXTURE29                      HEX: 84DD ; inline
-: GL_TEXTURE30                      HEX: 84DE ; inline
-: GL_TEXTURE31                      HEX: 84DF ; inline
-: GL_NORMAL_MAP                     HEX: 8511 ; inline
-: GL_REFLECTION_MAP                 HEX: 8512 ; inline
-: GL_TEXTURE_CUBE_MAP               HEX: 8513 ; inline
-: GL_TEXTURE_BINDING_CUBE_MAP       HEX: 8514 ; inline
-: GL_TEXTURE_CUBE_MAP_POSITIVE_X    HEX: 8515 ; inline
-: GL_TEXTURE_CUBE_MAP_NEGATIVE_X    HEX: 8516 ; inline
-: GL_TEXTURE_CUBE_MAP_POSITIVE_Y    HEX: 8517 ; inline
-: GL_TEXTURE_CUBE_MAP_NEGATIVE_Y    HEX: 8518 ; inline
-: GL_TEXTURE_CUBE_MAP_POSITIVE_Z    HEX: 8519 ; inline
-: GL_TEXTURE_CUBE_MAP_NEGATIVE_Z    HEX: 851A ; inline
-: GL_PROXY_TEXTURE_CUBE_MAP         HEX: 851B ; inline
-: GL_MAX_CUBE_MAP_TEXTURE_SIZE      HEX: 851C ; inline
-: GL_COMBINE                        HEX: 8570 ; inline
-: GL_COMBINE_RGB                    HEX: 8571 ; inline
-: GL_COMBINE_ALPHA                  HEX: 8572 ; inline
-: GL_RGB_SCALE                      HEX: 8573 ; inline
-: GL_ADD_SIGNED                     HEX: 8574 ; inline
-: GL_INTERPOLATE                    HEX: 8575 ; inline
-: GL_CONSTANT                       HEX: 8576 ; inline
-: GL_PRIMARY_COLOR                  HEX: 8577 ; inline
-: GL_PREVIOUS                       HEX: 8578 ; inline
-: GL_SOURCE0_RGB                    HEX: 8580 ; inline
-: GL_SOURCE1_RGB                    HEX: 8581 ; inline
-: GL_SOURCE2_RGB                    HEX: 8582 ; inline
-: GL_SOURCE0_ALPHA                  HEX: 8588 ; inline
-: GL_SOURCE1_ALPHA                  HEX: 8589 ; inline
-: GL_SOURCE2_ALPHA                  HEX: 858A ; inline
-: GL_OPERAND0_RGB                   HEX: 8590 ; inline
-: GL_OPERAND1_RGB                   HEX: 8591 ; inline
-: GL_OPERAND2_RGB                   HEX: 8592 ; inline
-: GL_OPERAND0_ALPHA                 HEX: 8598 ; inline
-: GL_OPERAND1_ALPHA                 HEX: 8599 ; inline
-: GL_OPERAND2_ALPHA                 HEX: 859A ; inline
-: GL_SUBTRACT                       HEX: 84E7 ; inline
-: GL_TRANSPOSE_MODELVIEW_MATRIX     HEX: 84E3 ; inline
-: GL_TRANSPOSE_PROJECTION_MATRIX    HEX: 84E4 ; inline
-: GL_TRANSPOSE_TEXTURE_MATRIX       HEX: 84E5 ; inline
-: GL_TRANSPOSE_COLOR_MATRIX         HEX: 84E6 ; inline
-: GL_COMPRESSED_ALPHA               HEX: 84E9 ; inline
-: GL_COMPRESSED_LUMINANCE           HEX: 84EA ; inline
-: GL_COMPRESSED_LUMINANCE_ALPHA     HEX: 84EB ; inline
-: GL_COMPRESSED_INTENSITY           HEX: 84EC ; inline
-: GL_COMPRESSED_RGB                 HEX: 84ED ; inline
-: GL_COMPRESSED_RGBA                HEX: 84EE ; inline
-: GL_TEXTURE_COMPRESSION_HINT       HEX: 84EF ; inline
-: GL_TEXTURE_COMPRESSED_IMAGE_SIZE  HEX: 86A0 ; inline
-: GL_TEXTURE_COMPRESSED             HEX: 86A1 ; inline
+
+: GL_MULTISAMPLE HEX: 809D ; inline
+: GL_SAMPLE_ALPHA_TO_COVERAGE HEX: 809E ; inline
+: GL_SAMPLE_ALPHA_TO_ONE HEX: 809F ; inline
+: GL_SAMPLE_COVERAGE HEX: 80A0 ; inline
+: GL_SAMPLE_BUFFERS HEX: 80A8 ; inline
+: GL_SAMPLES HEX: 80A9 ; inline
+: GL_SAMPLE_COVERAGE_VALUE HEX: 80AA ; inline
+: GL_SAMPLE_COVERAGE_INVERT HEX: 80AB ; inline
+: GL_CLAMP_TO_BORDER HEX: 812D ; inline
+: GL_TEXTURE0 HEX: 84C0 ; inline
+: GL_TEXTURE1 HEX: 84C1 ; inline
+: GL_TEXTURE2 HEX: 84C2 ; inline
+: GL_TEXTURE3 HEX: 84C3 ; inline
+: GL_TEXTURE4 HEX: 84C4 ; inline
+: GL_TEXTURE5 HEX: 84C5 ; inline
+: GL_TEXTURE6 HEX: 84C6 ; inline
+: GL_TEXTURE7 HEX: 84C7 ; inline
+: GL_TEXTURE8 HEX: 84C8 ; inline
+: GL_TEXTURE9 HEX: 84C9 ; inline
+: GL_TEXTURE10 HEX: 84CA ; inline
+: GL_TEXTURE11 HEX: 84CB ; inline
+: GL_TEXTURE12 HEX: 84CC ; inline
+: GL_TEXTURE13 HEX: 84CD ; inline
+: GL_TEXTURE14 HEX: 84CE ; inline
+: GL_TEXTURE15 HEX: 84CF ; inline
+: GL_TEXTURE16 HEX: 84D0 ; inline
+: GL_TEXTURE17 HEX: 84D1 ; inline
+: GL_TEXTURE18 HEX: 84D2 ; inline
+: GL_TEXTURE19 HEX: 84D3 ; inline
+: GL_TEXTURE20 HEX: 84D4 ; inline
+: GL_TEXTURE21 HEX: 84D5 ; inline
+: GL_TEXTURE22 HEX: 84D6 ; inline
+: GL_TEXTURE23 HEX: 84D7 ; inline
+: GL_TEXTURE24 HEX: 84D8 ; inline
+: GL_TEXTURE25 HEX: 84D9 ; inline
+: GL_TEXTURE26 HEX: 84DA ; inline
+: GL_TEXTURE27 HEX: 84DB ; inline
+: GL_TEXTURE28 HEX: 84DC ; inline
+: GL_TEXTURE29 HEX: 84DD ; inline
+: GL_TEXTURE30 HEX: 84DE ; inline
+: GL_TEXTURE31 HEX: 84DF ; inline
+: GL_ACTIVE_TEXTURE HEX: 84E0 ; inline
+: GL_CLIENT_ACTIVE_TEXTURE HEX: 84E1 ; inline
+: GL_MAX_TEXTURE_UNITS HEX: 84E2 ; inline
+: GL_TRANSPOSE_MODELVIEW_MATRIX HEX: 84E3 ; inline
+: GL_TRANSPOSE_PROJECTION_MATRIX HEX: 84E4 ; inline
+: GL_TRANSPOSE_TEXTURE_MATRIX HEX: 84E5 ; inline
+: GL_TRANSPOSE_COLOR_MATRIX HEX: 84E6 ; inline
+: GL_SUBTRACT HEX: 84E7 ; inline
+: GL_COMPRESSED_ALPHA HEX: 84E9 ; inline
+: GL_COMPRESSED_LUMINANCE HEX: 84EA ; inline
+: GL_COMPRESSED_LUMINANCE_ALPHA HEX: 84EB ; inline
+: GL_COMPRESSED_INTENSITY HEX: 84EC ; inline
+: GL_COMPRESSED_RGB HEX: 84ED ; inline
+: GL_COMPRESSED_RGBA HEX: 84EE ; inline
+: GL_TEXTURE_COMPRESSION_HINT HEX: 84EF ; inline
+: GL_NORMAL_MAP HEX: 8511 ; inline
+: GL_REFLECTION_MAP HEX: 8512 ; inline
+: GL_TEXTURE_CUBE_MAP HEX: 8513 ; inline
+: GL_TEXTURE_BINDING_CUBE_MAP HEX: 8514 ; inline
+: GL_TEXTURE_CUBE_MAP_POSITIVE_X HEX: 8515 ; inline
+: GL_TEXTURE_CUBE_MAP_NEGATIVE_X HEX: 8516 ; inline
+: GL_TEXTURE_CUBE_MAP_POSITIVE_Y HEX: 8517 ; inline
+: GL_TEXTURE_CUBE_MAP_NEGATIVE_Y HEX: 8518 ; inline
+: GL_TEXTURE_CUBE_MAP_POSITIVE_Z HEX: 8519 ; inline
+: GL_TEXTURE_CUBE_MAP_NEGATIVE_Z HEX: 851A ; inline
+: GL_PROXY_TEXTURE_CUBE_MAP HEX: 851B ; inline
+: GL_MAX_CUBE_MAP_TEXTURE_SIZE HEX: 851C ; inline
+: GL_COMBINE HEX: 8570 ; inline
+: GL_COMBINE_RGB HEX: 8571 ; inline
+: GL_COMBINE_ALPHA HEX: 8572 ; inline
+: GL_RGB_SCALE HEX: 8573 ; inline
+: GL_ADD_SIGNED HEX: 8574 ; inline
+: GL_INTERPOLATE HEX: 8575 ; inline
+: GL_CONSTANT HEX: 8576 ; inline
+: GL_PRIMARY_COLOR HEX: 8577 ; inline
+: GL_PREVIOUS HEX: 8578 ; inline
+: GL_SOURCE0_RGB HEX: 8580 ; inline
+: GL_SOURCE1_RGB HEX: 8581 ; inline
+: GL_SOURCE2_RGB HEX: 8582 ; inline
+: GL_SOURCE0_ALPHA HEX: 8588 ; inline
+: GL_SOURCE1_ALPHA HEX: 8589 ; inline
+: GL_SOURCE2_ALPHA HEX: 858A ; inline
+: GL_OPERAND0_RGB HEX: 8590 ; inline
+: GL_OPERAND1_RGB HEX: 8591 ; inline
+: GL_OPERAND2_RGB HEX: 8592 ; inline
+: GL_OPERAND0_ALPHA HEX: 8598 ; inline
+: GL_OPERAND1_ALPHA HEX: 8599 ; inline
+: GL_OPERAND2_ALPHA HEX: 859A ; inline
+: GL_TEXTURE_COMPRESSED_IMAGE_SIZE HEX: 86A0 ; inline
+: GL_TEXTURE_COMPRESSED HEX: 86A1 ; inline
 : GL_NUM_COMPRESSED_TEXTURE_FORMATS HEX: 86A2 ; inline
-: GL_COMPRESSED_TEXTURE_FORMATS     HEX: 86A3 ; inline
-: GL_DOT3_RGB                       HEX: 86AE ; inline
-: GL_DOT3_RGBA                      HEX: 86AF ; inline
-: GL_CLAMP_TO_BORDER                HEX: 812D ; inline
-: GL_MULTISAMPLE                    HEX: 809D ; inline
-: GL_SAMPLE_ALPHA_TO_COVERAGE       HEX: 809E ; inline
-: GL_SAMPLE_ALPHA_TO_ONE            HEX: 809F ; inline
-: GL_SAMPLE_COVERAGE                HEX: 80A0 ; inline
-: GL_SAMPLE_BUFFERS                 HEX: 80A8 ; inline
-: GL_SAMPLES                        HEX: 80A9 ; inline
-: GL_SAMPLE_COVERAGE_VALUE          HEX: 80AA ; inline
-: GL_SAMPLE_COVERAGE_INVERT         HEX: 80AB ; inline
-: GL_MULTISAMPLE_BIT                HEX: 20000000 ; inline
+: GL_COMPRESSED_TEXTURE_FORMATS HEX: 86A3 ; inline
+: GL_DOT3_RGB HEX: 86AE ; inline
+: GL_DOT3_RGBA HEX: 86AF ; inline
+: GL_MULTISAMPLE_BIT HEX: 20000000 ; inline
+
+GL-FUNCTION: void glActiveTexture ( GLenum texture ) ;
+GL-FUNCTION: void glClientActiveTexture ( GLenum texture ) ;
+GL-FUNCTION: void glCompressedTexImage1D ( GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, GLvoid* data ) ;
+GL-FUNCTION: void glCompressedTexImage2D ( GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, GLvoid* data ) ;
+GL-FUNCTION: void glCompressedTexImage3D ( GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, GLvoid* data ) ;
+GL-FUNCTION: void glCompressedTexSubImage1D ( GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, GLvoid* data ) ;
+GL-FUNCTION: void glCompressedTexSubImage2D ( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, GLvoid* data ) ;
+GL-FUNCTION: void glCompressedTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, GLvoid* data ) ;
+GL-FUNCTION: void glGetCompressedTexImage ( GLenum target, GLint lod, GLvoid* img ) ;
+GL-FUNCTION: void glLoadTransposeMatrixd ( GLdouble m[16] ) ;
+GL-FUNCTION: void glLoadTransposeMatrixf ( GLfloat m[16] ) ;
+GL-FUNCTION: void glMultTransposeMatrixd ( GLdouble m[16] ) ;
+GL-FUNCTION: void glMultTransposeMatrixf ( GLfloat m[16] ) ;
+GL-FUNCTION: void glMultiTexCoord1d ( GLenum target, GLdouble s ) ;
+GL-FUNCTION: void glMultiTexCoord1dv ( GLenum target, GLdouble* v ) ;
+GL-FUNCTION: void glMultiTexCoord1f ( GLenum target, GLfloat s ) ;
+GL-FUNCTION: void glMultiTexCoord1fv ( GLenum target, GLfloat* v ) ;
+GL-FUNCTION: void glMultiTexCoord1i ( GLenum target, GLint s ) ;
+GL-FUNCTION: void glMultiTexCoord1iv ( GLenum target, GLint* v ) ;
+GL-FUNCTION: void glMultiTexCoord1s ( GLenum target, GLshort s ) ;
+GL-FUNCTION: void glMultiTexCoord1sv ( GLenum target, GLshort* v ) ;
+GL-FUNCTION: void glMultiTexCoord2d ( GLenum target, GLdouble s, GLdouble t ) ;
+GL-FUNCTION: void glMultiTexCoord2dv ( GLenum target, GLdouble* v ) ;
+GL-FUNCTION: void glMultiTexCoord2f ( GLenum target, GLfloat s, GLfloat t ) ;
+GL-FUNCTION: void glMultiTexCoord2fv ( GLenum target, GLfloat* v ) ;
+GL-FUNCTION: void glMultiTexCoord2i ( GLenum target, GLint s, GLint t ) ;
+GL-FUNCTION: void glMultiTexCoord2iv ( GLenum target, GLint* v ) ;
+GL-FUNCTION: void glMultiTexCoord2s ( GLenum target, GLshort s, GLshort t ) ;
+GL-FUNCTION: void glMultiTexCoord2sv ( GLenum target, GLshort* v ) ;
+GL-FUNCTION: void glMultiTexCoord3d ( GLenum target, GLdouble s, GLdouble t, GLdouble r ) ;
+GL-FUNCTION: void glMultiTexCoord3dv ( GLenum target, GLdouble* v ) ;
+GL-FUNCTION: void glMultiTexCoord3f ( GLenum target, GLfloat s, GLfloat t, GLfloat r ) ;
+GL-FUNCTION: void glMultiTexCoord3fv ( GLenum target, GLfloat* v ) ;
+GL-FUNCTION: void glMultiTexCoord3i ( GLenum target, GLint s, GLint t, GLint r ) ;
+GL-FUNCTION: void glMultiTexCoord3iv ( GLenum target, GLint* v ) ;
+GL-FUNCTION: void glMultiTexCoord3s ( GLenum target, GLshort s, GLshort t, GLshort r ) ;
+GL-FUNCTION: void glMultiTexCoord3sv ( GLenum target, GLshort* v ) ;
+GL-FUNCTION: void glMultiTexCoord4d ( GLenum target, GLdouble s, GLdouble t, GLdouble r, GLdouble q ) ;
+GL-FUNCTION: void glMultiTexCoord4dv ( GLenum target, GLdouble* v ) ;
+GL-FUNCTION: void glMultiTexCoord4f ( GLenum target, GLfloat s, GLfloat t, GLfloat r, GLfloat q ) ;
+GL-FUNCTION: void glMultiTexCoord4fv ( GLenum target, GLfloat* v ) ;
+GL-FUNCTION: void glMultiTexCoord4i ( GLenum target, GLint s, GLint t, GLint r, GLint q ) ;
+GL-FUNCTION: void glMultiTexCoord4iv ( GLenum target, GLint* v ) ;
+GL-FUNCTION: void glMultiTexCoord4s ( GLenum target, GLshort s, GLshort t, GLshort r, GLshort q ) ;
+GL-FUNCTION: void glMultiTexCoord4sv ( GLenum target, GLshort* v ) ;
+GL-FUNCTION: void glSampleCoverage ( GLclampf value, GLboolean invert ) ;
 
 
 ! OpenGL 1.4
 
-: GL_POINT_SIZE_MIN                 HEX: 8126 ; inline
-: GL_POINT_SIZE_MAX                 HEX: 8127 ; inline
-: GL_POINT_FADE_THRESHOLD_SIZE      HEX: 8128 ; inline
-: GL_POINT_DISTANCE_ATTENUATION     HEX: 8129 ; inline
-: GL_FOG_COORDINATE_SOURCE          HEX: 8450 ; inline
-: GL_FOG_COORDINATE                 HEX: 8451 ; inline
-: GL_FRAGMENT_DEPTH                 HEX: 8452 ; inline
-: GL_CURRENT_FOG_COORDINATE         HEX: 8453 ; inline
-: GL_FOG_COORDINATE_ARRAY_TYPE      HEX: 8454 ; inline
-: GL_FOG_COORDINATE_ARRAY_STRIDE    HEX: 8455 ; inline
-: GL_FOG_COORDINATE_ARRAY_POINTER   HEX: 8456 ; inline
-: GL_FOG_COORDINATE_ARRAY           HEX: 8457 ; inline
-: GL_COLOR_SUM                      HEX: 8458 ; inline
-: GL_CURRENT_SECONDARY_COLOR        HEX: 8459 ; inline
-: GL_SECONDARY_COLOR_ARRAY_SIZE     HEX: 845A ; inline
-: GL_SECONDARY_COLOR_ARRAY_TYPE     HEX: 845B ; inline
-: GL_SECONDARY_COLOR_ARRAY_STRIDE   HEX: 845C ; inline
-: GL_SECONDARY_COLOR_ARRAY_POINTER  HEX: 845D ; inline
-: GL_SECONDARY_COLOR_ARRAY          HEX: 845E ; inline
-: GL_INCR_WRAP                      HEX: 8507 ; inline
-: GL_DECR_WRAP                      HEX: 8508 ; inline
-: GL_MAX_TEXTURE_LOD_BIAS           HEX: 84FD ; inline
-: GL_TEXTURE_FILTER_CONTROL         HEX: 8500 ; inline
-: GL_TEXTURE_LOD_BIAS               HEX: 8501 ; inline
-: GL_GENERATE_MIPMAP                HEX: 8191 ; inline
-: GL_GENERATE_MIPMAP_HINT           HEX: 8192 ; inline
-: GL_BLEND_DST_RGB                  HEX: 80C8 ; inline
-: GL_BLEND_SRC_RGB                  HEX: 80C9 ; inline
-: GL_BLEND_DST_ALPHA                HEX: 80CA ; inline
-: GL_BLEND_SRC_ALPHA                HEX: 80CB ; inline
-: GL_MIRRORED_REPEAT                HEX: 8370 ; inline
-: GL_DEPTH_COMPONENT16              HEX: 81A5 ; inline
-: GL_DEPTH_COMPONENT24              HEX: 81A6 ; inline
-: GL_DEPTH_COMPONENT32              HEX: 81A7 ; inline
-: GL_TEXTURE_DEPTH_SIZE             HEX: 884A ; inline
-: GL_DEPTH_TEXTURE_MODE             HEX: 884B ; inline
-: GL_TEXTURE_COMPARE_MODE           HEX: 884C ; inline
-: GL_TEXTURE_COMPARE_FUNC           HEX: 884D ; inline
-: GL_COMPARE_R_TO_TEXTURE           HEX: 884E ; inline
+
+: GL_BLEND_DST_RGB HEX: 80C8 ; inline
+: GL_BLEND_SRC_RGB HEX: 80C9 ; inline
+: GL_BLEND_DST_ALPHA HEX: 80CA ; inline
+: GL_BLEND_SRC_ALPHA HEX: 80CB ; inline
+: GL_POINT_SIZE_MIN HEX: 8126 ; inline
+: GL_POINT_SIZE_MAX HEX: 8127 ; inline
+: GL_POINT_FADE_THRESHOLD_SIZE HEX: 8128 ; inline
+: GL_POINT_DISTANCE_ATTENUATION HEX: 8129 ; inline
+: GL_GENERATE_MIPMAP HEX: 8191 ; inline
+: GL_GENERATE_MIPMAP_HINT HEX: 8192 ; inline
+: GL_DEPTH_COMPONENT16 HEX: 81A5 ; inline
+: GL_DEPTH_COMPONENT24 HEX: 81A6 ; inline
+: GL_DEPTH_COMPONENT32 HEX: 81A7 ; inline
+: GL_MIRRORED_REPEAT HEX: 8370 ; inline
+: GL_FOG_COORDINATE_SOURCE HEX: 8450 ; inline
+: GL_FOG_COORDINATE HEX: 8451 ; inline
+: GL_FRAGMENT_DEPTH HEX: 8452 ; inline
+: GL_CURRENT_FOG_COORDINATE HEX: 8453 ; inline
+: GL_FOG_COORDINATE_ARRAY_TYPE HEX: 8454 ; inline
+: GL_FOG_COORDINATE_ARRAY_STRIDE HEX: 8455 ; inline
+: GL_FOG_COORDINATE_ARRAY_POINTER HEX: 8456 ; inline
+: GL_FOG_COORDINATE_ARRAY HEX: 8457 ; inline
+: GL_COLOR_SUM HEX: 8458 ; inline
+: GL_CURRENT_SECONDARY_COLOR HEX: 8459 ; inline
+: GL_SECONDARY_COLOR_ARRAY_SIZE HEX: 845A ; inline
+: GL_SECONDARY_COLOR_ARRAY_TYPE HEX: 845B ; inline
+: GL_SECONDARY_COLOR_ARRAY_STRIDE HEX: 845C ; inline
+: GL_SECONDARY_COLOR_ARRAY_POINTER HEX: 845D ; inline
+: GL_SECONDARY_COLOR_ARRAY HEX: 845E ; inline
+: GL_MAX_TEXTURE_LOD_BIAS HEX: 84FD ; inline
+: GL_TEXTURE_FILTER_CONTROL HEX: 8500 ; inline
+: GL_TEXTURE_LOD_BIAS HEX: 8501 ; inline
+: GL_INCR_WRAP HEX: 8507 ; inline
+: GL_DECR_WRAP HEX: 8508 ; inline
+: GL_TEXTURE_DEPTH_SIZE HEX: 884A ; inline
+: GL_DEPTH_TEXTURE_MODE HEX: 884B ; inline
+: GL_TEXTURE_COMPARE_MODE HEX: 884C ; inline
+: GL_TEXTURE_COMPARE_FUNC HEX: 884D ; inline
+: GL_COMPARE_R_TO_TEXTURE HEX: 884E ; inline
+
+GL-FUNCTION: void glBlendColor ( GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha ) ;
+GL-FUNCTION: void glBlendEquation ( GLenum mode ) ;
+GL-FUNCTION: void glBlendFuncSeparate ( GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha ) ;
+GL-FUNCTION: void glFogCoordPointer ( GLenum type, GLsizei stride, GLvoid* pointer ) ;
+GL-FUNCTION: void glFogCoordd ( GLdouble coord ) ;
+GL-FUNCTION: void glFogCoorddv ( GLdouble* coord ) ;
+GL-FUNCTION: void glFogCoordf ( GLfloat coord ) ;
+GL-FUNCTION: void glFogCoordfv ( GLfloat* coord ) ;
+GL-FUNCTION: void glMultiDrawArrays ( GLenum mode, GLint* first, GLsizei* count, GLsizei primcount ) ;
+GL-FUNCTION: void glMultiDrawElements ( GLenum mode, GLsizei* count, GLenum type, GLvoid** indices, GLsizei primcount ) ;
+GL-FUNCTION: void glPointParameterf ( GLenum pname, GLfloat param ) ;
+GL-FUNCTION: void glPointParameterfv ( GLenum pname, GLfloat* params ) ;
+GL-FUNCTION: void glSecondaryColor3b ( GLbyte red, GLbyte green, GLbyte blue ) ;
+GL-FUNCTION: void glSecondaryColor3bv ( GLbyte* v ) ;
+GL-FUNCTION: void glSecondaryColor3d ( GLdouble red, GLdouble green, GLdouble blue ) ;
+GL-FUNCTION: void glSecondaryColor3dv ( GLdouble* v ) ;
+GL-FUNCTION: void glSecondaryColor3f ( GLfloat red, GLfloat green, GLfloat blue ) ;
+GL-FUNCTION: void glSecondaryColor3fv ( GLfloat* v ) ;
+GL-FUNCTION: void glSecondaryColor3i ( GLint red, GLint green, GLint blue ) ;
+GL-FUNCTION: void glSecondaryColor3iv ( GLint* v ) ;
+GL-FUNCTION: void glSecondaryColor3s ( GLshort red, GLshort green, GLshort blue ) ;
+GL-FUNCTION: void glSecondaryColor3sv ( GLshort* v ) ;
+GL-FUNCTION: void glSecondaryColor3ub ( GLubyte red, GLubyte green, GLubyte blue ) ;
+GL-FUNCTION: void glSecondaryColor3ubv ( GLubyte* v ) ;
+GL-FUNCTION: void glSecondaryColor3ui ( GLuint red, GLuint green, GLuint blue ) ;
+GL-FUNCTION: void glSecondaryColor3uiv ( GLuint* v ) ;
+GL-FUNCTION: void glSecondaryColor3us ( GLushort red, GLushort green, GLushort blue ) ;
+GL-FUNCTION: void glSecondaryColor3usv ( GLushort* v ) ;
+GL-FUNCTION: void glSecondaryColorPointer ( GLint size, GLenum type, GLsizei stride, GLvoid* pointer ) ;
+GL-FUNCTION: void glWindowPos2d ( GLdouble x, GLdouble y ) ;
+GL-FUNCTION: void glWindowPos2dv ( GLdouble* p ) ;
+GL-FUNCTION: void glWindowPos2f ( GLfloat x, GLfloat y ) ;
+GL-FUNCTION: void glWindowPos2fv ( GLfloat* p ) ;
+GL-FUNCTION: void glWindowPos2i ( GLint x, GLint y ) ;
+GL-FUNCTION: void glWindowPos2iv ( GLint* p ) ;
+GL-FUNCTION: void glWindowPos2s ( GLshort x, GLshort y ) ;
+GL-FUNCTION: void glWindowPos2sv ( GLshort* p ) ;
+GL-FUNCTION: void glWindowPos3d ( GLdouble x, GLdouble y, GLdouble z ) ;
+GL-FUNCTION: void glWindowPos3dv ( GLdouble* p ) ;
+GL-FUNCTION: void glWindowPos3f ( GLfloat x, GLfloat y, GLfloat z ) ;
+GL-FUNCTION: void glWindowPos3fv ( GLfloat* p ) ;
+GL-FUNCTION: void glWindowPos3i ( GLint x, GLint y, GLint z ) ;
+GL-FUNCTION: void glWindowPos3iv ( GLint* p ) ;
+GL-FUNCTION: void glWindowPos3s ( GLshort x, GLshort y, GLshort z ) ;
+GL-FUNCTION: void glWindowPos3sv ( GLshort* p ) ;
+
+
+! OpenGL 1.5
+
+: GL_BUFFER_SIZE HEX: 8764 ; inline
+: GL_BUFFER_USAGE HEX: 8765 ; inline
+: GL_QUERY_COUNTER_BITS HEX: 8864 ; inline
+: GL_CURRENT_QUERY HEX: 8865 ; inline
+: GL_QUERY_RESULT HEX: 8866 ; inline
+: GL_QUERY_RESULT_AVAILABLE HEX: 8867 ; inline
+: GL_ARRAY_BUFFER HEX: 8892 ; inline
+: GL_ELEMENT_ARRAY_BUFFER HEX: 8893 ; inline
+: GL_ARRAY_BUFFER_BINDING HEX: 8894 ; inline
+: GL_ELEMENT_ARRAY_BUFFER_BINDING HEX: 8895 ; inline
+: GL_VERTEX_ARRAY_BUFFER_BINDING HEX: 8896 ; inline
+: GL_NORMAL_ARRAY_BUFFER_BINDING HEX: 8897 ; inline
+: GL_COLOR_ARRAY_BUFFER_BINDING HEX: 8898 ; inline
+: GL_INDEX_ARRAY_BUFFER_BINDING HEX: 8899 ; inline
+: GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING HEX: 889A ; inline
+: GL_EDGE_FLAG_ARRAY_BUFFER_BINDING HEX: 889B ; inline
+: GL_SECONDARY_COLOR_ARRAY_BUFFER_BINDING HEX: 889C ; inline
+: GL_FOG_COORDINATE_ARRAY_BUFFER_BINDING HEX: 889D ; inline
+: GL_WEIGHT_ARRAY_BUFFER_BINDING HEX: 889E ; inline
+: GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING HEX: 889F ; inline
+: GL_READ_ONLY HEX: 88B8 ; inline
+: GL_WRITE_ONLY HEX: 88B9 ; inline
+: GL_READ_WRITE HEX: 88BA ; inline
+: GL_BUFFER_ACCESS HEX: 88BB ; inline
+: GL_BUFFER_MAPPED HEX: 88BC ; inline
+: GL_BUFFER_MAP_POINTER HEX: 88BD ; inline
+: GL_STREAM_DRAW HEX: 88E0 ; inline
+: GL_STREAM_READ HEX: 88E1 ; inline
+: GL_STREAM_COPY HEX: 88E2 ; inline
+: GL_STATIC_DRAW HEX: 88E4 ; inline
+: GL_STATIC_READ HEX: 88E5 ; inline
+: GL_STATIC_COPY HEX: 88E6 ; inline
+: GL_DYNAMIC_DRAW HEX: 88E8 ; inline
+: GL_DYNAMIC_READ HEX: 88E9 ; inline
+: GL_DYNAMIC_COPY HEX: 88EA ; inline
+: GL_SAMPLES_PASSED HEX: 8914 ; inline
+: GL_FOG_COORD_SRC GL_FOG_COORDINATE_SOURCE ; inline
+: GL_FOG_COORD GL_FOG_COORDINATE ; inline
+: GL_FOG_COORD_ARRAY GL_FOG_COORDINATE_ARRAY ; inline
+: GL_SRC0_RGB GL_SOURCE0_RGB ; inline
+: GL_FOG_COORD_ARRAY_POINTER GL_FOG_COORDINATE_ARRAY_POINTER ; inline
+: GL_FOG_COORD_ARRAY_TYPE GL_FOG_COORDINATE_ARRAY_TYPE ; inline
+: GL_SRC1_ALPHA GL_SOURCE1_ALPHA ; inline
+: GL_CURRENT_FOG_COORD GL_CURRENT_FOG_COORDINATE ; inline
+: GL_FOG_COORD_ARRAY_STRIDE GL_FOG_COORDINATE_ARRAY_STRIDE ; inline
+: GL_SRC0_ALPHA GL_SOURCE0_ALPHA ; inline
+: GL_SRC1_RGB GL_SOURCE1_RGB ; inline
+: GL_FOG_COORD_ARRAY_BUFFER_BINDING GL_FOG_COORDINATE_ARRAY_BUFFER_BINDING ; inline
+: GL_SRC2_ALPHA GL_SOURCE2_ALPHA ; inline
+: GL_SRC2_RGB GL_SOURCE2_RGB ; inline
+
+TYPEDEF: ptrdiff_t GLsizeiptr
+TYPEDEF: ptrdiff_t GLintptr
+
+GL-FUNCTION: void glBeginQuery ( GLenum target, GLuint id ) ;
+GL-FUNCTION: void glBindBuffer ( GLenum target, GLuint buffer ) ;
+GL-FUNCTION: void glBufferData ( GLenum target, GLsizeiptr size, GLvoid* data, GLenum usage ) ;
+GL-FUNCTION: void glBufferSubData ( GLenum target, GLintptr offset, GLsizeiptr size, GLvoid* data ) ;
+GL-FUNCTION: void glDeleteBuffers ( GLsizei n, GLuint* buffers ) ;
+GL-FUNCTION: void glDeleteQueries ( GLsizei n, GLuint* ids ) ;
+GL-FUNCTION: void glEndQuery ( GLenum target ) ;
+GL-FUNCTION: void glGenBuffers ( GLsizei n, GLuint* buffers ) ;
+GL-FUNCTION: void glGenQueries ( GLsizei n, GLuint* ids ) ;
+GL-FUNCTION: void glGetBufferParameteriv ( GLenum target, GLenum pname, GLint* params ) ;
+GL-FUNCTION: void glGetBufferPointerv ( GLenum target, GLenum pname, GLvoid** params ) ;
+GL-FUNCTION: void glGetBufferSubData ( GLenum target, GLintptr offset, GLsizeiptr size, GLvoid* data ) ;
+GL-FUNCTION: void glGetQueryObjectiv ( GLuint id, GLenum pname, GLint* params ) ;
+GL-FUNCTION: void glGetQueryObjectuiv ( GLuint id, GLenum pname, GLuint* params ) ;
+GL-FUNCTION: void glGetQueryiv ( GLenum target, GLenum pname, GLint* params ) ;
+GL-FUNCTION: GLboolean glIsBuffer ( GLuint buffer ) ;
+GL-FUNCTION: GLboolean glIsQuery ( GLuint id ) ;
+GL-FUNCTION: GLvoid* glMapBuffer ( GLenum target, GLenum access ) ;
+GL-FUNCTION: GLboolean glUnmapBuffer ( GLenum target ) ;
+
+
+! OpenGL 2.0
+
+
+: GL_VERTEX_ATTRIB_ARRAY_ENABLED HEX: 8622 ; inline
+: GL_VERTEX_ATTRIB_ARRAY_SIZE HEX: 8623 ; inline
+: GL_VERTEX_ATTRIB_ARRAY_STRIDE HEX: 8624 ; inline
+: GL_VERTEX_ATTRIB_ARRAY_TYPE HEX: 8625 ; inline
+: GL_CURRENT_VERTEX_ATTRIB HEX: 8626 ; inline
+: GL_VERTEX_PROGRAM_POINT_SIZE HEX: 8642 ; inline
+: GL_VERTEX_PROGRAM_TWO_SIDE HEX: 8643 ; inline
+: GL_VERTEX_ATTRIB_ARRAY_POINTER HEX: 8645 ; inline
+: GL_STENCIL_BACK_FUNC HEX: 8800 ; inline
+: GL_STENCIL_BACK_FAIL HEX: 8801 ; inline
+: GL_STENCIL_BACK_PASS_DEPTH_FAIL HEX: 8802 ; inline
+: GL_STENCIL_BACK_PASS_DEPTH_PASS HEX: 8803 ; inline
+: GL_MAX_DRAW_BUFFERS HEX: 8824 ; inline
+: GL_DRAW_BUFFER0 HEX: 8825 ; inline
+: GL_DRAW_BUFFER1 HEX: 8826 ; inline
+: GL_DRAW_BUFFER2 HEX: 8827 ; inline
+: GL_DRAW_BUFFER3 HEX: 8828 ; inline
+: GL_DRAW_BUFFER4 HEX: 8829 ; inline
+: GL_DRAW_BUFFER5 HEX: 882A ; inline
+: GL_DRAW_BUFFER6 HEX: 882B ; inline
+: GL_DRAW_BUFFER7 HEX: 882C ; inline
+: GL_DRAW_BUFFER8 HEX: 882D ; inline
+: GL_DRAW_BUFFER9 HEX: 882E ; inline
+: GL_DRAW_BUFFER10 HEX: 882F ; inline
+: GL_DRAW_BUFFER11 HEX: 8830 ; inline
+: GL_DRAW_BUFFER12 HEX: 8831 ; inline
+: GL_DRAW_BUFFER13 HEX: 8832 ; inline
+: GL_DRAW_BUFFER14 HEX: 8833 ; inline
+: GL_DRAW_BUFFER15 HEX: 8834 ; inline
+: GL_BLEND_EQUATION_ALPHA HEX: 883D ; inline
+: GL_POINT_SPRITE HEX: 8861 ; inline
+: GL_COORD_REPLACE HEX: 8862 ; inline
+: GL_MAX_VERTEX_ATTRIBS HEX: 8869 ; inline
+: GL_VERTEX_ATTRIB_ARRAY_NORMALIZED HEX: 886A ; inline
+: GL_MAX_TEXTURE_COORDS HEX: 8871 ; inline
+: GL_MAX_TEXTURE_IMAGE_UNITS HEX: 8872 ; inline
+: GL_FRAGMENT_SHADER HEX: 8B30 ; inline
+: GL_VERTEX_SHADER HEX: 8B31 ; inline
+: GL_MAX_FRAGMENT_UNIFORM_COMPONENTS HEX: 8B49 ; inline
+: GL_MAX_VERTEX_UNIFORM_COMPONENTS HEX: 8B4A ; inline
+: GL_MAX_VARYING_FLOATS HEX: 8B4B ; inline
+: GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS HEX: 8B4C ; inline
+: GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS HEX: 8B4D ; inline
+: GL_SHADER_TYPE HEX: 8B4F ; inline
+: GL_FLOAT_VEC2 HEX: 8B50 ; inline
+: GL_FLOAT_VEC3 HEX: 8B51 ; inline
+: GL_FLOAT_VEC4 HEX: 8B52 ; inline
+: GL_INT_VEC2 HEX: 8B53 ; inline
+: GL_INT_VEC3 HEX: 8B54 ; inline
+: GL_INT_VEC4 HEX: 8B55 ; inline
+: GL_BOOL HEX: 8B56 ; inline
+: GL_BOOL_VEC2 HEX: 8B57 ; inline
+: GL_BOOL_VEC3 HEX: 8B58 ; inline
+: GL_BOOL_VEC4 HEX: 8B59 ; inline
+: GL_FLOAT_MAT2 HEX: 8B5A ; inline
+: GL_FLOAT_MAT3 HEX: 8B5B ; inline
+: GL_FLOAT_MAT4 HEX: 8B5C ; inline
+: GL_SAMPLER_1D HEX: 8B5D ; inline
+: GL_SAMPLER_2D HEX: 8B5E ; inline
+: GL_SAMPLER_3D HEX: 8B5F ; inline
+: GL_SAMPLER_CUBE HEX: 8B60 ; inline
+: GL_SAMPLER_1D_SHADOW HEX: 8B61 ; inline
+: GL_SAMPLER_2D_SHADOW HEX: 8B62 ; inline
+: GL_DELETE_STATUS HEX: 8B80 ; inline
+: GL_COMPILE_STATUS HEX: 8B81 ; inline
+: GL_LINK_STATUS HEX: 8B82 ; inline
+: GL_VALIDATE_STATUS HEX: 8B83 ; inline
+: GL_INFO_LOG_LENGTH HEX: 8B84 ; inline
+: GL_ATTACHED_SHADERS HEX: 8B85 ; inline
+: GL_ACTIVE_UNIFORMS HEX: 8B86 ; inline
+: GL_ACTIVE_UNIFORM_MAX_LENGTH HEX: 8B87 ; inline
+: GL_SHADER_SOURCE_LENGTH HEX: 8B88 ; inline
+: GL_ACTIVE_ATTRIBUTES HEX: 8B89 ; inline
+: GL_ACTIVE_ATTRIBUTE_MAX_LENGTH HEX: 8B8A ; inline
+: GL_FRAGMENT_SHADER_DERIVATIVE_HINT HEX: 8B8B ; inline
+: GL_SHADING_LANGUAGE_VERSION HEX: 8B8C ; inline
+: GL_CURRENT_PROGRAM HEX: 8B8D ; inline
+: GL_POINT_SPRITE_COORD_ORIGIN HEX: 8CA0 ; inline
+: GL_LOWER_LEFT HEX: 8CA1 ; inline
+: GL_UPPER_LEFT HEX: 8CA2 ; inline
+: GL_STENCIL_BACK_REF HEX: 8CA3 ; inline
+: GL_STENCIL_BACK_VALUE_MASK HEX: 8CA4 ; inline
+: GL_STENCIL_BACK_WRITEMASK HEX: 8CA5 ; inline
+: GL_BLEND_EQUATION HEX: 8009 ; inline
+: GL_BLEND_EQUATION_RGB GL_BLEND_EQUATION ; inline
+
+TYPEDEF: char GLchar
+
+GL-FUNCTION: void glAttachShader ( GLuint program, GLuint shader ) ;
+GL-FUNCTION: void glBindAttribLocation ( GLuint program, GLuint index, GLchar* name ) ;
+GL-FUNCTION: void glBlendEquationSeparate ( GLenum modeRGB, GLenum modeAlpha ) ;
+GL-FUNCTION: void glCompileShader ( GLuint shader ) ;
+GL-FUNCTION: GLuint glCreateProgram (  ) ;
+GL-FUNCTION: GLuint glCreateShader ( GLenum type ) ;
+GL-FUNCTION: void glDeleteProgram ( GLuint program ) ;
+GL-FUNCTION: void glDeleteShader ( GLuint shader ) ;
+GL-FUNCTION: void glDetachShader ( GLuint program, GLuint shader ) ;
+GL-FUNCTION: void glDisableVertexAttribArray ( GLuint index ) ;
+GL-FUNCTION: void glDrawBuffers ( GLsizei n, GLenum* bufs ) ;
+GL-FUNCTION: void glEnableVertexAttribArray ( GLuint index ) ;
+GL-FUNCTION: void glGetActiveAttrib ( GLuint program, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLchar* name ) ;
+GL-FUNCTION: void glGetActiveUniform ( GLuint program, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLchar* name ) ;
+GL-FUNCTION: void glGetAttachedShaders ( GLuint program, GLsizei maxCount, GLsizei* count, GLuint* shaders ) ;
+GL-FUNCTION: GLint glGetAttribLocation ( GLuint program, GLchar* name ) ;
+GL-FUNCTION: void glGetProgramInfoLog ( GLuint program, GLsizei bufSize, GLsizei* length, GLchar* infoLog ) ;
+GL-FUNCTION: void glGetProgramiv ( GLuint program, GLenum pname, GLint* param ) ;
+GL-FUNCTION: void glGetShaderInfoLog ( GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* infoLog ) ;
+GL-FUNCTION: void glGetShaderSource ( GLint obj, GLsizei maxLength, GLsizei* length, GLchar* source ) ;
+GL-FUNCTION: void glGetShaderiv ( GLuint shader, GLenum pname, GLint* param ) ;
+GL-FUNCTION: GLint glGetUniformLocation ( GLint programObj, GLchar* name ) ;
+GL-FUNCTION: void glGetUniformfv ( GLuint program, GLint location, GLfloat* params ) ;
+GL-FUNCTION: void glGetUniformiv ( GLuint program, GLint location, GLint* params ) ;
+GL-FUNCTION: void glGetVertexAttribPointerv ( GLuint index, GLenum pname, GLvoid** pointer ) ;
+GL-FUNCTION: void glGetVertexAttribdv ( GLuint index, GLenum pname, GLdouble* params ) ;
+GL-FUNCTION: void glGetVertexAttribfv ( GLuint index, GLenum pname, GLfloat* params ) ;
+GL-FUNCTION: void glGetVertexAttribiv ( GLuint index, GLenum pname, GLint* params ) ;
+GL-FUNCTION: GLboolean glIsProgram ( GLuint program ) ;
+GL-FUNCTION: GLboolean glIsShader ( GLuint shader ) ;
+GL-FUNCTION: void glLinkProgram ( GLuint program ) ;
+GL-FUNCTION: void glShaderSource ( GLuint shader, GLsizei count, GLchar** strings, GLint* lengths ) ;
+GL-FUNCTION: void glStencilFuncSeparate ( GLenum frontfunc, GLenum backfunc, GLint ref, GLuint mask ) ;
+GL-FUNCTION: void glStencilMaskSeparate ( GLenum face, GLuint mask ) ;
+GL-FUNCTION: void glStencilOpSeparate ( GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass ) ;
+GL-FUNCTION: void glUniform1f ( GLint location, GLfloat v0 ) ;
+GL-FUNCTION: void glUniform1fv ( GLint location, GLsizei count, GLfloat* value ) ;
+GL-FUNCTION: void glUniform1i ( GLint location, GLint v0 ) ;
+GL-FUNCTION: void glUniform1iv ( GLint location, GLsizei count, GLint* value ) ;
+GL-FUNCTION: void glUniform2f ( GLint location, GLfloat v0, GLfloat v1 ) ;
+GL-FUNCTION: void glUniform2fv ( GLint location, GLsizei count, GLfloat* value ) ;
+GL-FUNCTION: void glUniform2i ( GLint location, GLint v0, GLint v1 ) ;
+GL-FUNCTION: void glUniform2iv ( GLint location, GLsizei count, GLint* value ) ;
+GL-FUNCTION: void glUniform3f ( GLint location, GLfloat v0, GLfloat v1, GLfloat v2 ) ;
+GL-FUNCTION: void glUniform3fv ( GLint location, GLsizei count, GLfloat* value ) ;
+GL-FUNCTION: void glUniform3i ( GLint location, GLint v0, GLint v1, GLint v2 ) ;
+GL-FUNCTION: void glUniform3iv ( GLint location, GLsizei count, GLint* value ) ;
+GL-FUNCTION: void glUniform4f ( GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3 ) ;
+GL-FUNCTION: void glUniform4fv ( GLint location, GLsizei count, GLfloat* value ) ;
+GL-FUNCTION: void glUniform4i ( GLint location, GLint v0, GLint v1, GLint v2, GLint v3 ) ;
+GL-FUNCTION: void glUniform4iv ( GLint location, GLsizei count, GLint* value ) ;
+GL-FUNCTION: void glUniformMatrix2fv ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
+GL-FUNCTION: void glUniformMatrix3fv ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
+GL-FUNCTION: void glUniformMatrix4fv ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
+GL-FUNCTION: void glUseProgram ( GLuint program ) ;
+GL-FUNCTION: void glValidateProgram ( GLuint program ) ;
+GL-FUNCTION: void glVertexAttrib1d ( GLuint index, GLdouble x ) ;
+GL-FUNCTION: void glVertexAttrib1dv ( GLuint index, GLdouble* v ) ;
+GL-FUNCTION: void glVertexAttrib1f ( GLuint index, GLfloat x ) ;
+GL-FUNCTION: void glVertexAttrib1fv ( GLuint index, GLfloat* v ) ;
+GL-FUNCTION: void glVertexAttrib1s ( GLuint index, GLshort x ) ;
+GL-FUNCTION: void glVertexAttrib1sv ( GLuint index, GLshort* v ) ;
+GL-FUNCTION: void glVertexAttrib2d ( GLuint index, GLdouble x, GLdouble y ) ;
+GL-FUNCTION: void glVertexAttrib2dv ( GLuint index, GLdouble* v ) ;
+GL-FUNCTION: void glVertexAttrib2f ( GLuint index, GLfloat x, GLfloat y ) ;
+GL-FUNCTION: void glVertexAttrib2fv ( GLuint index, GLfloat* v ) ;
+GL-FUNCTION: void glVertexAttrib2s ( GLuint index, GLshort x, GLshort y ) ;
+GL-FUNCTION: void glVertexAttrib2sv ( GLuint index, GLshort* v ) ;
+GL-FUNCTION: void glVertexAttrib3d ( GLuint index, GLdouble x, GLdouble y, GLdouble z ) ;
+GL-FUNCTION: void glVertexAttrib3dv ( GLuint index, GLdouble* v ) ;
+GL-FUNCTION: void glVertexAttrib3f ( GLuint index, GLfloat x, GLfloat y, GLfloat z ) ;
+GL-FUNCTION: void glVertexAttrib3fv ( GLuint index, GLfloat* v ) ;
+GL-FUNCTION: void glVertexAttrib3s ( GLuint index, GLshort x, GLshort y, GLshort z ) ;
+GL-FUNCTION: void glVertexAttrib3sv ( GLuint index, GLshort* v ) ;
+GL-FUNCTION: void glVertexAttrib4Nbv ( GLuint index, GLbyte* v ) ;
+GL-FUNCTION: void glVertexAttrib4Niv ( GLuint index, GLint* v ) ;
+GL-FUNCTION: void glVertexAttrib4Nsv ( GLuint index, GLshort* v ) ;
+GL-FUNCTION: void glVertexAttrib4Nub ( GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w ) ;
+GL-FUNCTION: void glVertexAttrib4Nubv ( GLuint index, GLubyte* v ) ;
+GL-FUNCTION: void glVertexAttrib4Nuiv ( GLuint index, GLuint* v ) ;
+GL-FUNCTION: void glVertexAttrib4Nusv ( GLuint index, GLushort* v ) ;
+GL-FUNCTION: void glVertexAttrib4bv ( GLuint index, GLbyte* v ) ;
+GL-FUNCTION: void glVertexAttrib4d ( GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w ) ;
+GL-FUNCTION: void glVertexAttrib4dv ( GLuint index, GLdouble* v ) ;
+GL-FUNCTION: void glVertexAttrib4f ( GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w ) ;
+GL-FUNCTION: void glVertexAttrib4fv ( GLuint index, GLfloat* v ) ;
+GL-FUNCTION: void glVertexAttrib4iv ( GLuint index, GLint* v ) ;
+GL-FUNCTION: void glVertexAttrib4s ( GLuint index, GLshort x, GLshort y, GLshort z, GLshort w ) ;
+GL-FUNCTION: void glVertexAttrib4sv ( GLuint index, GLshort* v ) ;
+GL-FUNCTION: void glVertexAttrib4ubv ( GLuint index, GLubyte* v ) ;
+GL-FUNCTION: void glVertexAttrib4uiv ( GLuint index, GLuint* v ) ;
+GL-FUNCTION: void glVertexAttrib4usv ( GLuint index, GLushort* v ) ;
+GL-FUNCTION: void glVertexAttribPointer ( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid* pointer ) ;
+
+
+! OpenGL 2.1
+
+
+: GL_CURRENT_RASTER_SECONDARY_COLOR HEX: 845F ; inline
+: GL_PIXEL_PACK_BUFFER HEX: 88EB ; inline
+: GL_PIXEL_UNPACK_BUFFER HEX: 88EC ; inline
+: GL_PIXEL_PACK_BUFFER_BINDING HEX: 88ED ; inline
+: GL_PIXEL_UNPACK_BUFFER_BINDING HEX: 88EF ; inline
+: GL_SRGB HEX: 8C40 ; inline
+: GL_SRGB8 HEX: 8C41 ; inline
+: GL_SRGB_ALPHA HEX: 8C42 ; inline
+: GL_SRGB8_ALPHA8 HEX: 8C43 ; inline
+: GL_SLUMINANCE_ALPHA HEX: 8C44 ; inline
+: GL_SLUMINANCE8_ALPHA8 HEX: 8C45 ; inline
+: GL_SLUMINANCE HEX: 8C46 ; inline
+: GL_SLUMINANCE8 HEX: 8C47 ; inline
+: GL_COMPRESSED_SRGB HEX: 8C48 ; inline
+: GL_COMPRESSED_SRGB_ALPHA HEX: 8C49 ; inline
+: GL_COMPRESSED_SLUMINANCE HEX: 8C4A ; inline
+: GL_COMPRESSED_SLUMINANCE_ALPHA HEX: 8C4B ; inline
+
+GL-FUNCTION: void glUniformMatrix2x3fv ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
+GL-FUNCTION: void glUniformMatrix2x4fv ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
+GL-FUNCTION: void glUniformMatrix3x2fv ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
+GL-FUNCTION: void glUniformMatrix3x4fv ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
+GL-FUNCTION: void glUniformMatrix4x2fv ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
+GL-FUNCTION: void glUniformMatrix4x3fv ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
+
+
+! GL_EXT_framebuffer_object
+
+
+: GL_INVALID_FRAMEBUFFER_OPERATION_EXT HEX: 0506 ; inline
+: GL_MAX_RENDERBUFFER_SIZE_EXT HEX: 84E8 ; inline
+: GL_FRAMEBUFFER_BINDING_EXT HEX: 8CA6 ; inline
+: GL_RENDERBUFFER_BINDING_EXT HEX: 8CA7 ; inline
+: GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT HEX: 8CD0 ; inline
+: GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT HEX: 8CD1 ; inline
+: GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL_EXT HEX: 8CD2 ; inline
+: GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE_EXT HEX: 8CD3 ; inline
+: GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_3D_ZOFFSET_EXT HEX: 8CD4 ; inline
+: GL_FRAMEBUFFER_COMPLETE_EXT HEX: 8CD5 ; inline
+: GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT HEX: 8CD6 ; inline
+: GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT HEX: 8CD7 ; inline
+: GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT HEX: 8CD9 ; inline
+: GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT HEX: 8CDA ; inline
+: GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT HEX: 8CDB ; inline
+: GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT HEX: 8CDC ; inline
+: GL_FRAMEBUFFER_UNSUPPORTED_EXT HEX: 8CDD ; inline
+: GL_MAX_COLOR_ATTACHMENTS_EXT HEX: 8CDF ; inline
+: GL_COLOR_ATTACHMENT0_EXT HEX: 8CE0 ; inline
+: GL_COLOR_ATTACHMENT1_EXT HEX: 8CE1 ; inline
+: GL_COLOR_ATTACHMENT2_EXT HEX: 8CE2 ; inline
+: GL_COLOR_ATTACHMENT3_EXT HEX: 8CE3 ; inline
+: GL_COLOR_ATTACHMENT4_EXT HEX: 8CE4 ; inline
+: GL_COLOR_ATTACHMENT5_EXT HEX: 8CE5 ; inline
+: GL_COLOR_ATTACHMENT6_EXT HEX: 8CE6 ; inline
+: GL_COLOR_ATTACHMENT7_EXT HEX: 8CE7 ; inline
+: GL_COLOR_ATTACHMENT8_EXT HEX: 8CE8 ; inline
+: GL_COLOR_ATTACHMENT9_EXT HEX: 8CE9 ; inline
+: GL_COLOR_ATTACHMENT10_EXT HEX: 8CEA ; inline
+: GL_COLOR_ATTACHMENT11_EXT HEX: 8CEB ; inline
+: GL_COLOR_ATTACHMENT12_EXT HEX: 8CEC ; inline
+: GL_COLOR_ATTACHMENT13_EXT HEX: 8CED ; inline
+: GL_COLOR_ATTACHMENT14_EXT HEX: 8CEE ; inline
+: GL_COLOR_ATTACHMENT15_EXT HEX: 8CEF ; inline
+: GL_DEPTH_ATTACHMENT_EXT HEX: 8D00 ; inline
+: GL_STENCIL_ATTACHMENT_EXT HEX: 8D20 ; inline
+: GL_FRAMEBUFFER_EXT HEX: 8D40 ; inline
+: GL_RENDERBUFFER_EXT HEX: 8D41 ; inline
+: GL_RENDERBUFFER_WIDTH_EXT HEX: 8D42 ; inline
+: GL_RENDERBUFFER_HEIGHT_EXT HEX: 8D43 ; inline
+: GL_RENDERBUFFER_INTERNAL_FORMAT_EXT HEX: 8D44 ; inline
+: GL_STENCIL_INDEX1_EXT HEX: 8D46 ; inline
+: GL_STENCIL_INDEX4_EXT HEX: 8D47 ; inline
+: GL_STENCIL_INDEX8_EXT HEX: 8D48 ; inline
+: GL_STENCIL_INDEX16_EXT HEX: 8D49 ; inline
+: GL_RENDERBUFFER_RED_SIZE_EXT HEX: 8D50 ; inline
+: GL_RENDERBUFFER_GREEN_SIZE_EXT HEX: 8D51 ; inline
+: GL_RENDERBUFFER_BLUE_SIZE_EXT HEX: 8D52 ; inline
+: GL_RENDERBUFFER_ALPHA_SIZE_EXT HEX: 8D53 ; inline
+: GL_RENDERBUFFER_DEPTH_SIZE_EXT HEX: 8D54 ; inline
+: GL_RENDERBUFFER_STENCIL_SIZE_EXT HEX: 8D55 ; inline
+
+GL-FUNCTION: void glBindFramebufferEXT ( GLenum target, GLuint framebuffer ) ;
+GL-FUNCTION: void glBindRenderbufferEXT ( GLenum target, GLuint renderbuffer ) ;
+GL-FUNCTION: GLenum glCheckFramebufferStatusEXT ( GLenum target ) ;
+GL-FUNCTION: void glDeleteFramebuffersEXT ( GLsizei n, GLuint* framebuffers ) ;
+GL-FUNCTION: void glDeleteRenderbuffersEXT ( GLsizei n, GLuint* renderbuffers ) ;
+GL-FUNCTION: void glFramebufferRenderbufferEXT ( GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer ) ;
+GL-FUNCTION: void glFramebufferTexture1DEXT ( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level ) ;
+GL-FUNCTION: void glFramebufferTexture2DEXT ( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level ) ;
+GL-FUNCTION: void glFramebufferTexture3DEXT ( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset ) ;
+GL-FUNCTION: void glGenFramebuffersEXT ( GLsizei n, GLuint* framebuffers ) ;
+GL-FUNCTION: void glGenRenderbuffersEXT ( GLsizei n, GLuint* renderbuffers ) ;
+GL-FUNCTION: void glGenerateMipmapEXT ( GLenum target ) ;
+GL-FUNCTION: void glGetFramebufferAttachmentParameterivEXT ( GLenum target, GLenum attachment, GLenum pname, GLint* params ) ;
+GL-FUNCTION: void glGetRenderbufferParameterivEXT ( GLenum target, GLenum pname, GLint* params ) ;
+GL-FUNCTION: GLboolean glIsFramebufferEXT ( GLuint framebuffer ) ;
+GL-FUNCTION: GLboolean glIsRenderbufferEXT ( GLuint renderbuffer ) ;
+GL-FUNCTION: void glRenderbufferStorageEXT ( GLenum target, GLenum internalformat, GLsizei width, GLsizei height ) ;
+
+
+! GL_ARB_texture_float
+
+
+: GL_RGBA32F_ARB HEX: 8814 ; inline
+: GL_RGB32F_ARB HEX: 8815 ; inline
+: GL_ALPHA32F_ARB HEX: 8816 ; inline
+: GL_INTENSITY32F_ARB HEX: 8817 ; inline
+: GL_LUMINANCE32F_ARB HEX: 8818 ; inline
+: GL_LUMINANCE_ALPHA32F_ARB HEX: 8819 ; inline
+: GL_RGBA16F_ARB HEX: 881A ; inline
+: GL_RGB16F_ARB HEX: 881B ; inline
+: GL_ALPHA16F_ARB HEX: 881C ; inline
+: GL_INTENSITY16F_ARB HEX: 881D ; inline
+: GL_LUMINANCE16F_ARB HEX: 881E ; inline
+: GL_LUMINANCE_ALPHA16F_ARB HEX: 881F ; inline
+: GL_TEXTURE_RED_TYPE_ARB HEX: 8C10 ; inline
+: GL_TEXTURE_GREEN_TYPE_ARB HEX: 8C11 ; inline
+: GL_TEXTURE_BLUE_TYPE_ARB HEX: 8C12 ; inline
+: GL_TEXTURE_ALPHA_TYPE_ARB HEX: 8C13 ; inline
+: GL_TEXTURE_LUMINANCE_TYPE_ARB HEX: 8C14 ; inline
+: GL_TEXTURE_INTENSITY_TYPE_ARB HEX: 8C15 ; inline
+: GL_TEXTURE_DEPTH_TYPE_ARB HEX: 8C16 ; inline
+: GL_UNSIGNED_NORMALIZED_ARB HEX: 8C17 ; inline
+

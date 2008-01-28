@@ -151,9 +151,6 @@ typedef struct
 	CELL code_length; /* # bytes */
 	CELL reloc_length; /* # bytes */
 	CELL literals_length; /* # bytes */
-	CELL words_length; /* # bytes */
-	CELL finalized; /* has finalize_code_block() been called on this yet? */
-	CELL padding[2];
 } F_COMPILED;
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -178,6 +175,8 @@ typedef struct {
 	XT xt;
 	/* UNTAGGED compiled code block */
 	F_COMPILED *code;
+	/* UNTAGGED profiler stub */
+	F_COMPILED *profiling;
 } F_WORD;
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -239,7 +238,7 @@ typedef struct {
 	/* tagged byte array holding a C string */
 	CELL path;
 	/* OS-specific handle */
-	void* dll;
+	void *dll;
 } F_DLL;
 
 typedef struct {
@@ -258,17 +257,7 @@ typedef struct {
 
 typedef struct
 {
-	/* In compiled quotation frames, position within the array.
-	In compiled word frames, unused. */
-	CELL scan;
-
-	/* In compiled quotation frames, the quot->array slot.
-	In compiled word frames, unused. */
-	CELL array;
-
-	/* In all compiled frames, the XT on entry. */
 	XT xt;
-
 	/* Frame size in bytes */
 	CELL size;
 } F_STACK_FRAME;

@@ -2,7 +2,7 @@
 IN: temporary
 USING: compiler generator generator.registers
 generator.registers.private tools.test namespaces sequences
-words kernel math effects ;
+words kernel math effects definitions compiler.units ;
 
 : <int-vreg> ( n -- vreg ) T{ int-regs } <vreg> ;
 
@@ -68,7 +68,7 @@ words kernel math effects ;
 ! Test template picking strategy
 SYMBOL: template-chosen
 
-: template-test ( a b -- c ) + ;
+: template-test ( a b -- c d ) ;
 
 \ template-test {
     {
@@ -76,7 +76,7 @@ SYMBOL: template-chosen
             1 template-chosen get push
         ] H{
             { +input+ { { f "obj" } { [ ] "n" } } }
-            { +output+ { "obj" } }
+            { +output+ { "obj" "obj" } }
         }
     }
     {
@@ -84,26 +84,26 @@ SYMBOL: template-chosen
             2 template-chosen get push
         ] H{
             { +input+ { { f "obj" } { f "n" } } }
-            { +output+ { "obj" } }
+            { +output+ { "obj" "n" } }
         }
     }
 } define-intrinsics
 
 [ V{ 2 } ] [
     V{ } clone template-chosen set
-    [ template-test ] compile-quot drop
+    0 0 [ template-test ] compile-call 2drop
     template-chosen get
 ] unit-test
 
 [ V{ 1 } ] [
     V{ } clone template-chosen set
-    [ dup 0 template-test ] compile-quot drop
+    1 [ dup 0 template-test ] compile-call 3drop
     template-chosen get
 ] unit-test
 
 [ V{ 1 } ] [
     V{ } clone template-chosen set
-    [ 0 template-test ] compile-quot drop
+    1 [ 0 template-test ] compile-call 2drop
     template-chosen get
 ] unit-test
 
@@ -209,7 +209,8 @@ H{
 { { f "x" } { f "y" } } define-if-intrinsic
 
 [ ] [
-    [ 2 template-choice-1 template-choice-2 ] compile-quot drop
+    [ 2 template-choice-1 template-choice-2 ]
+    [ define-temp ] with-compilation-unit drop
 ] unit-test
 
 [ V{ "template-choice-1" "template-choice-2" } ]

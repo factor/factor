@@ -4,6 +4,8 @@ IN: temporary
 
 TUPLE: testing x y z ;
 
+[ save-image-and-exit ] unit-test-fails
+
 [ ] [
     num-types get [
         type>class [

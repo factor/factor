@@ -119,7 +119,7 @@ M: float fp-nan?
 
 : iterate-prep 0 -rot ; inline
 
-: if-iterate? >r >r pick pick < r> r> if ; inline
+: if-iterate? >r >r 2over < r> r> if ; inline
 
 : iterate-step ( i n quot -- i n quot )
     #! Apply quot to i, keep i and quot, hide n.

@@ -9,8 +9,7 @@ IN: editors.emeditor
 
 : emeditor ( file line -- )
     [
-        emeditor-path % " /l " % #
-        " " % "\"" % % "\"" %
-    ] "" make run-detached ;
+        emeditor-path , "/l" , number>string , ,
+    ] { } make run-detached drop ;
 
 [ emeditor ] edit-hook set-global

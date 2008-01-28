@@ -3,7 +3,8 @@
 USING: namespaces splitting sequences io.files kernel assocs
 words vocabs definitions parser continuations inspector debugger
 io io.styles io.streams.lines hashtables sorting prettyprint
-source-files arrays combinators strings system math.parser ;
+source-files arrays combinators strings system math.parser
+compiler.errors ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -67,26 +68,20 @@ SYMBOL: load-help?
 : source-wasn't-loaded f swap set-vocab-source-loaded? ;
 
 : load-source ( root name -- )
-    [ source-was-loaded ] keep [
-        [ vocab-source path+ bootstrap-file ]
-        [ ] [ source-wasn't-loaded ]
-        cleanup
-    ] keep source-was-loaded ;
+    [ source-wasn't-loaded ] keep
+    [ vocab-source path+ bootstrap-file ] keep
+    source-was-loaded ;
 
 : docs-were-loaded t swap set-vocab-docs-loaded? ;
 
-: docs-were't-loaded f swap set-vocab-docs-loaded? ;
+: docs-weren't-loaded f swap set-vocab-docs-loaded? ;
 
 : load-docs ( root name -- )
     load-help? get [
-        [ docs-were-loaded ] keep [
-            [ vocab-docs path+ ?bootstrap-file ]
-            [ ] [ docs-were't-loaded ]
-            cleanup
-        ] keep source-was-loaded
-    ] [
-        2drop
-    ] if ;
+        [ docs-weren't-loaded ] keep
+        [ vocab-docs path+ ?run-file ] keep
+        docs-were-loaded
+    ] [ 2drop ] if ;
 
 : amend-vocab-from-root ( root name -- vocab )
     dup vocab-source-loaded? [ 2dup load-source ] unless
@@ -101,14 +96,17 @@ SYMBOL: load-help?
         nip no-vocab
     ] if ;
 
-: reload-vocab ( name -- )
-    dup find-vocab-root dup [
-        swap load-vocab-from-root
-    ] [
-        drop no-vocab
-    ] if ;
+: reload ( name -- )
+    [
+        dup find-vocab-root dup [
+            swap load-vocab-from-root
+        ] [
+            drop no-vocab
+        ] if
+    ] with-compiler-errors ;
 
-: require ( vocab -- ) load-vocab drop ;
+: require ( vocab -- )
+    load-vocab drop ;
 
 : run ( vocab -- )
     dup load-vocab vocab-main [
@@ -150,11 +148,14 @@ SYMBOL: load-help?
     dup update-roots
     dup modified-sources swap modified-docs ;
 
+: require-all ( seq -- )
+    [ [ require ] each ] with-compiler-errors ;
+
 : do-refresh ( modified-sources modified-docs -- )
     2dup
     [ f swap set-vocab-docs-loaded? ] each
     [ f swap set-vocab-source-loaded? ] each
-    append prune [ [ require ] each ] no-parse-hook ;
+    append prune require-all ;
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 
@@ -167,12 +168,12 @@ M: vocab (load-vocab)
     [ swap vocab-name amend-vocab-from-root ] when* ;
 
 M: string (load-vocab)
-    [ ".private" ?tail drop reload-vocab ] keep vocab ;
+    [ ".private" ?tail drop reload ] keep vocab ;
 
 M: vocab-link (load-vocab)
     vocab-name (load-vocab) ;
 
-[ dup vocab [ ] [ ] ?if (load-vocab) ]
+[ [ dup vocab [ ] [ ] ?if (load-vocab) ] with-compiler-errors ]
 load-vocab-hook set-global
 
 : vocab-where ( vocab -- loc )

@@ -28,11 +28,11 @@ T{ foo-gadget } <toolbar> "t" set
     } <radio-buttons> "religion" set
 ] unit-test
 
-{ 2 1 } [ <radio-buttons> ] unit-test-effect
+\ <radio-buttons> must-infer
 
-{ 2 1 } [ <toggle-buttons> ] unit-test-effect
+\ <toggle-buttons> must-infer
 
-{ 2 1 } [ <checkbox> ] unit-test-effect
+\ <checkbox> must-infer
 
 [ 0 ] [
     "religion" get gadget-child radio-control-value

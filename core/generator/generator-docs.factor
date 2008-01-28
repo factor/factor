@@ -1,5 +1,6 @@
 USING: help.markup help.syntax words debugger generator.fixup
-generator.registers quotations kernel vectors arrays ;
+generator.registers quotations kernel vectors arrays effects
+sequences ;
 IN: generator
 
 ARTICLE: "generator" "Compiled code generator"
@@ -13,27 +14,12 @@ $nl
 { $subsection define-if-intrinsic }
 { $subsection define-if-intrinsics }
 "The main entry point into the code generator:"
-{ $subsection generate }
-"Primitive compiler interface exported by the Factor VM:"
-{ $subsection add-compiled-block }
-{ $subsection finalize-compile } ;
+{ $subsection generate } ;
 
 ABOUT: "generator"
 
-HELP: compiled-xts
-{ $var-description "During compilation, holds a hashtable mapping words to temporary uninterned words. The XT of each value points to the compiled code block of each key; at the end of compilation, the XT of each key is set to the XT of the value." } ;
-
-HELP: compiling?
-{ $values { "word" word } { "?" "a boolean" } }
-{ $description "Tests if a word is going to be or already is compiled." } ;
-
-HELP: finalize-compile ( xts -- )
-{ $values { "xts" "an association list mapping words to uninterned words" } }
-{ $description "Performs relocation, atomically changes the XT of each key to the XT of each value, and flushes the CPU instruction cache on architectures where this has to be done manually." } ;
-
-HELP: add-compiled-block ( literals words rel labels code -- xt )
-{ $values { "literals" vector } { "words" "a vector of words" } { "rel" "a vector of integers" } { "labels" "an array of integers" } { "code" "a vector of integers" } { "xt" "an uninterned word" } }
-{ $description "Adds a new compiled block and outputs an uninterned word whose XT points at this block. This uninterned word can then be passed to " { $link finalize-compile } "." } ;
+HELP: compiled
+{ $var-description "During compilation, holds a hashtable mapping words to 5-element arrays holding compiled code." } ;
 
 HELP: compiling-word
 { $var-description "The word currently being compiled, set by " { $link generate-1 } "." } ;
@@ -42,7 +28,8 @@ HELP: compiling-label
 { $var-description "The label currently being compiled, set by " { $link generate-1 } "." } ;
 
 HELP: compiled-stack-traces?
-{ $var-description "If set to true, compiled code blocks will retain what word they were compiled from. This information is used by " { $link :c } " to display call stack traces after an error is thrown from compiled code. This variable is on by default; the deployment tool switches it off to save some space in the deployed image." } ;
+{ $values { "?" "a boolean" } }
+{ $description "Iftrue, compiled code blocks will retain what word they were compiled from. This information is used by " { $link :c } " to display call stack traces after an error is thrown from compiled code. This is on by default; the deployment tool switches it off to save some space in the deployed image." } ;
 
 HELP: literal-table
 { $var-description "Holds a vector of literal objects referenced from the currently compiling word. If " { $link compiled-stack-traces? } " is on, " { $link init-generator } " ensures that the first entry is the word being compiled." } ;
@@ -69,7 +56,7 @@ HELP: generate
 { $description "Generates machine code for " { $snippet "label" } " from " { $snippet "node" } ". The value of " { $snippet "word" } " is retained for debugging purposes; it is the word which will appear in a call stack trace if this compiled code block throws an error when run." } ;
 
 HELP: word-dataflow
-{ $values { "word" word } { "dataflow" "a dataflow graph" } }
+{ $values { "word" word } { "effect" effect } { "dependencies" sequence } { "dataflow" "a dataflow graph" } }
 { $description "Outputs the dataflow graph of a word, taking specializers into account (see " { $link "specializers" } ")." } ;
 
 HELP: define-intrinsics

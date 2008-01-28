@@ -100,3 +100,7 @@ HELP: set-axis
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "axis" "a sequence of 0/1" } { "w" "a sequence of numbers" } }
 { $description "Using " { $snippet "w" } " as a template, creates a new sequence containing corresponding elements from " { $snippet "u" } " in place of 0, and corresponding elements from " { $snippet "v" } " in place of 1." }
 { $examples { $example "USE: math.vectors" "{ 1 2 3 } { 4 5 6 } { 0 1 0 } set-axis ." "{ 1 5 3 }" } } ;
+
+{ 2map v+ v- v* v/ } related-words
+
+{ 2reduce v. } related-words

@@ -40,7 +40,7 @@ tools.test.inference tools.test.ui models ;
     ] with-grafted-gadget
 ] unit-test
 
-{ 0 1 } [ <editor> ] unit-test-effect
+\ <editor> must-infer
 
 "hello" <model> <field> "field" set
 

@@ -9,8 +9,8 @@ $nl
 "Unlike math, where all real numbers are also complex numbers, Factor only considers a number to be a complex number if its imaginary part is non-zero. However, complex number operations are fully supported for real numbers; they are treated as having an imaginary part of zero."
 $nl
 "Complex numbers can be taken apart:"
-{ $subsection real }
-{ $subsection imaginary }
+{ $subsection real-part }
+{ $subsection imaginary-part }
 { $subsection >rect }
 "Complex numbers can be constructed from real numbers:"
 { $subsection rect> }

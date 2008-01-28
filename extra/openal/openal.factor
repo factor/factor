@@ -3,24 +3,20 @@
 !
 IN: openal
 USING: kernel alien system combinators alien.syntax namespaces
-       alien.c-types sequences vocabs.loader shuffle combinators.lib ;
+       alien.c-types sequences vocabs.loader shuffle combinators.lib
+       openal.backend ;
 
-: load-alut-library ( -- )
-    "alut" {
+<< "alut" {
         { [ win32? ]  [ "alut.dll" ] }
         { [ macosx? ] [ "/System/Library/Frameworks/OpenAL.framework/OpenAL" ] }
         { [ unix?  ]  [ "libalut.so" ] }
-    } cond "cdecl" add-library ; parsing
+    } cond "cdecl" add-library >>
 
-: load-openal-library ( -- )
-    "openal" {
+<< "openal" {
         { [ win32? ]  [ "OpenAL32.dll" ] }
         { [ macosx? ] [ "/System/Library/Frameworks/OpenAL.framework/OpenAL" ] }
         { [ unix?  ]  [ "libopenal.so" ] }
-    } cond "cdecl" add-library ; parsing
-
-load-alut-library
-load-openal-library
+    } cond "cdecl" add-library >>
 
 LIBRARY: openal
 
@@ -261,18 +257,7 @@ SYMBOL: init
     "create-buffer-from-file failed" throw
   ] when ;
 
-SYMBOL: openal-impl
-HOOK: load-wav-file openal-impl ( filename -- format data size frequency )
-TUPLE: macosx-openal-impl ;
-TUPLE: other-openal-impl ;
-
-macosx? [ 
-    "openal.macosx" require
-    macosx-openal-impl
-] [ 
-    "openal.other" require
-    other-openal-impl
-] if construct-empty openal-impl set-global
+macosx? "openal.macosx" "openal.other" ? require
 
 : create-buffer-from-wav ( filename -- buffer )
   gen-buffer dup rot load-wav-file

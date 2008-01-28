@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private assocs arrays ;
+USING: kernel sequences sequences.private assocs arrays
+delegate.protocols delegate vectors ;
 IN: xml.data
 
 TUPLE: name space tag url ;
@@ -41,18 +42,14 @@ C: <instruction> instruction
 TUPLE: prolog version encoding standalone ;
 C: <prolog> prolog
 
-TUPLE: xml prolog before after ;
-: <xml> ( prolog before main after -- xml )
-    { set-xml-prolog set-xml-before set-delegate set-xml-after }
-    xml construct ;
+TUPLE: tag attrs children ;
 
-TUPLE: attrs ;
-: <attrs> ( alist -- attrs )
-    attrs construct-delegate ;
+TUPLE: attrs alist ;
+C: <attrs> attrs
 
 : attr@ ( key alist -- index {key,value} )
-    >r assure-name r>
-    [ first names-match? ] curry* find ;
+    >r assure-name r> attrs-alist
+    [ first names-match? ] with find ;
 
 M: attrs at*
     attr@ nip [ second t ] [ f f ] if* ;
@@ -60,53 +57,83 @@ M: attrs set-at
     2dup attr@ nip [
         2nip set-second
     ] [
-        >r assure-name swap 2array r> push
+        >r assure-name swap 2array r>
+        [ attrs-alist ?push ] keep set-attrs-alist
     ] if* ;
 
-M: attrs assoc-size length ;
+M: attrs assoc-size attrs-alist length ;
 M: attrs new-assoc drop V{ } new <attrs> ;
-M: attrs >alist delegate >alist ;
+M: attrs >alist attrs-alist ;
 
 : >attrs ( assoc -- attrs )
-    V{ } assoc-clone-like
-    [ >r assure-name r> ] assoc-map
-    <attrs> ;
+    dup [
+        V{ } assoc-clone-like
+        [ >r assure-name r> ] assoc-map
+    ] when <attrs> ;
 M: attrs assoc-like
     drop dup attrs? [ >attrs ] unless ;
 
 M: attrs clear-assoc
-    delete-all ;
+    f swap set-attrs-alist ;
 M: attrs delete-at
-    tuck attr@ drop [ swap delete-nth ] [ drop ] if* ;
+    tuck attr@ drop [ swap attrs-alist delete-nth ] [ drop ] if* ;
+
+M: attrs clone
+    attrs-alist clone <attrs> ;
 
 INSTANCE: attrs assoc
 
-TUPLE: tag attrs children ;
 : <tag> ( name attrs children -- tag )
     >r >r assure-name r> T{ attrs } assoc-like r>
     { set-delegate set-tag-attrs set-tag-children }
     tag construct ;
 
 ! For convenience, tags follow the assoc protocol too (for attrs)
-M: tag at* tag-attrs at* ;
-M: tag set-at tag-attrs set-at ;
-M: tag new-assoc tag-attrs new-assoc ;
-M: tag >alist tag-attrs >alist ;
-M: tag delete-at tag-attrs delete-at ;
-M: tag clear-assoc tag-attrs clear-assoc ;
-M: tag assoc-size tag-attrs assoc-size ;
-M: tag assoc-like tag-attrs assoc-like ;
-
+CONSULT: assoc-protocol tag tag-attrs ;
 INSTANCE: tag assoc
 
 ! They also follow the sequence protocol (for children)
-M: tag nth tag-children nth ;
-M: tag nth-unsafe tag-children nth-unsafe ;
-M: tag set-nth tag-children set-nth ;
-M: tag set-nth-unsafe tag-children set-nth-unsafe ;
-M: tag length tag-children length ;
-
+CONSULT: sequence-protocol tag tag-children ;
 INSTANCE: tag sequence
+
+M: tag like
+    over tag? [ drop ] [
+        [ delegate ] keep tag-attrs
+        rot dup [ V{ } like ] when <tag>
+    ] if ;
+
+M: tag clone
+    [ delegate clone ] keep [ tag-attrs clone ] keep
+    tag-children clone
+    { set-delegate set-tag-attrs set-tag-children } tag construct ;
+
+TUPLE: xml prolog before main after ;
+: <xml> ( prolog before main after -- xml )
+    { set-xml-prolog set-xml-before set-delegate set-xml-after }
+    xml construct ;
+
+CONSULT: sequence-protocol xml delegate ;
+INSTANCE: xml sequence
+
+CONSULT: assoc-protocol xml delegate ;
+INSTANCE: xml assoc
+
+<PRIVATE
+: tag>xml ( xml tag -- newxml )
+    swap [ dup xml-prolog swap xml-before rot ] keep xml-after <xml> ;
+
+: seq>xml ( xml seq -- newxml )
+    over delegate like tag>xml ;
+PRIVATE>
+
+M: xml clone
+    [ xml-prolog clone ] keep [ xml-before clone ] keep
+    [ delegate clone ] keep xml-after clone <xml> ;
+
+M: xml like
+    swap dup xml? [ nip ] [
+        dup tag? [ tag>xml ] [ seq>xml ] if
+    ] if ;
 
 ! tag with children=f is contained
 : <contained-tag> ( name attrs -- tag )

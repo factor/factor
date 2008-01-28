@@ -19,36 +19,36 @@ IN: html.parser.analyzer
     ] map ;
 
 : find-by-id ( id vector -- vector )
-    [ tag-attributes "id" swap at = ] curry* subset ;
+    [ tag-attributes "id" swap at = ] with subset ;
 
 : find-by-class ( id vector -- vector )
-    [ tag-attributes "class" swap at = ] curry* subset ;
+    [ tag-attributes "class" swap at = ] with subset ;
 
 : find-by-name ( str vector -- vector )
     >r >lower r>
-    [ tag-name = ] curry* subset ;
+    [ tag-name = ] with subset ;
 
 : find-first-name ( str vector -- i/f tag/f )
     >r >lower r>
-    [ tag-name = ] curry* find ;
+    [ tag-name = ] with find ;
 
 : find-matching-close ( str vector -- i/f tag/f )
     >r >lower r>
-    [ [ tag-name = ] keep tag-closing? and ] curry* find ;
+    [ [ tag-name = ] keep tag-closing? and ] with find ;
 
 : find-by-attribute-key ( key vector -- vector )
     >r >lower r>
-    [ tag-attributes at ] curry* subset
+    [ tag-attributes at ] with subset
     [ ] subset ;
 
 : find-by-attribute-key-value ( value key vector -- vector )
     >r >lower r>
-    [ tag-attributes at over = ] curry* subset nip
+    [ tag-attributes at over = ] with subset nip
     [ ] subset ;
 
 : find-first-attribute-key-value ( value key vector -- i/f tag/f )
     >r >lower r>
-    [ tag-attributes at over = ] curry* find rot drop ;
+    [ tag-attributes at over = ] with find rot drop ;
 
 : find-between ( i/f tag/f vector -- vector )
     pick integer? [
@@ -69,7 +69,7 @@ IN: html.parser.analyzer
 ! : find-last-tag ( name vector -- index tag )
     ! [
         ! dup tag-matched? [ 2drop f ] [ tag-name = ] if
-    ! ] curry* find-last ;
+    ! ] with find-last ;
 
 ! : find-last-tag* ( name n vector -- tag )
     ! 0 -rot <slice> find-last-tag ;
@@ -81,11 +81,11 @@ IN: html.parser.analyzer
     ! ] if ;
 
 
-! clear "/Users/erg/web/fark.html" <file-reader> contents parse-html find-links [ "go.pl" swap start ] subset [ "=" split peek ] map
+! clear "/Users/erg/web/fark.html" file-contents parse-html find-links [ "go.pl" swap start ] subset [ "=" split peek ] map
 ! clear "http://fark.com" http-get parse-html find-links [ "go.pl" swap start ] subset [ "=" split peek ] map
 
-! clear "/Users/erg/web/hostels.html" <file-reader> contents parse-html "Currency" "name" pick find-first-attribute-key-value
+! clear "/Users/erg/web/hostels.html" file-contents parse-html "Currency" "name" pick find-first-attribute-key-value
 
-! clear "/Users/erg/web/hostels.html" <file-reader> contents parse-html
+! clear "/Users/erg/web/hostels.html" file-contents parse-html
 ! "Currency" "name" pick find-first-attribute-key-value
 ! pick find-between remove-blank-text

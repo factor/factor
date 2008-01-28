@@ -94,6 +94,7 @@ DEFINE_PRIMITIVE(read_dir)
 {
 	DIR* dir = opendir(unbox_char_string());
 	GROWABLE_ARRAY(result);
+	REGISTER_ROOT(result);
 
 	if(dir != NULL)
 	{
@@ -101,18 +102,17 @@ DEFINE_PRIMITIVE(read_dir)
 
 		while((file = readdir(dir)) != NULL)
 		{
-			REGISTER_UNTAGGED(result);
 			CELL pair = parse_dir_entry(file);
-			UNREGISTER_UNTAGGED(result);
 			GROWABLE_ADD(result,pair);
 		}
 
 		closedir(dir);
 	}
 
+	UNREGISTER_ROOT(result);
 	GROWABLE_TRIM(result);
 
-	dpush(tag_object(result));
+	dpush(result);
 }
 
 DEFINE_PRIMITIVE(cwd)
@@ -131,19 +131,19 @@ DEFINE_PRIMITIVE(cd)
 DEFINE_PRIMITIVE(os_envs)
 {
 	GROWABLE_ARRAY(result);
+	REGISTER_ROOT(result);
 	char **env = environ;
 
 	while(*env)
 	{
-		REGISTER_UNTAGGED(result);
 		CELL string = tag_object(from_char_string(*env));
-		UNREGISTER_UNTAGGED(result);
 		GROWABLE_ADD(result,string);
 		env++;
 	}
 
+	UNREGISTER_ROOT(result);
 	GROWABLE_TRIM(result);
-	dpush(tag_object(result));
+	dpush(result);
 }
 
 F_SEGMENT *alloc_segment(CELL size)
@@ -192,7 +192,12 @@ INLINE F_STACK_FRAME *uap_stack_pointer(void *uap)
 	from Factor to C is a sign of things seriously gone wrong, not just
 	a divide by zero or stack underflow in the listener */
 	if(in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
-		return ucontext_stack_pointer(uap);
+	{
+		F_STACK_FRAME *ptr = ucontext_stack_pointer(uap);
+		if(!ptr)
+			critical_error("Invalid uap",(CELL)uap);
+		return ptr;
+	}
 	else
 		return NULL;
 }

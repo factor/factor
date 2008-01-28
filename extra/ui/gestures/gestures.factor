@@ -115,7 +115,7 @@ drag-timer construct-empty drag-timer set-global
 
 : start-drag-timer ( -- )
     hand-buttons get-global empty? [
-        drag-timer get-global 100 100 add-timer
+        drag-timer get-global 100 300 add-timer
     ] when ;
 
 : stop-drag-timer ( -- )
@@ -131,7 +131,7 @@ drag-timer construct-empty drag-timer set-global
     ] if ;
 
 : each-gesture ( gesture seq -- )
-    [ handle-gesture drop ] curry* each ;
+    [ handle-gesture drop ] with each ;
 
 : hand-gestures ( new old -- )
     drop-prefix <reversed>
@@ -164,7 +164,7 @@ drag-timer construct-empty drag-timer set-global
     ] if ;
 
 : modifier ( mod modifiers -- seq )
-    [ second swap bitand 0 > ] curry* subset
+    [ second swap bitand 0 > ] with subset
     0 <column> prune dup empty? [ drop f ] [ >array ] if ;
 
 : drag-loc ( -- loc )

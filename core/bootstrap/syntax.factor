@@ -45,7 +45,6 @@ f swap set-vocab-source-loaded?
     "TUPLE:"
     "T{"
     "UNION:"
-    "USE-IF:"
     "USE:"
     "USING:"
     "V{"
@@ -63,6 +62,8 @@ f swap set-vocab-source-loaded?
     "{"
     "}"
     "CS{"
+    "<<"
+    ">>"
 } [ "syntax" create drop ] each
 
 "t" "syntax" lookup define-symbol

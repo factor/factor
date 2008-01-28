@@ -1,4 +1,5 @@
-USING: help.markup help.syntax ui.tools.deploy ;
+USING: help.markup help.syntax ;
+IN: ui.tools.deploy
 
 HELP: deploy-tool
 { $values { "vocab" "a vocabulary specifier" } }
@@ -12,3 +13,5 @@ $nl
 { $subsection deploy-tool }
 "Alternatively, right-click on a vocabulary presentation in the UI and choose " { $strong "Deploy tool" } " from the resulting popup menu."
 { $see-also "tools.deploy" } ;
+
+ABOUT: "ui.tools.deploy"

@@ -4,7 +4,7 @@ USING: alien alien.c-types arrays continuations destructors io
 io.windows libc io.nonblocking io.streams.duplex windows.types
 math windows.kernel32 windows namespaces io.launcher kernel
 sequences windows.errors assocs splitting system
-io.windows.launcher io.windows.nt.pipes ;
+io.windows.launcher io.windows.pipes ;
 IN: io.windows.nt.launcher
 
 ! The below code is based on the example given in
@@ -30,22 +30,10 @@ IN: io.windows.nt.launcher
     dup pipe-out f set-inherit
     over set-CreateProcess-args-stdin-pipe ;
 
-: fill-startup-info
-    dup CreateProcess-args-lpStartupInfo
-    STARTF_USESTDHANDLES over set-STARTUPINFO-dwFlags
-
-    over CreateProcess-args-stdout-pipe
-        pipe-out over set-STARTUPINFO-hStdOutput
-    over CreateProcess-args-stdout-pipe
-        pipe-out over set-STARTUPINFO-hStdError
-    over CreateProcess-args-stdin-pipe
-        pipe-in swap set-STARTUPINFO-hStdInput ;
-
 M: windows-io process-stream*
     [
         [
             make-CreateProcess-args
-            TRUE over set-CreateProcess-args-bInheritHandles
 
             fill-stdout-pipe
             fill-stdin-pipe
@@ -59,6 +47,6 @@ M: windows-io process-stream*
             dup CreateProcess-args-stdout-pipe pipe-in
             over CreateProcess-args-stdin-pipe pipe-out <win32-duplex-stream>
 
-            swap dispose-CreateProcess-args
+            swap CreateProcess-args-lpProcessInformation <process>
         ] with-destructors
     ] with-descriptor ;

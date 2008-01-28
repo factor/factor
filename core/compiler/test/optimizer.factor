@@ -1,7 +1,8 @@
 USING: arrays compiler generic hashtables inference kernel
 kernel.private math optimizer prettyprint sequences sbufs
 strings tools.test vectors words sequences.private quotations
-optimizer.backend classes inference.dataflow tuples.private ;
+optimizer.backend classes inference.dataflow tuples.private
+continuations ;
 IN: temporary
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
@@ -46,11 +47,10 @@ IN: temporary
     sort-classes min-class
 ] unit-test
 
-FORGET: xyz
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 
-[ ] [ \ xyz compile ] unit-test
+[ t ] [ \ xyz compiled? ] unit-test
 
 ! Test predicate inlining
 : pred-test-1
@@ -101,14 +101,14 @@ TUPLE: pred-test ;
 
 ! regression
 
-: bad-kill-1 [ 3 f ] [ dup bad-kill-1 ] if ; inline
+: bad-kill-1 ( a b -- c d e ) [ 3 f ] [ dup bad-kill-1 ] if ; inline
 : bad-kill-2 bad-kill-1 drop ;
 
 [ 3 ] [ t bad-kill-2 ] unit-test
 
 ! regression
-: (the-test) ( n -- ) dup 0 > [ 1- (the-test) ] when ; inline
-: the-test ( -- n ) 2 dup (the-test) ;
+: (the-test) ( x -- y ) dup 0 > [ 1- (the-test) ] when ; inline
+: the-test ( -- x y ) 2 dup (the-test) ;
 
 [ 2 0 ] [ the-test ] unit-test
 
@@ -135,7 +135,7 @@ TUPLE: pred-test ;
 ! regression
 GENERIC: void-generic ( obj -- * )
 : breakage "hi" void-generic ;
-[ ] [ \ breakage compile ] unit-test
+[ t ] [ \ breakage compiled? ] unit-test
 [ breakage ] unit-test-fails
 
 ! regression
@@ -145,10 +145,10 @@ GENERIC: void-generic ( obj -- * )
 
 [ f ] [ f test-2 ] unit-test
 
-: branch-fold-regression-0 ( n -- )
+: branch-fold-regression-0 ( m -- n )
     t [ ] [ 1+ branch-fold-regression-0 ] if ; inline
 
-: branch-fold-regression-1 ( -- )
+: branch-fold-regression-1 ( -- m )
     10 branch-fold-regression-0 ;
 
 [ 10 ] [ branch-fold-regression-1 ] unit-test
@@ -156,7 +156,7 @@ GENERIC: void-generic ( obj -- * )
 ! another regression
 : constant-branch-fold-0 "hey" ; foldable
 : constant-branch-fold-1 constant-branch-fold-0 "hey" = ; inline
-[ 1 ] [ [ constant-branch-fold-1 [ 1 ] [ 2 ] if ] compile-1 ] unit-test
+[ 1 ] [ [ constant-branch-fold-1 [ 1 ] [ 2 ] if ] compile-call ] unit-test
 
 ! another regression
 : foo f ;
@@ -170,9 +170,11 @@ GENERIC: void-generic ( obj -- * )
 ] unit-test
 
 ! compiling <tuple> with a non-literal class failed
-[ t ] [ [ <tuple> ] compile-quot word? ] unit-test
+: <tuple>-regression <tuple> ;
 
-GENERIC: foozul
+[ t ] [ \ <tuple>-regression compiled? ] unit-test
+
+GENERIC: foozul ( a -- b )
 M: reversed foozul ;
 M: integer foozul ;
 M: slice foozul ;
@@ -184,71 +186,71 @@ M: slice foozul ;
 : constant-fold-3 4 ; foldable
 
 [ f t ] [
-    [ constant-fold-2 constant-fold-3 4 = ] compile-1
+    [ constant-fold-2 constant-fold-3 4 = ] compile-call
 ] unit-test
 
 : constant-fold-4 f ; foldable
 : constant-fold-5 f ; foldable
 
 [ f ] [
-    [ constant-fold-4 constant-fold-5 or ] compile-1
+    [ constant-fold-4 constant-fold-5 or ] compile-call
 ] unit-test
 
-[ 5 ] [ 5 [ 0 + ] compile-1 ] unit-test
-[ 5 ] [ 5 [ 0 swap + ] compile-1 ] unit-test
+[ 5 ] [ 5 [ 0 + ] compile-call ] unit-test
+[ 5 ] [ 5 [ 0 swap + ] compile-call ] unit-test
 
-[ 5 ] [ 5 [ 0 - ] compile-1 ] unit-test
-[ -5 ] [ 5 [ 0 swap - ] compile-1 ] unit-test
-[ 0 ] [ 5 [ dup - ] compile-1 ] unit-test
+[ 5 ] [ 5 [ 0 - ] compile-call ] unit-test
+[ -5 ] [ 5 [ 0 swap - ] compile-call ] unit-test
+[ 0 ] [ 5 [ dup - ] compile-call ] unit-test
 
-[ 5 ] [ 5 [ 1 * ] compile-1 ] unit-test
-[ 5 ] [ 5 [ 1 swap * ] compile-1 ] unit-test
-[ 0 ] [ 5 [ 0 * ] compile-1 ] unit-test
-[ 0 ] [ 5 [ 0 swap * ] compile-1 ] unit-test
-[ -5 ] [ 5 [ -1 * ] compile-1 ] unit-test
-[ -5 ] [ 5 [ -1 swap * ] compile-1 ] unit-test
+[ 5 ] [ 5 [ 1 * ] compile-call ] unit-test
+[ 5 ] [ 5 [ 1 swap * ] compile-call ] unit-test
+[ 0 ] [ 5 [ 0 * ] compile-call ] unit-test
+[ 0 ] [ 5 [ 0 swap * ] compile-call ] unit-test
+[ -5 ] [ 5 [ -1 * ] compile-call ] unit-test
+[ -5 ] [ 5 [ -1 swap * ] compile-call ] unit-test
 
-[ 0 ] [ 5 [ 1 mod ] compile-1 ] unit-test
-[ 0 ] [ 5 [ 1 rem ] compile-1 ] unit-test
+[ 0 ] [ 5 [ 1 mod ] compile-call ] unit-test
+[ 0 ] [ 5 [ 1 rem ] compile-call ] unit-test
 
-[ 5 ] [ 5 [ -1 bitand ] compile-1 ] unit-test
-[ 0 ] [ 5 [ 0 bitand ] compile-1 ] unit-test
-[ 5 ] [ 5 [ -1 swap bitand ] compile-1 ] unit-test
-[ 0 ] [ 5 [ 0 swap bitand ] compile-1 ] unit-test
-[ 5 ] [ 5 [ dup bitand ] compile-1 ] unit-test
+[ 5 ] [ 5 [ -1 bitand ] compile-call ] unit-test
+[ 0 ] [ 5 [ 0 bitand ] compile-call ] unit-test
+[ 5 ] [ 5 [ -1 swap bitand ] compile-call ] unit-test
+[ 0 ] [ 5 [ 0 swap bitand ] compile-call ] unit-test
+[ 5 ] [ 5 [ dup bitand ] compile-call ] unit-test
 
-[ 5 ] [ 5 [ 0 bitor ] compile-1 ] unit-test
-[ -1 ] [ 5 [ -1 bitor ] compile-1 ] unit-test
-[ 5 ] [ 5 [ 0 swap bitor ] compile-1 ] unit-test
-[ -1 ] [ 5 [ -1 swap bitor ] compile-1 ] unit-test
-[ 5 ] [ 5 [ dup bitor ] compile-1 ] unit-test
+[ 5 ] [ 5 [ 0 bitor ] compile-call ] unit-test
+[ -1 ] [ 5 [ -1 bitor ] compile-call ] unit-test
+[ 5 ] [ 5 [ 0 swap bitor ] compile-call ] unit-test
+[ -1 ] [ 5 [ -1 swap bitor ] compile-call ] unit-test
+[ 5 ] [ 5 [ dup bitor ] compile-call ] unit-test
 
-[ 5 ] [ 5 [ 0 bitxor ] compile-1 ] unit-test
-[ 5 ] [ 5 [ 0 swap bitxor ] compile-1 ] unit-test
-[ -6 ] [ 5 [ -1 bitxor ] compile-1 ] unit-test
-[ -6 ] [ 5 [ -1 swap bitxor ] compile-1 ] unit-test
-[ 0 ] [ 5 [ dup bitxor ] compile-1 ] unit-test
+[ 5 ] [ 5 [ 0 bitxor ] compile-call ] unit-test
+[ 5 ] [ 5 [ 0 swap bitxor ] compile-call ] unit-test
+[ -6 ] [ 5 [ -1 bitxor ] compile-call ] unit-test
+[ -6 ] [ 5 [ -1 swap bitxor ] compile-call ] unit-test
+[ 0 ] [ 5 [ dup bitxor ] compile-call ] unit-test
 
-[ 0 ] [ 5 [ 0 swap shift ] compile-1 ] unit-test
-[ 5 ] [ 5 [ 0 shift ] compile-1 ] unit-test
+[ 0 ] [ 5 [ 0 swap shift ] compile-call ] unit-test
+[ 5 ] [ 5 [ 0 shift ] compile-call ] unit-test
 
-[ f ] [ 5 [ dup < ] compile-1 ] unit-test
-[ t ] [ 5 [ dup <= ] compile-1 ] unit-test
-[ f ] [ 5 [ dup > ] compile-1 ] unit-test
-[ t ] [ 5 [ dup >= ] compile-1 ] unit-test
+[ f ] [ 5 [ dup < ] compile-call ] unit-test
+[ t ] [ 5 [ dup <= ] compile-call ] unit-test
+[ f ] [ 5 [ dup > ] compile-call ] unit-test
+[ t ] [ 5 [ dup >= ] compile-call ] unit-test
 
-[ t ] [ 5 [ dup eq? ] compile-1 ] unit-test
-[ t ] [ 5 [ dup = ] compile-1 ] unit-test
-[ t ] [ 5 [ dup number= ] compile-1 ] unit-test
-[ t ] [ \ vector [ \ vector = ] compile-1 ] unit-test
+[ t ] [ 5 [ dup eq? ] compile-call ] unit-test
+[ t ] [ 5 [ dup = ] compile-call ] unit-test
+[ t ] [ 5 [ dup number= ] compile-call ] unit-test
+[ t ] [ \ vector [ \ vector = ] compile-call ] unit-test
 
 GENERIC: detect-number ( obj -- obj )
 M: number detect-number ;
 
-[ 10 f [ <array> 0 + detect-number ] compile-1 ] unit-test-fails
+[ 10 f [ <array> 0 + detect-number ] compile-call ] unit-test-fails
 
 ! Regression
-[ 4 [ + ] ] [ 2 2 [ [ + ] [ call ] keep ] compile-1 ] unit-test
+[ 4 [ + ] ] [ 2 2 [ [ + ] [ call ] keep ] compile-call ] unit-test
 
 ! Regression
 USE: sorting
@@ -265,7 +267,7 @@ USE: sorting.private
 
 [ 10 ] [
     10 20 >vector <flat-slice>
-    [ [ - ] swap old-binsearch ] compile-1 2nip
+    [ [ - ] swap old-binsearch ] compile-call 2nip
 ] unit-test
 
 ! Regression
@@ -275,5 +277,13 @@ TUPLE: silly-tuple a b ;
     T{ silly-tuple f 1 2 }
     [
         { silly-tuple-a silly-tuple-b } [ get-slots ] keep
-    ] compile-1
+    ] compile-call
 ] unit-test
+
+! Regression
+: empty-compound ;
+
+: node-successor-f-bug ( x -- * )
+    [ 3 throw ] [ empty-compound ] compose [ 3 throw ] if ;
+
+[ t ] [ \ node-successor-f-bug compiled? ] unit-test

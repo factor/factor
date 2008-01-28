@@ -4,7 +4,7 @@ USING: arrays definitions generic hashtables inspector io kernel
 math namespaces prettyprint sequences assocs sequences.private
 strings io.styles vectors words system splitting math.parser
 tuples continuations continuations.private combinators
-generic.math io.streams.duplex classes
+generic.math io.streams.duplex classes compiler.units
 generic.standard ;
 IN: debugger
 
@@ -92,9 +92,6 @@ TUPLE: assert got expect ;
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;
 
-: undefined-word-error. ( obj -- )
-    "Undefined word: " write third . ;
-
 : io-error. ( error -- )
     "I/O error: " write third print ;
 
@@ -150,14 +147,14 @@ PREDICATE: array kernel-error ( obj -- ? )
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }
-        { [ t ] [ second 0 16 between? ] }
+        { [ t ] [ second 0 15 between? ] }
     } cond ;
 
 : kernel-errors
     second {
         { 0  [ expired-error.          ] }
         { 1  [ io-error.               ] }
-        { 2  [ undefined-word-error.   ] }
+        { 2  [ primitive-error.        ] }
         { 3  [ type-check-error.       ] }
         { 4  [ divide-by-zero-error.   ] }
         { 5  [ signal-error.           ] }
@@ -171,7 +168,6 @@ PREDICATE: array kernel-error ( obj -- ? )
         { 13 [ retainstack-underflow.  ] }
         { 14 [ retainstack-overflow.   ] }
         { 15 [ memory-error.           ] }
-        { 16 [ primitive-error.        ] }
     } ; inline
 
 M: kernel-error error. dup kernel-errors case ;
@@ -221,3 +217,18 @@ M: condition error-help drop f ;
 M: assert summary drop "Assertion failed" ;
 
 M: immutable summary drop "Sequence is immutable" ;
+
+M: redefine-error error.
+    "Re-definition of " write
+    redefine-error-def . ;
+
+M: forward-error error.
+    "Forward reference to " write forward-error-word . ;
+
+M: undefined summary
+    drop "Calling a deferred word before it has been defined" ;
+
+M: no-compilation-unit error.
+    "Attempting to define " write
+    no-compilation-unit-definition pprint
+    " outside of a compilation unit" print ;

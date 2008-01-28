@@ -25,8 +25,7 @@ C: <slot-spec> slot-spec
         [ drop ] [ 1array , \ declare , ] if
     ] [ ] make ;
 
-PREDICATE: compound slot-reader
-    "reading" word-prop >boolean ;
+PREDICATE: word slot-reader "reading" word-prop >boolean ;
 
 : set-reader-props ( class spec -- )
     2dup reader-effect
@@ -48,8 +47,7 @@ PREDICATE: compound slot-reader
 : writer-effect ( class spec -- effect )
     slot-spec-name swap ?word-name 2array 0 <effect> ;
 
-PREDICATE: compound slot-writer
-    "writing" word-prop >boolean ;
+PREDICATE: word slot-writer "writing" word-prop >boolean ;
 
 : set-writer-props ( class spec -- )
     2dup writer-effect
@@ -72,7 +70,7 @@ PREDICATE: compound slot-writer
     2dup define-reader define-writer ;
 
 : define-slots ( class specs -- )
-    [ define-slot ] curry* each ;
+    [ define-slot ] with each ;
 
 : reader-word ( class name vocab -- word )
     >r >r "-" r> 3append r> create ;
@@ -91,15 +89,15 @@ PREDICATE: compound slot-writer
 
 : simple-slot ( class name # -- spec )
     >r object bootstrap-word over r> f f <slot-spec>
-    pick pick simple-reader-word over set-slot-spec-reader
-    rot rot simple-writer-word over set-slot-spec-writer ;
+    2over simple-reader-word over set-slot-spec-reader
+    -rot simple-writer-word over set-slot-spec-writer ;
 
 : simple-slots ( class slots base -- specs )
-    over length [ + ] curry* map
+    over length [ + ] with map
     [ >r >r dup r> r> simple-slot ] 2map nip ;
 
 : slot-of-reader ( reader specs -- spec/f )
-    [ slot-spec-reader eq? ] curry* find nip ;
+    [ slot-spec-reader eq? ] with find nip ;
 
 : slot-of-writer ( writer specs -- spec/f )
-    [ slot-spec-writer eq? ] curry* find nip ;
+    [ slot-spec-writer eq? ] with find nip ;

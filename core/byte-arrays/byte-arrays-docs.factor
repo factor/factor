@@ -1,5 +1,4 @@
-USING: arrays bit-arrays vectors strings sbufs
-kernel help.markup help.syntax ;
+USING: help.markup help.syntax ;
 IN: byte-arrays
 
 ARTICLE: "byte-arrays" "Byte arrays"

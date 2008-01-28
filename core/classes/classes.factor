@@ -27,8 +27,7 @@ PREDICATE: class tuple-class
 
 : predicate-effect 1 { "?" } <effect> ;
 
-PREDICATE: compound predicate
-    "predicating" word-prop >boolean ;
+PREDICATE: word predicate "predicating" word-prop >boolean ;
 
 : define-predicate ( class predicate quot -- )
     over [
@@ -98,7 +97,7 @@ DEFER: (class<)
 
 : union-class< ( cls1 cls2 -- ? )
     [ flatten-union-class ] 2apply keys
-    [ nip [ (class<) ] curry* contains? ] curry assoc-all? ;
+    [ nip [ (class<) ] with contains? ] curry assoc-all? ;
 
 : (class<) ( class1 class2 -- ? )
     {
@@ -124,7 +123,7 @@ DEFER: (class<)
 : largest-class ( seq -- n elt )
     dup [
         [ 2dup class< >r swap class< not r> and ]
-        curry* subset empty?
+        with subset empty?
     ] curry find [ "Topological sort failed" throw ] unless* ;
 
 PRIVATE>
@@ -157,7 +156,7 @@ PRIVATE>
     [ dupd classes-intersect? ] subset dup empty? [
         2drop f
     ] [
-        tuck [ class< ] curry* all? [ peek ] [ drop f ] if
+        tuck [ class< ] with all? [ peek ] [ drop f ] if
     ] if ;
 
 GENERIC: reset-class ( class -- )
@@ -168,7 +167,7 @@ M: word reset-class drop ;
 
 ! class<map
 : bigger-classes ( class -- seq )
-    classes [ (class<) ] curry* subset ;
+    classes [ (class<) ] with subset ;
 
 : bigger-classes+ ( class -- )
     [ bigger-classes [ dup ] H{ } map>assoc ] keep
@@ -240,8 +239,6 @@ M: word uncache-class drop ;
 : uncache-classes ( assoc -- )
     [ drop uncache-class ] assoc-each ;
 
-GENERIC: update-methods ( class -- )
-
 PRIVATE>
 
 : define-class-props ( members superclass metaclass -- assoc )
@@ -253,9 +250,12 @@ PRIVATE>
 
 : (define-class) ( word props -- )
     over reset-class
+    over reset-generic
+    over define-symbol
     >r dup word-props r> union over set-word-props
-    dup intern-symbol
     t "class" set-word-prop ;
+
+GENERIC: update-methods ( class -- )
 
 : define-class ( word members superclass metaclass -- )
     #! If it was already a class, update methods after.

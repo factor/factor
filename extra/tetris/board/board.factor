@@ -6,7 +6,7 @@ IN: tetris.board
 TUPLE: board width height rows ;
 
 : make-rows ( width height -- rows )
-    [ drop f <array> ] curry* map ;
+    [ drop f <array> ] with map ;
 
 : <board> ( width height -- board )
     2dup make-rows board construct-boa ;
@@ -31,7 +31,7 @@ TUPLE: board width height rows ;
     2dup block-in-bounds? [ block-free? ] [ 2drop f ] if ;
 
 : piece-valid? ( board piece -- ? )
-    piece-blocks [ location-valid? ] curry* all? ;
+    piece-blocks [ location-valid? ] with all? ;
 
 : row-not-full? ( row -- ? ) f swap member? ;
 

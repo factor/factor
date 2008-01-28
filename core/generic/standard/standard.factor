@@ -96,7 +96,7 @@ TUPLE: no-method object generic ;
     num-tags get [
         vtable-class
         [ swap first classes-intersect? ] curry subset
-    ] curry* map ;
+    ] with map ;
 
 : build-type-vtable ( alist-seq -- alist-seq )
     dup length [
@@ -139,7 +139,8 @@ TUPLE: no-method object generic ;
 
 M: standard-combination perform-combination
     standard-combination-# (dispatch#) [
-        standard-methods single-combination
+        [ standard-methods ] keep "inline" word-prop
+        [ small-generic ] [ single-combination ] if
     ] with-variable ;
 
 : default-hook-method ( word -- pair )
@@ -182,3 +183,7 @@ M: standard-combination dispatch# standard-combination-# ;
 M: hook-combination dispatch# drop 0 ;
 
 M: simple-generic definer drop \ GENERIC: f ;
+
+M: standard-generic definer drop \ GENERIC# f ;
+
+M: hook-generic definer drop \ HOOK: f ;

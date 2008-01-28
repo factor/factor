@@ -1,4 +1,4 @@
-USING: help.markup help.syntax libc kernel destructors ;
+USING: help.markup help.syntax libc kernel ;
 IN: destructors
 
 HELP: free-always
@@ -27,5 +27,4 @@ HELP: with-destructors
 { $notes "Destructors are not allowed to throw exceptions.  No exceptions." }
 { $examples
     { $code "[ 10 malloc free-always ] with-destructors" }
-}
-{ $see-also } ;
+} ;

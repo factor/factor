@@ -1,6 +1,6 @@
-USING: help.markup help.syntax
-ui.gadgets.buttons ui.gadgets.menus models ui.operations
-inspector kernel ui.gadgets.worlds ui.gadgets ;
+USING: help.markup help.syntax ui.gadgets.buttons
+ui.gadgets.menus models ui.operations inspector kernel
+ui.gadgets.worlds ui.gadgets ;
 IN: ui.gadgets.presentations
 
 HELP: presentation

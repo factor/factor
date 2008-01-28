@@ -1,5 +1,5 @@
 source misc/version.sh
-rm -rf .git
+rm -rf .git .gitignore
 cd ..
 tar cfz Factor-$VERSION.tar.gz factor/
 

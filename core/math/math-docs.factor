@@ -209,7 +209,7 @@ HELP: bitxor
 
 HELP: shift
 { $values { "x" integer } { "n" integer } { "y" integer } }
-{ $description "Shifts " { $snippet "x" } " to the left by " { $snippet "y" } " bits if " { $snippet "y" } " is positive, or " { $snippet "-y" } " bits to the right if " { $snippet "y" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits ``falling off'' the right hand side and being discarded." }
+{ $description "Shifts " { $snippet "x" } " to the left by " { $snippet "n" } " bits if " { $snippet "n" } " is positive, or " { $snippet "-n" } " bits to the right if " { $snippet "n" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits ``falling off'' the right hand side and being discarded." }
 { $examples { $example "BIN: 101 5 shift .b" "10100000" } { $example "BIN: 11111 -2 shift .b" "111" } } ;
 
 HELP: bitnot
@@ -322,14 +322,16 @@ HELP: fp-nan?
 { $values { "x" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is an IEEE Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
 
-HELP: real ( z -- x )
+HELP: real-part ( z -- x )
 { $values { "z" number } { "x" real } }
-{ $description "Outputs the real part of a complex number. This acts as the identity on real numbers." }
-{ $class-description "The class of real numbers, which is a disjoint union of rationals and floats." } ;
+{ $description "Outputs the real part of a complex number. This acts as the identity on real numbers." } ;
 
-HELP: imaginary ( z -- y )
+HELP: imaginary-part ( z -- y )
 { $values { "z" number } { "y" real } }
 { $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." } ;
+
+HELP: real
+{ $class-description "The class of real numbers, which is a disjoint union of rationals and floats." } ;
 
 HELP: number
 { $class-description "The class of numbers." } ;
