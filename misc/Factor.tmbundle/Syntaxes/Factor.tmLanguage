@@ -139,7 +139,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>(^|(?&lt;=\s))(drop|2drop|3drop|keep|2keep|3keep|nip|2nip|dup|2dup|3dup|dupd|over|pick|tuck|swap|rot|-rot|slip|2swap|swapd|&gt;r|r&gt;)(\s|$)</string>
+			<string>(^|(?&lt;=\s))(drop|2drop|3drop|keep|2keep|3keep|nip|2nip|dup|2dup|3dup|dupd|over|pick|tuck|swap|rot|-rot|roll|-roll|slip|2swap|swapd|&gt;r|r&gt;)(\s|$)</string>
 			<key>name</key>
 			<string>keyword.control.stack.factor</string>
 		</dict>

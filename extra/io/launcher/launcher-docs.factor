@@ -1,6 +1,6 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax quotations kernel ;
+USING: help.markup help.syntax quotations kernel io math ;
 IN: io.launcher
 
 HELP: +command+
@@ -31,6 +31,36 @@ HELP: +environment-mode+
 "Default value is " { $link append-environment } "."
 } ;
 
+HELP: +stdin+
+{ $description "Launch descriptor key. Must equal one of the following:"
+    { $list
+        { { $link f } " - standard input is inherited" }
+        { { $link +closed+ } " - standard input is closed" }
+        { "a path name - standard input is read from the given file, which must exist" }
+    }
+} ;
+
+HELP: +stdout+
+{ $description "Launch descriptor key. Must equal one of the following:"
+    { $list
+        { { $link f } " - standard output is inherited" }
+        { { $link +closed+ } " - standard output is closed" }
+        { "a path name - standard output is written to the given file, which is overwritten if it already exists" }
+    }
+} ;
+
+HELP: +stderr+
+{ $description "Launch descriptor key. Must equal one of the following:"
+    { $list
+        { { $link f } " - standard error is inherited" }
+        { { $link +closed+ } " - standard error is closed" }
+        { "a path name - standard error is written to the given file, which is overwritten if it already exists" }
+    }
+} ;
+
+HELP: +closed+
+{ $description "Possible value for " { $link +stdin+ } ", " { $link +stdout+ } ", and " { $link +stderr+ } " launch descriptors." } ;
+
 HELP: prepend-environment
 { $description "Possible value of " { $link +environment-mode+ } " launch descriptor key. The child process environment consists of the value of the " { $link +environment+ } " key together with the current environment, with entries from the current environment taking precedence."
 $nl
@@ -58,7 +88,7 @@ HELP: get-environment
 { $description "Combines the current environment with the value of " { $link +environment+ } " using " { $link +environment-mode+ } "." } ;
 
 HELP: run-process*
-{ $values { "desc" "a launch descriptor" } }
+{ $values { "desc" "a launch descriptor" } { "handle" "a process handle" } }
 { $contract "Launches a process using the launch descriptor." }
 { $notes "User code should call " { $link run-process } " instead." } ;
 
@@ -73,22 +103,41 @@ HELP: >descriptor
 } ;
 
 HELP: run-process
-{ $values { "obj" object } }
-{ $contract "Launches a process. The object can either be a string, a sequence of strings or a launch descriptor. See " { $link >descriptor } " for details." } ;
+{ $values { "obj" object } { "process" process } }
+{ $description "Launches a process. The object can either be a string, a sequence of strings or a launch descriptor. See " { $link >descriptor } " for details." }
+{ $notes "The output value can be passed to " { $link wait-for-process } " to get an exit code." } ;
 
 HELP: run-detached
-{ $values { "obj" object } }
+{ $values { "obj" object } { "process" process } }
 { $contract "Launches a process without waiting for it to complete. The object can either be a string, a sequence of strings or a launch descriptor. See " { $link >descriptor } " for details." }
 { $notes
     "This word is functionally identical to passing a launch descriptor to " { $link run-process } " having the " { $link +detached+ } " key set."
+    $nl
+    "The output value can be passed to " { $link wait-for-process } " to get an exit code."
 } ;
+
+HELP: process
+{ $class-description "A class representing an active or finished process."
+$nl
+"Processes are output by " { $link run-process } " and " { $link run-detached } ", and are stored in the " { $link process-stream-process } " slot of " { $link process-stream } " instances."
+$nl
+"Processes can be passed to " { $link wait-for-process } "." } ;
+
+HELP: process-stream
+{ $class-description "A bidirectional stream for interacting with a running process. Instances are created by calling " { $link <process-stream> } ". The " { $link process-stream-process } " slot holds a " { $link process } " instance." } ;
 
 HELP: <process-stream>
 { $values { "obj" object } { "stream" "a bidirectional stream" } }
-{ $description "Launches a process and redirects its input and output via a paper of pipes which may be read and written as a stream." }
+{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream." }
 { $notes "Closing the stream will block until the process exits." } ;
 
-{ run-process run-detached <process-stream> } related-words
+HELP: with-process-stream
+{ $values { "obj" object } { "quot" quotation } { "process" process } }
+{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a " { $link process-stream } ". When the quotation returns, the " { $link process } " instance is output." } ;
+
+HELP: wait-for-process
+{ $values { "process" process } { "status" integer } }
+{ $description "If the process is still running, waits for it to exit, otherwise outputs the exit code immediately. Can be called multiple times on the same process." } ;
 
 ARTICLE: "io.launcher" "Launching OS processes"
 "The " { $vocab-link "io.launcher" } " vocabulary implements cross-platform process launching."
@@ -105,9 +154,19 @@ $nl
 { $subsection +detached+ }
 { $subsection +environment+ }
 { $subsection +environment-mode+ }
+"Redirecting standard input and output to files:"
+{ $subsection +stdin+ }
+{ $subsection +stdout+ }
+{ $subsection +stderr+ }
 "The following words are used to launch processes:"
 { $subsection run-process }
 { $subsection run-detached }
-{ $subsection <process-stream> } ;
+"Redirecting standard input and output to a pipe:"
+{ $subsection <process-stream> }
+{ $subsection with-process-stream }
+"A class representing an active or finished process:"
+{ $subsection process }
+"Waiting for a process to end, or getting the exit code of a finished process:"
+{ $subsection wait-for-process } ;
 
 ABOUT: "io.launcher"

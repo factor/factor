@@ -42,9 +42,12 @@ MEMO: (load-mode) ( name -- rule-sets )
 
 SYMBOL: rule-sets
 
+: no-such-rule-set ( name -- * )
+    "No such rule set: " swap append throw ;
+
 : get-rule-set ( name -- rule-sets rules )
-    "::" split1 [ swap (load-mode) ] [ rule-sets get ] if*
-    tuck at ;
+    dup "::" split1 [ swap (load-mode) ] [ rule-sets get ] if*
+    dup -roll at* [ nip ] [ drop no-such-rule-set ] if ;
 
 : resolve-delegate ( rule -- )
     dup rule-delegate dup string?
@@ -68,14 +71,11 @@ SYMBOL: rule-sets
 
 : resolve-imports ( ruleset -- )
     dup rule-set-imports [
-        get-rule-set dup [
-            swap rule-sets [
-                2dup import-keywords
-                import-rules
-            ] with-variable
-        ] [
-            3drop
-        ] if
+        get-rule-set swap rule-sets [
+            dup resolve-delegates
+            2dup import-keywords
+            import-rules
+        ] with-variable
     ] with each ;
 
 : finalize-rule-set ( ruleset -- )
@@ -99,7 +99,7 @@ SYMBOL: rule-sets
     (load-mode) dup finalize-mode ;
 
 : reset-modes ( -- )
-    \ load-mode "memoize" word-prop clear-assoc ;
+    \ (load-mode) "memoize" word-prop clear-assoc ;
 
 : ?glob-matches ( string glob/f -- ? )
     dup [ glob-matches? ] [ 2drop f ] if ;

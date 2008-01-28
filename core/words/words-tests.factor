@@ -175,3 +175,14 @@ SYMBOL: quot-uses-b
 
 [ t ] [ "symbol-generic" "temporary" lookup symbol? ] unit-test
 [ f ] [ "symbol-generic" "temporary" lookup generic? ] unit-test
+
+! Regressions
+[ ] [ "IN: temporary : decl-forget-test ; foldable" eval ] unit-test
+[ t ] [ "decl-forget-test" "temporary" lookup "foldable" word-prop ] unit-test
+[ ] [ "IN: temporary : decl-forget-test ;" eval ] unit-test
+[ f ] [ "decl-forget-test" "temporary" lookup "foldable" word-prop ] unit-test
+
+[ ] [ "IN: temporary : decl-forget-test ; flushable" eval ] unit-test
+[ t ] [ "decl-forget-test" "temporary" lookup "flushable" word-prop ] unit-test
+[ ] [ "IN: temporary : decl-forget-test ;" eval ] unit-test
+[ f ] [ "decl-forget-test" "temporary" lookup "flushable" word-prop ] unit-test

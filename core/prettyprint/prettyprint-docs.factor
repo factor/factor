@@ -1,6 +1,6 @@
 USING: prettyprint.backend prettyprint.config
-prettyprint.sections help.markup help.syntax io kernel words
-definitions quotations strings ;
+prettyprint.sections prettyprint.private help.markup help.syntax
+io kernel words definitions quotations strings ;
 IN: prettyprint
 
 ARTICLE: "prettyprint-numbers" "Prettyprinting numbers"

@@ -9,7 +9,7 @@ IN: assocs.lib
 
 : ref-at ( table key -- value ) swap at ;
 
-! set-hash with alternative stack effects
+! set-at with alternative stack effects
 
 : put-at* ( table key value -- ) swap rot set-at ;
 
@@ -22,3 +22,6 @@ IN: assocs.lib
 
 : at-default ( key assoc -- value/key )
     dupd at [ nip ] when* ;
+
+: at-peek ( key assoc -- value ? )
+    at* dup >r [ peek ] when r> ;

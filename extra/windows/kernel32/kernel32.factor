@@ -87,7 +87,7 @@ C-STRUCT: FILE_NOTIFY_INFORMATION
     { "DWORD" "NextEntryOffset" }
     { "DWORD" "Action" }
     { "DWORD" "FileNameLength" }
-    { "WCHAR*" "FileName" } ;
+    { "WCHAR[1]" "FileName" } ;
 TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 
 : STD_INPUT_HANDLE  -10 ; inline
@@ -898,7 +898,7 @@ FUNCTION: HANDLE GetCurrentThread ( ) ;
 ! FUNCTION: GetEnvironmentStringsW
 ! FUNCTION: GetEnvironmentVariableA
 ! FUNCTION: GetEnvironmentVariableW
-! FUNCTION: GetExitCodeProcess
+FUNCTION: BOOL GetExitCodeProcess ( HANDLE hProcess, LPDWORD lpExitCode ) ;
 ! FUNCTION: GetExitCodeThread
 ! FUNCTION: GetExpandedNameA
 ! FUNCTION: GetExpandedNameW
@@ -1496,7 +1496,7 @@ FUNCTION: BOOL VirtualQueryEx ( HANDLE hProcess, void* lpAddress, MEMORY_BASIC_I
 ! FUNCTION: VirtualUnlock
 ! FUNCTION: WaitCommEvent
 ! FUNCTION: WaitForDebugEvent
-! FUNCTION: WaitForMultipleObjects
+FUNCTION: DWORD WaitForMultipleObjects ( DWORD nCount, HANDLE* lpHandles, BOOL bWaitAll, DWORD dwMilliseconds ) ;
 ! FUNCTION: WaitForMultipleObjectsEx
 FUNCTION: BOOL WaitForSingleObject ( HANDLE hHandle, DWORD dwMilliseconds ) ;
 ! FUNCTION: WaitForSingleObjectEx

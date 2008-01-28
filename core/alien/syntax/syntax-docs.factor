@@ -1,6 +1,6 @@
-USING: alien alien.c-types alien.structs help.markup help.syntax ;
 IN: alien.syntax
-USE: alien.syntax.private
+USING: alien alien.c-types alien.structs alien.syntax.private
+help.markup help.syntax ;
 
 HELP: DLL"
 { $syntax "DLL\" path\"" }
@@ -88,8 +88,6 @@ HELP: typedef
 { $description "Alises the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
 { $notes "Using this word in the same source file which defines C bindings can cause problems, because words are compiled before top-level forms are run. Use the " { $link POSTPONE: TYPEDEF: } " word instead." } ;
 
-{ typedef POSTPONE: TYPEDEF: POSTPONE: TYPEDEF-IF: } related-words
-{ POSTPONE: TYPEDEF: typedef POSTPONE: TYPEDEF-IF: } related-words
 { POSTPONE: TYPEDEF-IF: POSTPONE: TYPEDEF: typedef } related-words
 
 HELP: c-struct?

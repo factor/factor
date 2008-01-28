@@ -49,7 +49,7 @@ ARTICLE: "basic-combinators" "Basic combinators"
 { $subsection execute }
 "These words are used to implement " { $emphasis "combinators" } ", which are words that take code from the stack. Note that combinator definitions must be followed by the " { $link POSTPONE: inline } " declaration in order to compile in the optimizing compiler; for example:"
 { $code
-    ": keep ( x quot -- x | quot: x -- )"
+    ": keep ( x quot -- x )"
     "    over >r call r> ; inline"
 }
 "Word inlining is documented in " { $link "declarations" } "."
@@ -372,7 +372,7 @@ HELP: 2keep
 { $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
-{ $values { "quot" "a quotation with stack effect " { $snippet "( x y -- )" } } { "x" object } { "y" object } { "z" object } }
+{ $values { "quot" "a quotation with stack effect " { $snippet "( x y z -- )" } } { "x" object } { "y" object } { "z" object } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 2apply
@@ -557,7 +557,7 @@ HELP: dip
 
 HELP: while
 { $values { "pred" "a quotation with stack effect " { $snippet "( -- ? )" } } { "body" "a quotation" } { "tail" "a quotation" } }
-{ $description "Repeatedly calls " { $snippet "pred" } ". If it yields " { $link f } ", iteration stops, otherwise " { $snippet "quot" } " is called. After iteration stops, " { $snippet "tail" } " is called." }
+{ $description "Repeatedly calls " { $snippet "pred" } ". If it yields " { $link f } ", iteration stops, otherwise " { $snippet "body" } " is called. After iteration stops, " { $snippet "tail" } " is called." }
 { $notes "In most cases, tail recursion should be used, because it is simpler both in terms of implementation and conceptually. However in some cases this combinator expresses intent better and should be used."
 $nl
 "Strictly speaking, the " { $snippet "tail" } " is not necessary, since the following are equivalent:"

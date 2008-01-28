@@ -13,7 +13,7 @@ TYPEDEF: longlong quad_t
 TYPEDEF: uint gid_t
 TYPEDEF: uint in_addr_t
 TYPEDEF: uint ino_t
-TYPEDEF: uint pid_t
+TYPEDEF: int pid_t
 TYPEDEF: uint socklen_t
 TYPEDEF: uint time_t
 TYPEDEF: uint uid_t
@@ -40,6 +40,12 @@ C-STRUCT: tm
 C-STRUCT: timespec
     { "time_t" "sec" }
     { "long" "nsec" } ;
+
+: make-timespec ( ms -- timespec )
+    1000 /mod 1000000 *
+    "timespec" <c-object>
+    [ set-timespec-nsec ] keep
+    [ set-timespec-sec ] keep ;
 
 ! ! ! Unix constants
 

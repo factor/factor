@@ -195,4 +195,7 @@ M: hashtable assoc-like
     dup length <hashtable> over length <vector>
     rot [ >r 2dup r> (prune) ] each nip ;
 
+: all-unique? ( seq -- ? )
+    dup prune [ length ] 2apply = ;
+
 INSTANCE: hashtable assoc

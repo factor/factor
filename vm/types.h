@@ -154,26 +154,22 @@ F_STRING *reallot_string(F_STRING *string, CELL capacity, u16 fill);
 DECLARE_PRIMITIVE(resize_string);
 
 F_STRING *memory_to_char_string(const char *string, CELL length);
-DECLARE_PRIMITIVE(memory_to_char_string);
 F_STRING *from_char_string(const char *c_string);
 DLLEXPORT void box_char_string(const char *c_string);
 DECLARE_PRIMITIVE(alien_to_char_string);
 
 F_STRING *memory_to_u16_string(const u16 *string, CELL length);
-DECLARE_PRIMITIVE(memory_to_u16_string);
 F_STRING *from_u16_string(const u16 *c_string);
 DLLEXPORT void box_u16_string(const u16 *c_string);
 DECLARE_PRIMITIVE(alien_to_u16_string);
 
 void char_string_to_memory(F_STRING *s, char *string);
-DECLARE_PRIMITIVE(char_string_to_memory);
 F_BYTE_ARRAY *string_to_char_alien(F_STRING *s, bool check);
 char* to_char_string(F_STRING *s, bool check);
 DLLEXPORT char *unbox_char_string(void);
 DECLARE_PRIMITIVE(string_to_char_alien);
 
 void u16_string_to_memory(F_STRING *s, u16 *string);
-DECLARE_PRIMITIVE(u16_string_to_memory);
 F_BYTE_ARRAY *string_to_u16_alien(F_STRING *s, bool check);
 u16* to_u16_string(F_STRING *s, bool check);
 DLLEXPORT u16 *unbox_u16_string(void);

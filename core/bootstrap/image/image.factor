@@ -427,32 +427,22 @@ M: curry '
     "Writing image to " write dup write "..." print flush
     <file-writer> [ (write-image) ] with-stream ;
 
-: prepare-profile ( arch -- )
-    "resource:core/bootstrap/layouts/layouts.factor" run-file
-    "resource:core/cpu/" swap {
-        { "x86.32" "x86/32" }
-        { "x86.64" "x86/64" }
-        { "linux-ppc" "ppc/linux" }
-        { "macosx-ppc" "ppc/macosx" }
-        { "arm" "arm" }
-    } at "/bootstrap.factor" 3append ?resource-path run-file ;
-
-: prepare-image ( arch -- )
-    dup architecture set prepare-profile
+: prepare-image ( -- )
     bootstrapping? on
     load-help? off
-    800000 <vector> image set 20000 <hashtable> objects set ;
+    800000 <vector> image set
+    20000 <hashtable> objects set ;
 
 PRIVATE>
 
 : make-image ( arch -- )
-    [
+    architecture [
         prepare-image
         begin-image
         "resource:/core/bootstrap/stage1.factor" run-file
         end-image
         image get image-name write-image
-    ] with-scope ;
+    ] with-variable ;
 
 : my-arch ( -- arch )
     cpu dup "ppc" = [ os "-" rot 3append ] when ;
@@ -460,7 +450,7 @@ PRIVATE>
 : make-images ( -- )
     {
         "x86.32"
-        ! "x86.64"
+        "x86.64"
         "linux-ppc" "macosx-ppc"
         ! "arm"
     } [ make-image ] each ;
