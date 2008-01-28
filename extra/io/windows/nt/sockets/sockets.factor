@@ -44,12 +44,11 @@ TUPLE: ConnectEx-args port
     "stdcall" alien-indirect drop
     winsock-error-string [ throw ] when* ;
 
-: check-connect-error ( ConnectEx -- )
-    ConnectEx-args-port duplex-stream-in get-overlapped-result drop ;
-
 : connect-continuation ( ConnectEx -- )
-    [ ConnectEx-args-port duplex-stream-in save-callback ] keep
-    check-connect-error ;
+    dup ConnectEx-args-lpOverlapped*
+    swap ConnectEx-args-port duplex-stream-in
+    [ save-callback ] 2keep
+    get-overlapped-result drop ;
 
 M: windows-nt-io (client) ( addrspec -- duplex-stream )
     [
@@ -64,10 +63,6 @@ M: windows-nt-io (client) ( addrspec -- duplex-stream )
         dup ConnectEx-args-s* <win32-socket> dup handle>duplex-stream
         over set-ConnectEx-args-port
 
-        [
-            dup ConnectEx-args-lpOverlapped*
-            swap ConnectEx-args-port duplex-stream-in set-port-overlapped
-        ] keep
         dup connect-continuation
         ConnectEx-args-port
         [ duplex-stream-in pending-error ] keep
@@ -93,8 +88,7 @@ TUPLE: AcceptEx-args port
     over set-AcceptEx-args-sAcceptSocket*
     0 over set-AcceptEx-args-dwReceiveDataLength*
     f over set-AcceptEx-args-lpdwBytesReceived*
-    (make-overlapped) over set-AcceptEx-args-lpOverlapped*
-    dup AcceptEx-args-lpOverlapped* swap AcceptEx-args-port set-port-overlapped ;
+    (make-overlapped) swap set-AcceptEx-args-lpOverlapped* ;
 
 : (accept) ( AcceptEx -- )
     \ AcceptEx-args >tuple*<
@@ -102,10 +96,12 @@ TUPLE: AcceptEx-args port
     winsock-error-string [ throw ] when* ;
 
 : make-accept-continuation ( AcceptEx -- )
-    AcceptEx-args-port save-callback ;
+    dup AcceptEx-args-lpOverlapped*
+    swap AcceptEx-args-port save-callback ;
 
 : check-accept-error ( AcceptEx -- )
-    AcceptEx-args-port get-overlapped-result drop ;
+    dup AcceptEx-args-lpOverlapped*
+    swap AcceptEx-args-port get-overlapped-result drop ;
 
 : extract-remote-host ( AcceptEx -- addrspec )
     [
@@ -184,20 +180,17 @@ TUPLE: WSARecvFrom-args port
     1 over set-WSARecvFrom-args-dwBufferCount*
     0 malloc-int dup free-always over set-WSARecvFrom-args-lpFlags*
     0 malloc-int dup free-always over set-WSARecvFrom-args-lpNumberOfBytesRecvd*
-    (make-overlapped) [ over set-WSARecvFrom-args-lpOverlapped* ] keep
-    swap WSARecvFrom-args-port set-port-overlapped ;
+    (make-overlapped) swap set-WSARecvFrom-args-lpOverlapped* ;
 
-: make-WSARecvFrom-continuation ( WSARecvFrom -- )
-    WSARecvFrom-args-port save-callback ;
+: WSARecvFrom-continuation ( WSARecvFrom -- n )
+    dup WSARecvFrom-args-lpOverlapped*
+    swap WSARecvFrom-args-port [ save-callback ] 2keep
+    get-overlapped-result ;
 
 : call-WSARecvFrom ( WSARecvFrom -- )
     \ WSARecvFrom-args >tuple*<
     WSARecvFrom
     socket-error* ;
-
-: WSARecvFrom-continuation ( WSARecvFrom -- n )
-    [ make-WSARecvFrom-continuation ] keep
-    WSARecvFrom-args-port get-overlapped-result ;
 
 : parse-WSARecvFrom ( n WSARecvFrom -- packet addrspec )
     [
@@ -225,7 +218,7 @@ TUPLE: WSASendTo-args port
 : init-WSASendTo ( packet addrspec datagram WSASendTo -- )
     [ set-WSASendTo-args-port ] 2keep
     [
-        >r delegate port-handle delegate win32-file-handle r>
+        >r delegate port-handle win32-file-handle r>
         set-WSASendTo-args-s*
     ] keep [
         >r make-sockaddr/size >r
@@ -242,15 +235,13 @@ TUPLE: WSASendTo-args port
     ] keep
     1 over set-WSASendTo-args-dwBufferCount*
     0 over set-WSASendTo-args-dwFlags*
-    (make-overlapped) [ over set-WSASendTo-args-lpOverlapped* ] keep
-    swap WSASendTo-args-port set-port-overlapped ;
-
-: make-WSASendTo-continuation ( WSASendTo -- )
-    WSASendTo-args-port save-callback ;
+    (make-overlapped) swap set-WSASendTo-args-lpOverlapped* ;
 
 : WSASendTo-continuation ( WSASendTo -- )
-    [ make-WSASendTo-continuation ] keep
-    WSASendTo-args-port get-overlapped-result drop ;
+    dup WSASendTo-args-lpOverlapped*
+    swap WSASendTo-args-port
+    [ save-callback ] 2keep
+    get-overlapped-result drop ;
 
 : call-WSASendTo ( WSASendTo -- )
     \ WSASendTo-args >tuple*<
