@@ -120,12 +120,12 @@ SYMBOL: ui-hook
     [ dup update-hand draw-world ] each ;
 
 : notify ( gadget -- )
-    dup gadget-graft-state [ dup {
-        { { f t } [ over activate-control over graft* ] }
-        { { t f } [ over activate-control over ungraft* ] }
-    } case ]
-    [ first { f f } { t t } ?
-      swap set-gadget-graft-state ] [ ] cleanup ;
+    dup gadget-graft-state {
+        { { f t } [ dup activate-control dup graft* ] }
+        { { t f } [ dup activate-control dup ungraft* ] }
+    } case
+    dup gadget-graft-state first { f f } { t t } ?
+    swap set-gadget-graft-state ;
 
 : notify-queued ( -- )
     graft-queue [ notify ] dlist-slurp ;
