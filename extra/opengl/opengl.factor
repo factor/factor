@@ -136,7 +136,6 @@ IN: opengl
 
 : with-framebuffer ( id quot -- )
     GL_FRAMEBUFFER_EXT rot glBindFramebufferEXT
-    [ call ]
     [ GL_FRAMEBUFFER_EXT 0 glBindFramebufferEXT ] [ ] cleanup ; inline
 
 : bind-texture-unit ( id target unit -- )
@@ -357,7 +356,7 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
     ] each delete-gl-program-only ;
 
 : with-gl-program ( program quot -- )
-    swap glUseProgram [ call ] [ 0 glUseProgram ] [ ] cleanup ; inline
+    swap glUseProgram [ 0 glUseProgram ] [ ] cleanup ; inline
 
 PREDICATE: integer gl-program (gl-program?) ;
 

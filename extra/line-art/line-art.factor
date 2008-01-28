@@ -187,7 +187,10 @@ main()
     ] if ;
     
 M: line-art-gadget graft* ( gadget -- )
-    "2.0" { "GL_ARB_draw_buffers" "GL_ARB_shader_objects" "GL_ARB_multitexture" }
+    "2.0" { "GL_ARB_draw_buffers"
+            "GL_ARB_shader_objects"
+            "GL_ARB_multitexture"
+            "GL_ARB_texture_float" }
     require-gl-version-or-extensions
     { "GL_EXT_framebuffer_object" } require-gl-extensions
     GL_CULL_FACE glEnable
