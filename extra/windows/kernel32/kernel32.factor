@@ -87,7 +87,7 @@ C-STRUCT: FILE_NOTIFY_INFORMATION
     { "DWORD" "NextEntryOffset" }
     { "DWORD" "Action" }
     { "DWORD" "FileNameLength" }
-    { "WCHAR*" "FileName" } ;
+    { "WCHAR[1]" "FileName" } ;
 TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 
 : STD_INPUT_HANDLE  -10 ; inline

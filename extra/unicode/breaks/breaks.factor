@@ -1,10 +1,10 @@
-USING: unicode.categories kernel math const combinators splitting
+USING: unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
 combinators.lib assocs.lib math.ranges unicode.normalize
-unicode.syntax unicode.data ;
+unicode.syntax unicode.data compiler.units alien.syntax ;
 IN: unicode.breaks
 
-ENUM: Any L V T Extend Control CR LF graphemes ;
+C-ENUM: Any L V T Extend Control CR LF graphemes ;
 
 : jamo-class ( ch -- class )
     dup initial? [ drop L ]
@@ -71,9 +71,9 @@ SYMBOL: table
 
 : make-grapheme-table ( -- )
     CR LF connect
-    { Control CR LF } graphemes break-around
-    L { L V } connect-before
-    V { V T } connect-before
+    Control CR LF 3array graphemes break-around
+    L L V 2array connect-before
+    V V T 2array connect-before
     T T connect
     graphemes Extend connect-after ;
 

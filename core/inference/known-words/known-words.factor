@@ -475,10 +475,6 @@ t over set-effect-terminated?
 
 \ string>u16-alien { string } { byte-array } <effect> "inferred-effect" set-word-prop
 
-\ string>memory { string c-ptr } { } <effect> "inferred-effect" set-word-prop
-
-\ memory>string { c-ptr integer } { string } <effect> "inferred-effect" set-word-prop
-
 \ alien-address { alien } { integer } <effect> "inferred-effect" set-word-prop
 \ alien-address make-flushable
 

@@ -14,4 +14,5 @@ IN: bootstrap.x86
 : fixnum>slot@ arg0 1 SAR ;
 : rex-length 0 ;
 
-"resource:core/cpu/x86/bootstrap.factor" run-file
+<< "resource:core/cpu/x86/bootstrap.factor" parse-file parsed >>
+call

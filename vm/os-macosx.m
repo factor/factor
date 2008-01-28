@@ -30,7 +30,7 @@ void early_init(void)
 
 const char *vm_executable_path(void)
 {
-	return [[[NSBundle mainBundle] executablePath] cString];
+	return [[[NSBundle mainBundle] executablePath] UTF8String];
 }
 
 const char *default_image_path(void)
@@ -55,7 +55,7 @@ const char *default_image_path(void)
 	else
 		returnVal = [path stringByAppendingPathComponent:image];
 
-	return [returnVal cString];
+	return [returnVal UTF8String];
 }
 
 void init_signals(void)

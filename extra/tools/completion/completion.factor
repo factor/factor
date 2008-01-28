@@ -60,13 +60,14 @@ vectors words assocs combinators sorting ;
     dupd fuzzy score max ;
 
 : completion ( short candidate -- result )
-    [ second swap complete ] keep first 2array ;
+    [ second >lower swap complete ] keep first 2array ;
 
 : completions ( short candidates -- seq )
     over empty? [
         nip [ first ] map
     ] [
-        >r >lower r> [ completion ] with map rank-completions
+        >r >lower r> [ completion ] with map
+        rank-completions
     ] if ;
 
 : string-completions ( short strs -- seq )

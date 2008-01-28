@@ -1,8 +1,10 @@
-USING: alien alien.c-types help.syntax help.markup libc
-kernel.private byte-arrays math strings ;
+IN: alien.c-types
+USING: alien help.syntax help.markup libc kernel.private
+byte-arrays math strings hashtables alien.syntax
+bit-arrays float-arrays debugger ;
 
 HELP: <c-type>
-{ $values { "type" "a hashtable" } }
+{ $values { "type" hashtable } }
 { $description "Creates a prototypical C type. User code should use higher-level facilities to define C types; see " { $link "c-data" } "." } ;
 
 HELP: no-c-type
@@ -14,12 +16,12 @@ HELP: c-types
 { $var-description "Global variable holding a hashtable mapping C type names to C types. Use the " { $link c-type } " word to look up C types." } ;
 
 HELP: c-type
-{ $values { "name" string } { "type" "a hashtable" } }
+{ $values { "name" string } { "type" hashtable } }
 { $description "Looks up a C type by name." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
 HELP: heap-size
-{ $values { "type" string } { "size" "an integer" } }
+{ $values { "type" string } { "size" integer } }
 { $description "Outputs the number of bytes needed for a heap-allocated value of this C type." }
 { $examples
     "On a 32-bit system, you will get the following output:"
@@ -28,7 +30,7 @@ HELP: heap-size
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
 HELP: stack-size
-{ $values { "type" string } { "size" "an integer" } }
+{ $values { "type" string } { "size" integer } }
 { $description "Outputs the number of bytes to reserve on the C stack by a value of this C type. In most cases this is equal to " { $link heap-size } ", except on some platforms where C structs are passed by invisible reference, in which case a C struct type only uses as much space as a pointer on the C stack." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
@@ -78,13 +80,31 @@ HELP: alien>u16-string ( c-ptr -- string )
 { $values { "c-ptr" c-ptr } { "string" string } }
 { $description "Reads a null-terminated UCS-2 string from the specified address." } ;
 
-HELP: memory>string ( base len -- string )
-{ $values { "base" c-ptr } { "len" "a non-negative integer" } { "string" string } }
-{ $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new Factor string." } ;
+HELP: memory>byte-array ( base len -- string )
+{ $values { "base" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
+{ $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new byte array." } ;
 
-HELP: string>memory ( string base -- )
+HELP: memory>char-string ( base len -- string )
+{ $values { "base" c-ptr } { "len" "a non-negative integer" } { "string" string } }
+{ $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new string." } ;
+
+HELP: memory>u16-string ( base len -- string )
+{ $values { "base" c-ptr } { "len" "a non-negative integer" } { "string" string } }
+{ $description "Reads " { $snippet "len" } " UCS2 characters starting from " { $snippet "base" } " and stores them in a new string." } ;
+
+HELP: byte-array>memory ( string base -- )
+{ $values { "byte-array" byte-array } { "base" c-ptr } }
+{ $description "Writes a byte array to memory starting from the " { $snippet "base" } " address." }
+{ $warning "This word is unsafe. Improper use can corrupt memory." } ;
+
+HELP: string>char-memory ( string base -- )
 { $values { "string" string } { "base" c-ptr } }
-{ $description "Writes the string to memory starting from the " { $snippet "base" } " address." }
+{ $description "Writes a string to memory starting from the " { $snippet "base" } " address." }
+{ $warning "This word is unsafe. Improper use can corrupt memory." } ;
+
+HELP: string>u16-memory ( string base -- )
+{ $values { "string" string } { "base" c-ptr } }
+{ $description "Writes a string to memory starting from the " { $snippet "base" } " address." }
 { $warning "This word is unsafe. Improper use can corrupt memory." } ;
 
 HELP: malloc-array
@@ -151,3 +171,143 @@ HELP: define-out
 { $values { "name" "a word name" } { "vocab" "a vocabulary name" } }
 { $description "Defines a word " { $snippet "<" { $emphasis "name" } ">" } " with stack effect " { $snippet "( value -- array )" } ". This word allocates a byte array large enough to hold a value with C type " { $snippet "name" } ", and writes the value at the top of the stack to the array." }
 { $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
+
+ARTICLE: "c-out-params" "Output parameters in C"
+"A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
+$nl
+"Each numerical C type, together with " { $snippet "void*" } ", has an associated " { $emphasis "out parameter constructor" } " word which takes a Factor object as input, constructs a byte array of the correct size, and converts the Factor object to a C value stored into the byte array:"
+{ $subsection <char> }
+{ $subsection <uchar> }
+{ $subsection <short> }
+{ $subsection <ushort> }
+{ $subsection <int> }
+{ $subsection <uint> }
+{ $subsection <long> }
+{ $subsection <ulong> }
+{ $subsection <longlong> }
+{ $subsection <ulonglong> }
+{ $subsection <float> }
+{ $subsection <double> }
+{ $subsection <void*> }
+"You call the out parameter constructor with the required initial value, then pass the byte array to the C function, which receives a pointer to the start of the byte array's data area. The C function then returns, leaving the result in the byte array; you read it back using the next set of words:"
+{ $subsection *char }
+{ $subsection *uchar }
+{ $subsection *short }
+{ $subsection *ushort }
+{ $subsection *int }
+{ $subsection *uint }
+{ $subsection *long }
+{ $subsection *ulong }
+{ $subsection *longlong }
+{ $subsection *ulonglong }
+{ $subsection *float }
+{ $subsection *double }
+{ $subsection *void* }
+{ $subsection *char* }
+{ $subsection *ushort* }
+"Note that while structure and union types do not get these words defined for them, there is no loss of generality since " { $link <void*> } " and " { $link *void* } " may be used." ;
+
+ARTICLE: "c-types-specs" "C type specifiers"
+"C types are identified by strings, and type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words, as well as " { $link POSTPONE: C-STRUCT: } ", " { $link POSTPONE: C-UNION: } " and " { $link POSTPONE: TYPEDEF: } "."
+$nl
+"The following numerical types are available; a " { $snippet "u" } " prefix denotes an unsigned type:"
+{ $table
+    { "C type" "Notes" }
+    { { $snippet "char" } "always 1 byte" }
+    { { $snippet "uchar" } { } }
+    { { $snippet "short" } "always 2 bytes" }
+    { { $snippet "ushort" } { } }
+    { { $snippet "int" } "always 4 bytes" }
+    { { $snippet "uint" } { } }
+    { { $snippet "long" } { "same size as CPU word size and " { $snippet "void*" } ", except on 64-bit Windows, where it is 4 bytes" } }
+    { { $snippet "ulong" } { } }
+    { { $snippet "longlong" } "always 8 bytes" }
+    { { $snippet "ulonglong" } { } }
+    { { $snippet "float" } { } }
+    { { $snippet "double" } { "same format as " { $link float } " objects" } }
+}
+"When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision."
+$nl
+"Pointer types are specified by suffixing a C type with " { $snippet "*" } ", for example " { $snippet "float*" } ". One special case is " { $snippet "void*" } ", which denotes a generic pointer; " { $snippet "void" } " by itself is not a valid C type specifier. With the exception of strings (see " { $link "c-strings" } "), all pointer types are identical to " { $snippet "void*" } " as far as the C library interface is concerned."
+$nl
+"Fixed-size array types are supported; the syntax consists of a C type name followed by dimension sizes in brackets; the following denotes a 3 by 4 array of integers:"
+{ $code "int[3][4]" }
+"Fixed-size arrays differ from pointers in that they are allocated inside structures and unions; however when used as function parameters they behave exactly like pointers and thus the dimensions only serve as documentation."
+$nl
+"Structure and union types are specified by the name of the structure or union." ;
+
+ARTICLE: "c-byte-arrays" "Passing data in byte arrays"
+"Instances of the " { $link byte-array } ", " { $link bit-array } " and " { $link float-array } " class can be passed to C functions; the C function receives a pointer to the first element of the array."
+$nl
+"Byte arrays can be allocated directly with a byte count using the " { $link <byte-array> } " word. However in most cases, instead of computing a size in bytes directly, it is easier to use a higher-level word which expects C type and outputs a byte array large enough to hold that type:"
+{ $subsection <c-object> }
+{ $subsection <c-array> }
+{ $warning
+"The Factor garbage collector can move byte arrays around, and it is only safe to pass byte arrays to C functions if the function does not store a pointer to the byte array in some global structure, or retain it in any way after returning."
+$nl
+"Long-lived data for use by C libraries can be allocated manually, just as when programming in C. See " { $link "malloc" } "." }
+{ $see-also "c-arrays" } ;
+
+ARTICLE: "malloc" "Manual memory management"
+"Sometimes data passed to C functions must be allocated at a fixed address, and so garbage collector managed byte arrays cannot be used. See the warning at the bottom of " { $link "c-byte-arrays" } " for a description of when this is the case."
+$nl
+"Allocating a C datum with a fixed address:"
+{ $subsection malloc-object }
+{ $subsection malloc-array }
+{ $subsection malloc-byte-array }
+"There is a set of words in the " { $vocab-link "libc" } " vocabulary which directly call C standard library memory management functions:"
+{ $subsection malloc }
+{ $subsection calloc }
+{ $subsection realloc }
+"The return value of the above three words must always be checked for a memory allocation failure:"
+{ $subsection check-ptr }
+"You must always free pointers returned by any of the above words when the block of memory is no longer in use:"
+{ $subsection free }
+"You can unsafely copy a range of bytes from one memory location to another:"
+{ $subsection memcpy }
+"You can copy a range of bytes from memory into a byte array:"
+{ $subsection memory>byte-array }
+"You can copy a byte array to memory unsafely:"
+{ $subsection byte-array>memory }
+"A wrapper for temporarily allocating a block of memory:"
+{ $subsection with-malloc } ;
+
+ARTICLE: "c-strings" "C strings"
+"The C library interface defines two types of C strings:"
+{ $table
+    { "C type" "Notes" }
+    { { $snippet "char*" } "8-bit per character null-terminated ASCII" }
+    { { $snippet "ushort*" } "16-bit per character null-terminated UCS-2" }
+}
+"Passing a Factor string to a C function expecting a C string allocates a " { $link byte-array } " in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function. If the conversion fails, for example if the string contains null bytes or characters with values higher than 255, a " { $link c-string-error. } " is thrown."
+"Sometimes a C function has a parameter type of " { $snippet "void*" } ", and various data types, among them strings, can be passed in. In this case, strings are not automatically converted to aliens, and instead you must call one of these words:"
+{ $subsection string>char-alien }
+{ $subsection string>u16-alien }
+{ $subsection malloc-char-string }
+{ $subsection malloc-u16-string }
+"The first two allocate " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } "."
+$nl
+"Finally, a set of words can be used to read and write " { $snippet "char*" } " and " { $snippet "ushort*" } " strings at arbitrary addresses:"
+{ $subsection alien>char-string }
+{ $subsection alien>u16-string }
+{ $subsection memory>char-string }
+{ $subsection memory>u16-string }
+{ $subsection string>char-memory }
+{ $subsection string>u16-memory } ;
+
+ARTICLE: "c-data" "Passing data between Factor and C"
+"Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers. Also Factor's garbage collector can move objects in memory, which means that special support has to be provided for passing blocks of memory to C code."
+{ $subsection "c-types-specs" }
+{ $subsection "c-byte-arrays" }
+{ $subsection "malloc" }
+{ $subsection "c-strings" }
+{ $subsection "c-arrays" }
+{ $subsection "c-out-params" }
+"C-style enumerated types are supported:"
+{ $subsection POSTPONE: C-ENUM: }
+"C types can be aliased for convenience and consitency with native library documentation:"
+{ $subsection POSTPONE: TYPEDEF: }
+"New C types can be defined:"
+{ $subsection "c-structs" }
+{ $subsection "c-unions" }
+{ $subsection "reading-writing-memory" } ;

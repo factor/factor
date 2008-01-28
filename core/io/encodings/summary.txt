@@ -1,0 +1,1 @@
+Common support for ASCII, UTF8 and UTF16 character encodings
