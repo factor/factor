@@ -1,5 +1,5 @@
 USING: unicode.data kernel math sequences parser bit-arrays namespaces 
-sequences.private arrays quotations classes.predicate ;
+sequences.private arrays quotations classes.predicate assocs ;
 IN: unicode.syntax
 
 ! Character classes (categories)
@@ -48,5 +48,5 @@ IN: unicode.syntax
     categories swap seq-minus define-category ; parsing
 
 : UNICHAR:
-    ! This should be part of CHAR:
+    ! This should be part of CHAR:. Also, name-map at ==> name>char
     scan name>char [ parsed ] [ "Invalid character" throw ] if* ; parsing
