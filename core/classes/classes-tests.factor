@@ -207,3 +207,14 @@ DEFER: mixin-forget-test-g
 
 [ { } mixin-forget-test-g ] unit-test-fails
 [ H{ } ] [ H{ } mixin-forget-test-g ] unit-test
+
+! Method flattening interfered with mixin update
+MIXIN: flat-mx-1
+TUPLE: flat-mx-1-1 ; INSTANCE: flat-mx-1-1 flat-mx-1
+TUPLE: flat-mx-1-2 ; INSTANCE: flat-mx-1-2 flat-mx-1
+TUPLE: flat-mx-1-3 ; INSTANCE: flat-mx-1-3 flat-mx-1
+TUPLE: flat-mx-1-4 ; INSTANCE: flat-mx-1-4 flat-mx-1
+MIXIN: flat-mx-2     INSTANCE: flat-mx-2 flat-mx-1
+TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
+
+[ t ] [ T{ flat-mx-2-1 } flat-mx-1? ] unit-test
