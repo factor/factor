@@ -14,6 +14,8 @@ INLINE CELL string_size(CELL size)
 	return sizeof(F_STRING) + (size + 1) * CHARS;
 }
 
+DEFINE_UNTAG(F_BYTE_ARRAY,BYTE_ARRAY_TYPE,byte_array)
+
 INLINE CELL byte_array_capacity(F_BYTE_ARRAY *array)
 {
 	return untag_fixnum_fast(array->capacity);
@@ -24,6 +26,8 @@ INLINE CELL byte_array_size(CELL size)
 	return sizeof(F_BYTE_ARRAY) + size;
 }
 
+DEFINE_UNTAG(F_BIT_ARRAY,BIT_ARRAY_TYPE,bit_array)
+
 INLINE CELL bit_array_capacity(F_BIT_ARRAY *array)
 {
 	return untag_fixnum_fast(array->capacity);
@@ -33,6 +37,8 @@ INLINE CELL bit_array_size(CELL size)
 {
 	return sizeof(F_BIT_ARRAY) + (size + 7) / 8;
 }
+
+DEFINE_UNTAG(F_FLOAT_ARRAY,FLOAT_ARRAY_TYPE,float_array)
 
 INLINE CELL float_array_capacity(F_FLOAT_ARRAY *array)
 {
@@ -49,22 +55,14 @@ INLINE CELL callstack_size(CELL size)
 	return sizeof(F_CALLSTACK) + size;
 }
 
-INLINE F_CALLSTACK *untag_callstack(CELL obj)
-{
-	type_check(CALLSTACK_TYPE,obj);
-	return untag_object(obj);
-}
+DEFINE_UNTAG(F_CALLSTACK,CALLSTACK_TYPE,callstack)
 
 INLINE CELL tag_boolean(CELL untagged)
 {
 	return (untagged == false ? F : T);
 }
 
-INLINE F_ARRAY* untag_array(CELL tagged)
-{
-	type_check(ARRAY_TYPE,tagged);
-	return untag_object(tagged);
-}
+DEFINE_UNTAG(F_ARRAY,ARRAY_TYPE,array)
 
 #define AREF(array,index) ((CELL)(array) + sizeof(F_ARRAY) + (index) * CELLS)
 #define UNAREF(array,ptr) (((CELL)(ptr)-(CELL)(array)-sizeof(F_ARRAY)) / CELLS)
@@ -103,17 +101,9 @@ INLINE void set_string_nth(F_STRING* string, CELL index, u16 value)
 	cput(SREF(string,index),value);
 }
 
-INLINE F_QUOTATION *untag_quotation(CELL tagged)
-{
-	type_check(QUOTATION_TYPE,tagged);
-	return untag_object(tagged);
-}
+DEFINE_UNTAG(F_QUOTATION,QUOTATION_TYPE,quotation)
 
-INLINE F_WORD *untag_word(CELL tagged)
-{
-	type_check(WORD_TYPE,tagged);
-	return untag_object(tagged);
-}
+DEFINE_UNTAG(F_WORD,WORD_TYPE,word)
 
 INLINE CELL tag_tuple(F_ARRAY *tuple)
 {
@@ -144,6 +134,9 @@ DECLARE_PRIMITIVE(to_tuple);
 
 F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill);
 DECLARE_PRIMITIVE(resize_array);
+DECLARE_PRIMITIVE(resize_byte_array);
+DECLARE_PRIMITIVE(resize_bit_array);
+DECLARE_PRIMITIVE(resize_float_array);
 
 DECLARE_PRIMITIVE(array_to_vector);
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private math sequences
-sequences.private growable ;
+sequences.private growable float-arrays ;
 IN: float-vectors
 
 <PRIVATE
@@ -12,7 +12,7 @@ IN: float-vectors
 PRIVATE>
 
 : <float-vector> ( n -- float-vector )
-    <float-array> 0 float-array>vector ; inline
+    0.0 <float-array> 0 float-array>vector ; inline
 
 : >float-vector ( seq -- float-vector ) V{ } clone-like ;
 

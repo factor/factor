@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private math sequences
-sequences.private growable ;
+sequences.private growable byte-arrays ;
 IN: byte-vectors
 
 <PRIVATE
 
-: byte-array>vector ( byte-array -- byte-vector )
+: byte-array>vector ( byte-array capacity -- byte-vector )
     byte-vector construct-boa ; inline
 
 PRIVATE>

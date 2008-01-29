@@ -192,4 +192,7 @@ void *primitives[] = {
 	primitive_set_innermost_stack_frame_quot,
 	primitive_call_clear,
 	primitive_os_envs,
+	primitive_resize_byte_array,
+	primitive_resize_bit_array,
+	primitive_resize_float_array,
 };

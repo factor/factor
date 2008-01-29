@@ -390,45 +390,45 @@ builtins get num-tags get tail f union-class define-class
 "byte-vector" "byte-vectors" create
 {
     {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    } {
         { "byte-array" "byte-arrays" }
         "underlying"
         { "underlying" "growable" }
         { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "fill"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
     }
 } define-tuple-class
 
 "bit-vector" "bit-vectors" create
 {
     {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    } {
         { "bit-array" "bit-arrays" }
         "underlying"
         { "underlying" "growable" }
         { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "fill"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
     }
 } define-tuple-class
 
 "float-vector" "float-vectors" create
 {
     {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    } {
         { "float-array" "float-arrays" }
         "underlying"
         { "underlying" "growable" }
         { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "fill"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
     }
 } define-tuple-class
 
@@ -628,6 +628,9 @@ builtins get num-tags get tail f union-class define-class
     { "set-innermost-frame-quot" "kernel.private" }
     { "call-clear" "kernel" }
     { "(os-envs)" "system" }
+    { "resize-byte-array" "byte-arrays" }
+    { "resize-bit-array" "bit-arrays" }
+    { "resize-float-array" "float-arrays" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 
