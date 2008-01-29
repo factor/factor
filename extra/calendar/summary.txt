@@ -1,1 +1,1 @@
-Date and time classes
+Timestamp model updated every second

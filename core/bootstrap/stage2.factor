@@ -54,6 +54,7 @@ IN: bootstrap.stage2
             ] each
         ] when
     ] with-compiler-errors
+    :errors
 
     f error set-global
     f error-continuation set-global

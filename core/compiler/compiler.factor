@@ -44,7 +44,7 @@ IN: compiler
 
 : compile-loop ( assoc -- )
     dup assoc-empty? [ drop ] [
-        dup delete-any (compile)
+        dup delete-any drop (compile)
         yield
         compile-loop
     ] if ;

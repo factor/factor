@@ -83,15 +83,6 @@ HELP: count
     "50"
 } ;
 
-HELP: all-unique?
-{ $values { "seq" sequence } { "?" "a boolean" } }
-{ $description "Tests whether a sequence contains any repeated elements." }
-{ $example
-    "USE: combinators.lib"
-    "{ 0 1 1 2 3 5 } all-unique? ."
-    "f"
-} ;
-
 HELP: &&
 { $values { "quots" "a sequence of quotations with stack effect " { $snippet "( ... -- ... ? )" } } { "?" "a boolean" } }
 { $description "Calls each quotation in turn; outputs " { $link f } " if one of the quotations output " { $link f } ", otherwise outputs " { $link t } ". As soon as a quotation outputs " { $link f } ", evaluation stops and subsequent quotations are not called." } ;

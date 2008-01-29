@@ -2,7 +2,7 @@
 ! Copyright (C) 2007 Slava Pestov
 ! Copyright (C) 2007 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien assocs init inspector kernel namespaces ;
+USING: alien assocs continuations init inspector kernel namespaces ;
 IN: libc
 
 <PRIVATE
@@ -84,4 +84,4 @@ PRIVATE>
     "void" "libc" "memcpy" { "void*" "void*" "ulong" } alien-invoke ;
 
 : with-malloc ( size quot -- )
-    swap 1 calloc swap keep free ; inline
+    swap 1 calloc [ swap keep ] [ free ] [ ] cleanup ; inline

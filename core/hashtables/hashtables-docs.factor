@@ -35,8 +35,10 @@ $nl
 "Utility words to create a new hashtable from a single key/value pair:"
 { $subsection associate }
 { $subsection ?set-at }
-"Removing duplicate elements from a sequence in linear time, using a hashtable:"
+"The final two words pertain to sequences but use a hashtable internally. Removing duplicate elements from a sequence in linear time, using a hashtable:"
 { $subsection prune }
+"Test if a sequence contains duplicates in linear time:"
+{ $subsection all-unique? }
 { $subsection "hashtables.private" } ;
 
 ABOUT: "hashtables"
@@ -131,6 +133,15 @@ HELP: prune
 { $description "Outputs a new sequence with each distinct element of " { $snippet "seq" } " appearing only once. Elements are compared for equality using " { $link = } " and elements are ordered according to their position in " { $snippet "seq" } "." }
 { $examples
     { $example "USE: hashtables" "{ 1 1 t 3 t } prune ." "V{ 1 t 3 }" }
+} ;
+
+HELP: all-unique?
+{ $values { "seq" sequence } { "?" "a boolean" } }
+{ $description "Tests whether a sequence contains any repeated elements." }
+{ $example
+    "USE: combinators.lib"
+    "{ 0 1 1 2 3 5 } all-unique? ."
+    "f"
 } ;
 
 HELP: rehash

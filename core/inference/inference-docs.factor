@@ -1,5 +1,5 @@
 USING: help.syntax help.markup kernel sequences words io
-effects inference.dataflow inference.backend
+effects inference.dataflow inference.backend classes
 math combinators inference.transforms inference.state ;
 IN: inference
 
@@ -93,8 +93,8 @@ $nl
 ABOUT: "inference"
 
 HELP: inference-error
-{ $values { "msg" "an object" } }
-{ $description "Throws an " { $link inference-error } "." }
+{ $values { "class" class } }
+{ $description "Creates an instance of " { $snippet "class" } ", wraps it in an " { $link inference-error } " and throws the result." }
 { $error-description
     "Thrown by " { $link infer } " and " { $link dataflow } " when the stack effect of a quotation cannot be inferred."
     $nl
