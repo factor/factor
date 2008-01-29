@@ -51,7 +51,7 @@ TUPLE: CreateProcess-args
     [ [ dup CHAR: " = [ CHAR: \\ , ] when , ] each ] "" make ;
 
 : join-arguments ( args -- cmd-line )
-    [ "\"" swap escape-argument "\"" 3append ] map " " join ;
+    " " join ;
 
 : app-name/cmd-line ( -- app-name cmd-line )
     +command+ get [
