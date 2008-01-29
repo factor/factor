@@ -11,4 +11,3 @@ HOOK: available-page-file os ( -- n )
 HOOK: total-virtual-mem os ( -- n )
 HOOK: available-virtual-mem os ( -- n )
 HOOK: available-virtual-extended-mem os ( -- n )
-
