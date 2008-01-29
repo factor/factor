@@ -1,5 +1,5 @@
 USING: slides help.markup math arrays hashtables namespaces
-sequences kernel sequences parser ;
+sequences kernel sequences parser memoize ;
 IN: minneapolis-talk
 
 : minneapolis-slides
@@ -17,13 +17,14 @@ IN: minneapolis-talk
         "Words: named functions, classes, variables"
         "Combinators: higher-order functions"
         "Quotations: anonymous functions"
-        "Other concepts are familiar: classes, objects, etc"
     }
     { $slide "Stack-based programming"
         { "Most languages are " { $emphasis "applicative" } }
         "Words pop inputs from the stack and push outputs on the stack"
         "Literals are pushed on the stack"
         { $code "{ 1 2 } { 7 } append reverse sum ." }
+    }
+    { $slide "Stack-based programming"
         "With the stack you can omit unnecessary names"
         "You can still name things: lexical/dynamic variables, sequences, associations, objects, ..."
     }
@@ -37,47 +38,64 @@ IN: minneapolis-talk
         { $code "{ 3 1 3 3 7 } 5 [ + ] curry map ." }
     }
     { $slide "Word definitions"
-        { $code ": name ( inputs -- outputs ) definition ;" }
+        { $code ": name ( inputs -- outputs )"
+        "    definition ;" }
         "Stack effect comments document stack inputs and outputs."
         "Example from previous slide:"
-        { $code ": add-each ( seq n -- newseq ) [ + ] curry map ;" }
-        { $code "{ 3 1 3 3 7 } add-each ." }
-        "Copy and paste factoring"
+        { $code ": add-each ( seq n -- newseq )"
+        "    [ + ] curry map ;" }
+        { $code "{ 3 1 3 3 7 } 5 add-each ." }
     }
     { $slide "Object-oriented programming"
-        "Define a tuple class and a constructor:"
+        { "Define a tuple class and a constructor:"
         { $code
             "TUPLE: person name address ;"
             "C: <person> person"
-        }
-        "Create an instance:"
-        { $code "\"Cosmo Kramer\" \"100 Blah blah St, New York\" <person>" }
-        "We can inspect it and edit it"
-        "We can reshape the class:"
-        { $code "TUPLE: person name address age phone-number ;" }
-        { $code "TUPLE: person name address phone-number age ;" }
+        } }
+        { "Create an instance:"
+        { $code
+            "\"Cosmo Kramer\""
+            "\"100 Blah blah St, New York\""
+            "<person>"
+        } }
     }
-    STRIP-TEASE:
-        $slide "Primary school geometry recap"
+    { $slide "Object-oriented programming"
+        "We can inspect it and edit objects"
+        "We can reshape the class!"
+        { $code "TUPLE: person" "name address age phone-number ;" }
+        { $code "TUPLE: person" "name address phone-number age ;" }
+    }
+    { $slide "An example"
         { $code
             "TUPLE: square dimension ;"
-            "TUPLE: circle radius ;"
-            "TUPLE: rectangle width height ;"
+            "C: <square> square"
             ""
+            "TUPLE: circle radius ;"
+            "C: <circle> circle"
+            ""
+            "TUPLE: rectangle width height ;"
+            "C: <rectangle> rectangle"
+        }
+    }
+    STRIP-TEASE:
+        $slide "An example"
+        { $code
+            "USE: math.constants"
             "GENERIC: area ( shape -- meters^2 )"
             "M: square area square-dimension sq ;"
             "M: circle area circle-radius sq pi * ;"
             "M: rectangle area"
-            "    { rectangle-width rectangle-height } get-slots * ;"
+            "    dup rectangle-width"
+            "    swap rectangle-height * ;"
         }
     ;
 
-    { $slide "Geometry example"
+    { $slide "An example"
         { $code "10 <square> area ." }
         { $code "18 <circle> area ." }
         { $code "20 40 <rectangle> area ." }
     }
-    { $slide "Factor: a meta language"
+    { $slide "Meta language"
         "Here's fibonacci:"
         { $code
             ": fib ( x -- y )"
@@ -87,7 +105,7 @@ IN: minneapolis-talk
         }
         "It is slow:"
         { $code
-            "20 [ fib ] map ."
+            "35 [ fib ] map ."
         }
         "Let's profile it!"
     }
@@ -96,7 +114,11 @@ IN: minneapolis-talk
         "What if we could define a word which caches its results?"
         { "The " { $vocab-link "memoize" } " library provides such a feature" }
         { "Just change " { $link POSTPONE: : } " to " { $link POSTPONE: MEMO: } }
+    }
+    { $slide "Memoization"
         { $code
+            "USE: memoize"
+            ""
             "MEMO: fib ( x -- y )"
             "    dup 1 > ["
             "        1 - dup fib swap 1 - fib +"
@@ -104,7 +126,7 @@ IN: minneapolis-talk
         }
         "It is faster:"
         { $code
-            "20 [ fib ] map ."
+            "35 [ fib ] map ."
         }
     }
     { $slide "The Factor UI"
@@ -113,13 +135,6 @@ IN: minneapolis-talk
         "Backends for Windows, X11, Cocoa"
         "You can call Windows, X11, Cocoa APIs directly too"
         "OpenGL 2.1 shaders, OpenAL 3D audio..."
-    }
-    { $slide "Implementation"
-        "Very small C core"
-        "Non-optimizing compiler"
-        "Optimizing compiler"
-        "Generational garbage collector"
-        "Non-blocking I/O"
     }
     { $slide "Live coding demo"
         
@@ -133,6 +148,24 @@ IN: minneapolis-talk
     { $slide "Live coding demo"
         
     }
+    { $slide "Deployment"
+        { "Let's play " { $vocab-link "tetris" } }
+    }
+    { $slide "Implementation"
+        "Portable: Windows, Mac OS X, Linux"
+        "Non-optimizing compiler"
+        "Optimizing compiler: x86, x86-64, PowerPC, ARM"
+        "Generational garbage collector"
+        "Non-blocking I/O"
+    }
+    { $slide "Some statistics"
+        "VM: 11,800 lines of C"
+        "Core library: 22,600 lines of Factor"
+        "Docs, tests, extra libraries: 117,000 lines of Factor"
+    }
+    { $slide "But wait, there's more!"
+        "Web server and framework, syntax highlighting, Ogg Theora video, SMTP, embedded Prolog, efficient unboxed arrays, XML, Unicode 5.0, memory mapped files, regular expressions, LDAP, database access, coroutines, Factor->JavaScript compiler, JSON, pattern matching, advanced math, parser generators, serialization, RSS/Atom, ..."
+    }
     { $slide "Community"
         "Factor development began in 2003"
         "About a dozen contributors"
@@ -140,8 +173,8 @@ IN: minneapolis-talk
         { "Web site: " { $url "http://factorcode.org" } }
         "IRC: #concatenative on irc.freenode.net"
         "Mailing list: factor-talk@lists.sf.net"
-        { "Let's play " { $vocab-link "space-invaders" } }
     }
+    { $slide "Questions?" }
 } ;
 
 : minneapolis-talk minneapolis-slides slides-window ;
