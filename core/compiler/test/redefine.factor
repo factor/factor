@@ -239,4 +239,14 @@ DEFER: flushable-test-2
 
 [ t ] [ \ ax compiled-usage [ drop interned? ] assoc-all? ] unit-test
 
-[ "one" "two" ] [ "DEFER: redefine-test1 : redefine-test2 redefine-test1 \"two\" ; : redefine-test1 \"one\" ; redefine-test2" eval ] unit-test
+DEFER: defer-redefine-test-2
+
+[ ] [ "IN: temporary DEFER: defer-redefine-test-1" eval ] unit-test
+
+[ ] [ "IN: temporary : defer-redefine-test-2 defer-redefine-test-1 1 ;" eval ] unit-test
+
+[ defer-redefine-test-2 ] unit-test-fails
+
+[ ] [ "IN: temporary : defer-redefine-test-1 2 ;" eval ] unit-test
+
+[ 1 ] [ defer-redefine-test-2 ] unit-test
