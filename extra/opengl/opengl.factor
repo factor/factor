@@ -4,7 +4,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types continuations kernel libc math macros namespaces
 math.vectors math.constants math.functions math.parser opengl.gl opengl.glu
-combinators arrays sequences splitting words ;
+combinators arrays sequences splitting words byte-arrays ;
 IN: opengl
 
 : coordinates [ first2 ] 2apply ;
