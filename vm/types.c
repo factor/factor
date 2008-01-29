@@ -235,6 +235,34 @@ DEFINE_PRIMITIVE(resize_array)
 	dpush(tag_object(reallot_array(array,capacity,F)));
 }
 
+F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity)
+{
+	CELL to_copy = array_capacity(array);
+	if(capacity < to_copy)
+		to_copy = capacity;
+
+	REGISTER_UNTAGGED(array);
+
+	F_BYTE_ARRAY *new_array = allot_array_internal(untag_header(array->header),capacity);
+
+	UNREGISTER_UNTAGGED(array);
+
+	memcpy(new_array + 1,array + 1,to_copy * CELLS);
+	memset(AREF(new_array,to_copy),0,capacity - to_copy)   ;
+
+	for(i = to_copy; i < capacity; i++)
+		set_array_nth(new_array,i,fill);
+
+	return new_array;
+}
+
+DEFINE_PRIMITIVE(resize_array)
+{
+	F_ARRAY* array = untag_array(dpop());
+	CELL capacity = unbox_array_size();
+	dpush(tag_object(reallot_array(array,capacity,F)));
+}
+
 DEFINE_PRIMITIVE(array_to_vector)
 {
 	F_VECTOR *vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
