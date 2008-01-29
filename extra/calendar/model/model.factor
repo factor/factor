@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar namespaces models threads ;
+USING: calendar namespaces models threads init ;
 IN: calendar.model
 
 SYMBOL: time
@@ -12,4 +12,4 @@ SYMBOL: time
 : time-thread ( -- ) [ (time-thread) ] in-thread ;
 
 f <model> time set-global
-time-thread
+[ time-thread ] "calendar.model" add-init-hook
