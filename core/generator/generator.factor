@@ -20,7 +20,6 @@ SYMBOL: compiled
     {
         { [ dup compiled get key? ] [ drop ] }
         { [ dup primitive? ] [ drop ] }
-        { [ dup deferred? ] [ drop ] }
         { [ t ] [ dup compile-queue get set-at ] }
     } cond ;
 

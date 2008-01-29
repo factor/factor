@@ -238,3 +238,5 @@ DEFER: flushable-test-2
 [ \ bx forget ] with-compilation-unit
 
 [ t ] [ \ ax compiled-usage [ drop interned? ] assoc-all? ] unit-test
+
+[ "one" "two" ] [ "DEFER: redefine-test1 : redefine-test2 redefine-test1 \"two\" ; : redefine-test1 \"one\" ; redefine-test2" eval ] unit-test
