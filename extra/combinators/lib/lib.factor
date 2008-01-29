@@ -98,8 +98,6 @@ MACRO: nfirst ( n -- )
 
 : count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
 
-: all-unique? ( seq -- ? ) [ prune ] keep [ length ] 2apply = ;
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! short circuiting words
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -173,14 +171,24 @@ MACRO: parallel-call ( quots -- )
 ! map-call and friends
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: (make-call-with) ( quots -- quot ) 
+  [ [ keep ] curry ] map concat [ drop ] append ;
+
+MACRO: call-with ( quots -- )
+  (make-call-with) ;
+
 MACRO: map-call-with ( quots -- )
-  [ [ [ keep ] curry ] map concat ] keep length [ nip narray ] curry compose ;
+  [ (make-call-with) ] keep length [ narray ] curry compose ;
+
+: (make-call-with2) ( quots -- quot )
+  [ [ 2dup >r >r ] swap append [ r> r> ] append ] map concat
+  [ 2drop ] append ;
+
+MACRO: call-with2 ( quots -- )
+  (make-call-with2) ;
 
 MACRO: map-call-with2 ( quots -- )
-  dup >r
-  [ [ 2dup >r >r ] swap append [ r> r> ] append ] map concat
-  [ 2drop ] append
-  r> length [ narray ] curry append ;
+  dup >r (make-call-with2) r> length [ narray ] curry append ;
 
 MACRO: map-exec-with ( words -- ) [ 1quotation ] map [ map-call-with ] curry ;
 

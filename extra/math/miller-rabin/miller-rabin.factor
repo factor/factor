@@ -1,5 +1,6 @@
 USING: combinators combinators.lib io locals kernel math
-math.functions math.ranges namespaces random sequences ;
+math.functions math.ranges namespaces random sequences
+hashtables ;
 IN: math.miller-rabin
 
 SYMBOL: a

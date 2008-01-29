@@ -7,8 +7,6 @@ IN: temporary
 [ 50 ] [ 100 [1,b] [ even? ] count ] unit-test
 [ 50 ] [ 100 [1,b] [ odd? ] count ] unit-test
 [ 328350 ] [ 100 [ sq ] sigma ] unit-test
-[ f ] [ { 0 1 1 2 3 5 } all-unique? ] unit-test
-[ t ] [ { 0 1 2 3 4 5 } all-unique? ] unit-test
 
 : infers? [ infer drop ] curry catch not ;
 

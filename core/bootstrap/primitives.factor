@@ -5,22 +5,32 @@ USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes tuples
 kernel.private vocabs vocabs.loader source-files definitions
-slots classes.union compiler.units ;
+slots classes.union compiler.units bootstrap.image.private
+io.files ;
 
 "Creating primitives and basic runtime structures..." print flush
 
-load-help? off
 crossref off
-
-! Bring up a bare cross-compiling vocabulary.
-"syntax" vocab vocab-words bootstrap-syntax set
 
 "resource:core/bootstrap/syntax.factor" parse-file
 
+"resource:core/cpu/" architecture get {
+       { "x86.32" "x86/32" }
+       { "x86.64" "x86/64" }
+       { "linux-ppc" "ppc/linux" }
+       { "macosx-ppc" "ppc/macosx" }
+       { "arm" "arm" }
+   } at "/bootstrap.factor" 3append parse-file
+
+! Now we have ( syntax-quot arch-quot ) on the stack
+
+! Bring up a bare cross-compiling vocabulary.
+"syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
 H{ } clone changed-words set
 [ drop ] recompile-hook set
 
+call
 call
 
 ! Create some empty vocabs where the below primitives and
@@ -558,8 +568,6 @@ builtins get num-tags get tail f union-class define-class
     { "alien>u16-string" "alien" }
     { "string>u16-alien" "alien" }
     { "(throw)" "kernel.private" }
-    { "string>memory" "alien" }
-    { "memory>string" "alien" }
     { "alien-address" "alien" }
     { "slot" "slots.private" }
     { "set-slot" "slots.private" }

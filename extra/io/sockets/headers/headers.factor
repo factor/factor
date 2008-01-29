@@ -9,6 +9,10 @@ C-STRUCT: etherneth
     { { "char" 6 } "smac" }
     { "ushort" "type" } ;
 
+: >mac-address ( byte-array -- string )
+    6 memory>byte-array
+    [ >hex 2 48 pad-left ] { } map-as ":" join ;
+
 : etherneth. ( etherneth -- )
     [ etherneth-dmac "Dest   MAC: " write >mac-address . ] keep
     [ etherneth-smac "Source MAC: " write >mac-address . ] keep

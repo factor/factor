@@ -363,12 +363,6 @@ DEFINE_PRIMITIVE(resize_string)
 		} \
 		return s; \
 	} \
-	DEFINE_PRIMITIVE(memory_to_##type##_string) \
-	{ \
-		CELL length = to_cell(dpop()); \
-		const type *string = unbox_alien(); \
-		dpush(tag_object(memory_to_##type##_string(string,length))); \
-	} \
 	F_STRING *from_##type##_string(const type *str) \
 	{ \
 		CELL length = 0; \
