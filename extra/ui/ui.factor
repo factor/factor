@@ -122,7 +122,7 @@ SYMBOL: ui-hook
 : notify ( gadget -- )
     dup gadget-graft-state dup first { f f } { t t } ? pick set-gadget-graft-state {
         { { f t } [ dup activate-control graft* ] }
-        { { t f } [ dup activate-control ungraft* ] }
+        { { t f } [ dup deactivate-control ungraft* ] }
     } case ;
 
 : notify-queued ( -- )
