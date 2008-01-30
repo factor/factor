@@ -57,13 +57,7 @@ uniform sampler2D colormap, normalmap, depthmap;
 uniform vec4 line_color;
 varying vec2 coord;
 
-const float DEPTH_RATIO_THRESHOLD = 1.001, NORMAL_DOT_THRESHOLD = 1.0, SAMPLE_SPREAD = 1.0/512.0;
-
-bool
-is_normal_border(vec3 norm1, vec3 norm2)
-{
-    return dot(norm1, norm2) < NORMAL_DOT_THRESHOLD;
-}
+const float DEPTH_RATIO_THRESHOLD = 1.001, SAMPLE_SPREAD = 1.0/512.0;
 
 float
 depth_sample(vec2 c)
@@ -97,33 +91,39 @@ border_factor(vec2 c)
          coord3 = c + vec2(-SAMPLE_SPREAD,  SAMPLE_SPREAD),
          coord4 = c + vec2( SAMPLE_SPREAD,  SAMPLE_SPREAD);
     
-    vec4 depths = vec4(depth_sample(coord1),
-                       depth_sample(coord2),
-                       depth_sample(coord3),
-                       depth_sample(coord4));
-    if (depths == vec4(1, 1, 1, 1))
-        return 0.0;
-    
-    vec3 ratios1 = depths.xxx/depths.yzw, ratios2 = depths.yyz/depths.zww;
-    
-    if (are_depths_border(ratios1) || are_depths_border(ratios2))
-        return 1.0;
-    
     vec3 normal1 = normal_sample(coord1),
          normal2 = normal_sample(coord2),
          normal3 = normal_sample(coord3),
          normal4 = normal_sample(coord4);
+
+    if (dot(normal1, normal1) < 0.5
+        && dot(normal2, normal2) < 0.5
+        && dot(normal3, normal3) < 0.5
+        && dot(normal4, normal4) < 0.5) {
+        return 0.0;
+    } else {
+        vec4 depths = vec4(depth_sample(coord1),
+                           depth_sample(coord2),
+                           depth_sample(coord3),
+                           depth_sample(coord4));
     
-    float normal_border = 1.0 - min6(
-        dot(normal1, normal2),
-        dot(normal1, normal3),
-        dot(normal1, normal4),
-        dot(normal2, normal3),
-        dot(normal2, normal4),
-        dot(normal3, normal4)
-    );
+        vec3 ratios1 = depths.xxx/depths.yzw, ratios2 = depths.yyz/depths.zww;
     
-    return normal_border;
+        if (are_depths_border(ratios1) || are_depths_border(ratios2)) {
+            return 1.0;
+        } else {
+            float normal_border = 1.0 - min6(
+                dot(normal1, normal2),
+                dot(normal1, normal3),
+                dot(normal1, normal4),
+                dot(normal2, normal3),
+                dot(normal2, normal4),
+                dot(normal3, normal4)
+            );
+    
+            return normal_border;
+        }
+    }
 }
 
 void
