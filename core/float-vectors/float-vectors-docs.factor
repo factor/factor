@@ -24,7 +24,7 @@ HELP: <float-vector>
 { $description "Creates a new float vector that can hold " { $snippet "n" } " floats before resizing." } ;
 
 HELP: >float-vector
-{ $values { "seq" "a sequence" } { "vector" vector } }
+{ $values { "seq" "a sequence" } { "float-vector" float-vector } }
 { $description "Outputs a freshly-allocated float vector with the same elements as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than real numbers." } ;
 
