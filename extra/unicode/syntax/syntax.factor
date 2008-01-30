@@ -47,14 +47,6 @@ IN: unicode.syntax
     CREATE ";" parse-tokens
     categories swap seq-minus define-category ; parsing
 
-TUPLE: code-point lower title upper ;
-
-C: <code-point> code-point
-
-: set-code-point ( seq -- )
-    4 head [ multihex ] map first4
-    <code-point> swap first set ;
-
 : UNICHAR:
     ! This should be part of CHAR:
     scan name>char [ parsed ] [ "Invalid character" throw ] if* ; parsing
