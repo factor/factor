@@ -85,45 +85,38 @@ DEFER: grapheme-table
 : chars ( i str n -- str[i] str[i+n] )
     swap >r dupd + r> [ ?nth ] curry 2apply ;
 
-: next-grapheme-step ( i str -- i+1 str prev-class )
-    2dup nth grapheme-class >r >r 1+ r> r> ;
+: find-index ( seq quot -- i ) find drop ; inline
+: find-last-index ( seq quot -- i ) find-last drop ; inline
 
-: (next-grapheme) ( i str prev-class -- next-i )
-    3dup drop bounds-check? [
-        >r next-grapheme-step r> over grapheme-break?
-        [ 2drop 1- ] [ (next-grapheme) ] if
-    ] [ 2drop ] if ;
+: first-grapheme ( str -- i )
+    unclip-slice grapheme-class over
+    [ grapheme-class tuck grapheme-break? ] find-index
+    nip swap length or 1+ ;
 
-: next-grapheme ( i str -- next-i )
-    next-grapheme-step (next-grapheme) ;
+: (>graphemes) ( str -- )
+    dup empty? [ drop ] [
+        dup first-grapheme cut-slice
+        swap , (>graphemes)
+    ] if ;
 
-: (>graphemes) ( i str -- )
-    2dup bounds-check? [
-        dupd [ next-grapheme ] keep
-        [ subseq , ] 2keep (>graphemes)
-    ] [ 2drop ] if ;
 : >graphemes ( str -- graphemes )
-    [ 0 swap (>graphemes) ] { } make* ;
+    [ (>graphemes) ] { } make ;
 
 : string-reverse ( str -- rts )
     >graphemes reverse concat ;
 
-: prev-grapheme-step ( i str -- i-1 str prev-class )
-    2dup nth grapheme-class >r >r 1- r> r> ;
+: unclip-last-slice ( seq -- beginning last )
+    dup 1 head-slice* swap peek ;
 
-: (prev-grapheme) ( i str next-class -- prev-i )
-    pick zero? [
-        >r prev-grapheme-step r> dupd grapheme-break?
-        [ 2drop 1- ] [ (prev-grapheme) ] if
-    ] [ 2drop ] if ;
+: last-grapheme ( str -- i )
+    unclip-last-slice grapheme-class swap
+    [ grapheme-class dup rot grapheme-break? ] find-last-index
+    nip -1 or 1+ ;
 
-: prev-grapheme ( i str -- prev-i )
-    prev-grapheme-step (prev-grapheme) ;
-
-[
+<<
     other-extend-lines process-other-extend \ other-extend define-value
 
     init-grapheme-table table
     [ make-grapheme-table finish-table ] with-variable
     \ grapheme-table define-value
-] with-compilation-unit
+>>
