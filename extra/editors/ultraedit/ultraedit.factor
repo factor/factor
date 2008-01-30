@@ -10,7 +10,7 @@ IN: editors.ultraedit
 
 : ultraedit ( file line -- )
     [
-        ultraedit-path , [ % "/" % # "/1" % ] "" make ,
+        ultraedit-path , [ swap % "/" % # "/1" % ] "" make ,
     ] { } make run-detached drop ;
 
 

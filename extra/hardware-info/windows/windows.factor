@@ -1,11 +1,9 @@
 USING: alien alien.c-types kernel libc math namespaces
 windows windows.kernel32 windows.advapi32
+hardware-info.windows.backend
 words combinators vocabs.loader hardware-info.backend ;
 IN: hardware-info.windows
 
-TUPLE: wince ;
-TUPLE: winnt ;
-UNION: windows wince winnt ;
 USE: system
 
 : system-info ( -- SYSTEM_INFO )

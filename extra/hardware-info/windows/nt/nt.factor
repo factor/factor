@@ -1,4 +1,4 @@
-USING: alien alien.c-types hardware-info hardware-info.windows
+USING: alien alien.c-types hardware-info.windows.backend
 kernel libc math namespaces hardware-info.backend
 windows windows.advapi32 windows.kernel32 ;
 IN: hardware-info.windows.nt

@@ -1,5 +1,5 @@
 USING: editors io.files io.launcher kernel math.parser
-namespaces windows.shell32 ;
+namespaces sequences windows.shell32 ;
 IN: editors.notepadpp
 
 : notepadpp-path
@@ -11,6 +11,6 @@ IN: editors.notepadpp
     [
         notepadpp-path ,
         "-n" swap number>string append , ,
-    ] "" make run-detached drop ;
+    ] { } make run-detached drop ;
 
 [ notepadpp ] edit-hook set-global

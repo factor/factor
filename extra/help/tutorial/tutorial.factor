@@ -23,7 +23,7 @@ $nl
 $nl
 "Now, we tell Factor that all definitions in this source file should go into the " { $snippet "palindrome" } " vocabulary using the " { $link POSTPONE: IN: } " word:"
 { $code "IN: palindrome" }
-"You are now ready to go onto the nex section." ;
+"You are now ready to go on to the next section." ;
 
 ARTICLE: "first-program-logic" "Writing some logic in your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
