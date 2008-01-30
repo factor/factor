@@ -1,21 +1,14 @@
 USING: alien alien.c-types kernel libc math namespaces
 windows windows.kernel32 windows.advapi32
-words combinators vocabs.loader hardware-info.backend ;
+words combinators vocabs.loader hardware-info.backend
+system ;
 IN: hardware-info.windows
-
-TUPLE: wince ;
-TUPLE: winnt ;
-UNION: windows wince winnt ;
-USE: system
 
 : system-info ( -- SYSTEM_INFO )
     "SYSTEM_INFO" <c-object> [ GetSystemInfo ] keep ;
 
 : page-size ( -- n )
     system-info SYSTEM_INFO-dwPageSize ;
-
-M: windows cpus ( -- n )
-    system-info SYSTEM_INFO-dwNumberOfProcessors ;
 
 ! 386, 486, 586, 2200 (IA64), 8664 (AMD_X8664)
 : processor-type ( -- n )
@@ -70,8 +63,7 @@ M: windows cpus ( -- n )
 : system-windows-directory ( -- str )
     \ GetSystemWindowsDirectory get-directory ;
 
-<< {
+{
     { [ wince? ] [ "hardware-info.windows.ce" ] }
     { [ winnt? ] [ "hardware-info.windows.nt" ] }
-    { [ t ] [ f ] }
-} cond [ require ] when* >>
+} cond [ require ] when*
