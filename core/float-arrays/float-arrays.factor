@@ -32,6 +32,8 @@ M: float-array equal?
 M: float-array resize
     resize-float-array ;
 
+M: float-array new-resizable drop <float-vector> ;
+
 INSTANCE: float-array sequence
 INSTANCE: float-array simple-c-ptr
 INSTANCE: float-array c-ptr

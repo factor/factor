@@ -28,4 +28,6 @@ M: bit-vector new
 M: bit-vector equal?
     over bit-vector? [ sequence= ] [ 2drop f ] if ;
 
+M: bit-array new-resizable drop <bit-vector> ;
+
 INSTANCE: bit-vector growable

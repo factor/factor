@@ -28,4 +28,6 @@ M: byte-vector new
 M: byte-vector equal?
     over byte-vector? [ sequence= ] [ 2drop f ] if ;
 
+M: byte-array new-resizable drop <byte-vector> ;
+
 INSTANCE: byte-vector growable

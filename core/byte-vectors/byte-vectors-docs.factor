@@ -24,7 +24,7 @@ HELP: <byte-vector>
 { $description "Creates a new byte vector that can hold " { $snippet "n" } " bytes before resizing." } ;
 
 HELP: >byte-vector
-{ $values { "seq" "a sequence" } { "byte-vector" vector } }
+{ $values { "seq" "a sequence" } { "byte-vector" byte-vector } }
 { $description "Outputs a freshly-allocated byte vector with the same elements as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than integers." } ;
 
