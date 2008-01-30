@@ -3,7 +3,15 @@ kernel libc math namespaces hardware-info.backend
 windows windows.advapi32 windows.kernel32 ;
 IN: hardware-info.windows.nt
 
+TUPLE: winnt ;
+
 T{ winnt } os set-global
+
+: system-info ( -- SYSTEM_INFO )
+    "SYSTEM_INFO" <c-object> [ GetSystemInfo ] keep ;
+
+M: winnt cpus ( -- n )
+    system-info SYSTEM_INFO-dwNumberOfProcessors ;
 
 : memory-status ( -- MEMORYSTATUSEX )
     "MEMORYSTATUSEX" <c-object>

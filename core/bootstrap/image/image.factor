@@ -320,24 +320,33 @@ M: quotation '
 ! Vectors and sbufs
 
 M: vector '
-    dup underlying ' swap length
-    vector type-number object tag-number [
-        emit-fixnum ! length
+    dup length swap underlying '
+    tuple type-number tuple tag-number [
+        4 emit-fixnum
+        vector ' emit
+        f ' emit
         emit ! array ptr
+        emit-fixnum ! length
     ] emit-object ;
 
 M: sbuf '
-    dup underlying ' swap length
-    sbuf type-number object tag-number [
-        emit-fixnum ! length
+    dup length swap underlying '
+    tuple type-number tuple tag-number [
+        4 emit-fixnum
+        sbuf ' emit
+        f ' emit
         emit ! array ptr
+        emit-fixnum ! length
     ] emit-object ;
 
 ! Hashes
 
 M: hashtable '
     [ hash-array ' ] keep
-    hashtable type-number object tag-number [
+    tuple type-number tuple tag-number [
+        5 emit-fixnum
+        hashtable ' emit
+        f ' emit
         dup hash-count emit-fixnum
         hash-deleted emit-fixnum
         emit ! array ptr

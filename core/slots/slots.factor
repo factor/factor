@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private math namespaces
 sequences strings words effects generic generic.standard
-classes slots.private ;
+classes slots.private combinators ;
 IN: slots
 
 TUPLE: slot-spec type name offset reader writer ;
@@ -87,14 +87,23 @@ PREDICATE: word slot-writer "writing" word-prop >boolean ;
 : simple-writer-word ( class name -- word )
     (simple-slot-word) writer-word ;
 
-: simple-slot ( class name # -- spec )
+: short-slot ( class name # -- spec )
     >r object bootstrap-word over r> f f <slot-spec>
     2over simple-reader-word over set-slot-spec-reader
     -rot simple-writer-word over set-slot-spec-writer ;
 
+: long-slot ( spec # -- spec )
+    >r [ dup array? [ first2 create ] when ] map first4 r>
+    -rot <slot-spec> ;
+
 : simple-slots ( class slots base -- specs )
-    over length [ + ] with map
-    [ >r >r dup r> r> simple-slot ] 2map nip ;
+    over length [ + ] with map [
+        {
+            { [ over not ] [ 2drop f ] }
+            { [ over string? ] [ >r dupd r> short-slot ] }
+            { [ over array? ] [ long-slot ] }
+        } cond
+    ] 2map [ ] subset nip ;
 
 : slot-of-reader ( reader specs -- spec/f )
     [ slot-spec-reader eq? ] with find nip ;

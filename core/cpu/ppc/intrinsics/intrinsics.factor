@@ -586,43 +586,6 @@ IN: cpu.ppc.intrinsics
     { +output+ { "wrapper" } }
 } define-intrinsic
 
-\ (hashtable) [
-    hashtable 4 cells %allot
-    f v>operand 12 LI
-    12 11 1 cells STW
-    12 11 2 cells STW
-    12 11 3 cells STW
-    ! Store tagged ptr in reg
-    "hashtable" get object %store-tagged
-] H{
-    { +scratch+ { { f "hashtable" } } }
-    { +output+ { "hashtable" } }
-} define-intrinsic
-
-\ string>sbuf [
-    sbuf 3 cells %allot
-    "length" operand 11 1 cells STW
-    "string" operand 11 2 cells STW
-    ! Store tagged ptr in reg
-    "sbuf" get object %store-tagged
-] H{
-    { +input+ { { f "string" } { f "length" } } }
-    { +scratch+ { { f "sbuf" } } }
-    { +output+ { "sbuf" } }
-} define-intrinsic
-
-\ array>vector [
-    vector 3 cells %allot
-    "length" operand 11 1 cells STW
-    "array" operand 11 2 cells STW
-    ! Store tagged ptr in reg
-    "vector" get object %store-tagged
-] H{
-    { +input+ { { f "array" } { f "length" } } }
-    { +scratch+ { { f "vector" } } }
-    { +output+ { "vector" } }
-} define-intrinsic
-
 ! Alien intrinsics
 : %alien-accessor ( quot -- )
     "offset" operand dup %untag-fixnum

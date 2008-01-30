@@ -30,10 +30,10 @@ HELP: >vector
 { $values { "seq" "a sequence" } { "vector" vector } }
 { $description "Outputs a freshly-allocated vector with the same elements as a given sequence." } ;
 
-HELP: array>vector ( array length -- vector )
+HELP: array>vector
 { $values { "array" "an array" } { "length" "a non-negative integer" } { "vector" vector } }
 { $description "Creates a new vector using the array for underlying storage with the specified initial length." }
-{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it does not perform type or bounds checks. User code should call " { $link >vector } " instead." } ;
+{ $warning "This word is in the " { $vocab-link "vectors.private" } " vocabulary because it does not perform type or bounds checks. User code should call " { $link >vector } " instead." } ;
 
 HELP: 1vector
 { $values { "x" object } { "vector" vector } }

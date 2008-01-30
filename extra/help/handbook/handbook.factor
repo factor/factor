@@ -110,15 +110,21 @@ USE: io.buffers
 ARTICLE: "collections" "Collections" 
 { $heading "Sequences" }
 { $subsection "sequences" }
-"Sequence implementations:"
+"Fixed-length sequences:"
 { $subsection "arrays" }
-{ $subsection "vectors" }
+{ $subsection "quotations" }
+"Fixed-length specialized sequences:"
+{ $subsection "strings" }
 { $subsection "bit-arrays" }
 { $subsection "byte-arrays" }
 { $subsection "float-arrays" }
-{ $subsection "strings" }
+"Resizable sequence:"
+{ $subsection "vectors" }
+"Resizable specialized sequences:"
 { $subsection "sbufs" }
-{ $subsection "quotations" }
+{ $subsection "bit-vectors" }
+{ $subsection "byte-vectors" }
+{ $subsection "float-vectors" }
 { $heading "Associative mappings" }
 { $subsection "assocs" }
 { $subsection "namespaces" }

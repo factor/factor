@@ -1,14 +1,16 @@
-USING: alien.c-types hardware-info hardware-info.windows
-kernel math namespaces windows windows.kernel32
-hardware-info.backend ;
+USING: alien.c-types hardware-info kernel math namespaces
+windows windows.kernel32 hardware-info.backend ;
 IN: hardware-info.windows.ce
 
+TUPLE: wince ;
 T{ wince } os set-global
 
 : memory-status ( -- MEMORYSTATUS )
     "MEMORYSTATUS" <c-object>
     "MEMORYSTATUS" heap-size over set-MEMORYSTATUS-dwLength
     [ GlobalMemoryStatus ] keep ;
+
+M: wince cpus ( -- n ) 1 ;
 
 M: wince memory-load ( -- n )
     memory-status MEMORYSTATUS-dwMemoryLoad ;

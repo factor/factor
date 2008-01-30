@@ -39,6 +39,13 @@ INLINE void type_check(CELL type, CELL tagged)
 	if(type_of(tagged) != type) type_error(type,tagged);
 }
 
+#define DEFINE_UNTAG(type,check,name) \
+	INLINE type *untag_##name(CELL obj) \
+	{ \
+		type_check(check,obj); \
+		return untag_object(obj); \
+	}
+
 /* Global variables used to pass fault handler state from signal handler to
 user-space */
 CELL signal_number;
