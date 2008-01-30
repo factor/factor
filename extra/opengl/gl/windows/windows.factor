@@ -29,6 +29,7 @@ PRIVATE>
     scan
     scan
     dup gl-function-number [ gl-function-pointer ] 2curry swap
+    scan drop "}" parse-tokens drop
     ";" parse-tokens [ "()" subseq? not ] subset
     define-indirect
     ; parsing
