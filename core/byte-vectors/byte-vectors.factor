@@ -14,7 +14,7 @@ PRIVATE>
 : <byte-vector> ( n -- byte-vector )
     <byte-array> 0 byte-array>vector ; inline
 
-: >byte-vector ( seq -- byte-vector ) V{ } clone-like ;
+: >byte-vector ( seq -- byte-vector ) BV{ } clone-like ;
 
 M: byte-vector like
     drop dup byte-vector? [

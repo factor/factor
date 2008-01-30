@@ -14,7 +14,7 @@ PRIVATE>
 : <bit-vector> ( n -- bit-vector )
     <bit-array> 0 bit-array>vector ; inline
 
-: >bit-vector ( seq -- bit-vector ) V{ } clone-like ;
+: >bit-vector ( seq -- bit-vector ) ?V{ } clone-like ;
 
 M: bit-vector like
     drop dup bit-vector? [

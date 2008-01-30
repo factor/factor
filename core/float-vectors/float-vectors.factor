@@ -14,7 +14,7 @@ PRIVATE>
 : <float-vector> ( n -- float-vector )
     0.0 <float-array> 0 float-array>vector ; inline
 
-: >float-vector ( seq -- float-vector ) V{ } clone-like ;
+: >float-vector ( seq -- float-vector ) FV{ } clone-like ;
 
 M: float-vector like
     drop dup float-vector? [
