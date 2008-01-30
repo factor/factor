@@ -28,4 +28,6 @@ M: float-vector new
 M: float-vector equal?
     over float-vector? [ sequence= ] [ 2drop f ] if ;
 
+M: float-array new-resizable drop <float-vector> ;
+
 INSTANCE: float-vector growable
