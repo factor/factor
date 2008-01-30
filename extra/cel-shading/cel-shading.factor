@@ -1,5 +1,5 @@
 USING: arrays bunny combinators.lib io io.files kernel
-       math math.functions multiline
+       math math.functions multiline continuations debugger
        opengl opengl.gl opengl-demo-support
        sequences ui ui.gadgets ui.render ;
 IN: cel-shading
@@ -58,14 +58,14 @@ main()
     <simple-gl-program> ;
 
 M: cel-shading-gadget graft* ( gadget -- )
-    "2.0" { "GL_ARB_shader_objects" } require-gl-version-or-extensions
+    [ "2.0" { "GL_ARB_shader_objects" } require-gl-version-or-extensions
     0.0 0.0 0.0 1.0 glClearColor
     GL_CULL_FACE glEnable
     GL_DEPTH_TEST glEnable
-    cel-shading-program swap set-cel-shading-gadget-program ;
+    cel-shading-program swap set-cel-shading-gadget-program ] [ ] [ :c ] cleanup ;
 
 M: cel-shading-gadget ungraft* ( gadget -- )
-    cel-shading-gadget-program delete-gl-program ;
+    cel-shading-gadget-program [ delete-gl-program ] when* ;
 
 : cel-shading-draw-setup ( gadget -- gadget )
     [ demo-gadget-set-matrices ] keep
