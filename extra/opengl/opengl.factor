@@ -255,7 +255,7 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 : c-true? ( int -- ? ) zero? not ; inline
 
 : with-gl-shader-source-ptr ( string quot -- )
-    swap >byte-array malloc-byte-array [
+    swap string>char-alien malloc-byte-array [
         <void*> swap call
     ] keep free ; inline
 
@@ -294,9 +294,8 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     GL_INFO_LOG_LENGTH gl-shader-get-int ; inline
 
 : gl-shader-info-log ( shader -- log )
-    dup gl-shader-info-log-length
-    dup [
-        0 <int> over glGetShaderInfoLog
+    dup gl-shader-info-log-length dup [
+        [ 0 <int> swap glGetShaderInfoLog ] keep
         alien>char-string
     ] with-malloc ;
 
@@ -330,9 +329,10 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
     GL_INFO_LOG_LENGTH gl-program-get-int ; inline
 
 : gl-program-info-log ( program -- log )
-    dup gl-program-info-log-length
-    dup [ [ 0 <int> swap glGetProgramInfoLog ] keep
-          alien>char-string ] with-malloc ;
+    dup gl-program-info-log-length dup [
+        [ 0 <int> swap glGetProgramInfoLog ] keep
+        alien>char-string
+    ] with-malloc ;
 
 : check-gl-program ( program -- program* )
     dup gl-program-ok? [ dup gl-program-info-log throw ] unless ;
@@ -342,7 +342,8 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
 
 : gl-program-shaders ( program -- shaders )
     dup gl-program-shaders-length [
-        dup "GLuint" <c-array> 0 <int> over glGetAttachedShaders
+        dup "GLuint" <c-array>
+        [ 0 <int> swap glGetAttachedShaders ] keep
     ] keep c-uint-array> ;
 
 : delete-gl-program-only ( program -- )
