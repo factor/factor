@@ -138,8 +138,6 @@ DECLARE_PRIMITIVE(resize_byte_array);
 DECLARE_PRIMITIVE(resize_bit_array);
 DECLARE_PRIMITIVE(resize_float_array);
 
-DECLARE_PRIMITIVE(array_to_vector);
-
 F_STRING* allot_string_internal(CELL capacity);
 F_STRING* allot_string(CELL capacity, CELL fill);
 DECLARE_PRIMITIVE(string);
@@ -170,10 +168,6 @@ DECLARE_PRIMITIVE(string_to_u16_alien);
 
 DECLARE_PRIMITIVE(char_slot);
 DECLARE_PRIMITIVE(set_char_slot);
-
-DECLARE_PRIMITIVE(string_to_sbuf);
-
-DECLARE_PRIMITIVE(hashtable);
 
 F_WORD *allot_word(CELL vocab, CELL name);
 DECLARE_PRIMITIVE(word);

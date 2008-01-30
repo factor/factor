@@ -34,31 +34,6 @@ DEFINE_PRIMITIVE(clone)
 	drepl(clone(dpeek()));
 }
 
-DEFINE_PRIMITIVE(array_to_vector)
-{
-	F_VECTOR *vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
-	vector->top = dpop();
-	vector->array = dpop();
-	dpush(tag_object(vector));
-}
-
-DEFINE_PRIMITIVE(string_to_sbuf)
-{
-	F_SBUF *sbuf = allot_object(SBUF_TYPE,sizeof(F_SBUF));
-	sbuf->top = dpop();
-	sbuf->string = dpop();
-	dpush(tag_object(sbuf));
-}
-
-DEFINE_PRIMITIVE(hashtable)
-{
-	F_HASHTABLE* hash = allot_object(HASHTABLE_TYPE,sizeof(F_HASHTABLE));
-	hash->count = F;
-	hash->deleted = F;
-	hash->array = F;
-	dpush(tag_object(hash));
-}
-
 F_WORD *allot_word(CELL vocab, CELL name)
 {
 	REGISTER_ROOT(vocab);

@@ -22,7 +22,9 @@ crossref off
        { "arm" "arm" }
    } at "/bootstrap.factor" 3append parse-file
 
-! Now we have ( syntax-quot arch-quot ) on the stack
+"resource:core/bootstrap/layouts/layouts.factor" parse-file
+
+! Now we have ( syntax-quot arch-quot layouts-quot ) on the stack
 
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab vocab-words bootstrap-syntax set
@@ -30,6 +32,7 @@ H{ } clone dictionary set
 H{ } clone changed-words set
 [ drop ] recompile-hook set
 
+call
 call
 call
 
@@ -180,41 +183,6 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"hashtable" "hashtables" create "hashtable?" "hashtables" create
-{
-    {
-        { "array-capacity" "sequences.private" }
-        "count"
-        { "hash-count" "hashtables.private" }
-        { "set-hash-count" "hashtables.private" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "deleted"
-        { "hash-deleted" "hashtables.private" }
-        { "set-hash-deleted" "hashtables.private" }
-    } {
-        { "array" "arrays" }
-        "array"
-        { "hash-array" "hashtables.private" }
-        { "set-hash-array" "hashtables.private" }
-    }
-} define-builtin
-
-"vector" "vectors" create "vector?" "vectors" create
-{
-    {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    } {
-        { "array" "arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    }
-} define-builtin
-
 "string" "strings" create "string?" "strings" create
 {
     {
@@ -222,22 +190,6 @@ num-types get f <array> builtins set
         "length"
         { "length" "sequences" }
         f
-    }
-} define-builtin
-
-"sbuf" "sbufs" create "sbuf?" "sbufs" create
-{
-    {
-        { "array-capacity" "sequences.private" }
-        "length"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-    {
-        { "string" "strings" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
     }
 } define-builtin
 
@@ -387,6 +339,56 @@ builtins get num-tags get tail f union-class define-class
 2array >tuple 1quotation define-inline
 
 ! Some tuple classes
+"hashtable" "hashtables" create
+{
+    {
+        { "array-capacity" "sequences.private" }
+        "count"
+        { "hash-count" "hashtables.private" }
+        { "set-hash-count" "hashtables.private" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "deleted"
+        { "hash-deleted" "hashtables.private" }
+        { "set-hash-deleted" "hashtables.private" }
+    } {
+        { "array" "arrays" }
+        "array"
+        { "hash-array" "hashtables.private" }
+        { "set-hash-array" "hashtables.private" }
+    }
+} define-tuple-class
+
+"sbuf" "sbufs" create
+{
+    {
+        { "string" "strings" }
+        "underlying"
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "length"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
+    }
+} define-tuple-class
+
+"vector" "vectors" create
+{
+    {
+        { "array" "arrays" }
+        "underlying"
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "fill"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
+    }
+} define-tuple-class
+
 "byte-vector" "byte-vectors" create
 {
     {
@@ -440,7 +442,6 @@ builtins get num-tags get tail f union-class define-class
     { "(execute)" "words.private" }
     { "(call)" "kernel.private" }
     { "uncurry" "kernel.private" }
-    { "string>sbuf" "sbufs.private" }
     { "bignum>fixnum" "math.private" }
     { "float>fixnum" "math.private" }
     { "fixnum>bignum" "math.private" }
@@ -593,7 +594,6 @@ builtins get num-tags get tail f union-class define-class
     { "set-char-slot" "strings.private" }
     { "resize-array" "arrays" }
     { "resize-string" "strings" }
-    { "(hashtable)" "hashtables.private" }
     { "<array>" "arrays" }
     { "begin-scan" "memory" }
     { "next-object" "memory" }
@@ -608,7 +608,6 @@ builtins get num-tags get tail f union-class define-class
     { "fclose" "io.streams.c" }
     { "<wrapper>" "kernel" }
     { "(clone)" "kernel" }
-    { "array>vector" "vectors.private" }
     { "<string>" "strings" }
     { "(>tuple)" "tuples.private" }
     { "array>quotation" "quotations.private" }

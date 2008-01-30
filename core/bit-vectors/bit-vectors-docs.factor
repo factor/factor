@@ -28,6 +28,6 @@ HELP: >bit vector
 { $description "Outputs a freshly-allocated bit vector with the same elements as a given sequence." } ;
 
 HELP: bit-array>vector
-{ $values { "bit-array" "an array" } { "capacity" "a non-negative integer" } { "bit-vector" bit-vector } }
+{ $values { "bit-array" "an array" } { "length" "a non-negative integer" } { "bit-vector" bit-vector } }
 { $description "Creates a new bit vector using the array for underlying storage with the specified initial length." }
 { $warning "This word is in the " { $vocab-link "bit-vectors.private" } " vocabulary because it does not perform type or bounds checks. User code should call " { $link >bit-vector } " instead." } ;
