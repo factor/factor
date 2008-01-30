@@ -148,8 +148,16 @@ SYMBOL: load-help?
     dup update-roots
     dup modified-sources swap modified-docs ;
 
+: require-restart { { "Ignore this vocabulary" t } } ;
+
 : require-all ( seq -- )
-    [ [ require ] each ] with-compiler-errors ;
+    [
+        [
+            [ require ]
+            [ require-restart rethrow-restarts drop ]
+            recover
+        ] each
+    ] with-compiler-errors ;
 
 : do-refresh ( modified-sources modified-docs -- )
     2dup
