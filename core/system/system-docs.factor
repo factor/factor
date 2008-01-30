@@ -49,6 +49,7 @@ HELP: os
         "linux"
         "macosx"
         "openbsd"
+        "netbsd"
         "solaris"
         "windows"
     }

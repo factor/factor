@@ -1,0 +1,4 @@
+include vm/Config.unix
+PLAF_DLL_OBJS += vm/os-genunix.o vm/os-netbsd.o
+CFLAGS += -export-dynamic
+LIBS = -L/usr/local/lib/ -L/usr/pkg/lib -Wl,-rpath,/usr/pkg/lib -lm $(X11_UI_LIBS)
