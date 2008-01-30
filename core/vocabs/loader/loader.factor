@@ -154,7 +154,7 @@ SYMBOL: load-help?
     [
         [
             [ require ]
-            [ require-restart rethrow-restarts drop ]
+            [ require-restart rethrow-restarts 2drop ]
             recover
         ] each
     ] with-compiler-errors ;
