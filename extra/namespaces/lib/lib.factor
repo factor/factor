@@ -16,4 +16,4 @@ IN: namespaces.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: set* ( val var -- ) namestack* set-hash-stack ;
+: set* ( val var -- ) namestack* set-assoc-stack ;
