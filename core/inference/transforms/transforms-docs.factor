@@ -1,5 +1,5 @@
-USING: help.markup help.syntax inference.transforms
-combinators words ;
+IN: inference.transforms
+USING: help.markup help.syntax combinators words kernel ;
 
 HELP: define-transform
 { $values { "word" word } { "quot" "a quotation taking " { $snippet "n" } " inputs from the stack and producing another quotation as output" } { "n" "a non-negative integer" } }
@@ -12,3 +12,8 @@ HELP: define-transform
 $nl
 "The " { $link cond } " word compiles to efficient code because it is transformed using " { $link cond>quot } ":"
 { $code "\\ cond [ cond>quot ] 1 define-transform" } } ;
+
+HELP: duplicated-slots-error
+{ $values { "names" "a sequence of setter words" } }
+{ $description "Throws a " { $link duplicated-slots-error } "." }
+{ $error-description "Thrown by stack effect inference if a " { $link set-slots } " form is given an array of slot setters that includes duplicates. Since writing to the same slot multiple times has no useful effect, this is a programmer error, so it is caught at compile time." } ;

@@ -15,10 +15,9 @@ M: windows-io destruct-handle CloseHandle drop ;
 
 M: windows-io destruct-socket closesocket drop ;
 
-TUPLE: win32-file handle ptr overlapped ;
+TUPLE: win32-file handle ptr ;
 
-: <win32-file> ( handle ptr -- obj )
-    f win32-file construct-boa ;
+C: <win32-file> win32-file
 
 : <win32-duplex-stream> ( in out -- stream )
     >r f <win32-file> r> f <win32-file> handle>duplex-stream ;

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs hashtables inference kernel
 math namespaces sequences words parser math.intervals
-effects classes inference.dataflow inference.backend ;
+effects classes inference.dataflow inference.backend
+combinators ;
 IN: inference.class
 
 ! Class inference
@@ -181,8 +182,11 @@ M: pair constraint-satisfied?
     ] if* ;
 
 : default-output-classes ( word -- classes )
-    "inferred-effect" word-prop effect-out
-    dup [ class? ] all? [ drop f ] unless ;
+    "inferred-effect" word-prop {
+        { [ dup not ] [ drop f ] }
+        { [ dup effect-out [ class? ] all? not ] [ drop f ] }
+        { [ t ] [ effect-out ] }
+    } cond ;
 
 : compute-output-classes ( node word -- classes intervals )
     dup node-param "output-classes" word-prop dup

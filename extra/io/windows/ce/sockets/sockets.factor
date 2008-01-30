@@ -78,7 +78,7 @@ M: windows-ce-io <datagram> ( addrspec -- datagram )
     packet-size receive-buffer make-WSABUF ;
 
 : packet-data ( len -- byte-array )
-    receive-buffer swap memory>string >byte-array ;
+    receive-buffer swap memory>byte-array ;
 
 packet-size <byte-array> receive-buffer set-global
 

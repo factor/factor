@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel words sequences generic math namespaces
 quotations assocs combinators math.bitfields inference.backend
-inference.dataflow inference.state tuples.private effects ;
+inference.dataflow inference.state tuples.private effects
+inspector hashtables ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )
@@ -59,7 +60,18 @@ M: pair (bitfield-quot) ( spec -- quot )
 
 \ get-slots [ [get-slots] ] 1 define-transform
 
-\ set-slots [ <reversed> [get-slots] ] 1 define-transform
+TUPLE: duplicated-slots-error names ;
+
+M: duplicated-slots-error summary
+    drop "Calling set-slots with duplicate slot setters" ;
+
+: duplicated-slots-error ( names -- * )
+    \ duplicated-slots-error construct-boa throw ;
+
+\ set-slots [
+    dup all-unique?
+    [ <reversed> [get-slots] ] [ duplicated-slots-error ] if
+] 1 define-transform
 
 \ construct-boa [
     dup +inlined+ depends-on

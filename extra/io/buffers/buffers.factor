@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight.
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.buffers
-USING: alien alien.syntax kernel kernel.private libc math
-sequences strings hints ;
+USING: alien alien.c-types alien.syntax kernel kernel.private
+libc math sequences strings hints ;
 
 TUPLE: buffer size ptr fill pos ;
 
@@ -39,14 +39,14 @@ TUPLE: buffer size ptr fill pos ;
 
 : (buffer>) ( n buffer -- string )
     [ dup buffer-fill swap buffer-pos - min ] keep
-    buffer@ swap memory>string ;
+    buffer@ swap memory>char-string ;
 
 : buffer> ( n buffer -- string )
     [ (buffer>) ] 2keep buffer-consume ;
 
 : (buffer>>) ( buffer -- string )
     dup buffer-pos over buffer-ptr <displaced-alien>
-    over buffer-fill rot buffer-pos - memory>string ;
+    over buffer-fill rot buffer-pos - memory>char-string ;
 
 : buffer>> ( buffer -- string )
     dup (buffer>>) 0 rot buffer-reset ;
@@ -87,7 +87,7 @@ HINTS: search-buffer-until { fixnum fixnum simple-alien string } ;
 
 : >buffer ( string buffer -- )
     over length over check-overflow
-    [ buffer-end string>memory ] 2keep
+    [ buffer-end string>char-memory ] 2keep
     [ buffer-fill swap length + ] keep set-buffer-fill ;
 
 : ch>buffer ( ch buffer -- )

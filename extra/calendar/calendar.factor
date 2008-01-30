@@ -333,16 +333,18 @@ M: integer year. ( n -- )
 M: timestamp year. ( timestamp -- )
     timestamp-year year. ;
 
-: pad-00 number>string 2 CHAR: 0 pad-left write ;
+: pad-00 number>string 2 CHAR: 0 pad-left ;
+
+: write-00 pad-00 write ;
 
 : (timestamp>string) ( timestamp -- )
     dup day-of-week day-abbreviations3 nth write ", " write
     dup timestamp-day number>string write bl
     dup timestamp-month month-abbreviations nth write bl
     dup timestamp-year number>string write bl
-    dup timestamp-hour pad-00 ":" write
-    dup timestamp-minute pad-00 ":" write
-    timestamp-second >fixnum pad-00 ;
+    dup timestamp-hour write-00 ":" write
+    dup timestamp-minute write-00 ":" write
+    timestamp-second >fixnum write-00 ;
 
 : timestamp>string ( timestamp -- str )
     [ (timestamp>string) ] string-out ;
@@ -357,11 +359,11 @@ M: timestamp year. ( timestamp -- )
 
 : (timestamp>rfc3339) ( timestamp -- )
     dup timestamp-year number>string write CHAR: - write1
-    dup timestamp-month pad-00 CHAR: - write1
-    dup timestamp-day pad-00 CHAR: T write1
-    dup timestamp-hour pad-00 CHAR: : write1
-    dup timestamp-minute pad-00 CHAR: : write1
-    timestamp-second >fixnum pad-00 CHAR: Z write1 ;
+    dup timestamp-month write-00 CHAR: - write1
+    dup timestamp-day write-00 CHAR: T write1
+    dup timestamp-hour write-00 CHAR: : write1
+    dup timestamp-minute write-00 CHAR: : write1
+    timestamp-second >fixnum write-00 CHAR: Z write1 ;
 
 : timestamp>rfc3339 ( timestamp -- str )
     >gmt [ (timestamp>rfc3339) ] string-out ;
@@ -390,8 +392,8 @@ M: timestamp year. ( timestamp -- )
         [ timestamp-month month-abbreviations nth write ] keep bl
         [ timestamp-day number>string 2 32 pad-left write ] keep bl
         dup now [ timestamp-year ] 2apply = [
-            [ timestamp-hour pad-00 ] keep ":" write
-            timestamp-minute pad-00
+            [ timestamp-hour write-00 ] keep ":" write
+            timestamp-minute write-00
         ] [
             timestamp-year number>string 5 32 pad-left write
         ] if
