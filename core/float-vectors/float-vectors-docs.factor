@@ -20,7 +20,7 @@ HELP: float-vector
 { $description "The class of resizable float vectors. See " { $link "syntax-float-vectors" } " for syntax and " { $link "float-vectors" } " for general information." } ;
 
 HELP: <float-vector>
-{ $values { "n" "a positive integer specifying initial capacity" } { "vector" vector } }
+{ $values { "n" "a positive integer specifying initial capacity" } { "float-vector" float-vector } }
 { $description "Creates a new float vector that can hold " { $snippet "n" } " floats before resizing." } ;
 
 HELP: >float-vector

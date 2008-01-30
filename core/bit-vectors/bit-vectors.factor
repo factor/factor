@@ -6,7 +6,7 @@ IN: bit-vectors
 
 <PRIVATE
 
-: bit-array>vector ( bit-array -- bit-vector )
+: bit-array>vector ( bit-array length -- bit-vector )
     bit-vector construct-boa ; inline
 
 PRIVATE>

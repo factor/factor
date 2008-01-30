@@ -10,3 +10,5 @@ USING: tools.test bit-vectors vectors sequences kernel math ;
     3 <bit-vector> dup do-it
     3 <vector> dup do-it sequence=
 ] unit-test
+
+[ t ] [ ?V{ } bit-vector? ] unit-test

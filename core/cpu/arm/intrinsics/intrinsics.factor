@@ -383,41 +383,6 @@ IN: cpu.arm.intrinsics
     { +output+ { "out" } }
 } define-intrinsic
 
-\ (hashtable) [
-    hashtable 4 cells %allot
-    R12 f v>operand MOV
-    R12 1 %set-slot
-    R12 2 %set-slot
-    R12 3 %set-slot
-    ! Store tagged ptr in reg
-    "out" get object %store-tagged
-] H{
-    { +scratch+ { { f "out" } } }
-    { +output+ { "out" } }
-} define-intrinsic
-
-\ string>sbuf [
-    sbuf 3 cells %allot
-    "length" operand 1 %set-slot
-    "string" operand 2 %set-slot
-    "out" get object %store-tagged
-] H{
-    { +input+ { { f "string" } { f "length" } } }
-    { +scratch+ { { f "out" } } }
-    { +output+ { "out" } }
-} define-intrinsic
-
-\ array>vector [
-    vector 3 cells %allot
-    "length" operand 1 %set-slot
-    "array" operand 2 %set-slot
-    "out" get object %store-tagged
-] H{
-    { +input+ { { f "array" } { f "length" } } }
-    { +scratch+ { { f "out" } } }
-    { +output+ { "out" } }
-} define-intrinsic
-
 ! Alien intrinsics
 : %alien-accessor ( quot -- )
     "offset" operand dup %untag-fixnum

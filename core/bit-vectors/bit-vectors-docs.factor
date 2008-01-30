@@ -20,11 +20,11 @@ HELP: bit-vector
 { $description "The class of resizable bit vectors. See " { $link "syntax-bit-vectors" } " for syntax and " { $link "bit-vectors" } " for general information." } ;
 
 HELP: <bit-vector>
-{ $values { "n" "a positive integer specifying initial capacity" } { "vector" vector } }
+{ $values { "n" "a positive integer specifying initial capacity" } { "bit-vector" bit-vector } }
 { $description "Creates a new bit vector that can hold " { $snippet "n" } " bits before resizing." } ;
 
-HELP: >bit vector
-{ $values { "seq" "a sequence" } { "vector" vector } }
+HELP: >bit-vector
+{ $values { "seq" "a sequence" } { "bit-vector" bit-vector } }
 { $description "Outputs a freshly-allocated bit vector with the same elements as a given sequence." } ;
 
 HELP: bit-array>vector

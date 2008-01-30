@@ -20,7 +20,7 @@ HELP: byte-vector
 { $description "The class of resizable byte vectors. See " { $link "syntax-byte-vectors" } " for syntax and " { $link "byte-vectors" } " for general information." } ;
 
 HELP: <byte-vector>
-{ $values { "n" "a positive integer specifying initial capacity" } { "vector" vector } }
+{ $values { "n" "a positive integer specifying initial capacity" } { "byte-vector" byte-vector } }
 { $description "Creates a new byte vector that can hold " { $snippet "n" } " bytes before resizing." } ;
 
 HELP: >byte-vector
