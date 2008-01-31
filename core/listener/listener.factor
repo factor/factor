@@ -18,11 +18,10 @@ GENERIC: stream-read-quot ( stream -- quot/f )
     [ parse-lines in get ] with-compilation-unit in set ;
 
 : read-quot-step ( lines -- quot/f )
-    [ parse-lines-interactive ] catch {
-        { [ dup delegate unexpected-eof? ] [ 2drop f ] }
-        { [ dup not ] [ drop ] }
-        { [ t ] [ rethrow ] }
-    } cond ;
+    [ parse-lines-interactive ] [
+        dup delegate unexpected-eof?
+        [ 2drop f ] [ rethrow ] if
+    ] recover ;
 
 : read-quot-loop  ( stream accum -- quot/f )
     over stream-readln dup [
