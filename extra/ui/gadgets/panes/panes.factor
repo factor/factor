@@ -8,7 +8,7 @@ hashtables io kernel namespaces sequences io.styles strings
 quotations math opengl combinators math.vectors
 io.streams.duplex sorting splitting io.streams.nested assocs
 ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
-ui.gadgets.grid-lines tuples models ;
+ui.gadgets.grid-lines tuples models continuations ;
 IN: ui.gadgets.panes
 
 TUPLE: pane output current prototype scrolls?
@@ -161,7 +161,7 @@ M: pane-stream stream-write
 M: pane-stream stream-format
     [ rot string-lines pane-format ] do-pane-stream ;
 
-M: pane-stream stream-close drop ;
+M: pane-stream dispose drop ;
 
 M: pane-stream stream-flush drop ;
 
@@ -249,7 +249,7 @@ TUPLE: nested-pane-stream style parent ;
 
 TUPLE: pane-block-stream ;
 
-M: pane-block-stream stream-close
+M: pane-block-stream dispose
     unnest-pane-stream write-gadget ;
 
 M: pane-stream make-block-stream
@@ -272,7 +272,7 @@ M: pane-stream make-block-stream
 
 TUPLE: pane-cell-stream ;
 
-M: pane-cell-stream stream-close ?nl ;
+M: pane-cell-stream dispose ?nl ;
 
 M: pane-stream make-cell-stream
     <nested-pane-stream> pane-cell-stream construct-delegate ;
@@ -284,9 +284,9 @@ M: pane-stream stream-write-table
     r> print-gadget ;
 
 ! Stream utilities
-M: pack stream-close drop ;
+M: pack dispose drop ;
 
-M: paragraph stream-close drop ;
+M: paragraph dispose drop ;
 
 : gadget-write ( string gadget -- )
     over empty? [

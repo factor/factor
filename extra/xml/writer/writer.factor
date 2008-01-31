@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel math namespaces sequences strings
-io io.streams.string xml.data assocs ;
+io io.streams.string xml.data assocs wrap xml.entities ;
 IN: xml.writer
 
 SYMBOL: xml-pprint?
@@ -13,10 +13,13 @@ SYMBOL: indenter
 : sensitive? ( tag -- ? )
     sensitive-tags get swap [ names-match? ] curry contains? ;
 
+: indent-string ( -- string )
+    xml-pprint? get
+    [ indentation get indenter get <repetition> concat ]
+    [ "" ] if ;
+
 : ?indent ( -- )
-    xml-pprint? get [
-        nl indentation get indenter get <repetition> [ write ] each
-    ] when ;
+    xml-pprint? get [ nl indent-string write ] when ;
 
 : indent ( -- )
     xml-pprint? get [ 1 indentation +@ ] when ;
@@ -35,30 +38,6 @@ SYMBOL: indenter
         [ dup empty? swap string? and not ] subset
     ] when ;
 
-: entities-out
-    H{
-        { CHAR: < "&lt;"   }
-        { CHAR: > "&gt;"   }
-        { CHAR: & "&amp;"  }
-    } ;
-
-: quoted-entities-out
-    H{
-        { CHAR: & "&amp;"  }
-        { CHAR: ' "&apos;" }
-        { CHAR: " "&quot;" }
-    } ;
-
-: escape-string-by ( str table -- escaped )
-    #! Convert <, >, &, ' and " to HTML entities.
-    [ [ dupd at [ % ] [ , ] ?if ] curry each ] "" make ;
-
-: escape-string ( str -- newstr )
-    entities-out escape-string-by ;
-
-: escape-quoted-string ( str -- newstr )
-    quoted-entities-out escape-string-by ;
-
 : print-name ( name -- )
     dup name-space f like
     [ write CHAR: : write1 ] when*
@@ -76,10 +55,11 @@ SYMBOL: indenter
 GENERIC: write-item ( object -- )
 
 M: string write-item
-    escape-string write ;
+    escape-string dup empty? not xml-pprint? get and
+    [ nl 80 indent-string indented-break ] when write ;
 
 : write-tag ( tag -- )
-    CHAR: < write1
+    ?indent CHAR: < write1
     dup print-name tag-attrs print-attrs ;
 
 M: contained-tag write-item
@@ -87,7 +67,7 @@ M: contained-tag write-item
 
 : write-children ( tag -- )
     indent tag-children ?filter-children
-    [ ?indent write-item ] each unindent ;
+    [ write-item ] each unindent ;
 
 : write-end-tag ( tag -- )
     ?indent "</" write print-name CHAR: > write1 ;
@@ -112,7 +92,7 @@ M: instruction write-item
     "<?xml version=\"" write dup prolog-version write
     "\" encoding=\"" write dup prolog-encoding write
     prolog-standalone [ "\" standalone=\"yes" write ] when
-    "\"?>\n" write ;
+    "\"?>" write ;
 
 : write-chunk ( seq -- )
     [ write-item ] each ;

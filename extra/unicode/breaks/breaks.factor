@@ -1,7 +1,7 @@
 USING: unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
 combinators.lib assocs.lib math.ranges unicode.normalize
-unicode.syntax unicode.data compiler.units alien.syntax ;
+unicode.syntax unicode.data compiler.units alien.syntax const ;
 IN: unicode.breaks
 
 C-ENUM: Any L V T Extend Control CR LF graphemes ;
@@ -32,7 +32,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 : other-extend-lines ( -- lines )
     "extra/unicode/PropList.txt" resource-path file-lines ;
 
-DEFER: other-extend
+VALUE: other-extend
 
 CATEGORY: (extend) Me Mn ;
 : extend? ( ch -- ? )
@@ -77,7 +77,7 @@ SYMBOL: table
     T T connect
     graphemes Extend connect-after ;
 
-DEFER: grapheme-table
+VALUE: grapheme-table
 
 : grapheme-break? ( class1 class2 -- ? )
     grapheme-table nth nth not ;
@@ -113,10 +113,10 @@ DEFER: grapheme-table
     [ grapheme-class dup rot grapheme-break? ] find-last-index
     nip -1 or 1+ ;
 
-<<
-    other-extend-lines process-other-extend \ other-extend define-value
+[
+    other-extend-lines process-other-extend \ other-extend set-value
 
     init-grapheme-table table
     [ make-grapheme-table finish-table ] with-variable
-    \ grapheme-table define-value
->>
+    \ grapheme-table set-value
+] with-compilation-unit

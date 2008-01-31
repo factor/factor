@@ -63,7 +63,7 @@ SYMBOL: append-environment
         { replace-environment [ ] }
     } case ;
 
-GENERIC: >descriptor ( obj -- desc )
+GENERIC: >descriptor ( desc -- desc )
 
 M: string >descriptor +command+ associate ;
 M: sequence >descriptor +arguments+ associate ;
@@ -76,24 +76,24 @@ HOOK: run-process* io-backend ( desc -- handle )
         dup [ processes get at push stop ] curry callcc0
     ] when process-status ;
 
-: run-process ( obj -- process )
+: run-process ( desc -- process )
     >descriptor
     dup run-process*
     +detached+ rot at [ dup wait-for-process drop ] unless ;
 
-: run-detached ( obj -- process )
+: run-detached ( desc -- process )
     >descriptor H{ { +detached+ t } } union run-process ;
 
 HOOK: process-stream* io-backend ( desc -- stream process )
 
 TUPLE: process-stream process ;
 
-: <process-stream> ( obj -- stream )
+: <process-stream> ( desc -- stream )
     >descriptor process-stream*
     { set-delegate set-process-stream-process }
     process-stream construct ;
 
-: with-process-stream ( obj quot -- process )
+: with-process-stream ( desc quot -- process )
     swap <process-stream>
     [ swap with-stream ] keep
     process-stream-process ; inline

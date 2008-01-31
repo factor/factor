@@ -402,10 +402,14 @@ TUPLE: recursive-declare-error word ;
     dup node-param #return node,
     dataflow-graph get 1array over set-node-children ;
 
+: inlined-block? "inlined-block" word-prop ;
+
+: <inlined-block> gensym dup t "inlined-block" set-word-prop ;
+
 : inline-block ( word -- node-block data )
     [
         copy-inference nest-node
-        dup word-def swap gensym
+        dup word-def swap <inlined-block>
         [ infer-quot-recursive ] 2keep
         #label unnest-node
     ] H{ } make-assoc ;

@@ -2,11 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.streams.string
 USING: io kernel math namespaces sequences sbufs strings
-generic splitting io.streams.plain io.streams.lines ;
+generic splitting io.streams.plain io.streams.lines
+continuations ;
+
+M: sbuf dispose drop ;
 
 M: sbuf stream-write1 push ;
 M: sbuf stream-write push-all ;
-M: sbuf stream-close drop ;
 M: sbuf stream-flush drop ;
 
 : <string-writer> ( -- stream )

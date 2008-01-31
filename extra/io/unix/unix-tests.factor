@@ -63,7 +63,7 @@ yield
 
          "d" get send
 
-        "d" get stream-close
+        "d" get dispose
 
         "Done" print
 
@@ -104,7 +104,7 @@ client-addr <datagram>
     >r >string r>
 ] unit-test
 
-[ ] [ "d" get stream-close ] unit-test
+[ ] [ "d" get dispose ] unit-test
 
 ! Test error behavior
 
@@ -120,7 +120,7 @@ client-addr <datagram>
     B{ 1 2 3 } "unix-domain-datagram-test-3" <local> "d" get send
 ] unit-test-fails
 
-[ ] [ "d" get stream-close ] unit-test
+[ ] [ "d" get dispose ] unit-test
 
 ! See what happens on send/receive after close
 

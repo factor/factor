@@ -65,14 +65,14 @@ M: duplex-stream make-cell-stream
 M: duplex-stream stream-write-table
     duplex-stream-out+ stream-write-table ;
 
-M: duplex-stream stream-close
+M: duplex-stream dispose
     #! The output stream is closed first, in case both streams
     #! are attached to the same file descriptor, the output
     #! buffer needs to be flushed before we close the fd.
     dup duplex-stream-closed? [
         t over set-duplex-stream-closed?
-        [ dup duplex-stream-out stream-close ]
-        [ dup duplex-stream-in stream-close ] [ ] cleanup
+        [ dup duplex-stream-out dispose ]
+        [ dup duplex-stream-in dispose ] [ ] cleanup
     ] unless drop ;
 
 M: duplex-stream set-timeout

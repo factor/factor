@@ -19,8 +19,8 @@ SYMBOL: compiled
 : queue-compile ( word -- )
     {
         { [ dup compiled get key? ] [ drop ] }
+        { [ dup inlined-block? ] [ drop ] }
         { [ dup primitive? ] [ drop ] }
-        { [ dup deferred? ] [ drop ] }
         { [ t ] [ dup compile-queue get set-at ] }
     } cond ;
 
