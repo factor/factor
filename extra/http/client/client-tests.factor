@@ -7,3 +7,8 @@ USING: http.client tools.test ;
 [ 404 ] [ "404 File not found" parse-response ] unit-test
 [ 200 ] [ "HTTP/1.0 200" parse-response ] unit-test
 [ 200 ] [ "HTTP/1.0 200 Success" parse-response ] unit-test
+
+[ "foo.txt" ] [ "http://www.paulgraham.com/foo.txt" download-name ] unit-test
+[ "foo.txt" ] [ "http://www.arcsucks.com/foo.txt?xxx" download-name ] unit-test
+[ "foo.txt" ] [ "http://www.arcsucks.com/foo.txt/" download-name ] unit-test
+[ "www.arcsucks.com" ] [ "http://www.arcsucks.com////" download-name ] unit-test
