@@ -185,7 +185,7 @@ SYMBOL: line
     dup irc-client-profile profile-server
     over irc-client-profile profile-port connect*
     dup irc-client-profile profile-nickname login
-    [ irc-loop ] [ irc-stream> stream-close ] [ ] cleanup ;
+    [ irc-loop ] [ irc-stream> dispose ] [ ] cleanup ;
 
 : with-infinite-loop ( quot timeout -- quot timeout )
     "looping" print flush

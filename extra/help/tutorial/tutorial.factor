@@ -23,7 +23,7 @@ $nl
 $nl
 "Now, we tell Factor that all definitions in this source file should go into the " { $snippet "palindrome" } " vocabulary using the " { $link POSTPONE: IN: } " word:"
 { $code "IN: palindrome" }
-"You are now ready to go on to the next section." ;
+"You are now ready to go on to the next section: " { $link "first-program-logic" } "." ;
 
 ARTICLE: "first-program-logic" "Writing some logic in your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
@@ -56,7 +56,7 @@ $nl
 { $code "\\ = see" }
 "It's in the " { $vocab-link "kernel" } " vocabulary, which we've already added to the search path."
 
-"Now press " { $command workspace "workflow" refresh-all } " again, and the source file should reload without any errors." ;
+"Now press " { $command workspace "workflow" refresh-all } " again, and the source file should reload without any errors. You can now go on and learn about " { $link "first-program-test" } "." ;
 
 ARTICLE: "first-program-test" "Testing your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
@@ -92,7 +92,7 @@ $nl
 }
 "Now, you can run unit tests:"
 { $code "\"palindrome\" test" }
-"It should report that all tests have passed." ;
+"It should report that all tests have passed. Now you can read about " { $link "first-program-extend" } "." ;
 
 ARTICLE: "first-program-extend" "Extending your first program"
 "Our palindrome program works well, however we'd like to extend it to ignore spaces and non-alphabetical characters in the input."

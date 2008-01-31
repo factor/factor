@@ -1,4 +1,4 @@
-USING: help.markup help.syntax alien math ;
+USING: help.markup help.syntax alien math continuations ;
 IN: io.mmap
 
 HELP: mapped-file
@@ -15,21 +15,17 @@ HELP: <mapped-file>
 { $notes "You must call " { $link close-mapped-file } " when you are finished working with the returned object, to reclaim resources. The " { $link with-mapped-file } " provides an abstraction which can close the mapped file for you." }
 { $errors "Throws an error if a memory mapping could not be established." } ;
 
-HELP: (close-mapped-file)
-{ $values { "mmap" mapped-file } }
-{ $contract "Releases system resources associated with the mapped file. This word should not be called by user code; use " { $link close-mapped-file } " instead." }
-{ $errors "Throws an error if a memory mapping could not be established." } ;
-
 HELP: close-mapped-file
 { $values { "mmap" mapped-file } }
-{ $description "Releases system resources associated with the mapped file." }
+{ $contract "Releases system resources associated with the mapped file. This word should not be called by user code; use " { $link dispose } " instead." }
 { $errors "Throws an error if a memory mapping could not be established." } ;
 
 ARTICLE: "io.mmap" "Memory-mapped files"
 "The " { $vocab-link "io.mmap" } " vocabulary implements support for memory-mapped files."
 { $subsection <mapped-file> }
-{ $subsection close-mapped-file }
-"A combinator which wraps the above two words:"
+"Memory-mapped files are disposable and can be closed with " { $link dispose } " or " { $link with-disposal } "."
+$nl
+"A utility combinator which wraps the above:"
 { $subsection with-mapped-file }
 "Memory mapped files implement the " { $link "sequence-protocol" } " and present themselves as a sequence of bytes. The underlying memory area can also be accessed directly:"
 { $subsection mapped-file-address }

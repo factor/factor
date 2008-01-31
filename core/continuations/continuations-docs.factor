@@ -68,6 +68,15 @@ $nl
 
 ABOUT: "continuations"
 
+HELP: dispose
+{ $values { "object" "a disposable object" } }
+{ $contract "Releases operating system resources associated with a disposable object. No further operations can be performed on a disposable object after this call. Disposable objects include streams, memory mapped files, and so on." }
+{ $notes "You must close disposable objects after you are finished working with them, to avoid leaking operating system resources. A convenient way to automate this is by using the " { $link with-disposal } " word." } ;
+
+HELP: with-disposal
+{ $values { "object" "a disposable object" } { "quot" "a quotation with stack effect " { $snippet "( object -- )" } } }
+{ $description "Calls the quotation, disposing the object with " { $link dispose } " after the quotation returns or if it throws an error." } ;
+
 HELP: catchstack*
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Outputs the current catchstack." } ;

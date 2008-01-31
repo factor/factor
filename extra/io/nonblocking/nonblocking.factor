@@ -1,16 +1,20 @@
-! Copyright (C) 2005, 2007 Slava Pestov, Doug Coleman
+! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.nonblocking
-USING: math kernel io sequences io.buffers generic sbufs
-system io.streams.lines io.streams.plain io.streams.duplex
-continuations debugger classes byte-arrays namespaces
-splitting ;
+USING: math kernel io sequences io.buffers generic sbufs system
+io.streams.lines io.streams.plain io.streams.duplex io.backend
+continuations debugger classes byte-arrays namespaces splitting
+dlists ;
 
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
 
 ! Common delegate of native stream readers and writers
-TUPLE: port handle error timeout cutoff type eof? ;
+TUPLE: port
+handle
+error
+timeout-entry timeout cutoff
+type eof? ;
 
 SYMBOL: closed
 
@@ -41,18 +45,45 @@ GENERIC: close-handle ( handle -- )
 
 : handle>duplex-stream ( in-handle out-handle -- stream )
     <writer>
-    [ >r <reader> r> <duplex-stream> ] [ ] [ stream-close ]
+    [ >r <reader> r> <duplex-stream> ] [ ] [ dispose ]
     cleanup ;
-
-: touch-port ( port -- )
-    dup port-timeout dup zero?
-    [ 2drop ] [ millis + swap set-port-cutoff ] if ;
 
 : timeout? ( port -- ? )
     port-cutoff dup zero? not swap millis < and ;
 
 : pending-error ( port -- )
     dup port-error f rot set-port-error [ throw ] when* ;
+
+SYMBOL: timeout-queue
+
+<dlist> timeout-queue set-global
+
+: unqueue-timeout ( port -- )
+    port-timeout-entry [
+        timeout-queue get-global swap delete-node
+    ] when* ;
+
+: queue-timeout ( port -- )
+    dup timeout-queue get-global push-front*
+    swap set-port-timeout-entry ;
+
+HOOK: expire-port io-backend ( port -- )
+
+M: object expire-port drop ;
+
+: expire-timeouts ( -- )
+    timeout-queue get-global dup dlist-empty? [ drop ] [
+        dup peek-back timeout?
+        [ pop-back expire-port expire-timeouts ] [ drop ] if
+    ] if ;
+
+: touch-port ( port -- )
+    dup port-timeout dup zero? [
+        2drop
+    ] [
+        millis + over set-port-cutoff
+        dup unqueue-timeout queue-timeout
+    ] if ;
 
 M: port set-timeout
     [ set-port-timeout ] keep touch-port ;
@@ -157,7 +188,7 @@ GENERIC: port-flush ( port -- )
 M: output-port stream-flush ( port -- )
     dup port-flush pending-error ;
 
-M: port stream-close
+M: port dispose
     dup port-type closed eq? [
         dup port-type >r closed over set-port-type r>
         output-port eq? [ dup port-flush ] when

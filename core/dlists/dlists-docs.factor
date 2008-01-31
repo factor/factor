@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel ;
+USING: help.markup help.syntax kernel quotations ;
 IN: dlists
 
 ARTICLE: "dlists" "Doubly-linked lists"
@@ -13,23 +13,31 @@ $nl
 { $subsection dlist? }
 "Constructing a dlist:"
 { $subsection <dlist> }
-"Double-ended queue protocol:"
-{ $subsection dlist-empty? }
+"Working with the front of the list:"
 { $subsection push-front }
+{ $subsection push-front* }
+{ $subsection peek-front }
 { $subsection pop-front }
 { $subsection pop-front* }
+"Working with the back of the list:"
 { $subsection push-back }
+{ $subsection push-back* }
+{ $subsection peek-back }
 { $subsection pop-back }
 { $subsection pop-back* }
 "Finding out the length:"
+{ $subsection dlist-empty? }
 { $subsection dlist-length }
 "Iterating over elements:"
 { $subsection dlist-each }
 { $subsection dlist-find }
 { $subsection dlist-contains? }
-"Deleting a node matching a predicate:"
-{ $subsection delete-node* }
+"Deleting a node:"
 { $subsection delete-node }
+{ $subsection dlist-delete }
+"Deleting a node matching a predicate:"
+{ $subsection delete-node-if* }
+{ $subsection delete-node-if }
 "Consuming all nodes:"
 { $subsection dlist-slurp } ;
 
@@ -77,7 +85,7 @@ HELP: pop-back*
 { $see-also push-front push-back pop-front pop-front* pop-back } ;
 
 HELP: dlist-find
-{ $values { "quot" "a quotation" } { "dlist" { $link dlist } } { "obj/f" "an object or " { $link f } } { "?" "a boolean" } }
+{ $values { "quot" quotation } { "dlist" { $link dlist } } { "obj/f" "an object or " { $link f } } { "?" "a boolean" } }
 { $description "Applies the quotation to each element of the " { $link dlist } " in turn, until it outputs a true value or the end of the " { $link dlist } " is reached.  Outputs either the object it found or " { $link f } ", and a boolean which is true if an object is found." }
 { $notes "Returns a boolean to allow dlists to store " { $link f } "."
     $nl
@@ -85,20 +93,20 @@ HELP: dlist-find
 } ;
 
 HELP: dlist-contains?
-{ $values { "quot" "a quotation" } { "dlist" { $link dlist } } { "?" "a boolean" } }
+{ $values { "quot" quotation } { "dlist" { $link dlist } } { "?" "a boolean" } }
 { $description "Just like " { $link dlist-find } " except it doesn't return the object." }
 { $notes "This operation is O(n)." } ;
 
-HELP: delete-node*
-{ $values { "quot" "a quotation" } { "dlist" { $link dlist } } { "obj/f" "an object or " { $link f } } { "?" "a boolean" } }
+HELP: delete-node-if*
+{ $values { "quot" quotation } { "dlist" { $link dlist } } { "obj/f" "an object or " { $link f } } { "?" "a boolean" } }
 { $description "Calls " { $link dlist-find } " on the " { $link dlist } " and deletes the node returned, if any.  Returns the value of the deleted node and a boolean to allow the deleted value to distinguished from " { $link f } ", for nothing deleted." }
 { $notes "This operation is O(n)." } ;
 
-HELP: delete-node
-{ $values { "quot" "a quotation" } { "dlist" { $link dlist } } { "obj/f" "an object or " { $link f } } }
-{ $description "Like " { $link delete-node* } " but cannot distinguish from deleting a node whose value is " { $link f } " or not deleting an element." }
+HELP: delete-node-if
+{ $values { "quot" quotation } { "dlist" { $link dlist } } { "obj/f" "an object or " { $link f } } }
+{ $description "Like " { $link delete-node-if* } " but cannot distinguish from deleting a node whose value is " { $link f } " or not deleting an element." }
 { $notes "This operation is O(n)." } ;
 
 HELP: dlist-each
-{ $values { "quot" "a quotation" } { "dlist" { $link dlist } } }
+{ $values { "quot" quotation } { "dlist" { $link dlist } } }
 { $description "Iterate a " { $link dlist } ", calling quot on each element." } ;

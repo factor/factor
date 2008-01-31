@@ -5,8 +5,6 @@ IN: io.monitor
 
 HOOK: <monitor> io-backend ( path recursive? -- monitor )
 
-HOOK: close-monitor io-backend ( monitor -- )
-
 HOOK: next-change io-backend ( monitor -- path changes )
 
 SYMBOL: +change-file+
@@ -16,4 +14,4 @@ SYMBOL: +change-attributes+
 SYMBOL: +change-modified+
 
 : with-monitor ( path recursive? quot -- )
-    >r <monitor> r> over [ close-monitor ] curry [ ] cleanup ;
+    >r <monitor> r> with-disposal ; inline
