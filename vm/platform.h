@@ -58,6 +58,9 @@
 			#else
 				#error "Unsupported OpenBSD flavor"
 			#endif
+		#elif defined(__NetBSD__)
+			#define FACTOR_OS_STRING "netbsd"
+			#include "os-netbsd.h"
 		#elif defined(linux)
 			#define FACTOR_OS_STRING "linux"
 			#include "os-linux.h"
