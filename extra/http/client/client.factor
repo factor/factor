@@ -44,7 +44,7 @@ DEFER: http-get-stream
     #! Should this support Location: headers that are
     #! relative URLs?
     pick 100 /i 3 = [
-        stream-close "Location" swap at nip http-get-stream
+        stream-close "location" swap header-single nip http-get-stream
     ] when ;
 
 : http-get-stream ( url -- code headers stream )
