@@ -23,14 +23,12 @@ INSTANCE: mapped-file sequence
 
 HOOK: <mapped-file> io-backend ( path length -- mmap )
 
-HOOK: (close-mapped-file) io-backend ( mmap -- )
+HOOK: close-mapped-file io-backend ( mmap -- )
 
-: close-mapped-file ( mmap -- )
+M: mapped-file dispose ( mmap -- )
     check-closed
     t over set-mapped-file-closed?
-    (close-mapped-file) ;
+    close-mapped-file ;
 
 : with-mapped-file ( path length quot -- )
-    >r <mapped-file> r>
-    [ keep ] curry
-    [ close-mapped-file ] [ ] cleanup ; inline
+    >r <mapped-file> r> with-disposal ; inline

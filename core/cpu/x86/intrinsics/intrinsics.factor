@@ -447,45 +447,6 @@ IN: cpu.x86.intrinsics
     { +output+ { "wrapper" } }
 } define-intrinsic
 
-\ (hashtable) [
-    hashtable 4 cells [
-        1 object@ f v>operand MOV
-        2 object@ f v>operand MOV
-        3 object@ f v>operand MOV
-        ! Store tagged ptr in reg
-        "hashtable" get object %store-tagged
-    ] %allot
-] H{
-    { +scratch+ { { f "hashtable" } } }
-    { +output+ { "hashtable" } }
-} define-intrinsic
-
-\ string>sbuf [
-    sbuf 3 cells [
-        1 object@ "length" operand MOV
-        2 object@ "string" operand MOV
-        ! Store tagged ptr in reg
-        "sbuf" get object %store-tagged
-    ] %allot
-] H{
-    { +input+ { { f "string" } { f "length" } } }
-    { +scratch+ { { f "sbuf" } } }
-    { +output+ { "sbuf" } }
-} define-intrinsic
-
-\ array>vector [
-    vector 3 cells [
-        1 object@ "length" operand MOV
-        2 object@ "array" operand MOV
-        ! Store tagged ptr in reg
-        "vector" get object %store-tagged
-    ] %allot
-] H{
-    { +input+ { { f "array" } { f "length" } } }
-    { +scratch+ { { f "vector" } } }
-    { +output+ { "vector" } }
-} define-intrinsic
-
 ! Alien intrinsics
 : %alien-accessor ( quot -- )
     "offset" operand %untag-fixnum

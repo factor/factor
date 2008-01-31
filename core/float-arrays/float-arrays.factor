@@ -29,6 +29,9 @@ M: float-array new drop 0.0 <float-array> ;
 M: float-array equal?
     over float-array? [ sequence= ] [ 2drop f ] if ;
 
+M: float-array resize
+    resize-float-array ;
+
 INSTANCE: float-array sequence
 INSTANCE: float-array simple-c-ptr
 INSTANCE: float-array c-ptr

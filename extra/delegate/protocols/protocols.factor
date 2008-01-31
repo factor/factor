@@ -15,7 +15,7 @@ PROTOCOL: assoc-protocol
     ! everything should work, just slower (with >alist)
 
 PROTOCOL: stream-protocol
-    stream-close stream-read1 stream-read stream-read-until
+    stream-read1 stream-read stream-read-until
     stream-flush stream-write1 stream-write stream-format
     stream-nl make-span-stream make-block-stream stream-readln
     make-cell-stream stream-write-table set-timeout ;

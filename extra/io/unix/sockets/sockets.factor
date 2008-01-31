@@ -15,8 +15,7 @@ libc combinators ;
     #! <client> don't set up error handlers until after <client>
     #! returns (and if they did before, they wouldn't have
     #! anything to close!)
-    dup port-error dup
-    [ swap stream-close throw ] [ 2drop ] if ;
+    dup port-error dup [ swap dispose throw ] [ 2drop ] if ;
 
 : socket-fd ( domain type -- socket )
     0 socket dup io-error dup init-handle ;

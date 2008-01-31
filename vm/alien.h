@@ -41,11 +41,7 @@ DLLEXPORT void to_value_struct(CELL src, void *dest, CELL size);
 DLLEXPORT void box_value_struct(void *src, CELL size);
 DLLEXPORT void box_small_struct(CELL x, CELL y, CELL size);
 
-INLINE F_DLL *untag_dll(CELL tagged)
-{
-	type_check(DLL_TYPE,tagged);
-	return (F_DLL*)UNTAG(tagged);
-}
+DEFINE_UNTAG(F_DLL,DLL_TYPE,dll)
 
 DECLARE_PRIMITIVE(dlopen);
 DECLARE_PRIMITIVE(dlsym);

@@ -1,10 +1,11 @@
-! Copyright (C) 2004, 2007 Mackenzie Straight, Doug Coleman.
+! Copyright (C) 2004, 2008 Mackenzie Straight, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays destructors io io.backend
 io.buffers io.files io.nonblocking io.sockets io.binary
 io.sockets.impl windows.errors strings io.streams.duplex kernel
 math namespaces sequences windows windows.kernel32
-windows.shell32 windows.types windows.winsock splitting ;
+windows.shell32 windows.types windows.winsock splitting
+continuations ;
 IN: io.windows
 
 TUPLE: windows-nt-io ;
@@ -15,10 +16,9 @@ M: windows-io destruct-handle CloseHandle drop ;
 
 M: windows-io destruct-socket closesocket drop ;
 
-TUPLE: win32-file handle ptr overlapped ;
+TUPLE: win32-file handle ptr ;
 
-: <win32-file> ( handle ptr -- obj )
-    f win32-file construct-boa ;
+C: <win32-file> win32-file
 
 : <win32-duplex-stream> ( in out -- stream )
     >r f <win32-file> r> f <win32-file> handle>duplex-stream ;
@@ -175,7 +175,7 @@ USE: namespaces
 : listen-on-socket ( socket -- )
     listen-backlog listen winsock-return-check ;
 
-M: win32-socket stream-close ( stream -- )
+M: win32-socket dispose ( stream -- )
     win32-file-handle closesocket drop ;
 
 M: windows-io addrinfo-error ( n -- )

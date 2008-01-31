@@ -1,53 +1,53 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types destructors io.windows kernel math windows
-windows.kernel32 windows.types libc assocs alien namespaces
-continuations io.monitor sequences hashtables sorting arrays ;
+USING: alien.c-types destructors io.windows
+io.windows.nt.backend kernel math windows windows.kernel32
+windows.types libc assocs alien namespaces continuations
+io.monitor io.nonblocking io.buffers io.files io sequences
+hashtables sorting arrays ;
 IN: io.windows.nt.monitor
 
-TUPLE: monitor handle recursive? buffer queue closed? ;
+TUPLE: monitor path recursive? queue closed? ;
 
 : open-directory ( path -- handle )
-    [
-        FILE_LIST_DIRECTORY
-        share-mode
-        f
-        OPEN_EXISTING
-        FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED bitor
-        f
-        CreateFile dup invalid-handle? dup close-later
-    ] with-destructors ;
-
-: buffer-size 65536 ; inline
+    FILE_LIST_DIRECTORY
+    share-mode
+    f
+    OPEN_EXISTING
+    FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED bitor
+    f
+    CreateFile
+    dup invalid-handle?
+    dup close-later
+    dup add-completion
+    f <win32-file> ;
 
 M: windows-nt-io <monitor> ( path recursive? -- monitor )
     [
-        >r open-directory r>
-        buffer-size malloc dup free-later f
-    ] with-destructors
-    f monitor construct-boa ;
+        >r dup open-directory monitor <buffered-port> r> {
+            set-monitor-path
+            set-delegate
+            set-monitor-recursive?
+        } monitor construct
+    ] with-destructors ;
 
 : check-closed ( monitor -- )
-    monitor-closed? [ "Monitor closed" throw ] when ;
+    port-type closed eq? [ "Monitor closed" throw ] when ;
 
-M: windows-nt-io close-monitor ( monitor -- )
-    dup check-closed
-    dup monitor-buffer free
-    dup monitor-handle CloseHandle drop
-    t swap set-monitor-closed? ;
+: begin-reading-changes ( monitor -- overlapped )
+    dup port-handle win32-file-handle
+    over buffer-ptr
+    pick buffer-size
+    roll monitor-recursive? 1 0 ?
+    FILE_NOTIFY_CHANGE_ALL
+    0 <uint>
+    (make-overlapped)
+    [ f ReadDirectoryChangesW win32-error=0/f ] keep ;
 
-: fill-buffer ( monitor -- bytes )
+: read-changes ( monitor -- bytes )
     [
-        dup monitor-handle
-        over monitor-buffer
-        buffer-size
-        roll monitor-recursive? 1 0 ?
-        FILE_NOTIFY_CHANGE_ALL
-        0 <uint> [
-            f
-            f
-            ReadDirectoryChangesW win32-error=0/f
-        ] keep *uint
+        dup begin-reading-changes swap [ save-callback ] 2keep
+        get-overlapped-result
     ] with-destructors ;
 
 : parse-action-flag ( action mask symbol -- action )
@@ -68,34 +68,30 @@ M: windows-nt-io close-monitor ( monitor -- )
         drop
     ] { } make ;
 
-: changed-file ( buffer -- changes path )
+: changed-file ( directory buffer -- changes path )
     {
         FILE_NOTIFY_INFORMATION-FileName
         FILE_NOTIFY_INFORMATION-FileNameLength
         FILE_NOTIFY_INFORMATION-Action
-    } get-slots parse-action -rot memory>u16-string ;
+    } get-slots >r memory>u16-string path+ r> parse-action swap ;
 
-: (changed-files) ( buffer -- )
-    dup changed-file namespace [ append ] change-at
-    dup FILE_NOTIFY_INFORMATION-NextEntryOffset
-    dup zero? [ 2drop ] [
-        swap <displaced-alien> (changed-files)
-    ] if ;
+: (changed-files) ( directory buffer -- )
+    2dup changed-file namespace [ append ] change-at
+    dup FILE_NOTIFY_INFORMATION-NextEntryOffset dup zero?
+    [ 3drop ] [ swap <displaced-alien> (changed-files) ] if ;
 
-: changed-files ( buffer len -- assoc )
-    [
-        zero? [ drop ] [ (changed-files) ] if
-    ] H{ } make-assoc ;
+: changed-files ( directory buffer len -- assoc )
+    [ zero? [ 2drop ] [ (changed-files) ] if ] H{ } make-assoc ;
 
 : fill-queue ( monitor -- )
-    dup monitor-buffer
-    over fill-buffer changed-files
+    dup monitor-path over buffer-ptr pick read-changes
+    changed-files
     swap set-monitor-queue ;
 
 M: windows-nt-io next-change ( monitor -- path changes )
     dup check-closed
     dup monitor-queue dup assoc-empty? [
-    drop dup fill-queue next-change
+        drop dup fill-queue next-change
     ] [
         nip delete-any prune natural-sort >array
     ] if ;

@@ -1,14 +1,14 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.streams.nested
 USING: arrays generic assocs kernel namespaces strings
-quotations io ;
+quotations io continuations ;
 
 TUPLE: ignore-close-stream ;
 
 : <ignore-close-stream> ignore-close-stream construct-delegate ;
 
-M: ignore-close-stream stream-close drop ;
+M: ignore-close-stream dispose drop ;
 
 TUPLE: style-stream style ;
 
@@ -44,4 +44,4 @@ TUPLE: block-stream ;
 
 : <block-stream> block-stream construct-delegate ;
 
-M: block-stream stream-close drop ;
+M: block-stream dispose drop ;

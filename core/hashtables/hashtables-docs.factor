@@ -116,10 +116,6 @@ HELP: <hashtable>
 { $values { "n" "a positive integer specifying hashtable capacity" } { "hash" "a new hashtable" } }
 { $description "Create a new hashtable capable of storing " { $snippet "n" } " key/value pairs before growing." } ;
 
-HELP: (hashtable) ( -- hash )
-{ $values { "hash" "a new hashtable" } }
-{ $description "Allocates a hashtable stub object without an underlying array. User code should call " { $link <hashtable> } " instead." } ;
-
 HELP: associate
 { $values { "value" "a value" } { "key" "a key" } { "hash" "a new " { $link hashtable } } }
 { $description "Create a new hashtable holding one key/value pair." } ;

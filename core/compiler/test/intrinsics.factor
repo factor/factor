@@ -334,10 +334,6 @@ cell 8 = [
 
 [ \ + ] [ \ + [ <wrapper> ] compile-call ] unit-test
 
-[ H{ } ] [
-    100 [ (hashtable) ] compile-call [ reset-hash ] keep
-] unit-test
-
 [ B{ 0 0 0 0 0 } ] [
     [ 5 <byte-array> ] compile-call
 ] unit-test

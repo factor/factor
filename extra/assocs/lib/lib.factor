@@ -9,16 +9,12 @@ IN: assocs.lib
 
 : ref-at ( table key -- value ) swap at ;
 
-! set-at with alternative stack effects
-
 : put-at* ( table key value -- ) swap rot set-at ;
 
 : put-at ( table key value -- table ) swap pick set-at ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : set-assoc-stack ( value key seq -- )
-  dupd [ key? ] with find-last nip set-at ;
+    dupd [ key? ] with find-last nip set-at ;
 
 : at-default ( key assoc -- value/key )
     dupd at [ nip ] when* ;

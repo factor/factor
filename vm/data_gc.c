@@ -177,12 +177,6 @@ CELL unaligned_object_size(CELL pointer)
 		return sizeof(F_QUOTATION);
 	case WORD_TYPE:
 		return sizeof(F_WORD);
-	case HASHTABLE_TYPE:
-		return sizeof(F_HASHTABLE);
-	case VECTOR_TYPE:
-		return sizeof(F_VECTOR);
-	case SBUF_TYPE:
-		return sizeof(F_SBUF);
 	case RATIO_TYPE:
 		return sizeof(F_RATIO);
 	case FLOAT_TYPE:

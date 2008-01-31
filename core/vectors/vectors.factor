@@ -1,9 +1,14 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel kernel.private math
-math.private sequences sequences.private vectors.private
-growable ;
+USING: arrays kernel math sequences sequences.private growable ;
 IN: vectors
+
+<PRIVATE
+
+: array>vector ( byte-array capacity -- byte-vector )
+    vector construct-boa ; inline
+
+PRIVATE>
 
 : <vector> ( n -- vector ) f <array> 0 array>vector ; inline
 

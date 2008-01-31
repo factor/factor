@@ -41,7 +41,7 @@ VARS: input user ;
 : ((send-input)) ( other -- ) [ input> print flush ] with-stream* ;
 
 : (send-input) ( other -- )
-[ ((send-input)) ] catch [ print dup stream-close users> delete ] when ;
+[ ((send-input)) ] catch [ print dup dispose users> delete ] when ;
 
 : send-input ( other -- )
 dup duplex-stream-closed? [ users> delete ] [ (send-input) ] if ;

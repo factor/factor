@@ -1,4 +1,4 @@
-USING: editors.gvim io.files io.windows kernel namespaces
+USING: editors.gvim.backend io.files io.windows kernel namespaces
 sequences windows.shell32 ;
 IN: editors.gvim.windows
 
