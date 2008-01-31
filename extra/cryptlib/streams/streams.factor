@@ -3,7 +3,7 @@
 USING: cryptlib cryptlib.libcl kernel alien sequences
 byte-arrays namespaces io.buffers math generic io strings
 io.streams.lines io.streams.plain io.streams.duplex combinators
-alien.c-types ;
+alien.c-types continuations ;
 
 IN: cryptlib.streams
 
