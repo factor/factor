@@ -75,8 +75,8 @@ ABOUT: "streams"
 
 HELP: set-timeout
 { $values { "n" "an integer" } { "stream" "a stream" } }
-{ $contract "Sets a timeout, in milliseconds, for closing the stream if there is no activity. Not all streams support timeouts." } 
-$io-error ;
+{ $contract "Sets a timeout, in milliseconds, for input and output operations on the stream. If a read or a write is initiated and no activity is seen before the timeout expires, an error will be thrown to the caller of the operation being performed." }
+{ $notes "Whether or not the stream is closed when the error is thrown is implementation-specific, and user code should take care to close the stream on all error conditions in any case." } ;
 
 HELP: stream-readln
 { $values { "stream" "an input stream" } { "str" string } }
