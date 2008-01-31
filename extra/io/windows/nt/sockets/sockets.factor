@@ -129,15 +129,16 @@ TUPLE: AcceptEx-args port
 
 M: windows-nt-io accept ( server -- client )
     [
-        dup check-server-port
-        dup touch-port
-        \ AcceptEx-args construct-empty
-        [ init-accept ] keep
-        [ (accept) ] keep
-        [ accept-continuation ] keep
-        AcceptEx-args-port pending-error
-        dup duplex-stream-in pending-error
-        dup duplex-stream-out pending-error
+        [
+            dup check-server-port
+            \ AcceptEx-args construct-empty
+            [ init-accept ] keep
+            [ (accept) ] keep
+            [ accept-continuation ] keep
+            AcceptEx-args-port pending-error
+            dup duplex-stream-in pending-error
+            dup duplex-stream-out pending-error
+        ] with-port-timeout
     ] with-destructors ;
 
 M: windows-nt-io <server> ( addrspec -- server )

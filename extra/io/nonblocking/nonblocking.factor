@@ -77,7 +77,7 @@ M: object expire-port drop ;
         [ pop-back expire-port expire-timeouts ] [ drop ] if
     ] if ;
 
-: touch-port ( port -- )
+: begin-timeout ( port -- )
     dup port-timeout dup zero? [
         2drop
     ] [
@@ -85,8 +85,13 @@ M: object expire-port drop ;
         dup unqueue-timeout queue-timeout
     ] if ;
 
-M: port set-timeout
-    [ set-port-timeout ] keep touch-port ;
+: end-timeout ( port -- )
+    unqueue-timeout ;
+
+: with-port-timeout ( port quot -- )
+    over begin-timeout keep end-timeout ; inline
+
+M: port set-timeout set-port-timeout ;
 
 GENERIC: (wait-to-read) ( port -- )
 
