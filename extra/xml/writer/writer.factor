@@ -14,7 +14,9 @@ SYMBOL: indenter
     sensitive-tags get swap [ names-match? ] curry contains? ;
 
 : indent-string ( -- string )
-    indentation get indenter get <repetition> concat ;
+    xml-pprint? get
+    [ indentation get indenter get <repetition> concat ]
+    [ "" ] if ;
 
 : ?indent ( -- )
     xml-pprint? get [ nl indent-string write ] when ;
@@ -53,7 +55,7 @@ SYMBOL: indenter
 GENERIC: write-item ( object -- )
 
 M: string write-item
-    escape-string xml-pprint? over empty? not and
+    escape-string dup empty? not xml-pprint? get and
     [ nl 80 indent-string indented-break ] when write ;
 
 : write-tag ( tag -- )
