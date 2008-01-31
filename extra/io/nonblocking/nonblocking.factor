@@ -4,7 +4,7 @@ IN: io.nonblocking
 USING: math kernel io sequences io.buffers generic sbufs system
 io.streams.lines io.streams.plain io.streams.duplex io.backend
 continuations debugger classes byte-arrays namespaces splitting
-dlists ;
+dlists assocs ;
 
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
@@ -56,7 +56,7 @@ GENERIC: close-handle ( handle -- )
 
 SYMBOL: timeout-queue
 
-<dlist> timeout-queue set-global
+timeout-queue global [ [ <dlist> ] unless* ] change-at
 
 : unqueue-timeout ( port -- )
     port-timeout-entry [
