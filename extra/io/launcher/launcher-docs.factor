@@ -93,7 +93,7 @@ HELP: run-process*
 { $notes "User code should call " { $link run-process } " instead." } ;
 
 HELP: >descriptor
-{ $values { "obj" object } { "desc" "a launch descriptor" } }
+{ $values { "desc" "a launch descriptor" } { "desc" "a launch descriptor" } }
 { $description "Creates a launch descriptor from an object, which must be one of the following:"
     { $list
         { "a string -- this is wrapped in a launch descriptor with a single " { $link +command+ } " key" }
@@ -103,12 +103,12 @@ HELP: >descriptor
 } ;
 
 HELP: run-process
-{ $values { "obj" object } { "process" process } }
+{ $values { "desc" "a launch descriptor" } { "process" process } }
 { $description "Launches a process. The object can either be a string, a sequence of strings or a launch descriptor. See " { $link >descriptor } " for details." }
 { $notes "The output value can be passed to " { $link wait-for-process } " to get an exit code." } ;
 
 HELP: run-detached
-{ $values { "obj" object } { "process" process } }
+{ $values { "desc" "a launch descriptor" } { "process" process } }
 { $contract "Launches a process without waiting for it to complete. The object can either be a string, a sequence of strings or a launch descriptor. See " { $link >descriptor } " for details." }
 { $notes
     "This word is functionally identical to passing a launch descriptor to " { $link run-process } " having the " { $link +detached+ } " key set."
@@ -127,12 +127,17 @@ HELP: process-stream
 { $class-description "A bidirectional stream for interacting with a running process. Instances are created by calling " { $link <process-stream> } ". The " { $link process-stream-process } " slot holds a " { $link process } " instance." } ;
 
 HELP: <process-stream>
-{ $values { "obj" object } { "stream" "a bidirectional stream" } }
+{ $values
+  { "desc" "a launch descriptor" }
+  { "stream" "a bidirectional stream" } }
 { $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream." }
 { $notes "Closing the stream will block until the process exits." } ;
 
 HELP: with-process-stream
-{ $values { "obj" object } { "quot" quotation } { "process" process } }
+{ $values
+  { "desc" "a launch descriptor" }
+  { "quot" quotation }
+  { "process" process } }
 { $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a " { $link process-stream } ". When the quotation returns, the " { $link process } " instance is output." } ;
 
 HELP: wait-for-process
