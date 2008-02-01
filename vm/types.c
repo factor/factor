@@ -429,10 +429,11 @@ F_STRING* allot_string_internal(CELL capacity)
 	/* strings are null-terminated in memory, even though they also
 	have a length field. The null termination allows us to add
 	the sizeof(F_STRING) to a Factor string to get a C-style
-	UCS-2 string for C library calls. */
-	cput(SREF(string,capacity),(u16)'\0');
+	char* string for C library calls. */
+	set_string_nth(string,capacity,0);
 	string->length = tag_fixnum(capacity);
 	string->hashcode = F;
+	string->aux = F;
 	return string;
 }
 
@@ -446,7 +447,7 @@ void fill_string(F_STRING *string, CELL start, CELL capacity, CELL fill)
 		CELL i;
 
 		for(i = start; i < capacity; i++)
-			cput(SREF(string,i),fill);
+			set_string_nth(string,i,fill);
 	}
 }
 
@@ -499,7 +500,7 @@ DEFINE_PRIMITIVE(resize_string)
 		CELL i; \
 		for(i = 0; i < length; i++) \
 		{ \
-			cput(SREF(s,i),(utype)*string); \
+			set_string_nth(s,i,(utype)*string); \
 			string++; \
 		} \
 		return s; \

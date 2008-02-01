@@ -1,14 +1,20 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math.private sequences kernel.private
-math sequences.private slots.private ;
+math sequences.private slots.private byte-arrays
+alien.accessors ;
 IN: strings
 
 <PRIVATE
 
-: string-hashcode 2 slot ; inline
+: make-string-aux ( string -- aux )
+    dup string-aux
+    [ ] [ dup length <byte-array> dup rot set-string-aux ] ?if
+    { byte-array } declare ; inline
 
-: set-string-hashcode 2 set-slot ; inline
+: string-hashcode 3 slot ; inline
+
+: set-string-hashcode 3 set-slot ; inline
 
 : reset-string-hashcode f swap set-string-hashcode ; inline
 

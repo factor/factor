@@ -106,6 +106,8 @@ typedef struct {
 	/* tagged num of chars */
 	CELL length;
 	/* tagged */
+	CELL aux;
+	/* tagged */
 	CELL hashcode;
 } F_STRING;
 

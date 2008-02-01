@@ -259,6 +259,7 @@ M: wrapper '
     string type-number object tag-number [
         dup length emit-fixnum
         f ' emit
+        f ' emit
         pack-string emit-chars
     ] emit-object ;
 

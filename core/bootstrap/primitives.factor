@@ -40,6 +40,7 @@ call
 ! classes will go
 {
     "alien"
+    "alien.accessors"
     "arrays"
     "bit-arrays"
     "bit-vectors"
@@ -190,6 +191,11 @@ num-types get f <array> builtins set
         "length"
         { "length" "sequences" }
         f
+    } {
+        { "object" "kernel" }
+        "aux"
+        { "string-aux" "strings.private" }
+        { "set-string-aux" "strings.private" }
     }
 } define-builtin
 
@@ -556,32 +562,32 @@ builtins get num-tags get tail f union-class define-class
     { "<byte-array>" "byte-arrays" }
     { "<bit-array>" "bit-arrays" }
     { "<displaced-alien>" "alien" }
-    { "alien-signed-cell" "alien" }
-    { "set-alien-signed-cell" "alien" }
-    { "alien-unsigned-cell" "alien" }
-    { "set-alien-unsigned-cell" "alien" }
-    { "alien-signed-8" "alien" }
-    { "set-alien-signed-8" "alien" }
-    { "alien-unsigned-8" "alien" }
-    { "set-alien-unsigned-8" "alien" }
-    { "alien-signed-4" "alien" }
-    { "set-alien-signed-4" "alien" }
-    { "alien-unsigned-4" "alien" }
-    { "set-alien-unsigned-4" "alien" }
-    { "alien-signed-2" "alien" }
-    { "set-alien-signed-2" "alien" }
-    { "alien-unsigned-2" "alien" }
-    { "set-alien-unsigned-2" "alien" }
-    { "alien-signed-1" "alien" }
-    { "set-alien-signed-1" "alien" }
-    { "alien-unsigned-1" "alien" }
-    { "set-alien-unsigned-1" "alien" }
-    { "alien-float" "alien" }
-    { "set-alien-float" "alien" }
-    { "alien-double" "alien" }
-    { "set-alien-double" "alien" }
-    { "alien-cell" "alien" }
-    { "set-alien-cell" "alien" }
+    { "alien-signed-cell" "alien.accessors" }
+    { "set-alien-signed-cell" "alien.accessors" }
+    { "alien-unsigned-cell" "alien.accessors" }
+    { "set-alien-unsigned-cell" "alien.accessors" }
+    { "alien-signed-8" "alien.accessors" }
+    { "set-alien-signed-8" "alien.accessors" }
+    { "alien-unsigned-8" "alien.accessors" }
+    { "set-alien-unsigned-8" "alien.accessors" }
+    { "alien-signed-4" "alien.accessors" }
+    { "set-alien-signed-4" "alien.accessors" }
+    { "alien-unsigned-4" "alien.accessors" }
+    { "set-alien-unsigned-4" "alien.accessors" }
+    { "alien-signed-2" "alien.accessors" }
+    { "set-alien-signed-2" "alien.accessors" }
+    { "alien-unsigned-2" "alien.accessors" }
+    { "set-alien-unsigned-2" "alien.accessors" }
+    { "alien-signed-1" "alien.accessors" }
+    { "set-alien-signed-1" "alien.accessors" }
+    { "alien-unsigned-1" "alien.accessors" }
+    { "set-alien-unsigned-1" "alien.accessors" }
+    { "alien-float" "alien.accessors" }
+    { "set-alien-float" "alien.accessors" }
+    { "alien-double" "alien.accessors" }
+    { "set-alien-double" "alien.accessors" }
+    { "alien-cell" "alien.accessors" }
+    { "set-alien-cell" "alien.accessors" }
     { "alien>char-string" "alien" }
     { "string>char-alien" "alien" }
     { "alien>u16-string" "alien" }
