@@ -1,5 +1,5 @@
 USING: calendar furnace furnace.validator io.files kernel
-namespaces sequences http.server.responders html math.parser rss
+namespaces sequences http.server.responders html math math.parser rss
 xml.writer xmode.code2html ;
 IN: webapps.pastebin
 
@@ -94,7 +94,7 @@ C: <annotation> annotation
 
 : annotate-paste ( n summary author mode contents -- )
     <annotation> swap get-paste
-    [ paste-annotations push store save-store ] keep
+    [ paste-annotations push ] keep
     paste-link permanent-redirect ;
 
 [ "n" show-paste ]

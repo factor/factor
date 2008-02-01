@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.streams.null
-USING: kernel io ;
+USING: kernel io continuations ;
 
 TUPLE: null-stream ;
 
