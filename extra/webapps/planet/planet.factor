@@ -89,7 +89,7 @@ SYMBOL: last-update
     [ set-entry-title ] keep ;
 
 : ?fetch-feed ( triple -- feed/f )
-    [ fetch-feed ] [ error. drop f ] recover ;
+    [ fetch-feed ] [ swap . error. f ] recover ;
 
 : fetch-blogroll ( blogroll -- entries )
     dup 0 <column>
