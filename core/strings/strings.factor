@@ -37,7 +37,8 @@ M: string set-nth-unsafe
     dup reset-string-hashcode
     >r >fixnum >r >fixnum r> r> set-string-nth ;
 
-M: string clone (clone) ;
+M: string clone
+	(clone) dup string-aux clone over set-string-aux ;
 
 M: string resize resize-string ;
 
