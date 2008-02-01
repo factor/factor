@@ -34,6 +34,10 @@ HELP: <alien>
 { $description "Creates an alien object, wrapping a raw memory address." }
 { $notes "Alien objects are invalidated between image saves and loads." } ;
 
+HELP: byte-length
+{ $values { "seq" "A byte array or float array" } { "n" "a non-negative integer" } }
+{ $contract "Outputs the size of the byte array or float array data in bytes as presented to the C library interface." } ;
+
 HELP: c-ptr
 { $class-description "Class of objects consisting of aliens, byte arrays and " { $link f } ". These objects can convert to pointer C types, which are all aliases of " { $snippet "void*" } "." } ;
 

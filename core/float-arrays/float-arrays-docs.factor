@@ -32,7 +32,7 @@ HELP: <float-array> ( n initial -- float-array )
 
 HELP: >float-array
 { $values { "seq" "a sequence" } { "float-array" float-array } }
-{ $description "Outputs a freshly-allocated float array whose elements have the same boolean values as a given sequence." }
+{ $description "Outputs a freshly-allocated float array whose elements have the same floating-point values as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than real numbers." } ;
 
 HELP: 1float-array

@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private alien sequences
+USING: kernel kernel.private alien alien.c-types sequences
 sequences.private math math.private ;
 IN: float-arrays
 
@@ -12,6 +12,7 @@ PRIVATE>
 
 M: float-array clone (clone) ;
 M: float-array length array-capacity ;
+M: float-array byte-length array-capacity "float" heap-size * ;
 
 M: float-array nth-unsafe
     float-array@ alien-double ;
