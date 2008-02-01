@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel math namespaces sequences strings
-io io.streams.string xml.data assocs wrap xml.entities ;
+io io.streams.string xml.data assocs wrap xml.entities
+unicode.categories ;
 IN: xml.writer
 
 SYMBOL: xml-pprint?
