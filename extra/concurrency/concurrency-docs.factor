@@ -127,7 +127,7 @@ ARTICLE: { "concurrency" "processes" } "Processes"
 { $code ": odd? ( n -- ? ) 2 mod 1 = ;\n1 self send 2 self send 3 self send\n\nreceive .\n => 1\n\n[ odd? ] receive-if .\n => 3\n\nreceive .\n => 2" } ;
 
 ARTICLE: { "concurrency" "self" } "Self"
-"A process can get access to its own process object using " { $link self } " so it can pass it to other processes. This allows the other processes to send messages back. A simple example of using this gets the current processes 'self' and spawns a process which sends a message to it. We then receive the message from the original process:" 
+"A process can get access to its own process object using " { $link self } " so it can pass it to other processes. This allows the other processes to send messages back. A simple example of using this gets the current process' 'self' and spawns a process which sends a message to it. We then receive the message from the original process:" 
 { $code "self [ \"Hello!\" swap send ] spawn 2drop receive .\n => \"Hello!\"" } ;
 
 ARTICLE: { "concurrency" "servers" } "Servers"
