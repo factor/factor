@@ -18,7 +18,7 @@ SYMBOL: begin
     over push 0 begin ;
 
 : finish-decoding ( buf ch state -- str )
-    begin eq? [ decode-error ] unless drop { } like ;
+    begin eq? [ decode-error ] unless drop "" like ;
 
 : decode ( seq quot -- str )
     >r [ length <sbuf> 0 begin ] keep r> each
