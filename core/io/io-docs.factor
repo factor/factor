@@ -1,12 +1,12 @@
 USING: help.markup help.syntax quotations hashtables kernel
-classes strings ;
+classes strings continuations ;
 IN: io
 
 ARTICLE: "stream-protocol" "Stream protocol"
 "The stream protocol consists of a large number of generic words, many of which are optional."
 $nl
-"A word required to be implemented for all streams:"
-{ $subsection stream-close }
+"All streams must implement the " { $link dispose } " word in addition to the stream protocol."
+$nl
 "Three words are required for input streams:"
 { $subsection stream-read1 }
 { $subsection stream-read }
@@ -73,16 +73,10 @@ ARTICLE: "streams" "Streams"
 
 ABOUT: "streams"
 
-HELP: stream-close
-{ $values { "stream" "a stream" } }
-{ $contract "Closes the stream. This releases any external resources associated with the stream, such as file handles and network connections. No further operations can be performed on the stream after this call." }
-{ $notes "You must close streams after you are finished working with them. A convenient way to automate this is by using the " { $link with-stream } " word." }
-$io-error ;
-
 HELP: set-timeout
 { $values { "n" "an integer" } { "stream" "a stream" } }
-{ $contract "Sets a timeout, in milliseconds, for closing the stream if there is no activity. Not all streams support timeouts." } 
-$io-error ;
+{ $contract "Sets a timeout, in milliseconds, for input and output operations on the stream. If a read or a write is initiated and no activity is seen before the timeout expires, an error will be thrown to the caller of the operation being performed." }
+{ $notes "Whether or not the stream is closed when the error is thrown is implementation-specific, and user code should take care to close the stream on all error conditions in any case." } ;
 
 HELP: stream-readln
 { $values { "stream" "an input stream" } { "str" string } }

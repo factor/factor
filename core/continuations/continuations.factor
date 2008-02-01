@@ -135,6 +135,11 @@ PRIVATE>
         [ [ , f ] compose [ , drop t ] recover ] curry all?
     ] { } make peek swap [ rethrow ] when ; inline
 
+GENERIC: dispose ( object -- )
+
+: with-disposal ( object quot -- )
+    over [ dispose ] curry [ ] cleanup ; inline
+
 TUPLE: condition restarts continuation ;
 
 : <condition> ( error restarts cc -- condition )

@@ -1,7 +1,7 @@
 USING: unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
 combinators.lib assocs.lib math.ranges unicode.normalize
-unicode.syntax unicode.data compiler.units alien.syntax ;
+unicode.syntax unicode.data compiler.units alien.syntax const ;
 IN: unicode.breaks
 
 C-ENUM: Any L V T Extend Control CR LF graphemes ;
@@ -32,7 +32,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 : other-extend-lines ( -- lines )
     "extra/unicode/PropList.txt" resource-path file-lines ;
 
-DEFER: other-extend
+VALUE: other-extend
 
 CATEGORY: (extend) Me Mn ;
 : extend? ( ch -- ? )
@@ -77,7 +77,7 @@ SYMBOL: table
     T T connect
     graphemes Extend connect-after ;
 
-DEFER: grapheme-table
+VALUE: grapheme-table
 
 : grapheme-break? ( class1 class2 -- ? )
     grapheme-table nth nth not ;
@@ -85,45 +85,38 @@ DEFER: grapheme-table
 : chars ( i str n -- str[i] str[i+n] )
     swap >r dupd + r> [ ?nth ] curry 2apply ;
 
-: next-grapheme-step ( i str -- i+1 str prev-class )
-    2dup nth grapheme-class >r >r 1+ r> r> ;
+: find-index ( seq quot -- i ) find drop ; inline
+: find-last-index ( seq quot -- i ) find-last drop ; inline
 
-: (next-grapheme) ( i str prev-class -- next-i )
-    3dup drop bounds-check? [
-        >r next-grapheme-step r> over grapheme-break?
-        [ 2drop 1- ] [ (next-grapheme) ] if
-    ] [ 2drop ] if ;
+: first-grapheme ( str -- i )
+    unclip-slice grapheme-class over
+    [ grapheme-class tuck grapheme-break? ] find-index
+    nip swap length or 1+ ;
 
-: next-grapheme ( i str -- next-i )
-    next-grapheme-step (next-grapheme) ;
+: (>graphemes) ( str -- )
+    dup empty? [ drop ] [
+        dup first-grapheme cut-slice
+        swap , (>graphemes)
+    ] if ;
 
-: (>graphemes) ( i str -- )
-    2dup bounds-check? [
-        dupd [ next-grapheme ] keep
-        [ subseq , ] 2keep (>graphemes)
-    ] [ 2drop ] if ;
 : >graphemes ( str -- graphemes )
-    [ 0 swap (>graphemes) ] { } make* ;
+    [ (>graphemes) ] { } make ;
 
 : string-reverse ( str -- rts )
     >graphemes reverse concat ;
 
-: prev-grapheme-step ( i str -- i-1 str prev-class )
-    2dup nth grapheme-class >r >r 1- r> r> ;
+: unclip-last-slice ( seq -- beginning last )
+    dup 1 head-slice* swap peek ;
 
-: (prev-grapheme) ( i str next-class -- prev-i )
-    pick zero? [
-        >r prev-grapheme-step r> dupd grapheme-break?
-        [ 2drop 1- ] [ (prev-grapheme) ] if
-    ] [ 2drop ] if ;
-
-: prev-grapheme ( i str -- prev-i )
-    prev-grapheme-step (prev-grapheme) ;
+: last-grapheme ( str -- i )
+    unclip-last-slice grapheme-class swap
+    [ grapheme-class dup rot grapheme-break? ] find-last-index
+    nip -1 or 1+ ;
 
 [
-    other-extend-lines process-other-extend \ other-extend define-value
+    other-extend-lines process-other-extend \ other-extend set-value
 
     init-grapheme-table table
     [ make-grapheme-table finish-table ] with-variable
-    \ grapheme-table define-value
+    \ grapheme-table set-value
 ] with-compilation-unit

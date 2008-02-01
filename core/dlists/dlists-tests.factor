@@ -49,14 +49,14 @@ IN: temporary
 [ f ] [ <dlist> 1 over push-back [ 2 = ] swap dlist-contains? ] unit-test
 [ t ] [ <dlist> 1 over push-back [ 1 = ] swap dlist-contains? ] unit-test
 
-[ 1 ] [ <dlist> 1 over push-back [ 1 = ] swap delete-node ] unit-test
-[ t ] [ <dlist> 1 over push-back [ 1 = ] over delete-node drop dlist-empty? ] unit-test
-[ t ] [ <dlist> 1 over push-back [ 1 = ] over delete-node drop dlist-empty? ] unit-test
-[ 0 ] [ <dlist> 1 over push-back [ 1 = ] over delete-node drop dlist-length ] unit-test
-[ 1 ] [ <dlist> 1 over push-back 2 over push-back [ 1 = ] over delete-node drop dlist-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back [ 1 = ] over delete-node drop dlist-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back [ 2 = ] over delete-node drop dlist-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back [ 3 = ] over delete-node drop dlist-length ] unit-test
+[ 1 ] [ <dlist> 1 over push-back [ 1 = ] swap delete-node-if ] unit-test
+[ t ] [ <dlist> 1 over push-back [ 1 = ] over delete-node-if drop dlist-empty? ] unit-test
+[ t ] [ <dlist> 1 over push-back [ 1 = ] over delete-node-if drop dlist-empty? ] unit-test
+[ 0 ] [ <dlist> 1 over push-back [ 1 = ] over delete-node-if drop dlist-length ] unit-test
+[ 1 ] [ <dlist> 1 over push-back 2 over push-back [ 1 = ] over delete-node-if drop dlist-length ] unit-test
+[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back [ 1 = ] over delete-node-if drop dlist-length ] unit-test
+[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back [ 2 = ] over delete-node-if drop dlist-length ] unit-test
+[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back [ 3 = ] over delete-node-if drop dlist-length ] unit-test
 
 [ 0 ] [ <dlist> dlist-length ] unit-test
 [ 1 ] [ <dlist> 1 over push-front dlist-length ] unit-test

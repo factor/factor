@@ -107,5 +107,5 @@ M: class forget* ( class -- )
     dup uncache-class
     forget-word ;
 
-M: class update-methods ( class -- )
-    class-usages implementors* [ make-generic ] each ;
+M: assoc update-methods ( assoc -- )
+    implementors* [ make-generic ] each ;

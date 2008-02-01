@@ -64,7 +64,7 @@ IN: bunny
     model-path resource-path dup exists? [
         "Downloading bunny from " write
         model-url dup print flush
-        over download
+        over download-to
     ] unless ;
 
 : draw-triangle ( ns vs triple -- )

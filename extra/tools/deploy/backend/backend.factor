@@ -9,15 +9,16 @@ quotations io.launcher words.private tools.deploy.config
 bootstrap.image ;
 IN: tools.deploy.backend
 
-: (copy-lines) ( stream -- stream )
-    dup stream-readln [ print flush (copy-lines) ] when* ;
+: (copy-lines) ( stream -- )
+    dup stream-readln dup
+    [ print flush (copy-lines) ] [ 2drop ] if ;
 
 : copy-lines ( stream -- )
-    [ (copy-lines) ] [ stream-close ] [ ] cleanup ;
+    [ (copy-lines) ] with-disposal ;
 
 : run-with-output ( descriptor -- )
     <process-stream>
-    dup duplex-stream-out stream-close
+    dup duplex-stream-out dispose
     copy-lines ;
 
 : boot-image-name ( -- string )

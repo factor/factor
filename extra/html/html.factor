@@ -105,7 +105,7 @@ TUPLE: html-sub-stream style stream ;
 
 TUPLE: html-span-stream ;
 
-M: html-span-stream stream-close
+M: html-span-stream dispose
     end-sub-stream not-a-div format-html-span ;
 
 : border-css, ( border -- )
@@ -138,7 +138,7 @@ M: html-span-stream stream-close
 
 TUPLE: html-block-stream ;
 
-M: html-block-stream stream-close ( quot style stream -- )
+M: html-block-stream dispose ( quot style stream -- )
     end-sub-stream a-div format-html-div ;
 
 : border-spacing-css,

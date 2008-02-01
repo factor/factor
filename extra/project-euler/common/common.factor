@@ -7,11 +7,11 @@ IN: project-euler.common
 
 ! Problems using each public word
 ! -------------------------------
-! cartesian-product - #4, #27
+! cartesian-product - #4, #27, #29, #32, #33
 ! collect-consecutive - #8, #11
 ! log10 - #25, #134
 ! max-path - #18, #67
-! number>digits - #16, #20, #30
+! number>digits - #16, #20, #30, #34
 ! propagate-all - #18, #67
 ! sum-proper-divisors - #21
 ! tau* - #12

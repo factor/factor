@@ -48,6 +48,9 @@ M: bit-array new drop <bit-array> ;
 M: bit-array equal?
     over bit-array? [ sequence= ] [ 2drop f ] if ;
 
+M: bit-array resize
+    resize-bit-array ;
+
 INSTANCE: bit-array sequence
 INSTANCE: bit-array simple-c-ptr
 INSTANCE: bit-array c-ptr

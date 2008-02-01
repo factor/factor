@@ -29,8 +29,7 @@ SYMBOL: log-stream
 
 : with-log-file ( file quot -- )
     >r <file-appender> r>
-    [ [ with-log-stream ] 2keep ]
-    [ drop stream-close ] [ ] cleanup ; inline
+    [ with-log-stream ] with-disposal ; inline
 
 : with-log-stdio ( quot -- )
     stdio get swap with-log-stream ;
@@ -52,7 +51,7 @@ SYMBOL: log-stream
     [ swap accept with-client ] 2keep accept-loop ; inline
 
 : server-loop ( server quot -- )
-    [ accept-loop ] [ drop stream-close ] [ ] cleanup ; inline
+    [ accept-loop ] compose with-disposal ; inline
 
 : spawn-server ( addrspec quot -- )
     "Waiting for connections on " pick unparse append
@@ -87,8 +86,7 @@ SYMBOL: log-stream
 
 : spawn-datagrams ( quot addrspec -- )
     "Waiting for datagrams on " over unparse append log-message
-    <datagram> [ datagram-loop ] [ stream-close ] [ ] cleanup ;
-    inline
+    <datagram> [ datagram-loop ] with-disposal ; inline
 
 : with-datagrams ( seq service quot -- )
     [

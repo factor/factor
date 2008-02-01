@@ -17,6 +17,8 @@ M: byte-array equal?
 
 M: byte-array byte-length
     length ;
+M: byte-array resize
+    resize-byte-array ;
 
 INSTANCE: byte-array sequence
 INSTANCE: byte-array simple-c-ptr

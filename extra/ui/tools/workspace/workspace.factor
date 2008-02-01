@@ -69,7 +69,11 @@ M: gadget tool-scroller drop f ;
     [ find-workspace hide-popup ] <debugger>
     "Error" show-titled-popup ;
 
-M: workspace pref-dim* drop { 600 700 } ;
+SYMBOL: workspace-dim
+
+{ 600 700 } workspace-dim set-global
+
+M: workspace pref-dim* drop workspace-dim get ;
 
 M: workspace focusable-child*
     dup workspace-popup [ ] [ workspace-listener ] ?if ;

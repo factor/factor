@@ -44,14 +44,14 @@ DEFER: http-get-stream
     #! Should this support Location: headers that are
     #! relative URLs?
     pick 100 /i 3 = [
-        stream-close "Location" swap at nip http-get-stream
+        dispose "Location" swap at nip http-get-stream
     ] when ;
 
 : http-get-stream ( url -- code headers stream )
     #! Opens a stream for reading from an HTTP URL.
     parse-url over parse-host <inet> <client> [
         [ [ get-request read-response ] with-stream* ] keep
-    ] [ >r stream-close r> rethrow ] recover do-redirect ;
+    ] [ ] [ dispose ] cleanup do-redirect ;
 
 : http-get ( url -- code headers string )
     #! Opens a stream for reading from an HTTP URL.
@@ -59,9 +59,23 @@ DEFER: http-get-stream
         http-get-stream [ stdio get contents ] with-stream
     ] with-scope ;
 
-: download ( url file -- )
+: download-name ( url -- name )
+    file-name "?" split1 drop "/" ?tail drop ;
+
+: default-timeout 60 1000 * over set-timeout ;
+
+: success? ( code -- ? ) 200 = ;
+
+: download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
-    >r http-get 2nip r> <file-writer> [ write ] with-stream ;
+    >r http-get-stream nip default-timeout swap success? [
+        r> <file-writer> stream-copy
+    ] [
+        r> drop dispose "HTTP download failed" throw
+    ] if ;
+
+: download ( url -- )
+    dup download-name download-to ;
 
 : post-request ( content-type content host resource -- )
     #! Note: It is up to the caller to url encode the content if
