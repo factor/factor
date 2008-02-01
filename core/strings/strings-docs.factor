@@ -58,4 +58,4 @@ HELP: >string
 
 HELP: resize-string ( n str -- newstr )
 { $values { "n" "a non-negative integer" } { "str" string } { "newstr" string } }
-{ $description "Creates a new string " { $snippet "n" } " characters long The contents of the existing string are copied into the new string; if the new string is shorter, only an initial segment is copied, and if the new string is longer the remaining space is filled with " { $snippet "\\u0000" } "." } ;
+{ $description "Creates a new string " { $snippet "n" } " characters long The contents of the existing string are copied into the new string; if the new string is shorter, only an initial segment is copied, and if the new string is longer the remaining space is filled with " { $snippet "\\u000000" } "." } ;

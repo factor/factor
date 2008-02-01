@@ -120,7 +120,7 @@ M: bad-escape summary drop "Bad escape code" ;
 
 : next-escape ( m str -- n ch )
     2dup nth CHAR: u =
-    [ >r 1+ dup 4 + tuck r> subseq hex> ]
+    [ >r 1+ dup 6 + tuck r> subseq hex> ]
     [ over 1+ -rot nth escape ] if ;
 
 : next-char ( m str -- n ch )

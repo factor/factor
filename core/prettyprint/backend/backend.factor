@@ -68,7 +68,7 @@ M: f pprint* drop \ f pprint-word ;
     } at ;
 
 : ch>unicode-escape ( ch -- str )
-    >hex 4 CHAR: 0 pad-left "\\u" swap append ;
+    >hex 6 CHAR: 0 pad-left "\\u" swap append ;
 
 : unparse-ch ( ch -- )
     dup quotable? [

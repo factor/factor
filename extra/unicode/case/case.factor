@@ -13,7 +13,7 @@ SYMBOL: locale ! Just casing locale, or overall?
 
 : lithuanian? ( -- ? ) locale get "lt" = ;
 
-: dot-over ( -- ch ) CHAR: \u0307 ;
+: dot-over ( -- ch ) HEX: 307 ;
 
 : lithuanian-ch>upper ( ? next ch -- ? )
     rot [ 2drop f ]
@@ -46,7 +46,7 @@ SYMBOL: locale ! Just casing locale, or overall?
         { [ rot ] [ 2drop f ] }
         { [ dup CHAR: I = ] [
             drop dot-over =
-            dup CHAR: i CHAR: \u0131 ? ,
+            dup CHAR: i HEX: 131 ? ,
         ] }
         { [ t ] [ , drop f ] }
     } cond ;

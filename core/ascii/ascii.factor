@@ -13,7 +13,8 @@ IN: ascii
 
 : printable? ( ch -- ? ) CHAR: \s CHAR: ~ between? ; inline
 
-: control? ( ch -- ? ) "\0\e\r\n\t\u0008\u007f" member? ; inline
+: control? ( ch -- ? )
+    "\0\e\r\n\t\u000008\u00007f" member? ; inline
 
 : quotable? ( ch -- ? )
     dup printable? [ "\"\\" member? not ] [ drop f ] if ; inline

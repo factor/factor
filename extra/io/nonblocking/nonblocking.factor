@@ -67,14 +67,14 @@ timeout-queue global [ [ <dlist> ] unless* ] change-at
     dup timeout-queue get-global push-front*
     swap set-port-timeout-entry ;
 
-HOOK: expire-port io-backend ( port -- )
+HOOK: cancel-io io-backend ( port -- )
 
-M: object expire-port drop ;
+M: object cancel-io drop ;
 
 : expire-timeouts ( -- )
     timeout-queue get-global dup dlist-empty? [ drop ] [
         dup peek-back timeout?
-        [ pop-back expire-port expire-timeouts ] [ drop ] if
+        [ pop-back cancel-io expire-timeouts ] [ drop ] if
     ] if ;
 
 : begin-timeout ( port -- )
@@ -193,14 +193,18 @@ GENERIC: port-flush ( port -- )
 M: output-port stream-flush ( port -- )
     dup port-flush pending-error ;
 
+: close-port ( port type -- )
+    output-port eq? [ dup port-flush ] when
+    dup cancel-io
+    dup port-handle close-handle
+    dup delegate [ buffer-free ] when*
+    f swap set-delegate ;
+
 M: port dispose
-    dup port-type closed eq? [
-        dup port-type >r closed over set-port-type r>
-        output-port eq? [ dup port-flush ] when
-        dup port-handle close-handle
-        dup delegate [ buffer-free ] when*
-        f over set-delegate
-    ] unless drop ;
+    dup port-type closed eq?
+    [ drop ]
+    [ dup port-type >r closed over set-port-type r> close-port ]
+    if ;
 
 TUPLE: server-port addr client ;
 

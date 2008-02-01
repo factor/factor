@@ -122,7 +122,7 @@ M: windows-nt-io add-completion ( handle -- )
 : drain-overlapped ( timeout -- )
     handle-overlapped [ 0 drain-overlapped ] unless ;
 
-M: windows-nt-io expire-port
+M: windows-nt-io cancel-io
     port-handle win32-file-handle CancelIo drop ;
 
 M: windows-nt-io io-multiplex ( ms -- )
