@@ -1,6 +1,7 @@
 USING: byte-arrays arrays help.syntax help.markup
 alien.syntax compiler definitions math libc
-debugger parser io io.backend system bit-arrays float-arrays ;
+debugger parser io io.backend system bit-arrays float-arrays
+alien.accessors ;
 IN: alien
 
 HELP: alien

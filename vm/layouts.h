@@ -19,9 +19,6 @@ typedef signed long long s64;
 
 #define CELLS ((signed)sizeof(CELL))
 
-/* must always be 16 bits */
-#define CHARS ((signed)sizeof(u16))
-
 #define WORD_SIZE (CELLS*8)
 #define HALF_WORD_SIZE (CELLS*4)
 #define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
@@ -105,6 +102,8 @@ typedef struct {
 	CELL header;
 	/* tagged num of chars */
 	CELL length;
+	/* tagged */
+	CELL aux;
 	/* tagged */
 	CELL hashcode;
 } F_STRING;

@@ -21,5 +21,5 @@ SYMBOL: begin
     begin eq? [ decode-error ] unless drop { } like ;
 
 : decode ( seq quot -- str )
-    >r [ length <vector> 0 begin ] keep r> each
+    >r [ length <sbuf> 0 begin ] keep r> each
     finish-decoding ; inline

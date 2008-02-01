@@ -3,7 +3,7 @@
 USING: byte-arrays arrays generator.registers assocs
 kernel kernel.private libc math namespaces parser sequences
 strings words assocs splitting math.parser cpu.architecture
-alien quotations system compiler.units ;
+alien alien.accessors quotations system compiler.units ;
 IN: alien.c-types
 
 TUPLE: c-type

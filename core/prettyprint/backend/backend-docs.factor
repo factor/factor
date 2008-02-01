@@ -20,7 +20,7 @@ HELP: ch>ascii-escape
 
 HELP: ch>unicode-escape
 { $values { "ch" "a character" } { "str" string } }
-{ $description "Converts a character to a Unicode escape code (" { $snippet "\\u1234"} ")." } ;
+{ $description "Converts a character to a Unicode escape code (" { $snippet "\\u123456"} ")." } ;
 
 HELP: unparse-ch
 { $values { "ch" "a character" } }

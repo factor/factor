@@ -151,7 +151,7 @@ unit-test
 
 [ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
 [ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
-[ 5 ] [ 1 >bignum "\u0001\u0005\u0007" nth-unsafe ] unit-test
+[ 5 ] [ 1 >bignum "\u000001\u000005\u000007" nth-unsafe ] unit-test
 
 [ SBUF" before&after" ] [
     "&" 6 11 SBUF" before and after" [ replace-slice ] keep

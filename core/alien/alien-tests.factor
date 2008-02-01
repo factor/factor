@@ -1,7 +1,7 @@
 IN: temporary
-USING: alien byte-arrays
-arrays kernel kernel.private namespaces tools.test sequences
-libc math system prettyprint ;
+USING: alien alien.accessors byte-arrays arrays kernel
+kernel.private namespaces tools.test sequences libc math system
+prettyprint ;
 
 [ t ] [ -1 <alien> alien-address 0 > ] unit-test
 

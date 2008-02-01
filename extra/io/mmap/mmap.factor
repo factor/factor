@@ -1,7 +1,7 @@
-! Copyright (C) 2007 Doug Coleman.
+! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations io.backend kernel quotations sequences
-system alien sequences.private ;
+system alien alien.accessors sequences.private ;
 IN: io.mmap
 
 TUPLE: mapped-file length address handle closed? ;

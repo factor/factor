@@ -5,7 +5,8 @@ namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger 
 io.files io.streams.string io.streams.lines vocabs
-source-files classes hashtables compiler.errors compiler.units ;
+source-files classes hashtables compiler.errors compiler.units
+ascii ;
 IN: parser
 
 TUPLE: lexer text line column ;
@@ -119,7 +120,7 @@ M: bad-escape summary drop "Bad escape code" ;
 
 : next-escape ( m str -- n ch )
     2dup nth CHAR: u =
-    [ >r 1+ dup 4 + tuck r> subseq hex> ]
+    [ >r 1+ dup 6 + tuck r> subseq hex> ]
     [ over 1+ -rot nth escape ] if ;
 
 : next-char ( m str -- n ch )

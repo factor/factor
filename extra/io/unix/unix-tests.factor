@@ -1,6 +1,6 @@
 USING: io.files io.sockets io kernel threads namespaces
 tools.test continuations strings byte-arrays sequences
-prettyprint system ;
+prettyprint system unicode.case ;
 IN: temporary
 
 ! Unix domain stream sockets

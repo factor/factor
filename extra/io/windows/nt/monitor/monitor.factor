@@ -46,8 +46,11 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
 
 : read-changes ( monitor -- bytes )
     [
-        dup begin-reading-changes swap [ save-callback ] 2keep
-        get-overlapped-result
+        [
+            dup begin-reading-changes
+            swap [ save-callback ] 2keep
+            get-overlapped-result
+        ] with-port-timeout
     ] with-destructors ;
 
 : parse-action-flag ( action mask symbol -- action )

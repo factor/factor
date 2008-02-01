@@ -94,7 +94,7 @@ C: <annotation> annotation
 
 : annotate-paste ( n summary author mode contents -- )
     <annotation> swap get-paste
-    [ paste-annotations push store save-store ] keep
+    [ paste-annotations push ] keep
     paste-link permanent-redirect ;
 
 [ "n" show-paste ]

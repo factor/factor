@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private alien sequences sequences.private
-math ;
+USING: kernel kernel.private alien.accessors sequences
+sequences.private math ;
 IN: byte-arrays
 
 M: byte-array clone (clone) ;
@@ -19,5 +19,3 @@ M: byte-array resize
     resize-byte-array ;
 
 INSTANCE: byte-array sequence
-INSTANCE: byte-array simple-c-ptr
-INSTANCE: byte-array c-ptr

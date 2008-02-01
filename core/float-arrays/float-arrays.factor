@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private alien sequences
+USING: kernel kernel.private alien.accessors sequences
 sequences.private math math.private ;
 IN: float-arrays
 
@@ -33,8 +33,6 @@ M: float-array resize
     resize-float-array ;
 
 INSTANCE: float-array sequence
-INSTANCE: float-array simple-c-ptr
-INSTANCE: float-array c-ptr
 
 : 1float-array ( x -- array ) 1 swap <float-array> ; flushable
 
