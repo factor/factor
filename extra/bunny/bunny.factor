@@ -3,7 +3,8 @@ USING: alien alien.c-types arrays sequences math
 math.vectors math.matrices math.parser io io.files kernel opengl
 opengl.gl opengl.glu shuffle http.client vectors timers
 namespaces ui.gadgets ui.gadgets.canvas ui.render ui splitting
-combinators tools.time system combinators.lib ;
+combinators tools.time system combinators.lib combinators.cleave
+float-arrays ;
 IN: bunny
 
 : numbers ( str -- seq )
@@ -44,6 +45,16 @@ IN: bunny
     "Reading model" print flush [
         <file-reader> parse-model [ normals ] 2keep 3array
     ] time ;
+
+: make-vertex-buffers ( model -- array element-array )
+    [
+        [ first concat ] [ second concat ] bi
+        append >float-array
+        GL_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
+    ] [
+        third concat >c-uint-array
+        GL_ELEMENT_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
+    ] bi ;
 
 : model-path "bun_zipper.ply" ;
 

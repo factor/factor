@@ -30,6 +30,13 @@ IN: opengl
 
 : do-enabled ( what quot -- )
     over glEnable dip glDisable ; inline
+: do-enabled-client-state ( what quot -- )
+    over glEnableClientState dip glDisableClientState ; inline
+
+: all-enabled ( seq quot -- )
+    over [ glEnable ] each dip [ glDisable ] each ; inline
+: all-enabled-client-state ( seq quot -- )
+    over [ glEnableClientState ] each dip [ glDisableClientState ] each ; inline
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
@@ -103,7 +110,7 @@ IN: opengl
     [ glGenFramebuffersEXT ] (gen-gl-object) ;
 : gen-renderbuffer ( -- id )
     [ glGenRenderbuffersEXT ] (gen-gl-object) ;
-: gen-buffer ( -- id )
+: gen-gl-buffer ( -- id )
     [ glGenBuffers ] (gen-gl-object) ;
 
 : (delete-gl-object) ( id quot -- )
@@ -114,8 +121,25 @@ IN: opengl
     [ glDeleteFramebuffersEXT ] (delete-gl-object) ;
 : delete-renderbuffer ( id -- )
     [ glDeleteRenderbuffersEXT ] (delete-gl-object) ;
-: delete-buffer ( id -- )
+: delete-gl-buffer ( id -- )
     [ glDeleteBuffers ] (delete-gl-object) ;
+
+: with-gl-buffer ( binding id quot -- )
+    -rot dupd glBindBuffer
+    [ slip ] [ 0 glBindBuffer ] [ ] cleanup ; inline
+
+: with-array-element-buffers ( array-buffer element-buffer quot -- )
+    -rot GL_ELEMENT_ARRAY_BUFFER swap [
+        swap GL_ARRAY_BUFFER -rot with-gl-buffer
+    ] with-gl-buffer ; inline
+
+: <gl-buffer> ( target data hint -- id )
+    pick gen-gl-buffer [ [
+        >r dup byte-length swap r> glBufferData
+    ] with-gl-buffer ] keep ;
+
+: buffer-offset ( int -- alien )
+    <alien> ; inline
 
 : framebuffer-incomplete? ( -- status/f )
     GL_FRAMEBUFFER_EXT glCheckFramebufferStatusEXT

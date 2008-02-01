@@ -65,7 +65,7 @@ HELP: gen-renderbuffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenRenderbuffersEXT } " to handle the common case of generating a single render buffer ID." } ;
 
-HELP: gen-buffer
+HELP: gen-gl-buffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenBuffers } " to handle the common case of generating a single buffer ID." } ;
 
@@ -81,14 +81,14 @@ HELP: delete-renderbuffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glDeleteRenderbuffersEXT } " to handle the common case of deleting a single render buffer ID." } ;
 
-HELP: delete-buffer
+HELP: delete-gl-buffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glDeleteBuffers } " to handle the common case of deleting a single buffer ID." } ;
 
 { gen-texture delete-texture } related-words
 { gen-framebuffer delete-framebuffer } related-words
 { gen-renderbuffer delete-renderbuffer } related-words
-{ gen-buffer delete-buffer } related-words
+{ gen-gl-buffer delete-gl-buffer } related-words
 
 HELP: framebuffer-incomplete?
 { $values { "status/f" "The framebuffer error code, or " { $snippet "f" } " if the framebuffer is render-complete." } }

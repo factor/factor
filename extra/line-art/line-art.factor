@@ -187,7 +187,7 @@ main()
     ] if ;
     
 M: line-art-gadget graft* ( gadget -- )
-    [ "2.0" { "GL_ARB_draw_buffers"
+    "2.0" { "GL_ARB_draw_buffers"
             "GL_ARB_shader_objects"
             "GL_ARB_multitexture"
             "GL_ARB_texture_float" }
@@ -196,8 +196,7 @@ M: line-art-gadget graft* ( gadget -- )
     GL_CULL_FACE glEnable
     GL_DEPTH_TEST glEnable
     (line-art-step1-program) over set-line-art-gadget-step1-program
-    (line-art-step2-program) swap set-line-art-gadget-step2-program
-    ] [ ] [ :c ] cleanup ;
+    (line-art-step2-program) swap set-line-art-gadget-step2-program ;
 
 M: line-art-gadget ungraft* ( gadget -- )
     dup line-art-gadget-framebuffer [
