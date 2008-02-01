@@ -93,30 +93,6 @@ IN: cpu.ppc.intrinsics
     }
 } define-intrinsics
 
-: (%char-slot)
-    "offset" operand "n" operand 2 SRAWI
-    "offset" operand dup "obj" operand ADD ;
-
-\ char-slot [
-    (%char-slot)
-    "out" operand "offset" operand string-offset LHZ
-    "out" operand dup %tag-fixnum
-] H{
-    { +input+ { { f "n" } { f "obj" } } }
-    { +scratch+ { { f "out" } { f "offset" } } }
-    { +output+ { "out" } }
-} define-intrinsic
-
-\ set-char-slot [
-    (%char-slot)
-    "val" operand dup %untag-fixnum
-    "val" operand "offset" operand string-offset STH
-] H{
-    { +input+ { { f "val" } { f "n" } { f "obj" } } }
-    { +scratch+ { { f "offset" } } }
-    { +clobber+ { "val" } }
-} define-intrinsic
-
 : fixnum-register-op ( op -- pair )
     [ "out" operand "y" operand "x" operand ] swap add H{
         { +input+ { { f "x" } { f "y" } } }

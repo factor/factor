@@ -1,7 +1,8 @@
-USING: alien alien.c-types byte-arrays continuations destructors
-io.nonblocking io io.sockets io.sockets.impl namespaces
-io.streams.duplex io.windows io.windows.nt.backend
-windows.winsock kernel libc math sequences threads tuples.lib ;
+USING: alien alien.accessors alien.c-types byte-arrays
+continuations destructors io.nonblocking io io.sockets
+io.sockets.impl namespaces io.streams.duplex io.windows
+io.windows.nt.backend windows.winsock kernel libc math sequences
+threads tuples.lib ;
 IN: io.windows.nt.sockets
 
 : malloc-int ( object -- object )

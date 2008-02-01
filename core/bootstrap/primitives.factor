@@ -596,8 +596,8 @@ builtins get num-tags get tail f union-class define-class
     { "alien-address" "alien" }
     { "slot" "slots.private" }
     { "set-slot" "slots.private" }
-    { "char-slot" "strings.private" }
-    { "set-char-slot" "strings.private" }
+    { "string-nth" "strings.private" }
+    { "set-string-nth" "strings.private" }
     { "resize-array" "arrays" }
     { "resize-string" "strings" }
     { "<array>" "arrays" }

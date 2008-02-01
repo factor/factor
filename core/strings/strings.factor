@@ -7,11 +7,6 @@ IN: strings
 
 <PRIVATE
 
-: make-string-aux ( string -- aux )
-    dup string-aux
-    [ ] [ dup length <byte-array> dup rot set-string-aux ] ?if
-    { byte-array } declare ; inline
-
 : string-hashcode 3 slot ; inline
 
 : set-string-hashcode 3 set-slot ; inline
@@ -35,42 +30,16 @@ M: string hashcode*
     nip dup string-hashcode [ ]
     [ dup rehash-string string-hashcode ] ?if ;
 
-M: string nth-unsafe >r >fixnum r> char-slot ;
+M: string nth-unsafe
+    >r >fixnum r> string-nth ;
 
-M: string set-nth-unsafe 
+M: string set-nth-unsafe
     dup reset-string-hashcode
-    >r >fixnum >r >fixnum r> r> set-char-slot ;
+    >r >fixnum >r >fixnum r> r> set-string-nth ;
 
 M: string clone (clone) ;
 
 M: string resize resize-string ;
-
-! Characters
-: blank? ( ch -- ? ) " \t\n\r" member? ; inline
-: letter? ( ch -- ? ) CHAR: a CHAR: z between? ; inline
-: LETTER? ( ch -- ? ) CHAR: A CHAR: Z between? ; inline
-: digit? ( ch -- ? ) CHAR: 0 CHAR: 9 between? ; inline
-: printable? ( ch -- ? ) CHAR: \s CHAR: ~ between? ; inline
-: control? ( ch -- ? ) "\0\e\r\n\t\u0008\u007f" member? ; inline
-
-: quotable? ( ch -- ? )
-    dup printable? [ "\"\\" member? not ] [ drop f ] if ; inline
-
-: Letter? ( ch -- ? )
-    dup letter? [ drop t ] [ LETTER? ] if ; inline
-
-: alpha? ( ch -- ? )
-    dup Letter? [ drop t ] [ digit? ] if ; inline
-
-: ch>lower ( ch -- lower )
-    dup LETTER? [ HEX: 20 + ] when ; inline
-
-: ch>upper ( ch -- upper )
-    dup letter? [ HEX: 20 - ] when ; inline
-
-: >lower ( str -- lower ) [ ch>lower ] map ;
-
-: >upper ( str -- upper ) [ ch>upper ] map ;
 
 : 1string ( ch -- str ) 1 swap <string> ;
 

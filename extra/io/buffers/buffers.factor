@@ -2,8 +2,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.buffers
-USING: alien alien.c-types alien.syntax kernel kernel.private
-libc math sequences strings hints ;
+USING: alien alien.accessors alien.c-types alien.syntax kernel
+kernel.private libc math sequences strings hints ;
 
 TUPLE: buffer size ptr fill pos ;
 

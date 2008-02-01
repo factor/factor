@@ -17,8 +17,6 @@ IN: bootstrap.image
 : image-magic HEX: 0f0e0d0c ; inline
 : image-version 4 ; inline
 
-: char bootstrap-cell 2/ ; inline
-
 : data-base 1024 ; inline
 
 : userenv-size 40 ; inline
@@ -244,16 +242,13 @@ M: wrapper '
     [ emit ] emit-object ;
 
 ! Strings
-: 16be> 0 [ swap 16 shift bitor ] reduce ;
-: 16le> <reversed> 16be> ;
-
 : emit-chars ( seq -- )
-    char <groups>
-    big-endian get [ [ 16be> ] map ] [ [ 16le> ] map ] if
+    bootstrap-cell <groups>
+    big-endian get [ [ be> ] map ] [ [ le> ] map ] if
     emit-seq ;
 
 : pack-string ( string -- newstr )
-    dup length 1+ char align 0 pad-right ;
+    dup length 1+ bootstrap-cell align 0 pad-right ;
 
 : emit-string ( string -- ptr )
     string type-number object tag-number [

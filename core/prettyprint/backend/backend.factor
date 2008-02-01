@@ -4,7 +4,7 @@ USING: arrays byte-arrays byte-vectors bit-arrays bit-vectors
 generic hashtables io assocs kernel math namespaces sequences
 strings sbufs io.styles vectors words prettyprint.config
 prettyprint.sections quotations io io.files math.parser effects
-tuples classes float-arrays float-vectors ;
+tuples classes float-arrays float-vectors ascii ;
 IN: prettyprint.backend
 
 GENERIC: pprint* ( obj -- )
