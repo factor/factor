@@ -1,6 +1,6 @@
 USING: arrays bunny combinators.lib continuations io io.files kernel
        math math.functions math.vectors multiline
-       namespaces
+       namespaces debugger
        opengl opengl.gl opengl-demo-support
        prettyprint
        sequences ui ui.gadgets ui.gestures ui.render ;
@@ -187,7 +187,7 @@ main()
     ] if ;
     
 M: line-art-gadget graft* ( gadget -- )
-    "2.0" { "GL_ARB_draw_buffers"
+    [ "2.0" { "GL_ARB_draw_buffers"
             "GL_ARB_shader_objects"
             "GL_ARB_multitexture"
             "GL_ARB_texture_float" }
@@ -196,16 +196,17 @@ M: line-art-gadget graft* ( gadget -- )
     GL_CULL_FACE glEnable
     GL_DEPTH_TEST glEnable
     (line-art-step1-program) over set-line-art-gadget-step1-program
-    (line-art-step2-program) swap set-line-art-gadget-step2-program ;
+    (line-art-step2-program) swap set-line-art-gadget-step2-program
+    ] [ ] [ :c ] cleanup ;
 
 M: line-art-gadget ungraft* ( gadget -- )
     dup line-art-gadget-framebuffer [
-        { [ line-art-gadget-step1-program delete-gl-program ]
-          [ line-art-gadget-step2-program delete-gl-program ]
-          [ line-art-gadget-framebuffer delete-framebuffer ]
-          [ line-art-gadget-color-texture delete-texture ]
-          [ line-art-gadget-normal-texture delete-texture ]
-          [ line-art-gadget-depth-texture delete-texture ]
+        { [ line-art-gadget-step1-program [ delete-gl-program ] when* ]
+          [ line-art-gadget-step2-program [ delete-gl-program ] when* ]
+          [ line-art-gadget-framebuffer [ delete-framebuffer ] when* ]
+          [ line-art-gadget-color-texture [ delete-texture ] when* ]
+          [ line-art-gadget-normal-texture [ delete-texture ] when* ]
+          [ line-art-gadget-depth-texture [ delete-texture ] when* ]
           [ f swap set-line-art-gadget-framebuffer-dim ]
           [ f swap set-line-art-gadget-framebuffer ] } call-with
     ] [ drop ] if ;

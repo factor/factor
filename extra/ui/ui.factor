@@ -120,7 +120,9 @@ SYMBOL: ui-hook
     [ dup update-hand draw-world ] each ;
 
 : notify ( gadget -- )
-    dup gadget-graft-state dup first { f f } { t t } ? pick set-gadget-graft-state {
+    dup gadget-graft-state
+    dup first { f f } { t t } ?
+    pick set-gadget-graft-state {
         { { f t } [ dup activate-control graft* ] }
         { { t f } [ dup deactivate-control ungraft* ] }
     } case ;

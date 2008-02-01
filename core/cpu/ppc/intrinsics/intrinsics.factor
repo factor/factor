@@ -1,6 +1,6 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays cpu.ppc.assembler
+USING: alien alien.accessors alien.c-types arrays cpu.ppc.assembler
 cpu.ppc.architecture cpu.ppc.allot cpu.architecture kernel
 kernel.private math math.private namespaces sequences words
 generic quotations byte-arrays hashtables hashtables.private
