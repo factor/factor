@@ -2,7 +2,7 @@ USING: alien alien.c-types arrays assocs combinators
 continuations destructors io io.backend io.nonblocking
 io.windows libc kernel math namespaces sequences
 threads tuples.lib windows windows.errors windows.kernel32
-strings splitting io.files qualified ;
+strings splitting io.files qualified ascii ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
 

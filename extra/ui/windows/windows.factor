@@ -6,7 +6,7 @@ math math.vectors namespaces prettyprint sequences strings
 vectors words windows.kernel32 windows.gdi32 windows.user32
 windows.opengl32 windows.messages windows.types
 windows.nt windows threads timers libc combinators continuations
-command-line shuffle opengl ui.render ;
+command-line shuffle opengl ui.render unicode.case ascii ;
 IN: ui.windows
 
 TUPLE: windows-ui-backend ;
@@ -140,7 +140,10 @@ SYMBOL: mouse-captured
 : ctrl? ( -- ? ) left-ctrl? right-ctrl? or ;
 : alt? ( -- ? ) left-alt? right-alt? or ;
 : caps-lock? ( -- ? ) VK_CAPITAL GetKeyState zero? not ;
-: switch-case ( seq -- seq ) dup first CHAR: a >= [ >upper ] [ >lower ] if ;
+
+: switch-case ( seq -- seq )
+    dup first CHAR: a >= [ >upper ] [ >lower ] if ;
+
 : switch-case? ( -- ? ) shift? caps-lock? xor not ;
 
 : key-modifiers ( -- seq )
