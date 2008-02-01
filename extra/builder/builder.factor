@@ -1,5 +1,5 @@
 
-USING: kernel io io.files io.launcher
+USING: kernel io io.files io.launcher tools.deploy.backend
        system namespaces sequences splitting math.parser
        unix prettyprint tools.time calendar bake vars ;
 
