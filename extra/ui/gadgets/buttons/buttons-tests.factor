@@ -17,7 +17,7 @@ TUPLE: foo-gadget ;
 T{ foo-gadget } <toolbar> "t" set
 
 [ 2 ] [ "t" get gadget-children length ] unit-test
-[ "Foo a" ] [ "t" get gadget-child gadget-child label-string ] unit-test
+[ "Foo A" ] [ "t" get gadget-child gadget-child label-string ] unit-test
 
 [ ] [
     2 <model> {
