@@ -1,5 +1,5 @@
 USING: arrays combinators.lib kernel math math.functions math.miller-rabin
-    math.parser math.primes.factors math.ranges namespaces sequences ;
+    math.parser math.primes.factors math.ranges namespaces sequences sorting ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -12,6 +12,7 @@ IN: project-euler.common
 ! log10 - #25, #134
 ! max-path - #18, #67
 ! number>digits - #16, #20, #30, #34
+! pandigital? - #32, #38
 ! propagate-all - #18, #67
 ! sum-proper-divisors - #21
 ! tau* - #12
@@ -66,6 +67,9 @@ PRIVATE>
 
 : number>digits ( n -- seq )
     number>string string>digits ;
+
+: pandigital? ( n -- ? )
+    number>string natural-sort "123456789" = ;
 
 ! Not strictly needed, but it is nice to be able to dump the triangle after the
 ! propagation
