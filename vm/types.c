@@ -419,29 +419,58 @@ DEFINE_PRIMITIVE(to_tuple)
 }
 
 /* Strings */
+CELL string_nth(F_STRING* string, CELL index)
+{
+	CELL ch = bget(SREF(string,index));
+	if(string->aux == F)
+		return ch;
+	else
+	{
+		F_BYTE_ARRAY *aux = untag_object(string->aux);
+		return (cget(BREF(aux,index * sizeof(u16))) << 8) | ch;
+	}
+}
+
+void set_string_nth(F_STRING* string, CELL index, CELL value)
+{
+	bput(SREF(string,index),value & 0xff);
+
+	if(string->aux == F)
+	{
+		if(value <= 0xff)
+			return;
+		else
+		{
+			string->aux = tag_object(allot_byte_array(
+				untag_fixnum_fast(string->length)
+				* sizeof(u16)));
+		}
+	}
+
+	F_BYTE_ARRAY *aux = untag_object(string->aux);
+	cput(BREF(aux,index * sizeof(u16)),value >> 8);
+}
 
 /* untagged */
 F_STRING* allot_string_internal(CELL capacity)
 {
-	F_STRING* string = allot_object(STRING_TYPE,
-		sizeof(F_STRING) + (capacity + 1) * CHARS);
+	F_STRING *string = allot_object(STRING_TYPE,string_size(capacity));
 
 	/* strings are null-terminated in memory, even though they also
 	have a length field. The null termination allows us to add
 	the sizeof(F_STRING) to a Factor string to get a C-style
 	char* string for C library calls. */
-	set_string_nth(string,capacity,0);
 	string->length = tag_fixnum(capacity);
 	string->hashcode = F;
 	string->aux = F;
+	set_string_nth(string,capacity,0);
 	return string;
 }
 
 void fill_string(F_STRING *string, CELL start, CELL capacity, CELL fill)
 {
 	if(fill == 0)
-		memset((void*)SREF(string,start),'\0',
-			(capacity - start) * CHARS);
+		memset((void*)SREF(string,start),'\0',capacity - start);
 	else
 	{
 		CELL i;
@@ -466,7 +495,7 @@ DEFINE_PRIMITIVE(string)
 	dpush(tag_object(allot_string(length,initial)));
 }
 
-F_STRING* reallot_string(F_STRING* string, CELL capacity, u16 fill)
+F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
 {
 	CELL to_copy = string_capacity(string);
 	if(capacity < to_copy)
@@ -476,7 +505,7 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, u16 fill)
 	F_STRING *new_string = allot_string_internal(capacity);
 	UNREGISTER_UNTAGGED(string);
 
-	memcpy(new_string + 1,string + 1,to_copy * CHARS);
+	memcpy(new_string + 1,string + 1,to_copy);
 	fill_string(new_string,to_copy,capacity,fill);
 
 	return new_string;
@@ -530,7 +559,7 @@ bool check_string(F_STRING *s, CELL max)
 	CELL i;
 	for(i = 0; i < capacity; i++)
 	{
-		u16 ch = string_nth(s,i);
+		CELL ch = string_nth(s,i);
 		if(ch == '\0' || ch >= (1 << (max * 8)))
 			return false;
 	}
@@ -572,7 +601,7 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 	} \
 	type *to_##type##_string(F_STRING *s, bool check) \
 	{ \
-		if(sizeof(type) == sizeof(u16)) \
+		if(sizeof(type) == sizeof(char)) \
 		{ \
 			if(check && !check_string(s,sizeof(type))) \
 				general_error(ERROR_C_STRING,tag_object(s),F,NULL); \
@@ -597,16 +626,16 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 STRING_TO_MEMORY(char);
 STRING_TO_MEMORY(u16);
 
-DEFINE_PRIMITIVE(char_slot)
+DEFINE_PRIMITIVE(string_nth)
 {
-	F_STRING* string = untag_object(dpop());
+	F_STRING *string = untag_object(dpop());
 	CELL index = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(string_nth(string,index)));
 }
 
-DEFINE_PRIMITIVE(set_char_slot)
+DEFINE_PRIMITIVE(set_string_nth)
 {
-	F_STRING* string = untag_object(dpop());
+	F_STRING *string = untag_object(dpop());
 	CELL index = untag_fixnum_fast(dpop());
 	CELL value = untag_fixnum_fast(dpop());
 	set_string_nth(string,index,value);
