@@ -83,6 +83,12 @@ IN: windows.kernel32
 : FILE_NOTIFY_CHANGE_FILE_NAME   HEX: 200 ; inline
 : FILE_NOTIFY_CHANGE_ALL         HEX: 3ff ; inline
 
+: FILE_ACTION_ADDED 1 ; inline
+: FILE_ACTION_REMOVED 2 ; inline
+: FILE_ACTION_MODIFIED 3 ; inline
+: FILE_ACTION_RENAMED_OLD_NAME 4 ; inline
+: FILE_ACTION_RENAMED_NEW_NAME 5 ; inline
+
 C-STRUCT: FILE_NOTIFY_INFORMATION
     { "DWORD" "NextEntryOffset" }
     { "DWORD" "Action" }

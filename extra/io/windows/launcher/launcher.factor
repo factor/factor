@@ -119,8 +119,15 @@ TUPLE: CreateProcess-args
     drop STD_ERROR_HANDLE GetStdHandle ;
 
 : redirect-stderr ( args -- handle )
-    +stderr+ get GENERIC_WRITE CREATE_ALWAYS redirect
-    swap inherited-stderr ?closed ;
+    +stderr+ get
+    dup +stdout+ eq? [
+        drop
+        CreateProcess-args-lpStartupInfo
+        STARTUPINFO-hStdOutput
+    ] [
+        GENERIC_WRITE CREATE_ALWAYS redirect
+        swap inherited-stderr ?closed
+    ] if ;
 
 : inherited-stdin ( args -- handle )
     CreateProcess-args-stdin-pipe
