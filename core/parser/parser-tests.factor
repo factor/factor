@@ -8,13 +8,13 @@ IN: temporary
     [ 1 CHAR: a ]
     [ 0 "abcd" next-char ] unit-test
 
-    [ 6 CHAR: \s ]
+    [ 8 CHAR: \s ]
     [ 1 "\\u000020hello" next-escape ] unit-test
 
     [ 2 CHAR: \n ]
     [ 1 "\\nhello" next-escape ] unit-test
 
-    [ 6 CHAR: \s ]
+    [ 8 CHAR: \s ]
     [ 0 "\\u000020hello" next-char ] unit-test
 
     [ 1 [ 2 [ 3 ] 4 ] 5 ]
