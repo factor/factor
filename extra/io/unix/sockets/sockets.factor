@@ -15,8 +15,7 @@ libc combinators ;
     #! <client> don't set up error handlers until after <client>
     #! returns (and if they did before, they wouldn't have
     #! anything to close!)
-    dup port-error dup
-    [ swap stream-close throw ] [ 2drop ] if ;
+    dup port-error dup [ swap dispose throw ] [ 2drop ] if ;
 
 : socket-fd ( domain type -- socket )
     0 socket dup io-error dup init-handle ;
@@ -41,7 +40,7 @@ M: connect-task do-io-task
     0 < [ defer-error ] [ drop t ] if ;
 
 : wait-to-connect ( port -- )
-    [ <connect-task> add-io-task stop ] callcc0 drop ;
+    [ <connect-task> add-io-task ] with-port-continuation drop ;
 
 M: unix-io (client) ( addrspec -- stream )
     dup make-sockaddr/size >r >r
@@ -83,7 +82,7 @@ M: accept-task do-io-task
     over 0 >= [ do-accept t ] [ 2drop defer-error ] if ;
 
 : wait-to-accept ( server -- )
-    [ <accept-task> add-io-task stop ] callcc0 drop ;
+    [ <accept-task> add-io-task ] with-port-continuation drop ;
 
 USE: io.sockets
 
@@ -148,7 +147,7 @@ M: receive-task do-io-task
     ] if ;
 
 : wait-receive ( stream -- )
-    [ <receive-task> add-io-task stop ] callcc0 drop ;
+    [ <receive-task> add-io-task ] with-port-continuation drop ;
 
 M: unix-io receive ( datagram -- packet addrspec )
     dup check-datagram-port
@@ -179,7 +178,8 @@ M: send-task do-io-task
     swap 0 < [ io-task-port defer-error ] [ drop t ] if ;
 
 : wait-send ( packet sockaddr len stream -- )
-    [ <send-task> add-io-task stop ] callcc0 2drop 2drop ;
+    [ <send-task> add-io-task ] with-port-continuation
+    2drop 2drop ;
 
 M: unix-io send ( packet addrspec datagram -- )
     3dup check-datagram-send

@@ -1,8 +1,8 @@
 USING: alien alien.c-types arrays assocs combinators
 continuations destructors io io.backend io.nonblocking
-io.windows libc kernel math namespaces sequences threads
-tuples.lib windows windows.errors windows.kernel32 strings
-splitting io.files qualified ;
+io.windows libc kernel math namespaces sequences
+threads tuples.lib windows windows.errors windows.kernel32
+strings splitting io.files qualified ascii ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
 
@@ -122,19 +122,11 @@ M: windows-nt-io add-completion ( handle -- )
 : drain-overlapped ( timeout -- )
     handle-overlapped [ 0 drain-overlapped ] unless ;
 
-: maybe-expire ( io-callbck -- )
-    io-callback-port
-    dup timeout? [
-        port-handle win32-file-handle CancelIo drop
-    ] [
-        drop
-    ] if ;
-
-: cancel-timeout ( -- )
-    io-hash get-global [ nip maybe-expire ] assoc-each ;
+M: windows-nt-io expire-port
+    port-handle win32-file-handle CancelIo drop ;
 
 M: windows-nt-io io-multiplex ( ms -- )
-    cancel-timeout drain-overlapped ;
+    expire-timeouts drain-overlapped ;
 
 M: windows-nt-io init-io ( -- )
     <master-completion-port> master-completion-port set-global

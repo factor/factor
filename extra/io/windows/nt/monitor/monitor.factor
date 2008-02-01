@@ -34,8 +34,6 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
 : check-closed ( monitor -- )
     port-type closed eq? [ "Monitor closed" throw ] when ;
 
-M: windows-nt-io close-monitor ( monitor -- ) stream-close ;
-
 : begin-reading-changes ( monitor -- overlapped )
     dup port-handle win32-file-handle
     over buffer-ptr
@@ -48,8 +46,11 @@ M: windows-nt-io close-monitor ( monitor -- ) stream-close ;
 
 : read-changes ( monitor -- bytes )
     [
-        dup begin-reading-changes swap [ save-callback ] 2keep
-        get-overlapped-result
+        [
+            dup begin-reading-changes
+            swap [ save-callback ] 2keep
+            get-overlapped-result
+        ] with-port-timeout
     ] with-destructors ;
 
 : parse-action-flag ( action mask symbol -- action )

@@ -2,7 +2,7 @@ USING: sequences namespaces unicode.data kernel combinators.lib
 math arrays ;
 IN: unicode.normalize
 
-! Utility word
+! Utility word--probably unnecessary
 : make* ( seq quot exemplar -- newseq )
     ! quot has access to original seq on stack
     ! this just makes the new-resizable the same length as seq
@@ -89,7 +89,7 @@ IN: unicode.normalize
         swap [ [
             dup hangul? [ hangul>jamo % drop ]
             [ dup rot call [ % ] [ , ] ?if ] if
-        ] with each ] "" make*
+        ] with each ] "" make
         dup reorder
     ] if ; inline
 
@@ -167,7 +167,7 @@ SYMBOL: char
         0 ind set
         SBUF" " clone after set
         pass-combining (compose)
-    ] "" make* ;
+    ] "" make ;
 
 : nfc ( string -- nfc )
     nfd compose ;

@@ -238,3 +238,15 @@ DEFER: flushable-test-2
 [ \ bx forget ] with-compilation-unit
 
 [ t ] [ \ ax compiled-usage [ drop interned? ] assoc-all? ] unit-test
+
+DEFER: defer-redefine-test-2
+
+[ ] [ "IN: temporary DEFER: defer-redefine-test-1" eval ] unit-test
+
+[ ] [ "IN: temporary : defer-redefine-test-2 defer-redefine-test-1 1 ;" eval ] unit-test
+
+[ defer-redefine-test-2 ] unit-test-fails
+
+[ ] [ "IN: temporary : defer-redefine-test-1 2 ;" eval ] unit-test
+
+[ 2 1 ] [ defer-redefine-test-2 ] unit-test

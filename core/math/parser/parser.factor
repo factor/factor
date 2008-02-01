@@ -1,7 +1,7 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math.private namespaces sequences strings arrays
-combinators splitting math ;
+combinators splitting math assocs ;
 IN: math.parser
 
 DEFER: base>
@@ -11,12 +11,30 @@ DEFER: base>
     2dup and [ / ] [ 2drop f ] if ;
 
 : digit> ( ch -- n )
-    {
-        { [ dup digit?  ] [ CHAR: 0 - ] }
-        { [ dup letter? ] [ CHAR: a - 10 + ] }
-        { [ dup LETTER? ] [ CHAR: A - 10 + ] }
-        { [ t ] [ drop f ] }
-    } cond ;
+    H{
+        { CHAR: 0 0 }
+        { CHAR: 1 1 }
+        { CHAR: 2 2 }
+        { CHAR: 3 3 }
+        { CHAR: 4 4 }
+        { CHAR: 5 5 }
+        { CHAR: 6 6 }
+        { CHAR: 7 7 }
+        { CHAR: 8 8 }
+        { CHAR: 9 9 }
+        { CHAR: A 10 }
+        { CHAR: B 11 }
+        { CHAR: C 12 }
+        { CHAR: D 13 }
+        { CHAR: E 14 }
+        { CHAR: F 15 }
+        { CHAR: a 10 }
+        { CHAR: b 11 }
+        { CHAR: c 12 }
+        { CHAR: d 13 }
+        { CHAR: e 14 }
+        { CHAR: f 15 }
+    } at ;
 
 : digits>integer ( radix seq -- n )
     0 rot [ swapd * + ] curry reduce ;

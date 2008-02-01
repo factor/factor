@@ -127,7 +127,7 @@ ARTICLE: { "concurrency" "processes" } "Processes"
 { $code ": odd? ( n -- ? ) 2 mod 1 = ;\n1 self send 2 self send 3 self send\n\nreceive .\n => 1\n\n[ odd? ] receive-if .\n => 3\n\nreceive .\n => 2" } ;
 
 ARTICLE: { "concurrency" "self" } "Self"
-"A process can get access to its own process object using " { $link self } " so it can pass it to other processes. This allows the other processes to send messages back. A simple example of using this gets the current processes 'self' and spawns a process which sends a message to it. We then receive the message from the original process:" 
+"A process can get access to its own process object using " { $link self } " so it can pass it to other processes. This allows the other processes to send messages back. A simple example of using this gets the current process' 'self' and spawns a process which sends a message to it. We then receive the message from the original process:" 
 { $code "self [ \"Hello!\" swap send ] spawn 2drop receive .\n => \"Hello!\"" } ;
 
 ARTICLE: { "concurrency" "servers" } "Servers"
@@ -150,7 +150,7 @@ ARTICLE: { "concurrency" "exceptions" } "Exceptions"
 "Exceptions are only raised in the parent when the parent does a " { $link receive } " or " { $link receive-if } ". This is because the exception is sent from the child to the parent as a message." ;
 
 ARTICLE: { "concurrency" "futures" } "Futures"
-"A future is a placeholder for the result of a computation that is being calculated in a process. When the process has completed the computation the future can be queried to find out the result. If the computation has not completed when the future is queried them the process will block until the result is completed. <p>A future is created using " { $link future } ".\n\nThe quotation will be run in a spawned process, and a future object is immediately returned. This future object can be resolved using " { $link ?future } ".\n\nFutures are useful for starting calculations that take a long time to run but aren't needed until later in the process. When the process needs the value it can use '?future' to get the result or block until the result is available. For example:"
+"A future is a placeholder for the result of a computation that is being calculated in a process. When the process has completed the computation the future can be queried to find out the result. If the computation has not completed when the future is queried them the process will block until the result is completed. A future is created using " { $link future } ".\n\nThe quotation will be run in a spawned process, and a future object is immediately returned. This future object can be resolved using " { $link ?future } ".\n\nFutures are useful for starting calculations that take a long time to run but aren't needed until later in the process. When the process needs the value it can use '?future' to get the result or block until the result is available. For example:"
 { $code "[ 30 fib ] future\n...do stuff...\n?future" } ;
 
 ARTICLE: { "concurrency" "promises" } "Promises"

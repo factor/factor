@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Matthew Willis
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cryptlib cryptlib.libcl kernel alien sequences
+USING: cryptlib cryptlib.libcl kernel alien sequences continuations
 byte-arrays namespaces io.buffers math generic io strings
 io.streams.lines io.streams.plain io.streams.duplex combinators
 alien.c-types ;
@@ -84,7 +84,7 @@ M: crypt-stream stream-write1 ( ch stream -- )
 : check-close ( err -- )
     dup CRYPT_ERROR_PARAM1 = [ drop ] [ check-result ] if ;
     
-M: crypt-stream stream-close ( stream -- )
+M: crypt-stream dispose ( stream -- )
     crypt-stream-handle cryptDestroySession check-close ;
 
 : create-session ( format -- session )
@@ -115,7 +115,7 @@ M: crypt-stream stream-close ( stream -- )
     
     dup stream-readln print
     
-    stream-close 
+    dispose 
     end 
     ;
     
@@ -130,7 +130,7 @@ M: crypt-stream stream-close ( stream -- )
     "Thanks!" over stream-print
     dup stream-flush
     
-    stream-close
+    dispose
     end 
     ;
     
@@ -152,6 +152,6 @@ M: crypt-stream stream-close ( stream -- )
     
     (rpl)
     
-    stream-close 
+    dispose 
     end 
     ;

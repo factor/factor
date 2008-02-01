@@ -46,3 +46,9 @@ IN: temporary
 [ ?{ f } ] [
     1 2 { t f t f } <slice> >bit-array
 ] unit-test
+
+[ ?{ t f t f f f } ] [ 6 ?{ t f t } resize-bit-array ] unit-test
+
+[ ?{ t t } ] [ 2 ?{ t t f t f t f t t t f t } resize-bit-array ] unit-test
+
+[ -10 ?{ } resize-bit-array ] unit-test-fails

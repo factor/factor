@@ -1,5 +1,5 @@
 USING: io io.buffers io.backend help.markup help.syntax kernel
-strings sbufs words ;
+strings sbufs words continuations ;
 IN: io.nonblocking
 
 ARTICLE: "io.nonblocking" "Non-blocking I/O implementation"
@@ -23,7 +23,7 @@ $nl
 "Per-port native I/O protocol:"
 { $subsection init-handle }
 { $subsection (wait-to-read) }
-"Additionally, the I/O backend must provide an implementation of the " { $link stream-flush } " and " { $link stream-close } " generic words."
+"Additionally, the I/O backend must provide an implementation of the " { $link stream-flush } " and " { $link dispose } " generic words."
 $nl
 "Dummy ports which should be used to implement networking:"
 { $subsection server-port }

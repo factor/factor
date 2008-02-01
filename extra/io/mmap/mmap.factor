@@ -1,7 +1,7 @@
-! Copyright (C) 2007 Doug Coleman.
+! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations io.backend kernel quotations sequences
-system alien sequences.private ;
+system alien alien.accessors sequences.private ;
 IN: io.mmap
 
 TUPLE: mapped-file length address handle closed? ;
@@ -23,14 +23,12 @@ INSTANCE: mapped-file sequence
 
 HOOK: <mapped-file> io-backend ( path length -- mmap )
 
-HOOK: (close-mapped-file) io-backend ( mmap -- )
+HOOK: close-mapped-file io-backend ( mmap -- )
 
-: close-mapped-file ( mmap -- )
+M: mapped-file dispose ( mmap -- )
     check-closed
     t over set-mapped-file-closed?
-    (close-mapped-file) ;
+    close-mapped-file ;
 
 : with-mapped-file ( path length quot -- )
-    >r <mapped-file> r>
-    [ keep ] curry
-    [ close-mapped-file ] [ ] cleanup ; inline
+    >r <mapped-file> r> with-disposal ; inline

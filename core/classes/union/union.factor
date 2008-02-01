@@ -20,6 +20,8 @@ PREDICATE: class union-class
     over members union-predicate-quot
     define-predicate ;
 
+M: union-class update-predicate define-union-predicate ;
+
 : define-union-class ( class members -- )
     dupd f union-class define-class define-union-predicate ;
 

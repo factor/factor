@@ -4,7 +4,7 @@ void print_chars(F_STRING* str)
 {
 	CELL i;
 	for(i = 0; i < string_capacity(str); i++)
-		putchar(cget(SREF(str,i)));
+		putchar(string_nth(str,i));
 }
 
 void print_word(F_WORD* word, CELL nesting)

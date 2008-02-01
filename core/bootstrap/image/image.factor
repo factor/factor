@@ -17,8 +17,6 @@ IN: bootstrap.image
 : image-magic HEX: 0f0e0d0c ; inline
 : image-version 4 ; inline
 
-: char bootstrap-cell 2/ ; inline
-
 : data-base 1024 ; inline
 
 : userenv-size 40 ; inline
@@ -244,20 +242,18 @@ M: wrapper '
     [ emit ] emit-object ;
 
 ! Strings
-: 16be> 0 [ swap 16 shift bitor ] reduce ;
-: 16le> <reversed> 16be> ;
-
 : emit-chars ( seq -- )
-    char <groups>
-    big-endian get [ [ 16be> ] map ] [ [ 16le> ] map ] if
+    bootstrap-cell <groups>
+    big-endian get [ [ be> ] map ] [ [ le> ] map ] if
     emit-seq ;
 
 : pack-string ( string -- newstr )
-    dup length 1+ char align 0 pad-right ;
+    dup length 1+ bootstrap-cell align 0 pad-right ;
 
 : emit-string ( string -- ptr )
     string type-number object tag-number [
         dup length emit-fixnum
+        f ' emit
         f ' emit
         pack-string emit-chars
     ] emit-object ;
@@ -320,24 +316,33 @@ M: quotation '
 ! Vectors and sbufs
 
 M: vector '
-    dup underlying ' swap length
-    vector type-number object tag-number [
-        emit-fixnum ! length
+    dup length swap underlying '
+    tuple type-number tuple tag-number [
+        4 emit-fixnum
+        vector ' emit
+        f ' emit
         emit ! array ptr
+        emit-fixnum ! length
     ] emit-object ;
 
 M: sbuf '
-    dup underlying ' swap length
-    sbuf type-number object tag-number [
-        emit-fixnum ! length
+    dup length swap underlying '
+    tuple type-number tuple tag-number [
+        4 emit-fixnum
+        sbuf ' emit
+        f ' emit
         emit ! array ptr
+        emit-fixnum ! length
     ] emit-object ;
 
 ! Hashes
 
 M: hashtable '
     [ hash-array ' ] keep
-    hashtable type-number object tag-number [
+    tuple type-number tuple tag-number [
+        5 emit-fixnum
+        hashtable ' emit
+        f ' emit
         dup hash-count emit-fixnum
         hash-deleted emit-fixnum
         emit ! array ptr

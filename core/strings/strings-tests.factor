@@ -1,5 +1,5 @@
 USING: continuations kernel math namespaces strings sbufs
-tools.test sequences vectors ;
+tools.test sequences vectors arrays ;
 IN: temporary
 
 [ CHAR: b ] [ 1 >bignum "abc" nth ] unit-test
@@ -66,3 +66,27 @@ unit-test
 ! Random tester found this
 [ { "kernel-error" 3 12 -7 } ]
 [ [ 2 -7 resize-string ] catch ] unit-test
+
+"hello world" "s" set
+
+[ ] [ HEX: 1234 1 "s" get set-nth ] unit-test
+[ ] [ HEX: 4321 3 "s" get set-nth ] unit-test
+[ ] [ HEX: 654321 5 "s" get set-nth ] unit-test
+
+[
+    {
+        CHAR: h
+        HEX: 1234
+        CHAR: l
+        HEX: 4321
+        CHAR: o
+        HEX: 654321
+        CHAR: w
+        CHAR: o
+        CHAR: r
+        CHAR: l
+        CHAR: d
+    }
+] [
+    "s" get >array
+] unit-test

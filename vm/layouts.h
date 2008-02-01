@@ -19,9 +19,6 @@ typedef signed long long s64;
 
 #define CELLS ((signed)sizeof(CELL))
 
-/* must always be 16 bits */
-#define CHARS ((signed)sizeof(u16))
-
 #define WORD_SIZE (CELLS*8)
 #define HALF_WORD_SIZE (CELLS*4)
 #define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
@@ -52,21 +49,18 @@ typedef signed long long s64;
 /*** Header types ***/
 #define ARRAY_TYPE 8
 #define WRAPPER_TYPE 9
-#define HASHTABLE_TYPE 10
-#define VECTOR_TYPE 11
+#define FLOAT_ARRAY_TYPE 10
+#define CALLSTACK_TYPE 11
 #define STRING_TYPE 12
-#define SBUF_TYPE 13
+#define CURRY_TYPE 13
 #define QUOTATION_TYPE 14
 #define DLL_TYPE 15
 #define ALIEN_TYPE 16
 #define WORD_TYPE 17
 #define BYTE_ARRAY_TYPE 18
 #define BIT_ARRAY_TYPE 19
-#define FLOAT_ARRAY_TYPE 20
-#define CURRY_TYPE 21
-#define CALLSTACK_TYPE 22
 
-#define TYPE_COUNT 23
+#define TYPE_COUNT 20
 
 INLINE bool immediate_p(CELL obj)
 {
@@ -105,44 +99,14 @@ typedef F_ARRAY F_FLOAT_ARRAY;
 
 /* Assembly code makes assumptions about the layout of this struct */
 typedef struct {
-	/* always tag_header(VECTOR_TYPE) */
-	CELL header;
-	/* tagged */
-	CELL top;
-	/* tagged */
-	CELL array;
-} F_VECTOR;
-
-/* Assembly code makes assumptions about the layout of this struct */
-typedef struct {
 	CELL header;
 	/* tagged num of chars */
 	CELL length;
 	/* tagged */
+	CELL aux;
+	/* tagged */
 	CELL hashcode;
 } F_STRING;
-
-/* Assembly code makes assumptions about the layout of this struct */
-typedef struct {
-	/* always tag_header(SBUF_TYPE) */
-	CELL header;
-	/* tagged */
-	CELL top;
-	/* tagged */
-	CELL string;
-} F_SBUF;
-
-/* Assembly code makes assumptions about the layout of this struct */
-typedef struct {
-	/* always tag_header(HASHTABLE_TYPE) */
-	CELL header;
-	/* tagged */
-	CELL count;
-        /* tagged */
-        CELL deleted;
-	/* tagged */
-	CELL array;
-} F_HASHTABLE;
 
 /* The compiled code heap is structured into blocks. */
 typedef struct
