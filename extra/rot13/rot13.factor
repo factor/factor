@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences strings io combinators ;
+USING: kernel math sequences strings io combinators ascii ;
 IN: rot13
 
 : rotate ( ch base -- ch ) tuck - 13 + 26 mod + ;
