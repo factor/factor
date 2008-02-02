@@ -1,5 +1,6 @@
 USING: arrays combinators.lib kernel math math.functions math.miller-rabin
-    math.parser math.primes.factors math.ranges namespaces sequences sorting ;
+    math.matrices math.parser math.primes.factors math.ranges namespaces
+    sequences sorting ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -16,6 +17,7 @@ IN: project-euler.common
 ! propagate-all - #18, #67
 ! sum-proper-divisors - #21
 ! tau* - #12
+! [uad]-transform - #39, #75
 
 
 : nth-pair ( n seq -- nth next )
@@ -44,6 +46,9 @@ IN: project-euler.common
         [ 2dup mod zero? [ 2dup / + , ] [ drop ] if ] each
         dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
     ] { } make sum ;
+
+: transform ( triple matrix -- new-triple )
+    [ 1array ] dip m. first ;
 
 PRIVATE>
 
@@ -101,3 +106,12 @@ PRIVATE>
     dup sqrt >fixnum [1,b] [
         dupd mod zero? [ [ 2 + ] dip ] when
     ] each drop * ;
+
+! These transforms are for generating primitive Pythagorean triples
+: u-transform ( triple -- new-triple )
+    { { 1 2 2 } { -2 -1 -2 } { 2 2 3 } } transform ;
+: a-transform ( triple -- new-triple )
+    { { 1 2 2 } { 2 1 2 } { 2 2 3 } } transform ;
+: d-transform ( triple -- new-triple )
+    { { -1 -2 -2 } { 2 1 2 } { 2 2 3 } } transform ;
+

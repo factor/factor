@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators.lib kernel math math.matrices math.ranges namespaces
-    sequences ;
+USING: arrays combinators.lib kernel math math.ranges namespaces
+    project-euler.common sequences ;
 IN: project-euler.039
 
 ! http://projecteuler.net/index.php?section=problems&id=39
@@ -21,6 +21,7 @@ IN: project-euler.039
 ! --------
 
 ! Algorithm adapted from http://mathworld.wolfram.com/PythagoreanTriple.html
+! Identical implementation as problem #75
 
 ! Basically, this makes an array of 1000 zeros, recursively creates primitive
 ! triples using the three transforms and then increments the array at index
@@ -38,18 +39,6 @@ SYMBOL: p-count
 : adjust-p-count ( n -- )
     max-p 1- over <range> p-count get
     [ [ 1+ ] change-nth ] curry each ;
-
-: transform ( triple matrix -- new-triple )
-    [ 1array ] dip m. first ;
-
-: u-transform ( triple -- new-triple )
-    { { 1 2 2 } { -2 -1 -2 } { 2 2 3 } } transform ;
-
-: a-transform ( triple -- new-triple )
-    { { 1 2 2 } { 2 1 2 } { 2 2 3 } } transform ;
-
-: d-transform ( triple -- new-triple )
-    { { -1 -2 -2 } { 2 1 2 } { 2 2 3 } } transform ;
 
 : (count-perimeters) ( seq -- )
     dup sum max-p < [

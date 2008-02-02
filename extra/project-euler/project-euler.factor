@@ -12,7 +12,8 @@ USING: definitions io io.files kernel math math.parser project-euler.ave-time
     project-euler.029 project-euler.030 project-euler.031 project-euler.032
     project-euler.033 project-euler.034 project-euler.035 project-euler.036
     project-euler.037 project-euler.038 project-euler.039 project-euler.067
-    project-euler.134 project-euler.169 project-euler.173 project-euler.175 ;
+    project-euler.075 project-euler.134 project-euler.169 project-euler.173
+    project-euler.175 ;
 IN: project-euler
 
 <PRIVATE
