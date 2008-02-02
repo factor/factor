@@ -109,7 +109,7 @@ M: c-type stack-size c-type-size ;
 
 GENERIC: byte-length ( seq -- n ) flushable
 
-M: float-array byte-length length "float" heap-size * ;
+M: float-array byte-length length "double" heap-size * ;
 
 M: byte-array byte-length length ;
 

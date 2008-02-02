@@ -1,6 +1,6 @@
 USING: arrays combinators.lib kernel math math.functions math.vectors namespaces
        opengl opengl.gl sequences ui ui.gadgets ui.gestures ui.render ;
-IN: opengl-demo-support
+IN: opengl.demo-support
 
 : NEAR-PLANE 1.0 64.0 / ; inline
 : FAR-PLANE 4.0 ; inline

@@ -444,8 +444,11 @@ PREDICATE: integer gl-program (gl-program?) ;
     [ "Required GLSL version " % % " not supported (" % glsl-version % " available)" % ]
     (require-gl) ;
 
+: has-gl-version-or-extensions? ( version extensions -- ? )
+    has-gl-extensions? swap has-gl-version? or ;
+
 : require-gl-version-or-extensions ( version extensions -- )
-    2array [ first2 has-gl-extensions? swap has-gl-version? or ]
-    [ dup first (make-gl-version-error) "\n" %
-      second (make-gl-extensions-error) "\n" % ]
-    (require-gl) ;
+    2array [ first2 has-gl-version-or-extensions? ] [
+        dup first (make-gl-version-error) "\n" %
+        second (make-gl-extensions-error) "\n" %
+    ] (require-gl) ;
