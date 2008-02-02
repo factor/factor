@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables io kernel math namespaces math.parser assocs
-sequences strings splitting ;
+sequences strings splitting ascii ;
 IN: http
 
 : header-line ( line -- )
@@ -20,7 +20,7 @@ IN: http
     dup letter?
     over LETTER? or
     over digit? or
-    swap "/_-?." member? or ; foldable
+    swap "/_-." member? or ; foldable
 
 : url-encode ( str -- str )
     [

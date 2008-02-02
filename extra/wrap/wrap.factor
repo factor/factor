@@ -12,15 +12,17 @@ SYMBOL: width
 
 : (split-chunk) ( words -- )
     -1 over [ length + 1+ dup width get > ] find drop nip
-    [ cut-slice swap , (split-chunk) ] [ , ] if* ;
+    [ 1 max cut-slice swap , (split-chunk) ] [ , ] if* ;
 
 : split-chunk ( words -- lines )
     [ (split-chunk) ] { } make ;
 
+: join-spaces ( words-seqs -- lines )
+    [ [ " " join ] map ] map concat ;
+
 : broken-lines ( string width -- lines )
     width [
-        line-chunks
-        [ split-chunk [ " " join ] map ] map concat
+        line-chunks [ split-chunk ] map join-spaces
     ] with-variable ;
 
 : line-break ( string width -- newstring )

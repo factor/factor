@@ -1,9 +1,8 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays assocs combinators.lib io kernel
+USING: alien alien.accessors arrays assocs combinators.lib io kernel
 macros math namespaces prettyprint quotations sequences
-vectors vocabs words ;
-USING: html.elements slots.private tar ;
+vectors vocabs words html.elements slots.private tar ;
 IN: lint
 
 SYMBOL: def-hash

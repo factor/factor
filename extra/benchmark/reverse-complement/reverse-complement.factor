@@ -1,6 +1,6 @@
 USING: io io.files io.streams.duplex kernel sequences
 sequences.private strings vectors words memoize splitting
-hints ;
+hints unicode.case ;
 IN: benchmark.reverse-complement
 
 MEMO: trans-map ( -- str )
