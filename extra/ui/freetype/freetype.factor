@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays io kernel libc math
-math.vectors namespaces opengl opengl.gl prettyprint assocs
+USING: alien alien.accessors alien.c-types arrays io kernel libc
+math math.vectors namespaces opengl opengl.gl prettyprint assocs
 sequences io.files io.styles continuations freetype
 ui.gadgets.worlds ui.render ui.backend byte-arrays ;
 IN: ui.freetype

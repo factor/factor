@@ -7,11 +7,10 @@ HOOK: <monitor> io-backend ( path recursive? -- monitor )
 
 HOOK: next-change io-backend ( monitor -- path changes )
 
-SYMBOL: +change-file+
-SYMBOL: +change-name+
-SYMBOL: +change-size+
-SYMBOL: +change-attributes+
-SYMBOL: +change-modified+
+SYMBOL: +add-file+
+SYMBOL: +remove-file+
+SYMBOL: +modify-file+
+SYMBOL: +rename-file+
 
 : with-monitor ( path recursive? quot -- )
     >r <monitor> r> with-disposal ; inline

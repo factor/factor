@@ -1,9 +1,9 @@
 ! Copyright (C) 2007 Matthew Willis
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cryptlib cryptlib.libcl kernel alien sequences
+USING: cryptlib cryptlib.libcl kernel alien sequences continuations
 byte-arrays namespaces io.buffers math generic io strings
 io.streams.lines io.streams.plain io.streams.duplex combinators
-alien.c-types ;
+alien.c-types continuations ;
 
 IN: cryptlib.streams
 

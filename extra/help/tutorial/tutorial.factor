@@ -1,6 +1,7 @@
 USING: help.markup help.syntax ui.commands ui.operations
 ui.tools.search ui.tools.workspace editors vocabs.loader
-kernel sequences prettyprint tools.test strings ;
+kernel sequences prettyprint tools.test strings
+unicode.categories unicode.case ;
 IN: help.tutorial
 
 ARTICLE: "first-program-start" "Creating a vocabulary for your first program"
@@ -134,7 +135,7 @@ $nl
 { $code "[ Letter? ] subset >lower" }
 "This code starts with a string on the stack, removes non-alphabetical characters, and converts the result to lower case, leaving a new string on the stack. We put this code in a new word, and add the new word to " { $snippet "palindrome.factor" } ":"
 { $code ": normalize ( str -- newstr ) [ Letter? ] subset >lower ;" }
-"You will need to add " { $vocab-link "strings" } " to the vocabulary search path, so that " { $link Letter? } " can be used in the source file."
+"You will need to add " { $vocab-link "unicode.categories" } " to the vocabulary search path, so that " { $link Letter? } " can be used in the source file."
 $nl
 "We modify " { $snippet "palindrome?" } " to first apply " { $snippet "normalize" } " to its input:"
 { $code ": palindrome? ( str -- ? ) normalize dup reverse = ;" }

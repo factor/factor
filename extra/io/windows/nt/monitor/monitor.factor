@@ -4,7 +4,7 @@ USING: alien.c-types destructors io.windows
 io.windows.nt.backend kernel math windows windows.kernel32
 windows.types libc assocs alien namespaces continuations
 io.monitor io.nonblocking io.buffers io.files io sequences
-hashtables sorting arrays ;
+hashtables sorting arrays combinators ;
 IN: io.windows.nt.monitor
 
 TUPLE: monitor path recursive? queue closed? ;
@@ -46,29 +46,24 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
 
 : read-changes ( monitor -- bytes )
     [
-        dup begin-reading-changes swap [ save-callback ] 2keep
-        get-overlapped-result
+        [
+            dup begin-reading-changes
+            swap [ save-callback ] 2keep
+            get-overlapped-result
+        ] with-port-timeout
     ] with-destructors ;
 
-: parse-action-flag ( action mask symbol -- action )
-    >r over bitand 0 > [ r> , ] [ r> drop ] if ;
+: parse-action ( action -- changed )
+    {
+        { [ dup FILE_ACTION_ADDED = ] [ +add-file+ ] }
+        { [ dup FILE_ACTION_REMOVED = ] [ +remove-file+ ] }
+        { [ dup FILE_ACTION_MODIFIED = ] [ +modify-file+ ] }
+        { [ dup FILE_ACTION_RENAMED_OLD_NAME = ] [ +rename-file+ ] }
+        { [ dup FILE_ACTION_RENAMED_NEW_NAME = ] [ +rename-file+ ] }
+        { [ t ] [ +modify-file+ ] }
+    } cond nip ;
 
-: parse-action ( action -- changes )
-    [
-        FILE_NOTIFY_CHANGE_FILE +change-file+ parse-action-flag
-        FILE_NOTIFY_CHANGE_DIR_NAME +change-name+ parse-action-flag
-        FILE_NOTIFY_CHANGE_ATTRIBUTES +change-attributes+ parse-action-flag
-        FILE_NOTIFY_CHANGE_SIZE +change-size+ parse-action-flag
-        FILE_NOTIFY_CHANGE_LAST_WRITE +change-modified+ parse-action-flag
-        FILE_NOTIFY_CHANGE_LAST_ACCESS +change-attributes+ parse-action-flag
-        FILE_NOTIFY_CHANGE_EA +change-attributes+ parse-action-flag
-        FILE_NOTIFY_CHANGE_CREATION +change-attributes+ parse-action-flag
-        FILE_NOTIFY_CHANGE_SECURITY +change-attributes+ parse-action-flag
-        FILE_NOTIFY_CHANGE_FILE_NAME +change-name+ parse-action-flag
-        drop
-    ] { } make ;
-
-: changed-file ( directory buffer -- changes path )
+: changed-file ( directory buffer -- changed path )
     {
         FILE_NOTIFY_INFORMATION-FileName
         FILE_NOTIFY_INFORMATION-FileNameLength
@@ -76,7 +71,7 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
     } get-slots >r memory>u16-string path+ r> parse-action swap ;
 
 : (changed-files) ( directory buffer -- )
-    2dup changed-file namespace [ append ] change-at
+    2dup changed-file namespace [ swap add ] change-at
     dup FILE_NOTIFY_INFORMATION-NextEntryOffset dup zero?
     [ 3drop ] [ swap <displaced-alien> (changed-files) ] if ;
 

@@ -99,9 +99,9 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\e" } "escape (ASCII 27)" }
     { { $snippet "\\\"" } { $snippet "\"" } }
 }
-"A Unicode character can be specified by its code number by writing " { $snippet "\\u" } " followed by a four-digit hexadecimal number. That is, the following two expressions are equivalent:"
+"A Unicode character can be specified by its code number by writing " { $snippet "\\u" } " followed by a six-digit hexadecimal number. That is, the following two expressions are equivalent:"
 { $code
-    "CHAR: \\u0078"
+    "CHAR: \\u000078"
     "78"
 }
 "While not useful for single characters, this syntax is also permitted inside strings." ;

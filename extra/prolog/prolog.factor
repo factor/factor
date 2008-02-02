@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: kernel sequences arrays vectors namespaces math strings
-    combinators continuations quotations io assocs ;
+    combinators continuations quotations io assocs ascii ;
 
 IN: prolog
 

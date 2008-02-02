@@ -14,7 +14,7 @@ PRIVATE>
 : <sbuf> ( n -- sbuf ) 0 <string> 0 string>sbuf ; inline
 
 M: sbuf set-nth-unsafe
-    underlying >r >r >fixnum r> >fixnum r> set-char-slot ;
+    underlying >r >r >fixnum r> >fixnum r> set-string-nth ;
 
 M: sbuf new drop [ 0 <string> ] keep >fixnum string>sbuf ;
 

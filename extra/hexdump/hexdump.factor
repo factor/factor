@@ -1,6 +1,6 @@
 USING: arrays combinators.lib io io.streams.string
-kernel math math.parser namespaces prettyprint
-sequences splitting strings ;
+       kernel math math.parser namespaces prettyprint
+       sequences splitting strings ascii ;
 IN: hexdump
 
 <PRIVATE

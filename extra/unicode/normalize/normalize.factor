@@ -2,17 +2,6 @@ USING: sequences namespaces unicode.data kernel combinators.lib
 math arrays ;
 IN: unicode.normalize
 
-! Utility word--probably unnecessary
-: make* ( seq quot exemplar -- newseq )
-    ! quot has access to original seq on stack
-    ! this just makes the new-resizable the same length as seq
-    [
-        [
-            pick length swap new-resizable
-            [ building set call ] keep
-        ] keep like
-    ] with-scope ; inline
-
 ! Conjoining Jamo behavior
 
 : hangul-base HEX: ac00 ; inline

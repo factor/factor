@@ -12,7 +12,7 @@ IN: bootstrap.stage2
 ! you can see what went wrong, instead of dealing with a
 ! fep
 [
-    vm file-name windows? [ >lower ".exe" ?tail drop ] when
+    vm file-name windows? [ "." split1 drop ] when
     ".image" append "output-image" set-global
 
     "math tools help compiler ui ui.tools io" "include" set-global

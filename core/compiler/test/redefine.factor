@@ -249,4 +249,4 @@ DEFER: defer-redefine-test-2
 
 [ ] [ "IN: temporary : defer-redefine-test-1 2 ;" eval ] unit-test
 
-[ 1 ] [ defer-redefine-test-2 ] unit-test
+[ 2 1 ] [ defer-redefine-test-2 ] unit-test

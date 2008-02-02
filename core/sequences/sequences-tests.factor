@@ -151,7 +151,7 @@ unit-test
 
 [ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
 [ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
-[ 5 ] [ 1 >bignum "\u0001\u0005\u0007" nth-unsafe ] unit-test
+[ 5 ] [ 1 >bignum "\u000001\u000005\u000007" nth-unsafe ] unit-test
 
 [ SBUF" before&after" ] [
     "&" 6 11 SBUF" before and after" [ replace-slice ] keep
@@ -235,12 +235,12 @@ unit-test
 [ 11 10 nth ] unit-test-fails
 
 [ -1./0. 0 delete-nth ] unit-test-fails
-[ "" ] [ "" [ blank? ] trim ] unit-test
-[ "" ] [ "" [ blank? ] left-trim ] unit-test
-[ "" ] [ "" [ blank? ] right-trim ] unit-test
-[ "" ] [ "  " [ blank? ] left-trim ] unit-test
-[ "" ] [ "  " [ blank? ] right-trim ] unit-test
-[ "asdf" ] [ " asdf " [ blank? ] trim ] unit-test
-[ "asdf " ] [ " asdf " [ blank? ] left-trim ] unit-test
-[ " asdf" ] [ " asdf " [ blank? ] right-trim ] unit-test
+[ "" ] [ "" [ CHAR: \s = ] trim ] unit-test
+[ "" ] [ "" [ CHAR: \s = ] left-trim ] unit-test
+[ "" ] [ "" [ CHAR: \s = ] right-trim ] unit-test
+[ "" ] [ "  " [ CHAR: \s = ] left-trim ] unit-test
+[ "" ] [ "  " [ CHAR: \s = ] right-trim ] unit-test
+[ "asdf" ] [ " asdf " [ CHAR: \s = ] trim ] unit-test
+[ "asdf " ] [ " asdf " [ CHAR: \s = ] left-trim ] unit-test
+[ " asdf" ] [ " asdf " [ CHAR: \s = ] right-trim ] unit-test
 
