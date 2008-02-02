@@ -17,7 +17,7 @@ IN: x11.windows
     StructureNotifyMask bitor
     KeyPressMask bitor
     KeyReleaseMask bitor
-    ButtonPressMask	bitor
+    ButtonPressMask     bitor
     ButtonReleaseMask bitor
     PointerMotionMask bitor
     FocusChangeMask bitor

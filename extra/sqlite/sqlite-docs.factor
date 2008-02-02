@@ -18,24 +18,24 @@ HELP: sqlite-close
 
 HELP: sqlite-last-insert-rowid
 { $values { "db" "the database object" } 
-	  { "rowid" "the row number of the last insert" }
+          { "rowid" "the row number of the last insert" }
 }
 { $description "Returns the number of the row of the last statement inserted into the database." } 
 { $see-also sqlite-open sqlite-close } ;
 
 HELP: sqlite-prepare
 { $values { "db" "the database object" } 
-	  { "sql" "the SQL statement as a string" }
-	  { "statement" "the prepared SQL statement" }
+          { "sql" "the SQL statement as a string" }
+          { "statement" "the prepared SQL statement" }
 }
 { $description "Internally compiles the SQL statement ready to be run by sqlite. The statement is executed and the results iterated over using " { $link sqlite-each } " and " { $link sqlite-map } ". The SQL statement can use named parameters which are later bound to values using " { $link sqlite-bind-text } " and " { $link sqlite-bind-text-by-name } "." } 
 { $see-also sqlite-open sqlite-close } ;
 
 HELP: sqlite-bind-text
 { $values { "statement" "a prepared SQL statement" }
-	  { "index" "the index of the bound parameter in the SQL statement" } 
-	  { "text" "the string value to bind to that column" }
-	  
+          { "index" "the index of the bound parameter in the SQL statement" } 
+          { "text" "the string value to bind to that column" }
+          
 }
 { $description "Binds the text to a parameter in the SQL statement. The parameter to be bound is identified by the index given and the indexes start from one." }
 { $examples { $code "\"people.db\" sqlite-open\n\"select * from people where name=?\" sqlite-prepare\n1 \"chris\" sqlite-bind-text" } }
@@ -43,9 +43,9 @@ HELP: sqlite-bind-text
 
 HELP: sqlite-bind-text-by-name
 { $values { "statement" "a prepared SQL statement" }
-	  { "name" "the name of the bound parameter in the SQL statement" } 
-	  { "text" "the string value to bind to that column" }
-	  
+          { "name" "the name of the bound parameter in the SQL statement" } 
+          { "text" "the string value to bind to that column" }
+          
 }
 { $description "Binds the text to a parameter in the SQL statement. The parameter to be bound is identified by the given name." }
 { $examples { $code "\"people.db\" sqlite-open\n\"select * from people where name=:name\" sqlite-prepare\n\"name\" \"chris\" sqlite-bind-text" } }

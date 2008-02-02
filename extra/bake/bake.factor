@@ -38,16 +38,16 @@ DEFER: bake
 
 : bake-item ( item -- )
   { { [ dup \ , = ]        [ drop , ] }
-    { [ dup \ % = ] 	   [ drop % ] }
-    { [ dup \ ,u = ]	   [ drop ,u ] }
+    { [ dup \ % = ]        [ drop % ] }
+    { [ dup \ ,u = ]       [ drop ,u ] }
     { [ dup insert-quot? ] [ insert-quot-expr call , ] }
     { [ dup splice-quot? ] [ splice-quot-expr call % ] }
     { [ dup integer? ]     [ , ] }
-    { [ dup string? ]	   [ , ] }
+    { [ dup string? ]      [ , ] }
     { [ dup tuple? ]       [ tuple>array bake >tuple , ] }
     { [ dup assoc? ]       [ [ >alist bake ] keep assoc-like , ] }
     { [ dup sequence? ]    [ bake , ] }
-    { [ t ] 		   [ , ] } }
+    { [ t ]                [ , ] } }
   cond ;
 
 : bake-items ( seq -- ) [ bake-item ] each ;

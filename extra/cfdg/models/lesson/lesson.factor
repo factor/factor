@@ -73,7 +73,7 @@ DEFER: tree
 iterate? [
   { 
     { 20  [ [ 0.25 size circle ] do
-      	    [ 0.1 y 0.97 size tree ] do ] }
+            [ 0.1 y 0.97 size tree ] do ] }
     { 1.5 [ branch ] }
   } random-weighted* do
 ] when ;

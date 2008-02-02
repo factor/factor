@@ -1,6 +1,6 @@
 USING: arrays html.parser.utils hashtables io kernel
 namespaces prettyprint quotations
-sequences splitting state-parser strings ;
+sequences splitting state-parser strings unicode.categories unicode.case ;
 IN: html.parser
 
 TUPLE: tag name attributes text matched? closing? ;

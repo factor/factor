@@ -9,9 +9,9 @@ iterate? [
   { { 1 [ circle
           [ .23 y .99 s .002 b tentacle ] do ] }
     { 1 [ circle
-      	  [ .17 y 2 r .99 s .002 b tentacle ] do ] }
+          [ .17 y 2 r .99 s .002 b tentacle ] do ] }
     { 1 [ circle
-      	  [ .12 y -2 r .99 s .001 b tentacle ] do ] } }
+          [ .12 y -2 r .99 s .001 b tentacle ] do ] } }
   call-random-weighted
 ] when ;
 

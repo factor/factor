@@ -9,23 +9,23 @@ IN: x11.glx
 LIBRARY: glx
 
 ! Visual Config Attributes (glXGetConfig, glXGetFBConfigAttrib)
-: GLX_USE_GL		1  ; ! support GLX rendering
-: GLX_BUFFER_SIZE	2  ; ! depth of the color buffer
-: GLX_LEVEL		3  ; ! level in plane stacking
-: GLX_RGBA		4  ; ! true if RGBA mode
-: GLX_DOUBLEBUFFER	5  ; ! double buffering supported
-: GLX_STEREO		6  ; ! stereo buffering supported
-: GLX_AUX_BUFFERS	7  ; ! number of aux buffers
-: GLX_RED_SIZE		8  ; ! number of red component bits
-: GLX_GREEN_SIZE	9  ; ! number of green component bits
-: GLX_BLUE_SIZE		10 ; ! number of blue component bits
-: GLX_ALPHA_SIZE	11 ; ! number of alpha component bits
-: GLX_DEPTH_SIZE	12 ; ! number of depth bits
-: GLX_STENCIL_SIZE	13 ; ! number of stencil bits
-: GLX_ACCUM_RED_SIZE	14 ; ! number of red accum bits
-: GLX_ACCUM_GREEN_SIZE	15 ; ! number of green accum bits
-: GLX_ACCUM_BLUE_SIZE	16 ; ! number of blue accum bits
-: GLX_ACCUM_ALPHA_SIZE	17 ; ! number of alpha accum bits
+: GLX_USE_GL            1  ; ! support GLX rendering
+: GLX_BUFFER_SIZE       2  ; ! depth of the color buffer
+: GLX_LEVEL             3  ; ! level in plane stacking
+: GLX_RGBA              4  ; ! true if RGBA mode
+: GLX_DOUBLEBUFFER      5  ; ! double buffering supported
+: GLX_STEREO            6  ; ! stereo buffering supported
+: GLX_AUX_BUFFERS       7  ; ! number of aux buffers
+: GLX_RED_SIZE          8  ; ! number of red component bits
+: GLX_GREEN_SIZE        9  ; ! number of green component bits
+: GLX_BLUE_SIZE         10 ; ! number of blue component bits
+: GLX_ALPHA_SIZE        11 ; ! number of alpha component bits
+: GLX_DEPTH_SIZE        12 ; ! number of depth bits
+: GLX_STENCIL_SIZE      13 ; ! number of stencil bits
+: GLX_ACCUM_RED_SIZE    14 ; ! number of red accum bits
+: GLX_ACCUM_GREEN_SIZE  15 ; ! number of green accum bits
+: GLX_ACCUM_BLUE_SIZE   16 ; ! number of blue accum bits
+: GLX_ACCUM_ALPHA_SIZE  17 ; ! number of alpha accum bits
 
 TYPEDEF: XID GLXContextID
 TYPEDEF: XID GLXPixmap
