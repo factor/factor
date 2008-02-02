@@ -1,10 +1,10 @@
 IN: temporary
-USING: arrays compiler kernel kernel.private math
-math.constants math.private sequences strings tools.test words
-continuations sequences.private hashtables.private byte-arrays
-strings.private system random layouts vectors.private
-sbufs.private strings.private slots.private alien alien.c-types
-alien.syntax namespaces libc combinators.private ;
+USING: arrays compiler kernel kernel.private math math.constants
+math.private sequences strings tools.test words continuations
+sequences.private hashtables.private byte-arrays strings.private
+system random layouts vectors.private sbufs.private
+strings.private slots.private alien alien.accessors
+alien.c-types alien.syntax namespaces libc combinators.private ;
 
 ! Make sure that intrinsic ops compile to correct code.
 [ ] [ 1 [ drop ] compile-call ] unit-test
@@ -36,13 +36,13 @@ alien.syntax namespaces libc combinators.private ;
 ! Write barrier hits on the wrong value were causing segfaults
 [ -3 ] [ -3 1 2 [ 2array [ 3 set-slot ] keep ] compile-call second ] unit-test
 
-[ CHAR: b ] [ 1 "abc" [ char-slot ] compile-call ] unit-test
-[ CHAR: b ] [ 1 [ "abc" char-slot ] compile-call ] unit-test
-[ CHAR: b ] [ [ 1 "abc" char-slot ] compile-call ] unit-test
-
-[ "axc" ] [ CHAR: x 1 "abc" [ [ set-char-slot ] keep { string } declare dup rehash-string ] compile-call ] unit-test
-[ "axc" ] [ CHAR: x 1 [ "abc" [ set-char-slot ] keep { string } declare dup rehash-string ] compile-call ] unit-test
-[ "axc" ] [ CHAR: x [ 1 "abc" [ set-char-slot ] keep { string } declare dup rehash-string ] compile-call ] unit-test
+! [ CHAR: b ] [ 1 "abc" [ char-slot ] compile-call ] unit-test
+! [ CHAR: b ] [ 1 [ "abc" char-slot ] compile-call ] unit-test
+! [ CHAR: b ] [ [ 1 "abc" char-slot ] compile-call ] unit-test
+! 
+! [ "axc" ] [ CHAR: x 1 "abc" [ [ set-char-slot ] keep { string } declare dup rehash-string ] compile-call ] unit-test
+! [ "axc" ] [ CHAR: x 1 [ "abc" [ set-char-slot ] keep { string } declare dup rehash-string ] compile-call ] unit-test
+! [ "axc" ] [ CHAR: x [ 1 "abc" [ set-char-slot ] keep { string } declare dup rehash-string ] compile-call ] unit-test
 
 [ ] [ [ 0 getenv ] compile-call drop ] unit-test
 [ ] [ 1 getenv [ 1 setenv ] compile-call ] unit-test

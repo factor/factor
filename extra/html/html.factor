@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic assocs help http io io.styles io.files
+USING: generic assocs help http io io.styles io.files continuations
 io.streams.string kernel math math.parser namespaces
 quotations assocs sequences strings words html.elements
-xml.writer sbufs ;
+xml.writer xml.entities sbufs ;
 IN: html
 
 GENERIC: browser-link-href ( presented -- href )

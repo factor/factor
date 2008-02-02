@@ -56,7 +56,7 @@ yield
 
         "Receive 2" print
 
-        "d" get receive >r >upper r>
+        "d" get receive >r " world" append r>
         
         "Send 1" print
         dup .
@@ -98,7 +98,7 @@ client-addr <datagram>
     "d" get send
 ] unit-test
 
-[ "HELLO" t ] [
+[ "hello world" t ] [
     "d" get receive
     server-addr =
     >r >string r>

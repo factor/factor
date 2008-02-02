@@ -158,8 +158,8 @@ IN: regexp-tests
 [ t ] [ "SXY" "\\0123XY" f <regexp> matches? ] unit-test
 [ t ] [ "x" "\\x78" f <regexp> matches? ] unit-test
 [ f ] [ "y" "\\x78" f <regexp> matches? ] unit-test
-[ t ] [ "x" "\\u0078" f <regexp> matches? ] unit-test
-[ f ] [ "y" "\\u0078" f <regexp> matches? ] unit-test
+[ t ] [ "x" "\\u000078" f <regexp> matches? ] unit-test
+[ f ] [ "y" "\\u000078" f <regexp> matches? ] unit-test
 
 [ t ] [ "ab" "a+b" f <regexp> matches? ] unit-test
 [ f ] [ "b" "a+b" f <regexp> matches? ] unit-test

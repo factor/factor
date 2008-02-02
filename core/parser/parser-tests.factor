@@ -8,14 +8,14 @@ IN: temporary
     [ 1 CHAR: a ]
     [ 0 "abcd" next-char ] unit-test
 
-    [ 6 CHAR: \s ]
-    [ 1 "\\u0020hello" next-escape ] unit-test
+    [ 8 CHAR: \s ]
+    [ 1 "\\u000020hello" next-escape ] unit-test
 
     [ 2 CHAR: \n ]
     [ 1 "\\nhello" next-escape ] unit-test
 
-    [ 6 CHAR: \s ]
-    [ 0 "\\u0020hello" next-char ] unit-test
+    [ 8 CHAR: \s ]
+    [ 0 "\\u000020hello" next-char ] unit-test
 
     [ 1 [ 2 [ 3 ] 4 ] 5 ]
     [ "1\n[\n2\n[\n3\n]\n4\n]\n5" eval ]
@@ -46,14 +46,12 @@ IN: temporary
     ! Test escapes
 
     [ " " ]
-    [ "\"\\u0020\"" eval ]
+    [ "\"\\u000020\"" eval ]
     unit-test
 
     [ "'" ]
-    [ "\"\\u0027\"" eval ]
+    [ "\"\\u000027\"" eval ]
     unit-test
-
-    [ "\\u123" eval ] unit-test-fails
 
     ! Test EOL comments in multiline strings.
     [ "Hello" ] [ "#! This calls until-eol.\n\"Hello\"" eval ] unit-test

@@ -1,5 +1,5 @@
 USING: continuations kernel math namespaces strings sbufs
-tools.test sequences vectors ;
+tools.test sequences vectors arrays ;
 IN: temporary
 
 [ CHAR: b ] [ 1 >bignum "abc" nth ] unit-test
@@ -28,22 +28,10 @@ IN: temporary
 
 [ "end" ] [ "Beginning and end" 14 tail ] unit-test
 
-[ t ] [ CHAR: a letter? ] unit-test
-[ f ] [ CHAR: A letter? ] unit-test
-[ f ] [ CHAR: a LETTER? ] unit-test
-[ t ] [ CHAR: A LETTER? ] unit-test
-[ t ] [ CHAR: 0 digit? ] unit-test
-[ f ] [ CHAR: x digit? ] unit-test
-
 [ t ] [ "abc" "abd" <=> 0 < ] unit-test
 [ t ] [ "z" "abd" <=> 0 > ] unit-test
 
 [ f ] [ [ 0 10 "hello" subseq ] catch not ] unit-test
-
-[ 4 ] [
-    0 "There are Four Upper Case characters"
-    [ LETTER? [ 1+ ] when ] each
-] unit-test
 
 [ "Replacing+spaces+with+plus" ]
 [
@@ -66,3 +54,37 @@ unit-test
 ! Random tester found this
 [ { "kernel-error" 3 12 -7 } ]
 [ [ 2 -7 resize-string ] catch ] unit-test
+
+! Make sure 24-bit strings work
+"hello world" "s" set
+
+[ ] [ HEX: 1234 1 "s" get set-nth ] unit-test
+[ ] [ HEX: 4321 3 "s" get set-nth ] unit-test
+[ ] [ HEX: 654321 5 "s" get set-nth ] unit-test
+
+[
+    {
+        CHAR: h
+        HEX: 1234
+        CHAR: l
+        HEX: 4321
+        CHAR: o
+        HEX: 654321
+        CHAR: w
+        CHAR: o
+        CHAR: r
+        CHAR: l
+        CHAR: d
+    }
+] [
+    "s" get >array
+] unit-test
+
+! Make sure we clear aux vector when storing octets
+[ "\u123456hi" ] [ "ih\u123456" clone dup reverse-here ] unit-test
+
+! Make sure aux vector is not shared
+[ "\udeadbe" ] [
+	"\udeadbe" clone
+	CHAR: \u123456 over clone set-first
+] unit-test

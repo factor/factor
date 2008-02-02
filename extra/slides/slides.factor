@@ -33,7 +33,7 @@ IN: slides
         { list-style
             H{ { table-gap { 10 20 } } }
         }
-        { bullet "\u00b7" }
+        { bullet "\u0000b7" }
     } ;
 
 : $title ( string -- )

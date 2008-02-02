@@ -42,19 +42,20 @@ M: windows-ce-io <server> ( addrspec -- duplex-stream )
     ] keep <server-port> ;
 
 M: windows-ce-io accept ( server -- client )
-    dup check-server-port
     [
-        dup touch-port
-        dup port-handle win32-file-handle
-        swap server-port-addr sockaddr-type heap-size
-        dup <byte-array> [
-            swap <int> f 0
-            windows.winsock:WSAAccept
-            dup windows.winsock:INVALID_SOCKET =
-            [ windows.winsock:winsock-error ] when
-        ] keep
-    ] keep server-port-addr parse-sockaddr swap
-    <win32-socket> dup handle>duplex-stream <client-stream> ;
+        dup check-server-port
+        [
+            dup port-handle win32-file-handle
+            swap server-port-addr sockaddr-type heap-size
+            dup <byte-array> [
+                swap <int> f 0
+                windows.winsock:WSAAccept
+                dup windows.winsock:INVALID_SOCKET =
+                [ windows.winsock:winsock-error ] when
+            ] keep
+        ] keep server-port-addr parse-sockaddr swap
+        <win32-socket> dup handle>duplex-stream <client-stream>
+    ] with-port-timeout ;
 
 M: windows-ce-io <datagram> ( addrspec -- datagram )
     [

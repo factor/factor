@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math
 namespaces prettyprint sequences strings vectors words
@@ -54,8 +54,9 @@ t parser-notes set-global
     0 over set-lexer-column
     dup lexer-line 1+ swap set-lexer-line ;
 
-: skip ( i seq quot -- n )
-    over >r find* drop
+: skip ( i seq ? -- n )
+    over >r
+    [ swap CHAR: \s eq? xor ] curry find* drop
     [ r> drop ] [ r> length ] if* ; inline
 
 : change-column ( lexer quot -- )
@@ -66,14 +67,13 @@ t parser-notes set-global
 GENERIC: skip-blank ( lexer -- )
 
 M: lexer skip-blank ( lexer -- )
-    [ [ blank? not ] skip ] change-column ;
+    [ t skip ] change-column ;
 
 GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word ( lexer -- )
     [
-        2dup nth CHAR: " =
-        [ drop 1+ ] [ [ blank? ] skip ] if
+        2dup nth CHAR: " = [ drop 1+ ] [ f skip ] if
     ] change-column ;
 
 : still-parsing? ( lexer -- ? )
@@ -119,7 +119,7 @@ M: bad-escape summary drop "Bad escape code" ;
 
 : next-escape ( m str -- n ch )
     2dup nth CHAR: u =
-    [ >r 1+ dup 4 + tuck r> subseq hex> ]
+    [ >r 1+ dup 6 + tuck r> subseq hex> ]
     [ over 1+ -rot nth escape ] if ;
 
 : next-char ( m str -- n ch )

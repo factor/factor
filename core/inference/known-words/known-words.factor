@@ -1,15 +1,16 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays byte-arrays classes
-combinators.private continuations.private effects float-arrays
-generic hashtables hashtables.private inference.state
-inference.backend inference.dataflow io io.backend io.files
-io.files.private io.streams.c kernel kernel.private math
-math.private memory namespaces namespaces.private parser
-prettyprint quotations quotations.private sbufs sbufs.private
-sequences sequences.private slots.private strings
-strings.private system threads.private tuples tuples.private
-vectors vectors.private words words.private assocs inspector ;
+USING: alien alien.accessors arrays bit-arrays byte-arrays
+classes combinators.private continuations.private effects
+float-arrays generic hashtables hashtables.private
+inference.state inference.backend inference.dataflow io
+io.backend io.files io.files.private io.streams.c kernel
+kernel.private math math.private memory namespaces
+namespaces.private parser prettyprint quotations
+quotations.private sbufs sbufs.private sequences
+sequences.private slots.private strings strings.private system
+threads.private tuples tuples.private vectors vectors.private
+words words.private assocs inspector ;
 IN: inference.known-words
 
 ! Shuffle words
@@ -480,10 +481,10 @@ t over set-effect-terminated?
 
 \ set-slot { object object fixnum } { } <effect> "inferred-effect" set-word-prop
 
-\ char-slot { fixnum object } { fixnum } <effect> "inferred-effect" set-word-prop
-\ char-slot make-flushable
+\ string-nth { fixnum string } { fixnum } <effect> "inferred-effect" set-word-prop
+\ string-nth make-flushable
 
-\ set-char-slot { fixnum fixnum object } { } <effect> "inferred-effect" set-word-prop
+\ set-string-nth { fixnum fixnum string } { } <effect> "inferred-effect" set-word-prop
 
 \ resize-array { integer array } { array } <effect> "inferred-effect" set-word-prop
 \ resize-array make-flushable

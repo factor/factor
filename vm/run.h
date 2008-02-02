@@ -74,14 +74,24 @@ INLINE void put(CELL where, CELL what)
 	*((CELL*)where) = what;
 }
 
-INLINE u16 cget(CELL where)
+INLINE CELL cget(CELL where)
 {
-	return *((u16*)where);
+	return *((u16 *)where);
 }
 
-INLINE void cput(CELL where, u16 what)
+INLINE void cput(CELL where, CELL what)
 {
-	*((u16*)where) = what;
+	*((u16 *)where) = what;
+}
+
+INLINE CELL bget(CELL where)
+{
+	return *((u8 *)where);
+}
+
+INLINE void bput(CELL where, CELL what)
+{
+	*((u8 *)where) = what;
 }
 
 INLINE CELL align(CELL a, CELL b)

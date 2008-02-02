@@ -176,7 +176,7 @@ void deposit_integers(CELL here, F_ARRAY *array, CELL format)
 	{
 		F_FIXNUM value = to_fixnum(array_nth(array,i));
 		if(format == 1)
-			cput(here + i,value);
+			bput(here + i,value);
 		else if(format == sizeof(unsigned int))
 			*(unsigned int *)(here + format * i) = value;
 		else if(format == CELLS)

@@ -11,7 +11,7 @@ INLINE CELL string_capacity(F_STRING* str)
 
 INLINE CELL string_size(CELL size)
 {
-	return sizeof(F_STRING) + (size + 1) * CHARS;
+	return sizeof(F_STRING) + size + 1;
 }
 
 DEFINE_UNTAG(F_BYTE_ARRAY,BYTE_ARRAY_TYPE,byte_array)
@@ -83,22 +83,13 @@ INLINE CELL array_capacity(F_ARRAY* array)
 	return array->capacity >> TAG_BITS;
 }
 
-#define SREF(string,index) ((CELL)string + sizeof(F_STRING) + index * CHARS)
+#define BREF(byte_array,index) ((CELL)byte_array + sizeof(F_BYTE_ARRAY) + index)
+#define SREF(string,index) ((CELL)string + sizeof(F_STRING) + index)
 
 INLINE F_STRING* untag_string(CELL tagged)
 {
 	type_check(STRING_TYPE,tagged);
 	return untag_object(tagged);
-}
-
-INLINE CELL string_nth(F_STRING* string, CELL index)
-{
-	return cget(SREF(string,index));
-}
-
-INLINE void set_string_nth(F_STRING* string, CELL index, u16 value)
-{
-	cput(SREF(string,index),value);
 }
 
 DEFINE_UNTAG(F_QUOTATION,QUOTATION_TYPE,quotation)
@@ -141,7 +132,7 @@ DECLARE_PRIMITIVE(resize_float_array);
 F_STRING* allot_string_internal(CELL capacity);
 F_STRING* allot_string(CELL capacity, CELL fill);
 DECLARE_PRIMITIVE(string);
-F_STRING *reallot_string(F_STRING *string, CELL capacity, u16 fill);
+F_STRING *reallot_string(F_STRING *string, CELL capacity, CELL fill);
 DECLARE_PRIMITIVE(resize_string);
 
 F_STRING *memory_to_char_string(const char *string, CELL length);
@@ -166,8 +157,12 @@ u16* to_u16_string(F_STRING *s, bool check);
 DLLEXPORT u16 *unbox_u16_string(void);
 DECLARE_PRIMITIVE(string_to_u16_alien);
 
-DECLARE_PRIMITIVE(char_slot);
-DECLARE_PRIMITIVE(set_char_slot);
+/* String getters and setters */
+CELL string_nth(F_STRING* string, CELL index);
+void set_string_nth(F_STRING* string, CELL index, CELL value);
+
+DECLARE_PRIMITIVE(string_nth);
+DECLARE_PRIMITIVE(set_string_nth);
 
 F_WORD *allot_word(CELL vocab, CELL name);
 DECLARE_PRIMITIVE(word);
