@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib hashtables kernel math math.combinatorics math.parser
-    math.ranges project-euler.common sequences sorting ;
+    math.ranges project-euler.common sequences ;
 IN: project-euler.032
 
 ! http://projecteuler.net/index.php?section=problems&id=32
@@ -62,9 +62,6 @@ PRIVATE>
 
 : source-032a ( -- seq )
     50 [1,b] 2000 [1,b] cartesian-product ;
-
-: pandigital? ( n -- ? )
-    number>string natural-sort "123456789" = ;
 
 ! multiplicand/multiplier/product
 : mmp ( pair -- n )
