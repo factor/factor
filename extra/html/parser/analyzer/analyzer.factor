@@ -1,4 +1,5 @@
-USING: assocs html.parser kernel math sequences strings ;
+USING: assocs html.parser kernel math sequences strings unicode.categories
+       unicode.case ;
 IN: html.parser.analyzer
 
 : remove-blank-text ( vector -- vector' )

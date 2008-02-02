@@ -51,10 +51,10 @@ DEFER: maybe-loop
 : springies-window* ( -- )
 
   C[ display ] <slate> >slate
-    { 800 600 }					     slate> set-slate-dim
+    { 800 600 }                                      slate> set-slate-dim
     C[ { 500 500 } >world-size loop on [ run ] in-thread ]
       slate> set-slate-graft
-    C[ loop off ]	       	 	     	     slate> set-slate-ungraft
+    C[ loop off ]                                    slate> set-slate-ungraft
 
   slate> "Springies" open-window ;
 

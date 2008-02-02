@@ -183,7 +183,7 @@ C: <spring> spring
     { [ dup below? ]        [ bounce-bottom ] }
     { [ dup beyond-left? ]  [ bounce-left ] }
     { [ dup beyond-right? ] [ bounce-right ] }
-    { [ t ] 		    [ drop ] } }
+    { [ t ]                 [ drop ] } }
   cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

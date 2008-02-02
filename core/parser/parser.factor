@@ -389,7 +389,7 @@ SYMBOL: interactive-vocabs
 : with-interactive-vocabs ( quot -- )
     [
         "scratchpad" in set
-	interactive-vocabs get set-use
+        interactive-vocabs get set-use
         call
     ] with-scope ; inline
 

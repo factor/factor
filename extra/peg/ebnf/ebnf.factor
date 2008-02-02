@@ -100,7 +100,7 @@ M: ebnf (generate-parser) ( ast -- id )
 DEFER: 'rhs'
 
 : 'non-terminal' ( -- parser )
-  CHAR: a CHAR: z range repeat1 [ >string <ebnf-non-terminal> ] action ;
+  CHAR: a CHAR: z range "-" token [ first ] action  2array choice repeat1 [ >string <ebnf-non-terminal> ] action ;
 
 : 'terminal' ( -- parser )
   "'" token hide [ CHAR: ' = not ] satisfy repeat1 "'" token hide 3array seq [ first >string <ebnf-terminal> ] action ;

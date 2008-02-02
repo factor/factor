@@ -39,8 +39,8 @@ TUPLE: search-field ;
 search-field H{
     { T{ key-down f f "UP" } [ find-search-list select-previous ] }
     { T{ key-down f f "DOWN" } [ find-search-list select-next ] }
-	{ T{ key-down f f "PAGE_UP" } [ find-search-list list-page-up ] }
-	{ T{ key-down f f "PAGE_DOWN" } [ find-search-list list-page-down ] }
+    { T{ key-down f f "PAGE_UP" } [ find-search-list list-page-up ] }
+    { T{ key-down f f "PAGE_DOWN" } [ find-search-list list-page-down ] }
     { T{ key-down f f "RET" } [ find-search-list invoke-value-action ] }
 } set-gestures
 
