@@ -24,5 +24,3 @@ IN: ascii
 
 : alpha? ( ch -- ? )
     dup Letter? [ drop t ] [ digit? ] if ; inline
-
-
