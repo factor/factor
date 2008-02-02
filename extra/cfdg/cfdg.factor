@@ -94,9 +94,9 @@ VAR: threshold
 
 : gl-flip ( angle -- ) deg>rad dup dup dup
   [ 2 * cos ,   2 * sin ,       0 ,   0 ,
-    2 * sin ,	2 * cos neg ,   0 ,   0 ,
+    2 * sin ,   2 * cos neg ,   0 ,   0 ,
           0 ,             0 ,   1 ,   0 , 
-	  0 ,		  0 ,	0 ,   1 , ]
+          0 ,             0 ,   0 ,   1 , ]
   { } make >c-double-array glMultMatrixd ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

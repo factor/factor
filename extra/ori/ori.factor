@@ -25,19 +25,19 @@ C: <ori> ori
 ! `Computer Graphics: Principles and Practice'
 
 : Rz ( angle -- Rx ) deg>rad
-[ dup cos ,	dup sin neg ,	0 ,
-  dup sin ,	dup cos ,	0 ,
-  0 ,		0 ,		1 , ] 3 make-matrix nip ;
+[ dup cos ,     dup sin neg ,   0 ,
+  dup sin ,     dup cos ,       0 ,
+  0 ,           0 ,             1 , ] 3 make-matrix nip ;
 
 : Ry ( angle -- Ry ) deg>rad
-[ dup cos ,	0 ,		dup sin ,
-  0 ,		1 ,		0 ,
-  dup sin neg ,	0 ,		dup cos , ] 3 make-matrix nip ;
+[ dup cos ,     0 ,             dup sin ,
+  0 ,           1 ,             0 ,
+  dup sin neg , 0 ,             dup cos , ] 3 make-matrix nip ;
 
 : Rx ( angle -- Rz ) deg>rad
-[ 1 ,		0 ,		0 ,
-  0 ,		dup cos ,	dup sin neg ,
-  0 ,		dup sin ,	dup cos , ] 3 make-matrix nip ;
+[ 1 ,           0 ,             0 ,
+  0 ,           dup cos ,       dup sin neg ,
+  0 ,           dup sin ,       dup cos , ] 3 make-matrix nip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

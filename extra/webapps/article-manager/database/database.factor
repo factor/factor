@@ -22,7 +22,7 @@ article default-mapping set-mapping
 tag default-mapping set-mapping 
 
 : db ( -- object )
-  { f } ;	    
+  { f } ;           
 
 : set-db ( value -- )
   0 db set-nth ;

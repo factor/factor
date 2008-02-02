@@ -9,10 +9,10 @@ IN: builder
 
 : datestamp ( -- string )
   now `{ ,[ dup timestamp-year   ]
-      	 ,[ dup timestamp-month	 ]
-	 ,[ dup timestamp-day	 ]
-	 ,[ dup timestamp-hour	 ]
-	 ,[     timestamp-minute ] }
+         ,[ dup timestamp-month  ]
+         ,[ dup timestamp-day    ]
+         ,[ dup timestamp-hour   ]
+         ,[     timestamp-minute ] }
   [ number>string 2 CHAR: 0 pad-left ] map "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

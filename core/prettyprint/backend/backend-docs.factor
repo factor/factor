@@ -18,10 +18,6 @@ HELP: ch>ascii-escape
 { $values { "ch" "a character" } { "str" string } }
 { $description "Converts a character to an escape code." } ;
 
-HELP: ch>unicode-escape
-{ $values { "ch" "a character" } { "str" string } }
-{ $description "Converts a character to a Unicode escape code (" { $snippet "\\u123456"} ")." } ;
-
 HELP: unparse-ch
 { $values { "ch" "a character" } }
 { $description "Adds the character to the sequence being constructed (see " { $link "namespaces-make" } "). If the character can appear in a string literal, it is added directly, otherwise an escape code is added." } ;
