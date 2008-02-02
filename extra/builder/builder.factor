@@ -1,5 +1,5 @@
 
-USING: kernel io io.files io.launcher
+USING: kernel io io.files io.launcher tools.deploy.backend
        system namespaces sequences splitting math.parser
        unix prettyprint tools.time calendar bake vars ;
 
@@ -31,8 +31,6 @@ SYMBOL: builder-recipients
   
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: boot-image ( -- filename ) `{ "boot" ,[ cpu ] "image" } "." join ;
-
 : target ( -- target ) `{ ,[ os ] %[ cpu "." split ] } "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -61,7 +59,7 @@ if
 
 "factor" cd
 
-{ "/usr/bin/git" "show" } <process-stream>
+{ "git" "show" } <process-stream>
 [ readln ] with-stream
 " " split second
 "../git-id" <file-writer> [ print ] with-stream
@@ -76,7 +74,7 @@ if
   "builder: vm compile" throw
 ] if
 
-"wget http://factorcode.org/images/latest/" boot-image append system
+"wget http://factorcode.org/images/latest/" boot-image-name append system
 0 =
 [ ]
 [
@@ -84,7 +82,11 @@ if
   "builder: image download" throw
 ] if
 
-[ "./factor -i=" boot-image " -no-user-init > ../boot-log" 3append system ]
+[
+  "./factor -i=" boot-image-name " -no-user-init > ../boot-log"
+  3append
+  system
+]
 benchmark nip
 "../boot-time" <file-writer> [ . ] with-stream
 0 =

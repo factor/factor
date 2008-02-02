@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
-       vectors arrays combinators.lib memoize math.parser match ;
+       vectors arrays combinators.lib memoize math.parser match
+       unicode.categories ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.errors xml.data xml.utilities xml.char-classes
 xml.entities kernel state-parser kernel namespaces strings math
-math.parser sequences assocs arrays splitting combinators ;
+math.parser sequences assocs arrays splitting combinators unicode.case ;
 IN: xml.tokenize
 
 ! XML namespace processing: ns = namespace

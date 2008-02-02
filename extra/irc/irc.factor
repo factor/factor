@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays calendar io io.sockets kernel match namespaces
-sequences splitting strings continuations threads ;
+sequences splitting strings continuations threads ascii ;
 IN: irc
 
 ! "setup" objects
