@@ -483,6 +483,7 @@ FUNCTION: BOOL LookupPrivilegeValueW ( LPCTSTR lpSystemName,
 : TOKEN_QUERY_SOURCE           HEX: 0010 ; inline
 : TOKEN_ADJUST_DEFAULT         HEX: 0080 ; inline
 : TOKEN_READ STANDARD_RIGHTS_READ TOKEN_QUERY bitor ;
+
 : TOKEN_WRITE
     {
         STANDARD_RIGHTS_WRITE
@@ -490,6 +491,7 @@ FUNCTION: BOOL LookupPrivilegeValueW ( LPCTSTR lpSystemName,
         TOKEN_ADJUST_GROUPS
         TOKEN_ADJUST_DEFAULT
     } flags ; foldable
+
 : TOKEN_ALL_ACCESS
     {
         STANDARD_RIGHTS_REQUIRED

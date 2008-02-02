@@ -12,6 +12,7 @@ IN: x11.windows
     XCreateColormap ;
 
 : event-mask ( -- n )
+<<<<<<< HEAD:extra/x11/windows/windows.factor
     {
         ExposureMask
         StructureNotifyMask
@@ -25,6 +26,19 @@ IN: x11.windows
         LeaveWindowMask
         PropertyChangeMask
     } flags ;
+=======
+    ExposureMask
+    StructureNotifyMask bitor
+    KeyPressMask bitor
+    KeyReleaseMask bitor
+    ButtonPressMask     bitor
+    ButtonReleaseMask bitor
+    PointerMotionMask bitor
+    FocusChangeMask bitor
+    EnterWindowMask bitor
+    LeaveWindowMask bitor
+    PropertyChangeMask bitor ;
+>>>>>>> a05c18152b59073c49aa313ba685516310ec74a8:extra/x11/windows/windows.factor
 
 : window-attributes ( visinfo -- attributes )
     "XSetWindowAttributes" <c-object>

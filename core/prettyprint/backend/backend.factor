@@ -58,17 +58,17 @@ M: f pprint* drop \ f pprint-word ;
 ! Strings
 : ch>ascii-escape ( ch -- str )
     H{
-        { CHAR: \e CHAR: \\e  }
-        { CHAR: \n CHAR: \\n  }
-        { CHAR: \r CHAR: \\r  }
-        { CHAR: \t CHAR: \\t  }
-        { CHAR: \0 CHAR: \\0  }
-        { CHAR: \\ CHAR: \\\\ }
-        { CHAR: \" CHAR: \\\" }
+        { CHAR: \e CHAR: e  }
+        { CHAR: \n CHAR: n  }
+        { CHAR: \r CHAR: r  }
+        { CHAR: \t CHAR: t  }
+        { CHAR: \0 CHAR: 0  }
+        { CHAR: \\ CHAR: \\ }
+        { CHAR: \" CHAR: \" }
     } at ;
 
 : unparse-ch ( ch -- )
-    dup ch>ascii-escape [ ] [ ] ?if , ;
+    dup ch>ascii-escape [ "\\" % ] [ ] ?if , ;
 
 : do-string-limit ( str -- trimmed )
     string-limit get [

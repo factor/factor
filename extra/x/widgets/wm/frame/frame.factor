@@ -139,7 +139,7 @@ SYMBOL: WM_DELETE_WINDOW
       [ over XConfigureRequestEvent-height <-- set-child-height ] }
     { [ t ]
       [ "<wm-frame> handle-configure-request :: resize not requested"
-      	print flush ] } }
+        print flush ] } }
   cond
   2drop ]
 

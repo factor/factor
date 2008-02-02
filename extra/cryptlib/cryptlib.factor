@@ -6,7 +6,7 @@
 ! Adapted from cryptlib.h
 ! Tested with cryptlib 3.3.1.0
 USING: cryptlib.libcl kernel hashtables alien math 
-namespaces sequences assocs libc alien.c-types continuations ;
+namespaces sequences assocs libc alien.c-types alien.accessors continuations ;
 
 IN: cryptlib
 
@@ -59,7 +59,7 @@ SYMBOL: session
     cryptEnd check-result ;
 
 : with-cryptlib ( quot -- )
-	[ init [ end ] [ ] cleanup ] with-scope ; inline
+        [ init [ end ] [ ] cleanup ] with-scope ; inline
 
 ! =========================================================
 ! Create and destroy an encryption context
@@ -71,10 +71,10 @@ SYMBOL: session
 
 : destroy-context ( -- )
     context get [ *int cryptDestroyContext check-result ] when*
-	context off ;
+        context off ;
 
 : with-context ( algo quot -- )
-	swap create-context [ destroy-context ] [ ] cleanup ; inline
+        swap create-context [ destroy-context ] [ ] cleanup ; inline
 
 ! =========================================================
 ! Keyset routines
@@ -86,10 +86,10 @@ SYMBOL: session
 
 : close-keyset ( -- )
     keyset get *int cryptKeysetClose check-result
-	destroy-context ;
+        destroy-context ;
 
 : with-keyset ( type name options quot -- )
-	>r open-keyset r> [ close-keyset ] [ ] cleanup ; inline
+        >r open-keyset r> [ close-keyset ] [ ] cleanup ; inline
 
 : get-public-key ( idtype id -- )
     >r >r keyset get *int "int*" <c-object> tuck r> r> string>char-alien
@@ -128,7 +128,7 @@ SYMBOL: session
     certificate get *int cryptDestroyCert check-result ;
 
 : with-certificate ( type quot -- )
-	swap create-certificate [ destroy-certificate ] [ ] cleanup ; inline
+        swap create-certificate [ destroy-certificate ] [ ] cleanup ; inline
 
 : sign-certificate ( -- )
     certificate get *int context get *int cryptSignCert check-result ;
@@ -175,7 +175,7 @@ SYMBOL: session
     envelope get *int cryptDestroyEnvelope check-result ;
 
 : with-envelope ( format quot -- )
-	swap create-envelope [ destroy-envelope ] [ ] cleanup ;
+        swap create-envelope [ destroy-envelope ] [ ] cleanup ;
 
 : create-session ( format -- )
     >r "int" <c-object> dup swap CRYPT_UNUSED r> cryptCreateSession
@@ -185,7 +185,7 @@ SYMBOL: session
     session get *int cryptDestroySession check-result ;
 
 : with-session ( format quot -- )
-	swap create-session [ destroy-session ] [ ] cleanup ;
+        swap create-session [ destroy-session ] [ ] cleanup ;
 
 : push-data ( handle buffer length -- )
     >r >r *int r> r> "int" <c-object> [ cryptPushData ]

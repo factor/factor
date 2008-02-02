@@ -77,7 +77,7 @@ M: listener-operation invoke-command ( target command -- )
         [ [ run-file ] each ] curry call-listener
     ] if ;
 
-: com-EOF ( listener -- )
+: com-end ( listener -- )
     listener-gadget-input interactor-eof ;
 
 : clear-output ( listener -- )
@@ -154,7 +154,7 @@ listener-gadget "toolbar" f {
     { f restart-listener }
     { T{ key-down f f "CLEAR" } clear-output }
     { T{ key-down f { C+ } "CLEAR" } clear-stack }
-    { T{ key-down f { C+ } "d" } com-EOF }
+    { T{ key-down f { C+ } "d" } com-end }
     { T{ key-down f f "F1" } listener-help }
 } define-command-map
 

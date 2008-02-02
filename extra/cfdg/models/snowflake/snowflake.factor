@@ -7,11 +7,11 @@ IN: cfdg.models.snowflake
 : spike ( -- )
 iterate? [
   { { 1    [ square
-      	     [ 0.95 y 0.97 s spike ] do ] }
+             [ 0.95 y 0.97 s spike ] do ] }
     { 0.03 [ square
-      	     [ 60 r spike ] do
-	     [ -60 r spike ] do
-	     [ 0.95 y 0.97 s spike ] do ] } }
+             [ 60 r spike ] do
+             [ -60 r spike ] do
+             [ 0.95 y 0.97 s spike ] do ] } }
   call-random-weighted
 ] when ;
 

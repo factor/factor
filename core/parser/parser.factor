@@ -347,45 +347,49 @@ SYMBOL: bootstrap-syntax
         call
     ] with-scope ; inline
 
+SYMBOL: interactive-vocabs
+
+{
+    "arrays"
+    "assocs"
+    "combinators"
+    "compiler.errors"
+    "continuations"
+    "debugger"
+    "definitions"
+    "editors"
+    "generic"
+    "help"
+    "inspector"
+    "io"
+    "io.files"
+    "kernel"
+    "listener"
+    "math"
+    "memory"
+    "namespaces"
+    "prettyprint"
+    "sequences"
+    "slicing"
+    "sorting"
+    "strings"
+    "syntax"
+    "tools.annotations"
+    "tools.crossref"
+    "tools.memory"
+    "tools.profiler"
+    "tools.test"
+    "tools.time"
+    "vocabs"
+    "vocabs.loader"
+    "words"
+    "scratchpad"
+} interactive-vocabs set-global
+
 : with-interactive-vocabs ( quot -- )
     [
         "scratchpad" in set
-        {
-            "arrays"
-            "assocs"
-            "combinators"
-            "compiler.errors"
-            "continuations"
-            "debugger"
-            "definitions"
-            "editors"
-            "generic"
-            "help"
-            "inspector"
-            "io"
-            "io.files"
-            "kernel"
-            "listener"
-            "math"
-            "memory"
-            "namespaces"
-            "prettyprint"
-            "sequences"
-            "slicing"
-            "sorting"
-            "strings"
-            "syntax"
-            "tools.annotations"
-            "tools.crossref"
-            "tools.memory"
-            "tools.profiler"
-            "tools.test"
-            "tools.time"
-            "vocabs"
-            "vocabs.loader"
-            "words"
-            "scratchpad"
-        } set-use
+        interactive-vocabs get set-use
         call
     ] with-scope ; inline
 

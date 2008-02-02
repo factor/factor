@@ -3,7 +3,7 @@
 USING: generic assocs help http io io.styles io.files continuations
 io.streams.string kernel math math.parser namespaces
 quotations assocs sequences strings words html.elements
-xml.writer xml.entities sbufs ;
+xml.entities sbufs continuations ;
 IN: html
 
 GENERIC: browser-link-href ( presented -- href )

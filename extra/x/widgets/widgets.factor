@@ -32,7 +32,7 @@ SYMBOL: <widget>
     { [ dup UnmapNotify = ]      [ drop <- handle-unmap ] }
     { [ dup PropertyNotify = ]   [ drop <- handle-property ] }
     { [ t ]                      [ "handle-event :: ignoring event"
-      	    			     print flush 3drop ] }
+                                     print flush 3drop ] }
   } cond ]
 
 } add-methods

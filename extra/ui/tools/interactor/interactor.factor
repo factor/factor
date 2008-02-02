@@ -3,9 +3,10 @@
 USING: arrays assocs combinators continuations documents
 ui.tools.workspace hashtables io io.styles kernel math
 math.vectors models namespaces parser prettyprint quotations
-sequences strings threads listener tuples ui.commands ui.gadgets
-ui.gadgets.editors ui.gadgets.presentations ui.gadgets.worlds
-ui.gestures definitions ;
+sequences sequences.lib strings threads listener tuples
+ui.commands ui.gadgets ui.gadgets.editors
+ui.gadgets.presentations ui.gadgets.worlds ui.gestures
+definitions ;
 IN: ui.tools.interactor
 
 TUPLE: interactor
@@ -97,7 +98,7 @@ M: interactor model-changed
     [ set-interactor-continuation stop ] curry callcc1 ;
 
 M: interactor stream-readln
-    [ interactor-yield ] keep interactor-finish first ;
+    [ interactor-yield ] keep interactor-finish ?first ;
 
 : interactor-call ( quot interactor -- )
     dup interactor-busy? [

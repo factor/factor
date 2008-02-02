@@ -54,7 +54,7 @@ MACRO: match-cond ( assoc -- )
 
 : replace-patterns ( object -- result )
     {
-	{ [ dup number? ] [ ] }
+        { [ dup number? ] [ ] }
         { [ dup match-var? ] [ get ] }
         { [ dup sequence? ] [ [ replace-patterns ] map ] }
         { [ dup tuple? ] [ tuple>array replace-patterns >tuple ] }

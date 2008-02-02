@@ -13,9 +13,9 @@ USING: alien alien.syntax combinators system ;
 IN: cairo
 
 << "cairo" {
-	{ [ win32? ] [ "cairo.dll" ] }
-	{ [ macosx? ] [ "libcairo.dylib" ] }
-	{ [ unix? ] [ "libcairo.so.2" ] }
+        { [ win32? ] [ "cairo.dll" ] }
+        { [ macosx? ] [ "libcairo.dylib" ] }
+        { [ unix? ] [ "libcairo.so.2" ] }
   } cond "cdecl" add-library >>
 
 ! cairo_status_t
@@ -152,12 +152,12 @@ C-STRUCT: cairo_t
     { "uint" "status ! cairo_status_t" } ;
 
 C-STRUCT: cairo_matrix_t
-	{ "double" "xx" }
-	{ "double" "yx" }
-	{ "double" "xy" }
-	{ "double" "yy" }
-	{ "double" "x0" }
-	{ "double" "y0" } ;
+        { "double" "xx" }
+        { "double" "yx" }
+        { "double" "xy" }
+        { "double" "yy" }
+        { "double" "x0" }
+        { "double" "y0" } ;
 
 ! cairo_format_t
 C-ENUM:
@@ -204,16 +204,16 @@ C-ENUM:
     "cairo_t*" "cairo" "cairo_create" [ "void*" ] alien-invoke ;
 
 : cairo_reference ( cairo_t -- cairo_t )
-  	"cairo_t*" "cairo" "cairo_reference" [ "cairo_t*" ] alien-invoke ;
+        "cairo_t*" "cairo" "cairo_reference" [ "cairo_t*" ] alien-invoke ;
 
 : cairo_destroy ( cairo_t -- )
     "void" "cairo" "cairo_destroy" [ "cairo_t*" ] alien-invoke ;
 
 : cairo_save ( cairo_t -- )
-  	"void" "cairo" "cairo_save" [ "cairo_t*" ] alien-invoke ;
+        "void" "cairo" "cairo_save" [ "cairo_t*" ] alien-invoke ;
 
 : cairo_restore ( cairo_t -- )
-  	"void" "cairo" "cairo_restore" [ "cairo_t*" ] alien-invoke ;
+        "void" "cairo" "cairo_restore" [ "cairo_t*" ] alien-invoke ;
 
 : cairo_set_operator ( cairo_t cairo_operator_t -- )
     "void" "cairo" "cairo_set_operator" [ "cairo_t*" "int" ] alien-invoke ;
@@ -268,13 +268,13 @@ C-ENUM:
     "void" "cairo" "cairo_rotate" [ "cairo_t*" "double" ] alien-invoke ;
 
 : cairo_transform ( cairo_t cairo_matrix_t -- )
-  	"void" "cairo" "cairo_transform" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
+        "void" "cairo" "cairo_transform" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
 
 : cairo_set_matrix ( cairo_t cairo_matrix_t -- )
-  	"void" "cairo" "cairo_set_matrix" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
+        "void" "cairo" "cairo_set_matrix" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
 
 : cairo_identity_matrix ( cairo_t -- )
-  	"void" "cairo" "cairo_identity_matrix" [ "cairo_t*" ] alien-invoke ;
+        "void" "cairo" "cairo_identity_matrix" [ "cairo_t*" ] alien-invoke ;
 
 ! cairo path creating functions
 
@@ -415,10 +415,10 @@ C-ENUM:
     "void" "cairo" "cairo_set_font_size" [ "cairo_t*" "double" ] alien-invoke ;
 
 : cairo_set_font_matrix ( cairo_t cairo_matrix_t -- )
-  	"void" "cairo" "cairo_set_font_matrix" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
+        "void" "cairo" "cairo_set_font_matrix" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
 
 : cairo_get_font_matrix ( cairo_t cairo_matrix_t -- )
-  	"void" "cairo" "cairo_get_font_matrix" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
+        "void" "cairo" "cairo_get_font_matrix" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
 
 
 

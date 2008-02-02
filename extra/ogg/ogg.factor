@@ -104,7 +104,7 @@ FUNCTION: int      ogg_stream_flush ( ogg_stream_state* os, ogg_page* og ) ;
 FUNCTION: int      ogg_sync_init ( ogg_sync_state* oy ) ;
 FUNCTION: int      ogg_sync_clear ( ogg_sync_state* oy ) ;
 FUNCTION: int      ogg_sync_reset ( ogg_sync_state* oy ) ;
-FUNCTION: int	ogg_sync_destroy ( ogg_sync_state* oy ) ;
+FUNCTION: int   ogg_sync_destroy ( ogg_sync_state* oy ) ;
 
 FUNCTION: void* ogg_sync_buffer ( ogg_sync_state* oy, long size ) ;
 FUNCTION: int      ogg_sync_wrote ( ogg_sync_state* oy, long bytes ) ;

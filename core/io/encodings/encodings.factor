@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors
-namespaces ;
+namespaces unicode.syntax ;
 IN: io.encodings
 
 TUPLE: encode-error ;
@@ -16,6 +16,9 @@ SYMBOL: begin
 
 : decoded ( buf ch -- buf ch state )
     over push 0 begin ;
+
+: push-replacement ( buf -- buf ch state )
+    UNICHAR: replacement-character decoded ;
 
 : finish-decoding ( buf ch state -- str )
     begin eq? [ decode-error ] unless drop "" like ;
