@@ -5,25 +5,26 @@ namespaces sequences x11.xlib x11.constants x11.glx ;
 IN: x11.windows
 
 : create-window-mask ( -- n )
-    CWBackPixel CWBorderPixel bitor
-    CWColormap bitor CWEventMask bitor ;
+    { CWBackPixel CWBorderPixel CWColormap CWEventMask } flags ;
 
 : create-colormap ( visinfo -- colormap )
     dpy get root get rot XVisualInfo-visual AllocNone
     XCreateColormap ;
 
 : event-mask ( -- n )
-    ExposureMask
-    StructureNotifyMask bitor
-    KeyPressMask bitor
-    KeyReleaseMask bitor
-    ButtonPressMask	bitor
-    ButtonReleaseMask bitor
-    PointerMotionMask bitor
-    FocusChangeMask bitor
-    EnterWindowMask bitor
-    LeaveWindowMask bitor
-    PropertyChangeMask bitor ;
+    {
+        ExposureMask
+        StructureNotifyMask
+        KeyPressMask
+        KeyReleaseMask
+        ButtonPressMask
+        ButtonReleaseMask
+        PointerMotionMask
+        FocusChangeMask
+        EnterWindowMask
+        LeaveWindowMask
+        PropertyChangeMask
+    } flags ;
 
 : window-attributes ( visinfo -- attributes )
     "XSetWindowAttributes" <c-object>

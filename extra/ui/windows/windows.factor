@@ -370,7 +370,7 @@ M: windows-ui-backend (close-window)
     class-name-ptr get-global
     pick GetClassInfoEx zero? [
         "WNDCLASSEX" heap-size over set-WNDCLASSEX-cbSize
-        CS_HREDRAW CS_VREDRAW bitor CS_OWNDC bitor over set-WNDCLASSEX-style
+        { CS_HREDRAW CS_VREDRAW CS_OWNDC } flags over set-WNDCLASSEX-style
         ui-wndproc over set-WNDCLASSEX-lpfnWndProc
         0 over set-WNDCLASSEX-cbClsExtra
         0 over set-WNDCLASSEX-cbWndExtra
@@ -387,7 +387,7 @@ M: windows-ui-backend (close-window)
     make-adjusted-RECT
     >r class-name-ptr get-global f r>
     >r >r >r ex-style r> r>
-        WS_CLIPSIBLINGS WS_CLIPCHILDREN bitor style bitor
+        { WS_CLIPSIBLINGS WS_CLIPCHILDREN style } flags
         CW_USEDEFAULT dup r>
     get-RECT-dimensions
     f f f GetModuleHandle f CreateWindowEx dup win32-error=0/f ;

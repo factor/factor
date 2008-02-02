@@ -31,8 +31,11 @@ M: windows-io normalize-directory ( string -- string )
     "\\" ?tail drop "\\*" append ;
 
 : share-mode ( -- fixnum )
-    FILE_SHARE_READ FILE_SHARE_WRITE bitor
-    FILE_SHARE_DELETE bitor ; foldable
+    {
+        FILE_SHARE_READ
+        FILE_SHARE_WRITE
+        FILE_SHARE_DELETE
+    } flags ; foldable
 
 : default-security-attributes ( -- obj )
     "SECURITY_ATTRIBUTES" <c-object>

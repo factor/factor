@@ -73,7 +73,7 @@ IN: windows.opengl32
 
 
 : pfd-dwFlags
-    PFD_DRAW_TO_WINDOW PFD_SUPPORT_OPENGL bitor PFD_DOUBLEBUFFER bitor ;
+    { PFD_DRAW_TO_WINDOW PFD_SUPPORT_OPENGL PFD_DOUBLEBUFFER } flags ;
 
 ! TODO: compare to http://www.nullterminator.net/opengl32.html
 : make-pfd ( bits -- pfd )

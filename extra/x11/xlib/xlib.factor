@@ -1088,8 +1088,8 @@ FUNCTION: Status XWithdrawWindow (
 : PAspect	1 7 shift ; inline
 : PBaseSize	1 8 shift ; inline
 : PWinGravity	1 9 shift ; inline
-: PAllHints [ PPosition PSize PMinSize PMaxSize PResizeInc PAspect ]
-0 [ execute bitor ] reduce ; inline
+: PAllHints 
+    { PPosition PSize PMinSize PMaxSize PResizeInc PAspect } flags ; foldable
 
 C-STRUCT: XSizeHints
     { "long" "flags" }
