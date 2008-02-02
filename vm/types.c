@@ -480,7 +480,16 @@ F_STRING* allot_string_internal(CELL capacity)
 void fill_string(F_STRING *string, CELL start, CELL capacity, CELL fill)
 {
 	if(fill == 0)
-		memset((void*)SREF(string,start),'\0',capacity - start);
+	{
+		memset((void *)SREF(string,start),'\0',capacity - start);
+
+		if(string->aux != F)
+		{
+			F_BYTE_ARRAY *aux = untag_object(string->aux);
+			memset((void *)BREF(aux,start * sizeof(u16)),'\0',
+				(capacity - start) * sizeof(u16));
+		}
+	}
 	else
 	{
 		CELL i;
@@ -522,6 +531,19 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
 	UNREGISTER_UNTAGGED(string);
 
 	memcpy(new_string + 1,string + 1,to_copy);
+
+	if(string->aux != F)
+	{
+		REGISTER_UNTAGGED(string);
+		REGISTER_UNTAGGED(new_string);
+		F_BYTE_ARRAY *new_aux = allot_byte_array(capacity * sizeof(u16));
+		new_string->aux = tag_object(new_aux);
+		UNREGISTER_UNTAGGED(new_string);
+		UNREGISTER_UNTAGGED(string);
+
+		F_BYTE_ARRAY *aux = untag_object(string->aux);
+		memcpy(new_aux + 1,aux + 1,to_copy * sizeof(u16));
+	}
 
 	REGISTER_UNTAGGED(string);
 	fill_string(new_string,to_copy,capacity,fill);
@@ -573,7 +595,7 @@ DEFINE_PRIMITIVE(resize_string)
 
 MEMORY_TO_STRING(char,u8)
 MEMORY_TO_STRING(u16,u16)
-// MEMORY_TO_STRING(u32,u32)
+MEMORY_TO_STRING(u32,u32)
 
 bool check_string(F_STRING *s, CELL max)
 {
