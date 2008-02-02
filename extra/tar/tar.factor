@@ -1,6 +1,8 @@
-USING: combinators io io.files io.streams.duplex continuations
-io.streams.string kernel math math.parser
-namespaces pack prettyprint sequences strings system hexdump ;
+<<<<<<< HEAD:extra/tar/tar.factor
+USING: combinators io io.files io.streams.duplex
+io.streams.string kernel math math.parser continuations
+namespaces pack prettyprint sequences strings system ;
+USING: hexdump tools.interpreter ;
 IN: tar
 
 : zero-checksum 256 ;
