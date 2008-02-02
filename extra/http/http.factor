@@ -1,18 +1,18 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables io kernel math namespaces math.parser assocs
-sequences strings splitting ;
+sequences strings splitting assocs.lib ;
 IN: http
 
 : header-line ( line -- )
-    ": " split1 dup [ swap set ] [ 2drop ] if ;
+    ": " split1 dup [ swap >lower set ] [ 2drop ] if ;
 
 : (read-header) ( -- )
     readln dup
     empty? [ drop ] [ header-line (read-header) ] if ;
 
 : read-header ( -- hash )
-    [ (read-header) ] H{ } make-assoc ;
+    [ (read-header) ] VH{ } make-assoc ;
 
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
@@ -74,4 +74,3 @@ IN: http
             hash>query %
         ] if
     ] "" make ;
-
