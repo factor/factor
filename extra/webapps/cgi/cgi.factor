@@ -1,8 +1,8 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs io.files combinators
 arrays io.launcher io http.server.responders webapps.file
-sequences strings math.parser ;
+sequences strings math.parser unicode.case ;
 IN: webapps.cgi
 
 SYMBOL: cgi-root
@@ -31,7 +31,7 @@ SYMBOL: cgi-root
 
         "method" get >upper "REQUEST_METHOD" set
         "raw-query" get "QUERY_STRING" set
-	"Cookie" header-param "HTTP_COOKIE" set 
+        "Cookie" header-param "HTTP_COOKIE" set 
 
         "User-Agent" header-param "HTTP_USER_AGENT" set
         "Accept" header-param "HTTP_ACCEPT" set

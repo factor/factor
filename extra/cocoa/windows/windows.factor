@@ -15,10 +15,12 @@ IN: cocoa.windows
 : NSBackingStoreBuffered    2 ; inline
 
 : standard-window-type
-    NSTitledWindowMask
-    NSClosableWindowMask bitor
-    NSMiniaturizableWindowMask bitor
-    NSResizableWindowMask bitor ; inline
+    {
+        NSTitledWindowMask
+        NSClosableWindowMask
+        NSMiniaturizableWindowMask
+        NSResizableWindowMask
+    } flags ; inline
 
 : <NSWindow> ( rect -- window )
     NSWindow -> alloc swap

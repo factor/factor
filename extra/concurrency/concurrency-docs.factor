@@ -33,7 +33,7 @@ HELP: (mailbox-block-unless-pred)
 
 HELP: (mailbox-block-if-empty)
 { $values { "mailbox" "a mailbox object" } 
-	  { "mailbox2" "same object as 'mailbox'" }
+          { "mailbox2" "same object as 'mailbox'" }
       { "timeout" "a timeout in milliseconds" }
 }
 { $description "Block the thread if the mailbox is empty." } 
@@ -41,21 +41,21 @@ HELP: (mailbox-block-if-empty)
 
 HELP: mailbox-get
 { $values { "mailbox" "a mailbox object" } 
-	  { "obj" "an object" }
+          { "obj" "an object" }
 }
 { $description "Get the first item put into the mailbox. If it is empty the thread blocks until an item is put into it. The thread then resumes, leaving the item on the stack." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put while-mailbox-empty mailbox-get-all mailbox-get? } ;
 
 HELP: mailbox-get-all
 { $values { "mailbox" "a mailbox object" } 
-	  { "array" "an array" }
+          { "array" "an array" }
 }
 { $description "Blocks the thread if the mailbox is empty, otherwise removes all objects in the mailbox and returns an array containing the objects." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put while-mailbox-empty mailbox-get-all mailbox-get? } ;
 
 HELP: while-mailbox-empty
 { $values { "mailbox" "a mailbox object" } 
-	  { "quot" "a quotation with stack effect " { $snippet "( -- )" } }
+          { "quot" "a quotation with stack effect " { $snippet "( -- )" } }
 }
 { $description "Repeatedly call the quotation while there are no items in the mailbox. Quotation should have stack effect " { $snippet "( -- )" } "." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all mailbox-get? } ;
@@ -63,7 +63,7 @@ HELP: while-mailbox-empty
 HELP: mailbox-get?
 { $values { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } }
           { "mailbox" "a mailbox object" } 
-	  { "obj" "an object" }
+          { "obj" "an object" }
 }
 { $description "Get the first item in the mailbox which satisfies the predicate. 'pred' will be called repeatedly for each item in the mailbox. When 'pred' returns true that item will be returned. If nothing in the mailbox satisfies the predicate then the thread will block until something does. 'pred' must have stack effect " { $snippet "( X -- bool }" } "." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all while-mailbox-empty } ;

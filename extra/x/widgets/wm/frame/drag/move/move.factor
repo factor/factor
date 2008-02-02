@@ -37,9 +37,9 @@ SYMBOL: <wm-frame-drag-move>
       [ <- draw-move-outline <- update-posn <- draw-move-outline <- loop ] }
     { [ <- event-type ButtonRelease = ]
       [ <- draw-move-outline
-      	dup $frame <- position over <- drag-offset v+ >r
-	dup $frame r> <-- move drop
-	dup $frame <- raise drop drop ] }
+        dup $frame <- position over <- drag-offset v+ >r
+        dup $frame r> <-- move drop
+        dup $frame <- raise drop drop ] }
     { [ t ] [ <- loop ] } }
   cond ]
 

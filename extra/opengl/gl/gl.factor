@@ -1014,7 +1014,7 @@ FUNCTION: void glTexImage1D ( GLenum target, GLint level, GLint internalFormat, 
 
 FUNCTION: void glTexImage2D ( GLenum target, GLint level, GLint internalFormat, 
                               GLsizei width, GLsizei height, GLint border, 
-			      GLenum format, GLenum type, GLvoid* pixels ) ;
+                              GLenum format, GLenum type, GLvoid* pixels ) ;
 
 FUNCTION: void glGetTexImage ( GLenum target, GLint level, GLenum format, 
                                GLenum type, GLvoid* pixels ) ;
@@ -1039,14 +1039,14 @@ FUNCTION: void glTexSubImage1D ( GLenum target, GLint level, GLint xoffset, GLsi
 
 FUNCTION: void glTexSubImage2D ( GLenum target, GLint level, GLint xoffset, GLint yoffset,
                                  GLsizei width, GLsizei height, GLenum format, 
-				 GLenum type, GLvoid* pixels ) ;
+                                 GLenum type, GLvoid* pixels ) ;
 
 FUNCTION: void glCopyTexImage1D ( GLenum target, GLint level, GLenum internalformat, 
                                   GLint x, GLint y, GLsizei width, GLint border ) ;
 
 FUNCTION: void glCopyTexImage2D ( GLenum target, GLint level, GLenum internalformat, 
                                   GLint x, GLint y,
-				  GLsizei width, GLsizei height, GLint border ) ;
+                                  GLsizei width, GLsizei height, GLint border ) ;
 
 FUNCTION: void glCopyTexSubImage1D ( GLenum target, GLint level, GLint xoffset, 
                                      GLint x, GLint y, GLsizei width ) ;
@@ -1064,10 +1064,10 @@ FUNCTION: void glMap1f ( GLenum target, GLfloat u1, GLfloat u2,
 
 FUNCTION: void glMap2d ( GLenum target, GLdouble u1, GLdouble u2, GLint ustride, GLint uorder,
                          GLdouble v1, GLdouble v2, GLint vstride, GLint vorder,
-			 GLdouble* points ) ;
+                         GLdouble* points ) ;
 FUNCTION: void glMap2f ( GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
                          GLfloat v1, GLfloat v2, GLint vstride, GLint vorder,
-			 GLfloat* points ) ;
+                         GLfloat* points ) ;
 
 FUNCTION: void glGetMapdv ( GLenum target, GLenum query, GLdouble* v ) ;
 FUNCTION: void glGetMapfv ( GLenum target, GLenum query, GLfloat* v ) ;

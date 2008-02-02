@@ -8,6 +8,9 @@ SYMBOL: double
 SYMBOL: quad1
 SYMBOL: quad2
 SYMBOL: quad3
+SYMBOL: ignore
+
+: do-ignore ( -- ch state ) 0 ignore ;
 
 : append-nums ( byte ch -- ch )
     8 shift bitor ;
@@ -19,21 +22,22 @@ SYMBOL: quad3
     dup -3 shift BIN: 11011 number= [
         dup BIN: 00000100 bitand zero?
         [ BIN: 11 bitand quad1 ]
-        [ decode-error ] if
+        [ drop do-ignore ] if
     ] [ double ] if ;
 
-: handle-quad2be ( byte ch -- ch )
+: handle-quad2be ( byte ch -- ch state )
     swap dup -2 shift BIN: 110111 number= [
-        >r 2 shift r> BIN: 11 bitand bitor
-    ] [ decode-error ] if ;
+        >r 2 shift r> BIN: 11 bitand bitor quad3
+    ] [ 2drop do-ignore ] if ;
 
 : (decode-utf16be) ( buf byte ch state -- buf ch state )
     {
         { begin [ drop begin-utf16be ] }
         { double [ end-multibyte ] }
         { quad1 [ append-nums quad2 ] }
-        { quad2 [ handle-quad2be quad3 ] }
+        { quad2 [ handle-quad2be ] }
         { quad3 [ append-nums HEX: 10000 + decoded ] }
+        { ignore [ 2drop push-replacement ] }
     } case ;
 
 : decode-utf16be ( seq -- str )
@@ -43,13 +47,13 @@ SYMBOL: quad3
     swap dup -3 shift BIN: 11011 = [
         dup BIN: 100 bitand 0 number=
         [ BIN: 11 bitand 8 shift bitor quad2 ]
-        [ decode-error ] if
+        [ 2drop push-replacement ] if
     ] [ end-multibyte ] if ;
 
 : handle-quad3le ( buf byte ch -- buf ch state )
     swap dup -2 shift BIN: 110111 = [
         BIN: 11 bitand append-nums HEX: 10000 + decoded
-    ] [ decode-error ] if ;
+    ] [ 2drop push-replacement ] if ;
 
 : (decode-utf16le) ( buf byte ch state -- buf ch state )
     {

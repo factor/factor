@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables io kernel math namespaces math.parser assocs
-sequences strings splitting ascii ;
+sequences strings splitting ascii io.utf8 ;
 IN: http
 
 : header-line ( line -- )
@@ -22,16 +22,13 @@ IN: http
     over digit? or
     swap "/_-." member? or ; foldable
 
+: push-utf8 ( string -- )
+    1string encode-utf8 [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each ;
+
 : url-encode ( str -- str )
-    [
-        [
-            dup url-quotable? [
-                ,
-            ] [
-                CHAR: % , >hex 2 CHAR: 0 pad-left %
-            ] if
-        ] each
-    ] "" make ;
+    [ [
+        dup url-quotable? [ , ] [ push-utf8 ] if
+    ] each ] "" make ;
 
 : url-decode-hex ( index str -- )
     2dup length 2 - >= [
@@ -58,7 +55,7 @@ IN: http
     ] if ;
 
 : url-decode ( str -- str )
-    [ 0 swap url-decode-iter ] "" make ;
+    [ 0 swap url-decode-iter ] "" make decode-utf8 ;
 
 : hash>query ( hash -- str )
     [ [ url-encode ] 2apply "=" swap 3append ] { } assoc>map

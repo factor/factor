@@ -88,8 +88,6 @@ unit-test
 
 ! Make sure aux vector is not shared
 [ "\udeadbe" ] [
-	"\udeadbe" clone
-	CHAR: \u123456 over clone set-first
+    "\udeadbe" clone
+    CHAR: \u123456 over clone set-first
 ] unit-test
-
-

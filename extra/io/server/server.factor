@@ -29,7 +29,7 @@ SYMBOL: log-stream
 
 : with-log-file ( file quot -- )
     >r <file-appender> r>
-    [ with-log-stream ] with-disposal ; inline
+    [ with-log-stream ] curry with-disposal ; inline
 
 : with-log-stdio ( quot -- )
     stdio get swap with-log-stream ;
@@ -47,11 +47,11 @@ SYMBOL: log-stream
     dup log-client
     [ swap with-stream ] 2curry concurrency:spawn drop ; inline
 
-: accept-loop ( server quot -- server quot )
+: accept-loop ( server quot -- )
     [ swap accept with-client ] 2keep accept-loop ; inline
 
 : server-loop ( server quot -- )
-    [ accept-loop ] compose with-disposal ; inline
+    [ accept-loop ] curry with-disposal ; inline
 
 : spawn-server ( addrspec quot -- )
     "Waiting for connections on " pick unparse append
