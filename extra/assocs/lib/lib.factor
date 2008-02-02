@@ -1,8 +1,5 @@
-USING: assocs kernel vectors sequences ;
+USING: assocs kernel vectors sequences namespaces ;
 IN: assocs.lib
-
-: insert-at ( value key assoc -- )
-    [ ?push ] change-at ;
 
 : >set ( seq -- hash )
     [ dup ] H{ } map>assoc ;
@@ -19,5 +16,19 @@ IN: assocs.lib
 : at-default ( key assoc -- value/key )
     dupd at [ nip ] when* ;
 
-: at-peek ( key assoc -- value ? )
-    at* dup >r [ peek ] when r> ;
+: insert-at ( value key assoc -- )
+    [ ?push ] change-at ;
+
+: peek-at* ( key assoc -- obj ? )
+    at* dup [ >r peek r> ] when ;
+
+: peek-at ( key assoc -- obj )
+    peek-at* drop ;
+
+: >multi-assoc ( assoc -- new-assoc )
+    [ 1vector ] assoc-map ;
+
+: multi-assoc-each ( assoc quot -- )
+    [ with each ] curry assoc-each ; inline
+
+: insert ( value variable -- ) namespace insert-at ;
