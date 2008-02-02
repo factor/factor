@@ -10,7 +10,7 @@ TUPLE: encode-error ;
 
 TUPLE: decode-error ;
 
-: decode-error ( -- * ) \ encode-error construct-empty throw ;
+: decode-error ( -- * ) \ decode-error construct-empty throw ;
 
 SYMBOL: begin
 
