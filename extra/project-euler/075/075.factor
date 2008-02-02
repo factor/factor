@@ -39,8 +39,8 @@ IN: project-euler.075
 ! Basically, this makes an array of 1000000 zeros, recursively creates
 ! primitive triples using the three transforms and then increments the array at
 ! index [a+b+c] by one for each triple's sum AND its multiples under 1000000
-! (to account for non-primitive triples). The answer is just the number of
-! indexes that equal one.
+! (to account for non-primitive triples). The answer is just the total number
+! of indexes that are equal to one.
 
 SYMBOL: p-count
 
