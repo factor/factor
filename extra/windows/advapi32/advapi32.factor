@@ -1,4 +1,4 @@
-USING: alien.syntax kernel math windows.types ;
+USING: alien.syntax kernel math windows.types math.bitfields ;
 IN: windows.advapi32
 LIBRARY: advapi32
 

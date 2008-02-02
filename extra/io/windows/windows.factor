@@ -5,7 +5,7 @@ io.buffers io.files io.nonblocking io.sockets io.binary
 io.sockets.impl windows.errors strings io.streams.duplex kernel
 math namespaces sequences windows windows.kernel32
 windows.shell32 windows.types windows.winsock splitting
-continuations ;
+continuations math.bitfields ;
 IN: io.windows
 
 TUPLE: windows-nt-io ;

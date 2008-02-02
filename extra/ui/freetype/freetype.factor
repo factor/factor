@@ -36,13 +36,13 @@ M: font hashcode* drop font hashcode* ;
 
 : close-freetype ( -- )
     global [
-        open-fonts [ values [ close-font ] each f ] change
+        open-fonts [ [ drop close-font ] assoc-each f ] change
         freetype [ FT_Done_FreeType f ] change
     ] bind ;
 
 M: freetype-renderer free-fonts ( world -- )
     dup world-handle select-gl-context
-    world-fonts values [ second free-sprites ] each ;
+    world-fonts [ nip second free-sprites ] assoc-each ;
 
 : ttf-name ( font style -- name )
     2array H{
@@ -100,7 +100,7 @@ SYMBOL: dpi
     swap set-font-height ;
 
 : <font> ( handle -- font )
-    V{ } clone
+    H{ } clone
     { set-font-handle set-font-widths } font construct
     dup init-font ;
 
@@ -119,7 +119,7 @@ M: freetype-renderer open-font ( font -- open-font )
 : char-width ( open-font char -- w )
     over font-widths [
         dupd load-glyph glyph-hori-advance ft-ceil
-    ] cache-nth nip ;
+    ] cache nip ;
 
 M: freetype-renderer string-width ( open-font string -- w )
     0 -rot [ char-width + ] with each ;
@@ -175,7 +175,7 @@ M: freetype-renderer string-height ( open-font string -- h )
     [ bitmap>texture ] keep [ init-sprite ] keep ;
 
 : draw-char ( open-font char sprites -- )
-    [ dupd <char-sprite> ] cache-nth nip
+    [ dupd <char-sprite> ] cache nip
     sprite-dlist glCallList ;
 
 : (draw-string) ( open-font sprites string loc -- )
@@ -186,7 +186,7 @@ M: freetype-renderer string-height ( open-font string -- h )
     ] do-enabled ;
 
 : font-sprites ( open-font world -- pair )
-    world-fonts [ open-font V{ } clone 2array ] cache ;
+    world-fonts [ open-font H{ } clone 2array ] cache ;
 
 M: freetype-renderer draw-string ( font string loc -- )
     >r >r world get font-sprites first2 r> r> (draw-string) ;

@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax parser namespaces kernel
-math windows.types windows.types init assocs sequences libc ;
+math math.bitfields windows.types windows.types init assocs
+sequences libc ;
 IN: windows.opengl32
 
 ! PIXELFORMATDESCRIPTOR flags
@@ -69,8 +70,6 @@ IN: windows.opengl32
 : WGL_SWAP_UNDERLAY13     HEX: 10000000 ; inline
 : WGL_SWAP_UNDERLAY14     HEX: 20000000 ; inline
 : WGL_SWAP_UNDERLAY15     HEX: 40000000 ; inline
-
-
 
 : pfd-dwFlags
     { PFD_DRAW_TO_WINDOW PFD_SUPPORT_OPENGL PFD_DOUBLEBUFFER } flags ;
