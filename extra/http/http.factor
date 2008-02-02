@@ -1,18 +1,19 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables io kernel math namespaces math.parser assocs
-sequences strings splitting ascii io.utf8 assocs.lib ;
+sequences strings splitting ascii io.utf8 assocs.lib
+namespaces unicode.case ;
 IN: http
 
 : header-line ( line -- )
-    ": " split1 dup [ swap >lower set ] [ 2drop ] if ;
+    ": " split1 dup [ swap >lower insert ] [ 2drop ] if ;
 
 : (read-header) ( -- )
     readln dup
     empty? [ drop ] [ header-line (read-header) ] if ;
 
 : read-header ( -- hash )
-    [ (read-header) ] VH{ } make-assoc ;
+    [ (read-header) ] H{ } make-assoc ;
 
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without

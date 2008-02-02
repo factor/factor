@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files strings splitting
-continuations ;
+continuations assocs.lib ;
 IN: http.client
 
 : parse-host ( url -- host port )
@@ -44,7 +44,7 @@ DEFER: http-get-stream
     #! Should this support Location: headers that are
     #! relative URLs?
     pick 100 /i 3 = [
-        dispose "location" swap header-single nip http-get-stream
+        dispose "location" swap peek-at nip http-get-stream
     ] when ;
 
 : http-get-stream ( url -- code headers stream )
