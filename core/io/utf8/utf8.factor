@@ -29,7 +29,7 @@ SYMBOL: quad3
     } cond ;
 
 : end-multibyte ( buf byte ch -- buf ch state )
-    begin append-nums decoded ;
+    f append-nums [ decoded ] unless* ;
 
 : (decode-utf8) ( buf byte ch state -- buf ch state )
     {
