@@ -15,4 +15,4 @@ M: pair (bitfield) ( value accum pair -- newaccum )
     0 [ (bitfield) ] reduce ;
 
 : flags ( values -- n )
-    0 [ execute bitor ] reduce ;
+    0 [ dup word? [ execute ] when bitor ] reduce ;
