@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math sequences words ;
 IN: math.bitfields
@@ -13,3 +13,6 @@ M: pair (bitfield) ( value accum pair -- newaccum )
 
 : bitfield ( values... bitspec -- n )
     0 [ (bitfield) ] reduce ;
+
+: flags ( values -- n )
+    0 [ execute bitor ] reduce ;
