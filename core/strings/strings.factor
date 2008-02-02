@@ -38,7 +38,7 @@ M: string set-nth-unsafe
     >r >fixnum >r >fixnum r> r> set-string-nth ;
 
 M: string clone
-	(clone) dup string-aux clone over set-string-aux ;
+    (clone) dup string-aux clone over set-string-aux ;
 
 M: string resize resize-string ;
 

@@ -4,7 +4,7 @@ USING: arrays byte-arrays byte-vectors bit-arrays bit-vectors
 generic hashtables io assocs kernel math namespaces sequences
 strings sbufs io.styles vectors words prettyprint.config
 prettyprint.sections quotations io io.files math.parser effects
-tuples classes float-arrays float-vectors ascii ;
+tuples classes float-arrays float-vectors ;
 IN: prettyprint.backend
 
 GENERIC: pprint* ( obj -- )
@@ -58,24 +58,17 @@ M: f pprint* drop \ f pprint-word ;
 ! Strings
 : ch>ascii-escape ( ch -- str )
     H{
-        { CHAR: \e "\\e"  }
-        { CHAR: \n "\\n"  }
-        { CHAR: \r "\\r"  }
-        { CHAR: \t "\\t"  }
-        { CHAR: \0 "\\0"  }
-        { CHAR: \\ "\\\\" }
-        { CHAR: \" "\\\"" }
+        { CHAR: \e CHAR: e  }
+        { CHAR: \n CHAR: n  }
+        { CHAR: \r CHAR: r  }
+        { CHAR: \t CHAR: t  }
+        { CHAR: \0 CHAR: 0  }
+        { CHAR: \\ CHAR: \\ }
+        { CHAR: \" CHAR: \" }
     } at ;
 
-: ch>unicode-escape ( ch -- str )
-    >hex 6 CHAR: 0 pad-left "\\u" swap append ;
-
 : unparse-ch ( ch -- )
-    dup quotable? [
-        ,
-    ] [
-        dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?if %
-    ] if ;
+    dup ch>ascii-escape [ "\\" % ] [ ] ?if , ;
 
 : do-string-limit ( str -- trimmed )
     string-limit get [

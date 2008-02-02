@@ -2,7 +2,7 @@ IN: xmode.marker
 USING: kernel namespaces xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators combinators.lib
-strings regexp splitting parser-combinators ;
+strings regexp splitting parser-combinators ascii unicode.case ;
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 

@@ -15,12 +15,12 @@ crossref off
 "resource:core/bootstrap/syntax.factor" parse-file
 
 "resource:core/cpu/" architecture get {
-       { "x86.32" "x86/32" }
-       { "x86.64" "x86/64" }
-       { "linux-ppc" "ppc/linux" }
-       { "macosx-ppc" "ppc/macosx" }
-       { "arm" "arm" }
-   } at "/bootstrap.factor" 3append parse-file
+    { "x86.32" "x86/32" }
+    { "x86.64" "x86/64" }
+    { "linux-ppc" "ppc/linux" }
+    { "macosx-ppc" "ppc/macosx" }
+    { "arm" "arm" }
+} at "/bootstrap.factor" 3append parse-file
 
 "resource:core/bootstrap/layouts/layouts.factor" parse-file
 
@@ -626,7 +626,7 @@ builtins get num-tags get tail f union-class define-class
     { "<float-array>" "float-arrays" }
     { "curry" "kernel" }
     { "<tuple-boa>" "tuples.private" }
-	{ "class-hash" "kernel.private" }
+    { "class-hash" "kernel.private" }
     { "callstack>array" "kernel" }
     { "innermost-frame-quot" "kernel.private" }
     { "innermost-frame-scan" "kernel.private" }

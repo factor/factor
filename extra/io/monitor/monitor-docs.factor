@@ -8,35 +8,32 @@ $nl
 "Not all operating systems support recursive monitors; if recursive monitoring is not available, an error is thrown and the caller must implement alternative logic for monitoring subdirectories." } ;
 
 HELP: next-change
-{ $values { "monitor" "a monitor" } { "path" "a pathname string" } { "changes" "a sequence of change descriptors" } }
-{ $description "Waits for file system changes and outputs the pathname of the first changed file. The change descriptor is a sequence containing at least one change descriptor; see " { $link "io.monitor.descriptors" } "." } ;
+{ $values { "monitor" "a monitor" } { "path" "a pathname string" } { "changes" "a change descriptor" } }
+{ $description "Waits for file system changes and outputs the pathname of the first changed file. The change descriptor is aq sequence of symbols documented in " { $link "io.monitor.descriptors" } "." } ;
 
 HELP: with-monitor
 { $values { "path" "a pathname string" } { "recursive?" "a boolean" } { "quot" "a quotation with stack effect " { $snippet "( monitor -- )" } } }
 { $description "Opens a file system change monitor and passes it to the quotation. Closes the monitor after the quotation returns or throws an error." } ;
 
-HELP: +change-file+
-{ $description "Indicates that the contents of the file have changed." } ;
+HELP: +add-file+
+{ $description "Indicates that the file has been added to the directory." } ;
 
-HELP: +change-name+
-{ $description "Indicates that the file name has changed." } ;
+HELP: +remove-file+
+{ $description "Indicates that the file has been removed from the directory." } ;
 
-HELP: +change-size+
-{ $description "Indicates that the file size has changed." } ;
+HELP: +modify-file+
+{ $description "Indicates that the file contents have changed." } ;
 
-HELP: +change-attributes+
-{ $description "Indicates that file attributes has changed. Attributes are operating system-specific but may include the creation time and permissions." } ;
-
-HELP: +change-modified+
-{ $description "Indicates that the last modification time of the file has changed." } ;
+HELP: +rename-file+
+{ $description "Indicates that file has been renamed." } ;
 
 ARTICLE: "io.monitor.descriptors" "File system change descriptors"
 "Change descriptors output by " { $link next-change } ":"
-{ $subsection +change-file+ }
-{ $subsection +change-name+ }
-{ $subsection +change-size+ }
-{ $subsection +change-attributes+ }
-{ $subsection +change-modified+ } ;
+{ $subsection +add-file+ }
+{ $subsection +remove-file+ }
+{ $subsection +modify-file+ }
+{ $subsection +rename-file+ }
+{ $subsection +add-file+ } ;
 
 ARTICLE: "io.monitor" "File system change monitors"
 "File system change monitors listen for changes to file names, attributes and contents under a specified directory. They can optionally be recursive, in which case subdirectories are also monitored."

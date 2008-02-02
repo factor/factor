@@ -83,8 +83,8 @@ INLINE CELL array_capacity(F_ARRAY* array)
 	return array->capacity >> TAG_BITS;
 }
 
-#define BREF(byte_array,index) ((CELL)byte_array + sizeof(F_BYTE_ARRAY) + index)
-#define SREF(string,index) ((CELL)string + sizeof(F_STRING) + index)
+#define BREF(byte_array,index) ((CELL)byte_array + sizeof(F_BYTE_ARRAY) + (index))
+#define SREF(string,index) ((CELL)string + sizeof(F_STRING) + (index))
 
 INLINE F_STRING* untag_string(CELL tagged)
 {

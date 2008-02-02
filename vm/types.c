@@ -431,9 +431,12 @@ CELL string_nth(F_STRING* string, CELL index)
 	}
 }
 
+/* allocates memory */
 void set_string_nth(F_STRING* string, CELL index, CELL value)
 {
 	bput(SREF(string,index),value & 0xff);
+
+	F_BYTE_ARRAY *aux;
 
 	if(string->aux == F)
 	{
@@ -441,13 +444,17 @@ void set_string_nth(F_STRING* string, CELL index, CELL value)
 			return;
 		else
 		{
-			string->aux = tag_object(allot_byte_array(
+			REGISTER_UNTAGGED(string);
+			aux = allot_byte_array(
 				untag_fixnum_fast(string->length)
-				* sizeof(u16)));
+				* sizeof(u16));
+			UNREGISTER_UNTAGGED(string);
+			string->aux = tag_object(aux);
 		}
 	}
+	else
+		aux = untag_object(string->aux);
 
-	F_BYTE_ARRAY *aux = untag_object(string->aux);
 	cput(BREF(aux,index * sizeof(u16)),value >> 8);
 }
 
@@ -463,20 +470,36 @@ F_STRING* allot_string_internal(CELL capacity)
 	string->length = tag_fixnum(capacity);
 	string->hashcode = F;
 	string->aux = F;
+
 	set_string_nth(string,capacity,0);
+
 	return string;
 }
 
+/* allocates memory */
 void fill_string(F_STRING *string, CELL start, CELL capacity, CELL fill)
 {
 	if(fill == 0)
-		memset((void*)SREF(string,start),'\0',capacity - start);
+	{
+		memset((void *)SREF(string,start),'\0',capacity - start);
+
+		if(string->aux != F)
+		{
+			F_BYTE_ARRAY *aux = untag_object(string->aux);
+			memset((void *)BREF(aux,start * sizeof(u16)),'\0',
+				(capacity - start) * sizeof(u16));
+		}
+	}
 	else
 	{
 		CELL i;
 
 		for(i = start; i < capacity; i++)
+		{
+			REGISTER_UNTAGGED(string);
 			set_string_nth(string,i,fill);
+			UNREGISTER_UNTAGGED(string);
+		}
 	}
 }
 
@@ -484,7 +507,9 @@ void fill_string(F_STRING *string, CELL start, CELL capacity, CELL fill)
 F_STRING *allot_string(CELL capacity, CELL fill)
 {
 	F_STRING* string = allot_string_internal(capacity);
+	REGISTER_UNTAGGED(string);
 	fill_string(string,0,capacity,fill);
+	UNREGISTER_UNTAGGED(string);
 	return string;
 }
 
@@ -506,7 +531,23 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
 	UNREGISTER_UNTAGGED(string);
 
 	memcpy(new_string + 1,string + 1,to_copy);
+
+	if(string->aux != F)
+	{
+		REGISTER_UNTAGGED(string);
+		REGISTER_UNTAGGED(new_string);
+		F_BYTE_ARRAY *new_aux = allot_byte_array(capacity * sizeof(u16));
+		new_string->aux = tag_object(new_aux);
+		UNREGISTER_UNTAGGED(new_string);
+		UNREGISTER_UNTAGGED(string);
+
+		F_BYTE_ARRAY *aux = untag_object(string->aux);
+		memcpy(new_aux + 1,aux + 1,to_copy * sizeof(u16));
+	}
+
+	REGISTER_UNTAGGED(string);
 	fill_string(new_string,to_copy,capacity,fill);
+	UNREGISTER_UNTAGGED(string);
 
 	return new_string;
 }
@@ -529,7 +570,9 @@ DEFINE_PRIMITIVE(resize_string)
 		CELL i; \
 		for(i = 0; i < length; i++) \
 		{ \
+			REGISTER_UNTAGGED(s); \
 			set_string_nth(s,i,(utype)*string); \
+			UNREGISTER_UNTAGGED(s); \
 			string++; \
 		} \
 		return s; \
@@ -552,6 +595,7 @@ DEFINE_PRIMITIVE(resize_string)
 
 MEMORY_TO_STRING(char,u8)
 MEMORY_TO_STRING(u16,u16)
+MEMORY_TO_STRING(u32,u32)
 
 bool check_string(F_STRING *s, CELL max)
 {
