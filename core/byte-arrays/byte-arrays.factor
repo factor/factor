@@ -15,8 +15,6 @@ M: byte-array new drop <byte-array> ;
 M: byte-array equal?
     over byte-array? [ sequence= ] [ 2drop f ] if ;
 
-M: byte-array byte-length
-    length ;
 M: byte-array resize
     resize-byte-array ;
 

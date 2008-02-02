@@ -28,8 +28,6 @@ PREDICATE: alien pinned-alien
 UNION: pinned-c-ptr
     pinned-alien POSTPONE: f ;
 
-GENERIC: byte-length ( seq -- n ) flushable
-
 M: f expired? drop t ;
 
 : <alien> ( address -- alien )
