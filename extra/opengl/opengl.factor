@@ -401,7 +401,7 @@ PREDICATE: integer gl-program (gl-program?) ;
 : gl-extensions ( -- seq )
     GL_EXTENSIONS glGetString " " split ;
 : has-gl-extensions? ( extensions -- ? )
-    gl-extensions subseq? ;
+    gl-extensions swap [ over member? ] all? nip ;
 : (make-gl-extensions-error) ( required-extensions -- )
     gl-extensions swap seq-diff
     "Required OpenGL extensions not supported:\n" %
