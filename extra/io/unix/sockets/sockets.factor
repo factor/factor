@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2007 Slava Pestov, Ivan Tikhonov.
+! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov.
 ! See http://factorcode.org/license.txt for BSD license.
 
 ! We need to fiddle with the exact search order here, since
@@ -15,8 +15,7 @@ libc combinators ;
     #! <client> don't set up error handlers until after <client>
     #! returns (and if they did before, they wouldn't have
     #! anything to close!)
-    dup port-error dup
-    [ swap stream-close throw ] [ 2drop ] if ;
+    dup port-error dup [ swap dispose throw ] [ 2drop ] if ;
 
 : socket-fd ( domain type -- socket )
     0 socket dup io-error dup init-handle ;
@@ -34,16 +33,14 @@ M: unix-io addrinfo-error ( n -- )
 TUPLE: connect-task ;
 
 : <connect-task> ( port continuation -- task )
-    connect-task <io-task> ;
+    connect-task <output-task> ;
 
 M: connect-task do-io-task
     io-task-port dup port-handle f 0 write
     0 < [ defer-error ] [ drop t ] if ;
 
-M: connect-task task-container drop write-tasks get-global ;
-
 : wait-to-connect ( port -- )
-    [ <connect-task> add-io-task stop ] callcc0 drop ;
+    [ <connect-task> add-io-task ] with-port-continuation drop ;
 
 M: unix-io (client) ( addrspec -- stream )
     dup make-sockaddr/size >r >r
@@ -68,9 +65,7 @@ USE: unix
 TUPLE: accept-task ;
 
 : <accept-task> ( port continuation  -- task )
-    accept-task <io-task> ;
-
-M: accept-task task-container drop read-tasks get ;
+    accept-task <input-task> ;
 
 : accept-sockaddr ( port -- fd sockaddr )
     dup port-handle swap server-port-addr sockaddr-type
@@ -87,7 +82,7 @@ M: accept-task do-io-task
     over 0 >= [ do-accept t ] [ 2drop defer-error ] if ;
 
 : wait-to-accept ( server -- )
-    [ <accept-task> add-io-task stop ] callcc0 drop ;
+    [ <accept-task> add-io-task ] with-port-continuation drop ;
 
 USE: io.sockets
 
@@ -101,7 +96,6 @@ M: unix-io <server> ( addrspec -- stream )
     [
         SOCK_STREAM server-fd
         dup 10 listen zero? [ dup close (io-error) ] unless
-        f <port>
     ] keep <server-port> ;
 
 M: unix-io accept ( server -- client )
@@ -113,7 +107,7 @@ M: unix-io accept ( server -- client )
 
 ! Datagram sockets - UDP and Unix domain
 M: unix-io <datagram>
-    [ SOCK_DGRAM server-fd f <port> ] keep <datagram-port> ;
+    [ SOCK_DGRAM server-fd ] keep <datagram-port> ;
 
 SYMBOL: receive-buffer
 
@@ -139,7 +133,7 @@ packet-size <byte-array> receive-buffer set-global
 TUPLE: receive-task ;
 
 : <receive-task> ( stream continuation  -- task )
-    receive-task <io-task> ;
+    receive-task <input-task> ;
 
 M: receive-task do-io-task
     io-task-port
@@ -152,10 +146,8 @@ M: receive-task do-io-task
         2drop defer-error
     ] if ;
 
-M: receive-task task-container drop read-tasks get ;
-
 : wait-receive ( stream -- )
-    [ <receive-task> add-io-task stop ] callcc0 drop ;
+    [ <receive-task> add-io-task ] with-port-continuation drop ;
 
 M: unix-io receive ( datagram -- packet addrspec )
     dup check-datagram-port
@@ -170,7 +162,7 @@ M: unix-io receive ( datagram -- packet addrspec )
 TUPLE: send-task packet sockaddr len ;
 
 : <send-task> ( packet sockaddr len stream continuation -- task )
-    send-task <io-task> [
+    send-task <output-task> [
         {
             set-send-task-packet
             set-send-task-sockaddr
@@ -185,10 +177,9 @@ M: send-task do-io-task
     [ send-task-len do-send ] keep
     swap 0 < [ io-task-port defer-error ] [ drop t ] if ;
 
-M: send-task task-container drop write-tasks get ;
-
 : wait-send ( packet sockaddr len stream -- )
-    [ <send-task> add-io-task stop ] callcc0 2drop 2drop ;
+    [ <send-task> add-io-task ] with-port-continuation
+    2drop 2drop ;
 
 M: unix-io send ( packet addrspec datagram -- )
     3dup check-datagram-send

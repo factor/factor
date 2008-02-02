@@ -421,6 +421,8 @@ DEFER: bar
 { 2 1 } [ [ + ] [ ] [ ] cleanup ] unit-test-effect
 { 2 1 } [ [ + ] [ 3drop 0 ] recover ] unit-test-effect
 
+\ dispose must-infer
+
 ! Test stream protocol
 \ set-timeout must-infer
 \ stream-read must-infer
@@ -430,7 +432,6 @@ DEFER: bar
 \ stream-write must-infer
 \ stream-write1 must-infer
 \ stream-nl must-infer
-\ stream-close must-infer
 \ stream-format must-infer
 \ stream-write-table must-infer
 \ stream-flush must-infer

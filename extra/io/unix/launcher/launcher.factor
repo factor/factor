@@ -1,9 +1,10 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.launcher io.unix.backend io.nonblocking
-sequences kernel namespaces math system alien.c-types
-debugger continuations arrays assocs combinators unix.process
-parser-combinators memoize promises strings ;
+USING: io io.backend io.launcher io.unix.backend io.unix.files
+io.nonblocking sequences kernel namespaces math system
+ alien.c-types debugger continuations arrays assocs 
+combinators unix.process parser-combinators memoize 
+promises strings threads ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -42,31 +43,35 @@ MEMO: 'arguments' ( -- parser )
 : assoc>env ( assoc -- env )
     [ "=" swap 3append ] { } assoc>map ;
 
-: (spawn-process) ( -- )
+: (redirect) ( path mode fd -- )
+    >r file-mode open dup io-error dup
+    r> dup2 io-error close ;
+
+: redirect ( obj mode fd -- )
+    {
+        { [ pick not ] [ 3drop ] }
+        { [ pick +closed+ eq? ] [ close 2drop ] }
+        { [ pick string? ] [ (redirect) ] }
+    } cond ;
+
+: setup-redirection ( -- )
+    +stdin+ get read-flags 0 redirect
+    +stdout+ get write-flags 1 redirect
+    +stderr+ get write-flags 2 redirect ;
+
+: spawn-process ( -- )
     [
-        pass-environment? [
-	    get-arguments get-environment assoc>env exec-args-with-env
-        ] [
-	    get-arguments exec-args-with-path
-        ] if io-error
+        setup-redirection
+        get-arguments
+        pass-environment?
+        [ get-environment assoc>env exec-args-with-env ]
+        [ exec-args-with-path ] if
+        io-error
     ] [ error. :c flush ] recover 1 exit ;
 
-: wait-for-process ( pid -- )
-    0 <int> 0 waitpid drop ;
-
-: spawn-process ( -- pid )
-    [ (spawn-process) ] [ ] with-fork ;
-
-: spawn-detached ( -- )
-    [ spawn-process 0 exit ] [ ] with-fork wait-for-process ;
-
-M: unix-io run-process* ( desc -- )
+M: unix-io run-process* ( desc -- pid )
     [
-        +detached+ get [
-            spawn-detached
-        ] [
-            spawn-process wait-for-process
-        ] if
+        [ spawn-process ] [ ] with-fork <process>
     ] with-descriptor ;
 
 : open-pipe ( -- pair )
@@ -80,20 +85,36 @@ M: unix-io run-process* ( desc -- )
 : spawn-process-stream ( -- in out pid )
     open-pipe open-pipe [
         setup-stdio-pipe
-        (spawn-process)
+        spawn-process
     ] [
         -rot 2dup second close first close
-    ] with-fork first swap second rot ;
-
-TUPLE: pipe-stream pid ;
-
-: <pipe-stream> ( in out pid -- stream )
-    pipe-stream construct-boa
-    -rot handle>duplex-stream over set-delegate ;
-
-M: pipe-stream stream-close
-    dup delegate stream-close
-    pipe-stream-pid wait-for-process ;
+    ] with-fork first swap second rot <process> ;
 
 M: unix-io process-stream*
-    [ spawn-process-stream <pipe-stream> ] with-descriptor ;
+    [
+        spawn-process-stream >r handle>duplex-stream r>
+    ] with-descriptor ;
+
+: find-process ( handle -- process )
+    processes get swap [ nip swap process-handle = ] curry
+    assoc-find 2drop ;
+
+! Inefficient process wait polling, used on Linux and Solaris.
+! On BSD and Mac OS X, we use kqueue() which scales better.
+: wait-for-processes ( -- ? )
+    -1 0 <int> tuck WNOHANG waitpid
+    dup 0 <= [
+        2drop t
+    ] [
+        find-process dup [
+            >r *uint r> notify-exit f
+        ] [
+            2drop f
+        ] if
+    ] if ;
+
+: wait-loop ( -- )
+    wait-for-processes [ 250 sleep ] when wait-loop ;
+
+: start-wait-thread ( -- )
+    [ wait-loop ] in-thread ;

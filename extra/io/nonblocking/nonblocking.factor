@@ -1,54 +1,52 @@
-! Copyright (C) 2005, 2007 Slava Pestov, Doug Coleman
+! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.nonblocking
-USING: math kernel io sequences io.buffers generic sbufs
-system io.streams.lines io.streams.plain io.streams.duplex
-continuations debugger classes byte-arrays namespaces
-splitting ;
+USING: math kernel io sequences io.buffers generic sbufs system
+io.streams.lines io.streams.plain io.streams.duplex io.backend
+continuations debugger classes byte-arrays namespaces splitting
+dlists assocs ;
 
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
 
 ! Common delegate of native stream readers and writers
-TUPLE: port handle error timeout cutoff type eof? ;
+TUPLE: port
+handle
+error
+timeout-entry timeout cutoff
+type eof? ;
 
-SYMBOL: input
-SYMBOL: output
 SYMBOL: closed
 
-PREDICATE: port input-port port-type input eq? ;
-PREDICATE: port output-port port-type output eq? ;
+PREDICATE: port input-port port-type input-port eq? ;
+PREDICATE: port output-port port-type output-port eq? ;
 
 GENERIC: init-handle ( handle -- )
 GENERIC: close-handle ( handle -- )
 
-: <port> ( handle buffer -- port )
-    over init-handle
+: <port> ( handle buffer type -- port )
+    pick init-handle
     0 0 {
         set-port-handle
         set-delegate
+        set-port-type
         set-port-timeout
         set-port-cutoff
     } port construct ;
 
-: <buffered-port> ( handle -- port )
-    default-buffer-size get <buffer> <port> ;
+: <buffered-port> ( handle type -- port )
+    default-buffer-size get <buffer> swap <port> ;
 
 : <reader> ( handle -- stream )
-    <buffered-port> input over set-port-type <line-reader> ;
+    input-port <buffered-port> <line-reader> ;
 
 : <writer> ( handle -- stream )
-    <buffered-port> output over set-port-type <plain-writer> ;
+    output-port <buffered-port> <plain-writer> ;
 
 : handle>duplex-stream ( in-handle out-handle -- stream )
     <writer>
-    [ >r <reader> r> <duplex-stream> ]
-    [ ] [ stream-close ]
+    [ >r <reader> r> <duplex-stream> ] [ ] [ dispose ]
     cleanup ;
-
-: touch-port ( port -- )
-    dup port-timeout dup zero?
-    [ 2drop ] [ millis + swap set-port-cutoff ] if ;
 
 : timeout? ( port -- ? )
     port-cutoff dup zero? not swap millis < and ;
@@ -56,8 +54,44 @@ GENERIC: close-handle ( handle -- )
 : pending-error ( port -- )
     dup port-error f rot set-port-error [ throw ] when* ;
 
-M: port set-timeout
-    [ set-port-timeout ] keep touch-port ;
+SYMBOL: timeout-queue
+
+timeout-queue global [ [ <dlist> ] unless* ] change-at
+
+: unqueue-timeout ( port -- )
+    port-timeout-entry [
+        timeout-queue get-global swap delete-node
+    ] when* ;
+
+: queue-timeout ( port -- )
+    dup timeout-queue get-global push-front*
+    swap set-port-timeout-entry ;
+
+HOOK: cancel-io io-backend ( port -- )
+
+M: object cancel-io drop ;
+
+: expire-timeouts ( -- )
+    timeout-queue get-global dup dlist-empty? [ drop ] [
+        dup peek-back timeout?
+        [ pop-back cancel-io expire-timeouts ] [ drop ] if
+    ] if ;
+
+: begin-timeout ( port -- )
+    dup port-timeout dup zero? [
+        2drop
+    ] [
+        millis + over set-port-cutoff
+        dup unqueue-timeout queue-timeout
+    ] if ;
+
+: end-timeout ( port -- )
+    unqueue-timeout ;
+
+: with-port-timeout ( port quot -- )
+    over begin-timeout keep end-timeout ; inline
+
+M: port set-timeout set-port-timeout ;
 
 GENERIC: (wait-to-read) ( port -- )
 
@@ -159,19 +193,23 @@ GENERIC: port-flush ( port -- )
 M: output-port stream-flush ( port -- )
     dup port-flush pending-error ;
 
-M: port stream-close
-    dup port-type closed eq? [
-        dup port-type >r closed over set-port-type r>
-        output eq? [ dup port-flush ] when
-        dup port-handle close-handle
-        dup delegate [ buffer-free ] when*
-        f over set-delegate
-    ] unless drop ;
+: close-port ( port type -- )
+    output-port eq? [ dup port-flush ] when
+    dup cancel-io
+    dup port-handle close-handle
+    dup delegate [ buffer-free ] when*
+    f swap set-delegate ;
+
+M: port dispose
+    dup port-type closed eq?
+    [ drop ]
+    [ dup port-type >r closed over set-port-type r> close-port ]
+    if ;
 
 TUPLE: server-port addr client ;
 
-: <server-port> ( port addr -- server )
-    server-port pick set-port-type
+: <server-port> ( handle addr -- server )
+    >r f server-port <port> r>
     { set-delegate set-server-port-addr }
     server-port construct ;
 
@@ -180,8 +218,8 @@ TUPLE: server-port addr client ;
 
 TUPLE: datagram-port addr packet packet-addr ;
 
-: <datagram-port> ( port addr -- datagram )
-    datagram-port pick set-port-type
+: <datagram-port> ( handle addr -- datagram )
+    >r f datagram-port <port> r>
     { set-delegate set-datagram-port-addr }
     datagram-port construct ;
 

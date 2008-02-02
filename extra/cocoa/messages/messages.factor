@@ -79,11 +79,11 @@ MACRO: (send) ( selector super? -- quot )
     super-message-senders message-senders ? get at
     [ slip execute ] 2curry ;
 
-: send ( args... receiver selector -- return... ) f (send) ; inline
+: send ( receiver args... selector -- return... ) f (send) ; inline
 
 \ send soft "break-after" set-word-prop
 
-: super-send ( args... receiver selector -- return... ) t (send) ; inline
+: super-send ( receiver args... selector -- return... ) t (send) ; inline
 
 \ super-send soft "break-after" set-word-prop
 

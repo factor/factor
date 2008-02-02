@@ -122,7 +122,7 @@ IN: hashtables
 PRIVATE>
 
 : <hashtable> ( n -- hash )
-    (hashtable) [ reset-hash ] keep ;
+    hashtable construct-empty [ reset-hash ] keep ;
 
 M: hashtable at* ( key hash -- value ? )
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;
@@ -194,5 +194,8 @@ M: hashtable assoc-like
 : prune ( seq -- newseq )
     dup length <hashtable> over length <vector>
     rot [ >r 2dup r> (prune) ] each nip ;
+
+: all-unique? ( seq -- ? )
+    dup prune [ length ] 2apply = ;
 
 INSTANCE: hashtable assoc

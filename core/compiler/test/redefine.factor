@@ -1,6 +1,6 @@
 USING: compiler definitions generic assocs inference math
 namespaces parser tools.test words kernel sequences arrays io
-effects tools.test.inference compiler.units ;
+effects tools.test.inference compiler.units inference.state ;
 IN: temporary
 
 DEFER: x-1
@@ -205,3 +205,48 @@ DEFER: generic-then-not-generic-test-2
 [ ] [ "IN: temporary USE: math : generic-then-not-generic-test-1 1 + ;" eval ] unit-test
 
 [ 4 ] [ generic-then-not-generic-test-2 ] unit-test
+
+DEFER: foldable-test-1
+DEFER: foldable-test-2
+
+[ ] [ "IN: temporary : foldable-test-1 3 ; foldable" eval ] unit-test
+
+[ ] [ "IN: temporary : foldable-test-2 foldable-test-1 ;" eval ] unit-test
+
+[ +inlined+ ] [ \ foldable-test-2 \ foldable-test-1 compiled-usage at ] unit-test
+
+[ 3 ] [ foldable-test-2 ] unit-test
+
+[ ] [ "IN: temporary : foldable-test-1 4 ; foldable" eval ] unit-test
+
+[ 4 ] [ foldable-test-2 ] unit-test
+
+DEFER: flushable-test-2
+
+[ ] [ "IN: temporary USE: kernel : flushable-test-1 drop 3 ; flushable" eval ] unit-test
+
+[ ] [ "IN: temporary USE: kernel : flushable-test-2 V{ } dup flushable-test-1 drop ;" eval ] unit-test
+
+[ V{ } ] [ flushable-test-2 ] unit-test
+
+[ ] [ "IN: temporary USING: kernel sequences ; : flushable-test-1 3 over push ;" eval ] unit-test
+
+[ V{ 3 } ] [ flushable-test-2 ] unit-test
+
+: ax ;
+: bx ax ;
+[ \ bx forget ] with-compilation-unit
+
+[ t ] [ \ ax compiled-usage [ drop interned? ] assoc-all? ] unit-test
+
+DEFER: defer-redefine-test-2
+
+[ ] [ "IN: temporary DEFER: defer-redefine-test-1" eval ] unit-test
+
+[ ] [ "IN: temporary : defer-redefine-test-2 defer-redefine-test-1 1 ;" eval ] unit-test
+
+[ defer-redefine-test-2 ] unit-test-fails
+
+[ ] [ "IN: temporary : defer-redefine-test-1 2 ;" eval ] unit-test
+
+[ 2 1 ] [ defer-redefine-test-2 ] unit-test

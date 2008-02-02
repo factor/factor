@@ -56,14 +56,14 @@ yield
 
         "Receive 2" print
 
-        "d" get receive >r >upper r>
+        "d" get receive >r " world" append r>
         
         "Send 1" print
         dup .
 
          "d" get send
 
-        "d" get stream-close
+        "d" get dispose
 
         "Done" print
 
@@ -98,13 +98,13 @@ client-addr <datagram>
     "d" get send
 ] unit-test
 
-[ "HELLO" t ] [
+[ "hello world" t ] [
     "d" get receive
     server-addr =
     >r >string r>
 ] unit-test
 
-[ ] [ "d" get stream-close ] unit-test
+[ ] [ "d" get dispose ] unit-test
 
 ! Test error behavior
 
@@ -120,7 +120,7 @@ client-addr <datagram>
     B{ 1 2 3 } "unix-domain-datagram-test-3" <local> "d" get send
 ] unit-test-fails
 
-[ ] [ "d" get stream-close ] unit-test
+[ ] [ "d" get dispose ] unit-test
 
 ! See what happens on send/receive after close
 

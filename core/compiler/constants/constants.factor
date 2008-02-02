@@ -10,7 +10,7 @@ IN: compiler.constants
 ! These constants must match vm/layouts.h
 : header-offset object tag-number neg ;
 : float-offset 8 float tag-number - ;
-: string-offset 3 bootstrap-cells object tag-number - ;
+: string-offset 4 bootstrap-cells object tag-number - ;
 : profile-count-offset 7 bootstrap-cells object tag-number - ;
 : byte-array-offset 2 bootstrap-cells object tag-number - ;
 : alien-offset 3 bootstrap-cells object tag-number - ;

@@ -1,6 +1,6 @@
 USING: calendar furnace furnace.validator io.files kernel
-namespaces sequences store http.server.responders html
-math.parser rss xml.writer xmode.code2html ;
+namespaces sequences http.server.responders html math math.parser rss
+xml.writer xmode.code2html ;
 IN: webapps.pastebin
 
 TUPLE: pastebin pastes ;
@@ -8,11 +8,7 @@ TUPLE: pastebin pastes ;
 : <pastebin> ( -- pastebin )
     V{ } clone pastebin construct-boa ;
 
-! Persistence
-SYMBOL: store
-
-"pastebin.store" store define-store
-<pastebin> pastebin store init-persistent
+<pastebin> pastebin set-global
 
 TUPLE: paste
 summary author channel mode contents date
@@ -25,11 +21,8 @@ TUPLE: annotation summary author mode contents ;
 
 C: <annotation> annotation
 
-: get-pastebin ( -- pastebin )
-    pastebin store get-persistent ;
-
 : get-paste ( n -- paste )
-    get-pastebin pastebin-pastes nth ;
+    pastebin get pastebin-pastes nth ;
 
 : show-paste ( n -- )
     serving-html
@@ -49,7 +42,7 @@ C: <annotation> annotation
     [
         [ show-paste ] "show-paste-quot" set
         [ new-paste ] "new-paste-quot" set
-        get-pastebin "paste-list" render-component
+        pastebin get "paste-list" render-component
     ] with-html-stream ;
 
 \ paste-list { } define-action
@@ -61,7 +54,7 @@ C: <annotation> annotation
     over length min head ;
 
 : paste-feed ( -- entries )
-    get-pastebin pastebin-pastes <reversed> 20 safe-head [
+    pastebin get pastebin-pastes <reversed> 20 safe-head [
         {
             paste-summary
             paste-link
@@ -82,10 +75,8 @@ C: <annotation> annotation
     pastebin-pastes 2dup length swap set-paste-n push ;
 
 : submit-paste ( summary author channel mode contents -- )
-    <paste> [
-        pastebin store get-persistent add-paste
-        store save-store
-    ] keep paste-link permanent-redirect ;
+    <paste> [ pastebin get add-paste ] keep
+    paste-link permanent-redirect ;
 
 \ new-paste
 \ submit-paste {
@@ -103,7 +94,7 @@ C: <annotation> annotation
 
 : annotate-paste ( n summary author mode contents -- )
     <annotation> swap get-paste
-    [ paste-annotations push store save-store ] keep
+    [ paste-annotations push ] keep
     paste-link permanent-redirect ;
 
 [ "n" show-paste ]

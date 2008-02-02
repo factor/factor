@@ -1,13 +1,18 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax byte-arrays io
-io.sockets.impl kernel structs math prettyprint ;
+io.sockets.impl kernel structs math math.parser
+prettyprint sequences ;
 IN: io.sockets.headers
 
 C-STRUCT: etherneth
     { { "char" 6 } "dmac" }
     { { "char" 6 } "smac" }
     { "ushort" "type" } ;
+
+: >mac-address ( byte-array -- string )
+    6 memory>byte-array
+    [ >hex 2 48 pad-left ] { } map-as ":" join ;
 
 : etherneth. ( etherneth -- )
     [ etherneth-dmac "Dest   MAC: " write >mac-address . ] keep

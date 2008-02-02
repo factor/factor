@@ -8,24 +8,24 @@
 ! variable to point to your executable,
 ! if not on the path.
 !
-USING: io.launcher kernel namespaces math math.parser
-editors ;
+USING: io.files io.launcher kernel namespaces math
+math.parser editors sequences windows.shell32 ;
 IN: editors.scite
 
-SYMBOL: scite-path
-
-"scite" scite-path set-global
+: scite-path ( -- path )
+    \ scite-path get-global [
+        program-files "wscite\\SciTE.exe" path+
+    ] unless* ;
 
 : scite-command ( file line -- cmd )
   swap
-  [ scite-path get %
-    " \"" %
-    %
-    "\" -goto:" %
-    #
-  ] "" make ;
+  [
+    scite-path ,
+    ,
+    "-goto:" swap number>string append ,
+  ] { } make ;
 
 : scite-location ( file line -- )
-  scite-command run-detached ;
+  scite-command run-detached drop ;
 
 [ scite-location ] edit-hook set-global

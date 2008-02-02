@@ -4,13 +4,15 @@ USING: io.backend io.nonblocking io.unix.backend io.files io
 unix kernel math continuations ;
 IN: io.unix.files
 
+: read-flags O_RDONLY ; inline
+
 : open-read ( path -- fd )
     O_RDONLY file-mode open dup io-error ;
 
 M: unix-io <file-reader> ( path -- stream )
     open-read <reader> ;
 
-: write-flags O_WRONLY O_CREAT O_TRUNC bitor bitor ;
+: write-flags O_WRONLY O_CREAT O_TRUNC bitor bitor ; inline
 
 : open-write ( path -- fd )
     write-flags file-mode open dup io-error ;
@@ -18,7 +20,7 @@ M: unix-io <file-reader> ( path -- stream )
 M: unix-io <file-writer> ( path -- stream )
     open-write <writer> ;
 
-: append-flags O_WRONLY O_APPEND O_CREAT bitor bitor ;
+: append-flags O_WRONLY O_APPEND O_CREAT bitor bitor ; inline
 
 : open-append ( path -- fd )
     append-flags file-mode open dup io-error

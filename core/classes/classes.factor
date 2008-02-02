@@ -255,7 +255,14 @@ PRIVATE>
     >r dup word-props r> union over set-word-props
     t "class" set-word-prop ;
 
-GENERIC: update-methods ( class -- )
+GENERIC: update-predicate ( class -- )
+
+M: class update-predicate drop ;
+
+: update-predicates ( assoc -- )
+    [ drop update-predicate ] assoc-each ;
+
+GENERIC: update-methods ( assoc -- )
 
 : define-class ( word members superclass metaclass -- )
     #! If it was already a class, update methods after.
@@ -264,8 +271,9 @@ GENERIC: update-methods ( class -- )
     over class-usages [
         uncache-classes
         dupd (define-class)
-    ] keep cache-classes
-    r> [ update-methods ] [ drop ] if ;
+    ] keep cache-classes r>
+    [ class-usages dup update-predicates update-methods ]
+    [ drop ] if ;
 
 GENERIC: class ( object -- class ) inline
 

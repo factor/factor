@@ -7,21 +7,6 @@ optimizer definitions math compiler.errors threads graphs
 generic ;
 IN: compiler
 
-SYMBOL: compiled-crossref
-
-compiled-crossref global [ H{ } assoc-like ] change-at
-
-: compiled-xref ( word dependencies -- )
-    2dup "compiled-uses" set-word-prop
-    compiled-crossref get add-vertex* ;
-
-: compiled-unxref ( word -- )
-    dup "compiled-uses" word-prop
-    compiled-crossref get remove-vertex* ;
-
-: compiled-usage ( word -- assoc )
-    compiled-crossref get at ;
-
 : compiled-usages ( words -- seq )
     [ [ dup ] H{ } map>assoc dup ] keep [
         compiled-usage [ nip +inlined+ eq? ] assoc-subset update
@@ -41,7 +26,7 @@ compiled-crossref global [ H{ } assoc-like ] change-at
     >r dupd save-effect r>
     f pick compiler-error
     over compiled-unxref
-    compiled-xref ;
+    over word-vocabulary [ compiled-xref ] [ 2drop ] if ;
 
 : compile-succeeded ( word -- effect dependencies )
     [
@@ -57,12 +42,9 @@ compiled-crossref global [ H{ } assoc-like ] change-at
     [ dupd compile-failed f save-effect ]
     recover ;
 
-: delete-any ( assoc -- element )
-    [ [ 2drop t ] assoc-find 2drop dup ] keep delete-at ;
-
 : compile-loop ( assoc -- )
     dup assoc-empty? [ drop ] [
-        dup delete-any (compile)
+        dup delete-any drop (compile)
         yield
         compile-loop
     ] if ;

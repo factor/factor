@@ -1,7 +1,6 @@
-USING: combinators io io.files io.streams.duplex
+USING: combinators io io.files io.streams.duplex continuations
 io.streams.string kernel math math.parser
-namespaces pack prettyprint sequences strings system ;
-USING: hexdump tools.interpreter ;
+namespaces pack prettyprint sequences strings system hexdump ;
 IN: tar
 
 : zero-checksum 256 ;
@@ -95,7 +94,7 @@ TUPLE: unimplemented-typeflag header ;
 ! Normal file
 : typeflag-0
   tar-header-name tar-path+ <file-writer>
-  [ read-data-blocks ] keep stream-close ;
+  [ read-data-blocks ] keep dispose ;
 
 ! Hard link
 : typeflag-1 ( header -- )
@@ -221,7 +220,7 @@ TUPLE: unimplemented-typeflag header ;
             [ <unknown-typeflag> throw ]
         } case
         ! dup tar-header-size zero? [
-            ! out-stream get [ stream-close ] when
+            ! out-stream get [ dispose ] when
             ! out-stream off
             ! drop
         ! ] [
