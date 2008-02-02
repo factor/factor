@@ -1,5 +1,4 @@
 USING: help.markup help.syntax ;
-
 IN: multiline
 
 HELP: STRING:

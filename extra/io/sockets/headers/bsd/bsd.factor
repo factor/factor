@@ -13,7 +13,7 @@ C-STRUCT: bpfh
 : bpfh. ( bpfh -- )
     [
         bpfh-timestamp "Timestamp: " write
-        "timeval" heap-size memory>string >byte-array .
+        "timeval" heap-size memory>byte-array .
     ] keep
     [ bpfh-caplen "caplen: " write . ] keep
     [ bpfh-datalen "datalen: " write . ] keep

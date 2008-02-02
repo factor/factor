@@ -36,6 +36,9 @@ to depend on:
   find a mode file which depends on this flaw, please fix it and submit
   the changes to the jEdit project.
 
+- References to non-existent rule sets in IMPORT tags and DELEGATE
+  attributes were ignored in jEdit. They raise an error in Factor.
+
 If you wish to contribute a new or improved mode file, please contact
 the jEdit project. Updated mode files in jEdit will be periodically
 imported into the Factor source tree.

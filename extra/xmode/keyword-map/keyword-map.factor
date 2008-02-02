@@ -1,4 +1,5 @@
-USING: kernel strings assocs sequences hashtables sorting ;
+USING: kernel strings assocs sequences hashtables sorting
+       unicode.case unicode.categories ;
 IN: xmode.keyword-map
 
 ! Based on org.gjt.sp.jedit.syntax.KeywordMap

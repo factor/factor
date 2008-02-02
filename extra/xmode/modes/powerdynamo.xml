@@ -200,11 +200,11 @@ for the other tags (data, document, etc). more support planned for future.
 			<END>*/</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1" DELEGATE="powerdynamo_LITERAL">
+		<SPAN TYPE="LITERAL1">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1" DELEGATE="powerdynamo_LITERAL">
+		<SPAN TYPE="LITERAL1">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
@@ -413,11 +413,11 @@ for the other tags (data, document, etc). more support planned for future.
 	</RULES>
 
 	<RULES IGNORE_CASE="TRUE" SET="powerdynamo-tag-general">
-		<SPAN TYPE="LITERAL1" DELEGATE="powerdynamo_LITERAL">
+		<SPAN TYPE="LITERAL1">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1" DELEGATE="powerdynamo_LITERAL">
+		<SPAN TYPE="LITERAL1">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
@@ -428,11 +428,11 @@ for the other tags (data, document, etc). more support planned for future.
 	</RULES>
 
 	<RULES IGNORE_CASE="TRUE" SET="powerdynamo-tag-data">
-		<SPAN TYPE="LITERAL1" DELEGATE="powerdynamo_LITERAL">
+		<SPAN TYPE="LITERAL1">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1" DELEGATE="powerdynamo_LITERAL">
+		<SPAN TYPE="LITERAL1">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
@@ -444,11 +444,11 @@ for the other tags (data, document, etc). more support planned for future.
 	</RULES>
 
 	<RULES IGNORE_CASE="TRUE" SET="powerdynamo-tag-document">
-		<SPAN TYPE="LITERAL1" DELEGATE="powerdynamo_LITERAL">
+		<SPAN TYPE="LITERAL1">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1" DELEGATE="powerdynamo_LITERAL">
+		<SPAN TYPE="LITERAL1">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>

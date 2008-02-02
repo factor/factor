@@ -19,8 +19,8 @@ SYMBOL: compiled
 : queue-compile ( word -- )
     {
         { [ dup compiled get key? ] [ drop ] }
+        { [ dup inlined-block? ] [ drop ] }
         { [ dup primitive? ] [ drop ] }
-        { [ dup deferred? ] [ drop ] }
         { [ t ] [ dup compile-queue get set-at ] }
     } cond ;
 
@@ -100,21 +100,10 @@ UNION: #terminal
 ! node
 M: node generate-node drop iterate-next ;
 
-: %call ( word -- )
-    dup primitive? [ %call-primitive ] [ %call-label ] if ;
-
 : %jump ( word -- )
-    {
-        { [ dup compiling-label get eq? ] [
-            drop current-label-start get %jump-label
-        ] }
-        { [ dup primitive? ] [
-            %epilogue-later %jump-primitive
-        ] }
-        { [ t ] [
-            %epilogue-later %jump-label
-        ] }
-    } cond ;
+    dup compiling-label get eq?
+    [ drop current-label-start get ] [ %epilogue-later ] if
+    %jump-label ;
 
 : generate-call ( label -- next )
     dup maybe-compile

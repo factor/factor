@@ -177,12 +177,6 @@ CELL unaligned_object_size(CELL pointer)
 		return sizeof(F_QUOTATION);
 	case WORD_TYPE:
 		return sizeof(F_WORD);
-	case HASHTABLE_TYPE:
-		return sizeof(F_HASHTABLE);
-	case VECTOR_TYPE:
-		return sizeof(F_VECTOR);
-	case SBUF_TYPE:
-		return sizeof(F_SBUF);
 	case RATIO_TYPE:
 		return sizeof(F_RATIO);
 	case FLOAT_TYPE:
@@ -511,7 +505,6 @@ CELL binary_payload_start(CELL pointer)
 	switch(untag_header(get(pointer)))
 	{
 	/* these objects do not refer to other objects at all */
-	case STRING_TYPE:
 	case FLOAT_TYPE:
 	case BYTE_ARRAY_TYPE:
 	case BIT_ARRAY_TYPE:
@@ -528,6 +521,8 @@ CELL binary_payload_start(CELL pointer)
 		return CELLS * 2;
 	case QUOTATION_TYPE:
 		return sizeof(F_QUOTATION) - CELLS * 2;
+	case STRING_TYPE:
+		return sizeof(F_STRING);
 	/* everything else consists entirely of pointers */
 	default:
 		return unaligned_object_size(pointer);

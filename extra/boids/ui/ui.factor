@@ -145,20 +145,20 @@ VARS: population-label cohesion-label alignment-label separation-label ;
   slate> over @center grid-add
 
   H{ } clone
-    T{ key-down f f "1" } C[ drop randomize    ] put-hash
-    T{ key-down f f "2" } C[ drop sub-10-boids ] put-hash
-    T{ key-down f f "3" } C[ drop add-10-boids ] put-hash
+    T{ key-down f f "1" } C[ drop randomize    ] put-at
+    T{ key-down f f "2" } C[ drop sub-10-boids ] put-at
+    T{ key-down f f "3" } C[ drop add-10-boids ] put-at
 
-    T{ key-down f f "q" } C[ drop inc-cohesion-weight ] put-hash
-    T{ key-down f f "a" } C[ drop dec-cohesion-weight ] put-hash
+    T{ key-down f f "q" } C[ drop inc-cohesion-weight ] put-at
+    T{ key-down f f "a" } C[ drop dec-cohesion-weight ] put-at
 
-    T{ key-down f f "w" } C[ drop inc-alignment-weight ] put-hash
-    T{ key-down f f "s" } C[ drop dec-alignment-weight ] put-hash
+    T{ key-down f f "w" } C[ drop inc-alignment-weight ] put-at
+    T{ key-down f f "s" } C[ drop dec-alignment-weight ] put-at
 
-    T{ key-down f f "e" } C[ drop inc-separation-weight ] put-hash
-    T{ key-down f f "d" } C[ drop dec-separation-weight ] put-hash
+    T{ key-down f f "e" } C[ drop inc-separation-weight ] put-at
+    T{ key-down f f "d" } C[ drop dec-separation-weight ] put-at
 
-    T{ key-down f f "ESC" } C[ drop toggle-loop ] put-hash
+    T{ key-down f f "ESC" } C[ drop toggle-loop ] put-at
   <handler> tuck set-gadget-delegate "Boids" open-window ;
 
 : boids-window ( -- ) [ [ boids-window* ] with-scope ] with-ui ;

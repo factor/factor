@@ -9,7 +9,7 @@ IN: editors.editplus
 
 : editplus ( file line -- )
     [
-        editplus-path % " -cursor " % # " " % %
-    ] "" make run-detached ;
+        editplus-path , "-cursor" , number>string , ,
+    ] { } make run-detached drop ;
 
 [ editplus ] edit-hook set-global

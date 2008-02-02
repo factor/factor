@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>name</key>
 	<string>Factor</string>
+	<key>ordering</key>
+	<array>
+		<string>3C9C9C2A-314A-475B-A4E4-A68BAAF3F36E</string>
+		<string>141517D7-73E0-4475-A481-71102575A175</string>
+		<string>CAD3BB10-C480-4C0E-9518-94D61F7A0C0B</string>
+		<string>15A984BD-BC65-43E8-878A-267788C8DA70</string>
+		<string>8E01DDAF-959B-4237-ADB9-C133A4ACCE90</string>
+		<string>35484754-DBF9-4381-BB25-00CAB64DF4A1</string>
+		<string>BC5BE120-734B-40DF-8B6B-5D3243614B27</string>
+		<string>B619FCC0-2DF2-4657-82A8-0E5676A10254</string>
+	</array>
 	<key>uuid</key>
 	<string>8061D2F3-B603-411D-AFFE-61784A07906D</string>
 </dict>

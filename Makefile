@@ -56,6 +56,8 @@ default:
 	@echo "linux-arm"
 	@echo "openbsd-x86-32"
 	@echo "openbsd-x86-64"
+	@echo "netbsd-x86-32"
+	@echo "netbsd-x86-64"
 	@echo "macosx-x86-32"
 	@echo "macosx-x86-64"
 	@echo "macosx-ppc"
@@ -82,6 +84,12 @@ freebsd-x86-32:
 
 freebsd-x86-64:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.freebsd.x86.64
+
+netbsd-x86-32:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.netbsd.x86.32
+
+netbsd-x86-64:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.netbsd.x86.64
 
 macosx-freetype:
 	ln -sf libfreetype.6.dylib \
@@ -140,7 +148,7 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 
 clean:
 	rm -f vm/*.o
-	rm -f libfactor.a
+	rm -f factor*.dll libfactor*.*
 
 vm/resources.o:
 	windres vm/factor.rs vm/resources.o

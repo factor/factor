@@ -10,6 +10,8 @@ IN: editors.editpadpro
     ] unless* ;
 
 : editpadpro ( file line -- )
-    [ editpadpro-path % " /l" % # " \"" % % "\"" % ] "" make run-detached ;
+    [
+        editpadpro-path , "/l" swap number>string append , ,
+    ] { } make run-detached drop ;
 
 [ editpadpro ] edit-hook set-global

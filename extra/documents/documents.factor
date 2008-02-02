@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io kernel math models namespaces sequences strings
-splitting io.streams.lines combinators ;
+splitting io.streams.lines combinators unicode.categories ;
 IN: documents
 
 : +col ( loc n -- newloc ) >r first2 r> + 2array ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: arrays assocs kernel math math.vectors namespaces
-quotations sequences sequences.lib sequences.private strings ;
+quotations sequences sequences.lib sequences.private strings unicode.case ;
 IN: roman
 
 <PRIVATE

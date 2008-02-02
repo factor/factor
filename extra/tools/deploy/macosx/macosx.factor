@@ -8,10 +8,10 @@ QUALIFIED: unix
 IN: tools.deploy.macosx
 
 : touch ( path -- )
-    { "touch" } swap add run-process ;
+    { "touch" } swap add run-process drop ;
 
 : rm ( path -- )
-    { "rm" "-rf" } swap add run-process ;
+    { "rm" "-rf" } swap add run-process drop ;
 
 : bundle-dir ( -- dir )
     vm parent-directory parent-directory ;
@@ -72,13 +72,12 @@ T{ macosx-deploy-implementation } deploy-implementation set-global
     -> selectFile:inFileViewerRootedAtPath: drop ;
 
 M: macosx-deploy-implementation deploy* ( vocab -- )
-    stage1
     ".app deploy tool" assert.app
     "." resource-path cd
     dup deploy-config [
         bundle-name rm
         [ bundle-name create-app-dir ] keep
         [ bundle-name deploy.app-image ] keep
-        namespace stage2
+        namespace make-deploy-image
         bundle-name show-in-finder
     ] bind ;

@@ -80,8 +80,8 @@ PRIVATE>
     } ;
 
 : define-tuple-slots ( class slots -- )
-    2dup "slot-names" set-word-prop
     dupd 4 simple-slots
+    2dup [ slot-spec-name ] map "slot-names" set-word-prop
     2dup delegate-slot-spec add* "slots" set-word-prop
     define-slots ;
 

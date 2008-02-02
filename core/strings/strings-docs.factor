@@ -4,7 +4,11 @@ sbufs math ;
 IN: strings
 
 ARTICLE: "strings" "Strings"
-"A string is a fixed-size mutable sequence of characters. The literal syntax is covered in " { $link "syntax-strings" } "."
+"A string is a fixed-size mutable sequence of Unicode 5.0 code points."
+$nl
+"Characters are not a first-class type; they are simply represented as integers between 0 and 16777216 (2^24). Only characters up to 2097152 (2^21) have a defined meaning in Unicode."
+$nl
+"String literal syntax is covered in " { $link "syntax-strings" } "."
 $nl
 "String words are found in the " { $vocab-link "strings" } " vocabulary."
 $nl
@@ -16,28 +20,25 @@ $nl
 { $subsection <string> }
 "Creating a string from a single character:"
 { $subsection 1string }
-"Characters are not a first-class type; they are simply represented as integers between 0 and 65535. A few words operate on characters:"
-{ $subsection blank? }
-{ $subsection letter? }
-{ $subsection LETTER? }
-{ $subsection digit? }
-{ $subsection printable? }
-{ $subsection control? }
-{ $subsection quotable? }
-{ $subsection ch>lower }
-{ $subsection ch>upper } ;
+"Since strings are sequences, basic string manipulation can be performed using sequence operations (" { $link "sequences" } "). More advanced functionality can be found in other vocabularies, including but not limited to:"
+{ $list
+    { { $vocab-link "ascii" } " - traditional ASCII character classes" }
+    { { $vocab-link "unicode" } " - Unicode 5.0-aware character classes, case conversion, word breaks, ..." }
+    { { $vocab-link "regexp" } " - regular expressions" }
+    { { $vocab-link "peg" } " - parser expression grammars" }
+} ;
 
 ABOUT: "strings"
 
 HELP: string
 { $description "The class of fixed-length character strings. See " { $link "syntax-strings" } " for syntax and " { $link "strings" } " for general information." } ;
 
-HELP: char-slot ( n string -- ch )
+HELP: string-nth ( n string -- ch )
 { $values { "n" fixnum } { "string" string } { "ch" "the character at the " { $snippet "n" } "th index" } }
 { $description "Unsafe string accessor, used to define " { $link nth } " on strings." }
 { $warning "This word is in the " { $vocab-link "strings.private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link nth } " instead." } ;
 
-HELP: set-char-slot ( ch n string -- )
+HELP: set-string-nth ( ch n string -- )
 { $values { "ch" "a character" } { "n" fixnum } { "string" string }  }
 { $description "Unsafe string mutator, used to define " { $link set-nth } " on strings." }
 { $warning "This word is in the " { $vocab-link "strings.private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link set-nth } " instead." } ;
@@ -45,58 +46,6 @@ HELP: set-char-slot ( ch n string -- )
 HELP: <string> ( n ch -- string )
 { $values { "n" "a positive integer specifying string length" } { "ch" "an initial character" } { "string" string } }
 { $description "Creates a new string with the given length and all characters initially set to " { $snippet "ch" } "." } ;
-
-HELP: blank?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
-{ $description "Tests for an ASCII whitespace character." } ;
-
-HELP: letter?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
-{ $description "Tests for a lowercase alphabet ASCII character." } ;
-
-HELP: LETTER?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
-{ $description "Tests for a uppercase alphabet ASCII character." } ;
-
-HELP: digit?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
-{ $description "Tests for an ASCII decimal digit character." } ;
-
-HELP: Letter?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
-{ $description "Tests for an ASCII alphabet character, both upper and lower case." } ;
-
-HELP: alpha?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
-{ $description "Tests for an alphanumeric ASCII character." } ;
-
-HELP: printable?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
-{ $description "Tests for a printable ASCII character." } ;
-
-HELP: control?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
-{ $description "Tests for an ASCII control character." } ;
-
-HELP: quotable?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
-{ $description "Tests for characters which may appear in a Factor string literal without escaping." } ;
-
-HELP: ch>lower
-{ $values { "ch" "a character" } { "lower" "a character" } }
-{ $description "Converts a character to lowercase." } ;
-
-HELP: ch>upper
-{ $values { "ch" "a character" } { "upper" "a character" } }
-{ $description "Converts a character to uppercase." } ;
-
-HELP: >lower
-{ $values { "str" string } { "lower" string } }
-{ $description "Converts a string to lowercase." } ;
-
-HELP: >upper
-{ $values { "str" string } { "upper" string } }
-{ $description "Converts a string to uppercase." } ;
 
 HELP: 1string
 { $values { "ch" "a character"} { "str" string } }
@@ -109,4 +58,4 @@ HELP: >string
 
 HELP: resize-string ( n str -- newstr )
 { $values { "n" "a non-negative integer" } { "str" string } { "newstr" string } }
-{ $description "Creates a new string " { $snippet "n" } " characters long The contents of the existing string are copied into the new string; if the new string is shorter, only an initial segment is copied, and if the new string is longer the remaining space is filled with " { $snippet "\\u0000" } "." } ;
+{ $description "Creates a new string " { $snippet "n" } " characters long The contents of the existing string are copied into the new string; if the new string is shorter, only an initial segment is copied, and if the new string is longer the remaining space is filled with " { $snippet "\\u000000" } "." } ;

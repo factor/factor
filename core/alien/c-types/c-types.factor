@@ -3,7 +3,7 @@
 USING: byte-arrays arrays generator.registers assocs
 kernel kernel.private libc math namespaces parser sequences
 strings words assocs splitting math.parser cpu.architecture
-alien quotations system compiler.units ;
+alien alien.accessors quotations system compiler.units ;
 IN: alien.c-types
 
 TUPLE: c-type
@@ -137,6 +137,28 @@ M: c-type stack-size c-type-size ;
 
 : malloc-u16-string ( string -- alien )
     string>u16-alien malloc-byte-array ;
+
+: memory>byte-array ( alien len -- byte-array )
+    dup <byte-array> [ -rot memcpy ] keep ;
+
+: memory>char-string ( alien len -- string )
+    memory>byte-array >string ;
+
+DEFER: c-ushort-array>
+
+: memory>u16-string ( alien len -- string )
+    [ memory>byte-array ] keep 2/ c-ushort-array> >string ;
+
+: byte-array>memory ( byte-array base -- )
+    swap dup length memcpy ;
+
+: string>char-memory ( string base -- )
+    >r >byte-array r> byte-array>memory ;
+
+DEFER: >c-ushort-array
+
+: string>u16-memory ( string base -- )
+    >r >c-ushort-array r> byte-array>memory ;
 
 : (define-nth) ( word type quot -- )
     >r heap-size [ rot * ] swap add* r> append define-inline ;
@@ -358,4 +380,7 @@ M: long-long-type box-return ( type -- )
     "ushort*" define-primitive-type
 
     [ string>u16-alien ] "ushort*" c-type set-c-type-prep
+    
+    win64? "longlong" "long" ? "ptrdiff_t" typedef
+    
 ] with-compilation-unit

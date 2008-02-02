@@ -37,6 +37,10 @@ HELP: gl-rect
 { $values { "loc" "a pair of integers" } { "ext" "a pair of integers" } }
 { $description "Draws the outline of a rectangle with top-left corner " { $snippet "loc" } " and bottom-right corner " { $snippet "ext" } "." } ;
 
+HELP: rect-vertices
+{ $values { "lower-left" "A pair of numbers indicating the lower-left coordinates of the rectangle." } { "upper-right" "The upper-right coordinates of the rectangle." } }
+{ $description "Emits" { $link glVertex2d } " calls outlining the axis-aligned rectangle from " { $snippet "lower-left" } " to " { $snippet "upper-right" } " on the z=0 plane in counterclockwise order." } ;
+
 HELP: gl-fill-poly
 { $values { "points" "a sequence of pairs of integers" } }
 { $description "Draws a filled polygon." } ;
@@ -52,6 +56,58 @@ HELP: gl-gradient
 HELP: gen-texture
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenTextures } " to handle the common case of generating a single texture ID." } ;
+
+HELP: gen-framebuffer
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glGenFramebuffersEXT } " to handle the common case of generating a single framebuffer ID." } ;
+
+HELP: gen-renderbuffer
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glGenRenderbuffersEXT } " to handle the common case of generating a single render buffer ID." } ;
+
+HELP: gen-buffer
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glGenBuffers } " to handle the common case of generating a single buffer ID." } ;
+
+HELP: delete-texture
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glDeleteTextures } " to handle the common case of deleting a single texture ID." } ;
+
+HELP: delete-framebuffer
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glDeleteFramebuffersEXT } " to handle the common case of deleting a single framebuffer ID." } ;
+
+HELP: delete-renderbuffer
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glDeleteRenderbuffersEXT } " to handle the common case of deleting a single render buffer ID." } ;
+
+HELP: delete-buffer
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glDeleteBuffers } " to handle the common case of deleting a single buffer ID." } ;
+
+{ gen-texture delete-texture } related-words
+{ gen-framebuffer delete-framebuffer } related-words
+{ gen-renderbuffer delete-renderbuffer } related-words
+{ gen-buffer delete-buffer } related-words
+
+HELP: framebuffer-incomplete?
+{ $values { "status/f" "The framebuffer error code, or " { $snippet "f" } " if the framebuffer is render-complete." } }
+{ $description "Checks the framebuffer currently bound by " { $link glBindFramebufferEXT } " or " { $link with-framebuffer } " to see if it is incomplete, i.e., it is not ready to be rendered to." } ;
+
+HELP: check-framebuffer
+{ $description "Checks the framebuffer currently bound by " { $link glBindFramebufferEXT } " or " { $link with-framebuffer } " with " { $link framebuffer-incomplete? } ", and throws a descriptive error if the framebuffer is incomplete." } ;
+
+HELP: with-framebuffer
+{ $values { "id" "The id of a framebuffer object." } { "quot" "a quotation" } }
+{ $description "Binds framebuffer " { $snippet "id" } " in the dynamic extent of " { $snippet "quot" } ", restoring the window framebuffer when finished." } ;
+
+HELP: bind-texture-unit
+{ $values { "id" "The id of a texture object." } { "target" "The texture target (e.g., " { $snippet "GL_TEXTURE_2D" } ")" } { "unit" "The texture unit to bind (e.g., " { $snippet "GL_TEXTURE0" } ")" } }
+{ $description "Binds texture " { $snippet "id" } " to texture target " { $snippet "target" } " of texture unit " { $snippet "unit" } ". Equivalent to " { $snippet "unit glActiveTexture target id glBindTexture" } "." } ;
+
+HELP: set-draw-buffers
+{ $values { "buffers" "A sequence of buffer words (e.g. " { $snippet "GL_BACK" } ", " { $snippet "GL_COLOR_ATTACHMENT0_EXT" } ")"} }
+{ $description "Wrapper for " { $link glDrawBuffers } ". Sets up the buffers named in the sequence for simultaneous drawing." } ;
 
 HELP: do-attribs
 { $values { "bits" integer } { "quot" quotation } }
@@ -92,19 +148,174 @@ HELP: with-translation
 { $values { "loc" "a pair of integers" } { "quot" quotation } }
 { $description "Calls the quotation with a translation by " { $snippet "loc" } " pixels applied to the current " { $link GL_MODELVIEW } " matrix, restoring the matrix when the quotation is done." } ;
 
+HELP: gl-shader
+{ $class-description { $snippet "gl-shader" } " is a predicate class comprising values returned by OpenGL to represent shader objects. The following words are provided for creating and manipulating these objects:"
+    { $list
+        { { $link <gl-shader> } " - Compile GLSL code into a shader object" }
+        { { $link gl-shader-ok? } " - Check whether a shader object compiled successfully" }
+        { { $link check-gl-shader } " - Throw an error unless a shader object compiled successfully" }
+        { { $link gl-shader-info-log } " - Retrieve the info log of messages generated by the GLSL compiler" }
+        { { $link delete-gl-shader } " - Invalidate a shader object" }
+    }
+  "The derived predicate classes " { $link vertex-shader } " and " { $link fragment-shader } " are also defined for the two standard kinds of shader defined by the OpenGL specification." } ;
+
+HELP: vertex-shader
+{ $class-description { $snippet "vertex-shader" } " is the predicate class of " { $link gl-shader } " objects that refer to shaders of type " { $snippet "GL_VERTEX_SHADER" } ". In addition to the " { $snippet "gl-shader" } " words, the following vertex shader-specific functions are defined:"
+    { $list
+        { { $link <vertex-shader> } " - Compile GLSL code into a vertex shader object "}
+    }
+} ;
+
+HELP: fragment-shader
+{ $class-description { $snippet "fragment-shader" } " is the predicate class of " { $link gl-shader } " objects that refer to shaders of type " { $snippet "GL_FRAGMENT_SHADER" } ". In addition to the " { $snippet "gl-shader" } " words, the following fragment shader-specific functions are defined:"
+    { $list
+        { { $link <fragment-shader> } " - Compile GLSL code into a fragment shader object "}
+    }
+} ;
+
+HELP: <gl-shader>
+{ $values { "source" "The GLSL source code to compile" } { "kind" "The kind of shader to compile, such as " { $snippet "GL_VERTEX_SHADER" } " or " { $snippet "GL_FRAGMENT_SHADER" } } }
+{ $description "Tries to compile the given GLSL source into a shader object. The returned object can be checked for validity by " { $link check-gl-shader } " or " { $link gl-shader-ok? } ". Errors and warnings generated by the GLSL compiler will be collected in the info log, available from " { $link gl-shader-info-log } ".\n\nWhen the shader object is no longer needed, it should be deleted using " { $link delete-gl-shader } " or else be attached to a " { $link gl-program } " object deleted using " { $link delete-gl-program } "." } ;
+
+HELP: <vertex-shader>
+{ $values { "source" "The GLSL source code to compile" } }
+{ $description "Tries to compile the given GLSL source into a vertex shader object. Equivalent to " { $snippet "GL_VERTEX_SHADER <gl-shader>" } "." } ;
+
+HELP: <fragment-shader>
+{ $values { "source" "The GLSL source code to compile" } }
+{ $description "Tries to compile the given GLSL source into a fragment shader object. Equivalent to " { $snippet "GL_FRAGMENT_SHADER <gl-shader>" } "." } ;
+
+HELP: gl-shader-ok?
+{ $values { "shader" "A " { $link gl-shader } " object" } }
+{ $description "Returns a boolean value indicating whether the given shader object compiled successfully. Compilation errors and warnings are available in the shader's info log, which can be gotten using " { $link gl-shader-info-log } "." } ;
+
+HELP: check-gl-shader
+{ $values { "shader" "A " { $link gl-shader } " object" } }
+{ $description "Throws an error containing the " { $link gl-shader-info-log } " for the shader object if it failed to compile. Otherwise, the shader object is left on the stack." } ;
+
+HELP: delete-gl-shader
+{ $values { "shader" "A " { $link gl-shader } " object" } }
+{ $description "Deletes the shader object, invalidating it and releasing any resources allocated for it by the OpenGL implementation." } ;
+
+HELP: gl-shader-info-log
+{ $values { "shader" "A " { $link gl-shader } " object" } }
+{ $description "Retrieves the info log for " { $snippet "shader" } ", including any errors or warnings generated in compiling the shader object." } ;
+
+HELP: gl-program
+{ $class-description { $snippet "gl-program" } " is a predicate class comprising values returned by OpenGL to represent proram objects. The following words are provided for creating and manipulating these objects:"
+    { $list
+        { { $link <gl-program> } ", " { $link <simple-gl-program> } " - Link a set of shaders into a GLSL program" }
+        { { $link gl-program-ok? } " - Check whether a program object linked successfully" }
+        { { $link check-gl-program } " - Throw an error unless a program object linked successfully" }
+        { { $link gl-program-info-log } " - Retrieve the info log of messages generated by the GLSL linker" }
+        { { $link gl-program-shaders } " - Retrieve the set of shader objects composing the GLSL program" }
+        { { $link delete-gl-program } " - Invalidate a program object and all its attached shaders" }
+        { { $link with-gl-program } " - Use a program object" }
+    }
+} ;
+
+HELP: <gl-program>
+{ $values { "shaders" "A sequence of " { $link gl-shader } " objects." } }
+{ $description "Creates a new GLSL program object, attaches all the shader objects in the " { $snippet "shaders" } " sequence, and attempts to link them. The returned object can be checked for validity by " { $link check-gl-program } " or " { $link gl-program-ok? } ". Errors and warnings generated by the GLSL linker will be collected in the info log, available from " { $link gl-program-info-log } ".\n\nWhen the program object and its attached shaders are no longer needed, it should be deleted using " { $link delete-gl-program } "." } ;
+
+HELP: <simple-gl-program>
+{ $values { "vertex-shader-source" "A string containing GLSL vertex shader source" } { "fragment-shader-source" "A string containing GLSL fragment shader source" } }
+{ $description "Wrapper for " { $link <gl-program> } " for the simple case of compiling a single vertex shader and fragment shader and linking them into a GLSL program. Throws an exception if compiling or linking fails." } ;
+
+{ <gl-program> <simple-gl-program> } related-words
+
+HELP: gl-program-ok?
+{ $values { "program" "A " { $link gl-program } " object" } }
+{ $description "Returns a boolean value indicating whether the given program object linked successfully. Link errors and warnings are available in the program's info log, which can be gotten using " { $link gl-program-info-log } "." } ;
+
+HELP: check-gl-program
+{ $values { "program" "A " { $link gl-program } " object" } }
+{ $description "Throws an error containing the " { $link gl-program-info-log } " for the program object if it failed to link. Otherwise, the program object is left on the stack." } ;
+
+HELP: gl-program-info-log
+{ $values { "program" "A " { $link gl-program } " object" } }
+{ $description "Retrieves the info log for " { $snippet "program" } ", including any errors or warnings generated in linking the program object." } ;
+
+HELP: delete-gl-program
+{ $values { "program" "A " { $link gl-program } " object" } }
+{ $description "Deletes the program object, invalidating it and releasing any resources allocated for it by the OpenGL implementation. Any attached " { $link gl-shader } "s are also deleted.\n\nIf the shader objects should be preserved, they should each be detached using " { $link detach-gl-program-shader } ". The program object can then be destroyed alone using " { $link delete-gl-program-only } "." } ;
+
+HELP: with-gl-program
+{ $values { "program" "A " { $link gl-program } " object" } { "quot" "A quotation" } }
+{ $description "Enables " { $snippet "program" } " for all OpenGL calls made in the dynamic extent of " { $snippet "quot" } ". The fixed-function pipeline is restored at the end of " { $snippet "quot" } "." } ;
+
+HELP: gl-version
+{ $values { "version" "The version string from the OpenGL implementation" } }
+{ $description "Wrapper for " { $snippet "GL_VERSION glGetString" } " that removes the vendor-specific information from the version string." } ;
+
+HELP: gl-vendor-version
+{ $values { "version" "The vendor-specific version information from the OpenGL implementation" } }
+{ $description "Wrapper for " { $snippet "GL_VERSION glGetString" } " that returns only the vendor-specific information from the version string." } ;
+
+HELP: has-gl-version?
+{ $values { "version" "A version string" } { "?" "A boolean value" } }
+{ $description "Compares the version string returned by " { $link gl-version } " to " { $snippet "version" } ". Returns true if the implementation version meets or exceeds " { $snippet "version" } "." } ;
+
+HELP: require-gl-version
+{ $values { "version" "A version string" } }
+{ $description "Throws an exception if " { $link has-gl-version? } " returns false for " { $snippet "version" } "." } ;
+
+HELP: glsl-version
+{ $values { "version" "The GLSL version string from the OpenGL implementation" } }
+{ $description "Wrapper for " { $snippet "GL_SHADING_LANGUAGE_VERSION glGetString" } " that removes the vendor-specific information from the version string." } ;
+
+HELP: glsl-vendor-version
+{ $values { "version" "The vendor-specific GLSL version information from the OpenGL implementation" } }
+{ $description "Wrapper for " { $snippet "GL_SHADING_LANGUAGE_VERSION glGetString" } " that returns only the vendor-specific information from the version string." } ;
+
+HELP: has-glsl-version?
+{ $values { "version" "A version string" } { "?" "A boolean value" } }
+{ $description "Compares the version string returned by " { $link glsl-version } " to " { $snippet "version" } ". Returns true if the implementation version meets or exceeds " { $snippet "version" } "." } ;
+
+HELP: require-glsl-version
+{ $values { "version" "A version string" } }
+{ $description "Throws an exception if " { $link has-glsl-version? } " returns false for " { $snippet "version" } "." } ;
+
+HELP: gl-extensions
+{ $values { "seq" "A sequence of strings naming the implementation-supported OpenGL extensions" } }
+{ $description "Wrapper for " { $snippet "GL_EXTENSIONS glGetString" } " that returns a sequence of extension names supported by the OpenGL implementation." } ;
+
+HELP: has-gl-extensions?
+{ $values { "extensions" "A sequence of extension name strings" } { "?" "A boolean value" } }
+{ $description "Returns true if the set of " { $snippet "extensions" } " is a subset of the implementation-supported extensions returned by " { $link gl-extensions } "." } ;
+
+HELP: require-gl-extensions
+{ $values { "extensions" "A sequence of extension name strings" } }
+{ $description "Throws an exception if " { $link has-gl-extensions? } " returns false for " { $snippet "extensions" } "." } ;
+
+HELP: require-gl-version-or-extensions
+{ $values { "version" "A version string" } { "extensions" "A sequence of extension name strings" } }
+{ $description "Throws an exception if neither " { $link has-gl-version? } " nor " { $link has-gl-extensions? } " returns true for " { $snippet "version" } " or " { $snippet "extensions" } ", respectively. Intended for use when required OpenGL functionality can be verified either by a minimum version, or a set of equivalent extensions." } ;
+
+{ require-gl-version require-glsl-version require-gl-extensions require-gl-version-or-extensions has-gl-version? has-glsl-version? has-gl-extensions? gl-version glsl-version gl-extensions } related-words
+
 ARTICLE: "gl-utilities" "OpenGL utility words"
 "In addition to the full OpenGL API, the " { $vocab-link "opengl" } " vocabulary includes some utility words to give OpenGL a more Factor-like feel."
 $nl
+"Checking implementation capabilities:"
+{ $subsection require-gl-version }
+{ $subsection require-gl-extensions }
+{ $subsection require-glsl-version }
+{ $subsection require-gl-version-or-extensions }
 "Wrappers:"
 { $subsection gl-color }
 { $subsection gl-vertex }
 { $subsection gl-translate }
+{ $subsection gen-texture }
+{ $subsection bind-texture-unit }
 "Combinators:"
 { $subsection do-state }
 { $subsection do-enabled }
 { $subsection do-attribs }
 { $subsection do-matrix }
 { $subsection with-translation }
+{ $subsection with-framebuffer }
+{ $subsection with-gl-program }
 { $subsection make-dlist }
 "Rendering geometric shapes:"
 { $subsection gl-line }
@@ -112,6 +323,10 @@ $nl
 { $subsection gl-rect }
 { $subsection gl-fill-poly }
 { $subsection gl-poly }
-{ $subsection gl-gradient } ;
+{ $subsection gl-gradient }
+"Compiling, linking, and using GLSL programs:"
+{ $subsection gl-shader }
+{ $subsection gl-program }
+;
 
 ABOUT: "gl-utilities"

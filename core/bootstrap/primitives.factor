@@ -5,35 +5,52 @@ USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes tuples
 kernel.private vocabs vocabs.loader source-files definitions
-slots classes.union compiler.units ;
+slots classes.union compiler.units bootstrap.image.private
+io.files ;
 
 "Creating primitives and basic runtime structures..." print flush
 
-load-help? off
 crossref off
-
-! Bring up a bare cross-compiling vocabulary.
-"syntax" vocab vocab-words bootstrap-syntax set
 
 "resource:core/bootstrap/syntax.factor" parse-file
 
+"resource:core/cpu/" architecture get {
+    { "x86.32" "x86/32" }
+    { "x86.64" "x86/64" }
+    { "linux-ppc" "ppc/linux" }
+    { "macosx-ppc" "ppc/macosx" }
+    { "arm" "arm" }
+} at "/bootstrap.factor" 3append parse-file
+
+"resource:core/bootstrap/layouts/layouts.factor" parse-file
+
+! Now we have ( syntax-quot arch-quot layouts-quot ) on the stack
+
+! Bring up a bare cross-compiling vocabulary.
+"syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
 H{ } clone changed-words set
 [ drop ] recompile-hook set
 
+call
+call
 call
 
 ! Create some empty vocabs where the below primitives and
 ! classes will go
 {
     "alien"
+    "alien.accessors"
     "arrays"
     "bit-arrays"
+    "bit-vectors"
     "byte-arrays"
+    "byte-vectors"
     "classes.private"
     "compiler.units"
     "continuations.private"
     "float-arrays"
+    "float-vectors"
     "generator"
     "growable"
     "hashtables"
@@ -86,12 +103,6 @@ H{ } clone update-map set
 : register-builtin ( class -- )
     dup "type" word-prop builtins get set-nth ;
 
-: intern-slots ( spec -- spec )
-    [
-        [ dup array? [ first2 create ] when ] map
-        { slot-spec f } swap append >tuple
-    ] map ;
-
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
 
@@ -100,8 +111,8 @@ H{ } clone update-map set
     dup dup lookup-type-number "type" set-word-prop
     dup f f builtin-class define-class
     dup r> builtin-predicate
-    dup r> intern-slots 2dup "slots" set-word-prop
-    define-slots
+    dup r> 1 simple-slots 2dup "slots" set-word-prop
+    dupd define-slots
     register-builtin ;
 
 H{ } clone typemap set
@@ -127,14 +138,12 @@ num-types get f <array> builtins set
     {
         { "integer" "math" }
         "numerator"
-        1
         { "numerator" "math" }
         f
     }
     {
         { "integer" "math" }
         "denominator"
-        2
         { "denominator" "math" }
         f
     }
@@ -148,14 +157,12 @@ num-types get f <array> builtins set
     {
         { "real" "math" }
         "real-part"
-        1
         { "real-part" "math" }
         f
     }
     {
         { "real" "math" }
         "imaginary-part"
-        2
         { "imaginary-part" "math" }
         f
     }
@@ -172,49 +179,8 @@ num-types get f <array> builtins set
     {
         { "object" "kernel" }
         "wrapped"
-        1
         { "wrapped" "kernel" }
         f
-    }
-} define-builtin
-
-"hashtable" "hashtables" create "hashtable?" "hashtables" create
-{
-    {
-        { "array-capacity" "sequences.private" }
-        "count"
-        1
-        { "hash-count" "hashtables.private" }
-        { "set-hash-count" "hashtables.private" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "deleted"
-        2
-        { "hash-deleted" "hashtables.private" }
-        { "set-hash-deleted" "hashtables.private" }
-    } {
-        { "array" "arrays" }
-        "array"
-        3
-        { "hash-array" "hashtables.private" }
-        { "set-hash-array" "hashtables.private" }
-    }
-} define-builtin
-
-"vector" "vectors" create "vector?" "vectors" create
-{
-    {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        1
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    } {
-        { "array" "arrays" }
-        "underlying"
-        2
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
     }
 } define-builtin
 
@@ -223,27 +189,13 @@ num-types get f <array> builtins set
     {
         { "array-capacity" "sequences.private" }
         "length"
-        1
         { "length" "sequences" }
         f
-    }
-} define-builtin
-
-"sbuf" "sbufs" create "sbuf?" "sbufs" create
-{
-    {
-        { "array-capacity" "sequences.private" }
-        "length"
-        1
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-    {
-        { "string" "strings" }
-        "underlying"
-        2
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
+    } {
+        { "object" "kernel" }
+        "aux"
+        { "string-aux" "strings.private" }
+        { "set-string-aux" "strings.private" }
     }
 } define-builtin
 
@@ -252,14 +204,12 @@ num-types get f <array> builtins set
     {
         { "object" "kernel" }
         "array"
-        1
         { "quotation-array" "quotations.private" }
         f
     }
     {
         { "object" "kernel" }
         "compiled?"
-        2
         { "quotation-compiled?" "quotations" }
         f
     }
@@ -270,7 +220,6 @@ num-types get f <array> builtins set
     {
         { "byte-array" "byte-arrays" }
         "path"
-        1
         { "(dll-path)" "alien" }
         f
     }
@@ -282,13 +231,11 @@ define-builtin
     {
         { "c-ptr" "alien" }
         "alien"
-        1
         { "underlying-alien" "alien" }
         f
     } {
         { "object" "kernel" }
         "expired?"
-        2
         { "expired?" "alien" }
         f
     }
@@ -297,45 +244,40 @@ define-builtin
 
 "word" "words" create "word?" "words" create
 {
+    f
     {
         { "object" "kernel" }
         "name"
-        2
         { "word-name" "words" }
         { "set-word-name" "words" }
     }
     {
         { "object" "kernel" }
         "vocabulary"
-        3
         { "word-vocabulary" "words" }
         { "set-word-vocabulary" "words" }
     }
     {
         { "quotation" "quotations" }
         "def"
-        4
         { "word-def" "words" }
         { "set-word-def" "words.private" }
     }
     {
         { "object" "kernel" }
         "props"
-        5
         { "word-props" "words" }
         { "set-word-props" "words" }
     }
     {
         { "object" "kernel" }
         "?"
-        6
         { "compiled?" "words" }
         f
     }
     {
         { "fixnum" "math" }
         "counter"
-        7
         { "profile-counter" "tools.profiler.private" }
         { "set-profile-counter" "tools.profiler.private" }
     }
@@ -359,14 +301,12 @@ define-builtin
     {
         { "object" "kernel" }
         "obj"
-        1
         { "curry-obj" "kernel" }
         f
     }
     {
         { "object" "kernel" }
         "obj"
-        2
         { "curry-quot" "kernel" }
         f
     }
@@ -404,6 +344,102 @@ builtins get num-tags get tail f union-class define-class
 "tombstone" "hashtables.private" lookup t
 2array >tuple 1quotation define-inline
 
+! Some tuple classes
+"hashtable" "hashtables" create
+{
+    {
+        { "array-capacity" "sequences.private" }
+        "count"
+        { "hash-count" "hashtables.private" }
+        { "set-hash-count" "hashtables.private" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "deleted"
+        { "hash-deleted" "hashtables.private" }
+        { "set-hash-deleted" "hashtables.private" }
+    } {
+        { "array" "arrays" }
+        "array"
+        { "hash-array" "hashtables.private" }
+        { "set-hash-array" "hashtables.private" }
+    }
+} define-tuple-class
+
+"sbuf" "sbufs" create
+{
+    {
+        { "string" "strings" }
+        "underlying"
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "length"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
+    }
+} define-tuple-class
+
+"vector" "vectors" create
+{
+    {
+        { "array" "arrays" }
+        "underlying"
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "fill"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
+    }
+} define-tuple-class
+
+"byte-vector" "byte-vectors" create
+{
+    {
+        { "byte-array" "byte-arrays" }
+        "underlying"
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "fill"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
+    }
+} define-tuple-class
+
+"bit-vector" "bit-vectors" create
+{
+    {
+        { "bit-array" "bit-arrays" }
+        "underlying"
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "fill"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
+    }
+} define-tuple-class
+
+"float-vector" "float-vectors" create
+{
+    {
+        { "float-array" "float-arrays" }
+        "underlying"
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "fill"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
+    }
+} define-tuple-class
+
 ! Primitive words
 : make-primitive ( word vocab n -- )
     >r create dup reset-word r> [ do-primitive ] curry [ ] like define ;
@@ -412,7 +448,6 @@ builtins get num-tags get tail f union-class define-class
     { "(execute)" "words.private" }
     { "(call)" "kernel.private" }
     { "uncurry" "kernel.private" }
-    { "string>sbuf" "sbufs.private" }
     { "bignum>fixnum" "math.private" }
     { "float>fixnum" "math.private" }
     { "fixnum>bignum" "math.private" }
@@ -527,47 +562,44 @@ builtins get num-tags get tail f union-class define-class
     { "<byte-array>" "byte-arrays" }
     { "<bit-array>" "bit-arrays" }
     { "<displaced-alien>" "alien" }
-    { "alien-signed-cell" "alien" }
-    { "set-alien-signed-cell" "alien" }
-    { "alien-unsigned-cell" "alien" }
-    { "set-alien-unsigned-cell" "alien" }
-    { "alien-signed-8" "alien" }
-    { "set-alien-signed-8" "alien" }
-    { "alien-unsigned-8" "alien" }
-    { "set-alien-unsigned-8" "alien" }
-    { "alien-signed-4" "alien" }
-    { "set-alien-signed-4" "alien" }
-    { "alien-unsigned-4" "alien" }
-    { "set-alien-unsigned-4" "alien" }
-    { "alien-signed-2" "alien" }
-    { "set-alien-signed-2" "alien" }
-    { "alien-unsigned-2" "alien" }
-    { "set-alien-unsigned-2" "alien" }
-    { "alien-signed-1" "alien" }
-    { "set-alien-signed-1" "alien" }
-    { "alien-unsigned-1" "alien" }
-    { "set-alien-unsigned-1" "alien" }
-    { "alien-float" "alien" }
-    { "set-alien-float" "alien" }
-    { "alien-double" "alien" }
-    { "set-alien-double" "alien" }
-    { "alien-cell" "alien" }
-    { "set-alien-cell" "alien" }
+    { "alien-signed-cell" "alien.accessors" }
+    { "set-alien-signed-cell" "alien.accessors" }
+    { "alien-unsigned-cell" "alien.accessors" }
+    { "set-alien-unsigned-cell" "alien.accessors" }
+    { "alien-signed-8" "alien.accessors" }
+    { "set-alien-signed-8" "alien.accessors" }
+    { "alien-unsigned-8" "alien.accessors" }
+    { "set-alien-unsigned-8" "alien.accessors" }
+    { "alien-signed-4" "alien.accessors" }
+    { "set-alien-signed-4" "alien.accessors" }
+    { "alien-unsigned-4" "alien.accessors" }
+    { "set-alien-unsigned-4" "alien.accessors" }
+    { "alien-signed-2" "alien.accessors" }
+    { "set-alien-signed-2" "alien.accessors" }
+    { "alien-unsigned-2" "alien.accessors" }
+    { "set-alien-unsigned-2" "alien.accessors" }
+    { "alien-signed-1" "alien.accessors" }
+    { "set-alien-signed-1" "alien.accessors" }
+    { "alien-unsigned-1" "alien.accessors" }
+    { "set-alien-unsigned-1" "alien.accessors" }
+    { "alien-float" "alien.accessors" }
+    { "set-alien-float" "alien.accessors" }
+    { "alien-double" "alien.accessors" }
+    { "set-alien-double" "alien.accessors" }
+    { "alien-cell" "alien.accessors" }
+    { "set-alien-cell" "alien.accessors" }
     { "alien>char-string" "alien" }
     { "string>char-alien" "alien" }
     { "alien>u16-string" "alien" }
     { "string>u16-alien" "alien" }
     { "(throw)" "kernel.private" }
-    { "string>memory" "alien" }
-    { "memory>string" "alien" }
     { "alien-address" "alien" }
     { "slot" "slots.private" }
     { "set-slot" "slots.private" }
-    { "char-slot" "strings.private" }
-    { "set-char-slot" "strings.private" }
+    { "string-nth" "strings.private" }
+    { "set-string-nth" "strings.private" }
     { "resize-array" "arrays" }
     { "resize-string" "strings" }
-    { "(hashtable)" "hashtables.private" }
     { "<array>" "arrays" }
     { "begin-scan" "memory" }
     { "next-object" "memory" }
@@ -582,7 +614,6 @@ builtins get num-tags get tail f union-class define-class
     { "fclose" "io.streams.c" }
     { "<wrapper>" "kernel" }
     { "(clone)" "kernel" }
-    { "array>vector" "vectors.private" }
     { "<string>" "strings" }
     { "(>tuple)" "tuples.private" }
     { "array>quotation" "quotations.private" }
@@ -595,13 +626,16 @@ builtins get num-tags get tail f union-class define-class
     { "<float-array>" "float-arrays" }
     { "curry" "kernel" }
     { "<tuple-boa>" "tuples.private" }
-	{ "class-hash" "kernel.private" }
+    { "class-hash" "kernel.private" }
     { "callstack>array" "kernel" }
     { "innermost-frame-quot" "kernel.private" }
     { "innermost-frame-scan" "kernel.private" }
     { "set-innermost-frame-quot" "kernel.private" }
     { "call-clear" "kernel" }
     { "(os-envs)" "system" }
+    { "resize-byte-array" "byte-arrays" }
+    { "resize-bit-array" "bit-arrays" }
+    { "resize-float-array" "float-arrays" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 

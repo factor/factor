@@ -9,8 +9,7 @@ IN: editors.ted-notepad
 
 : ted-notepad ( file line -- )
     [
-        ted-notepad-path % " /l" % #
-        " " % %
-    ] "" make run-detached ;
+        ted-notepad-path , "/l" swap number>string append , ,
+    ] { } make run-detached drop ;
 
 [ ted-notepad ] edit-hook set-global

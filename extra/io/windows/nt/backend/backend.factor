@@ -1,8 +1,8 @@
 USING: alien alien.c-types arrays assocs combinators
 continuations destructors io io.backend io.nonblocking
-io.windows libc kernel math namespaces sequences threads
-tuples.lib windows windows.errors windows.kernel32 strings
-splitting io.files qualified ;
+io.windows libc kernel math namespaces sequences
+threads tuples.lib windows windows.errors windows.kernel32
+strings splitting io.files qualified ascii ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
 
@@ -43,27 +43,16 @@ M: windows-nt-io normalize-pathname ( string -- string )
 
 SYMBOL: io-hash
 
-TUPLE: io-callback continuation port ;
+TUPLE: io-callback port continuation ;
 
 C: <io-callback> io-callback
 
 : (make-overlapped) ( -- overlapped-ext )
-    "OVERLAPPED" malloc-object dup free-always
-    0 over set-OVERLAPPED-internal
-    0 over set-OVERLAPPED-internal-high
-    0 over set-OVERLAPPED-offset-high
-    0 over set-OVERLAPPED-offset
-    f over set-OVERLAPPED-event ;
+    "OVERLAPPED" malloc-object dup free-always ;
 
 : make-overlapped ( port -- overlapped-ext )
     >r (make-overlapped) r> port-handle win32-file-ptr
     [ over set-OVERLAPPED-offset ] when* ;
-
-: port-overlapped ( port -- overlapped )
-    port-handle win32-file-overlapped ;
-
-: set-port-overlapped ( overlapped port -- )
-    port-handle set-win32-file-overlapped ;
 
 : <completion-port> ( handle existing -- handle )
      f 1 CreateIoCompletionPort dup win32-error=0/f ;
@@ -90,21 +79,16 @@ M: windows-nt-io add-completion ( handle -- )
         drop t
     ] if ;
 
-: get-overlapped-result ( port -- bytes-transferred )
-    dup
-    port-handle
-    dup win32-file-handle
-    swap win32-file-overlapped
-    0 <uint> [
-        0
-        GetOverlappedResult overlapped-error? drop
-    ] keep *uint ;
+: get-overlapped-result ( overlapped port -- bytes-transferred )
+    dup port-handle win32-file-handle rot 0 <uint>
+    [ 0 GetOverlappedResult overlapped-error? drop ] keep *uint ;
 
-: save-callback ( port -- )
+: save-callback ( overlapped port -- )
     [
-        [ <io-callback> ] keep port-handle win32-file-overlapped
+        <io-callback> swap
+        dup alien? [ "bad overlapped in save-callback" throw ] unless
         io-hash get-global set-at stop
-    ] curry callcc0 ;
+    ] callcc0 2drop ;
 
 : wait-for-overlapped ( ms -- overlapped ? )
     >r master-completion-port get-global r> ! port ms
@@ -113,41 +97,36 @@ M: windows-nt-io add-completion ( handle -- )
     f <void*> ! overlapped
     [ roll GetQueuedCompletionStatus ] keep *void* swap zero? ;
 
-: lookup-callback ( GetQueuedCompletion-args -- callback )
-    io-hash get-global delete-at* drop ;
+: lookup-callback ( overlapped -- callback )
+    io-hash get-global delete-at* drop
+    dup io-callback? [ "no callback in io-hash" throw ] unless ;
 
-: wait-for-io ( timeout -- continuation/f )
+: handle-overlapped ( timeout -- ? )
     wait-for-overlapped [
         GetLastError dup expected-io-error? [
-            2drop f
+            2drop t
         ] [
             dup eof? [
                 drop lookup-callback
                 dup io-callback-port t swap set-port-eof?
-                io-callback-continuation
             ] [
                 (win32-error-string) swap lookup-callback
                 [ io-callback-port set-port-error ] keep
-                io-callback-continuation
-            ] if
+            ] if io-callback-continuation schedule-thread f
         ] if
     ] [
-        lookup-callback io-callback-continuation
+        lookup-callback
+        io-callback-continuation schedule-thread f
     ] if ;
 
-: maybe-expire ( io-callbck -- )
-    io-callback-port
-    dup timeout? [
-        port-handle win32-file-handle CancelIo drop
-    ] [
-        drop
-    ] if ;
+: drain-overlapped ( timeout -- )
+    handle-overlapped [ 0 drain-overlapped ] unless ;
 
-: cancel-timeout ( -- )
-    io-hash get-global values [ maybe-expire ] each ;
+M: windows-nt-io cancel-io
+    port-handle win32-file-handle CancelIo drop ;
 
 M: windows-nt-io io-multiplex ( ms -- )
-    cancel-timeout wait-for-io [ schedule-thread ] when* ;
+    expire-timeouts drain-overlapped ;
 
 M: windows-nt-io init-io ( -- )
     <master-completion-port> master-completion-port set-global

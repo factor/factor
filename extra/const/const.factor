@@ -14,3 +14,11 @@ IN: const
 
 : ENUM:
     ";" parse-tokens [ create-in ] map define-enum ; parsing
+
+: define-value ( word -- )
+    { f } clone [ first ] curry define ;
+
+: VALUE: CREATE define-value ; parsing
+
+: set-value ( value word -- )
+    word-def first set-first ;

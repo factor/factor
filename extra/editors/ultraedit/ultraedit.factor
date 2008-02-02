@@ -10,8 +10,8 @@ IN: editors.ultraedit
 
 : ultraedit ( file line -- )
     [
-        ultraedit-path % " " % swap % "/" % # "/1" %
-    ] "" make run-detached ;
+        ultraedit-path , [ swap % "/" % # "/1" % ] "" make ,
+    ] { } make run-detached drop ;
 
 
 [ ultraedit ] edit-hook set-global

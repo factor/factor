@@ -110,4 +110,3 @@ SYMBOL: quad3
         { [ utf16be? ] [ decode-utf16be ] }
         { [ t ] [ decode-error ] }
     } cond ;
-

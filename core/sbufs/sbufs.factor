@@ -1,13 +1,20 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math strings kernel.private sequences.private
-sequences strings growable strings.private sbufs.private ;
+USING: kernel math strings sequences.private sequences strings
+growable strings.private ;
 IN: sbufs
+
+<PRIVATE
+
+: string>sbuf ( string length -- sbuf )
+    sbuf construct-boa ; inline
+
+PRIVATE>
 
 : <sbuf> ( n -- sbuf ) 0 <string> 0 string>sbuf ; inline
 
 M: sbuf set-nth-unsafe
-    underlying >r >r >fixnum r> >fixnum r> set-char-slot ;
+    underlying >r >r >fixnum r> >fixnum r> set-string-nth ;
 
 M: sbuf new drop [ 0 <string> ] keep >fixnum string>sbuf ;
 

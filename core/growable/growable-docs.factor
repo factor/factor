@@ -21,7 +21,7 @@ HELP: set-fill
 { $values { "n" "a new fill pointer" } { "seq" "a resizable sequence" } }
 { $contract "Sets the fill pointer (number of occupied elements in the underlying storage) of a resizable sequence." }
 { $side-effects "seq" }
-{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is not safe. Changing the fill pointer to a negative value, or a value higher than the underlying sequence length can lead to memory corruption. User code should use " { $link set-length } " instead." } ;
+{ $warning "This word is in the " { $vocab-link "growable.private" } " vocabulary because it is not safe. Changing the fill pointer to a negative value, or a value higher than the underlying sequence length can lead to memory corruption. User code should use " { $link set-length } " instead." } ;
 
 HELP: underlying
 { $values { "seq" "a resizable sequence" } { "underlying" "the underlying sequence" } }
@@ -30,7 +30,7 @@ HELP: underlying
 HELP: set-underlying
 { $values { "underlying" "a sequence" } { "seq" "a resizable sequence" } }
 { $contract "Modifies the underlying storage of a resizable sequence." }
-{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is not safe. Setting an underlying sequence shorter than the fill pointer can lead to memory corruption." } ;
+{ $warning "This word is in the " { $vocab-link "growable.private" } " vocabulary because it is not safe. Setting an underlying sequence shorter than the fill pointer can lead to memory corruption." } ;
 
 HELP: capacity
 { $values { "seq" "a vector or string buffer" } { "n" "the capacity of the sequence" } }

@@ -287,3 +287,7 @@ TUPLE: silly-tuple a b ;
     [ 3 throw ] [ empty-compound ] compose [ 3 throw ] if ;
 
 [ t ] [ \ node-successor-f-bug compiled? ] unit-test
+
+: construct-empty-bug construct-empty ;
+
+[ ] [ [ construct-empty ] dataflow optimize drop ] unit-test

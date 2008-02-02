@@ -1,9 +1,9 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private namespaces io
 strings sequences math generic threads.private classes
 io.backend io.streams.lines io.streams.plain io.streams.duplex
-io.files ;
+io.files continuations ;
 IN: io.streams.c
 
 TUPLE: c-writer handle ;
@@ -19,7 +19,7 @@ M: c-writer stream-write
 M: c-writer stream-flush
     c-writer-handle fflush ;
 
-M: c-writer stream-close
+M: c-writer dispose
     c-writer-handle fclose ;
 
 TUPLE: c-reader handle ;
@@ -46,7 +46,7 @@ M: c-reader stream-read-until
     [ swap read-until-loop ] "" make swap
     over empty? over not and [ 2drop f f ] when ;
 
-M: c-reader stream-close
+M: c-reader dispose
     c-reader-handle fclose ;
 
 : <duplex-c-stream> ( in out -- stream )
@@ -56,12 +56,13 @@ M: c-reader stream-close
 
 M: object init-io ;
 
-: stdin 11 getenv ;
-
-: stdout 12 getenv ;
+: stdin-handle 11 getenv ;
+: stdout-handle 12 getenv ;
+: stderr-handle 38 getenv ;
 
 M: object init-stdio
-    stdin stdout <duplex-c-stream> stdio set-global ;
+    stdin-handle stdout-handle <duplex-c-stream> stdio set-global
+    stderr-handle <c-writer> <plain-writer> stderr set-global ;
 
 M: object io-multiplex (sleep) ;
 

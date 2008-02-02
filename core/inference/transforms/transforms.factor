@@ -1,8 +1,9 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel words sequences generic math namespaces
 quotations assocs combinators math.bitfields inference.backend
-inference.dataflow inference.state tuples.private ;
+inference.dataflow inference.state tuples.private effects
+inspector hashtables ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )
@@ -59,13 +60,34 @@ M: pair (bitfield-quot) ( spec -- quot )
 
 \ get-slots [ [get-slots] ] 1 define-transform
 
-\ set-slots [ <reversed> [get-slots] ] 1 define-transform
+TUPLE: duplicated-slots-error names ;
 
-: [construct] ( word quot -- newquot )
-    >r dup +inlined+ depends-on dup tuple-size r> 2curry ;
+M: duplicated-slots-error summary
+    drop "Calling set-slots with duplicate slot setters" ;
 
-\ construct-boa
-[ [ <tuple-boa> ] [construct] ] 1 define-transform
+: duplicated-slots-error ( names -- * )
+    \ duplicated-slots-error construct-boa throw ;
 
-\ construct-empty
-[ [ <tuple> ] [construct] ] 1 define-transform
+\ set-slots [
+    dup all-unique?
+    [ <reversed> [get-slots] ] [ duplicated-slots-error ] if
+] 1 define-transform
+
+\ construct-boa [
+    dup +inlined+ depends-on
+    dup tuple-size [ <tuple-boa> ] 2curry
+] 1 define-transform
+
+\ construct-empty [
+    1 ensure-values
+    peek-d value? [
+        pop-literal
+        dup +inlined+ depends-on
+        dup tuple-size [ <tuple> ] 2curry
+        swap infer-quot
+    ] [
+        \ construct-empty 1 1 <effect> make-call-node
+    ] if
+] "infer" set-word-prop
+
+\ construct-empty 1 1 <effect> "inferred-effect" set-word-prop

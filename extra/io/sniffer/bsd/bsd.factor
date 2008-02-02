@@ -7,7 +7,7 @@ sequences io.sniffer.backend ;
 QUALIFIED: unix
 IN: io.sniffer.bsd
 
-M: unix-io destruct-handle ( obj -- ) close drop ;
+M: unix-io destruct-handle ( obj -- ) unix:close drop ;
 
 C-UNION: ifreq_props "sockaddr-in" "short" "int" "caddr_t" ;
 C-STRUCT: ifreq { { "char" 16 } "name" } { "ifreq_props" "props" } ;
@@ -83,7 +83,7 @@ M: unix-io <sniffer> ( obj -- sniffer )
         ] keep
         dupd sniffer-spec-ifname ioctl-sniffer-fd
         dup make-ioctl-buffer
-        <port> input over set-port-type <line-reader>
+        input-port <port> <line-reader>
         \ sniffer construct-delegate
     ] with-destructors ;
 

@@ -86,13 +86,13 @@ combinators quotations ;
 : .s ( -- ) datastack stack. ;
 : .r ( -- ) retainstack stack. ;
 
+<PRIVATE
+
 SYMBOL: ->
 
 \ ->
 { { foreground { 1 1 1 1 } } { background { 0 0 0 1 } } }
 "word-style" set-word-prop
-
-<PRIVATE
 
 ! This code is ugly and could probably be simplified
 : remove-step-into

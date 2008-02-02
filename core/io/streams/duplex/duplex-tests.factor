@@ -6,7 +6,7 @@ TUPLE: closing-stream closed? ;
 
 : <closing-stream> closing-stream construct-empty ;
 
-M: closing-stream stream-close
+M: closing-stream dispose
     dup closing-stream-closed? [
         "Closing twice!" throw
     ] [
@@ -17,24 +17,24 @@ TUPLE: unclosable-stream ;
 
 : <unclosable-stream> unclosable-stream construct-empty ;
 
-M: unclosable-stream stream-close
+M: unclosable-stream dispose
     "Can't close me!" throw ;
 
 [ ] [
     <closing-stream> <closing-stream> <duplex-stream>
-    dup stream-close stream-close
+    dup dispose dispose
 ] unit-test
 
 [ t ] [
     <unclosable-stream> <closing-stream> [
         <duplex-stream>
-        [ dup stream-close ] catch 2drop
+        [ dup dispose ] catch 2drop
     ] keep closing-stream-closed?
 ] unit-test
 
 [ t ] [
     <closing-stream> [ <unclosable-stream>
         <duplex-stream>
-        [ dup stream-close ] catch 2drop
+        [ dup dispose ] catch 2drop
     ] keep closing-stream-closed?
 ] unit-test

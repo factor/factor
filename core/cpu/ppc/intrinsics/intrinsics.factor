@@ -1,6 +1,6 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays cpu.ppc.assembler
+USING: alien alien.accessors alien.c-types arrays cpu.ppc.assembler
 cpu.ppc.architecture cpu.ppc.allot cpu.architecture kernel
 kernel.private math math.private namespaces sequences words
 generic quotations byte-arrays hashtables hashtables.private
@@ -92,30 +92,6 @@ IN: cpu.ppc.intrinsics
         }
     }
 } define-intrinsics
-
-: (%char-slot)
-    "offset" operand "n" operand 2 SRAWI
-    "offset" operand dup "obj" operand ADD ;
-
-\ char-slot [
-    (%char-slot)
-    "out" operand "offset" operand string-offset LHZ
-    "out" operand dup %tag-fixnum
-] H{
-    { +input+ { { f "n" } { f "obj" } } }
-    { +scratch+ { { f "out" } { f "offset" } } }
-    { +output+ { "out" } }
-} define-intrinsic
-
-\ set-char-slot [
-    (%char-slot)
-    "val" operand dup %untag-fixnum
-    "val" operand "offset" operand string-offset STH
-] H{
-    { +input+ { { f "val" } { f "n" } { f "obj" } } }
-    { +scratch+ { { f "offset" } } }
-    { +clobber+ { "val" } }
-} define-intrinsic
 
 : fixnum-register-op ( op -- pair )
     [ "out" operand "y" operand "x" operand ] swap add H{
@@ -584,43 +560,6 @@ IN: cpu.ppc.intrinsics
     { +input+ { { f "obj" } } }
     { +scratch+ { { f "wrapper" } } }
     { +output+ { "wrapper" } }
-} define-intrinsic
-
-\ (hashtable) [
-    hashtable 4 cells %allot
-    f v>operand 12 LI
-    12 11 1 cells STW
-    12 11 2 cells STW
-    12 11 3 cells STW
-    ! Store tagged ptr in reg
-    "hashtable" get object %store-tagged
-] H{
-    { +scratch+ { { f "hashtable" } } }
-    { +output+ { "hashtable" } }
-} define-intrinsic
-
-\ string>sbuf [
-    sbuf 3 cells %allot
-    "length" operand 11 1 cells STW
-    "string" operand 11 2 cells STW
-    ! Store tagged ptr in reg
-    "sbuf" get object %store-tagged
-] H{
-    { +input+ { { f "string" } { f "length" } } }
-    { +scratch+ { { f "sbuf" } } }
-    { +output+ { "sbuf" } }
-} define-intrinsic
-
-\ array>vector [
-    vector 3 cells %allot
-    "length" operand 11 1 cells STW
-    "array" operand 11 2 cells STW
-    ! Store tagged ptr in reg
-    "vector" get object %store-tagged
-] H{
-    { +input+ { { f "array" } { f "length" } } }
-    { +scratch+ { { f "vector" } } }
-    { +output+ { "vector" } }
 } define-intrinsic
 
 ! Alien intrinsics

@@ -5,13 +5,13 @@ assocs kernel vocabs words sequences memory io system arrays
 continuations math definitions mirrors splitting parser classes
 inspector layouts vocabs.loader prettyprint.config prettyprint
 debugger io.streams.c io.streams.duplex io.files io.backend
-quotations words.private tools.deploy.config ;
+quotations words.private tools.deploy.config compiler.units ;
 IN: tools.deploy.shaker
 
 : show ( msg -- )
     #! Use primitives directly so that we can print stuff even
     #! after most of the image has been stripped away
-    "\r\n" append stdout fwrite stdout fflush ;
+    "\r\n" append stdout-handle fwrite stdout-handle fflush ;
 
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
