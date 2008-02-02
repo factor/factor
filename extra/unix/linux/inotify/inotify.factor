@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax ;
+USING: alien.syntax math math.bitfields ;
 IN: unix.linux.inotify
 
 C-STRUCT: inotify-event
@@ -8,7 +8,7 @@ C-STRUCT: inotify-event
     { "uint" "mask" }    ! watch mask
     { "uint" "cookie" }  ! cookie to synchronize two events
     { "uint" "len" }     ! length (including nulls) of name
-    { "char[1]" "name" } ! stub for possible name
+    { "char[0]" "name" } ! stub for possible name
     ;
 
 : IN_ACCESS HEX: 1 ; inline         ! File was accessed
@@ -37,6 +37,13 @@ C-STRUCT: inotify-event
 : IN_ISDIR HEX: 40000000 ; inline      ! event occurred against dir
 : IN_ONESHOT HEX: 80000000 ; inline    ! only send event once
 
+: IN_CHANGE_EVENTS
+    {
+        IN_MODIFY IN_ATTRIB IN_MOVED_FROM
+        IN_MOVED_TO IN_DELETE IN_CREATE IN_DELETE_SELF
+        IN_MOVE_SELF
+    } flags ; foldable
+
 : IN_ALL_EVENTS
     {
         IN_ACCESS IN_MODIFY IN_ATTRIB IN_CLOSE_WRITE
@@ -45,6 +52,6 @@ C-STRUCT: inotify-event
         IN_MOVE_SELF
     } flags ; foldable
 
-FUNCTION: int inotify_init ( void ) ;
-FUNCTION: int inotify_add_watch ( int fd, char* name, u32 mask  ) ;
-FUNCTION: int inotify_rm_watch ( int fd, u32 wd ) ;
+FUNCTION: int inotify_init ( ) ;
+FUNCTION: int inotify_add_watch ( int fd, char* name, uint mask  ) ;
+FUNCTION: int inotify_rm_watch ( int fd, uint wd ) ;
