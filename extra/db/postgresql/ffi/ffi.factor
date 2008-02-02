@@ -56,7 +56,6 @@ IN: db.postgresql.ffi
 : PQERRORS_DEFAULT                  HEX: 1 ; inline
 : PQERRORS_VERBOSE                  HEX: 2 ; inline
 
-
 TYPEDEF: int size_t
 TYPEDEF: int ConnStatusType
 TYPEDEF: int ExecStatusType 
@@ -81,7 +80,6 @@ LIBRARY: postgresql
 
 
 ! Exported functions of libpq
-! ===    in fe-connect.c ===
 
 ! make a new client connection to the backend
 ! Asynchronous (non-blocking)
@@ -321,18 +319,17 @@ FUNCTION: void PQprint ( FILE* fout, PGresult* res, PQprintOpt* ps ) ;
 
 ! really old printing routines
 FUNCTION: void PQdisplayTuples ( PGresult* res,
-                FILE* fp,        
-                int fillAlign,
-                char* fieldSep,
-                int printHeader,
-                int quiet ) ;
+                                FILE* fp,               
+                                int fillAlign,
+                                char* fieldSep,
+                                int printHeader,
+                                int quiet ) ;
 
 FUNCTION: void PQprintTuples ( PGresult* res,
-              FILE* fout,        
-              int printAttName,
-              int terseOutput,    
-              int width ) ;    
-                        
+                          FILE* fout,           
+                          int printAttName,
+                          int terseOutput,      
+                          int width ) ; 
 ! === in fe-lobj.c ===
 
 ! Large-object access routines

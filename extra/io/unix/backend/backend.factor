@@ -104,8 +104,21 @@ M: integer close-handle ( fd -- )
 : handle-io-task ( mx task -- )
     dup do-io-task [ pop-callbacks ] [ 2drop ] if ;
 
-: handle-timeout ( mx task -- )
-    "Timeout" over io-task-port report-error pop-callbacks ;
+: handle-timeout ( port mx assoc -- )
+    >r swap port-handle r> delete-at* [
+        "I/O operation cancelled" over io-task-port report-error
+        pop-callbacks
+    ] [
+        2drop
+    ] if ;
+
+: cancel-io-tasks ( port mx -- )
+    2dup
+    dup mx-reads handle-timeout
+    dup mx-writes handle-timeout ;
+
+M: unix-io cancel-io ( port -- )
+    mx get-global cancel-io-tasks ;
 
 ! Readers
 : reader-eof ( reader -- )
@@ -165,7 +178,7 @@ M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: unix-io io-multiplex ( ms -- )
-    mx get-global wait-for-events ;
+    expire-timeouts mx get-global wait-for-events ;
 
 M: unix-io init-stdio ( -- )
     0 1 handle>duplex-stream io:stdio set-global
