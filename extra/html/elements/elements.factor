@@ -4,7 +4,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: io kernel namespaces prettyprint quotations
-sequences strings words xml.writer xml.entities compiler.units effects ;
+sequences strings words xml.entities compiler.units effects ;
 
 IN: html.elements
 

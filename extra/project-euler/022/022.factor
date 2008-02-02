@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel math math.parser namespaces sequences sorting splitting
-    strings system vocabs ;
+    strings system vocabs ascii ;
 IN: project-euler.022
 
 ! http://projecteuler.net/index.php?section=problems&id=22

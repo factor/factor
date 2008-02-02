@@ -51,6 +51,9 @@ unit-test
 [ "ab" ] [ 2 "abc" resize-string ] unit-test
 [ "abc\0\0\0" ] [ 6 "abc" resize-string ] unit-test
 
+[ "\u001234b" ] [ 2 "\u001234bc" resize-string ] unit-test
+[ "\u001234bc\0\0\0" ] [ 6 "\u001234bc" resize-string ] unit-test
+
 ! Random tester found this
 [ { "kernel-error" 3 12 -7 } ]
 [ [ 2 -7 resize-string ] catch ] unit-test
@@ -88,3 +91,5 @@ unit-test
 	"\udeadbe" clone
 	CHAR: \u123456 over clone set-first
 ] unit-test
+
+

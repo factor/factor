@@ -6,7 +6,7 @@
 ! Adapted from cryptlib.h
 ! Tested with cryptlib 3.3.1.0
 USING: cryptlib.libcl kernel hashtables alien math 
-namespaces sequences assocs libc alien.c-types continuations ;
+namespaces sequences assocs libc alien.c-types alien.accessors continuations ;
 
 IN: cryptlib
 

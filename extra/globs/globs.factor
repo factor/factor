@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser-combinators regexp lazy-lists sequences kernel
-promises strings ;
+promises strings unicode.case ;
 IN: globs
 
 <PRIVATE

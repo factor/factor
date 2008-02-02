@@ -1,6 +1,6 @@
 USING: combinators.lib kernel sequences math namespaces assocs 
-random sequences.private shuffle math.functions mirrors ;
-USING: arrays math.parser sorting strings ;
+random sequences.private shuffle math.functions mirrors
+arrays math.parser sorting strings ascii ;
 IN: sequences.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
