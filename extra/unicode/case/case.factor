@@ -110,12 +110,3 @@ SYMBOL: locale ! Just casing locale, or overall?
     dup >title = ;
 : case-fold? ( string -- ? )
     dup >case-fold = ;
-
-
-: >Upper ( str -- str ) 
-    dup empty? [
-        unclip ch>upper 1string swap append
-    ] unless ;
-
-: >Upper-dashes ( str -- str )
-    "-" split [ >Upper ] map "-" join ;

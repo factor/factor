@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs hashtables html html.elements splitting
 http io kernel math math.parser namespaces parser sequences
-strings io.server vectors assocs.lib unicode.case ;
+strings io.server vectors assocs.lib ;
 
 IN: http.server.responders
 
@@ -14,7 +14,7 @@ SYMBOL: responders
     H{ } clone [ insert-at ] keep ;
 
 : print-header ( alist -- )
-    [ swap >Upper-dashes write ": " write print ] multi-assoc-each nl ;
+    [ swap write ": " write print ] multi-assoc-each nl ;
 
 : response ( msg -- ) "HTTP/1.0 " write print ;
 
