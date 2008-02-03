@@ -1,6 +1,6 @@
 USING: kernel unicode.data sequences sequences.next namespaces
 assocs.lib unicode.normalize math unicode.categories combinators
-assocs ;
+assocs strings splitting ;
 IN: unicode.case
 
 : ch>lower ( ch -- lower ) simple-lower at-default ;
@@ -110,3 +110,12 @@ SYMBOL: locale ! Just casing locale, or overall?
     dup >title = ;
 : case-fold? ( string -- ? )
     dup >case-fold = ;
+
+
+: >Upper ( str -- str ) 
+    dup empty? [
+        unclip ch>upper 1string swap append
+    ] unless ;
+
+: >Upper-dashes ( str -- str )
+    "-" split [ >Upper ] map "-" join ;
