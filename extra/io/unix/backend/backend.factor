@@ -14,9 +14,9 @@ TUPLE: io-task port callbacks ;
 
 : io-task-fd io-task-port port-handle ;
 
-: <io-task> ( port continuation class -- task )
-    >r 1vector io-task construct-boa r> construct-delegate ;
-    inline
+: <io-task> ( port continuation/f class -- task )
+    >r [ 1vector ] [ V{ } clone ] if* io-task construct-boa
+    r> construct-delegate ; inline
 
 TUPLE: input-task ;
 
@@ -194,7 +194,7 @@ TUPLE: mx-port mx ;
 TUPLE: mx-task ;
 
 : <mx-task> ( port -- task )
-    f io-task construct-boa mx-task construct-delegate ;
+    f mx-task <io-task> ;
 
 M: mx-task do-io-task
     io-task-port mx-port-mx 0 swap wait-for-events f ;

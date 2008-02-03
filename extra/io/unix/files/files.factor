@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend io.nonblocking io.unix.backend io.files io
-unix kernel math continuations ;
+unix kernel math continuations math.bitfields ;
 IN: io.unix.files
 
 : read-flags O_RDONLY ; inline
@@ -12,7 +12,7 @@ IN: io.unix.files
 M: unix-io <file-reader> ( path -- stream )
     open-read <reader> ;
 
-: write-flags O_WRONLY O_CREAT O_TRUNC bitor bitor ; inline
+: write-flags { O_WRONLY O_CREAT O_TRUNC } flags ; inline
 
 : open-write ( path -- fd )
     write-flags file-mode open dup io-error ;
@@ -20,7 +20,7 @@ M: unix-io <file-reader> ( path -- stream )
 M: unix-io <file-writer> ( path -- stream )
     open-write <writer> ;
 
-: append-flags O_WRONLY O_APPEND O_CREAT bitor bitor ; inline
+: append-flags { O_WRONLY O_APPEND O_CREAT } flags ; inline
 
 : open-append ( path -- fd )
     append-flags file-mode open dup io-error

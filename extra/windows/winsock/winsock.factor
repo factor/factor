@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
-USING: alien alien.c-types alien.syntax arrays byte-arrays kernel
-math sequences windows.types windows.kernel32 windows.errors structs
-windows ;
+USING: alien alien.c-types alien.syntax arrays byte-arrays
+kernel math sequences windows.types windows.kernel32
+windows.errors structs windows math.bitfields ;
 IN: windows.winsock
 
 USE: libc
@@ -74,7 +74,7 @@ TYPEDEF: void* SOCKET
 : AI_PASSIVE     1 ; inline
 : AI_CANONNAME   2 ; inline
 : AI_NUMERICHOST 4 ; inline
-: AI_MASK AI_PASSIVE AI_CANONNAME bitor AI_NUMERICHOST bitor ;
+: AI_MASK { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ;
 
 : NI_NUMERICHOST 1 ;
 : NI_NUMERICSERV 2 ;

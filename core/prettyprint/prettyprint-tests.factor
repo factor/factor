@@ -21,9 +21,9 @@ IN: temporary
 [ "hello\\backslash" unparse ]
 unit-test
 
-[ "\"\\u123456\"" ]
-[ "\u123456" unparse ]
-unit-test
+! [ "\"\\u123456\"" ]
+! [ "\u123456" unparse ]
+! unit-test
 
 [ "\"\\e\"" ]
 [ "\e" unparse ]

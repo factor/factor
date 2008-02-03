@@ -3,11 +3,9 @@
 USING: alien.c-types destructors io.windows
 io.windows.nt.backend kernel math windows windows.kernel32
 windows.types libc assocs alien namespaces continuations
-io.monitor io.nonblocking io.buffers io.files io sequences
-hashtables sorting arrays combinators ;
+io.monitor io.monitor.private io.nonblocking io.buffers io.files
+io sequences hashtables sorting arrays combinators ;
 IN: io.windows.nt.monitor
-
-TUPLE: monitor path recursive? queue closed? ;
 
 : open-directory ( path -- handle )
     FILE_LIST_DIRECTORY
@@ -22,23 +20,26 @@ TUPLE: monitor path recursive? queue closed? ;
     dup add-completion
     f <win32-file> ;
 
+TUPLE: win32-monitor path recursive? ;
+
+: <win32-monitor> ( path recursive? port -- monitor )
+    (monitor) {
+        set-win32-monitor-path
+        set-win32-monitor-recursive?
+        set-delegate
+    } win32-monitor construct ;
+
 M: windows-nt-io <monitor> ( path recursive? -- monitor )
     [
-        >r dup open-directory monitor <buffered-port> r> {
-            set-monitor-path
-            set-delegate
-            set-monitor-recursive?
-        } monitor construct
+        over open-directory win32-monitor <buffered-port>
+        <win32-monitor>
     ] with-destructors ;
-
-: check-closed ( monitor -- )
-    port-type closed eq? [ "Monitor closed" throw ] when ;
 
 : begin-reading-changes ( monitor -- overlapped )
     dup port-handle win32-file-handle
     over buffer-ptr
     pick buffer-size
-    roll monitor-recursive? 1 0 ?
+    roll win32-monitor-recursive? 1 0 ?
     FILE_NOTIFY_CHANGE_ALL
     0 <uint>
     (make-overlapped)
@@ -49,6 +50,7 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
         [
             dup begin-reading-changes
             swap [ save-callback ] 2keep
+            dup check-monitor ! we may have closed it...
             get-overlapped-result
         ] with-port-timeout
     ] with-destructors ;
@@ -63,30 +65,19 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
         { [ t ] [ +modify-file+ ] }
     } cond nip ;
 
-: changed-file ( directory buffer -- changed path )
+: parse-file-notify ( directory buffer -- changed path )
     {
         FILE_NOTIFY_INFORMATION-FileName
         FILE_NOTIFY_INFORMATION-FileNameLength
         FILE_NOTIFY_INFORMATION-Action
-    } get-slots >r memory>u16-string path+ r> parse-action swap ;
+    } get-slots parse-action 1array -rot
+    memory>u16-string path+ ;
 
 : (changed-files) ( directory buffer -- )
-    2dup changed-file namespace [ swap add ] change-at
+    2dup parse-file-notify changed-file
     dup FILE_NOTIFY_INFORMATION-NextEntryOffset dup zero?
     [ 3drop ] [ swap <displaced-alien> (changed-files) ] if ;
 
-: changed-files ( directory buffer len -- assoc )
+M: windows-nt-io fill-queue ( monitor -- assoc )
+    dup win32-monitor-path over buffer-ptr rot read-changes
     [ zero? [ 2drop ] [ (changed-files) ] if ] H{ } make-assoc ;
-
-: fill-queue ( monitor -- )
-    dup monitor-path over buffer-ptr pick read-changes
-    changed-files
-    swap set-monitor-queue ;
-
-M: windows-nt-io next-change ( monitor -- path changes )
-    dup check-closed
-    dup monitor-queue dup assoc-empty? [
-        drop dup fill-queue next-change
-    ] [
-        nip delete-any prune natural-sort >array
-    ] if ;

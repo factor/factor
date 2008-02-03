@@ -1078,18 +1078,18 @@ FUNCTION: Status XWithdrawWindow (
 
 ! 17.1.7 - Setting and Reading the WM_NORMAL_HINTS Property
 
-: USPosition    1 0 shift ; inline
-: USSize        1 1 shift ; inline
-: PPosition     1 2 shift ; inline
-: PSize         1 3 shift ; inline
-: PMinSize      1 4 shift ; inline
-: PMaxSize      1 5 shift ; inline
-: PResizeInc    1 6 shift ; inline
-: PAspect       1 7 shift ; inline
-: PBaseSize     1 8 shift ; inline
-: PWinGravity   1 9 shift ; inline
-: PAllHints [ PPosition PSize PMinSize PMaxSize PResizeInc PAspect ]
-0 [ execute bitor ] reduce ; inline
+: USPosition	1 0 shift ; inline
+: USSize	1 1 shift ; inline
+: PPosition	1 2 shift ; inline
+: PSize		1 3 shift ; inline
+: PMinSize	1 4 shift ; inline
+: PMaxSize	1 5 shift ; inline
+: PResizeInc	1 6 shift ; inline
+: PAspect	1 7 shift ; inline
+: PBaseSize	1 8 shift ; inline
+: PWinGravity	1 9 shift ; inline
+: PAllHints 
+    { PPosition PSize PMinSize PMaxSize PResizeInc PAspect } flags ; foldable
 
 C-STRUCT: XSizeHints
     { "long" "flags" }
