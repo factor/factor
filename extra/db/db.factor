@@ -77,7 +77,7 @@ GENERIC: advance-row ( result-set -- ? )
 : do-bound-query ( obj query -- rows )
     [ bind-statement ] keep do-query ;
 
-: do-bound-command ( obj query -- rows )
+: do-bound-command ( obj query -- )
     [ bind-statement ] keep execute-statement ;
 
 : sql-query ( sql -- rows )

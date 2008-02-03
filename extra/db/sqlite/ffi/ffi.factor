@@ -109,7 +109,6 @@ TYPEDEF: void sqlite3_stmt
 
 LIBRARY: sqlite
 FUNCTION: int sqlite3_open ( char* filename, void* ppDb ) ;
-FUNCTION: int sqlite3_open_v2 ( char* filename, void* ppDb, int flags, char* zVfs ) ;
 FUNCTION: int sqlite3_close ( sqlite3* pDb ) ;
 FUNCTION: int sqlite3_prepare ( sqlite3* pDb, char* zSql, int nBytes, void* ppStmt, void* pzTail ) ;
 FUNCTION: int sqlite3_finalize ( sqlite3_stmt* pStmt ) ;

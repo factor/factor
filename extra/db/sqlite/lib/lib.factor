@@ -80,7 +80,7 @@ TUPLE: sqlite-error n message ;
         sqlite-step
     ] if ;
 
-: sqlite-next ( prepared -- )
+: sqlite-next ( prepared -- ? )
     sqlite3_step step-complete? ;
 
 : sqlite-each ( statement quot -- )    
