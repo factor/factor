@@ -12,29 +12,19 @@ C: <db> db ( handle -- obj )
 GENERIC: db-open ( db -- )
 GENERIC: db-close ( db -- )
 
-TUPLE: statement sql params handle bound? n max ;
+TUPLE: statement sql params handle bound? ;
 
 TUPLE: simple-statement ;
-TUPLE: bound-statement ;
 TUPLE: prepared-statement ;
-TUPLE: prepared-bound-statement ;
 
 HOOK: <simple-statement> db ( str -- statement )
-HOOK: <bound-statement> db ( str obj -- statement )
 HOOK: <prepared-statement> db ( str -- statement )
-HOOK: <prepared-bound-statement> db ( str obj -- statement )
-
-! TUPLE: result sql params handle n max ;
-
-GENERIC: #rows ( statement -- n )
-GENERIC: #columns ( statement -- n )
-GENERIC# row-column 1 ( statement n -- obj )
-GENERIC: advance-row ( statement -- ? )
 
 GENERIC: prepare-statement ( statement -- )
-GENERIC: reset-statement ( statement -- )
 GENERIC: bind-statement* ( obj statement -- )
 GENERIC: rebind-statement ( obj statement -- )
+
+GENERIC: execute-statement ( statement -- )
 
 : bind-statement ( obj statement -- )
     2dup dup statement-bound? [
@@ -45,7 +35,24 @@ GENERIC: rebind-statement ( obj statement -- )
     tuck set-statement-params
     t swap set-statement-bound? ;
 
-: sql-row ( statement -- seq )
+TUPLE: result-set sql params handle n max ;
+
+GENERIC: query-results ( query -- result-set )
+
+GENERIC: #rows ( result-set -- n )
+GENERIC: #columns ( result-set -- n )
+GENERIC# row-column 1 ( result-set n -- obj )
+GENERIC: advance-row ( result-set -- ? )
+
+: <result-set> ( query handle tuple -- result-set )
+    >r >r { statement-sql statement-params } get-slots r>
+    {
+        set-result-set-sql
+        set-result-set-params
+        set-result-set-handle
+    } result-set construct r> construct-delegate ;
+
+: sql-row ( result-set -- seq )
     dup #columns [ row-column ] with map ;
 
 : query-each ( statement quot -- )
@@ -64,23 +71,20 @@ GENERIC: rebind-statement ( obj statement -- )
         [ db swap with-variable ] curry with-disposal
     ] with-scope ;
 
-: do-statement ( statement -- )
-    [ advance-row drop ] with-disposal ;
+: do-query ( query -- result-set )
+    query-results [ [ sql-row ] query-map ] with-disposal ;
 
-: do-query ( query -- rows )
-    [ [ sql-row ] query-map ] with-disposal ;
+: do-bound-query ( obj query -- rows )
+    [ bind-statement ] keep do-query ;
 
-: do-simple-query ( sql -- rows )
-    <simple-statement> do-query ;
+: do-bound-command ( obj query -- rows )
+    [ bind-statement ] keep execute-statement ;
 
-: do-bound-query ( sql obj -- rows )
-    <bound-statement> do-query ;
+: sql-query ( sql -- rows )
+    <simple-statement> [ do-query ] with-disposal ;
 
-: do-simple-command ( sql -- )
-    <simple-statement> do-statement ;
-
-: do-bound-command ( sql obj -- )
-    <bound-statement> do-statement ;
+: sql-command ( sql -- )
+    <simple-statement> [ execute-statement ] with-disposal ;
 
 SYMBOL: in-transaction
 HOOK: begin-transaction db ( -- )

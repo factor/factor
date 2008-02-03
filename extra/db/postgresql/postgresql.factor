@@ -38,32 +38,41 @@ M: postgresql-db dispose ( db -- )
 : with-postgresql ( host ust pass db quot -- )
     >r <postgresql-db> r> with-disposal ;
 
-M: postgresql-statement #rows ( statement -- n )
+
+M: postgresql-result-set #rows ( statement -- n )
     statement-handle PQntuples ;
 
-M: postgresql-statement #columns ( statement -- n )
+M: postgresql-result-set #columns ( statement -- n )
     statement-handle PQnfields ;
 
-M: postgresql-statement row-column ( statement n -- obj )
+M: postgresql-result-set row-column ( statement n -- obj )
     >r dup statement-handle swap statement-n r> PQgetvalue ;
 
-: init-statement ( statement -- )
-    dup statement-max [
-        dup do-postgresql-statement over set-statement-handle
-        dup #rows over set-statement-max
-        -1 over set-statement-n
+
+: init-result-set ( result-set -- )
+    dup result-set-max [
+        dup do-postgresql-statement over set-result-set-handle
+        dup #rows over set-result-set-max
+        -1 over set-result-set-n
     ] unless drop ;
 
-: increment-n ( statement -- n )
-    dup statement-n 1+ dup rot set-statement-n ;
+: increment-n ( result-set -- n )
+    dup result-set-n 1+ dup rot set-result-set-n ;
 
-M: postgresql-statement advance-row ( statement -- ? )
-    dup init-statement
-    dup increment-n swap statement-max >= ;
+M: postgresql-result-set advance-row ( result-set -- ? )
+    dup init-result-set
+    dup increment-n swap result-set-max >= ;
+
 
 M: postgresql-statement dispose ( query -- )
     dup statement-handle PQclear
-    0 0 rot { set-statement-n set-statement-max } set-slots ;
+    f swap set-statement-handle ;
+
+M: postgresql-result-set dispose ( result-set -- )
+    dup result-set-handle PQclear
+    0 0 f roll {
+        set-statement-n set-statement-max set-statement-handle
+    } set-slots ;
 
 M: postgresql-statement prepare-statement ( statement -- )
     [
@@ -76,12 +85,6 @@ M: postgresql-db <simple-statement> ( sql -- statement )
     { set-statement-sql } statement construct
     <postgresql-statement> ;
 
-M: postgresql-db <bound-statement> ( sql array -- statement )
-    { set-statement-sql set-statement-params } statement construct
-    <postgresql-statement> ;
-
 M: postgresql-db <prepared-statement> ( sql -- statement )
-    ;
-
-M: postgresql-db <prepared-bound-statement> ( sql seq -- statement )
-    ;
+    { set-statement-sql } statement construct
+    <postgresql-statement> ;
