@@ -289,7 +289,7 @@ install_libraries() {
 }
 
 usage() {
-        echo "usage: $0 install|install-x11|self-update|quick-update|update|bootstrap"
+        echo "usage: $0 install|install-x11|self-update|quick-update|update|bootstrap|wget-bootstrap"
 }
 
 case "$1" in
@@ -299,5 +299,6 @@ case "$1" in
         quick-update) update; refresh_image ;;
         update) update; update_bootstrap ;;
         bootstrap) get_config_info; bootstrap ;;
+        wget-bootstrap) get_config_info; delete_boot_images; get_boot_image; bootstrap ;;
         *) usage ;;
 esac

@@ -141,6 +141,9 @@ PRIVATE>
 : ?third ( seq -- third/f ) 2 swap ?nth ; inline
 : ?fourth ( seq -- fourth/f ) 3 swap ?nth ; inline
 
+: accumulator ( quot -- quot vec )
+    V{ } clone [ [ push ] curry compose ] keep ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! List the positions of obj in seq
