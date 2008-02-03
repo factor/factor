@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib hashtables kernel math math.combinatorics math.parser
-    math.ranges project-euler.common sequences ;
+USING: combinators.lib hashtables kernel math math.combinatorics math.functions
+    math.parser math.ranges project-euler.common sequences ;
 IN: project-euler.032
 
 ! http://projecteuler.net/index.php?section=problems&id=32
@@ -41,7 +41,7 @@ IN: project-euler.032
     dup 1and4 swap 2and3 or ;
 
 : products ( seq -- m )
-    [ number>string 4 tail* 10 string>integer ] map ;
+    [ 10 4 ^ mod ] map ;
 
 PRIVATE>
 
@@ -49,7 +49,7 @@ PRIVATE>
     source-032 [ valid? ] subset products prune sum ;
 
 ! [ euler032 ] 10 ave-time
-! 27609 ms run / 2484 ms GC ave time - 10 trials
+! 23922 ms run / 1505 ms GC ave time - 10 trials
 
 
 ! ALTERNATE SOLUTIONS
