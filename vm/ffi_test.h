@@ -57,3 +57,7 @@ struct test_struct_10 { float x; int y; };
 DLLEXPORT double ffi_test_34(struct test_struct_10 x, int y);
 struct test_struct_11 { int x; int y; };
 DLLEXPORT double ffi_test_35(struct test_struct_11 x, int y);
+
+struct test_struct_12 { int a; double x; };
+
+DLLEXPORT double ffi_test_36(struct test_struct_12 x);
