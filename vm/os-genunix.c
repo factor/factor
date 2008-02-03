@@ -21,7 +21,8 @@ const char *default_image_path(void)
 	if(!path)
 		return "factor.image";
 
-	char *new_path = safe_realloc(path,PATH_MAX + strlen(SUFFIX) + 1);
+	char *new_path = safe_malloc(PATH_MAX + strlen(SUFFIX) + 1);
+	memcpy(new_path,path,strlen(path) + 1);
 	strcat(new_path,SUFFIX); 
 	return new_path;
 }

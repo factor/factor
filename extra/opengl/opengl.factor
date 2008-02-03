@@ -5,7 +5,7 @@
 USING: alien alien.c-types continuations kernel libc math macros
 namespaces math.vectors math.constants math.functions
 math.parser opengl.gl opengl.glu combinators arrays sequences
-splitting words byte-arrays assocs ;
+splitting words byte-arrays assocs combinators.lib ;
 IN: opengl
 
 : coordinates [ first2 ] 2apply ;
@@ -30,6 +30,13 @@ IN: opengl
 
 : do-enabled ( what quot -- )
     over glEnable dip glDisable ; inline
+: do-enabled-client-state ( what quot -- )
+    over glEnableClientState dip glDisableClientState ; inline
+
+: all-enabled ( seq quot -- )
+    over [ glEnable ] each dip [ glDisable ] each ; inline
+: all-enabled-client-state ( seq quot -- )
+    over [ glEnableClientState ] each dip [ glDisableClientState ] each ; inline
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
@@ -103,7 +110,7 @@ IN: opengl
     [ glGenFramebuffersEXT ] (gen-gl-object) ;
 : gen-renderbuffer ( -- id )
     [ glGenRenderbuffersEXT ] (gen-gl-object) ;
-: gen-buffer ( -- id )
+: gen-gl-buffer ( -- id )
     [ glGenBuffers ] (gen-gl-object) ;
 
 : (delete-gl-object) ( id quot -- )
@@ -114,8 +121,25 @@ IN: opengl
     [ glDeleteFramebuffersEXT ] (delete-gl-object) ;
 : delete-renderbuffer ( id -- )
     [ glDeleteRenderbuffersEXT ] (delete-gl-object) ;
-: delete-buffer ( id -- )
+: delete-gl-buffer ( id -- )
     [ glDeleteBuffers ] (delete-gl-object) ;
+
+: with-gl-buffer ( binding id quot -- )
+    -rot dupd glBindBuffer
+    [ slip ] [ 0 glBindBuffer ] [ ] cleanup ; inline
+
+: with-array-element-buffers ( array-buffer element-buffer quot -- )
+    -rot GL_ELEMENT_ARRAY_BUFFER swap [
+        swap GL_ARRAY_BUFFER -rot with-gl-buffer
+    ] with-gl-buffer ; inline
+
+: <gl-buffer> ( target data hint -- id )
+    pick gen-gl-buffer [ [
+        >r dup byte-length swap r> glBufferData
+    ] with-gl-buffer ] keep ;
+
+: buffer-offset ( int -- alien )
+    <alien> ; inline
 
 : framebuffer-incomplete? ( -- status/f )
     GL_FRAMEBUFFER_EXT glCheckFramebufferStatusEXT
@@ -256,7 +280,7 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 : c-true? ( int -- ? ) zero? not ; inline
 
 : with-gl-shader-source-ptr ( string quot -- )
-    swap >byte-array malloc-byte-array [
+    swap string>char-alien malloc-byte-array [
         <void*> swap call
     ] keep free ; inline
 
@@ -295,9 +319,8 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     GL_INFO_LOG_LENGTH gl-shader-get-int ; inline
 
 : gl-shader-info-log ( shader -- log )
-    dup gl-shader-info-log-length
-    dup [
-        0 <int> over glGetShaderInfoLog
+    dup gl-shader-info-log-length dup [
+        [ 0 <int> swap glGetShaderInfoLog ] keep
         alien>char-string
     ] with-malloc ;
 
@@ -331,9 +354,10 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
     GL_INFO_LOG_LENGTH gl-program-get-int ; inline
 
 : gl-program-info-log ( program -- log )
-    dup gl-program-info-log-length
-    dup [ [ 0 <int> swap glGetProgramInfoLog ] keep
-          alien>char-string ] with-malloc ;
+    dup gl-program-info-log-length dup [
+        [ 0 <int> swap glGetProgramInfoLog ] keep
+        alien>char-string
+    ] with-malloc ;
 
 : check-gl-program ( program -- program* )
     dup gl-program-ok? [ dup gl-program-info-log throw ] unless ;
@@ -343,7 +367,8 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
 
 : gl-program-shaders ( program -- shaders )
     dup gl-program-shaders-length [
-        dup "GLuint" <c-array> 0 <int> over glGetAttachedShaders
+        dup "GLuint" <c-array>
+        [ 0 <int> swap glGetAttachedShaders ] keep
     ] keep c-uint-array> ;
 
 : delete-gl-program-only ( program -- )
@@ -357,8 +382,22 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
         2dup detach-gl-program-shader delete-gl-shader
     ] each delete-gl-program-only ;
 
-: with-gl-program ( program quot -- )
+: (with-gl-program) ( program quot -- )
     swap glUseProgram [ 0 glUseProgram ] [ ] cleanup ; inline
+
+: (with-gl-program-uniforms) ( uniforms -- quot )
+    [ [ swap , \ glGetUniformLocation , % ] [ ] make ]
+    { } assoc>map ;
+: (make-with-gl-program) ( uniforms quot -- q )
+    [
+        \ dup ,
+        [ swap (with-gl-program-uniforms) , \ call-with , % ]
+        [ ] make ,
+        \ (with-gl-program) ,
+    ] [ ] make ;
+
+MACRO: with-gl-program ( uniforms quot -- )
+    (make-with-gl-program) ;
 
 PREDICATE: integer gl-program (gl-program?) ;
 
@@ -376,7 +415,7 @@ PREDICATE: integer gl-program (gl-program?) ;
 : gl-extensions ( -- seq )
     GL_EXTENSIONS glGetString " " split ;
 : has-gl-extensions? ( extensions -- ? )
-    gl-extensions subseq? ;
+    gl-extensions swap [ over member? ] all? nip ;
 : (make-gl-extensions-error) ( required-extensions -- )
     gl-extensions swap seq-diff
     "Required OpenGL extensions not supported:\n" %
@@ -420,8 +459,11 @@ PREDICATE: integer gl-program (gl-program?) ;
     [ "Required GLSL version " % % " not supported (" % glsl-version % " available)" % ]
     (require-gl) ;
 
+: has-gl-version-or-extensions? ( version extensions -- ? )
+    has-gl-extensions? swap has-gl-version? or ;
+
 : require-gl-version-or-extensions ( version extensions -- )
-    2array [ first2 has-gl-extensions? swap has-gl-version? or ]
-    [ dup first (make-gl-version-error) "\n" %
-      second (make-gl-extensions-error) "\n" % ]
-    (require-gl) ;
+    2array [ first2 has-gl-version-or-extensions? ] [
+        dup first (make-gl-version-error) "\n" %
+        second (make-gl-extensions-error) "\n" %
+    ] (require-gl) ;

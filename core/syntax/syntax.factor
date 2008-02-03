@@ -126,7 +126,7 @@ IN: bootstrap.syntax
         f set-word
         location >r
         scan-word bootstrap-word scan-word
-        [ parse-definition <method> -rot define-method ] 2keep
+        [ parse-definition -rot define-method ] 2keep
         2array r> remember-definition
     ] define-syntax
 

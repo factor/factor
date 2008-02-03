@@ -34,6 +34,10 @@ HELP: stack-size
 { $description "Outputs the number of bytes to reserve on the C stack by a value of this C type. In most cases this is equal to " { $link heap-size } ", except on some platforms where C structs are passed by invisible reference, in which case a C struct type only uses as much space as a pointer on the C stack." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
+HELP: byte-length
+{ $values { "seq" "A byte array or float array" } { "n" "a non-negative integer" } }
+{ $contract "Outputs the size of the byte array or float array data in bytes as presented to the C library interface." } ;
+
 HELP: c-getter
 { $values { "name" string } { "quot" "a quotation with stack effect " { $snippet "( c-ptr n -- obj )" } } }
 { $description "Outputs a quotation which reads values of this C type from a C structure." }

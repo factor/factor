@@ -143,3 +143,13 @@ PRIVATE>
 
 : accumulator ( quot -- quot vec )
     V{ } clone [ [ push ] curry compose ] keep ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! List the positions of obj in seq
+
+: indices ( seq obj -- seq )
+  >r dup length swap r>
+  [ = [ ] [ drop f ] if ] curry
+  2map
+  [ ] subset ;

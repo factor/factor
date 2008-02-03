@@ -21,8 +21,11 @@ TUPLE: linux-monitor path wd callback ;
 
 TUPLE: inotify watches ;
 
-: wd>path ( wd -- path )
-    inotify get-global inotify-watches at linux-monitor-path ;
+: watches ( -- assoc ) inotify get-global inotify-watches ;
+
+: wd>monitor ( wd -- monitor ) watches at ;
+
+: wd>path ( wd -- path ) wd>monitor linux-monitor-path ;
 
 : <inotify> ( -- port )
     H{ } clone
@@ -30,8 +33,6 @@ TUPLE: inotify watches ;
     { set-inotify-watches set-delegate } inotify construct ;
 
 : inotify-fd inotify get-global port-handle ;
-
-: watches inotify get-global inotify-watches ;
 
 : (add-watch) ( path mask -- wd )
     inotify-fd -rot inotify_add_watch dup io-error ;
@@ -105,9 +106,13 @@ M: linux-monitor dispose ( monitor -- )
     inotify-event-len "inotify-event" heap-size +
     swap >r + r> ;
 
+: wd>queue ( wd -- queue )
+    inotify-event-wd wd>monitor monitor-queue ;
+
 : parse-file-notifications ( i buffer -- )
     2dup events-exhausted? [ 2drop ] [
-        2dup inotify-event@ parse-file-notify changed-file
+        2dup inotify-event@ dup inotify-event-wd wd>queue
+        [ parse-file-notify changed-file ] bind
         next-event parse-file-notifications
     ] if ;
 

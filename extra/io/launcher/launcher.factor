@@ -84,6 +84,11 @@ HOOK: run-process* io-backend ( desc -- handle )
 : run-detached ( desc -- process )
     >descriptor H{ { +detached+ t } } union run-process ;
 
+HOOK: kill-process* io-backend ( handle -- )
+
+: kill-process ( process -- )
+    process-handle [ kill-process* ] when* ;
+
 HOOK: process-stream* io-backend ( desc -- stream process )
 
 TUPLE: process-stream process ;
