@@ -70,7 +70,8 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
         FILE_NOTIFY_INFORMATION-FileName
         FILE_NOTIFY_INFORMATION-FileNameLength
         FILE_NOTIFY_INFORMATION-Action
-    } get-slots >r memory>u16-string path+ r> parse-action swap ;
+    } get-slots parse-action 1array -rot
+    memory>u16-string path+ ;
 
 : (changed-files) ( directory buffer -- )
     2dup parse-file-notify changed-file

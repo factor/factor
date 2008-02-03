@@ -20,7 +20,7 @@ TUPLE: monitor queue closed? ;
 HOOK: fill-queue io-backend ( monitor -- assoc )
 
 : changed-file ( changed path -- )
-    namespace [ swap add ] change-at ;
+    namespace [ append ] change-at ;
 
 : dequeue-change ( assoc -- path changes )
     delete-any prune natural-sort >array ;
