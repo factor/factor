@@ -707,7 +707,19 @@ FUNCTION: BOOL DeleteFileW ( LPCTSTR lpFileName ) ;
 ! FUNCTION: DosPathToSessionPathA
 ! FUNCTION: DosPathToSessionPathW
 ! FUNCTION: DuplicateConsoleHandle
-! FUNCTION: DuplicateHandle
+
+FUNCTION: BOOL DuplicateHandle (
+    HANDLE hSourceProcessHandle,
+    HANDLE hSourceHandle,
+    HANDLE hTargetProcessHandle,
+    LPHANDLE lpTargetHandle,
+    DWORD dwDesiredAccess,
+    BOOL bInheritHandle,
+    DWORD dwOptions ) ;
+
+: DUPLICATE_CLOSE_SOURCE 1 ;
+: DUPLICATE_SAME_ACCESS 2 ;
+
 ! FUNCTION: EncodePointer
 ! FUNCTION: EncodeSystemPointer
 ! FUNCTION: EndUpdateResourceA

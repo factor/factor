@@ -118,11 +118,22 @@ TUPLE: CreateProcess-args
 : inherited-stderr ( args -- handle )
     drop STD_ERROR_HANDLE GetStdHandle ;
 
+: duplicate-handle ( handle -- handle )
+    GetCurrentProcess
+    swap
+    GetCurrentProcess
+    f <void*> [
+        0
+        TRUE
+        DUPLICATE_SAME_ACCESS
+        DuplicateHandle win32-error=0/f
+    ] keep *void* ;
+
 : redirect-stderr ( args -- handle )
     +stderr+ get
     dup +stdout+ eq? [
         drop
-        CreateProcess-args-lpStartupInfo
+        CreateProcess-args-lpStartupInfo duplicate-handle
         STARTUPINFO-hStdOutput
     ] [
         GENERIC_WRITE CREATE_ALWAYS redirect
