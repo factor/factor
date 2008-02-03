@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types hashtables kernel math math.vectors
+USING: alien alien.c-types hashtables kernel math math.vectors math.bitfields
 namespaces sequences x11.xlib x11.constants x11.glx ;
 IN: x11.windows
 
@@ -12,7 +12,6 @@ IN: x11.windows
     XCreateColormap ;
 
 : event-mask ( -- n )
-<<<<<<< HEAD:extra/x11/windows/windows.factor
     {
         ExposureMask
         StructureNotifyMask
@@ -26,19 +25,6 @@ IN: x11.windows
         LeaveWindowMask
         PropertyChangeMask
     } flags ;
-=======
-    ExposureMask
-    StructureNotifyMask bitor
-    KeyPressMask bitor
-    KeyReleaseMask bitor
-    ButtonPressMask     bitor
-    ButtonReleaseMask bitor
-    PointerMotionMask bitor
-    FocusChangeMask bitor
-    EnterWindowMask bitor
-    LeaveWindowMask bitor
-    PropertyChangeMask bitor ;
->>>>>>> a05c18152b59073c49aa313ba685516310ec74a8:extra/x11/windows/windows.factor
 
 : window-attributes ( visinfo -- attributes )
     "XSetWindowAttributes" <c-object>
