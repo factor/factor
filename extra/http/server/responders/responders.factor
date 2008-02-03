@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs hashtables html html.elements splitting
 http io kernel math math.parser namespaces parser sequences
-strings io.server vectors vector-hash strings.lib ;
+strings io.server vectors assocs.lib unicode.case ;
 
 IN: http.server.responders
 
@@ -10,11 +10,11 @@ IN: http.server.responders
 SYMBOL: vhosts
 SYMBOL: responders
 
-: >header ( value key -- vector-hash )
-    VH{ } clone [ set-at ] keep ;
+: >header ( value key -- multi-hash )
+    H{ } clone [ insert-at ] keep ;
 
 : print-header ( alist -- )
-    [ swap >Upper-dashes write ": " write print ] vector-hash-each nl ;
+    [ swap >Upper-dashes write ": " write print ] multi-assoc-each nl ;
 
 : response ( msg -- ) "HTTP/1.0 " write print ;
 
@@ -23,7 +23,7 @@ SYMBOL: responders
 
 : error-head ( error -- )
     dup log-error response
-    VH{ { "Content-Type" "text/html" } } print-header nl ;
+    H{ { "Content-Type" V{ "text/html" } } } print-header nl ;
 
 : httpd-error ( error -- )
     #! This must be run from handle-request
@@ -94,7 +94,7 @@ SYMBOL: max-post-request
         } member?
     ] assoc-subset [
         ": " swap 3append log-message
-    ] vector-hash-each ;
+    ] multi-assoc-each ;
 
 : prepare-url ( url -- url )
     #! This is executed in the with-request namespace.
