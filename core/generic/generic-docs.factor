@@ -1,6 +1,6 @@
 USING: help.markup help.syntax generic.math generic.standard
 words classes definitions kernel alien combinators sequences 
-math ;
+math quotations ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"
@@ -154,7 +154,7 @@ HELP: with-methods
 $low-level-note ;
 
 HELP: define-method
-{ $values { "method" "an instance of " { $link method } } { "class" class } { "generic" generic } }
+{ $values { "method" quotation } { "class" class } { "generic" generic } }
 { $description "Defines a method. This is the runtime equivalent of " { $link POSTPONE: M: } "." } ;
 
 HELP: implementors

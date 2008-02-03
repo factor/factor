@@ -11,7 +11,7 @@ SYMBOL: generic-1
 [
     generic-1 T{ combination-1 } define-generic
 
-    [ ] <method> object \ generic-1 define-method
+    [ ] object \ generic-1 define-method
 ] with-compilation-unit
 
 [ ] [
