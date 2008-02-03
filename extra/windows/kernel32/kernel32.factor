@@ -1453,7 +1453,7 @@ FUNCTION: DWORD SleepEx ( DWORD dwMilliSeconds, BOOL bAlertable ) ;
 FUNCTION: BOOL SystemTimeToFileTime ( SYSTEMTIME* lpSystemTime, LPFILETIME lpFileTime ) ;
 ! FUNCTION: SystemTimeToTzSpecificLocalTime
 ! FUNCTION: TerminateJobObject
-! FUNCTION: TerminateProcess
+FUNCTION: BOOL TerminateProcess ( HANDLE hProcess, DWORD uExit ) ;
 ! FUNCTION: TerminateThread
 ! FUNCTION: TermsrvAppInstallMode
 ! FUNCTION: Thread32First
