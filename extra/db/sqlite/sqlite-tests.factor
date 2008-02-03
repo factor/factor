@@ -5,12 +5,14 @@ IN: temporary
 
 ! "sqlite3 -init test.txt test.db"
 
+IN: scratchpad
 : test.db "extra/db/sqlite/test.db" resource-path ;
 
+IN: temporary
 : (create-db) ( -- str )
     [
         "sqlite3 -init " %
-        "extra/db/sqlite/test.txt" resource-path %
+        test.db %
         " " %
         test.db %
     ] "" make ;
@@ -27,7 +29,7 @@ IN: temporary
         { "Jane" "New Zealand" }
     }
 ] [
-    "extra/db/sqlite/test.db" resource-path [
+    test.db [
         "select * from person" sql-query
     ] with-sqlite
 ] unit-test
@@ -35,7 +37,7 @@ IN: temporary
 [
     { { "John" "America" } }
 ] [
-    "extra/db/sqlite/test.db" resource-path [
+    test.db [
         "select * from person where name = :name and country = :country"
         <simple-statement> [
             { { ":name" "Jane" } { ":country" "New Zealand" } }
@@ -59,7 +61,7 @@ IN: temporary
 
 [
 ] [
-    "extra/db/sqlite/test.db" resource-path [
+    test.db [
         "insert into person(name, country) values('Jimmy', 'Canada')"
         sql-command
     ] with-sqlite
@@ -74,7 +76,7 @@ IN: temporary
 ] [ test.db [ "select rowid, * from person" sql-query ] with-sqlite ] unit-test
 
 [
-    "extra/db/sqlite/test.db" resource-path [
+    test.db [
         [
             "insert into person(name, country) values('Jose', 'Mexico')" sql-command
             "insert into person(name, country) values('Jose', 'Mexico')" sql-command
@@ -84,14 +86,14 @@ IN: temporary
 ] unit-test-fails
 
 [ 3 ] [
-    "extra/db/sqlite/test.db" resource-path [
+    test.db [
         "select * from person" sql-query length
     ] with-sqlite
 ] unit-test
 
 [
 ] [
-    "extra/db/sqlite/test.db" resource-path [
+    test.db [
         [
             "insert into person(name, country) values('Jose', 'Mexico')"
             sql-command
@@ -102,7 +104,7 @@ IN: temporary
 ] unit-test
 
 [ 5 ] [
-    "extra/db/sqlite/test.db" resource-path [
+    test.db [
         "select * from person" sql-query length
     ] with-sqlite
 ] unit-test

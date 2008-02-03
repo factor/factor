@@ -2,53 +2,109 @@
 ! Set username and password in  the 'connect' word.
 
 USING: kernel db.postgresql alien continuations io prettyprint
-sequences namespaces tools.test ;
+sequences namespaces tools.test db ;
 IN: temporary
 
-: test-connection ( host port pgopts pgtty db user pass -- bool )
-    [ [ ] with-postgres ] catch "Error connecting!" "Connected!" ? print ;
+IN: scratchpad
+: test-db ( -- postgresql-db )
+    "localhost" "postgres" "" "factor-test" <postgresql-db> ;
+IN: temporary
 
-[ ] [ "localhost" "" "" "" "factor-test" "postgres" "" test-connection ] unit-test
+[ ] [ test-db [ ] with-db ] unit-test
 
-[ ] [ "localhost" "postgres" "" "factor-test" <postgresql-db> [ ] with-db ] unit-test
+[ ] [
+    test-db [
+        [ "drop table person;" sql-command ] catch drop
+        "create table person (name varchar(30), country varchar(30));"
+            sql-command
 
-! just a basic demo
+        "insert into person values('John', 'America');" sql-command
+        "insert into person values('Jane', 'New Zealand');" sql-command
+    ] with-db
+] unit-test
 
-"localhost" "postgres" "" "factor-test" <postgresql-db> [
-    [ ] [ "drop table animal" do-command ] unit-test
+[
+    {
+        { "John" "America" }
+        { "Jane" "New Zealand" }
+    }
+] [
+    test-db [
+        "select * from person" sql-query
+    ] with-db
+] unit-test
 
-    [ ] [ "create table animal (id serial not null primary key, species varchar(256), name varchar(256), age integer)" do-command ] unit-test
-    
-    [ ] [ "insert into animal (species, name, age) values ('lion', 'Mufasa', 5)"
-    do-command ] unit-test
+[
+    { { "John" "America" } }
+] [
+    test-db [
+        "select * from person where name = $1 and country = $2"
+        <simple-statement> [
+            { "Jane" "New Zealand" }
+            over do-bound-query
 
-    [ ] [ "select * from animal where name = 'Mufasa'" [ ] do-query ] unit-test
-    [ ] [ "select * from animal where name = 'Mufasa'" [
-            result>seq length 1 = [
-                "...there can only be one Mufasa..." throw
-            ] unless
-        ] do-query
-    ] unit-test
+            { { "Jane" "New Zealand" } } =
+            [ "test fails" throw ] unless
 
-    [ ] [ "insert into animal (species, name, age) values ('lion', 'Simba', 1)"
-    do-command ] unit-test
+            { "John" "America" }
+            swap do-bound-query
+        ] with-disposal
+    ] with-db
+] unit-test
 
-    [ ] [
-        "select * from animal" 
+[
+    {
+        { "John" "America" }
+        { "Jane" "New Zealand" }
+    }
+] [ test-db [ "select * from person" sql-query ] with-db ] unit-test
+
+[
+] [
+    test-db [
+        "insert into person(name, country) values('Jimmy', 'Canada')"
+        sql-command
+    ] with-db
+] unit-test
+
+[
+    {
+        { "John" "America" }
+        { "Jane" "New Zealand" }
+        { "Jimmy" "Canada" }
+    }
+] [ test-db [ "select * from person" sql-query ] with-db ] unit-test
+
+[
+    test-db [
         [
-            "Animal table:" print
-            result>seq print-table
-        ] do-query
-    ] unit-test
+            "insert into person(name, country) values('Jose', 'Mexico')" sql-command
+            "insert into person(name, country) values('Jose', 'Mexico')" sql-command
+            "oops" throw
+        ] with-transaction
+    ] with-db
+] unit-test-fails
 
-    ! intentional errors
-    ! [ "select asdf from animal"
-    ! [ ] do-query ] catch [ "caught: " write print ] when*
-    ! "select asdf from animal" [ ] do-query 
-    ! "aofijweafew" do-command
-] with-db
+[ 3 ] [
+    test-db [
+        "select * from person" sql-query length
+    ] with-db
+] unit-test
 
+[
+] [
+    test-db [
+        [
+            "insert into person(name, country) values('Jose', 'Mexico')"
+            sql-command
+            "insert into person(name, country) values('Jose', 'Mexico')"
+            sql-command
+        ] with-transaction
+    ] with-db
+] unit-test
 
-"localhost" "postgres" "" "factor-test" <postgresql-db> [
-    [ ] [ "drop table animal" do-command ] unit-test
-] with-db
+[ 5 ] [
+    test-db [
+        "select * from person" sql-query length
+    ] with-db
+] unit-test

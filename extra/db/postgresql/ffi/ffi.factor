@@ -1,9 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-
 ! adapted from libpq-fe.h version 7.4.7
-! tested on debian linux with postgresql 7.4.7
-! Updated to 8.1
+! tested on debian linux with postgresql 8.1
 
 USING: alien alien.syntax combinators system ;
 IN: db.postgresql.ffi

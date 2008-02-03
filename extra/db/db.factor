@@ -44,6 +44,10 @@ GENERIC: #columns ( result-set -- n )
 GENERIC# row-column 1 ( result-set n -- obj )
 GENERIC: advance-row ( result-set -- ? )
 
+: init-result-set ( result-set -- )
+    dup #rows over set-result-set-max
+    -1 swap set-result-set-n ;
+
 : <result-set> ( query handle tuple -- result-set )
     >r >r { statement-sql statement-params } get-slots r>
     {

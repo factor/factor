@@ -1,8 +1,5 @@
-! Copyright (C) 2007 Doug Coleman.
+! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-! adapted from libpq-fe.h version 7.4.7
-! tested on debian linux with postgresql 7.4.7
-
 USING: arrays assocs alien alien.syntax continuations io
 kernel math namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi ;
@@ -10,6 +7,7 @@ IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty db user pass ;
 TUPLE: postgresql-statement ;
+TUPLE: postgresql-result-set ;
 : <postgresql-statement> ( statement -- postgresql-statement )
     postgresql-statement construct-delegate ;
 
@@ -38,31 +36,39 @@ M: postgresql-db dispose ( db -- )
 : with-postgresql ( host ust pass db quot -- )
     >r <postgresql-db> r> with-disposal ;
 
+M: postgresql-statement bind-statement* ( seq statement -- )
+    set-statement-params ;
 
-M: postgresql-result-set #rows ( statement -- n )
-    statement-handle PQntuples ;
+M: postgresql-statement rebind-statement ( seq statement -- )
+    bind-statement* ;
 
-M: postgresql-result-set #columns ( statement -- n )
-    statement-handle PQnfields ;
+M: postgresql-result-set #rows ( result-set -- n )
+    result-set-handle PQntuples ;
 
-M: postgresql-result-set row-column ( statement n -- obj )
-    >r dup statement-handle swap statement-n r> PQgetvalue ;
+M: postgresql-result-set #columns ( result-set -- n )
+    result-set-handle PQnfields ;
 
+M: postgresql-result-set row-column ( result-set n -- obj )
+    >r dup result-set-handle swap result-set-n r> PQgetvalue ;
 
-: init-result-set ( result-set -- )
-    dup result-set-max [
-        dup do-postgresql-statement over set-result-set-handle
-        dup #rows over set-result-set-max
-        -1 over set-result-set-n
-    ] unless drop ;
+M: postgresql-statement execute-statement ( statement -- )
+    query-results dispose ;
 
 : increment-n ( result-set -- n )
     dup result-set-n 1+ dup rot set-result-set-n ;
 
-M: postgresql-result-set advance-row ( result-set -- ? )
-    dup init-result-set
-    dup increment-n swap result-set-max >= ;
+M: postgresql-statement query-results ( query -- result-set )
+    dup statement-params [
+        over [ bind-statement ] keep
+        do-postgresql-bound-statement
+    ] [
+        dup do-postgresql-statement
+    ] if*
+    postgresql-result-set <result-set>
+    dup init-result-set ;
 
+M: postgresql-result-set advance-row ( result-set -- ? )
+    dup increment-n swap result-set-max >= ;
 
 M: postgresql-statement dispose ( query -- )
     dup statement-handle PQclear
@@ -71,14 +77,14 @@ M: postgresql-statement dispose ( query -- )
 M: postgresql-result-set dispose ( result-set -- )
     dup result-set-handle PQclear
     0 0 f roll {
-        set-statement-n set-statement-max set-statement-handle
+        set-result-set-n set-result-set-max set-result-set-handle
     } set-slots ;
 
 M: postgresql-statement prepare-statement ( statement -- )
     [
         >r db get db-handle "" r>
         dup statement-sql swap statement-params
-        dup assoc-size swap PQprepare postgresql-error
+        length f PQprepare postgresql-error
     ] keep set-statement-handle ;
 
 M: postgresql-db <simple-statement> ( sql -- statement )
@@ -88,3 +94,12 @@ M: postgresql-db <simple-statement> ( sql -- statement )
 M: postgresql-db <prepared-statement> ( sql -- statement )
     { set-statement-sql } statement construct
     <postgresql-statement> ;
+
+M: postgresql-db begin-transaction ( -- )
+    "BEGIN" sql-command ;
+
+M: postgresql-db commit-transaction ( -- )
+    "COMMIT" sql-command ;
+
+M: postgresql-db rollback-transaction ( -- )
+    "ROLLBACK" sql-command ;

@@ -64,7 +64,6 @@ M: sqlite-result-set advance-row ( result-set -- handle ? )
 M: sqlite-statement query-results ( query -- result-set )
     dup statement-handle sqlite-result-set <result-set> ;
 
-
 M: sqlite-db begin-transaction ( -- )
     "BEGIN" sql-command ;
 
