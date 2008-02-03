@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays arrays generator.registers assocs
+USING: byte-arrays float-arrays arrays generator.registers assocs
 kernel kernel.private libc math namespaces parser sequences
 strings words assocs splitting math.parser cpu.architecture
 alien alien.accessors quotations system compiler.units ;
@@ -106,6 +106,12 @@ GENERIC: stack-size ( type -- size ) foldable
 M: string stack-size c-type stack-size ;
 
 M: c-type stack-size c-type-size ;
+
+GENERIC: byte-length ( seq -- n ) flushable
+
+M: float-array byte-length length "double" heap-size * ;
+
+M: byte-array byte-length length ;
 
 : c-getter ( name -- quot )
     c-type c-type-getter [
