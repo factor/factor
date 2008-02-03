@@ -39,11 +39,6 @@ TUPLE: method loc def ;
 : <method> ( def -- method )
     { set-method-def } \ method construct ;
 
-M: f method-def ;
-M: f method-loc ;
-M: quotation method-def ;
-M: quotation method-loc drop f ;
-
 : method ( class generic -- method/f )
     "methods" word-prop at ;
 
@@ -55,7 +50,7 @@ PREDICATE: pair method-spec
 
 : sort-methods ( assoc -- newassoc )
     [ keys sort-classes ] keep
-    [ dupd at method-def 2array ] curry map ;
+    [ dupd at method-def ] curry { } map>assoc ;
 
 : methods ( word -- assoc )
     "methods" word-prop sort-methods ;
@@ -72,18 +67,19 @@ TUPLE: check-method class generic ;
     inline
 
 : define-method ( method class generic -- )
-    >r bootstrap-word r> check-method
+    >r >r <method> r> bootstrap-word r> check-method
     [ set-at ] with-methods ;
 
 ! Definition protocol
 M: method-spec where
-    dup first2 method method-loc [ ] [ second where ] ?if ;
+    dup first2 method [ method-loc ] [ second where ] ?if ;
 
 M: method-spec set-where first2 method set-method-loc ;
 
 M: method-spec definer drop \ M: \ ; ;
 
-M: method-spec definition first2 method method-def ;
+M: method-spec definition
+    first2 method dup [ method-def ] when ;
 
 : forget-method ( class generic -- )
     check-method [ delete-at ] with-methods ;
