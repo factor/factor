@@ -1,11 +1,11 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types continuations kernel libc math macros
 namespaces math.vectors math.constants math.functions
 math.parser opengl.gl opengl.glu combinators arrays sequences
-splitting words byte-arrays ;
+splitting words byte-arrays assocs ;
 IN: opengl
 
 : coordinates [ first2 ] 2apply ;
@@ -233,7 +233,8 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     dup sprite-dlist delete-dlist
     sprite-texture delete-texture ;
 
-: free-sprites ( sprites -- ) [ [ free-sprite ] when* ] each ;
+: free-sprites ( sprites -- )
+    [ nip [ free-sprite ] when* ] assoc-each ;
 
 : with-translation ( loc quot -- )
     GL_MODELVIEW [ >r gl-translate r> call ] do-matrix ; inline

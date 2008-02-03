@@ -168,9 +168,10 @@ FUNCTION: time_t time ( time_t* t ) ;
 FUNCTION: int unlink ( char* path ) ;
 FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! wait and waitpid
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: SIGKILL 9 ; inline
+: SIGTERM 15 ; inline
+
+FUNCTION: int kill ( pid_t pid, int sig ) ;
 
 ! Flags for waitpid
 

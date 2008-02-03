@@ -132,8 +132,8 @@ FUNCTION: int ffi_test_10 int a int b double c int d float e int f int g int h ;
 [ -34 ] [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] unit-test
 
 FUNCTION: void ffi_test_20 double x1, double x2, double x3,
-	double y1, double y2, double y3,
-	double z1, double z2, double z3 ;
+    double y1, double y2, double y3,
+    double z1, double z2, double z3 ;
 
 [ ] [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
 

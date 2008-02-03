@@ -37,8 +37,8 @@ SYMBOL: <wm-frame-drag-size>
       [ <- draw-size-outline <- update-posn <- draw-size-outline <- loop ] }
     { [ <- event-type ButtonRelease = ]
       [ <- draw-size-outline
-      	dup $frame over $posn pick $frame <- position v- <-- resize
-	<- adjust-child drop ] }
+        dup $frame over $posn pick $frame <- position v- <-- resize
+        <- adjust-child drop ] }
     { [ t ] [ <- loop ] } }
   cond ]
 

@@ -59,9 +59,3 @@ IN: unix.linux.ifreq
   swap <int>		over set-struct-ifreq-ifr-ifru
 
   AF_INET SOCK_DGRAM 0 socket SIOCSIFMETRIC rot ioctl drop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USING: words quotations sequences math macros ;
-
-MACRO: flags ( seq -- ) 0 swap [ execute bitor ] each 1quotation ;

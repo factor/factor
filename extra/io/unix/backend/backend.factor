@@ -14,9 +14,9 @@ TUPLE: io-task port callbacks ;
 
 : io-task-fd io-task-port port-handle ;
 
-: <io-task> ( port continuation class -- task )
-    >r 1vector io-task construct-boa r> construct-delegate ;
-    inline
+: <io-task> ( port continuation/f class -- task )
+    >r [ 1vector ] [ V{ } clone ] if* io-task construct-boa
+    r> construct-delegate ; inline
 
 TUPLE: input-task ;
 
@@ -104,8 +104,21 @@ M: integer close-handle ( fd -- )
 : handle-io-task ( mx task -- )
     dup do-io-task [ pop-callbacks ] [ 2drop ] if ;
 
-: handle-timeout ( mx task -- )
-    "Timeout" over io-task-port report-error pop-callbacks ;
+: handle-timeout ( port mx assoc -- )
+    >r swap port-handle r> delete-at* [
+        "I/O operation cancelled" over io-task-port report-error
+        pop-callbacks
+    ] [
+        2drop
+    ] if ;
+
+: cancel-io-tasks ( port mx -- )
+    2dup
+    dup mx-reads handle-timeout
+    dup mx-writes handle-timeout ;
+
+M: unix-io cancel-io ( port -- )
+    mx get-global cancel-io-tasks ;
 
 ! Readers
 : reader-eof ( reader -- )
@@ -165,7 +178,7 @@ M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: unix-io io-multiplex ( ms -- )
-    mx get-global wait-for-events ;
+    expire-timeouts mx get-global wait-for-events ;
 
 M: unix-io init-stdio ( -- )
     0 1 handle>duplex-stream io:stdio set-global
@@ -181,7 +194,7 @@ TUPLE: mx-port mx ;
 TUPLE: mx-task ;
 
 : <mx-task> ( port -- task )
-    f io-task construct-boa mx-task construct-delegate ;
+    f mx-task <io-task> ;
 
 M: mx-task do-io-task
     io-task-port mx-port-mx 0 swap wait-for-events f ;

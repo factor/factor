@@ -5,7 +5,7 @@ io.buffers io.files io.nonblocking io.sockets io.binary
 io.sockets.impl windows.errors strings io.streams.duplex kernel
 math namespaces sequences windows windows.kernel32
 windows.shell32 windows.types windows.winsock splitting
-continuations ;
+continuations math.bitfields ;
 IN: io.windows
 
 TUPLE: windows-nt-io ;
@@ -31,8 +31,11 @@ M: windows-io normalize-directory ( string -- string )
     "\\" ?tail drop "\\*" append ;
 
 : share-mode ( -- fixnum )
-    FILE_SHARE_READ FILE_SHARE_WRITE bitor
-    FILE_SHARE_DELETE bitor ; foldable
+    {
+        FILE_SHARE_READ
+        FILE_SHARE_WRITE
+        FILE_SHARE_DELETE
+    } flags ; foldable
 
 : default-security-attributes ( -- obj )
     "SECURITY_ATTRIBUTES" <c-object>
