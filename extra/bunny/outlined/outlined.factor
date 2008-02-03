@@ -168,13 +168,24 @@ TUPLE: bunny-outlined
         check-framebuffer
     ] with-framebuffer ;
 
+: dispose-framebuffer ( draw -- )
+    dup bunny-outlined-framebuffer-dim [
+        {
+            [ bunny-outlined-framebuffer    [ delete-framebuffer ] when* ]
+            [ bunny-outlined-color-texture  [ delete-texture ] when* ]
+            [ bunny-outlined-normal-texture [ delete-texture ] when* ]
+            [ bunny-outlined-depth-texture  [ delete-texture ] when* ]
+            [ f swap set-bunny-outlined-framebuffer-dim ]
+        } call-with
+    ] [ drop ] if ;
+
 : remake-framebuffer-if-needed ( draw -- )
     dup bunny-outlined-gadget rect-dim
     over bunny-outlined-framebuffer-dim
     over =
     [ 2drop ]
     [
-        swap >r
+        swap dup dispose-framebuffer >r
         dup GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
         swap dup GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
         swap dup GL_DEPTH_COMPONENT32 GL_DEPTH_COMPONENT (framebuffer-texture)
@@ -209,15 +220,12 @@ TUPLE: bunny-outlined
     dup bunny-outlined-color-texture GL_TEXTURE_2D GL_TEXTURE0 bind-texture-unit
     dup bunny-outlined-normal-texture GL_TEXTURE_2D GL_TEXTURE1 bind-texture-unit
     dup bunny-outlined-depth-texture GL_TEXTURE_2D GL_TEXTURE2 bind-texture-unit
-    bunny-outlined-pass2-program dup [
-        {
-            [ "colormap"  glGetUniformLocation 0 glUniform1i ]
-            [ "normalmap" glGetUniformLocation 1 glUniform1i ]
-            [ "depthmap"  glGetUniformLocation 2 glUniform1i ]
-            [ "line_color" glGetUniformLocation 0.1 0.0 0.1 1.0 glUniform4f ]
-        } call-with
-        { -1.0 -1.0 } { 1.0 1.0 } rect-vertices
-    ] with-gl-program ;
+    bunny-outlined-pass2-program {
+        { "colormap"   [ 0 glUniform1i ] }
+        { "normalmap"  [ 1 glUniform1i ] }
+        { "depthmap"   [ 2 glUniform1i ] }
+        { "line_color" [ 0.1 0.0 0.1 1.0 glUniform4f ] }
+    } [ { -1.0 -1.0 } { 1.0 1.0 } rect-vertices ] with-gl-program ;
 
 M: bunny-outlined draw-bunny
     dup remake-framebuffer-if-needed
@@ -227,9 +235,5 @@ M: bunny-outlined dispose
     {
         [ bunny-outlined-pass1-program [ delete-gl-program ] when* ]
         [ bunny-outlined-pass2-program [ delete-gl-program ] when* ]
-        [ bunny-outlined-framebuffer [ delete-framebuffer ] when* ]
-        [ bunny-outlined-color-texture [ delete-texture ] when* ]
-        [ bunny-outlined-normal-texture [ delete-texture ] when* ]
-        [ bunny-outlined-depth-texture [ delete-texture ] when* ]
-        [ f swap set-bunny-outlined-framebuffer-dim ]
+        [ dispose-framebuffer ]
     } call-with ;

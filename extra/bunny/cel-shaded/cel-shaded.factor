@@ -76,16 +76,13 @@ TUPLE: bunny-cel-shaded program ;
     ] [ f ] if ;
 
 : (draw-cel-shaded-bunny) ( geom program -- )
-    dup [
-        {
-            [ "light_direction" glGetUniformLocation 1.0 -1.0 1.0 glUniform3f ]
-            [ "color" glGetUniformLocation 0.6 0.5 0.5 1.0 glUniform4f ]
-            [ "ambient" glGetUniformLocation 0.2 0.2 0.2 0.2 glUniform4f ]
-            [ "diffuse" glGetUniformLocation 0.8 0.8 0.8 0.8 glUniform4f ]
-            [ "shininess" glGetUniformLocation 100.0 glUniform1f ]
-        } call-with
-        bunny-geom
-    ] with-gl-program ;
+    {
+        { "light_direction" [ 1.0 -1.0 1.0 glUniform3f ] }
+        { "color"           [ 0.6 0.5 0.5 1.0 glUniform4f ] }
+        { "ambient"         [ 0.2 0.2 0.2 0.2 glUniform4f ] }
+        { "diffuse"         [ 0.8 0.8 0.8 0.8 glUniform4f ] }
+        { "shininess"       [ 100.0 glUniform1f ] }
+    } [ bunny-geom ] with-gl-program ;
 
 M: bunny-cel-shaded draw-bunny
     bunny-cel-shaded-program (draw-cel-shaded-bunny) ;

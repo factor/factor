@@ -5,7 +5,7 @@
 USING: alien alien.c-types continuations kernel libc math macros
 namespaces math.vectors math.constants math.functions
 math.parser opengl.gl opengl.glu combinators arrays sequences
-splitting words byte-arrays assocs ;
+splitting words byte-arrays assocs combinators.lib ;
 IN: opengl
 
 : coordinates [ first2 ] 2apply ;
@@ -382,8 +382,22 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
         2dup detach-gl-program-shader delete-gl-shader
     ] each delete-gl-program-only ;
 
-: with-gl-program ( program quot -- )
+: (with-gl-program) ( program quot -- )
     swap glUseProgram [ 0 glUseProgram ] [ ] cleanup ; inline
+
+: (with-gl-program-uniforms) ( uniforms -- quot )
+    [ [ swap , \ glGetUniformLocation , % ] [ ] make ]
+    { } assoc>map ;
+: (make-with-gl-program) ( uniforms quot -- q )
+    [
+        \ dup ,
+        [ swap (with-gl-program-uniforms) , \ call-with , % ]
+        [ ] make ,
+        \ (with-gl-program) ,
+    ] [ ] make ;
+
+MACRO: with-gl-program ( uniforms quot -- )
+    (make-with-gl-program) ;
 
 PREDICATE: integer gl-program (gl-program?) ;
 

@@ -8,10 +8,6 @@ ui.gestures
 bunny.fixed-pipeline bunny.cel-shaded bunny.outlined bunny.model ;
 IN: bunny
 
-<PRIVATE
-
-PRIVATE>
-
 TUPLE: bunny-gadget model geom draw-seq draw-n ;
 
 : <bunny-gadget> ( -- bunny-gadget )
