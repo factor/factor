@@ -111,4 +111,3 @@ M: bunny-buffers dispose
     "1.5" { "GL_ARB_vertex_buffer_object" }
     has-gl-version-or-extensions?
     [ <bunny-buffers> ] [ <bunny-dlist> ] if ;
-
