@@ -1,6 +1,6 @@
 USING: arrays combinators.lib kernel math math.functions math.miller-rabin
     math.matrices math.parser math.primes.factors math.ranges namespaces
-    sequences sorting ;
+    sequences sorting unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -8,6 +8,7 @@ IN: project-euler.common
 
 ! Problems using each public word
 ! -------------------------------
+! alpha-value - #22, #42
 ! cartesian-product - #4, #27, #29, #32, #33
 ! collect-consecutive - #8, #11
 ! log10 - #25, #134
@@ -51,6 +52,9 @@ IN: project-euler.common
     [ 1array ] dip m. first ;
 
 PRIVATE>
+
+: alpha-value ( str -- n )
+    >lower [ CHAR: a - 1+ ] sigma ;
 
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
     swap [ swap [ 2array ] map-with ] map-with concat ;
