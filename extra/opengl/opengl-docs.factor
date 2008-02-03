@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io kernel math quotations
-opengl.gl ;
+opengl.gl multiline assocs ;
 IN: opengl
 
 HELP: gl-color
@@ -65,7 +65,7 @@ HELP: gen-renderbuffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenRenderbuffersEXT } " to handle the common case of generating a single render buffer ID." } ;
 
-HELP: gen-buffer
+HELP: gen-gl-buffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenBuffers } " to handle the common case of generating a single buffer ID." } ;
 
@@ -81,14 +81,14 @@ HELP: delete-renderbuffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glDeleteRenderbuffersEXT } " to handle the common case of deleting a single render buffer ID." } ;
 
-HELP: delete-buffer
+HELP: delete-gl-buffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glDeleteBuffers } " to handle the common case of deleting a single buffer ID." } ;
 
 { gen-texture delete-texture } related-words
 { gen-framebuffer delete-framebuffer } related-words
 { gen-renderbuffer delete-renderbuffer } related-words
-{ gen-buffer delete-buffer } related-words
+{ gen-gl-buffer delete-gl-buffer } related-words
 
 HELP: framebuffer-incomplete?
 { $values { "status/f" "The framebuffer error code, or " { $snippet "f" } " if the framebuffer is render-complete." } }
@@ -241,8 +241,19 @@ HELP: delete-gl-program
 { $description "Deletes the program object, invalidating it and releasing any resources allocated for it by the OpenGL implementation. Any attached " { $link gl-shader } "s are also deleted.\n\nIf the shader objects should be preserved, they should each be detached using " { $link detach-gl-program-shader } ". The program object can then be destroyed alone using " { $link delete-gl-program-only } "." } ;
 
 HELP: with-gl-program
-{ $values { "program" "A " { $link gl-program } " object" } { "quot" "A quotation" } }
-{ $description "Enables " { $snippet "program" } " for all OpenGL calls made in the dynamic extent of " { $snippet "quot" } ". The fixed-function pipeline is restored at the end of " { $snippet "quot" } "." } ;
+{ $values { "program" "A " { $link gl-program } " object" } { "uniforms" "An " { $link assoc } " between uniform parameter names and quotations with effect " { $snippet "( uniform-location -- )" } } { "quot" "A quotation" } }
+{ $description "Enables " { $snippet "program" } " for all OpenGL calls made in the dynamic extent of " { $snippet "quot" } ". The fixed-function pipeline is restored at the end of " { $snippet "quot" } ". Before calling " { $snippet "quot" } ", calls " { $link glGetUniformLocation } " on each key of " { $snippet "uniforms" } " to get the address of the uniform parameter, which is then placed on top of the stack for the associated quotation.\n\nExample:" }
+{ $code <"
+! From bunny.cel-shaded
+: (draw-cel-shaded-bunny) ( geom program -- )
+    {
+        { "light_direction" [ 1.0 -1.0 1.0 glUniform3f ] }
+        { "color"           [ 0.6 0.5 0.5 1.0 glUniform4f ] }
+        { "ambient"         [ 0.2 0.2 0.2 0.2 glUniform4f ] }
+        { "diffuse"         [ 0.8 0.8 0.8 0.8 glUniform4f ] }
+        { "shininess"       [ 100.0 glUniform1f ] }
+    } [ bunny-geom ] with-gl-program ;
+"> } ;
 
 HELP: gl-version
 { $values { "version" "The version string from the OpenGL implementation" } }
@@ -284,15 +295,19 @@ HELP: has-gl-extensions?
 { $values { "extensions" "A sequence of extension name strings" } { "?" "A boolean value" } }
 { $description "Returns true if the set of " { $snippet "extensions" } " is a subset of the implementation-supported extensions returned by " { $link gl-extensions } "." } ;
 
+HELP: has-gl-version-or-extensions?
+{ $values { "version" "A version string" } { "extensions" "A sequence of extension name strings" } }
+{ $description "Returns true if either " { $link has-gl-version? } " or " { $link has-gl-extensions? } " returns true for " { $snippet "version" } " or " { $snippet "extensions" } ", respectively. Intended for use when required OpenGL functionality can be verified either by a minimum version or a set of equivalent extensions." } ;
+
 HELP: require-gl-extensions
 { $values { "extensions" "A sequence of extension name strings" } }
 { $description "Throws an exception if " { $link has-gl-extensions? } " returns false for " { $snippet "extensions" } "." } ;
 
 HELP: require-gl-version-or-extensions
 { $values { "version" "A version string" } { "extensions" "A sequence of extension name strings" } }
-{ $description "Throws an exception if neither " { $link has-gl-version? } " nor " { $link has-gl-extensions? } " returns true for " { $snippet "version" } " or " { $snippet "extensions" } ", respectively. Intended for use when required OpenGL functionality can be verified either by a minimum version, or a set of equivalent extensions." } ;
+{ $description "Throws an exception if neither " { $link has-gl-version? } " nor " { $link has-gl-extensions? } " returns true for " { $snippet "version" } " or " { $snippet "extensions" } ", respectively. Intended for use when required OpenGL functionality can be verified either by a minimum version or a set of equivalent extensions." } ;
 
-{ require-gl-version require-glsl-version require-gl-extensions require-gl-version-or-extensions has-gl-version? has-glsl-version? has-gl-extensions? gl-version glsl-version gl-extensions } related-words
+{ require-gl-version require-glsl-version require-gl-extensions require-gl-version-or-extensions has-gl-version? has-glsl-version? has-gl-extensions? has-gl-version-or-extensions? gl-version glsl-version gl-extensions } related-words
 
 ARTICLE: "gl-utilities" "OpenGL utility words"
 "In addition to the full OpenGL API, the " { $vocab-link "opengl" } " vocabulary includes some utility words to give OpenGL a more Factor-like feel."
