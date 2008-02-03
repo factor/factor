@@ -41,7 +41,4 @@ PRIVATE>
 ! [ euler022 ] 100 ave-time
 ! 123 ms run / 4 ms GC ave time - 100 trials
 
-! source-022 [ natural-sort name-scores sum ] curry 100 ave-time
-! 93 ms run / 2 ms GC ave time - 100 trials
-
 MAIN: euler022

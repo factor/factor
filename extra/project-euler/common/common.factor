@@ -13,6 +13,7 @@ IN: project-euler.common
 ! collect-consecutive - #8, #11
 ! log10 - #25, #134
 ! max-path - #18, #67
+! nth-triangle - #12, #42
 ! number>digits - #16, #20, #30, #34
 ! pandigital? - #32, #38
 ! propagate-all - #18, #67
@@ -76,6 +77,9 @@ PRIVATE>
 
 : number>digits ( n -- seq )
     number>string string>digits ;
+
+: nth-triangle ( n -- n )
+    dup 1+ * 2 / ;
 
 : pandigital? ( n -- ? )
     number>string natural-sort "123456789" = ;
