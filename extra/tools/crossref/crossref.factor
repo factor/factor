@@ -14,8 +14,7 @@ IN: tools.crossref
 
 : (method-usage) ( word generic -- methods )
     tuck methods
-    [ second quot-uses key? ] with subset
-    0 <column>
+    [ second uses member? ] with subset keys
     swap [ 2array ] curry map ;
 
 : method-usage ( word seq -- methods )
