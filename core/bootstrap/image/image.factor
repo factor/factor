@@ -203,7 +203,14 @@ M: f '
 
 ! Words
 
+DEFER: emit-word
+
+: emit-generic ( generic -- )
+    dup "default-method" word-prop method-word emit-word
+    "methods" word-prop [ nip method-word emit-word ] assoc-each ;
+
 : emit-word ( word -- )
+    dup generic? [ dup emit-generic ] when
     [
         dup hashcode ' ,
         dup word-name ' ,
@@ -224,7 +231,7 @@ M: f '
     [ % dup word-vocabulary % " " % word-name % ] "" make throw ;
 
 : transfer-word ( word -- word )
-    dup target-word [ ] [ word-name no-word ] ?if ;
+    dup target-word swap or ;
 
 : fixup-word ( word -- offset )
     transfer-word dup objects get at
@@ -248,7 +255,7 @@ M: wrapper '
     emit-seq ;
 
 : pack-string ( string -- newstr )
-    dup length 1+ bootstrap-cell align 0 pad-right ;
+    dup length bootstrap-cell align 0 pad-right ;
 
 : emit-string ( string -- ptr )
     string type-number object tag-number [
@@ -285,17 +292,20 @@ M: float-array ' float-array emit-dummy-array ;
     ] emit-object ;
 
 : emit-tuple ( obj -- pointer )
-    objects get [
+    [
         [ tuple>array unclip transfer-word , % ] { } make
         tuple type-number dup emit-array
-    ] cache ; inline
+    ]
+    ! Hack
+    over class word-name "tombstone" =
+    [ objects get swap cache ] [ call ] if ;
 
 M: tuple ' emit-tuple ;
 
 M: tombstone '
     delegate
     "((tombstone))" "((empty))" ? "hashtables.private" lookup
-    word-def first emit-tuple ;
+    word-def first objects get [ emit-tuple ] cache ;
 
 M: array '
     array type-number object tag-number emit-array ;
@@ -312,41 +322,6 @@ M: quotation '
             0 emit ! code
         ] emit-object
     ] cache ;
-
-! Vectors and sbufs
-
-M: vector '
-    dup length swap underlying '
-    tuple type-number tuple tag-number [
-        4 emit-fixnum
-        vector ' emit
-        f ' emit
-        emit ! array ptr
-        emit-fixnum ! length
-    ] emit-object ;
-
-M: sbuf '
-    dup length swap underlying '
-    tuple type-number tuple tag-number [
-        4 emit-fixnum
-        sbuf ' emit
-        f ' emit
-        emit ! array ptr
-        emit-fixnum ! length
-    ] emit-object ;
-
-! Hashes
-
-M: hashtable '
-    [ hash-array ' ] keep
-    tuple type-number tuple tag-number [
-        5 emit-fixnum
-        hashtable ' emit
-        f ' emit
-        dup hash-count emit-fixnum
-        hash-deleted emit-fixnum
-        emit ! array ptr
-    ] emit-object ;
 
 ! Curries
 

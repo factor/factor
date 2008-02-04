@@ -42,12 +42,16 @@ M: integer (stack-picture) drop "object" ;
     ] "" make ;
 
 : stack-effect ( word -- effect/f )
-    dup symbol? [
-        drop 0 1 <effect>
-    ] [
-        { "declared-effect" "inferred-effect" }
-        swap word-props [ at ] curry map [ ] find nip
-    ] if ;
+    {
+        { [ dup symbol? ] [ drop 0 1 <effect> ] }
+        { [ dup "parent-generic" word-prop ] [
+            "parent-generic" word-prop stack-effect
+        ] }
+        { [ t ] [
+            { "declared-effect" "inferred-effect" }
+            swap word-props [ at ] curry map [ ] find nip
+        ] }
+    } cond ;
 
 M: effect clone
     [ effect-in clone ] keep effect-out clone <effect> ;

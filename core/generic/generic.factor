@@ -5,12 +5,7 @@ definitions kernel.private classes classes.private
 quotations arrays vocabs ;
 IN: generic
 
-PREDICATE: word generic "combination" word-prop >boolean ;
-
-M: generic definer drop f f ;
-
-M: generic definition drop f ;
-
+! Method combination protocol
 GENERIC: perform-combination ( word combination -- quot )
 
 M: object perform-combination
@@ -22,22 +17,22 @@ M: object perform-combination
     #! the method will throw an error. We don't want that.
     nip [ "Invalid method combination" throw ] curry [ ] like ;
 
+GENERIC: method-prologue ( class combination -- quot )
+
+M: object method-prologue 2drop [ ] ;
+
+GENERIC: make-default-method ( generic combination -- method )
+
+PREDICATE: word generic "combination" word-prop >boolean ;
+
+M: generic definer drop f f ;
+
+M: generic definition drop f ;
+
 : make-generic ( word -- )
     dup dup "combination" word-prop perform-combination define ;
 
-: init-methods ( word -- )
-     dup "methods" word-prop
-     H{ } assoc-like
-     "methods" set-word-prop ;
-
-: define-generic ( word combination -- )
-    dupd "combination" set-word-prop
-    dup init-methods make-generic ;
-
-TUPLE: method loc def ;
-
-: <method> ( def -- method )
-    { set-method-def } \ method construct ;
+TUPLE: method word def specializer generic loc ;
 
 : method ( class generic -- method/f )
     "methods" word-prop at ;
@@ -48,12 +43,10 @@ PREDICATE: pair method-spec
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
 
-: sort-methods ( assoc -- newassoc )
-    [ keys sort-classes ] keep
-    [ dupd at method-def ] curry { } map>assoc ;
-
 : methods ( word -- assoc )
-    "methods" word-prop sort-methods ;
+    "methods" word-prop
+    [ keys sort-classes ] keep
+    [ dupd at method-word ] curry { } map>assoc ;
 
 TUPLE: check-method class generic ;
 
@@ -66,9 +59,30 @@ TUPLE: check-method class generic ;
     swap [ "methods" word-prop swap call ] keep make-generic ;
     inline
 
-: define-method ( method class generic -- )
-    >r >r <method> r> bootstrap-word r> check-method
+: method-word-name ( class word -- string )
+    word-name "/" rot word-name 3append ;
+
+: make-method-def ( quot word combination -- quot )
+    "combination" word-prop method-prologue swap append ;
+
+: <method-word> ( quot class generic -- word )
+    [ make-method-def ] 2keep
+    [ method-word-name f <word> dup ] keep
+    "parent-generic" set-word-prop
+    dup rot define ;
+
+: <method> ( quot class generic -- method )
+    check-method
+    [ <method-word> ] 3keep f \ method construct-boa ;
+
+: define-method ( quot class generic -- )
+    >r bootstrap-word r>
+    [ <method> ] 2keep
     [ set-at ] with-methods ;
+
+: define-default-method ( generic combination -- )
+    dupd make-default-method object bootstrap-word pick <method>
+    "default-method" set-word-prop ;
 
 ! Definition protocol
 M: method-spec where
@@ -105,3 +119,14 @@ M: class forget* ( class -- )
 
 M: assoc update-methods ( assoc -- )
     implementors* [ make-generic ] each ;
+
+: init-methods ( word -- )
+     dup "methods" word-prop
+     H{ } assoc-like
+     "methods" set-word-prop ;
+
+: define-generic ( word combination -- )
+    2dup "combination" set-word-prop
+    dupd define-default-method
+    dup init-methods
+    make-generic ;

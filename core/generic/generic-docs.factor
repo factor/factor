@@ -125,15 +125,11 @@ HELP: method
 { $description "Looks up a method definition." }
 { $class-description "Instances of this class are methods. A method consists of a quotation together with a source location where it was defined." } ;
 
-{ method method-def method-loc define-method POSTPONE: M: } related-words
+{ method define-method POSTPONE: M: } related-words
 
 HELP: <method>
 { $values { "def" "a quotation" } { "method" "a new method definition" } }
 { $description "Creates a new  "{ $link method } " instance." } ;
-
-HELP: sort-methods
-{ $values { "assoc" "an assoc mapping classes to methods" } { "newassoc" "an association list mapping classes to quotations" } }
-{ $description "Outputs a sequence of pairs, where the first element of each pair is a class and the second element is the corresponding method quotation. The methods are sorted by class order; see " { $link sort-classes } "." } ;
 
 HELP: methods
 { $values { "word" generic } { "assoc" "an association list mapping classes to quotations" } }
