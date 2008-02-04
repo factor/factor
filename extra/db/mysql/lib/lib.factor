@@ -1,39 +1,25 @@
+! Copyright (C) 2007 Berlin Brown, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for license.
-! Copyright (C) 2007 Berlin Brown
-! Date: 1/17/2007
-!
-! libs/mysql/mysql.factor
-!
 ! Adapted from mysql.h and mysql.c
 ! Tested with MySQL version - 5.0.24a
-
-IN: mysql
-USING: kernel alien errors io prettyprint 
-    sequences namespaces arrays math tools generic ;
+USING: kernel alien io prettyprint sequences
+namespaces arrays math db.mysql.ffi system ;
+IN: db.mysql.lib
 
 SYMBOL: my-conn
 
-TUPLE: mysql-connection mysqlconn host user password db port handle resulthandle ;
+TUPLE: mysql-db handle host user password db port ;
+TUPLE: mysql-statement ;
+TUPLE: mysql-result-set ;
 
-: init-mysql ( -- conn )
+: new-mysql ( -- conn )
     f mysql_init ;
     
-C: mysql-connection ( host user password db port -- mysql-connection )
-    [ set-mysql-connection-port ] keep
-    [ set-mysql-connection-db ] keep
-    [ set-mysql-connection-password ] keep
-    [ set-mysql-connection-user ] keep
-    [ set-mysql-connection-host ] keep ;
+: mysql-error-string ( mysql-connection -- str )
+    mysql-db-handle mysql_error ;
 
-: (mysql-error) ( mysql-connection -- str )
-    mysql-connection-mysqlconn mysql_error ;
-
-: connect-error-msg ( mysql-connection -- s ) 
-    mysql-connection-mysqlconn mysql_error
-    [
-        "Couldn't connect to mysql database.\n" %
-        "Message: " % %
-    ] "" make ;
+: mysql-error ( mysql -- )
+    mysql-error-string throw ;
 
 : mysql-connect ( mysql-connection -- )
     init-mysql swap
@@ -91,12 +77,7 @@ C: mysql-connection ( host user password db port -- mysql-connection )
 !  Public Word Definitions
 ! =========================================================
 
-: mysql-close ( mysql-connection -- )
-    mysql-connection-mysqlconn mysql_close ;
 
-: mysql-print-table ( seq -- )
-    [ [ write bl ] each "\n" write ] each ;
-    
 : mysql-query ( query -- ret )
     >r my-conn get r> (mysql-query) drop
     my-conn get (mysql-result) ;
@@ -105,20 +86,9 @@ C: mysql-connection ( host user password db port -- mysql-connection )
     mysql-query drop
     my-conn get (mysql-affected-rows) ;
 
-: mysql-error ( -- s )
-    #! Get the last mysql error
-    my-conn get (mysql-error) ; 
-
-: mysql-result>seq ( -- seq )
-    V{ } clone (mysql-result>seq) ;
-        
 : with-mysql ( host user password db port quot -- )
     [ 
         >r <mysql-connection> my-conn set 
             my-conn get mysql-connect drop r> 
         [ my-conn get mysql-close ] cleanup
     ] with-scope ; inline
-    
-: with-mysql-catch ( host user password db port quot -- )
-    [ with-mysql ] catch [ "Caught: " write print ] when* ;
-    
