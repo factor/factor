@@ -1,5 +1,5 @@
 USING: io io.files io.launcher kernel namespaces
-prettyprint tools.test db.sqlite db db.sql sequences
+prettyprint tools.test db.sqlite db sequences
 continuations ;
 IN: temporary
 
