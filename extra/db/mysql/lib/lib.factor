@@ -14,81 +14,65 @@ TUPLE: mysql-result-set ;
 
 : new-mysql ( -- conn )
     f mysql_init ;
-    
-: mysql-error-string ( mysql-connection -- str )
-    mysql-db-handle mysql_error ;
 
 : mysql-error ( mysql -- )
-    mysql-error-string throw ;
+    [ mysql_error throw ] when* ;
 
 : mysql-connect ( mysql-connection -- )
-    init-mysql swap
-    [ set-mysql-connection-mysqlconn ] 2keep
-    [ mysql-connection-host ] keep
-    [ mysql-connection-user ] keep
-    [ mysql-connection-password ] keep
-    [ mysql-connection-db ] keep
-    [ mysql-connection-port f 0 mysql_real_connect ] keep
-    [ set-mysql-connection-handle ] keep 
-    dup mysql-connection-handle 
-    [ connect-error-msg throw ] unless ;
+    new-mysql over set-mysql-db-handle
+    dup {
+        mysql-db-handle
+        mysql-db-host
+        mysql-db-user
+        mysql-db-password
+        mysql-db-db
+        mysql-db-port
+    } get-slots f 0 mysql_real_connect mysql-error ;
 
 ! =========================================================
 ! Low level mysql utility definitions
 ! =========================================================
 
 : (mysql-query) ( mysql-connection query -- ret )
-    >r mysql-connection-mysqlconn r> mysql_query ;
+    >r mysql-db-handle r> mysql_query ;
 
-: (mysql-result) ( mysql-connection -- ret )
-    [ mysql-connection-mysqlconn mysql_use_result ] keep 
-    [ set-mysql-connection-resulthandle ] keep ;
-    
-: (mysql-affected-rows) ( mysql-connection -- n )
-    mysql-connection-mysqlconn mysql_affected_rows ;
+! : (mysql-result) ( mysql-connection -- ret )
+    ! [ mysql-db-handle mysql_use_result ] keep 
+    ! [ set-mysql-connection-resulthandle ] keep ;
 
-: (mysql-free-result) ( mysql-connection -- )
-    mysql-connection-resulthandle drop ;
+! : (mysql-affected-rows) ( mysql-connection -- n )
+    ! mysql-connection-mysqlconn mysql_affected_rows ;
 
-: (mysql-row) ( mysql-connection -- row )
-    mysql-connection-resulthandle mysql_fetch_row ;
+! : (mysql-free-result) ( mysql-connection -- )
+    ! mysql-connection-resulthandle drop ;
 
-: (mysql-num-cols) ( mysql-connection -- n )
-    mysql-connection-resulthandle mysql_num_fields ;
+! : (mysql-row) ( mysql-connection -- row )
+    ! mysql-connection-resulthandle mysql_fetch_row ;
+
+! : (mysql-num-cols) ( mysql-connection -- n )
+    ! mysql-connection-resulthandle mysql_num_fields ;
    
-: mysql-char*-nth ( index object -- str )
-    #! Utility based on 'char*-nth' to perform an additional sanity check on the value
-    #! extracted from the array of strings.
-    void*-nth [ alien>char-string ] [ "" ] if* ;
-        
-: mysql-row>seq ( object n -- seq )
-    [ swap mysql-char*-nth ] map-with ;
-    
-: (mysql-result>seq) ( seq -- seq )
-    my-conn get (mysql-row) dup [       
-        my-conn get (mysql-num-cols) mysql-row>seq
-        over push
-        (mysql-result>seq)
-    ] [ drop ] if 
-    ! Perform needed cleanup on fetched results
-    my-conn get (mysql-free-result) ;
-            
-! =========================================================
-!  Public Word Definitions
-! =========================================================
+! : mysql-char*-nth ( index object -- str )
+    ! #! Utility based on 'char*-nth' to perform an additional sanity check on the value
+    ! #! extracted from the array of strings.
+    ! void*-nth [ alien>char-string ] [ "" ] if* ;
 
+! : mysql-row>seq ( object n -- seq )
+    ! [ swap mysql-char*-nth ] map-with ;
 
-: mysql-query ( query -- ret )
-    >r my-conn get r> (mysql-query) drop
-    my-conn get (mysql-result) ;
+! : (mysql-result>seq) ( seq -- seq )
+    ! my-conn get (mysql-row) dup [       
+        ! my-conn get (mysql-num-cols) mysql-row>seq
+        ! over push
+        ! (mysql-result>seq)
+    ! ] [ drop ] if 
+    ! ! Perform needed cleanup on fetched results
+    ! my-conn get (mysql-free-result) ;
 
-: mysql-command ( query -- n )
-    mysql-query drop
-    my-conn get (mysql-affected-rows) ;
+! : mysql-query ( query -- ret )
+    ! >r my-conn get r> (mysql-query) drop
+    ! my-conn get (mysql-result) ;
 
-: with-mysql ( host user password db port quot -- )
-    [ 
-        >r <mysql-connection> my-conn set 
-            my-conn get mysql-connect drop r> 
-        [ my-conn get mysql-close ] cleanup
-    ] with-scope ; inline
+! : mysql-command ( query -- n )
+    ! mysql-query drop
+    ! my-conn get (mysql-affected-rows) ;

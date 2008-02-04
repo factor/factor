@@ -463,10 +463,6 @@ F_STRING* allot_string_internal(CELL capacity)
 {
 	F_STRING *string = allot_object(STRING_TYPE,string_size(capacity));
 
-	/* strings are null-terminated in memory, even though they also
-	have a length field. The null termination allows us to add
-	the sizeof(F_STRING) to a Factor string to get a C-style
-	char* string for C library calls. */
 	string->length = tag_fixnum(capacity);
 	string->hashcode = F;
 	string->aux = F;

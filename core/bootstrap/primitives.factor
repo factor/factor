@@ -118,11 +118,11 @@ H{ } clone update-map set
 H{ } clone typemap set
 num-types get f <array> builtins set
 
-! These symbols are needed by the code that executes below
-{
-    { "object" "kernel" }
-    { "null" "kernel" }
-} [ create drop ] assoc-each
+! Forward definitions
+"object" "kernel" create t "class" set-word-prop
+"object" "kernel" create union-class "metaclass" set-word-prop
+
+"null" "kernel" create drop
 
 "fixnum" "math" create "fixnum?" "math" create { } define-builtin
 "fixnum" "math" create ">fixnum" "math" create 1quotation "coercer" set-word-prop
