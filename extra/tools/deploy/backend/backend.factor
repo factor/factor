@@ -16,8 +16,11 @@ IN: tools.deploy.backend
 : copy-lines ( stream -- )
     [ (copy-lines) ] with-disposal ;
 
-: run-with-output ( descriptor -- )
-    <process-stream>
+: run-with-output ( arguments -- )
+    [
+        +arguments+ set
+        +stdout+ +stderr+ set
+    ] H{ } make-assoc <process-stream>
     dup duplex-stream-out dispose
     copy-lines ;
 
