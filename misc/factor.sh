@@ -243,6 +243,8 @@ maybe_download_dlls() {
                 check_ret wget
                 wget http://factorcode.org/dlls/vorbis.dll
                 check_ret wget
+                wget http://factorcode.org/dlls/sqlite3.dll
+                check_ret wget
                 chmod 777 *.dll
                 check_ret chmod
         fi
