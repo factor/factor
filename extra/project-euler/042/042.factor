@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii combinators.lib io.files kernel math namespaces
+USING: ascii combinators.lib io.files kernel math math.functions namespaces
     project-euler.common sequences splitting ;
 IN: project-euler.042
 
