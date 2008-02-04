@@ -248,7 +248,7 @@ M: wrapper '
     emit-seq ;
 
 : pack-string ( string -- newstr )
-    dup length 1+ bootstrap-cell align 0 pad-right ;
+    dup length bootstrap-cell align 0 pad-right ;
 
 : emit-string ( string -- ptr )
     string type-number object tag-number [
