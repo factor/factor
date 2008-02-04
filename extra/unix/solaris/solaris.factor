@@ -3,8 +3,6 @@
 IN: unix
 USING: alien.syntax system kernel ;
 
-TYPEDEF: ulong off_t
-
 ! Solaris.
 
 : O_RDONLY  HEX: 0000 ; inline
