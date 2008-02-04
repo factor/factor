@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types arrays kernel math namespaces cocoa
-cocoa.messages cocoa.classes cocoa.types sequences ;
+cocoa.messages cocoa.classes cocoa.types sequences
+continuations ;
 IN: cocoa.views
 
 : NSOpenGLPFAAllRenderers 1 ;
@@ -35,11 +36,23 @@ IN: cocoa.views
 : NSOpenGLPFAPixelBuffer 90 ;
 : NSOpenGLPFAVirtualScreenCount 128 ;
 
+<PRIVATE
+
+SYMBOL: +software-renderer+
+
+PRIVATE>
+
+: with-software-renderer ( quot -- )
+    t +software-renderer+ set
+    [ f +software-renderer+ set ]
+    [ ] cleanup ; inline
+
 : <PixelFormat> ( -- pixelfmt )
     NSOpenGLPixelFormat -> alloc [
         NSOpenGLPFAWindow ,
         NSOpenGLPFADoubleBuffer ,
         NSOpenGLPFADepthSize , 16 ,
+        +software-renderer+ get [ NSOpenGLPFARobust , ] when
         0 ,
     ] { } make >c-int-array
     -> initWithAttributes:
