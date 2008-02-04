@@ -45,7 +45,6 @@ check_gcc_version() {
 }
 
 check_installed_programs() {
-        ensure_program_installed sudo
         ensure_program_installed chmod
         ensure_program_installed uname
         ensure_program_installed git
