@@ -9,9 +9,13 @@ IN: inference.backend
 : recursive-label ( word -- label/f )
     recursive-state get at ;
 
+: inline? ( word -- ? )
+    dup "parent-generic" word-prop
+    [ inline? ] [ "inline" word-prop ] ?if ;
+
 : local-recursive-state ( -- assoc )
     recursive-state get dup keys
-    [ dup word? [ "inline" word-prop ] when not ] find drop
+    [ dup word? [ inline? ] when not ] find drop
     [ head-slice ] when* ;
 
 : inline-recursive-label ( word -- label/f )
@@ -157,7 +161,7 @@ TUPLE: too-many-r> ;
     meta-d get push-all ;
 
 : if-inline ( word true false -- )
-    >r >r dup "inline" word-prop r> r> if ; inline
+    >r >r dup inline? r> r> if ; inline
 
 : consume/produce ( effect node -- )
     over effect-in over consume-values
@@ -331,7 +335,7 @@ TUPLE: unbalanced-branches-error quots in out ;
     #merge node, ; inline
 
 : make-call-node ( word effect -- )
-    swap dup "inline" word-prop
+    swap dup inline?
     over dup recursive-label eq? not and [
         meta-d get clone -rot
         recursive-label #call-label [ consume/produce ] keep
