@@ -233,6 +233,16 @@ maybe_download_dlls() {
                 check_ret wget
                 wget http://factorcode.org/dlls/zlib1.dll
                 check_ret wget
+                wget http://factorcode.org/dlls/OpenAL32.dll
+                check_ret wget
+                wget http://factorcode.org/dlls/alut.dll
+                check_ret wget
+                wget http://factorcode.org/dlls/ogg.dll
+                check_ret wget
+                wget http://factorcode.org/dlls/theora.dll
+                check_ret wget
+                wget http://factorcode.org/dlls/vorbis.dll
+                check_ret wget
                 chmod 777 *.dll
                 check_ret chmod
         fi

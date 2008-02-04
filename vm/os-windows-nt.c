@@ -57,26 +57,26 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
 
-	if(in_code_heap_p(c->Eip))
-		signal_callstack_top = (void *)c->Esp;
+	if(in_code_heap_p(c->EIP))
+		signal_callstack_top = (void *)c->ESP;
 	else
 		signal_callstack_top = NULL;
 
 	if(e->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
 	{
 		signal_fault_addr = e->ExceptionInformation[1];
-		c->Eip = (CELL)memory_signal_handler_impl;
+		c->EIP = (CELL)memory_signal_handler_impl;
 	}
 	else if(e->ExceptionCode == EXCEPTION_FLT_DIVIDE_BY_ZERO
 			|| e->ExceptionCode == EXCEPTION_INT_DIVIDE_BY_ZERO)
 	{
 		signal_number = ERROR_DIVIDE_BY_ZERO;
-		c->Eip = (CELL)divide_by_zero_signal_handler_impl;
+		c->EIP = (CELL)divide_by_zero_signal_handler_impl;
 	}
 	else
 	{
 		signal_number = 11;
-		c->Eip = (CELL)misc_signal_handler_impl;
+		c->EIP = (CELL)misc_signal_handler_impl;
 	}
 
 	return EXCEPTION_CONTINUE_EXECUTION;
