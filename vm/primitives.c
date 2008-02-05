@@ -109,8 +109,6 @@ void *primitives[] = {
 	primitive_millis,
 	primitive_type,
 	primitive_tag,
-	primitive_cwd,
-	primitive_cd,
 	primitive_modify_code_heap,
 	primitive_dlopen,
 	primitive_dlsym,

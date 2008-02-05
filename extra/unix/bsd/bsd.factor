@@ -5,6 +5,8 @@ USING: alien.syntax ;
 
 ! FreeBSD
 
+: MAXPATHLEN 1024 ; inline
+
 : O_RDONLY  HEX: 0000 ; inline
 : O_WRONLY  HEX: 0001 ; inline
 : O_RDWR    HEX: 0002 ; inline

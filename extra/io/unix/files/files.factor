@@ -1,8 +1,15 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend io.nonblocking io.unix.backend io.files io
 unix kernel math continuations math.bitfields ;
 IN: io.unix.files
+
+M: unix-io cwd
+    MAXPATHLEN dup <byte-array> getcwd
+    [ alien>char-string ] [ (io-error) ] if* ;
+
+M: unix-io cd
+    chdir io-error ;
 
 : read-flags O_RDONLY ; inline
 

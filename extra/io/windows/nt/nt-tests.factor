@@ -1,4 +1,4 @@
-USING: io.files kernel tools.test ;
+USING: io.files kernel tools.test io.backend splitting ;
 IN: temporary
 
 [ "c:\\foo\\" ] [ "c:\\foo\\bar" parent-directory ] unit-test
@@ -14,3 +14,7 @@ IN: temporary
 [ f ] [ "c:\\foo" root-directory? ] unit-test
 [ f ] [ "." root-directory? ] unit-test
 [ f ] [ ".." root-directory? ] unit-test
+
+[ ] [ "" resource-path cd ] unit-test
+
+[ "\\foo\\bar" ] [ "/foo/bar" normalize-pathname ":" split1 nip ] unit-test

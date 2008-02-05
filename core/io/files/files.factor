@@ -1,9 +1,13 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.files
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
 system combinators splitting sbufs ;
+
+HOOK: cd io-backend ( path -- )
+
+HOOK: cwd io-backend ( -- path )
 
 HOOK: <file-reader> io-backend ( path -- stream )
 
