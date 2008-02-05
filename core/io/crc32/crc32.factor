@@ -23,8 +23,6 @@ IN: io.crc32
 : crc32 ( seq -- n )
     >r HEX: ffffffff dup r> [ (crc32) ] each bitxor ;
 
-: file-crc32 ( path -- n ) file-contents crc32 ;
-
 : lines-crc32 ( seq -- n )
     HEX: ffffffff tuck [
         [ (crc32) ] each CHAR: \n (crc32)

@@ -17,7 +17,7 @@ TUPLE: monitor queue closed? ;
         set-monitor-queue
     } monitor construct ;
 
-HOOK: fill-queue io-backend ( monitor -- assoc )
+HOOK: fill-queue io-backend ( monitor -- )
 
 : changed-file ( changed path -- )
     namespace [ append ] change-at ;
@@ -32,7 +32,7 @@ HOOK: <monitor> io-backend ( path recursive? -- monitor )
 : next-change ( monitor -- path changed )
     dup check-monitor
     dup monitor-queue dup assoc-empty? [
-        drop dup fill-queue over set-monitor-queue next-change
+        drop dup fill-queue next-change
     ] [ nip dequeue-change ] if ;
 
 SYMBOL: +add-file+
