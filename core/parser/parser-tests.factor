@@ -342,7 +342,7 @@ IN: temporary
         [
             "IN: temporary \\ class-fwd-test"
             <string-reader> "redefining-a-class-3" parse-stream drop
-        ] catch [ forward-error? ] is?
+        ] catch [ no-word? ] is?
     ] unit-test
 
     [ ] [
@@ -354,7 +354,7 @@ IN: temporary
         [
             "IN: temporary \\ class-fwd-test"
             <string-reader> "redefining-a-class-3" parse-stream drop
-        ] catch [ forward-error? ] is?
+        ] catch [ no-word? ] is?
     ] unit-test
 
     [ t ] [

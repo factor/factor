@@ -26,11 +26,6 @@ TUPLE: redefine-error def ;
     over new-definitions get first key? [ dup redefine-error ] when
     new-definitions get second (remember-definition) ;
 
-TUPLE: forward-error word ;
-
-: forward-error ( word -- )
-    \ forward-error construct-boa throw ;
-
 : forward-reference? ( word -- ? )
     dup old-definitions get assoc-stack
     [ new-definitions get assoc-stack not ]

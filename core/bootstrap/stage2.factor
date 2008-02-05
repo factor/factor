@@ -24,6 +24,7 @@ IN: bootstrap.stage2
         "Cross-referencing..." print flush
         H{ } clone crossref set-global
         xref-words
+        xref-generics
         xref-sources
     ] unless
 

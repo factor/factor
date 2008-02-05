@@ -202,9 +202,7 @@ HELP: location
 
 HELP: save-location
 { $values { "definition" "a definition specifier" } }
-{ $description "Saves the location of a definition and associates this definition with the current source file."
-$nl
-"This is the book-keeping required to detect " { $link redefine-error } " and " { $link forward-error } "." } ;
+{ $description "Saves the location of a definition and associates this definition with the current source file." } ;
 
 HELP: parser-notes
 { $var-description "A boolean controlling whether the parser will print various notes and warnings. Switched on by default. If a source file is being run for its effect on the " { $link stdio } " stream, this variable should be switched off, to prevent parser notes from polluting the output." } ;

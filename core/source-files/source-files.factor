@@ -96,3 +96,17 @@ SYMBOL: file
         source-file-definitions old-definitions set
         [ ] [ file get rollback-source-file ] cleanup
     ] with-scope ; inline
+
+: smart-usage ( word -- definitions )
+    \ f or usage [
+        dup method-body? [
+            "method" word-prop
+            { method-specializer method-generic } get-slots
+            2array
+        ] when
+    ] map ;
+
+: outside-usages ( seq -- usages )
+    dup [
+        over smart-usage [ pathname? not ] subset seq-diff
+    ] curry { } map>assoc ;

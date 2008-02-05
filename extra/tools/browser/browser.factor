@@ -238,7 +238,7 @@ C: <vocab-author> vocab-author
 : vocab-xref ( vocab quot -- vocabs )
     >r dup vocab-name swap words r> map
     [ [ word? ] subset [ word-vocabulary ] map ] map>set
-    remove [ vocab ] map ; inline
+    remove [ ] subset [ vocab ] map ; inline
 
 : vocab-uses ( vocab -- vocabs ) [ uses ] vocab-xref ;
 

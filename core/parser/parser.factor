@@ -235,7 +235,8 @@ M: no-word summary
 
 : no-word ( name -- newword )
     dup \ no-word construct-boa
-    swap words-named word-restarts throw-restarts
+    swap words-named [ forward-reference? not ] subset
+    word-restarts throw-restarts
     dup word-vocabulary (use+) ;
 
 : check-forward ( str word -- word )
@@ -244,7 +245,7 @@ M: no-word summary
         dup use get
         [ at ] with map [ ] subset
         [ forward-reference? not ] find nip
-        [ ] [ forward-error ] ?if
+        [ ] [ no-word ] ?if
     ] [
         nip
     ] if ;
@@ -414,11 +415,6 @@ SYMBOL: interactive-vocabs
         nl
         over stack.
     ] when 2drop ;
-
-: outside-usages ( seq -- usages )
-    dup [
-        over usage [ pathname? not ] subset seq-diff
-    ] curry { } map>assoc ;
 
 : filter-moved ( assoc -- newassoc )
     [
