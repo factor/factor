@@ -134,3 +134,13 @@ M: assoc update-methods ( assoc -- )
         dupd define-default-method
         make-generic
     ] if ;
+
+: subwords ( generic -- seq )
+    dup "methods" word-prop values
+    swap "default-method" word-prop add
+    [ method-word ] map ;
+
+: xref-generics ( -- )
+    all-words
+    [ generic? ] subset
+    [ subwords [ xref ] each ] each ;
