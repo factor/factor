@@ -107,10 +107,6 @@ HELP: make-generic
 { $description "Regenerates the definition of a generic word by applying the method combination to the set of defined methods." }
 $low-level-note ;
 
-HELP: init-methods
-{ $values { "word" word } }
-{ $description "Prepare to define a generic word." } ;
-
 HELP: define-generic
 { $values { "word" word } { "combination" "a method combination" } }
 { $description "Defines a generic word. A method combination is an object which responds to the " { $link perform-combination } " generic word." }

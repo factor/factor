@@ -10,7 +10,7 @@ TUPLE: standard-combination # ;
 
 M: standard-combination method-prologue
     standard-combination-# object
-    <array> swap add [ declare ] curry ;
+    <array> swap add* [ declare ] curry ;
 
 C: <standard-combination> standard-combination
 
