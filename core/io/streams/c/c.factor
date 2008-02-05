@@ -74,3 +74,10 @@ M: object <file-writer>
 
 M: object <file-appender>
     "ab" fopen <c-writer> <plain-writer> ;
+
+: show ( msg -- )
+    #! A word which directly calls primitives. It is used to
+    #! print stuff from contexts where the I/O system would
+    #! otherwise not work (tools.deploy.shaker, the I/O
+    #! multiplexer thread).
+    "\r\n" append stdout-handle fwrite stdout-handle fflush ;

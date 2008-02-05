@@ -1,9 +1,10 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays arrays generator.registers assocs
-kernel kernel.private libc math namespaces parser sequences
-strings words assocs splitting math.parser cpu.architecture
-alien alien.accessors quotations system compiler.units ;
+USING: bit-arrays byte-arrays float-arrays arrays
+generator.registers assocs kernel kernel.private libc math
+namespaces parser sequences strings words assocs splitting
+math.parser cpu.architecture alien alien.accessors quotations
+system compiler.units ;
 IN: alien.c-types
 
 TUPLE: c-type
@@ -107,6 +108,14 @@ M: string stack-size c-type stack-size ;
 
 M: c-type stack-size c-type-size ;
 
+GENERIC: byte-length ( seq -- n ) flushable
+
+M: bit-array byte-length length 7 + -3 shift ;
+
+M: byte-array byte-length length ;
+
+M: float-array byte-length length "double" heap-size * ;
+
 : c-getter ( name -- quot )
     c-type c-type-getter [
         [ "Cannot read struct fields with type" throw ]
@@ -204,6 +213,9 @@ M: long-long-type box-return ( type -- )
 : define-out ( name vocab -- )
     over [ <c-object> tuck 0 ] over c-setter append swap
     >r >r constructor-word r> r> add* define-inline ;
+
+: c-bool> ( int -- ? )
+    zero? not ;
 
 : >c-array ( seq type word -- )
     >r >r dup length dup r> <c-array> dup -roll r>

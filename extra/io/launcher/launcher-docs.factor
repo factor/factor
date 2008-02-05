@@ -116,6 +116,15 @@ HELP: run-detached
     "The output value can be passed to " { $link wait-for-process } " to get an exit code."
 } ;
 
+HELP: kill-process
+{ $values { "process" process } }
+{ $description "Kills a running process. Does nothing if the process has already exited." } ;
+
+HELP: kill-process*
+{ $values { "handle" "a process handle" } }
+{ $contract "Kills a running process." }
+{ $notes "User code should call " { $link kill-process } " intead." } ;
+
 HELP: process
 { $class-description "A class representing an active or finished process."
 $nl
@@ -137,8 +146,8 @@ HELP: with-process-stream
 { $values
   { "desc" "a launch descriptor" }
   { "quot" quotation }
-  { "process" process } }
-{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a " { $link process-stream } ". When the quotation returns, the " { $link process } " instance is output." } ;
+  { "status" "an exit code" } }
+{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a " { $link process-stream } ". After the quotation returns, waits for the process to end and outputs the exit code." } ;
 
 HELP: wait-for-process
 { $values { "process" process } { "status" integer } }
@@ -166,6 +175,8 @@ $nl
 "The following words are used to launch processes:"
 { $subsection run-process }
 { $subsection run-detached }
+"Stopping processes:"
+{ $subsection kill-process }
 "Redirecting standard input and output to a pipe:"
 { $subsection <process-stream> }
 { $subsection with-process-stream }

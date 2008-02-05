@@ -84,6 +84,11 @@ HOOK: run-process* io-backend ( desc -- handle )
 : run-detached ( desc -- process )
     >descriptor H{ { +detached+ t } } union run-process ;
 
+HOOK: kill-process* io-backend ( handle -- )
+
+: kill-process ( process -- )
+    process-handle [ kill-process* ] when* ;
+
 HOOK: process-stream* io-backend ( desc -- stream process )
 
 TUPLE: process-stream process ;
@@ -93,10 +98,10 @@ TUPLE: process-stream process ;
     { set-delegate set-process-stream-process }
     process-stream construct ;
 
-: with-process-stream ( desc quot -- process )
+: with-process-stream ( desc quot -- status )
     swap <process-stream>
     [ swap with-stream ] keep
-    process-stream-process ; inline
+    process-stream-process wait-for-process ; inline
 
 : notify-exit ( status process -- )
     [ set-process-status ] keep

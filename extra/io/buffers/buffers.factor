@@ -14,7 +14,7 @@ TUPLE: buffer size ptr fill pos ;
     dup buffer-ptr free  f swap set-buffer-ptr ;
 
 : buffer-reset ( n buffer -- )
-    [ set-buffer-fill ] keep 0 swap set-buffer-pos ;
+    0 swap { set-buffer-fill set-buffer-pos } set-slots ;
 
 : buffer-consume ( n buffer -- )
     [ buffer-pos + ] keep

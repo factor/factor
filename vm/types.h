@@ -11,7 +11,7 @@ INLINE CELL string_capacity(F_STRING* str)
 
 INLINE CELL string_size(CELL size)
 {
-	return sizeof(F_STRING) + size + 1;
+	return sizeof(F_STRING) + size;
 }
 
 DEFINE_UNTAG(F_BYTE_ARRAY,BYTE_ARRAY_TYPE,byte_array)

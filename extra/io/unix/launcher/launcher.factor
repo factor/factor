@@ -57,7 +57,8 @@ MEMO: 'arguments' ( -- parser )
 : setup-redirection ( -- )
     +stdin+ get read-flags 0 redirect
     +stdout+ get write-flags 1 redirect
-    +stderr+ get write-flags 2 redirect ;
+    +stderr+ get dup +stdout+ eq?
+    [ drop 1 2 dup2 io-error ] [ write-flags 2 redirect ] if ;
 
 : spawn-process ( -- )
     [
@@ -73,6 +74,9 @@ M: unix-io run-process* ( desc -- pid )
     [
         [ spawn-process ] [ ] with-fork <process>
     ] with-descriptor ;
+
+M: unix-io kill-process* ( pid -- )
+    SIGTERM kill io-error ;
 
 : open-pipe ( -- pair )
     2 "int" <c-array> dup pipe zero?
@@ -107,7 +111,7 @@ M: unix-io process-stream*
         2drop t
     ] [
         find-process dup [
-            >r *uint r> notify-exit f
+            >r *int WEXITSTATUS r> notify-exit f
         ] [
             2drop f
         ] if

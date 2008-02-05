@@ -132,8 +132,8 @@ FUNCTION: int ffi_test_10 int a int b double c int d float e int f int g int h ;
 [ -34 ] [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] unit-test
 
 FUNCTION: void ffi_test_20 double x1, double x2, double x3,
-	double y1, double y2, double y3,
-	double z1, double z2, double z3 ;
+    double y1, double y2, double y3,
+    double z1, double z2, double z3 ;
 
 [ ] [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
 
@@ -269,6 +269,16 @@ FUNCTION: double ffi_test_35 test-struct-11 x int y ;
     2 over set-test-struct-11-y
     3 ffi_test_35
 ] unit-test
+
+C-STRUCT: test-struct-12 { "int" "a" } { "double" "x" } ;
+
+: make-struct-12
+    "test-struct-12" <c-object>
+    [ set-test-struct-12-x ] keep ;
+
+FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
+
+[ 1.23456 ] [ 1.23456 make-struct-12 ffi_test_36 ] unit-test
 
 ! Test callbacks
 

@@ -1,4 +1,4 @@
-USING: alien.syntax kernel math windows.types ;
+USING: alien.syntax kernel math windows.types math.bitfields ;
 IN: windows.advapi32
 LIBRARY: advapi32
 
@@ -483,20 +483,28 @@ FUNCTION: BOOL LookupPrivilegeValueW ( LPCTSTR lpSystemName,
 : TOKEN_QUERY_SOURCE           HEX: 0010 ; inline
 : TOKEN_ADJUST_DEFAULT         HEX: 0080 ; inline
 : TOKEN_READ STANDARD_RIGHTS_READ TOKEN_QUERY bitor ;
-: TOKEN_WRITE       STANDARD_RIGHTS_WRITE
-                                        TOKEN_ADJUST_PRIVILEGES bitor
-                                        TOKEN_ADJUST_GROUPS bitor
-                                        TOKEN_ADJUST_DEFAULT bitor ; foldable
-: TOKEN_ALL_ACCESS  STANDARD_RIGHTS_REQUIRED
-                                        TOKEN_ASSIGN_PRIMARY bitor
-                                        TOKEN_DUPLICATE bitor
-                                        TOKEN_IMPERSONATE bitor
-                                        TOKEN_QUERY bitor
-                                        TOKEN_QUERY_SOURCE bitor
-                                        TOKEN_ADJUST_PRIVILEGES bitor
-                                        TOKEN_ADJUST_GROUPS bitor
-                                        TOKEN_ADJUST_SESSIONID bitor
-                                        TOKEN_ADJUST_DEFAULT bitor ; foldable
+
+: TOKEN_WRITE
+    {
+        STANDARD_RIGHTS_WRITE
+        TOKEN_ADJUST_PRIVILEGES
+        TOKEN_ADJUST_GROUPS
+        TOKEN_ADJUST_DEFAULT
+    } flags ; foldable
+
+: TOKEN_ALL_ACCESS
+    {
+        STANDARD_RIGHTS_REQUIRED
+        TOKEN_ASSIGN_PRIMARY
+        TOKEN_DUPLICATE
+        TOKEN_IMPERSONATE
+        TOKEN_QUERY
+        TOKEN_QUERY_SOURCE
+        TOKEN_ADJUST_PRIVILEGES
+        TOKEN_ADJUST_GROUPS
+        TOKEN_ADJUST_SESSIONID
+        TOKEN_ADJUST_DEFAULT
+    } flags ; foldable
 
 FUNCTION: BOOL OpenProcessToken ( HANDLE ProcessHandle,
                                   DWORD DesiredAccess,

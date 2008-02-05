@@ -12,7 +12,7 @@
 ! and note the section.
 
 USING: kernel arrays alien alien.c-types alien.syntax
-math words sequences namespaces continuations ;
+math math.bitfields words sequences namespaces continuations ;
 IN: x11.xlib
 
 LIBRARY: xlib
@@ -1088,8 +1088,8 @@ FUNCTION: Status XWithdrawWindow (
 : PAspect       1 7 shift ; inline
 : PBaseSize     1 8 shift ; inline
 : PWinGravity   1 9 shift ; inline
-: PAllHints [ PPosition PSize PMinSize PMaxSize PResizeInc PAspect ]
-0 [ execute bitor ] reduce ; inline
+: PAllHints 
+    { PPosition PSize PMinSize PMaxSize PResizeInc PAspect } flags ; foldable
 
 C-STRUCT: XSizeHints
     { "long" "flags" }
