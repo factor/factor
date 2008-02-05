@@ -111,7 +111,7 @@ M: unix-io process-stream*
         2drop t
     ] [
         find-process dup [
-            >r *uint r> notify-exit f
+            >r *int WEXITSTATUS r> notify-exit f
         ] [
             2drop f
         ] if
