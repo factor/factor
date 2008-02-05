@@ -196,7 +196,7 @@ git_clone() {
 
 git_pull_factorcode() {
         echo "Updating the git repository from factorcode.org..."
-        git pull git://factorcode.org/git/factor.git
+        git pull git://factorcode.org/git/factor.git master
         check_ret git
 }
 
@@ -219,6 +219,7 @@ delete_boot_images() {
         echo "Deleting old images..."
         rm $BOOT_IMAGE > /dev/null 2>&1
         rm $BOOT_IMAGE.* > /dev/null 2>&1
+		rm staging.*.image > /dev/null 2>&1
 }
 
 get_boot_image() {
