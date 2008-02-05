@@ -1,7 +1,8 @@
 
 USING: kernel io io.files io.launcher hashtables tools.deploy.backend
        system continuations namespaces sequences splitting math.parser
-       prettyprint tools.time calendar bake vars http.client ;
+       prettyprint tools.time calendar bake vars http.client
+       combinators ;
 
 IN: builder
 
@@ -36,6 +37,15 @@ SYMBOL: builder-recipients
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : target ( -- target ) `{ ,[ os ] %[ cpu "." split ] } "-" join ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: factor-binary ( -- name )
+  os
+  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
+    { "windows" [ "./factor-nt.exe" ] }
+    [ drop "./factor" ] }
+  case ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -92,7 +102,7 @@ VAR: stamp
 
   `{
      { +arguments+ {
-                     "./factor"
+                     ,[ factor-binary ]
                      ,[ "-i=" boot-image-name append ]
                      "-no-user-init"
                    } }
@@ -110,7 +120,8 @@ VAR: stamp
   ] if
 
   `{
-     { +arguments+ { "./factor" "-e=USE: tools.browser load-everything" } }
+     { +arguments+
+       { ,[ factor-binary ] "-e=USE: tools.browser load-everything" } }
      { +stdout+    "../load-everything-log" }
      { +stderr+    +stdout+ }
    }
