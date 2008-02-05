@@ -33,10 +33,18 @@ IN: opengl
 : do-enabled-client-state ( what quot -- )
     over glEnableClientState dip glDisableClientState ; inline
 
-: all-enabled ( seq quot -- )
+: words>values ( word/value-seq -- value-seq )
+    [ dup word? [ execute ] [ ] if ] map ;
+
+: (all-enabled) ( seq quot -- )
     over [ glEnable ] each dip [ glDisable ] each ; inline
-: all-enabled-client-state ( seq quot -- )
+: (all-enabled-client-state) ( seq quot -- )
     over [ glEnableClientState ] each dip [ glDisableClientState ] each ; inline
+
+MACRO: all-enabled ( seq quot -- )
+    >r words>values r> [ (all-enabled) ] 2curry ;
+MACRO: all-enabled-client-state ( seq quot -- )
+    >r words>values r> [ (all-enabled-client-state) ] 2curry ;
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
@@ -106,10 +114,6 @@ IN: opengl
     >r 1 0 <uint> r> keep *uint ; inline
 : gen-texture ( -- id )
     [ glGenTextures ] (gen-gl-object) ;
-: gen-framebuffer ( -- id )
-    [ glGenFramebuffersEXT ] (gen-gl-object) ;
-: gen-renderbuffer ( -- id )
-    [ glGenRenderbuffersEXT ] (gen-gl-object) ;
 : gen-gl-buffer ( -- id )
     [ glGenBuffers ] (gen-gl-object) ;
 
@@ -117,10 +121,6 @@ IN: opengl
     >r 1 swap <uint> r> call ; inline
 : delete-texture ( id -- )
     [ glDeleteTextures ] (delete-gl-object) ;
-: delete-framebuffer ( id -- )
-    [ glDeleteFramebuffersEXT ] (delete-gl-object) ;
-: delete-renderbuffer ( id -- )
-    [ glDeleteRenderbuffersEXT ] (delete-gl-object) ;
 : delete-gl-buffer ( id -- )
     [ glDeleteBuffers ] (delete-gl-object) ;
 
@@ -141,40 +141,14 @@ IN: opengl
 : buffer-offset ( int -- alien )
     <alien> ; inline
 
-: framebuffer-incomplete? ( -- status/f )
-    GL_FRAMEBUFFER_EXT glCheckFramebufferStatusEXT
-    dup GL_FRAMEBUFFER_COMPLETE_EXT = f rot ? ;
-
-: framebuffer-error ( status -- * )
-    { { GL_FRAMEBUFFER_COMPLETE_EXT [ "framebuffer complete" ] }
-      { GL_FRAMEBUFFER_UNSUPPORTED_EXT [ "framebuffer configuration unsupported" ] }
-      { GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT [ "framebuffer incomplete (incomplete attachment)" ] }
-      { GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT [ "framebuffer incomplete (missing attachment)" ] }
-      { GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT [ "framebuffer incomplete (dimension mismatch)" ] }
-      { GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT [ "framebuffer incomplete (format mismatch)" ] }
-      { GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT [ "framebuffer incomplete (draw buffer(s) have no attachment)" ] }
-      { GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT [ "framebuffer incomplete (read buffer has no attachment)" ] }
-      [ drop gl-error "unknown framebuffer error" ] } case throw ;
-
-: check-framebuffer ( -- )
-    framebuffer-incomplete? [ framebuffer-error ] when* ;
-
-: with-framebuffer ( id quot -- )
-    GL_FRAMEBUFFER_EXT rot glBindFramebufferEXT
-    [ GL_FRAMEBUFFER_EXT 0 glBindFramebufferEXT ] [ ] cleanup ; inline
-
 : bind-texture-unit ( id target unit -- )
     glActiveTexture swap glBindTexture gl-error ;
 
-: framebuffer-attachment ( attachment -- id )
-    GL_FRAMEBUFFER_EXT swap GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT
-    0 <uint> [ glGetFramebufferAttachmentParameterivEXT ] keep *uint ;
-    
 : (set-draw-buffers) ( buffers -- )
     dup length swap >c-uint-array glDrawBuffers ;
 
 MACRO: set-draw-buffers ( buffers -- )
-    [ dup word? [ execute ] [ ] if ] map [ (set-draw-buffers) ] curry ;
+    words>values [ (set-draw-buffers) ] curry ;
 
 : do-attribs ( bits quot -- )
     swap glPushAttrib call glPopAttrib ; inline
@@ -274,196 +248,3 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     glLoadIdentity
     GL_MODELVIEW glMatrixMode
     glLoadIdentity ;
-
-! Shaders
-
-: c-true? ( int -- ? ) zero? not ; inline
-
-: with-gl-shader-source-ptr ( string quot -- )
-    swap string>char-alien malloc-byte-array [
-        <void*> swap call
-    ] keep free ; inline
-
-: <gl-shader> ( source kind -- shader )
-    glCreateShader dup rot
-    [ 1 swap f glShaderSource ] with-gl-shader-source-ptr
-    [ glCompileShader ] keep
-    gl-error ;
-
-: (gl-shader?) ( object -- ? )
-    dup integer? [ glIsShader c-true? ] [ drop f ] if ;
-
-: gl-shader-get-int ( shader enum -- value )
-    0 <int> [ glGetShaderiv ] keep *int ;
-
-: gl-shader-ok? ( shader -- ? )
-    GL_COMPILE_STATUS gl-shader-get-int c-true? ;
-
-: <vertex-shader> ( source -- vertex-shader )
-    GL_VERTEX_SHADER <gl-shader> ; inline
-
-: (vertex-shader?) ( object -- ? )
-    dup (gl-shader?)
-    [ GL_SHADER_TYPE gl-shader-get-int GL_VERTEX_SHADER = ]
-    [ drop f ] if ;
-
-: <fragment-shader> ( source -- fragment-shader )
-    GL_FRAGMENT_SHADER <gl-shader> ; inline
-
-: (fragment-shader?) ( object -- ? )
-    dup (gl-shader?)
-    [ GL_SHADER_TYPE gl-shader-get-int GL_FRAGMENT_SHADER = ]
-    [ drop f ] if ;
-
-: gl-shader-info-log-length ( shader -- log-length )
-    GL_INFO_LOG_LENGTH gl-shader-get-int ; inline
-
-: gl-shader-info-log ( shader -- log )
-    dup gl-shader-info-log-length dup [
-        [ 0 <int> swap glGetShaderInfoLog ] keep
-        alien>char-string
-    ] with-malloc ;
-
-: check-gl-shader ( shader -- shader* )
-    dup gl-shader-ok? [ dup gl-shader-info-log throw ] unless ;
-
-: delete-gl-shader ( shader -- ) glDeleteShader ; inline
-
-PREDICATE: integer gl-shader (gl-shader?) ;
-PREDICATE: gl-shader vertex-shader (vertex-shader?) ;
-PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
-
-! Programs
-
-: <gl-program> ( shaders -- program )
-    glCreateProgram swap
-    [ dupd glAttachShader ] each
-    [ glLinkProgram ] keep
-    gl-error ;
-    
-: (gl-program?) ( object -- ? )
-    dup integer? [ glIsProgram c-true? ] [ drop f ] if ;
-
-: gl-program-get-int ( program enum -- value )
-    0 <int> [ glGetProgramiv ] keep *int ;
-
-: gl-program-ok? ( program -- ? )
-    GL_LINK_STATUS gl-program-get-int c-true? ;
-
-: gl-program-info-log-length ( program -- log-length )
-    GL_INFO_LOG_LENGTH gl-program-get-int ; inline
-
-: gl-program-info-log ( program -- log )
-    dup gl-program-info-log-length dup [
-        [ 0 <int> swap glGetProgramInfoLog ] keep
-        alien>char-string
-    ] with-malloc ;
-
-: check-gl-program ( program -- program* )
-    dup gl-program-ok? [ dup gl-program-info-log throw ] unless ;
-
-: gl-program-shaders-length ( program -- shaders-length )
-    GL_ATTACHED_SHADERS gl-program-get-int ; inline
-
-: gl-program-shaders ( program -- shaders )
-    dup gl-program-shaders-length [
-        dup "GLuint" <c-array>
-        [ 0 <int> swap glGetAttachedShaders ] keep
-    ] keep c-uint-array> ;
-
-: delete-gl-program-only ( program -- )
-    glDeleteProgram ; inline
-
-: detach-gl-program-shader ( program shader -- )
-    glDetachShader ; inline
-
-: delete-gl-program ( program -- )
-    dup gl-program-shaders [
-        2dup detach-gl-program-shader delete-gl-shader
-    ] each delete-gl-program-only ;
-
-: (with-gl-program) ( program quot -- )
-    swap glUseProgram [ 0 glUseProgram ] [ ] cleanup ; inline
-
-: (with-gl-program-uniforms) ( uniforms -- quot )
-    [ [ swap , \ glGetUniformLocation , % ] [ ] make ]
-    { } assoc>map ;
-: (make-with-gl-program) ( uniforms quot -- q )
-    [
-        \ dup ,
-        [ swap (with-gl-program-uniforms) , \ call-with , % ]
-        [ ] make ,
-        \ (with-gl-program) ,
-    ] [ ] make ;
-
-MACRO: with-gl-program ( uniforms quot -- )
-    (make-with-gl-program) ;
-
-PREDICATE: integer gl-program (gl-program?) ;
-
-: <simple-gl-program> ( vertex-shader-source fragment-shader-source -- program )
-    >r <vertex-shader> check-gl-shader
-    r> <fragment-shader> check-gl-shader
-    2array <gl-program> check-gl-program ;
-
-: (require-gl) ( thing require-quot make-error-quot -- )
-    >r dupd call
-    [ r> 2drop ]
-    [ r> " " make throw ]
-    if ; inline
-
-: gl-extensions ( -- seq )
-    GL_EXTENSIONS glGetString " " split ;
-: has-gl-extensions? ( extensions -- ? )
-    gl-extensions swap [ over member? ] all? nip ;
-: (make-gl-extensions-error) ( required-extensions -- )
-    gl-extensions swap seq-diff
-    "Required OpenGL extensions not supported:\n" %
-    [ "    " % % "\n" % ] each ;
-: require-gl-extensions ( extensions -- )
-    [ has-gl-extensions? ]
-    [ (make-gl-extensions-error) ]
-    (require-gl) ;
-
-: version-seq ( version-string -- version-seq )
-    "." split [ string>number ] map ;
-
-: version<=> ( version1 version2 -- n )
-    swap version-seq swap version-seq <=> ;
-
-: (gl-version) ( -- version vendor )
-    GL_VERSION glGetString " " split1 ;
-: gl-version ( -- version )
-    (gl-version) drop ;
-: gl-vendor-version ( -- version )
-    (gl-version) nip ;
-: has-gl-version? ( version -- ? )
-    gl-version version<=> 0 <= ;
-: (make-gl-version-error) ( required-version -- )
-    "Required OpenGL version " % % " not supported (" % gl-version % " available)" % ;
-: require-gl-version ( version -- )
-    [ has-gl-version? ]
-    [ (make-gl-version-error) ]
-    (require-gl) ;
-
-: (glsl-version) ( -- version vendor )
-    GL_SHADING_LANGUAGE_VERSION glGetString " " split1 ;
-: glsl-version ( -- version )
-    (glsl-version) drop ;
-: glsl-vendor-version ( -- version )
-    (glsl-version) nip ;
-: has-glsl-version? ( version -- ? )
-    glsl-version version<=> 0 <= ;
-: require-glsl-version ( version -- )
-    [ has-glsl-version? ]
-    [ "Required GLSL version " % % " not supported (" % glsl-version % " available)" % ]
-    (require-gl) ;
-
-: has-gl-version-or-extensions? ( version extensions -- ? )
-    has-gl-extensions? swap has-gl-version? or ;
-
-: require-gl-version-or-extensions ( version extensions -- )
-    2array [ first2 has-gl-version-or-extensions? ] [
-        dup first (make-gl-version-error) "\n" %
-        second (make-gl-extensions-error) "\n" %
-    ] (require-gl) ;

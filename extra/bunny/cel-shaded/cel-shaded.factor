@@ -1,5 +1,6 @@
 USING: arrays bunny.model combinators.lib continuations
-kernel multiline opengl opengl.gl sequences ;
+kernel multiline opengl opengl.shaders opengl.capabilities
+opengl.gl sequences ;
 IN: bunny.cel-shaded
 
 STRING: vertex-shader-source
