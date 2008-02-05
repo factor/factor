@@ -19,10 +19,12 @@ TYPEDEF: uint time_t
 TYPEDEF: uint uid_t
 TYPEDEF: ulong size_t
 TYPEDEF: ulong u_long
-TYPEDEF: ulonglong off_t
 TYPEDEF: ushort mode_t
 TYPEDEF: ushort nlink_t
 TYPEDEF: void* caddr_t
+
+TYPEDEF: ulong off_t
+TYPEDEF-IF: bsd? ulonglong off_t
 
 C-STRUCT: tm
     { "int" "sec" }    ! Seconds: 0-59 (K&R says 0-61?)
