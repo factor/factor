@@ -78,6 +78,7 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
     dup FILE_NOTIFY_INFORMATION-NextEntryOffset dup zero?
     [ 3drop ] [ swap <displaced-alien> (changed-files) ] if ;
 
-M: windows-nt-io fill-queue ( monitor -- assoc )
-    dup win32-monitor-path over buffer-ptr rot read-changes
-    [ zero? [ 2drop ] [ (changed-files) ] if ] H{ } make-assoc ;
+M: windows-nt-io fill-queue ( monitor -- )
+    dup win32-monitor-path over buffer-ptr pick read-changes
+    [ zero? [ 2drop ] [ (changed-files) ] if ] H{ } make-assoc
+    swap set-monitor-queue ;

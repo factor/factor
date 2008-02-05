@@ -54,21 +54,22 @@ TUPLE: inotify watches ;
 M: linux-io <monitor> ( path recursive? -- monitor )
     drop IN_CHANGE_EVENTS add-watch ;
 
-: notify-callback ( assoc monitor -- )
-    linux-monitor-callback dup
-    [ schedule-thread-with ] [ 2drop ] if ;
+: notify-callback ( monitor -- )
+    dup linux-monitor-callback
+    f rot set-linux-monitor-callback
+    [ schedule-thread ] when* ;
 
-M: linux-io fill-queue ( monitor -- assoc )
+M: linux-io fill-queue ( monitor -- )
     dup linux-monitor-callback [
         "Cannot wait for changes on the same file from multiple threads" throw
     ] when
-    [ swap set-linux-monitor-callback stop ] callcc1
-    swap check-monitor ;
+    [ swap set-linux-monitor-callback stop ] callcc0
+    check-monitor ;
 
 M: linux-monitor dispose ( monitor -- )
     dup check-monitor
     t over set-monitor-closed?
-    H{ } over notify-callback
+    dup notify-callback
     remove-watch ;
 
 : ?flag ( n mask symbol -- n )
@@ -106,13 +107,13 @@ M: linux-monitor dispose ( monitor -- )
     inotify-event-len "inotify-event" heap-size +
     swap >r + r> ;
 
-: wd>queue ( wd -- queue )
-    inotify-event-wd wd>monitor monitor-queue ;
-
 : parse-file-notifications ( i buffer -- )
     2dup events-exhausted? [ 2drop ] [
-        2dup inotify-event@ dup inotify-event-wd wd>queue
-        [ parse-file-notify changed-file ] bind
+        2dup inotify-event@ dup inotify-event-wd wd>monitor [
+            monitor-queue [
+                parse-file-notify changed-file
+            ] bind
+        ] keep notify-callback
         next-event parse-file-notifications
     ] if ;
 
@@ -135,7 +136,7 @@ M: inotify-task do-io-task ( task -- )
     io-task-port read-notifications f ;
 
 M: linux-io init-io ( -- )
-    <select-mx> mx set-global ; ! init-inotify ;
+    <select-mx> dup mx set-global init-inotify ;
 
 T{ linux-io } set-io-backend
 
