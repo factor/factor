@@ -176,6 +176,9 @@ M: f tag-and-f 4 ;
 ! define-class hashing issue
 TUPLE: debug-combination ;
 
+M: debug-combination make-default-method
+    2drop [ "Oops" throw ] when ;
+
 M: debug-combination perform-combination
     drop
     order [ dup class-hashes ] { } map>assoc sort-keys

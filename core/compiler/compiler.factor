@@ -26,7 +26,7 @@ IN: compiler
     >r dupd save-effect r>
     f pick compiler-error
     over compiled-unxref
-    compiled-xref ;
+    over crossref? [ compiled-xref ] [ 2drop ] if ;
 
 : compile-succeeded ( word -- effect dependencies )
     [

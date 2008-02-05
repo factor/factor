@@ -146,8 +146,8 @@ HELP: with-process-stream
 { $values
   { "desc" "a launch descriptor" }
   { "quot" quotation }
-  { "process" process } }
-{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a " { $link process-stream } ". When the quotation returns, the " { $link process } " instance is output." } ;
+  { "status" "an exit code" } }
+{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a " { $link process-stream } ". After the quotation returns, waits for the process to end and outputs the exit code." } ;
 
 HELP: wait-for-process
 { $values { "process" process } { "status" integer } }
