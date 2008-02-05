@@ -8,7 +8,8 @@ IN: unix.process
 ! to implement io.launcher on Unix. User code should use
 ! io.launcher instead.
 
-: >argv ( seq -- alien ) [ malloc-char-string ] map f add >c-void*-array ;
+: >argv ( seq -- alien )
+    [ malloc-char-string ] map f add >c-void*-array ;
 
 : exec ( pathname argv -- int )
     [ malloc-char-string ] [ >argv ] bi* execv ;
@@ -29,7 +30,7 @@ IN: unix.process
     >r [ first ] [ ] bi r> exec-with-env ;
 
 : with-fork ( child parent -- )
-    fork dup zero? -roll swap curry if ; inline
+    fork dup io-error dup zero? -roll swap curry if ; inline
 
 : wait-for-pid ( pid -- status )
     0 <int> [ 0 waitpid drop ] keep *int WEXITSTATUS ;
