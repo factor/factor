@@ -16,8 +16,11 @@ IN: tools.deploy.backend
 : copy-lines ( stream -- )
     [ (copy-lines) ] with-disposal ;
 
-: run-with-output ( descriptor -- )
-    <process-stream>
+: run-with-output ( arguments -- )
+    [
+        +arguments+ set
+        +stdout+ +stderr+ set
+    ] H{ } make-assoc <process-stream>
     dup duplex-stream-out dispose
     copy-lines ;
 
@@ -77,6 +80,7 @@ IN: tools.deploy.backend
     ] { } make ;
 
 : make-deploy-image ( vm image vocab config -- )
+    make-boot-image
     dup staging-image-name exists? [
         >r pick r> tuck make-staging-image
     ] unless

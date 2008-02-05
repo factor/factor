@@ -33,6 +33,6 @@ def doc_using_statements(document)
 end
 
 def line_current_word(line, point)
-    left = line.rindex(/\s|^/, point - 1) + 1; right = line.index(/\s|$/, point) - 1
+    left = line.rindex(/\s/, point - 1) || 0; right = line.index(/\s/, point) || line.length
     line[left..right]
 end

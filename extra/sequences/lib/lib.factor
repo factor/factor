@@ -140,3 +140,16 @@ PRIVATE>
 : ?second ( seq -- second/f ) 1 swap ?nth ; inline
 : ?third ( seq -- third/f ) 2 swap ?nth ; inline
 : ?fourth ( seq -- fourth/f ) 3 swap ?nth ; inline
+
+: accumulator ( quot -- quot vec )
+    V{ } clone [ [ push ] curry compose ] keep ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! List the positions of obj in seq
+
+: indices ( seq obj -- seq )
+  >r dup length swap r>
+  [ = [ ] [ drop f ] if ] curry
+  2map
+  [ ] subset ;

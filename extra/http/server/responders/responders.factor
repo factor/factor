@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs hashtables html html.elements splitting
 http io kernel math math.parser namespaces parser sequences
-strings io.server ;
+strings io.server vectors assocs.lib ;
 
 IN: http.server.responders
 
@@ -10,8 +10,11 @@ IN: http.server.responders
 SYMBOL: vhosts
 SYMBOL: responders
 
+: >header ( value key -- multi-hash )
+    H{ } clone [ insert-at ] keep ;
+
 : print-header ( alist -- )
-    [ swap write ": " write print ] assoc-each nl ;
+    [ swap write ": " write print ] multi-assoc-each nl ;
 
 : response ( msg -- ) "HTTP/1.0 " write print ;
 
@@ -20,7 +23,7 @@ SYMBOL: responders
 
 : error-head ( error -- )
     dup log-error response
-    H{ { "Content-Type" "text/html" } } print-header nl ;
+    H{ { "Content-Type" V{ "text/html" } } } print-header nl ;
 
 : httpd-error ( error -- )
     #! This must be run from handle-request
@@ -36,7 +39,7 @@ SYMBOL: responders
 
 : serving-content ( mime -- )
     "200 Document follows" response
-    "Content-Type" associate print-header ;
+    "Content-Type" >header print-header ;
 
 : serving-html "text/html" serving-content ;
 
@@ -46,7 +49,7 @@ SYMBOL: responders
 : serving-text "text/plain" serving-content ;
 
 : redirect ( to response -- )
-    response "Location" associate print-header ;
+    response "Location" >header print-header ;
 
 : permanent-redirect ( to -- )
     "301 Moved Permanently" redirect ;
@@ -84,14 +87,14 @@ SYMBOL: max-post-request
 : log-headers ( hash -- )
     [
         drop {
-            "User-Agent"
-            "Referer"
-            "X-Forwarded-For"
-            "Host"
+            "user-agent"
+            "referer"
+            "x-forwarded-for"
+            "host"
         } member?
     ] assoc-subset [
         ": " swap 3append log-message
-    ] assoc-each ;
+    ] multi-assoc-each ;
 
 : prepare-url ( url -- url )
     #! This is executed in the with-request namespace.
@@ -122,7 +125,8 @@ SYMBOL: max-post-request
 
 : query-param ( key -- value ) "query" get at ;
 
-: header-param ( key -- value ) "header" get at ;
+: header-param ( key -- value )
+    "header" get peek-at ;
 
 : host ( -- string )
     #! The host the current responder was called from.
@@ -130,7 +134,7 @@ SYMBOL: max-post-request
 
 : add-responder ( responder -- )
     #! Add a responder object to the list.
-    "responder" over at  responders get set-at ;
+    "responder" over at responders get set-at ;
 
 : make-responder ( quot -- )
     #! quot has stack effect ( url -- )

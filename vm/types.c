@@ -463,15 +463,9 @@ F_STRING* allot_string_internal(CELL capacity)
 {
 	F_STRING *string = allot_object(STRING_TYPE,string_size(capacity));
 
-	/* strings are null-terminated in memory, even though they also
-	have a length field. The null termination allows us to add
-	the sizeof(F_STRING) to a Factor string to get a C-style
-	char* string for C library calls. */
 	string->length = tag_fixnum(capacity);
 	string->hashcode = F;
 	string->aux = F;
-
-	set_string_nth(string,capacity,0);
 
 	return string;
 }
@@ -645,14 +639,7 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 	} \
 	type *to_##type##_string(F_STRING *s, bool check) \
 	{ \
-		if(sizeof(type) == sizeof(char)) \
-		{ \
-			if(check && !check_string(s,sizeof(type))) \
-				general_error(ERROR_C_STRING,tag_object(s),F,NULL); \
-			return (type*)(s + 1); \
-		} \
-		else \
-			return (type*)(string_to_##type##_alien(s,check) + 1); \
+		return (type*)(string_to_##type##_alien(s,check) + 1); \
 	} \
 	type *unbox_##type##_string(void) \
 	{ \

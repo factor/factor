@@ -270,6 +270,16 @@ FUNCTION: double ffi_test_35 test-struct-11 x int y ;
     3 ffi_test_35
 ] unit-test
 
+C-STRUCT: test-struct-12 { "int" "a" } { "double" "x" } ;
+
+: make-struct-12
+    "test-struct-12" <c-object>
+    [ set-test-struct-12-x ] keep ;
+
+FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
+
+[ 1.23456 ] [ 1.23456 make-struct-12 ffi_test_36 ] unit-test
+
 ! Test callbacks
 
 : callback-1 "void" { } "cdecl" [ ] alien-callback ;

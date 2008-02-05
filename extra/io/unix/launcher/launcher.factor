@@ -57,8 +57,8 @@ MEMO: 'arguments' ( -- parser )
 : setup-redirection ( -- )
     +stdin+ get read-flags 0 redirect
     +stdout+ get write-flags 1 redirect
-    +stderr+ get dup +stdout+ get eq?
-    [ 1 2 dup2 ] [ write-flags 2 redirect ] if ;
+    +stderr+ get dup +stdout+ eq?
+    [ drop 1 2 dup2 io-error ] [ write-flags 2 redirect ] if ;
 
 : spawn-process ( -- )
     [
@@ -111,7 +111,7 @@ M: unix-io process-stream*
         2drop t
     ] [
         find-process dup [
-            >r *uint r> notify-exit f
+            >r *int WEXITSTATUS r> notify-exit f
         ] [
             2drop f
         ] if

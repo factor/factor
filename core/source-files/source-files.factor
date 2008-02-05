@@ -17,7 +17,7 @@ uses definitions ;
 
 : (source-modified?) ( path modified checksum -- ? )
     pick file-modified rot [ 0 or ] 2apply >
-    [ swap file-crc32 number= not ] [ 2drop f ] if ;
+    [ swap file-lines lines-crc32 = not ] [ 2drop f ] if ;
 
 : source-modified? ( path -- ? )
     dup source-files get at [

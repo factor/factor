@@ -116,13 +116,16 @@ SYMBOL: changed-words
     [ no-compilation-unit ] unless*
     set-at ;
 
+: crossref? ( word -- ? )
+    dup word-vocabulary swap "method" word-prop or ;
+
 : define ( word def -- )
     [ ] like
     over unxref
     over redefined
     over set-word-def
     dup changed-word
-    dup word-vocabulary [ dup xref ] when drop ;
+    dup crossref? [ dup xref ] when drop ;
 
 : define-declared ( word def effect -- )
     pick swap "declared-effect" set-word-prop
@@ -154,7 +157,8 @@ SYMBOL: changed-words
     } reset-props ;
 
 : reset-generic ( word -- )
-    dup reset-word { "methods" "combination" } reset-props ;
+    dup reset-word
+    { "methods" "combination" "default-method" } reset-props ;
 
 : gensym ( -- word )
     "G:" \ gensym counter number>string append f <word> ;

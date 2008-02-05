@@ -245,3 +245,8 @@ double ffi_test_35(struct test_struct_11 x, int y)
 {
 	return (x.x + x.y) * y;
 }
+
+double ffi_test_36(struct test_struct_12 x)
+{
+	return x.x;
+}

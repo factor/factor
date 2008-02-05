@@ -8,11 +8,6 @@ debugger io.streams.c io.streams.duplex io.files io.backend
 quotations words.private tools.deploy.config compiler.units ;
 IN: tools.deploy.shaker
 
-: show ( msg -- )
-    #! Use primitives directly so that we can print stuff even
-    #! after most of the image has been stripped away
-    "\r\n" append stdout-handle fwrite stdout-handle fflush ;
-
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
     "command-line" init-hooks get delete-at

@@ -30,3 +30,8 @@ MACRO: ntuck ( n -- ) 2 + [ dup , -nrot ] bake ;
 : 4drop ( a b c d -- ) 3drop drop ; inline
 
 : tuckd ( x y z -- z x y z ) 2 ntuck ; inline
+
+MACRO: nrev ( n -- quot )
+  [ 1+ ] map
+  reverse
+  [ [ -nrot ] curry ] map concat ;
