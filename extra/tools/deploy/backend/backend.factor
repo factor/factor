@@ -80,6 +80,7 @@ IN: tools.deploy.backend
     ] { } make ;
 
 : make-deploy-image ( vm image vocab config -- )
+    make-boot-image
     dup staging-image-name exists? [
         >r pick r> tuck make-staging-image
     ] unless

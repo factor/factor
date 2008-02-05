@@ -1,6 +1,7 @@
 USING: alien alien.c-types arrays sequences math
 math.vectors math.matrices math.parser io io.files kernel opengl
-opengl.gl opengl.glu shuffle http.client vectors splitting
+opengl.gl opengl.glu opengl.capabilities shuffle http.client
+vectors splitting
 tools.time system combinators combinators.lib combinators.cleave
 float-arrays continuations namespaces ;
 IN: bunny.model
@@ -91,7 +92,7 @@ M: bunny-buffers bunny-geom
         bunny-buffers-array
         bunny-buffers-element-array
     } get-slots [
-        GL_VERTEX_ARRAY GL_NORMAL_ARRAY 2array [
+        { GL_VERTEX_ARRAY GL_NORMAL_ARRAY } [
             GL_DOUBLE 0 0 buffer-offset glNormalPointer
             dup bunny-buffers-nv "double" heap-size * buffer-offset
             3 GL_DOUBLE 0 roll glVertexPointer
