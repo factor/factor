@@ -32,4 +32,4 @@ IN: unix.process
     fork dup zero? -roll swap curry if ; inline
 
 : wait-for-pid ( pid -- status )
-    0 <int> [ 0 waitpid drop ] keep *int ;
+    0 <int> [ 0 waitpid drop ] keep *int WEXITSTATUS ;

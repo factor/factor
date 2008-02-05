@@ -261,6 +261,10 @@ windows? [
     cell "ulonglong" c-type set-c-type-align
 ] unless
 
+macosx? [
+    cell "double" c-type set-c-type-align
+] when
+
 T{ x86-backend f 4 } compiler-backend set-global
 
 : sse2? "Intrinsic" throw ;
