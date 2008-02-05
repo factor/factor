@@ -98,10 +98,10 @@ TUPLE: process-stream process ;
     { set-delegate set-process-stream-process }
     process-stream construct ;
 
-: with-process-stream ( desc quot -- process )
+: with-process-stream ( desc quot -- status )
     swap <process-stream>
     [ swap with-stream ] keep
-    process-stream-process ; inline
+    process-stream-process wait-for-process ; inline
 
 : notify-exit ( status process -- )
     [ set-process-status ] keep
