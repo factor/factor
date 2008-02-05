@@ -1,12 +1,10 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-
 ! adapted from libpq-fe.h version 7.4.7
-! tested on debian linux with postgresql 7.4.7
-! Updated to 8.1
+! tested on debian linux with postgresql 8.1
 
 USING: alien alien.syntax combinators system ;
-IN: postgresql.libpq
+IN: db.postgresql.ffi
 
 <<
 "postgresql" {
@@ -17,45 +15,44 @@ IN: postgresql.libpq
 >>
 
 ! ConnSatusType
-: CONNECTION_OK                                         HEX: 0 ; inline
-: CONNECTION_BAD                                        HEX: 1 ; inline
-: CONNECTION_STARTED                            HEX: 2 ; inline
-: CONNECTION_MADE                                       HEX: 3 ; inline
-: CONNECTION_AWAITING_RESPONSE          HEX: 4 ; inline
-: CONNECTION_AUTH_OK                            HEX: 5 ; inline
-: CONNECTION_SETENV                                     HEX: 6 ; inline
-: CONNECTION_SSL_STARTUP                        HEX: 7 ; inline
-: CONNECTION_NEEDED                                     HEX: 8 ; inline
+: CONNECTION_OK                     HEX: 0 ; inline
+: CONNECTION_BAD                    HEX: 1 ; inline
+: CONNECTION_STARTED                HEX: 2 ; inline
+: CONNECTION_MADE                   HEX: 3 ; inline
+: CONNECTION_AWAITING_RESPONSE      HEX: 4 ; inline
+: CONNECTION_AUTH_OK                HEX: 5 ; inline
+: CONNECTION_SETENV                 HEX: 6 ; inline
+: CONNECTION_SSL_STARTUP            HEX: 7 ; inline
+: CONNECTION_NEEDED                 HEX: 8 ; inline
 
 ! PostgresPollingStatusType
-: PGRES_POLLING_FAILED                          HEX: 0 ; inline
-: PGRES_POLLING_READING                         HEX: 1 ; inline
-: PGRES_POLLING_WRITING                         HEX: 2 ; inline
-: PGRES_POLLING_OK                                      HEX: 3 ; inline
-: PGRES_POLLING_ACTIVE                          HEX: 4 ; inline
+: PGRES_POLLING_FAILED              HEX: 0 ; inline
+: PGRES_POLLING_READING             HEX: 1 ; inline
+: PGRES_POLLING_WRITING             HEX: 2 ; inline
+: PGRES_POLLING_OK                  HEX: 3 ; inline
+: PGRES_POLLING_ACTIVE              HEX: 4 ; inline
 
 ! ExecStatusType;
-: PGRES_EMPTY_QUERY                             HEX: 0 ; inline
-: PGRES_COMMAND_OK                                      HEX: 1 ; inline
-: PGRES_TUPLES_OK                                       HEX: 2 ; inline
-: PGRES_COPY_OUT                                        HEX: 3 ; inline
-: PGRES_COPY_IN                                         HEX: 4 ; inline
-: PGRES_BAD_RESPONSE                            HEX: 5 ; inline
-: PGRES_NONFATAL_ERROR                          HEX: 6 ; inline
-: PGRES_FATAL_ERROR                                     HEX: 7 ; inline
+: PGRES_EMPTY_QUERY                 HEX: 0 ; inline
+: PGRES_COMMAND_OK                  HEX: 1 ; inline
+: PGRES_TUPLES_OK                   HEX: 2 ; inline
+: PGRES_COPY_OUT                    HEX: 3 ; inline
+: PGRES_COPY_IN                     HEX: 4 ; inline
+: PGRES_BAD_RESPONSE                HEX: 5 ; inline
+: PGRES_NONFATAL_ERROR              HEX: 6 ; inline
+: PGRES_FATAL_ERROR                 HEX: 7 ; inline
 
 ! PGTransactionStatusType;
-: PQTRANS_IDLE                                          HEX: 0 ; inline
-: PQTRANS_ACTIVE                                        HEX: 1 ; inline
-: PQTRANS_INTRANS                                       HEX: 2 ; inline
-: PQTRANS_INERROR                                       HEX: 3 ; inline
-: PQTRANS_UNKNOWN                                       HEX: 4 ; inline
+: PQTRANS_IDLE                      HEX: 0 ; inline
+: PQTRANS_ACTIVE                    HEX: 1 ; inline
+: PQTRANS_INTRANS                   HEX: 2 ; inline
+: PQTRANS_INERROR                   HEX: 3 ; inline
+: PQTRANS_UNKNOWN                   HEX: 4 ; inline
 
 ! PGVerbosity;
-: PQERRORS_TERSE                                        HEX: 0 ; inline
-: PQERRORS_DEFAULT                                      HEX: 1 ; inline
-: PQERRORS_VERBOSE                                      HEX: 2 ; inline
-
+: PQERRORS_TERSE                    HEX: 0 ; inline
+: PQERRORS_DEFAULT                  HEX: 1 ; inline
+: PQERRORS_VERBOSE                  HEX: 2 ; inline
 
 TYPEDEF: int size_t
 TYPEDEF: int ConnStatusType
@@ -81,7 +78,6 @@ LIBRARY: postgresql
 
 
 ! Exported functions of libpq
-! ===   in fe-connect.c ===
 
 ! make a new client connection to the backend
 ! Asynchronous (non-blocking)
@@ -91,12 +87,12 @@ FUNCTION: PostgresPollingStatusType PQconnectPoll ( PGconn* conn ) ;
 ! Synchronous (blocking)
 FUNCTION: PGconn* PQconnectdb ( char* conninfo ) ;
 FUNCTION: PGconn* PQsetdbLogin ( char* pghost, char* pgport,
-                         char* pgoptions, char* pgtty,
-                         char* dbName,
-                         char* login, char* pwd ) ;
+             char* pgoptions, char* pgtty,
+             char* dbName,
+             char* login, char* pwd ) ;
 
 : PQsetdb ( M_PGHOST M_PGPORT M_PGOPT M_PGTTY M_DBNAME -- PGconn* )
-        f f PQsetdbLogin ;
+    f f PQsetdbLogin ;
 
 ! close the current connection and free the PGconn data structure
 FUNCTION: void PQfinish ( PGconn* conn ) ;
@@ -112,7 +108,7 @@ FUNCTION: void PQconninfoFree ( PQconninfoOption* connOptions ) ;
 ! parameters
 !
 ! Asynchronous (non-blocking)
-FUNCTION: int   PQresetStart ( PGconn* conn ) ;
+FUNCTION: int    PQresetStart ( PGconn* conn ) ;
 FUNCTION: PostgresPollingStatusType PQresetPoll ( PGconn* conn ) ;
 
 ! Synchronous (blocking)
@@ -125,7 +121,7 @@ FUNCTION: PGcancel* PQgetCancel ( PGconn* conn ) ;
 FUNCTION: void PQfreeCancel ( PGcancel* cancel ) ;
 
 ! issue a cancel request
-FUNCTION: int   PQrequestCancel ( PGconn* conn ) ;
+FUNCTION: int    PQrequestCancel ( PGconn* conn ) ;
 
 ! Accessor functions for PGconn objects
 FUNCTION: char* PQdb ( PGconn* conn ) ;
@@ -138,14 +134,14 @@ FUNCTION: char* PQoptions ( PGconn* conn ) ;
 FUNCTION: ConnStatusType PQstatus ( PGconn* conn ) ;
 FUNCTION: PGTransactionStatusType PQtransactionStatus ( PGconn* conn ) ;
 FUNCTION: char* PQparameterStatus ( PGconn* conn,
-                                  char* paramName ) ;
-FUNCTION: int   PQprotocolVersion ( PGconn* conn ) ;
-FUNCTION: int   PQServerVersion ( PGconn* conn ) ;
+                  char* paramName ) ;
+FUNCTION: int PQprotocolVersion ( PGconn* conn ) ;
+! FUNCTION: int PQServerVersion ( PGconn* conn ) ;
 FUNCTION: char* PQerrorMessage ( PGconn* conn ) ;
-FUNCTION: int   PQsocket ( PGconn* conn ) ;
-FUNCTION: int   PQbackendPID ( PGconn* conn ) ;
-FUNCTION: int   PQclientEncoding ( PGconn* conn ) ;
-FUNCTION: int   PQsetClientEncoding ( PGconn* conn, char* encoding ) ;
+FUNCTION: int PQsocket ( PGconn* conn ) ;
+FUNCTION: int PQbackendPID ( PGconn* conn ) ;
+FUNCTION: int PQclientEncoding ( PGconn* conn ) ;
+FUNCTION: int PQsetClientEncoding ( PGconn* conn, char* encoding ) ;
 
 ! May not be compiled into libpq
 ! Get the SSL structure associated with a connection
@@ -156,7 +152,7 @@ FUNCTION: void PQinitSSL ( int do_init ) ;
 
 ! Set verbosity for PQerrorMessage and PQresultErrorMessage
 FUNCTION: PGVerbosity PQsetErrorVerbosity ( PGconn* conn,
-        PGVerbosity verbosity ) ;
+    PGVerbosity verbosity ) ;
 
 ! Enable/disable tracing
 FUNCTION: void PQtrace ( PGconn* conn, FILE* debug_port ) ;
@@ -171,11 +167,11 @@ FUNCTION: void PQuntrace ( PGconn* conn ) ;
 
 ! Override default notice handling routines
 ! FUNCTION: PQnoticeReceiver PQsetNoticeReceiver ( PGconn* conn,
-                                        ! PQnoticeReceiver proc,
-                                        ! void* arg ) ;
+                    ! PQnoticeReceiver proc,
+                    ! void* arg ) ;
 ! FUNCTION: PQnoticeProcessor PQsetNoticeProcessor ( PGconn* conn,
-                                        ! PQnoticeProcessor proc,
-                                        ! void* arg ) ;
+                    ! PQnoticeProcessor proc,
+                    ! void* arg ) ;
 ! END BROKEN
 
 ! === in fe-exec.c ===
@@ -183,83 +179,83 @@ FUNCTION: void PQuntrace ( PGconn* conn ) ;
 ! Simple synchronous query
 FUNCTION: PGresult* PQexec ( PGconn* conn, char* query ) ;
 FUNCTION: PGresult* PQexecParams ( PGconn* conn,
-                         char* command,
-                         int nParams,
-                         Oid* paramTypes,
-                         char** paramValues,
-                         int* paramLengths,
-                         int* paramFormats,
-                         int resultFormat ) ;
+             char* command,
+             int nParams,
+             Oid* paramTypes,
+             char** paramValues,
+             int* paramLengths,
+             int* paramFormats,
+             int resultFormat ) ;
 FUNCTION: PGresult* PQprepare ( PGconn* conn, char* stmtName,
         char* query, int nParams,
         Oid* paramTypes ) ;
 FUNCTION: PGresult* PQexecPrepared ( PGconn* conn,
-                         char* stmtName,
-                         int nParams,
-                         char** paramValues,
-                         int* paramLengths,
-                         int* paramFormats,
-                         int resultFormat ) ;
+             char* stmtName,
+             int nParams,
+             char** paramValues,
+             int* paramLengths,
+             int* paramFormats,
+             int resultFormat ) ;
 
 ! Interface for multiple-result or asynchronous queries
 FUNCTION: int PQsendQuery ( PGconn* conn, char* query ) ;
 FUNCTION: int PQsendQueryParams ( PGconn* conn,
-                                  char* command,
-                                  int nParams,
-                                  Oid* paramTypes,
-                                  char** paramValues,
-                                  int* paramLengths,
-                                  int* paramFormats,
-                                  int resultFormat ) ;
+                  char* command,
+                  int nParams,
+                  Oid* paramTypes,
+                  char** paramValues,
+                  int* paramLengths,
+                  int* paramFormats,
+                  int resultFormat ) ;
 FUNCTION: PGresult* PQsendPrepare ( PGconn* conn, char* stmtName,
             char* query, int nParams,
             Oid* paramTypes ) ;
 FUNCTION: int PQsendQueryPrepared ( PGconn* conn,
-                                  char* stmtName,
-                                  int nParams,
-                                  char** paramValues,
-                                  int *paramLengths,
-                                  int *paramFormats,
-                                  int resultFormat ) ;
+                  char* stmtName,
+                  int nParams,
+                  char** paramValues,
+                  int *paramLengths,
+                  int *paramFormats,
+                  int resultFormat ) ;
 FUNCTION: PGresult* PQgetResult ( PGconn* conn ) ;
 
 ! Routines for managing an asynchronous query
-FUNCTION: int   PQisBusy ( PGconn* conn ) ;
-FUNCTION: int   PQconsumeInput ( PGconn* conn ) ;
+FUNCTION: int    PQisBusy ( PGconn* conn ) ;
+FUNCTION: int    PQconsumeInput ( PGconn* conn ) ;
 
 ! LISTEN/NOTIFY support
 FUNCTION: PGnotify* PQnotifies ( PGconn* conn ) ;
 
 ! Routines for copy in/out
-FUNCTION: int   PQputCopyData ( PGconn* conn, char* buffer, int nbytes ) ;
-FUNCTION: int   PQputCopyEnd ( PGconn* conn, char* errormsg ) ;
-FUNCTION: int   PQgetCopyData ( PGconn* conn, char** buffer, int async ) ;
+FUNCTION: int    PQputCopyData ( PGconn* conn, char* buffer, int nbytes ) ;
+FUNCTION: int    PQputCopyEnd ( PGconn* conn, char* errormsg ) ;
+FUNCTION: int    PQgetCopyData ( PGconn* conn, char** buffer, int async ) ;
 
 ! Deprecated routines for copy in/out
-FUNCTION: int   PQgetline ( PGconn* conn, char* string, int length ) ;
-FUNCTION: int   PQputline ( PGconn* conn, char* string ) ;
-FUNCTION: int   PQgetlineAsync ( PGconn* conn, char* buffer, int bufsize ) ;
-FUNCTION: int   PQputnbytes ( PGconn* conn, char* buffer, int nbytes ) ;
-FUNCTION: int   PQendcopy ( PGconn* conn ) ;
+FUNCTION: int    PQgetline ( PGconn* conn, char* string, int length ) ;
+FUNCTION: int    PQputline ( PGconn* conn, char* string ) ;
+FUNCTION: int    PQgetlineAsync ( PGconn* conn, char* buffer, int bufsize ) ;
+FUNCTION: int    PQputnbytes ( PGconn* conn, char* buffer, int nbytes ) ;
+FUNCTION: int    PQendcopy ( PGconn* conn ) ;
 
 ! Set blocking/nonblocking connection to the backend
-FUNCTION: int   PQsetnonblocking ( PGconn* conn, int arg ) ;
-FUNCTION: int   PQisnonblocking ( PGconn* conn ) ;
+FUNCTION: int    PQsetnonblocking ( PGconn* conn, int arg ) ;
+FUNCTION: int    PQisnonblocking ( PGconn* conn ) ;
 
 ! Force the write buffer to be written (or at least try)
-FUNCTION: int   PQflush ( PGconn* conn ) ;
+FUNCTION: int    PQflush ( PGconn* conn ) ;
 
 ! 
 ! * "Fast path" interface --- not really recommended for application
 ! * use
 !
 FUNCTION: PGresult* PQfn ( PGconn* conn,
-         int fnid,
-         int* result_buf,
-         int* result_len,
-         int result_is_int,
-         PQArgBlock* args,
-         int nargs ) ;
+     int fnid,
+     int* result_buf,
+     int* result_len,
+     int result_is_int,
+     PQArgBlock* args,
+     int nargs ) ;
 
 ! Accessor functions for PGresult objects
 FUNCTION: ExecStatusType PQresultStatus ( PGresult* res ) ;
@@ -313,7 +309,7 @@ FUNCTION: uchar* PQunescapeBytea ( uchar* strtext,
 ! These forms are deprecated!
 FUNCTION: size_t PQescapeString ( void* to, char* from, size_t length ) ;
 FUNCTION: uchar* PQescapeBytea ( uchar* bintext, size_t binlen,
-                          size_t* bytealen ) ;
+              size_t* bytealen ) ;
 
 ! === in fe-print.c ===
 
@@ -332,30 +328,28 @@ FUNCTION: void PQprintTuples ( PGresult* res,
                           int printAttName,
                           int terseOutput,      
                           int width ) ; 
-                                                
 ! === in fe-lobj.c ===
 
 ! Large-object access routines
-FUNCTION: int   lo_open ( PGconn* conn, Oid lobjId, int mode ) ;
-FUNCTION: int   lo_close ( PGconn* conn, int fd ) ;
-FUNCTION: int   lo_read ( PGconn* conn, int fd, char* buf, size_t len ) ;
-FUNCTION: int   lo_write ( PGconn* conn, int fd, char* buf, size_t len ) ;
-FUNCTION: int   lo_lseek ( PGconn* conn, int fd, int offset, int whence ) ;
-FUNCTION: Oid   lo_creat ( PGconn* conn, int mode ) ;
-! FUNCTION: Oid lo_creat ( PGconn* conn, Oid lobjId ) ;
-FUNCTION: int   lo_tell ( PGconn* conn, int fd ) ;
-FUNCTION: int   lo_unlink ( PGconn* conn, Oid lobjId ) ;
-FUNCTION: Oid   lo_import ( PGconn* conn, char* filename ) ;
-FUNCTION: int   lo_export ( PGconn* conn, Oid lobjId, char* filename ) ;
+FUNCTION: int    lo_open ( PGconn* conn, Oid lobjId, int mode ) ;
+FUNCTION: int    lo_close ( PGconn* conn, int fd ) ;
+FUNCTION: int    lo_read ( PGconn* conn, int fd, char* buf, size_t len ) ;
+FUNCTION: int    lo_write ( PGconn* conn, int fd, char* buf, size_t len ) ;
+FUNCTION: int    lo_lseek ( PGconn* conn, int fd, int offset, int whence ) ;
+FUNCTION: Oid    lo_creat ( PGconn* conn, int mode ) ;
+! FUNCTION: Oid    lo_creat ( PGconn* conn, Oid lobjId ) ;
+FUNCTION: int    lo_tell ( PGconn* conn, int fd ) ;
+FUNCTION: int    lo_unlink ( PGconn* conn, Oid lobjId ) ;
+FUNCTION: Oid    lo_import ( PGconn* conn, char* filename ) ;
+FUNCTION: int    lo_export ( PGconn* conn, Oid lobjId, char* filename ) ;
 
 ! === in fe-misc.c ===
 
 ! Determine length of multibyte encoded char at *s
-FUNCTION: int   PQmblen ( uchar* s, int encoding ) ;
+FUNCTION: int    PQmblen ( uchar* s, int encoding ) ;
 
 ! Determine display length of multibyte encoded char at *s
-FUNCTION: int   PQdsplen ( uchar* s, int encoding ) ;
+FUNCTION: int    PQdsplen ( uchar* s, int encoding ) ;
 
 ! Get encoding id from environment variable PGCLIENTENCODING
-FUNCTION: int   PQenv2encoding ( ) ;
-
+FUNCTION: int    PQenv2encoding ( ) ;

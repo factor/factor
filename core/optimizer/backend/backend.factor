@@ -245,11 +245,19 @@ M: #dispatch optimize-node*
 : dispatching-class ( node word -- class )
     [ dispatch# node-class# ] keep specific-method ;
 
+: flat-length ( seq -- n )
+    [
+        dup quotation? over array? or
+        [ flat-length ] [ drop 1 ] if
+    ] map sum ;
+
 : will-inline-method ( node word -- method-spec/t quot/t )
     #! t indicates failure
     tuck dispatching-class dup [
         swap [ 2array ] 2keep
-        method method-def
+        method method-word
+        dup word-def flat-length 5 >=
+        [ 1quotation ] [ word-def ] if
     ] [
         2drop t t
     ] if ;

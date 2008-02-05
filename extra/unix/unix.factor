@@ -19,10 +19,12 @@ TYPEDEF: uint time_t
 TYPEDEF: uint uid_t
 TYPEDEF: ulong size_t
 TYPEDEF: ulong u_long
-TYPEDEF: ulonglong off_t
 TYPEDEF: ushort mode_t
 TYPEDEF: ushort nlink_t
 TYPEDEF: void* caddr_t
+
+TYPEDEF: ulong off_t
+TYPEDEF-IF: bsd? ulonglong off_t
 
 C-STRUCT: tm
     { "int" "sec" }    ! Seconds: 0-59 (K&R says 0-61?)
@@ -168,9 +170,10 @@ FUNCTION: time_t time ( time_t* t ) ;
 FUNCTION: int unlink ( char* path ) ;
 FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! wait and waitpid
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: SIGKILL 9 ; inline
+: SIGTERM 15 ; inline
+
+FUNCTION: int kill ( pid_t pid, int sig ) ;
 
 ! Flags for waitpid
 

@@ -26,7 +26,7 @@ IN: compiler
     >r dupd save-effect r>
     f pick compiler-error
     over compiled-unxref
-    over word-vocabulary [ compiled-xref ] [ 2drop ] if ;
+    compiled-xref ;
 
 : compile-succeeded ( word -- effect dependencies )
     [

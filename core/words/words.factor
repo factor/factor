@@ -154,7 +154,8 @@ SYMBOL: changed-words
     } reset-props ;
 
 : reset-generic ( word -- )
-    dup reset-word { "methods" "combination" } reset-props ;
+    dup reset-word
+    { "methods" "combination" "default-method" } reset-props ;
 
 : gensym ( -- word )
     "G:" \ gensym counter number>string append f <word> ;
