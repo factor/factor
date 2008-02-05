@@ -14,7 +14,7 @@ IN: builder
          ,[ dup timestamp-day    ]
          ,[ dup timestamp-hour   ]
          ,[     timestamp-minute ] }
-  [ number>string 2 CHAR: 0 pad-left ] map "-" join ;
+  [ pad-00 ] map "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -29,10 +29,7 @@ SYMBOL: builder-recipients
 
 : email-string ( subject -- )
   `{ "mutt" "-s" , %[ builder-recipients get ] }
-  <process-stream>
-  dup
-  dispose
-  process-stream-process wait-for-process drop ;
+  [ ] with-process-stream drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
