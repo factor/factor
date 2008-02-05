@@ -52,7 +52,7 @@ M: bunny-gadget draw-gadget* ( gadget -- )
     GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
     dup demo-gadget-set-matrices
     GL_MODELVIEW glMatrixMode
-    0.0 -0.12 0.0 glTranslatef
+    0.02 -0.105 0.0 glTranslatef
     { bunny-gadget-geom bunny-gadget-draw } get-slots
     draw-bunny ;
 

@@ -214,6 +214,9 @@ M: long-long-type box-return ( type -- )
     over [ <c-object> tuck 0 ] over c-setter append swap
     >r >r constructor-word r> r> add* define-inline ;
 
+: c-bool> ( int -- ? )
+    zero? not ;
+
 : >c-array ( seq type word -- )
     >r >r dup length dup r> <c-array> dup -roll r>
     [ execute ] 2curry 2each ; inline
