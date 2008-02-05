@@ -177,31 +177,39 @@ FUNCTION: int kill ( pid_t pid, int sig ) ;
 
 ! Flags for waitpid
 
-: WNOHANG   1 ;
-: WUNTRACED 2 ;
+: WNOHANG   1 ; inline
+: WUNTRACED 2 ; inline
 
-: WSTOPPED   2 ;
-: WEXITED    4 ;
-: WCONTINUED 8 ;
-: WNOWAIT    HEX: 1000000 ;
+: WSTOPPED   2 ; inline
+: WEXITED    4 ; inline
+: WCONTINUED 8 ; inline
+: WNOWAIT    HEX: 1000000 ; inline
 
 ! Examining status
 
-: WTERMSIG ( status -- value ) HEX: 7f bitand ;
+: WTERMSIG ( status -- value )
+    HEX: 7f bitand ; inline
 
-: WIFEXITED ( status -- ? ) WTERMSIG zero? ;
+: WIFEXITED ( status -- ? )
+    WTERMSIG zero? ; inline
 
-: WEXITSTATUS ( status -- value ) HEX: ff00 bitand -8 shift ;
+: WEXITSTATUS ( status -- value )
+    HEX: ff00 bitand -8 shift ; inline
 
-: WIFSIGNALED ( status -- ? ) HEX: 7f bitand 1+ -1 shift 0 > ;
+: WIFSIGNALED ( status -- ? )
+    HEX: 7f bitand 1+ -1 shift 0 > ; inline
 
-: WCOREFLAG ( -- value ) HEX: 80 ;
+: WCOREFLAG ( -- value )
+    HEX: 80 ; inline
 
-: WCOREDUMP ( status -- ? ) WCOREFLAG bitand zero? not ;
+: WCOREDUMP ( status -- ? )
+    WCOREFLAG bitand zero? not ; inline
 
-: WIFSTOPPED ( status -- ? ) HEX: ff bitand HEX: 7f = ;
+: WIFSTOPPED ( status -- ? )
+    HEX: ff bitand HEX: 7f = ; inline
 
-: WSTOPSIG ( status -- value ) WEXITSTATUS ;
+: WSTOPSIG ( status -- value )
+    WEXITSTATUS ; inline
 
 FUNCTION: pid_t wait ( int* status ) ;
 FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
