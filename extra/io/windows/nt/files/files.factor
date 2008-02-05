@@ -1,8 +1,8 @@
 USING: continuations destructors io.buffers io.files io.backend
 io.nonblocking io.windows io.windows.nt.backend kernel libc math
 threads windows windows.kernel32 alien.c-types alien.arrays
-sequences combinators combinators.lib ascii splitting alien
-strings ;
+sequences combinators combinators.lib sequences.lib ascii
+splitting alien strings ;
 IN: io.windows.nt.files
 
 M: windows-nt-io cwd
@@ -47,7 +47,7 @@ M: windows-nt-io root-directory? ( path -- ? )
         ! \\foo
         { [ dup "\\" head? ] [ >r root-directory r> append prepend-prefix ] }
         ! c:\\foo
-        { [ dup second CHAR: : = ] [ nip prepend-prefix ] }
+        { [ dup ?second CHAR: : = ] [ nip prepend-prefix ] }
         ! foo.txt
         { [ t ] [ [ first CHAR: \\ = "" "\\" ? ] keep 3append prepend-prefix ] }
     } cond ;
