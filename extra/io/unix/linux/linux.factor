@@ -25,8 +25,6 @@ TUPLE: inotify watches ;
 
 : wd>monitor ( wd -- monitor ) watches at ;
 
-: wd>path ( wd -- path ) wd>monitor linux-monitor-path ;
-
 : <inotify> ( -- port )
     H{ } clone
     inotify_init dup io-error inotify <buffered-port>
@@ -89,12 +87,8 @@ M: linux-monitor dispose ( monitor -- )
     ] { } make ;
 
 : parse-file-notify ( buffer -- changed path )
-    {
-        inotify-event-wd
-        inotify-event-name
-        inotify-event-mask
-    } get-slots
-    parse-action -rot alien>char-string >r wd>path r> path+ ;
+    { inotify-event-name inotify-event-mask } get-slots
+    parse-action swap alien>char-string ;
 
 : events-exhausted? ( i buffer -- ? )
     buffer-fill >= ;

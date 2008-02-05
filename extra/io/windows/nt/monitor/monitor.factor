@@ -65,20 +65,20 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
         { [ t ] [ +modify-file+ ] }
     } cond nip ;
 
-: parse-file-notify ( directory buffer -- changed path )
+: parse-file-notify ( buffer -- changed path )
     {
         FILE_NOTIFY_INFORMATION-FileName
         FILE_NOTIFY_INFORMATION-FileNameLength
         FILE_NOTIFY_INFORMATION-Action
-    } get-slots parse-action 1array -rot
-    memory>u16-string path+ ;
+    } get-slots parse-action 1array swap
+    memory>u16-string ;
 
-: (changed-files) ( directory buffer -- )
-    2dup parse-file-notify changed-file
+: (changed-files) ( buffer -- )
+    dup parse-file-notify changed-file
     dup FILE_NOTIFY_INFORMATION-NextEntryOffset dup zero?
-    [ 3drop ] [ swap <displaced-alien> (changed-files) ] if ;
+    [ 2drop ] [ swap <displaced-alien> (changed-files) ] if ;
 
 M: windows-nt-io fill-queue ( monitor -- )
-    dup win32-monitor-path over buffer-ptr pick read-changes
-    [ zero? [ 2drop ] [ (changed-files) ] if ] H{ } make-assoc
+    dup buffer-ptr over read-changes
+    [ zero? [ drop ] [ (changed-files) ] if ] H{ } make-assoc
     swap set-monitor-queue ;
