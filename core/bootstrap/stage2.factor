@@ -88,5 +88,7 @@ IN: bootstrap.stage2
         "output-image" get resource-path save-image-and-exit
     ] if
 ] [
-    print-error :c "listener" vocab-main execute 1 exit
+    print-error :c restarts.
+    "listener" vocab-main execute
+    1 exit
 ] recover
