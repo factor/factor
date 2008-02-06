@@ -203,3 +203,40 @@ TUPLE: redefinition-test-tuple ;
         redefinition-test-generic ,
     ] { } make all-equal?
 ] unit-test
+
+! Issues with forget
+GENERIC: generic-forget-test-1
+
+M: integer generic-forget-test-1 / ;
+
+[ t ] [
+    \ / usage [ word? ] subset
+    [ word-name "generic-forget-test-1/integer" = ] contains?
+] unit-test
+
+[ ] [
+    [ \ generic-forget-test-1 forget ] with-compilation-unit
+] unit-test
+
+[ f ] [
+    \ / usage [ word? ] subset
+    [ word-name "generic-forget-test-1/integer" = ] contains?
+] unit-test
+
+GENERIC: generic-forget-test-2
+
+M: sequence generic-forget-test-2 = ;
+
+[ t ] [
+    \ = usage [ word? ] subset
+    [ word-name "generic-forget-test-2/sequence" = ] contains?
+] unit-test
+
+[ ] [
+    [ { sequence generic-forget-test-2 } forget ] with-compilation-unit
+] unit-test
+
+[ f ] [
+    \ = usage [ word? ] subset
+    [ word-name "generic-forget-test-2/sequence" = ] contains?
+] unit-test

@@ -71,7 +71,9 @@ GENERIC# (quot-uses) 1 ( obj assoc -- )
 
 M: object (quot-uses) 2drop ;
 
-M: interned (quot-uses) dupd set-at ;
+M: word (quot-uses)
+    >r dup "forgotten" word-prop
+    [ r> 2drop ] [ dup r> set-at ] if ;
 
 : seq-uses ( seq assoc -- ) [ (quot-uses) ] curry each ;
 
@@ -194,24 +196,17 @@ M: word where "loc" word-prop ;
 
 M: word set-where swap "loc" set-word-prop ;
 
-GENERIC: (forget-word) ( word -- )
+GENERIC: forget-word ( word -- )
 
-M: interned (forget-word)
-    dup word-name swap word-vocabulary vocab-words delete-at ;
+: (forget-word) ( word -- )
+    dup "forgotten" word-prop [
+        dup delete-xref
+        dup delete-compiled-xref
+        dup word-name over word-vocabulary vocab-words delete-at
+        dup t "forgotten" set-word-prop
+    ] unless drop ;
 
-M: word (forget-word)
-    drop ;
-
-: rename-word ( word newname newvocab -- )
-    pick (forget-word)
-    pick set-word-vocabulary
-    over set-word-name
-    reveal ;
-
-: forget-word ( word -- )
-    dup delete-xref
-    dup delete-compiled-xref
-    (forget-word) ;
+M: word forget-word (forget-word) ;
 
 M: word forget* forget-word ;
 
