@@ -8,6 +8,15 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: runtime ( quot -- time ) benchmark nip ;
+
+: log-runtime ( quot file -- )
+  >r runtime r> <file-writer> [ . ] with-stream ;
+
+: log-object ( object file -- ) <file-writer> [ . ] with-stream ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : datestamp ( -- string )
   now `{ ,[ dup timestamp-year   ]
          ,[ dup timestamp-month  ]
@@ -34,11 +43,6 @@ SYMBOL: builder-recipients
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : target ( -- target ) `{ ,[ os ] %[ cpu "." split ] } "-" join ;
-
-! : target ( -- target )
-!   { { [ os "windows" = ] [ "windows-nt-x86-32" ] }
-!     { [ t ]              [ `{ ,[ os ] %[ cpu "." split ] } "-" join ] } }
-!   cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -84,10 +88,8 @@ VAR: stamp
 
   "factor" cd
 
-  { "git" "show" } <process-stream>
-  [ readln ] with-stream
-  " " split second
-  "../git-id" <file-writer> [ print ] with-stream
+  { "git" "show" } <process-stream> [ readln ] with-stream " " split second
+  "../git-id" log-object
 
   { "make" "clean" } run-process drop
 
@@ -117,9 +119,7 @@ VAR: stamp
      { +stdout+   "../boot-log" }
      { +stderr+   +stdout+ }
    }
-  >hashtable
-  [ run-process process-status ]
-  benchmark nip "../boot-time" <file-writer> [ . ] with-stream
+  >hashtable [ run-process ] "../boot-time" log-runtime process-status
   0 =
   [ ]
   [
@@ -127,24 +127,14 @@ VAR: stamp
     "builder: bootstrap" throw
   ] if
 
-!   `{
-!      { +arguments+
-!        { ,[ factor-binary ] "-e=USE: tools.browser load-everything" } }
-!      { +stdout+    "../load-everything-log" }
-!      { +stderr+    +stdout+ }
-!    }
-!   >hashtable [ run-process process-status ] benchmark nip
-!   "../load-everything-time" <file-writer> [ . ] with-stream
-!   0 =
-!   [ ]
-!   [
-!     "builder: load-everything" "../load-everything-log" email-file
-!     "builder: load-everything" throw
-!   ] if ;
-
-  `{ ,[ factor-binary ] "-run=builder.load-everything" } run-process drop
+  `{ ,[ factor-binary ] "-run=builder.test" } run-process drop
+  
   "../load-everything-log" exists?
   [ "builder: load-everything" "../load-everything-log" email-file ]
+  when
+
+  "../failing-tests" exists?
+  [ "builder: failing tests" "../failing-tests" email-file ]
   when
 
   ;
