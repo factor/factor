@@ -99,7 +99,7 @@ SYMBOL: compiled-crossref
 compiled-crossref global [ H{ } assoc-like ] change-at
 
 : compiled-xref ( word dependencies -- )
-    [ crossref? ] subset
+    [ drop crossref? ] assoc-subset
     2dup "compiled-uses" set-word-prop
     compiled-crossref get add-vertex* ;
 
