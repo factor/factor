@@ -8,9 +8,12 @@ USING: kernel sequences assocs builder continuations vocabs vocabs.loader
 IN: builder.test
 
 : do-load ( -- )
-  [ [ load-everything ] catch ] "../load-everything-time" log-runtime
-  [ require-all-error-vocabs    "../load-everything-log"  log-object ]
-  when* ;
+  [
+    [ load-everything ]
+    [ require-all-error-vocabs "../load-everything-log" log-object ]
+    recover
+  ]
+  "../load-everything-time" log-runtime ;
 
 : do-tests ( -- )
   "" child-vocabs
