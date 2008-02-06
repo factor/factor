@@ -10,7 +10,8 @@ $nl
 $nl
 "If the test harness needs to define words, they should be placed in the " { $snippet "temporary" } " vocabulary so that they can be forgotten after the tests have been run. Test harness files consist mostly of calls to the following two words:"
 { $subsection unit-test }
-{ $subsection unit-test-fails }
+{ $subsection must-fail }
+{ $subsection must-fail-with }
 "The following words run test harness files; any test failures are collected and printed at the end:"
 { $subsection test }
 { $subsection test-all } ;
@@ -21,7 +22,7 @@ HELP: unit-test
 { $values { "output" "a sequence of expected stack elements" } { "input" "a quotation run with an empty stack" } }
 { $description "Runs a quotation with an empty stack, comparing the resulting stack with " { $snippet "output" } ". Elements are compared using " { $link = } ". Throws an error if the expected stack does not match the resulting stack." } ;
 
-HELP: unit-test-fails
+HELP: must-fail
 { $values { "quot" "a quotation run with an empty stack" } }
 { $description "Runs a quotation with an empty stack, expecting it to throw an error. If the quotation throws an error, this word returns normally. If the quotation does not throw an error, this word " { $emphasis "does" } " raise an error." }
 { $notes "This word is used to test boundary conditions and fail-fast behavior." } ;
