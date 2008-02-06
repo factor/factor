@@ -33,7 +33,12 @@ SYMBOL: builder-recipients
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: target ( -- target ) `{ ,[ os ] %[ cpu "." split ] } "-" join ;
+! : target ( -- target ) `{ ,[ os ] %[ cpu "." split ] } "-" join ;
+
+: target ( -- target )
+  { { [ os "windows" = ] [ "windows-nt-x86-32" ] }
+    { [ t ]              [ `{ ,[ os ] %[ cpu "." split ] } "-" join ] } }
+  cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
