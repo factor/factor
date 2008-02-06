@@ -3,7 +3,7 @@
 USING: namespaces arrays prettyprint sequences kernel
 vectors quotations words parser assocs combinators
 continuations debugger io io.files vocabs tools.time
-vocabs.loader source-files compiler.units ;
+vocabs.loader source-files compiler.units inspector ;
 IN: tools.test
 
 SYMBOL: failures
@@ -30,9 +30,17 @@ SYMBOL: this-test
 
 TUPLE: expected-error ;
 
-: unit-test-fails ( quot -- )
-    [ f ] append [ [ drop t ] recover ] curry
-    [ t ] swap unit-test ;
+M: expected-error summary
+    drop
+    "The unit test expected the quotation to throw an error" ;
+
+: must-fail-with ( quot test -- )
+    >r [ expected-error construct-empty throw ] compose r>
+    [ recover ] 2curry
+    [ ] swap unit-test ;
+
+: must-fail ( quot -- )
+    [ drop t ] must-fail-with ;
 
 : run-test ( path -- failures )
     [ "temporary" forget-vocab ] with-compilation-unit
