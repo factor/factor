@@ -172,7 +172,9 @@ UNION: forget-class-bug-2 forget-class-bug-1 dll ;
 FORGET: forget-class-bug-1
 FORGET: forget-class-bug-2
 
-[ t ] [ integer dll class-or interned? ] unit-test
+[ f ] [ forget-class-bug-1 typemap get values [ memq? ] with contains? ] unit-test
+
+[ f ] [ forget-class-bug-2 typemap get values [ memq? ] with contains? ] unit-test
 
 DEFER: mixin-forget-test-g
 

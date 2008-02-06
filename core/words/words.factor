@@ -1,10 +1,10 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: words
 USING: arrays definitions graphs assocs kernel kernel.private
 slots.private math namespaces sequences strings vectors sbufs
 quotations assocs hashtables sorting math.parser words.private
-vocabs ;
+vocabs combinators ;
+IN: words
 
 : word ( -- word ) \ word get-global ;
 
@@ -65,15 +65,20 @@ SYMBOL: bootstrapping?
 : bootstrap-word ( word -- target )
     [ target-word ] [ ] if-bootstrapping ;
 
-PREDICATE: word interned dup target-word eq? ;
+: crossref? ( word -- ? )
+    {
+        { [ dup "forgotten" word-prop ] [ f ] }
+        { [ dup "method" word-prop ] [ t ] }
+        { [ dup word-vocabulary ] [ t ] }
+        { [ t ] [ f ] }
+    } cond nip ;
 
 GENERIC# (quot-uses) 1 ( obj assoc -- )
 
 M: object (quot-uses) 2drop ;
 
 M: word (quot-uses)
-    >r dup "forgotten" word-prop
-    [ r> 2drop ] [ dup r> set-at ] if ;
+    >r dup crossref? [ dup r> set-at ] [ r> 2drop ] if ;
 
 : seq-uses ( seq assoc -- ) [ (quot-uses) ] curry each ;
 
@@ -94,6 +99,7 @@ SYMBOL: compiled-crossref
 compiled-crossref global [ H{ } assoc-like ] change-at
 
 : compiled-xref ( word dependencies -- )
+    [ crossref? ] subset
     2dup "compiled-uses" set-word-prop
     compiled-crossref get add-vertex* ;
 
@@ -117,9 +123,6 @@ SYMBOL: changed-words
     dup changed-words get
     [ no-compilation-unit ] unless*
     set-at ;
-
-: crossref? ( word -- ? )
-    dup word-vocabulary swap "method" word-prop or ;
 
 : define ( word def -- )
     [ ] like

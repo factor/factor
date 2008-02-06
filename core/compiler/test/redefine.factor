@@ -92,8 +92,6 @@ DEFER: x-4
 
 [ t ] [ \ x-3 "compiled-uses" word-prop >boolean ] unit-test
 
-[ t ] [ \ x-3 "compiled-uses" word-prop [ drop interned? ] assoc-all? ] unit-test
-
 DEFER: g-test-1
 
 DEFER: g-test-3
@@ -237,7 +235,7 @@ DEFER: flushable-test-2
 : bx ax ;
 [ \ bx forget ] with-compilation-unit
 
-[ t ] [ \ ax compiled-usage [ drop interned? ] assoc-all? ] unit-test
+[ f ] [ \ bx \ ax compiled-usage contains? ] unit-test
 
 DEFER: defer-redefine-test-2
 

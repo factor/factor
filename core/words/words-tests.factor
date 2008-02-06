@@ -54,21 +54,13 @@ GENERIC: testing
 
 [ f ] [ \ testing generic? ] unit-test
 
-[ f ] [ gensym interned? ] unit-test
-
 : forgotten ;
 : another-forgotten ;
 
-[ f ] [ \ forgotten interned? ] unit-test
-
 FORGET: forgotten
-
-[ f ] [ \ another-forgotten interned? ] unit-test
 
 FORGET: another-forgotten
 : another-forgotten ;
-
-[ t ] [ \ + interned? ] unit-test
 
 ! I forgot remove-crossref calls!
 : fee ;
@@ -87,8 +79,7 @@ FORGET: foe
 ] unit-test
 
 [ t ] [
-    \ * usage [ word? ] subset
-    [ dup interned? swap method-body? or ] all?
+    \ * usage [ word? ] subset [ crossref? ] all?
 ] unit-test
 
 DEFER: calls-a-gensym
