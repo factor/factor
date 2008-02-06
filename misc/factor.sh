@@ -45,7 +45,6 @@ check_gcc_version() {
 }
 
 check_installed_programs() {
-        ensure_program_installed sudo
         ensure_program_installed chmod
         ensure_program_installed uname
         ensure_program_installed git
@@ -100,9 +99,9 @@ find_os() {
         uname_s=`uname -s`
         check_ret uname
         case $uname_s in
-                CYGWIN_NT-5.2-WOW64) OS=windows-nt;;
-                *CYGWIN_NT*) OS=windows-nt;;
-                *CYGWIN*) OS=windows-nt;;
+                CYGWIN_NT-5.2-WOW64) OS=winnt;;
+                *CYGWIN_NT*) OS=winnt;;
+                *CYGWIN*) OS=winnt;;
                 *darwin*) OS=macosx;;
                 *Darwin*) OS=macosx;;
                 *linux*) OS=linux;;
@@ -140,7 +139,7 @@ find_word_size() {
 
 set_factor_binary() {
         case $OS in
-                windows-nt) FACTOR_BINARY=factor-nt;;
+                winnt) FACTOR_BINARY=factor-nt;;
                 macosx) FACTOR_BINARY=./Factor.app/Contents/MacOS/factor;;
                 *) FACTOR_BINARY=factor;;
         esac
@@ -197,7 +196,7 @@ git_clone() {
 
 git_pull_factorcode() {
         echo "Updating the git repository from factorcode.org..."
-        git pull git://factorcode.org/git/factor.git
+        git pull git://factorcode.org/git/factor.git master
         check_ret git
 }
 
@@ -220,6 +219,7 @@ delete_boot_images() {
         echo "Deleting old images..."
         rm $BOOT_IMAGE > /dev/null 2>&1
         rm $BOOT_IMAGE.* > /dev/null 2>&1
+		rm staging.*.image > /dev/null 2>&1
 }
 
 get_boot_image() {
@@ -228,10 +228,22 @@ get_boot_image() {
 }
 
 maybe_download_dlls() {
-        if [[ $OS == windows-nt ]] ; then
+        if [[ $OS == winnt ]] ; then
                 wget http://factorcode.org/dlls/freetype6.dll
                 check_ret wget
                 wget http://factorcode.org/dlls/zlib1.dll
+                check_ret wget
+                wget http://factorcode.org/dlls/OpenAL32.dll
+                check_ret wget
+                wget http://factorcode.org/dlls/alut.dll
+                check_ret wget
+                wget http://factorcode.org/dlls/ogg.dll
+                check_ret wget
+                wget http://factorcode.org/dlls/theora.dll
+                check_ret wget
+                wget http://factorcode.org/dlls/vorbis.dll
+                check_ret wget
+                wget http://factorcode.org/dlls/sqlite3.dll
                 check_ret wget
                 chmod 777 *.dll
                 check_ret chmod

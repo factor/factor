@@ -1,42 +1,28 @@
 USING: io io.files io.launcher kernel namespaces
-prettyprint tools.test db.sqlite db db.sql sequences
+prettyprint tools.test db.sqlite db sequences
 continuations ;
 IN: temporary
 
-! "sqlite3 -init test.txt test.db"
-
-IN: scratchpad
 : test.db "extra/db/sqlite/test.db" resource-path ;
 
-IN: temporary
-: (create-db) ( -- str )
-    [
-        "sqlite3 -init " %
-        test.db %
-        " " %
-        test.db %
-    ] "" make ;
+[ ] [ [ test.db delete-file ] catch drop ] unit-test
 
-: create-db ( -- ) (create-db) run-process drop ;
+[ ] [
+    test.db [
+        "create table person (name varchar(30), country varchar(30))" sql-command
+        "insert into person values('John', 'America')" sql-command
+        "insert into person values('Jane', 'New Zealand')" sql-command
+    ] with-sqlite
+] unit-test
 
-[ ] [ test.db delete-file ] unit-test
 
-[ ] [ create-db ] unit-test
-
-[
-    {
-        { "John" "America" }
-        { "Jane" "New Zealand" }
-    }
-] [
+[ { { "John" "America" } { "Jane" "New Zealand" } } ] [
     test.db [
         "select * from person" sql-query
     ] with-sqlite
 ] unit-test
 
-[
-    { { "John" "America" } }
-] [
+[ { { "John" "America" } } ] [
     test.db [
         "select * from person where name = :name and country = :country"
         <simple-statement> [
@@ -52,15 +38,10 @@ IN: temporary
     ] with-sqlite
 ] unit-test
 
-[
-    {
-        { "1" "John" "America" }
-        { "2" "Jane" "New Zealand" }
-    }
-] [ test.db [ "select rowid, * from person" sql-query ] with-sqlite ] unit-test
+[ { { "1" "John" "America" } { "2" "Jane" "New Zealand" } } ]
+[ test.db [ "select rowid, * from person" sql-query ] with-sqlite ] unit-test
 
-[
-] [
+[ ] [
     test.db [
         "insert into person(name, country) values('Jimmy', 'Canada')"
         sql-command

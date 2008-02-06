@@ -1,26 +1,17 @@
-! See http://factorcode.org/license.txt
-! Copyright (C) 2007 Berlin Brown
-! Date: 1/17/2007
-!
-! libs/mysql/libmysql.factor
-!
+! Copyright (C) 2007 Berlin Brown, 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 ! Adapted from mysql.h and mysql.c
 ! Tested with MySQL version - 5.0.24a
+USING: alien alien.syntax combinators kernel system ;
+IN: db.mysql.ffi
 
-IN: mysql
-USING: alien kernel ;
-
-"mysql" {
+<< "mysql" {
     { [ win32? ] [ "libmySQL.dll" "stdcall" ] }
     { [ macosx? ] [ "libmysqlclient.14.dylib" "cdecl" ] }
     { [ unix? ] [ "libmysqlclient.so.14" "cdecl" ] }
-} cond add-library
+} cond add-library >>
 
 LIBRARY: mysql
-
-! ===============================================
-! mysql.c
-! ===============================================
 
 FUNCTION: void* mysql_init ( void* mysql ) ;
 FUNCTION: char* mysql_error ( void* mysql ) ;
@@ -32,4 +23,3 @@ FUNCTION: void mysql_free_result ( void* result ) ;
 FUNCTION: char** mysql_fetch_row ( void* result ) ;
 FUNCTION: int mysql_num_fields ( void* result ) ;
 FUNCTION: ulong mysql_affected_rows ( void* mysql ) ;
-

@@ -65,6 +65,7 @@ default:
 	@echo "solaris-x86-64"
 	@echo "wince-arm"
 	@echo "winnt-x86-32"
+	@echo "winnt-x86-64"
 	@echo ""
 	@echo "Additional modifiers:"
 	@echo ""
@@ -125,6 +126,9 @@ solaris-x86-64:
 winnt-x86-32:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
 
+winnt-x86-64:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.64
+
 wince-arm:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.arm
 
@@ -151,7 +155,7 @@ clean:
 	rm -f factor*.dll libfactor*.*
 
 vm/resources.o:
-	windres vm/factor.rs vm/resources.o
+	$(WINDRES) vm/factor.rs vm/resources.o
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<

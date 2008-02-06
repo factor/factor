@@ -1,7 +1,7 @@
 USING: alien alien.c-types kernel libc math namespaces
 windows windows.kernel32 windows.advapi32
-hardware-info.windows.backend
-words combinators vocabs.loader hardware-info.backend ;
+words combinators vocabs.loader hardware-info.backend
+system ;
 IN: hardware-info.windows
 
 : system-info ( -- SYSTEM_INFO )
@@ -63,7 +63,8 @@ IN: hardware-info.windows
 : system-windows-directory ( -- str )
     \ GetSystemWindowsDirectory get-directory ;
 
+<<
 {
     { [ wince? ] [ "hardware-info.windows.ce" ] }
     { [ winnt? ] [ "hardware-info.windows.nt" ] }
-} cond [ require ] when*
+} cond [ require ] when* >>
