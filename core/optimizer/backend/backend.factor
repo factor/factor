@@ -4,7 +4,7 @@ USING: arrays generic assocs inference inference.class
 inference.dataflow inference.backend inference.state io kernel
 math namespaces sequences vectors words quotations hashtables
 combinators classes generic.math continuations optimizer.def-use
-optimizer.pattern-match generic.standard ;
+optimizer.pattern-match generic.standard optimizer.specializers ;
 IN: optimizer.backend
 
 SYMBOL: class-substitutions
@@ -256,7 +256,7 @@ M: #dispatch optimize-node*
     tuck dispatching-class dup [
         swap [ 2array ] 2keep
         method method-word
-        dup word-def flat-length 6 >=
+        dup word-def flat-length 5 >=
         [ 1quotation ] [ word-def ] if
     ] [
         2drop t t
@@ -363,7 +363,7 @@ M: #dispatch optimize-node*
 
 : optimistic-inline? ( #call -- ? )
     dup node-param "specializer" word-prop dup [
-        >r node-input-classes r> length tail*
+        >r node-input-classes r> specialized-length tail*
         [ types length 1 = ] all?
     ] [
         2drop f
