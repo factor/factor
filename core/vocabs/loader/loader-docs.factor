@@ -124,7 +124,7 @@ HELP: refresh
 { $values { "prefix" string } }
 { $description "Reloads source files and documentation belonging to loaded vocabularies whose names are prefixed by " { $snippet "prefix" } " which have been modified on disk." } ;
 
-HELP: refresh-all-error
+HELP: require-all-error
 { $values { "vocabs" "a sequence of vocabularies" } }
 { $description "Throws a " { $link require-all-error } "." }
 { $error-description "Thrown by " { $link require-all } " if one or more vocabulary failed to load." } ;

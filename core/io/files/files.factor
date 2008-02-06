@@ -29,12 +29,15 @@ HOOK: root-directory? io-backend ( path -- ? )
 
 M: object root-directory? ( path -- ? ) path-separator? ;
 
-: trim-path-separators ( str -- newstr )
+: right-trim-separators ( str -- newstr )
     [ path-separator? ] right-trim ;
 
+: left-trim-separators ( str -- newstr )
+    [ path-separator? ] left-trim ;
+
 : path+ ( str1 str2 -- str )
-    >r trim-path-separators "/" r>
-    [ path-separator? ] left-trim 3append ;
+    >r right-trim-separators "/" r>
+    left-trim-separators 3append ;
 
 : stat ( path -- directory? permissions length modified )
     normalize-pathname (stat) ;
@@ -69,7 +72,7 @@ TUPLE: no-parent-directory path ;
     \ no-parent-directory construct-boa throw ;
 
 : parent-directory ( path -- parent )
-    trim-path-separators {
+    right-trim-separators {
         { [ dup empty? ] [ drop "/" ] }
         { [ dup root-directory? ] [ ] }
         { [ dup [ path-separator? ] contains? not ] [ drop "." ] }
@@ -90,7 +93,7 @@ TUPLE: no-parent-directory path ;
     "resource:" ?head [ resource-path ] when ;
 
 : make-directories ( path -- )
-    normalize-pathname trim-path-separators {
+    normalize-pathname right-trim-separators {
         { [ dup "." = ] [ ] }
         { [ dup root-directory? ] [ ] }
         { [ dup empty? ] [ ] }
