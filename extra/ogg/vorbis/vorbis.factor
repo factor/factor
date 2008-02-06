@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel system combinators alien alien.syntax ;
+USING: kernel system combinators alien alien.syntax ogg ;
 IN: ogg.vorbis
 
 <<

@@ -23,10 +23,9 @@ $nl
 "Two words raise an error in the innermost error handler for the current dynamic extent:"
 { $subsection throw }
 { $subsection rethrow }
-"A set of words establish an error handler:"
+"Two words for establishing an error handler:"
 { $subsection cleanup }
 { $subsection recover }
-{ $subsection catch }
 "Unhandled errors are reported in the listener and can be debugged using various tools. See " { $link "debugger" } "."
 { $subsection "errors-restartable" }
 { $subsection "errors-post-mortem" } ;
@@ -147,12 +146,7 @@ HELP: throw
 { $values { "error" object } }
 { $description "Saves the current continuation in the " { $link error-continuation } " global variable and throws an error. Execution does not continue at the point after the " { $link throw } " call. Rather, the innermost catch block is invoked, and execution continues at that point." } ;
 
-HELP: catch
-{ $values { "try" quotation } { "error/f" object } }
-{ $description "Calls the " { $snippet "try" } " quotation. If an error is thrown in the dynamic extent of the quotation, restores the data stack and pushes the error. If the quotation returns successfully, outputs " { $link f } " without restoring the data stack." }
-{ $notes "This word cannot differentiate between the case of " { $link f } " being thrown, and no error being thrown. You should never throw " { $link f } ", and you should also use other error handling combinators where possible." } ;
-
-{ catch cleanup recover } related-words
+{ cleanup recover } related-words
 
 HELP: cleanup
 { $values { "try" quotation } { "cleanup-always" quotation } { "cleanup-error" quotation } }
@@ -166,7 +160,7 @@ HELP: rethrow
 { $values { "error" object } }
 { $description "Throws an error without saving the current continuation in the " { $link error-continuation } " global variable. This is done so that inspecting the error stacks sheds light on the original cause of the exception, rather than the point where it was rethrown." }
 { $notes
-    "This word is intended to be used in conjunction with " { $link recover } " or " { $link catch } " to implement error handlers which perform an action and pass the error to the next outermost error handler."
+    "This word is intended to be used in conjunction with " { $link recover } " to implement error handlers which perform an action and pass the error to the next outermost error handler."
 }
 { $examples
     "The " { $link with-parser } " catches errors, annotates them with file name and line number information, and rethrows them:"

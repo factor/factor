@@ -54,21 +54,13 @@ GENERIC: testing
 
 [ f ] [ \ testing generic? ] unit-test
 
-[ f ] [ gensym interned? ] unit-test
-
 : forgotten ;
 : another-forgotten ;
 
-[ f ] [ \ forgotten interned? ] unit-test
-
 FORGET: forgotten
-
-[ f ] [ \ another-forgotten interned? ] unit-test
 
 FORGET: another-forgotten
 : another-forgotten ;
-
-[ t ] [ \ + interned? ] unit-test
 
 ! I forgot remove-crossref calls!
 : fee ;
@@ -87,8 +79,7 @@ FORGET: foe
 ] unit-test
 
 [ t ] [
-    \ * usage [ word? ] subset
-    [ dup interned? swap method-body? or ] all?
+    \ * usage [ word? ] subset [ crossref? ] all?
 ] unit-test
 
 DEFER: calls-a-gensym
@@ -119,7 +110,7 @@ M: array freakish ;
 [ t ] [ \ bar \ freakish usage member? ] unit-test
 
 DEFER: x
-[ t ] [ [ x ] catch undefined? ] unit-test
+[ x ] [ undefined? ] must-fail-with
 
 [ ] [ "no-loc" "temporary" create drop ] unit-test
 [ f ] [ "no-loc" "temporary" lookup where ] unit-test
@@ -150,10 +141,8 @@ SYMBOL: quot-uses-b
 
 [ { + } ] [ \ quot-uses-b uses ] unit-test
 
-[ t ] [
-    [ "IN: temporary : undef-test ; << undef-test >>" eval ] catch
-    [ undefined? ] is?
-] unit-test
+[ "IN: temporary : undef-test ; << undef-test >>" eval ]
+[ [ undefined? ] is? ] must-fail-with
 
 [ ] [
     "IN: temporary GENERIC: symbol-generic" eval

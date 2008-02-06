@@ -3,8 +3,9 @@
 USING: arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
 inference inference.backend inference.dataflow io kernel
-kernel.private layouts math namespaces optimizer prettyprint
-quotations sequences system threads words vectors ;
+kernel.private layouts math namespaces optimizer
+optimizer.specializers prettyprint quotations sequences system
+threads words vectors ;
 IN: generator
 
 SYMBOL: compile-queue

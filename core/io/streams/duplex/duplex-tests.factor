@@ -28,13 +28,13 @@ M: unclosable-stream dispose
 [ t ] [
     <unclosable-stream> <closing-stream> [
         <duplex-stream>
-        [ dup dispose ] catch 2drop
+        [ dup dispose ] [ 2drop ] recover
     ] keep closing-stream-closed?
 ] unit-test
 
 [ t ] [
     <closing-stream> [ <unclosable-stream>
         <duplex-stream>
-        [ dup dispose ] catch 2drop
+        [ dup dispose ] [ 2drop ] recover
     ] keep closing-stream-closed?
 ] unit-test

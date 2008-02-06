@@ -25,7 +25,7 @@ timers [ init-timers ] unless
     [ ] [ "SYMBOL:" "i" get set-editor-string ] unit-test
 
     [ ] [
-        "i" get [ { "SYMBOL:" } parse-lines ] catch go-to-error
+        "i" get [ { "SYMBOL:" } parse-lines ] [ go-to-error ] recover
     ] unit-test
 
     [ t ] [

@@ -10,7 +10,6 @@ C: <db> db ( handle -- obj )
 ! HOOK: db-create db ( str -- )
 ! HOOK: db-drop db ( str -- )
 GENERIC: db-open ( db -- )
-GENERIC: db-close ( db -- )
 
 TUPLE: statement sql params handle bound? ;
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays assocs classes compiler db db.sql
+USING: alien arrays assocs classes compiler db
 hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi ;

@@ -91,7 +91,7 @@ M: union-1 generic-update-test drop "union-1" ;
 [ f ] [ union-1 union-class? ] unit-test
 [ t ] [ union-1 predicate-class? ] unit-test
 [ "union-1" ] [ 8 generic-update-test ] unit-test
-[ -7 generic-update-test ] unit-test-fails
+[ -7 generic-update-test ] must-fail
 
 ! Test mixins
 MIXIN: sequence-mixin
@@ -169,10 +169,14 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 UNION: forget-class-bug-1 integer ;
 UNION: forget-class-bug-2 forget-class-bug-1 dll ;
 
-FORGET: forget-class-bug-1
-FORGET: forget-class-bug-2
+[
+    \ forget-class-bug-1 forget
+    \ forget-class-bug-2 forget
+] with-compilation-unit
 
-[ t ] [ integer dll class-or interned? ] unit-test
+[ f ] [ forget-class-bug-1 typemap get values [ memq? ] with contains? ] unit-test
+
+[ f ] [ forget-class-bug-2 typemap get values [ memq? ] with contains? ] unit-test
 
 DEFER: mixin-forget-test-g
 
@@ -191,7 +195,7 @@ DEFER: mixin-forget-test-g
 ] unit-test
 
 [ { } ] [ { } mixin-forget-test-g ] unit-test
-[ H{ } mixin-forget-test-g ] unit-test-fails
+[ H{ } mixin-forget-test-g ] must-fail
 
 [ ] [
     {
@@ -205,7 +209,7 @@ DEFER: mixin-forget-test-g
     parse-stream drop
 ] unit-test
 
-[ { } mixin-forget-test-g ] unit-test-fails
+[ { } mixin-forget-test-g ] must-fail
 [ H{ } ] [ H{ } mixin-forget-test-g ] unit-test
 
 ! Method flattening interfered with mixin update

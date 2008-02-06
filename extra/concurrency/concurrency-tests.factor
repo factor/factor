@@ -67,15 +67,12 @@ IN: temporary
 ] unit-test
 
 
-[ "crash" ] [
+[
   [
-    [
-      "crash" throw
-    ] spawn-link drop
-    receive
-  ] 
-  catch
-] unit-test 
+    "crash" throw
+  ] spawn-link drop
+  receive
+] [ "crash" = ] must-fail-with
 
 [ 50 ] [
   [ 50 ] future ?future
@@ -115,7 +112,7 @@ SYMBOL: value
 ! this is fixed (via a timeout).
 ! [
 !  [ "this should propogate" throw ] future ?future 
-! ] unit-test-fails
+! ] must-fail
 
 [ ] [
   [ "this should not propogate" throw ] future drop 

@@ -2,8 +2,8 @@ USING: alien.c-types hardware-info kernel math namespaces
 windows windows.kernel32 hardware-info.backend ;
 IN: hardware-info.windows.ce
 
-TUPLE: wince ;
-T{ wince } os set-global
+TUPLE: wince-os ;
+T{ wince-os } os set-global
 
 : memory-status ( -- MEMORYSTATUS )
     "MEMORYSTATUS" <c-object>

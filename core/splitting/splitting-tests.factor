@@ -1,7 +1,7 @@
 USING: splitting tools.test ;
 IN: temporary
 
-[ { 1 2 3 } 0 group ] unit-test-fails
+[ { 1 2 3 } 0 group ] must-fail
 
 [ { "hell" "o wo" "rld" } ] [ "hello world" 4 group ] unit-test
 

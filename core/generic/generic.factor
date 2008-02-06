@@ -102,7 +102,9 @@ M: method-spec definition
     first2 method dup [ method-def ] when ;
 
 : forget-method ( class generic -- )
-    check-method [ delete-at ] with-methods ;
+    check-method
+    [ delete-at* ] with-methods
+    [ method-word forget ] [ drop ] if ;
 
 M: method-spec forget* first2 forget-method ;
 
@@ -144,6 +146,9 @@ M: generic subwords
     dup "methods" word-prop values
     swap "default-method" word-prop add
     [ method-word ] map ;
+
+M: generic forget-word
+    dup subwords [ forget-word ] each (forget-word) ;
 
 : xref-generics ( -- )
     all-words [ subwords [ xref ] each ] each ;

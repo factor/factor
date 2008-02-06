@@ -38,7 +38,7 @@ uses definitions ;
 
 : (xref-source) ( source-file -- pathname uses )
     dup source-file-path <pathname> swap source-file-uses
-    [ interned? ] subset ;
+    [ crossref? ] subset ;
 
 : xref-source ( source-file -- )
     (xref-source) crossref get add-vertex ;

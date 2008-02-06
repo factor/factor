@@ -3,25 +3,25 @@ sequences sequences.private strings tools.test vectors
 continuations random growable classes ;
 IN: temporary
 
-[ ] [ 10 [ [ -1000000 <vector> ] catch drop ] times ] unit-test
+[ ] [ 10 [ [ -1000000 <vector> ] ignore-errors ] times ] unit-test
 
 [ 3 ] [ [ t f t ] length ] unit-test
 [ 3 ] [ V{ t f t } length ] unit-test
 
-[ -3 V{ } nth ] unit-test-fails
-[ 3 V{ } nth ] unit-test-fails
-[ 3 54.3 nth ] unit-test-fails
+[ -3 V{ } nth ] must-fail
+[ 3 V{ } nth ] must-fail
+[ 3 54.3 nth ] must-fail
 
-[ "hey" [ 1 2 ] set-length ] unit-test-fails
-[ "hey" V{ 1 2 } set-length ] unit-test-fails
+[ "hey" [ 1 2 ] set-length ] must-fail
+[ "hey" V{ 1 2 } set-length ] must-fail
 
 [ 3 ] [ 3 0 <vector> [ set-length ] keep length ] unit-test
 [ "yo" ] [
     "yo" 4 1 <vector> [ set-nth ] keep 4 swap nth
 ] unit-test
 
-[ 1 V{ } nth ] unit-test-fails
-[ -1 V{ } set-length ] unit-test-fails
+[ 1 V{ } nth ] must-fail
+[ -1 V{ } set-length ] must-fail
 [ V{ } ] [ [ ] >vector ] unit-test
 [ V{ 1 2 } ] [ [ 1 2 ] >vector ] unit-test
 
@@ -64,8 +64,8 @@ IN: temporary
 [ V{ 2 3 } ] [ "funny-stack" get pop ] unit-test
 [ V{ 1 5 } ] [ "funny-stack" get peek ] unit-test
 [ V{ 1 5 } ] [ "funny-stack" get pop ] unit-test
-[ "funny-stack" get pop ] unit-test-fails
-[ "funny-stack" get pop ] unit-test-fails
+[ "funny-stack" get pop ] must-fail
+[ "funny-stack" get pop ] must-fail
 [ ] [ "funky" "funny-stack" get push ] unit-test
 [ "funky" ] [ "funny-stack" get pop ] unit-test
 

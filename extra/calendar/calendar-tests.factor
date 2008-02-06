@@ -1,14 +1,14 @@
 USING: arrays calendar kernel math sequences tools.test
 continuations system ;
 
-[ "invalid timestamp" ] [ [ 2004 12 32 0 0 0 0 make-timestamp ] catch ] unit-test
-[ "invalid timestamp" ] [ [ 2004 2 30 0 0 0 0 make-timestamp ] catch ] unit-test
-[ "invalid timestamp" ] [ [ 2003 2 29 0 0 0 0 make-timestamp ] catch ] unit-test
-[ "invalid timestamp" ] [ [ 2004 -2 9 0 0 0 0 make-timestamp ] catch ] unit-test
-[ "invalid timestamp" ] [ [ 2004 12 0 0 0 0 0 make-timestamp ] catch ] unit-test
-[ "invalid timestamp" ] [ [ 2004 12 1 24 0 0 0 make-timestamp ] catch ] unit-test
-[ "invalid timestamp" ] [ [ 2004 12 1 23 60 0 0 make-timestamp ] catch ] unit-test
-[ "invalid timestamp" ] [ [ 2004 12 1 23 59 60 0 0 make-timestamp ] catch ] unit-test
+[ 2004 12 32 0   0  0 0 make-timestamp ] [ "invalid timestamp" = ] must-fail-with
+[ 2004  2 30 0   0  0 0 make-timestamp ] [ "invalid timestamp" = ] must-fail-with
+[ 2003  2 29 0   0  0 0 make-timestamp ] [ "invalid timestamp" = ] must-fail-with
+[ 2004 -2  9 0   0  0 0 make-timestamp ] [ "invalid timestamp" = ] must-fail-with
+[ 2004 12  0 0   0  0 0 make-timestamp ] [ "invalid timestamp" = ] must-fail-with
+[ 2004 12  1 24  0  0 0 make-timestamp ] [ "invalid timestamp" = ] must-fail-with
+[ 2004 12  1 23 60  0 0 make-timestamp ] [ "invalid timestamp" = ] must-fail-with
+[ 2004 12  1 23 59 60 0 make-timestamp ] [ "invalid timestamp" = ] must-fail-with
 
 [ f ] [ 1900 leap-year? ] unit-test
 [ t ] [ 1904 leap-year? ] unit-test
