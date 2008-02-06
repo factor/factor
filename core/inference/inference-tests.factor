@@ -326,10 +326,10 @@ DEFER: bar
 : bad-bin ( a b -- ) 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
 [ [ bad-bin ] infer ] must-fail
 
-[ [ [ r> ] infer ] [ inference-error? ] must-fail-with
+[ [ r> ] infer ] [ inference-error? ] must-fail-with
 
 ! Regression
-[ [ [ get-slots ] infer ] [ inference-error? ] must-fail-with
+[ [ get-slots ] infer ] [ inference-error? ] must-fail-with
 
 ! Test some curry stuff
 { 1 1 } [ 3 [ ] curry 4 [ ] curry if ] unit-test-effect

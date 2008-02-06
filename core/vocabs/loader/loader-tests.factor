@@ -63,14 +63,12 @@ IN: temporary
 
 [ 2 ] [ "count-me" get-global ] unit-test
 
-[ t ] [
-    [
-        "IN: vocabs.loader.test.a v-l-t-a-hello"
-        <string-reader>
-        "resource:core/vocabs/loader/test/a/a.factor"
-        parse-stream
-    ] catch [ no-word? ] is?
-] unit-test
+[
+    "IN: vocabs.loader.test.a v-l-t-a-hello"
+    <string-reader>
+    "resource:core/vocabs/loader/test/a/a.factor"
+    parse-stream
+] [ [ no-word? ] is? ] must-fail-with
 
 0 "count-me" set-global
 
@@ -121,8 +119,7 @@ IN: temporary
 [ "kernel" vocab where ] unit-test
 
 [ t ] [
-    [ "vocabs.loader.test.d" require ] catch
-    [ :1 ] when
+    [ "vocabs.loader.test.d" require ] [ :1 ] recover
     "vocabs.loader.test.d" vocab-source-loaded?
 ] unit-test
 

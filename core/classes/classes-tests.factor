@@ -169,8 +169,10 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 UNION: forget-class-bug-1 integer ;
 UNION: forget-class-bug-2 forget-class-bug-1 dll ;
 
-FORGET: forget-class-bug-1
-FORGET: forget-class-bug-2
+[
+    \ forget-class-bug-1 forget
+    \ forget-class-bug-2 forget
+] with-compilation-unit
 
 [ f ] [ forget-class-bug-1 typemap get values [ memq? ] with contains? ] unit-test
 

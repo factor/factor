@@ -123,7 +123,7 @@ TUPLE: yo-momma ;
     [ ] [ \ yo-momma forget ] unit-test
     [ f ] [ \ yo-momma typemap get values memq? ] unit-test
 
-    [ f ] [ \ yo-momma crossref ] unit-test
+    [ f ] [ \ yo-momma crossref get at ] unit-test
 ] with-compilation-unit
 
 TUPLE: loc-recording ;

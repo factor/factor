@@ -37,7 +37,7 @@ M: expected-error summary
 : must-fail-with ( quot test -- )
     >r [ expected-error construct-empty throw ] compose r>
     [ recover ] 2curry
-    [ ] swap unit-test ;
+    [ t ] swap unit-test ;
 
 : must-fail ( quot -- )
     [ drop t ] must-fail-with ;

@@ -155,7 +155,7 @@ M: string my-hook "a string" ;
 
 [ "an integer" ] [ 3 my-var set my-hook ] unit-test
 [ "a string" ] [ my-hook my-var set my-hook ] unit-test
-[ 1.0 my-var set my-hook ] [ [ T{ no-method f 1.0 my-hook } = ] must-fail-with
+[ 1.0 my-var set my-hook ] [ T{ no-method f 1.0 my-hook } = ] must-fail-with
 
 GENERIC: tag-and-f ( x -- x x )
 
