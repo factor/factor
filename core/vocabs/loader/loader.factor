@@ -149,7 +149,7 @@ SYMBOL: load-help?
     dup modified-sources swap modified-docs ;
 
 : load-error. ( vocab error -- )
-    "While loading " swap dup >vocab-link write-object ":" print
+    "While loading " rot dup >vocab-link write-object ":" print
     print-error ;
 
 TUPLE: require-all-error vocabs ;

@@ -37,11 +37,13 @@ M: windows-nt-io root-directory? ( path -- ? )
 : windows-path+ ( cwd path -- newpath )
     {
         ! empty
-        { [ dup empty? ] [ "empty path" throw ] }
+        { [ dup empty? ] [ drop ] }
+        ! ..
+        { [ dup ".." = ] [ drop parent-directory prepend-prefix ] }
         ! \\\\?\\c:\\foo
         { [ dup unicode-prefix head? ] [ nip ] }
         ! ..\\foo
-        { [ dup "..\\" head? ] [ >r parent-directory r> 2 tail windows-path+ ] }
+        { [ dup "..\\" head? ] [ >r parent-directory r> 3 tail windows-path+ ] }
         ! .\\foo
         { [ dup ".\\" head? ] [ 1 tail append prepend-prefix ] }
         ! \\foo
@@ -49,7 +51,11 @@ M: windows-nt-io root-directory? ( path -- ? )
         ! c:\\foo
         { [ dup ?second CHAR: : = ] [ nip prepend-prefix ] }
         ! foo.txt
-        { [ t ] [ [ first CHAR: \\ = "" "\\" ? ] keep 3append prepend-prefix ] }
+        { [ t ] [
+            >r right-trim-separators "\\" r>
+            left-trim-separators
+            3append prepend-prefix
+        ] }
     } cond ;
 
 M: windows-nt-io normalize-pathname ( string -- string )
