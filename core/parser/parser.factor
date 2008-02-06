@@ -8,12 +8,17 @@ io.files io.streams.string io.streams.lines vocabs
 source-files classes hashtables compiler.errors compiler.units ;
 IN: parser
 
-TUPLE: lexer text line column ;
+TUPLE: lexer text line line-text line-length column ;
 
-: <lexer> ( text -- lexer ) 1 0 lexer construct-boa ;
+: next-line ( lexer -- )
+    0 over set-lexer-column
+    dup lexer-line over lexer-text ?nth over set-lexer-line-text
+    dup lexer-line-text length over set-lexer-line-length
+    dup lexer-line 1+ swap set-lexer-line ;
 
-: line-text ( lexer -- str )
-    dup lexer-line 1- swap lexer-text ?nth ;
+: <lexer> ( text -- lexer )
+    0 { set-lexer-text set-lexer-line } lexer construct
+    dup lexer-text empty? [ dup next-line ] unless ;
 
 : location ( -- loc )
     file get lexer get lexer-line 2dup and
@@ -50,18 +55,14 @@ t parser-notes set-global
         "Note: " write dup print
     ] when drop ;
 
-: next-line ( lexer -- )
-    0 over set-lexer-column
-    dup lexer-line 1+ swap set-lexer-line ;
-
 : skip ( i seq ? -- n )
     over >r
     [ swap CHAR: \s eq? xor ] curry find* drop
-    [ r> drop ] [ r> length ] if* ; inline
+    [ r> drop ] [ r> length ] if* ;
 
 : change-column ( lexer quot -- )
     swap
-    [ dup lexer-column swap line-text rot call ] keep
+    [ dup lexer-column swap lexer-line-text rot call ] keep
     set-lexer-column ; inline
 
 GENERIC: skip-blank ( lexer -- )
@@ -73,20 +74,20 @@ GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word ( lexer -- )
     [
-        2dup nth CHAR: " = [ drop 1+ ] [ f skip ] if
+        2dup nth CHAR: " eq? [ drop 1+ ] [ f skip ] if
     ] change-column ;
 
 : still-parsing? ( lexer -- ? )
     dup lexer-line swap lexer-text length <= ;
 
 : still-parsing-line? ( lexer -- ? )
-    dup lexer-column swap line-text length < ;
+    dup lexer-column swap lexer-line-length < ;
 
 : (parse-token) ( lexer -- str )
     [ lexer-column ] keep
     [ skip-word ] keep
     [ lexer-column ] keep
-    line-text subseq ;
+    lexer-line-text subseq ;
 
 :  parse-token ( lexer -- str/f )
     dup still-parsing? [
@@ -139,9 +140,8 @@ TUPLE: parse-error file line col text ;
 
 : <parse-error> ( msg -- error )
     file get
-    lexer get lexer-line
-    lexer get lexer-column
-    lexer get line-text
+    lexer get
+    { lexer-line lexer-column lexer-line-text } get-slots
     parse-error construct-boa
     [ set-delegate ] keep ;
 
@@ -239,22 +239,25 @@ M: no-word summary
     word-restarts throw-restarts
     dup word-vocabulary (use+) ;
 
-: check-forward ( str word -- word )
+: check-forward ( str word -- word/f )
     dup forward-reference? [
         drop
-        dup use get
+        use get
         [ at ] with map [ ] subset
         [ forward-reference? not ] find nip
-        [ ] [ no-word ] ?if
     ] [
         nip
     ] if ;
 
-: search ( str -- word )
-    dup use get assoc-stack [ check-forward ] [ no-word ] if* ;
+: search ( str -- word/f )
+    dup use get assoc-stack check-forward ;
 
 : scan-word ( -- word/number/f )
-    scan dup [ dup string>number [ ] [ search ] ?if ] when ;
+    scan dup [
+        dup search [ ] [
+            dup string>number [ ] [ no-word ] ?if
+        ] ?if
+    ] when ;
 
 TUPLE: staging-violation word ;
 

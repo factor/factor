@@ -136,8 +136,6 @@ ARTICLE: "parser-lexer" "The lexer"
 { $subsection <lexer> }
 "A word to test of the end of input has been reached:"
 { $subsection still-parsing? }
-"A word to get the text of the current line:"
-{ $subsection line-text }
 "A word to advance the lexer to the next line:"
 { $subsection next-line }
 "Two generic words to override the lexer's token boundary detection:"
@@ -221,10 +219,6 @@ HELP: parse-error
 HELP: <parse-error>
 { $values { "msg" "an error" } { "error" parse-error } }
 { $description "Creates a new " { $link parse-error } ", filling in the location information from the current " { $link lexer } "." } ;
-
-HELP: line-text
-{ $values { "lexer" lexer } { "str" string } }
-{ $description "Outputs the text of the line being parsed." } ;
 
 HELP: skip
 { $values { "i" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "n" integer } }

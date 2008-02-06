@@ -4,7 +4,7 @@ USING: namespaces parser kernel sequences words quotations math ;
 IN: multiline
 
 : next-line-text ( -- str )
-    lexer get dup next-line line-text ;
+    lexer get dup next-line lexer-line-text ;
 
 : (parse-here) ( -- )
     next-line-text dup ";" =
@@ -19,7 +19,7 @@ IN: multiline
     parse-here 1quotation define ; parsing
 
 : (parse-multiline-string) ( start-index end-text -- end-index )
-    lexer get line-text 2dup start
+    lexer get lexer-line-text 2dup start
     [ rot dupd >r >r swap subseq % r> r> length + ] [
         rot tail % "\n" % 0
         lexer get next-line swap (parse-multiline-string)
