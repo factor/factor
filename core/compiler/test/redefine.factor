@@ -235,7 +235,7 @@ DEFER: flushable-test-2
 : bx ax ;
 [ \ bx forget ] with-compilation-unit
 
-[ f ] [ \ bx \ ax compiled-usage contains? ] unit-test
+[ f ] [ \ bx \ ax compiled-usage key? ] unit-test
 
 DEFER: defer-redefine-test-2
 

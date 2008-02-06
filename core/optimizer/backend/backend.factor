@@ -245,18 +245,32 @@ M: #dispatch optimize-node*
 : dispatching-class ( node word -- class )
     [ dispatch# node-class# ] keep specific-method ;
 
-: flat-length ( seq -- n )
+! A heuristic to avoid excessive inlining
+DEFER: (flat-length)
+
+: word-flat-length ( word -- n )
+    dup get over inline? not or
+    [ drop 1 ] [ dup dup set word-def (flat-length) ] if ;
+
+: (flat-length) ( seq -- n )
     [
-        dup quotation? over array? or
-        [ flat-length ] [ drop 1 ] if
+        {
+            { [ dup quotation? ] [ (flat-length) 1+ ] }
+            { [ dup array? ] [ (flat-length) ] }
+            { [ dup word? ] [ word-flat-length ] }
+            { [ t ] [ drop 1 ] }
+        } cond
     ] map sum ;
+
+: flat-length ( seq -- n )
+    [ word-def (flat-length) ] with-scope ;
 
 : will-inline-method ( node word -- method-spec/t quot/t )
     #! t indicates failure
     tuck dispatching-class dup [
         swap [ 2array ] 2keep
         method method-word
-        dup word-def flat-length 5 >=
+        dup flat-length 10 >=
         [ 1quotation ] [ word-def ] if
     ] [
         2drop t t
