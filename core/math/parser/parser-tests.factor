@@ -105,6 +105,6 @@ unit-test
 !     [ dup number>string string>number = ] all?
 ! ] unit-test
 
-[ 1 1 >base ] unit-test-fails
-[ 1 0 >base ] unit-test-fails
-[ 1 -1 >base ] unit-test-fails
+[ 1 1 >base ] must-fail
+[ 1 0 >base ] must-fail
+[ 1 -1 >base ] must-fail

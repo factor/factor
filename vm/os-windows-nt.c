@@ -8,21 +8,6 @@ s64 current_millis(void)
 		- EPOCH_OFFSET) / 10000;
 }
 
-DEFINE_PRIMITIVE(cwd)
-{
-	F_CHAR buf[MAX_UNICODE_PATH];
-
-	if(!GetCurrentDirectory(MAX_UNICODE_PATH, buf))
-		io_error();
-
-	box_u16_string(buf);
-}
-
-DEFINE_PRIMITIVE(cd)
-{
-	SetCurrentDirectory(unbox_u16_string());
-}
-
 DEFINE_PRIMITIVE(os_envs)
 {
 	GROWABLE_ARRAY(result);

@@ -146,7 +146,7 @@ ARTICLE: { "concurrency" "exceptions" } "Exceptions"
 "A process can handle exceptions using the standard Factor exception handling mechanism. If an exception is uncaught the process will terminate. For example:" 
 { $code "[ 1 0 / \"This will not print\" print ] spawn" } 
 "Processes can be linked so that a parent process can receive the exception that caused the child process to terminate. In this way 'supervisor' processes can be created that are notified when child processes terminate and possibly restart them.\n\nThe easiest way to form this link is using " { $link spawn-link } ". This will create a unidirectional link, such that if an uncaught exception causes the child to terminate, the parent process can catch it:"
-{ $code "[\n  [ 1 0 / \"This will not print\" print ] spawn-link drop\n  receive\n] catch [ \"Exception caught.\" print ] when" } 
+{ $code "[\n  [ 1 0 / \"This will not print\" print ] spawn-link drop\n  receive\n] [ \"Exception caught.\" print ] recover" } 
 "Exceptions are only raised in the parent when the parent does a " { $link receive } " or " { $link receive-if } ". This is because the exception is sent from the child to the parent as a message." ;
 
 ARTICLE: { "concurrency" "futures" } "Futures"

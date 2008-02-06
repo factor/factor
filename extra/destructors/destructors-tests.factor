@@ -36,7 +36,7 @@ M: dummy-destructor destruct ( obj -- )
             dup destroy-always
             "foo" throw
         ] with-destructors
-    ] catch drop dummy-obj-destroyed? 
+    ] ignore-errors dummy-obj-destroyed? 
 ] unit-test
 
 [ t ] [
@@ -45,6 +45,6 @@ M: dummy-destructor destruct ( obj -- )
             dup destroy-later
             "foo" throw
         ] with-destructors
-    ] catch drop dummy-obj-destroyed? 
+    ] ignore-errors dummy-obj-destroyed? 
 ] unit-test
 

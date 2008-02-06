@@ -2,7 +2,7 @@ USING: arrays compiler generic hashtables inference kernel
 kernel.private math optimizer prettyprint sequences sbufs
 strings tools.test vectors words sequences.private quotations
 optimizer.backend classes inference.dataflow tuples.private
-continuations ;
+continuations growable ;
 IN: temporary
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
@@ -136,7 +136,7 @@ TUPLE: pred-test ;
 GENERIC: void-generic ( obj -- * )
 : breakage "hi" void-generic ;
 [ t ] [ \ breakage compiled? ] unit-test
-[ breakage ] unit-test-fails
+[ breakage ] must-fail
 
 ! regression
 : test-0 ( n -- ) dup 0 = [ drop ] [ 1- test-0 ] if ; inline
@@ -247,7 +247,7 @@ M: slice foozul ;
 GENERIC: detect-number ( obj -- obj )
 M: number detect-number ;
 
-[ 10 f [ <array> 0 + detect-number ] compile-call ] unit-test-fails
+[ 10 f [ <array> 0 + detect-number ] compile-call ] must-fail
 
 ! Regression
 [ 4 [ + ] ] [ 2 2 [ [ + ] [ call ] keep ] compile-call ] unit-test
@@ -291,3 +291,12 @@ TUPLE: silly-tuple a b ;
 : construct-empty-bug construct-empty ;
 
 [ ] [ [ construct-empty ] dataflow optimize drop ] unit-test
+
+! Make sure we have sane heuristics
+: should-inline? method method-word flat-length 10 <= ;
+
+[ t ] [ \ fixnum \ shift should-inline? ] unit-test
+[ f ] [ \ array \ equal? should-inline? ] unit-test
+[ f ] [ \ sequence \ hashcode* should-inline? ] unit-test
+[ t ] [ \ array \ nth-unsafe should-inline? ] unit-test
+[ t ] [ \ growable \ nth-unsafe should-inline? ] unit-test

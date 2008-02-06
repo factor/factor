@@ -57,8 +57,8 @@ IN: temporary
 
 ! Make sure error reporting works
 
-[ [ dup ] compile-call ] unit-test-fails
-[ [ drop ] compile-call ] unit-test-fails
+[ [ dup ] compile-call ] must-fail
+[ [ drop ] compile-call ] must-fail
 
 ! Regression
 

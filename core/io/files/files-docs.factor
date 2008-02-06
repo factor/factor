@@ -52,12 +52,12 @@ HELP: <file-appender>
 { $description "Outputs an output stream for writing to the specified pathname. The stream begins writing at the end of the file." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
-HELP: cwd ( -- path )
+HELP: cwd
 { $values { "path" "a pathname string" } }
 { $description "Outputs the current working directory of the Factor process." }
 { $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
 
-HELP: cd ( path -- )
+HELP: cd
 { $values { "path" "a pathname string" } }
 { $description "Changes the current working directory of the Factor process." }
 { $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;

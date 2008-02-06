@@ -10,7 +10,6 @@ IN: tools.test.inference
 : unit-test-effect ( effect quot -- )
     >r 1quotation r> [ infer short-effect ] curry unit-test ;
 
-: must-infer ( word -- )
-    dup "declared-effect" word-prop
-    dup effect-in length swap effect-out length 2array
-    swap 1quotation unit-test-effect ;
+: must-infer ( word/quot -- )
+    dup word? [ 1quotation ] when
+    [ infer drop ] curry [ ] swap unit-test ;

@@ -30,6 +30,7 @@ typedef wchar_t F_CHAR;
 
 F_STRING *get_error_message(void);
 DLLEXPORT F_CHAR *error_message(DWORD id);
+void windows_error(void);
 
 void init_ffi(void);
 void ffi_dlopen(F_DLL *dll, bool error);

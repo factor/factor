@@ -71,4 +71,4 @@ TYPEDEF: uchar* MyLPBYTE
 
 [
     0 B{ 1 2 3 4 } <displaced-alien> <void*>
-] unit-test-fails
+] must-fail

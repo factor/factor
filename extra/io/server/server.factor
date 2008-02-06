@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.sockets io.files continuations kernel math
 math.parser namespaces parser sequences strings
@@ -9,11 +9,14 @@ IN: io.server
 
 SYMBOL: log-stream
 
+: with-log-stream ( quot -- )
+    log-stream get swap with-stream* ; inline
+
 : log-message ( str -- )
-    log-stream get [
+    [
         "[" write now timestamp>string write "] " write
         print flush
-    ] with-stream* ;
+    ] with-log-stream ;
 
 : log-error ( str -- ) "Error: " swap append log-message ;
 
@@ -24,15 +27,13 @@ SYMBOL: log-stream
 : log-file ( service -- path )
     ".log" append resource-path ;
 
-: with-log-stream ( stream quot -- )
-    log-stream swap with-variable ; inline
-
 : with-log-file ( file quot -- )
     >r <file-appender> r>
-    [ with-log-stream ] curry with-disposal ; inline
+    [ log-stream swap with-variable ] curry
+    with-disposal ; inline
 
 : with-log-stdio ( quot -- )
-    stdio get swap with-log-stream ;
+    stdio get log-stream rot with-variable ; inline
 
 : with-logging ( service quot -- )
     over [

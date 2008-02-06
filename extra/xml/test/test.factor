@@ -17,7 +17,7 @@ SYMBOL: xml-file
     xml-file get T{ name f "" "this" "http://d.de" } swap at
 ] unit-test
 [ t ] [ xml-file get tag-children second contained-tag? ] unit-test
-[ t ] [ [ "<a></b>" string>xml ] catch xml-parse-error? ] unit-test
+[ "<a></b>" string>xml ] [ xml-parse-error? ] must-fail-with
 [ T{ comment f "This is where the fun begins!" } ] [
     xml-file get xml-before [ comment? ] find nip
 ] unit-test

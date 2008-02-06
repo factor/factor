@@ -9,4 +9,4 @@ IN: temporary
 yield
 
 [ ] [ 0.3 sleep ] unit-test
-[ "hey" sleep ] unit-test-fails
+[ "hey" sleep ] must-fail

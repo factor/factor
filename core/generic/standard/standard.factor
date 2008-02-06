@@ -91,7 +91,7 @@ TUPLE: no-method object generic ;
 
 : class-hash-dispatch-quot ( methods quot picker -- quot )
     >r >r hash-methods r> map
-    hash-dispatch-quot r> [ class-hash ] rot 3append ;
+    hash-dispatch-quot r> [ class-hash ] rot 3append ; inline
 
 : big-generic ( methods -- quot )
     [ small-generic ] picker class-hash-dispatch-quot ;

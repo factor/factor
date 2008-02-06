@@ -4,7 +4,7 @@ IN: temporary
 
 TUPLE: testing x y z ;
 
-[ save-image-and-exit ] unit-test-fails
+[ save-image-and-exit ] must-fail
 
 [ ] [
     num-types get [

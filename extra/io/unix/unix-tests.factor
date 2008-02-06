@@ -7,7 +7,7 @@ IN: temporary
 [
     [
         "unix-domain-socket-test" resource-path delete-file
-    ] catch drop
+    ] ignore-errors
 
     "unix-domain-socket-test" resource-path <local>
     <server> [
@@ -36,7 +36,7 @@ yield
 ! Unix domain datagram sockets
 [
     "unix-domain-datagram-test" resource-path delete-file
-] catch drop
+] ignore-errors
 
 : server-addr "unix-domain-datagram-test" resource-path <local> ;
 : client-addr "unix-domain-datagram-test-2" resource-path <local> ;
@@ -75,7 +75,7 @@ yield
 
 [
     "unix-domain-datagram-test-2" resource-path delete-file
-] catch drop
+] ignore-errors
 
 client-addr <datagram>
 "d" set
@@ -110,7 +110,7 @@ client-addr <datagram>
 
 [
     "unix-domain-datagram-test-3" resource-path delete-file
-] catch drop
+] ignore-errors
 
 "unix-domain-datagram-test-2" resource-path delete-file
 
@@ -118,29 +118,29 @@ client-addr <datagram>
 
 [
     B{ 1 2 3 } "unix-domain-datagram-test-3" <local> "d" get send
-] unit-test-fails
+] must-fail
 
 [ ] [ "d" get dispose ] unit-test
 
 ! See what happens on send/receive after close
 
-[ "d" get receive ] unit-test-fails
+[ "d" get receive ] must-fail
 
-[ B{ 1 2 } server-addr "d" get send ] unit-test-fails
+[ B{ 1 2 } server-addr "d" get send ] must-fail
 
 ! Invalid parameter tests
 
 [
     image <file-reader> [ stdio get accept ] with-stream
-] unit-test-fails
+] must-fail
 
 [
     image <file-reader> [ stdio get receive ] with-stream
-] unit-test-fails
+] must-fail
 
 [
     image <file-reader> [
         B{ 1 2 } server-addr
         stdio get send
     ] with-stream
-] unit-test-fails
+] must-fail

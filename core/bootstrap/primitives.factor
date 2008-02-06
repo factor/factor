@@ -553,8 +553,6 @@ builtins get num-tags get tail f union-class define-class
     { "millis" "system" }
     { "type" "kernel.private" }
     { "tag" "kernel.private" }
-    { "cwd" "io.files" }
-    { "cd" "io.files" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
     { "dlsym" "alien" }

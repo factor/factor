@@ -14,7 +14,7 @@ IN: temporary
 
 [ ] [
     test-db [
-        [ "drop table person;" sql-command ] catch drop
+        [ "drop table person;" sql-command ] ignore-errors
         "create table person (name varchar(30), country varchar(30));"
             sql-command
 
@@ -83,7 +83,7 @@ IN: temporary
             "oops" throw
         ] with-transaction
     ] with-db
-] unit-test-fails
+] must-fail
 
 [ 3 ] [
     test-db [

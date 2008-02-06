@@ -124,19 +124,19 @@ float-arrays combinators.private combinators ;
 ] each
 
 \ push-all
-{ { string array } { sbuf vector } }
+{ { string sbuf } { array vector } }
 "specializer" set-word-prop
 
 \ append
-{ { string array } { string array } }
+{ { string string } { array array } }
 "specializer" set-word-prop
 
 \ subseq
-{ fixnum fixnum { string array } }
+{ { fixnum fixnum string } { fixnum fixnum array } }
 "specializer" set-word-prop
 
 \ reverse-here
-{ { string array } }
+{ { string } { array } }
 "specializer" set-word-prop
 
 \ mismatch
@@ -147,9 +147,9 @@ float-arrays combinators.private combinators ;
 
 \ >string { sbuf } "specializer" set-word-prop
 
-\ >array { { string vector } } "specializer" set-word-prop
+\ >array { { string } { vector } } "specializer" set-word-prop
 
-\ >vector { { array vector } } "specializer" set-word-prop
+\ >vector { { array } { vector } } "specializer" set-word-prop
 
 \ >sbuf { string } "specializer" set-word-prop
 
@@ -163,6 +163,6 @@ float-arrays combinators.private combinators ;
 
 \ assoc-stack { vector } "specializer" set-word-prop
 
-\ >le { { fixnum bignum } fixnum } "specializer" set-word-prop
+\ >le { { fixnum fixnum } { bignum fixnum } } "specializer" set-word-prop
 
-\ >be { { fixnum bignum } fixnum } "specializer" set-word-prop
+\ >be { { bignum fixnum } { fixnum fixnum } } "specializer" set-word-prop

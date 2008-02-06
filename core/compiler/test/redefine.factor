@@ -92,8 +92,6 @@ DEFER: x-4
 
 [ t ] [ \ x-3 "compiled-uses" word-prop >boolean ] unit-test
 
-[ t ] [ \ x-3 "compiled-uses" word-prop [ drop interned? ] assoc-all? ] unit-test
-
 DEFER: g-test-1
 
 DEFER: g-test-3
@@ -237,7 +235,7 @@ DEFER: flushable-test-2
 : bx ax ;
 [ \ bx forget ] with-compilation-unit
 
-[ t ] [ \ ax compiled-usage [ drop interned? ] assoc-all? ] unit-test
+[ f ] [ \ bx \ ax compiled-usage key? ] unit-test
 
 DEFER: defer-redefine-test-2
 
@@ -245,8 +243,45 @@ DEFER: defer-redefine-test-2
 
 [ ] [ "IN: temporary : defer-redefine-test-2 defer-redefine-test-1 1 ;" eval ] unit-test
 
-[ defer-redefine-test-2 ] unit-test-fails
+[ defer-redefine-test-2 ] must-fail
 
 [ ] [ "IN: temporary : defer-redefine-test-1 2 ;" eval ] unit-test
 
 [ 2 1 ] [ defer-redefine-test-2 ] unit-test
+
+! Cross-referencing issue
+: compiled-xref-a ;
+
+: compiled-xref-c ; inline
+
+GENERIC: compiled-xref-b ( a -- b )
+
+TUPLE: c-1 ;
+
+M: c-1 compiled-xref-b compiled-xref-a compiled-xref-c ;
+
+TUPLE: c-2 ;
+
+M: c-2 compiled-xref-b drop 3 ;
+
+[ t ] [
+    \ compiled-xref-a compiled-crossref get key?
+] unit-test
+
+[ ] [
+    [
+        \ compiled-xref-a forget
+    ] with-compilation-unit
+] unit-test
+
+[ f ] [
+    \ compiled-xref-a compiled-crossref get key?
+] unit-test
+
+[ ] [
+    "IN: temporary : compiled-xref-c ; FORGET: { c-2 compiled-xref-b }" eval
+] unit-test
+
+[ f ] [
+    \ compiled-xref-a compiled-crossref get key?
+] unit-test

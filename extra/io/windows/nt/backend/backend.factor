@@ -2,44 +2,9 @@ USING: alien alien.c-types arrays assocs combinators
 continuations destructors io io.backend io.nonblocking
 io.windows libc kernel math namespaces sequences
 threads tuples.lib windows windows.errors windows.kernel32
-strings splitting io.files qualified ascii ;
+strings splitting io.files qualified ascii combinators.lib ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
-
-: unicode-prefix ( -- seq )
-    "\\\\?\\" ; inline
-
-M: windows-nt-io root-directory? ( path -- ? )
-    dup length 2 = [
-        dup first Letter?
-        swap second CHAR: : = and
-    ] [
-        drop f
-    ] if ;
-
-M: windows-nt-io normalize-pathname ( string -- string )
-    dup string? [ "pathname must be a string" throw ] unless
-    "/" split "\\" join
-    {
-        ! empty
-        { [ dup empty? ] [ "empty path" throw ] }
-        ! .\\foo
-        { [ dup ".\\" head? ] [
-            >r unicode-prefix cwd r> 1 tail 3append
-        ] }
-        ! c:\\foo
-        { [ dup 1 tail ":" head? ] [ >r unicode-prefix r> append ] }
-        ! \\\\?\\c:\\foo
-        { [ dup unicode-prefix head? ] [ ] }
-        ! foo.txt ..\\foo.txt
-        { [ t ] [
-            [
-                unicode-prefix % cwd %
-                dup first CHAR: \\ = [ CHAR: \\ , ] unless %
-            ] "" make
-        ] }
-    } cond [ "/\\." member? ] right-trim
-    dup peek CHAR: : = [ "\\" append ] when ;
 
 SYMBOL: io-hash
 

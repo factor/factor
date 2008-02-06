@@ -1,7 +1,7 @@
 USING: continuations xml xml.errors tools.test kernel arrays xml.data state-parser quotations ;
 
 : xml-error-test ( expected-error xml-string -- )
-    swap 1array >quotation swap [ [ string>xml ] catch nip ] curry unit-test ;
+    [ string>xml ] curry swap [ = ] curry must-fail-with ;
 
 T{ no-entity T{ parsing-error f 1 10 } "nbsp" } "<x>&nbsp;</x>" xml-error-test
 T{ mismatched T{ parsing-error f 1 8 } T{ name f "" "x" "" } T{ name f "" "y" "" }

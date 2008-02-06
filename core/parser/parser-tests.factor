@@ -93,12 +93,12 @@ IN: temporary
     ! Funny bug
     [ 2 ] [ "IN: temporary : \0. 2 ; \0." eval ] unit-test
 
-    [ "IN: temporary : missing-- ( a b ) ;" eval ] unit-test-fails
+    [ "IN: temporary : missing-- ( a b ) ;" eval ] must-fail
 
     ! These should throw errors
-    [ "HEX: zzz" eval ] unit-test-fails
-    [ "OCT: 999" eval ] unit-test-fails
-    [ "BIN: --0" eval ] unit-test-fails
+    [ "HEX: zzz" eval ] must-fail
+    [ "OCT: 999" eval ] must-fail
+    [ "BIN: --0" eval ] must-fail
 
     ! Another funny bug
     [ t ] [
@@ -205,12 +205,10 @@ IN: temporary
     
     "a" source-files get delete-at
 
-    [ t ] [
-        [
-            "IN: temporary : x ; : y 3 throw ; this is an error"
-            <string-reader> "a" parse-stream
-        ] catch parse-error?
-    ] unit-test
+    [
+        "IN: temporary : x ; : y 3 throw ; this is an error"
+        <string-reader> "a" parse-stream
+    ] [ parse-error? ] must-fail-with
 
     [ t ] [
         "y" "temporary" lookup >boolean
@@ -307,62 +305,50 @@ IN: temporary
         "killer?" "temporary" lookup >boolean
     ] unit-test
 
-    [ t ] [
-        [
-            "IN: temporary TUPLE: another-pred-test ; GENERIC: another-pred-test?"
-            <string-reader> "removing-the-predicate" parse-stream
-        ] catch [ redefine-error? ] is?
-    ] unit-test
+    [
+        "IN: temporary TUPLE: another-pred-test ; GENERIC: another-pred-test?"
+        <string-reader> "removing-the-predicate" parse-stream
+    ] [ [ redefine-error? ] is? ] must-fail-with
 
-    [ t ] [
-        [
-            "IN: temporary TUPLE: class-redef-test ; TUPLE: class-redef-test ;"
-            <string-reader> "redefining-a-class-1" parse-stream
-        ] catch [ redefine-error? ] is?
-    ] unit-test
+    [
+        "IN: temporary TUPLE: class-redef-test ; TUPLE: class-redef-test ;"
+        <string-reader> "redefining-a-class-1" parse-stream
+    ] [ [ redefine-error? ] is? ] must-fail-with
 
     [ ] [
         "IN: temporary TUPLE: class-redef-test ; SYMBOL: class-redef-test"
         <string-reader> "redefining-a-class-2" parse-stream drop
     ] unit-test
 
-    [ t ] [
-        [
-            "IN: temporary TUPLE: class-redef-test ; SYMBOL: class-redef-test : class-redef-test ;"
-            <string-reader> "redefining-a-class-3" parse-stream drop
-        ] catch [ redefine-error? ] is?
-    ] unit-test
+    [
+        "IN: temporary TUPLE: class-redef-test ; SYMBOL: class-redef-test : class-redef-test ;"
+        <string-reader> "redefining-a-class-3" parse-stream drop
+    ] [ [ redefine-error? ] is? ] must-fail-with
 
     [ ] [
         "IN: temporary TUPLE: class-fwd-test ;"
         <string-reader> "redefining-a-class-3" parse-stream drop
     ] unit-test
 
-    [ t ] [
-        [
-            "IN: temporary \\ class-fwd-test"
-            <string-reader> "redefining-a-class-3" parse-stream drop
-        ] catch [ forward-error? ] is?
-    ] unit-test
+    [
+        "IN: temporary \\ class-fwd-test"
+        <string-reader> "redefining-a-class-3" parse-stream drop
+    ] [ [ no-word? ] is? ] must-fail-with
 
     [ ] [
         "IN: temporary TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
     ] unit-test
 
-    [ t ] [
-        [
-            "IN: temporary \\ class-fwd-test"
-            <string-reader> "redefining-a-class-3" parse-stream drop
-        ] catch [ forward-error? ] is?
-    ] unit-test
+    [
+        "IN: temporary \\ class-fwd-test"
+        <string-reader> "redefining-a-class-3" parse-stream drop
+    ] [ [ no-word? ] is? ] must-fail-with
 
-    [ t ] [
-        [
-            "IN: temporary : foo ; TUPLE: foo ;"
-            <string-reader> "redefining-a-class-4" parse-stream drop
-        ] catch [ redefine-error? ] is?
-    ] unit-test
+    [
+        "IN: temporary : foo ; TUPLE: foo ;"
+        <string-reader> "redefining-a-class-4" parse-stream drop
+    ] [ [ redefine-error? ] is? ] must-fail-with
 ] with-file-vocabs
 
 [

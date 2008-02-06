@@ -1,7 +1,8 @@
 
-USING: kernel io io.files io.launcher tools.deploy.backend
-       system namespaces sequences splitting math.parser
-       unix prettyprint tools.time calendar bake vars ;
+USING: kernel io io.files io.launcher hashtables tools.deploy.backend
+       system continuations namespaces sequences splitting math.parser
+       prettyprint tools.time calendar bake vars http.client
+       combinators ;
 
 IN: builder
 
@@ -13,25 +14,35 @@ IN: builder
          ,[ dup timestamp-day    ]
          ,[ dup timestamp-hour   ]
          ,[     timestamp-minute ] }
-  [ number>string 2 CHAR: 0 pad-left ] map "-" join ;
+  [ pad-00 ] map "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: builder-recipients
 
-: quote ( str -- str ) "'" swap "'" 3append ;
-
 : email-file ( subject file -- )
   `{
-     "cat"       ,
-     "| mutt -s" ,[ quote ]
-     "-x"        %[ builder-recipients get ]
-   }
-   " " join system drop ;
-  
+    { +stdin+ , }
+    { +arguments+ { "mutt" "-s" , %[ builder-recipients get ] } }
+  }
+  >hashtable run-process drop ;
+
+: email-string ( subject -- )
+  `{ "mutt" "-s" , %[ builder-recipients get ] }
+  [ ] with-process-stream drop ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : target ( -- target ) `{ ,[ os ] %[ cpu "." split ] } "-" join ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: factor-binary ( -- name )
+  os
+  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
+    { "windows" [ "./factor-nt.exe" ] }
+    [ drop "./factor" ] }
+  case ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -41,74 +52,84 @@ VAR: stamp
 
 : build ( -- )
 
-datestamp >stamp
+  datestamp >stamp
 
-"/builds/factor" cd
-"git pull git://factorcode.org/git/factor.git" system
-0 =
-[ ]
-[
-  "builder: git pull" "/dev/null" email-file
-  "builder: git pull" throw
-]
-if
+  "/builds/factor" cd
+  
+  { "git" "pull" "--no-summary" "git://factorcode.org/git/factor.git" }
+  run-process process-status
+  0 =
+  [ ]
+  [
+    "builder: git pull" email-string
+    "builder: git pull" throw
+  ]
+  if
 
-"/builds/" stamp> append make-directory
-"/builds/" stamp> append cd
-"git clone /builds/factor" system drop
+  "/builds/" stamp> append make-directory
+  "/builds/" stamp> append cd
 
-"factor" cd
+  { "git" "clone" "/builds/factor" } run-process drop
 
-{ "git" "show" } <process-stream>
-[ readln ] with-stream
-" " split second
-"../git-id" <file-writer> [ print ] with-stream
+  "factor" cd
 
-"make clean" system drop
+  { "git" "show" } <process-stream>
+  [ readln ] with-stream
+  " " split second
+  "../git-id" <file-writer> [ print ] with-stream
 
-"make " target " > ../compile-log" 3append system
-0 =
-[ ]
-[
-  "builder: vm compile" "../compile-log" email-file
-  "builder: vm compile" throw
-] if
+  { "make" "clean" } run-process drop
 
-"wget http://factorcode.org/images/latest/" boot-image-name append system
-0 =
-[ ]
-[
-  "builder: image download" "/dev/null" email-file
-  "builder: image download" throw
-] if
+  `{
+     { +arguments+ { "make" ,[ target ] } }
+     { +stdout+    "../compile-log" }
+     { +stderr+    +stdout+ }
+   }
+  >hashtable run-process process-status
+  0 =
+  [ ]
+  [
+    "builder: vm compile" "../compile-log" email-file
+    "builder: vm compile" throw
+  ] if
 
-[
-  "./factor -i=" boot-image-name " -no-user-init > ../boot-log"
-  3append
-  system
-]
-benchmark nip
-"../boot-time" <file-writer> [ . ] with-stream
-0 =
-[ ]
-[
-  "builder: bootstrap" "../boot-log" email-file
-  "builder: bootstrap" throw
-] if
+  [ "http://factorcode.org/images/latest/" boot-image-name append download ]
+  [ "builder: image download" email-string ]
+  recover
 
-[
-  "./factor -e='USE: tools.browser load-everything' > ../load-everything-log"
-  system
-] benchmark nip
-"../load-everything-time" <file-writer> [ . ] with-stream
-0 =
-[ ]
-[
-  "builder: load-everything" "../load-everything-log" email-file
-  "builder: load-everything" throw
-] if
+  `{
+     { +arguments+ {
+                     ,[ factor-binary ]
+                     ,[ "-i=" boot-image-name append ]
+                     "-no-user-init"
+                   } }
+     { +stdout+   "../boot-log" }
+     { +stderr+   +stdout+ }
+   }
+  >hashtable
+  [ run-process process-status ]
+  benchmark nip "../boot-time" <file-writer> [ . ] with-stream
+  0 =
+  [ ]
+  [
+    "builder: bootstrap" "../boot-log" email-file
+    "builder: bootstrap" throw
+  ] if
 
-;
+  `{
+     { +arguments+
+       { ,[ factor-binary ] "-e=USE: tools.browser load-everything" } }
+     { +stdout+    "../load-everything-log" }
+     { +stderr+    +stdout+ }
+   }
+  >hashtable [ run-process process-status ] benchmark nip
+  "../load-everything-time" <file-writer> [ . ] with-stream
+  0 =
+  [ ]
+  [
+    "builder: load-everything" "../load-everything-log" email-file
+    "builder: load-everything" throw
+  ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

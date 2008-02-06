@@ -52,7 +52,7 @@ METHOD: beats? { thing thing } f ;
 
 : play ( obj1 obj2 -- ? ) beats? 2nip ;
 
-[ { } 3 play ] unit-test-fails
+[ { } 3 play ] must-fail
 [ t ] [ error get no-method? ] unit-test
 [ ] [ error get error. ] unit-test
 [ t ] [ T{ paper } T{ scissors } play ] unit-test
