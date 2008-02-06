@@ -87,7 +87,8 @@ FORGET: foe
 ] unit-test
 
 [ t ] [
-    \ * usage [ word? ] subset [ interned? not ] subset empty?
+    \ * usage [ word? ] subset
+    [ dup interned? swap method-body? or ] all?
 ] unit-test
 
 DEFER: calls-a-gensym

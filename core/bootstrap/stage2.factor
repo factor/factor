@@ -1,11 +1,11 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: init command-line namespaces words debugger io
 kernel.private math memory continuations kernel io.files
 io.backend system parser vocabs sequences prettyprint
 vocabs.loader combinators splitting source-files strings
 definitions assocs compiler.errors compiler.units
-math.parser ;
+math.parser generic ;
 IN: bootstrap.stage2
 
 ! Wrap everything in a catch which starts a listener so
@@ -24,6 +24,7 @@ IN: bootstrap.stage2
         "Cross-referencing..." print flush
         H{ } clone crossref set-global
         xref-words
+        xref-generics
         xref-sources
     ] unless
 
@@ -87,5 +88,7 @@ IN: bootstrap.stage2
         "output-image" get resource-path save-image-and-exit
     ] if
 ] [
-    print-error :c "listener" vocab-main execute
+    print-error :c restarts.
+    "listener" vocab-main execute
+    1 exit
 ] recover

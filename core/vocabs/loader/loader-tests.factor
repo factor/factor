@@ -79,7 +79,7 @@ IN: temporary
         <string-reader>
         "resource:core/vocabs/loader/test/a/a.factor"
         parse-stream
-    ] catch [ forward-error? ] is?
+    ] catch [ no-word? ] is?
 ] unit-test
 
 0 "count-me" set-global

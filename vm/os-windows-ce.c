@@ -10,16 +10,6 @@ s64 current_millis(void)
 		| (s64)ft.dwHighDateTime<<32) - EPOCH_OFFSET) / 10000;
 }
 
-DEFINE_PRIMITIVE(cwd)
-{
-	not_implemented_error();
-}
-
-DEFINE_PRIMITIVE(cd)
-{
-	not_implemented_error();
-}
-
 char *strerror(int err)
 {
 	/* strerror() is not defined on WinCE */

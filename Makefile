@@ -63,9 +63,9 @@ default:
 	@echo "macosx-ppc"
 	@echo "solaris-x86-32"
 	@echo "solaris-x86-64"
-	@echo "windows-ce-arm"
-	@echo "windows-nt-x86-32"
-	@echo "windows-nt-x86-64"
+	@echo "wince-arm"
+	@echo "winnt-x86-32"
+	@echo "winnt-x86-64"
 	@echo ""
 	@echo "Additional modifiers:"
 	@echo ""
@@ -123,13 +123,17 @@ solaris-x86-32:
 solaris-x86-64:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.x86.64
 
-windows-nt-x86-32:
+winnt-x86-32:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
 
+<<<<<<< HEAD:Makefile
 windows-nt-x86-64:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.64
 
 windows-ce-arm:
+=======
+wince-arm:
+>>>>>>> 1eda70f1ad1f0d744ed846ce8c975a1cd4b28fb6:Makefile
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.arm
 
 macosx.app: factor

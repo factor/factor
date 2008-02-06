@@ -28,20 +28,13 @@ HELP: redefine-error
 
 HELP: remember-definition
 { $values { "definition" "a definition specifier" } { "loc" "a " { $snippet "{ path line# }" } " pair" } }
-{ $description "Saves the location of a definition and associates this definition with the current source file."
-$nl
-"This is the book-keeping required to detect " { $link redefine-error } " and " { $link forward-error } "." } ;
+{ $description "Saves the location of a definition and associates this definition with the current source file." } ;
 
 HELP: old-definitions
 { $var-description "Stores an assoc where the keys form the set of definitions which were defined by " { $link file } " the most recent time it was loaded." } ;
 
 HELP: new-definitions
 { $var-description "Stores an assoc where the keys form the set of definitions which were defined so far by the current parsing of " { $link file } "." } ;
-
-HELP: forward-error
-{ $values { "word" word } }
-{ $description "Throws a " { $link forward-error } "." }
-{ $description "Indicates a word is being referenced prior to the location of its most recent definition. This can only happen if a source file is loaded, and subsequently edited such that two dependent definitions are reversed." } ;
 
 HELP: with-compilation-unit
 { $values { "quot" quotation } }

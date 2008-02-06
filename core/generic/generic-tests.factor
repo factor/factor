@@ -177,7 +177,7 @@ M: f tag-and-f 4 ;
 TUPLE: debug-combination ;
 
 M: debug-combination make-default-method
-    2drop [ "Oops" throw ] when ;
+    2drop [ "Oops" throw ] ;
 
 M: debug-combination perform-combination
     drop

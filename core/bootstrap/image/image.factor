@@ -203,14 +203,8 @@ M: f '
 
 ! Words
 
-DEFER: emit-word
-
-: emit-generic ( generic -- )
-    dup "default-method" word-prop method-word emit-word
-    "methods" word-prop [ nip method-word emit-word ] assoc-each ;
-
 : emit-word ( word -- )
-    dup generic? [ dup emit-generic ] when
+    dup subwords [ emit-word ] each
     [
         dup hashcode ' ,
         dup word-name ' ,

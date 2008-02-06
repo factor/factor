@@ -1,8 +1,8 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: vocabs.loader io.files io kernel sequences assocs
 splitting parser prettyprint namespaces math vocabs
-hashtables ;
+hashtables tools.browser ;
 IN: tools.deploy.config
 
 SYMBOL: deploy-name

@@ -256,7 +256,7 @@ M: #dispatch optimize-node*
     tuck dispatching-class dup [
         swap [ 2array ] 2keep
         method method-word
-        dup word-def flat-length 5 >=
+        dup word-def flat-length 6 >=
         [ 1quotation ] [ word-def ] if
     ] [
         2drop t t

@@ -22,7 +22,7 @@ splitting assocs ;
     os "wince" = ; foldable
 
 : winnt? ( -- ? )
-    os "windows" = ; foldable
+    os "winnt" = ; foldable
 
 : windows? ( -- ? )
     wince? winnt? or ; foldable
