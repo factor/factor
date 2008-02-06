@@ -42,6 +42,9 @@ M: expected-error summary
 : must-fail ( quot -- )
     [ drop t ] must-fail-with ;
 
+: ignore-errors ( quot -- )
+    [ drop ] recover ; inline
+
 : run-test ( path -- failures )
     [ "temporary" forget-vocab ] with-compilation-unit
     [

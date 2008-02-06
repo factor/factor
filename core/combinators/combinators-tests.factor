@@ -38,7 +38,7 @@ namespaces combinators words ;
 ! Interpreted
 [ "two" ] [ 2 \ case-test-1 word-def call ] unit-test
 
-[ "x" case-test-1 ] unit-test-fails
+[ "x" case-test-1 ] must-fail
 
 : case-test-2
     {

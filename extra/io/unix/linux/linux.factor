@@ -3,7 +3,7 @@
 USING: kernel io.backend io.monitors io.monitors.private io.files
 io.buffers io.nonblocking io.unix.backend io.unix.select
 io.unix.launcher unix.linux.inotify assocs namespaces threads
-continuations init math alien.c-types alien ;
+continuations init math alien.c-types alien vocabs.loader ;
 IN: io.unix.linux
 
 TUPLE: linux-io ;
@@ -135,3 +135,5 @@ M: linux-io init-io ( -- )
 T{ linux-io } set-io-backend
 
 [ start-wait-thread ] "io.unix.linux" add-init-hook
+
+"vocabs.monitor" require

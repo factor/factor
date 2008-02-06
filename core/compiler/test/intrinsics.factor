@@ -422,11 +422,11 @@ cell 8 = [
 
 [
     B{ 0 0 0 0 } [ { byte-array } declare <void*> ] compile-call
-] unit-test-fails
+] must-fail
 
 [
     B{ 0 0 0 0 } [ { c-ptr } declare <void*> ] compile-call
-] unit-test-fails
+] must-fail
 
 [
     4 5

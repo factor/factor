@@ -4,7 +4,7 @@ IN: temporary
 
 [ CHAR: b ] [ 1 >bignum "abc" nth ] unit-test
 
-[ ] [ 10 [ [ -1000000 <sbuf> ] catch drop ] times ] unit-test
+[ ] [ 10 [ [ -1000000 <sbuf> ] ignore-errors ] times ] unit-test
 
 [ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] "" make ] unit-test
 
@@ -31,7 +31,7 @@ IN: temporary
 [ t ] [ "abc" "abd" <=> 0 < ] unit-test
 [ t ] [ "z" "abd" <=> 0 > ] unit-test
 
-[ f ] [ [ 0 10 "hello" subseq ] catch not ] unit-test
+[ 0 10 "hello" subseq ] must-fail
 
 [ "Replacing+spaces+with+plus" ]
 [
@@ -43,8 +43,8 @@ unit-test
 [ "05" ] [ "5" 2 CHAR: 0 pad-left ] unit-test
 [ "666" ] [ "666" 2 CHAR: 0 pad-left ] unit-test
 
-[ 1 "" nth ] unit-test-fails
-[ -6 "hello" nth ] unit-test-fails
+[ 1 "" nth ] must-fail
+[ -6 "hello" nth ] must-fail
 
 [ t ] [ "hello world" dup >vector >string = ] unit-test 
 
@@ -55,8 +55,7 @@ unit-test
 [ "\u001234bc\0\0\0" ] [ 6 "\u001234bc" resize-string ] unit-test
 
 ! Random tester found this
-[ { "kernel-error" 3 12 -7 } ]
-[ [ 2 -7 resize-string ] catch ] unit-test
+[ 2 -7 resize-string ] [ { "kernel-error" 3 12 -7 } = ] must-fail-with
 
 ! Make sure 24-bit strings work
 "hello world" "s" set

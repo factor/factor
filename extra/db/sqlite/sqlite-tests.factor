@@ -5,7 +5,7 @@ IN: temporary
 
 : test.db "extra/db/sqlite/test.db" resource-path ;
 
-[ ] [ [ test.db delete-file ] catch drop ] unit-test
+[ ] [ [ test.db delete-file ] ignore-errors ] unit-test
 
 [ ] [
     test.db [
@@ -64,7 +64,7 @@ IN: temporary
             "oops" throw
         ] with-transaction
     ] with-sqlite
-] unit-test-fails
+] must-fail
 
 [ 3 ] [
     test.db [

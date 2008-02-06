@@ -55,7 +55,7 @@ C: <point> point
 
 "IN: temporary TUPLE: point z y ;" eval
 
-[ "p" get point-x ] unit-test-fails
+[ "p" get point-x ] must-fail
 [ 200 ] [ "p" get point-y ] unit-test
 [ 300 ] [ "p" get "point-z" "temporary" lookup execute ] unit-test
 
@@ -97,7 +97,7 @@ TUPLE: delegate-clone ;
 [ f ] [ \ tuple \ delegate-clone class< ] unit-test
 
 ! Compiler regression
-[ t ] [ [ t length ] catch no-method-object ] unit-test
+[ t length ] [ no-method-object t eq? ] must-fail-with
 
 [ "<constructor-test>" ]
 [ "TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval word word-name ] unit-test
@@ -204,15 +204,15 @@ SYMBOL: not-a-tuple-class
 [
     "IN: temporary C: <not-a-tuple-class> not-a-tuple-class"
     eval
-] unit-test-fails
+] must-fail
 
 [ t ] [
     "not-a-tuple-class" "temporary" lookup symbol?
 ] unit-test
 
 ! Missing check
-[ not-a-tuple-class construct-boa ] unit-test-fails
-[ not-a-tuple-class construct-empty ] unit-test-fails
+[ not-a-tuple-class construct-boa ] must-fail
+[ not-a-tuple-class construct-empty ] must-fail
 
 TUPLE: erg's-reshape-problem a b c d ;
 
@@ -234,8 +234,6 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 
 [ t ] [ 1 cons-test-3 array-capacity "a" get array-capacity = ] unit-test
 
-[ t ] [
-    [
-        "IN: temporary SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
-    ] catch [ check-tuple? ] is?
-] unit-test
+[
+    "IN: temporary SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
+] [ [ check-tuple? ] is? ] must-fail-with

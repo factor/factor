@@ -10,7 +10,7 @@ words splitting ;
 : foo 3 throw 7 ;
 : bar foo 4 ;
 : baz bar 5 ;
-[ 3 ] [ [ baz ] catch ] unit-test
+[ baz ] [ 3 = ] must-fail-with
 [ t ] [
     symbolic-stack-trace
     [ word? ] subset
@@ -22,11 +22,11 @@ words splitting ;
 : stack-trace-contains? symbolic-stack-trace memq? ;
 
 [ t ] [
-    [ { 1 "hi" } bleh ] catch drop \ + stack-trace-contains?
+    [ { 1 "hi" } bleh ] ignore-errors \ + stack-trace-contains?
 ] unit-test
     
 [ t f ] [
-    [ { "hi" } bleh ] catch drop
+    [ { "hi" } bleh ] ignore-errors
     \ + stack-trace-contains?
     \ > stack-trace-contains?
 ] unit-test
@@ -34,6 +34,6 @@ words splitting ;
 : quux [ t [ "hi" throw ] when ] times ;
 
 [ t ] [
-    [ 10 quux ] catch drop
+    [ 10 quux ] ignore-errors
     \ (each-integer) stack-trace-contains?
 ] unit-test

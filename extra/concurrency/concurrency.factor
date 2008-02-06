@@ -166,7 +166,7 @@ M: process send ( message process -- )
 PRIVATE>
 
 : spawn-link ( quot -- process )
-    [ catch [ rethrow-linked ] when* ] curry
+    [ [ rethrow-linked ] recover ] curry
     [ ((spawn)) ] curry (spawn-link) ; inline
 
 <PRIVATE

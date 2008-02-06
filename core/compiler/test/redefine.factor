@@ -243,7 +243,7 @@ DEFER: defer-redefine-test-2
 
 [ ] [ "IN: temporary : defer-redefine-test-2 defer-redefine-test-1 1 ;" eval ] unit-test
 
-[ defer-redefine-test-2 ] unit-test-fails
+[ defer-redefine-test-2 ] must-fail
 
 [ ] [ "IN: temporary : defer-redefine-test-1 2 ;" eval ] unit-test
 

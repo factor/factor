@@ -16,7 +16,7 @@ M: word   class-of drop "word"   ;
 
 [ "fixnum" ] [ 5 class-of ] unit-test
 [ "word" ] [ \ class-of class-of ] unit-test
-[ 3.4 class-of ] unit-test-fails
+[ 3.4 class-of ] must-fail
 
 [ "Hello world" ] [ 4 foobar foobar ] unit-test
 [ "Goodbye cruel world" ] [ 4 foobar ] unit-test
@@ -90,7 +90,7 @@ M: number union-containment drop 2 ;
 "IN: temporary GENERIC: unhappy ( x -- x )" eval
 [
     "IN: temporary M: dictionary unhappy ;" eval
-] unit-test-fails
+] must-fail
 [ ] [ "IN: temporary GENERIC: unhappy ( x -- x )" eval ] unit-test
 
 GENERIC# complex-combination 1 ( a b -- c )
@@ -155,9 +155,7 @@ M: string my-hook "a string" ;
 
 [ "an integer" ] [ 3 my-var set my-hook ] unit-test
 [ "a string" ] [ my-hook my-var set my-hook ] unit-test
-[ T{ no-method f 1.0 my-hook } ] [
-    1.0 my-var set [ my-hook ] catch
-] unit-test
+[ 1.0 my-var set my-hook ] [ [ T{ no-method f 1.0 my-hook } = ] must-fail-with
 
 GENERIC: tag-and-f ( x -- x x )
 

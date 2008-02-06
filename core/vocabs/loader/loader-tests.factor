@@ -18,16 +18,6 @@ debugger compiler.units ;
 [ t ]
 [ "kernel" f >vocab-link "kernel" vocab = ] unit-test
 
-! This vocab should not exist, but just in case...
-[ ] [ [ "core" forget-vocab ] with-compilation-unit ] unit-test
-
-2 [
-    [ T{ no-vocab f "core" } ]
-    [ [ "core" require ] catch ] unit-test
-] times
-
-[ f ] [ "core" vocab ] unit-test
-
 [ t ] [
     "kernel" vocab-files
     "kernel" vocab vocab-files
@@ -59,7 +49,7 @@ IN: temporary
 0 "count-me" set-global
 
 2 [
-    [ "vocabs.loader.test.a" require ] unit-test-fails
+    [ "vocabs.loader.test.a" require ] must-fail
     
     [ f ] [ "vocabs.loader.test.a" vocab-source-loaded? ] unit-test
     
@@ -97,7 +87,7 @@ IN: temporary
     ] with-compilation-unit
 ] unit-test
 
-[ "vocabs.loader.test.b" require ] unit-test-fails
+[ "vocabs.loader.test.b" require ] must-fail
 
 [ 1 ] [ "count-me" get-global ] unit-test
 

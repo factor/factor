@@ -136,7 +136,7 @@ TUPLE: pred-test ;
 GENERIC: void-generic ( obj -- * )
 : breakage "hi" void-generic ;
 [ t ] [ \ breakage compiled? ] unit-test
-[ breakage ] unit-test-fails
+[ breakage ] must-fail
 
 ! regression
 : test-0 ( n -- ) dup 0 = [ drop ] [ 1- test-0 ] if ; inline
@@ -247,7 +247,7 @@ M: slice foozul ;
 GENERIC: detect-number ( obj -- obj )
 M: number detect-number ;
 
-[ 10 f [ <array> 0 + detect-number ] compile-call ] unit-test-fails
+[ 10 f [ <array> 0 + detect-number ] compile-call ] must-fail
 
 ! Regression
 [ 4 [ + ] ] [ 2 2 [ [ + ] [ call ] keep ] compile-call ] unit-test

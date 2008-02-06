@@ -110,7 +110,7 @@ M: array freakish ;
 [ t ] [ \ bar \ freakish usage member? ] unit-test
 
 DEFER: x
-[ t ] [ [ x ] catch undefined? ] unit-test
+[ x ] [ undefined? ] must-fail-with
 
 [ ] [ "no-loc" "temporary" create drop ] unit-test
 [ f ] [ "no-loc" "temporary" lookup where ] unit-test
@@ -141,10 +141,8 @@ SYMBOL: quot-uses-b
 
 [ { + } ] [ \ quot-uses-b uses ] unit-test
 
-[ t ] [
-    [ "IN: temporary : undef-test ; << undef-test >>" eval ] catch
-    [ undefined? ] is?
-] unit-test
+[ "IN: temporary : undef-test ; << undef-test >>" eval ]
+[ [ undefined? ] is? ] must-fail-with
 
 [ ] [
     "IN: temporary GENERIC: symbol-generic" eval
