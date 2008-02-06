@@ -124,15 +124,12 @@ HELP: refresh
 { $values { "prefix" string } }
 { $description "Reloads source files and documentation belonging to loaded vocabularies whose names are prefixed by " { $snippet "prefix" } " which have been modified on disk." } ;
 
+HELP: refresh-all-error
+{ $values { "vocabs" "a sequence of vocabularies" } }
+{ $description "Throws a " { $link require-all-error } "." }
+{ $error-description "Thrown by " { $link require-all } " if one or more vocabulary failed to load." } ;
+
 HELP: refresh-all
 { $description "Reloads source files and documentation for all loaded vocabularies which have been modified on disk." } ;
 
 { refresh refresh-all } related-words
-
-HELP: vocab-file-contents
-{ $values { "vocab" "a vocabulary specifier" } { "name" string } { "seq" "a sequence of lines, or " { $link f } } }
-{ $description "Outputs the contents of the file named " { $snippet "name" } " from the vocabulary's directory, or " { $link f } " if the file does not exist." } ;
-
-HELP: set-vocab-file-contents
-{ $values { "seq" "a sequence of lines" } { "vocab" "a vocabulary specifier" } { "name" string } }
-{ $description "Stores a sequence of lines to the file named " { $snippet "name" } " from the vocabulary's directory." } ;

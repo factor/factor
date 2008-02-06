@@ -1,4 +1,4 @@
-IN: io.monitor
+IN: io.monitors
 USING: help.markup help.syntax continuations ;
 
 HELP: <monitor>
@@ -9,7 +9,7 @@ $nl
 
 HELP: next-change
 { $values { "monitor" "a monitor" } { "path" "a pathname string" } { "changes" "a change descriptor" } }
-{ $description "Waits for file system changes and outputs the pathname of the first changed file. The change descriptor is aq sequence of symbols documented in " { $link "io.monitor.descriptors" } "." } ;
+{ $description "Waits for file system changes and outputs the pathname of the first changed file. The change descriptor is aq sequence of symbols documented in " { $link "io.monitors.descriptors" } "." } ;
 
 HELP: with-monitor
 { $values { "path" "a pathname string" } { "recursive?" "a boolean" } { "quot" "a quotation with stack effect " { $snippet "( monitor -- )" } } }
@@ -27,7 +27,7 @@ HELP: +modify-file+
 HELP: +rename-file+
 { $description "Indicates that file has been renamed." } ;
 
-ARTICLE: "io.monitor.descriptors" "File system change descriptors"
+ARTICLE: "io.monitors.descriptors" "File system change descriptors"
 "Change descriptors output by " { $link next-change } ":"
 { $subsection +add-file+ }
 { $subsection +remove-file+ }
@@ -35,24 +35,24 @@ ARTICLE: "io.monitor.descriptors" "File system change descriptors"
 { $subsection +rename-file+ }
 { $subsection +add-file+ } ;
 
-ARTICLE: "io.monitor" "File system change monitors"
+ARTICLE: "io.monitors" "File system change monitors"
 "File system change monitors listen for changes to file names, attributes and contents under a specified directory. They can optionally be recursive, in which case subdirectories are also monitored."
 $nl
 "Creating a file system change monitor and listening for changes:"
 { $subsection <monitor> }
 { $subsection next-change }
-{ $subsection "io.monitor.descriptors" }
+{ $subsection "io.monitors.descriptors" }
 "Monitors are closed by calling " { $link dispose } " or " { $link with-disposal } "."
 $nl
 "A utility combinator which opens a monitor and cleans it up after:"
 { $subsection with-monitor }
 "An example which watches the Factor directory for changes:"
 { $code
-    "USE: io.monitor"
+    "USE: io.monitors"
     ": watch-loop ( monitor -- )"
     "    dup next-change . . nl nl flush watch-loop ;"
     ""
     "\"\" resource-path f [ watch-loop ] with-monitor"
 } ;
 
-ABOUT: "io.monitor"
+ABOUT: "io.monitors"

@@ -3,9 +3,9 @@
 USING: alien.c-types destructors io.windows
 io.windows.nt.backend kernel math windows windows.kernel32
 windows.types libc assocs alien namespaces continuations
-io.monitor io.monitor.private io.nonblocking io.buffers io.files
+io.monitors io.monitors.private io.nonblocking io.buffers io.files
 io sequences hashtables sorting arrays combinators ;
-IN: io.windows.nt.monitor
+IN: io.windows.nt.monitors
 
 : open-directory ( path -- handle )
     FILE_LIST_DIRECTORY
@@ -70,8 +70,7 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
         FILE_NOTIFY_INFORMATION-FileName
         FILE_NOTIFY_INFORMATION-FileNameLength
         FILE_NOTIFY_INFORMATION-Action
-    } get-slots parse-action 1array swap
-    memory>u16-string ;
+    } get-slots parse-action 1array -rot memory>u16-string ;
 
 : (changed-files) ( buffer -- )
     dup parse-file-notify changed-file

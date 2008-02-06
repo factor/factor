@@ -137,7 +137,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "graphs" }
 { $subsection "buffers" } ;
 
-USING: io.sockets io.launcher io.mmap io.monitor ;
+USING: io.sockets io.launcher io.mmap io.monitors ;
 
 ARTICLE: "io" "Input and output" 
 { $subsection "streams" }
@@ -155,7 +155,7 @@ ARTICLE: "io" "Input and output"
 "Advanced features:"
 { $subsection "io.launcher" }
 { $subsection "io.mmap" }
-{ $subsection "io.monitor" } ;
+{ $subsection "io.monitors" } ;
 
 ARTICLE: "tools" "Developer tools"
 { $subsection "tools.annotations" }

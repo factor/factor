@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io.backend io.monitor io.monitor.private io.files
+USING: kernel io.backend io.monitors io.monitors.private io.files
 io.buffers io.nonblocking io.unix.backend io.unix.select
 io.unix.launcher unix.linux.inotify assocs namespaces threads
 continuations init math alien.c-types alien ;

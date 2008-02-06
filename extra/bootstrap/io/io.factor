@@ -10,3 +10,5 @@ IN: bootstrap.io
         { [ wince? ] [ "windows.ce" ] }
     } cond append require
 ] when
+
+"vocabs.monitor" require
