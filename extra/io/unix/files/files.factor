@@ -6,7 +6,7 @@ alien ;
 IN: io.unix.files
 
 M: unix-io cwd
-    MAXPATHLEN dup <byte-array> getcwd
+    MAXPATHLEN dup <byte-array> swap getcwd
     [ alien>char-string ] [ (io-error) ] if* ;
 
 M: unix-io cd
