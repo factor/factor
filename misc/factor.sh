@@ -99,9 +99,9 @@ find_os() {
         uname_s=`uname -s`
         check_ret uname
         case $uname_s in
-                CYGWIN_NT-5.2-WOW64) OS=windows-nt;;
-                *CYGWIN_NT*) OS=windows-nt;;
-                *CYGWIN*) OS=windows-nt;;
+                CYGWIN_NT-5.2-WOW64) OS=winnt;;
+                *CYGWIN_NT*) OS=winnt;;
+                *CYGWIN*) OS=winnt;;
                 *darwin*) OS=macosx;;
                 *Darwin*) OS=macosx;;
                 *linux*) OS=linux;;
@@ -139,7 +139,7 @@ find_word_size() {
 
 set_factor_binary() {
         case $OS in
-                windows-nt) FACTOR_BINARY=factor-nt;;
+                winnt) FACTOR_BINARY=factor-nt;;
                 macosx) FACTOR_BINARY=./Factor.app/Contents/MacOS/factor;;
                 *) FACTOR_BINARY=factor;;
         esac
@@ -227,7 +227,7 @@ get_boot_image() {
 }
 
 maybe_download_dlls() {
-        if [[ $OS == windows-nt ]] ; then
+        if [[ $OS == winnt ]] ; then
                 wget http://factorcode.org/dlls/freetype6.dll
                 check_ret wget
                 wget http://factorcode.org/dlls/zlib1.dll
