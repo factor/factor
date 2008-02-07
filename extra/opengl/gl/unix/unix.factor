@@ -1,5 +1,10 @@
-USING: alien.syntax kernel syntax words ;
+USING: alien.syntax alien.syntax.private kernel
+       namespaces parser sequences syntax words ;
 
 IN: opengl.gl.unix
 
-: GL-FUNCTION: POSTPONE: FUNCTION: ; parsing
+: GL-FUNCTION:
+    scan "c-library" get scan
+    scan drop "}" parse-tokens drop
+    ";" parse-tokens [ "()" subseq? not ] subset
+    define-function ; parsing
