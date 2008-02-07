@@ -200,6 +200,12 @@ git_pull_factorcode() {
         check_ret git
 }
 
+http_git_pull_factorcode() {
+        echo "Updating the git repository from factorcode.org..."
+        git pull http://factorcode.org/git/factor.git master
+        check_ret git
+}
+
 cd_factor() {
         cd factor
         check_ret cd
@@ -271,9 +277,17 @@ install() {
         bootstrap
 }
 
+
 update() {
         get_config_info
         git_pull_factorcode
+        make_clean
+        make_factor
+}
+
+http_update() {
+        get_config_info
+        http_git_pull_factorcode
         make_clean
         make_factor
 }
@@ -310,6 +324,7 @@ case "$1" in
         self-update) update; make_boot_image; bootstrap;;
         quick-update) update; refresh_image ;;
         update) update; update_bootstrap ;;
+        http-update) http_update; update_bootstrap ;;
         bootstrap) get_config_info; bootstrap ;;
         wget-bootstrap) get_config_info; delete_boot_images; get_boot_image; bootstrap ;;
         *) usage ;;

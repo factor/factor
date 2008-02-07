@@ -173,3 +173,12 @@ PRIVATE>
 
 : file-contents ( path -- str )
     dup <file-reader> swap file-length <sbuf> [ stream-copy ] keep >string ;
+
+: with-file-in ( path quot -- )
+    >r <file-reader> r> with-stream ; inline
+
+: with-file-out ( path quot -- )
+    >r <file-writer> r> with-stream ; inline
+
+: with-file-appender ( path quot -- )
+    >r <file-appender> r> with-stream ; inline
