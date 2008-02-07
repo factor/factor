@@ -220,7 +220,8 @@ FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 
 {
-    { [ linux? ] [ "unix.linux" ] }
-    { [ bsd? ] [ "unix.bsd" ] }
-    { [ solaris? ] [ "unix.solaris" ] }
-} cond require
+    { [ linux? ] [ "unix.linux" require ] }
+    { [ bsd? ] [ "unix.bsd" require ] }
+    { [ solaris? ] [ "unix.solaris" require ] }
+    { [ t ] [ ] }
+} cond
