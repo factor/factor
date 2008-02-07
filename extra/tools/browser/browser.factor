@@ -10,7 +10,7 @@ IN: tools.browser
 
 MEMO: (vocab-file-contents) ( path -- lines )
     ?resource-path dup exists?
-    [ <file-reader> lines ] [ drop f ] if ;
+    [ file-lines ] [ drop f ] if ;
 
 : vocab-file-contents ( vocab name -- seq )
     vocab-path+ dup [ (vocab-file-contents) ] when ;
@@ -18,7 +18,7 @@ MEMO: (vocab-file-contents) ( path -- lines )
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-path+ [
         ?resource-path
-        <file-writer> [ [ print ] each ] with-stream
+        [ [ print ] each ] with-file-out
     ] [
         "The " swap vocab-name
         " vocabulary was not loaded from the file system"
