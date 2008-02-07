@@ -3,7 +3,7 @@ USING: alien alien.c-types alien.syntax compiler kernel
 namespaces namespaces tools.test sequences inference words
 arrays parser quotations continuations inference.backend effects
 namespaces.private io io.streams.string memory system threads
-tools.test.inference ;
+tools.test ;
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test
@@ -80,7 +80,7 @@ FUNCTION: tiny ffi_test_17 int x ;
 : indirect-test-1
     "int" { } "cdecl" alien-indirect ;
 
-{ 1 1 } [ indirect-test-1 ] unit-test-effect
+{ 1 1 } [ indirect-test-1 ] must-infer-as
 
 [ 3 ] [ "ffi_test_1" f dlsym indirect-test-1 ] unit-test
 
@@ -89,7 +89,7 @@ FUNCTION: tiny ffi_test_17 int x ;
 : indirect-test-2
     "int" { "int" "int" } "cdecl" alien-indirect data-gc ;
 
-{ 3 1 } [ indirect-test-2 ] unit-test-effect
+{ 3 1 } [ indirect-test-2 ] must-infer-as
 
 [ 5 ]
 [ 2 3 "ffi_test_2" f dlsym indirect-test-2 ]

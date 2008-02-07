@@ -1,8 +1,10 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! See http://factorcode.org/license.txt for BSD license.
 
-! Usage: 8889 start-server
-! $ telnet 127.0.0.1 8889
+! Mock SMTP server for testing purposes.
+
+! Usage: 4321 smtp-server
+! $ telnet 127.0.0.1 4321
 ! Trying 127.0.0.1...
 ! Connected to localhost.
 ! Escape character is '^]'.
@@ -26,7 +28,7 @@
 ! Connection closed by foreign host.
 
 USING: combinators kernel prettyprint io io.server sequences
-namespaces ;
+namespaces io.sockets continuations ;
 
 SYMBOL: data-mode
 
@@ -59,10 +61,12 @@ SYMBOL: data-mode
           ] }
     } cond nip [ process ] when ;
 
-: start-server ( port -- )
+: smtp-server ( port -- )
     "Starting SMTP server on port " write dup . flush
-    internet-server "smtp-server" [
-        60000 stdio get set-timeout
-        "220 hello\r\n" write flush
-        process
-    ] with-server ;
+    "127.0.0.1" swap <inet4> <server> [
+        accept [
+            60000 stdio get set-timeout
+            "220 hello\r\n" write flush
+            process
+        ] with-stream
+    ] with-disposal ;

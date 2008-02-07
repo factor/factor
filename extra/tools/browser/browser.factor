@@ -127,6 +127,7 @@ MEMO: all-vocabs-seq ( -- seq )
         { [ "windows." ?head ] [ t ] }
         { [ "cocoa" ?head ] [ t ] }
         { [ ".test" ?tail ] [ t ] }
+        { [ "raptor" ?head ] [ t ] }
         { [ dup "tools.deploy.app" = ] [ t ] }
         { [ t ] [ f ] }
     } cond nip ;

@@ -1,41 +1,111 @@
-! Tested with Apache JAMES version 2.3.1 on localhost
-! cram-md5 authentication tested against Exim 4
-! Replace "localhost" with your smtp server
-! e.g. "your.smtp.server" initialize
+USING: smtp tools.test io.streams.string threads
+smtp.server kernel sequences namespaces ;
+IN: temporary
 
-USING: smtp tools.test ;
+{ 0 0 } [ [ ] with-smtp-connection ] must-infer-as
 
-"localhost" initialize ! replace localhost with your smtp server
+[ "hello\nworld" validate-address ] must-fail
 
-! 8889 set-port ! default port = 25, change for testing purposes
+[ "slava@factorcode.org" ]
+[ "slava@factorcode.org" validate-address ] unit-test
 
-! 30000 set-read-timeout ! default = 60000
-! f set-esmtp ! when esmtp (extended smtp) is not supported
+[ { "hello" "." "world" } validate-message ] must-fail
 
-start
+[ "hello\r\nworld\r\n.\r\n" ] [
+    { "hello" "world" } [ send-body ] string-out
+] unit-test
 
-! "md5 password here" "login" cram-md5-auth
+[
+    [
+        "500 syntax error" check-response
+    ] with-log-stdio
+] must-fail
 
-"root@localhost" mailfrom ! your@mail.address
+[ ] [
+    [
+        "220 success" check-response
+    ] with-log-stdio
+] unit-test
 
-"root@localhost" rcptto ! someone@example.com
+[ "220 success" ] [
+    "220 success" [ receive-response ] string-in
+] unit-test
 
-! { "From: Your Name <your@mail.address>" 
-!   "To: Destination Address <someone@example.com>"
-!   "Subject: test message"
-!   "Date: Thu, 17 May 2007 18:46:45 +0200"
-!   "Message-Id: <unique.message.id.string@example.com>"
-!   " "
-!   "This is a test message."
-! } send-message
+[ "220 the end" ] [
+    [
+        "220-a multiline response\r\n250-another line\r\n220 the end"
+        [ receive-response ] string-in
+    ] with-log-stdio
+] unit-test
 
-{ "From: Your Name <root@localhost>" 
-  "To: Destination Address <root@localhost>"
-  "Subject: test message"
-  "Date: Thu, 17 May 2007 18:46:45 +0200"
-  "Message-Id: <unique.message.id.string@example.com>"
-  " "
-  "This is a test message."
-} send-message
+[ ] [
+    [
+        "220-a multiline response\r\n250-another line\r\n220 the end"
+        [ get-ok ] string-in
+    ] with-log-stdio
+] unit-test
 
-quit
+[
+    "Subject:\r\nsecurity hole" validate-header
+] must-fail
+
+[
+    V{
+        { "To" "Slava <slava@factorcode.org>, Ed <dharmatech@factorcode.org>" }
+        { "From" "Doug <erg@factorcode.org>" }
+        { "Subject" "Factor rules" }
+    }
+    { "slava@factorcode.org" "dharmatech@factorcode.org" }
+    "erg@factorcode.org"
+] [
+    "Factor rules"
+    {
+        "Slava <slava@factorcode.org>"
+        "Ed <dharmatech@factorcode.org>"
+    }
+    "Doug <erg@factorcode.org>"
+    simple-headers >r >r 2 head* r> r>
+] unit-test
+
+[
+    {
+        "To: Slava <slava@factorcode.org>, Ed <dharmatech@factorcode.org>"
+        "From: Doug <erg@factorcode.org>"
+        "Subject: Factor rules"
+        f
+        f
+        " "
+        "Hi guys"
+        "Bye guys"
+    }
+    { "slava@factorcode.org" "dharmatech@factorcode.org" }
+    "erg@factorcode.org"
+] [
+    "Hi guys\nBye guys"
+    "Factor rules"
+    {
+        "Slava <slava@factorcode.org>"
+        "Ed <dharmatech@factorcode.org>"
+    }
+    "Doug <erg@factorcode.org>"
+    prepare-simple-message
+    >r >r f 3 pick set-nth f 4 pick set-nth r> r>
+] unit-test
+
+[ ] [ [ 4321 smtp-server ] in-thread ] unit-test
+
+[ ] [
+    [
+        4321 smtp-port set
+
+        "Hi guys\nBye guys"
+        "Factor rules"
+        {
+            "Slava <slava@factorcode.org>"
+            "Ed <dharmatech@factorcode.org>"
+        }
+        "Doug <erg@factorcode.org>"
+
+        send-simple-message
+    ] with-scope
+] unit-test

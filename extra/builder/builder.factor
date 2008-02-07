@@ -70,6 +70,7 @@ VAR: stamp
     "pull"
     "--no-summary"
     "git://factorcode.org/git/factor.git"
+    ! "http://dharmatech.onigirihouse.com/factor.git"
     "master"
   }
   run-process process-status

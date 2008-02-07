@@ -1,5 +1,5 @@
 USING: combinators.lib kernel math math.ranges random sequences
-tools.test tools.test.inference continuations arrays vectors ;
+tools.test continuations arrays vectors ;
 IN: temporary
 
 [ 5 ] [ [ 10 random ] [ 5 = ] generate ] unit-test
