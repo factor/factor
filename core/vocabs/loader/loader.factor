@@ -148,10 +148,17 @@ SYMBOL: load-help?
     dup update-roots
     dup modified-sources swap modified-docs ;
 
-: load-error. ( vocab error -- )
-    "==== " write >r
-    dup vocab-name swap f >vocab-link write-object ":" print nl
-    r> print-error ;
+: vocab-heading. ( vocab -- )
+    nl
+    "==== " write
+    dup vocab-name swap f >vocab-link write-object ":" print
+    nl ;
+
+: load-error. ( triple -- )
+    dup first vocab-heading.
+    dup second print-error
+    drop ;
+    ! third "Traceback" swap write-object ;
 
 TUPLE: require-all-error vocabs ;
 
@@ -166,10 +173,14 @@ M: require-all-error summary
     dup length 1 = [ first require ] [
         [
             [
-                [ [ require ] [ 2array , ] recover ] each
+                [
+                    [ require ]
+                    [ error-continuation get 3array , ]
+                    recover
+                ] each
             ] { } make
             dup empty? [ drop ] [
-                dup [ nl load-error. ] assoc-each
+                dup [ load-error. nl ] each
                 keys require-all-error
             ] if
         ] with-compiler-errors

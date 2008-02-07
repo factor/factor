@@ -11,7 +11,8 @@ SYMBOL: failures
 : <failure> ( error what -- triple )
     error-continuation get 3array ;
 
-: failure ( error what -- ) <failure> failures get push ;
+: failure ( error what -- )
+    <failure> failures get push ;
 
 SYMBOL: this-test
 
@@ -45,16 +46,23 @@ M: expected-error summary
 : ignore-errors ( quot -- )
     [ drop ] recover ; inline
 
-: run-test ( path -- failures )
-    [ "temporary" forget-vocab ] with-compilation-unit
-    [
-        V{ } clone [
-            failures [
-                [ run-file ] [ swap failure ] recover
-            ] with-variable
-        ] keep
-    ] keep
-    [ forget-source ] with-compilation-unit ;
+: (run-test) ( vocab -- )
+    dup vocab-source-loaded? [
+        vocab-tests-path dup [
+            dup ?resource-path exists? [
+                [ "temporary" forget-vocab ] with-compilation-unit
+                dup run-file
+                [ dup forget-source ] with-compilation-unit
+            ] when
+        ] when
+    ] when drop ;
+
+: run-test ( vocab -- failures )
+    V{ } clone [
+        failures [
+            (run-test)
+        ] with-variable
+    ] keep ;
 
 : failure. ( triple -- )
     dup second .
@@ -70,8 +78,7 @@ M: expected-error summary
         ] [
             "==== FAILING TESTS:" print
             [
-                nl
-                "Failing tests in " write swap <pathname> .
+                swap vocab-heading.
                 [ nl failure. nl ] each
             ] assoc-each
         ] if
@@ -79,18 +86,11 @@ M: expected-error summary
         drop "==== NOTHING TO TEST" print
     ] if ;
 
-: run-vocab-tests ( vocabs -- failures )
-    dup empty? [ f ] [
+: run-tests ( prefix -- failures )
+    child-vocabs dup empty? [ f ] [
         [ dup run-test ] { } map>assoc
         [ second empty? not ] subset
     ] if ;
-
-: run-tests ( prefix -- failures )
-    child-vocabs
-    [ vocab-source-loaded? ] subset
-    [ vocab-tests-path ] map
-    [ dup [ ?resource-path exists? ] when ] subset
-    run-vocab-tests ;
 
 : test ( prefix -- )
     run-tests failures. ;
