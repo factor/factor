@@ -1,6 +1,6 @@
 
 USING: kernel namespaces threads sequences calendar
-       combinators.cleave combinators.lib ;
+       combinators.cleave combinators.lib debugger ;
 
 IN: raptor.cron
 
@@ -43,9 +43,9 @@ C: <when> when
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : recurring-job ( when quot -- )
-  [ swap when=now? [ call ] [ drop ] if 60000 sleep ] [ recurring-job ] 2bi ;
+  [ swap when=now? [ try ] [ drop ] if 60000 sleep ] [ recurring-job ] 2bi ;
 
-: schedule ( when quot -- ) [ recurring-job ] curry curry in-thread ;
+: schedule ( when quot -- ) [ recurring-job ] 2curry in-thread ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

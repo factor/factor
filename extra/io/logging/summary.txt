@@ -1,1 +1,0 @@
-Basic logging framework for server applications

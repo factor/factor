@@ -1,4 +1,4 @@
-USING: smtp tools.test io.streams.string io.logging threads
+USING: smtp tools.test io.streams.string threads
 smtp.server kernel sequences namespaces ;
 IN: temporary
 

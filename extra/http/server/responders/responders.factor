@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs hashtables html html.elements splitting
 http io kernel math math.parser namespaces parser sequences
-strings io.server vectors assocs.lib io.logging ;
+strings io.server vectors assocs.lib logging ;
 
 IN: http.server.responders
 
@@ -22,13 +22,15 @@ SYMBOL: responders
     <html> <body> <h1> write </h1> </body> </html> ;
 
 : error-head ( error -- )
-    dup log-error response
+    response
     H{ { "Content-Type" V{ "text/html" } } } print-header nl ;
 
 : httpd-error ( error -- )
     #! This must be run from handle-request
     dup error-head
     "head" "method" get = [ drop ] [ error-body ] if ;
+
+\ httpd-error ERROR add-error-logging
 
 : bad-request ( -- )
     [
@@ -84,17 +86,21 @@ SYMBOL: max-post-request
 : read-post-request ( header -- str hash )
     content-length [ read dup query>hash ] [ f f ] if* ;
 
-: log-headers ( hash -- )
+LOG: log-headers DEBUG
+
+: interesting-headers ( assoc -- string )
     [
-        drop {
-            "user-agent"
-            "referer"
-            "x-forwarded-for"
-            "host"
-        } member?
-    ] assoc-subset [
-        ": " swap 3append log-message
-    ] multi-assoc-each ;
+        [
+            drop {
+                "user-agent"
+                "referer"
+                "x-forwarded-for"
+                "host"
+            } member?
+        ] assoc-subset [
+            ": " swap 3append % "\n" %
+        ] multi-assoc-each
+    ] "" make ;
 
 : prepare-url ( url -- url )
     #! This is executed in the with-request namespace.
@@ -105,7 +111,7 @@ SYMBOL: max-post-request
 : prepare-header ( -- )
     read-header
     dup "header" set
-    dup log-headers
+    dup interesting-headers log-headers
     read-post-request "response" set "raw-response" set ;
 
 ! Responders are called in a new namespace with these
@@ -177,9 +183,6 @@ SYMBOL: max-post-request
     "/" "responder-url" set
     "default" responder call-responder ;
 
-: log-responder ( path -- )
-    "Calling responder " swap append log-message ;
-
 : trim-/ ( url -- url )
     #! Trim a leading /, if there is one.
     "/" ?head drop ;
@@ -199,12 +202,14 @@ SYMBOL: max-post-request
     #! /foo/bar... - default responder used
     #! /responder/foo/bar - responder foo, argument bar
     vhost [
-        dup log-responder trim-/ "responder/" ?head [
+        trim-/ "responder/" ?head [
             serve-explicit-responder
         ] [
             serve-default-responder
         ] if
     ] bind ;
+
+\ serve-responder DEBUG add-input-logging
 
 : no-such-responder ( -- )
     "404 No such responder" httpd-error ;

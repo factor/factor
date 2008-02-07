@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces io kernel io.logging io.sockets sequences
+USING: namespaces io kernel logging io.sockets sequences
 combinators sequences.lib splitting assocs strings math.parser
 random system calendar ;
 
@@ -12,21 +12,18 @@ SYMBOL: smtp-port       25 smtp-port set-global
 SYMBOL: read-timeout    60000 read-timeout set-global
 SYMBOL: esmtp           t esmtp set-global
 
-: log-smtp-connection ( host port -- )
-    [
-        "Establishing SMTP connection to " % swap % ":" % #
-    ] "" make log-message ;
+: log-smtp-connection ( host port -- ) 2drop ;
+
+\ log-smtp-connection NOTICE add-input-logging
 
 : with-smtp-connection ( quot -- )
-    [
-        smtp-host get smtp-port get
-        2dup log-smtp-connection
-        <inet> <client> [
-            smtp-domain [ host-name or ] change
-            read-timeout get stdio get set-timeout
-            call
-        ] with-stream
-    ] with-log-stdio ; inline
+    smtp-host get smtp-port get
+    2dup log-smtp-connection
+    <inet> <client> [
+        smtp-domain [ host-name or ] change
+        read-timeout get stdio get set-timeout
+        call
+    ] with-stream ; inline
 
 : crlf "\r\n" write ;
 
@@ -58,20 +55,20 @@ SYMBOL: esmtp           t esmtp set-global
 : quit ( -- )
     "QUIT" write crlf ;
 
-: log-response ( string -- ) "SMTP: " swap append log-message ;
+LOG: smtp-response DEBUG
 
 : check-response ( response -- )
     {
-        { [ dup "220" head? ] [ log-response ] }
-        { [ dup "235" swap subseq? ] [ log-response ] }
-        { [ dup "250" head? ] [ log-response ] }
-        { [ dup "221" head? ] [ log-response ] }
-        { [ dup "bye" head? ] [ log-response ] }
+        { [ dup "220" head? ] [ smtp-response ] }
+        { [ dup "235" swap subseq? ] [ smtp-response ] }
+        { [ dup "250" head? ] [ smtp-response ] }
+        { [ dup "221" head? ] [ smtp-response ] }
+        { [ dup "bye" head? ] [ smtp-response ] }
         { [ dup "4" head? ] [ "server busy" throw ] }
-        { [ dup "354" head? ] [ log-response ] }
-        { [ dup "50" head? ] [ log-response "syntax error" throw ] }
-        { [ dup "53" head? ] [ log-response "invalid authentication data" throw ] }
-        { [ dup "55" head? ] [ log-response "fatal error" throw ] }
+        { [ dup "354" head? ] [ smtp-response ] }
+        { [ dup "50" head? ] [ smtp-response "syntax error" throw ] }
+        { [ dup "53" head? ] [ smtp-response "invalid authentication data" throw ] }
+        { [ dup "55" head? ] [ smtp-response "fatal error" throw ] }
         { [ t ] [ "unknown error" throw ] }
     } cond ;
 
@@ -80,7 +77,7 @@ SYMBOL: esmtp           t esmtp set-global
 
 : process-multiline ( multiline -- response )
     >r readln r> 2dup " " append head? [
-        drop dup log-response
+        drop dup smtp-response
     ] [
         swap check-response process-multiline
     ] if ;

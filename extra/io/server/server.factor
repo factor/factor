@@ -1,32 +1,34 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.sockets io.files io.logging continuations kernel
+USING: io io.sockets io.files logging continuations kernel
 math math.parser namespaces parser sequences strings
 prettyprint debugger quotations calendar qualified ;
 QUALIFIED: concurrency
 
 IN: io.server
 
-: with-client ( quot client -- )
-    dup log-client
-    [ swap with-stream ] 2curry concurrency:spawn drop ; inline
+LOG: accepted-connection NOTICE
+
+: with-client ( client quot -- )
+    [
+        over client-stream-addr accepted-connection
+        with-stream*
+    ] curry with-disposal ; inline
+
+\ with-client NOTICE add-error-logging
 
 : accept-loop ( server quot -- )
-    [ swap accept with-client ] 2keep accept-loop ; inline
+    [
+        >r accept r> [ with-client ] 2curry concurrency:spawn
+    ] 2keep accept-loop ; inline
 
 : server-loop ( server quot -- )
     [ accept-loop ] curry with-disposal ; inline
 
 : spawn-server ( addrspec quot -- )
-    "Waiting for connections on " pick unparse append
-    log-message
-    [
-        >r <server> r> server-loop
-    ] [
-        "Cannot spawn server: " print
-        print-error
-        2drop
-    ] recover ; inline
+    >r <server> r> server-loop ; inline
+
+\ spawn-server NOTICE add-error-logging
 
 : local-server ( port -- seq )
     "localhost" swap t resolve-host ;
@@ -39,18 +41,20 @@ IN: io.server
         [ spawn-server ] curry concurrency:parallel-each
     ] curry with-logging ; inline
 
-: log-datagram ( addrspec -- )
-    "Received datagram from " swap unparse append log-message ;
+: received-datagram ( addrspec -- ) drop ;
+
+\ received-datagram NOTICE add-input-logging
 
 : datagram-loop ( quot datagram -- )
     [
-        [ receive dup log-datagram >r swap call r> ] keep
+        [ receive dup received-datagram >r swap call r> ] keep
         pick [ send ] [ 3drop ] keep
     ] 2keep datagram-loop ; inline
 
 : spawn-datagrams ( quot addrspec -- )
-    "Waiting for datagrams on " over unparse append log-message
     <datagram> [ datagram-loop ] with-disposal ; inline
+
+\ spawn-datagrams NOTICE add-input-logging
 
 : with-datagrams ( seq service quot -- )
     [
