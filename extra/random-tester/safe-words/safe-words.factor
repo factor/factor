@@ -16,7 +16,7 @@ IN: random-tester.safe-words
         array? integer? complex? value-ref? ref? key-ref?
         interval? number?
         wrapper? tuple?
-        [-1,1]? between? bignum? both? either? eq? equal? even? fixnum? float? fp-nan? hashtable? interval-contains? interval-subset? interval? key-ref? key? number? odd? pair? power-of-2? ratio? rational? real? subassoc? valid-digits? zero? assoc? curry? vector? callstack? ! clear 3.14 [ <vector> assoc? ] compile-1
+        [-1,1]? between? bignum? both? either? eq? equal? even? fixnum? float? fp-nan? hashtable? interval-contains? interval-subset? interval? key-ref? key? number? odd? pair? power-of-2? ratio? rational? real? subassoc? zero? assoc? curry? vector? callstack? ! clear 3.14 [ <vector> assoc? ] compile-1
         2^ not
         ! arrays
         resize-array <array>

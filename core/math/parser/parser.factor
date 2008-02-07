@@ -33,6 +33,9 @@ IN: math.parser
 : string>digits ( str -- digits )
     [ digit> ] { } map-as ;
 
+: digits>integer ( seq radix -- n )
+    0 swap [ swapd * + ] curry reduce ;
+
 DEFER: base>
 
 <PRIVATE
@@ -52,9 +55,6 @@ SYMBOL: radix
     "/" split1 (base>) >r whole-part r>
     3dup and and [ / + ] [ 3drop f ] if ;
 
-: digits>integer ( seq -- n )
-    0 radix get [ swapd * + ] curry reduce ;
-
 : valid-digits? ( seq -- ? )
     {
         { [ dup empty? ] [ drop f ] }
@@ -64,7 +64,7 @@ SYMBOL: radix
 
 : string>integer ( str -- n/f )
     string>digits dup valid-digits?
-    [ digits>integer ] [ drop f ] if ;
+    [ radix get digits>integer ] [ drop f ] if ;
 
 PRIVATE>
 
