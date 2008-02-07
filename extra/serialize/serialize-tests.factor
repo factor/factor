@@ -10,8 +10,6 @@ TUPLE: serialize-test a b ;
 
 C: <serialize-test> serialize-test
 
-: CURRY< \ > parse-until first2 curry parsed ; parsing
-
 : objects
     {
         f
@@ -33,7 +31,7 @@ C: <serialize-test> serialize-test
         B{ 50 13 55 64 1 }
         ?{ t f t f f t f }
         F{ 1.0 3.0 4.0 1.0 2.35 0.33 }
-        CURRY< 1 [ 2 ] >
+        << 1 [ 2 ] curry parsed >>
         { { "a" "bc" } { "de" "fg" } }
         H{ { "a" "bc" } { "de" "fg" } }
     } ;

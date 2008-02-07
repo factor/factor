@@ -4,7 +4,7 @@
 ! Tested with OpenSSL 0.9.8a_0 on Mac OS X 10.4.9 PowerPC
 
 USING: alien alien.c-types assocs kernel libc namespaces
-openssl.libcrypto openssl.libssl sequences unix ;
+openssl.libcrypto openssl.libssl sequences ;
 
 IN: openssl
 

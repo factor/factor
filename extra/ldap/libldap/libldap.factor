@@ -40,9 +40,9 @@ IN: ldap.libldap
 : LDAP_RES_UNSOLICITED     0 ; inline
 
 ! how many messages to retrieve results for
-: LDAP_MSG_ONE		       HEX: 00 ; inline
-: LDAP_MSG_ALL		       HEX: 01 ; inline
-: LDAP_MSG_RECEIVED	       HEX: 02 ; inline
+: LDAP_MSG_ONE             HEX: 00 ; inline
+: LDAP_MSG_ALL             HEX: 01 ; inline
+: LDAP_MSG_RECEIVED        HEX: 02 ; inline
 
 ! the possible result types returned
 : LDAP_RES_BIND             HEX: 61 ; inline
@@ -71,7 +71,7 @@ IN: ldap.libldap
     { HEX: 79  "LDAP_RES_EXTENDED_PARTIAL" }
 } ;
 
-: LDAP_OPT_PROTOCOL_VERSION	HEX: 0011 ; inline
+: LDAP_OPT_PROTOCOL_VERSION HEX: 0011 ; inline
 
 C-STRUCT: ldap 
     { "char" "ld_lberoptions" }

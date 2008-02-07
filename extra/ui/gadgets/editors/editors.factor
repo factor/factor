@@ -249,11 +249,11 @@ M: editor gadget-text* editor-string % ;
 : extend-selection ( editor -- )
     dup request-focus dup editor-caret click-loc ;
 
-: mouse-elt ( -- elelement )
+: mouse-elt ( -- element )
     hand-click# get {
+        { 1 T{ one-char-elt } }
         { 2 T{ one-word-elt } }
-        { 3 T{ one-line-elt } }
-    } at T{ one-char-elt } or ;
+    } at T{ one-line-elt } or ;
 
 : drag-direction? ( loc editor -- ? )
     editor-mark* <=> 0 < ;
