@@ -1,4 +1,4 @@
-USING: io.files io.launcher system tools.deploy.backend
+USING: io.files io.launcher system bootstrap.image
 namespaces sequences kernel ;
 IN: benchmark.bootstrap2
 
@@ -6,7 +6,7 @@ IN: benchmark.bootstrap2
     "." resource-path cd
     [
         vm ,
-        "-i=" boot-image-name append ,
+        "-i=" my-boot-image-name append ,
         "-output-image=foo.image" ,
         "-no-user-init" ,
     ] { } make run-process drop ;

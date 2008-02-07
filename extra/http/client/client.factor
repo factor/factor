@@ -47,32 +47,31 @@ DEFER: http-get-stream
         dispose "location" swap peek-at nip http-get-stream
     ] when ;
 
+: default-timeout 60 1000 * over set-timeout ;
+
 : http-get-stream ( url -- code headers stream )
     #! Opens a stream for reading from an HTTP URL.
     parse-url over parse-host <inet> <client> [
         [ [ get-request read-response ] with-stream* ] keep
+        default-timeout
     ] [ ] [ dispose ] cleanup do-redirect ;
 
-: http-get ( url -- code headers string )
-    #! Opens a stream for reading from an HTTP URL.
-    [
-        http-get-stream [ stdio get contents ] with-stream
-    ] with-scope ;
+: success? ( code -- ? ) 200 = ;
+
+: check-response ( code headers stream -- stream )
+    nip swap success?
+    [ dispose "HTTP download failed" throw ] unless ;
+
+: http-get ( url -- string )
+    http-get-stream check-response contents ;
 
 : download-name ( url -- name )
     file-name "?" split1 drop "/" ?tail drop ;
 
-: default-timeout 60 1000 * over set-timeout ;
-
-: success? ( code -- ? ) 200 = ;
-
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
-    >r http-get-stream nip default-timeout swap success? [
-        r> <file-writer> stream-copy
-    ] [
-        r> drop dispose "HTTP download failed" throw
-    ] if ;
+    >r http-get-stream check-response
+    r> <file-writer> stream-copy ;
 
 : download ( url -- )
     dup download-name download-to ;

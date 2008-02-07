@@ -19,7 +19,8 @@ LOG: accepted-connection NOTICE
 
 : accept-loop ( server quot -- )
     [
-        >r accept r> [ with-client ] 2curry concurrency:spawn
+        >r accept r> [ with-client ] 2curry
+        concurrency:spawn drop
     ] 2keep accept-loop ; inline
 
 : server-loop ( server quot -- )

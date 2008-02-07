@@ -10,6 +10,23 @@ definitions debugger float-arrays quotations.private
 combinators.private combinators ;
 IN: bootstrap.image
 
+: my-arch ( -- arch )
+    cpu dup "ppc" = [ os "-" rot 3append ] when ;
+
+: boot-image-name ( arch -- string )
+    "boot." swap ".image" 3append ;
+
+: my-boot-image-name ( -- string )
+    my-arch boot-image-name ;
+
+: images ( -- seq )
+    {
+        "x86.32"
+        "x86.64"
+        "linux-ppc" "macosx-ppc"
+        ! "arm"
+    } ;
+
 <PRIVATE
 
 ! Constants
@@ -394,9 +411,6 @@ M: curry '
         [ >le write ] curry each
     ] if ;
 
-: image-name
-    "boot." architecture get ".image" 3append resource-path ;
-
 : write-image ( image filename -- )
     "Writing image to " write dup write "..." print flush
     <file-writer> [ (write-image) ] with-stream ;
@@ -415,16 +429,10 @@ PRIVATE>
         begin-image
         "resource:/core/bootstrap/stage1.factor" run-file
         end-image
-        image get image-name write-image
+        image get
+        architecture get boot-image-name resource-path
+        write-image
     ] with-variable ;
 
-: my-arch ( -- arch )
-    cpu dup "ppc" = [ os "-" rot 3append ] when ;
-
 : make-images ( -- )
-    {
-        "x86.32"
-        "x86.64"
-        "linux-ppc" "macosx-ppc"
-        ! "arm"
-    } [ make-image ] each ;
+    images [ make-image ] each ;
