@@ -61,35 +61,42 @@ M: expected-error summary
     dup first print-error
     "Traceback" swap third write-object ;
 
-: failures. ( path failures -- )
-    "Failing tests in " write swap <pathname> .
-    [ nl failure. nl ] each ;
-
-: run-tests ( seq -- )
-    dup empty? [ drop "==== NOTHING TO TEST" print ] [
-        [ dup run-test ] { } map>assoc
-        [ second empty? not ] subset
+: failures. ( assoc -- )
+    dup [
         nl
         dup empty? [
             drop
             "==== ALL TESTS PASSED" print
         ] [
             "==== FAILING TESTS:" print
-            [ nl failures. ] assoc-each
+            [
+                nl
+                "Failing tests in " write swap <pathname> .
+                [ nl failure. nl ] each
+            ] assoc-each
         ] if
+    ] [
+        drop "==== NOTHING TO TEST" print
     ] if ;
 
-: run-vocab-tests ( vocabs -- )
-    [ vocab-tests-path ] map
-    [ dup [ ?resource-path exists? ] when ] subset
-    run-tests ;
+: run-vocab-tests ( vocabs -- failures )
+    dup empty? [ f ] [
+        [ dup run-test ] { } map>assoc
+        [ second empty? not ] subset
+    ] if ;
 
-: test ( prefix -- )
+: run-tests ( prefix -- failures )
     child-vocabs
     [ vocab-source-loaded? ] subset
+    [ vocab-tests-path ] map
+    [ dup [ ?resource-path exists? ] when ] subset
     run-vocab-tests ;
 
-: test-all ( -- ) "" test ;
+: test ( prefix -- )
+    run-tests failures. ;
 
-: test-changes ( -- )
-    "" to-refresh dupd do-refresh run-vocab-tests ;
+: run-all-tests ( prefix -- failures )
+    "" run-tests ;
+
+: test-all ( -- )
+    run-all-tests failures. ;
