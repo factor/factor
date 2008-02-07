@@ -1,6 +1,6 @@
 USING: compiler definitions generic assocs inference math
 namespaces parser tools.test words kernel sequences arrays io
-effects tools.test.inference compiler.units inference.state ;
+effects tools.test compiler.units inference.state ;
 IN: temporary
 
 DEFER: x-1
@@ -28,13 +28,13 @@ DEFER: c
 
 [ 1 2 1 2 ] [ "USE: temporary b" eval ] unit-test
 
-{ 0 4 } [ b ] unit-test-effect
+{ 0 4 } [ b ] must-infer-as
 
 [ ] [ "IN: temporary : a 1 2 3 ;" eval ] unit-test
 
 [ 1 2 3 1 2 3 ] [ "USE: temporary b" eval ] unit-test
 
-{ 0 6 } [ b ] unit-test-effect
+{ 0 6 } [ b ] must-infer-as
 
 \ b word-xt "b-xt" set
 
@@ -52,7 +52,7 @@ DEFER: c
 
 [ ] [ "IN: temporary : a 1 2 ;" eval ] unit-test
 
-{ 0 4 } [ c ] unit-test-effect
+{ 0 4 } [ c ] must-infer-as
 
 [ f ] [ "c-xt" get \ c word-xt = ] unit-test
 

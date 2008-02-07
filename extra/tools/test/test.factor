@@ -3,7 +3,8 @@
 USING: namespaces arrays prettyprint sequences kernel
 vectors quotations words parser assocs combinators
 continuations debugger io io.files vocabs tools.time
-vocabs.loader source-files compiler.units inspector ;
+vocabs.loader source-files compiler.units inspector
+inference effects ;
 IN: tools.test
 
 SYMBOL: failures
@@ -29,13 +30,23 @@ SYMBOL: this-test
         { } swap with-datastack swap >array assert=
     ] 2curry (unit-test) ;
 
+: short-effect ( effect -- pair )
+    dup effect-in length swap effect-out length 2array ;
+
+: must-infer-as ( effect quot -- )
+    >r 1quotation r> [ infer short-effect ] curry unit-test ;
+
+: must-infer ( word/quot -- )
+    dup word? [ 1quotation ] when
+    [ infer drop ] curry [ ] swap unit-test ;
+
 TUPLE: expected-error ;
 
 M: expected-error summary
     drop
     "The unit test expected the quotation to throw an error" ;
 
-: must-fail-with ( quot test -- )
+: must-fail-with ( quot pred -- )
     >r [ expected-error construct-empty throw ] compose r>
     [ recover ] 2curry
     [ t ] swap unit-test ;
@@ -60,7 +71,7 @@ M: expected-error summary
 : run-test ( vocab -- failures )
     V{ } clone [
         failures [
-            (run-test)
+            [ (run-test) ] [ swap failure ] recover
         ] with-variable
     ] keep ;
 

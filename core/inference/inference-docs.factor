@@ -73,6 +73,12 @@ $nl
 { $subsection infer-quot-value }
 "The " { $vocab-link "macros" } " vocabulary defines some nice syntax sugar which makes compiler transforms easier to work with." ;
 
+ARTICLE: "dataflow-graphs" "Inspecting the dataflow graph"
+"The dataflow graph used by " { $link "compiler" } " can be obtained:"
+{ $subsection dataflow }
+"The " { $vocab-link "optimizer.debugger" } " tool prints the dataflow graph in human readable form."
+$nl ;
+
 ARTICLE: "inference" "Stack effect inference"
 "The stack effect inference tool is used to check correctness of code before it is run. It is also used by the compiler to build a dataflow graph on which optimizations can be performed. Only words for which a stack effect can be inferred will compile."
 $nl
@@ -80,14 +86,15 @@ $nl
 { $subsection infer. }
 "Instead of printing the inferred information, it can be returned as objects on the stack:"
 { $subsection infer }
-"The dataflow graph used by " { $link "compiler" } " can be obtained:"
-{ $subsection dataflow }
+"Static stack effect inference can be combined with unit tests; see " { $link "tools.test.write" } "."
+$nl
 "The following articles describe the implementation of the stack effect inference algorithm:"
 { $subsection "inference-simple" }
 { $subsection "inference-combinators" }
 { $subsection "inference-branches" }
 { $subsection "inference-recursive" } 
 { $subsection "inference-limitations" } 
+{ $subsection "dataflow-graphs" }
 { $subsection "compiler-transforms" } ;
 
 ABOUT: "inference"

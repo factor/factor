@@ -1,6 +1,6 @@
 IN: temporary
 USING: sequences inference.transforms tools.test math kernel
-quotations tools.test.inference inference ;
+quotations inference ;
 
 : compose-n-quot <repetition> >quotation ;
 : compose-n compose-n-quot call ;
