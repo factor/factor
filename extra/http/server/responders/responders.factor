@@ -1,8 +1,8 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs hashtables html html.elements splitting
 http io kernel math math.parser namespaces parser sequences
-strings io.server vectors assocs.lib ;
+strings io.server vectors assocs.lib io.logging ;
 
 IN: http.server.responders
 

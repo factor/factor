@@ -80,14 +80,10 @@ H{ { +nullary+ t } } define-command
 \ refresh-all
 H{ { +nullary+ t } { +listener+ t } } define-command
 
-\ test-changes
-H{ { +nullary+ t } { +listener+ t } } define-command
-
 workspace "workflow" f {
     { T{ key-down f { C+ } "n" } workspace-window }
     { T{ key-down f f "ESC" } hide-popup }
     { T{ key-down f f "F2" } refresh-all }
-    { T{ key-down f { A+ } "F2" } test-changes }
 } define-command-map
 
 [
