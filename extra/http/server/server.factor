@@ -1,8 +1,8 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io strings splitting
 threads http http.server.responders sequences prettyprint
-io.server ;
+io.server io.logging ;
 
 IN: http.server
 

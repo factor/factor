@@ -27,21 +27,21 @@ IN: project-euler.032
 <PRIVATE
 
 : source-032 ( -- seq )
-    9 factorial [ 9 permutation [ 1+ ] map 10 swap digits>integer ] map ;
+    9 factorial [ 9 permutation [ 1+ ] map 10 digits>integer ] map ;
 
 : 1and4 ( n -- ? )
     number>string 1 cut-slice 4 cut-slice
-    [ 10 string>integer ] 3apply [ * ] dip = ;
+    [ string>number ] 3apply [ * ] dip = ;
 
 : 2and3 ( n -- ? )
     number>string 2 cut-slice 3 cut-slice
-    [ 10 string>integer ] 3apply [ * ] dip = ;
+    [ string>number ] 3apply [ * ] dip = ;
 
 : valid? ( n -- ? )
     dup 1and4 swap 2and3 or ;
 
 : products ( seq -- m )
-    [ number>string 4 tail* 10 string>integer ] map ;
+    [ number>string 4 tail* string>number ] map ;
 
 PRIVATE>
 
@@ -65,7 +65,7 @@ PRIVATE>
 
 ! multiplicand/multiplier/product
 : mmp ( pair -- n )
-    first2 2dup * [ number>string ] 3apply 3append 10 string>integer ;
+    first2 2dup * [ number>string ] 3apply 3append string>number ;
 
 PRIVATE>
 

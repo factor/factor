@@ -36,7 +36,7 @@ IN: project-euler.038
 
 : (concat-product) ( accum n multiplier -- m )
     pick length 8 > [
-        2drop 10 swap digits>integer
+        2drop 10 digits>integer
     ] [
         [ * number>digits over push-all ] 2keep 1+ (concat-product)
     ] if ;

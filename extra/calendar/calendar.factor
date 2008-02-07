@@ -349,13 +349,23 @@ M: timestamp year. ( timestamp -- )
 : timestamp>string ( timestamp -- str )
     [ (timestamp>string) ] string-out ;
 
+: timestamp>rfc822-string ( timestamp -- str )
+    #! RFC822 timestamp format
+    #! Example: Tue, 15 Nov 1994 08:12:31 +0200
+    [
+        dup (timestamp>string)
+        " " write
+        timestamp-gmt-offset {
+            { [ dup zero? ] [ drop "GMT" write ] }
+            { [ dup 0 < ] [ "-" write neg write-00 "00" write ] }
+            { [ dup 0 > ] [ "+" write write-00 "00" write ] }
+        } cond
+    ] string-out ;
+
 : timestamp>http-string ( timestamp -- str )
     #! http timestamp format
     #! Example: Tue, 15 Nov 1994 08:12:31 GMT
-    >gmt [
-        (timestamp>string)
-        " GMT" write
-    ] string-out ;
+    >gmt timestamp>rfc822-string ;
 
 : (timestamp>rfc3339) ( timestamp -- )
     dup timestamp-year number>string write CHAR: - write1

@@ -6,6 +6,8 @@ namespaces tools.test continuations dlists strings math words
 match quotations concurrency.private ;
 IN: temporary
 
+[ ] [ self process-mailbox mailbox-data dlist-delete-all ] unit-test
+
 [ V{ 1 2 3 } ] [
   0 <vector>
   make-mailbox

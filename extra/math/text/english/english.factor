@@ -33,7 +33,7 @@ SYMBOL: and-needed?
 
 : 3digit-groups ( n -- seq )
     number>string <reversed> 3 <groups>
-    [ reverse 10 string>integer ] map ;
+    [ reverse string>number ] map ;
 
 : hundreds-place ( n -- str )
     100 /mod swap dup zero? [

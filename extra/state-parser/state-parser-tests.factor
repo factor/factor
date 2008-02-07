@@ -1,4 +1,4 @@
-USING: tools.test state-parser kernel io strings ;
+USING: tools.test state-parser kernel io strings ascii ;
 
 [ "hello" ] [ "hello" [ rest ] string-parse ] unit-test
 [ 2 4 ] [ "12\n123" [ rest drop get-line get-column ] string-parse ] unit-test

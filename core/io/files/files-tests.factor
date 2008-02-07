@@ -2,7 +2,8 @@ IN: temporary
 USING: tools.test io.files io threads kernel continuations ;
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
-[ "awk/" ] [ "/usr/libexec/awk/" file-name ] unit-test
+[ "awk" ] [ "/usr/libexec/awk/" file-name ] unit-test
+[ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
 
 [ ] [
     "test-foo.txt" resource-path <file-writer> [
