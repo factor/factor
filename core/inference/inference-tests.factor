@@ -12,14 +12,14 @@ IN: temporary
 { 1 2 } [ dup ] unit-test-effect
 
 { 1 2 } [ [ dup ] call ] unit-test-effect
-[ [ call ] infer ] unit-test-fails
+[ [ call ] infer ] must-fail
 
 { 2 4 } [ 2dup ] unit-test-effect
 
 { 1 0 } [ [ ] [ ] if ] unit-test-effect
-[ [ if ] infer ] unit-test-fails
-[ [ [ ] if ] infer ] unit-test-fails
-[ [ [ 2 ] [ ] if ] infer ] unit-test-fails
+[ [ if ] infer ] must-fail
+[ [ [ ] if ] infer ] must-fail
+[ [ [ 2 ] [ ] if ] infer ] must-fail
 { 4 3 } [ [ rot ] [ -rot ] if ] unit-test-effect
 
 { 4 3 } [
@@ -42,7 +42,7 @@ IN: temporary
 
 [
     [ [ [ 2 2 fixnum+ ] ] [ [ 2 2 fixnum* ] ] if call ] infer
-] unit-test-fails
+] must-fail
 
 ! Test inference of termination of control flow
 : termination-test-1
@@ -54,10 +54,10 @@ IN: temporary
 
 : infinite-loop infinite-loop ;
 
-[ [ infinite-loop ] infer ] unit-test-fails
+[ [ infinite-loop ] infer ] must-fail
 
 : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
-[ [ no-base-case-1 ] infer ] unit-test-fails
+[ [ no-base-case-1 ] infer ] must-fail
 
 : simple-recursion-1 ( obj -- obj )
     dup [ simple-recursion-1 ] [ ] if ;
@@ -72,7 +72,7 @@ IN: temporary
 : bad-recursion-2 ( obj -- obj )
     dup [ dup first swap second bad-recursion-2 ] [ ] if ;
 
-[ [ bad-recursion-2 ] infer ] unit-test-fails
+[ [ bad-recursion-2 ] infer ] must-fail
 
 : funny-recursion ( obj -- obj )
     dup [ funny-recursion 1 ] [ 2 ] if drop ;
@@ -192,7 +192,7 @@ DEFER: blah4
         [ swap slip ] keep swap bad-combinator
     ] if ; inline
 
-[ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
+[ [ [ 1 ] [ ] bad-combinator ] infer ] must-fail
 
 ! Regression
 : bad-input#
@@ -207,13 +207,13 @@ DEFER: blah4
 DEFER: do-crap
 : more-crap ( obj -- ) dup [ drop ] [ dup do-crap call ] if ;
 : do-crap ( obj -- ) dup [ more-crap ] [ do-crap ] if ;
-[ [ do-crap ] infer ] unit-test-fails
+[ [ do-crap ] infer ] must-fail
 
 ! This one does not
 DEFER: do-crap*
 : more-crap* ( obj -- ) dup [ drop ] [ dup do-crap* call ] if ;
 : do-crap* ( obj -- ) dup [ do-crap* ] [ more-crap* ] if ;
-[ [ do-crap* ] infer ] unit-test-fails
+[ [ do-crap* ] infer ] must-fail
 
 ! Regression
 : too-deep ( a b -- c )
@@ -226,7 +226,7 @@ M: fixnum xyz 2array ;
 M: float xyz
     [ 3 ] 2apply swapd >r 2array swap r> 2array swap ;
 
-[ t ] [ [ [ xyz ] infer ] catch inference-error? ] unit-test
+[ [ xyz ] infer ] [ inference-error? ] must-fail-with
 
 ! Doug Coleman discovered this one while working on the
 ! calendar library
@@ -277,78 +277,66 @@ DEFER: #1
 : #4 ( a -- ) dup [ drop ] [ dup #4 dup #3 call ] if ;
 : #1 ( a -- ) dup [ dup #4 dup #3 ] [ ] if drop ;
 
-[ \ #4 word-def infer ] unit-test-fails
-[ [ #1 ] infer ] unit-test-fails
+[ \ #4 word-def infer ] must-fail
+[ [ #1 ] infer ] must-fail
 
 ! Similar
 DEFER: bar
 : foo ( a b -- c d ) dup [ 2drop f f bar ] [ ] if ;
 : bar ( a b -- ) [ 2 2 + ] t foo drop call drop ;
 
-[ [ foo ] infer ] unit-test-fails
+[ [ foo ] infer ] must-fail
 
-[ 1234 infer ] unit-test-fails
+[ 1234 infer ] must-fail
 
 ! This used to hang
-[ t ] [
-    [ [ [ dup call ] dup call ] infer ] catch
-    inference-error?
-] unit-test
+[ [ [ dup call ] dup call ] infer ]
+[ inference-error? ] must-fail-with
 
 : m dup call ; inline
 
-[ t ] [
-    [ [ [ m ] m ] infer ] catch inference-error?
-] unit-test
+[ [ [ m ] m ] infer ] [ inference-error? ] must-fail-with
 
 : m' dup curry call ; inline
 
-[ t ] [
-    [ [ [ m' ] m' ] infer ] catch inference-error?
-] unit-test
+[ [ [ m' ] m' ] infer ] [ inference-error? ] must-fail-with
 
 : m'' [ dup curry ] ; inline
 
 : m''' m'' call call ; inline
 
-[ t ] [
-    [ [ [ m''' ] m''' ] infer ] catch inference-error?
-] unit-test
+[ [ [ m''' ] m''' ] infer ] [ inference-error? ] must-fail-with
 
 : m-if t over if ; inline
 
-[ t ] [
-    [ [ [ m-if ] m-if ] infer ] catch inference-error?
-] unit-test
+[ [ [ m-if ] m-if ] infer ] [ inference-error? ] must-fail-with
 
 ! This doesn't hang but it's also an example of the
 ! undedicable case
-[ t ] [
-    [ [ [ [ drop 3 ] swap call ] dup call ] infer ] catch
-    inference-error?
-] unit-test
+[ [ [ [ drop 3 ] swap call ] dup call ] infer ]
+[ inference-error? ] must-fail-with
 
 ! This form should not have a stack effect
 
 : bad-recursion-1 ( a -- b )
     dup [ drop bad-recursion-1 5 ] [ ] if ;
 
-[ [ bad-recursion-1 ] infer ] unit-test-fails
+[ [ bad-recursion-1 ] infer ] must-fail
 
 : bad-bin ( a b -- ) 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
-[ [ bad-bin ] infer ] unit-test-fails
+[ [ bad-bin ] infer ] must-fail
 
-[ t ] [ [ [ r> ] infer ] catch inference-error? ] unit-test
+[ [ r> ] infer ] [ inference-error? ] must-fail-with
 
 ! Regression
-[ t ] [ [ [ get-slots ] infer ] catch inference-error? ] unit-test
+[ [ get-slots ] infer ] [ inference-error? ] must-fail-with
 
 ! Test some curry stuff
 { 1 1 } [ 3 [ ] curry 4 [ ] curry if ] unit-test-effect
 
 { 2 1 } [ [ ] curry 4 [ ] curry if ] unit-test-effect
 
-[ [ 3 [ ] curry 1 2 [ ] 2curry if ] infer ] unit-test-fails
+[ [ 3 [ ] curry 1 2 [ ] 2curry if ] infer ] must-fail
 
 ! Test number protocol
 \ bitor must-infer
@@ -459,7 +447,7 @@ DEFER: bar
 : fooxxx ( a b -- c ) over [ foo ] when ; inline
 : barxxx fooxxx ;
 
-[ [ barxxx ] infer ] unit-test-fails
+[ [ barxxx ] infer ] must-fail
 
 ! A typo
 { 1 0 } [ { [ ] } dispatch ] unit-test-effect

@@ -7,25 +7,22 @@ IN: temporary
 [ t ] [ [ \ = \ = ] all-equal? ] unit-test
 
 ! Don't leak extra roots if error is thrown
-[ ] [ 10000 [ [ 3 throw ] catch drop ] times ] unit-test
+[ ] [ 10000 [ [ 3 throw ] ignore-errors ] times ] unit-test
 
-[ ] [ 10000 [ [ -1 f <array> ] catch drop ] times ] unit-test
+[ ] [ 10000 [ [ -1 f <array> ] ignore-errors ] times ] unit-test
 
 ! Make sure we report the correct error on stack underflow
-[ { "kernel-error" 11 f f } ]
-[ [ clear drop ] catch ] unit-test
+[ clear drop ] [ { "kernel-error" 11 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
-[ { "kernel-error" 13 f f } ]
-[ [ { } set-retainstack r> ] catch ] unit-test
+[ { } set-retainstack r> ] [ { "kernel-error" 13 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
 : overflow-d 3 overflow-d ;
 
-[ { "kernel-error" 12 f f } ]
-[ [ overflow-d ] catch ] unit-test
+[ overflow-d ] [ { "kernel-error" 12 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
@@ -33,24 +30,17 @@ IN: temporary
 
 : overflow-d-alt (overflow-d-alt) overflow-d-alt ;
 
-[ { "kernel-error" 12 f f } ]
-[ [ overflow-d-alt ] catch ] unit-test
+[ overflow-d-alt ] [ { "kernel-error" 12 f f } = ] must-fail-with
 
 [ ] [ [ :c ] string-out drop ] unit-test
 
 : overflow-r 3 >r overflow-r ;
 
-[ { "kernel-error" 14 f f } ]
-[ [ overflow-r ] catch ] unit-test
+[ overflow-r ] [ { "kernel-error" 14 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
-! : overflow-c overflow-c 3 ;
-! 
-! [ { "kernel-error" 16 f f } ]
-! [ [ overflow-c ] catch ] unit-test
-
-[ -7 <byte-array> ] unit-test-fails
+[ -7 <byte-array> ] must-fail
 
 [ 2 3 4 1 ] [ 1 2 3 4 roll ] unit-test
 [ 1 2 3 4 ] [ 2 3 4 1 -roll ] unit-test
@@ -61,27 +51,27 @@ IN: temporary
 [ 4 ] [ 4 6 or ] unit-test
 [ 6 ] [ f 6 or ] unit-test
 
-[ slip ] unit-test-fails
+[ slip ] must-fail
 [ ] [ :c ] unit-test
 
-[ 1 slip ] unit-test-fails
+[ 1 slip ] must-fail
 [ ] [ :c ] unit-test
 
-[ 1 2 slip ] unit-test-fails
+[ 1 2 slip ] must-fail
 [ ] [ :c ] unit-test
 
-[ 1 2 3 slip ] unit-test-fails
+[ 1 2 3 slip ] must-fail
 [ ] [ :c ] unit-test
 
 
 [ 5 ] [ [ 2 2 + ] 1 slip + ] unit-test
 
-[ [ ] keep ] unit-test-fails
+[ [ ] keep ] must-fail
 
 [ 6 ] [ 2 [ sq ] keep + ] unit-test
 
-[ [ ] 2keep ] unit-test-fails
-[ 1 [ ] 2keep ] unit-test-fails
+[ [ ] 2keep ] must-fail
+[ 1 [ ] 2keep ] must-fail
 [ 3 1 2 ] [ 1 2 [ 2drop 3 ] 2keep ] unit-test
 
 [ 0 ] [ f [ sq ] [ 0 ] if* ] unit-test
@@ -100,13 +90,13 @@ IN: temporary
 
 [ ] [ callstack set-callstack ] unit-test
 
-[ 3drop datastack ] unit-test-fails
+[ 3drop datastack ] must-fail
 [ ] [ :c ] unit-test
 
 ! Doesn't compile; important
 : foo 5 + 0 [ ] each ;
 
-[ drop foo ] unit-test-fails
+[ drop foo ] must-fail
 [ ] [ :c ] unit-test
 
 ! Regression
@@ -117,4 +107,4 @@ IN: temporary
 : loop ( obj obj -- )
     H{ } values swap >r dup length swap r> 0 -roll (loop) ;
 
-[ loop ] unit-test-fails
+[ loop ] must-fail

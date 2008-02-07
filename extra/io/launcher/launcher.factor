@@ -35,9 +35,9 @@ SYMBOL: +stdout+
 SYMBOL: +stderr+
 SYMBOL: +closed+
 
-SYMBOL: prepend-environment
-SYMBOL: replace-environment
-SYMBOL: append-environment
+SYMBOL: +prepend-environment+
+SYMBOL: +replace-environment+
+SYMBOL: +append-environment+
 
 : default-descriptor
     H{
@@ -45,7 +45,7 @@ SYMBOL: append-environment
         { +arguments+ f }
         { +detached+ f }
         { +environment+ H{ } }
-        { +environment-mode+ append-environment }
+        { +environment-mode+ +append-environment+ }
     } ;
 
 : with-descriptor ( desc quot -- )
@@ -53,14 +53,14 @@ SYMBOL: append-environment
 
 : pass-environment? ( -- ? )
     +environment+ get assoc-empty? not
-    +environment-mode+ get replace-environment eq? or ;
+    +environment-mode+ get +replace-environment+ eq? or ;
 
 : get-environment ( -- env )
     +environment+ get
     +environment-mode+ get {
-        { prepend-environment [ os-envs union ] }
-        { append-environment [ os-envs swap union ] }
-        { replace-environment [ ] }
+        { +prepend-environment+ [ os-envs union ] }
+        { +append-environment+ [ os-envs swap union ] }
+        { +replace-environment+ [ ] }
     } case ;
 
 GENERIC: >descriptor ( desc -- desc )
@@ -98,10 +98,10 @@ TUPLE: process-stream process ;
     { set-delegate set-process-stream-process }
     process-stream construct ;
 
-: with-process-stream ( desc quot -- process )
+: with-process-stream ( desc quot -- status )
     swap <process-stream>
     [ swap with-stream ] keep
-    process-stream-process ; inline
+    process-stream-process wait-for-process ; inline
 
 : notify-exit ( status process -- )
     [ set-process-status ] keep

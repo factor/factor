@@ -73,7 +73,7 @@ PRIVATE>
 
 : mailbox-get?* ( pred mailbox timeout -- obj )
     2over >r >r (mailbox-block-unless-pred) r> r>
-    mailbox-data delete-node ; inline
+    mailbox-data delete-node-if ; inline
 
 : mailbox-get? ( pred mailbox -- obj )
     f mailbox-get?* ;
@@ -166,7 +166,7 @@ M: process send ( message process -- )
 PRIVATE>
 
 : spawn-link ( quot -- process )
-    [ catch [ rethrow-linked ] when* ] curry
+    [ [ rethrow-linked ] recover ] curry
     [ ((spawn)) ] curry (spawn-link) ; inline
 
 <PRIVATE

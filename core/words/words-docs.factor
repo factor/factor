@@ -14,9 +14,7 @@ $nl
 { $subsection lookup }
 "Words can output their name and vocabulary:"
 { $subsection word-name }
-{ $subsection word-vocabulary }
-"Testing if a word object is part of a vocabulary:"
-{ $subsection interned? } ;
+{ $subsection word-vocabulary } ;
 
 ARTICLE: "uninterned-words" "Uninterned words"
 "A word that is not a member of any vocabulary is said to be " { $emphasis "uninterned" } "."
@@ -368,18 +366,6 @@ HELP: delimiter?
 { $values { "obj" object } { "?" "a boolean" } }
 { $description "Tests if an object is a delimiter word declared by " { $link POSTPONE: delimiter } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
-
-HELP: interned
-{ $class-description "The class of words defined in the " { $link dictionary } "." }
-{ $examples
-    { $example "\\ + interned? ." "t" }
-    { $example "gensym interned? ." "f" }
-} ;
-
-HELP: rename-word
-{ $values { "word" word } { "newname" string } { "newvocab" string } }
-{ $description "Changes the name and vocabulary of a word, and adds it to its new vocabulary." }
-{ $side-effects "word" } ;
 
 HELP: make-flushable
 { $values { "word" word } }

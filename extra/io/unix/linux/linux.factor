@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io.backend io.monitor io.monitor.private io.files
+USING: kernel io.backend io.monitors io.monitors.private io.files
 io.buffers io.nonblocking io.unix.backend io.unix.select
 io.unix.launcher unix.linux.inotify assocs namespaces threads
-continuations init math alien.c-types alien ;
+continuations init math alien.c-types alien vocabs.loader ;
 IN: io.unix.linux
 
 TUPLE: linux-io ;
@@ -24,8 +24,6 @@ TUPLE: inotify watches ;
 : watches ( -- assoc ) inotify get-global inotify-watches ;
 
 : wd>monitor ( wd -- monitor ) watches at ;
-
-: wd>path ( wd -- path ) wd>monitor linux-monitor-path ;
 
 : <inotify> ( -- port )
     H{ } clone
@@ -89,12 +87,8 @@ M: linux-monitor dispose ( monitor -- )
     ] { } make ;
 
 : parse-file-notify ( buffer -- changed path )
-    {
-        inotify-event-wd
-        inotify-event-name
-        inotify-event-mask
-    } get-slots
-    parse-action -rot alien>char-string >r wd>path r> path+ ;
+    { inotify-event-name inotify-event-mask } get-slots
+    parse-action swap alien>char-string ;
 
 : events-exhausted? ( i buffer -- ? )
     buffer-fill >= ;
@@ -141,3 +135,5 @@ M: linux-io init-io ( -- )
 T{ linux-io } set-io-backend
 
 [ start-wait-thread ] "io.unix.linux" add-init-hook
+
+"vocabs.monitor" require

@@ -96,6 +96,9 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     article-content print-content nl ;
 
 : about ( vocab -- )
+    dup vocab [ ] [
+        "No such vocabulary: " swap append throw
+    ] ?if
     dup vocab-help [
         help
     ] [

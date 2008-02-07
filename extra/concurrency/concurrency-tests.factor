@@ -6,6 +6,8 @@ namespaces tools.test continuations dlists strings math words
 match quotations concurrency.private ;
 IN: temporary
 
+[ ] [ self process-mailbox mailbox-data dlist-delete-all ] unit-test
+
 [ V{ 1 2 3 } ] [
   0 <vector>
   make-mailbox
@@ -67,15 +69,12 @@ IN: temporary
 ] unit-test
 
 
-[ "crash" ] [
+[
   [
-    [
-      "crash" throw
-    ] spawn-link drop
-    receive
-  ] 
-  catch
-] unit-test 
+    "crash" throw
+  ] spawn-link drop
+  receive
+] [ "crash" = ] must-fail-with
 
 [ 50 ] [
   [ 50 ] future ?future
@@ -115,7 +114,7 @@ SYMBOL: value
 ! this is fixed (via a timeout).
 ! [
 !  [ "this should propogate" throw ] future ?future 
-! ] unit-test-fails
+! ] must-fail
 
 [ ] [
   [ "this should not propogate" throw ] future drop 

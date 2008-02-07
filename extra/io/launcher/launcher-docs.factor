@@ -24,11 +24,11 @@ $nl
 HELP: +environment-mode+
 { $description "Launch descriptor key. Must equal of the following:"
     { $list
-        { $link prepend-environment }
-        { $link replace-environment }
-        { $link append-environment }
+        { $link +prepend-environment+ }
+        { $link +replace-environment+ }
+        { $link +append-environment+ }
     }
-"Default value is " { $link append-environment } "."
+"Default value is " { $link +append-environment+ } "."
 } ;
 
 HELP: +stdin+
@@ -61,17 +61,17 @@ HELP: +stderr+
 HELP: +closed+
 { $description "Possible value for " { $link +stdin+ } ", " { $link +stdout+ } ", and " { $link +stderr+ } " launch descriptors." } ;
 
-HELP: prepend-environment
+HELP: +prepend-environment+
 { $description "Possible value of " { $link +environment-mode+ } " launch descriptor key. The child process environment consists of the value of the " { $link +environment+ } " key together with the current environment, with entries from the current environment taking precedence."
 $nl
 "This is used in situations where you want to spawn a child process with some default environment variables set, but allowing the user to override these defaults by changing the environment before launching Factor." } ;
 
-HELP: replace-environment
+HELP: +replace-environment+
 { $description "Possible value of " { $link +environment-mode+ } " launch descriptor key. The child process environment consists of the value of the " { $link +environment+ } " key."
 $nl
 "This is used in situations where you want full control over a child process environment, perhaps for security or testing." } ;
 
-HELP: append-environment
+HELP: +append-environment+
 { $description "Possible value of " { $link +environment-mode+ } " launch descriptor key. The child process environment consists of the current environment together with the value of the " { $link +environment+ } " key, with entries from the " { $link +environment+ } " key taking precedence."
 $nl
 "This is used in situations where you want a spawn child process with some overridden environment variables." } ;
@@ -146,8 +146,8 @@ HELP: with-process-stream
 { $values
   { "desc" "a launch descriptor" }
   { "quot" quotation }
-  { "process" process } }
-{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a " { $link process-stream } ". When the quotation returns, the " { $link process } " instance is output." } ;
+  { "status" "an exit code" } }
+{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a " { $link process-stream } ". After the quotation returns, waits for the process to end and outputs the exit code." } ;
 
 HELP: wait-for-process
 { $values { "process" process } { "status" integer } }

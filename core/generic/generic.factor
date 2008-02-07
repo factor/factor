@@ -1,8 +1,8 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words kernel sequences namespaces assocs hashtables
 definitions kernel.private classes classes.private
-quotations arrays vocabs ;
+quotations arrays vocabs effects ;
 IN: generic
 
 ! Method combination protocol
@@ -65,15 +65,21 @@ TUPLE: check-method class generic ;
 : make-method-def ( quot word combination -- quot )
     "combination" word-prop method-prologue swap append ;
 
+PREDICATE: word method-body "method" word-prop >boolean ;
+
+M: method-body stack-effect
+    "method" word-prop method-generic stack-effect ;
+
 : <method-word> ( quot class generic -- word )
     [ make-method-def ] 2keep
-    [ method-word-name f <word> dup ] keep
-    "parent-generic" set-word-prop
-    dup rot define ;
+    method-word-name f <word>
+    dup rot define
+    dup xref ;
 
 : <method> ( quot class generic -- method )
     check-method
-    [ <method-word> ] 3keep f \ method construct-boa ;
+    [ <method-word> ] 3keep f \ method construct-boa
+    dup method-word over "method" set-word-prop ;
 
 : define-method ( quot class generic -- )
     >r bootstrap-word r>
@@ -96,7 +102,9 @@ M: method-spec definition
     first2 method dup [ method-def ] when ;
 
 : forget-method ( class generic -- )
-    check-method [ delete-at ] with-methods ;
+    check-method
+    [ delete-at* ] with-methods
+    [ method-word forget ] [ drop ] if ;
 
 M: method-spec forget* first2 forget-method ;
 
@@ -120,13 +128,27 @@ M: class forget* ( class -- )
 M: assoc update-methods ( assoc -- )
     implementors* [ make-generic ] each ;
 
-: init-methods ( word -- )
-     dup "methods" word-prop
-     H{ } assoc-like
-     "methods" set-word-prop ;
-
 : define-generic ( word combination -- )
-    2dup "combination" set-word-prop
-    dupd define-default-method
-    dup init-methods
-    make-generic ;
+    over "combination" word-prop over = [
+        2drop
+    ] [
+        2dup "combination" set-word-prop
+        over H{ } clone "methods" set-word-prop
+        dupd define-default-method
+        make-generic
+    ] if ;
+
+GENERIC: subwords ( word -- seq )
+
+M: word subwords drop f ;
+
+M: generic subwords
+    dup "methods" word-prop values
+    swap "default-method" word-prop add
+    [ method-word ] map ;
+
+M: generic forget-word
+    dup subwords [ forget-word ] each (forget-word) ;
+
+: xref-generics ( -- )
+    all-words [ subwords [ xref ] each ] each ;

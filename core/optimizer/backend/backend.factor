@@ -4,7 +4,7 @@ USING: arrays generic assocs inference inference.class
 inference.dataflow inference.backend inference.state io kernel
 math namespaces sequences vectors words quotations hashtables
 combinators classes generic.math continuations optimizer.def-use
-optimizer.pattern-match generic.standard ;
+optimizer.pattern-match generic.standard optimizer.specializers ;
 IN: optimizer.backend
 
 SYMBOL: class-substitutions
@@ -245,18 +245,32 @@ M: #dispatch optimize-node*
 : dispatching-class ( node word -- class )
     [ dispatch# node-class# ] keep specific-method ;
 
-: flat-length ( seq -- n )
+! A heuristic to avoid excessive inlining
+DEFER: (flat-length)
+
+: word-flat-length ( word -- n )
+    dup get over inline? not or
+    [ drop 1 ] [ dup dup set word-def (flat-length) ] if ;
+
+: (flat-length) ( seq -- n )
     [
-        dup quotation? over array? or
-        [ flat-length ] [ drop 1 ] if
+        {
+            { [ dup quotation? ] [ (flat-length) 1+ ] }
+            { [ dup array? ] [ (flat-length) ] }
+            { [ dup word? ] [ word-flat-length ] }
+            { [ t ] [ drop 1 ] }
+        } cond
     ] map sum ;
+
+: flat-length ( seq -- n )
+    [ word-def (flat-length) ] with-scope ;
 
 : will-inline-method ( node word -- method-spec/t quot/t )
     #! t indicates failure
     tuck dispatching-class dup [
         swap [ 2array ] 2keep
         method method-word
-        dup word-def flat-length 5 >=
+        dup flat-length 10 >=
         [ 1quotation ] [ word-def ] if
     ] [
         2drop t t
@@ -363,7 +377,7 @@ M: #dispatch optimize-node*
 
 : optimistic-inline? ( #call -- ? )
     dup node-param "specializer" word-prop dup [
-        >r node-input-classes r> length tail*
+        >r node-input-classes r> specialized-length tail*
         [ types length 1 = ] all?
     ] [
         2drop f

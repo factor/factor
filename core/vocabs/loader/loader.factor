@@ -148,16 +148,32 @@ SYMBOL: load-help?
     dup update-roots
     dup modified-sources swap modified-docs ;
 
-: require-restart { { "Ignore this vocabulary" t } } ;
+: load-error. ( vocab error -- )
+    "==== " write >r
+    dup vocab-name swap f >vocab-link write-object ":" print nl
+    r> print-error ;
 
-: require-all ( seq -- )
-    [
+TUPLE: require-all-error vocabs ;
+
+: require-all-error ( vocabs -- )
+    [ vocab-name ] map
+    \ require-all-error construct-boa throw ;
+
+M: require-all-error summary
+    drop "The require-all operation failed" ;
+
+: require-all ( vocabs -- )
+    dup length 1 = [ first require ] [
         [
-            [ require ]
-            [ require-restart rethrow-restarts 2drop ]
-            recover
-        ] each
-    ] with-compiler-errors ;
+            [
+                [ [ require ] [ 2array , ] recover ] each
+            ] { } make
+            dup empty? [ drop ] [
+                dup [ nl load-error. ] assoc-each
+                keys require-all-error
+            ] if
+        ] with-compiler-errors
+    ] if ;
 
 : do-refresh ( modified-sources modified-docs -- )
     2dup
@@ -190,22 +206,3 @@ load-vocab-hook set-global
 M: vocab where vocab-where ;
 
 M: vocab-link where vocab-where ;
-
-: vocab-file-contents ( vocab name -- seq )
-    vocab-path+ dup [
-        ?resource-path dup exists? [
-            <file-reader> lines
-        ] [
-            drop f
-        ] if
-    ] when ;
-
-: set-vocab-file-contents ( seq vocab name -- )
-    dupd vocab-path+ [
-        ?resource-path
-        <file-writer> [ [ print ] each ] with-stream
-    ] [
-        "The " swap vocab-name
-        " vocabulary was not loaded from the file system"
-        3append throw
-    ] ?if ;

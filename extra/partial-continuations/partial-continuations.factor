@@ -6,7 +6,7 @@ USING: kernel continuations arrays sequences quotations ;
 : breset ( quot -- )
     [ 1array swap keep first continue-with ] callcc1 nip ;
 
-: (bshift) ( v r k -- )
+: (bshift) ( v r k -- obj )
     >r dup first -rot r>
     [
         rot set-first
@@ -19,4 +19,4 @@ USING: kernel continuations arrays sequences quotations ;
         over >r
         [ (bshift) ] 2curry swap call
         r> first continue-with
-    ] callcc1 2nip ;
+    ] callcc1 2nip ; inline

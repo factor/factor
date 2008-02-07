@@ -49,7 +49,7 @@ C-STRUCT: bio
 : BIO_CLOSE         HEX: 01 ; inline
 
 : RSA_3             HEX: 3 ; inline
-: RSA_F4	        HEX: 10001 ; inline
+: RSA_F4            HEX: 10001 ; inline
 
 : BIO_C_SET_SSL     109 ; inline
 : BIO_C_GET_SSL     110 ; inline

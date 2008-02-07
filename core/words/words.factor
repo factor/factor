@@ -1,10 +1,10 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: words
 USING: arrays definitions graphs assocs kernel kernel.private
 slots.private math namespaces sequences strings vectors sbufs
 quotations assocs hashtables sorting math.parser words.private
-vocabs ;
+vocabs combinators ;
+IN: words
 
 : word ( -- word ) \ word get-global ;
 
@@ -65,13 +65,20 @@ SYMBOL: bootstrapping?
 : bootstrap-word ( word -- target )
     [ target-word ] [ ] if-bootstrapping ;
 
-PREDICATE: word interned dup target-word eq? ;
+: crossref? ( word -- ? )
+    {
+        { [ dup "forgotten" word-prop ] [ f ] }
+        { [ dup "method" word-prop ] [ t ] }
+        { [ dup word-vocabulary ] [ t ] }
+        { [ t ] [ f ] }
+    } cond nip ;
 
 GENERIC# (quot-uses) 1 ( obj assoc -- )
 
 M: object (quot-uses) 2drop ;
 
-M: interned (quot-uses) dupd set-at ;
+M: word (quot-uses)
+    >r dup crossref? [ dup r> set-at ] [ r> 2drop ] if ;
 
 : seq-uses ( seq assoc -- ) [ (quot-uses) ] curry each ;
 
@@ -92,6 +99,7 @@ SYMBOL: compiled-crossref
 compiled-crossref global [ H{ } assoc-like ] change-at
 
 : compiled-xref ( word dependencies -- )
+    [ drop crossref? ] assoc-subset
     2dup "compiled-uses" set-word-prop
     compiled-crossref get add-vertex* ;
 
@@ -122,7 +130,7 @@ SYMBOL: changed-words
     over redefined
     over set-word-def
     dup changed-word
-    dup word-vocabulary [ dup xref ] when drop ;
+    dup crossref? [ dup xref ] when drop ;
 
 : define-declared ( word def effect -- )
     pick swap "declared-effect" set-word-prop
@@ -191,24 +199,17 @@ M: word where "loc" word-prop ;
 
 M: word set-where swap "loc" set-word-prop ;
 
-GENERIC: (forget-word) ( word -- )
+GENERIC: forget-word ( word -- )
 
-M: interned (forget-word)
-    dup word-name swap word-vocabulary vocab-words delete-at ;
+: (forget-word) ( word -- )
+    dup "forgotten" word-prop [
+        dup delete-xref
+        dup delete-compiled-xref
+        dup word-name over word-vocabulary vocab-words delete-at
+        dup t "forgotten" set-word-prop
+    ] unless drop ;
 
-M: word (forget-word)
-    drop ;
-
-: rename-word ( word newname newvocab -- )
-    pick (forget-word)
-    pick set-word-vocabulary
-    over set-word-name
-    reveal ;
-
-: forget-word ( word -- )
-    dup delete-xref
-    dup delete-compiled-xref
-    (forget-word) ;
+M: word forget-word (forget-word) ;
 
 M: word forget* forget-word ;
 

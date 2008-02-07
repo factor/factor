@@ -5,7 +5,7 @@ colors ;
 [ { { f f } { f f } { f f } } ] [ 2 3 <board> board-rows ] unit-test
 [ 1 { f f } ] [ 2 3 <board> { 1 1 } board@block ] unit-test
 [ f ] [ 2 3 <board> { 1 1 } board-block ] unit-test
-[ 2 3 <board> { 2 3 } board-block ] unit-test-fails
+[ 2 3 <board> { 2 3 } board-block ] must-fail
 red 1array [ 2 3 <board> dup { 1 1 } red board-set-block { 1 1 } board-block ] unit-test
 [ t ] [ 2 3 <board> { 1 1 } block-free? ] unit-test
 [ f ] [ 2 3 <board> dup { 1 1 } red board-set-block { 1 1 } block-free? ] unit-test
