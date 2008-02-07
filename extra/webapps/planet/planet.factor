@@ -2,7 +2,7 @@ USING: sequences rss arrays concurrency kernel sorting
 html.elements io assocs namespaces math threads vocabs html
 furnace http.server.templating calendar math.parser splitting
 continuations debugger system http.server.responders
-xml.writer prettyprint io.server ;
+xml.writer prettyprint io.logging ;
 IN: webapps.planet
 
 : print-posting-summary ( posting -- )
@@ -90,7 +90,7 @@ SYMBOL: last-update
     [
         fetch-feed
     ] [
-        swap [ . error. ] with-log-stream f
+        swap [ . error. ] to-log-stream f
     ] recover ;
 
 : fetch-blogroll ( blogroll -- entries )
