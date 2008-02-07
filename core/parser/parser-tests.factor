@@ -349,6 +349,14 @@ IN: temporary
         "IN: temporary : foo ; TUPLE: foo ;"
         <string-reader> "redefining-a-class-4" parse-stream drop
     ] [ [ redefine-error? ] is? ] must-fail-with
+
+    [ ] [
+        "IN: temporary : foo ( x y -- z ) 1 2 ; : bar ( a -- b ) ;" eval
+    ] unit-test
+
+    [
+        "IN: temporary : foo ( x y -- z) 1 2 ; : bar ( a -- b ) ;" eval
+    ] must-fail
 ] with-file-vocabs
 
 [

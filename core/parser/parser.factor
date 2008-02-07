@@ -307,10 +307,14 @@ SYMBOL: lexer-factory
 
 ! Parsing word utilities
 : parse-effect ( -- effect )
-    ")" parse-tokens { "--" } split1 dup [
-        <effect>
+    ")" parse-tokens "(" over member? [
+        "Stack effect declaration must not contain (" throw
     ] [
-        "Stack effect declaration must contain --" throw
+        { "--" } split1 dup [
+            <effect>
+        ] [
+            "Stack effect declaration must contain --" throw
+        ] if
     ] if ;
 
 TUPLE: bad-number ;

@@ -4,7 +4,7 @@ IN: math.constants
 ARTICLE: "math-constants" "Constants"
 "Standard mathematical constants:"
 { $subsection e }
-{ $subsection gamma }
+{ $subsection euler }
 { $subsection phi }
 { $subsection pi }
 "Various limits:"
@@ -17,7 +17,7 @@ ABOUT: "math-constants"
 HELP: e
 { $values { "e" "base of natural logarithm" } } ;
 
-HELP: gamma
+HELP: euler
 { $values { "gamma" "Euler-Mascheroni constant" } }
 { $description "The Euler-Mascheroni constant, also called \"Euler's constant\" or \"the Euler constant\"." } ;
 

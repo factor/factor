@@ -144,6 +144,11 @@ PRIVATE>
 : dlist-delete ( obj dlist -- obj/f )
     >r [ eq? ] curry r> delete-node-if ;
 
+: dlist-delete-all ( dlist -- )
+    f over set-dlist-front
+    f over set-dlist-back
+    0 swap set-dlist-length ;
+
 : dlist-each ( dlist quot -- )
     [ dlist-node-obj ] swap compose dlist-each-node ; inline
 

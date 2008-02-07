@@ -149,12 +149,14 @@ SYMBOL: load-help?
     dup modified-sources swap modified-docs ;
 
 : load-error. ( vocab error -- )
-    "While loading " rot dup >vocab-link write-object ":" print
-    print-error ;
+    "==== " write >r
+    dup vocab-name swap f >vocab-link write-object ":" print nl
+    r> print-error ;
 
 TUPLE: require-all-error vocabs ;
 
 : require-all-error ( vocabs -- )
+    [ vocab-name ] map
     \ require-all-error construct-boa throw ;
 
 M: require-all-error summary
@@ -167,7 +169,6 @@ M: require-all-error summary
                 [ [ require ] [ 2array , ] recover ] each
             ] { } make
             dup empty? [ drop ] [
-                "==== LOAD ERRORS:" print
                 dup [ nl load-error. ] assoc-each
                 keys require-all-error
             ] if

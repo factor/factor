@@ -64,7 +64,7 @@ M: object root-directory? ( path -- ? ) path-separator? ;
     normalize-directory dup (directory) fixup-directory ;
 
 : last-path-separator ( path -- n ? )
-    [ length 2 [-] ] keep [ path-separator? ] find-last* ;
+    [ length 1- ] keep [ path-separator? ] find-last* ;
 
 TUPLE: no-parent-directory path ;
 
@@ -83,7 +83,11 @@ TUPLE: no-parent-directory path ;
     } cond ;
 
 : file-name ( path -- string )
-    dup last-path-separator [ 1+ tail ] [ drop ] if ;
+    right-trim-separators {
+        { [ dup empty? ] [ drop "/" ] }
+        { [ dup last-path-separator ] [ 1+ tail ] }
+        { [ t ] [ drop ] }
+    } cond ;
 
 : resource-path ( path -- newpath )
     \ resource-path get [ image parent-directory ] unless*
