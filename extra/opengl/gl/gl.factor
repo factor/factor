@@ -1365,7 +1365,7 @@ GL-FUNCTION: void glSampleCoverage { glSampleCoverageARB } ( GLclampf value, GLb
 : GL_COMPARE_R_TO_TEXTURE HEX: 884E ; inline
 
 GL-FUNCTION: void glBlendColor { glBlendColorEXT } ( GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha ) ;
-GL-FUNCTION: void glBlendEquation { glBlendEquationEXT }( GLenum mode ) ;
+GL-FUNCTION: void glBlendEquation { glBlendEquationEXT } ( GLenum mode ) ;
 GL-FUNCTION: void glBlendFuncSeparate { glBlendFuncSeparateEXT } ( GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha ) ;
 GL-FUNCTION: void glFogCoordPointer { glFogCoordPointerEXT } ( GLenum type, GLsizei stride, GLvoid* pointer ) ;
 GL-FUNCTION: void glFogCoordd { glFogCoorddEXT } ( GLdouble coord ) ;
@@ -1466,7 +1466,7 @@ GL-FUNCTION: void glWindowPos3sv { glWindowPos3svARB } ( GLshort* p ) ;
 TYPEDEF: ptrdiff_t GLsizeiptr
 TYPEDEF: ptrdiff_t GLintptr
 
-GL-FUNCTION: void glBeginQuery { glBeginQueryARB }( GLenum target, GLuint id ) ;
+GL-FUNCTION: void glBeginQuery { glBeginQueryARB } ( GLenum target, GLuint id ) ;
 GL-FUNCTION: void glBindBuffer { glBindBufferARB } ( GLenum target, GLuint buffer ) ;
 GL-FUNCTION: void glBufferData { glBufferDataARB } ( GLenum target, GLsizeiptr size, GLvoid* data, GLenum usage ) ;
 GL-FUNCTION: void glBufferSubData { glBufferSubDataARB } ( GLenum target, GLintptr offset, GLsizeiptr size, GLvoid* data ) ;
