@@ -132,10 +132,16 @@ MEMO: all-vocabs-seq ( -- seq )
         { [ t ] [ f ] }
     } cond nip ;
 
-: load-everything ( -- )
+: filter-dangerous ( seq -- seq' )
+    [ vocab-name dangerous? not ] subset ;
+
+: try-everything ( -- failures )
     all-vocabs-seq
-    [ vocab-name dangerous? not ] subset
+    filter-dangerous
     require-all ;
+
+: load-everything ( -- )
+    try-everything drop ;
 
 : unrooted-child-vocabs ( prefix -- seq )
     dup empty? [ CHAR: . add ] unless
@@ -155,7 +161,9 @@ MEMO: all-vocabs-seq ( -- seq )
 
 : load-children ( prefix -- )
     all-child-vocabs values concat
-    require-all ;
+    filter-dangerous
+    require-all
+    drop ;
 
 : vocab-status-string ( vocab -- string )
     {

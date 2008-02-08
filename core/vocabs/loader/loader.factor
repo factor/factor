@@ -160,37 +160,25 @@ SYMBOL: load-help?
     drop ;
     ! third "Traceback" swap write-object ;
 
-TUPLE: require-all-error vocabs ;
+: load-failures. ( failures -- )
+    [ load-error. nl ] each ;
 
-: require-all-error ( vocabs -- )
-    [ vocab-name ] map
-    \ require-all-error construct-boa throw ;
-
-M: require-all-error summary
-    drop "The require-all operation failed" ;
-
-: require-all ( vocabs -- )
-    dup length 1 = [ first require ] [
+: require-all ( vocabs -- failures )
+    [
         [
             [
-                [
-                    [ require ]
-                    [ error-continuation get 3array , ]
-                    recover
-                ] each
-            ] { } make
-            dup empty? [ drop ] [
-                dup [ load-error. nl ] each
-                keys require-all-error
-            ] if
-        ] with-compiler-errors
-    ] if ;
+                [ require ]
+                [ error-continuation get 3array , ]
+                recover
+            ] each
+        ] { } make
+    ] with-compiler-errors ;
 
 : do-refresh ( modified-sources modified-docs -- )
     2dup
     [ f swap set-vocab-docs-loaded? ] each
     [ f swap set-vocab-source-loaded? ] each
-    append prune require-all ;
+    append prune require-all drop ;
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 

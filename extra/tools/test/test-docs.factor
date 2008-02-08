@@ -29,7 +29,7 @@ $nl
 { $subsection run-tests }
 { $subsection run-all-tests }
 "The following word prints failures:"
-{ $subsection failures. } ;
+{ $subsection test-failures. } ;
 
 ARTICLE: "tools.test" "Unit testing"
 "A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."
