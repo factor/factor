@@ -3,8 +3,8 @@
 
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 
-USING: alien alien.syntax kernel parser sequences system words ;
-<< windows? "opengl.gl.windows" "opengl.gl.unix" ? use+ >>
+USING: alien alien.syntax combinators kernel parser sequences
+system words opengl.gl.extensions ;
 
 IN: opengl.gl
 
@@ -1119,9 +1119,7 @@ FUNCTION: void glLoadName ( GLuint name ) ;
 FUNCTION: void glPushName ( GLuint name ) ;
 FUNCTION: void glPopName ( ) ;
 
-
-! OpenGL extension functions
-
+<< reset-gl-function-number-counter >>
 
 ! OpenGL 1.2
 
@@ -1273,7 +1271,7 @@ GL-FUNCTION: void glTexSubImage3D { glTexSubImage3DEXT } ( GLenum target, GLint 
 : GL_DOT3_RGBA HEX: 86AF ; inline
 : GL_MULTISAMPLE_BIT HEX: 20000000 ; inline
 
-GL-FUNCTION: void glActiveTexture { glActiveTextureARB }( GLenum texture ) ;
+GL-FUNCTION: void glActiveTexture { glActiveTextureARB } ( GLenum texture ) ;
 GL-FUNCTION: void glClientActiveTexture { glClientActiveTextureARB } ( GLenum texture ) ;
 GL-FUNCTION: void glCompressedTexImage1D { glCompressedTexImage1DARB } ( GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, GLvoid* data ) ;
 GL-FUNCTION: void glCompressedTexImage2D { glCompressedTexImage2DARB } ( GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, GLvoid* data ) ;
@@ -1607,7 +1605,7 @@ GL-FUNCTION: void glGetVertexAttribdv { glGetVertexAttribdvARB } ( GLuint index,
 GL-FUNCTION: void glGetVertexAttribfv { glGetVertexAttribfvARB } ( GLuint index, GLenum pname, GLfloat* params ) ;
 GL-FUNCTION: void glGetVertexAttribiv { glGetVertexAttribivARB } ( GLuint index, GLenum pname, GLint* params ) ;
 GL-FUNCTION: GLboolean glIsProgram { glIsProgramARB } ( GLuint program ) ;
-GL-FUNCTION: GLboolean glIsShader { glIsShaderARB }( GLuint shader ) ;
+GL-FUNCTION: GLboolean glIsShader { glIsShaderARB } ( GLuint shader ) ;
 GL-FUNCTION: void glLinkProgram { glLinkProgramARB } ( GLuint program ) ;
 GL-FUNCTION: void glShaderSource { glShaderSourceARB } ( GLuint shader, GLsizei count, GLchar** strings, GLint* lengths ) ;
 GL-FUNCTION: void glStencilFuncSeparate { glStencilFuncSeparateATI } ( GLenum frontfunc, GLenum backfunc, GLint ref, GLuint mask ) ;

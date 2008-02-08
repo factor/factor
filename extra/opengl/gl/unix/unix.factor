@@ -1,10 +1,6 @@
-USING: alien.syntax alien.syntax.private kernel
-       namespaces parser sequences syntax words ;
-
+USING: kernel x11.glx ;
 IN: opengl.gl.unix
 
-: GL-FUNCTION:
-    scan "c-library" get scan
-    scan drop "}" parse-tokens drop
-    ";" parse-tokens [ "()" subseq? not ] subset
-    define-function ; parsing
+: gl-function-context ( -- context ) glXGetCurrentContext ; inline
+: gl-function-address ( name -- address ) glXGetProcAddress ; inline
+: gl-function-calling-convention ( -- str ) "cdecl" ; inline

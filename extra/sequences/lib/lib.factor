@@ -1,6 +1,6 @@
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions mirrors
-arrays math.parser sorting strings ascii ;
+arrays math.parser math.private sorting strings ascii ;
 IN: sequences.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -153,3 +153,14 @@ PRIVATE>
   [ = [ ] [ drop f ] if ] curry
   2map
   [ ] subset ;
+
+<PRIVATE
+: (attempt-each-integer) ( i n quot -- result )
+    [
+        iterate-step roll
+        [ 3nip ] [ iterate-next (attempt-each-integer) ] if*
+    ] [ 3drop f ] if-iterate? ; inline
+PRIVATE>
+
+: attempt-each ( seq quot -- result )
+    (each) iterate-prep (attempt-each-integer) ; inline

@@ -42,7 +42,7 @@ FUNCTION: GLXContext glXCreateContext ( Display* dpy, XVisualInfo* vis, GLXConte
 FUNCTION: GLXPixmap glXCreateGLXPixmap ( Display* dpy, XVisualInfo* vis, Pixmap pixmap ) ;
 FUNCTION: void glXDestroyContext ( Display* dpy, GLXContext ctx ) ;
 FUNCTION: void glXDestroyGLXPixmap ( Display* dpy, GLXPixmap pix ) ;
-FUNCTION: int glXGetConfig ( Display* dpy, XVisualInfo* vis, int attrib, int* value) ;
+FUNCTION: int glXGetConfig ( Display* dpy, XVisualInfo* vis, int attrib, int* value ) ;
 FUNCTION: GLXContext glXGetCurrentContext ( ) ;
 FUNCTION: GLXDrawable glXGetCurrentDrawable ( ) ;
 FUNCTION: bool glXIsDirect ( Display* dpy, GLXContext ctx ) ;
