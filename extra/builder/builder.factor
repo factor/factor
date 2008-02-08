@@ -1,8 +1,8 @@
 
-USING: kernel io io.files io.launcher hashtables tools.deploy.backend
+USING: kernel io io.files io.launcher hashtables
        system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
-       combinators ;
+       combinators bootstrap.image ;
 
 IN: builder
 
@@ -81,6 +81,11 @@ VAR: stamp
     "builder: git pull" throw
   ]
   if
+
+  {
+    "git" "pull" "--no-summary"
+    "http://dharmatech.onigirihouse.com/factor.git" "master"
+  } run-process process-status
 
   "/builds/" stamp> append make-directory
   "/builds/" stamp> append cd
