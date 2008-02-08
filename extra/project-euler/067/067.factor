@@ -58,7 +58,4 @@ PRIVATE>
 ! [ euler067a ] 100 ave-time
 ! 14 ms run / 0 ms GC ave time - 100 trials
 
-! source-067 [ max-path ] curry 100 ave-time
-! 3 ms run / 0 ms GC ave time - 100 trials
-
 MAIN: euler067a

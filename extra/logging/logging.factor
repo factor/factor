@@ -39,8 +39,8 @@ SYMBOL: log-service
 : rotate-logs ( -- )
     { } "rotate-logs" send-to-log-server ;
 
-: close-log-files ( -- )
-    { } "close-log-files" send-to-log-server ;
+: close-logs ( -- )
+    { } "close-logs" send-to-log-server ;
 
 : with-logging ( service quot -- )
     log-service swap with-variable ; inline
@@ -56,7 +56,7 @@ SYMBOL: log-service
         [ dup first string? ]
     } && nip ;
 
-: inputs>message ( obj -- inputs>message )
+: stack>message ( obj -- inputs>message )
     dup one-string? [ first ] [
         H{
             { string-limit f }
@@ -77,9 +77,9 @@ PRIVATE>
 : add-logging ( word level -- )
     [ call-logging-quot ] (define-logging) ;
 
-: log-inputs ( n word level -- )
+: log-stack ( n word level -- )
     log-service get [
-        >r >r [ ndup ] keep narray inputs>message
+        >r >r [ ndup ] keep narray stack>message
         r> r> log-message
     ] [
         3drop
@@ -88,10 +88,18 @@ PRIVATE>
 : input# stack-effect effect-in length ;
 
 : input-logging-quot ( quot word level -- quot' )
-    over input# -rot [ log-inputs ] 3curry swap compose ;
+    over input# -rot [ log-stack ] 3curry swap compose ;
 
 : add-input-logging ( word level -- )
     [ input-logging-quot ] (define-logging) ;
+
+: output# stack-effect effect-out length ;
+
+: output-logging-quot ( quot word level -- quot' )
+    over output# -rot [ log-stack ] 3curry compose ;
+
+: add-output-logging ( word level -- )
+    [ output-logging-quot ] (define-logging) ;
 
 : (log-error) ( object word level -- )
     log-service get [
@@ -100,9 +108,9 @@ PRIVATE>
         2drop rethrow
     ] if ;
 
-: log-error ( object word -- ) ERROR (log-error) ;
+: log-error ( error word -- ) ERROR (log-error) ;
 
-: log-critical ( object word -- ) CRITICAL (log-error) ;
+: log-critical ( error word -- ) CRITICAL (log-error) ;
 
 : error-logging-quot ( quot word -- quot' )
     dup stack-effect effect-in length
@@ -118,5 +126,5 @@ PRIVATE>
     CREATE
     dup reset-generic
     dup scan-word
-    [ >r >r 1array inputs>message r> r> log-message ] 2curry
+    [ >r >r 1array stack>message r> r> log-message ] 2curry
     define ; parsing

@@ -1,7 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files kernel math math.parser namespaces sequences sorting splitting
-    strings system vocabs ascii ;
+USING: ascii io.files kernel math project-euler.common sequences sorting splitting ;
 IN: project-euler.022
 
 ! http://projecteuler.net/index.php?section=problems&id=22
@@ -31,9 +30,6 @@ IN: project-euler.022
     "extra/project-euler/022/names.txt" resource-path
     file-contents [ quotable? ] subset "," split ;
 
-: alpha-value ( str -- n )
-    [ string>digits sum ] keep length 9 * - ;
-
 : name-scores ( seq -- seq )
     dup length [ 1+ swap alpha-value * ] 2map ;
 
@@ -43,9 +39,6 @@ PRIVATE>
     source-022 natural-sort name-scores sum ;
 
 ! [ euler022 ] 100 ave-time
-! 59 ms run / 1 ms GC ave time - 100 trials
-
-! source-022 [ natural-sort name-scores sum ] curry 100 ave-time
-! 45 ms run / 1 ms GC ave time - 100 trials
+! 123 ms run / 4 ms GC ave time - 100 trials
 
 MAIN: euler022
