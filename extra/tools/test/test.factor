@@ -80,7 +80,7 @@ M: expected-error summary
     dup first print-error
     "Traceback" swap third write-object ;
 
-: failures. ( assoc -- )
+: test-failures. ( assoc -- )
     dup [
         nl
         dup empty? [
@@ -104,10 +104,10 @@ M: expected-error summary
     ] if ;
 
 : test ( prefix -- )
-    run-tests failures. ;
+    run-tests test-failures. ;
 
 : run-all-tests ( prefix -- failures )
     "" run-tests ;
 
 : test-all ( -- )
-    run-all-tests failures. ;
+    run-all-tests test-failures. ;
