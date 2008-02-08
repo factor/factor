@@ -178,7 +178,7 @@ SYMBOL: load-help?
     2dup
     [ f swap set-vocab-docs-loaded? ] each
     [ f swap set-vocab-source-loaded? ] each
-    append prune require-all drop ;
+    append prune require-all load-failures. ;
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 

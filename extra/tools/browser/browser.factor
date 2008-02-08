@@ -163,7 +163,7 @@ MEMO: all-vocabs-seq ( -- seq )
     all-child-vocabs values concat
     filter-dangerous
     require-all
-    drop ;
+    load-failures. ;
 
 : vocab-status-string ( vocab -- string )
     {
