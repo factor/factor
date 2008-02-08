@@ -81,7 +81,7 @@ M: expected-error summary
     "Traceback" swap third write-object ;
 
 : test-failures. ( assoc -- )
-    dup [
+    [
         nl
         dup empty? [
             drop
@@ -90,15 +90,15 @@ M: expected-error summary
             "==== FAILING TESTS:" print
             [
                 swap vocab-heading.
-                [ nl failure. nl ] each
+                [ failure. nl ] each
             ] assoc-each
         ] if
     ] [
-        drop "==== NOTHING TO TEST" print
-    ] if ;
+        "==== NOTHING TO TEST" print
+    ] if* ;
 
 : run-tests ( prefix -- failures )
-    child-vocabs dup empty? [ f ] [
+    child-vocabs dup empty? [ drop f ] [
         [ dup run-test ] { } map>assoc
         [ second empty? not ] subset
     ] if ;
