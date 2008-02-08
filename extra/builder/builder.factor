@@ -2,7 +2,7 @@
 USING: kernel io io.files io.launcher hashtables
        system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
-       combinators bootstrap.image ;
+       combinators bootstrap.image bootstrap.image.download ;
 
 IN: builder
 
@@ -70,7 +70,6 @@ VAR: stamp
     "pull"
     "--no-summary"
     "git://factorcode.org/git/factor.git"
-    ! "http://dharmatech.onigirihouse.com/factor.git"
     "master"
   }
   run-process process-status
@@ -85,7 +84,7 @@ VAR: stamp
   {
     "git" "pull" "--no-summary"
     "http://dharmatech.onigirihouse.com/factor.git" "master"
-  } run-process process-status
+  } run-process drop
 
   "/builds/" stamp> append make-directory
   "/builds/" stamp> append cd
@@ -112,14 +111,15 @@ VAR: stamp
     "builder: vm compile" throw
   ] if
 
-  [ "http://factorcode.org/images/latest/" boot-image-name append download ]
+  [ my-arch download-image ]
+  [ ]
   [ "builder: image download" email-string ]
-  recover
+  cleanup
 
   `{
      { +arguments+ {
                      ,[ factor-binary ]
-                     ,[ "-i=" boot-image-name append ]
+                     ,[ "-i=" my-boot-image-name append ]
                      "-no-user-init"
                    } }
      { +stdout+   "../boot-log" }
