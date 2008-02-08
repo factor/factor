@@ -54,7 +54,7 @@ PRIVATE>
     concat prune dupd seq-diff append ;
 
 : euler079 ( -- answer )
-    source-079 >edges topological-sort 10 swap digits>integer ;
+    source-079 >edges topological-sort 10 digits>integer ;
 
 ! [ euler079 ] 100 ave-time
 ! 2 ms run / 0 ms GC ave time - 100 trials
