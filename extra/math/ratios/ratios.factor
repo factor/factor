@@ -48,3 +48,4 @@ M: ratio * 2>fraction * >r * r> / ;
 M: ratio / scale / ;
 M: ratio /i scale /i ;
 M: ratio mod 2dup >r >r /i r> r> rot * - ;
+M: ratio /mod [ /i ] 2keep mod ;

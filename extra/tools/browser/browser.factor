@@ -127,14 +127,21 @@ MEMO: all-vocabs-seq ( -- seq )
         { [ "windows." ?head ] [ t ] }
         { [ "cocoa" ?head ] [ t ] }
         { [ ".test" ?tail ] [ t ] }
+        { [ "raptor" ?head ] [ t ] }
         { [ dup "tools.deploy.app" = ] [ t ] }
         { [ t ] [ f ] }
     } cond nip ;
 
-: load-everything ( -- )
+: filter-dangerous ( seq -- seq' )
+    [ vocab-name dangerous? not ] subset ;
+
+: try-everything ( -- failures )
     all-vocabs-seq
-    [ vocab-name dangerous? not ] subset
+    filter-dangerous
     require-all ;
+
+: load-everything ( -- )
+    try-everything drop ;
 
 : unrooted-child-vocabs ( prefix -- seq )
     dup empty? [ CHAR: . add ] unless
@@ -154,7 +161,9 @@ MEMO: all-vocabs-seq ( -- seq )
 
 : load-children ( prefix -- )
     all-child-vocabs values concat
-    require-all ;
+    filter-dangerous
+    require-all
+    load-failures. ;
 
 : vocab-status-string ( vocab -- string )
     {

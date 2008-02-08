@@ -23,7 +23,7 @@ IN: project-euler.024
 ! --------
 
 : euler024 ( -- answer )
-    999999 10 permutation 10 swap digits>integer ;
+    999999 10 permutation 10 digits>integer ;
 
 ! [ euler024 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials

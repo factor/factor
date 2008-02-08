@@ -8,6 +8,15 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: runtime ( quot -- time ) benchmark nip ;
+
+: log-runtime ( quot file -- )
+  >r runtime r> <file-writer> [ . ] with-stream ;
+
+: log-object ( object file -- ) <file-writer> [ . ] with-stream ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : datestamp ( -- string )
   now `{ ,[ dup timestamp-year   ]
          ,[ dup timestamp-month  ]
@@ -40,7 +49,7 @@ SYMBOL: builder-recipients
 : factor-binary ( -- name )
   os
   { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
-    { "windows" [ "./factor-nt.exe" ] }
+    { "winnt" [ "./factor-nt.exe" ] }
     [ drop "./factor" ] }
   case ;
 
@@ -56,7 +65,14 @@ VAR: stamp
 
   "/builds/factor" cd
   
-  { "git" "pull" "--no-summary" "git://factorcode.org/git/factor.git" }
+  {
+    "git"
+    "pull"
+    "--no-summary"
+    "git://factorcode.org/git/factor.git"
+    ! "http://dharmatech.onigirihouse.com/factor.git"
+    "master"
+  }
   run-process process-status
   0 =
   [ ]
@@ -69,14 +85,12 @@ VAR: stamp
   "/builds/" stamp> append make-directory
   "/builds/" stamp> append cd
 
-  { "git" "clone" "/builds/factor" } run-process drop
+  { "git" "clone" "../factor" } run-process drop
 
   "factor" cd
 
-  { "git" "show" } <process-stream>
-  [ readln ] with-stream
-  " " split second
-  "../git-id" <file-writer> [ print ] with-stream
+  { "git" "show" } <process-stream> [ readln ] with-stream " " split second
+  "../git-id" log-object
 
   { "make" "clean" } run-process drop
 
@@ -106,9 +120,7 @@ VAR: stamp
      { +stdout+   "../boot-log" }
      { +stderr+   +stdout+ }
    }
-  >hashtable
-  [ run-process process-status ]
-  benchmark nip "../boot-time" <file-writer> [ . ] with-stream
+  >hashtable [ run-process ] "../boot-time" log-runtime process-status
   0 =
   [ ]
   [
@@ -116,20 +128,17 @@ VAR: stamp
     "builder: bootstrap" throw
   ] if
 
-  `{
-     { +arguments+
-       { ,[ factor-binary ] "-e=USE: tools.browser load-everything" } }
-     { +stdout+    "../load-everything-log" }
-     { +stderr+    +stdout+ }
-   }
-  >hashtable [ run-process process-status ] benchmark nip
-  "../load-everything-time" <file-writer> [ . ] with-stream
-  0 =
-  [ ]
-  [
-    "builder: load-everything" "../load-everything-log" email-file
-    "builder: load-everything" throw
-  ] if ;
+  `{ ,[ factor-binary ] "-run=builder.test" } run-process drop
+  
+  "../load-everything-log" exists?
+  [ "builder: load-everything" "../load-everything-log" email-file ]
+  when
+
+  "../failing-tests" exists?
+  [ "builder: failing tests" "../failing-tests" email-file ]
+  when
+
+  ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -32,7 +32,7 @@ IN: project-euler.037
     ] if ;
 
 : reverse-digits ( n -- m )
-    number>string reverse 10 string>integer ;
+    number>string reverse string>number ;
 
 : l-trunc? ( n -- ? )
     reverse-digits 10 /i reverse-digits dup 0 > [

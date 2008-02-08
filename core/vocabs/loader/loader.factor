@@ -148,38 +148,37 @@ SYMBOL: load-help?
     dup update-roots
     dup modified-sources swap modified-docs ;
 
-: load-error. ( vocab error -- )
-    "==== " write >r
-    dup vocab-name swap f >vocab-link write-object ":" print nl
-    r> print-error ;
+: vocab-heading. ( vocab -- )
+    nl
+    "==== " write
+    dup vocab-name swap f >vocab-link write-object ":" print
+    nl ;
 
-TUPLE: require-all-error vocabs ;
+: load-error. ( triple -- )
+    dup first vocab-heading.
+    dup second print-error
+    drop ;
+    ! third "Traceback" swap write-object ;
 
-: require-all-error ( vocabs -- )
-    [ vocab-name ] map
-    \ require-all-error construct-boa throw ;
+: load-failures. ( failures -- )
+    [ load-error. nl ] each ;
 
-M: require-all-error summary
-    drop "The require-all operation failed" ;
-
-: require-all ( vocabs -- )
-    dup length 1 = [ first require ] [
+: require-all ( vocabs -- failures )
+    [
         [
             [
-                [ [ require ] [ 2array , ] recover ] each
-            ] { } make
-            dup empty? [ drop ] [
-                dup [ nl load-error. ] assoc-each
-                keys require-all-error
-            ] if
-        ] with-compiler-errors
-    ] if ;
+                [ require ]
+                [ error-continuation get 3array , ]
+                recover
+            ] each
+        ] { } make
+    ] with-compiler-errors ;
 
 : do-refresh ( modified-sources modified-docs -- )
     2dup
     [ f swap set-vocab-docs-loaded? ] each
     [ f swap set-vocab-source-loaded? ] each
-    append prune require-all ;
+    append prune require-all load-failures. ;
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 

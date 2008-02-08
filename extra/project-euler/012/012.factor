@@ -33,9 +33,6 @@ IN: project-euler.012
 ! SOLUTION
 ! --------
 
-: nth-triangle ( n -- n )
-    dup 1+ * 2 / ;
-
 : euler012 ( -- answer )
     8 [ dup nth-triangle tau* 500 < ] [ 1+ ] [ ] while nth-triangle ;
 

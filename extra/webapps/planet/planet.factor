@@ -2,7 +2,7 @@ USING: sequences rss arrays concurrency kernel sorting
 html.elements io assocs namespaces math threads vocabs html
 furnace http.server.templating calendar math.parser splitting
 continuations debugger system http.server.responders
-xml.writer prettyprint io.server ;
+xml.writer prettyprint logging ;
 IN: webapps.planet
 
 : print-posting-summary ( posting -- )
@@ -75,27 +75,19 @@ SYMBOL: cached-postings
 
 SYMBOL: last-update
 
-: fetch-feed ( triple -- feed )
-    second
-    "Fetching " over append log-message
-    dup download-feed feed-entries
-    "Done fetching " swap append log-message ;
-
 : <posting> ( author entry -- entry' )
     clone
     [ ": " swap entry-title 3append ] keep
     [ set-entry-title ] keep ;
 
-: ?fetch-feed ( triple -- feed/f )
-    [
-        fetch-feed
-    ] [
-        swap [ . error. ] with-log-stream f
-    ] recover ;
+: fetch-feed ( url -- feed )
+    download-feed feed-entries ;
+
+\ fetch-feed DEBUG add-error-logging
 
 : fetch-blogroll ( blogroll -- entries )
     dup 0 <column>
-    swap [ ?fetch-feed ] parallel-map
+    swap [ fetch-feed ] parallel-map
     [ [ <posting> ] with map ] 2map concat ;
 
 : sort-entries ( entries -- entries' )

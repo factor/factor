@@ -26,6 +26,4 @@ C: <result> result
     ] "" make ;
 
 : search-yahoo ( search num -- seq )
-    query http-get 2nip
-    [ "Search failed" throw ] unless*
-    string>xml parse-yahoo ;
+    query http-get string>xml parse-yahoo ;
