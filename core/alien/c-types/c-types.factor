@@ -7,6 +7,8 @@ math.parser cpu.architecture alien alien.accessors quotations
 system compiler.units ;
 IN: alien.c-types
 
+: little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
+
 TUPLE: c-type
 boxer prep unboxer
 getter setter

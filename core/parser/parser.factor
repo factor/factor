@@ -18,7 +18,7 @@ TUPLE: lexer text line line-text line-length column ;
 
 : <lexer> ( text -- lexer )
     0 { set-lexer-text set-lexer-line } lexer construct
-    dup lexer-text empty? [ dup next-line ] unless ;
+    dup next-line ;
 
 : location ( -- loc )
     file get lexer get lexer-line 2dup and
