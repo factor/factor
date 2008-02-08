@@ -300,3 +300,4 @@ TUPLE: silly-tuple a b ;
 [ f ] [ \ sequence \ hashcode* should-inline? ] unit-test
 [ t ] [ \ array \ nth-unsafe should-inline? ] unit-test
 [ t ] [ \ growable \ nth-unsafe should-inline? ] unit-test
+[ t ] [ \ sbuf \ set-nth-unsafe should-inline? ] unit-test
