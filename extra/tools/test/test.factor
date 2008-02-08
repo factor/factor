@@ -61,9 +61,14 @@ M: expected-error summary
     dup vocab-source-loaded? [
         vocab-tests-path dup [
             dup ?resource-path exists? [
-                [ "temporary" forget-vocab ] with-compilation-unit
+                [
+                    "temporary" forget-vocab
+                ] with-compilation-unit
                 dup run-file
-                [ dup forget-source ] with-compilation-unit
+                [
+                    dup forget-source
+                    "temporary" forget-vocab
+                ] with-compilation-unit
             ] when
         ] when
     ] when drop ;
