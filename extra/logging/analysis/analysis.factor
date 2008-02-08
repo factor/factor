@@ -11,6 +11,7 @@ SYMBOL: message-histogram
 
 : analyze-entry ( entry -- )
     dup second ERROR eq? [ dup errors get push ] when
+    dup second CRITICAL eq? [ dup errors get push ] when
     1 over third word-histogram get at+
     dup third word-names get member? [
         1 over 1 tail message-histogram get at+
@@ -65,5 +66,5 @@ SYMBOL: message-histogram
     "==== ERRORS:" print nl
     errors. ;
 
-: log-analysis ( lines word-names -- )
+: analyze-log ( lines word-names -- )
     >r parse-log r> analyze-entries analysis. ;

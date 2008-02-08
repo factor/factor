@@ -1,19 +1,17 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: logging.analysis logging.server logging smtp io.sockets
-kernel io.files io.streams.string namespaces raptor.cron ;
+kernel io.files io.streams.string namespaces raptor.cron assocs ;
 IN: logging.insomniac
-
-SYMBOL: insomniac-config
 
 SYMBOL: insomniac-smtp-host
 SYMBOL: insomniac-smtp-port
 SYMBOL: insomniac-sender
 SYMBOL: insomniac-recipients
 
-: ?log-analysis ( service word-names -- string/f )
+: ?analyze-log ( service word-names -- string/f )
     >r log-path 1 log# dup exists? [
-        file-lines r> [ log-analysis ] string-out
+        file-lines r> [ analyze-log ] string-out
     ] [
         r> 2drop f
     ] if ;
@@ -31,7 +29,7 @@ SYMBOL: insomniac-recipients
 : (email-log-report) ( service word-names -- )
     [
         over >r
-        ?log-analysis dup [
+        ?analyze-log dup [
             r> email-subject
             insomniac-recipients get
             insomniac-sender get
@@ -39,11 +37,12 @@ SYMBOL: insomniac-recipients
         ] [ r> 2drop ] if
     ] with-insomniac-smtp ;
 
+\ (email-log-report) NOTICE add-error-logging
+
 : email-log-report ( service word-names -- )
-    (email-log-report) ;
+    "logging.insomniac" [ (email-log-report) ] with-logging ;
 
-\ email-log-report NOTICE add-error-logging
-
-: schedule-insomniac ( service word-names -- )
-    { 25 } { 6 } f f f <when> -rot
-    [ email-log-report ] 2curry schedule ;
+: schedule-insomniac ( alist -- )
+    { 25 } { 6 } f f f <when> -rot [
+        [ email-log-report ] assoc-each rotate-logs
+    ] 2curry schedule ;
