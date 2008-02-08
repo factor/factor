@@ -36,7 +36,7 @@ IN: project-euler.043
 <PRIVATE
 
 : subseq-divisible? ( n index seq -- ? )
-    [ 1- dup 3 + ] dip subseq 10 swap digits>integer swap mod zero? ;
+    [ 1- dup 3 + ] dip subseq 10 digits>integer swap mod zero? ;
 
 : interesting? ( seq -- ? )
     {
@@ -53,7 +53,7 @@ PRIVATE>
 
 : euler043 ( -- answer )
     1234567890 number>digits all-permutations
-    [ interesting? ] subset [ 10 swap digits>integer ] map sum ;
+    [ interesting? ] subset [ 10 digits>integer ] map sum ;
 
 ! [ euler043 ] time
 ! 125196 ms run / 19548 ms GC time
@@ -89,7 +89,7 @@ PRIVATE>
 PRIVATE>
 
 : euler043a ( -- answer )
-    interesting-pandigitals [ 10 swap digits>integer ] sigma ;
+    interesting-pandigitals [ 10 digits>integer ] sigma ;
 
 ! [ euler043a ] 100 ave-time
 ! 19 ms run / 1 ms GC ave time - 100 trials

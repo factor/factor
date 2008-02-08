@@ -52,11 +52,11 @@ SYMBOL: log-files
 : try-dispose ( stream -- )
     [ dispose ] curry [ error. ] recover ;
 
-: close-log-file ( service -- )
+: close-log ( service -- )
     log-files get delete-at*
     [ try-dispose ] [ drop ] if ;
 
-: (close-log-files) ( -- )
+: (close-logs) ( -- )
     log-files get
     dup values [ try-dispose ] each
     clear-assoc ;
@@ -75,13 +75,13 @@ SYMBOL: log-files
     [ 1- log# ] 2keep log# ?rename-file ;
 
 : rotate-log ( service -- )
-    dup close-log-file
+    dup close-log
     log-path
     dup delete-oldest
     keep-logs 1 [a,b] [ advance-log ] with each ;
 
 : (rotate-logs) ( -- )
-    (close-log-files)
+    (close-logs)
     log-root directory [ drop rotate-log ] assoc-each ;
 
 : log-server-loop
@@ -89,9 +89,9 @@ SYMBOL: log-files
         receive unclip {
             { "log-message" [ (log-message) ] }
             { "rotate-logs" [ drop (rotate-logs) ] }
-            { "close-log-files" [ drop (close-log-files) ] }
+            { "close-logs" [ drop (close-logs) ] }
         } case
-    ] [ error. (close-log-files) ] recover
+    ] [ error. (close-logs) ] recover
     log-server-loop ;
 
 : log-server ( -- )
