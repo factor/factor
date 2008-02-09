@@ -272,19 +272,15 @@ TUPLE: future value processes ;
     f swap set-future-processes ;
 
 : future ( quot -- future )
-    #! Spawn a process to call the quotation and immediately return
-    #! a 'future' on the stack. The future can later be queried with
-    #! ?future. If the quotation has completed the result will be returned.
-    #! If not, the process will block until the quotation completes.
-    #! 'quot' must have stack effect ( -- X ).
+    #! Spawn a process to call the quotation and immediately return.
     \ future construct-empty [
         [
             >r [ t 2array ] compose [ f 2array ] recover r>
             notify-future
         ] 2curry spawn drop
     ] keep ;
-
-: ?future ( future -- result )
+ 
+ : ?future ( future -- result )
     #! Block the process until the future has completed and then
     #! place the result on the stack. Return the result
     #! immediately if the future has completed.
@@ -293,6 +289,16 @@ TUPLE: future value processes ;
     ] [
         dup [ future-processes push stop ] curry callcc0 ?future
     ] ?if ;
+
+: parallel-map ( seq quot -- newseq )
+    #! Spawn a process to apply quot to each element of seq,
+    #! joining the results into a sequence at the end.
+    [ curry future ] curry map [ ?future ] map ;
+
+: parallel-each ( seq quot -- )
+    #! Spawn a process to apply quot to each element of seq,
+    #! and waits for all processes to complete.
+    [ f ] compose parallel-map drop ;
 
 TUPLE: promise fulfilled? value processes ;
 

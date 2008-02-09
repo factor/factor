@@ -8,27 +8,17 @@ USING: kernel sequences assocs builder continuations vocabs vocabs.loader
 IN: builder.test
 
 : do-load ( -- )
-  [
-    [ load-everything ]
-    [ require-all-error-vocabs "../load-everything-log" log-object ]
-    recover
-  ]
-  "../load-everything-time" log-runtime ;
+  [ try-everything ] "../load-everything-time" log-runtime
+  dup empty?
+    [ drop ]
+    [ "../load-everything-log" log-object ]
+  if ;
 
 : do-tests ( -- )
-  "" child-vocabs
-  [ vocab-source-loaded? ] subset
-  [ vocab-tests-path ] map
-  [ dup [ ?resource-path exists? ] when ] subset
-  [ dup run-test ] { } map>assoc
-  [ second empty? not ] subset
+  run-all-tests keys
   dup empty?
   [ drop ]
-  [
-    "../failing-tests" <file-writer>
-      [ [ nl failures. ] assoc-each ]
-    with-stream
-  ]
+  [ "../failing-tests" log-object ]
   if ;
 
 : do-all ( -- ) do-load do-tests ;
