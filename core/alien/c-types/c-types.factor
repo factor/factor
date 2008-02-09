@@ -7,6 +7,9 @@ math.parser cpu.architecture alien alien.accessors quotations
 system compiler.units ;
 IN: alien.c-types
 
+DEFER: <int>
+DEFER: *char
+
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
 TUPLE: c-type
