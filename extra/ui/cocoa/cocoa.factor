@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays cocoa cocoa.application command-line
+USING: math arrays cocoa cocoa.application command-line
 kernel memory namespaces cocoa.messages cocoa.runtime
 cocoa.subclassing cocoa.pasteboard cocoa.types cocoa.windows
 cocoa.classes cocoa.application sequences system ui ui.backend
@@ -52,6 +52,18 @@ M: pasteboard set-clipboard-contents
 
 M: cocoa-ui-backend set-title ( string world -- )
     world-handle second swap <NSString> -> setTitle: ;
+
+: enter-fullscreen ( world -- )
+    world-handle first NSScreen -> mainScreen f -> enterFullScreenMode:withOptions: drop ;
+
+: exit-fullscreen ( world -- )
+    world-handle first f -> exitFullScreenModeWithOptions: ;
+
+M: cocoa-ui-backend set-fullscreen? ( ? world -- )
+    swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
+
+M: cocoa-ui-backend fullscreen? ( world -- ? )
+    world-handle first -> isInFullScreenMode zero? not ;
 
 : auto-position ( world -- )
     dup world-loc { 0 0 } = [
