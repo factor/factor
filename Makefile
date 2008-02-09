@@ -123,7 +123,15 @@ solaris-x86-32:
 solaris-x86-64:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.x86.64
 
-winnt-x86-32:
+freetype6.dll:
+	wget http://factorcode.org/dlls/freetype6.dll
+	chmod 755 freetype6.dll
+
+zlib1.dll:
+	wget http://factorcode.org/dlls/zlib1.dll
+	chmod 755 zlib1.dll
+
+winnt-x86-32: freetype6.dll zlib1.dll
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
 
 winnt-x86-64:
