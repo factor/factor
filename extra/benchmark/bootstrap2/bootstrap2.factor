@@ -9,6 +9,6 @@ IN: benchmark.bootstrap2
         "-i=" my-boot-image-name append ,
         "-output-image=foo.image" ,
         "-no-user-init" ,
-    ] { } make run-process drop ;
+    ] { } make try-process ;
 
 MAIN: bootstrap-benchmark

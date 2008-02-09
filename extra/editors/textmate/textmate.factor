@@ -5,6 +5,6 @@ IN: editors.textmate
 
 : textmate-location ( file line -- )
     [ "mate" , "-a" , "-l" , number>string , , ] { } make
-    run-process drop ;
+    try-process ;
 
 [ textmate-location ] edit-hook set-global

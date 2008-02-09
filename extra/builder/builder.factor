@@ -1,8 +1,8 @@
 
-USING: kernel io io.files io.launcher hashtables tools.deploy.backend
+USING: kernel io io.files io.launcher hashtables
        system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
-       combinators ;
+       combinators bootstrap.image bootstrap.image.download ;
 
 IN: builder
 
@@ -59,7 +59,11 @@ VAR: stamp
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+SYMBOL: build-status
+
 : build ( -- )
+
+  "running" build-status set-global
 
   datestamp >stamp
 
@@ -70,7 +74,6 @@ VAR: stamp
     "pull"
     "--no-summary"
     "git://factorcode.org/git/factor.git"
-    ! "http://dharmatech.onigirihouse.com/factor.git"
     "master"
   }
   run-process process-status
@@ -81,6 +84,11 @@ VAR: stamp
     "builder: git pull" throw
   ]
   if
+
+  {
+    "git" "pull" "--no-summary"
+    "http://dharmatech.onigirihouse.com/factor.git" "master"
+  } run-process drop
 
   "/builds/" stamp> append make-directory
   "/builds/" stamp> append cd
@@ -93,6 +101,8 @@ VAR: stamp
   "../git-id" log-object
 
   { "make" "clean" } run-process drop
+
+  ! "vm" build-status set-global
 
   `{
      { +arguments+ { "make" ,[ target ] } }
@@ -107,14 +117,17 @@ VAR: stamp
     "builder: vm compile" throw
   ] if
 
-  [ "http://factorcode.org/images/latest/" boot-image-name append download ]
+  [ my-arch download-image ]
+  [ ]
   [ "builder: image download" email-string ]
-  recover
+  cleanup
+
+  ! "bootstrap" build-status set-global
 
   `{
      { +arguments+ {
                      ,[ factor-binary ]
-                     ,[ "-i=" boot-image-name append ]
+                     ,[ "-i=" my-boot-image-name append ]
                      "-no-user-init"
                    } }
      { +stdout+   "../boot-log" }
@@ -128,6 +141,8 @@ VAR: stamp
     "builder: bootstrap" throw
   ] if
 
+  ! "test" build-status set-global
+
   `{ ,[ factor-binary ] "-run=builder.test" } run-process drop
   
   "../load-everything-log" exists?
@@ -137,6 +152,8 @@ VAR: stamp
   "../failing-tests" exists?
   [ "builder: failing tests" "../failing-tests" email-file ]
   when
+
+  ! "ready" build-status set-global
 
   ;
 

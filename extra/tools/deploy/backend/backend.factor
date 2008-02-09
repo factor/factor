@@ -22,7 +22,10 @@ IN: tools.deploy.backend
         +stdout+ +stderr+ set
     ] H{ } make-assoc <process-stream>
     dup duplex-stream-out dispose
-    copy-lines ;
+    dup copy-lines
+    process-stream-process wait-for-process zero? [
+        "Deployment failed" throw
+    ] unless ;
 
 : make-boot-image ( -- )
     #! If stage1 image doesn't exist, create one.

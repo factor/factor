@@ -116,6 +116,15 @@ HELP: run-detached
     "The output value can be passed to " { $link wait-for-process } " to get an exit code."
 } ;
 
+HELP: process-failed
+{ $values { "code" "an exit status" } }
+{ $description "Throws a " { $link process-failed } " error." }
+{ $error-description "Thrown by " { $link try-process } " if the process exited with a non-zero status code." } ;
+
+HELP: try-process
+{ $values { "desc" "a launch descriptor" } }
+{ $description "Launches a process and waits for it to complete. If it exits with a non-zero status code, throws a " { $link process-failed } " error." } ;
+
 HELP: kill-process
 { $values { "process" process } }
 { $description "Kills a running process. Does nothing if the process has already exited." } ;
@@ -175,6 +184,7 @@ $nl
 "The following words are used to launch processes:"
 { $subsection run-process }
 { $subsection run-detached }
+{ $subsection try-process }
 "Stopping processes:"
 { $subsection kill-process }
 "Redirecting standard input and output to a pipe:"

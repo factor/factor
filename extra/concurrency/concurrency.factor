@@ -264,12 +264,19 @@ PRIVATE>
     #! so the server continuation gets its new self updated.
     self swap call ;
 
+TUPLE: future status value processes ;
+
 : future ( quot -- future )
     #! Spawn a process to call the quotation and immediately return
     #! a 'future' on the stack. The future can later be queried with
     #! ?future. If the quotation has completed the result will be returned.
     #! If not, the process will block until the quotation completes.
     #! 'quot' must have stack effect ( -- X ).
+    [
+        [
+            t 
+        ] compose
+    ] spawn drop
     [ self send ] compose spawn ;
 
 : ?future ( future -- result )

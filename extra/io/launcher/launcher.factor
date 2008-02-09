@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.backend system kernel namespaces strings hashtables
 sequences assocs combinators vocabs.loader init threads
-continuations ;
+continuations math ;
 IN: io.launcher
 
 ! Non-blocking process exit notification facility
@@ -83,6 +83,15 @@ HOOK: run-process* io-backend ( desc -- handle )
 
 : run-detached ( desc -- process )
     >descriptor H{ { +detached+ t } } union run-process ;
+
+TUPLE: process-failed code ;
+
+: process-failed ( code -- * )
+    process-failed construct-boa throw ;
+
+: try-process ( desc -- )
+    run-process wait-for-process dup zero?
+    [ drop ] [ process-failed ] if ;
 
 HOOK: kill-process* io-backend ( handle -- )
 
