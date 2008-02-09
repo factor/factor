@@ -97,7 +97,7 @@ TUPLE: no-method object generic ;
     [ small-generic ] picker class-hash-dispatch-quot ;
 
 : vtable-class ( n -- class )
-    type>class [ hi-tag bootstrap-word ] unless* ;
+    bootstrap-type>class [ hi-tag bootstrap-word ] unless* ;
 
 : group-methods ( assoc -- vtable )
     #! Input is a predicate -> method association.
