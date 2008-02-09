@@ -78,16 +78,10 @@ FUNCTION: void glXSelectEvent ( Display* dpy, GLXDrawable draw, ulong event_mask
 FUNCTION: void glXGetSelectedEvent ( Display* dpy, GLXDrawable draw, ulong* event_mask ) ;
 
 ! GLX 1.4 and later
-! Fall back to the extension function glXGetProcAddressARB if necessary
-<< "glx" load-library "glXGetProcAddress" dlsym
-    [ "void*" "glx" "glXGetProcAddress" { "char*" "procname" } define-function ]
-    [
-        "void*" "glx" "glXGetProcAddressARB" { "char*" "procname" } define-function
-        "glXGetProcAddress" create-in [ glXGetProcAddressARB ] define make-inline
-    ]
-    if >>
-    
 FUNCTION: void* glXGetProcAddress ( char* procname ) ;
+
+! GLX_ARB_get_proc_address extension
+FUNCTION: void* glXGetProcAddressARB ( char* procname ) ;
 
 ! GLX Events
 ! (also skipped for now. only has GLXPbufferClobberEvent, the rest is handled by xlib methinks
