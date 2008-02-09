@@ -2,13 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser-combinators memoize kernel sequences
 logging arrays words strings vectors io io.files
-namespaces combinators combinators.lib logging.server ;
+namespaces combinators combinators.lib logging.server
+calendar ;
 IN: logging.parser
 
 : string-of satisfy <!*> [ >string ] <@ ;
 
+SYMBOL: multiline
+
 : 'date'
-    [ CHAR: ] eq? not ] string-of
+    multiline-header token [ drop multiline ] <@
+    [ CHAR: ] eq? not ] string-of [ rfc3339>timestamp ] <@ <|>
     "[" "]" surrounded-by ;
 
 : 'log-level'
@@ -41,7 +45,7 @@ MEMO: 'log-line' ( -- parser )
     first malformed eq? ;
 
 : multiline? ( line -- ? )
-    first first CHAR: - = ;
+    first multiline eq? ;
 
 : malformed-line
     "Warning: malformed log line:" print

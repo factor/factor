@@ -84,6 +84,15 @@ HOOK: run-process* io-backend ( desc -- handle )
 : run-detached ( desc -- process )
     >descriptor H{ { +detached+ t } } union run-process ;
 
+TUPLE: process-failed code ;
+
+: process-failed ( code -- * )
+    process-failed construct-boa throw ;
+
+: try-process ( desc -- )
+    run-process wait-for-process dup zero?
+    [ drop ] [ process-failed ] if ;
+
 HOOK: kill-process* io-backend ( handle -- )
 
 : kill-process ( process -- )
