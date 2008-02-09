@@ -59,7 +59,11 @@ VAR: stamp
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+SYMBOL: build-status
+
 : build ( -- )
+
+  "running" build-status set-global
 
   datestamp >stamp
 
@@ -98,6 +102,8 @@ VAR: stamp
 
   { "make" "clean" } run-process drop
 
+  ! "vm" build-status set-global
+
   `{
      { +arguments+ { "make" ,[ target ] } }
      { +stdout+    "../compile-log" }
@@ -116,6 +122,8 @@ VAR: stamp
   [ "builder: image download" email-string ]
   cleanup
 
+  ! "bootstrap" build-status set-global
+
   `{
      { +arguments+ {
                      ,[ factor-binary ]
@@ -133,6 +141,8 @@ VAR: stamp
     "builder: bootstrap" throw
   ] if
 
+  ! "test" build-status set-global
+
   `{ ,[ factor-binary ] "-run=builder.test" } run-process drop
   
   "../load-everything-log" exists?
@@ -142,6 +152,8 @@ VAR: stamp
   "../failing-tests" exists?
   [ "builder: failing tests" "../failing-tests" email-file ]
   when
+
+  ! "ready" build-status set-global
 
   ;
 
