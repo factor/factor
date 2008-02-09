@@ -270,11 +270,10 @@ TUPLE: future value processes ;
     tuck set-future-value
     dup future-processes [ schedule-thread ] each
     f swap set-future-processes ;
- 
+
 : future ( quot -- future )
     #! Spawn a process to call the quotation and immediately return.
     \ future construct-empty [
-    [
         [
             >r [ t 2array ] compose [ f 2array ] recover r>
             notify-future
