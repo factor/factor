@@ -16,6 +16,7 @@ IN: project-euler.common
 ! nth-triangle - #12, #42
 ! number>digits - #16, #20, #30, #34
 ! pandigital? - #32, #38
+! pentagonal? - #44, #45
 ! propagate-all - #18, #67
 ! sum-proper-divisors - #21
 ! tau* - #12
@@ -83,6 +84,9 @@ PRIVATE>
 
 : pandigital? ( n -- ? )
     number>string natural-sort "123456789" = ;
+
+: pentagonal? ( n -- ? )
+    dup 0 > [ 24 * 1+ sqrt 1+ 6 / 1 mod zero? ] [ drop f ] if ;
 
 ! Not strictly needed, but it is nice to be able to dump the triangle after the
 ! propagation
