@@ -280,15 +280,11 @@ TUPLE: future value processes ;
             notify-future
         ] 2curry spawn drop
     ] keep ;
-            t 
-        ] compose
-    ] spawn drop
-    [ self send ] compose spawn ;
  
  : ?future ( future -- result )
-     #! Block the process until the future has completed and then
-     #! place the result on the stack. Return the result
-     #! immediately if the future has completed.
+    #! Block the process until the future has completed and then
+    #! place the result on the stack. Return the result
+    #! immediately if the future has completed.
     dup future-value [
         first2 [ throw ] unless
     ] [
