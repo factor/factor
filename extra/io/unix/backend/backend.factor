@@ -3,7 +3,7 @@
 USING: alien generic assocs kernel kernel.private math
 io.nonblocking sequences strings structs sbufs threads unix
 vectors io.buffers io.backend io.streams.duplex math.parser
-continuations system libc qualified namespaces ;
+continuations system libc qualified namespaces io.timeouts ;
 QUALIFIED: io
 IN: io.unix.backend
 
