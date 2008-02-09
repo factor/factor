@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! based on glx.h from xfree86, and some of glxtokens.h
-USING: alien alien.c-types alien.syntax x11.xlib
-namespaces kernel sequences ;
+USING: alien alien.c-types alien.syntax alien.syntax.private x11.xlib
+namespaces kernel sequences parser words ;
 IN: x11.glx
 
 LIBRARY: glx
@@ -78,6 +78,15 @@ FUNCTION: void glXSelectEvent ( Display* dpy, GLXDrawable draw, ulong event_mask
 FUNCTION: void glXGetSelectedEvent ( Display* dpy, GLXDrawable draw, ulong* event_mask ) ;
 
 ! GLX 1.4 and later
+! Fall back to the extension function glXGetProcAddressARB if necessary
+<< "glx" load-library "glXGetProcAddress" dlsym
+    [ "void*" "glx" "glXGetProcAddress" { "char*" "procname" } define-function ]
+    [
+        "void*" "glx" "glXGetProcAddressARB" { "char*" "procname" } define-function
+        "glXGetProcAddress" create-in [ glXGetProcAddressARB ] define make-inline
+    ]
+    if >>
+    
 FUNCTION: void* glXGetProcAddress ( char* procname ) ;
 
 ! GLX Events
