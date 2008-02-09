@@ -9,12 +9,13 @@ IN: project-euler.common
 ! Problems using each public word
 ! -------------------------------
 ! alpha-value - #22, #42
-! cartesian-product - #4, #27, #29, #32, #33
+! cartesian-product - #4, #27, #29, #32, #33, #43, #44, #56
 ! collect-consecutive - #8, #11
 ! log10 - #25, #134
 ! max-path - #18, #67
 ! nth-triangle - #12, #42
 ! number>digits - #16, #20, #30, #34
+! palindrome? - #4, #36, #55
 ! pandigital? - #32, #38
 ! pentagonal? - #44, #45
 ! propagate-all - #18, #67
@@ -81,6 +82,9 @@ PRIVATE>
 
 : nth-triangle ( n -- n )
     dup 1+ * 2 / ;
+
+: palindrome? ( n -- ? )
+    number>string dup reverse = ;
 
 : pandigital? ( n -- ? )
     number>string natural-sort "123456789" = ;
