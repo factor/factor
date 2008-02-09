@@ -32,7 +32,7 @@ IN: project-euler.045
 
 DEFER: next-solution
 
-: (next-solution) ( n hexagonal -- n )
+: (next-solution) ( n hexagonal -- hexagonal )
     dup pentagonal? [ nip ] [ drop next-solution ] if ;
 
 : next-solution ( n -- m )

@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib kernel math math.combinatorics math.ranges sequences ;
+USING: combinators.lib kernel math math.combinatorics math.ranges ;
 IN: project-euler.053
 
 ! http://projecteuler.net/index.php?section=problems&id=53
@@ -27,7 +27,7 @@ IN: project-euler.053
 ! --------
 
 : euler053 ( -- answer )
-    23 100 [a,b] [ dup [ nCk ] with map [ 1000000 > ] count ] sigma ;
+    23 100 [a,b] [ dup [ nCk 1000000 > ] with count ] sigma ;
 
 ! [ euler053 ] 100 ave-time
 ! 64 ms run / 2 ms GC ave time - 100 trials
