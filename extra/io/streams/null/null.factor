@@ -1,12 +1,12 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.streams.null
-USING: kernel io continuations ;
+USING: kernel io io.timeouts continuations ;
 
 TUPLE: null-stream ;
 
 M: null-stream dispose drop ;
-M: null-stream set-timeout 2drop ;
+M: null-stream set-timeout drop ;
 M: null-stream stream-readln drop f ;
 M: null-stream stream-read1 drop f ;
 M: null-stream stream-read-until 2drop f f ;

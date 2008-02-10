@@ -1,8 +1,8 @@
 USING: continuations destructors io.buffers io.files io.backend
-io.nonblocking io.windows io.windows.nt.backend kernel libc math
-threads windows windows.kernel32 alien.c-types alien.arrays
-sequences combinators combinators.lib sequences.lib ascii
-splitting alien strings ;
+io.timeouts io.nonblocking io.windows io.windows.nt.backend
+kernel libc math threads windows windows.kernel32 alien.c-types
+alien.arrays sequences combinators combinators.lib sequences.lib
+ascii splitting alien strings ;
 IN: io.windows.nt.files
 
 M: windows-nt-io cwd
@@ -98,7 +98,7 @@ M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
     ] if ;
 
 : flush-output ( port -- )
-    [ [ (flush-output) ] with-port-timeout ] with-destructors ;
+    [ [ (flush-output) ] with-timeout ] with-destructors ;
 
 M: port port-flush
     dup buffer-empty? [ dup flush-output ] unless drop ;
@@ -122,4 +122,4 @@ M: port port-flush
     ] [ 2drop ] if ;
 
 M: input-port (wait-to-read) ( port -- )
-    [ [ ((wait-to-read)) ] with-port-timeout ] with-destructors ;
+    [ [ ((wait-to-read)) ] with-timeout ] with-destructors ;

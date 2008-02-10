@@ -55,7 +55,7 @@ M: windows-ce-io accept ( server -- client )
             ] keep
         ] keep server-port-addr parse-sockaddr swap
         <win32-socket> dup handle>duplex-stream <client-stream>
-    ] with-port-timeout ;
+    ] with-timeout ;
 
 M: windows-ce-io <datagram> ( addrspec -- datagram )
     [

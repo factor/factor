@@ -61,7 +61,7 @@ M: mx register-io-task ( task mx -- )
     mx get-global register-io-task stop ;
 
 : with-port-continuation ( port quot -- port )
-    [ callcc0 ] curry with-port-timeout ; inline
+    [ callcc0 ] curry with-timeout ; inline
 
 M: mx unregister-io-task ( task mx -- )
     fd/container delete-at drop ;
@@ -178,7 +178,7 @@ M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: unix-io io-multiplex ( ms -- )
-    expire-timeouts mx get-global wait-for-events ;
+    mx get-global wait-for-events ;
 
 M: unix-io init-stdio ( -- )
     0 1 handle>duplex-stream io:stdio set-global

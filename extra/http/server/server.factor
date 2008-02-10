@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel namespaces io strings splitting
+USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http http.server.responders sequences prettyprint
 io.server logging ;
 
