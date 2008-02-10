@@ -135,10 +135,8 @@ SYMBOL: undefined-quot
 
 : here-as ( tag -- pointer ) here swap bitor ;
 
-USE: continuations
-
 : align-here ( -- )
-    here 8 mod 4 = [ break heap-size drop 0 emit ] when ;
+    here 8 mod 4 = [ heap-size drop 0 emit ] when ;
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
@@ -216,10 +214,6 @@ M: f '
 :  0,  0 >bignum '  0-offset fixup ;
 :  1,  1 >bignum '  1-offset fixup ;
 : -1, -1 >bignum ' -1-offset fixup ;
-
-! Beginning of the image
-: begin-image ( -- )
-    emit-header t, 0, 1, -1, ;
 
 ! Words
 
@@ -388,7 +382,10 @@ M: curry '
 : fixup-header ( -- )
     heap-size data-heap-size-offset fixup ;
 
-: end-image ( -- )
+: build-image ( -- image )
+    800000 <vector> image set
+    20000 <hashtable> objects set
+    emit-header t, 0, 1, -1,
     "Serializing words..." print flush
     emit-words
     "Serializing JIT data..." print flush
@@ -403,7 +400,8 @@ M: curry '
     fixup-header
     "Image length: " write image get length .
     "Object cache size: " write objects get assoc-size .
-    \ word global delete-at ;
+    \ word global delete-at
+    image get ;
 
 ! Image output
 
@@ -414,28 +412,23 @@ M: curry '
         [ >le write ] curry each
     ] if ;
 
-: write-image ( image filename -- )
-    "Writing image to " write dup write "..." print flush
+: write-image ( image -- )
+    "Writing image to " write
+    architecture get boot-image-name resource-path
+    dup write "..." print flush
     <file-writer> [ (write-image) ] with-stream ;
-
-: prepare-image ( -- )
-    bootstrapping? on
-    load-help? off
-    800000 <vector> image set
-    20000 <hashtable> objects set ;
 
 PRIVATE>
 
 : make-image ( arch -- )
-    architecture [
-        prepare-image
+    [
+        architecture set
+        bootstrapping? on
+        load-help? off
         "resource:/core/bootstrap/stage1.factor" run-file
-        begin-image
-        end-image
-        image get
-        architecture get boot-image-name resource-path
+        build-image
         write-image
-    ] with-variable ;
+    ] with-scope ;
 
 : make-images ( -- )
     images [ make-image ] each ;
