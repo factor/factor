@@ -1,7 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib kernel math math.ranges namespaces project-euler.common
-    sequences ;
+USING: kernel math math.ranges project-euler.common sequences ;
 IN: project-euler.092
 
 ! http://projecteuler.net/index.php?section=problems&id=92
@@ -30,7 +29,7 @@ IN: project-euler.092
 <PRIVATE
 
 : next-link ( n -- m )
-    number>digits [ sq ] sigma ;
+    0 swap [ dup zero? not ] [ 10 /mod sq -rot [ + ] dip ] [ ] while drop ;
 
 : chain-ending ( n -- m )
     dup 1 = over 89 = or [ next-link chain-ending ] unless ;
@@ -41,15 +40,15 @@ IN: project-euler.092
 : fast-chain-ending ( seq n -- m )
     dup 567 > [ next-link ] when 1- swap nth ;
 
+: count ( seq quot -- n )
+    0 -rot [ rot >r call [ r> 1+ ] [ r> ] if ] curry each ; inline
+
 PRIVATE>
 
 : euler092 ( -- answer )
     lower-endings 9999999 [1,b] [ fast-chain-ending 89 = ] with count ;
 
-! [ euler092 ] time
-! 68766 ms run / 372 ms GC time
-
-! TODO: solution is still too slow, maybe try using a 10000000-byte array that
-! keeps track of each number in the chain and their endings
+! [ euler092 ] 10 ave-time
+! 11169 ms run / 0 ms GC ave time - 10 trials
 
 MAIN: euler092
