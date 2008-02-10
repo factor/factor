@@ -363,9 +363,21 @@ editor "clipboard" f {
     { T{ cut-action } cut }
 } define-command-map
 
-: previous-character T{ char-elt } editor-prev ;
+: previous-character ( editor -- )
+    dup gadget-selection? [
+        dup selection-start/end drop
+        over set-caret mark>caret
+    ] [
+        T{ char-elt } editor-prev
+    ] if ;
 
-: next-character T{ char-elt } editor-next ;
+: next-character ( editor -- )
+    dup gadget-selection? [
+        dup selection-start/end nip
+        over set-caret mark>caret
+    ] [
+        T{ char-elt } editor-next
+    ] if ;
 
 : previous-line T{ line-elt } editor-prev ;
 
