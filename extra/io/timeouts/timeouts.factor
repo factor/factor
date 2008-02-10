@@ -8,21 +8,30 @@ TUPLE: lapse entry timeout cutoff ;
 
 : <lapse> f 0 0 \ lapse construct-boa ;
 
+! Won't need this with new slot accessors
 GENERIC: get-lapse ( obj -- lapse )
+
 GENERIC: set-timeout ( ms obj -- )
 
-M: object set-timeout get-lapse set-lapse-timeout ;
+M: object set-timeout get-lapse set-timeout ;
 
-M: duplex-stream set-timeout
-    2dup
-    duplex-stream-in set-timeout
-    duplex-stream-out set-timeout ;
+M: lapse set-timeout set-lapse-timeout ;
 
 : timeout ( obj -- ms ) get-lapse lapse-timeout ;
 : entry ( obj -- dlist-node ) get-lapse lapse-entry ;
 : set-entry ( obj dlist-node -- ) get-lapse set-lapse-entry ;
 : cutoff ( obj -- ms ) get-lapse lapse-cutoff ;
 : set-cutoff ( ms obj -- ) get-lapse set-lapse-cutoff ;
+
+! Won't need this with inheritance
+TUPLE: duplex-stream-lapse stream ;
+
+M: duplex-stream-lapse set-timeout
+    duplex-stream-lapse-stream 2dup
+    duplex-stream-in set-timeout
+    duplex-stream-out set-timeout ;
+
+M: duplex-stream get-lapse duplex-stream-lapse construct-boa ;
 
 SYMBOL: timeout-queue
 
