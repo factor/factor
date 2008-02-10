@@ -30,7 +30,9 @@ IN: builder
 
 SYMBOL: builder-recipients
 
-: tag-subject ( str -- str ) `{ "builder@" ,[ host-name ] ": " , } concat ;
+: host-name* ( -- name ) host-name "." split first ;
+
+: tag-subject ( str -- str ) `{ "builder@" ,[ host-name* ] ": " , } concat ;
 
 : email-string ( subject -- )
   `{ "mutt" "-s" ,[ tag-subject ] %[ builder-recipients get ] }
@@ -158,11 +160,11 @@ SYMBOL: build-status
   builder-test "builder.test fatal error" run-or-notify
   
   "../load-everything-log" exists?
-  [ "builder: load-everything" "../load-everything-log" email-file ]
+  [ "load-everything" "../load-everything-log" email-file ]
   when
 
   "../failing-tests" exists?
-  [ "builder: failing tests" "../failing-tests" email-file ]
+  [ "failing tests" "../failing-tests" email-file ]
   when
 
   "ready" build-status set-global ;
