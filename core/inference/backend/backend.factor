@@ -370,6 +370,7 @@ TUPLE: effect-error word effect ;
             init-inference
             dependencies off
             dup word-def over dup infer-quot-recursive
+            end-infer
             finish-word
             current-effect
         ] with-scope

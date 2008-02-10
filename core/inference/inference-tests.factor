@@ -537,3 +537,8 @@ TUPLE: custom-error ;
 ! This was a false trigger of the undecidable quotation
 ! recursion bug
 { 2 1 } [ find-last-sep ] must-infer-as
+
+! Regression
+: missing->r-check >r ;
+
+[ [ missing->r-check ] infer ] must-fail
