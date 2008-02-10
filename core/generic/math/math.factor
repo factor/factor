@@ -61,7 +61,7 @@ TUPLE: no-math-method left right generic ;
 : math-vtable* ( picker max quot -- quot )
     [
         rot , \ tag ,
-        [ >r [ type>class ] map r> map % ] { } make ,
+        [ >r [ bootstrap-type>class ] map r> map % ] { } make ,
         \ dispatch ,
     ] [ ] make ; inline
 

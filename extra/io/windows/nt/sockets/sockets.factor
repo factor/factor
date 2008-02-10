@@ -1,6 +1,6 @@
 USING: alien alien.accessors alien.c-types byte-arrays
-continuations destructors io.nonblocking io io.sockets
-io.sockets.impl namespaces io.streams.duplex io.windows
+continuations destructors io.nonblocking io.timeouts io.sockets
+io.sockets.impl io namespaces io.streams.duplex io.windows
 io.windows.nt.backend windows.winsock kernel libc math sequences
 threads tuples.lib ;
 IN: io.windows.nt.sockets
@@ -139,7 +139,7 @@ M: windows-nt-io accept ( server -- client )
             AcceptEx-args-port pending-error
             dup duplex-stream-in pending-error
             dup duplex-stream-out pending-error
-        ] with-port-timeout
+        ] with-timeout
     ] with-destructors ;
 
 M: windows-nt-io <server> ( addrspec -- server )

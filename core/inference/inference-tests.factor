@@ -4,7 +4,8 @@ math.parser math.private namespaces namespaces.private parser
 sequences strings vectors words quotations effects tools.test
 continuations generic.standard sorting assocs definitions
 prettyprint io inspector tuples classes.union classes.predicate
-debugger threads.private io.streams.string combinators.private ;
+debugger threads.private io.streams.string io.timeouts
+combinators.private ;
 IN: temporary
 
 { 0 2 } [ 2 "Hello" ] must-infer-as

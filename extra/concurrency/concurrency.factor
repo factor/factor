@@ -273,14 +273,14 @@ TUPLE: future value processes ;
 
 : future ( quot -- future )
     #! Spawn a process to call the quotation and immediately return.
-    \ future construct-empty [
+    f V{ } clone \ future construct-boa [
         [
             >r [ t 2array ] compose [ f 2array ] recover r>
             notify-future
         ] 2curry spawn drop
     ] keep ;
- 
- : ?future ( future -- result )
+
+: ?future ( future -- result )
     #! Block the process until the future has completed and then
     #! place the result on the stack. Return the result
     #! immediately if the future has completed.

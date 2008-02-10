@@ -111,20 +111,15 @@ M: ppc-backend %jump-label ( label -- ) B ;
 M: ppc-backend %jump-t ( label -- )
     0 "flag" operand f v>operand CMPI BNE ;
 
-: (%dispatch) ( len -- )
-    0 11 LOAD32 rc-absolute-ppc-2/2 rel-here
-    "offset" operand "n" operand 1 SRAWI
-    11 11 "offset" operand ADD
-    11 dup rot cells LWZ ;
-
-M: ppc-backend %call-dispatch ( word-table# -- )
-    [ 7 (%dispatch) (%call) <label> dup B ] H{
-        { +input+ { { f "n" } } }
-        { +scratch+ { { f "offset" } } }
-    } with-template ;
-
-M: ppc-backend %jump-dispatch ( -- )
-    [ %epilogue-later 6 (%dispatch) (%jump) ] H{
+M: ppc-backend %dispatch ( -- )
+    [
+        %epilogue-later
+        0 11 LOAD32 rc-absolute-ppc-2/2 rel-here
+        "offset" operand "n" operand 1 SRAWI
+        11 11 "offset" operand ADD
+        11 dup 6 cells LWZ
+        (%jump)
+    ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "offset" } } }
     } with-template ;

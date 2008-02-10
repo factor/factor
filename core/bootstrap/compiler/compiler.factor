@@ -77,3 +77,14 @@ nl
 [ compiled-usages recompile ] recompile-hook set-global
 
 " done" print flush
+
+! Load empty test vocabs
+USE: compiler.test.curry
+USE: compiler.test.float
+USE: compiler.test.intrinsics
+USE: compiler.test.redefine
+USE: compiler.test.simple
+USE: compiler.test.stack-trace
+USE: compiler.test.templates
+USE: compiler.test.templates-early
+USE: compiler.test.tuples
