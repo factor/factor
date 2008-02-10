@@ -8,21 +8,21 @@ TUPLE: lapse entry timeout cutoff ;
 
 : <lapse> f 0 0 \ lapse construct-boa ;
 
-GENERIC: lapse ( obj -- lapse )
+GENERIC: get-lapse ( obj -- lapse )
 GENERIC: set-timeout ( ms obj -- )
 
-M: object set-timeout lapse set-lapse-timeout ;
+M: object set-timeout get-lapse set-lapse-timeout ;
 
 M: duplex-stream set-timeout
     2dup
     duplex-stream-in set-timeout
     duplex-stream-out set-timeout ;
 
-: timeout ( obj -- ms ) lapse lapse-timeout ;
-: entry ( obj -- dlist-node ) lapse lapse-entry ;
-: set-entry ( dlist-node -- obj ) lapse set-lapse-entry ;
-: cutoff ( obj -- ms ) lapse lapse-cutoff ;
-: set-cutoff ( ms obj -- ) lapse set-lapse-cutoff ;
+: timeout ( obj -- ms ) get-lapse lapse-timeout ;
+: entry ( obj -- dlist-node ) get-lapse lapse-entry ;
+: set-entry ( obj dlist-node -- ) get-lapse set-lapse-entry ;
+: cutoff ( obj -- ms ) get-lapse lapse-cutoff ;
+: set-cutoff ( ms obj -- ) get-lapse set-lapse-cutoff ;
 
 SYMBOL: timeout-queue
 
@@ -62,6 +62,6 @@ M: object timed-out drop ;
     over begin-timeout keep unqueue-timeout ; inline
 
 : expiry-thread ( -- )
-    expire-timeouts 5000 sleep expire-timeouts ;
+    expire-timeouts 5000 sleep expiry-thread ;
 
-[ expiry-thread ] "io.timeouts" add-init-hook
+[ [ expiry-thread ] in-thread ] "io.timeouts" add-init-hook

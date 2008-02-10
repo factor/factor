@@ -106,6 +106,8 @@ HOOK: kill-process* io-backend ( handle -- )
     t over set-process-killed?
     process-handle [ kill-process* ] when* ;
 
+M: process get-lapse process-lapse ;
+
 M: process timed-out kill-process ;
 
 HOOK: process-stream* io-backend ( desc -- stream process )

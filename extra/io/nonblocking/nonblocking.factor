@@ -17,7 +17,7 @@ lapse
 type eof? ;
 
 ! Ports support the lapse protocol
-M: port lapse port-lapse ;
+M: port get-lapse port-lapse ;
 
 SYMBOL: closed
 
