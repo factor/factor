@@ -98,7 +98,7 @@ HOOK: run-process* io-backend ( desc -- handle )
 TUPLE: process-failed code ;
 
 : process-failed ( code -- * )
-    process-failed construct-boa throw ;
+    \ process-failed construct-boa throw ;
 
 : try-process ( desc -- )
     run-process wait-for-process dup zero?
