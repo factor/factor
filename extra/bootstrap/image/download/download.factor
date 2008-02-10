@@ -23,3 +23,7 @@ bootstrap.image sequences io ;
         "Boot image up to date" print
         drop
     ] if ;
+
+: download-my-image ( -- ) my-arch download-image ;
+
+MAIN: download-my-image

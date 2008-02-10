@@ -84,3 +84,15 @@ METHOD: hook-test { hashtable number } assoc-size ;
 [ fixnum ] [ 3 hook-test ] unit-test
 5.0 some-var set
 [ 0 ] [ H{ } hook-test ] unit-test
+
+MIXIN: busted
+
+TUPLE: busted-1 ;
+TUPLE: busted-2 ; INSTANCE: busted-2 busted
+TUPLE: busted-3 ;
+
+GENERIC: busted-sort
+
+METHOD: busted-sort { busted-1 busted-2 } ;
+METHOD: busted-sort { busted-2 busted-3 } ;
+METHOD: busted-sort { busted busted } ;

@@ -38,6 +38,9 @@ void print_array(F_ARRAY* array, CELL nesting)
 	CELL length = array_capacity(array);
 	CELL i;
 
+	if(length > 10)
+		length = 10;
+
 	for(i = 0; i < length; i++)
 	{
 		printf(" ");
@@ -201,9 +204,39 @@ void dump_objects(F_FIXNUM type)
 		if(type == -1 || type_of(obj) == type)
 		{
 			printf("%lx ",obj);
-			print_nested_obj(obj,3);
+			print_nested_obj(obj,1);
 			printf("\n");
 		}
+	}
+
+	/* end scan */
+	gc_off = false;
+}
+
+CELL obj;
+CELL look_for;
+
+void find_references_step(CELL *scan)
+{
+	if(look_for == *scan)
+	{
+		printf("%lx ",obj);
+		print_nested_obj(obj,1);
+		printf("\n");
+	}
+}
+
+void find_references(CELL look_for_)
+{
+	look_for = look_for_;
+
+	begin_scan();
+
+	CELL obj_;
+	while((obj_ = next_object()) != F)
+	{
+		obj = obj_;
+		do_slots(obj_,find_references_step);
 	}
 
 	/* end scan */

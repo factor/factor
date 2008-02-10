@@ -9,8 +9,6 @@ TUPLE: select-mx read-fdset write-fdset ;
 ! Factor's bit-arrays are an array of bytes, OS X expects
 ! FD_SET to be an array of cells, so we have to account for
 ! byte order differences on big endian platforms
-: little-endian? 1 <int> *char 1 = ; foldable
-
 : munge ( i -- i' )
     little-endian? [ BIN: 11000 bitxor ] unless ; inline
 

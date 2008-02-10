@@ -8,10 +8,10 @@ QUALIFIED: unix
 IN: tools.deploy.macosx
 
 : touch ( path -- )
-    { "touch" } swap add run-process drop ;
+    { "touch" } swap add try-process ;
 
 : rm ( path -- )
-    { "rm" "-rf" } swap add run-process drop ;
+    { "rm" "-rf" } swap add try-process ;
 
 : bundle-dir ( -- dir )
     vm parent-directory parent-directory ;

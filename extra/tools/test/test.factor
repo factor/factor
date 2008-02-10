@@ -61,9 +61,14 @@ M: expected-error summary
     dup vocab-source-loaded? [
         vocab-tests-path dup [
             dup ?resource-path exists? [
-                [ "temporary" forget-vocab ] with-compilation-unit
+                [
+                    "temporary" forget-vocab
+                ] with-compilation-unit
                 dup run-file
-                [ dup forget-source ] with-compilation-unit
+                [
+                    dup forget-source
+                    "temporary" forget-vocab
+                ] with-compilation-unit
             ] when
         ] when
     ] when drop ;
@@ -81,7 +86,7 @@ M: expected-error summary
     "Traceback" swap third write-object ;
 
 : test-failures. ( assoc -- )
-    dup [
+    [
         nl
         dup empty? [
             drop
@@ -90,15 +95,15 @@ M: expected-error summary
             "==== FAILING TESTS:" print
             [
                 swap vocab-heading.
-                [ nl failure. nl ] each
+                [ failure. nl ] each
             ] assoc-each
         ] if
     ] [
-        drop "==== NOTHING TO TEST" print
-    ] if ;
+        "==== NOTHING TO TEST" print
+    ] if* ;
 
 : run-tests ( prefix -- failures )
-    child-vocabs dup empty? [ f ] [
+    child-vocabs dup empty? [ drop f ] [
         [ dup run-test ] { } map>assoc
         [ second empty? not ] subset
     ] if ;
