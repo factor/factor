@@ -86,8 +86,8 @@ SYMBOL: last-update
 \ fetch-feed DEBUG add-error-logging
 
 : fetch-blogroll ( blogroll -- entries )
-    dup 0 <column>
-    swap [ fetch-feed ] parallel-map
+    dup 0 <column> swap 1 <column>
+    [ fetch-feed ] parallel-map
     [ [ <posting> ] with map ] 2map concat ;
 
 : sort-entries ( entries -- entries' )
@@ -120,9 +120,6 @@ SYMBOL: last-update
     { "Doug Coleman" "http://code-factor.blogspot.com/feeds/posts/default" "http://code-factor.blogspot.com/" }
     { "Daniel Ehrenberg" "http://useless-factor.blogspot.com/feeds/posts/default" "http://useless-factor.blogspot.com/" }
     { "Gavin Harrison" "http://gmh33.blogspot.com/feeds/posts/default" "http://gmh33.blogspot.com/" }
-    { "Kevin Marshall"
-    "http://blog.botfu.com/?cat=9&feed=atom"
-    "http://blog.botfu.com/" }
     { "Kio M. Smallwood"
     "http://sekenre.wordpress.com/feed/atom/"
     "http://sekenre.wordpress.com/" }

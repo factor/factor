@@ -96,7 +96,7 @@ M: x86-backend %dispatch ( -- )
         "n" operand "offset" operand ADD
         "n" operand HEX: 7f [+] JMP
         ! Fix up the displacement above
-        code-alignment dup bootstrap-cell 8 = 14 9 ? +
+        code-alignment dup bootstrap-cell 8 = 15 9 ? +
         building get dup pop* push
         align-code
     ] H{
