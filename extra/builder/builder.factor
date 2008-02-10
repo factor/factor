@@ -56,7 +56,7 @@ SYMBOL: builder-recipients
 
 : run-or-send-file ( desc message file -- )
   >r >r [ try-process ]         curry
-  r> r> [ email-string throw ] 2curry
+  r> r> [ email-file throw ] 2curry
   recover ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
