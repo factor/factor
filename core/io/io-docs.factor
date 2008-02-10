@@ -21,7 +21,8 @@ $nl
 { $subsection make-span-stream }
 { $subsection make-block-stream }
 { $subsection make-cell-stream }
-{ $subsection stream-write-table } ;
+{ $subsection stream-write-table }
+{ $see-also "io.timeouts" } ;
 
 ARTICLE: "stdio" "The default stream"
 "Various words take an implicit stream parameter from a variable to reduce stack shuffling."

@@ -66,11 +66,15 @@ SYMBOL: +append-environment+
         { +replace-environment+ [ ] }
     } case ;
 
-GENERIC: >descriptor ( desc -- desc )
+: string-array? ( obj -- ? )
+    dup sequence? [ [ string? ] all? ] [ drop f ] if ;
 
-M: string >descriptor +command+ associate ;
-M: sequence >descriptor +arguments+ associate ;
-M: assoc >descriptor >hashtable ;
+: >descriptor ( desc -- desc )
+    {
+        { [ dup string? ] [ +command+ associate ] }
+        { [ dup string-array? ] [ +arguments+ associate ] }
+        { [ dup assoc? ] [ >hashtable ] }
+    } cond ;
 
 HOOK: run-process* io-backend ( desc -- handle )
 
