@@ -135,8 +135,10 @@ SYMBOL: undefined-quot
 
 : here-as ( tag -- pointer ) here swap bitor ;
 
+USE: continuations
+
 : align-here ( -- )
-    here 8 mod 4 = [ 0 emit ] when ;
+    here 8 mod 4 = [ break heap-size drop 0 emit ] when ;
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
@@ -177,6 +179,7 @@ GENERIC: ' ( obj -- ptr )
     [ dup bignum-bits neg shift swap bignum-radix bitand ]
     [ ] unfold nip ;
 
+USE: continuations
 : emit-bignum ( n -- )
     dup 0 < [ 1 swap neg ] [ 0 swap ] if bignum>seq
     dup length 1+ emit-fixnum
@@ -215,8 +218,8 @@ M: f '
 : -1, -1 >bignum ' -1-offset fixup ;
 
 ! Beginning of the image
-
-: begin-image ( -- ) emit-header t, 0, 1, -1, ;
+: begin-image ( -- )
+    emit-header t, 0, 1, -1, ;
 
 ! Words
 
@@ -426,8 +429,8 @@ PRIVATE>
 : make-image ( arch -- )
     architecture [
         prepare-image
-        begin-image
         "resource:/core/bootstrap/stage1.factor" run-file
+        begin-image
         end-image
         image get
         architecture get boot-image-name resource-path
