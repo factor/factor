@@ -91,7 +91,7 @@ M: windows-nt-io cancel-io
     port-handle win32-file-handle CancelIo drop ;
 
 M: windows-nt-io io-multiplex ( ms -- )
-    expire-timeouts drain-overlapped ;
+    drain-overlapped ;
 
 M: windows-nt-io init-io ( -- )
     <master-completion-port> master-completion-port set-global

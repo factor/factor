@@ -56,13 +56,16 @@ GENERIC: generate-node ( node -- next )
 : generate-nodes ( node -- )
     [ node@ generate-node ] iterate-nodes end-basic-block ;
 
+: init-generate-nodes ( -- )
+    init-templates
+    %save-word-xt
+    %prologue-later
+    current-label-start define-label
+    current-label-start resolve-label ;
+    
 : generate ( word label node -- )
     [
-        init-templates
-        %save-word-xt
-        %prologue-later
-        current-label-start define-label
-        current-label-start resolve-label
+        init-generate-nodes
         [ generate-nodes ] with-node-iterator
     ] generate-1 ;
 
@@ -168,17 +171,23 @@ M: #if generate-node
         ] if %dispatch-label
     ] each ;
 
+: generate-dispatch ( node -- )
+    %dispatch dispatch-branches init-templates ;
+
 M: #dispatch generate-node
     #! The order here is important, dispatch-branches must
     #! run after %dispatch, so that each branch gets the
     #! correct register state
     tail-call? [
-        %jump-dispatch dispatch-branches
+        generate-dispatch iterate-next
     ] [
-        0 frame-required
-        %call-dispatch >r dispatch-branches r> resolve-label
-    ] if
-    init-templates iterate-next ;
+        compiling-word get gensym [
+            rot [
+                init-generate-nodes
+                generate-dispatch
+            ] generate-1
+        ] keep generate-call
+    ] if ;
 
 ! #call
 : define-intrinsics ( word intrinsics -- )

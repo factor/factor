@@ -4,7 +4,7 @@ USING: logging.server sequences namespaces concurrency
 words kernel arrays shuffle tools.annotations
 prettyprint.config prettyprint debugger io.streams.string
 splitting continuations effects arrays.lib parser strings
-combinators.lib ;
+combinators.lib quotations ;
 IN: logging
 
 SYMBOL: DEBUG
@@ -112,9 +112,13 @@ PRIVATE>
 
 : log-critical ( error word -- ) CRITICAL (log-error) ;
 
+: stack-balancer ( effect word -- quot )
+    >r dup effect-in length r> [ over >r ERROR log-stack r> ndrop ] 2curry
+    swap effect-out length f <repetition> append >quotation ;
+
 : error-logging-quot ( quot word -- quot' )
-    dup stack-effect effect-in length
-    [ >r log-error r> ndrop ] 2curry
+    [ [ log-error ] curry ] keep
+    [ stack-effect ] keep stack-balancer compose
     [ recover ] 2curry ;
 
 : add-error-logging ( word level -- )

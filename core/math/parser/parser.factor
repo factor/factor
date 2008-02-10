@@ -41,6 +41,9 @@ DEFER: base>
 <PRIVATE
 
 SYMBOL: radix
+SYMBOL: negative?
+
+: sign negative? get "-" "+" ? ;
 
 : with-radix ( radix quot -- )
     radix swap with-variable ; inline
@@ -48,7 +51,7 @@ SYMBOL: radix
 : (base>) ( str -- n ) radix get base> ;
 
 : whole-part ( str -- m n )
-    "+" split1 >r (base>) r>
+    sign split1 >r (base>) r>
     dup [ (base>) ] [ drop 0 swap ] if ;
 
 : string>ratio ( str -- a/b )
@@ -70,7 +73,7 @@ PRIVATE>
 
 : base> ( str radix -- n/f )
     [
-        "-" ?head >r
+        "-" ?head dup negative? set >r
         {
             { [ CHAR: / over member? ] [ string>ratio ] }
             { [ CHAR: . over member? ] [ string>float ] }
@@ -114,9 +117,9 @@ M: integer >base
 M: ratio >base
     [
         [
-            dup 0 < [ "-" % neg ] when
+            dup 0 < dup negative? set [ "-" % neg ] when
             1 /mod
-            >r dup zero? [ drop ] [ (>base) % "+" % ] if r>
+            >r dup zero? [ drop ] [ (>base) % sign % ] if r>
             dup numerator (>base) %
             "/" %
             denominator (>base) %

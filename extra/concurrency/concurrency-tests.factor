@@ -134,3 +134,8 @@ SYMBOL: value
     [ 3 ] future
     dup ?future swap ?future
 ] unit-test
+
+! Another race
+[ 3 ] [
+    [ 3 yield ] future ?future
+] unit-test

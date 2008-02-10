@@ -40,14 +40,8 @@ SYMBOL: this-test
     dup word? [ 1quotation ] when
     [ infer drop ] curry [ ] swap unit-test ;
 
-TUPLE: expected-error ;
-
-M: expected-error summary
-    drop
-    "The unit test expected the quotation to throw an error" ;
-
 : must-fail-with ( quot pred -- )
-    >r [ expected-error construct-empty throw ] compose r>
+    >r [ f ] compose r>
     [ recover ] 2curry
     [ t ] swap unit-test ;
 

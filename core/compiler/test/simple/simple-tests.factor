@@ -1,6 +1,6 @@
 USING: compiler tools.test kernel kernel.private
 combinators.private math.private math combinators strings
-alien arrays ;
+alien arrays memory ;
 IN: temporary
 
 ! Test empty word
@@ -47,6 +47,8 @@ IN: temporary
 [ 3 1 ] [ 1 [ { [ bar 1 ] [ 3 1 ] } dispatch ] compile-call ] unit-test
 [ 4 1 3 ] [ 0 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
 [ 3 1 3 ] [ 1 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
+
+[ 2 3 ] [ 1 [ { [ code-gc 1 ] [ code-gc 2 ] } dispatch 3 ] compile-call ] unit-test
 
 ! Labels
 

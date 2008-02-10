@@ -21,7 +21,7 @@ void print_word(F_WORD* word, CELL nesting)
 	else
 	{
 		printf("#<not a string: ");
-		print_nested_obj(word->name,nesting - 1);
+		print_nested_obj(word->name,nesting);
 		printf(">");
 	}
 }
@@ -44,13 +44,13 @@ void print_array(F_ARRAY* array, CELL nesting)
 	for(i = 0; i < length; i++)
 	{
 		printf(" ");
-		print_nested_obj(array_nth(array,i),nesting - 1);
+		print_nested_obj(array_nth(array,i),nesting);
 	}
 }
 
-void print_nested_obj(CELL obj, CELL nesting)
+void print_nested_obj(CELL obj, F_FIXNUM nesting)
 {
-	if(nesting == 0)
+	if(nesting <= 0)
 	{
 		printf(" ... ");
 		return;
@@ -204,7 +204,7 @@ void dump_objects(F_FIXNUM type)
 		if(type == -1 || type_of(obj) == type)
 		{
 			printf("%lx ",obj);
-			print_nested_obj(obj,1);
+			print_nested_obj(obj,2);
 			printf("\n");
 		}
 	}
@@ -213,34 +213,56 @@ void dump_objects(F_FIXNUM type)
 	gc_off = false;
 }
 
-CELL obj;
-CELL look_for;
-
-void find_references_step(CELL *scan)
+void find_data_references(CELL look_for)
 {
-	if(look_for == *scan)
+	CELL obj;
+
+	void find_references_step(CELL *scan)
 	{
-		printf("%lx ",obj);
-		print_nested_obj(obj,1);
-		printf("\n");
+		if(look_for == *scan)
+		{
+			printf("%lx ",obj);
+			print_nested_obj(obj,2);
+			printf("\n");
+		}
 	}
-}
-
-void find_references(CELL look_for_)
-{
-	look_for = look_for_;
 
 	begin_scan();
 
-	CELL obj_;
-	while((obj_ = next_object()) != F)
-	{
-		obj = obj_;
-		do_slots(obj_,find_references_step);
-	}
+	while((obj = next_object()) != F)
+		do_slots(UNTAG(obj),find_references_step);
 
 	/* end scan */
 	gc_off = false;
+}
+
+void find_code_references(CELL look_for)
+{
+	void find_references_step(F_COMPILED *compiled, CELL code_start,
+		CELL reloc_start, CELL literals_start)
+	{
+		CELL scan;
+		CELL literal_end = literals_start + compiled->literals_length;
+
+		for(scan = literals_start; scan < literal_end; scan += CELLS)
+		{
+			CELL code_start = (CELL)(compiled + 1);
+			CELL literal_start = code_start
+				+ compiled->code_length
+				+ compiled->reloc_length;
+
+			CELL obj = get(literal_start);
+
+			if(look_for == get(scan))
+			{
+				printf("%lx ",obj);
+				print_nested_obj(obj,2);
+				printf("\n");
+			}
+		}
+	}
+
+	iterate_code_heap(find_references_step);
 }
 
 void factorbug(void)
@@ -265,6 +287,9 @@ void factorbug(void)
 	printf("addr <card>      -- print address containing card\n");
 	printf("data             -- data heap dump\n");
 	printf("words            -- words dump\n");
+	printf("tuples           -- tuples dump\n");
+	printf("refs <addr>      -- find data heap references to object\n");
+	printf("push <addr>      -- push object on data stack - NOT SAFE\n");
 	printf("code             -- code heap dump\n");
 
 	for(;;)
@@ -335,8 +360,26 @@ void factorbug(void)
 			save_image(STR_FORMAT("fep.image"));
 		else if(strcmp(cmd,"data") == 0)
 			dump_objects(-1);
+		else if(strcmp(cmd,"refs") == 0)
+		{
+			CELL addr;
+			scanf("%lx",&addr);
+			printf("Data heap references:\n");
+			find_data_references(addr);
+			printf("Code heap references:\n");
+			find_code_references(addr);
+			printf("\n");
+		}
 		else if(strcmp(cmd,"words") == 0)
 			dump_objects(WORD_TYPE);
+		else if(strcmp(cmd,"tuples") == 0)
+			dump_objects(TUPLE_TYPE);
+		else if(strcmp(cmd,"push") == 0)
+		{
+			CELL addr;
+			scanf("%lx",&addr);
+			dpush(addr);
+		}
 		else if(strcmp(cmd,"code") == 0)
 			dump_heap(&code_heap);
 		else
