@@ -5,8 +5,8 @@ USING: arrays kernel math namespaces tools.test
 heaps heaps.private ;
 IN: temporary
 
-[ <min-heap> heap-pop ] unit-test-fails
-[ <max-heap> heap-pop ] unit-test-fails
+[ <min-heap> heap-pop ] must-fail
+[ <max-heap> heap-pop ] must-fail
 
 [ t ] [ <min-heap> heap-empty? ] unit-test
 [ f ] [ <min-heap> 1 t pick heap-push heap-empty? ] unit-test

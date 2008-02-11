@@ -64,7 +64,7 @@ dup XKeyEvent-state swap event>keyname 2array ;
 "handle-map-request" !( event wm-root -- ) [
   { { [ over XMapRequestEvent-window managed? ]
       [ "<wm-root> handle-map-request :: window already managed" print flush
-      	2drop ] }
+        2drop ] }
     { [ t ] [ drop XMapRequestEvent-window <wm-frame> <<- create drop ] } }
   cond ]
 
@@ -88,7 +88,7 @@ dup XKeyEvent-state swap event>keyname 2array ;
     { [ over CWX? ] [ over XConfigureRequestEvent-x <-- set-x ] }
     { [ over CWY? ] [ over XConfigureRequestEvent-y <-- set-y ] }
     { [ t ] [ "<wm-root> handle-configure-request :: move not requested"
-      	      print flush ] } }
+              print flush ] } }
   cond
 
   { { [ over dup CWWidth? swap CWHeight? and ]
@@ -96,7 +96,7 @@ dup XKeyEvent-state swap event>keyname 2array ;
     { [ over CWWidth? ] [ over XConfigureRequestEvent-width <-- set-width ] }
     { [ over CWHeight? ] [ over XConfigureRequestEvent-height <-- set-height ] }
     { [ t ] [ "<wm-root> handle-configure-request :: resize not requested"
-      	      print flush ] } }
+              print flush ] } }
   cond
   2drop ]
 

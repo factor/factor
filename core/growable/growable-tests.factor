@@ -9,16 +9,16 @@ IN: temporary
 
 ! overflow bugs
 [ "hi" most-positive-fixnum 2 * 2 + V{ } clone set-nth ]
-unit-test-fails
+must-fail
 
 [ most-positive-fixnum 2 * 2 + { 1 } clone nth ]
-unit-test-fails
+must-fail
 
 [ most-positive-fixnum 2 * 2 + V{ } clone lengthen ]
-unit-test-fails
+must-fail
 
 [ most-positive-fixnum 2 * 2 + V{ } clone set-length ]
-unit-test-fails
+must-fail
 
 [ ] [
     10 V{ } [ set-length ] keep

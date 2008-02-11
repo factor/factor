@@ -22,7 +22,7 @@ splitting assocs ;
     os "wince" = ; foldable
 
 : winnt? ( -- ? )
-    os "windows" = ; foldable
+    os "winnt" = ; foldable
 
 : windows? ( -- ? )
     wince? winnt? or ; foldable
@@ -39,11 +39,11 @@ splitting assocs ;
 
 : unix? ( -- ? )
     os {
-        "freebsd" "openbsd" "linux" "macosx" "solaris"
+        "freebsd" "openbsd" "netbsd" "linux" "macosx" "solaris"
     } member? ;
 
 : bsd? ( -- ? )
-    os { "freebsd" "openbsd" "macosx" } member? ;
+    os { "freebsd" "openbsd" "netbsd" "macosx" } member? ;
 
 : linux? ( -- ? )
     os "linux" = ;

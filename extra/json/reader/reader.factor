@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel parser-combinators namespaces sequences promises strings 
        assocs math math.parser math.vectors math.functions
-       lazy-lists hashtables ;
+       lazy-lists hashtables ascii ;
 IN: json.reader
 
 ! Grammar for JSON from RFC 4627
@@ -104,7 +104,7 @@ LAZY: 'digit1-9' ( -- parser )
 LAZY: 'digit0-9' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
 
-: decimal>integer ( seq -- num ) 10 swap digits>integer ;
+: decimal>integer ( seq -- num ) 10 digits>integer ;
 
 LAZY: 'int' ( -- parser )
   'zero' 

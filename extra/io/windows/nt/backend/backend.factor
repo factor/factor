@@ -1,45 +1,10 @@
 USING: alien alien.c-types arrays assocs combinators
 continuations destructors io io.backend io.nonblocking
-io.windows libc kernel math namespaces sequences threads
-tuples.lib windows windows.errors windows.kernel32 strings
-splitting io.files qualified ;
+io.windows libc kernel math namespaces sequences
+threads tuples.lib windows windows.errors windows.kernel32
+strings splitting io.files qualified ascii combinators.lib ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
-
-: unicode-prefix ( -- seq )
-    "\\\\?\\" ; inline
-
-M: windows-nt-io root-directory? ( path -- ? )
-    dup length 2 = [
-        dup first Letter?
-        swap second CHAR: : = and
-    ] [
-        drop f
-    ] if ;
-
-M: windows-nt-io normalize-pathname ( string -- string )
-    dup string? [ "pathname must be a string" throw ] unless
-    "/" split "\\" join
-    {
-        ! empty
-        { [ dup empty? ] [ "empty path" throw ] }
-        ! .\\foo
-        { [ dup ".\\" head? ] [
-            >r unicode-prefix cwd r> 1 tail 3append
-        ] }
-        ! c:\\foo
-        { [ dup 1 tail ":" head? ] [ >r unicode-prefix r> append ] }
-        ! \\\\?\\c:\\foo
-        { [ dup unicode-prefix head? ] [ ] }
-        ! foo.txt ..\\foo.txt
-        { [ t ] [
-            [
-                unicode-prefix % cwd %
-                dup first CHAR: \\ = [ CHAR: \\ , ] unless %
-            ] "" make
-        ] }
-    } cond [ "/\\." member? ] right-trim
-    dup peek CHAR: : = [ "\\" append ] when ;
 
 SYMBOL: io-hash
 
@@ -122,19 +87,11 @@ M: windows-nt-io add-completion ( handle -- )
 : drain-overlapped ( timeout -- )
     handle-overlapped [ 0 drain-overlapped ] unless ;
 
-: maybe-expire ( io-callbck -- )
-    io-callback-port
-    dup timeout? [
-        port-handle win32-file-handle CancelIo drop
-    ] [
-        drop
-    ] if ;
-
-: cancel-timeout ( -- )
-    io-hash get-global [ nip maybe-expire ] assoc-each ;
+M: windows-nt-io cancel-io
+    port-handle win32-file-handle CancelIo drop ;
 
 M: windows-nt-io io-multiplex ( ms -- )
-    cancel-timeout drain-overlapped ;
+    drain-overlapped ;
 
 M: windows-nt-io init-io ( -- )
     <master-completion-port> master-completion-port set-global

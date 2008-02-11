@@ -263,3 +263,23 @@ cell-bits 32 = [
         \ fixnum-shift inlined?
     ] unit-test
 ] when
+
+[ t ] [
+    [ B{ 1 0 } *short 0 number= ]
+    \ number= inlined?
+] unit-test
+
+[ t ] [
+    [ B{ 1 0 } *short 0 { number number } declare number= ]
+    \ number= inlined?
+] unit-test
+
+[ t ] [
+    [ B{ 1 0 } *short 0 = ]
+    \ number= inlined?
+] unit-test
+
+[ t ] [
+    [ B{ 1 0 } *short dup number? [ 0 number= ] [ drop f ] if ]
+    \ number= inlined?
+] unit-test

@@ -1,6 +1,7 @@
 USING: help.markup help.syntax ui.commands ui.operations
 ui.tools.search ui.tools.workspace editors vocabs.loader
-kernel sequences prettyprint tools.test strings ;
+kernel sequences prettyprint tools.test strings
+unicode.categories unicode.case ;
 IN: help.tutorial
 
 ARTICLE: "first-program-start" "Creating a vocabulary for your first program"
@@ -23,7 +24,7 @@ $nl
 $nl
 "Now, we tell Factor that all definitions in this source file should go into the " { $snippet "palindrome" } " vocabulary using the " { $link POSTPONE: IN: } " word:"
 { $code "IN: palindrome" }
-"You are now ready to go onto the nex section." ;
+"You are now ready to go on to the next section: " { $link "first-program-logic" } "." ;
 
 ARTICLE: "first-program-logic" "Writing some logic in your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
@@ -56,7 +57,7 @@ $nl
 { $code "\\ = see" }
 "It's in the " { $vocab-link "kernel" } " vocabulary, which we've already added to the search path."
 
-"Now press " { $command workspace "workflow" refresh-all } " again, and the source file should reload without any errors." ;
+"Now press " { $command workspace "workflow" refresh-all } " again, and the source file should reload without any errors. You can now go on and learn about " { $link "first-program-test" } "." ;
 
 ARTICLE: "first-program-test" "Testing your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
@@ -92,7 +93,7 @@ $nl
 }
 "Now, you can run unit tests:"
 { $code "\"palindrome\" test" }
-"It should report that all tests have passed." ;
+"It should report that all tests have passed. Now you can read about " { $link "first-program-extend" } "." ;
 
 ARTICLE: "first-program-extend" "Extending your first program"
 "Our palindrome program works well, however we'd like to extend it to ignore spaces and non-alphabetical characters in the input."
@@ -134,7 +135,7 @@ $nl
 { $code "[ Letter? ] subset >lower" }
 "This code starts with a string on the stack, removes non-alphabetical characters, and converts the result to lower case, leaving a new string on the stack. We put this code in a new word, and add the new word to " { $snippet "palindrome.factor" } ":"
 { $code ": normalize ( str -- newstr ) [ Letter? ] subset >lower ;" }
-"You will need to add " { $vocab-link "strings" } " to the vocabulary search path, so that " { $link Letter? } " can be used in the source file."
+"You will need to add " { $vocab-link "unicode.categories" } " to the vocabulary search path, so that " { $link Letter? } " can be used in the source file."
 $nl
 "We modify " { $snippet "palindrome?" } " to first apply " { $snippet "normalize" } " to its input:"
 { $code ": palindrome? ( str -- ? ) normalize dup reverse = ;" }

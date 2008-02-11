@@ -43,5 +43,5 @@ USING: io io.streams.string kernel namespaces pack strings tools.test ;
 
 [ "FRAM" ] [ "FRAM\0" [ read-c-string ] string-in ] unit-test
 [ f ] [ "" [ read-c-string ] string-in ] unit-test
-[ 5 ] [ "FRAM\0\u0005\0\0\0\0\0\0\0" [ read-c-string drop read-u64 ] string-in ] unit-test
+[ 5 ] [ "FRAM\0\u000005\0\0\0\0\0\0\0" [ read-c-string drop read-u64 ] string-in ] unit-test
 

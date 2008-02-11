@@ -35,13 +35,13 @@ PRIVATE>
     #! pad string with = when not enough bits
     dup length dup 3 mod - cut swap
     [
-        3 group [ encode3 % ] each
+        3 <groups> [ encode3 % ] each
         dup empty? [ drop ] [ >base64-rem % ] if
     ] "" make ;
 
 : base64> ( base64 -- str )
     #! input length must be a multiple of 4
     [
-        [ 4 group [ decode4 % ] each ] keep [ CHAR: = = not ] count-end 
+        [ 4 <groups> [ decode4 % ] each ] keep [ CHAR: = = not ] count-end 
     ] SBUF" " make swap [ dup pop* ] times >string ;
 

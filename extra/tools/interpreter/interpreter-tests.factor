@@ -99,7 +99,7 @@ IN: temporary
 [ [ [ 3 swap continue-with ] callcc1 2 * ] test-interpreter ] unit-test
 
 [ { 6 } ]
-[ [ [ 3 throw ] catch 2 * ] test-interpreter ] unit-test
+[ [ [ 3 throw ] [ 2 * ] recover ] test-interpreter ] unit-test
 
 [ { "{ 1 2 3 }\n" } ] [
     [ [ { 1 2 3 } . ] string-out ] test-interpreter

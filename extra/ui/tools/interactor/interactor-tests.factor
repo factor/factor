@@ -1,4 +1,4 @@
 IN: temporary
-USING: ui.tools.interactor tools.test.inference ;
+USING: ui.tools.interactor tools.test ;
 
 \ <interactor> must-infer

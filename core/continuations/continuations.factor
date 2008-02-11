@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
 namespaces math splitting sorting quotations assocs ;
@@ -16,9 +16,6 @@ SYMBOL: restarts
 : >c ( continuation -- ) catchstack* push ;
 
 : c> ( -- continuation ) catchstack* pop ;
-
-: (catch) ( quot -- newquot )
-    [ swap >c call c> drop ] curry ; inline
 
 : dummy ( -- obj )
     #! Optimizing compiler assumes stack won't be messed with
@@ -120,11 +117,8 @@ PRIVATE>
     catchstack* empty? [ die ] when
     dup save-error c> continue-with ;
 
-: catch ( try -- error/f )
-    (catch) [ f ] compose callcc1 ; inline
-
 : recover ( try recovery -- )
-    >r (catch) r> ifcc ; inline
+    >r [ swap >c call c> drop ] curry r> ifcc ; inline
 
 : cleanup ( try cleanup-always cleanup-error -- )
     over >r compose [ dip rethrow ] curry
@@ -134,6 +128,11 @@ PRIVATE>
     [
         [ [ , f ] compose [ , drop t ] recover ] curry all?
     ] { } make peek swap [ rethrow ] when ; inline
+
+GENERIC: dispose ( object -- )
+
+: with-disposal ( object quot -- )
+    over [ dispose ] curry [ ] cleanup ; inline
 
 TUPLE: condition restarts continuation ;
 

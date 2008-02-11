@@ -58,6 +58,7 @@ SYMBOL: super-sent-messages
         "NSPasteboard"
         "NSResponder"
         "NSSavePanel"
+        "NSScreen"
         "NSView"
         "NSWindow"
         "NSWorkspace"

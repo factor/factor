@@ -8,7 +8,7 @@ assocs quotations sequences.private io.binary io.crc32
 io.streams.string layouts splitting math.intervals
 math.floats.private tuples tuples.private classes
 optimizer.def-use optimizer.backend optimizer.pattern-match
-float-arrays combinators.private combinators ;
+float-arrays sequences.private combinators ;
 
 ! the output of <tuple> and <tuple-boa> has the class which is
 ! its second-to-last input
@@ -98,7 +98,7 @@ float-arrays combinators.private combinators ;
     [
         num-types get swap [
             [
-                [ type>class 0 `input class, ] keep
+                [ type>class object or 0 `input class, ] keep
                 0 `output literal,
             ] set-constraints
         ] curry each
@@ -124,19 +124,19 @@ float-arrays combinators.private combinators ;
 ] each
 
 \ push-all
-{ { string array } { sbuf vector } }
+{ { string sbuf } { array vector } }
 "specializer" set-word-prop
 
 \ append
-{ { string array } { string array } }
+{ { string string } { array array } }
 "specializer" set-word-prop
 
 \ subseq
-{ fixnum fixnum { string array } }
+{ { fixnum fixnum string } { fixnum fixnum array } }
 "specializer" set-word-prop
 
 \ reverse-here
-{ { string array } }
+{ { string } { array } }
 "specializer" set-word-prop
 
 \ mismatch
@@ -147,9 +147,9 @@ float-arrays combinators.private combinators ;
 
 \ >string { sbuf } "specializer" set-word-prop
 
-\ >array { { string vector } } "specializer" set-word-prop
+\ >array { { string } { vector } } "specializer" set-word-prop
 
-\ >vector { { array vector } } "specializer" set-word-prop
+\ >vector { { array } { vector } } "specializer" set-word-prop
 
 \ >sbuf { string } "specializer" set-word-prop
 
@@ -163,6 +163,6 @@ float-arrays combinators.private combinators ;
 
 \ assoc-stack { vector } "specializer" set-word-prop
 
-\ >le { { fixnum bignum } fixnum } "specializer" set-word-prop
+\ >le { { fixnum fixnum } { bignum fixnum } } "specializer" set-word-prop
 
-\ >be { { fixnum bignum } fixnum } "specializer" set-word-prop
+\ >be { { bignum fixnum } { fixnum fixnum } } "specializer" set-word-prop

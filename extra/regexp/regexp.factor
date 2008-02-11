@@ -1,7 +1,7 @@
 USING: arrays combinators kernel lazy-lists math math.parser
 namespaces parser parser-combinators parser-combinators.simple
 promises quotations sequences combinators.lib strings
-assocs prettyprint.backend memoize ;
+assocs prettyprint.backend memoize unicode.case unicode.categories ;
 USE: io
 IN: regexp
 
@@ -77,7 +77,7 @@ PRIVATE>
 
 : 'hex' ( -- parser )
     "x" token 'hex-digit' 2 exactly-n &>
-    "u" token 'hex-digit' 4 exactly-n &> <|>
+    "u" token 'hex-digit' 6 exactly-n &> <|>
     [ hex> ] <@ ;
 
 : satisfy-tokens ( assoc -- parser )

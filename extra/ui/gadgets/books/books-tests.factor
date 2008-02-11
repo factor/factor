@@ -1,4 +1,4 @@
 IN: temporary
-USING: tools.test.inference ui.gadgets.books ;
+USING: tools.test ui.gadgets.books ;
 
 \ <book> must-infer

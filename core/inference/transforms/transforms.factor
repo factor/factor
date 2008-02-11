@@ -54,6 +54,10 @@ M: pair (bitfield-quot) ( spec -- quot )
 
 \ bitfield [ bitfield-quot ] 1 define-transform
 
+\ flags [
+    [ 0 , [ , \ bitor , ] each ] [ ] make
+] 1 define-transform
+
 ! Tuple operations
 : [get-slots] ( slots -- quot )
     [ [ 1quotation , \ keep , ] each \ drop , ] [ ] make ;

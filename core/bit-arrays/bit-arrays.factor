@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math alien kernel kernel.private sequences
+USING: math alien.accessors kernel kernel.private sequences
 sequences.private ;
 IN: bit-arrays
 
@@ -52,5 +52,3 @@ M: bit-array resize
     resize-bit-array ;
 
 INSTANCE: bit-array sequence
-INSTANCE: bit-array simple-c-ptr
-INSTANCE: bit-array c-ptr

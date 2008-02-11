@@ -2,7 +2,7 @@ USING: arrays continuations ui.tools.listener ui.tools.walker
 ui.tools.workspace inspector kernel namespaces sequences threads
 listener tools.test ui ui.gadgets ui.gadgets.worlds
 ui.gadgets.packs vectors ui.tools tools.interpreter
-tools.interpreter.debug tools.test.inference tools.test.ui ;
+tools.interpreter.debug tools.test.ui ;
 IN: temporary
 
 \ <walker> must-infer

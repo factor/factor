@@ -25,13 +25,9 @@ $nl
 ABOUT: "number-strings"
 
 HELP: digits>integer
-{ $values { "radix" "an integer between 2 and 36" } { "seq" "a sequence of integers" } { "n" integer } }
+{ $values { "seq" "a sequence of integers" } { "radix" "an integer between 2 and 36" } { "n" integer } }
 { $description "Converts a sequence of digits (with most significant digit first) into an integer." }
 { $notes "This is one of the factors of " { $link string>number } "." } ;
-
-HELP: valid-digits?
-{ $values { "radix" "an integer between 2 and 36" } { "seq" "a sequence of integers" } { "?" "a boolean" } }
-{ $description "Tests if this sequence of integers represents a valid integer in the given radix." } ;
 
 HELP: >digit
 { $values { "n" "an integer between 0 and 35" } { "ch" "a character" } }
@@ -42,11 +38,6 @@ HELP: digit>
 { $values { "ch" "a character" } { "n" integer } }
 { $description "Converts a character representation of a digit to an integer." }
 { $notes "This is one of the factors of " { $link string>number } "." } ;
-
-HELP: string>integer
-{ $values { "str" string } { "radix" "an integer between 2 and 36" } { "n/f" "an integer or " { $link f } } }
-{ $description "Creates an integer from a string representation." }
-{ $notes "The " { $link base> } " word is more general." } ;
 
 HELP: base>
 { $values { "str" string } { "radix" "an integer between 2 and 36" } { "n/f" "a real number or " { $link f } } }

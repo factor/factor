@@ -1,6 +1,6 @@
 USING: help.markup help.syntax generic.math generic.standard
 words classes definitions kernel alien combinators sequences 
-math ;
+math quotations ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"
@@ -107,10 +107,6 @@ HELP: make-generic
 { $description "Regenerates the definition of a generic word by applying the method combination to the set of defined methods." }
 $low-level-note ;
 
-HELP: init-methods
-{ $values { "word" word } }
-{ $description "Prepare to define a generic word." } ;
-
 HELP: define-generic
 { $values { "word" word } { "combination" "a method combination" } }
 { $description "Defines a generic word. A method combination is an object which responds to the " { $link perform-combination } " generic word." }
@@ -125,15 +121,11 @@ HELP: method
 { $description "Looks up a method definition." }
 { $class-description "Instances of this class are methods. A method consists of a quotation together with a source location where it was defined." } ;
 
-{ method method-def method-loc define-method POSTPONE: M: } related-words
+{ method define-method POSTPONE: M: } related-words
 
 HELP: <method>
 { $values { "def" "a quotation" } { "method" "a new method definition" } }
 { $description "Creates a new  "{ $link method } " instance." } ;
-
-HELP: sort-methods
-{ $values { "assoc" "an assoc mapping classes to methods" } { "newassoc" "an association list mapping classes to quotations" } }
-{ $description "Outputs a sequence of pairs, where the first element of each pair is a class and the second element is the corresponding method quotation. The methods are sorted by class order; see " { $link sort-classes } "." } ;
 
 HELP: methods
 { $values { "word" generic } { "assoc" "an association list mapping classes to quotations" } }
@@ -154,7 +146,7 @@ HELP: with-methods
 $low-level-note ;
 
 HELP: define-method
-{ $values { "method" "an instance of " { $link method } } { "class" class } { "generic" generic } }
+{ $values { "method" quotation } { "class" class } { "generic" generic } }
 { $description "Defines a method. This is the runtime equivalent of " { $link POSTPONE: M: } "." } ;
 
 HELP: implementors

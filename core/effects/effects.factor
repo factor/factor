@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces sequences strings words assocs
 combinators ;
@@ -41,13 +41,13 @@ M: integer (stack-picture) drop "object" ;
         ")" %
     ] "" make ;
 
-: stack-effect ( word -- effect/f )
-    dup symbol? [
-        drop 0 1 <effect>
-    ] [
-        { "declared-effect" "inferred-effect" }
-        swap word-props [ at ] curry map [ ] find nip
-    ] if ;
+GENERIC: stack-effect ( word -- effect/f )
+
+M: symbol stack-effect drop 0 1 <effect> ;
+
+M: word stack-effect
+    { "declared-effect" "inferred-effect" }
+    swap word-props [ at ] curry map [ ] find nip ;
 
 M: effect clone
     [ effect-in clone ] keep effect-out clone <effect> ;

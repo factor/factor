@@ -75,5 +75,5 @@ sequences tools.test namespaces ;
 "b" get buffer-free
 
 100 <buffer> "b" set
-[ 1000 "b" get n>buffer ] unit-test-fails
+[ 1000 "b" get n>buffer ] must-fail
 "b" get buffer-free

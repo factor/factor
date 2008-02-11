@@ -1,7 +1,6 @@
 USING: ui.gadgets.editors tools.test kernel io io.streams.plain
-definitions namespaces ui.gadgets
-ui.gadgets.grids prettyprint documents ui.gestures
-tools.test.inference tools.test.ui models ;
+definitions namespaces ui.gadgets ui.gadgets.grids prettyprint
+documents ui.gestures tools.test.ui models ;
 
 [ "foo bar" ] [
     <editor> "editor" set

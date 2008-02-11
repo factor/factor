@@ -7,7 +7,7 @@ source-files strings tools.completion tools.crossref tuples
 ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.lists ui.gadgets.scrollers ui.gadgets.tracks
 ui.gestures ui.operations vocabs words vocabs.loader
-tools.browser ;
+tools.browser unicode.case ;
 IN: ui.tools.search
 
 TUPLE: live-search field list ;
@@ -39,8 +39,8 @@ TUPLE: search-field ;
 search-field H{
     { T{ key-down f f "UP" } [ find-search-list select-previous ] }
     { T{ key-down f f "DOWN" } [ find-search-list select-next ] }
-	{ T{ key-down f f "PAGE_UP" } [ find-search-list list-page-up ] }
-	{ T{ key-down f f "PAGE_DOWN" } [ find-search-list list-page-down ] }
+    { T{ key-down f f "PAGE_UP" } [ find-search-list list-page-up ] }
+    { T{ key-down f f "PAGE_DOWN" } [ find-search-list list-page-down ] }
     { T{ key-down f f "RET" } [ find-search-list invoke-value-action ] }
 } set-gestures
 

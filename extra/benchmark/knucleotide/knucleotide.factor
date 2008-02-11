@@ -1,6 +1,6 @@
 USING: kernel io io.files splitting strings
        hashtables sequences assocs math namespaces prettyprint
-       math.parser combinators arrays sorting ;
+       math.parser combinators arrays sorting unicode.case ;
 
 IN: benchmark.knucleotide
 

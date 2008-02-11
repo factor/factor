@@ -63,7 +63,8 @@ IN: hardware-info.windows
 : system-windows-directory ( -- str )
     \ GetSystemWindowsDirectory get-directory ;
 
+<<
 {
     { [ wince? ] [ "hardware-info.windows.ce" ] }
     { [ winnt? ] [ "hardware-info.windows.nt" ] }
-} cond [ require ] when*
+} cond [ require ] when* >>

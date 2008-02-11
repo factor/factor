@@ -9,23 +9,27 @@ quotations io.launcher words.private tools.deploy.config
 bootstrap.image ;
 IN: tools.deploy.backend
 
-: (copy-lines) ( stream -- stream )
-    dup stream-readln [ print flush (copy-lines) ] when* ;
+: (copy-lines) ( stream -- )
+    dup stream-readln dup
+    [ print flush (copy-lines) ] [ 2drop ] if ;
 
 : copy-lines ( stream -- )
-    [ (copy-lines) ] [ stream-close ] [ ] cleanup ;
+    [ (copy-lines) ] with-disposal ;
 
-: run-with-output ( descriptor -- )
-    <process-stream>
-    dup duplex-stream-out stream-close
-    copy-lines ;
-
-: boot-image-name ( -- string )
-    "boot." my-arch ".image" 3append ;
+: run-with-output ( arguments -- )
+    [
+        +arguments+ set
+        +stdout+ +stderr+ set
+    ] H{ } make-assoc <process-stream>
+    dup duplex-stream-out dispose
+    dup copy-lines
+    process-stream-process wait-for-process zero? [
+        "Deployment failed" throw
+    ] unless ;
 
 : make-boot-image ( -- )
     #! If stage1 image doesn't exist, create one.
-    boot-image-name resource-path exists?
+    my-boot-image-name resource-path exists?
     [ my-arch make-image ] unless ;
 
 : ?, [ , ] [ drop ] if ;
@@ -45,7 +49,7 @@ IN: tools.deploy.backend
 
 : staging-command-line ( config -- flags )
     [
-        "-i=" boot-image-name append ,
+        "-i=" my-boot-image-name append ,
 
         "-output-image=" over staging-image-name append ,
 
@@ -76,6 +80,7 @@ IN: tools.deploy.backend
     ] { } make ;
 
 : make-deploy-image ( vm image vocab config -- )
+    make-boot-image
     dup staging-image-name exists? [
         >r pick r> tuck make-staging-image
     ] unless

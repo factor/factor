@@ -47,11 +47,13 @@ ARTICLE: "syntax-integers" "Integer syntax"
 "More information on integers can be found in " { $link "integers" } "." ;
 
 ARTICLE: "syntax-ratios" "Ratio syntax"
-"The printed representation of a ratio is a pair of integers separated by a slash (/). No intermediate whitespace is permitted. Either integer may be signed, however the ratio will be normalized into a form where the denominator is positive and the greatest common divisor of the two terms is 1."
+"The printed representation of a ratio is a pair of integers separated by a slash (/), prefixed by an optional whole number part followed by a plus (+). No intermediate whitespace is permitted. Here are some examples:"
 { $code
     "75/33"
     "1/10"
     "-5/-6"
+    "1+1/3"
+    "-10+1/7"
 }
 "More information on ratios can be found in " { $link "rationals" } ;
 
@@ -99,9 +101,9 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\e" } "escape (ASCII 27)" }
     { { $snippet "\\\"" } { $snippet "\"" } }
 }
-"A Unicode character can be specified by its code number by writing " { $snippet "\\u" } " followed by a four-digit hexadecimal number. That is, the following two expressions are equivalent:"
+"A Unicode character can be specified by its code number by writing " { $snippet "\\u" } " followed by a six-digit hexadecimal number. That is, the following two expressions are equivalent:"
 { $code
-    "CHAR: \\u0078"
+    "CHAR: \\u000078"
     "78"
 }
 "While not useful for single characters, this syntax is also permitted inside strings." ;

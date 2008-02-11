@@ -330,7 +330,7 @@ add-method
   [ 3dup dup <- top-left    swap <- top-right    <---- draw-line
     3dup dup <- top-right   swap <- bottom-right <---- draw-line
     3dup dup <- bottom-left swap <- bottom-right <---- draw-line
-    	 dup <- top-left    swap <- bottom-left  <---- draw-line ]
+         dup <- top-left    swap <- bottom-left  <---- draw-line ]
 add-method
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -449,8 +449,8 @@ USING: alien.syntax ;
 FUNCTION: KeyCode XKeysymToKeycode ( Display* display, KeySym keysym ) ;
 
 FUNCTION: KeySym XKeycodeToKeysym ( Display* display,
-	  	 		    KeyCode keycode,
-				    int index ) ;
+                                    KeyCode keycode,
+                                    int index ) ;
 
 FUNCTION: char* XKeysymToString ( KeySym keysym ) ;
 

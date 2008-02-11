@@ -62,9 +62,9 @@ DEFER: automata-window
 {
 [ "1 - Center"      [ start-center    ] view-button ]
 [ "2 - Random"      [ start-random    ] view-button ]
-[ "3 - Continue"    [ run-rule 	      ] view-button ]
+[ "3 - Continue"    [ run-rule        ] view-button ]
 [ "5 - Random Rule" [ random-rule     ] view-button ]
-[ "n - New"   	    [ automata-window ] view-button ]
+[ "n - New"         [ automata-window ] view-button ]
 } make*
 [ [ gadget, ] curry ] map concat ! Hack
 make-shelf over @top grid-add
@@ -75,7 +75,7 @@ over @center grid-add
 {
 { T{ key-down f f "1" } [ [ start-center    ] view-action ] }
 { T{ key-down f f "2" } [ [ start-random    ] view-action ] }
-{ T{ key-down f f "3" } [ [ run-rule 	    ] view-action ] }
+{ T{ key-down f f "3" } [ [ run-rule        ] view-action ] }
 { T{ key-down f f "5" } [ [ random-rule     ] view-action ] }
 { T{ key-down f f "n" } [ [ automata-window ] view-action ] }
 } [ make* ] map >hashtable <handler> tuck set-gadget-delegate

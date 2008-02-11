@@ -32,12 +32,13 @@ vocabs.loader system ;
 
     "io.streams.c" require
     "vocabs.loader" require
+    
     "syntax" require
     "bootstrap.layouts" require
 
     [
         "resource:core/bootstrap/stage2.factor"
-        dup ?resource-path exists? [
+        dup resource-exists? [
             run-file
         ] [
             "Cannot find " write write "." print

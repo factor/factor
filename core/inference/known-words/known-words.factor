@@ -1,15 +1,16 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays byte-arrays classes
-combinators.private continuations.private effects float-arrays
-generic hashtables hashtables.private inference.state
-inference.backend inference.dataflow io io.backend io.files
-io.files.private io.streams.c kernel kernel.private math
-math.private memory namespaces namespaces.private parser
-prettyprint quotations quotations.private sbufs sbufs.private
-sequences sequences.private slots.private strings
-strings.private system threads.private tuples tuples.private
-vectors vectors.private words words.private assocs inspector ;
+USING: alien alien.accessors arrays bit-arrays byte-arrays
+classes sequences.private continuations.private effects
+float-arrays generic hashtables hashtables.private
+inference.state inference.backend inference.dataflow io
+io.backend io.files io.files.private io.streams.c kernel
+kernel.private math math.private memory namespaces
+namespaces.private parser prettyprint quotations
+quotations.private sbufs sbufs.private sequences
+sequences.private slots.private strings strings.private system
+threads.private tuples tuples.private vectors vectors.private
+words words.private assocs inspector ;
 IN: inference.known-words
 
 ! Shuffle words
@@ -413,64 +414,81 @@ t over set-effect-terminated?
 \ <displaced-alien> make-flushable
 
 \ alien-signed-cell { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-signed-cell make-flushable
 
 \ set-alien-signed-cell { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-unsigned-cell { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-unsigned-cell make-flushable
 
 \ set-alien-unsigned-cell { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-signed-8 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-signed-8 make-flushable
 
 \ set-alien-signed-8 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-unsigned-8 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-unsigned-8 make-flushable
 
 \ set-alien-unsigned-8 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-signed-4 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-signed-4 make-flushable
 
 \ set-alien-signed-4 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-unsigned-4 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-unsigned-4 make-flushable
 
 \ set-alien-unsigned-4 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-signed-2 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
+\ alien-signed-2 make-flushable
 
 \ set-alien-signed-2 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-unsigned-2 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
+\ alien-unsigned-2 make-flushable
 
 \ set-alien-unsigned-2 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-signed-1 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
+\ alien-signed-1 make-flushable
 
 \ set-alien-signed-1 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-unsigned-1 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
+\ alien-unsigned-1 make-flushable
 
 \ set-alien-unsigned-1 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-float { c-ptr integer } { float } <effect> "inferred-effect" set-word-prop
+\ alien-float make-flushable
 
 \ set-alien-float { float c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-double { c-ptr integer } { float } <effect> "inferred-effect" set-word-prop
+\ alien-double make-flushable
 
 \ set-alien-double { float c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien-cell { c-ptr integer } { simple-c-ptr } <effect> "inferred-effect" set-word-prop
+\ alien-cell make-flushable
 
 \ set-alien-cell { c-ptr c-ptr integer } { } <effect> "inferred-effect" set-word-prop
 
 \ alien>char-string { c-ptr } { string } <effect> "inferred-effect" set-word-prop
+\ alien>char-string make-flushable
 
 \ string>char-alien { string } { byte-array } <effect> "inferred-effect" set-word-prop
+\ string>char-alien make-flushable
 
 \ alien>u16-string { c-ptr } { string } <effect> "inferred-effect" set-word-prop
+\ alien>u16-string make-flushable
 
 \ string>u16-alien { string } { byte-array } <effect> "inferred-effect" set-word-prop
+\ string>u16-alien make-flushable
 
 \ alien-address { alien } { integer } <effect> "inferred-effect" set-word-prop
 \ alien-address make-flushable
@@ -480,10 +498,10 @@ t over set-effect-terminated?
 
 \ set-slot { object object fixnum } { } <effect> "inferred-effect" set-word-prop
 
-\ char-slot { fixnum object } { fixnum } <effect> "inferred-effect" set-word-prop
-\ char-slot make-flushable
+\ string-nth { fixnum string } { fixnum } <effect> "inferred-effect" set-word-prop
+\ string-nth make-flushable
 
-\ set-char-slot { fixnum fixnum object } { } <effect> "inferred-effect" set-word-prop
+\ set-string-nth { fixnum fixnum string } { } <effect> "inferred-effect" set-word-prop
 
 \ resize-array { integer array } { array } <effect> "inferred-effect" set-word-prop
 \ resize-array make-flushable

@@ -60,9 +60,7 @@ HOOK: %jump-label compiler-backend ( label -- )
 ! Test if vreg is 'f' or not
 HOOK: %jump-t compiler-backend ( label -- )
 
-HOOK: %call-dispatch compiler-backend ( -- label )
-
-HOOK: %jump-dispatch compiler-backend ( -- )
+HOOK: %dispatch compiler-backend ( -- )
 
 HOOK: %dispatch-label compiler-backend ( word -- )
 

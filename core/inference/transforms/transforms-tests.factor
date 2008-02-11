@@ -1,6 +1,6 @@
 IN: temporary
 USING: sequences inference.transforms tools.test math kernel
-quotations tools.test.inference inference ;
+quotations inference ;
 
 : compose-n-quot <repetition> >quotation ;
 : compose-n compose-n-quot call ;
@@ -31,4 +31,4 @@ TUPLE: a-tuple x y z ;
 : set-slots-test-2
     { set-a-tuple-x set-a-tuple-x } set-slots ;
 
-[ [ set-slots-test-2 ] infer ] unit-test-fails
+[ [ set-slots-test-2 ] infer ] must-fail

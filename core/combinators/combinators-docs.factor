@@ -1,6 +1,6 @@
 USING: arrays help.markup help.syntax strings sbufs vectors
 kernel quotations generic generic.standard classes
-math assocs sequences combinators.private ;
+math assocs sequences sequences.private ;
 IN: combinators
 
 ARTICLE: "combinators-quot" "Quotation construction utilities"

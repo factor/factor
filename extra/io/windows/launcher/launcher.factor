@@ -48,10 +48,10 @@ TUPLE: CreateProcess-args
     } get-slots CreateProcess win32-error=0/f ;
 
 : escape-argument ( str -- newstr )
-    [ [ dup CHAR: " = [ CHAR: \\ , ] when , ] each ] "" make ;
+    CHAR: \s over member? [ "\"" swap "\"" 3append ] when ;
 
 : join-arguments ( args -- cmd-line )
-    [ "\"" swap escape-argument "\"" 3append ] map " " join ;
+    [ escape-argument ] map " " join ;
 
 : app-name/cmd-line ( -- app-name cmd-line )
     +command+ get [
@@ -119,8 +119,14 @@ TUPLE: CreateProcess-args
     drop STD_ERROR_HANDLE GetStdHandle ;
 
 : redirect-stderr ( args -- handle )
-    +stderr+ get GENERIC_WRITE CREATE_ALWAYS redirect
-    swap inherited-stderr ?closed ;
+    +stderr+ get
+    dup +stdout+ eq? [
+        drop
+        CreateProcess-args-lpStartupInfo STARTUPINFO-hStdOutput
+    ] [
+        GENERIC_WRITE CREATE_ALWAYS redirect
+        swap inherited-stderr ?closed
+    ] if ;
 
 : inherited-stdin ( args -- handle )
     CreateProcess-args-stdin-pipe
@@ -154,6 +160,10 @@ M: windows-io run-process* ( desc -- handle )
             CreateProcess-args-lpProcessInformation <process>
         ] with-descriptor
     ] with-destructors ;
+
+M: windows-io kill-process* ( handle -- )
+    PROCESS_INFORMATION-hProcess
+    255 TerminateProcess win32-error=0/f ;
 
 : dispose-process ( process-information -- )
     #! From MSDN: "Handles in PROCESS_INFORMATION must be closed

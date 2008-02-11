@@ -4,8 +4,6 @@ USING: hashtables generic kernel math namespaces sequences strings
     continuations assocs io.styles sbufs ;
 IN: io
 
-GENERIC: stream-close ( stream -- )
-GENERIC: set-timeout ( n stream -- )
 GENERIC: stream-readln ( stream -- str )
 GENERIC: stream-read1 ( stream -- ch/f )
 GENERIC: stream-read ( n stream -- str/f )
@@ -29,7 +27,7 @@ GENERIC: stream-write-table ( table-cells style stream -- )
     [ over stream-write (stream-copy) ] [ 2drop ] if* ;
 
 : stream-copy ( in out -- )
-    [ 2dup (stream-copy) ] [ stream-close stream-close ] [ ]
+    [ 2dup (stream-copy) ] [ dispose dispose ] [ ]
     cleanup ;
 
 ! Default stream
@@ -54,9 +52,7 @@ SYMBOL: stderr
     stdio swap with-variable ; inline
 
 : with-stream ( stream quot -- )
-    swap [
-        [ stdio get stream-close ] [ ] cleanup
-    ] with-stream* ; inline
+    [ with-stream* ] curry with-disposal ; inline
 
 : tabular-output ( style quot -- )
     swap >r { } make r> stdio get stream-write-table ; inline

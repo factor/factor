@@ -15,12 +15,12 @@ crossref off
 "resource:core/bootstrap/syntax.factor" parse-file
 
 "resource:core/cpu/" architecture get {
-       { "x86.32" "x86/32" }
-       { "x86.64" "x86/64" }
-       { "linux-ppc" "ppc/linux" }
-       { "macosx-ppc" "ppc/macosx" }
-       { "arm" "arm" }
-   } at "/bootstrap.factor" 3append parse-file
+    { "x86.32" "x86/32" }
+    { "x86.64" "x86/64" }
+    { "linux-ppc" "ppc/linux" }
+    { "macosx-ppc" "ppc/macosx" }
+    { "arm" "arm" }
+} at "/bootstrap.factor" 3append parse-file
 
 "resource:core/bootstrap/layouts/layouts.factor" parse-file
 
@@ -40,6 +40,7 @@ call
 ! classes will go
 {
     "alien"
+    "alien.accessors"
     "arrays"
     "bit-arrays"
     "bit-vectors"
@@ -117,11 +118,11 @@ H{ } clone update-map set
 H{ } clone typemap set
 num-types get f <array> builtins set
 
-! These symbols are needed by the code that executes below
-{
-    { "object" "kernel" }
-    { "null" "kernel" }
-} [ create drop ] assoc-each
+! Forward definitions
+"object" "kernel" create t "class" set-word-prop
+"object" "kernel" create union-class "metaclass" set-word-prop
+
+"null" "kernel" create drop
 
 "fixnum" "math" create "fixnum?" "math" create { } define-builtin
 "fixnum" "math" create ">fixnum" "math" create 1quotation "coercer" set-word-prop
@@ -190,6 +191,11 @@ num-types get f <array> builtins set
         "length"
         { "length" "sequences" }
         f
+    } {
+        { "object" "kernel" }
+        "aux"
+        { "string-aux" "strings.private" }
+        { "set-string-aux" "strings.private" }
     }
 } define-builtin
 
@@ -547,8 +553,6 @@ builtins get num-tags get tail f union-class define-class
     { "millis" "system" }
     { "type" "kernel.private" }
     { "tag" "kernel.private" }
-    { "cwd" "io.files" }
-    { "cd" "io.files" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
     { "dlsym" "alien" }
@@ -556,32 +560,32 @@ builtins get num-tags get tail f union-class define-class
     { "<byte-array>" "byte-arrays" }
     { "<bit-array>" "bit-arrays" }
     { "<displaced-alien>" "alien" }
-    { "alien-signed-cell" "alien" }
-    { "set-alien-signed-cell" "alien" }
-    { "alien-unsigned-cell" "alien" }
-    { "set-alien-unsigned-cell" "alien" }
-    { "alien-signed-8" "alien" }
-    { "set-alien-signed-8" "alien" }
-    { "alien-unsigned-8" "alien" }
-    { "set-alien-unsigned-8" "alien" }
-    { "alien-signed-4" "alien" }
-    { "set-alien-signed-4" "alien" }
-    { "alien-unsigned-4" "alien" }
-    { "set-alien-unsigned-4" "alien" }
-    { "alien-signed-2" "alien" }
-    { "set-alien-signed-2" "alien" }
-    { "alien-unsigned-2" "alien" }
-    { "set-alien-unsigned-2" "alien" }
-    { "alien-signed-1" "alien" }
-    { "set-alien-signed-1" "alien" }
-    { "alien-unsigned-1" "alien" }
-    { "set-alien-unsigned-1" "alien" }
-    { "alien-float" "alien" }
-    { "set-alien-float" "alien" }
-    { "alien-double" "alien" }
-    { "set-alien-double" "alien" }
-    { "alien-cell" "alien" }
-    { "set-alien-cell" "alien" }
+    { "alien-signed-cell" "alien.accessors" }
+    { "set-alien-signed-cell" "alien.accessors" }
+    { "alien-unsigned-cell" "alien.accessors" }
+    { "set-alien-unsigned-cell" "alien.accessors" }
+    { "alien-signed-8" "alien.accessors" }
+    { "set-alien-signed-8" "alien.accessors" }
+    { "alien-unsigned-8" "alien.accessors" }
+    { "set-alien-unsigned-8" "alien.accessors" }
+    { "alien-signed-4" "alien.accessors" }
+    { "set-alien-signed-4" "alien.accessors" }
+    { "alien-unsigned-4" "alien.accessors" }
+    { "set-alien-unsigned-4" "alien.accessors" }
+    { "alien-signed-2" "alien.accessors" }
+    { "set-alien-signed-2" "alien.accessors" }
+    { "alien-unsigned-2" "alien.accessors" }
+    { "set-alien-unsigned-2" "alien.accessors" }
+    { "alien-signed-1" "alien.accessors" }
+    { "set-alien-signed-1" "alien.accessors" }
+    { "alien-unsigned-1" "alien.accessors" }
+    { "set-alien-unsigned-1" "alien.accessors" }
+    { "alien-float" "alien.accessors" }
+    { "set-alien-float" "alien.accessors" }
+    { "alien-double" "alien.accessors" }
+    { "set-alien-double" "alien.accessors" }
+    { "alien-cell" "alien.accessors" }
+    { "set-alien-cell" "alien.accessors" }
     { "alien>char-string" "alien" }
     { "string>char-alien" "alien" }
     { "alien>u16-string" "alien" }
@@ -590,8 +594,8 @@ builtins get num-tags get tail f union-class define-class
     { "alien-address" "alien" }
     { "slot" "slots.private" }
     { "set-slot" "slots.private" }
-    { "char-slot" "strings.private" }
-    { "set-char-slot" "strings.private" }
+    { "string-nth" "strings.private" }
+    { "set-string-nth" "strings.private" }
     { "resize-array" "arrays" }
     { "resize-string" "strings" }
     { "<array>" "arrays" }
@@ -620,7 +624,7 @@ builtins get num-tags get tail f union-class define-class
     { "<float-array>" "float-arrays" }
     { "curry" "kernel" }
     { "<tuple-boa>" "tuples.private" }
-	{ "class-hash" "kernel.private" }
+    { "class-hash" "kernel.private" }
     { "callstack>array" "kernel" }
     { "innermost-frame-quot" "kernel.private" }
     { "innermost-frame-scan" "kernel.private" }

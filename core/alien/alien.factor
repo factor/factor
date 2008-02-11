@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math namespaces sequences system
-kernel.private tuples ;
+kernel.private tuples bit-arrays byte-arrays float-arrays ;
 IN: alien
 
 ! Some predicate classes used by the compiler for optimization
@@ -9,16 +9,11 @@ IN: alien
 PREDICATE: alien simple-alien
     underlying-alien not ;
 
-! These mixins are not intended to be extended by user code.
-! They are not unions, because if they were we'd have a circular
-! dependency between alien and {byte,bit,float}-arrays.
-MIXIN: simple-c-ptr
-INSTANCE: simple-alien simple-c-ptr
-INSTANCE: f simple-c-ptr
+UNION: simple-c-ptr
+simple-alien POSTPONE: f byte-array bit-array float-array ;
 
-MIXIN: c-ptr
-INSTANCE: alien c-ptr
-INSTANCE: f c-ptr
+UNION: c-ptr
+alien POSTPONE: f byte-array bit-array float-array ;
 
 DEFER: pinned-c-ptr?
 

@@ -2,8 +2,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.buffers
-USING: alien alien.c-types alien.syntax kernel kernel.private
-libc math sequences strings hints ;
+USING: alien alien.accessors alien.c-types alien.syntax kernel
+kernel.private libc math sequences strings hints ;
 
 TUPLE: buffer size ptr fill pos ;
 
@@ -14,7 +14,7 @@ TUPLE: buffer size ptr fill pos ;
     dup buffer-ptr free  f swap set-buffer-ptr ;
 
 : buffer-reset ( n buffer -- )
-    [ set-buffer-fill ] keep 0 swap set-buffer-pos ;
+    0 swap { set-buffer-fill set-buffer-pos } set-slots ;
 
 : buffer-consume ( n buffer -- )
     [ buffer-pos + ] keep
