@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators.cleave combinators.lib kernel math math.ranges
-    namespaces project-euler.common sequences ;
+    namespaces project-euler.common sequences sequences.lib ;
 IN: project-euler.075
 
 ! http://projecteuler.net/index.php?section=problems&id=75

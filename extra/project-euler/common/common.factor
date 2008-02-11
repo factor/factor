@@ -1,6 +1,6 @@
-USING: arrays combinators.lib kernel math math.functions math.miller-rabin
-    math.matrices math.parser math.primes.factors math.ranges namespaces
-    sequences sorting unicode.case ;
+USING: arrays kernel math math.functions math.miller-rabin math.matrices
+    math.parser math.primes.factors math.ranges namespaces sequences
+    sequences.lib sorting unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
