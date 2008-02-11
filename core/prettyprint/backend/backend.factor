@@ -58,6 +58,7 @@ M: f pprint* drop \ f pprint-word ;
 ! Strings
 : ch>ascii-escape ( ch -- str )
     H{
+        { CHAR: \a CHAR: a  }
         { CHAR: \e CHAR: e  }
         { CHAR: \n CHAR: n  }
         { CHAR: \r CHAR: r  }

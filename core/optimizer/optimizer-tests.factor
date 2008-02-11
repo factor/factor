@@ -288,9 +288,9 @@ TUPLE: silly-tuple a b ;
 
 [ t ] [ \ node-successor-f-bug compiled? ] unit-test
 
-: construct-empty-bug construct-empty ;
-
 [ ] [ [ construct-empty ] dataflow optimize drop ] unit-test
+
+[ ] [ [ <tuple> ] dataflow optimize drop ] unit-test
 
 ! Make sure we have sane heuristics
 : should-inline? method method-word flat-length 10 <= ;
