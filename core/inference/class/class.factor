@@ -185,20 +185,14 @@ M: pair constraint-satisfied?
         [ swap predicate-constraints ] [ 2drop ] if
     ] if* ;
 
-: default-output-classes ( word -- classes )
-    "inferred-effect" word-prop {
-        { [ dup not ] [ drop f ] }
-        { [ dup effect-out [ class? ] all? not ] [ drop f ] }
-        { [ t ] [ effect-out ] }
-    } cond ;
-
 : compute-output-classes ( node word -- classes intervals )
-    dup node-param "output-classes" word-prop dup
-    [ call ] [ 2drop f f ] if ;
+    dup node-param "output-classes" word-prop
+    dup [ call ] [ 2drop f f ] if ;
 
 : output-classes ( node -- classes intervals )
-    dup compute-output-classes
-    >r [ ] [ node-param default-output-classes ] ?if r> ;
+    dup compute-output-classes >r
+    [ ] [ node-param "default-output-classes" word-prop ] ?if
+    r> ;
 
 M: #call infer-classes-before
     dup compute-constraints

@@ -147,6 +147,7 @@ M: object infer-call
 ] "infer" set-word-prop
 
 :  set-primitive-effect ( word effect -- )
+    2dup effect-out "default-output-classes" set-word-prop
     dupd [ make-call-node ] 2curry "infer" set-word-prop ;
 
 ! Stack effects for all primitives
