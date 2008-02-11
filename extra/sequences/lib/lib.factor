@@ -178,6 +178,10 @@ PRIVATE>
 : ?third ( seq -- third/f ) 2 swap ?nth ; inline
 : ?fourth ( seq -- fourth/f ) 3 swap ?nth ; inline
 
+: ?first2 ( seq -- 1st/f 2nd/f ) dup ?first swap ?second ; inline
+: ?first3 ( seq -- 1st/f 2nd/f 3rd/f ) dup ?first2 rot ?third ; inline
+: ?first4 ( seq -- 1st/f 2nd/f 3rd/f 4th/f ) dup ?first3 roll ?fourth ; inline
+
 : accumulator ( quot -- quot vec )
     V{ } clone [ [ push ] curry compose ] keep ;
 
