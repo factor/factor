@@ -1,5 +1,5 @@
 
-USING: kernel io io.files io.launcher io.sockets hashtables
+USING: kernel io io.files io.launcher io.sockets hashtables math threads
        system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
        combinators bootstrap.image bootstrap.image.download
@@ -95,9 +95,10 @@ VAR: stamp
   stamp> make-directory
   stamp> cd ;
 
-: record-git-id ( -- )
-  { "git" "show" } <process-stream> [ readln ] with-stream " " split second
-  "../git-id" log-object ;
+: git-id ( -- id )
+  { "git" "show" } <process-stream> [ readln ] with-stream " " split second ;
+
+: record-git-id ( -- ) git-id "../git-id" log-object ;
 
 : make-clean ( -- desc ) { "make" "clean" } ;
 
@@ -113,7 +114,8 @@ VAR: stamp
   [ my-arch download-image ]
   [ ]
   [ "builder: image download" email-string ]
-  cleanup ;
+  cleanup
+  flush ;
 
 : bootstrap ( -- desc )
   `{
@@ -134,12 +136,6 @@ VAR: stamp
 SYMBOL: build-status
 
 : build ( -- )
-
-  "running" build-status set-global
-
-  "/builds/factor" cd
-
-  git-pull "git pull error" run-or-notify
 
   enter-build-dir
   
@@ -165,10 +161,30 @@ SYMBOL: build-status
 
   "../failing-tests" exists?
   [ "failing tests" "../failing-tests" email-file ]
-  when
-
-  "ready" build-status set-global ;
+  when ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MAIN: build
+: minutes>ms ( min -- ms ) 60 * 1000 * ;
+
+: updates-available? ( -- ? )
+  git-id
+  git-pull run-process drop
+  git-id
+  = not ;
+
+: build-loop ( -- )
+  [
+    "/builds/factor" cd
+    updates-available?
+      [ build ]
+    when
+  ]
+  [ drop ]
+  recover
+  5 minutes>ms sleep
+  build-loop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MAIN: build-loop
