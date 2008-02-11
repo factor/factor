@@ -98,7 +98,7 @@ PRIVATE>
 : continue-with ( obj continuation -- )
     [
         walker-hook [ >r 2array r> ] when* (continue-with)
-    ] 2curry (throw) ;
+    ] 2 (throw) ;
 
 : continue ( continuation -- )
     f swap continue-with ;

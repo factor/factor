@@ -52,13 +52,7 @@ GENERIC: optimize-node* ( node -- node/t changed? )
 DEFER: optimize-nodes
 
 : optimize-children ( node -- )
-    [
-        dup node-children dup [
-            [ optimize-nodes ] map swap set-node-children
-        ] [
-            2drop
-        ] if
-    ] when* ;
+    [ optimize-nodes ] change-children ;
 
 : optimize-node ( node -- node )
     dup [
@@ -76,38 +70,16 @@ DEFER: optimize-nodes
 
 M: f set-node-successor 2drop ;
 
-: (optimize-nodes) ( prev node -- )
-    optimize-node [
-        dup rot set-node-successor
-        dup node-successor (optimize-nodes)
-    ] [
-        f swap set-node-successor
-    ] if* ;
-
 : optimize-nodes ( node -- newnode )
     [
         class-substitutions [ clone ] change
         literal-substitutions [ clone ] change
-        dup [
-            optimize-node
-            dup dup node-successor (optimize-nodes)
-        ] when optimizer-changed get
+        [ optimize-node ] transform-nodes
+        optimizer-changed get
     ] with-scope optimizer-changed set ;
-
-: prune-if ( node quot -- successor/t )
-    over >r call [ r> node-successor t ] [ r> drop t f ] if ;
-    inline
 
 ! Generic nodes
 M: node optimize-node* drop t f ;
-
-M: #shuffle optimize-node* 
-    [
-        dup node-in-d empty? swap node-out-d empty? and
-    ] prune-if ;
-
-M: #push optimize-node* 
-    [ node-out-d empty? ] prune-if ;
 
 : cleanup-inlining ( node -- newnode changed? )
     node-successor [ node-successor t ] [ t f ] if* ;
@@ -117,12 +89,6 @@ M: #return optimize-node* cleanup-inlining ;
 
 ! #values
 M: #values optimize-node* cleanup-inlining ;
-
-! #>r
-M: #>r optimize-node* [ node-in-d empty? ] prune-if ;
-
-! #r>
-M: #r> optimize-node* [ node-in-r empty? ] prune-if ;
 
 ! Some utilities for splicing in dataflow IR subtrees
 : follow ( key assoc -- value )
@@ -194,10 +160,8 @@ M: node remember-method*
 
 ! Constant branch folding
 : fold-branch ( node branch# -- node )
-    over drop-inputs >r
     over node-children nth
-    swap node-successor over substitute-node
-    r> [ set-node-successor ] keep ;
+    swap node-successor over substitute-node ;
 
 ! #if
 : known-boolean-value? ( node value -- value ? )
@@ -213,12 +177,18 @@ M: node remember-method*
     ] if ;
 
 M: #if optimize-node*
-    dup dup node-in-d first known-boolean-value?
-    [ 0 1 ? fold-branch t ] [ 2drop t f ] if ;
+    dup dup node-in-d first known-boolean-value? [
+        over drop-inputs >r
+        0 1 ? fold-branch
+        r> [ set-node-successor ] keep
+        t
+    ] [ 2drop t f ] if ;
 
 M: #dispatch optimize-node*
     dup dup node-in-d first 2dup node-literal? [
-        node-literal fold-branch t
+        "Optimizing #dispatch" print
+        node-literal
+        over drop-inputs >r fold-branch r> [ set-node-successor ] keep t
     ] [
         3drop t f
     ] if ;
@@ -322,9 +292,19 @@ DEFER: (flat-length)
     #! Make #shuffle -> #push -> #return -> successor
     dupd literal-quot splice-quot ;
 
-: optimize-predicate ( #call -- node )
+: evaluate-predicate ( #call -- ? )
     dup node-param "predicating" word-prop >r
-    dup node-class-first r> class< 1array inline-literals ;
+    node-class-first r> class< ;
+
+: optimize-predicate ( #call -- node )
+    dup evaluate-predicate swap
+    dup node-successor #if? [
+        dup drop-inputs >r
+        node-successor swap 0 1 ? fold-branch
+        r> [ set-node-successor ] keep
+    ] [
+        swap 1array inline-literals
+    ] if ;
 
 : optimizer-hooks ( node -- conditions )
     node-param "optimizer-hooks" word-prop ;

@@ -1,4 +1,4 @@
-USING: tools.test base64 ;
+USING: kernel tools.test base64 strings ;
 
 [ "abcdefghijklmnopqrstuvwxyz" ] [ "abcdefghijklmnopqrstuvwxyz" >base64 base64>
 ] unit-test

@@ -21,9 +21,6 @@ TUPLE: sqlite-error n message ;
 : sqlite-close ( db -- )
     sqlite3_close sqlite-check-result ;
 
-: sqlite-last-insert-rowid ( db -- rowid )
-    sqlite3_last_insert_rowid ;
-
 : sqlite-prepare ( db sql -- statement )
     #! TODO: Support multiple statements in the SQL string.
     dup length "void*" <c-object> "void*" <c-object>

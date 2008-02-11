@@ -49,7 +49,7 @@ PRIVATE>
             V{ } set-catchstack
             { } set-retainstack
             [ [ print-error ] recover stop ] call-clear
-        ] (throw)
+        ] 1 (throw)
     ] curry callcc0 ;
 
 <PRIVATE

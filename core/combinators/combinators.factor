@@ -4,12 +4,6 @@ IN: combinators
 USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors ;
 
-<PRIVATE
-
-: dispatch ( n array -- ) array-nth (call) ;
-
-PRIVATE>
-
 TUPLE: no-cond ;
 
 : no-cond ( -- * ) \ no-cond construct-empty throw ;

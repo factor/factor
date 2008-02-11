@@ -213,56 +213,62 @@ void dump_objects(F_FIXNUM type)
 	gc_off = false;
 }
 
-void find_data_references(CELL look_for)
-{
-	CELL obj;
+CELL look_for;
+CELL obj;
 
-	void find_references_step(CELL *scan)
+void find_data_references_step(CELL *scan)
+{
+	if(look_for == *scan)
 	{
-		if(look_for == *scan)
+		printf("%lx ",obj);
+		print_nested_obj(obj,2);
+		printf("\n");
+	}
+}
+
+void find_data_references(CELL look_for_)
+{
+	look_for = look_for_;
+
+	begin_scan();
+
+	while((obj = next_object()) != F)
+		do_slots(UNTAG(obj),find_data_references_step);
+
+	/* end scan */
+	gc_off = false;
+}
+
+CELL look_for;
+
+void find_code_references_step(F_COMPILED *compiled, CELL code_start,
+		CELL reloc_start, CELL literals_start)
+{
+	CELL scan;
+	CELL literal_end = literals_start + compiled->literals_length;
+
+	for(scan = literals_start; scan < literal_end; scan += CELLS)
+	{
+		CELL code_start = (CELL)(compiled + 1);
+		CELL literal_start = code_start
+			+ compiled->code_length
+			+ compiled->reloc_length;
+
+		CELL obj = get(literal_start);
+
+		if(look_for == get(scan))
 		{
 			printf("%lx ",obj);
 			print_nested_obj(obj,2);
 			printf("\n");
 		}
 	}
-
-	begin_scan();
-
-	while((obj = next_object()) != F)
-		do_slots(UNTAG(obj),find_references_step);
-
-	/* end scan */
-	gc_off = false;
 }
 
-void find_code_references(CELL look_for)
+void find_code_references(CELL look_for_)
 {
-	void find_references_step(F_COMPILED *compiled, CELL code_start,
-		CELL reloc_start, CELL literals_start)
-	{
-		CELL scan;
-		CELL literal_end = literals_start + compiled->literals_length;
-
-		for(scan = literals_start; scan < literal_end; scan += CELLS)
-		{
-			CELL code_start = (CELL)(compiled + 1);
-			CELL literal_start = code_start
-				+ compiled->code_length
-				+ compiled->reloc_length;
-
-			CELL obj = get(literal_start);
-
-			if(look_for == get(scan))
-			{
-				printf("%lx ",obj);
-				print_nested_obj(obj,2);
-				printf("\n");
-			}
-		}
-	}
-
-	iterate_code_heap(find_references_step);
+	look_for = look_for_;
+	iterate_code_heap(find_code_references_step);
 }
 
 void factorbug(void)

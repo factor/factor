@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
-combinators.private classes definitions ;
+sequences.private classes definitions ;
 IN: generic.math
 
 PREDICATE: class math-class ( object -- ? )

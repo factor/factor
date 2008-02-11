@@ -7,7 +7,7 @@ strings sbufs vectors words quotations assocs system layouts
 splitting growable classes tuples words.private
 io.binary io.files vocabs vocabs.loader source-files
 definitions debugger float-arrays quotations.private
-combinators.private combinators ;
+sequences.private combinators ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )

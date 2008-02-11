@@ -107,6 +107,7 @@ M: bad-escape summary drop "Bad escape code" ;
 
 : escape ( escape -- ch )
     H{
+        { CHAR: a  CHAR: \a }
         { CHAR: e  CHAR: \e }
         { CHAR: n  CHAR: \n }
         { CHAR: r  CHAR: \r }
@@ -479,7 +480,7 @@ SYMBOL: interactive-vocabs
     [ [ parse-file call ] keep ] assert-depth drop ;
 
 : ?run-file ( path -- )
-    dup ?resource-path exists? [ run-file ] [ drop ] if ;
+    dup resource-exists? [ run-file ] [ drop ] if ;
 
 : bootstrap-file ( path -- )
     [ parse-file % ] [ run-file ] if-bootstrapping ;
