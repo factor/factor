@@ -7,8 +7,10 @@ USING: kernel sequences assocs builder continuations vocabs vocabs.loader
 
 IN: builder.test
 
+: try-everything* ( -- vocabs ) try-everything [ first vocab-link-name ] map ;
+
 : do-load ( -- )
-  [ try-everything ] "../load-everything-time" log-runtime
+  [ try-everything* ] "../load-everything-time" log-runtime
   dup empty?
     [ drop ]
     [ "../load-everything-log" log-object ]
