@@ -59,10 +59,10 @@ M: cocoa-ui-backend set-title ( string world -- )
 : exit-fullscreen ( world -- )
     world-handle first f -> exitFullScreenModeWithOptions: ;
 
-M: cocoa-ui-backend set-fullscreen? ( ? world -- )
+M: cocoa-ui-backend set-fullscreen* ( ? world -- )
     swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
-M: cocoa-ui-backend fullscreen? ( world -- ? )
+M: cocoa-ui-backend fullscreen* ( world -- ? )
     world-handle first -> isInFullScreenMode zero? not ;
 
 : auto-position ( world -- )
