@@ -36,7 +36,12 @@ ARTICLE: "tools.test" "Unit testing"
 $nl
 "For example, if you were developing a word for computing symbolic derivatives, your unit tests would apply the word to certain input functions, comparing the results against the correct values. While the passing of these tests would not guarantee the algorithm is correct, it would at least ensure that what used to work keeps working, in that as soon as something breaks due to a change in another part of your program, failing tests will let you know."
 $nl
-"Unit tests for a vocabulary are placed in test files, named " { $snippet { $emphasis "vocab" } "-tests.factor" } " alongside " { $snippet { $emphasis "vocab" } ".factor" } "; see " { $link "vocabs.loader" } " for details."
+"Unit tests for a vocabulary are placed in test files in the same directory as the vocabulary source file (see " { $link "vocabs.loader" } "). Two possibilities are supported:"
+{ $list
+    { "Tests can be placed in a file named " { $snippet { $emphasis "vocab" } "-tests.factor" } "." }
+    { "Tests can be placed in files in the " { $snippet "test" } " subdirectory." }
+}
+"The latter is used for vocabularies with more extensive test suites."
 $nl
 "If the test harness needs to define words, they should be placed in the " { $snippet "temporary" } " vocabulary so that they can be forgotten after the tests have been run."
 { $subsection "tools.test.write" }

@@ -96,8 +96,16 @@ M: vocab-link hashcode*
 
 M: vocab-link vocab-name vocab-link-name ;
 
-: >vocab-link ( name root -- vocab )
-    over vocab dup [ 2nip ] [ drop <vocab-link> ] if ;
+GENERIC# >vocab-link 1 ( name root -- vocab )
+
+M: vocab >vocab-link drop ;
+
+M: vocab-link >vocab-link drop ;
+
+M: string >vocab-link
+    over vocab dup [ 2nip ] [
+        drop [ dup vocab-root ] unless* <vocab-link>
+    ] if ;
 
 UNION: vocab-spec vocab vocab-link ;
 

@@ -72,13 +72,6 @@ M: vocab-link summary vocab-summary ;
 : set-vocab-authors ( authors vocab -- )
     dup vocab-authors-path set-vocab-file-contents ;
 
-: vocab-dir? ( root name -- ? )
-    over [
-        vocab-source path+ ?resource-path exists?
-    ] [
-        2drop f
-    ] if ;
-
 : subdirs ( dir -- dirs )
     directory [ second ] subset keys natural-sort ;
 
@@ -96,10 +89,8 @@ M: vocab-link summary vocab-summary ;
         vocabs-in-dir
     ] with each ;
 
-: sane-vocab-roots "." vocab-roots get remove ;
-
 : all-vocabs ( -- assoc )
-    sane-vocab-roots [
+    vocab-roots get [
         dup [ "" vocabs-in-dir ] { } make
     ] { } map>assoc ;
 
@@ -153,9 +144,9 @@ MEMO: all-vocabs-seq ( -- seq )
     [ vocab ] map ;
 
 : all-child-vocabs ( prefix -- assoc )
-    sane-vocab-roots [
-        dup pick dupd (all-child-vocabs)
-        [ swap >vocab-link ] with map
+    vocab-roots get [
+        over dupd dupd (all-child-vocabs)
+        swap [ >vocab-link ] curry map
     ] { } map>assoc
     f rot unrooted-child-vocabs 2array add ;
 
