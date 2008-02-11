@@ -14,7 +14,7 @@ IN: project-euler.common
 ! log10 - #25, #134
 ! max-path - #18, #67
 ! nth-triangle - #12, #42
-! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56, #92
+! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56
 ! palindrome? - #4, #36, #55
 ! pandigital? - #32, #38
 ! pentagonal? - #44, #45
