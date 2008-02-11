@@ -155,20 +155,21 @@ SYMBOL: load-help?
     dup first vocab-heading.
     dup second print-error
     drop ;
-    ! third "Traceback" swap write-object ;
 
 : load-failures. ( failures -- )
     [ load-error. nl ] each ;
 
+SYMBOL: blacklist
+
 : require-all ( vocabs -- failures )
     [
+        V{ } clone blacklist set
         [
-            [
-                [ require ]
-                [ error-continuation get 3array , ]
-                recover
-            ] each
-        ] { } make
+            [ require ]
+            [ >r vocab-name r> 2array blacklist get push ]
+            recover
+        ] each
+        blacklist get
     ] with-compiler-errors ;
 
 : do-refresh ( modified-sources modified-docs -- )
@@ -182,7 +183,7 @@ SYMBOL: load-help?
 : refresh-all ( -- ) "" refresh ;
 
 GENERIC: (load-vocab) ( name -- vocab )
-
+!
 M: vocab (load-vocab)
     dup vocab-root [
         dup vocab-source-loaded? [ dup load-source ] unless
@@ -195,8 +196,25 @@ M: string (load-vocab)
 M: vocab-link (load-vocab)
     vocab-name (load-vocab) ;
 
-[ [ dup vocab [ ] [ ] ?if (load-vocab) ] with-compiler-errors ]
-load-vocab-hook set-global
+TUPLE: blacklisted-vocab name ;
+
+: blacklisted-vocab ( name -- * )
+    \ blacklisted-vocab construct-boa throw ;
+
+M: blacklisted-vocab error.
+    "This vocabulary depends on the " write
+    blacklisted-vocab-name write
+    " vocabulary which failed to load" print ;
+
+[
+    dup vocab-name blacklist get key? [
+        vocab-name blacklisted-vocab
+    ] [
+        [
+            dup vocab [ ] [ ] ?if (load-vocab)
+        ] with-compiler-errors
+    ] if
+] load-vocab-hook set-global
 
 : vocab-where ( vocab -- loc )
     vocab-source-path dup [ 1 2array ] when ;

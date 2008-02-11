@@ -261,9 +261,9 @@ windows? [
     cell "ulonglong" c-type set-c-type-align
 ] unless
 
-macosx? [
-    cell "double" c-type set-c-type-align
-] when
+windows? [
+    4 "double" c-type set-c-type-align
+] unless
 
 T{ x86-backend f 4 } compiler-backend set-global
 

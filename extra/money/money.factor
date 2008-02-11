@@ -12,18 +12,21 @@ IN: money
         "$" %
         swap number>string
         <reversed> 3 group "," join <reversed> %
-        "." % number>string 2 48 pad-left %
+        "." % number>string 2 CHAR: 0 pad-left %
     ] "" make print ;
 
 TUPLE: not-a-decimal ;
-: DECIMAL:
-    scan
-    "." split dup length 1 2 between? [
-        T{ not-a-decimal } throw
-    ] unless
-    ?first2
-    >r dup ?first CHAR: - = [ drop t "0" ] [ f swap ] if r>
+
+: not-a-decimal ( -- * )
+    T{ not-a-decimal } throw ;
+
+: parse-decimal ( str -- ratio )
+    "." split1
+    >r dup "-" head? [ drop t "0" ] [ f swap ] if r>
     [ dup empty? [ drop "0" ] when ] 2apply
     dup length
-    >r [ string>number dup [ T{ not-a-decimal } throw ] unless ] 2apply r>
-    10 swap ^ / + swap [ neg ] when parsed ; parsing
+    >r [ string>number dup [ not-a-decimal ] unless ] 2apply r>
+    10 swap ^ / + swap [ neg ] when ;
+
+: DECIMAL:
+    scan parse-decimal parsed ; parsing
