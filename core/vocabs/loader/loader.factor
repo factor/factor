@@ -155,7 +155,6 @@ SYMBOL: load-help?
     dup first vocab-heading.
     dup second print-error
     drop ;
-    ! third "Traceback" swap write-object ;
 
 : load-failures. ( failures -- )
     [ load-error. nl ] each ;
@@ -166,14 +165,11 @@ SYMBOL: blacklist
     [
         V{ } clone blacklist set
         [
-            [
-                [ require ]
-                [
-                    over vocab-name blacklist get push
-                    error-continuation get 3array ,
-                ] recover
-            ] each
-        ] { } make
+            [ require ]
+            [ >r vocab-name r> 2array blacklist get push ]
+            recover
+        ] each
+        blacklist get
     ] with-compiler-errors ;
 
 : do-refresh ( modified-sources modified-docs -- )
@@ -201,7 +197,7 @@ M: vocab-link (load-vocab)
     vocab-name (load-vocab) ;
 
 TUPLE: blacklisted-vocab name ;
-!
+
 : blacklisted-vocab ( name -- * )
     \ blacklisted-vocab construct-boa throw ;
 
@@ -211,7 +207,7 @@ M: blacklisted-vocab error.
     " vocabulary which failed to load" print ;
 
 [
-    dup vocab-name blacklist get member? [
+    dup vocab-name blacklist get key? [
         vocab-name blacklisted-vocab
     ] [
         [
