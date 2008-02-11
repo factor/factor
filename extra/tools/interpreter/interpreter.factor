@@ -55,7 +55,7 @@ M: word (step-into) (step-into-execute) ;
 
 {
     { call [ walk ] }
-    { (throw) [ walk ] }
+    { (throw) [ drop walk ] }
     { execute [ (step-into-execute) ] }
     { if [ (step-into-if) ] }
     { dispatch [ (step-into-dispatch) ] }

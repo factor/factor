@@ -145,6 +145,12 @@ SYMBOL: ui-hook
     >r [ 1 track, ] { 0 1 } make-track r>
     f <world> open-world-window ;
 
+: set-fullscreen? ( ? gadget -- )
+    find-world set-fullscreen* ;
+
+: fullscreen? ( gadget -- ? )
+    find-world fullscreen* ;
+
 HOOK: close-window ui-backend ( gadget -- )
 
 M: object close-window

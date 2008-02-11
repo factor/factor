@@ -26,8 +26,10 @@ LOG: accepted-connection NOTICE
 : server-loop ( server quot -- )
     [ accept-loop ] curry with-disposal ; inline
 
+SYMBOL: servers
+
 : spawn-server ( addrspec quot -- )
-    >r <server> r> server-loop ; inline
+    >r <server> dup servers get push r> server-loop ; inline
 
 \ spawn-server NOTICE add-error-logging
 
@@ -39,8 +41,12 @@ LOG: accepted-connection NOTICE
 
 : with-server ( seq service quot -- )
     [
+        V{ } clone servers set
         [ spawn-server ] curry concurrency:parallel-each
     ] curry with-logging ; inline
+
+: stop-server ( -- )
+    servers get [ dispose ] each ;
 
 : received-datagram ( addrspec -- ) drop ;
 

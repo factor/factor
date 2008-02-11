@@ -71,7 +71,8 @@ M: vocab-link vocab-root
 
 TUPLE: no-vocab name ;
 
-: no-vocab ( name -- * ) \ no-vocab construct-boa throw ;
+: no-vocab ( name -- * )
+    vocab-name \ no-vocab construct-boa throw ;
 
 M: no-vocab summary drop "Vocabulary does not exist" ;
 

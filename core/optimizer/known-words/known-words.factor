@@ -19,6 +19,11 @@ float-arrays sequences.private combinators ;
     ] "output-classes" set-word-prop
 ] each
 
+\ construct-empty [
+    dup node-in-d peek node-literal
+    dup class? [ drop tuple ] unless 1array f
+] "output-classes" set-word-prop
+
 ! the output of clone has the same type as the input
 { clone (clone) } [
     [

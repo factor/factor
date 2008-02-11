@@ -52,15 +52,14 @@ typedef signed long long s64;
 #define FLOAT_ARRAY_TYPE 10
 #define CALLSTACK_TYPE 11
 #define STRING_TYPE 12
-#define CURRY_TYPE 13
+#define BIT_ARRAY_TYPE 13
 #define QUOTATION_TYPE 14
 #define DLL_TYPE 15
 #define ALIEN_TYPE 16
 #define WORD_TYPE 17
 #define BYTE_ARRAY_TYPE 18
-#define BIT_ARRAY_TYPE 19
 
-#define TYPE_COUNT 20
+#define TYPE_COUNT 19
 
 INLINE bool immediate_p(CELL obj)
 {

@@ -98,6 +98,9 @@ IN: temporary
 [ { 6 } ]
 [ [ [ 3 swap continue-with ] callcc1 2 * ] test-interpreter ] unit-test
 
+[ { } ]
+[ [ [ ] [ ] recover ] test-interpreter ] unit-test
+
 [ { 6 } ]
 [ [ [ 3 throw ] [ 2 * ] recover ] test-interpreter ] unit-test
 
