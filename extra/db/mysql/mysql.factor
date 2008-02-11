@@ -14,7 +14,6 @@ M: mysql-db db-open ( mysql-db -- )
 M: mysql-db dispose ( mysql-db -- )
     mysql-db-handle mysql_close ;
 
-
 M: mysql-db <simple-statement> ( str -- statement )
     ;
 
