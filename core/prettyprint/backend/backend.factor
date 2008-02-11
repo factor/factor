@@ -182,8 +182,19 @@ M: tuple pprint-narrow? drop t ;
         >pprint-sequence pprint-elements
         block> r> pprint-word block>
     ] check-recursion ;
-    
+
 M: object pprint* pprint-object ;
+
+M: curry pprint*
+    dup curry-quot callable? [ pprint-object ] [
+        "( invalid curry )" swap present-text
+    ] if ;
+
+M: compose pprint*
+    dup compose-first over compose-second [ callable? ] both?
+    [ pprint-object ] [
+        "( invalid compose )" swap present-text
+    ] if ;
 
 M: wrapper pprint*
     dup wrapped word? [
