@@ -73,16 +73,26 @@ SYMBOL: value-intervals
 ! Current value --> class mapping
 SYMBOL: value-classes
 
+: value-interval* ( value -- interval/f )
+    value-intervals get at ;
+
 : set-value-interval* ( interval value -- )
     value-intervals get set-at ;
 
+: intersect-value-interval ( interval value -- )
+    [ value-interval* interval-intersect ] keep
+    set-value-interval* ;
+
 M: interval-constraint apply-constraint
     dup interval-constraint-interval
-    swap interval-constraint-value set-value-interval* ;
+    swap interval-constraint-value intersect-value-interval ;
 
 : set-class-interval ( class value -- )
     >r "interval" word-prop dup
     [ r> set-value-interval* ] [ r> 2drop ] if ;
+
+: value-class* ( value -- class )
+    value-classes get at object or ;
 
 : set-value-class* ( class value -- )
     over [
@@ -93,9 +103,12 @@ M: interval-constraint apply-constraint
     ] when
     value-classes get set-at ;
 
+: intersect-value-class ( class value -- )
+    [ value-class* class-and ] keep set-value-class* ;
+
 M: class-constraint apply-constraint
     dup class-constraint-class
-    swap class-constraint-value set-value-class* ;
+    swap class-constraint-value intersect-value-class ;
 
 : set-value-literal* ( literal value -- )
     over class over set-value-class*
@@ -127,15 +140,9 @@ M: literal-constraint constraint-satisfied?
     dup literal-constraint-value value-literal*
     [ swap literal-constraint-literal eql? ] [ 2drop f ] if ;
 
-: value-class* ( value -- class )
-    value-classes get at object or ;
-
 M: class-constraint constraint-satisfied?
     dup class-constraint-value value-class*
     swap class-constraint-class class< ;
-
-: value-interval* ( value -- interval/f )
-    value-intervals get at ;
 
 M: pair apply-constraint
     first2 2dup constraints get set-at
@@ -159,13 +166,10 @@ M: pair constraint-satisfied?
     2drop ;
 
 : intersect-classes ( classes values -- )
-    [ [ value-class* class-and ] keep set-value-class* ] 2each ;
+    [ intersect-value-class ] 2each ;
 
 : intersect-intervals ( intervals values -- )
-    [
-        [ value-interval* interval-intersect ] keep
-        set-value-interval*
-    ] 2each ;
+    [ intersect-value-interval ] 2each ;
 
 : predicate-constraints ( class #call -- )
     [
@@ -220,7 +224,8 @@ M: #dispatch child-constraints
     ] make-constraints ;
 
 M: #declare infer-classes-before
-    dup node-param swap node-in-d [ set-value-class* ] 2each ;
+    dup node-param swap node-in-d
+    [ intersect-value-class ] 2each ;
 
 DEFER: (infer-classes)
 

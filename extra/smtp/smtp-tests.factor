@@ -1,5 +1,5 @@
 USING: smtp tools.test io.streams.string threads
-smtp.server kernel sequences namespaces ;
+smtp.server kernel sequences namespaces logging ;
 IN: temporary
 
 { 0 0 } [ [ ] with-smtp-connection ] must-infer-as
@@ -15,34 +15,22 @@ IN: temporary
     { "hello" "world" } [ send-body ] string-out
 ] unit-test
 
-[
-    [
-        "500 syntax error" check-response
-    ] with-log-stdio
-] must-fail
+[ "500 syntax error" check-response ] must-fail
 
-[ ] [
-    [
-        "220 success" check-response
-    ] with-log-stdio
-] unit-test
+[ ] [ "220 success" check-response ] unit-test
 
 [ "220 success" ] [
     "220 success" [ receive-response ] string-in
 ] unit-test
 
 [ "220 the end" ] [
-    [
-        "220-a multiline response\r\n250-another line\r\n220 the end"
-        [ receive-response ] string-in
-    ] with-log-stdio
+    "220-a multiline response\r\n250-another line\r\n220 the end"
+    [ receive-response ] string-in
 ] unit-test
 
 [ ] [
-    [
-        "220-a multiline response\r\n250-another line\r\n220 the end"
-        [ get-ok ] string-in
-    ] with-log-stdio
+    "220-a multiline response\r\n250-another line\r\n220 the end"
+    [ get-ok ] string-in
 ] unit-test
 
 [

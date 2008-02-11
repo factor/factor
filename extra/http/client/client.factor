@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
-io io.sockets io.streams.string io.files strings splitting
-continuations assocs.lib ;
+io io.sockets io.streams.string io.files io.timeouts strings
+splitting continuations assocs.lib ;
 IN: http.client
 
 : parse-host ( url -- host port )

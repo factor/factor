@@ -26,7 +26,7 @@ uses definitions ;
         rot source-file-checksum
         (source-modified?)
     ] [
-        ?resource-path exists?
+        resource-exists?
     ] ?if ;
 
 : record-modified ( source-file -- )

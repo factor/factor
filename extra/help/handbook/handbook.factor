@@ -157,7 +157,8 @@ ARTICLE: "io" "Input and output"
 "Advanced features:"
 { $subsection "io.launcher" }
 { $subsection "io.mmap" }
-{ $subsection "io.monitors" } ;
+{ $subsection "io.monitors" }
+{ $subsection "io.timeouts" } ;
 
 ARTICLE: "tools" "Developer tools"
 { $subsection "tools.annotations" }

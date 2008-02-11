@@ -42,7 +42,7 @@ SYMBOL: insomniac-recipients
 : email-log-report ( service word-names -- )
     "logging.insomniac" [ (email-log-report) ] with-logging ;
 
-: schedule-insomniac ( alist -- )
+: schedule-insomniac ( service word-names -- )
     { 25 } { 6 } f f f <when> -rot [
         [ email-log-report ] assoc-each rotate-logs
     ] 2curry schedule ;

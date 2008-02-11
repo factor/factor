@@ -24,24 +24,24 @@ IN: inference.backend
 : recursive-quotation? ( quot -- ? )
     local-recursive-state [ first eq? ] with contains? ;
 
-TUPLE: inference-error rstate major? ;
+TUPLE: inference-error rstate type ;
 
-M: inference-error compiler-warning?
-    inference-error-major? not ;
+M: inference-error compiler-error-type
+    inference-error-type ;
 
-: (inference-error) ( ... class important? -- * )
+: (inference-error) ( ... class type -- * )
     >r construct-boa r>
     recursive-state get {
         set-delegate
-        set-inference-error-major?
+        set-inference-error-type
         set-inference-error-rstate
     } \ inference-error construct throw ; inline
 
 : inference-error ( ... class -- * )
-    t (inference-error) ; inline
+    +error+ (inference-error) ; inline
 
 : inference-warning ( ... class -- * )
-    f (inference-error) ; inline
+    +warning+ (inference-error) ; inline
 
 TUPLE: literal-expected ;
 
@@ -370,6 +370,7 @@ TUPLE: effect-error word effect ;
             init-inference
             dependencies off
             dup word-def over dup infer-quot-recursive
+            end-infer
             finish-word
             current-effect
         ] with-scope

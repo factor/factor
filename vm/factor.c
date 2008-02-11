@@ -154,6 +154,8 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 
 	init_factor(&p);
 
+	nest_stacks();
+
 	F_ARRAY *args = allot_array(ARRAY_TYPE,argc,F);
 
 	for(i = 1; i < argc; i++)
@@ -172,8 +174,6 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 
 	userenv[EXECUTABLE_ENV] = tag_object(from_native_string(executable_path));
 	userenv[EMBEDDED_ENV] = (embedded ? T : F);
-
-	nest_stacks();
 
 	if(p.console)
 		open_console();

@@ -49,7 +49,7 @@ MEMO: 'arguments' ( -- parser )
 
 : redirect ( obj mode fd -- )
     {
-        { [ pick not ] [ 3drop ] }
+        { [ pick not ] [ 2nip F_SETFL 0 fcntl io-error ] }
         { [ pick +closed+ eq? ] [ close 2drop ] }
         { [ pick string? ] [ (redirect) ] }
     } cond ;

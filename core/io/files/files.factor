@@ -96,6 +96,9 @@ TUPLE: no-parent-directory path ;
 : ?resource-path ( path -- newpath )
     "resource:" ?head [ resource-path ] when ;
 
+: resource-exists? ( path -- ? )
+    ?resource-path exists? ;
+
 : make-directories ( path -- )
     normalize-pathname right-trim-separators {
         { [ dup "." = ] [ ] }

@@ -1,8 +1,9 @@
 
-USING: kernel io io.files io.launcher hashtables
+USING: kernel io io.files io.launcher io.sockets hashtables
        system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
-       combinators bootstrap.image bootstrap.image.download ;
+       combinators bootstrap.image bootstrap.image.download
+       combinators.cleave ;
 
 IN: builder
 
@@ -29,16 +30,34 @@ IN: builder
 
 SYMBOL: builder-recipients
 
+: host-name* ( -- name ) host-name "." split first ;
+
+: tag-subject ( str -- str ) `{ "builder@" ,[ host-name* ] ": " , } concat ;
+
+: email-string ( subject -- )
+  `{ "mutt" "-s" ,[ tag-subject ] %[ builder-recipients get ] }
+  [ ] with-process-stream drop ;
+
 : email-file ( subject file -- )
   `{
     { +stdin+ , }
-    { +arguments+ { "mutt" "-s" , %[ builder-recipients get ] } }
+    { +arguments+
+      { "mutt" "-s" ,[ tag-subject ] %[ builder-recipients get ] } }
   }
   >hashtable run-process drop ;
 
-: email-string ( subject -- )
-  `{ "mutt" "-s" , %[ builder-recipients get ] }
-  [ ] with-process-stream drop ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: run-or-notify ( desc message -- )
+  [ [ try-process ]        curry ]
+  [ [ email-string throw ] curry ]
+  bi*
+  recover ;
+
+: run-or-send-file ( desc message file -- )
+  >r >r [ try-process ]         curry
+  r> r> [ email-file throw ] 2curry
+  recover ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -59,71 +78,44 @@ VAR: stamp
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: build-status
-
-: build ( -- )
-
-  "running" build-status set-global
-
-  datestamp >stamp
-
-  "/builds/factor" cd
-  
+: git-pull ( -- desc )
   {
     "git"
     "pull"
     "--no-summary"
     "git://factorcode.org/git/factor.git"
     "master"
-  }
-  run-process process-status
-  0 =
-  [ ]
-  [
-    "builder: git pull" email-string
-    "builder: git pull" throw
-  ]
-  if
+  } ;
 
-  {
-    "git" "pull" "--no-summary"
-    "http://dharmatech.onigirihouse.com/factor.git" "master"
-  } run-process drop
+: git-clone ( -- desc ) { "git" "clone" "../factor" } ;
 
-  "/builds/" stamp> append make-directory
-  "/builds/" stamp> append cd
+: enter-build-dir ( -- )
+  datestamp >stamp
+  "/builds" cd
+  stamp> make-directory
+  stamp> cd ;
 
-  { "git" "clone" "../factor" } run-process drop
-
-  "factor" cd
-
+: record-git-id ( -- )
   { "git" "show" } <process-stream> [ readln ] with-stream " " split second
-  "../git-id" log-object
+  "../git-id" log-object ;
 
-  { "make" "clean" } run-process drop
+: make-clean ( -- desc ) { "make" "clean" } ;
 
-  ! "vm" build-status set-global
-
+: make-vm ( -- )
   `{
      { +arguments+ { "make" ,[ target ] } }
      { +stdout+    "../compile-log" }
      { +stderr+    +stdout+ }
    }
-  >hashtable run-process process-status
-  0 =
-  [ ]
-  [
-    "builder: vm compile" "../compile-log" email-file
-    "builder: vm compile" throw
-  ] if
+  >hashtable ;
 
+: retrieve-boot-image ( -- )
   [ my-arch download-image ]
   [ ]
   [ "builder: image download" email-string ]
-  cleanup
+  cleanup ;
 
-  ! "bootstrap" build-status set-global
-
+: bootstrap ( -- desc )
   `{
      { +arguments+ {
                      ,[ factor-binary ]
@@ -133,29 +125,49 @@ SYMBOL: build-status
      { +stdout+   "../boot-log" }
      { +stderr+   +stdout+ }
    }
-  >hashtable [ run-process ] "../boot-time" log-runtime process-status
-  0 =
-  [ ]
-  [
-    "builder: bootstrap" "../boot-log" email-file
-    "builder: bootstrap" throw
-  ] if
+  >hashtable ;
 
-  ! "test" build-status set-global
+: builder-test ( -- desc ) `{ ,[ factor-binary ] "-run=builder.test" } ;
+  
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  `{ ,[ factor-binary ] "-run=builder.test" } run-process drop
+SYMBOL: build-status
+
+: build ( -- )
+
+  "running" build-status set-global
+
+  "/builds/factor" cd
+
+  git-pull "git pull error" run-or-notify
+
+  enter-build-dir
+  
+  git-clone "git clone error" run-or-notify
+
+  "factor" cd
+
+  record-git-id
+
+  make-clean "make clean error" run-or-notify
+
+  make-vm "vm compile error" "../compile-log" run-or-send-file
+
+  retrieve-boot-image
+
+  bootstrap "bootstrap error" "../boot-log" run-or-send-file
+
+  builder-test "builder.test fatal error" run-or-notify
   
   "../load-everything-log" exists?
-  [ "builder: load-everything" "../load-everything-log" email-file ]
+  [ "load-everything" "../load-everything-log" email-file ]
   when
 
   "../failing-tests" exists?
-  [ "builder: failing tests" "../failing-tests" email-file ]
+  [ "failing tests" "../failing-tests" email-file ]
   when
 
-  ! "ready" build-status set-global
-
-  ;
+  "ready" build-status set-global ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

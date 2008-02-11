@@ -40,14 +40,8 @@ SYMBOL: this-test
     dup word? [ 1quotation ] when
     [ infer drop ] curry [ ] swap unit-test ;
 
-TUPLE: expected-error ;
-
-M: expected-error summary
-    drop
-    "The unit test expected the quotation to throw an error" ;
-
 : must-fail-with ( quot pred -- )
-    >r [ expected-error construct-empty throw ] compose r>
+    >r [ f ] compose r>
     [ recover ] 2curry
     [ t ] swap unit-test ;
 
@@ -59,18 +53,12 @@ M: expected-error summary
 
 : (run-test) ( vocab -- )
     dup vocab-source-loaded? [
-        vocab-tests-path dup [
-            dup ?resource-path exists? [
-                [
-                    "temporary" forget-vocab
-                ] with-compilation-unit
-                dup run-file
-                [
-                    dup forget-source
-                    "temporary" forget-vocab
-                ] with-compilation-unit
-            ] when
-        ] when
+        [ "temporary" forget-vocab ] with-compilation-unit
+        vocab-tests dup [ run-file ] each
+        [
+            dup [ forget-source ] each
+            "temporary" forget-vocab
+        ] with-compilation-unit
     ] when drop ;
 
 : run-test ( vocab -- failures )

@@ -74,8 +74,3 @@ M: duplex-stream dispose
         [ dup duplex-stream-out dispose ]
         [ dup duplex-stream-in dispose ] [ ] cleanup
     ] unless drop ;
-
-M: duplex-stream set-timeout
-    2dup
-    duplex-stream-in set-timeout
-    duplex-stream-out set-timeout ;

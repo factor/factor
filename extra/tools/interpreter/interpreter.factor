@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes combinators combinators.private
+USING: arrays assocs classes combinators sequences.private
 continuations continuations.private generic hashtables io kernel
 kernel.private math namespaces namespaces.private prettyprint
 quotations sequences splitting strings threads vectors words ;

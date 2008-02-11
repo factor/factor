@@ -4,7 +4,6 @@ USING: hashtables generic kernel math namespaces sequences strings
     continuations assocs io.styles sbufs ;
 IN: io
 
-GENERIC: set-timeout ( n stream -- )
 GENERIC: stream-readln ( stream -- str )
 GENERIC: stream-read1 ( stream -- ch/f )
 GENERIC: stream-read ( n stream -- str/f )

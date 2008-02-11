@@ -1339,9 +1339,27 @@ FUNCTION: int XwcLookupString ( XIC ic, XKeyPressedEvent* event, ulong* buffer_r
 
 FUNCTION: int Xutf8LookupString ( XIC ic, XKeyPressedEvent* event, char* buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
 
+! !!! category of setlocale
+: LC_ALL      0 ; inline
+: LC_COLLATE  1 ; inline
+: LC_CTYPE    2 ; inline
+: LC_MONETARY 3 ; inline
+: LC_NUMERIC  4 ; inline
+: LC_TIME     5 ; inline
+
+FUNCTION: char* setlocale ( int category, char* name ) ;
+
+FUNCTION: Bool XSupportsLocale ( ) ;
+
+FUNCTION: char* XSetLocaleModifiers ( char* modifier_list ) ;
+
 SYMBOL: dpy
 SYMBOL: scr
 SYMBOL: root
+
+: init-locale ( -- )
+   LC_ALL "" setlocale [ "setlocale() failed" throw ] unless
+   XSupportsLocale [ "XSupportsLocale() failed" throw ] unless ;
 
 : flush-dpy ( -- ) dpy get XFlush drop ;
 
@@ -1353,6 +1371,7 @@ SYMBOL: root
     ] unless* ;
 
 : initialize-x ( display-string -- )
+    init-locale
     dup [ string>char-alien ] when
     XOpenDisplay check-display dpy set-global
     dpy get XDefaultScreen scr set-global
