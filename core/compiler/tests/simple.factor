@@ -1,5 +1,5 @@
 USING: compiler tools.test kernel kernel.private
-combinators.private math.private math combinators strings
+sequences.private math.private math combinators strings
 alien arrays memory ;
 IN: temporary
 

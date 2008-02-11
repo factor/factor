@@ -4,7 +4,7 @@
 USING: kernel math sequences words arrays io 
        io.files namespaces math.parser kernel.private
        assocs quotations parser parser-combinators tools.time
-       combinators.private compiler.units ;
+       sequences.private compiler.units ;
 IN: cpu.8080.emulator
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;

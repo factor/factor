@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions mirrors
-arrays math.parser sorting strings ascii ;
+arrays math.parser sorting strings ascii macros ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline

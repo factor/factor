@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences
 USING: kernel kernel.private slots.private math math.private ;
@@ -76,6 +76,8 @@ PREDICATE: fixnum array-capacity
 
 : set-array-nth ( elt n array -- )
     swap 2 fixnum+fast set-slot ; inline
+
+: dispatch ( n array -- ) array-nth (call) ;
 
 GENERIC: resize ( n seq -- newseq ) flushable
 
@@ -614,13 +616,21 @@ M: sequence <=>
     dup midpoint@ cut-slice ;
 
 : binary-reduce ( seq start quot -- value )
-    pick length {
-        { 0 [ drop nip ] }
-        { 1 [ 2drop first ] }
-        { 2 [ >r drop first2 r> call ] }
-        { 3 [ >r drop first3 r> 2apply ] }
-        [ drop >r >r halves r> r> [ [ split-reduce ] 2curry 2apply ] keep call ]
-    } case ; inline
+    #! We can't use case here since combinators depends on
+    #! sequences
+    pick length dup 0 3 between? [
+        >fixnum {
+            [ drop nip ]
+            [ 2drop first ]
+            [ >r drop first2 r> call ]
+            [ >r drop first3 r> 2apply ]
+        } dispatch
+    ] [
+        drop
+        >r >r halves r> r>
+        [ [ binary-reduce ] 2curry 2apply ] keep
+        call
+    ] if ; inline
 
 : cut ( seq n -- before after )
     [ head ] 2keep tail ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private math
 namespaces sequences vectors words strings layouts combinators
-combinators.private classes generic.standard assocs ;
+sequences.private classes generic.standard assocs ;
 IN: optimizer.specializers
 
 : (make-specializer) ( class picker -- quot )
