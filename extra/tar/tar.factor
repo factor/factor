@@ -236,10 +236,9 @@ TUPLE: unimplemented-typeflag header ;
     ] when* ;
 
 : parse-tar ( path -- obj )
-    <file-reader> [
+    [
         "tar-test" resource-path base-dir set
         global [ nl nl nl "Starting to parse .tar..." print flush ] bind
         global [ "Expanding to: " write base-dir get . flush ] bind
         (parse-tar)
-    ] with-stream ;
-
+    ] with-file-out ;
