@@ -84,7 +84,7 @@ SYMBOL: log-files
     (close-logs)
     log-root directory [ drop rotate-log ] assoc-each ;
 
-: log-server-loop
+: log-server-loop ( -- )
     [
         receive unclip {
             { "log-message" [ (log-message) ] }

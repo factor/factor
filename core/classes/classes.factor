@@ -20,7 +20,9 @@ PREDICATE: class tuple-class
 
 : classes ( -- seq ) class<map get keys ;
 
-: type>class ( n -- class ) builtins get nth ;
+: type>class ( n -- class ) builtins get-global nth ;
+
+: bootstrap-type>class ( n -- class ) builtins get nth ;
 
 : predicate-word ( word -- predicate )
     [ word-name "?" append ] keep word-vocabulary create ;

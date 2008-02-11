@@ -11,8 +11,10 @@ IN: logging.parser
 SYMBOL: multiline
 
 : 'date'
-    multiline-header token [ drop multiline ] <@
-    [ CHAR: ] eq? not ] string-of [ rfc3339>timestamp ] <@ <|>
+    [ "]" member? not ] string-of [
+        dup multiline-header =
+        [ drop multiline ] [ rfc3339>timestamp ] if
+    ] <@
     "[" "]" surrounded-by ;
 
 : 'log-level'

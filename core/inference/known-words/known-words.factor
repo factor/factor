@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.accessors arrays bit-arrays byte-arrays
-classes combinators.private continuations.private effects
+classes sequences.private continuations.private effects
 float-arrays generic hashtables hashtables.private
 inference.state inference.backend inference.dataflow io
 io.backend io.files io.files.private io.streams.c kernel

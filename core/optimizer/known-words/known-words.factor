@@ -8,7 +8,7 @@ assocs quotations sequences.private io.binary io.crc32
 io.streams.string layouts splitting math.intervals
 math.floats.private tuples tuples.private classes
 optimizer.def-use optimizer.backend optimizer.pattern-match
-float-arrays combinators.private combinators ;
+float-arrays sequences.private combinators ;
 
 ! the output of <tuple> and <tuple-boa> has the class which is
 ! its second-to-last input
@@ -98,7 +98,7 @@ float-arrays combinators.private combinators ;
     [
         num-types get swap [
             [
-                [ type>class 0 `input class, ] keep
+                [ type>class object or 0 `input class, ] keep
                 0 `output literal,
             ] set-constraints
         ] curry each

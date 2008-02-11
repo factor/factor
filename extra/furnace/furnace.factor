@@ -189,7 +189,7 @@ SYMBOL: model
     swap [ render-template ] with-slots ;
 
 : browse-webapp-source ( vocab -- )
-    <a f >vocab-link browser-link-href =href a>
+    <a vocab browser-link-href =href a>
         "Browse source" write
     </a> ;
 

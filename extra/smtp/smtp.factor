@@ -1,8 +1,9 @@
-! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels, Slava Pestov.
+! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
+! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces io kernel logging io.sockets sequences
-combinators sequences.lib splitting assocs strings math.parser
-random system calendar ;
+USING: namespaces io io.timeouts kernel logging io.sockets
+sequences combinators sequences.lib splitting assocs strings
+math.parser random system calendar ;
 
 IN: smtp
 

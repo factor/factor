@@ -7,9 +7,15 @@ IN: x11.xim
 
 SYMBOL: xim
 
+: (init-xim) ( classname medifier -- im )
+   XSetLocaleModifiers [ "XSetLocaleModifiers() failed" throw ] unless
+   dpy get f rot dup XOpenIM ;
+
 : init-xim ( classname -- )
-    dpy get f rot dup XOpenIM
-    [ "XOpenIM() failed" throw ] unless* xim set-global ;
+   dup "" (init-xim)
+   [ nip ]
+   [ "@im=none" (init-xim) [ "XOpenIM() failed" throw ] unless* ] if*
+   xim set-global ;
 
 : close-xim ( -- )
     xim get-global XCloseIM drop f xim set-global ;
@@ -32,11 +38,11 @@ SYMBOL: keybuf
 SYMBOL: keysym
 
 : prepare-lookup ( -- )
-    buf-size "ulong" <c-array> keybuf set
+    buf-size "uint" <c-array> keybuf set
     0 <KeySym> keysym set ;
 
 : finish-lookup ( len -- string keysym )
-    keybuf get swap c-ulong-array> >string
+    keybuf get swap c-uint-array> >string
     keysym get *KeySym ;
 
 : lookup-string ( event xic -- string keysym )

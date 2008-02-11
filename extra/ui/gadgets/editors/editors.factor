@@ -363,9 +363,21 @@ editor "clipboard" f {
     { T{ cut-action } cut }
 } define-command-map
 
-: previous-character T{ char-elt } editor-prev ;
+: previous-character ( editor -- )
+    dup gadget-selection? [
+        dup selection-start/end drop
+        over set-caret mark>caret
+    ] [
+        T{ char-elt } editor-prev
+    ] if ;
 
-: next-character T{ char-elt } editor-next ;
+: next-character ( editor -- )
+    dup gadget-selection? [
+        dup selection-start/end nip
+        over set-caret mark>caret
+    ] [
+        T{ char-elt } editor-next
+    ] if ;
 
 : previous-line T{ line-elt } editor-prev ;
 
@@ -436,8 +448,8 @@ editor "selection" f {
     { T{ key-down f { S+ } "RIGHT" } select-next-character }
     { T{ key-down f { S+ } "UP" } select-previous-line }
     { T{ key-down f { S+ } "DOWN" } select-next-line }
-    { T{ key-down f { S+ C+ } "LEFT" } select-previous-line }
-    { T{ key-down f { S+ C+ } "RIGHT" } select-next-line }
+    { T{ key-down f { S+ C+ } "LEFT" } select-previous-word }
+    { T{ key-down f { S+ C+ } "RIGHT" } select-next-word }
     { T{ key-down f { S+ } "HOME" } select-start-of-line }
     { T{ key-down f { S+ } "END" } select-end-of-line }
     { T{ key-down f { S+ C+ } "HOME" } select-start-of-document }

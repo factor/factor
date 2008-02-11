@@ -17,6 +17,7 @@ IN: kernel
 : clear ( -- ) { } set-datastack ;
 
 ! Combinators
+
 : call ( callable -- ) uncurry (call) ;
 
 DEFER: if

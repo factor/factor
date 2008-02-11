@@ -3,8 +3,9 @@
 USING: alien.c-types destructors io.windows
 io.windows.nt.backend kernel math windows windows.kernel32
 windows.types libc assocs alien namespaces continuations
-io.monitors io.monitors.private io.nonblocking io.buffers io.files
-io sequences hashtables sorting arrays combinators ;
+io.monitors io.monitors.private io.nonblocking io.buffers
+io.files io.timeouts io sequences hashtables sorting arrays
+combinators ;
 IN: io.windows.nt.monitors
 
 : open-directory ( path -- handle )
@@ -52,7 +53,7 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
             swap [ save-callback ] 2keep
             dup check-monitor ! we may have closed it...
             get-overlapped-result
-        ] with-port-timeout
+        ] with-timeout
     ] with-destructors ;
 
 : parse-action ( action -- changed )

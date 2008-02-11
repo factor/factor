@@ -22,8 +22,7 @@ $nl
 { $subsection make-block-stream }
 { $subsection make-cell-stream }
 { $subsection stream-write-table }
-"Optional word for network streams:"
-{ $subsection set-timeout } ;
+{ $see-also "io.timeouts" } ;
 
 ARTICLE: "stdio" "The default stream"
 "Various words take an implicit stream parameter from a variable to reduce stack shuffling."
@@ -72,11 +71,6 @@ ARTICLE: "streams" "Streams"
 { $see-also "io.streams.string" "io.streams.lines" "io.streams.plain" "io.streams.duplex" } ;
 
 ABOUT: "streams"
-
-HELP: set-timeout
-{ $values { "n" "an integer" } { "stream" "a stream" } }
-{ $contract "Sets a timeout, in milliseconds, for input and output operations on the stream. If a read or a write is initiated and no activity is seen before the timeout expires, an error will be thrown to the caller of the operation being performed." }
-{ $notes "Whether or not the stream is closed when the error is thrown is implementation-specific, and user code should take care to close the stream on all error conditions in any case." } ;
 
 HELP: stream-readln
 { $values { "stream" "an input stream" } { "str" string } }
