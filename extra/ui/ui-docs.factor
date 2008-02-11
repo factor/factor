@@ -14,6 +14,16 @@ HELP: open-window
 { $values { "gadget" gadget } { "title" string } }
 { $description "Opens a native window with the specified title." } ;
 
+HELP: set-fullscreen?
+{ $values { "?" "a boolean" } { "gadget" gadget } }
+{ $description "Sets and unsets fullscreen mode for the gadget's world." } ;
+
+HELP: fullscreen?
+{ $values { "gadget" gadget } { "?" "a boolean" } }
+{ $description "Queries the gadget's world to see if it is running in fullscreen mode." } ;
+
+{ fullscreen? set-fullscreen? } related-words
+
 HELP: find-window
 { $values { "quot" "a quotation with stack effect " { $snippet "( world -- ? )" } } { "world" "a " { $link world } " or " { $link f } } }
 { $description "Finds a native window whose world satisfies the quotation, outputting " { $link f } " if no such world could be found. The front-most native window is checked first." } ;
