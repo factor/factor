@@ -23,6 +23,18 @@ SYMBOL: begin
 : finish-decoding ( buf ch state -- str )
     begin eq? [ decode-error ] unless drop "" like ;
 
-: decode ( seq quot -- str )
-    >r [ length <sbuf> 0 begin ] keep r> each
-    finish-decoding ; inline
+: decode ( ch state seq quot -- buf ch state )
+    [ -rot ] swap compose each ; inline
+
+: start-decoding ( seq -- buf ch state seq )
+    [ length <sbuf> 0 begin ] keep ;
+
+GENERIC: init-decoding ( stream encoding -- decoded-stream )
+
+: <decoding> ( stream decoding-class -- decoded-stream )
+    construct-empty init-decoding ;
+
+GENERIC: init-encoding ( stream encoding -- encoded-stream )
+
+: <encoding> ( stream encoding-class -- encoded-stream )
+    construct-empty init-encoding ;
