@@ -1,4 +1,5 @@
-USING: io.files kernel tools.test db db.sqlite db.tuples ;
+USING: io.files kernel tools.test db db.sqlite db.tuples
+db.types continuations namespaces ;
 IN: temporary
 
 TUPLE: person the-id the-name the-number ;
@@ -13,16 +14,23 @@ person "PERSON"
 } define-persistent
 
 
+SYMBOL: the-person
+
 : test-tuples ( -- )
-    f "billy" 100 person construct-boa dup insert-tuple
+    [ person drop-table ] [ ] recover
+    person create-table
+    f "billy" 100 person construct-boa
+    the-person set
+    
+    [  ] [ the-person get insert-tuple ] unit-test
 
-    [ 1 ] [ dup person-id ] unit-test
+    [ 1 ] [ the-person get person-the-id ] unit-test
 
-    200 over set-person-the-number
+    200 the-person get set-person-the-number
 
-    [ ] [ dup update-tuple ] unit-test
+    [ ] [ the-person get update-tuple ] unit-test
 
-    [ ] [ delete-tuple ] unit-test ;
+    [ ] [ the-person get delete-tuple ] unit-test ;
 
 : test-sqlite ( -- )
     "tuples-test.db" resource-path <sqlite-db> [

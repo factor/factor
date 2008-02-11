@@ -49,7 +49,7 @@ IN: db.tuples
     [ <prepared-statement> ] 3compose cache nip ; inline
 
 HOOK: create-sql db ( columns table -- sql )
-HOOK: drop-sql db ( columns table -- sql )
+HOOK: drop-sql db ( table -- sql )
 HOOK: insert-sql* db ( columns table -- sql )
 HOOK: update-sql* db ( columns table -- sql )
 HOOK: delete-sql* db ( columns table -- sql )
@@ -80,6 +80,9 @@ HOOK: tuple>params db ( columns tuple -- obj )
 : create-table ( class -- )
     dup db-columns swap db-table create-sql sql-command ;
     
+: drop-table ( class -- )
+    db-table drop-sql sql-command ;
+
 : insert-tuple ( tuple -- )
     [
         [ maybe-remove-id ] [ insert-sql ] do-tuple-statement
