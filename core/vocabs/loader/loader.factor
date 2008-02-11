@@ -56,7 +56,7 @@ M: vocab-link vocab-root
             dup "-tests.factor" vocab-dir+ vocab-path+
             dup resource-exists? [ , ] [ drop ] if
 
-            dup vocab-dir "test" path+ vocab-path+ dup
+            dup vocab-dir "tests" path+ vocab-path+ dup
             ?resource-path directory keys [ ".factor" tail? ] subset
             [ path+ , ] with each
         ] { } make

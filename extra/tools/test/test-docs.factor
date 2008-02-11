@@ -39,7 +39,7 @@ $nl
 "Unit tests for a vocabulary are placed in test files in the same directory as the vocabulary source file (see " { $link "vocabs.loader" } "). Two possibilities are supported:"
 { $list
     { "Tests can be placed in a file named " { $snippet { $emphasis "vocab" } "-tests.factor" } "." }
-    { "Tests can be placed in files in the " { $snippet "test" } " subdirectory." }
+    { "Tests can be placed in files in the " { $snippet "tests" } " subdirectory." }
 }
 "The latter is used for vocabularies with more extensive test suites."
 $nl
