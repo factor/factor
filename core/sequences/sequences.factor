@@ -606,7 +606,21 @@ M: sequence <=>
     ] if ;
 
 : cut-slice ( seq n -- before after )
-    [ head ] 2keep tail-slice ;
+    [ head-slice ] 2keep tail-slice ;
+
+: midpoint@ ( seq -- n ) length 2/ ; inline
+
+: halves ( seq -- first second )
+    dup midpoint@ cut-slice ;
+
+: binary-reduce ( seq start quot -- value )
+    pick length {
+        { 0 [ drop nip ] }
+        { 1 [ 2drop first ] }
+        { 2 [ >r drop first2 r> call ] }
+        { 3 [ >r drop first3 r> 2apply ] }
+        [ drop >r >r halves r> r> [ [ split-reduce ] 2curry 2apply ] keep call ]
+    } case ; inline
 
 : cut ( seq n -- before after )
     [ head ] 2keep tail ;
@@ -657,8 +671,8 @@ PRIVATE>
 : trim ( seq quot -- newseq )
     [ left-trim ] keep right-trim ; inline
 
-: sum ( seq -- n ) 0 [ + ] reduce ;
-: product ( seq -- n ) 1 [ * ] reduce ;
+: sum ( seq -- n ) 0 [ + ] binary-reduce ;
+: product ( seq -- n ) 1 [ * ] binary-reduce ;
 
 : infimum ( seq -- n ) dup first [ min ] reduce ;
 : supremum ( seq -- n ) dup first [ max ] reduce ;
