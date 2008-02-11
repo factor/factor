@@ -17,8 +17,7 @@ IN: kernel
 : clear ( -- ) { } set-datastack ;
 
 ! Combinators
-
-: call ( callable -- ) uncurry (call) ;
+GENERIC: call ( callable -- )
 
 DEFER: if
 
@@ -71,6 +70,10 @@ DEFER: if
     [ 2nip call ] if ; inline
 
 ! Quotation building
+USE: tuples.private
+
+: curry ( obj quot -- curry )
+    \ curry 4 <tuple-boa> ;
 
 : 2curry ( obj1 obj2 quot -- curry )
     curry curry ; inline
@@ -82,12 +85,10 @@ DEFER: if
     swapd [ swapd call ] 2curry ; inline
 
 : compose ( quot1 quot2 -- curry )
-    ! Not inline because this is treated as a primitive by
-    ! the compiler
-    [ slip call ] 2curry ;
+    \ compose 4 <tuple-boa> ;
 
 : 3compose ( quot1 quot2 quot3 -- curry )
-    [ 2slip slip call ] 3curry ; inline
+    compose compose ; inline
 
 ! Object protocol
 
@@ -156,7 +157,7 @@ GENERIC: construct-boa ( ... class -- tuple )
 
 ! Error handling -- defined early so that other files can
 ! throw errors before continuations are loaded
-: throw ( error -- * ) 5 getenv [ die ] or curry (throw) ;
+: throw ( error -- * ) 5 getenv [ die ] or 1 (throw) ;
 
 <PRIVATE
 

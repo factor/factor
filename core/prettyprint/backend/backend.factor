@@ -135,6 +135,7 @@ GENERIC: pprint-delims ( obj -- start end )
 
 M: quotation pprint-delims drop \ [ \ ] ;
 M: curry pprint-delims drop \ [ \ ] ;
+M: compose pprint-delims drop \ [ \ ] ;
 M: array pprint-delims drop \ { \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
 M: byte-vector pprint-delims drop \ BV{ \ } ;
@@ -156,6 +157,8 @@ M: vector >pprint-sequence ;
 M: bit-vector >pprint-sequence ;
 M: byte-vector >pprint-sequence ;
 M: float-vector >pprint-sequence ;
+M: curry >pprint-sequence ;
+M: compose >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
 M: tuple >pprint-sequence tuple>array ;
 M: wrapper >pprint-sequence wrapped 1array ;

@@ -532,7 +532,7 @@ HELP: compose
         "compose call"
         "append call"
     }
-    "However, " { $link compose } " runs in constant time, and the compiler is able to compile code which calls composed quotations."
+    "However, " { $link compose } " runs in constant time, and the optimizing compiler is able to compile code which calls composed quotations."
 } ;
 
 HELP: 3compose
