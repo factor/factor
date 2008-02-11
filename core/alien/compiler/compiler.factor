@@ -5,7 +5,8 @@ hashtables kernel math namespaces sequences words
 inference.state inference.backend inference.dataflow system
 math.parser classes alien.arrays alien.c-types alien.structs
 alien.syntax cpu.architecture alien inspector quotations assocs
-kernel.private threads continuations.private libc combinators ;
+kernel.private threads continuations.private libc combinators
+compiler.errors continuations ;
 IN: alien.compiler
 
 ! Common protocol for alien-invoke/alien-callback/alien-indirect
@@ -207,9 +208,21 @@ M: alien-invoke-error summary
     swap alien-node-parameters parameter-sizes drop
     number>string 3append ;
 
+TUPLE: no-such-library name ;
+
+M: no-such-library summary
+    drop "Library not found" ;
+
+: no-such-library ( name -- )
+    \ no-such-library +linkage+ (inference-error) ;
+
 : (alien-invoke-dlsym) ( node -- symbol dll )
     dup alien-invoke-function
-    swap alien-invoke-library load-library ;
+    swap alien-invoke-library [
+        load-library
+    ] [
+        2drop no-such-library
+    ] recover ;
 
 TUPLE: no-such-symbol ;
 
@@ -217,7 +230,7 @@ M: no-such-symbol summary
     drop "Symbol not found" ;
 
 : no-such-symbol ( -- )
-    \ no-such-symbol inference-error ;
+    \ no-such-symbol +linkage+ (inference-error) ;
 
 : alien-invoke-dlsym ( node -- symbol dll )
     dup (alien-invoke-dlsym) 2dup dlsym [

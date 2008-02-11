@@ -270,6 +270,16 @@ cell-bits 32 = [
 ] unit-test
 
 [ t ] [
+    [ B{ 1 0 } *short 0 { number number } declare number= ]
+    \ number= inlined?
+] unit-test
+
+[ t ] [
     [ B{ 1 0 } *short 0 = ]
+    \ number= inlined?
+] unit-test
+
+[ t ] [
+    [ B{ 1 0 } *short dup number? [ 0 number= ] [ drop f ] if ]
     \ number= inlined?
 ] unit-test

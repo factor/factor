@@ -98,7 +98,7 @@ float-arrays combinators.private combinators ;
     [
         num-types get swap [
             [
-                [ type>class 0 `input class, ] keep
+                [ type>class object or 0 `input class, ] keep
                 0 `output literal,
             ] set-constraints
         ] curry each

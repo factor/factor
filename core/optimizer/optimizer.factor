@@ -4,13 +4,16 @@ USING: kernel namespaces optimizer.backend optimizer.def-use
 optimizer.known-words optimizer.math inference.class ;
 IN: optimizer
 
+SYMBOL: optimize-count
+
 : optimize-1 ( node -- newnode ? )
     [
+        global [ optimize-count inc ] bind
         H{ } clone class-substitutions set
         H{ } clone literal-substitutions set
         H{ } clone value-substitutions set
         dup compute-def-use
-        dup kill-values
+        kill-values
         dup infer-classes
         optimizer-changed off
         optimize-nodes
