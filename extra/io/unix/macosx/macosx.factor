@@ -12,9 +12,9 @@ T{ macosx-io } set-io-backend
 TUPLE: macosx-monitor ;
 
 : enqueue-notifications ( triples monitor -- )
-    monitor-queue [
-        [ first { +modify-file+ } swap changed-file ] each
-    ] bind ;
+    tuck monitor-queue
+    [ [ first { +modify-file+ } swap changed-file ] each ] bind
+    notify-callback ;
 
 M: macosx-io <monitor>
     drop
@@ -25,4 +25,3 @@ M: macosx-io <monitor>
 
 M: macosx-monitor dispose
     dup simple-monitor-handle dispose delegate dispose ;
-
