@@ -42,8 +42,8 @@ TUPLE: inotify watches ;
     [ <linux-monitor> dup ] keep watches set-at ;
 
 : remove-watch ( monitor -- )
-    dup linux-monitor-wd watches delete-at
-    linux-monitor-wd inotify-fd swap inotify_rm_watch io-error ;
+    dup simple-monitor-handle watches delete-at
+    simple-monitor-handle inotify-fd swap inotify_rm_watch io-error ;
 
 M: linux-io <monitor> ( path recursive? -- monitor )
     drop IN_CHANGE_EVENTS add-watch ;
