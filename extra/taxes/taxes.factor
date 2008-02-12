@@ -41,7 +41,6 @@ TUPLE: fica-base-unknown ;
 MIXIN: collector
 GENERIC: adjust-allowances ( salary w4 collector -- newsalary )
 GENERIC: withholding ( salary w4 collector -- x )
-GENERIC: net ( salary w4 collector -- x )
 
 TUPLE: tax-table single married ;
 
@@ -102,9 +101,6 @@ M: federal withholding ( salary w4 tax-table -- x )
     [ fica-tax ] 2keep
     medicare-tax + + ;
 
-M: federal net ( salary w4 collector -- x )
-    >r dupd r> withholding - ;
-
 
 ! Minnesota
 : minnesota-single ( -- triples )
@@ -134,14 +130,9 @@ M: minnesota adjust-allowances ( salary w4 collector -- newsalary )
 M: minnesota withholding ( salary w4 collector -- x )
     [ adjust-allowances ] 2keep marriage-table tax ;
 
-TUPLE: total ;
-INSTANCE: total collector
-
-! Totals
-M: total net ( salary w4 collector -- x )
-    >r dupd r>
+: employer-withhold ( salary w4 collector -- x )
     [ withholding ] 3keep
-    drop <federal> withholding + - ;
+    dup federal? [ 3drop ] [ drop <federal> withholding + ] if ;
 
-M: total withholding ( salary w4 collector -- x )
-    >r >r dup r> r> net - ;
+: net ( salary w4 collector -- x )
+    >r dupd r> employer-withhold - ;
