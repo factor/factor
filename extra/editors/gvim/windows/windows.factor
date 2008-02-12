@@ -1,5 +1,5 @@
 USING: editors.gvim.backend io.files io.windows kernel namespaces
-sequences windows.shell32 ;
+sequences windows.shell32 io.paths ;
 IN: editors.gvim.windows
 
 M: windows-io gvim-path
