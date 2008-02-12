@@ -57,7 +57,7 @@ IN: builder.test
 
 : do-all ( -- )
   record-bootstrap-time
-  do-load
-  do-tests ;
+  [ do-load ]  [ drop ] recover
+  [ do-tests ] [ drop ] recover ;
 
 MAIN: do-all
