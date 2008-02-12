@@ -1,5 +1,6 @@
-USING: alien.syntax kernel syntax words ;
-
+USING: kernel x11.glx ;
 IN: opengl.gl.unix
 
-: GL-FUNCTION: POSTPONE: FUNCTION: ; parsing
+: gl-function-context ( -- context ) glXGetCurrentContext ; inline
+: gl-function-address ( name -- address ) glXGetProcAddressARB ; inline
+: gl-function-calling-convention ( -- str ) "cdecl" ; inline

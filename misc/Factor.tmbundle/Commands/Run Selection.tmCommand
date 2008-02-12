@@ -16,7 +16,7 @@ factor_run(STDIN.read)</string>
 	<key>keyEquivalent</key>
 	<string>^~e</string>
 	<key>name</key>
-	<string>Run Selection/Line in Listener</string>
+	<string>Run Selection</string>
 	<key>output</key>
 	<string>discard</string>
 	<key>scope</key>

@@ -107,6 +107,7 @@ M: bad-escape summary drop "Bad escape code" ;
 
 : escape ( escape -- ch )
     H{
+        { CHAR: a  CHAR: \a }
         { CHAR: e  CHAR: \e }
         { CHAR: n  CHAR: \n }
         { CHAR: r  CHAR: \r }

@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
 
 # Programs returning != 0 will not cause script to exit
 set +e
@@ -11,6 +11,9 @@ OS=
 ARCH=
 WORD=
 NO_UI=
+GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
+GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
+
 
 ensure_program_installed() {
         echo -n "Checking for $1..."
@@ -51,6 +54,9 @@ check_installed_programs() {
         ensure_program_installed wget
         ensure_program_installed gcc
         ensure_program_installed make
+        case $OS in
+            netbsd) ensure_program_installed gmake;;
+        esac
         check_gcc_version
 }
 
@@ -106,6 +112,7 @@ find_os() {
                 *Darwin*) OS=macosx;;
                 *linux*) OS=linux;;
                 *Linux*) OS=linux;;
+                *NetBSD*) OS=netbsd;;
         esac
 }
 
@@ -153,6 +160,8 @@ echo_build_info() {
         echo MAKE_TARGET=$MAKE_TARGET
         echo BOOT_IMAGE=$BOOT_IMAGE
         echo MAKE_IMAGE_TARGET=$MAKE_IMAGE_TARGET
+        echo GIT_PROTOCOL=$GIT_PROTOCOL
+        echo GIT_URL=$GIT_URL
 }
 
 set_build_info() {
@@ -188,22 +197,19 @@ find_build_info() {
         echo_build_info
 }
 
+invoke_git() {
+        git $*
+        check_ret git
+}
+
 git_clone() {
         echo "Downloading the git repository from factorcode.org..."
-        git clone git://factorcode.org/git/factor.git
-        check_ret git
+        invoke_git clone $GIT_URL
 }
 
 git_pull_factorcode() {
         echo "Updating the git repository from factorcode.org..."
-        git pull git://factorcode.org/git/factor.git master
-        check_ret git
-}
-
-http_git_pull_factorcode() {
-        echo "Updating the git repository from factorcode.org..."
-        git pull http://factorcode.org/git/factor.git master
-        check_ret git
+        invoke_git pull $GIT_URL master
 }
 
 cd_factor() {
@@ -211,21 +217,28 @@ cd_factor() {
         check_ret cd
 }
 
+invoke_make() {
+    case $OS in
+        netbsd) make='gmake';;
+        *) make='make';;
+    esac
+   $make $*
+   check_ret $make
+}
+
 make_clean() {
-        make clean
-        check_ret make
+        invoke_make clean
 }
 
 make_factor() {
-        make NO_UI=$NO_UI $MAKE_TARGET -j5
-        check_ret make
+        invoke_make NO_UI=$NO_UI $MAKE_TARGET -j5
 }
 
 delete_boot_images() {
         echo "Deleting old images..."
         rm $BOOT_IMAGE > /dev/null 2>&1
         rm $BOOT_IMAGE.* > /dev/null 2>&1
-		rm staging.*.image > /dev/null 2>&1
+                rm staging.*.image > /dev/null 2>&1
 }
 
 get_boot_image() {
@@ -257,8 +270,8 @@ maybe_download_dlls() {
 }
 
 get_config_info() {
-        check_installed_programs
         find_build_info
+        check_installed_programs
         check_libraries
 }
 
@@ -285,13 +298,6 @@ update() {
         make_factor
 }
 
-http_update() {
-        get_config_info
-        http_git_pull_factorcode
-        make_clean
-        make_factor
-}
-
 update_bootstrap() {
         delete_boot_images
         get_boot_image
@@ -299,7 +305,7 @@ update_bootstrap() {
 }
 
 refresh_image() {
-        ./$FACTOR_BINARY -script -e="refresh-all save 0 USE: system exit"
+        ./$FACTOR_BINARY -script -e="USE: vocabs.loader refresh-all USE: memory save 0 USE: system exit"
         check_ret factor
 }
 
@@ -316,6 +322,8 @@ install_libraries() {
 
 usage() {
         echo "usage: $0 install|install-x11|self-update|quick-update|update|bootstrap|wget-bootstrap"
+        echo "If you are behind a firewall, invoke as:"
+        echo "env GIT_PROTOCOL=http $0 <command>"
 }
 
 case "$1" in
@@ -324,7 +332,6 @@ case "$1" in
         self-update) update; make_boot_image; bootstrap;;
         quick-update) update; refresh_image ;;
         update) update; update_bootstrap ;;
-        http-update) http_update; update_bootstrap ;;
         bootstrap) get_config_info; bootstrap ;;
         wget-bootstrap) get_config_info; delete_boot_images; get_boot_image; bootstrap ;;
         *) usage ;;

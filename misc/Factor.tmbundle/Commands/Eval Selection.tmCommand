@@ -16,7 +16,7 @@ puts factor_eval(STDIN.read)</string>
 	<key>keyEquivalent</key>
 	<string>^E</string>
 	<key>name</key>
-	<string>Eval Selection/Line</string>
+	<string>Eval Selection</string>
 	<key>output</key>
 	<string>replaceSelectedText</string>
 	<key>scope</key>

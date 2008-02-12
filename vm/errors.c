@@ -137,12 +137,11 @@ void misc_signal_handler_impl(void)
 
 DEFINE_PRIMITIVE(throw)
 {
-	uncurry(dpop());
+	dpop();
 	throw_impl(dpop(),stack_chain->callstack_top);
 }
 
 DEFINE_PRIMITIVE(call_clear)
 {
-	uncurry(dpop());
 	throw_impl(dpop(),stack_chain->callstack_bottom);
 }

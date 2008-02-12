@@ -115,7 +115,7 @@ compiled-crossref global [ H{ } assoc-like ] change-at
     compiled-crossref get at ;
 
 M: word redefined* ( word -- )
-    { "inferred-effect" "base-case" "no-effect" } reset-props ;
+    { "inferred-effect" "no-effect" } reset-props ;
 
 SYMBOL: changed-words
 

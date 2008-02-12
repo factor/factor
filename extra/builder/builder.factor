@@ -1,6 +1,6 @@
 
-USING: kernel io io.files io.launcher io.sockets hashtables
-       system continuations namespaces sequences splitting math.parser
+USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
+       arrays system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
        combinators bootstrap.image bootstrap.image.download
        combinators.cleave ;
@@ -10,21 +10,6 @@ IN: builder
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : runtime ( quot -- time ) benchmark nip ;
-
-: log-runtime ( quot file -- )
-  >r runtime r> <file-writer> [ . ] with-stream ;
-
-: log-object ( object file -- ) <file-writer> [ . ] with-stream ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: datestamp ( -- string )
-  now `{ ,[ dup timestamp-year   ]
-         ,[ dup timestamp-month  ]
-         ,[ dup timestamp-day    ]
-         ,[ dup timestamp-hour   ]
-         ,[     timestamp-minute ] }
-  [ pad-00 ] map "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -48,22 +33,7 @@ SYMBOL: builder-recipients
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run-or-notify ( desc message -- )
-  [ [ try-process ]        curry ]
-  [ [ email-string throw ] curry ]
-  bi*
-  recover ;
-
-: run-or-send-file ( desc message file -- )
-  >r >r [ try-process ]         curry
-  r> r> [ email-file throw ] 2curry
-  recover ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : target ( -- target ) `{ ,[ os ] %[ cpu "." split ] } "-" join ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : factor-binary ( -- name )
   os
@@ -71,12 +41,6 @@ SYMBOL: builder-recipients
     { "winnt" [ "./factor-nt.exe" ] }
     [ drop "./factor" ] }
   case ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-VAR: stamp
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : git-pull ( -- desc )
   {
@@ -89,15 +53,30 @@ VAR: stamp
 
 : git-clone ( -- desc ) { "git" "clone" "../factor" } ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: datestamp ( -- string )
+  now `{ ,[ dup timestamp-year   ]
+         ,[ dup timestamp-month  ]
+         ,[ dup timestamp-day    ]
+         ,[ dup timestamp-hour   ]
+         ,[     timestamp-minute ] }
+  [ pad-00 ] map "-" join ;
+
+VAR: stamp
+
 : enter-build-dir ( -- )
   datestamp >stamp
   "/builds" cd
   stamp> make-directory
   stamp> cd ;
 
-: record-git-id ( -- )
-  { "git" "show" } <process-stream> [ readln ] with-stream " " split second
-  "../git-id" log-object ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: git-id ( -- id )
+  { "git" "show" } <process-stream> [ readln ] with-stream " " split second ;
+
+: record-git-id ( -- ) git-id "../git-id" [ . ] with-file-out ;
 
 : make-clean ( -- desc ) { "make" "clean" } ;
 
@@ -108,12 +87,6 @@ VAR: stamp
      { +stderr+    +stdout+ }
    }
   >hashtable ;
-
-: retrieve-boot-image ( -- )
-  [ my-arch download-image ]
-  [ ]
-  [ "builder: image download" email-string ]
-  cleanup ;
 
 : bootstrap ( -- desc )
   `{
@@ -129,46 +102,89 @@ VAR: stamp
 
 : builder-test ( -- desc ) `{ ,[ factor-binary ] "-run=builder.test" } ;
   
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 SYMBOL: build-status
 
-: build ( -- )
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  "running" build-status set-global
+: milli-seconds>time ( n -- string )
+  1000 /i 60 /mod >r 60 /mod r> 3array [ pad-00 ] map ":" join ;
 
-  "/builds/factor" cd
-
-  git-pull "git pull error" run-or-notify
-
-  enter-build-dir
+: eval-file ( file -- obj ) <file-reader> contents eval ;
   
-  git-clone "git clone error" run-or-notify
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  "factor" cd
+: cat ( file -- ) <file-reader> contents print ;
 
-  record-git-id
-
-  make-clean "make clean error" run-or-notify
-
-  make-vm "vm compile error" "../compile-log" run-or-send-file
-
-  retrieve-boot-image
-
-  bootstrap "bootstrap error" "../boot-log" run-or-send-file
-
-  builder-test "builder.test fatal error" run-or-notify
-  
-  "../load-everything-log" exists?
-  [ "load-everything" "../load-everything-log" email-file ]
-  when
-
-  "../failing-tests" exists?
-  [ "failing tests" "../failing-tests" email-file ]
-  when
-
-  "ready" build-status set-global ;
+: run-or-bail ( desc quot -- )
+  [ [ try-process ] curry ]
+  [ [ throw       ] curry ]
+  bi*
+  recover ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MAIN: build
+: (build) ( -- )
+
+  enter-build-dir
+
+  "report" [
+
+    "Build machine:   " write host-name print
+    "Build directory: " write cwd       print
+
+    git-clone [ "git clone failed" print ] run-or-bail
+
+    "factor" cd
+
+    record-git-id
+
+    make-clean run-process drop
+
+    make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
+
+    [ my-arch download-image ] [ "Image download error" print throw ] recover
+
+    bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
+
+    [ builder-test try-process ]
+    [ "Builder test error" print throw ]
+    recover
+
+    "Boot time: " write "../boot-time" eval-file milli-seconds>time print
+    "Load time: " write "../load-time" eval-file milli-seconds>time print
+    "Test time: " write "../test-time" eval-file milli-seconds>time print
+
+    "Did not pass load-everything: " print "../load-everything-vocabs" cat
+    "Did not pass test-all: "        print "../test-all-vocabs"        cat
+
+  ] with-file-out ;
+
+: build ( -- )
+  [ (build) ] [ drop ] recover
+  "report" "../report" email-file ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: minutes>ms ( min -- ms ) 60 * 1000 * ;
+
+: updates-available? ( -- ? )
+  git-id
+  git-pull run-process drop
+  git-id
+  = not ;
+
+: build-loop ( -- )
+  [
+    "/builds/factor" cd
+    updates-available?
+      [ build ]
+    when
+  ]
+  [ drop ]
+  recover
+  5 minutes>ms sleep
+  build-loop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MAIN: build-loop

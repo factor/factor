@@ -321,3 +321,7 @@ unit-test
 [ [ 2 . ] ] [
     [ 2 \ break (step-into) . ] (remove-breakpoints)
 ] unit-test
+
+[ ] [ 1 \ + curry unparse drop ] unit-test
+
+[ ] [ 1 \ + compose unparse drop ] unit-test

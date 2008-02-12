@@ -93,5 +93,3 @@ M: duplicated-slots-error summary
         \ construct-empty 1 1 <effect> make-call-node
     ] if
 ] "infer" set-word-prop
-
-\ construct-empty 1 1 <effect> "inferred-effect" set-word-prop

@@ -84,6 +84,11 @@ M: sqlite-db create-sql ( columns table -- sql )
         ] interleave ")" %
     ] "" make ;
 
+M: sqlite-db drop-sql ( table -- sql )
+    [
+        "drop table " % %
+    ] "" make ;
+
 M: sqlite-db insert-sql* ( columns table -- sql )
     [
         "insert into " %
@@ -109,7 +114,6 @@ M: sqlite-db update-sql* ( columns table -- sql )
 
 M: sqlite-db delete-sql* ( columns table -- sql )
     [
-    break
         "delete from " %
         %
         " where " %
