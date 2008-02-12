@@ -167,24 +167,40 @@ SYMBOL: build-status
 
 SYMBOL: report
 
+: >>>report ( quot -- ) report get swap with-stream* ;
+
+: file>>>report ( file -- ) [ <file-reader> contents write ] curry >>>report ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: run-or-report ( desc quot -- )
+  [ [ try-process     ] curry ]
+  [ [ >>>report throw ] curry ]
+  bi*
+  recover ;
+
+: run-or-report-file ( desc quot file -- )
+  [ [ try-process ] curry ]
+  [ [ >>>report ] curry ]
+  [ [ file>>>report throw ] curry ]
+  tri*
+  compose
+  recover ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : (build) ( -- )
 
   enter-build-dir
 
   "report" <file-writer> report set
 
-  report get [ "Build machine:   " write host-name write nl ] with-stream*
-
-  report get [ "Build directory: " write cwd write nl ] with-stream*
-
-  [ git-clone try-process ]
   [
-    report get
-     [ "Builder fatal error: git clone failed" write nl ]
-    with-stream*
-    throw
-  ]
-  recover
+    "Build machine:   " write host-name write nl
+    "Build directory: " write cwd write nl
+  ] >>>report
+
+  git-clone [ "Builder fatal error: git clone failed" write nl ] run-or-report
 
   "factor" cd
 
@@ -192,74 +208,32 @@ SYMBOL: report
 
   make-clean run-process drop
 
-  [ make-vm try-process ]
-  [
-    report get
-    [
-      "Builder fatal error: vm compile error" write nl
-      "../compile-log" <file-reader> contents write
-    ]
-    with-stream*
-    throw
-  ]
-  recover
+  make-vm
+    [ "Builder fatal error: vm compile error" write nl ]
+    "../compile-log"
+  run-or-report-file
 
   [ my-arch download-image ]
-  [
-    report get
-      [ "Builder fatal error: image download" write nl ]
-    with-stream*
-    throw
-  ]
+    [ [ "Builder fatal error: image download" write nl ] >>>report throw ]
   recover
 
-  [ bootstrap try-process ]
-  [
-    report get
-      [
-        "Bootstrap error" write nl
-        "../boot-log" <file-reader> contents write
-      ]
-    with-stream*
-    throw
-  ]
-  recover
+  bootstrap [ "Bootstrap error" write nl ] "../boot-log" run-or-report-file
 
-  [ builder-test try-process ]
-  [
-    report get
-      [ "Builder test error" write nl ]
-    with-stream*
-    throw
-  ]
-  recover
+  builder-test [ "Builder test error" write nl ] run-or-report
 
-  report get
-    [
-      "Bootstrap time: " write
-      "../bootstrap-time" <file-reader> contents write nl
-    ]
-  with-stream*
+  [ "Bootstrap time: " write ] >>>report   "../bootstrap-time" file>>>report
 
   "../load-everything-vocabs" exists?
     [
-      report get
-        [
-          "Did not pass load-everything: " write nl
-          "../load-everything-vocabs" <file-reader> contents write nl
-        ]
-      with-stream*
+      [ "Did not pass load-everything: " write nl ] >>>report
+      "../load-everything-vocabs" file>>>report
     ]
   when
 
   "../test-all-vocabs" exists?
     [
-      report get
-        [
-          "Did not pass test-all: " write nl
-          "../test-all-vocabs" <file-reader> contents write nl
-        ]
-      with-stream*
+      [ "Did not pass test-all: " write nl ] >>>report
+      "../test-all-vocabs" file>>>report
     ]
   when ;
 
