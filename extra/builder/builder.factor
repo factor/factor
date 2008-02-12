@@ -189,11 +189,22 @@ SYMBOL: report
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: ms>minutes ( ms -- minutes ) 1000.0 / 60 / ;
+! : ms>minutes ( ms -- minutes ) 1000.0 / 60 / ;
 
-: bootstrap-minutes ( -- )
-  "../bootstrap-time" <file-reader> contents eval ms>minutes unparse ;
+! : bootstrap-minutes ( -- )
+!   "../bootstrap-time" <file-reader> contents eval ms>minutes unparse ;
 
+: min-and-sec ( milliseconds -- str )
+  1000 /i 60 /mod swap
+  `{ ,[ number>string ] " minutes and " ,[ number>string ] " seconds" }
+  concat ;
+
+: eval-file ( file -- obj ) <file-reader> contents eval ;
+
+: boot-time ( -- string ) "../bootstrap-time"       eval-file min-and-sec ;
+: load-time ( -- string ) "../load-everything-time" eval-file min-and-sec ;
+: test-time ( -- string ) "../test-all-time"        eval-file min-and-sec ;
+  
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : (build) ( -- )
@@ -228,8 +239,11 @@ SYMBOL: report
 
   builder-test [ "Builder test error" write nl ] run-or-report
 
-  [ "Bootstrap time: " write bootstrap-minutes write " minutes" write nl ]
-  >>>report
+  [
+    "Bootstrap time: " write boot-time write nl
+    "Load all time:  " write load-time write nl
+    "Test all time:  " write test-time write nl
+  ] >>>report
 
   "../load-everything-vocabs" exists?
     [
