@@ -217,6 +217,19 @@ M: x-clipboard paste-clipboard
 M: x11-ui-backend set-title ( string world -- )
     world-handle x11-handle-window swap dpy get -rot
     3dup set-title-old set-title-new ;
+    
+M: x11-ui-backend set-fullscreen* ( ? world -- )
+    world-handle x11-handle-window "XClientMessageEvent" <c-object>
+    tuck set-XClientMessageEvent-window
+    swap _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ?
+    over set-XClientMessageEvent-data0
+    ClientMessage over set-XClientMessageEvent-type
+    dpy get over set-XClientMessageEvent-display
+    "_NET_WM_STATE" x-atom over set-XClientMessageEvent-message_type
+    32 over set-XClientMessageEvent-format
+    "_NET_WM_STATE_FULLSCREEN" x-atom over set-XClientMessageEvent-data1
+    >r dpy get root get 0 SubstructureNotifyMask r> XSendEvent drop ;
+
 
 M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
