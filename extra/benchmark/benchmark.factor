@@ -1,12 +1,14 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel vocabs vocabs.loader tools.time tools.browser
-arrays assocs io.styles io help.markup prettyprint sequences ;
+arrays assocs io.styles io help.markup prettyprint sequences
+continuations debugger ;
 IN: benchmark
 
 : run-benchmark ( vocab -- result )
     "=== Benchmark " write dup print flush
-    dup require [ run ] benchmark 2array
+    dup require
+    [ [ run ] benchmark ] [ error. f f ] recover 2array
     dup . ;
 
 : run-benchmarks ( -- assoc )
