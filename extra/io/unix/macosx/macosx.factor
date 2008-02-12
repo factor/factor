@@ -1,6 +1,7 @@
 IN: io.unix.macosx
 USING: io.unix.bsd io.backend io.monitors io.monitors.private
-continuations kernel core-foundation.fsevents ;
+continuations kernel core-foundation.fsevents sequences
+namespaces arrays ;
 
 TUPLE: macosx-io ;
 

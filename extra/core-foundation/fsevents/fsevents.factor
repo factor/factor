@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel math sequences
-namespaces assocs init continuations ;
-IN: core-foundation
+namespaces assocs init continuations core-foundation ;
+IN: core-foundation.fsevents
 
 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 ! FSEventStream API, Leopard only !

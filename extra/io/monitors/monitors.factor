@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend kernel continuations namespaces sequences
-assocs hashtables sorting arrays ;
+assocs hashtables sorting arrays threads ;
 IN: io.monitors
 
 <PRIVATE
@@ -36,7 +36,7 @@ TUPLE: simple-monitor handle callback ;
 
 : <simple-monitor> ( handle -- simple-monitor )
     f (monitor) {
-        set-simple-monitor-wd
+        set-simple-monitor-handle
         set-delegate
     } simple-monitor construct ;
 
@@ -44,8 +44,8 @@ TUPLE: simple-monitor handle callback ;
     >r <simple-monitor> r> construct-delegate ; inline
 
 : notify-callback ( simple-monitor -- )
-    dup linux-monitor-callback
-    f rot set-linux-monitor-callback
+    dup simple-monitor-callback
+    f rot set-simple-monitor-callback
     [ schedule-thread ] when* ;
 
 M: simple-monitor fill-queue ( monitor -- )
