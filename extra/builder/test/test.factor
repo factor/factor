@@ -1,7 +1,9 @@
 
-USING: kernel sequences assocs builder continuations vocabs vocabs.loader
+USING: kernel namespaces sequences assocs builder continuations
+       vocabs vocabs.loader
        io
        io.files
+       prettyprint
        tools.browser
        tools.test
        bootstrap.stage2 ;
