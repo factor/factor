@@ -1,5 +1,5 @@
 
-USING: kernel io io.files io.launcher io.sockets hashtables math threads
+USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
        system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
        combinators bootstrap.image bootstrap.image.download
@@ -189,6 +189,13 @@ SYMBOL: report
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: ms>minutes ( ms -- minutes ) 1000.0 / 60 / ;
+
+: bootstrap-minutes ( -- )
+  "../bootstrap-time" <file-reader> contents eval ms>minutes unparse ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : (build) ( -- )
 
   enter-build-dir
@@ -221,7 +228,8 @@ SYMBOL: report
 
   builder-test [ "Builder test error" write nl ] run-or-report
 
-  [ "Bootstrap time: " write ] >>>report   "../bootstrap-time" file>>>report
+  [ "Bootstrap time: " write bootstrap-minutes write " minutes" write nl ]
+  >>>report
 
   "../load-everything-vocabs" exists?
     [
