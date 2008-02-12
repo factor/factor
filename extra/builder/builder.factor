@@ -1,5 +1,5 @@
 
-USING: kernel io io.files io.launcher io.sockets hashtables math threads
+USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
        system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
        combinators bootstrap.image bootstrap.image.download
@@ -135,33 +135,125 @@ VAR: stamp
 
 SYMBOL: build-status
 
-: build ( -- )
+! : build ( -- )
+
+!   enter-build-dir
+  
+!   git-clone "git clone error" run-or-notify
+
+!   "factor" cd
+
+!   record-git-id
+
+!   make-clean "make clean error" run-or-notify
+
+!   make-vm "vm compile error" "../compile-log" run-or-send-file
+
+!   retrieve-boot-image
+
+!   bootstrap "bootstrap error" "../boot-log" run-or-send-file
+
+!   builder-test "builder.test fatal error" run-or-notify
+  
+!   "../load-everything-log" exists?
+!   [ "load-everything" "../load-everything-log" email-file ]
+!   when
+
+!   "../failing-tests" exists?
+!   [ "failing tests" "../failing-tests" email-file ]
+!   when ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: report
+
+: >>>report ( quot -- ) report get swap with-stream* ;
+
+: file>>>report ( file -- ) [ <file-reader> contents write ] curry >>>report ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: run-or-report ( desc quot -- )
+  [ [ try-process     ] curry ]
+  [ [ >>>report throw ] curry ]
+  bi*
+  recover ;
+
+: run-or-report-file ( desc quot file -- )
+  [ [ try-process ] curry ]
+  [ [ >>>report ] curry ]
+  [ [ file>>>report throw ] curry ]
+  tri*
+  compose
+  recover ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: ms>minutes ( ms -- minutes ) 1000.0 / 60 / ;
+
+: bootstrap-minutes ( -- )
+  "../bootstrap-time" <file-reader> contents eval ms>minutes unparse ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: (build) ( -- )
 
   enter-build-dir
-  
-  git-clone "git clone error" run-or-notify
+
+  "report" <file-writer> report set
+
+  [
+    "Build machine:   " write host-name write nl
+    "Build directory: " write cwd write nl
+  ] >>>report
+
+  git-clone [ "Builder fatal error: git clone failed" write nl ] run-or-report
 
   "factor" cd
 
   record-git-id
 
-  make-clean "make clean error" run-or-notify
+  make-clean run-process drop
 
-  make-vm "vm compile error" "../compile-log" run-or-send-file
+  make-vm
+    [ "Builder fatal error: vm compile error" write nl ]
+    "../compile-log"
+  run-or-report-file
 
-  retrieve-boot-image
+  [ my-arch download-image ]
+    [ [ "Builder fatal error: image download" write nl ] >>>report throw ]
+  recover
 
-  bootstrap "bootstrap error" "../boot-log" run-or-send-file
+  bootstrap [ "Bootstrap error" write nl ] "../boot-log" run-or-report-file
 
-  builder-test "builder.test fatal error" run-or-notify
-  
-  "../load-everything-log" exists?
-  [ "load-everything" "../load-everything-log" email-file ]
+  builder-test [ "Builder test error" write nl ] run-or-report
+
+  [ "Bootstrap time: " write bootstrap-minutes write " minutes" write nl ]
+  >>>report
+
+  "../load-everything-vocabs" exists?
+    [
+      [ "Did not pass load-everything: " write nl ] >>>report
+      "../load-everything-vocabs" file>>>report
+    ]
   when
 
-  "../failing-tests" exists?
-  [ "failing tests" "../failing-tests" email-file ]
+  "../test-all-vocabs" exists?
+    [
+      [ "Did not pass test-all: " write nl ] >>>report
+      "../test-all-vocabs" file>>>report
+    ]
   when ;
+
+: send-report ( -- )
+  report get dispose
+  "report" "../report" email-file ;
+
+: build ( -- )
+  [ (build) ]
+    [ drop ]
+  recover
+  send-report ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

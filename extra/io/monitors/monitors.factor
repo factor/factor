@@ -17,13 +17,46 @@ TUPLE: monitor queue closed? ;
         set-monitor-queue
     } monitor construct ;
 
-HOOK: fill-queue io-backend ( monitor -- )
+GENERIC: fill-queue ( monitor -- )
 
 : changed-file ( changed path -- )
     namespace [ append ] change-at ;
 
 : dequeue-change ( assoc -- path changes )
     delete-any prune natural-sort >array ;
+
+M: monitor dispose
+    dup check-monitor
+    t over set-monitor-closed?
+    delegate dispose ;
+
+! Simple monitor; used on Linux and Mac OS X. On Windows,
+! monitors are full-fledged ports.
+TUPLE: simple-monitor handle callback ;
+
+: <simple-monitor> ( handle -- simple-monitor )
+    f (monitor) {
+        set-simple-monitor-wd
+        set-delegate
+    } simple-monitor construct ;
+
+: construct-simple-monitor ( handle class -- simple-monitor )
+    >r <simple-monitor> r> construct-delegate ; inline
+
+: notify-callback ( simple-monitor -- )
+    dup linux-monitor-callback
+    f rot set-linux-monitor-callback
+    [ schedule-thread ] when* ;
+
+M: simple-monitor fill-queue ( monitor -- )
+    dup simple-monitor-callback [
+        "Cannot wait for changes on the same file from multiple threads" throw
+    ] when
+    [ swap set-simple-monitor-callback stop ] callcc0
+    check-monitor ;
+
+M: simple-monitor dispose ( monitor -- )
+    dup delegate dispose notify-callback ;
 
 PRIVATE>
 
