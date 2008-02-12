@@ -22,10 +22,6 @@ SYMBOL: +not-null+
 
 SYMBOL: +has-many+
 
-! SQLite Types
-! http://www.sqlite.org/datatype3.html
-! NULL INTEGER REAL TEXT BLOB
-
 SYMBOL: INTEGER
 SYMBOL: DOUBLE
 SYMBOL: BOOLEAN
@@ -38,18 +34,16 @@ SYMBOL: DATE
 
 SYMBOL: BIG_INTEGER
 
-! PostgreSQL Types
-! http://developer.postgresql.org/pgdocs/postgres/datatype.html
-
-
-: number>string* ( num/str -- str )
-    dup number? [ number>string ] when ;
-
 TUPLE: no-sql-type ;
+: no-sql-type ( -- * ) T{ no-sql-type } throw ;
+
 HOOK: sql-modifiers* db ( modifiers -- str )
 HOOK: >sql-type db ( obj -- str )
 
 ! HOOK: >factor-type db ( obj -- obj )
+
+: number>string* ( n/str -- str )
+    dup number? [ number>string ] when ;
 
 : maybe-remove-id ( columns -- obj )
     [ +native-id+ swap member? not ] subset ;
@@ -59,3 +53,8 @@ HOOK: >sql-type db ( obj -- str )
 
 : sql-modifiers ( spec -- seq )
     3 tail sql-modifiers* ;
+
+! SQLite Types: http://www.sqlite.org/datatype3.html
+! NULL INTEGER REAL TEXT BLOB
+! PostgreSQL Types:
+! http://developer.postgresql.org/pgdocs/postgres/datatype.html

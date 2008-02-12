@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types assocs kernel math math.parser
+USING: alien.c-types arrays assocs kernel math math.parser
 namespaces sequences db.sqlite.ffi db combinators
-continuations ;
+continuations db.types ;
 IN: db.sqlite.lib
 
 : sqlite-error ( n -- * )
@@ -40,29 +40,47 @@ IN: db.sqlite.lib
     >r dupd sqlite-bind-parameter-index r> ;
 
 : sqlite-bind-text ( handle index text -- )
-    ! dup number? [ number>string ] when
-    dup length SQLITE_TRANSIENT sqlite3_bind_text sqlite-check-result ;
+    dup length SQLITE_TRANSIENT
+    sqlite3_bind_text sqlite-check-result ;
 
-: sqlite-bind-int ( handle name n -- )
+: sqlite-bind-int ( handle i n -- )
     sqlite3_bind_int sqlite-check-result ;
 
-: sqlite-bind-int64 ( handle name n -- )
+: sqlite-bind-int64 ( handle i n -- )
     sqlite3_bind_int64 sqlite-check-result ;
 
-: sqlite-bind-null ( handle n -- )
+: sqlite-bind-double ( handle i x -- )
+    sqlite3_bind_double sqlite-check-result ;
+
+: sqlite-bind-null ( handle i -- )
     sqlite3_bind_null sqlite-check-result ;
 
 : sqlite-bind-text-by-name ( handle name text -- )
     parameter-index sqlite-bind-text ;
 
-: sqlite-bind-int-by-name ( handle name text -- )
+: sqlite-bind-int-by-name ( handle name int -- )
     parameter-index sqlite-bind-int ;
 
-: sqlite-bind-int64-by-name ( handle name text -- )
+: sqlite-bind-int64-by-name ( handle name int64 -- )
     parameter-index sqlite-bind-int ;
+
+: sqlite-bind-double-by-name ( handle name double -- )
+    parameter-index sqlite-bind-double ;
 
 : sqlite-bind-null-by-name ( handle name obj -- )
     parameter-index drop sqlite-bind-null ;
+
+: sqlite-bind-type ( handle key value type -- )
+    dup array? [ first ] when
+    {
+        { INTEGER [ sqlite-bind-int-by-name ] }
+        { BIG_INTEGER [ sqlite-bind-int-by-name ] }
+        { TEXT [ sqlite-bind-text-by-name ] }
+        { VARCHAR [ sqlite-bind-text-by-name ] }
+        { DOUBLE [ sqlite-bind-double-by-name ] }
+        ! { NULL [ sqlite-bind-null-by-name ] }
+        [ no-sql-type ]
+    } case ;
 
 : sqlite-finalize ( handle -- )
     sqlite3_finalize sqlite-check-result ;

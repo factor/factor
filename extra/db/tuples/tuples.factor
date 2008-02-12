@@ -61,11 +61,12 @@ HOOK: tuple>params db ( columns tuple -- obj )
 
 : tuple-statement ( columns tuple quot -- statement )
     >r [ tuple>params ] 2keep class r> call
+    2dup . .
     [ bind-statement ] keep ;
 
 : do-tuple-statement ( tuple columns-quot statement-quot -- )
     >r [ class db-columns ] swap compose keep
-    r> tuple-statement dup . execute-statement ;
+    r> tuple-statement execute-statement ;
 
 : create-table ( class -- )
     dup db-columns swap db-table create-sql sql-command ;
