@@ -228,15 +228,7 @@ SYMBOL: report
   [ builder-test try-process ]
   [
     report get
-      [
-        "Builder test error" write nl
-        "../load-everything-log" exists?
-          [ "../load-everything-log" <file-reader> contents write nl ]
-        when
-        "../test-all-log" exists?
-          [ "../test-all-log" <file-reader> contents write nl ]
-        when
-      ]
+      [ "Builder test error" write nl ]
     with-stream*
     throw
   ]
