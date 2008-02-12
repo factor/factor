@@ -133,35 +133,153 @@ VAR: stamp
   
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: build-status
+! SYMBOL: build-status
 
-: build ( -- )
+! : build ( -- )
+
+!   enter-build-dir
+  
+!   git-clone "git clone error" run-or-notify
+
+!   "factor" cd
+
+!   record-git-id
+
+!   make-clean "make clean error" run-or-notify
+
+!   make-vm "vm compile error" "../compile-log" run-or-send-file
+
+!   retrieve-boot-image
+
+!   bootstrap "bootstrap error" "../boot-log" run-or-send-file
+
+!   builder-test "builder.test fatal error" run-or-notify
+  
+!   "../load-everything-log" exists?
+!   [ "load-everything" "../load-everything-log" email-file ]
+!   when
+
+!   "../failing-tests" exists?
+!   [ "failing tests" "../failing-tests" email-file ]
+!   when ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: report
+
+: (build) ( -- )
 
   enter-build-dir
-  
-  git-clone "git clone error" run-or-notify
+
+  "report" <file-writer> report set
+
+  report get [ "Build machine:   " write host-name write nl ] with-stream*
+
+  report get [ "Build directory: " write cwd write nl ] with-stream*
+
+  [ git-clone try-process ]
+  [
+    report get
+     [ "Builder fatal error: git clone failed" write nl ]
+    with-stream*
+    throw
+  ]
+  recover
 
   "factor" cd
 
   record-git-id
 
-  make-clean "make clean error" run-or-notify
+  make-clean run-process drop
 
-  make-vm "vm compile error" "../compile-log" run-or-send-file
+  [ make-vm try-process ]
+  [
+    report get
+    [
+      "Builder fatal error: vm compile error" write nl
+      "../compile-log" <file-reader> contents write
+    ]
+    with-stream*
+    throw
+  ]
+  recover
 
-  retrieve-boot-image
+  [ my-arch download-image ]
+  [
+    report get
+      [ "Builder fatal error: image download" write nl ]
+    with-stream*
+    throw
+  ]
+  recover
 
-  bootstrap "bootstrap error" "../boot-log" run-or-send-file
+  [ bootstrap try-process ]
+  [
+    report get
+      [
+        "Bootstrap error" write nl
+        "../boot-log" <file-reader> contents write
+      ]
+    with-stream*
+    throw
+  ]
+  recover
 
-  builder-test "builder.test fatal error" run-or-notify
-  
-  "../load-everything-log" exists?
-  [ "load-everything" "../load-everything-log" email-file ]
+  [ builder-test try-process ]
+  [
+    report get
+      [
+        "Builder test error" write nl
+        "../load-everything-log" exists?
+          [ "../load-everything-log" <file-reader> contents write nl ]
+        when
+        "../test-all-log" exists?
+          [ "../test-all-log" <file-reader> contents write nl ]
+        when
+      ]
+    with-stream*
+    throw
+  ]
+  recover
+
+  report get
+    [
+      "Bootstrap time: " write
+      "../bootstrap-time" <file-reader> contents write nl
+    ]
+  with-stream*
+
+  "../load-everything-vocabs" exists?
+    [
+      report get
+        [
+          "Did not pass load-everything: " write nl
+          "../load-everything-vocabs" <file-reader> contents write nl
+        ]
+      with-stream*
+    ]
   when
 
-  "../failing-tests" exists?
-  [ "failing tests" "../failing-tests" email-file ]
+  "../test-all-vocabs" exists?
+    [
+      report get
+        [
+          "Did not pass test-all: " write nl
+          "../test-all-vocabs" <file-reader> contents write nl
+        ]
+      with-stream*
+    ]
   when ;
+
+: send-report ( -- )
+  report get dispose
+  "report" "../report" email-file ;
+
+: build ( -- )
+  [ (build) ]
+    [ drop ]
+  recover
+  send-report ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
