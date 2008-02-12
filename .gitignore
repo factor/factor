@@ -16,3 +16,4 @@ factor
 *.*.marks
 .*.swp
 reverse-complement-in.txt
+reverse-complement-out.txt
