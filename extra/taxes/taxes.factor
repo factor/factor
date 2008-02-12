@@ -105,11 +105,6 @@ M: federal withholding ( salary w4 tax-table -- x )
 M: federal net ( salary w4 collector -- x )
     >r dupd r> withholding - ;
 
-M: collector net ( salary w4 collector -- x )
-    >r dupd r>
-    [ withholding ] 3keep
-    drop <federal> withholding + - ;
-
 
 ! Minnesota
 : minnesota-single ( -- triples )
@@ -138,3 +133,15 @@ M: minnesota adjust-allowances ( salary w4 collector -- newsalary )
 
 M: minnesota withholding ( salary w4 collector -- x )
     [ adjust-allowances ] 2keep marriage-table tax ;
+
+TUPLE: total ;
+INSTANCE: total collector
+
+! Totals
+M: total net ( salary w4 collector -- x )
+    >r dupd r>
+    [ withholding ] 3keep
+    drop <federal> withholding + - ;
+
+M: total withholding ( salary w4 collector -- x )
+    >r >r dup r> r> net - ;
