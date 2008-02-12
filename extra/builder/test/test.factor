@@ -10,28 +10,15 @@ USING: kernel namespaces sequences assocs builder continuations
 
 IN: builder.test
 
-: record-bootstrap-time ( -- )
-  "../bootstrap-time" <file-writer>
-    [ bootstrap-time get . ]
-  with-stream ;
-
 : do-load ( -- )
-  [ try-everything keys ] "../load-everything-time" log-runtime
-  dup empty?
-    [ drop ]
-    [ "../load-everything-vocabs" log-object ]
-  if ;
+  try-everything keys "../load-everything-vocabs" [ . ] with-file-out ;
 
 : do-tests ( -- )
-  [ run-all-tests keys ] "../test-all-time" log-runtime
-  dup empty?
-    [ drop ]
-    [ "../test-all-vocabs" log-object ]
-  if ;
+  run-all-tests keys "../test-all-vocabs" [ . ] with-file-out ;
 
 : do-all ( -- )
-  record-bootstrap-time
-  do-load
-  do-tests ;
+  bootstrap-time get   "../boot-time" [ . ] with-file-out
+  [ do-load  ] runtime "../load-time" [ . ] with-file-out
+  [ do-tests ] runtime "../test-time" [ . ] with-file-out ;
 
 MAIN: do-all
