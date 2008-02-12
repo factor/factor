@@ -43,12 +43,17 @@ M: sqlite-statement dispose ( statement -- )
 M: sqlite-result-set dispose ( result-set -- )
     f swap set-result-set-handle ;
 
-M: sqlite-statement bind-statement* ( assoc statement -- )
-    statement-handle swap sqlite-bind-assoc ;
+: sqlite-bind ( triples handle -- )
+    [
+        -rot sqlite-bind-text-by-name
+    ] curry assoc-each ;
 
-M: sqlite-statement rebind-statement ( assoc statement -- )
+M: sqlite-statement bind-statement* ( triples statement -- )
+    statement-handle sqlite-bind ;
+
+M: sqlite-statement rebind-statement ( triples statement -- )
     dup statement-handle sqlite-reset
-    statement-handle swap sqlite-bind-assoc ;
+    bind-statement* ;
 
 M: sqlite-statement execute-statement ( statement -- )
     statement-handle sqlite-next drop ;

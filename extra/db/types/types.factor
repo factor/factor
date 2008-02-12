@@ -1,9 +1,9 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs db kernel math math.parser
 sequences continuations ;
 IN: db.types
 
-
-! id   serial not null primary key,
 ! ID is the Primary key
 SYMBOL: +native-id+
 SYMBOL: +assigned-id+
@@ -19,15 +19,12 @@ SYMBOL: +unique+
 SYMBOL: +default+
 SYMBOL: +null+
 SYMBOL: +not-null+
+
 SYMBOL: +has-many+
 
 ! SQLite Types
 ! http://www.sqlite.org/datatype3.html
-! SYMBOL: NULL
-! SYMBOL: INTEGER
-! SYMBOL: REAL
-! SYMBOL: TEXT
-! SYMBOL: BLOB
+! NULL INTEGER REAL TEXT BLOB
 
 SYMBOL: INTEGER
 SYMBOL: DOUBLE
@@ -41,11 +38,6 @@ SYMBOL: DATE
 
 SYMBOL: BIG_INTEGER
 
-! SYMBOL: LOCALE
-! SYMBOL: TIMEZONE
-! SYMBOL: CURRENCY
-
-
 ! PostgreSQL Types
 ! http://developer.postgresql.org/pgdocs/postgres/datatype.html
 
@@ -57,8 +49,7 @@ TUPLE: no-sql-type ;
 HOOK: sql-modifiers* db ( modifiers -- str )
 HOOK: >sql-type db ( obj -- str )
 
-
-
+! HOOK: >factor-type db ( obj -- obj )
 
 : maybe-remove-id ( columns -- obj )
     [ +native-id+ swap member? not ] subset ;

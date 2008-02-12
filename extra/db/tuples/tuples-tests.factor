@@ -13,7 +13,6 @@ person "PERSON"
     { "the-number" "AGE" INTEGER { +default+ 0 } }
 } define-persistent
 
-
 SYMBOL: the-person
 
 : test-tuples ( -- )
@@ -43,3 +42,5 @@ test-sqlite
     ! resource-path <postgresql-db> [
         ! test-tuples
     ! ] with-db ;
+
+! test-postgres

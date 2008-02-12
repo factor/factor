@@ -27,17 +27,14 @@ HOOK: db-close db ( handle -- )
     ] with-variable ;
 
 TUPLE: statement sql params handle bound? ;
-
 TUPLE: simple-statement ;
 TUPLE: prepared-statement ;
 
 HOOK: <simple-statement> db ( str -- statement )
 HOOK: <prepared-statement> db ( str -- statement )
-
 GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( obj statement -- )
 GENERIC: rebind-statement ( obj statement -- )
-
 GENERIC: execute-statement ( statement -- )
 
 : bind-statement ( obj statement -- )
