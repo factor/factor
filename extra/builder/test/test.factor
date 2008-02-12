@@ -3,7 +3,8 @@ USING: kernel sequences assocs builder continuations vocabs vocabs.loader
        io
        io.files
        tools.browser
-       tools.test ;
+       tools.test
+       bootstrap.stage2 ;
 
 IN: builder.test
 
