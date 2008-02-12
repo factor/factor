@@ -65,7 +65,7 @@ HINTS: random fixnum ;
 :: split-lines | n quot |
     n line-length /mod
     [ [ line-length quot call ] times ] dip
-    quot call ; inline
+    dup zero? [ drop ] quot if ; inline
 
 : write-random-fasta ( seed n chars floats desc id -- seed )
     write-description
