@@ -5,14 +5,14 @@ USING: io.backend io.unix.backend io.unix.kqueue io.unix.select
 io.launcher io.unix.launcher namespaces kernel assocs threads 
 continuations ;
 
-! On *BSD and Mac OS X, we use select() for the top-level
-! multiplexer, and we hang a kqueue off of it but file change
-! notification and process exit notification.
+! On Mac OS X, we use select() for the top-level
+! multiplexer, and we hang a kqueue off of it for process exit
+! notification.
 
 ! kqueue is buggy with files and ptys so we can't use it as the
 ! main multiplexer.
 
-TUPLE: bsd-io ;
+MIXIN: bsd-io
 
 INSTANCE: bsd-io unix-io
 
@@ -25,5 +25,3 @@ M: bsd-io init-io ( -- )
 
 M: bsd-io register-process ( process -- )
     process-handle kqueue-mx get-global add-pid-task ;
-
-T{ bsd-io } set-io-backend

@@ -1,35 +1,45 @@
-! Copyright (C) 2006 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel math sequences ;
 IN: core-foundation
 
+TYPEDEF: void* CFAllocatorRef
+TYPEDEF: void* CFArrayRef
+TYPEDEF: void* CFBundleRef
+TYPEDEF: void* CFStringRef
+TYPEDEF: void* CFURLRef
+TYPEDEF: void* CFUUIDRef
+TYPEDEF: void* CFRunLoopRef
+TYPEDEF: bool Boolean
 TYPEDEF: int CFIndex
+TYPEDEF: double CFTimeInterval
+TYPEDEF: double CFAbsoluteTime
 
-FUNCTION: void* CFArrayCreateMutable ( void* allocator, CFIndex capacity, void* callbacks ) ;
+FUNCTION: CFArrayRef CFArrayCreateMutable ( CFAllocatorRef allocator, CFIndex capacity, void* callbacks ) ;
 
-FUNCTION: void* CFArrayGetValueAtIndex ( void* array, CFIndex idx ) ;
+FUNCTION: void* CFArrayGetValueAtIndex ( CFArrayRef array, CFIndex idx ) ;
 
-FUNCTION: void CFArraySetValueAtIndex ( void* array, CFIndex index, void* value ) ;
+FUNCTION: void CFArraySetValueAtIndex ( CFArrayRef array, CFIndex index, void* value ) ;
 
-FUNCTION: CFIndex CFArrayGetCount ( void* array ) ;
+FUNCTION: CFIndex CFArrayGetCount ( CFArrayRef array ) ;
 
 : kCFURLPOSIXPathStyle 0 ;
 
-FUNCTION: void* CFURLCreateWithFileSystemPath ( void* allocator, void* filePath, int pathStyle, bool isDirectory ) ;
+FUNCTION: CFURLRef CFURLCreateWithFileSystemPath ( CFAllocatorRef allocator, CFStringRef filePath, int pathStyle, Boolean isDirectory ) ;
 
-FUNCTION: void* CFURLCreateWithString ( void* allocator, void* string, void* base ) ;
+FUNCTION: CFURLRef CFURLCreateWithString ( CFAllocatorRef allocator, CFStringRef string, CFURLRef base ) ;
 
-FUNCTION: void* CFURLCopyFileSystemPath ( void* url, int pathStyle ) ;
+FUNCTION: CFURLRef CFURLCopyFileSystemPath ( CFURLRef url, int pathStyle ) ;
 
-FUNCTION: void* CFStringCreateWithCharacters ( void* allocator, ushort* cStr, CFIndex numChars ) ;
+FUNCTION: CFStringRef CFStringCreateWithCharacters ( CFAllocatorRef allocator, ushort* cStr, CFIndex numChars ) ;
 
-FUNCTION: CFIndex CFStringGetLength ( void* theString ) ;
+FUNCTION: CFIndex CFStringGetLength ( CFStringRef theString ) ;
 
 FUNCTION: void CFStringGetCharacters ( void* theString, CFIndex start, CFIndex length, void* buffer ) ;
 
-FUNCTION: void* CFBundleCreate ( void* allocator, void* bundleURL ) ;
+FUNCTION: CFBundleRef CFBundleCreate ( CFAllocatorRef allocator, CFURLRef bundleURL ) ;
 
-FUNCTION: bool CFBundleLoadExecutable ( void* bundle ) ;
+FUNCTION: Boolean CFBundleLoadExecutable ( CFBundleRef bundle ) ;
 
 FUNCTION: void CFRelease ( void* cf ) ;
 
@@ -52,6 +62,9 @@ FUNCTION: void CFRelease ( void* cf ) ;
 : CF>string-array ( alien -- seq )
     CF>array [ CF>string ] map ;
 
+: <CFStringArray> ( seq -- alien )
+    [ <CFString> ] map dup <CFArray> swap [ CFRelease ] each ;
+
 : <CFFileSystemURL> ( string dir? -- url )
     >r <CFString> f over kCFURLPOSIXPathStyle
     r> CFURLCreateWithFileSystemPath swap CFRelease ;
@@ -72,3 +85,5 @@ FUNCTION: void CFRelease ( void* cf ) ;
     ] [
         "Cannot load bundled named " swap append throw
     ] ?if ;
+
+FUNCTION: CFRunLoopRef CFRunLoopGetMain ( ) ;

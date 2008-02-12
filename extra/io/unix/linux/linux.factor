@@ -136,5 +136,3 @@ M: linux-io init-io ( -- )
 T{ linux-io } set-io-backend
 
 [ start-wait-thread ] "io.unix.linux" add-init-hook
-
-"vocabs.monitor" require
