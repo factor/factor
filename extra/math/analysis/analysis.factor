@@ -113,7 +113,7 @@ PRIVATE>
 ! http://www.csse.monash.edu.au/~lloyd/tildeAlgDS/Numerical/Stirling/
 
 : stirling-fact ( n -- fact )
-  [ pi 2 * * sqrt ]
-  [ dup e / swap ^ ]
-  [ 12 * recip 1 + ]
-  tri * * ;
+    [ pi 2 * * sqrt ]
+    [ dup e / swap ^ ]
+    [ 12 * recip 1 + ]
+    tri * * ;
