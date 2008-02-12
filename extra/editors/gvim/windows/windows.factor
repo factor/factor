@@ -4,5 +4,6 @@ IN: editors.gvim.windows
 
 M: windows-io gvim-path
     \ gvim-path get-global [
-        program-files walk-dir [ "gvim.exe" tail? ] find nip
+        program-files "vim" path+
+        [ "gvim.exe" tail? ] find-file-breadth
     ] unless* ;
