@@ -82,25 +82,6 @@ GENERIC: generate-node ( node -- next )
 : if-intrinsics ( #call -- quot )
     node-param "if-intrinsics" word-prop ;
 
-DEFER: #terminal?
-
-PREDICATE: #merge #terminal-merge node-successor #terminal? ;
-
-PREDICATE: #values #terminal-values node-successor #terminal? ;
-
-PREDICATE: #call #terminal-call
-    dup node-successor #if?
-    over node-successor node-successor #terminal? and
-    swap if-intrinsics and ;
-
-UNION: #terminal
-    POSTPONE: f #return #terminal-values #terminal-merge ;
-
-: tail-call? ( -- ? )
-    node-stack get [
-        dup #terminal-call? swap node-successor #terminal? or
-    ] all? ;
-
 ! node
 M: node generate-node drop iterate-next ;
 
@@ -224,10 +205,11 @@ M: #dispatch generate-node
 : define-if-intrinsic ( word quot inputs -- )
     2array 1array define-if-intrinsics ;
 
-: do-if-intrinsic ( #call pair -- next )
-    <label> [ swap do-template ] keep
-    >r node-successor r> generate-if
-    node-successor ;
+: do-if-intrinsic ( pair -- next )
+    <label> [
+        swap do-template
+        node> node-successor dup >node
+    ] keep generate-if ;
 
 : find-intrinsic ( #call -- pair/f )
     intrinsics find-template ;
@@ -249,7 +231,7 @@ M: #call generate-node
         ] [
             node-param generate-call
         ] ?if
-    ] if* ;
+    ] ?if ;
 
 ! #call-label
 M: #call-label generate-node node-param generate-call ;

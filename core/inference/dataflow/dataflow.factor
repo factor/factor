@@ -304,3 +304,15 @@ SYMBOL: node-stack
     node-children
     [ last-node ] map
     [ #terminate? not ] subset ;
+
+DEFER: #tail?
+
+PREDICATE: #merge #tail-merge node-successor #tail? ;
+
+PREDICATE: #values #tail-values node-successor #tail? ;
+
+UNION: #tail
+    POSTPONE: f #return #tail-values #tail-merge ;
+
+: tail-call? ( -- ? )
+    node-stack get [ node-successor #tail? ] all? ;
