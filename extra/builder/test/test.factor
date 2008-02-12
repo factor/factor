@@ -1,36 +1,63 @@
 
-USING: kernel sequences assocs builder continuations vocabs vocabs.loader
+USING: kernel namespaces sequences assocs builder continuations
+       vocabs vocabs.loader
        io
        io.files
+       prettyprint
        tools.browser
-       tools.test ;
+       tools.test
+       bootstrap.stage2 ;
 
 IN: builder.test
 
+: record-bootstrap-time ( -- )
+  "../bootstrap-time" <file-writer>
+    [ bootstrap-time get . ]
+  with-stream ;
+
+: try-everything* ( -- vocabs ) try-everything [ first vocab-link-name ] map ;
+
+! : do-load ( -- )
+!   [ try-everything* ] "../load-everything-time" log-runtime
+!   dup empty?
+!     [ drop ]
+!     [ "../load-everything-log" log-object ]
+!   if ;
+
 : do-load ( -- )
   [
-    [ load-everything ]
-    [ require-all-error-vocabs "../load-everything-log" log-object ]
-    recover
-  ]
-  "../load-everything-time" log-runtime ;
+    "../load-everything-log" <file-writer>
+      [ try-everything* ]
+    with-stream
+  ] "../load-everything-time" log-runtime
+  dup empty?
+    [ drop ]
+    [ "../load-everything-vocabs" log-object ]
+  if
+  "../load-everything-log" delete-file ;
+
+! : do-tests ( -- )
+!   run-all-tests keys
+!   dup empty?
+!   [ drop ]
+!   [ "../failing-tests" log-object ]
+!   if ;
 
 : do-tests ( -- )
-  "" child-vocabs
-  [ vocab-source-loaded? ] subset
-  [ vocab-tests-path ] map
-  [ dup [ ?resource-path exists? ] when ] subset
-  [ dup run-test ] { } map>assoc
-  [ second empty? not ] subset
-  dup empty?
-  [ drop ]
   [
-    "../failing-tests" <file-writer>
-      [ [ nl failures. ] assoc-each ]
+    "../test-all-log" <file-writer>
+      [ run-all-tests keys ]
     with-stream
-  ]
-  if ;
+  ] "../test-all-time" log-runtime
+  dup empty?
+    [ drop ]
+    [ "../test-all-vocabs" log-object ]
+  if
+  "../test-all-log" delete-file ;
 
-: do-all ( -- ) do-load do-tests ;
+: do-all ( -- )
+  record-bootstrap-time
+  do-load
+  do-tests ;
 
 MAIN: do-all

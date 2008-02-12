@@ -18,7 +18,7 @@ TUPLE: lexer text line line-text line-length column ;
 
 : <lexer> ( text -- lexer )
     0 { set-lexer-text set-lexer-line } lexer construct
-    dup lexer-text empty? [ dup next-line ] unless ;
+    dup next-line ;
 
 : location ( -- loc )
     file get lexer get lexer-line 2dup and
@@ -107,6 +107,7 @@ M: bad-escape summary drop "Bad escape code" ;
 
 : escape ( escape -- ch )
     H{
+        { CHAR: a  CHAR: \a }
         { CHAR: e  CHAR: \e }
         { CHAR: n  CHAR: \n }
         { CHAR: r  CHAR: \r }
@@ -479,7 +480,7 @@ SYMBOL: interactive-vocabs
     [ [ parse-file call ] keep ] assert-depth drop ;
 
 : ?run-file ( path -- )
-    dup ?resource-path exists? [ run-file ] [ drop ] if ;
+    dup resource-exists? [ run-file ] [ drop ] if ;
 
 : bootstrap-file ( path -- )
     [ parse-file % ] [ run-file ] if-bootstrapping ;

@@ -77,26 +77,29 @@ M: x86-backend %jump-label ( label -- ) JMP ;
 M: x86-backend %jump-t ( label -- )
     "flag" operand f v>operand CMP JNE ;
 
-: (%dispatch) ( n -- operand )
-    ! Load jump table base. We use a temporary register
-    ! since on AMD64 we have to load a 64-bit immediate. On
-    ! x86, this is redundant.
-    ! Untag and multiply to get a jump table offset
-    "n" operand fixnum>slot@
-    ! Add jump table base
-    "offset" operand HEX: ffffffff MOV rc-absolute-cell rel-here
-    "n" operand "offset" operand ADD
-    "n" operand swap bootstrap-cell 8 = 14 9 ? + [+] ;
+: code-alignment ( -- n )
+    building get length dup cell align swap - ;
 
-M: x86-backend %call-dispatch ( word-table# -- )
-    [ 5 (%dispatch) CALL <label> dup JMP ] H{
-        { +input+ { { f "n" } } }
-        { +scratch+ { { f "offset" } } }
-        { +clobber+ { "n" } }
-    } with-template ;
+: align-code ( n -- )
+    0 <repetition> % ;
 
-M: x86-backend %jump-dispatch ( -- )
-    [ %epilogue-later 0 (%dispatch) JMP ] H{
+M: x86-backend %dispatch ( -- )
+    [
+        %epilogue-later
+        ! Load jump table base. We use a temporary register
+        ! since on AMD64 we have to load a 64-bit immediate. On
+        ! x86, this is redundant.
+        ! Untag and multiply to get a jump table offset
+        "n" operand fixnum>slot@
+        ! Add jump table base
+        "offset" operand HEX: ffffffff MOV rc-absolute-cell rel-here
+        "n" operand "offset" operand ADD
+        "n" operand HEX: 7f [+] JMP
+        ! Fix up the displacement above
+        code-alignment dup bootstrap-cell 8 = 15 9 ? +
+        building get dup pop* push
+        align-code
+    ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "offset" } } }
         { +clobber+ { "n" } }

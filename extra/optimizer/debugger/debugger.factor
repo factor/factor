@@ -3,7 +3,7 @@
 USING: classes inference inference.dataflow io kernel
 kernel.private math.parser namespaces optimizer prettyprint
 prettyprint.backend sequences words arrays match macros
-assocs combinators.private ;
+assocs sequences.private ;
 IN: optimizer.debugger
 
 ! A simple tool for turning dataflow IR into quotations, for

@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words parser io inspector quotations sequences
-prettyprint continuations effects definitions compiler.units ;
+prettyprint continuations effects definitions compiler.units
+namespaces assocs ;
 IN: tools.annotations
 
 : reset ( word -- )
@@ -48,6 +49,16 @@ IN: tools.annotations
 
 : watch ( word -- )
     dup [ (watch) ] annotate ;
+
+: (watch-vars) ( quot word vars -- newquot )
+    [
+        "--- Entering: " write swap .
+        "--- Variable values:" print
+        [ dup get ] H{ } map>assoc describe
+    ] 2curry swap compose ;
+
+: watch-vars ( word vars -- )
+    dupd [ (watch-vars) ] 2curry annotate ;
 
 : breakpoint ( word -- )
     [ \ break add* ] annotate ;

@@ -112,9 +112,9 @@ SYMBOL: value
 ! The following unit test blocks forever if the
 ! exception does not propogate. Uncomment when
 ! this is fixed (via a timeout).
-! [
-!  [ "this should propogate" throw ] future ?future 
-! ] must-fail
+[
+ [ "this should propogate" throw ] future ?future 
+] must-fail
 
 [ ] [
   [ "this should not propogate" throw ] future drop 
@@ -128,3 +128,14 @@ SYMBOL: value
   [ "testing unregistering on error" throw ] spawn 
   100 sleep process-pid get-process
 ] unit-test 
+
+! Race condition with futures
+[ 3 3 ] [
+    [ 3 ] future
+    dup ?future swap ?future
+] unit-test
+
+! Another race
+[ 3 ] [
+    [ 3 yield ] future ?future
+] unit-test

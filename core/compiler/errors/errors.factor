@@ -4,15 +4,19 @@ USING: kernel namespaces assocs prettyprint io sequences
 sorting continuations debugger math math.parser ;
 IN: compiler.errors
 
+SYMBOL: +error+
+SYMBOL: +warning+
+SYMBOL: +linkage+
+
+GENERIC: compiler-error-type ( error -- ? )
+
+M: object compiler-error-type drop +error+ ;
+
+<PRIVATE
+
 SYMBOL: compiler-errors
 
 SYMBOL: with-compiler-errors?
-
-: compiler-error ( error word -- )
-    with-compiler-errors? get [
-        compiler-errors get pick
-        [ set-at ] [ delete-at drop ] if
-    ] [ 2drop ] if ;
 
 : compiler-error. ( error word -- )
     nl
@@ -20,35 +24,46 @@ SYMBOL: with-compiler-errors?
     nl
     print-error ;
 
-: compiler-errors. ( assoc -- )
-    >alist sort-keys [ swap compiler-error. ] assoc-each ;
-
-GENERIC: compiler-warning? ( error -- ? )
-
-M: object compiler-warning? drop f ;
-
-: (:errors) ( -- assoc )
+: errors-of-type ( type -- assoc )
     compiler-errors get-global
-    [ nip compiler-warning? not ] assoc-subset ;
+    swap [ >r nip compiler-error-type r> eq? ] curry
+    assoc-subset ;
 
-: :errors (:errors) compiler-errors. ;
+: compiler-errors. ( type -- )
+    errors-of-type >alist sort-keys
+    [ swap compiler-error. ] assoc-each ;
 
-: (:warnings) ( -- seq )
-    compiler-errors get-global
-    [ nip compiler-warning? ] assoc-subset ;
-
-: :warnings (:warnings) compiler-errors. ;
-
-: (compiler-report) ( what assoc -- )
-    length dup zero? [ 2drop ] [
+: (compiler-report) ( what type word -- )
+    over errors-of-type assoc-empty? [ 3drop ] [
         [
-            ":" % over % " - print " % # " compiler " % % "." %
+            ":" %
+            %
+            " - print " %
+            errors-of-type assoc-size #
+            " " %
+            %
+            "." %
         ] "" make print
     ] if ;
 
 : compiler-report ( -- )
-    "errors" (:errors) (compiler-report)
-    "warnings" (:warnings) (compiler-report) ;
+    "semantic errors" +error+ "errors" (compiler-report)
+    "semantic warnings" +warning+ "warnings" (compiler-report)
+    "linkage errors" +linkage+ "linkage" (compiler-report) ;
+
+PRIVATE>
+
+: compiler-error ( error word -- )
+    with-compiler-errors? get [
+        compiler-errors get pick
+        [ set-at ] [ delete-at drop ] if
+    ] [ 2drop ] if ;
+
+: :errors +error+ compiler-errors. ;
+
+: :warnings +warning+ compiler-errors. ;
+
+: :linkage +linkage+ compiler-errors. ;
 
 : with-compiler-errors ( quot -- )
     with-compiler-errors? get "quiet" get or [ call ] [

@@ -40,14 +40,8 @@ SYMBOL: this-test
     dup word? [ 1quotation ] when
     [ infer drop ] curry [ ] swap unit-test ;
 
-TUPLE: expected-error ;
-
-M: expected-error summary
-    drop
-    "The unit test expected the quotation to throw an error" ;
-
 : must-fail-with ( quot pred -- )
-    >r [ expected-error construct-empty throw ] compose r>
+    >r [ f ] compose r>
     [ recover ] 2curry
     [ t ] swap unit-test ;
 
@@ -59,13 +53,12 @@ M: expected-error summary
 
 : (run-test) ( vocab -- )
     dup vocab-source-loaded? [
-        vocab-tests-path dup [
-            dup ?resource-path exists? [
-                [ "temporary" forget-vocab ] with-compilation-unit
-                dup run-file
-                [ dup forget-source ] with-compilation-unit
-            ] when
-        ] when
+        [ "temporary" forget-vocab ] with-compilation-unit
+        vocab-tests dup [ run-file ] each
+        [
+            dup [ forget-source ] each
+            "temporary" forget-vocab
+        ] with-compilation-unit
     ] when drop ;
 
 : run-test ( vocab -- failures )
@@ -81,7 +74,7 @@ M: expected-error summary
     "Traceback" swap third write-object ;
 
 : test-failures. ( assoc -- )
-    dup [
+    [
         nl
         dup empty? [
             drop
@@ -90,15 +83,15 @@ M: expected-error summary
             "==== FAILING TESTS:" print
             [
                 swap vocab-heading.
-                [ nl failure. nl ] each
+                [ failure. nl ] each
             ] assoc-each
         ] if
     ] [
-        drop "==== NOTHING TO TEST" print
-    ] if ;
+        "==== NOTHING TO TEST" print
+    ] if* ;
 
 : run-tests ( prefix -- failures )
-    child-vocabs dup empty? [ f ] [
+    child-vocabs dup empty? [ drop f ] [
         [ dup run-test ] { } map>assoc
         [ second empty? not ] subset
     ] if ;

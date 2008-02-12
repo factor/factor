@@ -27,8 +27,8 @@
 ! bye
 ! Connection closed by foreign host.
 
-USING: combinators kernel prettyprint io io.server sequences
-namespaces io.sockets continuations ;
+USING: combinators kernel prettyprint io io.timeouts io.server
+sequences namespaces io.sockets continuations ;
 
 SYMBOL: data-mode
 

@@ -1,5 +1,5 @@
 USING: kernel.private kernel sequences math combinators
-combinators.private ;
+sequences.private ;
 IN: benchmark.dispatch4
 
 : foobar-1

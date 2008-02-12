@@ -76,6 +76,9 @@ HELP: +append-environment+
 $nl
 "This is used in situations where you want a spawn child process with some overridden environment variables." } ;
 
+HELP: +timeout+
+{ $description "Launch descriptor key. If set, specifies a maximum running time for the process. If the process runs longer than this time, it will be killed." } ;
+
 HELP: default-descriptor
 { $description "Association storing default values for launch descriptor keys." } ;
 
@@ -94,27 +97,30 @@ HELP: run-process*
 
 HELP: >descriptor
 { $values { "desc" "a launch descriptor" } { "desc" "a launch descriptor" } }
-{ $description "Creates a launch descriptor from an object, which must be one of the following:"
-    { $list
-        { "a string -- this is wrapped in a launch descriptor with a single " { $link +command+ } " key" }
-        { "a sequence of strings -- this is wrapped in a launch descriptor with a single " { $link +arguments+ } " key" }
-        { "an association, used to set launch parameters for additional control" }
-    }
-} ;
+{ $description "Creates a launch descriptor from an object. See " { $link "io.launcher.descriptors" } " for details." } ;
 
 HELP: run-process
 { $values { "desc" "a launch descriptor" } { "process" process } }
-{ $description "Launches a process. The object can either be a string, a sequence of strings or a launch descriptor. See " { $link >descriptor } " for details." }
+{ $description "Launches a process. The object can either be a string, a sequence of strings or a launch descriptor. See " { $link "io.launcher.descriptors" } " for details." }
 { $notes "The output value can be passed to " { $link wait-for-process } " to get an exit code." } ;
 
 HELP: run-detached
 { $values { "desc" "a launch descriptor" } { "process" process } }
-{ $contract "Launches a process without waiting for it to complete. The object can either be a string, a sequence of strings or a launch descriptor. See " { $link >descriptor } " for details." }
+{ $contract "Launches a process without waiting for it to complete. The object can either be a string, a sequence of strings or a launch descriptor. See " { $link "io.launcher.descriptors" } " for details." }
 { $notes
     "This word is functionally identical to passing a launch descriptor to " { $link run-process } " having the " { $link +detached+ } " key set."
     $nl
     "The output value can be passed to " { $link wait-for-process } " to get an exit code."
 } ;
+
+HELP: process-failed
+{ $values { "code" "an exit status" } }
+{ $description "Throws a " { $link process-failed } " error." }
+{ $error-description "Thrown by " { $link try-process } " if the process exited with a non-zero status code." } ;
+
+HELP: try-process
+{ $values { "desc" "a launch descriptor" } }
+{ $description "Launches a process and waits for it to complete. If it exits with a non-zero status code, throws a " { $link process-failed } " error." } ;
 
 HELP: kill-process
 { $values { "process" process } }
@@ -153,28 +159,31 @@ HELP: wait-for-process
 { $values { "process" process } { "status" integer } }
 { $description "If the process is still running, waits for it to exit, otherwise outputs the exit code immediately. Can be called multiple times on the same process." } ;
 
-ARTICLE: "io.launcher" "Launching OS processes"
-"The " { $vocab-link "io.launcher" } " vocabulary implements cross-platform process launching."
-$nl
-"Words which launch processes can take either a command line string, a sequence of command line arguments, or a launch descriptor:"
+ARTICLE: "io.launcher.descriptors" "Launch descriptors"
+"Words which launch processes can take either a command line string, a sequence of command line arguments, or an assoc:"
 { $list
-    { "strings are wrapped in a launch descriptor with a single " { $link +command+ } " key" }
-    { "sequences of strings are wrapped in a launch descriptor with a single " { $link +arguments+ } " key" }
-    { "launch descriptors are associations, which can set extra launch parameters for finer control" }
+    { "strings are wrapped in an assoc with a single " { $link +command+ } " key" }
+    { "sequences of strings are wrapped in an assoc with a single " { $link +arguments+ } " key" }
+    { "associations can be passed in, which allows finer control over launch parameters" }
 }
-"A launch descriptor is an association containing keys from the below set:"
+"The associations can contain the following keys:"
 { $subsection +command+ }
 { $subsection +arguments+ }
 { $subsection +detached+ }
 { $subsection +environment+ }
 { $subsection +environment-mode+ }
-"Redirecting standard input and output to files:"
+{ $subsection +timeout+ }
 { $subsection +stdin+ }
 { $subsection +stdout+ }
-{ $subsection +stderr+ }
+{ $subsection +stderr+ } ;
+
+ARTICLE: "io.launcher" "Launching OS processes"
+"The " { $vocab-link "io.launcher" } " vocabulary implements cross-platform process launching."
+{ $subsection "io.launcher.descriptors" }
 "The following words are used to launch processes:"
 { $subsection run-process }
 { $subsection run-detached }
+{ $subsection try-process }
 "Stopping processes:"
 { $subsection kill-process }
 "Redirecting standard input and output to a pipe:"
@@ -183,6 +192,7 @@ $nl
 "A class representing an active or finished process:"
 { $subsection process }
 "Waiting for a process to end, or getting the exit code of a finished process:"
-{ $subsection wait-for-process } ;
+{ $subsection wait-for-process }
+"Processes support the " { $link "io.timeouts" } "; the timeout specifies an upper bound on the running time of the process." ;
 
 ABOUT: "io.launcher"

@@ -3,7 +3,6 @@
 void *primitives[] = {
 	primitive_execute,
 	primitive_call,
-	primitive_uncurry,
 	primitive_bignum_to_fixnum,
 	primitive_float_to_fixnum,
 	primitive_fixnum_to_bignum,
@@ -178,7 +177,6 @@ void *primitives[] = {
 	primitive_become,
 	primitive_sleep,
 	primitive_float_array,
-	primitive_curry,
 	primitive_tuple_boa,
 	primitive_class_hash,
 	primitive_callstack_to_array,

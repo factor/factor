@@ -25,9 +25,11 @@ SYMBOL: log-files
 : log-stream ( service -- stream )
     log-files get [ open-log-stream ] cache ;
 
+: multiline-header 20 CHAR: - <string> ; foldable
+
 : (write-message) ( msg word-name level multi? -- )
     [
-        "[" write 20 CHAR: - <string> write "] " write
+        "[" write multiline-header write "] " write
     ] [
         "[" write now (timestamp>rfc3339) "] " write
     ] if
@@ -82,7 +84,7 @@ SYMBOL: log-files
     (close-logs)
     log-root directory [ drop rotate-log ] assoc-each ;
 
-: log-server-loop
+: log-server-loop ( -- )
     [
         receive unclip {
             { "log-message" [ (log-message) ] }

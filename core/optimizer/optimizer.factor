@@ -10,7 +10,7 @@ IN: optimizer
         H{ } clone literal-substitutions set
         H{ } clone value-substitutions set
         dup compute-def-use
-        dup kill-values
+        kill-values
         dup infer-classes
         optimizer-changed off
         optimize-nodes
