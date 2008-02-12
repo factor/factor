@@ -119,7 +119,6 @@ write-test-2 "q" set
 SYMBOL: a
 
 :: use-test | a b c |
-    USE: kernel
-    ;
+    USE: kernel ;
 
 [ t ] [ a symbol? ] unit-test
