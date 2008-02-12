@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math cocoa cocoa.messages cocoa.classes
-sequences ;
+sequences math.bitfields ;
 IN: cocoa.windows
 
 : NSBorderlessWindowMask     0 ; inline
@@ -15,10 +15,12 @@ IN: cocoa.windows
 : NSBackingStoreBuffered    2 ; inline
 
 : standard-window-type
-    NSTitledWindowMask
-    NSClosableWindowMask bitor
-    NSMiniaturizableWindowMask bitor
-    NSResizableWindowMask bitor ; inline
+    {
+        NSTitledWindowMask
+        NSClosableWindowMask
+        NSMiniaturizableWindowMask
+        NSResizableWindowMask
+    } flags ; inline
 
 : <NSWindow> ( rect -- window )
     NSWindow -> alloc swap

@@ -7,6 +7,10 @@ SYMBOL: ui-backend
 
 HOOK: set-title ui-backend ( string world -- )
 
+HOOK: set-fullscreen* ui-backend ( ? world -- )
+
+HOOK: fullscreen* ui-backend ( world -- ? )
+
 HOOK: (open-window) ui-backend ( world -- )
 
 HOOK: (close-window) ui-backend ( handle -- )

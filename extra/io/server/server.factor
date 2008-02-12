@@ -1,68 +1,37 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.sockets io.files continuations kernel math
-math.parser namespaces parser sequences strings
+USING: io io.sockets io.files logging continuations kernel
+math math.parser namespaces parser sequences strings
 prettyprint debugger quotations calendar qualified ;
 QUALIFIED: concurrency
 
 IN: io.server
 
-SYMBOL: log-stream
+LOG: accepted-connection NOTICE
 
-: log-message ( str -- )
-    log-stream get [
-        "[" write now timestamp>string write "] " write
-        print flush
-    ] with-stream* ;
+: with-client ( client quot -- )
+    [
+        over client-stream-addr accepted-connection
+        with-stream*
+    ] curry with-disposal ; inline
 
-: log-error ( str -- ) "Error: " swap append log-message ;
-
-: log-client ( client -- )
-    "Accepted connection from "
-    swap client-stream-addr unparse append log-message ;
-
-: log-file ( service -- path )
-    ".log" append resource-path ;
-
-: with-log-stream ( stream quot -- )
-    log-stream swap with-variable ; inline
-
-: with-log-file ( file quot -- )
-    >r <file-appender> r>
-    [ with-log-stream ] curry with-disposal ; inline
-
-: with-log-stdio ( quot -- )
-    stdio get swap with-log-stream ;
-
-: with-logging ( service quot -- )
-    over [
-        >r log-file
-        "Writing log messages to " write dup print flush r>
-        with-log-file
-    ] [
-        nip with-log-stdio
-    ] if ; inline
-
-: with-client ( quot client -- )
-    dup log-client
-    [ swap with-stream ] 2curry concurrency:spawn drop ; inline
+\ with-client NOTICE add-error-logging
 
 : accept-loop ( server quot -- )
-    [ swap accept with-client ] 2keep accept-loop ; inline
+    [
+        >r accept r> [ with-client ] 2curry
+        concurrency:spawn drop
+    ] 2keep accept-loop ; inline
 
 : server-loop ( server quot -- )
     [ accept-loop ] curry with-disposal ; inline
 
+SYMBOL: servers
+
 : spawn-server ( addrspec quot -- )
-    "Waiting for connections on " pick unparse append
-    log-message
-    [
-        >r <server> r> server-loop
-    ] [
-        "Cannot spawn server: " print
-        print-error
-        2drop
-    ] recover ; inline
+    >r <server> dup servers get push r> server-loop ; inline
+
+\ spawn-server NOTICE add-error-logging
 
 : local-server ( port -- seq )
     "localhost" swap t resolve-host ;
@@ -72,21 +41,27 @@ SYMBOL: log-stream
 
 : with-server ( seq service quot -- )
     [
+        V{ } clone servers set
         [ spawn-server ] curry concurrency:parallel-each
     ] curry with-logging ; inline
 
-: log-datagram ( addrspec -- )
-    "Received datagram from " swap unparse append log-message ;
+: stop-server ( -- )
+    servers get [ dispose ] each ;
+
+: received-datagram ( addrspec -- ) drop ;
+
+\ received-datagram NOTICE add-input-logging
 
 : datagram-loop ( quot datagram -- )
     [
-        [ receive dup log-datagram >r swap call r> ] keep
+        [ receive dup received-datagram >r swap call r> ] keep
         pick [ send ] [ 3drop ] keep
     ] 2keep datagram-loop ; inline
 
 : spawn-datagrams ( quot addrspec -- )
-    "Waiting for datagrams on " over unparse append log-message
     <datagram> [ datagram-loop ] with-disposal ; inline
+
+\ spawn-datagrams NOTICE add-input-logging
 
 : with-datagrams ( seq service quot -- )
     [

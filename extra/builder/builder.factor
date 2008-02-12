@@ -1,9 +1,20 @@
 
-USING: kernel io io.files io.launcher tools.deploy.backend
-       system namespaces sequences splitting math.parser
-       unix prettyprint tools.time calendar bake vars ;
+USING: kernel io io.files io.launcher io.sockets hashtables math threads
+       system continuations namespaces sequences splitting math.parser
+       prettyprint tools.time calendar bake vars http.client
+       combinators bootstrap.image bootstrap.image.download
+       combinators.cleave ;
 
 IN: builder
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: runtime ( quot -- time ) benchmark nip ;
+
+: log-runtime ( quot file -- )
+  >r runtime r> <file-writer> [ . ] with-stream ;
+
+: log-object ( object file -- ) <file-writer> [ . ] with-stream ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -13,25 +24,53 @@ IN: builder
          ,[ dup timestamp-day    ]
          ,[ dup timestamp-hour   ]
          ,[     timestamp-minute ] }
-  [ number>string 2 CHAR: 0 pad-left ] map "-" join ;
+  [ pad-00 ] map "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: builder-recipients
 
-: quote ( str -- str ) "'" swap "'" 3append ;
+: host-name* ( -- name ) host-name "." split first ;
+
+: tag-subject ( str -- str ) `{ "builder@" ,[ host-name* ] ": " , } concat ;
+
+: email-string ( subject -- )
+  `{ "mutt" "-s" ,[ tag-subject ] %[ builder-recipients get ] }
+  [ ] with-process-stream drop ;
 
 : email-file ( subject file -- )
   `{
-     "cat"       ,
-     "| mutt -s" ,[ quote ]
-     "-x"        %[ builder-recipients get ]
-   }
-   " " join system drop ;
-  
+    { +stdin+ , }
+    { +arguments+
+      { "mutt" "-s" ,[ tag-subject ] %[ builder-recipients get ] } }
+  }
+  >hashtable run-process drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: run-or-notify ( desc message -- )
+  [ [ try-process ]        curry ]
+  [ [ email-string throw ] curry ]
+  bi*
+  recover ;
+
+: run-or-send-file ( desc message file -- )
+  >r >r [ try-process ]         curry
+  r> r> [ email-file throw ] 2curry
+  recover ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : target ( -- target ) `{ ,[ os ] %[ cpu "." split ] } "-" join ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: factor-binary ( -- name )
+  os
+  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
+    { "winnt" [ "./factor-nt.exe" ] }
+    [ drop "./factor" ] }
+  case ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -39,77 +78,113 @@ VAR: stamp
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: git-pull ( -- desc )
+  {
+    "git"
+    "pull"
+    "--no-summary"
+    "git://factorcode.org/git/factor.git"
+    "master"
+  } ;
+
+: git-clone ( -- desc ) { "git" "clone" "../factor" } ;
+
+: enter-build-dir ( -- )
+  datestamp >stamp
+  "/builds" cd
+  stamp> make-directory
+  stamp> cd ;
+
+: git-id ( -- id )
+  { "git" "show" } <process-stream> [ readln ] with-stream " " split second ;
+
+: record-git-id ( -- ) git-id "../git-id" log-object ;
+
+: make-clean ( -- desc ) { "make" "clean" } ;
+
+: make-vm ( -- )
+  `{
+     { +arguments+ { "make" ,[ target ] } }
+     { +stdout+    "../compile-log" }
+     { +stderr+    +stdout+ }
+   }
+  >hashtable ;
+
+: retrieve-boot-image ( -- )
+  [ my-arch download-image ]
+  [ ]
+  [ "builder: image download" email-string ]
+  cleanup
+  flush ;
+
+: bootstrap ( -- desc )
+  `{
+     { +arguments+ {
+                     ,[ factor-binary ]
+                     ,[ "-i=" my-boot-image-name append ]
+                     "-no-user-init"
+                   } }
+     { +stdout+   "../boot-log" }
+     { +stderr+   +stdout+ }
+   }
+  >hashtable ;
+
+: builder-test ( -- desc ) `{ ,[ factor-binary ] "-run=builder.test" } ;
+  
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: build-status
+
 : build ( -- )
 
-datestamp >stamp
+  enter-build-dir
+  
+  git-clone "git clone error" run-or-notify
 
-"/builds/factor" cd
-"git pull git://factorcode.org/git/factor.git" system
-0 =
-[ ]
-[
-  "builder: git pull" "/dev/null" email-file
-  "builder: git pull" throw
-]
-if
+  "factor" cd
 
-"/builds/" stamp> append make-directory
-"/builds/" stamp> append cd
-"git clone /builds/factor" system drop
+  record-git-id
 
-"factor" cd
+  make-clean "make clean error" run-or-notify
 
-{ "git" "show" } <process-stream>
-[ readln ] with-stream
-" " split second
-"../git-id" <file-writer> [ print ] with-stream
+  make-vm "vm compile error" "../compile-log" run-or-send-file
 
-"make clean" system drop
+  retrieve-boot-image
 
-"make " target " > ../compile-log" 3append system
-0 =
-[ ]
-[
-  "builder: vm compile" "../compile-log" email-file
-  "builder: vm compile" throw
-] if
+  bootstrap "bootstrap error" "../boot-log" run-or-send-file
 
-"wget http://factorcode.org/images/latest/" boot-image-name append system
-0 =
-[ ]
-[
-  "builder: image download" "/dev/null" email-file
-  "builder: image download" throw
-] if
+  builder-test "builder.test fatal error" run-or-notify
+  
+  "../load-everything-log" exists?
+  [ "load-everything" "../load-everything-log" email-file ]
+  when
 
-[
-  "./factor -i=" boot-image-name " -no-user-init > ../boot-log"
-  3append
-  system
-]
-benchmark nip
-"../boot-time" <file-writer> [ . ] with-stream
-0 =
-[ ]
-[
-  "builder: bootstrap" "../boot-log" email-file
-  "builder: bootstrap" throw
-] if
-
-[
-  "./factor -e='USE: tools.browser load-everything' > ../load-everything-log"
-  system
-] benchmark nip
-"../load-everything-time" <file-writer> [ . ] with-stream
-0 =
-[ ]
-[
-  "builder: load-everything" "../load-everything-log" email-file
-  "builder: load-everything" throw
-] if
-
-;
+  "../failing-tests" exists?
+  [ "failing tests" "../failing-tests" email-file ]
+  when ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MAIN: build
+: minutes>ms ( min -- ms ) 60 * 1000 * ;
+
+: updates-available? ( -- ? )
+  git-id
+  git-pull run-process drop
+  git-id
+  = not ;
+
+: build-loop ( -- )
+  [
+    "/builds/factor" cd
+    updates-available?
+      [ build ]
+    when
+  ]
+  [ drop ]
+  recover
+  5 minutes>ms sleep
+  build-loop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MAIN: build-loop

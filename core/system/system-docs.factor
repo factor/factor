@@ -51,7 +51,8 @@ HELP: os
         "openbsd"
         "netbsd"
         "solaris"
-        "windows"
+        "wince"
+        "winnt"
     }
 } ;
 

@@ -14,7 +14,7 @@ C: <node> node
 
 : node-server ( port -- )
     internet-server
-    "concurrency"
+    "concurrency.distributed"
     [ handle-node-client ] with-server ;
 
 : send-to-node ( msg pid  host port -- )

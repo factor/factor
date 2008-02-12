@@ -3,7 +3,7 @@
 USING: io io.streams.string io.files kernel math namespaces
 prettyprint sequences arrays generic strings vectors
 xml.char-classes xml.data xml.errors xml.tokenize xml.writer
-xml.utilities state-parser assocs unicode.categories ;
+xml.utilities state-parser assocs ascii ;
 IN: xml
 
 !   -- Overall parser with data tree

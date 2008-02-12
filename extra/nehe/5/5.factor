@@ -108,10 +108,12 @@ M: nehe5-gadget draw-gadget* ( gadget -- )
 
 : nehe5-update-thread ( gadget -- )  
   dup nehe5-gadget-quit? [
+    drop
+  ] [
     redraw-interval sleep 
     dup relayout-1  
     nehe5-update-thread 
-  ] unless ;
+  ] if ;
 
 M: nehe5-gadget graft* ( gadget -- )
  [ f swap set-nehe5-gadget-quit? ] keep

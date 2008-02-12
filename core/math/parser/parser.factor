@@ -4,12 +4,6 @@ USING: kernel math.private namespaces sequences strings arrays
 combinators splitting math assocs ;
 IN: math.parser
 
-DEFER: base>
-
-: string>ratio ( str radix -- a/b )
-    >r "/" split1 r> tuck base> >r base> r>
-    2dup and [ / ] [ 2drop f ] if ;
-
 : digit> ( ch -- n )
     H{
         { CHAR: 0 0 }
@@ -36,30 +30,57 @@ DEFER: base>
         { CHAR: f 15 }
     } at ;
 
-: digits>integer ( radix seq -- n )
-    0 rot [ swapd * + ] curry reduce ;
-
-: valid-digits? ( radix seq -- ? )
-    {
-        { [ dup empty? ] [ 2drop f ] }
-        { [ f over memq? ] [ 2drop f ] }
-        { [ t ] [ swap [ < ] curry all? ] }
-    } cond ;
-
 : string>digits ( str -- digits )
     [ digit> ] { } map-as ;
 
-: string>integer ( str radix -- n/f )
-    swap "-" ?head >r
-    string>digits 2dup valid-digits?
-    [ digits>integer r> [ neg ] when ] [ r> 3drop f ] if ;
+: digits>integer ( seq radix -- n )
+    0 swap [ swapd * + ] curry reduce ;
+
+DEFER: base>
+
+<PRIVATE
+
+SYMBOL: radix
+SYMBOL: negative?
+
+: sign negative? get "-" "+" ? ;
+
+: with-radix ( radix quot -- )
+    radix swap with-variable ; inline
+
+: (base>) ( str -- n ) radix get base> ;
+
+: whole-part ( str -- m n )
+    sign split1 >r (base>) r>
+    dup [ (base>) ] [ drop 0 swap ] if ;
+
+: string>ratio ( str -- a/b )
+    "/" split1 (base>) >r whole-part r>
+    3dup and and [ / + ] [ 3drop f ] if ;
+
+: valid-digits? ( seq -- ? )
+    {
+        { [ dup empty? ] [ drop f ] }
+        { [ f over memq? ] [ drop f ] }
+        { [ t ] [ radix get [ < ] curry all? ] }
+    } cond ;
+
+: string>integer ( str -- n/f )
+    string>digits dup valid-digits?
+    [ radix get digits>integer ] [ drop f ] if ;
+
+PRIVATE>
 
 : base> ( str radix -- n/f )
-    {
-        { [ CHAR: / pick member? ] [ string>ratio ] }
-        { [ CHAR: . pick member? ] [ drop string>float ] }
-        { [ t ] [ string>integer ] }
-    } cond ;
+    [
+        "-" ?head dup negative? set >r
+        {
+            { [ CHAR: / over member? ] [ string>ratio ] }
+            { [ CHAR: . over member? ] [ string>float ] }
+            { [ t ] [ string>integer ] }
+        } cond
+        r> [ dup [ neg ] when ] when
+    ] with-radix ;
 
 : string>number ( str -- n/f ) 10 base> ;
 : bin> ( str -- n/f ) 2 base> ;
@@ -74,7 +95,15 @@ DEFER: base>
     dup >r /mod >digit , dup 0 >
     [ r> integer, ] [ r> 2drop ] if ;
 
+PRIVATE>
+
 GENERIC# >base 1 ( n radix -- str )
+
+<PRIVATE
+
+: (>base) ( n -- str ) radix get >base ;
+
+PRIVATE>
 
 M: integer >base
     [
@@ -87,10 +116,15 @@ M: integer >base
 
 M: ratio >base
     [
-        over numerator over >base %
-        CHAR: / ,
-        swap denominator swap >base %
-    ] "" make ;
+        [
+            dup 0 < dup negative? set [ "-" % neg ] when
+            1 /mod
+            >r dup zero? [ drop ] [ (>base) % sign % ] if r>
+            dup numerator (>base) %
+            "/" %
+            denominator (>base) %
+        ] "" make
+    ] with-radix ;
 
 : fix-float ( str -- newstr )
     {

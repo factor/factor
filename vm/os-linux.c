@@ -17,3 +17,18 @@ const char *vm_executable_path(void)
 		return safe_strdup(path);
 	}
 }
+
+int inotify_init(void)
+{
+	return syscall(SYS_inotify_init);
+}
+
+int inotify_add_watch(int fd, const char *name, u32 mask)
+{
+	return syscall(SYS_inotify_add_watch, fd, name, mask);
+}
+
+int inotify_rm_watch(int fd, u32 wd)
+{
+	return syscall(SYS_inotify_rm_watch, fd, wd);
+}

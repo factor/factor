@@ -21,21 +21,21 @@ TUPLE: walker model interpreter history ;
 : walker-active? ( walker -- ? )
     walker-interpreter interpreter-continuation >boolean ;
 
-: walker-command ( gadget quot -- )
-    over walker-active? [ with-walker ] [ 2drop ] if ; inline
-
 : save-interpreter ( walker -- )
     dup walker-interpreter interpreter-continuation clone
     swap walker-history push ;
 
-: com-step ( walker -- )
-    dup save-interpreter [ step ] walker-command ;
+: walker-command ( gadget quot -- )
+    over walker-active? [
+        over save-interpreter
+        with-walker
+    ] [ 2drop ] if ; inline
 
-: com-into ( walker -- )
-    dup save-interpreter [ step-into ] walker-command ;
+: com-step ( walker -- ) [ step ] walker-command ;
 
-: com-out ( walker -- )
-    dup save-interpreter [ step-out ] walker-command ;
+: com-into ( walker -- ) [ step-into ] walker-command ;
+
+: com-out ( walker -- ) [ step-out ] walker-command ;
 
 : com-back ( walker -- )
     dup walker-history

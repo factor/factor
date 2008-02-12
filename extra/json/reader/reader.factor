@@ -104,7 +104,7 @@ LAZY: 'digit1-9' ( -- parser )
 LAZY: 'digit0-9' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
 
-: decimal>integer ( seq -- num ) 10 swap digits>integer ;
+: decimal>integer ( seq -- num ) 10 digits>integer ;
 
 LAZY: 'int' ( -- parser )
   'zero' 

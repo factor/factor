@@ -87,7 +87,32 @@ TUPLE: assert got expect ;
 
 : depth ( -- n ) datastack length ;
 
-: assert-depth ( quot -- ) depth slip depth swap assert= ;
+: trim-datastacks ( seq1 seq2 -- seq1' seq2' )
+    2dup [ length ] 2apply min tuck tail >r tail r> ;
+
+TUPLE: relative-underflow stack ;
+
+: relative-underflow ( before after -- * )
+    trim-datastacks nip \ relative-underflow construct-boa throw ;
+
+M: relative-underflow summary
+    drop "Too many items removed from data stack" ;
+
+TUPLE: relative-overflow stack ;
+
+M: relative-overflow summary
+    drop "Superfluous items pushed to data stack" ;
+
+: relative-overflow ( before after -- * )
+    trim-datastacks drop \ relative-overflow construct-boa throw ;
+
+: assert-depth ( quot -- )
+    >r datastack r> swap slip >r datastack r>
+    2dup [ length ] compare sgn {
+        { -1 [ relative-underflow ] }
+        { 0 [ 2drop ] }
+        { 1 [ relative-overflow ] }
+    } case ; inline
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;
@@ -221,9 +246,6 @@ M: immutable summary drop "Sequence is immutable" ;
 M: redefine-error error.
     "Re-definition of " write
     redefine-error-def . ;
-
-M: forward-error error.
-    "Forward reference to " write forward-error-word . ;
 
 M: undefined summary
     drop "Calling a deferred word before it has been defined" ;

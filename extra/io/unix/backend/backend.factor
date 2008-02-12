@@ -3,7 +3,7 @@
 USING: alien generic assocs kernel kernel.private math
 io.nonblocking sequences strings structs sbufs threads unix
 vectors io.buffers io.backend io.streams.duplex math.parser
-continuations system libc qualified namespaces ;
+continuations system libc qualified namespaces io.timeouts ;
 QUALIFIED: io
 IN: io.unix.backend
 
@@ -14,9 +14,9 @@ TUPLE: io-task port callbacks ;
 
 : io-task-fd io-task-port port-handle ;
 
-: <io-task> ( port continuation class -- task )
-    >r 1vector io-task construct-boa r> construct-delegate ;
-    inline
+: <io-task> ( port continuation/f class -- task )
+    >r [ 1vector ] [ V{ } clone ] if* io-task construct-boa
+    r> construct-delegate ; inline
 
 TUPLE: input-task ;
 
@@ -61,7 +61,7 @@ M: mx register-io-task ( task mx -- )
     mx get-global register-io-task stop ;
 
 : with-port-continuation ( port quot -- port )
-    [ callcc0 ] curry with-port-timeout ; inline
+    [ callcc0 ] curry with-timeout ; inline
 
 M: mx unregister-io-task ( task mx -- )
     fd/container delete-at drop ;
@@ -178,7 +178,7 @@ M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: unix-io io-multiplex ( ms -- )
-    expire-timeouts mx get-global wait-for-events ;
+    mx get-global wait-for-events ;
 
 M: unix-io init-stdio ( -- )
     0 1 handle>duplex-stream io:stdio set-global
@@ -194,7 +194,7 @@ TUPLE: mx-port mx ;
 TUPLE: mx-task ;
 
 : <mx-task> ( port -- task )
-    f io-task construct-boa mx-task construct-delegate ;
+    f mx-task <io-task> ;
 
 M: mx-task do-io-task
     io-task-port mx-port-mx 0 swap wait-for-events f ;

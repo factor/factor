@@ -6,12 +6,14 @@ TUPLE: combination-1 ;
 
 M: combination-1 perform-combination 2drop { } [ ] each [ ] ;
 
+M: combination-1 make-default-method 2drop [ "No method" throw ] ;
+
 SYMBOL: generic-1
 
 [
     generic-1 T{ combination-1 } define-generic
 
-    [ ] <method> object \ generic-1 define-method
+    [ ] object \ generic-1 define-method
 ] with-compilation-unit
 
 [ ] [
@@ -20,7 +22,7 @@ SYMBOL: generic-1
     ] with-compilation-unit
 ] unit-test
 
-GENERIC: some-generic
+GENERIC: some-generic ( a -- b )
 
 USE: arrays
 

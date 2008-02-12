@@ -76,7 +76,7 @@ IN: scratchpad
 
 [
   "begin1" "begin" token some parse 
-] unit-test-fails 
+] must-fail 
 
 { "begin" } [
   "begin" "begin" token some parse 

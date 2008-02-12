@@ -1,5 +1,6 @@
 USING: arrays combinators.lib kernel math math.functions math.miller-rabin
-    math.parser math.primes.factors math.ranges namespaces sequences ;
+    math.matrices math.parser math.primes.factors math.ranges namespaces
+    sequences sorting unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -7,14 +8,18 @@ IN: project-euler.common
 
 ! Problems using each public word
 ! -------------------------------
+! alpha-value - #22, #42
 ! cartesian-product - #4, #27, #29, #32, #33
 ! collect-consecutive - #8, #11
 ! log10 - #25, #134
 ! max-path - #18, #67
+! nth-triangle - #12, #42
 ! number>digits - #16, #20, #30, #34
+! pandigital? - #32, #38
 ! propagate-all - #18, #67
 ! sum-proper-divisors - #21
 ! tau* - #12
+! [uad]-transform - #39, #75
 
 
 : nth-pair ( n seq -- nth next )
@@ -44,7 +49,13 @@ IN: project-euler.common
         dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
     ] { } make sum ;
 
+: transform ( triple matrix -- new-triple )
+    [ 1array ] dip m. first ;
+
 PRIVATE>
+
+: alpha-value ( str -- n )
+    >lower [ CHAR: a - 1+ ] sigma ;
 
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
     swap [ swap [ 2array ] map-with ] map-with concat ;
@@ -66,6 +77,12 @@ PRIVATE>
 
 : number>digits ( n -- seq )
     number>string string>digits ;
+
+: nth-triangle ( n -- n )
+    dup 1+ * 2 / ;
+
+: pandigital? ( n -- ? )
+    number>string natural-sort "123456789" = ;
 
 ! Not strictly needed, but it is nice to be able to dump the triangle after the
 ! propagation
@@ -97,3 +114,12 @@ PRIVATE>
     dup sqrt >fixnum [1,b] [
         dupd mod zero? [ [ 2 + ] dip ] when
     ] each drop * ;
+
+! These transforms are for generating primitive Pythagorean triples
+: u-transform ( triple -- new-triple )
+    { { 1 2 2 } { -2 -1 -2 } { 2 2 3 } } transform ;
+: a-transform ( triple -- new-triple )
+    { { 1 2 2 } { 2 1 2 } { 2 2 3 } } transform ;
+: d-transform ( triple -- new-triple )
+    { { -1 -2 -2 } { 2 1 2 } { 2 2 3 } } transform ;
+

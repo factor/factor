@@ -9,9 +9,13 @@ IN: inference.backend
 : recursive-label ( word -- label/f )
     recursive-state get at ;
 
+: inline? ( word -- ? )
+    dup "method" word-prop
+    [ method-generic inline? ] [ "inline" word-prop ] ?if ;
+
 : local-recursive-state ( -- assoc )
     recursive-state get dup keys
-    [ dup word? [ "inline" word-prop ] when not ] find drop
+    [ dup word? [ inline? ] when not ] find drop
     [ head-slice ] when* ;
 
 : inline-recursive-label ( word -- label/f )
@@ -20,24 +24,24 @@ IN: inference.backend
 : recursive-quotation? ( quot -- ? )
     local-recursive-state [ first eq? ] with contains? ;
 
-TUPLE: inference-error rstate major? ;
+TUPLE: inference-error rstate type ;
 
-M: inference-error compiler-warning?
-    inference-error-major? not ;
+M: inference-error compiler-error-type
+    inference-error-type ;
 
-: (inference-error) ( ... class important? -- * )
+: (inference-error) ( ... class type -- * )
     >r construct-boa r>
     recursive-state get {
         set-delegate
-        set-inference-error-major?
+        set-inference-error-type
         set-inference-error-rstate
     } \ inference-error construct throw ; inline
 
 : inference-error ( ... class -- * )
-    t (inference-error) ; inline
+    +error+ (inference-error) ; inline
 
 : inference-warning ( ... class -- * )
-    f (inference-error) ; inline
+    +warning+ (inference-error) ; inline
 
 TUPLE: literal-expected ;
 
@@ -157,7 +161,7 @@ TUPLE: too-many-r> ;
     meta-d get push-all ;
 
 : if-inline ( word true false -- )
-    >r >r dup "inline" word-prop r> r> if ; inline
+    >r >r dup inline? r> r> if ; inline
 
 : consume/produce ( effect node -- )
     over effect-in over consume-values
@@ -331,7 +335,7 @@ TUPLE: unbalanced-branches-error quots in out ;
     #merge node, ; inline
 
 : make-call-node ( word effect -- )
-    swap dup "inline" word-prop
+    swap dup inline?
     over dup recursive-label eq? not and [
         meta-d get clone -rot
         recursive-label #call-label [ consume/produce ] keep
@@ -366,6 +370,7 @@ TUPLE: effect-error word effect ;
             init-inference
             dependencies off
             dup word-def over dup infer-quot-recursive
+            end-infer
             finish-word
             current-effect
         ] with-scope

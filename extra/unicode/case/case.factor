@@ -1,6 +1,6 @@
 USING: kernel unicode.data sequences sequences.next namespaces
 assocs.lib unicode.normalize math unicode.categories combinators
-assocs ;
+assocs strings splitting ;
 IN: unicode.case
 
 : ch>lower ( ch -- lower ) simple-lower at-default ;

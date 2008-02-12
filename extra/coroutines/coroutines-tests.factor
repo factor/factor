@@ -10,7 +10,7 @@ USING: coroutines kernel sequences prettyprint tools.test math ;
   [ 1+ coyield* ] cocreate ;
 
 test1 dup *coresume . dup *coresume . dup *coresume . dup *coresume 2drop
-[ test2 42 over coresume . dup *coresume . drop ] unit-test-fails
+[ test2 42 over coresume . dup *coresume . drop ] must-fail
 { 43 } [ 42 test2 coresume ] unit-test
 
 : test3 ( -- co )

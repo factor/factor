@@ -1,4 +1,4 @@
 IN: temporary
-USING: tools.test tools.test.inference io.launcher ;
+USING: tools.test io.launcher ;
 
 \ <process-stream> must-infer

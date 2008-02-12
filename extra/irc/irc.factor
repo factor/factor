@@ -189,7 +189,7 @@ SYMBOL: line
 
 : with-infinite-loop ( quot timeout -- quot timeout )
     "looping" print flush
-    over catch drop dup sleep with-infinite-loop ;
+    over [ drop ] recover dup sleep with-infinite-loop ;
 
 : start-irc ( irc-client -- )
     ! [ [ do-irc ] curry 3000 with-infinite-loop ] with-scope ;

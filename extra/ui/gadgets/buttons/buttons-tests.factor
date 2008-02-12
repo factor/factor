@@ -1,7 +1,6 @@
 IN: temporary
 USING: ui.commands ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets tools.test namespaces sequences kernel models
-tools.test.inference ;
+ui.gadgets tools.test namespaces sequences kernel models ;
 
 TUPLE: foo-gadget ;
 

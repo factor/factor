@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Gavin Harrison
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences kernel.private namespaces arrays io io.files
-    splitting io.binary math.functions vectors quotations combinators.private ;
+    splitting io.binary math.functions vectors quotations sequences.private ;
 IN: icfp.2006
 
 SYMBOL: regs

@@ -50,3 +50,6 @@ M: memoized definition "memo-quot" word-prop ;
 : memoize-quot ( quot effect -- memo-quot )
     gensym swap dupd "declared-effect" set-word-prop
     dup rot define-memoized 1quotation ;
+
+: reset-memoized ( word -- )
+    "memoize" word-prop clear-assoc ;

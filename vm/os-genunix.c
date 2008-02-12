@@ -13,6 +13,7 @@ void init_signals(void)
 void early_init(void) { }
 
 #define SUFFIX ".image"
+#define SUFFIX_LEN 6
 
 const char *default_image_path(void)
 {
@@ -21,7 +22,14 @@ const char *default_image_path(void)
 	if(!path)
 		return "factor.image";
 
-	char *new_path = safe_realloc(path,PATH_MAX + strlen(SUFFIX) + 1);
-	strcat(new_path,SUFFIX); 
+	/* We can't call strlen() here because with gcc 4.1.2 this
+	causes an internal compiler error. */
+	int len = 0;
+	const char *iter = path;
+	while(*iter) { len++; iter++; }
+
+	char *new_path = safe_malloc(PATH_MAX + SUFFIX_LEN + 1);
+	memcpy(new_path,path,len + 1);
+	memcpy(new_path + len,SUFFIX,SUFFIX_LEN + 1);
 	return new_path;
 }

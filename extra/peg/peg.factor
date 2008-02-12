@@ -343,7 +343,7 @@ MEMO: 'digit' ( -- parser )
   [ digit? ] satisfy [ digit> ] action ;
 
 MEMO: 'integer' ( -- parser )
-  'digit' repeat1 [ 10 swap digits>integer ] action ;
+  'digit' repeat1 [ 10 digits>integer ] action ;
 
 MEMO: 'string' ( -- parser )
   [

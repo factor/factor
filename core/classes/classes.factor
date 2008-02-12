@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: classes
 USING: arrays definitions assocs kernel
@@ -20,7 +20,9 @@ PREDICATE: class tuple-class
 
 : classes ( -- seq ) class<map get keys ;
 
-: type>class ( n -- class ) builtins get nth ;
+: type>class ( n -- class ) builtins get-global nth ;
+
+: bootstrap-type>class ( n -- class ) builtins get nth ;
 
 : predicate-word ( word -- predicate )
     [ word-name "?" append ] keep word-vocabulary create ;

@@ -115,19 +115,6 @@ DEFINE_PRIMITIVE(read_dir)
 	dpush(result);
 }
 
-DEFINE_PRIMITIVE(cwd)
-{
-	char wd[MAXPATHLEN];
-	if(getcwd(wd,MAXPATHLEN) == NULL)
-		io_error();
-	box_char_string(wd);
-}
-
-DEFINE_PRIMITIVE(cd)
-{
-	chdir(unbox_char_string());
-}
-
 DEFINE_PRIMITIVE(os_envs)
 {
 	GROWABLE_ARRAY(result);
