@@ -1,5 +1,5 @@
 USING: locals math sequences tools.test hashtables words kernel
-namespaces ;
+namespaces arrays ;
 IN: temporary
 
 :: foo | a b | a a ;
@@ -34,6 +34,21 @@ IN: temporary
 
 :: let-test-3 | |
     [let | a [ ] | [let | b [ [ a ] ] | [let | a [ 3 ] | b ] ] ] ;
+
+:: let-test-4 | |
+    [let | a [ 1 ] b [ ] | a b 2array ] ;
+
+[ { 1 2 } ] [ 2 let-test-4 ] unit-test
+
+:: let-test-5 | |
+    [let | a [ ] b [ ] | a b 2array ] ;
+
+[ { 2 1 } ] [ 1 2 let-test-5 ] unit-test
+
+:: let-test-6 | |
+    [let | a [ ] b [ 1 ] | a b 2array ] ;
+
+[ { 2 1 } ] [ 2 let-test-6 ] unit-test
 
 [ -1 ] [ -1 let-test-3 call ] unit-test
 

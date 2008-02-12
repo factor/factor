@@ -4,7 +4,7 @@ USING: kernel namespaces sequences sequences.private assocs
        math inference.transforms parser words quotations debugger
        macros arrays macros splitting combinators prettyprint.backend
        definitions prettyprint hashtables combinators.lib
-       prettyprint.sections ;
+       prettyprint.sections sequences.private ;
 IN: locals
 
 ! Inspired by
@@ -69,14 +69,14 @@ C: <quote> quote
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : localize-writer ( obj args -- quot )
-  >r "local-reader" word-prop r> read-local [ set-first ] append ;
+  >r "local-reader" word-prop r> read-local [ 0 swap set-array-nth ] append ;
 
 : localize ( obj args -- quot )
     {
         { [ over local? ]        [ read-local ] }
         { [ over quote? ]        [ >r quote-local r> read-local ] }
         { [ over local-word? ]   [ read-local [ call ] append ] }
-        { [ over local-reader? ] [ read-local [ first ] append ] }
+        { [ over local-reader? ] [ read-local [ 0 swap array-nth ] append ] }
         { [ over local-writer? ] [ localize-writer ] }
         { [ over \ lambda eq? ]  [ 2drop [ ] ] }
         { [ t ]                  [ drop 1quotation ] }
@@ -138,33 +138,38 @@ M: quotation free-vars { } [ add-if-free ] reduce ;
 M: lambda free-vars
     dup lambda-vars swap lambda-body free-vars seq-diff ;
 
-M: let free-vars
-    dup let-vars swap let-body free-vars seq-diff ;
-
-M: wlet free-vars
-    dup wlet-vars swap wlet-body free-vars seq-diff ;
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! lambda-rewrite
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 GENERIC: lambda-rewrite* ( obj -- )
 
-: lambda-rewrite [ lambda-rewrite* ] [ ] make ;
+GENERIC: local-rewrite* ( obj -- )
 
-UNION: block quotation lambda ;
+: lambda-rewrite
+    [ local-rewrite* ] [ ] make
+    [ [ lambda-rewrite* ] each ] [ ] make ;
+
+UNION: block callable lambda ;
 
 GENERIC: block-vars ( block -- seq )
 
 GENERIC: block-body ( block -- quot )
 
-M: quotation block-vars drop { } ;
+M: callable block-vars drop { } ;
 
-M: quotation block-body ;
+M: callable block-body ;
+
+M: callable local-rewrite*
+    [ [ local-rewrite* ] each ] [ ] make , ;
 
 M: lambda block-vars lambda-vars ;
 
 M: lambda block-body lambda-body ;
+
+M: lambda local-rewrite*
+    dup lambda-vars swap lambda-body
+    [ local-rewrite* \ call , ] [ ] make <lambda> , ;
 
 M: block lambda-rewrite*
     #! Turn free variables into bound variables, curry them
@@ -176,6 +181,8 @@ M: block lambda-rewrite*
     ] keep length \ curry <repetition> % ;
 
 M: object lambda-rewrite* , ;
+
+M: object local-rewrite* , ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -227,16 +234,17 @@ M: object lambda-rewrite* , ;
 : parse-bindings ( -- alist )
     scan "|" assert= [ (parse-bindings) ] { } make dup keys ;
 
-: let-rewrite ( words body -- )
-    <lambda> lambda-rewrite* \ call , ;
+M: let local-rewrite*
+    { let-bindings let-vars let-body } get-slots -rot
+    [ <reversed> ] 2apply
+    [
+        1array -rot second -rot <lambda>
+        [ call ] curry compose
+    ] 2each local-rewrite* \ call , ;
 
-M: let lambda-rewrite*
-    dup let-bindings values [ lambda-rewrite* \ call , ] each
-    { let-vars let-body } get-slots let-rewrite ;
-
-M: wlet lambda-rewrite*
-    dup wlet-bindings values [ lambda-rewrite* ] each
-    { wlet-vars wlet-body } get-slots let-rewrite ;
+M: wlet local-rewrite*
+    dup wlet-bindings values over wlet-vars rot wlet-body
+    <lambda> [ call ] curry compose local-rewrite* \ call , ;
 
 : (::) ( prop -- word quot n )
     >r CREATE dup reset-generic
