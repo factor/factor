@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces splitting sequences io.files kernel assocs
 words vocabs definitions parser continuations inspector debugger
@@ -15,49 +15,64 @@ V{
     "resource:work"
 } clone vocab-roots set-global
 
-! No such thing as current directory on Windows CE
-wince? [ "." vocab-roots get push ] unless
+: vocab-dir ( vocab -- dir )
+    vocab-name "." split "/" join ;
 
 : vocab-dir+ ( vocab str/f -- path )
     >r vocab-name "." split r>
     [ >r dup peek r> append add ] when*
     "/" join ;
 
-: vocab-dir ( vocab -- dir )
-    f vocab-dir+ ;
+: vocab-path+ ( vocab path -- newpath )
+    swap vocab-root dup [ swap path+ ] [ 2drop f ] if ;
 
-: vocab-source ( vocab -- path )
-    ".factor" vocab-dir+ ;
+: vocab-source-path ( vocab -- path/f )
+    dup ".factor" vocab-dir+ vocab-path+ ;
 
-: vocab-docs ( vocab -- path )
-    "-docs.factor" vocab-dir+ ;
+: vocab-docs-path ( vocab -- path/f )
+    dup "-docs.factor" vocab-dir+ vocab-path+ ;
 
-: vocab-tests ( vocab -- path )
-    "-tests.factor" vocab-dir+ ;
+: vocab-dir? ( root name -- ? )
+    over [
+        ".factor" vocab-dir+ path+ resource-exists?
+    ] [
+        2drop f
+    ] if ;
 
 : find-vocab-root ( vocab -- path/f )
-    vocab-dir vocab-roots get
-    swap [ path+ ?resource-path exists? ] curry find nip ;
+    vocab-roots get swap [ vocab-dir? ] curry find nip ;
 
 M: string vocab-root
     dup vocab [ vocab-root ] [ find-vocab-root ] ?if ;
 
 M: vocab-link vocab-root
-    dup vocab-link-root [ ] [ vocab-link-name vocab-root ] ?if ;
+    vocab-link-root ;
+
+: vocab-tests ( vocab -- tests )
+    dup vocab-root [
+        [
+            f >vocab-link dup
+
+            dup "-tests.factor" vocab-dir+ vocab-path+
+            dup resource-exists? [ , ] [ drop ] if
+
+            dup vocab-dir "tests" path+ vocab-path+ dup
+            ?resource-path directory keys [ ".factor" tail? ] subset
+            [ path+ , ] with each
+        ] { } make
+    ] [ drop f ] if ;
 
 : vocab-files ( vocab -- seq )
-    [
-        dup vocab-root dup [
-            swap
-            2dup vocab-source path+ ,
-            2dup vocab-docs path+ ,
-            2dup vocab-tests path+ ,
-        ] when 2drop
-    ] { } make [ ?resource-path exists? ] subset ;
+    f >vocab-link [
+        dup vocab-source-path [ , ] when*
+        dup vocab-docs-path [ , ] when*
+        vocab-tests %
+    ] { } make ;
 
 TUPLE: no-vocab name ;
 
-: no-vocab ( name -- * ) \ no-vocab construct-boa throw ;
+: no-vocab ( name -- * )
+    vocab-name \ no-vocab construct-boa throw ;
 
 M: no-vocab summary drop "Vocabulary does not exist" ;
 
@@ -67,42 +82,36 @@ SYMBOL: load-help?
 
 : source-wasn't-loaded f swap set-vocab-source-loaded? ;
 
-: load-source ( root name -- )
+: load-source ( vocab-link -- )
     [ source-wasn't-loaded ] keep
-    [ vocab-source path+ bootstrap-file ] keep
+    [ vocab-source-path bootstrap-file ] keep
     source-was-loaded ;
 
 : docs-were-loaded t swap set-vocab-docs-loaded? ;
 
 : docs-weren't-loaded f swap set-vocab-docs-loaded? ;
 
-: load-docs ( root name -- )
+: load-docs ( vocab-link -- )
     load-help? get [
         [ docs-weren't-loaded ] keep
-        [ vocab-docs path+ ?run-file ] keep
+        [ vocab-docs-path ?run-file ] keep
         docs-were-loaded
-    ] [ 2drop ] if ;
+    ] [ drop ] if ;
 
-: amend-vocab-from-root ( root name -- vocab )
-    dup vocab-source-loaded? [ 2dup load-source ] unless
-    dup vocab-docs-loaded? [ 2dup load-docs ] unless
-    nip vocab ;
-
-: load-vocab-from-root ( root name -- )
-    2dup vocab-source path+ ?resource-path exists? [
-        2dup create-vocab set-vocab-root
-        2dup load-source load-docs
-    ] [
-        nip no-vocab
-    ] if ;
+: create-vocab-with-root ( vocab-link -- vocab )
+    dup vocab-name create-vocab
+    swap vocab-root over set-vocab-root ;
 
 : reload ( name -- )
     [
-        dup find-vocab-root dup [
-            swap load-vocab-from-root
-        ] [
-            drop no-vocab
-        ] if
+        f >vocab-link
+        dup vocab-root [
+            dup vocab-source-path resource-exists? [
+                create-vocab-with-root
+                dup load-source
+                load-docs
+            ] [ no-vocab ] if
+        ] [ no-vocab ] if
     ] with-compiler-errors ;
 
 : require ( vocab -- )
@@ -122,18 +131,6 @@ SYMBOL: load-help?
     [ nip ] assoc-subset
     [ nip source-modified? ] assoc-subset keys ; inline
 
-: vocab-path+ ( vocab path -- newpath )
-    swap vocab-root dup [ swap path+ ] [ 2drop f ] if ;
-
-: vocab-source-path ( vocab -- path/f )
-    dup vocab-source vocab-path+ ;
-
-: vocab-tests-path ( vocab -- path/f )
-    dup vocab-tests vocab-path+ ;
-
-: vocab-docs-path ( vocab -- path/f )
-    dup vocab-docs vocab-path+ ;
-
 : modified-sources ( vocabs -- seq )
     [ vocab-source-path ] modified ;
 
@@ -148,32 +145,50 @@ SYMBOL: load-help?
     dup update-roots
     dup modified-sources swap modified-docs ;
 
-: require-restart { { "Ignore this vocabulary" t } } ;
+: vocab-heading. ( vocab -- )
+    nl
+    "==== " write
+    dup vocab-name swap vocab write-object ":" print
+    nl ;
 
-: require-all ( seq -- )
+: load-error. ( triple -- )
+    dup first vocab-heading.
+    dup second print-error
+    drop ;
+
+: load-failures. ( failures -- )
+    [ load-error. nl ] each ;
+
+SYMBOL: blacklist
+
+: require-all ( vocabs -- failures )
     [
+        V{ } clone blacklist set
         [
             [ require ]
-            [ require-restart rethrow-restarts 2drop ]
+            [ >r vocab-name r> 2array blacklist get push ]
             recover
         ] each
+        blacklist get
     ] with-compiler-errors ;
 
 : do-refresh ( modified-sources modified-docs -- )
     2dup
     [ f swap set-vocab-docs-loaded? ] each
     [ f swap set-vocab-source-loaded? ] each
-    append prune require-all ;
+    append prune require-all load-failures. ;
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 
 : refresh-all ( -- ) "" refresh ;
 
 GENERIC: (load-vocab) ( name -- vocab )
-
+!
 M: vocab (load-vocab)
-    dup vocab-root
-    [ swap vocab-name amend-vocab-from-root ] when* ;
+    dup vocab-root [
+        dup vocab-source-loaded? [ dup load-source ] unless
+        dup vocab-docs-loaded? [ dup load-docs ] unless
+    ] when ;
 
 M: string (load-vocab)
     [ ".private" ?tail drop reload ] keep vocab ;
@@ -181,8 +196,25 @@ M: string (load-vocab)
 M: vocab-link (load-vocab)
     vocab-name (load-vocab) ;
 
-[ [ dup vocab [ ] [ ] ?if (load-vocab) ] with-compiler-errors ]
-load-vocab-hook set-global
+TUPLE: blacklisted-vocab name ;
+
+: blacklisted-vocab ( name -- * )
+    \ blacklisted-vocab construct-boa throw ;
+
+M: blacklisted-vocab error.
+    "This vocabulary depends on the " write
+    blacklisted-vocab-name write
+    " vocabulary which failed to load" print ;
+
+[
+    dup vocab-name blacklist get key? [
+        vocab-name blacklisted-vocab
+    ] [
+        [
+            dup vocab [ ] [ ] ?if (load-vocab)
+        ] with-compiler-errors
+    ] if
+] load-vocab-hook set-global
 
 : vocab-where ( vocab -- loc )
     vocab-source-path dup [ 1 2array ] when ;
@@ -190,22 +222,3 @@ load-vocab-hook set-global
 M: vocab where vocab-where ;
 
 M: vocab-link where vocab-where ;
-
-: vocab-file-contents ( vocab name -- seq )
-    vocab-path+ dup [
-        ?resource-path dup exists? [
-            <file-reader> lines
-        ] [
-            drop f
-        ] if
-    ] when ;
-
-: set-vocab-file-contents ( seq vocab name -- )
-    dupd vocab-path+ [
-        ?resource-path
-        <file-writer> [ [ print ] each ] with-stream
-    ] [
-        "The " swap vocab-name
-        " vocabulary was not loaded from the file system"
-        3append throw
-    ] ?if ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
-combinators.private classes definitions ;
+sequences.private classes definitions ;
 IN: generic.math
 
 PREDICATE: class math-class ( object -- ? )
@@ -61,7 +61,7 @@ TUPLE: no-math-method left right generic ;
 : math-vtable* ( picker max quot -- quot )
     [
         rot , \ tag ,
-        [ >r [ type>class ] map r> map % ] { } make ,
+        [ >r [ bootstrap-type>class ] map r> map % ] { } make ,
         \ dispatch ,
     ] [ ] make ; inline
 

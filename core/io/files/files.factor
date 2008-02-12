@@ -1,9 +1,13 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.files
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
 system combinators splitting sbufs ;
+
+HOOK: cd io-backend ( path -- )
+
+HOOK: cwd io-backend ( -- path )
 
 HOOK: <file-reader> io-backend ( path -- stream )
 
@@ -25,12 +29,15 @@ HOOK: root-directory? io-backend ( path -- ? )
 
 M: object root-directory? ( path -- ? ) path-separator? ;
 
-: trim-path-separators ( str -- newstr )
+: right-trim-separators ( str -- newstr )
     [ path-separator? ] right-trim ;
 
+: left-trim-separators ( str -- newstr )
+    [ path-separator? ] left-trim ;
+
 : path+ ( str1 str2 -- str )
-    >r trim-path-separators "/" r>
-    [ path-separator? ] left-trim 3append ;
+    >r right-trim-separators "/" r>
+    left-trim-separators 3append ;
 
 : stat ( path -- directory? permissions length modified )
     normalize-pathname (stat) ;
@@ -57,7 +64,7 @@ M: object root-directory? ( path -- ? ) path-separator? ;
     normalize-directory dup (directory) fixup-directory ;
 
 : last-path-separator ( path -- n ? )
-    [ length 2 [-] ] keep [ path-separator? ] find-last* ;
+    [ length 1- ] keep [ path-separator? ] find-last* ;
 
 TUPLE: no-parent-directory path ;
 
@@ -65,7 +72,7 @@ TUPLE: no-parent-directory path ;
     \ no-parent-directory construct-boa throw ;
 
 : parent-directory ( path -- parent )
-    trim-path-separators {
+    right-trim-separators {
         { [ dup empty? ] [ drop "/" ] }
         { [ dup root-directory? ] [ ] }
         { [ dup [ path-separator? ] contains? not ] [ drop "." ] }
@@ -76,7 +83,11 @@ TUPLE: no-parent-directory path ;
     } cond ;
 
 : file-name ( path -- string )
-    dup last-path-separator [ 1+ tail ] [ drop ] if ;
+    right-trim-separators {
+        { [ dup empty? ] [ drop "/" ] }
+        { [ dup last-path-separator ] [ 1+ tail ] }
+        { [ t ] [ drop ] }
+    } cond ;
 
 : resource-path ( path -- newpath )
     \ resource-path get [ image parent-directory ] unless*
@@ -85,8 +96,11 @@ TUPLE: no-parent-directory path ;
 : ?resource-path ( path -- newpath )
     "resource:" ?head [ resource-path ] when ;
 
+: resource-exists? ( path -- ? )
+    ?resource-path exists? ;
+
 : make-directories ( path -- )
-    normalize-pathname trim-path-separators {
+    normalize-pathname right-trim-separators {
         { [ dup "." = ] [ ] }
         { [ dup root-directory? ] [ ] }
         { [ dup empty? ] [ ] }
@@ -162,3 +176,12 @@ PRIVATE>
 
 : file-contents ( path -- str )
     dup <file-reader> swap file-length <sbuf> [ stream-copy ] keep >string ;
+
+: with-file-in ( path quot -- )
+    >r <file-reader> r> with-stream ; inline
+
+: with-file-out ( path quot -- )
+    >r <file-writer> r> with-stream ; inline
+
+: with-file-appender ( path quot -- )
+    >r <file-appender> r> with-stream ; inline

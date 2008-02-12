@@ -892,7 +892,8 @@ FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
 ! FUNCTION: GetCurrentActCtx
 ! FUNCTION: GetCurrentConsoleFont
 ! FUNCTION: GetCurrentDirectoryA
-! FUNCTION: GetCurrentDirectoryW
+FUNCTION: BOOL GetCurrentDirectoryW ( DWORD len, LPTSTR buf ) ;
+: GetCurrentDirectory GetCurrentDirectoryW ; inline
 FUNCTION: HANDLE GetCurrentProcess ( ) ;
 ! FUNCTION: GetCurrentProcessId
 FUNCTION: HANDLE GetCurrentThread ( ) ;
@@ -1387,7 +1388,8 @@ FUNCTION: BOOL SetConsoleTitleW ( LPCWSTR lpConsoleTitle ) ;
 ! FUNCTION: SetCPGlobal
 ! FUNCTION: SetCriticalSectionSpinCount
 ! FUNCTION: SetCurrentDirectoryA
-! FUNCTION: SetCurrentDirectoryW
+FUNCTION: BOOL SetCurrentDirectoryW ( LPCWSTR lpDirectory ) ;
+: SetCurrentDirectory SetCurrentDirectoryW ; inline
 ! FUNCTION: SetDefaultCommConfigA
 ! FUNCTION: SetDefaultCommConfigW
 ! FUNCTION: SetDllDirectoryA

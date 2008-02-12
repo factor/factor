@@ -1,13 +1,20 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays sequences sequences.private
-kernel kernel.private math assocs quotations.private ;
+kernel kernel.private math assocs quotations.private
+slots.private ;
 IN: quotations
+
+M: quotation call (call) ;
+
+M: curry call dup 4 slot swap 5 slot call ;
+
+M: compose call dup 4 slot swap 5 slot slip call ;
 
 M: wrapper equal?
     over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
 
-UNION: callable quotation curry ;
+UNION: callable quotation curry compose ;
 
 M: callable equal?
     over callable? [ sequence= ] [ 2drop f ] if ;
@@ -19,7 +26,7 @@ M: quotation nth-unsafe quotation-array nth-unsafe ;
 : >quotation ( seq -- quot )
     >array array>quotation ; inline
 
-M: quotation like drop dup quotation? [ >quotation ] unless ;
+M: callable like drop dup quotation? [ >quotation ] unless ;
 
 INSTANCE: quotation immutable-sequence
 
@@ -40,6 +47,17 @@ M: curry nth
         >r 1- r> curry-quot nth
     ] if ;
 
-M: curry like drop dup callable? [ >quotation ] unless ;
-
 INSTANCE: curry immutable-sequence
+
+M: compose length
+    dup compose-first length
+    swap compose-second length + ;
+
+M: compose nth
+    2dup compose-first length < [
+        compose-first
+    ] [
+        [ compose-first length - ] keep compose-second
+    ] if nth ;
+
+INSTANCE: compose immutable-sequence

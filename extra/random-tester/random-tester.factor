@@ -17,9 +17,9 @@ TUPLE: random-tester-error ;
 : test-compiler ! ( data... quot -- ... )
     errored off
     dup quot set
-    datastack clone >vector dup pop* before set
-    [ call ] catch drop
-    datastack clone after set
+    datastack 1 head* before set
+    [ call ] [ drop ] recover
+    datastack after set
     clear
     before get [ ] each
     quot get [ compile-call ] [ errored on ] recover ;

@@ -124,6 +124,7 @@ FUNCTION: void freeaddrinfo ( addrinfo* ai ) ;
 FUNCTION: int futimes ( int id, timeval[2] times ) ;
 FUNCTION: char* gai_strerror ( int ecode ) ;
 FUNCTION: int getaddrinfo ( char* hostname, char* servname, addrinfo* hints, addrinfo** res ) ;
+FUNCTION: char* getcwd ( char* buf, size_t size ) ;
 FUNCTION: int getdtablesize ;
 FUNCTION: gid_t getegid ;
 FUNCTION: uid_t geteuid ;
@@ -219,7 +220,8 @@ FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 
 {
-    { [ linux? ] [ "unix.linux" ] }
-    { [ bsd? ] [ "unix.bsd" ] }
-    { [ solaris? ] [ "unix.solaris" ] }
-} cond require
+    { [ linux? ] [ "unix.linux" require ] }
+    { [ bsd? ] [ "unix.bsd" require ] }
+    { [ solaris? ] [ "unix.solaris" require ] }
+    { [ t ] [ ] }
+} cond

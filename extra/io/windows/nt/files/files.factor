@@ -1,7 +1,69 @@
-USING: continuations destructors io.buffers io.nonblocking
-io.windows io.windows.nt.backend kernel libc math threads
-windows windows.kernel32 ;
+USING: continuations destructors io.buffers io.files io.backend
+io.timeouts io.nonblocking io.windows io.windows.nt.backend
+kernel libc math threads windows windows.kernel32 alien.c-types
+alien.arrays sequences combinators combinators.lib sequences.lib
+ascii splitting alien strings ;
 IN: io.windows.nt.files
+
+M: windows-nt-io cwd
+    MAX_UNICODE_PATH dup "ushort" <c-array>
+    [ GetCurrentDirectory win32-error=0/f ] keep
+    alien>u16-string ;
+
+M: windows-nt-io cd
+    SetCurrentDirectory win32-error=0/f ;
+
+: unicode-prefix ( -- seq )
+    "\\\\?\\" ; inline
+
+M: windows-nt-io root-directory? ( path -- ? )
+    dup length 2 = [
+        dup first Letter?
+        swap second CHAR: : = and
+    ] [
+        drop f
+    ] if ;
+
+: root-directory ( string -- string' )
+    {
+        [ dup length 2 >= ]
+        [ dup second CHAR: : = ]
+        [ dup first Letter? ]
+    } && [ 2 head ] [ "Not an absolute path" throw ] if ;
+
+: prepend-prefix ( string -- string' )
+    unicode-prefix swap append ;
+
+: windows-path+ ( cwd path -- newpath )
+    {
+        ! empty
+        { [ dup empty? ] [ drop ] }
+        ! ..
+        { [ dup ".." = ] [ drop parent-directory prepend-prefix ] }
+        ! \\\\?\\c:\\foo
+        { [ dup unicode-prefix head? ] [ nip ] }
+        ! ..\\foo
+        { [ dup "..\\" head? ] [ >r parent-directory r> 3 tail windows-path+ ] }
+        ! .\\foo
+        { [ dup ".\\" head? ] [ 1 tail append prepend-prefix ] }
+        ! \\foo
+        { [ dup "\\" head? ] [ >r root-directory r> append prepend-prefix ] }
+        ! c:\\foo
+        { [ dup ?second CHAR: : = ] [ nip prepend-prefix ] }
+        ! foo.txt
+        { [ t ] [
+            >r right-trim-separators "\\" r>
+            left-trim-separators
+            3append prepend-prefix
+        ] }
+    } cond ;
+
+M: windows-nt-io normalize-pathname ( string -- string )
+    dup string? [ "pathname must be a string" throw ] unless
+    "/" split "\\" join
+    cwd swap windows-path+
+    [ "/\\." member? ] right-trim
+    dup peek CHAR: : = [ "\\" append ] when ;
 
 M: windows-nt-io CreateFile-flags ( DWORD -- DWORD )
     FILE_FLAG_OVERLAPPED bitor ;
@@ -36,7 +98,7 @@ M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
     ] if ;
 
 : flush-output ( port -- )
-    [ [ (flush-output) ] with-port-timeout ] with-destructors ;
+    [ [ (flush-output) ] with-timeout ] with-destructors ;
 
 M: port port-flush
     dup buffer-empty? [ dup flush-output ] unless drop ;
@@ -60,4 +122,4 @@ M: port port-flush
     ] [ 2drop ] if ;
 
 M: input-port (wait-to-read) ( port -- )
-    [ [ ((wait-to-read)) ] with-port-timeout ] with-destructors ;
+    [ [ ((wait-to-read)) ] with-timeout ] with-destructors ;

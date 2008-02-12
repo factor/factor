@@ -1,9 +1,9 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: inference.backend inference.state inference.dataflow
 inference.known-words inference.transforms inference.errors
-sequences prettyprint io effects kernel namespaces quotations
-words vocabs ;
+kernel io effects namespaces sequences quotations vocabs
+generic words ;
 IN: inference
 
 GENERIC: infer ( quot -- effect )
@@ -28,4 +28,7 @@ M: callable dataflow-with
     ] with-infer nip ;
 
 : forget-errors ( -- )
-    all-words [ f "no-effect" set-word-prop ] each ;
+    all-words [
+        dup subwords [ f "no-effect" set-word-prop ] each
+        f "no-effect" set-word-prop
+    ] each ;

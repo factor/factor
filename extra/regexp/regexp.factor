@@ -77,7 +77,7 @@ PRIVATE>
 
 : 'hex' ( -- parser )
     "x" token 'hex-digit' 2 exactly-n &>
-    "u" token 'hex-digit' 4 exactly-n &> <|>
+    "u" token 'hex-digit' 6 exactly-n &> <|>
     [ hex> ] <@ ;
 
 : satisfy-tokens ( assoc -- parser )

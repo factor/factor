@@ -127,9 +127,9 @@ H{ } "x" set
 ! Another crash discovered by erg
 [ ] [
     H{ } clone
-    [ 1 swap set-at ] catch drop
-    [ 2 swap set-at ] catch drop
-    [ 3 swap set-at ] catch drop
+    [ 1 swap set-at ] ignore-errors
+    [ 2 swap set-at ] ignore-errors
+    [ 3 swap set-at ] ignore-errors
     drop
 ] unit-test
 

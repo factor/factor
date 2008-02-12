@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.nonblocking
-USING: math kernel io sequences io.buffers generic sbufs system
-io.streams.lines io.streams.plain io.streams.duplex io.backend
-continuations debugger classes byte-arrays namespaces splitting
-dlists assocs ;
+USING: math kernel io sequences io.buffers io.timeouts generic
+sbufs system io.streams.lines io.streams.plain io.streams.duplex
+io.backend continuations debugger classes byte-arrays namespaces
+splitting dlists assocs ;
 
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
@@ -13,8 +13,11 @@ SYMBOL: default-buffer-size
 TUPLE: port
 handle
 error
-timeout-entry timeout cutoff
+lapse
 type eof? ;
+
+! Ports support the lapse protocol
+M: port get-lapse port-lapse ;
 
 SYMBOL: closed
 
@@ -26,12 +29,11 @@ GENERIC: close-handle ( handle -- )
 
 : <port> ( handle buffer type -- port )
     pick init-handle
-    0 0 {
+    <lapse> {
         set-port-handle
         set-delegate
         set-port-type
-        set-port-timeout
-        set-port-cutoff
+        set-port-lapse
     } port construct ;
 
 : <buffered-port> ( handle type -- port )
@@ -48,50 +50,14 @@ GENERIC: close-handle ( handle -- )
     [ >r <reader> r> <duplex-stream> ] [ ] [ dispose ]
     cleanup ;
 
-: timeout? ( port -- ? )
-    port-cutoff dup zero? not swap millis < and ;
-
 : pending-error ( port -- )
     dup port-error f rot set-port-error [ throw ] when* ;
-
-SYMBOL: timeout-queue
-
-timeout-queue global [ [ <dlist> ] unless* ] change-at
-
-: unqueue-timeout ( port -- )
-    port-timeout-entry [
-        timeout-queue get-global swap delete-node
-    ] when* ;
-
-: queue-timeout ( port -- )
-    dup timeout-queue get-global push-front*
-    swap set-port-timeout-entry ;
 
 HOOK: cancel-io io-backend ( port -- )
 
 M: object cancel-io drop ;
 
-: expire-timeouts ( -- )
-    timeout-queue get-global dup dlist-empty? [ drop ] [
-        dup peek-back timeout?
-        [ pop-back cancel-io expire-timeouts ] [ drop ] if
-    ] if ;
-
-: begin-timeout ( port -- )
-    dup port-timeout dup zero? [
-        2drop
-    ] [
-        millis + over set-port-cutoff
-        dup unqueue-timeout queue-timeout
-    ] if ;
-
-: end-timeout ( port -- )
-    unqueue-timeout ;
-
-: with-port-timeout ( port quot -- )
-    over begin-timeout keep end-timeout ; inline
-
-M: port set-timeout set-port-timeout ;
+M: port timed-out cancel-io ;
 
 GENERIC: (wait-to-read) ( port -- )
 

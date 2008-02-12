@@ -1,5 +1,6 @@
-USING: assocs html.parser kernel math sequences strings unicode.categories
-       unicode.case ;
+USING: assocs html.parser kernel math sequences strings ascii
+arrays shuffle unicode.case namespaces splitting
+http.server.responders ;
 IN: html.parser.analyzer
 
 : remove-blank-text ( vector -- vector' )
@@ -65,28 +66,30 @@ IN: html.parser.analyzer
     [ tag-attributes "href" swap at ] map
     [ ] subset ;
 
+: (find-all) ( n seq quot -- )
+    2dup >r >r find* [
+        dupd 2array , 1+ r> r> (find-all)
+    ] [
+        r> r> 3drop
+    ] if* ;
 
+: find-all ( seq quot -- alist )
+    [ 0 -rot (find-all) ] { } make ;
 
-! : find-last-tag ( name vector -- index tag )
-    ! [
-        ! dup tag-matched? [ 2drop f ] [ tag-name = ] if
-    ! ] with find-last ;
+: find-opening-tags-by-name ( name seq -- seq )
+    [ [ tag-name = ] keep tag-closing? not and ] with find-all ;
 
-! : find-last-tag* ( name n vector -- tag )
-    ! 0 -rot <slice> find-last-tag ;
+: href-contains? ( str tag -- ? )
+    tag-attributes "href" swap at* [ subseq? ] [ 2drop f ] if ;
 
-! : find-matching-tag ( tag -- tag )
-    ! dup tag-closing? [
-        ! find-last-tag
-    ! ] [
-    ! ] if ;
+: query>hash* ( str -- hash )
+    "?" split1 nip query>hash ;
 
-
-! clear "/Users/erg/web/fark.html" file-contents parse-html find-links [ "go.pl" swap start ] subset [ "=" split peek ] map
 ! clear "http://fark.com" http-get parse-html find-links [ "go.pl" swap start ] subset [ "=" split peek ] map
 
-! clear "/Users/erg/web/hostels.html" file-contents parse-html "Currency" "name" pick find-first-attribute-key-value
-
-! clear "/Users/erg/web/hostels.html" file-contents parse-html
-! "Currency" "name" pick find-first-attribute-key-value
-! pick find-between remove-blank-text
+! clear "http://www.sailwx.info/shiptrack/cruiseships.phtml" http-get parse-html remove-blank-text
+! "a" over find-opening-tags-by-name
+! [ nip "shipposition.phtml?call=GBTT" swap href-contains? ] assoc-subset
+! first first 8 + over nth
+! tag-attributes "href" swap at query>hash*
+! "lat" over at "lon" rot at

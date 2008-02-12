@@ -25,7 +25,7 @@ IN: webapps.fjsc
 : compile-url ( url -- )
   #! Compile the factor code at the given url, return the javascript.
   dup "http:" head? [ "Unable to access remote sites." throw ] when
-  "http://" "Host" header-param rot 3append http-get 2nip compile "();" write flush ;
+  "http://" "Host" header-param rot 3append http-get compile "();" write flush ;
 
 \ compile-url {
   { "url" v-required }

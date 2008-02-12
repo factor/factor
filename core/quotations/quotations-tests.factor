@@ -15,4 +15,4 @@ IN: temporary
 
 [ [ "hi" ] ] [ "hi" 1quotation ] unit-test
 
-[ 1 \ + curry ] unit-test-fails
+! [ 1 \ + curry ] must-fail

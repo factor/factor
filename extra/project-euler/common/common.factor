@@ -1,6 +1,6 @@
 USING: arrays combinators.lib kernel math math.functions math.miller-rabin
     math.matrices math.parser math.primes.factors math.ranges namespaces
-    sequences sorting ;
+    sequences sorting unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -8,10 +8,12 @@ IN: project-euler.common
 
 ! Problems using each public word
 ! -------------------------------
+! alpha-value - #22, #42
 ! cartesian-product - #4, #27, #29, #32, #33
 ! collect-consecutive - #8, #11
 ! log10 - #25, #134
 ! max-path - #18, #67
+! nth-triangle - #12, #42
 ! number>digits - #16, #20, #30, #34
 ! pandigital? - #32, #38
 ! propagate-all - #18, #67
@@ -52,6 +54,9 @@ IN: project-euler.common
 
 PRIVATE>
 
+: alpha-value ( str -- n )
+    >lower [ CHAR: a - 1+ ] sigma ;
+
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
     swap [ swap [ 2array ] map-with ] map-with concat ;
 
@@ -72,6 +77,9 @@ PRIVATE>
 
 : number>digits ( n -- seq )
     number>string string>digits ;
+
+: nth-triangle ( n -- n )
+    dup 1+ * 2 / ;
 
 : pandigital? ( n -- ? )
     number>string natural-sort "123456789" = ;

@@ -32,17 +32,18 @@ M: template-lexer skip-word
 DEFER: <% delimiter
 
 : check-<% ( lexer -- col )
-    "<%" over line-text rot lexer-column start* ;
+    "<%" over lexer-line-text rot lexer-column start* ;
 
 : found-<% ( accum lexer col -- accum )
     [
-        over line-text >r >r lexer-column r> r> subseq parsed
+        over lexer-line-text
+        >r >r lexer-column r> r> subseq parsed
         \ write-html parsed
     ] 2keep 2 + swap set-lexer-column ;
 
 : still-looking ( accum lexer -- accum )
     [
-        dup line-text swap lexer-column tail
+        dup lexer-line-text swap lexer-column tail
         parsed \ print-html parsed
     ] keep next-line ;
 

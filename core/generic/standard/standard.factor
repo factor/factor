@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel kernel.private slots.private math
 namespaces sequences vectors words quotations definitions
-hashtables layouts combinators combinators.private generic
+hashtables layouts combinators sequences.private generic
 classes classes.private ;
 IN: generic.standard
 
@@ -91,13 +91,13 @@ TUPLE: no-method object generic ;
 
 : class-hash-dispatch-quot ( methods quot picker -- quot )
     >r >r hash-methods r> map
-    hash-dispatch-quot r> [ class-hash ] rot 3append ;
+    hash-dispatch-quot r> [ class-hash ] rot 3append ; inline
 
 : big-generic ( methods -- quot )
     [ small-generic ] picker class-hash-dispatch-quot ;
 
 : vtable-class ( n -- class )
-    type>class [ hi-tag bootstrap-word ] unless* ;
+    bootstrap-type>class [ hi-tag bootstrap-word ] unless* ;
 
 : group-methods ( assoc -- vtable )
     #! Input is a predicate -> method association.

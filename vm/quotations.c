@@ -350,50 +350,6 @@ F_FASTCALL CELL primitive_jit_compile(CELL quot, F_STACK_FRAME *stack)
 	return quot;
 }
 
-DEFINE_PRIMITIVE(curry)
-{
-	F_CURRY *curry;
-
-	switch(type_of(dpeek()))
-	{
-	case QUOTATION_TYPE:
-	case CURRY_TYPE:
-		curry = allot_object(CURRY_TYPE,sizeof(F_CURRY));
-		curry->quot = dpop();
-		curry->obj = dpop();
-		dpush(tag_object(curry));
-		break;
-	default:
-		type_error(QUOTATION_TYPE,dpeek());
-		break;
-	}
-}
-
-void uncurry(CELL obj)
-{
-	F_CURRY *curry;
-
-	switch(type_of(obj))
-	{
-	case QUOTATION_TYPE:
-		dpush(obj);
-		break;
-	case CURRY_TYPE:
-		curry = untag_object(obj);
-		dpush(curry->obj);
-		uncurry(curry->quot);
-		break;
-	default:
-		type_error(QUOTATION_TYPE,obj);
-		break;
-	}
-}
-
-DEFINE_PRIMITIVE(uncurry)
-{
-	uncurry(dpop());
-}
-
 /* push a new quotation on the stack */
 DEFINE_PRIMITIVE(array_to_quotation)
 {

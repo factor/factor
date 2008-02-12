@@ -32,6 +32,8 @@ $nl
     { { $snippet "with-" { $emphasis "foo" } } { "performs some kind of initialization and cleanup related to " { $snippet "foo" } ", usually in a new dynamic scope" } { $links with-scope with-stream } }
     { { $snippet "$" { $emphasis "foo" } } { "help markup" } { $links $heading $emphasis } }
 }
+{ $heading "Stack effect conventions" }
+"Stack effect conventions are documented in " { $link "effect-declaration" } "."
 { $heading "Glossary of terms" }
 "Common terminology and abbreviations used throughout Factor and its documentation:"
 { $table
@@ -137,7 +139,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "graphs" }
 { $subsection "buffers" } ;
 
-USING: io.sockets io.launcher io.mmap io.monitor ;
+USING: io.sockets io.launcher io.mmap io.monitors ;
 
 ARTICLE: "io" "Input and output" 
 { $subsection "streams" }
@@ -155,7 +157,8 @@ ARTICLE: "io" "Input and output"
 "Advanced features:"
 { $subsection "io.launcher" }
 { $subsection "io.mmap" }
-{ $subsection "io.monitor" } ;
+{ $subsection "io.monitors" }
+{ $subsection "io.timeouts" } ;
 
 ARTICLE: "tools" "Developer tools"
 { $subsection "tools.annotations" }

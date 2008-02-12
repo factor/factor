@@ -51,4 +51,4 @@ IN: temporary
 
 [ ?{ t t } ] [ 2 ?{ t t f t f t f t t t f t } resize-bit-array ] unit-test
 
-[ -10 ?{ } resize-bit-array ] unit-test-fails
+[ -10 ?{ } resize-bit-array ] must-fail

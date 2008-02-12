@@ -1,4 +1,4 @@
 IN: temporary
-USING: tools.test.inference io.server ;
+USING: tools.test io.server ;
 
-{ 1 0 } [ [ ] spawn-server ] unit-test-effect
+{ 1 0 } [ [ ] spawn-server ] must-infer-as

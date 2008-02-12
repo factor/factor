@@ -50,7 +50,7 @@ io.streams.string continuations debugger compiler.units ;
     [
         "IN: azz USE: help.syntax USE: help.markup ARTICLE: \"yyy\" \"YYY\" ; ARTICLE: \"xxx\" \"XXX\" { $subsection \"yyy\" } ; ARTICLE: \"yyy\" \"YYY\" ;"
         <string-reader> "parent-test" parse-stream drop
-    ] catch [ :1 ] when
+    ] [ :1 ] recover
 ] unit-test
 
 [ "xxx" ] [ "yyy" article-parent ] unit-test

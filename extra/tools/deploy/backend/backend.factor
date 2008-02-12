@@ -22,14 +22,14 @@ IN: tools.deploy.backend
         +stdout+ +stderr+ set
     ] H{ } make-assoc <process-stream>
     dup duplex-stream-out dispose
-    copy-lines ;
-
-: boot-image-name ( -- string )
-    "boot." my-arch ".image" 3append ;
+    dup copy-lines
+    process-stream-process wait-for-process zero? [
+        "Deployment failed" throw
+    ] unless ;
 
 : make-boot-image ( -- )
     #! If stage1 image doesn't exist, create one.
-    boot-image-name resource-path exists?
+    my-boot-image-name resource-path exists?
     [ my-arch make-image ] unless ;
 
 : ?, [ , ] [ drop ] if ;
@@ -49,7 +49,7 @@ IN: tools.deploy.backend
 
 : staging-command-line ( config -- flags )
     [
-        "-i=" boot-image-name append ,
+        "-i=" my-boot-image-name append ,
 
         "-output-image=" over staging-image-name append ,
 

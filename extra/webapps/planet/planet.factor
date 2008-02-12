@@ -2,7 +2,7 @@ USING: sequences rss arrays concurrency kernel sorting
 html.elements io assocs namespaces math threads vocabs html
 furnace http.server.templating calendar math.parser splitting
 continuations debugger system http.server.responders
-xml.writer prettyprint ;
+xml.writer prettyprint logging ;
 IN: webapps.planet
 
 : print-posting-summary ( posting -- )
@@ -75,25 +75,19 @@ SYMBOL: cached-postings
 
 SYMBOL: last-update
 
-: diagnostic write print flush ;
-
-: fetch-feed ( triple -- feed )
-    second
-    dup "Fetching " diagnostic
-    dup download-feed feed-entries
-    swap "Done fetching " diagnostic ;
-
 : <posting> ( author entry -- entry' )
     clone
     [ ": " swap entry-title 3append ] keep
     [ set-entry-title ] keep ;
 
-: ?fetch-feed ( triple -- feed/f )
-    [ fetch-feed ] [ swap . error. f ] recover ;
+: fetch-feed ( url -- feed )
+    download-feed feed-entries ;
+
+\ fetch-feed DEBUG add-error-logging
 
 : fetch-blogroll ( blogroll -- entries )
-    dup 0 <column>
-    swap [ ?fetch-feed ] parallel-map
+    dup 0 <column> swap 1 <column>
+    [ fetch-feed ] parallel-map
     [ [ <posting> ] with map ] 2map concat ;
 
 : sort-entries ( entries -- entries' )
@@ -111,7 +105,11 @@ SYMBOL: last-update
     update-thread ;
 
 : start-update-thread ( -- )
-    [ update-thread ] in-thread ;
+    [
+        "webapps.planet" [
+            update-thread
+        ] with-logging
+    ] in-thread ;
 
 "planet" "planet-factor" "extra/webapps/planet" web-app
 
@@ -122,9 +120,6 @@ SYMBOL: last-update
     { "Doug Coleman" "http://code-factor.blogspot.com/feeds/posts/default" "http://code-factor.blogspot.com/" }
     { "Daniel Ehrenberg" "http://useless-factor.blogspot.com/feeds/posts/default" "http://useless-factor.blogspot.com/" }
     { "Gavin Harrison" "http://gmh33.blogspot.com/feeds/posts/default" "http://gmh33.blogspot.com/" }
-    { "Kevin Marshall"
-    "http://blog.botfu.com/?cat=9&feed=atom"
-    "http://blog.botfu.com/" }
     { "Kio M. Smallwood"
     "http://sekenre.wordpress.com/feed/atom/"
     "http://sekenre.wordpress.com/" }

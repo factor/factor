@@ -131,10 +131,30 @@
   (comint-send-string "*factor*" (format "\"%s\"" (buffer-file-name)))
   (comint-send-string "*factor*" " run-file\n"))
 
+;; (defun factor-send-region (start end)
+;;   (interactive "r")
+;;   (comint-send-region "*factor*" start end)
+;;   (comint-send-string "*factor*" "\n"))
+
+(defun factor-send-string (str)
+  (let ((n (length (split-string str "\n"))))
+    (save-excursion
+      (set-buffer "*factor*")
+      (goto-char (point-max))
+      (if (> n 1) (newline))
+      (insert str)
+      (comint-send-input))))
+
 (defun factor-send-region (start end)
   (interactive "r")
-  (comint-send-region "*factor*" start end)
-  (comint-send-string "*factor*" "\n"))
+  (let ((str (buffer-substring start end))
+        (n   (count-lines      start end)))
+    (save-excursion
+      (set-buffer "*factor*")
+      (goto-char (point-max))
+      (if (> n 1) (newline))
+      (insert str)
+      (comint-send-input))))
 
 (defun factor-see ()
   (interactive)
@@ -153,6 +173,10 @@
   (comint-send-string "*factor*" "\\ ")
   (comint-send-string "*factor*" (thing-at-point 'sexp))
   (comint-send-string "*factor*" " edit\n"))
+
+(defun factor-clear ()
+  (interactive)
+  (factor-send-string "clear"))
   
 (defun factor-comment-line ()
   (interactive)

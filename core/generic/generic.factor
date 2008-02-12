@@ -73,7 +73,8 @@ M: method-body stack-effect
 : <method-word> ( quot class generic -- word )
     [ make-method-def ] 2keep
     method-word-name f <word>
-    dup rot define ;
+    dup rot define
+    dup xref ;
 
 : <method> ( quot class generic -- method )
     check-method
@@ -101,7 +102,9 @@ M: method-spec definition
     first2 method dup [ method-def ] when ;
 
 : forget-method ( class generic -- )
-    check-method [ delete-at ] with-methods ;
+    check-method
+    [ delete-at* ] with-methods
+    [ method-word forget ] [ drop ] if ;
 
 M: method-spec forget* first2 forget-method ;
 
@@ -135,12 +138,17 @@ M: assoc update-methods ( assoc -- )
         make-generic
     ] if ;
 
-: subwords ( generic -- seq )
+GENERIC: subwords ( word -- seq )
+
+M: word subwords drop f ;
+
+M: generic subwords
     dup "methods" word-prop values
     swap "default-method" word-prop add
     [ method-word ] map ;
 
+M: generic forget-word
+    dup subwords [ forget-word ] each (forget-word) ;
+
 : xref-generics ( -- )
-    all-words
-    [ generic? ] subset
-    [ subwords [ xref ] each ] each ;
+    all-words [ subwords [ xref ] each ] each ;

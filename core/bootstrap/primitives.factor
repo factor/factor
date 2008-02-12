@@ -295,23 +295,6 @@ define-builtin
 "float-array?" "float-arrays" create
 { } define-builtin
 
-"curry" "kernel" create
-"curry?" "kernel" create
-{
-    {
-        { "object" "kernel" }
-        "obj"
-        { "curry-obj" "kernel" }
-        f
-    }
-    {
-        { "object" "kernel" }
-        "obj"
-        { "curry-quot" "kernel" }
-        f
-    }
-} define-builtin
-
 "callstack" "kernel" create "callstack?" "kernel" create
 { } define-builtin
 
@@ -440,14 +423,44 @@ builtins get num-tags get tail f union-class define-class
     }
 } define-tuple-class
 
+"curry" "kernel" create
+{
+    {
+        { "object" "kernel" }
+        "obj"
+        { "curry-obj" "kernel" }
+        f
+    } {
+        { "object" "kernel" }
+        "quot"
+        { "curry-quot" "kernel" }
+        f
+    }
+} define-tuple-class
+
+"compose" "kernel" create
+{
+    {
+        { "object" "kernel" }
+        "first"
+        { "compose-first" "kernel" }
+        f
+    } {
+        { "object" "kernel" }
+        "second"
+        { "compose-second" "kernel" }
+        f
+    }
+} define-tuple-class
+
 ! Primitive words
 : make-primitive ( word vocab n -- )
-    >r create dup reset-word r> [ do-primitive ] curry [ ] like define ;
+    >r create dup reset-word r>
+    [ do-primitive ] curry [ ] like define ;
 
 {
     { "(execute)" "words.private" }
     { "(call)" "kernel.private" }
-    { "uncurry" "kernel.private" }
     { "bignum>fixnum" "math.private" }
     { "float>fixnum" "math.private" }
     { "fixnum>bignum" "math.private" }
@@ -553,8 +566,6 @@ builtins get num-tags get tail f union-class define-class
     { "millis" "system" }
     { "type" "kernel.private" }
     { "tag" "kernel.private" }
-    { "cwd" "io.files" }
-    { "cd" "io.files" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
     { "dlsym" "alien" }
@@ -624,7 +635,6 @@ builtins get num-tags get tail f union-class define-class
     { "become" "kernel.private" }
     { "(sleep)" "threads.private" }
     { "<float-array>" "float-arrays" }
-    { "curry" "kernel" }
     { "<tuple-boa>" "tuples.private" }
     { "class-hash" "kernel.private" }
     { "callstack>array" "kernel" }

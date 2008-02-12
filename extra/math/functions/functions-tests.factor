@@ -73,7 +73,7 @@ IN: temporary
 [ 3 ] [ 5 7 mod-inv ] unit-test
 [ 78572682077 ] [ 234829342 342389423843 mod-inv ] unit-test
 
-[ 2 10 mod-inv ] unit-test-fails
+[ 2 10 mod-inv ] must-fail
 
 [ t ] [ 0 0 ^ fp-nan? ] unit-test
 [ 1 ] [ 10 0 ^ ] unit-test

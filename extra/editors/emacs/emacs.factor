@@ -8,7 +8,7 @@ IN: editors.emacs
         "--no-wait" ,
         "+" swap number>string append ,
         ,
-    ] { } make run-process drop ;
+    ] { } make try-process ;
 
 : emacs ( word -- )
     where first2 emacsclient ;

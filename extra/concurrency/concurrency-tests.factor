@@ -6,6 +6,8 @@ namespaces tools.test continuations dlists strings math words
 match quotations concurrency.private ;
 IN: temporary
 
+[ ] [ self process-mailbox mailbox-data dlist-delete-all ] unit-test
+
 [ V{ 1 2 3 } ] [
   0 <vector>
   make-mailbox
@@ -67,15 +69,12 @@ IN: temporary
 ] unit-test
 
 
-[ "crash" ] [
+[
   [
-    [
-      "crash" throw
-    ] spawn-link drop
-    receive
-  ] 
-  catch
-] unit-test 
+    "crash" throw
+  ] spawn-link drop
+  receive
+] [ "crash" = ] must-fail-with
 
 [ 50 ] [
   [ 50 ] future ?future
@@ -113,9 +112,9 @@ SYMBOL: value
 ! The following unit test blocks forever if the
 ! exception does not propogate. Uncomment when
 ! this is fixed (via a timeout).
-! [
-!  [ "this should propogate" throw ] future ?future 
-! ] unit-test-fails
+[
+ [ "this should propogate" throw ] future ?future 
+] must-fail
 
 [ ] [
   [ "this should not propogate" throw ] future drop 
@@ -129,3 +128,14 @@ SYMBOL: value
   [ "testing unregistering on error" throw ] spawn 
   100 sleep process-pid get-process
 ] unit-test 
+
+! Race condition with futures
+[ 3 3 ] [
+    [ 3 ] future
+    dup ?future swap ?future
+] unit-test
+
+! Another race
+[ 3 ] [
+    [ 3 yield ] future ?future
+] unit-test

@@ -4,13 +4,27 @@ USING: arrays assocs classes continuations kernel math
 namespaces sequences sequences.lib tuples words ;
 IN: db
 
-TUPLE: db handle ;
-C: <db> db ( handle -- obj )
+TUPLE: db handle insert-statements update-statements delete-statements select-statements ;
+: <db> ( handle -- obj )
+    H{ } clone
+    H{ } clone
+    H{ } clone
+    H{ } clone
+    db construct-boa ;
 
-! HOOK: db-create db ( str -- )
-! HOOK: db-drop db ( str -- )
 GENERIC: db-open ( db -- )
-GENERIC: db-close ( db -- )
+HOOK: db-close db ( handle -- )
+
+: dispose-statements [ dispose drop ] assoc-each ;
+
+: dispose-db ( db -- ) 
+    dup db [
+        dup db-insert-statements dispose-statements
+        dup db-update-statements dispose-statements
+        dup db-delete-statements dispose-statements
+        dup db-select-statements dispose-statements
+        db-handle db-close
+    ] with-variable ;
 
 TUPLE: statement sql params handle bound? ;
 
@@ -43,6 +57,8 @@ GENERIC: #rows ( result-set -- n )
 GENERIC: #columns ( result-set -- n )
 GENERIC# row-column 1 ( result-set n -- obj )
 GENERIC: advance-row ( result-set -- ? )
+
+HOOK: last-id db ( -- id )
 
 : init-result-set ( result-set -- )
     dup #rows over set-result-set-max

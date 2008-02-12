@@ -2,8 +2,8 @@ USING: kernel math math.constants math.functions tools.test
 prettyprint ;
 IN: temporary
 
-[ 1 C{ 0 1 } rect> ] unit-test-fails
-[ C{ 0 1 } 1 rect> ] unit-test-fails
+[ 1 C{ 0 1 } rect> ] must-fail
+[ C{ 0 1 } 1 rect> ] must-fail
 
 [ f ] [ C{ 5 12.5 } 5  = ] unit-test
 [ t ] [ C{ 1.0 2.0 } C{ 1 2 }  = ] unit-test

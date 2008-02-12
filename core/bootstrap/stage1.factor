@@ -38,7 +38,7 @@ vocabs.loader system ;
 
     [
         "resource:core/bootstrap/stage2.factor"
-        dup ?resource-path exists? [
+        dup resource-exists? [
             run-file
         ] [
             "Cannot find " write write "." print

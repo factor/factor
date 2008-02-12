@@ -3,7 +3,7 @@
 USING: calendar html io io.files kernel math math.parser
 http.server.responders http.server.templating namespaces parser
 sequences strings assocs hashtables debugger http.mime sorting
-html.elements ;
+html.elements logging ;
 
 IN: webapps.file
 
@@ -58,6 +58,8 @@ SYMBOL: page
     [ [ dup page set run-template-file ] with-scope ] try
     drop ;
 
+\ run-page DEBUG add-input-logging
+
 : include-page ( filename -- )
     "doc-root" get swap path+ run-page ;
 
@@ -68,6 +70,8 @@ SYMBOL: page
 : serve-file ( filename -- )
     dup mime-type dup "application/x-factor-server-page" =
     [ drop serve-fhtml ] [ serve-static ] if ;
+
+\ serve-file NOTICE add-input-logging
 
 : file. ( name dirp -- )
     [ "/" append ] when
@@ -104,15 +108,15 @@ SYMBOL: page
     ] if ;
 
 : serve-object ( filename -- )
-    dup directory? [ serve-directory ] [ serve-file ] if ;
+    serving-path dup exists? [
+        dup directory? [ serve-directory ] [ serve-file ] if
+    ] [
+        drop "404 not found" httpd-error
+    ] if ;
 
 : file-responder ( -- )
     "doc-root" get [
-        "argument" get serving-path dup exists? [
-            serve-object
-        ] [
-            drop "404 not found" httpd-error
-        ] if
+        "argument" get serve-object
     ] [
         "404 doc-root not set" httpd-error
     ] if ;

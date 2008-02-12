@@ -153,7 +153,7 @@ SYMBOL: old-d
     dup S44 64 9  [ I ] BCDA ;
 
 : (process-md5-block) ( block -- )
-    4 group [ le> ] map
+    4 <groups> [ le> ] map
 
     (process-md5-block-F)
     (process-md5-block-G)
