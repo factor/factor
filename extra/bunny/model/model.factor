@@ -3,7 +3,7 @@ math.vectors math.matrices math.parser io io.files kernel opengl
 opengl.gl opengl.glu opengl.capabilities shuffle http.client
 vectors splitting
 tools.time system combinators combinators.lib combinators.cleave
-float-arrays continuations namespaces ;
+float-arrays continuations namespaces sequences.lib ;
 IN: bunny.model
 
 : numbers ( str -- seq )
