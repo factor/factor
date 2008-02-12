@@ -133,7 +133,7 @@ VAR: stamp
   
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! SYMBOL: build-status
+SYMBOL: build-status
 
 ! : build ( -- )
 
