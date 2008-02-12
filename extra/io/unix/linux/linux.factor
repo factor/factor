@@ -11,14 +11,10 @@ TUPLE: linux-io ;
 
 INSTANCE: linux-io unix-io
 
-TUPLE: linux-monitor path wd callback ;
+TUPLE: linux-monitor ;
 
-: <linux-monitor> ( path wd -- monitor )
-    f (monitor) {
-        set-linux-monitor-path
-        set-linux-monitor-wd
-        set-delegate
-    } linux-monitor construct ;
+: <linux-monitor> ( wd -- monitor )
+    linux-monitor construct-simple-monitor ;
 
 TUPLE: inotify watches ;
 
@@ -42,8 +38,7 @@ TUPLE: inotify watches ;
     ] when ;
 
 : add-watch ( path mask -- monitor )
-    dupd (add-watch)
-    dup check-existing
+    (add-watch) dup check-existing
     [ <linux-monitor> dup ] keep watches set-at ;
 
 : remove-watch ( monitor -- )
@@ -53,23 +48,8 @@ TUPLE: inotify watches ;
 M: linux-io <monitor> ( path recursive? -- monitor )
     drop IN_CHANGE_EVENTS add-watch ;
 
-: notify-callback ( monitor -- )
-    dup linux-monitor-callback
-    f rot set-linux-monitor-callback
-    [ schedule-thread ] when* ;
-
-M: linux-io fill-queue ( monitor -- )
-    dup linux-monitor-callback [
-        "Cannot wait for changes on the same file from multiple threads" throw
-    ] when
-    [ swap set-linux-monitor-callback stop ] callcc0
-    check-monitor ;
-
 M: linux-monitor dispose ( monitor -- )
-    dup check-monitor
-    t over set-monitor-closed?
-    dup notify-callback
-    remove-watch ;
+    dup delegate dispose remove-watch ;
 
 : ?flag ( n mask symbol -- n )
     pick rot bitand 0 > [ , ] [ drop ] if ;
@@ -136,5 +116,3 @@ M: linux-io init-io ( -- )
 T{ linux-io } set-io-backend
 
 [ start-wait-thread ] "io.unix.linux" add-init-hook
-
-"vocabs.monitor" require
