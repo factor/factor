@@ -36,14 +36,22 @@ SYMBOL: begin
 
 : full? ( resizable -- ? ) space zero? ;
 
-: decode-part-loop ( buf ch state stream quot -- string )
-    >r >r pick r> r> rot full?
-    [ 2drop 2drop >string ]
-    [ [ >r stream-read1 -rot r> call ] 2keep decode-part-loop ] if ; inline
+: end-read-loop ( buf ch state stream quot -- string/f )
+    2drop 2drop >string f like ;
 
-: decode-part ( length stream quot -- string )
+: under ( a b c -- c a b c )
+    tuck >r swapd r> ; inline
+
+: decode-read-loop ( buf ch state stream quot -- string/f )
+    >r >r pick r> r> rot full?  [ end-read-loop ] [
+        over stream-read1 [
+            -rot tuck >r >r >r -rot r> call r> r> decode-read-loop
+        ] [ end-read-loop ] if*
+    ] if ; inline
+
+: decode-read ( length stream quot -- string )
     >r swap start-decoding r>
-    decode-part-loop ; inline
+    decode-read-loop ; inline
 
 GENERIC: init-decoding ( stream encoding -- decoded-stream )
 

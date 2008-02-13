@@ -90,7 +90,9 @@ M: utf8 init-encoding ( stream utf8 -- utf8-stream )
 M: utf8 stream-read1 1 swap stream-read ;
 
 M: utf8 stream-read
-    [ decode-utf8-step ] decode-part ;
+    delegate [ decode-utf8-step ] decode-read ;
+
+M: utf8 stream-read-partial stream-read ;
 
 M: utf8 stream-read-until
     ! Copied from { c-reader stream-read-until }!!!

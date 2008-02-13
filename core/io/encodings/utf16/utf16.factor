@@ -114,3 +114,35 @@ SYMBOL: ignore
         { [ utf16be? ] [ decode-utf16be ] }
         { [ t ] [ decode-error ] }
     } cond ;
+
+! UTF16LE streams
+
+TUPLE: utf16le ;
+: <utf16le> utf16le construct-delegate ;
+! In the future, this should detect and ignore a BOM at the beginning
+
+M: utf16le init-decoding ( stream utf16le -- utf16le-stream )
+    tuck set-delegate ;
+
+M: utf16le init-encoding ( stream utf16le -- utf16le-stream )
+    tuck set-delegate ;
+
+M: utf16le stream-read1 1 swap stream-read ;
+
+M: utf16le stream-read
+    delegate [ decode-utf16le-step ] decode-read ;
+
+M: utf16le stream-read-partial stream-read ;
+
+M: utf16le stream-read-until
+    ! Copied from { c-reader stream-read-until }!!!
+    [ swap read-until-loop ] "" make
+    swap over empty? over not and [ 2drop f f ] when ;
+
+M: utf16le stream-write1
+    >r 1string r> stream-write ;
+
+M: utf16le stream-write
+    >r encode-utf16le r> delegate stream-write ;
+
+M: utf16le dispose delegate dispose ;
