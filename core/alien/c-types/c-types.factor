@@ -167,7 +167,7 @@ DEFER: c-ushort-array>
     swap dup length memcpy ;
 
 : string>char-memory ( string base -- )
-    >r >byte-array r> byte-array>memory ;
+    >r B{ } like r> byte-array>memory ;
 
 DEFER: >c-ushort-array
 

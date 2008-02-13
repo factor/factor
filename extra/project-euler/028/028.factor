@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib kernel math math.ranges ;
+USING: kernel math math.ranges sequences.lib ;
 IN: project-euler.028
 
 ! http://projecteuler.net/index.php?section=problems&id=28

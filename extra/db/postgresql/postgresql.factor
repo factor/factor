@@ -39,8 +39,8 @@ M: postgresql-db dispose ( db -- )
 M: postgresql-statement bind-statement* ( seq statement -- )
     set-statement-params ;
 
-M: postgresql-statement rebind-statement ( seq statement -- )
-    bind-statement* ;
+M: postgresql-statement reset-statement ( statement -- )
+    drop ;
 
 M: postgresql-result-set #rows ( result-set -- n )
     result-set-handle PQntuples ;

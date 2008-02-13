@@ -111,7 +111,8 @@ SYMBOL: bootstrap-time
         "output-image" get resource-path save-image-and-exit
     ] if
 ] [
-    print-error :c restarts.
+    :c
+    print-error restarts.
     "listener" vocab-main execute
     1 exit
 ] recover

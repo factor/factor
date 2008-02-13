@@ -43,12 +43,14 @@ M: sqlite-statement dispose ( statement -- )
 M: sqlite-result-set dispose ( result-set -- )
     f swap set-result-set-handle ;
 
-M: sqlite-statement bind-statement* ( assoc statement -- )
-    statement-handle swap sqlite-bind-assoc ;
+: sqlite-bind ( triples handle -- )
+    swap [ first3 sqlite-bind-type ] with each ;
 
-M: sqlite-statement rebind-statement ( assoc statement -- )
-    dup statement-handle sqlite-reset
-    statement-handle swap sqlite-bind-assoc ;
+M: sqlite-statement bind-statement* ( triples statement -- )
+    statement-handle sqlite-bind ;
+
+M: sqlite-statement reset-statement ( statement -- )
+    statement-handle sqlite-reset ;
 
 M: sqlite-statement execute-statement ( statement -- )
     statement-handle sqlite-next drop ;
@@ -118,7 +120,7 @@ M: sqlite-db delete-sql* ( columns table -- sql )
         %
         " where " %
         first second dup % " = :" % %
-    ] "" make dup . ;
+    ] "" make ;
 
 M: sqlite-db select-sql* ( columns table -- sql )
     [
@@ -131,9 +133,10 @@ M: sqlite-db select-sql* ( columns table -- sql )
 
 M: sqlite-db tuple>params ( columns tuple -- obj )
     [
-        >r [ second ":" swap append ] keep first r> get-slot-named
-        number>string*
-    ] curry { } map>assoc  ;
+        >r [ second ":" swap append ] keep r>
+        dupd >r first r> get-slot-named swap
+        third 3array
+    ] curry map ;
     
 M: sqlite-db last-id ( -- id )
     db get db-handle sqlite3_last_insert_rowid ;
@@ -166,6 +169,7 @@ M: sqlite-db sql-modifiers* ( modifiers -- str )
         { INTEGER "integer" }
         { TEXT "text" }
         { VARCHAR "text" }
+        { DOUBLE "real" }
     } ;
 
 M: sqlite-db >sql-type ( obj -- str )

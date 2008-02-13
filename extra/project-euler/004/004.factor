@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables kernel math math.parser math.ranges project-euler.common
-    sequences sorting ;
+USING: hashtables kernel math math.ranges project-euler.common sequences
+    sorting ;
 IN: project-euler.004
 
 ! http://projecteuler.net/index.php?section=problems&id=4
@@ -17,9 +17,6 @@ IN: project-euler.004
 
 ! SOLUTION
 ! --------
-
-: palindrome? ( n -- ? )
-    number>string dup reverse = ;
 
 <PRIVATE
 

@@ -1,6 +1,6 @@
 USING: io io.files io.launcher kernel namespaces
 prettyprint tools.test db.sqlite db sequences
-continuations ;
+continuations db.types ;
 IN: temporary
 
 : test.db "extra/db/sqlite/test.db" resource-path ;
@@ -26,13 +26,13 @@ IN: temporary
     test.db [
         "select * from person where name = :name and country = :country"
         <simple-statement> [
-            { { ":name" "Jane" } { ":country" "New Zealand" } }
+            { { ":name" "Jane" TEXT } { ":country" "New Zealand" TEXT } }
             over do-bound-query
 
             { { "Jane" "New Zealand" } } =
             [ "test fails" throw ] unless
 
-            { { ":name" "John" } { ":country" "America" } }
+            { { ":name" "John" TEXT } { ":country" "America" TEXT } }
             swap do-bound-query
         ] with-disposal
     ] with-sqlite

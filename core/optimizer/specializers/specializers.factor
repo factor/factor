@@ -24,16 +24,18 @@ IN: optimizer.specializers
         \ dispatch ,
     ] [ ] make ;
 
+: specializer-methods ( word -- alist )
+    dup [ array? ] all? [ 1array ] unless [
+        [ make-specializer ] keep
+        [ declare ] curry pick append
+    ] { } map>assoc ;
+
 : specialized-def ( word -- quot )
     dup word-def swap "specializer" word-prop [
         dup { number } = [
             drop tag-specializer
         ] [
-            dup [ array? ] all? [ 1array ] unless [
-                [ make-specializer ] keep
-                [ declare ] curry pick append
-            ] { } map>assoc
-            alist>quot
+            specializer-methods alist>quot
         ] if
     ] when* ;
 
