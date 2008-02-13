@@ -1,8 +1,10 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel sequences sbufs vectors
-namespaces io.encodings combinators ;
-IN: io.utf8
+USING: math kernel sequences sbufs vectors growable io continuations
+namespaces io.encodings combinators strings io.streams.c ;
+IN: io.encodings.utf8
+
+! Decoding UTF-8
 
 SYMBOL: double
 SYMBOL: triple
@@ -31,7 +33,7 @@ SYMBOL: quad3
 : end-multibyte ( buf byte ch -- buf ch state )
     f append-nums [ decoded ] unless* ;
 
-: (decode-utf8) ( buf byte ch state -- buf ch state )
+: decode-utf8-step ( buf byte ch state -- buf ch state )
     {
         { begin [ drop begin-utf8 ] }
         { double [ end-multibyte ] }
@@ -43,7 +45,9 @@ SYMBOL: quad3
     } case ;
 
 : decode-utf8 ( seq -- str )
-    [ -rot (decode-utf8) ] decode ;
+    [ decode-utf8-step ] decode ; 
+
+! Encoding UTF-8
 
 : encoded ( char -- )
     BIN: 111111 bitand BIN: 10000000 bitor , ;
@@ -70,3 +74,35 @@ SYMBOL: quad3
 
 : encode-utf8 ( str -- seq )
     [ [ char>utf8 ] each ] B{ } make ;
+
+! Interface for streams
+
+TUPLE: utf8 ;
+: <utf8> utf8 construct-delegate ;
+! In the future, this should detect and ignore a BOM at the beginning
+
+M: utf8 init-decoding ( stream utf8 -- utf8-stream )
+    tuck set-delegate ;
+
+M: utf8 init-encoding ( stream utf8 -- utf8-stream )
+    tuck set-delegate ;
+
+M: utf8 stream-read1 1 swap stream-read ;
+
+M: utf8 stream-read
+    delegate [ decode-utf8-step ] decode-read ;
+
+M: utf8 stream-read-partial stream-read ;
+
+M: utf8 stream-read-until
+    ! Copied from { c-reader stream-read-until }!!!
+    [ swap read-until-loop ] "" make
+    swap over empty? over not and [ 2drop f f ] when ;
+
+M: utf8 stream-write1
+    >r 1string r> stream-write ;
+
+M: utf8 stream-write
+    >r encode-utf8 r> delegate stream-write ;
+
+M: utf8 dispose delegate dispose ;

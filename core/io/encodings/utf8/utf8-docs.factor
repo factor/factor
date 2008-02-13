@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io.encodings strings ;
-IN: io.utf8
+IN: io.encodings.utf8
 
 ARTICLE: "io.utf8" "Working with UTF8-encoded data"
 "The UTF8 encoding is a variable-width encoding. 7-bit ASCII characters are encoded as single bytes, and other Unicode code points are encoded as 2 to 4 byte sequences."

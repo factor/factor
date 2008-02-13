@@ -30,7 +30,7 @@ SYMBOL: ignore
         >r 2 shift r> BIN: 11 bitand bitor quad3
     ] [ 2drop do-ignore ] if ;
 
-: (decode-utf16be) ( buf byte ch state -- buf ch state )
+: decode-utf16be-step ( buf byte ch state -- buf ch state )
     {
         { begin [ drop begin-utf16be ] }
         { double [ end-multibyte ] }
@@ -41,7 +41,7 @@ SYMBOL: ignore
     } case ;
 
 : decode-utf16be ( seq -- str )
-    [ -rot (decode-utf16be) ] decode ;
+    [ decode-utf16be-step ] decode ;
 
 : handle-double ( buf byte ch -- buf ch state )
     swap dup -3 shift BIN: 11011 = [
@@ -55,7 +55,7 @@ SYMBOL: ignore
         BIN: 11 bitand append-nums HEX: 10000 + decoded
     ] [ 2drop push-replacement ] if ;
 
-: (decode-utf16le) ( buf byte ch state -- buf ch state )
+: decode-utf16le-step ( buf byte ch state -- buf ch state )
     {
         { begin [ drop double ] }
         { double [ handle-double ] }
@@ -65,7 +65,7 @@ SYMBOL: ignore
     } case ;
 
 : decode-utf16le ( seq -- str )
-    [ -rot (decode-utf16le) ] decode ;
+    [ decode-utf16le-step ] decode ;
 
 : encode-first
     -10 shift
@@ -114,3 +114,35 @@ SYMBOL: ignore
         { [ utf16be? ] [ decode-utf16be ] }
         { [ t ] [ decode-error ] }
     } cond ;
+
+! UTF16LE streams
+
+TUPLE: utf16le ;
+: <utf16le> utf16le construct-delegate ;
+! In the future, this should detect and ignore a BOM at the beginning
+
+M: utf16le init-decoding ( stream utf16le -- utf16le-stream )
+    tuck set-delegate ;
+
+M: utf16le init-encoding ( stream utf16le -- utf16le-stream )
+    tuck set-delegate ;
+
+M: utf16le stream-read1 1 swap stream-read ;
+
+M: utf16le stream-read
+    delegate [ decode-utf16le-step ] decode-read ;
+
+M: utf16le stream-read-partial stream-read ;
+
+M: utf16le stream-read-until
+    ! Copied from { c-reader stream-read-until }!!!
+    [ swap read-until-loop ] "" make
+    swap over empty? over not and [ 2drop f f ] when ;
+
+M: utf16le stream-write1
+    >r 1string r> stream-write ;
+
+M: utf16le stream-write
+    >r encode-utf16le r> delegate stream-write ;
+
+M: utf16le dispose delegate dispose ;
