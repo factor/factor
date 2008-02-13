@@ -83,6 +83,8 @@ check_installed_programs() {
         ensure_program_installed wget curl
         ensure_program_installed gcc
         ensure_program_installed make
+        ensure_program_installed md5sum
+        ensure_program_installed cut
         case $OS in
             netbsd) ensure_program_installed gmake;;
         esac
@@ -263,14 +265,28 @@ make_factor() {
         invoke_make NO_UI=$NO_UI $MAKE_TARGET -j5
 }
 
-delete_boot_images() {
+update_boot_images() {
         echo "Deleting old images..."
-        rm $BOOT_IMAGE > /dev/null 2>&1
+		rm checksums.txt* > /dev/null 2>&1
         rm $BOOT_IMAGE.* > /dev/null 2>&1
 		rm staging.*.image > /dev/null 2>&1
+		if [[ -f $BOOT_IMAGE ]] ; then
+			get_url http://factorcode.org/images/latest/checksums.txt
+			factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`;
+			disk_md5=`md5sum $BOOT_IMAGE|cut -f1 -d' '`;
+			if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
+				echo "Your disk boot image matches the one on factorcode.org."
+			else
+				rm $BOOT_IMAGE > /dev/null 2>&1
+				get_boot_image;
+			fi
+		else
+			get_boot_image
+		fi
 }
 
 get_boot_image() {
+	echo "Downloading boot image $BOOT_IMAGE."
 	get_url http://factorcode.org/images/latest/$BOOT_IMAGE
 }
 
@@ -278,7 +294,6 @@ get_url() {
 	if [[ $DOWNLOAD -eq "" ]] ; then
 		set_downloader;
 	fi
-	echo "HI"
 	echo $DOWNLOAD $1 ;
 	$DOWNLOAD $1
 	check_ret $DOWNLOAD
@@ -329,8 +344,7 @@ update() {
 }
 
 update_bootstrap() {
-        delete_boot_images
-        get_boot_image
+        update_boot_images
         bootstrap
 }
 
@@ -363,6 +377,6 @@ case "$1" in
         quick-update) update; refresh_image ;;
         update) update; update_bootstrap ;;
         bootstrap) get_config_info; bootstrap ;;
-        net-bootstrap) get_config_info; delete_boot_images; get_boot_image; bootstrap ;;
+        net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
         *) usage ;;
 esac
