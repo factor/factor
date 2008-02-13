@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators.lib kernel math math.primes math.primes.factors math.ranges namespaces sequences ;
+USING: arrays combinators.lib kernel math math.primes math.primes.factors
+    math.ranges namespaces sequences ;
 IN: project-euler.047
 
 ! http://projecteuler.net/index.php?section=problems&id=47
@@ -54,8 +55,8 @@ PRIVATE>
 ! ALTERNATE SOLUTIONS
 ! -------------------
 
-! Use a sieve to generate prime factor counts up to a limit, then look for a
-! repetition of the specified number of factors.
+! Use a sieve to generate prime factor counts up to an arbitrary limit, then
+! look for a repetition of the specified number of factors.
 
 <PRIVATE
 
@@ -84,12 +85,12 @@ SYMBOL: sieve
 PRIVATE>
 
 : euler047a ( -- answer )
-    4 1000000 consecutive-under ;
+    4 200000 consecutive-under ;
 
 ! [ euler047a ] 100 ave-time
-! 2589 ms run / 45 ms GC ave time - 100 trials
+! 503 ms run / 5 ms GC ave time - 100 trials
 
 ! TODO: I don't like that you have to specify the upper bound, maybe try making
-! this lazy so it will also short-circuit when it finds the answer?
+! this lazy so it could also short-circuit when it finds the answer?
 
 MAIN: euler047a
