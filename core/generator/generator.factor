@@ -109,7 +109,7 @@ M: node generate-node drop iterate-next ;
 ! #label
 M: #label generate-node
     dup node-param generate-call >r
-    dup node-child over node-param rot #label-word generate
+    dup node-child over #label-word rot node-param generate
     r> ;
 
 ! #loop
