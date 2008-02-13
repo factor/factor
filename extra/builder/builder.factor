@@ -3,7 +3,7 @@ USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
        arrays system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
        combinators bootstrap.image bootstrap.image.download
-       combinators.cleave ;
+       combinators.cleave benchmark ;
 
 IN: builder
 
