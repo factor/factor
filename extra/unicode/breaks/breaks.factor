@@ -1,7 +1,7 @@
 USING: unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
 combinators.lib assocs.lib math.ranges unicode.normalize
-unicode.syntax unicode.data compiler.units alien.syntax const ;
+unicode.syntax unicode.data compiler.units alien.syntax ;
 IN: unicode.breaks
 
 C-ENUM: Any L V T Extend Control CR LF graphemes ;
