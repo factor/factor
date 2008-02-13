@@ -26,7 +26,7 @@ ensure_program_installed() {
 	for i in $* ;
 	do
 	    echo -n "Checking for $i..."
-		test_program_installed $1
+		test_program_installed $i
 		if [[ $? -eq 0 ]]; then
 			echo -n "not "
 		else	
@@ -76,6 +76,15 @@ set_downloader() {
 	fi
 }
 
+set_md5sum() {
+	test_program_installed md5sum
+	if [[ $? -ne 0 ]] ; then
+		MD5SUM=md5sum
+	else
+		MD5SUM="md5 -r"
+	fi
+}
+
 check_installed_programs() {
         ensure_program_installed chmod
         ensure_program_installed uname
@@ -83,7 +92,7 @@ check_installed_programs() {
         ensure_program_installed wget curl
         ensure_program_installed gcc
         ensure_program_installed make
-        ensure_program_installed md5sum
+        ensure_program_installed md5sum md5
         ensure_program_installed cut
         case $OS in
             netbsd) ensure_program_installed gmake;;
@@ -273,7 +282,10 @@ update_boot_images() {
 		if [[ -f $BOOT_IMAGE ]] ; then
 			get_url http://factorcode.org/images/latest/checksums.txt
 			factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`;
-			disk_md5=`md5sum $BOOT_IMAGE|cut -f1 -d' '`;
+			set_md5sum
+			disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '`;
+			echo "Factorcode md5: $factorcode_md5";
+			echo "Disk md5: $disk_md5";
 			if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
 				echo "Your disk boot image matches the one on factorcode.org."
 			else
