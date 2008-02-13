@@ -8,7 +8,7 @@ IN: benchmark
 : run-benchmark ( vocab -- result )
     "=== Benchmark " write dup print flush
     dup require
-    [ [ run ] benchmark ] [ error. f f ] recover 2array
+    [ [ run ] benchmark ] [ error. drop f f ] recover 2array
     dup . ;
 
 : run-benchmarks ( -- assoc )
