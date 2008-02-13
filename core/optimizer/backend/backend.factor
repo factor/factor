@@ -176,22 +176,70 @@ M: node remember-method*
         } cond
     ] if ;
 
+: fold-if-branch? dup node-in-d first known-boolean-value? ;
+
+: fold-if-branch ( node value -- node' )
+    over drop-inputs >r
+    0 1 ? fold-branch
+    r> [ set-node-successor ] keep ;
+
+: only-one ( seq -- elt/f )
+    dup length 1 = [ first ] [ drop f ] if ;
+
+: lift-throw-tail? ( #if -- tail/? )
+    dup node-successor node-successor
+    [ active-children only-one ] [ drop f ] if ;
+
+: clone-node ( node -- newnode )
+    clone dup [ clone ] modify-values ;
+
+: lift-branch ( #if node -- )
+    over last-node clone-node -rot
+    >r dup node-successor r> substitute-node
+    set-node-successor ;
+
 M: #if optimize-node*
-    dup dup node-in-d first known-boolean-value? [
-        over drop-inputs >r
-        0 1 ? fold-branch
-        r> [ set-node-successor ] keep
-        t
-    ] [ 2drop t f ] if ;
+    dup fold-if-branch? [ fold-if-branch t ] [
+        drop dup lift-throw-tail? dup [
+            dupd lift-branch t
+        ] [
+            2drop t f
+        ] if
+    ] if ;
+
+: fold-dispatch-branch? dup node-in-d first tuck node-literal? ;
+
+: fold-dispatch-branch ( node value -- node' )
+    dupd node-literal
+    over drop-inputs >r fold-branch r>
+    [ set-node-successor ] keep ;
 
 M: #dispatch optimize-node*
-    dup dup node-in-d first 2dup node-literal? [
-        "Optimizing #dispatch" print
-        node-literal
-        over drop-inputs >r fold-branch r> [ set-node-successor ] keep t
+    dup fold-dispatch-branch? [
+        fold-dispatch-branch t
     ] [
-        3drop t f
+        2drop t f
     ] if ;
+
+! #loop
+: lift-loop-tail? ( #label -- tail/f )
+    dup node-child dup #if? [
+        node-children
+        [ penultimate-node ] map
+        [
+            dup #call-label?
+            [ node-param eq? not ] [ 2drop t ] if
+        ] with subset only-one
+    ] [
+        2drop f
+    ] if ;
+
+! M: #loop optimize-node*
+!     dup lift-loop-tail? dup [
+!         over node-child swap lift-branch t
+!     ] [
+!         2drop t f
+!     ] if ;
 
 ! #call
 : splice-method ( #call method-spec/t quot/t -- node/t )

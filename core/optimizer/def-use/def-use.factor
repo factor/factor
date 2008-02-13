@@ -70,20 +70,6 @@ M: #branch node-def-use
     #! #values node.
     dup branch-def-use (node-def-use) ;
 
-! : dead-literals ( -- values )
-!     def-use get [ >r value? r> empty? and ] assoc-subset ;
-! 
-! : kill-node* ( node values -- )
-!     [ swap remove-all ] curry modify-values ;
-! 
-! : kill-node ( node values -- )
-!     dup assoc-empty?
-!     [ 2drop ] [ [ kill-node* ] curry each-node ] if ;
-! 
-! : kill-values ( node -- )
-!     #! Remove literals which are not actually used anywhere.
-!     dead-literals kill-node ;
-
 : compute-dead-literals ( -- values )
     def-use get [ >r value? r> empty? and ] assoc-subset ;
 
@@ -128,8 +114,6 @@ M: #r> kill-node* [ node-in-r empty? ] prune-if ;
     compute-dead-literals dup assoc-empty? [ drop ] [
         dead-literals [ kill-nodes ] with-variable
     ] if ;
-
-!
 
 : sole-consumer ( #call -- node/f )
     node-out-d first used-by
