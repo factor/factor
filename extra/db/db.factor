@@ -27,32 +27,25 @@ HOOK: db-close db ( handle -- )
     ] with-variable ;
 
 TUPLE: statement sql params handle bound? ;
-
 TUPLE: simple-statement ;
 TUPLE: prepared-statement ;
 
 HOOK: <simple-statement> db ( str -- statement )
 HOOK: <prepared-statement> db ( str -- statement )
-
 GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( obj statement -- )
-GENERIC: rebind-statement ( obj statement -- )
-
+GENERIC: reset-statement ( statement -- )
 GENERIC: execute-statement ( statement -- )
 
 : bind-statement ( obj statement -- )
-    2dup dup statement-bound? [
-        rebind-statement
-    ] [
-        bind-statement*
-    ] if
-    tuck set-statement-params
+    dup statement-bound? [ dup reset-statement ] when
+    [ bind-statement* ] 2keep
+    [ set-statement-params ] keep
     t swap set-statement-bound? ;
 
 TUPLE: result-set sql params handle n max ;
 
 GENERIC: query-results ( query -- result-set )
-
 GENERIC: #rows ( result-set -- n )
 GENERIC: #columns ( result-set -- n )
 GENERIC# row-column 1 ( result-set n -- obj )

@@ -1,37 +1,28 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes db kernel namespaces
 tuples words sequences slots slots.private math
-math.parser io prettyprint db.types ;
-USE: continuations
+math.parser io prettyprint db.types continuations ;
 IN: db.tuples
 
-! only take a tuple if you have to extract things from it
-! otherwise take a class
-! primary-key vs primary-key-spec
-! define-persistent should enforce a primary key
-! in sqlite, defining a new primary key makes it an alias for rowid, _rowid_, and oid
-! -sql outputs sql code
-! table - string
-! columns - seq of column specifiers
+: db-columns ( class -- obj ) "db-columns" word-prop ;
+: db-table ( class -- obj ) "db-table" word-prop ;
 
-: db-columns ( class -- obj )
-    "db-columns" word-prop ;
-
-: db-table ( class -- obj )
-    "db-table" word-prop ;
-
+TUPLE: no-slot-named ;
+: no-slot-named ( -- * ) T{ no-slot-named } throw ;
 
 : slot-spec-named ( str class -- slot-spec )
-    "slots" word-prop [ slot-spec-name = ] with find nip ;
+    "slots" word-prop [ slot-spec-name = ] with find nip
+    [ no-slot-named ] unless* ;
 
 : offset-of-slot ( str obj -- n )
     class slot-spec-named slot-spec-offset ;
 
 : get-slot-named ( str obj -- value )
-    tuck offset-of-slot slot ;
+    tuck offset-of-slot [ no-slot-named ] unless* slot ;
 
 : set-slot-named ( value str obj -- )
-    tuck offset-of-slot set-slot ;
-    
+    tuck offset-of-slot [ no-slot-named ] unless* set-slot ;
 
 : primary-key-spec ( class -- spec )
     db-columns [ primary-key? ] find nip ;
@@ -42,7 +33,6 @@ IN: db.tuples
 : set-primary-key ( obj tuple -- )
     [ class primary-key-spec first ] keep
     set-slot-named ;
-
 
 : cache-statement ( columns class assoc quot -- statement )
     [ db-table dupd ] swap
@@ -71,11 +61,12 @@ HOOK: tuple>params db ( columns tuple -- obj )
 
 : tuple-statement ( columns tuple quot -- statement )
     >r [ tuple>params ] 2keep class r> call
+    2dup . .
     [ bind-statement ] keep ;
 
 : do-tuple-statement ( tuple columns-quot statement-quot -- )
     >r [ class db-columns ] swap compose keep
-    r> tuple-statement dup . execute-statement ;
+    r> tuple-statement execute-statement ;
 
 : create-table ( class -- )
     dup db-columns swap db-table create-sql sql-command ;
@@ -101,19 +92,9 @@ HOOK: tuple>params db ( columns tuple -- obj )
 : persist ( tuple -- )
     dup primary-key [ update-tuple ] [ insert-tuple ] if ;
 
-! PERSISTENT:
-
 : define-persistent ( class table columns -- )
     >r dupd "db-table" set-word-prop r>
     "db-columns" set-word-prop ;
 
 : define-relation ( spec -- )
     drop ;
-
-
-
-
-
-
-
-
