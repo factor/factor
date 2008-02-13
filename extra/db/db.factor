@@ -15,7 +15,8 @@ TUPLE: db handle insert-statements update-statements delete-statements select-st
 GENERIC: db-open ( db -- )
 HOOK: db-close db ( handle -- )
 
-: dispose-statements [ dispose drop ] assoc-each ;
+: dispose-statements ( seq -- )
+    [ dispose drop ] assoc-each ;
 
 : dispose-db ( db -- ) 
     dup db [
@@ -35,7 +36,13 @@ HOOK: <prepared-statement> db ( str -- statement )
 GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( obj statement -- )
 GENERIC: reset-statement ( statement -- )
-GENERIC: execute-statement ( statement -- )
+GENERIC: execute-statement* ( statement -- result-set )
+HOOK: last-id db ( res -- id )
+: execute-statement ( statement -- )
+    execute-statement* dispose ;
+
+: execute-statement-last-id ( statement -- id )
+    execute-statement* [ last-id ] with-disposal ;
 
 : bind-statement ( obj statement -- )
     dup statement-bound? [ dup reset-statement ] when
@@ -50,8 +57,6 @@ GENERIC: #rows ( result-set -- n )
 GENERIC: #columns ( result-set -- n )
 GENERIC# row-column 1 ( result-set n -- obj )
 GENERIC: advance-row ( result-set -- ? )
-
-HOOK: last-id db ( -- id )
 
 : init-result-set ( result-set -- )
     dup #rows over set-result-set-max

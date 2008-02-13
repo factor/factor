@@ -64,9 +64,12 @@ HOOK: tuple>params db ( columns tuple -- obj )
     2dup . .
     [ bind-statement ] keep ;
 
-: do-tuple-statement ( tuple columns-quot statement-quot -- )
+: make-tuple-statement ( tuple columns-quot statement-quot -- statement )
     >r [ class db-columns ] swap compose keep
-    r> tuple-statement execute-statement ;
+    r> tuple-statement ;
+
+: do-tuple-statement ( tuple columns-quot statement-quot -- )
+    make-tuple-statement execute-statement ;
 
 : create-table ( class -- )
     dup db-columns swap db-table create-sql sql-command ;
@@ -76,8 +79,8 @@ HOOK: tuple>params db ( columns tuple -- obj )
 
 : insert-tuple ( tuple -- )
     [
-        [ maybe-remove-id ] [ insert-sql ] do-tuple-statement
-        last-id
+        [ maybe-remove-id ] [ insert-sql ]
+        make-tuple-statement execute-statement-last-id
     ] keep set-primary-key ;
 
 : update-tuple ( tuple -- )
