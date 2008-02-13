@@ -97,8 +97,7 @@ VAR: stamp
                    } }
      { +stdout+   "../boot-log" }
      { +stderr+   +stdout+ }
-   }
-  >hashtable ;
+   } ;
 
 : builder-test ( -- desc ) `{ ,[ factor-binary ] "-run=builder.test" } ;
   
@@ -144,7 +143,11 @@ SYMBOL: build-status
 
     [ my-arch download-image ] [ "Image download error" print throw ] recover
 
-    bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
+    ! bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
+
+    bootstrap <process-stream> dup dispose process-stream-process wait-for-process zero? not
+      [ "Bootstrap error" print "../boot-log" cat "bootstrap error" throw ]
+    when
 
     [ builder-test try-process ]
     [ "Builder test error" print throw ]
