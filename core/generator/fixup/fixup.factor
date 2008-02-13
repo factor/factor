@@ -140,17 +140,19 @@ SYMBOL: literal-table
     V{ } clone relocation-table set
     V{ } clone label-table set ;
 
-: generate-labels ( -- labels )
-    label-table get [
+: resolve-labels ( labels -- labels' )
+    [
         first3 label-offset
         [ "Unresolved label" throw ] unless*
         3array
     ] map concat ;
 
-: fixup ( code -- relocation-table label-table code )
+: fixup ( code -- literals relocation labels code )
     [
         init-fixup
         dup stack-frame-size swap [ fixup* ] each drop
+
+        literal-table get >array
         relocation-table get >array
-        generate-labels
+        label-table get resolve-labels
     ] { } make ;

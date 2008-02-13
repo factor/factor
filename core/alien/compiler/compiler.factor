@@ -398,7 +398,7 @@ TUPLE: callback-context ;
     callback-unwind %unwind ;
 
 : generate-callback ( node -- )
-    dup alien-callback-xt dup rot [
+    dup alien-callback-xt dup [
         init-templates
         %save-word-xt
         %prologue-later
@@ -407,7 +407,7 @@ TUPLE: callback-context ;
             dup wrap-callback-quot %alien-callback
             %callback-return
         ] with-stack-frame
-    ] generate-1 ;
+    ] with-generator ;
 
 M: alien-callback generate-node
     end-basic-block generate-callback iterate-next ;

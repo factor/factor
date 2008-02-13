@@ -12,7 +12,7 @@ IN: optimizer
         H{ } clone value-substitutions set
         dup compute-def-use
         kill-values
-        "detect-loops" get [ dup detect-loops ] when
+        ! dup detect-loops
         dup infer-classes
         optimizer-changed off
         optimize-nodes

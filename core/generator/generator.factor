@@ -11,12 +11,6 @@ IN: generator
 SYMBOL: compile-queue
 SYMBOL: compiled
 
-: begin-compiling ( word -- )
-    f swap compiled get set-at ;
-
-: finish-compiling ( word literals relocation labels code -- )
-    4array swap compiled get set-at ;
-
 : queue-compile ( word -- )
     {
         { [ dup compiled get key? ] [ drop ] }
@@ -32,24 +26,31 @@ SYMBOL: compiling-word
 
 SYMBOL: compiling-label
 
+SYMBOL: compiling-loop?
+
 ! Label of current word, after prologue, makes recursion faster
 SYMBOL: current-label-start
 
 : compiled-stack-traces? ( -- ? ) 36 getenv ;
 
-: init-generator ( -- )
+: begin-compiling ( word label -- )
+    compiling-loop? off
+    compiling-label set
+    compiling-word set
     compiled-stack-traces?
-    compiling-word get  f ?
-    1vector literal-table set ;
+    compiling-word get f ?
+    1vector literal-table set
+    f compiling-word get compiled get set-at ;
 
-: generate-1 ( word label node quot -- )
-    pick begin-compiling [
-        roll compiling-word set
-        pick compiling-label set
-        init-generator
-        call
-        literal-table get >array
-    ] { } make fixup finish-compiling ;
+: finish-compiling ( literals relocation labels code -- )
+    4array compiling-label get compiled get set-at ;
+
+: with-generator ( node word label quot -- )
+    [
+        >r begin-compiling r>
+        { } make fixup
+        finish-compiling
+    ] with-scope ; inline
 
 GENERIC: generate-node ( node -- next )
 
@@ -63,11 +64,11 @@ GENERIC: generate-node ( node -- next )
     current-label-start define-label
     current-label-start resolve-label ;
 
-: generate ( word label node -- )
+: generate ( node word label -- )
     [
         init-generate-nodes
         [ generate-nodes ] with-node-iterator
-    ] generate-1 ;
+    ] with-generator ;
 
 : word-dataflow ( word -- effect dataflow )
     [
@@ -93,23 +94,25 @@ M: node generate-node drop iterate-next ;
 : generate-call ( label -- next )
     dup maybe-compile
     end-basic-block
-    tail-call? [
-        %jump f
+    dup compiling-label get eq? compiling-loop? get and [
+        drop current-label-start get %jump-label f
     ] [
-        0 frame-required
-        %call
-        iterate-next
+        tail-call? [
+            %jump f
+        ] [
+            0 frame-required
+            %call
+            iterate-next
+        ] if
     ] if ;
 
 ! #label
 M: #label generate-node
     dup node-param generate-call >r
-    dup #label-word over node-param rot node-child generate
+    dup node-child over node-param rot #label-word generate
     r> ;
 
 ! #loop
-SYMBOL: compiling-loop?
-
 M: #loop generate-node
     end-basic-block
     [
@@ -118,8 +121,10 @@ M: #loop generate-node
         current-label-start resolve-label
         compiling-loop? on
         node-child generate-nodes
+        end-basic-block
     ] with-scope
-    end-basic-block ;
+    init-templates
+    iterate-next ;
 
 ! #if
 : end-false-branch ( label -- )
@@ -145,12 +150,12 @@ M: #if generate-node
 ! #dispatch
 : dispatch-branch ( node word -- label )
     gensym [
-        rot [
+        [
             copy-templates
             %save-dispatch-xt
             %prologue-later
             [ generate-nodes ] with-node-iterator
-        ] generate-1
+        ] with-generator
     ] keep ;
 
 : tail-dispatch? ( node -- ? )
@@ -177,10 +182,10 @@ M: #dispatch generate-node
         generate-dispatch iterate-next
     ] [
         compiling-word get gensym [
-            rot [
+            [
                 init-generate-nodes
                 generate-dispatch
-            ] generate-1
+            ] with-generator
         ] keep generate-call
     ] if ;
 
