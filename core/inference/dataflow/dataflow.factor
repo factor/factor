@@ -97,10 +97,12 @@ M: object flatten-curry , ;
 
 : node-child node-children first ;
 
-TUPLE: #label word ;
+TUPLE: #label word loop? ;
 
 : #label ( word label -- node )
     \ #label param-node [ set-#label-word ] keep ;
+
+PREDICATE: #label #loop #label-loop? ;
 
 TUPLE: #entry ;
 

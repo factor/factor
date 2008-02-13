@@ -62,7 +62,7 @@ GENERIC: generate-node ( node -- next )
     %prologue-later
     current-label-start define-label
     current-label-start resolve-label ;
-    
+
 : generate ( word label node -- )
     [
         init-generate-nodes
@@ -106,6 +106,20 @@ M: #label generate-node
     dup node-param generate-call >r
     dup #label-word over node-param rot node-child generate
     r> ;
+
+! #loop
+SYMBOL: compiling-loop?
+
+M: #loop generate-node
+    end-basic-block
+    [
+        dup node-param compiling-label set
+        current-label-start define-label
+        current-label-start resolve-label
+        compiling-loop? on
+        node-child generate-nodes
+    ] with-scope
+    end-basic-block ;
 
 ! #if
 : end-false-branch ( label -- )
@@ -256,4 +270,6 @@ M: #r> generate-node
     iterate-next ;
 
 ! #return
-M: #return generate-node drop end-basic-block %return f ;
+M: #return generate-node
+    node-param compiling-label get eq? compiling-loop? get and
+    [ end-basic-block %return ] unless f ;
