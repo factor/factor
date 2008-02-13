@@ -30,7 +30,7 @@ SYMBOL: ignore
         >r 2 shift r> BIN: 11 bitand bitor quad3
     ] [ 2drop do-ignore ] if ;
 
-: (decode-utf16be) ( buf byte ch state -- buf ch state )
+: decode-utf16be-step ( buf byte ch state -- buf ch state )
     {
         { begin [ drop begin-utf16be ] }
         { double [ end-multibyte ] }
@@ -41,7 +41,7 @@ SYMBOL: ignore
     } case ;
 
 : decode-utf16be ( seq -- str )
-    [ (decode-utf16be) ] decode ;
+    [ decode-utf16be-step ] decode ;
 
 : handle-double ( buf byte ch -- buf ch state )
     swap dup -3 shift BIN: 11011 = [
@@ -55,7 +55,7 @@ SYMBOL: ignore
         BIN: 11 bitand append-nums HEX: 10000 + decoded
     ] [ 2drop push-replacement ] if ;
 
-: (decode-utf16le) ( buf byte ch state -- buf ch state )
+: decode-utf16le-step ( buf byte ch state -- buf ch state )
     {
         { begin [ drop double ] }
         { double [ handle-double ] }
@@ -65,7 +65,7 @@ SYMBOL: ignore
     } case ;
 
 : decode-utf16le ( seq -- str )
-    [ (decode-utf16le) ] decode ;
+    [ decode-utf16le-step ] decode ;
 
 : encode-first
     -10 shift

@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel sequences sbufs vectors growable io
-namespaces io.encodings combinators ;
-IN: io.utf8
+USING: math kernel sequences sbufs vectors growable io continuations
+namespaces io.encodings combinators strings io.streams.c ;
+IN: io.encodings.utf8
 
 ! Decoding UTF-8
 
@@ -33,7 +33,7 @@ SYMBOL: quad3
 : end-multibyte ( buf byte ch -- buf ch state )
     f append-nums [ decoded ] unless* ;
 
-: (decode-utf8) ( buf byte ch state -- buf ch state )
+: decode-utf8-step ( buf byte ch state -- buf ch state )
     {
         { begin [ drop begin-utf8 ] }
         { double [ end-multibyte ] }
@@ -44,11 +44,8 @@ SYMBOL: quad3
         { quad3 [ end-multibyte ] }
     } case ;
 
-: decode-utf8-chunk ( ch state seq -- buf ch state )
-    [ (decode-utf8) ] decode ;
-
 : decode-utf8 ( seq -- str )
-    start-decoding decode-utf8-chunk finish-decoding ;
+    [ decode-utf8-step ] decode ; 
 
 ! Encoding UTF-8
 
@@ -81,6 +78,7 @@ SYMBOL: quad3
 ! Interface for streams
 
 TUPLE: utf8 ;
+: <utf8> utf8 construct-delegate ;
 ! In the future, this should detect and ignore a BOM at the beginning
 
 M: utf8 init-decoding ( stream utf8 -- utf8-stream )
@@ -91,19 +89,8 @@ M: utf8 init-encoding ( stream utf8 -- utf8-stream )
 
 M: utf8 stream-read1 1 swap stream-read ;
 
-: space ( resizable -- room-left )
-    dup underlying swap [ length ] 2apply - ;
-
-: full? ( resizable -- ? ) space zero? ;
-
-: utf8-stream-read ( buf ch state stream -- string )
-    >r pick full? [ r> 3drop >string ]  [
-        pick space r> [ stream-read decode-utf8-chunk ] keep
-        utf8-stream-read
-    ] if ;
-
 M: utf8 stream-read
-    >r start-decoding drop r> delegate utf8-stream-read ;
+    [ decode-utf8-step ] decode-part ;
 
 M: utf8 stream-read-until
     ! Copied from { c-reader stream-read-until }!!!
@@ -115,3 +102,5 @@ M: utf8 stream-write1
 
 M: utf8 stream-write
     >r encode-utf8 r> delegate stream-write ;
+
+M: utf8 dispose delegate dispose ;
