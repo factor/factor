@@ -176,7 +176,7 @@ SYMBOL: build-status
     "Did not pass test-all: "        print "../test-all-vocabs"        cat
 
     "Benchmarks: " print
-    "../benchmarks" [ stdio get contents eval ] with-file-in .
+    "../benchmarks" [ stdio get contents eval ] with-file-in benchmarks.
 
   ] with-file-out ;
 
