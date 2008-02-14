@@ -1,11 +1,26 @@
-USING: arrays kernel sequences sequences.lib math
-math.functions tools.test strings math.ranges ;
+USING: arrays kernel sequences sequences.lib math math.functions math.ranges
+    tools.test strings ;
+IN: temporary
+
+[ 50 ] [ 100 [1,b] [ even? ] count ] unit-test
+[ 50 ] [ 100 [1,b] [ odd? ] count ] unit-test
+[ 328350 ] [ 100 [ sq ] sigma ] unit-test
+
+[ 1 2 { 3 4 } [ + + drop ] 2 each-withn  ] must-infer
+{ 13 } [ 1 2 { 3 4 } [ + + ] 2 each-withn + ] unit-test
+
+[ 1 2 { 3 4 } [ + + ] 2 map-withn ] must-infer
+{ { 6 7 } } [ 1 2 { 3 4 } [ + + ] 2 map-withn ] unit-test
+{ { 16 17 18 19 20 } } [ 1 2 3 4 { 6 7 8 9 10 } [ + + + + ] 4 map-withn ] unit-test
+[ { 910 911 912 } ] [ 10 900 3 [ + + ] map-with2 ] unit-test
 
 [ 4 ] [ { 1 2 } [ sq ] [ * ] map-reduce ] unit-test
 [ 36 ] [ { 2 3 } [ sq ] [ * ] map-reduce ] unit-test
 
 [ 10 ] [ { 1 2 3 4 } [ + ] reduce* ] unit-test
 [ 24 ] [ { 1 2 3 4 } [ * ] reduce* ] unit-test
+
+[ 1 2 3 4 ] [ { 1 2 3 4 } 4 nfirst ] unit-test
 
 [ -4 ] [ 1 -4 [ abs ] higher ] unit-test
 [ 1 ] [ 1 -4 [ abs ] lower ] unit-test

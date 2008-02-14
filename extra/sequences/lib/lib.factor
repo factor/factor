@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions mirrors
-arrays math.parser sorting strings ascii macros ;
+arrays math.parser math.private sorting strings ascii macros ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -190,7 +190,18 @@ PRIVATE>
 ! List the positions of obj in seq
 
 : indices ( seq obj -- seq )
-    >r dup length swap r>
-    [ = [ ] [ drop f ] if ] curry
-    2map
-    [ ] subset ;
+  >r dup length swap r>
+  [ = [ ] [ drop f ] if ] curry
+  2map
+  [ ] subset ;
+
+<PRIVATE
+: (attempt-each-integer) ( i n quot -- result )
+    [
+        iterate-step roll
+        [ 3nip ] [ iterate-next (attempt-each-integer) ] if*
+    ] [ 3drop f ] if-iterate? ; inline
+PRIVATE>
+
+: attempt-each ( seq quot -- result )
+    (each) iterate-prep (attempt-each-integer) ; inline

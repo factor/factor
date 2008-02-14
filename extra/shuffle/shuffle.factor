@@ -25,6 +25,8 @@ MACRO: ntuck ( n -- ) 2 + [ dup , -nrot ] bake ;
 
 : 3nip ( a b c d -- d ) 3 nnip ; inline
 
+: 4nip ( a b c d e -- e ) 4 nnip ; inline
+
 : 4dup ( a b c d -- a b c d a b c d ) 4 ndup ; inline
 
 : 4drop ( a b c d -- ) 3drop drop ; inline

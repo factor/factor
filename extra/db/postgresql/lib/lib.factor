@@ -37,8 +37,13 @@ IN: db.postgresql.lib
     >r db get db-handle r>
     [ statement-sql ] keep
     [ statement-params length f ] keep
-    statement-params [ malloc-char-string ] map >c-void*-array
+    statement-params [ second malloc-char-string ] map >c-void*-array
     f f 0 PQexecParams
     dup postgresql-result-ok? [
         dup postgresql-result-error-message swap PQclear throw
     ] unless ;
+
+: pq-oid-value ( res -- n )
+    PQoidValue dup InvalidOid = [
+        "postgresql returned an InvalidOid" throw
+    ] when ;

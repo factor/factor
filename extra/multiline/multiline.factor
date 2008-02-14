@@ -19,7 +19,7 @@ IN: multiline
 
 : STRING:
     CREATE dup reset-generic
-    parse-here 1quotation define ; parsing
+    parse-here 1quotation define-inline ; parsing
 
 : (parse-multiline-string) ( start-index end-text -- end-index )
     lexer get lexer-line-text [

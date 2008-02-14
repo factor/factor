@@ -1,28 +1,27 @@
 
-USING: kernel sequences assocs builder continuations vocabs vocabs.loader
+USING: kernel namespaces sequences assocs builder continuations
+       vocabs vocabs.loader
        io
        io.files
+       prettyprint
        tools.browser
-       tools.test ;
+       tools.test
+       bootstrap.stage2 benchmark ;
 
 IN: builder.test
 
-: try-everything* ( -- vocabs ) try-everything [ first vocab-link-name ] map ;
-
 : do-load ( -- )
-  [ try-everything* ] "../load-everything-time" log-runtime
-  dup empty?
-    [ drop ]
-    [ "../load-everything-log" log-object ]
-  if ;
+  try-everything keys "../load-everything-vocabs" [ . ] with-file-out ;
 
 : do-tests ( -- )
-  run-all-tests keys
-  dup empty?
-  [ drop ]
-  [ "../failing-tests" log-object ]
-  if ;
+  run-all-tests keys "../test-all-vocabs" [ . ] with-file-out ;
 
-: do-all ( -- ) do-load do-tests ;
+: do-benchmarks ( -- ) run-benchmarks "../benchmarks" [ . ] with-file-out ;
+
+: do-all ( -- )
+  bootstrap-time get   "../boot-time" [ . ] with-file-out
+  [ do-load  ] runtime "../load-time" [ . ] with-file-out
+  [ do-tests ] runtime "../test-time" [ . ] with-file-out
+  do-benchmarks ;
 
 MAIN: do-all

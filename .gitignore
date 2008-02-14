@@ -15,3 +15,5 @@ factor
 .gdb_history
 *.*.marks
 .*.swp
+reverse-complement-in.txt
+reverse-complement-out.txt
