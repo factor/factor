@@ -158,17 +158,10 @@ M: #if generate-node
         ] with-generator
     ] keep ;
 
-: tail-dispatch? ( node -- ? )
-    #! Is the dispatch a jump to a tail call to a word?
-    dup #call? swap node-successor #return? and ;
-
 : dispatch-branches ( node -- )
     node-children [
-        dup tail-dispatch? [
-            node-param
-        ] [
-            compiling-word get dispatch-branch
-        ] if %dispatch-label
+        compiling-word get dispatch-branch
+        %dispatch-label
     ] each ;
 
 : generate-dispatch ( node -- )
