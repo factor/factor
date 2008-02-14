@@ -15,7 +15,8 @@ TUPLE: db handle insert-statements update-statements delete-statements select-st
 GENERIC: db-open ( db -- )
 HOOK: db-close db ( handle -- )
 
-: dispose-statements [ dispose drop ] assoc-each ;
+: dispose-statements ( seq -- )
+    [ dispose drop ] assoc-each ;
 
 : dispose-db ( db -- ) 
     dup db [
@@ -27,38 +28,35 @@ HOOK: db-close db ( handle -- )
     ] with-variable ;
 
 TUPLE: statement sql params handle bound? ;
-
 TUPLE: simple-statement ;
 TUPLE: prepared-statement ;
 
 HOOK: <simple-statement> db ( str -- statement )
 HOOK: <prepared-statement> db ( str -- statement )
-
 GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( obj statement -- )
-GENERIC: rebind-statement ( obj statement -- )
+GENERIC: reset-statement ( statement -- )
+GENERIC: execute-statement* ( statement -- result-set )
+HOOK: last-id db ( res -- id )
+: execute-statement ( statement -- )
+    execute-statement* dispose ;
 
-GENERIC: execute-statement ( statement -- )
+: execute-statement-last-id ( statement -- id )
+    execute-statement* [ last-id ] with-disposal ;
 
 : bind-statement ( obj statement -- )
-    2dup dup statement-bound? [
-        rebind-statement
-    ] [
-        bind-statement*
-    ] if
-    tuck set-statement-params
+    dup statement-bound? [ dup reset-statement ] when
+    [ bind-statement* ] 2keep
+    [ set-statement-params ] keep
     t swap set-statement-bound? ;
 
 TUPLE: result-set sql params handle n max ;
 
 GENERIC: query-results ( query -- result-set )
-
 GENERIC: #rows ( result-set -- n )
 GENERIC: #columns ( result-set -- n )
 GENERIC# row-column 1 ( result-set n -- obj )
 GENERIC: advance-row ( result-set -- ? )
-
-HOOK: last-id db ( -- id )
 
 : init-result-set ( result-set -- )
     dup #rows over set-result-set-max

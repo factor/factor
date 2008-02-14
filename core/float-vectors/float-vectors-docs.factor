@@ -12,7 +12,7 @@ $nl
 { $subsection >float-vector }
 { $subsection <float-vector> }
 "If you don't care about initial capacity, a more elegant way to create a new float vector is to write:"
-{ $code "BV{ } clone" } ;
+{ $code "FV{ } clone" } ;
 
 ABOUT: "float-vectors"
 

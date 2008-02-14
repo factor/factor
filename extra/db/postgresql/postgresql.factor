@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs alien alien.syntax continuations io
-kernel math namespaces prettyprint quotations
-sequences debugger db db.postgresql.lib db.postgresql.ffi ;
+kernel math math.parser namespaces prettyprint quotations
+sequences debugger db db.postgresql.lib db.postgresql.ffi
+db.tuples db.types ;
 IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty db user pass ;
@@ -39,8 +40,8 @@ M: postgresql-db dispose ( db -- )
 M: postgresql-statement bind-statement* ( seq statement -- )
     set-statement-params ;
 
-M: postgresql-statement rebind-statement ( seq statement -- )
-    bind-statement* ;
+M: postgresql-statement reset-statement ( statement -- )
+    drop ;
 
 M: postgresql-result-set #rows ( result-set -- n )
     result-set-handle PQntuples ;
@@ -51,8 +52,8 @@ M: postgresql-result-set #columns ( result-set -- n )
 M: postgresql-result-set row-column ( result-set n -- obj )
     >r dup result-set-handle swap result-set-n r> PQgetvalue ;
 
-M: postgresql-statement execute-statement ( statement -- )
-    query-results dispose ;
+M: postgresql-statement execute-statement* ( statement -- obj )
+    query-results ;
 
 : increment-n ( result-set -- n )
     dup result-set-n 1+ dup rot set-result-set-n ;
@@ -103,3 +104,103 @@ M: postgresql-db commit-transaction ( -- )
 
 M: postgresql-db rollback-transaction ( -- )
     "ROLLBACK" sql-command ;
+
+
+M: postgresql-db create-sql ( columns table -- sql )
+    [
+        "create table " % %
+        " (" % [ ", " % ] [
+            dup second % " " %
+            dup third >sql-type % " " %
+            sql-modifiers " " join %
+        ] interleave ")" %
+    ] "" make ;
+
+M: postgresql-db drop-sql ( table -- sql )
+    [
+        "drop table " % %
+    ] "" make ;
+
+SYMBOL: postgresql-counter
+
+M: postgresql-db insert-sql* ( columns table -- sql )
+    [
+        postgresql-counter off
+        "insert into " %
+        %
+        "(" %
+        dup [ ", " % ] [ second % ] interleave
+        ") " %
+        " values (" %
+        [ ", " % ] [
+            drop "$" % postgresql-counter [ inc ] keep get #
+        ] interleave
+        ")" %
+    ] "" make ;
+
+M: postgresql-db update-sql* ( columns table -- sql )
+    [
+        "update " %
+        %
+        " set " %
+        dup remove-id
+        [ ", " % ] [ second dup % " = :" % % ] interleave
+        " where " %
+        [ primary-key? ] find nip second dup % " = :" % %
+    ] "" make ;
+
+M: postgresql-db delete-sql* ( columns table -- sql )
+    [
+        "delete from " %
+        %
+        " where " %
+        first second dup % " = :" % %
+    ] "" make ;
+
+M: postgresql-db select-sql* ( columns table -- sql )
+    drop ;
+
+M: postgresql-db tuple>params ( columns tuple -- obj )
+    [
+        >r dup first r> get-slot-named swap third
+    ] curry { } map>assoc ;
+    
+M: postgresql-db last-id ( res -- id )
+    pq-oid-value ;
+
+: postgresql-db-modifiers ( -- hashtable )
+    H{
+        { +native-id+ "primary key" }
+        { +assigned-id+ "primary key" }
+        { +autoincrement+ "autoincrement" }
+        { +unique+ "unique" }
+        { +default+ "default" }
+        { +null+ "null" }
+        { +not-null+ "not null" }
+    } ;
+
+M: postgresql-db sql-modifiers* ( modifiers -- str )
+    postgresql-db-modifiers swap [
+        dup array? [
+            first2
+            >r swap at r> number>string*
+            " " swap 3append
+        ] [
+            swap at
+        ] if
+    ] with map [ ] subset ;
+
+: postgresql-type-hash ( -- assoc )
+    H{
+        { INTEGER "integer" }
+        { TEXT "text" }
+        { VARCHAR "text" }
+        { DOUBLE "real" }
+    } ;
+
+M: postgresql-db >sql-type ( obj -- str )
+    dup pair? [
+        first >sql-type
+    ] [
+        postgresql-type-hash at* [ T{ no-sql-type } throw ] unless
+    ] if ;

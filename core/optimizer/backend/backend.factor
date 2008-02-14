@@ -367,6 +367,10 @@ DEFER: (flat-length)
     dup node-param dup +inlined+ depends-on
     word-def splice-quot ;
 
+: method-body-inline? ( #call -- ? )
+    node-param dup method-body?
+    [ flat-length 8 <= ] [ drop f ] if ;
+
 M: #call optimize-node*
     {
         { [ dup flush-eval? ] [ flush-eval ] }
@@ -375,5 +379,6 @@ M: #call optimize-node*
         { [ dup optimizer-hook ] [ optimize-hook ] }
         { [ dup optimize-predicate? ] [ optimize-predicate ] }
         { [ dup optimistic-inline? ] [ optimistic-inline ] }
+        { [ dup method-body-inline? ] [ optimistic-inline ] }
         { [ t ] [ inline-method ] }
     } cond dup not ;

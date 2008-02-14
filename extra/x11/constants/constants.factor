@@ -402,3 +402,8 @@ TYPEDEF: uchar KeyCode
 : LSBFirst              0 ;
 : MSBFirst              1 ;
 
+! *****************************************************************
+! * EXTENDED WINDOW MANAGER HINTS
+! *****************************************************************
+
+C-ENUM: _NET_WM_STATE_REMOVE _NET_WM_STATE_ADD _NET_WM_STATE_TOGGLE ;

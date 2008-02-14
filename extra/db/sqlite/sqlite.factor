@@ -25,7 +25,7 @@ M: sqlite-db dispose ( db -- ) dispose-db ;
 TUPLE: sqlite-statement ;
 C: <sqlite-statement> sqlite-statement
 
-TUPLE: sqlite-result-set ;
+TUPLE: sqlite-result-set advanced? ;
 : <sqlite-result-set> ( query -- sqlite-result-set )
     dup statement-handle sqlite-result-set <result-set> ;
 
@@ -40,18 +40,26 @@ M: sqlite-db <prepared-statement> ( str -- obj )
 M: sqlite-statement dispose ( statement -- )
     statement-handle sqlite-finalize ;
 
+: maybe-advance-row ( result-set -- result-set )
+    dup sqlite-result-set-advanced? [
+        dup advance-row drop
+    ] unless ;
+
 M: sqlite-result-set dispose ( result-set -- )
+    maybe-advance-row
     f swap set-result-set-handle ;
 
-M: sqlite-statement bind-statement* ( assoc statement -- )
-    statement-handle swap sqlite-bind-assoc ;
+: sqlite-bind ( triples handle -- )
+    swap [ first3 sqlite-bind-type ] with each ;
 
-M: sqlite-statement rebind-statement ( assoc statement -- )
-    dup statement-handle sqlite-reset
-    statement-handle swap sqlite-bind-assoc ;
+M: sqlite-statement bind-statement* ( triples statement -- )
+    statement-handle sqlite-bind ;
 
-M: sqlite-statement execute-statement ( statement -- )
-    statement-handle sqlite-next drop ;
+M: sqlite-statement reset-statement ( statement -- )
+    statement-handle sqlite-reset ;
+
+M: sqlite-statement execute-statement* ( statement -- obj )
+    query-results ;
 
 M: sqlite-result-set #columns ( result-set -- n )
     result-set-handle sqlite-#columns ;
@@ -60,7 +68,8 @@ M: sqlite-result-set row-column ( result-set n -- obj )
     >r result-set-handle r> sqlite-column ;
 
 M: sqlite-result-set advance-row ( result-set -- handle ? )
-    result-set-handle sqlite-next ;
+    [ result-set-handle sqlite-next ] keep
+    t swap set-sqlite-result-set-advanced? ;
 
 M: sqlite-statement query-results ( query -- result-set )
     dup statement-handle sqlite-result-set <result-set> ;
@@ -118,7 +127,7 @@ M: sqlite-db delete-sql* ( columns table -- sql )
         %
         " where " %
         first second dup % " = :" % %
-    ] "" make dup . ;
+    ] "" make ;
 
 M: sqlite-db select-sql* ( columns table -- sql )
     [
@@ -131,13 +140,15 @@ M: sqlite-db select-sql* ( columns table -- sql )
 
 M: sqlite-db tuple>params ( columns tuple -- obj )
     [
-        >r [ second ":" swap append ] keep first r> get-slot-named
-        number>string*
-    ] curry { } map>assoc  ;
+        >r [ second ":" swap append ] keep r>
+        dupd >r first r> get-slot-named swap
+        third 3array
+    ] curry map ;
     
-M: sqlite-db last-id ( -- id )
-    db get db-handle sqlite3_last_insert_rowid ;
-
+M: sqlite-db last-id ( result-set -- id )
+    maybe-advance-row drop
+    db get db-handle sqlite3_last_insert_rowid
+    dup zero? [ "last-id failed" throw ] when ;
 
 : sqlite-db-modifiers ( -- hashtable )
     H{
@@ -166,6 +177,7 @@ M: sqlite-db sql-modifiers* ( modifiers -- str )
         { INTEGER "integer" }
         { TEXT "text" }
         { VARCHAR "text" }
+        { DOUBLE "real" }
     } ;
 
 M: sqlite-db >sql-type ( obj -- str )

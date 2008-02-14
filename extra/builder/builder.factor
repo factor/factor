@@ -1,9 +1,9 @@
 
-USING: kernel io io.files io.launcher io.sockets hashtables math threads
-       system continuations namespaces sequences splitting math.parser
+USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
+       arrays system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
        combinators bootstrap.image bootstrap.image.download
-       combinators.cleave ;
+       combinators.cleave benchmark ;
 
 IN: builder
 
@@ -11,20 +11,7 @@ IN: builder
 
 : runtime ( quot -- time ) benchmark nip ;
 
-: log-runtime ( quot file -- )
-  >r runtime r> <file-writer> [ . ] with-stream ;
-
-: log-object ( object file -- ) <file-writer> [ . ] with-stream ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: datestamp ( -- string )
-  now `{ ,[ dup timestamp-year   ]
-         ,[ dup timestamp-month  ]
-         ,[ dup timestamp-day    ]
-         ,[ dup timestamp-hour   ]
-         ,[     timestamp-minute ] }
-  [ pad-00 ] map "-" join ;
+: minutes>ms ( min -- ms ) 60 * 1000 * ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -48,22 +35,7 @@ SYMBOL: builder-recipients
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run-or-notify ( desc message -- )
-  [ [ try-process ]        curry ]
-  [ [ email-string throw ] curry ]
-  bi*
-  recover ;
-
-: run-or-send-file ( desc message file -- )
-  >r >r [ try-process ]         curry
-  r> r> [ email-file throw ] 2curry
-  recover ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : target ( -- target ) `{ ,[ os ] %[ cpu "." split ] } "-" join ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : factor-binary ( -- name )
   os
@@ -71,12 +43,6 @@ SYMBOL: builder-recipients
     { "winnt" [ "./factor-nt.exe" ] }
     [ drop "./factor" ] }
   case ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-VAR: stamp
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : git-pull ( -- desc )
   {
@@ -89,16 +55,30 @@ VAR: stamp
 
 : git-clone ( -- desc ) { "git" "clone" "../factor" } ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: datestamp ( -- string )
+  now `{ ,[ dup timestamp-year   ]
+         ,[ dup timestamp-month  ]
+         ,[ dup timestamp-day    ]
+         ,[ dup timestamp-hour   ]
+         ,[     timestamp-minute ] }
+  [ pad-00 ] map "-" join ;
+
+VAR: stamp
+
 : enter-build-dir ( -- )
   datestamp >stamp
   "/builds" cd
   stamp> make-directory
   stamp> cd ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : git-id ( -- id )
   { "git" "show" } <process-stream> [ readln ] with-stream " " split second ;
 
-: record-git-id ( -- ) git-id "../git-id" log-object ;
+: record-git-id ( -- ) git-id "../git-id" [ . ] with-file-out ;
 
 : make-clean ( -- desc ) { "make" "clean" } ;
 
@@ -110,13 +90,6 @@ VAR: stamp
    }
   >hashtable ;
 
-: retrieve-boot-image ( -- )
-  [ my-arch download-image ]
-  [ ]
-  [ "builder: image download" email-string ]
-  cleanup
-  flush ;
-
 : bootstrap ( -- desc )
   `{
      { +arguments+ {
@@ -126,46 +99,92 @@ VAR: stamp
                    } }
      { +stdout+   "../boot-log" }
      { +stderr+   +stdout+ }
-   }
-  >hashtable ;
+     { +timeout+  ,[ 20 minutes>ms ] }
+   } ;
 
 : builder-test ( -- desc ) `{ ,[ factor-binary ] "-run=builder.test" } ;
   
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 SYMBOL: build-status
 
-: build ( -- )
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  enter-build-dir
+: milli-seconds>time ( n -- string )
+  1000 /i 60 /mod >r 60 /mod r> 3array [ pad-00 ] map ":" join ;
+
+: eval-file ( file -- obj ) <file-reader> contents eval ;
   
-  git-clone "git clone error" run-or-notify
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  "factor" cd
+: cat ( file -- ) <file-reader> contents print ;
 
-  record-git-id
-
-  make-clean "make clean error" run-or-notify
-
-  make-vm "vm compile error" "../compile-log" run-or-send-file
-
-  retrieve-boot-image
-
-  bootstrap "bootstrap error" "../boot-log" run-or-send-file
-
-  builder-test "builder.test fatal error" run-or-notify
-  
-  "../load-everything-log" exists?
-  [ "load-everything" "../load-everything-log" email-file ]
-  when
-
-  "../failing-tests" exists?
-  [ "failing tests" "../failing-tests" email-file ]
-  when ;
+: run-or-bail ( desc quot -- )
+  [ [ try-process ] curry ]
+  [ [ throw       ] curry ]
+  bi*
+  recover ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: minutes>ms ( min -- ms ) 60 * 1000 * ;
+: (build) ( -- )
+
+  enter-build-dir
+
+  "report" [
+
+    "Build machine:   " write host-name print
+    "Build directory: " write cwd       print
+
+    git-clone [ "git clone failed" print ] run-or-bail
+
+    "factor" cd
+
+    record-git-id
+
+    make-clean run-process drop
+
+    make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
+
+    [ my-arch download-image ] [ "Image download error" print throw ] recover
+
+    ! bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
+
+!     bootstrap
+!       <process-stream> dup dispose process-stream-process wait-for-process
+!     zero? not
+!       [ "Bootstrap error" print "../boot-log" cat "bootstrap error" throw ]
+!     when
+
+    [
+      bootstrap
+        <process-stream> dup dispose process-stream-process wait-for-process
+      zero? not
+        [ "bootstrap non-zero" throw ]
+      when
+    ]
+    [ "Bootstrap error" print "../boot-log" cat "bootstrap" throw ]
+    recover
+        
+    [ builder-test try-process ]
+    [ "Builder test error" print throw ]
+    recover
+
+    "Boot time: " write "../boot-time" eval-file milli-seconds>time print
+    "Load time: " write "../load-time" eval-file milli-seconds>time print
+    "Test time: " write "../test-time" eval-file milli-seconds>time print
+
+    "Did not pass load-everything: " print "../load-everything-vocabs" cat
+    "Did not pass test-all: "        print "../test-all-vocabs"        cat
+
+    "Benchmarks: " print
+    "../benchmarks" [ stdio get contents eval ] with-file-in benchmarks.
+
+  ] with-file-out ;
+
+: build ( -- )
+  [ (build) ] [ drop ] recover
+  "report" "../report" email-file ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : updates-available? ( -- ? )
   git-id

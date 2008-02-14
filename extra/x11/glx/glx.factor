@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! based on glx.h from xfree86, and some of glxtokens.h
-USING: alien alien.c-types alien.syntax x11.xlib
-namespaces kernel sequences ;
+USING: alien alien.c-types alien.syntax alien.syntax.private x11.xlib
+namespaces kernel sequences parser words ;
 IN: x11.glx
 
 LIBRARY: glx
@@ -42,7 +42,7 @@ FUNCTION: GLXContext glXCreateContext ( Display* dpy, XVisualInfo* vis, GLXConte
 FUNCTION: GLXPixmap glXCreateGLXPixmap ( Display* dpy, XVisualInfo* vis, Pixmap pixmap ) ;
 FUNCTION: void glXDestroyContext ( Display* dpy, GLXContext ctx ) ;
 FUNCTION: void glXDestroyGLXPixmap ( Display* dpy, GLXPixmap pix ) ;
-FUNCTION: int glXGetConfig ( Display* dpy, XVisualInfo* vis, int attrib, int* value) ;
+FUNCTION: int glXGetConfig ( Display* dpy, XVisualInfo* vis, int attrib, int* value ) ;
 FUNCTION: GLXContext glXGetCurrentContext ( ) ;
 FUNCTION: GLXDrawable glXGetCurrentDrawable ( ) ;
 FUNCTION: bool glXIsDirect ( Display* dpy, GLXContext ctx ) ;
@@ -79,6 +79,9 @@ FUNCTION: void glXGetSelectedEvent ( Display* dpy, GLXDrawable draw, ulong* even
 
 ! GLX 1.4 and later
 FUNCTION: void* glXGetProcAddress ( char* procname ) ;
+
+! GLX_ARB_get_proc_address extension
+FUNCTION: void* glXGetProcAddressARB ( char* procname ) ;
 
 ! GLX Events
 ! (also skipped for now. only has GLXPbufferClobberEvent, the rest is handled by xlib methinks

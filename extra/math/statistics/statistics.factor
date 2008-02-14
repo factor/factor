@@ -1,5 +1,5 @@
-USING: combinators.lib kernel math math.analysis
-math.functions math.vectors sequences sequences.lib sorting ;
+USING: kernel math math.analysis math.functions math.vectors sequences
+    sequences.lib sorting ;
 IN: math.statistics
 
 : mean ( seq -- n )
@@ -43,9 +43,9 @@ IN: math.statistics
 : ste ( seq -- x )
     #! standard error, standard deviation / sqrt ( length of sequence )
     dup std swap length sqrt / ;
-     
+
 : ((r)) ( mean(x) mean(y) {x} {y} -- (r) )
-    ! finds sigma((xi-mean(x))(yi-mean(y)) 
+    ! finds sigma((xi-mean(x))(yi-mean(y))
     0 [ [ >r pick r> swap - ] 2apply * + ] 2reduce 2nip ;
 
 : (r) ( mean(x) mean(y) {x} {y} sx sy -- r )
