@@ -74,10 +74,11 @@ IN: db.sqlite.lib
     dup array? [ first ] when
     {
         { INTEGER [ sqlite-bind-int-by-name ] }
-        { BIG_INTEGER [ sqlite-bind-int-by-name ] }
+        { BIG_INTEGER [ sqlite-bind-int64-by-name ] }
         { TEXT [ sqlite-bind-text-by-name ] }
         { VARCHAR [ sqlite-bind-text-by-name ] }
         { DOUBLE [ sqlite-bind-double-by-name ] }
+        { SERIAL [ sqlite-bind-int-by-name ] }
         ! { NULL [ sqlite-bind-null-by-name ] }
         [ no-sql-type ]
     } case ;

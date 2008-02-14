@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.sqlite db.tuples
-db.types continuations namespaces db.postgresql math
-tools.time ;
+db.types continuations namespaces db.postgresql math ;
+! tools.time ;
 IN: temporary
 
 TUPLE: person the-id the-name the-number real ;
@@ -44,7 +44,7 @@ SYMBOL: the-person
 
 person "PERSON"
 {
-    { "the-id" "ROWID" INTEGER +native-id+ }
+    { "the-id" "ID" SERIAL +native-id+ }
     { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
     { "the-number" "AGE" INTEGER { +default+ 0 } }
     { "real" "REAL" DOUBLE { +default+ 0.3 } }
@@ -52,12 +52,12 @@ person "PERSON"
 
 "billy" 10 3.14 <person> the-person set
 
-test-sqlite
+ test-sqlite
 ! test-postgresql
 
 person "PERSON"
 {
-    { "the-id" "ROWID" INTEGER +assigned-id+ }
+    { "the-id" "ID" INTEGER +assigned-id+ }
     { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
     { "the-number" "AGE" INTEGER { +default+ 0 } }
     { "real" "REAL" DOUBLE { +default+ 0.3 } }
@@ -65,5 +65,5 @@ person "PERSON"
 
 1 "billy" 20 6.28 <assigned-person> the-person set
 
-test-sqlite
+ test-sqlite
 ! test-postgresql

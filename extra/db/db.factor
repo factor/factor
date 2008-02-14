@@ -36,27 +36,23 @@ HOOK: <prepared-statement> db ( str -- statement )
 GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( obj statement -- )
 GENERIC: reset-statement ( statement -- )
-GENERIC: execute-statement* ( statement -- result-set )
+GENERIC: insert-statement ( statement -- id )
 HOOK: last-id db ( res -- id )
-: execute-statement ( statement -- )
-    execute-statement* dispose ;
 
-: execute-statement-last-id ( statement -- id )
-    execute-statement* [ last-id ] with-disposal ;
+TUPLE: result-set sql params handle n max ;
+GENERIC: query-results ( query -- result-set )
+GENERIC: #rows ( result-set -- n )
+GENERIC: #columns ( result-set -- n )
+GENERIC# row-column 1 ( result-set n -- obj )
+GENERIC: advance-row ( result-set -- ? )
+
+: execute-statement ( statement -- ) query-results dispose ;
 
 : bind-statement ( obj statement -- )
     dup statement-bound? [ dup reset-statement ] when
     [ bind-statement* ] 2keep
     [ set-statement-params ] keep
     t swap set-statement-bound? ;
-
-TUPLE: result-set sql params handle n max ;
-
-GENERIC: query-results ( query -- result-set )
-GENERIC: #rows ( result-set -- n )
-GENERIC: #columns ( result-set -- n )
-GENERIC# row-column 1 ( result-set n -- obj )
-GENERIC: advance-row ( result-set -- ? )
 
 : init-result-set ( result-set -- )
     dup #rows over set-result-set-max

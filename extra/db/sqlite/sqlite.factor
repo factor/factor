@@ -58,8 +58,8 @@ M: sqlite-statement bind-statement* ( triples statement -- )
 M: sqlite-statement reset-statement ( statement -- )
     statement-handle sqlite-reset ;
 
-M: sqlite-statement execute-statement* ( statement -- obj )
-    query-results ;
+M: sqlite-statement insert-statement ( statement -- id )
+    query-results [ last-id ] with-disposal ;
 
 M: sqlite-result-set #columns ( result-set -- n )
     result-set-handle sqlite-#columns ;
@@ -93,9 +93,10 @@ M: sqlite-db create-sql ( columns table -- sql )
         ] interleave ")" %
     ] "" make ;
 
-M: sqlite-db drop-sql ( table -- sql )
+M: sqlite-db drop-sql ( columns table -- sql )
     [
         "drop table " % %
+        drop
     ] "" make ;
 
 M: sqlite-db insert-sql* ( columns table -- sql )
@@ -175,6 +176,7 @@ M: sqlite-db sql-modifiers* ( modifiers -- str )
 : sqlite-type-hash ( -- assoc )
     H{
         { INTEGER "integer" }
+        { SERIAL "integer" }
         { TEXT "text" }
         { VARCHAR "text" }
         { DOUBLE "real" }
@@ -190,4 +192,3 @@ M: sqlite-db >sql-type ( obj -- str )
 ! HOOK: get-column-value ( n result-set type -- )
 ! M: sqlite get-column-value { { "TEXT" get-text-column } { 
 ! "INTEGER" get-integer-column } ... } case ;
-
