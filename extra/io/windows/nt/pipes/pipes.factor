@@ -1,9 +1,10 @@
-! Copyright (C) 2007 Doug Coleman, Slava Pestov.
+! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays destructors io io.windows libc
 windows.types math windows.kernel32 windows namespaces kernel
-sequences windows.errors assocs math.parser system random ;
-IN: io.windows.pipes
+sequences windows.errors assocs math.parser system random
+combinators ;
+IN: io.windows.nt.pipes
 
 ! This code is based on
 ! http://twistedmatrix.com/trac/browser/trunk/twisted/internet/iocpreactor/process.py
@@ -65,3 +66,20 @@ TUPLE: pipe in out ;
 
 : <unique-outgoing-pipe> ( -- pipe )
     unique-pipe-name <outgoing-pipe> ;
+
+! /dev/null simulation
+: null-input ( -- pipe )
+    <unique-outgoing-pipe>
+    dup pipe-out CloseHandle drop
+    pipe-in ;
+
+: null-output ( -- pipe )
+    <unique-incoming-pipe>
+    dup pipe-in CloseHandle drop
+    pipe-out ;
+
+: null-pipe ( mode -- pipe )
+    {
+        { [ dup GENERIC_READ = ] [ drop null-input ] }
+        { [ dup GENERIC_WRITE = ] [ drop null-output ] }
+    } cond ;
