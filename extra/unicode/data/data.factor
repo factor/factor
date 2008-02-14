@@ -1,6 +1,6 @@
 USING: assocs math kernel sequences io.files hashtables
 quotations splitting arrays math.parser combinators.lib hash2
-byte-arrays words namespaces words compiler.units const ;
+byte-arrays words namespaces words compiler.units ;
 IN: unicode.data
 
 ! Convenience functions
