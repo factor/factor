@@ -12,7 +12,7 @@ IN: optimizer
         H{ } clone value-substitutions set
         dup compute-def-use
         kill-values
-        ! dup detect-loops
+        dup detect-loops
         dup infer-classes
         optimizer-changed off
         optimize-nodes

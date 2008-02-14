@@ -314,7 +314,7 @@ PREDICATE: #merge #tail-merge node-successor #tail? ;
 PREDICATE: #values #tail-values node-successor #tail? ;
 
 UNION: #tail
-    POSTPONE: f #return #tail-values #tail-merge ;
+    POSTPONE: f #return #tail-values #tail-merge #terminate ;
 
 : tail-call? ( -- ? )
     node-stack get [ node-successor #tail? ] all? ;

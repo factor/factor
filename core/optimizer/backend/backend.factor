@@ -68,8 +68,6 @@ DEFER: optimize-nodes
         ] if
     ] when ;
 
-M: f set-node-successor 2drop ;
-
 : optimize-nodes ( node -- newnode )
     [
         class-substitutions [ clone ] change
@@ -81,16 +79,7 @@ M: f set-node-successor 2drop ;
 ! Generic nodes
 M: node optimize-node* drop t f ;
 
-: cleanup-inlining ( node -- newnode changed? )
-    node-successor [ node-successor t ] [ t f ] if* ;
-
-! #return
-M: #return optimize-node* cleanup-inlining ;
-
-! #values
-M: #values optimize-node* cleanup-inlining ;
-
-! Some utilities for splicing in dataflow IR subtrees
+! Post-inlining cleanup
 : follow ( key assoc -- value )
     2dup at* [ swap follow nip ] [ 2drop ] if ;
 
@@ -103,32 +92,31 @@ M: #values optimize-node* cleanup-inlining ;
     #! Not very efficient.
     dupd union* update ;
 
-: post-inline ( #call/#merge #return/#values -- assoc )
-    >r node-out-d r> node-in-d 2array unify-lengths flip
+: compute-value-substitutions ( #return/#values #call/#merge -- assoc )
+    node-out-d swap node-in-d 2array unify-lengths flip
     [ = not ] assoc-subset >hashtable ;
 
-: substitute-def-use ( node -- )
-    #! As a first approximation, we take all the values used
-    #! by the set of new nodes, and push a 't' on their
-    #! def-use list here. We could perform a full graph
-    #! substitution, but we don't need to, because the next
-    #! optimizer iteration will do that. We just need a minimal
-    #! degree of accuracy; the new values should be marked as
-    #! having _some_ usage, so that flushing doesn't erronously
-    #! flush them away.
-    [ compute-def-use def-use get keys ] with-scope
-    def-use get [ [ t swap ?push ] change-at ] curry each ;
+: cleanup-inlining ( #return/#values -- newnode changed? )
+    dup node-successor dup [
+        class-substitutions get pick node-classes update
+        literal-substitutions get pick node-literals update
+        tuck compute-value-substitutions value-substitutions get swap update*
+        node-successor t
+    ] [
+        2drop t f
+    ] if ;
 
-: substitute-node ( old new -- )
-    #! The last node of 'new' becomes 'old', then values are
-    #! substituted. A subsequent optimizer phase kills the
-    #! last node of 'new' and the first node of 'old'.
-    dup substitute-def-use
-    last-node
-    class-substitutions get over node-classes update
-    literal-substitutions get over node-literals update
-    2dup post-inline value-substitutions get swap update*
-    set-node-successor ;
+! #return
+M: #return optimize-node* cleanup-inlining ;
+
+! #values
+M: #values optimize-node* cleanup-inlining ;
+
+! Some utilities for splicing in dataflow IR subtrees
+M: f set-node-successor 2drop ;
+
+: splice-node ( old new -- )
+    dup splice-def-use last-node set-node-successor ;
 
 GENERIC: remember-method* ( method-spec node -- )
 
@@ -148,12 +136,12 @@ M: node remember-method*
     pick node-in-d dataflow-with
     [ remember-method ] keep
     [ swap infer-classes/node ] 2keep
-    [ substitute-node ] keep ;
+    [ splice-node ] keep ;
 
 : splice-quot ( #call quot -- node )
     over node-in-d dataflow-with
     [ swap infer-classes/node ] 2keep
-    [ substitute-node ] keep ;
+    [ splice-node ] keep ;
 
 : drop-inputs ( node -- #shuffle )
     node-in-d clone \ #shuffle in-node ;
@@ -161,7 +149,7 @@ M: node remember-method*
 ! Constant branch folding
 : fold-branch ( node branch# -- node )
     over node-children nth
-    swap node-successor over substitute-node ;
+    swap node-successor over splice-node ;
 
 ! #if
 : known-boolean-value? ( node value -- value ? )
@@ -193,18 +181,20 @@ M: node remember-method*
 : clone-node ( node -- newnode )
     clone dup [ clone ] modify-values ;
 
+: detach-node-successor ( node -- successor )
+    dup node-successor #terminate rot set-node-successor ;
+
 : lift-branch ( #if node -- )
-    over last-node clone-node -rot
-    >r dup node-successor r> substitute-node
-    set-node-successor ;
+    >r detach-node-successor r> splice-node ;
 
 M: #if optimize-node*
     dup fold-if-branch? [ fold-if-branch t ] [
-        drop dup lift-throw-tail? dup [
-            dupd lift-branch t
-        ] [
-            2drop t f
-        ] if
+        2drop t f
+        ! drop dup lift-throw-tail? dup [
+        !     dupd lift-branch t
+        ! ] [
+        !     2drop t f
+        ! ] if
     ] if ;
 
 : fold-dispatch-branch? dup node-in-d first tuck node-literal? ;
@@ -222,21 +212,72 @@ M: #dispatch optimize-node*
     ] if ;
 
 ! #loop
+
+
+! BEFORE:
+
+!   #label -> C -> #return 1
+!     |
+!     -> #if -> #merge -> #return 2
+!         |
+!     --------
+!     |      |
+!     A      B
+!     |      |
+!  #values   |
+!        #call-label
+!            |
+!            |
+!         #values
+
+! AFTER:
+
+!    #label -> #terminate
+!     |
+!     -> #if -> #terminate
+!         |
+!     --------
+!     |      |
+!     A      B
+!     |      |
+!  #values   |
+!     |  #call-label
+!  #merge    |
+!     |      |
+!     C   #values
+!     |
+!  #return 1
+
+: find-final-if ( node -- #if/f )
+    dup [
+        dup #if? [
+            dup node-successor #tail? [
+                node-successor find-final-if
+            ] unless
+        ] [
+            node-successor find-final-if
+        ] if
+    ] when ;
+
 : lift-loop-tail? ( #label -- tail/f )
-    dup node-child dup #if? [
-        node-children
-        [ penultimate-node ] map
-        [
-            dup #call-label?
-            [ node-param eq? not ] [ 2drop t ] if
-        ] with subset only-one
-    ] [
-        2drop f
-    ] if ;
+    dup node-successor node-successor [
+        dup node-param swap node-child find-final-if dup [
+            node-children [ penultimate-node ] map
+            [
+                dup #call-label?
+                [ node-param eq? not ] [ 2drop t ] if
+            ] with subset only-one
+        ] [ 2drop f ] if
+    ] [ drop f ] if ;
 
 ! M: #loop optimize-node*
 !     dup lift-loop-tail? dup [
-!         over node-child swap lift-branch t
+!         last-node >r
+!         dup detach-node-successor
+!         over node-child find-final-if detach-node-successor
+!         [ set-node-successor ] keep
+!         r> set-node-successor
+!         t
 !     ] [
 !         2drop t f
 !     ] if ;

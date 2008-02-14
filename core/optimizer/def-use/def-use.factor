@@ -118,3 +118,15 @@ M: #r> kill-node* [ node-in-r empty? ] prune-if ;
 : sole-consumer ( #call -- node/f )
     node-out-d first used-by
     dup length 1 = [ first ] [ drop f ] if ;
+
+: splice-def-use ( node -- )
+    #! As a first approximation, we take all the values used
+    #! by the set of new nodes, and push a 't' on their
+    #! def-use list here. We could perform a full graph
+    #! substitution, but we don't need to, because the next
+    #! optimizer iteration will do that. We just need a minimal
+    #! degree of accuracy; the new values should be marked as
+    #! having _some_ usage, so that flushing doesn't erronously
+    #! flush them away.
+    [ compute-def-use def-use get keys ] with-scope
+    def-use get [ [ t swap ?push ] change-at ] curry each ;
