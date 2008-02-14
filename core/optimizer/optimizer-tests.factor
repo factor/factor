@@ -2,7 +2,7 @@ USING: arrays compiler generic hashtables inference kernel
 kernel.private math optimizer prettyprint sequences sbufs
 strings tools.test vectors words sequences.private quotations
 optimizer.backend classes inference.dataflow tuples.private
-continuations growable ;
+continuations growable optimizer.inlining ;
 IN: temporary
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
