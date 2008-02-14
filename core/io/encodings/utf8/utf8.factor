@@ -79,30 +79,8 @@ SYMBOL: quad3
 
 TUPLE: utf8 ;
 : <utf8> utf8 construct-delegate ;
+INSTANCE: encoding-stream utf8
+
+M: utf8 encode-string drop encode-utf8 ;
+M: utf8 decode-step drop decode-utf8-step ;
 ! In the future, this should detect and ignore a BOM at the beginning
-
-M: utf8 init-decoding ( stream utf8 -- utf8-stream )
-    tuck set-delegate ;
-
-M: utf8 init-encoding ( stream utf8 -- utf8-stream )
-    tuck set-delegate ;
-
-M: utf8 stream-read1 1 swap stream-read ;
-
-M: utf8 stream-read
-    delegate [ decode-utf8-step ] decode-read ;
-
-M: utf8 stream-read-partial stream-read ;
-
-M: utf8 stream-read-until
-    ! Copied from { c-reader stream-read-until }!!!
-    [ swap read-until-loop ] "" make
-    swap over empty? over not and [ 2drop f f ] when ;
-
-M: utf8 stream-write1
-    >r 1string r> stream-write ;
-
-M: utf8 stream-write
-    >r encode-utf8 r> delegate stream-write ;
-
-M: utf8 dispose delegate dispose ;
