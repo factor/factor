@@ -79,7 +79,7 @@ SYMBOL: quad3
 
 TUPLE: utf8 ;
 : <utf8> utf8 construct-delegate ;
-INSTANCE: encoding-stream utf8
+INSTANCE: utf8 encoding-stream 
 
 M: utf8 encode-string drop encode-utf8 ;
 M: utf8 decode-step drop decode-utf8-step ;

@@ -117,14 +117,14 @@ SYMBOL: ignore
 
 TUPLE: utf16le ;
 : <utf16le> utf16le construct-delegate ;
-INSTANCE: encoding-stream utf16le
+INSTANCE: utf16le encoding-stream 
 
 M: utf16le encode-string drop encode-utf16le ;
 M: utf16le decode-step drop decode-utf16le-step ;
 
 TUPLE: utf16be ;
 : <utf16be> utf16be construct-delegate ;
-INSTANCE: encoding-stream utf16be
+INSTANCE: utf16be encoding-stream 
 
 M: utf16be encode-string drop encode-utf16be ;
 M: utf16le decode-step drop decode-utf16be-step ;

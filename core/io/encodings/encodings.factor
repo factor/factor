@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel sequences sbufs vectors
-namespaces unicode.syntax growable strings io ;
+USING: math kernel sequences sbufs vectors io.streams.lines io.streams.plain
+namespaces unicode.syntax growable strings io classes io.streams.c
+continuations ;
 IN: io.encodings
 
 TUPLE: encode-error ;
