@@ -313,3 +313,19 @@ TUPLE: silly-tuple a b ;
 [ t ] [ \ lift-throw-tail-regression compiled? ] unit-test
 [ 3 "an integer" ] [ 3 lift-throw-tail-regression ] unit-test
 [ "hi" "a string" ] [ "hi" lift-throw-tail-regression ] unit-test
+
+: lift-loop-tail-test-1 ( a quot -- )
+    over even? [
+        [ >r 3 - r> call ] keep lift-loop-tail-test-1
+    ] [
+        over 0 < [
+            2drop
+        ] [
+            [ >r 2 - r> call ] keep lift-loop-tail-test-1
+        ] if
+    ] if ; inline
+
+: lift-loop-tail-test-2
+    10 [ ] lift-loop-tail-test-1 1 2 3 ;
+
+[ 1 2 3 ] [ lift-loop-tail-test-2 ] unit-test
