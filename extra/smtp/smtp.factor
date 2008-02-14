@@ -139,7 +139,7 @@ LOG: smtp-response DEBUG
 : prepare-message ( body headers -- body' )
     [
         prepare-headers
-        " " ,
+        "" ,
         dup string? [ string-lines ] when %
     ] { } make ;
 
