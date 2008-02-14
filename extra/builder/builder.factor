@@ -3,67 +3,17 @@ USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
        arrays system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
        combinators bootstrap.image bootstrap.image.download
-       combinators.cleave benchmark ;
+       combinators.cleave benchmark
+       classes strings quotations words parser-combinators new-slots accessors
+       assocs.lib smtp builder.util ;
 
 IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: runtime ( quot -- time ) benchmark nip ;
-
-: minutes>ms ( min -- ms ) 60 * 1000 * ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: builder-recipients
-
-: host-name* ( -- name ) host-name "." split first ;
-
-: tag-subject ( str -- str ) `{ "builder@" ,[ host-name* ] ": " , } concat ;
-
-: email-string ( subject -- )
-  `{ "mutt" "-s" ,[ tag-subject ] %[ builder-recipients get ] }
-  [ ] with-process-stream drop ;
-
-: email-file ( subject file -- )
-  `{
-    { +stdin+ , }
-    { +arguments+
-      { "mutt" "-s" ,[ tag-subject ] %[ builder-recipients get ] } }
-  }
-  >hashtable run-process drop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: target ( -- target ) `{ ,[ os ] %[ cpu "." split ] } "-" join ;
-
-: factor-binary ( -- name )
-  os
-  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
-    { "winnt" [ "./factor-nt.exe" ] }
-    [ drop "./factor" ] }
-  case ;
-
-: git-pull ( -- desc )
-  {
-    "git"
-    "pull"
-    "--no-summary"
-    "git://factorcode.org/git/factor.git"
-    "master"
-  } ;
-
 : git-clone ( -- desc ) { "git" "clone" "../factor" } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: datestamp ( -- string )
-  now `{ ,[ dup timestamp-year   ]
-         ,[ dup timestamp-month  ]
-         ,[ dup timestamp-day    ]
-         ,[ dup timestamp-hour   ]
-         ,[     timestamp-minute ] }
-  [ pad-00 ] map "-" join ;
 
 VAR: stamp
 
@@ -82,47 +32,40 @@ VAR: stamp
 
 : make-clean ( -- desc ) { "make" "clean" } ;
 
-: make-vm ( -- )
-  `{
-     { +arguments+ { "make" ,[ target ] } }
-     { +stdout+    "../compile-log" }
-     { +stderr+    +stdout+ }
-   }
-  >hashtable ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: target ( -- target ) { os [ cpu "." split ] } to-strings "-" join ;
+
+: make-vm ( -- desc )
+  <process*>
+    { "make" target } to-strings >>arguments
+    "../compile-log"             >>stdout
+    +stdout+                     >>stderr
+  >desc ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: factor-binary ( -- name )
+  os
+  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
+    { "winnt"  [ "./factor-nt.exe" ] }
+    [ drop       "./factor" ] }
+  case ;
+
+: bootstrap-cmd ( -- cmd )
+  { factor-binary [ "-i=" my-boot-image-name append ] "-no-user-init" }
+  to-strings ;
 
 : bootstrap ( -- desc )
-  `{
-     { +arguments+ {
-                     ,[ factor-binary ]
-                     ,[ "-i=" my-boot-image-name append ]
-                     "-no-user-init"
-                   } }
-     { +stdout+   "../boot-log" }
-     { +stderr+   +stdout+ }
-     { +timeout+  ,[ 20 minutes>ms ] }
-   } ;
+  <process*>
+    bootstrap-cmd >>arguments
+    "../boot-log" >>stdout
+    +stdout+      >>stderr
+    20 minutes>ms >>timeout
+  >desc ;
 
-: builder-test ( -- desc ) `{ ,[ factor-binary ] "-run=builder.test" } ;
+: builder-test ( -- desc ) { factor-binary "-run=builder.test" } to-strings ;
   
-SYMBOL: build-status
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: milli-seconds>time ( n -- string )
-  1000 /i 60 /mod >r 60 /mod r> 3array [ pad-00 ] map ":" join ;
-
-: eval-file ( file -- obj ) <file-reader> contents eval ;
-  
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: cat ( file -- ) <file-reader> contents print ;
-
-: run-or-bail ( desc quot -- )
-  [ [ try-process ] curry ]
-  [ [ throw       ] curry ]
-  bi*
-  recover ;
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : (build) ( -- )
@@ -180,11 +123,31 @@ SYMBOL: build-status
 
   ] with-file-out ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: builder-recipients
+
+: tag-subject ( str -- str ) { "builder@" host-name* ": " , } bake to-string ;
+
 : build ( -- )
   [ (build) ] [ drop ] recover
-  "report" "../report" email-file ;
+  <email>
+    "ed@factorcode.org"     >>from
+    builder-recipients get  >>to
+    "report" tag-subject    >>subject
+    "../report" file>string >>body
+  send ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: git-pull ( -- desc )
+  {
+    "git"
+    "pull"
+    "--no-summary"
+    "git://factorcode.org/git/factor.git"
+    "master"
+  } ;
 
 : updates-available? ( -- ? )
   git-id
