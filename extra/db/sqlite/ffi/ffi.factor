@@ -108,7 +108,7 @@ LIBRARY: sqlite
 FUNCTION: int sqlite3_open ( char* filename, void* ppDb ) ;
 FUNCTION: int sqlite3_close ( sqlite3* pDb ) ;
 FUNCTION: char* sqlite3_errmsg ( sqlite3* pDb ) ;
-FUNCTION: int sqlite3_prepare_v2 ( sqlite3* pDb, char* zSql, int nBytes, void* ppStmt, void* pzTail ) ;
+FUNCTION: int sqlite3_prepare ( sqlite3* pDb, char* zSql, int nBytes, void* ppStmt, void* pzTail ) ;
 FUNCTION: int sqlite3_finalize ( sqlite3_stmt* pStmt ) ;
 FUNCTION: int sqlite3_reset ( sqlite3_stmt* pStmt ) ;
 FUNCTION: int sqlite3_step ( sqlite3_stmt* pStmt ) ;

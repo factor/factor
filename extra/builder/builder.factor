@@ -3,13 +3,15 @@ USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
        arrays system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
        combinators bootstrap.image bootstrap.image.download
-       combinators.cleave ;
+       combinators.cleave benchmark ;
 
 IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : runtime ( quot -- time ) benchmark nip ;
+
+: minutes>ms ( min -- ms ) 60 * 1000 * ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -97,6 +99,7 @@ VAR: stamp
                    } }
      { +stdout+   "../boot-log" }
      { +stderr+   +stdout+ }
+     { +timeout+  ,[ 20 minutes>ms ] }
    } ;
 
 : builder-test ( -- desc ) `{ ,[ factor-binary ] "-run=builder.test" } ;
@@ -145,10 +148,22 @@ SYMBOL: build-status
 
     ! bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
-    bootstrap <process-stream> dup dispose process-stream-process wait-for-process zero? not
-      [ "Bootstrap error" print "../boot-log" cat "bootstrap error" throw ]
-    when
+!     bootstrap
+!       <process-stream> dup dispose process-stream-process wait-for-process
+!     zero? not
+!       [ "Bootstrap error" print "../boot-log" cat "bootstrap error" throw ]
+!     when
 
+    [
+      bootstrap
+        <process-stream> dup dispose process-stream-process wait-for-process
+      zero? not
+        [ "bootstrap non-zero" throw ]
+      when
+    ]
+    [ "Bootstrap error" print "../boot-log" cat "bootstrap" throw ]
+    recover
+        
     [ builder-test try-process ]
     [ "Builder test error" print throw ]
     recover
@@ -160,6 +175,9 @@ SYMBOL: build-status
     "Did not pass load-everything: " print "../load-everything-vocabs" cat
     "Did not pass test-all: "        print "../test-all-vocabs"        cat
 
+    "Benchmarks: " print
+    "../benchmarks" [ stdio get contents eval ] with-file-in benchmarks.
+
   ] with-file-out ;
 
 : build ( -- )
@@ -167,8 +185,6 @@ SYMBOL: build-status
   "report" "../report" email-file ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: minutes>ms ( min -- ms ) 60 * 1000 * ;
 
 : updates-available? ( -- ? )
   git-id

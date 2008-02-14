@@ -50,6 +50,8 @@ IN: db.postgresql.ffi
 : PQERRORS_DEFAULT                  HEX: 1 ; inline
 : PQERRORS_VERBOSE                  HEX: 2 ; inline
 
+: InvalidOid 0 ; inline
+
 TYPEDEF: int size_t
 TYPEDEF: int ConnStatusType
 TYPEDEF: int ExecStatusType 

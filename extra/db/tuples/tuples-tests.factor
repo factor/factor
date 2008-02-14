@@ -1,11 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.sqlite db.tuples
-db.types continuations namespaces ;
+db.types continuations namespaces db.postgresql math
+tools.time ;
 IN: temporary
 
 TUPLE: person the-id the-name the-number real ;
-: <person> ( name age -- person )
+: <person> ( name age real -- person )
     {
         set-person-the-name
         set-person-the-number
@@ -36,10 +37,10 @@ SYMBOL: the-person
         test-tuples
     ] with-db ;
 
-! : test-postgres ( -- )
-    ! resource-path <postgresql-db> [
-        ! test-tuples
-    ! ] with-db ;
+: test-postgresql ( -- )
+    "localhost" "postgres" "" "factor-test" <postgresql-db> [
+        test-tuples
+    ] with-db ;
 
 person "PERSON"
 {
@@ -52,7 +53,7 @@ person "PERSON"
 "billy" 10 3.14 <person> the-person set
 
 test-sqlite
-! test-postgres
+! test-postgresql
 
 person "PERSON"
 {
@@ -65,4 +66,4 @@ person "PERSON"
 1 "billy" 20 6.28 <assigned-person> the-person set
 
 test-sqlite
-! test-postgres
+! test-postgresql
