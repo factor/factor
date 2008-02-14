@@ -11,28 +11,6 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: builder-recipients
-
-: tag-subject ( str -- str ) { "builder@" host-name* ": " , } bake to-string ;
-
-: target ( -- target ) { os [ cpu "." split ] } to-strings "-" join ;
-
-: factor-binary ( -- name )
-  os
-  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
-    { "winnt"  [ "./factor-nt.exe" ] }
-    [ drop       "./factor" ] }
-  case ;
-
-: git-pull ( -- desc )
-  {
-    "git"
-    "pull"
-    "--no-summary"
-    "git://factorcode.org/git/factor.git"
-    "master"
-  } ;
-
 : git-clone ( -- desc ) { "git" "clone" "../factor" } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -54,12 +32,25 @@ VAR: stamp
 
 : make-clean ( -- desc ) { "make" "clean" } ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: target ( -- target ) { os [ cpu "." split ] } to-strings "-" join ;
+
 : make-vm ( -- desc )
   <process*>
     { "make" target } to-strings >>arguments
     "../compile-log"             >>stdout
     +stdout+                     >>stderr
   >desc ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: factor-binary ( -- name )
+  os
+  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
+    { "winnt"  [ "./factor-nt.exe" ] }
+    [ drop       "./factor" ] }
+  case ;
 
 : bootstrap-cmd ( -- cmd )
   { factor-binary [ "-i=" my-boot-image-name append ] "-no-user-init" }
@@ -75,8 +66,6 @@ VAR: stamp
 
 : builder-test ( -- desc ) { factor-binary "-run=builder.test" } to-strings ;
   
-SYMBOL: build-status
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : (build) ( -- )
@@ -134,6 +123,12 @@ SYMBOL: build-status
 
   ] with-file-out ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: builder-recipients
+
+: tag-subject ( str -- str ) { "builder@" host-name* ": " , } bake to-string ;
+
 : build ( -- )
   [ (build) ] [ drop ] recover
   <email>
@@ -144,6 +139,15 @@ SYMBOL: build-status
   send ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: git-pull ( -- desc )
+  {
+    "git"
+    "pull"
+    "--no-summary"
+    "git://factorcode.org/git/factor.git"
+    "master"
+  } ;
 
 : updates-available? ( -- ? )
   git-id
