@@ -22,7 +22,7 @@ IN: benchmark.sockets
         CHAR: x write1
     ] with-stream ;
 
-: socket-benchmark ( n -- )
+: clients ( n -- )
     dup pprint " clients: " write
         [
         [ simple-server ] in-thread
@@ -33,11 +33,12 @@ IN: benchmark.sockets
     ] time ;
 
 : socket-benchmarks
-    10 socket-benchmark
-    20 socket-benchmark
-    40 socket-benchmark
-    80 socket-benchmark
-    160 socket-benchmark
-    320 socket-benchmark ;
+    10 clients
+    20 clients
+    40 clients
+    80 clients
+    160 clients
+    320 clients
+    640 clients ;
 
 MAIN: socket-benchmarks
