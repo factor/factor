@@ -95,14 +95,18 @@ M: #dispatch node>quot
     node-children swap [ dataflow>quot ] curry map ,
     \ dispatch , ;
 
-M: #return node>quot
-    dup node-param unparse "#return " swap append comment, ;
-
 M: #>r node>quot nip node-in-d length \ >r <array> % ;
 
 M: #r> node>quot nip node-out-d length \ r> <array> % ;
 
-M: object node>quot dup class word-name comment, ;
+M: object node>quot
+    [
+        dup class word-name %
+        " " %
+        dup node-param unparse %
+        " " %
+        dup effect-str %
+    ] "" make comment, ;
 
 : (dataflow>quot) ( ? node -- )
     dup [

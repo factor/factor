@@ -50,15 +50,16 @@ MEMO: 'arguments' ( -- parser )
 : redirect ( obj mode fd -- )
     {
         { [ pick not ] [ 2nip F_SETFL 0 fcntl io-error ] }
-        { [ pick +closed+ eq? ] [ close 2drop ] }
         { [ pick string? ] [ (redirect) ] }
     } cond ;
 
+: ?closed dup +closed+ eq? [ drop "/dev/null" ] when ;
+
 : setup-redirection ( -- )
-    +stdin+ get read-flags 0 redirect
-    +stdout+ get write-flags 1 redirect
+    +stdin+ get ?closed read-flags 0 redirect
+    +stdout+ get ?closed write-flags 1 redirect
     +stderr+ get dup +stdout+ eq?
-    [ drop 1 2 dup2 io-error ] [ write-flags 2 redirect ] if ;
+    [ drop 1 2 dup2 io-error ] [ ?closed write-flags 2 redirect ] if ;
 
 : spawn-process ( -- )
     [

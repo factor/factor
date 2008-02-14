@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces io.binary
 io.encodings combinators splitting ;
-IN: io.utf16
+IN: io.encodings.utf16
 
 SYMBOL: double
 SYMBOL: quad1
@@ -30,7 +30,7 @@ SYMBOL: ignore
         >r 2 shift r> BIN: 11 bitand bitor quad3
     ] [ 2drop do-ignore ] if ;
 
-: (decode-utf16be) ( buf byte ch state -- buf ch state )
+: decode-utf16be-step ( buf byte ch state -- buf ch state )
     {
         { begin [ drop begin-utf16be ] }
         { double [ end-multibyte ] }
@@ -41,7 +41,7 @@ SYMBOL: ignore
     } case ;
 
 : decode-utf16be ( seq -- str )
-    [ -rot (decode-utf16be) ] decode ;
+    [ decode-utf16be-step ] decode ;
 
 : handle-double ( buf byte ch -- buf ch state )
     swap dup -3 shift BIN: 11011 = [
@@ -55,7 +55,7 @@ SYMBOL: ignore
         BIN: 11 bitand append-nums HEX: 10000 + decoded
     ] [ 2drop push-replacement ] if ;
 
-: (decode-utf16le) ( buf byte ch state -- buf ch state )
+: decode-utf16le-step ( buf byte ch state -- buf ch state )
     {
         { begin [ drop double ] }
         { double [ handle-double ] }
@@ -65,7 +65,7 @@ SYMBOL: ignore
     } case ;
 
 : decode-utf16le ( seq -- str )
-    [ -rot (decode-utf16le) ] decode ;
+    [ decode-utf16le-step ] decode ;
 
 : encode-first
     -10 shift
@@ -104,13 +104,23 @@ SYMBOL: ignore
 : encode-utf16 ( str -- seq )
     encode-utf16le bom-le swap append ;
 
-: utf16le? ( seq1 -- seq2 ? ) bom-le ?head ;
-
-: utf16be? ( seq1 -- seq2 ? ) bom-be ?head ;
-
 : decode-utf16 ( seq -- str )
     {
-        { [ utf16le? ] [ decode-utf16le ] }
-        { [ utf16be? ] [ decode-utf16be ] }
+        { [ bom-le ?head ] [ decode-utf16le ] }
+        { [ bom-be ?head ] [ decode-utf16be ] }
         { [ t ] [ decode-error ] }
     } cond ;
+
+TUPLE: utf16le ;
+: <utf16le> utf16le construct-delegate ;
+INSTANCE: utf16le encoding-stream 
+
+M: utf16le encode-string drop encode-utf16le ;
+M: utf16le decode-step drop decode-utf16le-step ;
+
+TUPLE: utf16be ;
+: <utf16be> utf16be construct-delegate ;
+INSTANCE: utf16be encoding-stream 
+
+M: utf16be encode-string drop encode-utf16be ;
+M: utf16be decode-step drop decode-utf16be-step ;

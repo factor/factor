@@ -24,7 +24,7 @@ IN: optimizer.specializers
         \ dispatch ,
     ] [ ] make ;
 
-: specializer-methods ( word -- alist )
+: specializer-methods ( quot word -- default alist )
     dup [ array? ] all? [ 1array ] unless [
         [ make-specializer ] keep
         [ declare ] curry pick append

@@ -1,7 +1,7 @@
 IN: temporary
 USING: compiler tools.test namespaces sequences
 kernel.private kernel math continuations continuations.private
-words splitting ;
+words splitting sorting ;
 
 : symbolic-stack-trace ( -- newseq )
     error-continuation get continuation-call callstack>array
@@ -31,9 +31,9 @@ words splitting ;
     \ > stack-trace-contains?
 ] unit-test
 
-: quux [ t [ "hi" throw ] when ] times ;
+: quux { 1 2 3 } [ "hi" throw ] sort ;
 
 [ t ] [
     [ 10 quux ] ignore-errors
-    \ (each-integer) stack-trace-contains?
+    \ sort stack-trace-contains?
 ] unit-test

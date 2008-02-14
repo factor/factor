@@ -1,8 +1,9 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: combinators
 USING: arrays sequences sequences.private math.private
-kernel kernel.private math assocs quotations vectors ;
+kernel kernel.private math assocs quotations vectors
+hashtables sorting ;
 
 TUPLE: no-cond ;
 
@@ -31,8 +32,16 @@ TUPLE: no-case ;
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ rot 1- -rot call ] if ; inline
 
+! These go here, not in sequences and hashtables, since those
+! two depend on combinators
 M: sequence hashcode*
     [ sequence-hashcode ] recursive-hashcode ;
+
+M: hashtable hashcode*
+    [
+        dup assoc-size 1 number=
+        [ assoc-hashcode ] [ nip assoc-size ] if
+    ] recursive-hashcode ;
 
 : alist>quot ( default assoc -- quot )
     [ rot \ if 3array append [ ] like ] assoc-each ;
@@ -40,7 +49,7 @@ M: sequence hashcode*
 : cond>quot ( assoc -- quot )
     reverse [ no-cond ] swap alist>quot ;
 
-: case>quot ( default assoc -- quot )
+: linear-case-quot ( default assoc -- quot )
     [ >r [ dupd = ] curry r> \ drop add* ] assoc-map
     alist>quot ;
 
@@ -63,20 +72,50 @@ M: sequence hashcode*
 
 : hash-case-table ( default assoc -- array )
     V{ } [ 1array ] distribute-buckets
-    [ case>quot ] with map ;
+    [ linear-case-quot ] with map ;
 
 : hash-dispatch-quot ( table -- quot )
     [ length 1- [ fixnum-bitand ] curry ] keep
     [ dispatch ] curry append ;
 
-: hash-case>quot ( default assoc -- quot )
+: hash-case-quot ( default assoc -- quot )
+    hash-case-table hash-dispatch-quot
+    [ dup hashcode >fixnum ] swap append ;
+
+: contiguous-range? ( keys -- from to ? )
+    dup [ fixnum? ] all? [
+        dup all-unique? [
+            dup infimum over supremum
+            [ - swap prune length + 1 = ] 2keep rot
+        ] [
+            drop f f f
+        ] if
+    ] [
+        drop f f f
+    ] if ;
+
+: dispatch-case ( value from to default array -- )
+    >r >r 3dup between? [
+        drop - >fixnum r> drop r> dispatch
+    ] [
+        2drop r> call r> drop
+    ] if ; inline
+
+: dispatch-case-quot ( default assoc from to -- quot )
+    -roll -roll sort-keys values [ >quotation ] map
+    [ dispatch-case ] 2curry 2curry ;
+
+: case>quot ( default assoc -- quot )
     dup empty? [
         drop
     ] [
         dup length 4 <= [
-            case>quot
+            linear-case-quot
         ] [
-            hash-case-table hash-dispatch-quot
-            [ dup hashcode >fixnum ] swap append
+            dup keys contiguous-range? [
+                dispatch-case-quot
+            ] [
+                2drop hash-case-quot
+            ] if
         ] if
     ] if ;

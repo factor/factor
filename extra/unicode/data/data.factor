@@ -1,7 +1,15 @@
 USING: assocs math kernel sequences io.files hashtables
 quotations splitting arrays math.parser combinators.lib hash2
-byte-arrays words namespaces words compiler.units const ;
+byte-arrays words namespaces words compiler.units parser ;
 IN: unicode.data
+
+<<
+: VALUE:
+    CREATE dup reset-generic { f } clone [ first ] curry define ; parsing
+
+: set-value ( value word -- )
+    word-def first set-first ;
+>>
 
 ! Convenience functions
 : 1+* ( n/f _ -- n+1 )

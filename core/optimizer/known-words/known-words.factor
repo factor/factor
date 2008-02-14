@@ -8,7 +8,7 @@ assocs quotations sequences.private io.binary io.crc32
 io.streams.string layouts splitting math.intervals
 math.floats.private tuples tuples.private classes
 optimizer.def-use optimizer.backend optimizer.pattern-match
-float-arrays sequences.private combinators ;
+optimizer.inlining float-arrays sequences.private combinators ;
 
 ! the output of <tuple> and <tuple-boa> has the class which is
 ! its second-to-last input

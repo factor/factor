@@ -74,6 +74,12 @@ nl
     malloc free memcpy
 } compile
 
-[ compiled-usages recompile ] recompile-hook set-global
+: enable-compiler ( -- )
+    [ compiled-usages recompile ] recompile-hook set-global ;
+
+: disable-compiler ( -- )
+    [ [ f ] { } map>assoc modify-code-heap ] recompile-hook set-global ;
+
+enable-compiler
 
 " done" print flush
