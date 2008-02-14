@@ -59,6 +59,7 @@ VAR: stamp
 : bootstrap ( -- desc )
   <process*>
     bootstrap-cmd >>arguments
+    +closed+      >>stdin
     "../boot-log" >>stdout
     +stdout+      >>stderr
     20 minutes>ms >>timeout
@@ -89,24 +90,8 @@ VAR: stamp
 
     [ my-arch download-image ] [ "Image download error" print throw ] recover
 
-    ! bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
+    bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
-!     bootstrap
-!       <process-stream> dup dispose process-stream-process wait-for-process
-!     zero? not
-!       [ "Bootstrap error" print "../boot-log" cat "bootstrap error" throw ]
-!     when
-
-    [
-      bootstrap
-        <process-stream> dup dispose process-stream-process wait-for-process
-      zero? not
-        [ "bootstrap non-zero" throw ]
-      when
-    ]
-    [ "Bootstrap error" print "../boot-log" cat "bootstrap" throw ]
-    recover
-        
     [ builder-test try-process ]
     [ "Builder test error" print throw ]
     recover
