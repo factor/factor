@@ -145,9 +145,6 @@ M: #call-label detect-loops*
 : clone-node ( node -- newnode )
     clone dup [ clone ] modify-values ;
 
-: detach-node-successor ( node -- successor )
-    dup node-successor #terminate rot set-node-successor ;
-
 ! BEFORE
 !
 !         #if ----> #merge ----> B ----> #return/#values
@@ -260,6 +257,9 @@ M: #dispatch optimize-node*
             node-successor find-final-if
         ] if
     ] when ;
+
+: detach-node-successor ( node -- successor )
+    dup node-successor #terminate rot set-node-successor ;
 
 : lift-loop-tail? ( #label -- tail/f )
     dup node-successor node-successor [

@@ -301,3 +301,15 @@ TUPLE: silly-tuple a b ;
 [ t ] [ \ array \ nth-unsafe should-inline? ] unit-test
 [ t ] [ \ growable \ nth-unsafe should-inline? ] unit-test
 [ t ] [ \ sbuf \ set-nth-unsafe should-inline? ] unit-test
+
+! Regression
+: lift-throw-tail-regression
+    dup integer? [ "an integer" ] [
+        dup string? [ "a string" ] [
+            "error" throw
+        ] if
+    ] if ;
+
+[ t ] [ \ lift-throw-tail-regression compiled? ] unit-test
+[ 3 "an integer" ] [ 3 lift-throw-tail-regression ] unit-test
+[ "hi" "a string" ] [ "hi" lift-throw-tail-regression ] unit-test
