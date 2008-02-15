@@ -180,7 +180,7 @@ SYMBOL: builder-recipients
 : build-loop ( -- )
   builds-check
   [
-    builds cd
+    builds "/factor" append cd
     updates-available?
       [ build ]
     when
