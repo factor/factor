@@ -25,9 +25,7 @@ M: sqlite-db dispose ( db -- ) dispose-db ;
 TUPLE: sqlite-statement ;
 C: <sqlite-statement> sqlite-statement
 
-TUPLE: sqlite-result-set ;
-: <sqlite-result-set> ( query -- sqlite-result-set )
-    dup statement-handle sqlite-result-set <result-set> ;
+TUPLE: sqlite-result-set has-more? ;
 
 M: sqlite-db <simple-statement> ( str -- obj )
     <prepared-statement> ;
@@ -52,8 +50,12 @@ M: sqlite-statement bind-statement* ( triples statement -- )
 M: sqlite-statement reset-statement ( statement -- )
     statement-handle sqlite-reset ;
 
-M: sqlite-statement execute-statement ( statement -- )
-    statement-handle sqlite-next drop ;
+: last-insert-id ( -- id )
+    db get db-handle sqlite3_last_insert_rowid
+    dup zero? [ "last-id failed" throw ] when ;
+
+M: sqlite-statement insert-statement ( statement -- id )
+    execute-statement last-insert-id ;
 
 M: sqlite-result-set #columns ( result-set -- n )
     result-set-handle sqlite-#columns ;
@@ -61,11 +63,19 @@ M: sqlite-result-set #columns ( result-set -- n )
 M: sqlite-result-set row-column ( result-set n -- obj )
     >r result-set-handle r> sqlite-column ;
 
-M: sqlite-result-set advance-row ( result-set -- handle ? )
-    result-set-handle sqlite-next ;
+M: sqlite-result-set row-column-typed ( result-set n type -- obj )
+    >r result-set-handle r> sqlite-column-typed ;
+
+M: sqlite-result-set advance-row ( result-set -- )
+    [ result-set-handle sqlite-next ] keep
+    set-sqlite-result-set-has-more? ;
+
+M: sqlite-result-set more-rows? ( result-set -- ? )
+    sqlite-result-set-has-more? ;
 
 M: sqlite-statement query-results ( query -- result-set )
-    dup statement-handle sqlite-result-set <result-set> ;
+    dup statement-handle sqlite-result-set <result-set>
+    dup advance-row ;
 
 M: sqlite-db begin-transaction ( -- )
     "BEGIN" sql-command ;
@@ -86,9 +96,10 @@ M: sqlite-db create-sql ( columns table -- sql )
         ] interleave ")" %
     ] "" make ;
 
-M: sqlite-db drop-sql ( table -- sql )
+M: sqlite-db drop-sql ( columns table -- sql )
     [
         "drop table " % %
+        drop
     ] "" make ;
 
 M: sqlite-db insert-sql* ( columns table -- sql )
@@ -103,6 +114,10 @@ M: sqlite-db insert-sql* ( columns table -- sql )
         ")" %
     ] "" make ;
 
+: where-primary-key% ( columns -- )
+    " where " %
+    [ primary-key? ] find nip second dup % " = :" % % ;
+
 M: sqlite-db update-sql* ( columns table -- sql )
     [
         "update " %
@@ -110,8 +125,7 @@ M: sqlite-db update-sql* ( columns table -- sql )
         " set " %
         dup remove-id
         [ ", " % ] [ second dup % " = :" % % ] interleave
-        " where " %
-        [ primary-key? ] find nip second dup % " = :" % %
+        where-primary-key%
     ] "" make ;
 
 M: sqlite-db delete-sql* ( columns table -- sql )
@@ -122,13 +136,18 @@ M: sqlite-db delete-sql* ( columns table -- sql )
         first second dup % " = :" % %
     ] "" make ;
 
-M: sqlite-db select-sql* ( columns table -- sql )
+: select-interval ( interval name -- )
+    ;
+
+: select-sequence ( seq name -- )
+    ;
+
+M: sqlite-db select-sql ( columns table -- sql )
     [
         "select ROWID, " %
-        swap [ ", " % ] [ second % ] interleave
-        " from " %
-        %
-        " where ROWID = :ID" %
+        over [ ", " % ] [ second % ] interleave
+        " from " % %
+        " where " %
     ] "" make ;
 
 M: sqlite-db tuple>params ( columns tuple -- obj )
@@ -137,10 +156,6 @@ M: sqlite-db tuple>params ( columns tuple -- obj )
         dupd >r first r> get-slot-named swap
         third 3array
     ] curry map ;
-    
-M: sqlite-db last-id ( -- id )
-    db get db-handle sqlite3_last_insert_rowid ;
-
 
 : sqlite-db-modifiers ( -- hashtable )
     H{
@@ -167,6 +182,7 @@ M: sqlite-db sql-modifiers* ( modifiers -- str )
 : sqlite-type-hash ( -- assoc )
     H{
         { INTEGER "integer" }
+        { SERIAL "integer" }
         { TEXT "text" }
         { VARCHAR "text" }
         { DOUBLE "real" }
@@ -182,4 +198,3 @@ M: sqlite-db >sql-type ( obj -- str )
 ! HOOK: get-column-value ( n result-set type -- )
 ! M: sqlite get-column-value { { "TEXT" get-text-column } { 
 ! "INTEGER" get-integer-column } ... } case ;
-

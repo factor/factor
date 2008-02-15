@@ -345,7 +345,7 @@ M: object infer-call
 \ <word> { object object } { word } <effect> set-primitive-effect
 \ <word> make-flushable
 
-\ word-xt { word } { integer } <effect> set-primitive-effect
+\ word-xt { word } { integer integer } <effect> set-primitive-effect
 \ word-xt make-flushable
 
 \ getenv { fixnum } { object } <effect> set-primitive-effect

@@ -1,5 +1,5 @@
 USING: kernel math math.constants math.functions math.intervals
-math.vectors namespaces sequences ;
+math.vectors namespaces sequences combinators.cleave ;
 IN: math.analysis
 
 <PRIVATE
@@ -108,3 +108,12 @@ PRIVATE>
         swap -1.0 * exp
         *
     ] if ;
+
+! James Stirling's approximation for N!:
+! http://www.csse.monash.edu.au/~lloyd/tildeAlgDS/Numerical/Stirling/
+
+: stirling-fact ( n -- fact )
+    [ pi 2 * * sqrt ]
+    [ dup e / swap ^ ]
+    [ 12 * recip 1 + ]
+    tri * * ;

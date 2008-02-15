@@ -1,12 +1,12 @@
 USING: help.markup help.syntax io.encodings strings ;
-IN: io.utf8
+IN: io.encodings.utf8
 
-ARTICLE: "io.utf8" "Working with UTF8-encoded data"
+ARTICLE: "io.encodings.utf8" "Working with UTF8-encoded data"
 "The UTF8 encoding is a variable-width encoding. 7-bit ASCII characters are encoded as single bytes, and other Unicode code points are encoded as 2 to 4 byte sequences."
 { $subsection encode-utf8 }
 { $subsection decode-utf8 } ;
 
-ABOUT: "io.utf8"
+ABOUT: "io.encodings.utf8"
 
 HELP: decode-utf8
 { $values { "seq" "a sequence of bytes" } { "str" string } }

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io.encodings strings ;
-IN: io.utf16
+IN: io.encodings.utf16
 
 ARTICLE: "io.utf16" "Working with UTF16-encoded data"
 "The UTF16 encoding is a variable-width encoding. Unicode code points are encoded as 2 or 4 byte sequences."

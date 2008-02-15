@@ -3,71 +3,43 @@ USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
        arrays system continuations namespaces sequences splitting math.parser
        prettyprint tools.time calendar bake vars http.client
        combinators bootstrap.image bootstrap.image.download
-       combinators.cleave ;
+       combinators.cleave benchmark
+       classes strings quotations words parser-combinators new-slots accessors
+       assocs.lib smtp builder.util ;
 
 IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: runtime ( quot -- time ) benchmark nip ;
+SYMBOL: builds-dir
+
+: builds ( -- path )
+  builds-dir get
+  home "/builds" append
+  or ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: builder-recipients
-
-: host-name* ( -- name ) host-name "." split first ;
-
-: tag-subject ( str -- str ) `{ "builder@" ,[ host-name* ] ": " , } concat ;
-
-: email-string ( subject -- )
-  `{ "mutt" "-s" ,[ tag-subject ] %[ builder-recipients get ] }
-  [ ] with-process-stream drop ;
-
-: email-file ( subject file -- )
-  `{
-    { +stdin+ , }
-    { +arguments+
-      { "mutt" "-s" ,[ tag-subject ] %[ builder-recipients get ] } }
-  }
-  >hashtable run-process drop ;
+: prepare-build-machine ( -- )
+  builds make-directory
+  builds cd
+  { "git" "clone" "git://factorcode.org/git/factor.git" } run-process drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: target ( -- target ) `{ ,[ os ] %[ cpu "." split ] } "-" join ;
+: builds-check ( -- ) builds exists? not [ prepare-build-machine ] when ;
 
-: factor-binary ( -- name )
-  os
-  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
-    { "winnt" [ "./factor-nt.exe" ] }
-    [ drop "./factor" ] }
-  case ;
-
-: git-pull ( -- desc )
-  {
-    "git"
-    "pull"
-    "--no-summary"
-    "git://factorcode.org/git/factor.git"
-    "master"
-  } ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : git-clone ( -- desc ) { "git" "clone" "../factor" } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: datestamp ( -- string )
-  now `{ ,[ dup timestamp-year   ]
-         ,[ dup timestamp-month  ]
-         ,[ dup timestamp-day    ]
-         ,[ dup timestamp-hour   ]
-         ,[     timestamp-minute ] }
-  [ pad-00 ] map "-" join ;
-
 VAR: stamp
 
 : enter-build-dir ( -- )
   datestamp >stamp
-  "/builds" cd
+  builds cd
   stamp> make-directory
   stamp> cd ;
 
@@ -80,57 +52,59 @@ VAR: stamp
 
 : make-clean ( -- desc ) { "make" "clean" } ;
 
-: make-vm ( -- )
-  `{
-     { +arguments+ { "make" ,[ target ] } }
-     { +stdout+    "../compile-log" }
-     { +stderr+    +stdout+ }
-   }
-  >hashtable ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: target ( -- target ) { os [ cpu "." split ] } to-strings "-" join ;
+
+: make-vm ( -- desc )
+  <process*>
+    { "make" target } to-strings >>arguments
+    "../compile-log"             >>stdout
+    +stdout+                     >>stderr
+  >desc ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: factor-binary ( -- name )
+  os
+  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
+    { "winnt"  [ "./factor-nt.exe" ] }
+    [ drop       "./factor" ] }
+  case ;
+
+: bootstrap-cmd ( -- cmd )
+  { factor-binary [ "-i=" my-boot-image-name append ] "-no-user-init" }
+  to-strings ;
 
 : bootstrap ( -- desc )
-  `{
-     { +arguments+ {
-                     ,[ factor-binary ]
-                     ,[ "-i=" my-boot-image-name append ]
-                     "-no-user-init"
-                   } }
-     { +stdout+   "../boot-log" }
-     { +stderr+   +stdout+ }
-   }
-  >hashtable ;
+  <process*>
+    bootstrap-cmd >>arguments
+    +closed+      >>stdin
+    "../boot-log" >>stdout
+    +stdout+      >>stderr
+    20 minutes>ms >>timeout
+  >desc ;
 
-: builder-test ( -- desc ) `{ ,[ factor-binary ] "-run=builder.test" } ;
+: builder-test ( -- desc ) { factor-binary "-run=builder.test" } to-strings ;
   
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 SYMBOL: build-status
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: milli-seconds>time ( n -- string )
-  1000 /i 60 /mod >r 60 /mod r> 3array [ pad-00 ] map ":" join ;
-
-: eval-file ( file -- obj ) <file-reader> contents eval ;
-  
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: cat ( file -- ) <file-reader> contents print ;
-
-: run-or-bail ( desc quot -- )
-  [ [ try-process ] curry ]
-  [ [ throw       ] curry ]
-  bi*
-  recover ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : (build) ( -- )
+
+  builds-check  
+
+  build-status off
 
   enter-build-dir
 
   "report" [
 
     "Build machine:   " write host-name print
-    "Build directory: " write cwd       print
+    "CPU:             " write cpu       print
+    "OS:              " write os        print
+    "Build directory: " write cwd       print nl
 
     git-clone [ "git clone failed" print ] run-or-bail
 
@@ -142,7 +116,7 @@ SYMBOL: build-status
 
     make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
 
-    [ my-arch download-image ] [ "Image download error" print throw ] recover
+    [ retrieve-image ] [ "Image download error" print throw ] recover
 
     bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
@@ -152,20 +126,50 @@ SYMBOL: build-status
 
     "Boot time: " write "../boot-time" eval-file milli-seconds>time print
     "Load time: " write "../load-time" eval-file milli-seconds>time print
-    "Test time: " write "../test-time" eval-file milli-seconds>time print
+    "Test time: " write "../test-time" eval-file milli-seconds>time print nl
 
     "Did not pass load-everything: " print "../load-everything-vocabs" cat
     "Did not pass test-all: "        print "../test-all-vocabs"        cat
 
-  ] with-file-out ;
+    "Benchmarks: " print
+    "../benchmarks" [ stdio get contents eval ] with-file-in benchmarks.
 
-: build ( -- )
-  [ (build) ] [ drop ] recover
-  "report" "../report" email-file ;
+  ] with-file-out
+
+  build-status on ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: minutes>ms ( min -- ms ) 60 * 1000 * ;
+SYMBOL: builder-from
+
+SYMBOL: builder-recipients
+
+: tag-subject ( str -- str ) { "builder@" host-name* ": " , } bake to-string ;
+
+: subject ( -- str ) build-status get [ "report" ] [ "error" ] if tag-subject ;
+
+: send-builder-email ( -- )
+  <email>
+    builder-from get        >>from
+    builder-recipients get  >>to
+    subject                 >>subject
+    "../report" file>string >>body
+  send ;
+
+: build ( -- )
+  [ (build) ] [ drop ] recover
+  [ send-builder-email ] [ drop "not sending mail" . ] recover ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: git-pull ( -- desc )
+  {
+    "git"
+    "pull"
+    "--no-summary"
+    "git://factorcode.org/git/factor.git"
+    "master"
+  } ;
 
 : updates-available? ( -- ? )
   git-id
@@ -174,8 +178,9 @@ SYMBOL: build-status
   = not ;
 
 : build-loop ( -- )
+  builds-check
   [
-    "/builds/factor" cd
+    builds "/factor" append cd
     updates-available?
       [ build ]
     when

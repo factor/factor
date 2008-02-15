@@ -30,7 +30,7 @@ IN: compiler
 
 : compile-succeeded ( word -- effect dependencies )
     [
-        dup word-dataflow >r swap dup r> optimize generate
+        [ word-dataflow optimize ] keep dup generate
     ] computing-dependencies ;
 
 : compile-failed ( word error -- )

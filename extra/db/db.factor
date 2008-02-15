@@ -1,32 +1,29 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations kernel math
-namespaces sequences sequences.lib tuples words ;
+namespaces sequences sequences.lib tuples words strings ;
 IN: db
 
-TUPLE: db handle insert-statements update-statements delete-statements select-statements ;
+TUPLE: db handle insert-statements update-statements delete-statements ;
 : <db> ( handle -- obj )
-    H{ } clone
-    H{ } clone
-    H{ } clone
-    H{ } clone
+    H{ } clone H{ } clone H{ } clone
     db construct-boa ;
 
 GENERIC: db-open ( db -- )
 HOOK: db-close db ( handle -- )
 
-: dispose-statements [ dispose drop ] assoc-each ;
+: dispose-statements ( seq -- )
+    [ dispose drop ] assoc-each ;
 
 : dispose-db ( db -- ) 
     dup db [
         dup db-insert-statements dispose-statements
         dup db-update-statements dispose-statements
         dup db-delete-statements dispose-statements
-        dup db-select-statements dispose-statements
         db-handle db-close
     ] with-variable ;
 
-TUPLE: statement sql params handle bound? ;
+TUPLE: statement sql params handle bound? slot-names ;
 TUPLE: simple-statement ;
 TUPLE: prepared-statement ;
 
@@ -35,7 +32,17 @@ HOOK: <prepared-statement> db ( str -- statement )
 GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( obj statement -- )
 GENERIC: reset-statement ( statement -- )
-GENERIC: execute-statement ( statement -- )
+GENERIC: insert-statement ( statement -- id )
+
+TUPLE: result-set sql params handle n max ;
+GENERIC: query-results ( query -- result-set )
+GENERIC: #rows ( result-set -- n )
+GENERIC: #columns ( result-set -- n )
+GENERIC# row-column 1 ( result-set n -- obj )
+GENERIC: advance-row ( result-set -- )
+GENERIC: more-rows? ( result-set -- ? )
+
+: execute-statement ( statement -- ) query-results dispose ;
 
 : bind-statement ( obj statement -- )
     dup statement-bound? [ dup reset-statement ] when
@@ -43,19 +50,9 @@ GENERIC: execute-statement ( statement -- )
     [ set-statement-params ] keep
     t swap set-statement-bound? ;
 
-TUPLE: result-set sql params handle n max ;
-
-GENERIC: query-results ( query -- result-set )
-GENERIC: #rows ( result-set -- n )
-GENERIC: #columns ( result-set -- n )
-GENERIC# row-column 1 ( result-set n -- obj )
-GENERIC: advance-row ( result-set -- ? )
-
-HOOK: last-id db ( -- id )
-
 : init-result-set ( result-set -- )
     dup #rows over set-result-set-max
-    -1 swap set-result-set-n ;
+    0 swap set-result-set-n ;
 
 : <result-set> ( query handle tuple -- result-set )
     >r >r { statement-sql statement-params } get-slots r>
@@ -69,10 +66,10 @@ HOOK: last-id db ( -- id )
     dup #columns [ row-column ] with map ;
 
 : query-each ( statement quot -- )
-    over advance-row [
-        2drop
+    over more-rows? [
+        [ call ] 2keep over advance-row query-each
     ] [
-        [ call ] 2keep query-each
+        2drop
     ] if ; inline
 
 : query-map ( statement quot -- seq )
@@ -93,11 +90,6 @@ HOOK: last-id db ( -- id )
 : do-bound-command ( obj query -- )
     [ bind-statement ] keep execute-statement ;
 
-: sql-query ( sql -- rows )
-    <simple-statement> [ do-query ] with-disposal ;
-
-: sql-command ( sql -- )
-    <simple-statement> [ execute-statement ] with-disposal ;
 
 SYMBOL: in-transaction
 HOOK: begin-transaction db ( -- )
@@ -111,3 +103,15 @@ HOOK: rollback-transaction db ( -- )
         begin-transaction
         [ ] [ rollback-transaction ] cleanup commit-transaction
     ] with-variable ;
+
+: sql-query ( sql -- rows )
+    <simple-statement> [ do-query ] with-disposal ;
+
+: sql-command ( sql -- )
+    dup string? [
+        <simple-statement> [ execute-statement ] with-disposal
+    ] [
+        ! [
+            [ sql-command ] each
+        ! ] with-transaction
+    ] if ;

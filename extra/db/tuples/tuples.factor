@@ -38,12 +38,28 @@ TUPLE: no-slot-named ;
     [ db-table dupd ] swap
     [ <prepared-statement> ] 3compose cache nip ; inline
 
-HOOK: create-sql db ( columns table -- sql )
-HOOK: drop-sql db ( table -- sql )
-HOOK: insert-sql* db ( columns table -- sql )
-HOOK: update-sql* db ( columns table -- sql )
-HOOK: delete-sql* db ( columns table -- sql )
-HOOK: select-sql* db ( columns table -- sql )
+HOOK: create-sql db ( columns table -- seq )
+HOOK: drop-sql db ( columns table -- seq )
+
+HOOK: insert-sql* db ( columns table -- slot-names sql )
+HOOK: update-sql* db ( columns table -- slot-names sql )
+HOOK: delete-sql* db ( columns table -- slot-names sql )
+HOOK: select-sql db ( tuple -- statement )
+
+HOOK: row-column-typed db ( result-set n type -- sql )
+HOOK: sql-type>factor-type db ( obj type -- obj )
+HOOK: tuple>params db ( columns tuple -- obj )
+
+
+HOOK: make-slot-names* db ( quot -- seq )
+HOOK: column-slot-name% db ( spec -- )
+HOOK: column-bind-name% db ( spec -- )
+
+: make-slots-names ( quot -- seq str )
+    [ make-column-names ] "" make ; inline
+: slot-name% ( seq -- ) first % ;
+: column-name% ( seq -- ) second % ;
+: column-type% ( seq -- ) third % ;
 
 : insert-sql ( columns class -- statement )
     db get db-insert-statements [ insert-sql* ] cache-statement ;
@@ -54,30 +70,29 @@ HOOK: select-sql* db ( columns table -- sql )
 : delete-sql ( columns class -- statement )
     db get db-delete-statements [ delete-sql* ] cache-statement ;
 
-: select-sql ( columns class -- statement )
-    db get db-select-statements [ select-sql* ] cache-statement ;
-
-HOOK: tuple>params db ( columns tuple -- obj )
 
 : tuple-statement ( columns tuple quot -- statement )
     >r [ tuple>params ] 2keep class r> call
     2dup . .
     [ bind-statement ] keep ;
 
-: do-tuple-statement ( tuple columns-quot statement-quot -- )
+: make-tuple-statement ( tuple columns-quot statement-quot -- statement )
     >r [ class db-columns ] swap compose keep
-    r> tuple-statement execute-statement ;
+    r> tuple-statement ;
+
+: do-tuple-statement ( tuple columns-quot statement-quot -- )
+    make-tuple-statement execute-statement ;
 
 : create-table ( class -- )
     dup db-columns swap db-table create-sql sql-command ;
     
 : drop-table ( class -- )
-    db-table drop-sql sql-command ;
+    dup db-columns swap db-table drop-sql sql-command ;
 
 : insert-tuple ( tuple -- )
     [
-        [ maybe-remove-id ] [ insert-sql ] do-tuple-statement
-        last-id
+        [ maybe-remove-id ] [ insert-sql ]
+        make-tuple-statement insert-statement
     ] keep set-primary-key ;
 
 : update-tuple ( tuple -- )
@@ -86,8 +101,8 @@ HOOK: tuple>params db ( columns tuple -- obj )
 : delete-tuple ( tuple -- )
     [ [ primary-key? ] subset ] [ delete-sql ] do-tuple-statement ;
 
-! : select-tuple ( tuple -- )
-  !  [ select-sql ] bind-tuple do-query ;
+: select-tuple ( tuple -- )
+    [ select-sql ] keep do-query ;
 
 : persist ( tuple -- )
     dup primary-key [ update-tuple ] [ insert-tuple ] if ;

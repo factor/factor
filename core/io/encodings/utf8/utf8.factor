@@ -1,8 +1,10 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel sequences sbufs vectors
-namespaces io.encodings combinators ;
-IN: io.utf8
+USING: math kernel sequences sbufs vectors growable io continuations
+namespaces io.encodings combinators strings io.streams.c ;
+IN: io.encodings.utf8
+
+! Decoding UTF-8
 
 SYMBOL: double
 SYMBOL: triple
@@ -31,7 +33,7 @@ SYMBOL: quad3
 : end-multibyte ( buf byte ch -- buf ch state )
     f append-nums [ decoded ] unless* ;
 
-: (decode-utf8) ( buf byte ch state -- buf ch state )
+: decode-utf8-step ( buf byte ch state -- buf ch state )
     {
         { begin [ drop begin-utf8 ] }
         { double [ end-multibyte ] }
@@ -43,7 +45,9 @@ SYMBOL: quad3
     } case ;
 
 : decode-utf8 ( seq -- str )
-    [ -rot (decode-utf8) ] decode ;
+    [ decode-utf8-step ] decode ; 
+
+! Encoding UTF-8
 
 : encoded ( char -- )
     BIN: 111111 bitand BIN: 10000000 bitor , ;
@@ -70,3 +74,13 @@ SYMBOL: quad3
 
 : encode-utf8 ( str -- seq )
     [ [ char>utf8 ] each ] B{ } make ;
+
+! Interface for streams
+
+TUPLE: utf8 ;
+: <utf8> utf8 construct-delegate ;
+INSTANCE: utf8 encoding-stream 
+
+M: utf8 encode-string drop encode-utf8 ;
+M: utf8 decode-step drop decode-utf8-step ;
+! In the future, this should detect and ignore a BOM at the beginning

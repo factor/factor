@@ -1,7 +1,15 @@
 USING: assocs math kernel sequences io.files hashtables
 quotations splitting arrays math.parser combinators.lib hash2
-byte-arrays words namespaces words compiler.units const ;
+byte-arrays words namespaces words compiler.units parser ;
 IN: unicode.data
+
+<<
+: VALUE:
+    CREATE dup reset-generic { f } clone [ first ] curry define ; parsing
+
+: set-value ( value word -- )
+    word-def first set-first ;
+>>
 
 ! Convenience functions
 : 1+* ( n/f _ -- n+1 )
@@ -59,7 +67,7 @@ IN: unicode.data
 : process-combining ( data -- hash )
     3 swap (process-data)
     [ string>number ] assoc-map
-    [ nip 0 = not ] assoc-subset
+    [ nip zero? not ] assoc-subset
     >hashtable ;
 
 : categories ( -- names )
@@ -85,13 +93,10 @@ IN: unicode.data
 : ascii-lower ( string -- lower )
     [ dup CHAR: A CHAR: Z between? [ HEX: 20 + ] when ] map ;
 
-: replace ( seq old new -- newseq )
-    swap rot [ 2dup = [ drop over ] when ] map 2nip ;
-
 : process-names ( data -- names-hash )
-    1 swap (process-data)
-    [ ascii-lower CHAR: \s CHAR: - replace swap ] assoc-map
-    >hashtable ;
+    1 swap (process-data) [
+        ascii-lower { { CHAR: \s CHAR: - } } substitute swap
+    ] assoc-map >hashtable ;
 
 : multihex ( hexstring -- string )
     " " split [ hex> ] map [ ] subset ;

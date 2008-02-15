@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax arrays kernel math
-namespaces sequences io.utf8 x11.xlib x11.constants ;
+namespaces sequences io.encodings.utf8 x11.xlib x11.constants ;
 IN: x11.clipboard
 
 ! This code was based on by McCLIM's Backends/CLX/port.lisp
