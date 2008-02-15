@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io words alien kernel math.parser alien.syntax
 io.launcher system assocs arrays sequences namespaces qualified
-regexp system math ;
+regexp system math sequences.lib ;
 QUALIFIED: unix
 IN: tools.disassembler
 
@@ -36,7 +36,7 @@ M: pair make-disassemble-cmd
     R/ 0x.*:.*/ matches? ;
 
 : tabs>spaces ( str -- str' )
-    [ dup CHAR: \t = [ drop CHAR: \s ] when ] map ;
+    CHAR: \t CHAR: \s replace ;
 
 : disassemble ( word -- )
     make-disassemble-cmd run-gdb
