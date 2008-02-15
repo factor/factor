@@ -69,13 +69,19 @@ VAR: stamp
   
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+SYMBOL: build-status
+
 : (build) ( -- )
+
+  build-status off
 
   enter-build-dir
 
   "report" [
 
     "Build machine:   " write host-name print
+    "CPU:             " write cpu       print
+    "OS:              " write os        print
     "Build directory: " write cwd       print
 
     git-clone [ "git clone failed" print ] run-or-bail
@@ -88,7 +94,7 @@ VAR: stamp
 
     make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
 
-    [ my-arch download-image ] [ "Image download error" print throw ] recover
+    [ retrieve-image ] [ "Image download error" print throw ] recover
 
     bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
@@ -106,7 +112,9 @@ VAR: stamp
     "Benchmarks: " print
     "../benchmarks" [ stdio get contents eval ] with-file-in benchmarks.
 
-  ] with-file-out ;
+  ] with-file-out
+
+  build-status on ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -114,12 +122,14 @@ SYMBOL: builder-recipients
 
 : tag-subject ( str -- str ) { "builder@" host-name* ": " , } bake to-string ;
 
+: subject ( -- str ) build-status get [ "report" ] [ "error" ] if ;
+
 : build ( -- )
   [ (build) ] [ drop ] recover
   <email>
     "ed@factorcode.org"     >>from
     builder-recipients get  >>to
-    "report" tag-subject    >>subject
+    subject                 >>subject
     "../report" file>string >>body
   send ;
 

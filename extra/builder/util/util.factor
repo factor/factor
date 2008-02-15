@@ -81,3 +81,6 @@ TUPLE: process* arguments stdin stdout stderr timeout ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+USING: bootstrap.image bootstrap.image.download io.streams.null ;
+
+: retrieve-image ( -- ) [ my-arch download-image ] with-null-stream ;
