@@ -11,6 +11,28 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+SYMBOL: builds-dir
+
+: builds ( -- path )
+  builds-dir get
+  home "/builds" append
+  or ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! User also needs to set smtp-host and builder-recipients
+
+: prepare-build-machine ( -- )
+  builds make-directory
+  builds cd
+  { "git" "clone" "git://factorcode.org/git/factor.git" } run-process drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: builds-check ( -- ) builds exists? not [ prepare-build-machine ] when ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : git-clone ( -- desc ) { "git" "clone" "../factor" } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -19,7 +41,7 @@ VAR: stamp
 
 : enter-build-dir ( -- )
   datestamp >stamp
-  "/builds" cd
+  builds cd
   stamp> make-directory
   stamp> cd ;
 
@@ -75,6 +97,8 @@ SYMBOL: build-status
 
   build-status off
 
+  builds-check
+
   enter-build-dir
 
   "report" [
@@ -118,20 +142,25 @@ SYMBOL: build-status
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+SYMBOL: builder-from
+
 SYMBOL: builder-recipients
 
 : tag-subject ( str -- str ) { "builder@" host-name* ": " , } bake to-string ;
 
-: subject ( -- str ) build-status get [ "report" ] [ "error" ] if ;
+: subject ( -- str ) build-status get [ "report" ] [ "error" ] if tag-subject ;
 
-: build ( -- )
-  [ (build) ] [ drop ] recover
+: send-builder-email ( -- )
   <email>
-    "ed@factorcode.org"     >>from
+    builder-from get        >>from
     builder-recipients get  >>to
     subject                 >>subject
     "../report" file>string >>body
   send ;
+
+: build ( -- )
+  [ (build) ] [ drop ] recover
+  [ send-builder-email ] [ "not sending mail" . ] recover ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
