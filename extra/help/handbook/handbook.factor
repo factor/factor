@@ -161,15 +161,20 @@ ARTICLE: "io" "Input and output"
 { $subsection "io.timeouts" } ;
 
 ARTICLE: "tools" "Developer tools"
-{ $subsection "tools.annotations" }
-{ $subsection "tools.crossref" }
+"Exploratory tools:"
 { $subsection "editor" }
+{ $subsection "tools.crossref" }
 { $subsection "inspector" }
+"Debugging tools:"
+{ $subsection "tools.annotations" }
+{ $subsection "tools.test" }
 { $subsection "meta-interpreter" }
+"Performance tools:"
 { $subsection "tools.memory" }
 { $subsection "profiling" }
-{ $subsection "tools.test" }
 { $subsection "timing" }
+{ $subsection "tools.disassembler" }
+"Deployment tools:"
 { $subsection "tools.deploy" } ;
 
 ARTICLE: "article-index" "Article index"

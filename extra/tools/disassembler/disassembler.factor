@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io words alien kernel math.parser alien.syntax
 io.launcher system assocs arrays sequences namespaces qualified
-regexp system math sequences.lib windows.kernel32 ;
+system math sequences.lib windows.kernel32 generator.fixup ;
 IN: tools.disassembler
 
 : in-file "gdb-in.txt" resource-path ;
@@ -12,7 +12,7 @@ IN: tools.disassembler
 GENERIC: make-disassemble-cmd ( obj -- )
 
 M: word make-disassemble-cmd
-    word-xt cell - 2array make-disassemble-cmd ;
+    word-xt code-format - 2array make-disassemble-cmd ;
 
 M: pair make-disassemble-cmd
     in-file [
@@ -30,12 +30,9 @@ M: pair make-disassemble-cmd
     ] { } make-assoc run-process drop
     out-file file-lines ;
 
-: relevant? ( line -- ? )
-    R/ 0x.*:.*/ matches? ;
-
 : tabs>spaces ( str -- str' )
     CHAR: \t CHAR: \s replace ;
 
 : disassemble ( word -- )
     make-disassemble-cmd run-gdb
-    [ relevant? ] subset [ tabs>spaces ] map [ print ] each ;
+    [ tabs>spaces ] map [ print ] each ;
