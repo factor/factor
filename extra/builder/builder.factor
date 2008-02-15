@@ -97,8 +97,6 @@ SYMBOL: build-status
 
   build-status off
 
-  builds-check
-
   enter-build-dir
 
   "report" [
@@ -160,7 +158,7 @@ SYMBOL: builder-recipients
 
 : build ( -- )
   [ (build) ] [ drop ] recover
-  [ send-builder-email ] [ "not sending mail" . ] recover ;
+  [ send-builder-email ] [ drop "not sending mail" . ] recover ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -180,6 +178,7 @@ SYMBOL: builder-recipients
   = not ;
 
 : build-loop ( -- )
+  builds-check
   [
     "/builds/factor" cd
     updates-available?
