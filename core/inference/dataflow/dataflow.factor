@@ -317,4 +317,8 @@ UNION: #tail
     POSTPONE: f #return #tail-values #tail-merge #terminate ;
 
 : tail-call? ( -- ? )
-    node-stack get [ node-successor #tail? ] all? ;
+    #! We don't consider calls which do non-local exits to be
+    #! tail calls, because this gives better error traces.
+    node-stack get [
+        node-successor dup #tail? swap #terminate? not and
+    ] all? ;

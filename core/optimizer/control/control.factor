@@ -68,7 +68,7 @@ M: #label detect-loops* t swap set-#label-loop? ;
     node-stack get
     dup [ #label? ] find-last drop [ 1+ ] [ 0 ] if* tail
     [ node-successor #tail? ] all? ;
-
+USE: io
 : detect-loop ( seen-other? label node -- seen-other? continue? )
     #! seen-other?: have we seen another label?
     {
@@ -234,9 +234,12 @@ M: #if optimize-node*
 !     |
 !  #return 1
 
-: find-tail
-    dup node-successor #tail?
-    [ node-successor find-tail ] unless ;
+: find-tail ( node -- tail )
+    dup #terminate? [
+        dup node-successor #tail? [
+            node-successor find-tail
+        ] unless
+    ] unless ;
 
 : child-tails ( node -- seq )
     node-children [ find-tail ] map ;
@@ -246,14 +249,17 @@ GENERIC: add-loop-exit* ( label node -- )
 M: #branch add-loop-exit*
     child-tails [ add-loop-exit* ] with each ;
 
-M: #call-label add-loop-exit* drop ;
+M: #call-label add-loop-exit*
+    tuck node-param eq? [ drop ] [ node-successor , ] if ;
 
-M: node add-loop-exit* node-successor add-loop-exit* , ;
+M: #terminate add-loop-exit*
+    2drop ;
+
+M: node add-loop-exit*
+    nip node-successor dup #terminate? [ drop ] [ , ] if ;
 
 : find-loop-exits ( label node -- seq )
     [ add-loop-exit* ] { } make ;
-
-! ! ! !
 
 : find-final-if ( node -- #if/f )
     dup [
