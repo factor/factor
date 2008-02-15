@@ -32,6 +32,8 @@ $nl
     { { $snippet "with-" { $emphasis "foo" } } { "performs some kind of initialization and cleanup related to " { $snippet "foo" } ", usually in a new dynamic scope" } { $links with-scope with-stream } }
     { { $snippet "$" { $emphasis "foo" } } { "help markup" } { $links $heading $emphasis } }
 }
+{ $heading "Stack effect conventions" }
+"Stack effect conventions are documented in " { $link "effect-declaration" } "."
 { $heading "Glossary of terms" }
 "Common terminology and abbreviations used throughout Factor and its documentation:"
 { $table
@@ -110,15 +112,21 @@ USE: io.buffers
 ARTICLE: "collections" "Collections" 
 { $heading "Sequences" }
 { $subsection "sequences" }
-"Sequence implementations:"
+"Fixed-length sequences:"
 { $subsection "arrays" }
-{ $subsection "vectors" }
+{ $subsection "quotations" }
+"Fixed-length specialized sequences:"
+{ $subsection "strings" }
 { $subsection "bit-arrays" }
 { $subsection "byte-arrays" }
 { $subsection "float-arrays" }
-{ $subsection "strings" }
+"Resizable sequence:"
+{ $subsection "vectors" }
+"Resizable specialized sequences:"
 { $subsection "sbufs" }
-{ $subsection "quotations" }
+{ $subsection "bit-vectors" }
+{ $subsection "byte-vectors" }
+{ $subsection "float-vectors" }
 { $heading "Associative mappings" }
 { $subsection "assocs" }
 { $subsection "namespaces" }
@@ -131,22 +139,26 @@ ARTICLE: "collections" "Collections"
 { $subsection "graphs" }
 { $subsection "buffers" } ;
 
-USING: io.sockets io.launcher io.mmap ;
+USING: io.sockets io.launcher io.mmap io.monitors ;
 
 ARTICLE: "io" "Input and output" 
 { $subsection "streams" }
-"Stream implementations:"
+"External streams:"
 { $subsection "file-streams" }
+{ $subsection "network-streams" }
+"Wrapper streams:"
 { $subsection "io.streams.duplex" }
 { $subsection "io.streams.lines" }
 { $subsection "io.streams.plain" }
 { $subsection "io.streams.string" }
-"Advanced features:"
+"Stream utilities:"
 { $subsection "stream-binary" }
 { $subsection "styles" }
-{ $subsection "network-streams" }
+"Advanced features:"
 { $subsection "io.launcher" }
-{ $subsection "io.mmap" } ;
+{ $subsection "io.mmap" }
+{ $subsection "io.monitors" }
+{ $subsection "io.timeouts" } ;
 
 ARTICLE: "tools" "Developer tools"
 { $subsection "tools.annotations" }

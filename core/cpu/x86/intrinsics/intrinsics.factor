@@ -1,12 +1,13 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays cpu.x86.assembler cpu.x86.allot
-cpu.x86.architecture cpu.architecture kernel kernel.private math
-math.private namespaces quotations sequences
+USING: alien alien.accessors arrays cpu.x86.assembler
+cpu.x86.allot cpu.x86.architecture cpu.architecture kernel
+kernel.private math math.private namespaces quotations sequences
 words generic byte-arrays hashtables hashtables.private
 generator generator.registers generator.fixup sequences.private
 sbufs sbufs.private vectors vectors.private layouts system
-tuples.private strings.private slots.private compiler.constants ;
+tuples.private strings.private slots.private compiler.constants
+;
 IN: cpu.x86.intrinsics
 
 ! Type checks
@@ -152,34 +153,6 @@ IN: cpu.x86.intrinsics
 : small-reg-8 BL ; inline
 : small-reg-16 BX ; inline
 : small-reg-32 EBX ; inline
-
-\ char-slot [
-    small-reg PUSH
-    "n" operand 2 SHR
-    small-reg dup XOR
-    "obj" operand "n" operand ADD
-    small-reg-16 "obj" operand string-offset [+] MOV
-    small-reg %tag-fixnum
-    "obj" operand small-reg MOV
-    small-reg POP
-] H{
-    { +input+ { { f "n" } { f "obj" } } }
-    { +output+ { "obj" } }
-    { +clobber+ { "obj" "n" } }
-} define-intrinsic
-
-\ set-char-slot [
-    small-reg PUSH
-    "val" operand %untag-fixnum
-    "slot" operand 2 SHR
-    "obj" operand "slot" operand ADD
-    small-reg "val" operand MOV
-    "obj" operand string-offset [+] small-reg-16 MOV
-    small-reg POP
-] H{
-    { +input+ { { f "val" } { f "slot" } { f "obj" } } }
-    { +clobber+ { "val" "slot" "obj" } }
-} define-intrinsic
 
 ! Fixnums
 : fixnum-op ( op hash -- pair )
@@ -445,45 +418,6 @@ IN: cpu.x86.intrinsics
     { +input+ { { f "obj" } } }
     { +scratch+ { { f "wrapper" } } }
     { +output+ { "wrapper" } }
-} define-intrinsic
-
-\ (hashtable) [
-    hashtable 4 cells [
-        1 object@ f v>operand MOV
-        2 object@ f v>operand MOV
-        3 object@ f v>operand MOV
-        ! Store tagged ptr in reg
-        "hashtable" get object %store-tagged
-    ] %allot
-] H{
-    { +scratch+ { { f "hashtable" } } }
-    { +output+ { "hashtable" } }
-} define-intrinsic
-
-\ string>sbuf [
-    sbuf 3 cells [
-        1 object@ "length" operand MOV
-        2 object@ "string" operand MOV
-        ! Store tagged ptr in reg
-        "sbuf" get object %store-tagged
-    ] %allot
-] H{
-    { +input+ { { f "string" } { f "length" } } }
-    { +scratch+ { { f "sbuf" } } }
-    { +output+ { "sbuf" } }
-} define-intrinsic
-
-\ array>vector [
-    vector 3 cells [
-        1 object@ "length" operand MOV
-        2 object@ "array" operand MOV
-        ! Store tagged ptr in reg
-        "vector" get object %store-tagged
-    ] %allot
-] H{
-    { +input+ { { f "array" } { f "length" } } }
-    { +scratch+ { { f "vector" } } }
-    { +output+ { "vector" } }
 } define-intrinsic
 
 ! Alien intrinsics

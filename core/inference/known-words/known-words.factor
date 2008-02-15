@@ -1,15 +1,16 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays byte-arrays classes
-combinators.private continuations.private effects float-arrays
-generic hashtables hashtables.private inference.state
-inference.backend inference.dataflow io io.backend io.files
-io.files.private io.streams.c kernel kernel.private math
-math.private memory namespaces namespaces.private parser
-prettyprint quotations quotations.private sbufs sbufs.private
-sequences sequences.private slots.private strings
-strings.private system threads.private tuples tuples.private
-vectors vectors.private words words.private assocs inspector ;
+USING: alien alien.accessors arrays bit-arrays byte-arrays
+classes sequences.private continuations.private effects
+float-arrays generic hashtables hashtables.private
+inference.state inference.backend inference.dataflow io
+io.backend io.files io.files.private io.streams.c kernel
+kernel.private math math.private memory namespaces
+namespaces.private parser prettyprint quotations
+quotations.private sbufs sbufs.private sequences
+sequences.private slots.private strings strings.private system
+threads.private tuples tuples.private vectors vectors.private
+words words.private assocs inspector ;
 IN: inference.known-words
 
 ! Shuffle words
@@ -125,14 +126,10 @@ M: object infer-call
     pop-d pop-d swap <curried> push-d
 ] "infer" set-word-prop
 
-\ curry { object object } { curry } <effect> "inferred-effect" set-word-prop
-
 \ compose [
     2 ensure-values
     pop-d pop-d swap <composed> push-d
 ] "infer" set-word-prop
-
-\ compose { object object } { curry } <effect> "inferred-effect" set-word-prop
 
 ! Variadic tuple constructor
 \ <tuple-boa> [
@@ -141,444 +138,461 @@ M: object infer-call
     make-call-node
 ] "infer" set-word-prop
 
-! We need this for default-output-classes
-\ <tuple-boa> 2 { tuple } <effect> "inferred-effect" set-word-prop
-
 ! Non-standard control flow
-\ (throw) { callable } { } <effect>
-t over set-effect-terminated?
-"inferred-effect" set-word-prop
+\ (throw) [
+    \ (throw)
+    peek-d value-literal 2 + { } <effect>
+    t over set-effect-terminated?
+    make-call-node
+] "infer" set-word-prop
+
+:  set-primitive-effect ( word effect -- )
+    2dup effect-out "default-output-classes" set-word-prop
+    dupd [ make-call-node ] 2curry "infer" set-word-prop ;
 
 ! Stack effects for all primitives
-\ fixnum< { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
+\ fixnum< { fixnum fixnum } { object } <effect> set-primitive-effect
 \ fixnum< make-foldable
 
-\ fixnum<= { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
+\ fixnum<= { fixnum fixnum } { object } <effect> set-primitive-effect
 \ fixnum<= make-foldable
 
-\ fixnum> { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
+\ fixnum> { fixnum fixnum } { object } <effect> set-primitive-effect
 \ fixnum> make-foldable
 
-\ fixnum>= { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
+\ fixnum>= { fixnum fixnum } { object } <effect> set-primitive-effect
 \ fixnum>= make-foldable
 
-\ eq? { object object } { object } <effect> "inferred-effect" set-word-prop
+\ eq? { object object } { object } <effect> set-primitive-effect
 \ eq? make-foldable
 
-\ rehash-string { string } { } <effect> "inferred-effect" set-word-prop
+\ rehash-string { string } { } <effect> set-primitive-effect
 
-\ string>sbuf { string integer } { sbuf } <effect> "inferred-effect" set-word-prop
-\ string>sbuf make-flushable
-
-\ bignum>fixnum { bignum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ bignum>fixnum { bignum } { fixnum } <effect> set-primitive-effect
 \ bignum>fixnum make-foldable
 
-\ float>fixnum { float } { fixnum } <effect> "inferred-effect" set-word-prop
+\ float>fixnum { float } { fixnum } <effect> set-primitive-effect
 \ bignum>fixnum make-foldable
 
-\ fixnum>bignum { fixnum } { bignum } <effect> "inferred-effect" set-word-prop
+\ fixnum>bignum { fixnum } { bignum } <effect> set-primitive-effect
 \ fixnum>bignum make-foldable
 
-\ float>bignum { float } { bignum } <effect> "inferred-effect" set-word-prop
+\ float>bignum { float } { bignum } <effect> set-primitive-effect
 \ float>bignum make-foldable
 
-\ fixnum>float { fixnum } { float } <effect> "inferred-effect" set-word-prop
+\ fixnum>float { fixnum } { float } <effect> set-primitive-effect
 \ fixnum>float make-foldable
 
-\ bignum>float { bignum } { float } <effect> "inferred-effect" set-word-prop
+\ bignum>float { bignum } { float } <effect> set-primitive-effect
 \ bignum>float make-foldable
 
-\ <ratio> { integer integer } { ratio } <effect> "inferred-effect" set-word-prop
+\ <ratio> { integer integer } { ratio } <effect> set-primitive-effect
 \ <ratio> make-foldable
 
-\ string>float { string } { float } <effect> "inferred-effect" set-word-prop
+\ string>float { string } { float } <effect> set-primitive-effect
 \ string>float make-foldable
 
-\ float>string { float } { string } <effect> "inferred-effect" set-word-prop
+\ float>string { float } { string } <effect> set-primitive-effect
 \ float>string make-foldable
 
-\ float>bits { real } { integer } <effect> "inferred-effect" set-word-prop
+\ float>bits { real } { integer } <effect> set-primitive-effect
 \ float>bits make-foldable
 
-\ double>bits { real } { integer } <effect> "inferred-effect" set-word-prop
+\ double>bits { real } { integer } <effect> set-primitive-effect
 \ double>bits make-foldable
 
-\ bits>float { integer } { float } <effect> "inferred-effect" set-word-prop
+\ bits>float { integer } { float } <effect> set-primitive-effect
 \ bits>float make-foldable
 
-\ bits>double { integer } { float } <effect> "inferred-effect" set-word-prop
+\ bits>double { integer } { float } <effect> set-primitive-effect
 \ bits>double make-foldable
 
-\ <complex> { real real } { complex } <effect> "inferred-effect" set-word-prop
+\ <complex> { real real } { complex } <effect> set-primitive-effect
 \ <complex> make-foldable
 
-\ fixnum+ { fixnum fixnum } { integer } <effect> "inferred-effect" set-word-prop
+\ fixnum+ { fixnum fixnum } { integer } <effect> set-primitive-effect
 \ fixnum+ make-foldable
 
-\ fixnum+fast { fixnum fixnum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum+fast { fixnum fixnum } { fixnum } <effect> set-primitive-effect
 \ fixnum+fast make-foldable
 
-\ fixnum- { fixnum fixnum } { integer } <effect> "inferred-effect" set-word-prop
+\ fixnum- { fixnum fixnum } { integer } <effect> set-primitive-effect
 \ fixnum- make-foldable
 
-\ fixnum-fast { fixnum fixnum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum-fast { fixnum fixnum } { fixnum } <effect> set-primitive-effect
 \ fixnum-fast make-foldable
 
-\ fixnum* { fixnum fixnum } { integer } <effect> "inferred-effect" set-word-prop
+\ fixnum* { fixnum fixnum } { integer } <effect> set-primitive-effect
 \ fixnum* make-foldable
 
-\ fixnum*fast { fixnum fixnum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum*fast { fixnum fixnum } { fixnum } <effect> set-primitive-effect
 \ fixnum*fast make-foldable
 
-\ fixnum/i { fixnum fixnum } { integer } <effect> "inferred-effect" set-word-prop
+\ fixnum/i { fixnum fixnum } { integer } <effect> set-primitive-effect
 \ fixnum/i make-foldable
 
-\ fixnum-mod { fixnum fixnum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum-mod { fixnum fixnum } { fixnum } <effect> set-primitive-effect
 \ fixnum-mod make-foldable
 
-\ fixnum/mod { fixnum fixnum } { integer fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum/mod { fixnum fixnum } { integer fixnum } <effect> set-primitive-effect
 \ fixnum/mod make-foldable
 
-\ fixnum-bitand { fixnum fixnum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum-bitand { fixnum fixnum } { fixnum } <effect> set-primitive-effect
 \ fixnum-bitand make-foldable
 
-\ fixnum-bitor { fixnum fixnum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum-bitor { fixnum fixnum } { fixnum } <effect> set-primitive-effect
 \ fixnum-bitor make-foldable
 
-\ fixnum-bitxor { fixnum fixnum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum-bitxor { fixnum fixnum } { fixnum } <effect> set-primitive-effect
 \ fixnum-bitxor make-foldable
 
-\ fixnum-bitnot { fixnum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum-bitnot { fixnum } { fixnum } <effect> set-primitive-effect
 \ fixnum-bitnot make-foldable
 
-\ fixnum-shift { fixnum fixnum } { integer } <effect> "inferred-effect" set-word-prop
+\ fixnum-shift { fixnum fixnum } { integer } <effect> set-primitive-effect
 \ fixnum-shift make-foldable
 
-\ fixnum-shift-fast { fixnum fixnum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum-shift-fast { fixnum fixnum } { fixnum } <effect> set-primitive-effect
 \ fixnum-shift-fast make-foldable
 
-\ bignum= { bignum bignum } { object } <effect> "inferred-effect" set-word-prop
+\ bignum= { bignum bignum } { object } <effect> set-primitive-effect
 \ bignum= make-foldable
 
-\ bignum+ { bignum bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum+ { bignum bignum } { bignum } <effect> set-primitive-effect
 \ bignum+ make-foldable
 
-\ bignum- { bignum bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum- { bignum bignum } { bignum } <effect> set-primitive-effect
 \ bignum- make-foldable
 
-\ bignum* { bignum bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum* { bignum bignum } { bignum } <effect> set-primitive-effect
 \ bignum* make-foldable
 
-\ bignum/i { bignum bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum/i { bignum bignum } { bignum } <effect> set-primitive-effect
 \ bignum/i make-foldable
 
-\ bignum-mod { bignum bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum-mod { bignum bignum } { bignum } <effect> set-primitive-effect
 \ bignum-mod make-foldable
 
-\ bignum/mod { bignum bignum } { bignum bignum } <effect> "inferred-effect" set-word-prop
+\ bignum/mod { bignum bignum } { bignum bignum } <effect> set-primitive-effect
 \ bignum/mod make-foldable
 
-\ bignum-bitand { bignum bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum-bitand { bignum bignum } { bignum } <effect> set-primitive-effect
 \ bignum-bitand make-foldable
 
-\ bignum-bitor { bignum bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum-bitor { bignum bignum } { bignum } <effect> set-primitive-effect
 \ bignum-bitor make-foldable
 
-\ bignum-bitxor { bignum bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum-bitxor { bignum bignum } { bignum } <effect> set-primitive-effect
 \ bignum-bitxor make-foldable
 
-\ bignum-bitnot { bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum-bitnot { bignum } { bignum } <effect> set-primitive-effect
 \ bignum-bitnot make-foldable
 
-\ bignum-shift { bignum bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum-shift { bignum bignum } { bignum } <effect> set-primitive-effect
 \ bignum-shift make-foldable
 
-\ bignum< { bignum bignum } { object } <effect> "inferred-effect" set-word-prop
+\ bignum< { bignum bignum } { object } <effect> set-primitive-effect
 \ bignum< make-foldable
 
-\ bignum<= { bignum bignum } { object } <effect> "inferred-effect" set-word-prop
+\ bignum<= { bignum bignum } { object } <effect> set-primitive-effect
 \ bignum<= make-foldable
 
-\ bignum> { bignum bignum } { object } <effect> "inferred-effect" set-word-prop
+\ bignum> { bignum bignum } { object } <effect> set-primitive-effect
 \ bignum> make-foldable
 
-\ bignum>= { bignum bignum } { object } <effect> "inferred-effect" set-word-prop
+\ bignum>= { bignum bignum } { object } <effect> set-primitive-effect
 \ bignum>= make-foldable
 
-\ bignum-bit? { bignum integer } { object } <effect> "inferred-effect" set-word-prop
+\ bignum-bit? { bignum integer } { object } <effect> set-primitive-effect
 \ bignum-bit? make-foldable
 
-\ bignum-log2 { bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum-log2 { bignum } { bignum } <effect> set-primitive-effect
 \ bignum-log2 make-foldable
 
-\ byte-array>bignum { byte-array } { bignum } <effect> "inferred-effect" set-word-prop
+\ byte-array>bignum { byte-array } { bignum } <effect> set-primitive-effect
 \ byte-array>bignum make-foldable
 
-\ float= { float float } { object } <effect> "inferred-effect" set-word-prop
+\ float= { float float } { object } <effect> set-primitive-effect
 \ float= make-foldable
 
-\ float+ { float float } { float } <effect> "inferred-effect" set-word-prop
+\ float+ { float float } { float } <effect> set-primitive-effect
 \ float+ make-foldable
 
-\ float- { float float } { float } <effect> "inferred-effect" set-word-prop
+\ float- { float float } { float } <effect> set-primitive-effect
 \ float- make-foldable
 
-\ float* { float float } { float } <effect> "inferred-effect" set-word-prop
+\ float* { float float } { float } <effect> set-primitive-effect
 \ float* make-foldable
 
-\ float/f { float float } { float } <effect> "inferred-effect" set-word-prop
+\ float/f { float float } { float } <effect> set-primitive-effect
 \ float/f make-foldable
 
-\ float< { float float } { object } <effect> "inferred-effect" set-word-prop
+\ float< { float float } { object } <effect> set-primitive-effect
 \ float< make-foldable
 
-\ float-mod { float float } { float } <effect> "inferred-effect" set-word-prop
+\ float-mod { float float } { float } <effect> set-primitive-effect
 \ float-mod make-foldable
 
-\ float<= { float float } { object } <effect> "inferred-effect" set-word-prop
+\ float<= { float float } { object } <effect> set-primitive-effect
 \ float<= make-foldable
 
-\ float> { float float } { object } <effect> "inferred-effect" set-word-prop
+\ float> { float float } { object } <effect> set-primitive-effect
 \ float> make-foldable
 
-\ float>= { float float } { object } <effect> "inferred-effect" set-word-prop
+\ float>= { float float } { object } <effect> set-primitive-effect
 \ float>= make-foldable
 
-\ <word> { object object } { word } <effect> "inferred-effect" set-word-prop
+\ <word> { object object } { word } <effect> set-primitive-effect
 \ <word> make-flushable
 
-\ word-xt { word } { integer } <effect> "inferred-effect" set-word-prop
+\ word-xt { word } { integer integer } <effect> set-primitive-effect
 \ word-xt make-flushable
 
-\ getenv { fixnum } { object } <effect> "inferred-effect" set-word-prop
+\ getenv { fixnum } { object } <effect> set-primitive-effect
 \ getenv make-flushable
 
-\ setenv { object fixnum } { } <effect> "inferred-effect" set-word-prop
+\ setenv { object fixnum } { } <effect> set-primitive-effect
 
-\ (stat) { string } { object object object object } <effect> "inferred-effect" set-word-prop
+\ (stat) { string } { object object object object } <effect> set-primitive-effect
 
-\ (directory) { string } { array } <effect> "inferred-effect" set-word-prop
+\ (directory) { string } { array } <effect> set-primitive-effect
 
-\ data-gc { } { } <effect> "inferred-effect" set-word-prop
+\ data-gc { } { } <effect> set-primitive-effect
 
-\ code-gc { } { } <effect> "inferred-effect" set-word-prop
+\ code-gc { } { } <effect> set-primitive-effect
 
-\ gc-time { } { integer } <effect> "inferred-effect" set-word-prop
+\ gc-time { } { integer } <effect> set-primitive-effect
 
-\ save-image { string } { } <effect> "inferred-effect" set-word-prop
+\ save-image { string } { } <effect> set-primitive-effect
 
-\ save-image-and-exit { string } { } <effect> "inferred-effect" set-word-prop
+\ save-image-and-exit { string } { } <effect> set-primitive-effect
 
 \ exit { integer } { } <effect>
 t over set-effect-terminated?
-"inferred-effect" set-word-prop
+set-primitive-effect
 
-\ data-room { } { integer array } <effect> "inferred-effect" set-word-prop
+\ data-room { } { integer array } <effect> set-primitive-effect
 \ data-room make-flushable
 
-\ code-room { } { integer integer } <effect> "inferred-effect" set-word-prop
+\ code-room { } { integer integer } <effect> set-primitive-effect
 \ code-room  make-flushable
 
-\ os-env { string } { object } <effect> "inferred-effect" set-word-prop
+\ os-env { string } { object } <effect> set-primitive-effect
 
-\ millis { } { integer } <effect> "inferred-effect" set-word-prop
+\ millis { } { integer } <effect> set-primitive-effect
 \ millis make-flushable
 
-\ type { object } { fixnum } <effect> "inferred-effect" set-word-prop
+\ type { object } { fixnum } <effect> set-primitive-effect
 \ type make-foldable
 
-\ tag { object } { fixnum } <effect> "inferred-effect" set-word-prop
+\ tag { object } { fixnum } <effect> set-primitive-effect
 \ tag make-foldable
 
-\ class-hash { object } { fixnum } <effect> "inferred-effect" set-word-prop
+\ class-hash { object } { fixnum } <effect> set-primitive-effect
 \ class-hash make-foldable
 
-\ cwd { } { string } <effect> "inferred-effect" set-word-prop
+\ cwd { } { string } <effect> set-primitive-effect
 
-\ cd { string } { } <effect> "inferred-effect" set-word-prop
+\ cd { string } { } <effect> set-primitive-effect
 
-\ dlopen { string } { dll } <effect> "inferred-effect" set-word-prop
+\ dlopen { string } { dll } <effect> set-primitive-effect
 
-\ dlsym { string object } { c-ptr } <effect> "inferred-effect" set-word-prop
+\ dlsym { string object } { c-ptr } <effect> set-primitive-effect
 
-\ dlclose { dll } { } <effect> "inferred-effect" set-word-prop
+\ dlclose { dll } { } <effect> set-primitive-effect
 
-\ <byte-array> { integer } { byte-array } <effect> "inferred-effect" set-word-prop
+\ <byte-array> { integer } { byte-array } <effect> set-primitive-effect
 \ <byte-array> make-flushable
 
-\ <bit-array> { integer } { bit-array } <effect> "inferred-effect" set-word-prop
+\ <bit-array> { integer } { bit-array } <effect> set-primitive-effect
 \ <bit-array> make-flushable
 
-\ <float-array> { integer float } { float-array } <effect> "inferred-effect" set-word-prop
+\ <float-array> { integer float } { float-array } <effect> set-primitive-effect
 \ <float-array> make-flushable
 
-\ <displaced-alien> { integer c-ptr } { c-ptr } <effect> "inferred-effect" set-word-prop
+\ <displaced-alien> { integer c-ptr } { c-ptr } <effect> set-primitive-effect
 \ <displaced-alien> make-flushable
 
-\ alien-signed-cell { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-signed-cell { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-signed-cell make-flushable
 
-\ set-alien-signed-cell { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-signed-cell { integer c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-unsigned-cell { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-unsigned-cell { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-unsigned-cell make-flushable
 
-\ set-alien-unsigned-cell { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-unsigned-cell { integer c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-signed-8 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-signed-8 { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-signed-8 make-flushable
 
-\ set-alien-signed-8 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-signed-8 { integer c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-unsigned-8 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-unsigned-8 { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-unsigned-8 make-flushable
 
-\ set-alien-unsigned-8 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-unsigned-8 { integer c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-signed-4 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-signed-4 { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-signed-4 make-flushable
 
-\ set-alien-signed-4 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-signed-4 { integer c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-unsigned-4 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-unsigned-4 { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-unsigned-4 make-flushable
 
-\ set-alien-unsigned-4 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-unsigned-4 { integer c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-signed-2 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
+\ alien-signed-2 { c-ptr integer } { fixnum } <effect> set-primitive-effect
+\ alien-signed-2 make-flushable
 
-\ set-alien-signed-2 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-signed-2 { integer c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-unsigned-2 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
+\ alien-unsigned-2 { c-ptr integer } { fixnum } <effect> set-primitive-effect
+\ alien-unsigned-2 make-flushable
 
-\ set-alien-unsigned-2 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-unsigned-2 { integer c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-signed-1 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
+\ alien-signed-1 { c-ptr integer } { fixnum } <effect> set-primitive-effect
+\ alien-signed-1 make-flushable
 
-\ set-alien-signed-1 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-signed-1 { integer c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-unsigned-1 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
+\ alien-unsigned-1 { c-ptr integer } { fixnum } <effect> set-primitive-effect
+\ alien-unsigned-1 make-flushable
 
-\ set-alien-unsigned-1 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-unsigned-1 { integer c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-float { c-ptr integer } { float } <effect> "inferred-effect" set-word-prop
+\ alien-float { c-ptr integer } { float } <effect> set-primitive-effect
+\ alien-float make-flushable
 
-\ set-alien-float { float c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-float { float c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-double { c-ptr integer } { float } <effect> "inferred-effect" set-word-prop
+\ alien-double { c-ptr integer } { float } <effect> set-primitive-effect
+\ alien-double make-flushable
 
-\ set-alien-double { float c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-double { float c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien-cell { c-ptr integer } { simple-c-ptr } <effect> "inferred-effect" set-word-prop
+\ alien-cell { c-ptr integer } { simple-c-ptr } <effect> set-primitive-effect
+\ alien-cell make-flushable
 
-\ set-alien-cell { c-ptr c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+\ set-alien-cell { c-ptr c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien>char-string { c-ptr } { string } <effect> "inferred-effect" set-word-prop
+\ alien>char-string { c-ptr } { string } <effect> set-primitive-effect
+\ alien>char-string make-flushable
 
-\ string>char-alien { string } { byte-array } <effect> "inferred-effect" set-word-prop
+\ string>char-alien { string } { byte-array } <effect> set-primitive-effect
+\ string>char-alien make-flushable
 
-\ alien>u16-string { c-ptr } { string } <effect> "inferred-effect" set-word-prop
+\ alien>u16-string { c-ptr } { string } <effect> set-primitive-effect
+\ alien>u16-string make-flushable
 
-\ string>u16-alien { string } { byte-array } <effect> "inferred-effect" set-word-prop
+\ string>u16-alien { string } { byte-array } <effect> set-primitive-effect
+\ string>u16-alien make-flushable
 
-\ string>memory { string c-ptr } { } <effect> "inferred-effect" set-word-prop
-
-\ memory>string { c-ptr integer } { string } <effect> "inferred-effect" set-word-prop
-
-\ alien-address { alien } { integer } <effect> "inferred-effect" set-word-prop
+\ alien-address { alien } { integer } <effect> set-primitive-effect
 \ alien-address make-flushable
 
-\ slot { object fixnum } { object } <effect> "inferred-effect" set-word-prop
+\ slot { object fixnum } { object } <effect> set-primitive-effect
 \ slot make-flushable
 
-\ set-slot { object object fixnum } { } <effect> "inferred-effect" set-word-prop
+\ set-slot { object object fixnum } { } <effect> set-primitive-effect
 
-\ char-slot { fixnum object } { fixnum } <effect> "inferred-effect" set-word-prop
-\ char-slot make-flushable
+\ string-nth { fixnum string } { fixnum } <effect> set-primitive-effect
+\ string-nth make-flushable
 
-\ set-char-slot { fixnum fixnum object } { } <effect> "inferred-effect" set-word-prop
+\ set-string-nth { fixnum fixnum string } { } <effect> set-primitive-effect
 
-\ resize-array { integer array } { array } <effect> "inferred-effect" set-word-prop
+\ resize-array { integer array } { array } <effect> set-primitive-effect
 \ resize-array make-flushable
 
-\ resize-string { integer string } { string } <effect> "inferred-effect" set-word-prop
+\ resize-byte-array { integer byte-array } { byte-array } <effect> set-primitive-effect
+\ resize-byte-array make-flushable
+
+\ resize-bit-array { integer bit-array } { bit-array } <effect> set-primitive-effect
+\ resize-bit-array make-flushable
+
+\ resize-float-array { integer float-array } { float-array } <effect> set-primitive-effect
+\ resize-float-array make-flushable
+
+\ resize-string { integer string } { string } <effect> set-primitive-effect
 \ resize-string make-flushable
 
-\ (hashtable) { } { hashtable } <effect> "inferred-effect" set-word-prop
-\ (hashtable) make-flushable
-
-\ <array> { integer object } { array } <effect> "inferred-effect" set-word-prop
+\ <array> { integer object } { array } <effect> set-primitive-effect
 \ <array> make-flushable
 
-\ begin-scan { } { } <effect> "inferred-effect" set-word-prop
+\ begin-scan { } { } <effect> set-primitive-effect
 
-\ next-object { } { object } <effect> "inferred-effect" set-word-prop
+\ next-object { } { object } <effect> set-primitive-effect
 
-\ end-scan { } { } <effect> "inferred-effect" set-word-prop
+\ end-scan { } { } <effect> set-primitive-effect
 
-\ size { object } { fixnum } <effect> "inferred-effect" set-word-prop
+\ size { object } { fixnum } <effect> set-primitive-effect
 \ size make-flushable
 
-\ die { } { } <effect> "inferred-effect" set-word-prop
+\ die { } { } <effect> set-primitive-effect
 
-\ fopen { string string } { alien } <effect> "inferred-effect" set-word-prop
+\ fopen { string string } { alien } <effect> set-primitive-effect
 
-\ fgetc { alien } { object } <effect> "inferred-effect" set-word-prop
+\ fgetc { alien } { object } <effect> set-primitive-effect
 
-\ fwrite { string alien } { } <effect> "inferred-effect" set-word-prop
+\ fwrite { string alien } { } <effect> set-primitive-effect
 
-\ fread { integer string } { object } <effect> "inferred-effect" set-word-prop
+\ fread { integer string } { object } <effect> set-primitive-effect
 
-\ fflush { alien } { } <effect> "inferred-effect" set-word-prop
+\ fflush { alien } { } <effect> set-primitive-effect
 
-\ fclose { alien } { } <effect> "inferred-effect" set-word-prop
+\ fclose { alien } { } <effect> set-primitive-effect
 
-\ expired? { object } { object } <effect> "inferred-effect" set-word-prop
+\ expired? { object } { object } <effect> set-primitive-effect
 \ expired? make-flushable
 
-\ <wrapper> { object } { wrapper } <effect> "inferred-effect" set-word-prop
+\ <wrapper> { object } { wrapper } <effect> set-primitive-effect
 \ <wrapper> make-foldable
 
-\ (clone) { object } { object } <effect> "inferred-effect" set-word-prop
+\ (clone) { object } { object } <effect> set-primitive-effect
 \ (clone) make-flushable
 
-\ array>vector { array integer } { vector } <effect> "inferred-effect" set-word-prop
-\ array>vector make-flushable
-
-\ <string> { integer integer } { string } <effect> "inferred-effect" set-word-prop
+\ <string> { integer integer } { string } <effect> set-primitive-effect
 \ <string> make-flushable
 
-\ array>quotation { array } { quotation } <effect> "inferred-effect" set-word-prop
+\ array>quotation { array } { quotation } <effect> set-primitive-effect
 \ array>quotation make-flushable
 
-\ quotation-xt { quotation } { integer } <effect> "inferred-effect" set-word-prop
+\ quotation-xt { quotation } { integer } <effect> set-primitive-effect
 \ quotation-xt make-flushable
 
-\ <tuple> { word integer } { quotation } <effect> "inferred-effect" set-word-prop
+\ <tuple> { word integer } { quotation } <effect> set-primitive-effect
 \ <tuple> make-flushable
 
-\ (>tuple) { array } { tuple } <effect> "inferred-effect" set-word-prop
+\ (>tuple) { array } { tuple } <effect> set-primitive-effect
 \ (>tuple) make-flushable
 
-\ tuple>array { tuple } { array } <effect> "inferred-effect" set-word-prop
+\ tuple>array { tuple } { array } <effect> set-primitive-effect
 \ tuple>array make-flushable
 
-\ datastack { } { array } <effect> "inferred-effect" set-word-prop
+\ datastack { } { array } <effect> set-primitive-effect
 \ datastack make-flushable
 
-\ retainstack { } { array } <effect> "inferred-effect" set-word-prop
+\ retainstack { } { array } <effect> set-primitive-effect
 \ retainstack make-flushable
 
-\ callstack { } { callstack } <effect> "inferred-effect" set-word-prop
+\ callstack { } { callstack } <effect> set-primitive-effect
 \ callstack make-flushable
 
-\ callstack>array { callstack } { array } <effect> "inferred-effect" set-word-prop
+\ callstack>array { callstack } { array } <effect> set-primitive-effect
 \ callstack>array make-flushable
 
-\ (sleep) { integer } { } <effect> "inferred-effect" set-word-prop
+\ (sleep) { integer } { } <effect> set-primitive-effect
 
-\ become { array array } { } <effect> "inferred-effect" set-word-prop
+\ become { array array } { } <effect> set-primitive-effect
 
-\ innermost-frame-quot { callstack } { quotation } <effect> "inferred-effect" set-word-prop
+\ innermost-frame-quot { callstack } { quotation } <effect> set-primitive-effect
 
-\ innermost-frame-scan { callstack } { fixnum } <effect> "inferred-effect" set-word-prop
+\ innermost-frame-scan { callstack } { fixnum } <effect> set-primitive-effect
 
-\ set-innermost-frame-quot { quotation callstack } { } <effect> "inferred-effect" set-word-prop
+\ set-innermost-frame-quot { quotation callstack } { } <effect> set-primitive-effect
 
-\ (os-envs) { } { array } <effect> "inferred-effect" set-word-prop
+\ (os-envs) { } { array } <effect> set-primitive-effect
 
 \ do-primitive [ \ do-primitive no-effect ] "infer" set-word-prop

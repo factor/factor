@@ -70,20 +70,63 @@ M: #branch node-def-use
     #! #values node.
     dup branch-def-use (node-def-use) ;
 
-: dead-literals ( -- values )
+: compute-dead-literals ( -- values )
     def-use get [ >r value? r> empty? and ] assoc-subset ;
 
-: kill-node* ( node values -- )
-    [ swap remove-all ] curry modify-values ;
+DEFER: kill-nodes
+SYMBOL: dead-literals
 
-: kill-node ( node values -- )
-    dup assoc-empty?
-    [ 2drop ] [ [ kill-node* ] curry each-node ] if ;
+GENERIC: kill-node* ( node -- node/t )
 
-: kill-values ( node -- )
+M: node kill-node* drop t ;
+
+: prune-if ( node quot -- successor/t )
+    over >r call [ r> node-successor ] [ r> drop t ] if ;
+    inline
+
+M: #shuffle kill-node* 
+    [
+        dup node-in-d empty? swap node-out-d empty? and
+    ] prune-if ;
+
+M: #push kill-node* 
+    [ node-out-d empty? ] prune-if ;
+
+M: #>r kill-node* [ node-in-d empty? ] prune-if ;
+
+M: #r> kill-node* [ node-in-r empty? ] prune-if ;
+
+: kill-node ( node -- node )
+    dup [
+        dup [ dead-literals get swap remove-all ] modify-values
+        dup kill-node* dup t eq? [
+            drop dup [ kill-nodes ] change-children
+        ] [
+            nip kill-node
+        ] if
+    ] when ;
+
+: kill-nodes ( node -- newnode )
+    [ kill-node ] transform-nodes ;
+
+: kill-values ( node -- new-node )
     #! Remove literals which are not actually used anywhere.
-    dead-literals kill-node ;
+    compute-dead-literals dup assoc-empty? [ drop ] [
+        dead-literals [ kill-nodes ] with-variable
+    ] if ;
 
 : sole-consumer ( #call -- node/f )
     node-out-d first used-by
     dup length 1 = [ first ] [ drop f ] if ;
+
+: splice-def-use ( node -- )
+    #! As a first approximation, we take all the values used
+    #! by the set of new nodes, and push a 't' on their
+    #! def-use list here. We could perform a full graph
+    #! substitution, but we don't need to, because the next
+    #! optimizer iteration will do that. We just need a minimal
+    #! degree of accuracy; the new values should be marked as
+    #! having _some_ usage, so that flushing doesn't erronously
+    #! flush them away.
+    [ compute-def-use def-use get keys ] with-scope
+    def-use get [ [ t swap ?push ] change-at ] curry each ;

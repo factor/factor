@@ -59,7 +59,16 @@ CELL allot_alien(CELL delegate, CELL displacement)
 	REGISTER_ROOT(delegate);
 	F_ALIEN *alien = allot_object(ALIEN_TYPE,sizeof(F_ALIEN));
 	UNREGISTER_ROOT(delegate);
-	alien->alien = delegate;
+
+	if(type_of(delegate) == ALIEN_TYPE)
+	{
+		F_ALIEN *delegate_alien = untag_object(delegate);
+		displacement += delegate_alien->displacement;
+		alien->alien = F;
+	}
+	else
+		alien->alien = delegate;
+
 	alien->displacement = displacement;
 	alien->expired = F;
 	return tag_object(alien);

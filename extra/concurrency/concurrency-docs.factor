@@ -33,7 +33,7 @@ HELP: (mailbox-block-unless-pred)
 
 HELP: (mailbox-block-if-empty)
 { $values { "mailbox" "a mailbox object" } 
-	  { "mailbox2" "same object as 'mailbox'" }
+          { "mailbox2" "same object as 'mailbox'" }
       { "timeout" "a timeout in milliseconds" }
 }
 { $description "Block the thread if the mailbox is empty." } 
@@ -41,21 +41,21 @@ HELP: (mailbox-block-if-empty)
 
 HELP: mailbox-get
 { $values { "mailbox" "a mailbox object" } 
-	  { "obj" "an object" }
+          { "obj" "an object" }
 }
 { $description "Get the first item put into the mailbox. If it is empty the thread blocks until an item is put into it. The thread then resumes, leaving the item on the stack." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put while-mailbox-empty mailbox-get-all mailbox-get? } ;
 
 HELP: mailbox-get-all
 { $values { "mailbox" "a mailbox object" } 
-	  { "array" "an array" }
+          { "array" "an array" }
 }
 { $description "Blocks the thread if the mailbox is empty, otherwise removes all objects in the mailbox and returns an array containing the objects." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put while-mailbox-empty mailbox-get-all mailbox-get? } ;
 
 HELP: while-mailbox-empty
 { $values { "mailbox" "a mailbox object" } 
-	  { "quot" "a quotation with stack effect " { $snippet "( -- )" } }
+          { "quot" "a quotation with stack effect " { $snippet "( -- )" } }
 }
 { $description "Repeatedly call the quotation while there are no items in the mailbox. Quotation should have stack effect " { $snippet "( -- )" } "." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all mailbox-get? } ;
@@ -63,7 +63,7 @@ HELP: while-mailbox-empty
 HELP: mailbox-get?
 { $values { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } }
           { "mailbox" "a mailbox object" } 
-	  { "obj" "an object" }
+          { "obj" "an object" }
 }
 { $description "Get the first item in the mailbox which satisfies the predicate. 'pred' will be called repeatedly for each item in the mailbox. When 'pred' returns true that item will be returned. If nothing in the mailbox satisfies the predicate then the thread will block until something does. 'pred' must have stack effect " { $snippet "( X -- bool }" } "." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all while-mailbox-empty } ;
@@ -127,7 +127,7 @@ ARTICLE: { "concurrency" "processes" } "Processes"
 { $code ": odd? ( n -- ? ) 2 mod 1 = ;\n1 self send 2 self send 3 self send\n\nreceive .\n => 1\n\n[ odd? ] receive-if .\n => 3\n\nreceive .\n => 2" } ;
 
 ARTICLE: { "concurrency" "self" } "Self"
-"A process can get access to its own process object using " { $link self } " so it can pass it to other processes. This allows the other processes to send messages back. A simple example of using this gets the current processes 'self' and spawns a process which sends a message to it. We then receive the message from the original process:" 
+"A process can get access to its own process object using " { $link self } " so it can pass it to other processes. This allows the other processes to send messages back. A simple example of using this gets the current process' 'self' and spawns a process which sends a message to it. We then receive the message from the original process:" 
 { $code "self [ \"Hello!\" swap send ] spawn 2drop receive .\n => \"Hello!\"" } ;
 
 ARTICLE: { "concurrency" "servers" } "Servers"
@@ -138,7 +138,7 @@ ARTICLE: { "concurrency" "servers" } "Servers"
 ARTICLE: { "concurrency" "synchronous-sends" } "Synchronous Sends"
 { $link send } " sends a message asynchronously, and the sending process continues immediately. The 'pong server' example shown previously all sent messages to the server and waited for a reply back from the server. This pattern of synchronous sending is made easier with " { $link send-synchronous } ".\n\nThis word will send a message to the given process and immediately block until a reply is received for this particular message send. It leaves the reply on the stack. Note that it doesn't wait for just any reply, it waits for a reply specifically to this send.\n\nTo do this it wraps the requested message inside a tagged message format using " { $link tag-message } ":"
 { $code "\"My Message\" tag-message .\n => { ...from... ...tag... \"My Message\" }" }
-"The message is wrapped in array where the first item is the sending process object, the second is a unique tag, and the third is the original message. Server processes can use the 'from' to reply to the process that originally sent the message. The tag can is used in the receiving server to include the value in the reply. After the send-synchronous call the current process will block waiting for a reply that has the exact same tag. In this way you can be sure that the reply you got was for the specific message sent. Here is the pong-server recoded to use 'send-synchronous':"
+"The message is wrapped in array where the first item is the sending process object, the second is a unique tag, and the third is the original message. Server processes can use the 'from' to reply to the process that originally sent the message. The tag is used in the receiving server to include the value in the reply. After the send-synchronous call the current process will block waiting for a reply that has the exact same tag. In this way you can be sure that the reply you got was for the specific message sent. Here is the pong-server recoded to use 'send-synchronous':"
 { $code ": pong-server ( -- )\n  receive {\n    { { ?from ?tag \"ping\" } [ ?tag \"pong\" 2array ?from send pong-server ] }\n    { { ?from _ } [ ?tag \"server shutdown\" 2array ?from send ] }\n  } match-cond ;\n\n[ pong-server ] spawn \"ping\" swap send-synchronous .\n => \"pong\"" } 
 "Notice that the code to send the reply back to the original caller wraps the reply in an array where the first item is the tag originally sent. 'send-synchronous' only returns if it receives a reply containing that specific tag." ;
 
@@ -146,11 +146,11 @@ ARTICLE: { "concurrency" "exceptions" } "Exceptions"
 "A process can handle exceptions using the standard Factor exception handling mechanism. If an exception is uncaught the process will terminate. For example:" 
 { $code "[ 1 0 / \"This will not print\" print ] spawn" } 
 "Processes can be linked so that a parent process can receive the exception that caused the child process to terminate. In this way 'supervisor' processes can be created that are notified when child processes terminate and possibly restart them.\n\nThe easiest way to form this link is using " { $link spawn-link } ". This will create a unidirectional link, such that if an uncaught exception causes the child to terminate, the parent process can catch it:"
-{ $code "[\n  [ 1 0 / \"This will not print\" print ] spawn-link drop\n  receive\n] catch [ \"Exception caught.\" print ] when" } 
+{ $code "[\n  [ 1 0 / \"This will not print\" print ] spawn-link drop\n  receive\n] [ \"Exception caught.\" print ] recover" } 
 "Exceptions are only raised in the parent when the parent does a " { $link receive } " or " { $link receive-if } ". This is because the exception is sent from the child to the parent as a message." ;
 
 ARTICLE: { "concurrency" "futures" } "Futures"
-"A future is a placeholder for the result of a computation that is being calculated in a process. When the process has completed the computation the future can be queried to find out the result. If the computation has not completed when the future is queried them the process will block until the result is completed. <p>A future is created using " { $link future } ".\n\nThe quotation will be run in a spawned process, and a future object is immediately returned. This future object can be resolved using " { $link ?future } ".\n\nFutures are useful for starting calculations that take a long time to run but aren't needed until later in the process. When the process needs the value it can use '?future' to get the result or block until the result is available. For example:"
+"A future is a placeholder for the result of a computation that is being calculated in a process. When the process has completed the computation the future can be queried to find out the result. If the computation has not completed when the future is queried them the process will block until the result is completed. A future is created using " { $link future } ".\n\nThe quotation will be run in a spawned process, and a future object is immediately returned. This future object can be resolved using " { $link ?future } ".\n\nFutures are useful for starting calculations that take a long time to run but aren't needed until later in the process. When the process needs the value it can use '?future' to get the result or block until the result is available. For example:"
 { $code "[ 30 fib ] future\n...do stuff...\n?future" } ;
 
 ARTICLE: { "concurrency" "promises" } "Promises"

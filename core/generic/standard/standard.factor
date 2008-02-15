@@ -2,11 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel kernel.private slots.private math
 namespaces sequences vectors words quotations definitions
-hashtables layouts combinators combinators.private generic
+hashtables layouts combinators sequences.private generic
 classes classes.private ;
 IN: generic.standard
 
 TUPLE: standard-combination # ;
+
+M: standard-combination method-prologue
+    standard-combination-# object
+    <array> swap add* [ declare ] curry ;
 
 C: <standard-combination> standard-combination
 
@@ -31,10 +35,10 @@ TUPLE: no-method object generic ;
 : no-method ( object generic -- * )
     \ no-method construct-boa throw ;
 
-: error-method ( word -- method )
+: error-method ( word --  quot )
     picker swap [ no-method ] curry append ;
 
-: empty-method ( word -- method )
+: empty-method ( word -- quot )
     [
         picker % [ delegate dup ] %
         unpicker over add ,
@@ -65,13 +69,15 @@ TUPLE: no-method object generic ;
     ] if ;
 
 : default-method ( word -- pair )
-    empty-method object bootstrap-word swap 2array ;
+    "default-method" word-prop method-word
+    object bootstrap-word swap 2array ;
 
 : method-alist>quot ( alist base-class -- quot )
     bootstrap-word swap simplify-alist
     class-predicates alist>quot ;
 
 : small-generic ( methods -- def )
+    [ 1quotation ] assoc-map
     object method-alist>quot ;
 
 : hash-methods ( methods -- buckets )
@@ -83,12 +89,15 @@ TUPLE: no-method object generic ;
         ] if
     ] distribute-buckets ;
 
+: class-hash-dispatch-quot ( methods quot picker -- quot )
+    >r >r hash-methods r> map
+    hash-dispatch-quot r> [ class-hash ] rot 3append ; inline
+
 : big-generic ( methods -- quot )
-    hash-methods [ small-generic ] map
-    hash-dispatch-quot picker [ class-hash ] rot 3append ;
+    [ small-generic ] picker class-hash-dispatch-quot ;
 
 : vtable-class ( n -- class )
-    type>class [ hi-tag bootstrap-word ] unless* ;
+    bootstrap-type>class [ hi-tag bootstrap-word ] unless* ;
 
 : group-methods ( assoc -- vtable )
     #! Input is a predicate -> method association.
@@ -100,7 +109,8 @@ TUPLE: no-method object generic ;
 
 : build-type-vtable ( alist-seq -- alist-seq )
     dup length [
-        vtable-class swap simplify-alist
+        vtable-class
+        swap [ word-def ] assoc-map simplify-alist
         class-predicates alist>quot
     ] 2map ;
 
@@ -137,30 +147,35 @@ TUPLE: no-method object generic ;
 : standard-methods ( word -- alist )
     dup methods swap default-method add* ;
 
+M: standard-combination make-default-method
+    standard-combination-# (dispatch#)
+    [ empty-method ] with-variable ;
+
 M: standard-combination perform-combination
     standard-combination-# (dispatch#) [
         [ standard-methods ] keep "inline" word-prop
         [ small-generic ] [ single-combination ] if
     ] with-variable ;
 
-: default-hook-method ( word -- pair )
-    error-method object bootstrap-word swap 2array ;
-
-: hook-methods ( word -- methods )
-    dup methods [ [ drop ] swap append ] assoc-map
-    swap default-hook-method add* ;
-
 TUPLE: hook-combination var ;
 
 C: <hook-combination> hook-combination
 
-M: hook-combination perform-combination
+M: hook-combination method-prologue
+    2drop [ drop ] ;
+
+: with-hook ( combination quot -- quot' )
     0 (dispatch#) [
-        [
-            hook-combination-var [ get ] curry %
-            hook-methods single-combination %
-        ] [ ] make
-    ] with-variable ;
+        swap slip
+        hook-combination-var [ get ] curry
+        swap append
+    ] with-variable ; inline
+
+M: hook-combination make-default-method
+    [ error-method ] with-hook ;
+
+M: hook-combination perform-combination
+    [ standard-methods single-combination ] with-hook ;
 
 : define-simple-generic ( word -- )
     T{ standard-combination f 0 } define-generic ;

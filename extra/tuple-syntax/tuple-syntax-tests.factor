@@ -1,4 +1,5 @@
 USING: tools.test tuple-syntax ;
+IN: temporary
 
 TUPLE: foo bar baz ;
 

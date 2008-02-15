@@ -7,7 +7,7 @@
 
 
 USING: cairo math math.constants byte-arrays kernel ui ui.render
-	   ui.gadgets opengl.gl ;
+           ui.gadgets opengl.gl ;
 
 IN: cairo-demo
 
@@ -66,7 +66,7 @@ M: cairo-gadget ungraft* ( gadget -- )
 
 : run ( -- )
   [
-	<cairo-gadget> "Hello World from Factor!" open-window
+        <cairo-gadget> "Hello World from Factor!" open-window
   ] with-ui ;
 
 MAIN: run

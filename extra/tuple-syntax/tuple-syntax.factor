@@ -1,4 +1,5 @@
-USING: kernel sequences slots parser words classes ;
+USING: kernel sequences slots parser words classes
+slots.private ;
 IN: tuple-syntax
 
 ! TUPLE: foo bar baz ;
@@ -7,15 +8,15 @@ IN: tuple-syntax
 : parse-object ( -- object )
     scan-word dup parsing? [ V{ } clone swap execute first ] when ;
 
-: parse-slot-writer ( tuple -- slot-setter )
+: parse-slot-writer ( tuple -- slot# )
     scan dup "}" = [ 2drop f ] [
         1 head* swap class "slots" word-prop
-        [ slot-spec-name = ] with find nip slot-spec-writer
+        [ slot-spec-name = ] with find nip slot-spec-offset
     ] if ;
 
 : parse-slots ( accum tuple -- accum tuple )
     dup parse-slot-writer
-    [ parse-object pick rot execute parse-slots ] when* ;
+    [ parse-object pick rot set-slot parse-slots ] when* ;
 
 : TUPLE{
     scan-word construct-empty parse-slots parsed ; parsing

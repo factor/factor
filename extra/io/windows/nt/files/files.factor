@@ -1,7 +1,69 @@
-USING: continuations destructors io.buffers io.nonblocking
-io.windows io.windows.nt.backend kernel libc math threads
-windows windows.kernel32 ;
+USING: continuations destructors io.buffers io.files io.backend
+io.timeouts io.nonblocking io.windows io.windows.nt.backend
+kernel libc math threads windows windows.kernel32 alien.c-types
+alien.arrays sequences combinators combinators.lib sequences.lib
+ascii splitting alien strings ;
 IN: io.windows.nt.files
+
+M: windows-nt-io cwd
+    MAX_UNICODE_PATH dup "ushort" <c-array>
+    [ GetCurrentDirectory win32-error=0/f ] keep
+    alien>u16-string ;
+
+M: windows-nt-io cd
+    SetCurrentDirectory win32-error=0/f ;
+
+: unicode-prefix ( -- seq )
+    "\\\\?\\" ; inline
+
+M: windows-nt-io root-directory? ( path -- ? )
+    dup length 2 = [
+        dup first Letter?
+        swap second CHAR: : = and
+    ] [
+        drop f
+    ] if ;
+
+: root-directory ( string -- string' )
+    {
+        [ dup length 2 >= ]
+        [ dup second CHAR: : = ]
+        [ dup first Letter? ]
+    } && [ 2 head ] [ "Not an absolute path" throw ] if ;
+
+: prepend-prefix ( string -- string' )
+    unicode-prefix swap append ;
+
+: windows-path+ ( cwd path -- newpath )
+    {
+        ! empty
+        { [ dup empty? ] [ drop ] }
+        ! ..
+        { [ dup ".." = ] [ drop parent-directory prepend-prefix ] }
+        ! \\\\?\\c:\\foo
+        { [ dup unicode-prefix head? ] [ nip ] }
+        ! ..\\foo
+        { [ dup "..\\" head? ] [ >r parent-directory r> 3 tail windows-path+ ] }
+        ! .\\foo
+        { [ dup ".\\" head? ] [ 1 tail append prepend-prefix ] }
+        ! \\foo
+        { [ dup "\\" head? ] [ >r root-directory r> append prepend-prefix ] }
+        ! c:\\foo
+        { [ dup ?second CHAR: : = ] [ nip prepend-prefix ] }
+        ! foo.txt
+        { [ t ] [
+            >r right-trim-separators "\\" r>
+            left-trim-separators
+            3append prepend-prefix
+        ] }
+    } cond ;
+
+M: windows-nt-io normalize-pathname ( string -- string )
+    dup string? [ "pathname must be a string" throw ] unless
+    "/" split "\\" join
+    cwd swap windows-path+
+    [ "/\\." member? ] right-trim
+    dup peek CHAR: : = [ "\\" append ] when ;
 
 M: windows-nt-io CreateFile-flags ( DWORD -- DWORD )
     FILE_FLAG_OVERLAPPED bitor ;
@@ -17,22 +79,18 @@ M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
         2drop
     ] if* ;
 
-: finish-flush ( port -- )
+: finish-flush ( overlapped port -- )
     dup pending-error
-    dup get-overlapped-result
+    tuck get-overlapped-result
     dup pick update-file-ptr
     swap buffer-consume ;
 
-: save-overlapped-and-callback ( fileargs port -- )
-    swap FileArgs-lpOverlapped over set-port-overlapped
-    save-callback ;
-
 : (flush-output) ( port -- )
-    dup touch-port
     dup make-FileArgs
     tuck setup-write WriteFile
     dupd overlapped-error? [
-        [ save-overlapped-and-callback ] keep
+        >r FileArgs-lpOverlapped r>
+        [ save-callback ] 2keep
         [ finish-flush ] keep
         dup buffer-empty? [ drop ] [ (flush-output) ] if
     ] [
@@ -40,14 +98,14 @@ M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
     ] if ;
 
 : flush-output ( port -- )
-    [ (flush-output) ] with-destructors ;
+    [ [ (flush-output) ] with-timeout ] with-destructors ;
 
 M: port port-flush
     dup buffer-empty? [ dup flush-output ] unless drop ;
 
-: finish-read ( port -- )
+: finish-read ( overlapped port -- )
     dup pending-error
-    dup get-overlapped-result dup zero? [
+    tuck get-overlapped-result dup zero? [
         drop t swap set-port-eof?
     ] [
         dup pick n>buffer
@@ -55,16 +113,13 @@ M: port port-flush
     ] if ;
 
 : ((wait-to-read)) ( port -- )
-    dup touch-port
     dup make-FileArgs
     tuck setup-read ReadFile
     dupd overlapped-error? [
-        [ save-overlapped-and-callback ] keep
+        >r FileArgs-lpOverlapped r>
+        [ save-callback ] 2keep
         finish-read
-    ] [
-        2drop
-    ] if ;
+    ] [ 2drop ] if ;
 
 M: input-port (wait-to-read) ( port -- )
-    [ ((wait-to-read)) ] with-destructors ;
-
+    [ [ ((wait-to-read)) ] with-timeout ] with-destructors ;

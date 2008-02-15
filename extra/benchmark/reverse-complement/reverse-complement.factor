@@ -1,6 +1,6 @@
 USING: io io.files io.streams.duplex kernel sequences
 sequences.private strings vectors words memoize splitting
-hints ;
+hints unicode.case ;
 IN: benchmark.reverse-complement
 
 MEMO: trans-map ( -- str )
@@ -36,10 +36,17 @@ HINTS: do-line vector string ;
         500000 <vector> (reverse-complement)
     ] with-stream ;
 
+: reverse-complement-in
+    "extra/benchmark/reverse-complement/reverse-complement-in.txt"
+    resource-path ;
+
+: reverse-complement-out
+    "extra/benchmark/reverse-complement/reverse-complement-out.txt"
+    resource-path ;
+
 : reverse-complement-main ( -- )
-    "extra/benchmark/reverse-complement/reverse-complement-test-in.txt"
-    "extra/benchmark/reverse-complement/reverse-complement-test-out.txt"
-    [ resource-path ] 2apply
+    reverse-complement-in
+    reverse-complement-out
     reverse-complement ;
 
 MAIN: reverse-complement-main

@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser math.ranges namespaces sequences ;
+USING: kernel math.combinatorics math.parser ;
 IN: project-euler.024
 
 ! http://projecteuler.net/index.php?section=problems&id=24
@@ -22,25 +22,8 @@ IN: project-euler.024
 ! SOLUTION
 ! --------
 
-<PRIVATE
-
-: (>permutation) ( seq n -- seq )
-    [ [ dupd >= [ 1+ ] when ] curry map ] keep add* ;
-
-PRIVATE>
-
-: >permutation ( factoradic -- permutation )
-    reverse 1 cut [ (>permutation) ] each ;
-
-: factoradic ( k order -- factoradic )
-    [ [1,b] [ 2dup mod , /i ] each ] { } make reverse nip ;
-
-: permutation ( k seq -- seq )
-    dup length swapd factoradic >permutation
-    [ [ dupd swap nth , ] each drop ] { } make ;
-
 : euler024 ( -- answer )
-    999999 10 permutation 10 swap digits>integer ;
+    999999 10 permutation 10 digits>integer ;
 
 ! [ euler024 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials

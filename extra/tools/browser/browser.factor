@@ -1,12 +1,29 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces splitting sequences io.files kernel assocs
 words vocabs vocabs.loader definitions parser continuations
 inspector debugger io io.styles io.streams.lines hashtables
 sorting prettyprint source-files arrays combinators strings
 system math.parser help.markup help.topics help.syntax
-help.stylesheet ;
+help.stylesheet memoize ;
 IN: tools.browser
+
+MEMO: (vocab-file-contents) ( path -- lines )
+    ?resource-path dup exists?
+    [ file-lines ] [ drop f ] if ;
+
+: vocab-file-contents ( vocab name -- seq )
+    vocab-path+ dup [ (vocab-file-contents) ] when ;
+
+: set-vocab-file-contents ( seq vocab name -- )
+    dupd vocab-path+ [
+        ?resource-path
+        [ [ print ] each ] with-file-out
+    ] [
+        "The " swap vocab-name
+        " vocabulary was not loaded from the file system"
+        3append throw
+    ] ?if ;
 
 : vocab-summary-path ( vocab -- string )
     vocab-dir "summary.txt" path+ ;
@@ -55,13 +72,6 @@ M: vocab-link summary vocab-summary ;
 : set-vocab-authors ( authors vocab -- )
     dup vocab-authors-path set-vocab-file-contents ;
 
-: vocab-dir? ( root name -- ? )
-    over [
-        vocab-source path+ ?resource-path exists?
-    ] [
-        2drop f
-    ] if ;
-
 : subdirs ( dir -- dirs )
     directory [ second ] subset keys natural-sort ;
 
@@ -79,14 +89,12 @@ M: vocab-link summary vocab-summary ;
         vocabs-in-dir
     ] with each ;
 
-: sane-vocab-roots "." vocab-roots get remove ;
-
 : all-vocabs ( -- assoc )
-    sane-vocab-roots [
+    vocab-roots get [
         dup [ "" vocabs-in-dir ] { } make
     ] { } map>assoc ;
 
-: all-vocabs-seq ( -- seq )
+MEMO: all-vocabs-seq ( -- seq )
     all-vocabs values concat ;
 
 : dangerous? ( name -- ? )
@@ -110,14 +118,21 @@ M: vocab-link summary vocab-summary ;
         { [ "windows." ?head ] [ t ] }
         { [ "cocoa" ?head ] [ t ] }
         { [ ".test" ?tail ] [ t ] }
+        { [ "raptor" ?head ] [ t ] }
         { [ dup "tools.deploy.app" = ] [ t ] }
         { [ t ] [ f ] }
     } cond nip ;
 
-: load-everything ( -- )
+: filter-dangerous ( seq -- seq' )
+    [ vocab-name dangerous? not ] subset ;
+
+: try-everything ( -- failures )
     all-vocabs-seq
-    [ vocab-name dangerous? not ] subset
+    filter-dangerous
     require-all ;
+
+: load-everything ( -- )
+    try-everything load-failures. ;
 
 : unrooted-child-vocabs ( prefix -- seq )
     dup empty? [ CHAR: . add ] unless
@@ -129,15 +144,17 @@ M: vocab-link summary vocab-summary ;
     [ vocab ] map ;
 
 : all-child-vocabs ( prefix -- assoc )
-    sane-vocab-roots [
-        dup pick dupd (all-child-vocabs)
-        [ swap >vocab-link ] with map
+    vocab-roots get [
+        over dupd dupd (all-child-vocabs)
+        swap [ >vocab-link ] curry map
     ] { } map>assoc
     f rot unrooted-child-vocabs 2array add ;
 
 : load-children ( prefix -- )
     all-child-vocabs values concat
-    require-all ;
+    filter-dangerous
+    require-all
+    load-failures. ;
 
 : vocab-status-string ( vocab -- string )
     {
@@ -238,7 +255,7 @@ C: <vocab-author> vocab-author
 : vocab-xref ( vocab quot -- vocabs )
     >r dup vocab-name swap words r> map
     [ [ word? ] subset [ word-vocabulary ] map ] map>set
-    remove [ vocab ] map ; inline
+    remove [ ] subset [ vocab ] map ; inline
 
 : vocab-uses ( vocab -- vocabs ) [ uses ] vocab-xref ;
 
@@ -288,20 +305,20 @@ C: <vocab-author> vocab-author
 : $tagged-vocabs ( element -- )
     first tagged vocabs. ;
 
-: all-tags ( vocabs -- seq ) [ vocab-tags ] map>set ;
+MEMO: all-tags ( -- seq )
+    all-vocabs-seq [ vocab-tags ] map>set ;
 
 : $authored-vocabs ( element -- )
     first authored vocabs. ;
 
-: all-authors ( vocabs -- seq ) [ vocab-authors ] map>set ;
+MEMO: all-authors ( -- seq )
+    all-vocabs-seq [ vocab-authors ] map>set ;
 
-: $tags,authors ( element -- )
-    drop
-    all-vocabs-seq
-    "Tags" $heading
-    dup all-tags tags.
-    "Authors" $heading
-    all-authors authors. ;
+: $tags ( element -- )
+    drop "Tags" $heading all-tags tags. ;
+
+: $authors ( element -- )
+    drop "Authors" $heading all-authors authors. ;
 
 M: vocab-spec article-title vocab-name " vocabulary" append ;
 
@@ -339,3 +356,9 @@ M: vocab-author article-content
 M: vocab-author article-parent drop "vocab-index" ;
 
 M: vocab-author summary article-title ;
+
+: reset-cache ( -- )
+    \ (vocab-file-contents) reset-memoized
+    \ all-vocabs-seq reset-memoized
+    \ all-authors reset-memoized
+    \ all-tags reset-memoized ;

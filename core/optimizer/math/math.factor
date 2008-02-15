@@ -1,13 +1,13 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer.math
-USING: alien arrays generic hashtables kernel assocs math
-math.private kernel.private sequences words parser
+USING: alien alien.accessors arrays generic hashtables kernel
+assocs math math.private kernel.private sequences words parser
 inference.class inference.dataflow vectors strings sbufs io
 namespaces assocs quotations math.intervals sequences.private
-combinators splitting layouts math.parser classes
-generic.math optimizer.pattern-match optimizer.backend
-optimizer.def-use generic.standard system ;
+combinators splitting layouts math.parser classes generic.math
+optimizer.pattern-match optimizer.backend optimizer.def-use
+optimizer.inlining generic.standard system ;
 
 { + bignum+ float+ fixnum+fast } {
     { { number 0 } [ drop ] }

@@ -1,7 +1,7 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.vectors math.matrices namespaces
-sequences parser ;
+sequences ;
 IN: math.matrices.elimination
 
 SYMBOL: matrix
@@ -19,6 +19,9 @@ SYMBOL: matrix
 : rows ( -- n ) matrix get length ;
 
 : cols ( -- n ) 0 nth-row length ;
+
+: skip ( i seq quot -- n )
+    over >r find* drop r> length or ; inline
 
 : first-col ( row# -- n )
     #! First non-zero column

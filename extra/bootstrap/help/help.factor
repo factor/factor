@@ -13,13 +13,7 @@ IN: bootstrap.help
         vocabs
         [ vocab-root ] subset
         [ vocab-source-loaded? ] subset
-        [
-            dup vocab-docs-loaded? [
-                drop
-            ] [
-                dup vocab-root swap load-docs
-            ] if
-        ] each
+        [ dup vocab-docs-loaded? [ drop ] [ load-docs ] if ] each
     ] with-variable
 
     "help.handbook" require ;

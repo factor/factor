@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
-combinators.private classes definitions ;
+sequences.private classes definitions ;
 IN: generic.math
 
 PREDICATE: class math-class ( object -- ? )
@@ -38,9 +38,13 @@ TUPLE: no-math-method left right generic ;
 : no-math-method ( left right generic -- * )
     \ no-math-method construct-boa throw ;
 
+: default-math-method ( generic -- quot )
+    [ no-math-method ] curry [ ] like ;
+
 : applicable-method ( generic class -- quot )
-    over method method-def
-    [ ] [ [ no-math-method ] curry [ ] like ] ?if ;
+    over method
+    [ method-word word-def ]
+    [ default-math-method ] ?if ;
 
 : object-method ( generic -- quot )
     object bootstrap-word applicable-method ;
@@ -54,17 +58,19 @@ TUPLE: no-math-method left right generic ;
         2drop object-method
     ] if ;
 
-: math-vtable* ( picker max quot -- quot )
+: math-vtable ( picker quot -- quot )
     [
-        rot , \ tag ,
-        [ >r [ type>class ] map r> map % ] { } make ,
+        >r
+        , \ tag ,
+        num-tags get [ bootstrap-type>class ]
+        r> compose map ,
         \ dispatch ,
     ] [ ] make ; inline
 
-: math-vtable ( picker quot -- quot )
-    num-tags get swap math-vtable* ; inline
-
 TUPLE: math-combination ;
+
+M: math-combination make-default-method
+    drop default-math-method ;
 
 M: math-combination perform-combination
     drop

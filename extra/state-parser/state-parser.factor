@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.streams.string kernel math namespaces sequences
-strings circular prettyprint debugger ;
+strings circular prettyprint debugger ascii ;
 IN: state-parser
 
 ! * Basic underlying words

@@ -9,50 +9,82 @@ quotations io.launcher words.private tools.deploy.config
 bootstrap.image ;
 IN: tools.deploy.backend
 
-: boot-image-name ( -- string )
-    "boot." my-arch ".image" 3append ;
-
-: stage1 ( -- )
-    #! If stage1 image doesn't exist, create one.
-    boot-image-name resource-path exists?
-    [ my-arch make-image ] unless ;
-
-: (copy-lines) ( stream -- stream )
-    dup stream-readln [ print flush (copy-lines) ] when* ;
+: (copy-lines) ( stream -- )
+    dup stream-readln dup
+    [ print flush (copy-lines) ] [ 2drop ] if ;
 
 : copy-lines ( stream -- )
-    [ (copy-lines) ] [ stream-close ] [ ] cleanup ;
+    [ (copy-lines) ] with-disposal ;
 
-: ?append swap [ append ] [ drop ] if ;
-
-: profile-string ( config -- string )
+: run-with-output ( arguments -- )
     [
-        ""
-        deploy-math? get " math" ?append
-        deploy-compiler? get " compiler" ?append
-        deploy-ui? get " ui" ?append
-        native-io? " io" ?append
+        +arguments+ set
+        +stdout+ +stderr+ set
+    ] H{ } make-assoc <process-stream>
+    dup duplex-stream-out dispose
+    dup copy-lines
+    process-stream-process wait-for-process zero? [
+        "Deployment failed" throw
+    ] unless ;
+
+: make-boot-image ( -- )
+    #! If stage1 image doesn't exist, create one.
+    my-boot-image-name resource-path exists?
+    [ my-arch make-image ] unless ;
+
+: ?, [ , ] [ drop ] if ;
+
+: bootstrap-profile ( config -- profile )
+    [
+        [
+            "math" deploy-math? get ?,
+            "compiler" deploy-compiler? get ?,
+            "ui" deploy-ui? get ?,
+            "io" native-io? ?,
+        ] { } make
     ] bind ;
 
-: deploy-command-line ( vm image vocab config -- vm flags )
+: staging-image-name ( profile -- name )
+    "staging." swap bootstrap-profile "-" join ".image" 3append ;
+
+: staging-command-line ( config -- flags )
     [
-        "-include=" swap profile-string append ,
+        "-i=" my-boot-image-name append ,
 
-        "-deploy-vocab=" swap append ,
+        "-output-image=" over staging-image-name append ,
 
-        "-output-image=" swap append ,
+        "-include=" swap bootstrap-profile " " join append ,
 
         "-no-stack-traces" ,
 
         "-no-user-init" ,
     ] { } make ;
 
-: stage2 ( vm image vocab config -- )
-    deploy-command-line
-    >r "-i=" boot-image-name append 2array r> append dup .
-    <process-stream>
-    dup duplex-stream-out stream-close
-    copy-lines ;
+: run-factor ( vm flags -- )
+    dup . swap add* run-with-output ; inline
+
+: make-staging-image ( vm config -- )
+    staging-command-line run-factor ;
+
+: deploy-command-line ( image vocab config -- flags )
+    [
+        "-i=" swap staging-image-name append ,
+
+        "-run=tools.deploy.shaker" ,
+
+        "-deploy-vocab=" swap append ,
+
+        "-output-image=" swap append ,
+
+        "-no-stack-traces" ,
+    ] { } make ;
+
+: make-deploy-image ( vm image vocab config -- )
+    make-boot-image
+    dup staging-image-name exists? [
+        >r pick r> tuck make-staging-image
+    ] unless
+    deploy-command-line run-factor ;
 
 SYMBOL: deploy-implementation
 

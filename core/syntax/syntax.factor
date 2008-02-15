@@ -1,11 +1,11 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays byte-arrays definitions generic
-hashtables kernel math namespaces parser sequences strings sbufs
-vectors words quotations io assocs splitting tuples
-generic.standard generic.math classes io.files vocabs
-float-arrays classes.union classes.mixin classes.predicate
-compiler.units ;
+USING: alien arrays bit-arrays bit-vectors byte-arrays
+byte-vectors definitions generic hashtables kernel math
+namespaces parser sequences strings sbufs vectors words
+quotations io assocs splitting tuples generic.standard
+generic.math classes io.files vocabs float-arrays float-vectors
+classes.union classes.mixin classes.predicate compiler.units ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -71,8 +71,11 @@ IN: bootstrap.syntax
     "{" [ \ } [ >array ] parse-literal ] define-syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-syntax
+    "BV{" [ \ } [ >byte-vector ] parse-literal ] define-syntax
     "?{" [ \ } [ >bit-array ] parse-literal ] define-syntax
+    "?V{" [ \ } [ >bit-vector ] parse-literal ] define-syntax
     "F{" [ \ } [ >float-array ] parse-literal ] define-syntax
+    "FV{" [ \ } [ >float-vector ] parse-literal ] define-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
     "T{" [ \ } [ >tuple ] parse-literal ] define-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
@@ -123,7 +126,7 @@ IN: bootstrap.syntax
         f set-word
         location >r
         scan-word bootstrap-word scan-word
-        [ parse-definition <method> -rot define-method ] 2keep
+        [ parse-definition -rot define-method ] 2keep
         2array r> remember-definition
     ] define-syntax
 

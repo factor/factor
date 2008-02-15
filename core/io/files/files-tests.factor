@@ -1,8 +1,9 @@
 IN: temporary
-USING: tools.test io.files io threads kernel ;
+USING: tools.test io.files io threads kernel continuations ;
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
-[ "awk/" ] [ "/usr/libexec/awk/" file-name ] unit-test
+[ "awk" ] [ "/usr/libexec/awk/" file-name ] unit-test
+[ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
 
 [ ] [
     "test-foo.txt" resource-path <file-writer> [
@@ -41,7 +42,7 @@ USING: tools.test io.files io threads kernel ;
 [ ] [ "test-blah" resource-path make-directory ] unit-test
 
 [ ] [
-    "test-blah/fooz" resource-path <file-writer> stream-close
+    "test-blah/fooz" resource-path <file-writer> dispose
 ] unit-test
 
 [ t ] [

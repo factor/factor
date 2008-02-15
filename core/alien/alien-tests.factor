@@ -1,7 +1,7 @@
 IN: temporary
-USING: alien byte-arrays
-arrays kernel kernel.private namespaces tools.test sequences
-libc math system prettyprint ;
+USING: alien alien.accessors byte-arrays arrays kernel
+kernel.private namespaces tools.test sequences libc math system
+prettyprint ;
 
 [ t ] [ -1 <alien> alien-address 0 > ] unit-test
 
@@ -14,7 +14,7 @@ libc math system prettyprint ;
 ! Testing the various bignum accessor
 10 <byte-array> "dump" set
 
-[ "dump" get alien-address ] unit-test-fails
+[ "dump" get alien-address ] must-fail
 
 [ 123 ] [
     123 "dump" get 0 set-alien-signed-1
@@ -61,9 +61,9 @@ cell 8 = [
 [ ] [ 0 F{ 1 2 3 } <displaced-alien> drop ] unit-test
 [ ] [ 0 ?{ t f t } <displaced-alien> drop ] unit-test
 
-[ 0 B{ 1 2 3 } <displaced-alien> alien-address ] unit-test-fails
+[ 0 B{ 1 2 3 } <displaced-alien> alien-address ] must-fail
 
-[ 1 1 <displaced-alien> ] unit-test-fails
+[ 1 1 <displaced-alien> ] must-fail
 
 [ f ] [ 0 B{ 1 2 3 } <displaced-alien> pinned-c-ptr? ] unit-test
 

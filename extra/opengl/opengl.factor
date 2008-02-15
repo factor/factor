@@ -1,9 +1,11 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! Portions copyright (C) 2007 Eduardo Cavazos.
+! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types kernel libc math namespaces sequences
-math.vectors math.constants math.functions opengl.gl opengl.glu
-combinators arrays ;
+USING: alien alien.c-types continuations kernel libc math macros
+namespaces math.vectors math.constants math.functions
+math.parser opengl.gl opengl.glu combinators arrays sequences
+splitting words byte-arrays assocs combinators.lib ;
 IN: opengl
 
 : coordinates [ first2 ] 2apply ;
@@ -28,6 +30,21 @@ IN: opengl
 
 : do-enabled ( what quot -- )
     over glEnable dip glDisable ; inline
+: do-enabled-client-state ( what quot -- )
+    over glEnableClientState dip glDisableClientState ; inline
+
+: words>values ( word/value-seq -- value-seq )
+    [ dup word? [ execute ] [ ] if ] map ;
+
+: (all-enabled) ( seq quot -- )
+    over [ glEnable ] each dip [ glDisable ] each ; inline
+: (all-enabled-client-state) ( seq quot -- )
+    over [ glEnableClientState ] each dip [ glDisableClientState ] each ; inline
+
+MACRO: all-enabled ( seq quot -- )
+    >r words>values r> [ (all-enabled) ] 2curry ;
+MACRO: all-enabled-client-state ( seq quot -- )
+    >r words>values r> [ (all-enabled-client-state) ] 2curry ;
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
@@ -93,8 +110,45 @@ IN: opengl
         ] 2each 2drop
     ] do-state ;
 
+: (gen-gl-object) ( quot -- id )
+    >r 1 0 <uint> r> keep *uint ; inline
 : gen-texture ( -- id )
-    1 0 <uint> [ glGenTextures ] keep *uint ;
+    [ glGenTextures ] (gen-gl-object) ;
+: gen-gl-buffer ( -- id )
+    [ glGenBuffers ] (gen-gl-object) ;
+
+: (delete-gl-object) ( id quot -- )
+    >r 1 swap <uint> r> call ; inline
+: delete-texture ( id -- )
+    [ glDeleteTextures ] (delete-gl-object) ;
+: delete-gl-buffer ( id -- )
+    [ glDeleteBuffers ] (delete-gl-object) ;
+
+: with-gl-buffer ( binding id quot -- )
+    -rot dupd glBindBuffer
+    [ slip ] [ 0 glBindBuffer ] [ ] cleanup ; inline
+
+: with-array-element-buffers ( array-buffer element-buffer quot -- )
+    -rot GL_ELEMENT_ARRAY_BUFFER swap [
+        swap GL_ARRAY_BUFFER -rot with-gl-buffer
+    ] with-gl-buffer ; inline
+
+: <gl-buffer> ( target data hint -- id )
+    pick gen-gl-buffer [ [
+        >r dup byte-length swap r> glBufferData
+    ] with-gl-buffer ] keep ;
+
+: buffer-offset ( int -- alien )
+    <alien> ; inline
+
+: bind-texture-unit ( id target unit -- )
+    glActiveTexture swap glBindTexture gl-error ;
+
+: (set-draw-buffers) ( buffers -- )
+    dup length swap >c-uint-array glDrawBuffers ;
+
+MACRO: set-draw-buffers ( buffers -- )
+    words>values [ (set-draw-buffers) ] curry ;
 
 : do-attribs ( bits quot -- )
     swap glPushAttrib call glPopAttrib ; inline
@@ -120,7 +174,7 @@ TUPLE: sprite loc dim dim2 dlist texture ;
             GL_UNSIGNED_BYTE r> glTexImage2D
         ] do-attribs
     ] keep ;
-
+    
 : gen-dlist ( -- id ) 1 glGenLists ;
 
 : make-dlist ( type quot -- id )
@@ -154,6 +208,14 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     swap sprite-loc v- gl-translate
     GL_TEXTURE_2D 0 glBindTexture ;
 
+: rect-vertices ( lower-left upper-right -- )
+    GL_QUADS [
+        over first2 glVertex2d
+        dup first pick second glVertex2d
+        dup first2 glVertex2d
+        swap first swap second glVertex2d
+    ] do-state ;
+
 : make-sprite-dlist ( sprite -- id )
     GL_MODELVIEW [
         GL_COMPILE [ draw-sprite ] make-dlist
@@ -167,9 +229,10 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 
 : free-sprite ( sprite -- )
     dup sprite-dlist delete-dlist
-    sprite-texture <uint> 1 swap glDeleteTextures ;
+    sprite-texture delete-texture ;
 
-: free-sprites ( sprites -- ) [ [ free-sprite ] when* ] each ;
+: free-sprites ( sprites -- )
+    [ nip [ free-sprite ] when* ] assoc-each ;
 
 : with-translation ( loc quot -- )
     GL_MODELVIEW [ >r gl-translate r> call ] do-matrix ; inline
@@ -185,100 +248,3 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     glLoadIdentity
     GL_MODELVIEW glMatrixMode
     glLoadIdentity ;
-
-! Shaders
-
-: c-true? ( int -- ? ) zero? not ; inline
-
-: with-gl-shader-source-ptr ( string quot -- )
-    swap dup length 1+ [ tuck string>memory <void*> swap call ] with-malloc ; inline
-
-: <gl-shader> ( source kind -- shader )
-    glCreateShader dup rot [ 1 swap f glShaderSource ] with-gl-shader-source-ptr
-    [ glCompileShader ] keep
-    gl-error ;
-
-: (gl-shader?) ( object -- ? )
-    dup integer? [ glIsShader c-true? ] [ drop f ] if ;
-
-: gl-shader-get-int ( shader enum -- value )
-    0 <int> [ glGetShaderiv ] keep *int ;
-
-: gl-shader-ok? ( shader -- ? )
-    GL_COMPILE_STATUS gl-shader-get-int c-true? ;
-
-: <vertex-shader> ( source -- vertex-shader )
-    GL_VERTEX_SHADER <gl-shader> ; inline
-
-: (vertex-shader?) ( object -- ? )
-    dup (gl-shader?) [ GL_SHADER_TYPE gl-shader-get-int GL_VERTEX_SHADER = ] [ drop f ] if ;
-
-: <fragment-shader> ( source -- fragment-shader )
-    GL_FRAGMENT_SHADER <gl-shader> ; inline
-
-: (fragment-shader?) ( object -- ? )
-    dup (gl-shader?) [ GL_SHADER_TYPE gl-shader-get-int GL_FRAGMENT_SHADER = ] [ drop f ] if ;
-
-: gl-shader-info-log-length ( shader -- log-length )
-    GL_INFO_LOG_LENGTH gl-shader-get-int ; inline
-
-: gl-shader-info-log ( shader -- log )
-    dup gl-shader-info-log-length dup [ [ 0 <int> swap glGetShaderInfoLog ] keep alien>char-string ] with-malloc ;
-
-: check-gl-shader ( shader -- shader* )
-    dup gl-shader-ok? [ dup gl-shader-info-log throw ] unless ;
-
-: delete-gl-shader ( shader -- ) glDeleteShader ; inline
-
-PREDICATE: integer gl-shader (gl-shader?) ;
-PREDICATE: gl-shader vertex-shader (vertex-shader?) ;
-PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
-
-! Programs
-
-: <gl-program> ( shaders -- program )
-    glCreateProgram swap
-    [ dupd glAttachShader ] each
-    [ glLinkProgram ] keep
-    gl-error ;
-
-: (gl-program?) ( object -- ? )
-    dup integer? [ glIsProgram c-true? ] [ drop f ] if ;
-
-: gl-program-get-int ( program enum -- value )
-    0 <int> [ glGetProgramiv ] keep *int ;
-
-: gl-program-ok? ( program -- ? )
-    GL_LINK_STATUS gl-program-get-int c-true? ;
-
-: gl-program-info-log-length ( program -- log-length )
-    GL_INFO_LOG_LENGTH gl-program-get-int ; inline
-
-: gl-program-info-log ( program -- log )
-    dup gl-program-info-log-length
-    dup [ [ 0 <int> swap glGetProgramInfoLog ] keep
-          alien>char-string ] with-malloc ;
-
-: check-gl-program ( program -- program* )
-    dup gl-program-ok? [ dup gl-program-info-log throw ] unless ;
-
-: gl-program-shaders-length ( program -- shaders-length )
-    GL_ATTACHED_SHADERS gl-program-get-int ; inline
-
-: gl-program-shaders ( program -- shaders )
-    dup gl-program-shaders-length
-    [ dup "GLuint" <c-array> [ 0 <int> swap glGetAttachedShaders ] keep ] keep
-    c-uint-array> ;
-
-: delete-gl-program-only ( program -- ) glDeleteProgram ; inline
-
-: detach-gl-program-shader ( program shader -- ) glDetachShader ; inline
-
-: delete-gl-program ( program -- )
-    dup gl-program-shaders [ 2dup detach-gl-program-shader delete-gl-shader ] each
-    delete-gl-program-only ;
-
-: with-gl-program ( program quot -- )
-    swap glUseProgram call 0 glUseProgram ; inline
-
-PREDICATE: integer gl-program (gl-program?) ;

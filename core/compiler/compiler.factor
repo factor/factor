@@ -26,11 +26,11 @@ IN: compiler
     >r dupd save-effect r>
     f pick compiler-error
     over compiled-unxref
-    over word-vocabulary [ compiled-xref ] [ 2drop ] if ;
+    over crossref? [ compiled-xref ] [ 2drop ] if ;
 
 : compile-succeeded ( word -- effect dependencies )
     [
-        dup word-dataflow >r swap dup r> optimize generate
+        [ word-dataflow optimize ] keep dup generate
     ] computing-dependencies ;
 
 : compile-failed ( word error -- )
@@ -42,12 +42,9 @@ IN: compiler
     [ dupd compile-failed f save-effect ]
     recover ;
 
-: delete-any ( assoc -- element )
-    [ [ 2drop t ] assoc-find 2drop dup ] keep delete-at ;
-
 : compile-loop ( assoc -- )
     dup assoc-empty? [ drop ] [
-        dup delete-any (compile)
+        dup delete-any drop (compile)
         yield
         compile-loop
     ] if ;

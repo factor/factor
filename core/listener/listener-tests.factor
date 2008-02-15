@@ -22,7 +22,7 @@ IN: temporary
             [
                 "\\ + 1 2 3 4" parse-interactive
                 "cont" get continue-with
-            ] catch
+            ] ignore-errors
             "USE: debugger :1" eval
         ] callcc1
     ] unit-test
@@ -36,7 +36,7 @@ IN: temporary
 
 [
     "USE: vocabs.loader.test.c" parse-interactive
-] unit-test-fails
+] must-fail
 
 [ ] [
     [

@@ -1,10 +1,7 @@
-USING: io.unix.backend io.unix.files io.unix.sockets
+USING: io.unix.backend io.unix.files io.unix.sockets io.timeouts
 io.unix.launcher io.unix.mmap io.backend combinators namespaces
-system vocabs.loader ;
+system vocabs.loader sequences ;
 
-{
-    { [ bsd? ] [ "io.unix.bsd" ] }
-    { [ macosx? ] [ "io.unix.bsd" ] }
-    { [ linux? ] [ "io.unix.linux" ] }
-    { [ solaris? ] [ "io.unix.solaris" ] }
-} cond require
+"io.unix." os append require
+
+"vocabs.monitor" require

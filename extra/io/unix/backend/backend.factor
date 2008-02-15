@@ -3,7 +3,7 @@
 USING: alien generic assocs kernel kernel.private math
 io.nonblocking sequences strings structs sbufs threads unix
 vectors io.buffers io.backend io.streams.duplex math.parser
-continuations system libc qualified namespaces ;
+continuations system libc qualified namespaces io.timeouts ;
 QUALIFIED: io
 IN: io.unix.backend
 
@@ -14,9 +14,9 @@ TUPLE: io-task port callbacks ;
 
 : io-task-fd io-task-port port-handle ;
 
-: <io-task> ( port continuation class -- task )
-    >r 1vector io-task construct-boa r> construct-delegate ;
-    inline
+: <io-task> ( port continuation/f class -- task )
+    >r [ 1vector ] [ V{ } clone ] if* io-task construct-boa
+    r> construct-delegate ; inline
 
 TUPLE: input-task ;
 
@@ -57,7 +57,11 @@ GENERIC: wait-for-events ( ms mx -- )
 M: mx register-io-task ( task mx -- )
     2dup check-io-task fd/container set-at ;
 
-: add-io-task ( task -- ) mx get-global register-io-task ;
+: add-io-task ( task -- )
+    mx get-global register-io-task stop ;
+
+: with-port-continuation ( port quot -- port )
+    [ callcc0 ] curry with-timeout ; inline
 
 M: mx unregister-io-task ( task mx -- )
     fd/container delete-at drop ;
@@ -98,11 +102,23 @@ M: integer close-handle ( fd -- )
     io-task-callbacks [ schedule-thread ] each ;
 
 : handle-io-task ( mx task -- )
-    dup io-task-port touch-port
     dup do-io-task [ pop-callbacks ] [ 2drop ] if ;
 
-: handle-timeout ( mx task -- )
-    "Timeout" over io-task-port report-error pop-callbacks ;
+: handle-timeout ( port mx assoc -- )
+    >r swap port-handle r> delete-at* [
+        "I/O operation cancelled" over io-task-port report-error
+        pop-callbacks
+    ] [
+        2drop
+    ] if ;
+
+: cancel-io-tasks ( port mx -- )
+    2dup
+    dup mx-reads handle-timeout
+    dup mx-writes handle-timeout ;
+
+M: unix-io cancel-io ( port -- )
+    mx get-global cancel-io-tasks ;
 
 ! Readers
 : reader-eof ( reader -- )
@@ -133,7 +149,8 @@ M: read-task do-io-task
     [ [ reader-eof ] [ drop ] if ] keep ;
 
 M: input-port (wait-to-read)
-    [ <read-task> add-io-task stop ] callcc0 pending-error ;
+    [ <read-task> add-io-task ] with-port-continuation
+    pending-error ;
 
 ! Writers
 : write-step ( port -- ? )
@@ -151,11 +168,11 @@ M: write-task do-io-task
 
 : add-write-io-task ( port continuation -- )
     over port-handle mx get-global mx-writes at*
-    [ io-task-callbacks push drop ]
+    [ io-task-callbacks push stop ]
     [ drop <write-task> add-io-task ] if ;
 
 : (wait-to-write) ( port -- )
-    [ add-write-io-task stop ] callcc0 drop ;
+    [ add-write-io-task ] with-port-continuation drop ;
 
 M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
@@ -177,7 +194,7 @@ TUPLE: mx-port mx ;
 TUPLE: mx-task ;
 
 : <mx-task> ( port -- task )
-    f io-task construct-boa mx-task construct-delegate ;
+    f mx-task <io-task> ;
 
 M: mx-task do-io-task
     io-task-port mx-port-mx 0 swap wait-for-events f ;

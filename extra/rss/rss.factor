@@ -78,7 +78,7 @@ C: <entry> entry
 
 : download-feed ( url -- feed )
     #! Retrieve an news syndication file, return as a feed tuple.
-    http-get-stream rot 200 = [
+    http-get-stream rot success? [
         nip read-feed
     ] [
         2drop "Error retrieving newsfeed file" throw

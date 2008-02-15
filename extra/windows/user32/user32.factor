@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax parser namespaces kernel math
-windows.types shuffle ;
+windows.types shuffle math.bitfields ;
 IN: windows.user32
 
 ! HKL for ActivateKeyboardLayout
@@ -32,9 +32,18 @@ IN: windows.user32
 : WS_MAXIMIZEBOX      HEX: 00010000 ; inline
 
 ! Common window styles
-: WS_OVERLAPPEDWINDOW WS_OVERLAPPED WS_CAPTION WS_SYSMENU WS_THICKFRAME WS_MINIMIZEBOX WS_MAXIMIZEBOX bitor bitor bitor bitor bitor ; foldable inline
+: WS_OVERLAPPEDWINDOW
+    {
+        WS_OVERLAPPED
+        WS_CAPTION
+        WS_SYSMENU
+        WS_THICKFRAME
+        WS_MINIMIZEBOX
+        WS_MAXIMIZEBOX
+    } flags ; foldable
 
-: WS_POPUPWINDOW      WS_POPUP WS_BORDER WS_SYSMENU bitor bitor ; foldable inline
+: WS_POPUPWINDOW
+    { WS_POPUP WS_BORDER WS_SYSMENU } flags ; foldable
 
 : WS_CHILDWINDOW      WS_CHILD ; inline
 
@@ -66,10 +75,9 @@ IN: windows.user32
 : WS_EX_STATICEDGE        HEX: 00020000 ; inline
 : WS_EX_APPWINDOW         HEX: 00040000 ; inline
 : WS_EX_OVERLAPPEDWINDOW ( -- n )
-    WS_EX_WINDOWEDGE WS_EX_CLIENTEDGE bitor ; foldable inline
+    WS_EX_WINDOWEDGE WS_EX_CLIENTEDGE bitor ; foldable
 : WS_EX_PALETTEWINDOW ( -- n )
-    WS_EX_WINDOWEDGE WS_EX_TOOLWINDOW bitor
-    WS_EX_TOPMOST bitor ; foldable inline
+    { WS_EX_WINDOWEDGE WS_EX_TOOLWINDOW WS_EX_TOPMOST } flags ; foldable
 
 : CS_VREDRAW          HEX: 0001 ; inline
 : CS_HREDRAW          HEX: 0002 ; inline

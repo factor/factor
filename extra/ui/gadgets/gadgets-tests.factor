@@ -1,6 +1,6 @@
 IN: temporary
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
-namespaces models kernel tools.test.inference dlists math
+namespaces models kernel dlists math
 math.parser ui sequences hashtables assocs io arrays
 prettyprint io.streams.string ;
 

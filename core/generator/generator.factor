@@ -3,24 +3,19 @@
 USING: arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
 inference inference.backend inference.dataflow io kernel
-kernel.private layouts math namespaces optimizer prettyprint
-quotations sequences system threads words vectors ;
+kernel.private layouts math namespaces optimizer
+optimizer.specializers prettyprint quotations sequences system
+threads words vectors ;
 IN: generator
 
 SYMBOL: compile-queue
 SYMBOL: compiled
 
-: begin-compiling ( word -- )
-    f swap compiled get set-at ;
-
-: finish-compiling ( word literals relocation labels code -- )
-    4array swap compiled get set-at ;
-
 : queue-compile ( word -- )
     {
         { [ dup compiled get key? ] [ drop ] }
+        { [ dup inlined-block? ] [ drop ] }
         { [ dup primitive? ] [ drop ] }
-        { [ dup deferred? ] [ drop ] }
         { [ t ] [ dup compile-queue get set-at ] }
     } cond ;
 
@@ -31,39 +26,49 @@ SYMBOL: compiling-word
 
 SYMBOL: compiling-label
 
+SYMBOL: compiling-loop?
+
 ! Label of current word, after prologue, makes recursion faster
 SYMBOL: current-label-start
 
 : compiled-stack-traces? ( -- ? ) 36 getenv ;
 
-: init-generator ( -- )
+: begin-compiling ( word label -- )
+    compiling-loop? off
+    compiling-label set
+    compiling-word set
     compiled-stack-traces?
-    compiling-word get  f ?
-    1vector literal-table set ;
+    compiling-word get f ?
+    1vector literal-table set
+    f compiling-word get compiled get set-at ;
 
-: generate-1 ( word label node quot -- )
-    pick begin-compiling [
-        roll compiling-word set
-        pick compiling-label set
-        init-generator
-        call
-        literal-table get >array
-    ] { } make fixup finish-compiling ;
+: finish-compiling ( literals relocation labels code -- )
+    4array compiling-label get compiled get set-at ;
+
+: with-generator ( node word label quot -- )
+    [
+        >r begin-compiling r>
+        { } make fixup
+        finish-compiling
+    ] with-scope ; inline
 
 GENERIC: generate-node ( node -- next )
 
 : generate-nodes ( node -- )
     [ node@ generate-node ] iterate-nodes end-basic-block ;
 
-: generate ( word label node -- )
+: init-generate-nodes ( -- )
+    init-templates
+    %save-word-xt
+    %prologue-later
+    current-label-start define-label
+    current-label-start resolve-label ;
+
+: generate ( node word label -- )
     [
-        init-templates
-        %save-word-xt
-        %prologue-later
-        current-label-start define-label
-        current-label-start resolve-label
+        init-generate-nodes
         [ generate-nodes ] with-node-iterator
-    ] generate-1 ;
+    ] with-generator ;
 
 : word-dataflow ( word -- effect dataflow )
     [
@@ -78,25 +83,6 @@ GENERIC: generate-node ( node -- next )
 : if-intrinsics ( #call -- quot )
     node-param "if-intrinsics" word-prop ;
 
-DEFER: #terminal?
-
-PREDICATE: #merge #terminal-merge node-successor #terminal? ;
-
-PREDICATE: #values #terminal-values node-successor #terminal? ;
-
-PREDICATE: #call #terminal-call
-    dup node-successor #if?
-    over node-successor node-successor #terminal? and
-    swap if-intrinsics and ;
-
-UNION: #terminal
-    POSTPONE: f #return #terminal-values #terminal-merge ;
-
-: tail-call? ( -- ? )
-    node-stack get [
-        dup #terminal-call? swap node-successor #terminal? or
-    ] all? ;
-
 ! node
 M: node generate-node drop iterate-next ;
 
@@ -108,19 +94,37 @@ M: node generate-node drop iterate-next ;
 : generate-call ( label -- next )
     dup maybe-compile
     end-basic-block
-    tail-call? [
-        %jump f
+    dup compiling-label get eq? compiling-loop? get and [
+        drop current-label-start get %jump-label f
     ] [
-        0 frame-required
-        %call
-        iterate-next
+        tail-call? [
+            %jump f
+        ] [
+            0 frame-required
+            %call
+            iterate-next
+        ] if
     ] if ;
 
 ! #label
 M: #label generate-node
     dup node-param generate-call >r
-    dup #label-word over node-param rot node-child generate
+    dup node-child over #label-word rot node-param generate
     r> ;
+
+! #loop
+M: #loop generate-node
+    end-basic-block
+    [
+        dup node-param compiling-label set
+        current-label-start define-label
+        current-label-start resolve-label
+        compiling-loop? on
+        node-child generate-nodes
+        end-basic-block
+    ] with-scope
+    init-templates
+    iterate-next ;
 
 ! #if
 : end-false-branch ( label -- )
@@ -146,30 +150,37 @@ M: #if generate-node
 ! #dispatch
 : dispatch-branch ( node word -- label )
     gensym [
-        rot [
+        [
             copy-templates
             %save-dispatch-xt
             %prologue-later
             [ generate-nodes ] with-node-iterator
-        ] generate-1
+        ] with-generator
     ] keep ;
 
 : dispatch-branches ( node -- )
     node-children [
-        compiling-word get dispatch-branch %dispatch-label
+        compiling-word get dispatch-branch
+        %dispatch-label
     ] each ;
+
+: generate-dispatch ( node -- )
+    %dispatch dispatch-branches init-templates ;
 
 M: #dispatch generate-node
     #! The order here is important, dispatch-branches must
     #! run after %dispatch, so that each branch gets the
     #! correct register state
     tail-call? [
-        %jump-dispatch dispatch-branches
+        generate-dispatch iterate-next
     ] [
-        0 frame-required
-        %call-dispatch >r dispatch-branches r> resolve-label
-    ] if
-    init-templates iterate-next ;
+        compiling-word get gensym [
+            [
+                init-generate-nodes
+                generate-dispatch
+            ] with-generator
+        ] keep generate-call
+    ] if ;
 
 ! #call
 : define-intrinsics ( word intrinsics -- )
@@ -206,10 +217,11 @@ M: #dispatch generate-node
 : define-if-intrinsic ( word quot inputs -- )
     2array 1array define-if-intrinsics ;
 
-: do-if-intrinsic ( #call pair -- next )
-    <label> [ swap do-template ] keep
-    >r node-successor r> generate-if
-    node-successor ;
+: do-if-intrinsic ( pair -- next )
+    <label> [
+        swap do-template
+        node> node-successor dup >node
+    ] keep generate-if ;
 
 : find-intrinsic ( #call -- pair/f )
     intrinsics find-template ;
@@ -231,7 +243,7 @@ M: #call generate-node
         ] [
             node-param generate-call
         ] ?if
-    ] if* ;
+    ] ?if ;
 
 ! #call-label
 M: #call-label generate-node node-param generate-call ;
@@ -256,4 +268,6 @@ M: #r> generate-node
     iterate-next ;
 
 ! #return
-M: #return generate-node drop end-basic-block %return f ;
+M: #return generate-node
+    node-param compiling-label get eq? compiling-loop? get and
+    [ end-basic-block %return ] unless f ;

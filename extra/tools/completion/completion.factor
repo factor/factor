@@ -1,8 +1,9 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: tools.completion
 USING: kernel arrays sequences math namespaces strings io
-vectors words assocs combinators sorting ;
+vectors words assocs combinators sorting unicode.case
+unicode.categories ;
 
 : (fuzzy) ( accum ch i full -- accum i ? )
     index* 
@@ -60,13 +61,14 @@ vectors words assocs combinators sorting ;
     dupd fuzzy score max ;
 
 : completion ( short candidate -- result )
-    [ second swap complete ] keep first 2array ;
+    [ second >lower swap complete ] keep first 2array ;
 
 : completions ( short candidates -- seq )
     over empty? [
         nip [ first ] map
     ] [
-        >r >lower r> [ completion ] with map rank-completions
+        >r >lower r> [ completion ] with map
+        rank-completions
     ] if ;
 
 : string-completions ( short strs -- seq )

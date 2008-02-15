@@ -2,30 +2,30 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! based on glx.h from xfree86, and some of glxtokens.h
-USING: alien alien.c-types alien.syntax x11.xlib
-namespaces kernel sequences ;
+USING: alien alien.c-types alien.syntax alien.syntax.private x11.xlib
+namespaces kernel sequences parser words ;
 IN: x11.glx
 
 LIBRARY: glx
 
 ! Visual Config Attributes (glXGetConfig, glXGetFBConfigAttrib)
-: GLX_USE_GL		1  ; ! support GLX rendering
-: GLX_BUFFER_SIZE	2  ; ! depth of the color buffer
-: GLX_LEVEL		3  ; ! level in plane stacking
-: GLX_RGBA		4  ; ! true if RGBA mode
-: GLX_DOUBLEBUFFER	5  ; ! double buffering supported
-: GLX_STEREO		6  ; ! stereo buffering supported
-: GLX_AUX_BUFFERS	7  ; ! number of aux buffers
-: GLX_RED_SIZE		8  ; ! number of red component bits
-: GLX_GREEN_SIZE	9  ; ! number of green component bits
-: GLX_BLUE_SIZE		10 ; ! number of blue component bits
-: GLX_ALPHA_SIZE	11 ; ! number of alpha component bits
-: GLX_DEPTH_SIZE	12 ; ! number of depth bits
-: GLX_STENCIL_SIZE	13 ; ! number of stencil bits
-: GLX_ACCUM_RED_SIZE	14 ; ! number of red accum bits
-: GLX_ACCUM_GREEN_SIZE	15 ; ! number of green accum bits
-: GLX_ACCUM_BLUE_SIZE	16 ; ! number of blue accum bits
-: GLX_ACCUM_ALPHA_SIZE	17 ; ! number of alpha accum bits
+: GLX_USE_GL            1  ; ! support GLX rendering
+: GLX_BUFFER_SIZE       2  ; ! depth of the color buffer
+: GLX_LEVEL             3  ; ! level in plane stacking
+: GLX_RGBA              4  ; ! true if RGBA mode
+: GLX_DOUBLEBUFFER      5  ; ! double buffering supported
+: GLX_STEREO            6  ; ! stereo buffering supported
+: GLX_AUX_BUFFERS       7  ; ! number of aux buffers
+: GLX_RED_SIZE          8  ; ! number of red component bits
+: GLX_GREEN_SIZE        9  ; ! number of green component bits
+: GLX_BLUE_SIZE         10 ; ! number of blue component bits
+: GLX_ALPHA_SIZE        11 ; ! number of alpha component bits
+: GLX_DEPTH_SIZE        12 ; ! number of depth bits
+: GLX_STENCIL_SIZE      13 ; ! number of stencil bits
+: GLX_ACCUM_RED_SIZE    14 ; ! number of red accum bits
+: GLX_ACCUM_GREEN_SIZE  15 ; ! number of green accum bits
+: GLX_ACCUM_BLUE_SIZE   16 ; ! number of blue accum bits
+: GLX_ACCUM_ALPHA_SIZE  17 ; ! number of alpha accum bits
 
 TYPEDEF: XID GLXContextID
 TYPEDEF: XID GLXPixmap
@@ -42,7 +42,7 @@ FUNCTION: GLXContext glXCreateContext ( Display* dpy, XVisualInfo* vis, GLXConte
 FUNCTION: GLXPixmap glXCreateGLXPixmap ( Display* dpy, XVisualInfo* vis, Pixmap pixmap ) ;
 FUNCTION: void glXDestroyContext ( Display* dpy, GLXContext ctx ) ;
 FUNCTION: void glXDestroyGLXPixmap ( Display* dpy, GLXPixmap pix ) ;
-FUNCTION: int glXGetConfig ( Display* dpy, XVisualInfo* vis, int attrib, int* value) ;
+FUNCTION: int glXGetConfig ( Display* dpy, XVisualInfo* vis, int attrib, int* value ) ;
 FUNCTION: GLXContext glXGetCurrentContext ( ) ;
 FUNCTION: GLXDrawable glXGetCurrentDrawable ( ) ;
 FUNCTION: bool glXIsDirect ( Display* dpy, GLXContext ctx ) ;
@@ -79,6 +79,9 @@ FUNCTION: void glXGetSelectedEvent ( Display* dpy, GLXDrawable draw, ulong* even
 
 ! GLX 1.4 and later
 FUNCTION: void* glXGetProcAddress ( char* procname ) ;
+
+! GLX_ARB_get_proc_address extension
+FUNCTION: void* glXGetProcAddressARB ( char* procname ) ;
 
 ! GLX Events
 ! (also skipped for now. only has GLXPbufferClobberEvent, the rest is handled by xlib methinks

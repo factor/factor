@@ -34,11 +34,10 @@ TUPLE: windows-deploy-implementation ;
 T{ windows-deploy-implementation } deploy-implementation set-global
 
 M: windows-deploy-implementation deploy*
-    stage1
     "." resource-path cd
     dup deploy-config [
         [ deploy-name get create-exe-dir ] keep
         [ deploy-name get image-name ] keep
-        [ namespace stage2 ] keep
+        [ namespace make-deploy-image ] keep
         open-in-explorer
     ] bind ;

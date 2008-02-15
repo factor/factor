@@ -1,8 +1,7 @@
 ! Copyright (C) 2005 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-!
 USING: kernel lazy-lists tools.test strings math
-sequences parser-combinators arrays math.parser ;
+sequences parser-combinators arrays math.parser unicode.categories ;
 IN: scratchpad
 
 ! Testing <&>
@@ -77,7 +76,7 @@ IN: scratchpad
 
 [
   "begin1" "begin" token some parse 
-] unit-test-fails 
+] must-fail 
 
 { "begin" } [
   "begin" "begin" token some parse 

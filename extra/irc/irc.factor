@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays calendar io io.sockets kernel match namespaces
-sequences splitting strings continuations threads ;
+sequences splitting strings continuations threads ascii ;
 IN: irc
 
 ! "setup" objects
@@ -185,11 +185,11 @@ SYMBOL: line
     dup irc-client-profile profile-server
     over irc-client-profile profile-port connect*
     dup irc-client-profile profile-nickname login
-    [ irc-loop ] [ irc-stream> stream-close ] [ ] cleanup ;
+    [ irc-loop ] [ irc-stream> dispose ] [ ] cleanup ;
 
 : with-infinite-loop ( quot timeout -- quot timeout )
     "looping" print flush
-    over catch drop dup sleep with-infinite-loop ;
+    over [ drop ] recover dup sleep with-infinite-loop ;
 
 : start-irc ( irc-client -- )
     ! [ [ do-irc ] curry 3000 with-infinite-loop ] with-scope ;

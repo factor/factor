@@ -38,7 +38,7 @@ namespaces combinators words ;
 ! Interpreted
 [ "two" ] [ 2 \ case-test-1 word-def call ] unit-test
 
-[ "x" case-test-1 ] unit-test-fails
+[ "x" case-test-1 ] must-fail
 
 : case-test-2
     {
@@ -69,3 +69,10 @@ namespaces combinators words ;
 
 ! Interpreted
 [ "a hashtable" ] [ H{ } \ case-test-3 word-def call ] unit-test
+
+[ 1 3 t ] [ { 1 3 2 } contiguous-range? ] unit-test
+[ f ] [ { 1 2 2 4 } contiguous-range? 2nip ] unit-test
+[ f ] [ { + 3 2 } contiguous-range? 2nip ] unit-test
+[ f ] [ { 1 0 7 } contiguous-range? 2nip ] unit-test
+[ f ] [ { 1 1 3 7 } contiguous-range? 2nip ] unit-test
+[ 4 8 t ] [ { 7 6 4 8 5 } contiguous-range? ] unit-test

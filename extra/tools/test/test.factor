@@ -3,7 +3,8 @@
 USING: namespaces arrays prettyprint sequences kernel
 vectors quotations words parser assocs combinators
 continuations debugger io io.files vocabs tools.time
-vocabs.loader source-files compiler.units ;
+vocabs.loader source-files compiler.units inspector
+inference effects ;
 IN: tools.test
 
 SYMBOL: failures
@@ -11,7 +12,8 @@ SYMBOL: failures
 : <failure> ( error what -- triple )
     error-continuation get 3array ;
 
-: failure ( error what -- ) <failure> failures get push ;
+: failure ( error what -- )
+    <failure> failures get push ;
 
 SYMBOL: this-test
 
@@ -28,57 +30,77 @@ SYMBOL: this-test
         { } swap with-datastack swap >array assert=
     ] 2curry (unit-test) ;
 
-TUPLE: expected-error ;
+: short-effect ( effect -- pair )
+    dup effect-in length swap effect-out length 2array ;
 
-: unit-test-fails ( quot -- )
-    [ f ] append [ [ drop t ] recover ] curry
+: must-infer-as ( effect quot -- )
+    >r 1quotation r> [ infer short-effect ] curry unit-test ;
+
+: must-infer ( word/quot -- )
+    dup word? [ 1quotation ] when
+    [ infer drop ] curry [ ] swap unit-test ;
+
+: must-fail-with ( quot pred -- )
+    >r [ f ] compose r>
+    [ recover ] 2curry
     [ t ] swap unit-test ;
 
-: run-test ( path -- failures )
-    [ "temporary" forget-vocab ] with-compilation-unit
-    [
-        V{ } clone [
-            failures [
-                [ run-file ] [ swap failure ] recover
-            ] with-variable
-        ] keep
-    ] keep
-    [ forget-source ] with-compilation-unit ;
+: must-fail ( quot -- )
+    [ drop t ] must-fail-with ;
+
+: ignore-errors ( quot -- )
+    [ drop ] recover ; inline
+
+: (run-test) ( vocab -- )
+    dup vocab-source-loaded? [
+        vocab-tests
+        [
+            "temporary" forget-vocab
+            dup [ forget-source ] each
+        ] with-compilation-unit
+        dup [ run-file ] each
+    ] when drop ;
+
+: run-test ( vocab -- failures )
+    V{ } clone [
+        failures [
+            [ (run-test) ] [ swap failure ] recover
+        ] with-variable
+    ] keep ;
 
 : failure. ( triple -- )
     dup second .
     dup first print-error
     "Traceback" swap third write-object ;
 
-: failures. ( path failures -- )
-    "Failing tests in " write swap <pathname> .
-    [ nl failure. nl ] each ;
-
-: run-tests ( seq -- )
-    dup empty? [ drop "==== NOTHING TO TEST" print ] [
-        [ dup run-test ] { } map>assoc
-        [ second empty? not ] subset
+: test-failures. ( assoc -- )
+    [
         nl
         dup empty? [
             drop
             "==== ALL TESTS PASSED" print
         ] [
             "==== FAILING TESTS:" print
-            [ nl failures. ] assoc-each
+            [
+                swap vocab-heading.
+                [ failure. nl ] each
+            ] assoc-each
         ] if
+    ] [
+        "==== NOTHING TO TEST" print
+    ] if* ;
+
+: run-tests ( prefix -- failures )
+    child-vocabs dup empty? [ drop f ] [
+        [ dup run-test ] { } map>assoc
+        [ second empty? not ] subset
     ] if ;
 
-: run-vocab-tests ( vocabs -- )
-    [ vocab-tests-path ] map
-    [ dup [ ?resource-path exists? ] when ] subset
-    run-tests ;
-
 : test ( prefix -- )
-    child-vocabs
-    [ vocab-source-loaded? ] subset
-    run-vocab-tests ;
+    run-tests test-failures. ;
 
-: test-all ( -- ) "" test ;
+: run-all-tests ( prefix -- failures )
+    "" run-tests ;
 
-: test-changes ( -- )
-    "" to-refresh dupd do-refresh run-vocab-tests ;
+: test-all ( -- )
+    run-all-tests test-failures. ;

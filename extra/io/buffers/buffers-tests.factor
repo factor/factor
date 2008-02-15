@@ -1,9 +1,9 @@
 IN: temporary
-USING: alien io.buffers kernel kernel.private libc
+USING: alien alien.c-types io.buffers kernel kernel.private libc
 sequences tools.test namespaces ;
 
 : buffer-set ( string buffer -- )
-    2dup buffer-ptr string>memory
+    2dup buffer-ptr string>char-memory
     >r length r> buffer-reset ;
 
 : string>buffer ( string -- buffer )
@@ -75,5 +75,5 @@ sequences tools.test namespaces ;
 "b" get buffer-free
 
 100 <buffer> "b" set
-[ 1000 "b" get n>buffer ] unit-test-fails
+[ 1000 "b" get n>buffer ] must-fail
 "b" get buffer-free

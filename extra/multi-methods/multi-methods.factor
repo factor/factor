@@ -3,12 +3,12 @@
 USING: kernel math sequences vectors classes combinators
 arrays words assocs parser namespaces definitions
 prettyprint prettyprint.backend quotations arrays.lib
-debugger io compiler.units ;
+debugger io compiler.units kernel.private effects ;
 IN: multi-methods
 
-TUPLE: method loc def ;
+GENERIC: generic-prologue ( combination -- quot )
 
-: <method> { set-method-def } \ method construct ;
+GENERIC: method-prologue ( combination -- quot )
 
 : maximal-element ( seq quot -- n elt )
     dupd [
@@ -25,6 +25,7 @@ TUPLE: method loc def ;
     [
         {
             { [ 2dup eq? ] [ 0 ] }
+            { [ 2dup [ class< ] 2keep swap class< and ] [ 0 ] }
             { [ 2dup class< ] [ -1 ] }
             { [ 2dup swap class< ] [ 1 ] }
             { [ t ] [ 0 ] }
@@ -54,8 +55,37 @@ TUPLE: method loc def ;
 : methods ( word -- alist )
     "multi-methods" word-prop >alist ;
 
-: method-defs ( methods -- methods' )
-    [ method-def ] assoc-map ;
+: make-method-def ( quot classes generic -- quot )
+    [
+        swap [ declare ] curry %
+        "multi-combination" word-prop method-prologue %
+        %
+    ] [ ] make ;
+
+TUPLE: method word def classes generic loc ;
+
+PREDICATE: word method-body "multi-method" word-prop >boolean ;
+
+M: method-body stack-effect
+    "multi-method" word-prop method-generic stack-effect ;
+
+: method-word-name ( classes generic -- string )
+    [
+        word-name %
+        "-(" % [ "," % ] [ word-name % ] interleave ")" %
+    ] "" make ;
+
+: <method-word> ( quot classes generic -- word )
+    #! We xref here because the "multi-method" word-prop isn't
+    #! set yet so crossref? yields f.
+    [ make-method-def ] 2keep
+    method-word-name f <word>
+    dup rot define
+    dup xref ;
+
+: <method> ( quot classes generic -- method )
+    [ <method-word> ] 3keep f \ method construct-boa
+    dup method-word over "multi-method" set-word-prop ;
 
 TUPLE: no-method arguments generic ;
 
@@ -68,8 +98,11 @@ TUPLE: no-method arguments generic ;
     ] if ;
 
 : multi-dispatch-quot ( methods generic -- quot )
-    >r
-    [ [ >r multi-predicate r> ] assoc-map ] keep argument-count
+    >r [
+        [
+            >r multi-predicate r> method-word 1quotation
+        ] assoc-map
+    ] keep argument-count
     r> [ no-method ] 2curry
     swap reverse alist>quot ;
 
@@ -98,36 +131,36 @@ M: no-method error.
     methods congruify-methods sorted-methods keys
     [ niceify-method ] map stack. ;
 
-GENERIC: perform-combination ( word combination -- quot )
-
 TUPLE: standard-combination ;
 
-: standard-combination ( methods generic -- quot )
-    >r congruify-methods sorted-methods r> multi-dispatch-quot ;
+M: standard-combination method-prologue drop [ ] ;
 
-M: standard-combination perform-combination
-    drop [ methods method-defs ] keep standard-combination ;
+M: standard-combination generic-prologue drop [ ] ;
+
+: make-generic ( generic -- quot )
+    dup "multi-combination" word-prop generic-prologue swap
+    [ methods congruify-methods sorted-methods ] keep
+    multi-dispatch-quot append ;
 
 TUPLE: hook-combination var ;
 
-M: hook-combination perform-combination
-    hook-combination-var [ get ] curry swap methods
-    [ method-defs [ [ drop ] swap append ] assoc-map ] keep
-    standard-combination append ;
+M: hook-combination method-prologue
+    drop [ drop ] ;
 
-: make-generic ( word -- )
-    dup dup "multi-combination" word-prop perform-combination
-    define ;
+M: hook-combination generic-prologue
+    hook-combination-var [ get ] curry ;
 
-: init-methods ( word -- )
-    dup "multi-methods" word-prop
-    H{ } assoc-like
-    "multi-methods" set-word-prop ;
+: update-generic ( word -- )
+    dup make-generic define ;
 
 : define-generic ( word combination -- )
-    dupd "multi-combination" set-word-prop
-    dup init-methods
-    make-generic ;
+    over "multi-combination" word-prop over = [
+        2drop
+    ] [
+        dupd "multi-combination" set-word-prop
+        dup H{ } clone "multi-methods" set-word-prop
+        update-generic
+    ] if ;
 
 : define-standard-generic ( word -- )
     T{ standard-combination } define-generic ;
@@ -146,29 +179,31 @@ M: hook-combination perform-combination
 
 : with-methods ( word quot -- )
     over >r >r "multi-methods" word-prop
-    r> call r> make-generic ; inline
+    r> call r> update-generic ; inline
 
-: add-method ( method classes word -- )
+: define-method ( quot classes generic -- )
+    >r [ bootstrap-word ] map r>
+    [ <method> ] 2keep
     [ set-at ] with-methods ;
 
-: forget-method ( classes word -- )
+: forget-method ( classes generic -- )
     [ delete-at ] with-methods ;
 
-: parse-method ( -- method classes word method-spec )
-    parse-definition 2 cut
-    over >r
-    >r first2 swap r> <method> -rot
-    r> first2 swap add* >array ;
+: method>spec ( method -- spec )
+    dup method-classes swap method-generic add* ;
+
+: parse-method ( -- quot classes generic )
+    parse-definition dup 2 tail over second rot first ;
 
 : METHOD:
     location
-    >r parse-method >r add-method r> r>
+    >r parse-method [ define-method ] 2keep add* r>
     remember-definition ; parsing
 
 ! For compatibility
 : M:
-    scan-word 1array scan-word parse-definition <method>
-    -rot add-method ; parsing
+    scan-word 1array scan-word parse-definition
+    -rot define-method ; parsing
 
 ! Definition protocol. We qualify core generics here
 USE: qualified
@@ -202,7 +237,7 @@ PREDICATE: array method-spec
     unclip generic? >r [ class? ] all? r> and ;
 
 syntax:M: method-spec where
-    dup unclip method method-loc [ ] [ second where ] ?if ;
+    dup unclip method [ method-loc ] [ second where ] ?if ;
 
 syntax:M: method-spec set-where
     unclip method set-method-loc ;
@@ -211,11 +246,11 @@ syntax:M: method-spec definer
     drop \ METHOD: \ ; ;
 
 syntax:M: method-spec definition
-    unclip method method-def ;
+    unclip method dup [ method-def ] when ;
 
 syntax:M: method-spec synopsis*
     dup definer.
     unclip pprint* pprint* ;
 
 syntax:M: method-spec forget*
-    unclip [ delete-at ] with-methods ;
+    unclip forget-method ;

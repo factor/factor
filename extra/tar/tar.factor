@@ -1,7 +1,7 @@
 USING: combinators io io.files io.streams.duplex
-io.streams.string kernel math math.parser
-namespaces pack prettyprint sequences strings system ;
-USING: hexdump tools.interpreter ;
+io.streams.string kernel math math.parser continuations
+namespaces pack prettyprint sequences strings system
+hexdump tools.interpreter ;
 IN: tar
 
 : zero-checksum 256 ;
@@ -95,7 +95,7 @@ TUPLE: unimplemented-typeflag header ;
 ! Normal file
 : typeflag-0
   tar-header-name tar-path+ <file-writer>
-  [ read-data-blocks ] keep stream-close ;
+  [ read-data-blocks ] keep dispose ;
 
 ! Hard link
 : typeflag-1 ( header -- )
@@ -221,7 +221,7 @@ TUPLE: unimplemented-typeflag header ;
             [ <unknown-typeflag> throw ]
         } case
         ! dup tar-header-size zero? [
-            ! out-stream get [ stream-close ] when
+            ! out-stream get [ dispose ] when
             ! out-stream off
             ! drop
         ! ] [
@@ -236,10 +236,9 @@ TUPLE: unimplemented-typeflag header ;
     ] when* ;
 
 : parse-tar ( path -- obj )
-    <file-reader> [
+    [
         "tar-test" resource-path base-dir set
         global [ nl nl nl "Starting to parse .tar..." print flush ] bind
         global [ "Expanding to: " write base-dir get . flush ] bind
         (parse-tar)
-    ] with-stream ;
-
+    ] with-file-out ;

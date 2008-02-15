@@ -42,23 +42,9 @@ HELP: vocab-main
 HELP: vocab-roots
 { $var-description "A sequence of pathname strings to search for vocabularies." } ;
 
-HELP: vocab-source
-{ $values { "vocab" "a vocabulary specifier" } { "path" string } }
-{ $description "Outputs a pathname relative to a vocabulary root where the source code for " { $snippet "vocab" } " might be found." } ;
-
-{ vocab-source vocab-source-path } related-words
-
-HELP: vocab-docs
-{ $values { "vocab" "a vocabulary specifier" } { "path" string } }
-{ $description "Outputs a pathname relative to a vocabulary root where the documentation for " { $snippet "vocab" } " might be found." } ;
-
-{ vocab-docs vocab-docs-path } related-words
-
 HELP: vocab-tests
-{ $values { "vocab" "a vocabulary specifier" } { "path" string } }
-{ $description "Outputs a pathname relative to a vocabulary root where the unit tests for " { $snippet "vocab" } " might be found." } ;
-
-{ vocab-tests vocab-tests-path } related-words
+{ $values { "vocab" "a vocabulary specifier" } { "tests" "a sequence of pathname strings" } }
+{ $description "Outputs a sequence of pathnames where the unit tests for " { $snippet "vocab" } " are located." } ;
 
 HELP: find-vocab-root
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string" } }
@@ -86,14 +72,6 @@ HELP: load-docs
 { $values { "root" "a pathname string" } { "name" "a vocabulary name" } }
 { $description "If " { $link load-help? } " is on, loads a vocabulary's documentation from the specified vocabulary root." } ;
 
-HELP: amend-vocab-from-root
-{ $values { "root" "a pathname string" } { "name" "a vocabulary name" } { "vocab" vocab }  }
-{ $description "Loads a vocabulary's source code and documentation if they have not already been loaded, and outputs the vocabulary." } ;
-
-HELP: load-vocab-from-root
-{ $values { "root" "a pathname string" } { "name" "a vocabulary name" } }
-{ $description "Loads a vocabulary's source code and documentation." } ;
-
 HELP: reload
 { $values { "name" "a vocabulary name" } }
 { $description "Loads it's source code and documentation." }
@@ -116,10 +94,6 @@ HELP: vocab-docs-path
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string or " { $link f } } }
 { $description "Outputs a pathname where the documentation for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
 
-HELP: vocab-tests-path
-{ $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string or " { $link f } } }
-{ $description "Outputs a pathname where the unit tests for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
-
 HELP: refresh
 { $values { "prefix" string } }
 { $description "Reloads source files and documentation belonging to loaded vocabularies whose names are prefixed by " { $snippet "prefix" } " which have been modified on disk." } ;
@@ -128,11 +102,3 @@ HELP: refresh-all
 { $description "Reloads source files and documentation for all loaded vocabularies which have been modified on disk." } ;
 
 { refresh refresh-all } related-words
-
-HELP: vocab-file-contents
-{ $values { "vocab" "a vocabulary specifier" } { "name" string } { "seq" "a sequence of lines, or " { $link f } } }
-{ $description "Outputs the contents of the file named " { $snippet "name" } " from the vocabulary's directory, or " { $link f } " if the file does not exist." } ;
-
-HELP: set-vocab-file-contents
-{ $values { "seq" "a sequence of lines" } { "vocab" "a vocabulary specifier" } { "name" string } }
-{ $description "Stores a sequence of lines to the file named " { $snippet "name" } " from the vocabulary's directory." } ;

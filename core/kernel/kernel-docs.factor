@@ -372,7 +372,7 @@ HELP: 2keep
 { $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
-{ $values { "quot" "a quotation with stack effect " { $snippet "( x y -- )" } } { "x" object } { "y" object } { "z" object } }
+{ $values { "quot" "a quotation with stack effect " { $snippet "( x y z -- )" } } { "x" object } { "y" object } { "z" object } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 2apply
@@ -532,7 +532,7 @@ HELP: compose
         "compose call"
         "append call"
     }
-    "However, " { $link compose } " runs in constant time, and the compiler is able to compile code which calls composed quotations."
+    "However, " { $link compose } " runs in constant time, and the optimizing compiler is able to compile code which calls composed quotations."
 } ;
 
 HELP: 3compose

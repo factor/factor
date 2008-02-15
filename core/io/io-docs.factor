@@ -1,12 +1,12 @@
 USING: help.markup help.syntax quotations hashtables kernel
-classes strings ;
+classes strings continuations ;
 IN: io
 
 ARTICLE: "stream-protocol" "Stream protocol"
 "The stream protocol consists of a large number of generic words, many of which are optional."
 $nl
-"A word required to be implemented for all streams:"
-{ $subsection stream-close }
+"All streams must implement the " { $link dispose } " word in addition to the stream protocol."
+$nl
 "Three words are required for input streams:"
 { $subsection stream-read1 }
 { $subsection stream-read }
@@ -22,8 +22,7 @@ $nl
 { $subsection make-block-stream }
 { $subsection make-cell-stream }
 { $subsection stream-write-table }
-"Optional word for network streams:"
-{ $subsection set-timeout } ;
+{ $see-also "io.timeouts" } ;
 
 ARTICLE: "stdio" "The default stream"
 "Various words take an implicit stream parameter from a variable to reduce stack shuffling."
@@ -72,17 +71,6 @@ ARTICLE: "streams" "Streams"
 { $see-also "io.streams.string" "io.streams.lines" "io.streams.plain" "io.streams.duplex" } ;
 
 ABOUT: "streams"
-
-HELP: stream-close
-{ $values { "stream" "a stream" } }
-{ $contract "Closes the stream. This releases any external resources associated with the stream, such as file handles and network connections. No further operations can be performed on the stream after this call." }
-{ $notes "You must close streams after you are finished working with them. A convenient way to automate this is by using the " { $link with-stream } " word." }
-$io-error ;
-
-HELP: set-timeout
-{ $values { "n" "an integer" } { "stream" "a stream" } }
-{ $contract "Sets a timeout, in milliseconds, for closing the stream if there is no activity. Not all streams support timeouts." } 
-$io-error ;
 
 HELP: stream-readln
 { $values { "stream" "an input stream" } { "str" string } }

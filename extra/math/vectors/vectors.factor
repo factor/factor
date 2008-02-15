@@ -27,20 +27,20 @@ IN: math.vectors
 : set-axis ( u v axis -- w )
     dup length [ >r zero? pick pick ? r> swap nth ] 2map 2nip ;
 
-HINTS: vneg { float-array array } ;
-HINTS: norm-sq { float-array array } ;
-HINTS: norm { float-array array } ;
-HINTS: normalize { float-array array } ;
+HINTS: vneg { float-array } { array } ;
+HINTS: norm-sq { float-array } { array } ;
+HINTS: norm { float-array } { array } ;
+HINTS: normalize { float-array } { array } ;
 
-HINTS: n*v * { float-array array } ;
-HINTS: v*n { float-array array } * ;
-HINTS: n/v * { float-array array } ;
-HINTS: v/n { float-array array } * ;
+HINTS: n*v { object float-array } { object array } ;
+HINTS: v*n { float-array object } { array object } ;
+HINTS: n/v { object float-array } { array } ;
+HINTS: v/n { float-array object } { array object } ;
 
-HINTS: v+ { float-array array } { float-array array } ;
-HINTS: v- { float-array array } { float-array array } ;
-HINTS: v* { float-array array } { float-array array } ;
-HINTS: v/ { float-array array } { float-array array } ;
-HINTS: vmax { float-array array } { float-array array } ;
-HINTS: vmin { float-array array } { float-array array } ;
-HINTS: v. { float-array array } { float-array array } ;
+HINTS: v+ { float-array float-array } { array array } ;
+HINTS: v- { float-array float-array } { array array } ;
+HINTS: v* { float-array float-array } { array array } ;
+HINTS: v/ { float-array float-array } { array array } ;
+HINTS: vmax { float-array float-array } { array array } ;
+HINTS: vmin { float-array float-array } { array array } ;
+HINTS: v. { float-array float-array } { array array } ;

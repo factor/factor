@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib hashtables kernel math math.combinatorics math.parser
-    math.ranges project-euler.common project-euler.024 sequences sorting ;
+USING: combinators.lib hashtables kernel math math.combinatorics math.functions
+    math.parser math.ranges project-euler.common sequences ;
 IN: project-euler.032
 
 ! http://projecteuler.net/index.php?section=problems&id=32
@@ -27,21 +27,21 @@ IN: project-euler.032
 <PRIVATE
 
 : source-032 ( -- seq )
-    9 factorial [ 9 permutation [ 1+ ] map 10 swap digits>integer ] map ;
+    9 factorial [ 9 permutation [ 1+ ] map 10 digits>integer ] map ;
 
 : 1and4 ( n -- ? )
     number>string 1 cut-slice 4 cut-slice
-    [ 10 string>integer ] 3apply [ * ] dip = ;
+    [ string>number ] 3apply [ * ] dip = ;
 
 : 2and3 ( n -- ? )
     number>string 2 cut-slice 3 cut-slice
-    [ 10 string>integer ] 3apply [ * ] dip = ;
+    [ string>number ] 3apply [ * ] dip = ;
 
 : valid? ( n -- ? )
     dup 1and4 swap 2and3 or ;
 
 : products ( seq -- m )
-    [ number>string 4 tail* 10 string>integer ] map ;
+    [ 10 4 ^ mod ] map ;
 
 PRIVATE>
 
@@ -49,7 +49,7 @@ PRIVATE>
     source-032 [ valid? ] subset products prune sum ;
 
 ! [ euler032 ] 10 ave-time
-! 27609 ms run / 2484 ms GC ave time - 10 trials
+! 23922 ms run / 1505 ms GC ave time - 10 trials
 
 
 ! ALTERNATE SOLUTIONS
@@ -63,12 +63,9 @@ PRIVATE>
 : source-032a ( -- seq )
     50 [1,b] 2000 [1,b] cartesian-product ;
 
-: pandigital? ( n -- ? )
-    number>string natural-sort "123456789" = ;
-
 ! multiplicand/multiplier/product
 : mmp ( pair -- n )
-    first2 2dup * [ number>string ] 3apply 3append 10 string>integer ;
+    first2 2dup * [ number>string ] 3apply 3append string>number ;
 
 PRIVATE>
 
