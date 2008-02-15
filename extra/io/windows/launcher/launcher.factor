@@ -102,6 +102,9 @@ M: windows-ce-io fill-redirection ;
     fill-lpEnvironment
     fill-startup-info ;
 
+M: windows-io current-process-handle ( -- handle )
+    GetCurrentProcessId ;
+
 M: windows-io run-process* ( desc -- handle )
     [
         [

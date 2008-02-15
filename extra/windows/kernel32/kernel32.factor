@@ -895,7 +895,7 @@ FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
 FUNCTION: BOOL GetCurrentDirectoryW ( DWORD len, LPTSTR buf ) ;
 : GetCurrentDirectory GetCurrentDirectoryW ; inline
 FUNCTION: HANDLE GetCurrentProcess ( ) ;
-! FUNCTION: GetCurrentProcessId
+FUNCTION: DWORD GetCurrentProcessId ( ) ;
 FUNCTION: HANDLE GetCurrentThread ( ) ;
 ! FUNCTION: GetCurrentThreadId
 ! FUNCTION: GetDateFormatA

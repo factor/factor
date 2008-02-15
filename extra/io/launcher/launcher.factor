@@ -76,6 +76,8 @@ SYMBOL: +append-environment+
         { [ dup assoc? ] [ >hashtable ] }
     } cond ;
 
+HOOK: current-process-handle io-backend ( -- handle )
+
 HOOK: run-process* io-backend ( desc -- handle )
 
 : wait-for-process ( process -- status )

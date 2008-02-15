@@ -4,7 +4,7 @@ USING: io io.backend io.launcher io.unix.backend io.unix.files
 io.nonblocking sequences kernel namespaces math system
  alien.c-types debugger continuations arrays assocs 
 combinators unix.process parser-combinators memoize 
-promises strings threads ;
+promises strings threads unix ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -70,6 +70,8 @@ MEMO: 'arguments' ( -- parser )
         [ exec-args-with-path ] if
         io-error
     ] [ error. :c flush ] recover 1 exit ;
+
+M: unix-io current-process-handle ( -- handle ) getpid ;
 
 M: unix-io run-process* ( desc -- pid )
     [
