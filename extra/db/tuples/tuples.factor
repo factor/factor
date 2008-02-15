@@ -46,6 +46,9 @@ HOOK: update-sql* db ( columns table -- sql )
 HOOK: delete-sql* db ( columns table -- sql )
 HOOK: select-sql* db ( columns table -- sql )
 
+HOOK: row-column-typed db ( result-set n type -- sql )
+HOOK: sql-type>factor-type db ( obj type -- obj )
+
 : insert-sql ( columns class -- statement )
     db get db-insert-statements [ insert-sql* ] cache-statement ;
 

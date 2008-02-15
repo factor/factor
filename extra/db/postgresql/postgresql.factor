@@ -3,7 +3,8 @@
 USING: arrays assocs alien alien.syntax continuations io
 kernel math math.parser namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
-db.tuples db.types tools.annotations math.ranges ;
+db.tuples db.types tools.annotations math.ranges
+combinators ;
 IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty db user pass ;
@@ -52,8 +53,16 @@ M: postgresql-result-set #columns ( result-set -- n )
 M: postgresql-result-set row-column ( result-set n -- obj )
     >r dup result-set-handle swap result-set-n r> PQgetvalue ;
 
-M: postgresql-result-set row-column ( result-set n -- obj )
-    >r dup result-set-handle swap result-set-n r> PQgetvalue ;
+M: postgresql-result-set row-column-typed ( result-set n type -- obj )
+    >r row-column r> sql-type>factor-type ;
+
+M: postgresql-result-set sql-type>factor-type ( obj type -- newobj )
+    {
+        { INTEGER [ string>number ] }
+        { BIG_INTEGER [ string>number ] }
+        { DOUBLE [ string>number ] }
+        [ drop ]
+    } case ;
 
 M: postgresql-statement insert-statement ( statement -- id )
     query-results [ break 0 row-column ] with-disposal ;
