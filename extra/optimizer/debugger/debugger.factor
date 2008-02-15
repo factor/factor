@@ -82,7 +82,10 @@ M: #call node>quot #call>quot ;
 M: #call-label node>quot #call>quot ;
 
 M: #label node>quot
-    [ "#label: " over node-param word-name append comment, ] 2keep
+    [
+        dup #label-loop? "#loop: " "#label: " ?
+        over node-param word-name append comment,
+    ] 2keep
     node-child swap dataflow>quot , \ call ,  ;
 
 M: #if node>quot
