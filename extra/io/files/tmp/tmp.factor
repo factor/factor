@@ -7,7 +7,7 @@ IN: io.files.tmp
     "tmp" resource-path dup directory? [ dup make-directory ] unless ;
 
 : touch ( filename -- )
-    <file-writer> stream-close ;
+    <file-writer> dispose ;
 
 : tmpfile ( extension -- filename )
     16 random-alphanumeric-string over append
