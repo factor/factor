@@ -68,7 +68,7 @@ M: #label detect-loops* t swap set-#label-loop? ;
     node-stack get
     dup [ #label? ] find-last drop [ 1+ ] [ 0 ] if* tail
     [ node-successor #tail? ] all? ;
-
+USE: io
 : detect-loop ( seen-other? label node -- seen-other? continue? )
     #! seen-other?: have we seen another label?
     {
@@ -135,15 +135,6 @@ M: #call-label detect-loops*
     r> [ set-node-successor ] keep ;
 
 ! ! ! Lifting code after a conditional if one branch throws
-: only-one ( seq -- elt/f )
-    dup length 1 = [ first ] [ drop f ] if ;
-
-: lift-throw-tail? ( #if -- tail/? )
-    dup node-successor #tail?
-    [ drop f ] [ active-children only-one ] if ;
-
-: clone-node ( node -- newnode )
-    clone dup [ clone ] modify-values ;
 
 ! BEFORE
 !
@@ -177,7 +168,17 @@ M: #call-label detect-loops*
 ! the same node as (***)
 !
 ! Note: if (**) is #return is is sound to put #terminate there,
-! but not if (**) is #values
+! but not if (**) is #
+
+: only-one ( seq -- elt/f )
+    dup length 1 = [ first ] [ drop f ] if ;
+
+: lift-throw-tail? ( #if -- tail/? )
+    dup node-successor #tail?
+    [ drop f ] [ active-children only-one ] if ;
+
+: clone-node ( node -- newnode )
+    clone dup [ clone ] modify-values ;
 
 : lift-branch
     over
@@ -194,20 +195,6 @@ M: #if optimize-node*
         ] [
             2drop t f
         ] if
-    ] if ;
-
-: fold-dispatch-branch? dup node-in-d first tuck node-literal? ;
-
-: fold-dispatch-branch ( node value -- node' )
-    dupd node-literal
-    over drop-inputs >r fold-branch r>
-    [ set-node-successor ] keep ;
-
-M: #dispatch optimize-node*
-    dup fold-dispatch-branch? [
-        fold-dispatch-branch t
-    ] [
-        2drop t f
     ] if ;
 
 ! Loop tail hoising: code after a loop can sometimes go in the
@@ -247,6 +234,33 @@ M: #dispatch optimize-node*
 !     |
 !  #return 1
 
+: find-tail ( node -- tail )
+    dup #terminate? [
+        dup node-successor #tail? [
+            node-successor find-tail
+        ] unless
+    ] unless ;
+
+: child-tails ( node -- seq )
+    node-children [ find-tail ] map ;
+
+GENERIC: add-loop-exit* ( label node -- )
+
+M: #branch add-loop-exit*
+    child-tails [ add-loop-exit* ] with each ;
+
+M: #call-label add-loop-exit*
+    tuck node-param eq? [ drop ] [ node-successor , ] if ;
+
+M: #terminate add-loop-exit*
+    2drop ;
+
+M: node add-loop-exit*
+    nip node-successor dup #terminate? [ drop ] [ , ] if ;
+
+: find-loop-exits ( label node -- seq )
+    [ add-loop-exit* ] { } make ;
+
 : find-final-if ( node -- #if/f )
     dup [
         dup #if? [
@@ -264,11 +278,7 @@ M: #dispatch optimize-node*
 : lift-loop-tail? ( #label -- tail/f )
     dup node-successor node-successor [
         dup node-param swap node-child find-final-if dup [
-            node-children [ penultimate-node ] map
-            [
-                dup #call-label?
-                [ node-param eq? not ] [ 2drop t ] if
-            ] with subset only-one
+            find-loop-exits only-one
         ] [ 2drop f ] if
     ] [ drop f ] if ;
 

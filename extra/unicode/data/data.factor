@@ -1,6 +1,7 @@
-USING: assocs math kernel sequences io.files hashtables
-quotations splitting arrays math.parser combinators.lib hash2
-byte-arrays words namespaces words compiler.units parser ;
+USING: assocs math kernel sequences sequences.lib io.files
+hashtables quotations splitting arrays math.parser
+combinators.lib hash2 byte-arrays words namespaces words
+compiler.units parser ;
 IN: unicode.data
 
 <<
@@ -92,9 +93,6 @@ IN: unicode.data
 
 : ascii-lower ( string -- lower )
     [ dup CHAR: A CHAR: Z between? [ HEX: 20 + ] when ] map ;
-
-: replace ( seq old new -- newseq )
-    swap rot [ 2dup = [ drop over ] when ] map 2nip ;
 
 : process-names ( data -- names-hash )
     1 swap (process-data)

@@ -2,7 +2,7 @@ USING: arrays compiler generic hashtables inference kernel
 kernel.private math optimizer prettyprint sequences sbufs
 strings tools.test vectors words sequences.private quotations
 optimizer.backend classes inference.dataflow tuples.private
-continuations growable optimizer.inlining ;
+continuations growable optimizer.inlining namespaces ;
 IN: temporary
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
@@ -329,3 +329,25 @@ TUPLE: silly-tuple a b ;
     10 [ ] lift-loop-tail-test-1 1 2 3 ;
 
 [ 1 2 3 ] [ lift-loop-tail-test-2 ] unit-test
+
+! Make sure we don't lose
+GENERIC: generic-inline-test ( x -- y )
+M: integer generic-inline-test ;
+
+: generic-inline-test-1
+    1
+    generic-inline-test
+    generic-inline-test
+    generic-inline-test
+    generic-inline-test
+    generic-inline-test
+    generic-inline-test
+    generic-inline-test
+    generic-inline-test
+    generic-inline-test
+    generic-inline-test ;
+
+[ { t f } ] [
+    \ generic-inline-test-1 word-def dataflow
+    [ optimize-1 , optimize-1 , drop ] { } make
+] unit-test

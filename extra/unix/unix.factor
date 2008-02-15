@@ -125,6 +125,7 @@ FUNCTION: int futimes ( int id, timeval[2] times ) ;
 FUNCTION: char* gai_strerror ( int ecode ) ;
 FUNCTION: int getaddrinfo ( char* hostname, char* servname, addrinfo* hints, addrinfo** res ) ;
 FUNCTION: char* getcwd ( char* buf, size_t size ) ;
+FUNCTION: pid_t getpid ;
 FUNCTION: int getdtablesize ;
 FUNCTION: gid_t getegid ;
 FUNCTION: uid_t geteuid ;
