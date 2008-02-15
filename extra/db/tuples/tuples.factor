@@ -38,8 +38,9 @@ TUPLE: no-slot-named ;
     [ db-table dupd ] swap
     [ <prepared-statement> ] 3compose cache nip ; inline
 
-HOOK: create-sql db ( columns table -- sql )
-HOOK: drop-sql db ( columns table -- sql )
+HOOK: create-sql db ( columns table -- seq )
+HOOK: drop-sql db ( columns table -- seq )
+
 HOOK: insert-sql* db ( columns table -- sql )
 HOOK: update-sql* db ( columns table -- sql )
 HOOK: delete-sql* db ( columns table -- sql )

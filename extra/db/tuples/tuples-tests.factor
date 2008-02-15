@@ -30,7 +30,8 @@ SYMBOL: the-person
 
     [ ] [ the-person get update-tuple ] unit-test
 
-    [ ] [ the-person get delete-tuple ] unit-test ;
+    [ ] [ the-person get delete-tuple ] unit-test
+    [ ] [ person drop-table ] unit-test ;
 
 : test-sqlite ( -- )
     "tuples-test.db" resource-path <sqlite-db> [
@@ -52,8 +53,8 @@ person "PERSON"
 
 "billy" 10 3.14 <person> the-person set
 
- test-sqlite
-! test-postgresql
+! test-sqlite
+test-postgresql
 
 person "PERSON"
 {
@@ -65,5 +66,5 @@ person "PERSON"
 
 1 "billy" 20 6.28 <assigned-person> the-person set
 
- test-sqlite
+! test-sqlite
 ! test-postgresql

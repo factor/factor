@@ -25,9 +25,7 @@ M: sqlite-db dispose ( db -- ) dispose-db ;
 TUPLE: sqlite-statement ;
 C: <sqlite-statement> sqlite-statement
 
-TUPLE: sqlite-result-set advanced? ;
-: <sqlite-result-set> ( query -- sqlite-result-set )
-    dup statement-handle sqlite-result-set <result-set> ;
+TUPLE: sqlite-result-set has-more? ;
 
 M: sqlite-db <simple-statement> ( str -- obj )
     <prepared-statement> ;
@@ -40,13 +38,7 @@ M: sqlite-db <prepared-statement> ( str -- obj )
 M: sqlite-statement dispose ( statement -- )
     statement-handle sqlite-finalize ;
 
-: maybe-advance-row ( result-set -- result-set )
-    dup sqlite-result-set-advanced? [
-        dup advance-row drop
-    ] unless ;
-
 M: sqlite-result-set dispose ( result-set -- )
-    maybe-advance-row
     f swap set-result-set-handle ;
 
 : sqlite-bind ( triples handle -- )
@@ -58,8 +50,12 @@ M: sqlite-statement bind-statement* ( triples statement -- )
 M: sqlite-statement reset-statement ( statement -- )
     statement-handle sqlite-reset ;
 
+: last-insert-id ( -- id )
+    db get db-handle sqlite3_last_insert_rowid
+    dup zero? [ "last-id failed" throw ] when ;
+
 M: sqlite-statement insert-statement ( statement -- id )
-    query-results [ last-id ] with-disposal ;
+    execute-statement last-insert-id ;
 
 M: sqlite-result-set #columns ( result-set -- n )
     result-set-handle sqlite-#columns ;
@@ -67,12 +63,16 @@ M: sqlite-result-set #columns ( result-set -- n )
 M: sqlite-result-set row-column ( result-set n -- obj )
     >r result-set-handle r> sqlite-column ;
 
-M: sqlite-result-set advance-row ( result-set -- handle ? )
+M: sqlite-result-set advance-row ( result-set -- )
     [ result-set-handle sqlite-next ] keep
-    t swap set-sqlite-result-set-advanced? ;
+    set-sqlite-result-set-has-more? ;
+
+M: sqlite-result-set more-rows? ( result-set -- ? )
+    sqlite-result-set-has-more? ;
 
 M: sqlite-statement query-results ( query -- result-set )
-    dup statement-handle sqlite-result-set <result-set> ;
+    dup statement-handle sqlite-result-set <result-set>
+    dup advance-row ;
 
 M: sqlite-db begin-transaction ( -- )
     "BEGIN" sql-command ;
@@ -145,11 +145,6 @@ M: sqlite-db tuple>params ( columns tuple -- obj )
         dupd >r first r> get-slot-named swap
         third 3array
     ] curry map ;
-    
-M: sqlite-db last-id ( result-set -- id )
-    maybe-advance-row drop
-    db get db-handle sqlite3_last_insert_rowid
-    dup zero? [ "last-id failed" throw ] when ;
 
 : sqlite-db-modifiers ( -- hashtable )
     H{

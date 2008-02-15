@@ -11,6 +11,12 @@ SYMBOL: +assigned-id+
 : primary-key? ( spec -- ? )
     [ { +native-id+ +assigned-id+ } member? ] contains? ;
 
+: contains-id? ( columns id -- ? )
+    swap [ member? ] with contains? ;
+    
+: assigned-id? ( columns -- ? ) +assigned-id+ contains-id? ;
+: native-id? ( columns -- ? ) +native-id+ contains-id? ;
+
 ! Same concept, SQLite has autoincrement, PostgreSQL has serial
 SYMBOL: +autoincrement+
 SYMBOL: +serial+

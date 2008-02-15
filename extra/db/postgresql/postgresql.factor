@@ -3,7 +3,7 @@
 USING: arrays assocs alien alien.syntax continuations io
 kernel math math.parser namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
-db.tuples db.types tools.annotations ;
+db.tuples db.types tools.annotations math.ranges ;
 IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty db user pass ;
@@ -52,14 +52,8 @@ M: postgresql-result-set #columns ( result-set -- n )
 M: postgresql-result-set row-column ( result-set n -- obj )
     >r dup result-set-handle swap result-set-n r> PQgetvalue ;
 
-M: postgresql-statement execute-statement ( statement -- obj )
-    query-results dispose ;
-
 M: postgresql-statement insert-statement ( statement -- id )
-    query-results dispose ;
-
-: increment-n ( result-set -- n )
-    dup result-set-n 1+ dup rot set-result-set-n ;
+    query-results [ break 0 row-column ] with-disposal ;
 
 M: postgresql-statement query-results ( query -- result-set )
     dup statement-params [
@@ -71,8 +65,11 @@ M: postgresql-statement query-results ( query -- result-set )
     postgresql-result-set <result-set>
     dup init-result-set ;
 
-M: postgresql-result-set advance-row ( result-set -- ? )
-    dup increment-n swap result-set-max >= ;
+M: postgresql-result-set advance-row ( result-set -- )
+    dup result-set-n 1+ swap set-result-set-n ;
+
+M: postgresql-result-set more-rows? ( result-set -- ? )
+    dup result-set-n swap result-set-max < ;
 
 M: postgresql-statement dispose ( query -- )
     dup statement-handle PQclear
@@ -107,15 +104,6 @@ M: postgresql-db commit-transaction ( -- )
 
 M: postgresql-db rollback-transaction ( -- )
     "ROLLBACK" sql-command ;
-
-SYMBOL: postgresql-counter
-
-: make-postgresql-counter ( quot -- )
-    [ postgresql-counter off ] swap compose "" make ;
-
-: counter% ( -- )
-    CHAR: $ ,
-    postgresql-counter [ inc ] keep get # ;
 
 : postgresql-type-hash* ( -- assoc )
     H{
@@ -156,16 +144,9 @@ M: postgresql-db >sql-type ( hash obj -- str )
         ] unless
     ] if ;
 
-M: postgresql-db create-sql ( columns table -- sql )
+: insert-function ( columns table -- sql )
     [
-        2dup
-        "create table " % %
-        " (" % [ ", " % ] [
-            dup second % " " %
-            dup third >sql-type* % " " %
-            sql-modifiers " " join %
-        ] interleave "); " %
-
+        >r remove-id r>
         "create function add_" % dup %
         "(" %
         over [ "," % ]
@@ -179,33 +160,52 @@ M: postgresql-db create-sql ( columns table -- sql )
         dup [ ", " % ] [ second % ] interleave
         ") " %
         " values (" %
-        [ ", " % ] [ drop counter% ] interleave
+        length [1,b] [ ", " % ] [ "$" % # ] interleave
         "); " %
 
         "select currval(''" % % "_id_seq'');' language sql;" %
         drop
-    ] make-postgresql-counter dup . ;
+    ] "" make ;
 
-M: postgresql-db drop-sql ( columns table -- sql )
+: drop-function ( columns table -- sql )
     [
-        dup "drop table " % %
-        "; drop function add_" % %
+        >r remove-id r>
+        "drop function add_" % %
         "(" %
         [ "," % ] [ third >sql-type % ] interleave
         ")" %
-        
     ] "" make ;
 
-! \ create-sql reset
-! \ create-sql watch
+M: postgresql-db create-sql ( columns table -- seq )
+    [
+        [
+            2dup
+            "create table " % %
+            " (" % [ ", " % ] [
+                dup second % " " %
+                dup third >sql-type* % " " %
+                sql-modifiers " " join %
+            ] interleave "); " %
+        ] "" make ,
+
+        over native-id? [ insert-function , ] [ 2drop ] if
+    ] { } make ;
+
+M: postgresql-db drop-sql ( columns table -- seq )
+    [
+        [
+            dup "drop table " % % ";" %
+        ] "" make ,
+        over native-id? [ drop-function , ] [ 2drop ] if
+    ] { } make ;
 
 M: postgresql-db insert-sql* ( columns table -- sql )
     [
         "select add_" % %
         "(" %
-        [ ", " % ] [ counter% ] interleave
+        length [1,b] [ ", " % ] [ "$" % # ] interleave
         ")" %
-    ] make-postgresql-counter ;
+    ] "" make ;
 
 M: postgresql-db update-sql* ( columns table -- sql )
     [
@@ -213,18 +213,19 @@ M: postgresql-db update-sql* ( columns table -- sql )
         %
         " set " %
         dup remove-id
-        [ ", " % ] [ second % " = " % counter% ] interleave
+        dup length [1,b] swap 2array flip
+        [ ", " % ] [ first2 second % " = $" % # ] interleave
         " where " %
-        [ primary-key? ] find nip second dup % " = " % counter%
-    ] make-postgresql-counter ;
+        [ primary-key? ] find nip second dup % " = $" % length 2 + #
+    ] "" make ;
 
 M: postgresql-db delete-sql* ( columns table -- sql )
     [
         "delete from " %
         %
         " where " %
-        first second dup % " = " % counter%
-    ] make-postgresql-counter ;
+        first second % " = $1" %
+    ] "" make ;
 
 M: postgresql-db select-sql* ( columns table -- sql )
     drop ;

@@ -100,13 +100,13 @@ IN: db.sqlite.lib
 : sqlite-row ( handle -- seq )
     dup sqlite-#columns [ sqlite-column ] with map ;
 
-: step-complete? ( step-result -- bool )
+: sqlite-step-has-more-rows? ( step-result -- bool )
     dup SQLITE_ROW =  [
-        drop f
+        drop t
     ] [
         dup SQLITE_DONE =
-        [ drop ] [ sqlite-check-result ] if t
+        [ drop ] [ sqlite-check-result ] if f
     ] if ;
 
 : sqlite-next ( prepared -- ? )
-    sqlite3_step step-complete? ;
+    sqlite3_step sqlite-step-has-more-rows? ;
