@@ -20,8 +20,6 @@ SYMBOL: builds-dir
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! User also needs to set smtp-host and builder-recipients
-
 : prepare-build-machine ( -- )
   builds make-directory
   builds cd
@@ -104,7 +102,7 @@ SYMBOL: build-status
     "Build machine:   " write host-name print
     "CPU:             " write cpu       print
     "OS:              " write os        print
-    "Build directory: " write cwd       print
+    "Build directory: " write cwd       print nl
 
     git-clone [ "git clone failed" print ] run-or-bail
 
@@ -126,7 +124,7 @@ SYMBOL: build-status
 
     "Boot time: " write "../boot-time" eval-file milli-seconds>time print
     "Load time: " write "../load-time" eval-file milli-seconds>time print
-    "Test time: " write "../test-time" eval-file milli-seconds>time print
+    "Test time: " write "../test-time" eval-file milli-seconds>time print nl
 
     "Did not pass load-everything: " print "../load-everything-vocabs" cat
     "Did not pass test-all: "        print "../test-all-vocabs"        cat
