@@ -52,6 +52,9 @@ M: postgresql-result-set #columns ( result-set -- n )
 M: postgresql-result-set row-column ( result-set n -- obj )
     >r dup result-set-handle swap result-set-n r> PQgetvalue ;
 
+M: postgresql-result-set row-column ( result-set n -- obj )
+    >r dup result-set-handle swap result-set-n r> PQgetvalue ;
+
 M: postgresql-statement insert-statement ( statement -- id )
     query-results [ break 0 row-column ] with-disposal ;
 
@@ -234,9 +237,6 @@ M: postgresql-db tuple>params ( columns tuple -- obj )
     [ >r dup third swap first r> get-slot-named swap ]
     curry { } map>assoc ;
     
-M: postgresql-db last-id ( res -- id )
-    drop f ;
-
 : postgresql-db-modifiers ( -- hashtable )
     H{
         { +native-id+ "not null primary key" }
