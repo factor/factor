@@ -3,7 +3,7 @@
 !
 
 USING: arrays combinators io io.binary io.files io.paths
-io.utf16 kernel math math.parser namespaces sequences
+io.encodings.utf16 kernel math math.parser namespaces sequences
 splitting strings assocs unicode.categories ;
 
 IN: id3

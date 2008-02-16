@@ -37,18 +37,15 @@ C: <ast-hashtable> ast-hashtable
 
 : identifier-middle? ( ch -- bool )
   [ blank? not ] keep
-  [ CHAR: } = not ] keep
-  [ CHAR: ] = not ] keep
-  [ CHAR: ;" = not ] keep
-  [ CHAR: " = not ] keep
+  [ "}];\"" member? not ] keep
   digit? not
-  and and and and and ;
+  and and ;
 
 MEMO: 'identifier-ends' ( -- parser )
   [
     [ blank? not ] keep
     [ CHAR: " = not ] keep
-    [ CHAR: ;" = not ] keep
+    [ CHAR: ; = not ] keep
     [ LETTER? not ] keep
     [ letter? not ] keep
     identifier-middle? not
