@@ -24,7 +24,6 @@ IN: compiler
 
 : finish-compile ( word effect dependencies -- )
     >r dupd save-effect r>
-    f pick compiler-error
     over compiled-unxref
     over crossref? [ compiled-xref ] [ 2drop ] if ;
 
@@ -38,6 +37,7 @@ IN: compiler
     swap compiler-error ;
 
 : (compile) ( word -- )
+    f over compiler-error
     [ dup compile-succeeded finish-compile ]
     [ dupd compile-failed f save-effect ]
     recover ;

@@ -5,18 +5,6 @@ sorting tuples compiler.units ;
 IN: temporary
 
 [
-    [ 1 CHAR: a ]
-    [ 0 "abcd" next-char ] unit-test
-
-    [ 8 CHAR: \s ]
-    [ 1 "\\u000020hello" next-escape ] unit-test
-
-    [ 2 CHAR: \n ]
-    [ 1 "\\nhello" next-escape ] unit-test
-
-    [ 8 CHAR: \s ]
-    [ 0 "\\u000020hello" next-char ] unit-test
-
     [ 1 [ 2 [ 3 ] 4 ] 5 ]
     [ "1\n[\n2\n[\n3\n]\n4\n]\n5" eval ]
     unit-test

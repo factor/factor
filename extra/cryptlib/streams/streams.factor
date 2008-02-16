@@ -23,10 +23,10 @@ TUPLE: crypt-stream handle eof? ;
     CRYPT_SESSINFO_ACTIVE 1 set-attribute ;
 
 : <crypt-stream> ( handle -- stream )
-    crypt-stream construct-empty
-    over init-crypt-stream
-    default-buffer-size <buffer> over set-delegate
-    tuck set-crypt-stream-handle 
+    dup init-crypt-stream
+    default-buffer-size <buffer>
+    { set-crypt-stream-handle set-delegate }
+    crypt-stream construct
     dup <line-reader> swap <plain-writer> <duplex-stream> ;
 
 : check-read ( err -- eof? )
