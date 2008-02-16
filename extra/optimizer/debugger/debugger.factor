@@ -4,7 +4,7 @@ USING: classes inference inference.dataflow io kernel
 kernel.private math.parser namespaces optimizer prettyprint
 prettyprint.backend sequences words arrays match macros
 assocs sequences.private optimizer.specializers generic
-combinators sorting math ;
+combinators sorting math quotations ;
 IN: optimizer.debugger
 
 ! A simple tool for turning dataflow IR into quotations, for
@@ -67,7 +67,7 @@ M: #shuffle node>quot
     [ , ] [ >r drop t r> ] if*
     dup effect-str "#shuffle: " swap append comment, ;
 
-: pushed-literals node-out-d [ value-literal ] map ;
+: pushed-literals node-out-d [ value-literal literalize ] map ;
 
 M: #push node>quot nip pushed-literals % ;
 
@@ -83,6 +83,7 @@ M: #call-label node>quot #call>quot ;
 
 M: #label node>quot
     [
+        dup node-param literalize ,
         dup #label-loop? "#loop: " "#label: " ?
         over node-param word-name append comment,
     ] 2keep
