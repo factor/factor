@@ -100,13 +100,9 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\0" } "a null byte (ASCII 0)" }
     { { $snippet "\\e" } "escape (ASCII 27)" }
     { { $snippet "\\\"" } { $snippet "\"" } }
-}
-"A Unicode character can be specified by its code number by writing " { $snippet "\\u" } " followed by a six-digit hexadecimal number. That is, the following two expressions are equivalent:"
-{ $code
-    "CHAR: \\u000078"
-    "78"
-}
-"While not useful for single characters, this syntax is also permitted inside strings." ;
+    { { $snippet "\\u" { $emphasis "xxxxxx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xxxxxx" } } } }
+    { { $snippet "\\u{" { $emphasis "name" } "}" } { "The Unicode code point named " { $snippet { $emphasis "name" } } } }
+} ;
 
 ARTICLE: "syntax-strings" "Character and string syntax"
 "Factor has no distinct character type, however Unicode character value integers can be read by specifying a literal character, or an escaped representation thereof."
@@ -412,8 +408,17 @@ HELP: IN:
 
 HELP: CHAR:
 { $syntax "CHAR: token" }
-{ $values { "token" "a literal character or escape code" } }
-{ $description "Adds the Unicode code point of the character represented by the token to the parse tree." } ;
+{ $values { "token" "a literal character, escape code, or Unicode character name" } }
+{ $description "Adds a Unicode code point to the parse tree." }
+{ $examples
+    { $code
+        "CHAR: x"
+        "CHAR: \\u000032"
+        "CHAR: \\u{exclamation-mark}"
+        "CHAR: exclamation-mark"
+        "CHAR: ugaritic-letter-samka"
+    }
+} ;
 
 HELP: "
 { $syntax "\"string...\"" }
