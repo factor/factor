@@ -1,13 +1,11 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel sequences sbufs vectors io.streams.lines io.streams.plain
-namespaces unicode growable strings io classes io.streams.c
-continuations ;
+USING: math kernel sequences sbufs vectors namespaces
+growable strings io classes io.streams.c continuations
+io.styles io.streams.nested ;
 IN: io.encodings
 
-TUPLE: encode-error ;
-
-: encode-error ( -- * ) \ encode-error construct-empty throw ;
+! Decoding
 
 TUPLE: decode-error ;
 
@@ -19,7 +17,8 @@ SYMBOL: begin
     over push 0 begin ;
 
 : push-replacement ( buf -- buf ch state )
-    CHAR: replacement-character decoded ;
+    ! This is the replacement character
+    HEX: fffd decoded ;
 
 : finish-decoding ( buf ch state -- str )
     begin eq? [ decode-error ] unless drop "" like ;
@@ -53,43 +52,89 @@ GENERIC: decode-step ( buf byte ch state encoding -- buf ch state )
     >r swap start-decoding r>
     decode-read-loop ;
 
-: <decoding> ( stream decoding-class -- decoded-stream )
-    construct-delegate <line-reader> ;
+TUPLE: decoded code cr ;
+: <decoded> ( stream decoding-class -- decoded-stream )
+    construct-empty { set-delegate set-decoded-code } decoded construct ;
 
-: <encoding> ( stream encoding-class -- encoded-stream )
-    construct-delegate <plain-writer> ;
+: cr+ t swap set-line-reader-cr ; inline
 
-GENERIC: encode-string ( string encoding -- byte-array )
-M: tuple-class encode-string construct-empty encode-string ;
+: cr- f swap set-line-reader-cr ; inline
 
-MIXIN: encoding-stream
+: line-ends/eof ( stream str -- str ) f like swap cr- ; inline
 
-M: encoding-stream stream-read1 1 swap stream-read ;
+: line-ends\r ( stream str -- str ) swap cr+ ; inline
 
-M: encoding-stream stream-read
-    [ delegate ] keep decode-read ;
+: line-ends\n ( stream str -- str )
+    over line-reader-cr over empty? and
+    [ drop dup cr- stream-readln ] [ swap cr- ] if ; inline
 
-M: encoding-stream stream-read-partial stream-read ;
+: handle-readln ( stream str ch -- str )
+    {
+        { f [ line-ends/eof ] }
+        { CHAR: \r [ line-ends\r ] }
+        { CHAR: \n [ line-ends\n ] }
+    } case ;
 
-M: encoding-stream stream-read-until
+: fix-read ( stream string -- string )
+    over line-reader-cr [
+        over cr-
+        "\n" ?head [
+            swap stream-read1 [ add ] when*
+        ] [ nip ] if
+    ] [ nip ] if ;
+
+M: decoded stream-read
+    tuck { delegate decoded-code } get-slots decode-read fix-read ;
+
+M: decoded stream-read-partial tuck stream-read fix-read ;
+
+M: decoded stream-read-until
     ! Copied from { c-reader stream-read-until }!!!
     [ swap read-until-loop ] "" make
     swap over empty? over not and [ 2drop f f ] when ;
 
-M: encoding-stream stream-write1
+: fix-read1 ( stream char -- char )
+    over line-reader-cr [
+        over cr-
+        dup CHAR: \n = [
+            drop stream-read1
+        ] [ nip ] if
+    ] [ nip ] if ;
+
+M: decoded stream-read1 1 over stream-read ;
+
+M: line-reader stream-readln ( stream -- str )
+    "\r\n" over stream-read-until handle-readln ;
+
+! Encoding
+
+TUPLE: encode-error ;
+
+: encode-error ( -- * ) \ encode-error construct-empty throw ;
+
+TUPLE: encoded code ;
+: <encoded> ( stream encoding-class -- encoded-stream )
+    construct-empty { set-delegate set-encoded-code } encoded construct ;
+
+GENERIC: encode-string ( string encoding -- byte-array )
+M: tuple-class encode-string construct-empty encode-string ;
+
+M: encoded stream-write1
     >r 1string r> stream-write ;
 
-M: encoding-stream stream-write
-    [ encode-string ] keep delegate stream-write ;
+M: encoded stream-write
+    [ encoding-code encode-string ] keep delegate stream-write ;
 
-M: encoding-stream dispose delegate dispose ;
+M: encoded dispose delegate dispose ;
 
-GENERIC: underlying-stream ( encoded-stream -- delegate )
-M: encoding-stream underlying-stream delegate ;
+M: encoded stream-nl
+    CHAR: \n swap stream-write1 ;
 
-GENERIC: set-underlying-stream ( new-underlying stream -- )
-M: encoding-stream set-underlying-stream set-delegate ;
+M: encoded stream-format
+    nip stream-write ;
 
-: set-encoding ( encoding stream -- ) ! This doesn't work now
-    [ underlying-stream swap construct-delegate ] keep
-    set-underlying-stream ;
+M: encoded make-span-stream
+    <style-stream> <ignore-close-stream> ;
+
+M: encoded make-block-stream
+    nip <ignore-close-stream> ;

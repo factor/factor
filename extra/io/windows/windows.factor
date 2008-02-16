@@ -112,13 +112,13 @@ C: <FileArgs> FileArgs
     [ FileArgs-lpNumberOfBytesRet ] keep
     FileArgs-lpOverlapped ;
 
-M: windows-io <file-reader> ( path -- stream )
+M: windows-io file-reader* ( path -- stream )
     open-read <win32-file> <reader> ;
 
-M: windows-io <file-writer> ( path -- stream )
+M: windows-io file-writer* ( path -- stream )
     open-write <win32-file> <writer> ;
 
-M: windows-io <file-appender> ( path -- stream )
+M: windows-io file-appender* ( path -- stream )
     open-append <win32-file> <writer> ;
 
 M: windows-io rename-file ( from to -- )

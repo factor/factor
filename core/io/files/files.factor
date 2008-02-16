@@ -3,17 +3,17 @@
 IN: io.files
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
-system combinators splitting sbufs continuations ;
+system combinators splitting sbufs continuations io.encodings ;
 
 HOOK: cd io-backend ( path -- )
 
 HOOK: cwd io-backend ( -- path )
 
-HOOK: <file-reader> io-backend ( path -- stream )
+HOOK: file-reader* io-backend ( path -- stream )
 
-HOOK: <file-writer> io-backend ( path -- stream )
+HOOK: file-writer* io-backend ( path -- stream )
 
-HOOK: <file-appender> io-backend ( path -- stream )
+HOOK: file-appender* io-backend ( path -- stream )
 
 HOOK: delete-file io-backend ( path -- )
 
@@ -140,16 +140,25 @@ C: <pathname> pathname
 
 M: pathname <=> [ pathname-string ] compare ;
 
-: file-lines ( path -- seq ) <file-reader> lines ;
+: <file-reader> ( path encoding -- stream )
+    swap file-reader* swap <decoding> ;
 
-: file-contents ( path -- str )
-    dup <file-reader> swap file-length <sbuf> [ stream-copy ] keep >string ;
+: <file-writer> ( path encoding -- stream )
+    swap file-writer* swap <encoding> ;
 
-: with-file-writer ( path quot -- )
-    >r <file-reader> r> with-stream ; inline
+: <file-appender> ( path encoding -- stream )
+    swap file-appender* swap <encoding> ;
 
-: with-file-reader ( path quot -- )
+: file-lines ( path encoding -- seq ) <file-reader> lines ;
+
+: file-contents ( path encoding -- str )
+    dupd <file-reader> swap file-length <sbuf> [ stream-copy ] keep >string ;
+
+: with-file-writer ( path encoding quot -- )
     >r <file-writer> r> with-stream ; inline
 
-: with-file-appender ( path quot -- )
+: with-file-reader ( path encoding quot -- )
+    >r <file-reader> r> with-stream ; inline
+
+: with-file-appender ( path encoding quot -- )
     >r <file-appender> r> with-stream ; inline

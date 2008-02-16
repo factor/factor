@@ -66,14 +66,14 @@ M: object init-stdio
 
 M: object io-multiplex (sleep) ;
 
-M: object <file-reader>
-    "rb" fopen <c-reader> <line-reader> ;
+M: object file-reader*
+    "rb" fopen <c-reader> ;
 
-M: object <file-writer>
-    "wb" fopen <c-writer> <plain-writer> ;
+M: object file-writer*
+    "wb" fopen <c-writer> ;
 
-M: object <file-appender>
-    "ab" fopen <c-writer> <plain-writer> ;
+M: object file-appender*
+    "ab" fopen <c-writer> ;
 
 : show ( msg -- )
     #! A word which directly calls primitives. It is used to

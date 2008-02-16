@@ -40,10 +40,10 @@ GENERIC: close-handle ( handle -- )
     default-buffer-size get <buffer> swap <port> ;
 
 : <reader> ( handle -- stream )
-    input-port <buffered-port> <line-reader> ;
+    input-port <buffered-port> ;
 
 : <writer> ( handle -- stream )
-    output-port <buffered-port> <plain-writer> ;
+    output-port <buffered-port> ;
 
 : handle>duplex-stream ( in-handle out-handle -- stream )
     <writer>
