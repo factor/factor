@@ -3,7 +3,7 @@
 IN: io.streams.string
 USING: io kernel math namespaces sequences sbufs strings
 generic splitting io.streams.plain io.streams.lines growable
-continuations byte-vectors io.encodings byte-arrays ;
+continuations ;
 
 M: growable dispose drop ;
 
@@ -17,13 +17,6 @@ M: growable stream-flush drop ;
 : with-string-writer ( quot -- str )
     <string-writer> swap [ stdio get ] compose with-stream*
     >string ; inline
-
-: <byte-writer> ( encoding -- stream )
-    512 <byte-vector> swap <encoding> ;
-
-: with-byte-writer ( encoding quot -- byte-array )
-    >r <byte-writer> r> [ stdio get ] compose with-stream*
-    >byte-array ; inline
 
 : format-column ( seq ? -- seq )
     [
@@ -46,17 +39,20 @@ M: plain-writer make-cell-stream 2drop <string-writer> ;
 
 M: growable stream-read1 dup empty? [ drop f ] [ pop ] if ;
 
-: sbuf-read-until ( sbuf n -- str )
-    tail-slice >string dup reverse-here ;
+: harden-as ( seq growble-exemplar -- newseq )
+    underlying like ;
+
+: growable-read-until ( growable n -- str )
+    dupd tail-slice swap harden-as dup reverse-here ;
 
 : find-last-sep swap [ memq? ] curry find-last drop ;
 
 M: growable stream-read-until
     [ find-last-sep ] keep over [
-        [ swap 1+ sbuf-read-until ] 2keep [ nth ] 2keep
+        [ swap 1+ growable-read-until ] 2keep [ nth ] 2keep
         set-length
     ] [
-        [ swap drop 0 sbuf-read-until f like f ] keep
+        [ swap drop 0 growable-read-until f like f ] keep
         delete-all
     ] if ;
 
@@ -65,7 +61,7 @@ M: growable stream-read
         2drop f
     ] [
         [ length swap - 0 max ] keep
-        [ swap sbuf-read-until ] 2keep
+        [ swap growable-read-until ] 2keep
         set-length
     ] if ;
 
@@ -77,9 +73,3 @@ M: growable stream-read-partial
 
 : with-string-reader ( str quot -- )
     >r <string-reader> r> with-stream ; inline
-
-: <byte-reader> ( byte-array encoding -- stream )
-    >r >byte-vector dup reverse-here r> <decoding> ;
-
-: with-byte-reader ( byte-array encoding quot -- )
-    >r <byte-reader> r> with-stream ; inline

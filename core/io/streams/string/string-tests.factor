@@ -1,4 +1,4 @@
-USING: io.streams.string io kernel arrays namespaces tools.test io.encodings.latin1 ;
+USING: io.streams.string io kernel arrays namespaces tools.test ;
 IN: temporary
 
 [ "line 1" CHAR: l ]
@@ -56,6 +56,3 @@ unit-test
     dup stream-readln
     2 rot stream-read
 ] unit-test
-
-[ B{ 1 2 3 } ] [ latin1 [ { 1 2 3 } write ] with-byte-writer ] unit-test
-[ "\u000001\u000002\u000003" ] [ { 1 2 3 } latin1 [ 3 read ] with-byte-reader ] unit-test
