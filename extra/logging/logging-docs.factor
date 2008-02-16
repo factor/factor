@@ -122,9 +122,3 @@ ARTICLE: "logging" "Logging framework"
 
 ABOUT: "logging"
 
-! A workaround for circular dependency prohibition
-USING: threads vocabs.loader ;
-[
-    yield
-    "logging.insomniac" require
-] in-thread
