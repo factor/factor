@@ -1,4 +1,4 @@
-USING: io.encodings.utf8 tools.test sbufs kernel io
+USING: io.encodings.utf8 tools.test sbufs kernel io io.encodings
 sequences strings arrays unicode ;
 
 : decode-utf8-w/stream ( array -- newarray )
