@@ -69,7 +69,7 @@ IN: help.lint
     ] each ;
 
 : check-rendering ( word element -- )
-    [ help ] string-out drop ;
+    [ help ] with-string-writer drop ;
 
 : all-word-help ( words -- seq )
     [ word-help ] subset ;

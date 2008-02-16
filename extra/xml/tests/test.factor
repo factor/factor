@@ -7,7 +7,7 @@ USING: kernel xml tools.test io namespaces sequences xml.errors xml.entities
 
 ! This is insufficient
 SYMBOL: xml-file
-[ ] [ "extra/xml/test/test.xml" resource-path
+[ ] [ "extra/xml/tests/test.xml" resource-path
     [ file>xml ] with-html-entities xml-file set ] unit-test
 [ "1.0" ] [ xml-file get xml-prolog prolog-version ] unit-test
 [ f ] [ xml-file get xml-prolog prolog-standalone ] unit-test

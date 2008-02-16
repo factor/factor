@@ -81,11 +81,11 @@ IN: temporary
 ] unit-test
 
 [ { "hi\n" } ] [
-    [ [ "hi" print ] string-out ] test-interpreter
+    [ [ "hi" print ] with-string-writer ] test-interpreter
 ] unit-test
 
 [ { "4\n" } ] [
-    [ [ 2 2 + number>string print ] string-out ] test-interpreter
+    [ [ 2 2 + number>string print ] with-string-writer ] test-interpreter
 ] unit-test
 
 [ { 1 2 3 } ] [
@@ -105,7 +105,7 @@ IN: temporary
 [ [ [ 3 throw ] [ 2 * ] recover ] test-interpreter ] unit-test
 
 [ { "{ 1 2 3 }\n" } ] [
-    [ [ { 1 2 3 } . ] string-out ] test-interpreter
+    [ [ { 1 2 3 } . ] with-string-writer ] test-interpreter
 ] unit-test
 
 [ { } ] [

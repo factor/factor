@@ -1,6 +1,5 @@
 ! Copyright (C) 2007 Adam Wendt.
 ! See http://factorcode.org/license.txt for BSD license.
-!
 
 USING: arrays combinators io io.binary io.files io.paths
 io.encodings.utf16 kernel math math.parser namespaces sequences
@@ -121,7 +120,7 @@ C: <extended-header> extended-header
   id3v2? [ read-id3v2 ] [ f ] if ;
 
 : id3v2 ( filename -- tag/f )
-  <file-reader> [ read-tag ] with-stream ;
+  [ read-tag ] with-file-reader ;
 
 : file? ( path -- ? )
   stat 3drop not ;
@@ -136,7 +135,7 @@ C: <extended-header> extended-header
   [ mp3? ] subset ;
 
 : id3? ( file -- ? )
-  <file-reader> [ id3v2? ] with-stream ;
+  [ id3v2? ] with-file-reader ;
 
 : id3s ( files -- id3s )
   [ id3? ] subset ;

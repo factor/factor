@@ -48,7 +48,7 @@ VAR: stamp
 : git-id ( -- id )
   { "git" "show" } <process-stream> [ readln ] with-stream " " split second ;
 
-: record-git-id ( -- ) git-id "../git-id" [ . ] with-file-out ;
+: record-git-id ( -- ) git-id "../git-id" [ . ] with-file-writer ;
 
 : make-clean ( -- desc ) { "make" "clean" } ;
 
@@ -132,9 +132,9 @@ SYMBOL: build-status
     "Did not pass test-all: "        print "../test-all-vocabs"        cat
 
     "Benchmarks: " print
-    "../benchmarks" [ stdio get contents eval ] with-file-in benchmarks.
+    "../benchmarks" [ stdio get contents eval ] with-file-reader benchmarks.
 
-  ] with-file-out
+  ] with-file-writer
 
   build-status on ;
 

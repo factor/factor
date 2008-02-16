@@ -14,7 +14,7 @@ IN: builder.util
 
 : minutes>ms ( min -- ms ) 60 * 1000 * ;
 
-: file>string ( file -- string ) [ stdio get contents ] with-file-in ;
+: file>string ( file -- string ) [ stdio get contents ] with-file-reader ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -93,4 +93,4 @@ DEFER: <% delimiter
     swap path+ run-template-file ;
 
 : template-convert ( infile outfile -- )
-    <file-writer> [ run-template-file ] with-stream ;
+    [ run-template-file ] with-file-writer ;
