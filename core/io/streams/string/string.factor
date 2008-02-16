@@ -2,21 +2,28 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.streams.string
 USING: io kernel math namespaces sequences sbufs strings
-generic splitting io.streams.plain io.streams.lines
-continuations ;
+generic splitting io.streams.plain io.streams.lines growable
+continuations byte-vectors io.encodings byte-arrays ;
 
-M: sbuf dispose drop ;
+M: growable dispose drop ;
 
-M: sbuf stream-write1 push ;
-M: sbuf stream-write push-all ;
-M: sbuf stream-flush drop ;
+M: growable stream-write1 push ;
+M: growable stream-write push-all ;
+M: growable stream-flush drop ;
 
 : <string-writer> ( -- stream )
     512 <sbuf> <plain-writer> ;
 
 : string-out ( quot -- str )
-    <string-writer> [ call stdio get >string ] with-stream* ;
-    inline
+    <string-writer> swap [ stdio get ] compose with-stream*
+    >string ; inline
+
+: <byte-writer> ( encoding -- stream )
+    512 <byte-vector> swap <encoding> ;
+
+: with-byte-writer ( encoding quot -- byte-array )
+    >r <byte-writer> r> [ stdio get ] compose with-stream*
+    >byte-array ; inline
 
 : format-column ( seq ? -- seq )
     [
@@ -37,14 +44,14 @@ M: plain-writer stream-write-table
 
 M: plain-writer make-cell-stream 2drop <string-writer> ;
 
-M: sbuf stream-read1 dup empty? [ drop f ] [ pop ] if ;
+M: growable stream-read1 dup empty? [ drop f ] [ pop ] if ;
 
 : sbuf-read-until ( sbuf n -- str )
     tail-slice >string dup reverse-here ;
 
 : find-last-sep swap [ memq? ] curry find-last drop ;
 
-M: sbuf stream-read-until
+M: growable stream-read-until
     [ find-last-sep ] keep over [
         [ swap 1+ sbuf-read-until ] 2keep [ nth ] 2keep
         set-length
@@ -53,7 +60,7 @@ M: sbuf stream-read-until
         delete-all
     ] if ;
 
-M: sbuf stream-read
+M: growable stream-read
     dup empty? [
         2drop f
     ] [
@@ -62,7 +69,7 @@ M: sbuf stream-read
         set-length
     ] if ;
 
-M: sbuf stream-read-partial
+M: growable stream-read-partial
     stream-read ;
 
 : <string-reader> ( str -- stream )
@@ -70,3 +77,9 @@ M: sbuf stream-read-partial
 
 : string-in ( str quot -- )
     >r <string-reader> r> with-stream ; inline
+
+: <byte-reader> ( byte-array encoding -- stream )
+    >r >byte-vector dup reverse-here r> <decoding> ;
+
+: with-byte-reader ( byte-array encoding quot -- )
+    >r <byte-reader> r> with-stream ; inline
