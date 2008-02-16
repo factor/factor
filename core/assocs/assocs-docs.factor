@@ -268,13 +268,13 @@ HELP: remove-all
 { $side-effects "assoc" } ;
 
 HELP: substitute-here
-{ $values { "assoc" assoc } { "seq" "a mutable sequence" } }
+{ $values { "seq" "a mutable sequence" } { "assoc" assoc } }
 { $description "Replaces elements of " { $snippet "seq" } " which appear as keys in " { $snippet "assoc" } " with the corresponding values, acting as the identity on all other elements." }
 { $errors "Throws an error if " { $snippet "assoc" } " contains values whose types are not permissible in " { $snippet "seq" } "." }
 { $side-effects "seq" } ;
 
 HELP: substitute
-{ $values { "assoc" assoc } { "seq" sequence } { "seq" sequence } }
+{ $values { "seq" sequence } { "assoc" assoc } { "newseq" sequence } }
 { $description "Creates a new sequence where elements of " { $snippet "seq" } " which appear as keys in " { $snippet "assoc" } " are replaced by the corresponding values, and all other elements are unchanged." } ;
 
 HELP: cache
