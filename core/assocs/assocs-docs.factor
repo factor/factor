@@ -59,6 +59,7 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 { $subsection diff }
 { $subsection remove-all }
 { $subsection substitute }
+{ $subsection substitute-here }
 { $see-also key? } ;
 
 ARTICLE: "assocs-mutation" "Storing keys and values in assocs"
@@ -266,11 +267,15 @@ HELP: remove-all
 { $notes "The values of the keys in the assoc are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." }
 { $side-effects "assoc" } ;
 
-HELP: substitute
+HELP: substitute-here
 { $values { "assoc" assoc } { "seq" "a mutable sequence" } }
-{ $description "Replaces elements of " { $snippet "seq" } " which appear in as keys in " { $snippet "assoc" } " with the corresponding values, acting as the identity on all other elements." }
+{ $description "Replaces elements of " { $snippet "seq" } " which appear as keys in " { $snippet "assoc" } " with the corresponding values, acting as the identity on all other elements." }
 { $errors "Throws an error if " { $snippet "assoc" } " contains values whose types are not permissible in " { $snippet "seq" } "." }
 { $side-effects "seq" } ;
+
+HELP: substitute
+{ $values { "assoc" assoc } { "seq" sequence } { "seq" sequence } }
+{ $description "Creates a new sequence where elements of " { $snippet "seq" } " which appear as keys in " { $snippet "assoc" } " are replaced by the corresponding values, and all other elements are unchanged." } ;
 
 HELP: cache
 { $values { "key" "a key" } { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
