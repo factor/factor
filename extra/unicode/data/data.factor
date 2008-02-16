@@ -1,7 +1,6 @@
-USING: assocs math kernel sequences sequences.lib io.files
-hashtables quotations splitting arrays math.parser
-combinators.lib hash2 byte-arrays words namespaces words
-compiler.units parser ;
+USING: assocs math kernel sequences io.files hashtables
+quotations splitting arrays math.parser combinators.lib hash2
+byte-arrays words namespaces words compiler.units parser ;
 IN: unicode.data
 
 <<
@@ -68,7 +67,7 @@ IN: unicode.data
 : process-combining ( data -- hash )
     3 swap (process-data)
     [ string>number ] assoc-map
-    [ nip 0 = not ] assoc-subset
+    [ nip zero? not ] assoc-subset
     >hashtable ;
 
 : categories ( -- names )
@@ -95,9 +94,9 @@ IN: unicode.data
     [ dup CHAR: A CHAR: Z between? [ HEX: 20 + ] when ] map ;
 
 : process-names ( data -- names-hash )
-    1 swap (process-data)
-    [ ascii-lower CHAR: \s CHAR: - replace swap ] assoc-map
-    >hashtable ;
+    1 swap (process-data) [
+        ascii-lower { { CHAR: \s CHAR: - } } substitute swap
+    ] assoc-map >hashtable ;
 
 : multihex ( hexstring -- string )
     " " split [ hex> ] map [ ] subset ;

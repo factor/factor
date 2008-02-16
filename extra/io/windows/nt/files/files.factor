@@ -2,7 +2,7 @@ USING: continuations destructors io.buffers io.files io.backend
 io.timeouts io.nonblocking io.windows io.windows.nt.backend
 kernel libc math threads windows windows.kernel32 alien.c-types
 alien.arrays sequences combinators combinators.lib sequences.lib
-ascii splitting alien strings ;
+ascii splitting alien strings assocs ;
 IN: io.windows.nt.files
 
 M: windows-nt-io cwd
@@ -60,7 +60,7 @@ M: windows-nt-io root-directory? ( path -- ? )
 
 M: windows-nt-io normalize-pathname ( string -- string )
     dup string? [ "pathname must be a string" throw ] unless
-    "/" split "\\" join
+    { { CHAR: / CHAR: \\ } } substitute
     cwd swap windows-path+
     [ "/\\." member? ] right-trim
     dup peek CHAR: : = [ "\\" append ] when ;

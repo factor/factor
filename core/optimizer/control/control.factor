@@ -7,7 +7,7 @@ combinators classes generic.math continuations optimizer.def-use
 optimizer.backend generic.standard ;
 IN: optimizer.control
 
-! ! ! Loop detection
+! ! ! Rudimentary CFA
 
 ! A LOOP
 !
@@ -36,7 +36,8 @@ IN: optimizer.control
 !       |
 !    #values
 !
-! NOT A LOOP (call to A nested inside another label/loop):
+! NOT A LOOP (call to A nested inside another label which is
+! not a loop):
 !
 !
 !          #label A
@@ -53,38 +54,70 @@ IN: optimizer.control
 !               |       |
 !         #call-label A |
 !               |       |
-!              ...     ...
+!           #values     |
+!                 #call-label B
+!                       |
+!                      ...
 
-GENERIC: detect-loops* ( node -- )
+! Mapping word => { node { nesting tail? }+ height }
+! We record all calls to a label, their control nesting and
+! whether it is a tail call or not
+SYMBOL: label-info
 
-M: node detect-loops* drop ;
+GENERIC: collect-label-info* ( node -- )
 
-M: #label detect-loops* t swap set-#label-loop? ;
+M: #label collect-label-info*
+    [ V{ } clone node-stack get length 3array ] keep
+    node-param label-info get set-at ;
 
-: not-a-loop ( #label -- )
-    f swap set-#label-loop? ;
+USE: prettyprint
 
-: tail-call? ( -- ? )
-    node-stack get
-    dup [ #label? ] find-last drop [ 1+ ] [ 0 ] if* tail
-    [ node-successor #tail? ] all? ;
-USE: io
-: detect-loop ( seen-other? label node -- seen-other? continue? )
-    #! seen-other?: have we seen another label?
-    {
-        { [ dup #label? not ] [ 2drop t ] }
-        { [ 2dup node-param eq? not ] [ 3drop t t ] }
-        { [ tail-call? not ] [ not-a-loop drop f ] }
-        { [ pick ] [ not-a-loop drop f ] }
-        { [ t ] [ 2drop f ] }
-    } cond ;
+M: #call-label collect-label-info*
+    node-param label-info get at
+    node-stack get over third tail
+    [ [ #label? ] subset [ node-param ] map ] keep
+    [ node-successor #tail? ] all? 2array
+    swap second push ;
 
-M: #call-label detect-loops*
-    f swap node-param node-stack get <reversed>
-    [ detect-loop ] with all? 2drop ;
+M: node collect-label-info*
+    drop ;
 
-: detect-loops ( node -- )
-    [ detect-loops* ] each-node ;
+: collect-label-info ( node -- )
+    H{ } clone label-info set
+    [ collect-label-info* ] each-node ;
+
+! Mapping word => label
+SYMBOL: potential-loops
+
+: remove-non-tail-calls ( -- )
+    label-info get
+    [ nip second [ second ] all? ] assoc-subset
+    [ first ] assoc-map
+    potential-loops set ;
+
+: remove-non-loop-calls ( -- )
+    ! Boolean is set to t if something changed.
+    !  We recurse until a fixed point is reached.
+    f label-info get [
+        ! If label X is called from within a label Y that is
+        ! no longer a potential loop, then X is no longer a
+        ! potential loop either.
+        over potential-loops get key? [
+            second [ first ] map concat
+            potential-loops get [ key? ] curry all?
+            [ drop ] [ potential-loops get delete-at t or ] if
+        ] [ 2drop ] if
+    ] assoc-each [ remove-non-loop-calls ] when ;
+
+: detect-loops ( nodes -- )
+    [
+        collect-label-info
+        remove-non-tail-calls
+        remove-non-loop-calls
+        potential-loops get [
+            nip t swap set-#label-loop?
+        ] assoc-each
+    ] with-scope ;
 
 ! ! ! Constant branch folding
 !
@@ -204,7 +237,7 @@ M: #if optimize-node*
 
 !   #label -> C -> #return 1
 !     |
-!     -> #if -> #merge -> #return 2
+!     -> #if -> #merge (*) -> #return 2
 !         |
 !     --------
 !     |      |
@@ -218,19 +251,19 @@ M: #if optimize-node*
 
 ! AFTER:
 
-!    #label -> #terminate
-!     |
-!     -> #if -> #terminate
+!        #label -> #return 1
 !         |
-!     --------
-!     |      |
-!     A      B
-!     |      |
-!  #values   |
-!     |  #call-label
-!  #merge    |
-!     |      |
-!     C   #values
+!         -> #if -------> #merge (*) -> #return 2
+!             |           \-------------------/
+!     ----------------              |
+!     |              |              |
+!     A              B     unreacachable code needed to
+!     |              |         preserve invariants
+!  #values           |
+!     |          #call-label
+!  #merge (*)        |
+!     |              |
+!     C           #values
 !     |
 !  #return 1
 
@@ -282,14 +315,22 @@ M: node add-loop-exit*
         ] [ 2drop f ] if
     ] [ drop f ] if ;
 
-! M: #loop optimize-node*
-!     dup lift-loop-tail? dup [
-!         last-node >r
-!         dup detach-node-successor
-!         over node-child find-final-if detach-node-successor
-!         [ set-node-successor ] keep
-!         r> set-node-successor
-!         t
-!     ] [
-!         2drop t f
-!     ] if ;
+M: #loop optimize-node*
+    dup lift-loop-tail? dup [
+        last-node "values" set
+
+        dup node-successor "tail" set
+        dup node-successor last-node "return" set
+        dup node-child find-final-if node-successor "merge" set
+
+        ! #label -> #return
+        "return" get clone-node over set-node-successor
+        ! #merge -> C
+        "merge" get clone-node "tail" get over set-node-successor
+        ! #values -> #merge ->C
+        "values" get set-node-successor
+
+        t
+    ] [
+        2drop t f
+    ] if ;

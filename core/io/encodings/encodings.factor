@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors io.streams.lines io.streams.plain
-namespaces unicode.syntax growable strings io classes io.streams.c
+namespaces unicode growable strings io classes io.streams.c
 continuations ;
 IN: io.encodings
 
@@ -19,7 +19,7 @@ SYMBOL: begin
     over push 0 begin ;
 
 : push-replacement ( buf -- buf ch state )
-    UNICHAR: replacement-character decoded ;
+    CHAR: replacement-character decoded ;
 
 : finish-decoding ( buf ch state -- str )
     begin eq? [ decode-error ] unless drop "" like ;
