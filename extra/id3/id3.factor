@@ -1,9 +1,8 @@
 ! Copyright (C) 2007 Adam Wendt.
 ! See http://factorcode.org/license.txt for BSD license.
-!
 
 USING: arrays combinators io io.binary io.files io.paths
-io.utf16 kernel math math.parser namespaces sequences
+io.encodings.utf16 kernel math math.parser namespaces sequences
 splitting strings assocs unicode.categories ;
 
 IN: id3
