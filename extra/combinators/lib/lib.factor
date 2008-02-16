@@ -167,3 +167,10 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
 
 : and? ( obj quot1 quot2 -- ? )
     >r keep r> rot [ call ] [ 2drop f ] if ; inline
+
+MACRO: multikeep ( word out-indexes -- ... )
+    [
+        dup >r [ \ npick \ >r 3array % ] each
+        %
+        r> [ drop \ r> , ] each
+    ] [ ] make ;

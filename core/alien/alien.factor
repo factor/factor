@@ -90,10 +90,3 @@ TUPLE: alien-invoke-error library symbol ;
 
 : alien-invoke ( ... return library function parameters -- ... )
     2over \ alien-invoke-error construct-boa throw ;
-
-MACRO: out-keep ( word out-indexes -- ... )
-    [
-        dup >r [ \ npick \ >r 3array % ] each
-        %
-        r> [ drop \ r> , ] each
-    ] [ ] make ;

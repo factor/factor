@@ -145,23 +145,7 @@ HELP: alien-callback
 }
 { $errors "Throws an " { $link alien-callback-error } " if the word calling " { $link alien-callback } " is not compiled." } ;
 
-HELP: out-keep
-{ $values { "quot" "A quotation" } { "out-indexes" "A sequence of indexes relative to the top of the stack" } }
-{ $description
-    "Invokes " { $snippet "quot" } ", restoring the values to the stack indicated by " { $snippet "out-indexes" } ". This word is useful for calling C functions with out parameters. " { $snippet "quot" } " can invoke the function and manipulate its return value, after which the actually interesting values stored in the out parameters are brought back to the top of the stack." }
-{ $notes "The indexes in " { $snippet "out-indexes" } " are relative to the top of the stack, with " { $snippet "1" } " indicating the topmost value. This means that the indexes are reversed relative to the order in the C prototype; 1 indicates the rightmost parameter, and higher numbers count leftward." }
-{ $examples
-    "A simple wrapper around memcpy (pretending that the return value is not equal to the out parameter):"
-    { $code
-        "LIBRARY: libc"
-        "FUNCTION: void* memcpy ( void* out, void* in, size_t n ) ;"
-        ": copy-byte-array ( a -- a' )"
-        "    dup length dup <byte-array> -rot"
-        "    [ memcpy drop ] { 3 } out-keep ;"
-    }
-} ;
-
-{ alien-invoke alien-indirect alien-callback out-keep } related-words
+{ alien-invoke alien-indirect alien-callback } related-words
 
 ARTICLE: "aliens" "Alien addresses"
 "Instances of the " { $link alien } " class represent pointers to C data outside the Factor heap:"

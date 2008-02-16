@@ -1,5 +1,5 @@
 USING: alien alien.syntax alien.c-types math kernel sequences
-windows windows.types ;
+windows windows.types combinators.lib ;
 IN: windows.ole32
 
 LIBRARY: ole32
@@ -39,5 +39,5 @@ FUNCTION: HRESULT CLSIDFromString ( LPOLESTR lpsz, REFGUID out_rguid ) ;
     string>u16-alien "GUID" <c-object> [ CLSIDFromString ole32-error ] keep ;
 : guid>string ( guid -- string )
     GUID-STRING-LENGTH 1+ [ "ushort" <c-array> ] keep
-    [ StringFromGUID2 drop ] { 2 } out-keep alien>u16-string ;
+    [ StringFromGUID2 drop ] { 2 } multikeep alien>u16-string ;
 
