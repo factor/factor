@@ -3,7 +3,7 @@
 USING: arrays assocs alien alien.syntax continuations io
 kernel math math.parser namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
-db.tuples db.types ;
+db.tuples db.types tools.annotations math.ranges ;
 IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty db user pass ;
@@ -52,11 +52,11 @@ M: postgresql-result-set #columns ( result-set -- n )
 M: postgresql-result-set row-column ( result-set n -- obj )
     >r dup result-set-handle swap result-set-n r> PQgetvalue ;
 
-M: postgresql-statement execute-statement* ( statement -- obj )
-    query-results ;
+M: postgresql-result-set row-column ( result-set n -- obj )
+    >r dup result-set-handle swap result-set-n r> PQgetvalue ;
 
-: increment-n ( result-set -- n )
-    dup result-set-n 1+ dup rot set-result-set-n ;
+M: postgresql-statement insert-statement ( statement -- id )
+    query-results [ break 0 row-column ] with-disposal ;
 
 M: postgresql-statement query-results ( query -- result-set )
     dup statement-params [
@@ -68,8 +68,11 @@ M: postgresql-statement query-results ( query -- result-set )
     postgresql-result-set <result-set>
     dup init-result-set ;
 
-M: postgresql-result-set advance-row ( result-set -- ? )
-    dup increment-n swap result-set-max >= ;
+M: postgresql-result-set advance-row ( result-set -- )
+    dup result-set-n 1+ swap set-result-set-n ;
+
+M: postgresql-result-set more-rows? ( result-set -- ? )
+    dup result-set-n swap result-set-max < ;
 
 M: postgresql-statement dispose ( query -- )
     dup statement-handle PQclear
@@ -105,36 +108,105 @@ M: postgresql-db commit-transaction ( -- )
 M: postgresql-db rollback-transaction ( -- )
     "ROLLBACK" sql-command ;
 
+: postgresql-type-hash* ( -- assoc )
+    H{
+        { SERIAL "serial" }
+    } ;
 
-M: postgresql-db create-sql ( columns table -- sql )
+: postgresql-type-hash ( -- assoc )
+    H{
+        { INTEGER "integer" }
+        { SERIAL "integer" }
+        { TEXT "text" }
+        { VARCHAR "varchar" }
+        { DOUBLE "real" }
+    } ;
+
+: enquote ( str -- newstr ) "(" swap ")" 3append ;
+
+: postgresql-type ( str n/str  -- newstr )
+    " " swap number>string* enquote 3append ;
+
+: >sql-type* ( obj -- str )
+    dup pair? [
+        first2 >r >sql-type* r> postgresql-type
+    ] [
+        dup postgresql-type-hash* at* [
+            nip
+        ] [
+            drop >sql-type
+        ] if
+    ] if ;
+
+M: postgresql-db >sql-type ( hash obj -- str )
+    dup pair? [
+        first2 >r >sql-type r> postgresql-type
+    ]  [
+        postgresql-type-hash at* [
+            no-sql-type
+        ] unless
+    ] if ;
+
+: insert-function ( columns table -- sql )
     [
-        "create table " % %
-        " (" % [ ", " % ] [
-            dup second % " " %
-            dup third >sql-type % " " %
-            sql-modifiers " " join %
-        ] interleave ")" %
-    ] "" make ;
+        >r remove-id r>
+        "create function add_" % dup %
+        "(" %
+        over [ "," % ]
+        [ third dup array? [ first ] when >sql-type % ] interleave
+        ")" %
+        " returns bigint as '" %
 
-M: postgresql-db drop-sql ( table -- sql )
-    [
-        "drop table " % %
-    ] "" make ;
-
-SYMBOL: postgresql-counter
-
-M: postgresql-db insert-sql* ( columns table -- sql )
-    [
-        postgresql-counter off
-        "insert into " %
+        2dup "insert into " %
         %
         "(" %
         dup [ ", " % ] [ second % ] interleave
         ") " %
         " values (" %
-        [ ", " % ] [
-            drop "$" % postgresql-counter [ inc ] keep get #
-        ] interleave
+        length [1,b] [ ", " % ] [ "$" % # ] interleave
+        "); " %
+
+        "select currval(''" % % "_id_seq'');' language sql;" %
+        drop
+    ] "" make ;
+
+: drop-function ( columns table -- sql )
+    [
+        >r remove-id r>
+        "drop function add_" % %
+        "(" %
+        [ "," % ] [ third >sql-type % ] interleave
+        ")" %
+    ] "" make ;
+
+M: postgresql-db create-sql ( columns table -- seq )
+    [
+        [
+            2dup
+            "create table " % %
+            " (" % [ ", " % ] [
+                dup second % " " %
+                dup third >sql-type* % " " %
+                sql-modifiers " " join %
+            ] interleave "); " %
+        ] "" make ,
+
+        over native-id? [ insert-function , ] [ 2drop ] if
+    ] { } make ;
+
+M: postgresql-db drop-sql ( columns table -- seq )
+    [
+        [
+            dup "drop table " % % ";" %
+        ] "" make ,
+        over native-id? [ drop-function , ] [ 2drop ] if
+    ] { } make ;
+
+M: postgresql-db insert-sql* ( columns table -- sql )
+    [
+        "select add_" % %
+        "(" %
+        length [1,b] [ ", " % ] [ "$" % # ] interleave
         ")" %
     ] "" make ;
 
@@ -144,9 +216,10 @@ M: postgresql-db update-sql* ( columns table -- sql )
         %
         " set " %
         dup remove-id
-        [ ", " % ] [ second dup % " = :" % % ] interleave
+        dup length [1,b] swap 2array flip
+        [ ", " % ] [ first2 second % " = $" % # ] interleave
         " where " %
-        [ primary-key? ] find nip second dup % " = :" % %
+        [ primary-key? ] find nip second dup % " = $" % length 2 + #
     ] "" make ;
 
 M: postgresql-db delete-sql* ( columns table -- sql )
@@ -154,23 +227,19 @@ M: postgresql-db delete-sql* ( columns table -- sql )
         "delete from " %
         %
         " where " %
-        first second dup % " = :" % %
+        first second % " = $1" %
     ] "" make ;
 
 M: postgresql-db select-sql* ( columns table -- sql )
     drop ;
 
 M: postgresql-db tuple>params ( columns tuple -- obj )
-    [
-        >r dup first r> get-slot-named swap third
-    ] curry { } map>assoc ;
+    [ >r dup third swap first r> get-slot-named swap ]
+    curry { } map>assoc ;
     
-M: postgresql-db last-id ( res -- id )
-    pq-oid-value ;
-
 : postgresql-db-modifiers ( -- hashtable )
     H{
-        { +native-id+ "primary key" }
+        { +native-id+ "not null primary key" }
         { +assigned-id+ "primary key" }
         { +autoincrement+ "autoincrement" }
         { +unique+ "unique" }
@@ -189,18 +258,3 @@ M: postgresql-db sql-modifiers* ( modifiers -- str )
             swap at
         ] if
     ] with map [ ] subset ;
-
-: postgresql-type-hash ( -- assoc )
-    H{
-        { INTEGER "integer" }
-        { TEXT "text" }
-        { VARCHAR "text" }
-        { DOUBLE "real" }
-    } ;
-
-M: postgresql-db >sql-type ( obj -- str )
-    dup pair? [
-        first >sql-type
-    ] [
-        postgresql-type-hash at* [ T{ no-sql-type } throw ] unless
-    ] if ;

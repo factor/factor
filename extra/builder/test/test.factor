@@ -6,7 +6,7 @@ USING: kernel namespaces sequences assocs builder continuations
        prettyprint
        tools.browser
        tools.test
-       bootstrap.stage2 benchmark ;
+       bootstrap.stage2 benchmark builder.util ;
 
 IN: builder.test
 

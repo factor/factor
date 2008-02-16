@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces io.binary
 io.encodings combinators splitting ;
-IN: io.utf16
+IN: io.encodings.utf16
 
 SYMBOL: double
 SYMBOL: quad1
@@ -104,14 +104,10 @@ SYMBOL: ignore
 : encode-utf16 ( str -- seq )
     encode-utf16le bom-le swap append ;
 
-: utf16le? ( seq1 -- seq2 ? ) bom-le ?head ;
-
-: utf16be? ( seq1 -- seq2 ? ) bom-be ?head ;
-
 : decode-utf16 ( seq -- str )
     {
-        { [ utf16le? ] [ decode-utf16le ] }
-        { [ utf16be? ] [ decode-utf16be ] }
+        { [ bom-le ?head ] [ decode-utf16le ] }
+        { [ bom-be ?head ] [ decode-utf16be ] }
         { [ t ] [ decode-error ] }
     } cond ;
 
@@ -127,4 +123,4 @@ TUPLE: utf16be ;
 INSTANCE: utf16be encoding-stream 
 
 M: utf16be encode-string drop encode-utf16be ;
-M: utf16le decode-step drop decode-utf16be-step ;
+M: utf16be decode-step drop decode-utf16be-step ;

@@ -132,7 +132,7 @@ MEMO: all-vocabs-seq ( -- seq )
     require-all ;
 
 : load-everything ( -- )
-    try-everything drop ;
+    try-everything load-failures. ;
 
 : unrooted-child-vocabs ( prefix -- seq )
     dup empty? [ CHAR: . add ] unless

@@ -1,6 +1,7 @@
 IN: temporary
 USING: tools.test optimizer.control combinators kernel
-sequences inference.dataflow math inference ;
+sequences inference.dataflow math inference classes strings
+optimizer ;
 
 : label-is-loop? ( node word -- ? )
     [
@@ -59,4 +60,122 @@ sequences inference.dataflow math inference ;
 [ t ] [
     [ loop-test-3 ] dataflow dup detect-loops
     \ loop-test-3 label-is-not-loop?
+] unit-test
+
+: loop-test-4 ( a -- )
+    dup [
+        loop-test-4
+    ] [
+        drop
+    ] if ; inline
+
+: find-label ( node -- label )
+    dup #label? [ node-successor find-label ] unless ;
+
+: test-loop-exits
+    dataflow dup detect-loops find-label
+    dup node-param swap
+    [ node-child find-tail find-loop-exits [ class ] map ] keep
+    #label-loop? ;
+
+[ { #values } t ] [
+    [ loop-test-4 ] test-loop-exits
+] unit-test
+
+: loop-test-5 ( a -- )
+    dup [
+        dup string? [
+            loop-test-5
+        ] [
+            drop
+        ] if
+    ] [
+        drop
+    ] if ; inline
+
+[ { #values #values } t ] [
+    [ loop-test-5 ] test-loop-exits
+] unit-test
+
+: loop-test-6 ( a -- )
+    dup [
+        dup string? [
+            loop-test-6
+        ] [
+            3 throw
+        ] if
+    ] [
+        drop
+    ] if ; inline
+
+[ { #values } t ] [
+    [ loop-test-6 ] test-loop-exits
+] unit-test
+
+[ f ] [
+    [ [ [ ] map ] map ] dataflow dup detect-loops
+    [ dup #label? swap #loop? not and ] node-exists?
+] unit-test
+
+: blah f ;
+
+DEFER: a
+
+: b ( -- )
+    blah [ b ] [ a ] if ; inline
+
+: a ( -- )
+    blah [ b ] [ a ] if ; inline
+
+[ t ] [
+    [ a ] dataflow dup detect-loops
+    \ a label-is-loop?
+] unit-test
+
+[ t ] [
+    [ a ] dataflow dup detect-loops
+    \ b label-is-loop?
+] unit-test
+
+[ t ] [
+    [ b ] dataflow dup detect-loops
+    \ a label-is-loop?
+] unit-test
+
+[ t ] [
+    [ a ] dataflow dup detect-loops
+    \ b label-is-loop?
+] unit-test
+
+DEFER: a'
+
+: b' ( -- )
+    blah [ b' b' ] [ a' ] if ; inline
+
+: a' ( -- )
+    blah [ b' ] [ a' ] if ; inline
+
+[ f ] [
+    [ a' ] dataflow dup detect-loops
+    \ a' label-is-loop?
+] unit-test
+
+[ f ] [
+    [ b' ] dataflow dup detect-loops
+    \ b' label-is-loop?
+] unit-test
+
+! I used to think this should be f, but doing this on pen and
+! paper almost convinced me that a loop conversion here is
+! sound. The loop analysis algorithm looks pretty solid -- its
+! a standard iterative dataflow problem after all -- so I'm
+! tempted to believe the computer here
+[ t ] [
+    [ b' ] dataflow dup detect-loops
+    \ a' label-is-loop?
+] unit-test
+
+[ f ] [
+    [ a' ] dataflow dup detect-loops
+    \ b' label-is-loop?
 ] unit-test
