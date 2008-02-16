@@ -1,5 +1,5 @@
 USING: arrays io io.files kernel math parser strings system
-tools.test words namespaces ;
+tools.test words namespaces io.encodings.ascii ;
 IN: temporary
 
 [ f ] [
@@ -8,7 +8,7 @@ IN: temporary
 ] unit-test
 
 : <resource-reader> ( resource -- stream )
-    resource-path <file-reader> ;
+    resource-path binary ascii <file-reader> ;
 
 [
     "This is a line.\rThis is another line.\r"

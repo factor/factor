@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces
 growable strings io classes io.streams.c continuations
-io.styles io.streams.nested ;
+io.styles io.streams.nested io.encodings.binary ;
 IN: io.encodings
 
 ! Decoding
@@ -54,7 +54,10 @@ GENERIC: decode-step ( buf byte ch state encoding -- buf ch state )
 
 TUPLE: decoded code cr ;
 : <decoded> ( stream decoding-class -- decoded-stream )
-    construct-empty { set-delegate set-decoded-code } decoded construct ;
+    dup binary eq? [ drop ] [
+        construct-empty { set-delegate set-decoded-code }
+        decoded construct
+    ] if ;
 
 : cr+ t swap set-line-reader-cr ; inline
 

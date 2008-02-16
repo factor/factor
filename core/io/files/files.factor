@@ -15,6 +15,15 @@ HOOK: file-writer* io-backend ( path -- stream )
 
 HOOK: file-appender* io-backend ( path -- stream )
 
+: <file-reader> ( path encoding -- stream )
+    swap file-reader* swap <decoding> ;
+
+: <file-writer> ( path encoding -- stream )
+    swap file-writer* swap <encoding> ;
+
+: <file-appender> ( path encoding -- stream )
+    swap file-appender* swap <encoding> ;
+
 HOOK: delete-file io-backend ( path -- )
 
 HOOK: rename-file io-backend ( from to -- )
@@ -115,8 +124,8 @@ HOOK: copy-file io-backend ( from to -- )
 
 M: object copy-file
     dup parent-directory make-directories
-    <file-writer> [
-        swap <file-reader> [
+    binary <file-writer> [
+        swap binary <file-reader> [
             swap stream-copy
         ] with-disposal
     ] with-disposal ;
@@ -139,15 +148,6 @@ TUPLE: pathname string ;
 C: <pathname> pathname
 
 M: pathname <=> [ pathname-string ] compare ;
-
-: <file-reader> ( path encoding -- stream )
-    swap file-reader* swap <decoding> ;
-
-: <file-writer> ( path encoding -- stream )
-    swap file-writer* swap <encoding> ;
-
-: <file-appender> ( path encoding -- stream )
-    swap file-appender* swap <encoding> ;
 
 : file-lines ( path encoding -- seq ) <file-reader> lines ;
 

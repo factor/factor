@@ -1,3 +1,2 @@
-USING: kernel io.encodings ;
-
-TUPLE: binary ;
+IN: io.encodings.binary
+SYMBOL: binary

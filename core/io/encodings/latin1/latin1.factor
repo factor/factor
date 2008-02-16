@@ -1,10 +1,10 @@
-USING: io io.encodings strings kernel ;
+USING: io io.encodings strings kernel io.encodings.ascii ;
 IN: io.encodings.latin1
 
 TUPLE: latin1 ;
 
-M: latin1 stream-read delegate stream-read >string ;
+M: latin1 encode-string 
+    drop 255 encode-check>= ;
 
-M: latin1 stream-read-until delegate stream-read-until >string ;
-
-M: latin1 stream-read-partial delegate stream-read-partial >string ;
+M: latin1 decode-step
+    3drop over push f f ;
