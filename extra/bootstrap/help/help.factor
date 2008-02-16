@@ -14,8 +14,6 @@ IN: bootstrap.help
         [ vocab-root ] subset
         [ vocab-source-loaded? ] subset
         [ dup vocab-docs-loaded? [ drop ] [ load-docs ] if ] each
-    ] with-variable
-
-    "help.handbook" require ;
+    ] with-variable ;
 
 load-help
