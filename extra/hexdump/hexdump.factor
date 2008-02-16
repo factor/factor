@@ -25,7 +25,7 @@ PRIVATE>
     [
         dup length header.
         16 <sliced-groups> [ line. ] each-index
-    ] string-out ;
+    ] with-string-writer ;
 
 : hexdump. ( seq -- )
     hexdump write ;

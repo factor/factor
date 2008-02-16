@@ -12,7 +12,7 @@ unit-test
 [ "" <string-reader> stream-readln ]
 unit-test
 
-[ "xyzzy" ] [ [ "xyzzy" write ] string-out ] unit-test
+[ "xyzzy" ] [ [ "xyzzy" write ] with-string-writer ] unit-test
 
 [ "a" ] [ 1 SBUF" cba" stream-read ] unit-test
 [ "ab" ] [ 2 SBUF" cba" stream-read ] unit-test

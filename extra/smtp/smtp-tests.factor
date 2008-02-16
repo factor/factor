@@ -12,7 +12,7 @@ IN: temporary
 [ { "hello" "." "world" } validate-message ] must-fail
 
 [ "hello\r\nworld\r\n.\r\n" ] [
-    { "hello" "world" } [ send-body ] string-out
+    { "hello" "world" } [ send-body ] with-string-writer
 ] unit-test
 
 [ "500 syntax error" check-response ] must-fail
@@ -20,17 +20,17 @@ IN: temporary
 [ ] [ "220 success" check-response ] unit-test
 
 [ "220 success" ] [
-    "220 success" [ receive-response ] string-in
+    "220 success" [ receive-response ] with-string-reader
 ] unit-test
 
 [ "220 the end" ] [
     "220-a multiline response\r\n250-another line\r\n220 the end"
-    [ receive-response ] string-in
+    [ receive-response ] with-string-reader
 ] unit-test
 
 [ ] [
     "220-a multiline response\r\n250-another line\r\n220 the end"
-    [ get-ok ] string-in
+    [ get-ok ] with-string-reader
 ] unit-test
 
 [

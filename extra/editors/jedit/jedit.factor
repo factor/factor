@@ -7,11 +7,11 @@ math.parser ;
 IN: editors.jedit
 
 : jedit-server-info ( -- port auth )
-    home "/.jedit/server" path+ <file-reader> [
+    home "/.jedit/server" path+ [
         readln drop
         readln string>number
         readln string>number
-    ] with-stream ;
+    ] with-file-reader ;
 
 : make-jedit-request ( files -- code )
     [
@@ -21,7 +21,7 @@ IN: editors.jedit
         "new String[] {" write
         [ pprint "," write ] each
         "null});\n" write
-    ] string-out ;
+    ] with-string-writer ;
 
 : send-jedit-request ( request -- )
     jedit-server-info swap "localhost" swap <inet> <client> [

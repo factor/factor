@@ -347,7 +347,7 @@ M: timestamp year. ( timestamp -- )
     timestamp-second >fixnum write-00 ;
 
 : timestamp>string ( timestamp -- str )
-    [ (timestamp>string) ] string-out ;
+    [ (timestamp>string) ] with-string-writer ;
 
 : (write-gmt-offset) ( ratio -- )
     1 /mod swap write-00 60 * write-00 ;
@@ -366,7 +366,7 @@ M: timestamp year. ( timestamp -- )
         dup (timestamp>string)
         " " write
         timestamp-gmt-offset write-gmt-offset
-    ] string-out ;
+    ] with-string-writer ;
 
 : timestamp>http-string ( timestamp -- str )
     #! http timestamp format
@@ -382,7 +382,7 @@ M: timestamp year. ( timestamp -- )
     timestamp-second >fixnum write-00 CHAR: Z write1 ;
 
 : timestamp>rfc3339 ( timestamp -- str )
-    >gmt [ (timestamp>rfc3339) ] string-out ;
+    >gmt [ (timestamp>rfc3339) ] with-string-writer ;
 
 : expect read1 assert= ;
 
@@ -401,7 +401,7 @@ M: timestamp year. ( timestamp -- )
     0 <timestamp> ;
 
 : rfc3339>timestamp ( str -- timestamp )
-    [ (rfc3339>timestamp) ] string-in ;
+    [ (rfc3339>timestamp) ] with-string-reader ;
 
 : file-time-string ( timestamp -- string )
     [
@@ -413,7 +413,7 @@ M: timestamp year. ( timestamp -- )
         ] [
             timestamp-year number>string 5 32 pad-left write
         ] if
-    ] string-out ;
+    ] with-string-writer ;
 
 : day-offset ( timestamp m -- timestamp n )
     over day-of-week - ; inline

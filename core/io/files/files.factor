@@ -116,11 +116,10 @@ HOOK: copy-file io-backend ( from to -- )
 M: object copy-file
     dup parent-directory make-directories
     <file-writer> [
-        stdio get swap
-        <file-reader> [
-            stdio get swap stream-copy
-        ] with-stream
-    ] with-stream ;
+        swap <file-reader> [
+            swap stream-copy
+        ] with-disposal
+    ] with-disposal ;
 
 : copy-directory ( from to -- )
     dup make-directories
@@ -146,10 +145,10 @@ M: pathname <=> [ pathname-string ] compare ;
 : file-contents ( path -- str )
     dup <file-reader> swap file-length <sbuf> [ stream-copy ] keep >string ;
 
-: with-file-in ( path quot -- )
+: with-file-writer ( path quot -- )
     >r <file-reader> r> with-stream ; inline
 
-: with-file-out ( path quot -- )
+: with-file-reader ( path quot -- )
     >r <file-writer> r> with-stream ; inline
 
 : with-file-appender ( path quot -- )

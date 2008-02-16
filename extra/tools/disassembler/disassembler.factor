@@ -20,7 +20,7 @@ M: pair make-disassemble-cmd
         current-process-handle number>string print
         "disassemble " write
         [ number>string write bl ] each
-    ] with-file-out ;
+    ] with-file-writer ;
 
 : run-gdb ( -- lines )
     [

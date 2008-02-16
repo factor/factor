@@ -461,9 +461,9 @@ M: cpu reset ( cpu -- )
 : load-rom ( filename cpu -- )
   #! Load the contents of the file into ROM.
   #! (address 0x0000-0x1FFF).
-  cpu-ram swap <file-reader> [ 
+  cpu-ram swap [ 
     0 swap (load-rom)
-  ] with-stream ;
+  ] with-file-reader ;
 
 SYMBOL: rom-root
 
@@ -477,9 +477,9 @@ SYMBOL: rom-root
   #! file path shoul dbe relative to the '/roms' resource path.
   rom-dir [
     cpu-ram [
-      swap first2 rom-dir swap path+ <file-reader> [      
+      swap first2 rom-dir swap path+ [      
         swap (load-rom)
-      ] with-stream
+      ] with-file-reader
     ] curry each 
   ] [
     ! 

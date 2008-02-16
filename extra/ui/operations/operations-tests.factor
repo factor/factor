@@ -11,7 +11,7 @@ io.streams.string math help help.markup ;
     3 "op" get operation-command command-quot
 ] unit-test
 
-[ "3" ] [ [ 3 "op" get invoke-command ] string-out ] unit-test
+[ "3" ] [ [ 3 "op" get invoke-command ] with-string-writer ] unit-test
 
 [ drop t ] \ my-pprint [ ] [ editor-string ] f operation construct-boa
 "op" set
@@ -20,9 +20,9 @@ io.streams.string math help help.markup ;
     [
         "4" <editor> [ set-editor-string ] keep
         "op" get invoke-command
-    ] string-out
+    ] with-string-writer
 ] unit-test
 
 [ ] [
-    [ { $operations \ + } print-element ] string-out drop
+    [ { $operations \ + } print-element ] with-string-writer drop
 ] unit-test

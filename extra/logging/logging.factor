@@ -103,7 +103,7 @@ PRIVATE>
 
 : (log-error) ( object word level -- )
     log-service get [
-        >r >r [ print-error ] string-out r> r> log-message
+        >r >r [ print-error ] with-string-writer r> r> log-message
     ] [
         2drop rethrow
     ] if ;

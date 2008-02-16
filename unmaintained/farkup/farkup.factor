@@ -72,7 +72,7 @@ M: number tree-write ( char -- ) write1 ;
 
 : farkup ( str -- html )
     'farkup' parse dup nil? 
-    [ error ] [ car parse-result-parsed [ tree-write ] string-out ] if ;
+    [ error ] [ car parse-result-parsed [ tree-write ] with-string-writer ] if ;
 
 ! useful debugging code below
 
@@ -83,4 +83,4 @@ M: number tree-write ( char -- ) write1 ;
 : farkup-parsed ( wiki -- all-parses )
     ! for debugging and optimization only
     'farkup' parse list>array 
-    [ parse-result-parsed [ tree-write ] string-out ] map ;
+    [ parse-result-parsed [ tree-write ] with-string-writer ] map ;

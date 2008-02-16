@@ -14,7 +14,7 @@ M: growable stream-flush drop ;
 : <string-writer> ( -- stream )
     512 <sbuf> <plain-writer> ;
 
-: string-out ( quot -- str )
+: with-string-writer ( quot -- str )
     <string-writer> swap [ stdio get ] compose with-stream*
     >string ; inline
 
@@ -75,7 +75,7 @@ M: growable stream-read-partial
 : <string-reader> ( str -- stream )
     >sbuf dup reverse-here <line-reader> ;
 
-: string-in ( str quot -- )
+: with-string-reader ( str quot -- )
     >r <string-reader> r> with-stream ; inline
 
 : <byte-reader> ( byte-array encoding -- stream )
