@@ -59,5 +59,7 @@ M: string (profile.)
 : vocabs-profile. ( -- )
     "Call counts for all vocabularies:" print
     vocabs [
-        dup words [ profile-counter ] map sum
+        dup words
+        [ "predicating" word-prop not ] subset
+        [ profile-counter ] map sum
     ] { } map>assoc counters. ;

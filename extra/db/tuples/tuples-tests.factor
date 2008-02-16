@@ -31,7 +31,7 @@ SYMBOL: the-person
     [ ] [ the-person get update-tuple ] unit-test
 
     [ ] [ the-person get delete-tuple ] unit-test
-    [ ] [ person drop-table ] unit-test ;
+    ; ! 1 [ ] [ person drop-table ] unit-test ;
 
 : test-sqlite ( -- )
     "tuples-test.db" resource-path <sqlite-db> [
@@ -54,17 +54,17 @@ person "PERSON"
 "billy" 10 3.14 <person> the-person set
 
 ! test-sqlite
-test-postgresql
+ test-postgresql
 
-person "PERSON"
-{
-    { "the-id" "ID" INTEGER +assigned-id+ }
-    { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
-    { "the-number" "AGE" INTEGER { +default+ 0 } }
-    { "real" "REAL" DOUBLE { +default+ 0.3 } }
-} define-persistent
+! person "PERSON"
+! {
+    ! { "the-id" "ID" INTEGER +assigned-id+ }
+    ! { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
+    ! { "the-number" "AGE" INTEGER { +default+ 0 } }
+    ! { "real" "REAL" DOUBLE { +default+ 0.3 } }
+! } define-persistent
 
-1 "billy" 20 6.28 <assigned-person> the-person set
+! 1 "billy" 20 6.28 <assigned-person> the-person set
 
 ! test-sqlite
 ! test-postgresql
