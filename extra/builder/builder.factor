@@ -1,7 +1,7 @@
 
 USING: kernel namespaces sequences splitting system combinators continuations
        parser io io.files io.launcher io.sockets prettyprint threads
-       bootstrap.image benchmark accessors vars bake smtp builder.util ;
+       bootstrap.image benchmark vars bake smtp builder.util accessors ;
 
 IN: builder
 
