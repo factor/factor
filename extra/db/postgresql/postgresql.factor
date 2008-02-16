@@ -65,7 +65,7 @@ M: postgresql-result-set sql-type>factor-type ( obj type -- newobj )
     } case ;
 
 M: postgresql-statement insert-statement ( statement -- id )
-    query-results [ break 0 row-column ] with-disposal ;
+    query-results [ 0 row-column ] with-disposal string>number ;
 
 M: postgresql-statement query-results ( query -- result-set )
     dup statement-params [
@@ -211,7 +211,7 @@ M: postgresql-db drop-sql ( columns table -- seq )
         over native-id? [ drop-function , ] [ 2drop ] if
     ] { } make ;
 
-M: postgresql-db insert-sql* ( columns table -- sql )
+M: postgresql-db insert-sql* ( columns table -- slot-names sql )
     [
         "select add_" % %
         "(" %
@@ -219,7 +219,7 @@ M: postgresql-db insert-sql* ( columns table -- sql )
         ")" %
     ] "" make ;
 
-M: postgresql-db update-sql* ( columns table -- sql )
+M: postgresql-db update-sql* ( columns table -- slot-names sql )
     [
         "update " %
         %
@@ -231,7 +231,7 @@ M: postgresql-db update-sql* ( columns table -- sql )
         [ primary-key? ] find nip second dup % " = $" % length 2 + #
     ] "" make ;
 
-M: postgresql-db delete-sql* ( columns table -- sql )
+M: postgresql-db delete-sql* ( columns table -- slot-names sql )
     [
         "delete from " %
         %
@@ -239,7 +239,7 @@ M: postgresql-db delete-sql* ( columns table -- sql )
         first second % " = $1" %
     ] "" make ;
 
-M: postgresql-db select-sql* ( columns table -- sql )
+M: postgresql-db select-sql ( columns table -- slot-names sql )
     drop ;
 
 M: postgresql-db tuple>params ( columns tuple -- obj )

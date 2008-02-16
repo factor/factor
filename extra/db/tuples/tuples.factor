@@ -41,13 +41,25 @@ TUPLE: no-slot-named ;
 HOOK: create-sql db ( columns table -- seq )
 HOOK: drop-sql db ( columns table -- seq )
 
-HOOK: insert-sql* db ( columns table -- sql )
-HOOK: update-sql* db ( columns table -- sql )
-HOOK: delete-sql* db ( columns table -- sql )
-HOOK: select-sql* db ( columns table -- sql )
+HOOK: insert-sql* db ( columns table -- slot-names sql )
+HOOK: update-sql* db ( columns table -- slot-names sql )
+HOOK: delete-sql* db ( columns table -- slot-names sql )
+HOOK: select-sql db ( tuple -- statement )
 
 HOOK: row-column-typed db ( result-set n type -- sql )
 HOOK: sql-type>factor-type db ( obj type -- obj )
+HOOK: tuple>params db ( columns tuple -- obj )
+
+
+HOOK: make-slot-names* db ( quot -- seq )
+HOOK: column-slot-name% db ( spec -- )
+HOOK: column-bind-name% db ( spec -- )
+
+: make-slots-names ( quot -- seq str )
+    [ make-column-names ] "" make ; inline
+: slot-name% ( seq -- ) first % ;
+: column-name% ( seq -- ) second % ;
+: column-type% ( seq -- ) third % ;
 
 : insert-sql ( columns class -- statement )
     db get db-insert-statements [ insert-sql* ] cache-statement ;
@@ -58,10 +70,6 @@ HOOK: sql-type>factor-type db ( obj type -- obj )
 : delete-sql ( columns class -- statement )
     db get db-delete-statements [ delete-sql* ] cache-statement ;
 
-: select-sql ( columns class -- statement )
-    db get db-select-statements [ select-sql* ] cache-statement ;
-
-HOOK: tuple>params db ( columns tuple -- obj )
 
 : tuple-statement ( columns tuple quot -- statement )
     >r [ tuple>params ] 2keep class r> call
@@ -93,8 +101,8 @@ HOOK: tuple>params db ( columns tuple -- obj )
 : delete-tuple ( tuple -- )
     [ [ primary-key? ] subset ] [ delete-sql ] do-tuple-statement ;
 
-! : select-tuple ( tuple -- )
-  !  [ select-sql ] bind-tuple do-query ;
+: select-tuple ( tuple -- )
+    [ select-sql ] keep do-query ;
 
 : persist ( tuple -- )
     dup primary-key [ update-tuple ] [ insert-tuple ] if ;

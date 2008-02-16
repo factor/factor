@@ -114,6 +114,10 @@ M: sqlite-db insert-sql* ( columns table -- sql )
         ")" %
     ] "" make ;
 
+: where-primary-key% ( columns -- )
+    " where " %
+    [ primary-key? ] find nip second dup % " = :" % % ;
+
 M: sqlite-db update-sql* ( columns table -- sql )
     [
         "update " %
@@ -121,8 +125,7 @@ M: sqlite-db update-sql* ( columns table -- sql )
         " set " %
         dup remove-id
         [ ", " % ] [ second dup % " = :" % % ] interleave
-        " where " %
-        [ primary-key? ] find nip second dup % " = :" % %
+        where-primary-key%
     ] "" make ;
 
 M: sqlite-db delete-sql* ( columns table -- sql )
@@ -133,13 +136,18 @@ M: sqlite-db delete-sql* ( columns table -- sql )
         first second dup % " = :" % %
     ] "" make ;
 
-M: sqlite-db select-sql* ( columns table -- sql )
+: select-interval ( interval name -- )
+    ;
+
+: select-sequence ( seq name -- )
+    ;
+
+M: sqlite-db select-sql ( columns table -- sql )
     [
         "select ROWID, " %
-        swap [ ", " % ] [ second % ] interleave
-        " from " %
-        %
-        " where ROWID = :ID" %
+        over [ ", " % ] [ second % ] interleave
+        " from " % %
+        " where " %
     ] "" make ;
 
 M: sqlite-db tuple>params ( columns tuple -- obj )
