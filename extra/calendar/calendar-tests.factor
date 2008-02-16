@@ -1,5 +1,5 @@
 USING: arrays calendar kernel math sequences tools.test
-continuations system ;
+continuations system io.streams.string ;
 
 [ 2004 12 32 0   0  0 0 make-timestamp ] [ "invalid timestamp" = ] must-fail-with
 [ 2004  2 30 0   0  0 0 make-timestamp ] [ "invalid timestamp" = ] must-fail-with
@@ -141,3 +141,23 @@ continuations system ;
 [ t ] [ 0 unix-time>timestamp unix-1970 = ] unit-test
 [ t ] [ 123456789 [ unix-time>timestamp timestamp>unix-time ] keep = ] unit-test
 [ t ] [ 123456789123456789 [ unix-time>timestamp timestamp>unix-time ] keep = ] unit-test
+
+[ 0 ] [
+    "Z" [ read-rfc3339-gmt-offset ] with-string-reader
+] unit-test
+
+[ 1 ] [
+    "+01" [ read-rfc3339-gmt-offset ] with-string-reader
+] unit-test
+
+[ -1 ] [
+    "-01" [ read-rfc3339-gmt-offset ] with-string-reader
+] unit-test
+
+[ -1-1/2 ] [
+    "-01:30" [ read-rfc3339-gmt-offset ] with-string-reader
+] unit-test
+
+[ 1+1/2 ] [
+    "+01:30" [ read-rfc3339-gmt-offset ] with-string-reader
+] unit-test

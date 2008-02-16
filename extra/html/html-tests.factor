@@ -3,7 +3,7 @@ namespaces tools.test xml.writer sbufs sequences html.private ;
 IN: temporary
 
 : make-html-string
-    [ with-html-stream ] string-out ;
+    [ with-html-stream ] with-string-writer ;
 
 [ ] [
     512 <sbuf> <html-stream> drop

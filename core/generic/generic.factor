@@ -30,6 +30,7 @@ M: generic definer drop f f ;
 M: generic definition drop f ;
 
 : make-generic ( word -- )
+    dup { "unannotated-def" } reset-props
     dup dup "combination" word-prop perform-combination define ;
 
 TUPLE: method word def specializer generic loc ;

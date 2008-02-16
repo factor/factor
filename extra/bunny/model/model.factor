@@ -18,13 +18,7 @@ IN: bunny.model
     ] when* ;
 
 : parse-model ( stream -- vs is )
-    [
-        100000 <vector> 100000 <vector> (parse-model)
-    ] with-stream
-    [
-        over length # " vertices, " %
-        dup length # " triangles" %
-    ] "" make print ;
+    100000 <vector> 100000 <vector> (parse-model) ;
 
 : n ( vs triple -- n )
     swap [ nth ] curry map
@@ -41,7 +35,8 @@ IN: bunny.model
 
 : read-model ( stream -- model )
     "Reading model" print flush [
-        <file-reader> parse-model [ normals ] 2keep 3array
+        [ parse-model ] with-file-reader
+        [ normals ] 2keep 3array
     ] time ;
 
 : model-path "bun_zipper.ply" ;

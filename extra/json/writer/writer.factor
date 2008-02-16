@@ -10,7 +10,7 @@ GENERIC: json-print ( obj -- )
 
 : >json ( obj -- string )
   #! Returns a string representing the factor object in JSON format
-  [ json-print ] string-out ;
+  [ json-print ] with-string-writer ;
 
 M: f json-print ( f -- )
   drop "false" write ;

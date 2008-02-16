@@ -6,7 +6,7 @@ IN: temporary
     "extra/http/server/templating/test/" swap append
     [
         ".fhtml" append resource-path
-        [ run-template-file ] string-out
+        [ run-template-file ] with-string-writer
     ] keep
     ".html" append resource-path file-contents = ;
 
