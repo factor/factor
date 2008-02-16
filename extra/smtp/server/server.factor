@@ -29,6 +29,7 @@
 
 USING: combinators kernel prettyprint io io.timeouts io.server
 sequences namespaces io.sockets continuations ;
+IN: smtp.server
 
 SYMBOL: data-mode
 
@@ -55,7 +56,7 @@ SYMBOL: data-mode
             data-mode off
             "220 OK\r\n" write flush t
           ] }
-        { [ data-mode get ] [ t ] }
+        { [ data-mode get ] [ global [ print ] bind t ] }
         { [ t ] [ 
             "500 ERROR\r\n" write flush t
           ] }
@@ -68,5 +69,6 @@ SYMBOL: data-mode
             60000 stdio get set-timeout
             "220 hello\r\n" write flush
             process
+            global [ flush ] bind
         ] with-stream
     ] with-disposal ;

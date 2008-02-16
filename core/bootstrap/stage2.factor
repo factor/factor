@@ -59,7 +59,7 @@ SYMBOL: bootstrap-time
 
     default-image-name "output-image" set-global
 
-    "math help compiler tools ui ui.tools io" "include" set-global
+    "math help handbook compiler tools ui ui.tools io" "include" set-global
     "" "exclude" set-global
 
     parse-command-line
@@ -111,7 +111,8 @@ SYMBOL: bootstrap-time
         "output-image" get resource-path save-image-and-exit
     ] if
 ] [
-    print-error :c restarts.
+    :c
+    print-error restarts.
     "listener" vocab-main execute
     1 exit
 ] recover

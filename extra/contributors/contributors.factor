@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io.launcher io.styles io hashtables kernel
-sequences combinators.lib assocs system sorting math.parser ;
+sequences sequences.lib assocs system sorting math.parser ;
 IN: contributors
 
 : changelog ( -- authors )

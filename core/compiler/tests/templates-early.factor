@@ -44,7 +44,9 @@ words kernel math effects definitions compiler.units ;
 [
     [ ] [ init-templates ] unit-test
 
-    [ ] [ init-generator ] unit-test
+    H{ } clone compiled set
+
+    [ ] [ gensym gensym begin-compiling ] unit-test
 
     [ t ] [ [ end-basic-block ] { } make empty? ] unit-test
 

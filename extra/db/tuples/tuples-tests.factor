@@ -1,26 +1,26 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.sqlite db.tuples
-db.types continuations namespaces ;
+db.types continuations namespaces db.postgresql math ;
+! tools.time ;
 IN: temporary
 
-TUPLE: person the-id the-name the-number ;
-: <person> ( name age -- person )
-    { set-person-the-name set-person-the-number } person construct ;
+TUPLE: person the-id the-name the-number real ;
+: <person> ( name age real -- person )
+    {
+        set-person-the-name
+        set-person-the-number
+        set-person-real
+    } person construct ;
 
-person "PERSON"
-{
-    { "the-id" "ROWID" INTEGER +native-id+ }
-    { "the-name" "NAME" { VARCHAR 256 } +not-null+ } 
-    { "the-number" "AGE" INTEGER { +default+ 0 } }
-} define-persistent
-
+: <assigned-person> ( id name number real -- obj )
+    <person> [ set-person-the-id ] keep ;
 
 SYMBOL: the-person
 
 : test-tuples ( -- )
-    [ person drop-table ] [ ] recover
-    person create-table
-    f "billy" 100 person construct-boa
-    the-person set
+    [ person drop-table ] [ drop ] recover
+    [ ] [ person create-table ] unit-test
     
     [  ] [ the-person get insert-tuple ] unit-test
 
@@ -30,16 +30,41 @@ SYMBOL: the-person
 
     [ ] [ the-person get update-tuple ] unit-test
 
-    [ ] [ the-person get delete-tuple ] unit-test ;
+    [ ] [ the-person get delete-tuple ] unit-test
+    [ ] [ person drop-table ] unit-test ;
 
 : test-sqlite ( -- )
     "tuples-test.db" resource-path <sqlite-db> [
         test-tuples
     ] with-db ;
 
-test-sqlite
+: test-postgresql ( -- )
+    "localhost" "postgres" "" "factor-test" <postgresql-db> [
+        test-tuples
+    ] with-db ;
 
-! : test-postgres ( -- )
-    ! resource-path <postgresql-db> [
-        ! test-tuples
-    ! ] with-db ;
+person "PERSON"
+{
+    { "the-id" "ID" SERIAL +native-id+ }
+    { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
+    { "the-number" "AGE" INTEGER { +default+ 0 } }
+    { "real" "REAL" DOUBLE { +default+ 0.3 } }
+} define-persistent
+
+"billy" 10 3.14 <person> the-person set
+
+! test-sqlite
+test-postgresql
+
+person "PERSON"
+{
+    { "the-id" "ID" INTEGER +assigned-id+ }
+    { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
+    { "the-number" "AGE" INTEGER { +default+ 0 } }
+    { "real" "REAL" DOUBLE { +default+ 0.3 } }
+} define-persistent
+
+1 "billy" 20 6.28 <assigned-person> the-person set
+
+! test-sqlite
+! test-postgresql

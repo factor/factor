@@ -257,7 +257,7 @@ INSTANCE: repetition immutable-sequence
 
 : check-copy ( src n dst -- )
     over 0 < [ bounds-error ] when
-    >r swap length + r> lengthen ;
+    >r swap length + r> lengthen ; inline
 
 PRIVATE>
 

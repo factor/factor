@@ -245,8 +245,8 @@ HELP: remove-word-prop
 { $description "Removes a word property, so future lookups will output " { $link f } " until it is set again. Word property names are conventionally strings." }
 { $side-effects "word" } ;
 
-HELP: word-xt
-{ $values { "word" word } { "xt" "an execution token integer" } }
+HELP: word-xt ( word -- start end )
+{ $values { "word" word } { "start" "the word's start address" } { "end" "the word's end address" } }
 { $description "Outputs the machine code address of the word's definition." } ;
 
 HELP: define-symbol

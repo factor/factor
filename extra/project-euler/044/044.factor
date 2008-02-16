@@ -30,9 +30,6 @@ IN: project-euler.044
 : nth-pentagonal ( n -- seq )
     dup 3 * 1- * 2 / ;
 
-: pentagonal? ( n -- ? )
-    dup 0 > [ 24 * 1+ sqrt 1+ 6 / 1 mod zero? ] [ drop f ] if ;
-
 : sum-and-diff? ( m n -- ? )
     2dup + -rot - [ pentagonal? ] 2apply and ;
 

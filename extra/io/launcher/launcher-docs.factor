@@ -90,6 +90,10 @@ HELP: get-environment
 { $values { "env" "an association" } }
 { $description "Combines the current environment with the value of " { $link +environment+ } " using " { $link +environment-mode+ } "." } ;
 
+HELP: current-process-handle
+{ $values { "handle" "a process handle" } }
+{ $description "Returns the handle of the current process." } ;
+
 HELP: run-process*
 { $values { "desc" "a launch descriptor" } { "handle" "a process handle" } }
 { $contract "Launches a process using the launch descriptor." }
@@ -186,6 +190,8 @@ ARTICLE: "io.launcher" "Launching OS processes"
 { $subsection try-process }
 "Stopping processes:"
 { $subsection kill-process }
+"Finding the current process handle:"
+{ $subsection current-process-handle }
 "Redirecting standard input and output to a pipe:"
 { $subsection <process-stream> }
 { $subsection with-process-stream }

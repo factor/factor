@@ -51,7 +51,7 @@ GENERIC: command-word ( command -- word )
     update-gestures ;
 
 : (command-name) ( string -- newstring )
-    "-" split " " join >title ;
+    { { CHAR: - CHAR: \s } } substitute >title ;
 
 M: word command-name ( word -- str )
     word-name

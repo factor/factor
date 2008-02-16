@@ -1,17 +1,14 @@
-! Copyright (C) 2007 Doug Coleman.
+! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 ! tested on debian linux with postgresql 8.1
-
 USING: alien alien.syntax combinators system ;
 IN: db.postgresql.ffi
 
-<<
-"postgresql" {
+<< "postgresql" {
     { [ win32? ]  [ "libpq.dll" ] }
     { [ macosx? ] [ "/opt/local/lib/postgresql81/libpq.dylib" ] }
     { [ unix?  ]  [ "libpq.so" ] }
-} cond "cdecl" add-library
->>
+} cond "cdecl" add-library >>
 
 ! ConnSatusType
 : CONNECTION_OK                     HEX: 0 ; inline
@@ -53,6 +50,8 @@ IN: db.postgresql.ffi
 : PQERRORS_DEFAULT                  HEX: 1 ; inline
 : PQERRORS_VERBOSE                  HEX: 2 ; inline
 
+: InvalidOid 0 ; inline
+
 TYPEDEF: int size_t
 TYPEDEF: int ConnStatusType
 TYPEDEF: int ExecStatusType 
@@ -74,7 +73,6 @@ TYPEDEF: void* FILE*
 TYPEDEF: void* SSL*
 
 LIBRARY: postgresql
-
 
 ! Exported functions of libpq
 
@@ -102,10 +100,6 @@ FUNCTION: PQconninfoOption* PQconndefaults ( ) ;
 ! free the data structure returned by PQconndefaults()
 FUNCTION: void PQconninfoFree ( PQconninfoOption* connOptions ) ;
 
-! 
-! close the current connection and restablish a new one with the same
-! parameters
-!
 ! Asynchronous (non-blocking)
 FUNCTION: int    PQresetStart ( PGconn* conn ) ;
 FUNCTION: PostgresPollingStatusType PQresetPoll ( PGconn* conn ) ;

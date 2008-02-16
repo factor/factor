@@ -76,6 +76,8 @@ SYMBOL: +append-environment+
         { [ dup assoc? ] [ >hashtable ] }
     } cond ;
 
+HOOK: current-process-handle io-backend ( -- handle )
+
 HOOK: run-process* io-backend ( desc -- handle )
 
 : wait-for-process ( process -- status )
@@ -119,7 +121,9 @@ HOOK: process-stream* io-backend ( desc -- stream process )
 TUPLE: process-stream process ;
 
 : <process-stream> ( desc -- stream )
-    >descriptor process-stream*
+    >descriptor
+    [ process-stream* ] keep
+    +timeout+ swap at [ over set-timeout ] when*
     { set-delegate set-process-stream-process }
     process-stream construct ;
 

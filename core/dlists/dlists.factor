@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Mackenzie Straight, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math ;
+USING: combinators kernel math sequences ;
 IN: dlists
 
 TUPLE: dlist front back length ;
@@ -72,6 +72,9 @@ PRIVATE>
 : push-front ( obj dlist -- )
     push-front* drop ;
 
+: push-all-front ( seq dlist -- )
+    [ push-front ] curry each ;
+
 : push-back* ( obj dlist -- dlist-node )
     [ dlist-back f <dlist-node> ] keep
     [ dlist-back set-next-when ] 2keep
@@ -80,11 +83,10 @@ PRIVATE>
     inc-length ;
 
 : push-back ( obj dlist -- )
-    [ dlist-back f <dlist-node> ] keep
-    [ dlist-back set-next-when ] 2keep
-    [ set-dlist-back ] keep
-    [ set-front-to-back ] keep
-    inc-length ;
+    push-back* drop ;
+
+: push-all-back ( seq dlist -- )
+    [ push-back ] curry each ;
 
 : peek-front ( dlist -- obj )
     dlist-front dlist-node-obj ;
@@ -156,3 +158,6 @@ PRIVATE>
     over dlist-empty?
     [ 2drop ] [ [ >r pop-back r> call ] 2keep dlist-slurp ] if ;
     inline
+
+: 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
+

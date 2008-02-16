@@ -6,58 +6,22 @@ USING: kernel namespaces sequences assocs builder continuations
        prettyprint
        tools.browser
        tools.test
-       bootstrap.stage2 ;
+       bootstrap.stage2 benchmark builder.util ;
 
 IN: builder.test
 
-: record-bootstrap-time ( -- )
-  "../bootstrap-time" <file-writer>
-    [ bootstrap-time get . ]
-  with-stream ;
-
-: try-everything* ( -- vocabs ) try-everything [ first vocab-link-name ] map ;
-
-! : do-load ( -- )
-!   [ try-everything* ] "../load-everything-time" log-runtime
-!   dup empty?
-!     [ drop ]
-!     [ "../load-everything-log" log-object ]
-!   if ;
-
 : do-load ( -- )
-  [
-    "../load-everything-log" <file-writer>
-      [ try-everything* ]
-    with-stream
-  ] "../load-everything-time" log-runtime
-  dup empty?
-    [ drop ]
-    [ "../load-everything-vocabs" log-object ]
-  if
-  "../load-everything-log" delete-file ;
-
-! : do-tests ( -- )
-!   run-all-tests keys
-!   dup empty?
-!   [ drop ]
-!   [ "../failing-tests" log-object ]
-!   if ;
+  try-everything keys "../load-everything-vocabs" [ . ] with-file-out ;
 
 : do-tests ( -- )
-  [
-    "../test-all-log" <file-writer>
-      [ run-all-tests keys ]
-    with-stream
-  ] "../test-all-time" log-runtime
-  dup empty?
-    [ drop ]
-    [ "../test-all-vocabs" log-object ]
-  if
-  "../test-all-log" delete-file ;
+  run-all-tests keys "../test-all-vocabs" [ . ] with-file-out ;
+
+: do-benchmarks ( -- ) run-benchmarks "../benchmarks" [ . ] with-file-out ;
 
 : do-all ( -- )
-  record-bootstrap-time
-  do-load
-  do-tests ;
+  bootstrap-time get   "../boot-time" [ . ] with-file-out
+  [ do-load  ] runtime "../load-time" [ . ] with-file-out
+  [ do-tests ] runtime "../test-time" [ . ] with-file-out
+  do-benchmarks ;
 
 MAIN: do-all

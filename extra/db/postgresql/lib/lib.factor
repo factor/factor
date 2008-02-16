@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays continuations db io kernel math namespaces
-quotations sequences db.postgresql.ffi alien alien.c-types ;
+quotations sequences db.postgresql.ffi alien alien.c-types
+db.types ;
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )
@@ -37,7 +38,8 @@ IN: db.postgresql.lib
     >r db get db-handle r>
     [ statement-sql ] keep
     [ statement-params length f ] keep
-    statement-params [ malloc-char-string ] map >c-void*-array
+    statement-params
+    [ first number>string* malloc-char-string ] map >c-void*-array
     f f 0 PQexecParams
     dup postgresql-result-ok? [
         dup postgresql-result-error-message swap PQclear throw
