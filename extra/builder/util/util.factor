@@ -69,9 +69,9 @@ TUPLE: process* arguments stdin stdout stderr timeout ;
 : milli-seconds>time ( n -- string )
   1000 /i 60 /mod >r 60 /mod r> 3array [ pad-00 ] map ":" join ;
 
-: eval-file ( file -- obj ) <file-reader> contents eval ;
+: eval-file ( file -- obj ) file-contents eval ;
 
-: cat ( file -- ) <file-reader> contents print ;
+: cat ( file -- ) file-contents print ;
 
 : run-or-bail ( desc quot -- )
   [ [ try-process ] curry   ]
@@ -81,3 +81,6 @@ TUPLE: process* arguments stdin stdout stderr timeout ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+USING: bootstrap.image bootstrap.image.download io.streams.null ;
+
+: retrieve-image ( -- ) [ my-arch download-image ] with-null-stream ;
