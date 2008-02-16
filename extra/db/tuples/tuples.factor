@@ -56,7 +56,7 @@ HOOK: column-slot-name% db ( spec -- )
 HOOK: column-bind-name% db ( spec -- )
 
 : make-slots-names ( quot -- seq str )
-    [ make-column-names ] "" make ; inline
+    [ make-slot-names* ] "" make ; inline
 : slot-name% ( seq -- ) first % ;
 : column-name% ( seq -- ) second % ;
 : column-type% ( seq -- ) third % ;
