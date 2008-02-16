@@ -45,8 +45,13 @@ USING: io io.files io.streams.lines io.streams.plain io.streams.duplex
        listener ;
 
 : tty-listener ( tty -- )
-  [ <file-reader> ] [ <file-writer> ] bi <duplex-stream>
-  [ listener ] with-stream ;
+  dup <file-reader> [
+    swap <file-writer> [
+      <duplex-stream> [
+        listener
+      ] with-stream
+    ] with-disposal
+  ] with-disposal ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
