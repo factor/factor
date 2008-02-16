@@ -224,7 +224,7 @@ void relocate_object(CELL relocating)
 		fixup_quotation((F_QUOTATION *)relocating);
 		break;
 	case DLL_TYPE:
-		ffi_dlopen((F_DLL *)relocating,false);
+		ffi_dlopen((F_DLL *)relocating);
 		break;
 	case ALIEN_TYPE:
 		fixup_alien((F_ALIEN *)relocating);

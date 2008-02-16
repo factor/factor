@@ -182,7 +182,7 @@ DEFINE_PRIMITIVE(dlopen)
 	F_DLL* dll = allot_object(DLL_TYPE,sizeof(F_DLL));
 	UNREGISTER_ROOT(path);
 	dll->path = path;
-	ffi_dlopen(dll,true);
+	ffi_dlopen(dll);
 	dpush(tag_object(dll));
 }
 
@@ -202,7 +202,7 @@ DEFINE_PRIMITIVE(dlsym)
 	{
 		d = untag_dll(dll);
 		if(d->dll == NULL)
-			general_error(ERROR_EXPIRED,dll,F,NULL);
+			dpush(F);
 	}
 
 	box_alien(ffi_dlsym(d,sym));
@@ -212,4 +212,16 @@ DEFINE_PRIMITIVE(dlsym)
 DEFINE_PRIMITIVE(dlclose)
 {
 	ffi_dlclose(untag_dll(dpop()));
+}
+
+DEFINE_PRIMITIVE(dll_validp)
+{
+	CELL dll = dpop();
+	if(dll == F)
+		dpush(T);
+	else
+	{
+		F_DLL *d = untag_dll(dll);
+		dpush(d->dll == NULL ? F : T);
+	}
 }
