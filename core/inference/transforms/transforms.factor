@@ -35,7 +35,7 @@ IN: inference.transforms
             dup peek swap 1 head*
         ] [
             [ no-case ] swap
-        ] if hash-case>quot
+        ] if case>quot
     ] if
 ] 1 define-transform
 

@@ -5,7 +5,8 @@ byte-vectors definitions generic hashtables kernel math
 namespaces parser sequences strings sbufs vectors words
 quotations io assocs splitting tuples generic.standard
 generic.math classes io.files vocabs float-arrays float-vectors
-classes.union classes.mixin classes.predicate compiler.units ;
+classes.union classes.mixin classes.predicate compiler.units
+combinators ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -56,7 +57,14 @@ IN: bootstrap.syntax
     "f" [ f parsed ] define-syntax
     "t" "syntax" lookup define-symbol
 
-    "CHAR:" [ 0 scan next-char nip parsed ] define-syntax
+    "CHAR:" [
+        scan {
+            { [ dup length 1 = ] [ first ] }
+            { [ "\\" ?head ] [ next-escape drop ] }
+            { [ t ] [ name>char-hook get call ] }
+        } cond parsed
+    ] define-syntax
+
     "\"" [ parse-string parsed ] define-syntax
 
     "SBUF\"" [

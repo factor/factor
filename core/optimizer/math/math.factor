@@ -7,7 +7,7 @@ inference.class inference.dataflow vectors strings sbufs io
 namespaces assocs quotations math.intervals sequences.private
 combinators splitting layouts math.parser classes generic.math
 optimizer.pattern-match optimizer.backend optimizer.def-use
-generic.standard system ;
+optimizer.inlining generic.standard system ;
 
 { + bignum+ float+ fixnum+fast } {
     { { number 0 } [ drop ] }

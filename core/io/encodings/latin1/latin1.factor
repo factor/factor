@@ -1,4 +1,4 @@
-USING: io.encodings strings kernel ;
+USING: io io.encodings strings kernel ;
 IN: io.encodings.latin1
 
 TUPLE: latin1 stream ;

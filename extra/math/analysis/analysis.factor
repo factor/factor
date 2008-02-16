@@ -1,5 +1,5 @@
 USING: kernel math math.constants math.functions math.intervals
-math.vectors namespaces sequences ;
+math.vectors namespaces sequences combinators.cleave ;
 IN: math.analysis
 
 <PRIVATE

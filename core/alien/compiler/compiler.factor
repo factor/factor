@@ -326,7 +326,7 @@ M: alien-callback-error summary
     drop "Words calling ``alien-callback'' must be compiled with the optimizing compiler." ;
 
 : callback-bottom ( node -- )
-    alien-callback-xt [ word-xt <alien> ] curry
+    alien-callback-xt [ word-xt drop <alien> ] curry
     recursive-state get infer-quot ;
 
 \ alien-callback [

@@ -266,19 +266,10 @@ HELP: escape
 { $description "Converts from a single-character escape code and the corresponding character." }
 { $examples { $example "CHAR: n escape CHAR: \\n = ." "t" } } ;
 
-HELP: next-escape
-{ $values { "m" "an index into " { $snippet "str" } } { "str" string } { "n" "an index into " { $snippet "str" } } { "ch" "a character" } }
-{ $description "Helper word for " { $link parse-string } " which parses an escape sequence starting at the " { $snippet "m" } "th index of " { $snippet "str" } "." }
-{ $errors "Throws a " { $link bad-escape } " if the string contains an invalid escape sequence." } ;
-
-HELP: next-char
-{ $values { "m" "an index into " { $snippet "str" } } { "str" string } { "n" "an index into " { $snippet "str" } } { "ch" "a character" } }
-{ $description "Helper word for " { $link parse-string } " which parses a character starting at the " { $snippet "m" } "th index of " { $snippet "str" } "." } ;
-
 HELP: parse-string
 { $values { "str" "a new " { $link string } } }
 { $description "Parses the line until a quote (\"), interpreting escape codes along the way." }
-{ $errors "Throws an " { $link bad-escape } " if the string contains an invalid escape sequence." }
+{ $errors "Throws an error if the string contains an invalid escape sequence." }
 $parsing-note ;
 
 HELP: still-parsing?

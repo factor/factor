@@ -4,7 +4,7 @@ USING: io io.backend io.launcher io.unix.backend io.unix.files
 io.nonblocking sequences kernel namespaces math system
  alien.c-types debugger continuations arrays assocs 
 combinators unix.process parser-combinators memoize 
-promises strings threads ;
+promises strings threads unix ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -50,15 +50,16 @@ MEMO: 'arguments' ( -- parser )
 : redirect ( obj mode fd -- )
     {
         { [ pick not ] [ 2nip F_SETFL 0 fcntl io-error ] }
-        { [ pick +closed+ eq? ] [ close 2drop ] }
         { [ pick string? ] [ (redirect) ] }
     } cond ;
 
+: ?closed dup +closed+ eq? [ drop "/dev/null" ] when ;
+
 : setup-redirection ( -- )
-    +stdin+ get read-flags 0 redirect
-    +stdout+ get write-flags 1 redirect
+    +stdin+ get ?closed read-flags 0 redirect
+    +stdout+ get ?closed write-flags 1 redirect
     +stderr+ get dup +stdout+ eq?
-    [ drop 1 2 dup2 io-error ] [ write-flags 2 redirect ] if ;
+    [ drop 1 2 dup2 io-error ] [ ?closed write-flags 2 redirect ] if ;
 
 : spawn-process ( -- )
     [
@@ -69,6 +70,8 @@ MEMO: 'arguments' ( -- parser )
         [ exec-args-with-path ] if
         io-error
     ] [ error. :c flush ] recover 1 exit ;
+
+M: unix-io current-process-handle ( -- handle ) getpid ;
 
 M: unix-io run-process* ( desc -- pid )
     [

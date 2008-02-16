@@ -2,7 +2,7 @@
 ! Set username and password in  the 'connect' word.
 
 USING: kernel db.postgresql alien continuations io prettyprint
-sequences namespaces tools.test db ;
+sequences namespaces tools.test db db.types ;
 IN: temporary
 
 IN: scratchpad
@@ -40,13 +40,13 @@ IN: temporary
     test-db [
         "select * from person where name = $1 and country = $2"
         <simple-statement> [
-            { "Jane" "New Zealand" }
+            { { "Jane" TEXT } { "New Zealand" TEXT } }
             over do-bound-query
 
             { { "Jane" "New Zealand" } } =
             [ "test fails" throw ] unless
 
-            { "John" "America" }
+            { { "John" TEXT } { "America" TEXT } }
             swap do-bound-query
         ] with-disposal
     ] with-db

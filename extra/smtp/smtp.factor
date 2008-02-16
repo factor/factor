@@ -139,7 +139,7 @@ LOG: smtp-response DEBUG
 : prepare-message ( body headers -- body' )
     [
         prepare-headers
-        " " ,
+        "" ,
         dup string? [ string-lines ] when %
     ] { } make ;
 
@@ -169,3 +169,15 @@ LOG: smtp-response DEBUG
 ! : cram-md5-auth ( key login  -- )
 !     "AUTH CRAM-MD5\r\n" get-ok 
 !     (cram-md5-auth) "\r\n" append get-ok ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USE: new-slots
+
+TUPLE: email from to subject body ;
+
+: <email> ( -- email ) email construct-empty ;
+
+: send ( email -- )
+  { email-body email-subject email-to email-from } get-slots
+  send-simple-message ;

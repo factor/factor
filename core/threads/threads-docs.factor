@@ -9,6 +9,7 @@ $nl
 { $subsection in-thread }
 { $subsection yield }
 { $subsection sleep }
+"Threads stop either when the quotation given to " { $link in-thread } " returns, or when the following word is called:"
 { $subsection stop }
 "Continuations can be added to the run queue directly:"
 { $subsection schedule-thread }
@@ -21,7 +22,8 @@ ABOUT: "threads"
 
 HELP: run-queue
 { $values { "queue" dlist } }
-{ $description "Outputs the runnable thread queue. By convention, continuations are queued with " { $link push-front } " and dequeued with " { $link pop-back } "." } ;
+{ $description "Outputs the runnable thread queue. By convention, continuations are queued with " { $link push-front } 
+" and dequeued with " { $link pop-back } "." } ;
 
 HELP: schedule-thread
 { $values { "continuation" "a continuation reified by " { $link callcc0 } } }
