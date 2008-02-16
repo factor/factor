@@ -3,7 +3,7 @@
 IN: io.files
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
-system combinators splitting sbufs ;
+system combinators splitting sbufs continuations ;
 
 HOOK: cd io-backend ( path -- )
 
