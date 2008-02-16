@@ -143,12 +143,13 @@ M: pathname <=> [ pathname-string ] compare ;
 : file-lines ( path -- seq ) <file-reader> lines ;
 
 : file-contents ( path -- str )
-    dup <file-reader> swap file-length <sbuf> [ stream-copy ] keep >string ;
-
-: with-file-writer ( path quot -- )
-    >r <file-reader> r> with-stream ; inline
+    dup <file-reader> swap file-length <sbuf>
+    [ stream-copy ] keep >string ;
 
 : with-file-reader ( path quot -- )
+    >r <file-reader> r> with-stream ; inline
+
+: with-file-writer ( path quot -- )
     >r <file-writer> r> with-stream ; inline
 
 : with-file-appender ( path quot -- )
