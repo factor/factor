@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math namespaces sequences system
-kernel.private tuples bit-arrays byte-arrays float-arrays ;
+kernel.private tuples bit-arrays byte-arrays float-arrays 
+shuffle arrays macros ;
 IN: alien
 
 ! Some predicate classes used by the compiler for optimization
@@ -89,3 +90,10 @@ TUPLE: alien-invoke-error library symbol ;
 
 : alien-invoke ( ... return library function parameters -- ... )
     2over \ alien-invoke-error construct-boa throw ;
+
+MACRO: out-keep ( word out-indexes -- ... )
+    [
+        dup >r [ \ npick \ >r 3array % ] each
+        %
+        r> [ drop \ r> , ] each
+    ] [ ] make ;

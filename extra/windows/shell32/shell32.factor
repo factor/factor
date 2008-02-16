@@ -1,5 +1,5 @@
 USING: alien alien.c-types alien.syntax combinators
-kernel windows windows.user32 ;
+kernel windows windows.user32 windows.ole32 ;
 IN: windows.shell32
 
 : CSIDL_DESKTOP HEX: 00 ; inline
@@ -68,10 +68,6 @@ IN: windows.shell32
 : CSIDL_FLAG_MASK HEX: ff00 ; inline
 
 
-: S_OK 0 ; inline
-: S_FALSE 1 ; inline
-: E_FAIL HEX: 80004005 ; inline
-: E_INVALIDARG HEX: 80070057 ; inline
 : ERROR_FILE_NOT_FOUND 2 ; inline
 
 : SHGFP_TYPE_CURRENT 0 ; inline
@@ -89,15 +85,7 @@ FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFi
     f "open" rot f f SW_SHOWNORMAL ShellExecute drop ;
 
 : shell32-error ( n -- )
-    dup S_OK = [
-        drop
-    ] [
-        {
-            ! { ERROR_FILE_NOT_FOUND [ "file not found" throw ] }
-            ! { E_INVALIDARG [ "invalid arg" throw ] }
-            [ (win32-error-string) throw ]
-        } case
-    ] if ;
+    ole32-error ; inline
 
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT

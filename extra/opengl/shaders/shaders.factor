@@ -92,10 +92,11 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
     GL_ATTACHED_SHADERS gl-program-get-int ; inline
 
 : gl-program-shaders ( program -- shaders )
-    dup gl-program-shaders-length [
-        dup "GLuint" <c-array>
-        [ 0 <int> swap glGetAttachedShaders ] keep
-    ] keep c-uint-array> ;
+    dup gl-program-shaders-length
+    dup "GLuint" <c-array>
+    0 <int> swap
+    [ glGetAttachedShaders ] { 3 1 } out-keep
+    c-uint-array> ;
 
 : delete-gl-program-only ( program -- )
     glDeleteProgram ; inline
