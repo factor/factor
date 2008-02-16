@@ -100,7 +100,7 @@ M: math-inverse inverse
     [ drop swap-inverse ] [ pull-inverse ] if ;
 
 M: pop-inverse inverse
-    [ "pop-length" word-prop cut-slice swap ] keep
+    [ "pop-length" word-prop cut-slice swap >quotation ] keep
     "pop-inverse" word-prop compose call ;
 
 : (undo) ( revquot -- )
