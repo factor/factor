@@ -3,10 +3,11 @@ quotations io strings words definitions ;
 IN: tools.profiler
 
 ARTICLE: "profiling" "Profiling code" 
-"The " { $vocab-link "tools.profiler" } " vocabulary implements a simple call counting profiler. The profiler is completely accurate with words which are compiled with the non-optimizing compiler. Some optimizations performed by the optimizing compiler can inhibit accurate call counting, however:"
+"The " { $vocab-link "tools.profiler" } " vocabulary implements a simple call counting profiler. The profiler is completely accurate with words and methods which are compiled with the non-optimizing compiler. Some optimizations performed by the optimizing compiler can inhibit accurate call counting, however:"
 { $list
     "The optimizing compiler open-codes certain primitives with inline machine code, and in some cases optimizes them out altogether; this includes stack shuffling operations, conditionals, and many object allocation operations."
     { "Calls to " { $link POSTPONE: inline } " words are not counted.." }
+    { "Calls to methods which were inlined as a result of type inference are not counted." }
     "Tail-recursive loops will only count the initial invocation of the word, not every tail call."
 }
 "Quotations can be passed to a combinator which calls them with the profiler enabled:"
@@ -15,7 +16,8 @@ ARTICLE: "profiling" "Profiling code"
 { $subsection profile. }
 { $subsection vocab-profile. }
 { $subsection usage-profile. }
-{ $subsection vocabs-profile. } ;
+{ $subsection vocabs-profile. }
+{ $subsection method-profile. } ;
 
 ABOUT: "profiling"
 
@@ -47,6 +49,9 @@ HELP: usage-profile.
 
 HELP: vocabs-profile.
 { $description "Print a table of cumilative call counts for each vocabulary. Vocabularies whose words were not called are supressed from the output." } ;
+
+HELP: method-profile.
+{ $description "Print a table of cumilative call counts for each method. Methods which were not called are supressed from the output." } ;
 
 HELP: profiling ( ? -- )
 { $values { "?" "a boolean" } }
