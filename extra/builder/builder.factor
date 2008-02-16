@@ -93,6 +93,8 @@ SYMBOL: build-status
 
 : (build) ( -- )
 
+  builds-check  
+
   build-status off
 
   enter-build-dir
