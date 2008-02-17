@@ -69,13 +69,6 @@ M: vocab-link vocab-root
         vocab-tests %
     ] { } make ;
 
-TUPLE: no-vocab name ;
-
-: no-vocab ( name -- * )
-    vocab-name \ no-vocab construct-boa throw ;
-
-M: no-vocab summary drop "Vocabulary does not exist" ;
-
 SYMBOL: load-help?
 
 : source-was-loaded t swap set-vocab-source-loaded? ;
