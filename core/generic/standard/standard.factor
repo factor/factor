@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel kernel.private slots.private math
 namespaces sequences vectors words quotations definitions
@@ -77,7 +77,6 @@ TUPLE: no-method object generic ;
     class-predicates alist>quot ;
 
 : small-generic ( methods -- def )
-    [ 1quotation ] assoc-map
     object method-alist>quot ;
 
 : hash-methods ( methods -- buckets )
@@ -110,7 +109,7 @@ TUPLE: no-method object generic ;
 : build-type-vtable ( alist-seq -- alist-seq )
     dup length [
         vtable-class
-        swap [ word-def ] assoc-map simplify-alist
+        swap simplify-alist
         class-predicates alist>quot
     ] 2map ;
 
@@ -145,7 +144,8 @@ TUPLE: no-method object generic ;
     ] if ;
 
 : standard-methods ( word -- alist )
-    dup methods swap default-method add* ;
+    dup methods swap default-method add*
+    [ 1quotation ] assoc-map ;
 
 M: standard-combination make-default-method
     standard-combination-# (dispatch#)
@@ -161,9 +161,6 @@ TUPLE: hook-combination var ;
 
 C: <hook-combination> hook-combination
 
-M: hook-combination method-prologue
-    2drop [ drop ] ;
-
 : with-hook ( combination quot -- quot' )
     0 (dispatch#) [
         swap slip
@@ -175,7 +172,11 @@ M: hook-combination make-default-method
     [ error-method ] with-hook ;
 
 M: hook-combination perform-combination
-    [ standard-methods single-combination ] with-hook ;
+    [
+        standard-methods
+        [ [ drop ] swap append ] assoc-map
+        single-combination
+    ] with-hook ;
 
 : define-simple-generic ( word -- )
     T{ standard-combination f 0 } define-generic ;
