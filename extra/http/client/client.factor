@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
-splitting continuations assocs.lib ;
+splitting continuations assocs.lib io.encodings.binary ;
 IN: http.client
 
 : parse-host ( url -- host port )
@@ -71,7 +71,7 @@ DEFER: http-get-stream
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
     >r http-get-stream check-response
-    r> <file-writer> stream-copy ;
+    r> binary <file-writer> stream-copy ;
 
 : download ( url -- )
     dup download-name download-to ;

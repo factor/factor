@@ -5,7 +5,7 @@ furnace.validator hashtables heaps html.elements http
 http.server.responders http.server.templating io.files kernel
 math namespaces quotations sequences splitting words strings
 vectors webapps.callback continuations tuples classes vocabs
-html io ;
+html io io.encodings.binary ;
 IN: furnace
 
 : code>quotation ( word/quot -- quot )
@@ -194,7 +194,7 @@ SYMBOL: model
     </a> ;
 
 : send-resource ( name -- )
-    template-path get swap path+ resource-path <file-reader>
+    template-path get swap path+ resource-path binary <file-reader>
     stdio get stream-copy ;
 
 : render-link ( quot name -- )

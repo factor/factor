@@ -1,6 +1,6 @@
 IN: temporary
 USING: arrays io kernel porter-stemmer sequences tools.test
-io.files ;
+io.files io.encodings.utf8 ;
 
 [ 0 ] [ "xa" consonant-seq ] unit-test
 [ 0 ] [ "xxaa" consonant-seq ] unit-test
@@ -56,7 +56,7 @@ io.files ;
 [ "hell" ] [ "hell" step5 "" like ] unit-test
 [ "mate" ] [ "mate" step5 "" like ] unit-test
 
-: resource-lines resource-path file-lines ;
+: resource-lines resource-path utf8 file-lines ;
 
 [ { } ] [
     "extra/porter-stemmer/test/voc.txt" resource-lines

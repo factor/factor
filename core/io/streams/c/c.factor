@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private namespaces io
 strings sequences math generic threads.private classes
-io.backend io.streams.lines io.streams.plain io.streams.duplex
-io.files continuations ;
+io.backend io.streams.duplex io.files continuations ;
 IN: io.streams.c
 
 TUPLE: c-writer handle ;

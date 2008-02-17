@@ -2,7 +2,7 @@ USING: tools.test io.files io io.streams.c ;
 IN: temporary
 
 [ "hello world" ] [
-    "test.txt" resource-path [
+    "test.txt" resource-path ascii [
         "hello world" write
     ] with-file-writer
 

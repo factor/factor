@@ -46,8 +46,8 @@ IN: tools.deploy.macosx
     ] H{ } make-assoc print-plist ;
 
 : create-app-plist ( vocab bundle-name -- )
-    dup "Contents/Info.plist" path+ <file-writer>
-    [ print-app-plist ] with-stream ;
+    dup "Contents/Info.plist" path+
+    utf8 [ print-app-plist ] with-file-writer ;
 
 : create-app-dir ( vocab bundle-name -- vm )
     dup "Frameworks" copy-bundle-dir

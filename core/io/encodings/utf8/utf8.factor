@@ -23,7 +23,7 @@ SYMBOL: quad3
 
 : begin-utf8 ( buf byte -- buf ch state )
     {
-        { [ dup -7 shift zero? ] [ decoded ] }
+        { [ dup -7 shift zero? ] [ push-decoded ] }
         { [ dup -5 shift BIN: 110 number= ] [ BIN: 11111 bitand double ] }
         { [ dup -4 shift BIN: 1110 number= ] [ BIN: 1111 bitand triple ] }
         { [ dup -3 shift BIN: 11110 number= ] [ BIN: 111 bitand quad ] }
@@ -31,7 +31,7 @@ SYMBOL: quad3
     } cond ;
 
 : end-multibyte ( buf byte ch -- buf ch state )
-    f append-nums [ decoded ] unless* ;
+    f append-nums [ push-decoded ] unless* ;
 
 : decode-utf8-step ( buf byte ch state -- buf ch state )
     {

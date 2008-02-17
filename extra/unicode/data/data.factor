@@ -1,6 +1,6 @@
 USING: assocs math kernel sequences io.files hashtables
 quotations splitting arrays math.parser combinators.lib hash2
-byte-arrays words namespaces words compiler.units parser ;
+byte-arrays words namespaces words compiler.units parser io.encodings.ascii  ;
 IN: unicode.data
 
 <<
@@ -21,7 +21,7 @@ IN: unicode.data
 ! Loading data from UnicodeData.txt
 
 : data ( filename -- data )
-    file-lines [ ";" split ] map ;
+    ascii file-lines [ ";" split ] map ;
 
 : load-data ( -- data )
     "extra/unicode/UnicodeData.txt" resource-path data ;

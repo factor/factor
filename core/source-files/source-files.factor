@@ -5,7 +5,7 @@ namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger
 io.files io.crc32 io.streams.string io.streams.lines vocabs
-hashtables graphs compiler.units ;
+hashtables graphs compiler.units io.encodings.utf8 ;
 IN: source-files
 
 SYMBOL: source-files
@@ -17,7 +17,7 @@ uses definitions ;
 
 : (source-modified?) ( path modified checksum -- ? )
     pick file-modified rot [ 0 or ] 2apply >
-    [ swap file-lines lines-crc32 = not ] [ 2drop f ] if ;
+    [ swap utf8 file-lines lines-crc32 = not ] [ 2drop f ] if ;
 
 : source-modified? ( path -- ? )
     dup source-files get at [
@@ -68,7 +68,7 @@ uses definitions ;
 : reset-checksums ( -- )
     source-files get [
         swap ?resource-path dup exists?
-        [ file-lines swap record-checksum ] [ 2drop ] if
+        [ utf8 file-lines swap record-checksum ] [ 2drop ] if
     ] assoc-each ;
 
 M: pathname where pathname-string 1 2array ;

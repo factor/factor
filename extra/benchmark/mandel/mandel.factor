@@ -1,6 +1,6 @@
 IN: benchmark.mandel
 USING: arrays io kernel math namespaces sequences strings sbufs
-math.functions math.parser io.files colors.hsv ;
+math.functions math.parser io.files colors.hsv io.encodings.binary ;
 
 : max-color 360 ; inline
 : zoom-fact 0.8 ; inline
@@ -66,6 +66,6 @@ SYMBOL: cols
 
 : mandel-main ( -- )
     "mandel.ppm" resource-path
-    [ mandel write ] with-file-writer ;
+    binary [ mandel write ] with-file-writer ;
 
 MAIN: mandel-main

@@ -1,4 +1,4 @@
-USING: kernel io io.files io.monitors ;
+USING: kernel io io.files io.monitors io.encodings.utf8 ;
 IN: log-viewer
 
 : read-lines ( stream -- )
@@ -9,6 +9,6 @@ IN: log-viewer
     dup next-change 2drop over read-lines tail-file-loop ;
 
 : tail-file ( file -- )
-    dup <file-reader> dup read-lines
+    dup utf8 <file-reader> dup read-lines
     swap parent-directory f <monitor>
     tail-file-loop ;

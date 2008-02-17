@@ -1,5 +1,5 @@
 USING: io io.files io.streams.string http.server.templating kernel tools.test
-    sequences ;
+    sequences io.encodings.utf8 ;
 IN: temporary
 
 : test-template ( path -- ? )
@@ -8,7 +8,7 @@ IN: temporary
         ".fhtml" append resource-path
         [ run-template-file ] with-string-writer
     ] keep
-    ".html" append resource-path file-contents = ;
+    ".html" append resource-path utf8 file-contents = ;
 
 [ t ] [ "example" test-template ] unit-test
 [ t ] [ "bug" test-template ] unit-test

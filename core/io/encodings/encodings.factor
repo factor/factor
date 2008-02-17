@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces
-growable strings io classes io.streams.c continuations
+growable strings io classes continuations
 io.styles io.streams.nested io.encodings.binary ;
 IN: io.encodings
 
@@ -13,12 +13,12 @@ TUPLE: decode-error ;
 
 SYMBOL: begin
 
-: decoded ( buf ch -- buf ch state )
+: push-decoded ( buf ch -- buf ch state )
     over push 0 begin ;
 
 : push-replacement ( buf -- buf ch state )
     ! This is the replacement character
-    HEX: fffd decoded ;
+    HEX: fffd push-decoded ;
 
 : finish-decoding ( buf ch state -- str )
     begin eq? [ decode-error ] unless drop "" like ;
@@ -59,16 +59,16 @@ TUPLE: decoded code cr ;
         decoded construct
     ] if ;
 
-: cr+ t swap set-line-reader-cr ; inline
+: cr+ t swap set-decoded-cr ; inline
 
-: cr- f swap set-line-reader-cr ; inline
+: cr- f swap set-decoded-cr ; inline
 
 : line-ends/eof ( stream str -- str ) f like swap cr- ; inline
 
 : line-ends\r ( stream str -- str ) swap cr+ ; inline
 
 : line-ends\n ( stream str -- str )
-    over line-reader-cr over empty? and
+    over decoded-cr over empty? and
     [ drop dup cr- stream-readln ] [ swap cr- ] if ; inline
 
 : handle-readln ( stream str ch -- str )
@@ -79,7 +79,7 @@ TUPLE: decoded code cr ;
     } case ;
 
 : fix-read ( stream string -- string )
-    over line-reader-cr [
+    over decoded-cr [
         over cr-
         "\n" ?head [
             swap stream-read1 [ add ] when*
@@ -91,13 +91,21 @@ M: decoded stream-read
 
 M: decoded stream-read-partial tuck stream-read fix-read ;
 
+: read-until-loop ( stream delim -- ch )
+    ! Copied from { c-reader stream-read-until }!!!
+    over stream-read1 dup [
+        dup pick memq? [ 2nip ] [ , read-until-loop ] if
+    ] [
+        2nip
+    ] if ;
+
 M: decoded stream-read-until
     ! Copied from { c-reader stream-read-until }!!!
     [ swap read-until-loop ] "" make
     swap over empty? over not and [ 2drop f f ] when ;
 
 : fix-read1 ( stream char -- char )
-    over line-reader-cr [
+    over decoded-cr [
         over cr-
         dup CHAR: \n = [
             drop stream-read1
@@ -106,7 +114,7 @@ M: decoded stream-read-until
 
 M: decoded stream-read1 1 over stream-read ;
 
-M: line-reader stream-readln ( stream -- str )
+M: decoded stream-readln ( stream -- str )
     "\r\n" over stream-read-until handle-readln ;
 
 ! Encoding

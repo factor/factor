@@ -1,6 +1,6 @@
 USING: io.files io.sockets io kernel threads namespaces
 tools.test continuations strings byte-arrays sequences
-prettyprint system ;
+prettyprint system io.encodings.binary ;
 IN: temporary
 
 ! Unix domain stream sockets
@@ -131,15 +131,15 @@ client-addr <datagram>
 ! Invalid parameter tests
 
 [
-    image [ stdio get accept ] with-file-reader
+    image binary [ stdio get accept ] with-file-reader
 ] must-fail
 
 [
-    image [ stdio get receive ] with-file-reader
+    image binary [ stdio get receive ] with-file-reader
 ] must-fail
 
 [
-    image [
+    image binary [
         B{ 1 2 } server-addr
         stdio get send
     ] with-file-reader

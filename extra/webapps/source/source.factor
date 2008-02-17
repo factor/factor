@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files namespaces webapps.file http.server.responders
-xmode.code2html kernel html sequences ;
+xmode.code2html kernel html sequences io.encodings.utf8 ;
 IN: webapps.source
 
 ! This responder is a potential security problem. Make sure you
@@ -15,7 +15,7 @@ IN: webapps.source
 : source-responder ( path mime-type -- )
     drop
     serving-html
-    [ dup <file-reader> htmlize-stream ] with-html-stream ;
+    [ dup utf8 <file-reader> htmlize-stream ] with-html-stream ;
 
 global [
     ! Serve up our own source code

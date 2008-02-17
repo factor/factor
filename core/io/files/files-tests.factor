@@ -1,34 +1,34 @@
 IN: temporary
-USING: tools.test io.files io threads kernel continuations ;
+USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk/" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
 
 [ ] [
-    "test-foo.txt" resource-path [
+    "test-foo.txt" resource-path ascii [
         "Hello world." print
     ] with-file-writer
 ] unit-test
 
 [ ] [
-    "test-foo.txt" resource-path <file-appender> [
+    "test-foo.txt" resource-path ascii [
         "Hello appender." print
-    ] with-stream
+    ] with-file-appender
 ] unit-test
 
 [ ] [
-    "test-bar.txt" resource-path <file-appender> [
+    "test-bar.txt" resource-path ascii [
         "Hello appender." print
-    ] with-stream
+    ] with-file-appender
 ] unit-test
 
 [ "Hello world.\nHello appender.\n" ] [
-    "test-foo.txt" resource-path file-contents
+    "test-foo.txt" resource-path ascii file-contents
 ] unit-test
 
 [ "Hello appender.\n" ] [
-    "test-bar.txt" resource-path file-contents
+    "test-bar.txt" resource-path ascii file-contents
 ] unit-test
 
 [ ] [ "test-foo.txt" resource-path delete-file ] unit-test
@@ -42,7 +42,7 @@ USING: tools.test io.files io threads kernel continuations ;
 [ ] [ "test-blah" resource-path make-directory ] unit-test
 
 [ ] [
-    "test-blah/fooz" resource-path <file-writer> dispose
+    "test-blah/fooz" resource-path ascii <file-writer> dispose
 ] unit-test
 
 [ t ] [
@@ -55,11 +55,11 @@ USING: tools.test io.files io threads kernel continuations ;
 
 [ f ] [ "test-blah" resource-path exists? ] unit-test
 
-[ ] [ "test-quux.txt" resource-path [ [ yield "Hi" write ] in-thread ] with-file-writer ] unit-test
+[ ] [ "test-quux.txt" resource-path ascii [ [ yield "Hi" write ] in-thread ] with-file-writer ] unit-test
 
 [ ] [ "test-quux.txt" resource-path delete-file ] unit-test
 
-[ ] [ "test-quux.txt" resource-path [ [ yield "Hi" write ] in-thread ] with-file-writer ] unit-test
+[ ] [ "test-quux.txt" resource-path ascii [ [ yield "Hi" write ] in-thread ] with-file-writer ] unit-test
 
 [ ] [ "test-quux.txt" "quux-test.txt" [ resource-path ] 2apply rename-file ] unit-test
 [ t ] [ "quux-test.txt" resource-path exists? ] unit-test

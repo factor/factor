@@ -3,7 +3,7 @@
 USING: calendar html io io.files kernel math math.parser
 http.server.responders http.server.templating namespaces parser
 sequences strings assocs hashtables debugger http.mime sorting
-html.elements logging ;
+html.elements logging io.encodings.binary ;
 
 IN: webapps.file
 
@@ -37,7 +37,7 @@ SYMBOL: serve-file-hook
 [
     dupd
     file-response
-    <file-reader> stdio get stream-copy
+    binary <file-reader> stdio get stream-copy
 ] serve-file-hook set-global
 
 : serve-static ( filename mime-type -- )

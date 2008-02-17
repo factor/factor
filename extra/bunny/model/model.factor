@@ -1,5 +1,5 @@
 USING: alien alien.c-types arrays sequences math math.vectors math.matrices
-    math.parser io io.files kernel opengl opengl.gl opengl.glu
+    math.parser io io.files kernel opengl opengl.gl opengl.glu io.encodings.ascii
     opengl.capabilities shuffle http.client vectors splitting tools.time system
     combinators combinators.cleave float-arrays continuations namespaces
     sequences.lib ;
@@ -35,7 +35,7 @@ IN: bunny.model
 
 : read-model ( stream -- model )
     "Reading model" print flush [
-        [ parse-model ] with-file-reader
+        ascii [ parse-model ] with-file-reader
         [ normals ] 2keep 3array
     ] time ;
 

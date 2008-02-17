@@ -16,7 +16,7 @@ SYMBOL: ignore
     8 shift bitor ;
 
 : end-multibyte ( buf byte ch -- buf ch state )
-    append-nums decoded ;
+    append-nums push-decoded ;
 
 : begin-utf16be ( buf byte -- buf ch state )
     dup -3 shift BIN: 11011 number= [
@@ -36,7 +36,7 @@ SYMBOL: ignore
         { double [ end-multibyte ] }
         { quad1 [ append-nums quad2 ] }
         { quad2 [ handle-quad2be ] }
-        { quad3 [ append-nums HEX: 10000 + decoded ] }
+        { quad3 [ append-nums HEX: 10000 + push-decoded ] }
         { ignore [ 2drop push-replacement ] }
     } case ;
 
@@ -52,7 +52,7 @@ SYMBOL: ignore
 
 : handle-quad3le ( buf byte ch -- buf ch state )
     swap dup -2 shift BIN: 110111 = [
-        BIN: 11 bitand append-nums HEX: 10000 + decoded
+        BIN: 11 bitand append-nums HEX: 10000 + push-decoded
     ] [ 2drop push-replacement ] if ;
 
 : decode-utf16le-step ( buf byte ch state -- buf ch state )

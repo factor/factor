@@ -4,7 +4,7 @@
 USING: continuations sequences kernel parser namespaces io
 io.files io.streams.lines io.streams.string html html.elements
 source-files debugger combinators math quotations generic
-strings splitting ;
+strings splitting io.encodings.utf8 ;
 
 IN: http.server.templating
 
@@ -82,7 +82,7 @@ DEFER: <% delimiter
             templating-vocab use+
             dup source-file file set ! so that reload works properly
             [
-                ?resource-path file-contents
+                ?resource-path utf8 file-contents
                 [ eval-template ] [ html-error. drop ] recover
             ] keep
         ] with-file-vocabs
@@ -93,4 +93,4 @@ DEFER: <% delimiter
     swap path+ run-template-file ;
 
 : template-convert ( infile outfile -- )
-    [ run-template-file ] with-file-writer ;
+    utf8 [ run-template-file ] with-file-writer ;

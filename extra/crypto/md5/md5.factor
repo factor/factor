@@ -2,7 +2,8 @@
 
 USING: kernel io io.binary io.files io.streams.string math
 math.functions math.parser namespaces splitting strings
-sequences crypto.common byte-arrays locals sequences.private ;
+sequences crypto.common byte-arrays locals sequences.private
+io.encodings.binary ;
 IN: crypto.md5
 
 <PRIVATE
@@ -186,5 +187,5 @@ PRIVATE>
 
 : string>md5 ( string -- byte-array ) <string-reader> stream>md5 ;
 : string>md5str ( string -- md5-string ) string>md5 hex-string ;
-: file>md5 ( path -- byte-array ) <file-reader> stream>md5 ;
+: file>md5 ( path -- byte-array ) binary <file-reader> stream>md5 ;
 : file>md5str ( path -- md5-string ) file>md5 hex-string ;

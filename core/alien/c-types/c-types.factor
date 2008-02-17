@@ -4,7 +4,7 @@ USING: bit-arrays byte-arrays float-arrays arrays
 generator.registers assocs kernel kernel.private libc math
 namespaces parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
-system compiler.units ;
+system compiler.units io.encodings.binary ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -272,6 +272,9 @@ M: long-long-type box-return ( type -- )
         unclip >r [ dup word? [ word-def call ] when ] map
         r> add*
     ] when ;
+
+: malloc-file-contents ( path -- alien )
+  binary file-contents >byte-array malloc-byte-array ;
 
 [
     [ alien-cell ]

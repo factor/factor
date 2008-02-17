@@ -1,2 +1,1 @@
-IN: io.encodings.binary
-SYMBOL: binary
+IN: io.encodings.binary SYMBOL: binary

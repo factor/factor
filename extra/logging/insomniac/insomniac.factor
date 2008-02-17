@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: logging.analysis logging.server logging smtp io.sockets
-kernel io.files io.streams.string namespaces raptor.cron assocs ;
+kernel io.files io.streams.string namespaces raptor.cron assocs
+io.encodings.utf8 ;
 IN: logging.insomniac
 
 SYMBOL: insomniac-smtp-host
@@ -11,7 +12,7 @@ SYMBOL: insomniac-recipients
 
 : ?analyze-log ( service word-names -- string/f )
     >r log-path 1 log# dup exists? [
-        file-lines r> [ analyze-log ] with-string-writer
+        utf8 file-lines r> [ analyze-log ] with-string-writer
     ] [
         r> 2drop f
     ] if ;
