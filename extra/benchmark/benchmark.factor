@@ -5,16 +5,25 @@ arrays assocs io.styles io help.markup prettyprint sequences
 continuations debugger ;
 IN: benchmark
 
+! : run-benchmark ( vocab -- result )
+!     "=== Benchmark " write dup print flush
+!     dup require
+!     [ [ run ] benchmark ] [ error. drop f f ] recover 2array
+!     dup . ;
+
 : run-benchmark ( vocab -- result )
-    "=== Benchmark " write dup print flush
-    dup require
-    [ [ run ] benchmark ] [ error. drop f f ] recover 2array
-    dup . ;
+  "=== Benchmark " write dup vocab-name print flush
+  [ dup require [ run ] benchmark ] [ error. drop f f ] recover 2array
+  dup . ;
+
+! : run-benchmarks ( -- assoc )
+!     "benchmark" load-children
+!     "benchmark" dup child-vocabs remove
+!     [ dup run-benchmark ] { } map>assoc ;
 
 : run-benchmarks ( -- assoc )
-    "benchmark" load-children
-    "benchmark" dup child-vocabs remove
-    [ dup run-benchmark ] { } map>assoc ;
+  "benchmark"
+    all-child-vocabs values concat [ dup run-benchmark ] { } map>assoc ;
 
 : benchmarks. ( assoc -- )
     standard-table-style [
