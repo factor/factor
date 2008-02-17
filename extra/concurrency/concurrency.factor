@@ -145,12 +145,12 @@ M: process send ( message process -- )
 
 : receive ( -- message )
     self process-mailbox mailbox-get dup linked-exception? [
-        linked-exception-error throw
+        linked-exception-error rethrow
     ] when ;
 
 : receive-if ( pred -- message )
     self process-mailbox mailbox-get? dup linked-exception? [
-        linked-exception-error throw
+        linked-exception-error rethrow
     ] when ; inline
 
 : rethrow-linked ( error -- )
@@ -285,7 +285,7 @@ TUPLE: future value processes ;
     #! place the result on the stack. Return the result
     #! immediately if the future has completed.
     dup future-value [
-        first2 [ throw ] unless
+        first2 [ rethrow ] unless
     ] [
         dup [ future-processes push stop ] curry callcc0 ?future
     ] ?if ;
