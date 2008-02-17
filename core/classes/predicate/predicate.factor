@@ -16,7 +16,7 @@ PREDICATE: class predicate-class
 : define-predicate-class ( superclass class definition -- )
     >r dup f roll predicate-class define-class r>
     dupd "predicate-definition" set-word-prop
-    dup predicate-word over predicate-quot define-predicate ;
+    dup predicate-quot define-predicate ;
 
 M: predicate-class reset-class
     {
