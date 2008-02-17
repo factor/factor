@@ -64,7 +64,7 @@ C: <extended-header> extended-header
   } cond ;
 
 : (read-frame) ( id -- frame )
-  read-frame-size read-frame-flags pick pick read-frame-data <frame> ;
+  read-frame-size read-frame-flags 2over read-frame-data <frame> ;
 
 : read-frame ( -- frame/f )
   read-frame-id dup good-frame-id? [ (read-frame) ] [ drop f ] if ;
