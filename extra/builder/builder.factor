@@ -1,11 +1,7 @@
 
-USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
-       arrays system continuations namespaces sequences splitting math.parser
-       prettyprint tools.time calendar bake vars http.client
-       combinators bootstrap.image bootstrap.image.download
-       combinators.cleave benchmark
-       classes strings quotations words parser-combinators new-slots accessors
-       assocs.lib smtp builder.util ;
+USING: kernel namespaces sequences splitting system combinators continuations
+       parser io io.files io.launcher io.sockets prettyprint threads
+       bootstrap.image benchmark vars bake smtp builder.util accessors ;
 
 IN: builder
 
