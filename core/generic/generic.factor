@@ -82,10 +82,19 @@ M: method-body stack-effect
     [ <method-word> ] 3keep f \ method construct-boa
     dup method-word over "method" set-word-prop ;
 
+: redefine-method ( quot method -- )
+    2dup set-method-def
+    method-word swap define ;
+
 : define-method ( quot class generic -- )
     >r bootstrap-word r>
-    [ <method> ] 2keep
-    [ set-at ] with-methods ;
+    2dup method dup [
+        2nip redefine-method
+    ] [
+        drop
+        [ <method> ] 2keep
+        [ set-at ] with-methods
+    ] if ;
 
 : define-default-method ( generic combination -- )
     dupd make-default-method object bootstrap-word pick <method>

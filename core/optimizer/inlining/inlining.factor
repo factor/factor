@@ -6,62 +6,38 @@ math namespaces sequences vectors words quotations hashtables
 combinators classes generic.math continuations optimizer.def-use
 optimizer.backend generic.standard optimizer.specializers
 optimizer.def-use optimizer.pattern-match generic.standard
-optimizer.control ;
+optimizer.control kernel.private ;
 IN: optimizer.inlining
 
-GENERIC: remember-method* ( method-spec node -- )
+: remember-inlining ( node history -- )
+    [ swap set-node-history ] curry each-node ;
 
-M: #call remember-method*
-    [ node-history ?push ] keep set-node-history ;
-
-M: node remember-method*
-    2drop ;
-
-: remember-method ( method-spec node -- )
-    swap dup second +inlined+ depends-on
-    [ swap remember-method* ] curry each-node ;
-
-: (splice-method) ( #call method-spec quot -- node )
-    #! Must remember the method before splicing in, otherwise
-    #! the rest of the IR will also remember the method
-    pick node-in-d dataflow-with
-    [ remember-method ] keep
-    [ swap infer-classes/node ] 2keep
-    [ splice-node ] keep ;
-
-: splice-quot ( #call quot -- node )
+: inlining-quot ( node quot -- node )
     over node-in-d dataflow-with
-    [ swap infer-classes/node ] 2keep
-    [ splice-node ] keep ;
+    dup rot infer-classes/node ;
 
-! #call
-: splice-method ( #call method-spec/t quot/t -- node/t )
-    #! t indicates failure
-    {
-        { [ dup t eq? ] [ 3drop t ] }
-        { [ 2over swap node-history member? ] [ 3drop t ] }
-        { [ t ] [ (splice-method) ] }
-    } cond ;
-
-! Single dispatch method inlining optimization
-: already-inlined? ( node -- ? )
-    #! Was this node inlined from definition of 'word'?
-    dup node-param swap node-history memq? ;
-
-: specific-method ( class word -- class ) order min-class ;
-
-: node-class# ( node n -- class )
-    over node-in-d <reversed> ?nth node-class ;
-
-: dispatching-class ( node word -- class )
-    [ dispatch# node-class# ] keep specific-method ;
+: splice-quot ( #call quot history -- node )
+    #! Must add history *before* splicing in, otherwise
+    #! the rest of the IR will also remember the history
+    pick node-history append
+    >r dupd inlining-quot dup r> remember-inlining
+    tuck splice-node ;
 
 ! A heuristic to avoid excessive inlining
 DEFER: (flat-length)
 
 : word-flat-length ( word -- n )
-    dup get over inline? not or
-    [ drop 1 ] [ dup dup set word-def (flat-length) ] if ;
+    {
+        ! heuristic: { ... } declare comes up in method bodies
+        ! and we don't care about it
+        { [ dup \ declare eq? ] [ drop -2 ] }
+        ! recursive
+        { [ dup get ] [ drop 1 ] }
+        ! not inline
+        { [ dup inline? not ] [ drop 1 ] }
+        ! inline
+        { [ t ] [ dup dup set word-def (flat-length) ] }
+    } cond ;
 
 : (flat-length) ( seq -- n )
     [
@@ -76,32 +52,29 @@ DEFER: (flat-length)
 : flat-length ( seq -- n )
     [ word-def (flat-length) ] with-scope ;
 
-: will-inline-method ( node word -- method-spec/t quot/t )
-    #! t indicates failure
-    tuck dispatching-class dup [
-        swap [ 2array ] 2keep
-        method method-word
-        dup flat-length 10 >=
-        [ 1quotation ] [ word-def ] if
-    ] [
-        2drop t t
-    ] if ;
+! Single dispatch method inlining optimization
+: specific-method ( class word -- class ) order min-class ;
+
+: node-class# ( node n -- class )
+    over node-in-d <reversed> ?nth node-class ;
+
+: dispatching-class ( node word -- class )
+    [ dispatch# node-class# ] keep specific-method ;
 
 : inline-standard-method ( node word -- node )
-    dupd will-inline-method splice-method ;
+    2dup dispatching-class dup [
+        swap method method-word 1quotation f splice-quot
+    ] [
+        3drop t
+    ] if ;
 
 ! Partial dispatch of math-generic words
 : math-both-known? ( word left right -- ? )
     math-class-max swap specific-method ;
 
-: will-inline-math-method ( word left right -- method-spec/t quot/t )
-    #! t indicates failure
-    3dup math-both-known?
-    [ [ 3array ] 3keep math-method ] [ 3drop t t ] if ;
-
 : inline-math-method ( #call word -- node )
-    over node-input-classes first2
-    will-inline-math-method splice-method ;
+    over node-input-classes first2 3dup math-both-known?
+    [ math-method f splice-quot ] [ 2drop 2drop t ] if ;
 
 : inline-method ( #call -- node )
     dup node-param {
@@ -131,7 +104,7 @@ DEFER: (flat-length)
 
 : inline-literals ( node literals -- node )
     #! Make #shuffle -> #push -> #return -> successor
-    dupd literal-quot splice-quot ;
+    dupd literal-quot f splice-quot ;
 
 : evaluate-predicate ( #call -- ? )
     dup node-param "predicating" word-prop >r
@@ -196,7 +169,7 @@ DEFER: (flat-length)
     nip dup [ second ] when ;
 
 : apply-identities ( node -- node/f )
-    dup find-identity dup [ splice-quot ] [ 2drop f ] if ;
+    dup find-identity dup [ f splice-quot ] [ 2drop f ] if ;
 
 : optimistic-inline? ( #call -- ? )
     dup node-param "specializer" word-prop dup [
@@ -206,13 +179,20 @@ DEFER: (flat-length)
         2drop f
     ] if ;
 
+: splice-word-def ( #call word -- node )
+    dup +inlined+ depends-on
+    dup word-def swap 1array splice-quot ;
+
 : optimistic-inline ( #call -- node )
-    dup node-param dup +inlined+ depends-on
-    word-def splice-quot ;
+    dup node-param over node-history memq? [
+        drop t
+    ] [
+        dup node-param splice-word-def
+    ] if ;
 
 : method-body-inline? ( #call -- ? )
     node-param dup method-body?
-    [ flat-length 8 <= ] [ drop f ] if ;
+    [ flat-length 10 <= ] [ drop f ] if ;
 
 M: #call optimize-node*
     {
