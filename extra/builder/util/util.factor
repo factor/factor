@@ -3,8 +3,8 @@ USING: kernel words namespaces classes parser continuations
        io io.files io.launcher io.sockets
        math math.parser
        combinators sequences splitting quotations arrays strings tools.time
-       parser-combinators accessors assocs.lib
-       combinators.cleave bake calendar new-slots ;
+       parser-combinators new-slots accessors assocs.lib
+       combinators.cleave bake calendar  ;
 
 IN: builder.util
 
@@ -14,7 +14,7 @@ IN: builder.util
 
 : minutes>ms ( min -- ms ) 60 * 1000 * ;
 
-: file>string ( file -- string ) [ stdio get contents ] with-file-in ;
+: file>string ( file -- string ) [ stdio get contents ] with-file-reader ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

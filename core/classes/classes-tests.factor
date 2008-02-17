@@ -63,7 +63,7 @@ UNION: bah fixnum alien ;
 
 ! Test generic see and parsing
 [ "USING: alien math ;\nIN: temporary\nUNION: bah fixnum alien ;\n" ]
-[ [ \ bah see ] string-out ] unit-test
+[ [ \ bah see ] with-string-writer ] unit-test
 
 ! Test redefinition of classes
 UNION: union-1 fixnum float ;

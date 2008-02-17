@@ -38,8 +38,8 @@ C: <serialize-test> serialize-test
 
 : check-serialize-1 ( obj -- ? )
     dup class .
-    dup [ serialize ] string-out
-    [ deserialize ] string-in = ;
+    dup [ serialize ] with-string-writer
+    [ deserialize ] with-string-reader = ;
 
 : check-serialize-2 ( obj -- ? )
     dup number? over wrapper? or [
@@ -47,8 +47,8 @@ C: <serialize-test> serialize-test
     ] [
         dup class .
         dup 2array
-        [ serialize ] string-out
-        [ deserialize ] string-in
+        [ serialize ] with-string-writer
+        [ deserialize ] with-string-reader
         first2 eq?
     ] if ;
 
@@ -63,7 +63,7 @@ C: <serialize-test> serialize-test
         [
             dup (serialize) (serialize)
         ] with-serialized
-    ] string-out [
+    ] with-string-writer [
         deserialize-sequence all-eq?
-    ] string-in
+    ] with-string-reader
 ] unit-test

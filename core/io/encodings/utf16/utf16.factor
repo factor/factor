@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces io.binary
-io.encodings combinators splitting ;
+io.encodings combinators splitting io byte-arrays ;
 IN: io.encodings.utf16
 
 SYMBOL: double
@@ -104,23 +104,49 @@ SYMBOL: ignore
 : encode-utf16 ( str -- seq )
     encode-utf16le bom-le swap append ;
 
+: start-utf16le? ( seq1 -- seq2 ? ) bom-le ?head ;
+
+: start-utf16be? ( seq1 -- seq2 ? ) bom-be ?head ;
+
 : decode-utf16 ( seq -- str )
     {
-        { [ bom-le ?head ] [ decode-utf16le ] }
-        { [ bom-be ?head ] [ decode-utf16be ] }
+        { [ start-utf16le? ] [ decode-utf16le ] }
+        { [ start-utf16be? ] [ decode-utf16be ] }
         { [ t ] [ decode-error ] }
     } cond ;
 
 TUPLE: utf16le ;
-: <utf16le> utf16le construct-delegate ;
 INSTANCE: utf16le encoding-stream 
 
 M: utf16le encode-string drop encode-utf16le ;
 M: utf16le decode-step drop decode-utf16le-step ;
 
 TUPLE: utf16be ;
-: <utf16be> utf16be construct-delegate ;
 INSTANCE: utf16be encoding-stream 
 
 M: utf16be encode-string drop encode-utf16be ;
 M: utf16be decode-step drop decode-utf16be-step ;
+
+TUPLE: utf16 encoding ;
+INSTANCE: utf16 encoding-stream
+M: utf16 underlying-stream delegate dup delegate [ ] [ ] ?if ; ! necessary? 
+M: utf16 set-underlying-stream delegate set-delegate ; ! necessary? 
+
+M: utf16 encode-string
+    >r encode-utf16le r>
+    dup utf16-encoding [ drop ]
+    [ t swap set-utf16-encoding bom-le swap append ] if ;
+
+: bom>le/be ( bom -- le/be )
+    dup bom-le sequence= [ drop utf16le ] [
+        bom-be sequence= [ utf16be ] [ decode-error ] if
+    ] if ;
+
+: read-bom ( utf16 -- encoding )
+    2 over delegate stream-read bom>le/be construct-empty
+    [ swap set-utf16-encoding ] keep ;
+
+M: utf16 decode-step
+    ! inefficient: checks if bom is done many times
+    ! This should transform itself into utf16be or utf16le after reading BOM
+    dup utf16-encoding [ ] [ read-bom ] ?if decode-step ;

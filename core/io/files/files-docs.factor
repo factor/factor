@@ -52,12 +52,12 @@ HELP: <file-appender>
 { $description "Outputs an output stream for writing to the specified pathname. The stream begins writing at the end of the file." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
-HELP: with-file-in
+HELP: with-file-reader
 { $values { "path" "a pathname string" } { "quot" "a quotation" } }
 { $description "Opens a file for reading and calls the quotation using " { $link with-stream } "." }
 { $errors "Throws an error if the file is unreadable." } ;
 
-HELP: with-file-out
+HELP: with-file-writer
 { $values { "path" "a pathname string" } { "quot" "a quotation" } }
 { $description "Opens a file for writing and calls the quotation using " { $link with-stream } "." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;

@@ -1,11 +1,7 @@
 
-USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
-       arrays system continuations namespaces sequences splitting math.parser
-       prettyprint tools.time calendar bake vars http.client
-       combinators bootstrap.image bootstrap.image.download
-       combinators.cleave benchmark
-       classes strings quotations words parser-combinators new-slots accessors
-       assocs.lib smtp builder.util ;
+USING: kernel namespaces sequences splitting system combinators continuations
+       parser io io.files io.launcher io.sockets prettyprint threads
+       bootstrap.image benchmark vars bake smtp builder.util accessors ;
 
 IN: builder
 
@@ -48,7 +44,7 @@ VAR: stamp
 : git-id ( -- id )
   { "git" "show" } <process-stream> [ readln ] with-stream " " split second ;
 
-: record-git-id ( -- ) git-id "../git-id" [ . ] with-file-out ;
+: record-git-id ( -- ) git-id "../git-id" [ . ] with-file-writer ;
 
 : make-clean ( -- desc ) { "make" "clean" } ;
 
@@ -132,9 +128,9 @@ SYMBOL: build-status
     "Did not pass test-all: "        print "../test-all-vocabs"        cat
 
     "Benchmarks: " print
-    "../benchmarks" [ stdio get contents eval ] with-file-in benchmarks.
+    "../benchmarks" [ stdio get contents eval ] with-file-reader benchmarks.
 
-  ] with-file-out
+  ] with-file-writer
 
   build-status on ;
 

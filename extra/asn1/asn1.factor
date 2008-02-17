@@ -112,7 +112,7 @@ SYMBOL: end
         { "boolean" [ "\0" = not ] }
         { "string" [ "" or ] }
         { "integer" [ be> ] }
-        { "array" [ "" or [ read-array ] string-in ] }
+        { "array" [ "" or [ read-array ] with-string-reader ] }
     } case ;
 
 : read-ber ( syntax -- object )

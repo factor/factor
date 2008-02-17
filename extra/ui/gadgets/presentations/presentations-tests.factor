@@ -10,5 +10,5 @@ tuples ;
 [ "+" ] [
     [
         \ + f \ pprint <command-button> dup button-quot call
-    ] string-out
+    ] with-string-writer
 ] unit-test
