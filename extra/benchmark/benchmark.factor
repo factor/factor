@@ -6,7 +6,7 @@ continuations debugger ;
 IN: benchmark
 
 : run-benchmark ( vocab -- result )
-  [ [ run ] benchmark ] [ error. drop f f ] recover 2array ;
+  [ dup require [ run ] benchmark ] [ error. drop f f ] recover 2array ;
 
 : run-benchmarks ( -- assoc )
   "benchmark" all-child-vocabs values concat [ vocab-name ] map
