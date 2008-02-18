@@ -61,6 +61,13 @@ VAR: stamp
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: copy-image ( -- )
+  "../../factor/" my-arch boot-image-name append
+  my-arch boot-image-name
+  copy-file ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : factor-binary ( -- name )
   os
   { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
@@ -112,7 +119,9 @@ SYMBOL: build-status
 
     make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
 
-    [ retrieve-image ] [ "Image download error" print throw ] recover
+    ! [ retrieve-image ] [ "Image download error" print throw ] recover
+
+    copy-image
 
     bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
@@ -158,6 +167,8 @@ SYMBOL: builder-recipients
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+USE: bootstrap.image.download
+
 : git-pull ( -- desc )
   {
     "git"
@@ -173,11 +184,17 @@ SYMBOL: builder-recipients
   git-id
   = not ;
 
+: new-image-available? ( -- ? )
+  my-arch boot-image-name need-new-image?
+    [ download-my-image t ]
+    [ f ]
+  if ;
+
 : build-loop ( -- )
   builds-check
   [
     builds "/factor" append cd
-    updates-available?
+    updates-available? new-image-available? or
       [ build ]
     when
   ]
