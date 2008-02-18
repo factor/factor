@@ -62,8 +62,12 @@ VAR: stamp
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : copy-image ( -- )
-  "../../factor/" my-arch boot-image-name append
-  my-arch boot-image-name
+  "../../factor/" my-boot-image-name append
+  "../"           my-boot-image-name append
+  copy-file
+
+  "../../factor/" my-boot-image-name append
+                  my-boot-image-name
   copy-file ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -76,8 +80,7 @@ VAR: stamp
   case ;
 
 : bootstrap-cmd ( -- cmd )
-  { factor-binary [ "-i=" my-boot-image-name append ] "-no-user-init" }
-  to-strings ;
+  { factor-binary { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
 
 : bootstrap ( -- desc )
   <process*>
@@ -102,6 +105,37 @@ VAR: stamp
     45 minutes>ms    >>timeout
   >desc ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: arrays assocs math ;
+
+: passing-benchmarks ( table -- table )
+  [ second first2 number? swap number? and ] subset ;
+
+: simplify-table ( table -- table ) [ first2 second 2array ] map ;
+
+: benchmark-difference ( old-table benchmark-result -- result-diff )
+  first2 >r
+  tuck swap at
+  r>
+  swap -
+  2array ;
+
+: compare-tables ( old new -- table )
+  [ passing-benchmarks simplify-table ] 2apply
+  [ benchmark-difference ] with map ;
+
+: show-benchmark-deltas ( -- )
+  "Benchmark deltas: " print
+
+  [
+    "../../benchmarks" eval-file
+    "../benchmarks"    eval-file
+    compare-tables .
+  ]
+    [ drop "Error generating benchmark deltas" . ]
+  recover ;
+  
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: build-status
@@ -143,6 +177,8 @@ SYMBOL: build-status
 
     builder-test [ "Test error" print "../test-log" cat ] run-or-bail
 
+
+
     "Boot time: " write "../boot-time" eval-file milli-seconds>time print
     "Load time: " write "../load-time" eval-file milli-seconds>time print
     "Test time: " write "../test-time" eval-file milli-seconds>time print nl
@@ -152,6 +188,12 @@ SYMBOL: build-status
 
     "Benchmarks: " print
     "../benchmarks" [ stdio get contents eval ] with-file-reader benchmarks.
+
+    nl
+    
+    show-benchmark-deltas
+
+    "../benchmarks" "../../benchmarks" copy-file    
 
   ] with-file-writer
 
@@ -175,9 +217,12 @@ SYMBOL: builder-recipients
     "../report" file>string >>body
   send ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : build ( -- )
   [ (build) ] [ drop ] recover
-  [ send-builder-email ] [ drop "not sending mail" . ] recover ;
+  [ send-builder-email ] [ drop "not sending mail" . ] recover
+  ".." cd { "rm" "-rf" "factor" } run-process drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -199,7 +244,7 @@ USE: bootstrap.image.download
   = not ;
 
 : new-image-available? ( -- ? )
-  my-arch boot-image-name need-new-image?
+  my-boot-image-name need-new-image?
     [ download-my-image t ]
     [ f ]
   if ;
