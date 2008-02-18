@@ -6,7 +6,7 @@
 IN: concurrency.messaging
 USING: dlists threads sequences continuations
 namespaces random math quotations words kernel arrays assocs
-init system ;
+init system concurrency.conditions ;
 
 TUPLE: mailbox threads data ;
 
@@ -16,29 +16,22 @@ TUPLE: mailbox threads data ;
 : mailbox-empty? ( mailbox -- bool )
     mailbox-data dlist-empty? ;
 
-: notify-all ( dlist -- )
-    [ second resume ] dlist-slurp yield ;
-
 : mailbox-put ( obj mailbox -- )
     [ mailbox-data push-front ] keep
     mailbox-threads notify-all ;
 
 <PRIVATE
 
-: mailbox-wait ( mailbox timeout -- mailbox timeout )
-    [ 2array swap mailbox-threads push-front ] suspend drop ;
-    inline
-
 : block-unless-pred ( pred mailbox timeout -- )
     2over mailbox-data dlist-contains? [
         3drop
     ] [
-        mailbox-wait block-unless-pred
+        2dup mailbox-threads wait block-unless-pred
     ] if ; inline
 
 : block-if-empty ( mailbox timeout -- mailbox )
     over mailbox-empty? [
-        mailbox-wait block-if-empty
+        2dup mailbox-threads wait block-if-empty
     ] [
         drop
     ] if ;
@@ -104,8 +97,12 @@ M: thread send ( message thread -- )
 : rethrow-linked ( error supervisor -- )
     >r <linked> r> send ;
 
+: spawn-linked-to ( quot name mailbox -- thread )
+    [ >r <linked> r> mailbox-put ] curry <thread>
+    [ (spawn) ] keep ;
+
 : spawn-linked ( quot name -- thread )
-    self [ rethrow-linked ] curry <thread> [ (spawn) ] keep ;
+    mailbox spawn-linked-to ;
 
 TUPLE: synchronous data sender tag ;
 
@@ -124,3 +121,21 @@ TUPLE: reply data tag ;
 
 : reply-synchronous ( message synchronous -- )
     [ <reply> ] keep synchronous-sender send ;
+
+<PRIVATE
+
+: remote-processes ( -- hash )
+   \ remote-processes get-global ;
+
+PRIVATE>
+
+: register-process ( name process -- )
+    swap remote-processes set-at ;
+
+: unregister-process ( name -- )
+    remote-processes delete-at ;
+
+: get-process ( name -- process )
+    dup remote-processes at [ ] [ thread ] ?if ;
+
+\ remote-processes global [ H{ } assoc-like ] change-at

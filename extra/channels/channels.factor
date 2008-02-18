@@ -19,7 +19,7 @@ GENERIC: from ( channel -- value )
     [ channel-senders push stop ] curry callcc0 ;
 
 : (to) ( value receivers -- )
-    delete-random schedule-thread-with yield ;
+    delete-random resume-with yield ;
 
 : notify ( continuation channel -- channel )
     [ channel-receivers push ] keep ;

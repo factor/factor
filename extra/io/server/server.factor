@@ -3,7 +3,7 @@
 USING: io io.sockets io.files logging continuations kernel
 math math.parser namespaces parser sequences strings
 prettyprint debugger quotations calendar
-threads concurrency.futures ;
+threads concurrency.combinators ;
 
 IN: io.server
 

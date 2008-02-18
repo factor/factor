@@ -6,8 +6,10 @@ namespaces kernel ;
 QUALIFIED: io.sockets
 IN: concurrency.distributed
 
+SYMBOL: local-node ( -- addrspec )
+
 : handle-node-client ( -- )
-    deserialize first2 thread send ;
+    deserialize first2 get-process send ;
 
 : (start-node) ( addrspecs addrspec -- )
     [
@@ -16,18 +18,19 @@ IN: concurrency.distributed
         [ handle-node-client ] with-server
     ] 2curry f spawn drop ;
 
-SYMBOL: local-node ( -- addrspec )
-
 : start-node ( port -- )
-    dup internet-server host-name rot <inet> (start-node) ;
+    dup internet-server io.sockets:host-name
+    rot io.sockets:<inet> (start-node) ;
 
-TUPLE: remote-thread pid node ;
+TUPLE: remote-process id node ;
 
-M: remote-thread send ( message thread -- )
-    { remote-thread-pid remote-thread-node } get-slots
+C: <remote-process> remote-process
+
+M: remote-process send ( message thread -- )
+    { remote-process-id remote-process-node } get-slots
     io.sockets:<client> [ 2array serialize ] with-stream ;
 
 M: thread (serialize) ( obj -- )
     thread-id local-node get-global
-    remote-thread construct-boa
+    <remote-process>
     (serialize) ;

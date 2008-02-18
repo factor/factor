@@ -1,3 +1,6 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: dlists kernel threads math ;
 IN: concurrency.semaphores
 
 TUPLE: semaphore count threads ;
