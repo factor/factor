@@ -9,5 +9,9 @@ IN: concurrency.combinators
     inline
 
 : parallel-each ( seq quot -- )
-    "Parallel each" pick length <count-down>
-    [ [ spawn-stage ] 2curry each ] keep await ; inline
+    over length <count-down>
+    [ [ >r curry r> spawn-stage ] 2curry each ] keep await ;
+    inline
+
+: parallel-subset ( seq quot -- newseq )
+    over >r pusher >r each r> r> like ; inline

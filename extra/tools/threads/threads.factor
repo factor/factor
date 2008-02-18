@@ -16,7 +16,7 @@ io io.styles sequences assocs namespaces sorting ;
             [ [ write ] with-cell ] each
         ] with-row
 
-        threads get-global >alist sort-keys values [
+        threads >alist sort-keys values [
             [ thread. ] with-row
         ] each
     ] tabular-output ;

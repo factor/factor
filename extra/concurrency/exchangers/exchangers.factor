@@ -6,16 +6,21 @@ IN: concurrency.exchangers
 ! Motivated by
 ! http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/Exchanger.html
 
-TUPLE: exchanger thread ;
+TUPLE: exchanger thread object ;
 
 : <exchanger> ( -- exchanger )
-    f exchanger construct-boa ;
+    f f exchanger construct-boa ;
+
+: pop-object ( exchanger -- obj )
+    dup exchanger-object f rot set-exchanger-object ;
+
+: pop-thread ( exchanger -- thread )
+    dup exchanger-thread f rot set-exchanger-thread ;
 
 : exchange ( obj exchanger -- newobj )
     dup exchanger-thread [
-        dup exchanger-thread
-        f rot set-exchanger-thread
-        resume-with
+        dup pop-object >r pop-thread resume-with r>
     ] [
+        [ set-exchanger-object ] keep
         [ set-exchanger-thread ] curry suspend
     ] if ;

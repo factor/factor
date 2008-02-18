@@ -26,12 +26,12 @@ TUPLE: mailbox threads data ;
     2over mailbox-data dlist-contains? [
         3drop
     ] [
-        2dup mailbox-threads wait block-unless-pred
+        2dup >r mailbox-threads r> wait block-unless-pred
     ] if ; inline
 
 : block-if-empty ( mailbox timeout -- mailbox )
     over mailbox-empty? [
-        2dup mailbox-threads wait block-if-empty
+        2dup >r mailbox-threads r> wait block-if-empty
     ] [
         drop
     ] if ;
@@ -39,10 +39,10 @@ TUPLE: mailbox threads data ;
 PRIVATE>
 
 : mailbox-peek ( mailbox -- obj )
-    mailbox-data peek-front ;
+    mailbox-data peek-back ;
 
 : mailbox-get-timeout ( mailbox timeout -- obj )
-    block-if-empty mailbox-data pop-front ;
+    block-if-empty mailbox-data pop-back ;
 
 : mailbox-get ( mailbox -- obj )
     f mailbox-get-timeout ;
@@ -68,13 +68,13 @@ PRIVATE>
     mailbox-data delete-node-if ; inline
 
 : mailbox-get? ( pred mailbox -- obj )
-    f mailbox-timeout-get? ;
+    f mailbox-timeout-get? ; inline
 
 TUPLE: linked error thread ;
 
-: <linked> self linked construct-boa ;
+C: <linked> linked
 
-GENERIC: send ( message thread -- )
+GENERIC: send ( message process -- )
 
 : mailbox-of ( thread -- mailbox )
     dup thread-mailbox [ ] [
@@ -94,7 +94,7 @@ M: thread send ( message thread -- )
 : receive-if ( pred -- message )
     mailbox mailbox-get? ?linked ; inline
 
-: rethrow-linked ( error supervisor -- )
+: rethrow-linked ( error process supervisor -- )
     >r <linked> r> send ;
 
 : spawn-linked-to ( quot name mailbox -- thread )
@@ -115,9 +115,13 @@ TUPLE: reply data tag ;
     synchronous-tag \ reply construct-boa ;
 
 : send-synchronous ( message thread -- reply )
-    >r <synchronous> dup r> send
-    [ over reply? [ reply-tag = ] [ 2drop f ] if ] curry
-    receive-if reply-data ;
+    >r <synchronous> dup r> send [
+        over reply? [
+            >r reply-tag r> synchronous-tag =
+        ] [
+            2drop f
+        ] if
+    ] curry receive-if reply-data ;
 
 : reply-synchronous ( message synchronous -- )
     [ <reply> ] keep synchronous-sender send ;

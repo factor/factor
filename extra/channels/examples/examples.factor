@@ -28,7 +28,7 @@ IN: channels.examples
     [let | p [ c from ] 
            newc [ <channel> ] |
         p prime to
-        [ newc p c filter ] spawn drop
+        [ newc p c filter ] "Filter" spawn drop
         prime newc (sieve)
     ] ;
 

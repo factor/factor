@@ -32,7 +32,7 @@ SYMBOL: no-channel
     receive [
         {
             { { to ?id ?value  }
-            [ ?value ?id get-channel [ to f ] [ no-channel ] if* ] }
+            [ ?value ?id get-channel dup [ to f ] [ 2drop no-channel ] if ] }
             { { from ?id }
             [ ?id get-channel [ from ] [ no-channel ] if* ] }
         } match-cond
@@ -43,7 +43,7 @@ PRIVATE>
 : start-channel-node ( -- )
     "remote-channels" get-process [
         "remote-channels" 
-        [ channel-process ] "Remote channels" spawn-server
+        [ channel-process t ] "Remote channels" spawn-server
         register-process 
     ] unless ;
 

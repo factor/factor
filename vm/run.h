@@ -56,7 +56,11 @@ typedef enum {
 
 	STAGE2_ENV          = 39, /* have we bootstrapped? */
 
-	CURRENT_THREAD_ENV  = 40
+	CURRENT_THREAD_ENV  = 40,
+
+	THREADS_ENV         = 41,
+	RUN_QUEUE_ENV       = 42,
+	SLEEP_QUEUE_ENV     = 43,
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV

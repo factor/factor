@@ -5,9 +5,13 @@ concurrency.conditions ;
 IN: concurrency.locks
 
 ! Simple critical sections
-TUPLE: lock threads owner ;
+TUPLE: lock threads owner reentrant? ;
 
-: <lock> <dlist> lock construct-boa ;
+: <lock> ( -- lock )
+    <dlist> f f lock construct-boa ;
+
+: <reentrant-lock> ( -- lock )
+    <dlist> f t lock construct-boa ;
 
 <PRIVATE
 
@@ -21,16 +25,24 @@ TUPLE: lock threads owner ;
     lock-threads notify-1 ;
 
 : do-lock ( lock timeout quot acquire release -- )
-    >r >r pick r> call over r> curry [ ] cleanup ; inline
+    >r swap compose pick >r 2curry r> r> curry [ ] cleanup ;
+    inline
+
+: (with-lock) ( lock timeout quot -- )
+    [ acquire-lock ] [ release-lock ] do-lock ; inline
 
 PRIVATE>
 
 : with-lock ( lock timeout quot -- )
-    [ acquire-lock ] [ release-lock ] do-lock ; inline
-
-: with-reentrant-lock ( lock timeout quot -- )
-    over lock-owner self eq?
-    [ nip call ] [ with-lock ] if ; inline
+    pick lock-reentrant? [
+        pick lock-owner self eq? [
+            2nip call
+        ] [
+            (with-lock)
+        ] if
+    ] [
+        (with-lock)
+    ] if ; inline
 
 ! Many-reader/single-writer locks
 TUPLE: rw-lock readers writers reader# writer ;
@@ -40,8 +52,8 @@ TUPLE: rw-lock readers writers reader# writer ;
 
 <PRIVATE
 
-: acquire-read-lock ( timeout lock -- )
-    dup rw-lock-writer
+: acquire-read-lock ( lock timeout -- )
+    over rw-lock-writer
     [ 2dup >r rw-lock-readers r> wait ] when drop
     dup rw-lock-reader# 1+ swap set-rw-lock-reader# ;
 
@@ -52,8 +64,8 @@ TUPLE: rw-lock readers writers reader# writer ;
     dup rw-lock-reader# 1- dup pick set-rw-lock-reader#
     zero? [ notify-writer ] [ drop ] if ;
 
-: acquire-write-lock ( lock -- )
-    dup rw-lock-writer over rw-lock-reader# 0 > or
+: acquire-write-lock ( lock timeout -- )
+    over rw-lock-writer pick rw-lock-reader# 0 > or
     [ 2dup >r rw-lock-writers r> wait ] when drop
     self swap set-rw-lock-writer ;
 
@@ -62,7 +74,7 @@ TUPLE: rw-lock readers writers reader# writer ;
     dup rw-lock-readers dlist-empty?
     [ notify-writer ] [ rw-lock-readers notify-all ] if ;
 
-: do-recursive-rw-lock ( lock timeout quot quot' -- )
+: do-reentrant-rw-lock ( lock timeout quot quot' -- )
     >r pick rw-lock-writer self eq? [ 2nip call ] r> if ; inline
 
 PRIVATE>
@@ -70,9 +82,9 @@ PRIVATE>
 : with-read-lock ( lock timeout quot -- )
     [
         [ acquire-read-lock ] [ release-read-lock ] do-lock
-    ] do-recursive-rw-lock ; inline
+    ] do-reentrant-rw-lock ; inline
 
 : with-write-lock ( lock timeout quot -- )
     [
         [ acquire-write-lock ] [ release-write-lock ] do-lock
-    ] do-recursive-rw-lock ; inline
+    ] do-reentrant-rw-lock ; inline

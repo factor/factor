@@ -17,19 +17,24 @@ mailbox variables ;
 : self ( -- thread ) 40 getenv ; inline
 
 ! Thread-local storage
-: tnamespace ( -- assoc ) self thread-variables ;
+: tnamespace ( -- assoc )
+    self dup thread-variables
+    [ ] [ H{ } clone dup rot set-thread-variables ] ?if ;
 
-: tget ( key -- value ) tnamespace at ;
+: tget ( key -- value )
+    self thread-variables at ;
 
-: tset ( value key -- ) tnamespace set-at ;
+: tset ( value key -- )
+    tnamespace set-at ;
 
-: tchange ( key quot -- ) tnamespace change-at ; inline
+: tchange ( key quot -- )
+    tnamespace change-at ; inline
 
-SYMBOL: threads
+: threads 41 getenv ;
 
 threads global [ H{ } assoc-like ] change-at
 
-: thread ( id -- thread ) threads get-global at ;
+: thread ( id -- thread ) threads at ;
 
 <PRIVATE
 
@@ -44,46 +49,46 @@ threads global [ H{ } assoc-like ] change-at
 : register-thread ( thread -- )
     check-unregistered
     t over set-thread-registered?
-    dup thread-id threads get-global set-at ;
+    dup thread-id threads set-at ;
 
 : unregister-thread ( thread -- )
     check-registered
     f over set-thread-registered?
-    thread-id threads get-global delete-at ;
+    thread-id threads delete-at ;
 
 : set-self ( thread -- ) 40 setenv ; inline
 
 PRIVATE>
 
 : <thread> ( quot name error-handler -- thread )
-    \ thread counter H{ } clone {
+    \ thread counter {
         set-thread-quot
         set-thread-name
         set-thread-error-handler
         set-thread-id
-        set-thread-variables
     } \ thread construct ;
 
-SYMBOL: run-queue
-SYMBOL: sleep-queue
+: run-queue 42 getenv ;
+
+: sleep-queue 43 getenv ;
 
 : resume ( thread -- )
-    check-registered run-queue get-global push-front ;
+    check-registered run-queue push-front ;
 
 : resume-with ( obj thread -- )
-    check-registered 2array run-queue get-global push-front ;
+    check-registered 2array run-queue push-front ;
 
 <PRIVATE
 
 : schedule-sleep ( thread ms -- )
-    >r check-registered r> sleep-queue get-global heap-push ;
+    >r check-registered r> sleep-queue heap-push ;
 
 : wake-up? ( heap -- ? )
     dup heap-empty?
     [ drop f ] [ heap-peek nip millis <= ] if ;
 
 : wake-up ( -- )
-    sleep-queue get-global
+    sleep-queue
     [ dup wake-up? ] [ dup heap-pop drop resume ] [ ] while
     drop ;
 
@@ -92,7 +97,7 @@ SYMBOL: sleep-queue
         continue
     ] [
         wake-up
-        run-queue get-global pop-back
+        run-queue pop-back
         dup array? [ first2 ] [ f swap ] if dup set-self
         dup thread-continuation
         f rot set-thread-continuation
@@ -103,9 +108,9 @@ PRIVATE>
 
 : sleep-time ( -- ms )
     {
-        { [ run-queue get-global dlist-empty? not ] [ 0 ] }
-        { [ sleep-queue get-global heap-empty? ] [ f ] }
-        { [ t ] [ sleep-queue get-global heap-peek nip millis [-] ] }
+        { [ run-queue dlist-empty? not ] [ 0 ] }
+        { [ sleep-queue heap-empty? ] [ f ] }
+        { [ t ] [ sleep-queue heap-peek nip millis [-] ] }
     } cond ;
 
 : stop ( -- )
@@ -160,9 +165,9 @@ PRIVATE>
 <PRIVATE
 
 : init-threads ( -- )
-    <dlist> run-queue set-global
-    <min-heap> sleep-queue set-global
-    H{ } clone threads set-global
+    H{ } clone 41 setenv
+    <dlist> 42 setenv
+    <min-heap> 43 setenv
     initial-thread global
     [ drop f "Initial" [ die ] <thread> ] cache
     f over set-thread-continuation

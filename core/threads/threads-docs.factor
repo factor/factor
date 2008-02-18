@@ -6,6 +6,7 @@ IN: threads
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
 "Spawning new threads:"
 { $subsection spawn }
+{ $subsection spawn-server }
 "Creating and spawning a thread can be factored out into two separate steps:"
 { $subsection <thread> }
 { $subsection (spawn) }
@@ -42,7 +43,9 @@ ARTICLE: "thread-impl" "Thread implementation"
 { $subsection sleep-queue } ;
 
 ARTICLE: "threads" "Lightweight co-operative threads"
-"Factor supports lightweight co-operative threads implemented on top of continuations. A thread will yield while waiting for I/O operations to complete, or when a yield has been explicitly requested."
+"Factor supports lightweight co-operative threads implemented on top of continuations. A thread will yield while waiting for input/output operations to complete, or when a yield has been explicitly requested."
+$nl
+"Factor threads are very lightweight. Each thread can take as little as 900 bytes of memory. This library has been tested running hundreds of thousands of simple threads."
 $nl
 "Words for working with threads are in the " { $vocab-link "threads" } " vocabulary."
 { $subsection "threads-start/stop" }
@@ -112,9 +115,17 @@ HELP: spawn
 { $values { "quot" quotation } { "name" string } }
 { $description "Spawns a new thread. The thread begins executing the given quotation; the name is for debugging purposes. The new thread begins running immediately and the current thread is added to the end of the run queue."
 $nl
-"The new thread begins with an empty data stack, an empty catch stack and a name stack containing the global namespace only. This means that the only way to pass data to the new thread is to explicitly construct a quotation containing the data, for example using " { $link curry } " or " { $link compose } "." }
+"The new thread begins with an empty data stack, an empty catch stack, and a name stack containing the global namespace only. This means that the only way to pass data to the new thread is to explicitly construct a quotation containing the data, for example using " { $link curry } " or " { $link compose } "." }
 { $examples
     { $code "1 2 [ + . ] 2curry \"Addition thread\" spawn" }
+} ;
+
+HELP: spawn-server
+{ $values { "quot" "a quotation with stack effect " { $snippet "( -- ? )" } } { "name" string } }
+{ $description "Convenience wrapper around " { $link spawn } " which repeatedly calls the quotation in a new thread until it outputs " { $link f } "." }
+{ $examples
+    "A thread that runs forever:"
+    { $code "[ do-foo-bar t ] \"Foo bar server\" spawn-server" }
 } ;
 
 HELP: init-threads

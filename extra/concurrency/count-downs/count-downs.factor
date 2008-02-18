@@ -8,25 +8,32 @@ IN: concurrency.count-downs
 
 TUPLE: count-down n promise ;
 
+: count-down-check ( count-down -- )
+    dup count-down-n zero? [
+        t swap count-down-promise fulfill
+    ] [ drop ] if ;
+
 : <count-down> ( n -- count-down )
-    <dlist> count-down construct-boa ;
+    dup 0 < [ "Invalid count for count down" throw ] when
+    <promise> \ count-down construct-boa
+    dup count-down-check ;
 
 : count-down ( count-down -- )
     dup count-down-n dup zero? [
         "Count down already done" throw
     ] [
-        1- dup pick set-count-down-n
-        zero? [
-            t swap count-down-promise fulfill
-        ] [ drop ] if
+        1- over set-count-down-n
+        count-down-check
     ] if ;
 
 : await-timeout ( count-down timeout -- )
     >r count-down-promise r> ?promise-timeout drop ;
 
-: spawn-stage ( quot name count-down -- )
-    count-down-promise
-    promise-mailbox spawn-linked-to drop ;
-
 : await ( count-down -- )
     f await-timeout ;
+
+: spawn-stage ( quot count-down -- )
+    [ [ count-down ] curry compose ] keep
+    "Count down stage"
+    swap count-down-promise
+    promise-mailbox spawn-linked-to drop ;

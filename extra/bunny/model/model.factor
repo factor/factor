@@ -17,7 +17,7 @@ IN: bunny.model
         } cond (parse-model)
     ] when* ;
 
-: parse-model ( stream -- vs is )
+: parse-model ( -- vs is )
     100000 <vector> 100000 <vector> (parse-model) ;
 
 : n ( vs triple -- n )
