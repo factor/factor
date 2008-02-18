@@ -84,10 +84,3 @@ TUPLE: process* arguments stdin stdout stderr timeout ;
 USING: bootstrap.image bootstrap.image.download io.streams.null ;
 
 : retrieve-image ( -- ) [ my-arch download-image ] with-null-stream ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: copy-image ( -- )
-  "../../factor/" my-arch boot-image-name append
-  my-arch boot-image-name
-  copy-file ;
