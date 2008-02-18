@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel concurrency.threads ;
+USING: kernel threads ;
 IN: concurrency.exchangers
 
 ! Motivated by

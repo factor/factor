@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: dlists kernel concurrency.threads continuations math ;
+USING: dlists kernel threads continuations math ;
 IN: concurrency.locks
 
 ! Simple critical sections

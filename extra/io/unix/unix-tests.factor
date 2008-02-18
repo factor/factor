@@ -1,6 +1,6 @@
-USING: io.files io.sockets io kernel threads namespaces
-tools.test continuations strings byte-arrays sequences
-prettyprint system ;
+USING: io.files io.sockets io kernel threads
+namespaces tools.test continuations strings byte-arrays
+sequences prettyprint system ;
 IN: temporary
 
 ! Unix domain stream sockets

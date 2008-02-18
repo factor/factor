@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math system dlists namespaces assocs init
-concurrency.threads io.streams.duplex ;
+threads io.streams.duplex ;
 IN: io.timeouts
 
 TUPLE: lapse entry timeout cutoff ;

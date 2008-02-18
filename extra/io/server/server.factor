@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.sockets io.files logging continuations kernel
 math math.parser namespaces parser sequences strings
-prettyprint debugger quotations calendar qualified ;
-QUALIFIED: concurrency
+prettyprint debugger quotations calendar
+threads concurrency.futures ;
 
 IN: io.server
 
@@ -20,7 +20,7 @@ LOG: accepted-connection NOTICE
 : accept-loop ( server quot -- )
     [
         >r accept r> [ with-client ] 2curry
-        concurrency:spawn drop
+        "Client" spawn drop
     ] 2keep accept-loop ; inline
 
 : server-loop ( server quot -- )
@@ -42,7 +42,7 @@ SYMBOL: servers
 : with-server ( seq service quot -- )
     [
         V{ } clone servers set
-        [ spawn-server ] curry concurrency:parallel-each
+        [ spawn-server ] curry parallel-each
     ] curry with-logging ; inline
 
 : stop-server ( -- )
@@ -65,5 +65,5 @@ SYMBOL: servers
 
 : with-datagrams ( seq service quot -- )
     [
-        [ swap spawn-datagrams ] curry concurrency:parallel-each
+        [ swap spawn-datagrams ] curry parallel-each
     ] curry with-logging ; inline

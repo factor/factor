@@ -1,4 +1,5 @@
-USING: concurrency kernel tools.time math sequences ;
+USING: threads concurrency.messaging kernel
+tools.time math sequences ;
 IN: benchmark.ring
 
 SYMBOL: done
@@ -7,7 +8,7 @@ SYMBOL: done
     receive 2dup swap send done eq? [ tunnel ] unless ;
 
 : create-ring ( processes -- target )
-    self swap [ [ tunnel ] spawn nip ] times ;
+    self swap [ [ tunnel ] "Tunnel" spawn nip ] times ;
 
 : send-messages ( messages target -- )
     dupd [ send ] curry each [ receive drop ] times ; 
@@ -22,4 +23,3 @@ SYMBOL: done
     1000 1000 ring-bench ;
 
 MAIN: main-ring-bench
-

@@ -3,7 +3,7 @@
 USING: arrays assocs combinators continuations documents
 ui.tools.workspace hashtables io io.styles kernel math
 math.vectors models namespaces parser prettyprint quotations
-sequences sequences.lib strings concurrency.threads listener
+sequences sequences.lib strings threads listener
 tuples ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
 definitions ;
@@ -88,12 +88,12 @@ M: interactor model-changed
     ] unless drop ;
 
 : interactor-yield ( interactor -- obj )
-    dup gadget-graft-state first [
+    ! dup gadget-graft-state first [
         f over set-interactor-busy?
-        [ set-interactor-thread ] curry suspend
-    ] [
-        drop f
-    ] if ;
+        [ set-interactor-thread ] curry suspend ;
+    ! ] [
+    !     drop f
+    ! ] if ;
 
 M: interactor stream-readln
     [ interactor-yield ] keep interactor-finish ?first ;

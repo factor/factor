@@ -1,18 +1,22 @@
-USING: concurrency.threads io.files io.monitors init kernel
-tools.browser ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: threads io.files io.monitors init kernel
+tools.browser namespaces continuations ;
 IN: vocabs.monitor
 
 ! Use file system change monitoring to flush the tags/authors
 ! cache
-: (monitor-thread) ( monitor -- )
-    dup next-change 2drop reset-cache (monitor-thread) ;
+SYMBOL: vocab-monitor
 
 : monitor-thread ( -- )
-    "" resource-path t <monitor> (monitor-thread) ;
+    vocab-monitor get-global next-change 2drop reset-cache ;
 
 : start-monitor-thread
     #! Silently ignore errors during monitor creation since
     #! monitors are not supported on all platforms.
-    [ monitor-thread ] "Vocabulary monitor" spawn drop ;
+    [
+        "" resource-path t <monitor> vocab-monitor set-global
+        [ monitor-thread t ] "Vocabulary monitor" spawn-server drop
+    ] [ drop ] recover ;
 
 [ start-monitor-thread ] "vocabs.monitor" add-init-hook

@@ -1,9 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien generic assocs kernel kernel.private math
-io.nonblocking sequences strings structs sbufs threads unix
-vectors io.buffers io.backend io.streams.duplex math.parser
-continuations system libc qualified namespaces io.timeouts ;
+io.nonblocking sequences strings structs sbufs
+threads unix vectors io.buffers io.backend
+io.streams.duplex math.parser continuations system libc
+qualified namespaces io.timeouts ;
 QUALIFIED: io
 IN: io.unix.backend
 

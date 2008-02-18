@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel concurrency threads vectors arrays sequences
+USING: kernel threads vectors arrays sequences
 namespaces tools.test continuations dlists strings math words
 match quotations concurrency.private ;
 IN: temporary

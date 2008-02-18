@@ -6,7 +6,7 @@ kernel models namespaces parser quotations sequences ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
-prettyprint listener debugger concurrency.threads ;
+prettyprint listener debugger threads ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;

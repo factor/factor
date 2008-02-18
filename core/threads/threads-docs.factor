@@ -1,7 +1,7 @@
 USING: help.markup help.syntax kernel kernel.private io
-concurrency.threads.private continuations dlists init
-quotations strings assocs heaps ;
-IN: concurrency.threads
+threads.private continuations dlists init quotations strings
+assocs heaps ;
+IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
 "Spawning new threads:"
@@ -44,7 +44,7 @@ ARTICLE: "thread-impl" "Thread implementation"
 ARTICLE: "threads" "Lightweight co-operative threads"
 "Factor supports lightweight co-operative threads implemented on top of continuations. A thread will yield while waiting for I/O operations to complete, or when a yield has been explicitly requested."
 $nl
-"Words for working with threads are in the " { $vocab-link "concurrency.threads" } " vocabulary."
+"Words for working with threads are in the " { $vocab-link "threads" } " vocabulary."
 { $subsection "threads-start/stop" }
 { $subsection "threads-yield" }
 { $subsection "thread-state" }

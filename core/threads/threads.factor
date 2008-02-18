@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: concurrency.threads
+IN: threads
 USING: arrays hashtables heaps kernel kernel.private math
 namespaces sequences vectors continuations continuations.private
 dlists assocs system combinators debugger prettyprint io init ;
@@ -53,6 +53,8 @@ threads global [ H{ } assoc-like ] change-at
 
 : set-self ( thread -- ) 40 setenv ; inline
 
+PRIVATE>
+
 : <thread> ( quot name error-handler -- thread )
     \ thread counter H{ } clone {
         set-thread-quot
@@ -61,8 +63,6 @@ threads global [ H{ } assoc-like ] change-at
         set-thread-id
         set-thread-variables
     } \ thread construct ;
-
-PRIVATE>
 
 SYMBOL: run-queue
 SYMBOL: sleep-queue
@@ -149,7 +149,13 @@ PRIVATE>
     ] <thread>
     [ (spawn) ] keep ;
 
-: in-thread ( quot -- ) "Thread" spawn drop ;
+: spawn-server ( quot name -- thread )
+    >r [ [ ] [ ] while ] curry r> spawn ;
+
+: in-thread ( quot -- )
+    >r datastack namestack r>
+    [ >r set-namestack set-datastack r> call ] 3curry
+    "Thread" spawn drop ;
 
 <PRIVATE
 
@@ -169,4 +175,4 @@ thread-error-hook set-global
 
 PRIVATE>
 
-[ init-threads ] "concurrency.threads" add-init-hook
+[ init-threads ] "threads" add-init-hook

@@ -1,4 +1,4 @@
-USING: namespaces io tools.test concurrency.threads kernel ;
+USING: namespaces io tools.test threads kernel ;
 IN: temporary
 
 3 "x" set

@@ -3,7 +3,8 @@
 !
 ! Remote Channels
 USING: kernel init namespaces assocs arrays random
-sequences channels match concurrency concurrency.distributed ;
+sequences channels match concurrency.messaging
+concurrency.distributed ;
 IN: channels.remote
 
 <PRIVATE
@@ -40,8 +41,10 @@ SYMBOL: no-channel
 PRIVATE>
 
 : start-channel-node ( -- )
-    "remote-channels" get-process [ 
-      [ channel-process ] spawn "remote-channels" swap register-process 
+    "remote-channels" get-process [
+      "remote-channels" 
+      [ channel-process ] "Remote channels" spawn
+      register-process 
     ] unless ;
 
 TUPLE: remote-channel node id ;

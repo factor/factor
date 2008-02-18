@@ -5,7 +5,7 @@ effects generator.fixup generator.registers generic hashtables
 inference inference.backend inference.dataflow io kernel
 kernel.private layouts math namespaces optimizer
 optimizer.specializers prettyprint quotations sequences system
-concurrency.threads words vectors ;
+threads words vectors ;
 IN: generator
 
 SYMBOL: compile-queue

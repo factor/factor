@@ -4,14 +4,14 @@
 ! Concurrency library for Factor based on Erlang/Termite style
 ! concurrency.
 IN: concurrency.messaging
-USING: dlists concurrency.threads sequences continuations
+USING: dlists threads sequences continuations
 namespaces random math quotations words kernel arrays assocs
 init system ;
 
 TUPLE: mailbox threads data ;
 
 : <mailbox> ( -- mailbox )
-    <dlist> <dlist> mailbox construct-boa ;
+    <dlist> <dlist> \ mailbox construct-boa ;
 
 : mailbox-empty? ( mailbox -- bool )
     mailbox-data dlist-empty? ;
@@ -52,16 +52,16 @@ PRIVATE>
     block-if-empty mailbox-data pop-front ;
 
 : mailbox-get ( mailbox -- obj )
-    f mailbox-timeout-get ;
+    f mailbox-get-timeout ;
 
 : mailbox-get-all-timeout ( mailbox timeout -- array )
-    (mailbox-block-if-empty)
+    block-if-empty
     [ dup mailbox-empty? ]
     [ dup mailbox-data pop-back ]
     [ ] unfold nip ;
 
 : mailbox-get-all ( mailbox -- array )
-    f mailbox-timeout-get-all ;
+    f mailbox-get-all-timeout ;
 
 : while-mailbox-empty ( mailbox quot -- )
     over mailbox-empty? [
@@ -71,7 +71,7 @@ PRIVATE>
     ] if ; inline
 
 : mailbox-timeout-get? ( pred mailbox timeout -- obj )
-    [ (mailbox-block-unless-pred) ] 3keep drop
+    [ block-unless-pred ] 3keep drop
     mailbox-data delete-node-if ; inline
 
 : mailbox-get? ( pred mailbox -- obj )
@@ -83,12 +83,17 @@ TUPLE: linked error thread ;
 
 GENERIC: send ( message thread -- )
 
+: mailbox-of ( thread -- mailbox )
+    dup thread-mailbox [ ] [
+        <mailbox> dup rot set-thread-mailbox
+    ] ?if ;
+
 M: thread send ( message thread -- )
-    thread-mailbox mailbox-put ;
+    mailbox-of mailbox-put ;
 
 : ?linked dup linked? [ rethrow ] when ;
 
-: mailbox self thread-mailbox ;
+: mailbox self mailbox-of ;
 
 : receive ( -- message )
     mailbox mailbox-get ?linked ;
@@ -118,4 +123,4 @@ TUPLE: reply data tag ;
     receive-if reply-data ;
 
 : reply-synchronous ( message synchronous -- )
-    [ <reply> ] keep synchronous-sender reply ;
+    [ <reply> ] keep synchronous-sender send ;

@@ -1,7 +1,7 @@
 USING: alien alien.c-types arrays assocs combinators
 continuations destructors io io.backend io.nonblocking
 io.windows libc kernel math namespaces sequences
-concurrency.threads tuples.lib windows windows.errors
+threads tuples.lib windows windows.errors
 windows.kernel32 strings splitting io.files qualified ascii
 combinators.lib ;
 QUALIFIED: windows.winsock

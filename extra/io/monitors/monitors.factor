@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend kernel continuations namespaces sequences
-assocs hashtables sorting arrays concurrency.threads ;
+assocs hashtables sorting arrays threads ;
 IN: io.monitors
 
 <PRIVATE
