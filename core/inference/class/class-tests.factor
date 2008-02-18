@@ -283,3 +283,8 @@ cell-bits 32 = [
     [ B{ 1 0 } *short dup number? [ 0 number= ] [ drop f ] if ]
     \ number= inlined?
 ] unit-test
+
+[ t ] [
+    [ HEX: ff bitand 0 HEX: ff between? ]
+    \ >= inlined?
+] unit-test

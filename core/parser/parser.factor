@@ -119,22 +119,43 @@ M: bad-escape summary drop "Bad escape code" ;
         { CHAR: \" CHAR: \" }
     } at [ bad-escape ] unless* ;
 
-: next-escape ( m str -- n ch )
-    2dup nth CHAR: u =
-    [ >r 1+ dup 6 + tuck r> subseq hex> ]
-    [ over 1+ -rot nth escape ] if ;
+SYMBOL: name>char-hook
 
-: next-char ( m str -- n ch )
-    2dup nth CHAR: \\ =
-    [ >r 1+ r> next-escape ] [ over 1+ -rot nth ] if ;
+name>char-hook global [
+    [ "Unicode support not available" throw ] or
+] change-at
 
-: (parse-string) ( m str -- n )
-    2dup nth CHAR: " =
-    [ drop 1+ ] [ [ next-char , ] keep (parse-string) ] if ;
+: unicode-escape ( str -- ch str' )
+    "{" ?head-slice [
+        CHAR: } over index cut-slice
+        >r >string name>char-hook get call r>
+        1 tail-slice
+    ] [
+        6 cut-slice >r hex> r>
+    ] if ;
+
+: next-escape ( str -- ch str' )
+    "u" ?head-slice [
+        unicode-escape
+    ] [
+        unclip-slice escape swap
+    ] if ;
+
+: (parse-string) ( str -- m )
+    dup [ "\"\\" member? ] find dup [
+        >r cut-slice >r % r> 1 tail-slice r>
+        dup CHAR: " = [
+            drop slice-from
+        ] [
+            drop next-escape >r , r> (parse-string)
+        ] if
+    ] [
+        "Unterminated string" throw
+    ] if ;
 
 : parse-string ( -- str )
     lexer get [
-        [ (parse-string) ] "" make swap
+        [ swap tail-slice (parse-string) ] "" make swap
     ] change-column ;
 
 TUPLE: parse-error file line col text ;
@@ -492,4 +513,4 @@ SYMBOL: interactive-vocabs
     [
         parser-notes off
         [ [ eval ] keep ] try drop
-    ] string-out ;
+    ] with-string-writer ;

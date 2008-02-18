@@ -11,7 +11,7 @@ SYMBOL: insomniac-recipients
 
 : ?analyze-log ( service word-names -- string/f )
     >r log-path 1 log# dup exists? [
-        file-lines r> [ analyze-log ] string-out
+        file-lines r> [ analyze-log ] with-string-writer
     ] [
         r> 2drop f
     ] if ;

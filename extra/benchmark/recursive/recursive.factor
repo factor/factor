@@ -16,7 +16,7 @@ USING: math kernel hints prettyprint io ;
     ] if ;
 
 : tak ( x y z -- t )
-    pick pick swap < [
+    2over swap < [
         [ rot 1- -rot tak ] 3keep
         [ -rot 1- -rot tak ] 3keep
         1- -rot tak

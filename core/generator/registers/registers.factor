@@ -504,7 +504,7 @@ M: loc lazy-store
 : substitute-vregs ( values vregs -- )
     [ vreg-substitution ] 2map
     [ substitute-vreg? ] assoc-subset >hashtable
-    [ swap substitute ] curry each-phantom ;
+    [ substitute-here ] curry each-phantom ;
 
 : set-operand ( value var -- )
     >r dup constant? [ constant-value ] when r> set ;

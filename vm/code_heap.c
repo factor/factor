@@ -18,22 +18,37 @@ INLINE CELL get_literal(CELL literals_start, CELL num)
 void *get_rel_symbol(F_REL *rel, CELL literals_start)
 {
 	CELL arg = REL_ARGUMENT(rel);
-	F_SYMBOL *symbol = alien_offset(get_literal(literals_start,arg));
+	CELL symbol = get_literal(literals_start,arg);
 	CELL library = get_literal(literals_start,arg + 1);
+
 	F_DLL *dll = (library == F ? NULL : untag_dll(library));
 
 	if(dll != NULL && !dll->dll)
 		return undefined_symbol;
 
-	if(!symbol)
-		return undefined_symbol;
+	if(type_of(symbol) == BYTE_ARRAY_TYPE)
+	{
+		F_SYMBOL *name = alien_offset(symbol);
+		void *sym = ffi_dlsym(dll,name);
 
-	void *sym = ffi_dlsym(dll,symbol);
+		if(sym)
+			return sym;
+	}
+	else if(type_of(symbol) == ARRAY_TYPE)
+	{
+		CELL i;
+		F_ARRAY *names = untag_object(symbol);
+		for(i = 0; i < array_capacity(names); i++)
+		{
+			F_SYMBOL *name = alien_offset(array_nth(names,i));
+			void *sym = ffi_dlsym(dll,name);
 
-	if(sym)
-		return sym;
-	else
-		return undefined_symbol;
+			if(sym)
+				return sym;
+		}
+	}
+
+	return undefined_symbol;
 }
 
 /* Compute an address to store at a relocation */
@@ -303,9 +318,8 @@ void default_word_code(F_WORD *word, bool relocate)
 
 DEFINE_PRIMITIVE(modify_code_heap)
 {
+	bool rescan_code_heap = to_boolean(dpop());
 	F_ARRAY *alist = untag_array(dpop());
-
-	bool rescan_code_heap = false;
 
 	CELL count = untag_fixnum_fast(alist->capacity);
 	CELL i;
@@ -314,9 +328,6 @@ DEFINE_PRIMITIVE(modify_code_heap)
 		F_ARRAY *pair = untag_array(array_nth(alist,i));
 
 		F_WORD *word = untag_word(array_nth(pair,0));
-
-		if(word->vocabulary != F)
-			rescan_code_heap = true;
 
 		CELL data = array_nth(pair,1);
 

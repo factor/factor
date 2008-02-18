@@ -195,7 +195,7 @@ ARTICLE: "cookbook-io" "Input and output cookbook"
 }
 "Read 1024 bytes from a file:"
 { $code
-    "\"data.bin\" <file-reader> [ 1024 read ] with-stream"
+    "\"data.bin\" [ 1024 read ] with-file-reader"
 }
 "Convert a file of 4-byte cells from little to big endian or vice versa, by directly mapping it into memory:"
 { $code

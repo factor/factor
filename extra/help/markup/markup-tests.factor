@@ -16,7 +16,7 @@ TUPLE: blahblah quux ;
     test-slot blahblah $spec-reader-values
 ] unit-test
 
-[ "an int" ] [ [ { "int" } $instance ] string-out ] unit-test
+[ "an int" ] [ [ { "int" } $instance ] with-string-writer ] unit-test
 
 [ ] [ \ blahblah-quux help ] unit-test
 [ ] [ \ set-blahblah-quux help ] unit-test

@@ -78,7 +78,6 @@ SYMBOL: quad3
 ! Interface for streams
 
 TUPLE: utf8 ;
-: <utf8> utf8 construct-delegate ;
 INSTANCE: utf8 encoding-stream 
 
 M: utf8 encode-string drop encode-utf8 ;

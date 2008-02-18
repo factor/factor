@@ -101,7 +101,7 @@ HINTS: random fixnum ;
             n 3 * homo-sapiens-chars homo-sapiens-floats "IUB ambiguity codes" "TWO" write-random-fasta
             n 5 * IUB-chars IUB-floats "Homo sapiens frequency" "THREE" write-random-fasta
             drop
-        ] with-file-out
+        ] with-file-writer
 
     ] with-locals ;
 

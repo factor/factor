@@ -4,9 +4,9 @@ IN: temporary
 SYMBOL: mmap "mmap-test.txt" \ mmap set
 
 [ \ mmap get delete-file ] catch drop
-\ mmap get <file-writer> [
+\ mmap get [
     "Four" write
-] with-stream
+] with-file-writer
 
 \ mmap get [
     >r CHAR: R r> mmap-address 3 set-alien-unsigned-1

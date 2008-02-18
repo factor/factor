@@ -27,6 +27,6 @@ MEMO: any-char-parser ( -- parser )
   any-char-parser 2array choice repeat0 parse parse-result-ast [ ] subset ;
 
 : replace ( string parser -- result )
- [  (replace) [ tree-write ] each ] string-out ;
+ [  (replace) [ tree-write ] each ] with-string-writer ;
 
 

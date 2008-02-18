@@ -2,7 +2,7 @@ USING: arrays compiler generic hashtables inference kernel
 kernel.private math optimizer prettyprint sequences sbufs
 strings tools.test vectors words sequences.private quotations
 optimizer.backend classes inference.dataflow tuples.private
-continuations growable optimizer.inlining namespaces ;
+continuations growable optimizer.inlining namespaces hints ;
 IN: temporary
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
@@ -351,3 +351,28 @@ M: integer generic-inline-test ;
     \ generic-inline-test-1 word-def dataflow
     [ optimize-1 , optimize-1 , drop ] { } make
 ] unit-test
+
+! Forgot a recursive inline check
+: recursive-inline-hang ( a -- a )
+    dup array? [ recursive-inline-hang ] when ;
+
+HINTS: recursive-inline-hang array ;
+
+: recursive-inline-hang-1
+    { } recursive-inline-hang ;
+
+[ t ] [ \ recursive-inline-hang-1 compiled? ] unit-test
+
+DEFER: recursive-inline-hang-3
+
+: recursive-inline-hang-2 ( a -- a )
+    dup array? [ recursive-inline-hang-3 ] when ;
+
+HINTS: recursive-inline-hang-2 array ;
+
+: recursive-inline-hang-3 ( a -- a )
+    dup array? [ recursive-inline-hang-2 ] when ;
+
+HINTS: recursive-inline-hang-3 array ;
+
+

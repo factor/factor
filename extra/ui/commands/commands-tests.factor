@@ -27,5 +27,5 @@ testing "testing" "hey" {
 [ "C+x" ] [
     [
         { $command testing "testing" com-test-1 } print-element
-    ] string-out
+    ] with-string-writer
 ] unit-test

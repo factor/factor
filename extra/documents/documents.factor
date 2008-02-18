@@ -43,7 +43,7 @@ TUPLE: document locs ;
     ] if ;
 
 : each-line ( from to quot -- )
-    pick pick = [
+    2over = [
         3drop
     ] [
         >r [ first ] 2apply 1+ dup <slice> r> each

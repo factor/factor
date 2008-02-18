@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors io.streams.lines io.streams.plain
-namespaces unicode.syntax growable strings io classes io.streams.c
+namespaces unicode growable strings io classes io.streams.c
 continuations ;
 IN: io.encodings
 
@@ -19,7 +19,7 @@ SYMBOL: begin
     over push 0 begin ;
 
 : push-replacement ( buf -- buf ch state )
-    UNICHAR: replacement-character decoded ;
+    CHAR: replacement-character decoded ;
 
 : finish-decoding ( buf ch state -- str )
     begin eq? [ decode-error ] unless drop "" like ;
@@ -53,26 +53,16 @@ GENERIC: decode-step ( buf byte ch state encoding -- buf ch state )
     >r swap start-decoding r>
     decode-read-loop ;
 
-GENERIC: init-decoding ( stream encoding -- decoded-stream )
-
 : <decoding> ( stream decoding-class -- decoded-stream )
-    construct-empty init-decoding <line-reader> ;
-
-GENERIC: init-encoding ( stream encoding -- encoded-stream )
+    construct-delegate <line-reader> ;
 
 : <encoding> ( stream encoding-class -- encoded-stream )
-    construct-empty init-encoding <plain-writer> ;
+    construct-delegate <plain-writer> ;
 
 GENERIC: encode-string ( string encoding -- byte-array )
 M: tuple-class encode-string construct-empty encode-string ;
 
 MIXIN: encoding-stream
-
-M: encoding-stream init-decoding ( stream encoding-stream -- encoding-stream )
-    tuck set-delegate ;
-
-M: encoding-stream init-encoding ( stream encoding-stream -- encoding-stream )
-    tuck set-delegate ;
 
 M: encoding-stream stream-read1 1 swap stream-read ;
 
@@ -93,3 +83,13 @@ M: encoding-stream stream-write
     [ encode-string ] keep delegate stream-write ;
 
 M: encoding-stream dispose delegate dispose ;
+
+GENERIC: underlying-stream ( encoded-stream -- delegate )
+M: encoding-stream underlying-stream delegate ;
+
+GENERIC: set-underlying-stream ( new-underlying stream -- )
+M: encoding-stream set-underlying-stream set-delegate ;
+
+: set-encoding ( encoding stream -- ) ! This doesn't work now
+    [ underlying-stream swap construct-delegate ] keep
+    set-underlying-stream ;

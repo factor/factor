@@ -205,6 +205,3 @@ PRIVATE>
 
 : attempt-each ( seq quot -- result )
     (each) iterate-prep (attempt-each-integer) ; inline
-
-: replace ( seq old new -- newseq )
-    [ pick pick = [ 2nip ] [ 2drop ] if ] 2curry map ;

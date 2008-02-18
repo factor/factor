@@ -37,18 +37,15 @@ C: <ast-hashtable> ast-hashtable
 
 : identifier-middle? ( ch -- bool )
   [ blank? not ] keep
-  [ CHAR: } = not ] keep
-  [ CHAR: ] = not ] keep
-  [ CHAR: ;" = not ] keep
-  [ CHAR: " = not ] keep
+  [ "}];\"" member? not ] keep
   digit? not
-  and and and and and ;
+  and and ;
 
 MEMO: 'identifier-ends' ( -- parser )
   [
     [ blank? not ] keep
     [ CHAR: " = not ] keep
-    [ CHAR: ;" = not ] keep
+    [ CHAR: ; = not ] keep
     [ LETTER? not ] keep
     [ letter? not ] keep
     identifier-middle? not
@@ -368,7 +365,7 @@ M: quotation fjsc-parse ( object -- ast )
       (compile)
       ")" ,
     ] { } make [ write ] each
-  ] string-out ;
+  ] with-string-writer ;
 
 : fjsc-compile* ( string -- string )
   'statement' parse parse-result-ast fjsc-compile ;
@@ -382,5 +379,5 @@ M: quotation fjsc-parse ( object -- ast )
 : fjsc-literal ( ast -- string )
   [
     [ (literal) ] { } make [ write ] each
-  ] string-out ;
+  ] with-string-writer ;
 

@@ -26,7 +26,7 @@ SYMBOL: compiling-word
 
 SYMBOL: compiling-label
 
-SYMBOL: compiling-loop?
+SYMBOL: compiling-loops
 
 ! Label of current word, after prologue, makes recursion faster
 SYMBOL: current-label-start
@@ -34,7 +34,7 @@ SYMBOL: current-label-start
 : compiled-stack-traces? ( -- ? ) 36 getenv ;
 
 : begin-compiling ( word label -- )
-    compiling-loop? off
+    H{ } clone compiling-loops set
     compiling-label set
     compiling-word set
     compiled-stack-traces?
@@ -94,8 +94,8 @@ M: node generate-node drop iterate-next ;
 : generate-call ( label -- next )
     dup maybe-compile
     end-basic-block
-    dup compiling-label get eq? compiling-loop? get and [
-        drop current-label-start get %jump-label f
+    dup compiling-loops get at [
+        %jump-label f
     ] [
         tail-call? [
             %jump f
@@ -104,7 +104,7 @@ M: node generate-node drop iterate-next ;
             %call
             iterate-next
         ] if
-    ] if ;
+    ] ?if ;
 
 ! #label
 M: #label generate-node
@@ -113,17 +113,13 @@ M: #label generate-node
     r> ;
 
 ! #loop
+: compiling-loop ( word -- )
+    <label> dup resolve-label swap compiling-loops get set-at ;
+
 M: #loop generate-node
     end-basic-block
-    [
-        dup node-param compiling-label set
-        current-label-start define-label
-        current-label-start resolve-label
-        compiling-loop? on
-        node-child generate-nodes
-        end-basic-block
-    ] with-scope
-    init-templates
+    dup node-param compiling-loop
+    node-child generate-nodes
     iterate-next ;
 
 ! #if
@@ -269,5 +265,6 @@ M: #r> generate-node
 
 ! #return
 M: #return generate-node
-    node-param compiling-label get eq? compiling-loop? get and
-    [ end-basic-block %return ] unless f ;
+    end-basic-block
+    node-param compiling-loops get key?
+    [ %return ] unless f ;

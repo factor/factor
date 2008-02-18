@@ -57,8 +57,7 @@ IN: benchmark.knucleotide
 
 : knucleotide ( -- )
     "extra/benchmark/knucleotide/knucleotide-input.txt" resource-path
-    <file-reader>
-    [ read-input ] with-stream
+    [ read-input ] with-file-reader
     process-input ;
 
 MAIN: knucleotide

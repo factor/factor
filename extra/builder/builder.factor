@@ -1,13 +1,29 @@
 
-USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
-       arrays system continuations namespaces sequences splitting math.parser
-       prettyprint tools.time calendar bake vars http.client
-       combinators bootstrap.image bootstrap.image.download
-       combinators.cleave benchmark
-       classes strings quotations words parser-combinators new-slots accessors
-       assocs.lib smtp builder.util ;
+USING: kernel namespaces sequences splitting system combinators continuations
+       parser io io.files io.launcher io.sockets prettyprint threads
+       bootstrap.image benchmark vars bake smtp builder.util accessors ;
 
 IN: builder
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: builds-dir
+
+: builds ( -- path )
+  builds-dir get
+  home "/builds" append
+  or ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: prepare-build-machine ( -- )
+  builds make-directory
+  builds cd
+  { "git" "clone" "git://factorcode.org/git/factor.git" } run-process drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: builds-check ( -- ) builds exists? not [ prepare-build-machine ] when ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -19,7 +35,7 @@ VAR: stamp
 
 : enter-build-dir ( -- )
   datestamp >stamp
-  "/builds" cd
+  builds cd
   stamp> make-directory
   stamp> cd ;
 
@@ -28,7 +44,7 @@ VAR: stamp
 : git-id ( -- id )
   { "git" "show" } <process-stream> [ readln ] with-stream " " split second ;
 
-: record-git-id ( -- ) git-id "../git-id" [ . ] with-file-out ;
+: record-git-id ( -- ) git-id "../git-id" [ . ] with-file-writer ;
 
 : make-clean ( -- desc ) { "make" "clean" } ;
 
@@ -69,14 +85,22 @@ VAR: stamp
   
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+SYMBOL: build-status
+
 : (build) ( -- )
+
+  builds-check  
+
+  build-status off
 
   enter-build-dir
 
   "report" [
 
     "Build machine:   " write host-name print
-    "Build directory: " write cwd       print
+    "CPU:             " write cpu       print
+    "OS:              " write os        print
+    "Build directory: " write cwd       print nl
 
     git-clone [ "git clone failed" print ] run-or-bail
 
@@ -88,7 +112,7 @@ VAR: stamp
 
     make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
 
-    [ my-arch download-image ] [ "Image download error" print throw ] recover
+    [ retrieve-image ] [ "Image download error" print throw ] recover
 
     bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
@@ -98,30 +122,39 @@ VAR: stamp
 
     "Boot time: " write "../boot-time" eval-file milli-seconds>time print
     "Load time: " write "../load-time" eval-file milli-seconds>time print
-    "Test time: " write "../test-time" eval-file milli-seconds>time print
+    "Test time: " write "../test-time" eval-file milli-seconds>time print nl
 
     "Did not pass load-everything: " print "../load-everything-vocabs" cat
     "Did not pass test-all: "        print "../test-all-vocabs"        cat
 
     "Benchmarks: " print
-    "../benchmarks" [ stdio get contents eval ] with-file-in benchmarks.
+    "../benchmarks" [ stdio get contents eval ] with-file-reader benchmarks.
 
-  ] with-file-out ;
+  ] with-file-writer
+
+  build-status on ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: builder-from
 
 SYMBOL: builder-recipients
 
 : tag-subject ( str -- str ) { "builder@" host-name* ": " , } bake to-string ;
 
-: build ( -- )
-  [ (build) ] [ drop ] recover
+: subject ( -- str ) build-status get [ "report" ] [ "error" ] if tag-subject ;
+
+: send-builder-email ( -- )
   <email>
-    "ed@factorcode.org"     >>from
+    builder-from get        >>from
     builder-recipients get  >>to
-    "report" tag-subject    >>subject
+    subject                 >>subject
     "../report" file>string >>body
   send ;
+
+: build ( -- )
+  [ (build) ] [ drop ] recover
+  [ send-builder-email ] [ drop "not sending mail" . ] recover ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -141,8 +174,9 @@ SYMBOL: builder-recipients
   = not ;
 
 : build-loop ( -- )
+  builds-check
   [
-    "/builds/factor" cd
+    builds "/factor" append cd
     updates-available?
       [ build ]
     when

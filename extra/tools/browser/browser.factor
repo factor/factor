@@ -18,7 +18,7 @@ MEMO: (vocab-file-contents) ( path -- lines )
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-path+ [
         ?resource-path
-        [ [ print ] each ] with-file-out
+        [ [ print ] each ] with-file-writer
     ] [
         "The " swap vocab-name
         " vocabulary was not loaded from the file system"

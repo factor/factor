@@ -40,7 +40,7 @@ optimizer.inlining float-arrays sequences.private combinators ;
 : flip-branches ( #call -- #if )
     #! If a not is followed by an #if, flip branches and
     #! remove the not.
-    dup sole-consumer (flip-branches) [ ] splice-quot ;
+    dup sole-consumer (flip-branches) [ ] f splice-quot ;
 
 \ not {
     { [ dup flip-branches? ] [ flip-branches ] }
@@ -63,7 +63,7 @@ optimizer.inlining float-arrays sequences.private combinators ;
     [ [ t ] ] { } map>assoc [ drop f ] add [ nip case ] curry ;
 
 : expand-member ( #call -- )
-    dup node-in-d peek value-literal member-quot splice-quot ;
+    dup node-in-d peek value-literal member-quot f splice-quot ;
 
 \ member? {
     { [ dup literal-member? ] [ expand-member ] }

@@ -148,13 +148,13 @@ DEFER: name>user
     [ httpd ] in-thread drop ;
 
 : onigiri-dump ( path -- )
-    <file-writer> [
+    [
         [
             entry get-global serialize
             meta get-global serialize
             user get-global serialize
         ] with-serialized
-    ] with-stream ;
+    ] with-file-writer ;
 
 : onigiri-boot ( path -- )
     <file-reader> [

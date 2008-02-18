@@ -46,7 +46,3 @@ IN: unicode.syntax
 : CATEGORY-NOT:
     CREATE ";" parse-tokens
     categories swap seq-minus define-category ; parsing
-
-: UNICHAR:
-    ! This should be part of CHAR:. Also, name-map at ==> name>char
-    scan name>char [ parsed ] [ "Invalid character" throw ] if* ; parsing

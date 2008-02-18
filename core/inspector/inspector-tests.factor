@@ -8,4 +8,4 @@ f describe
 H{ } describe
 H{ } describe
 
-[ "fixnum instance\n" ] [ [ 3 describe ] string-out ] unit-test
+[ "fixnum instance\n" ] [ [ 3 describe ] with-string-writer ] unit-test

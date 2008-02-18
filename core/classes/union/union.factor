@@ -31,9 +31,7 @@ PREDICATE: class union-class
     ] if ;
 
 : define-union-predicate ( class -- )
-    dup predicate-word
-    over members union-predicate-quot
-    define-predicate ;
+    dup members union-predicate-quot define-predicate ;
 
 M: union-class update-predicate define-union-predicate ;
 
