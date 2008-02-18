@@ -63,6 +63,7 @@ DEFER: (flat-length)
 
 : inline-standard-method ( node word -- node )
     2dup dispatching-class dup [
+        over +inlined+ depends-on
         swap method method-word 1quotation f splice-quot
     ] [
         3drop t

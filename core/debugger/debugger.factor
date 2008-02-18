@@ -1,11 +1,11 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic hashtables inspector io kernel
 math namespaces prettyprint sequences assocs sequences.private
 strings io.styles vectors words system splitting math.parser
 tuples continuations continuations.private combinators
 generic.math io.streams.duplex classes compiler.units
-generic.standard ;
+generic.standard vocabs ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -254,3 +254,6 @@ M: no-compilation-unit error.
     "Attempting to define " write
     no-compilation-unit-definition pprint
     " outside of a compilation unit" print ;
+
+M: no-vocab summary
+    drop "Vocabulary does not exist" ;
