@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types parser threads words kernel.private
-kernel ;
+USING: alien alien.c-types parser concurrency.threads words
+kernel.private kernel ;
 IN: alien.remote-control
 
 : eval-callback

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend kernel continuations namespaces sequences
-assocs hashtables sorting arrays threads ;
+assocs hashtables sorting arrays concurrency.threads ;
 IN: io.monitors
 
 <PRIVATE
@@ -46,13 +46,13 @@ TUPLE: simple-monitor handle callback ;
 : notify-callback ( simple-monitor -- )
     dup simple-monitor-callback
     f rot set-simple-monitor-callback
-    [ schedule-thread ] when* ;
+    [ resume ] when* ;
 
 M: simple-monitor fill-queue ( monitor -- )
     dup simple-monitor-callback [
         "Cannot wait for changes on the same file from multiple threads" throw
     ] when
-    [ swap set-simple-monitor-callback stop ] callcc0
+    [ swap set-simple-monitor-callback ] suspend drop
     check-monitor ;
 
 M: simple-monitor dispose ( monitor -- )

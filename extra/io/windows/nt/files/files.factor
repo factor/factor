@@ -1,8 +1,8 @@
 USING: continuations destructors io.buffers io.files io.backend
 io.timeouts io.nonblocking io.windows io.windows.nt.backend
-kernel libc math threads windows windows.kernel32 alien.c-types
-alien.arrays sequences combinators combinators.lib sequences.lib
-ascii splitting alien strings assocs ;
+kernel libc math concurrency.threads windows windows.kernel32
+alien.c-types alien.arrays sequences combinators combinators.lib
+sequences.lib ascii splitting alien strings assocs ;
 IN: io.windows.nt.files
 
 M: windows-nt-io cwd

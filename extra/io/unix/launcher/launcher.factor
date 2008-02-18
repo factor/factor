@@ -124,4 +124,4 @@ M: unix-io process-stream*
     wait-for-processes [ 250 sleep ] when wait-loop ;
 
 : start-wait-thread ( -- )
-    [ wait-loop ] in-thread ;
+    [ wait-loop ] "Process reaper" spawn drop ;

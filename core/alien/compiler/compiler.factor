@@ -1,12 +1,12 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generator generator.registers generator.fixup
 hashtables kernel math namespaces sequences words
 inference.state inference.backend inference.dataflow system
 math.parser classes alien.arrays alien.c-types alien.structs
 alien.syntax cpu.architecture alien inspector quotations assocs
-kernel.private threads continuations.private libc combinators
-compiler.errors continuations ;
+kernel.private concurrency.threads continuations.private libc
+combinators compiler.errors continuations ;
 IN: alien.compiler
 
 ! Common protocol for alien-invoke/alien-callback/alien-indirect

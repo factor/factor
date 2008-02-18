@@ -1,4 +1,4 @@
-#define USER_ENV 40
+#define USER_ENV 64
 
 typedef enum {
 	NAMESTACK_ENV,            /* used by library only */
@@ -54,7 +54,9 @@ typedef enum {
 
 	STDERR_ENV          = 38, /* stderr FILE* handle */
 
-	STAGE2_ENV          = 39  /* have we bootstrapped? */
+	STAGE2_ENV          = 39, /* have we bootstrapped? */
+
+	CURRENT_THREAD_ENV  = 40
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV

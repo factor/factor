@@ -12,3 +12,5 @@ USE: io.windows.mmap
 USE: io.backend
 
 T{ windows-nt-io } set-io-backend
+
+"vocabs.monitor" require

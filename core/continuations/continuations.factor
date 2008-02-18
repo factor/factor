@@ -113,8 +113,13 @@ GENERIC: compute-restarts ( error -- seq )
 
 PRIVATE>
 
+SYMBOL: thread-error-hook
+
 : rethrow ( error -- * )
-    catchstack* empty? [ die ] when
+    catchstack* empty? [
+        thread-error-hook get-global
+        [ 1 (throw) ] [ die ] if*
+    ] when
     dup save-error c> continue-with ;
 
 : recover ( try recovery -- )

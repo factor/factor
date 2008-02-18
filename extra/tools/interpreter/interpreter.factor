@@ -3,7 +3,8 @@
 USING: arrays assocs classes combinators sequences.private
 continuations continuations.private generic hashtables io kernel
 kernel.private math namespaces namespaces.private prettyprint
-quotations sequences splitting strings threads vectors words ;
+quotations sequences splitting strings concurrency.threads
+vectors words ;
 IN: tools.interpreter
 
 : walk ( quot -- ) \ break add* call ;

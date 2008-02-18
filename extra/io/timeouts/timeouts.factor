@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math system dlists namespaces assocs init threads
-io.streams.duplex ;
+USING: kernel math system dlists namespaces assocs init
+concurrency.threads io.streams.duplex ;
 IN: io.timeouts
 
 TUPLE: lapse entry timeout cutoff ;
@@ -73,4 +73,7 @@ M: object timed-out drop ;
 : expiry-thread ( -- )
     expire-timeouts 5000 sleep expiry-thread ;
 
-[ [ expiry-thread ] in-thread ] "io.timeouts" add-init-hook
+: start-expiry-thread ( -- )
+    [ expiry-thread ] "I/O expiry" spawn drop ;
+
+[ start-expiry-thread ] "io.timeouts" add-init-hook

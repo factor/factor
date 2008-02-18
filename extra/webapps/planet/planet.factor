@@ -100,7 +100,7 @@ SYMBOL: last-update
 
 : update-thread ( -- )
     millis last-update set-global
-    [ update-cached-postings ] in-thread
+    [ update-cached-postings ] "RSS feed update slave" spawn drop
     10 60 * 1000 * sleep
     update-thread ;
 
@@ -109,7 +109,7 @@ SYMBOL: last-update
         "webapps.planet" [
             update-thread
         ] with-logging
-    ] in-thread ;
+    ] "RSS feed update master" spawn drop ;
 
 "planet" "planet-factor" "extra/webapps/planet" web-app
 

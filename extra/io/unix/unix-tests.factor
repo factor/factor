@@ -18,7 +18,7 @@ IN: temporary
     ] with-stream
 
     "unix-domain-socket-test" resource-path delete-file
-] in-thread
+] "Test" spawn drop
 
 yield
 
@@ -69,7 +69,7 @@ yield
 
         "unix-domain-datagram-test" resource-path delete-file
     ] with-scope
-] in-thread
+] "Test" spawn drop
 
 yield
 

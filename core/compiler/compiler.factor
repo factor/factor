@@ -3,8 +3,8 @@
 USING: kernel namespaces arrays sequences io inference.backend
 inference.state generator debugger math.parser prettyprint words
 compiler.units continuations vocabs assocs alien.compiler dlists
-optimizer definitions math compiler.errors threads graphs
-generic ;
+optimizer definitions math compiler.errors concurrency.threads
+graphs generic ;
 IN: compiler
 
 : compiled-usages ( words -- seq )

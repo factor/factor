@@ -1,14 +1,15 @@
 USING: alien alien.c-types arrays assocs combinators
 continuations destructors io io.backend io.nonblocking
 io.windows libc kernel math namespaces sequences
-threads tuples.lib windows windows.errors windows.kernel32
-strings splitting io.files qualified ascii combinators.lib ;
+concurrency.threads tuples.lib windows windows.errors
+windows.kernel32 strings splitting io.files qualified ascii
+combinators.lib ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
 
 SYMBOL: io-hash
 
-TUPLE: io-callback port continuation ;
+TUPLE: io-callback port thread ;
 
 C: <io-callback> io-callback
 
@@ -52,8 +53,8 @@ M: windows-nt-io add-completion ( handle -- )
     [
         <io-callback> swap
         dup alien? [ "bad overlapped in save-callback" throw ] unless
-        io-hash get-global set-at stop
-    ] callcc0 2drop ;
+        io-hash get-global set-at
+    ] suspend 3drop ;
 
 : wait-for-overlapped ( ms -- overlapped ? )
     >r master-completion-port get-global r> ! port ms
@@ -77,11 +78,11 @@ M: windows-nt-io add-completion ( handle -- )
             ] [
                 (win32-error-string) swap lookup-callback
                 [ io-callback-port set-port-error ] keep
-            ] if io-callback-continuation schedule-thread f
+            ] if io-callback-thread resume f
         ] if
     ] [
         lookup-callback
-        io-callback-continuation schedule-thread f
+        io-callback-thread resume f
     ] if ;
 
 : drain-overlapped ( timeout -- )

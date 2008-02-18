@@ -4,7 +4,8 @@ USING: alien alien.c-types arrays continuations destructors io
 io.windows io.windows.nt.pipes libc io.nonblocking
 io.streams.duplex windows.types math windows.kernel32 windows
 namespaces io.launcher kernel sequences windows.errors assocs
-splitting system threads init strings combinators io.backend ;
+splitting system concurrency.threads init strings combinators
+io.backend ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args
@@ -150,6 +151,6 @@ M: windows-io kill-process* ( handle -- )
     wait-loop ;
 
 : start-wait-thread ( -- )
-    [ wait-loop ] in-thread ;
+    [ wait-loop ] "Process wait" spawn drop ;
 
 [ start-wait-thread ] "io.windows.launcher" add-init-hook

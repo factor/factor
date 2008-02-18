@@ -5,10 +5,11 @@ USING: vocabs.loader sequences ;
     "tools.annotations"
     "tools.crossref"
     "tools.deploy"
+    "tools.disassembler"
     "tools.memory"
     "tools.profiler"
     "tools.test"
     "tools.time"
-    "tools.disassembler"
+    "tools.threads"
     "editors"
 } [ require ] each

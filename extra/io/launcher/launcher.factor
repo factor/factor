@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.backend io.timeouts system kernel namespaces
 strings hashtables sequences assocs combinators vocabs.loader
-init threads continuations math ;
+init concurrency.threads continuations math ;
 IN: io.launcher
 
 ! Non-blocking process exit notification facility
@@ -83,7 +83,7 @@ HOOK: run-process* io-backend ( desc -- handle )
 : wait-for-process ( process -- status )
     [
         dup process-handle
-        [ dup [ processes get at push stop ] curry callcc0 ] when
+        [ dup [ processes get at push ] curry suspend drop ] when
         dup process-killed?
         [ "Process was killed" throw ] [ process-status ] if
     ] with-timeout ;
@@ -134,5 +134,5 @@ TUPLE: process-stream process ;
 
 : notify-exit ( status process -- )
     [ set-process-status ] keep
-    [ processes get delete-at* drop [ schedule-thread ] each ] keep
+    [ processes get delete-at* drop [ resume ] each ] keep
     f swap set-process-handle ;

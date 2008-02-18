@@ -58,10 +58,10 @@ M: mx register-io-task ( task mx -- )
     2dup check-io-task fd/container set-at ;
 
 : add-io-task ( task -- )
-    mx get-global register-io-task stop ;
+    mx get-global register-io-task ;
 
 : with-port-continuation ( port quot -- port )
-    [ callcc0 ] curry with-timeout ; inline
+    [ suspend drop ] curry with-timeout ; inline
 
 M: mx unregister-io-task ( task mx -- )
     fd/container delete-at drop ;
@@ -99,7 +99,7 @@ M: integer close-handle ( fd -- )
 
 : pop-callbacks ( mx task -- )
     dup rot unregister-io-task
-    io-task-callbacks [ schedule-thread ] each ;
+    io-task-callbacks [ resume ] each ;
 
 : handle-io-task ( mx task -- )
     dup do-io-task [ pop-callbacks ] [ 2drop ] if ;
@@ -168,7 +168,7 @@ M: write-task do-io-task
 
 : add-write-io-task ( port continuation -- )
     over port-handle mx get-global mx-writes at*
-    [ io-task-callbacks push stop ]
+    [ io-task-callbacks push ]
     [ drop <write-task> add-io-task ] if ;
 
 : (wait-to-write) ( port -- )

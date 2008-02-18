@@ -1,18 +1,18 @@
-USING: threads io.files io.monitors init kernel tools.browser
-continuations ;
+USING: concurrency.threads io.files io.monitors init kernel
+tools.browser ;
 IN: vocabs.monitor
 
 ! Use file system change monitoring to flush the tags/authors
 ! cache
-: update-thread ( monitor -- )
-    dup next-change 2drop reset-cache update-thread ;
+: (monitor-thread) ( monitor -- )
+    dup next-change 2drop reset-cache (monitor-thread) ;
 
-: start-update-thread
+: monitor-thread ( -- )
+    "" resource-path t <monitor> (monitor-thread) ;
+
+: start-monitor-thread
     #! Silently ignore errors during monitor creation since
     #! monitors are not supported on all platforms.
-    [
-        [ "" resource-path t <monitor> ] [ drop f ] recover
-        [ update-thread ] when*
-    ] in-thread ;
+    [ monitor-thread ] "Vocabulary monitor" spawn drop ;
 
-[ start-update-thread ] "tools.browser" add-init-hook
+[ start-monitor-thread ] "vocabs.monitor" add-init-hook

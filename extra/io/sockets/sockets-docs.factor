@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io io.backend threads
+USING: help.markup help.syntax io io.backend concurrency.threads
 strings byte-arrays continuations ;
 IN: io.sockets
 

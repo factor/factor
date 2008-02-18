@@ -3,20 +3,20 @@
 USING: arrays assocs combinators continuations documents
 ui.tools.workspace hashtables io io.styles kernel math
 math.vectors models namespaces parser prettyprint quotations
-sequences sequences.lib strings threads listener tuples
-ui.commands ui.gadgets ui.gadgets.editors
+sequences sequences.lib strings concurrency.threads listener
+tuples ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
 definitions ;
 IN: ui.tools.interactor
 
 TUPLE: interactor
 history output
-continuation quot busy?
+thread quot busy?
 help ;
 
 : interactor-use ( interactor -- seq )
     use swap
-    interactor-continuation continuation-name
+    interactor-thread thread-continuation continuation-name
     assoc-stack ;
 
 : init-caret-help ( interactor -- )
@@ -36,10 +36,6 @@ M: interactor graft*
     dup delegate graft*
     dup dup interactor-help add-connection
     f swap set-interactor-busy? ;
-
-M: interactor ungraft*
-    dup dup interactor-help remove-connection
-    delegate ungraft* ;
 
 : word-at-loc ( loc interactor -- word )
     over [
@@ -70,7 +66,7 @@ M: interactor model-changed
 
 : interactor-continue ( obj interactor -- )
     t over set-interactor-busy?
-    interactor-continuation schedule-thread-with ;
+    interactor-thread resume-with ;
 
 : clear-input ( interactor -- ) gadget-model clear-doc ;
 
@@ -88,14 +84,16 @@ M: interactor model-changed
 
 : evaluate-input ( interactor -- )
     dup interactor-busy? [
-        [
-            [ control-value ] keep interactor-continue
-        ] in-thread
+        dup control-value over interactor-continue
     ] unless drop ;
 
 : interactor-yield ( interactor -- obj )
-    f over set-interactor-busy?
-    [ set-interactor-continuation stop ] curry callcc1 ;
+    dup gadget-graft-state first [
+        f over set-interactor-busy?
+        [ set-interactor-thread ] curry suspend
+    ] [
+        drop f
+    ] if ;
 
 M: interactor stream-readln
     [ interactor-yield ] keep interactor-finish ?first ;

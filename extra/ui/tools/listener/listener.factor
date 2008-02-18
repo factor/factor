@@ -6,7 +6,7 @@ kernel models namespaces parser quotations sequences ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
-prettyprint listener debugger threads ;
+prettyprint listener debugger concurrency.threads ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;
@@ -134,8 +134,7 @@ M: stack-display tool-scroller
     ] with-stream* ;
 
 : restart-listener ( listener -- )
-    [ >r clear r> init-namespaces listener-thread ] in-thread
-    drop ;
+    [ listener-thread ] curry "Listener" spawn drop ;
 
 : init-listener ( listener -- )
     f <model> swap set-listener-gadget-stack ;
