@@ -2,11 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes db kernel namespaces
 tuples words sequences slots slots.private math
-math.parser io prettyprint db.types continuations ;
+math.parser io prettyprint db.types continuations
+mirrors sequences.lib ;
 IN: db.tuples
 
-: db-columns ( class -- obj ) "db-columns" word-prop ;
 : db-table ( class -- obj ) "db-table" word-prop ;
+: db-columns ( class -- obj ) "db-columns" word-prop ;
+: db-relations ( class -- obj ) "db-relations" word-prop ;
 
 TUPLE: no-slot-named ;
 : no-slot-named ( -- * ) T{ no-slot-named } throw ;
@@ -41,25 +43,14 @@ TUPLE: no-slot-named ;
 HOOK: create-sql db ( columns table -- seq )
 HOOK: drop-sql db ( columns table -- seq )
 
-HOOK: insert-sql* db ( columns table -- slot-names sql )
-HOOK: update-sql* db ( columns table -- slot-names sql )
-HOOK: delete-sql* db ( columns table -- slot-names sql )
-HOOK: select-sql db ( tuple -- statement )
+HOOK: insert-sql* db ( columns table -- sql slot-names )
+HOOK: update-sql* db ( columns table -- sql slot-names )
+HOOK: delete-sql* db ( columns table -- sql slot-names )
+HOOK: select-sql db ( tuple -- seq/statement )
 
 HOOK: row-column-typed db ( result-set n type -- sql )
 HOOK: sql-type>factor-type db ( obj type -- obj )
 HOOK: tuple>params db ( columns tuple -- obj )
-
-
-HOOK: make-slot-names* db ( quot -- seq )
-HOOK: column-slot-name% db ( spec -- )
-HOOK: column-bind-name% db ( spec -- )
-
-: make-slots-names ( quot -- seq str )
-    [ make-slot-names* ] "" make ; inline
-: slot-name% ( seq -- ) first % ;
-: column-name% ( seq -- ) second % ;
-: column-type% ( seq -- ) third % ;
 
 : insert-sql ( columns class -- statement )
     db get db-insert-statements [ insert-sql* ] cache-statement ;
@@ -108,8 +99,37 @@ HOOK: column-bind-name% db ( spec -- )
     dup primary-key [ update-tuple ] [ insert-tuple ] if ;
 
 : define-persistent ( class table columns -- )
-    >r dupd "db-table" set-word-prop r>
-    "db-columns" set-word-prop ;
+    >r dupd "db-table" set-word-prop dup r>
+    [ relation? ] partition swapd
+    [ spec>tuple ] map "db-columns" set-word-prop
+    "db-relations" set-word-prop ;
 
-: define-relation ( spec -- )
-    drop ;
+: tuple>filled-slots ( tuple -- alist )
+    dup <mirror> mirror-slots [ slot-spec-name ] map
+    swap tuple-slots 2array flip [ nip ] assoc-subset ;
+
+! [ tuple>filled-slots ] keep
+! [ >r first r> get-slot-named ] curry each
+
+SYMBOL: building-seq 
+: get-building-seq ( n -- seq )
+    building-seq get nth ;
+
+: n, get-building-seq push ;
+: n% get-building-seq push-all ;
+
+: 0, 0 n, ;
+: 0% 0 n% ;
+: 1, 1 n, ;
+: 1% 1 n% ;
+: 2, 2 n, ;
+: 2% 2 n% ;
+
+: nmake ( quot exemplars -- seqs )
+    dup length dup zero? [ 1+ ] when
+    [
+        [
+            [ drop 1024 swap new-resizable ] 2map
+            [ building-seq set call ] keep
+        ] 2keep >r [ like ] 2map r> firstn 
+    ] with-scope ;

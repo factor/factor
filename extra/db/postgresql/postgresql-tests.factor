@@ -1,8 +1,9 @@
 ! You will need to run  'createdb factor-test' to create the database.
 ! Set username and password in  the 'connect' word.
 
-USING: kernel db.postgresql alien continuations io prettyprint
-sequences namespaces tools.test db db.types ;
+USING: kernel db.postgresql alien continuations io classes
+prettyprint sequences namespaces tools.test db
+db.tuples db.types unicode.case ;
 IN: temporary
 
 IN: scratchpad
@@ -108,3 +109,48 @@ IN: temporary
         "select * from person" sql-query length
     ] with-db
 ] unit-test
+
+
+
+! TEST TUPLE DB
+
+TUPLE: puppy id name age ;
+: <puppy> ( name age -- puppy )
+    { set-puppy-name set-puppy-age } puppy construct ;
+
+puppy "PUPPY" {
+    { "id" "ID" +native-id+ }
+    { "name" "NAME" TEXT }
+    { "age" "AGE" INTEGER }
+} define-persistent
+
+TUPLE: kitty id name age ;
+: <kitty> ( name age -- kitty )
+    { set-kitty-name set-kitty-age } kitty construct ;
+
+kitty "KITTY" {
+    { "id" "ID" +native-id+ }
+    { "name" "NAME" TEXT }
+    { "age" "AGE" INTEGER }
+} define-persistent
+
+TUPLE: basket id puppies kitties ;
+basket "BASKET"
+{
+    { "id" "ID" +native-id+ }
+    { "location" "LOCATION" TEXT }
+    { "puppies" { +has-many+ puppy } }
+    { "kitties" { +has-many+ kitty } }
+} define-persistent
+
+[
+    { "name" "age" }
+    ! "insert into table puppy(name, age) values($1, $2);"
+    "select add_puppy($1, $2, $3);"
+] [
+    T{ postgresql-db } db [
+        "Mr Clunkers" 3 <puppy>
+        class dup db-columns swap db-table insert-sql* >lower
+    ] with-variable
+] unit-test
+
