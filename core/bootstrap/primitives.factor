@@ -98,7 +98,7 @@ H{ } clone update-map set
     [
         over "type" word-prop dup
         \ tag-mask get < \ tag \ type ? , , \ eq? ,
-    ] [ ] make define-predicate ;
+    ] [ ] make define-predicate* ;
 
 : register-builtin ( class -- )
     dup "type" word-prop builtins get set-nth ;
@@ -646,6 +646,7 @@ builtins get num-tags get tail f union-class define-class
     { "resize-byte-array" "byte-arrays" }
     { "resize-bit-array" "bit-arrays" }
     { "resize-float-array" "float-arrays" }
+    { "dll-valid?" "alien" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 

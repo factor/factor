@@ -171,6 +171,6 @@ DEFER: create ( level c r -- scene )
 
 : raytracer-main
     "raytracer.pnm" resource-path
-    <file-writer> [ run write ] with-stream ;
+    [ run write ] with-file-writer ;
 
 MAIN: raytracer-main

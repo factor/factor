@@ -113,7 +113,7 @@ optimizer ;
 ] unit-test
 
 [ f ] [
-    [ [ [ ] map ] map ] dataflow optimize
+    [ [ [ ] map ] map ] dataflow dup detect-loops
     [ dup #label? swap #loop? not and ] node-exists?
 ] unit-test
 
@@ -145,4 +145,37 @@ DEFER: a
 [ t ] [
     [ a ] dataflow dup detect-loops
     \ b label-is-loop?
+] unit-test
+
+DEFER: a'
+
+: b' ( -- )
+    blah [ b' b' ] [ a' ] if ; inline
+
+: a' ( -- )
+    blah [ b' ] [ a' ] if ; inline
+
+[ f ] [
+    [ a' ] dataflow dup detect-loops
+    \ a' label-is-loop?
+] unit-test
+
+[ f ] [
+    [ b' ] dataflow dup detect-loops
+    \ b' label-is-loop?
+] unit-test
+
+! I used to think this should be f, but doing this on pen and
+! paper almost convinced me that a loop conversion here is
+! sound. The loop analysis algorithm looks pretty solid -- its
+! a standard iterative dataflow problem after all -- so I'm
+! tempted to believe the computer here
+[ t ] [
+    [ b' ] dataflow dup detect-loops
+    \ a' label-is-loop?
+] unit-test
+
+[ f ] [
+    [ a' ] dataflow dup detect-loops
+    \ b' label-is-loop?
 ] unit-test

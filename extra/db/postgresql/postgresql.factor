@@ -3,7 +3,8 @@
 USING: arrays assocs alien alien.syntax continuations io
 kernel math math.parser namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
-db.tuples db.types tools.annotations math.ranges ;
+db.tuples db.types tools.annotations math.ranges
+combinators ;
 IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty db user pass ;
@@ -52,8 +53,19 @@ M: postgresql-result-set #columns ( result-set -- n )
 M: postgresql-result-set row-column ( result-set n -- obj )
     >r dup result-set-handle swap result-set-n r> PQgetvalue ;
 
+M: postgresql-result-set row-column-typed ( result-set n type -- obj )
+    >r row-column r> sql-type>factor-type ;
+
+M: postgresql-result-set sql-type>factor-type ( obj type -- newobj )
+    {
+        { INTEGER [ string>number ] }
+        { BIG_INTEGER [ string>number ] }
+        { DOUBLE [ string>number ] }
+        [ drop ]
+    } case ;
+
 M: postgresql-statement insert-statement ( statement -- id )
-    query-results [ break 0 row-column ] with-disposal ;
+    query-results [ 0 row-column ] with-disposal string>number ;
 
 M: postgresql-statement query-results ( query -- result-set )
     dup statement-params [
@@ -199,7 +211,7 @@ M: postgresql-db drop-sql ( columns table -- seq )
         over native-id? [ drop-function , ] [ 2drop ] if
     ] { } make ;
 
-M: postgresql-db insert-sql* ( columns table -- sql )
+M: postgresql-db insert-sql* ( columns table -- slot-names sql )
     [
         "select add_" % %
         "(" %
@@ -207,7 +219,7 @@ M: postgresql-db insert-sql* ( columns table -- sql )
         ")" %
     ] "" make ;
 
-M: postgresql-db update-sql* ( columns table -- sql )
+M: postgresql-db update-sql* ( columns table -- slot-names sql )
     [
         "update " %
         %
@@ -219,7 +231,7 @@ M: postgresql-db update-sql* ( columns table -- sql )
         [ primary-key? ] find nip second dup % " = $" % length 2 + #
     ] "" make ;
 
-M: postgresql-db delete-sql* ( columns table -- sql )
+M: postgresql-db delete-sql* ( columns table -- slot-names sql )
     [
         "delete from " %
         %
@@ -227,16 +239,13 @@ M: postgresql-db delete-sql* ( columns table -- sql )
         first second % " = $1" %
     ] "" make ;
 
-M: postgresql-db select-sql* ( columns table -- sql )
+M: postgresql-db select-sql ( columns table -- slot-names sql )
     drop ;
 
 M: postgresql-db tuple>params ( columns tuple -- obj )
     [ >r dup third swap first r> get-slot-named swap ]
     curry { } map>assoc ;
     
-M: postgresql-db last-id ( res -- id )
-    drop f ;
-
 : postgresql-db-modifiers ( -- hashtable )
     H{
         { +native-id+ "not null primary key" }

@@ -5,7 +5,7 @@ IN: benchmark.sum-file
     readln [ string>number + sum-file-loop ] when* ;
 
 : sum-file ( file -- )
-    <file-reader> [ 0 sum-file-loop ] with-stream . ;
+    [ 0 sum-file-loop ] with-file-reader . ;
 
 : sum-file-main ( -- )
     home "sum-file-in.txt" path+ sum-file ;

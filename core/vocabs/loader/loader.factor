@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces splitting sequences io.files kernel assocs
-words vocabs definitions parser continuations inspector debugger
-io io.styles io.streams.lines hashtables sorting prettyprint
-source-files arrays combinators strings system math.parser
-compiler.errors ;
+USING: namespaces sequences io.files kernel assocs words vocabs
+definitions parser continuations inspector debugger io io.styles
+io.streams.lines hashtables sorting prettyprint source-files
+arrays combinators strings system math.parser compiler.errors
+splitting ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -16,7 +16,7 @@ V{
 } clone vocab-roots set-global
 
 : vocab-dir ( vocab -- dir )
-    vocab-name "." split "/" join ;
+    vocab-name { { CHAR: . CHAR: / } } substitute ;
 
 : vocab-dir+ ( vocab str/f -- path )
     >r vocab-name "." split r>
@@ -68,13 +68,6 @@ M: vocab-link vocab-root
         dup vocab-docs-path [ , ] when*
         vocab-tests %
     ] { } make ;
-
-TUPLE: no-vocab name ;
-
-: no-vocab ( name -- * )
-    vocab-name \ no-vocab construct-boa throw ;
-
-M: no-vocab summary drop "Vocabulary does not exist" ;
 
 SYMBOL: load-help?
 

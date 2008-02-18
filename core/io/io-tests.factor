@@ -53,7 +53,7 @@ IN: temporary
 ] unit-test
 
 [ ] [
-    image <file-reader> [
+    image [
         10 [ 65536 read drop ] times
-    ] with-stream
+    ] with-file-reader
 ] unit-test

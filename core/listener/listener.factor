@@ -48,7 +48,14 @@ M: duplex-stream stream-read-quot
 
 : listen ( -- )
     listener-hook get call prompt.
-    [ read-quot [ call ] [ bye ] if* ] try ;
+    [ read-quot [ try ] [ bye ] if* ]
+    [
+        dup parse-error? [
+            error-hook get call
+        ] [
+            rethrow
+        ] if
+    ] recover ;
 
 : until-quit ( -- )
     quit-flag get

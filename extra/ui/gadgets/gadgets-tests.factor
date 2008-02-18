@@ -191,7 +191,7 @@ M: mock-gadget ungraft*
         ] with-variable ;
 
     { { f f } { f t } { t f } { t t } } [ notify-combo ] assoc-each
-] string-out print
+] with-string-writer print
 
 \ <gadget> must-infer
 \ unparent must-infer

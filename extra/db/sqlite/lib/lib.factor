@@ -96,6 +96,14 @@ IN: db.sqlite.lib
 : sqlite-column ( handle index -- string )
     sqlite3_column_text ;
 
+: sqlite-column-typed ( handle index type -- obj )
+    {
+        { INTEGER [ sqlite3_column_int ] }
+        { BIG_INTEGER [ sqlite3_column_int64 ] }
+        { TEXT [ sqlite3_column_text ] }
+        { DOUBLE [ sqlite3_column_double ] }
+    } case ;
+
 ! TODO
 : sqlite-row ( handle -- seq )
     dup sqlite-#columns [ sqlite-column ] with map ;

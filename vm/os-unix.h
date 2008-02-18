@@ -27,7 +27,7 @@ typedef char F_SYMBOL;
 #define FPRINTF(stream,format,arg) fprintf(stream,format,arg)
 
 void init_ffi(void);
-void ffi_dlopen(F_DLL *dll, bool error);
+void ffi_dlopen(F_DLL *dll);
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);
 void ffi_dlclose(F_DLL *dll);
 

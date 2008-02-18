@@ -11,7 +11,7 @@ bootstrap.image sequences io namespaces io.launcher math ;
 : compute-checksums ( -- )
     "checksums.txt" [
         boot-image-names [ dup write bl file>md5str print ] each
-    ] with-file-out ;
+    ] with-file-writer ;
 
 : upload-images ( -- )
     [

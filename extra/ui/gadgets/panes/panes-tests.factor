@@ -18,7 +18,7 @@ tools.test.ui models ;
 
 : test-gadget-text
     dup make-pane gadget-text
-    swap string-out "\n" ?tail drop "\n" ?tail drop = ;
+    swap with-string-writer "\n" ?tail drop "\n" ?tail drop = ;
 
 [ t ] [ [ "hello" write ] test-gadget-text ] unit-test
 [ t ] [ [ "hello" pprint ] test-gadget-text ] unit-test

@@ -108,7 +108,7 @@ M: instruction write-item
     write-xml nl ;
 
 : xml>string ( xml -- string )
-    [ write-xml ] string-out ;
+    [ write-xml ] with-string-writer ;
 
 : with-xml-pprint ( sensitive-tags quot -- )
     [

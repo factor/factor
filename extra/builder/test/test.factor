@@ -11,17 +11,17 @@ USING: kernel namespaces sequences assocs builder continuations
 IN: builder.test
 
 : do-load ( -- )
-  try-everything keys "../load-everything-vocabs" [ . ] with-file-out ;
+  try-everything keys "../load-everything-vocabs" [ . ] with-file-writer ;
 
 : do-tests ( -- )
-  run-all-tests keys "../test-all-vocabs" [ . ] with-file-out ;
+  run-all-tests keys "../test-all-vocabs" [ . ] with-file-writer ;
 
-: do-benchmarks ( -- ) run-benchmarks "../benchmarks" [ . ] with-file-out ;
+: do-benchmarks ( -- ) run-benchmarks "../benchmarks" [ . ] with-file-writer ;
 
 : do-all ( -- )
-  bootstrap-time get   "../boot-time" [ . ] with-file-out
-  [ do-load  ] runtime "../load-time" [ . ] with-file-out
-  [ do-tests ] runtime "../test-time" [ . ] with-file-out
+  bootstrap-time get   "../boot-time" [ . ] with-file-writer
+  [ do-load  ] runtime "../load-time" [ . ] with-file-writer
+  [ do-tests ] runtime "../test-time" [ . ] with-file-writer
   do-benchmarks ;
 
 MAIN: do-all

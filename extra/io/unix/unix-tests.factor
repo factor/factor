@@ -131,16 +131,16 @@ client-addr <datagram>
 ! Invalid parameter tests
 
 [
-    image <file-reader> [ stdio get accept ] with-stream
+    image [ stdio get accept ] with-file-reader
 ] must-fail
 
 [
-    image <file-reader> [ stdio get receive ] with-stream
+    image [ stdio get receive ] with-file-reader
 ] must-fail
 
 [
-    image <file-reader> [
+    image [
         B{ 1 2 } server-addr
         stdio get send
-    ] with-stream
+    ] with-file-reader
 ] must-fail

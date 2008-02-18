@@ -55,7 +55,7 @@ C: <entry> entry
     [
         { "content" "summary" } any-tag-named
         dup tag-children [ string? not ] contains?
-        [ tag-children [ write-chunk ] string-out ]
+        [ tag-children [ write-chunk ] with-string-writer ]
         [ children>string ] if
     ] keep
     { "published" "updated" "issued" "modified" } any-tag-named

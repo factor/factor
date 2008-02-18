@@ -37,10 +37,10 @@ GENERIC: optimize-node* ( node -- node/t changed? )
     over assoc-empty? [
         2drop
     ] [
-        2dup node-in-d substitute
-        2dup node-in-r substitute
-        2dup node-out-d substitute
-        node-out-r substitute
+        2dup node-in-d swap substitute-here
+        2dup node-in-r swap substitute-here
+        2dup node-out-d swap substitute-here
+        node-out-r swap substitute-here
     ] if ;
 
 : perform-substitutions ( node -- )

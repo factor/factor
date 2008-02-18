@@ -38,7 +38,7 @@ C: <parse-result> parse-result
     [ [ >upper ] 2apply ] when sequence= ;
 
 : string-head? ( str head ignore-case -- ? )
-    pick pick shorter? [
+    2over shorter? [
         3drop f
     ] [
         >r [ length head-slice ] keep r> string=

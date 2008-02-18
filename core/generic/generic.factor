@@ -30,6 +30,7 @@ M: generic definer drop f f ;
 M: generic definition drop f ;
 
 : make-generic ( word -- )
+    dup { "unannotated-def" } reset-props
     dup dup "combination" word-prop perform-combination define ;
 
 TUPLE: method word def specializer generic loc ;
@@ -81,10 +82,19 @@ M: method-body stack-effect
     [ <method-word> ] 3keep f \ method construct-boa
     dup method-word over "method" set-word-prop ;
 
+: redefine-method ( quot class generic -- )
+    [ method set-method-def ] 3keep
+    [ make-method-def ] 2keep
+    method method-word swap define ;
+
 : define-method ( quot class generic -- )
     >r bootstrap-word r>
-    [ <method> ] 2keep
-    [ set-at ] with-methods ;
+    2dup method [
+        redefine-method
+    ] [
+        [ <method> ] 2keep
+        [ set-at ] with-methods
+    ] if ;
 
 : define-default-method ( generic combination -- )
     dupd make-default-method object bootstrap-word pick <method>

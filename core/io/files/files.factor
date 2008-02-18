@@ -3,7 +3,7 @@
 IN: io.files
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
-system combinators splitting sbufs ;
+system combinators splitting sbufs continuations ;
 
 HOOK: cd io-backend ( path -- )
 
@@ -116,11 +116,10 @@ HOOK: copy-file io-backend ( from to -- )
 M: object copy-file
     dup parent-directory make-directories
     <file-writer> [
-        stdio get swap
-        <file-reader> [
-            stdio get swap stream-copy
-        ] with-stream
-    ] with-stream ;
+        swap <file-reader> [
+            swap stream-copy
+        ] with-disposal
+    ] with-disposal ;
 
 : copy-directory ( from to -- )
     dup make-directories
@@ -144,12 +143,13 @@ M: pathname <=> [ pathname-string ] compare ;
 : file-lines ( path -- seq ) <file-reader> lines ;
 
 : file-contents ( path -- str )
-    dup <file-reader> swap file-length <sbuf> [ stream-copy ] keep >string ;
+    dup <file-reader> swap file-length <sbuf>
+    [ stream-copy ] keep >string ;
 
-: with-file-in ( path quot -- )
+: with-file-reader ( path quot -- )
     >r <file-reader> r> with-stream ; inline
 
-: with-file-out ( path quot -- )
+: with-file-writer ( path quot -- )
     >r <file-writer> r> with-stream ; inline
 
 : with-file-appender ( path quot -- )
