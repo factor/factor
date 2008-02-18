@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs strings kernel sorting namespaces sequences
 definitions ;
@@ -113,3 +113,8 @@ UNION: vocab-spec vocab vocab-link ;
     vocab-name dictionary get delete-at ;
 
 M: vocab-spec forget* forget-vocab ;
+
+TUPLE: no-vocab name ;
+
+: no-vocab ( name -- * )
+    vocab-name \ no-vocab construct-boa throw ;

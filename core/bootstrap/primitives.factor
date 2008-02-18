@@ -98,7 +98,7 @@ H{ } clone update-map set
     [
         over "type" word-prop dup
         \ tag-mask get < \ tag \ type ? , , \ eq? ,
-    ] [ ] make define-predicate ;
+    ] [ ] make define-predicate* ;
 
 : register-builtin ( class -- )
     dup "type" word-prop builtins get set-nth ;

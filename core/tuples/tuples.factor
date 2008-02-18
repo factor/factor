@@ -66,9 +66,7 @@ M: tuple-class tuple-size "slot-names" word-prop length 2 + ;
 PRIVATE>
 
 : define-tuple-predicate ( class -- )
-    dup predicate-word
-    over [ tuple-class-eq? ] curry
-    define-predicate ;
+    dup [ tuple-class-eq? ] curry define-predicate ;
 
 : delegate-slot-spec
     T{ slot-spec f

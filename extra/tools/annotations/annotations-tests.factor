@@ -7,7 +7,7 @@ IN: temporary
 [ ] [ foo ] unit-test
 
 ! erg's bug
-GENERIC: some-generic
+GENERIC: some-generic ( a -- b )
 
 M: integer some-generic 1+ ;
 

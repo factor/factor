@@ -28,7 +28,7 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 
 	if(type_of(symbol) == BYTE_ARRAY_TYPE)
 	{
-		F_CHAR *name = alien_offset(symbol);
+		F_SYMBOL *name = alien_offset(symbol);
 		void *sym = ffi_dlsym(dll,name);
 
 		if(sym)
@@ -40,7 +40,7 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 		F_ARRAY *names = untag_object(symbol);
 		for(i = 0; i < array_capacity(names); i++)
 		{
-			F_CHAR *name = alien_offset(array_nth(names,i));
+			F_SYMBOL *name = alien_offset(array_nth(names,i));
 			void *sym = ffi_dlsym(dll,name);
 
 			if(sym)
@@ -318,9 +318,8 @@ void default_word_code(F_WORD *word, bool relocate)
 
 DEFINE_PRIMITIVE(modify_code_heap)
 {
+	bool rescan_code_heap = to_boolean(dpop());
 	F_ARRAY *alist = untag_array(dpop());
-
-	bool rescan_code_heap = false;
 
 	CELL count = untag_fixnum_fast(alist->capacity);
 	CELL i;
@@ -329,9 +328,6 @@ DEFINE_PRIMITIVE(modify_code_heap)
 		F_ARRAY *pair = untag_array(array_nth(alist,i));
 
 		F_WORD *word = untag_word(array_nth(pair,0));
-
-		if(word->vocabulary != F)
-			rescan_code_heap = true;
 
 		CELL data = array_nth(pair,1);
 

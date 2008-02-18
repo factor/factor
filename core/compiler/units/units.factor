@@ -77,6 +77,11 @@ GENERIC: definitions-changed ( assoc obj -- )
         [ ] cleanup
     ] with-scope ; inline
 
+: default-recompile-hook
+    [ f ] { } map>assoc
+    dup [ drop crossref? ] assoc-contains?
+    modify-code-heap ;
+
 recompile-hook global
-[ [ [ f ] { } map>assoc modify-code-heap ] or ]
+[ [ default-recompile-hook ] or ]
 change-at

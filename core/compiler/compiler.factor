@@ -55,7 +55,9 @@ IN: compiler
         H{ } clone compiled set
         [ queue-compile ] each
         compile-queue get compile-loop
-        compiled get >alist modify-code-heap
+        compiled get >alist
+        dup [ drop crossref? ] assoc-contains?
+        modify-code-heap
     ] with-scope ; inline
 
 : compile ( words -- )
@@ -70,4 +72,4 @@ IN: compiler
     [ all-words recompile ] with-compiler-errors ;
 
 : decompile ( word -- )
-    f 2array 1array modify-code-heap ;
+    f 2array 1array t modify-code-heap ;
