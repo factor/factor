@@ -174,7 +174,7 @@ M: hook-generic synopsis*
     dup definer.
     dup seeing-word
     dup pprint-word
-    dup "combination" word-prop hook-combination-var pprint-word
+    dup "combination" word-prop hook-combination-var pprint*
     stack-effect. ;
 
 M: method-spec synopsis*
