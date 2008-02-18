@@ -49,7 +49,7 @@ M: string host-name ;
 
 [ host? ] \ send-clipboard H{ } define-operation
 
-: ask-text ( text host -- )
+: ask-text ( text host -- text )
     clipboard-port <inet4>
     [ write flush contents ] with-client ;
 
