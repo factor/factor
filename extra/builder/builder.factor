@@ -137,7 +137,7 @@ SYMBOL: build-status
 
     bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
-    builder-test [ "Test error" print "../test-log" cat ] run-or-bail
+    builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail
 
     "../test-log" delete-file
 
