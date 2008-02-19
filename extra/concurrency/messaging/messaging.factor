@@ -26,12 +26,14 @@ TUPLE: mailbox threads data ;
     2over mailbox-data dlist-contains? [
         3drop
     ] [
-        2dup >r mailbox-threads r> wait block-unless-pred
+        2dup >r mailbox-threads r> "mailbox" wait
+        block-unless-pred
     ] if ; inline
 
 : block-if-empty ( mailbox timeout -- mailbox )
     over mailbox-empty? [
-        2dup >r mailbox-threads r> wait block-if-empty
+        2dup >r mailbox-threads r> "mailbox" wait
+        block-if-empty
     ] [
         drop
     ] if ;

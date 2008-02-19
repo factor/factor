@@ -11,7 +11,7 @@ TUPLE: semaphore count threads ;
     <dlist> semaphore construct-boa ;
 
 : wait-to-acquire ( semaphore timeout -- )
-    >r semaphore-threads r> wait ;
+    >r semaphore-threads r> "semaphore" wait ;
 
 : acquire ( semaphore timeout -- )
     dup semaphore-count zero? [

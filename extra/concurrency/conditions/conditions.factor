@@ -9,5 +9,5 @@ IN: concurrency.conditions
 : notify-all ( dlist -- )
     [ second resume ] dlist-slurp yield ;
 
-: wait ( queue timeout -- )
-    [ 2array swap push-front ] suspend 3drop ; inline
+: wait ( queue timeout status -- )
+    >r [ 2array swap push-front ] r> suspend 3drop ; inline

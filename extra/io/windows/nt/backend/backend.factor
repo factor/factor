@@ -54,7 +54,7 @@ M: windows-nt-io add-completion ( handle -- )
         <io-callback> swap
         dup alien? [ "bad overlapped in save-callback" throw ] unless
         io-hash get-global set-at
-    ] suspend 3drop ;
+    ] "I/O" suspend 3drop ;
 
 : wait-for-overlapped ( ms -- overlapped ? )
     >r master-completion-port get-global r> ! port ms

@@ -161,6 +161,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "hashtables" }
 { $subsection "alists" }
 { $heading "Other collections" }
+{ $subsection "boxes" }
 { $subsection "dlists" }
 { $subsection "heaps" }
 { $subsection "graphs" }

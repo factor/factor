@@ -73,18 +73,21 @@ MATCH-VARS: ?from ?to ?value ;
 SYMBOL: increment
 SYMBOL: decrement
 SYMBOL: value
+SYMBOL: exit
 
-: counter ( value -- value )
+: counter ( value -- value ? )
     receive {
-        { { increment ?value } [ ?value + ] }
-        { { decrement ?value } [ ?value - ] }
-        { { value ?from }      [ dup ?from send ] }
+        { { increment ?value } [ ?value + t ] }
+        { { decrement ?value } [ ?value - t ] }
+        { { value ?from }      [ dup ?from send t ] }
+        { exit                 [ f ] }
     } match-cond ;
 
 [ -5 ] [
-    [ 0 [ t ] [ counter ] [ ] while ] "Counter" spawn
-    { increment 10 } over send
-    { decrement 15 } over send
-    [ value , self , ] { } make swap send 
+    [ 0 [ counter ] [ ] [ ] while ] "Counter" spawn "counter" set
+    { increment 10 } "counter" get send
+    { decrement 15 } "counter" get send
+    [ value , self , ] { } make "counter" get send
     receive
+    exit "counter" get send
 ] unit-test

@@ -83,7 +83,10 @@ HOOK: run-process* io-backend ( desc -- handle )
 : wait-for-process ( process -- status )
     [
         dup process-handle
-        [ dup [ processes get at push ] curry suspend drop ] when
+        [
+            dup [ processes get at push ] curry
+            "process" suspend drop
+        ] when
         dup process-killed?
         [ "Process was killed" throw ] [ process-status ] if
     ] with-timeout ;

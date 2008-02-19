@@ -12,5 +12,5 @@ yield
 [ "hey" sleep ] must-fail
 
 [ 3 ] [
-    [ 3 swap resume-with ] suspend
+    [ 3 swap resume-with ] "Test suspend" suspend
 ] unit-test

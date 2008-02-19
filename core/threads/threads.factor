@@ -4,14 +4,15 @@
 IN: threads
 USING: arrays hashtables heaps kernel kernel.private math
 namespaces sequences vectors continuations continuations.private
-dlists assocs system combinators debugger prettyprint io init ;
+dlists assocs system combinators debugger prettyprint io init
+boxes ;
 
 SYMBOL: initial-thread
 
 TUPLE: thread
 name quot error-handler
 id registered?
-continuation
+continuation state
 mailbox variables ;
 
 : self ( -- thread ) 40 getenv ; inline
@@ -61,11 +62,12 @@ threads global [ H{ } assoc-like ] change-at
 PRIVATE>
 
 : <thread> ( quot name error-handler -- thread )
-    \ thread counter {
+    \ thread counter <box> {
         set-thread-quot
         set-thread-name
         set-thread-error-handler
         set-thread-id
+        set-thread-continuation
     } \ thread construct ;
 
 : run-queue 42 getenv ;
@@ -99,8 +101,8 @@ PRIVATE>
         wake-up
         run-queue pop-back
         dup array? [ first2 ] [ f swap ] if dup set-self
-        dup thread-continuation
-        f rot set-thread-continuation
+        f over set-thread-state
+        thread-continuation box>
         continue-with
     ] if* ;
 
@@ -116,15 +118,19 @@ PRIVATE>
 : stop ( -- )
     self unregister-thread next ;
 
-: suspend ( quot -- obj )
+: suspend ( quot state -- obj )
     [
-        >r self [ set-thread-continuation ] keep r> call next
-    ] curry callcc1 ; inline
+        self thread-continuation >box
+        self set-thread-state
+        self swap call next
+    ] callcc1 2nip ; inline
 
-: yield ( -- ) [ resume ] suspend drop ;
+: yield ( -- ) [ resume ] "yield" suspend drop ;
 
 : sleep ( ms -- )
-    >fixnum millis + [ schedule-sleep ] curry suspend drop ;
+    >fixnum millis +
+    [ schedule-sleep ] curry
+    "sleep" suspend drop ;
 
 : (spawn) ( thread -- )
     [
@@ -137,7 +143,7 @@ PRIVATE>
             >r { } set-datastack r>
             thread-quot [ call stop ] call-clear
         ] 1 (throw)
-    ] suspend 2drop ;
+    ] "spawn" suspend 2drop ;
 
 : spawn ( quot name -- thread )
     [
@@ -170,7 +176,7 @@ PRIVATE>
     <min-heap> 43 setenv
     initial-thread global
     [ drop f "Initial" [ die ] <thread> ] cache
-    f over set-thread-continuation
+    <box> over set-thread-continuation
     f over set-thread-registered?
     dup register-thread
     set-self ;

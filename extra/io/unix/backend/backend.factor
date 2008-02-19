@@ -62,7 +62,7 @@ M: mx register-io-task ( task mx -- )
     mx get-global register-io-task ;
 
 : with-port-continuation ( port quot -- port )
-    [ suspend drop ] curry with-timeout ; inline
+    [ "I/O" suspend drop ] curry with-timeout ; inline
 
 M: mx unregister-io-task ( task mx -- )
     fd/container delete-at drop ;

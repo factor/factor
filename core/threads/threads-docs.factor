@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private io
 threads.private continuations dlists init quotations strings
-assocs heaps ;
+assocs heaps boxes ;
 IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
@@ -61,7 +61,7 @@ HELP: thread
         { { $link thread-id } " - a unique identifier assigned to each thread." }
         { { $link thread-name } " - the name passed to " { $link spawn } "." }
         { { $link thread-quot } " - the initial quotation passed to " { $link spawn } "." }
-        { { $link thread-continuation } " - if the thread is waiting to run, the saved thread context. If the thread is currently running, will be " { $link f } "." }
+        { { $link thread-continuation } " - a " { $link box } "; if the thread is ready to run, the box holds the continuation, otherwise it is empty." }
         { { $link thread-registered? } " - a boolean indicating whether the thread is eligible to run or not. Spawning a thread with " { $link (spawn) } " sets this flag and " { $link stop } " clears it." }
     }
 } ;
