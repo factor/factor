@@ -28,11 +28,7 @@ TUPLE: listener-gadget input output stack ;
     <scroller> "Input" <labelled-gadget> f track, ;
 
 : welcome. ( -- )
-   "If this is your first time with the Factor UI," print
-   "please read " write
-   "ui-tools" ($link) " and " write
-   "ui-listener" ($link) "." print nl
-   "If you are completely new to Factor, start with the " print
+   "If this is your first time with Factor, please read the " print
    "cookbook" ($link) "." print nl ;
 
 M: listener-gadget focusable-child*
@@ -45,7 +41,8 @@ M: listener-gadget tool-scroller
     listener-gadget-output find-scroller ;
 
 : workspace-busy? ( workspace -- ? )
-    workspace-listener listener-gadget-input interactor-busy? ;
+    workspace-listener listener-gadget-input
+    interactor-busy? ;
 
 : get-listener ( -- listener )
     [ workspace-busy? not ] get-workspace* workspace-listener ;
@@ -81,8 +78,9 @@ M: listener-operation invoke-command ( target command -- )
     listener-gadget-input interactor-eof ;
 
 : clear-output ( listener -- )
-    [ listener-gadget-output [ pane-clear ] curry ] keep
-    (call-listener) ;
+    listener-gadget-output pane-clear ;
+
+\ clear-output H{ { +listener+ t } } define-command
 
 : clear-stack ( listener -- )
     [ clear ] swap (call-listener) ;
@@ -134,17 +132,16 @@ M: stack-display tool-scroller
     ] with-stream* ;
 
 : restart-listener ( listener -- )
-    [ >r clear r> init-namespaces listener-thread ] in-thread
-    drop ;
+    dup com-end dup clear-output
+    [ listener-thread ] curry
+    "Listener" spawn drop ;
 
 : init-listener ( listener -- )
     f <model> swap set-listener-gadget-stack ;
 
 : <listener-gadget> ( -- gadget )
-    listener-gadget construct-empty
-    dup init-listener
-    [ listener-output, listener-input, ] { 0 1 } build-track
-    dup restart-listener ;
+    listener-gadget construct-empty dup init-listener
+    [ listener-output, listener-input, ] { 0 1 } build-track ;
 
 : listener-help "ui-listener" help-window ;
 
@@ -161,3 +158,11 @@ listener-gadget "toolbar" f {
 M: listener-gadget handle-gesture* ( gadget gesture delegate -- ? )
     3dup drop swap find-workspace workspace-page handle-gesture
     [ default-gesture-handler ] [ 3drop f ] if ;
+
+M: listener-gadget graft*
+    dup delegate graft*
+    restart-listener ;
+
+M: listener-gadget ungraft*
+    dup com-end
+    delegate ungraft* ;

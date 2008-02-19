@@ -107,6 +107,7 @@ MEMO: all-vocabs-seq ( -- seq )
         { [ "ui.windows" ?head ] [ t ] }
         { [ "ui.cocoa" ?head ] [ t ] }
         { [ "cocoa" ?head ] [ t ] }
+        { [ "core-foundation" ?head ] [ t ] }
         { [ "vocabs.loader.test" ?head ] [ t ] }
         { [ "editors." ?head ] [ t ] }
         { [ ".windows" ?tail ] [ t ] }

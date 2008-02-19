@@ -83,7 +83,10 @@ HOOK: run-process* io-backend ( desc -- handle )
 : wait-for-process ( process -- status )
     [
         dup process-handle
-        [ dup [ processes get at push stop ] curry callcc0 ] when
+        [
+            dup [ processes get at push ] curry
+            "process" suspend drop
+        ] when
         dup process-killed?
         [ "Process was killed" throw ] [ process-status ] if
     ] with-timeout ;
@@ -134,5 +137,5 @@ TUPLE: process-stream process ;
 
 : notify-exit ( status process -- )
     [ set-process-status ] keep
-    [ processes get delete-at* drop [ schedule-thread ] each ] keep
+    [ processes get delete-at* drop [ resume ] each ] keep
     f swap set-process-handle ;

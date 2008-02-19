@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays calendar combinators concurrency generic
-init kernel math namespaces sequences threads ;
+USING: arrays calendar combinators concurrency.messaging
+threads generic init kernel math namespaces sequences ;
 IN: alarms
 
 TUPLE: alarm time quot ;
@@ -36,7 +36,7 @@ SYMBOL: alarm-looper
     [ alarm-time <=> 0 <= ] with subset ;
 
 : call-alarm ( alarm -- )
-    alarm-quot spawn drop ;
+    alarm-quot "Alarm invocation" spawn drop ;
 
 : do-alarms ( -- )
     expired-alarms [ call-alarm ] each
@@ -49,7 +49,7 @@ SYMBOL: alarm-looper
 : start-alarm-receiver ( -- )
     [
         alarm-receive-loop
-    ] spawn alarm-receiver set-global ;
+    ] "Alarm receiver" spawn alarm-receiver set-global ;
 
 : alarm-loop ( -- )
     alarms get-global empty? [
@@ -59,7 +59,7 @@ SYMBOL: alarm-looper
 : start-alarm-looper ( -- )
     [
         alarm-loop
-    ] spawn alarm-looper set-global ;
+    ] "Alarm looper" spawn alarm-looper set-global ;
 
 : send-alarm ( str alarm -- )
     over set-delegate
