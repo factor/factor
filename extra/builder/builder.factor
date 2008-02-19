@@ -1,7 +1,8 @@
 
 USING: kernel namespaces sequences splitting system combinators continuations
        parser io io.files io.launcher io.sockets prettyprint threads
-       bootstrap.image benchmark vars bake smtp builder.util accessors ;
+       bootstrap.image benchmark vars bake smtp builder.util accessors
+       builder.benchmark ;
 
 IN: builder
 
@@ -62,8 +63,12 @@ VAR: stamp
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : copy-image ( -- )
-  "../../factor/" my-arch boot-image-name append
-  my-arch boot-image-name
+  "../../factor/" my-boot-image-name append
+  "../"           my-boot-image-name append
+  copy-file
+
+  "../../factor/" my-boot-image-name append
+                  my-boot-image-name
   copy-file ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -76,8 +81,7 @@ VAR: stamp
   case ;
 
 : bootstrap-cmd ( -- cmd )
-  { factor-binary [ "-i=" my-boot-image-name append ] "-no-user-init" }
-  to-strings ;
+  { factor-binary { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
 
 : bootstrap ( -- desc )
   <process*>
@@ -87,8 +91,6 @@ VAR: stamp
     +stdout+      >>stderr
     20 minutes>ms >>timeout
   >desc ;
-
-! : builder-test ( -- desc ) { factor-binary "-run=builder.test" } to-strings ;
 
 : builder-test-cmd ( -- cmd )
   { factor-binary "-run=builder.test" } to-strings ;
@@ -137,10 +139,6 @@ SYMBOL: build-status
 
     bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
-!     [ builder-test try-process ]
-!     [ "Builder test error" print throw ]
-!     recover
-
     builder-test [ "Test error" print "../test-log" cat ] run-or-bail
 
     "Boot time: " write "../boot-time" eval-file milli-seconds>time print
@@ -152,6 +150,12 @@ SYMBOL: build-status
 
     "Benchmarks: " print
     "../benchmarks" [ stdio get contents eval ] with-file-reader benchmarks.
+
+    nl
+    
+    show-benchmark-deltas
+
+    "../benchmarks" "../../benchmarks" copy-file    
 
   ] with-file-writer
 
@@ -175,9 +179,12 @@ SYMBOL: builder-recipients
     "../report" file>string >>body
   send ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : build ( -- )
   [ (build) ] [ drop ] recover
-  [ send-builder-email ] [ drop "not sending mail" . ] recover ;
+  [ send-builder-email ] [ drop "not sending mail" . ] recover
+  ".." cd { "rm" "-rf" "factor" } run-process drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -199,7 +206,7 @@ USE: bootstrap.image.download
   = not ;
 
 : new-image-available? ( -- ? )
-  my-arch boot-image-name need-new-image?
+  my-boot-image-name need-new-image?
     [ download-my-image t ]
     [ f ]
   if ;
