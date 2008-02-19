@@ -110,8 +110,8 @@
 
 (require 'comint)
 
-(defvar factor-binary "/scratch/repos/Factor/factor")
-(defvar factor-image "/scratch/repos/Factor/factor.image")
+(defvar factor-binary "~/factor/factor")
+(defvar factor-image "~/factor/factor.image")
 
 (defun factor-telnet-to-port (port)
   (interactive "nPort: ")
@@ -202,8 +202,8 @@
 (defun run-factor ()
   (interactive)
   (switch-to-buffer
-   (make-comint-in-buffer "factor" nil factor-binary nil
-			  (concat "-i=" factor-image)
+   (make-comint-in-buffer "factor" nil (expand-file-name factor-binary) nil
+			  (concat "-i=" (expand-file-name factor-image))
 			  "-run=listener"))
   (factor-listener-mode))
 
