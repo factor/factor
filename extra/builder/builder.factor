@@ -181,10 +181,14 @@ SYMBOL: builder-recipients
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: compress-image ( -- )
+  { "bzip2" my-boot-image-name } to-strings run-process drop ;
+
 : build ( -- )
   [ (build) ] [ drop ] recover
   [ send-builder-email ] [ drop "not sending mail" . ] recover
-  ".." cd { "rm" "-rf" "factor" } run-process drop ;
+  ".." cd { "rm" "-rf" "factor" } run-process drop
+  [ compress-image ] [ drop ] recover ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
