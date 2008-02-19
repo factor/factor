@@ -513,4 +513,4 @@ SYMBOL: interactive-vocabs
     [
         parser-notes off
         [ [ eval ] keep ] try drop
-    ] string-out ;
+    ] with-string-writer ;

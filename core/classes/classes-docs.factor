@@ -119,7 +119,7 @@ HELP: predicate-word
 { $values { "word" "a word" } { "predicate" "a predicate word" } }
 { $description "Suffixes the word's name with \"?\" and creates a word with that name in the same vocabulary as the word itself." } ;
 
-HELP: define-predicate
+HELP: define-predicate*
 { $values { "class" class } { "predicate" "a predicate word" } { "quot" "a quotation" } }
 { $description
     "Defines a predicate word. This is identical to a word definition associating " { $snippet "quot" } " with " { $snippet "predicate" } " with the added perk that three word properties are set:"
@@ -129,6 +129,13 @@ HELP: define-predicate
         { "the predicate word's " { $snippet "\"declared-effect\"" } " word property is set to a descriptive " { $link effect } }
     }
     "These properties are used by method dispatch and the help system."
+}
+$low-level-note ;
+
+HELP: define-predicate
+{ $values { "class" class } { "quot" "a quotation" } }
+{ $description
+    "Defines a predicate word named " { $snippet "class?" } " with " { $link define-predicate* } "."
 }
 $low-level-note ;
 

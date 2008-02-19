@@ -43,20 +43,9 @@ void init_ffi(void)
 		fatal_error("GetModuleHandle(\"" FACTOR_DLL_NAME "\") failed", 0);
 }
 
-void ffi_dlopen (F_DLL *dll, bool error)
+void ffi_dlopen(F_DLL *dll)
 {
-	HMODULE module = LoadLibraryEx(alien_offset(dll->path), NULL, 0);
-
-	if (!module)
-	{
-		dll->dll = NULL;
-		if(error)
-			general_error(ERROR_FFI,F,tag_object(get_error_message()),NULL);
-		else
-			return;
-	}
-
-	dll->dll = module;
+	dll->dll = LoadLibraryEx(alien_offset(dll->path), NULL, 0);
 }
 
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol)

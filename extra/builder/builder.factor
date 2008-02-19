@@ -1,11 +1,7 @@
 
-USING: kernel parser io io.files io.launcher io.sockets hashtables math threads
-       arrays system continuations namespaces sequences splitting math.parser
-       prettyprint tools.time calendar bake vars http.client
-       combinators bootstrap.image bootstrap.image.download
-       combinators.cleave benchmark
-       classes strings quotations words parser-combinators new-slots accessors
-       assocs.lib smtp builder.util ;
+USING: kernel namespaces sequences splitting system combinators continuations
+       parser io io.files io.launcher io.sockets prettyprint threads
+       bootstrap.image benchmark vars bake smtp builder.util accessors ;
 
 IN: builder
 
@@ -48,7 +44,7 @@ VAR: stamp
 : git-id ( -- id )
   { "git" "show" } <process-stream> [ readln ] with-stream " " split second ;
 
-: record-git-id ( -- ) git-id "../git-id" [ . ] with-file-out ;
+: record-git-id ( -- ) git-id "../git-id" [ . ] with-file-writer ;
 
 : make-clean ( -- desc ) { "make" "clean" } ;
 
@@ -65,6 +61,17 @@ VAR: stamp
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: copy-image ( -- )
+  "../../factor/" my-boot-image-name append
+  "../"           my-boot-image-name append
+  copy-file
+
+  "../../factor/" my-boot-image-name append
+                  my-boot-image-name
+  copy-file ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : factor-binary ( -- name )
   os
   { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
@@ -73,8 +80,7 @@ VAR: stamp
   case ;
 
 : bootstrap-cmd ( -- cmd )
-  { factor-binary [ "-i=" my-boot-image-name append ] "-no-user-init" }
-  to-strings ;
+  { factor-binary { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
 
 : bootstrap ( -- desc )
   <process*>
@@ -85,7 +91,48 @@ VAR: stamp
     20 minutes>ms >>timeout
   >desc ;
 
-: builder-test ( -- desc ) { factor-binary "-run=builder.test" } to-strings ;
+: builder-test-cmd ( -- cmd )
+  { factor-binary "-run=builder.test" } to-strings ;
+
+: builder-test ( -- desc )
+  <process*>
+    builder-test-cmd >>arguments
+    +closed+         >>stdin
+    "../test-log"    >>stdout
+    +stdout+         >>stderr
+    45 minutes>ms    >>timeout
+  >desc ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: arrays assocs math ;
+
+: passing-benchmarks ( table -- table )
+  [ second first2 number? swap number? and ] subset ;
+
+: simplify-table ( table -- table ) [ first2 second 2array ] map ;
+
+: benchmark-difference ( old-table benchmark-result -- result-diff )
+  first2 >r
+  tuck swap at
+  r>
+  swap -
+  2array ;
+
+: compare-tables ( old new -- table )
+  [ passing-benchmarks simplify-table ] 2apply
+  [ benchmark-difference ] with map ;
+
+: show-benchmark-deltas ( -- )
+  "Benchmark deltas: " print
+
+  [
+    "../../benchmarks" eval-file
+    "../benchmarks"    eval-file
+    compare-tables .
+  ]
+    [ drop "Error generating benchmark deltas" . ]
+  recover ;
   
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -116,13 +163,13 @@ SYMBOL: build-status
 
     make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
 
-    [ retrieve-image ] [ "Image download error" print throw ] recover
+    ! [ retrieve-image ] [ "Image download error" print throw ] recover
+
+    copy-image
 
     bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
-    [ builder-test try-process ]
-    [ "Builder test error" print throw ]
-    recover
+    builder-test [ "Test error" print "../test-log" cat ] run-or-bail
 
     "Boot time: " write "../boot-time" eval-file milli-seconds>time print
     "Load time: " write "../load-time" eval-file milli-seconds>time print
@@ -132,9 +179,15 @@ SYMBOL: build-status
     "Did not pass test-all: "        print "../test-all-vocabs"        cat
 
     "Benchmarks: " print
-    "../benchmarks" [ stdio get contents eval ] with-file-in benchmarks.
+    "../benchmarks" [ stdio get contents eval ] with-file-reader benchmarks.
 
-  ] with-file-out
+    nl
+    
+    show-benchmark-deltas
+
+    "../benchmarks" "../../benchmarks" copy-file    
+
+  ] with-file-writer
 
   build-status on ;
 
@@ -156,11 +209,16 @@ SYMBOL: builder-recipients
     "../report" file>string >>body
   send ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : build ( -- )
   [ (build) ] [ drop ] recover
-  [ send-builder-email ] [ drop "not sending mail" . ] recover ;
+  [ send-builder-email ] [ drop "not sending mail" . ] recover
+  ".." cd { "rm" "-rf" "factor" } run-process drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USE: bootstrap.image.download
 
 : git-pull ( -- desc )
   {
@@ -177,11 +235,17 @@ SYMBOL: builder-recipients
   git-id
   = not ;
 
+: new-image-available? ( -- ? )
+  my-boot-image-name need-new-image?
+    [ download-my-image t ]
+    [ f ]
+  if ;
+
 : build-loop ( -- )
   builds-check
   [
     builds "/factor" append cd
-    updates-available?
+    updates-available? new-image-available? or
       [ build ]
     when
   ]

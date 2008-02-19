@@ -63,9 +63,9 @@ combinators quotations ;
 
 : pprint-use ( obj -- ) [ pprint* ] with-use ;
 
-: unparse ( obj -- str ) [ pprint ] string-out ;
+: unparse ( obj -- str ) [ pprint ] with-string-writer ;
 
-: unparse-use ( obj -- str ) [ pprint-use ] string-out ;
+: unparse-use ( obj -- str ) [ pprint-use ] with-string-writer ;
 
 : pprint-short ( obj -- )
     H{
@@ -174,7 +174,7 @@ M: hook-generic synopsis*
     dup definer.
     dup seeing-word
     dup pprint-word
-    dup "combination" word-prop hook-combination-var pprint-word
+    dup "combination" word-prop hook-combination-var pprint*
     stack-effect. ;
 
 M: method-spec synopsis*
@@ -192,7 +192,7 @@ M: pathname synopsis* pprint* ;
         0 margin set
         1 line-limit set
         [ synopsis* ] with-in
-    ] string-out ;
+    ] with-string-writer ;
 
 GENERIC: declarations. ( obj -- )
 

@@ -4,12 +4,9 @@ USING: arrays assocs classes continuations kernel math
 namespaces sequences sequences.lib tuples words strings ;
 IN: db
 
-TUPLE: db handle insert-statements update-statements delete-statements select-statements ;
+TUPLE: db handle insert-statements update-statements delete-statements ;
 : <db> ( handle -- obj )
-    H{ } clone
-    H{ } clone
-    H{ } clone
-    H{ } clone
+    H{ } clone H{ } clone H{ } clone
     db construct-boa ;
 
 GENERIC: db-open ( db -- )
@@ -23,11 +20,10 @@ HOOK: db-close db ( handle -- )
         dup db-insert-statements dispose-statements
         dup db-update-statements dispose-statements
         dup db-delete-statements dispose-statements
-        dup db-select-statements dispose-statements
         db-handle db-close
     ] with-variable ;
 
-TUPLE: statement sql params handle bound? ;
+TUPLE: statement sql params handle bound? slot-names ;
 TUPLE: simple-statement ;
 TUPLE: prepared-statement ;
 
@@ -115,5 +111,7 @@ HOOK: rollback-transaction db ( -- )
     dup string? [
         <simple-statement> [ execute-statement ] with-disposal
     ] [
-        [ [ sql-command ] each ] with-transaction
+        ! [
+            [ sql-command ] each
+        ! ] with-transaction
     ] if ;

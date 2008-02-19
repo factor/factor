@@ -6,9 +6,9 @@ USING: tools.test io.files io threads kernel continuations ;
 [ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
 
 [ ] [
-    "test-foo.txt" resource-path <file-writer> [
+    "test-foo.txt" resource-path [
         "Hello world." print
-    ] with-stream
+    ] with-file-writer
 ] unit-test
 
 [ ] [
@@ -55,11 +55,11 @@ USING: tools.test io.files io threads kernel continuations ;
 
 [ f ] [ "test-blah" resource-path exists? ] unit-test
 
-[ ] [ "test-quux.txt" resource-path <file-writer> [ [ yield "Hi" write ] in-thread ] with-stream ] unit-test
+[ ] [ "test-quux.txt" resource-path [ [ yield "Hi" write ] in-thread ] with-file-writer ] unit-test
 
 [ ] [ "test-quux.txt" resource-path delete-file ] unit-test
 
-[ ] [ "test-quux.txt" resource-path <file-writer> [ [ yield "Hi" write ] in-thread ] with-stream ] unit-test
+[ ] [ "test-quux.txt" resource-path [ [ yield "Hi" write ] in-thread ] with-file-writer ] unit-test
 
 [ ] [ "test-quux.txt" "quux-test.txt" [ resource-path ] 2apply rename-file ] unit-test
 [ t ] [ "quux-test.txt" resource-path exists? ] unit-test

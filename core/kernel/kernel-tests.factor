@@ -32,7 +32,7 @@ IN: temporary
 
 [ overflow-d-alt ] [ { "kernel-error" 12 f f } = ] must-fail-with
 
-[ ] [ [ :c ] string-out drop ] unit-test
+[ ] [ [ :c ] with-string-writer drop ] unit-test
 
 : overflow-r 3 >r overflow-r ;
 
@@ -80,8 +80,8 @@ IN: temporary
 [ 0 ] [ f [ 0 ] unless* ] unit-test
 [ t ] [ t [ "Hello" ] unless* ] unit-test
 
-[ "2\n" ] [ [ 1 2 [ . ] [ sq . ] ?if ] string-out ] unit-test
-[ "9\n" ] [ [ 3 f [ . ] [ sq . ] ?if ] string-out ] unit-test
+[ "2\n" ] [ [ 1 2 [ . ] [ sq . ] ?if ] with-string-writer ] unit-test
+[ "9\n" ] [ [ 3 f [ . ] [ sq . ] ?if ] with-string-writer ] unit-test
 
 [ f ] [ f (clone) ] unit-test
 [ -123 ] [ -123 (clone) ] unit-test

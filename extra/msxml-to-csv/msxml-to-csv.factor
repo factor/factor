@@ -13,6 +13,6 @@ IN: msxml-to-csv
     ] map ;
 
 : msxml>csv ( infile outfile -- )
-    <file-writer> [
+    [
         file>xml (msxml>csv) print-csv
-    ] with-stream ;
+    ] with-file-writer ;

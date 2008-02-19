@@ -366,7 +366,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
 } [
     [
         [ dup remove-overflow-check? ] ,
-        [ splice-quot ] curry ,
+        [ f splice-quot ] curry ,
     ] { } make 1array define-optimizers
 ] assoc-each
 
@@ -436,7 +436,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
             dup remove-overflow-check?
             over coereced-to-fixnum? or
         ] ,
-        [ splice-quot ] curry ,
+        [ f splice-quot ] curry ,
     ] { } make 1array define-optimizers
 ] assoc-each
 
@@ -461,6 +461,6 @@ most-negative-fixnum most-positive-fixnum [a,b]
 \ fixnum-shift {
     {
         [ dup fixnum-shift-fast? ]
-        [ [ fixnum-shift-fast ] splice-quot ]
+        [ [ fixnum-shift-fast ] f splice-quot ]
     }
 } define-optimizers
