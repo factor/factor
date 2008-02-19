@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: semantic-db.db ;
+USING: semantic-db ;
 IN: semantic-db.context
 
 : all-contexts ( -- contexts )
