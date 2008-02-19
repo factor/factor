@@ -133,13 +133,13 @@ SYMBOL: build-status
 
     make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
 
-    ! [ retrieve-image ] [ "Image download error" print throw ] recover
-
     copy-image
 
     bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
     builder-test [ "Test error" print "../test-log" cat ] run-or-bail
+
+    "../test-log" delete-file
 
     "Boot time: " write "../boot-time" eval-file milli-seconds>time print
     "Load time: " write "../load-time" eval-file milli-seconds>time print
