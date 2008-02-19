@@ -47,6 +47,7 @@ HOOK: insert-sql* db ( columns table -- sql slot-names )
 HOOK: update-sql* db ( columns table -- sql slot-names )
 HOOK: delete-sql* db ( columns table -- sql slot-names )
 HOOK: select-sql db ( tuple -- seq/statement )
+HOOK: select-relations-sql db ( tuple -- seq/statement )
 
 HOOK: row-column-typed db ( result-set n type -- sql )
 HOOK: sql-type>factor-type db ( obj type -- obj )
@@ -101,7 +102,8 @@ HOOK: tuple>params db ( columns tuple -- obj )
 : define-persistent ( class table columns -- )
     >r dupd "db-table" set-word-prop dup r>
     [ relation? ] partition swapd
-    [ spec>tuple ] map "db-columns" set-word-prop
+    [ spec>tuple ] map
+    "db-columns" set-word-prop
     "db-relations" set-word-prop ;
 
 : tuple>filled-slots ( tuple -- alist )
@@ -117,13 +119,17 @@ SYMBOL: building-seq
 
 : n, get-building-seq push ;
 : n% get-building-seq push-all ;
+: n# >r number>string r> n% ;
 
 : 0, 0 n, ;
 : 0% 0 n% ;
+: 0# 0 n# ;
 : 1, 1 n, ;
 : 1% 1 n% ;
+: 1# 1 n# ;
 : 2, 2 n, ;
 : 2% 2 n% ;
+: 2# 2 n# ;
 
 : nmake ( quot exemplars -- seqs )
     dup length dup zero? [ 1+ ] when

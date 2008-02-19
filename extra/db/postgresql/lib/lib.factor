@@ -37,8 +37,8 @@ IN: db.postgresql.lib
 : do-postgresql-bound-statement ( statement -- res )
     >r db get db-handle r>
     [ statement-sql ] keep
-    [ statement-params length f ] keep
-    statement-params
+    [ statement-bind-params length f ] keep
+    statement-bind-params
     [ first number>string* malloc-char-string ] map >c-void*-array
     f f 0 PQexecParams
     dup postgresql-result-ok? [

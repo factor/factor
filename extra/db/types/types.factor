@@ -1,21 +1,38 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs db kernel math math.parser
-sequences continuations sequences.deep sequences.lib ;
+sequences continuations sequences.deep sequences.lib
+words ;
 IN: db.types
 
+TUPLE: sql-spec slot-name column-name type modifiers primary-key ;
 ! ID is the Primary key
+! +native-id+ can be a columns type or a modifier
 SYMBOL: +native-id+
+! +assigned-id+ can only be a modifier
 SYMBOL: +assigned-id+
 
-: primary-key? ( spec -- ? )
-    [ { +native-id+ +assigned-id+ } member? ] contains? ;
+: primary-key? ( obj -- ? )
+    { +native-id+ +assigned-id+ } member? ;
 
-: contains-id? ( columns id -- ? )
-    swap [ member? ] with contains? ;
-    
-: assigned-id? ( columns -- ? ) +assigned-id+ contains-id? ;
-: native-id? ( columns -- ? ) +native-id+ contains-id? ;
+: normalize-spec ( spec -- )
+    dup sql-spec-type dup primary-key? [
+        swap set-sql-spec-primary-key
+    ] [
+        drop dup sql-spec-modifiers [
+            primary-key?
+        ] deep-find
+        [ swap set-sql-spec-primary-key ] [ drop ] if*
+    ] if ;
+
+: find-primary-key ( specs -- obj )
+    [ sql-spec-primary-key ] find nip ;
+
+: native-id? ( spec -- ? )
+    sql-spec-primary-key +native-id+ = ;
+
+: assigned-id? ( spec -- ? )
+    sql-spec-primary-key +assigned-id+ = ;
 
 SYMBOL: +foreign-key+
 
@@ -31,7 +48,7 @@ SYMBOL: +not-null+
 SYMBOL: +has-many+
 
 : relation? ( spec -- ? )
-    [ +has-many+ = ] deep-find* nip ;
+    [ +has-many+ = ] deep-find ;
 
 SYMBOL: INTEGER
 SYMBOL: BIG_INTEGER
@@ -45,30 +62,15 @@ SYMBOL: VARCHAR
 SYMBOL: TIMESTAMP
 SYMBOL: DATE
 
-TUPLE: no-sql-type ;
-: no-sql-type ( -- * ) T{ no-sql-type } throw ;
-
-: number>string* ( n/str -- str )
-    dup number? [ number>string ] when ;
-
-: maybe-remove-id ( columns -- obj )
-    [ +native-id+ swap member? not ] subset ;
-
-: remove-relations ( columns -- newcolumns )
-    [ relation? not ] subset ;
-
-: remove-id ( columns -- obj )
-    [ primary-key? not ] subset ;
-
-! SQLite Types: http://www.sqlite.org/datatype3.html
-! NULL INTEGER REAL TEXT BLOB
-! PostgreSQL Types:
-! http://developer.postgresql.org/pgdocs/postgres/datatype.html
-
-TUPLE: sql-spec slot-name column-name type modifiers ;
-
 : spec>tuple ( spec -- tuple )
-    [ ?first3 ] keep 3 ?tail* sql-spec construct-boa ;
+    [ ?first3 ] keep 3 ?tail*
+    {
+        set-sql-spec-slot-name
+        set-sql-spec-column-name
+        set-sql-spec-type
+        set-sql-spec-modifiers
+    } sql-spec construct
+    dup normalize-spec ;
 
 : sql-type-hash ( -- assoc )
     H{
@@ -79,16 +81,62 @@ TUPLE: sql-spec slot-name column-name type modifiers ;
         { TIMESTAMP "timestamp" }
     } ;
 
-! HOOK: sql-type-hash db ( -- obj )
-! HOOK: >sql-type-string db ( obj -- str )
+TUPLE: no-sql-type ;
+: no-sql-type ( -- * ) T{ no-sql-type } throw ;
 
-: >sql-type-string ( obj -- str/f )
+TUPLE: no-sql-modifier ;
+: no-sql-modifier ( -- * ) T{ no-sql-modifier } throw ;
+
+: number>string* ( n/str -- str )
+    dup number? [ number>string ] when ;
+
+: maybe-remove-id ( specs -- obj )
+    [ native-id? not ] subset ;
+
+: remove-relations ( specs -- newcolumns )
+    [ relation? not ] subset ;
+
+: remove-id ( specs -- obj )
+    [ sql-spec-primary-key not ] subset ;
+
+! SQLite Types: http://www.sqlite.org/datatype3.html
+! NULL INTEGER REAL TEXT BLOB
+! PostgreSQL Types:
+! http://developer.postgresql.org/pgdocs/postgres/datatype.html
+
+
+
+HOOK: modifier-table db ( -- hash )
+HOOK: compound-modifier db ( str n -- hash )
+
+: lookup-modifier ( obj -- str )
     dup pair? [
-        first >sql-type-string
+        first2 >r lookup-modifier r> compound-modifier
     ] [
-        sql-type-hash at* [ drop "" ] unless
+        modifier-table at*
+        [ "unknown modifier" throw ] unless
     ] if ;
 
-: full-sql-type-string ( obj -- str )
-    [ >sql-type-string ] keep second
-    number>string " " swap 3append ;
+
+HOOK: type-table db ( -- hash )
+HOOK: create-type-table db ( -- hash )
+HOOK: compound-type db ( str n -- hash )
+
+: lookup-type* ( obj -- str )
+    dup pair? [
+        first lookup-type*
+    ] [
+        type-table at*
+        [ no-sql-type ] unless
+    ] if ;
+
+: lookup-create-type ( obj -- str )
+    dup pair? [
+        first2 >r lookup-create-type r> compound-type
+    ] [
+        dup create-type-table at*
+        [ nip ] [ drop lookup-type* ] if
+    ] if ;
+
+: lookup-type ( obj create? -- str )
+    [ lookup-create-type ] [ lookup-type* ] if ;
