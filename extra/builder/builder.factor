@@ -91,8 +91,6 @@ VAR: stamp
     20 minutes>ms >>timeout
   >desc ;
 
-! : builder-test ( -- desc ) { factor-binary "-run=builder.test" } to-strings ;
-
 : builder-test-cmd ( -- cmd )
   { factor-binary "-run=builder.test" } to-strings ;
 
@@ -171,13 +169,7 @@ SYMBOL: build-status
 
     bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
-!     [ builder-test try-process ]
-!     [ "Builder test error" print throw ]
-!     recover
-
     builder-test [ "Test error" print "../test-log" cat ] run-or-bail
-
-
 
     "Boot time: " write "../boot-time" eval-file milli-seconds>time print
     "Load time: " write "../load-time" eval-file milli-seconds>time print
