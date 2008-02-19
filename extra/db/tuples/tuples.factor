@@ -12,23 +12,38 @@ TUPLE: no-slot-named ;
 : no-slot-named ( -- * ) T{ no-slot-named } throw ;
 
 : slot-spec-named ( str class -- slot-spec )
-    "slots" word-prop [ slot-spec-name = ] with find nip
-    [ no-slot-named ] unless* ;
+    "slots" word-prop [ slot-spec-name = ] with find nip ;
 
 : offset-of-slot ( str obj -- n )
-    class slot-spec-named slot-spec-offset ;
+    class slot-spec-named dup [ slot-spec-offset ] when ;
+
+DEFER: get-slot-named
+: get-delegate-slot-named ( str obj -- value )
+    delegate [ get-slot-named ] [ drop no-slot-named ] if* ;
 
 : get-slot-named ( str obj -- value )
-    tuck offset-of-slot [ no-slot-named ] unless* slot ;
+    2dup offset-of-slot [
+        rot drop slot
+    ] [
+        get-delegate-slot-named
+    ] if* ;
+
+DEFER: set-slot-named
+: set-delegate-slot-named ( value str obj -- )
+    delegate [ set-slot-named ] [ 2drop no-slot-named ] if* ;
 
 : set-slot-named ( value str obj -- )
-    tuck offset-of-slot [ no-slot-named ] unless* set-slot ;
+    2dup offset-of-slot [
+        rot drop set-slot
+    ] [
+        set-delegate-slot-named
+    ] if* ;
 
 : primary-key-spec ( class -- spec )
     db-columns [ primary-key? ] find nip ;
     
 : primary-key ( tuple -- obj )
-    dup class primary-key-spec get-slot-named ;
+    dup class primary-key-spec first swap get-slot-named ;
 
 : set-primary-key ( obj tuple -- )
     [ class primary-key-spec first ] keep
@@ -41,9 +56,9 @@ TUPLE: no-slot-named ;
 HOOK: create-sql db ( columns table -- seq )
 HOOK: drop-sql db ( columns table -- seq )
 
-HOOK: insert-sql* db ( columns table -- slot-names sql )
-HOOK: update-sql* db ( columns table -- slot-names sql )
-HOOK: delete-sql* db ( columns table -- slot-names sql )
+HOOK: insert-sql* db ( columns table -- sql )
+HOOK: update-sql* db ( columns table -- sql )
+HOOK: delete-sql* db ( columns table -- sql )
 HOOK: select-sql db ( tuple -- statement )
 
 HOOK: row-column-typed db ( result-set n type -- sql )
