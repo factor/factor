@@ -84,7 +84,6 @@ USING: concurrency.combinators
 concurrency.messaging
 concurrency.promises
 concurrency.futures
-concurrency.distributed
 concurrency.locks
 concurrency.semaphores
 concurrency.count-downs
@@ -102,12 +101,12 @@ $nl
 { $subsection "concurrency.promises" }
 { $subsection "concurrency.futures" }
 { $subsection "concurrency.messaging" }
-{ $subsection "concurrency.distributed" }
 "Shared-state abstractions:"
 { $subsection "concurrency.locks" }
 { $subsection "concurrency.semaphores" }
 { $subsection "concurrency.count-downs" }
-{ $subsection "concurrency.exchangers" } ;
+{ $subsection "concurrency.exchangers" }
+"Other concurrency abstractions include " { $vocab-link "concurrency.distributed" } " and " { $vocab-link "channels" } "." ;
 
 ARTICLE: "objects" "Objects"
 "An " { $emphasis "object" } " is any datum which may be identified. All values are objects in Factor. Each object carries type information, and types are checked at runtime; Factor is dynamically typed."
