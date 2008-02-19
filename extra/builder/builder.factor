@@ -1,7 +1,8 @@
 
 USING: kernel namespaces sequences splitting system combinators continuations
        parser io io.files io.launcher io.sockets prettyprint threads
-       bootstrap.image benchmark vars bake smtp builder.util accessors ;
+       bootstrap.image benchmark vars bake smtp builder.util accessors
+       builder.benchmark ;
 
 IN: builder
 
@@ -103,37 +104,6 @@ VAR: stamp
     45 minutes>ms    >>timeout
   >desc ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USING: arrays assocs math ;
-
-: passing-benchmarks ( table -- table )
-  [ second first2 number? swap number? and ] subset ;
-
-: simplify-table ( table -- table ) [ first2 second 2array ] map ;
-
-: benchmark-difference ( old-table benchmark-result -- result-diff )
-  first2 >r
-  tuck swap at
-  r>
-  swap -
-  2array ;
-
-: compare-tables ( old new -- table )
-  [ passing-benchmarks simplify-table ] 2apply
-  [ benchmark-difference ] with map ;
-
-: show-benchmark-deltas ( -- )
-  "Benchmark deltas: " print
-
-  [
-    "../../benchmarks" eval-file
-    "../benchmarks"    eval-file
-    compare-tables .
-  ]
-    [ drop "Error generating benchmark deltas" . ]
-  recover ;
-  
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: build-status
