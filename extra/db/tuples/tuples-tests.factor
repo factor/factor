@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.sqlite db.tuples
-db.types continuations namespaces db.postgresql math ;
+db.types continuations namespaces db.postgresql math
+prettyprint ;
 ! tools.time ;
 IN: temporary
 
@@ -45,7 +46,7 @@ SYMBOL: the-person
 
 person "PERSON"
 {
-    { "the-id" "ID" SERIAL +native-id+ }
+    { "the-id" "ID" +native-id+ }
     { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
     { "the-number" "AGE" INTEGER { +default+ 0 } }
     { "real" "REAL" DOUBLE { +default+ 0.3 } }
@@ -53,7 +54,7 @@ person "PERSON"
 
 "billy" 10 3.14 <person> the-person set
 
-! test-sqlite
+test-sqlite
 ! test-postgresql
 
 ! person "PERSON"
@@ -74,7 +75,7 @@ TUPLE: annotation n paste-id summary author mode contents ;
 
 paste "PASTE"
 {
-    { "n" "ID" SERIAL +native-id+ }
+    { "n" "ID" +native-id+ }
     { "summary" "SUMMARY" TEXT }
     { "author" "AUTHOR" TEXT }
     { "channel" "CHANNEL" TEXT }
@@ -84,17 +85,10 @@ paste "PASTE"
     { "annotations" { +has-many+ annotation } }
 } define-persistent
 
-! n
-    ! NO: drop insert
-    ! YES: create update delete select
-! annotations
-    ! NO: create drop insert update delete
-    ! YES: select
-
 annotation "ANNOTATION"
 {
-    { "n" "ID" SERIAL +native-id+ }
-    { "paste-id" "PASTE_ID" INTEGER { +foreign-key+ paste "n" } }
+    { "n" "ID" +native-id+ }
+    { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "n" } }
     { "summary" "SUMMARY" TEXT }
     { "author" "AUTHOR" TEXT }
     { "mode" "MODE" TEXT }
@@ -102,8 +96,10 @@ annotation "ANNOTATION"
 } define-persistent
 
 "localhost" "postgres" "" "factor-test" <postgresql-db> [
-    ! paste drop-table
-    ! annotation drop-table
+    [ paste drop-table ] [ drop ] recover
+    [ annotation drop-table ] [ drop ] recover
+    [ paste drop-table ] [ drop ] recover
+    [ annotation drop-table ] [ drop ] recover
     paste create-table
     annotation create-table
 ] with-db

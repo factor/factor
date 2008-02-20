@@ -39,7 +39,7 @@ M: postgresql-db dispose ( db -- )
     >r <postgresql-db> r> with-disposal ;
 
 M: postgresql-statement bind-statement* ( seq statement -- )
-    set-statement-bind-params ;
+    set-statement-in-params ;
 
 M: postgresql-statement reset-statement ( statement -- )
     drop ;
@@ -68,7 +68,7 @@ M: postgresql-statement insert-statement ( statement -- id )
     query-results [ 0 row-column ] with-disposal string>number ;
 
 M: postgresql-statement query-results ( query -- result-set )
-    dup statement-bind-params [
+    dup statement-in-params [
         over [ bind-statement ] keep
         do-postgresql-bound-statement
     ] [
@@ -96,7 +96,7 @@ M: postgresql-result-set dispose ( result-set -- )
 M: postgresql-statement prepare-statement ( statement -- )
     [
         >r db get db-handle "" r>
-        dup statement-sql swap statement-bind-params
+        dup statement-sql swap statement-in-params
         length f PQprepare postgresql-error
     ] keep set-statement-handle ;
 
@@ -117,12 +117,6 @@ M: postgresql-db commit-transaction ( -- )
 
 M: postgresql-db rollback-transaction ( -- )
     "ROLLBACK" sql-command ;
-
-: modifiers% ( spec -- )
-    sql-spec-modifiers
-    [ lookup-modifier ] map
-    " " join
-    dup empty? [ drop ] [ " " % % ] if ;
 
 SYMBOL: postgresql-counter
 : bind% ( spec -- )
@@ -274,6 +268,7 @@ M: postgresql-db type-table ( -- hash )
         { TEXT "text" }
         { VARCHAR "varchar" }
         { INTEGER "integer" }
+        { TIMESTAMP "timestamp" }
     } ;
 
 M: postgresql-db create-type-table ( -- hash )
@@ -282,16 +277,24 @@ M: postgresql-db create-type-table ( -- hash )
     } ;
 
 : postgresql-compound ( str n -- newstr )
-    dup number? [ "compound -- not a number" throw ] unless
-    number>string " " swap 3append ;
+    over {
+        { "varchar" [ first number>string join-space ] }
+        { "references"
+            [
+                first2 >r [ unparse join-space ] keep db-columns r>
+                swap [ sql-spec-slot-name = ] with find nip sql-spec-column-name paren append
+                ] }
+        [ "no compound found" 3array throw ]
+    } case ;
 
-M: postgresql-db compound-modifier ( str n -- newstr )
+M: postgresql-db compound-modifier ( str seq -- newstr )
     postgresql-compound ;
     
 M: postgresql-db modifier-table ( -- hashtable )
     H{
         { +native-id+ "primary key" }
         { +assigned-id+ "primary key" }
+        { +foreign-id+ "references" }
         { +autoincrement+ "autoincrement" }
         { +unique+ "unique" }
         { +default+ "default" }

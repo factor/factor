@@ -4,7 +4,7 @@ USING: alien arrays assocs classes compiler db
 hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
-words combinators.lib db.types ;
+words combinators.lib db.types combinators ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
@@ -86,54 +86,53 @@ M: sqlite-db commit-transaction ( -- )
 M: sqlite-db rollback-transaction ( -- )
     "ROLLBACK" sql-command ;
 
-M: sqlite-db create-sql ( columns table -- sql )
+M: sqlite-db create-sql ( specs table -- sql )
     [
         "create table " % %
-        " (" % [ ", " % ] [
-            dup second % " " %
-            dup third >sql-type % " " %
-            sql-modifiers " " join %
-        ] interleave ")" %
+        "(" % [ ", " % ] [
+            dup sql-spec-column-name %
+            " " %
+            dup sql-spec-type t lookup-type %
+            modifiers%
+        ] interleave ");" %
     ] "" make ;
 
-M: sqlite-db drop-sql ( columns table -- sql )
+M: sqlite-db drop-sql ( specs table -- sql )
     [
-        "drop table " % %
-        drop
+        "drop table " % % ";" %
     ] "" make ;
 
-M: sqlite-db insert-sql* ( columns table -- sql )
+M: sqlite-db insert-sql* ( specs table -- sql )
     [
-        "insert into " %
-        %
+        "insert into " % %
         "(" %
-        dup [ ", " % ] [ second % ] interleave
-        ") " %
-        " values (" %
-        [ ", " % ] [ ":" % second % ] interleave
-        ")" %
+        maybe-remove-id
+        dup [ ", " % ] [ sql-spec-column-name % ] interleave
+        ") values(" %
+        [ ", " % ] [ ":" % sql-spec-column-name % ] interleave
+        ");" %
     ] "" make ;
 
-: where-primary-key% ( columns -- )
+: where-primary-key% ( specs -- )
     " where " %
-    [ primary-key? ] find nip second dup % " = :" % % ;
+    find-primary-key sql-spec-column-name dup % " = :" % % ;
 
-M: sqlite-db update-sql* ( columns table -- sql )
+M: sqlite-db update-sql* ( specs table -- sql )
     [
         "update " %
         %
         " set " %
         dup remove-id
-        [ ", " % ] [ second dup % " = :" % % ] interleave
+        [ ", " % ] [ sql-spec-column-name dup % " = :" % % ] interleave
         where-primary-key%
     ] "" make ;
 
-M: sqlite-db delete-sql* ( columns table -- sql )
+M: sqlite-db delete-sql* ( specs table -- sql )
     [
-        "delete from " %
-        %
+        "delete from " % %
         " where " %
-        first second dup % " = :" % %
+        find-primary-key
+        sql-spec-column-name dup % " = :" % %
     ] "" make ;
 
 : select-interval ( interval name -- )
@@ -142,22 +141,32 @@ M: sqlite-db delete-sql* ( columns table -- sql )
 : select-sequence ( seq name -- )
     ;
 
-M: sqlite-db select-sql ( columns table -- sql )
+: select-by-slots-sql ( tuple -- sql out-specs )
     [
-        "select ROWID, " %
-        over [ ", " % ] [ second % ] interleave
-        " from " % %
-        " where " %
-    ] "" make ;
+        "select from " 0% dup class db-table 0%
+        " " 0%
+        dup class db-columns [ ", " 0% ]
+        [ dup sql-spec-column-name 0% 1, ] interleave
 
-M: sqlite-db tuple>params ( columns tuple -- obj )
+        dup class db-columns
+        [ sql-spec-slot-name swap get-slot-named ] with subset
+        " where " 0%
+        [ ", " 0% ]
+        [ sql-spec-column-name dup 0% " = :" 0% 0% ] interleave
+        ";" 0%
+    ] { "" { } } nmake ;
+
+M: sqlite-db select-sql ( tuple -- sql )
+    select-by-slots-sql ;
+
+M: sqlite-db tuple>params ( specs tuple -- obj )
     [
         >r [ second ":" swap append ] keep r>
         dupd >r first r> get-slot-named swap
         third 3array
     ] curry map ;
 
-: sqlite-db-modifiers ( -- hashtable )
+M: sqlite-db modifier-table ( -- hashtable )
     H{
         { +native-id+ "primary key" }
         { +assigned-id+ "primary key" }
@@ -168,32 +177,24 @@ M: sqlite-db tuple>params ( columns tuple -- obj )
         { +not-null+ "not null" }
     } ;
 
-M: sqlite-db sql-modifiers* ( modifiers -- str )
-    sqlite-db-modifiers swap [
-        dup array? [
-            first2
-            >r swap at r> number>string*
-            " " swap 3append
-        ] [
-            swap at
-        ] if
-    ] with map [ ] subset ;
+M: sqlite-db compound-type ( str seq -- )
+    over {
+        { "varchar" [ first number>string join-space ] }
+        [ 2drop "" ] !  "no sqlite compound data type" 3array throw ]
+    } case ;
 
-: sqlite-type-hash ( -- assoc )
+M: sqlite-db type-table ( -- assoc )
     H{
+        { +native-id+ "integer primary key" }
         { INTEGER "integer" }
-        { SERIAL "integer" }
         { TEXT "text" }
-        { VARCHAR "text" }
+        { VARCHAR "varchar" }
+        { TIMESTAMP "timestamp" }
         { DOUBLE "real" }
     } ;
 
-M: sqlite-db >sql-type ( obj -- str )
-    dup pair? [
-        first >sql-type
-    ] [
-        sqlite-type-hash at* [ T{ no-sql-type } throw ] unless
-    ] if ;
+M: sqlite-db create-type-table
+    type-table ;
 
 ! HOOK: get-column-value ( n result-set type -- )
 ! M: sqlite get-column-value { { "TEXT" get-text-column } { 

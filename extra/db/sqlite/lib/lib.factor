@@ -78,7 +78,7 @@ IN: db.sqlite.lib
         { TEXT [ sqlite-bind-text-by-name ] }
         { VARCHAR [ sqlite-bind-text-by-name ] }
         { DOUBLE [ sqlite-bind-double-by-name ] }
-        { SERIAL [ sqlite-bind-int-by-name ] }
+        { TIMESTAMP [ sqlite-bind-double-by-name ] }
         ! { NULL [ sqlite-bind-null-by-name ] }
         [ no-sql-type ]
     } case ;
@@ -102,6 +102,8 @@ IN: db.sqlite.lib
         { BIG_INTEGER [ sqlite3_column_int64 ] }
         { TEXT [ sqlite3_column_text ] }
         { DOUBLE [ sqlite3_column_double ] }
+        { TIMESTAMP [ sqlite3_column_double ] }
+        [ no-sql-type ]
     } case ;
 
 ! TODO

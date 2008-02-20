@@ -65,7 +65,6 @@ HOOK: tuple>params db ( columns tuple -- obj )
 
 : tuple-statement ( columns tuple quot -- statement )
     >r [ tuple>params ] 2keep class r> call
-    2dup . .
     [ bind-statement ] keep ;
 
 : make-tuple-statement ( tuple columns-quot statement-quot -- statement )

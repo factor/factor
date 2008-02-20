@@ -23,7 +23,7 @@ HOOK: db-close db ( handle -- )
         db-handle db-close
     ] with-variable ;
 
-TUPLE: statement handle sql slot-names bind-params bound? ;
+TUPLE: statement handle sql slot-names bound? in-params out-params ;
 TUPLE: simple-statement ;
 TUPLE: prepared-statement ;
 
@@ -47,7 +47,7 @@ GENERIC: more-rows? ( result-set -- ? )
 : bind-statement ( obj statement -- )
     dup statement-bound? [ dup reset-statement ] when
     [ bind-statement* ] 2keep
-    [ set-statement-bind-params ] keep
+    [ set-statement-in-params ] keep
     t swap set-statement-bound? ;
 
 : init-result-set ( result-set -- )
@@ -55,7 +55,7 @@ GENERIC: more-rows? ( result-set -- ? )
     0 swap set-result-set-n ;
 
 : <result-set> ( query handle tuple -- result-set )
-    >r >r { statement-sql statement-bind-params } get-slots r>
+    >r >r { statement-sql statement-in-params } get-slots r>
     {
         set-result-set-sql
         set-result-set-params
