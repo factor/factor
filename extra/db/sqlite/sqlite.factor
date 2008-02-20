@@ -177,10 +177,13 @@ M: sqlite-db modifier-table ( -- hashtable )
         { +not-null+ "not null" }
     } ;
 
-M: sqlite-db compound-type ( str seq -- )
+M: sqlite-db compound-modifier ( str obj -- newstr )
+    drop ;
+
+M: sqlite-db compound-type ( str seq -- newstr )
     over {
-        { "varchar" [ first number>string join-space ] }
-        [ 2drop "" ] !  "no sqlite compound data type" 3array throw ]
+        ! { "varchar" [ first number>string join-space ] }
+        [ drop ] !  "no sqlite compound data type" 3array throw ]
     } case ;
 
 M: sqlite-db type-table ( -- assoc )
