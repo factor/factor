@@ -97,7 +97,7 @@ M: thread send ( message thread -- )
     mailbox mailbox-get? ?linked ; inline
 
 : rethrow-linked ( error process supervisor -- )
-    >r <linked> r> send ;
+    pick thread-death? [ 3drop ] [ >r <linked> r> send ] if ;
 
 : spawn-linked-to ( quot name mailbox -- thread )
     [ >r <linked> r> mailbox-put ] curry <thread>
@@ -117,16 +117,25 @@ TUPLE: reply data tag ;
     synchronous-tag \ reply construct-boa ;
 
 : send-synchronous ( message thread -- reply )
-    >r <synchronous> dup r> send [
-        over reply? [
-            >r reply-tag r> synchronous-tag =
-        ] [
-            2drop f
-        ] if
-    ] curry receive-if reply-data ;
+    dup self eq? [
+        "Cannot synchronous send to myself" throw
+    ] [
+        >r <synchronous> dup r> send [
+            over reply? [
+                >r reply-tag r> synchronous-tag =
+            ] [
+                2drop f
+            ] if
+        ] curry receive-if reply-data
+    ] if ;
 
 : reply-synchronous ( message synchronous -- )
     [ <reply> ] keep synchronous-sender send ;
+
+: handle-synchronous ( quot -- )
+    receive [
+        synchronous-data swap call
+    ] keep reply-synchronous ; inline
 
 <PRIVATE
 
