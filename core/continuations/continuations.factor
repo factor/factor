@@ -91,14 +91,8 @@ C: <continuation> continuation
 
 PRIVATE>
 
-: set-walker-hook ( quot -- ) 3 setenv ; inline
-
-: walker-hook ( -- quot ) 3 getenv f set-walker-hook ; inline
-
 : continue-with ( obj continuation -- )
-    [
-        walker-hook [ >r 2array r> ] when* (continue-with)
-    ] 2 (throw) ;
+    [ (continue-with) ] 2 (throw) ;
 
 : continue ( continuation -- )
     f swap continue-with ;
@@ -185,20 +179,3 @@ M: condition compute-restarts
     "kernel-error" 6 setenv ;
 
 PRIVATE>
-
-! Debugging support
-: with-walker-hook ( continuation -- )
-    [ swap set-walker-hook (continue) ] curry callcc1 ;
-
-SYMBOL: break-hook
-
-: break ( -- )
-    continuation callstack
-    over set-continuation-call
-    walker-hook [ (continue-with) ] [ break-hook get call ] if* ;
-
-GENERIC: (step-into) ( obj -- )
-
-M: wrapper (step-into) wrapped break ;
-M: object (step-into) break ;
-M: callable (step-into) \ break add* break ;

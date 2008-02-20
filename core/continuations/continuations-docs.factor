@@ -199,6 +199,3 @@ $low-level-note ;
 
 HELP: init-error-handler
 { $description "Called on startup to initialize the catch stack and set a pair of hooks which allow the Factor VM to signal errors to library code." } ;
-
-HELP: break
-{ $description "Suspends execution of the current thread and starts the single stepper by calling " { $link break-hook } "." } ;

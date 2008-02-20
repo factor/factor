@@ -29,14 +29,14 @@ MATCH-VARS: ?from ?tag ?id ?value ;
 SYMBOL: no-channel
 
 : channel-process ( -- )
-    receive [
+    [
         {
             { { to ?id ?value  }
             [ ?value ?id get-channel dup [ to f ] [ 2drop no-channel ] if ] }
             { { from ?id }
             [ ?id get-channel [ from ] [ no-channel ] if* ] }
         } match-cond
-    ] keep reply-synchronous ;
+    ] handle-synchronous ;
 
 PRIVATE>
 
