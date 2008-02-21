@@ -110,11 +110,12 @@ PRIVATE>
 SYMBOL: thread-error-hook
 
 : rethrow ( error -- * )
+    dup save-error
     catchstack* empty? [
         thread-error-hook get-global
         [ 1 (throw) ] [ die ] if*
     ] when
-    dup save-error c> continue-with ;
+    c> continue-with ;
 
 : recover ( try recovery -- )
     >r [ swap >c call c> drop ] curry r> ifcc ; inline
