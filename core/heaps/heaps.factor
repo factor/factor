@@ -1,30 +1,30 @@
-! Copyright (C) 2007 Ryan Murphy, Doug Coleman.
+! Copyright (C) 2007, 2008 Ryan Murphy, Doug Coleman,
+! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences arrays assocs ;
+USING: kernel math sequences arrays assocs sequences.private
+growable ;
 IN: heaps
 
 MIXIN: priority-queue
 
-GENERIC: heap-push ( value key heap -- )
+GENERIC: heap-push* ( value key heap -- entry )
 GENERIC: heap-peek ( heap -- value key )
 GENERIC: heap-pop* ( heap -- )
 GENERIC: heap-pop ( heap -- value key )
-GENERIC: heap-delete ( key heap -- )
-GENERIC: heap-delete* ( key heap -- old ? )
+GENERIC: heap-delete ( entry -- )
 GENERIC: heap-empty? ( heap -- ? )
 GENERIC: heap-size ( heap -- n )
 
 <PRIVATE
 
-TUPLE: heap data ;
+: heap-data delegate ; inline
 
 : <heap> ( class -- heap )
-    >r V{ } clone heap construct-boa r>
-    construct-delegate ; inline
+    >r V{ } clone r> construct-delegate ; inline
 
 TUPLE: entry value key index ;
 
-: <entry> f entry construct-boa ;
+: <entry> ( value key -- entry ) f entry construct-boa ;
 
 PRIVATE>
 
@@ -47,44 +47,48 @@ M: priority-queue heap-size ( heap -- n )
 
 <PRIVATE
 
-: left ( n -- m ) 1 shift 1+ ; inline
+: left ( n -- m ) 1 shift 1 + ; inline
 
 : right ( n -- m ) 1 shift 2 + ; inline
 
 : up ( n -- m ) 1- 2/ ; inline
 
-: data-nth ( n heap -- obj )
-    heap-data nth ; inline
+: data-nth ( n heap -- entry )
+    heap-data nth-unsafe ; inline
 
-: up-value ( n heap -- obj )
+: up-value ( n heap -- entry )
     >r up r> data-nth ; inline
 
-: left-value ( n heap -- obj )
+: left-value ( n heap -- entry )
     >r left r> data-nth ; inline
 
-: right-value ( n heap -- obj )
+: right-value ( n heap -- entry )
     >r right r> data-nth ; inline
 
-: data-push ( obj heap -- )
-    heap-data push ; inline
+: data-set-nth ( entry n heap -- )
+    >r [ swap set-entry-index ] 2keep r>
+    heap-data set-nth-unsafe ;
 
-: data-pop ( heap -- obj )
+: data-push ( entry heap -- n )
+    dup heap-size [
+        swap 2dup heap-data ensure 2drop data-set-nth
+    ] keep ; inline
+
+: data-pop ( heap -- entry )
     heap-data pop ; inline
 
-: data-pop* ( heap -- obj )
+: data-pop* ( heap -- )
     heap-data pop* ; inline
 
-: data-peek ( heap -- obj )
+: data-peek ( heap -- entry )
     heap-data peek ; inline
 
-: data-first ( heap -- obj )
+: data-first ( heap -- entry )
     heap-data first ; inline
 
-: data-set-first ( obj heap -- )
-    heap-data set-first ; inline
-
 : data-exchange ( m n heap -- )
-    heap-data exchange ; inline
+    [ tuck data-nth >r data-nth r> ] 3keep
+    tuck >r >r data-set-nth r> r> data-set-nth ; inline
 
 GENERIC: heap-compare ( pair1 pair2 heap -- ? )
 
@@ -103,17 +107,22 @@ M: max-heap heap-compare (heap-compare) < ;
 : right-bounds-check? ( m heap -- ? )
     >r right r> heap-bounds-check? ; inline
 
-: up-heap-continue? ( m up[m] heap -- ? )
+: continue? ( m up[m] heap -- ? )
     [ data-nth swap ] keep [ data-nth ] keep
     heap-compare ; inline
 
-: up-heap ( n heap -- )
+DEFER: up-heap
+
+: (up-heap) ( n heap -- )
     >r dup up r>
-    3dup up-heap-continue? [
+    3dup continue? [
         [ data-exchange ] 2keep up-heap
     ] [
-        2drop
+        3drop
     ] if ;
+
+: up-heap ( n heap -- )
+    over 0 > [ (up-heap) ] [ 2drop ] if ;
 
 : (child) ( m heap -- n )
     2dup right-value
@@ -122,7 +131,8 @@ M: max-heap heap-compare (heap-compare) < ;
     [ right ] [ left ] if ;
 
 : child ( m heap -- n )
-    2dup right-bounds-check? [ drop left ] [ (child) ] if ;
+    2dup right-bounds-check?
+    [ drop left ] [ (child) ] if ;
 
 : swap-down ( m heap -- )
     [ child ] 2keep data-exchange ;
@@ -130,11 +140,11 @@ M: max-heap heap-compare (heap-compare) < ;
 DEFER: down-heap
 
 : (down-heap) ( m heap -- )
-    2dup [ data-nth ] 2keep child pick
-    dupd [ data-nth swapd ] keep heap-compare [
-        -rot [ swap-down ] keep down-heap
-    ] [
+    [ child ] 2keep swapd
+    3dup continue? [
         3drop
+    ] [
+        [ data-exchange ] 2keep down-heap
     ] if ;
 
 : down-heap ( m heap -- )
@@ -142,23 +152,37 @@ DEFER: down-heap
 
 PRIVATE>
 
-M: priority-queue heap-push ( value key heap -- )
-    [ >r <heap-entry> r> data-push ] keep up-heap ;
+M: priority-queue heap-push* ( value key heap -- entry )
+    >r <entry> dup r> [ data-push ] keep up-heap ;
+
+: heap-push ( value key heap -- ) heap-push* drop ;
 
 : heap-push-all ( assoc heap -- )
     [ swapd heap-push ] curry assoc-each ;
 
-M: priority-queue heap-peek ( heap -- value key )
-    data-first { entry-value entry-key } get-slots ;
+: >entry< ( entry -- key value )
+    { entry-value entry-key } get-slots ;
 
-M: priority-queue heap-pop* ( heap -- )
-    dup heap-size 1 > [
-        [ heap-pop ] keep
-        [ set-data-first ] keep
-        0 swap down-heap
+M: priority-queue heap-peek ( heap -- value key )
+    data-first >entry< ;
+
+M: priority-queue heap-delete ( entry heap -- )
+    >r entry-index r>
+    2dup heap-size 1- = [
+        nip data-pop*
     ] [
-        data-pop*
+        [ nip data-pop ] 2keep
+        [ data-set-nth ] 2keep
+        down-heap
     ] if ;
 
+M: priority-queue heap-pop* ( heap -- )
+    dup data-first swap heap-delete ;
+
 M: priority-queue heap-pop ( heap -- value key )
-    dup heap-peek rot heap-pop* ;
+    dup data-first [ swap heap-delete ] keep >entry< ;
+
+: heap-pop-all ( heap -- alist )
+    [ dup heap-empty? not ]
+    [ dup heap-pop swap 2array ]
+    [ ] unfold nip ;
