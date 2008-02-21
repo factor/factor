@@ -34,16 +34,3 @@ IN: temporary
 
 [ 0 ] [ <max-heap> heap-length ] unit-test
 [ 1 ] [ <max-heap> t 1 pick heap-push heap-length ] unit-test
-
-[ { { 1 2 } { 3 4 } { 5 6 } } ] [
-    T{ min-heap T{ heap f V{ { 2 1 } { 4 3 } { 6 5 } } } }
-    [ [ 10 < nip ] [ 2array , ] heap-pop-while ] { } make
-] unit-test
-[ { { 1 2 } } ] [
-    T{ min-heap T{ heap f V{ { 2 1 } { 4 3 } { 6 5 } } } }
-    [ [ 3 < nip ] [ 2array , ] heap-pop-while ] { } make
-] unit-test
-[ { } ] [
-    T{ min-heap T{ heap f V{ { 2 1 } { 4 3 } { 6 5 } } } }
-    [ [ 1 < nip ] [ 2array , ] heap-pop-while ] { } make
-] unit-test
