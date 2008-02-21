@@ -169,7 +169,7 @@ M: write-task do-io-task
 
 : add-write-io-task ( port continuation -- )
     over port-handle mx get-global mx-writes at*
-    [ io-task-callbacks push ]
+    [ io-task-callbacks push drop ]
     [ drop <write-task> add-io-task ] if ;
 
 : (wait-to-write) ( port -- )
