@@ -6,9 +6,8 @@ io io.styles sequences assocs namespaces sorting boxes ;
 
 : thread. ( thread -- )
     dup thread-id pprint-cell
-    dup thread-name pprint-cell
-    thread-state "running" or
-    [ write ] with-cell ;
+    dup thread-name over [ write-object ] with-cell
+    thread-state "running" or [ write ] with-cell ;
 
 : threads. ( -- )
     standard-table-style [
