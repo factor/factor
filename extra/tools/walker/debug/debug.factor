@@ -15,11 +15,15 @@ IN: tools.walker.debug
             [ drop ] show-walker-hook set
 
             break
-            
+
             quot call
         ] "Walker test" spawn drop
 
         step-into-all
+        p ?promise
+        send-synchronous drop
+
+        detach
         p ?promise
         send-synchronous drop
 
