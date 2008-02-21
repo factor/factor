@@ -3,7 +3,7 @@
 USING: arrays assocs classes db kernel namespaces
 tuples words sequences slots slots.private math
 math.parser io prettyprint db.types continuations
-mirrors sequences.lib ;
+mirrors sequences.lib tools.walker ;
 IN: db.tuples
 
 : db-table ( class -- obj ) "db-table" word-prop ;
@@ -33,7 +33,7 @@ TUPLE: no-slot-named ;
     dup class primary-key-spec get-slot-named ;
 
 : set-primary-key ( obj tuple -- )
-    [ class primary-key-spec first ] keep
+    [ class primary-key-spec sql-spec-slot-name ] keep
     set-slot-named ;
 
 : cache-statement ( columns class assoc quot -- statement )
@@ -92,7 +92,7 @@ HOOK: tuple>params db ( columns tuple -- obj )
 : delete-tuple ( tuple -- )
     [ [ primary-key? ] subset ] [ delete-sql ] do-tuple-statement ;
 
-: select-tuple ( tuple -- )
+: select-tuples ( tuple -- )
     [ select-sql ] keep do-query ;
 
 : persist ( tuple -- )

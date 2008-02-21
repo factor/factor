@@ -4,7 +4,7 @@ USING: arrays assocs alien alien.syntax continuations io
 kernel math math.parser namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
 db.tuples db.types tools.annotations math.ranges
-combinators sequences.lib classes locals words ;
+combinators sequences.lib classes locals words tools.walker ;
 IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty db user pass ;
@@ -65,6 +65,7 @@ M: postgresql-result-set sql-type>factor-type ( obj type -- newobj )
     } case ;
 
 M: postgresql-statement insert-statement ( statement -- id )
+break
     query-results [ 0 row-column ] with-disposal string>number ;
 
 M: postgresql-statement query-results ( query -- result-set )
@@ -104,10 +105,13 @@ M: postgresql-db <simple-statement> ( sql -- statement )
     { set-statement-sql } statement construct
     <postgresql-statement> ;
 
-M: postgresql-db <prepared-statement> ( pair -- statement )
-    ?first2
-    { set-statement-sql set-statement-slot-names }
-    statement construct <postgresql-statement> ;
+M: postgresql-db <prepared-statement> ( triple -- statement )
+    ?first3
+    {
+        set-statement-sql
+        set-statement-in-params
+        set-statement-out-params
+    } statement construct <postgresql-statement> ;
 
 M: postgresql-db begin-transaction ( -- )
     "BEGIN" sql-command ;
@@ -166,6 +170,7 @@ SYMBOL: postgresql-counter
 
 : drop-function-sql ( specs table -- sql )
     [
+break
         "drop function add_" % %
         "(" %
         remove-id
@@ -215,8 +220,8 @@ M: postgresql-db drop-sql ( specs table -- seq )
     ] postgresql-make ;
 
 M: postgresql-db insert-sql* ( specs table -- sql in-specs out-specs )
-    over find-primary-key native-id?
-    [ insert-function-sql ] [ insert-table-sql ] if ;
+    dup class db-columns find-primary-key native-id?
+    [ insert-function-sql ] [ insert-table-sql ] if 3array ;
 
 M: postgresql-db update-sql* ( specs table -- sql in-specs out-specs )
     [
@@ -228,7 +233,7 @@ M: postgresql-db update-sql* ( specs table -- sql in-specs out-specs )
         " where " 0%
         find-primary-key
         dup sql-spec-column-name 0% " = " 0% bind%
-    ] postgresql-make ;
+    ] postgresql-make 3array ;
 
 M: postgresql-db delete-sql* ( specs table -- sql in-specs out-specs )
     [
@@ -236,7 +241,7 @@ M: postgresql-db delete-sql* ( specs table -- sql in-specs out-specs )
         " where " 0%
         find-primary-key
         dup sql-spec-column-name 0% " = " 0% bind%
-    ] postgresql-make ;
+    ] postgresql-make 3array ;
 
 : select-by-slots-sql ( tuple -- sql in-specs out-specs )
     [
@@ -251,7 +256,7 @@ M: postgresql-db delete-sql* ( specs table -- sql in-specs out-specs )
         [ ", " 0% ]
         [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
         ";" 0%
-    ] postgresql-make ;
+    ] postgresql-make 3array ;
 
 ! : select-with-relations ( tuple -- sql in-specs out-specs )
 
@@ -259,7 +264,7 @@ M: postgresql-db select-sql ( tuple -- sql in-specs out-specs )
     select-by-slots-sql ;
 
 M: postgresql-db tuple>params ( specs tuple -- obj )
-    [ >r dup third swap first r> get-slot-named swap ]
+    [ >r dup sql-spec-type swap sql-spec-slot-name r> get-slot-named swap ]
     curry { } map>assoc ;
 
 M: postgresql-db type-table ( -- hash )
@@ -268,6 +273,7 @@ M: postgresql-db type-table ( -- hash )
         { TEXT "text" }
         { VARCHAR "varchar" }
         { INTEGER "integer" }
+        { DOUBLE "real" }
         { TIMESTAMP "timestamp" }
     } ;
 
@@ -278,12 +284,13 @@ M: postgresql-db create-type-table ( -- hash )
 
 : postgresql-compound ( str n -- newstr )
     over {
-        { "varchar" [ first number>string join-space ] }
-        { "references"
-            [
+        { "default" [ first number>string join-space ] }
+        { "varchar" [ first number>string paren append ] }
+        { "references" [
                 first2 >r [ unparse join-space ] keep db-columns r>
-                swap [ sql-spec-slot-name = ] with find nip sql-spec-column-name paren append
-                ] }
+                swap [ sql-spec-slot-name = ] with find nip
+                sql-spec-column-name paren append
+            ] }
         [ "no compound found" 3array throw ]
     } case ;
 

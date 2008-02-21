@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep sequences.lib
-words namespaces ;
+words namespaces tools.walker ;
 IN: db.types
 
 TUPLE: sql-spec slot-name column-name type modifiers primary-key ;
@@ -12,15 +12,18 @@ SYMBOL: +native-id+
 ! +assigned-id+ can only be a modifier
 SYMBOL: +assigned-id+
 
-: primary-key? ( obj -- ? )
+: (primary-key?) ( obj -- ? )
     { +native-id+ +assigned-id+ } member? ;
 
+: primary-key? ( spec -- ? )
+    sql-spec-primary-key (primary-key?) ;
+
 : normalize-spec ( spec -- )
-    dup sql-spec-type dup primary-key? [
+    dup sql-spec-type dup (primary-key?) [
         swap set-sql-spec-primary-key
     ] [
         drop dup sql-spec-modifiers [
-            primary-key?
+            (primary-key?)
         ] deep-find
         [ swap set-sql-spec-primary-key ] [ drop ] if*
     ] if ;

@@ -79,6 +79,7 @@ IN: db.sqlite.lib
         { VARCHAR [ sqlite-bind-text-by-name ] }
         { DOUBLE [ sqlite-bind-double-by-name ] }
         { TIMESTAMP [ sqlite-bind-double-by-name ] }
+        { +native-id+ [ sqlite-bind-int-by-name ] }
         ! { NULL [ sqlite-bind-null-by-name ] }
         [ no-sql-type ]
     } case ;

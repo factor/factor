@@ -4,7 +4,7 @@ USING: alien arrays assocs classes compiler db
 hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
-words combinators.lib db.types combinators ;
+words combinators.lib db.types combinators tools.walker ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
@@ -99,7 +99,7 @@ M: sqlite-db create-sql ( specs table -- sql )
 
 M: sqlite-db drop-sql ( specs table -- sql )
     [
-        "drop table " % % ";" %
+        "drop table " % % ";" % drop
     ] "" make ;
 
 M: sqlite-db insert-sql* ( specs table -- sql )
@@ -161,9 +161,9 @@ M: sqlite-db select-sql ( tuple -- sql )
 
 M: sqlite-db tuple>params ( specs tuple -- obj )
     [
-        >r [ second ":" swap append ] keep r>
-        dupd >r first r> get-slot-named swap
-        third 3array
+        >r [ sql-spec-column-name ":" swap append ] keep r>
+        dupd >r sql-spec-slot-name r> get-slot-named swap
+        sql-spec-type 3array
     ] curry map ;
 
 M: sqlite-db modifier-table ( -- hashtable )

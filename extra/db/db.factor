@@ -23,12 +23,12 @@ HOOK: db-close db ( handle -- )
         db-handle db-close
     ] with-variable ;
 
-TUPLE: statement handle sql slot-names bound? in-params out-params ;
+TUPLE: statement handle sql bound? in-params out-params ;
 TUPLE: simple-statement ;
 TUPLE: prepared-statement ;
 
 HOOK: <simple-statement> db ( str -- statement )
-HOOK: <prepared-statement> db ( str slot-names -- statement )
+HOOK: <prepared-statement> db ( str -- statement )
 GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( obj statement -- )
 GENERIC: reset-statement ( statement -- )
