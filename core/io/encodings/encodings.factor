@@ -113,7 +113,7 @@ M: decoded stream-read-until
         ] [ nip ] if
     ] [ nip ] if ;
 
-M: decoded stream-read1 1 over stream-read ;
+M: decoded stream-read1 1 swap stream-read ;
 
 M: decoded stream-readln ( stream -- str )
     "\r\n" over stream-read-until handle-readln ;
