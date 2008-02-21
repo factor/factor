@@ -18,11 +18,8 @@ node "node"
 : create-node-table ( -- )
     node create-table ;
 
-: create-node* ( content -- id )
+: create-node ( content -- id )
     <node> dup persist id>> ;
-
-: create-node ( content -- )
-    create-node* drop ;
 
 TUPLE: arc relation subject object ;
 
@@ -41,7 +38,6 @@ arc "arc"
 
 : create-arc-table ( -- )
     arc create-table ;
-    ! arc db-columns maybe-remove-id arc db-table create-sql sql-command ;
 
 : insert-arc ( arc -- )
     dup delegate insert-tuple
@@ -53,15 +49,12 @@ arc "arc"
 : delete-arc ( arc -- )
     dup delete-tuple delegate delete-tuple ;
 
-: create-arc* ( relation subject object -- id )
+: create-arc ( relation subject object -- id )
     <arc> dup persist-arc id>> ;
-
-: create-arc ( relation subject object -- )
-    create-arc* drop ;
 
 : create-bootstrap-nodes ( -- )
     { "context" "relation" "is of type" "semantic-db" "is in context" }
-    [ create-node ] each ;
+    [ create-node drop ] each ;
 
 : context-type 1 ; inline
 : relation-type 2 ; inline
@@ -70,11 +63,11 @@ arc "arc"
 : has-context-relation 5 ; inline
 
 : create-bootstrap-arcs ( -- )
-    has-type-relation has-type-relation relation-type create-arc
-    has-type-relation semantic-db-context context-type create-arc
-    has-context-relation has-type-relation semantic-db-context create-arc
-    has-type-relation has-context-relation relation-type create-arc
-    has-context-relation has-context-relation semantic-db-context create-arc ;
+    has-type-relation has-type-relation relation-type create-arc drop
+    has-type-relation semantic-db-context context-type create-arc drop
+    has-context-relation has-type-relation semantic-db-context create-arc drop
+    has-type-relation has-context-relation relation-type create-arc drop
+    has-context-relation has-context-relation semantic-db-context create-arc drop ;
 
 : init-semantic-db ( -- )
     create-node-table create-arc-table create-bootstrap-nodes create-bootstrap-arcs ;
