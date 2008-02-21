@@ -67,7 +67,7 @@ unit-test
 [ "[ \\ [ ]" ] [ [ \ [ ] unparse ] unit-test
     
 [ t ] [
-    100 \ dup <array> [ pprint-short ] with-string-writer
+    100 \ dup <array> unparse-short
     "{" head?
 ] unit-test
 

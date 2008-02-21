@@ -75,6 +75,9 @@ combinators quotations ;
        { string-limit t }
     } clone [ pprint ] bind ;
 
+: unparse-short ( obj -- str )
+    [ pprint-short ] with-string-writer ;
+
 : short. ( obj -- ) pprint-short nl ;
 
 : .b ( n -- ) >bin print ;
