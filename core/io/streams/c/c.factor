@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private namespaces io
+USING: kernel kernel.private namespaces io io.encodings
 strings sequences math generic threads.private classes
-io.backend io.streams.duplex io.files continuations ;
+io.backend io.streams.duplex io.files continuations
+io.encodings.utf8 ;
 IN: io.streams.c
 
 TUPLE: c-writer handle ;
@@ -49,9 +50,7 @@ M: c-reader dispose
     c-reader-handle fclose ;
 
 : <duplex-c-stream> ( in out -- stream )
-    >r <c-reader> <line-reader> r>
-    <c-writer> <plain-writer>
-    <duplex-stream> ;
+    >r <c-reader> r> <c-writer> <duplex-stream> ;
 
 M: object init-io ;
 
@@ -60,8 +59,9 @@ M: object init-io ;
 : stderr-handle 38 getenv ;
 
 M: object init-stdio
-    stdin-handle stdout-handle <duplex-c-stream> stdio set-global
-    stderr-handle <c-writer> <plain-writer> stderr set-global ;
+    stdin-handle stdout-handle <duplex-c-stream>
+    utf8 <encoded-duplex> stdio set-global
+    stderr-handle <c-writer> utf8 <encoded> stderr set-global ;
 
 M: object io-multiplex (sleep) ;
 

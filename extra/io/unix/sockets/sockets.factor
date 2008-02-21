@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov.
+! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov. 
 ! See http://factorcode.org/license.txt for BSD license.
 
 ! We need to fiddle with the exact search order here, since
@@ -92,7 +92,7 @@ USE: io.sockets
     dup rot make-sockaddr/size bind
     zero? [ dup close (io-error) ] unless ;
 
-M: unix-io <server> ( addrspec -- stream )
+M: unix-io <server> ( addrspec -- server )
     [
         SOCK_STREAM server-fd
         dup 10 listen zero? [ dup close (io-error) ] unless

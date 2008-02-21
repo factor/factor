@@ -148,8 +148,9 @@ HELP: process-stream
 HELP: <process-stream>
 { $values
   { "desc" "a launch descriptor" }
+  { "encoding" "an encoding descriptor" }
   { "stream" "a bidirectional stream" } }
-{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream." }
+{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream of the given encoding." }
 { $notes "Closing the stream will block until the process exits." } ;
 
 HELP: with-process-stream

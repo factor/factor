@@ -1,9 +1,10 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.files
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
-system combinators splitting sbufs continuations io.encodings ;
+system combinators splitting sbufs continuations io.encodings
+io.encodings.binary ;
 
 HOOK: cd io-backend ( path -- )
 
@@ -16,13 +17,13 @@ HOOK: file-writer* io-backend ( path -- stream )
 HOOK: file-appender* io-backend ( path -- stream )
 
 : <file-reader> ( path encoding -- stream )
-    swap file-reader* swap <decoding> ;
+    swap file-reader* swap <decoded> ;
 
 : <file-writer> ( path encoding -- stream )
-    swap file-writer* swap <encoding> ;
+    swap file-writer* swap <encoded> ;
 
 : <file-appender> ( path encoding -- stream )
-    swap file-appender* swap <encoding> ;
+    swap file-appender* swap <encoded> ;
 
 HOOK: delete-file io-backend ( path -- )
 

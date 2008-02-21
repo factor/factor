@@ -92,11 +92,11 @@ HELP: inet6
 } ;
 
 HELP: <client>
-{ $values { "addrspec" "an address specifier" } { "stream" "a bidirectional stream" } }
-{ $description "Opens a network connection and outputs a bidirectional stream." }
+{ $values { "addrspec" "an address specifier" } { "encoding" "an encding descriptor" } { "stream" "a bidirectional stream" } }
+{ $description "Opens a network connection and outputs a bidirectional stream using the given encoding." }
 { $errors "Throws an error if the connection cannot be established." }
 { $examples
-    { $code "\"www.apple.com\" \"http\" <inet> <client>" }
+    { $code "\"www.apple.com\" \"http\" <inet> utf8 <client>" }
 } ;
 
 HELP: <server>

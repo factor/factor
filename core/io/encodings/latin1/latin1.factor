@@ -1,4 +1,6 @@
-USING: io io.encodings strings kernel io.encodings.ascii ;
+! Copyright (C) 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
+USING: io io.encodings strings kernel io.encodings.ascii sequences ;
 IN: io.encodings.latin1
 
 TUPLE: latin1 ;

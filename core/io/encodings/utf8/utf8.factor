@@ -1,7 +1,7 @@
-! Copyright (C) 2006, 2007 Daniel Ehrenberg.
+! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors growable io continuations
-namespaces io.encodings combinators strings io.streams.c ;
+namespaces io.encodings combinators strings ;
 IN: io.encodings.utf8
 
 ! Decoding UTF-8
@@ -78,7 +78,6 @@ SYMBOL: quad3
 ! Interface for streams
 
 TUPLE: utf8 ;
-INSTANCE: utf8 encoding-stream 
 
 M: utf8 encode-string drop encode-utf8 ;
 M: utf8 decode-step drop decode-utf8-step ;

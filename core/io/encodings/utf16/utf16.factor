@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Daniel Ehrenberg.
+! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces io.binary
 io.encodings combinators splitting io byte-arrays ;
@@ -116,19 +116,16 @@ SYMBOL: ignore
     } cond ;
 
 TUPLE: utf16le ;
-INSTANCE: utf16le encoding-stream 
 
 M: utf16le encode-string drop encode-utf16le ;
 M: utf16le decode-step drop decode-utf16le-step ;
 
 TUPLE: utf16be ;
-INSTANCE: utf16be encoding-stream 
 
 M: utf16be encode-string drop encode-utf16be ;
 M: utf16be decode-step drop decode-utf16be-step ;
 
 TUPLE: utf16 encoding ;
-INSTANCE: utf16 encoding-stream
 M: utf16 underlying-stream delegate dup delegate [ ] [ ] ?if ; ! necessary? 
 M: utf16 set-underlying-stream delegate set-delegate ; ! necessary? 
 

@@ -1,8 +1,9 @@
-! Copyright (C) 2006, 2007 Daniel Ehrenberg.
+! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces
-growable strings io classes continuations
-io.styles io.streams.nested io.encodings.binary ;
+growable strings io classes continuations combinators
+io.styles io.streams.plain io.encodings.binary splitting
+io.streams.string io.streams.duplex ;
 IN: io.encodings
 
 ! Decoding
@@ -134,18 +135,20 @@ M: encoded stream-write1
     >r 1string r> stream-write ;
 
 M: encoded stream-write
-    [ encoding-code encode-string ] keep delegate stream-write ;
+    [ encoded-code encode-string ] keep delegate stream-write ;
 
 M: encoded dispose delegate dispose ;
 
-M: encoded stream-nl
-    CHAR: \n swap stream-write1 ;
+INSTANCE: encoded plain-writer
 
-M: encoded stream-format
-    nip stream-write ;
+! Rebinding duplex streams which have not read anything yet
 
-M: encoded make-span-stream
-    <style-stream> <ignore-close-stream> ;
+: reencode ( stream encoding -- newstream )
+    over encoded? [ >r delegate r> ] when <encoded> ;
 
-M: encoded make-block-stream
-    nip <ignore-close-stream> ;
+: redecode ( stream encoding -- newstream )
+    over decoded? [ >r delegate r> ] when <decoded> ;
+
+: <encoded-duplex> ( duplex-stream encoding -- duplex-stream )
+    swap { duplex-stream-in duplex-stream-out } get-slots
+    pick reencode >r swap redecode r> <duplex-stream> ;

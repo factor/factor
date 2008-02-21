@@ -416,7 +416,8 @@ M: curry '
     "Writing image to " write
     architecture get boot-image-name resource-path
     dup write "..." print flush
-    binary [ (write-image) ] with-file-writer ;
+    ! binary
+    <file-writer> [ (write-image) ] with-stream ;
 
 PRIVATE>
 

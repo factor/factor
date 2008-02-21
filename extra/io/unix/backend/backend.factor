@@ -181,8 +181,8 @@ M: unix-io io-multiplex ( ms -- )
     mx get-global wait-for-events ;
 
 M: unix-io init-stdio ( -- )
-    0 1 handle>duplex-stream io:stdio set-global
-    2 <writer> io:stderr set-global ;
+    0 1 utf8 handle>duplex-stream io:stdio set-global
+    2 <writer> utf8 <encoded> io:stderr set-global ;
 
 ! mx io-task for embedding an fd-based mx inside another mx
 TUPLE: mx-port mx ;

@@ -45,10 +45,10 @@ GENERIC: close-handle ( handle -- )
 : <writer> ( handle -- stream )
     output-port <buffered-port> ;
 
-: handle>duplex-stream ( in-handle out-handle -- stream )
-    <writer>
-    [ >r <reader> r> <duplex-stream> ] [ ] [ dispose ]
-    cleanup ;
+: handle>duplex-stream ( in-handle out-handle encoding -- stream )
+    [ swap <writer> swap <encoded> ] keep
+    [ -rot >r <reader> swap <decoded> r> <duplex-stream> ]
+    [ ] [ dispose ] cleanup ;
 
 : pending-error ( port -- )
     dup port-error f rot set-port-error [ throw ] when* ;

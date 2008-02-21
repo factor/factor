@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs io.files combinators
 arrays io.launcher io http.server.responders webapps.file
-sequences strings math.parser unicode.case ;
+sequences strings math.parser unicode.case io.encodings.binary ;
 IN: webapps.cgi
 
 SYMBOL: cgi-root
@@ -50,7 +50,7 @@ SYMBOL: cgi-root
     
 : (do-cgi) ( name -- )
     "200 CGI output follows" response
-    stdio get swap cgi-descriptor <process-stream> [
+    stdio get swap cgi-descriptor binary <process-stream> [
         post? [
             "raw-response" get write flush
         ] when

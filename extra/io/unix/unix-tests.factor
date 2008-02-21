@@ -1,6 +1,6 @@
 USING: io.files io.sockets io kernel threads namespaces
 tools.test continuations strings byte-arrays sequences
-prettyprint system io.encodings.binary ;
+prettyprint system io.encodings.binary io.encodings.ascii ;
 IN: temporary
 
 ! Unix domain stream sockets
@@ -24,7 +24,7 @@ yield
 
 [ { "Hello world" "FOO" } ] [
     [
-        "unix-domain-socket-test" resource-path <local> <client>
+        "unix-domain-socket-test" resource-path <local> ascii <client>
         [
             readln ,
             "XYZ" print flush

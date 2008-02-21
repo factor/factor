@@ -4,7 +4,7 @@ USING: io io.backend io.launcher io.unix.backend io.unix.files
 io.nonblocking sequences kernel namespaces math system
  alien.c-types debugger continuations arrays assocs 
 combinators unix.process parser-combinators memoize 
-promises strings threads unix ;
+promises strings threads unix io.encodings.latin1 ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -99,7 +99,7 @@ M: unix-io kill-process* ( pid -- )
 
 M: unix-io process-stream*
     [
-        spawn-process-stream >r handle>duplex-stream r>
+        spawn-process-stream >r latin1 handle>duplex-stream r>
     ] with-descriptor ;
 
 : find-process ( handle -- process )

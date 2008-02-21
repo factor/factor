@@ -1,8 +1,8 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.sockets
 USING: generic kernel io.backend namespaces continuations
-sequences arrays ;
+sequences arrays io.encodings ;
 
 TUPLE: local path ;
 
@@ -28,11 +28,12 @@ TUPLE: client-stream addr ;
 
 HOOK: (client) io-backend ( addrspec -- stream )
 
-GENERIC: <client> ( addrspec -- stream )
+GENERIC: client* ( addrspec -- stream )
+M: array client* [ (client) ] attempt-all ;
+M: object client* (client) ;
 
-M: array <client> [ (client) ] attempt-all ;
-
-M: object <client> (client) ;
+: <client> ( addrspec encoding -- stream )
+    >r client* r> <encoded-duplex> ;
 
 HOOK: <server> io-backend ( addrspec -- server )
 
@@ -48,7 +49,7 @@ HOOK: resolve-host io-backend ( host serv passive? -- seq )
 
 HOOK: host-name io-backend ( -- string )
 
-M: inet <client>
+M: inet client*
     dup inet-host swap inet-port f resolve-host
     dup empty? [ "Host name lookup failed" throw ] when
-    <client> ;
+    client* ;
