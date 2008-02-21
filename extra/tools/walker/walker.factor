@@ -6,29 +6,56 @@ concurrency.messaging quotations kernel.private words
 sequences.private assocs models ;
 IN: tools.walker
 
-SYMBOL: walker-hook
+SYMBOL: new-walker-hook
+SYMBOL: show-walker-hook
 
 ! Thread local
 SYMBOL: walker-thread
+SYMBOL: walking-thread
 
 : get-walker-thread ( -- thread )
     walker-thread tget [
-        walker-hook get [ "No walker hook" throw ] or call
+        dup show-walker-hook get call
+    ] [
+        new-walker-hook get call
         walker-thread tget
-    ] unless* ;
+    ] if* ;
 
 : break ( -- )
-    callstack [
-        over set-continuation-call
+    continuation callstack over set-continuation-call
 
-        get-walker-thread send-synchronous {
-            { [ dup continuation? ] [ (continue) ] }
-            { [ dup quotation? ] [ call ] }
-            { [ dup not ] [ "Single stepping abandoned" throw ] }
-        } cond
-    ] curry callcc0 ;
+    get-walker-thread send-synchronous {
+        { [ dup continuation? ] [ (continue) ] }
+        { [ dup quotation? ] [ call ] }
+        { [ dup not ] [ "Single stepping abandoned" throw ] }
+    } cond ;
 
-: walk ( quot -- ) \ break add* call ;
+\ break t "break?" set-word-prop
+
+: add-breakpoint ( quot -- quot' )
+    dup [ break ] head? [ \ break add* ] unless ;
+
+: walk ( quot -- ) add-breakpoint call ;
+
+: (step-into-if) ? walk ;
+
+: (step-into-dispatch) nth walk ;
+
+: (step-into-execute) ( word -- )
+    dup "step-into" word-prop [
+        call
+    ] [
+        dup primitive? [
+            execute break
+        ] [
+            word-def walk
+        ] if
+    ] ?if ;
+
+\ (step-into-execute) t "step-into?" set-word-prop
+
+: (step-into-continuation)
+    continuation callstack over set-continuation-call break ;
 
 ! Messages sent to walker thread
 SYMBOL: step
@@ -49,10 +76,12 @@ SYMBOL: walker-history
 SYMBOL: +running+
 SYMBOL: +suspended+
 SYMBOL: +stopped+
+SYMBOL: +detached+
 
 : change-frame ( continuation quot -- continuation' )
     #! Applies quot to innermost call frame of the
     #! continuation.
+    >r clone r>
     over continuation-call clone
     [
         dup innermost-frame-scan 1+
@@ -73,32 +102,6 @@ SYMBOL: +stopped+
 
 : step-out-msg ( continuation -- continuation' )
     [ nip \ break add ] change-frame ;
-
-GENERIC: (step-into) ( obj -- )
-
-M: wrapper (step-into) wrapped break ;
-M: object (step-into) break ;
-M: callable (step-into) \ break add* break ;
-
-: (step-into-if) ? walk ;
-
-: (step-into-dispatch) nth walk ;
-
-: (step-into-execute) ( word -- )
-    dup "step-into" word-prop [
-        call
-    ] [
-        dup primitive? [
-            execute break
-        ] [
-            word-def walk
-        ] if
-    ] ?if ;
-
-: (step-into-continuation)
-    continuation callstack over set-continuation-call break ;
-
-M: word (step-into) (step-into-execute) ;
 
 {
     { call [ walk ] }
@@ -124,7 +127,12 @@ M: word (step-into) (step-into-execute) ;
 : step-into-msg ( continuation -- continuation' )
     [
         swap cut [
-            swap % unclip literalize , \ (step-into) , %
+            swap % unclip {
+                { [ dup \ break eq? ] [ , ] }
+                { [ dup quotation? ] [ add-breakpoint , \ break , ] }
+                { [ dup word? ] [ literalize , \ (step-into-execute) , ] }
+                { [ t ] [ , \ break , ] }
+            } cond %
         ] [ ] make
     ] change-frame ;
 
@@ -134,44 +142,55 @@ M: word (step-into) (step-into-execute) ;
 : set-status ( symbol -- )
     walker-status tget set-model ;
 
-: detach-msg ( -- f )
-    +stopped+ set-status ;
+: unassociate-thread ( -- )
+    walker-thread walking-thread tget thread-variables delete-at
+    [ ] walking-thread tget set-thread-exit-handler ;
 
-: keep-running ( continuation -- continuation )
-    +running+ set-status
-    dup continuation? [ dup walker-history tget push ] when ;
+: detach-msg ( -- )
+    +detached+ set-status
+    unassociate-thread ;
+
+: keep-running ( -- )
+    +running+ set-status ;
 
 : walker-stopped ( -- )
     +stopped+ set-status
-    [
-        {
-            { detach [ detach-msg ] }
-            [ drop f ]
-        } case
-    ] handle-synchronous
-    walker-stopped ;
-
-: step-into-all-loop ( -- )
-    +running+ set-status
-    [ status +stopped+ eq? not ] [
+    [ status +stopped+ eq? ] [
         [
             {
                 { detach [ detach-msg ] }
-                { step [ f ] }
-                { step-out [ f ] }
-                { step-into [ f ] }
-                { step-all [ f ] }
-                { step-into-all [ f ] }
-                { step-back [ f ] }
-                { f [ walker-stopped ] }
-                [ step-into-msg ]
-            } case
+                [ drop ]
+            } case f
         ] handle-synchronous
     ] [ ] while ;
+
+: step-into-all-loop ( -- )
+    +running+ set-status
+    [ status +running+ eq? ] [
+        [
+            {
+                { detach [ detach-msg ] }
+                { step [ ] }
+                { step-out [ ] }
+                { step-into [ ] }
+                { step-all [ ] }
+                { step-into-all [ ] }
+                { step-back [ ] }
+                { f [ walker-stopped ] }
+                [ step-into-msg ]
+            } case f
+        ] handle-synchronous
+    ] [ ] while ;
+
+: step-back-msg ( continuation -- continuation' )
+    walker-history tget dup pop*
+    empty? [ drop walker-history tget pop ] unless ;
 
 : walker-suspended ( continuation -- continuation' )
     +suspended+ set-status
     [ status +suspended+ eq? ] [
+        dup walker-history tget push
+        dup walker-continuation tget set-model
         [
             {
                 ! These are sent by the walker tool. We reply
@@ -189,25 +208,26 @@ M: word (step-into) (step-into-execute) ;
                 ! Pass quotation to debugged thread
                 { call-in [ nip keep-running ] }
                 ! Pass previous continuation to debugged thread
-                { step-back [ drop walker-history tget pop f ] }
-            } case
+                { step-back [ step-back-msg ] }
+            } case f
         ] handle-synchronous
     ] [ ] while ;
 
 : walker-loop ( -- )
     +running+ set-status
-    [ status +stopped+ eq? not ] [
+    [ status +detached+ eq? not ] [
         [
             {
-                { detach [ detach-msg ] }
+                { detach [ detach-msg f ] }
                 ! ignore these commands while the thread is
                 ! running
                 { step [ f ] }
                 { step-out [ f ] }
                 { step-into [ f ] }
                 { step-all [ f ] }
-                { step-into-all [ step-into-all-loop ] }
+                { step-into-all [ step-into-all-loop f ] }
                 { step-back [ f ] }
+                { abandon [ f ] }
                 { f [ walker-stopped f ] }
                 ! thread hit a breakpoint and sent us the
                 ! continuation, so we modify it and send it
@@ -218,15 +238,17 @@ M: word (step-into) (step-into-execute) ;
     ] [ ] while ;
 
 : associate-thread ( walker -- )
-    dup walker-thread tset
-    [ f swap send ] curry self set-thread-exit-handler ;
+    walker-thread tset
+    [ f walker-thread tget send-synchronous drop ]
+    self set-thread-exit-handler ;
 
 : start-walker-thread ( status continuation -- thread' )
-    [
+    self [
+        walking-thread tset
         walker-continuation tset
         walker-status tset
         V{ } clone walker-history tset
         walker-loop
-    ] 2curry
+    ] 3curry
     "Walker on " self thread-name append spawn
     [ associate-thread ] keep ;

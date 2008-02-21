@@ -438,7 +438,7 @@ M: windows-ui-backend flush-gl-context ( handle -- )
     win-hDC SwapBuffers win32-error=0/f ;
 
 ! Move window to front
-M: windows-ui-backend raise-window ( world -- )
+M: windows-ui-backend raise-window* ( world -- )
     world-handle [
         win-hWnd SetFocus drop
     ] when* ;

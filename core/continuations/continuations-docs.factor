@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private
 continuations.private parser vectors arrays namespaces
-threads assocs words quotations ;
+assocs words quotations ;
 IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable errors"
@@ -44,11 +44,7 @@ ARTICLE: "continuations.private" "Continuation implementation details"
 { $subsection namestack }
 { $subsection set-namestack }
 { $subsection catchstack }
-{ $subsection set-catchstack }
-"The continuations implementation has hooks for single-steppers:"
-{ $subsection walker-hook }
-{ $subsection set-walker-hook }
-{ $subsection (continue-with) } ;
+{ $subsection set-catchstack } ;
 
 ARTICLE: "continuations" "Continuations"
 "At any point in the execution of a program, the " { $emphasis "current continuation" } " represents the future of the computation."
@@ -109,10 +105,6 @@ HELP: callcc0
 HELP: callcc1
 { $values { "quot" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "obj" "an object provided when resuming the continuation" } }
 { $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue-with } " word resumes the continuation, passing a value back to the original execution context." } ;
-
-HELP: (continue-with)
-{ $values { "obj" "an object to pass to the continuation's execution context" } { "continuation" continuation } }
-{ $description "Resumes a continuation reified by " { $link callcc1 } " without invoking " { $link walker-hook } ". The object will be placed on the data stack when the continuation resumes." } ;
 
 HELP: continue
 { $values { "continuation" continuation } }

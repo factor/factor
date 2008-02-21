@@ -26,7 +26,7 @@ HELP: fullscreen?
 
 HELP: find-window
 { $values { "quot" "a quotation with stack effect " { $snippet "( world -- ? )" } } { "world" "a " { $link world } " or " { $link f } } }
-{ $description "Finds a native window whose world satisfies the quotation, outputting " { $link f } " if no such world could be found. The front-most native window is checked first." } ;
+{ $description "Finds a native window such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting " { $link f } " if no such gadget could be found. The front-most native window is checked first." } ;
 
 HELP: register-window
 { $values { "world" world } { "handle" "a baackend-specific handle" } }
@@ -184,6 +184,10 @@ ARTICLE: "ui-backend-windows" "UI backend window management"
 { $subsection flush-gl-context }
 "If the user clicks the window's close box, you must call the following word:"
 { $subsection close-window } ;
+
+HELP: raise-window
+{ $values { "gadget" gadget } }
+{ $description "Makes the native window containing the given gadget the front-most window." } ;
 
 ARTICLE: "ui-layouts" "Gadget hierarchy and layouts"
 "A layout gadget is a gadget whose sole purpose is to contain other gadgets. Layout gadgets position and resize children according to a certain policy, taking the preferred size of the children into account. Gadget hierarchies are constructed by building up nested layouts."

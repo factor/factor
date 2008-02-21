@@ -85,7 +85,7 @@ M: cocoa-ui-backend close-window ( gadget -- )
         world-handle second f -> performClose:
     ] when* ;
 
-M: cocoa-ui-backend raise-window ( world -- )
+M: cocoa-ui-backend raise-window* ( world -- )
     world-handle [
         second dup f -> orderFront: -> makeKeyWindow
         NSApp 1 -> activateIgnoringOtherApps:

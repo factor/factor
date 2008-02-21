@@ -84,7 +84,7 @@ GENERIC: send ( message process -- )
     ] ?if ;
 
 M: thread send ( message thread -- )
-    mailbox-of mailbox-put ;
+    check-registered mailbox-of mailbox-put ;
 
 : ?linked dup linked? [ rethrow ] when ;
 
@@ -97,7 +97,7 @@ M: thread send ( message thread -- )
     mailbox mailbox-get? ?linked ; inline
 
 : rethrow-linked ( error process supervisor -- )
-    pick thread-death? [ 3drop ] [ >r <linked> r> send ] if ;
+    >r <linked> r> send ;
 
 : spawn-linked-to ( quot name mailbox -- thread )
     [ >r <linked> r> mailbox-put ] curry <thread>

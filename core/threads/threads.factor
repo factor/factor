@@ -10,8 +10,8 @@ boxes ;
 SYMBOL: initial-thread
 
 TUPLE: thread
-name quot error-handler
-id registered?
+name quot error-handler exit-handler
+id
 continuation state
 mailbox variables ;
 
@@ -37,37 +37,37 @@ threads global [ H{ } assoc-like ] change-at
 
 : thread ( id -- thread ) threads at ;
 
-<PRIVATE
+: thread-registered? ( thread -- ? )
+    thread-id threads key? ;
 
 : check-unregistered
     dup thread-registered?
-    [ "Registering a thread twice" throw ] when ;
+    [ "Thread already stopped" throw ] when ;
 
 : check-registered
     dup thread-registered?
-    [ "Unregistering a thread twice" throw ] unless ;
+    [ "Thread is not running" throw ] unless ;
+
+<PRIVATE
 
 : register-thread ( thread -- )
-    check-unregistered
-    t over set-thread-registered?
-    dup thread-id threads set-at ;
+    check-unregistered dup thread-id threads set-at ;
 
 : unregister-thread ( thread -- )
-    check-registered
-    f over set-thread-registered?
-    thread-id threads delete-at ;
+    check-registered thread-id threads delete-at ;
 
 : set-self ( thread -- ) 40 setenv ; inline
 
 PRIVATE>
 
 : <thread> ( quot name error-handler -- thread )
-    \ thread counter <box> {
+    \ thread counter <box> [ ] {
         set-thread-quot
         set-thread-name
         set-thread-error-handler
         set-thread-id
         set-thread-continuation
+        set-thread-exit-handler
     } \ thread construct ;
 
 : run-queue 42 getenv ;
@@ -95,16 +95,12 @@ PRIVATE>
     drop ;
 
 : next ( -- )
-    walker-hook [
-        continue
-    ] [
-        wake-up
-        run-queue pop-back
-        dup array? [ first2 ] [ f swap ] if dup set-self
-        f over set-thread-state
-        thread-continuation box>
-        continue-with
-    ] if* ;
+    wake-up
+    run-queue pop-back
+    dup array? [ first2 ] [ f swap ] if dup set-self
+    f over set-thread-state
+    thread-continuation box>
+    continue-with ;
 
 PRIVATE>
 
@@ -116,7 +112,8 @@ PRIVATE>
     } cond ;
 
 : stop ( -- )
-    self unregister-thread next ;
+    self dup thread-exit-handler call
+    unregister-thread next ;
 
 : suspend ( quot state -- obj )
     [
@@ -145,20 +142,20 @@ PRIVATE>
         ] 1 (throw)
     ] "spawn" suspend 2drop ;
 
+: default-thread-error-handler ( error thread -- )
+    global [
+        "Error in thread " write
+        dup thread-id pprint
+        " (" write
+        dup thread-name pprint ")" print
+        "spawned to call " write
+        thread-quot short.
+        nl
+        print-error flush
+    ] bind ;
+
 : spawn ( quot name -- thread )
-    [
-        global [
-            "Error in thread " write
-            dup thread-id pprint
-            " (" write
-            dup thread-name pprint ")" print
-            "spawned to call " write
-            thread-quot short.
-            nl
-            print-error flush
-        ] bind
-    ] <thread>
-    [ (spawn) ] keep ;
+    [ default-thread-error-handler ] <thread> [ (spawn) ] keep ;
 
 : spawn-server ( quot name -- thread )
     >r [ [ ] [ ] while ] curry r> spawn ;
@@ -177,7 +174,6 @@ PRIVATE>
     initial-thread global
     [ drop f "Initial" [ die ] <thread> ] cache
     <box> over set-thread-continuation
-    f over set-thread-registered?
     dup register-thread
     set-self ;
 

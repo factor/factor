@@ -131,10 +131,8 @@ SYMBOL: ui-hook
     graft-queue [ notify ] dlist-slurp ;
 
 : ui-step ( -- )
-    [ do-timers ] assert-depth
-    [ notify-queued ] assert-depth
-    [ layout-queued "a" set ] assert-depth
-    [ "a" get redraw-worlds ] assert-depth ;
+    [ do-timers notify-queued layout-queued redraw-worlds ]
+    assert-depth ;
 
 : open-world-window ( world -- )
     dup pref-dim over set-gadget-dim dup relayout graft ui-step ;
@@ -148,6 +146,9 @@ SYMBOL: ui-hook
 
 : fullscreen? ( gadget -- ? )
     find-world fullscreen* ;
+
+: raise-window ( gadget -- )
+    find-world raise-window* ;
 
 HOOK: close-window ui-backend ( gadget -- )
 

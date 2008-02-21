@@ -94,43 +94,34 @@ SYMBOL: ->
 { { foreground { 1 1 1 1 } } { background { 0 0 0 1 } } }
 "word-style" set-word-prop
 
-! This code is ugly and could probably be simplified
-! : remove-step-into
-!     building get dup empty? [
-!         drop \ (step-into) ,
-!     ] [
-!         pop dup wrapper? [
-!             wrapped dup \ break eq?
-!             [ drop ] [ , ] if
-!         ] [
-!             ,
-!         ] if
-!     ] if ;
-! 
-! : (remove-breakpoints) ( quot -- newquot )
-!     [
-!         [
-!             dup {
-!                 { break [ drop ] }
-!                 { (step-into) [ remove-step-into ] }
-!                 [ , ]
-!             } case
-!         ] each
-!     ] [ ] make ;
-! 
-! : remove-breakpoints ( quot pos -- quot' )
-!     over quotation? [
-!         1+ cut [ (remove-breakpoints) ] 2apply
-!         [ -> ] swap 3append
-!     ] [
-!         drop
-!     ] if ;
+: remove-step-into ( word -- )
+    building get dup empty? [ drop ] [ nip pop wrapped ] if , ;
+
+: (remove-breakpoints) ( quot -- newquot )
+    [
+        [
+            {
+                { [ dup word? not ] [ , ] }
+                { [ dup "break?" word-prop ] [ drop ] }
+                { [ dup "step-into?" word-prop ] [ remove-step-into ] }
+                { [ t ] [ , ] }
+            } cond
+        ] each
+    ] [ ] make ;
+
+: remove-breakpoints ( quot pos -- quot' )
+    over quotation? [
+        1+ cut [ (remove-breakpoints) ] 2apply
+        [ -> ] swap 3append
+    ] [
+        drop
+    ] if ;
 
 PRIVATE>
 
 : callstack. ( callstack -- )
     callstack>array 2 <groups> [
-        ! remove-breakpoints
+        remove-breakpoints
         2 nesting-limit [ . ] with-variable
     ] assoc-each ;
 

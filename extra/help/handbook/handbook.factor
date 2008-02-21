@@ -66,8 +66,7 @@ ARTICLE: "evaluator" "Evaluation semantics"
     { "All other types of objects are pushed on the data stack." }
 }
 "If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $snippet "tail-recursion" } " and allows iterative algorithms to execute without incurring unbounded call stack usage."
-$nl
-"There are various ways of implementing these evaluation semantics. See " { $link "compiler" } " and " { $link "meta-interpreter" } "." ;
+{ $see-also "compiler" } ;
 
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "evaluator" }
@@ -196,7 +195,6 @@ ARTICLE: "tools" "Developer tools"
 "Debugging tools:"
 { $subsection "tools.annotations" }
 { $subsection "tools.test" }
-{ $subsection "meta-interpreter" }
 "Performance tools:"
 { $subsection "tools.memory" }
 { $subsection "profiling" }

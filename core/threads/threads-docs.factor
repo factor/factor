@@ -62,7 +62,6 @@ HELP: thread
         { { $link thread-name } " - the name passed to " { $link spawn } "." }
         { { $link thread-quot } " - the initial quotation passed to " { $link spawn } "." }
         { { $link thread-continuation } " - a " { $link box } "; if the thread is ready to run, the box holds the continuation, otherwise it is empty." }
-        { { $link thread-registered? } " - a boolean indicating whether the thread is eligible to run or not. Spawning a thread with " { $link (spawn) } " sets this flag and " { $link stop } " clears it." }
     }
 } ;
 

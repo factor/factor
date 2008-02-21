@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: concurrency.promises models tools.walker kernel
-sequences concurrency.messaging locals ;
+sequences concurrency.messaging locals continuations
+threads ;
 IN: tools.walker.debug
 
 :: test-walker | quot |
@@ -9,7 +10,7 @@ IN: tools.walker.debug
            s [ f <model> ]
            c [ f <model> ] |
         [ s c start-walker-thread p fulfill break ]
-        quot compose
+        quot compose "Walker test" spawn drop
 
         step-into-all
         p ?promise

@@ -7,13 +7,13 @@ io io.styles sequences assocs namespaces sorting boxes ;
 : thread. ( thread -- )
     dup thread-id pprint-cell
     dup thread-name pprint-cell
-    thread-state [ "Waiting for " swap append ] [ "Running" ] if*
+    thread-state "running" or
     [ write ] with-cell ;
 
 : threads. ( -- )
     standard-table-style [
         [
-            { "ID" "Name" "State" }
+            { "ID" "Name" "Waiting on" }
             [ [ write ] with-cell ] each
         ] with-row
 
