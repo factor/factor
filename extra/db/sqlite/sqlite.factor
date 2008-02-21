@@ -178,12 +178,12 @@ M: sqlite-db modifier-table ( -- hashtable )
     } ;
 
 M: sqlite-db compound-modifier ( str obj -- newstr )
-    drop ;
+    compound-type ;
 
 M: sqlite-db compound-type ( str seq -- newstr )
     over {
-        ! { "varchar" [ first number>string join-space ] }
-        [ drop ] !  "no sqlite compound data type" 3array throw ]
+        { "default" [ first number>string join-space ] }
+        [ 2drop ] !  "no sqlite compound data type" 3array throw ]
     } case ;
 
 M: sqlite-db type-table ( -- assoc )
@@ -191,7 +191,7 @@ M: sqlite-db type-table ( -- assoc )
         { +native-id+ "integer primary key" }
         { INTEGER "integer" }
         { TEXT "text" }
-        { VARCHAR "varchar" }
+        { VARCHAR "text" }
         { TIMESTAMP "timestamp" }
         { DOUBLE "real" }
     } ;

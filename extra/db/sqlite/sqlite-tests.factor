@@ -123,7 +123,7 @@ basket "BASKET"
 
 ! Create table
 [
-    "create table puppy(id integer primary key not null, name varchar 256, age integer);"
+    "create table puppy(id integer primary key not null, name varchar, age integer);"
 ] [
     T{ sqlite-db } db [
         puppy dup db-columns swap db-table create-sql >lower

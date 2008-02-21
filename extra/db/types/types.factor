@@ -104,8 +104,6 @@ TUPLE: no-sql-modifier ;
 ! PostgreSQL Types:
 ! http://developer.postgresql.org/pgdocs/postgres/datatype.html
 
-
-
 HOOK: modifier-table db ( -- hash )
 HOOK: compound-modifier db ( str seq -- hash )
 
@@ -142,7 +140,6 @@ HOOK: compound-type db ( str n -- hash )
         [ nip ] [ drop lookup-type* ] if
     ] if ;
 
-USE: prettyprint
 : lookup-type ( obj create? -- str )
     [ lookup-create-type ] [ lookup-type* ] if ;
 
