@@ -31,6 +31,9 @@ M: string error. print ;
 : :get ( variable -- value )
     error-continuation get continuation-name assoc-stack ;
 
+: :vars ( -- )
+    error-continuation get continuation-name namestack. ;
+
 : :res ( n -- )
     1- restarts get-global nth f restarts set-global restart ;
 

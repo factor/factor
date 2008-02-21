@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs debugger ui.tools.workspace
 ui.tools.operations ui.tools.browser ui.tools.inspector
-ui.tools.listener ui.tools.profiler ui.tools.walker
+ui.tools.listener ui.tools.profiler
 ui.tools.operations inspector io kernel math models namespaces
 prettyprint quotations sequences ui ui.commands ui.gadgets
 ui.gadgets.books ui.gadgets.buttons
@@ -23,7 +23,6 @@ IN: ui.tools
         <stack-display> ,
         <browser-gadget> ,
         <inspector-gadget> ,
-        <walker> ,
         <profiler-gadget> ,
     ] { } make g gadget-model <book> ;
 
@@ -62,15 +61,12 @@ M: workspace model-changed
 
 : com-inspector inspector-gadget select-tool ;
 
-: com-walker walker select-tool ;
-
 : com-profiler profiler-gadget select-tool ;
 
 workspace "tool-switching" f {
     { T{ key-down f { A+ } "1" } com-listener }
     { T{ key-down f { A+ } "2" } com-browser }
     { T{ key-down f { A+ } "3" } com-inspector }
-    { T{ key-down f { A+ } "4" } com-walker }
     { T{ key-down f { A+ } "5" } com-profiler }
 } define-command-map
 

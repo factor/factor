@@ -1,7 +1,8 @@
 USING: continuations documents ui.tools.interactor
 ui.tools.listener hashtables kernel namespaces parser sequences
 timers tools.test ui.commands ui.gadgets ui.gadgets.editors
-ui.gadgets.panes vocabs words tools.test.ui slots.private ;
+ui.gadgets.panes vocabs words tools.test.ui slots.private
+threads ;
 IN: temporary
 
 timers [ init-timers ] unless
@@ -13,7 +14,9 @@ timers [ init-timers ] unless
 [ ] [ <listener-gadget> "listener" set ] unit-test
 
 "listener" get [
-    [ "dup" ] [ \ dup "listener" get word-completion-string ] unit-test
+    [ "dup" ] [
+        \ dup "listener" get word-completion-string
+    ] unit-test
 
     [ "USE: slots.private slot" ]
     [ \ slot "listener" get word-completion-string ] unit-test

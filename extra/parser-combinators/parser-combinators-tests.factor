@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel lazy-lists tools.test strings math
 sequences parser-combinators arrays math.parser unicode.categories ;
-IN: scratchpad
+IN: temporary
 
 ! Testing <&>
 { { T{ parse-result f { "a" "b" } T{ slice f 2 4 "abcd" } } }  } [

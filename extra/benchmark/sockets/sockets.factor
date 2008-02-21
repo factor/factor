@@ -1,5 +1,5 @@
-USING: io.sockets io.server io kernel math threads debugger
-concurrency tools.time prettyprint ;
+USING: io.sockets io.server io kernel math threads
+debugger tools.time prettyprint concurrency.combinators ;
 IN: benchmark.sockets
 
 : simple-server ( -- )

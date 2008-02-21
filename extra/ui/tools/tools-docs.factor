@@ -1,5 +1,5 @@
 USING: editors help.markup help.syntax inspector io listener
-parser prettyprint tools.profiler tools.interpreter ui.commands
+parser prettyprint tools.profiler tools.walker ui.commands
 ui.gadgets.editors ui.gadgets.panes ui.gadgets.presentations
 ui.gadgets.slots ui.operations ui.tools.browser
 ui.tools.interactor ui.tools.listener ui.tools.operations
@@ -53,14 +53,6 @@ ARTICLE: "ui-browser" "UI browser"
 "The browser is used to display Factor code, documentation, and vocabularies."
 { $command-map browser-gadget "toolbar" }
 "Browsers are instances of " { $link browser-gadget } "." ;
-
-ARTICLE: "ui-walker" "UI walker"
-"The walker single-steps through quotations. To use the walker, enter a piece of code in the listener's input area and press " { $operation walk } "."
-$nl
-"The walker can travel backwards through time, and restore stacks. This does not undo side effects and therefore can only be used reliably on referentially transparent code."
-{ $command-map walker "toolbar" }
-{ $command-map walker "other" }
-"Walkers are instances of " { $link walker } "." ;
 
 ARTICLE: "ui-profiler" "UI profiler" 
 "The graphical profiler is based on the terminal profiler (see " { $link "profiling" } ") and adds more convenient browsing of profiler results."
@@ -134,9 +126,9 @@ $nl
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }
 { $subsection "ui-inspector" }
-{ $subsection "ui-walker" }
 { $subsection "ui-profiler" }
 "Additional tools:"
+{ $subsection "ui-walker" }
 { $subsection "ui.tools.deploy" }
 "Platform-specific features:"
 { $subsection "ui-cocoa" } ;

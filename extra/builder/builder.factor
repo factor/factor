@@ -133,13 +133,13 @@ SYMBOL: build-status
 
     make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
 
-    ! [ retrieve-image ] [ "Image download error" print throw ] recover
-
     copy-image
 
     bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
-    builder-test [ "Test error" print "../test-log" cat ] run-or-bail
+    builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail
+
+    "../test-log" delete-file
 
     "Boot time: " write "../boot-time" eval-file milli-seconds>time print
     "Load time: " write "../load-time" eval-file milli-seconds>time print
@@ -181,10 +181,14 @@ SYMBOL: builder-recipients
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: compress-image ( -- )
+  { "bzip2" my-boot-image-name } to-strings run-process drop ;
+
 : build ( -- )
   [ (build) ] [ drop ] recover
   [ send-builder-email ] [ drop "not sending mail" . ] recover
-  ".." cd { "rm" "-rf" "factor" } run-process drop ;
+  ".." cd { "rm" "-rf" "factor" } run-process drop
+  [ compress-image ] [ drop ] recover ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
