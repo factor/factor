@@ -106,7 +106,7 @@ TUPLE: stack-display ;
     g workspace-listener swap [
         dup <toolbar> f track,
         listener-gadget-stack [ stack. ]
-        "Data stack" <labelled-pane> 1 track,
+        t "Data stack" <labelled-pane> 1 track,
     ] { 0 1 } build-track ;
 
 M: stack-display tool-scroller

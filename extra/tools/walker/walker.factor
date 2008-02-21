@@ -6,8 +6,8 @@ concurrency.messaging quotations kernel.private words
 sequences.private assocs models ;
 IN: tools.walker
 
-SYMBOL: new-walker-hook
-SYMBOL: show-walker-hook
+SYMBOL: new-walker-hook ! ( -- )
+SYMBOL: show-walker-hook ! ( thread -- )
 
 ! Thread local
 SYMBOL: walker-thread
@@ -169,16 +169,19 @@ SYMBOL: +detached+
     [ status +running+ eq? ] [
         [
             {
-                { detach [ detach-msg ] }
-                { step [ ] }
-                { step-out [ ] }
-                { step-into [ ] }
-                { step-all [ ] }
-                { step-into-all [ ] }
-                { step-back [ ] }
-                { f [ walker-stopped ] }
-                [ step-into-msg ]
-            } case f
+                { detach [ detach-msg f ] }
+                { step [ f ] }
+                { step-out [ f ] }
+                { step-into [ f ] }
+                { step-all [ f ] }
+                { step-into-all [ f ] }
+                { step-back [ f ] }
+                { f [ +stopped+ set-status f ] }
+                [
+                    dup walker-continuation tget set-model
+                    step-into-msg
+                ]
+            } case
         ] handle-synchronous
     ] [ ] while ;
 

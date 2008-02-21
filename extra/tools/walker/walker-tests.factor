@@ -97,10 +97,6 @@ IN: temporary
 [ { 6 } ]
 [ [ [ 3 throw ] [ 2 * ] recover ] test-walker ] unit-test
 
-[ { "{ 1 2 3 }\n" } ] [
-    [ [ { 1 2 3 } . ] with-string-writer ] test-walker
-] unit-test
-
 [ { } ] [
     [ "a" "b" set "c" "d" set [ ] test-walker ] with-scope
 ] unit-test

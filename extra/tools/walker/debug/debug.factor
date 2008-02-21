@@ -2,15 +2,22 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: concurrency.promises models tools.walker kernel
 sequences concurrency.messaging locals continuations
-threads ;
+threads namespaces namespaces.private ;
 IN: tools.walker.debug
 
 :: test-walker | quot |
     [let | p [ <promise> ]
            s [ f <model> ]
            c [ f <model> ] |
-        [ s c start-walker-thread p fulfill break ]
-        quot compose "Walker test" spawn drop
+        [
+            H{ } clone >n
+            [ s c start-walker-thread p fulfill ] new-walker-hook set
+            [ drop ] show-walker-hook set
+
+            break
+            
+            quot call
+        ] "Walker test" spawn drop
 
         step-into-all
         p ?promise
