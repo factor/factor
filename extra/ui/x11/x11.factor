@@ -235,7 +235,7 @@ M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
     world-handle x11-handle-window dup set-closable map-window ;
 
-M: x11-ui-backend raise-window ( world -- )
+M: x11-ui-backend raise-window* ( world -- )
     world-handle [
         dpy get swap x11-handle-window XRaiseWindow drop
     ] when* ;

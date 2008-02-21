@@ -75,6 +75,9 @@ combinators quotations ;
        { string-limit t }
     } clone [ pprint ] bind ;
 
+: unparse-short ( obj -- str )
+    [ pprint-short ] with-string-writer ;
+
 : short. ( obj -- ) pprint-short nl ;
 
 : .b ( n -- ) >bin print ;
@@ -94,27 +97,18 @@ SYMBOL: ->
 { { foreground { 1 1 1 1 } } { background { 0 0 0 1 } } }
 "word-style" set-word-prop
 
-! This code is ugly and could probably be simplified
-: remove-step-into
-    building get dup empty? [
-        drop \ (step-into) ,
-    ] [
-        pop dup wrapper? [
-            wrapped dup \ break eq?
-            [ drop ] [ , ] if
-        ] [
-            ,
-        ] if
-    ] if ;
+: remove-step-into ( word -- )
+    building get dup empty? [ drop ] [ nip pop wrapped ] if , ;
 
 : (remove-breakpoints) ( quot -- newquot )
     [
         [
             {
-                { break [ ] }
-                { (step-into) [ remove-step-into ] }
-                [ , ]
-            } case
+                { [ dup word? not ] [ , ] }
+                { [ dup "break?" word-prop ] [ drop ] }
+                { [ dup "step-into?" word-prop ] [ remove-step-into ] }
+                { [ t ] [ , ] }
+            } cond
         ] each
     ] [ ] make ;
 

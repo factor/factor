@@ -1,4 +1,5 @@
 USING: sequences xml kernel arrays xml.utilities io.files tools.test ;
+IN: temporary
 
 : assemble-data ( tag -- 3array )
     { "URL" "snippet" "title" }

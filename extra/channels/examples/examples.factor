@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Examples of using channels
-USING: kernel concurrency channels math namespaces locals
-sequences ;
+USING: kernel threads channels math namespaces
+locals sequences ;
 IN: channels.examples
 
 : (counter) ( channel n -- )
@@ -13,7 +13,7 @@ IN: channels.examples
     2 (counter) ;    
 
 : counter-test ( -- n1 n2 n3 )
-    <channel> [ counter ] spawn drop 
+    <channel> dup [ counter ] curry "Counter" spawn drop 
     [ from ] keep [ from ] keep from ;
 
 : filter ( send prime recv -- )
@@ -28,17 +28,17 @@ IN: channels.examples
     [let | p [ c from ] 
            newc [ <channel> ] |
         p prime to
-        [ newc p c filter ] spawn drop
+        [ newc p c filter ] "Filter" spawn drop
         prime newc (sieve)
     ] ;
 
 : sieve ( prime -- ) 
     #! Send prime numbers to 'prime' channel
-    <channel> [ counter ] spawn drop
+    <channel> dup [ counter ] curry "Counter" spawn drop
     (sieve) ;
 
 : sieve-test ( -- seq )
-    <channel> [ sieve ] spawn drop
+    <channel> dup [ sieve ] curry "Sieve" spawn drop
     V{ } clone swap 
     [ from swap push ] 2keep
     [ from swap push ] 2keep

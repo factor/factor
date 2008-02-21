@@ -1,8 +1,8 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel sequences generic words
 arrays classes slots slots.private tuples math vectors
-quotations ;
+quotations sorting prettyprint ;
 IN: mirrors
 
 GENERIC: object-slots ( obj -- seq )
@@ -69,8 +69,13 @@ M: enum clear-assoc enum-seq delete-all ;
 
 INSTANCE: enum assoc
 
+: sort-assoc ( assoc -- alist )
+    >alist
+    [ dup first unparse-short swap ] { } map>assoc
+    sort-keys values ;
+
 GENERIC: make-mirror ( obj -- assoc )
-M: hashtable make-mirror ;
+M: hashtable make-mirror sort-assoc ;
 M: integer make-mirror drop f ;
 M: array make-mirror <enum> ;
 M: vector make-mirror <enum> ;

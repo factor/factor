@@ -3,7 +3,7 @@
 !
 USING: cpu.8080 cpu.8080.emulator openal math alien.c-types
 sequences kernel shuffle arrays io.files combinators ui.gestures
-ui.gadgets ui.render opengl.gl system threads concurrency match
+ui.gadgets ui.render opengl.gl system threads match
 ui byte-arrays combinators.lib ;
 IN: space-invaders
 
@@ -353,9 +353,10 @@ M: space-invaders update-video ( value addr cpu -- )
   ] if ;
 
 M: invaders-gadget graft* ( gadget -- )
- dup invaders-gadget-cpu init-sounds
- [ f swap set-invaders-gadget-quit? ] keep
- [ millis swap invaders-process ] spawn 2drop ;
+  dup invaders-gadget-cpu init-sounds
+  f over set-invaders-gadget-quit?
+  [ millis swap invaders-process ] curry
+  "Space invaders" spawn drop ;
 
 M: invaders-gadget ungraft* ( gadget -- )
  t swap set-invaders-gadget-quit? ;

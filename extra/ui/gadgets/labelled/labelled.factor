@@ -21,8 +21,8 @@ M: labelled-gadget focusable-child* labelled-gadget-content ;
 : <labelled-scroller> ( gadget title -- gadget )
     >r <scroller> r> <labelled-gadget> ;
 
-: <labelled-pane> ( model quot title -- gadget )
-    >r <pane-control> t over set-pane-scrolls? r>
+: <labelled-pane> ( model quot scrolls? title -- gadget )
+    >r >r <pane-control> r> over set-pane-scrolls? r>
     <labelled-scroller> ;
 
 : <close-box> ( quot -- button/f )
