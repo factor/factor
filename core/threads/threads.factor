@@ -77,6 +77,9 @@ PRIVATE>
 : resume ( thread -- )
     check-registered run-queue push-front ;
 
+: resume-now ( thread -- )
+    check-registered run-queue push-back ;
+
 : resume-with ( obj thread -- )
     check-registered 2array run-queue push-front ;
 

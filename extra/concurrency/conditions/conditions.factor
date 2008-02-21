@@ -4,10 +4,11 @@ USING: dlists threads kernel arrays sequences ;
 IN: concurrency.conditions
 
 : notify-1 ( dlist -- )
-    dup dlist-empty? [ drop ] [ pop-back second resume ] if ;
+    dup dlist-empty?
+    [ drop ] [ pop-back second resume-now ] if ;
 
 : notify-all ( dlist -- )
-    [ second resume ] dlist-slurp yield ;
+    [ second resume-now ] dlist-slurp yield ;
 
 : wait ( queue timeout status -- )
     >r [ 2array swap push-front ] r> suspend 3drop ; inline
