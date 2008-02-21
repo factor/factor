@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables io kernel math memory namespaces
 parser sequences strings io.styles io.streams.lines
@@ -48,7 +48,14 @@ M: duplex-stream stream-read-quot
 
 : listen ( -- )
     listener-hook get call prompt.
-    [ read-quot [ call ] [ bye ] if* ] try ;
+    [ read-quot [ try ] [ bye ] if* ]
+    [
+        dup parse-error? [
+            error-hook get call
+        ] [
+            rethrow
+        ] if
+    ] recover ;
 
 : until-quit ( -- )
     quit-flag get

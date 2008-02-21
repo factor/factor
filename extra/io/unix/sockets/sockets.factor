@@ -4,11 +4,11 @@
 ! We need to fiddle with the exact search order here, since
 ! unix::accept shadows streams::accept.
 IN: io.unix.sockets
-USING: alien alien.c-types generic io
-kernel math namespaces io.nonblocking parser threads unix
-sequences byte-arrays io.sockets io.binary io.unix.backend
-io.streams.duplex io.sockets.impl math.parser continuations
-libc combinators ;
+USING: alien alien.c-types generic io kernel math namespaces
+io.nonblocking parser threads unix sequences
+byte-arrays io.sockets io.binary io.unix.backend
+io.streams.duplex io.sockets.impl math.parser continuations libc
+combinators ;
 
 : pending-init-error ( port -- )
     #! We close it here to avoid a resource leak; callers of

@@ -15,7 +15,7 @@ HOOK: (open-window) ui-backend ( world -- )
 
 HOOK: (close-window) ui-backend ( handle -- )
 
-HOOK: raise-window ui-backend ( world -- )
+HOOK: raise-window* ui-backend ( world -- )
 
 HOOK: select-gl-context ui-backend ( handle -- )
 

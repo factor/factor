@@ -10,7 +10,7 @@ namespaces.private parser prettyprint quotations
 quotations.private sbufs sbufs.private sequences
 sequences.private slots.private strings strings.private system
 threads.private tuples tuples.private vectors vectors.private
-words words.private assocs inspector ;
+words words.private assocs inspector compiler.units ;
 IN: inference.known-words
 
 ! Shuffle words
@@ -596,3 +596,7 @@ set-primitive-effect
 \ (os-envs) { } { array } <effect> set-primitive-effect
 
 \ do-primitive [ \ do-primitive no-effect ] "infer" set-word-prop
+
+\ dll-valid? { object } { object } <effect> set-primitive-effect
+
+\ modify-code-heap { array object } { } <effect> set-primitive-effect

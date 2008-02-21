@@ -409,6 +409,7 @@ SYMBOL: interactive-vocabs
     "tools.memory"
     "tools.profiler"
     "tools.test"
+    "tools.threads"
     "tools.time"
     "vocabs"
     "vocabs.loader"

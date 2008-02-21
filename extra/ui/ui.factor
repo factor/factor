@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces
-prettyprint dlists sequences threads sequences words timers
-debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
-ui.gestures ui.backend ui.render continuations init
-combinators hashtables ;
+prettyprint dlists sequences threads sequences words
+timers debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
+ui.gestures ui.backend ui.render continuations init combinators
+hashtables ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -131,12 +131,8 @@ SYMBOL: ui-hook
     graft-queue [ notify ] dlist-slurp ;
 
 : ui-step ( -- )
-    [
-        do-timers
-        notify-queued
-        layout-queued
-        redraw-worlds
-    ] assert-depth ;
+    [ do-timers notify-queued layout-queued redraw-worlds ]
+    assert-depth ;
 
 : open-world-window ( world -- )
     dup pref-dim over set-gadget-dim dup relayout graft ui-step ;
@@ -150,6 +146,9 @@ SYMBOL: ui-hook
 
 : fullscreen? ( gadget -- ? )
     find-world fullscreen* ;
+
+: raise-window ( gadget -- )
+    find-world raise-window* ;
 
 HOOK: close-window ui-backend ( gadget -- )
 

@@ -1,5 +1,5 @@
-USING: io.sockets io.server io kernel math threads debugger
-concurrency tools.time prettyprint ;
+USING: io.sockets io.server io kernel math threads
+debugger tools.time prettyprint concurrency.combinators ;
 IN: benchmark.sockets
 
 : simple-server ( -- )
@@ -23,10 +23,9 @@ IN: benchmark.sockets
     ] with-stream ;
 
 : clients ( n -- )
-    dup pprint " clients: " write
-        [
+    dup pprint " clients: " write [
         [ simple-server ] in-thread
-        100 sleep
+        yield yield
         [ drop simple-client ] parallel-each
         stop-server
         yield yield

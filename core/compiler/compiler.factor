@@ -24,7 +24,6 @@ IN: compiler
 
 : finish-compile ( word effect dependencies -- )
     >r dupd save-effect r>
-    f pick compiler-error
     over compiled-unxref
     over crossref? [ compiled-xref ] [ 2drop ] if ;
 
@@ -38,6 +37,7 @@ IN: compiler
     swap compiler-error ;
 
 : (compile) ( word -- )
+    f over compiler-error
     [ dup compile-succeeded finish-compile ]
     [ dupd compile-failed f save-effect ]
     recover ;
@@ -55,7 +55,9 @@ IN: compiler
         H{ } clone compiled set
         [ queue-compile ] each
         compile-queue get compile-loop
-        compiled get >alist modify-code-heap
+        compiled get >alist
+        dup [ drop crossref? ] assoc-contains?
+        modify-code-heap
     ] with-scope ; inline
 
 : compile ( words -- )
@@ -70,4 +72,4 @@ IN: compiler
     [ all-words recompile ] with-compiler-errors ;
 
 : decompile ( word -- )
-    f 2array 1array modify-code-heap ;
+    f 2array 1array t modify-code-heap ;

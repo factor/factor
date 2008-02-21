@@ -373,32 +373,53 @@ M: timestamp year. ( timestamp -- )
     #! Example: Tue, 15 Nov 1994 08:12:31 GMT
     >gmt timestamp>rfc822-string ;
 
+: write-rfc3339-gmt-offset ( n -- )
+    dup zero? [ drop "Z" write ] [
+        dup 0 < [ CHAR: - write1 neg ] [ CHAR: + write1 ] if
+        60 * 60 /mod swap write-00 CHAR: : write1 write-00
+    ] if ;
+
 : (timestamp>rfc3339) ( timestamp -- )
     dup timestamp-year number>string write CHAR: - write1
     dup timestamp-month write-00 CHAR: - write1
     dup timestamp-day write-00 CHAR: T write1
     dup timestamp-hour write-00 CHAR: : write1
     dup timestamp-minute write-00 CHAR: : write1
-    timestamp-second >fixnum write-00 CHAR: Z write1 ;
+    dup timestamp-second >fixnum write-00
+    timestamp-gmt-offset write-rfc3339-gmt-offset ;
 
 : timestamp>rfc3339 ( timestamp -- str )
-    >gmt [ (timestamp>rfc3339) ] with-string-writer ;
+    [ (timestamp>rfc3339) ] with-string-writer ;
 
-: expect read1 assert= ;
+: expect ( str -- )
+    read1 swap member? [ "Parse error" throw ] unless ;
+
+: read-00 2 read string>number ;
+
+: read-0000 4 read string>number ;
+
+: read-rfc3339-gmt-offset ( -- n )
+    read1 dup CHAR: Z = [ drop 0 ] [
+        { { CHAR: + [ 1 ] } { CHAR: - [ -1 ] } } case
+        read-00
+        read1 { { CHAR: : [ read-00 ] } { f [ 0 ] } } case
+        60 / + *
+    ] if ;
 
 : (rfc3339>timestamp) ( -- timestamp )
-    4 read string>number ! year
-    CHAR: - expect
-    2 read string>number ! month
-    CHAR: - expect
-    2 read string>number ! day
-    CHAR: T expect
-    2 read string>number ! hour
-    CHAR: : expect
-    2 read string>number ! minute
-    CHAR: : expect
-    2 read string>number ! second
-    0 <timestamp> ;
+    read-0000 ! year
+    "-" expect
+    read-00 ! month
+    "-" expect
+    read-00 ! day
+    "Tt" expect
+    read-00 ! hour
+    ":" expect
+    read-00 ! minute
+    ":" expect
+    read-00 ! second
+    read-rfc3339-gmt-offset ! timezone
+    <timestamp> ;
 
 : rfc3339>timestamp ( str -- timestamp )
     [ (rfc3339>timestamp) ] with-string-reader ;

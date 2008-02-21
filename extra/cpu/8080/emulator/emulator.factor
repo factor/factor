@@ -1,10 +1,9 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel math sequences words arrays io 
-       io.files namespaces math.parser kernel.private
-       assocs quotations parser parser-combinators tools.time
-       sequences.private compiler.units io.encodings.binary ;
+USING: kernel math sequences words arrays io io.files namespaces
+math.parser assocs quotations parser parser-combinators
+tools.time io.encodings.binary ;
 IN: cpu.8080.emulator
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;
@@ -396,39 +395,18 @@ M: cpu write-port ( value port cpu -- )
 : instruction-cycles ( -- vector )
   #! Return a 256 element vector containing the cycles for
   #! each opcode in the 8080 instruction set.
-  { 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f } ;
-
-: instructions ( -- vector )
-  #! Return a 256 element vector containing the emulation words for
-  #! each opcode in the 8080 instruction set.
-  { 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f } ; 
+  << 256 f <array> parsed >> ;
 
 : not-implemented ( <cpu> -- )
   drop ;
 
-instructions length [ 
-  dup instructions nth [
-    drop
-  ] [
-    [ not-implemented ] swap instructions set-nth 
-  ] if
-] each
+: instructions ( -- vector )
+  #! Return a 256 element vector containing the emulation words for
+  #! each opcode in the 8080 instruction set.
+  << 256 [ [ not-implemented ] 2array ] map parsed >> ; inline
+
+: set-instruction ( quot n -- )
+  tuck >r 2array r> instructions set-nth ;
 
 M: cpu reset ( cpu -- )
   #! Reset the CPU to its poweron state
@@ -517,15 +495,6 @@ SYMBOL: rom-root
     ] if     
   ] if ;
 
-: step ( cpu -- )
-  #! Run a single 8080 instruction
-  [ read-instruction ] keep ! n cpu
-  over get-cycles over inc-cycles
-  [ swap instructions dispatch ] keep
-  [ cpu-pc HEX: FFFF bitand ] keep 
-  [ set-cpu-pc ] keep 
-  process-interrupts ;
-
 : peek-instruction ( cpu -- word )
   #! Return the next instruction from the cpu's program
   #! counter, but don't increment the counter.
@@ -559,18 +528,6 @@ SYMBOL: rom-root
   [ " SP: " write cpu-sp 16 >base 4 CHAR: \s pad-left write ] keep 
   [ " cycles: " write cpu-cycles number>string 5 CHAR: \s pad-left write ] keep 
   nl drop ;
-
-: test-step ( cpu -- cpu )
-  [ step ] keep dup cpu. ;
-
-: test-cpu ( -- cpu )
-  <cpu> "invaders.rom" over load-rom dup cpu. ;
-
-: test-n ( n -- )
-  test-cpu swap [ test-step ] times ;
-
-: run-n ( cpu n -- cpu )
-  [ dup step ] times ;
 
 : register-lookup ( string -- vector )
   #! Given a string containing a register name, return a vector
@@ -1337,11 +1294,9 @@ SYMBOL: last-opcode
   #! Process the list of strings, which should make
   #! up an 8080 instruction, and output a quotation
   #! that would implement that instruction.
-  [
-    dup " " join instruction-quotations
-    >r "_" join [ "emulate-" % % ] "" make create-in dup last-instruction global set-at  
-    r> define
-  ] with-compilation-unit ;
+  dup " " join instruction-quotations
+  >r "_" join [ "emulate-" % % ] "" make create-in dup last-instruction global set-at  
+  r> define ;
 
 : INSTRUCTION: ";" parse-tokens parse-instructions ; parsing
 
@@ -1352,5 +1307,5 @@ SYMBOL: last-opcode
 : opcode ( -- )
   #! Set the opcode number for the last instruction that was defined.
   last-instruction global at 1quotation scan 16 base>
-  dup last-opcode global set-at instructions set-nth ; parsing
+  dup last-opcode global set-at set-instruction ; parsing
 

@@ -78,7 +78,7 @@ nl
     [ compiled-usages recompile ] recompile-hook set-global ;
 
 : disable-compiler ( -- )
-    [ [ f ] { } map>assoc modify-code-heap ] recompile-hook set-global ;
+    [ default-recompile-hook ] recompile-hook set-global ;
 
 enable-compiler
 

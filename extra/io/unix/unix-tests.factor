@@ -1,6 +1,6 @@
-USING: io.files io.sockets io kernel threads namespaces
-tools.test continuations strings byte-arrays sequences
-prettyprint system io.encodings.binary io.encodings.ascii ;
+USING: io.files io.sockets io kernel threads
+namespaces tools.test continuations strings byte-arrays
+sequences prettyprint system io.encodings.binary io.encodings.ascii ;
 IN: temporary
 
 ! Unix domain stream sockets
@@ -18,7 +18,7 @@ IN: temporary
     ] with-stream
 
     "unix-domain-socket-test" resource-path delete-file
-] in-thread
+] "Test" spawn drop
 
 yield
 
@@ -69,7 +69,7 @@ yield
 
         "unix-domain-datagram-test" resource-path delete-file
     ] with-scope
-] in-thread
+] "Test" spawn drop
 
 yield
 

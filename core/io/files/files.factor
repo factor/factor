@@ -153,13 +153,14 @@ M: pathname <=> [ pathname-string ] compare ;
 : file-lines ( path encoding -- seq ) <file-reader> lines ;
 
 : file-contents ( path encoding -- str )
-    dupd <file-reader> swap file-length <sbuf> [ stream-copy ] keep >string ;
+    dupd <file-reader> swap file-length <sbuf>
+    [ stream-copy ] keep >string ;
 
-: with-file-writer ( path encoding quot -- )
-    >r <file-writer> r> with-stream ; inline
-
-: with-file-reader ( path encoding quot -- )
+: with-file-reader ( path quot -- )
     >r <file-reader> r> with-stream ; inline
+
+: with-file-writer ( path quot -- )
+    >r <file-writer> r> with-stream ; inline
 
 : with-file-appender ( path encoding quot -- )
     >r <file-appender> r> with-stream ; inline

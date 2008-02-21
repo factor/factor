@@ -1,13 +1,13 @@
 IN: optimizer.report
 USING: assocs words sequences arrays compiler tools.time
 io.styles io prettyprint vocabs kernel sorting generator
-optimizer ;
+optimizer math ;
 
 : count-optimization-passes ( nodes n -- n )
     >r optimize-1
     [ r> 1+ count-optimization-passes ] [ drop r> ] if ;
 
-: word-table
+: results
     [ [ second ] swap compose compare ] curry sort 20 tail*
     print
     standard-table-style

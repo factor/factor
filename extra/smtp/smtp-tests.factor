@@ -62,7 +62,7 @@ IN: temporary
         "Subject: Factor rules"
         f
         f
-        " "
+        ""
         "Hi guys"
         "Bye guys"
     }

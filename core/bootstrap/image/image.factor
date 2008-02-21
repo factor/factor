@@ -36,7 +36,7 @@ IN: bootstrap.image
 
 : data-base 1024 ; inline
 
-: userenv-size 40 ; inline
+: userenv-size 64 ; inline
 
 : header-size 10 ; inline
 

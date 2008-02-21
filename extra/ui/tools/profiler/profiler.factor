@@ -24,6 +24,9 @@ TUPLE: profiler-gadget pane ;
 : com-vocabs-profile ( gadget -- )
     [ vocabs-profile. ] with-profiler-pane ;
 
+: com-method-profile ( gadget -- )
+    [ method-profile. ] with-profiler-pane ;
+
 : profiler-help "ui-profiler" help-window ;
 
 \ profiler-help H{ { +nullary+ t } } define-command
@@ -31,6 +34,7 @@ TUPLE: profiler-gadget pane ;
 profiler-gadget "toolbar" f {
     { f com-full-profile }
     { f com-vocabs-profile }
+    { f com-method-profile }
     { T{ key-down f f "F1" } profiler-help }
 } define-command-map
 

@@ -16,7 +16,6 @@ IN: hashtables
     2 fixnum+fast over wrap ; inline
 
 : (key@) ( key keys i -- array n ? )
-    #! cond form expanded by hand for better interpreter speed
     3dup swap array-nth dup ((tombstone)) eq? [
         2drop probe (key@)
     ] [
@@ -40,7 +39,6 @@ IN: hashtables
     swap <hash-array> over set-hash-array init-hash ;
 
 : (new-key@) ( key keys i -- keys n empty? )
-    #! cond form expanded by hand for better interpreter speed
     3dup swap array-nth dup ((empty)) eq? [
         2drop rot drop t
     ] [

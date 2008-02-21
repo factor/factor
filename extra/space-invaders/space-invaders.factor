@@ -1,11 +1,10 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: cpu.8080 cpu.8080.emulator openal math alien.c-types sequences kernel
-       shuffle arrays io.files combinators kernel.private
-       ui.gestures ui.gadgets ui.render opengl.gl system 
-       threads concurrency match ui byte-arrays combinators.lib
-       sequences.private ;
+USING: cpu.8080 cpu.8080.emulator openal math alien.c-types
+sequences kernel shuffle arrays io.files combinators ui.gestures
+ui.gadgets ui.render opengl.gl system threads match
+ui byte-arrays combinators.lib ;
 IN: space-invaders
 
 TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap sounds looping? ;
@@ -191,7 +190,7 @@ M: space-invaders reset ( cpu -- )
 : gui-step ( cpu -- )
   [ read-instruction ] keep ! n cpu
   over get-cycles over inc-cycles
-  [ swap instructions dispatch ] keep  
+  [ swap instructions case ] keep  
   [ cpu-pc HEX: FFFF bitand ] keep 
   set-cpu-pc ;
 
@@ -345,16 +344,19 @@ M: space-invaders update-video ( value addr cpu -- )
   #! concurrent process. Messages can be sent to
   #! signal key presses, etc.
   dup invaders-gadget-quit? [
+    2drop
+  ] [
     [ sync-frame ] dip
     [ invaders-gadget-cpu gui-frame ] keep
     [ relayout-1 ] keep
     invaders-process 
-  ] unless ;
+  ] if ;
 
 M: invaders-gadget graft* ( gadget -- )
- dup invaders-gadget-cpu init-sounds
- [ f swap set-invaders-gadget-quit? ] keep
- [ millis swap invaders-process ] spawn 2drop ;
+  dup invaders-gadget-cpu init-sounds
+  f over set-invaders-gadget-quit?
+  [ millis swap invaders-process ] curry
+  "Space invaders" spawn drop ;
 
 M: invaders-gadget ungraft* ( gadget -- )
  t swap set-invaders-gadget-quit? ;
