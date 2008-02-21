@@ -56,7 +56,7 @@ SYMBOL: data-mode
             data-mode off
             "220 OK\r\n" write flush t
           ] }
-        { [ data-mode get ] [ global [ print ] bind t ] }
+        { [ data-mode get ] [ dup global [ print ] bind t ] }
         { [ t ] [ 
             "500 ERROR\r\n" write flush t
           ] }

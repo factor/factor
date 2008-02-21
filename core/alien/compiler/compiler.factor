@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generator generator.registers generator.fixup
 hashtables kernel math namespaces sequences words

@@ -55,11 +55,11 @@ USING: tools.test io.files io threads kernel continuations ;
 
 [ f ] [ "test-blah" resource-path exists? ] unit-test
 
-[ ] [ "test-quux.txt" resource-path [ [ yield "Hi" write ] in-thread ] with-file-writer ] unit-test
+[ ] [ "test-quux.txt" resource-path [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
 
 [ ] [ "test-quux.txt" resource-path delete-file ] unit-test
 
-[ ] [ "test-quux.txt" resource-path [ [ yield "Hi" write ] in-thread ] with-file-writer ] unit-test
+[ ] [ "test-quux.txt" resource-path [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
 
 [ ] [ "test-quux.txt" "quux-test.txt" [ resource-path ] 2apply rename-file ] unit-test
 [ t ] [ "quux-test.txt" resource-path exists? ] unit-test

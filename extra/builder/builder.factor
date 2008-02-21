@@ -1,7 +1,8 @@
 
 USING: kernel namespaces sequences splitting system combinators continuations
        parser io io.files io.launcher io.sockets prettyprint threads
-       bootstrap.image benchmark vars bake smtp builder.util accessors ;
+       bootstrap.image benchmark vars bake smtp builder.util accessors
+       builder.benchmark ;
 
 IN: builder
 
@@ -105,37 +106,6 @@ VAR: stamp
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-USING: arrays assocs math ;
-
-: passing-benchmarks ( table -- table )
-  [ second first2 number? swap number? and ] subset ;
-
-: simplify-table ( table -- table ) [ first2 second 2array ] map ;
-
-: benchmark-difference ( old-table benchmark-result -- result-diff )
-  first2 >r
-  tuck swap at
-  r>
-  swap -
-  2array ;
-
-: compare-tables ( old new -- table )
-  [ passing-benchmarks simplify-table ] 2apply
-  [ benchmark-difference ] with map ;
-
-: show-benchmark-deltas ( -- )
-  "Benchmark deltas: " print
-
-  [
-    "../../benchmarks" eval-file
-    "../benchmarks"    eval-file
-    compare-tables .
-  ]
-    [ drop "Error generating benchmark deltas" . ]
-  recover ;
-  
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 SYMBOL: build-status
 
 : (build) ( -- )
@@ -163,13 +133,13 @@ SYMBOL: build-status
 
     make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
 
-    ! [ retrieve-image ] [ "Image download error" print throw ] recover
-
     copy-image
 
     bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
 
-    builder-test [ "Test error" print "../test-log" cat ] run-or-bail
+    builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail
+
+    "../test-log" delete-file
 
     "Boot time: " write "../boot-time" eval-file milli-seconds>time print
     "Load time: " write "../load-time" eval-file milli-seconds>time print
@@ -211,10 +181,14 @@ SYMBOL: builder-recipients
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: compress-image ( -- )
+  { "bzip2" my-boot-image-name } to-strings run-process drop ;
+
 : build ( -- )
   [ (build) ] [ drop ] recover
   [ send-builder-email ] [ drop "not sending mail" . ] recover
-  ".." cd { "rm" "-rf" "factor" } run-process drop ;
+  ".." cd { "rm" "-rf" "factor" } run-process drop
+  [ compress-image ] [ drop ] recover ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

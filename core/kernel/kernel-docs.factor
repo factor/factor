@@ -336,7 +336,7 @@ HELP: either?
     { $example "5 7 [ even? ] either? ." "f" }
 } ;
 
-HELP: call ( quot -- )
+HELP: call ( callable -- )
 { $values { "quot" callable } }
 { $description "Calls a quotation."
 $nl

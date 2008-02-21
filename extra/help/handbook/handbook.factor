@@ -78,8 +78,35 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "conditionals" }
 { $subsection "basic-combinators" }
 { $subsection "combinators" }
-{ $subsection "continuations" }
-{ $subsection "threads" } ;
+{ $subsection "continuations" } ;
+
+USING: concurrency.combinators
+concurrency.messaging
+concurrency.promises
+concurrency.futures
+concurrency.locks
+concurrency.semaphores
+concurrency.count-downs
+concurrency.exchangers ;
+
+ARTICLE: "concurrency" "Concurrency"
+"Factor supports a variety of concurrency abstractions, however they are mostly used to multiplex input/output operations since the thread scheduling is co-operative and only one CPU is used at a time."
+$nl
+"Factor's concurrency support was insipired by Erlang, Termite, Scheme48 and Java's " { $snippet "java.util.concurrent" } " library."
+$nl
+"The basic building blocks:"
+{ $subsection "threads" }
+"High-level abstractions:"
+{ $subsection "concurrency.combinators" }
+{ $subsection "concurrency.promises" }
+{ $subsection "concurrency.futures" }
+{ $subsection "concurrency.messaging" }
+"Shared-state abstractions:"
+{ $subsection "concurrency.locks" }
+{ $subsection "concurrency.semaphores" }
+{ $subsection "concurrency.count-downs" }
+{ $subsection "concurrency.exchangers" }
+"Other concurrency abstractions include " { $vocab-link "concurrency.distributed" } " and " { $vocab-link "channels" } "." ;
 
 ARTICLE: "objects" "Objects"
 "An " { $emphasis "object" } " is any datum which may be identified. All values are objects in Factor. Each object carries type information, and types are checked at runtime; Factor is dynamically typed."
@@ -134,6 +161,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "hashtables" }
 { $subsection "alists" }
 { $heading "Other collections" }
+{ $subsection "boxes" }
 { $subsection "dlists" }
 { $subsection "heaps" }
 { $subsection "graphs" }
@@ -216,6 +244,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "numbers" }
 { $subsection "collections" }
 { $subsection "io" }
+{ $subsection "concurrency" }
 { $subsection "os" }
 { $subsection "alien" }
 { $heading "Environment reference" }
