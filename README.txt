@@ -52,7 +52,9 @@ The Factor runtime is written in GNU C99, and is built with GNU make and
 gcc.
 
 Factor requires gcc 3.4 or later. On x86, it /will not/ build using gcc
-3.3 or earlier.
+3.3 or earlier. If you are using gcc 4.3, you might get an unusable
+Factor binary unless you add 'SITE_CFLAGS=-fno-forward-propagate' to the
+command-line arguments for make.
 
 Run 'make' (or 'gmake' on *BSD) with no parameters to see a list of
 targets and build options. Then run 'make' with the appropriate target
