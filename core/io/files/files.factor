@@ -155,10 +155,10 @@ M: pathname <=> [ pathname-string ] compare ;
 : with-file-appender ( path quot -- )
     >r <file-appender> r> with-stream ; inline
 
-: temp-dir ( -- path )
+: temp-directory ( -- path )
     "temp" resource-path
     dup exists? not
       [ dup make-directory ]
     when ;
 
-: temp-file ( name -- path ) temp-dir swap path+ ;
+: temp-file ( name -- path ) temp-directory swap path+ ;
