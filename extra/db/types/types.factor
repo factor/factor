@@ -2,10 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep sequences.lib
-words namespaces tools.walker ;
+words namespaces tools.walker slots slots.private classes
+mirrors tuples combinators ;
 IN: db.types
 
-TUPLE: sql-spec slot-name column-name type modifiers primary-key ;
+HOOK: modifier-table db ( -- hash )
+HOOK: compound-modifier db ( str seq -- hash )
+HOOK: type-table db ( -- hash )
+HOOK: create-type-table db ( -- hash )
+HOOK: compound-type db ( str n -- hash )
+
+TUPLE: sql-spec class slot-name column-name type modifiers primary-key ;
 ! ID is the Primary key
 ! +native-id+ can be a columns type or a modifier
 SYMBOL: +native-id+
@@ -50,24 +57,22 @@ SYMBOL: +not-null+
 
 SYMBOL: +has-many+
 
-: relation? ( spec -- ? )
-    [ +has-many+ = ] deep-find ;
+: relation? ( spec -- ? ) [ +has-many+ = ] deep-find ;
 
 SYMBOL: INTEGER
 SYMBOL: BIG_INTEGER
 SYMBOL: DOUBLE
-
+SYMBOL: REAL
 SYMBOL: BOOLEAN
-
 SYMBOL: TEXT
 SYMBOL: VARCHAR
-
 SYMBOL: TIMESTAMP
 SYMBOL: DATE
 
-: spec>tuple ( spec -- tuple )
+: spec>tuple ( class spec -- tuple )
     [ ?first3 ] keep 3 ?tail*
     {
+        set-sql-spec-class
         set-sql-spec-slot-name
         set-sql-spec-column-name
         set-sql-spec-type
@@ -107,9 +112,6 @@ TUPLE: no-sql-modifier ;
 ! PostgreSQL Types:
 ! http://developer.postgresql.org/pgdocs/postgres/datatype.html
 
-HOOK: modifier-table db ( -- hash )
-HOOK: compound-modifier db ( str seq -- hash )
-
 : lookup-modifier ( obj -- str )
     dup array? [
         unclip lookup-modifier swap compound-modifier
@@ -117,15 +119,6 @@ HOOK: compound-modifier db ( str seq -- hash )
         modifier-table at*
         [ "unknown modifier" throw ] unless
     ] if ;
-
-: modifiers% ( spec -- )
-    sql-spec-modifiers 
-    [ lookup-modifier ] map    " " join
-    dup empty? [ drop ] [ " " % % ] if ;
-
-HOOK: type-table db ( -- hash )
-HOOK: create-type-table db ( -- hash )
-HOOK: compound-type db ( str n -- hash )
 
 : lookup-type* ( obj -- str )
     dup array? [
@@ -157,3 +150,75 @@ HOOK: compound-type db ( str n -- hash )
 
 : join-space ( str1 str2 -- newstr )
     " " swap 3append ;
+
+: modifiers ( spec -- str )
+    sql-spec-modifiers 
+    [ lookup-modifier ] map " " join
+    dup empty? [ " " swap append ] unless ;
+
+SYMBOL: building-seq 
+: get-building-seq ( n -- seq )
+    building-seq get nth ;
+
+: n, get-building-seq push ;
+: n% get-building-seq push-all ;
+: n# >r number>string r> n% ;
+
+: 0, 0 n, ;
+: 0% 0 n% ;
+: 0# 0 n# ;
+: 1, 1 n, ;
+: 1% 1 n% ;
+: 1# 1 n# ;
+: 2, 2 n, ;
+: 2% 2 n% ;
+: 2# 2 n# ;
+
+: nmake ( quot exemplars -- seqs )
+    dup length dup zero? [ 1+ ] when
+    [
+        [
+            [ drop 1024 swap new-resizable ] 2map
+            [ building-seq set call ] keep
+        ] 2keep >r [ like ] 2map r> firstn 
+    ] with-scope ;
+
+HOOK: bind% db ( spec -- )
+
+TUPLE: no-slot-named ;
+: no-slot-named ( -- * ) T{ no-slot-named } throw ;
+
+: slot-spec-named ( str class -- slot-spec )
+    "slots" word-prop [ slot-spec-name = ] with find nip
+    [ no-slot-named ] unless* ;
+
+: offset-of-slot ( str obj -- n )
+    class slot-spec-named slot-spec-offset ;
+
+: get-slot-named ( str obj -- value )
+    tuck offset-of-slot [ no-slot-named ] unless* slot ;
+
+: set-slot-named ( value str obj -- )
+    tuck offset-of-slot [ no-slot-named ] unless* set-slot ;
+
+: tuple>filled-slots ( tuple -- alist )
+    dup <mirror> mirror-slots [ slot-spec-name ] map
+    swap tuple-slots 2array flip [ nip ] assoc-subset ;
+
+: tuple>params ( specs tuple -- obj )
+    [
+        >r dup sql-spec-type swap sql-spec-slot-name r>
+        get-slot-named swap
+    ] curry { } map>assoc ;
+
+: sql-type>factor-type ( obj type -- obj )
+    dup array? [ first ] when
+    {
+        { +native-id+ [ string>number ] }
+        { INTEGER [ string>number ] }
+        { DOUBLE [ string>number ] }
+        { REAL [ string>number ] }
+        { TEXT [ ] }
+        { VARCHAR [ ] }
+        [ "no conversion from sql type to factor type" throw ]
+    } case ;

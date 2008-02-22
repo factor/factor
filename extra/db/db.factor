@@ -1,12 +1,14 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations kernel math
-namespaces sequences sequences.lib tuples words strings ;
+namespaces sequences sequences.lib tuples words strings
+tools.walker ;
 IN: db
 
-TUPLE: db handle insert-statements update-statements delete-statements ;
+TUPLE: db handle ;
+! TUPLE: db handle insert-statements update-statements delete-statements ;
 : <db> ( handle -- obj )
-    H{ } clone H{ } clone H{ } clone
+    ! H{ } clone H{ } clone H{ } clone
     db construct-boa ;
 
 GENERIC: db-open ( db -- )
@@ -17,22 +19,29 @@ HOOK: db-close db ( handle -- )
 
 : dispose-db ( db -- ) 
     dup db [
-        dup db-insert-statements dispose-statements
-        dup db-update-statements dispose-statements
-        dup db-delete-statements dispose-statements
+        ! dup db-insert-statements dispose-statements
+        ! dup db-update-statements dispose-statements
+        ! dup db-delete-statements dispose-statements
         db-handle db-close
     ] with-variable ;
 
-TUPLE: statement handle sql bound? in-params out-params ;
+TUPLE: statement handle sql in-params out-params bind-params bound? ;
+: <statement> ( sql in out -- statement )
+    {
+        set-statement-sql
+        set-statement-in-params
+        set-statement-out-params
+    } statement construct ;
+
 TUPLE: simple-statement ;
 TUPLE: prepared-statement ;
 
-HOOK: <simple-statement> db ( str -- statement )
-HOOK: <prepared-statement> db ( str -- statement )
+HOOK: <simple-statement> db ( str in out -- statement )
+HOOK: <prepared-statement> db ( str in out -- statement )
 GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( obj statement -- )
 GENERIC: reset-statement ( statement -- )
-GENERIC: insert-statement ( statement -- id )
+GENERIC: bind-tuple ( tuple statement -- )
 
 TUPLE: result-set sql params handle n max ;
 GENERIC: query-results ( query -- result-set )
@@ -42,13 +51,19 @@ GENERIC# row-column 1 ( result-set n -- obj )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 
-: execute-statement ( statement -- ) query-results dispose ;
+: execute-statement ( statement -- )
+    dup sequence? [
+        [ execute-statement ] each
+    ] [
+        query-results dispose
+    ] if ;
 
 : bind-statement ( obj statement -- )
     dup statement-bound? [ dup reset-statement ] when
     [ bind-statement* ] 2keep
-    [ set-statement-in-params ] keep
+    [ set-statement-bind-params ] keep
     t swap set-statement-bound? ;
+
 
 : init-result-set ( result-set -- )
     dup #rows over set-result-set-max
@@ -81,11 +96,11 @@ GENERIC: more-rows? ( result-set -- ? )
         [ db swap with-variable ] curry with-disposal
     ] with-scope ;
 
-: do-query ( query -- result-set )
+: default-query ( query -- result-set )
     query-results [ [ sql-row ] query-map ] with-disposal ;
 
 : do-bound-query ( obj query -- rows )
-    [ bind-statement ] keep do-query ;
+    [ bind-statement ] keep default-query ;
 
 : do-bound-command ( obj query -- )
     [ bind-statement ] keep execute-statement ;
@@ -105,11 +120,11 @@ HOOK: rollback-transaction db ( -- )
     ] with-variable ;
 
 : sql-query ( sql -- rows )
-    <simple-statement> [ do-query ] with-disposal ;
+    f f <simple-statement> [ default-query ] with-disposal ;
 
 : sql-command ( sql -- )
     dup string? [
-        <simple-statement> [ execute-statement ] with-disposal
+        f f <simple-statement> [ execute-statement ] with-disposal
     ] [
         ! [
             [ sql-command ] each

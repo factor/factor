@@ -40,7 +40,7 @@ IN: temporary
 ] [
     test-db [
         "select * from person where name = $1 and country = $2"
-        <simple-statement> [
+        f f <simple-statement> [
             { { "Jane" TEXT } { "New Zealand" TEXT } }
             over do-bound-query
 

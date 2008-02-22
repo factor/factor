@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files kernel tools.test db db.sqlite db.tuples
+USING: io.files kernel tools.test db db.tuples
 db.types continuations namespaces db.postgresql math
 prettyprint tools.walker ;
+! db.sqlite
 IN: temporary
 
 TUPLE: person the-id the-name the-number the-real ;
@@ -32,13 +33,14 @@ SYMBOL: the-person
 
     ! T{ person f f f 200 f } select-tuples
 
-    [ ] [ the-person get delete-tuple ] unit-test
-    [ ] [ person drop-table ] unit-test ;
+    ! [ ] [ the-person get delete-tuple ] unit-test
+    ! [ ] [ person drop-table ] unit-test
+    ;
 
-: test-sqlite ( -- )
-    "tuples-test.db" resource-path <sqlite-db> [
-        test-tuples
-    ] with-db ;
+! : test-sqlite ( -- )
+    ! "tuples-test.db" resource-path <sqlite-db> [
+        ! test-tuples
+    ! ] with-db ;
 
 : test-postgresql ( -- )
     "localhost" "postgres" "" "factor-test" <postgresql-db> [
