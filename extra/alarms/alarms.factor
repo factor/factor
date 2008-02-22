@@ -73,7 +73,7 @@ SYMBOL: alarm-thread
 
 PRIVATE>
 
-: add-alarm ( time delay quot -- alarm )
+: add-alarm ( time frequency quot -- alarm )
     <alarm> [
         dup dup alarm-time alarms get-global heap-push*
         swap alarm-entry >box
