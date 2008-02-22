@@ -16,3 +16,6 @@ factor
 *.*.marks
 .*.swp
 temp
+logs
+work
+misc/wordsize
