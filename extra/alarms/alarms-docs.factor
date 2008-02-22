@@ -1,5 +1,5 @@
 IN: alarms
-USING: help.markup help.syntax calendar ;
+USING: help.markup help.syntax calendar quotations ;
 
 HELP: alarm
 { $class-description "An alarm. Cancel passed to " { $link cancel-alarm } "." } ;

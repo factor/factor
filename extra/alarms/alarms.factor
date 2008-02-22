@@ -8,6 +8,12 @@ TUPLE: alarm time interval quot entry ;
 
 <PRIVATE
 
+SYMBOL: alarms
+SYMBOL: alarm-thread
+
+: notify-alarm-thread ( -- )
+    alarm-thread get-global interrupt ;
+
 : check-alarm
     pick timestamp? [ "Not a timestamp" throw ] unless
     over dup dt? swap not or [ "Not a dt" throw ] unless
@@ -16,11 +22,10 @@ TUPLE: alarm time interval quot entry ;
 : <alarm> ( time delay quot -- alarm )
     check-alarm <box> alarm construct-boa ;
 
-SYMBOL: alarms
-SYMBOL: alarm-thread
-
-: notify-alarm-thread ( -- )
-    alarm-thread get-global interrupt ;
+: register-alarm ( alarm -- )
+    dup dup alarm-time alarms get-global heap-push*
+    swap alarm-entry >box
+    notify-alarm-thread ;
 
 : alarm-expired? ( alarm now -- ? )
     >r alarm-time r> <=> 0 <= ;
@@ -28,7 +33,7 @@ SYMBOL: alarm-thread
 : reschedule-alarm ( alarm -- )
     dup alarm-time over alarm-interval +dt
     over set-alarm-time
-    add-alarm drop ;
+    register-alarm ;
 
 : call-alarm ( alarm -- )
     dup alarm-quot try
@@ -52,10 +57,9 @@ SYMBOL: alarm-thread
 
 : next-alarm ( alarms -- ms )
     dup heap-empty?
-    [ drop f ] [
-        heap-peek drop alarm-time now
-        [ timestamp>unix-time ] 2apply [-] 1000 *
-    ] if ;
+    [ drop f ]
+    [ heap-peek drop alarm-time now timestamp- 1000 * 0 max ]
+    if ;
 
 : alarm-thread-loop ( -- )
     alarms get-global
@@ -73,11 +77,7 @@ SYMBOL: alarm-thread
 PRIVATE>
 
 : add-alarm ( time frequency quot -- alarm )
-    <alarm> [
-        dup dup alarm-time alarms get-global heap-push*
-        swap alarm-entry >box
-        notify-alarm-thread
-    ] keep ;
+    <alarm> [ register-alarm ] keep ;
 
 : cancel-alarm ( alarm -- )
     alarm-entry box> alarms get-global heap-delete ;

@@ -1,6 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic kernel math sequences arrays assocs alarms ;
+USING: generic kernel math sequences arrays assocs alarms
+calendar ;
 IN: models
 
 TUPLE: model value connections dependencies ref locked? ;
@@ -186,14 +187,14 @@ TUPLE: delay model timeout alarm ;
     [ add-dependency ] keep ;
 
 : cancel-delay ( delay -- )
-    delay-model-alarm [ cancel-alarm ] when* ;
+    delay-alarm [ cancel-alarm ] when* ;
 
 : start-delay ( delay -- )
-    now over delay-model-timeout dt+ f
+    now over delay-timeout +dt f
     pick [ f over set-delay-alarm update-delay-model ] curry
-    add-alarm swap set-delay-model-alarm ;
+    add-alarm swap set-delay-alarm ;
 
-M: delay model-changed nip start-delay ;
+M: delay model-changed nip dup cancel-delay start-delay ;
 
 M: delay model-activated update-delay-model ;
 

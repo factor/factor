@@ -223,7 +223,13 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [ >time< >r >r 3600 * r> 60 * r> + + ] 2apply - + ;
 
 : unix-1970 ( -- timestamp )
-    1970 1 1 0 0 0 0 <timestamp> ; foldable
+    1970 1 1 0 0 0 0 <timestamp> ;
+
+: millis>timestamp ( n -- timestamp )
+    >r unix-1970 r> 1000 /f seconds +dt ;
+
+: timestamp>millis ( timestamp -- n )
+    unix-1970 timestamp- 1000 * >integer ;
 
 : unix-time>timestamp ( n -- timestamp )
     >r unix-1970 r> seconds +dt ;

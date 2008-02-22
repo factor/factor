@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.thread
-USING: threads io.backend namespaces init ;
+USING: threads io.backend namespaces init math ;
 
 : io-thread ( -- )
     sleep-time io-multiplex yield ;

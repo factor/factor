@@ -178,7 +178,7 @@ M: write-task do-io-task
 M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
-M: unix-io io-multiplex ( ms -- )
+M: unix-io io-multiplex ( ms/f -- )
     mx get-global wait-for-events ;
 
 M: unix-io init-stdio ( -- )

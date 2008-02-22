@@ -1,8 +1,9 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
-math.vectors tuples classes ui.gadgets combinators.lib ;
+math.vectors tuples classes ui.gadgets combinators.lib boxes
+calendar alarms ;
 IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
@@ -113,7 +114,7 @@ SYMBOL: drag-timer
 
 : start-drag-timer ( -- )
     hand-buttons get-global empty? [
-        now 300 milliseconds dt+ 100 milliseconds
+        now 300 milliseconds +dt 100 milliseconds
         [ drag-gesture ] add-alarm drag-timer get-global >box
     ] when ;
 

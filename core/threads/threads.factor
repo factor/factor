@@ -113,7 +113,7 @@ PRIVATE>
 
 PRIVATE>
 
-: sleep-time ( -- ms )
+: sleep-time ( -- ms/f )
     {
         { [ run-queue dlist-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
@@ -134,18 +134,21 @@ PRIVATE>
 : yield ( -- ) [ resume ] "yield" suspend drop ;
 
 : nap ( ms/f -- ? )
-    [
-        >fixnum millis + [ schedule-sleep ] curry "sleep"
-    ] [
-        [ drop ] "interrupt"
-    ] if* suspend ;
+    [ >fixnum millis + [ schedule-sleep ] curry "sleep" ]
+    [ [ drop ] "interrupt" ] if*
+    suspend ;
 
 : sleep ( ms -- )
     nap [ "Sleep interrupted" throw ] when ;
 
 : interrupt ( thread -- )
-    dup thread-sleep-entry [ sleep-queue heap-delete ] when*
-    t swap resume-with ;
+    dup self eq? [
+        drop
+    ] [
+        dup thread-sleep-entry [ sleep-queue heap-delete ] when*
+        f over set-thread-sleep-entry
+        t swap resume-with
+    ] if ;
 
 : (spawn) ( thread -- )
     [

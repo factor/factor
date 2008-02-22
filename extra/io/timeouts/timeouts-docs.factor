@@ -25,7 +25,6 @@ ARTICLE: "io.timeouts" "I/O timeout protocol"
 { $subsection timed-out }
 "A combinator to be used in operations which can time out:"
 { $subsection with-timeout }
-{ $see-also "stream-protocol" "io.launcher" }
-;
+{ $see-also "stream-protocol" "io.launcher" } ;
 
 ABOUT: "io.timeouts"

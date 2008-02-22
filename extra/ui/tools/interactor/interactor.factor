@@ -6,7 +6,7 @@ math.vectors models namespaces parser prettyprint quotations
 sequences sequences.lib strings threads listener
 tuples ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
-definitions boxes ;
+definitions boxes calendar ;
 IN: ui.tools.interactor
 
 TUPLE: interactor
@@ -29,7 +29,8 @@ help ;
     ] if ;
 
 : init-caret-help ( interactor -- )
-    dup editor-caret 100 <delay> swap set-interactor-help ;
+    dup editor-caret 1/3 seconds <delay>
+    swap set-interactor-help ;
 
 : init-interactor-history ( interactor -- )
     V{ } clone swap set-interactor-history ;
