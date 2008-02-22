@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http http.server.responders sequences prettyprint
-io.server logging ;
+io.server logging calendar ;
 
 IN: http.server
 
@@ -50,7 +50,7 @@ IN: http.server
 
 : httpd ( port -- )
     internet-server "http.server" [
-        60000 stdio get set-timeout
+        1 minutes stdio get set-timeout
         readln [ parse-request ] when*
     ] with-server ;
 

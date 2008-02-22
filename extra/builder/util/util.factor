@@ -99,3 +99,9 @@ USING: bootstrap.image bootstrap.image.download io.streams.null ;
   [ file-lines ] [ ] bi*
   maybe-tail*
   [ print ] each ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USE: prettyprint
+
+: to-file ( object file -- ) [ . ] with-file-writer ;

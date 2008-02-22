@@ -1,5 +1,5 @@
 IN: concurrency.semaphores
-USING: help.markup help.syntax kernel quotations ;
+USING: help.markup help.syntax kernel quotations calendar ;
 
 HELP: semaphore
 { $class-description "The class of counting semaphores." } ;
@@ -8,13 +8,22 @@ HELP: <semaphore>
 { $values { "n" "a non-negative integer" } { "semaphore" semaphore } }
 { $description "Creates a counting semaphore with the specified initial count." } ;
 
+HELP: acquire-timeout
+{ $values { "semaphore" semaphore } { "timeout" "a " { $link dt } " or " { $link f } } { "value" object } }
+{ $description "If the semaphore has a non-zero count, decrements it and returns immediately. Otherwise, if the timeout is " { $link f } ", waits indefinitely for the semaphore to be released. If the timeout is not " { $link f } ", waits a certain period of time, and if the semaphore still has not been released, throws an error." }
+{ $errors "Throws an error if the timeout expires before the semaphore is released." } ;
+
 HELP: acquire
-{ $values { "semaphore" semaphore } { "timeout" "a timeout in milliseconds or " { $link f } } { "value" object } }
-{ $description "If the semaphore has a non-zero count, decrements it and returns immediately. Otherwise, if the timeout is " { $link f } ", waits indefinitely for the semaphore to be released. If the timeout is not " { $link f } ", waits up to that number of milliseconds for the semaphore to be released." } ;
+{ $values { "semaphore" semaphore } { "value" object } }
+{ $description "If the semaphore has a non-zero count, decrements it and returns immediately. Otherwise, waits for it to be released." } ;
 
 HELP: release
 { $values { "semaphore" semaphore } }
 { $description "Increments a semaphore's count. If the count was previously zero, any threads waiting on the semaphore are woken up." } ;
+
+HELP: with-semaphore-timeout
+{ $values { "semaphore" semaphore } { "timeout" "a " { $link dt } " or " { $link f } } { "quot" quotation } }
+{ $description "Calls the quotation with the semaphore held." } ;
 
 HELP: with-semaphore
 { $values { "semaphore" semaphore } { "quot" quotation } }
@@ -38,8 +47,10 @@ $nl
 { $subsection <semaphore> }
 "Unlike locks, where acquisition and release are always paired by a combinator, semaphores expose these operations directly and there is no requirement that they be performed in the same thread:"
 { $subsection acquire }
+{ $subsection acquire-timeout }
 { $subsection release }
-"A combinator which pairs acquisition and release:"
-{ $subsection with-semaphore } ;
+"Combinators which pair acquisition and release:"
+{ $subsection with-semaphore }
+{ $subsection with-semaphore-timeout } ;
 
 ABOUT: "concurrency.semaphores"

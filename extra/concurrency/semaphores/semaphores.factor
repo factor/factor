@@ -13,17 +13,21 @@ TUPLE: semaphore count threads ;
 : wait-to-acquire ( semaphore timeout -- )
     >r semaphore-threads r> "semaphore" wait ;
 
-: acquire ( semaphore timeout -- )
-    dup semaphore-count zero? [
-        wait-to-acquire
-    ] [
-        drop
-        dup semaphore-count 1- swap set-semaphore-count
-    ] if ;
+: acquire-timeout ( semaphore timeout -- )
+    over semaphore-count zero?
+    [ dupd wait-to-acquire ] [ drop ] if
+    dup semaphore-count 1- swap set-semaphore-count ;
+
+: acquire ( semaphore -- )
+    f acquire-timeout ;
 
 : release ( semaphore -- )
     dup semaphore-count 1+ over set-semaphore-count
     semaphore-threads notify-1 ;
 
+: with-semaphore-timeout ( semaphore timeout quot -- )
+    pick rot acquire-timeout swap
+    [ release ] curry [ ] cleanup ; inline
+
 : with-semaphore ( semaphore quot -- )
-    over acquire [ release ] curry [ ] cleanup ; inline
+    over acquire swap [ release ] curry [ ] cleanup ; inline

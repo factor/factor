@@ -99,6 +99,7 @@ $nl
 { $subsection "concurrency.combinators" }
 { $subsection "concurrency.promises" }
 { $subsection "concurrency.futures" }
+{ $subsection "concurrency.mailboxes" }
 { $subsection "concurrency.messaging" }
 "Shared-state abstractions:"
 { $subsection "concurrency.locks" }

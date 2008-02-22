@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs ui.tools.interactor ui.tools.listener
 ui.tools.workspace help help.topics io.files io.styles kernel
@@ -7,7 +7,7 @@ source-files strings tools.completion tools.crossref tuples
 ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.lists ui.gadgets.scrollers ui.gadgets.tracks
 ui.gestures ui.operations vocabs words vocabs.loader
-tools.browser unicode.case ;
+tools.browser unicode.case calendar ;
 IN: ui.tools.search
 
 TUPLE: live-search field list ;
@@ -45,7 +45,7 @@ search-field H{
 } set-gestures
 
 : <search-model> ( producer -- model )
-    >r g live-search-field gadget-model 200 <delay>
+    >r g live-search-field gadget-model 1/5 seconds <delay>
     [ "\n" join ] r> append <filter> ;
 
 : <search-list> ( seq limited? presenter -- gadget )

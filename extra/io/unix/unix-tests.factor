@@ -38,8 +38,8 @@ yield
     "unix-domain-datagram-test" resource-path delete-file
 ] ignore-errors
 
-: server-addr "unix-domain-datagram-test" resource-path <local> ;
-: client-addr "unix-domain-datagram-test-2" resource-path <local> ;
+: server-addr "unix-domain-datagram-test" temp-file <local> ;
+: client-addr "unix-domain-datagram-test-2" temp-file <local> ;
 
 [
     [
@@ -112,7 +112,7 @@ client-addr <datagram>
     "unix-domain-datagram-test-3" resource-path delete-file
 ] ignore-errors
 
-"unix-domain-datagram-test-2" resource-path delete-file
+"unix-domain-datagram-test-2" temp-file delete-file
 
 [ ] [ client-addr <datagram> "d" set ] unit-test
 

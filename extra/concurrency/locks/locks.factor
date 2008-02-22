@@ -25,15 +25,15 @@ TUPLE: lock threads owner reentrant? ;
     lock-threads notify-1 ;
 
 : do-lock ( lock timeout quot acquire release -- )
-    >r swap compose pick >r 2curry r> r> curry [ ] cleanup ;
-    inline
+    >r >r pick rot r> call ! use up  timeout acquire
+    swap r> curry [ ] cleanup ; inline
 
 : (with-lock) ( lock timeout quot -- )
     [ acquire-lock ] [ release-lock ] do-lock ; inline
 
 PRIVATE>
 
-: with-lock ( lock timeout quot -- )
+: with-lock-timeout ( lock timeout quot -- )
     pick lock-reentrant? [
         pick lock-owner self eq? [
             2nip call
@@ -43,6 +43,9 @@ PRIVATE>
     ] [
         (with-lock)
     ] if ; inline
+
+: with-lock ( lock quot -- )
+    f swap with-lock-timeout ; inline
 
 ! Many-reader/single-writer locks
 TUPLE: rw-lock readers writers reader# writer ;
@@ -79,12 +82,18 @@ TUPLE: rw-lock readers writers reader# writer ;
 
 PRIVATE>
 
-: with-read-lock ( lock timeout quot -- )
+: with-read-lock-timeout ( lock timeout quot -- )
     [
         [ acquire-read-lock ] [ release-read-lock ] do-lock
     ] do-reentrant-rw-lock ; inline
 
-: with-write-lock ( lock timeout quot -- )
+: with-read-lock ( lock quot -- )
+    f swap with-read-lock-timeout ; inline
+
+: with-write-lock-timeout ( lock timeout quot -- )
     [
         [ acquire-write-lock ] [ release-write-lock ] do-lock
     ] do-reentrant-rw-lock ; inline
+
+: with-write-lock ( lock quot -- )
+    f swap with-write-lock-timeout ; inline

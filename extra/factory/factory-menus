@@ -25,14 +25,14 @@ apps-menu> not [ new-wm-menu >apps-menu ] when
 { { "Emacs"     [ "emacs &" system drop ] }
   { "KMail"     [ "kmail &" system drop ] }
   { "Akregator" [ "akregator &" system drop ] }
-  { "Amarok" 	[ "amarok &" system drop ] }
-  { "K3b"	[ "k3b &" system drop ] }
-  { "xchat"	[ "xchat &" system drop ] }
+  { "Amarok"    [ "amarok &" system drop ] }
+  { "K3b"       [ "k3b &" system drop ] }
+  { "xchat"     [ "xchat &" system drop ] }
   { "Nautilus"  [ "nautilus --no-desktop &" system drop ] }
-  { "synaptic"	[ "gksudo synaptic &" system drop ] }
+  { "synaptic"  [ "gksudo synaptic &" system drop ] }
   { "Volume control" [ "gnome-volume-control &" system drop ] }
   { "Azureus"        [ "~/azureus/azureus &" system drop ] }
-  { "Xephyr"	     [ "Xephyr -host-cursor :1 &" system drop ] }
+  { "Xephyr"         [ "Xephyr -host-cursor :1 &" system drop ] }
   { "Stop Xephyr"    [ "pkill Xephyr &" system drop ] }
   { "Stop Firefox"   [ "pkill firefox &" system drop ] }
 } apps-menu> set-menu-items
@@ -95,8 +95,8 @@ factory-menu> not [ new-wm-menu >factory-menu ] when
 { { "Maximize"          [ maximize ] }
   { "Maximize Vertical" [ maximize-vertical ] }
   { "Restore"           [ restore ] }
-  { "Hide"         	[ minimize ] }
-  { "Tile Master"	[ tile-master ] }
+  { "Hide"              [ minimize ] }
+  { "Tile Master"       [ tile-master ] }
 }
 
 factory-menu> set-menu-items
@@ -106,17 +106,17 @@ factory-menu> set-menu-items
 ! VAR: root-menu
 
 { { "xterm"             [ "urxvt -bd grey +sb &" system drop ] }
-  { "Firefox"		[ "firefox &" system drop ] }
-  { "xclock" 		[ "xclock &" system drop ] }
-  { "Apps >" 		[ apps-menu> <- popup ] }
+  { "Firefox"           [ "firefox &" system drop ] }
+  { "xclock"            [ "xclock &" system drop ] }
+  { "Apps >"            [ apps-menu> <- popup ] }
   { "Factor >"          [ factor-menu> <- popup ] }
   { "Unmapped frames >" [ unmapped-frames-menu> <- popup ] }
-  { "Emacs >" 	     	[ emacs-menu> <- popup ] }
-  { "Mail >" 	     	[ mail-menu> <- popup ] }
-  { "onigirihouse"	[ "xterm -e 'ssh dharmatech@onigirihouse.com' &"
-    			  system drop ] }
-  { "Edit menus"	[ edit-factory-menus ] }
+  { "Emacs >"           [ emacs-menu> <- popup ] }
+  { "Mail >"            [ mail-menu> <- popup ] }
+  { "onigirihouse"      [ "xterm -e 'ssh dharmatech@onigirihouse.com' &"
+                          system drop ] }
+  { "Edit menus"        [ edit-factory-menus ] }
   { "Reload menus"      [ load-factory-menus ] }
-  { "Factory >"		[ factory-menu> <- popup ] }
+  { "Factory >"         [ factory-menu> <- popup ] }
 } root-menu> set-menu-items
 
