@@ -50,7 +50,7 @@ IN: http.server
 
 : httpd ( port -- )
     internet-server "http.server" [
-        60000 stdio get set-timeout
+        1 minutes stdio get set-timeout
         readln [ parse-request ] when*
     ] with-server ;
 

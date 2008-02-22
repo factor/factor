@@ -47,7 +47,7 @@ DEFER: http-get-stream
         dispose "location" swap peek-at nip http-get-stream
     ] when ;
 
-: default-timeout 60 1000 * over set-timeout ;
+: default-timeout 1 minutes over set-timeout ;
 
 : http-get-stream ( url -- code headers stream )
     #! Opens a stream for reading from an HTTP URL.
