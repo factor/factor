@@ -22,9 +22,9 @@ GENERIC: heap-size ( heap -- n )
 : <heap> ( class -- heap )
     >r V{ } clone r> construct-delegate ; inline
 
-TUPLE: entry value key index ;
+TUPLE: entry value key heap index ;
 
-: <entry> ( value key -- entry ) f entry construct-boa ;
+: <entry> ( value key heap -- entry ) f entry construct-boa ;
 
 PRIVATE>
 
@@ -153,7 +153,7 @@ DEFER: down-heap
 PRIVATE>
 
 M: priority-queue heap-push* ( value key heap -- entry )
-    >r <entry> dup r> [ data-push ] keep up-heap ;
+    [ <entry> dup ] keep [ data-push ] keep up-heap ;
 
 : heap-push ( value key heap -- ) heap-push* drop ;
 
@@ -166,8 +166,14 @@ M: priority-queue heap-push* ( value key heap -- entry )
 M: priority-queue heap-peek ( heap -- value key )
     data-first >entry< ;
 
+: entry>index ( entry heap -- n )
+    over entry-heap eq? [
+        "Invalid entry passed to heap-delete" throw
+    ] unless
+    entry-index ;
+
 M: priority-queue heap-delete ( entry heap -- )
-    >r entry-index r>
+    [ entry>index ] keep
     2dup heap-size 1- = [
         nip data-pop*
     ] [

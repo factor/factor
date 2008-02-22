@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays calendar combinators generic init kernel math
-namespaces sequences heaps boxes threads debugger quotations ;
+namespaces sequences heaps boxes threads debugger quotations
+assocs ;
 IN: alarms
 
 TUPLE: alarm quot time interval entry ;
@@ -67,8 +68,13 @@ SYMBOL: alarm-thread
     dup trigger-alarms
     alarm-thread-loop ;
 
+: cancel-alarms ( alarms -- )
+    [
+        heap-pop-all [ nip alarm-entry box> drop ] assoc-each
+    ] when* ;
+
 : init-alarms ( -- )
-    <min-heap> alarms set-global
+    alarms global [ cancel-alarms <min-heap> ] change-at
     [ alarm-thread-loop ] "Alarms" spawn
     alarm-thread set-global ;
 
@@ -83,4 +89,5 @@ PRIVATE>
     from-now f add-alarm ;
 
 : cancel-alarm ( alarm -- )
-    alarm-entry box> alarms get-global heap-delete ;
+    alarm-entry ?box
+    [ alarms get-global heap-delete ] [ drop ] if ;

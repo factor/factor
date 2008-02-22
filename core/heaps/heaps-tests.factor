@@ -15,8 +15,8 @@ IN: temporary
 
 ! Binary Min Heap
 { 1 2 3 4 5 6 } [ 0 left 0 right 1 left 1 right 2 left 2 right ] unit-test
-{ t } [ t 5 <entry> t 3 <entry> T{ min-heap } heap-compare ] unit-test
-{ f } [ t 5 <entry> t 3 <entry> T{ max-heap } heap-compare ] unit-test
+{ t } [ t 5 f <entry> t 3 f <entry> T{ min-heap } heap-compare ] unit-test
+{ f } [ t 5 f <entry> t 3 f <entry> T{ max-heap } heap-compare ] unit-test
 
 [ t 2 ] [ <min-heap> t 300 pick heap-push t 200 pick heap-push t 400 pick heap-push t 3 pick heap-push t 2 pick heap-push heap-pop ] unit-test
 
