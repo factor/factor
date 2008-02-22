@@ -22,6 +22,7 @@ ARTICLE: "alarms" "Alarms"
 { $subsection alarm }
 { $subsection add-alarm }
 { $subsection later }
-{ $subsection cancel-alarm } ;
+{ $subsection cancel-alarm }
+"Alarms do not persist across image saves. Saving and restoring an image has the effect of calling " { $link cancel-alarm } " on all " { $link alarm } " instances." ;
 
 ABOUT: "alarms"
