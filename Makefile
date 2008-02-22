@@ -158,6 +158,12 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
 
+misc/wordsize: misc/wordsize.c
+	gcc misc/wordsize.c -o misc/wordsize
+
+auto: misc/wordsize
+	make `./misc/target`
+
 clean:
 	rm -f vm/*.o
 	rm -f factor*.dll libfactor*.*
