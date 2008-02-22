@@ -1,6 +1,6 @@
 IN: temporary
 USING: concurrency.combinators tools.test random kernel math 
-concurrency.messaging threads sequences ;
+concurrency.mailboxes threads sequences ;
 
 [ [ drop ] parallel-each ] must-infer
 [ [ ] parallel-map ] must-infer

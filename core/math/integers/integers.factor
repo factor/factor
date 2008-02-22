@@ -6,6 +6,7 @@ IN: math.integers.private
 
 M: integer numerator ;
 M: integer denominator drop 1 ;
+M: integer >integer ;
 
 M: fixnum >fixnum ;
 M: fixnum >bignum fixnum>bignum ;

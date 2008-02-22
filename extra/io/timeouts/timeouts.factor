@@ -17,7 +17,7 @@ GENERIC: timed-out ( obj -- )
 M: object timed-out drop ;
 
 : queue-timeout ( obj timeout -- alarm )
-    from-now f rot [ timed-out ] curry add-alarm ;
+    >r [ timed-out ] curry r> later ;
 
 : with-timeout ( obj quot -- )
     over dup timeout dup [

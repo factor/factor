@@ -190,9 +190,9 @@ TUPLE: delay model timeout alarm ;
     delay-alarm [ cancel-alarm ] when* ;
 
 : start-delay ( delay -- )
-    now over delay-timeout +dt f
-    pick [ f over set-delay-alarm update-delay-model ] curry
-    add-alarm swap set-delay-alarm ;
+    dup [ f over set-delay-alarm update-delay-model ] curry
+    over delay-timeout later
+    swap set-delay-alarm ;
 
 M: delay model-changed nip dup cancel-delay start-delay ;
 

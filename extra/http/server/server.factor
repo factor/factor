@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http http.server.responders sequences prettyprint
-io.server logging ;
+io.server logging calendar ;
 
 IN: http.server
 

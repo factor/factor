@@ -5,7 +5,7 @@ USING: arrays hashtables io io.streams.string kernel math
 math.vectors math.functions math.parser namespaces sequences
 strings tuples system debugger combinators vocabs.loader
 calendar.backend structs alien.c-types math.vectors
-math.ranges shuffle ;
+shuffle threads ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
@@ -472,6 +472,10 @@ M: timestamp year. ( timestamp -- )
 
 : seconds-since-midnight ( timestamp -- x )
     dup beginning-of-day timestamp- ;
+
+M: timestamp nap-until timestamp>millis nap-until ;
+
+M: dt nap from-now nap-until ;
 
 {
     { [ unix? ] [ "calendar.unix" ] }

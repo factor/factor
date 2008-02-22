@@ -4,7 +4,7 @@ USING: arrays calendar combinators generic init kernel math
 namespaces sequences heaps boxes threads debugger quotations ;
 IN: alarms
 
-TUPLE: alarm time interval quot entry ;
+TUPLE: alarm quot time interval entry ;
 
 <PRIVATE
 
@@ -15,11 +15,11 @@ SYMBOL: alarm-thread
     alarm-thread get-global interrupt ;
 
 : check-alarm
-    pick timestamp? [ "Not a timestamp" throw ] unless
-    over dup dt? swap not or [ "Not a dt" throw ] unless
-    dup callable? [ "Not a quotation" throw ] unless ; inline
+    dup dt? over not or [ "Not a dt" throw ] unless
+    over timestamp? [ "Not a timestamp" throw ] unless
+    pick callable? [ "Not a quotation" throw ] unless ; inline
 
-: <alarm> ( time delay quot -- alarm )
+: <alarm> ( quot time frequency -- alarm )
     check-alarm <box> alarm construct-boa ;
 
 : register-alarm ( alarm -- )
@@ -76,8 +76,11 @@ SYMBOL: alarm-thread
 
 PRIVATE>
 
-: add-alarm ( time frequency quot -- alarm )
+: add-alarm ( quot time frequency -- alarm )
     <alarm> [ register-alarm ] keep ;
+
+: later ( quot dt -- alarm )
+    from-now f add-alarm ;
 
 : cancel-alarm ( alarm -- )
     alarm-entry box> alarms get-global heap-delete ;

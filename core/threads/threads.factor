@@ -133,12 +133,22 @@ PRIVATE>
 
 : yield ( -- ) [ resume ] "yield" suspend drop ;
 
-: nap ( ms/f -- ? )
-    [ >fixnum millis + [ schedule-sleep ] curry "sleep" ]
-    [ [ drop ] "interrupt" ] if*
-    suspend ;
+GENERIC: nap-until ( time -- ? )
 
-: sleep ( ms -- )
+M: integer nap-until [ schedule-sleep ] curry "sleep" suspend ;
+
+M: f nap-until drop [ drop ] "interrupt" suspend ;
+
+GENERIC: nap ( time -- ? )
+
+M: real nap millis + >integer nap-until ;
+
+M: f nap nap-until ;
+
+: sleep-until ( time -- )
+    nap-until [ "Sleep interrupted" throw ] when ;
+
+: sleep ( time -- )
     nap [ "Sleep interrupted" throw ] when ;
 
 : interrupt ( thread -- )

@@ -14,6 +14,7 @@ $nl
 { $subsection fixnum? }
 { $subsection bignum? }
 { $subsection >fixnum }
+{ $subsection >integer }
 { $subsection >bignum }
 { $see-also "prettyprint-numbers" "modular-arithmetic" "bitwise-arithmetic" "integer-functions" "syntax-integers" } ;
 
