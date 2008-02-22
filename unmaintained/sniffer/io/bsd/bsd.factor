@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Elie Chaftari, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax destructors hexdump io
-io.buffers io.nonblocking io.sockets io.streams.lines
+io.buffers io.nonblocking io.sockets
 io.unix.backend io.unix.files kernel libc locals math qualified
 sequences io.sniffer.backend ;
 QUALIFIED: unix
