@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables kernel models math namespaces sequences
-timers quotations math.vectors combinators sorting vectors
-dlists models ;
+quotations math.vectors combinators sorting vectors dlists
+models ;
 IN: ui.gadgets
 
 TUPLE: rect loc dim ;

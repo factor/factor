@@ -66,7 +66,7 @@ SYMBOL: data-mode
     "Starting SMTP server on port " write dup . flush
     "127.0.0.1" swap <inet4> <server> [
         accept [
-            60000 stdio get set-timeout
+            1 minutes stdio get set-timeout
             "220 hello\r\n" write flush
             process
             global [ flush ] bind

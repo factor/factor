@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
-math.vectors tuples classes ui.gadgets timers combinators.lib ;
+math.vectors tuples classes ui.gadgets combinators.lib ;
 IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
@@ -107,20 +107,19 @@ SYMBOL: double-click-timeout
 : drag-gesture ( -- )
     hand-buttons get-global first <drag> button-gesture ;
 
-TUPLE: drag-timer ;
+SYMBOL: drag-timer
 
-M: drag-timer tick drop drag-gesture ;
-
-drag-timer construct-empty drag-timer set-global
+<box> drag-timer set-global
 
 : start-drag-timer ( -- )
     hand-buttons get-global empty? [
-        drag-timer get-global 100 300 add-timer
+        now 300 milliseconds dt+ 100 milliseconds
+        [ drag-gesture ] add-alarm drag-timer get-global >box
     ] when ;
 
 : stop-drag-timer ( -- )
     hand-buttons get-global empty? [
-        drag-timer get-global remove-timer
+        drag-timer get-global box> cancel-alarm
     ] when ;
 
 : fire-motion ( -- )

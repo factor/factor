@@ -122,3 +122,7 @@ SYMBOL: a
     USE: kernel ;
 
 [ t ] [ a symbol? ] unit-test
+
+:: let-let-test | n | [let | n [ n 3 + ] | n ] ;
+
+[ 13 ] [ 10 let-let-test ] unit-test

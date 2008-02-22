@@ -1,87 +1,83 @@
-! Copyright (C) 2007 Doug Coleman.
+! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays calendar combinators concurrency.messaging
-threads generic init kernel math namespaces sequences ;
+USING: arrays calendar combinators generic init kernel math
+namespaces sequences heaps boxes threads debugger quotations ;
 IN: alarms
 
-TUPLE: alarm time quot ;
-
-C: <alarm> alarm
+TUPLE: alarm time interval quot entry ;
 
 <PRIVATE
 
-! for now a V{ }, eventually a min-heap to store alarms
+: check-alarm
+    pick timestamp? [ "Not a timestamp" throw ] unless
+    over dup dt? swap not or [ "Not a dt" throw ] unless
+    dup callable? [ "Not a quotation" throw ] unless ; inline
+
+: <alarm> ( time delay quot -- alarm )
+    check-alarm <box> alarm construct-boa ;
+
 SYMBOL: alarms
-SYMBOL: alarm-receiver
-SYMBOL: alarm-looper
+SYMBOL: alarm-thread
 
-: add-alarm ( alarm -- )
-    alarms get-global push ;
+: notify-alarm-thread ( -- )
+    alarm-thread get-global interrupt ;
 
-: remove-alarm ( alarm -- )
-    alarms get-global delete ;
+: alarm-expired? ( alarm now -- ? )
+    >r alarm-time r> <=> 0 <= ;
 
-: handle-alarm ( alarm -- )
-    dup delegate {
-        { "register" [ add-alarm ] }
-        { "unregister" [ remove-alarm  ] }
-    } case ;
-
-: expired-alarms ( -- seq )
-    now alarms get-global
-    [ alarm-time <=> 0 > ] with subset ;
-
-: unexpired-alarms ( -- seq )
-    now alarms get-global
-    [ alarm-time <=> 0 <= ] with subset ;
+: reschedule-alarm ( alarm -- )
+    dup alarm-time over alarm-interval +dt
+    over set-alarm-time
+    add-alarm drop ;
 
 : call-alarm ( alarm -- )
-    alarm-quot "Alarm invocation" spawn drop ;
+    dup alarm-quot try
+    dup alarm-entry box> drop
+    dup alarm-interval [ reschedule-alarm ] [ drop ] if ;
 
-: do-alarms ( -- )
-    expired-alarms [ call-alarm ] each
-    unexpired-alarms alarms set-global ;
+: (trigger-alarms) ( alarms now -- )
+    over heap-empty? [
+        2drop
+    ] [
+        over heap-peek drop over alarm-expired? [
+            over heap-pop drop call-alarm
+            (trigger-alarms)
+        ] [
+            2drop
+        ] if
+    ] if ;
 
-: alarm-receive-loop ( -- )
-    receive dup alarm? [ handle-alarm ] [ drop ] if
-    alarm-receive-loop ;
+: trigger-alarms ( alarms -- )
+    now (trigger-alarms) ;
 
-: start-alarm-receiver ( -- )
-    [
-        alarm-receive-loop
-    ] "Alarm receiver" spawn alarm-receiver set-global ;
+: next-alarm ( alarms -- ms )
+    dup heap-empty?
+    [ drop f ] [
+        heap-peek drop alarm-time now
+        [ timestamp>unix-time ] 2apply [-] 1000 *
+    ] if ;
 
-: alarm-loop ( -- )
-    alarms get-global empty? [
-        do-alarms
-    ] unless 100 sleep alarm-loop ;
+: alarm-thread-loop ( -- )
+    alarms get-global
+    dup next-alarm nap drop
+    dup trigger-alarms
+    alarm-thread-loop ;
 
-: start-alarm-looper ( -- )
-    [
-        alarm-loop
-    ] "Alarm looper" spawn alarm-looper set-global ;
+: init-alarms ( -- )
+    <min-heap> alarms set-global
+    [ alarm-thread-loop ] "Alarms" spawn
+    alarm-thread set-global ;
 
-: send-alarm ( str alarm -- )
-    over set-delegate
-    alarm-receiver get-global send ;
+[ init-alarms ] "alarms" add-init-hook
 
-: start-alarm-daemon ( -- )
-    alarms get-global [ V{ } clone alarms set-global ] unless
-    start-alarm-looper
-    start-alarm-receiver ;
-
-[ start-alarm-daemon ] "alarms" add-init-hook
 PRIVATE>
 
-: register-alarm ( alarm -- )
-    "register" send-alarm ;
+: add-alarm ( time frequency quot -- alarm )
+    <alarm> [
+        dup dup alarm-time alarms get-global heap-push*
+        swap alarm-entry >box
+        notify-alarm-thread
+    ] keep ;
 
-: unregister-alarm ( alarm -- )
-    "unregister" send-alarm ;
-
-: change-alarm ( alarm-old alarm-new -- )
-    "register" send-alarm
-    "unregister" send-alarm ;
-
-! Example:
-! 5 seconds from-now [ "hi" print flush ] <alarm> register-alarm
+: cancel-alarm ( alarm -- )
+    alarm-entry box> alarms get-global heap-delete ;
