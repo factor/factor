@@ -6,6 +6,8 @@ IN: alarms
 
 TUPLE: alarm time interval quot entry ;
 
+<PRIVATE
+
 : check-alarm
     pick timestamp? [ "Not a timestamp" throw ] unless
     over dup dt? swap not or [ "Not a dt" throw ] unless
@@ -20,16 +22,6 @@ SYMBOL: alarm-thread
 
 : notify-alarm-thread ( -- )
     alarm-thread get-global interrupt ;
-
-: add-alarm ( time delay quot -- alarm )
-    <alarm> [
-        dup dup alarm-time alarms get-global heap-push*
-        swap alarm-entry >box
-        notify-alarm-thread
-    ] keep ;
-
-: cancel-alarm ( alarm -- )
-    alarm-entry box> alarms get-global heap-delete ;
 
 : alarm-expired? ( alarm now -- ? )
     >r alarm-time r> <=> 0 <= ;
@@ -78,3 +70,15 @@ SYMBOL: alarm-thread
     alarm-thread set-global ;
 
 [ init-alarms ] "alarms" add-init-hook
+
+PRIVATE>
+
+: add-alarm ( time delay quot -- alarm )
+    <alarm> [
+        dup dup alarm-time alarms get-global heap-push*
+        swap alarm-entry >box
+        notify-alarm-thread
+    ] keep ;
+
+: cancel-alarm ( alarm -- )
+    alarm-entry box> alarms get-global heap-delete ;
