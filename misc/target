@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ \( `uname -s` = Darwin \) -a \( `uname -p` = powerpc \) ]
+then
+  echo macosx-ppc
+elif [ `uname -s` = Darwin ]
+then
+  echo macosx-x86-`./misc/wordsize`
+elif [ \( `uname -s` = Linux \) -a \( `uname -m` = i686 \) ]
+then
+  echo linux-x86-`./misc/wordsize`
+elif [ \( `uname -o` = Cygwin \) -a \( `uname -m` = i686 \) ]
+then
+  echo winnt-x86-`./misc/wordsize`
+fi
+
