@@ -16,7 +16,6 @@ TUPLE: alarm time interval quot entry ;
 : <alarm> ( time delay quot -- alarm )
     check-alarm <box> alarm construct-boa ;
 
-! Global min-heap
 SYMBOL: alarms
 SYMBOL: alarm-thread
 
