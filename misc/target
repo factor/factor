@@ -12,5 +12,6 @@ then
 elif [ \( `uname -o` = Cygwin \) -a \( `uname -m` = i686 \) ]
 then
   echo winnt-x86-`./misc/wordsize`
+else
+  echo help
 fi
-
