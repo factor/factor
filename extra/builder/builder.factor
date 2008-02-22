@@ -2,6 +2,7 @@
 USING: kernel namespaces sequences splitting system combinators continuations
        parser io io.files io.launcher io.sockets prettyprint threads
        bootstrap.image benchmark vars bake smtp builder.util accessors
+       calendar
        builder.common
        builder.benchmark
        builder.release ;
@@ -80,7 +81,7 @@ IN: builder
     +closed+      >>stdin
     "../boot-log" >>stdout
     +stdout+      >>stderr
-    20 minutes>ms >>timeout
+    20 minutes    >>timeout
   >desc ;
 
 : builder-test-cmd ( -- cmd )
@@ -92,7 +93,7 @@ IN: builder
     +closed+         >>stdin
     "../test-log"    >>stdout
     +stdout+         >>stderr
-    45 minutes>ms    >>timeout
+    45 minutes       >>timeout
   >desc ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -216,7 +217,7 @@ USE: bootstrap.image.download
   ]
   [ drop ]
   recover
-  5 minutes>ms sleep
+  5 minutes sleep
   build-loop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
