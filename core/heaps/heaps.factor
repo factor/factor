@@ -11,7 +11,7 @@ GENERIC: heap-push* ( value key heap -- entry )
 GENERIC: heap-peek ( heap -- value key )
 GENERIC: heap-pop* ( heap -- )
 GENERIC: heap-pop ( heap -- value key )
-GENERIC: heap-delete ( entry -- )
+GENERIC: heap-delete ( entry heap -- )
 GENERIC: heap-empty? ( heap -- ? )
 GENERIC: heap-size ( heap -- n )
 

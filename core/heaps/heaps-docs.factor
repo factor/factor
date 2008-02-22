@@ -18,7 +18,7 @@ $nl
 $nl
 "Queries:"
 { $subsection heap-empty? }
-{ $subsection heap-length }
+{ $subsection heap-size }
 { $subsection heap-peek }
 "Insertion:"
 { $subsection heap-push }
@@ -40,43 +40,43 @@ HELP: <max-heap>
 { $description "Create a new " { $link max-heap } "." } ;
 
 HELP: heap-push
-{ $values { "key" "a comparable object" } { "value" object } { "heap" heap } }
+{ $values { "key" "a comparable object" } { "value" object } { "heap" "a heap" } }
 { $description "Push a pair onto a heap. The key must be comparable with all other keys by the " { $link <=> } " generic word." }
 { $side-effects "heap" } ;
 
 HELP: heap-push*
-{ $values { "key" "a comparable object" } { "value" object } { "heap" heap } { "entry" entry } }
+{ $values { "key" "a comparable object" } { "value" object } { "heap" "a heap" } { "entry" entry } }
 { $description "Push a pair onto a heap, and output an entry which may later be passed to " { $link heap-delete } "." }
 { $side-effects "heap" } ;
 
 HELP: heap-push-all
-{ $values { "assoc" assoc } { "heap" heap } }
+{ $values { "assoc" assoc } { "heap" "a heap" } }
 { $description "Push every key/value pair of an assoc onto a heap." }
 { $side-effects "heap" } ;
 
 HELP: heap-peek
-{ $values { "heap" heap } { "key" object } { "value" object } }
+{ $values { "heap" "a heap" } { "key" object } { "value" object } }
 { $description "Output the first element in the heap, leaving it in the heap." } ;
 
 HELP: heap-pop*
-{ $values { "heap" heap } }
+{ $values { "heap" "a heap" } }
 { $description "Remove the first element from the heap." }
 { $side-effects "heap" } ;
 
 HELP: heap-pop
-{ $values { "heap" heap } { "key" object } { "value" object } }
+{ $values { "heap" "a heap" } { "key" object } { "value" object } }
 { $description "Output and remove the first element in the heap." }
 { $side-effects "heap" } ;
 
 HELP: heap-empty?
-{ $values { "heap" heap } { "?" "a boolean" } }
-{ $description "Tests if a " { $link heap } " has no nodes." } ;
+{ $values { "heap" "a heap" } { "?" "a boolean" } }
+{ $description "Tests if a heap has no nodes." } ;
 
 HELP: heap-size
-{ $values { "heap" heap } { "n" integer } }
+{ $values { "heap" "a heap" } { "n" integer } }
 { $description "Returns the number of key/value pairs in the heap." } ;
 
 HELP: heap-delete
-{ $values { "heap" heap } { "key" object } { "value" object } }
+{ $values { "heap" "a heap" } { "key" object } { "value" object } }
 { $description "Output and remove the first element in the heap." }
 { $side-effects "heap" } ;
