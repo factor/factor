@@ -1,5 +1,5 @@
 
-USING: kernel sequences combinators io.files io.launcher
+USING: kernel namespaces sequences combinators io.files io.launcher
        combinators.cleave builder.common builder.util ;
 
 IN: builder.release
