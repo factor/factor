@@ -1,6 +1,6 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic kernel math sequences timers arrays assocs ;
+USING: generic kernel math sequences arrays assocs alarms ;
 IN: models
 
 TUPLE: model value connections dependencies ref locked? ;
@@ -174,7 +174,7 @@ TUPLE: history back forward ;
     dup history-forward delete-all
     dup history-back (add-history) ;
 
-TUPLE: delay model timeout ;
+TUPLE: delay model timeout alarm ;
 
 : update-delay-model ( delay -- )
     dup delay-model model-value swap set-model ;
@@ -185,11 +185,17 @@ TUPLE: delay model timeout ;
     [ set-delay-model ] 2keep
     [ add-dependency ] keep ;
 
-M: delay model-changed nip 0 over delay-timeout add-timer ;
+: cancel-delay ( delay -- )
+    delay-model-alarm [ cancel-alarm ] when* ;
+
+: start-delay ( delay -- )
+    now over delay-model-timeout dt+ f
+    pick [ f over set-delay-alarm update-delay-model ] curry
+    add-alarm swap set-delay-model-alarm ;
+
+M: delay model-changed nip start-delay ;
 
 M: delay model-activated update-delay-model ;
-
-M: delay tick dup remove-timer update-delay-model ;
 
 GENERIC: range-value ( model -- value )
 GENERIC: range-page-value ( model -- value )
