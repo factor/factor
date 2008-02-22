@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences io.files kernel assocs words vocabs
 definitions parser continuations inspector debugger io io.styles
-io.streams.lines hashtables sorting prettyprint source-files
+hashtables sorting prettyprint source-files
 arrays combinators strings system math.parser compiler.errors
 splitting ;
 IN: vocabs.loader

@@ -33,7 +33,7 @@ HELP: <c-writer> ( out -- stream )
 
 HELP: <duplex-c-stream>
 { $values { "in" "a C FILE* handle" } { "out" "a C FILE* handle" } { "stream" "a new stream" } }
-{ $description "Creates a stream which reads and writes data by calling C standard library functions, wrapping the input portion in a " { $link line-reader } " and the output portion in a " { $link plain-writer } "." } ;
+{ $description "Creates a duplex stream which reads and writes data by calling C standard library functions." } ;
 
 HELP: fopen ( path mode -- alien )
 { $values { "path" "a pathname string" } { "mode" "an access mode specifier" } { "alien" "a C FILE* handle" } }

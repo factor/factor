@@ -2,7 +2,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations sequences kernel parser namespaces io
-io.files io.streams.lines io.streams.string html html.elements
+io.files io.streams.string html html.elements
 source-files debugger combinators math quotations generic
 strings splitting io.encodings.utf8 ;
 

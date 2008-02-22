@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.backend io.timeouts system kernel namespaces
 strings hashtables sequences assocs combinators vocabs.loader
-init threads continuations math ;
+init threads continuations math io.encodings ;
 IN: io.launcher
 
 ! Non-blocking process exit notification facility

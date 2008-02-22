@@ -1,6 +1,6 @@
 USING: arrays combinators crypto.common kernel io io.encodings.binary
 io.files io.streams.string math.vectors strings sequences
-namespaces math parser sequences vectors
+namespaces math parser sequences vectors io.binary
 hashtables ;
 IN: crypto.sha1
 

@@ -126,8 +126,6 @@ M: utf16be encode-string drop encode-utf16be ;
 M: utf16be decode-step drop decode-utf16be-step ;
 
 TUPLE: utf16 encoding ;
-M: utf16 underlying-stream delegate dup delegate [ ] [ ] ?if ; ! necessary? 
-M: utf16 set-underlying-stream delegate set-delegate ; ! necessary? 
 
 M: utf16 encode-string
     >r encode-utf16le r>

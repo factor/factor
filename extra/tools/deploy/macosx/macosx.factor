@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files io.launcher kernel namespaces sequences
 system tools.deploy.backend tools.deploy.config assocs
-hashtables prettyprint io.unix.backend cocoa
+hashtables prettyprint io.unix.backend cocoa io.encodings.utf8
 cocoa.application cocoa.classes cocoa.plists qualified ;
 QUALIFIED: unix
 IN: tools.deploy.macosx

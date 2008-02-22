@@ -90,7 +90,7 @@ TUPLE: decoded code cr ;
 M: decoded stream-read
     tuck { delegate decoded-code } get-slots decode-read fix-read ;
 
-M: decoded stream-read-partial tuck stream-read fix-read ;
+M: decoded stream-read-partial stream-read ;
 
 : read-until-loop ( stream delim -- ch )
     ! Copied from { c-reader stream-read-until }!!!
@@ -113,7 +113,8 @@ M: decoded stream-read-until
         ] [ nip ] if
     ] [ nip ] if ;
 
-M: decoded stream-read1 1 swap stream-read ;
+M: decoded stream-read1
+    1 swap stream-read [ first ] [ f ] if* ;
 
 M: decoded stream-readln ( stream -- str )
     "\r\n" over stream-read-until handle-readln ;

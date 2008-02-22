@@ -14,7 +14,7 @@ M: c-writer stream-write1
     >r 1string r> stream-write ;
 
 M: c-writer stream-write
-    c-writer-handle fwrite ;
+    >r >string r> c-writer-handle fwrite ;
 
 M: c-writer stream-flush
     c-writer-handle fflush ;

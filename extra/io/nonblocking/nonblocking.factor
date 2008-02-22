@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.nonblocking
 USING: math kernel io sequences io.buffers io.timeouts generic
-sbufs system io.streams.lines io.streams.plain io.streams.duplex
+sbufs system io.streams.plain io.streams.duplex io.encodings
 io.backend continuations debugger classes byte-arrays namespaces
 splitting dlists assocs ;
 

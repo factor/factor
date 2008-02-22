@@ -4,7 +4,7 @@ USING: arrays definitions generic assocs kernel math
 namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger
-io.files io.crc32 io.streams.string io.streams.lines vocabs
+io.files io.crc32 io.streams.string vocabs
 hashtables graphs compiler.units io.encodings.utf8 ;
 IN: source-files
 
