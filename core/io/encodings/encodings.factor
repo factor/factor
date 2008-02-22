@@ -92,17 +92,17 @@ M: decoded stream-read
 
 M: decoded stream-read-partial stream-read ;
 
-: read-until-loop ( stream delim -- ch )
+: decoded-read-until ( stream delim -- ch )
     ! Copied from { c-reader stream-read-until }!!!
     over stream-read1 dup [
-        dup pick memq? [ 2nip ] [ , read-until-loop ] if
+        dup pick memq? [ 2nip ] [ , decoded-read-until ] if
     ] [
         2nip
     ] if ;
 
 M: decoded stream-read-until
     ! Copied from { c-reader stream-read-until }!!!
-    [ swap read-until-loop ] "" make
+    [ swap decoded-read-until ] "" make
     swap over empty? over not and [ 2drop f f ] when ;
 
 : fix-read1 ( stream char -- char )

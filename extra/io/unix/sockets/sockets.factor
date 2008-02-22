@@ -48,7 +48,7 @@ M: unix-io (client) ( addrspec -- stream )
     dup r> r> connect
     zero? err_no EINPROGRESS = or [
         dup init-client-socket
-        dup handle>duplex-stream
+        dup f handle>duplex-stream
         dup duplex-stream-out
         dup wait-to-connect
         pending-init-error
