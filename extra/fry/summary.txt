@@ -1,0 +1,1 @@
+Syntax for pictured partial application and composition
