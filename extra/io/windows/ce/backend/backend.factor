@@ -1,7 +1,7 @@
 USING: io.nonblocking io.windows threads.private kernel
 io.backend windows.winsock windows.kernel32 windows
 io.streams.duplex io namespaces alien.syntax system combinators
-io.buffers ;
+io.buffers io.encodings io.encodings.utf8 ;
 IN: io.windows.ce.backend
 
 : port-errored ( port -- )
@@ -41,5 +41,5 @@ M: windows-ce-io init-stdio ( -- )
         ] [
             0 _getstdfilex _fileno
             1 _getstdfilex _fileno
-        ] if <win32-duplex-stream>
+        ] if <win32-duplex-stream> utf8 <encoded-duplex>
     ] with-variable stdio set-global ;
