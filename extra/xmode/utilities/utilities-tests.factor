@@ -49,5 +49,5 @@ TAGS>
     }
 ] [
     "extra/xmode/utilities/test.xml"
-    resource-path <file-reader> read-xml parse-company-tag
+    resource-path file>xml parse-company-tag
 ] unit-test

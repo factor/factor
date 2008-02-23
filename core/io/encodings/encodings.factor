@@ -3,7 +3,7 @@
 USING: math kernel sequences sbufs vectors namespaces
 growable strings io classes continuations combinators
 io.styles io.streams.plain io.encodings.binary splitting
-io.streams.string io.streams.duplex ;
+io.streams.duplex ;
 IN: io.encodings
 
 ! Decoding
@@ -50,7 +50,7 @@ GENERIC: decode-step ( buf byte ch state encoding -- buf ch state )
     ] if ;
 
 : decode-read ( length stream encoding -- string )
-    >r swap start-decoding r>
+    >r swap >fixnum start-decoding r>
     decode-read-loop ;
 
 TUPLE: decoded code cr ;
@@ -114,7 +114,7 @@ M: decoded stream-read-until
     ] [ nip ] if ;
 
 M: decoded stream-read1
-    1 swap stream-read [ first ] [ f ] if* ;
+    1 swap stream-read f like [ first ] [ f ] if* ;
 
 M: decoded stream-readln ( stream -- str )
     "\r\n" over stream-read-until handle-readln ;
@@ -127,7 +127,10 @@ TUPLE: encode-error ;
 
 TUPLE: encoded code ;
 : <encoded> ( stream encoding-class -- encoded-stream )
-    construct-empty { set-delegate set-encoded-code } encoded construct ;
+    dup binary eq? [ drop ] [
+        construct-empty { set-delegate set-encoded-code }
+        encoded construct
+    ] if ;
 
 GENERIC: encode-string ( string encoding -- byte-array )
 M: tuple-class encode-string construct-empty encode-string ;
@@ -153,3 +156,11 @@ INSTANCE: encoded plain-writer
 : <encoded-duplex> ( duplex-stream encoding -- duplex-stream )
     swap { duplex-stream-in duplex-stream-out } get-slots
     pick reencode >r swap redecode r> <duplex-stream> ;
+
+! The null encoding does nothing
+! (used to wrap things as line-reader/plain-writer)
+! Later this will be replaced by inheritance
+
+TUPLE: null-encoding ;
+M: null-encoding encode-string drop ;
+M: null-encoding decode-step 3drop over push f f ;

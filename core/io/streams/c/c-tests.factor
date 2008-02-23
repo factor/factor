@@ -1,4 +1,4 @@
-USING: tools.test io.files io io.streams.c ;
+USING: tools.test io.files io io.streams.c io.encodings.ascii ;
 IN: temporary
 
 [ "hello world" ] [

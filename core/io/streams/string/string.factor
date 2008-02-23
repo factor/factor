@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.streams.string
 USING: io kernel math namespaces sequences sbufs strings
-generic splitting growable continuations io.streams.plain ;
+generic splitting growable continuations io.streams.plain
+io.encodings ;
 
 M: growable dispose drop ;
 
@@ -23,7 +24,7 @@ M: growable stream-read1 dup empty? [ drop f ] [ pop ] if ;
     underlying like ;
 
 : growable-read-until ( growable n -- str )
-    dupd tail-slice swap harden-as dup reverse-here ;
+    >fixnum dupd tail-slice swap harden-as dup reverse-here ;
 
 : find-last-sep swap [ memq? ] curry find-last drop ;
 
@@ -49,7 +50,7 @@ M: growable stream-read-partial
     stream-read ;
 
 : <string-reader> ( str -- stream )
-    >sbuf dup reverse-here ;
+    >sbuf dup reverse-here null-encoding <decoded> ;
 
 : with-string-reader ( str quot -- )
     >r <string-reader> r> with-stream ; inline
@@ -74,3 +75,6 @@ M: plain-writer stream-write-table
     [ drop format-table [ print ] each ] with-stream* ;
 
 M: plain-writer make-cell-stream 2drop <string-writer> ;
+
+M: growable stream-readln ( stream -- str )
+    "\r\n" over stream-read-until handle-readln ;

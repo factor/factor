@@ -2,10 +2,10 @@ USING: kernel tools.test io.encodings.utf16 arrays sbufs sequences io.encodings
 io unicode ;
 
 : decode-w/stream ( array encoding -- newarray )
-    >r >sbuf dup reverse-here r> <decoding> contents >array ;
+    >r >sbuf dup reverse-here r> <decoded> contents >array ;
 
 : encode-w/stream ( array encoding -- newarray )
-    >r SBUF" " clone tuck r> <encoding> stream-write >array ;
+    >r SBUF" " clone tuck r> <encoded> stream-write >array ;
 
 [ { CHAR: x } ] [ { 0 CHAR: x } utf16be decode-w/stream ] unit-test
 [ { HEX: 1D11E } ] [ { HEX: D8 HEX: 34 HEX: DD HEX: 1E } utf16be decode-w/stream ] unit-test

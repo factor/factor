@@ -99,7 +99,7 @@ M: unix-io kill-process* ( pid -- )
 
 M: unix-io process-stream*
     [
-        spawn-process-stream >r latin1 handle>duplex-stream r>
+        spawn-process-stream >r handle>duplex-stream r>
     ] with-descriptor ;
 
 : find-process ( handle -- process )

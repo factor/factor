@@ -39,15 +39,14 @@ GENERIC: close-handle ( handle -- )
 : <buffered-port> ( handle type -- port )
     default-buffer-size get <buffer> swap <port> ;
 
-: <reader> ( handle -- stream )
+: <reader> ( handle -- input-port )
     input-port <buffered-port> ;
 
-: <writer> ( handle -- stream )
+: <writer> ( handle -- output-port )
     output-port <buffered-port> ;
 
-: handle>duplex-stream ( in-handle out-handle encoding -- stream )
-    [ swap <writer> swap <encoded> ] keep
-    [ -rot >r <reader> swap <decoded> r> <duplex-stream> ]
+: handle>duplex-stream ( in-handle out-handle -- stream )
+    [ swap <reader> swap <writer> <duplex-stream> ]
     [ ] [ dispose ] cleanup ;
 
 : pending-error ( port -- )
