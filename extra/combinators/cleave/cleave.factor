@@ -30,3 +30,16 @@ IN: combinators.cleave
 
 : tetra* ( obj obj obj obj quot quot quot quot -- val val val val )
   >r roll >r tri* r> r> call ; inline
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! General spread
+
+USING: sequences macros ;
+
+MACRO: spread ( seq -- )
+  dup
+    [ drop [ >r ] ]        map concat
+  swap
+    [ [ r> ] swap append ] map concat
+  append ;
