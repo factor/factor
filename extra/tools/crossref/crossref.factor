@@ -6,14 +6,8 @@ generic tools.completion quotations parser inspector
 sorting hashtables vocabs parser source-files ;
 IN: tools.crossref
 
-: synopsis-alist ( definitions -- alist )
-    [ dup synopsis swap ] { } map>assoc ;
-
-: definitions. ( alist -- )
-    [ write-object nl ] assoc-each ;
-
 : usage. ( word -- )
-    smart-usage synopsis-alist sort-keys definitions. ;
+    usage sorted-definitions. ;
 
 : words-matching ( str -- seq )
     all-words [ dup word-name ] { } map>assoc completions ;

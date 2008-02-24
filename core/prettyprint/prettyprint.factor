@@ -174,6 +174,12 @@ M: hook-generic synopsis*
 M: method-spec synopsis*
     dup definer. [ pprint-word ] each ;
 
+M: method-body synopsis*
+    dup definer.
+    "method" word-prop dup
+    method-specializer pprint*
+    method-generic pprint* ;
+
 M: mixin-instance synopsis*
     dup definer.
     dup mixin-instance-class pprint-word
@@ -187,6 +193,15 @@ M: pathname synopsis* pprint* ;
         1 line-limit set
         [ synopsis* ] with-in
     ] with-string-writer ;
+
+: synopsis-alist ( definitions -- alist )
+    [ dup synopsis swap ] { } map>assoc ;
+
+: definitions. ( alist -- )
+    [ write-object nl ] assoc-each ;
+
+: sorted-definitions. ( definitions -- )
+    synopsis-alist sort-keys definitions. ;
 
 GENERIC: declarations. ( obj -- )
 
@@ -253,7 +268,9 @@ M: builtin-class see-class*
     natural-sort [ nl see ] each ;
 
 : see-implementors ( class -- seq )
-    dup implementors [ 2array ] with map ;
+    dup implementors
+    [ method method-word ] with map
+    natural-sort ;
 
 : see-class ( class -- )
     dup class? [
@@ -263,8 +280,9 @@ M: builtin-class see-class*
     ] when drop ;
 
 : see-methods ( generic -- seq )
-    [ "methods" word-prop keys natural-sort ] keep
-    [ 2array ] curry map ;
+    "methods" word-prop
+    [ nip method-word ] { } assoc>map
+    natural-sort ;
 
 M: word see
     dup see-class
