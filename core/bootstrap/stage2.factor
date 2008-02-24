@@ -29,9 +29,7 @@ SYMBOL: bootstrap-time
 
 : compile-remaining ( -- )
     "Compiling remaining words..." print flush
-    vocabs [
-        words "compile" "compiler" lookup execute
-    ] each ;
+    vocabs [ words compile ] each ;
 
 : count-words ( pred -- )
     all-words swap subset length number>string write ;
