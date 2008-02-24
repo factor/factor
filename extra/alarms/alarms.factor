@@ -56,15 +56,13 @@ SYMBOL: alarm-thread
 : trigger-alarms ( alarms -- )
     now (trigger-alarms) ;
 
-: next-alarm ( alarms -- ms )
+: next-alarm ( alarms -- timestamp/f )
     dup heap-empty?
-    [ drop f ]
-    [ heap-peek drop alarm-time now timestamp- 1000 * 0 max ]
-    if ;
+    [ drop f ] [ heap-peek drop alarm-time ] if ;
 
 : alarm-thread-loop ( -- )
     alarms get-global
-    dup next-alarm nap drop
+    dup next-alarm nap-until drop
     dup trigger-alarms
     alarm-thread-loop ;
 

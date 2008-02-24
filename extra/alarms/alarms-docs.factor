@@ -14,8 +14,7 @@ HELP: later
 
 HELP: cancel-alarm
 { $values { "alarm" alarm } }
-{ $description "Cancels an alarm." }
-{ $errors "Throws an error if the alarm is not active." } ;
+{ $description "Cancels an alarm. Does nothing if the alarm is not active." } ;
 
 ARTICLE: "alarms" "Alarms"
 "Alarms provide a lightweight way to schedule one-time and recurring tasks without spawning a new thread."
