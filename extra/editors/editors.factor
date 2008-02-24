@@ -35,6 +35,9 @@ SYMBOL: edit-hook
 : edit ( defspec -- )
     where [ first2 edit-location ] when* ;
 
+: edit-vocab ( name -- )
+    vocab-source-path 1 edit-location ;
+
 : :edit ( -- )
     error get delegates [ parse-error? ] find-last nip [
         dup parse-error-file source-file-path ?resource-path
