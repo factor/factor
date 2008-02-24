@@ -47,8 +47,8 @@ HELP: gc-time ( -- n )
 { $values { "n" "a timestamp in milliseconds" } }
 { $description "Outputs the total time spent in garbage collection during this Factor session." } ;
 
-HELP: data-room ( -- cards semi generations )
-{ $values { "cards" "number of bytes reserved for card marking" } { "semi" "number of bytes reserved for tenured semi-space" } { "generations" "array of free/total bytes pairs" } }
+HELP: data-room ( -- cards generations )
+{ $values { "cards" "number of bytes reserved for card marking" } { "generations" "array of free/total bytes pairs" } }
 { $description "Queries the runtime for memory usage information." } ;
 
 HELP: code-room ( -- code-free code-total )

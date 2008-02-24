@@ -76,9 +76,9 @@ $nl
 ARTICLE: "declarations" "Declarations"
 "Declarations give special behavior to a word. Declarations are parsing words that set a word property in the most recently defined word."
 $nl
-"The first declaration specifies the time when a word runs. It affects both interpreted and compiled definitions."
+"The first declaration specifies the time when a word runs. It affects both the non-optimizing and optimizing compilers:"
 { $subsection POSTPONE: parsing }
-"The remaining declarations only affect compiled definitions. They do not change evaluation semantics of a word, but instead declare that the word follows a certain contract, and thus may be compiled differently."
+"The remaining declarations only affect definitions compiled with the optimizing compiler. They do not change evaluation semantics of a word, but instead declare that the word follows a certain contract, and thus may be compiled differently."
 { $warning "If a generic word is declared " { $link POSTPONE: foldable } " or " { $link POSTPONE: flushable } ", all methods must satisfy the contract, otherwise unpredicable behavior will occur." }
 { $subsection POSTPONE: inline }
 { $subsection POSTPONE: foldable }

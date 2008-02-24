@@ -4,7 +4,7 @@ USING: kernel namespaces arrays sequences io inference.backend
 inference.state generator debugger math.parser prettyprint words
 compiler.units continuations vocabs assocs alien.compiler dlists
 optimizer definitions math compiler.errors threads graphs
-generic ;
+generic inference ;
 IN: compiler
 
 : compiled-usages ( words -- seq )
@@ -49,27 +49,17 @@ IN: compiler
         compile-loop
     ] if ;
 
-: recompile ( words -- )
+: decompile ( word -- )
+    f 2array 1array t modify-code-heap ;
+
+: optimized-recompile-hook ( words -- alist )
     [
         H{ } clone compile-queue set
         H{ } clone compiled set
-        [ queue-compile ] each
+        compiled-usages [ queue-compile ] each
         compile-queue get compile-loop
         compiled get >alist
-        dup [ drop crossref? ] assoc-contains?
-        modify-code-heap
-    ] with-scope ; inline
-
-: compile ( words -- )
-    [ compiled? not ] subset recompile ;
-
-: compile-call ( quot -- )
-    H{ } clone changed-words
-    [ define-temp dup 1array compile ] with-variable
-    execute ;
+    ] with-scope ;
 
 : recompile-all ( -- )
-    [ all-words recompile ] with-compiler-errors ;
-
-: decompile ( word -- )
-    f 2array 1array t modify-code-heap ;
+    forget-errors all-words compile ;

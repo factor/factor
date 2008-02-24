@@ -30,7 +30,7 @@ crossref off
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
 H{ } clone changed-words set
-[ drop ] recompile-hook set
+[ default-recompile-hook ] recompile-hook set
 
 call
 call

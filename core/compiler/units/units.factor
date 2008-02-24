@@ -63,24 +63,39 @@ GENERIC: definitions-changed ( assoc obj -- )
     dup changed-words get update
     dup dup changed-vocabs update ;
 
+: compile ( words -- )
+    recompile-hook get call
+    dup [ drop crossref? ] assoc-contains?
+    modify-code-heap ;
+
+SYMBOL: post-compile-tasks
+
+: after-compilation ( quot -- )
+    post-compile-tasks get push ;
+
 : finish-compilation-unit ( -- )
     changed-words get keys recompile-hook get call
+    dup [ drop crossref? ] assoc-contains?
+    post-compile-tasks get [ call ] each
+    modify-code-heap
     changed-definitions notify-definition-observers ;
 
 : with-compilation-unit ( quot -- )
     [
         H{ } clone changed-words set
         H{ } clone forgotten-definitions set
+        V{ } clone post-compile-tasks set
         <definitions> new-definitions set
         <definitions> old-definitions set
         [ finish-compilation-unit ]
         [ ] cleanup
     ] with-scope ; inline
 
-: default-recompile-hook
-    [ f ] { } map>assoc
-    dup [ drop crossref? ] assoc-contains?
-    modify-code-heap ;
+: compile-call ( quot -- )
+    [ define-temp ] with-compilation-unit execute ;
+
+: default-recompile-hook ( words -- alist )
+    [ f ] { } map>assoc ;
 
 recompile-hook global
 [ [ default-recompile-hook ] or ]
