@@ -310,13 +310,11 @@ M: immutable-sequence clone-like like ;
 
 <PRIVATE
 
-: iterate-seq >r dup length swap r> ; inline
-
 : (each) ( seq quot -- n quot' )
-    iterate-seq [ >r nth-unsafe r> call ] 2curry ; inline
+    >r dup length swap [ nth-unsafe ] curry r> compose ; inline
 
 : (collect) ( quot into -- quot' )
-    [ >r over slip r> set-nth-unsafe ] 2curry ; inline
+    [ >r keep r> set-nth-unsafe ] 2curry ; inline
 
 : collect ( n quot into -- )
     (collect) each-integer ; inline
@@ -415,7 +413,7 @@ PRIVATE>
     >r dup length 1- swap r> (monotonic) all? ; inline
 
 : interleave ( seq between quot -- )
-    [ (interleave) ] 2curry iterate-seq 2each ; inline
+    [ (interleave) ] 2curry >r dup length swap r> 2each ; inline
 
 : unfold ( pred quot tail -- seq )
     V{ } clone [
@@ -695,9 +693,9 @@ PRIVATE>
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
     swap [
-        dup -2 fixnum-shift >fixnum swap 5 fixnum-shift >fixnum
+        dup -2 fixnum-shift-fast swap 5 fixnum-shift-fast
         fixnum+fast fixnum+fast
-    ] keep bitxor ; inline
+    ] keep fixnum-bitxor ; inline
 
 : sequence-hashcode ( n seq -- x )
     0 -rot [

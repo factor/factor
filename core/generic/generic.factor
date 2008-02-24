@@ -116,7 +116,7 @@ M: method-spec definition
 : forget-method ( class generic -- )
     check-method
     [ delete-at* ] with-methods
-    [ method-word forget ] [ drop ] if ;
+    [ method-word forget-word ] [ drop ] if ;
 
 M: method-spec forget*
     first2 forget-method ;

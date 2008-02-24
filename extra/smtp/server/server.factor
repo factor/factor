@@ -28,7 +28,7 @@
 ! Connection closed by foreign host.
 
 USING: combinators kernel prettyprint io io.timeouts io.server
-sequences namespaces io.sockets continuations ;
+sequences namespaces io.sockets continuations calendar ;
 IN: smtp.server
 
 SYMBOL: data-mode
