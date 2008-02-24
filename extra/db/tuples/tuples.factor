@@ -32,6 +32,12 @@ HOOK: <delete-tuples-statement> db ( tuple -- obj )
 
 HOOK: row-column-typed db ( result-set n type -- sql )
 
+: resulting-tuple ( class out-params row -- tuple )
+    >r >r construct-empty r> r> rot [
+        >r [ sql-spec-type sql-type>factor-type ] keep
+        sql-spec-slot-name r> set-slot-named
+    ] curry 2each ;
+
 : query-tuple ( tuple statement -- seq )
     dupd
     [ query-results [ sql-row ] with-disposal ] keep
@@ -40,8 +46,14 @@ HOOK: row-column-typed db ( result-set n type -- sql )
         sql-spec-slot-name r> set-slot-named
     ] curry 2each ;
  
-: query-tuples ( statement -- seq )
-    ;
+: query-tuples ( tuple statement -- seq )
+    dup query-results [
+        statement-out-params [
+break
+            >r [ sql-spec-type sql-type>factor-type ] keep
+            sql-spec-slot-name r> set-slot-named
+        ] with with query-map
+    ] with-disposal ; 
 
 : sql-props ( class -- columns table )
     dup db-columns swap db-table ;
@@ -51,7 +63,7 @@ HOOK: row-column-typed db ( result-set n type -- sql )
 
 : insert-native ( tuple -- )
     dup class <insert-native-statement>
-    [ bind-tuple ] 2keep query-tuple ;
+    [ bind-tuple ] 2keep query-tuple drop ;
 
 : insert-assigned ( tuple -- )
     dup <insert-assigned-statement>
@@ -65,12 +77,11 @@ HOOK: row-column-typed db ( result-set n type -- sql )
     ] if ;
 
 : update-tuple ( tuple -- )
-    <update-tuple-statement> execute-statement ;
+    dup class <update-tuple-statement>
+    [ bind-tuple ] keep execute-statement ;
 
 : update-tuples ( seq -- )
     <update-tuples-statement> execute-statement ;
-
-
 
 ! : persist ( tuple -- )
 
@@ -80,10 +91,14 @@ HOOK: delete-by-id db ( tuple -- )
 
 HOOK: <select-by-slots-statement> db ( tuple -- tuple )
 
-: select-tuple ( tuple -- tuple )
+: setup-select ( tuple -- tuple statement )
     dup dup class <select-by-slots-statement>
-    [ bind-tuple ] 2keep query-tuple ;
+    [ bind-tuple ] 2keep ;
+
+: select-tuple ( tuple -- tuple )
+    setup-select query-tuple ;
 
 : select-tuples ( tuple -- tuple )
-    dup dup class <select-by-slots-statement>
-    [ bind-tuple ] 2keep query-tuples ;
+    setup-select query-tuples ;
+
+! uniqueResult

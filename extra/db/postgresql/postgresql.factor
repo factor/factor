@@ -208,7 +208,7 @@ M: postgresql-db <insert-assigned-statement> ( tuple -- statement )
         ");" 0%
     ] postgresql-make ;
 
-M: postgresql-db <update-tuple-statement> ( tuple -- statement )
+M: postgresql-db <update-tuple-statement> ( class -- statement )
     [
         "update " 0% 0%
         " set " 0%
@@ -220,7 +220,7 @@ M: postgresql-db <update-tuple-statement> ( tuple -- statement )
         dup sql-spec-column-name 0% " = " 0% bind%
     ] postgresql-make ;
 
-M: postgresql-db <delete-tuple-statement> ( tuple -- statement )
+M: postgresql-db <delete-tuple-statement> ( class -- statement )
     [
         "delete from " 0% 0%
         " where " 0%

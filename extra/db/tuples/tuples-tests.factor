@@ -31,7 +31,8 @@ SYMBOL: the-person
 
     [ ] [ the-person get update-tuple ] unit-test
 
-    ! T{ person f f f 200 f } select-tuples
+    [ T{ person f 1 "billy" 200 3.14 } ]
+    [ T{ person f 1 } select-tuple ] unit-test
 
     ! [ ] [ the-person get delete-tuple ] unit-test
     ! [ ] [ person drop-table ] unit-test
