@@ -8,7 +8,10 @@ then
   echo macosx-x86-`./misc/wordsize`
 elif [ \( `uname -s` = Linux \) -a \( `uname -m` = i686 \) ]
 then
-  echo linux-x86-`./misc/wordsize`
+  echo linux-x86-32
+elif [ \( `uname -s` = Linux \) -a \( `uname -m` = x86_64 \) ]
+then
+  echo linux-x86-64
 elif [ \( `uname -o` = Cygwin \) -a \( `uname -m` = i686 \) ]
 then
   echo winnt-x86-`./misc/wordsize`

@@ -102,11 +102,13 @@ M: method-body stack-effect
 
 ! Definition protocol
 M: method-spec where
-    dup first2 method [ method-loc ] [ second where ] ?if ;
+    dup first2 method [ method-word ] [ second ] ?if where ;
 
-M: method-spec set-where first2 method set-method-loc ;
+M: method-spec set-where
+    first2 method method-word set-where ;
 
-M: method-spec definer drop \ M: \ ; ;
+M: method-spec definer
+    drop \ M: \ ; ;
 
 M: method-spec definition
     first2 method dup [ method-def ] when ;
@@ -114,9 +116,21 @@ M: method-spec definition
 : forget-method ( class generic -- )
     check-method
     [ delete-at* ] with-methods
-    [ method-word forget ] [ drop ] if ;
+    [ method-word forget-word ] [ drop ] if ;
 
-M: method-spec forget* first2 forget-method ;
+M: method-spec forget*
+    first2 forget-method ;
+
+M: method-body definer
+    drop \ M: \ ; ;
+
+M: method-body definition
+    "method" word-prop method-def ;
+
+M: method-body forget*
+    "method" word-prop
+    { method-specializer method-generic } get-slots
+    forget-method ;
 
 : implementors* ( classes -- words )
     all-words [

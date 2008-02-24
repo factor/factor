@@ -10,7 +10,7 @@ IN: smtp
 SYMBOL: smtp-domain
 SYMBOL: smtp-host       "localhost" smtp-host set-global
 SYMBOL: smtp-port       25 smtp-port set-global
-SYMBOL: read-timeout    60000 read-timeout set-global
+SYMBOL: read-timeout    1 minutes read-timeout set-global
 SYMBOL: esmtp           t esmtp set-global
 
 : log-smtp-connection ( host port -- ) 2drop ;

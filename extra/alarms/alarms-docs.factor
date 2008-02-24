@@ -14,14 +14,14 @@ HELP: later
 
 HELP: cancel-alarm
 { $values { "alarm" alarm } }
-{ $description "Cancels an alarm." }
-{ $errors "Throws an error if the alarm is not active." } ;
+{ $description "Cancels an alarm. Does nothing if the alarm is not active." } ;
 
 ARTICLE: "alarms" "Alarms"
 "Alarms provide a lightweight way to schedule one-time and recurring tasks without spawning a new thread."
 { $subsection alarm }
 { $subsection add-alarm }
 { $subsection later }
-{ $subsection cancel-alarm } ;
+{ $subsection cancel-alarm }
+"Alarms do not persist across image saves. Saving and restoring an image has the effect of calling " { $link cancel-alarm } " on all " { $link alarm } " instances." ;
 
 ABOUT: "alarms"

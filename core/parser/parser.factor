@@ -439,11 +439,12 @@ SYMBOL: interactive-vocabs
         "Warning: the following definitions were removed from sources," print
         "but are still referenced from other definitions:" print
         nl
-        dup stack.
+        dup sorted-definitions.
         nl
         "The following definitions need to be updated:" print
         nl
-        over stack.
+        over sorted-definitions.
+        nl
     ] when 2drop ;
 
 : filter-moved ( assoc -- newassoc )
