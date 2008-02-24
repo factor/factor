@@ -153,9 +153,8 @@ INSTANCE: encoded plain-writer
 : redecode ( stream encoding -- newstream )
     over decoded? [ >r delegate r> ] when <decoded> ;
 
-: <encoded-duplex> ( duplex-stream encoding -- duplex-stream )
-    swap { duplex-stream-in duplex-stream-out } get-slots
-    pick reencode >r swap redecode r> <duplex-stream> ;
+: <encoded-duplex> ( stream-in stream-out encoding -- duplex-stream )
+    tuck reencode >r redecode r> <duplex-stream> ;
 
 ! The null encoding does nothing
 ! (used to wrap things as line-reader/plain-writer)

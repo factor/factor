@@ -181,9 +181,10 @@ M: port port-flush ( port -- )
 M: unix-io io-multiplex ( ms -- )
     mx get-global wait-for-events ;
 
-M: unix-io init-stdio ( -- )
-    0 1 handle>duplex-stream utf8 <encoded-duplex> io:stdio set-global
-    2 <writer> utf8 <encoded> io:stderr set-global ;
+M: unix-io (init-stdio) ( -- )
+    0 <reader>
+    1 <writer>
+    2 <writer> ;
 
 ! mx io-task for embedding an fd-based mx inside another mx
 TUPLE: mx-port mx ;

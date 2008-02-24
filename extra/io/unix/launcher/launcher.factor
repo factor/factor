@@ -97,9 +97,9 @@ M: unix-io kill-process* ( pid -- )
         -rot 2dup second close first close
     ] with-fork first swap second rot <process> ;
 
-M: unix-io process-stream*
+M: unix-io (process-stream)
     [
-        spawn-process-stream >r handle>duplex-stream r>
+        spawn-process-stream >r <reader&writer> r>
     ] with-descriptor ;
 
 : find-process ( handle -- process )

@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.nonblocking
 USING: math kernel io sequences io.buffers io.timeouts generic
-sbufs system io.streams.plain io.streams.duplex io.encodings
+sbufs system io.streams.duplex io.encodings
 io.backend continuations debugger classes byte-arrays namespaces
-splitting dlists assocs ;
+splitting dlists assocs io.encodings.binary ;
 
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
@@ -45,9 +45,8 @@ GENERIC: close-handle ( handle -- )
 : <writer> ( handle -- output-port )
     output-port <buffered-port> ;
 
-: handle>duplex-stream ( in-handle out-handle -- stream )
-    [ swap <reader> swap <writer> <duplex-stream> ]
-    [ ] [ dispose ] cleanup ;
+: <reader&writer> ( read-handle write-handle -- input-port output-port )
+    swap <reader> [ swap <writer> ] [ dispose ] cleanup ;
 
 : pending-error ( port -- )
     dup port-error f rot set-port-error [ throw ] when* ;
@@ -171,11 +170,11 @@ M: port dispose
     [ dup port-type >r closed over set-port-type r> close-port ]
     if ;
 
-TUPLE: server-port addr client ;
+TUPLE: server-port addr client encoding ;
 
-: <server-port> ( handle addr -- server )
-    >r f server-port <port> r>
-    { set-delegate set-server-port-addr }
+: <server-port> ( handle addr encoding -- server )
+    rot f server-port <port>
+    { set-server-port-addr set-server-port-encoding set-delegate }
     server-port construct ;
 
 : check-server-port ( port -- )

@@ -87,7 +87,7 @@ M: windows-nt-io fill-redirection
     over redirect-stdin over set-STARTUPINFO-hStdInput
     drop ;
 
-M: windows-nt-io process-stream*
+M: windows-nt-io (process-stream)
     [
         [
             make-CreateProcess-args
@@ -103,8 +103,10 @@ M: windows-nt-io process-stream*
             dup CreateProcess-args-stdout-pipe pipe-out CloseHandle drop
 
             dup CreateProcess-args-stdout-pipe pipe-in
-            over CreateProcess-args-stdin-pipe pipe-out <win32-duplex-stream>
+            over CreateProcess-args-stdin-pipe pipe-out
 
-            swap CreateProcess-args-lpProcessInformation <process>
+            [ f <win32-file> ] 2apply <reader&writer>
+
+            rot CreateProcess-args-lpProcessInformation <process>
         ] with-destructors
     ] with-descriptor ;

@@ -1,13 +1,17 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: init kernel system namespaces ;
+USING: init kernel system namespaces io io.encodings io.encodings.utf8 ;
 IN: io.backend
 
 SYMBOL: io-backend
 
 HOOK: init-io io-backend ( -- )
 
-HOOK: init-stdio io-backend ( -- )
+HOOK: (init-stdio) io-backend ( -- stdin stdout stderr )
+
+: init-stdio ( -- )
+    (init-stdio) utf8 <encoded> stderr set-global
+    utf8 <encoded-duplex> stdio set-global ;
 
 HOOK: io-multiplex io-backend ( ms -- )
 

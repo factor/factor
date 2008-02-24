@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: io.sockets
 USING: generic kernel io.backend namespaces continuations
-sequences arrays io.encodings ;
+sequences arrays io.encodings io.nonblocking ;
+IN: io.sockets
 
 TUPLE: local path ;
 
@@ -26,18 +26,24 @@ TUPLE: client-stream addr ;
     { set-client-stream-addr set-delegate }
     client-stream construct ;
 
-HOOK: (client) io-backend ( addrspec -- stream )
+HOOK: (client) io-backend ( addrspec -- client-in client-out )
 
-GENERIC: client* ( addrspec -- stream )
+GENERIC: client* ( addrspec -- client-in client-out )
 M: array client* [ (client) ] attempt-all ;
 M: object client* (client) ;
 
 : <client> ( addrspec encoding -- stream )
-    >r client* r> <encoded-duplex> ;
+    [ >r client* r> <encoded-duplex> ] keep <client-stream> ;
 
-HOOK: <server> io-backend ( addrspec -- server )
+HOOK: (server) io-backend ( addrspec -- handle )
 
-HOOK: accept io-backend ( server -- client )
+: <server> ( addrspec encoding -- server )
+    >r [ (server) ] keep r> <server-port> ;
+
+HOOK: (accept) io-backend ( server -- stream-in stream-out )
+
+: accept ( server -- client )
+    [ (accept) ] keep server-port-encoding <encoded-duplex> ;
 
 HOOK: <datagram> io-backend ( addrspec -- datagram )
 

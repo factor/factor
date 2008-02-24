@@ -49,29 +49,26 @@ M: c-reader stream-read-until
 M: c-reader dispose
     c-reader-handle fclose ;
 
-: <duplex-c-stream> ( in out -- stream )
-    >r <c-reader> r> <c-writer> <duplex-stream> ;
-
 M: object init-io ;
 
 : stdin-handle 11 getenv ;
 : stdout-handle 12 getenv ;
 : stderr-handle 38 getenv ;
 
-M: object init-stdio
-    stdin-handle stdout-handle <duplex-c-stream>
-    utf8 <encoded-duplex> stdio set-global
-    stderr-handle <c-writer> utf8 <encoded> stderr set-global ;
+M: object (init-stdio)
+    stdin-handle <c-reader>
+    stdout-handle <c-writer>
+    stderr-handle <c-writer> ;
 
 M: object io-multiplex (sleep) ;
 
-M: object file-reader*
+M: object (file-reader)
     "rb" fopen <c-reader> ;
 
-M: object file-writer*
+M: object (file-writer)
     "wb" fopen <c-writer> ;
 
-M: object file-appender*
+M: object (file-appender)
     "ab" fopen <c-writer> ;
 
 : show ( msg -- )

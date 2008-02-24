@@ -119,14 +119,13 @@ M: process get-lapse process-lapse ;
 
 M: process timed-out kill-process ;
 
-HOOK: process-stream* io-backend ( desc -- stream process )
-! Process streams are always latin1 for now; will be updated
+HOOK: (process-stream) io-backend ( desc -- in out process )
 
 TUPLE: process-stream process ;
 
 : <process-stream> ( desc encoding -- stream )
     swap >descriptor
-    [ process-stream* >r swap <encoded-duplex> r> ] keep
+    [ (process-stream) >r rot <encoded-duplex> r> ] keep
     +timeout+ swap at [ over set-timeout ] when*
     { set-delegate set-process-stream-process }
     process-stream construct ;

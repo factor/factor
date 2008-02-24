@@ -3,12 +3,12 @@
 
 ! We need to fiddle with the exact search order here, since
 ! unix::accept shadows streams::accept.
-IN: io.unix.sockets
 USING: alien alien.c-types generic io kernel math namespaces
 io.nonblocking parser threads unix sequences
 byte-arrays io.sockets io.binary io.unix.backend
 io.streams.duplex io.sockets.impl math.parser continuations libc
 combinators ;
+IN: io.unix.sockets
 
 : pending-init-error ( port -- )
     #! We close it here to avoid a resource leak; callers of
@@ -48,10 +48,9 @@ M: unix-io (client) ( addrspec -- stream )
     dup r> r> connect
     zero? err_no EINPROGRESS = or [
         dup init-client-socket
-        dup handle>duplex-stream
-        dup duplex-stream-out
+        dup <reader&writer>
         dup wait-to-connect
-        pending-init-error
+        dup pending-init-error
     ] [
         dup close (io-error)
     ] if ;
@@ -74,7 +73,7 @@ TUPLE: accept-task ;
 : do-accept ( port fd sockaddr -- )
     rot [
         server-port-addr parse-sockaddr
-        swap dup handle>duplex-stream <client-stream>
+        swap dup <reader&writer> <duplex-stream> <client-stream>
     ] keep set-server-port-client ;
 
 M: accept-task do-io-task
@@ -92,18 +91,17 @@ USE: io.sockets
     dup rot make-sockaddr/size bind
     zero? [ dup close (io-error) ] unless ;
 
-M: unix-io <server> ( addrspec -- server )
-    [
-        SOCK_STREAM server-fd
-        dup 10 listen zero? [ dup close (io-error) ] unless
-    ] keep <server-port> ;
+M: unix-io (server) ( addrspec -- handle )
+    SOCK_STREAM server-fd
+    dup 10 listen zero? [ dup close (io-error) ] unless ;
 
-M: unix-io accept ( server -- client )
+M: unix-io (accept) ( server -- client-in client-out )
     #! Wait for a client connection.
     dup check-server-port
     dup wait-to-accept
     dup pending-error
-    server-port-client ;
+    server-port-client
+    { duplex-stream-in duplex-stream-out } get-slots ;
 
 ! Datagram sockets - UDP and Unix domain
 M: unix-io <datagram>
