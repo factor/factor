@@ -17,7 +17,11 @@ ARTICLE: "threads-start/stop" "Starting and stopping threads"
 ARTICLE: "threads-yield" "Yielding and suspending threads"
 "Yielding to other threads:"
 { $subsection yield }
+"Sleeping for a period of time:"
 { $subsection sleep }
+"Interruptible sleep:"
+{ $subsection nap }
+{ $subsection interrupt }
 "Threads can be suspended and woken up at some point in the future when a condition is satisfied:"
 { $subsection suspend }
 { $subsection resume }
@@ -104,7 +108,16 @@ HELP: yield
 
 HELP: sleep
 { $values { "ms" "a non-negative integer" } }
-{ $description "Suspends the current thread for " { $snippet "ms" } " milliseconds. It will not get woken up before this time period elapses, but since the multitasker is co-operative, the precise wakeup time is dependent on when other threads yield." } ;
+{ $description "Suspends the current thread for " { $snippet "ms" } " milliseconds." }
+{ $errors "Throws an error if another thread interrupted the sleep with " { $link interrupt } "." } ;
+
+HELP: nap
+{ $values { "ms/f" "a non-negative integer or " { $link f } } { "?" "a boolean indicating whether the thread was interrupted" } }
+{ $description "Suspends the current thread until another thread interrupts it with " { $link interrupt } ". If the input parameter is not " { $link f } ", then the thread will also wake up if the timeout expires before an interrupt is received." } ;
+
+HELP: interrupt
+{ $values { "thread" thread } }
+{ $description "Interrupts a sleeping thread." } ;
 
 HELP: suspend
 { $values { "quot" "a quotation with stack effect " { $snippet "( thread -- )" } } { "obj" object } }

@@ -1,4 +1,5 @@
-USING: help.syntax help.markup kernel math classes tuples ;
+USING: help.syntax help.markup kernel math classes tuples
+calendar ;
 IN: models
 
 HELP: model
@@ -142,18 +143,18 @@ HELP: delay
 { $examples
     "The following code displays a sliders and a label which is updated half a second after the slider stops changing:"
     { $code
-        "USING: models ui.gadgets.labels ui.gadgets.sliders ui.gadgets.panes ;"
+        "USING: models ui.gadgets.labels ui.gadgets.sliders ui.gadgets.panes calendar ;"
         ": <funny-slider>"
         "    0 0 0 100 <range> <x-slider> 500 over set-slider-max ;"
         "<funny-slider> dup gadget."
-        "gadget-model 500 <delay> [ number>string ] <filter>"
+        "gadget-model 1/2 seconds <delay> [ number>string ] <filter>"
         "<label-control> gadget."
     }
 } ;
 
 HELP: <delay>
-{ $values { "model" model } { "timeout" "a positive integer" } { "delay" delay } }
-{ $description "Creates a new instance of " { $link delay } ". A timer of " { $snippet "timeout" } " milliseconds must elapse from the time the underlying model last changed to when the delay model value is changed and its connections are notified." }
+{ $values { "model" model } { "timeout" dt } { "delay" delay } }
+{ $description "Creates a new instance of " { $link delay } ". The timeout must elapse from the time the underlying model last changed to when the delay model value is changed and its connections are notified." }
 { $examples "See the example in the documentation for " { $link delay } "." } ;
 
 HELP: range-value

@@ -2,18 +2,12 @@
 USING: kernel namespaces sequences splitting system combinators continuations
        parser io io.files io.launcher io.sockets prettyprint threads
        bootstrap.image benchmark vars bake smtp builder.util accessors
-       builder.benchmark ;
+       calendar
+       builder.common
+       builder.benchmark
+       builder.release ;
 
 IN: builder
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: builds-dir
-
-: builds ( -- path )
-  builds-dir get
-  home "/builds" append
-  or ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -31,8 +25,6 @@ SYMBOL: builds-dir
 : git-clone ( -- desc ) { "git" "clone" "../factor" } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-VAR: stamp
 
 : enter-build-dir ( -- )
   datestamp >stamp
@@ -89,7 +81,7 @@ VAR: stamp
     +closed+      >>stdin
     "../boot-log" >>stdout
     +stdout+      >>stderr
-    20 minutes>ms >>timeout
+    20 minutes    >>timeout
   >desc ;
 
 : builder-test-cmd ( -- cmd )
@@ -101,7 +93,7 @@ VAR: stamp
     +closed+         >>stdin
     "../test-log"    >>stdout
     +stdout+         >>stderr
-    45 minutes>ms    >>timeout
+    45 minutes       >>timeout
   >desc ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -225,7 +217,7 @@ USE: bootstrap.image.download
   ]
   [ drop ]
   recover
-  5 minutes>ms sleep
+  5 minutes sleep
   build-loop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

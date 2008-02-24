@@ -45,7 +45,10 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 
-default:
+default: misc/wordsize
+	make `./misc/target`
+
+help:
 	@echo "Run 'make' with one of the following parameters:"
 	@echo ""
 	@echo "freebsd-x86-32"
@@ -157,6 +160,9 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
+
+misc/wordsize: misc/wordsize.c
+	gcc misc/wordsize.c -o misc/wordsize
 
 clean:
 	rm -f vm/*.o

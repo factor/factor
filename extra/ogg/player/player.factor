@@ -150,7 +150,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     dup player-gadget [
         dup { player-td player-yuv } get-slots theora_decode_YUVout drop
         dup player-rgb over player-yuv yuv>rgb
-        dup player-gadget find-world dup draw-world
+        dup player-gadget find-world draw-world
     ] when ;
 
 : num-audio-buffers-processed ( player -- player n )

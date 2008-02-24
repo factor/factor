@@ -66,7 +66,8 @@ M: kqueue-mx unregister-io-task ( task mx -- )
     [ over kqueue-mx-events kevent-nth handle-kevent ] with each ;
 
 M: kqueue-mx wait-for-events ( ms mx -- )
-    swap make-timespec dupd wait-kevent handle-kevents ;
+    swap dup [ make-timespec ] when
+    dupd wait-kevent handle-kevents ;
 
 : make-proc-kevent ( pid -- kevent )
     "kevent" <c-object>

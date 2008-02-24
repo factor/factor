@@ -10,14 +10,14 @@ SYMBOL: processes
 
 [ H{ } clone processes set-global ] "io.launcher" add-init-hook
 
-TUPLE: process handle status killed? lapse ;
+TUPLE: process handle status killed? timeout ;
 
 HOOK: register-process io-backend ( process -- )
 
 M: object register-process drop ;
 
 : <process> ( handle -- process )
-    f f <lapse> process construct-boa
+    f f f process construct-boa
     V{ } clone over processes get set-at
     dup register-process ;
 
@@ -115,7 +115,9 @@ HOOK: kill-process* io-backend ( handle -- )
     t over set-process-killed?
     process-handle [ kill-process* ] when* ;
 
-M: process get-lapse process-lapse ;
+M: process timeout process-timeout ;
+
+M: process set-timeout set-process-timeout ;
 
 M: process timed-out kill-process ;
 

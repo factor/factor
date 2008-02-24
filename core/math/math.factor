@@ -5,6 +5,7 @@ IN: math
 
 GENERIC: >fixnum ( x -- y ) foldable
 GENERIC: >bignum ( x -- y ) foldable
+GENERIC: >integer ( x -- y ) foldable
 GENERIC: >float ( x -- y ) foldable
 
 MATH: number= ( x y -- ? ) foldable

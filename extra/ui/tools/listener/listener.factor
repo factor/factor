@@ -6,7 +6,7 @@ kernel models namespaces parser quotations sequences ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
-prettyprint listener debugger threads ;
+prettyprint listener debugger threads boxes ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;
@@ -161,6 +161,7 @@ M: listener-gadget handle-gesture* ( gadget gesture delegate -- ? )
 
 M: listener-gadget graft*
     dup delegate graft*
+    dup listener-gadget-input interactor-thread ?box 2drop
     restart-listener ;
 
 M: listener-gadget ungraft*

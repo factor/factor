@@ -1,6 +1,7 @@
 IN: temporary
 USING: tools.test concurrency.locks concurrency.count-downs
-locals kernel threads sequences ;
+concurrency.messaging concurrency.mailboxes locals kernel
+threads sequences calendar ;
 
 :: lock-test-0 | |
     [let | v [ V{ } clone ]
@@ -32,7 +33,7 @@ locals kernel threads sequences ;
            c [ 2 <count-down> ] |
 
            [
-               l f [
+               l [
                    yield
                    1 v push
                    yield
@@ -42,7 +43,7 @@ locals kernel threads sequences ;
            ] "Lock test 1" spawn drop
 
            [
-               l f [
+               l [
                    yield
                    3 v push
                    yield
@@ -59,8 +60,8 @@ locals kernel threads sequences ;
 [ V{ 1 2 3 4 } ] [ lock-test-1 ] unit-test
 
 [ 3 ] [
-    <reentrant-lock> dup f [
-        f [
+    <reentrant-lock> dup [
+        [
             3
         ] with-lock
     ] with-lock
@@ -68,15 +69,15 @@ locals kernel threads sequences ;
 
 [ ] [ <rw-lock> drop ] unit-test
 
-[ ] [ <rw-lock> f [ ] with-read-lock ] unit-test
+[ ] [ <rw-lock> [ ] with-read-lock ] unit-test
 
-[ ] [ <rw-lock> dup f [ f [ ] with-read-lock ] with-read-lock ] unit-test
+[ ] [ <rw-lock> dup [ [ ] with-read-lock ] with-read-lock ] unit-test
 
-[ ] [ <rw-lock> f [ ] with-write-lock ] unit-test
+[ ] [ <rw-lock> [ ] with-write-lock ] unit-test
 
-[ ] [ <rw-lock> dup f [ f [ ] with-write-lock ] with-write-lock ] unit-test
+[ ] [ <rw-lock> dup [ [ ] with-write-lock ] with-write-lock ] unit-test
 
-[ ] [ <rw-lock> dup f [ f [ ] with-read-lock ] with-write-lock ] unit-test
+[ ] [ <rw-lock> dup [ [ ] with-read-lock ] with-write-lock ] unit-test
 
 :: rw-lock-test-1 | |
     [let | l [ <rw-lock> ]
@@ -86,7 +87,7 @@ locals kernel threads sequences ;
            v [ V{ } clone ] |
 
            [
-               l f [
+               l [
                    1 v push
                    c count-down
                    yield
@@ -97,7 +98,7 @@ locals kernel threads sequences ;
 
            [
                c await
-               l f [
+               l [
                    4 v push
                    1000 sleep
                    5 v push
@@ -107,7 +108,7 @@ locals kernel threads sequences ;
 
            [
                c await
-               l f [
+               l [
                    2 v push
                    c' count-down
                ] with-read-lock
@@ -116,7 +117,7 @@ locals kernel threads sequences ;
 
            [
                c' await
-               l f [
+               l [
                    6 v push
                ] with-write-lock
                c'' count-down
@@ -135,7 +136,7 @@ locals kernel threads sequences ;
            v [ V{ } clone ] |
 
            [
-               l f [
+               l [
                    1 v push
                    c count-down
                    1000 sleep
@@ -146,7 +147,7 @@ locals kernel threads sequences ;
 
            [
                c await
-               l f [
+               l [
                    3 v push
                ] with-read-lock
                c' count-down
@@ -157,3 +158,21 @@ locals kernel threads sequences ;
     ] ;
 
 [ V{ 1 2 3 } ] [ rw-lock-test-2 ] unit-test
+
+! Test lock timeouts
+:: lock-timeout-test | |
+    [let | l [ <lock> ] |
+        [
+            l [ 1 seconds sleep ] with-lock
+        ] "Lock holder" spawn drop
+
+        [
+            l 1/10 seconds [ ] with-lock-timeout
+        ] "Lock timeout-er" spawn-linked drop
+
+        receive
+    ] ;
+
+[ lock-timeout-test ] [
+    linked-thread thread-name "Lock timeout-er" =
+] must-fail-with

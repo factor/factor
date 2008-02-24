@@ -32,3 +32,7 @@ SYMBOL: type-numbers
 
 : most-negative-fixnum ( -- n )
     first-bignum neg ;
+
+M: real >integer
+    dup most-negative-fixnum most-positive-fixnum between?
+    [ >fixnum ] [ >bignum ] if ;

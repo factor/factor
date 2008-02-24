@@ -13,7 +13,7 @@ TUPLE: thread
 name quot error-handler exit-handler
 id
 continuation state
-mailbox variables ;
+mailbox variables sleep-entry ;
 
 : self ( -- thread ) 40 getenv ; inline
 
@@ -86,19 +86,25 @@ PRIVATE>
 <PRIVATE
 
 : schedule-sleep ( thread ms -- )
-    >r check-registered r> sleep-queue heap-push ;
+    >r check-registered dup r> sleep-queue heap-push*
+    swap set-thread-sleep-entry ;
 
-: wake-up? ( heap -- ? )
+: expire-sleep? ( heap -- ? )
     dup heap-empty?
     [ drop f ] [ heap-peek nip millis <= ] if ;
 
-: wake-up ( -- )
+: expire-sleep ( thread -- )
+    f over set-thread-sleep-entry resume ;
+
+: expire-sleep-loop ( -- )
     sleep-queue
-    [ dup wake-up? ] [ dup heap-pop drop resume ] [ ] while
+    [ dup expire-sleep? ]
+    [ dup heap-pop drop expire-sleep ]
+    [ ] while
     drop ;
 
 : next ( -- )
-    wake-up
+    expire-sleep-loop
     run-queue pop-back
     dup array? [ first2 ] [ f swap ] if dup set-self
     f over set-thread-state
@@ -107,7 +113,7 @@ PRIVATE>
 
 PRIVATE>
 
-: sleep-time ( -- ms )
+: sleep-time ( -- ms/f )
     {
         { [ run-queue dlist-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
@@ -127,14 +133,36 @@ PRIVATE>
 
 : yield ( -- ) [ resume ] "yield" suspend drop ;
 
-: sleep ( ms -- )
-    >fixnum millis +
-    [ schedule-sleep ] curry
-    "sleep" suspend drop ;
+GENERIC: nap-until ( time -- ? )
+
+M: integer nap-until [ schedule-sleep ] curry "sleep" suspend ;
+
+M: f nap-until drop [ drop ] "interrupt" suspend ;
+
+GENERIC: nap ( time -- ? )
+
+M: real nap millis + >integer nap-until ;
+
+M: f nap nap-until ;
+
+: sleep-until ( time -- )
+    nap-until [ "Sleep interrupted" throw ] when ;
+
+: sleep ( time -- )
+    nap [ "Sleep interrupted" throw ] when ;
+
+: interrupt ( thread -- )
+    dup self eq? [
+        drop
+    ] [
+        dup thread-sleep-entry [ sleep-queue heap-delete ] when*
+        f over set-thread-sleep-entry
+        t swap resume-with
+    ] if ;
 
 : (spawn) ( thread -- )
     [
-        resume [
+        resume-now [
             dup set-self
             dup register-thread
             init-namespaces

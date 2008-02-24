@@ -60,7 +60,7 @@ M: object (init-stdio)
     stdout-handle <c-writer>
     stderr-handle <c-writer> ;
 
-M: object io-multiplex (sleep) ;
+M: object io-multiplex 60 60 * 1000 * or (sleep) ;
 
 M: object (file-reader)
     "rb" fopen <c-reader> ;

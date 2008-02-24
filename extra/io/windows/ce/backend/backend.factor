@@ -7,7 +7,9 @@ IN: io.windows.ce.backend
 : port-errored ( port -- )
     win32-error-string swap set-port-error ;
 
-M: windows-ce-io io-multiplex ( ms -- ) (sleep) ;
+M: windows-ce-io io-multiplex ( ms -- )
+    60 60 * 1000 * or (sleep) ;
+
 M: windows-ce-io add-completion ( handle -- ) drop ;
 
 GENERIC: wince-read ( port port-handle -- )

@@ -57,7 +57,8 @@ M: windows-nt-io add-completion ( handle -- )
     ] "I/O" suspend 3drop ;
 
 : wait-for-overlapped ( ms -- overlapped ? )
-    >r master-completion-port get-global r> ! port ms
+    >r master-completion-port get-global
+    r> INFINITE or ! timeout
     0 <int> ! bytes
     f <void*> ! key
     f <void*> ! overlapped

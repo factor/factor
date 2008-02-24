@@ -1,10 +1,6 @@
 USING: kernel layouts math namespaces sequences sequences.private ;
 IN: math.ranges
 
-: >integer ( n -- i )
-    dup most-negative-fixnum most-positive-fixnum between?
-    [ >fixnum ] [ >bignum ] if ;
-
 TUPLE: range from length step ;
 
 : <range> ( from to step -- range )

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces
 prettyprint dlists sequences threads sequences words
-timers debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
+debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render continuations init combinators
 hashtables ;
 IN: ui
@@ -131,8 +131,7 @@ SYMBOL: ui-hook
     graft-queue [ notify ] dlist-slurp ;
 
 : ui-step ( -- )
-    [ do-timers notify-queued layout-queued redraw-worlds ]
-    assert-depth ;
+    [ notify-queued layout-queued redraw-worlds ] assert-depth ;
 
 : open-world-window ( world -- )
     dup pref-dim over set-gadget-dim dup relayout graft ui-step ;
@@ -156,7 +155,6 @@ M: object close-window
     find-world [ ungraft ] when* ;
 
 : start-ui ( -- )
-    init-timers
     restore-windows? [
         restore-windows
     ] [
