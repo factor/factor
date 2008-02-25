@@ -65,15 +65,14 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: factor-binary ( -- name )
-  os
-  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
-    { "winnt"  [ "./factor-nt.exe" ] }
-    [ drop       "./factor" ] }
-  case ;
+! : factor-binary ( -- name )
+!   os "macosx" =
+!     [ "./Factor.app/Contents/MacOS/factor" ]
+!     [ "./factor" ]
+!   if ;
 
 : bootstrap-cmd ( -- cmd )
-  { factor-binary { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
+  { "./factor" { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
 
 : bootstrap ( -- desc )
   <process*>
@@ -85,7 +84,7 @@ IN: builder
   >desc ;
 
 : builder-test-cmd ( -- cmd )
-  { factor-binary "-run=builder.test" } to-strings ;
+  { "./factor" "-run=builder.test" } to-strings ;
 
 : builder-test ( -- desc )
   <process*>
@@ -178,7 +177,7 @@ SYMBOL: builder-recipients
 
 : build ( -- )
   [ (build) ] [ drop ] recover
-  maybe-release
+  build-status get [ maybe-release ] when
   [ send-builder-email ] [ drop "not sending mail" . ] recover
   ".." cd { "rm" "-rf" "factor" } run-process drop
   [ compress-image ] [ drop ] recover ;
