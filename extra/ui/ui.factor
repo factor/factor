@@ -133,6 +133,9 @@ SYMBOL: ui-hook
 : ui-step ( -- )
     [ notify-queued layout-queued redraw-worlds ] assert-depth ;
 
+: ui-wait ( -- )
+    10 sleep ;
+
 : open-world-window ( world -- )
     dup pref-dim over set-gadget-dim dup relayout graft ui-step ;
 
@@ -155,6 +158,7 @@ M: object close-window
     find-world [ ungraft ] when* ;
 
 : start-ui ( -- )
+    self ui-thread set-global
     restore-windows? [
         restore-windows
     ] [

@@ -354,7 +354,7 @@ M: windows-ui-backend (close-window)
     {
         { [ windows get empty? ] [ drop ] }
         { [ dup peek-message? ] [
-            >r [ ui-step 10 sleep ] ui-try
+            >r [ ui-step ui-wait ] ui-try
             r> event-loop
         ] }
         { [ dup MSG-message WM_QUIT = ] [ drop ] }
@@ -459,8 +459,8 @@ M: windows-ui-backend raise-window* ( world -- )
 M: windows-ui-backend set-title ( string world -- )
     world-handle [ nip win-hWnd WM_SETTEXT 0 ] 2keep
     dup win-title [ free ] when*
-    >r malloc-u16-string r>
-    dupd set-win-title alien-address
+    >r malloc-u16-string dup r>
+    set-win-title alien-address
     SendMessage drop ;
 
 M: windows-ui-backend ui
