@@ -7,11 +7,6 @@ optimizer definitions math compiler.errors threads graphs
 generic inference ;
 IN: compiler
 
-: compiled-usages ( words -- seq )
-    [ [ dup ] H{ } map>assoc dup ] keep [
-        compiled-usage [ nip +inlined+ eq? ] assoc-subset update
-    ] with each keys ;
-
 : ripple-up ( word -- )
     compiled-usage [ drop queue-compile ] assoc-each ;
 
@@ -56,7 +51,7 @@ IN: compiler
     [
         H{ } clone compile-queue set
         H{ } clone compiled set
-        compiled-usages [ queue-compile ] each
+        [ queue-compile ] each
         compile-queue get compile-loop
         compiled get >alist
     ] with-scope ;

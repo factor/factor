@@ -73,11 +73,17 @@ SYMBOL: post-compile-tasks
 : after-compilation ( quot -- )
     post-compile-tasks get push ;
 
+: call-recompile-hook ( -- )
+    changed-words get keys
+    compiled-usages recompile-hook get call ;
+
+: call-post-compile-tasks ( -- )
+    post-compile-tasks get [ call ] each ;
+
 : finish-compilation-unit ( -- )
-    changed-words get keys recompile-hook get call
-    dup [ drop crossref? ] assoc-contains?
-    post-compile-tasks get [ call ] each
-    modify-code-heap
+    call-recompile-hook
+    call-post-compile-tasks
+    dup [ drop crossref? ] assoc-contains? modify-code-heap
     changed-definitions notify-definition-observers ;
 
 : with-compilation-unit ( quot -- )
