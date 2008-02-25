@@ -14,16 +14,18 @@ TUPLE: postgresql-result-set ;
     <statement>
     postgresql-statement construct-delegate ;
 
-: <postgresql-db> ( host user pass db -- obj )
-    {
-        set-postgresql-db-host
-        set-postgresql-db-user
-        set-postgresql-db-pass
-        set-postgresql-db-db
-    } postgresql-db construct ;
+M: postgresql-db make-db* ( seq tuple -- db )
+    >r first4 r> [
+        {
+            set-postgresql-db-host
+            set-postgresql-db-user
+            set-postgresql-db-pass
+            set-postgresql-db-db
+        } set-slots
+    ] keep ;
 
 M: postgresql-db db-open ( db -- )
-    dup {
+        dup {
         postgresql-db-host
         postgresql-db-port
         postgresql-db-pgopts
@@ -35,9 +37,6 @@ M: postgresql-db db-open ( db -- )
 
 M: postgresql-db dispose ( db -- )
     db-handle PQfinish ;
-
-: with-postgresql ( host ust pass db quot -- )
-    >r <postgresql-db> r> with-disposal ;
 
 M: postgresql-statement bind-statement* ( seq statement -- )
     set-statement-bind-params ;
@@ -186,7 +185,7 @@ M: postgresql-db drop-sql-statement ( class -- seq )
         [ drop-function-sql , ] [ 2drop ] if
     ] { } make ;
 
-M: postgresql-db <insert-native-statement> ( tuple -- statement )
+M: postgresql-db <insert-native-statement> ( class -- statement )
     [
         "select add_" 0% 0%
         "(" 0%
@@ -196,7 +195,7 @@ M: postgresql-db <insert-native-statement> ( tuple -- statement )
         ");" 0%
     ] postgresql-make ;
 
-M: postgresql-db <insert-assigned-statement> ( tuple -- statement )
+M: postgresql-db <insert-assigned-statement> ( class -- statement )
     [
         "insert into " 0% 0%
         "(" 0%
@@ -207,6 +206,9 @@ M: postgresql-db <insert-assigned-statement> ( tuple -- statement )
         [ ", " 0% ] [ bind% ] interleave
         ");" 0%
     ] postgresql-make ;
+
+M: postgresql-db insert-tuple* ( tuple statement -- )
+    query-modify-tuple ;
 
 M: postgresql-db <update-tuple-statement> ( class -- statement )
     [

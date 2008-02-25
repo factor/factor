@@ -8,7 +8,7 @@ IN: temporary
 
 IN: scratchpad
 : test-db ( -- postgresql-db )
-    "localhost" "postgres" "" "factor-test" <postgresql-db> ;
+    { "localhost" "postgres" "" "factor-test" } postgresql-db ;
 IN: temporary
 
 [ ] [ test-db [ ] with-db ] unit-test
@@ -217,17 +217,9 @@ basket "BASKET"
 
 ! Insert
 [
-    "select add_puppy($1, $2);"
-    {
-        T{ sql-spec f "name" "NAME" { VARCHAR 256 } { } }
-        T{ sql-spec f "age" "AGE" INTEGER { } }
-    }
-    {
-        T{ sql-spec f "id" "ID" +native-id+ { +not-null+ } +native-id+ }
-    }
 ] [
     T{ postgresql-db } db [
-        puppy dup db-columns swap db-table insert-sql* >r >r >lower r> r>
+        puppy <insert-native-statement>
     ] with-variable
 ] unit-test
 
@@ -249,7 +241,7 @@ basket "BASKET"
     { }
 ] [
     T{ postgresql-db } db [
-        kitty dup db-columns swap db-table insert-sql* >r >r >lower r> r>
+        kitty <insert-assigned-statement>
     ] with-variable
 ] unit-test
 
@@ -272,7 +264,7 @@ basket "BASKET"
     { }
 ] [
     T{ postgresql-db } db [
-        puppy dup db-columns swap db-table update-sql* >r >r >lower r> r>
+        puppy dup db-columns swap db-table <update-tuple-statement> >r >r >lower r> r>
     ] with-variable
 ] unit-test
 
@@ -294,7 +286,7 @@ basket "BASKET"
     { }
 ] [
     T{ postgresql-db } db [
-        kitty dup db-columns swap db-table update-sql* >r >r >lower r> r>
+        kitty dup db-columns swap db-table <update-tuple-statement> >r >r >lower r> r>
     ] with-variable
 ] unit-test
 
@@ -315,7 +307,7 @@ basket "BASKET"
     { }
 ] [
     T{ postgresql-db } db [
-        puppy dup db-columns swap db-table delete-sql* >r >r >lower r> r>
+        puppy dup db-columns swap db-table <delete-tuple-statement> >r >r >lower r> r>
     ] with-variable
 ] unit-test
 
@@ -335,7 +327,7 @@ basket "BASKET"
     { }
 ] [
     T{ postgresql-db } db [
-        kitty dup db-columns swap db-table delete-sql*
+        kitty dup db-columns swap db-table <delete-tuple-statement>
     ] with-variable
 ] unit-test
 
@@ -359,6 +351,6 @@ basket "BASKET"
 ] [
     T{ postgresql-db } db [
         T{ puppy f f "Mr. Clunkers" }
-        select-by-slots-sql
+        <select-by-slots-statement>
     ] with-variable
 ] unit-test

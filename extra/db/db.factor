@@ -11,6 +11,8 @@ TUPLE: db handle ;
     ! H{ } clone H{ } clone H{ } clone
     db construct-boa ;
 
+GENERIC: make-db* ( seq class -- db )
+: make-db ( seq class -- db ) construct-empty make-db* ;
 GENERIC: db-open ( db -- )
 HOOK: db-close db ( handle -- )
 
@@ -64,7 +66,6 @@ GENERIC: more-rows? ( result-set -- ? )
     [ set-statement-bind-params ] keep
     t swap set-statement-bound? ;
 
-
 : init-result-set ( result-set -- )
     dup #rows over set-result-set-max
     0 swap set-result-set-n ;
@@ -90,11 +91,9 @@ GENERIC: more-rows? ( result-set -- ? )
 : query-map ( statement quot -- seq )
     accumulator >r query-each r> { } like ; inline
 
-: with-db ( db quot -- )
-    [
-        over db-open
-        [ db swap with-variable ] curry with-disposal
-    ] with-scope ;
+: with-db ( db seq quot -- )
+    >r make-db dup db-open db r>
+    [ db get swap [ drop ] swap compose with-disposal ] curry with-variable ;
 
 : default-query ( query -- result-set )
     query-results [ [ sql-row ] query-map ] with-disposal ;

@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.tuples
 db.types continuations namespaces db.postgresql math
-prettyprint tools.walker ;
-! db.sqlite
+prettyprint tools.walker db.sqlite ;
 IN: temporary
 
 TUPLE: person the-id the-name the-number the-real ;
@@ -38,13 +37,13 @@ SYMBOL: the-person
     ! [ ] [ person drop-table ] unit-test
     ;
 
-! : test-sqlite ( -- )
-    ! "tuples-test.db" resource-path <sqlite-db> [
-        ! test-tuples
-    ! ] with-db ;
+: test-sqlite ( -- )
+    "tuples-test.db" resource-path <sqlite-db> [
+        test-tuples
+    ] with-db ;
 
 : test-postgresql ( -- )
-    "localhost" "postgres" "" "factor-test" <postgresql-db> [
+    { "localhost" "postgres" "" "factor-test" } postgresql-db [
         test-tuples
     ] with-db ;
 

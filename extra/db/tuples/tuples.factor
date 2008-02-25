@@ -17,6 +17,11 @@ IN: db.tuples
 : db-columns ( class -- obj ) "db-columns" word-prop ;
 : db-relations ( class -- obj ) "db-relations" word-prop ;
 
+: set-primary-key ( key tuple -- )
+    [
+        class db-columns find-primary-key sql-spec-slot-name
+    ] keep set-slot-named ;
+
 ! returns a sequence of prepared-statements
 HOOK: create-sql-statement db ( class -- obj )
 HOOK: drop-sql-statement db ( class -- obj )
@@ -30,7 +35,10 @@ HOOK: <update-tuples-statement> db ( tuple -- obj )
 HOOK: <delete-tuple-statement> db ( tuple -- obj )
 HOOK: <delete-tuples-statement> db ( tuple -- obj )
 
+HOOK: <select-by-slots-statement> db ( tuple -- tuple )
+
 HOOK: row-column-typed db ( result-set n type -- sql )
+HOOK: insert-tuple* db ( tuple statement -- )
 
 : resulting-tuple ( row out-params -- tuple )
     dup first sql-spec-class construct-empty [
@@ -63,10 +71,10 @@ HOOK: row-column-typed db ( result-set n type -- sql )
 
 : insert-native ( tuple -- )
     dup class <insert-native-statement>
-    [ bind-tuple ] 2keep query-modify-tuple ;
+    [ bind-tuple ] 2keep insert-tuple* ;
 
 : insert-assigned ( tuple -- )
-    dup <insert-assigned-statement>
+    dup class <insert-assigned-statement>
     [ bind-tuple ] keep execute-statement ;
 
 : insert-tuple ( tuple -- )
@@ -83,21 +91,13 @@ HOOK: row-column-typed db ( result-set n type -- sql )
 : update-tuples ( seq -- )
     <update-tuples-statement> execute-statement ;
 
-! : persist ( tuple -- )
+: persist ( tuple -- )
+    dup class db-columns find-primary-key ;
 
-HOOK: delete-by-id db ( tuple -- )
-! : delete-tuple ( tuple -- ) -one-sql execute-statement ;
-! : delete-tuples ( seq -- ) delete-many-sql execute-statement ;
-
-HOOK: <select-by-slots-statement> db ( tuple -- tuple )
 
 : setup-select ( tuple -- statement )
     dup dup class <select-by-slots-statement>
     [ bind-tuple ] keep ;
 
-: select-tuple ( tuple -- tuple )
-    setup-select query-tuples first ;
-
 : select-tuples ( tuple -- tuple ) setup-select query-tuples ;
-
-! uniqueResult
+: select-tuple ( tuple -- tuple ) select-tuples first ;
