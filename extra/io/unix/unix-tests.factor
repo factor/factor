@@ -6,10 +6,10 @@ IN: temporary
 ! Unix domain stream sockets
 [
     [
-        "unix-domain-socket-test" resource-path delete-file
+        "unix-domain-socket-test" temp-file delete-file
     ] ignore-errors
 
-    "unix-domain-socket-test" resource-path <local>
+    "unix-domain-socket-test" temp-file <local>
     ascii <server> [
         accept [
             "Hello world" print flush
@@ -17,14 +17,14 @@ IN: temporary
         ] with-stream
     ] with-disposal
 
-    "unix-domain-socket-test" resource-path delete-file
+    "unix-domain-socket-test" temp-file delete-file
 ] "Test" spawn drop
 
 yield
 
 [ { "Hello world" "FOO" } ] [
     [
-        "unix-domain-socket-test" resource-path <local>
+        "unix-domain-socket-test" temp-file <local>
         ascii <client> [
             readln ,
             "XYZ" print flush
@@ -35,7 +35,7 @@ yield
 
 ! Unix domain datagram sockets
 [
-    "unix-domain-datagram-test" resource-path delete-file
+    "unix-domain-datagram-test" temp-file delete-file
 ] ignore-errors
 
 : server-addr "unix-domain-datagram-test" temp-file <local> ;
@@ -67,17 +67,18 @@ yield
 
         "Done" print
 
-        "unix-domain-datagram-test" resource-path delete-file
+        "unix-domain-datagram-test" temp-file delete-file
     ] with-scope
 ] "Test" spawn drop
 
 yield
 
 [
-    "unix-domain-datagram-test-2" resource-path delete-file
+    "unix-domain-datagram-test-2" temp-file delete-file
 ] ignore-errors
 
 client-addr <datagram>
+"Four" print
 "d" set
 
 [ ] [
@@ -109,7 +110,7 @@ client-addr <datagram>
 ! Test error behavior
 
 [
-    "unix-domain-datagram-test-3" resource-path delete-file
+    "unix-domain-datagram-test-3" temp-file delete-file
 ] ignore-errors
 
 "unix-domain-datagram-test-2" temp-file delete-file
