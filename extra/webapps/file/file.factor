@@ -1,14 +1,15 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar html io io.files kernel math math.parser
 http.server.responders http.server.templating namespaces parser
 sequences strings assocs hashtables debugger http.mime sorting
 html.elements logging io.encodings.binary ;
-
 IN: webapps.file
 
+SYMBOL: doc-root
+
 : serving-path ( filename -- filename )
-    "" or "doc-root" get swap path+ ;
+    "" or doc-root get swap path+ ;
 
 : file-http-date ( filename -- string )
     file-modified unix-time>timestamp timestamp>http-string ;
@@ -61,7 +62,7 @@ SYMBOL: page
 \ run-page DEBUG add-input-logging
 
 : include-page ( filename -- )
-    "doc-root" get swap path+ run-page ;
+    serving-path run-page ;
 
 : serve-fhtml ( filename -- )
     serving-html
@@ -115,14 +116,14 @@ SYMBOL: page
     ] if ;
 
 : file-responder ( -- )
-    "doc-root" get [
+    doc-root get [
         "argument" get serve-object
     ] [
         "404 doc-root not set" httpd-error
     ] if ;
 
 global [
-    ! Serves files from a directory stored in the "doc-root"
+    ! Serves files from a directory stored in the doc-root
     ! variable. You can set the variable in the global
     ! namespace, or inside the responder.
     "file" [ file-responder ] add-simple-responder

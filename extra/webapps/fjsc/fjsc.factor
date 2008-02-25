@@ -53,7 +53,7 @@ IN: webapps.fjsc
   ! the 'fjsc' responder.
   "fjsc-resources" [
    [
-     "extra/fjsc/resources/" resource-path "doc-root" set
+     "extra/fjsc/resources/" resource-path doc-root set
      file-responder
    ] with-scope
   ] add-simple-responder
@@ -62,7 +62,7 @@ IN: webapps.fjsc
   ! 'termlib'.
   "fjsc-repl-resources" [
    [
-     "extra/webapps/fjsc/resources/" resource-path "doc-root" set
+     "extra/webapps/fjsc/resources/" resource-path doc-root set
      file-responder
    ] with-scope
   ] add-simple-responder ;

@@ -178,6 +178,7 @@ SYMBOL: builder-recipients
 
 : build ( -- )
   [ (build) ] [ drop ] recover
+  maybe-release
   [ send-builder-email ] [ drop "not sending mail" . ] recover
   ".." cd { "rm" "-rf" "factor" } run-process drop
   [ compress-image ] [ drop ] recover ;

@@ -58,7 +58,7 @@ SYMBOL: cgi-root
     ] with-stream ;
 
 : serve-regular-file ( -- )
-    cgi-root get "doc-root" [ file-responder ] with-variable ;
+    cgi-root get doc-root [ file-responder ] with-variable ;
 
 : do-cgi ( name -- )
     {

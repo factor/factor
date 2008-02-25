@@ -464,9 +464,16 @@ SYMBOL: interactive-vocabs
         dup values concat prune swap keys
     ] keep ;
 
+: fix-class-words ( -- )
+    #! If a class word had a compound definition which was
+    #! removed, it must go back to being a symbol.
+    new-definitions get first2 diff
+    [ nip define-symbol ] assoc-each ;
+
 : forget-smudged ( -- )
     smudged-usage forget-all
-    over empty? [ 2dup smudged-usage-warning ] unless 2drop ;
+    over empty? [ 2dup smudged-usage-warning ] unless 2drop
+    fix-class-words ;
 
 : finish-parsing ( lines quot -- )
     file get

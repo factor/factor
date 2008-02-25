@@ -165,7 +165,6 @@ M: f nap nap-until ;
         resume-now [
             dup set-self
             dup register-thread
-            init-namespaces
             V{ } set-catchstack
             { } set-retainstack
             >r { } set-datastack r>
