@@ -31,13 +31,13 @@ SYMBOL: cgi-root
 
         "method" get >upper "REQUEST_METHOD" set
         "raw-query" get "QUERY_STRING" set
-        "Cookie" header-param "HTTP_COOKIE" set 
+        "cookie" header-param "HTTP_COOKIE" set 
 
-        "User-Agent" header-param "HTTP_USER_AGENT" set
-        "Accept" header-param "HTTP_ACCEPT" set
+        "user-agent" header-param "HTTP_USER_AGENT" set
+        "accept" header-param "HTTP_ACCEPT" set
 
         post? [
-            "Content-Type" header-param "CONTENT_TYPE" set
+            "content-type" header-param "CONTENT_TYPE" set
             "raw-response" get length number>string "CONTENT_LENGTH" set
         ] when
     ] H{ } make-assoc ;

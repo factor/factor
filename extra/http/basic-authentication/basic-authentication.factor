@@ -61,5 +61,5 @@ SYMBOL: realms
   #! Check if the user is authenticated in the given realm
   #! to run the specified quotation. If not, use Basic
   #! Authentication to ask for authorization details.
-  over "Authorization" header-param authorization-ok?
+  over "authorization" header-param authorization-ok?
   [ nip call ] [ drop authentication-error ] if ;
