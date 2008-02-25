@@ -75,12 +75,15 @@ PRIVATE>
 : sleep-queue 43 getenv ;
 
 : resume ( thread -- )
+    f over set-thread-state
     check-registered run-queue push-front ;
 
 : resume-now ( thread -- )
+    f over set-thread-state
     check-registered run-queue push-back ;
 
 : resume-with ( obj thread -- )
+    f over set-thread-state
     check-registered 2array run-queue push-front ;
 
 <PRIVATE
@@ -131,34 +134,27 @@ PRIVATE>
         self swap call next
     ] callcc1 2nip ; inline
 
-: yield ( -- ) [ resume ] "yield" suspend drop ;
+: yield ( -- ) [ resume ] f suspend drop ;
 
-GENERIC: nap-until ( time -- ? )
+GENERIC: sleep-until ( time/f -- )
 
-M: integer nap-until [ schedule-sleep ] curry "sleep" suspend ;
+M: integer sleep-until
+    [ schedule-sleep ] curry "sleep" suspend drop ;
 
-M: f nap-until drop [ drop ] "interrupt" suspend ;
+M: f sleep-until
+    drop [ drop ] "interrupt" suspend drop ;
 
-GENERIC: nap ( time -- ? )
+GENERIC: sleep ( ms -- )
 
-M: real nap millis + >integer nap-until ;
-
-M: f nap nap-until ;
-
-: sleep-until ( time -- )
-    nap-until [ "Sleep interrupted" throw ] when ;
-
-: sleep ( time -- )
-    nap [ "Sleep interrupted" throw ] when ;
+M: real sleep
+    millis + >integer sleep-until ;
 
 : interrupt ( thread -- )
-    dup self eq? [
-        drop
-    ] [
+    dup thread-state [
         dup thread-sleep-entry [ sleep-queue heap-delete ] when*
         f over set-thread-sleep-entry
-        t swap resume-with
-    ] if ;
+        dup resume
+    ] when drop ;
 
 : (spawn) ( thread -- )
     [
@@ -204,6 +200,7 @@ M: f nap nap-until ;
     initial-thread global
     [ drop f "Initial" [ die ] <thread> ] cache
     <box> over set-thread-continuation
+    f over set-thread-state
     dup register-thread
     set-self ;
 
