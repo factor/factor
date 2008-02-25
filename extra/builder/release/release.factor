@@ -1,12 +1,12 @@
 
 USING: kernel namespaces sequences combinators io.files io.launcher
-       combinators.cleave builder.common builder.util ;
+       bake combinators.cleave builder.common builder.util ;
 
 IN: builder.release
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: releases ( -- path ) builds "/releases" append ;
+: releases ( -- path ) builds "/releases" append dup make-directory ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -57,7 +57,8 @@ USING: system sequences splitting ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: move-file ( source destination -- ) swap { "mv" , , } run-process drop ;
+: move-file ( source destination -- )
+  swap { "mv" , , } bake run-process drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -114,4 +115,17 @@ USING: system sequences splitting ;
       { "macosx" [ macosx-release  ] }
     }
   case ;
-  
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: release? ( -- ? )
+  {
+    "../load-everything-vocabs"
+    "../test-all-vocabs"
+  }
+    [ eval-file empty? ]
+  all? ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: maybe-release ( -- ) release? [ release ] when ;
