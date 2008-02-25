@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http http.server.responders sequences prettyprint
-io.server logging calendar ;
+io.server logging calendar io.encodings.latin1 ;
 
 IN: http.server
 
@@ -49,7 +49,7 @@ IN: http.server
 \ parse-request NOTICE add-input-logging
 
 : httpd ( port -- )
-    internet-server "http.server" [
+    internet-server "http.server" latin1 [
         1 minutes stdio get set-timeout
         readln [ parse-request ] when*
     ] with-server ;

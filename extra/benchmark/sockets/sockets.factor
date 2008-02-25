@@ -1,9 +1,9 @@
-USING: io.sockets io.server io kernel math threads
+USING: io.sockets io.server io kernel math threads io.encodings.ascii
 debugger tools.time prettyprint concurrency.combinators ;
 IN: benchmark.sockets
 
 : simple-server ( -- )
-    7777 local-server "benchmark.sockets" [
+    7777 local-server "benchmark.sockets" ascii [
         read1 CHAR: x = [
             stop-server
         ] [

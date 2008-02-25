@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: serialize sequences concurrency.messaging
 threads io io.server qualified arrays
-namespaces kernel ;
+namespaces kernel io.encodings.binary ;
 QUALIFIED: io.sockets
 IN: concurrency.distributed
 
@@ -15,7 +15,7 @@ SYMBOL: local-node ( -- addrspec )
     [
         local-node set-global
         "concurrency.distributed"
-        [ handle-node-client ] with-server
+        binary [ handle-node-client ] with-server
     ] 2curry f spawn drop ;
 
 : start-node ( port -- )
