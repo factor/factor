@@ -6,7 +6,7 @@ IN: editors.editpadpro
 : editpadpro-path
     \ editpadpro-path get-global [
         program-files "JGsoft" path+
-        [ >lower "editpadpro.exe" tail? ] find-file-breadth
+        t [ >lower "editpadpro.exe" tail? ] find-file
     ] unless* ;
 
 : editpadpro ( file line -- )

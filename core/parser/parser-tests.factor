@@ -395,3 +395,34 @@ IN: temporary
 [ t ] [
     "foo?" "temporary" lookup word eq?
 ] unit-test
+
+[ ] [
+    "IN: temporary TUPLE: foo ; GENERIC: foo"
+    <string-reader> "redefining-a-class-5" parse-stream drop
+] unit-test
+
+[ ] [
+    "IN: temporary M: f foo ;"
+    <string-reader> "redefining-a-class-6" parse-stream drop
+] unit-test
+
+[ f ] [ f "foo" "temporary" lookup execute ] unit-test
+
+[ ] [
+    "IN: temporary TUPLE: foo ; GENERIC: foo"
+    <string-reader> "redefining-a-class-5" parse-stream drop
+] unit-test
+
+[ f ] [ f "foo" "temporary" lookup execute ] unit-test
+
+[ ] [
+    "IN: temporary TUPLE: foo ; GENERIC: foo"
+    <string-reader> "redefining-a-class-7" parse-stream drop
+] unit-test
+
+[ ] [
+    "IN: temporary TUPLE: foo ;"
+    <string-reader> "redefining-a-class-7" parse-stream drop
+] unit-test
+
+[ t ] [ "foo" "temporary" lookup symbol? ] unit-test
