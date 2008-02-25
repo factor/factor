@@ -25,7 +25,7 @@ SYMBOL: doc-root
 
 : last-modified-matches? ( filename -- bool )
     file-http-date dup [
-        "If-Modified-Since" header-param = 
+        "if-modified-since" header-param = 
     ] when ;
 
 : not-modified-response ( -- )

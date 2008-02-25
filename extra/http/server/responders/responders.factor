@@ -77,7 +77,7 @@ SYMBOL: max-post-request
 1024 256 * max-post-request set-global
 
 : content-length ( header -- n )
-    "content-length" peek at string>number dup [
+    "content-length" peek-at string>number dup [
         dup max-post-request get > [
             "Content-Length > max-post-request" throw
         ] when
