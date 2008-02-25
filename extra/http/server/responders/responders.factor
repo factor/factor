@@ -77,7 +77,7 @@ SYMBOL: max-post-request
 1024 256 * max-post-request set-global
 
 : content-length ( header -- n )
-    "Content-Length" swap at string>number dup [
+    "content-length" peek-at string>number dup [
         dup max-post-request get > [
             "Content-Length > max-post-request" throw
         ] when
@@ -136,7 +136,7 @@ LOG: log-headers DEBUG
 
 : host ( -- string )
     #! The host the current responder was called from.
-    "Host" header-param ":" split1 drop ;
+    "host" header-param ":" split1 drop ;
 
 : add-responder ( responder -- )
     #! Add a responder object to the list.

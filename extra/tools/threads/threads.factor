@@ -8,7 +8,10 @@ heaps.private system math math.parser ;
 : thread. ( thread -- )
     dup thread-id pprint-cell
     dup thread-name over [ write-object ] with-cell
-    dup thread-state "running" or [ write ] with-cell
+    dup thread-state [
+        [ dup self eq? "running" "yield" ? ] unless*
+        write
+    ] with-cell
     [
         thread-sleep-entry [
             entry-key millis [-] number>string write

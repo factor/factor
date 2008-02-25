@@ -473,9 +473,9 @@ M: timestamp year. ( timestamp -- )
 : seconds-since-midnight ( timestamp -- x )
     dup beginning-of-day timestamp- ;
 
-M: timestamp nap-until timestamp>millis nap-until ;
+M: timestamp sleep-until timestamp>millis sleep-until ;
 
-M: dt nap from-now nap-until ;
+M: dt sleep from-now sleep-until ;
 
 {
     { [ unix? ] [ "calendar.unix" ] }

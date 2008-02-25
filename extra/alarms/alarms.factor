@@ -62,7 +62,7 @@ SYMBOL: alarm-thread
 
 : alarm-thread-loop ( -- )
     alarms get-global
-    dup next-alarm nap-until drop
+    dup next-alarm sleep-until
     dup trigger-alarms
     alarm-thread-loop ;
 
