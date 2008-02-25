@@ -1,49 +1,52 @@
-USING: arrays assocs combinators.lib dlists io.files
-kernel namespaces sequences shuffle vectors ;
+USING: io.files kernel sequences new-slots accessors
+dlists arrays ;
 IN: io.paths
 
-! HOOK: library-roots io-backend ( -- seq )
-! HOOK: binary-roots io-backend ( -- seq )
+TUPLE: directory-iterator path bfs queue ;
 
-<PRIVATE
-: append-path ( path files -- paths )
-    [ >r path+ r> ] with* assoc-map ;
+: qualified-directory ( path -- seq )
+    dup directory [ first2 >r path+ r> 2array ] with map ;
 
-: get-paths ( dir -- paths )
-    dup directory append-path ;
+: push-directory ( path iter -- )
+    >r qualified-directory r> [
+        dup queue>> swap bfs>>
+        [ push-front ] [ push-back ] if
+    ] curry each ;
 
-: (walk-dir) ( path -- )
-    first2 [
-        get-paths dup keys % [ (walk-dir) ] each
+: <directory-iterator> ( path bfs? -- iterator )
+    <dlist> directory-iterator construct-boa
+    dup path>> over push-directory ;
+
+: next-file ( iter -- file/f )
+    dup queue>> dlist-empty? [ drop f ] [
+        dup queue>> pop-back first2
+        [ over push-directory next-file ] [ nip ] if
+    ] if ;
+
+: iterate-directory ( iter quot -- obj )
+    2dup >r >r >r next-file dup [
+        r> call dup [
+            r> r> 2drop
+        ] [
+            drop r> r> iterate-directory
+        ] if
     ] [
+        drop r> r> r> 3drop f
+    ] if ; inline
+
+: prepare-find-file ( path bfs? quot -- iter quot' )
+    >r <directory-iterator> r> [ keep and ] curry ; inline
+
+: find-file ( path bfs? quot -- path/f )
+    prepare-find-file iterate-directory ;
+
+: find-all-files ( path bfs? quot -- paths )
+    prepare-find-file V{ } clone [
+        [ over [ push ] [ 2drop ] if f ] curry compose
+        iterate-directory
         drop
-    ] if ;
-PRIVATE>
+    ] keep ; inline
 
-: walk-dir ( path -- seq )
-    dup directory? 2array [ (walk-dir) ] { } make ;
-
-GENERIC# find-file* 1 ( obj quot -- path/f )
-
-M: dlist find-file* ( dlist quot -- path/f )
-    over dlist-empty? [ 2drop f ] [
-        2dup >r pop-front get-paths dup r> assoc-find
-        [ drop 3nip ]
-        [ 2drop [ nip ] assoc-subset keys pick push-all-back find-file* ] if
-    ] if ;
-
-M: vector find-file* ( vector quot -- path/f )
-    over empty? [ 2drop f ] [
-        2dup >r pop get-paths dup r> assoc-find
-        [ drop 3nip ]
-        [ 2drop [ nip ] assoc-subset keys pick push-all find-file* ] if
-    ] if ;
-
-: prepare-find-file ( quot -- quot )
-    [ drop ] swap compose ;
-
-: find-file-depth ( path quot -- path/f )
-    prepare-find-file >r 1vector r> find-file* ;
-
-: find-file-breadth ( path quot -- path/f )
-    prepare-find-file >r 1dlist r> find-file* ;
+: recursive-directory ( path bfs? -- paths )
+    <directory-iterator>
+    [ dup next-file dup ] [ ] [ drop ] unfold nip ;

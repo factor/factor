@@ -5,5 +5,5 @@ IN: editors.gvim.windows
 M: windows-io gvim-path
     \ gvim-path get-global [
         program-files "vim" path+
-        [ "gvim.exe" tail? ] find-file-breadth
+        t [ "gvim.exe" tail? ] find-file
     ] unless* ;
