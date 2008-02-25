@@ -42,7 +42,7 @@ definition-observers global [ V{ } like ] change-at
 GENERIC: definitions-changed ( assoc obj -- )
 
 : add-definition-observer ( obj -- )
-    definition-observers get push ;
+    definition-observers get push-new ;
 
 : remove-definition-observer ( obj -- )
     definition-observers get delete ;

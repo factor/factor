@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables kernel models math namespaces sequences
 quotations math.vectors combinators sorting vectors dlists
-models ;
+models threads ;
 IN: ui.gadgets
 
 TUPLE: rect loc dim ;
@@ -178,13 +178,17 @@ M: array gadget-text*
 
 : forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
 
+SYMBOL: ui-thread
+
+: notify-ui-thread ( -- ) ui-thread get interrupt ;
+
 : layout-queue ( -- queue ) \ layout-queue get ;
 
 : layout-later ( gadget -- )
     #! When unit testing gadgets without the UI running, the
     #! invalid queue is not initialized and we simply ignore
     #! invalidation requests.
-    layout-queue [ push-front ] [ drop ] if* ;
+    layout-queue [ push-front notify-ui-thread ] [ drop ] if* ;
 
 DEFER: relayout
 
@@ -256,11 +260,11 @@ M: gadget layout* drop ;
 
 : queue-graft ( gadget -- )
     { f t } over set-gadget-graft-state
-    graft-queue push-front ;
+    graft-queue push-front notify-ui-thread ;
 
 : queue-ungraft ( gadget -- )
     { t f } over set-gadget-graft-state
-    graft-queue push-front ;
+    graft-queue push-front notify-ui-thread ;
 
 : graft-later ( gadget -- )
     dup gadget-graft-state {

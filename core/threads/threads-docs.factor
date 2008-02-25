@@ -19,8 +19,7 @@ ARTICLE: "threads-yield" "Yielding and suspending threads"
 { $subsection yield }
 "Sleeping for a period of time:"
 { $subsection sleep }
-"Interruptible sleep:"
-{ $subsection nap }
+"Interrupting sleep:"
 { $subsection interrupt }
 "Threads can be suspended and woken up at some point in the future when a condition is satisfied:"
 { $subsection suspend }
@@ -106,14 +105,17 @@ HELP: stop
 HELP: yield
 { $description "Adds the current thread to the end of the run queue, and switches to the next runnable thread." } ;
 
+HELP: sleep-until
+{ $values { "time/f" "a non-negative integer or " { $link f } } }
+{ $description "Suspends the current thread until the given time, or indefinitely if a value of " { $link f } " is passed in."
+$nl
+"Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;
+
 HELP: sleep
 { $values { "ms" "a non-negative integer" } }
-{ $description "Suspends the current thread for " { $snippet "ms" } " milliseconds." }
-{ $errors "Throws an error if another thread interrupted the sleep with " { $link interrupt } "." } ;
-
-HELP: nap
-{ $values { "ms/f" "a non-negative integer or " { $link f } } { "?" "a boolean indicating whether the thread was interrupted" } }
-{ $description "Suspends the current thread until another thread interrupts it with " { $link interrupt } ". If the input parameter is not " { $link f } ", then the thread will also wake up if the timeout expires before an interrupt is received." } ;
+{ $description "Suspends the current thread for " { $snippet "ms" } " milliseconds."
+$nl
+"Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;
 
 HELP: interrupt
 { $values { "thread" thread } }
