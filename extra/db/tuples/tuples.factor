@@ -32,28 +32,28 @@ HOOK: <delete-tuples-statement> db ( tuple -- obj )
 
 HOOK: row-column-typed db ( result-set n type -- sql )
 
-: resulting-tuple ( class out-params row -- tuple )
-    >r >r construct-empty r> r> rot [
-        >r [ sql-spec-type sql-type>factor-type ] keep
-        sql-spec-slot-name r> set-slot-named
-    ] curry 2each ;
+: resulting-tuple ( row out-params -- tuple )
+    dup first sql-spec-class construct-empty [
+        [
+            >r [ sql-spec-type sql-type>factor-type ] keep
+            sql-spec-slot-name r> set-slot-named
+        ] curry 2each
+    ] keep ;
 
-: query-tuple ( tuple statement -- seq )
-    dupd
+: query-tuples ( statement -- seq )
+    [ statement-out-params ] keep query-results [
+        ! out-parms result-set
+        [
+            sql-row swap resulting-tuple
+        ] with query-map
+    ] with-disposal ;
+ 
+: query-modify-tuple ( tuple statement -- )
     [ query-results [ sql-row ] with-disposal ] keep
     statement-out-params rot [
         >r [ sql-spec-type sql-type>factor-type ] keep
         sql-spec-slot-name r> set-slot-named
     ] curry 2each ;
- 
-: query-tuples ( tuple statement -- seq )
-    dup query-results [
-        statement-out-params [
-break
-            >r [ sql-spec-type sql-type>factor-type ] keep
-            sql-spec-slot-name r> set-slot-named
-        ] with with query-map
-    ] with-disposal ; 
 
 : sql-props ( class -- columns table )
     dup db-columns swap db-table ;
@@ -63,7 +63,7 @@ break
 
 : insert-native ( tuple -- )
     dup class <insert-native-statement>
-    [ bind-tuple ] 2keep query-tuple drop ;
+    [ bind-tuple ] 2keep query-modify-tuple ;
 
 : insert-assigned ( tuple -- )
     dup <insert-assigned-statement>
@@ -91,14 +91,13 @@ HOOK: delete-by-id db ( tuple -- )
 
 HOOK: <select-by-slots-statement> db ( tuple -- tuple )
 
-: setup-select ( tuple -- tuple statement )
+: setup-select ( tuple -- statement )
     dup dup class <select-by-slots-statement>
-    [ bind-tuple ] 2keep ;
+    [ bind-tuple ] keep ;
 
 : select-tuple ( tuple -- tuple )
-    setup-select query-tuple ;
+    setup-select query-tuples first ;
 
-: select-tuples ( tuple -- tuple )
-    setup-select query-tuples ;
+: select-tuples ( tuple -- tuple ) setup-select query-tuples ;
 
 ! uniqueResult
