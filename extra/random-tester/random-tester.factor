@@ -1,6 +1,6 @@
 USING: compiler continuations io kernel math namespaces
 prettyprint quotations random sequences vectors
-compile-call ;
+compiler.units ;
 USING: random-tester.databank random-tester.safe-words ;
 IN: random-tester
 
