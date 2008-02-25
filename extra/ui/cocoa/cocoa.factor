@@ -19,7 +19,7 @@ SYMBOL: stop-after-last-window?
 : event-loop ( -- )
     event-loop? [
         [
-            [ NSApp do-events ui-step ui-wait ] ui-try
+            [ NSApp do-events ui-wait ] ui-try
         ] with-autorelease-pool event-loop
     ] when ;
 

@@ -130,14 +130,31 @@ SYMBOL: ui-hook
 : notify-queued ( -- )
     graft-queue [ notify ] dlist-slurp ;
 
-: ui-step ( -- )
+: update-ui ( -- )
     [ notify-queued layout-queued redraw-worlds ] assert-depth ;
 
 : ui-wait ( -- )
     10 sleep ;
 
+: ui-try ( quot -- ) [ ui-error ] recover ;
+
+: ui-running ( quot -- )
+    t \ ui-running set-global
+    [ f \ ui-running set-global ] [ ] cleanup ; inline
+
+: ui-thread-running? ( -- ? )
+    ui-thread get-global self eq? \ ui-running get-global and ;
+
+: update-ui-loop ( -- )
+    ui-thread-running?
+    [ [ update-ui ] ui-try f sleep-until update-ui-loop ] when ;
+
+: start-ui-thread ( -- )
+    [ self ui-thread set-global update-ui-loop ]
+    "UI update" spawn drop ;
+
 : open-world-window ( world -- )
-    dup pref-dim over set-gadget-dim dup relayout graft ui-step ;
+    dup pref-dim over set-gadget-dim dup relayout graft ;
 
 : open-window ( gadget title -- )
     >r [ 1 track, ] { 0 1 } make-track r>
@@ -158,16 +175,12 @@ M: object close-window
     find-world [ ungraft ] when* ;
 
 : start-ui ( -- )
-    self ui-thread set-global
+    start-ui-thread
     restore-windows? [
         restore-windows
     ] [
         init-ui ui-hook get call
-    ] if ui-step ;
-
-: ui-running ( quot -- )
-    t \ ui-running set-global
-    [ f \ ui-running set-global ] [ ] cleanup ; inline
+    ] if update-ui ;
 
 : ui-running? ( -- ? )
     \ ui-running get-global ;
@@ -185,5 +198,3 @@ MAIN: ui
         f windows set-global
         ui-hook [ ui ] with-variable
     ] if ;
-
-: ui-try ( quot -- ) [ ui-error ] recover ;

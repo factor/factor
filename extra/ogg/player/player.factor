@@ -149,7 +149,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     dup player-gadget [
         dup { player-td player-yuv } get-slots theora_decode_YUVout drop
         dup player-rgb over player-yuv yuv>rgb
-        dup player-gadget relayout yield
+        dup player-gadget relayout-1 yield
     ] when ;
 
 : num-audio-buffers-processed ( player -- player n )

@@ -86,6 +86,13 @@ PRIVATE>
     f over set-thread-state
     check-registered 2array run-queue push-front ;
 
+: sleep-time ( -- ms/f )
+    {
+        { [ run-queue dlist-empty? not ] [ 0 ] }
+        { [ sleep-queue heap-empty? ] [ f ] }
+        { [ t ] [ sleep-queue heap-peek nip millis [-] ] }
+    } cond ;
+
 <PRIVATE
 
 : schedule-sleep ( thread ms -- )
@@ -106,22 +113,26 @@ PRIVATE>
     [ ] while
     drop ;
 
-: next ( -- )
+: next ( -- * )
     expire-sleep-loop
-    run-queue pop-back
-    dup array? [ first2 ] [ f swap ] if dup set-self
-    f over set-thread-state
-    thread-continuation box>
-    continue-with ;
+    run-queue dup dlist-empty? [
+        ! We should never be in a state where the only threads
+        ! are sleeping; the I/O wait thread is always runnable.
+        ! However, if it dies, we handle this case
+        ! semi-gracefully.
+        !
+        ! And if sleep-time outputs f, there are no sleeping
+        ! threads either... so WTF.
+        drop sleep-time [ die 0 ] unless* (sleep) next
+    ] [
+        pop-back
+        dup array? [ first2 ] [ f swap ] if dup set-self
+        f over set-thread-state
+        thread-continuation box>
+        continue-with
+    ] if ;
 
 PRIVATE>
-
-: sleep-time ( -- ms/f )
-    {
-        { [ run-queue dlist-empty? not ] [ 0 ] }
-        { [ sleep-queue heap-empty? ] [ f ] }
-        { [ t ] [ sleep-queue heap-peek nip millis [-] ] }
-    } cond ;
 
 : stop ( -- )
     self dup thread-exit-handler call
