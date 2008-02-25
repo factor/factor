@@ -54,7 +54,7 @@ GENERIC: decode-step ( buf byte ch state encoding -- buf ch state )
     decode-read-loop ;
 
 TUPLE: decoded code cr ;
-: <decoded> ( stream decoding-class -- decoded-stream )
+: <decoder> ( stream decoding-class -- decoded-stream )
     dup binary eq? [ drop ] [
         construct-empty { set-delegate set-decoded-code }
         decoded construct
@@ -126,7 +126,7 @@ TUPLE: encode-error ;
 : encode-error ( -- * ) \ encode-error construct-empty throw ;
 
 TUPLE: encoded code ;
-: <encoded> ( stream encoding-class -- encoded-stream )
+: <encoder> ( stream encoding-class -- encoded-stream )
     dup binary eq? [ drop ] [
         construct-empty { set-delegate set-encoded-code }
         encoded construct
@@ -148,12 +148,12 @@ INSTANCE: encoded plain-writer
 ! Rebinding duplex streams which have not read anything yet
 
 : reencode ( stream encoding -- newstream )
-    over encoded? [ >r delegate r> ] when <encoded> ;
+    over encoded? [ >r delegate r> ] when <encoder> ;
 
 : redecode ( stream encoding -- newstream )
-    over decoded? [ >r delegate r> ] when <decoded> ;
+    over decoded? [ >r delegate r> ] when <decoder> ;
 
-: <encoded-duplex> ( stream-in stream-out encoding -- duplex-stream )
+: <encoder-duplex> ( stream-in stream-out encoding -- duplex-stream )
     tuck reencode >r redecode r> <duplex-stream> ;
 
 ! The null encoding does nothing

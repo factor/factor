@@ -33,7 +33,7 @@ M: array client* [ (client) ] attempt-all ;
 M: object client* (client) ;
 
 : <client> ( addrspec encoding -- stream )
-    [ >r client* r> <encoded-duplex> ] keep <client-stream> ;
+    [ >r client* r> <encoder-duplex> ] keep <client-stream> ;
 
 HOOK: (server) io-backend ( addrspec -- handle )
 
@@ -43,7 +43,7 @@ HOOK: (server) io-backend ( addrspec -- handle )
 HOOK: (accept) io-backend ( server -- stream-in stream-out )
 
 : accept ( server -- client )
-    [ (accept) ] keep server-port-encoding <encoded-duplex> ;
+    [ (accept) ] keep server-port-encoding <encoder-duplex> ;
 
 HOOK: <datagram> io-backend ( addrspec -- datagram )
 

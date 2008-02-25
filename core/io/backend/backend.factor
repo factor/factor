@@ -10,8 +10,8 @@ HOOK: init-io io-backend ( -- )
 HOOK: (init-stdio) io-backend ( -- stdin stdout stderr )
 
 : init-stdio ( -- )
-    (init-stdio) utf8 <encoded> stderr set-global
-    utf8 <encoded-duplex> stdio set-global ;
+    (init-stdio) utf8 <encoder> stderr set-global
+    utf8 <encoder-duplex> stdio set-global ;
 
 HOOK: io-multiplex io-backend ( ms -- )
 
@@ -23,8 +23,8 @@ HOOK: normalize-pathname io-backend ( str -- newstr )
 
 M: object normalize-pathname ;
 
-: set-io-backend ( backend -- )
-    io-backend set-global init-io init-stdio ;
+: set-io-backend ( io-backend -- )
+    io-backend set-global init-io init-stdio die ;
 
 [ init-io embedded? [ init-stdio ] unless ]
 "io.backend" add-init-hook

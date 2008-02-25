@@ -50,7 +50,7 @@ M: growable stream-read-partial
     stream-read ;
 
 : <string-reader> ( str -- stream )
-    >sbuf dup reverse-here null-encoding <decoded> ;
+    >sbuf dup reverse-here null-encoding <decoder> ;
 
 : with-string-reader ( str quot -- )
     >r <string-reader> r> with-stream ; inline

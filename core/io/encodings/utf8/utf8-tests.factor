@@ -1,11 +1,11 @@
 USING: io.encodings.utf8 tools.test sbufs kernel io io.encodings
-sequences strings arrays unicode ;
+sequences strings arrays unicode io.streams.byte-array ;
 
 : decode-utf8-w/stream ( array -- newarray )
-    >sbuf dup reverse-here utf8 <decoded> contents ;
+    utf8 <byte-reader> contents >array ;
 
 : encode-utf8-w/stream ( array -- newarray )
-    SBUF" " clone tuck utf8 <encoded> stream-write >array ;
+    utf8 [ write ] with-byte-writer >array ;
 
 [ { CHAR: replacement-character } ] [ { BIN: 11110101 BIN: 10111111 BIN: 10000000 BIN: 11111111 } decode-utf8-w/stream >array ] unit-test
 

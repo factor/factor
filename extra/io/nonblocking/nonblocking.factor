@@ -45,7 +45,7 @@ GENERIC: close-handle ( handle -- )
     output-port <buffered-port> ;
 
 : <reader&writer> ( read-handle write-handle -- input-port output-port )
-    swap <reader> [ swap <writer> ] [ dispose ] cleanup ;
+    swap <reader> [ swap <writer> ] [ ] [ dispose drop ] cleanup ;
 
 : pending-error ( port -- )
     dup port-error f rot set-port-error [ throw ] when* ;

@@ -127,7 +127,7 @@ TUPLE: process-stream process ;
 
 : <process-stream> ( desc encoding -- stream )
     swap >descriptor
-    [ (process-stream) >r rot <encoded-duplex> r> ] keep
+    [ (process-stream) >r rot <encoder-duplex> r> ] keep
     +timeout+ swap at [ over set-timeout ] when*
     { set-delegate set-process-stream-process }
     process-stream construct ;

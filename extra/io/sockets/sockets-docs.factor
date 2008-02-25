@@ -100,12 +100,12 @@ HELP: <client>
 } ;
 
 HELP: <server>
-{ $values  { "addrspec" "an address specifier" } { "server" "a handle" } }
+{ $values  { "addrspec" "an address specifier" } { "encoding" "an encoding descriptor" } { "server" "a handle" } }
 { $description
     "Begins listening for network connections to a local address. Server objects responds to two words:"
     { $list
         { { $link dispose } " - stops listening on the port and frees all associated resources" }
-        { { $link accept } " - blocks until there is a connection" }
+        { { $link accept } " - blocks until there is a connection, and returns a stream of the encoding passed to the constructor" }
     }
 }
 { $notes
@@ -119,7 +119,7 @@ HELP: <server>
 
 HELP: accept
 { $values { "server" "a handle" } { "client" "a bidirectional stream" } }
-{ $description "Waits for a connection to a server socket created by " { $link <server> } ", and outputs a bidirectional stream when the connection has been established."
+{ $description "Waits for a connection to a server socket created by " { $link <server> } ", and outputs a bidirectional stream when the connection has been established. The encoding of this stream is the one that was passed to the server constructor."
 $nl
 "The returned client stream responds to the " { $link client-stream-addr } " word with the address of the incoming connection." }
 { $errors "Throws an error if the server socket is closed or otherwise is unavailable." } ;
@@ -139,6 +139,7 @@ HELP: <datagram>
     "To accept UDP/IP packets from the loopback interface only, use an address specifier returned by the following code, where 1234 is the desired port number:"
     { $code "\"localhost\" 1234 t resolve-host" }
     "Since " { $link resolve-host } " can return multiple address specifiers, your code must create a datagram socket for each one and co-ordinate packet sending accordingly."
+    "Datagrams are low-level binary ports that don't map onto streams, so the constructor does not use an encoding"
 }
 { $errors "Throws an error if the port is already in use, or if the OS forbids access." } ;
 

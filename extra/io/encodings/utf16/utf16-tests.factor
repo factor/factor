@@ -1,11 +1,11 @@
-USING: kernel tools.test io.encodings.utf16 arrays sbufs sequences io.encodings
-io unicode ;
+USING: kernel tools.test io.encodings.utf16 arrays sbufs
+sequences io.encodings io unicode io.streams.byte-array ;
 
 : decode-w/stream ( array encoding -- newarray )
-    >r >sbuf dup reverse-here r> <decoded> contents >array ;
+    <byte-reader> contents >array ;
 
 : encode-w/stream ( array encoding -- newarray )
-    >r SBUF" " clone tuck r> <encoded> stream-write >array ;
+    [ write ] with-byte-writer >array ;
 
 [ { CHAR: x } ] [ { 0 CHAR: x } utf16be decode-w/stream ] unit-test
 [ { HEX: 1D11E } ] [ { HEX: D8 HEX: 34 HEX: DD HEX: 1E } utf16be decode-w/stream ] unit-test

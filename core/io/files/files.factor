@@ -17,13 +17,13 @@ HOOK: (file-writer) io-backend ( path -- stream )
 HOOK: (file-appender) io-backend ( path -- stream )
 
 : <file-reader> ( path encoding -- stream )
-    swap (file-reader) swap <decoded> ;
+    swap (file-reader) swap <decoder> ;
 
 : <file-writer> ( path encoding -- stream )
-    swap (file-writer) swap <encoded> ;
+    swap (file-writer) swap <encoder> ;
 
 : <file-appender> ( path encoding -- stream )
-    swap (file-appender) swap <encoded> ;
+    swap (file-appender) swap <encoder> ;
 
 HOOK: delete-file io-backend ( path -- )
 
