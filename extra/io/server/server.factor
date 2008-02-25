@@ -30,7 +30,7 @@ LOG: accepted-connection NOTICE
         { log-service servers } "Client" spawn-vars
     ] 2keep accept-loop ; inline
 
-: server-loop ( addrspec quot -- )
+: server-loop ( addrspec encoding quot -- )
     >r <server> dup servers get push r>
     [ accept-loop ] curry with-disposal ; inline
 

@@ -8,7 +8,7 @@ IN: temporary
 ] unit-test
 
 : <resource-reader> ( resource -- stream )
-    resource-path ascii <file-reader> ;
+    resource-path binary <file-reader> ;
 
 [
     "This is a line.\rThis is another line.\r"

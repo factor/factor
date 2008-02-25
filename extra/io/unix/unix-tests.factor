@@ -10,12 +10,12 @@ IN: temporary
     ] ignore-errors
 
     "unix-domain-socket-test" resource-path <local>
-    <server> [
-        stdio get accept [
+    ascii <server> [
+        accept [
             "Hello world" print flush
             readln "XYZ" = "FOO" "BAR" ? print flush
         ] with-stream
-    ] with-stream
+    ] with-disposal
 
     "unix-domain-socket-test" resource-path delete-file
 ] "Test" spawn drop
@@ -24,8 +24,8 @@ yield
 
 [ { "Hello world" "FOO" } ] [
     [
-        "unix-domain-socket-test" resource-path <local> ascii <client>
-        [
+        "unix-domain-socket-test" resource-path <local>
+        ascii <client> [
             readln ,
             "XYZ" print flush
             readln ,

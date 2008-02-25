@@ -29,11 +29,11 @@ TUPLE: client-stream addr ;
 HOOK: (client) io-backend ( addrspec -- client-in client-out )
 
 GENERIC: client* ( addrspec -- client-in client-out )
-M: array client* [ (client) ] attempt-all ;
+M: array client* [ (client) 2array ] attempt-all first2 ;
 M: object client* (client) ;
 
 : <client> ( addrspec encoding -- stream )
-    [ >r client* r> <encoder-duplex> ] keep <client-stream> ;
+    over client* rot <encoder-duplex> <client-stream> ;
 
 HOOK: (server) io-backend ( addrspec -- handle )
 

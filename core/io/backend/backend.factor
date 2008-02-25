@@ -24,7 +24,7 @@ HOOK: normalize-pathname io-backend ( str -- newstr )
 M: object normalize-pathname ;
 
 : set-io-backend ( io-backend -- )
-    io-backend set-global init-io init-stdio die ;
+    io-backend set-global init-io init-stdio ;
 
 [ init-io embedded? [ init-stdio ] unless ]
 "io.backend" add-init-hook
