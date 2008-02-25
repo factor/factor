@@ -57,17 +57,9 @@ SYMBOL: validation-errors
         ] if*
     ] with map ;
 
-: expire-sessions ( -- )
-    sessions get-global
-    [ nip session-last-seen 20 minutes ago <=> 0 > ]
-    [ 2drop ] heap-pop-while ;
-
 : lookup-session ( hash -- session )
-    "furnace-session-id" over at sessions get-global at [
-        nip
-    ] [
-        new-session rot "furnace-session-id" swap set-at
-    ] if* ;
+    "furnace-session-id" over at get-session
+    [ ] [ new-session "furnace-session-id" roll set-at ] ?if ;
 
 : quot>query ( seq action -- hash )
     >r >array r> "action-params" word-prop
