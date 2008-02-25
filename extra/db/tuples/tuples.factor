@@ -92,7 +92,13 @@ HOOK: insert-tuple* db ( tuple statement -- )
     <update-tuples-statement> execute-statement ;
 
 : persist ( tuple -- )
-    dup class db-columns find-primary-key ;
+    dup class db-columns find-primary-key
+    sql-spec-slot-name over get-slot-named
+    [ update-tuple ] [ insert-tuple ] if ;
+
+: delete-tuple ( tuple -- )
+    dup class <delete-tuple-statement>
+    [ bind-tuple ] keep execute-statement ;
 
 
 : setup-select ( tuple -- statement )
@@ -100,4 +106,4 @@ HOOK: insert-tuple* db ( tuple statement -- )
     [ bind-tuple ] keep ;
 
 : select-tuples ( tuple -- tuple ) setup-select query-tuples ;
-: select-tuple ( tuple -- tuple ) select-tuples first ;
+: select-tuple ( tuple -- tuple/f ) select-tuples ?first ;
