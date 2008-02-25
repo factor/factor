@@ -1,5 +1,6 @@
 USING: compiler continuations io kernel math namespaces
-prettyprint quotations random sequences vectors ;
+prettyprint quotations random sequences vectors
+compile-call ;
 USING: random-tester.databank random-tester.safe-words ;
 IN: random-tester
 
