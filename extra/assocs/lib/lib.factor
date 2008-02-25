@@ -16,13 +16,16 @@ IN: assocs.lib
 : at-default ( key assoc -- value/key )
     dupd at [ nip ] when* ;
 
+: replace-at ( assoc value key -- assoc )
+    >r >r dup r> 1vector r> rot set-at ;
+
 : insert-at ( value key assoc -- )
     [ ?push ] change-at ;
 
-: peek-at* ( key assoc -- obj ? )
-    at* dup [ >r peek r> ] when ;
+: peek-at* ( assoc key -- obj ? )
+    swap at* dup [ >r peek r> ] when ;
 
-: peek-at ( key assoc -- obj )
+: peek-at ( assoc key -- obj )
     peek-at* drop ;
 
 : >multi-assoc ( assoc -- new-assoc )
