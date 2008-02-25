@@ -161,7 +161,7 @@ M: postgresql-db create-sql-statement ( class -- seq )
     [
         [ create-table-sql , ] keep
         dup db-columns find-primary-key native-id?
-        [ create-function-sql , ] [ 2drop ] if
+        [ create-function-sql , ] [ drop ] if
     ] { } make ;
 
 : drop-function-sql ( class -- statement )
@@ -176,13 +176,13 @@ M: postgresql-db create-sql-statement ( class -- seq )
 : drop-table-sql ( table -- statement )
     [
         "drop table " 0% 0% ";" 0% drop
-    ] postgresql-make dup . ;
+    ] postgresql-make ;
 
 M: postgresql-db drop-sql-statement ( class -- seq )
     [
         [ drop-table-sql , ] keep
         dup db-columns find-primary-key native-id?
-        [ drop-function-sql , ] [ 2drop ] if
+        [ drop-function-sql , ] [ drop ] if
     ] { } make ;
 
 M: postgresql-db <insert-native-statement> ( class -- statement )
