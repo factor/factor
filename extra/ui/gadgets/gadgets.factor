@@ -2,8 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables kernel models math namespaces sequences
 quotations math.vectors combinators sorting vectors dlists
-models threads ;
+models threads concurrency.messaging ;
 IN: ui.gadgets
+
+SYMBOL: ui-thread
+
+: notify-ui-thread ( -- )
+    self ui-thread get-global eq? [
+        "notify" ui-thread get-global send
+    ] unless ;
+
+: stop-ui-thread ( -- ) "stop" ui-thread get-global send ;
 
 TUPLE: rect loc dim ;
 
@@ -177,10 +186,6 @@ M: array gadget-text*
     \ invalidate swap set-gadget-layout-state ;
 
 : forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
-
-SYMBOL: ui-thread
-
-: notify-ui-thread ( -- ) ui-thread get interrupt ;
 
 : layout-queue ( -- queue ) \ layout-queue get ;
 

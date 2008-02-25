@@ -4,7 +4,7 @@ USING: arrays assocs io kernel math models namespaces
 prettyprint dlists sequences threads sequences words
 debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render continuations init combinators
-hashtables ;
+hashtables concurrency.messaging ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -142,16 +142,14 @@ SYMBOL: ui-hook
     t \ ui-running set-global
     [ f \ ui-running set-global ] [ ] cleanup ; inline
 
-: ui-thread-running? ( -- ? )
-    ui-thread get-global self eq? \ ui-running get-global and ;
-
 : update-ui-loop ( -- )
-    ui-thread-running?
-    [ [ update-ui ] ui-try f sleep-until update-ui-loop ] when ;
+    receive { { "notify" [ ] } { "stop" [ stop ] } } case
+    [ update-ui ] ui-try
+    update-ui-loop ;
 
 : start-ui-thread ( -- )
-    [ self ui-thread set-global update-ui-loop ]
-    "UI update" spawn drop ;
+    [ update-ui-loop ]
+    "UI update" spawn ui-thread set-global ;
 
 : open-world-window ( world -- )
     dup pref-dim over set-gadget-dim dup relayout graft ;
