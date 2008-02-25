@@ -33,6 +33,13 @@ SYMBOL: the-person2
 
     [ T{ person f 1 "billy" 200 3.14 } ]
     [ T{ person f 1 } select-tuple ] unit-test
+    [ ] [ the-person2 get insert-tuple ] unit-test
+    [
+        {
+            T{ person f 1 "billy" 200 3.14 }
+            T{ person f 2 "johnny" 10 3.14 }
+        }
+    ] [ T{ person f f f f 3.14 } select-tuples ] unit-test
 
     [ ] [ the-person1 get delete-tuple ] unit-test
     [ f ] [ T{ person f 1 } select-tuple ] unit-test
@@ -71,6 +78,7 @@ person "PERSON"
 } define-persistent
 
 1 "billy" 10 3.14 <assigned-person> the-person1 set
+2 "johnny" 10 3.14 <assigned-person> the-person2 set
 
 ! test-sqlite
 test-postgresql
@@ -108,4 +116,3 @@ annotation "ANNOTATION"
     [ ] [ paste create-table ] unit-test
     [ ] [ annotation create-table ] unit-test
 ] with-db
-
