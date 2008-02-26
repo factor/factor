@@ -161,3 +161,19 @@ continuations system io.streams.string ;
 [ 1+1/2 ] [
     "+01:30" [ read-rfc3339-gmt-offset ] with-string-reader
 ] unit-test
+
+: check+dt now dup clone [ rot +dt drop ] keep = ;
+
+[ t ] [ 5 seconds check+dt ] unit-test
+
+[ t ] [ 5 minutes check+dt ] unit-test
+
+[ t ] [ 5 hours check+dt ] unit-test
+
+[ t ] [ 5 days check+dt ] unit-test
+
+[ t ] [ 5 weeks check+dt ] unit-test
+
+[ t ] [ 5 months check+dt ] unit-test
+
+[ t ] [ 5 years check+dt ] unit-test
