@@ -21,10 +21,13 @@ MEMO: delimiter ( -- parser )
     [ dup delimiters member? swap CHAR: \n = not and ] satisfy
     [ 1string ] action ;
 
+: surround-with-foo ( string tag -- seq )
+    dup <foo> swap </foo> swapd 3array ;
+
 : delimited ( str html -- parser )
     [
         over token hide ,
-        text [ dup <foo> swap </foo> swapd 3array ] swapd curry action ,
+        text [ surround-with-foo ] swapd curry action ,
         token hide ,
     ] seq* ;
 
@@ -72,14 +75,22 @@ MEMO: link ( -- parser ) [ simple-link , labelled-link , ] choice* ;
 DEFER: line
 MEMO: list-item ( -- parser )
     [
-        "-" token hide ,
-        line ,
-    ] seq*
-    [ "li" <foo> swap "li" </foo> 3array ] action ;
+        "-" token hide , line ,
+    ] seq* [ "li" surround-with-foo ] action ;
 
 MEMO: list ( -- parser )
     list-item "\n" token hide list-of
-    [ "ul" <foo> swap "ul" </foo> 3array ] action ;
+    [ "ul" surround-with-foo ] action ;
+
+MEMO: table-column ( -- parser ) [ "|" token text ] seq* ;
+MEMO: table-row ( -- parser )
+    [
+        "|" 
+    ] seq* ; 
+MEMO: table ( -- parser )
+    [
+        "|" 
+    ] seq* ;
 
 MEMO: code ( -- parser )
     [
@@ -92,10 +103,6 @@ MEMO: code ( -- parser )
             [ any-char , "}]" token hide , ] seq* optional [ >string ] action ,
         ] seq* [ concat ] action ,
     ] seq* [ first2 swap render-code ] action ;
-
-MEMO: table-column ( -- parser ) [ "|" token text ] seq* ;
-MEMO: table-row ( -- parser ) [ ] seq* ; 
-MEMO: table ( -- parser ) [ "[" ] seq* ;
 
 MEMO: line ( -- parser )
     [
@@ -121,9 +128,3 @@ MEMO: farkup ( -- parser )
 : parse-farkup ( string -- string' )
     farkup parse parse-result-ast
     [ [ dup string? [ write ] [ drop ] if ] deep-each ] with-string-writer ;
-
-! paragraph
-    ! [
-        ! line ,
-        ! "\n" token ,
-    ! ] choice* repeat1
