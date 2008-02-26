@@ -40,6 +40,7 @@ MEMO: h1 ( -- parser ) "=" "h1" delimited ;
 MEMO: h2 ( -- parser ) "==" "h2" delimited ;
 MEMO: h3 ( -- parser ) "===" "h3" delimited ;
 MEMO: h4 ( -- parser ) "====" "h4" delimited ;
+MEMO: nl ( -- parser ) "\n" token ;
 MEMO: 2nl ( -- parser ) "\n\n" token hide ;
 
 : render-code ( string mode -- string' )
@@ -104,19 +105,25 @@ MEMO: line ( -- parser )
     ] choice* repeat1 ;
 
 MEMO: paragraph ( -- parser )
+    line
+    "\n" token over 2seq repeat0
+    "\n" token "\n" token ensure-not 2seq optional 3seq
     [
-        line ,
-        "\n" token ,
-    ] choice* repeat1 [
         dup [ dup string? not swap [ blank? ] all? or ] deep-all?
         [ "<p>" swap "</p>" 3array ] unless
     ] action ;
 
 MEMO: farkup ( -- parser )
     [
-        list , h1 , h2 , h3 , h4 , code , paragraph , 2nl ,
-    ] choice* repeat1 ;
+        list , h1 , h2 , h3 , h4 , code , paragraph , 2nl , nl ,
+    ] choice* repeat0 "\n" token optional 2seq ;
 
 : parse-farkup ( string -- string' )
     farkup parse parse-result-ast
     [ [ dup string? [ write ] [ drop ] if ] deep-each ] with-string-writer ;
+
+! paragraph
+    ! [
+        ! line ,
+        ! "\n" token ,
+    ! ] choice* repeat1
