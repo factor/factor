@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables io kernel math memory namespaces
-parser sequences strings io.styles io.streams.lines
+USING: arrays hashtables io kernel math math.parser memory
+namespaces parser sequences strings io.styles io.streams.lines
 io.streams.duplex vectors words generic system combinators
 tuples continuations debugger definitions compiler.units ;
 IN: listener
@@ -63,7 +63,7 @@ M: duplex-stream stream-read-quot
     [ listen until-quit ] if ; inline
 
 : print-banner ( -- )
-    "Factor #" write build write
+    "Factor #" write build number>string write
     " on " write os write "/" write cpu print ;
 
 : listener ( -- )
