@@ -86,7 +86,8 @@ concurrency.futures
 concurrency.locks
 concurrency.semaphores
 concurrency.count-downs
-concurrency.exchangers ;
+concurrency.exchangers
+concurrency.flags ;
 
 ARTICLE: "concurrency" "Concurrency"
 "Factor supports a variety of concurrency abstractions, however they are mostly used to multiplex input/output operations since the thread scheduling is co-operative and only one CPU is used at a time."
@@ -106,6 +107,7 @@ $nl
 { $subsection "concurrency.semaphores" }
 { $subsection "concurrency.count-downs" }
 { $subsection "concurrency.exchangers" }
+{ $subsection "concurrency.flags" }
 "Other concurrency abstractions include " { $vocab-link "concurrency.distributed" } " and " { $vocab-link "channels" } "." ;
 
 ARTICLE: "objects" "Objects"

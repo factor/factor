@@ -65,15 +65,8 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: factor-binary ( -- name )
-  os
-  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
-    { "winnt"  [ "./factor-nt.exe" ] }
-    [ drop       "./factor" ] }
-  case ;
-
 : bootstrap-cmd ( -- cmd )
-  { factor-binary { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
+  { "./factor" { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
 
 : bootstrap ( -- desc )
   <process*>
@@ -85,7 +78,7 @@ IN: builder
   >desc ;
 
 : builder-test-cmd ( -- cmd )
-  { factor-binary "-run=builder.test" } to-strings ;
+  { "./factor" "-run=builder.test" } to-strings ;
 
 : builder-test ( -- desc )
   <process*>
@@ -147,7 +140,11 @@ SYMBOL: build-status
     
     show-benchmark-deltas
 
-    "../benchmarks" "../../benchmarks" copy-file    
+    "../benchmarks" "../../benchmarks" copy-file
+
+    ".." cd
+
+    maybe-release
 
   ] with-file-writer
 
@@ -168,7 +165,7 @@ SYMBOL: builder-recipients
     builder-from get        >>from
     builder-recipients get  >>to
     subject                 >>subject
-    "../report" file>string >>body
+    "./report" file>string >>body
   send ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -177,11 +174,11 @@ SYMBOL: builder-recipients
   { "bzip2" my-boot-image-name } to-strings run-process drop ;
 
 : build ( -- )
-  [ (build) ] [ drop ] recover
-  maybe-release
+  [ (build) ] failsafe
+  builds cd stamp> cd
   [ send-builder-email ] [ drop "not sending mail" . ] recover
-  ".." cd { "rm" "-rf" "factor" } run-process drop
-  [ compress-image ] [ drop ] recover ;
+  { "rm" "-rf" "factor" } run-process drop
+  [ compress-image ] failsafe ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -216,8 +213,7 @@ USE: bootstrap.image.download
       [ build ]
     when
   ]
-  [ drop ]
-  recover
+  failsafe
   5 minutes sleep
   build-loop ;
 

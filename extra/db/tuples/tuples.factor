@@ -50,10 +50,7 @@ HOOK: insert-tuple* db ( tuple statement -- )
 
 : query-tuples ( statement -- seq )
     [ statement-out-params ] keep query-results [
-        ! out-parms result-set
-        [
-            sql-row swap resulting-tuple
-        ] with query-map
+        [ sql-row swap resulting-tuple ] with query-map
     ] with-disposal ;
  
 : query-modify-tuple ( tuple statement -- )
@@ -91,13 +88,13 @@ HOOK: insert-tuple* db ( tuple statement -- )
 : update-tuples ( seq -- )
     <update-tuples-statement> execute-statement ;
 
-: persist ( tuple -- )
-    dup class db-columns find-primary-key ;
-
+: delete-tuple ( tuple -- )
+    dup class <delete-tuple-statement>
+    [ bind-tuple ] keep execute-statement ;
 
 : setup-select ( tuple -- statement )
     dup dup class <select-by-slots-statement>
     [ bind-tuple ] keep ;
 
 : select-tuples ( tuple -- tuple ) setup-select query-tuples ;
-: select-tuple ( tuple -- tuple ) select-tuples first ;
+: select-tuple ( tuple -- tuple/f ) select-tuples ?first ;

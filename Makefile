@@ -145,7 +145,8 @@ wince-arm:
 
 macosx.app: factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
-	cp $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
+	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
+	ln -s Factor.app/Contents/MacOS/factor ./factor
 	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks
 
 	install_name_tool \

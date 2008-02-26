@@ -15,8 +15,11 @@ TUPLE: windows-ui-backend ;
 : lf>crlf [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
 
 : enum-clipboard ( -- seq )
-    0 [ EnumClipboardFormats win32-error dup dup 0 > ] [ ]
-    { } unfold nip ;
+    0
+    [ EnumClipboardFormats win32-error dup dup 0 > ]
+    [ ]
+    [ drop ]
+    unfold nip ;
 
 : with-clipboard ( quot -- )
     f OpenClipboard win32-error=0/f
@@ -40,13 +43,12 @@ TUPLE: windows-ui-backend ;
 : copy ( str -- )
     lf>crlf [
         string>u16-alien
-        f OpenClipboard win32-error=0/f
         EmptyClipboard win32-error=0/f
         GMEM_MOVEABLE over length 1+ GlobalAlloc
             dup win32-error=0/f
     
         dup GlobalLock dup win32-error=0/f
-        rot dup length memcpy
+        swapd byte-array>memory
         dup GlobalUnlock win32-error=0/f
         CF_UNICODETEXT swap SetClipboardData win32-error=0/f
     ] with-clipboard ;
@@ -72,30 +74,28 @@ SYMBOL: mouse-captured
 : style ( -- n ) WS_OVERLAPPEDWINDOW ; inline
 : ex-style ( -- n ) WS_EX_APPWINDOW WS_EX_WINDOWEDGE bitor ; inline
 
-: adjust-RECT ( RECT -- )
-    style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
-
-: make-RECT ( width height -- RECT )
-    "RECT" <c-object> [ set-RECT-bottom ] keep [ set-RECT-right ] keep ;
-
-: make-adjusted-RECT ( width height -- RECT )
-    make-RECT dup adjust-RECT ;
-
-: get-RECT-dimensions ( RECT -- width height )
-    [ RECT-right ] keep [ RECT-left - ] keep
-    [ RECT-bottom ] keep RECT-top - ;
-
 : get-RECT-top-left ( RECT -- x y )
     [ RECT-left ] keep RECT-top ;
+
+: get-RECT-dimensions ( RECT -- x y width height )
+    [ get-RECT-top-left ] keep
+    [ RECT-right ] keep [ RECT-left - ] keep
+    [ RECT-bottom ] keep RECT-top - ;
 
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
     #! only paint if width/height both > 0
-    3drop window draw-world ;
+    3drop window relayout-1 ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
-    [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array 2nip
-    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ui-step ] if ;
+    2nip
+    [ lo-word ] keep hi-word 2array
+    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ] if ;
+
+: handle-wm-move ( hWnd uMsg wParam lParam -- )
+    2nip
+    [ lo-word ] keep hi-word 2array
+    swap window set-world-loc ;
 
 : wm-keydown-codes ( -- key )
     H{
@@ -240,7 +240,7 @@ M: windows-ui-backend (close-window)
 
 : mouse-absolute>relative ( lparam handle -- array )
     >r >lo-hi r>
-    0 0 make-RECT [ GetWindowRect win32-error=0/f ] keep
+    "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep
     get-RECT-top-left 2array v- ;
 
 : mouse-event>gesture ( uMsg -- button )
@@ -317,6 +317,7 @@ M: windows-ui-backend (close-window)
                 { [ dup WM_PAINT = ]
                       [ drop 4dup handle-wm-paint DefWindowProc ] }
                 { [ dup WM_SIZE = ]      [ drop handle-wm-size 0 ] }
+                { [ dup WM_MOVE = ]      [ drop handle-wm-move 0 ] }
 
                 ! Keyboard events
                 { [ dup WM_KEYDOWN = over WM_SYSKEYDOWN = or ]
@@ -352,14 +353,12 @@ M: windows-ui-backend (close-window)
 : event-loop ( msg -- )
     {
         { [ windows get empty? ] [ drop ] }
-        { [ dup peek-message? ] [
-            >r [ ui-step 10 sleep ] ui-try
-            r> event-loop
-        ] }
+        { [ dup peek-message? ] [ ui-wait event-loop ] }
         { [ dup MSG-message WM_QUIT = ] [ drop ] }
         { [ t ] [
             dup TranslateMessage drop
             dup DispatchMessage drop
+            yield
             event-loop
         ] }
     } cond ;
@@ -383,13 +382,26 @@ M: windows-ui-backend (close-window)
         RegisterClassEx dup win32-error=0/f
     ] when ;
 
-: create-window ( width height -- hwnd )
+: adjust-RECT ( RECT -- )
+    style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
+
+: make-RECT ( world -- RECT )
+    dup world-loc { 40 40 } vmax dup rot rect-dim v+
+    "RECT" <c-object>
+    over first over set-RECT-right
+    swap second over set-RECT-bottom
+    over first over set-RECT-left
+    swap second over set-RECT-top ;
+
+: make-adjusted-RECT ( rect -- RECT )
+    make-RECT dup adjust-RECT ;
+
+: create-window ( rect -- hwnd )
     make-adjusted-RECT
     >r class-name-ptr get-global f r>
     >r >r >r ex-style r> r>
         { WS_CLIPSIBLINGS WS_CLIPCHILDREN style } flags
-        CW_USEDEFAULT dup r>
-    get-RECT-dimensions
+    r> get-RECT-dimensions
     f f f GetModuleHandle f CreateWindowEx dup win32-error=0/f ;
 
 : show-window ( hWnd -- )
@@ -424,7 +436,7 @@ M: windows-ui-backend (close-window)
     get-dc dup setup-pixel-format dup get-rc ;
 
 M: windows-ui-backend (open-window) ( world -- )
-    [ rect-dim first2 create-window dup setup-gl ] keep
+    [ create-window dup setup-gl ] keep
     [ f <win> ] keep
     [ swap win-hWnd register-window ] 2keep
     dupd set-world-handle
@@ -445,8 +457,8 @@ M: windows-ui-backend raise-window* ( world -- )
 M: windows-ui-backend set-title ( string world -- )
     world-handle [ nip win-hWnd WM_SETTEXT 0 ] 2keep
     dup win-title [ free ] when*
-    >r malloc-u16-string r>
-    dupd set-win-title alien-address
+    >r malloc-u16-string dup r>
+    set-win-title alien-address
     SendMessage drop ;
 
 M: windows-ui-backend ui

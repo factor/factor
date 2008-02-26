@@ -1,5 +1,5 @@
 USING: assocs calendar init kernel math.parser
-namespaces random boxes alarms ;
+namespaces random boxes alarms combinators.lib ;
 IN: furnace.sessions
 
 SYMBOL: sessions
@@ -11,9 +11,8 @@ SYMBOL: sessions
 ] "furnace.sessions" add-init-hook
 
 : new-session-id ( -- str )
-    4 big-random >hex
-    dup sessions get-global key?
-    [ drop new-session-id ] when ;
+    [ 4 big-random >hex ]
+    [ sessions get-global key? not ] generate ;
 
 TUPLE: session id namespace alarm user-agent ;
 

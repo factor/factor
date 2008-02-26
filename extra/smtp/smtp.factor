@@ -114,7 +114,7 @@ LOG: smtp-response DEBUG
 
 : extract-email ( recepient -- email )
     #! This could be much smarter.
-    " " last-split1 [ ] [ ] ?if "<" ?head drop ">" ?tail drop ;
+    " " last-split1 swap or "<" ?head drop ">" ?tail drop ;
 
 : message-id ( -- string )
     [

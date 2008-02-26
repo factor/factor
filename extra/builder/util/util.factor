@@ -105,3 +105,7 @@ USING: bootstrap.image bootstrap.image.download io.streams.null ;
 USE: prettyprint
 
 : to-file ( object file -- ) [ . ] with-file-writer ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: failsafe ( quot -- ) [ drop ] recover ;

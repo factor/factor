@@ -15,7 +15,7 @@ USING: kernel alien ogg ogg.vorbis ogg.theora io byte-arrays
        namespaces threads shuffle opengl arrays ui.gadgets.worlds
        combinators math.parser ui.gadgets ui.render opengl.gl ui
        continuations io.files hints combinators.lib sequences.lib
-       io.encodings.binary ;
+       io.encodings.binary debugger ;
 
 IN: ogg.player
 
@@ -150,7 +150,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     dup player-gadget [
         dup { player-td player-yuv } get-slots theora_decode_YUVout drop
         dup player-rgb over player-yuv yuv>rgb
-        dup player-gadget find-world draw-world
+        dup player-gadget relayout-1 yield
     ] when ;
 
 : num-audio-buffers-processed ( player -- player n )
@@ -178,7 +178,7 @@ HINTS: yuv>rgb byte-array byte-array ;
 : append-audio ( player -- player bool )
     num-audio-buffers-processed {
         { [ over player-buffers length 1 = over zero? and ] [ drop append-new-audio-buffer t ] }
-        { [ over player-buffers length 2 = over zero? and ] [ 0 sleep drop f ] }
+        { [ over player-buffers length 2 = over zero? and ] [ yield drop f ] }
         { [ t ] [ fill-processed-audio-buffer t ] }
     } cond ;
 
@@ -603,8 +603,7 @@ M: theora-gadget draw-gadget* ( gadget -- )
     parse-remaining-headers
     initialize-decoder
     dup player-gadget [ initialize-gui ] when*
-    [ decode ] [ drop ] recover
-!    decode
+    [ decode ] try
     wait-for-sound
     cleanup
     drop ;

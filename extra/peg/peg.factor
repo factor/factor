@@ -306,8 +306,14 @@ MEMO: range ( min max -- parser )
 : seq ( seq -- parser )
   seq-parser construct-boa init-parser ;
 
+: seq* ( quot -- paser )
+  { } make seq ; inline 
+
 : choice ( seq -- parser )
   choice-parser construct-boa init-parser ;
+
+: choice* ( quot -- paser )
+  { } make choice ; inline 
 
 MEMO: repeat0 ( parser -- parser )
   repeat0-parser construct-boa init-parser ;
