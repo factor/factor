@@ -126,8 +126,8 @@ USING: system sequences splitting ;
 
 : release? ( -- ? )
   {
-    "../load-everything-vocabs"
-    "../test-all-vocabs"
+    "./load-everything-vocabs"
+    "./test-all-vocabs"
   }
     [ eval-file empty? ]
   all? ;
