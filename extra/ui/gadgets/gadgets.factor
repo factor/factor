@@ -2,17 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables kernel models math namespaces sequences
 quotations math.vectors combinators sorting vectors dlists
-models threads concurrency.messaging ;
+models threads concurrency.flags ;
 IN: ui.gadgets
 
-SYMBOL: ui-thread
+SYMBOL: ui-notify-flag
 
-: notify-ui-thread ( -- )
-    self ui-thread get-global eq? [
-        "notify" ui-thread get-global send
-    ] unless ;
-
-: stop-ui-thread ( -- ) "stop" ui-thread get-global send ;
+: notify-ui-thread ( -- ) ui-notify-flag get-global raise-flag ;
 
 TUPLE: rect loc dim ;
 

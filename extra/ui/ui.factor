@@ -4,7 +4,7 @@ USING: arrays assocs io kernel math models namespaces
 prettyprint dlists sequences threads sequences words
 debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render continuations init combinators
-hashtables concurrency.messaging ;
+hashtables concurrency.flags ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -138,18 +138,25 @@ SYMBOL: ui-hook
 
 : ui-try ( quot -- ) [ ui-error ] recover ;
 
+SYMBOL: ui-thread
+
 : ui-running ( quot -- )
     t \ ui-running set-global
     [ f \ ui-running set-global ] [ ] cleanup ; inline
 
+: ui-running? ( -- ? )
+    \ ui-running get-global ;
+
 : update-ui-loop ( -- )
-    receive { { "notify" [ ] } { "stop" [ stop ] } } case
-    [ update-ui ] ui-try
-    update-ui-loop ;
+    ui-running? ui-thread get-global self eq? [
+        ui-notify-flag get lower-flag
+        [ update-ui ] ui-try
+        update-ui-loop
+    ] when ;
 
 : start-ui-thread ( -- )
-    [ update-ui-loop ]
-    "UI update" spawn ui-thread set-global ;
+    [ self ui-thread set-global update-ui-loop ]
+    "UI update" spawn drop ;
 
 : open-world-window ( world -- )
     dup pref-dim over set-gadget-dim dup relayout graft ;
@@ -173,17 +180,17 @@ M: object close-window
     find-world [ ungraft ] when* ;
 
 : start-ui ( -- )
-    start-ui-thread
     restore-windows? [
         restore-windows
     ] [
         init-ui ui-hook get call
-    ] if update-ui ;
+    ] if
+    notify-ui-thread start-ui-thread ;
 
-: ui-running? ( -- ? )
-    \ ui-running get-global ;
-
-[ f \ ui-running set-global ] "ui" add-init-hook
+[
+    f \ ui-running set-global
+    <flag> ui-notify-flag set-global
+] "ui" add-init-hook
 
 HOOK: ui ui-backend ( -- )
 

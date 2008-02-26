@@ -1,4 +1,4 @@
-USING: arrays compiler generic hashtables inference kernel
+USING: arrays compiler.units generic hashtables inference kernel
 kernel.private math optimizer prettyprint sequences sbufs
 strings tools.test vectors words sequences.private quotations
 optimizer.backend classes inference.dataflow tuples.private

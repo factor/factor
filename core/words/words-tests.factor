@@ -1,6 +1,6 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
-vocabs continuations tuples compiler.units ;
+vocabs continuations tuples compiler.units io.streams.string ;
 IN: temporary
 
 [ 4 ] [
@@ -156,11 +156,13 @@ SYMBOL: quot-uses-b
 [ f ] [ "symbol-generic" "temporary" lookup generic? ] unit-test
 
 [ ] [
-    "IN: temporary GENERIC: symbol-generic" eval
+    "IN: temporary GENERIC: symbol-generic" <string-reader>
+    "symbol-generic-test" parse-stream drop
 ] unit-test
 
 [ ] [
-    "IN: temporary TUPLE: symbol-generic ;" eval
+    "IN: temporary TUPLE: symbol-generic ;" <string-reader>
+    "symbol-generic-test" parse-stream drop
 ] unit-test
 
 [ t ] [ "symbol-generic" "temporary" lookup symbol? ] unit-test
