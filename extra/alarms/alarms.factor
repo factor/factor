@@ -29,10 +29,10 @@ SYMBOL: alarm-thread
     notify-alarm-thread ;
 
 : alarm-expired? ( alarm now -- ? )
-    >r alarm-time r> <=> 0 <= ;
+    >r alarm-time r> before=? ;
 
 : reschedule-alarm ( alarm -- )
-    dup alarm-time over alarm-interval +dt
+    dup alarm-time over alarm-interval time+
     over set-alarm-time
     register-alarm ;
 
