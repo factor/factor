@@ -120,6 +120,9 @@ SYMBOL: thread-error-hook
 : recover ( try recovery -- )
     >r [ swap >c call c> drop ] curry r> ifcc ; inline
 
+: ignore-errors ( quot -- )
+    [ drop ] recover ; inline
+
 : cleanup ( try cleanup-always cleanup-error -- )
     over >r compose [ dip rethrow ] curry
     recover r> call ; inline

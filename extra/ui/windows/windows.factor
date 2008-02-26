@@ -85,7 +85,7 @@ SYMBOL: mouse-captured
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
     #! only paint if width/height both > 0
-    3drop window relayout-1 ;
+    3drop window relayout-1 yield ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     2nip
