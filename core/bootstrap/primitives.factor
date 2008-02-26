@@ -30,7 +30,10 @@ crossref off
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
 H{ } clone changed-words set
-[ default-recompile-hook ] recompile-hook set
+
+! Trivial recompile hook. We don't want to touch the code heap
+! during stage1 bootstrap, it would just waste time.
+[ drop { } ] recompile-hook set
 
 call
 call
