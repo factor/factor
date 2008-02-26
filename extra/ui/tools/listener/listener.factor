@@ -133,7 +133,7 @@ M: stack-display tool-scroller
 
 : restart-listener ( listener -- )
     dup com-end dup clear-output
-    [ init-namespaces listener-thread ] curry
+    [ listener-thread ] curry
     "Listener" spawn drop ;
 
 : init-listener ( listener -- )

@@ -15,7 +15,7 @@ TUPLE: mailbox threads data ;
 
 : mailbox-put ( obj mailbox -- )
     [ mailbox-data push-front ] keep
-    mailbox-threads notify-all ;
+    mailbox-threads notify-all yield ;
 
 : block-unless-pred ( pred mailbox timeout -- )
     2over mailbox-data dlist-contains? [

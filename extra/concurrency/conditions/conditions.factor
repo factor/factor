@@ -8,7 +8,7 @@ IN: concurrency.conditions
     dup dlist-empty? [ drop ] [ pop-back resume-now ] if ;
 
 : notify-all ( dlist -- )
-    [ resume-now ] dlist-slurp yield ;
+    [ resume-now ] dlist-slurp ;
 
 : queue-timeout ( queue timeout -- alarm )
     #! Add an alarm which removes the current thread from the

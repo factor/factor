@@ -1,4 +1,4 @@
-USING: compiler tools.test kernel kernel.private
+USING: compiler.units tools.test kernel kernel.private
 sequences.private math.private math combinators strings
 alien arrays memory ;
 IN: temporary
