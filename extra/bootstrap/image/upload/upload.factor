@@ -17,7 +17,9 @@ bootstrap.image sequences io namespaces io.launcher math ;
 
 : upload-images ( -- )
     [
-        "scp" , boot-image-names % checksums , destination ,
+        "scp" ,
+        boot-image-names %
+        "temp/checksums.txt" , destination ,
     ] { } make try-process ;
 
 : new-images ( -- )
