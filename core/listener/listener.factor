@@ -63,7 +63,7 @@ M: duplex-stream stream-read-quot
     [ listen until-quit ] if ; inline
 
 : print-banner ( -- )
-    "Factor " write version write
+    "Factor #" write build write
     " on " write os write "/" write cpu print ;
 
 : listener ( -- )
