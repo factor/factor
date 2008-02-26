@@ -134,7 +134,7 @@ datagram-client delete-file
 
 [
     image binary [
-        B{ 1 2 } server-addr
+        B{ 1 2 } datagram-server <local>
         stdio get send
     ] with-file-reader
 ] must-fail
