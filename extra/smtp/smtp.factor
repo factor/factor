@@ -20,7 +20,7 @@ SYMBOL: esmtp           t esmtp set-global
 : with-smtp-connection ( quot -- )
     smtp-host get smtp-port get
     2dup log-smtp-connection
-    <inet> ascii <client> [ ! ASCII until encodings reconsidered
+    <inet> ascii <client> [
         smtp-domain [ host-name or ] change
         read-timeout get stdio get set-timeout
         call
