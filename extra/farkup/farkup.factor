@@ -3,15 +3,23 @@
 USING: arrays io kernel memoize namespaces peg
 peg.ebnf sequences strings html.elements xml.entities
 xmode.code2html splitting io.streams.string html
-html.elements sequences.deep unicode.categories ;
+html.elements sequences.deep ascii ;
+! unicode.categories ;
 USE: tools.walker
 IN: farkup
 
 MEMO: any-char ( -- parser ) [ drop t ] satisfy ;
 
+: delimiters ( -- string )
+    "*_^~%=[-|\\\n" ; inline
+
 MEMO: text ( -- parser )
-    [ "*_^~%=[-|\n" member? not ] satisfy repeat1
+    [ delimiters member? not ] satisfy repeat1
     [ >string escape-string ] action ;
+
+MEMO: delimiter ( -- parser )
+    [ dup delimiters member? swap CHAR: \n = not and ] satisfy
+    [ 1string ] action ;
 
 : delimited ( str html -- parser )
     [
@@ -19,6 +27,9 @@ MEMO: text ( -- parser )
         text [ dup <foo> swap </foo> swapd 3array ] swapd curry action ,
         token hide ,
     ] seq* ;
+
+MEMO: escaped-char ( -- parser )
+    [ "\\" token hide , any-char , ] seq* [ >string ] action ;
 
 MEMO: strong ( -- parser ) "*" "strong" delimited ;
 MEMO: emphasis ( -- parser ) "_" "em" delimited ;
@@ -89,16 +100,17 @@ MEMO: line ( -- parser )
     [
         text , strong , emphasis , link ,
         superscript , subscript , inline-code ,
+        escaped-char , delimiter ,
     ] choice* repeat1 ;
 
 MEMO: paragraph ( -- parser )
     [
-        line [
-            dup [ [ blank? ] all? ] deep-all?
-            [ "<p>" swap "</p>" 3array ] unless
-        ] action ,
-        "\n" token hide ,
-    ] choice* ;
+        line ,
+        "\n" token ,
+    ] choice* repeat1 [
+        dup [ dup string? not swap [ blank? ] all? or ] deep-all?
+        [ "<p>" swap "</p>" 3array ] unless
+    ] action ;
 
 MEMO: farkup ( -- parser )
     [
