@@ -15,7 +15,7 @@ IN: windows.time
     FILETIME-dwHighDateTime >64bit ;
 
 : windows-time>timestamp ( n -- timestamp )
-    10000000 /i seconds windows-1601 swap +dt ;
+    10000000 /i seconds windows-1601 swap time+ ;
 
 : windows-time ( -- n )
     "FILETIME" <c-object> [ GetSystemTimeAsFileTime ] keep
