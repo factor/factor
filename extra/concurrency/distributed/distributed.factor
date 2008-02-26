@@ -28,7 +28,7 @@ C: <remote-process> remote-process
 
 M: remote-process send ( message thread -- )
     { remote-process-id remote-process-node } get-slots
-    io.sockets:<client> [ 2array serialize ] with-stream ;
+    binary io.sockets:<client> [ 2array serialize ] with-stream ;
 
 M: thread (serialize) ( obj -- )
     thread-id local-node get-global
