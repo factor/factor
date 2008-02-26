@@ -82,15 +82,16 @@ MEMO: list ( -- parser )
     list-item "\n" token hide list-of
     [ "ul" surround-with-foo ] action ;
 
-MEMO: table-column ( -- parser ) [ "|" token text ] seq* ;
+MEMO: table-column ( -- parser )
+    text [ "td" surround-with-foo ] action ;
+
 MEMO: table-row ( -- parser )
     [
-        "|" 
-    ] seq* ; 
+        table-column "|" token hide list-of* ,
+    ] seq* [ "tr" surround-with-foo ] action ;
+
 MEMO: table ( -- parser )
-    [
-        "|" 
-    ] seq* ;
+    table-row repeat1 [ "table" surround-with-foo ] action ;
 
 MEMO: code ( -- parser )
     [
@@ -122,9 +123,26 @@ MEMO: paragraph ( -- parser )
 
 MEMO: farkup ( -- parser )
     [
-        list , h1 , h2 , h3 , h4 , code , paragraph , 2nl , nl ,
+        list , table , h1 , h2 , h3 , h4 , code , paragraph , 2nl , nl ,
     ] choice* repeat0 "\n" token optional 2seq ;
 
+: farkup. ( parse-result  -- )
+    parse-result-ast
+    [ dup string? [ write ] [ drop ] if ] deep-each ;
+
 : parse-farkup ( string -- string' )
-    farkup parse parse-result-ast
-    [ [ dup string? [ write ] [ drop ] if ] deep-each ] with-string-writer ;
+    farkup parse [ farkup. ] with-string-writer ;
+
+! MEMO: table-column ( -- parser )
+    ! text [ "td" surround-with-foo ] action ;
+! 
+! MEMO: table-row ( -- parser )
+    ! [
+        ! "|" token hide ,
+        ! table-column "|" token hide list-of ,
+        ! "|" token "\n" token 2array choice hide ,
+    ! ] seq* [ "tr" surround-with-foo ] action ;
+! 
+! MEMO: table ( -- parser )
+    ! table-row repeat1
+    ! [ "table" surround-with-foo ] action ;
