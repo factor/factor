@@ -6,7 +6,7 @@ kernel models namespaces parser quotations sequences ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
-prettyprint listener debugger threads boxes ;
+prettyprint listener debugger threads boxes concurrency.flags ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;
@@ -131,10 +131,18 @@ M: stack-display tool-scroller
         listener
     ] with-stream* ;
 
+: start-listener-thread ( listener -- )
+    [ listener-thread ] curry "Listener" spawn drop ;
+
+: wait-for-listener ( listener -- )
+    #! Wait for the listener to start.
+    listener-gadget-input interactor-flag wait-for-flag ;
+
 : restart-listener ( listener -- )
+    #! Returns when listener is ready to receive input.
     dup com-end dup clear-output
-    [ listener-thread ] curry
-    "Listener" spawn drop ;
+    dup start-listener-thread
+    wait-for-listener ;
 
 : init-listener ( listener -- )
     f <model> swap set-listener-gadget-stack ;

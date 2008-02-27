@@ -83,5 +83,7 @@ workspace "workflow" f {
 } define-command-map
 
 [
-    <workspace> "Factor workspace" open-status-window
+    <workspace>
+    dup "Factor workspace" open-status-window
+    workspace-listener wait-for-listener
 ] workspace-window-hook set-global
