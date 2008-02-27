@@ -28,7 +28,7 @@ HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )
 
 M: windows-io normalize-directory ( string -- string )
-    "\\" ?tail drop "\\*" append ;
+    normalize-pathname "\\" ?tail drop "\\*" append ;
 
 : share-mode ( -- fixnum )
     {
@@ -121,7 +121,7 @@ M: windows-io <file-writer> ( path -- stream )
 M: windows-io <file-appender> ( path -- stream )
     open-append <win32-file> <writer> ;
 
-M: windows-io rename-file ( from to -- )
+M: windows-io move-file ( from to -- )
     [ normalize-pathname ] 2apply MoveFile win32-error=0/f ;
 
 M: windows-io delete-file ( path -- )

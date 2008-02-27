@@ -1,1 +1,1 @@
-Timestamp model updated every second
+Operations on timestamps and durations

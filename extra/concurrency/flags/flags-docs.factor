@@ -21,7 +21,7 @@ HELP: lower-flag
 ARTICLE: "concurrency.flags" "Flags"
 "A " { $emphasis "flag" } " is a condition notification device which can be in one of two states: " { $emphasis "lowered" } " (the initial state) or " { $emphasis "raised" } "."
 $nl
-"The flag can be raised at any time; raising a raised flag does nothing. Lowering a flag if the flag has not been raised, it first waits for it to be raised."
+"The flag can be raised at any time; raising a raised flag does nothing. Lowering a flag if it has not been raised yet will wait for another thread to raise the flag."
 $nl
 "Essentially, a flag can be thought of as a counting semaphore where the count never goes above one."
 { $subsection flag }
