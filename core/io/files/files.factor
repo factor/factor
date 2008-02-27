@@ -135,6 +135,9 @@ HOOK: copy-file io-backend ( from to -- )
 : copy-file-to ( from to -- )
     to-directory copy-file ;
 
+: copy-files-to ( files to -- )
+    [ copy-file-to ] curry each ;
+
 DEFER: copy-tree-to
 
 : copy-tree ( from to -- )
@@ -149,6 +152,9 @@ DEFER: copy-tree-to
 
 : copy-tree-to ( from to -- )
     to-directory copy-tree ;
+
+: copy-trees-to ( files to -- )
+    [ copy-tree-to ] curry each ;
 
 ! Special paths
 : resource-path ( path -- newpath )

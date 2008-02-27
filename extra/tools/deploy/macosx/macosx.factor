@@ -12,7 +12,7 @@ IN: tools.deploy.macosx
     bundle-dir swap path+ swap "Contents" path+ copy-tree ;
 
 : copy-vm ( executable bundle-name -- vm )
-    "Contents/MacOS/" path+ swap path+ vm swap copy-file ;
+    "Contents/MacOS/" path+ swap path+ vm over copy-file ;
 
 : copy-fonts ( name -- )
     "fonts/" resource-path

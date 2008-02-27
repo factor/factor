@@ -66,4 +66,4 @@ M: unix-io delete-directory ( path -- )
     ] with-disposal ;
 
 M: unix-io copy-file ( from to -- )
-    over file-permissions >r (copy-file) r> chmod io-error ;
+    >r dup file-permissions over r> (copy-file) chmod io-error ;

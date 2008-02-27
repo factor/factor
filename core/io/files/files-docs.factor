@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io io.styles strings
-io.backend io.files.private ;
+io.backend io.files.private quotations ;
 IN: io.files
 
 ARTICLE: "file-streams" "Reading and writing files"
@@ -28,19 +28,40 @@ ARTICLE: "pathnames" "Pathname manipulation"
 { $subsection pathname }
 { $subsection <pathname> } ;
 
-ARTICLE: "file-system" "The file system"
-"File system meta-data:"
-{ $subsection exists? }
-{ $subsection directory? }
-{ $subsection file-length }
-{ $subsection file-modified }
-{ $subsection stat }
+ARTICLE: "directories" "Directories"
+"Current and home directories:"
+{ $subsection cwd }
+{ $subsection cd }
+{ $subsection with-directory }
+{ $subsection home }
 "Directory listing:"
 { $subsection directory }
 { $subsection directory* }
 "Creating directories:"
 { $subsection make-directory }
-{ $subsection make-directories }
+{ $subsection make-directories } ;
+
+ARTICLE: "fs-meta" "File meta-data"
+{ $subsection exists? }
+{ $subsection directory? }
+{ $subsection file-length }
+{ $subsection file-modified }
+{ $subsection stat } ;
+
+ARTICLE: "delete-move-copy" "Deleting, moving, copying files"
+"Operations for deleting and copying files come in two forms:"
+{ $list
+    { "Words named " { $snippet { $emphasis "operation" } "-file" } " which work on regular files only." }
+    { "Words named " { $snippet { $emphasis "operation" } "-tree" } " works on directory trees recursively, and also accepts regular files." }
+}
+"The operations for moving and copying files come in three flavors:"
+{ $list
+    { "A word named " { $snippet { $emphasis "operation" } } " which takes a source and destination path." }
+    { "A word named " { $snippet { $emphasis "operation" } "-to" } " which takes a source path and destination directory. The destination file will be stored in the destination directory and will have the same file name as the source path." }
+    { "A word named " { $snippet { $emphasis "operation" } "s-to" } " which takes a sequence of source paths and destination directory." }
+}
+"Since both of the above lists apply to copying files, that this means that there are a total of six variations on copying a file."
+$nl
 "Deleting files:"
 { $subsection delete-file }
 { $subsection delete-directory }
@@ -48,23 +69,27 @@ ARTICLE: "file-system" "The file system"
 "Moving files:"
 { $subsection move-file }
 { $subsection move-file-to }
+{ $subsection move-files-to }
 "Copying files:"
 { $subsection copy-file }
 { $subsection copy-file-to }
+{ $subsection copy-files-to }
+"Copying directory trees recursively:"
 { $subsection copy-tree }
-"Current and home directories:"
-{ $subsection cwd }
-{ $subsection cd }
-{ $subsection with-directory }
-{ $subsection home }
-{ $see-also "os" } ;
+{ $subsection copy-tree-to }
+{ $subsection copy-trees-to }
+"On most operating systems, files can only be moved within the same file system. To move files between file systems, use " { $link copy-file } " followed by " { $link delete-file } " on the old name." ;
 
 ARTICLE: "io.files" "Basic file operations"
 "The " { $vocab-link "io.files" } " vocabulary provides basic support for working with files."
-{ $subsection "file-streams" }
 { $subsection "pathnames" }
-{ $subsection "file-system" } ;
-ABOUT: "file-streams"
+{ $subsection "file-streams" }
+{ $subsection "fs-meta" }
+{ $subsection "directories" }
+{ $subsection "delete-move-copy" }
+{ $see-also "os" } ;
+
+ABOUT: "io.files"
 
 HELP: path-separator?
 { $values { "ch" "a code point" } { "?" "a boolean" } }
@@ -72,6 +97,19 @@ HELP: path-separator?
 { $examples
     "On Unix:"
     { $example "USING: io.files prettyprint ;" "CHAR: / path-separator? ." "t" }
+} ;
+
+HELP: parent-directory
+{ $values { "path" "a pathname string" } { "parent" "a pathname string" } }
+{ $description "Strips the last component off a pathname." }
+{ $examples { $example "USE: io.files" "\"/etc/passwd\" parent-directory print" "/etc/" } } ;
+
+HELP: file-name
+{ $values { "path" "a pathname string" } { "string" string } }
+{ $description "Outputs the last component of a pathname string." }
+{ $examples
+    { "\"/usr/bin/gcc\" file-name ." "\"gcc\"" }
+    { "\"/usr/libexec/awk/\" file-name ." "\"awk\"" }
 } ;
 
 HELP: <file-reader>
@@ -114,7 +152,12 @@ HELP: cd
 { $description "Changes the current working directory of the Factor process." }
 { $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
 
-{ cd cwd } related-words
+{ cd cwd with-directory } related-words
+
+HELP: with-directory
+{ $values { "path" "a pathname string" } { "quot" quotation } }
+{ $description "Changes the current working directory for the duration of a quotation's execution." }
+{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
 
 HELP: stat ( path -- directory? permissions length modified )
 { $values { "path" "a pathname string" } { "directory?" "boolean indicating if the file is a directory" } { "permissions" "a Unix permission bitmap (0 on Windows)" } { "length" "the length in bytes as an integer" } { "modified" "the last modification time, as milliseconds since midnight, January 1st 1970 GMT" } }
@@ -145,6 +188,11 @@ HELP: directory
 { $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ name dir? }" } " pairs" } }
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
 
+HELP: directory*
+{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ path dir? }" } " pairs" } }
+{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
+{ $notes "Unlike " { $link directory } ", this word prepends the directory's path to all file names in the list." } ;
+
 HELP: file-length
 { $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
 { $description "Outputs the length of the file in bytes, or " { $link f } " if it does not exist." } ;
@@ -152,19 +200,6 @@ HELP: file-length
 HELP: file-modified
 { $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
 { $description "Outputs a file's last modification time, since midnight January 1, 1970. If the file does not exist, outputs " { $link f } "." } ;
-
-HELP: parent-directory
-{ $values { "path" "a pathname string" } { "parent" "a pathname string" } }
-{ $description "Strips the last component off a pathname." }
-{ $examples { $example "USE: io.files" "\"/etc/passwd\" parent-directory print" "/etc/" } } ;
-
-HELP: file-name
-{ $values { "path" "a pathname string" } { "string" string } }
-{ $description "Outputs the last component of a pathname string." }
-{ $examples
-    { "\"/usr/bin/gcc\" file-name ." "\"gcc\"" }
-    { "\"/usr/libexec/awk/\" file-name ." "\"awk\"" }
-} ;
 
 HELP: resource-path
 { $values { "path" "a pathname string" } { "newpath" "a pathname string" } }
@@ -205,7 +240,72 @@ HELP: make-directory
 { $description "Creates a directory." }
 { $errors "Throws an error if the directory could not be created." } ;
 
+HELP: make-directories
+{ $values { "path" "a pathname string" } }
+{ $description "Creates a directory and any parent directories which do not yet exist." }
+{ $errors "Throws an error if the directories could not be created." } ;
+
 HELP: delete-directory
 { $values { "path" "a pathname string" } }
 { $description "Deletes a directory. The directory must be empty." }
 { $errors "Throws an error if the directory could not be deleted." } ;
+
+HELP: touch-file
+{ $values { "path" "a pathname string" } }
+{ $description "Updates the modification time of a file or directory. If the file does not exist, creates a new, empty file." }
+{ $errors "Throws an error if the file could not be touched." } ;
+
+HELP: delete-tree
+{ $values { "path" "a pathname string" } }
+{ $description "Deletes a file or directory, recursing into subdirectories." }
+{ $errors "Throws an error if the deletion fails." } 
+{ $warning "Misuse of this word can lead to catastrophic data loss." } ;
+
+HELP: move-file
+{ $values { "from" "a pathname string" } { "to" "a pathname string" } }
+{ $description "Moves or renames a file." }
+{ $errors "Throws an error if the file does not exist or if the move operation fails." } ;
+
+HELP: move-file-to
+{ $values { "from" "a pathname string" } { "to" "a directory pathname string" } }
+{ $description "Moves a file to another directory without renaming it." }
+{ $errors "Throws an error if the file does not exist or if the move operation fails." } ;
+
+HELP: move-files-to
+{ $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
+{ $description "Moves a set of files to another directory." }
+{ $errors "Throws an error if the file does not exist or if the move operation fails." } ;
+
+HELP: copy-file
+{ $values { "from" "a pathname string" } { "to" "a pathname string" } }
+{ $description "Copies a file." }
+{ $notes "This operation attempts to preserve the original file's attributes, however not all attributes may be preserved." }
+{ $errors "Throws an error if the file does not exist or if the copy operation fails." } ;
+
+HELP: copy-file-to
+{ $values { "from" "a pathname string" } { "to" "a directory pathname string" } }
+{ $description "Copies a file to another directory." }
+{ $errors "Throws an error if the file does not exist or if the copy operation fails." } ;
+
+HELP: copy-files-to
+{ $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
+{ $description "Copies a set of files to another directory." }
+{ $errors "Throws an error if the file does not exist or if the copy operation fails." } ;
+
+HELP: copy-tree
+{ $values { "from" "a pathname string" } { "to" "a pathname string" } }
+{ $description "Copies a directory tree recursively." }
+{ $notes "This operation attempts to preserve original file attributes, however not all attributes may be preserved." }
+{ $errors "Throws an error if the copy operation fails." } ;
+
+HELP: copy-tree-to
+{ $values { "from" "a pathname string" } { "to" "a directory pathname string" } }
+{ $description "Copies a directory tree to another directory, recursively." }
+{ $errors "Throws an error if the copy operation fails." } ;
+
+HELP: copy-trees-to
+{ $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
+{ $description "Copies a set of directory trees to another directory, recursively." }
+{ $errors "Throws an error if the copy operation fails." } ;
+
+
