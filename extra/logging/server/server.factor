@@ -3,7 +3,7 @@
 USING: namespaces kernel io calendar sequences io.files
 io.sockets continuations prettyprint assocs math.parser
 words debugger math combinators concurrency.messaging
-threads arrays init math.ranges strings ;
+threads arrays init math.ranges strings calendar.format ;
 IN: logging.server
 
 : log-root ( -- string )

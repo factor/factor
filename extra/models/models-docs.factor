@@ -153,7 +153,7 @@ HELP: delay
 } ;
 
 HELP: <delay>
-{ $values { "model" model } { "timeout" dt } { "delay" delay } }
+{ $values { "model" model } { "timeout" duration } { "delay" delay } }
 { $description "Creates a new instance of " { $link delay } ". The timeout must elapse from the time the underlying model last changed to when the delay model value is changed and its connections are notified." }
 { $examples "See the example in the documentation for " { $link delay } "." } ;
 

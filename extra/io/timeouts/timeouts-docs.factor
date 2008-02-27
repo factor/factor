@@ -2,11 +2,11 @@ IN: io.timeouts
 USING: help.markup help.syntax math kernel calendar ;
 
 HELP: timeout
-{ $values { "obj" object } { "dt/f" "a " { $link dt } " or " { $link f } } }
+{ $values { "obj" object } { "dt/f" "a " { $link duration } " or " { $link f } } }
 { $contract "Outputs an object's timeout." } ;
 
 HELP: set-timeout
-{ $values { "dt/f" "a " { $link dt } " or " { $link f } } { "obj" object } }
+{ $values { "dt/f" "a " { $link duration } " or " { $link f } } { "obj" object } }
 { $contract "Sets an object's timeout." } ;
 
 HELP: timed-out

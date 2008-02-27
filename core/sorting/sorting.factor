@@ -52,7 +52,7 @@ PRIVATE>
 
 : sort-values ( seq -- sortedseq ) [ [ second ] compare ] sort ;
 
-: sort-pair ( a b -- c d ) 2dup <=> 0 > [ swap ] when ;
+: sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;
 
 : midpoint ( seq -- elt )
     [ midpoint@ ] keep nth-unsafe ; inline
