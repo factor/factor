@@ -9,8 +9,7 @@ IN: tools.deploy.windows
     swap path+ ".exe" append vm swap [ copy-file ] keep ;
 
 : copy-fonts ( bundle-name -- )
-    "fonts/" resource-path
-    swap "fonts/" path+ copy-directory ;
+    "fonts/" resource-path swap copy-tree ;
 
 : copy-dlls ( bundle-name -- )
     {
@@ -18,7 +17,7 @@ IN: tools.deploy.windows
         "zlib1.dll"
         "factor-nt.dll"
     } [
-        dup resource-path -rot path+ copy-file
+        resource-path swap copy-file-to
     ] with each ;
 
 : create-exe-dir ( vocab bundle-name -- vm )

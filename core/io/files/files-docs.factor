@@ -3,14 +3,32 @@ io.backend io.files.private ;
 IN: io.files
 
 ARTICLE: "file-streams" "Reading and writing files"
+"File streams:"
 { $subsection <file-reader> }
 { $subsection <file-writer> }
 { $subsection <file-appender> }
+"Utility combinators:"
+{ $subsection with-file-reader }
+{ $subsection with-file-writer }
+{ $subsection with-file-appender } ;
+
+ARTICLE: "pathnames" "Pathname manipulation"
 "Pathname manipulation:"
 { $subsection parent-directory }
 { $subsection file-name }
 { $subsection last-path-separator }
 { $subsection path+ }
+"Pathnames relative to Factor's install directory:"
+{ $subsection resource-path }
+{ $subsection ?resource-path }
+"Pathnames relative to Factor's temporary files directory:"
+{ $subsection temp-directory }
+{ $subsection temp-file }
+"Pathname presentations:"
+{ $subsection pathname }
+{ $subsection <pathname> } ;
+
+ARTICLE: "file-system" "The file system"
 "File system meta-data:"
 { $subsection exists? }
 { $subsection directory? }
@@ -19,23 +37,42 @@ ARTICLE: "file-streams" "Reading and writing files"
 { $subsection stat }
 "Directory listing:"
 { $subsection directory }
-"File management:"
-{ $subsection delete-file }
+{ $subsection directory* }
+"Creating directories:"
 { $subsection make-directory }
+{ $subsection make-directories }
+"Deleting files:"
+{ $subsection delete-file }
 { $subsection delete-directory }
+{ $subsection delete-tree }
+"Moving files:"
+{ $subsection move-file }
+{ $subsection move-file-to }
+"Copying files:"
+{ $subsection copy-file }
+{ $subsection copy-file-to }
+{ $subsection copy-tree }
 "Current and home directories:"
-{ $subsection home }
 { $subsection cwd }
 { $subsection cd }
-"Pathnames relative to the Factor install directory:"
-{ $subsection resource-path }
-{ $subsection ?resource-path }
-"Pathname presentations:"
-{ $subsection pathname }
-{ $subsection <pathname> }
+{ $subsection with-directory }
+{ $subsection home }
 { $see-also "os" } ;
 
+ARTICLE: "io.files" "Basic file operations"
+"The " { $vocab-link "io.files" } " vocabulary provides basic support for working with files."
+{ $subsection "file-streams" }
+{ $subsection "pathnames" }
+{ $subsection "file-system" } ;
 ABOUT: "file-streams"
+
+HELP: path-separator?
+{ $values { "ch" "a code point" } { "?" "a boolean" } }
+{ $description "Tests if the code point is a platform-specific path separator." }
+{ $examples
+    "On Unix:"
+    { $example "USING: io.files prettyprint ;" "CHAR: / path-separator? ." "t" }
+} ;
 
 HELP: <file-reader>
 { $values { "path" "a pathname string" } { "stream" "an input stream" } }

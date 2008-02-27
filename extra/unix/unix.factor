@@ -102,6 +102,8 @@ C-STRUCT: timespec
 
 : MAP_FAILED -1 <alien> ; inline
 
+: EEXIST 17 ; inline
+
 ! ! ! Unix functions
 LIBRARY: factor
 FUNCTION: int err_no ( ) ;

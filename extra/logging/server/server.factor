@@ -68,11 +68,11 @@ SYMBOL: log-files
 
 : delete-oldest keep-logs log# ?delete-file ;
 
-: ?rename-file ( old new -- )
-    over exists? [ rename-file ] [ 2drop ] if ;
+: ?move-file ( old new -- )
+    over exists? [ move-file ] [ 2drop ] if ;
 
 : advance-log ( path n -- )
-    [ 1- log# ] 2keep log# ?rename-file ;
+    [ 1- log# ] 2keep log# ?move-file ;
 
 : rotate-log ( service -- )
     dup close-log
