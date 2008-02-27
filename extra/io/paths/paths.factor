@@ -34,19 +34,17 @@ TUPLE: directory-iterator path bfs queue ;
         drop r> r> r> 3drop f
     ] if ; inline
 
-: prepare-find-file ( path bfs? quot -- iter quot' )
-    >r <directory-iterator> r> [ keep and ] curry ; inline
-
 : find-file ( path bfs? quot -- path/f )
-    prepare-find-file iterate-directory ;
+    >r <directory-iterator> r>
+    [ keep and ] curry iterate-directory ; inline
+
+: each-file ( path bfs? quot -- )
+    >r <directory-iterator> r>
+    [ f ] compose iterate-directory drop ; inline
 
 : find-all-files ( path bfs? quot -- paths )
-    prepare-find-file V{ } clone [
-        [ over [ push ] [ 2drop ] if f ] curry compose
-        iterate-directory
-        drop
-    ] keep ; inline
+    >r <directory-iterator> r>
+    pusher >r iterate-directory drop r> ; inline
 
 : recursive-directory ( path bfs? -- paths )
-    <directory-iterator>
-    [ dup next-file dup ] [ ] [ drop ] unfold nip ;
+    [ ] accumulator >r each-file r> ;
