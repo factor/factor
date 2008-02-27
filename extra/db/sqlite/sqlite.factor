@@ -8,7 +8,9 @@ words combinators.lib db.types combinators tools.walker ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
-C: <sqlite-db> sqlite-db
+
+M: sqlite-db make-db* ( path db -- db )
+    [ set-sqlite-db-path ] keep ;
 
 M: sqlite-db db-open ( db -- )
     dup sqlite-db-path sqlite-open <db>
@@ -18,9 +20,6 @@ M: sqlite-db db-close ( handle -- )
     sqlite-close ;
 
 M: sqlite-db dispose ( db -- ) dispose-db ;
-
-: with-sqlite ( path quot -- )
-    >r <sqlite-db> r> with-db ; inline
 
 TUPLE: sqlite-statement ;
 
@@ -47,7 +46,6 @@ M: sqlite-result-set dispose ( result-set -- )
     f swap set-result-set-handle ;
 
 : sqlite-bind ( specs handle -- )
-break
     swap [ sqlite-bind-type ] with each ;
 
 M: sqlite-statement bind-statement* ( obj statement -- )
