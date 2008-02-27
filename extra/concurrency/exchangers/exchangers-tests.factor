@@ -3,7 +3,7 @@ USING: sequences tools.test concurrency.exchangers
 concurrency.count-downs concurrency.promises locals kernel
 threads ;
 
-:: exchanger-test | |
+:: exchanger-test ( -- )
     [let |
         ex [ <exchanger> ]
         c [ 2 <count-down> ]

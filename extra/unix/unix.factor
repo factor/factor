@@ -5,22 +5,29 @@ USING: alien alien.c-types alien.syntax kernel libc structs
 math namespaces system combinators vocabs.loader ;
 
 ! ! ! Unix types
-TYPEDEF: int blksize_t
-TYPEDEF: int dev_t
+
+TYPEDEF:  long  word
+TYPEDEF: ulong uword
+
+TYPEDEF:  long longword
+TYPEDEF: ulong ulongword
+
 TYPEDEF: long ssize_t
-TYPEDEF: longlong blkcnt_t
+TYPEDEF: longword blksize_t
+TYPEDEF: longword blkcnt_t
 TYPEDEF: longlong quad_t
+TYPEDEF: ulonglong dev_t
 TYPEDEF: uint gid_t
 TYPEDEF: uint in_addr_t
-TYPEDEF: uint ino_t
+TYPEDEF: ulong ino_t
 TYPEDEF: int pid_t
 TYPEDEF: uint socklen_t
 TYPEDEF: uint time_t
 TYPEDEF: uint uid_t
 TYPEDEF: ulong size_t
 TYPEDEF: ulong u_long
-TYPEDEF: ushort mode_t
-TYPEDEF: ushort nlink_t
+TYPEDEF: uint mode_t
+TYPEDEF: uword nlink_t
 TYPEDEF: void* caddr_t
 
 TYPEDEF: ulong off_t
@@ -226,3 +233,4 @@ FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
     { [ solaris? ] [ "unix.solaris" require ] }
     { [ t ] [ ] }
 } cond
+

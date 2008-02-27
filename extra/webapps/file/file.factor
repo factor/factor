@@ -3,7 +3,7 @@
 USING: calendar html io io.files kernel math math.parser
 http.server.responders http.server.templating namespaces parser
 sequences strings assocs hashtables debugger http.mime sorting
-html.elements logging ;
+html.elements logging calendar.format ;
 IN: webapps.file
 
 SYMBOL: doc-root

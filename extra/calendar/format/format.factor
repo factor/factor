@@ -1,6 +1,6 @@
 IN: calendar.format
 USING: math math.parser kernel sequences io calendar
-accessors arrays io.streams.string combinators ;
+accessors arrays io.streams.string combinators accessors ;
 
 GENERIC: day. ( obj -- )
 
