@@ -37,7 +37,15 @@ M: unix-io <file-writer> ( path -- stream )
 M: unix-io <file-appender> ( path -- stream )
     open-append <writer> ;
 
-M: unix-io rename-file ( from to -- )
+: touch-mode
+    { O_WRONLY O_APPEND O_CREAT O_EXCL } flags ; foldable
+
+M: unix-io touch-file ( path -- )
+    touch-mode file-mode open
+    dup 0 < [ err_no EEXIST = [ err_no io-error ] unless ] when
+    close ;
+
+M: unix-io move-file ( from to -- )
     rename io-error ;
 
 M: unix-io delete-file ( path -- )
@@ -48,3 +56,14 @@ M: unix-io make-directory ( path -- )
 
 M: unix-io delete-directory ( path -- )
     rmdir io-error ;
+
+: (copy-file) ( from to -- )
+    dup parent-directory make-directories
+    <file-writer> [
+        swap <file-reader> [
+            swap stream-copy
+        ] with-disposal
+    ] with-disposal ;
+
+M: unix-io copy-file ( from to -- )
+    >r dup file-permissions over r> (copy-file) chmod io-error ;

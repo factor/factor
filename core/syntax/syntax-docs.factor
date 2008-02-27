@@ -163,7 +163,7 @@ ARTICLE: "syntax-byte-vectors" "Byte vector syntax"
 
 ARTICLE: "syntax-pathnames" "Pathname syntax"
 { $subsection POSTPONE: P" }
-"Pathnames are documented in " { $link "file-streams" } "." ;
+"Pathnames are documented in " { $link "pathnames" } "." ;
 
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."

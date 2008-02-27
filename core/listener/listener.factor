@@ -62,11 +62,7 @@ M: duplex-stream stream-read-quot
     [ quit-flag off ]
     [ listen until-quit ] if ; inline
 
-: print-banner ( -- )
-    "Factor #" write build number>string write
-    " on " write os write "/" write cpu print ;
-
 : listener ( -- )
-    print-banner [ until-quit ] with-interactive-vocabs ;
+    [ until-quit ] with-interactive-vocabs ;
 
 MAIN: listener

@@ -1,1 +1,1 @@
-Support for launching OS processes
+Launching operating system processes
