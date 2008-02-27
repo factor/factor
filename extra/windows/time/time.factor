@@ -23,7 +23,7 @@ IN: windows.time
 
 : timestamp>windows-time ( timestamp -- n )
     #! 64bit number representing # of nanoseconds since Jan 1, 1601 (UTC)
-    >gmt windows-1601 time- >integer 10000000 * ;
+    >gmt windows-1601 (time-) 10000000 * >integer ;
 
 : windows-time>FILETIME ( n -- FILETIME )
     "FILETIME" <c-object>

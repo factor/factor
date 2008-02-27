@@ -37,9 +37,12 @@ C: <duration> duration
 : day-abbreviations2 { "Su" "Mo" "Tu" "We" "Th" "Fr" "Sa" } ;
 : day-abbreviations3 { "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" } ;
 
-: average-month ( -- x )
-    #! length of average month in days
-    30.41666666666667 ;
+: average-month 30+5/12 ; inline
+: months-per-year 12 ; inline
+: days-per-year 3652425/10000 ; inline
+: hours-per-year 876582/100 ; inline
+: minutes-per-year 5259492/10 ; inline
+: seconds-per-year 31556952 ; inline
 
 <PRIVATE
 
@@ -129,7 +132,7 @@ M: integer +year ( timestamp n -- timestamp )
     [ [ + ] curry change-year adjust-leap-year ] unless-zero ;
 
 M: real +year ( timestamp n -- timestamp )
-    [ float>whole-part swapd 365.2425 * +day swap +year ] unless-zero ;
+    [ float>whole-part swapd days-per-year * +day swap +year ] unless-zero ;
 
 : months/years ( n -- months years )
     12 /rem dup zero? [ drop 1- 12 ] when swap ; inline
@@ -191,33 +194,37 @@ M: timestamp time+
     >r clone r> (time+) drop ;
 
 M: duration time+
-    [ year>> ] +slots
-    [ month>> ] +slots
-    [ day>> ] +slots
-    [ hour>> ] +slots
-    [ minute>> ] +slots
-    [ second>> ] +slots
-    2drop <duration> ;
+    dup timestamp? [
+        swap time+
+    ] [
+        [ year>> ] +slots
+        [ month>> ] +slots
+        [ day>> ] +slots
+        [ hour>> ] +slots
+        [ minute>> ] +slots
+        [ second>> ] +slots
+        2drop <duration>
+    ] if ;
 
 : dt>years ( dt -- x )
     #! Uses average month/year length since dt loses calendar
     #! data
     0 swap
     [ year>> + ] keep
-    [ month>> 12 / + ] keep
-    [ day>> 365.2425 / + ] keep
-    [ hour>> 8765.82 / + ] keep
-    [ minute>> 525949.2 / + ] keep
-    second>> 31556952.0 / + ;
+    [ month>> months-per-year / + ] keep
+    [ day>> days-per-year / + ] keep
+    [ hour>> hours-per-year / + ] keep
+    [ minute>> minutes-per-year / + ] keep
+    second>> seconds-per-year / + ;
 
 M: duration <=> [ dt>years ] compare ;
 
-: dt>months ( dt -- x ) dt>years 12 * ;
-: dt>days ( dt -- x ) dt>years 365.2425 * ;
-: dt>hours ( dt -- x ) dt>years 8765.82 * ;
-: dt>minutes ( dt -- x ) dt>years 525949.2 * ;
-: dt>seconds ( dt -- x ) dt>years 31556952 * ;
-: dt>milliseconds ( dt -- x ) dt>years 31556952000 * ;
+: dt>months ( dt -- x ) dt>years months-per-year * ;
+: dt>days ( dt -- x ) dt>years days-per-year * ;
+: dt>hours ( dt -- x ) dt>years hours-per-year * ;
+: dt>minutes ( dt -- x ) dt>years minutes-per-year * ;
+: dt>seconds ( dt -- x ) dt>years seconds-per-year * ;
+: dt>milliseconds ( dt -- x ) dt>seconds 1000 * ;
 
 : convert-timezone ( timestamp n -- timestamp )
     over gmt-offset>> over = [ drop ] [
@@ -233,26 +240,16 @@ M: duration <=> [ dt>years ] compare ;
 M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
 
-: time- ( timestamp timestamp -- seconds )
-    #! Exact calendar-time difference
+: (time-) ( timestamp timestamp -- n )
     [ >gmt ] 2apply
     [ [ >date< julian-day-number ] 2apply - 86400 * ] 2keep
     [ >time< >r >r 3600 * r> 60 * r> + + ] 2apply - + ;
 
-: unix-1970 ( -- timestamp )
-    1970 1 1 0 0 0 0 <timestamp> ; foldable
+GENERIC: time- ( time1 time2 -- time )
 
-: millis>timestamp ( n -- timestamp )
-    >r unix-1970 r> milliseconds time+ ;
-
-: timestamp>millis ( timestamp -- n )
-    unix-1970 time- 1000 * >integer ;
-
-: gmt ( -- timestamp )
-    #! GMT time, right now
-    unix-1970 millis milliseconds time+ ;
-
-: now ( -- timestamp ) gmt >local-time ;
+M: timestamp time-
+    #! Exact calendar-time difference
+    (time-) seconds ;
 
 : before ( dt -- -dt )
     [ year>>   neg ] keep
@@ -263,10 +260,34 @@ M: timestamp <=> ( ts1 ts2 -- n )
       second>> neg
     <duration> ;
 
-: from-now ( dt -- timestamp ) now swap time+ ;
-: ago ( dt -- timestamp ) before from-now ;
+M: duration time-
+    before time+ ;
 
-: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 } ;
+: <zero> 0 0 0 0 0 0 0 <timestamp> ;
+
+: valid-timestamp? ( timestamp -- ? )
+    clone 0 >>gmt-offset
+    dup <zero> time- <zero> time+ = ;
+
+: unix-1970 ( -- timestamp )
+    1970 1 1 0 0 0 0 <timestamp> ; foldable
+
+: millis>timestamp ( n -- timestamp )
+    >r unix-1970 r> milliseconds time+ ;
+
+: timestamp>millis ( timestamp -- n )
+    unix-1970 (time-) 1000 * >integer ;
+
+: gmt ( -- timestamp )
+    #! GMT time, right now
+    unix-1970 millis milliseconds time+ ;
+
+: now ( -- timestamp ) gmt >local-time ;
+
+: from-now ( dt -- timestamp ) now swap time+ ;
+: ago ( dt -- timestamp ) now swap time- ;
+
+: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 } ; inline
 
 : zeller-congruence ( year month day -- n )
     #! Zeller Congruence
@@ -347,7 +368,7 @@ M: timestamp day-of-year ( timestamp -- n )
 : beginning-of-year ( timestamp -- new-timestamp )
     beginning-of-month 1 >>month ;
 
-: seconds-since-midnight ( timestamp -- x )
+: time-since-midnight ( timestamp -- duration )
     dup beginning-of-day time- ;
 
 M: timestamp sleep-until timestamp>millis sleep-until ;
