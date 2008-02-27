@@ -3,7 +3,7 @@
 USING: parser-combinators memoize kernel sequences
 logging arrays words strings vectors io io.files
 namespaces combinators combinators.lib logging.server
-calendar ;
+calendar calendar.format ;
 IN: logging.parser
 
 : string-of satisfy <!*> [ >string ] <@ ;

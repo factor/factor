@@ -45,14 +45,14 @@ IN: project-euler.019
 <PRIVATE
 
 : start-date ( -- timestamp )
-    1901 1 1 0 0 0 0 make-timestamp ;
+    1901 1 1 0 0 0 0 <timestamp> ;
 
 : end-date ( -- timestamp )
-    2000 12 31 0 0 0 0 make-timestamp ;
+    2000 12 31 0 0 0 0 <timestamp> ;
 
 : (first-days) ( end-date start-date -- )
-    2dup timestamp- 0 >= [
-        dup day-of-week , 1 +month (first-days)
+    2dup time- 0 >= [
+        dup day-of-week , 1 months time+ (first-days)
     ] [
         2drop
     ] if ;

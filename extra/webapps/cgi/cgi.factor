@@ -14,7 +14,7 @@ SYMBOL: cgi-root
     [
         "CGI/1.0" "GATEWAY_INTERFACE" set
         "HTTP/1.0" "SERVER_PROTOCOL" set
-        "Factor " version append "SERVER_SOFTWARE" set
+        "Factor" "SERVER_SOFTWARE" set
 
         dup "PATH_TRANSLATED" set
         "SCRIPT_FILENAME" set

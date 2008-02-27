@@ -1,5 +1,5 @@
 USING: io.files kernel sequences new-slots accessors
-dlists arrays ;
+dlists arrays sequences.lib ;
 IN: io.paths
 
 TUPLE: directory-iterator path bfs queue ;

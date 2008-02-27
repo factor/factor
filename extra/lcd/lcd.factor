@@ -1,5 +1,6 @@
-USING: sequences kernel math io calendar calendar.model
-arrays models namespaces ui.gadgets ui.gadgets.labels
+USING: sequences kernel math io calendar calendar.format
+calendar.model arrays models namespaces ui.gadgets
+ui.gadgets.labels
 ui.gadgets.theme ui ;
 IN: lcd
 
