@@ -255,12 +255,12 @@ M: timestamp <=> ( ts1 ts2 -- n )
 : now ( -- timestamp ) gmt >local-time ;
 
 : before ( dt -- -dt )
-    [ year>> neg ] keep
-    [ month>> neg ] keep
-    [ day>> neg ] keep
-    [ hour>> neg ] keep
+    [ year>>   neg ] keep
+    [ month>>  neg ] keep
+    [ day>>    neg ] keep
+    [ hour>>   neg ] keep
     [ minute>> neg ] keep
-    [ second>> neg ] keep
+      second>> neg
     <duration> ;
 
 : from-now ( dt -- timestamp ) now swap time+ ;

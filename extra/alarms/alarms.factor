@@ -16,7 +16,7 @@ SYMBOL: alarm-thread
     alarm-thread get-global interrupt ;
 
 : check-alarm
-    dup dt? over not or [ "Not a dt" throw ] unless
+    dup duration? over not or [ "Not a duration" throw ] unless
     over timestamp? [ "Not a timestamp" throw ] unless
     pick callable? [ "Not a quotation" throw ] unless ; inline
 
