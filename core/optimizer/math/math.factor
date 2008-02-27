@@ -379,7 +379,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
     >r dup dup node-in-d first node-interval
     swap dup node-in-d second node-literal r> execute ; inline
 
-: foldable-comparison? ( #call word -- )
+: foldable-comparison? ( #call word -- ? )
     >r dup known-comparison? [
         r> perform-comparison incomparable eq? not
     ] [

@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: strings arrays hashtables assocs sequences
 xml.writer xml.utilities kernel namespaces ;
+IN: cocoa.plists
 
 GENERIC: >plist ( obj -- tag )
 

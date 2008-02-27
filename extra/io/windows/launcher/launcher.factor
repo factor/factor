@@ -146,10 +146,16 @@ M: windows-io kill-process* ( handle -- )
 
 : wait-loop ( -- )
     processes get dup assoc-empty?
-    [ drop t ] [ wait-for-processes ] if
-    [ 250 sleep ] when ;
+    [ drop f sleep-until ]
+    [ wait-for-processes [ 100 sleep ] when ] if ;
+
+SYMBOL: wait-thread
 
 : start-wait-thread ( -- )
-    [ wait-loop t ] "Process wait" spawn-server drop ;
+    [ wait-loop t ] "Process wait" spawn-server
+    wait-thread set-global ;
+
+M: windows-io register-process
+    drop wait-thread get-global interrupt ;
 
 [ start-wait-thread ] "io.windows.launcher" add-init-hook

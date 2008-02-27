@@ -2,17 +2,27 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: tools.threads
 USING: threads kernel prettyprint prettyprint.config
-io io.styles sequences assocs namespaces sorting boxes ;
+io io.styles sequences assocs namespaces sorting boxes
+heaps.private system math math.parser ;
 
 : thread. ( thread -- )
     dup thread-id pprint-cell
     dup thread-name over [ write-object ] with-cell
-    thread-state "running" or [ write ] with-cell ;
+    dup thread-state [
+        [ dup self eq? "running" "yield" ? ] unless*
+        write
+    ] with-cell
+    [
+        thread-sleep-entry [
+            entry-key millis [-] number>string write
+            " ms" write
+        ] when*
+    ] with-cell ;
 
 : threads. ( -- )
     standard-table-style [
         [
-            { "ID" "Name" "Waiting on" }
+            { "ID" "Name" "Waiting on" "Remaining sleep" }
             [ [ write ] with-cell ] each
         ] with-row
 

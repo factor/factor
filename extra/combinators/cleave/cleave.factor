@@ -1,5 +1,5 @@
 
-USING: kernel ;
+USING: kernel sequences macros ;
 
 IN: combinators.cleave
 
@@ -20,6 +20,22 @@ IN: combinators.cleave
 : 2bi ( obj obj quot quot -- val val ) >r 2keep r> call ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! General cleave
+
+MACRO: cleave ( seq -- )
+  dup
+    [ drop [ dup ] ] map concat
+  swap
+  dup
+    [ drop [ >r ] ]  map concat
+  swap
+    [ [ r> ] append ] map concat
+  3append
+    [ drop ]
+  append ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! The spread family
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -30,3 +46,14 @@ IN: combinators.cleave
 
 : tetra* ( obj obj obj obj quot quot quot quot -- val val val val )
   >r roll >r tri* r> r> call ; inline
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! General spread
+
+MACRO: spread ( seq -- )
+  dup
+    [ drop [ >r ] ]        map concat
+  swap
+    [ [ r> ] swap append ] map concat
+  append ;

@@ -28,8 +28,8 @@ IN: temporary
 
 [ "end" ] [ "Beginning and end" 14 tail ] unit-test
 
-[ t ] [ "abc" "abd" <=> 0 < ] unit-test
-[ t ] [ "z" "abd" <=> 0 > ] unit-test
+[ t ] [ "abc" "abd" before? ] unit-test
+[ t ] [ "z" "abd" after? ] unit-test
 
 [ 0 10 "hello" subseq ] must-fail
 

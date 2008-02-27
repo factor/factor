@@ -1,7 +1,7 @@
 USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
-sorting tuples compiler.units ;
+sorting tuples compiler.units debugger ;
 IN: temporary
 
 [
@@ -351,18 +351,41 @@ IN: temporary
     << file get parsed >> file set
 
     : ~a ;
-    : ~b ~a ;
+
+    DEFER: ~b
+
+    "IN: temporary : ~b ~a ;" <string-reader>
+    "smudgy" parse-stream drop
+
     : ~c ;
     : ~d ;
 
-    { H{ { ~a ~a } { ~c ~c } { ~d ~d } } H{ } } old-definitions set
+    { H{ { ~a ~a } { ~b ~b } { ~c ~c } { ~d ~d } } H{ } } old-definitions set
     
-    { H{ { ~d ~d } } H{ } } new-definitions set
+    { H{ { ~b ~b } { ~d ~d } } H{ } } new-definitions set
     
     [ V{ ~b } { ~a } { ~a ~c } ] [
         smudged-usage
         natural-sort
     ] unit-test
+] with-scope
+
+[
+    << file get parsed >> file set
+
+    GENERIC: ~e
+
+    : ~f ~e ;
+
+    : ~g ;
+
+    { H{ { ~e ~e } { ~f ~f } { ~g ~g } } H{ } } old-definitions set
+    
+    { H{ { ~g ~g } } H{ } } new-definitions set
+
+    [ V{ } { } { ~e ~f } ]
+    [ smudged-usage natural-sort ]
+    unit-test
 ] with-scope
 
 [ ] [
@@ -372,3 +395,38 @@ IN: temporary
 [ t ] [
     "foo?" "temporary" lookup word eq?
 ] unit-test
+
+[ ] [
+    "IN: temporary TUPLE: foo ; GENERIC: foo"
+    <string-reader> "redefining-a-class-5" parse-stream drop
+] unit-test
+
+[ ] [
+    "IN: temporary M: f foo ;"
+    <string-reader> "redefining-a-class-6" parse-stream drop
+] unit-test
+
+[ f ] [ f "foo" "temporary" lookup execute ] unit-test
+
+[ ] [
+    "IN: temporary TUPLE: foo ; GENERIC: foo"
+    <string-reader> "redefining-a-class-5" parse-stream drop
+] unit-test
+
+[ f ] [ f "foo" "temporary" lookup execute ] unit-test
+
+[ ] [
+    "IN: temporary TUPLE: foo ; GENERIC: foo"
+    <string-reader> "redefining-a-class-7" parse-stream drop
+] unit-test
+
+[ ] [
+    "IN: temporary TUPLE: foo ;"
+    <string-reader> "redefining-a-class-7" parse-stream drop
+] unit-test
+
+[ t ] [ "foo" "temporary" lookup symbol? ] unit-test
+
+[ "resource:core/parser/test/assert-depth.factor" run-file ]
+[ relative-overflow-stack { 1 2 3 } sequence= ]
+must-fail-with

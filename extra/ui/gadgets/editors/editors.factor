@@ -256,7 +256,7 @@ M: editor gadget-text* editor-string % ;
     } at T{ one-line-elt } or ;
 
 : drag-direction? ( loc editor -- ? )
-    editor-mark* <=> 0 < ;
+    editor-mark* before? ;
 
 : drag-selection-caret ( loc editor element -- loc )
     >r [ drag-direction? ] 2keep

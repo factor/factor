@@ -229,7 +229,7 @@ CELL allot_code_block(CELL size)
 
 		/* Insufficient room even after code GC, give up */
 		if(start == 0)
-			critical_error("Out of memory in add-compiled-block",0);
+			fatal_error("Out of memory in add-compiled-block",0);
 	}
 
 	return start;

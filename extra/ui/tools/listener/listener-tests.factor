@@ -1,11 +1,9 @@
 USING: continuations documents ui.tools.interactor
 ui.tools.listener hashtables kernel namespaces parser sequences
-timers tools.test ui.commands ui.gadgets ui.gadgets.editors
+tools.test ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.panes vocabs words tools.test.ui slots.private
 threads ;
 IN: temporary
-
-timers [ init-timers ] unless
 
 [ f ] [ "word" source-editor command-map empty? ] unit-test
 

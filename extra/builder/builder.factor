@@ -2,18 +2,12 @@
 USING: kernel namespaces sequences splitting system combinators continuations
        parser io io.files io.launcher io.sockets prettyprint threads
        bootstrap.image benchmark vars bake smtp builder.util accessors
-       builder.benchmark ;
+       calendar
+       builder.common
+       builder.benchmark
+       builder.release ;
 
 IN: builder
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: builds-dir
-
-: builds ( -- path )
-  builds-dir get
-  home "/builds" append
-  or ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -31,8 +25,6 @@ SYMBOL: builds-dir
 : git-clone ( -- desc ) { "git" "clone" "../factor" } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-VAR: stamp
 
 : enter-build-dir ( -- )
   datestamp >stamp
@@ -73,15 +65,8 @@ VAR: stamp
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: factor-binary ( -- name )
-  os
-  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
-    { "winnt"  [ "./factor-nt.exe" ] }
-    [ drop       "./factor" ] }
-  case ;
-
 : bootstrap-cmd ( -- cmd )
-  { factor-binary { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
+  { "./factor" { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
 
 : bootstrap ( -- desc )
   <process*>
@@ -89,11 +74,11 @@ VAR: stamp
     +closed+      >>stdin
     "../boot-log" >>stdout
     +stdout+      >>stderr
-    20 minutes>ms >>timeout
+    20 minutes    >>timeout
   >desc ;
 
 : builder-test-cmd ( -- cmd )
-  { factor-binary "-run=builder.test" } to-strings ;
+  { "./factor" "-run=builder.test" } to-strings ;
 
 : builder-test ( -- desc )
   <process*>
@@ -101,7 +86,7 @@ VAR: stamp
     +closed+         >>stdin
     "../test-log"    >>stdout
     +stdout+         >>stderr
-    45 minutes>ms    >>timeout
+    45 minutes       >>timeout
   >desc ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -155,7 +140,11 @@ SYMBOL: build-status
     
     show-benchmark-deltas
 
-    "../benchmarks" "../../benchmarks" copy-file    
+    "../benchmarks" "../../benchmarks" copy-file
+
+    ".." cd
+
+    maybe-release
 
   ] with-file-writer
 
@@ -176,7 +165,7 @@ SYMBOL: builder-recipients
     builder-from get        >>from
     builder-recipients get  >>to
     subject                 >>subject
-    "../report" file>string >>body
+    "./report" file>string >>body
   send ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -185,10 +174,11 @@ SYMBOL: builder-recipients
   { "bzip2" my-boot-image-name } to-strings run-process drop ;
 
 : build ( -- )
-  [ (build) ] [ drop ] recover
+  [ (build) ] failsafe
+  builds cd stamp> cd
   [ send-builder-email ] [ drop "not sending mail" . ] recover
-  ".." cd { "rm" "-rf" "factor" } run-process drop
-  [ compress-image ] [ drop ] recover ;
+  { "rm" "-rf" "factor" } run-process drop
+  [ compress-image ] failsafe ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -223,9 +213,8 @@ USE: bootstrap.image.download
       [ build ]
     when
   ]
-  [ drop ]
-  recover
-  5 minutes>ms sleep
+  failsafe
+  5 minutes sleep
   build-loop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

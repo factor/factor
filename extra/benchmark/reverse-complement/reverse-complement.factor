@@ -41,12 +41,10 @@ HINTS: do-line vector string ;
     ] with-disposal ;
 
 : reverse-complement-in
-    "extra/benchmark/reverse-complement/reverse-complement-in.txt"
-    resource-path ;
+    "reverse-complement-in.txt" temp-file ;
 
 : reverse-complement-out
-    "extra/benchmark/reverse-complement/reverse-complement-out.txt"
-    resource-path ;
+    "reverse-complement-out.txt" temp-file ;
 
 : reverse-complement-main ( -- )
     reverse-complement-in

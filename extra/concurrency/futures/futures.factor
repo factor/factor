@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: concurrency.promises concurrency.messaging kernel arrays
+USING: concurrency.promises concurrency.mailboxes kernel arrays
 continuations ;
 IN: concurrency.futures
 
@@ -11,7 +11,7 @@ IN: concurrency.futures
     ] keep ; inline
 
 : ?future-timeout ( future timeout -- value )
-    ?promise-timeout ;
+    ?promise-timeout ?linked ;
 
 : ?future ( future -- value )
-    ?promise ;
+    ?promise ?linked ;

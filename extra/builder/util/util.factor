@@ -4,7 +4,7 @@ USING: kernel words namespaces classes parser continuations
        math math.parser
        combinators sequences splitting quotations arrays strings tools.time
        parser-combinators new-slots accessors assocs.lib
-       combinators.cleave bake calendar  ;
+       combinators.cleave bake calendar calendar.format ;
 
 IN: builder.util
 
@@ -99,3 +99,13 @@ USING: bootstrap.image bootstrap.image.download io.streams.null ;
   [ file-lines ] [ ] bi*
   maybe-tail*
   [ print ] each ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USE: prettyprint
+
+: to-file ( object file -- ) [ . ] with-file-writer ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: failsafe ( quot -- ) [ drop ] recover ;

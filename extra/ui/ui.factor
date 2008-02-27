@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces
 prettyprint dlists sequences threads sequences words
-timers debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
+debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render continuations init combinators
-hashtables ;
+hashtables concurrency.flags ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -130,12 +130,36 @@ SYMBOL: ui-hook
 : notify-queued ( -- )
     graft-queue [ notify ] dlist-slurp ;
 
-: ui-step ( -- )
-    [ do-timers notify-queued layout-queued redraw-worlds ]
-    assert-depth ;
+: update-ui ( -- )
+    [ notify-queued layout-queued redraw-worlds ] assert-depth ;
+
+: ui-wait ( -- )
+    10 sleep ;
+
+: ui-try ( quot -- ) [ ui-error ] recover ;
+
+SYMBOL: ui-thread
+
+: ui-running ( quot -- )
+    t \ ui-running set-global
+    [ f \ ui-running set-global ] [ ] cleanup ; inline
+
+: ui-running? ( -- ? )
+    \ ui-running get-global ;
+
+: update-ui-loop ( -- )
+    ui-running? ui-thread get-global self eq? [
+        ui-notify-flag get lower-flag
+        [ update-ui ] ui-try
+        update-ui-loop
+    ] when ;
+
+: start-ui-thread ( -- )
+    [ self ui-thread set-global update-ui-loop ]
+    "UI update" spawn drop ;
 
 : open-world-window ( world -- )
-    dup pref-dim over set-gadget-dim dup relayout graft ui-step ;
+    dup pref-dim over set-gadget-dim dup relayout graft ;
 
 : open-window ( gadget title -- )
     >r [ 1 track, ] { 0 1 } make-track r>
@@ -156,21 +180,17 @@ M: object close-window
     find-world [ ungraft ] when* ;
 
 : start-ui ( -- )
-    init-timers
     restore-windows? [
         restore-windows
     ] [
         init-ui ui-hook get call
-    ] if ui-step ;
+    ] if
+    notify-ui-thread start-ui-thread ;
 
-: ui-running ( quot -- )
-    t \ ui-running set-global
-    [ f \ ui-running set-global ] [ ] cleanup ; inline
-
-: ui-running? ( -- ? )
-    \ ui-running get-global ;
-
-[ f \ ui-running set-global ] "ui" add-init-hook
+[
+    f \ ui-running set-global
+    <flag> ui-notify-flag set-global
+] "ui" add-init-hook
 
 HOOK: ui ui-backend ( -- )
 
@@ -183,5 +203,3 @@ MAIN: ui
         f windows set-global
         ui-hook [ ui ] with-variable
     ] if ;
-
-: ui-try ( quot -- ) [ ui-error ] recover ;

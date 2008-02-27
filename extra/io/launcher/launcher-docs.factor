@@ -1,6 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax quotations kernel io math ;
+USING: help.markup help.syntax quotations kernel io math
+calendar ;
 IN: io.launcher
 
 HELP: +command+
@@ -77,7 +78,7 @@ $nl
 "This is used in situations where you want a spawn child process with some overridden environment variables." } ;
 
 HELP: +timeout+
-{ $description "Launch descriptor key. If set, specifies a maximum running time for the process. If the process runs longer than this time, it will be killed." } ;
+{ $description "Launch descriptor key. If set to a " { $link duration } ", specifies a maximum running time for the process. If the process runs longer than this time, it will be killed." } ;
 
 HELP: default-descriptor
 { $description "Association storing default values for launch descriptor keys." } ;

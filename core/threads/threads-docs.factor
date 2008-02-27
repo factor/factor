@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private io
 threads.private continuations dlists init quotations strings
-assocs heaps boxes ;
+assocs heaps boxes namespaces ;
 IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
@@ -17,7 +17,10 @@ ARTICLE: "threads-start/stop" "Starting and stopping threads"
 ARTICLE: "threads-yield" "Yielding and suspending threads"
 "Yielding to other threads:"
 { $subsection yield }
+"Sleeping for a period of time:"
 { $subsection sleep }
+"Interrupting sleep:"
+{ $subsection interrupt }
 "Threads can be suspended and woken up at some point in the future when a condition is satisfied:"
 { $subsection suspend }
 { $subsection resume }
@@ -102,9 +105,21 @@ HELP: stop
 HELP: yield
 { $description "Adds the current thread to the end of the run queue, and switches to the next runnable thread." } ;
 
+HELP: sleep-until
+{ $values { "time/f" "a non-negative integer or " { $link f } } }
+{ $description "Suspends the current thread until the given time, or indefinitely if a value of " { $link f } " is passed in."
+$nl
+"Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;
+
 HELP: sleep
 { $values { "ms" "a non-negative integer" } }
-{ $description "Suspends the current thread for " { $snippet "ms" } " milliseconds. It will not get woken up before this time period elapses, but since the multitasker is co-operative, the precise wakeup time is dependent on when other threads yield." } ;
+{ $description "Suspends the current thread for " { $snippet "ms" } " milliseconds."
+$nl
+"Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;
+
+HELP: interrupt
+{ $values { "thread" thread } }
+{ $description "Interrupts a sleeping thread." } ;
 
 HELP: suspend
 { $values { "quot" "a quotation with stack effect " { $snippet "( thread -- )" } } { "obj" object } }
@@ -114,7 +129,10 @@ HELP: spawn
 { $values { "quot" quotation } { "name" string } }
 { $description "Spawns a new thread. The thread begins executing the given quotation; the name is for debugging purposes. The new thread begins running immediately and the current thread is added to the end of the run queue."
 $nl
-"The new thread begins with an empty data stack, an empty catch stack, and a name stack containing the global namespace only. This means that the only way to pass data to the new thread is to explicitly construct a quotation containing the data, for example using " { $link curry } " or " { $link compose } "." }
+"The new thread begins with an empty data stack, an empty retain stack, and an empty catch stack. The name stack is inherited from the parent thread but may be cleared with " { $link init-namespaces } "." }
+{ $notes
+     "The recommended way to pass data to the new thread is to explicitly construct a quotation containing the data, for example using " { $link curry } " or " { $link compose } "."
+}
 { $examples
     { $code "1 2 [ + . ] 2curry \"Addition thread\" spawn" }
 } ;

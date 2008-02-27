@@ -10,10 +10,6 @@ SYMBOL: servers
 
 <PRIVATE
 
-: spawn-vars ( quot vars name -- )
-    >r [ dup get ] H{ } map>assoc [ swap bind ] 2curry r>
-    spawn drop ;
-
 LOG: accepted-connection NOTICE
 
 : with-client ( client quot -- )
@@ -26,8 +22,7 @@ LOG: accepted-connection NOTICE
 
 : accept-loop ( server quot -- )
     [
-        >r accept r> [ with-client ] 2curry
-        { log-service servers } "Client" spawn-vars
+        >r accept r> [ with-client ] 2curry "Client" spawn drop
     ] 2keep accept-loop ; inline
 
 : server-loop ( addrspec quot -- )

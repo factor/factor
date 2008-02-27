@@ -49,7 +49,7 @@ TUPLE: select-mx read-fdset write-fdset ;
     f ;
 
 M: select-mx wait-for-events ( ms mx -- )
-    swap >r dup init-fdsets r> make-timeval
+    swap >r dup init-fdsets r> dup [ make-timeval ] when
     select multiplexer-error
     dup read-fdset/tasks pick handle-fdset
     dup write-fdset/tasks rot handle-fdset ;

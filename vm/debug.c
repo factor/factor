@@ -37,15 +37,24 @@ void print_array(F_ARRAY* array, CELL nesting)
 {
 	CELL length = array_capacity(array);
 	CELL i;
+	bool trimmed;
 
 	if(length > 10)
+	{
+		trimmed = true;
 		length = 10;
+	}
+	else
+		trimmed = false;
 
 	for(i = 0; i < length; i++)
 	{
 		printf(" ");
 		print_nested_obj(array_nth(array,i),nesting);
 	}
+
+	if(trimmed)
+		printf("...");
 }
 
 void print_nested_obj(CELL obj, F_FIXNUM nesting)

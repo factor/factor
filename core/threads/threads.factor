@@ -13,7 +13,7 @@ TUPLE: thread
 name quot error-handler exit-handler
 id
 continuation state
-mailbox variables ;
+mailbox variables sleep-entry ;
 
 : self ( -- thread ) 40 getenv ; inline
 
@@ -75,44 +75,64 @@ PRIVATE>
 : sleep-queue 43 getenv ;
 
 : resume ( thread -- )
+    f over set-thread-state
     check-registered run-queue push-front ;
 
 : resume-now ( thread -- )
+    f over set-thread-state
     check-registered run-queue push-back ;
 
 : resume-with ( obj thread -- )
+    f over set-thread-state
     check-registered 2array run-queue push-front ;
 
-<PRIVATE
-
-: schedule-sleep ( thread ms -- )
-    >r check-registered r> sleep-queue heap-push ;
-
-: wake-up? ( heap -- ? )
-    dup heap-empty?
-    [ drop f ] [ heap-peek nip millis <= ] if ;
-
-: wake-up ( -- )
-    sleep-queue
-    [ dup wake-up? ] [ dup heap-pop drop resume ] [ ] while
-    drop ;
-
-: next ( -- )
-    wake-up
-    run-queue pop-back
-    dup array? [ first2 ] [ f swap ] if dup set-self
-    f over set-thread-state
-    thread-continuation box>
-    continue-with ;
-
-PRIVATE>
-
-: sleep-time ( -- ms )
+: sleep-time ( -- ms/f )
     {
         { [ run-queue dlist-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
         { [ t ] [ sleep-queue heap-peek nip millis [-] ] }
     } cond ;
+
+<PRIVATE
+
+: schedule-sleep ( thread ms -- )
+    >r check-registered dup r> sleep-queue heap-push*
+    swap set-thread-sleep-entry ;
+
+: expire-sleep? ( heap -- ? )
+    dup heap-empty?
+    [ drop f ] [ heap-peek nip millis <= ] if ;
+
+: expire-sleep ( thread -- )
+    f over set-thread-sleep-entry resume ;
+
+: expire-sleep-loop ( -- )
+    sleep-queue
+    [ dup expire-sleep? ]
+    [ dup heap-pop drop expire-sleep ]
+    [ ] while
+    drop ;
+
+: next ( -- * )
+    expire-sleep-loop
+    run-queue dup dlist-empty? [
+        ! We should never be in a state where the only threads
+        ! are sleeping; the I/O wait thread is always runnable.
+        ! However, if it dies, we handle this case
+        ! semi-gracefully.
+        !
+        ! And if sleep-time outputs f, there are no sleeping
+        ! threads either... so WTF.
+        drop sleep-time [ die 0 ] unless* (sleep) next
+    ] [
+        pop-back
+        dup array? [ first2 ] [ f swap ] if dup set-self
+        f over set-thread-state
+        thread-continuation box>
+        continue-with
+    ] if ;
+
+PRIVATE>
 
 : stop ( -- )
     self dup thread-exit-handler call
@@ -125,19 +145,33 @@ PRIVATE>
         self swap call next
     ] callcc1 2nip ; inline
 
-: yield ( -- ) [ resume ] "yield" suspend drop ;
+: yield ( -- ) [ resume ] f suspend drop ;
 
-: sleep ( ms -- )
-    >fixnum millis +
-    [ schedule-sleep ] curry
-    "sleep" suspend drop ;
+GENERIC: sleep-until ( time/f -- )
+
+M: integer sleep-until
+    [ schedule-sleep ] curry "sleep" suspend drop ;
+
+M: f sleep-until
+    drop [ drop ] "interrupt" suspend drop ;
+
+GENERIC: sleep ( ms -- )
+
+M: real sleep
+    millis + >integer sleep-until ;
+
+: interrupt ( thread -- )
+    dup thread-state [
+        dup thread-sleep-entry [ sleep-queue heap-delete ] when*
+        f over set-thread-sleep-entry
+        dup resume
+    ] when drop ;
 
 : (spawn) ( thread -- )
     [
-        resume [
+        resume-now [
             dup set-self
             dup register-thread
-            init-namespaces
             V{ } set-catchstack
             { } set-retainstack
             >r { } set-datastack r>
@@ -177,6 +211,7 @@ PRIVATE>
     initial-thread global
     [ drop f "Initial" [ die ] <thread> ] cache
     <box> over set-thread-continuation
+    f over set-thread-state
     dup register-thread
     set-self ;
 

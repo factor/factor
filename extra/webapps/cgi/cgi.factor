@@ -9,20 +9,21 @@ SYMBOL: cgi-root
 
 : post? "method" get "post" = ;
 
-: cgi-variables ( name -- assoc )
+: cgi-variables ( script-path -- assoc )
     #! This needs some work.
     [
-        cgi-root get over path+ "PATH_TRANSLATED" set
-        cgi-root get over path+ "SCRIPT_FILENAME" set
-        "SCRIPT_NAME" set
-
         "CGI/1.0" "GATEWAY_INTERFACE" set
         "HTTP/1.0" "SERVER_PROTOCOL" set
-        "Factor " version append "SERVER_SOFTWARE" set
+        "Factor" "SERVER_SOFTWARE" set
+
+        dup "PATH_TRANSLATED" set
+        "SCRIPT_FILENAME" set
+
+        "request" get "SCRIPT_NAME" set
+
         host "SERVER_NAME" set
         "" "SERVER_PORT" set
-        "request" get "PATH_INFO" set
-        "request" get "PATH_TRANSLATED" set
+        "" "PATH_INFO" set
         "" "REMOTE_HOST" set
         "" "REMOTE_ADDR" set
         "" "AUTH_TYPE" set
@@ -31,20 +32,20 @@ SYMBOL: cgi-root
 
         "method" get >upper "REQUEST_METHOD" set
         "raw-query" get "QUERY_STRING" set
-        "Cookie" header-param "HTTP_COOKIE" set 
+        "cookie" header-param "HTTP_COOKIE" set 
 
-        "User-Agent" header-param "HTTP_USER_AGENT" set
-        "Accept" header-param "HTTP_ACCEPT" set
+        "user-agent" header-param "HTTP_USER_AGENT" set
+        "accept" header-param "HTTP_ACCEPT" set
 
         post? [
-            "Content-Type" header-param "CONTENT_TYPE" set
+            "content-type" header-param "CONTENT_TYPE" set
             "raw-response" get length number>string "CONTENT_LENGTH" set
         ] when
     ] H{ } make-assoc ;
 
 : cgi-descriptor ( name -- desc )
     [
-        cgi-root get over path+ 1array +arguments+ set
+        cgi-root get swap path+ dup 1array +arguments+ set
         cgi-variables +environment+ set
     ] H{ } make-assoc ;
     
@@ -58,7 +59,7 @@ SYMBOL: cgi-root
     ] with-stream ;
 
 : serve-regular-file ( -- )
-    cgi-root get "doc-root" [ file-responder ] with-variable ;
+    cgi-root get doc-root [ file-responder ] with-variable ;
 
 : do-cgi ( name -- )
     {

@@ -1,10 +1,11 @@
 IN: temporary
-USING: arrays compiler kernel kernel.private math math.constants
-math.private sequences strings tools.test words continuations
-sequences.private hashtables.private byte-arrays strings.private
-system random layouts vectors.private sbufs.private
-strings.private slots.private alien alien.accessors
-alien.c-types alien.syntax namespaces libc sequences.private ;
+USING: arrays compiler.units kernel kernel.private math
+math.constants math.private sequences strings tools.test words
+continuations sequences.private hashtables.private byte-arrays
+strings.private system random layouts vectors.private
+sbufs.private strings.private slots.private alien
+alien.accessors alien.c-types alien.syntax namespaces libc
+sequences.private ;
 
 ! Make sure that intrinsic ops compile to correct code.
 [ ] [ 1 [ drop ] compile-call ] unit-test

@@ -3,7 +3,8 @@
 IN: xml-rpc
 USING: kernel xml arrays math generic http.client combinators
     hashtables namespaces io base64 sequences strings calendar
-    xml.data xml.writer xml.utilities assocs math.parser debugger ;
+    xml.data xml.writer xml.utilities assocs math.parser debugger
+    calendar.format ;
 
 ! * Sending RPC requests
 ! TODO: time

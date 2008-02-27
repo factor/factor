@@ -352,6 +352,8 @@ TUPLE: bad-number ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
+: (:) CREATE dup reset-generic parse-definition ;
+
 GENERIC: expected>string ( obj -- str )
 
 M: f expected>string drop "end of input" ;
@@ -439,11 +441,12 @@ SYMBOL: interactive-vocabs
         "Warning: the following definitions were removed from sources," print
         "but are still referenced from other definitions:" print
         nl
-        dup stack.
+        dup sorted-definitions.
         nl
         "The following definitions need to be updated:" print
         nl
-        over stack.
+        over sorted-definitions.
+        nl
     ] when 2drop ;
 
 : filter-moved ( assoc -- newassoc )
@@ -463,9 +466,16 @@ SYMBOL: interactive-vocabs
         dup values concat prune swap keys
     ] keep ;
 
+: fix-class-words ( -- )
+    #! If a class word had a compound definition which was
+    #! removed, it must go back to being a symbol.
+    new-definitions get first2 diff
+    [ nip dup reset-generic define-symbol ] assoc-each ;
+
 : forget-smudged ( -- )
     smudged-usage forget-all
-    over empty? [ 2dup smudged-usage-warning ] unless 2drop ;
+    over empty? [ 2dup smudged-usage-warning ] unless 2drop
+    fix-class-words ;
 
 : finish-parsing ( lines quot -- )
     file get
@@ -499,7 +509,7 @@ SYMBOL: interactive-vocabs
     ] recover ;
 
 : run-file ( file -- )
-    [ [ parse-file call ] keep ] assert-depth drop ;
+    [ dup parse-file call ] assert-depth drop ;
 
 : ?run-file ( path -- )
     dup resource-exists? [ run-file ] [ drop ] if ;
