@@ -10,10 +10,10 @@ IN: tools.deploy.windows
     vm over copy-file ;
 
 : copy-fonts ( bundle-name -- )
-    "fonts/" resource-path swap copy-tree ;
+    "fonts/" resource-path swap copy-tree-to ;
 
 : copy-dlls ( bundle-name -- )
-    { "freetype6.dll" "zlib1.dll" "factor-nt.dll" }
+    { "freetype6.dll" "zlib1.dll" "factor.dll" }
     [ resource-path ] map
     swap copy-files-to ;
 
@@ -30,10 +30,11 @@ TUPLE: windows-deploy-implementation ;
 T{ windows-deploy-implementation } deploy-implementation set-global
 
 M: windows-deploy-implementation deploy*
-    "." resource-path cd
-    dup deploy-config [
-        [ deploy-name get create-exe-dir ] keep
-        [ deploy-name get image-name ] keep
-        [ namespace make-deploy-image ] keep
-        open-in-explorer
-    ] bind ;
+    "." resource-path [
+        dup deploy-config [
+            [ deploy-name get create-exe-dir ] keep
+            [ deploy-name get image-name ] keep
+            [ namespace make-deploy-image ] keep
+            open-in-explorer
+        ] bind
+    ] with-directory ;
