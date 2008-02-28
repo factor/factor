@@ -5,10 +5,14 @@ namespaces sequences sequences.lib tuples words strings
 tools.walker ;
 IN: db
 
-TUPLE: db handle ;
-! TUPLE: db handle insert-statements update-statements delete-statements ;
+TUPLE: db
+    handle
+    insert-statements
+    update-statements
+    delete-statements ;
+
 : <db> ( handle -- obj )
-    ! H{ } clone H{ } clone H{ } clone
+    H{ } clone H{ } clone H{ } clone
     db construct-boa ;
 
 GENERIC: make-db* ( seq class -- db )
@@ -21,9 +25,9 @@ HOOK: db-close db ( handle -- )
 
 : dispose-db ( db -- ) 
     dup db [
-        ! dup db-insert-statements dispose-statements
-        ! dup db-update-statements dispose-statements
-        ! dup db-delete-statements dispose-statements
+        dup db-insert-statements dispose-statements
+        dup db-update-statements dispose-statements
+        dup db-delete-statements dispose-statements
         db-handle db-close
     ] with-variable ;
 
@@ -50,7 +54,6 @@ GENERIC# row-column 1 ( result-set n -- obj )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 
-! must be called from within with-disposal
 : execute-statement ( statement -- )
     dup sequence? [
         [ execute-statement ] each
@@ -100,7 +103,6 @@ GENERIC: more-rows? ( result-set -- ? )
 
 : do-bound-command ( obj query -- )
     [ bind-statement ] keep execute-statement ;
-
 
 SYMBOL: in-transaction
 HOOK: begin-transaction db ( -- )

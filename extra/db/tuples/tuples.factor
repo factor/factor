@@ -26,14 +26,14 @@ IN: db.tuples
 HOOK: create-sql-statement db ( class -- obj )
 HOOK: drop-sql-statement db ( class -- obj )
 
-HOOK: <insert-native-statement> db ( tuple -- obj )
-HOOK: <insert-assigned-statement> db ( tuple -- obj )
+HOOK: <insert-native-statement> db ( class -- obj )
+HOOK: <insert-assigned-statement> db ( class -- obj )
 
-HOOK: <update-tuple-statement> db ( tuple -- obj )
-HOOK: <update-tuples-statement> db ( tuple -- obj )
+HOOK: <update-tuple-statement> db ( class -- obj )
+HOOK: <update-tuples-statement> db ( class -- obj )
 
-HOOK: <delete-tuple-statement> db ( tuple -- obj )
-HOOK: <delete-tuples-statement> db ( tuple -- obj )
+HOOK: <delete-tuple-statement> db ( class -- obj )
+HOOK: <delete-tuples-statement> db ( class -- obj )
 
 HOOK: <select-by-slots-statement> db ( tuple -- tuple )
 
@@ -73,14 +73,14 @@ HOOK: insert-tuple* db ( tuple statement -- )
     drop-sql-statement [ execute-statement ] with-disposals ;
 
 : insert-native ( tuple -- )
-    dup class <insert-native-statement> [
-        [ bind-tuple ] 2keep dup . insert-tuple*
-    ] with-disposal ;
+    dup class
+    db get db-insert-statements [ <insert-native-statement> ] cache
+    [ bind-tuple ] 2keep insert-tuple* ;
 
 : insert-assigned ( tuple -- )
-    dup class <insert-assigned-statement> [
-        [ bind-tuple ] keep execute-statement
-    ] with-disposal ;
+    dup class
+    db get db-insert-statements [ <insert-assigned-statement> ] cache
+    [ bind-tuple ] keep execute-statement ;
 
 : insert-tuple ( tuple -- )
     dup class db-columns find-primary-key assigned-id? [
@@ -90,17 +90,14 @@ HOOK: insert-tuple* db ( tuple statement -- )
     ] if ;
 
 : update-tuple ( tuple -- )
-    dup class <update-tuple-statement> [
-        [ bind-tuple ] keep execute-statement
-    ] with-disposal ;
-
-! : update-tuples ( seq -- )
-    ! <update-tuples-statement> execute-statement ;
+    dup class
+    db get db-update-statements [ <update-tuple-statement> ] cache
+    [ bind-tuple ] keep execute-statement ;
 
 : delete-tuple ( tuple -- )
-    dup class <delete-tuple-statement> [
-        [ bind-tuple ] keep execute-statement
-    ] with-disposal ;
+    dup class
+    db get db-delete-statements [ <delete-tuple-statement> ] cache
+    [ bind-tuple ] keep execute-statement ;
 
 : select-tuples ( tuple -- tuple )
     dup dup class <select-by-slots-statement> [
