@@ -27,7 +27,7 @@ M: pair make-disassemble-cmd
         +closed+ +stdin+ set
         out-file +stdout+ set
         [ "gdb" , "-x" , in-file , "-batch" , ] { } make +arguments+ set
-    ] { } make-assoc run-process drop
+    ] { } make-assoc try-process
     out-file file-lines ;
 
 : tabs>spaces ( str -- str' )
