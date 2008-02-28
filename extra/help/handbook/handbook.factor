@@ -86,7 +86,8 @@ concurrency.futures
 concurrency.locks
 concurrency.semaphores
 concurrency.count-downs
-concurrency.exchangers ;
+concurrency.exchangers
+concurrency.flags ;
 
 ARTICLE: "concurrency" "Concurrency"
 "Factor supports a variety of concurrency abstractions, however they are mostly used to multiplex input/output operations since the thread scheduling is co-operative and only one CPU is used at a time."
@@ -106,6 +107,7 @@ $nl
 { $subsection "concurrency.semaphores" }
 { $subsection "concurrency.count-downs" }
 { $subsection "concurrency.exchangers" }
+{ $subsection "concurrency.flags" }
 "Other concurrency abstractions include " { $vocab-link "concurrency.distributed" } " and " { $vocab-link "channels" } "." ;
 
 ARTICLE: "objects" "Objects"
@@ -169,23 +171,24 @@ ARTICLE: "collections" "Collections"
 
 USING: io.sockets io.launcher io.mmap io.monitors ;
 
-ARTICLE: "io" "Input and output" 
+ARTICLE: "io" "Input and output"
+{ $heading "Streams" }
 { $subsection "streams" }
-"External streams:"
-{ $subsection "file-streams" }
-{ $subsection "network-streams" }
 "Wrapper streams:"
 { $subsection "io.streams.duplex" }
 { $subsection "io.streams.lines" }
 { $subsection "io.streams.plain" }
 { $subsection "io.streams.string" }
-"Stream utilities:"
+"Utilities:"
 { $subsection "stream-binary" }
 { $subsection "styles" }
-"Advanced features:"
-{ $subsection "io.launcher" }
+{ $heading "Files" }
+{ $subsection "io.files" }
 { $subsection "io.mmap" }
 { $subsection "io.monitors" }
+{ $heading "Other features" }
+{ $subsection "network-streams" }
+{ $subsection "io.launcher" }
 { $subsection "io.timeouts" } ;
 
 ARTICLE: "tools" "Developer tools"
@@ -196,6 +199,7 @@ ARTICLE: "tools" "Developer tools"
 "Debugging tools:"
 { $subsection "tools.annotations" }
 { $subsection "tools.test" }
+{ $subsection "tools.threads" }
 "Performance tools:"
 { $subsection "tools.memory" }
 { $subsection "profiling" }

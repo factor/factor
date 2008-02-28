@@ -5,7 +5,7 @@ io.windows.nt.backend kernel math windows windows.kernel32
 windows.types libc assocs alien namespaces continuations
 io.monitors io.monitors.private io.nonblocking io.buffers
 io.files io.timeouts io sequences hashtables sorting arrays
-combinators ;
+combinators math.bitfields ;
 IN: io.windows.nt.monitors
 
 : open-directory ( path -- handle )
@@ -13,7 +13,7 @@ IN: io.windows.nt.monitors
     share-mode
     f
     OPEN_EXISTING
-    FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED bitor
+    { FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED } flags
     f
     CreateFile
     dup invalid-handle?

@@ -1,6 +1,6 @@
 USING: calendar furnace furnace.validator io.files kernel
 namespaces sequences http.server.responders html math.parser rss
-xml.writer xmode.code2html math ;
+xml.writer xmode.code2html math calendar.format ;
 IN: webapps.pastebin
 
 TUPLE: pastebin pastes ;

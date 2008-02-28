@@ -59,7 +59,8 @@ M: windows-nt-io root-directory? ( path -- ? )
     } cond ;
 
 M: windows-nt-io normalize-pathname ( string -- string )
-    dup string? [ "pathname must be a string" throw ] unless
+    dup string? [ "Pathname must be a string" throw ] unless
+    dup empty? [ "Empty pathname" throw ] when
     { { CHAR: / CHAR: \\ } } substitute
     cwd swap windows-path+
     [ "/\\." member? ] right-trim

@@ -167,7 +167,7 @@ ARTICLE: "ui-backend-init" "UI initialization and the event loop"
 { $subsection start-ui }
 "The " { $link ui } " word must not return until the event loop has stopped and the UI has been shut down."
 $nl
-"The event loop must not block, since otherwise other Factor threads and I/O will not run. Instead, it should poll for pending events, then call " { $link ui-step } ", which performs pending layout and sleeps for 10 milliseconds." ;
+"The event loop must not block, since otherwise other Factor threads and I/O will not run. Instead, it should poll for pending events, then call " { $link ui-wait } "." ;
 
 ARTICLE: "ui-backend-windows" "UI backend window management"
 "The high-level " { $link open-window } " word eventually calls a low-level word which you must implement:"

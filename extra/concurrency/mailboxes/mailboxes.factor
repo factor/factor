@@ -15,7 +15,7 @@ TUPLE: mailbox threads data ;
 
 : mailbox-put ( obj mailbox -- )
     [ mailbox-data push-front ] keep
-    mailbox-threads notify-all ;
+    mailbox-threads notify-all yield ;
 
 : block-unless-pred ( pred mailbox timeout -- )
     2over mailbox-data dlist-contains? [
@@ -65,12 +65,23 @@ TUPLE: mailbox threads data ;
 : mailbox-get? ( pred mailbox -- obj )
     f mailbox-get-timeout? ; inline
 
-TUPLE: linked error thread ;
+TUPLE: linked-error thread ;
 
-C: <linked> linked
+: <linked-error> ( error thread -- linked )
+    { set-delegate set-linked-error-thread }
+    linked-error construct ;
 
-: ?linked dup linked? [ rethrow ] when ;
+: ?linked dup linked-error? [ rethrow ] when ;
+
+TUPLE: linked-thread supervisor ;
+
+M: linked-thread error-in-thread
+    [ <linked-error> ] keep
+    linked-thread-supervisor mailbox-put ;
+
+: <linked-thread> ( quot name mailbox -- thread' )
+    >r <thread> linked-thread construct-delegate r>
+    over set-linked-thread-supervisor ;
 
 : spawn-linked-to ( quot name mailbox -- thread )
-    [ >r <linked> r> mailbox-put ] curry <thread>
-    [ (spawn) ] keep ;
+    <linked-thread> [ (spawn) ] keep ;

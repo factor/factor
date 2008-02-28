@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations assocs namespaces sequences words
-vocabs definitions hashtables ;
+vocabs definitions hashtables init ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -37,12 +37,13 @@ SYMBOL: recompile-hook
 
 SYMBOL: definition-observers
 
-definition-observers global [ V{ } like ] change-at
-
 GENERIC: definitions-changed ( assoc obj -- )
 
+[ V{ } clone definition-observers set-global ]
+"compiler.units" add-init-hook
+
 : add-definition-observer ( obj -- )
-    definition-observers get push-new ;
+    definition-observers get push ;
 
 : remove-definition-observer ( obj -- )
     definition-observers get delete ;

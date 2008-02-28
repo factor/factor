@@ -2,7 +2,7 @@ USING: sequences rss arrays concurrency.combinators kernel
 sorting html.elements io assocs namespaces math threads vocabs
 html furnace http.server.templating calendar math.parser
 splitting continuations debugger system http.server.responders
-xml.writer prettyprint logging ;
+xml.writer prettyprint logging calendar.format ;
 IN: webapps.planet
 
 : print-posting-summary ( posting -- )

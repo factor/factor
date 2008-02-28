@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend kernel continuations namespaces sequences
-assocs hashtables sorting arrays threads boxes ;
+assocs hashtables sorting arrays threads boxes io.timeouts ;
 IN: io.monitors
 
 <PRIVATE
@@ -32,7 +32,11 @@ M: monitor dispose
 
 ! Simple monitor; used on Linux and Mac OS X. On Windows,
 ! monitors are full-fledged ports.
-TUPLE: simple-monitor handle callback ;
+TUPLE: simple-monitor handle callback timeout ;
+
+M: simple-monitor timeout simple-monitor-timeout ;
+
+M: simple-monitor set-timeout set-simple-monitor-timeout ;
 
 : <simple-monitor> ( handle -- simple-monitor )
     f (monitor) <box> {
@@ -47,9 +51,14 @@ TUPLE: simple-monitor handle callback ;
 : notify-callback ( simple-monitor -- )
     simple-monitor-callback ?box [ resume ] [ drop ] if ;
 
+M: simple-monitor timed-out
+    notify-callback ;
+
 M: simple-monitor fill-queue ( monitor -- )
-    [ swap simple-monitor-callback >box ]
-    "monitor" suspend drop
+    [
+        [ swap simple-monitor-callback >box ]
+        "monitor" suspend drop
+    ] with-timeout
     check-monitor ;
 
 M: simple-monitor dispose ( monitor -- )

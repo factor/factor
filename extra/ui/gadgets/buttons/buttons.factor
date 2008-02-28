@@ -88,7 +88,6 @@ TUPLE: repeat-button ;
 
 repeat-button H{
     { T{ drag } [ button-clicked ] }
-    { T{ button-down } [ button-clicked ] }
 } set-gestures
 
 : <repeat-button> ( label quot -- button )

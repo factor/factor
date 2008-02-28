@@ -1,6 +1,6 @@
 USING: alien arrays generic generic.math help.markup help.syntax
 kernel math memory strings sbufs vectors io io.files classes
-help generic.standard continuations system ;
+help generic.standard continuations system debugger.private ;
 IN: debugger
 
 ARTICLE: "errors-assert" "Assertions"
@@ -79,9 +79,6 @@ HELP: print-error
 
 HELP: restarts.
 { $description "Print a list of restarts for the most recently thrown error to the " { $link stdio } " stream." } ;
-
-HELP: debug-help
-{ $description "Print a synopsis of useful debugger words." } ;
 
 HELP: error-hook
 { $var-description "A quotation with stack effect " { $snippet "( error -- )" } " which is used by " { $link try } " to report the error to the user." }
@@ -169,3 +166,6 @@ HELP: depth
 HELP: assert-depth
 { $values { "quot" "a quotation" } }
 { $description "Runs a quotation. Throws an error if the total number of elements on the stack is not the same before and after the quotation runs." } ;
+
+HELP: init-debugger
+{ $description "Called on startup to set a pair of hooks which allow the " { $link throw } " word to function." } ;

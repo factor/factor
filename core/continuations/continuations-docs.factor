@@ -23,9 +23,10 @@ $nl
 "Two words raise an error in the innermost error handler for the current dynamic extent:"
 { $subsection throw }
 { $subsection rethrow }
-"Two words for establishing an error handler:"
+"Words for establishing an error handler:"
 { $subsection cleanup }
 { $subsection recover }
+{ $subsection ignore-errors }
 "Unhandled errors are reported in the listener and can be debugged using various tools. See " { $link "debugger" } "."
 { $subsection "errors-restartable" }
 { $subsection "errors-post-mortem" } ;
@@ -148,6 +149,10 @@ HELP: recover
 { $values { "try" quotation } { "recovery" "a quotation with stack effect " { $snippet "( error -- )" } } }
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
 
+HELP: ignore-errors
+{ $values { "try" quotation } }
+{ $description "Calls the quotation. If an exception is thrown in the dynamic extent of the quotation, restores the data stack and returns." } ;
+
 HELP: rethrow
 { $values { "error" object } }
 { $description "Throws an error without saving the current continuation in the " { $link error-continuation } " global variable. This is done so that inspecting the error stacks sheds light on the original cause of the exception, rather than the point where it was rethrown." }
@@ -188,6 +193,3 @@ HELP: save-error
 { $values { "error" "an error" } }
 { $description "Called by the error handler to set the " { $link error } " and " { $link restarts } " global variables after an error was thrown." }
 $low-level-note ;
-
-HELP: init-error-handler
-{ $description "Called on startup to initialize the catch stack and set a pair of hooks which allow the Factor VM to signal errors to library code." } ;

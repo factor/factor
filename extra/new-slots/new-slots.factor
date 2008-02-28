@@ -34,7 +34,7 @@ IN: new-slots
         [ \ over , swap writer-word , ] [ ] make define-inline
     ] [ 2drop ] if ;
 
-: changer-effect T{ effect f { "object" "quot" } } ; inline
+: changer-effect T{ effect f { "object" "quot" } { "object" } } ; inline
 
 : changer-word ( name -- word )
     "change-" swap append changer-effect create-accessor ;
@@ -44,9 +44,9 @@ IN: new-slots
         [
             [ over >r >r ] %
             over reader-word ,
-            [ r> call r> ] %
-            swap writer-word ,
-        ] [ ] make define
+            [ r> call r> swap ] %
+            swap setter-word ,
+        ] [ ] make define-inline
     ] [ 2drop ] if ;
 
 : define-new-slot ( class slot name -- )

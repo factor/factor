@@ -7,5 +7,4 @@ ARTICLE: "ui-walker" "UI walker"
 $nl
 "The walker can travel backwards through time, and restore stacks. This does not undo side effects and therefore can only be used reliably on referentially transparent code."
 { $command-map walker-gadget "toolbar" }
-{ $command-map walker-gadget "other" }
 "Walkers are instances of " { $link walker-gadget } "." ;

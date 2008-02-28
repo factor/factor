@@ -186,8 +186,8 @@ find_word_size() {
 
 set_factor_binary() {
         case $OS in
-                winnt) FACTOR_BINARY=factor-nt;;
-                macosx) FACTOR_BINARY=./Factor.app/Contents/MacOS/factor;;
+                # winnt) FACTOR_BINARY=factor-nt;;
+                # macosx) FACTOR_BINARY=./Factor.app/Contents/MacOS/factor;;
                 *) FACTOR_BINARY=factor;;
         esac
 }

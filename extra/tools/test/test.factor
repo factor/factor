@@ -48,9 +48,6 @@ SYMBOL: this-test
 : must-fail ( quot -- )
     [ drop t ] must-fail-with ;
 
-: ignore-errors ( quot -- )
-    [ drop ] recover ; inline
-
 : (run-test) ( vocab -- )
     dup vocab-source-loaded? [
         vocab-tests

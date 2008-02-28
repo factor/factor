@@ -64,6 +64,8 @@ USING: system sequences splitting ;
 
 : linux-release ( -- )
 
+  "factor" cd
+
   { "rm" "-rf" "Factor.app" } run-process drop
 
   { "rm" "-rf" common-files } to-strings run-process drop
@@ -78,6 +80,8 @@ USING: system sequences splitting ;
 
 : windows-release ( -- )
 
+  "factor" cd
+
   { "rm" "-rf" "Factor.app" } run-process drop
 
   { "rm" "-rf" common-files } to-strings run-process drop
@@ -91,6 +95,8 @@ USING: system sequences splitting ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : macosx-release ( -- )
+
+  "factor" cd
 
   { "rm" "-rf" common-files } to-strings run-process drop
 
@@ -120,8 +126,8 @@ USING: system sequences splitting ;
 
 : release? ( -- ? )
   {
-    "../load-everything-vocabs"
-    "../test-all-vocabs"
+    "./load-everything-vocabs"
+    "./test-all-vocabs"
   }
     [ eval-file empty? ]
   all? ;

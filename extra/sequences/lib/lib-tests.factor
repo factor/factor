@@ -20,8 +20,6 @@ IN: temporary
 [ 10 ] [ { 1 2 3 4 } [ + ] reduce* ] unit-test
 [ 24 ] [ { 1 2 3 4 } [ * ] reduce* ] unit-test
 
-[ 1 2 3 4 ] [ { 1 2 3 4 } 4 nfirst ] unit-test
-
 [ -4 ] [ 1 -4 [ abs ] higher ] unit-test
 [ 1 ] [ 1 -4 [ abs ] lower ] unit-test
 
@@ -80,4 +78,4 @@ IN: temporary
 { 13 } [ 1 2 { 3 4 } [ + + ] 2 each-withn + ] unit-test
 [ { 910 911 912 } ] [ 10 900 3 [ + + ] map-with2 ] unit-test
 
-[ 1 2 3 4 ] [ { 1 2 3 4 } 4 nfirst ] unit-test
+[ 1 2 3 4 ] [ { 1 2 3 4 } 4 firstn ] unit-test

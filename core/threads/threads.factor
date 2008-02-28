@@ -4,13 +4,12 @@
 IN: threads
 USING: arrays hashtables heaps kernel kernel.private math
 namespaces sequences vectors continuations continuations.private
-dlists assocs system combinators debugger prettyprint io init
-boxes ;
+dlists assocs system combinators init boxes ;
 
 SYMBOL: initial-thread
 
 TUPLE: thread
-name quot error-handler exit-handler
+name quot exit-handler
 id
 continuation state
 mailbox variables sleep-entry ;
@@ -60,11 +59,10 @@ threads global [ H{ } assoc-like ] change-at
 
 PRIVATE>
 
-: <thread> ( quot name error-handler -- thread )
+: <thread> ( quot name -- thread )
     \ thread counter <box> [ ] {
         set-thread-quot
         set-thread-name
-        set-thread-error-handler
         set-thread-id
         set-thread-continuation
         set-thread-exit-handler
@@ -86,6 +84,13 @@ PRIVATE>
     f over set-thread-state
     check-registered 2array run-queue push-front ;
 
+: sleep-time ( -- ms/f )
+    {
+        { [ run-queue dlist-empty? not ] [ 0 ] }
+        { [ sleep-queue heap-empty? ] [ f ] }
+        { [ t ] [ sleep-queue heap-peek nip millis [-] ] }
+    } cond ;
+
 <PRIVATE
 
 : schedule-sleep ( thread ms -- )
@@ -106,22 +111,26 @@ PRIVATE>
     [ ] while
     drop ;
 
-: next ( -- )
+: next ( -- * )
     expire-sleep-loop
-    run-queue pop-back
-    dup array? [ first2 ] [ f swap ] if dup set-self
-    f over set-thread-state
-    thread-continuation box>
-    continue-with ;
+    run-queue dup dlist-empty? [
+        ! We should never be in a state where the only threads
+        ! are sleeping; the I/O wait thread is always runnable.
+        ! However, if it dies, we handle this case
+        ! semi-gracefully.
+        !
+        ! And if sleep-time outputs f, there are no sleeping
+        ! threads either... so WTF.
+        drop sleep-time [ die 0 ] unless* (sleep) next
+    ] [
+        pop-back
+        dup array? [ first2 ] [ f swap ] if dup set-self
+        f over set-thread-state
+        thread-continuation box>
+        continue-with
+    ] if ;
 
 PRIVATE>
-
-: sleep-time ( -- ms/f )
-    {
-        { [ run-queue dlist-empty? not ] [ 0 ] }
-        { [ sleep-queue heap-empty? ] [ f ] }
-        { [ t ] [ sleep-queue heap-peek nip millis [-] ] }
-    } cond ;
 
 : stop ( -- )
     self dup thread-exit-handler call
@@ -168,20 +177,8 @@ M: real sleep
         ] 1 (throw)
     ] "spawn" suspend 2drop ;
 
-: default-thread-error-handler ( error thread -- )
-    global [
-        "Error in thread " write
-        dup thread-id pprint
-        " (" write
-        dup thread-name pprint ")" print
-        "spawned to call " write
-        thread-quot short.
-        nl
-        print-error flush
-    ] bind ;
-
 : spawn ( quot name -- thread )
-    [ default-thread-error-handler ] <thread> [ (spawn) ] keep ;
+    <thread> [ (spawn) ] keep ;
 
 : spawn-server ( quot name -- thread )
     >r [ [ ] [ ] while ] curry r> spawn ;
@@ -191,6 +188,8 @@ M: real sleep
     [ >r set-namestack set-datastack r> call ] 3curry
     "Thread" spawn drop ;
 
+GENERIC: error-in-thread ( error thread -- )
+
 <PRIVATE
 
 : init-threads ( -- )
@@ -198,13 +197,13 @@ M: real sleep
     <dlist> 42 setenv
     <min-heap> 43 setenv
     initial-thread global
-    [ drop f "Initial" [ die ] <thread> ] cache
+    [ drop f "Initial" <thread> ] cache
     <box> over set-thread-continuation
     f over set-thread-state
     dup register-thread
     set-self ;
 
-[ self dup thread-error-handler call stop ]
+[ self error-in-thread stop ]
 thread-error-hook set-global
 
 PRIVATE>

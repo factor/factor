@@ -1,7 +1,7 @@
 USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
-sorting tuples compiler.units ;
+sorting tuples compiler.units debugger ;
 IN: temporary
 
 [
@@ -426,3 +426,7 @@ IN: temporary
 ] unit-test
 
 [ t ] [ "foo" "temporary" lookup symbol? ] unit-test
+
+[ "resource:core/parser/test/assert-depth.factor" run-file ]
+[ relative-overflow-stack { 1 2 3 } sequence= ]
+must-fail-with

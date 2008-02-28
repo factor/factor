@@ -85,12 +85,12 @@ SYMBOL: mouse-captured
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
     #! only paint if width/height both > 0
-    3drop window draw-world ;
+    3drop window relayout-1 yield ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     2nip
     [ lo-word ] keep hi-word 2array
-    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ui-step ] if ;
+    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ] if ;
 
 : handle-wm-move ( hWnd uMsg wParam lParam -- )
     2nip
@@ -353,14 +353,12 @@ M: windows-ui-backend (close-window)
 : event-loop ( msg -- )
     {
         { [ windows get empty? ] [ drop ] }
-        { [ dup peek-message? ] [
-            >r [ ui-step ui-wait ] ui-try
-            r> event-loop
-        ] }
+        { [ dup peek-message? ] [ ui-wait event-loop ] }
         { [ dup MSG-message WM_QUIT = ] [ drop ] }
         { [ t ] [
             dup TranslateMessage drop
             dup DispatchMessage drop
+            yield
             event-loop
         ] }
     } cond ;

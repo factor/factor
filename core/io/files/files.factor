@@ -5,29 +5,8 @@ USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
 system combinators splitting sbufs continuations ;
 
-HOOK: cd io-backend ( path -- )
-
-HOOK: cwd io-backend ( -- path )
-
-HOOK: <file-reader> io-backend ( path -- stream )
-
-HOOK: <file-writer> io-backend ( path -- stream )
-
-HOOK: <file-appender> io-backend ( path -- stream )
-
-HOOK: delete-file io-backend ( path -- )
-
-HOOK: rename-file io-backend ( from to -- )
-
-HOOK: make-directory io-backend ( path -- )
-
-HOOK: delete-directory io-backend ( path -- )
-
+! Pathnames
 : path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
-
-HOOK: root-directory? io-backend ( path -- ? )
-
-M: object root-directory? ( path -- ? ) path-separator? ;
 
 : right-trim-separators ( str -- newstr )
     [ path-separator? ] right-trim ;
@@ -39,32 +18,14 @@ M: object root-directory? ( path -- ? ) path-separator? ;
     >r right-trim-separators "/" r>
     left-trim-separators 3append ;
 
-: stat ( path -- directory? permissions length modified )
-    normalize-pathname (stat) ;
-
-: file-length ( path -- n ) stat 4array third ;
-
-: file-modified ( path -- n ) stat >r 3drop r> ; inline
-
-: exists? ( path -- ? ) file-modified >boolean ;
-
-: directory? ( path -- ? ) stat 3drop ;
-
-: special-directory? ( name -- ? )
-    { "." ".." } member? ;
-
-: fixup-directory ( path seq -- newseq )
-    [
-        dup string?
-        [ tuck path+ directory? 2array ] [ nip ] if
-    ] with map
-    [ first special-directory? not ] subset ;
-
-: directory ( path -- seq )
-    normalize-directory dup (directory) fixup-directory ;
-
 : last-path-separator ( path -- n ? )
     [ length 1- ] keep [ path-separator? ] find-last* ;
+
+HOOK: root-directory? io-backend ( path -- ? )
+
+M: object root-directory? ( path -- ? ) path-separator? ;
+
+: special-directory? ( name -- ? ) { "." ".." } member? ;
 
 TUPLE: no-parent-directory path ;
 
@@ -89,15 +50,30 @@ TUPLE: no-parent-directory path ;
         { [ t ] [ drop ] }
     } cond ;
 
-: resource-path ( path -- newpath )
-    \ resource-path get [ image parent-directory ] unless*
-    swap path+ ;
+! File metadata
+: stat ( path -- directory? permissions length modified )
+    normalize-pathname (stat) ;
 
-: ?resource-path ( path -- newpath )
-    "resource:" ?head [ resource-path ] when ;
+: file-length ( path -- n ) stat drop 2nip ;
 
-: resource-exists? ( path -- ? )
-    ?resource-path exists? ;
+: file-modified ( path -- n ) stat >r 3drop r> ;
+
+: file-permissions ( path -- perm ) stat 2drop nip ;
+
+: exists? ( path -- ? ) file-modified >boolean ;
+
+: directory? ( path -- ? ) stat 3drop ;
+
+! Current working directory
+HOOK: cd io-backend ( path -- )
+
+HOOK: cwd io-backend ( -- path )
+
+: with-directory ( path quot -- )
+    swap cd cwd [ cd ] curry [ ] cleanup ; inline
+
+! Creating directories
+HOOK: make-directory io-backend ( path -- )
 
 : make-directories ( path -- )
     normalize-pathname right-trim-separators {
@@ -111,34 +87,106 @@ TUPLE: no-parent-directory path ;
         ] }
     } cond drop ;
 
+! Directory listings
+: fixup-directory ( path seq -- newseq )
+    [
+        dup string?
+        [ tuck path+ directory? 2array ] [ nip ] if
+    ] with map
+    [ first special-directory? not ] subset ;
+
+: directory ( path -- seq )
+    normalize-directory dup (directory) fixup-directory ;
+
+: directory* ( path -- seq )
+    dup directory [ first2 >r path+ r> 2array ] with map ;
+
+! Touching files
+HOOK: touch-file io-backend ( path -- )
+
+! Deleting files
+HOOK: delete-file io-backend ( path -- )
+
+HOOK: delete-directory io-backend ( path -- )
+
+: (delete-tree) ( path dir? -- )
+    [
+        dup directory* [ (delete-tree) ] assoc-each
+        delete-directory
+    ] [ delete-file ] if ;
+
+: delete-tree ( path -- )
+    dup directory? (delete-tree) ;
+
+: to-directory over file-name path+ ;
+
+! Moving and renaming files
+HOOK: move-file io-backend ( from to -- )
+
+: move-file-to ( from to -- )
+    to-directory move-file ;
+
+: move-files-to ( files to -- )
+    [ move-file-to ] curry each ;
+
+! Copying files
 HOOK: copy-file io-backend ( from to -- )
 
-M: object copy-file
-    dup parent-directory make-directories
-    <file-writer> [
-        swap <file-reader> [
-            swap stream-copy
-        ] with-disposal
-    ] with-disposal ;
+: copy-file-to ( from to -- )
+    to-directory copy-file ;
 
-: copy-directory ( from to -- )
-    dup make-directories
-    >r dup directory swap r> [
-        >r >r first r> over path+ r> rot path+ copy-file
-    ] 2curry each ;
+: copy-files-to ( files to -- )
+    [ copy-file-to ] curry each ;
 
-: home ( -- dir )
-    {
-        { [ winnt? ] [ "USERPROFILE" os-env ] }
-        { [ wince? ] [ "" resource-path ] }
-        { [ unix? ] [ "HOME" os-env ] }
-    } cond ;
+DEFER: copy-tree-to
 
+: copy-tree ( from to -- )
+    over directory? [
+        >r dup directory swap r> [
+            >r swap first path+ r> copy-tree-to
+        ] 2curry each
+    ] [
+        copy-file
+    ] if ;
+
+: copy-tree-to ( from to -- )
+    to-directory copy-tree ;
+
+: copy-trees-to ( files to -- )
+    [ copy-tree-to ] curry each ;
+
+! Special paths
+: resource-path ( path -- newpath )
+    \ resource-path get [ image parent-directory ] unless*
+    swap path+ ;
+
+: ?resource-path ( path -- newpath )
+    "resource:" ?head [ resource-path ] when ;
+
+: resource-exists? ( path -- ? )
+    ?resource-path exists? ;
+
+: temp-directory ( -- path )
+    "temp" resource-path
+    dup exists? not
+      [ dup make-directory ]
+    when ;
+
+: temp-file ( name -- path ) temp-directory swap path+ ;
+
+! Pathname presentations
 TUPLE: pathname string ;
 
 C: <pathname> pathname
 
 M: pathname <=> [ pathname-string ] compare ;
+
+! Streams
+HOOK: <file-reader> io-backend ( path -- stream )
+
+HOOK: <file-writer> io-backend ( path -- stream )
+
+HOOK: <file-appender> io-backend ( path -- stream )
 
 : file-lines ( path -- seq ) <file-reader> lines ;
 
@@ -155,10 +203,10 @@ M: pathname <=> [ pathname-string ] compare ;
 : with-file-appender ( path quot -- )
     >r <file-appender> r> with-stream ; inline
 
-: temp-directory ( -- path )
-    "temp" resource-path
-    dup exists? not
-      [ dup make-directory ]
-    when ;
-
-: temp-file ( name -- path ) temp-directory swap path+ ;
+! Home directory
+: home ( -- dir )
+    {
+        { [ winnt? ] [ "USERPROFILE" os-env ] }
+        { [ wince? ] [ "" resource-path ] }
+        { [ unix? ] [ "HOME" os-env ] }
+    } cond ;
