@@ -64,7 +64,11 @@ HOOK: insert-tuple* db ( tuple statement -- )
     dup db-columns swap db-table ;
 
 : with-disposals ( seq quot -- )
-    [ with-disposal ] curry each ;
+    over sequence? [
+        [ with-disposal ] curry each
+    ] [
+        with-disposal
+    ] if ;
 
 : create-table ( class -- )
     create-sql-statement [ execute-statement ] with-disposals ;
