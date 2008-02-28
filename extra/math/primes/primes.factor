@@ -47,3 +47,5 @@ PRIVATE>
   primes-upto
   >r 1- next-prime r>
   [ [ <=> ] binsearch ] keep [ length ] keep <slice> ; foldable
+
+: coprime? ( a b -- ? ) gcd nip 1 = ; foldable
