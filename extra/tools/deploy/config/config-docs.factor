@@ -66,6 +66,11 @@ HELP: deploy-math?
 $nl
 "On by default. Often the programmer will use rationals without realizing it. A small amount of space can be saved by stripping these features out, but some code may require changes to work properly." } ;
 
+HELP: deploy-threads?
+{ $description "Deploy flag. If set, the deployed image will contain support for threads."
+$nl
+"On by default. Often the programmer will use threads without realizing it. A small amount of space can be saved by stripping this feature out, but some code may require changes to work properly." } ;
+
 HELP: deploy-compiler?
 { $description "Deploy flag. If set, words in the deployed image will be compiled with the optimizing compiler when possible."
 $nl
