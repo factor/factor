@@ -193,6 +193,3 @@ HELP: save-error
 { $values { "error" "an error" } }
 { $description "Called by the error handler to set the " { $link error } " and " { $link restarts } " global variables after an error was thrown." }
 $low-level-note ;
-
-HELP: init-error-handler
-{ $description "Called on startup to initialize the catch stack and set a pair of hooks which allow the Factor VM to signal errors to library code." } ;
