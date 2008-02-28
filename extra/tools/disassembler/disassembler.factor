@@ -5,9 +5,9 @@ io.launcher system assocs arrays sequences namespaces qualified
 system math generator.fixup ;
 IN: tools.disassembler
 
-: in-file "gdb-in.txt" resource-path ;
+: in-file "gdb-in.txt" temp-file ;
 
-: out-file "gdb-out.txt" resource-path ;
+: out-file "gdb-out.txt" temp-file ;
 
 GENERIC: make-disassemble-cmd ( obj -- )
 
