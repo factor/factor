@@ -2,36 +2,36 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: unix
 USING: alien alien.c-types alien.syntax kernel libc structs
-math namespaces system combinators vocabs.loader ;
+math namespaces system combinators vocabs.loader unix.types ;
 
 ! ! ! Unix types
 
-TYPEDEF:  long  word
-TYPEDEF: ulong uword
+! TYPEDEF:  long  word
+! TYPEDEF: ulong uword
 
-TYPEDEF:  long longword
-TYPEDEF: ulong ulongword
+! TYPEDEF:  long longword
+! TYPEDEF: ulong ulongword
 
-TYPEDEF: long ssize_t
-TYPEDEF: longword blksize_t
-TYPEDEF: longword blkcnt_t
-TYPEDEF: longlong quad_t
-TYPEDEF: ulonglong dev_t
-TYPEDEF: uint gid_t
+! TYPEDEF: long ssize_t
+! TYPEDEF: longword blksize_t
+! TYPEDEF: longword blkcnt_t
+! TYPEDEF: longlong quad_t
+! TYPEDEF: ulonglong dev_t
+! TYPEDEF: uint gid_t
 TYPEDEF: uint in_addr_t
-TYPEDEF: ulong ino_t
-TYPEDEF: int pid_t
+! TYPEDEF: ulong ino_t
+! TYPEDEF: int pid_t
 TYPEDEF: uint socklen_t
 TYPEDEF: uint time_t
-TYPEDEF: uint uid_t
+! TYPEDEF: uint uid_t
 TYPEDEF: ulong size_t
-TYPEDEF: ulong u_long
-TYPEDEF: uint mode_t
-TYPEDEF: uword nlink_t
-TYPEDEF: void* caddr_t
+! TYPEDEF: ulong u_long
+! TYPEDEF: uint mode_t
+! TYPEDEF: uword nlink_t
+! TYPEDEF: void* caddr_t
 
-TYPEDEF: ulong off_t
-TYPEDEF-IF: bsd? ulonglong off_t
+! TYPEDEF: ulong off_t
+! TYPEDEF-IF: bsd? ulonglong off_t
 
 C-STRUCT: tm
     { "int" "sec" }    ! Seconds: 0-59 (K&R says 0-61?)
