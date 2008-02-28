@@ -6,6 +6,7 @@ IN: continuations
 
 SYMBOL: error
 SYMBOL: error-continuation
+SYMBOL: error-thread
 SYMBOL: restarts
 
 <PRIVATE
@@ -23,6 +24,8 @@ SYMBOL: restarts
     #! on the stack, we put it in a non-inline word together
     #! with a declaration.
     f { object } declare ;
+
+: init-catchstack V{ } clone 1 setenv ;
 
 PRIVATE>
 
@@ -169,17 +172,3 @@ M: condition compute-restarts
     condition-continuation
     [ <restart> ] curry { } assoc>map
     append ;
-
-<PRIVATE
-
-: init-error-handler ( -- )
-    V{ } clone set-catchstack
-    ! VM calls on error
-    [
-        continuation error-continuation set-global rethrow
-    ] 5 setenv
-    ! VM adds this to kernel errors, so that user-space
-    ! can identify them
-    "kernel-error" 6 setenv ;
-
-PRIVATE>

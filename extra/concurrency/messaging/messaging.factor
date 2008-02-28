@@ -32,7 +32,7 @@ M: thread send ( message thread -- )
     my-mailbox swap mailbox-get-timeout? ?linked ; inline
 
 : rethrow-linked ( error process supervisor -- )
-    >r <linked> r> send ;
+    >r <linked-error> r> send ;
 
 : spawn-linked ( quot name -- thread )
     my-mailbox spawn-linked-to ;

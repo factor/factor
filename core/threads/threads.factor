@@ -4,13 +4,12 @@
 IN: threads
 USING: arrays hashtables heaps kernel kernel.private math
 namespaces sequences vectors continuations continuations.private
-dlists assocs system combinators debugger prettyprint io init
-boxes ;
+dlists assocs system combinators init boxes ;
 
 SYMBOL: initial-thread
 
 TUPLE: thread
-name quot error-handler exit-handler
+name quot exit-handler
 id
 continuation state
 mailbox variables sleep-entry ;
@@ -60,11 +59,10 @@ threads global [ H{ } assoc-like ] change-at
 
 PRIVATE>
 
-: <thread> ( quot name error-handler -- thread )
+: <thread> ( quot name -- thread )
     \ thread counter <box> [ ] {
         set-thread-quot
         set-thread-name
-        set-thread-error-handler
         set-thread-id
         set-thread-continuation
         set-thread-exit-handler
@@ -179,20 +177,8 @@ M: real sleep
         ] 1 (throw)
     ] "spawn" suspend 2drop ;
 
-: default-thread-error-handler ( error thread -- )
-    global [
-        "Error in thread " write
-        dup thread-id pprint
-        " (" write
-        dup thread-name pprint ")" print
-        "spawned to call " write
-        thread-quot short.
-        nl
-        print-error flush
-    ] bind ;
-
 : spawn ( quot name -- thread )
-    [ default-thread-error-handler ] <thread> [ (spawn) ] keep ;
+    <thread> [ (spawn) ] keep ;
 
 : spawn-server ( quot name -- thread )
     >r [ [ ] [ ] while ] curry r> spawn ;
@@ -202,6 +188,8 @@ M: real sleep
     [ >r set-namestack set-datastack r> call ] 3curry
     "Thread" spawn drop ;
 
+GENERIC: error-in-thread ( error thread -- )
+
 <PRIVATE
 
 : init-threads ( -- )
@@ -209,13 +197,13 @@ M: real sleep
     <dlist> 42 setenv
     <min-heap> 43 setenv
     initial-thread global
-    [ drop f "Initial" [ die ] <thread> ] cache
+    [ drop f "Initial" <thread> ] cache
     <box> over set-thread-continuation
     f over set-thread-state
     dup register-thread
     set-self ;
 
-[ self dup thread-error-handler call stop ]
+[ self error-in-thread stop ]
 thread-error-hook set-global
 
 PRIVATE>

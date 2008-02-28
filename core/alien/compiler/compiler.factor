@@ -367,7 +367,7 @@ TUPLE: callback-context ;
     ] if ;
 
 : do-callback ( quot token -- )
-    init-error-handler
+    init-catchstack
     dup 2 setenv
     slip
     wait-to-return ; inline

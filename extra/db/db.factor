@@ -5,29 +5,36 @@ namespaces sequences sequences.lib tuples words strings
 tools.walker ;
 IN: db
 
-TUPLE: db handle ;
-! TUPLE: db handle insert-statements update-statements delete-statements ;
+TUPLE: db
+    handle
+    insert-statements
+    update-statements
+    delete-statements ;
+
 : <db> ( handle -- obj )
-    ! H{ } clone H{ } clone H{ } clone
+    H{ } clone H{ } clone H{ } clone
     db construct-boa ;
 
 GENERIC: make-db* ( seq class -- db )
-: make-db ( seq class -- db ) construct-empty make-db* ;
 GENERIC: db-open ( db -- )
 HOOK: db-close db ( handle -- )
+: make-db ( seq class -- db ) construct-empty make-db* ;
 
 : dispose-statements ( seq -- )
     [ dispose drop ] assoc-each ;
 
 : dispose-db ( db -- ) 
     dup db [
-        ! dup db-insert-statements dispose-statements
-        ! dup db-update-statements dispose-statements
-        ! dup db-delete-statements dispose-statements
+        dup db-insert-statements dispose-statements
+        dup db-update-statements dispose-statements
+        dup db-delete-statements dispose-statements
         db-handle db-close
     ] with-variable ;
 
 TUPLE: statement handle sql in-params out-params bind-params bound? ;
+TUPLE: simple-statement ;
+TUPLE: prepared-statement ;
+TUPLE: result-set sql params handle n max ;
 : <statement> ( sql in out -- statement )
     {
         set-statement-sql
@@ -35,17 +42,11 @@ TUPLE: statement handle sql in-params out-params bind-params bound? ;
         set-statement-out-params
     } statement construct ;
 
-TUPLE: simple-statement ;
-TUPLE: prepared-statement ;
-
 HOOK: <simple-statement> db ( str in out -- statement )
 HOOK: <prepared-statement> db ( str in out -- statement )
 GENERIC: prepare-statement ( statement -- )
-GENERIC: bind-statement* ( obj statement -- )
-GENERIC: reset-statement ( statement -- )
+GENERIC: bind-statement* ( statement -- )
 GENERIC: bind-tuple ( tuple statement -- )
-
-TUPLE: result-set sql params handle n max ;
 GENERIC: query-results ( query -- result-set )
 GENERIC: #rows ( result-set -- n )
 GENERIC: #columns ( result-set -- n )
@@ -61,9 +62,8 @@ GENERIC: more-rows? ( result-set -- ? )
     ] if ;
 
 : bind-statement ( obj statement -- )
-    dup statement-bound? [ dup reset-statement ] when
-    [ bind-statement* ] 2keep
     [ set-statement-bind-params ] keep
+    [ bind-statement* ] keep
     t swap set-statement-bound? ;
 
 : init-result-set ( result-set -- )
@@ -103,7 +103,6 @@ GENERIC: more-rows? ( result-set -- ? )
 
 : do-bound-command ( obj query -- )
     [ bind-statement ] keep execute-statement ;
-
 
 SYMBOL: in-transaction
 HOOK: begin-transaction db ( -- )
