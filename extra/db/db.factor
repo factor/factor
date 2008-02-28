@@ -12,9 +12,9 @@ TUPLE: db handle ;
     db construct-boa ;
 
 GENERIC: make-db* ( seq class -- db )
-: make-db ( seq class -- db ) construct-empty make-db* ;
 GENERIC: db-open ( db -- )
 HOOK: db-close db ( handle -- )
+: make-db ( seq class -- db ) construct-empty make-db* ;
 
 : dispose-statements ( seq -- )
     [ dispose drop ] assoc-each ;
@@ -28,6 +28,9 @@ HOOK: db-close db ( handle -- )
     ] with-variable ;
 
 TUPLE: statement handle sql in-params out-params bind-params bound? ;
+TUPLE: simple-statement ;
+TUPLE: prepared-statement ;
+TUPLE: result-set sql params handle n max ;
 : <statement> ( sql in out -- statement )
     {
         set-statement-sql
@@ -35,17 +38,11 @@ TUPLE: statement handle sql in-params out-params bind-params bound? ;
         set-statement-out-params
     } statement construct ;
 
-TUPLE: simple-statement ;
-TUPLE: prepared-statement ;
-
 HOOK: <simple-statement> db ( str in out -- statement )
 HOOK: <prepared-statement> db ( str in out -- statement )
 GENERIC: prepare-statement ( statement -- )
-GENERIC: bind-statement* ( obj statement -- )
-GENERIC: reset-statement ( statement -- )
+GENERIC: bind-statement* ( statement -- )
 GENERIC: bind-tuple ( tuple statement -- )
-
-TUPLE: result-set sql params handle n max ;
 GENERIC: query-results ( query -- result-set )
 GENERIC: #rows ( result-set -- n )
 GENERIC: #columns ( result-set -- n )
@@ -53,6 +50,7 @@ GENERIC# row-column 1 ( result-set n -- obj )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 
+! must be called from within with-disposal
 : execute-statement ( statement -- )
     dup sequence? [
         [ execute-statement ] each
@@ -61,9 +59,8 @@ GENERIC: more-rows? ( result-set -- ? )
     ] if ;
 
 : bind-statement ( obj statement -- )
-    dup statement-bound? [ dup reset-statement ] when
-    [ bind-statement* ] 2keep
     [ set-statement-bind-params ] keep
+    [ bind-statement* ] keep
     t swap set-statement-bound? ;
 
 : init-result-set ( result-set -- )
