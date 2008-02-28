@@ -63,10 +63,14 @@ HOOK: insert-tuple* db ( tuple statement -- )
 : sql-props ( class -- columns table )
     dup db-columns swap db-table ;
 
+: with-disposals ( seq quot -- )
+    [ with-disposal ] curry each ;
+
 : create-table ( class -- )
-    create-sql-statement [ execute-statement ] with-disposal ;
+    create-sql-statement [ execute-statement ] with-disposals ;
+
 : drop-table ( class -- )
-    drop-sql-statement [ execute-statement ] with-disposal ;
+    drop-sql-statement [ execute-statement ] with-disposals ;
 
 : insert-native ( tuple -- )
     dup class <insert-native-statement> [
