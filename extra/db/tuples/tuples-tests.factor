@@ -22,8 +22,9 @@ SYMBOL: the-person2
 : test-tuples ( -- )
     [ person drop-table ] [ drop ] recover
     [ ] [ person create-table ] unit-test
+    [ person create-table ] must-fail
     
-    [  ] [ the-person1 get insert-tuple ] unit-test
+    [ ] [ the-person1 get insert-tuple ] unit-test
 
     [ 1 ] [ the-person1 get person-the-id ] unit-test
 
@@ -108,11 +109,11 @@ annotation "ANNOTATION"
     { "contents" "CONTENTS" TEXT }
 } define-persistent
 
-{ "localhost" "postgres" "" "factor-test" } postgresql-db [
-    [ paste drop-table ] [ drop ] recover
-    [ annotation drop-table ] [ drop ] recover
-    [ paste drop-table ] [ drop ] recover
-    [ annotation drop-table ] [ drop ] recover
-    [ ] [ paste create-table ] unit-test
-    [ ] [ annotation create-table ] unit-test
-] with-db
+! { "localhost" "postgres" "" "factor-test" } postgresql-db [
+    ! [ paste drop-table ] [ drop ] recover
+    ! [ annotation drop-table ] [ drop ] recover
+    ! [ paste drop-table ] [ drop ] recover
+    ! [ annotation drop-table ] [ drop ] recover
+    ! [ ] [ paste create-table ] unit-test
+    ! [ ] [ annotation create-table ] unit-test
+! ] with-db

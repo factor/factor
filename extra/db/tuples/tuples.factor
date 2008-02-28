@@ -63,16 +63,24 @@ HOOK: insert-tuple* db ( tuple statement -- )
 : sql-props ( class -- columns table )
     dup db-columns swap db-table ;
 
-: create-table ( class -- ) create-sql-statement execute-statement ;
-: drop-table ( class -- ) drop-sql-statement execute-statement ;
+: with-disposals ( seq quot -- )
+    [ with-disposal ] curry each ;
+
+: create-table ( class -- )
+    create-sql-statement [ execute-statement ] with-disposals ;
+
+: drop-table ( class -- )
+    drop-sql-statement [ execute-statement ] with-disposals ;
 
 : insert-native ( tuple -- )
-    dup class <insert-native-statement>
-    [ bind-tuple ] 2keep insert-tuple* ;
+    dup class <insert-native-statement> [
+        [ bind-tuple ] 2keep dup . insert-tuple*
+    ] with-disposal ;
 
 : insert-assigned ( tuple -- )
-    dup class <insert-assigned-statement>
-    [ bind-tuple ] keep execute-statement ;
+    dup class <insert-assigned-statement> [
+        [ bind-tuple ] keep execute-statement
+    ] with-disposal ;
 
 : insert-tuple ( tuple -- )
     dup class db-columns find-primary-key assigned-id? [
@@ -82,19 +90,21 @@ HOOK: insert-tuple* db ( tuple statement -- )
     ] if ;
 
 : update-tuple ( tuple -- )
-    dup class <update-tuple-statement>
-    [ bind-tuple ] keep execute-statement ;
+    dup class <update-tuple-statement> [
+        [ bind-tuple ] keep execute-statement
+    ] with-disposal ;
 
-: update-tuples ( seq -- )
-    <update-tuples-statement> execute-statement ;
+! : update-tuples ( seq -- )
+    ! <update-tuples-statement> execute-statement ;
 
 : delete-tuple ( tuple -- )
-    dup class <delete-tuple-statement>
-    [ bind-tuple ] keep execute-statement ;
+    dup class <delete-tuple-statement> [
+        [ bind-tuple ] keep execute-statement
+    ] with-disposal ;
 
-: setup-select ( tuple -- statement )
-    dup dup class <select-by-slots-statement>
-    [ bind-tuple ] keep ;
+: select-tuples ( tuple -- tuple )
+    dup dup class <select-by-slots-statement> [
+        [ bind-tuple ] keep query-tuples
+    ] with-disposal ;
 
-: select-tuples ( tuple -- tuple ) setup-select query-tuples ;
 : select-tuple ( tuple -- tuple/f ) select-tuples ?first ;
