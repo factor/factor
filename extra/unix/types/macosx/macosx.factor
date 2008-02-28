@@ -1,4 +1,6 @@
 
+USING: alien.syntax ;
+
 IN: unix.types
 
 ! Darwin 9.1.0 ppc

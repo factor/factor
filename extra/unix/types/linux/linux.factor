@@ -7,9 +7,9 @@ IN: unix.types
 
 TYPEDEF: ulonglong __uquad_type
 TYPEDEF: ulong     __ulongword_type
-TYPEDEF: uint      __uword_type
+TYPEDEF: long      __sword_type
+TYPEDEF: ulong     __uword_type
 TYPEDEF: long      __slongword_type
-TYPEDEF: int       __sword_type
 TYPEDEF: uint      __u32_type
 TYPEDEF: int       __s32_type 
 
