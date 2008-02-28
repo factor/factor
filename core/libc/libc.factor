@@ -46,7 +46,7 @@ M: realloc-error summary drop "Memory reallocation failed" ;
 
 <PRIVATE
 
-[ H{ } clone mallocs set-global ] "mallocs" add-init-hook
+[ H{ } clone mallocs set-global ] "libc" add-init-hook
 
 : add-malloc ( alien -- )
     dup mallocs get-global set-at ;

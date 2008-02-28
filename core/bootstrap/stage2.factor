@@ -51,66 +51,60 @@ SYMBOL: bootstrap-time
 ! Wrap everything in a catch which starts a listener so
 ! you can see what went wrong, instead of dealing with a
 ! fep
-[
-    ! We time bootstrap
-    millis >r
 
-    default-image-name "output-image" set-global
+! We time bootstrap
+millis >r
 
-    "math help handbook compiler tools ui ui.tools io" "include" set-global
-    "" "exclude" set-global
+default-image-name "output-image" set-global
 
-    parse-command-line
+"math help handbook compiler tools ui ui.tools io" "include" set-global
+"" "exclude" set-global
 
-    "-no-crossref" cli-args member? [ do-crossref ] unless
+parse-command-line
 
-    ! Set dll paths
-    wince? [ "windows.ce" require ] when
-    winnt? [ "windows.nt" require ] when
+"-no-crossref" cli-args member? [ do-crossref ] unless
 
-    "deploy-vocab" get [
-        "stage2: deployment mode" print
-    ] [
-        "listener" require
-        "none" require
-    ] if
+! Set dll paths
+wince? [ "windows.ce" require ] when
+winnt? [ "windows.nt" require ] when
 
-    [
-        load-components
-
-        run-bootstrap-init
-
-        "bootstrap.compiler" vocab [
-            compile-remaining
-        ] when
-    ] with-compiler-errors
-    :errors
-
-    f error set-global
-    f error-continuation set-global
-
-    "deploy-vocab" get [
-        "tools.deploy.shaker" run
-    ] [
-        [
-            boot
-            do-init-hooks
-            [
-                parse-command-line
-                run-user-init
-                "run" get run
-                stdio get [ stream-flush ] when*
-            ] [ print-error 1 exit ] recover
-        ] set-boot-quot
-
-        millis r> - dup bootstrap-time set-global
-        print-report
-
-        "output-image" get resource-path save-image-and-exit
-    ] if
+"deploy-vocab" get [
+    "stage2: deployment mode" print
 ] [
-    :c
-    print-error restarts.
-    "listener" vocab-main execute
-    1 exit
-] recover
+    "listener" require
+    "none" require
+] if
+
+[
+    load-components
+
+    run-bootstrap-init
+
+    "bootstrap.compiler" vocab [
+        compile-remaining
+    ] when
+] with-compiler-errors
+:errors
+
+f error set-global
+f error-continuation set-global
+
+"deploy-vocab" get [
+    "tools.deploy.shaker" run
+] [
+    [
+        boot
+        do-init-hooks
+        [
+            parse-command-line
+            run-user-init
+            "run" get run
+            stdio get [ stream-flush ] when*
+        ] [ print-error 1 exit ] recover
+    ] set-boot-quot
+
+    millis r> - dup bootstrap-time set-global
+    print-report
+
+    "output-image" get resource-path save-image-and-exit
+] if
