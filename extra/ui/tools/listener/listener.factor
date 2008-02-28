@@ -40,9 +40,14 @@ M: listener-gadget call-tool* ( input listener -- )
 M: listener-gadget tool-scroller
     listener-gadget-output find-scroller ;
 
+: wait-for-listener ( listener -- )
+    #! Wait for the listener to start.
+    listener-gadget-input interactor-flag wait-for-flag ;
+
 : workspace-busy? ( workspace -- ? )
-    workspace-listener listener-gadget-input
-    interactor-busy? ;
+    workspace-listener
+    dup wait-for-listener
+    listener-gadget-input interactor-busy? ;
 
 : get-listener ( -- listener )
     [ workspace-busy? not ] get-workspace* workspace-listener ;
@@ -133,10 +138,6 @@ M: stack-display tool-scroller
 
 : start-listener-thread ( listener -- )
     [ listener-thread ] curry "Listener" spawn drop ;
-
-: wait-for-listener ( listener -- )
-    #! Wait for the listener to start.
-    listener-gadget-input interactor-flag wait-for-flag ;
 
 : restart-listener ( listener -- )
     #! Returns when listener is ready to receive input.

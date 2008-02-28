@@ -54,7 +54,3 @@ M: variables-gadget pref-dim* drop { 400 400 } ;
 
 : traceback-window ( continuation -- )
     <model> <traceback-gadget> "Traceback" open-window ;
-
-traceback-gadget "toolbar" f {
-    { T{ key-down f f "v" } variables }
-} define-command-map
