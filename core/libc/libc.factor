@@ -2,7 +2,7 @@
 ! Copyright (C) 2007 Slava Pestov
 ! Copyright (C) 2007 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien assocs continuations init inspector kernel namespaces ;
+USING: alien assocs continuations init kernel namespaces ;
 IN: libc
 
 <PRIVATE
@@ -25,21 +25,15 @@ PRIVATE>
 
 TUPLE: check-ptr ;
 
-M: check-ptr summary drop "Memory allocation failed" ;
-
 : check-ptr ( c-ptr -- c-ptr )
     [ \ check-ptr construct-boa throw ] unless* ;
 
 TUPLE: double-free ;
 
-M: double-free summary drop "Free failed since memory is not allocated" ;
-
 : double-free ( -- * )
     \ double-free construct-empty throw ;
 
 TUPLE: realloc-error ptr size ;
-
-M: realloc-error summary drop "Memory reallocation failed" ;
 
 : realloc-error ( alien size -- * )
     \ realloc-error construct-boa throw ;

@@ -142,7 +142,6 @@ DEFER: copy-tree-to
 
 : copy-tree ( from to -- )
     over directory? [
-        dup make-directories
         >r dup directory swap r> [
             >r swap first path+ r> copy-tree-to
         ] 2curry each

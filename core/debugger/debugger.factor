@@ -6,7 +6,7 @@ strings io.styles vectors words system splitting math.parser
 tuples continuations continuations.private combinators
 generic.math io.streams.duplex classes compiler.units
 generic.standard vocabs threads threads.private init
-kernel.private ;
+kernel.private libc ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -63,20 +63,9 @@ M: string error. print ;
     [ global [ "Error in print-error!" print drop ] bind ]
     recover ;
 
-: error-in-thread. ( -- )
-    error-thread get-global
-    "Error in thread " write
-    [
-        dup thread-id #
-        " (" % dup thread-name %
-        ", " % dup thread-quot unparse-short % ")" %
-    ] "" make
-    swap write-object ":" print nl ;
-
 SYMBOL: error-hook
 
 [
-    error-in-thread.
     print-error
     restarts.
     nl
@@ -264,6 +253,24 @@ M: no-compilation-unit error.
 
 M: no-vocab summary
     drop "Vocabulary does not exist" ;
+
+M: check-ptr summary
+    drop "Memory allocation failed" ;
+
+M: double-free summary
+    drop "Free failed since memory is not allocated" ;
+
+M: realloc-error summary
+    drop "Memory reallocation failed" ;
+
+: error-in-thread. ( -- )
+    error-thread get-global
+    "Error in thread " write
+    [
+        dup thread-id #
+        " (" % dup thread-name %
+        ", " % dup thread-quot unparse-short % ")" %
+    ] "" make swap write-object ":" print nl ;
 
 ! Hooks
 M: thread error-in-thread ( error thread -- )
