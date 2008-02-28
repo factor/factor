@@ -2,18 +2,14 @@ USING: kernel math math.bitfields combinators.lib math.parser
 random sequences sequences.lib continuations namespaces
 io.files io.backend io.nonblocking io arrays
 io.files.temporary.backend system combinators vocabs.loader ;
-USE: tools.walker
 IN: io.files.temporary
 
-: random-letter ( -- ch )
-    26 random { CHAR: a CHAR: A } random + ;
+: random-letter ( -- ch ) 26 random { CHAR: a CHAR: A } random + ;
 
 : random-ch ( -- ch )
-    { t f } random
-    [ 10 random CHAR: 0 + ] [ random-letter ] if ;
+    { t f } random [ 10 random CHAR: 0 + ] [ random-letter ] if ;
 
-: random-name ( n -- string )
-    [ drop random-ch ] "" map-as ;
+: random-name ( n -- string ) [ drop random-ch ] "" map-as ;
 
 : <temporary-file> ( prefix suffix -- path duplex-stream )
     temporary-path -rot
