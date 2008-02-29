@@ -23,7 +23,7 @@ TUPLE: session id manager namespace alarm ;
 : timeout ( -- dt ) 20 minutes ;
 
 : cancel-timeout ( session -- )
-    alarm>> ?box [ cancel-alarm ] [ drop ] if ;
+    alarm>> [ cancel-alarm ] if-box? ;
 
 : delete-session ( session -- )
     dup cancel-timeout
