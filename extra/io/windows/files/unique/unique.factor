@@ -1,4 +1,4 @@
-USING: kernel system io.files.unqiue io.files.unique.backend ;
+USING: kernel system io.files.unique.backend ;
 IN: io.windows.files.unique
 
 M: windows-io (make-unique-file) ( path -- stream )
