@@ -174,5 +174,5 @@ threads sequences calendar ;
     ] ;
 
 [ lock-timeout-test ] [
-    linked-thread thread-name "Lock timeout-er" =
+    linked-error-thread thread-name "Lock timeout-er" =
 ] must-fail-with

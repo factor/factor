@@ -13,9 +13,14 @@ TUPLE: flag value? thread ;
         [ resume ] [ drop t over set-flag-value? ] if
     ] unless drop ;
 
+: wait-for-flag ( flag -- )
+    dup flag-value? [ drop ] [
+        [ flag-thread >box ] curry "flag" suspend drop
+    ] if ;
+
 : lower-flag ( flag -- )
     dup flag-value? [
         f swap set-flag-value?
     ] [
-        [ flag-thread >box ] curry "flag" suspend drop
+        wait-for-flag
     ] if ;

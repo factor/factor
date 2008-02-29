@@ -64,6 +64,7 @@ typedef enum {
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV
+#define LAST_SAVE_ENV STAGE2_ENV
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];

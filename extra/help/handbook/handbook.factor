@@ -199,6 +199,7 @@ ARTICLE: "tools" "Developer tools"
 "Debugging tools:"
 { $subsection "tools.annotations" }
 { $subsection "tools.test" }
+{ $subsection "tools.threads" }
 "Performance tools:"
 { $subsection "tools.memory" }
 { $subsection "profiling" }
