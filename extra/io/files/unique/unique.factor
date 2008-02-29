@@ -46,3 +46,8 @@ PRIVATE>
 
 : with-temporary-directory ( quot -- )
     with-unique-directory delete-tree ; inline
+
+{
+    { [ unix? ] [ "io.unix.files.unique" ] }
+    { [ windows? ] [ "io.windows.files.unique" ] }
+} cond require
