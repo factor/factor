@@ -1,9 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: io.files
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
 system combinators splitting sbufs continuations ;
+
+IN: io.files
 
 ! Pathnames
 : path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
@@ -49,6 +50,19 @@ TUPLE: no-parent-directory path ;
         { [ dup last-path-separator ] [ 1+ tail ] }
         { [ t ] [ drop ] }
     } cond ;
+
+TUPLE: file-info type size permissions modified ;
+
+HOOK: file-info io-backend ( path -- info )
+
+SYMBOL: +regular-file+
+SYMBOL: +directory+
+SYMBOL: +character-device+
+SYMBOL: +block-device+
+SYMBOL: +fifo+
+SYMBOL: +symbolic-link+
+SYMBOL: +socket+
+SYMBOL: +unknown+
 
 ! File metadata
 : stat ( path -- directory? permissions length modified )
