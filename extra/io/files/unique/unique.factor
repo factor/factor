@@ -29,7 +29,7 @@ PRIVATE>
     ] 3curry unique-retries retry ;
 
 : with-unique-file ( quot -- path )
-    >r f f make-unique-file r> with-stream ; inline
+    >r f f make-unique-file r> rot [ with-stream ] dip ; inline
 
 : with-temporary-file ( quot -- )
     with-unique-file delete-file ; inline
