@@ -64,7 +64,8 @@ M: sqlite-statement bind-tuple ( tuple statement -- )
             [ sql-spec-type ] tri 3array
         ] with map
     ] keep
-    [ set-statement-bind-params ] keep bind-statement* ;
+    [ set-statement-bind-params ] keep
+    t over set-statement-bound? bind-statement* ;
 
 : last-insert-id ( -- id )
     db get db-handle sqlite3_last_insert_rowid
