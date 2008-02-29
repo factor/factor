@@ -4,11 +4,14 @@ USING: alien arrays assocs classes compiler db
 hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
-words combinators.lib db.types ;
+words combinators.lib db.types combinators tools.walker
+combinators.cleave ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
-C: <sqlite-db> sqlite-db
+
+M: sqlite-db make-db* ( path db -- db )
+    [ set-sqlite-db-path ] keep ;
 
 M: sqlite-db db-open ( db -- )
     dup sqlite-db-path sqlite-open <db>
@@ -19,23 +22,22 @@ M: sqlite-db db-close ( handle -- )
 
 M: sqlite-db dispose ( db -- ) dispose-db ;
 
-: with-sqlite ( path quot -- )
-    >r <sqlite-db> r> with-db ; inline
-
 TUPLE: sqlite-statement ;
-C: <sqlite-statement> sqlite-statement
 
-TUPLE: sqlite-result-set ;
-: <sqlite-result-set> ( query -- sqlite-result-set )
-    dup statement-handle sqlite-result-set <result-set> ;
+TUPLE: sqlite-result-set has-more? ;
 
 M: sqlite-db <simple-statement> ( str -- obj )
     <prepared-statement> ;
 
 M: sqlite-db <prepared-statement> ( str -- obj )
-    db get db-handle over sqlite-prepare
-    { set-statement-sql set-statement-handle } statement construct
-    <sqlite-statement> [ set-delegate ] keep ;
+    {
+        set-statement-sql
+        set-statement-in-params
+        set-statement-out-params
+    } statement construct
+    db get db-handle over statement-sql sqlite-prepare
+    over set-statement-handle
+    sqlite-statement construct-delegate ;
 
 M: sqlite-statement dispose ( statement -- )
     statement-handle sqlite-finalize ;
@@ -43,15 +45,33 @@ M: sqlite-statement dispose ( statement -- )
 M: sqlite-result-set dispose ( result-set -- )
     f swap set-result-set-handle ;
 
-M: sqlite-statement bind-statement* ( assoc statement -- )
-    statement-handle swap sqlite-bind-assoc ;
+: sqlite-bind ( triples handle -- )
+    swap [ first3 sqlite-bind-type ] with each ;
 
-M: sqlite-statement rebind-statement ( assoc statement -- )
-    dup statement-handle sqlite-reset
-    statement-handle swap sqlite-bind-assoc ;
+: reset-statement ( statement -- )
+    statement-handle sqlite-reset ;
 
-M: sqlite-statement execute-statement ( statement -- )
-    statement-handle sqlite-next drop ;
+M: sqlite-statement bind-statement* ( statement -- )
+    dup statement-bound? [ dup reset-statement ] when
+    [ statement-bind-params ] [ statement-handle ] bi sqlite-bind ;
+
+M: sqlite-statement bind-tuple ( tuple statement -- )
+    [
+        statement-in-params
+        [
+            [ sql-spec-column-name ":" swap append ]
+            [ sql-spec-slot-name rot get-slot-named ]
+            [ sql-spec-type ] tri 3array
+        ] with map
+    ] keep
+    [ set-statement-bind-params ] keep bind-statement* ;
+
+: last-insert-id ( -- id )
+    db get db-handle sqlite3_last_insert_rowid
+    dup zero? [ "last-id failed" throw ] when ;
+
+M: sqlite-db insert-tuple* ( tuple statement -- )
+    execute-statement last-insert-id swap set-primary-key ;
 
 M: sqlite-result-set #columns ( result-set -- n )
     result-set-handle sqlite-#columns ;
@@ -59,11 +79,19 @@ M: sqlite-result-set #columns ( result-set -- n )
 M: sqlite-result-set row-column ( result-set n -- obj )
     >r result-set-handle r> sqlite-column ;
 
-M: sqlite-result-set advance-row ( result-set -- handle ? )
-    result-set-handle sqlite-next ;
+M: sqlite-result-set row-column-typed ( result-set n type -- obj )
+    >r result-set-handle r> sqlite-column-typed ;
+
+M: sqlite-result-set advance-row ( result-set -- )
+    [ result-set-handle sqlite-next ] keep
+    set-sqlite-result-set-has-more? ;
+
+M: sqlite-result-set more-rows? ( result-set -- ? )
+    sqlite-result-set-has-more? ;
 
 M: sqlite-statement query-results ( query -- result-set )
-    dup statement-handle sqlite-result-set <result-set> ;
+    dup statement-handle sqlite-result-set <result-set>
+    dup advance-row ;
 
 M: sqlite-db begin-transaction ( -- )
     "BEGIN" sql-command ;
@@ -74,72 +102,83 @@ M: sqlite-db commit-transaction ( -- )
 M: sqlite-db rollback-transaction ( -- )
     "ROLLBACK" sql-command ;
 
-M: sqlite-db create-sql ( columns table -- sql )
-    [
-        "create table " % %
-        " (" % [ ", " % ] [
-            dup second % " " %
-            dup third >sql-type % " " %
-            sql-modifiers " " join %
-        ] interleave ")" %
-    ] "" make ;
+: sqlite-make ( class quot -- )
+    >r sql-props r>
+    { "" { } { } } nmake <simple-statement> ;
 
-M: sqlite-db drop-sql ( table -- sql )
+M: sqlite-db create-sql-statement ( class -- statement )
     [
-        "drop table " % %
-    ] "" make ;
+        "create table " 0% 0%
+        "(" 0% [ ", " 0% ] [
+            dup sql-spec-column-name 0%
+            " " 0%
+            dup sql-spec-type t lookup-type 0%
+            modifiers 0%
+        ] interleave ");" 0%
+    ] sqlite-make ;
 
-M: sqlite-db insert-sql* ( columns table -- sql )
+M: sqlite-db drop-sql-statement ( class -- statement )
     [
-        "insert into " %
-        %
-        "(" %
-        dup [ ", " % ] [ second % ] interleave
-        ") " %
-        " values (" %
-        [ ", " % ] [ ":" % second % ] interleave
-        ")" %
-    ] "" make ;
+        "drop table " 0% 0% ";" 0% drop
+    ] sqlite-make ;
 
-M: sqlite-db update-sql* ( columns table -- sql )
+M: sqlite-db <insert-native-statement> ( tuple -- statement )
     [
-        "update " %
-        %
-        " set " %
+        "insert into " 0% 0%
+        "(" 0%
+        maybe-remove-id
+        dup [ ", " 0% ] [ sql-spec-column-name 0% ] interleave
+        ") values(" 0%
+        [ ", " 0% ] [ bind% ] interleave
+        ");" 0%
+    ] sqlite-make ;
+
+M: sqlite-db <insert-assigned-statement> ( tuple -- statement )
+    <insert-native-statement> ;
+
+: where-primary-key% ( specs -- )
+    " where " 0%
+    find-primary-key dup sql-spec-column-name 0% " = " 0% bind% ;
+
+M: sqlite-db <update-tuple-statement> ( class -- statement )
+    [
+        "update " 0%
+        0%
+        " set " 0%
         dup remove-id
-        [ ", " % ] [ second dup % " = :" % % ] interleave
-        " where " %
-        [ primary-key? ] find nip second dup % " = :" % %
-    ] "" make ;
+        [ ", " 0% ] [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
+        where-primary-key%
+    ] sqlite-make ;
 
-M: sqlite-db delete-sql* ( columns table -- sql )
+M: sqlite-db <delete-tuple-statement> ( specs table -- sql )
     [
-        "delete from " %
-        %
-        " where " %
-        first second dup % " = :" % %
-    ] "" make dup . ;
+        "delete from " 0% 0%
+        " where " 0%
+        find-primary-key
+        dup sql-spec-column-name 0% " = " 0% bind%
+    ] sqlite-make ;
 
-M: sqlite-db select-sql* ( columns table -- sql )
+! : select-interval ( interval name -- ) ;
+! : select-sequence ( seq name -- ) ;
+
+M: sqlite-db bind% ( spec -- )
+    dup 1, sql-spec-column-name ":" swap append 0% ;
+
+M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
     [
-        "select ROWID, " %
-        swap [ ", " % ] [ second % ] interleave
-        " from " %
-        %
-        " where ROWID = :ID" %
-    ] "" make ;
+        "select " 0%
+        over [ ", " 0% ]
+        [ dup sql-spec-column-name 0% 2, ] interleave
 
-M: sqlite-db tuple>params ( columns tuple -- obj )
-    [
-        >r [ second ":" swap append ] keep first r> get-slot-named
-        number>string*
-    ] curry { } map>assoc  ;
-    
-M: sqlite-db last-id ( -- id )
-    db get db-handle sqlite3_last_insert_rowid ;
+        " from " 0% 0%
+        [ sql-spec-slot-name swap get-slot-named ] with subset
+        " where " 0%
+        [ ", " 0% ]
+        [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
+        ";" 0%
+    ] sqlite-make ;
 
-
-: sqlite-db-modifiers ( -- hashtable )
+M: sqlite-db modifier-table ( -- hashtable )
     H{
         { +native-id+ "primary key" }
         { +assigned-id+ "primary key" }
@@ -150,32 +189,24 @@ M: sqlite-db last-id ( -- id )
         { +not-null+ "not null" }
     } ;
 
-M: sqlite-db sql-modifiers* ( modifiers -- str )
-    sqlite-db-modifiers swap [
-        dup array? [
-            first2
-            >r swap at r> number>string*
-            " " swap 3append
-        ] [
-            swap at
-        ] if
-    ] with map [ ] subset ;
+M: sqlite-db compound-modifier ( str obj -- newstr )
+    compound-type ;
 
-: sqlite-type-hash ( -- assoc )
+M: sqlite-db compound-type ( str seq -- newstr )
+    over {
+        { "default" [ first number>string join-space ] }
+        [ 2drop ] !  "no sqlite compound data type" 3array throw ]
+    } case ;
+
+M: sqlite-db type-table ( -- assoc )
     H{
+        { +native-id+ "integer primary key" }
         { INTEGER "integer" }
         { TEXT "text" }
         { VARCHAR "text" }
+        { TIMESTAMP "timestamp" }
+        { DOUBLE "real" }
     } ;
 
-M: sqlite-db >sql-type ( obj -- str )
-    dup pair? [
-        first >sql-type
-    ] [
-        sqlite-type-hash at* [ T{ no-sql-type } throw ] unless
-    ] if ;
-
-! HOOK: get-column-value ( n result-set type -- )
-! M: sqlite get-column-value { { "TEXT" get-text-column } { 
-! "INTEGER" get-integer-column } ... } case ;
-
+M: sqlite-db create-type-table
+    type-table ;

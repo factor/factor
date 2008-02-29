@@ -119,22 +119,43 @@ M: bad-escape summary drop "Bad escape code" ;
         { CHAR: \" CHAR: \" }
     } at [ bad-escape ] unless* ;
 
-: next-escape ( m str -- n ch )
-    2dup nth CHAR: u =
-    [ >r 1+ dup 6 + tuck r> subseq hex> ]
-    [ over 1+ -rot nth escape ] if ;
+SYMBOL: name>char-hook
 
-: next-char ( m str -- n ch )
-    2dup nth CHAR: \\ =
-    [ >r 1+ r> next-escape ] [ over 1+ -rot nth ] if ;
+name>char-hook global [
+    [ "Unicode support not available" throw ] or
+] change-at
 
-: (parse-string) ( m str -- n )
-    2dup nth CHAR: " =
-    [ drop 1+ ] [ [ next-char , ] keep (parse-string) ] if ;
+: unicode-escape ( str -- ch str' )
+    "{" ?head-slice [
+        CHAR: } over index cut-slice
+        >r >string name>char-hook get call r>
+        1 tail-slice
+    ] [
+        6 cut-slice >r hex> r>
+    ] if ;
+
+: next-escape ( str -- ch str' )
+    "u" ?head-slice [
+        unicode-escape
+    ] [
+        unclip-slice escape swap
+    ] if ;
+
+: (parse-string) ( str -- m )
+    dup [ "\"\\" member? ] find dup [
+        >r cut-slice >r % r> 1 tail-slice r>
+        dup CHAR: " = [
+            drop slice-from
+        ] [
+            drop next-escape >r , r> (parse-string)
+        ] if
+    ] [
+        "Unterminated string" throw
+    ] if ;
 
 : parse-string ( -- str )
     lexer get [
-        [ (parse-string) ] "" make swap
+        [ swap tail-slice (parse-string) ] "" make swap
     ] change-column ;
 
 TUPLE: parse-error file line col text ;
@@ -331,6 +352,8 @@ TUPLE: bad-number ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
+: (:) CREATE dup reset-generic parse-definition ;
+
 GENERIC: expected>string ( obj -- str )
 
 M: f expected>string drop "end of input" ;
@@ -388,6 +411,7 @@ SYMBOL: interactive-vocabs
     "tools.memory"
     "tools.profiler"
     "tools.test"
+    "tools.threads"
     "tools.time"
     "vocabs"
     "vocabs.loader"
@@ -417,11 +441,12 @@ SYMBOL: interactive-vocabs
         "Warning: the following definitions were removed from sources," print
         "but are still referenced from other definitions:" print
         nl
-        dup stack.
+        dup sorted-definitions.
         nl
         "The following definitions need to be updated:" print
         nl
-        over stack.
+        over sorted-definitions.
+        nl
     ] when 2drop ;
 
 : filter-moved ( assoc -- newassoc )
@@ -441,9 +466,16 @@ SYMBOL: interactive-vocabs
         dup values concat prune swap keys
     ] keep ;
 
+: fix-class-words ( -- )
+    #! If a class word had a compound definition which was
+    #! removed, it must go back to being a symbol.
+    new-definitions get first2 diff
+    [ nip dup reset-generic define-symbol ] assoc-each ;
+
 : forget-smudged ( -- )
     smudged-usage forget-all
-    over empty? [ 2dup smudged-usage-warning ] unless 2drop ;
+    over empty? [ 2dup smudged-usage-warning ] unless 2drop
+    fix-class-words ;
 
 : finish-parsing ( lines quot -- )
     file get
@@ -477,7 +509,7 @@ SYMBOL: interactive-vocabs
     ] recover ;
 
 : run-file ( file -- )
-    [ [ parse-file call ] keep ] assert-depth drop ;
+    [ dup parse-file call ] assert-depth drop ;
 
 : ?run-file ( path -- )
     dup resource-exists? [ run-file ] [ drop ] if ;
@@ -492,4 +524,4 @@ SYMBOL: interactive-vocabs
     [
         parser-notes off
         [ [ eval ] keep ] try drop
-    ] string-out ;
+    ] with-string-writer ;

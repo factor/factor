@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
-splitting continuations assocs.lib ;
+splitting continuations assocs.lib calendar ;
 IN: http.client
 
 : parse-host ( url -- host port )
@@ -47,7 +47,7 @@ DEFER: http-get-stream
         dispose "location" swap peek-at nip http-get-stream
     ] when ;
 
-: default-timeout 60 1000 * over set-timeout ;
+: default-timeout 1 minutes over set-timeout ;
 
 : http-get-stream ( url -- code headers stream )
     #! Opens a stream for reading from an HTTP URL.

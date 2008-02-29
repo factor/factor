@@ -3,14 +3,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces io io.timeouts kernel logging io.sockets
 sequences combinators sequences.lib splitting assocs strings
-math.parser random system calendar ;
+math.parser random system calendar calendar.format ;
 
 IN: smtp
 
 SYMBOL: smtp-domain
 SYMBOL: smtp-host       "localhost" smtp-host set-global
 SYMBOL: smtp-port       25 smtp-port set-global
-SYMBOL: read-timeout    60000 read-timeout set-global
+SYMBOL: read-timeout    1 minutes read-timeout set-global
 SYMBOL: esmtp           t esmtp set-global
 
 : log-smtp-connection ( host port -- ) 2drop ;
@@ -114,7 +114,7 @@ LOG: smtp-response DEBUG
 
 : extract-email ( recepient -- email )
     #! This could be much smarter.
-    " " last-split1 [ ] [ ] ?if "<" ?head drop ">" ?tail drop ;
+    " " last-split1 swap or "<" ?head drop ">" ?tail drop ;
 
 : message-id ( -- string )
     [
@@ -139,7 +139,7 @@ LOG: smtp-response DEBUG
 : prepare-message ( body headers -- body' )
     [
         prepare-headers
-        " " ,
+        "" ,
         dup string? [ string-lines ] when %
     ] { } make ;
 
@@ -169,3 +169,15 @@ LOG: smtp-response DEBUG
 ! : cram-md5-auth ( key login  -- )
 !     "AUTH CRAM-MD5\r\n" get-ok 
 !     (cram-md5-auth) "\r\n" append get-ok ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USE: new-slots
+
+TUPLE: email from to subject body ;
+
+: <email> ( -- email ) email construct-empty ;
+
+: send ( email -- )
+  { email-body email-subject email-to email-from } get-slots
+  send-simple-message ;

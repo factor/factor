@@ -11,8 +11,16 @@ IN: tools.deploy.shaker
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
     "command-line" init-hooks get delete-at
-    "mallocs" init-hooks get delete-at
-    strip-io? [ "io.backend" init-hooks get delete-at ] when ;
+    "libc" init-hooks get delete-at
+    deploy-threads? get [
+        "threads" init-hooks get delete-at
+    ] unless
+    native-io? [
+        "io.thread" init-hooks get delete-at
+    ] unless
+    strip-io? [
+        "io.backend" init-hooks get delete-at
+    ] when ;
 
 : strip-debugger ( -- )
     strip-debugger? [
@@ -85,6 +93,7 @@ IN: tools.deploy.shaker
     { } set-retainstack
     V{ } set-namestack
     V{ } set-catchstack
+    
     "Saving final image" show
     [ save-image-and-exit ] call-clear ;
 

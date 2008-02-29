@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces splitting sequences io.files kernel assocs
-words vocabs definitions parser continuations inspector debugger
-io io.styles io.streams.lines hashtables sorting prettyprint
-source-files arrays combinators strings system math.parser
-compiler.errors ;
+USING: namespaces sequences io.files kernel assocs words vocabs
+definitions parser continuations inspector debugger io io.styles
+io.streams.lines hashtables sorting prettyprint source-files
+arrays combinators strings system math.parser compiler.errors
+splitting ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -16,7 +16,7 @@ V{
 } clone vocab-roots set-global
 
 : vocab-dir ( vocab -- dir )
-    vocab-name "." split "/" join ;
+    vocab-name { { CHAR: . CHAR: / } } substitute ;
 
 : vocab-dir+ ( vocab str/f -- path )
     >r vocab-name "." split r>
@@ -68,13 +68,6 @@ M: vocab-link vocab-root
         dup vocab-docs-path [ , ] when*
         vocab-tests %
     ] { } make ;
-
-TUPLE: no-vocab name ;
-
-: no-vocab ( name -- * )
-    vocab-name \ no-vocab construct-boa throw ;
-
-M: no-vocab summary drop "Vocabulary does not exist" ;
 
 SYMBOL: load-help?
 
@@ -160,16 +153,18 @@ SYMBOL: load-help?
     [ load-error. nl ] each ;
 
 SYMBOL: blacklist
+SYMBOL: failures
 
 : require-all ( vocabs -- failures )
     [
         V{ } clone blacklist set
+        V{ } clone failures set
         [
             [ require ]
-            [ >r vocab-name r> 2array blacklist get push ]
+            [ swap vocab-name failures get set-at ]
             recover
         ] each
-        blacklist get
+        failures get
     ] with-compiler-errors ;
 
 : do-refresh ( modified-sources modified-docs -- )
@@ -183,12 +178,17 @@ SYMBOL: blacklist
 : refresh-all ( -- ) "" refresh ;
 
 GENERIC: (load-vocab) ( name -- vocab )
-!
+
+: add-to-blacklist ( error vocab -- )
+    vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
+
 M: vocab (load-vocab)
-    dup vocab-root [
-        dup vocab-source-loaded? [ dup load-source ] unless
-        dup vocab-docs-loaded? [ dup load-docs ] unless
-    ] when ;
+    [
+        dup vocab-root [
+            dup vocab-source-loaded? [ dup load-source ] unless
+            dup vocab-docs-loaded? [ dup load-docs ] unless
+        ] when
+    ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
 M: string (load-vocab)
     [ ".private" ?tail drop reload ] keep vocab ;
@@ -196,24 +196,14 @@ M: string (load-vocab)
 M: vocab-link (load-vocab)
     vocab-name (load-vocab) ;
 
-TUPLE: blacklisted-vocab name ;
-
-: blacklisted-vocab ( name -- * )
-    \ blacklisted-vocab construct-boa throw ;
-
-M: blacklisted-vocab error.
-    "This vocabulary depends on the " write
-    blacklisted-vocab-name write
-    " vocabulary which failed to load" print ;
-
 [
-    dup vocab-name blacklist get key? [
-        vocab-name blacklisted-vocab
+    dup vocab-name blacklist get at* [
+        rethrow
     ] [
-        [
-            dup vocab [ ] [ ] ?if (load-vocab)
-        ] with-compiler-errors
+        drop
+        [ dup vocab swap or (load-vocab) ] with-compiler-errors
     ] if
+
 ] load-vocab-hook set-global
 
 : vocab-where ( vocab -- loc )

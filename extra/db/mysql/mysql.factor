@@ -26,12 +26,6 @@ M: mysql-statement prepare-statement ( statement -- )
 M: mysql-statement bind-statement* ( statement -- )
     ;
 
-M: mysql-statement rebind-statement ( statement -- )
-    ;
-
-M: mysql-statement execute-statement ( statement -- )
-    ;
-
 M: mysql-statement query-results ( query -- result-set )
     ;
 

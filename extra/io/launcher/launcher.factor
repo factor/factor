@@ -10,14 +10,14 @@ SYMBOL: processes
 
 [ H{ } clone processes set-global ] "io.launcher" add-init-hook
 
-TUPLE: process handle status killed? lapse ;
+TUPLE: process handle status killed? timeout ;
 
 HOOK: register-process io-backend ( process -- )
 
 M: object register-process drop ;
 
 : <process> ( handle -- process )
-    f f <lapse> process construct-boa
+    f f f process construct-boa
     V{ } clone over processes get set-at
     dup register-process ;
 
@@ -76,12 +76,17 @@ SYMBOL: +append-environment+
         { [ dup assoc? ] [ >hashtable ] }
     } cond ;
 
+HOOK: current-process-handle io-backend ( -- handle )
+
 HOOK: run-process* io-backend ( desc -- handle )
 
 : wait-for-process ( process -- status )
     [
         dup process-handle
-        [ dup [ processes get at push stop ] curry callcc0 ] when
+        [
+            dup [ processes get at push ] curry
+            "process" suspend drop
+        ] when
         dup process-killed?
         [ "Process was killed" throw ] [ process-status ] if
     ] with-timeout ;
@@ -110,7 +115,9 @@ HOOK: kill-process* io-backend ( handle -- )
     t over set-process-killed?
     process-handle [ kill-process* ] when* ;
 
-M: process get-lapse process-lapse ;
+M: process timeout process-timeout ;
+
+M: process set-timeout set-process-timeout ;
 
 M: process timed-out kill-process ;
 
@@ -119,7 +126,9 @@ HOOK: process-stream* io-backend ( desc -- stream process )
 TUPLE: process-stream process ;
 
 : <process-stream> ( desc -- stream )
-    >descriptor process-stream*
+    >descriptor
+    [ process-stream* ] keep
+    +timeout+ swap at [ over set-timeout ] when*
     { set-delegate set-process-stream-process }
     process-stream construct ;
 
@@ -130,5 +139,5 @@ TUPLE: process-stream process ;
 
 : notify-exit ( status process -- )
     [ set-process-status ] keep
-    [ processes get delete-at* drop [ schedule-thread ] each ] keep
+    [ processes get delete-at* drop [ resume ] each ] keep
     f swap set-process-handle ;

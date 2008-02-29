@@ -18,7 +18,7 @@ MEMO: (vocab-file-contents) ( path -- lines )
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-path+ [
         ?resource-path
-        [ [ print ] each ] with-file-out
+        [ [ print ] each ] with-file-writer
     ] [
         "The " swap vocab-name
         " vocabulary was not loaded from the file system"
@@ -107,6 +107,7 @@ MEMO: all-vocabs-seq ( -- seq )
         { [ "ui.windows" ?head ] [ t ] }
         { [ "ui.cocoa" ?head ] [ t ] }
         { [ "cocoa" ?head ] [ t ] }
+        { [ "core-foundation" ?head ] [ t ] }
         { [ "vocabs.loader.test" ?head ] [ t ] }
         { [ "editors." ?head ] [ t ] }
         { [ ".windows" ?tail ] [ t ] }
@@ -132,7 +133,7 @@ MEMO: all-vocabs-seq ( -- seq )
     require-all ;
 
 : load-everything ( -- )
-    try-everything drop ;
+    try-everything load-failures. ;
 
 : unrooted-child-vocabs ( prefix -- seq )
     dup empty? [ CHAR: . add ] unless

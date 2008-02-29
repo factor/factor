@@ -80,11 +80,10 @@ DEFER: <% delimiter
             "quiet" on
             parser-notes off
             templating-vocab use+
-            dup source-file file set ! so that reload works properly
-            [
-                ?resource-path file-contents
-                [ eval-template ] [ html-error. drop ] recover
-            ] keep
+            ! so that reload works properly
+            dup source-file file set
+            dup ?resource-path file-contents
+            [ eval-template ] [ html-error. drop ] recover
         ] with-file-vocabs
     ] assert-depth drop ;
 
@@ -93,4 +92,4 @@ DEFER: <% delimiter
     swap path+ run-template-file ;
 
 : template-convert ( infile outfile -- )
-    <file-writer> [ run-template-file ] with-stream ;
+    [ run-template-file ] with-file-writer ;

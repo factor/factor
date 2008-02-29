@@ -128,7 +128,7 @@ HOOK: %prepare-var-args compiler-backend ( -- )
 
 M: object %prepare-var-args ;
 
-HOOK: %alien-invoke compiler-backend ( library function -- )
+HOOK: %alien-invoke compiler-backend ( function library -- )
 
 HOOK: %cleanup compiler-backend ( alien-node -- )
 

@@ -2,7 +2,7 @@ USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
-continuations generic compiler.units ;
+continuations generic compiler.units tools.walker ;
 IN: temporary
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -67,19 +67,19 @@ unit-test
 [ "[ \\ [ ]" ] [ [ \ [ ] unparse ] unit-test
     
 [ t ] [
-    100 \ dup <array> [ pprint-short ] string-out
+    100 \ dup <array> unparse-short
     "{" head?
 ] unit-test
 
 : foo ( a -- b ) dup * ; inline
 
 [ "USING: kernel math ;\nIN: temporary\n: foo ( a -- b ) dup * ; inline\n" ]
-[ [ \ foo see ] string-out ] unit-test
+[ [ \ foo see ] with-string-writer ] unit-test
 
 : bar ( x -- y ) 2 + ;
 
 [ "USING: math ;\nIN: temporary\n: bar ( x -- y ) 2 + ;\n" ]
-[ [ \ bar see ] string-out ] unit-test
+[ [ \ bar see ] with-string-writer ] unit-test
 
 : blah 
     drop
@@ -105,7 +105,7 @@ unit-test
 
 [ "drop ;" ] [
     \ blah f "inferred-effect" set-word-prop
-    [ \ blah see ] string-out "\n" ?tail drop 6 tail*
+    [ \ blah see ] with-string-writer "\n" ?tail drop 6 tail*
 ] unit-test
 
 : check-see ( expect name -- )
@@ -116,7 +116,7 @@ unit-test
             [ parse-fresh drop ] with-compilation-unit
             [
                 "temporary" lookup see
-            ] string-out "\n" split 1 head*
+            ] with-string-writer "\n" split 1 head*
         ] keep =
     ] with-scope ;
 
@@ -295,31 +295,23 @@ unit-test
     "IN: temporary\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
     dup eval
     "generic-decl-test" "temporary" lookup
-    [ see ] string-out =
+    [ see ] with-string-writer =
 ] unit-test
 
 [ [ + ] ] [
-    [ \ + (step-into) ] (remove-breakpoints)
+    [ \ + (step-into-execute) ] (remove-breakpoints)
 ] unit-test
 
-[ [ (step-into) ] ] [
-    [ (step-into) ] (remove-breakpoints)
-] unit-test
-
-[ [ 3 ] ] [
-    [ 3 (step-into) ] (remove-breakpoints)
+[ [ (step-into-execute) ] ] [
+    [ (step-into-execute) ] (remove-breakpoints)
 ] unit-test
 
 [ [ 2 2 + . ] ] [
-    [ 2 2 \ + (step-into) . ] (remove-breakpoints)
+    [ 2 2 \ + (step-into-execute) . ] (remove-breakpoints)
 ] unit-test
 
 [ [ 2 2 + . ] ] [
-    [ 2 break 2 \ + (step-into) . ] (remove-breakpoints)
-] unit-test
-
-[ [ 2 . ] ] [
-    [ 2 \ break (step-into) . ] (remove-breakpoints)
+    [ 2 break 2 \ + (step-into-execute) . ] (remove-breakpoints)
 ] unit-test
 
 [ ] [ 1 \ + curry unparse drop ] unit-test

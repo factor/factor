@@ -26,7 +26,7 @@ SYMBOL: delegate-end-escaped?
     current-rule-set rule-set-keywords ;
 
 : token, ( from to id -- )
-    pick pick = [ 3drop ] [ >r line get subseq r> <token> , ] if ;
+    2over = [ 3drop ] [ >r line get subseq r> <token> , ] if ;
 
 : prev-token, ( id -- )
     >r last-offset get position get r> token,

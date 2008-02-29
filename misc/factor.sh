@@ -14,16 +14,36 @@ NO_UI=
 GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
 
+test_program_installed() {
+  	if ! [[ -n `type -p $1` ]] ; then
+		return 0;
+	fi
+	return 1;
+}
 
 ensure_program_installed() {
-        echo -n "Checking for $1..."
-        result=`type -p $1`
-        if ! [[ -n $result ]] ; then
-                echo "not found!"
-                echo "Install $1 and try again."
-                exit 1
-        fi
-        echo "found!"
+	installed=0;
+	for i in $* ;
+	do
+	    echo -n "Checking for $i..."
+		test_program_installed $i
+		if [[ $? -eq 0 ]]; then
+			echo -n "not "
+		else	
+			installed=$(( $installed + 1 ))
+	    fi
+	    echo "found!"
+	done
+	if [[ $installed -eq 0 ]] ; then
+	    echo -n "Install "
+	    if [[ $# -eq 1 ]] ; then
+			echo -n $1
+	    else
+			echo -n "any of [ $* ]"
+	    fi
+	    echo " and try again."
+	    exit 1
+	fi
 }
 
 check_ret() {
@@ -47,13 +67,33 @@ check_gcc_version() {
         echo "ok."
 }
 
+set_downloader() {
+	test_program_installed wget
+	if [[ $? -ne 0 ]] ; then
+		DOWNLOAD=wget
+	else
+		DOWNLOAD="curl -O"
+	fi
+}
+
+set_md5sum() {
+	test_program_installed md5sum
+	if [[ $? -ne 0 ]] ; then
+		MD5SUM=md5sum
+	else
+		MD5SUM="md5 -r"
+	fi
+}
+
 check_installed_programs() {
         ensure_program_installed chmod
         ensure_program_installed uname
         ensure_program_installed git
-        ensure_program_installed wget
+        ensure_program_installed wget curl
         ensure_program_installed gcc
         ensure_program_installed make
+        ensure_program_installed md5sum md5
+        ensure_program_installed cut
         case $OS in
             netbsd) ensure_program_installed gmake;;
         esac
@@ -146,8 +186,8 @@ find_word_size() {
 
 set_factor_binary() {
         case $OS in
-                winnt) FACTOR_BINARY=factor-nt;;
-                macosx) FACTOR_BINARY=./Factor.app/Contents/MacOS/factor;;
+                # winnt) FACTOR_BINARY=factor-nt;;
+                # macosx) FACTOR_BINARY=./Factor.app/Contents/MacOS/factor;;
                 *) FACTOR_BINARY=factor;;
         esac
 }
@@ -234,36 +274,53 @@ make_factor() {
         invoke_make NO_UI=$NO_UI $MAKE_TARGET -j5
 }
 
-delete_boot_images() {
+update_boot_images() {
         echo "Deleting old images..."
-        rm $BOOT_IMAGE > /dev/null 2>&1
+		rm checksums.txt* > /dev/null 2>&1
         rm $BOOT_IMAGE.* > /dev/null 2>&1
-                rm staging.*.image > /dev/null 2>&1
+		rm staging.*.image > /dev/null 2>&1
+		if [[ -f $BOOT_IMAGE ]] ; then
+			get_url http://factorcode.org/images/latest/checksums.txt
+			factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`;
+			set_md5sum
+			disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '`;
+			echo "Factorcode md5: $factorcode_md5";
+			echo "Disk md5: $disk_md5";
+			if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
+				echo "Your disk boot image matches the one on factorcode.org."
+			else
+				rm $BOOT_IMAGE > /dev/null 2>&1
+				get_boot_image;
+			fi
+		else
+			get_boot_image
+		fi
 }
 
 get_boot_image() {
-        wget http://factorcode.org/images/latest/$BOOT_IMAGE
-        check_ret wget
+	echo "Downloading boot image $BOOT_IMAGE."
+	get_url http://factorcode.org/images/latest/$BOOT_IMAGE
+}
+
+get_url() {
+	if [[ $DOWNLOAD -eq "" ]] ; then
+		set_downloader;
+	fi
+	echo $DOWNLOAD $1 ;
+	$DOWNLOAD $1
+	check_ret $DOWNLOAD
 }
 
 maybe_download_dlls() {
         if [[ $OS == winnt ]] ; then
-                wget http://factorcode.org/dlls/freetype6.dll
-                check_ret wget
-                wget http://factorcode.org/dlls/zlib1.dll
-                check_ret wget
-                wget http://factorcode.org/dlls/OpenAL32.dll
-                check_ret wget
-                wget http://factorcode.org/dlls/alut.dll
-                check_ret wget
-                wget http://factorcode.org/dlls/ogg.dll
-                check_ret wget
-                wget http://factorcode.org/dlls/theora.dll
-                check_ret wget
-                wget http://factorcode.org/dlls/vorbis.dll
-                check_ret wget
-                wget http://factorcode.org/dlls/sqlite3.dll
-                check_ret wget
+                get_url http://factorcode.org/dlls/freetype6.dll
+                get_url http://factorcode.org/dlls/zlib1.dll
+                get_url http://factorcode.org/dlls/OpenAL32.dll
+                get_url http://factorcode.org/dlls/alut.dll
+                get_url http://factorcode.org/dlls/ogg.dll
+                get_url http://factorcode.org/dlls/theora.dll
+                get_url http://factorcode.org/dlls/vorbis.dll
+                get_url http://factorcode.org/dlls/sqlite3.dll
                 chmod 777 *.dll
                 check_ret chmod
         fi
@@ -299,8 +356,7 @@ update() {
 }
 
 update_bootstrap() {
-        delete_boot_images
-        get_boot_image
+        update_boot_images
         bootstrap
 }
 
@@ -321,7 +377,7 @@ install_libraries() {
 }
 
 usage() {
-        echo "usage: $0 install|install-x11|self-update|quick-update|update|bootstrap|wget-bootstrap"
+        echo "usage: $0 install|install-x11|self-update|quick-update|update|bootstrap|net-bootstrap"
         echo "If you are behind a firewall, invoke as:"
         echo "env GIT_PROTOCOL=http $0 <command>"
 }
@@ -333,6 +389,6 @@ case "$1" in
         quick-update) update; refresh_image ;;
         update) update; update_bootstrap ;;
         bootstrap) get_config_info; bootstrap ;;
-        wget-bootstrap) get_config_info; delete_boot_images; get_boot_image; bootstrap ;;
+        net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
         *) usage ;;
 esac

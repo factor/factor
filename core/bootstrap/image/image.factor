@@ -36,7 +36,7 @@ IN: bootstrap.image
 
 : data-base 1024 ; inline
 
-: userenv-size 40 ; inline
+: userenv-size 64 ; inline
 
 : header-size 10 ; inline
 
@@ -416,7 +416,7 @@ M: curry '
     "Writing image to " write
     architecture get boot-image-name resource-path
     dup write "..." print flush
-    <file-writer> [ (write-image) ] with-stream ;
+    [ (write-image) ] with-file-writer ;
 
 PRIVATE>
 

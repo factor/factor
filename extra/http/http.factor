@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables io kernel math namespaces math.parser assocs
-sequences strings splitting ascii io.utf8 assocs.lib
+sequences strings splitting ascii io.encodings.utf8 assocs.lib
 namespaces unicode.case ;
 IN: http
 

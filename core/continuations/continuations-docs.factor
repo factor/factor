@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private
 continuations.private parser vectors arrays namespaces
-threads assocs words quotations ;
+assocs words quotations ;
 IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable errors"
@@ -23,9 +23,10 @@ $nl
 "Two words raise an error in the innermost error handler for the current dynamic extent:"
 { $subsection throw }
 { $subsection rethrow }
-"Two words for establishing an error handler:"
+"Words for establishing an error handler:"
 { $subsection cleanup }
 { $subsection recover }
+{ $subsection ignore-errors }
 "Unhandled errors are reported in the listener and can be debugged using various tools. See " { $link "debugger" } "."
 { $subsection "errors-restartable" }
 { $subsection "errors-post-mortem" } ;
@@ -44,11 +45,7 @@ ARTICLE: "continuations.private" "Continuation implementation details"
 { $subsection namestack }
 { $subsection set-namestack }
 { $subsection catchstack }
-{ $subsection set-catchstack }
-"The continuations implementation has hooks for single-steppers:"
-{ $subsection walker-hook }
-{ $subsection set-walker-hook }
-{ $subsection (continue-with) } ;
+{ $subsection set-catchstack } ;
 
 ARTICLE: "continuations" "Continuations"
 "At any point in the execution of a program, the " { $emphasis "current continuation" } " represents the future of the computation."
@@ -110,10 +107,6 @@ HELP: callcc1
 { $values { "quot" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "obj" "an object provided when resuming the continuation" } }
 { $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue-with } " word resumes the continuation, passing a value back to the original execution context." } ;
 
-HELP: (continue-with)
-{ $values { "obj" "an object to pass to the continuation's execution context" } { "continuation" continuation } }
-{ $description "Resumes a continuation reified by " { $link callcc1 } " without invoking " { $link walker-hook } ". The object will be placed on the data stack when the continuation resumes." } ;
-
 HELP: continue
 { $values { "continuation" continuation } }
 { $description "Resumes a continuation reified by " { $link callcc0 } "." } ;
@@ -156,6 +149,10 @@ HELP: recover
 { $values { "try" quotation } { "recovery" "a quotation with stack effect " { $snippet "( error -- )" } } }
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
 
+HELP: ignore-errors
+{ $values { "try" quotation } }
+{ $description "Calls the quotation. If an exception is thrown in the dynamic extent of the quotation, restores the data stack and returns." } ;
+
 HELP: rethrow
 { $values { "error" object } }
 { $description "Throws an error without saving the current continuation in the " { $link error-continuation } " global variable. This is done so that inspecting the error stacks sheds light on the original cause of the exception, rather than the point where it was rethrown." }
@@ -196,9 +193,3 @@ HELP: save-error
 { $values { "error" "an error" } }
 { $description "Called by the error handler to set the " { $link error } " and " { $link restarts } " global variables after an error was thrown." }
 $low-level-note ;
-
-HELP: init-error-handler
-{ $description "Called on startup to initialize the catch stack and set a pair of hooks which allow the Factor VM to signal errors to library code." } ;
-
-HELP: break
-{ $description "Suspends execution of the current thread and starts the single stepper by calling " { $link break-hook } "." } ;

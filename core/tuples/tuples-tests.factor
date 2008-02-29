@@ -237,3 +237,40 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 [
     "IN: temporary SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
 ] [ [ check-tuple? ] is? ] must-fail-with
+
+! Hardcore unit tests
+USE: threads
+
+\ thread "slot-names" word-prop "slot-names" set
+
+[ ] [
+    [
+        \ thread { "xxx" } "slot-names" get append
+        define-tuple-class
+    ] with-compilation-unit
+
+    [ 1337 sleep ] "Test" spawn drop
+
+    [
+        \ thread "slot-names" get
+        define-tuple-class
+    ] with-compilation-unit
+] unit-test
+
+USE: vocabs
+
+\ vocab "slot-names" word-prop "slot-names" set
+
+[ ] [
+    [
+        \ vocab { "xxx" } "slot-names" get append
+        define-tuple-class
+    ] with-compilation-unit
+
+    all-words drop
+
+    [
+        \ vocab "slot-names" get
+        define-tuple-class
+    ] with-compilation-unit
+] unit-test

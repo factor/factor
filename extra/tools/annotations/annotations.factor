@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words parser io inspector quotations sequences
 prettyprint continuations effects definitions compiler.units
-namespaces assocs ;
+namespaces assocs tools.walker ;
 IN: tools.annotations
 
 : reset ( word -- )
@@ -61,7 +61,7 @@ IN: tools.annotations
     dupd [ (watch-vars) ] 2curry annotate ;
 
 : breakpoint ( word -- )
-    [ \ break add* ] annotate ;
+    [ add-breakpoint ] annotate ;
 
 : breakpoint-if ( word quot -- )
     [ [ [ break ] when ] rot 3append ] curry annotate ;

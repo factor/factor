@@ -13,11 +13,12 @@ SYMBOL: default-buffer-size
 TUPLE: port
 handle
 error
-lapse
+timeout
 type eof? ;
 
-! Ports support the lapse protocol
-M: port get-lapse port-lapse ;
+M: port timeout port-timeout ;
+
+M: port set-timeout set-port-timeout ;
 
 SYMBOL: closed
 
@@ -28,12 +29,10 @@ GENERIC: init-handle ( handle -- )
 GENERIC: close-handle ( handle -- )
 
 : <port> ( handle buffer type -- port )
-    pick init-handle
-    <lapse> {
+    pick init-handle {
         set-port-handle
         set-delegate
         set-port-type
-        set-port-lapse
     } port construct ;
 
 : <buffered-port> ( handle type -- port )

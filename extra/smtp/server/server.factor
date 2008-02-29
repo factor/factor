@@ -28,7 +28,8 @@
 ! Connection closed by foreign host.
 
 USING: combinators kernel prettyprint io io.timeouts io.server
-sequences namespaces io.sockets continuations ;
+sequences namespaces io.sockets continuations calendar ;
+IN: smtp.server
 
 SYMBOL: data-mode
 
@@ -55,7 +56,7 @@ SYMBOL: data-mode
             data-mode off
             "220 OK\r\n" write flush t
           ] }
-        { [ data-mode get ] [ t ] }
+        { [ data-mode get ] [ dup global [ print ] bind t ] }
         { [ t ] [ 
             "500 ERROR\r\n" write flush t
           ] }
@@ -65,8 +66,9 @@ SYMBOL: data-mode
     "Starting SMTP server on port " write dup . flush
     "127.0.0.1" swap <inet4> <server> [
         accept [
-            60000 stdio get set-timeout
+            1 minutes stdio get set-timeout
             "220 hello\r\n" write flush
             process
+            global [ flush ] bind
         ] with-stream
     ] with-disposal ;

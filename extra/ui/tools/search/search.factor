@@ -1,13 +1,13 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs ui.tools.interactor ui.tools.listener
 ui.tools.workspace help help.topics io.files io.styles kernel
 models namespaces prettyprint quotations sequences sorting
-source-files strings tools.completion tools.crossref tuples
-ui.commands ui.gadgets ui.gadgets.editors
+source-files definitions strings tools.completion tools.crossref
+tuples ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.lists ui.gadgets.scrollers ui.gadgets.tracks
 ui.gestures ui.operations vocabs words vocabs.loader
-tools.browser unicode.case ;
+tools.browser unicode.case calendar ui ;
 IN: ui.tools.search
 
 TUPLE: live-search field list ;
@@ -45,7 +45,8 @@ search-field H{
 } set-gestures
 
 : <search-model> ( producer -- model )
-    >r g live-search-field gadget-model 200 <delay>
+    >r g live-search-field gadget-model
+    ui-running? [ 1/5 seconds <delay> ] when
     [ "\n" join ] r> append <filter> ;
 
 : <search-list> ( seq limited? presenter -- gadget )
@@ -93,7 +94,7 @@ M: live-search pref-dim* drop { 400 200 } ;
     "Words in " rot vocab-name append show-titled-popup ;
 
 : show-word-usage ( workspace word -- )
-    "" over smart-usage f <definition-search>
+    "" over usage f <definition-search>
     "Words and methods using " rot word-name append
     show-titled-popup ;
 

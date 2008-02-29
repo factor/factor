@@ -6,15 +6,11 @@ continuations debugger ;
 IN: benchmark
 
 : run-benchmark ( vocab -- result )
-    "=== Benchmark " write dup print flush
-    dup require
-    [ [ run ] benchmark ] [ error. f f ] recover 2array
-    dup . ;
+  [ dup require [ run ] benchmark ] [ error. drop f f ] recover 2array ;
 
 : run-benchmarks ( -- assoc )
-    "benchmark" load-children
-    "benchmark" dup child-vocabs remove
-    [ dup run-benchmark ] { } map>assoc ;
+  "benchmark" all-child-vocabs values concat [ vocab-name ] map
+  [ dup run-benchmark ] { } map>assoc ;
 
 : benchmarks. ( assoc -- )
     standard-table-style [

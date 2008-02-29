@@ -1,8 +1,8 @@
-USING: help help.markup help.syntax help.topics
-namespaces words sequences classes assocs vocabs kernel
-arrays prettyprint.backend kernel.private io tools.browser
-generic math tools.profiler system ui strings sbufs vectors
-byte-arrays bit-arrays float-arrays quotations help.lint ;
+USING: help help.markup help.syntax help.definitions help.topics
+namespaces words sequences classes assocs vocabs kernel arrays
+prettyprint.backend kernel.private io generic math system
+strings sbufs vectors byte-arrays bit-arrays float-arrays
+quotations ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -66,8 +66,7 @@ ARTICLE: "evaluator" "Evaluation semantics"
     { "All other types of objects are pushed on the data stack." }
 }
 "If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $snippet "tail-recursion" } " and allows iterative algorithms to execute without incurring unbounded call stack usage."
-$nl
-"There are various ways of implementing these evaluation semantics. See " { $link "compiler" } " and " { $link "meta-interpreter" } "." ;
+{ $see-also "compiler" } ;
 
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "evaluator" }
@@ -78,8 +77,38 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "conditionals" }
 { $subsection "basic-combinators" }
 { $subsection "combinators" }
-{ $subsection "continuations" }
-{ $subsection "threads" } ;
+{ $subsection "continuations" } ;
+
+USING: concurrency.combinators
+concurrency.messaging
+concurrency.promises
+concurrency.futures
+concurrency.locks
+concurrency.semaphores
+concurrency.count-downs
+concurrency.exchangers
+concurrency.flags ;
+
+ARTICLE: "concurrency" "Concurrency"
+"Factor supports a variety of concurrency abstractions, however they are mostly used to multiplex input/output operations since the thread scheduling is co-operative and only one CPU is used at a time."
+$nl
+"Factor's concurrency support was insipired by Erlang, Termite, Scheme48 and Java's " { $snippet "java.util.concurrent" } " library."
+$nl
+"The basic building blocks:"
+{ $subsection "threads" }
+"High-level abstractions:"
+{ $subsection "concurrency.combinators" }
+{ $subsection "concurrency.promises" }
+{ $subsection "concurrency.futures" }
+{ $subsection "concurrency.mailboxes" }
+{ $subsection "concurrency.messaging" }
+"Shared-state abstractions:"
+{ $subsection "concurrency.locks" }
+{ $subsection "concurrency.semaphores" }
+{ $subsection "concurrency.count-downs" }
+{ $subsection "concurrency.exchangers" }
+{ $subsection "concurrency.flags" }
+"Other concurrency abstractions include " { $vocab-link "concurrency.distributed" } " and " { $vocab-link "channels" } "." ;
 
 ARTICLE: "objects" "Objects"
 "An " { $emphasis "object" } " is any datum which may be identified. All values are objects in Factor. Each object carries type information, and types are checked at runtime; Factor is dynamically typed."
@@ -134,6 +163,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "hashtables" }
 { $subsection "alists" }
 { $heading "Other collections" }
+{ $subsection "boxes" }
 { $subsection "dlists" }
 { $subsection "heaps" }
 { $subsection "graphs" }
@@ -141,35 +171,41 @@ ARTICLE: "collections" "Collections"
 
 USING: io.sockets io.launcher io.mmap io.monitors ;
 
-ARTICLE: "io" "Input and output" 
+ARTICLE: "io" "Input and output"
+{ $heading "Streams" }
 { $subsection "streams" }
-"External streams:"
-{ $subsection "file-streams" }
-{ $subsection "network-streams" }
 "Wrapper streams:"
 { $subsection "io.streams.duplex" }
 { $subsection "io.streams.lines" }
 { $subsection "io.streams.plain" }
 { $subsection "io.streams.string" }
-"Stream utilities:"
+"Utilities:"
 { $subsection "stream-binary" }
 { $subsection "styles" }
-"Advanced features:"
-{ $subsection "io.launcher" }
+{ $heading "Files" }
+{ $subsection "io.files" }
 { $subsection "io.mmap" }
 { $subsection "io.monitors" }
+{ $heading "Other features" }
+{ $subsection "network-streams" }
+{ $subsection "io.launcher" }
 { $subsection "io.timeouts" } ;
 
 ARTICLE: "tools" "Developer tools"
-{ $subsection "tools.annotations" }
-{ $subsection "tools.crossref" }
+"Exploratory tools:"
 { $subsection "editor" }
+{ $subsection "tools.crossref" }
 { $subsection "inspector" }
-{ $subsection "meta-interpreter" }
+"Debugging tools:"
+{ $subsection "tools.annotations" }
+{ $subsection "tools.test" }
+{ $subsection "tools.threads" }
+"Performance tools:"
 { $subsection "tools.memory" }
 { $subsection "profiling" }
-{ $subsection "tools.test" }
 { $subsection "timing" }
+{ $subsection "tools.disassembler" }
+"Deployment tools:"
 { $subsection "tools.deploy" } ;
 
 ARTICLE: "article-index" "Article index"
@@ -201,7 +237,6 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "cookbook" }
 { $subsection "first-program" }
 { $subsection "vocab-index" }
-{ $subsection "changes" }
 { $heading "Language reference" }
 { $subsection "conventions" }
 { $subsection "syntax" }
@@ -212,6 +247,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "numbers" }
 { $subsection "collections" }
 { $subsection "io" }
+{ $subsection "concurrency" }
 { $subsection "os" }
 { $subsection "alien" }
 { $heading "Environment reference" }
@@ -230,137 +266,6 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "error-index" }
 { $subsection "type-index" }
 { $subsection "class-index" } ;
-
-
-USING: io.files io.sockets float-arrays inference ;
-
-ARTICLE: "changes" "Changes in the latest release"
-{ $heading "Factor 0.91" }
-{ $subheading "Performance" }
-{ $list
-    { "Continuations are now supported by the static stack effect system. This means that the " { $link infer } " word and the optimizing compiler now both support code which uses continuations." }
-    { "Many words which previously ran in the interpreter, such as error handling and I/O, are now compiled to optimized machine code." }
-    { "A non-optimizing, just-in-time compiler replaces the interpreter with no loss in functionality or introspective ability." }
-    { "The non-optimizing compiler compiles quotations the first time they are called, generating a series of stack pushes and subroutine calls. It offers a 33%-50% performance increase over the interpreter." }
-    { "The optimizing compiler now performs some more representation inference. Alien pointers are unboxed where possible. This improves performance of the " { $vocab-link "ogg.player" } " Ogg Theora video player." }
-    { "The queue of sleeping tasks is now a sorted priority queue. This reduces overhead for workloads involving large numbers of sleeping threads (Doug Coleman)" }
-    { "Improved hash code algorithm for sequences" }
-    { "New, efficient implementations of " { $link bit? } " and " { $link log2 } " runs in constant time for large bignums" }
-    { "New " { $link big-random } " word for generating large random numbers quickly" }
-    { "Improved profiler no longer has to be explicitly enabled and disabled with a full recompile; instead, the " { $link profile } " word can be used at any time, and it dynamically patches words to increment call counts. There is no overhead when the profiler is not in use." }
-    { "Calls to " { $link member? } " with a literal sequence are now open-coded. If there are four or fewer elements, a series of conditionals are generated; if there are more than four elements, there is a hash dispatch followed by conditionals in each branch." }
-}
-{ $subheading "IO" }
-{ $list
-    { "More robust Windows CE native I/O" }
-    { "New " { $link os-envs } " word to get the current set of environment variables" }
-    { "Redesigned " { $vocab-link "io.launcher" } " supports passing environment variables to the child process" }
-    { { $link <process-stream> } " implemented on Windows (Doug Coleman)" }
-    { "Updated " { $vocab-link "io.mmap" } " for new module system, now supports Windows CE (Doug Coleman)" }
-    { { $vocab-link "io.sniffer" } " - packet sniffer library (Doug Coleman, Elie Chaftari)" }
-    { { $vocab-link "io.server" } " - improved logging support, logs to a file by default" }
-    { { $vocab-link "io.files" } " - several new file system manipulation words added" }
-    { { $vocab-link "tar" } " - tar file extraction in pure Factor (Doug Coleman)" }
-    { { $vocab-link "unix.linux" } ", " { $vocab-link "raptor" } " - ``Raptor Linux'', a set of alien bindings to low-level Linux features, such as network interface configuration, file system mounting/unmounting, etc, together with experimental boot scripts intended to entirely replace " { $snippet "/sbin/init" } ", " { $snippet "/etc/inittab" } " and " { $snippet "/etc/init.d/" } " (Eduardo Cavazos)." }
-}
-{ $subheading "Tools" }
-{ $list
-    { "Graphical deploy tool added - see " { $link "ui.tools.deploy" } }
-    { "The deploy tool now supports Windows" }
-    { { $vocab-link "network-clipboard" } " - clipboard synchronization with a simple TCP/IP protocol" }
-}
-{ $subheading "UI" }
-{ $list
-    { { $vocab-link "cairo" } " - updated for new module system, new features (Sampo Vuori)" }
-    { { $vocab-link "springies" } " - physics simulation UI demo (Eduardo Cavazos)" }
-    { { $vocab-link "ui.gadgets.buttons" } " - added check box and radio button gadgets" }
-    { "Double- and triple-click-drag now supported in the editor gadget to select words or lines at a time" }
-    { "Windows can be closed on request now using " { $link close-window } }
-    { "New icons (Elie Chaftari)" }
-}
-{ $subheading "Libraries" }
-{ $list
-    { "The " { $snippet "queues" } " vocabulary has been removed because its functionality is a subset of " { $vocab-link "dlists" } }
-    { "The " { $vocab-link "webapps.cgi" } " vocabulary implements CGI support for the Factor HTTP server." }
-    { "The optimizing compiler no longer depends on the number tower and it is possible to bootstrap a minimal image by just passing " { $snippet "-include=compiler" } " to stage 2 bootstrap." }
-    { { $vocab-link "benchmark.knucleotide" } " - new benchmark (Eric Mertens)" }
-    { { $vocab-link "channels" } " - concurrent message passing over message channels" }
-    { { $vocab-link "destructors" } " - deterministic scope-based resource deallocation (Doug Coleman)" }
-    { { $vocab-link "dlists" } " - various updates (Doug Coleman)" }
-    { { $vocab-link "editors.emeditor" } " - EmEditor integration (Doug Coleman)" }
-    { { $vocab-link "editors.editplus" } " - EditPlus integration (Aaron Schaefer)" }
-    { { $vocab-link "editors.notepadpp" } " - Notepad++ integration (Doug Coleman)" }
-    { { $vocab-link "editors.ted-notepad" } " - TED Notepad integration (Doug Coleman)" }
-    { { $vocab-link "editors.ultraedit" } " - UltraEdit integration (Doug Coleman)" }
-    { { $vocab-link "globs" } " - simple Unix shell-style glob patterns" }
-    { { $vocab-link "heaps" } " - updated for new module system and cleaned up (Doug Coleman)" }
-    { { $vocab-link "peg" } " - Parser Expression Grammars, a new appoach to parser construction, similar to parser combinators (Chris Double)" }
-    { { $vocab-link "regexp" } " - revived from " { $snippet "unmaintained/" } " and completely redesigned (Doug Coleman)" }
-    { { $vocab-link "rss" } " - add Atom feed generation (Daniel Ehrenberg)" }
-    { { $vocab-link "tuples.lib" } " - some utility words for working with tuples (Doug Coleman)" }
-    { { $vocab-link "webapps.pastebin" } " - improved appearance, add Atom feed generation, add syntax highlighting using " { $vocab-link "xmode" } }
-    { { $vocab-link "webapps.planet" } " - add Atom feed generation" }
-}
-{ $heading "Factor 0.90" }
-{ $subheading "Core" }
-{ $list
-    { "New module system; see " { $link "vocabs.loader" } ". (Eduardo Cavazos)" }
-    { "Tuple constructors are defined differently now; see " { $link "tuple-constructors" } "." }
-    { "Mixin classes implemented; these are essentially extensible unions. See " { $link "mixins" } "."  }
-    { "New " { $link float-array } " data type implements a space-efficient sequence of floats." }
-    { "Moved " { $link <file-appender> } ", " { $link delete-file } ", " { $link make-directory } ", " { $link delete-directory } " words from " { $snippet "libs/io" } " into the core, and fixed them to work on more platforms." }
-    { "New " { $link host-name } " word." }
-    { "The " { $link directory } " word now outputs an array of pairs, with the second element of each pair indicating if that entry is a subdirectory. This saves an unnecessary " { $link stat } " call when traversing directory hierarchies, which speeds things up." }
-    { "IPv6 is now supported, along with Unix domain sockets (the latter on Unix systems only). The stack effects of " { $link <client> } " and " { $link <server> } " have changed, since they now take generic address specifiers; see " { $link "network-streams" } "." }
-    { "The stage 2 bootstrap process is more flexible, and various subsystems such as help, tools and the UI can be omitted by supplying command line switches; see " { $link "bootstrap-cli-args" } "." }
-    { "The " { $snippet "-shell" } " command line switch has been replaced by a " { $snippet "-run" } " command line switch; see " { $link "standard-cli-args" } "." }
-    { "Variable usage inference has been removed; the " { $link infer } " word no longer reports this information." }
-
-}
-{ $subheading "Tools" }
-{ $list
-    { "Stand-alone image deployment; see " { $link "tools.deploy" } "." }
-    { "Stand-alone application bundle deployment on Mac OS X; see " { $vocab-link "tools.deploy.app" } "." }
-    { "New vocabulary browser tool in the UI." }
-    { "New profiler tool in the UI." }
-}
-{ $subheading "Extras" }
-"Most existing libraries were improved when ported to the new module system; the most notable changes include:"
-{ $list
-    { { $vocab-link "asn1" } ": ASN1 parser and writer. (Elie Chaftari)" }
-    { { $vocab-link "benchmark" } ": new set of benchmarks." }
-    { { $vocab-link "cfdg" } ": Context-free design grammar implementation; see " { $url "http://www.chriscoyne.com/cfdg/" } ". (Eduardo Cavazos)" }
-    { { $vocab-link "cryptlib" } ": Cryptlib library binding. (Elie Chaftari)" }
-    { { $vocab-link "cryptlib.streams" } ": Streams which perform SSL encryption and decryption. (Matthew Willis)" }
-    { { $vocab-link "hints" } ": Give type specialization hints to the compiler." }
-    { { $vocab-link "inverse" } ": Invertible computation and concatenative pattern matching. (Daniel Ehrenberg)" }
-    { { $vocab-link "ldap" } ": OpenLDAP library binding. (Elie Chaftari)" }
-    { { $vocab-link "locals" } ": Efficient lexically scoped locals, closures, and local words." }
-    { { $vocab-link "mortar" } ": Experimental message-passing object system. (Eduardo Cavazos)" }
-    { { $vocab-link "openssl" } ": OpenSSL library binding. (Elie Chaftari)" }
-    { { $vocab-link "pack" } ": Utility for reading and writing binary data. (Doug Coleman)" }
-    { { $vocab-link "pdf" } ": Haru PDF library binding. (Elie Chaftari)" }
-    { { $vocab-link "qualified" } ": Refer to words from another vocabulary without adding the entire vocabulary to the search path. (Daniel Ehrenberg)" }
-    { { $vocab-link "roman" } ": Reading and writing Roman numerals. (Doug Coleman)" }
-    { { $vocab-link "scite" } ": SciTE editor integration. (Clemens Hofreither)" }
-    { { $vocab-link "smtp" } ": SMTP client with support for CRAM-MD5 authentication. (Elie Chaftari, Dirk Vleugels)" }
-    { { $vocab-link "tuple-arrays" } ": Space-efficient packed tuple arrays. (Daniel Ehrenberg)" }
-    { { $vocab-link "unicode" } ": major new functionality added. (Daniel Ehrenberg)" }
-}
-{ $subheading "Performance" }
-{ $list
-    { "The " { $link curry } " word now runs in constant time, and curried quotations can be called from compiled code; this allows for abstractions and idioms which were previously impractical due to performance issues. In particular, words such as " { $snippet "each-with" } " and " { $snippet "map-with" } " are gone; " { $snippet "each-with" } " can now be written as " { $snippet "with each" } ", and similarly for other " { $snippet "-with" } " combinators." }
-    "Improved generational promotion strategy in garbage collector reduces the amount of junk which makes its way into tenured space, which in turn reduces the frequency of full garbage collections."
-    "Faster generic word dispatch and union membership testing."
-    { "Alien memory accessors (" { $link "reading-writing-memory" } ") are compiled as intrinsics where possible, which improves performance in code which iteroperates with C libraries." }
-}
-{ $subheading "Platforms" }
-{ $list
-    "Networking support added for Windows CE. (Doug Coleman)"
-    "UDP/IP networking support added for all Windows platforms. (Doug Coleman)"
-    "Solaris/x86 fixes. (Samuel Tardieu)"
-    "Linux/AMD64 port works again."
-} ;
 
 { <array> <string> <sbuf> <vector> <byte-array> <bit-array> <float-array> }
 related-words

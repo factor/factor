@@ -35,7 +35,7 @@ DEFER: search
         { [ t ] [ assume ] }
     } cond ;
 
-: solve ( x y -- ) 9 [ 1+ pick pick attempt ] each 2drop ;
+: solve ( x y -- ) 9 [ 1+ 2over attempt ] each 2drop ;
 
 : board. ( board -- )
     standard-table-style [

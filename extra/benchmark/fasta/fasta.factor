@@ -51,7 +51,7 @@ HINTS: random fixnum ;
     dup keys >byte-array
     swap values >float-array unclip [ + ] accumulate swap add ;
 
-:: select-random | seed chars floats |
+:: select-random ( seed chars floats -- elt )
     floats seed random -rot
     [ >= ] curry find drop
     chars nth-unsafe ; inline
@@ -62,16 +62,16 @@ HINTS: random fixnum ;
 : write-description ( desc id -- )
     ">" write write bl print ; inline
 
-:: split-lines | n quot |
+:: split-lines ( n quot -- )
     n line-length /mod
     [ [ line-length quot call ] times ] dip
-    quot call ; inline
+    dup zero? [ drop ] quot if ; inline
 
 : write-random-fasta ( seed n chars floats desc id -- seed )
     write-description
     [ make-random-fasta ] 2curry split-lines ; inline
 
-:: make-repeat-fasta | k len alu |
+:: make-repeat-fasta ( k len alu -- )
     [let | kn [ alu length ] |
         len [ k + kn mod alu nth-unsafe ] B{ } map-as print
         k len +
@@ -101,7 +101,7 @@ HINTS: random fixnum ;
             n 3 * homo-sapiens-chars homo-sapiens-floats "IUB ambiguity codes" "TWO" write-random-fasta
             n 5 * IUB-chars IUB-floats "Homo sapiens frequency" "THREE" write-random-fasta
             drop
-        ] with-file-out
+        ] with-file-writer
 
     ] with-locals ;
 

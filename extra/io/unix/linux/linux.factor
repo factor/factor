@@ -3,8 +3,8 @@
 USING: kernel io.backend io.monitors io.monitors.private
 io.files io.buffers io.nonblocking io.timeouts io.unix.backend
 io.unix.select io.unix.launcher unix.linux.inotify assocs
-namespaces threads continuations init math alien.c-types alien
-vocabs.loader ;
+namespaces threads continuations init math
+alien.c-types alien vocabs.loader ;
 IN: io.unix.linux
 
 TUPLE: linux-io ;
@@ -22,10 +22,12 @@ TUPLE: inotify watches ;
 
 : wd>monitor ( wd -- monitor ) watches at ;
 
-: <inotify> ( -- port )
+: <inotify> ( -- port/f )
     H{ } clone
-    inotify_init dup io-error inotify <buffered-port>
-    { set-inotify-watches set-delegate } inotify construct ;
+    inotify_init dup 0 < [ 2drop f ] [
+        inotify <buffered-port>
+        { set-inotify-watches set-delegate } inotify construct
+    ] if ;
 
 : inotify-fd inotify get-global port-handle ;
 
@@ -42,10 +44,16 @@ TUPLE: inotify watches ;
     [ <linux-monitor> dup ] keep watches set-at ;
 
 : remove-watch ( monitor -- )
-    dup linux-monitor-wd watches delete-at
-    linux-monitor-wd inotify-fd swap inotify_rm_watch io-error ;
+    dup simple-monitor-handle watches delete-at
+    simple-monitor-handle inotify-fd swap inotify_rm_watch io-error ;
+
+: check-inotify
+    inotify get [
+        "inotify is not supported by this Linux release" throw
+    ] unless ;
 
 M: linux-io <monitor> ( path recursive? -- monitor )
+    check-inotify
     drop IN_CHANGE_EVENTS add-watch ;
 
 M: linux-monitor dispose ( monitor -- )
@@ -103,8 +111,7 @@ TUPLE: inotify-task ;
     f inotify-task <input-task> ;
 
 : init-inotify ( mx -- )
-    <inotify>
-    dup inotify set-global
+    <inotify> dup inotify set-global
     <inotify-task> swap register-io-task ;
 
 M: inotify-task do-io-task ( task -- )

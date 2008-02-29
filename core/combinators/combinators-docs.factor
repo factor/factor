@@ -7,11 +7,7 @@ ARTICLE: "combinators-quot" "Quotation construction utilities"
 "Some words for creating quotations which can be useful for implementing method combinations and compiler transforms:"
 { $subsection cond>quot }
 { $subsection case>quot }
-{ $subsection alist>quot }
-"A powerful tool used to optimize code in several places is open-coded hashtable dispatch:"
-{ $subsection hash-case>quot }
-{ $subsection distribute-buckets }
-{ $subsection hash-dispatch-quot } ;
+{ $subsection alist>quot } ;
 
 ARTICLE: "combinators" "Additional combinators"
 "The " { $vocab-link "combinators" } " vocabulary is usually used because it provides two combinators which abstract out nested chains of " { $link if } ":"
@@ -104,19 +100,17 @@ HELP: case>quot
 { $values { "assoc" "a sequence of pairs of quotations" } { "default" quotation } { "quot" quotation } }
 { $description "Creates a quotation that when called, has the same effect as applying " { $link case } " to " { $snippet "assoc" } "."
 $nl
-"The quotation actually tests each possible case in order;" { $link hash-case>quot } " produces more efficient code." } ;
+"This word uses three strategies:"
+{ $list
+    "If the assoc only has a few keys, a linear search is generated."
+    { "If the assoc has a large number of keys which form a contiguous range of integers, a direct dispatch is generated using the " { $link dispatch } " word together with a bounds check." }
+    "Otherwise, an open-coded hashtable dispatch is generated."
+} } ;
 
 HELP: distribute-buckets
 { $values { "assoc" "an alist" } { "initial" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- assoc )" } } { "buckets" "a new array" } }
 { $description "Sorts the entries of " { $snippet "assoc" } " into buckets, using the quotation to yield a set of keys for each entry. The hashcode of each key is computed, and the entry is placed in all corresponding buckets. Each bucket is initially cloned from " { $snippet "initial" } "; this should either be an empty vector or a one-element vector containing a pair." }
-{ $notes "This word is used in the implemention of " { $link hash-case>quot } " and " { $link standard-combination } "." } ;
-
-HELP: hash-case>quot
-{ $values { "default" quotation } { "assoc" "an association list mapping quotations to quotations" } { "quot" quotation } }
-{ $description "Creates a quotation that when called, has the same effect as applying " { $link case } " to " { $snippet "assoc" } "."
-$nl
-"The quotation uses an efficient hash-based search to avoid testing the object against all possible keys." }
-{ $notes "This word is used behind the scenes to compile " { $link case } " forms efficiently; it can also be called directly,  which is useful for meta-programming." } ;
+{ $notes "This word is used in the implemention of " { $link hash-case-quot } " and " { $link standard-combination } "." } ;
 
 HELP: dispatch ( n array -- )
 { $values { "n" "a fixnum" } { "array" "an array of quotations" } }

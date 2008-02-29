@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables io kernel assocs math
 namespaces prettyprint sequences strings io.styles vectors words
@@ -92,6 +92,15 @@ SYMBOL: +editable+
     ] bind ;
 
 : describe ( obj -- ) H{ } describe* ;
+
+: namestack. ( seq -- )
+    [
+        [ global eq? not ] subset
+        [ keys ] map concat prune
+    ] keep [ dupd assoc-stack ] curry H{ } map>assoc describe ;
+
+: .vars ( -- )
+    namestack namestack. ;
 
 SYMBOL: inspector-hook
 

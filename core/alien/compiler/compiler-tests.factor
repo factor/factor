@@ -315,7 +315,7 @@ FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
     data-gc ;
 
 [ "Hello world" ] [ 
-    [ callback-4 callback_test_1 ] string-out
+    [ callback-4 callback_test_1 ] with-string-writer
 ] unit-test
 
 : callback-5

@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2007 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays ui ui.gadgets ui.gestures ui.backend
-ui.clipboards ui.gadgets.worlds assocs kernel math namespaces
-opengl sequences strings x11.xlib x11.events x11.xim x11.glx
-x11.clipboard x11.constants x11.windows io.utf8 combinators
-debugger system command-line ui.render math.vectors tuples
-opengl.gl threads ;
+USING: alien alien.c-types arrays ui ui.gadgets ui.gestures
+ui.backend ui.clipboards ui.gadgets.worlds assocs kernel math
+namespaces opengl sequences strings x11.xlib x11.events x11.xim
+x11.glx x11.clipboard x11.constants x11.windows
+io.encodings.utf8 combinators debugger system command-line
+ui.render math.vectors tuples opengl.gl threads ;
 IN: ui.x11
 
 TUPLE: x11-ui-backend ;
@@ -178,7 +178,7 @@ M: world client-event
         next-event dup
         None XFilterEvent zero? [ drop wait-event ] unless
     ] [
-        ui-step 10 sleep wait-event
+        ui-wait wait-event
     ] if ;
 
 : do-events ( -- )
@@ -235,7 +235,7 @@ M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
     world-handle x11-handle-window dup set-closable map-window ;
 
-M: x11-ui-backend raise-window ( world -- )
+M: x11-ui-backend raise-window* ( world -- )
     world-handle [
         dpy get swap x11-handle-window XRaiseWindow drop
     ] when* ;

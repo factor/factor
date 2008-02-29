@@ -6,7 +6,7 @@ kernel models namespaces parser quotations sequences ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
-prettyprint listener debugger threads ;
+prettyprint listener debugger threads boxes concurrency.flags ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;
@@ -28,11 +28,7 @@ TUPLE: listener-gadget input output stack ;
     <scroller> "Input" <labelled-gadget> f track, ;
 
 : welcome. ( -- )
-   "If this is your first time with the Factor UI," print
-   "please read " write
-   "ui-tools" ($link) " and " write
-   "ui-listener" ($link) "." print nl
-   "If you are completely new to Factor, start with the " print
+   "If this is your first time with Factor, please read the " print
    "cookbook" ($link) "." print nl ;
 
 M: listener-gadget focusable-child*
@@ -44,8 +40,14 @@ M: listener-gadget call-tool* ( input listener -- )
 M: listener-gadget tool-scroller
     listener-gadget-output find-scroller ;
 
+: wait-for-listener ( listener -- )
+    #! Wait for the listener to start.
+    listener-gadget-input interactor-flag wait-for-flag ;
+
 : workspace-busy? ( workspace -- ? )
-    workspace-listener listener-gadget-input interactor-busy? ;
+    workspace-listener
+    dup wait-for-listener
+    listener-gadget-input interactor-busy? ;
 
 : get-listener ( -- listener )
     [ workspace-busy? not ] get-workspace* workspace-listener ;
@@ -81,8 +83,9 @@ M: listener-operation invoke-command ( target command -- )
     listener-gadget-input interactor-eof ;
 
 : clear-output ( listener -- )
-    [ listener-gadget-output [ pane-clear ] curry ] keep
-    (call-listener) ;
+    listener-gadget-output pane-clear ;
+
+\ clear-output H{ { +listener+ t } } define-command
 
 : clear-stack ( listener -- )
     [ clear ] swap (call-listener) ;
@@ -108,7 +111,7 @@ TUPLE: stack-display ;
     g workspace-listener swap [
         dup <toolbar> f track,
         listener-gadget-stack [ stack. ]
-        "Data stack" <labelled-pane> 1 track,
+        t "Data stack" <labelled-pane> 1 track,
     ] { 0 1 } build-track ;
 
 M: stack-display tool-scroller
@@ -133,18 +136,21 @@ M: stack-display tool-scroller
         listener
     ] with-stream* ;
 
+: start-listener-thread ( listener -- )
+    [ listener-thread ] curry "Listener" spawn drop ;
+
 : restart-listener ( listener -- )
-    [ >r clear r> init-namespaces listener-thread ] in-thread
-    drop ;
+    #! Returns when listener is ready to receive input.
+    dup com-end dup clear-output
+    dup start-listener-thread
+    wait-for-listener ;
 
 : init-listener ( listener -- )
     f <model> swap set-listener-gadget-stack ;
 
 : <listener-gadget> ( -- gadget )
-    listener-gadget construct-empty
-    dup init-listener
-    [ listener-output, listener-input, ] { 0 1 } build-track
-    dup restart-listener ;
+    listener-gadget construct-empty dup init-listener
+    [ listener-output, listener-input, ] { 0 1 } build-track ;
 
 : listener-help "ui-listener" help-window ;
 
@@ -161,3 +167,12 @@ listener-gadget "toolbar" f {
 M: listener-gadget handle-gesture* ( gadget gesture delegate -- ? )
     3dup drop swap find-workspace workspace-page handle-gesture
     [ default-gesture-handler ] [ 3drop f ] if ;
+
+M: listener-gadget graft*
+    dup delegate graft*
+    dup listener-gadget-input interactor-thread ?box 2drop
+    restart-listener ;
+
+M: listener-gadget ungraft*
+    dup com-end
+    delegate ungraft* ;

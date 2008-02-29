@@ -111,8 +111,16 @@ compiled-crossref global [ H{ } assoc-like ] change-at
     dup compiled-unxref
     compiled-crossref get delete-at ;
 
+SYMBOL: +inlined+
+SYMBOL: +called+
+
 : compiled-usage ( word -- assoc )
     compiled-crossref get at ;
+
+: compiled-usages ( words -- seq )
+    [ [ dup ] H{ } map>assoc dup ] keep [
+        compiled-usage [ nip +inlined+ eq? ] assoc-subset update
+    ] with each keys ;
 
 M: word redefined* ( word -- )
     { "inferred-effect" "no-effect" } reset-props ;
@@ -172,7 +180,9 @@ SYMBOL: changed-words
     gensym dup rot define ;
 
 : reveal ( word -- )
-    dup word-name over word-vocabulary vocab-words set-at ;
+    dup word-name over word-vocabulary dup vocab-words
+    [ ] [ no-vocab ] ?if
+    set-at ;
 
 TUPLE: check-create name vocab ;
 

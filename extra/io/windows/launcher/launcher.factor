@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays continuations destructors io
-io.windows io.windows.pipes libc io.nonblocking
+io.windows io.windows.nt.pipes libc io.nonblocking
 io.streams.duplex windows.types math windows.kernel32 windows
 namespaces io.launcher kernel sequences windows.errors assocs
-splitting system threads init strings combinators io.backend ;
+splitting system threads init strings combinators
+io.backend ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args
@@ -87,75 +88,29 @@ TUPLE: CreateProcess-args
         over set-CreateProcess-args-lpEnvironment
     ] when ;
 
-: (redirect) ( path access-mode create-mode -- handle )
-    >r >r
-    normalize-pathname
-    r> ! access-mode
-    share-mode
-    security-attributes-inherit
-    r> ! create-mode
-    FILE_ATTRIBUTE_NORMAL ! flags and attributes
-    f ! template file
-    CreateFile dup invalid-handle? dup close-later ;
-
-: redirect ( obj access-mode create-mode -- handle )
-    {
-        { [ pick not ] [ 3drop f ] }
-        { [ pick +closed+ eq? ] [ 3drop t ] }
-        { [ pick string? ] [ (redirect) ] }
-    } cond ;
-
-: ?closed or dup t eq? [ drop f ] when ;
-
-: inherited-stdout ( args -- handle )
-    CreateProcess-args-stdout-pipe
-    [ pipe-out ] [ STD_OUTPUT_HANDLE GetStdHandle ] if* ;
-
-: redirect-stdout ( args -- handle )
-    +stdout+ get GENERIC_WRITE CREATE_ALWAYS redirect
-    swap inherited-stdout ?closed ;
-
-: inherited-stderr ( args -- handle )
-    drop STD_ERROR_HANDLE GetStdHandle ;
-
-: redirect-stderr ( args -- handle )
-    +stderr+ get
-    dup +stdout+ eq? [
-        drop
-        CreateProcess-args-lpStartupInfo STARTUPINFO-hStdOutput
-    ] [
-        GENERIC_WRITE CREATE_ALWAYS redirect
-        swap inherited-stderr ?closed
-    ] if ;
-
-: inherited-stdin ( args -- handle )
-    CreateProcess-args-stdin-pipe
-    [ pipe-in ] [ STD_INPUT_HANDLE GetStdHandle ] if* ;
-
-: redirect-stdin ( args -- handle )
-    +stdin+ get GENERIC_READ OPEN_EXISTING redirect
-    swap inherited-stdin ?closed ;
-
 : fill-startup-info
     dup CreateProcess-args-lpStartupInfo
-    STARTF_USESTDHANDLES over set-STARTUPINFO-dwFlags
+    STARTF_USESTDHANDLES swap set-STARTUPINFO-dwFlags ;
 
-    over redirect-stdout over set-STARTUPINFO-hStdOutput
-    over redirect-stderr over set-STARTUPINFO-hStdError
-    over redirect-stdin over set-STARTUPINFO-hStdInput
+HOOK: fill-redirection io-backend ( args -- args )
 
-    drop ;
+M: windows-ce-io fill-redirection ;
 
 : make-CreateProcess-args ( -- args )
     default-CreateProcess-args
     wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
     fill-dwCreateFlags
-    fill-lpEnvironment ;
+    fill-lpEnvironment
+    fill-startup-info ;
+
+M: windows-io current-process-handle ( -- handle )
+    GetCurrentProcessId ;
 
 M: windows-io run-process* ( desc -- handle )
     [
         [
-            make-CreateProcess-args fill-startup-info
+            make-CreateProcess-args
+            fill-redirection
             dup call-CreateProcess
             CreateProcess-args-lpProcessInformation <process>
         ] with-descriptor
@@ -191,11 +146,16 @@ M: windows-io kill-process* ( handle -- )
 
 : wait-loop ( -- )
     processes get dup assoc-empty?
-    [ drop t ] [ wait-for-processes ] if
-    [ 250 sleep ] when
-    wait-loop ;
+    [ drop f sleep-until ]
+    [ wait-for-processes [ 100 sleep ] when ] if ;
+
+SYMBOL: wait-thread
 
 : start-wait-thread ( -- )
-    [ wait-loop ] in-thread ;
+    [ wait-loop t ] "Process wait" spawn-server
+    wait-thread set-global ;
+
+M: windows-io register-process
+    drop wait-thread get-global interrupt ;
 
 [ start-wait-thread ] "io.windows.launcher" add-init-hook

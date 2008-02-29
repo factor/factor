@@ -3,6 +3,8 @@ IN: sequences.next
 
 <PRIVATE
 
+: iterate-seq >r dup length swap r> ; inline
+
 : (map-next) ( i seq quot -- )
     ! this uses O(n) more bounds checks than is really necessary
     >r [ >r 1+ r> ?nth ] 2keep nth-unsafe r> call ; inline

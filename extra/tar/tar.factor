@@ -1,7 +1,7 @@
 USING: combinators io io.files io.streams.duplex
 io.streams.string kernel math math.parser continuations
 namespaces pack prettyprint sequences strings system
-hexdump tools.interpreter ;
+hexdump ;
 IN: tar
 
 : zero-checksum 256 ;
@@ -72,7 +72,7 @@ SYMBOL: filename
         0 over set-tar-header-size
         0 over set-tar-header-checksum
     ] [
-        [ read-tar-header ] string-in
+        [ read-tar-header ] with-string-reader
         [ tar-header-checksum = [
                 \ checksum-error construct-empty throw
             ] unless
@@ -241,4 +241,4 @@ TUPLE: unimplemented-typeflag header ;
         global [ nl nl nl "Starting to parse .tar..." print flush ] bind
         global [ "Expanding to: " write base-dir get . flush ] bind
         (parse-tar)
-    ] with-file-out ;
+    ] with-file-writer ;

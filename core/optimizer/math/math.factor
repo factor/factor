@@ -7,7 +7,7 @@ inference.class inference.dataflow vectors strings sbufs io
 namespaces assocs quotations math.intervals sequences.private
 combinators splitting layouts math.parser classes generic.math
 optimizer.pattern-match optimizer.backend optimizer.def-use
-generic.standard system ;
+optimizer.inlining generic.standard system ;
 
 { + bignum+ float+ fixnum+fast } {
     { { number 0 } [ drop ] }
@@ -366,7 +366,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
 } [
     [
         [ dup remove-overflow-check? ] ,
-        [ splice-quot ] curry ,
+        [ f splice-quot ] curry ,
     ] { } make 1array define-optimizers
 ] assoc-each
 
@@ -379,7 +379,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
     >r dup dup node-in-d first node-interval
     swap dup node-in-d second node-literal r> execute ; inline
 
-: foldable-comparison? ( #call word -- )
+: foldable-comparison? ( #call word -- ? )
     >r dup known-comparison? [
         r> perform-comparison incomparable eq? not
     ] [
@@ -436,7 +436,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
             dup remove-overflow-check?
             over coereced-to-fixnum? or
         ] ,
-        [ splice-quot ] curry ,
+        [ f splice-quot ] curry ,
     ] { } make 1array define-optimizers
 ] assoc-each
 
@@ -461,6 +461,6 @@ most-negative-fixnum most-positive-fixnum [a,b]
 \ fixnum-shift {
     {
         [ dup fixnum-shift-fast? ]
-        [ [ fixnum-shift-fast ] splice-quot ]
+        [ [ fixnum-shift-fast ] f splice-quot ]
     }
 } define-optimizers

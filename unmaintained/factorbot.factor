@@ -98,7 +98,7 @@ IN: factorbot-commands
     ] if ;
 
 : memory ( text -- )
-    drop [ room. ] string-out multiline-respond ;
+    drop [ room. ] with-string-writer multiline-respond ;
 
 : quit ( text -- )
     drop speaker get "slava" = [ disconnect ] when ;

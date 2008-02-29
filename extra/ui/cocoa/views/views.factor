@@ -298,7 +298,6 @@ CLASS: {
     [
         [
             2drop dup view-dim swap window set-gadget-dim
-            ui-step
         ] ui-try
     ]
 }

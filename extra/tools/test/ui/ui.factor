@@ -13,4 +13,4 @@ IN: tools.test.ui
             swap slip
             ungraft notify-queued
         ] with-variable
-    ] string-out print ;
+    ] with-string-writer print ;

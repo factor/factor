@@ -1,119 +1,111 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes db kernel namespaces
-tuples words sequences slots slots.private math
-math.parser io prettyprint db.types ;
-USE: continuations
+tuples words sequences slots math
+math.parser io prettyprint db.types continuations
+mirrors sequences.lib tools.walker combinators.lib ;
 IN: db.tuples
 
-! only take a tuple if you have to extract things from it
-! otherwise take a class
-! primary-key vs primary-key-spec
-! define-persistent should enforce a primary key
-! in sqlite, defining a new primary key makes it an alias for rowid, _rowid_, and oid
-! -sql outputs sql code
-! table - string
-! columns - seq of column specifiers
+: define-persistent ( class table columns -- )
+    >r dupd "db-table" set-word-prop dup r>
+    [ relation? ] partition swapd
+    dupd [ spec>tuple ] with map
+    "db-columns" set-word-prop
+    "db-relations" set-word-prop ;
 
-: db-columns ( class -- obj )
-    "db-columns" word-prop ;
+: db-table ( class -- obj ) "db-table" word-prop ;
+: db-columns ( class -- obj ) "db-columns" word-prop ;
+: db-relations ( class -- obj ) "db-relations" word-prop ;
 
-: db-table ( class -- obj )
-    "db-table" word-prop ;
+: set-primary-key ( key tuple -- )
+    [
+        class db-columns find-primary-key sql-spec-slot-name
+    ] keep set-slot-named ;
 
+! returns a sequence of prepared-statements
+HOOK: create-sql-statement db ( class -- obj )
+HOOK: drop-sql-statement db ( class -- obj )
 
-: slot-spec-named ( str class -- slot-spec )
-    "slots" word-prop [ slot-spec-name = ] with find nip ;
+HOOK: <insert-native-statement> db ( class -- obj )
+HOOK: <insert-assigned-statement> db ( class -- obj )
 
-: offset-of-slot ( str obj -- n )
-    class slot-spec-named slot-spec-offset ;
+HOOK: <update-tuple-statement> db ( class -- obj )
+HOOK: <update-tuples-statement> db ( class -- obj )
 
-: get-slot-named ( str obj -- value )
-    tuck offset-of-slot slot ;
+HOOK: <delete-tuple-statement> db ( class -- obj )
+HOOK: <delete-tuples-statement> db ( class -- obj )
 
-: set-slot-named ( value str obj -- )
-    tuck offset-of-slot set-slot ;
-    
+HOOK: <select-by-slots-statement> db ( tuple -- tuple )
 
-: primary-key-spec ( class -- spec )
-    db-columns [ primary-key? ] find nip ;
-    
-: primary-key ( tuple -- obj )
-    dup class primary-key-spec get-slot-named ;
+HOOK: row-column-typed db ( result-set n type -- sql )
+HOOK: insert-tuple* db ( tuple statement -- )
 
-: set-primary-key ( obj tuple -- )
-    [ class primary-key-spec first ] keep
-    set-slot-named ;
+: resulting-tuple ( row out-params -- tuple )
+    dup first sql-spec-class construct-empty [
+        [
+            >r [ sql-spec-type sql-type>factor-type ] keep
+            sql-spec-slot-name r> set-slot-named
+        ] curry 2each
+    ] keep ;
 
+: query-tuples ( statement -- seq )
+    [ statement-out-params ] keep query-results [
+        [ sql-row swap resulting-tuple ] with query-map
+    ] with-disposal ;
+ 
+: query-modify-tuple ( tuple statement -- )
+    [ query-results [ sql-row ] with-disposal ] keep
+    statement-out-params rot [
+        >r [ sql-spec-type sql-type>factor-type ] keep
+        sql-spec-slot-name r> set-slot-named
+    ] curry 2each ;
 
-: cache-statement ( columns class assoc quot -- statement )
-    [ db-table dupd ] swap
-    [ <prepared-statement> ] 3compose cache nip ; inline
+: sql-props ( class -- columns table )
+    dup db-columns swap db-table ;
 
-HOOK: create-sql db ( columns table -- sql )
-HOOK: drop-sql db ( table -- sql )
-HOOK: insert-sql* db ( columns table -- sql )
-HOOK: update-sql* db ( columns table -- sql )
-HOOK: delete-sql* db ( columns table -- sql )
-HOOK: select-sql* db ( columns table -- sql )
-
-: insert-sql ( columns class -- statement )
-    db get db-insert-statements [ insert-sql* ] cache-statement ;
-
-: update-sql ( columns class -- statement )
-    db get db-update-statements [ update-sql* ] cache-statement ;
-
-: delete-sql ( columns class -- statement )
-    db get db-delete-statements [ delete-sql* ] cache-statement ;
-
-: select-sql ( columns class -- statement )
-    db get db-select-statements [ select-sql* ] cache-statement ;
-
-HOOK: tuple>params db ( columns tuple -- obj )
-
-: tuple-statement ( columns tuple quot -- statement )
-    >r [ tuple>params ] 2keep class r> call
-    [ bind-statement ] keep ;
-
-: do-tuple-statement ( tuple columns-quot statement-quot -- )
-    >r [ class db-columns ] swap compose keep
-    r> tuple-statement dup . execute-statement ;
+: with-disposals ( seq quot -- )
+    over sequence? [
+        [ with-disposal ] curry each
+    ] [
+        with-disposal
+    ] if ;
 
 : create-table ( class -- )
-    dup db-columns swap db-table create-sql sql-command ;
-    
+    create-sql-statement [ execute-statement ] with-disposals ;
+
 : drop-table ( class -- )
-    db-table drop-sql sql-command ;
+    drop-sql-statement [ execute-statement ] with-disposals ;
+
+: insert-native ( tuple -- )
+    dup class
+    db get db-insert-statements [ <insert-native-statement> ] cache
+    [ bind-tuple ] 2keep insert-tuple* ;
+
+: insert-assigned ( tuple -- )
+    dup class
+    db get db-insert-statements [ <insert-assigned-statement> ] cache
+    [ bind-tuple ] keep execute-statement ;
 
 : insert-tuple ( tuple -- )
-    [
-        [ maybe-remove-id ] [ insert-sql ] do-tuple-statement
-        last-id
-    ] keep set-primary-key ;
+    dup class db-columns find-primary-key assigned-id? [
+        insert-assigned
+    ] [
+        insert-native
+    ] if ;
 
 : update-tuple ( tuple -- )
-    [ ] [ update-sql ] do-tuple-statement ;
+    dup class
+    db get db-update-statements [ <update-tuple-statement> ] cache
+    [ bind-tuple ] keep execute-statement ;
 
 : delete-tuple ( tuple -- )
-    [ [ primary-key? ] subset ] [ delete-sql ] do-tuple-statement ;
+    dup class
+    db get db-delete-statements [ <delete-tuple-statement> ] cache
+    [ bind-tuple ] keep execute-statement ;
 
-! : select-tuple ( tuple -- )
-  !  [ select-sql ] bind-tuple do-query ;
+: select-tuples ( tuple -- tuple )
+    dup dup class <select-by-slots-statement> [
+        [ bind-tuple ] keep query-tuples
+    ] with-disposal ;
 
-: persist ( tuple -- )
-    dup primary-key [ update-tuple ] [ insert-tuple ] if ;
-
-! PERSISTENT:
-
-: define-persistent ( class table columns -- )
-    >r dupd "db-table" set-word-prop r>
-    "db-columns" set-word-prop ;
-
-: define-relation ( spec -- )
-    drop ;
-
-
-
-
-
-
-
-
+: select-tuple ( tuple -- tuple/f ) select-tuples ?first ;

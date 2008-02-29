@@ -1,5 +1,5 @@
 IN: temporary
-USING: kernel tools.test compiler ;
+USING: kernel tools.test compiler.units ;
 
 TUPLE: color red green blue ;
 

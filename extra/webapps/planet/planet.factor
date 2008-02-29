@@ -1,8 +1,8 @@
-USING: sequences rss arrays concurrency kernel sorting
-html.elements io assocs namespaces math threads vocabs html
-furnace http.server.templating calendar math.parser splitting
-continuations debugger system http.server.responders
-xml.writer prettyprint logging ;
+USING: sequences rss arrays concurrency.combinators kernel
+sorting html.elements io assocs namespaces math threads vocabs
+html furnace http.server.templating calendar math.parser
+splitting continuations debugger system http.server.responders
+xml.writer prettyprint logging calendar.format ;
 IN: webapps.planet
 
 : print-posting-summary ( posting -- )
@@ -100,7 +100,7 @@ SYMBOL: last-update
 
 : update-thread ( -- )
     millis last-update set-global
-    [ update-cached-postings ] in-thread
+    [ update-cached-postings ] "RSS feed update slave" spawn drop
     10 60 * 1000 * sleep
     update-thread ;
 
@@ -109,7 +109,7 @@ SYMBOL: last-update
         "webapps.planet" [
             update-thread
         ] with-logging
-    ] in-thread ;
+    ] "RSS feed update master" spawn drop ;
 
 "planet" "planet-factor" "extra/webapps/planet" web-app
 

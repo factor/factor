@@ -1,4 +1,5 @@
 USING: sequences xml kernel arrays xml.utilities io.files tools.test ;
+IN: temporary
 
 : assemble-data ( tag -- 3array )
     { "URL" "snippet" "title" }
@@ -9,6 +10,6 @@ USING: sequences xml kernel arrays xml.utilities io.files tools.test ;
     [ assemble-data ] map ;
 
 [ "http://www.foxnews.com/oreilly/" ] [
-    "extra/xml/test/soap.xml" resource-path file>xml
+    "extra/xml/tests/soap.xml" resource-path file>xml
     parse-result first first
 ] unit-test

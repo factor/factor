@@ -87,7 +87,7 @@ $nl
 HELP: alien-invoke-error
 { $error-description "Thrown if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
     { $list
-        { "This can happen when experimenting with " { $link alien-invoke } " in this listener. To fix the problem, place the " { $link alien-invoke } " call in a word and then call " { $link recompile } ". See " { $link "compiler" } "." }
+        { "This can happen when experimenting with " { $link alien-invoke } " in this listener. To fix the problem, place the " { $link alien-invoke } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
         { "The return type or parameter list references an unknown C type." }
         { "The symbol or library could not be found." }
         { "One of the four inputs to " { $link alien-invoke } " is not a literal value. To call functions which are not known at compile-time, use " { $link alien-indirect } "." }
@@ -103,7 +103,7 @@ HELP: alien-invoke
 HELP: alien-indirect-error
 { $error-description "Thrown if the word calling " { $link alien-indirect } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
     { $list
-        { "This can happen when experimenting with " { $link alien-indirect } " in this listener. To fix the problem, place the " { $link alien-indirect } " call in a word and then call " { $link recompile } ". See " { $link "compiler" } "." }
+        { "This can happen when experimenting with " { $link alien-indirect } " in this listener. To fix the problem, place the " { $link alien-indirect } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
         { "The return type or parameter list references an unknown C type." }
         { "One of the three inputs to " { $link alien-indirect } " is not a literal value." }
     }
@@ -120,7 +120,7 @@ HELP: alien-indirect
 HELP: alien-callback-error
 { $error-description "Thrown if the word calling " { $link alien-callback } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
     { $list
-        { "This can happen when experimenting with " { $link alien-callback } " in this listener. To fix the problem, place the " { $link alien-callback } " call in a word and then call " { $link recompile } ". See " { $link "compiler" } "." }
+        { "This can happen when experimenting with " { $link alien-callback } " in this listener. To fix the problem, place the " { $link alien-callback } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
         { "The return type or parameter list references an unknown C type." }
         { "One of the four inputs to " { $link alien-callback } " is not a literal value." }
     }
@@ -199,9 +199,7 @@ ARTICLE: "alien-invoke" "Calling C from Factor"
 { $subsection alien-invoke }
 "Sometimes it is necessary to invoke a C function pointer, rather than a named C function:"
 { $subsection alien-indirect }
-"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "."
-$nl
-"Don't forget to compile your binding word after defining it; C library calls cannot be made from an interpreted definition. Words defined in source files are automatically compiled when the source file is loaded, but words defined in the listener are not; when interactively testing C libraries, use " { $link compile } " or " { $link recompile } " to compile binding words." ;
+"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "." ;
 
 ARTICLE: "alien-callback-gc" "Callbacks and code GC"
 "A callback consits of two parts; the callback word, which pushes the address of the callback on the stack when executed, and the callback body itself. If the callback word is redefined, removed from the dictionary using " { $link forget } ", or recompiled, the callback body will not be reclaimed by the garbage collector, since potentially C code may be holding a reference to the callback body."
