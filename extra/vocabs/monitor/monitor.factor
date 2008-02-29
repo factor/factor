@@ -17,6 +17,6 @@ SYMBOL: vocab-monitor
     [
         "" resource-path t <monitor> vocab-monitor set-global
         [ monitor-thread t ] "Vocabulary monitor" spawn-server drop
-    ] [ drop ] recover ;
+    ] ignore-errors ;
 
 [ start-monitor-thread ] "vocabs.monitor" add-init-hook

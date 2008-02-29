@@ -22,8 +22,9 @@ SYMBOL: the-person2
 : test-tuples ( -- )
     [ person drop-table ] [ drop ] recover
     [ ] [ person create-table ] unit-test
+    [ person create-table ] must-fail
     
-    [  ] [ the-person1 get insert-tuple ] unit-test
+    [ ] [ the-person1 get insert-tuple ] unit-test
 
     [ 1 ] [ the-person1 get person-the-id ] unit-test
 
@@ -66,8 +67,8 @@ person "PERSON"
 "billy" 10 3.14 <person> the-person1 set
 "johnny" 10 3.14 <person> the-person2 set
 
-! test-sqlite
-test-postgresql
+test-sqlite
+! test-postgresql
 
 person "PERSON"
 {
@@ -80,8 +81,8 @@ person "PERSON"
 1 "billy" 10 3.14 <assigned-person> the-person1 set
 2 "johnny" 10 3.14 <assigned-person> the-person2 set
 
-! test-sqlite
-test-postgresql
+test-sqlite
+! test-postgresql
 
 TUPLE: paste n summary author channel mode contents timestamp annotations ;
 TUPLE: annotation n paste-id summary author mode contents ;
@@ -108,11 +109,11 @@ annotation "ANNOTATION"
     { "contents" "CONTENTS" TEXT }
 } define-persistent
 
-{ "localhost" "postgres" "" "factor-test" } postgresql-db [
-    [ paste drop-table ] [ drop ] recover
-    [ annotation drop-table ] [ drop ] recover
-    [ paste drop-table ] [ drop ] recover
-    [ annotation drop-table ] [ drop ] recover
-    [ ] [ paste create-table ] unit-test
-    [ ] [ annotation create-table ] unit-test
-] with-db
+! { "localhost" "postgres" "" "factor-test" } postgresql-db [
+    ! [ paste drop-table ] [ drop ] recover
+    ! [ annotation drop-table ] [ drop ] recover
+    ! [ paste drop-table ] [ drop ] recover
+    ! [ annotation drop-table ] [ drop ] recover
+    ! [ ] [ paste create-table ] unit-test
+    ! [ ] [ annotation create-table ] unit-test
+! ] with-db

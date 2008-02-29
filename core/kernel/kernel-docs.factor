@@ -139,10 +139,6 @@ ARTICLE: "equality" "Equality and comparison testing"
 ! Defined in handbook.factor
 ABOUT: "dataflow"
 
-HELP: version
-{ $values { "str" string } }
-{ $description "Outputs the version number of the current Factor instance." } ;
-
 HELP: eq? ( obj1 obj2 -- ? )
 { $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
 { $description "Tests if two references point at the same object." } ;

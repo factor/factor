@@ -306,11 +306,23 @@ MEMO: range ( min max -- parser )
 : seq ( seq -- parser )
   seq-parser construct-boa init-parser ;
 
+: 2seq ( parser1 parser2 -- parser )
+  2array seq ;
+
+: 3seq ( parser1 parser2 parser3 -- parser )
+  3array seq ;
+
 : seq* ( quot -- paser )
   { } make seq ; inline 
 
 : choice ( seq -- parser )
   choice-parser construct-boa init-parser ;
+
+: 2choice ( parser1 parser2 -- parser )
+  2array choice ;
+
+: 3choice ( parser1 parser2 parser3 -- parser )
+  3array choice ;
 
 : choice* ( quot -- paser )
   { } make choice ; inline 
@@ -342,8 +354,15 @@ MEMO: hide ( parser -- parser )
 MEMO: delay ( parser -- parser )
   delay-parser construct-boa init-parser ;
 
+MEMO: (list-of) ( items separator repeat1? -- parser )
+  >r over 2seq r> [ repeat1 ] [ repeat0 ] if [ concat ] action 2seq
+  [ unclip 1vector swap first append ] action ;
+
 MEMO: list-of ( items separator -- parser )
-  hide over 2array seq repeat0 [ concat ] action 2array seq [ unclip 1vector swap first append ] action ;
+  hide f (list-of) ;
+
+MEMO: list-of* ( items separator -- parser )
+  hide t (list-of) ;
 
 MEMO: 'digit' ( -- parser )
   [ digit? ] satisfy [ digit> ] action ;

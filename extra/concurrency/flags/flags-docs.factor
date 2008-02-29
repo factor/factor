@@ -14,6 +14,10 @@ HELP: raise-flag
 { $values { "flag" flag } }
 { $description "Raises a flag, notifying any threads waiting on it. Does nothing if the flag has already been raised." } ;
 
+HELP: wait-for-flag
+{ $values { "flag" flag } }
+{ $description "Waits for a flag to be raised. If the flag has already been raised, returns immediately." } ;
+
 HELP: lower-flag
 { $values { "flag" flag } }
 { $description "Attempts to lower a flag. If the flag has been raised previously, returns immediately, otherwise waits for it to be raised first." } ;
@@ -21,13 +25,14 @@ HELP: lower-flag
 ARTICLE: "concurrency.flags" "Flags"
 "A " { $emphasis "flag" } " is a condition notification device which can be in one of two states: " { $emphasis "lowered" } " (the initial state) or " { $emphasis "raised" } "."
 $nl
-"The flag can be raised at any time; raising a raised flag does nothing. Lowering a flag if the flag has not been raised, it first waits for it to be raised."
+"The flag can be raised at any time; raising a raised flag does nothing. Lowering a flag if it has not been raised yet will wait for another thread to raise the flag."
 $nl
 "Essentially, a flag can be thought of as a counting semaphore where the count never goes above one."
 { $subsection flag }
 { $subsection flag? }
-"Raising and lowering flags:"
+"Waiting for a flag to be raised:"
 { $subsection raise-flag }
+{ $subsection wait-for-flag }
 { $subsection lower-flag } ;
 
 ABOUT: "concurrency.flags"

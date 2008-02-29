@@ -1,11 +1,11 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: bootstrap.stage1
 USING: arrays debugger generic hashtables io assocs
 kernel.private kernel math memory namespaces parser
 prettyprint sequences vectors words system splitting
 init io.files bootstrap.image bootstrap.image.private vocabs
-vocabs.loader system ;
+vocabs.loader system debugger continuations ;
 
 { "resource:core" } vocab-roots set
 
@@ -40,7 +40,14 @@ vocabs.loader system ;
     [
         "resource:core/bootstrap/stage2.factor"
         dup resource-exists? [
-            run-file
+            [ run-file ]
+            [
+                :c
+                dup print-error flush
+                "listener" vocab
+                [ restarts. vocab-main execute ]
+                [ die ] if*
+            ] recover
         ] [
             "Cannot find " write write "." print
             "Please move " write image write " to the same directory as the Factor sources," print

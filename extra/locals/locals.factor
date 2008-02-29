@@ -4,7 +4,8 @@ USING: kernel namespaces sequences sequences.private assocs math
 inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
 definitions prettyprint hashtables combinators.lib
-prettyprint.sections sequences.private ;
+prettyprint.sections sequences.private effects generic
+compiler.units ;
 IN: locals
 
 ! Inspired by
@@ -208,9 +209,6 @@ M: object local-rewrite* , ;
 : push-locals ( assoc -- )
     use get push ;
 
-: parse-locals ( -- words assoc )
-    "|" parse-tokens make-locals ;
-
 : pop-locals ( assoc -- )
     use get delete ;
 
@@ -218,7 +216,7 @@ M: object local-rewrite* , ;
     over push-locals parse-until >quotation swap pop-locals ;
 
 : parse-lambda ( -- lambda )
-    parse-locals \ ] (parse-lambda) <lambda> ;
+    "|" parse-tokens make-locals \ ] (parse-lambda) <lambda> ;
 
 : (parse-bindings) ( -- )
     scan dup "|" = [
@@ -246,11 +244,18 @@ M: wlet local-rewrite*
     dup wlet-bindings values over wlet-vars rot wlet-body
     <lambda> [ call ] curry compose local-rewrite* \ call , ;
 
-: (::) ( prop -- word quot n )
-    >r CREATE dup reset-generic
-    scan "|" assert= parse-locals \ ; (parse-lambda) <lambda>
-    2dup r> set-word-prop
-    [ lambda-rewrite first ] keep lambda-vars length ;
+: parse-locals
+    parse-effect
+    word [ over "declared-effect" set-word-prop ] when*
+    effect-in make-locals ;
+
+: ((::)) ( word -- word quot )
+    scan "(" assert= parse-locals \ ; (parse-lambda) <lambda>
+    2dup "lambda" set-word-prop
+    lambda-rewrite first ;
+
+: (::) ( -- word quot )
+    CREATE dup reset-generic ((::)) ;
 
 PRIVATE>
 
@@ -268,9 +273,22 @@ PRIVATE>
 
 MACRO: with-locals ( form -- quot ) lambda-rewrite ;
 
-: :: "lambda" (::) drop define ; parsing
+: :: (::) define ; parsing
 
-: MACRO:: "lambda-macro" (::) (MACRO:) ; parsing
+! This will be cleaned up when method tuples and method words
+! are unified
+: create-method ( class generic -- method )
+    2dup method dup
+    [ 2nip method-word ]
+    [ drop 2dup [ ] -rot define-method create-method ] if ;
+
+: CREATE-METHOD ( -- class generic body )
+    scan-word bootstrap-word scan-word 2dup
+    create-method f set-word dup save-location ;
+
+: M:: CREATE-METHOD ((::)) nip -rot define-method ; parsing
+
+: MACRO:: (::) define-macro ; parsing
 
 <PRIVATE
 
@@ -323,26 +341,42 @@ M: lambda-word definer drop \ :: \ ; ;
 M: lambda-word definition
     "lambda" word-prop lambda-body ;
 
-: lambda-word-synopsis ( word prop -- )
-    over definer.
-    over seeing-word
-    over pprint-word
-    \ | pprint-word
-    word-prop lambda-vars pprint-vars
-    \ | pprint-word ;
+: lambda-word-synopsis ( word -- )
+    dup definer.
+    dup seeing-word
+    dup pprint-word
+    stack-effect. ;
 
-M: lambda-word synopsis*
-    "lambda" lambda-word-synopsis ;
+M: lambda-word synopsis* lambda-word-synopsis ;
 
 PREDICATE: macro lambda-macro
-    "lambda-macro" word-prop >boolean ;
+    "lambda" word-prop >boolean ;
 
 M: lambda-macro definer drop \ MACRO:: \ ; ;
 
 M: lambda-macro definition
-    "lambda-macro" word-prop lambda-body ;
+    "lambda" word-prop lambda-body ;
 
-M: lambda-macro synopsis*
-    "lambda-macro" lambda-word-synopsis ;
+M: lambda-macro synopsis* lambda-word-synopsis ;
+
+PREDICATE: method-body lambda-method
+    "lambda" word-prop >boolean ;
+
+M: lambda-method definer drop \ M:: \ ; ;
+
+M: lambda-method definition
+    "lambda" word-prop lambda-body ;
+
+: method-stack-effect
+    dup "lambda" word-prop lambda-vars
+    swap "method" word-prop method-generic stack-effect dup [ effect-out ] when
+    <effect> ;
+
+M: lambda-method synopsis*
+    dup definer.
+    dup "method" word-prop dup
+        method-specializer pprint*
+        method-generic pprint*
+    method-stack-effect effect>string comment. ;
 
 PRIVATE>

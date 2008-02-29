@@ -6,16 +6,20 @@ bootstrap.image sequences io namespaces io.launcher math io.encodings.ascii ;
 
 : destination "slava@factorcode.org:www/images/latest/" ;
 
+: checksums "checksums.txt" temp-file ;
+
 : boot-image-names images [ boot-image-name ] map ;
 
 : compute-checksums ( -- )
-    "checksums.txt" ascii [
+    checksums ascii [
         boot-image-names [ dup write bl file>md5str print ] each
     ] with-file-writer ;
 
 : upload-images ( -- )
     [
-        "scp" , boot-image-names % "checksums.txt" , destination ,
+        "scp" ,
+        boot-image-names %
+        "temp/checksums.txt" , destination ,
     ] { } make try-process ;
 
 : new-images ( -- )

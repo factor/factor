@@ -1,4 +1,5 @@
-USING: io io.files math math.parser kernel prettyprint io.encodings.ascii ;
+USING: io io.files math math.parser kernel prettyprint
+benchmark.random io.encodings.ascii ;
 IN: benchmark.sum-file
 
 : sum-file-loop ( n -- n' )
@@ -8,6 +9,6 @@ IN: benchmark.sum-file
     ascii [ 0 sum-file-loop ] with-file-reader . ;
 
 : sum-file-main ( -- )
-    home "sum-file-in.txt" path+ sum-file ;
+    random-numbers-path sum-file ;
 
 MAIN: sum-file-main

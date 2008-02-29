@@ -4,11 +4,14 @@ USING: alien arrays assocs classes compiler db
 hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
-words combinators.lib db.types combinators tools.walker ;
+words combinators.lib db.types combinators tools.walker
+combinators.cleave ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
-C: <sqlite-db> sqlite-db
+
+M: sqlite-db make-db* ( path db -- db )
+    [ set-sqlite-db-path ] keep ;
 
 M: sqlite-db db-open ( db -- )
     dup sqlite-db-path sqlite-open <db>
@@ -19,9 +22,6 @@ M: sqlite-db db-close ( handle -- )
 
 M: sqlite-db dispose ( db -- ) dispose-db ;
 
-: with-sqlite ( path quot -- )
-    >r <sqlite-db> r> with-db ; inline
-
 TUPLE: sqlite-statement ;
 
 TUPLE: sqlite-result-set has-more? ;
@@ -30,14 +30,13 @@ M: sqlite-db <simple-statement> ( str -- obj )
     <prepared-statement> ;
 
 M: sqlite-db <prepared-statement> ( str -- obj )
-    db get db-handle 
     {
         set-statement-sql
         set-statement-in-params
         set-statement-out-params
-        set-statement-handle
     } statement construct
-    dup statement-handle over statement-sql sqlite-prepare
+    db get db-handle over statement-sql sqlite-prepare
+    over set-statement-handle
     sqlite-statement construct-delegate ;
 
 M: sqlite-statement dispose ( statement -- )
@@ -46,21 +45,32 @@ M: sqlite-statement dispose ( statement -- )
 M: sqlite-result-set dispose ( result-set -- )
     f swap set-result-set-handle ;
 
-: sqlite-bind ( specs handle -- )
-break
-    swap [ sqlite-bind-type ] with each ;
+: sqlite-bind ( triples handle -- )
+    swap [ first3 sqlite-bind-type ] with each ;
 
-M: sqlite-statement bind-statement* ( obj statement -- )
-    statement-handle sqlite-bind ;
-
-M: sqlite-statement reset-statement ( statement -- )
+: reset-statement ( statement -- )
     statement-handle sqlite-reset ;
+
+M: sqlite-statement bind-statement* ( statement -- )
+    dup statement-bound? [ dup reset-statement ] when
+    [ statement-bind-params ] [ statement-handle ] bi sqlite-bind ;
+
+M: sqlite-statement bind-tuple ( tuple statement -- )
+    [
+        statement-in-params
+        [
+            [ sql-spec-column-name ":" swap append ]
+            [ sql-spec-slot-name rot get-slot-named ]
+            [ sql-spec-type ] tri 3array
+        ] with map
+    ] keep
+    [ set-statement-bind-params ] keep bind-statement* ;
 
 : last-insert-id ( -- id )
     db get db-handle sqlite3_last_insert_rowid
     dup zero? [ "last-id failed" throw ] when ;
 
-M: sqlite-statement insert-tuple* ( tuple statement -- )
+M: sqlite-db insert-tuple* ( tuple statement -- )
     execute-statement last-insert-id swap set-primary-key ;
 
 M: sqlite-result-set #columns ( result-set -- n )
@@ -80,7 +90,6 @@ M: sqlite-result-set more-rows? ( result-set -- ? )
     sqlite-result-set-has-more? ;
 
 M: sqlite-statement query-results ( query -- result-set )
-break
     dup statement-handle sqlite-result-set <result-set>
     dup advance-row ;
 
@@ -129,7 +138,7 @@ M: sqlite-db <insert-assigned-statement> ( tuple -- statement )
 
 : where-primary-key% ( specs -- )
     " where " 0%
-    find-primary-key sql-spec-column-name dup 0% " = " 0% bind% ;
+    find-primary-key dup sql-spec-column-name 0% " = " 0% bind% ;
 
 M: sqlite-db <update-tuple-statement> ( class -- statement )
     [
@@ -137,7 +146,7 @@ M: sqlite-db <update-tuple-statement> ( class -- statement )
         0%
         " set " 0%
         dup remove-id
-        [ ", " 0% ] [ sql-spec-column-name dup 0% " = " 0% bind% ] interleave
+        [ ", " 0% ] [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
         where-primary-key%
     ] sqlite-make ;
 
@@ -146,7 +155,7 @@ M: sqlite-db <delete-tuple-statement> ( specs table -- sql )
         "delete from " 0% 0%
         " where " 0%
         find-primary-key
-        sql-spec-column-name dup 0% " = " 0% bind%
+        dup sql-spec-column-name 0% " = " 0% bind%
     ] sqlite-make ;
 
 ! : select-interval ( interval name -- ) ;
@@ -154,8 +163,6 @@ M: sqlite-db <delete-tuple-statement> ( specs table -- sql )
 
 M: sqlite-db bind% ( spec -- )
     dup 1, sql-spec-column-name ":" swap append 0% ;
-    ! dup 1, sql-spec-column-name
-    ! dup 0% " = " 0% ":" swap append 0% ;
 
 M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
     [
@@ -203,7 +210,3 @@ M: sqlite-db type-table ( -- assoc )
 
 M: sqlite-db create-type-table
     type-table ;
-
-! HOOK: get-column-value ( n result-set type -- )
-! M: sqlite get-column-value { { "TEXT" get-text-column } { 
-! "INTEGER" get-integer-column } ... } case ;

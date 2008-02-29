@@ -24,7 +24,7 @@ IN: channels.examples
         from swap dupd mod zero? not [ swap to ] [ 2drop ] if     
     ] 3keep filter ;
 
-:: (sieve) | prime c | ( prime c -- )
+:: (sieve) ( prime c -- )
     [let | p [ c from ] 
            newc [ <channel> ] |
         p prime to

@@ -29,7 +29,7 @@ IN: temporary
         "crash" throw
     ] "Linked test" spawn-linked drop
     receive
-] [ linked-error "crash" = ] must-fail-with
+] [ delegate "crash" = ] must-fail-with
 
 MATCH-VARS: ?from ?to ?value ;
 SYMBOL: increment

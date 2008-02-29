@@ -352,6 +352,8 @@ TUPLE: bad-number ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
+: (:) CREATE dup reset-generic parse-definition ;
+
 GENERIC: expected>string ( obj -- str )
 
 M: f expected>string drop "end of input" ;
@@ -507,7 +509,7 @@ SYMBOL: interactive-vocabs
     ] recover ;
 
 : run-file ( file -- )
-    [ [ parse-file call ] keep ] assert-depth drop ;
+    [ dup parse-file call ] assert-depth drop ;
 
 : ?run-file ( path -- )
     dup resource-exists? [ run-file ] [ drop ] if ;

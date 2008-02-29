@@ -1,5 +1,5 @@
 USING: generic help.markup help.syntax kernel math memory
-namespaces sequences kernel.private io.files strings ;
+namespaces sequences kernel.private strings ;
 IN: system
 
 ARTICLE: "os" "System interface"
@@ -29,7 +29,7 @@ ARTICLE: "os" "System interface"
 { $subsection millis }
 "Exiting the Factor VM:"
 { $subsection exit }
-{ $see-also "file-streams" "network-streams" "io.launcher" "io.mmap" } ;
+{ $see-also "io.files" "io.mmap" "io.monitors" "network-streams" "io.launcher" } ;
 
 ABOUT: "os"
 

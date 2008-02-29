@@ -16,7 +16,7 @@ SYMBOL: alarm-thread
     alarm-thread get-global interrupt ;
 
 : check-alarm
-    dup dt? over not or [ "Not a dt" throw ] unless
+    dup duration? over not or [ "Not a duration" throw ] unless
     over timestamp? [ "Not a timestamp" throw ] unless
     pick callable? [ "Not a quotation" throw ] unless ; inline
 
@@ -29,10 +29,10 @@ SYMBOL: alarm-thread
     notify-alarm-thread ;
 
 : alarm-expired? ( alarm now -- ? )
-    >r alarm-time r> <=> 0 <= ;
+    >r alarm-time r> before=? ;
 
 : reschedule-alarm ( alarm -- )
-    dup alarm-time over alarm-interval +dt
+    dup alarm-time over alarm-interval time+
     over set-alarm-time
     register-alarm ;
 

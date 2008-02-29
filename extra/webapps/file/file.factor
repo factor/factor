@@ -3,13 +3,16 @@
 USING: calendar html io io.files kernel math math.parser
 http.server.responders http.server.templating namespaces parser
 sequences strings assocs hashtables debugger http.mime sorting
-html.elements logging io.encodings.binary ;
+html.elements logging calendar.format io.encodings.binary ;
 IN: webapps.file
 
 SYMBOL: doc-root
 
 : serving-path ( filename -- filename )
     "" or doc-root get swap path+ ;
+
+: unix-time>timestamp ( n -- timestamp )
+    >r unix-1970 r> seconds time+ ;
 
 : file-http-date ( filename -- string )
     file-modified unix-time>timestamp timestamp>http-string ;

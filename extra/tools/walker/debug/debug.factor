@@ -5,7 +5,7 @@ sequences concurrency.messaging locals continuations
 threads namespaces namespaces.private ;
 IN: tools.walker.debug
 
-:: test-walker | quot |
+:: test-walker ( quot -- data )
     [let | p [ <promise> ]
            s [ f <model> ]
            c [ f <model> ] |

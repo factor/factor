@@ -38,10 +38,7 @@ M: postgresql-db db-open ( db -- )
 M: postgresql-db dispose ( db -- )
     db-handle PQfinish ;
 
-M: postgresql-statement bind-statement* ( seq statement -- )
-    set-statement-bind-params ;
-
-M: postgresql-statement reset-statement ( statement -- )
+M: postgresql-statement bind-statement* ( statement -- )
     drop ;
 
 M: postgresql-statement bind-tuple ( tuple statement -- )

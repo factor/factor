@@ -34,6 +34,9 @@ IN: sequences.deep
 
 : deep-contains? ( obj quot -- ? ) deep-find* nip ; inline
 
+: deep-all? ( obj quot -- ? )
+    [ not ] compose deep-contains? not ; inline
+
 : deep-change-each ( obj quot -- )
     over branch? [ [
         [ call ] keep over >r deep-change-each r>

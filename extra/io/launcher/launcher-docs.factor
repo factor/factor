@@ -78,7 +78,7 @@ $nl
 "This is used in situations where you want a spawn child process with some overridden environment variables." } ;
 
 HELP: +timeout+
-{ $description "Launch descriptor key. If set to a " { $link dt } ", specifies a maximum running time for the process. If the process runs longer than this time, it will be killed." } ;
+{ $description "Launch descriptor key. If set to a " { $link duration } ", specifies a maximum running time for the process. If the process runs longer than this time, it will be killed." } ;
 
 HELP: default-descriptor
 { $description "Association storing default values for launch descriptor keys." } ;

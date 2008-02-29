@@ -174,7 +174,7 @@ DEFINE_PRIMITIVE(read_dir)
 			GROWABLE_ADD(result,pair);
 		}
 		while (FindNextFile(dir, &find_data));
-		CloseHandle(dir);
+		FindClose(dir);
 	}
 
 	UNREGISTER_ROOT(result);

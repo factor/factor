@@ -80,11 +80,10 @@ DEFER: <% delimiter
             "quiet" on
             parser-notes off
             templating-vocab use+
-            dup source-file file set ! so that reload works properly
-            [
-                ?resource-path utf8 file-contents
-                [ eval-template ] [ html-error. drop ] recover
-            ] keep
+            ! so that reload works properly
+            dup source-file file set
+            dup ?resource-path utf8 file-contents
+            [ eval-template ] [ html-error. drop ] recover
         ] with-file-vocabs
     ] assert-depth drop ;
 
