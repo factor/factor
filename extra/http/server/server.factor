@@ -2,24 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http sequences prettyprint io.server logging calendar
-new-slots html.elements accessors math.parser combinators.lib ;
+new-slots html.elements accessors math.parser combinators.lib
+vocabs.loader debugger html continuations random ;
 IN: http.server
 
-TUPLE: responder path directory ;
+GENERIC: call-responder ( request path responder -- response )
 
-: <responder> ( path -- responder )
-    "/" ?tail responder construct-boa ;
+TUPLE: trivial-responder response ;
 
-GENERIC: do-responder ( request path responder -- quot response )
+C: <trivial-responder> trivial-responder
 
-TUPLE: trivial-responder quot response ;
-
-: <trivial-responder> ( quot response -- responder )
-    trivial-responder construct-boa
-    "" <responder> over set-delegate ;
-
-M: trivial-responder do-responder
-    2nip dup quot>> swap response>> ;
+M: trivial-responder call-responder 2nip response>> call ;
 
 : trivial-response-body ( code message -- )
     <html>
@@ -28,23 +21,30 @@ M: trivial-responder do-responder
         </body>
     </html> ;
 
-: <trivial-response> ( code message -- quot response )
-    [ [ trivial-response-body ] 2curry ] 2keep <response>
+: <trivial-response> ( code message -- response )
+    <response>
+    2over [ trivial-response-body ] 2curry >>body
     "text/html" set-content-type
     swap >>message
     swap >>code ;
 
-: <404> ( -- quot response )
+: <404> ( -- response )
     404 "Not Found" <trivial-response> ;
 
-: <redirect> ( to code message -- quot response )
-    <trivial-response>
-    rot "location" set-response-header ;
+SYMBOL: 404-responder
 
-: <permanent-redirect> ( to -- quot response )
+[ <404> ] <trivial-responder> 404-responder set-global
+
+: <redirect> ( to code message -- response )
+    <trivial-response>
+    swap "location" set-header ;
+
+\ <redirect> DEBUG add-input-logging
+
+: <permanent-redirect> ( to -- response )
     301 "Moved Permanently" <redirect> ;
 
-: <temporary-redirect> ( to -- quot response )
+: <temporary-redirect> ( to -- response )
     307 "Temporary Redirect" <redirect> ;
 
 : <content> ( content-type -- response )
@@ -52,66 +52,58 @@ M: trivial-responder do-responder
     200 >>code
     swap set-content-type ;
 
-TUPLE: dispatcher responders default ;
+TUPLE: dispatcher default responders ;
 
-: responder-matches? ( path responder -- ? )
-    path>> head? ;
+: get-responder ( name dispatcher -- responder )
+    tuck responders>> at [ ] [ default>> ] ?if ;
 
-TUPLE: no-/-responder ;
+: find-responder ( path dispatcher -- path responder )
+    >r [ CHAR: / = ] left-trim "/" split1
+    swap [ CHAR: / = ] right-trim r> get-responder ;
 
-M: no-/-responder do-responder
-    2drop
+: redirect-with-/ ( request -- response )
     dup path>> "/" append >>path
     request-url <permanent-redirect> ;
 
-: <no-/-responder> ( -- responder )
-    "" <responder> no-/-responder construct-delegate ;
+M: dispatcher call-responder
+    over [
+        find-responder call-responder
+    ] [
+        2drop redirect-with-/
+    ] if ;
 
-<no-/-responder> no-/-responder set-global
+: <dispatcher> ( -- dispatcher )
+    404-responder get-global H{ } clone
+    dispatcher construct-boa ;
 
-: find-responder ( path dispatcher -- path responder )
-    >r "/" ?head drop r>
-    [ responders>> [ dupd responder-matches? ] find nip ] keep
-    default>> or [ path>> ?head drop ] keep ;
-
-: no-trailing-/ ( path responder -- path responder )
-    over empty? over directory>> and
-    [ drop no-/-responder get-global ] when ;
-
-: call-responder ( request path responder -- quot response )
-    no-trailing-/ do-responder ;
-
-SYMBOL: 404-responder
-
-<404> <trivial-responder> 404-responder set-global
-
-M: dispatcher do-responder
-    find-responder call-responder ;
-
-: <dispatcher> ( path -- dispatcher )
-    <responder>
-    dispatcher construct-delegate
-    404-responder get-global >>default
-    V{ } clone >>responders ;
-
-: add-responder ( dispatcher responder -- dispatcher )
-    over responders>> push ;
+: add-responder ( dispatcher responder path -- dispatcher )
+    pick responders>> set-at ;
 
 SYMBOL: virtual-hosts
 SYMBOL: default-host
 
 virtual-hosts global [ drop H{ } clone ] cache drop
-default-host global [ drop 404-responder ] cache drop
+default-host global [ drop 404-responder get-global ] cache drop
 
 : find-virtual-host ( host -- responder )
     virtual-hosts get at [ default-host get ] unless* ;
 
+: <500> ( error -- response )
+    500 "Internal server error" <trivial-response>
+    swap [
+        "Internal server error" [
+            [ print-error nl :c ] with-html-stream
+        ] simple-page
+    ] curry >>body ;
+
 : handle-request ( request -- )
     [
-        dup path>> over host>> find-virtual-host
-        call-responder
-        write-response
-    ] keep method>> "HEAD" = [ drop ] [ call ] if ;
+        dup dup path>> over host>>
+        find-virtual-host call-responder
+    ] [ <500> ] recover
+    dup write-response
+    swap method>> "HEAD" =
+    [ drop ] [ write-response-body ] if ;
 
 : default-timeout 1 minutes stdio get set-timeout ;
 
@@ -120,12 +112,21 @@ LOG: httpd-hit NOTICE
 : log-request ( request -- )
     { method>> host>> path>> } map-exec-with httpd-hit ;
 
+SYMBOL: development-mode
+
+: (httpd) ( -- )
+    default-timeout
+    development-mode get-global
+    [ global [ refresh-all ] bind ] when
+    read-request dup log-request handle-request ;
+
 : httpd ( port -- )
-    internet-server "http.server" [
-        default-timeout
-        read-request dup log-request handle-request
-    ] with-server ;
+    internet-server "http.server" [ (httpd) ] with-server ;
 
 : httpd-main ( -- ) 8888 httpd ;
 
 MAIN: httpd-main
+
+: generate-key ( assoc -- str )
+    4 big-random >hex dup pick key?
+    [ drop generate-key ] [ nip ] if ;

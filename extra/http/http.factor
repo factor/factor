@@ -2,33 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables io io.streams.string kernel math namespaces
 math.parser assocs sequences strings splitting ascii
-io.encodings.utf8 assocs.lib namespaces unicode.case combinators
-vectors sorting new-slots accessors calendar ;
+io.encodings.utf8 namespaces unicode.case combinators
+vectors sorting new-slots accessors calendar calendar.format
+quotations arrays ;
 IN: http
 
 : http-port 80 ; inline
-
-: crlf "\r\n" write ;
-
-: header-line ( line -- )
-    ": " split1 dup [ swap >lower insert ] [ 2drop ] if ;
-
-: read-header-line ( -- )
-    readln dup
-    empty? [ drop ] [ header-line read-header-line ] if ;
-
-: read-header ( -- multi-assoc )
-    [ read-header-line ] H{ } make-assoc ;
-
-: write-header ( multi-assoc -- )
-    >alist sort-keys
-    [
-        swap write ": " write {
-            { [ dup number? ] [ number>string ] }
-            { [ dup timestamp? ] [ timestamp>http-string ] }
-            { [ dup string? ] [ ] }
-        } cond write crlf
-    ] multi-assoc-each crlf ;
 
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
@@ -73,6 +52,54 @@ IN: http
 : url-decode ( str -- str )
     [ 0 swap url-decode-iter ] "" make decode-utf8 ;
 
+: crlf "\r\n" write ;
+
+: add-header ( value key assoc -- )
+    [ at dup [ "; " rot 3append ] [ drop ] if ] 2keep set-at ;
+
+: header-line ( line -- )
+    dup first blank? [
+        [ blank? ] left-trim
+        "last-header" get
+        "header" get
+        add-header
+    ] [
+        ": " split1 dup [
+            swap >lower dup "last-header" set
+            "header" get add-header
+        ] [
+            2drop
+        ] if
+    ] if ;
+
+: read-header-line ( -- )
+    readln dup
+    empty? [ drop ] [ header-line read-header-line ] if ;
+
+: read-header ( -- assoc )
+    H{ } clone [
+        "header" [ read-header-line ] with-variable
+    ] keep ;
+
+: header-value>string ( value -- string )
+    {
+        { [ dup number? ] [ number>string ] }
+        { [ dup timestamp? ] [ timestamp>http-string ] }
+        { [ dup string? ] [ ] }
+        { [ dup sequence? ] [ [ header-value>string ] map "; " join ] }
+    } cond ;
+
+: check-header-string ( str -- str )
+    #! http://en.wikipedia.org/wiki/HTTP_Header_Injection
+    dup [ "\r\n" member? ] contains?
+    [ "Header injection attack" throw ] when ;
+
+: write-header ( assoc -- )
+    >alist sort-keys [
+        swap url-encode write ": " write
+        header-value>string check-header-string write crlf
+    ] assoc-each crlf ;
+
 : query>assoc ( query -- assoc )
     dup [
         "&" split [
@@ -84,6 +111,50 @@ IN: http
     [ [ url-encode ] 2apply "=" swap 3append ] { } assoc>map
     "&" join ;
 
+TUPLE: cookie name value path domain expires http-only ;
+
+: <cookie> ( value name -- cookie )
+    cookie construct-empty
+    swap >>name swap >>value ;
+
+: parse-cookies ( string -- seq )
+    [
+        f swap
+
+        ";" split [
+            [ blank? ] trim "=" split1 swap >lower {
+                { "expires" [ >>expires ] }
+                { "domain" [ >>domain ] }
+                { "path" [ >>path ] }
+                { "httponly" [ drop t >>http-only ] }
+                { "" [ drop ] }
+                [ <cookie> dup , nip ]
+            } case
+        ] each
+
+        drop
+    ] { } make ;
+
+: (unparse-cookie) ( key value -- )
+    {
+        { [ dup f eq? ] [ 2drop ] }
+        { [ dup t eq? ] [ drop , ] }
+        { [ t ] [ "=" swap 3append , ] }
+    } cond ;
+
+: unparse-cookie ( cookie -- strings )
+    [
+        dup name>> >lower over value>> (unparse-cookie)
+        "path" over path>> (unparse-cookie)
+        "domain" over domain>> (unparse-cookie)
+        "expires" over expires>> (unparse-cookie)
+        "httponly" over http-only>> (unparse-cookie)
+        drop
+    ] { } make ;
+
+: unparse-cookies ( cookies -- string )
+    [ unparse-cookie ] map concat "; " join ;
+
 TUPLE: request
 host
 port
@@ -93,12 +164,21 @@ query
 version
 header
 post-data
-post-data-type ;
+post-data-type
+cookies ;
 
 : <request>
     request construct-empty
-    "1.0" >>version
-    http-port >>port ;
+    "1.1" >>version
+    http-port >>port
+    H{ } clone >>query
+    V{ } clone >>cookies ;
+
+: query-param ( request key -- value )
+    swap query>> at ;
+
+: set-query-param ( request value key -- request )
+    pick query>> set-at ;
 
 : url>path ( url -- path )
     url-decode "http://" ?head
@@ -132,12 +212,15 @@ post-data-type ;
 : read-request-header ( request -- request )
     read-header >>header ;
 
+: header ( request/response key -- value )
+    swap header>> at ;
+
 SYMBOL: max-post-request
 
 1024 256 * max-post-request set-global
 
 : content-length ( header -- n )
-    "content-length" peek-at string>number dup [
+    "content-length" swap at string>number dup [
         dup max-post-request get > [
             "content-length > max-post-request" throw
         ] when
@@ -151,10 +234,13 @@ SYMBOL: max-post-request
     [ string>number ] [ http-port ] if* ;
 
 : extract-host ( request -- request )
-    dup header>> "host" peek-at parse-host >r >>host r> >>port ;
+    dup "host" header parse-host >r >>host r> >>port ;
 
 : extract-post-data-type ( request -- request )
-    dup header>> "content-type" peek-at >>post-data-type ;
+    dup "content-type" header >>post-data-type ;
+
+: extract-cookies ( request -- request )
+    dup "cookie" header [ parse-cookies >>cookies ] when* ;
 
 : read-request ( -- request )
     <request>
@@ -164,7 +250,8 @@ SYMBOL: max-post-request
     read-request-header
     read-post-data
     extract-host
-    extract-post-data-type ;
+    extract-post-data-type
+    extract-cookies ;
 
 : write-method ( request -- request )
     dup method>> write bl ;
@@ -184,9 +271,10 @@ SYMBOL: max-post-request
 
 : write-request-header ( request -- request )
     dup header>> >hashtable
-    over host>> [ "host" replace-at ] when*
-    over post-data>> [ length "content-length" replace-at ] when*
-    over post-data-type>> [ "content-type" replace-at ] when*
+    over host>> [ "host" pick set-at ] when*
+    over post-data>> [ length "content-length" pick set-at ] when*
+    over post-data-type>> [ "content-type" pick set-at ] when*
+    over cookies>> f like [ unparse-cookies "cookie" pick set-at ] when*
     write-header ;
 
 : write-post-data ( request -- request )
@@ -194,7 +282,7 @@ SYMBOL: max-post-request
 
 : write-request ( request -- )
     write-method
-    write-url
+    write-request-url
     write-version
     write-request-header
     write-post-data
@@ -209,30 +297,42 @@ SYMBOL: max-post-request
             ":" write
             dup port>> number>string write
         ] when
-        "/" write
+        dup path>> "/" head? [ "/" write ] unless
         write-url
         drop
     ] with-string-writer ;
+
+: set-header ( request/response value key -- request/response )
+    pick header>> set-at ;
+
+GENERIC: write-response ( response -- )
+
+GENERIC: write-full-response ( request response -- )
 
 TUPLE: response
 version
 code
 message
-header ;
+header
+cookies
+body ;
 
 : <response>
     response construct-empty
-    "1.0" >>version
-    H{ } clone >>header ;
+    "1.1" >>version
+    H{ } clone >>header
+    "close" "connection" set-header
+    now timestamp>http-string "date" set-header
+    V{ } clone >>cookies ;
 
 : read-response-version
-    " " read-until
+    " \t" read-until
     [ "Bad response: version" throw ] unless
     parse-version
     >>version ;
 
 : read-response-code
-    " " read-until [ "Bad response: code" throw ] unless
+    " \t" read-until [ "Bad response: code" throw ] unless
     string>number [ "Bad response: code" throw ] unless*
     >>code ;
 
@@ -240,7 +340,8 @@ header ;
     readln >>message ;
 
 : read-response-header
-    read-header >>header ;
+    read-header >>header
+    dup "set-cookie" header [ parse-cookies >>cookies ] when* ;
 
 : read-response ( -- response )
     <response>
@@ -260,9 +361,20 @@ header ;
     dup message>> write crlf ;
 
 : write-response-header ( response -- response )
-    dup header>> write-header ;
+    dup header>> clone
+    over cookies>> f like
+    [ unparse-cookies "set-cookie" pick set-at ] when*
+    write-header ;
 
-: write-response ( respose -- )
+: write-response-body ( response -- response )
+    dup body>> {
+        { [ dup not ] [ drop ] }
+        { [ dup string? ] [ write ] }
+        { [ dup callable? ] [ call ] }
+        { [ t ] [ stdio get stream-copy ] }
+    } cond ;
+
+M: response write-response ( respose -- )
     write-response-version
     write-response-code
     write-response-message
@@ -270,8 +382,39 @@ header ;
     flush
     drop ;
 
-: set-response-header ( response value key -- response )
-    pick header>> -rot replace-at drop ;
+M: response write-full-response ( request response -- )
+    dup write-response
+    swap method>> "HEAD" = [ write-response-body ] unless ;
 
-: set-content-type ( response content-type -- response )
-    "content-type" set-response-header ;
+: set-content-type ( request/response content-type -- request/response )
+    "content-type" set-header ;
+
+: get-cookie ( request/response name -- cookie/f )
+    >r cookies>> r> [ swap name>> = ] curry find nip ;
+
+: delete-cookie ( request/response name -- )
+    over cookies>> >r get-cookie r> delete ;
+
+: put-cookie ( request/response cookie -- request/response )
+    [ dupd name>> get-cookie [ dupd delete-cookie ] when* ] keep
+    over cookies>> push ;
+
+TUPLE: raw-response 
+version
+code
+message
+body ;
+
+: <raw-response> ( -- response )
+    raw-response construct-empty
+    "1.1" >>version ;
+
+M: raw-response write-response ( respose -- )
+    write-response-version
+    write-response-code
+    write-response-message
+    write-response-body
+    drop ;
+
+M: raw-response write-full-response ( response -- )
+    write-response nip ;

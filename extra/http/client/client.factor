@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
-splitting continuations assocs.lib calendar vectors hashtables
+splitting continuations calendar vectors hashtables
 accessors ;
 IN: http.client
 
@@ -32,7 +32,7 @@ DEFER: (http-request)
 
 : do-redirect ( response -- response stream )
     dup response-code 300 399 between? [
-        header>> "location" peek-at
+        header>> "location" swap at
         dup "http://" head? [
             absolute-redirect
         ] [
@@ -44,7 +44,7 @@ DEFER: (http-request)
 
 : (http-request) ( request -- response stream )
     dup host>> over port>> <inet> <client> stdio set
-    write-request flush read-response
+    dup "r" set-global  write-request flush read-response
     do-redirect ;
 
 PRIVATE>
@@ -59,8 +59,7 @@ PRIVATE>
     ] with-scope ;
 
 : <get-request> ( -- request )
-    request construct-empty
-    "GET" >>method ;
+    <request> "GET" >>method ;
 
 : http-get-stream ( url -- response stream )
     <get-request> http-request ;
@@ -86,7 +85,7 @@ PRIVATE>
     dup download-name download-to ;
 
 : <post-request> ( content-type content -- request )
-    request construct-empty
+    <request>
     "POST" >>method
     swap >>post-data
     swap >>post-data-type ;

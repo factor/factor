@@ -29,12 +29,14 @@ blah
 
 [
     TUPLE{ request
+        port: 80
         method: "GET"
         path: "bar"
-        query: f
+        query: H{ }
         version: "1.1"
-        header: H{ { "some-header" V{ "1" "2" } } { "content-length" V{ "4" } } }
+        header: H{ { "some-header" "1; 2" } { "content-length" "4" } }
         post-data: "blah"
+        cookies: V{ }
     }
 ] [
     read-request-test-1 [
@@ -45,8 +47,7 @@ blah
 STRING: read-request-test-1'
 GET bar HTTP/1.1
 content-length: 4
-some-header: 1
-some-header: 2
+some-header: 1; 2
 
 blah
 ;
@@ -60,18 +61,20 @@ read-request-test-1' 1array [
 ] unit-test
 
 STRING: read-request-test-2
-HEAD  http://foo/bar   HTTP/1.0
+HEAD  http://foo/bar   HTTP/1.1
 Host: www.sex.com
 ;
 
 [
     TUPLE{ request
+        port: 80
         method: "HEAD"
         path: "bar"
-        query: f
-        version: "1.0"
-        header: H{ { "host" V{ "www.sex.com" } } }
+        query: H{ }
+        version: "1.1"
+        header: H{ { "host" "www.sex.com" } }
         host: "www.sex.com"
+        cookies: V{ }
     }
 ] [
     read-request-test-2 [
@@ -80,7 +83,7 @@ Host: www.sex.com
 ] unit-test
 
 STRING: read-response-test-1
-HTTP/1.0 404 not found
+HTTP/1.1 404 not found
 Content-Type: text/html
 
 blah
@@ -88,10 +91,11 @@ blah
 
 [
     TUPLE{ response
-        version: "1.0"
+        version: "1.1"
         code: 404
         message: "not found"
-        header: H{ { "content-type" V{ "text/html" } } }
+        header: H{ { "content-type" "text/html" } }
+        cookies: V{ }
     }
 ] [
     read-response-test-1
@@ -100,7 +104,7 @@ blah
 
 
 STRING: read-response-test-1'
-HTTP/1.0 404 not found
+HTTP/1.1 404 not found
 content-type: text/html
 
 
@@ -112,4 +116,9 @@ read-response-test-1' 1array [
     [ write-response ] with-string-writer
     ! normalize crlf
     string-lines "\n" join
+] unit-test
+
+[ t ] [
+    "rmid=732423sdfs73242; path=/; domain=.example.net; expires=Fri, 31-Dec-2010 23:59:59 GMT"
+    dup parse-cookies unparse-cookies =
 ] unit-test

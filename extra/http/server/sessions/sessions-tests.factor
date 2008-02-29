@@ -1,0 +1,32 @@
+IN: temporary
+USING: tools.test http.server.sessions math namespaces
+kernel accessors ;
+
+"1234" f <session> [
+    [ ] [ 3 "x" sset ] unit-test
+    
+    [ 9 ] [ "x" sget sq ] unit-test
+    
+    [ ] [ "x" [ 1- ] schange ] unit-test
+    
+    [ 4 ] [ "x" sget sq ] unit-test
+] with-session
+
+[ t ] [ f <url-sessions> url-sessions? ] unit-test
+[ t ] [ f <cookie-sessions> cookie-sessions? ] unit-test
+
+[ ] [
+    f <url-sessions>
+        [ 0 "x" sset ] >>init
+    "manager" set
+] unit-test
+
+[ { 5 0 } ] [
+    [
+        "manager" get new-session
+        dup "manager" get get-session [ 5 "a" sset ] with-session
+        dup "manager" get get-session [ "a" sget , ] with-session
+        dup "manager" get get-session [ "x" sget , ] with-session
+        "manager" get get-session delete-session
+    ] { } make
+] unit-test

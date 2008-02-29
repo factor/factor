@@ -16,6 +16,8 @@ tuple-syntax namespaces ;
         host: "www.apple.com"
         path: "/index.html"
         port: 80
+        version: "1.1"
+        cookies: V{ }
     }
 ] [
     [
