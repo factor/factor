@@ -81,7 +81,7 @@ person "PERSON"
 1 "billy" 10 3.14 <assigned-person> the-person1 set
 2 "johnny" 10 3.14 <assigned-person> the-person2 set
 
-! test-sqlite
+test-sqlite
 ! test-postgresql
 
 TUPLE: paste n summary author channel mode contents timestamp annotations ;
