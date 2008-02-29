@@ -22,7 +22,7 @@ M: sqlite-db db-close ( handle -- )
 M: sqlite-db dispose ( db -- ) dispose-db ;
 
 : with-sqlite ( path quot -- )
-    >r <sqlite-db> r> with-db ; inline
+    sqlite-db swap with-db ; inline
 
 : with-tmp-sqlite ( quot -- )
     ".db" [
@@ -33,10 +33,10 @@ TUPLE: sqlite-statement ;
 
 TUPLE: sqlite-result-set has-more? ;
 
-M: sqlite-db <simple-statement> ( str -- obj )
+M: sqlite-db <simple-statement> ( str in out -- obj )
     <prepared-statement> ;
 
-M: sqlite-db <prepared-statement> ( str -- obj )
+M: sqlite-db <prepared-statement> ( str in out -- obj )
     db get db-handle 
     {
         set-statement-sql
@@ -44,7 +44,7 @@ M: sqlite-db <prepared-statement> ( str -- obj )
         set-statement-out-params
         set-statement-handle
     } statement construct
-    dup statement-handle over statement-sql sqlite-prepare
+    dup statement-handle over statement-sql sqlite-prepare over set-statement-handle
     sqlite-statement construct-delegate ;
 
 M: sqlite-statement dispose ( statement -- )
@@ -86,7 +86,6 @@ M: sqlite-result-set more-rows? ( result-set -- ? )
     sqlite-result-set-has-more? ;
 
 M: sqlite-statement query-results ( query -- result-set )
-break
     dup statement-handle sqlite-result-set <result-set>
     dup advance-row ;
 

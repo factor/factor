@@ -35,7 +35,7 @@ M: sequence bindings
 
 : 1result ( array -- result )
     #! return the first (and hopefully only) element of the array, or f
-    dup length 0 > [ first ] [ drop f ] if ;
+    dup length zero? [ drop f ] [ first ] if ;
 
 : (collect-int-columns) ( statement n -- )
     [ dupd column-int , ] each drop ;

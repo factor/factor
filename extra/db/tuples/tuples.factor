@@ -22,12 +22,6 @@ IN: db.tuples
         class db-columns find-primary-key sql-spec-slot-name
     ] keep set-slot-named ;
 
-! : primary-key-spec ( class -- spec )
-!     db-columns [ primary-key? ] find nip ;
-!     
-! : primary-key ( tuple -- obj )
-!     dup class primary-key-spec first swap get-slot-named ;
-
 ! returns a sequence of prepared-statements
 HOOK: create-sql-statement db ( class -- obj )
 HOOK: drop-sql-statement db ( class -- obj )
@@ -81,6 +75,7 @@ HOOK: insert-tuple* db ( tuple statement -- )
     [ bind-tuple ] keep execute-statement ;
 
 : insert-tuple ( tuple -- )
+    break
     dup class db-columns find-primary-key assigned-id? [
         insert-assigned
     ] [
