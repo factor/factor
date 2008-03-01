@@ -1,4 +1,5 @@
-USING: kernel system io.files.unique.backend ;
+USING: kernel system io.files.unique.backend
+windows.kernel32 io.windows io.nonblocking ;
 IN: io.windows.files.unique
 
 M: windows-io (make-unique-file) ( path -- stream )
