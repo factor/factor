@@ -235,6 +235,35 @@ M: windows-ui-backend (close-window)
 : handle-wm-kill-focus ( hWnd uMsg wParam lParam -- )
     3drop window [ unfocus-world ] when* ;
 
+: message>button ( uMsg -- button down? )
+    {
+        { [ dup WM_LBUTTONDOWN   = ] [ drop 1 t ] }
+        { [ dup WM_LBUTTONUP     = ] [ drop 1 f ] }
+        { [ dup WM_MBUTTONDOWN   = ] [ drop 2 t ] }
+        { [ dup WM_MBUTTONUP     = ] [ drop 2 f ] }
+        { [ dup WM_RBUTTONDOWN   = ] [ drop 3 t ] }
+        { [ dup WM_RBUTTONUP     = ] [ drop 3 f ] }
+
+        { [ dup WM_NCLBUTTONDOWN = ] [ drop 1 t ] }
+        { [ dup WM_NCLBUTTONUP   = ] [ drop 1 f ] }
+        { [ dup WM_NCMBUTTONDOWN = ] [ drop 2 t ] }
+        { [ dup WM_NCMBUTTONUP   = ] [ drop 2 f ] }
+        { [ dup WM_NCRBUTTONDOWN = ] [ drop 3 t ] }
+        { [ dup WM_NCRBUTTONUP   = ] [ drop 3 f ] }
+    } cond ;
+
+! If the user clicks in the window border ("non-client area")
+! Windows sends us an NC[LMR]BUTTONDOWN message; but if the
+! mouse is subsequently released outside the NC area, we receive
+! a [LMR]BUTTONUP message and Factor can get confused. So we
+! ignore BUTTONUP's that are a result of an NC*BUTTONDOWN.
+SYMBOL: nc-buttons
+
+: handle-wm-ncbutton ( hWnd uMsg wParam lParam -- )
+    2drop nip
+    message>button nc-buttons get
+    swap [ push ] [ delete ] if ;
+
 : >lo-hi ( WORD -- array ) [ lo-word ] keep hi-word 2array ;
 : mouse-wheel ( lParam -- array ) >lo-hi [ sgn neg ] map ;
 
@@ -244,16 +273,8 @@ M: windows-ui-backend (close-window)
     get-RECT-top-left 2array v- ;
 
 : mouse-event>gesture ( uMsg -- button )
-    key-modifiers swap
-    {
-        { [ dup WM_LBUTTONDOWN = ] [ drop 1 <button-down> ] }
-        { [ dup WM_LBUTTONUP = ] [ drop 1 <button-up> ] }
-        { [ dup WM_MBUTTONDOWN = ] [ drop 2 <button-down> ] }
-        { [ dup WM_MBUTTONUP = ] [ drop 2 <button-up> ] }
-        { [ dup WM_RBUTTONDOWN = ] [ drop 3 <button-down> ] }
-        { [ dup WM_RBUTTONUP = ] [ drop 3 <button-up> ] }
-        { [ t ] [ "bad button" throw ] }
-    } cond ;
+    key-modifiers swap message>button
+    [ <button-down> ] [ <button-up> ] if ;
 
 : mouse-buttons ( -- seq ) WM_LBUTTONDOWN WM_RBUTTONDOWN 2array ;
 
@@ -276,12 +297,16 @@ M: windows-ui-backend (close-window)
     mouse-captured off ;
 
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
-    >r over capture-mouse? [ pick set-capture ] when r>
+    >r >r dup capture-mouse? [ over set-capture ] when r> r>
     prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
     mouse-captured get [ release-capture ] when
-    prepare-mouse send-button-up ;
+    pick message>button drop dup nc-buttons get member? [
+        nc-buttons get delete 4drop
+    ] [
+        drop prepare-mouse send-button-up
+    ] if ;
 
 : make-TRACKMOUSEEVENT ( hWnd -- alien )
     "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
@@ -307,44 +332,58 @@ M: windows-ui-backend (close-window)
     #! message sent if mouse leaves main application 
     4drop forget-rollover ;
 
+SYMBOL: wm-handlers
+
+H{ } clone wm-handlers set-global
+
+: add-wm-handler ( quot wm -- )
+    dup array?
+    [ [ execute add-wm-handler ] with each ]
+    [ wm-handlers get-global set-at ] if ;
+
+[ handle-wm-close 0                  ] WM_CLOSE add-wm-handler
+[ 4dup handle-wm-paint DefWindowProc ] WM_PAINT add-wm-handler
+
+[ handle-wm-size 0 ] WM_SIZE add-wm-handler
+[ handle-wm-move 0 ] WM_MOVE add-wm-handler
+
+[ 4dup handle-wm-keydown DefWindowProc ] { WM_KEYDOWN WM_SYSKEYDOWN } add-wm-handler
+[ 4dup handle-wm-char DefWindowProc    ] { WM_CHAR WM_SYSCHAR }       add-wm-handler
+[ 4dup handle-wm-keyup DefWindowProc   ] { WM_KEYUP WM_SYSKEYUP }     add-wm-handler
+               
+[ handle-wm-syscommand   ] WM_SYSCOMMAND add-wm-handler
+[ handle-wm-set-focus 0  ] WM_SETFOCUS add-wm-handler
+[ handle-wm-kill-focus 0 ] WM_KILLFOCUS add-wm-handler
+
+[ handle-wm-buttondown 0 ] WM_LBUTTONDOWN add-wm-handler
+[ handle-wm-buttondown 0 ] WM_MBUTTONDOWN add-wm-handler
+[ handle-wm-buttondown 0 ] WM_RBUTTONDOWN add-wm-handler
+[ handle-wm-buttonup 0   ] WM_LBUTTONUP   add-wm-handler
+[ handle-wm-buttonup 0   ] WM_MBUTTONUP   add-wm-handler
+[ handle-wm-buttonup 0   ] WM_RBUTTONUP   add-wm-handler
+
+[ 4dup handle-wm-ncbutton DefWindowProc ]
+{ WM_NCLBUTTONDOWN WM_NCMBUTTONDOWN WM_NCRBUTTONDOWN
+WM_NCLBUTTONUP WM_NCMBUTTONUP WM_NCRBUTTONUP }
+add-wm-handler
+
+[ nc-buttons get-global delete-all DefWindowProc ]
+{ WM_EXITSIZEMOVE WM_EXITMENULOOP } add-wm-handler
+
+[ handle-wm-mousemove 0  ] WM_MOUSEMOVE  add-wm-handler
+[ handle-wm-mousewheel 0 ] WM_MOUSEWHEEL add-wm-handler
+[ handle-wm-cancelmode 0 ] WM_CANCELMODE add-wm-handler
+[ handle-wm-mouseleave 0 ] WM_MOUSELEAVE add-wm-handler
+
+SYMBOL: trace-messages?
+
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
         [
-        pick ! global [ dup windows-message-name . ] bind
-            {
-                { [ dup WM_CLOSE = ]    [ drop handle-wm-close 0 ] }
-                { [ dup WM_PAINT = ]
-                      [ drop 4dup handle-wm-paint DefWindowProc ] }
-                { [ dup WM_SIZE = ]      [ drop handle-wm-size 0 ] }
-                { [ dup WM_MOVE = ]      [ drop handle-wm-move 0 ] }
-
-                ! Keyboard events
-                { [ dup WM_KEYDOWN = over WM_SYSKEYDOWN = or ]
-                [ drop 4dup handle-wm-keydown DefWindowProc ] }
-                { [ dup WM_CHAR = over WM_SYSCHAR = or ]
-                    [ drop 4dup handle-wm-char DefWindowProc ] }
-                { [ dup WM_KEYUP = over WM_SYSKEYUP = or ]
-                    [ drop 4dup handle-wm-keyup DefWindowProc ] }
-
-                { [ dup WM_SYSCOMMAND = ] [ drop handle-wm-syscommand ] }
-                { [ dup WM_SETFOCUS = ] [ drop handle-wm-set-focus 0 ] }
-                { [ dup WM_KILLFOCUS = ] [ drop handle-wm-kill-focus 0 ] }
-
-                ! Mouse events
-                { [ dup WM_LBUTTONDOWN = ] [ drop handle-wm-buttondown 0 ] }
-                { [ dup WM_MBUTTONDOWN = ] [ drop handle-wm-buttondown 0 ] }
-                { [ dup WM_RBUTTONDOWN = ] [ drop handle-wm-buttondown 0 ] }
-                { [ dup WM_LBUTTONUP = ] [ drop handle-wm-buttonup 0 ] }
-                { [ dup WM_MBUTTONUP = ] [ drop handle-wm-buttonup 0 ] }
-                { [ dup WM_RBUTTONUP = ] [ drop handle-wm-buttonup 0 ] }
-                { [ dup WM_MOUSEMOVE = ] [ drop handle-wm-mousemove 0 ] }
-                { [ dup WM_MOUSEWHEEL = ] [ drop handle-wm-mousewheel 0 ] }
-                { [ dup WM_CANCELMODE = ] [ drop handle-wm-cancelmode 0 ] }
-                { [ dup WM_MOUSELEAVE = ] [ drop handle-wm-mouseleave 0 ] }
-
-                { [ t ] [ drop DefWindowProc ] }
-            } cond
+            pick
+            trace-messages? get-global [ dup windows-message-name . ] when
+            wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
         ] ui-try
      ] alien-callback ;
 
@@ -409,7 +448,8 @@ M: windows-ui-backend (close-window)
     SetFocus drop ;
 
 : init-win32-ui ( -- )
-    "MSG" <c-object> msg-obj set
+    V{ } clone nc-buttons set-global
+    "MSG" <c-object> msg-obj set-global
     "Factor-window" malloc-u16-string class-name-ptr set-global
     register-wndclassex drop
     GetDoubleClickTime double-click-timeout set-global ;
@@ -453,7 +493,8 @@ M: windows-ui-backend raise-window* ( world -- )
         win-hWnd SetFocus drop
     ] when* ;
 
-M: windows-ui-backend set-title ( string handle -- )
+M: windows-ui-backend set-title ( string world -- )
+    world-handle
     dup win-title [ free ] when*
     >r malloc-u16-string r>
     2dup set-win-title
