@@ -87,5 +87,4 @@ PRIVATE>
     from-now f add-alarm ;
 
 : cancel-alarm ( alarm -- )
-    alarm-entry ?box
-    [ alarms get-global heap-delete ] [ drop ] if ;
+    alarm-entry [ alarms get-global heap-delete ] if-box? ;

@@ -1,0 +1,5 @@
+<%
+    USING: prettyprint ;
+    ! Hello world
+    5 pprint
+%>

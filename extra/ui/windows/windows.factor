@@ -358,7 +358,6 @@ M: windows-ui-backend (close-window)
         { [ t ] [
             dup TranslateMessage drop
             dup DispatchMessage drop
-            yield
             event-loop
         ] }
     } cond ;
@@ -454,12 +453,11 @@ M: windows-ui-backend raise-window* ( world -- )
         win-hWnd SetFocus drop
     ] when* ;
 
-M: windows-ui-backend set-title ( string world -- )
-    world-handle [ nip win-hWnd WM_SETTEXT 0 ] 2keep
+M: windows-ui-backend set-title ( string handle -- )
     dup win-title [ free ] when*
-    >r malloc-u16-string dup r>
-    set-win-title alien-address
-    SendMessage drop ;
+    >r malloc-u16-string r>
+    2dup set-win-title
+    win-hWnd WM_SETTEXT 0 roll alien-address SendMessage drop ;
 
 M: windows-ui-backend ui
     [
