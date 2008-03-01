@@ -101,7 +101,7 @@ USING: tools.test io.files io threads kernel continuations ;
 
 [ ] [
     "copy-tree-test" temp-file
-    "copy-destination" temp-file copy-tree-to
+    "copy-destination" temp-file copy-tree-into
 ] unit-test
 
 [ "Foobar" ] [
@@ -109,7 +109,7 @@ USING: tools.test io.files io threads kernel continuations ;
 ] unit-test
 
 [ ] [
-    "copy-destination/copy-tree-test/a/b/c/d" temp-file "" temp-file copy-file-to
+    "copy-destination/copy-tree-test/a/b/c/d" temp-file "" temp-file copy-file-into
 ] unit-test
 
 [ "Foobar" ] [
