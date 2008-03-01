@@ -4,7 +4,12 @@ IN: bootstrap.image.upload
 USING: http.client crypto.md5 splitting assocs kernel io.files
 bootstrap.image sequences io namespaces io.launcher math ;
 
-: destination "slava@factorcode.org:www/images/latest/" ;
+SYMBOL: upload-images-destination
+
+: destination ( -- dest )
+  upload-images-destination get
+  "slava@/var/www/factorcode.org/w/images/latest/"
+  or ;
 
 : checksums "checksums.txt" temp-file ;
 
@@ -23,6 +28,8 @@ bootstrap.image sequences io namespaces io.launcher math ;
     ] { } make try-process ;
 
 : new-images ( -- )
-    make-images compute-checksums upload-images ;
+    "" resource-path
+      [ make-images compute-checksums upload-images ]
+    with-directory ;
 
 MAIN: new-images
