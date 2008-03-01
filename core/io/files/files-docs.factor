@@ -57,8 +57,8 @@ ARTICLE: "delete-move-copy" "Deleting, moving, copying files"
 "The operations for moving and copying files come in three flavors:"
 { $list
     { "A word named " { $snippet { $emphasis "operation" } } " which takes a source and destination path." }
-    { "A word named " { $snippet { $emphasis "operation" } "-to" } " which takes a source path and destination directory. The destination file will be stored in the destination directory and will have the same file name as the source path." }
-    { "A word named " { $snippet { $emphasis "operation" } "s-to" } " which takes a sequence of source paths and destination directory." }
+    { "A word named " { $snippet { $emphasis "operation" } "-into" } " which takes a source path and destination directory. The destination file will be stored in the destination directory and will have the same file name as the source path." }
+    { "A word named " { $snippet { $emphasis "operation" } "s-into" } " which takes a sequence of source paths and destination directory." }
 }
 "Since both of the above lists apply to copying files, that this means that there are a total of six variations on copying a file."
 $nl
@@ -68,16 +68,16 @@ $nl
 { $subsection delete-tree }
 "Moving files:"
 { $subsection move-file }
-{ $subsection move-file-to }
-{ $subsection move-files-to }
+{ $subsection move-file-into }
+{ $subsection move-files-into }
 "Copying files:"
 { $subsection copy-file }
-{ $subsection copy-file-to }
-{ $subsection copy-files-to }
+{ $subsection copy-file-into }
+{ $subsection copy-files-into }
 "Copying directory trees recursively:"
 { $subsection copy-tree }
-{ $subsection copy-tree-to }
-{ $subsection copy-trees-to }
+{ $subsection copy-tree-into }
+{ $subsection copy-trees-into }
 "On most operating systems, files can only be moved within the same file system. To move files between file systems, use " { $link copy-file } " followed by " { $link delete-file } " on the old name." ;
 
 ARTICLE: "io.files" "Basic file operations"
@@ -267,12 +267,12 @@ HELP: move-file
 { $description "Moves or renames a file." }
 { $errors "Throws an error if the file does not exist or if the move operation fails." } ;
 
-HELP: move-file-to
+HELP: move-file-into
 { $values { "from" "a pathname string" } { "to" "a directory pathname string" } }
 { $description "Moves a file to another directory without renaming it." }
 { $errors "Throws an error if the file does not exist or if the move operation fails." } ;
 
-HELP: move-files-to
+HELP: move-files-into
 { $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
 { $description "Moves a set of files to another directory." }
 { $errors "Throws an error if the file does not exist or if the move operation fails." } ;
@@ -283,12 +283,12 @@ HELP: copy-file
 { $notes "This operation attempts to preserve the original file's attributes, however not all attributes may be preserved." }
 { $errors "Throws an error if the file does not exist or if the copy operation fails." } ;
 
-HELP: copy-file-to
+HELP: copy-file-into
 { $values { "from" "a pathname string" } { "to" "a directory pathname string" } }
 { $description "Copies a file to another directory." }
 { $errors "Throws an error if the file does not exist or if the copy operation fails." } ;
 
-HELP: copy-files-to
+HELP: copy-files-into
 { $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
 { $description "Copies a set of files to another directory." }
 { $errors "Throws an error if the file does not exist or if the copy operation fails." } ;
@@ -299,12 +299,12 @@ HELP: copy-tree
 { $notes "This operation attempts to preserve original file attributes, however not all attributes may be preserved." }
 { $errors "Throws an error if the copy operation fails." } ;
 
-HELP: copy-tree-to
+HELP: copy-tree-into
 { $values { "from" "a pathname string" } { "to" "a directory pathname string" } }
 { $description "Copies a directory tree to another directory, recursively." }
 { $errors "Throws an error if the copy operation fails." } ;
 
-HELP: copy-trees-to
+HELP: copy-trees-into
 { $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
 { $description "Copies a set of directory trees to another directory, recursively." }
 { $errors "Throws an error if the copy operation fails." } ;
