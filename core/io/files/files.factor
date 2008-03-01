@@ -84,7 +84,7 @@ HOOK: cd io-backend ( path -- )
 HOOK: cwd io-backend ( -- path )
 
 : with-directory ( path quot -- )
-    swap cd cwd [ cd ] curry [ ] cleanup ; inline
+    cwd [ cd ] curry rot cd [ ] cleanup ; inline
 
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )
