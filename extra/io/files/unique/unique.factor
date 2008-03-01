@@ -22,11 +22,12 @@ IN: io.files.unique
 PRIVATE>
 
 : make-unique-file ( prefix suffix -- path stream )
+break
     temporary-path -rot
     [
         unique-length random-name swap 3append path+
         dup (make-unique-file)
-    ] 3curry unique-retries retry ;
+    ] 3curry unique-retries retry break ;
 
 : with-unique-file ( quot -- path )
     >r f f make-unique-file r> rot [ with-stream ] dip ; inline
