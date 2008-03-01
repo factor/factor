@@ -1,7 +1,7 @@
 USING: io io.streams.string io.streams.duplex listener
 tools.test parser math namespaces continuations vocabs kernel
 compiler.units ;
-IN: temporary
+IN: listener.tests
 
 : hello "Hi" print ; parsing
 
@@ -45,6 +45,6 @@ IN: temporary
 ] unit-test
 
 [ ] [
-    "IN: temporary : hello\n\"world\" ;" parse-interactive
+    "IN: listener.tests : hello\n\"world\" ;" parse-interactive
     drop
 ] unit-test

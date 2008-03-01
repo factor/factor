@@ -1,4 +1,4 @@
-IN: temporary
+IN: ui.gadgets.panes.tests
 USING: alien ui.gadgets.panes ui.gadgets namespaces
 kernel sequences io io.streams.string tools.test prettyprint
 definitions help help.syntax help.markup splitting

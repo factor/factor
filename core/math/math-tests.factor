@@ -1,5 +1,5 @@
 USING: kernel math namespaces tools.test ;
-IN: temporary
+IN: math.tests
 
 [ ] [ 5 [ ] times ] unit-test
 [ ] [ 0 [ ] times ] unit-test

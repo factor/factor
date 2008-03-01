@@ -1,4 +1,4 @@
-IN: temporary
+IN: math.matrices.elimination.tests
 USING: kernel math.matrices math.matrices.elimination
 tools.test sequences ;
 

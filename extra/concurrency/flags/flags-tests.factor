@@ -1,4 +1,4 @@
-IN: temporary
+IN: concurrency.flags.tests
 USING: tools.test concurrency.flags kernel threads locals ;
 
 :: flag-test-1 ( -- )

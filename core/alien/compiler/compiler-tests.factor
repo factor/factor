@@ -1,4 +1,4 @@
-IN: temporary
+IN: alien.compiler.tests
 USING: alien alien.c-types alien.syntax compiler kernel
 namespaces namespaces tools.test sequences inference words
 arrays parser quotations continuations inference.backend effects

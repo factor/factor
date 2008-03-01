@@ -1,4 +1,4 @@
-IN: temporary
+IN: io.unix.launcher.tests
 USING: io.unix.launcher tools.test ;
 
 [ "" tokenize-command ] must-fail

@@ -1,4 +1,4 @@
-IN: temporary
+IN: benchmark.reverse-complement.tests
 USING: tools.test benchmark.reverse-complement crypto.md5
 io.files kernel ;
 

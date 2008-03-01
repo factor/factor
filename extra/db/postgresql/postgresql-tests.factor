@@ -4,12 +4,10 @@
 USING: kernel db.postgresql alien continuations io classes
 prettyprint sequences namespaces tools.test db
 db.tuples db.types unicode.case ;
-IN: temporary
+IN: db.postgresql.tests
 
-IN: scratchpad
 : test-db ( -- postgresql-db )
     { "localhost" "postgres" "" "factor-test" } postgresql-db ;
-IN: temporary
 
 [ ] [ test-db [ ] with-db ] unit-test
 

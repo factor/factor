@@ -1,6 +1,6 @@
 USING: io io.files io.streams.string http.server.templating kernel tools.test
     sequences ;
-IN: temporary
+IN: http.server.templating.tests
 
 : test-template ( path -- ? )
     "extra/http/server/templating/test/" swap append

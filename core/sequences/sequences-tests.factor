@@ -1,7 +1,7 @@
 USING: arrays kernel math namespaces sequences kernel.private
 sequences.private strings sbufs tools.test vectors bit-arrays
 generic ;
-IN: temporary
+IN: sequences.tests
 
 [ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
 [ 3 ] [ 1 4 dup <slice> length ] unit-test

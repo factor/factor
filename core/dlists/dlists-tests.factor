@@ -1,7 +1,7 @@
 USING: dlists dlists.private kernel tools.test random assocs
 hashtables sequences namespaces sorting debugger io prettyprint
 math ;
-IN: temporary
+IN: dlists.tests
 
 [ t ] [ <dlist> dlist-empty? ] unit-test
 

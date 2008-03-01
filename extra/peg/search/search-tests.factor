@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel math math.parser arrays tools.test peg peg.search ;
-IN: temporary
+IN: peg.search.tests
 
 { V{ 123 456 } } [
   "abc 123 def 456" 'integer' search

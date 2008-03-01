@@ -1,5 +1,5 @@
 USING: kernel money taxes tools.test ;
-IN: temporary
+IN: taxes.tests
 
 [
     426 23

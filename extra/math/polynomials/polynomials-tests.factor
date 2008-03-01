@@ -1,4 +1,4 @@
-IN: temporary
+IN: math.polynomials.tests
 USING: kernel math math.polynomials tools.test ;
 
 ! Tests

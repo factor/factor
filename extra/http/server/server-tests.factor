@@ -1,7 +1,7 @@
 USING: webapps.file http.server.responders http
 http.server namespaces io tools.test strings io.server
 logging ;
-IN: temporary
+IN: http.server.tests
 
 [ ] [ f [ "404 not found" httpd-error ] with-logging ] unit-test
 

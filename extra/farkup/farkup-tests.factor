@@ -1,5 +1,5 @@
 USING: farkup kernel tools.test ;
-IN: temporary
+IN: farkup.tests
 
 [ "<ul><li>foo</li></ul>" ] [ "-foo" parse-farkup ] unit-test
 [ "<ul><li>foo</li></ul>\n" ] [ "-foo\n" parse-farkup ] unit-test

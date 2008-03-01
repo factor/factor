@@ -1,5 +1,5 @@
 USING: math math.bitfields tools.test kernel words ;
-IN: temporary
+IN: math.bitfields.tests
 
 [ 0 ] [ { } bitfield ] unit-test
 [ 256 ] [ 1 { 8 } bitfield ] unit-test

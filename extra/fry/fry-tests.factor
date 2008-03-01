@@ -1,4 +1,4 @@
-IN: temporary
+IN: fry.tests
 USING: fry tools.test math prettyprint kernel io arrays
 sequences ;
 

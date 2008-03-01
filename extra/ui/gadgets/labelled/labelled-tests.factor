@@ -1,7 +1,7 @@
 USING: ui.gadgets ui.gadgets.labels ui.gadgets.labelled
 ui.gadgets.packs ui.gadgets.frames ui.gadgets.grids namespaces
 kernel tools.test ui.gadgets.buttons sequences ;
-IN: temporary
+IN: ui.gadgets.labelled.tests
 
 TUPLE: testing ;
 

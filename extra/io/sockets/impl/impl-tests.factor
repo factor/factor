@@ -1,5 +1,5 @@
 USING: io.sockets.impl io.sockets kernel tools.test ;
-IN: temporary
+IN: io.sockets.impl.tests
 
 [ B{ 1 2 3 4 } ]
 [ "1.2.3.4" T{ inet4 } inet-pton ] unit-test
