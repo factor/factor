@@ -87,6 +87,7 @@ ARTICLE: "io.files" "Basic file operations"
 { $subsection "fs-meta" }
 { $subsection "directories" }
 { $subsection "delete-move-copy" }
+{ $subsection "unique" }
 { $see-also "os" } ;
 
 ABOUT: "io.files"
