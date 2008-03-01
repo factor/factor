@@ -176,3 +176,38 @@ threads sequences calendar ;
 [ lock-timeout-test ] [
     linked-error-thread thread-name "Lock timeout-er" =
 ] must-fail-with
+
+:: read/write-test ( -- )
+    [let | l [ <lock> ] |
+        [
+            l [ 1 seconds sleep ] with-lock
+        ] "Lock holder" spawn drop
+
+        [
+            l 1/10 seconds [ ] with-lock-timeout
+        ] "Lock timeout-er" spawn-linked drop
+
+        receive
+    ] ;
+
+[
+    <rw-lock> dup [
+        1 seconds [ ] with-write-lock-timeout
+    ] with-read-lock
+] must-fail
+
+[
+    <rw-lock> dup [
+        dup [
+            1 seconds [ ] with-write-lock-timeout
+        ] with-read-lock
+    ] with-write-lock
+] must-fail
+
+[ ] [
+    <rw-lock> dup [
+        dup [
+            1 seconds [ ] with-read-lock-timeout
+        ] with-read-lock
+    ] with-write-lock
+] unit-test
