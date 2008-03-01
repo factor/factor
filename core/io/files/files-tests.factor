@@ -121,3 +121,5 @@ USING: tools.test io.files io threads kernel continuations ;
 [ ] [ "copy-destination" temp-file delete-tree ] unit-test
 
 [ ] [ "copy-tree-test" temp-file delete-tree ] unit-test
+
+[ t ] [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
