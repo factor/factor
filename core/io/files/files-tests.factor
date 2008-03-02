@@ -1,4 +1,4 @@
-IN: temporary
+IN: io.files.tests
 USING: tools.test io.files io threads kernel continuations ;
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test

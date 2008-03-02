@@ -1,7 +1,7 @@
 USING: io.files io.sockets io kernel threads
 namespaces tools.test continuations strings byte-arrays
 sequences prettyprint system ;
-IN: temporary
+IN: io.unix.tests
 
 ! Unix domain stream sockets
 : socket-server "unix-domain-socket-test" temp-file ;

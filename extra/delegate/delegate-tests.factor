@@ -1,5 +1,5 @@
 USING: delegate kernel arrays tools.test ;
-IN: temporary
+IN: delegate.tests
 
 TUPLE: hello this that ;
 C: <hello> hello

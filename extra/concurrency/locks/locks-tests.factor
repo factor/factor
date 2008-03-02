@@ -1,4 +1,4 @@
-IN: temporary
+IN: concurrency.locks.tests
 USING: tools.test concurrency.locks concurrency.count-downs
 concurrency.messaging concurrency.mailboxes locals kernel
 threads sequences calendar ;

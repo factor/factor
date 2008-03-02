@@ -1,4 +1,4 @@
-IN: temporary
+IN: boxes.tests
 USING: boxes namespaces tools.test ;
 
 [ ] [ <box> "b" set ] unit-test

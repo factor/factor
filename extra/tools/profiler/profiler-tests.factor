@@ -1,4 +1,4 @@
-IN: temporary
+IN: tools.profiler.tests
 USING: tools.profiler tools.test kernel memory math threads
 alien tools.profiler.private sequences ;
 

@@ -1,4 +1,4 @@
-IN: temporary
+IN: math.vectors.tests
 USING: math.vectors tools.test ;
 
 [ { 1 2 3 } ] [ 1/2 { 2 4 6 } n*v ] unit-test

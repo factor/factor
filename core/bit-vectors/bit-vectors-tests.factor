@@ -1,4 +1,4 @@
-IN: temporary
+IN: bit-vectors.tests
 USING: tools.test bit-vectors vectors sequences kernel math ;
 
 [ 0 ] [ 123 <bit-vector> length ] unit-test

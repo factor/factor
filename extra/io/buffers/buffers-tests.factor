@@ -1,4 +1,4 @@
-IN: temporary
+IN: io.buffers.tests
 USING: alien alien.c-types io.buffers kernel kernel.private libc
 sequences tools.test namespaces ;
 

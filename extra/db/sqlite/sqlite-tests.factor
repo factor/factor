@@ -1,7 +1,7 @@
 USING: io io.files io.launcher kernel namespaces
 prettyprint tools.test db.sqlite db sequences
 continuations db.types db.tuples unicode.case ;
-IN: temporary
+IN: db.sqlite.tests
 
 : test.db "extra/db/sqlite/test.db" resource-path ;
 

@@ -1,6 +1,6 @@
 USING: math kernel sequences io.files tools.crossref tools.test
 parser namespaces source-files generic definitions ;
-IN: temporary
+IN: tools.crossref.tests
 
 GENERIC: foo
 

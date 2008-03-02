@@ -3,7 +3,7 @@
 USING: io.files kernel tools.test db db.tuples
 db.types continuations namespaces db.postgresql math
 prettyprint tools.walker db.sqlite ;
-IN: temporary
+IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real ;
 : <person> ( name age real -- person )

@@ -1,5 +1,5 @@
 USING: io lint kernel math tools.test ;
-IN: temporary
+IN: lint.tests
 
 ! Don't write code like this
 : lint1

@@ -1,4 +1,4 @@
-IN: temporary
+IN: compiler.tests
 USING: compiler tools.test namespaces sequences
 kernel.private kernel math continuations continuations.private
 words splitting sorting ;

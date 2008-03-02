@@ -1,7 +1,7 @@
 USING: kernel math namespaces io tools.test sequences vectors
 continuations debugger parser memory arrays words
 kernel.private ;
-IN: temporary
+IN: continuations.tests
 
 : (callcc1-test)
     swap 1- tuck swap ?push

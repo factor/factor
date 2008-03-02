@@ -1,6 +1,6 @@
 USING: continuations kernel math namespaces strings sbufs
 tools.test sequences vectors arrays ;
-IN: temporary
+IN: strings.tests
 
 [ CHAR: b ] [ 1 >bignum "abc" nth ] unit-test
 

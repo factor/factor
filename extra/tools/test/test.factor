@@ -50,13 +50,8 @@ SYMBOL: this-test
 
 : (run-test) ( vocab -- )
     dup vocab-source-loaded? [
-        vocab-tests
-        [
-            "temporary" forget-vocab
-            dup [ forget-source ] each
-        ] with-compilation-unit
-        dup [ run-file ] each
-    ] when drop ;
+        vocab-tests [ run-file ] each
+    ] [ drop ] if ;
 
 : run-test ( vocab -- failures )
     V{ } clone [
