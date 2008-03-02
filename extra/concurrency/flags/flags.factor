@@ -9,8 +9,8 @@ TUPLE: flag value? thread ;
 
 : raise-flag ( flag -- )
     dup flag-value? [
-        dup flag-thread ?box
-        [ resume ] [ drop t over set-flag-value? ] if
+        t over set-flag-value?
+        dup flag-thread [ resume ] if-box?
     ] unless drop ;
 
 : wait-for-flag ( flag -- )
@@ -19,8 +19,4 @@ TUPLE: flag value? thread ;
     ] if ;
 
 : lower-flag ( flag -- )
-    dup flag-value? [
-        f swap set-flag-value?
-    ] [
-        wait-for-flag
-    ] if ;
+    dup wait-for-flag f swap set-flag-value? ;

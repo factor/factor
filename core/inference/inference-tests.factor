@@ -6,7 +6,7 @@ continuations generic.standard sorting assocs definitions
 prettyprint io inspector tuples classes.union classes.predicate
 debugger threads.private io.streams.string io.timeouts
 io.thread sequences.private ;
-IN: temporary
+IN: inference.tests
 
 { 0 2 } [ 2 "Hello" ] must-infer-as
 { 1 2 } [ dup ] must-infer-as

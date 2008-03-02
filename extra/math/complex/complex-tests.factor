@@ -1,6 +1,6 @@
 USING: kernel math math.constants math.functions tools.test
 prettyprint ;
-IN: temporary
+IN: math.complex.tests
 
 [ 1 C{ 0 1 } rect> ] must-fail
 [ C{ 0 1 } 1 rect> ] must-fail

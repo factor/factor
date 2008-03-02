@@ -1,4 +1,4 @@
-IN: temporary
+IN: io.files.tests
 USING: tools.test io.files io threads kernel continuations ;
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
@@ -101,7 +101,7 @@ USING: tools.test io.files io threads kernel continuations ;
 
 [ ] [
     "copy-tree-test" temp-file
-    "copy-destination" temp-file copy-tree-to
+    "copy-destination" temp-file copy-tree-into
 ] unit-test
 
 [ "Foobar" ] [
@@ -109,7 +109,7 @@ USING: tools.test io.files io threads kernel continuations ;
 ] unit-test
 
 [ ] [
-    "copy-destination/copy-tree-test/a/b/c/d" temp-file "" temp-file copy-file-to
+    "copy-destination/copy-tree-test/a/b/c/d" temp-file "" temp-file copy-file-into
 ] unit-test
 
 [ "Foobar" ] [
@@ -121,3 +121,5 @@ USING: tools.test io.files io threads kernel continuations ;
 [ ] [ "copy-destination" temp-file delete-tree ] unit-test
 
 [ ] [ "copy-tree-test" temp-file delete-tree ] unit-test
+
+[ t ] [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test

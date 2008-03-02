@@ -1,4 +1,4 @@
-IN: temporary
+IN: init.tests
 USING: init namespaces sequences math tools.test kernel ;
 
 [ t ] [

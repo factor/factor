@@ -1,5 +1,5 @@
 USING: io io.mmap io.files kernel tools.test continuations sequences ;
-IN: temporary
+IN: io.mmap.tests
 
 [ "mmap-test-file.txt" resource-path delete-file ] ignore-errors
 [ ] [ "mmap-test-file.txt" resource-path [ "12345" write ] with-file-writer ] unit-test

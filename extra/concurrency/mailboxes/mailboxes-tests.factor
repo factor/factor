@@ -1,4 +1,4 @@
-IN: temporary
+IN: concurrency.mailboxes.tests
 USING: concurrency.mailboxes vectors sequences threads
 tools.test math kernel strings ;
 

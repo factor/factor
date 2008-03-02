@@ -1,4 +1,4 @@
-IN: temporary
+IN: globs.tests
 USING: tools.test globs ;
 
 [ f ] [ "abd" "fdf" glob-matches? ] unit-test

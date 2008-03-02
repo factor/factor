@@ -1,5 +1,5 @@
 USING: math.ranges sequences tools.test arrays ;
-IN: temporary
+IN: math.ranges.tests
 
 [ { } ] [ 1 1 (a,b) >array ] unit-test
 [ { } ] [ 1 1 (a,b] >array ] unit-test

@@ -1,4 +1,4 @@
-IN: temporary
+IN: concurrency.futures.tests
 USING: concurrency.futures kernel tools.test threads ;
 
 [ 50 ] [

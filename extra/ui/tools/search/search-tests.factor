@@ -2,7 +2,7 @@ USING: assocs ui.tools.search help.topics io.files io.styles
 kernel namespaces sequences source-files threads
 tools.test ui.gadgets ui.gestures vocabs
 vocabs.loader words tools.test.ui debugger ;
-IN: temporary
+IN: ui.tools.search.tests
 
 [ f ] [
     "no such word with this name exists, certainly"

@@ -1,5 +1,5 @@
 USING: kernel tools.test trees trees.avl math random sequences assocs ;
-IN: temporary
+IN: trees.avl.tests
 
 [ "key1" 0 "key2" 0 ] [
     T{ avl-node T{ node f "key1" f f T{ avl-node T{ node f "key2" } 1 } } 2 }

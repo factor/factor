@@ -1,6 +1,6 @@
 USING: http tools.test multiline tuple-syntax
 io.streams.string kernel arrays splitting sequences     ;
-IN: temporary
+IN: http.tests
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test
 [ "hello world" ] [ "hello%20world" url-decode ] unit-test

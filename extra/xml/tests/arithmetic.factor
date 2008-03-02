@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-IN: xml-arith
+IN: xml.tests
 USING: xml io kernel math sequences strings xml.utilities tools.test math.parser ;
 
 PROCESS: calculate ( tag -- n )

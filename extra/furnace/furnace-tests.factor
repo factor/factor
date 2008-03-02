@@ -1,5 +1,5 @@
 USING: kernel sequences namespaces math tools.test furnace furnace.validator ;
-IN: temporary
+IN: furnace.tests
 
 TUPLE: test-tuple m n ;
 

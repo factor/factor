@@ -1,10 +1,10 @@
 USING: arrays io io.files kernel math parser strings system
 tools.test words namespaces ;
-IN: temporary
+IN: io.tests
 
 [ f ] [
     "resource:/core/io/test/no-trailing-eol.factor" run-file
-    "foo" "temporary" lookup
+    "foo" "io.tests" lookup
 ] unit-test
 
 : <resource-reader> ( resource -- stream )

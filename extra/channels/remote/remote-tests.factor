@@ -3,7 +3,7 @@
 !
 USING: kernel tools.test math assocs channels channels.remote
 channels.remote.private ;
-IN: temporary
+IN: channels.remote.tests
 
 { t } [
     remote-channels assoc?

@@ -1,5 +1,6 @@
 USING: kernel xml sequences assocs tools.test io arrays namespaces
     xml.data xml.utilities xml.writer generic sequences.deep ;
+IN: xml.tests
 
 : sub-tag
     T{ name f f "sub" "http://littledan.onigirihouse.com/namespaces/replace" } ;

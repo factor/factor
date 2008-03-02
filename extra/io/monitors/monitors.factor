@@ -49,7 +49,7 @@ M: simple-monitor set-timeout set-simple-monitor-timeout ;
     >r <simple-monitor> r> construct-delegate ; inline
 
 : notify-callback ( simple-monitor -- )
-    simple-monitor-callback ?box [ resume ] [ drop ] if ;
+    simple-monitor-callback [ resume ] if-box? ;
 
 M: simple-monitor timed-out
     notify-callback ;

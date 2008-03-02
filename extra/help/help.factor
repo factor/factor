@@ -132,13 +132,13 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     nl
     "Debugger commands:" print
     nl
-    ":help - documentation for this error" print
-    ":s    - data stack at exception time" print
-    ":r    - retain stack at exception time" print
-    ":c    - call stack at exception time" print
+    ":s    - data stack at error time" print
+    ":r    - retain stack at error time" print
+    ":c    - call stack at error time" print
     ":edit - jump to source location (parse errors only)" print
 
-    ":get  ( var -- value ) accesses variables at time of the error" print ;
+    ":get  ( var -- value ) accesses variables at time of the error" print
+    ":vars - list all variables at error time";
 
 : :help ( -- )
     error get delegates [ error-help ] map [ ] subset

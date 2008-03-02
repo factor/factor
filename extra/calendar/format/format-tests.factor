@@ -1,4 +1,4 @@
-IN: temporary
+IN: calendar.format.tests
 USING: calendar.format tools.test io.streams.string ;
 
 [ 0 ] [

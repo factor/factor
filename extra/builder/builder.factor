@@ -39,29 +39,27 @@ IN: builder
 
 : record-git-id ( -- ) git-id "../git-id" [ . ] with-file-writer ;
 
-: make-clean ( -- desc ) { "make" "clean" } ;
+: do-make-clean ( -- desc ) { "make" "clean" } try-process ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: target ( -- target ) { os [ cpu "." split ] } to-strings "-" join ;
+! : target ( -- target ) { os [ cpu "." split ] } to-strings "-" join ;
 
 : make-vm ( -- desc )
   <process*>
-    { "make" target } to-strings >>arguments
-    "../compile-log"             >>stdout
-    +stdout+                     >>stderr
+    { "make" }       >>arguments
+    "../compile-log" >>stdout
+    +stdout+         >>stderr
   >desc ;
+
+: do-make-vm ( -- )
+  make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : copy-image ( -- )
-  "../../factor/" my-boot-image-name append
-  "../"           my-boot-image-name append
-  copy-file
-
-  "../../factor/" my-boot-image-name append
-                  my-boot-image-name
-  copy-file ;
+  builds "factor" path+ my-boot-image-name path+ ".." copy-file-into
+  builds "factor" path+ my-boot-image-name path+ "."  copy-file-into ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -77,6 +75,9 @@ IN: builder
     20 minutes    >>timeout
   >desc ;
 
+: do-bootstrap ( -- )
+  bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail ;
+
 : builder-test-cmd ( -- cmd )
   { "./factor" "-run=builder.test" } to-strings ;
 
@@ -88,6 +89,9 @@ IN: builder
     +stdout+         >>stderr
     45 minutes       >>timeout
   >desc ;
+
+: do-builder-test ( -- )
+  builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -101,52 +105,46 @@ SYMBOL: build-status
 
   enter-build-dir
 
-  "report" [
+  "report"
+    [
+      "Build machine:   " write host-name print
+      "CPU:             " write cpu       print
+      "OS:              " write os        print
+      "Build directory: " write cwd       print nl
 
-    "Build machine:   " write host-name print
-    "CPU:             " write cpu       print
-    "OS:              " write os        print
-    "Build directory: " write cwd       print nl
+      git-clone [ "git clone failed" print ] run-or-bail
 
-    git-clone [ "git clone failed" print ] run-or-bail
+      "factor"
+        [
+          record-git-id
+          do-make-clean
+          do-make-vm
+          copy-image
+          do-bootstrap
+          do-builder-test
+        ]
+      with-directory
 
-    "factor" cd
+      "test-log" delete-file
 
-    record-git-id
+      "Boot time: " write "boot-time" eval-file milli-seconds>time print
+      "Load time: " write "load-time" eval-file milli-seconds>time print
+      "Test time: " write "test-time" eval-file milli-seconds>time print nl
 
-    make-clean run-process drop
+      "Did not pass load-everything: " print "load-everything-vocabs" cat
+      "Did not pass test-all: "        print "test-all-vocabs"        cat
 
-    make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
+      "Benchmarks: " print "benchmarks" eval-file benchmarks.
 
-    copy-image
+      nl
 
-    bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
+      show-benchmark-deltas
 
-    builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail
+      "benchmarks" ".." copy-file-into
 
-    "../test-log" delete-file
-
-    "Boot time: " write "../boot-time" eval-file milli-seconds>time print
-    "Load time: " write "../load-time" eval-file milli-seconds>time print
-    "Test time: " write "../test-time" eval-file milli-seconds>time print nl
-
-    "Did not pass load-everything: " print "../load-everything-vocabs" cat
-    "Did not pass test-all: "        print "../test-all-vocabs"        cat
-
-    "Benchmarks: " print
-    "../benchmarks" [ stdio get contents eval ] with-file-reader benchmarks.
-
-    nl
-    
-    show-benchmark-deltas
-
-    "../benchmarks" "../../benchmarks" copy-file
-
-    ".." cd
-
-    maybe-release
-
-  ] with-file-writer
+      maybe-release
+    ]
+  with-file-writer
 
   build-status on ;
 

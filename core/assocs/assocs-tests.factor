@@ -1,4 +1,4 @@
-IN: temporary
+IN: assocs.tests
 USING: kernel math namespaces tools.test vectors sequences
 sequences.private hashtables io prettyprint assocs
 continuations ;

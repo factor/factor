@@ -1,4 +1,4 @@
-IN: temporary
+IN: concurrency.combinators.tests
 USING: concurrency.combinators tools.test random kernel math 
 concurrency.mailboxes threads sequences ;
 

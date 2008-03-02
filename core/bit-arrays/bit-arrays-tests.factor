@@ -1,6 +1,6 @@
 USING: sequences arrays bit-arrays kernel tools.test math
 random ;
-IN: temporary
+IN: bit-arrays.tests
 
 [ 100 ] [ 100 <bit-array> length ] unit-test
 
