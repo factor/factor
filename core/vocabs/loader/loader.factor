@@ -180,8 +180,7 @@ SYMBOL: sources-changed?
 [ t sources-changed? set-global ] "vocabs.loader" add-init-hook
 
 : refresh-all ( -- )
-    sources-changed? get-global
-    [ "" refresh f sources-changed? set-global ] when ;
+    "" refresh f sources-changed? set-global ;
 
 GENERIC: (load-vocab) ( name -- vocab )
 

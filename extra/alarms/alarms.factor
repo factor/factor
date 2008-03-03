@@ -37,8 +37,8 @@ SYMBOL: alarm-thread
     register-alarm ;
 
 : call-alarm ( alarm -- )
-    dup alarm-quot try
     dup alarm-entry box> drop
+    dup alarm-quot try
     dup alarm-interval [ reschedule-alarm ] [ drop ] if ;
 
 : (trigger-alarms) ( alarms now -- )
@@ -46,8 +46,7 @@ SYMBOL: alarm-thread
         2drop
     ] [
         over heap-peek drop over alarm-expired? [
-            over heap-pop drop call-alarm
-            (trigger-alarms)
+            over heap-pop drop call-alarm (trigger-alarms)
         ] [
             2drop
         ] if
