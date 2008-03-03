@@ -1,9 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: io.files
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
 system combinators splitting sbufs continuations ;
+
+IN: io.files
 
 ! Pathnames
 : path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
@@ -50,6 +51,19 @@ TUPLE: no-parent-directory path ;
         { [ t ] [ drop ] }
     } cond ;
 
+TUPLE: file-info type size permissions modified ;
+
+HOOK: file-info io-backend ( path -- info )
+
+SYMBOL: +regular-file+
+SYMBOL: +directory+
+SYMBOL: +character-device+
+SYMBOL: +block-device+
+SYMBOL: +fifo+
+SYMBOL: +symbolic-link+
+SYMBOL: +socket+
+SYMBOL: +unknown+
+
 ! File metadata
 : stat ( path -- directory? permissions length modified )
     normalize-pathname (stat) ;
@@ -70,7 +84,7 @@ HOOK: cd io-backend ( path -- )
 HOOK: cwd io-backend ( -- path )
 
 : with-directory ( path quot -- )
-    swap cd cwd [ cd ] curry [ ] cleanup ; inline
+    cwd [ cd ] curry rot cd [ ] cleanup ; inline
 
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )
@@ -123,37 +137,37 @@ HOOK: delete-directory io-backend ( path -- )
 ! Moving and renaming files
 HOOK: move-file io-backend ( from to -- )
 
-: move-file-to ( from to -- )
+: move-file-into ( from to -- )
     to-directory move-file ;
 
-: move-files-to ( files to -- )
-    [ move-file-to ] curry each ;
+: move-files-into ( files to -- )
+    [ move-file-into ] curry each ;
 
 ! Copying files
 HOOK: copy-file io-backend ( from to -- )
 
-: copy-file-to ( from to -- )
+: copy-file-into ( from to -- )
     to-directory copy-file ;
 
-: copy-files-to ( files to -- )
-    [ copy-file-to ] curry each ;
+: copy-files-into ( files to -- )
+    [ copy-file-into ] curry each ;
 
-DEFER: copy-tree-to
+DEFER: copy-tree-into
 
 : copy-tree ( from to -- )
     over directory? [
         >r dup directory swap r> [
-            >r swap first path+ r> copy-tree-to
+            >r swap first path+ r> copy-tree-into
         ] 2curry each
     ] [
         copy-file
     ] if ;
 
-: copy-tree-to ( from to -- )
+: copy-tree-into ( from to -- )
     to-directory copy-tree ;
 
-: copy-trees-to ( files to -- )
-    [ copy-tree-to ] curry each ;
+: copy-trees-into ( files to -- )
+    [ copy-tree-into ] curry each ;
 
 ! Special paths
 : resource-path ( path -- newpath )

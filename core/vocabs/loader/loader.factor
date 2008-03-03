@@ -4,7 +4,7 @@ USING: namespaces sequences io.files kernel assocs words vocabs
 definitions parser continuations inspector debugger io io.styles
 io.streams.lines hashtables sorting prettyprint source-files
 arrays combinators strings system math.parser compiler.errors
-splitting ;
+splitting init ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -175,7 +175,12 @@ SYMBOL: failures
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 
-: refresh-all ( -- ) "" refresh ;
+SYMBOL: sources-changed?
+
+[ t sources-changed? set-global ] "vocabs.loader" add-init-hook
+
+: refresh-all ( -- )
+    "" refresh f sources-changed? set-global ;
 
 GENERIC: (load-vocab) ( name -- vocab )
 

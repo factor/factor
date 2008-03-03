@@ -1,6 +1,6 @@
 USING: sorting sequences kernel math random tools.test
 vectors ;
-IN: temporary
+IN: sorting.tests
 
 [ [ ] ] [ [ ] natural-sort ] unit-test
 

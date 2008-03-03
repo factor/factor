@@ -1,5 +1,6 @@
 
-USING: kernel system combinators alien.syntax math vocabs.loader ;
+USING: kernel system combinators alien.syntax alien.c-types
+       math io.unix.backend vocabs.loader ;
 
 IN: unix.stat
 
@@ -56,10 +57,20 @@ FUNCTION: int fchmod ( int fd, mode_t mode ) ;
 FUNCTION: int mkdir ( char* path, mode_t mode ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+<<
+  os
+  {
+    { "linux"  [ "unix.stat.linux"  require ] }
+    { "macosx" [ "unix.stat.macosx" require ] }
+    [ drop ]
+  }
+  case
+>>
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-{
-  { [ linux? ] [ "unix.stat.linux" require ] }
-  { [ t      ] [                           ] }
-}
-cond
+: check-status ( n -- ) io-error ;
 
+: stat* ( pathname -- stat )
+  "stat" <c-object> dup >r
+    stat check-status
+  r> ;

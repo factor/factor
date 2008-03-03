@@ -1,5 +1,5 @@
 USING: kernel math random namespaces sequences tools.test ;
-IN: temporary
+IN: random.tests
 
 : check-random ( max -- ? )
     dup >r random 0 r> between? ;

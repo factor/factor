@@ -1,4 +1,4 @@
-IN: temporary
+IN: compiler.tests
 USING: compiler.units kernel kernel.private memory math
 math.private tools.test math.floats.private ;
 

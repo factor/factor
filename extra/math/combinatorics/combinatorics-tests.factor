@@ -1,5 +1,5 @@
 USING: math.combinatorics math.combinatorics.private tools.test ;
-IN: temporary
+IN: math.combinatorics.tests
 
 [ { } ] [ 0 factoradic ] unit-test
 [ { 1 0 } ] [ 1 factoradic ] unit-test

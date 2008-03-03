@@ -1,4 +1,4 @@
-IN: temporary
+IN: concurrency.promises.tests
 USING: vectors concurrency.promises kernel threads sequences
 tools.test ;
 

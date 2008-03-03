@@ -82,10 +82,10 @@ DEFER: <% delimiter
             templating-vocab use+
             ! so that reload works properly
             dup source-file file set
-            dup ?resource-path file-contents
+            ?resource-path file-contents
             [ eval-template ] [ html-error. drop ] recover
         ] with-file-vocabs
-    ] assert-depth drop ;
+    ] curry assert-depth ;
 
 : run-relative-template-file ( filename -- )
     file get source-file-path parent-directory

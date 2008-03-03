@@ -1,4 +1,4 @@
-IN: temporary
+IN: ui.gadgets.packs.tests
 USING: ui.gadgets.packs ui.gadgets.labels ui.gadgets ui.render
 kernel namespaces tools.test math.parser sequences ;
 

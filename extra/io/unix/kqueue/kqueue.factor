@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel io.nonblocking io.unix.backend
-sequences assocs unix unix.kqueue unix.process math namespaces
+sequences assocs unix unix.time unix.kqueue unix.process math namespaces
 combinators threads vectors io.launcher
 io.unix.launcher ;
 IN: io.unix.kqueue

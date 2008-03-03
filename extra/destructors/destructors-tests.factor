@@ -1,5 +1,5 @@
 USING: destructors kernel tools.test continuations ;
-IN: temporary
+IN: destructors.tests
 
 TUPLE: dummy-obj destroyed? ;
 

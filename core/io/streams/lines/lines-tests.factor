@@ -1,6 +1,6 @@
 USING: io.streams.lines io.files io.streams.string io
 tools.test kernel ;
-IN: temporary
+IN: io.streams.lines.tests
 
 : <resource-reader> ( resource -- stream )
     resource-path <file-reader> ;
