@@ -3,7 +3,7 @@ USING: kernel words namespaces classes parser continuations
        io io.files io.launcher io.sockets
        math math.parser
        combinators sequences splitting quotations arrays strings tools.time
-       parser-combinators new-slots accessors assocs.lib
+       sequences.deep new-slots accessors assocs.lib
        combinators.cleave bake calendar calendar.format ;
 
 IN: builder.util
