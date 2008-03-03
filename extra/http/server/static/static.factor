@@ -87,8 +87,6 @@ TUPLE: file-responder root hook special ;
         drop <404>
     ] if ;
 
-: <400> 400 "Bad request" <trivial-response> ;
-
 M: file-responder call-responder ( request path responder -- response )
     over [
         ".." pick subseq? [

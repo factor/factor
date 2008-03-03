@@ -28,6 +28,9 @@ M: trivial-responder call-responder nip response>> call ;
     swap >>message
     swap >>code ;
 
+: <400> ( -- response )
+    400 "Bad request" <trivial-response> ;
+
 : <404> ( -- response )
     404 "Not Found" <trivial-response> ;
 
@@ -66,7 +69,7 @@ TUPLE: dispatcher default responders ;
     404-responder H{ } clone dispatcher construct-boa ;
 
 : set-main ( dispatcher name -- dispatcher )
-    [ <temporary-redirect> ] curry
+    [ <permanent-redirect> ] curry
     <trivial-responder> >>default ;
 
 : split-path ( path -- rest first )
@@ -102,6 +105,7 @@ M: dispatcher call-responder
 
 : <webapp> ( class -- dispatcher )
     <dispatcher> swap construct-delegate ; inline
+
 SYMBOL: virtual-hosts
 SYMBOL: default-host
 
