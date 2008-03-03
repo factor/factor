@@ -43,8 +43,6 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : target ( -- target ) { os [ cpu "." split ] } to-strings "-" join ;
-
 : make-vm ( -- desc )
   <process*>
     { "make" }       >>arguments
