@@ -9,7 +9,7 @@ IN: io.unix.launcher.parser
 ! foo\ bar -- escaping the space
 ! 'foo bar' -- quotation
 ! "foo bar" -- quotation
-MEMO: 'escaped-char'
+MEMO: 'escaped-char' ( -- parser )
     "\\" token [ drop t ] satisfy 2seq [ second ] action ;
 
 MEMO: 'quoted-char' ( delimiter -- parser' )
