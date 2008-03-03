@@ -24,7 +24,7 @@ IN: parser.tests
     [ "hello world" ]
     [
         "IN: parser.tests : hello \"hello world\" ;"
-        eval "USE: temporary hello" eval
+        eval "USE: parser.tests hello" eval
     ] unit-test
 
     [ ]
@@ -104,12 +104,12 @@ IN: parser.tests
 
     "IN: parser.tests USING: math prettyprint ; : foo 2 2 + . ; parsing" eval
 
-    [ ] [ "USE: temporary foo" eval ] unit-test
+    [ ] [ "USE: parser.tests foo" eval ] unit-test
 
     "IN: parser.tests USING: math prettyprint ; : foo 2 2 + . ;" eval
 
     [ t ] [
-        "USE: temporary \\ foo" eval
+        "USE: parser.tests \\ foo" eval
         "foo" "parser.tests" lookup eq?
     ] unit-test
 

@@ -9,7 +9,7 @@ IN: listener.tests
     <string-reader> stream-read-quot ;
 
 [ [ ] ] [
-    "USE: temporary hello" parse-interactive
+    "USE: listener.tests hello" parse-interactive
 ] unit-test
 
 [

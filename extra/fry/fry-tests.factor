@@ -32,6 +32,10 @@ sequences ;
     { "a" "b" "c" } swap map
 ] unit-test
 
+[ 1 2 ] [
+    1 2 '[ _ , ] call
+] unit-test
+
 [ { { 1 "a" 2 } { 1 "b" 2 } { 1 "c" 2 } } ] [
     1 2 '[ , _ , 3array ]
     { "a" "b" "c" } swap map
