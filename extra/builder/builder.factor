@@ -108,7 +108,8 @@ SYMBOL: build-status
       "Build machine:   " write host-name print
       "CPU:             " write cpu       print
       "OS:              " write os        print
-      "Build directory: " write cwd       print nl
+      "Build directory: " write cwd       print
+      "git id:          " write "git-id" eval-file print
 
       git-clone [ "git clone failed" print ] run-or-bail
 
