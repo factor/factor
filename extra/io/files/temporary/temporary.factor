@@ -27,6 +27,6 @@ IN: io.files.temporary
     [ with-directory ] 2keep drop delete-tree ;
 
 {
-    { [ unix? ] [ "io.unix.files.temporary" ] }
-    { [ windows? ] [ "io.windows.files.temporary" ] }
+    { [ unix? ] [ "io.unix.files.unique" ] }
+    { [ windows? ] [ "io.windows.files.unique" ] }
 } cond require
