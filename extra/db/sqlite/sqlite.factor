@@ -5,7 +5,7 @@ hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators tools.walker
-combinators.cleave ;
+combinators.cleave io ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
@@ -173,10 +173,14 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
 
         " from " 0% 0%
         [ sql-spec-slot-name swap get-slot-named ] with subset
-        " where " 0%
-        [ ", " 0% ]
-        [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
-        ";" 0%
+        dup empty? [
+            drop
+        ] [
+            " where " 0%
+            [ ", " 0% ]
+            [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
+            ";" 0%
+        ] if
     ] sqlite-make ;
 
 M: sqlite-db modifier-table ( -- hashtable )
