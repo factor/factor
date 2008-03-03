@@ -8,8 +8,6 @@ html.elements sequences.deep ascii ;
 USE: tools.walker
 IN: farkup
 
-MEMO: any-char ( -- parser ) [ drop t ] satisfy ;
-
 : delimiters ( -- string )
     "*_^~%=[-|\\\n" ; inline
 
@@ -108,6 +106,7 @@ MEMO: code ( -- parser )
 MEMO: line ( -- parser )
     [
         text , strong , emphasis , link ,
+        h1 , h2 , h3 , h4 ,
         superscript , subscript , inline-code ,
         escaped-char , delimiter ,
     ] choice* repeat1 ;
