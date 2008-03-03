@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.backend io.timeouts system kernel namespaces
-strings hashtables sequences assocs combinators vocabs.loader
-init threads continuations math ;
+USING: io io.backend io.nonblocking io.streams.duplex
+io.timeouts system kernel namespaces strings hashtables
+sequences assocs combinators vocabs.loader init threads
+continuations math ;
 IN: io.launcher
 
 ! Non-blocking process exit notification facility
@@ -141,3 +142,12 @@ TUPLE: process-stream process ;
     [ set-process-status ] keep
     [ processes get delete-at* drop [ resume ] each ] keep
     f swap set-process-handle ;
+
+GENERIC: underlying-handle ( stream -- handle )
+
+M: port underlying-handle port-handle ;
+
+M: duplex-stream underlying-handle
+    dup duplex-stream-in underlying-handle
+    swap duplex-stream-out underlying-handle tuck =
+    [ "Invalid duplex stream" throw ] when ;
