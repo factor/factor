@@ -5,6 +5,22 @@ USING: kernel sequences strings namespaces math assocs shuffle
      unicode.categories sequences.deep peg ;
 IN: peg.parsers
 
+TUPLE: just-parser p1 ;
+
+: just-pattern
+  [
+    dup [
+      dup parse-result-remaining empty? [ drop f ] unless
+    ] when
+  ] ;
+
+
+M: just-parser compile ( parser -- quot )
+  just-parser-p1 compile just-pattern swap append ;
+
+MEMO: just ( parser -- parser )
+  just-parser construct-boa init-parser ;
+
 <PRIVATE
 MEMO: (list-of) ( items separator repeat1? -- parser )
   >r over 2seq r> [ repeat1 ] [ repeat0 ] if [ concat ] action 2seq
@@ -48,7 +64,7 @@ MEMO: from-m-to-n ( parser m n -- parser' )
   [ flatten-vectors ] action ;
 
 MEMO: pack ( begin body end -- parser )
-  >r >r hide r> r> hide 3seq ;
+  >r >r hide r> r> hide 3seq [ first ] action ;
 
 MEMO: surrounded-by ( parser begin end -- parser' )
   [ token ] 2apply swapd pack ;

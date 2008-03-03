@@ -292,18 +292,6 @@ M: delay-parser compile ( parser -- quot )
     delay-parser-quot % \ compile , \ call ,
   ] [ ] make ;
 
-TUPLE: just-parser p1 ;
-
-: just-pattern
-    [
-        ?quot call dup
-        [ parse-result-remaining empty? [ drop f ] unless ] [ f ] if*
-    ] ;
-
-
-M: just-parser compile ( parser -- quot )
-  just-parser-p1 compile \ ?quot just-pattern match-replace ;
-
 PRIVATE>
 
 MEMO: token ( string -- parser )
@@ -371,6 +359,3 @@ MEMO: hide ( parser -- parser )
 
 MEMO: delay ( parser -- parser )
   delay-parser construct-boa init-parser ;
-
-MEMO: just ( parser -- parser )
-  just-parser construct-boa init-parser ;

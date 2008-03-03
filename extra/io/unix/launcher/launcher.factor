@@ -2,40 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.backend io.launcher io.unix.backend io.unix.files
 io.nonblocking sequences kernel namespaces math system
- alien.c-types debugger continuations arrays assocs 
-combinators unix.process parser-combinators memoize 
-promises strings threads unix ;
+alien.c-types debugger continuations arrays assocs combinators
+unix.process strings threads unix ;
 IN: io.unix.launcher
 
 ! Search unix first
 USE: unix
-
-! Our command line parser. Supported syntax:
-! foo bar baz -- simple tokens
-! foo\ bar -- escaping the space
-! 'foo bar' -- quotation
-! "foo bar" -- quotation
-LAZY: 'escaped-char' "\\" token any-char-parser &> ;
-
-LAZY: 'quoted-char' ( delimiter -- parser' )
-    'escaped-char'
-    swap [ member? not ] curry satisfy
-    <|> ; inline
-
-LAZY: 'quoted' ( delimiter -- parser )
-    dup 'quoted-char' <!*> swap dup surrounded-by ;
-
-LAZY: 'unquoted' ( -- parser ) " '\"" 'quoted-char' <!+> ;
-
-LAZY: 'argument' ( -- parser )
-    "\"" 'quoted' "'" 'quoted' 'unquoted' <|> <|>
-    [ >string ] <@ ;
-
-MEMO: 'arguments' ( -- parser )
-    'argument' " " token <!+> nonempty-list-of ;
-
-: tokenize-command ( command -- arguments )
-    'arguments' just parse-1 ;
 
 : get-arguments ( -- seq )
     +command+ get [ tokenize-command ] [ +arguments+ get ] if* ;

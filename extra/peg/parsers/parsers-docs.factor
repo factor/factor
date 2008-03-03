@@ -112,7 +112,7 @@ HELP: pack
 } { $description
     "Returns a parser that parses the begin, body, and end parsers in order.  The begin and end parsers are hidden."
 } { $examples
-    { $example "\"hi123bye\" \"hi\" token 'integer' \"bye\" token pack parse parse-result-ast ." "V{ 123 }" }
+    { $example "\"hi123bye\" \"hi\" token 'integer' \"bye\" token pack parse parse-result-ast ." "123" }
 } { $see-also surrounded-by } ;
 
 HELP: surrounded-by
@@ -124,7 +124,7 @@ HELP: surrounded-by
 } { $description
     "Calls token on begin and end to make them into string parsers.  Returns a parser that parses the begin, body, and end parsers in order.  The begin and end parsers are hidden."
 } { $examples
-    { $example "\"hi123bye\" 'integer' \"hi\" \"bye\" surrounded-by parse parse-result-ast ." "V{ 123 }" }
+    { $example "\"hi123bye\" 'integer' \"hi\" \"bye\" surrounded-by parse parse-result-ast ." "123" }
 } { $see-also pack } ;
 
 HELP: 'digit'
