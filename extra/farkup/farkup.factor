@@ -9,14 +9,14 @@ USE: tools.walker
 IN: farkup
 
 : delimiters ( -- string )
-    "*_^~%=[-|\\\n" ; inline
+    "*_^~%[-=|\\\n" ; inline
 
 MEMO: text ( -- parser )
     [ delimiters member? not ] satisfy repeat1
     [ >string escape-string ] action ;
 
 MEMO: delimiter ( -- parser )
-    [ dup delimiters member? swap CHAR: \n = not and ] satisfy
+    [ dup delimiters member? swap "\n=" member? not and ] satisfy
     [ 1string ] action ;
 
 : surround-with-foo ( string tag -- seq )
@@ -37,12 +37,12 @@ MEMO: emphasis ( -- parser ) "_" "em" delimited ;
 MEMO: superscript ( -- parser ) "^" "sup" delimited ;
 MEMO: subscript ( -- parser ) "~" "sub" delimited ;
 MEMO: inline-code ( -- parser ) "%" "code" delimited ;
+MEMO: nl ( -- parser ) "\n" token ;
+MEMO: 2nl ( -- parser ) "\n\n" token hide ;
 MEMO: h1 ( -- parser ) "=" "h1" delimited ;
 MEMO: h2 ( -- parser ) "==" "h2" delimited ;
 MEMO: h3 ( -- parser ) "===" "h3" delimited ;
 MEMO: h4 ( -- parser ) "====" "h4" delimited ;
-MEMO: nl ( -- parser ) "\n" token ;
-MEMO: 2nl ( -- parser ) "\n\n" token hide ;
 
 : render-code ( string mode -- string' )
     >r string-lines r>
@@ -106,7 +106,6 @@ MEMO: code ( -- parser )
 MEMO: line ( -- parser )
     [
         text , strong , emphasis , link ,
-        h1 , h2 , h3 , h4 ,
         superscript , subscript , inline-code ,
         escaped-char , delimiter ,
     ] choice* repeat1 ;

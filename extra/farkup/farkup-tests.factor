@@ -40,3 +40,5 @@ IN: farkup.tests
 [ "<table><tr><td>a</td><td>b</td></tr></table>\n<table><tr><td>c</td><td>d</td></tr></table>\n" ]
 [ "a|b\nc|d\n" parse-farkup ] unit-test
 
+[ "<p><strong>foo</strong>\n</p><h1>aheading</h1>\n<p>adfasd</p>" ]
+[ "*foo*\n=aheading=\nadfasd" parse-farkup ] unit-test
