@@ -173,9 +173,11 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
 
         " from " 0% 0%
         [ sql-spec-slot-name swap get-slot-named ] with subset
-        " where " 0%
-        [ ", " 0% ]
-        [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
+        dup empty? [ drop ] [
+            " where " 0%
+            [ ", " 0% ]
+            [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
+        ] if
         ";" 0%
     ] sqlite-make ;
 
