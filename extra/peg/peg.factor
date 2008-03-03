@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib memoize math.parser match
-       unicode.categories sequences.lib ;
+       unicode.categories sequences.lib compiler.units parser
+       words ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
@@ -359,3 +360,12 @@ MEMO: hide ( parser -- parser )
 
 MEMO: delay ( parser -- parser )
   delay-parser construct-boa init-parser ;
+
+: PEG:
+  (:) [
+    [
+        call compile
+        [ dup [ parse-result-ast ] [ "Parse failed" throw ] if ]
+        append define
+    ] with-compilation-unit
+  ] 2curry over push-all ; parsing

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
      vectors arrays combinators.lib memoize math.parser match
-     unicode.categories sequences.deep peg ;
+     unicode.categories sequences.deep peg peg.private ;
 IN: peg.parsers
 
 TUPLE: just-parser p1 ;
@@ -16,7 +16,7 @@ TUPLE: just-parser p1 ;
 
 
 M: just-parser compile ( parser -- quot )
-  just-parser-p1 compile just-pattern swap append ;
+  just-parser-p1 compile just-pattern append ;
 
 MEMO: just ( parser -- parser )
   just-parser construct-boa init-parser ;
