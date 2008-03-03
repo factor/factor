@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io kernel memoize namespaces peg
 peg.ebnf sequences strings html.elements xml.entities
-xmode.code2html splitting io.streams.string html
-html.elements sequences.deep ascii ;
-! unicode.categories ;
+xmode.code2html splitting io.streams.string html peg.parsers
+html.elements sequences.deep unicode.categories ;
 USE: tools.walker
 IN: farkup
 
