@@ -109,7 +109,6 @@ SYMBOL: build-status
       "CPU:             " write cpu       print
       "OS:              " write os        print
       "Build directory: " write cwd       print
-      "git id:          " write "git-id" eval-file print
 
       git-clone [ "git clone failed" print ] run-or-bail
 
@@ -125,6 +124,8 @@ SYMBOL: build-status
       with-directory
 
       "test-log" delete-file
+
+      "git id:          " write "git-id" eval-file print nl
 
       "Boot time: " write "boot-time" eval-file milli-seconds>time print
       "Load time: " write "load-time" eval-file milli-seconds>time print
