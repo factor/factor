@@ -87,9 +87,17 @@ TUPLE: file-responder root hook special ;
         drop <404>
     ] if ;
 
+: <400> 400 "Bad request" <trivial-response> ;
+
 M: file-responder call-responder ( request path responder -- response )
-    [
-        responder set
-        swap request set
-        serve-object
-    ] with-scope ;
+    over [
+        ".." pick subseq? [
+            3drop <400>
+        ] [
+            responder set
+            swap request set
+            serve-object
+        ] if
+    ] [
+        2drop redirect-with-/
+    ] if ;

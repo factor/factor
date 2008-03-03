@@ -180,9 +180,15 @@ cookies ;
 : set-query-param ( request value key -- request )
     pick query>> set-at ;
 
+: chop-hostname ( str -- str' )
+    CHAR: / over index over length or tail
+    dup empty? [ drop "/" ] when ;
+
 : url>path ( url -- path )
-    url-decode "http://" ?head
-    [ "/" split1 "" or nip ] [ "/" ?head drop ] if ;
+    #! Technically, only proxies are meant to support hostnames
+    #! in HTTP requests, but IE sends these sometimes so we
+    #! just chop the hostname part.
+    url-decode "http://" ?head [ chop-hostname ] when ;
 
 : read-method ( request -- request )
     " " read-until [ "Bad request: method" throw ] unless

@@ -9,10 +9,12 @@ IN: http.server.sessions
 ! WARNING: this session manager is vulnerable to XSRF attacks
 ! ! ! ! ! !
 
-TUPLE: session-manager responder init sessions ;
+GENERIC: init-session ( responder -- )
+
+TUPLE: session-manager responder sessions ;
 
 : <session-manager> ( responder class -- responder' )
-    >r [ ] H{ } clone session-manager construct-boa r>
+    >r H{ } clone session-manager construct-boa r>
     construct-delegate ; inline
 
 TUPLE: session id manager namespace alarm ;
@@ -42,13 +44,10 @@ TUPLE: session id manager namespace alarm ;
 
 : schange ( key quot -- ) session swap change-at ; inline
 
-: with-session ( session quot -- )
-    >r \ session r> with-variable ; inline
-
 : new-session ( responder -- id )
     [ sessions>> generate-key dup ] keep
     [ <session> dup touch-session ] keep
-    [ init>> with-session ] 2keep
+    [ swap \ session [ responder>> init-session ] with-variable ] 2keep
     >r over r> sessions>> set-at ;
 
 : get-session ( id responder -- session )
@@ -59,7 +58,7 @@ TUPLE: session id manager namespace alarm ;
     ] if ;
 
 : call-responder/session ( request path responder session -- response )
-    [ responder>> call-responder ] with-session ;
+    \ session set responder>> call-responder ;
 
 : sessions ( -- manager/f )
     \ session get dup [ manager>> ] when ;
@@ -82,7 +81,7 @@ M: url-sessions call-responder ( request path responder -- response )
         call-responder/session
     ] [
         new-session nip sess-id set-query-param
-        request-url <temporary-redirect>
+        dup request-url <temporary-redirect>
     ] if* ;
 
 M: url-sessions session-link*
@@ -96,14 +95,15 @@ TUPLE: cookie-sessions ;
 : <cookie-sessions> ( responder -- responder' )
     cookie-sessions <session-manager> ;
 
-: get-session-cookie ( request -- cookie )
-    sess-id get-cookie ;
+: get-session-cookie ( request responder -- cookie )
+    >r sess-id get-cookie dup
+    [ value>> r> get-session ] [ r> 2drop f ] if ;
 
 : <session-cookie> ( id -- cookie )
     sess-id <cookie> ;
 
 M: cookie-sessions call-responder ( request path responder -- response )
-    pick get-session-cookie value>> over get-session [
+    3dup nip get-session-cookie [
         call-responder/session
     ] [
         dup new-session

@@ -18,6 +18,11 @@ IN: http.tests
 
 [ "\u001234hi\u002045" ] [ "\u001234hi\u002045" url-encode url-decode ] unit-test
 
+[ "/" ] [ "http://foo.com" url>path ] unit-test
+[ "/" ] [ "http://foo.com/" url>path ] unit-test
+[ "/bar" ] [ "http://foo.com/bar" url>path ] unit-test
+[ "/bar" ] [ "/bar" url>path ] unit-test
+
 STRING: read-request-test-1
 GET http://foo/bar HTTP/1.1
 Some-Header: 1
@@ -31,7 +36,7 @@ blah
     TUPLE{ request
         port: 80
         method: "GET"
-        path: "bar"
+        path: "/bar"
         query: H{ }
         version: "1.1"
         header: H{ { "some-header" "1; 2" } { "content-length" "4" } }
@@ -45,7 +50,7 @@ blah
 ] unit-test
 
 STRING: read-request-test-1'
-GET bar HTTP/1.1
+GET /bar HTTP/1.1
 content-length: 4
 some-header: 1; 2
 
@@ -69,7 +74,7 @@ Host: www.sex.com
     TUPLE{ request
         port: 80
         method: "HEAD"
-        path: "bar"
+        path: "/bar"
         query: H{ }
         version: "1.1"
         header: H{ { "host" "www.sex.com" } }

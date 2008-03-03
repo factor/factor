@@ -3,7 +3,7 @@
 USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http sequences prettyprint io.server logging calendar
 new-slots html.elements accessors math.parser combinators.lib
-vocabs.loader debugger html continuations random ;
+vocabs.loader debugger html continuations random combinators ;
 IN: http.server
 
 GENERIC: call-responder ( request path responder -- response )
@@ -12,7 +12,7 @@ TUPLE: trivial-responder response ;
 
 C: <trivial-responder> trivial-responder
 
-M: trivial-responder call-responder 2nip response>> call ;
+M: trivial-responder call-responder nip response>> call ;
 
 : trivial-response-body ( code message -- )
     <html>
@@ -33,18 +33,26 @@ M: trivial-responder call-responder 2nip response>> call ;
 
 SYMBOL: 404-responder
 
-[ <404> ] <trivial-responder> 404-responder set-global
+[ drop <404> ] <trivial-responder> 404-responder set-global
 
-: <redirect> ( to code message -- response )
+: modify-for-redirect ( request to -- url )
+    {
+        { [ dup "http://" head? ] [ nip ] }
+        { [ dup "/" head? ] [ >>path request-url ] }
+        { [ t ] [ >r dup path>> "/" last-split1 drop "/" r> 3append >>path request-url ] }
+    } cond ;
+
+: <redirect> ( request to code message -- response )
     <trivial-response>
-    swap "location" set-header ;
+    -rot modify-for-redirect
+    "location" set-header ;
 
 \ <redirect> DEBUG add-input-logging
 
-: <permanent-redirect> ( to -- response )
+: <permanent-redirect> ( request to -- response )
     301 "Moved Permanently" <redirect> ;
 
-: <temporary-redirect> ( to -- response )
+: <temporary-redirect> ( request to -- response )
     307 "Temporary Redirect" <redirect> ;
 
 : <content> ( content-type -- response )
@@ -54,31 +62,46 @@ SYMBOL: 404-responder
 
 TUPLE: dispatcher default responders ;
 
-: get-responder ( name dispatcher -- responder )
-    tuck responders>> at [ ] [ default>> ] ?if ;
+: <dispatcher> ( -- dispatcher )
+    404-responder H{ } clone dispatcher construct-boa ;
+
+: set-main ( dispatcher name -- dispatcher )
+    [ <temporary-redirect> ] curry
+    <trivial-responder> >>default ;
+
+: split-path ( path -- rest first )
+    [ CHAR: / = ] left-trim "/" split1 swap ;
 
 : find-responder ( path dispatcher -- path responder )
-    >r [ CHAR: / = ] left-trim "/" split1
-    swap [ CHAR: / = ] right-trim r> get-responder ;
+    over split-path pick responders>> at*
+    [ >r >r 2drop r> r> ] [ 2drop default>> ] if ;
 
 : redirect-with-/ ( request -- response )
-    dup path>> "/" append >>path
-    request-url <permanent-redirect> ;
+    dup path>> "/" append <permanent-redirect> ;
 
 M: dispatcher call-responder
     over [
-        find-responder call-responder
+        3dup find-responder call-responder [
+            >r 3drop r>
+        ] [
+            default>> [
+                call-responder
+            ] [
+                3drop f
+            ] if*
+        ] if*
     ] [
         2drop redirect-with-/
     ] if ;
 
-: <dispatcher> ( -- dispatcher )
-    404-responder get-global H{ } clone
-    dispatcher construct-boa ;
-
 : add-responder ( dispatcher responder path -- dispatcher )
     pick responders>> set-at ;
 
+: add-main-responder ( dispatcher responder path -- dispatcher )
+    [ add-responder ] keep set-main ;
+
+: <webapp> ( class -- dispatcher )
+    <dispatcher> swap construct-delegate ; inline
 SYMBOL: virtual-hosts
 SYMBOL: default-host
 
@@ -88,22 +111,32 @@ default-host global [ drop 404-responder get-global ] cache drop
 : find-virtual-host ( host -- responder )
     virtual-hosts get at [ default-host get ] unless* ;
 
+SYMBOL: development-mode
+
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
     swap [
         "Internal server error" [
-            [ print-error nl :c ] with-html-stream
+            development-mode get [
+                [ print-error nl :c ] with-html-stream
+            ] [
+                500 "Internal server error"
+                trivial-response-body
+            ] if
         ] simple-page
     ] curry >>body ;
 
-: handle-request ( request -- )
-    [
-        dup dup path>> over host>>
-        find-virtual-host call-responder
-    ] [ <500> ] recover
+: do-response ( request response -- )
     dup write-response
     swap method>> "HEAD" =
     [ drop ] [ write-response-body ] if ;
+
+: do-request ( request -- request )
+    [
+        dup dup path>> over host>>
+        find-virtual-host call-responder
+        [ <404> ] unless*
+    ] [ dup \ do-request log-error <500> ] recover ;
 
 : default-timeout 1 minutes stdio get set-timeout ;
 
@@ -112,16 +145,17 @@ LOG: httpd-hit NOTICE
 : log-request ( request -- )
     { method>> host>> path>> } map-exec-with httpd-hit ;
 
-SYMBOL: development-mode
-
-: (httpd) ( -- )
+: handle-client ( -- )
     default-timeout
     development-mode get-global
     [ global [ refresh-all ] bind ] when
-    read-request dup log-request handle-request ;
+    read-request
+    dup log-request
+    do-request do-response ;
 
 : httpd ( port -- )
-    internet-server "http.server" [ (httpd) ] with-server ;
+    internet-server "http.server"
+    [ handle-client ] with-server ;
 
 : httpd-main ( -- ) 8888 httpd ;
 

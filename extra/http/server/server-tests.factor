@@ -51,3 +51,11 @@ M: mock-responder call-responder
         header>> "location" swap at "baz/" tail? r> and
     ] unit-test
 ] with-scope
+
+[
+    <dispatcher>
+        "default" <mock-responder> >>default
+    default-host set
+
+    [ "/default" ] [ "/default" default-host get find-responder drop ] unit-test
+] with-scope

@@ -1,6 +1,8 @@
-IN: temporary
+IN: http.server.sessions.tests
 USING: tools.test http.server.sessions math namespaces
 kernel accessors ;
+
+: with-session \ session swap with-variable ; inline
 
 "1234" f <session> [
     [ ] [ 3 "x" sset ] unit-test

@@ -50,12 +50,12 @@ SYMBOL: exit-continuation
     #! When executed inside a 'show' call, this will force a
     #! HTTP 302 to occur to instruct the browser to forward to
     #! the request URL.
-    <temporary-redirect> exit-with ;
+    request get swap <temporary-redirect> exit-with ;
 
 : cont-id "factorcontid" ;
 
 : id>url ( id -- url )
-    request get clone
+    request get
     swap cont-id associate >>query
     request-url ;
 
@@ -102,9 +102,8 @@ SYMBOL: current-show
     [ restore-request store-current-show ] when* ;
 
 : show-final ( quot -- * )
-    [
-        >r store-current-show redirect-to-here r> call exit-with
-    ] with-scope ; inline
+    >r redirect-to-here store-current-show
+    r> call exit-with ; inline
 
 M: callback-responder call-responder
     [
@@ -122,49 +121,15 @@ M: callback-responder call-responder
     ] callcc1 >r 3drop r> ;
 
 : show-page ( quot -- )
+    >r redirect-to-here store-current-show r>
     [
-        >r store-current-show redirect-to-here r>
-        [
-            [ ] register-callback
-            call
-            exit-with
-        ] callcc1 restore-request
-    ] with-scope ; inline
+        [ ] register-callback
+        with-scope
+        exit-with
+    ] callcc1 restore-request ; inline
 
 : quot-id ( quot -- id )
     current-show get swap t register-callback ;
 
 : quot-url ( quot -- url )
     quot-id id>url ;
-
-! SYMBOL: current-show
-! 
-! : store-current-show ( -- )
-!   #! Store the current continuation in the variable 'current-show'
-!   #! so it can be returned to later by href callbacks. Note that it
-!   #! recalls itself when the continuation is called to ensure that
-!   #! it resets its value back to the most recent show call.
-!   [  ( 0 -- )
-!       [ ( 0 1 -- )
-!           current-show set ( 0 -- )
-!           continue
-!       ] callcc1
-!       nip
-!       store-current-show
-!   ] callcc0 ;
-! 
-
-! 
-! : show-final ( quot -- * )
-!     store-current-show
-!     redirect-to-here
-!     call
-!     exit-with ; inline
-! 
-! : show-page ( quot -- request )
-!     store-current-show redirect-to-here
-!     [
-!         register-continuation
-!         call
-!         exit-with
-!     ] callcc1 restore-request ; inline
