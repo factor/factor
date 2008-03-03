@@ -84,7 +84,7 @@ MEMO: table-column ( -- parser )
 
 MEMO: table-row ( -- parser )
     [
-        table-column "|" token hide list-of* ,
+        table-column "|" token hide list-of-many ,
     ] seq* [ "tr" surround-with-foo ] action ;
 
 MEMO: table ( -- parser )
