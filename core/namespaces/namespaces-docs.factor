@@ -179,8 +179,5 @@ HELP: %
 { $description "Appends a sequence to the end of the sequence being constructed by " { $link make } "." } ;
 
 HELP: init-namespaces
-{ $description "Resets the name stack to its initial state, holding a single copy of the global namespace. This word is called during startup and is rarely useful, except in certain situations such as the example below." }
-{ $examples
-    "You can use this word to spawn a new thread which does not inherit the parent thread's dynamic variable bindings:"
-    { $code "[ init-namestack do-some-work ] in-thread" }
-} ;
+{ $description "Resets the name stack to its initial state, holding a single copy of the global namespace." }
+$low-level-note ;

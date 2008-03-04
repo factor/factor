@@ -1,5 +1,5 @@
 ! Unit tests for vocabs.loader vocabulary
-IN: temporary
+IN: vocabs.loader.tests
 USING: vocabs.loader tools.test continuations vocabs math
 kernel arrays sequences namespaces io.streams.string
 parser source-files words assocs tuples definitions
@@ -31,7 +31,7 @@ IN: vocabs.loader.test.2
 
 MAIN: hello
 
-IN: temporary
+IN: vocabs.loader.tests
 
 [ { 3 3 3 } ] [
     "vocabs.loader.test.2" run

@@ -1,4 +1,4 @@
-IN: temporary
+IN: cpu.arm.assembler.tests
 USING: assembler-arm math test namespaces sequences kernel
 quotations ;
 

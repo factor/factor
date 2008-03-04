@@ -1,4 +1,4 @@
-IN: temporary
+IN: inference.transforms.tests
 USING: sequences inference.transforms tools.test math kernel
 quotations inference ;
 

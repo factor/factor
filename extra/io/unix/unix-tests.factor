@@ -1,15 +1,15 @@
-USING: io.files io.sockets io kernel threads namespaces
-tools.test continuations strings byte-arrays sequences
-prettyprint system ;
-IN: temporary
+USING: io.files io.sockets io kernel threads
+namespaces tools.test continuations strings byte-arrays
+sequences prettyprint system ;
+IN: io.unix.tests
 
 ! Unix domain stream sockets
-[
-    [
-        "unix-domain-socket-test" resource-path delete-file
-    ] ignore-errors
+: socket-server "unix-domain-socket-test" temp-file ;
 
-    "unix-domain-socket-test" resource-path <local>
+[
+    [ socket-server delete-file ] ignore-errors
+
+    socket-server <local>
     <server> [
         stdio get accept [
             "Hello world" print flush
@@ -17,14 +17,14 @@ IN: temporary
         ] with-stream
     ] with-stream
 
-    "unix-domain-socket-test" resource-path delete-file
-] in-thread
+    socket-server delete-file
+] "Test" spawn drop
 
 yield
 
 [ { "Hello world" "FOO" } ] [
     [
-        "unix-domain-socket-test" resource-path <local> <client>
+        socket-server <local> <client>
         [
             readln ,
             "XYZ" print flush
@@ -33,17 +33,16 @@ yield
     ] { } make
 ] unit-test
 
-! Unix domain datagram sockets
-[
-    "unix-domain-datagram-test" resource-path delete-file
-] ignore-errors
+: datagram-server "unix-domain-datagram-test" temp-file ;
+: datagram-client "unix-domain-datagram-test-2" temp-file ;
 
-: server-addr "unix-domain-datagram-test" resource-path <local> ;
-: client-addr "unix-domain-datagram-test-2" resource-path <local> ;
+! Unix domain datagram sockets
+[ datagram-server delete-file ] ignore-errors
+[ datagram-client delete-file ] ignore-errors
 
 [
     [
-        server-addr <datagram> "d" set
+        datagram-server <local> <datagram> "d" set
 
         "Receive 1" print
 
@@ -67,58 +66,53 @@ yield
 
         "Done" print
 
-        "unix-domain-datagram-test" resource-path delete-file
+        datagram-server delete-file
     ] with-scope
-] in-thread
+] "Test" spawn drop
 
 yield
 
-[
-    "unix-domain-datagram-test-2" resource-path delete-file
-] ignore-errors
+[ datagram-client delete-file ] ignore-errors
 
-client-addr <datagram>
+datagram-client <local> <datagram>
 "d" set
 
 [ ] [
     "hello" >byte-array
-    server-addr
+    datagram-server <local>
     "d" get send
 ] unit-test
 
 [ "olleh" t ] [
     "d" get receive
-    server-addr =
+    datagram-server <local> =
     >r >string r>
 ] unit-test
 
 [ ] [
     "hello" >byte-array
-    server-addr
+    datagram-server <local>
     "d" get send
 ] unit-test
 
 [ "hello world" t ] [
     "d" get receive
-    server-addr =
+    datagram-server <local> =
     >r >string r>
 ] unit-test
 
 [ ] [ "d" get dispose ] unit-test
 
 ! Test error behavior
+: another-datagram "unix-domain-datagram-test-3" temp-file ;
 
-[
-    "unix-domain-datagram-test-3" resource-path delete-file
-] ignore-errors
+[ another-datagram delete-file ] ignore-errors
 
-"unix-domain-datagram-test-2" resource-path delete-file
+datagram-client delete-file
 
-[ ] [ client-addr <datagram> "d" set ] unit-test
+[ ] [ datagram-client <local> <datagram> "d" set ] unit-test
 
-[
-    B{ 1 2 3 } "unix-domain-datagram-test-3" <local> "d" get send
-] must-fail
+[ B{ 1 2 3 } another-datagram <local> "d" get send ] must-fail
 
 [ ] [ "d" get dispose ] unit-test
 
@@ -126,7 +120,7 @@ client-addr <datagram>
 
 [ "d" get receive ] must-fail
 
-[ B{ 1 2 } server-addr "d" get send ] must-fail
+[ B{ 1 2 } datagram-server <local> "d" get send ] must-fail
 
 ! Invalid parameter tests
 
@@ -140,7 +134,7 @@ client-addr <datagram>
 
 [
     image [
-        B{ 1 2 } server-addr
+        B{ 1 2 } datagram-server <local>
         stdio get send
     ] with-file-reader
 ] must-fail

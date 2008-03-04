@@ -1,5 +1,5 @@
 USING: io.streams.duplex io kernel continuations tools.test ;
-IN: temporary
+IN: io.streams.duplex.tests
 
 ! Test duplex stream close behavior
 TUPLE: closing-stream closed? ;

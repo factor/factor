@@ -16,7 +16,7 @@ HELP: [|
 { $examples
     { $example
         "USE: locals"
-        ":: adder | n | [| m | m n + ] ;"
+        ":: adder ( n -- quot ) [| m | m n + ] ;"
         "3 5 adder call ."
         "8"
     }
@@ -29,7 +29,7 @@ HELP: [let
 { $examples
     { $example
         "USING: locals math.functions ;"
-        ":: frobnicate | n seq |"
+        ":: frobnicate ( n seq -- newseq )"
         "    [let | n' [ n 6 * ] |"
         "        seq [ n' gcd nip ] map ] ;"
         "6 { 36 14 } frobnicate ."
@@ -44,7 +44,7 @@ HELP: [wlet
 { $examples
     { $example
         "USE: locals"
-        ":: quuxify | n seq |"
+        ":: quuxify ( n seq -- newseq )"
         "    [wlet | add-n [| m | m n + ] |"
         "        seq [ add-n ] map ] ;"
         "2 { 1 2 3 } quuxify ."
@@ -57,13 +57,15 @@ HELP: with-locals
 { $description "Performs closure conversion of a lexically-scoped form. All nested sub-forms are converted. This word must be applied to a " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " or " { $link POSTPONE: [wlet } " used in an ordinary definition, however forms in " { $link POSTPONE: :: } " and " { $link POSTPONE: MACRO:: } " definitions are automatically closure-converted and there is no need to use this word." } ;
 
 HELP: ::
-{ $syntax ":: word | bindings... | body... ;" }
+{ $syntax ":: word ( bindings... -- outputs... ) body... ;" }
 { $description "Defines a word with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope. Any " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " or " { $link POSTPONE: [wlet } " forms used in the body of the word definition are automatically closure-converted." }
+{ $notes "The output names do not affect the word's behavior, however the compiler attempts to check the stack effect as with other definitions." }
 { $examples "See " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " and " { $link POSTPONE: [wlet } "." } ;
 
 HELP: MACRO::
-{ $syntax "MACRO:: word | bindings... | body... ;" }
-{ $description "Defines a macro with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope. Any " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " or " { $link POSTPONE: [wlet } " forms used in the body of the word definition are automatically closure-converted." } ;
+{ $syntax "MACRO:: word ( bindings... -- outputs... ) body... ;" }
+{ $description "Defines a macro with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope. Any " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " or " { $link POSTPONE: [wlet } " forms used in the body of the word definition are automatically closure-converted." }
+{ $notes "The output names do not affect the word's behavior, however the compiler attempts to check the stack effect as with other definitions." } ;
 
 { POSTPONE: MACRO: POSTPONE: MACRO:: } related-words
 
@@ -72,7 +74,7 @@ ARTICLE: "locals-mutable" "Mutable locals"
 $nl
 "Here is a example word which outputs a pair of quotations which increment and decrement an internal counter, and then return the new value. The quotations are closed over the counter and each invocation of the word yields new quotations with their unique internal counter:"
 { $code
-    ":: counter | |"
+    ":: counter ( -- )"
     "    [let | value! [ 0 ] |"
     "        [ value 1+ dup value! ]"
     "        [ value 1- dup value! ] ] ;"
@@ -86,7 +88,7 @@ ARTICLE: "locals-limitations" "Limitations of locals"
 $nl
 "Another limitation is that closure conversion does not descend into arrays, hashtables or other types of literals. For example, the following does not work:"
 { $code
-    ":: bad-cond-usage | a |"
+    ":: bad-cond-usage ( a -- ... )"
     "    { [ a 0 < ] [ ... ] }"
     "    { [ a 0 > ] [ ... ] }"
     "    { [ a 0 = ] [ ... ] } ;"

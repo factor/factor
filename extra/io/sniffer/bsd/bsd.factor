@@ -24,7 +24,7 @@ C: <sniffer-spec> sniffer-spec
 : IOC_INOUT      IOC_IN IOC_OUT bitor ; inline
 : IOC_DIRMASK    HEX: e0000000 ; inline
 
-:: ioc | inout group num len |
+:: ioc ( inout group num len -- n )
     group first 8 shift num bitor
     len IOCPARM_MASK bitand 16 shift bitor
     inout bitor ;

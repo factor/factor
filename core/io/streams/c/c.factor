@@ -64,7 +64,7 @@ M: object init-stdio
     stdin-handle stdout-handle <duplex-c-stream> stdio set-global
     stderr-handle <c-writer> <plain-writer> stderr set-global ;
 
-M: object io-multiplex (sleep) ;
+M: object io-multiplex 60 60 * 1000 * or (sleep) ;
 
 M: object <file-reader>
     "rb" fopen <c-reader> <line-reader> ;

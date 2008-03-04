@@ -26,7 +26,7 @@ HELP: fullscreen?
 
 HELP: find-window
 { $values { "quot" "a quotation with stack effect " { $snippet "( world -- ? )" } } { "world" "a " { $link world } " or " { $link f } } }
-{ $description "Finds a native window whose world satisfies the quotation, outputting " { $link f } " if no such world could be found. The front-most native window is checked first." } ;
+{ $description "Finds a native window such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting " { $link f } " if no such gadget could be found. The front-most native window is checked first." } ;
 
 HELP: register-window
 { $values { "world" world } { "handle" "a baackend-specific handle" } }
@@ -167,7 +167,7 @@ ARTICLE: "ui-backend-init" "UI initialization and the event loop"
 { $subsection start-ui }
 "The " { $link ui } " word must not return until the event loop has stopped and the UI has been shut down."
 $nl
-"The event loop must not block. Instead, it should poll for pending events, then call " { $link ui-step } ", which performs pending layout, runs timers and sleeps for 10 milliseconds, or until a Factor thread wakes up." ;
+"The event loop must not block, since otherwise other Factor threads and I/O will not run. Instead, it should poll for pending events, then call " { $link ui-wait } "." ;
 
 ARTICLE: "ui-backend-windows" "UI backend window management"
 "The high-level " { $link open-window } " word eventually calls a low-level word which you must implement:"
@@ -184,6 +184,10 @@ ARTICLE: "ui-backend-windows" "UI backend window management"
 { $subsection flush-gl-context }
 "If the user clicks the window's close box, you must call the following word:"
 { $subsection close-window } ;
+
+HELP: raise-window
+{ $values { "gadget" gadget } }
+{ $description "Makes the native window containing the given gadget the front-most window." } ;
 
 ARTICLE: "ui-layouts" "Gadget hierarchy and layouts"
 "A layout gadget is a gadget whose sole purpose is to contain other gadgets. Layout gadgets position and resize children according to a certain policy, taking the preferred size of the children into account. Gadget hierarchies are constructed by building up nested layouts."
@@ -364,7 +368,6 @@ $nl
 { $subsection "ui-paint" }
 { $subsection "ui-control-impl" }
 { $subsection "clipboard-protocol" }
-{ $subsection "timers" }
 { $see-also "ui-layout-impl" } ;
 
 ARTICLE: "ui" "UI framework"

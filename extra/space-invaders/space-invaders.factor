@@ -3,8 +3,9 @@
 !
 USING: cpu.8080 cpu.8080.emulator openal math alien.c-types
 sequences kernel shuffle arrays io.files combinators ui.gestures
-ui.gadgets ui.render opengl.gl system threads concurrency match
-ui byte-arrays combinators.lib ;
+ui.gadgets ui.render opengl.gl system match
+ui byte-arrays combinators.lib qualified ;
+QUALIFIED: threads
 IN: space-invaders
 
 TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap sounds looping? ;
@@ -337,7 +338,7 @@ M: space-invaders update-video ( value addr cpu -- )
 : sync-frame ( millis -- millis )
   #! Sleep until the time for the next frame arrives.
   1000 60 / >fixnum + millis - dup 0 >
-  [ sleep ] [ drop yield ] if millis ;
+  [ threads:sleep ] [ drop threads:yield ] if millis ;
 
 : invaders-process ( millis gadget -- )
   #! Run a space invaders gadget inside a 
@@ -353,9 +354,10 @@ M: space-invaders update-video ( value addr cpu -- )
   ] if ;
 
 M: invaders-gadget graft* ( gadget -- )
- dup invaders-gadget-cpu init-sounds
- [ f swap set-invaders-gadget-quit? ] keep
- [ millis swap invaders-process ] spawn 2drop ;
+  dup invaders-gadget-cpu init-sounds
+  f over set-invaders-gadget-quit?
+  [ millis swap invaders-process ] curry
+  "Space invaders" threads:spawn drop ;
 
 M: invaders-gadget ungraft* ( gadget -- )
  t swap set-invaders-gadget-quit? ;

@@ -18,8 +18,9 @@ IN: sequences.lib
 
 : map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
 
-MACRO: nfirst ( n -- )
-    [ [ swap nth ] curry [ keep ] curry ] map concat [ drop ] compose ;
+MACRO: firstn ( n -- )
+    [ [ swap nth ] curry
+    [ keep ] curry ] map concat [ drop ] compose ;
 
 : prepare-index ( seq quot -- seq n quot )
     >r dup length r> ; inline
@@ -181,6 +182,14 @@ PRIVATE>
 : ?first2 ( seq -- 1st/f 2nd/f ) dup ?first swap ?second ; inline
 : ?first3 ( seq -- 1st/f 2nd/f 3rd/f ) dup ?first2 rot ?third ; inline
 : ?first4 ( seq -- 1st/f 2nd/f 3rd/f 4th/f ) dup ?first3 roll ?fourth ; inline
+
+USE: continuations
+: ?subseq ( from to seq -- subseq )
+    >r >r 0 max r> r>
+    [ length tuck min >r min r> ] keep subseq ;
+
+: ?head* ( seq n -- seq/f ) (head) ?subseq ;
+: ?tail* ( seq n -- seq/f ) (tail) ?subseq ;
 
 : accumulator ( quot -- quot vec )
     V{ } clone [ [ push ] curry compose ] keep ;

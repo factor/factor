@@ -2,8 +2,8 @@ USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
-continuations generic compiler.units ;
-IN: temporary
+continuations generic compiler.units tools.walker ;
+IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
 [ "1.0" ] [ 1.0 unparse ] unit-test
@@ -67,18 +67,18 @@ unit-test
 [ "[ \\ [ ]" ] [ [ \ [ ] unparse ] unit-test
     
 [ t ] [
-    100 \ dup <array> [ pprint-short ] with-string-writer
+    100 \ dup <array> unparse-short
     "{" head?
 ] unit-test
 
 : foo ( a -- b ) dup * ; inline
 
-[ "USING: kernel math ;\nIN: temporary\n: foo ( a -- b ) dup * ; inline\n" ]
+[ "USING: kernel math ;\nIN: prettyprint.tests\n: foo ( a -- b ) dup * ; inline\n" ]
 [ [ \ foo see ] with-string-writer ] unit-test
 
 : bar ( x -- y ) 2 + ;
 
-[ "USING: math ;\nIN: temporary\n: bar ( x -- y ) 2 + ;\n" ]
+[ "USING: math ;\nIN: prettyprint.tests\n: bar ( x -- y ) 2 + ;\n" ]
 [ [ \ bar see ] with-string-writer ] unit-test
 
 : blah 
@@ -115,28 +115,28 @@ unit-test
         [
             [ parse-fresh drop ] with-compilation-unit
             [
-                "temporary" lookup see
+                "prettyprint.tests" lookup see
             ] with-string-writer "\n" split 1 head*
         ] keep =
     ] with-scope ;
 
 : method-test
     {
-        "IN: temporary"
+        "IN: prettyprint.tests"
         "GENERIC: method-layout"
         ""
-        "USING: math temporary ;"
+        "USING: math prettyprint.tests ;"
         "M: complex method-layout"
         "    \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\""
         "    ;"
         ""
-        "USING: math temporary ;"
+        "USING: math prettyprint.tests ;"
         "M: fixnum method-layout ;"
         ""
-        "USING: math temporary ;"
+        "USING: math prettyprint.tests ;"
         "M: integer method-layout ;"
         ""
-        "USING: kernel temporary ;"
+        "USING: kernel prettyprint.tests ;"
         "M: object method-layout ;"
     } ;
 
@@ -147,7 +147,7 @@ unit-test
 : retain-stack-test
     {
         "USING: io kernel sequences words ;"
-        "IN: temporary"
+        "IN: prettyprint.tests"
         ": retain-stack-layout ( x -- )"
         "    dup stream-readln stream-readln"
         "    >r [ define ] map r>"
@@ -161,7 +161,7 @@ unit-test
 : soft-break-test
     {
         "USING: kernel math sequences strings ;"
-        "IN: temporary"
+        "IN: prettyprint.tests"
         ": soft-break-layout ( x y -- ? )"
         "    over string? ["
         "        over hashcode over hashcode number="
@@ -176,7 +176,7 @@ unit-test
 : another-retain-layout-test
     {
         "USING: kernel sequences ;"
-        "IN: temporary"
+        "IN: prettyprint.tests"
         ": another-retain-layout ( seq1 seq2 quot -- newseq )"
         "    -rot 2dup dupd min-length [ each drop roll ] map"
         "    >r 3drop r> ; inline"
@@ -189,7 +189,7 @@ unit-test
 : another-soft-break-test
     {
         "USING: namespaces parser sequences ;"
-        "IN: temporary"
+        "IN: prettyprint.tests"
         ": another-soft-break-layout ( node -- quot )"
         "    parse-error-file"
         "    [ <reversed> \"hello world foo\" add ] [ ] make ;"
@@ -203,7 +203,7 @@ unit-test
 : string-layout
     {
         "USING: io kernel parser ;"
-        "IN: temporary"
+        "IN: prettyprint.tests"
         ": string-layout-test ( error -- )"
         "    \"Expected \" write dup unexpected-want expected>string write"
         "    \" but got \" write unexpected-got expected>string print ;"
@@ -224,7 +224,7 @@ unit-test
 : final-soft-break-test
     {
         "USING: kernel sequences ;"
-        "IN: temporary"
+        "IN: prettyprint.tests"
         ": final-soft-break-layout ( class dim -- view )"
         "    >r \"alloc\" send 0 0 r>"
         "    first2 <NSRect>"
@@ -240,7 +240,7 @@ unit-test
 : narrow-test
     {
         "USING: arrays combinators continuations kernel sequences ;"
-        "IN: temporary"
+        "IN: prettyprint.tests"
         ": narrow-layout ( obj -- )"
         "    {"
         "        { [ dup continuation? ] [ append ] }"
@@ -255,7 +255,7 @@ unit-test
 
 : another-narrow-test
     {
-        "IN: temporary"
+        "IN: prettyprint.tests"
         ": another-narrow-layout ( -- obj )"
         "    H{"
         "        { 1 2 }"
@@ -274,13 +274,13 @@ unit-test
 
 : class-see-test
     {
-        "IN: temporary"
+        "IN: prettyprint.tests"
         "TUPLE: class-see-layout ;"
         ""
-        "IN: temporary"
+        "IN: prettyprint.tests"
         "GENERIC: class-see-layout ( x -- y )"
         ""
-        "USING: temporary ;"
+        "USING: prettyprint.tests ;"
         "M: class-see-layout class-see-layout ;"
     } ;
 
@@ -292,34 +292,26 @@ unit-test
 
 ! Regression
 [ t ] [
-    "IN: temporary\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
+    "IN: prettyprint.tests\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
     dup eval
-    "generic-decl-test" "temporary" lookup
+    "generic-decl-test" "prettyprint.tests" lookup
     [ see ] with-string-writer =
 ] unit-test
 
 [ [ + ] ] [
-    [ \ + (step-into) ] (remove-breakpoints)
+    [ \ + (step-into-execute) ] (remove-breakpoints)
 ] unit-test
 
-[ [ (step-into) ] ] [
-    [ (step-into) ] (remove-breakpoints)
-] unit-test
-
-[ [ 3 ] ] [
-    [ 3 (step-into) ] (remove-breakpoints)
+[ [ (step-into-execute) ] ] [
+    [ (step-into-execute) ] (remove-breakpoints)
 ] unit-test
 
 [ [ 2 2 + . ] ] [
-    [ 2 2 \ + (step-into) . ] (remove-breakpoints)
+    [ 2 2 \ + (step-into-execute) . ] (remove-breakpoints)
 ] unit-test
 
 [ [ 2 2 + . ] ] [
-    [ 2 break 2 \ + (step-into) . ] (remove-breakpoints)
-] unit-test
-
-[ [ 2 . ] ] [
-    [ 2 \ break (step-into) . ] (remove-breakpoints)
+    [ 2 break 2 \ + (step-into-execute) . ] (remove-breakpoints)
 ] unit-test
 
 [ ] [ 1 \ + curry unparse drop ] unit-test

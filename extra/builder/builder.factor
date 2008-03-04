@@ -1,18 +1,13 @@
 
 USING: kernel namespaces sequences splitting system combinators continuations
        parser io io.files io.launcher io.sockets prettyprint threads
-       bootstrap.image benchmark vars bake smtp builder.util accessors ;
+       bootstrap.image benchmark vars bake smtp builder.util accessors
+       calendar
+       builder.common
+       builder.benchmark
+       builder.release ;
 
 IN: builder
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: builds-dir
-
-: builds ( -- path )
-  builds-dir get
-  home "/builds" append
-  or ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -31,8 +26,6 @@ SYMBOL: builds-dir
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-VAR: stamp
-
 : enter-build-dir ( -- )
   datestamp >stamp
   builds cd
@@ -46,31 +39,30 @@ VAR: stamp
 
 : record-git-id ( -- ) git-id "../git-id" [ . ] with-file-writer ;
 
-: make-clean ( -- desc ) { "make" "clean" } ;
+: do-make-clean ( -- desc ) { "make" "clean" } try-process ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: target ( -- target ) { os [ cpu "." split ] } to-strings "-" join ;
 
 : make-vm ( -- desc )
   <process*>
-    { "make" target } to-strings >>arguments
-    "../compile-log"             >>stdout
-    +stdout+                     >>stderr
+    { "make" }       >>arguments
+    "../compile-log" >>stdout
+    +stdout+         >>stderr
   >desc ;
+
+: do-make-vm ( -- )
+  make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: factor-binary ( -- name )
-  os
-  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
-    { "winnt"  [ "./factor-nt.exe" ] }
-    [ drop       "./factor" ] }
-  case ;
+: copy-image ( -- )
+  builds "factor" path+ my-boot-image-name path+ ".." copy-file-into
+  builds "factor" path+ my-boot-image-name path+ "."  copy-file-into ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : bootstrap-cmd ( -- cmd )
-  { factor-binary [ "-i=" my-boot-image-name append ] "-no-user-init" }
-  to-strings ;
+  { "./factor" { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
 
 : bootstrap ( -- desc )
   <process*>
@@ -78,11 +70,27 @@ VAR: stamp
     +closed+      >>stdin
     "../boot-log" >>stdout
     +stdout+      >>stderr
-    20 minutes>ms >>timeout
+    20 minutes    >>timeout
   >desc ;
 
-: builder-test ( -- desc ) { factor-binary "-run=builder.test" } to-strings ;
-  
+: do-bootstrap ( -- )
+  bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail ;
+
+: builder-test-cmd ( -- cmd )
+  { "./factor" "-run=builder.test" } to-strings ;
+
+: builder-test ( -- desc )
+  <process*>
+    builder-test-cmd >>arguments
+    +closed+         >>stdin
+    "../test-log"    >>stdout
+    +stdout+         >>stderr
+    45 minutes       >>timeout
+  >desc ;
+
+: do-builder-test ( -- )
+  builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: build-status
@@ -95,42 +103,48 @@ SYMBOL: build-status
 
   enter-build-dir
 
-  "report" [
+  "report"
+    [
+      "Build machine:   " write host-name print
+      "CPU:             " write cpu       print
+      "OS:              " write os        print
+      "Build directory: " write cwd       print
 
-    "Build machine:   " write host-name print
-    "CPU:             " write cpu       print
-    "OS:              " write os        print
-    "Build directory: " write cwd       print nl
+      git-clone [ "git clone failed" print ] run-or-bail
 
-    git-clone [ "git clone failed" print ] run-or-bail
+      "factor"
+        [
+          record-git-id
+          do-make-clean
+          do-make-vm
+          copy-image
+          do-bootstrap
+          do-builder-test
+        ]
+      with-directory
 
-    "factor" cd
+      "test-log" delete-file
 
-    record-git-id
+      "git id:          " write "git-id" eval-file print nl
 
-    make-clean run-process drop
+      "Boot time: " write "boot-time" eval-file milli-seconds>time print
+      "Load time: " write "load-time" eval-file milli-seconds>time print
+      "Test time: " write "test-time" eval-file milli-seconds>time print nl
 
-    make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
+      "Did not pass load-everything: " print "load-everything-vocabs" cat
+      "Did not pass test-all: "        print "test-all-vocabs"        cat
 
-    [ retrieve-image ] [ "Image download error" print throw ] recover
+      "Benchmarks: " print "benchmarks" eval-file benchmarks.
 
-    bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
+      nl
 
-    [ builder-test try-process ]
-    [ "Builder test error" print throw ]
-    recover
+      show-benchmark-deltas
 
-    "Boot time: " write "../boot-time" eval-file milli-seconds>time print
-    "Load time: " write "../load-time" eval-file milli-seconds>time print
-    "Test time: " write "../test-time" eval-file milli-seconds>time print nl
+      "benchmarks" ".." copy-file-into
 
-    "Did not pass load-everything: " print "../load-everything-vocabs" cat
-    "Did not pass test-all: "        print "../test-all-vocabs"        cat
-
-    "Benchmarks: " print
-    "../benchmarks" [ stdio get contents eval ] with-file-reader benchmarks.
-
-  ] with-file-writer
+      maybe-release
+    ]
+  with-file-writer
 
   build-status on ;
 
@@ -149,14 +163,24 @@ SYMBOL: builder-recipients
     builder-from get        >>from
     builder-recipients get  >>to
     subject                 >>subject
-    "../report" file>string >>body
+    "./report" file>string >>body
   send ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: compress-image ( -- )
+  { "bzip2" my-boot-image-name } to-strings run-process drop ;
+
 : build ( -- )
-  [ (build) ] [ drop ] recover
-  [ send-builder-email ] [ drop "not sending mail" . ] recover ;
+  [ (build) ] failsafe
+  builds cd stamp> cd
+  [ send-builder-email ] [ drop "not sending mail" . ] recover
+  { "rm" "-rf" "factor" } run-process drop
+  [ compress-image ] failsafe ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USE: bootstrap.image.download
 
 : git-pull ( -- desc )
   {
@@ -173,17 +197,22 @@ SYMBOL: builder-recipients
   git-id
   = not ;
 
+: new-image-available? ( -- ? )
+  my-boot-image-name need-new-image?
+    [ download-my-image t ]
+    [ f ]
+  if ;
+
 : build-loop ( -- )
   builds-check
   [
     builds "/factor" append cd
-    updates-available?
+    updates-available? new-image-available? or
       [ build ]
     when
   ]
-  [ drop ]
-  recover
-  5 minutes>ms sleep
+  failsafe
+  5 minutes sleep
   build-loop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

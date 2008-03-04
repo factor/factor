@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays destructors io io.backend
 io.buffers io.files io.nonblocking io.sockets io.binary
-io.sockets.impl windows.errors strings io.streams.duplex kernel
-math namespaces sequences windows windows.kernel32
+io.sockets.impl windows.errors strings io.streams.duplex
+kernel math namespaces sequences windows windows.kernel32
 windows.shell32 windows.types windows.winsock splitting
 continuations math.bitfields ;
 IN: io.windows
@@ -28,7 +28,7 @@ HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )
 
 M: windows-io normalize-directory ( string -- string )
-    "\\" ?tail drop "\\*" append ;
+    normalize-pathname "\\" ?tail drop "\\*" append ;
 
 : share-mode ( -- fixnum )
     {
@@ -121,7 +121,7 @@ M: windows-io <file-writer> ( path -- stream )
 M: windows-io <file-appender> ( path -- stream )
     open-append <win32-file> <writer> ;
 
-M: windows-io rename-file ( from to -- )
+M: windows-io move-file ( from to -- )
     [ normalize-pathname ] 2apply MoveFile win32-error=0/f ;
 
 M: windows-io delete-file ( path -- )

@@ -32,7 +32,7 @@ SYMBOL: old-d
     old-c c update-old-new
     old-d d update-old-new ;
 
-:: (ABCD) | x s i k func a b c d |
+:: (ABCD) ( x s i k func a b c d -- )
     #! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
     a [
         b get c get d get func call w+

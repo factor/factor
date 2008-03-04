@@ -1,5 +1,5 @@
 USING: kernel io strings sequences namespaces math parser crypto.hmac tools.test ;
-IN: temporary
+IN: crypto.hmac.tests
 
 [ "\u000092\u000094rz68\u0000bb\u00001c\u000013\u0000f4\u00008e\u0000f8\u000015\u00008b\u0000fc\u00009d" ] [ 16 11 <string> "Hi There" string>md5-hmac >string ] unit-test
 [ "u\u00000cx>j\u0000b0\u0000b5\u000003\u0000ea\u0000a8n1\n]\u0000b78" ] [ "Jefe" "what do ya want for nothing?" string>md5-hmac >string ] unit-test

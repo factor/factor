@@ -53,7 +53,7 @@ M: inet4 make-sockaddr ( inet -- sockaddr )
 
 SYMBOL: port-override
 
-: (port) port-override get [ ] [ ] ?if ;
+: (port) port-override get swap or ;
 
 M: inet4 parse-sockaddr
     >r dup sockaddr-in-addr <uint> r> inet-ntop

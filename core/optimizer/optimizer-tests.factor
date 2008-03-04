@@ -1,9 +1,9 @@
-USING: arrays compiler generic hashtables inference kernel
+USING: arrays compiler.units generic hashtables inference kernel
 kernel.private math optimizer prettyprint sequences sbufs
 strings tools.test vectors words sequences.private quotations
 optimizer.backend classes inference.dataflow tuples.private
 continuations growable optimizer.inlining namespaces hints ;
-IN: temporary
+IN: optimizer.tests
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
     H{ { 1 2 } { 3 4 } } H{ { 2 5 } } union*

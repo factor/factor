@@ -4,7 +4,7 @@ USING: namespaces sequences io.files kernel assocs words vocabs
 definitions parser continuations inspector debugger io io.styles
 io.streams.lines hashtables sorting prettyprint source-files
 arrays combinators strings system math.parser compiler.errors
-splitting ;
+splitting init ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -153,16 +153,18 @@ SYMBOL: load-help?
     [ load-error. nl ] each ;
 
 SYMBOL: blacklist
+SYMBOL: failures
 
 : require-all ( vocabs -- failures )
     [
         V{ } clone blacklist set
+        V{ } clone failures set
         [
             [ require ]
-            [ >r vocab-name r> 2array blacklist get push ]
+            [ swap vocab-name failures get set-at ]
             recover
         ] each
-        blacklist get
+        failures get
     ] with-compiler-errors ;
 
 : do-refresh ( modified-sources modified-docs -- )
@@ -173,15 +175,25 @@ SYMBOL: blacklist
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 
-: refresh-all ( -- ) "" refresh ;
+SYMBOL: sources-changed?
+
+[ t sources-changed? set-global ] "vocabs.loader" add-init-hook
+
+: refresh-all ( -- )
+    "" refresh f sources-changed? set-global ;
 
 GENERIC: (load-vocab) ( name -- vocab )
-!
+
+: add-to-blacklist ( error vocab -- )
+    vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
+
 M: vocab (load-vocab)
-    dup vocab-root [
-        dup vocab-source-loaded? [ dup load-source ] unless
-        dup vocab-docs-loaded? [ dup load-docs ] unless
-    ] when ;
+    [
+        dup vocab-root [
+            dup vocab-source-loaded? [ dup load-source ] unless
+            dup vocab-docs-loaded? [ dup load-docs ] unless
+        ] when
+    ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
 M: string (load-vocab)
     [ ".private" ?tail drop reload ] keep vocab ;
@@ -189,24 +201,14 @@ M: string (load-vocab)
 M: vocab-link (load-vocab)
     vocab-name (load-vocab) ;
 
-TUPLE: blacklisted-vocab name ;
-
-: blacklisted-vocab ( name -- * )
-    \ blacklisted-vocab construct-boa throw ;
-
-M: blacklisted-vocab error.
-    "This vocabulary depends on the " write
-    blacklisted-vocab-name write
-    " vocabulary which failed to load" print ;
-
 [
-    dup vocab-name blacklist get key? [
-        vocab-name blacklisted-vocab
+    dup vocab-name blacklist get at* [
+        rethrow
     ] [
-        [
-            dup vocab [ ] [ ] ?if (load-vocab)
-        ] with-compiler-errors
+        drop
+        [ dup vocab swap or (load-vocab) ] with-compiler-errors
     ] if
+
 ] load-vocab-hook set-global
 
 : vocab-where ( vocab -- loc )

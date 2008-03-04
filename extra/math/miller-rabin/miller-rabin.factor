@@ -30,7 +30,7 @@ TUPLE: positive-even-expected n ;
     #! factor an integer into s * 2^r
     0 swap (factor-2s) ;
 
-:: (miller-rabin) | n prime?! |
+:: (miller-rabin) ( n prime?! -- ? )
     n 1- factor-2s s set r set
     trials get [
         n 1- [1,b] random a set

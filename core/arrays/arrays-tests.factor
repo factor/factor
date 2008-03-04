@@ -1,6 +1,6 @@
 USING: arrays kernel sequences sequences.private growable
 tools.test vectors layouts system math vectors.private ;
-IN: temporary
+IN: arrays.tests
 
 [ -2 { "a" "b" "c" } nth ] must-fail
 [ 10 { "a" "b" "c" } nth ] must-fail

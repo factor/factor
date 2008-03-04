@@ -178,7 +178,7 @@ M: world client-event
         next-event dup
         None XFilterEvent zero? [ drop wait-event ] unless
     ] [
-        ui-step 10 sleep wait-event
+        ui-wait wait-event
     ] if ;
 
 : do-events ( -- )
@@ -235,7 +235,7 @@ M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
     world-handle x11-handle-window dup set-closable map-window ;
 
-M: x11-ui-backend raise-window ( world -- )
+M: x11-ui-backend raise-window* ( world -- )
     world-handle [
         dpy get swap x11-handle-window XRaiseWindow drop
     ] when* ;

@@ -1,6 +1,6 @@
 USING: xmode.tokens xmode.catalog
 xmode.marker tools.test kernel ;
-IN: temporary
+IN: xmode.marker.tests
 
 [
     {

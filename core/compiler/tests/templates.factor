@@ -4,7 +4,7 @@ hashtables.private math.private namespaces sequences
 sequences.private tools.test namespaces.private slots.private
 sequences.private byte-arrays alien alien.accessors layouts
 words definitions compiler.units io combinators ;
-IN: temporary
+IN: compiler.tests
 
 ! Oops!
 [ 5000 ] [ [ 5000 ] compile-call ] unit-test

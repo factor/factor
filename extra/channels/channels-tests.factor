@@ -3,7 +3,7 @@
 !
 USING: kernel tools.test math channels channels.private 
 sequences threads sorting ;
-IN: temporary
+IN: channels.tests
 
 { V{ 10 } } [
     V{ } clone <channel>

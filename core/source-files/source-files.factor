@@ -68,7 +68,10 @@ uses definitions ;
 : reset-checksums ( -- )
     source-files get [
         swap ?resource-path dup exists?
-        [ file-lines swap record-checksum ] [ 2drop ] if
+        [
+            over record-modified
+            file-lines swap record-checksum
+        ] [ 2drop ] if
     ] assoc-each ;
 
 M: pathname where pathname-string 1 2array ;
@@ -97,16 +100,8 @@ SYMBOL: file
         [ ] [ file get rollback-source-file ] cleanup
     ] with-scope ; inline
 
-: smart-usage ( word -- definitions )
-    \ f or usage [
-        dup method-body? [
-            "method" word-prop
-            { method-specializer method-generic } get-slots
-            2array
-        ] when
-    ] map ;
-
 : outside-usages ( seq -- usages )
     dup [
-        over smart-usage [ pathname? not ] subset seq-diff
+        over usage
+        [ dup pathname? not swap where and ] subset seq-diff
     ] curry { } map>assoc ;

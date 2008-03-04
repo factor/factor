@@ -1,4 +1,4 @@
-IN: temporary
+IN: inference.class.tests
 USING: arrays math.private kernel math compiler inference
 inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien
@@ -288,3 +288,10 @@ cell-bits 32 = [
     [ HEX: ff bitand 0 HEX: ff between? ]
     \ >= inlined?
 ] unit-test
+
+[ t ] [
+    [ HEX: ff swap HEX: ff bitand >= ]
+    \ >= inlined?
+] unit-test
+
+

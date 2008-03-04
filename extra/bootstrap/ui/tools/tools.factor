@@ -7,4 +7,6 @@ USING: kernel vocabs vocabs.loader sequences system ;
     "ui.cocoa" vocab [
         "ui.cocoa.tools" require
     ] when
+
+    "ui.tools.walker" require
 ] when

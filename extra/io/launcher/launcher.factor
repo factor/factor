@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.backend io.timeouts system kernel namespaces
-strings hashtables sequences assocs combinators vocabs.loader
-init threads continuations math ;
+USING: io io.backend io.nonblocking io.streams.duplex
+io.timeouts system kernel namespaces strings hashtables
+sequences assocs combinators vocabs.loader init threads
+continuations math ;
 IN: io.launcher
 
 ! Non-blocking process exit notification facility
@@ -10,14 +11,14 @@ SYMBOL: processes
 
 [ H{ } clone processes set-global ] "io.launcher" add-init-hook
 
-TUPLE: process handle status killed? lapse ;
+TUPLE: process handle status killed? timeout ;
 
 HOOK: register-process io-backend ( process -- )
 
 M: object register-process drop ;
 
 : <process> ( handle -- process )
-    f f <lapse> process construct-boa
+    f f f process construct-boa
     V{ } clone over processes get set-at
     dup register-process ;
 
@@ -83,7 +84,10 @@ HOOK: run-process* io-backend ( desc -- handle )
 : wait-for-process ( process -- status )
     [
         dup process-handle
-        [ dup [ processes get at push stop ] curry callcc0 ] when
+        [
+            dup [ processes get at push ] curry
+            "process" suspend drop
+        ] when
         dup process-killed?
         [ "Process was killed" throw ] [ process-status ] if
     ] with-timeout ;
@@ -112,7 +116,9 @@ HOOK: kill-process* io-backend ( handle -- )
     t over set-process-killed?
     process-handle [ kill-process* ] when* ;
 
-M: process get-lapse process-lapse ;
+M: process timeout process-timeout ;
+
+M: process set-timeout set-process-timeout ;
 
 M: process timed-out kill-process ;
 
@@ -134,5 +140,14 @@ TUPLE: process-stream process ;
 
 : notify-exit ( status process -- )
     [ set-process-status ] keep
-    [ processes get delete-at* drop [ schedule-thread ] each ] keep
+    [ processes get delete-at* drop [ resume ] each ] keep
     f swap set-process-handle ;
+
+GENERIC: underlying-handle ( stream -- handle )
+
+M: port underlying-handle port-handle ;
+
+M: duplex-stream underlying-handle
+    dup duplex-stream-in underlying-handle
+    swap duplex-stream-out underlying-handle tuck =
+    [ "Invalid duplex stream" throw ] when ;

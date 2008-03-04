@@ -1,15 +1,14 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs debugger ui.tools.workspace
-ui.tools.operations ui.tools.browser ui.tools.inspector
-ui.tools.listener ui.tools.profiler ui.tools.walker
+ui.tools.operations ui.tools.traceback ui.tools.browser
+ui.tools.inspector ui.tools.listener ui.tools.profiler
 ui.tools.operations inspector io kernel math models namespaces
 prettyprint quotations sequences ui ui.commands ui.gadgets
-ui.gadgets.books ui.gadgets.buttons
-ui.gadgets.labelled ui.gadgets.scrollers ui.gadgets.tracks
-ui.gadgets.worlds ui.gadgets.presentations ui.gestures words
-vocabs.loader tools.test ui.gadgets.buttons
-ui.gadgets.status-bar mirrors ;
+ui.gadgets.books ui.gadgets.buttons ui.gadgets.labelled
+ui.gadgets.scrollers ui.gadgets.tracks ui.gadgets.worlds
+ui.gadgets.presentations ui.gestures words vocabs.loader
+tools.test ui.gadgets.buttons ui.gadgets.status-bar mirrors ;
 IN: ui.tools
 
 : <workspace-tabs> ( -- tabs )
@@ -23,7 +22,6 @@ IN: ui.tools
         <stack-display> ,
         <browser-gadget> ,
         <inspector-gadget> ,
-        <walker> ,
         <profiler-gadget> ,
     ] { } make g gadget-model <book> ;
 
@@ -62,15 +60,12 @@ M: workspace model-changed
 
 : com-inspector inspector-gadget select-tool ;
 
-: com-walker walker select-tool ;
-
 : com-profiler profiler-gadget select-tool ;
 
 workspace "tool-switching" f {
     { T{ key-down f { A+ } "1" } com-listener }
     { T{ key-down f { A+ } "2" } com-browser }
     { T{ key-down f { A+ } "3" } com-inspector }
-    { T{ key-down f { A+ } "4" } com-walker }
     { T{ key-down f { A+ } "5" } com-profiler }
 } define-command-map
 
@@ -87,5 +82,13 @@ workspace "workflow" f {
 } define-command-map
 
 [
-    <workspace> "Factor workspace" open-status-window
+    <workspace> dup "Factor workspace" open-status-window
 ] workspace-window-hook set-global
+
+: inspect-continuation ( traceback -- )
+    control-value [ inspect ] curry call-listener ;
+
+traceback-gadget "toolbar" f {
+    { T{ key-down f f "v" } variables }
+    { T{ key-down f f "n" } inspect-continuation }
+} define-command-map

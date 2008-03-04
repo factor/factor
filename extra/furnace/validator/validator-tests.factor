@@ -1,4 +1,4 @@
-IN: temporary
+IN: furnace.validator.tests
 USING: kernel sequences tools.test furnace.validator furnace ;
 
 [

@@ -1,45 +1,52 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators continuations documents
-ui.tools.workspace hashtables io io.styles kernel math
+ hashtables io io.styles kernel math
 math.vectors models namespaces parser prettyprint quotations
-sequences sequences.lib strings threads listener tuples
-ui.commands ui.gadgets ui.gadgets.editors
+sequences sequences.lib strings threads listener
+tuples ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
-definitions ;
+definitions boxes calendar concurrency.flags ui.tools.workspace ;
 IN: ui.tools.interactor
 
-TUPLE: interactor
-history output
-continuation quot busy?
-help ;
+TUPLE: interactor history output flag thread help ;
+
+: interactor-continuation ( interactor -- continuation )
+    interactor-thread box-value
+    thread-continuation box-value ;
+
+: interactor-busy? ( interactor -- ? )
+    interactor-thread box-full? not ;
 
 : interactor-use ( interactor -- seq )
-    use swap
-    interactor-continuation continuation-name
-    assoc-stack ;
+    dup interactor-busy? [ drop f ] [
+        use swap
+        interactor-continuation continuation-name
+        assoc-stack
+    ] if ;
 
 : init-caret-help ( interactor -- )
-    dup editor-caret 100 <delay> swap set-interactor-help ;
+    dup editor-caret 1/3 seconds <delay>
+    swap set-interactor-help ;
 
 : init-interactor-history ( interactor -- )
     V{ } clone swap set-interactor-history ;
+
+: init-interactor-state ( interactor -- )
+    <flag> over set-interactor-flag
+    <box> swap set-interactor-thread ;
 
 : <interactor> ( output -- gadget )
     <source-editor>
     interactor construct-editor
     tuck set-interactor-output
     dup init-interactor-history
+    dup init-interactor-state
     dup init-caret-help ;
 
 M: interactor graft*
     dup delegate graft*
-    dup dup interactor-help add-connection
-    f swap set-interactor-busy? ;
-
-M: interactor ungraft*
-    dup dup interactor-help remove-connection
-    delegate ungraft* ;
+    dup interactor-help add-connection ;
 
 : word-at-loc ( loc interactor -- word )
     over [
@@ -69,17 +76,16 @@ M: interactor model-changed
     over empty? [ 2drop ] [ interactor-history push-new ] if ;
 
 : interactor-continue ( obj interactor -- )
-    t over set-interactor-busy?
-    interactor-continuation schedule-thread-with ;
+    interactor-thread box> resume-with ;
 
 : clear-input ( interactor -- ) gadget-model clear-doc ;
 
 : interactor-finish ( interactor -- )
-    #! The in-thread is a kludge to make it infer. Stupid.
+    #! The spawn is a kludge to make it infer. Stupid.
     [ editor-string ] keep
     [ interactor-input. ] 2keep
     [ add-interactor-history ] keep
-    [ clear-input ] curry in-thread ;
+    [ clear-input ] curry "Clearing input" spawn drop ;
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
@@ -88,14 +94,14 @@ M: interactor model-changed
 
 : evaluate-input ( interactor -- )
     dup interactor-busy? [
-        [
-            [ control-value ] keep interactor-continue
-        ] in-thread
+        dup control-value over interactor-continue
     ] unless drop ;
 
 : interactor-yield ( interactor -- obj )
-    f over set-interactor-busy?
-    [ set-interactor-continuation stop ] curry callcc1 ;
+    [
+        [ interactor-thread >box ] keep
+        interactor-flag raise-flag
+    ] curry "input" suspend ;
 
 M: interactor stream-readln
     [ interactor-yield ] keep interactor-finish ?first ;
@@ -129,7 +135,7 @@ M: interactor stream-read-partial
     [
         drop parse-lines-interactive
     ] [
-        >r f swap set-interactor-busy? drop r>
+        2nip
         dup delegate unexpected-eof? [ drop f ] when
     ] recover ;
 

@@ -35,6 +35,9 @@ SYMBOL: edit-hook
 : edit ( defspec -- )
     where [ first2 edit-location ] when* ;
 
+: edit-vocab ( name -- )
+    vocab-source-path 1 edit-location ;
+
 : :edit ( -- )
     error get delegates [ parse-error? ] find-last nip [
         dup parse-error-file source-file-path ?resource-path
@@ -43,7 +46,7 @@ SYMBOL: edit-hook
 
 : fix ( word -- )
     "Fixing " write dup pprint " and all usages..." print nl
-    dup smart-usage swap add* [
+    dup usage swap add* [
         "Editing " write dup .
         "RETURN moves on to the next usage, C+d stops." print
         flush
