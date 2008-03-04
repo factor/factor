@@ -1,24 +1,20 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io kernel memoize namespaces peg
-peg.ebnf sequences strings html.elements xml.entities
-xmode.code2html splitting io.streams.string html
-html.elements sequences.deep ascii ;
-! unicode.categories ;
-USE: tools.walker
+USING: arrays io kernel memoize namespaces peg sequences strings
+html.elements xml.entities xmode.code2html splitting
+io.streams.string html peg.parsers html.elements sequences.deep
+unicode.categories ;
 IN: farkup
 
-MEMO: any-char ( -- parser ) [ drop t ] satisfy ;
-
 : delimiters ( -- string )
-    "*_^~%=[-|\\\n" ; inline
+    "*_^~%[-=|\\\n" ; inline
 
 MEMO: text ( -- parser )
     [ delimiters member? not ] satisfy repeat1
     [ >string escape-string ] action ;
 
 MEMO: delimiter ( -- parser )
-    [ dup delimiters member? swap CHAR: \n = not and ] satisfy
+    [ dup delimiters member? swap "\n=" member? not and ] satisfy
     [ 1string ] action ;
 
 : surround-with-foo ( string tag -- seq )
@@ -39,12 +35,12 @@ MEMO: emphasis ( -- parser ) "_" "em" delimited ;
 MEMO: superscript ( -- parser ) "^" "sup" delimited ;
 MEMO: subscript ( -- parser ) "~" "sub" delimited ;
 MEMO: inline-code ( -- parser ) "%" "code" delimited ;
+MEMO: nl ( -- parser ) "\n" token ;
+MEMO: 2nl ( -- parser ) "\n\n" token hide ;
 MEMO: h1 ( -- parser ) "=" "h1" delimited ;
 MEMO: h2 ( -- parser ) "==" "h2" delimited ;
 MEMO: h3 ( -- parser ) "===" "h3" delimited ;
 MEMO: h4 ( -- parser ) "====" "h4" delimited ;
-MEMO: nl ( -- parser ) "\n" token ;
-MEMO: 2nl ( -- parser ) "\n\n" token hide ;
 
 : render-code ( string mode -- string' )
     >r string-lines r>
@@ -87,7 +83,7 @@ MEMO: table-column ( -- parser )
 
 MEMO: table-row ( -- parser )
     [
-        table-column "|" token hide list-of* ,
+        table-column "|" token hide list-of-many ,
     ] seq* [ "tr" surround-with-foo ] action ;
 
 MEMO: table ( -- parser )
@@ -121,28 +117,13 @@ MEMO: paragraph ( -- parser )
         [ "<p>" swap "</p>" 3array ] unless
     ] action ;
 
-MEMO: farkup ( -- parser )
+PEG: parse-farkup ( -- parser )
     [
         list , table , h1 , h2 , h3 , h4 , code , paragraph , 2nl , nl ,
     ] choice* repeat0 "\n" token optional 2seq ;
 
-: farkup. ( parse-result  -- )
-    parse-result-ast
+: write-farkup ( parse-result  -- )
     [ dup string? [ write ] [ drop ] if ] deep-each ;
 
-: parse-farkup ( string -- string' )
-    farkup parse [ farkup. ] with-string-writer ;
-
-! MEMO: table-column ( -- parser )
-    ! text [ "td" surround-with-foo ] action ;
-! 
-! MEMO: table-row ( -- parser )
-    ! [
-        ! "|" token hide ,
-        ! table-column "|" token hide list-of ,
-        ! "|" token "\n" token 2array choice hide ,
-    ! ] seq* [ "tr" surround-with-foo ] action ;
-! 
-! MEMO: table ( -- parser )
-    ! table-row repeat1
-    ! [ "table" surround-with-foo ] action ;
+: convert-farkup ( string -- string' )
+    parse-farkup [ write-farkup ] with-string-writer ;

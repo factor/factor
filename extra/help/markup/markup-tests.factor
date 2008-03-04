@@ -1,6 +1,6 @@
 USING: definitions help help.markup kernel sequences tools.test
 words parser namespaces assocs generic io.streams.string ;
-IN: temporary
+IN: help.markup.tests
 
 TUPLE: blahblah quux ;
 

@@ -4,7 +4,7 @@
 USING: kernel threads vectors arrays sequences
 namespaces tools.test continuations dlists strings math words
 match quotations concurrency.messaging concurrency.mailboxes ;
-IN: temporary
+IN: concurrency.messaging.tests
 
 [ ] [ my-mailbox mailbox-data dlist-delete-all ] unit-test
 

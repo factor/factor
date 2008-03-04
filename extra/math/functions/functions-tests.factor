@@ -1,6 +1,6 @@
 USING: kernel math math.constants math.functions math.private
 math.libm tools.test ;
-IN: temporary
+IN: math.functions.tests
 
 [ t ] [ 4 4 .00000001 ~ ] unit-test
 [ t ] [ 4.0000001 4.0000001 .000001 ~ ] unit-test

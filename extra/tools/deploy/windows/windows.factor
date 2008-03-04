@@ -10,12 +10,12 @@ IN: tools.deploy.windows
     vm over copy-file ;
 
 : copy-fonts ( bundle-name -- )
-    "fonts/" resource-path swap copy-tree-to ;
+    "fonts/" resource-path swap copy-tree-into ;
 
 : copy-dlls ( bundle-name -- )
     { "freetype6.dll" "zlib1.dll" "factor.dll" }
     [ resource-path ] map
-    swap copy-files-to ;
+    swap copy-files-into ;
 
 : create-exe-dir ( vocab bundle-name -- vm )
     dup copy-dlls

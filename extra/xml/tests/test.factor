@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-IN: temporary
+IN: xml.tests
 USING: kernel xml tools.test io namespaces sequences xml.errors xml.entities
     parser strings xml.data io.files xml.writer xml.utilities state-parser 
     continuations assocs sequences.deep ;

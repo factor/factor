@@ -1,4 +1,4 @@
-IN: temporary
+IN: concurrency.exchangers.tests
 USING: sequences tools.test concurrency.exchangers
 concurrency.count-downs concurrency.promises locals kernel
 threads ;

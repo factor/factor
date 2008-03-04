@@ -1,6 +1,6 @@
 USING: io io.mmap io.files kernel tools.test continuations
 sequences io.encodings.ascii ;
-IN: temporary
+IN: io.mmap.tests
 
 [ "mmap-test-file.txt" resource-path delete-file ] ignore-errors
 [ ] [ "mmap-test-file.txt" resource-path ascii [ "12345" write ] with-file-writer ] unit-test

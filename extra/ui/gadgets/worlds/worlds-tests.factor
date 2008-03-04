@@ -1,4 +1,4 @@
-IN: temporary
+IN: ui.gadgets.worlds.tests
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
 namespaces models kernel ;
 

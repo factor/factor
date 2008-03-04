@@ -5,7 +5,7 @@ hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators tools.walker
-combinators.cleave ;
+combinators.cleave io ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
@@ -53,7 +53,8 @@ M: sqlite-result-set dispose ( result-set -- )
 
 M: sqlite-statement bind-statement* ( statement -- )
     dup statement-bound? [ dup reset-statement ] when
-    [ statement-bind-params ] [ statement-handle ] bi sqlite-bind ;
+    [ statement-bind-params ] [ statement-handle ] bi
+    sqlite-bind ;
 
 M: sqlite-statement bind-tuple ( tuple statement -- )
     [
@@ -64,7 +65,7 @@ M: sqlite-statement bind-tuple ( tuple statement -- )
             [ sql-spec-type ] tri 3array
         ] with map
     ] keep
-    [ set-statement-bind-params ] keep bind-statement* ;
+    bind-statement ;
 
 : last-insert-id ( -- id )
     db get db-handle sqlite3_last_insert_rowid
@@ -172,10 +173,14 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
 
         " from " 0% 0%
         [ sql-spec-slot-name swap get-slot-named ] with subset
-        " where " 0%
-        [ ", " 0% ]
-        [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
-        ";" 0%
+        dup empty? [
+            drop
+        ] [
+            " where " 0%
+            [ ", " 0% ]
+            [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
+            ";" 0%
+        ] if
     ] sqlite-make ;
 
 M: sqlite-db modifier-table ( -- hashtable )

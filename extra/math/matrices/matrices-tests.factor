@@ -1,4 +1,4 @@
-IN: temporary
+IN: math.matrices.tests
 USING: math.matrices math.vectors tools.test math ;
 
 [

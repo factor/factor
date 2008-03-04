@@ -1,6 +1,6 @@
 USING: combinators.lib kernel math random sequences tools.test continuations
     arrays vectors ;
-IN: temporary
+IN: combinators.lib.tests
 
 [ 5 ] [ [ 10 random ] [ 5 = ] generate ] unit-test
 [ t ] [ [ 10 random ] [ even? ] generate even? ] unit-test

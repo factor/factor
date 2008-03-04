@@ -1,4 +1,4 @@
-IN: temporary
+IN: inference.class.tests
 USING: arrays math.private kernel math compiler inference
 inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien

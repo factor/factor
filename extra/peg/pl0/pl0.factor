@@ -1,6 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays strings math.parser sequences peg peg.ebnf memoize ;
+USING: kernel arrays strings math.parser sequences
+peg peg.ebnf peg.parsers memoize ;
 IN: peg.pl0
 
 #! Grammar for PL/0 based on http://en.wikipedia.org/wiki/PL/0

@@ -1,33 +1,80 @@
-IN: temporary
-USING: io.unix.launcher tools.test ;
+IN: io.unix.launcher.tests
+USING: io.files tools.test io.launcher arrays io namespaces
+continuations math ;
 
-[ "" tokenize-command ] must-fail
-[ "   " tokenize-command ] must-fail
-[ { "a" } ] [ "a" tokenize-command ] unit-test
-[ { "abc" } ] [ "abc" tokenize-command ] unit-test
-[ { "abc" } ] [ "abc   " tokenize-command ] unit-test
-[ { "abc" } ] [ "   abc" tokenize-command ] unit-test
-[ { "abc" "def" } ] [ "abc def" tokenize-command ] unit-test
-[ { "abc def" } ] [ "abc\\ def" tokenize-command ] unit-test
-[ { "abc\\" "def" } ] [ "abc\\\\ def" tokenize-command ] unit-test
-[ { "abc\\ def" } ] [ "'abc\\\\ def'" tokenize-command ] unit-test
-[ { "abc\\ def" } ] [ "  'abc\\\\ def'" tokenize-command ] unit-test
-[ { "abc\\ def" "hey" } ] [ "'abc\\\\ def' hey" tokenize-command ] unit-test
-[ { "abc def" "hey" } ] [ "'abc def' \"hey\"" tokenize-command ] unit-test
-[ "'abc def' \"hey" tokenize-command ] must-fail
-[ "'abc def" tokenize-command ] must-fail
-[ { "abc def" "h\"ey" } ] [ "'abc def' \"h\\\"ey\"  " tokenize-command ] unit-test
+[ ] [
+    [ "launcher-test-1" temp-file delete-file ] ignore-errors
+] unit-test
 
-[
-    {
-        "Hello world.app/Contents/MacOS/hello-ui"
-        "-i=boot.macosx-ppc.image"
-        "-include= math compiler ui"
-        "-deploy-vocab=hello-ui"
-        "-output-image=Hello world.app/Contents/Resources/hello-ui.image"
-        "-no-stack-traces"
-        "-no-user-init"
-    }
-] [
-    "\"Hello world.app/Contents/MacOS/hello-ui\" -i=boot.macosx-ppc.image \"-include= math compiler ui\" -deploy-vocab=hello-ui \"-output-image=Hello world.app/Contents/Resources/hello-ui.image\" -no-stack-traces -no-user-init" tokenize-command
+[ ] [
+    "touch"
+    "launcher-test-1" temp-file
+    2array
+    try-process
+] unit-test
+
+[ t ] [ "launcher-test-1" temp-file exists? ] unit-test
+
+[ ] [
+    [ "launcher-test-1" temp-file delete-file ] ignore-errors
+] unit-test
+
+[ ] [
+    [
+        "echo Hello" +command+ set
+        "launcher-test-1" temp-file +stdout+ set
+    ] { } make-assoc try-process
+] unit-test
+
+[ "Hello\n" ] [
+    "cat"
+    "launcher-test-1" temp-file
+    2array
+    <process-stream> contents
+] unit-test
+
+[ "" ] [
+    [
+        "cat"
+        "launcher-test-1" temp-file
+        2array +arguments+ set
+        +inherit+ +stdout+ set
+    ] { } make-assoc <process-stream> contents
+] unit-test
+
+[ ] [
+    [ "launcher-test-1" temp-file delete-file ] ignore-errors
+] unit-test
+
+[ ] [
+    [
+        "cat" +command+ set
+        +closed+ +stdin+ set
+        "launcher-test-1" temp-file +stdout+ set
+    ] { } make-assoc try-process
+] unit-test
+
+[ "" ] [
+    "cat"
+    "launcher-test-1" temp-file
+    2array
+    <process-stream> contents
+] unit-test
+
+[ ] [
+    2 [
+        "launcher-test-1" temp-file <file-appender> [
+            [
+                +stdout+ set
+                "echo Hello" +command+ set
+            ] { } make-assoc try-process
+        ] with-disposal
+    ] times
+] unit-test
+
+[ "Hello\nHello\n" ] [
+    "cat"
+    "launcher-test-1" temp-file
+    2array
+    <process-stream> contents
 ] unit-test

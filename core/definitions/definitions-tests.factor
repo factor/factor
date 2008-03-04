@@ -1,4 +1,4 @@
-IN: temporary
+IN: definitions.tests
 USING: tools.test generic kernel definitions sequences
 compiler.units ;
 

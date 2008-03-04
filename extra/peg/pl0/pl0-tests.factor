@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.pl0 ;
-IN: temporary
+IN: peg.pl0.tests
 
 { "abc" } [
   "abc" ident parse parse-result-ast 

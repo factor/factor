@@ -1,5 +1,5 @@
 USING: mirrors tools.test assocs kernel arrays ;
-IN: temporary
+IN: mirrors.tests
 
 TUPLE: foo bar baz ;
 

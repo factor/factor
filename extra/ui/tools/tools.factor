@@ -82,7 +82,7 @@ workspace "workflow" f {
 } define-command-map
 
 [
-    <workspace> "Factor workspace" open-status-window
+    <workspace> dup "Factor workspace" open-status-window
 ] workspace-window-hook set-global
 
 : inspect-continuation ( traceback -- )

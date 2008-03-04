@@ -1,6 +1,6 @@
 USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint ;
-IN: temporary
+IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
 

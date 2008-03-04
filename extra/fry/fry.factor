@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences combinators parser splitting
-quotations ;
+quotations arrays namespaces ;
 IN: fry
 
 : , "Only valid inside a fry" throw ;
@@ -31,7 +31,12 @@ DEFER: (fry)
 
 : fry ( quot -- quot' )
     { _ } last-split1 [
-        >r fry [ [ dip ] curry ] r> trivial-fry [ compose ] compose 3compose
+        [
+            trivial-fry %
+            [ >r ] %
+            fry %
+            [ [ dip ] curry r> compose ] %
+        ] [ ] make
     ] [
         trivial-fry
     ] if* ;

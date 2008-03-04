@@ -1,5 +1,5 @@
 USING: tools.test io.files ;
-IN: temporary
+IN: io.unix.files.tests
 
 [ "/usr/libexec/" ] [ "/usr/libexec/awk/" parent-directory ] unit-test
 [ "/etc/" ] [ "/etc/passwd" parent-directory ] unit-test

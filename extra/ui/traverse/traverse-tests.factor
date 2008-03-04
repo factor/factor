@@ -1,4 +1,4 @@
-IN: temporary
+IN: ui.traverse.tests
 USING: ui.gadgets ui.gadgets.labels namespaces sequences kernel
 math arrays tools.test io ui.gadgets.panes ui.traverse
 definitions compiler.units ;

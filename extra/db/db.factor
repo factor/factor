@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations kernel math
 namespaces sequences sequences.lib tuples words strings
-tools.walker ;
+tools.walker new-slots accessors ;
 IN: db
 
 TUPLE: db
@@ -25,10 +25,10 @@ HOOK: db-close db ( handle -- )
 
 : dispose-db ( db -- ) 
     dup db [
-        dup db-insert-statements dispose-statements
-        dup db-update-statements dispose-statements
-        dup db-delete-statements dispose-statements
-        db-handle db-close
+        dup insert-statements>> dispose-statements
+        dup update-statements>> dispose-statements
+        dup delete-statements>> dispose-statements
+        handle>> db-close
     ] with-variable ;
 
 TUPLE: statement handle sql in-params out-params bind-params bound? ;
@@ -36,11 +36,7 @@ TUPLE: simple-statement ;
 TUPLE: prepared-statement ;
 TUPLE: result-set sql params handle n max ;
 : <statement> ( sql in out -- statement )
-    {
-        set-statement-sql
-        set-statement-in-params
-        set-statement-out-params
-    } statement construct ;
+    { (>>sql) (>>in-params) (>>out-params) } statement construct ;
 
 HOOK: <simple-statement> db ( str in out -- statement )
 HOOK: <prepared-statement> db ( str in out -- statement )
@@ -62,21 +58,18 @@ GENERIC: more-rows? ( result-set -- ? )
     ] if ;
 
 : bind-statement ( obj statement -- )
-    [ set-statement-bind-params ] keep
+    swap >>bind-params
     [ bind-statement* ] keep
-    t swap set-statement-bound? ;
+    t >>bound? drop ;
 
 : init-result-set ( result-set -- )
-    dup #rows over set-result-set-max
-    0 swap set-result-set-n ;
+    dup #rows >>max
+    0 >>n drop ;
 
 : <result-set> ( query handle tuple -- result-set )
-    >r >r { statement-sql statement-in-params } get-slots r>
-    {
-        set-result-set-sql
-        set-result-set-params
-        set-result-set-handle
-    } result-set construct r> construct-delegate ;
+    >r >r { sql>> in-params>> } get-slots r>
+    { (>>sql) (>>params) (>>handle) } result-set
+    construct r> construct-delegate ;
 
 : sql-row ( result-set -- seq )
     dup #columns [ row-column ] with map ;

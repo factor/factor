@@ -46,7 +46,7 @@ $nl
 $nl
 "Read/write locks allow any number of threads to hold the read lock simulateneously, however attempting to acquire a write lock blocks until all other threads release read locks and write locks."
 $nl
-"Read/write locks are reentrant. A thread holding a read lock may acquire a write lock recursively, and a thread holding a write lock may acquire a write lock or a read lock recursively, however a thread holding a read lock may not acquire a write lock recursively since that could break invariants assumed by the code executing with the read lock held."
+"Read/write locks are reentrant. A thread holding a write lock may acquire a read lock or a write lock without blocking. However a thread holding a read lock may not acquire a write lock recursively since that could break invariants assumed by the code executing with the read lock held."
 { $subsection rw-lock }
 { $subsection <rw-lock> }
 { $subsection with-read-lock }

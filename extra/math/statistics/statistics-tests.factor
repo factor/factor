@@ -1,5 +1,5 @@
 USING: kernel math math.functions math.statistics tools.test ;
-IN: temporary
+IN: math.statistics.tests
 
 [ 1 ] [ { 1 } mean ] unit-test
 [ 3/2 ] [ { 1 2 } mean ] unit-test

@@ -68,7 +68,10 @@ uses definitions ;
 : reset-checksums ( -- )
     source-files get [
         swap ?resource-path dup exists?
-        [ utf8 file-lines swap record-checksum ] [ 2drop ] if
+        [
+            over record-modified
+            utf8 file-lines swap record-checksum
+        ] [ 2drop ] if
     ] assoc-each ;
 
 M: pathname where pathname-string 1 2array ;

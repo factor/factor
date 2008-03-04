@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.backend io.timeouts system kernel namespaces
 strings hashtables sequences assocs combinators vocabs.loader
-init threads continuations math io.encodings ;
+init threads continuations math io.encodings io.streams.duplex
+io.nonblocking ;
 IN: io.launcher
 
 ! Non-blocking process exit notification facility
@@ -35,12 +36,15 @@ SYMBOL: +environment-mode+
 SYMBOL: +stdin+
 SYMBOL: +stdout+
 SYMBOL: +stderr+
-SYMBOL: +closed+
+
 SYMBOL: +timeout+
 
 SYMBOL: +prepend-environment+
 SYMBOL: +replace-environment+
 SYMBOL: +append-environment+
+
+SYMBOL: +closed+
+SYMBOL: +inherit+
 
 : default-descriptor
     H{
@@ -141,3 +145,12 @@ TUPLE: process-stream process ;
     [ set-process-status ] keep
     [ processes get delete-at* drop [ resume ] each ] keep
     f swap set-process-handle ;
+
+GENERIC: underlying-handle ( stream -- handle )
+
+M: port underlying-handle port-handle ;
+
+M: duplex-stream underlying-handle
+    dup duplex-stream-in underlying-handle
+    swap duplex-stream-out underlying-handle tuck =
+    [ "Invalid duplex stream" throw ] when ;

@@ -170,4 +170,4 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
     >r keep r> rot [ call ] [ 2drop f ] if ; inline
 
 : retry ( quot n -- )
-    swap [ drop ] swap compose attempt-all ; inline
+    [ drop ] rot compose attempt-all ; inline

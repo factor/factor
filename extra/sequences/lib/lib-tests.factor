@@ -1,6 +1,6 @@
 USING: arrays kernel sequences sequences.lib math math.functions math.ranges
     tools.test strings ;
-IN: temporary
+IN: sequences.lib.tests
 
 [ 50 ] [ 100 [1,b] [ even? ] count ] unit-test
 [ 50 ] [ 100 [1,b] [ odd? ] count ] unit-test

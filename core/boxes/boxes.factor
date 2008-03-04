@@ -19,3 +19,6 @@ TUPLE: box value full? ;
 
 : ?box ( box -- value/f ? )
     dup box-full? [ box> t ] [ drop f f ] if ;
+
+: if-box? ( box quot -- )
+    >r ?box r> [ drop ] if ; inline

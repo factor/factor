@@ -45,21 +45,20 @@ M: listener-gadget tool-scroller
     listener-gadget-input interactor-flag wait-for-flag ;
 
 : workspace-busy? ( workspace -- ? )
-    workspace-listener
-    dup wait-for-listener
-    listener-gadget-input interactor-busy? ;
-
-: get-listener ( -- listener )
-    [ workspace-busy? not ] get-workspace* workspace-listener ;
+    workspace-listener listener-gadget-input interactor-busy? ;
 
 : listener-input ( string -- )
-    get-listener listener-gadget-input set-editor-string ;
+    get-workspace
+    workspace-listener
+    listener-gadget-input set-editor-string ;
 
 : (call-listener) ( quot listener -- )
     listener-gadget-input interactor-call ;
 
 : call-listener ( quot -- )
-    get-listener (call-listener) ;
+    [ workspace-busy? not ] get-workspace* workspace-listener
+    [ dup wait-for-listener (call-listener) ] 2curry
+    "Listener call" spawn drop ;
 
 M: listener-command invoke-command ( target command -- )
     command-quot call-listener ;
@@ -68,7 +67,8 @@ M: listener-operation invoke-command ( target command -- )
     [ operation-hook call ] keep operation-quot call-listener ;
 
 : eval-listener ( string -- )
-    get-listener
+    get-workspace
+    workspace-listener
     listener-gadget-input [ set-editor-string ] keep
     evaluate-input ;
 
@@ -96,7 +96,9 @@ M: listener-operation invoke-command ( target command -- )
     [ drop ] [ [ "USE: " % % " " % % ] "" make ] if ;
 
 : insert-word ( word -- )
-    get-listener [ word-completion-string ] keep
+    get-workspace
+    workspace-listener
+    [ word-completion-string ] keep
     listener-gadget-input user-input ;
 
 : quot-action ( interactor -- lines )

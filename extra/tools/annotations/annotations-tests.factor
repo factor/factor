@@ -1,5 +1,5 @@
 USING: tools.test tools.annotations math parser ;
-IN: temporary
+IN: tools.annotations.tests
 
 : foo ;
 \ foo watch
@@ -17,7 +17,7 @@ M: integer some-generic 1+ ;
 
 [ 4 ] [ 3 some-generic ] unit-test
 
-[ ] [ "IN: temporary USE: math M: integer some-generic 1- ;" eval ] unit-test
+[ ] [ "IN: tools.annotations.tests USE: math M: integer some-generic 1- ;" eval ] unit-test
 
 [ 2 ] [ 3 some-generic ] unit-test
 

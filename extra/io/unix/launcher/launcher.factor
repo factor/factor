@@ -1,41 +1,22 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+<<<<<<< HEAD:extra/io/unix/launcher/launcher.factor
 USING: io io.backend io.launcher io.unix.backend io.unix.files
 io.nonblocking sequences kernel namespaces math system
  alien.c-types debugger continuations arrays assocs 
 combinators unix.process parser-combinators memoize 
 promises strings threads unix io.encodings.latin1 ;
+=======
+USING: io io.backend io.launcher io.nonblocking io.unix.backend
+io.unix.files io.nonblocking sequences kernel namespaces math
+system alien.c-types debugger continuations arrays assocs
+combinators unix.process strings threads unix
+io.unix.launcher.parser ;
+>>>>>>> b80434b2e394480fa317348955b1f7b89e284bde:extra/io/unix/launcher/launcher.factor
 IN: io.unix.launcher
 
 ! Search unix first
 USE: unix
-
-! Our command line parser. Supported syntax:
-! foo bar baz -- simple tokens
-! foo\ bar -- escaping the space
-! 'foo bar' -- quotation
-! "foo bar" -- quotation
-LAZY: 'escaped-char' "\\" token any-char-parser &> ;
-
-LAZY: 'quoted-char' ( delimiter -- parser' )
-    'escaped-char'
-    swap [ member? not ] curry satisfy
-    <|> ; inline
-
-LAZY: 'quoted' ( delimiter -- parser )
-    dup 'quoted-char' <!*> swap dup surrounded-by ;
-
-LAZY: 'unquoted' ( -- parser ) " '\"" 'quoted-char' <!+> ;
-
-LAZY: 'argument' ( -- parser )
-    "\"" 'quoted' "'" 'quoted' 'unquoted' <|> <|>
-    [ >string ] <@ ;
-
-MEMO: 'arguments' ( -- parser )
-    'argument' " " token <!+> nonempty-list-of ;
-
-: tokenize-command ( command -- arguments )
-    'arguments' just parse-1 ;
 
 : get-arguments ( -- seq )
     +command+ get [ tokenize-command ] [ +arguments+ get ] if* ;
@@ -43,14 +24,30 @@ MEMO: 'arguments' ( -- parser )
 : assoc>env ( assoc -- env )
     [ "=" swap 3append ] { } assoc>map ;
 
-: (redirect) ( path mode fd -- )
-    >r file-mode open dup io-error dup
-    r> dup2 io-error close ;
+: redirect-fd ( oldfd fd -- )
+    2dup = [ 2drop ] [ dupd dup2 io-error close ] if ;
+
+: reset-fd ( fd -- ) F_SETFL 0 fcntl io-error ;
+
+: redirect-inherit ( obj mode fd -- )
+    2nip reset-fd ;
+
+: redirect-file ( obj mode fd -- )
+    >r file-mode open dup io-error r> redirect-fd ;
+
+: redirect-closed ( obj mode fd -- )
+    >r >r drop "/dev/null" r> r> redirect-file ;
+
+: redirect-stream ( obj mode fd -- )
+    >r drop underlying-handle dup reset-fd r> redirect-fd ;
 
 : redirect ( obj mode fd -- )
     {
-        { [ pick not ] [ 2nip F_SETFL 0 fcntl io-error ] }
-        { [ pick string? ] [ (redirect) ] }
+        { [ pick not ] [ redirect-inherit ] }
+        { [ pick string? ] [ redirect-file ] }
+        { [ pick +closed+ eq? ] [ redirect-closed ] }
+        { [ pick +inherit+ eq? ] [ redirect-closed ] }
+        { [ t ] [ redirect-stream ] }
     } cond ;
 
 : ?closed dup +closed+ eq? [ drop "/dev/null" ] when ;
