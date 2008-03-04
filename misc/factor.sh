@@ -95,6 +95,7 @@ check_installed_programs() {
         ensure_program_installed md5sum md5
         ensure_program_installed cut
         case $OS in
+            macosx) ensure_program_installed port;;
             netbsd) ensure_program_installed gmake;;
         esac
         check_gcc_version
@@ -371,20 +372,26 @@ make_boot_image() {
 
 }
 
-install_libraries() {
+install_libraries_apt() {
         yes | sudo apt-get install sudo libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
         check_ret sudo
 }
 
+install_libraries_port() {
+		ensure_program_installed port
+        yes | sudo port install git-core
+}
+
 usage() {
-        echo "usage: $0 install|install-x11|self-update|quick-update|update|bootstrap|net-bootstrap"
+        echo "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|net-bootstrap"
         echo "If you are behind a firewall, invoke as:"
         echo "env GIT_PROTOCOL=http $0 <command>"
 }
 
 case "$1" in
         install) install ;;
-        install-x11) install_libraries; install ;;
+        install-x11) install_libraries_apt; install ;;
+        install-macosx) install_libraries_port; install ;;
         self-update) update; make_boot_image; bootstrap;;
         quick-update) update; refresh_image ;;
         update) update; update_bootstrap ;;
