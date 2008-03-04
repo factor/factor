@@ -16,14 +16,30 @@ USE: unix
 : assoc>env ( assoc -- env )
     [ "=" swap 3append ] { } assoc>map ;
 
-: (redirect) ( path mode fd -- )
-    >r file-mode open dup io-error dup
-    r> dup2 io-error close ;
+: redirect-fd ( oldfd fd -- )
+    2dup = [ 2drop ] [ dupd dup2 io-error close ] if ;
+
+: reset-fd ( fd -- ) F_SETFL 0 fcntl io-error ;
+
+: redirect-inherit ( obj mode fd -- )
+    2nip reset-fd ;
+
+: redirect-file ( obj mode fd -- )
+    >r file-mode open dup io-error r> redirect-fd ;
+
+: redirect-closed ( obj mode fd -- )
+    >r >r drop "/dev/null" r> r> redirect-file ;
+
+: redirect-stream ( obj mode fd -- )
+    >r drop underlying-handle dup reset-fd r> redirect-fd ;
 
 : redirect ( obj mode fd -- )
     {
-        { [ pick not ] [ 2nip F_SETFL 0 fcntl io-error ] }
-        { [ pick string? ] [ (redirect) ] }
+        { [ pick not ] [ redirect-inherit ] }
+        { [ pick string? ] [ redirect-file ] }
+        { [ pick +closed+ eq? ] [ redirect-closed ] }
+        { [ pick +inherit+ eq? ] [ redirect-closed ] }
+        { [ t ] [ redirect-stream ] }
     } cond ;
 
 : ?closed dup +closed+ eq? [ drop "/dev/null" ] when ;
