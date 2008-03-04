@@ -6,10 +6,6 @@ system combinators splitting sbufs continuations io.encodings
 io.encodings.binary ;
 IN: io.files
 
-HOOK: cd io-backend ( path -- )
-
-HOOK: cwd io-backend ( -- path )
-
 HOOK: (file-reader) io-backend ( path -- stream )
 
 HOOK: (file-writer) io-backend ( path -- stream )
@@ -25,13 +21,7 @@ HOOK: (file-appender) io-backend ( path -- stream )
 : <file-appender> ( path encoding -- stream )
     swap (file-appender) swap <encoder> ;
 
-HOOK: delete-file io-backend ( path -- )
-
 HOOK: rename-file io-backend ( from to -- )
-
-HOOK: make-directory io-backend ( path -- )
-
-HOOK: delete-directory io-backend ( path -- )
 
 ! Pathnames
 : path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
@@ -214,14 +204,6 @@ DEFER: copy-tree-to
 
 : resource-exists? ( path -- ? )
     ?resource-path exists? ;
-
-: temp-directory ( -- path )
-    "temp" resource-path
-    dup exists? not
-      [ dup make-directory ]
-    when ;
-
-: temp-file ( name -- path ) temp-directory swap path+ ;
 
 ! Pathname presentations
 TUPLE: pathname string ;
