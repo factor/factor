@@ -195,11 +195,33 @@ TUPLE: no-slot-named ;
 : offset-of-slot ( str obj -- n )
     class slot-spec-named slot-spec-offset ;
 
+DEFER: get-slot-named
+: get-delegate-slot-named ( str obj -- value )
+    delegate [ get-slot-named ] [ drop no-slot-named ] if* ;
+
+! : get-slot-named ( str obj -- value )
+!     tuck offset-of-slot [ no-slot-named ] unless* slot ;
+
 : get-slot-named ( str obj -- value )
-    tuck offset-of-slot [ no-slot-named ] unless* slot ;
+    2dup offset-of-slot [
+        rot drop slot
+    ] [
+        get-delegate-slot-named
+    ] if* ;
+
+DEFER: set-slot-named
+: set-delegate-slot-named ( value str obj -- )
+    delegate [ set-slot-named ] [ 2drop no-slot-named ] if* ;
+
+! : set-slot-named ( value str obj -- )
+!     tuck offset-of-slot [ no-slot-named ] unless* set-slot ;
 
 : set-slot-named ( value str obj -- )
-    tuck offset-of-slot [ no-slot-named ] unless* set-slot ;
+    2dup offset-of-slot [
+        rot drop set-slot
+    ] [
+        set-delegate-slot-named
+    ] if* ;
 
 : tuple>filled-slots ( tuple -- alist )
     dup <mirror> mirror-slots [ slot-spec-name ] map

@@ -161,5 +161,6 @@ SYMBOL: html
         "id" "onclick" "style" "valign" "accesskey"
         "src" "language" "colspan" "onchange" "rel"
         "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
+        "media"
     ] [ define-attribute-word ] each
 ] with-compilation-unit

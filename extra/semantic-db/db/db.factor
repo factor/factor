@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math namespaces sequences sqlite ;
+USING: arrays assocs kernel math namespaces new-slots sequences sqlite ;
 IN: semantic-db.db
 
 ! sqlite utils
@@ -35,7 +35,7 @@ M: sequence bindings
 
 : 1result ( array -- result )
     #! return the first (and hopefully only) element of the array, or f
-    dup length 0 > [ first ] [ drop f ] if ;
+    dup length zero? [ drop f ] [ first ] if ;
 
 : (collect-int-columns) ( statement n -- )
     [ dupd column-int , ] each drop ;
@@ -56,37 +56,37 @@ TUPLE: query fields tables conditions args statement results ;
     query construct-boa ;
 
 : invalidate-query ( query -- query )
-    f over set-query-results ;
+    f >>results ;
 
-: add-field ( field query -- ) invalidate-query query-fields push ;
-: ,field ( name table retriever -- ) <field> query get add-field ;
+: add-field ( field query -- query )
+    dup invalidate-query fields>> push ;
 
-: add-table ( table query -- ) invalidate-query query-tables push ;
-: ,table ( table -- ) query get add-table ;
+: add-table ( table query -- query )
+    dup invalidate-query tables>> push ;
 
-: add-condition ( condition query -- ) invalidate-query query-conditions push ;
-: ,condition ( condition -- ) query get add-condition ;
+: add-condition ( condition query -- query )
+    tuck invalidate-query conditions>> push ;
 
-: add-arg ( arg key query -- ) invalidate-query query-args set-at ;
-: ,arg ( arg key -- ) query get add-arg ;
+: add-arg ( arg key query -- query )
+    [ invalidate-query args>> set-at ] keep ;
 
 <PRIVATE
 
 : field-sql ( field -- sql )
-    [ dup field-table % CHAR: . , field-name % ] "" make ;
+    [ dup table>> % CHAR: . , name>> % ] "" make ;
 
 : fields-sql ( query -- sql )
-    query-fields dup length [
+    fields>> dup length [
         [ field-sql ] map ", " join
     ] [
         drop "*"
     ] if ;
 
 : tables-sql ( query -- sql )
-    query-tables ", " join ;
+    tables>> ", " join ;
 
 : conditions-sql ( query -- sql )
-    query-conditions dup length [
+    conditions>> dup length [
         " and " join "where " swap append
     ] [
         drop ""
@@ -97,22 +97,22 @@ TUPLE: query fields tables conditions args statement results ;
         "select" , dup fields-sql , dup "from" , tables-sql , conditions-sql ,
     ] { } make " " join ;
 
-: prepare-query ( query -- )
-    [ query-sql prepare ] keep set-query-statement ;
+: prepare-query ( query -- query )
+    dup query-sql prepare >>statement ;
 
-: bind-query ( query -- )
-    dup query-args over query-statement bindings swap set-query-statement ;
+: bind-query ( query -- query )
+    dup args>> over statement>> bindings >>statement ;
 
 : (retrieve) ( statement query -- result )
-    query-fields swap [ field-retriever call ] curry each ;
+    fields>> swap [ retriever>> call ] curry each ;
 
-: retrieve ( query -- )
-    dup query-statement over [ (retrieve) ] curry sqlite-map
-    swap set-query-results ;
-   ! dup query-statement over query-retriever sqlite-map swap set-query-results ;
+: retrieve ( query -- query )
+    dup statement>> over [ (retrieve) ] curry sqlite-map
+    swap >>results ;
+   ! dup query-statement over query-retriever sqlite-map swap >>results ;
 
-: finalize-query ( query -- )
-    query-statement dup sqlite-finalize f swap set-query-statement ;
+: finalize-query ( query -- query )
+    statement>> dup sqlite-finalize f swap >>statement ;
 
 PRIVATE>
     
@@ -120,14 +120,7 @@ PRIVATE>
     dup prepare-query dup bind-query dup retrieve finalize-query ;
 
 : get-results ( query -- results )
-    dup query-results [ nip ] [ dup run-query query-results ] if* ;
-
-: with-query ( quot -- results )
-    [
-        <query> query set
-        call
-        query get get-results
-    ] with-scope ;
+    dup results>> [ nip ] [ dup run-query results>> ] if* ;
 
 ! nodes and arcs
 
@@ -252,24 +245,25 @@ PRIVATE>
     2dup type-and-name-node [ 2nip ] [ create-node-of-type ] if* ;
 
 : type-and-name-in-context-node ( context type name -- node )
-    [
-        "id" "n" [ 0 column-int ] ,field
-        "nodes n" ,table
-        "n.name = :name" ,condition
-        ":name" ,arg
-        "arcs a" ,table
-        "a.relation = :has_type" ,condition
-        has-type-relation ":has_type" ,arg
-        "a.subject = n.id" ,condition
-        "a.object = :type" ,condition
-        ":type" ,arg
-        "arcs b" ,table
-        "b.subject = a.relation" ,condition
-        "b.relation = :has_context" ,condition
-        has-context-relation ":has_context" ,arg
-        "b.object = :context" ,condition
-        ":context" ,arg
-    ] with-query 1result ;
+    <query>
+    "id" "n" [ 0 column-int ] add-field
+    "nodes n" add-table
+    "n.name = :name" add-condition
+    ":name" add-arg
+    "arcs a" add-table
+    "a.relation = :has_type" add-condition
+    has-type-relation ":has_type" add-arg
+    "a.subject = n.id" add-condition
+    "a.object = :type" add-condition
+    ":type" add-arg
+    "arcs b" add-table
+    "b.subject = a.relation" add-condition
+    "b.relation = :has_context" add-condition
+    has-context-relation ":has_context" add-arg
+    "b.object = :context" add-condition
+    ":context" add-arg
+    get-results 1result ;
+
 
 ! ideas for an api:
 ! this would work something like jquery, where arcs can be selected according

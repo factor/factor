@@ -1,4 +1,4 @@
-USING: math arrays sequences kernel random splitting strings ;
+USING: math arrays sequences kernel random splitting strings unicode.case ;
 IN: strings.lib
 
 : char>digit ( c -- i ) 48 - ;
