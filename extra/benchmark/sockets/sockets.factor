@@ -23,21 +23,11 @@ SYMBOL: counter
     ] curry "Client handler" spawn drop server-loop ;
 
 : simple-server ( -- )
-<<<<<<< HEAD:extra/benchmark/sockets/sockets.factor
-    7777 local-server "benchmark.sockets" ascii [
-        read1 CHAR: x = [
-            stop-server
-        ] [
-            20 [ read1 write1 flush ] times
-        ] if
-    ] with-server ;
-=======
     [
-        server-addr <server> dup "server" set [
+        server-addr ascii <server> dup "server" set [
             server-loop
         ] with-disposal
     ] ignore-errors ;
->>>>>>> b80434b2e394480fa317348955b1f7b89e284bde:extra/benchmark/sockets/sockets.factor
 
 : simple-client ( -- )
     server-addr <client> [
