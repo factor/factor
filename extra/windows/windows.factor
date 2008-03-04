@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax alien.c-types arrays combinators
-io io.nonblocking kernel math namespaces parser prettyprint
-sequences windows.errors windows.types windows.kernel32 words ;
+kernel math namespaces parser prettyprint sequences
+windows.errors windows.types windows.kernel32 words ;
 IN: windows
 
 : lo-word ( wparam -- lo ) <short> *short ; inline

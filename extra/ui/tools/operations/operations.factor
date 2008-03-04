@@ -5,7 +5,7 @@ ui.tools.interactor ui.tools.listener ui.tools.profiler
 ui.tools.search ui.tools.traceback ui.tools.workspace generic
 help.topics inference inspector io.files io.styles kernel
 namespaces parser prettyprint quotations tools.annotations
-editors tools.profiler tools.test tools.time tools.interpreter
+editors tools.profiler tools.test tools.time tools.walker
 ui.commands ui.gadgets.editors ui.gestures ui.operations
 ui.tools.deploy vocabs vocabs.loader words sequences
 tools.browser classes compiler.units ;
@@ -188,7 +188,7 @@ source-editor
 "These commands operate on the Factor word named by the token at the caret position."
 \ selected-word
 [ selected-word ]
-[ search ] 
+[ dup search [ ] [ no-word ] ?if ] 
 define-operation-map
 
 interactor

@@ -1,4 +1,5 @@
 USING: tools.test tuple-syntax ;
+IN: tuple-syntax.tests
 
 TUPLE: foo bar baz ;
 

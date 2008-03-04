@@ -1,6 +1,6 @@
 USING: math sequences classes growable tools.test kernel
 layouts ;
-IN: temporary
+IN: growable.tests
 
 ! erg found this one
 [ fixnum ] [
@@ -9,16 +9,16 @@ IN: temporary
 
 ! overflow bugs
 [ "hi" most-positive-fixnum 2 * 2 + V{ } clone set-nth ]
-unit-test-fails
+must-fail
 
 [ most-positive-fixnum 2 * 2 + { 1 } clone nth ]
-unit-test-fails
+must-fail
 
 [ most-positive-fixnum 2 * 2 + V{ } clone lengthen ]
-unit-test-fails
+must-fail
 
 [ most-positive-fixnum 2 * 2 + V{ } clone set-length ]
-unit-test-fails
+must-fail
 
 [ ] [
     10 V{ } [ set-length ] keep

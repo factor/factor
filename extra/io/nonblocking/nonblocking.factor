@@ -1,16 +1,24 @@
-! Copyright (C) 2005, 2007 Slava Pestov, Doug Coleman
+! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.nonblocking
-USING: math kernel io sequences io.buffers generic sbufs
-system io.streams.lines io.streams.plain io.streams.duplex
-continuations debugger classes byte-arrays namespaces
-splitting ;
+USING: math kernel io sequences io.buffers io.timeouts generic
+sbufs system io.streams.lines io.streams.plain io.streams.duplex
+io.backend continuations debugger classes byte-arrays namespaces
+splitting dlists assocs ;
 
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
 
 ! Common delegate of native stream readers and writers
-TUPLE: port handle error timeout cutoff type eof? ;
+TUPLE: port
+handle
+error
+timeout
+type eof? ;
+
+M: port timeout port-timeout ;
+
+M: port set-timeout set-port-timeout ;
 
 SYMBOL: closed
 
@@ -21,13 +29,10 @@ GENERIC: init-handle ( handle -- )
 GENERIC: close-handle ( handle -- )
 
 : <port> ( handle buffer type -- port )
-    pick init-handle
-    0 0 {
+    pick init-handle {
         set-port-handle
         set-delegate
         set-port-type
-        set-port-timeout
-        set-port-cutoff
     } port construct ;
 
 : <buffered-port> ( handle type -- port )
@@ -41,21 +46,17 @@ GENERIC: close-handle ( handle -- )
 
 : handle>duplex-stream ( in-handle out-handle -- stream )
     <writer>
-    [ >r <reader> r> <duplex-stream> ] [ ] [ stream-close ]
+    [ >r <reader> r> <duplex-stream> ] [ ] [ dispose ]
     cleanup ;
-
-: touch-port ( port -- )
-    dup port-timeout dup zero?
-    [ 2drop ] [ millis + swap set-port-cutoff ] if ;
-
-: timeout? ( port -- ? )
-    port-cutoff dup zero? not swap millis < and ;
 
 : pending-error ( port -- )
     dup port-error f rot set-port-error [ throw ] when* ;
 
-M: port set-timeout
-    [ set-port-timeout ] keep touch-port ;
+HOOK: cancel-io io-backend ( port -- )
+
+M: object cancel-io drop ;
+
+M: port timed-out cancel-io ;
 
 GENERIC: (wait-to-read) ( port -- )
 
@@ -157,14 +158,18 @@ GENERIC: port-flush ( port -- )
 M: output-port stream-flush ( port -- )
     dup port-flush pending-error ;
 
-M: port stream-close
-    dup port-type closed eq? [
-        dup port-type >r closed over set-port-type r>
-        output-port eq? [ dup port-flush ] when
-        dup port-handle close-handle
-        dup delegate [ buffer-free ] when*
-        f over set-delegate
-    ] unless drop ;
+: close-port ( port type -- )
+    output-port eq? [ dup port-flush ] when
+    dup cancel-io
+    dup port-handle close-handle
+    dup delegate [ buffer-free ] when*
+    f swap set-delegate ;
+
+M: port dispose
+    dup port-type closed eq?
+    [ drop ]
+    [ dup port-type >r closed over set-port-type r> close-port ]
+    if ;
 
 TUPLE: server-port addr client ;
 

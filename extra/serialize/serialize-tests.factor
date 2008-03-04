@@ -4,13 +4,11 @@
 USING: tools.test kernel serialize io io.streams.string math
 alien arrays byte-arrays sequences math prettyprint parser
 classes math.constants ;
-IN: temporary
+IN: serialize.tests
 
 TUPLE: serialize-test a b ;
 
 C: <serialize-test> serialize-test
-
-: CURRY< \ > parse-until first2 curry parsed ; parsing
 
 : objects
     {
@@ -33,15 +31,15 @@ C: <serialize-test> serialize-test
         B{ 50 13 55 64 1 }
         ?{ t f t f f t f }
         F{ 1.0 3.0 4.0 1.0 2.35 0.33 }
-        CURRY< 1 [ 2 ] >
+        << 1 [ 2 ] curry parsed >>
         { { "a" "bc" } { "de" "fg" } }
         H{ { "a" "bc" } { "de" "fg" } }
     } ;
 
 : check-serialize-1 ( obj -- ? )
     dup class .
-    dup [ serialize ] string-out
-    [ deserialize ] string-in = ;
+    dup [ serialize ] with-string-writer
+    [ deserialize ] with-string-reader = ;
 
 : check-serialize-2 ( obj -- ? )
     dup number? over wrapper? or [
@@ -49,8 +47,8 @@ C: <serialize-test> serialize-test
     ] [
         dup class .
         dup 2array
-        [ serialize ] string-out
-        [ deserialize ] string-in
+        [ serialize ] with-string-writer
+        [ deserialize ] with-string-reader
         first2 eq?
     ] if ;
 
@@ -65,7 +63,7 @@ C: <serialize-test> serialize-test
         [
             dup (serialize) (serialize)
         ] with-serialized
-    ] string-out [
+    ] with-string-writer [
         deserialize-sequence all-eq?
-    ] string-in
+    ] with-string-reader
 ] unit-test

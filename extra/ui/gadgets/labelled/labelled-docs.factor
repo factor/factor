@@ -18,7 +18,7 @@ HELP: <closable-gadget>
 { $notes "The quotation can find the " { $link closable-gadget } " instance, or any other parent gadget by calling " { $link find-parent } " with the gadget it receives on the stack." } ;
 
 HELP: <labelled-pane>
-{ $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( value -- )" } } { "title" string } { "gadget" "a new " { $link gadget } } }
+{ $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( value -- )" } } { "scrolls?" "a boolean" } { "title" string } { "gadget" "a new " { $link gadget } } }
 { $description "Creates a new control delegating to a " { $link pane } ", and wraps it in a " { $link labelled-gadget } ". When the value of the model changes, the value is pushed on the stack and the quotation is called using " { $link with-pane } "." } ;
 
 { <labelled-pane> <pane-control> } related-words

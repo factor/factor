@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io io.backend threads
-strings byte-arrays ;
+strings byte-arrays continuations ;
 IN: io.sockets
 
 ARTICLE: "network-addressing" "Address specifiers"
@@ -19,7 +19,7 @@ ARTICLE: "network-connection" "Connection-oriented networking"
 { $subsection accept }
 "The stream returned by " { $link accept } " holds the address specifier of the remote client:"
 { $subsection client-stream-addr }
-"Server sockets are closed by calling " { $link stream-close } ", but they do not respond to the rest of the stream protocol."
+"Server sockets are closed by calling " { $link dispose } "."
 $nl
 "Address specifiers have the following interpretation with connection-oriented networking words:"
 { $list
@@ -36,7 +36,7 @@ ARTICLE: "network-packet" "Packet-oriented networking"
 "Packets can be sent and received with a pair of words:"
 { $subsection send }
 { $subsection receive }
-"Packet-oriented sockets are closed by calling " { $link stream-close } ", but they do not respond to the rest of the stream protocol."
+"Packet-oriented sockets are closed by calling " { $link dispose } "."
 $nl
 "Address specifiers have the following interpretation with connection-oriented networking words:"
 { $list
@@ -104,7 +104,7 @@ HELP: <server>
 { $description
     "Begins listening for network connections to a local address. Server objects responds to two words:"
     { $list
-        { { $link stream-close } " - stops listening on the port and frees all associated resources" }
+        { { $link dispose } " - stops listening on the port and frees all associated resources" }
         { { $link accept } " - blocks until there is a connection" }
     }
 }
@@ -128,7 +128,7 @@ HELP: <datagram>
 { $values { "addrspec" "an address specifier" } { "datagram" "a handle" } }
 { $description "Creates a datagram socket bound to a local address. Datagram socket objects responds to three words:"
     { $list
-        { { $link stream-close } " - stops listening on the port and frees all associated resources" }
+        { { $link dispose } " - stops listening on the port and frees all associated resources" }
         { { $link receive } " - waits for a packet" }
         { { $link send } " - sends a packet" }
     }

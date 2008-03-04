@@ -1,27 +1,34 @@
-USING: assocs kernel vectors sequences ;
+USING: assocs kernel vectors sequences namespaces ;
 IN: assocs.lib
-
-: insert-at ( value key assoc -- )
-    [ ?push ] change-at ;
 
 : >set ( seq -- hash )
     [ dup ] H{ } map>assoc ;
 
-: ref-hash ( table key -- value ) swap at ;
+: ref-at ( table key -- value ) swap at ;
 
-! set-hash with alternative stack effects
+: put-at* ( table key value -- ) swap rot set-at ;
 
-: put-hash* ( table key value -- ) spin set-at ;
+: put-at ( table key value -- table ) swap pick set-at ;
 
-: put-hash ( table key value -- table ) swap pick set-at ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: set-hash-stack ( value key seq -- )
+: set-assoc-stack ( value key seq -- )
     dupd [ key? ] with find-last nip set-at ;
 
 : at-default ( key assoc -- value/key )
     dupd at [ nip ] when* ;
 
-: at-peek ( key assoc -- value ? )
-    at* dup >r [ peek ] when r> ;
+: insert-at ( value key assoc -- )
+    [ ?push ] change-at ;
+
+: peek-at* ( key assoc -- obj ? )
+    at* dup [ >r peek r> ] when ;
+
+: peek-at ( key assoc -- obj )
+    peek-at* drop ;
+
+: >multi-assoc ( assoc -- new-assoc )
+    [ 1vector ] assoc-map ;
+
+: multi-assoc-each ( assoc quot -- )
+    [ with each ] curry assoc-each ; inline
+
+: insert ( value variable -- ) namespace insert-at ;

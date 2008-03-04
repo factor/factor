@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions kernel sequences strings math assocs
 words generic namespaces assocs quotations splitting
-ui.gestures ;
+ui.gestures unicode.case unicode.categories ;
 IN: ui.commands
 
 SYMBOL: +nullary+
@@ -51,7 +51,7 @@ GENERIC: command-word ( command -- word )
     update-gestures ;
 
 : (command-name) ( string -- newstring )
-    "-" split " " join unclip ch>upper add* ;
+    { { CHAR: - CHAR: \s } } substitute >title ;
 
 M: word command-name ( word -- str )
     word-name

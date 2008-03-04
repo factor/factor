@@ -1,7 +1,7 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables io kernel math memory namespaces
-parser sequences strings io.styles io.streams.lines
+USING: arrays hashtables io kernel math math.parser memory
+namespaces parser sequences strings io.styles io.streams.lines
 io.streams.duplex vectors words generic system combinators
 tuples continuations debugger definitions compiler.units ;
 IN: listener
@@ -18,11 +18,10 @@ GENERIC: stream-read-quot ( stream -- quot/f )
     [ parse-lines in get ] with-compilation-unit in set ;
 
 : read-quot-step ( lines -- quot/f )
-    [ parse-lines-interactive ] catch {
-        { [ dup delegate unexpected-eof? ] [ 2drop f ] }
-        { [ dup not ] [ drop ] }
-        { [ t ] [ rethrow ] }
-    } cond ;
+    [ parse-lines-interactive ] [
+        dup delegate unexpected-eof?
+        [ 2drop f ] [ rethrow ] if
+    ] recover ;
 
 : read-quot-loop  ( stream accum -- quot/f )
     over stream-readln dup [
@@ -49,18 +48,21 @@ M: duplex-stream stream-read-quot
 
 : listen ( -- )
     listener-hook get call prompt.
-    [ read-quot [ call ] [ bye ] if* ] try ;
+    [ read-quot [ try ] [ bye ] if* ]
+    [
+        dup parse-error? [
+            error-hook get call
+        ] [
+            rethrow
+        ] if
+    ] recover ;
 
 : until-quit ( -- )
     quit-flag get
     [ quit-flag off ]
     [ listen until-quit ] if ; inline
 
-: print-banner ( -- )
-    "Factor " write version write
-    " on " write os write "/" write cpu print ;
-
 : listener ( -- )
-    print-banner [ until-quit ] with-interactive-vocabs ;
+    [ until-quit ] with-interactive-vocabs ;
 
 MAIN: listener

@@ -65,7 +65,7 @@ SYMBOL: cols
     ] with-scope ;
 
 : mandel-main ( -- )
-    "mandel.ppm" resource-path <file-writer>
-    [ mandel write ] with-stream ;
+    "mandel.ppm" temp-file
+    [ mandel write ] with-file-writer ;
 
 MAIN: mandel-main

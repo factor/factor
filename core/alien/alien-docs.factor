@@ -1,6 +1,7 @@
 USING: byte-arrays arrays help.syntax help.markup
-alien.syntax alien.c-types compiler definitions math libc
-debugger parser io io.backend system bit-arrays float-arrays ;
+alien.syntax compiler definitions math libc
+debugger parser io io.backend system bit-arrays float-arrays
+alien.accessors ;
 IN: alien
 
 HELP: alien
@@ -86,7 +87,7 @@ $nl
 HELP: alien-invoke-error
 { $error-description "Thrown if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
     { $list
-        { "This can happen when experimenting with " { $link alien-invoke } " in this listener. To fix the problem, place the " { $link alien-invoke } " call in a word and then call " { $link recompile } ". See " { $link "compiler" } "." }
+        { "This can happen when experimenting with " { $link alien-invoke } " in this listener. To fix the problem, place the " { $link alien-invoke } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
         { "The return type or parameter list references an unknown C type." }
         { "The symbol or library could not be found." }
         { "One of the four inputs to " { $link alien-invoke } " is not a literal value. To call functions which are not known at compile-time, use " { $link alien-indirect } "." }
@@ -102,7 +103,7 @@ HELP: alien-invoke
 HELP: alien-indirect-error
 { $error-description "Thrown if the word calling " { $link alien-indirect } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
     { $list
-        { "This can happen when experimenting with " { $link alien-indirect } " in this listener. To fix the problem, place the " { $link alien-indirect } " call in a word and then call " { $link recompile } ". See " { $link "compiler" } "." }
+        { "This can happen when experimenting with " { $link alien-indirect } " in this listener. To fix the problem, place the " { $link alien-indirect } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
         { "The return type or parameter list references an unknown C type." }
         { "One of the three inputs to " { $link alien-indirect } " is not a literal value." }
     }
@@ -119,7 +120,7 @@ HELP: alien-indirect
 HELP: alien-callback-error
 { $error-description "Thrown if the word calling " { $link alien-callback } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
     { $list
-        { "This can happen when experimenting with " { $link alien-callback } " in this listener. To fix the problem, place the " { $link alien-callback } " call in a word and then call " { $link recompile } ". See " { $link "compiler" } "." }
+        { "This can happen when experimenting with " { $link alien-callback } " in this listener. To fix the problem, place the " { $link alien-callback } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
         { "The return type or parameter list references an unknown C type." }
         { "One of the four inputs to " { $link alien-callback } " is not a literal value." }
     }
@@ -155,36 +156,6 @@ ARTICLE: "aliens" "Alien addresses"
 "Anywhere that a " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
 $nl
 "Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a pointer type such as " { $snippet "void*" } " takes care of the details. See " { $link "c-types-specs" } "." ;
-
-ARTICLE: "c-structs" "C structure types"
-"A " { $snippet "struct" } " in C is essentially a block of memory with the value of each structure field stored at a fixed offset from the start of the block. The C library interface provides some utilities to define words which read and write structure fields given a base address."
-{ $subsection POSTPONE: C-STRUCT: }
-"Great care must be taken when working with C structures since no type or bounds checking is possible."
-$nl
-"An example:"
-{ $code
-    "C-STRUCT: XVisualInfo"
-    "    { \"Visual*\" \"visual\" }"
-    "    { \"VisualID\" \"visualid\" }"
-    "    { \"int\" \"screen\" }"
-    "    { \"uint\" \"depth\" }"
-    "    { \"int\" \"class\" }"
-    "    { \"ulong\" \"red_mask\" }"
-    "    { \"ulong\" \"green_mask\" }"
-    "    { \"ulong\" \"blue_mask\" }"
-    "    { \"int\" \"colormap_size\" }"
-    "    { \"int\" \"bits_per_rgb\" } ;"
-}
-"C structure objects can be allocated by calling " { $link <c-object> } " or " { $link malloc-object } "."
-$nl
-"Arrays of C structures can be created by calling " { $link <c-array> } " or " { $link malloc-array } ". Elements can be read and written using words named " { $snippet { $emphasis "type" } "-nth" } " and " { $snippet "set-" { $emphasis "type" } "-nth" } "; these words are automatically generated by " { $link POSTPONE: C-STRUCT: } "." ;
-
-ARTICLE: "c-unions" "C unions"
-"A " { $snippet "union" } " in C defines a type large enough to hold its largest member. This is usually used to allocate a block of memory which can hold one of several types of values."
-{ $subsection POSTPONE: C-UNION: }
-"C structure objects can be allocated by calling " { $link <c-object> } " or " { $link malloc-object } "."
-$nl
-"Arrays of C unions can be created by calling " { $link <c-array> } " or " { $link malloc-array } ". Elements can be read and written using words named " { $snippet { $emphasis "type" } "-nth" } " and " { $snippet "set-" { $emphasis "type" } "-nth" } "; these words are automatically generated by " { $link POSTPONE: C-UNION: } "." ;
 
 ARTICLE: "reading-writing-memory" "Reading and writing memory directly"
 "Numerical values can be read from memory addresses and converted to Factor objects using the various typed memory accessor words:"
@@ -228,9 +199,7 @@ ARTICLE: "alien-invoke" "Calling C from Factor"
 { $subsection alien-invoke }
 "Sometimes it is necessary to invoke a C function pointer, rather than a named C function:"
 { $subsection alien-indirect }
-"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "."
-$nl
-"Don't forget to compile your binding word after defining it; C library calls cannot be made from an interpreted definition. Words defined in source files are automatically compiled when the source file is loaded, but words defined in the listener are not; when interactively testing C libraries, use " { $link compile } " or " { $link recompile } " to compile binding words." ;
+"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "." ;
 
 ARTICLE: "alien-callback-gc" "Callbacks and code GC"
 "A callback consits of two parts; the callback word, which pushes the address of the callback on the stack when executed, and the callback body itself. If the callback word is redefined, removed from the dictionary using " { $link forget } ", or recompiled, the callback body will not be reclaimed by the garbage collector, since potentially C code may be holding a reference to the callback body."
@@ -252,211 +221,6 @@ $nl
 { $subsection dlopen }
 { $subsection dlsym }
 { $subsection dlclose } ;
-
-ARTICLE: "c-types-specs" "C type specifiers"
-"C types are identified by strings, and type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words, as well as " { $link POSTPONE: C-STRUCT: } ", " { $link POSTPONE: C-UNION: } " and " { $link POSTPONE: TYPEDEF: } "."
-$nl
-"The following numerical types are available; a " { $snippet "u" } " prefix denotes an unsigned type:"
-{ $table
-    { "C type" "Notes" }
-    { { $snippet "char" } "always 1 byte" }
-    { { $snippet "uchar" } { } }
-    { { $snippet "short" } "always 2 bytes" }
-    { { $snippet "ushort" } { } }
-    { { $snippet "int" } "always 4 bytes" }
-    { { $snippet "uint" } { } }
-    { { $snippet "long" } { "same size as CPU word size and " { $snippet "void*" } ", except on 64-bit Windows, where it is 4 bytes" } }
-    { { $snippet "ulong" } { } }
-    { { $snippet "longlong" } "always 8 bytes" }
-    { { $snippet "ulonglong" } { } }
-    { { $snippet "float" } { } }
-    { { $snippet "double" } { "same format as " { $link float } " objects" } }
-}
-"When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision."
-$nl
-"Pointer types are specified by suffixing a C type with " { $snippet "*" } ", for example " { $snippet "float*" } ". One special case is " { $snippet "void*" } ", which denotes a generic pointer; " { $snippet "void" } " by itself is not a valid C type specifier. With the exception of strings (see " { $link "c-strings" } "), all pointer types are identical to " { $snippet "void*" } " as far as the C library interface is concerned."
-$nl
-"Fixed-size array types are supported; the syntax consists of a C type name followed by dimension sizes in brackets; the following denotes a 3 by 4 array of integers:"
-{ $code "int[3][4]" }
-"Fixed-size arrays differ from pointers in that they are allocated inside structures and unions; however when used as function parameters they behave exactly like pointers and thus the dimensions only serve as documentation."
-$nl
-"Structure and union types are specified by the name of the structure or union." ;
-
-ARTICLE: "c-byte-arrays" "Passing data in byte arrays"
-"Instances of the " { $link byte-array } ", " { $link bit-array } " and " { $link float-array } " class can be passed to C functions; the C function receives a pointer to the first element of the array."
-$nl
-"Byte arrays can be allocated directly with a byte count using the " { $link <byte-array> } " word. However in most cases, instead of computing a size in bytes directly, it is easier to use a higher-level word which expects C type and outputs a byte array large enough to hold that type:"
-{ $subsection <c-object> }
-{ $subsection <c-array> }
-{ $warning
-"The Factor garbage collector can move byte arrays around, and it is only safe to pass byte arrays to C functions if the function does not store a pointer to the byte array in some global structure, or retain it in any way after returning."
-$nl
-"Long-lived data for use by C libraries can be allocated manually, just as when programming in C. See " { $link "malloc" } "." }
-{ $see-also "c-arrays" } ;
-
-ARTICLE: "malloc" "Manual memory management"
-"Sometimes data passed to C functions must be allocated at a fixed address, and so garbage collector managed byte arrays cannot be used. See the warning at the bottom of " { $link "c-byte-arrays" } " for a description of when this is the case."
-$nl
-"Allocating a C datum with a fixed address:"
-{ $subsection malloc-object }
-{ $subsection malloc-array }
-{ $subsection malloc-byte-array }
-"There is a set of words in the " { $vocab-link "libc" } " vocabulary which directly call C standard library memory management functions:"
-{ $subsection malloc }
-{ $subsection calloc }
-{ $subsection realloc }
-"The return value of the above three words must always be checked for a memory allocation failure:"
-{ $subsection check-ptr }
-"You must always free pointers returned by any of the above words when the block of memory is no longer in use:"
-{ $subsection free }
-"You can unsafely copy a range of bytes from one memory location to another:"
-{ $subsection memcpy }
-"A wrapper for temporarily allocating a block of memory:"
-{ $subsection with-malloc } ;
-
-ARTICLE: "c-strings" "C strings"
-"The C library interface defines two types of C strings:"
-{ $table
-    { "C type" "Notes" }
-    { { $snippet "char*" } "8-bit per character null-terminated ASCII" }
-    { { $snippet "ushort*" } "16-bit per character null-terminated UCS-2" }
-}
-"Passing a Factor string to a C function expecting a C string allocates a " { $link byte-array } " in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function. If the conversion fails, for example if the string contains null bytes or characters with values higher than 255, a " { $link c-string-error. } " is thrown."
-"Sometimes a C function has a parameter type of " { $snippet "void*" } ", and various data types, among them strings, can be passed in. In this case, strings are not automatically converted to aliens, and instead you must call one of these words:"
-{ $subsection string>char-alien }
-{ $subsection string>u16-alien }
-{ $subsection malloc-char-string }
-{ $subsection malloc-u16-string }
-"The first two allocate " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } "."
-$nl
-"Finally, a set of words can be used to read and write " { $snippet "char*" } " and " { $snippet "ushort*" } " strings at arbitrary addresses:"
-{ $subsection alien>char-string }
-{ $subsection alien>u16-string }
-{ $subsection memory>string }
-{ $subsection string>memory } ;
-
-ARTICLE: "c-arrays-factor" "Converting C arrays to and from Factor arrays"
-"Each primitive C type has a pair of words, " { $snippet ">" { $emphasis "type" } "-array" } " and " { $snippet { $emphasis "type" } "-array>" } ", for converting an array of Factor objects to and from a " { $link byte-array } " of C values. This set of words consists of:"
-{ $subsection >c-bool-array      }
-{ $subsection >c-char-array      }
-{ $subsection >c-double-array    }
-{ $subsection >c-float-array     }
-{ $subsection >c-int-array       }
-{ $subsection >c-long-array      }
-{ $subsection >c-longlong-array  }
-{ $subsection >c-short-array     }
-{ $subsection >c-uchar-array     }
-{ $subsection >c-uint-array      }
-{ $subsection >c-ulong-array     }
-{ $subsection >c-ulonglong-array }
-{ $subsection >c-ushort-array    }
-{ $subsection >c-void*-array     }
-{ $subsection c-bool-array>      }
-{ $subsection c-char*-array>     }
-{ $subsection c-char-array>      }
-{ $subsection c-double-array>    }
-{ $subsection c-float-array>     }
-{ $subsection c-int-array>       }
-{ $subsection c-long-array>      }
-{ $subsection c-longlong-array>  }
-{ $subsection c-short-array>     }
-{ $subsection c-uchar-array>     }
-{ $subsection c-uint-array>      }
-{ $subsection c-ulong-array>     }
-{ $subsection c-ulonglong-array> }
-{ $subsection c-ushort*-array>   }
-{ $subsection c-ushort-array>    }
-{ $subsection c-void*-array>     } ;
-
-ARTICLE: "c-arrays-get/set" "Reading and writing elements in C arrays"
-"Each C type has a pair of words, " { $snippet { $emphasis "type" } "-nth" } " and " { $snippet "set-" { $emphasis "type" } "-nth" } ", for reading and writing values of this type stored in an array. This set of words includes but is not limited to:"
-{ $subsection char-nth }
-{ $subsection set-char-nth }
-{ $subsection uchar-nth }
-{ $subsection set-uchar-nth }
-{ $subsection short-nth }
-{ $subsection set-short-nth }
-{ $subsection ushort-nth }
-{ $subsection set-ushort-nth }
-{ $subsection int-nth }
-{ $subsection set-int-nth }
-{ $subsection uint-nth }
-{ $subsection set-uint-nth }
-{ $subsection long-nth }
-{ $subsection set-long-nth }
-{ $subsection ulong-nth }
-{ $subsection set-ulong-nth }
-{ $subsection longlong-nth }
-{ $subsection set-longlong-nth }
-{ $subsection ulonglong-nth }
-{ $subsection set-ulonglong-nth }
-{ $subsection float-nth }
-{ $subsection set-float-nth }
-{ $subsection double-nth }
-{ $subsection set-double-nth }
-{ $subsection void*-nth }
-{ $subsection set-void*-nth }
-{ $subsection char*-nth }
-{ $subsection ushort*-nth } ;
-
-ARTICLE: "c-arrays" "C arrays"
-"C arrays are allocated in the same manner as other C data; see " { $link "c-byte-arrays" } " and " { $link "malloc" } "."
-$nl
-"C type specifiers for array types are documented in " { $link "c-types-specs" } "."
-{ $subsection "c-arrays-factor" }
-{ $subsection "c-arrays-get/set" } ;
-
-ARTICLE: "c-out-params" "Output parameters in C"
-"A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
-$nl
-"Each numerical C type, together with " { $snippet "void*" } ", has an associated " { $emphasis "out parameter constructor" } " word which takes a Factor object as input, constructs a byte array of the correct size, and converts the Factor object to a C value stored into the byte array:"
-{ $subsection <char> }
-{ $subsection <uchar> }
-{ $subsection <short> }
-{ $subsection <ushort> }
-{ $subsection <int> }
-{ $subsection <uint> }
-{ $subsection <long> }
-{ $subsection <ulong> }
-{ $subsection <longlong> }
-{ $subsection <ulonglong> }
-{ $subsection <float> }
-{ $subsection <double> }
-{ $subsection <void*> }
-"You call the out parameter constructor with the required initial value, then pass the byte array to the C function, which receives a pointer to the start of the byte array's data area. The C function then returns, leaving the result in the byte array; you read it back using the next set of words:"
-{ $subsection *char }
-{ $subsection *uchar }
-{ $subsection *short }
-{ $subsection *ushort }
-{ $subsection *int }
-{ $subsection *uint }
-{ $subsection *long }
-{ $subsection *ulong }
-{ $subsection *longlong }
-{ $subsection *ulonglong }
-{ $subsection *float }
-{ $subsection *double }
-{ $subsection *void* }
-{ $subsection *char* }
-{ $subsection *ushort* }
-"Note that while structure and union types do not get these words defined for them, there is no loss of generality since " { $link <void*> } " and " { $link *void* } " may be used." ;
-
-ARTICLE: "c-data" "Passing data between Factor and C"
-"Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers. Also Factor's garbage collector can move objects in memory, which means that special support has to be provided for passing blocks of memory to C code."
-{ $subsection "c-types-specs" }
-{ $subsection "c-byte-arrays" }
-{ $subsection "malloc" }
-{ $subsection "c-strings" }
-{ $subsection "c-arrays" }
-{ $subsection "c-out-params" }
-"C-style enumerated types are supported:"
-{ $subsection POSTPONE: C-ENUM: }
-"C types can be aliased for convenience and consitency with native library documentation:"
-{ $subsection POSTPONE: TYPEDEF: }
-"New C types can be defined:"
-{ $subsection "c-structs" }
-{ $subsection "c-unions" }
-{ $subsection "reading-writing-memory" } ;
 
 ARTICLE: "embedding-api" "Factor embedding API"
 "The Factor embedding API is defined in " { $snippet "vm/master.h" } "."

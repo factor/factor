@@ -1,10 +1,10 @@
 USING: continuations kernel math namespaces strings sbufs
-tools.test sequences vectors ;
-IN: temporary
+tools.test sequences vectors arrays ;
+IN: strings.tests
 
 [ CHAR: b ] [ 1 >bignum "abc" nth ] unit-test
 
-[ ] [ 10 [ [ -1000000 <sbuf> ] catch drop ] times ] unit-test
+[ ] [ 10 [ [ -1000000 <sbuf> ] ignore-errors ] times ] unit-test
 
 [ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] "" make ] unit-test
 
@@ -28,22 +28,10 @@ IN: temporary
 
 [ "end" ] [ "Beginning and end" 14 tail ] unit-test
 
-[ t ] [ CHAR: a letter? ] unit-test
-[ f ] [ CHAR: A letter? ] unit-test
-[ f ] [ CHAR: a LETTER? ] unit-test
-[ t ] [ CHAR: A LETTER? ] unit-test
-[ t ] [ CHAR: 0 digit? ] unit-test
-[ f ] [ CHAR: x digit? ] unit-test
+[ t ] [ "abc" "abd" before? ] unit-test
+[ t ] [ "z" "abd" after? ] unit-test
 
-[ t ] [ "abc" "abd" <=> 0 < ] unit-test
-[ t ] [ "z" "abd" <=> 0 > ] unit-test
-
-[ f ] [ [ 0 10 "hello" subseq ] catch not ] unit-test
-
-[ 4 ] [
-    0 "There are Four Upper Case characters"
-    [ LETTER? [ 1+ ] when ] each
-] unit-test
+[ 0 10 "hello" subseq ] must-fail
 
 [ "Replacing+spaces+with+plus" ]
 [
@@ -55,14 +43,50 @@ unit-test
 [ "05" ] [ "5" 2 CHAR: 0 pad-left ] unit-test
 [ "666" ] [ "666" 2 CHAR: 0 pad-left ] unit-test
 
-[ 1 "" nth ] unit-test-fails
-[ -6 "hello" nth ] unit-test-fails
+[ 1 "" nth ] must-fail
+[ -6 "hello" nth ] must-fail
 
 [ t ] [ "hello world" dup >vector >string = ] unit-test 
 
 [ "ab" ] [ 2 "abc" resize-string ] unit-test
 [ "abc\0\0\0" ] [ 6 "abc" resize-string ] unit-test
 
+[ "\u001234b" ] [ 2 "\u001234bc" resize-string ] unit-test
+[ "\u001234bc\0\0\0" ] [ 6 "\u001234bc" resize-string ] unit-test
+
 ! Random tester found this
-[ { "kernel-error" 3 12 -7 } ]
-[ [ 2 -7 resize-string ] catch ] unit-test
+[ 2 -7 resize-string ] [ { "kernel-error" 3 12 -7 } = ] must-fail-with
+
+! Make sure 24-bit strings work
+"hello world" "s" set
+
+[ ] [ HEX: 1234 1 "s" get set-nth ] unit-test
+[ ] [ HEX: 4321 3 "s" get set-nth ] unit-test
+[ ] [ HEX: 654321 5 "s" get set-nth ] unit-test
+
+[
+    {
+        CHAR: h
+        HEX: 1234
+        CHAR: l
+        HEX: 4321
+        CHAR: o
+        HEX: 654321
+        CHAR: w
+        CHAR: o
+        CHAR: r
+        CHAR: l
+        CHAR: d
+    }
+] [
+    "s" get >array
+] unit-test
+
+! Make sure we clear aux vector when storing octets
+[ "\u123456hi" ] [ "ih\u123456" clone dup reverse-here ] unit-test
+
+! Make sure aux vector is not shared
+[ "\udeadbe" ] [
+    "\udeadbe" clone
+    CHAR: \u123456 over clone set-first
+] unit-test

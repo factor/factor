@@ -4,6 +4,7 @@ USING: kernel io combinators namespaces quotations arrays sequences
        x11.xlib x11.constants
        mortar mortar.sugar slot-accessors
        geom.rect
+       math.bitfields
        x x.gc x.widgets
        x.widgets.button
        x.widgets.wm.child
@@ -21,14 +22,16 @@ SYMBOL: <wm-frame>
   swap <wm-child> new* >>child
   <gc> new* "white" <-- set-foreground >>gc
 
-  SubstructureRedirectMask
-  ExposureMask bitor
-  ButtonPressMask bitor
-  ButtonReleaseMask bitor
-  ButtonMotionMask bitor
-  EnterWindowMask bitor
-  ! experimental masks
-  SubstructureNotifyMask bitor
+  {
+    SubstructureRedirectMask
+    ExposureMask
+    ButtonPressMask
+    ButtonReleaseMask
+    ButtonMotionMask
+    EnterWindowMask
+    ! experimental masks
+    SubstructureNotifyMask
+  } flags
   >>mask
 
   <- init-widget
@@ -137,7 +140,7 @@ SYMBOL: WM_DELETE_WINDOW
       [ over XConfigureRequestEvent-height <-- set-child-height ] }
     { [ t ]
       [ "<wm-frame> handle-configure-request :: resize not requested"
-      	print flush ] } }
+        print flush ] } }
   cond
   2drop ]
 

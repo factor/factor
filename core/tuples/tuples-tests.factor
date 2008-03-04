@@ -3,7 +3,7 @@ math.constants parser sequences tools.test words assocs
 namespaces quotations sequences.private classes continuations
 generic.standard effects tuples tuples.private arrays vectors
 strings compiler.units ;
-IN: temporary
+IN: tuples.tests
 
 [ t ] [ \ tuple-class \ class class< ] unit-test
 [ f ] [ \ class \ tuple-class class< ] unit-test
@@ -45,19 +45,19 @@ C: <point> point
 100 200 <point> "p" set
 
 ! Use eval to sequence parsing explicitly
-"IN: temporary TUPLE: point x y z ;" eval
+"IN: tuples.tests TUPLE: point x y z ;" eval
 
 [ 100 ] [ "p" get point-x ] unit-test
 [ 200 ] [ "p" get point-y ] unit-test
-[ f ] [ "p" get "point-z" "temporary" lookup execute ] unit-test
+[ f ] [ "p" get "point-z" "tuples.tests" lookup execute ] unit-test
 
-300 "p" get "set-point-z" "temporary" lookup execute
+300 "p" get "set-point-z" "tuples.tests" lookup execute
 
-"IN: temporary TUPLE: point z y ;" eval
+"IN: tuples.tests TUPLE: point z y ;" eval
 
-[ "p" get point-x ] unit-test-fails
+[ "p" get point-x ] must-fail
 [ 200 ] [ "p" get point-y ] unit-test
-[ 300 ] [ "p" get "point-z" "temporary" lookup execute ] unit-test
+[ 300 ] [ "p" get "point-z" "tuples.tests" lookup execute ] unit-test
 
 TUPLE: predicate-test ;
 
@@ -97,7 +97,7 @@ TUPLE: delegate-clone ;
 [ f ] [ \ tuple \ delegate-clone class< ] unit-test
 
 ! Compiler regression
-[ t ] [ [ t length ] catch no-method-object ] unit-test
+[ t length ] [ no-method-object t eq? ] must-fail-with
 
 [ "<constructor-test>" ]
 [ "TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval word word-name ] unit-test
@@ -113,7 +113,7 @@ GENERIC: <yo-momma>
 
 TUPLE: yo-momma ;
 
-"IN: temporary C: <yo-momma> yo-momma" eval
+"IN: tuples.tests C: <yo-momma> yo-momma" eval
 
 [ f ] [ \ <yo-momma> generic? ] unit-test
 
@@ -123,7 +123,7 @@ TUPLE: yo-momma ;
     [ ] [ \ yo-momma forget ] unit-test
     [ f ] [ \ yo-momma typemap get values memq? ] unit-test
 
-    [ f ] [ \ yo-momma interned? ] unit-test
+    [ f ] [ \ yo-momma crossref get at ] unit-test
 ] with-compilation-unit
 
 TUPLE: loc-recording ;
@@ -202,17 +202,17 @@ M: vector silly "z" ;
 SYMBOL: not-a-tuple-class
 
 [
-    "IN: temporary C: <not-a-tuple-class> not-a-tuple-class"
+    "IN: tuples.tests C: <not-a-tuple-class> not-a-tuple-class"
     eval
-] unit-test-fails
+] must-fail
 
 [ t ] [
-    "not-a-tuple-class" "temporary" lookup symbol?
+    "not-a-tuple-class" "tuples.tests" lookup symbol?
 ] unit-test
 
 ! Missing check
-[ not-a-tuple-class construct-boa ] unit-test-fails
-[ not-a-tuple-class construct-empty ] unit-test-fails
+[ not-a-tuple-class construct-boa ] must-fail
+[ not-a-tuple-class construct-empty ] must-fail
 
 TUPLE: erg's-reshape-problem a b c d ;
 
@@ -226,7 +226,7 @@ C: <erg's-reshape-problem> erg's-reshape-problem
     { set-erg's-reshape-problem-a }
     \ erg's-reshape-problem construct ;
 
-"IN: temporary TUPLE: erg's-reshape-problem a b c d e f ;" eval
+"IN: tuples.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
 
 [ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
 
@@ -234,8 +234,43 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 
 [ t ] [ 1 cons-test-3 array-capacity "a" get array-capacity = ] unit-test
 
-[ t ] [
+[
+    "IN: tuples.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
+] [ [ check-tuple? ] is? ] must-fail-with
+
+! Hardcore unit tests
+USE: threads
+
+\ thread "slot-names" word-prop "slot-names" set
+
+[ ] [
     [
-        "IN: temporary SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
-    ] catch [ check-tuple? ] is?
+        \ thread { "xxx" } "slot-names" get append
+        define-tuple-class
+    ] with-compilation-unit
+
+    [ 1337 sleep ] "Test" spawn drop
+
+    [
+        \ thread "slot-names" get
+        define-tuple-class
+    ] with-compilation-unit
+] unit-test
+
+USE: vocabs
+
+\ vocab "slot-names" word-prop "slot-names" set
+
+[ ] [
+    [
+        \ vocab { "xxx" } "slot-names" get append
+        define-tuple-class
+    ] with-compilation-unit
+
+    all-words drop
+
+    [
+        \ vocab "slot-names" get
+        define-tuple-class
+    ] with-compilation-unit
 ] unit-test

@@ -32,7 +32,7 @@ GENERIC: inet-pton ( str addrspec -- data )
 
 
 M: inet4 inet-ntop ( data addrspec -- str )
-    drop 4 memory>string [ number>string ] { } map-as "." join ;
+    drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
 
 M: inet4 inet-pton ( str addrspec -- data )
     drop "." split [ string>number ] B{ } map-as ;
@@ -53,14 +53,14 @@ M: inet4 make-sockaddr ( inet -- sockaddr )
 
 SYMBOL: port-override
 
-: (port) port-override get [ ] [ ] ?if ;
+: (port) port-override get swap or ;
 
 M: inet4 parse-sockaddr
     >r dup sockaddr-in-addr <uint> r> inet-ntop
     swap sockaddr-in-port ntohs (port) <inet4> ;
 
 M: inet6 inet-ntop ( data addrspec -- str )
-    drop 16 memory>string 2 <groups> [ be> >hex ] map ":" join ;
+    drop 16 memory>byte-array 2 <groups> [ be> >hex ] map ":" join ;
 
 M: inet6 inet-pton ( str addrspec -- data )
     drop "::" split1
@@ -132,8 +132,3 @@ M: object host-name ( -- name )
     256 <byte-array> dup dup length gethostname
     zero? [ "gethostname failed" throw ] unless
     alien>char-string ;
-
-: >mac-address ( byte-array -- string )
-    6 memory>string >byte-array
-    [ >hex 2 48 pad-left ] { } map-as ":" join ;
-

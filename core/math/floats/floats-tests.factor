@@ -1,5 +1,5 @@
 USING: kernel math math.constants tools.test sequences ;
-IN: temporary
+IN: math.floats.tests
 
 [ t ] [ 0.0 float? ] unit-test
 [ t ] [ 3.1415 number? ] unit-test

@@ -17,7 +17,7 @@ ARTICLE: "tools.memory" "Object memory tools"
 "The garbage collector can be invoked manually:"
 { $subsection data-gc }
 { $subsection code-gc }
-{ $see-also "image" } ;
+{ $see-also "images" } ;
 
 ABOUT: "tools.memory"
 

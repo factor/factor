@@ -59,11 +59,13 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 { $subsection diff }
 { $subsection remove-all }
 { $subsection substitute }
+{ $subsection substitute-here }
 { $see-also key? } ;
 
 ARTICLE: "assocs-mutation" "Storing keys and values in assocs"
 "Utility operations built up from the " { $link "assocs-protocol" } ":"
 { $subsection delete-at* }
+{ $subsection delete-any }
 { $subsection rename-at }
 { $subsection change-at }
 { $subsection at+ }
@@ -220,6 +222,12 @@ HELP: delete-at*
 { $description "Removes an entry from the assoc and outputs the previous value together with a boolean indicating whether it was present." }
 { $side-effects "assoc" } ;
 
+HELP: delete-any
+{ $values { "assoc" assoc } { "key" "a key" } { "value" "a value" } }
+{ $description "Removes an undetermined entry from the assoc and outputs it." }
+{ $errors "Throws an error if the assoc is empty." }
+{ $notes "This word is useful when using an assoc as an unordered queue which requires constant-time membership tests. Entries are enqueued with " { $link set-at } " and dequeued with " { $link delete-any } "." } ;
+
 HELP: rename-at
 { $values { "newkey" object } { "key" object } { "assoc" assoc } }
 { $description "Removes the values associated to " { $snippet "key" } " and re-adds it as " { $snippet "newkey" } ". Does nothing if the assoc does not contain " { $snippet "key" } "." }
@@ -259,11 +267,15 @@ HELP: remove-all
 { $notes "The values of the keys in the assoc are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." }
 { $side-effects "assoc" } ;
 
-HELP: substitute
-{ $values { "assoc" assoc } { "seq" "a mutable sequence" } }
-{ $description "Replaces elements of " { $snippet "seq" } " which appear in as keys in " { $snippet "assoc" } " with the corresponding values, acting as the identity on all other elements." }
+HELP: substitute-here
+{ $values { "seq" "a mutable sequence" } { "assoc" assoc } }
+{ $description "Replaces elements of " { $snippet "seq" } " which appear as keys in " { $snippet "assoc" } " with the corresponding values, acting as the identity on all other elements." }
 { $errors "Throws an error if " { $snippet "assoc" } " contains values whose types are not permissible in " { $snippet "seq" } "." }
 { $side-effects "seq" } ;
+
+HELP: substitute
+{ $values { "seq" sequence } { "assoc" assoc } { "newseq" sequence } }
+{ $description "Creates a new sequence where elements of " { $snippet "seq" } " which appear as keys in " { $snippet "assoc" } " are replaced by the corresponding values, and all other elements are unchanged." } ;
 
 HELP: cache
 { $values { "key" "a key" } { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key -- value )" } } { "value" "a previously-retained or freshly-computed value" } }

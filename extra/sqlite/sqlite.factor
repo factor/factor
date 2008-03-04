@@ -7,8 +7,8 @@
 ! executing SQL calls and obtaining results.
 !
 IN: sqlite
-USING: alien compiler kernel namespaces sequences strings sqlite.lib
-    alien.c-types continuations ;
+USING: alien compiler io.files.tmp kernel math namespaces sequences strings
+    sqlite.lib alien.c-types continuations ;
 
 TUPLE: sqlite-error n message ;
 SYMBOL: db
@@ -50,11 +50,33 @@ SYMBOL: db
   #! Bind the text to the parameterized value in the statement.  
   dup length SQLITE_TRANSIENT sqlite3_bind_text sqlite-check-result ;
 
+: sqlite-bind-int ( statement index int -- )
+    sqlite3_bind_int sqlite-check-result ;
+
+GENERIC: sqlite-bind ( statement index obj -- )
+
+M: object sqlite-bind ( statement index obj --  )
+    sqlite-bind-text ;
+
+M: integer sqlite-bind ( statement index int -- )
+    sqlite-bind-int ;
+
 : sqlite-bind-parameter-index ( statement name -- index )
   sqlite3_bind_parameter_index ;
 
 : sqlite-bind-text-by-name ( statement name text -- )
   >r dupd sqlite-bind-parameter-index r> sqlite-bind-text ;
+
+: sqlite-bind-by-name ( statement name obj -- )
+    >r dupd sqlite-bind-parameter-index r> sqlite-bind ;
+
+GENERIC# sqlite-bind-by-name-or-index 1 ( statement key val -- )
+
+M: object sqlite-bind-by-name-or-index ( statement object val -- )
+    sqlite-bind-by-name ;
+
+M: integer sqlite-bind-by-name-or-index ( statement integer val -- )
+    sqlite-bind ;
 
 : sqlite-finalize ( statement -- )
   #! Clean up all resources related to a statement. Once called
@@ -76,6 +98,9 @@ SYMBOL: db
   #! Return the value of the given column, indexed
   #! from zero, as a string.
   sqlite3_column_text ;
+
+: column-int ( statement index -- int )
+  sqlite3_column_int ;
 
 : step-complete? ( step-result -- bool )
   #! Return true if the result of a sqlite3_step is
@@ -125,3 +150,7 @@ DEFER: (sqlite-map)
         [ db get sqlite-close ] [ ] cleanup
     ] with-scope ;
 
+: with-tmp-db ( quot -- )
+  ".db" [
+      swap with-sqlite
+  ] with-tmpfile ;

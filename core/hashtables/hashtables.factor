@@ -1,8 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private slots.private math assocs
-math.private sequences sequences.private vectors
-combinators ;
+math.private sequences sequences.private vectors ;
 IN: hashtables
 
 <PRIVATE
@@ -17,7 +16,6 @@ IN: hashtables
     2 fixnum+fast over wrap ; inline
 
 : (key@) ( key keys i -- array n ? )
-    #! cond form expanded by hand for better interpreter speed
     3dup swap array-nth dup ((tombstone)) eq? [
         2drop probe (key@)
     ] [
@@ -41,7 +39,6 @@ IN: hashtables
     swap <hash-array> over set-hash-array init-hash ;
 
 : (new-key@) ( key keys i -- keys n empty? )
-    #! cond form expanded by hand for better interpreter speed
     3dup swap array-nth dup ((empty)) eq? [
         2drop rot drop t
     ] [
@@ -122,7 +119,7 @@ IN: hashtables
 PRIVATE>
 
 : <hashtable> ( n -- hash )
-    (hashtable) [ reset-hash ] keep ;
+    hashtable construct-empty [ reset-hash ] keep ;
 
 M: hashtable at* ( key hash -- value ? )
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;
@@ -161,17 +158,10 @@ M: hashtable clone
     (clone) dup hash-array clone over set-hash-array ;
 
 M: hashtable equal?
-    {
-        { [ over hashtable? not ] [ 2drop f ] }
-        { [ 2dup [ assoc-size ] 2apply number= not ] [ 2drop f ] }
-        { [ t ] [ assoc= ] }
-    } cond ;
-
-M: hashtable hashcode*
-    [
-        dup assoc-size 1 number=
-        [ assoc-hashcode ] [ nip assoc-size ] if
-    ] recursive-hashcode ;
+    over hashtable? [
+        2dup [ assoc-size ] 2apply number=
+        [ assoc= ] [ 2drop f ] if
+    ] [ 2drop f ] if ;
 
 ! Default method
 M: assoc new-assoc drop <hashtable> ;
@@ -194,5 +184,8 @@ M: hashtable assoc-like
 : prune ( seq -- newseq )
     dup length <hashtable> over length <vector>
     rot [ >r 2dup r> (prune) ] each nip ;
+
+: all-unique? ( seq -- ? )
+    dup prune [ length ] 2apply = ;
 
 INSTANCE: hashtable assoc

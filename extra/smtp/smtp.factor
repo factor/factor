@@ -1,138 +1,183 @@
-! Copyright (C) 2007 Elie CHAFTARI
+! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
+! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-! cram-md5 auth code contributed by Dirk Vleugels <dvl@2scale.net>
-
-USING: alien alien.c-types combinators crypto.common crypto.hmac base64
-kernel io io.sockets namespaces sequences splitting ;
+USING: namespaces io io.timeouts kernel logging io.sockets
+sequences combinators sequences.lib splitting assocs strings
+math.parser random system calendar calendar.format ;
 
 IN: smtp
 
-! =========================================================
-! smtp.factor implementation
-! =========================================================
+SYMBOL: smtp-domain
+SYMBOL: smtp-host       "localhost" smtp-host set-global
+SYMBOL: smtp-port       25 smtp-port set-global
+SYMBOL: read-timeout    1 minutes read-timeout set-global
+SYMBOL: esmtp           t esmtp set-global
 
-! Connection default values
-: default-port  25                      ; inline
-: read-timeout  60000                   ; inline
-: esmtp         t                       ; inline ! t = ehlo
-: domain        "localhost.localdomain" ; inline
+: log-smtp-connection ( host port -- ) 2drop ;
 
-SYMBOL: sess
-SYMBOL: conn
-SYMBOL: challenge
+\ log-smtp-connection NOTICE add-input-logging
 
-TUPLE: session address port timeout domain esmtp ;
+: with-smtp-connection ( quot -- )
+    smtp-host get smtp-port get
+    2dup log-smtp-connection
+    <inet> <client> [
+        smtp-domain [ host-name or ] change
+        read-timeout get stdio get set-timeout
+        call
+    ] with-stream ; inline
 
-: <session> ( address -- session )
-    default-port read-timeout domain esmtp
-    session construct-boa ;
+: crlf "\r\n" write ;
 
-! =========================================================
-! Initialization routines
-! =========================================================
+: helo ( -- )
+    esmtp get "EHLO " "HELO " ? write host-name write crlf ;
 
-: initialize ( address -- )
-    <session> sess set ;
+: validate-address ( string -- string' )
+    #! Make sure we send funky stuff to the server by accident.
+    dup [ "\r\n>" member? ] contains?
+    [ "Bad e-mail address: " swap append throw ] when ;
 
-: set-port ( port -- )
-    sess get set-session-port ;
+: mail-from ( fromaddr -- )
+    "MAIL FROM:<" write validate-address write ">" write crlf ;
 
-: set-read-timeout ( timeout -- )
-    sess get set-session-timeout ;
+: rcpt-to ( to -- )
+    "RCPT TO:<" write validate-address write ">" write crlf ;
 
-: set-esmtp ( esmtp -- )
-    sess get set-session-esmtp ;
+: data ( -- )
+    "DATA" write crlf ;
 
-: set-domain ( -- )
-    host-name sess get set-session-domain ;
+: validate-message ( msg -- msg' )
+    "." over member? [ "Message cannot contain . on a line by itself" throw ] when ;
 
-: do-start ( -- )
-    sess get [ session-address ] keep session-port <inet> <client>
-    dup conn set [ sess get session-timeout swap set-timeout ]
-    keep stream-readln print ;
+: send-body ( body -- )
+    validate-message
+    [ write crlf ] each
+    "." write crlf ;
 
-! =========================================================
-! Command routines
-! =========================================================
+: quit ( -- )
+    "QUIT" write crlf ;
+
+LOG: smtp-response DEBUG
 
 : check-response ( response -- )
     {
-        { [ dup "220" head? ] [ print ] }
-        { [ dup "235" swap subseq? ] [ print ] }
-        { [ dup "250" head? ] [ print ] }
-        { [ dup "221" head? ] [ print ] }
-        { [ dup "bye" head? ] [ print ] }
+        { [ dup "220" head? ] [ smtp-response ] }
+        { [ dup "235" swap subseq? ] [ smtp-response ] }
+        { [ dup "250" head? ] [ smtp-response ] }
+        { [ dup "221" head? ] [ smtp-response ] }
+        { [ dup "bye" head? ] [ smtp-response ] }
         { [ dup "4" head? ] [ "server busy" throw ] }
-        { [ dup "334" head? ] [ " " split 1 swap nth base64> challenge set ] }
-        { [ dup "354" head? ] [ print ] }
-        { [ dup "50" head? ] [ print "syntax error" throw ] }
-        { [ dup "53" head? ] [ print "invalid authentication data" throw ] }
-        { [ dup "55" head? ] [ print "fatal error" throw ] }
-        { [ t ] [ "unknow error" throw ] }
+        { [ dup "354" head? ] [ smtp-response ] }
+        { [ dup "50" head? ] [ smtp-response "syntax error" throw ] }
+        { [ dup "53" head? ] [ smtp-response "invalid authentication data" throw ] }
+        { [ dup "55" head? ] [ smtp-response "fatal error" throw ] }
+        { [ t ] [ "unknown error" throw ] }
     } cond ;
 
-SYMBOL: multiline
-
 : multiline? ( response -- boolean )
-    CHAR: - swap index 3 = ;
+    ?fourth CHAR: - = ;
 
-: process-multiline ( -- response )
-    conn get stream-readln dup
-    multiline get " " append head? [ 
-        print
+: process-multiline ( multiline -- response )
+    >r readln r> 2dup " " append head? [
+        drop dup smtp-response
     ] [
-        check-response process-multiline
+        swap check-response process-multiline
     ] if ;
 
-: recv-response ( -- response )
-    conn get stream-readln
-    dup multiline? [
-        dup 3 head multiline set process-multiline
-    ] [ ] if ;
+: receive-response ( -- response )
+    readln
+    dup multiline? [ 3 head process-multiline ] when ;
 
-: get-ok ( command -- )
-    >r conn get r> over stream-write stream-flush
-    recv-response check-response ;
+: get-ok ( -- ) flush receive-response check-response ;
 
-: helo ( -- )
-    "HELO " sess get session-domain append "\r\n" append get-ok ;
+: send-raw-message ( body to from -- )
+    [
+        helo get-ok
+        mail-from get-ok
+        [ rcpt-to get-ok ] each
+        data get-ok
+        send-body get-ok
+        quit get-ok
+    ] with-smtp-connection ;
 
-: ehlo ( -- )
-    "EHLO " sess get session-domain append "\r\n" append get-ok ;
+: validate-header ( string -- string' )
+    dup [ "\r\n" member? ] contains?
+    [ "Invalid header string: " swap append throw ] when ;
 
-: mailfrom ( fromaddr -- )
-    "MAIL FROM:<" swap append ">\r\n" append get-ok ;
+: prepare-header ( key value -- )
+    swap
+    validate-header %
+    ": " %
+    validate-header % ;
 
-: rcptto ( to -- )
-    "RCPT TO:<" swap append ">\r\n" append get-ok ;
+: prepare-headers ( assoc -- )
+    [ [ prepare-header ] "" make , ] assoc-each ;
 
-: (cram-md5-auth) ( -- response )
-    swap challenge get 
-    string>md5-hmac hex-string 
-    " " swap append append 
-    >base64 ;
+: extract-email ( recepient -- email )
+    #! This could be much smarter.
+    " " last-split1 swap or "<" ?head drop ">" ?tail drop ;
 
-: cram-md5-auth ( key login  -- )
-    "AUTH CRAM-MD5\r\n" get-ok 
-    (cram-md5-auth) "\r\n" append get-ok ;
-  
-: data ( -- )
-    "DATA\r\n" get-ok ;
+: message-id ( -- string )
+    [
+        "<" %
+        2 big-random #
+        "-" %
+        millis #
+        "@" %
+        smtp-domain get %
+        ">" %
+    ] "" make ;
 
-: start ( -- )
-    set-domain ! replaces localhost.localdomain with hostname
-    do-start
-    sess get session-esmtp [
-        ehlo
-    ] [
-        helo
-    ] if ;
+: simple-headers ( subject to from -- headers to from )
+    [
+        >r dup ", " join "To" set [ extract-email ] map r>
+        dup "From" set extract-email
+        rot "Subject" set
+        now timestamp>rfc822-string "Date" set
+        message-id "Message-Id" set
+    ] { } make-assoc -rot ;
 
-: send-message ( msg -- )
-    data
-    "\r\n" join conn get swap "\r\n" append over stream-write
-    stream-flush ".\r\n" get-ok ;
+: prepare-message ( body headers -- body' )
+    [
+        prepare-headers
+        "" ,
+        dup string? [ string-lines ] when %
+    ] { } make ;
 
-: quit ( -- )
-    "QUIT\r\n" get-ok ;
+: prepare-simple-message ( body subject to from -- body' to from )
+    simple-headers >r >r prepare-message r> r> ;
+
+: send-message ( body headers to from -- )
+    >r >r prepare-message r> r> send-raw-message ;
+
+: send-simple-message ( body subject to from -- )
+    prepare-simple-message send-raw-message ;
+
+! Dirk's old AUTH CRAM-MD5 code. I don't know anything about
+! CRAM MD5, and the old code didn't work properly either, so here
+! it is in case anyone wants to fix it later.
+!
+! check-response used to have this clause:
+! { [ dup "334" head? ] [ " " split 1 swap nth base64> challenge set ] }
+!
+! and the rest of the code was as follows:
+! : (cram-md5-auth) ( -- response )
+!     swap challenge get 
+!     string>md5-hmac hex-string 
+!     " " swap append append 
+!     >base64 ;
+! 
+! : cram-md5-auth ( key login  -- )
+!     "AUTH CRAM-MD5\r\n" get-ok 
+!     (cram-md5-auth) "\r\n" append get-ok ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USE: new-slots
+
+TUPLE: email from to subject body ;
+
+: <email> ( -- email ) email construct-empty ;
+
+: send ( email -- )
+  { email-body email-subject email-to email-from } get-slots
+  send-simple-message ;

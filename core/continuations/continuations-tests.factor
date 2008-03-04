@@ -1,7 +1,7 @@
 USING: kernel math namespaces io tools.test sequences vectors
 continuations debugger parser memory arrays words
 kernel.private ;
-IN: temporary
+IN: continuations.tests
 
 : (callcc1-test)
     swap 1- tuck swap ?push
@@ -25,13 +25,11 @@ IN: temporary
 [ t ] [ 10 callcc1-test 10 reverse >vector = ] unit-test
 [ t ] [ callcc-namespace-test ] unit-test
 
-[ f ] [ [ ] catch ] unit-test
-
-[ 5 ] [ [ 5 throw ] catch ] unit-test
+[ 5 throw ] [ 5 = ] must-fail-with
 
 [ t ] [
-    [ "Hello" throw ] catch drop
-    global [ error get ] bind
+    [ "Hello" throw ] ignore-errors
+    error get-global
     "Hello" =
 ] unit-test
 
@@ -41,13 +39,13 @@ IN: temporary
 
 "!!! The following error is part of the test" print
 
-[ [ "2 car" ] eval ] catch print-error
+[ ] [ [ [ "2 car" ] eval ] [ print-error ] recover ] unit-test
 
-[ f throw ] unit-test-fails
+[ f throw ] must-fail
 
 ! Weird PowerPC bug.
 [ ] [
-    [ "4" throw ] catch drop
+    [ "4" throw ] ignore-errors
     data-gc
     data-gc
 ] unit-test
@@ -56,10 +54,10 @@ IN: temporary
 [ f ] [ { "A" "B" } kernel-error? ] unit-test
 
 ! ! See how well callstack overflow is handled
-! [ clear drop ] unit-test-fails
+! [ clear drop ] must-fail
 ! 
 ! : callstack-overflow callstack-overflow f ;
-! [ callstack-overflow ] unit-test-fails
+! [ callstack-overflow ] must-fail
 
 : don't-compile-me { } [ ] each ;
 
@@ -84,24 +82,20 @@ SYMBOL: error-counter
     [ 1 ] [ always-counter get ] unit-test
     [ 0 ] [ error-counter get ] unit-test
 
-    [ "a" ] [
-        [
-            [ "a" throw ]
-            [ always-counter inc ]
-            [ error-counter inc ] cleanup
-        ] catch
-    ] unit-test
+    [
+        [ "a" throw ]
+        [ always-counter inc ]
+        [ error-counter inc ] cleanup
+    ] [ "a" = ] must-fail-with
 
     [ 2 ] [ always-counter get ] unit-test
     [ 1 ] [ error-counter get ] unit-test
 
-    [ "a" ] [
-        [
-            [ ]
-            [ always-counter inc "a" throw ]
-            [ error-counter inc ] cleanup
-        ] catch
-    ] unit-test
+    [
+        [ ]
+        [ always-counter inc "a" throw ]
+        [ error-counter inc ] cleanup
+    ] [ "a" = ] must-fail-with
 
     [ 3 ] [ always-counter get ] unit-test
     [ 1 ] [ error-counter get ] unit-test

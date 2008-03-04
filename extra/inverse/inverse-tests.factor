@@ -3,7 +3,7 @@ math.functions math.constants ;
 IN: inverse-tests
 
 [ 2 ] [ { 3 2 } [ 3 swap 2array ] undo ] unit-test
-[ { 3 4 } [ dup 2array ] undo ] unit-test-fails
+[ { 3 4 } [ dup 2array ] undo ] must-fail
 
 TUPLE: foo bar baz ;
 
@@ -15,7 +15,7 @@ C: <foo> foo
 
 [ t ] [ { 3 3 } [ 2same ] matches? ] unit-test
 [ f ] [ { 3 4 } [ 2same ] matches? ] unit-test
-[ [ 2same ] matches? ] unit-test-fails
+[ [ 2same ] matches? ] must-fail
 
 : something ( array -- num )
     {
@@ -25,9 +25,9 @@ C: <foo> foo
 
 [ 5 ] [ { 1 2 2 } something ] unit-test
 [ 6 ] [ { 2 3 } something ] unit-test
-[ { 1 } something ] unit-test-fails
+[ { 1 } something ] must-fail
 
-[ 1 2 [ eq? ] undo ] unit-test-fails
+[ 1 2 [ eq? ] undo ] must-fail
 
 : f>c ( *fahrenheit -- *celsius )
     32 - 1.8 / ;

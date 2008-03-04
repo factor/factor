@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs strings kernel sorting namespaces sequences
 definitions ;
@@ -85,7 +85,8 @@ SYMBOL: load-vocab-hook
 
 TUPLE: vocab-link name root ;
 
-C: <vocab-link> vocab-link
+: <vocab-link> ( name root -- vocab-link )
+    [ dup vocab-root ] unless* vocab-link construct-boa ;
 
 M: vocab-link equal?
     over vocab-link?
@@ -96,7 +97,13 @@ M: vocab-link hashcode*
 
 M: vocab-link vocab-name vocab-link-name ;
 
-: >vocab-link ( name root -- vocab )
+GENERIC# >vocab-link 1 ( name root -- vocab )
+
+M: vocab >vocab-link drop ;
+
+M: vocab-link >vocab-link drop ;
+
+M: string >vocab-link
     over vocab dup [ 2nip ] [ drop <vocab-link> ] if ;
 
 UNION: vocab-spec vocab vocab-link ;
@@ -106,3 +113,8 @@ UNION: vocab-spec vocab vocab-link ;
     vocab-name dictionary get delete-at ;
 
 M: vocab-spec forget* forget-vocab ;
+
+TUPLE: no-vocab name ;
+
+: no-vocab ( name -- * )
+    vocab-name \ no-vocab construct-boa throw ;

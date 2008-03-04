@@ -1,17 +1,17 @@
-IN: temporary
+IN: alien.c-types.tests
 USING: alien alien.syntax alien.c-types kernel tools.test
 sequences system libc ;
 
-[ "\u00ff" ]
-[ "\u00ff" string>char-alien alien>char-string ]
+[ "\u0000ff" ]
+[ "\u0000ff" string>char-alien alien>char-string ]
 unit-test
 
 [ "hello world" ]
 [ "hello world" string>char-alien alien>char-string ]
 unit-test
 
-[ "hello\uabcdworld" ]
-[ "hello\uabcdworld" string>u16-alien alien>u16-string ]
+[ "hello\u00abcdworld" ]
+[ "hello\u00abcdworld" string>u16-alien alien>u16-string ]
 unit-test
 
 [ t ] [ f expired? ] unit-test
@@ -71,4 +71,4 @@ TYPEDEF: uchar* MyLPBYTE
 
 [
     0 B{ 1 2 3 4 } <displaced-alien> <void*>
-] unit-test-fails
+] must-fail

@@ -429,7 +429,7 @@ HELP: collect
 
 HELP: each
 { $values { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt -- )" } } }
-{ $description "Applies the quotation to each element of the sequence in turn." } ;
+{ $description "Applies the quotation to each element of the sequence in order." } ;
 
 HELP: reduce
 { $values { "seq" sequence } { "identity" object } { "quot" "a quotation with stack effect " { $snippet "( prev elt -- next )" } } { "result" "the final result" } }
@@ -447,7 +447,7 @@ HELP: accumulate
 
 HELP: map
 { $values { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } { "newseq" "a new sequence" } }
-{ $description "Applies the quotation to each element yielding a new element. The new elements are collected into a sequence of the same class as the input sequence." } ;
+{ $description "Applies the quotation to each element of the sequence in order. The new elements are collected into a sequence of the same class as the input sequence." } ;
 
 HELP: change-nth
 { $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- newelt )" } } }

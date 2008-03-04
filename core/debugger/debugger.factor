@@ -1,11 +1,12 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic hashtables inspector io kernel
 math namespaces prettyprint sequences assocs sequences.private
 strings io.styles vectors words system splitting math.parser
 tuples continuations continuations.private combinators
 generic.math io.streams.duplex classes compiler.units
-generic.standard ;
+generic.standard vocabs threads threads.private init
+kernel.private libc ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -31,6 +32,9 @@ M: string error. print ;
 : :get ( variable -- value )
     error-continuation get continuation-name assoc-stack ;
 
+: :vars ( -- )
+    error-continuation get continuation-name namestack. ;
+
 : :res ( n -- )
     1- restarts get-global nth f restarts set-global restart ;
 
@@ -54,19 +58,6 @@ M: string error. print ;
         dup length [ restart. ] 2each
     ] if ;
 
-: debug-help ( -- )
-    nl
-    "Debugger commands:" print
-    nl
-    ":help - documentation for this error" print
-    ":s    - data stack at exception time" print
-    ":r    - retain stack at exception time" print
-    ":c    - call stack at exception time" print
-    ":edit - jump to source location (parse errors only)" print
-
-    ":get  ( var -- value ) accesses variables at time of the error" print
-    flush ;
-
 : print-error ( error -- )
     [ error. flush ] curry
     [ global [ "Error in print-error!" print drop ] bind ]
@@ -74,7 +65,12 @@ M: string error. print ;
 
 SYMBOL: error-hook
 
-[ print-error restarts. debug-help ] error-hook set-global
+[
+    print-error
+    restarts.
+    nl
+    "Type :help for debugging help." print flush
+] error-hook set-global
 
 : try ( quot -- )
     [ error-hook get call ] recover ;
@@ -87,7 +83,32 @@ TUPLE: assert got expect ;
 
 : depth ( -- n ) datastack length ;
 
-: assert-depth ( quot -- ) depth slip depth swap assert= ;
+: trim-datastacks ( seq1 seq2 -- seq1' seq2' )
+    2dup [ length ] 2apply min tuck tail >r tail r> ;
+
+TUPLE: relative-underflow stack ;
+
+: relative-underflow ( before after -- * )
+    trim-datastacks nip \ relative-underflow construct-boa throw ;
+
+M: relative-underflow summary
+    drop "Too many items removed from data stack" ;
+
+TUPLE: relative-overflow stack ;
+
+M: relative-overflow summary
+    drop "Superfluous items pushed to data stack" ;
+
+: relative-overflow ( before after -- * )
+    trim-datastacks drop \ relative-overflow construct-boa throw ;
+
+: assert-depth ( quot -- )
+    >r datastack r> swap slip >r datastack r>
+    2dup [ length ] compare sgn {
+        { -1 [ relative-underflow ] }
+        { 0 [ 2drop ] }
+        { 1 [ relative-overflow ] }
+    } case ; inline
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;
@@ -222,9 +243,6 @@ M: redefine-error error.
     "Re-definition of " write
     redefine-error-def . ;
 
-M: forward-error error.
-    "Forward reference to " write forward-error-word . ;
-
 M: undefined summary
     drop "Calling a deferred word before it has been defined" ;
 
@@ -232,3 +250,52 @@ M: no-compilation-unit error.
     "Attempting to define " write
     no-compilation-unit-definition pprint
     " outside of a compilation unit" print ;
+
+M: no-vocab summary
+    drop "Vocabulary does not exist" ;
+
+M: check-ptr summary
+    drop "Memory allocation failed" ;
+
+M: double-free summary
+    drop "Free failed since memory is not allocated" ;
+
+M: realloc-error summary
+    drop "Memory reallocation failed" ;
+
+: error-in-thread. ( -- )
+    error-thread get-global
+    "Error in thread " write
+    [
+        dup thread-id #
+        " (" % dup thread-name %
+        ", " % dup thread-quot unparse-short % ")" %
+    ] "" make swap write-object ":" print nl ;
+
+! Hooks
+M: thread error-in-thread ( error thread -- )
+    initial-thread get-global eq? [
+        die drop
+    ] [
+        global [
+            error-in-thread. print-error flush
+        ] bind
+    ] if ;
+
+<PRIVATE
+
+: init-debugger ( -- )
+    V{ } clone set-catchstack
+    ! VM calls on error
+    [
+        self error-thread set-global
+        continuation error-continuation set-global
+        rethrow
+    ] 5 setenv
+    ! VM adds this to kernel errors, so that user-space
+    ! can identify them
+    "kernel-error" 6 setenv ;
+
+PRIVATE>
+
+[ init-debugger ] "debugger" add-init-hook

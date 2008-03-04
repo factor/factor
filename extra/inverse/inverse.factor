@@ -1,7 +1,7 @@
 USING: kernel words inspector slots quotations sequences assocs
 math arrays inference effects shuffle continuations debugger
 tuples namespaces vectors bit-arrays byte-arrays strings sbufs
-math.functions macros combinators.private combinators ;
+math.functions macros sequences.private combinators ;
 IN: inverse
 
 TUPLE: fail ;
@@ -100,7 +100,7 @@ M: math-inverse inverse
     [ drop swap-inverse ] [ pull-inverse ] if ;
 
 M: pop-inverse inverse
-    [ "pop-length" word-prop cut-slice swap ] keep
+    [ "pop-length" word-prop cut-slice swap >quotation ] keep
     "pop-inverse" word-prop compose call ;
 
 : (undo) ( revquot -- )

@@ -1,7 +1,45 @@
+! Copyright (C) 2007 Slava Pestov, Chris Double, Doug Coleman,
+!                    Eduardo Cavazos, Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel sequences math namespaces assocs 
-random sequences.private shuffle math.functions mirrors ;
-USING: arrays math.parser sorting strings ;
+random sequences.private shuffle math.functions mirrors
+arrays math.parser math.private sorting strings ascii macros ;
 IN: sequences.lib
+
+: each-withn ( seq quot n -- ) nwith each ; inline
+
+: each-with ( seq quot -- ) with each ; inline
+
+: each-with2 ( obj obj list quot -- ) 2 each-withn ; inline
+
+: map-withn ( seq quot n -- newseq ) nwith map ; inline
+
+: map-with ( seq quot -- ) with map ; inline
+
+: map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
+
+MACRO: firstn ( n -- )
+    [ [ swap nth ] curry
+    [ keep ] curry ] map concat [ drop ] compose ;
+
+: prepare-index ( seq quot -- seq n quot )
+    >r dup length r> ; inline
+
+: each-index ( seq quot -- )
+    #! quot: ( elt index -- )
+    prepare-index 2each ; inline
+
+: map-index ( seq quot -- )
+    #! quot: ( elt index -- obj )
+    prepare-index 2map ; inline
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: sigma ( seq quot -- n )
+    [ rot slip + ] curry 0 swap reduce ; inline
+
+: count ( seq quot -- n )
+    [ 1 0 ? ] compose sigma ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -66,7 +104,7 @@ IN: sequences.lib
 
 : split-around ( seq quot -- before elem after )
     dupd find over [ "Element not found" throw ] unless
-    >r cut-slice 1 tail r> swap ; inline
+    >r cut 1 tail r> swap ; inline
 
 : (map-until) ( quot pred -- quot )
     [ dup ] swap 3compose
@@ -140,3 +178,39 @@ PRIVATE>
 : ?second ( seq -- second/f ) 1 swap ?nth ; inline
 : ?third ( seq -- third/f ) 2 swap ?nth ; inline
 : ?fourth ( seq -- fourth/f ) 3 swap ?nth ; inline
+
+: ?first2 ( seq -- 1st/f 2nd/f ) dup ?first swap ?second ; inline
+: ?first3 ( seq -- 1st/f 2nd/f 3rd/f ) dup ?first2 rot ?third ; inline
+: ?first4 ( seq -- 1st/f 2nd/f 3rd/f 4th/f ) dup ?first3 roll ?fourth ; inline
+
+USE: continuations
+: ?subseq ( from to seq -- subseq )
+    >r >r 0 max r> r>
+    [ length tuck min >r min r> ] keep subseq ;
+
+: ?head* ( seq n -- seq/f ) (head) ?subseq ;
+: ?tail* ( seq n -- seq/f ) (tail) ?subseq ;
+
+: accumulator ( quot -- quot vec )
+    V{ } clone [ [ push ] curry compose ] keep ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! List the positions of obj in seq
+
+: indices ( seq obj -- seq )
+  >r dup length swap r>
+  [ = [ ] [ drop f ] if ] curry
+  2map
+  [ ] subset ;
+
+<PRIVATE
+: (attempt-each-integer) ( i n quot -- result )
+    [
+        iterate-step roll
+        [ 3nip ] [ iterate-next (attempt-each-integer) ] if*
+    ] [ 3drop f ] if-iterate? ; inline
+PRIVATE>
+
+: attempt-each ( seq quot -- result )
+    (each) iterate-prep (attempt-each-integer) ; inline

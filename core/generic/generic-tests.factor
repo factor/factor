@@ -3,7 +3,7 @@ generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
 quotations classes continuations layouts classes.union sorting
 compiler.units ;
-IN: temporary
+IN: generic.tests
 
 GENERIC: foobar ( x -- y )
 M: object foobar drop "Hello world" ;
@@ -16,7 +16,7 @@ M: word   class-of drop "word"   ;
 
 [ "fixnum" ] [ 5 class-of ] unit-test
 [ "word" ] [ \ class-of class-of ] unit-test
-[ 3.4 class-of ] unit-test-fails
+[ 3.4 class-of ] must-fail
 
 [ "Hello world" ] [ 4 foobar foobar ] unit-test
 [ "Goodbye cruel world" ] [ 4 foobar ] unit-test
@@ -87,11 +87,11 @@ M: number union-containment drop 2 ;
 [ 2 ] [ 1.0 union-containment ] unit-test
 
 ! Testing recovery from bad method definitions
-"IN: temporary GENERIC: unhappy ( x -- x )" eval
+"IN: generic.tests GENERIC: unhappy ( x -- x )" eval
 [
-    "IN: temporary M: dictionary unhappy ;" eval
-] unit-test-fails
-[ ] [ "IN: temporary GENERIC: unhappy ( x -- x )" eval ] unit-test
+    "IN: generic.tests M: dictionary unhappy ;" eval
+] must-fail
+[ ] [ "IN: generic.tests GENERIC: unhappy ( x -- x )" eval ] unit-test
 
 GENERIC# complex-combination 1 ( a b -- c )
 M: string complex-combination drop ;
@@ -155,9 +155,7 @@ M: string my-hook "a string" ;
 
 [ "an integer" ] [ 3 my-var set my-hook ] unit-test
 [ "a string" ] [ my-hook my-var set my-hook ] unit-test
-[ T{ no-method f 1.0 my-hook } ] [
-    1.0 my-var set [ my-hook ] catch
-] unit-test
+[ 1.0 my-var set my-hook ] [ T{ no-method f 1.0 my-hook } = ] must-fail-with
 
 GENERIC: tag-and-f ( x -- x x )
 
@@ -176,6 +174,9 @@ M: f tag-and-f 4 ;
 ! define-class hashing issue
 TUPLE: debug-combination ;
 
+M: debug-combination make-default-method
+    2drop [ "Oops" throw ] ;
+
 M: debug-combination perform-combination
     drop
     order [ dup class-hashes ] { } map>assoc sort-keys
@@ -191,12 +192,49 @@ SYMBOL: redefinition-test-generic
 
 TUPLE: redefinition-test-tuple ;
 
-"IN: temporary M: redefinition-test-tuple redefinition-test-generic ;" eval
+"IN: generic.tests M: redefinition-test-tuple redefinition-test-generic ;" eval
 
 [ t ] [
     [
         redefinition-test-generic ,
-        "IN: temporary TUPLE: redefinition-test-tuple ;" eval
+        "IN: generic.tests TUPLE: redefinition-test-tuple ;" eval
         redefinition-test-generic ,
     ] { } make all-equal?
+] unit-test
+
+! Issues with forget
+GENERIC: generic-forget-test-1
+
+M: integer generic-forget-test-1 / ;
+
+[ t ] [
+    \ / usage [ word? ] subset
+    [ word-name "generic-forget-test-1/integer" = ] contains?
+] unit-test
+
+[ ] [
+    [ \ generic-forget-test-1 forget ] with-compilation-unit
+] unit-test
+
+[ f ] [
+    \ / usage [ word? ] subset
+    [ word-name "generic-forget-test-1/integer" = ] contains?
+] unit-test
+
+GENERIC: generic-forget-test-2
+
+M: sequence generic-forget-test-2 = ;
+
+[ t ] [
+    \ = usage [ word? ] subset
+    [ word-name "generic-forget-test-2/sequence" = ] contains?
+] unit-test
+
+[ ] [
+    [ { sequence generic-forget-test-2 } forget ] with-compilation-unit
+] unit-test
+
+[ f ] [
+    \ = usage [ word? ] subset
+    [ word-name "generic-forget-test-2/sequence" = ] contains?
 ] unit-test

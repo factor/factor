@@ -25,24 +25,25 @@ M: template-lexer skip-word
         {
             { [ 2dup nth CHAR: " = ] [ drop 1+ ] }
             { [ 2dup swap tail-slice "%>" head? ] [ drop 2 + ] }
-            { [ t ] [ [ blank? ] skip ] }
+            { [ t ] [ f skip ] }
         } cond
     ] change-column ;
 
 DEFER: <% delimiter
 
 : check-<% ( lexer -- col )
-    "<%" over line-text rot lexer-column start* ;
+    "<%" over lexer-line-text rot lexer-column start* ;
 
 : found-<% ( accum lexer col -- accum )
     [
-        over line-text >r >r lexer-column r> r> subseq parsed
+        over lexer-line-text
+        >r >r lexer-column r> r> subseq parsed
         \ write-html parsed
     ] 2keep 2 + swap set-lexer-column ;
 
 : still-looking ( accum lexer -- accum )
     [
-        dup line-text swap lexer-column tail
+        dup lexer-line-text swap lexer-column tail
         parsed \ print-html parsed
     ] keep next-line ;
 
@@ -79,17 +80,16 @@ DEFER: <% delimiter
             "quiet" on
             parser-notes off
             templating-vocab use+
-            dup source-file file set ! so that reload works properly
-            [
-                ?resource-path file-contents
-                [ eval-template ] [ html-error. drop ] recover
-            ] keep
+            ! so that reload works properly
+            dup source-file file set
+            ?resource-path file-contents
+            [ eval-template ] [ html-error. drop ] recover
         ] with-file-vocabs
-    ] assert-depth drop ;
+    ] curry assert-depth ;
 
 : run-relative-template-file ( filename -- )
     file get source-file-path parent-directory
     swap path+ run-template-file ;
 
 : template-convert ( infile outfile -- )
-    <file-writer> [ run-template-file ] with-stream ;
+    [ run-template-file ] with-file-writer ;

@@ -99,7 +99,7 @@ SYMBOL: rule-sets
     (load-mode) dup finalize-mode ;
 
 : reset-modes ( -- )
-    \ (load-mode) "memoize" word-prop clear-assoc ;
+    \ (load-mode) reset-memoized ;
 
 : ?glob-matches ( string glob/f -- ? )
     dup [ glob-matches? ] [ 2drop f ] if ;

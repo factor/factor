@@ -1,5 +1,7 @@
+! Copyright (C) 2007 Alex Chapman
+! See http://factorcode.org/license.txt for BSD license.
 USING: jamshred.oint jamshred.tunnel kernel sequences tools.test ;
-IN: temporary
+IN: jamshred.tunnel.tests
 
 [ 0 ] [ T{ segment T{ oint f { 0 0 0 } } 0 }
         T{ segment T{ oint f { 1 1 1 } } 1 }

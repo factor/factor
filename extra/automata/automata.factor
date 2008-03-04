@@ -1,6 +1,6 @@
 
 USING: kernel math math.parser random arrays hashtables assocs sequences
-       vars strings.lib ;
+       vars ;
 
 IN: automata
 

@@ -1,5 +1,5 @@
 USING: kernel tools.test tuples.lib ;
-IN: temporary
+IN: tuples.lib.tests
 
 TUPLE: foo a b* c d* e f* ;
 

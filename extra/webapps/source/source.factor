@@ -15,14 +15,16 @@ IN: webapps.source
 : source-responder ( path mime-type -- )
     drop
     serving-html
-    [ dup <file-reader> htmlize-stream ] with-html-stream ;
+    [
+        dup file-name swap <file-reader> htmlize-stream
+    ] with-html-stream ;
 
 global [
     ! Serve up our own source code
     "source" [
         "argument" get check-source-path [
             [
-                "" resource-path "doc-root" set
+                "" resource-path doc-root set
                 [ source-responder ] serve-file-hook set
                 file-responder
             ] with-scope

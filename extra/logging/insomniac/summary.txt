@@ -1,0 +1,1 @@
+Task which rotates logs and e-mails summaries

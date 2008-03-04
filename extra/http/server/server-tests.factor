@@ -1,14 +1,11 @@
 USING: webapps.file http.server.responders http
-http.server namespaces io tools.test strings io.server ;
-IN: temporary
+http.server namespaces io tools.test strings io.server
+logging ;
+IN: http.server.tests
 
 [ ] [ f [ "404 not found" httpd-error ] with-logging ] unit-test
 
 [ "inspect/global" ] [ "/inspect/global" trim-/ ] unit-test
-
-[ ] [
-    f [ "unit/test" log-responder ] with-logging
-] unit-test
 
 [ "index.html" ]
 [ "http://www.jedit.org/index.html" url>path ] unit-test

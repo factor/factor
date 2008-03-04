@@ -3,7 +3,7 @@
 USING: arrays definitions hashtables kernel
 kernel.private math namespaces sequences sequences.private
 strings vectors words quotations memory combinators generic
-classes classes.private slots slots.private ;
+classes classes.private slots slots.private compiler.units ;
 IN: tuples
 
 M: tuple delegate 3 slot ;
@@ -35,9 +35,12 @@ M: tuple class class-of-tuple ;
     append (>tuple) ;
 
 : reshape-tuples ( class newslots -- )
-    >r dup [ swap class eq? ] curry instances dup
-    rot "slot-names" word-prop r> permutation
-    [ reshape-tuple ] curry map become ;
+    >r dup "slot-names" word-prop r> permutation
+    [
+        >r [ swap class eq? ] curry instances dup r>
+        [ reshape-tuple ] curry map
+        become
+    ] 2curry after-compilation ;
 
 : old-slots ( class newslots -- seq )
     swap "slots" word-prop 1 tail-slice
@@ -55,6 +58,7 @@ M: tuple class class-of-tuple ;
         over "slot-names" word-prop over = [
             2dup forget-slots
             2dup reshape-tuples
+            over changed-word
             over redefined
         ] unless
     ] when 2drop ;
@@ -66,9 +70,7 @@ M: tuple-class tuple-size "slot-names" word-prop length 2 + ;
 PRIVATE>
 
 : define-tuple-predicate ( class -- )
-    dup predicate-word
-    over [ tuple-class-eq? ] curry
-    define-predicate ;
+    dup [ tuple-class-eq? ] curry define-predicate ;
 
 : delegate-slot-spec
     T{ slot-spec f
@@ -80,8 +82,8 @@ PRIVATE>
     } ;
 
 : define-tuple-slots ( class slots -- )
-    2dup "slot-names" set-word-prop
     dupd 4 simple-slots
+    2dup [ slot-spec-name ] map "slot-names" set-word-prop
     2dup delegate-slot-spec add* "slots" set-word-prop
     define-slots ;
 

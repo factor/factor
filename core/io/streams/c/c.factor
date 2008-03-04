@@ -1,9 +1,9 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private namespaces io
 strings sequences math generic threads.private classes
 io.backend io.streams.lines io.streams.plain io.streams.duplex
-io.files ;
+io.files continuations ;
 IN: io.streams.c
 
 TUPLE: c-writer handle ;
@@ -19,7 +19,7 @@ M: c-writer stream-write
 M: c-writer stream-flush
     c-writer-handle fflush ;
 
-M: c-writer stream-close
+M: c-writer dispose
     c-writer-handle fclose ;
 
 TUPLE: c-reader handle ;
@@ -46,7 +46,7 @@ M: c-reader stream-read-until
     [ swap read-until-loop ] "" make swap
     over empty? over not and [ 2drop f f ] when ;
 
-M: c-reader stream-close
+M: c-reader dispose
     c-reader-handle fclose ;
 
 : <duplex-c-stream> ( in out -- stream )
@@ -64,7 +64,7 @@ M: object init-stdio
     stdin-handle stdout-handle <duplex-c-stream> stdio set-global
     stderr-handle <c-writer> <plain-writer> stderr set-global ;
 
-M: object io-multiplex (sleep) ;
+M: object io-multiplex 60 60 * 1000 * or (sleep) ;
 
 M: object <file-reader>
     "rb" fopen <c-reader> <line-reader> ;
@@ -74,3 +74,10 @@ M: object <file-writer>
 
 M: object <file-appender>
     "ab" fopen <c-writer> <plain-writer> ;
+
+: show ( msg -- )
+    #! A word which directly calls primitives. It is used to
+    #! print stuff from contexts where the I/O system would
+    #! otherwise not work (tools.deploy.shaker, the I/O
+    #! multiplexer thread).
+    "\r\n" append stdout-handle fwrite stdout-handle fflush ;

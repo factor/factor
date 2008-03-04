@@ -7,8 +7,25 @@ strings sbufs vectors words quotations assocs system layouts
 splitting growable classes tuples words.private
 io.binary io.files vocabs vocabs.loader source-files
 definitions debugger float-arrays quotations.private
-combinators.private combinators ;
+sequences.private combinators ;
 IN: bootstrap.image
+
+: my-arch ( -- arch )
+    cpu dup "ppc" = [ os "-" rot 3append ] when ;
+
+: boot-image-name ( arch -- string )
+    "boot." swap ".image" 3append ;
+
+: my-boot-image-name ( -- string )
+    my-arch boot-image-name ;
+
+: images ( -- seq )
+    {
+        "x86.32"
+        "x86.64"
+        "linux-ppc" "macosx-ppc"
+        ! "arm"
+    } ;
 
 <PRIVATE
 
@@ -17,11 +34,9 @@ IN: bootstrap.image
 : image-magic HEX: 0f0e0d0c ; inline
 : image-version 4 ; inline
 
-: char bootstrap-cell 2/ ; inline
-
 : data-base 1024 ; inline
 
-: userenv-size 40 ; inline
+: userenv-size 64 ; inline
 
 : header-size 10 ; inline
 
@@ -121,7 +136,7 @@ SYMBOL: undefined-quot
 : here-as ( tag -- pointer ) here swap bitor ;
 
 : align-here ( -- )
-    here 8 mod 4 = [ 0 emit ] when ;
+    here 8 mod 4 = [ heap-size drop 0 emit ] when ;
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
@@ -162,6 +177,7 @@ GENERIC: ' ( obj -- ptr )
     [ dup bignum-bits neg shift swap bignum-radix bitand ]
     [ ] unfold nip ;
 
+USE: continuations
 : emit-bignum ( n -- )
     dup 0 < [ 1 swap neg ] [ 0 swap ] if bignum>seq
     dup length 1+ emit-fixnum
@@ -199,13 +215,10 @@ M: f '
 :  1,  1 >bignum '  1-offset fixup ;
 : -1, -1 >bignum ' -1-offset fixup ;
 
-! Beginning of the image
-
-: begin-image ( -- ) emit-header t, 0, 1, -1, ;
-
 ! Words
 
 : emit-word ( word -- )
+    dup subwords [ emit-word ] each
     [
         dup hashcode ' ,
         dup word-name ' ,
@@ -226,7 +239,7 @@ M: f '
     [ % dup word-vocabulary % " " % word-name % ] "" make throw ;
 
 : transfer-word ( word -- word )
-    dup target-word [ ] [ word-name no-word ] ?if ;
+    dup target-word swap or ;
 
 : fixup-word ( word -- offset )
     transfer-word dup objects get at
@@ -244,20 +257,18 @@ M: wrapper '
     [ emit ] emit-object ;
 
 ! Strings
-: 16be> 0 [ swap 16 shift bitor ] reduce ;
-: 16le> <reversed> 16be> ;
-
 : emit-chars ( seq -- )
-    char <groups>
-    big-endian get [ [ 16be> ] map ] [ [ 16le> ] map ] if
+    bootstrap-cell <groups>
+    big-endian get [ [ be> ] map ] [ [ le> ] map ] if
     emit-seq ;
 
 : pack-string ( string -- newstr )
-    dup length 1+ char align 0 pad-right ;
+    dup length bootstrap-cell align 0 pad-right ;
 
 : emit-string ( string -- ptr )
     string type-number object tag-number [
         dup length emit-fixnum
+        f ' emit
         f ' emit
         pack-string emit-chars
     ] emit-object ;
@@ -289,17 +300,20 @@ M: float-array ' float-array emit-dummy-array ;
     ] emit-object ;
 
 : emit-tuple ( obj -- pointer )
-    objects get [
+    [
         [ tuple>array unclip transfer-word , % ] { } make
         tuple type-number dup emit-array
-    ] cache ; inline
+    ]
+    ! Hack
+    over class word-name "tombstone" =
+    [ objects get swap cache ] [ call ] if ;
 
 M: tuple ' emit-tuple ;
 
 M: tombstone '
     delegate
     "((tombstone))" "((empty))" ? "hashtables.private" lookup
-    word-def first emit-tuple ;
+    word-def first objects get [ emit-tuple ] cache ;
 
 M: array '
     array type-number object tag-number emit-array ;
@@ -316,32 +330,6 @@ M: quotation '
             0 emit ! code
         ] emit-object
     ] cache ;
-
-! Vectors and sbufs
-
-M: vector '
-    dup underlying ' swap length
-    vector type-number object tag-number [
-        emit-fixnum ! length
-        emit ! array ptr
-    ] emit-object ;
-
-M: sbuf '
-    dup underlying ' swap length
-    sbuf type-number object tag-number [
-        emit-fixnum ! length
-        emit ! array ptr
-    ] emit-object ;
-
-! Hashes
-
-M: hashtable '
-    [ hash-array ' ] keep
-    hashtable type-number object tag-number [
-        dup hash-count emit-fixnum
-        hash-deleted emit-fixnum
-        emit ! array ptr
-    ] emit-object ;
 
 ! Curries
 
@@ -394,7 +382,10 @@ M: curry '
 : fixup-header ( -- )
     heap-size data-heap-size-offset fixup ;
 
-: end-image ( -- )
+: build-image ( -- image )
+    800000 <vector> image set
+    20000 <hashtable> objects set
+    emit-header t, 0, 1, -1,
     "Serializing words..." print flush
     emit-words
     "Serializing JIT data..." print flush
@@ -409,7 +400,8 @@ M: curry '
     fixup-header
     "Image length: " write image get length .
     "Object cache size: " write objects get assoc-size .
-    \ word global delete-at ;
+    \ word global delete-at
+    image get ;
 
 ! Image output
 
@@ -420,47 +412,23 @@ M: curry '
         [ >le write ] curry each
     ] if ;
 
-: image-name
-    "boot." architecture get ".image" 3append resource-path ;
-
-: write-image ( image filename -- )
-    "Writing image to " write dup write "..." print flush
-    <file-writer> [ (write-image) ] with-stream ;
-
-: prepare-profile ( arch -- )
-    "resource:core/bootstrap/layouts/layouts.factor" run-file
-    "resource:core/cpu/" swap {
-        { "x86.32" "x86/32" }
-        { "x86.64" "x86/64" }
-        { "linux-ppc" "ppc/linux" }
-        { "macosx-ppc" "ppc/macosx" }
-        { "arm" "arm" }
-    } at "/bootstrap.factor" 3append ?resource-path run-file ;
-
-: prepare-image ( arch -- )
-    dup architecture set prepare-profile
-    bootstrapping? on
-    load-help? off
-    800000 <vector> image set 20000 <hashtable> objects set ;
+: write-image ( image -- )
+    "Writing image to " write
+    architecture get boot-image-name resource-path
+    dup write "..." print flush
+    [ (write-image) ] with-file-writer ;
 
 PRIVATE>
 
 : make-image ( arch -- )
     [
-        prepare-image
-        begin-image
+        architecture set
+        bootstrapping? on
+        load-help? off
         "resource:/core/bootstrap/stage1.factor" run-file
-        end-image
-        image get image-name write-image
+        build-image
+        write-image
     ] with-scope ;
 
-: my-arch ( -- arch )
-    cpu dup "ppc" = [ os "-" rot 3append ] when ;
-
 : make-images ( -- )
-    {
-        "x86.32"
-        ! "x86.64"
-        "linux-ppc" "macosx-ppc"
-        ! "arm"
-    } [ make-image ] each ;
+    images [ make-image ] each ;

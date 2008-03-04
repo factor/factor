@@ -55,7 +55,7 @@ C: <entry> entry
     [
         { "content" "summary" } any-tag-named
         dup tag-children [ string? not ] contains?
-        [ tag-children [ write-chunk ] string-out ]
+        [ tag-children [ write-chunk ] with-string-writer ]
         [ children>string ] if
     ] keep
     { "published" "updated" "issued" "modified" } any-tag-named
@@ -78,7 +78,7 @@ C: <entry> entry
 
 : download-feed ( url -- feed )
     #! Retrieve an news syndication file, return as a feed tuple.
-    http-get-stream rot 200 = [
+    http-get-stream rot success? [
         nip read-feed
     ] [
         2drop "Error retrieving newsfeed file" throw

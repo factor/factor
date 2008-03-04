@@ -1,6 +1,6 @@
 USING: kernel math math.parser math.ratios math.functions
 tools.test ;
-IN: temporary
+IN: math.ratios.tests
 
 [ 1 2 ] [ 1/2 >fraction ] unit-test
 
@@ -105,3 +105,8 @@ unit-test
 [ "33/100" ]
 [ "66/200" string>number number>string ]
 unit-test
+
+[ 3 ] [ "1+1/2" string>number 2 * ] unit-test
+[ -3 ] [ "-1-1/2" string>number 2 * ] unit-test
+[ "2+1/7" ] [ 1 7 / 2 + number>string ] unit-test
+[ "1/8" ] [ 1 8 / number>string ] unit-test

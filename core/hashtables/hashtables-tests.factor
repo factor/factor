@@ -1,4 +1,4 @@
-IN: temporary
+IN: hashtables.tests
 USING: kernel math namespaces tools.test vectors sequences
 sequences.private hashtables io prettyprint assocs
 continuations ;
@@ -127,9 +127,9 @@ H{ } "x" set
 ! Another crash discovered by erg
 [ ] [
     H{ } clone
-    [ 1 swap set-at ] catch drop
-    [ 2 swap set-at ] catch drop
-    [ 3 swap set-at ] catch drop
+    [ 1 swap set-at ] ignore-errors
+    [ 2 swap set-at ] ignore-errors
+    [ 3 swap set-at ] ignore-errors
     drop
 ] unit-test
 
@@ -157,6 +157,13 @@ H{ } "x" set
 ] unit-test
 
 [ { "one" "two" 3 } ] [
-    H{ { 1 "one" } { 2 "two" } }
-    { 1 2 3 } clone [ substitute ] keep
+    { 1 2 3 } clone dup
+    H{ { 1 "one" } { 2 "two" } } substitute-here
 ] unit-test
+
+[ { "one" "two" 3 } ] [
+    { 1 2 3 } H{ { 1 "one" } { 2 "two" } } substitute
+] unit-test
+
+[ f ] [ { 0 1 1 2 3 5 } all-unique? ] unit-test
+[ t ] [ { 0 1 2 3 4 5 } all-unique? ] unit-test

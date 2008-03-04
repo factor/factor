@@ -7,7 +7,7 @@ sequences io.sniffer.backend ;
 QUALIFIED: unix
 IN: io.sniffer.bsd
 
-M: unix-io destruct-handle ( obj -- ) close drop ;
+M: unix-io destruct-handle ( obj -- ) unix:close drop ;
 
 C-UNION: ifreq_props "sockaddr-in" "short" "int" "caddr_t" ;
 C-STRUCT: ifreq { { "char" 16 } "name" } { "ifreq_props" "props" } ;
@@ -24,7 +24,7 @@ C: <sniffer-spec> sniffer-spec
 : IOC_INOUT      IOC_IN IOC_OUT bitor ; inline
 : IOC_DIRMASK    HEX: e0000000 ; inline
 
-:: ioc | inout group num len |
+:: ioc ( inout group num len -- n )
     group first 8 shift num bitor
     len IOCPARM_MASK bitand 16 shift bitor
     inout bitor ;

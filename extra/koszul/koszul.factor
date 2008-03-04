@@ -123,7 +123,7 @@ DEFER: (d)
     [ drop H{ } ] [ unclip swap [ x.dy ] 2keep dx.y alt+ ] if ;
 
 : linear-op ( vec quot -- vec )
-	[
+        [
         [
             -rot >r swap call r> alt*n (alt+)
         ] curry assoc-each

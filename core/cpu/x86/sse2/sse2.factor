@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays cpu.x86.assembler cpu.x86.architecture
-cpu.x86.intrinsics generic kernel kernel.private math
-math.private memory namespaces sequences words generator
-generator.registers cpu.architecture math.floats.private layouts
-quotations ;
+USING: alien alien.accessors arrays cpu.x86.assembler
+cpu.x86.architecture cpu.x86.intrinsics generic kernel
+kernel.private math math.private memory namespaces sequences
+words generator generator.registers cpu.architecture
+math.floats.private layouts quotations ;
 IN: cpu.x86.sse2
 
 : define-float-op ( word op -- )

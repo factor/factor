@@ -14,8 +14,11 @@ TUPLE: workspace book listener popup ;
 
 SYMBOL: workspace-window-hook
 
-: workspace-window ( -- workspace )
+: workspace-window* ( -- workspace )
     workspace-window-hook get call ;
+
+: workspace-window ( -- )
+    workspace-window* drop ;
 
 GENERIC: call-tool* ( arg tool -- )
 
@@ -33,9 +36,9 @@ M: gadget tool-scroller drop f ;
 : select-tool ( workspace class -- ) swap show-tool drop ;
 
 : get-workspace* ( quot -- workspace )
-    [ dup workspace? [ over call ] [ drop f ] if ] find-window
-    [ nip dup raise-window gadget-child ]
-    [ workspace-window get-workspace* ] if* ; inline
+    [ >r dup workspace? r> [ drop f ] if ] curry find-window
+    [ dup raise-window gadget-child ]
+    [ workspace-window* ] if* ; inline
 
 : get-workspace ( -- workspace ) [ drop t ] get-workspace* ;
 
@@ -69,7 +72,11 @@ M: gadget tool-scroller drop f ;
     [ find-workspace hide-popup ] <debugger>
     "Error" show-titled-popup ;
 
-M: workspace pref-dim* drop { 600 700 } ;
+SYMBOL: workspace-dim
+
+{ 600 700 } workspace-dim set-global
+
+M: workspace pref-dim* drop workspace-dim get ;
 
 M: workspace focusable-child*
     dup workspace-popup [ ] [ workspace-listener ] ?if ;

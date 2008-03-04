@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
 namespaces math splitting sorting quotations assocs ;
@@ -6,6 +6,7 @@ IN: continuations
 
 SYMBOL: error
 SYMBOL: error-continuation
+SYMBOL: error-thread
 SYMBOL: restarts
 
 <PRIVATE
@@ -17,15 +18,14 @@ SYMBOL: restarts
 
 : c> ( -- continuation ) catchstack* pop ;
 
-: (catch) ( quot -- newquot )
-    [ swap >c call c> drop ] curry ; inline
-
 : dummy ( -- obj )
     #! Optimizing compiler assumes stack won't be messed with
     #! in-transit. To ensure that a value is actually reified
     #! on the stack, we put it in a non-inline word together
     #! with a declaration.
     f { object } declare ;
+
+: init-catchstack V{ } clone 1 setenv ;
 
 PRIVATE>
 
@@ -94,14 +94,8 @@ C: <continuation> continuation
 
 PRIVATE>
 
-: set-walker-hook ( quot -- ) 3 setenv ; inline
-
-: walker-hook ( -- quot ) 3 getenv f set-walker-hook ; inline
-
 : continue-with ( obj continuation -- )
-    [
-        walker-hook [ >r 2array r> ] when* (continue-with)
-    ] 2curry (throw) ;
+    [ (continue-with) ] 2 (throw) ;
 
 : continue ( continuation -- )
     f swap continue-with ;
@@ -116,15 +110,21 @@ GENERIC: compute-restarts ( error -- seq )
 
 PRIVATE>
 
-: rethrow ( error -- * )
-    catchstack* empty? [ die ] when
-    dup save-error c> continue-with ;
+SYMBOL: thread-error-hook
 
-: catch ( try -- error/f )
-    (catch) [ f ] compose callcc1 ; inline
+: rethrow ( error -- * )
+    dup save-error
+    catchstack* empty? [
+        thread-error-hook get-global
+        [ 1 (throw) ] [ die ] if*
+    ] when
+    c> continue-with ;
 
 : recover ( try recovery -- )
-    >r (catch) r> ifcc ; inline
+    >r [ swap >c call c> drop ] curry r> ifcc ; inline
+
+: ignore-errors ( quot -- )
+    [ drop ] recover ; inline
 
 : cleanup ( try cleanup-always cleanup-error -- )
     over >r compose [ dip rethrow ] curry
@@ -134,6 +134,11 @@ PRIVATE>
     [
         [ [ , f ] compose [ , drop t ] recover ] curry all?
     ] { } make peek swap [ rethrow ] when ; inline
+
+GENERIC: dispose ( object -- )
+
+: with-disposal ( object quot -- )
+    over [ dispose ] curry [ ] cleanup ; inline
 
 TUPLE: condition restarts continuation ;
 
@@ -167,34 +172,3 @@ M: condition compute-restarts
     condition-continuation
     [ <restart> ] curry { } assoc>map
     append ;
-
-<PRIVATE
-
-: init-error-handler ( -- )
-    V{ } clone set-catchstack
-    ! VM calls on error
-    [
-        continuation error-continuation set-global rethrow
-    ] 5 setenv
-    ! VM adds this to kernel errors, so that user-space
-    ! can identify them
-    "kernel-error" 6 setenv ;
-
-PRIVATE>
-
-! Debugging support
-: with-walker-hook ( continuation -- )
-    [ swap set-walker-hook (continue) ] curry callcc1 ;
-
-SYMBOL: break-hook
-
-: break ( -- )
-    continuation callstack
-    over set-continuation-call
-    walker-hook [ (continue-with) ] [ break-hook get call ] if* ;
-
-GENERIC: (step-into) ( obj -- )
-
-M: wrapper (step-into) wrapped break ;
-M: object (step-into) break ;
-M: callable (step-into) \ break add* break ;

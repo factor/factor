@@ -5,7 +5,7 @@ words strings classes tools.browser namespaces io
 io.streams.string prettyprint definitions arrays vectors
 combinators splitting debugger hashtables sorting effects vocabs
 vocabs.loader assocs editors continuations classes.predicate
-macros combinators.lib ;
+macros combinators.lib sequences.lib ;
 IN: help.lint
 
 : check-example ( element -- )
@@ -69,7 +69,7 @@ IN: help.lint
     ] each ;
 
 : check-rendering ( word element -- )
-    [ help ] string-out drop ;
+    [ help ] with-string-writer drop ;
 
 : all-word-help ( words -- seq )
     [ word-help ] subset ;
@@ -84,7 +84,7 @@ M: help-error error.
     delegate error. ;
 
 : check-something ( obj quot -- )
-    over . flush [ <help-error> , ] recover ; inline
+    flush [ <help-error> , ] recover ; inline
 
 : check-word ( word -- )
     dup word-help [
@@ -106,22 +106,45 @@ M: help-error error.
         [ dup check-rendering ] assert-depth drop
     ] check-something ;
 
-: check-articles ( -- )
-    articles get keys [ check-article ] each ;
+: group-articles ( -- assoc )
+    articles get keys
+    vocabs [ dup vocab-docs-path swap ] H{ } map>assoc
+    H{ } clone [
+        [
+            >r >r dup >link where ?first r> at r> [ ?push ] change-at
+        ] 2curry each
+    ] keep ;
 
-: with-help-lint ( quot -- )
+: check-vocab ( vocab -- seq )
+    "Checking " write dup write "..." print
+    [
+        dup words [ check-word ] each
+        "vocab-articles" get at [ check-article ] each
+    ] { } make ;
+
+: run-help-lint ( prefix -- alist )
     [
         all-vocabs-seq [ vocab-name ] map "all-vocabs" set
-        call
-    ] { } make [ nl error. ] each ; inline
+        articles get keys "group-articles" set
+        child-vocabs
+        [ dup check-vocab ] { } map>assoc
+        [ nip empty? not ] assoc-subset
+    ] with-scope ;
 
-: check-help ( -- )
-    [ all-words check-words check-articles ] with-help-lint ;
+: typos. ( assoc -- )
+    dup empty? [
+        drop
+        "==== ALL CHECKS PASSED" print
+    ] [
+        [
+            swap vocab-heading.
+            [ error. nl ] each
+        ] assoc-each
+    ] if ;
 
-: check-vocab-help ( vocab -- )
-    [
-        child-vocabs [ words check-words ] each
-    ] with-help-lint ;
+: help-lint ( prefix -- ) run-help-lint typos. ;
+
+: help-lint-all ( -- ) "" help-lint ;
 
 : unlinked-words ( words -- seq )
     all-word-help [ article-parent not ] subset ;
@@ -132,4 +155,4 @@ M: help-error error.
     [ article-parent ] subset
     [ "predicating" word-prop not ] subset ;
 
-MAIN: check-help
+MAIN: help-lint

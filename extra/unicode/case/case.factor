@@ -1,5 +1,6 @@
-USING: kernel unicode.data sequences sequences.next namespaces assocs.lib
-unicode.normalize math unicode.categories combinators assocs ;
+USING: kernel unicode.data sequences sequences.next namespaces
+assocs.lib unicode.normalize math unicode.categories combinators
+assocs strings splitting ;
 IN: unicode.case
 
 : ch>lower ( ch -- lower ) simple-lower at-default ;
@@ -13,14 +14,14 @@ SYMBOL: locale ! Just casing locale, or overall?
 
 : lithuanian? ( -- ? ) locale get "lt" = ;
 
-: dot-over ( -- ch ) CHAR: \u0307 ;
+: dot-over ( -- ch ) HEX: 307 ;
 
 : lithuanian-ch>upper ( ? next ch -- ? )
     rot [ 2drop f ]
     [ swap dot-over = over "ij" member? and swap , ] if ;
 
 : lithuanian>upper ( string -- lower )
-    [ f swap [ lithuanian-ch>upper ] each-next drop ] "" make* ;
+    [ f swap [ lithuanian-ch>upper ] each-next drop ] "" make ;
 
 : mark-above? ( ch -- ? )
     combining-class 230 = ;
@@ -32,27 +33,27 @@ SYMBOL: locale ! Just casing locale, or overall?
     dup , "IJ" member? swap mark-above? and [ dot-over , ] when ;
 
 : lithuanian>lower ( string -- lower )
-    [ [ lithuanian-ch>lower ] each-next ] "" make* ;
+    [ [ lithuanian-ch>lower ] each-next ] "" make ;
 
 : turk-ch>upper ( ch -- )
     dup CHAR: i = 
     [ drop CHAR: I , dot-over , ] [ , ] if ;
 
 : turk>upper ( string -- upper-i )
-    [ [ turk-ch>upper ] each ] "" make* ;
+    [ [ turk-ch>upper ] each ] "" make ;
 
 : turk-ch>lower ( ? next ch -- ? )
     {
         { [ rot ] [ 2drop f ] }
         { [ dup CHAR: I = ] [
             drop dot-over =
-            dup CHAR: i CHAR: \u0131 ? ,
+            dup CHAR: i HEX: 131 ? ,
         ] }
         { [ t ] [ , drop f ] }
     } cond ;
 
 : turk>lower ( string -- lower-i )
-    [ f swap [ turk-ch>lower ] each-next drop ] "" make* ;
+    [ f swap [ turk-ch>lower ] each-next drop ] "" make ;
 
 : word-boundary ( prev char -- new ? )
     dup non-starter? [ drop dup ] when
@@ -76,7 +77,7 @@ SYMBOL: locale ! Just casing locale, or overall?
                 [ -rot nip call , ] ?if
             ] 2keep
         ] each 2drop
-    ] "" make* ; inline
+    ] "" make ; inline
 
 : >lower ( string -- lower )
     i-dot? [ turk>lower ] when

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel words sequences generic math namespaces
 quotations assocs combinators math.bitfields inference.backend
-inference.dataflow inference.state tuples.private effects ;
+inference.dataflow inference.state tuples.private effects
+inspector hashtables ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )
@@ -34,7 +35,7 @@ IN: inference.transforms
             dup peek swap 1 head*
         ] [
             [ no-case ] swap
-        ] if hash-case>quot
+        ] if case>quot
     ] if
 ] 1 define-transform
 
@@ -53,13 +54,28 @@ M: pair (bitfield-quot) ( spec -- quot )
 
 \ bitfield [ bitfield-quot ] 1 define-transform
 
+\ flags [
+    [ 0 , [ , \ bitor , ] each ] [ ] make
+] 1 define-transform
+
 ! Tuple operations
 : [get-slots] ( slots -- quot )
     [ [ 1quotation , \ keep , ] each \ drop , ] [ ] make ;
 
 \ get-slots [ [get-slots] ] 1 define-transform
 
-\ set-slots [ <reversed> [get-slots] ] 1 define-transform
+TUPLE: duplicated-slots-error names ;
+
+M: duplicated-slots-error summary
+    drop "Calling set-slots with duplicate slot setters" ;
+
+: duplicated-slots-error ( names -- * )
+    \ duplicated-slots-error construct-boa throw ;
+
+\ set-slots [
+    dup all-unique?
+    [ <reversed> [get-slots] ] [ duplicated-slots-error ] if
+] 1 define-transform
 
 \ construct-boa [
     dup +inlined+ depends-on
@@ -77,5 +93,3 @@ M: pair (bitfield-quot) ( spec -- quot )
         \ construct-empty 1 1 <effect> make-call-node
     ] if
 ] "infer" set-word-prop
-
-\ construct-empty 1 1 <effect> "inferred-effect" set-word-prop

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io ;
+USING: help.markup help.syntax io continuations ;
 IN: io.streams.duplex
 
 ARTICLE: "io.streams.duplex" "Duplex streams"
@@ -19,4 +19,4 @@ HELP: <duplex-stream>
 HELP: check-closed
 { $values { "stream" "a duplex stream" } }
 { $description "Throws a " { $link check-closed } " error if the stream has already been closed." }
-{ $error-description "This error is thrown when performing an I/O operation on a " { $link duplex-stream } " which has been closed with " { $link stream-close } "." } ;
+{ $error-description "This error is thrown when performing an I/O operation on a " { $link duplex-stream } " which has been closed with " { $link dispose } "." } ;

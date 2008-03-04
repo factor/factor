@@ -1,6 +1,6 @@
 USING: kernel io io.files splitting strings
        hashtables sequences assocs math namespaces prettyprint
-       math.parser combinators arrays sorting ;
+       math.parser combinators arrays sorting unicode.case ;
 
 IN: benchmark.knucleotide
 
@@ -57,8 +57,7 @@ IN: benchmark.knucleotide
 
 : knucleotide ( -- )
     "extra/benchmark/knucleotide/knucleotide-input.txt" resource-path
-    <file-reader>
-    [ read-input ] with-stream
+    [ read-input ] with-file-reader
     process-input ;
 
 MAIN: knucleotide

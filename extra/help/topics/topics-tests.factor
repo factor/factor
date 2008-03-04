@@ -1,7 +1,7 @@
 USING: definitions help help.topics help.crossref help.markup
 help.syntax kernel sequences tools.test words parser namespaces
 assocs source-files ;
-IN: temporary
+IN: help.topics.tests
 
 ! Test help cross-referencing
 

@@ -1,8 +1,8 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel namespaces io strings splitting
+USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http http.server.responders sequences prettyprint
-io.server ;
+io.server logging calendar ;
 
 IN: http.server
 
@@ -36,7 +36,6 @@ IN: http.server
     [ (handle-request) serve-responder ] with-scope ;
 
 : parse-request ( request -- )
-    dup log-message
     " " split1 dup [
         " HTTP" split1 drop url>path secure-path dup [
             swap handle-request
@@ -47,10 +46,11 @@ IN: http.server
         2drop bad-request
     ] if ;
 
+\ parse-request NOTICE add-input-logging
+
 : httpd ( port -- )
-    "Starting HTTP server on port " write dup . flush
     internet-server "http.server" [
-        60000 stdio get set-timeout
+        1 minutes stdio get set-timeout
         readln [ parse-request ] when*
     ] with-server ;
 

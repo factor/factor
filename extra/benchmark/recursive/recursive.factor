@@ -4,8 +4,6 @@ USING: math kernel hints prettyprint io ;
 : fib ( m -- n )
     dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ;
 
-! HINTS: fib { fixnum float } ;
-! 
 : ack ( m n -- x )
     over zero? [
         nip 1+
@@ -17,10 +15,8 @@ USING: math kernel hints prettyprint io ;
         ] if
     ] if ;
 
-! HINTS: ack fixnum fixnum ;
-
 : tak ( x y z -- t )
-    pick pick swap < [
+    2over swap < [
         [ rot 1- -rot tak ] 3keep
         [ -rot 1- -rot tak ] 3keep
         1- -rot tak
@@ -28,8 +24,6 @@ USING: math kernel hints prettyprint io ;
     ] [
         2nip
     ] if ;
-
-! HINTS: tak { fixnum float } { fixnum float } { fixnum float } ;
 
 : recursive ( n -- )
     3 over ack . flush

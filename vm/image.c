@@ -161,6 +161,9 @@ DEFINE_PRIMITIVE(save_image_and_exit)
 	for(i = 0; i < FIRST_SAVE_ENV; i++)
 		userenv[i] = F;
 
+	for(i = LAST_SAVE_ENV + 1; i < USER_ENV; i++)
+		userenv[i] = F;
+
 	/* do a full GC + code heap compaction */
 	compact_code_heap();
 
@@ -224,7 +227,7 @@ void relocate_object(CELL relocating)
 		fixup_quotation((F_QUOTATION *)relocating);
 		break;
 	case DLL_TYPE:
-		ffi_dlopen((F_DLL *)relocating,false);
+		ffi_dlopen((F_DLL *)relocating);
 		break;
 	case ALIEN_TYPE:
 		fixup_alien((F_ALIEN *)relocating);

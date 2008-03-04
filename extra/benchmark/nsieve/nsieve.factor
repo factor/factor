@@ -6,7 +6,7 @@ arrays namespaces io ;
     2dup length >= [
         3drop
     ] [
-        f pick pick set-nth-unsafe >r over + r> clear-flags
+        f 2over set-nth-unsafe >r over + r> clear-flags
     ] if ; inline
 
 : (nsieve) ( count i seq -- count )

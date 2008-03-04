@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io kernel math models namespaces sequences strings
-splitting io.streams.lines combinators ;
+splitting io.streams.lines combinators unicode.categories ;
 IN: documents
 
 : +col ( loc n -- newloc ) >r first2 r> + 2array ;
@@ -43,7 +43,7 @@ TUPLE: document locs ;
     ] if ;
 
 : each-line ( from to quot -- )
-    pick pick = [
+    2over = [
         3drop
     ] [
         >r [ first ] 2apply 1+ dup <slice> r> each

@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
-io io.sockets io.streams.string io.files strings splitting
-continuations ;
+io io.sockets io.streams.string io.files io.timeouts strings
+splitting continuations assocs.lib calendar ;
 IN: http.client
 
 : parse-host ( url -- host port )
@@ -44,24 +44,37 @@ DEFER: http-get-stream
     #! Should this support Location: headers that are
     #! relative URLs?
     pick 100 /i 3 = [
-        stream-close "Location" swap at nip http-get-stream
+        dispose "location" swap peek-at nip http-get-stream
     ] when ;
+
+: default-timeout 1 minutes over set-timeout ;
 
 : http-get-stream ( url -- code headers stream )
     #! Opens a stream for reading from an HTTP URL.
     parse-url over parse-host <inet> <client> [
         [ [ get-request read-response ] with-stream* ] keep
-    ] [ >r stream-close r> rethrow ] recover do-redirect ;
+        default-timeout
+    ] [ ] [ dispose ] cleanup do-redirect ;
 
-: http-get ( url -- code headers string )
-    #! Opens a stream for reading from an HTTP URL.
-    [
-        http-get-stream [ stdio get contents ] with-stream
-    ] with-scope ;
+: success? ( code -- ? ) 200 = ;
 
-: download ( url file -- )
+: check-response ( code headers stream -- stream )
+    nip swap success?
+    [ dispose "HTTP download failed" throw ] unless ;
+
+: http-get ( url -- string )
+    http-get-stream check-response contents ;
+
+: download-name ( url -- name )
+    file-name "?" split1 drop "/" ?tail drop ;
+
+: download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
-    >r http-get 2nip r> <file-writer> [ write ] with-stream ;
+    >r http-get-stream check-response
+    r> <file-writer> stream-copy ;
+
+: download ( url -- )
+    dup download-name download-to ;
 
 : post-request ( content-type content host resource -- )
     #! Note: It is up to the caller to url encode the content if

@@ -139,10 +139,6 @@ ARTICLE: "equality" "Equality and comparison testing"
 ! Defined in handbook.factor
 ABOUT: "dataflow"
 
-HELP: version
-{ $values { "str" string } }
-{ $description "Outputs the version number of the current Factor instance." } ;
-
 HELP: eq? ( obj1 obj2 -- ? )
 { $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
 { $description "Tests if two references point at the same object." } ;
@@ -336,7 +332,7 @@ HELP: either?
     { $example "5 7 [ even? ] either? ." "f" }
 } ;
 
-HELP: call ( quot -- )
+HELP: call ( callable -- )
 { $values { "quot" callable } }
 { $description "Calls a quotation."
 $nl
@@ -372,7 +368,7 @@ HELP: 2keep
 { $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
-{ $values { "quot" "a quotation with stack effect " { $snippet "( x y -- )" } } { "x" object } { "y" object } { "z" object } }
+{ $values { "quot" "a quotation with stack effect " { $snippet "( x y z -- )" } } { "x" object } { "y" object } { "z" object } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 2apply
@@ -532,7 +528,7 @@ HELP: compose
         "compose call"
         "append call"
     }
-    "However, " { $link compose } " runs in constant time, and the compiler is able to compile code which calls composed quotations."
+    "However, " { $link compose } " runs in constant time, and the optimizing compiler is able to compile code which calls composed quotations."
 } ;
 
 HELP: 3compose

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel lazy-lists namespaces openal
-parser-combinators promises sequences strings ;
+parser-combinators promises sequences strings unicode.case ;
 IN: morse
 
 <PRIVATE

@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays io kernel libc math
-math.vectors namespaces opengl opengl.gl prettyprint assocs
+USING: alien alien.accessors alien.c-types arrays io kernel libc
+math math.vectors namespaces opengl opengl.gl prettyprint assocs
 sequences io.files io.styles continuations freetype
-ui.gadgets.worlds ui.render ui.backend io.mmap ;
+ui.gadgets.worlds ui.render ui.backend byte-arrays ;
 IN: ui.freetype
 
 TUPLE: freetype-renderer ;
@@ -36,13 +36,13 @@ M: font hashcode* drop font hashcode* ;
 
 : close-freetype ( -- )
     global [
-        open-fonts [ values [ close-font ] each f ] change
+        open-fonts [ [ drop close-font ] assoc-each f ] change
         freetype [ FT_Done_FreeType f ] change
     ] bind ;
 
 M: freetype-renderer free-fonts ( world -- )
     dup world-handle select-gl-context
-    world-fonts values [ second free-sprites ] each ;
+    world-fonts [ nip second free-sprites ] assoc-each ;
 
 : ttf-name ( font style -- name )
     2array H{
@@ -63,18 +63,23 @@ M: freetype-renderer free-fonts ( world -- )
 : ttf-path ( name -- string )
     "/fonts/" swap ".ttf" 3append resource-path ;
 
-: (open-face) ( mapped-file -- face )
+: (open-face) ( path length -- face )
     #! We use FT_New_Memory_Face, not FT_New_Face, since
     #! FT_New_Face only takes an ASCII path name and causes
     #! problems on localized versions of Windows
-    freetype swap dup mapped-file-address swap length 0 f
-    <void*> [ FT_New_Memory_Face freetype-error ] keep *void* ;
+    freetype -rot 0 f <void*> [
+        FT_New_Memory_Face freetype-error
+    ] keep *void* ;
 
 : open-face ( font style -- face )
-    ttf-name ttf-path dup file-length
-    <mapped-file> (open-face) ;
+    ttf-name ttf-path
+    dup file-contents >byte-array malloc-byte-array
+    swap file-length
+    (open-face) ;
 
-: dpi 72 ; inline
+SYMBOL: dpi
+
+72 dpi set-global
 
 : ft-floor -6 shift ; inline
 
@@ -95,13 +100,14 @@ M: freetype-renderer free-fonts ( world -- )
     swap set-font-height ;
 
 : <font> ( handle -- font )
-    V{ } clone
+    H{ } clone
     { set-font-handle set-font-widths } font construct
     dup init-font ;
 
 : (open-font) ( font -- open-font )
     first3 >r open-face dup 0 r> 6 shift
-    dpi dpi FT_Set_Char_Size freetype-error <font> ;
+    dpi get-global dpi get-global FT_Set_Char_Size
+    freetype-error <font> ;
 
 M: freetype-renderer open-font ( font -- open-font )
     freetype drop open-fonts get [ (open-font) ] cache ;
@@ -113,7 +119,7 @@ M: freetype-renderer open-font ( font -- open-font )
 : char-width ( open-font char -- w )
     over font-widths [
         dupd load-glyph glyph-hori-advance ft-ceil
-    ] cache-nth nip ;
+    ] cache nip ;
 
 M: freetype-renderer string-width ( open-font string -- w )
     0 -rot [ char-width + ] with each ;
@@ -169,7 +175,7 @@ M: freetype-renderer string-height ( open-font string -- h )
     [ bitmap>texture ] keep [ init-sprite ] keep ;
 
 : draw-char ( open-font char sprites -- )
-    [ dupd <char-sprite> ] cache-nth nip
+    [ dupd <char-sprite> ] cache nip
     sprite-dlist glCallList ;
 
 : (draw-string) ( open-font sprites string loc -- )
@@ -180,7 +186,7 @@ M: freetype-renderer string-height ( open-font string -- h )
     ] do-enabled ;
 
 : font-sprites ( open-font world -- pair )
-    world-fonts [ open-font V{ } clone 2array ] cache ;
+    world-fonts [ open-font H{ } clone 2array ] cache ;
 
 M: freetype-renderer draw-string ( font string loc -- )
     >r >r world get font-sprites first2 r> r> (draw-string) ;

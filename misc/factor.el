@@ -110,8 +110,8 @@
 
 (require 'comint)
 
-(defvar factor-binary "/scratch/repos/Factor/factor")
-(defvar factor-image "/scratch/repos/Factor/factor.image")
+(defvar factor-binary "~/factor/factor")
+(defvar factor-image "~/factor/factor.image")
 
 (defun factor-telnet-to-port (port)
   (interactive "nPort: ")
@@ -131,10 +131,30 @@
   (comint-send-string "*factor*" (format "\"%s\"" (buffer-file-name)))
   (comint-send-string "*factor*" " run-file\n"))
 
+;; (defun factor-send-region (start end)
+;;   (interactive "r")
+;;   (comint-send-region "*factor*" start end)
+;;   (comint-send-string "*factor*" "\n"))
+
+(defun factor-send-string (str)
+  (let ((n (length (split-string str "\n"))))
+    (save-excursion
+      (set-buffer "*factor*")
+      (goto-char (point-max))
+      (if (> n 1) (newline))
+      (insert str)
+      (comint-send-input))))
+
 (defun factor-send-region (start end)
   (interactive "r")
-  (comint-send-region "*factor*" start end)
-  (comint-send-string "*factor*" "\n"))
+  (let ((str (buffer-substring start end))
+        (n   (count-lines      start end)))
+    (save-excursion
+      (set-buffer "*factor*")
+      (goto-char (point-max))
+      (if (> n 1) (newline))
+      (insert str)
+      (comint-send-input))))
 
 (defun factor-see ()
   (interactive)
@@ -153,6 +173,10 @@
   (comint-send-string "*factor*" "\\ ")
   (comint-send-string "*factor*" (thing-at-point 'sexp))
   (comint-send-string "*factor*" " edit\n"))
+
+(defun factor-clear ()
+  (interactive)
+  (factor-send-string "clear"))
   
 (defun factor-comment-line ()
   (interactive)
@@ -178,8 +202,8 @@
 (defun run-factor ()
   (interactive)
   (switch-to-buffer
-   (make-comint-in-buffer "factor" nil factor-binary nil
-			  (concat "-i=" factor-image)
+   (make-comint-in-buffer "factor" nil (expand-file-name factor-binary) nil
+			  (concat "-i=" (expand-file-name factor-image))
 			  "-run=listener"))
   (factor-listener-mode))
 

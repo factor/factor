@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences
 USING: kernel kernel.private slots.private math math.private ;
@@ -76,6 +76,8 @@ PREDICATE: fixnum array-capacity
 
 : set-array-nth ( elt n array -- )
     swap 2 fixnum+fast set-slot ; inline
+
+: dispatch ( n array -- ) array-nth (call) ;
 
 GENERIC: resize ( n seq -- newseq ) flushable
 
@@ -255,7 +257,7 @@ INSTANCE: repetition immutable-sequence
 
 : check-copy ( src n dst -- )
     over 0 < [ bounds-error ] when
-    >r swap length + r> lengthen ;
+    >r swap length + r> lengthen ; inline
 
 PRIVATE>
 
@@ -308,13 +310,11 @@ M: immutable-sequence clone-like like ;
 
 <PRIVATE
 
-: iterate-seq >r dup length swap r> ; inline
-
 : (each) ( seq quot -- n quot' )
-    iterate-seq [ >r nth-unsafe r> call ] 2curry ; inline
+    >r dup length swap [ nth-unsafe ] curry r> compose ; inline
 
 : (collect) ( quot into -- quot' )
-    [ >r over slip r> set-nth-unsafe ] 2curry ; inline
+    [ >r keep r> set-nth-unsafe ] 2curry ; inline
 
 : collect ( n quot into -- )
     (collect) each-integer ; inline
@@ -413,7 +413,7 @@ PRIVATE>
     >r dup length 1- swap r> (monotonic) all? ; inline
 
 : interleave ( seq between quot -- )
-    [ (interleave) ] 2curry iterate-seq 2each ; inline
+    [ (interleave) ] 2curry >r dup length swap r> 2each ; inline
 
 : unfold ( pred quot tail -- seq )
     V{ } clone [
@@ -606,7 +606,29 @@ M: sequence <=>
     ] if ;
 
 : cut-slice ( seq n -- before after )
-    [ head ] 2keep tail-slice ;
+    [ head-slice ] 2keep tail-slice ;
+
+: midpoint@ ( seq -- n ) length 2/ ; inline
+
+: halves ( seq -- first second )
+    dup midpoint@ cut-slice ;
+
+: binary-reduce ( seq start quot -- value )
+    #! We can't use case here since combinators depends on
+    #! sequences
+    pick length dup 0 3 between? [
+        >fixnum {
+            [ drop nip ]
+            [ 2drop first ]
+            [ >r drop first2 r> call ]
+            [ >r drop first3 r> 2apply ]
+        } dispatch
+    ] [
+        drop
+        >r >r halves r> r>
+        [ [ binary-reduce ] 2curry 2apply ] keep
+        call
+    ] if ; inline
 
 : cut ( seq n -- before after )
     [ head ] 2keep tail ;
@@ -657,8 +679,8 @@ PRIVATE>
 : trim ( seq quot -- newseq )
     [ left-trim ] keep right-trim ; inline
 
-: sum ( seq -- n ) 0 [ + ] reduce ;
-: product ( seq -- n ) 1 [ * ] reduce ;
+: sum ( seq -- n ) 0 [ + ] binary-reduce ;
+: product ( seq -- n ) 1 [ * ] binary-reduce ;
 
 : infimum ( seq -- n ) dup first [ min ] reduce ;
 : supremum ( seq -- n ) dup first [ max ] reduce ;
@@ -671,9 +693,9 @@ PRIVATE>
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
     swap [
-        dup -2 fixnum-shift >fixnum swap 5 fixnum-shift >fixnum
+        dup -2 fixnum-shift-fast swap 5 fixnum-shift-fast
         fixnum+fast fixnum+fast
-    ] keep bitxor ; inline
+    ] keep fixnum-bitxor ; inline
 
 : sequence-hashcode ( n seq -- x )
     0 -rot [

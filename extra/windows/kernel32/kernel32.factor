@@ -83,11 +83,17 @@ IN: windows.kernel32
 : FILE_NOTIFY_CHANGE_FILE_NAME   HEX: 200 ; inline
 : FILE_NOTIFY_CHANGE_ALL         HEX: 3ff ; inline
 
+: FILE_ACTION_ADDED 1 ; inline
+: FILE_ACTION_REMOVED 2 ; inline
+: FILE_ACTION_MODIFIED 3 ; inline
+: FILE_ACTION_RENAMED_OLD_NAME 4 ; inline
+: FILE_ACTION_RENAMED_NEW_NAME 5 ; inline
+
 C-STRUCT: FILE_NOTIFY_INFORMATION
     { "DWORD" "NextEntryOffset" }
     { "DWORD" "Action" }
     { "DWORD" "FileNameLength" }
-    { "WCHAR*" "FileName" } ;
+    { "WCHAR[1]" "FileName" } ;
 TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 
 : STD_INPUT_HANDLE  -10 ; inline
@@ -701,7 +707,19 @@ FUNCTION: BOOL DeleteFileW ( LPCTSTR lpFileName ) ;
 ! FUNCTION: DosPathToSessionPathA
 ! FUNCTION: DosPathToSessionPathW
 ! FUNCTION: DuplicateConsoleHandle
-! FUNCTION: DuplicateHandle
+
+FUNCTION: BOOL DuplicateHandle (
+    HANDLE hSourceProcessHandle,
+    HANDLE hSourceHandle,
+    HANDLE hTargetProcessHandle,
+    LPHANDLE lpTargetHandle,
+    DWORD dwDesiredAccess,
+    BOOL bInheritHandle,
+    DWORD dwOptions ) ;
+
+: DUPLICATE_CLOSE_SOURCE 1 ;
+: DUPLICATE_SAME_ACCESS 2 ;
+
 ! FUNCTION: EncodePointer
 ! FUNCTION: EncodeSystemPointer
 ! FUNCTION: EndUpdateResourceA
@@ -874,9 +892,10 @@ FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
 ! FUNCTION: GetCurrentActCtx
 ! FUNCTION: GetCurrentConsoleFont
 ! FUNCTION: GetCurrentDirectoryA
-! FUNCTION: GetCurrentDirectoryW
+FUNCTION: BOOL GetCurrentDirectoryW ( DWORD len, LPTSTR buf ) ;
+: GetCurrentDirectory GetCurrentDirectoryW ; inline
 FUNCTION: HANDLE GetCurrentProcess ( ) ;
-! FUNCTION: GetCurrentProcessId
+FUNCTION: DWORD GetCurrentProcessId ( ) ;
 FUNCTION: HANDLE GetCurrentThread ( ) ;
 ! FUNCTION: GetCurrentThreadId
 ! FUNCTION: GetDateFormatA
@@ -1369,7 +1388,8 @@ FUNCTION: BOOL SetConsoleTitleW ( LPCWSTR lpConsoleTitle ) ;
 ! FUNCTION: SetCPGlobal
 ! FUNCTION: SetCriticalSectionSpinCount
 ! FUNCTION: SetCurrentDirectoryA
-! FUNCTION: SetCurrentDirectoryW
+FUNCTION: BOOL SetCurrentDirectoryW ( LPCWSTR lpDirectory ) ;
+: SetCurrentDirectory SetCurrentDirectoryW ; inline
 ! FUNCTION: SetDefaultCommConfigA
 ! FUNCTION: SetDefaultCommConfigW
 ! FUNCTION: SetDllDirectoryA
@@ -1447,7 +1467,7 @@ FUNCTION: DWORD SleepEx ( DWORD dwMilliSeconds, BOOL bAlertable ) ;
 FUNCTION: BOOL SystemTimeToFileTime ( SYSTEMTIME* lpSystemTime, LPFILETIME lpFileTime ) ;
 ! FUNCTION: SystemTimeToTzSpecificLocalTime
 ! FUNCTION: TerminateJobObject
-! FUNCTION: TerminateProcess
+FUNCTION: BOOL TerminateProcess ( HANDLE hProcess, DWORD uExit ) ;
 ! FUNCTION: TerminateThread
 ! FUNCTION: TermsrvAppInstallMode
 ! FUNCTION: Thread32First

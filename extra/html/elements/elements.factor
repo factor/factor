@@ -4,7 +4,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: io kernel namespaces prettyprint quotations
-sequences strings words xml.writer compiler.units effects ;
+sequences strings words xml.entities compiler.units effects ;
 
 IN: html.elements
 
@@ -87,14 +87,14 @@ SYMBOL: html
     #! word.
     foo> [ ">" write-html ] empty-effect html-word ;
 
-: </foo> [ "</" % % ">" % ] "" make ;
+: </foo> "</" swap ">" 3append ;
 
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.
     </foo> dup [ write-html ] curry empty-effect html-word ;
 
-: <foo/> [ "<" % % "/>" % ] "" make ;
+: <foo/> "<" swap "/>" 3append ;
 
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
@@ -161,5 +161,6 @@ SYMBOL: html
         "id" "onclick" "style" "valign" "accesskey"
         "src" "language" "colspan" "onchange" "rel"
         "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
+        "media"
     ] [ define-attribute-word ] each
 ] with-compilation-unit

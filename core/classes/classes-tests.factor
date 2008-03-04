@@ -3,7 +3,7 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes io.streams.string
 classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units ;
-IN: temporary
+IN: classes.tests
 
 H{ } "s" set
 
@@ -62,8 +62,8 @@ UNION: bah fixnum alien ;
 [ bah ] [ \ bah? "predicating" word-prop ] unit-test
 
 ! Test generic see and parsing
-[ "USING: alien math ;\nIN: temporary\nUNION: bah fixnum alien ;\n" ]
-[ [ \ bah see ] string-out ] unit-test
+[ "USING: alien math ;\nIN: classes.tests\nUNION: bah fixnum alien ;\n" ]
+[ [ \ bah see ] with-string-writer ] unit-test
 
 ! Test redefinition of classes
 UNION: union-1 fixnum float ;
@@ -78,7 +78,7 @@ M: union-1 generic-update-test drop "union-1" ;
 
 [ union-1 ] [ fixnum float class-or ] unit-test
 
-"IN: temporary USE: math USE: arrays UNION: union-1 rational array ;" eval
+"IN: classes.tests USE: math USE: arrays UNION: union-1 rational array ;" eval
 
 [ t ] [ bignum union-1 class< ] unit-test
 [ f ] [ union-1 number class< ] unit-test
@@ -86,12 +86,12 @@ M: union-1 generic-update-test drop "union-1" ;
 
 [ object ] [ fixnum float class-or ] unit-test
 
-"IN: temporary USE: math PREDICATE: integer union-1 even? ;" eval
+"IN: classes.tests USE: math PREDICATE: integer union-1 even? ;" eval
 
 [ f ] [ union-1 union-class? ] unit-test
 [ t ] [ union-1 predicate-class? ] unit-test
 [ "union-1" ] [ 8 generic-update-test ] unit-test
-[ -7 generic-update-test ] unit-test-fails
+[ -7 generic-update-test ] must-fail
 
 ! Test mixins
 MIXIN: sequence-mixin
@@ -126,7 +126,7 @@ INSTANCE: integer mx1
 [ t ] [ mx1 integer class< ] unit-test
 [ t ] [ mx1 number class< ] unit-test
 
-"IN: temporary USE: arrays INSTANCE: array mx1" eval
+"IN: classes.tests USE: arrays INSTANCE: array mx1" eval
 
 [ t ] [ array mx1 class< ] unit-test
 [ f ] [ mx1 number class< ] unit-test
@@ -157,7 +157,7 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 [ t ] [ quotation redefine-bug-2 class< ] unit-test
 [ redefine-bug-2 ] [ fixnum quotation class-or ] unit-test
 
-[ ] [ "IN: temporary USE: math UNION: redefine-bug-1 bignum ;" eval ] unit-test
+[ ] [ "IN: classes.tests USE: math UNION: redefine-bug-1 bignum ;" eval ] unit-test
 
 [ t ] [ bignum redefine-bug-1 class< ] unit-test
 [ f ] [ fixnum redefine-bug-2 class< ] unit-test
@@ -169,10 +169,14 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 UNION: forget-class-bug-1 integer ;
 UNION: forget-class-bug-2 forget-class-bug-1 dll ;
 
-FORGET: forget-class-bug-1
-FORGET: forget-class-bug-2
+[
+    \ forget-class-bug-1 forget
+    \ forget-class-bug-2 forget
+] with-compilation-unit
 
-[ t ] [ integer dll class-or interned? ] unit-test
+[ f ] [ forget-class-bug-1 typemap get values [ memq? ] with contains? ] unit-test
+
+[ f ] [ forget-class-bug-2 typemap get values [ memq? ] with contains? ] unit-test
 
 DEFER: mixin-forget-test-g
 
@@ -181,7 +185,7 @@ DEFER: mixin-forget-test-g
 [ ] [
     {
         "USING: sequences ;"
-        "IN: temporary"
+        "IN: classes.tests"
         "MIXIN: mixin-forget-test"
         "INSTANCE: sequence mixin-forget-test"
         "GENERIC: mixin-forget-test-g ( x -- y )"
@@ -191,12 +195,12 @@ DEFER: mixin-forget-test-g
 ] unit-test
 
 [ { } ] [ { } mixin-forget-test-g ] unit-test
-[ H{ } mixin-forget-test-g ] unit-test-fails
+[ H{ } mixin-forget-test-g ] must-fail
 
 [ ] [
     {
         "USING: hashtables ;"
-        "IN: temporary"
+        "IN: classes.tests"
         "MIXIN: mixin-forget-test"
         "INSTANCE: hashtable mixin-forget-test"
         "GENERIC: mixin-forget-test-g ( x -- y )"
@@ -205,5 +209,16 @@ DEFER: mixin-forget-test-g
     parse-stream drop
 ] unit-test
 
-[ { } mixin-forget-test-g ] unit-test-fails
+[ { } mixin-forget-test-g ] must-fail
 [ H{ } ] [ H{ } mixin-forget-test-g ] unit-test
+
+! Method flattening interfered with mixin update
+MIXIN: flat-mx-1
+TUPLE: flat-mx-1-1 ; INSTANCE: flat-mx-1-1 flat-mx-1
+TUPLE: flat-mx-1-2 ; INSTANCE: flat-mx-1-2 flat-mx-1
+TUPLE: flat-mx-1-3 ; INSTANCE: flat-mx-1-3 flat-mx-1
+TUPLE: flat-mx-1-4 ; INSTANCE: flat-mx-1-4 flat-mx-1
+MIXIN: flat-mx-2     INSTANCE: flat-mx-2 flat-mx-1
+TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
+
+[ t ] [ T{ flat-mx-2-1 } flat-mx-1? ] unit-test

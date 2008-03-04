@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel parser words arrays strings math.parser sequences 
-       quotations vectors namespaces math assocs continuations peg ;
+       quotations vectors namespaces math assocs continuations peg
+       peg.parsers unicode.categories ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -99,7 +100,7 @@ M: ebnf (generate-parser) ( ast -- id )
 DEFER: 'rhs'
 
 : 'non-terminal' ( -- parser )
-  CHAR: a CHAR: z range repeat1 [ >string <ebnf-non-terminal> ] action ;
+  CHAR: a CHAR: z range "-" token [ first ] action  2array choice repeat1 [ >string <ebnf-non-terminal> ] action ;
 
 : 'terminal' ( -- parser )
   "'" token hide [ CHAR: ' = not ] satisfy repeat1 "'" token hide 3array seq [ first >string <ebnf-terminal> ] action ;

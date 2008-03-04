@@ -1,7 +1,6 @@
-IN: temporary
+IN: ui.gadgets.buttons.tests
 USING: ui.commands ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets tools.test namespaces sequences kernel models
-tools.test.inference ;
+ui.gadgets tools.test namespaces sequences kernel models ;
 
 TUPLE: foo-gadget ;
 
@@ -17,7 +16,7 @@ TUPLE: foo-gadget ;
 T{ foo-gadget } <toolbar> "t" set
 
 [ 2 ] [ "t" get gadget-children length ] unit-test
-[ "Foo a" ] [ "t" get gadget-child gadget-child label-string ] unit-test
+[ "Foo A" ] [ "t" get gadget-child gadget-child label-string ] unit-test
 
 [ ] [
     2 <model> {

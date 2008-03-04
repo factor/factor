@@ -19,7 +19,7 @@ VAR: accum
 : (rewrite) ( slice -- )
   { { [ empty? ]     [ drop ] }
     { [ has-param? ] [ next+rest* [ push-next ] [ (rewrite) ] bi* ] }
-    { [ t ]	     [ next+rest  [ push-next ] [ (rewrite) ] bi* ] } }
+    { [ t ]          [ next+rest  [ push-next ] [ (rewrite) ] bi* ] } }
   switch ;
 
 : rewrite ( string -- string )

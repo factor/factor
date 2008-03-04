@@ -136,8 +136,6 @@ ARTICLE: "parser-lexer" "The lexer"
 { $subsection <lexer> }
 "A word to test of the end of input has been reached:"
 { $subsection still-parsing? }
-"A word to get the text of the current line:"
-{ $subsection line-text }
 "A word to advance the lexer to the next line:"
 { $subsection next-line }
 "Two generic words to override the lexer's token boundary detection:"
@@ -202,9 +200,7 @@ HELP: location
 
 HELP: save-location
 { $values { "definition" "a definition specifier" } }
-{ $description "Saves the location of a definition and associates this definition with the current source file."
-$nl
-"This is the book-keeping required to detect " { $link redefine-error } " and " { $link forward-error } "." } ;
+{ $description "Saves the location of a definition and associates this definition with the current source file." } ;
 
 HELP: parser-notes
 { $var-description "A boolean controlling whether the parser will print various notes and warnings. Switched on by default. If a source file is being run for its effect on the " { $link stdio } " stream, this variable should be switched off, to prevent parser notes from polluting the output." } ;
@@ -223,10 +219,6 @@ HELP: parse-error
 HELP: <parse-error>
 { $values { "msg" "an error" } { "error" parse-error } }
 { $description "Creates a new " { $link parse-error } ", filling in the location information from the current " { $link lexer } "." } ;
-
-HELP: line-text
-{ $values { "lexer" lexer } { "str" string } }
-{ $description "Outputs the text of the line being parsed." } ;
 
 HELP: skip
 { $values { "i" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "n" integer } }
@@ -274,19 +266,10 @@ HELP: escape
 { $description "Converts from a single-character escape code and the corresponding character." }
 { $examples { $example "CHAR: n escape CHAR: \\n = ." "t" } } ;
 
-HELP: next-escape
-{ $values { "m" "an index into " { $snippet "str" } } { "str" string } { "n" "an index into " { $snippet "str" } } { "ch" "a character" } }
-{ $description "Helper word for " { $link parse-string } " which parses an escape sequence starting at the " { $snippet "m" } "th index of " { $snippet "str" } "." }
-{ $errors "Throws a " { $link bad-escape } " if the string contains an invalid escape sequence." } ;
-
-HELP: next-char
-{ $values { "m" "an index into " { $snippet "str" } } { "str" string } { "n" "an index into " { $snippet "str" } } { "ch" "a character" } }
-{ $description "Helper word for " { $link parse-string } " which parses a character starting at the " { $snippet "m" } "th index of " { $snippet "str" } "." } ;
-
 HELP: parse-string
 { $values { "str" "a new " { $link string } } }
 { $description "Parses the line until a quote (\"), interpreting escape codes along the way." }
-{ $errors "Throws an " { $link bad-escape } " if the string contains an invalid escape sequence." }
+{ $errors "Throws an error if the string contains an invalid escape sequence." }
 $parsing-note ;
 
 HELP: still-parsing?

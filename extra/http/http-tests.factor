@@ -1,5 +1,5 @@
 USING: http tools.test ;
-IN: temporary
+IN: http.tests
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test
 [ "hello world" ] [ "hello%20world" url-decode ] unit-test
@@ -14,3 +14,5 @@ IN: temporary
 [ "hello world"   ] [ "hello world%x"  url-decode ] unit-test
 [ "hello%20world" ] [ "hello world"    url-encode ] unit-test
 [ "%20%21%20"     ] [ " ! "            url-encode ] unit-test
+
+[ "\u001234hi\u002045" ] [ "\u001234hi\u002045" url-encode url-decode ] unit-test

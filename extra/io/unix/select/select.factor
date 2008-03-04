@@ -9,8 +9,6 @@ TUPLE: select-mx read-fdset write-fdset ;
 ! Factor's bit-arrays are an array of bytes, OS X expects
 ! FD_SET to be an array of cells, so we have to account for
 ! byte order differences on big endian platforms
-: little-endian? 1 <int> *char 1 = ; foldable
-
 : munge ( i -- i' )
     little-endian? [ BIN: 11000 bitxor ] unless ; inline
 
@@ -19,14 +17,18 @@ TUPLE: select-mx read-fdset write-fdset ;
     FD_SETSIZE 8 * <bit-array> over set-select-mx-read-fdset
     FD_SETSIZE 8 * <bit-array> over set-select-mx-write-fdset ;
 
+: clear-nth ( n seq -- ? )
+    [ nth ] 2keep f -rot set-nth ;
+
 : handle-fd ( fd task fdset mx -- )
-    roll munge rot nth [ swap handle-io-task ] [ 2drop ] if ;
+    roll munge rot clear-nth
+    [ swap handle-io-task ] [ 2drop ] if ;
 
 : handle-fdset ( tasks fdset mx -- )
     [ handle-fd ] 2curry assoc-each ;
 
 : init-fdset ( tasks fdset -- )
-    dup clear-bits
+    ! dup clear-bits
     [ >r drop t swap munge r> set-nth ] curry assoc-each ;
 
 : read-fdset/tasks
@@ -35,13 +37,19 @@ TUPLE: select-mx read-fdset write-fdset ;
 : write-fdset/tasks
     { mx-writes select-mx-write-fdset } get-slots ;
 
-: init-fdsets ( mx -- read write except )
+: max-fd dup assoc-empty? [ drop 0 ] [ keys supremum ] if ;
+
+: num-fds ( mx -- n )
+    dup mx-reads max-fd swap mx-writes max-fd max 1+ ;
+
+: init-fdsets ( mx -- nfds read write except )
+    [ num-fds ] keep
     [ read-fdset/tasks tuck init-fdset ] keep
     write-fdset/tasks tuck init-fdset
     f ;
 
 M: select-mx wait-for-events ( ms mx -- )
-    swap >r FD_SETSIZE over init-fdsets r> make-timeval
+    swap >r dup init-fdsets r> dup [ make-timeval ] when
     select multiplexer-error
     dup read-fdset/tasks pick handle-fdset
     dup write-fdset/tasks rot handle-fdset ;

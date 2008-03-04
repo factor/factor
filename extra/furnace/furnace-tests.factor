@@ -1,5 +1,5 @@
 USING: kernel sequences namespaces math tools.test furnace furnace.validator ;
-IN: temporary
+IN: furnace.tests
 
 TUPLE: test-tuple m n ;
 
@@ -39,7 +39,7 @@ TUPLE: test-tuple m n ;
 ] unit-test
 
 [
-    "/responder/temporary/foo?foo=3"
+    "/responder/furnace.tests/foo?foo=3"
 ] [
     [
         [ "3" foo ] quot-link

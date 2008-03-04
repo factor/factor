@@ -27,7 +27,7 @@ M: tuple-class group-words
     swap [ slot-spec-writer ] map append ;
 
 : define-consult-method ( word class quot -- )
-    pick add <method> spin define-method ;
+    pick add spin define-method ;
 
 : define-consult ( class group quot -- )
     >r group-words r>
@@ -39,7 +39,7 @@ M: tuple-class group-words
 : define-mimic ( group mimicker mimicked -- )
     >r >r group-words r> r> [
         pick "methods" word-prop at dup
-        [ method-def <method> spin define-method ] [ 3drop ] if
+        [ method-def spin define-method ] [ 3drop ] if
     ] 2curry each ; 
 
 : MIMIC:

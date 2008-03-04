@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar combinators combinators.lib kernel math math.ranges namespaces
-    sequences ;
+USING: calendar combinators kernel math math.ranges namespaces sequences
+    sequences.lib ;
 IN: project-euler.019
 
 ! http://projecteuler.net/index.php?section=problems&id=19
@@ -32,7 +32,7 @@ IN: project-euler.019
 
 : euler019 ( -- answer )
     1901 2000 [a,b] [
-        12 [1,b] [ 1 zeller-congruence ] 1 map-withn
+        12 [1,b] [ 1 zeller-congruence ] map-with
     ] map concat [ zero? ] count ;
 
 ! [ euler019 ] 100 ave-time
@@ -45,25 +45,20 @@ IN: project-euler.019
 <PRIVATE
 
 : start-date ( -- timestamp )
-    1901 1 1 0 0 0 0 make-timestamp ;
+    1901 1 1 <date> ;
 
 : end-date ( -- timestamp )
-    2000 12 31 0 0 0 0 make-timestamp ;
+    2000 12 31 <date> ;
 
-: (first-days) ( end-date start-date -- )
-    2dup timestamp- 0 >= [
-        dup day-of-week , 1 +month (first-days)
-    ] [
-        2drop
-    ] if ;
-
-: first-days ( start-date end-date -- seq )
-    [ swap (first-days) ] { } make ;
+: first-days ( end-date start-date -- days )
+    [ 2dup after=? ]
+    [ dup 1 months time+ swap day-of-week ]
+    [ ] unfold 2nip ;
 
 PRIVATE>
 
 : euler019a ( -- answer )
-    start-date end-date first-days [ zero? ] count ;
+    end-date start-date first-days [ zero? ] count ;
 
 ! [ euler019a ] 100 ave-time
 ! 131 ms run / 3 ms GC ave time - 100 trials

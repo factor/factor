@@ -47,11 +47,13 @@ ARTICLE: "syntax-integers" "Integer syntax"
 "More information on integers can be found in " { $link "integers" } "." ;
 
 ARTICLE: "syntax-ratios" "Ratio syntax"
-"The printed representation of a ratio is a pair of integers separated by a slash (/). No intermediate whitespace is permitted. Either integer may be signed, however the ratio will be normalized into a form where the denominator is positive and the greatest common divisor of the two terms is 1."
+"The printed representation of a ratio is a pair of integers separated by a slash (/), prefixed by an optional whole number part followed by a plus (+). No intermediate whitespace is permitted. Here are some examples:"
 { $code
     "75/33"
     "1/10"
     "-5/-6"
+    "1+1/3"
+    "-10+1/7"
 }
 "More information on ratios can be found in " { $link "rationals" } ;
 
@@ -98,13 +100,9 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\0" } "a null byte (ASCII 0)" }
     { { $snippet "\\e" } "escape (ASCII 27)" }
     { { $snippet "\\\"" } { $snippet "\"" } }
-}
-"A Unicode character can be specified by its code number by writing " { $snippet "\\u" } " followed by a four-digit hexadecimal number. That is, the following two expressions are equivalent:"
-{ $code
-    "CHAR: \\u0078"
-    "78"
-}
-"While not useful for single characters, this syntax is also permitted inside strings." ;
+    { { $snippet "\\u" { $emphasis "xxxxxx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xxxxxx" } } } }
+    { { $snippet "\\u{" { $emphasis "name" } "}" } { "The Unicode code point named " { $snippet { $emphasis "name" } } } }
+} ;
 
 ARTICLE: "syntax-strings" "Character and string syntax"
 "Factor has no distinct character type, however Unicode character value integers can be read by specifying a literal character, or an escaped representation thereof."
@@ -151,9 +149,21 @@ ARTICLE: "syntax-byte-arrays" "Byte array syntax"
 { $subsection POSTPONE: B{ }
 "Byte arrays are documented in " { $link "byte-arrays" } "." ;
 
+ARTICLE: "syntax-bit-vectors" "Bit vector syntax"
+{ $subsection POSTPONE: ?V{ }
+"Bit vectors are documented in " { $link "bit-vectors" } "." ;
+
+ARTICLE: "syntax-float-vectors" "Float vector syntax"
+{ $subsection POSTPONE: FV{ }
+"Float vectors are documented in " { $link "float-vectors" } "." ;
+
+ARTICLE: "syntax-byte-vectors" "Byte vector syntax"
+{ $subsection POSTPONE: BV{ }
+"Byte vectors are documented in " { $link "byte-vectors" } "." ;
+
 ARTICLE: "syntax-pathnames" "Pathname syntax"
 { $subsection POSTPONE: P" }
-"Pathnames are documented in " { $link "file-streams" } "." ;
+"Pathnames are documented in " { $link "pathnames" } "." ;
 
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."
@@ -165,11 +175,15 @@ $nl
 { $subsection "syntax-words" }
 { $subsection "syntax-quots" }
 { $subsection "syntax-arrays" }
-{ $subsection "syntax-vectors" }
 { $subsection "syntax-strings" }
-{ $subsection "syntax-sbufs" }
-{ $subsection "syntax-byte-arrays" }
 { $subsection "syntax-bit-arrays" }
+{ $subsection "syntax-byte-arrays" }
+{ $subsection "syntax-float-arrays" }
+{ $subsection "syntax-vectors" }
+{ $subsection "syntax-sbufs" }
+{ $subsection "syntax-bit-vectors" }
+{ $subsection "syntax-byte-vectors" }
+{ $subsection "syntax-float-vectors" }
 { $subsection "syntax-hashtables" }
 { $subsection "syntax-tuples" }
 { $subsection "syntax-pathnames" } ;
@@ -273,11 +287,29 @@ HELP: B{
 { $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "B{ 1 2 3 }" } } ;
 
+HELP: BV{
+{ $syntax "BV{ elements... }" }
+{ $values { "elements" "a list of bytes" } }
+{ $description "Marks the beginning of a literal byte vector. Literal byte vectors are terminated by " { $link POSTPONE: } } "." } 
+{ $examples { $code "BV{ 1 2 3 12 }" } } ;
+
 HELP: ?{
 { $syntax "?{ elements... }" }
 { $values { "elements" "a list of booleans" } }
 { $description "Marks the beginning of a literal bit array. Literal bit arrays are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "?{ t f t }" } } ;
+
+HELP: ?V{
+{ $syntax "?V{ elements... }" }
+{ $values { "elements" "a list of booleans" } }
+{ $description "Marks the beginning of a literal bit vector. Literal bit vectors are terminated by " { $link POSTPONE: } } "." } 
+{ $examples { $code "?V{ t f t }" } } ;
+
+HELP: FV{
+{ $syntax "FV{ elements... }" }
+{ $values { "elements" "a list of real numbers" } }
+{ $description "Marks the beginning of a literal float vector. Literal float vectors are terminated by " { $link POSTPONE: } } "." } 
+{ $examples { $code "FV{ 1.0 2.0 3.0 }" } } ;
 
 HELP: F{
 { $syntax "F{ elements... }" }
@@ -376,8 +408,17 @@ HELP: IN:
 
 HELP: CHAR:
 { $syntax "CHAR: token" }
-{ $values { "token" "a literal character or escape code" } }
-{ $description "Adds the Unicode code point of the character represented by the token to the parse tree." } ;
+{ $values { "token" "a literal character, escape code, or Unicode character name" } }
+{ $description "Adds a Unicode code point to the parse tree." }
+{ $examples
+    { $code
+        "CHAR: x"
+        "CHAR: \\u000032"
+        "CHAR: \\u{exclamation-mark}"
+        "CHAR: exclamation-mark"
+        "CHAR: ugaritic-letter-samka"
+    }
+} ;
 
 HELP: "
 { $syntax "\"string...\"" }

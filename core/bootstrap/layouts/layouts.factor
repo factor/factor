@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math words kernel alien byte-arrays
 hashtables vectors strings sbufs arrays bit-arrays
@@ -8,7 +8,7 @@ BIN: 111 tag-mask set
 8 num-tags set
 3 tag-bits set
 
-23 num-types set
+19 num-types set
 
 H{
     { fixnum      BIN: 000 }
@@ -24,17 +24,13 @@ H{
 tag-numbers get H{
     { array 8 }
     { wrapper 9 }
-    { hashtable 10 }
-    { vector 11 }
+    { float-array 10 }
+    { callstack 11 }
     { string 12 }
-    { sbuf 13 }
+    { bit-array 13 }
     { quotation 14 }
     { dll 15 }
     { alien 16 }
     { word 17 }
     { byte-array 18 }
-    { bit-array 19 }
-    { float-array 20 }
-    { curry 21 }
-    { callstack 22 }
 } union type-numbers set

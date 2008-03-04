@@ -1,12 +1,12 @@
 USING: io io.files io.streams.string http.server.templating kernel tools.test
     sequences ;
-IN: temporary
+IN: http.server.templating.tests
 
 : test-template ( path -- ? )
     "extra/http/server/templating/test/" swap append
     [
         ".fhtml" append resource-path
-        [ run-template-file ] string-out
+        [ run-template-file ] with-string-writer
     ] keep
     ".html" append resource-path file-contents = ;
 

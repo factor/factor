@@ -1,14 +1,18 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar html io io.files kernel math math.parser
 http.server.responders http.server.templating namespaces parser
 sequences strings assocs hashtables debugger http.mime sorting
-html.elements ;
-
+html.elements logging calendar.format ;
 IN: webapps.file
 
+SYMBOL: doc-root
+
 : serving-path ( filename -- filename )
-    "" or "doc-root" get swap path+ ;
+    "" or doc-root get swap path+ ;
+
+: unix-time>timestamp ( n -- timestamp )
+    >r unix-1970 r> seconds time+ ;
 
 : file-http-date ( filename -- string )
     file-modified unix-time>timestamp timestamp>http-string ;
@@ -24,7 +28,7 @@ IN: webapps.file
 
 : last-modified-matches? ( filename -- bool )
     file-http-date dup [
-        "If-Modified-Since" header-param = 
+        "if-modified-since" header-param = 
     ] when ;
 
 : not-modified-response ( -- )
@@ -58,8 +62,10 @@ SYMBOL: page
     [ [ dup page set run-template-file ] with-scope ] try
     drop ;
 
+\ run-page DEBUG add-input-logging
+
 : include-page ( filename -- )
-    "doc-root" get swap path+ run-page ;
+    serving-path run-page ;
 
 : serve-fhtml ( filename -- )
     serving-html
@@ -68,6 +74,8 @@ SYMBOL: page
 : serve-file ( filename -- )
     dup mime-type dup "application/x-factor-server-page" =
     [ drop serve-fhtml ] [ serve-static ] if ;
+
+\ serve-file NOTICE add-input-logging
 
 : file. ( name dirp -- )
     [ "/" append ] when
@@ -104,21 +112,21 @@ SYMBOL: page
     ] if ;
 
 : serve-object ( filename -- )
-    dup directory? [ serve-directory ] [ serve-file ] if ;
+    serving-path dup exists? [
+        dup directory? [ serve-directory ] [ serve-file ] if
+    ] [
+        drop "404 not found" httpd-error
+    ] if ;
 
 : file-responder ( -- )
-    "doc-root" get [
-        "argument" get serving-path dup exists? [
-            serve-object
-        ] [
-            drop "404 not found" httpd-error
-        ] if
+    doc-root get [
+        "argument" get serve-object
     ] [
         "404 doc-root not set" httpd-error
     ] if ;
 
 global [
-    ! Serves files from a directory stored in the "doc-root"
+    ! Serves files from a directory stored in the doc-root
     ! variable. You can set the variable in the global
     ! namespace, or inside the responder.
     "file" [ file-responder ] add-simple-responder

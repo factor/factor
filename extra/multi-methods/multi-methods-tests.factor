@@ -1,4 +1,4 @@
-IN: temporary
+IN: multi-methods.tests
 USING: multi-methods tools.test kernel math arrays sequences
 prettyprint strings classes hashtables assocs namespaces
 debugger continuations ;
@@ -52,7 +52,7 @@ METHOD: beats? { thing thing } f ;
 
 : play ( obj1 obj2 -- ? ) beats? 2nip ;
 
-[ { } 3 play ] unit-test-fails
+[ { } 3 play ] must-fail
 [ t ] [ error get no-method? ] unit-test
 [ ] [ error get error. ] unit-test
 [ t ] [ T{ paper } T{ scissors } play ] unit-test
@@ -84,3 +84,15 @@ METHOD: hook-test { hashtable number } assoc-size ;
 [ fixnum ] [ 3 hook-test ] unit-test
 5.0 some-var set
 [ 0 ] [ H{ } hook-test ] unit-test
+
+MIXIN: busted
+
+TUPLE: busted-1 ;
+TUPLE: busted-2 ; INSTANCE: busted-2 busted
+TUPLE: busted-3 ;
+
+GENERIC: busted-sort
+
+METHOD: busted-sort { busted-1 busted-2 } ;
+METHOD: busted-sort { busted-2 busted-3 } ;
+METHOD: busted-sort { busted busted } ;

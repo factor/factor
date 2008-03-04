@@ -1,7 +1,7 @@
 USING: arrays kernel math namespaces sequences kernel.private
 sequences.private strings sbufs tools.test vectors bit-arrays
 generic ;
-IN: temporary
+IN: sequences.tests
 
 [ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
 [ 3 ] [ 1 4 dup <slice> length ] unit-test
@@ -83,8 +83,8 @@ unit-test
 [ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] [ 4 ] append ] unit-test
 [ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] { 4 } append ] unit-test
 
-[ "a" -1 append ] unit-test-fails
-[ -1 "a" append ] unit-test-fails
+[ "a" -1 append ] must-fail
+[ -1 "a" append ] must-fail
 
 [ [ ]       ] [ 1 [ ]           remove ] unit-test
 [ [ ]       ] [ 1 [ 1 ]         remove ] unit-test
@@ -119,7 +119,7 @@ unit-test
 
 [ V{ 0 1 4 5 } ] [ 6 >vector 2 4 pick delete-slice ] unit-test
 
-[ 6 >vector 2 8 pick delete-slice ] unit-test-fails
+[ 6 >vector 2 8 pick delete-slice ] must-fail
 
 [ V{ } ] [ 6 >vector 0 6 pick delete-slice ] unit-test
 
@@ -151,7 +151,7 @@ unit-test
 
 [ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
 [ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
-[ 5 ] [ 1 >bignum "\u0001\u0005\u0007" nth-unsafe ] unit-test
+[ 5 ] [ 1 >bignum "\u000001\u000005\u000007" nth-unsafe ] unit-test
 
 [ SBUF" before&after" ] [
     "&" 6 11 SBUF" before and after" [ replace-slice ] keep
@@ -173,7 +173,7 @@ unit-test
 
 [ V{ "C" } V{ "c" } ] [ { "a" "b" "C" } { "a" "b" "c" } drop-prefix [ >vector ] 2apply ] unit-test
 
-[ -1 1 "abc" <slice> ] unit-test-fails
+[ -1 1 "abc" <slice> ] must-fail
 
 [ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] 2apply ] unit-test
 
@@ -195,8 +195,8 @@ unit-test
 ! Pathological case
 [ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test
 
-[ -10 "hi" "bye" copy ] unit-test-fails
-[ 10 "hi" "bye" copy ] unit-test-fails
+[ -10 "hi" "bye" copy ] must-fail
+[ 10 "hi" "bye" copy ] must-fail
 
 [ V{ 1 2 3 5 6 } ] [
     3 V{ 1 2 3 4 5 6 } clone [ delete-nth ] keep
@@ -228,19 +228,19 @@ unit-test
 [ SBUF" \0\0\0" ] [ 3 SBUF" " new ] unit-test
 
 [ 0 ] [ f length ] unit-test
-[ f first ] unit-test-fails
+[ f first ] must-fail
 [ 3 ] [ 3 10 nth ] unit-test
 [ 3 ] [ 3 10 nth-unsafe ] unit-test
-[ -3 10 nth ] unit-test-fails
-[ 11 10 nth ] unit-test-fails
+[ -3 10 nth ] must-fail
+[ 11 10 nth ] must-fail
 
-[ -1./0. 0 delete-nth ] unit-test-fails
-[ "" ] [ "" [ blank? ] trim ] unit-test
-[ "" ] [ "" [ blank? ] left-trim ] unit-test
-[ "" ] [ "" [ blank? ] right-trim ] unit-test
-[ "" ] [ "  " [ blank? ] left-trim ] unit-test
-[ "" ] [ "  " [ blank? ] right-trim ] unit-test
-[ "asdf" ] [ " asdf " [ blank? ] trim ] unit-test
-[ "asdf " ] [ " asdf " [ blank? ] left-trim ] unit-test
-[ " asdf" ] [ " asdf " [ blank? ] right-trim ] unit-test
+[ -1./0. 0 delete-nth ] must-fail
+[ "" ] [ "" [ CHAR: \s = ] trim ] unit-test
+[ "" ] [ "" [ CHAR: \s = ] left-trim ] unit-test
+[ "" ] [ "" [ CHAR: \s = ] right-trim ] unit-test
+[ "" ] [ "  " [ CHAR: \s = ] left-trim ] unit-test
+[ "" ] [ "  " [ CHAR: \s = ] right-trim ] unit-test
+[ "asdf" ] [ " asdf " [ CHAR: \s = ] trim ] unit-test
+[ "asdf " ] [ " asdf " [ CHAR: \s = ] left-trim ] unit-test
+[ " asdf" ] [ " asdf " [ CHAR: \s = ] right-trim ] unit-test
 

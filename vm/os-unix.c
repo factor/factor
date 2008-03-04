@@ -20,25 +20,9 @@ void init_ffi(void)
 	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
 }
 
-void ffi_dlopen(F_DLL *dll, bool error)
+void ffi_dlopen(F_DLL *dll)
 {
-	void *dllptr = dlopen(alien_offset(dll->path), RTLD_LAZY);
-
-	if(dllptr == NULL)
-	{
-		if(error)
-		{
-			general_error(ERROR_FFI,F,
-				tag_object(from_char_string(dlerror())),
-				NULL);
-		}
-		else
-			dll->dll = NULL;
-
-		return;
-	}
-
-	dll->dll = dllptr;
+	dll->dll = dlopen(alien_offset(dll->path), RTLD_LAZY);
 }
 
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol)
@@ -113,19 +97,6 @@ DEFINE_PRIMITIVE(read_dir)
 	GROWABLE_TRIM(result);
 
 	dpush(result);
-}
-
-DEFINE_PRIMITIVE(cwd)
-{
-	char wd[MAXPATHLEN];
-	if(getcwd(wd,MAXPATHLEN) == NULL)
-		io_error();
-	box_char_string(wd);
-}
-
-DEFINE_PRIMITIVE(cd)
-{
-	chdir(unbox_char_string());
 }
 
 DEFINE_PRIMITIVE(os_envs)

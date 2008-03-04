@@ -1,43 +1,36 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: serialize sequences concurrency io io.server qualified
-threads arrays namespaces kernel ;
+USING: serialize sequences concurrency.messaging
+threads io io.server qualified arrays
+namespaces kernel ;
 QUALIFIED: io.sockets
 IN: concurrency.distributed
 
-TUPLE: node hostname port ;
-
-C: <node> node
+SYMBOL: local-node ( -- addrspec )
 
 : handle-node-client ( -- )
     deserialize first2 get-process send ;
 
-: node-server ( port -- )
-    internet-server
-    "concurrency"
-    [ handle-node-client ] with-server ;
+: (start-node) ( addrspecs addrspec -- )
+    [
+        local-node set-global
+        "concurrency.distributed"
+        [ handle-node-client ] with-server
+    ] 2curry f spawn drop ;
 
-: send-to-node ( msg pid  host port -- )
-    io.sockets:<inet> io.sockets:<client> [
-        2array serialize
-    ] with-stream ;
+: start-node ( port -- )
+    dup internet-server io.sockets:host-name
+    rot io.sockets:<inet> (start-node) ;
 
-: localnode ( -- node )
-    \ localnode get ;
-
-: start-node ( hostname port -- )
-    [ node-server ] in-thread
-    <node> \ localnode set-global ;
-
-TUPLE: remote-process node pid ;
+TUPLE: remote-process id node ;
 
 C: <remote-process> remote-process
 
-M: remote-process send ( message process -- )
-    #! Send the message via the inter-node protocol
-    { remote-process-pid remote-process-node } get-slots
-    { node-hostname node-port } get-slots
-    send-to-node ;
+M: remote-process send ( message thread -- )
+    { remote-process-id remote-process-node } get-slots
+    io.sockets:<client> [ 2array serialize ] with-stream ;
 
-M: process (serialize) ( obj -- )
-    localnode swap process-pid <remote-process> (serialize) ;
+M: thread (serialize) ( obj -- )
+    thread-id local-node get-global
+    <remote-process>
+    (serialize) ;

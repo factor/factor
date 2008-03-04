@@ -60,9 +60,7 @@ HOOK: %jump-label compiler-backend ( label -- )
 ! Test if vreg is 'f' or not
 HOOK: %jump-t compiler-backend ( label -- )
 
-HOOK: %call-dispatch compiler-backend ( -- label )
-
-HOOK: %jump-dispatch compiler-backend ( -- )
+HOOK: %dispatch compiler-backend ( -- )
 
 HOOK: %dispatch-label compiler-backend ( word -- )
 
@@ -130,7 +128,7 @@ HOOK: %prepare-var-args compiler-backend ( -- )
 
 M: object %prepare-var-args ;
 
-HOOK: %alien-invoke compiler-backend ( library function -- )
+HOOK: %alien-invoke compiler-backend ( function library -- )
 
 HOOK: %cleanup compiler-backend ( alien-node -- )
 

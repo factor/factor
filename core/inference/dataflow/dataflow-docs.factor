@@ -1,4 +1,5 @@
-USING: inference.dataflow help.syntax help.markup ;
+USING: help.syntax help.markup ;
+IN: inference.dataflow
 
 HELP: #return
 { $values { "label" "a word or " { $link f } } { "node" "a new " { $link node } } }

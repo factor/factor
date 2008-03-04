@@ -4,11 +4,14 @@ USING: namespaces parser kernel sequences words quotations math ;
 IN: multiline
 
 : next-line-text ( -- str )
-    lexer get dup next-line line-text ;
+    lexer get dup next-line lexer-line-text ;
 
 : (parse-here) ( -- )
-    next-line-text dup ";" =
-    [ drop lexer get next-line ] [ % "\n" % (parse-here) ] if ;
+    next-line-text [
+        dup ";" =
+        [ drop lexer get next-line ]
+        [ % "\n" % (parse-here) ] if
+    ] [ ";" unexpected-eof ] if* ;
 
 : parse-here ( -- str )
     [ (parse-here) ] "" make 1 head*
@@ -16,14 +19,16 @@ IN: multiline
 
 : STRING:
     CREATE dup reset-generic
-    parse-here 1quotation define ; parsing
+    parse-here 1quotation define-inline ; parsing
 
 : (parse-multiline-string) ( start-index end-text -- end-index )
-    lexer get line-text 2dup start
-    [ rot dupd >r >r swap subseq % r> r> length + ] [
-        rot tail % "\n" % 0
-        lexer get next-line swap (parse-multiline-string)
-    ] if* ;
+    lexer get lexer-line-text [
+        2dup start
+        [ rot dupd >r >r swap subseq % r> r> length + ] [
+            rot tail % "\n" % 0
+            lexer get next-line swap (parse-multiline-string)
+        ] if*
+    ] [ nip unexpected-eof ] if* ;
 
 : parse-multiline-string ( end-text -- str )
     [

@@ -4,8 +4,6 @@ USING: arrays kernel math sequences vectors
 sequences sequences.private growable ;
 IN: sorting
 
-: midpoint@ ( seq -- n ) length 2/ ; inline
-
 DEFER: sort
 
 <PRIVATE
@@ -38,9 +36,6 @@ DEFER: sort
     rot length rot length + <vector>
     [ (merge) ] keep underlying ; inline
 
-: divide ( seq -- first second )
-    dup midpoint@ [ head-slice ] 2keep tail-slice ;
-
 : conquer ( first second quot -- result )
     [ tuck >r >r sort r> r> sort ] keep merge ; inline
 
@@ -48,7 +43,7 @@ PRIVATE>
 
 : sort ( seq quot -- sortedseq )
     over length 1 <=
-    [ drop ] [ over >r >r divide r> conquer r> like ] if ;
+    [ drop ] [ over >r >r halves r> conquer r> like ] if ;
     inline
 
 : natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
@@ -57,14 +52,13 @@ PRIVATE>
 
 : sort-values ( seq -- sortedseq ) [ [ second ] compare ] sort ;
 
-: sort-pair ( a b -- c d ) 2dup <=> 0 > [ swap ] when ;
+: sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;
 
 : midpoint ( seq -- elt )
     [ midpoint@ ] keep nth-unsafe ; inline
 
 : partition ( seq n -- slice )
-    >r dup midpoint@ r> 1 < [ head-slice ] [ tail-slice ] if ;
-    inline
+    1 < swap halves ? ; inline
 
 : (binsearch) ( elt quot seq -- i )
     dup length 1 <= [

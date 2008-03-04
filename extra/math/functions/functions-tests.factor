@@ -1,6 +1,6 @@
 USING: kernel math math.constants math.functions math.private
 math.libm tools.test ;
-IN: temporary
+IN: math.functions.tests
 
 [ t ] [ 4 4 .00000001 ~ ] unit-test
 [ t ] [ 4.0000001 4.0000001 .000001 ~ ] unit-test
@@ -73,7 +73,7 @@ IN: temporary
 [ 3 ] [ 5 7 mod-inv ] unit-test
 [ 78572682077 ] [ 234829342 342389423843 mod-inv ] unit-test
 
-[ 2 10 mod-inv ] unit-test-fails
+[ 2 10 mod-inv ] must-fail
 
 [ t ] [ 0 0 ^ fp-nan? ] unit-test
 [ 1 ] [ 10 0 ^ ] unit-test

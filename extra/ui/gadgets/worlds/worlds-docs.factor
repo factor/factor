@@ -13,11 +13,6 @@ HELP: set-title
 { $description "Sets the title bar of the native window containing the world." }
 { $notes "This word should not be called directly by user code. Instead, change the " { $link world-title } " model; see " { $link "models" } "." } ;
 
-HELP: raise-window
-{ $values { "world" world } }
-{ $description "Makes the native window containing the given world the front-most window." }
-{ $notes "To raise the window containing a specific gadget, use " { $link find-world } " to find the world containing the gadget first." } ;
-
 HELP: select-gl-context
 { $values { "handle" "a backend-specific handle" } }
 { $description "Selects an OpenGL context to be the implicit destination for subsequent GL rendering calls. This word is called automatically by the UI before drawing a " { $link world } "." } ;

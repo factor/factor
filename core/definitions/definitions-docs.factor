@@ -52,9 +52,7 @@ $nl
 $nl
 "If the parser did not have special checks for this case, then the modified source file would still load, because when the definition of " { $snippet "hello-world" } " on line 4 is being parsed, the " { $snippet "world" } " word is already present in the dictionary from an earlier run. The developer would then not discover this mistake until attempting to load the source file into a fresh image."
 $nl
-"Since this is undesirable, the parser explicitly raises an error if a source file refers to a word which is in the dictionary, but defined after it is used."
-{ $subsection forward-error }
-"If a source file raises a " { $link forward-error } " when loaded into a development image, then it would have raised a " { $link no-word } " error when loaded into a fresh image."
+"Since this is undesirable, the parser explicitly raises a " { $link no-word } " error if a source file refers to a word which is in the dictionary, but defined after it is used."
 $nl
 "The parser also catches duplicate definitions. If an artifact is defined twice in the same source file, the earlier definition will never be accessible, and this is almost always a mistake, perhaps due to a bad choice of word names, or a copy and paste error. The parser raises an error in this case."
 { $subsection redefine-error } ;

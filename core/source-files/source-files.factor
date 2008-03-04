@@ -17,7 +17,7 @@ uses definitions ;
 
 : (source-modified?) ( path modified checksum -- ? )
     pick file-modified rot [ 0 or ] 2apply >
-    [ swap file-crc32 number= not ] [ 2drop f ] if ;
+    [ swap file-lines lines-crc32 = not ] [ 2drop f ] if ;
 
 : source-modified? ( path -- ? )
     dup source-files get at [
@@ -26,7 +26,7 @@ uses definitions ;
         rot source-file-checksum
         (source-modified?)
     ] [
-        ?resource-path exists?
+        resource-exists?
     ] ?if ;
 
 : record-modified ( source-file -- )
@@ -38,7 +38,7 @@ uses definitions ;
 
 : (xref-source) ( source-file -- pathname uses )
     dup source-file-path <pathname> swap source-file-uses
-    [ interned? ] subset ;
+    [ crossref? ] subset ;
 
 : xref-source ( source-file -- )
     (xref-source) crossref get add-vertex ;
@@ -68,7 +68,10 @@ uses definitions ;
 : reset-checksums ( -- )
     source-files get [
         swap ?resource-path dup exists?
-        [ file-lines record-checksum ] [ 2drop ] if
+        [
+            over record-modified
+            file-lines swap record-checksum
+        ] [ 2drop ] if
     ] assoc-each ;
 
 M: pathname where pathname-string 1 2array ;
@@ -96,3 +99,9 @@ SYMBOL: file
         source-file-definitions old-definitions set
         [ ] [ file get rollback-source-file ] cleanup
     ] with-scope ; inline
+
+: outside-usages ( seq -- usages )
+    dup [
+        over usage
+        [ dup pathname? not swap where and ] subset seq-diff
+    ] curry { } map>assoc ;

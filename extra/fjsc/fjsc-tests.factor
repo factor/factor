@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test peg fjsc ;
-IN: temporary
+IN: fjsc.tests
 
 { T{ ast-expression f V{ T{ ast-number f 55 } T{ ast-identifier f "2abc1" } T{ ast-number f 100 } } } } [
   "55 2abc1 100" 'expression' parse parse-result-ast

@@ -1,4 +1,4 @@
-IN: temporary
+IN: optimizer.def-use.tests
 USING: inference inference.dataflow optimizer optimizer.def-use
 namespaces assocs kernel sequences math tools.test words ;
 
@@ -8,7 +8,7 @@ namespaces assocs kernel sequences math tools.test words ;
 ] unit-test
 
 : kill-set ( quot -- seq )
-    dataflow compute-def-use dead-literals keys
+    dataflow compute-def-use compute-dead-literals keys
     [ value-literal ] map ;
 
 : subset? [ member? ] curry all? ;

@@ -1,10 +1,10 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io kernel namespaces parser prettyprint sequences
-words assocs definitions generic quotations effects
-slots continuations tuples debugger combinators
-vocabs help.stylesheet help.topics help.crossref help.markup
-sorting classes ;
+words assocs definitions generic quotations effects slots
+continuations tuples debugger combinators vocabs help.stylesheet
+help.topics help.crossref help.markup sorting classes
+vocabs.loader ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -96,6 +96,10 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     article-content print-content nl ;
 
 : about ( vocab -- )
+    dup require
+    dup vocab [ ] [
+        "No such vocabulary: " swap append throw
+    ] ?if
     dup vocab-help [
         help
     ] [
@@ -118,10 +122,23 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 
 : (:help-multi)
     "This error has multiple delegates:" print
-    ($index) nl ;
+    ($index) nl
+    "Use \\ ... help to get help about a specific delegate." print ;
 
 : (:help-none)
     drop "No help for this error. " print ;
+
+: (:help-debugger)
+    nl
+    "Debugger commands:" print
+    nl
+    ":s    - data stack at error time" print
+    ":r    - retain stack at error time" print
+    ":c    - call stack at error time" print
+    ":edit - jump to source location (parse errors only)" print
+
+    ":get  ( var -- value ) accesses variables at time of the error" print
+    ":vars - list all variables at error time";
 
 : :help ( -- )
     error get delegates [ error-help ] map [ ] subset
@@ -129,7 +146,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
         { [ dup empty? ] [ (:help-none) ] }
         { [ dup length 1 = ] [ first help ] }
         { [ t ] [ (:help-multi) ] }
-    } cond ;
+    } cond (:help-debugger) ;
 
 : remove-article ( name -- )
     dup articles get key? [

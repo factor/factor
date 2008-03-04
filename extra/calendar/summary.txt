@@ -1,1 +1,1 @@
-Date and time classes
+Operations on timestamps and durations

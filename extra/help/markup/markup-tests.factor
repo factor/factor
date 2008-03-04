@@ -1,6 +1,6 @@
 USING: definitions help help.markup kernel sequences tools.test
 words parser namespaces assocs generic io.streams.string ;
-IN: temporary
+IN: help.markup.tests
 
 TUPLE: blahblah quux ;
 
@@ -16,7 +16,7 @@ TUPLE: blahblah quux ;
     test-slot blahblah $spec-reader-values
 ] unit-test
 
-[ "an int" ] [ [ { "int" } $instance ] string-out ] unit-test
+[ "an int" ] [ [ { "int" } $instance ] with-string-writer ] unit-test
 
 [ ] [ \ blahblah-quux help ] unit-test
 [ ] [ \ set-blahblah-quux help ] unit-test

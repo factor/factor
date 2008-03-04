@@ -1,11 +1,11 @@
 #if defined(__arm__)
 	#define FACTOR_ARM
+#elif defined(__amd64__) || defined(__x86_64__)
+	#define FACTOR_AMD64
 #elif defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32)
 	#define FACTOR_X86
 #elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
 	#define FACTOR_PPC
-#elif defined(__amd64__) || defined(__x86_64__)
-	#define FACTOR_AMD64
 #else
 	#error "Unsupported architecture"
 #endif
@@ -18,6 +18,11 @@
 	#endif
 
 	#include "os-windows.h"
+	#if defined(FACTOR_AMD64)
+		#include "os-windows-nt.64.h"
+	#elif defined(FACTOR_X86)
+		#include "os-windows-nt.32.h"
+	#endif
 #else
 	#include "os-unix.h"
 
@@ -58,6 +63,9 @@
 			#else
 				#error "Unsupported OpenBSD flavor"
 			#endif
+		#elif defined(__NetBSD__)
+			#define FACTOR_OS_STRING "netbsd"
+			#include "os-netbsd.h"
 		#elif defined(linux)
 			#define FACTOR_OS_STRING "linux"
 			#include "os-linux.h"

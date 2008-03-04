@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: classes
 USING: arrays definitions assocs kernel
@@ -20,7 +20,9 @@ PREDICATE: class tuple-class
 
 : classes ( -- seq ) class<map get keys ;
 
-: type>class ( n -- class ) builtins get nth ;
+: type>class ( n -- class ) builtins get-global nth ;
+
+: bootstrap-type>class ( n -- class ) builtins get nth ;
 
 : predicate-word ( word -- predicate )
     [ word-name "?" append ] keep word-vocabulary create ;
@@ -29,13 +31,16 @@ PREDICATE: class tuple-class
 
 PREDICATE: word predicate "predicating" word-prop >boolean ;
 
-: define-predicate ( class predicate quot -- )
+: define-predicate* ( class predicate quot -- )
     over [
         dupd predicate-effect define-declared
         2dup 1quotation "predicate" set-word-prop
         swap "predicating" set-word-prop
-    ] [
-        3drop
+    ] [ 3drop ] if ;
+
+: define-predicate ( class quot -- )
+    over "forgotten" word-prop [ 2drop ] [
+        >r dup predicate-word r> define-predicate*
     ] if ;
 
 : superclass ( class -- super )
@@ -250,12 +255,18 @@ PRIVATE>
 
 : (define-class) ( word props -- )
     over reset-class
-    over reset-generic
-    over define-symbol
+    over deferred? [ over define-symbol ] when
     >r dup word-props r> union over set-word-props
     t "class" set-word-prop ;
 
-GENERIC: update-methods ( class -- )
+GENERIC: update-predicate ( class -- )
+
+M: class update-predicate drop ;
+
+: update-predicates ( assoc -- )
+    [ drop update-predicate ] assoc-each ;
+
+GENERIC: update-methods ( assoc -- )
 
 : define-class ( word members superclass metaclass -- )
     #! If it was already a class, update methods after.
@@ -264,8 +275,9 @@ GENERIC: update-methods ( class -- )
     over class-usages [
         uncache-classes
         dupd (define-class)
-    ] keep cache-classes
-    r> [ update-methods ] [ drop ] if ;
+    ] keep cache-classes r>
+    [ class-usages dup update-predicates update-methods ]
+    [ drop ] if ;
 
 GENERIC: class ( object -- class ) inline
 

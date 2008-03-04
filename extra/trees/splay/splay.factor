@@ -7,7 +7,7 @@ IN: trees.splay
 TUPLE: splay ;
 
 : <splay> ( -- splay-tree )
-    splay construct-tree ;
+    \ splay construct-tree ;
 
 INSTANCE: splay tree-mixin
 

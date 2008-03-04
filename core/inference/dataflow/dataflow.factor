@@ -97,10 +97,12 @@ M: object flatten-curry , ;
 
 : node-child node-children first ;
 
-TUPLE: #label word ;
+TUPLE: #label word loop? ;
 
 : #label ( word label -- node )
     \ #label param-node [ set-#label-word ] keep ;
+
+PREDICATE: #label #loop #label-loop? ;
 
 TUPLE: #entry ;
 
@@ -256,6 +258,28 @@ SYMBOL: node-stack
         ] iterate-nodes drop
     ] with-node-iterator ; inline
 
+: change-children ( node quot -- )
+    over [
+        >r dup node-children dup r>
+        [ map swap set-node-children ] curry
+        [ 2drop ] if
+    ] [
+        2drop
+    ] if ; inline
+
+: (transform-nodes) ( prev node quot -- )
+    dup >r call dup [
+        dup rot set-node-successor
+        dup node-successor r> (transform-nodes)
+    ] [
+        r> drop f swap set-node-successor drop
+    ] if ; inline
+
+: transform-nodes ( node quot -- new-node )
+    over [
+        [ call dup dup node-successor ] keep (transform-nodes)
+    ] [ drop ] if ; inline
+
 : node-literal? ( node value -- ? )
     dup value? >r swap node-literals key? r> or ;
 
@@ -282,3 +306,19 @@ SYMBOL: node-stack
     node-children
     [ last-node ] map
     [ #terminate? not ] subset ;
+
+DEFER: #tail?
+
+PREDICATE: #merge #tail-merge node-successor #tail? ;
+
+PREDICATE: #values #tail-values node-successor #tail? ;
+
+UNION: #tail
+    POSTPONE: f #return #tail-values #tail-merge #terminate ;
+
+: tail-call? ( -- ? )
+    #! We don't consider calls which do non-local exits to be
+    #! tail calls, because this gives better error traces.
+    node-stack get [
+        node-successor dup #tail? swap #terminate? not and
+    ] all? ;

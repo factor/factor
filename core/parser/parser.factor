@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math
 namespaces prettyprint sequences strings vectors words
@@ -8,12 +8,17 @@ io.files io.streams.string io.streams.lines vocabs
 source-files classes hashtables compiler.errors compiler.units ;
 IN: parser
 
-TUPLE: lexer text line column ;
+TUPLE: lexer text line line-text line-length column ;
 
-: <lexer> ( text -- lexer ) 1 0 lexer construct-boa ;
+: next-line ( lexer -- )
+    0 over set-lexer-column
+    dup lexer-line over lexer-text ?nth over set-lexer-line-text
+    dup lexer-line-text length over set-lexer-line-length
+    dup lexer-line 1+ swap set-lexer-line ;
 
-: line-text ( lexer -- str )
-    dup lexer-line 1- swap lexer-text ?nth ;
+: <lexer> ( text -- lexer )
+    0 { set-lexer-text set-lexer-line } lexer construct
+    dup next-line ;
 
 : location ( -- loc )
     file get lexer get lexer-line 2dup and
@@ -50,43 +55,39 @@ t parser-notes set-global
         "Note: " write dup print
     ] when drop ;
 
-: next-line ( lexer -- )
-    0 over set-lexer-column
-    dup lexer-line 1+ swap set-lexer-line ;
-
-: skip ( i seq quot -- n )
-    over >r find* drop
-    [ r> drop ] [ r> length ] if* ; inline
+: skip ( i seq ? -- n )
+    over >r
+    [ swap CHAR: \s eq? xor ] curry find* drop
+    [ r> drop ] [ r> length ] if* ;
 
 : change-column ( lexer quot -- )
     swap
-    [ dup lexer-column swap line-text rot call ] keep
+    [ dup lexer-column swap lexer-line-text rot call ] keep
     set-lexer-column ; inline
 
 GENERIC: skip-blank ( lexer -- )
 
 M: lexer skip-blank ( lexer -- )
-    [ [ blank? not ] skip ] change-column ;
+    [ t skip ] change-column ;
 
 GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word ( lexer -- )
     [
-        2dup nth CHAR: " =
-        [ drop 1+ ] [ [ blank? ] skip ] if
+        2dup nth CHAR: " eq? [ drop 1+ ] [ f skip ] if
     ] change-column ;
 
 : still-parsing? ( lexer -- ? )
     dup lexer-line swap lexer-text length <= ;
 
 : still-parsing-line? ( lexer -- ? )
-    dup lexer-column swap line-text length < ;
+    dup lexer-column swap lexer-line-length < ;
 
 : (parse-token) ( lexer -- str )
     [ lexer-column ] keep
     [ skip-word ] keep
     [ lexer-column ] keep
-    line-text subseq ;
+    lexer-line-text subseq ;
 
 :  parse-token ( lexer -- str/f )
     dup still-parsing? [
@@ -106,6 +107,7 @@ M: bad-escape summary drop "Bad escape code" ;
 
 : escape ( escape -- ch )
     H{
+        { CHAR: a  CHAR: \a }
         { CHAR: e  CHAR: \e }
         { CHAR: n  CHAR: \n }
         { CHAR: r  CHAR: \r }
@@ -117,31 +119,51 @@ M: bad-escape summary drop "Bad escape code" ;
         { CHAR: \" CHAR: \" }
     } at [ bad-escape ] unless* ;
 
-: next-escape ( m str -- n ch )
-    2dup nth CHAR: u =
-    [ >r 1+ dup 4 + tuck r> subseq hex> ]
-    [ over 1+ -rot nth escape ] if ;
+SYMBOL: name>char-hook
 
-: next-char ( m str -- n ch )
-    2dup nth CHAR: \\ =
-    [ >r 1+ r> next-escape ] [ over 1+ -rot nth ] if ;
+name>char-hook global [
+    [ "Unicode support not available" throw ] or
+] change-at
 
-: (parse-string) ( m str -- n )
-    2dup nth CHAR: " =
-    [ drop 1+ ] [ [ next-char , ] keep (parse-string) ] if ;
+: unicode-escape ( str -- ch str' )
+    "{" ?head-slice [
+        CHAR: } over index cut-slice
+        >r >string name>char-hook get call r>
+        1 tail-slice
+    ] [
+        6 cut-slice >r hex> r>
+    ] if ;
+
+: next-escape ( str -- ch str' )
+    "u" ?head-slice [
+        unicode-escape
+    ] [
+        unclip-slice escape swap
+    ] if ;
+
+: (parse-string) ( str -- m )
+    dup [ "\"\\" member? ] find dup [
+        >r cut-slice >r % r> 1 tail-slice r>
+        dup CHAR: " = [
+            drop slice-from
+        ] [
+            drop next-escape >r , r> (parse-string)
+        ] if
+    ] [
+        "Unterminated string" throw
+    ] if ;
 
 : parse-string ( -- str )
     lexer get [
-        [ (parse-string) ] "" make swap
+        [ swap tail-slice (parse-string) ] "" make swap
     ] change-column ;
 
 TUPLE: parse-error file line col text ;
 
 : <parse-error> ( msg -- error )
     file get
-    lexer get lexer-line
-    lexer get lexer-column
-    lexer get line-text
+    lexer get
+    { lexer-line lexer-column lexer-line-text } get-slots
     parse-error construct-boa
     [ set-delegate ] keep ;
 
@@ -235,25 +257,29 @@ M: no-word summary
 
 : no-word ( name -- newword )
     dup \ no-word construct-boa
-    swap words-named word-restarts throw-restarts
+    swap words-named [ forward-reference? not ] subset
+    word-restarts throw-restarts
     dup word-vocabulary (use+) ;
 
-: check-forward ( str word -- word )
+: check-forward ( str word -- word/f )
     dup forward-reference? [
         drop
-        dup use get
+        use get
         [ at ] with map [ ] subset
         [ forward-reference? not ] find nip
-        [ ] [ forward-error ] ?if
     ] [
         nip
     ] if ;
 
-: search ( str -- word )
-    dup use get assoc-stack [ check-forward ] [ no-word ] if* ;
+: search ( str -- word/f )
+    dup use get assoc-stack check-forward ;
 
 : scan-word ( -- word/number/f )
-    scan dup [ dup string>number [ ] [ search ] ?if ] when ;
+    scan dup [
+        dup search [ ] [
+            dup string>number [ ] [ no-word ] ?if
+        ] ?if
+    ] when ;
 
 TUPLE: staging-violation word ;
 
@@ -303,10 +329,14 @@ SYMBOL: lexer-factory
 
 ! Parsing word utilities
 : parse-effect ( -- effect )
-    ")" parse-tokens { "--" } split1 dup [
-        <effect>
+    ")" parse-tokens "(" over member? [
+        "Stack effect declaration must not contain (" throw
     ] [
-        "Stack effect declaration must contain --" throw
+        { "--" } split1 dup [
+            <effect>
+        ] [
+            "Stack effect declaration must contain --" throw
+        ] if
     ] if ;
 
 TUPLE: bad-number ;
@@ -321,6 +351,8 @@ TUPLE: bad-number ;
 
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
+
+: (:) CREATE dup reset-generic parse-definition ;
 
 GENERIC: expected>string ( obj -- str )
 
@@ -347,45 +379,50 @@ SYMBOL: bootstrap-syntax
         call
     ] with-scope ; inline
 
+SYMBOL: interactive-vocabs
+
+{
+    "arrays"
+    "assocs"
+    "combinators"
+    "compiler.errors"
+    "continuations"
+    "debugger"
+    "definitions"
+    "editors"
+    "generic"
+    "help"
+    "inspector"
+    "io"
+    "io.files"
+    "kernel"
+    "listener"
+    "math"
+    "memory"
+    "namespaces"
+    "prettyprint"
+    "sequences"
+    "slicing"
+    "sorting"
+    "strings"
+    "syntax"
+    "tools.annotations"
+    "tools.crossref"
+    "tools.memory"
+    "tools.profiler"
+    "tools.test"
+    "tools.threads"
+    "tools.time"
+    "vocabs"
+    "vocabs.loader"
+    "words"
+    "scratchpad"
+} interactive-vocabs set-global
+
 : with-interactive-vocabs ( quot -- )
     [
         "scratchpad" in set
-        {
-            "arrays"
-            "assocs"
-            "combinators"
-            "compiler.errors"
-            "continuations"
-            "debugger"
-            "definitions"
-            "editors"
-            "generic"
-            "help"
-            "inspector"
-            "io"
-            "io.files"
-            "kernel"
-            "listener"
-            "math"
-            "memory"
-            "namespaces"
-            "prettyprint"
-            "sequences"
-            "slicing"
-            "sorting"
-            "strings"
-            "syntax"
-            "tools.annotations"
-            "tools.crossref"
-            "tools.memory"
-            "tools.profiler"
-            "tools.test"
-            "tools.time"
-            "vocabs"
-            "vocabs.loader"
-            "words"
-            "scratchpad"
-        } set-use
+        interactive-vocabs get set-use
         call
     ] with-scope ; inline
 
@@ -404,17 +441,13 @@ SYMBOL: bootstrap-syntax
         "Warning: the following definitions were removed from sources," print
         "but are still referenced from other definitions:" print
         nl
-        dup stack.
+        dup sorted-definitions.
         nl
         "The following definitions need to be updated:" print
         nl
-        over stack.
+        over sorted-definitions.
+        nl
     ] when 2drop ;
-
-: outside-usages ( seq -- usages )
-    dup [
-        over usage [ pathname? not ] subset seq-diff
-    ] curry { } map>assoc ;
 
 : filter-moved ( assoc -- newassoc )
     [
@@ -433,9 +466,16 @@ SYMBOL: bootstrap-syntax
         dup values concat prune swap keys
     ] keep ;
 
+: fix-class-words ( -- )
+    #! If a class word had a compound definition which was
+    #! removed, it must go back to being a symbol.
+    new-definitions get first2 diff
+    [ nip dup reset-generic define-symbol ] assoc-each ;
+
 : forget-smudged ( -- )
     smudged-usage forget-all
-    over empty? [ 2dup smudged-usage-warning ] unless 2drop ;
+    over empty? [ 2dup smudged-usage-warning ] unless 2drop
+    fix-class-words ;
 
 : finish-parsing ( lines quot -- )
     file get
@@ -469,10 +509,10 @@ SYMBOL: bootstrap-syntax
     ] recover ;
 
 : run-file ( file -- )
-    [ [ parse-file call ] keep ] assert-depth drop ;
+    [ dup parse-file call ] assert-depth drop ;
 
 : ?run-file ( path -- )
-    dup ?resource-path exists? [ run-file ] [ drop ] if ;
+    dup resource-exists? [ run-file ] [ drop ] if ;
 
 : bootstrap-file ( path -- )
     [ parse-file % ] [ run-file ] if-bootstrapping ;
@@ -484,4 +524,4 @@ SYMBOL: bootstrap-syntax
     [
         parser-notes off
         [ [ eval ] keep ] try drop
-    ] string-out ;
+    ] with-string-writer ;

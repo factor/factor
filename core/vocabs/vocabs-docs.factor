@@ -76,7 +76,7 @@ HELP: all-words
 
 HELP: forget-vocab
 { $values { "vocab" string } }
-{ $description "Removes a vocabulary. All words in the vocabulary become uninterned." }
+{ $description "Removes a vocabulary. All words in the vocabulary are forgotten." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: load-vocab-hook

@@ -45,7 +45,10 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 
-default:
+default: misc/wordsize
+	make `./misc/target`
+
+help:
 	@echo "Run 'make' with one of the following parameters:"
 	@echo ""
 	@echo "freebsd-x86-32"
@@ -56,13 +59,16 @@ default:
 	@echo "linux-arm"
 	@echo "openbsd-x86-32"
 	@echo "openbsd-x86-64"
+	@echo "netbsd-x86-32"
+	@echo "netbsd-x86-64"
 	@echo "macosx-x86-32"
 	@echo "macosx-x86-64"
 	@echo "macosx-ppc"
 	@echo "solaris-x86-32"
 	@echo "solaris-x86-64"
-	@echo "windows-ce-arm"
-	@echo "windows-nt-x86-32"
+	@echo "wince-arm"
+	@echo "winnt-x86-32"
+	@echo "winnt-x86-64"
 	@echo ""
 	@echo "Additional modifiers:"
 	@echo ""
@@ -82,6 +88,12 @@ freebsd-x86-32:
 
 freebsd-x86-64:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.freebsd.x86.64
+
+netbsd-x86-32:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.netbsd.x86.32
+
+netbsd-x86-64:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.netbsd.x86.64
 
 macosx-freetype:
 	ln -sf libfreetype.6.dylib \
@@ -114,15 +126,27 @@ solaris-x86-32:
 solaris-x86-64:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.x86.64
 
-windows-nt-x86-32:
+freetype6.dll:
+	wget http://factorcode.org/dlls/freetype6.dll
+	chmod 755 freetype6.dll
+
+zlib1.dll:
+	wget http://factorcode.org/dlls/zlib1.dll
+	chmod 755 zlib1.dll
+
+winnt-x86-32: freetype6.dll zlib1.dll
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
 
-windows-ce-arm:
+winnt-x86-64:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.64
+
+wince-arm:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.arm
 
 macosx.app: factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
-	cp $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
+	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
+	ln -s Factor.app/Contents/MacOS/factor ./factor
 	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks
 
 	install_name_tool \
@@ -138,12 +162,15 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
 
+misc/wordsize: misc/wordsize.c
+	gcc misc/wordsize.c -o misc/wordsize
+
 clean:
 	rm -f vm/*.o
 	rm -f factor*.dll libfactor*.*
 
 vm/resources.o:
-	windres vm/factor.rs vm/resources.o
+	$(WINDRES) vm/factor.rs vm/resources.o
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
