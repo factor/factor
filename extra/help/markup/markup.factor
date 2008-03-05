@@ -144,20 +144,32 @@ M: f print-element drop ;
 : $link ( element -- )
     first ($link) ;
 
-: ($subsection) ( object -- )
-    [ article-title ] keep >link write-object ;
+: ($long-link) ( object -- )
+    dup article-title swap >link write-link ;
 
-: $subsection ( element -- )
+: ($subsection) ( element quot -- )
     [
         subsection-style get [
             bullet get write bl
-            first ($subsection)
+            call
         ] with-style
-    ] ($block) ;
+    ] ($block) ; inline
 
-: ($vocab-link) ( vocab -- ) dup f >vocab-link write-link ;
+: $subsection ( element -- )
+    [ first ($long-link) ] ($subsection) ;
 
-: $vocab-link ( element -- ) first ($vocab-link) ;
+: ($vocab-link) ( text vocab -- ) f >vocab-link write-link ;
+
+: $vocab-subsection ( element -- )
+    [
+        first2 dup vocab-help dup [
+            2nip ($long-link)
+        ] [
+            drop ($vocab-link)
+        ] if
+    ] ($subsection) ;
+
+: $vocab-link ( element -- ) first dup ($vocab-link) ;
 
 : $vocabulary ( element -- )
     first word-vocabulary [

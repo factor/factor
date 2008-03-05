@@ -8,7 +8,7 @@ SYMBOL: upload-images-destination
 
 : destination ( -- dest )
   upload-images-destination get
-  "slava@/var/www/factorcode.org/newsite/images/latest/"
+  "slava@factorcode.org:/var/www/factorcode.org/newsite/images/latest/"
   or ;
 
 : checksums "checksums.txt" temp-file ;

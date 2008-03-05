@@ -1,4 +1,4 @@
-USING: io.sockets io kernel math threads io.encodings.ascii
+USING: io.sockets io kernel math threads
 debugger tools.time prettyprint concurrency.count-downs
 namespaces arrays continuations ;
 IN: benchmark.sockets
@@ -30,7 +30,7 @@ SYMBOL: counter
     ] ignore-errors ;
 
 : simple-client ( -- )
-    server-addr <client> [
+    server-addr ascii <client> [
         CHAR: b write1 flush
         number-of-requests
         [ CHAR: a dup write1 flush read1 assert= ] times
@@ -38,7 +38,7 @@ SYMBOL: counter
     ] with-stream ;
 
 : stop-server ( -- )
-    server-addr <client> [
+    server-addr ascii <client> [
         CHAR: x write1
     ] with-stream ;
 
@@ -53,13 +53,6 @@ SYMBOL: counter
         yield yield
     ] time ;
 
-: socket-benchmarks
-    10 clients
-    20 clients
-    40 clients ;
-    ! 80 clients
-    ! 160 clients
-    ! 320 clients
-    ! 640 clients ;
+: socket-benchmarks ;
 
 MAIN: socket-benchmarks
