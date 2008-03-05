@@ -1,4 +1,4 @@
-USING: io.sockets io kernel math threads
+USING: io.sockets io kernel math threads io.encodings.ascii
 debugger tools.time prettyprint concurrency.count-downs
 namespaces arrays continuations ;
 IN: benchmark.sockets
