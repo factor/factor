@@ -1,18 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-<<<<<<< HEAD:extra/io/unix/launcher/launcher.factor
-USING: io io.backend io.launcher io.unix.backend io.unix.files
-io.nonblocking sequences kernel namespaces math system
- alien.c-types debugger continuations arrays assocs 
-combinators unix.process parser-combinators memoize 
-promises strings threads unix io.encodings.latin1 ;
-=======
 USING: io io.backend io.launcher io.nonblocking io.unix.backend
 io.unix.files io.nonblocking sequences kernel namespaces math
 system alien.c-types debugger continuations arrays assocs
 combinators unix.process strings threads unix
-io.unix.launcher.parser ;
->>>>>>> b80434b2e394480fa317348955b1f7b89e284bde:extra/io/unix/launcher/launcher.factor
+io.unix.launcher.parser io.encodings.latin1 ;
 IN: io.unix.launcher
 
 ! Search unix first
