@@ -70,7 +70,7 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 
 [ ] [
     "delete-tree-test/a/b/c/d" temp-file
-    [ "Hi" print ] with-file-writer
+    ascii [ "Hi" print ] with-file-writer
 ] unit-test
 
 [ ] [
@@ -83,7 +83,7 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 
 [ ] [
     "copy-tree-test/a/b/c/d" temp-file
-    [ "Foobar" write ] with-file-writer
+    ascii [ "Foobar" write ] with-file-writer
 ] unit-test
 
 [ ] [
@@ -92,7 +92,7 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 ] unit-test
 
 [ "Foobar" ] [
-    "copy-destination/a/b/c/d" temp-file file-contents
+    "copy-destination/a/b/c/d" temp-file ascii file-contents
 ] unit-test
 
 [ ] [
@@ -105,7 +105,7 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 ] unit-test
 
 [ "Foobar" ] [
-    "copy-destination/copy-tree-test/a/b/c/d" temp-file file-contents
+    "copy-destination/copy-tree-test/a/b/c/d" temp-file ascii file-contents
 ] unit-test
 
 [ ] [
@@ -113,7 +113,7 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 ] unit-test
 
 [ "Foobar" ] [
-    "d" temp-file file-contents
+    "d" temp-file ascii file-contents
 ] unit-test
 
 [ ] [ "d" temp-file delete-file ] unit-test

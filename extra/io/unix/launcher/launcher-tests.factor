@@ -1,6 +1,6 @@
 IN: io.unix.launcher.tests
 USING: io.files tools.test io.launcher arrays io namespaces
-continuations math ;
+continuations math io.encodings.ascii ;
 
 [ ] [
     [ "launcher-test-1" temp-file delete-file ] ignore-errors
@@ -30,7 +30,7 @@ continuations math ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    <process-stream> contents
+    ascii <process-stream> contents
 ] unit-test
 
 [ "" ] [
@@ -39,7 +39,7 @@ continuations math ;
         "launcher-test-1" temp-file
         2array +arguments+ set
         +inherit+ +stdout+ set
-    ] { } make-assoc <process-stream> contents
+    ] { } make-assoc ascii <process-stream> contents
 ] unit-test
 
 [ ] [
@@ -58,12 +58,12 @@ continuations math ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    <process-stream> contents
+    ascii <process-stream> contents
 ] unit-test
 
 [ ] [
     2 [
-        "launcher-test-1" temp-file <file-appender> [
+        "launcher-test-1" temp-file ascii <file-appender> [
             [
                 +stdout+ set
                 "echo Hello" +command+ set
@@ -76,5 +76,5 @@ continuations math ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    <process-stream> contents
+    ascii <process-stream> contents
 ] unit-test

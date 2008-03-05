@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables io kernel math math.parser memory
-namespaces parser sequences strings io.styles io.streams.lines
+namespaces parser sequences strings io.styles
 io.streams.duplex vectors words generic system combinators
 tuples continuations debugger definitions compiler.units ;
 IN: listener
