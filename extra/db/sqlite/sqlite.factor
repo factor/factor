@@ -179,8 +179,8 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
             " where " 0%
             [ ", " 0% ]
             [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
-            ";" 0%
         ] if
+        ";" 0%
     ] sqlite-make ;
 
 M: sqlite-db modifier-table ( -- hashtable )

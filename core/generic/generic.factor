@@ -25,8 +25,6 @@ GENERIC: make-default-method ( generic combination -- method )
 
 PREDICATE: word generic "combination" word-prop >boolean ;
 
-M: generic definer drop f f ;
-
 M: generic definition drop f ;
 
 : make-generic ( word -- )

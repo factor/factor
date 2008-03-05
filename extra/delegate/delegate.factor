@@ -39,7 +39,8 @@ M: tuple-class group-words
 : define-mimic ( group mimicker mimicked -- )
     >r >r group-words r> r> [
         pick "methods" word-prop at dup
-        [ method-def spin define-method ] [ 3drop ] if
+        [ "method-def" word-prop spin define-method ]
+        [ 3drop ] if
     ] 2curry each ; 
 
 : MIMIC:

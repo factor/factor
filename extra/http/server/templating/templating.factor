@@ -4,7 +4,8 @@
 USING: continuations sequences kernel parser namespaces io
 io.files io.streams.string html html.elements
 source-files debugger combinators math quotations generic
-strings splitting io.encodings.utf8 ;
+strings splitting accessors http.server.static http.server
+assocs io.encodings.utf8 ;
 
 IN: http.server.templating
 
@@ -93,3 +94,13 @@ DEFER: <% delimiter
 
 : template-convert ( infile outfile -- )
     utf8 [ run-template-file ] with-file-writer ;
+
+! file responder integration
+: serve-fhtml ( filename -- response )
+    "text/html" <content>
+    swap [ run-template-file ] curry >>body ;
+
+: enable-fhtml ( responder -- responder )
+    [ serve-fhtml ]
+    "application/x-factor-server-page"
+    pick special>> set-at ;

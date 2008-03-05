@@ -103,7 +103,7 @@ HOOK: insert-tuple* db ( tuple statement -- )
     db get db-delete-statements [ <delete-tuple-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
-: select-tuples ( tuple -- tuple )
+: select-tuples ( tuple -- tuples )
     dup dup class <select-by-slots-statement> [
         [ bind-tuple ] keep query-tuples
     ] with-disposal ;
