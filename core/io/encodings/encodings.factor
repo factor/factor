@@ -54,7 +54,7 @@ GENERIC: decode-step ( buf byte ch state encoding -- buf ch state )
     decode-read-loop ;
 
 TUPLE: decoded code cr ;
-: <decoder> ( stream decoding-class -- decoded-stream )
+: <decoder> ( stream encoding -- newstream )
     dup binary eq? [ drop ] [
         construct-empty { set-delegate set-decoded-code }
         decoded construct
@@ -126,7 +126,7 @@ TUPLE: encode-error ;
 : encode-error ( -- * ) \ encode-error construct-empty throw ;
 
 TUPLE: encoded code ;
-: <encoder> ( stream encoding-class -- encoded-stream )
+: <encoder> ( stream encoding -- newstream )
     dup binary eq? [ drop ] [
         construct-empty { set-delegate set-encoded-code }
         encoded construct
@@ -153,7 +153,7 @@ INSTANCE: encoded plain-writer
 : redecode ( stream encoding -- newstream )
     over decoded? [ >r delegate r> ] when <decoder> ;
 
-: <encoder-duplex> ( stream-in stream-out encoding -- duplex-stream )
+: <encoder-duplex> ( stream-in stream-out encoding -- duplex )
     tuck reencode >r redecode r> <duplex-stream> ;
 
 ! The null encoding does nothing

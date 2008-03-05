@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend io.nonblocking io.unix.backend io.files io
-       unix unix.stat unix.time kernel math continuations math.bitfields
-       byte-arrays alien combinators combinators.cleave calendar ;
+unix unix.stat unix.time kernel math continuations math.bitfields
+byte-arrays alien combinators combinators.cleave calendar
+io.encodings.binary ;
 
 IN: io.unix.files
 
@@ -60,8 +61,8 @@ M: unix-io delete-directory ( path -- )
 
 : (copy-file) ( from to -- )
     dup parent-directory make-directories
-    <file-writer> [
-        swap <file-reader> [
+    binary <file-writer> [
+        swap binary <file-reader> [
             swap stream-copy
         ] with-disposal
     ] with-disposal ;
