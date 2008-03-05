@@ -4,6 +4,10 @@ USING: math kernel sequences sbufs vectors namespaces io.binary
 io.encodings combinators splitting io byte-arrays ;
 IN: io.encodings.utf16
 
+! UTF-16BE decoding
+
+TUPLE: utf16be ch state ;
+
 SYMBOL: double
 SYMBOL: quad1
 SYMBOL: quad2
@@ -40,8 +44,20 @@ SYMBOL: ignore
         { ignore [ 2drop push-replacement ] }
     } case ;
 
-: decode-utf16be ( seq -- str )
-    [ decode-utf16be-step ] decode ;
+: unpack-state-be ( encoding -- ch state )
+    { utf16be-ch utf16be-state } get-slots ;
+
+: pack-state-be ( ch state encoding -- )
+    { set-utf16be-ch set-utf16be-state } set-slots ;
+
+M: utf16be decode-step
+    [ unpack-state-be decode-utf16be-step ] keep pack-state-be drop ;
+
+M: utf16be init-decoder nip begin over set-utf16be-state ;
+
+! UTF-16LE decoding
+
+TUPLE: utf16le ch state ;
 
 : handle-double ( buf byte ch -- buf ch state )
     swap dup -3 shift BIN: 11011 = [
@@ -64,8 +80,18 @@ SYMBOL: ignore
         { quad3 [ handle-quad3le ] }
     } case ;
 
-: decode-utf16le ( seq -- str )
-    [ decode-utf16le-step ] decode ;
+: unpack-state-le ( encoding -- ch state )
+    { utf16le-ch utf16le-state } get-slots ;
+
+: pack-state-le ( ch state encoding -- )
+    { set-utf16le-ch set-utf16le-state } set-slots ;
+
+M: utf16le decode-step
+    [ unpack-state-le decode-utf16le-step ] keep pack-state-le drop ;
+
+M: utf16le init-decoder nip begin over set-utf16le-state ;
+
+! UTF-16LE/BE encoding
 
 : encode-first
     -10 shift
@@ -97,6 +123,11 @@ SYMBOL: ignore
 : encode-utf16le ( str -- seq )
     [ [ char>utf16le ] each ] B{ } make ;
 
+M: utf16le encode-string drop encode-utf16le ;
+M: utf16be encode-string drop encode-utf16be ;
+
+! UTF-16
+
 : bom-le B{ HEX: ff HEX: fe } ; inline
 
 : bom-be B{ HEX: fe HEX: ff } ; inline
@@ -108,40 +139,17 @@ SYMBOL: ignore
 
 : start-utf16be? ( seq1 -- seq2 ? ) bom-be ?head ;
 
-: decode-utf16 ( seq -- str )
-    {
-        { [ start-utf16le? ] [ decode-utf16le ] }
-        { [ start-utf16be? ] [ decode-utf16be ] }
-        { [ t ] [ decode-error ] }
-    } cond ;
-
-TUPLE: utf16le ;
-
-M: utf16le encode-string drop encode-utf16le ;
-M: utf16le decode-step drop decode-utf16le-step ;
-
-TUPLE: utf16be ;
-
-M: utf16be encode-string drop encode-utf16be ;
-M: utf16be decode-step drop decode-utf16be-step ;
-
-TUPLE: utf16 encoding ;
+TUPLE: utf16 started? ;
 
 M: utf16 encode-string
     >r encode-utf16le r>
-    dup utf16-encoding [ drop ]
-    [ t swap set-utf16-encoding bom-le swap append ] if ;
+    dup utf16-started? [ drop ]
+    [ t swap set-utf16-started? bom-le swap append ] if ;
 
 : bom>le/be ( bom -- le/be )
     dup bom-le sequence= [ drop utf16le ] [
         bom-be sequence= [ utf16be ] [ decode-error ] if
     ] if ;
 
-: read-bom ( utf16 -- encoding )
-    2 over delegate stream-read bom>le/be construct-empty
-    [ swap set-utf16-encoding ] keep ;
-
-M: utf16 decode-step
-    ! inefficient: checks if bom is done many times
-    ! This should transform itself into utf16be or utf16le after reading BOM
-    dup utf16-encoding [ ] [ read-bom ] ?if decode-step ;
+M: utf16 init-decoder ( stream encoding -- newencoding )
+    2 rot stream-read bom>le/be construct-empty init-decoder ;

@@ -12,4 +12,4 @@ M: ascii encode-string
     drop 127 encode-check<= ;
 
 M: ascii decode-step
-    3drop dup 127 >= [ encode-error ] when over push f f ;
+    drop dup 128 >= [ encode-error ] [ swap push ] if ;

@@ -2,7 +2,7 @@ USING: help help.markup help.syntax help.definitions help.topics
 namespaces words sequences classes assocs vocabs kernel arrays
 prettyprint.backend kernel.private io generic math system
 strings sbufs vectors byte-arrays bit-arrays float-arrays
-quotations ;
+quotations io.streams.byte-array ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -176,9 +176,9 @@ ARTICLE: "io" "Input and output"
 { $subsection "streams" }
 "Wrapper streams:"
 { $subsection "io.streams.duplex" }
-{ $subsection "io.streams.lines" }
 { $subsection "io.streams.plain" }
 { $subsection "io.streams.string" }
+{ $subsection "io.streams.byte-array" }
 "Utilities:"
 { $subsection "stream-binary" }
 { $subsection "styles" }
@@ -187,6 +187,7 @@ ARTICLE: "io" "Input and output"
 { $subsection "io.mmap" }
 { $subsection "io.monitors" }
 { $heading "Other features" }
+{ $subsection "io.encodings" }
 { $subsection "network-streams" }
 { $subsection "io.launcher" }
 { $subsection "io.timeouts" } ;

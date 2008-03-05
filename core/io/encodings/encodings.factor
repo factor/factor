@@ -3,8 +3,21 @@
 USING: math kernel sequences sbufs vectors namespaces
 growable strings io classes continuations combinators
 io.styles io.streams.plain io.encodings.binary splitting
-io.streams.duplex ;
+io.streams.duplex byte-arrays ;
 IN: io.encodings
+
+! The encoding descriptor protocol
+
+GENERIC: decode-step ( buf char encoding -- )
+M: object decode-step drop swap push ;
+
+GENERIC: init-decoder ( stream encoding -- encoding )
+M: tuple-class init-decoder construct-empty init-decoder ;
+M: object init-decoder nip ;
+
+GENERIC: encode-string ( string encoding -- byte-array )
+M: tuple-class encode-string construct-empty encode-string ;
+M: object encode-string drop >byte-array ;
 
 ! Decoding
 
@@ -21,19 +34,6 @@ SYMBOL: begin
     ! This is the replacement character
     HEX: fffd push-decoded ;
 
-: finish-decoding ( buf ch state -- str )
-    begin eq? [ decode-error ] unless drop "" like ;
-
-: start-decoding ( seq length -- buf ch state seq )
-    <sbuf> 0 begin roll ;
-
-GENERIC: decode-step ( buf byte ch state encoding -- buf ch state )
-
-: decode ( seq quot -- string )
-    >r dup length start-decoding r>
-    [ -rot ] swap compose each
-    finish-decoding ; inline
-
 : space ( resizable -- room-left )
     dup underlying swap [ length ] 2apply - ;
 
@@ -42,34 +42,34 @@ GENERIC: decode-step ( buf byte ch state encoding -- buf ch state )
 : end-read-loop ( buf ch state stream quot -- string/f )
     2drop 2drop >string f like ;
 
-: decode-read-loop ( buf ch state stream encoding -- string/f )
-    >r >r pick r> r> rot full?  [ end-read-loop ] [
+: decode-read-loop ( buf stream encoding -- string/f )
+    pick full? [ 2drop >string ] [
         over stream-read1 [
-            -rot tuck >r >r >r -rot r> decode-step r> r> decode-read-loop
-        ] [ end-read-loop ] if*
+            -rot tuck >r >r >r dupd r> decode-step r> r>
+            decode-read-loop
+        ] [ 2drop >string f like ] if*
     ] if ;
 
 : decode-read ( length stream encoding -- string )
-    >r swap >fixnum start-decoding r>
-    decode-read-loop ;
+    rot <sbuf> -rot decode-read-loop ;
 
-TUPLE: decoded code cr ;
+TUPLE: decoder code cr ;
 : <decoder> ( stream encoding -- newstream )
     dup binary eq? [ drop ] [
-        construct-empty { set-delegate set-decoded-code }
-        decoded construct
+        dupd init-decoder { set-delegate set-decoder-code }
+        decoder construct
     ] if ;
 
-: cr+ t swap set-decoded-cr ; inline
+: cr+ t swap set-decoder-cr ; inline
 
-: cr- f swap set-decoded-cr ; inline
+: cr- f swap set-decoder-cr ; inline
 
 : line-ends/eof ( stream str -- str ) f like swap cr- ; inline
 
 : line-ends\r ( stream str -- str ) swap cr+ ; inline
 
 : line-ends\n ( stream str -- str )
-    over decoded-cr over empty? and
+    over decoder-cr over empty? and
     [ drop dup cr- stream-readln ] [ swap cr- ] if ; inline
 
 : handle-readln ( stream str ch -- str )
@@ -80,43 +80,43 @@ TUPLE: decoded code cr ;
     } case ;
 
 : fix-read ( stream string -- string )
-    over decoded-cr [
+    over decoder-cr [
         over cr-
         "\n" ?head [
             swap stream-read1 [ add ] when*
         ] [ nip ] if
     ] [ nip ] if ;
 
-M: decoded stream-read
-    tuck { delegate decoded-code } get-slots decode-read fix-read ;
+M: decoder stream-read
+    tuck { delegate decoder-code } get-slots decode-read fix-read ;
 
-M: decoded stream-read-partial stream-read ;
+M: decoder stream-read-partial stream-read ;
 
-: decoded-read-until ( stream delim -- ch )
+: decoder-read-until ( stream delim -- ch )
     ! Copied from { c-reader stream-read-until }!!!
     over stream-read1 dup [
-        dup pick memq? [ 2nip ] [ , decoded-read-until ] if
+        dup pick memq? [ 2nip ] [ , decoder-read-until ] if
     ] [
         2nip
     ] if ;
 
-M: decoded stream-read-until
+M: decoder stream-read-until
     ! Copied from { c-reader stream-read-until }!!!
-    [ swap decoded-read-until ] "" make
+    [ swap decoder-read-until ] "" make
     swap over empty? over not and [ 2drop f f ] when ;
 
 : fix-read1 ( stream char -- char )
-    over decoded-cr [
+    over decoder-cr [
         over cr-
         dup CHAR: \n = [
             drop stream-read1
         ] [ nip ] if
     ] [ nip ] if ;
 
-M: decoded stream-read1
+M: decoder stream-read1
     1 swap stream-read f like [ first ] [ f ] if* ;
 
-M: decoded stream-readln ( stream -- str )
+M: decoder stream-readln ( stream -- str )
     "\r\n" over stream-read-until handle-readln ;
 
 ! Encoding
@@ -125,41 +125,30 @@ TUPLE: encode-error ;
 
 : encode-error ( -- * ) \ encode-error construct-empty throw ;
 
-TUPLE: encoded code ;
+TUPLE: encoder code ;
 : <encoder> ( stream encoding -- newstream )
     dup binary eq? [ drop ] [
-        construct-empty { set-delegate set-encoded-code }
-        encoded construct
+        construct-empty { set-delegate set-encoder-code }
+        encoder construct
     ] if ;
 
-GENERIC: encode-string ( string encoding -- byte-array )
-M: tuple-class encode-string construct-empty encode-string ;
-
-M: encoded stream-write1
+M: encoder stream-write1
     >r 1string r> stream-write ;
 
-M: encoded stream-write
-    [ encoded-code encode-string ] keep delegate stream-write ;
+M: encoder stream-write
+    [ encoder-code encode-string ] keep delegate stream-write ;
 
-M: encoded dispose delegate dispose ;
+M: encoder dispose delegate dispose ;
 
-INSTANCE: encoded plain-writer
+INSTANCE: encoder plain-writer
 
 ! Rebinding duplex streams which have not read anything yet
 
 : reencode ( stream encoding -- newstream )
-    over encoded? [ >r delegate r> ] when <encoder> ;
+    over encoder? [ >r delegate r> ] when <encoder> ;
 
 : redecode ( stream encoding -- newstream )
-    over decoded? [ >r delegate r> ] when <decoder> ;
+    over decoder? [ >r delegate r> ] when <decoder> ;
 
 : <encoder-duplex> ( stream-in stream-out encoding -- duplex )
     tuck reencode >r redecode r> <duplex-stream> ;
-
-! The null encoding does nothing
-! (used to wrap things as line-reader/plain-writer)
-! Later this will be replaced by inheritance
-
-TUPLE: null-encoding ;
-M: null-encoding encode-string drop ;
-M: null-encoding decode-step 3drop over push f f ;

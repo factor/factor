@@ -1,45 +1,22 @@
 USING: help.markup help.syntax io.encodings strings ;
 IN: io.encodings.utf16
 
-ARTICLE: "io.utf16" "Working with UTF16-encoded data"
-"The UTF16 encoding is a variable-width encoding. Unicode code points are encoded as 2 or 4 byte sequences."
-{ $subsection encode-utf16le }
-{ $subsection encode-utf16be }
-{ $subsection decode-utf16le }
-{ $subsection decode-utf16be }
-"Support for UTF16 data with a byte order mark:"
-{ $subsection encode-utf16 }
-{ $subsection decode-utf16 } ;
+ARTICLE: "utf16" "Working with UTF-16-encoded data"
+"The UTF-16 encoding is a variable-width encoding. Unicode code points are encoded as 2 or 4 byte sequences. There are three encoding descriptor classes for working with UTF-16, depending on endianness or the presence of a BOM:"
+{ $subsection utf16le }
+{ $subsection utf16be }
+{ $subsection utf16 }
+"All of these conform to the " { $link "encodings-protocol" } "." ;
 
-ABOUT: "io.utf16"
+ABOUT: "utf16"
 
-HELP: decode-utf16
-{ $values { "seq" "a sequence of bytes" } { "str" string } }
-{ $description "Decodes a sequence of bytes representing a Unicode string in UTF16 format. The bytes must begin with a UTF16 byte order mark, which determines if the input is in little or big endian. To decode data without a byte order mark, use " { $link decode-utf16le } " or " { $link decode-utf16be } "." }
-{ $errors "Throws a " { $link decode-error } " if the input is malformed." } ;
+HELP: utf16le
+{ $class-description "The encoding protocol for UTF-16LE, that is, UTF-16 in little endian, without a byte order mark. Streams can be made which read or write wth this encoding." } ;
 
-HELP: decode-utf16be
-{ $values { "seq" "a sequence of bytes" } { "str" string } }
-{ $description "Decodes a sequence of bytes representing a Unicode string in big endian UTF16 format. The bytes must not begin with a UTF16 byte order mark. To decode data with a byte order mark, use " { $link decode-utf16 } "." }
-{ $errors "Throws a " { $link decode-error } " if the input is malformed." } ;
+HELP: utf16be
+{ $class-description "The encoding protocol for UTF-16BE, that is, UTF-16 in big endian, without a byte order mark. Streams can be made which read or write wth this encoding." } ;
 
-HELP: decode-utf16le
-{ $values { "seq" "a sequence of bytes" } { "str" string } }
-{ $description "Decodes a sequence of bytes representing a Unicode string in little endian UTF16 format. The bytes must not begin with a UTF16 byte order mark. To decode data with a byte order mark, use " { $link decode-utf16 } "." }
-{ $errors "Throws a " { $link decode-error } " if the input is malformed." } ;
+HELP: utf16
+{ $class-description "The encoding protocol for UTF-16, that is, UTF-16 with a byte order mark. This is the most useful for general input and output in UTF-16. Streams can be made which read or write wth this encoding." } ;
 
-{ decode-utf16 decode-utf16le decode-utf16be } related-words
-
-HELP: encode-utf16be
-{ $values { "str" string } { "seq" "a sequence of bytes" } }
-{ $description "Encodes a Unicode string as a sequence of bytes in big endian UTF16 format." } ;
-
-HELP: encode-utf16le
-{ $values { "str" string } { "seq" "a sequence of bytes" } }
-{ $description "Encodes a Unicode string as a sequence of bytes in little endian UTF16 format." } ;
-
-HELP: encode-utf16
-{ $values { "str" string } { "seq" "a sequence of bytes" } }
-{ $description "Encodes a Unicode string as a sequence of bytes in UTF16 format with a byte order mark." } ;
-
-{ encode-utf16 encode-utf16be encode-utf16le } related-words
+{ utf16 utf16le utf16be } related-words

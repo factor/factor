@@ -6,6 +6,8 @@ IN: io.encodings.utf8
 
 ! Decoding UTF-8
 
+TUPLE: utf8 ch state ;
+
 SYMBOL: double
 SYMBOL: triple
 SYMBOL: triple2
@@ -44,8 +46,16 @@ SYMBOL: quad3
         { quad3 [ end-multibyte ] }
     } case ;
 
-: decode-utf8 ( seq -- str )
-    [ decode-utf8-step ] decode ; 
+: unpack-state ( encoding -- ch state )
+    { utf8-ch utf8-state } get-slots ;
+
+: pack-state ( ch state encoding -- )
+    { set-utf8-ch set-utf8-state } set-slots ;
+
+M: utf8 decode-step ( buf char encoding -- )
+    [ unpack-state decode-utf8-step ] keep pack-state drop ;
+
+M: utf8 init-decoder nip begin over set-utf8-state ;
 
 ! Encoding UTF-8
 
@@ -75,10 +85,4 @@ SYMBOL: quad3
 : encode-utf8 ( str -- seq )
     [ [ char>utf8 ] each ] B{ } make ;
 
-! Interface for streams
-
-TUPLE: utf8 ;
-
 M: utf8 encode-string drop encode-utf8 ;
-M: utf8 decode-step drop decode-utf8-step ;
-! In the future, this should detect and ignore a BOM at the beginning

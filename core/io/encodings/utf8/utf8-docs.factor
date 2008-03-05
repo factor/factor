@@ -6,6 +6,6 @@ ARTICLE: "io.encodings.utf8" "Working with UTF8-encoded data"
 { $subsection utf8 } ;
 
 HELP: utf8
-{ $class-description "This is the class of encoding tuples which denote a UTF-8 encoding. You can pass this class symbol as an encoding descriptor to words like " { $link <file-reader> } " and " { $link encode-string } "." } ;
+{ $class-description "This is the class of encoding tuples which denote a UTF-8 encoding. You can pass this class symbol as an encoding descriptor to words like " { $link <file-reader> } " and " { $link encode-string } ". This conforms to the " { $link "encodings-protocol" } "." } ;
 
 ABOUT: "io.encodings.utf8"

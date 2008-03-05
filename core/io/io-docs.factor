@@ -100,7 +100,7 @@ $nl
 { $subsection "stream-protocol" }
 { $subsection "stdio" }
 { $subsection "stream-utils" }
-{ $see-also "io.streams.string" "io.streams.lines" "io.streams.plain" "io.streams.duplex" } ;
+{ $see-also "io.streams.string" "io.streams.plain" "io.streams.duplex" } ;
 
 ABOUT: "streams"
 

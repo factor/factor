@@ -3,7 +3,7 @@ IN: io.encodings
 
 ABOUT: "encodings"
 
-ARTICLE: "encodings" "I/O encodings"
+ARTICLE: "io.encodings" "I/O encodings"
 "Many streams deal with bytes, rather than Unicode code points, at some level. The translation between these two things is specified by an encoding. To abstract this away from the programmer, Factor provides a system where these streams are associated with an encoding which is always used when the stream is read from or written to. For most purposes, an encoding descriptor consisting of a symbol is all that is needed when initializing a stream."
 { $subsection "encodings-constructors" }
 { $subsection "encodings-descriptors" }
@@ -37,17 +37,37 @@ HELP: <encoder-duplex> ( stream-in stream-out encoding -- duplex )
 { <encoder> <decoder> <encoder-duplex> } related-words
 
 ARTICLE: "encodings-descriptors" "Encoding descriptors"
-"An encoding descriptor is something which can be used for input or output streams to encode or decode files. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use include:"
-{ $vocab-link "io.encodings.utf8" }
-{ $vocab-link "io.encodings.ascii" }
-{ $vocab-link "io.encodings.binary" }
-{ $vocab-link "io.encodings.utf16" } ;
+"An encoding descriptor is something which can be used for input or output streams to encode or decode files. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
+$nl { $vocab-link "io.encodings.utf8" }
+$nl { $vocab-link "io.encodings.ascii" }
+$nl { $vocab-link "io.encodings.binary" }
+$nl { $vocab-link "io.encodings.utf16" } ;
 
 ARTICLE: "encodings-protocol" "Encoding protocol"
 "An encoding descriptor must implement the following methods. The methods are implemented on tuple classes by instantiating the class and calling the method again."
 { $subsection decode-step }
+{ $subsection init-decoder }
 { $subsection encode-string } ;
 
 ARTICLE: "encodings-string" "Encoding and decoding strings"
 "Strings can be encoded and decoded with the following words:"
 { $subsection encode-string } ;
+
+HELP: decode-step ( buf char encoding -- )
+{ $values { "buf" "A string buffer which characters can be pushed to" }
+    { "char" "An octet which is read from a stream" }
+    { "encoding" "An encoding descriptor tuple" } }
+{ $description "A single step in the decoding process must be defined for the decoding descriptor. When each octet is read, this word is called, and depending on the decoder's internal state, something may be pushed to the buffer or the state may change." } ;
+
+HELP: encode-string ( string encoding -- byte-array )
+{ $values { "string" "a string" }
+    { "encoding" "an encoding descriptor" }
+    { "byte-array" "an encoded byte-array" } }
+{ $description "Encodes the string with the given encoding descriptor, outputting the result to a byte-array." } ;
+
+HELP: init-decoder ( stream encoding -- encoding )
+{ $values { "stream" "an input stream" }
+    { "encoding" "an encoding descriptor" } }
+{ $description "Initializes the decoder tuple's state. The stream is exposed so that it can be read, eg for a BOM." } ;
+
+{ init-decoder decode-step encode-string } related-words
