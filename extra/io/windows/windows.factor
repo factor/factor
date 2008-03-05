@@ -55,7 +55,7 @@ M: win32-file close-handle ( handle -- )
 : open-file ( path access-mode create-mode flags -- handle )
     [
         >r >r >r normalize-pathname r>
-        share-mode f r> r> CreateFile-flags f CreateFile
+        share-mode security-attributes-inherit r> r> CreateFile-flags f CreateFile
         dup invalid-handle? dup close-later
         dup add-completion
     ] with-destructors ;
