@@ -55,6 +55,8 @@ M: f vocab-docs-loaded? ;
 
 M: f set-vocab-docs-loaded? 2drop ;
 
+M: f vocab-help ;
+
 : create-vocab ( name -- vocab )
     dictionary get [ <vocab> ] cache ;
 
