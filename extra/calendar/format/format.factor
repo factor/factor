@@ -166,6 +166,34 @@ M: timestamp year. ( timestamp -- )
 : ymd>timestamp ( str -- timestamp )
     [ (ymd>timestamp) ] with-string-reader ;
 
+
+: (timestamp>ymd) ( timestamp -- )
+    dup timestamp-year number>string write
+    "-" write
+    dup timestamp-month write-00
+    "-" write
+    timestamp-day write-00 ;
+
+: timestamp>ymd ( timestamp -- str )
+    [ (timestamp>ymd) ] with-string-writer ;
+
+: (timestamp>hms)
+    dup timestamp-hour write-00
+    ":" write
+    dup timestamp-minute write-00
+    ":" write
+    timestamp-second >integer write-00 ;
+
+: timestamp>hms ( timestamp -- str )
+    [ (timestamp>hms) ] with-string-writer ;
+
+: timestamp>ymdhms ( timestamp -- str )
+    [
+        dup (timestamp>ymd)
+        " " write
+        (timestamp>hms)
+    ] with-string-writer ;
+
 : file-time-string ( timestamp -- string )
     [
         [ month>> month-abbreviations nth write ] keep bl
