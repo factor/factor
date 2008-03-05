@@ -21,7 +21,7 @@ IN: benchmark
         ] with-row
         [
             [
-                swap [ ($vocab-link) ] with-cell
+                swap [ dup ($vocab-link) ] with-cell
                 first2 pprint-cell pprint-cell
             ] with-row
         ] assoc-each

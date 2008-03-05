@@ -173,7 +173,7 @@ M: f print-element drop ;
 
 : $vocabulary ( element -- )
     first word-vocabulary [
-        "Vocabulary" $heading nl ($vocab-link)
+        "Vocabulary" $heading nl dup ($vocab-link)
     ] when* ;
 
 : textual-list ( seq quot -- )
