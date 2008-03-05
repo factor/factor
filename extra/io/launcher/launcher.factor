@@ -36,12 +36,15 @@ SYMBOL: +environment-mode+
 SYMBOL: +stdin+
 SYMBOL: +stdout+
 SYMBOL: +stderr+
-SYMBOL: +closed+
+
 SYMBOL: +timeout+
 
 SYMBOL: +prepend-environment+
 SYMBOL: +replace-environment+
 SYMBOL: +append-environment+
+
+SYMBOL: +closed+
+SYMBOL: +inherit+
 
 : default-descriptor
     H{
