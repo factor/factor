@@ -29,9 +29,8 @@ M: string (profile.)
     dup <vocab-profile> write-object ;
 
 M: method-body (profile.)
-    "method" word-prop
-    dup method-specializer over method-generic 2array synopsis
-    swap method-generic <usage-profile> write-object ;
+    dup synopsis swap "method-generic" word-prop
+    <usage-profile> write-object ;
 
 : counter. ( obj n -- )
     [

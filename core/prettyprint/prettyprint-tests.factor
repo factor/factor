@@ -125,18 +125,18 @@ unit-test
         "IN: prettyprint.tests"
         "GENERIC: method-layout"
         ""
-        "USING: math temporary ;"
+        "USING: math prettyprint.tests ;"
         "M: complex method-layout"
         "    \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\""
         "    ;"
         ""
-        "USING: math temporary ;"
+        "USING: math prettyprint.tests ;"
         "M: fixnum method-layout ;"
         ""
-        "USING: math temporary ;"
+        "USING: math prettyprint.tests ;"
         "M: integer method-layout ;"
         ""
-        "USING: kernel temporary ;"
+        "USING: kernel prettyprint.tests ;"
         "M: object method-layout ;"
     } ;
 
@@ -280,7 +280,7 @@ unit-test
         "IN: prettyprint.tests"
         "GENERIC: class-see-layout ( x -- y )"
         ""
-        "USING: temporary ;"
+        "USING: prettyprint.tests ;"
         "M: class-see-layout class-see-layout ;"
     } ;
 

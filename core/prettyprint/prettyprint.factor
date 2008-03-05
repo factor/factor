@@ -175,10 +175,10 @@ M: method-spec synopsis*
     dup definer. [ pprint-word ] each ;
 
 M: method-body synopsis*
-    dup definer.
-    "method" word-prop dup
-    method-specializer pprint*
-    method-generic pprint* ;
+    dup dup
+    definer.
+    "method-class" word-prop pprint*
+    "method-generic" word-prop pprint* ;
 
 M: mixin-instance synopsis*
     dup definer.
@@ -269,7 +269,7 @@ M: builtin-class see-class*
 
 : see-implementors ( class -- seq )
     dup implementors
-    [ method method-word ] with map
+    [ method ] with map
     natural-sort ;
 
 : see-class ( class -- )
@@ -280,9 +280,7 @@ M: builtin-class see-class*
     ] when drop ;
 
 : see-methods ( generic -- seq )
-    "methods" word-prop
-    [ nip method-word ] { } assoc>map
-    natural-sort ;
+    "methods" word-prop values natural-sort ;
 
 M: word see
     dup see-class
