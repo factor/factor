@@ -1,12 +1,17 @@
 
-USING: kernel namespaces sequences combinators io.files io.launcher
-       combinators.cleave builder.common builder.util ;
+USING: kernel system namespaces sequences splitting combinators
+       io.files io.launcher
+       bake combinators.cleave builder.common builder.util ;
 
 IN: builder.release
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: releases ( -- path ) builds "/releases" append ;
+: releases ( -- path )
+  builds "releases" path+
+  dup exists? not
+    [ dup make-directory ]
+  when ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -34,8 +39,6 @@ IN: builder.release
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-USING: system sequences splitting ;
-
 : cpu- ( -- cpu ) cpu "." split "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -57,61 +60,57 @@ USING: system sequences splitting ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: move-file ( source destination -- ) swap { "mv" , , } run-process drop ;
+: windows-archive-cmd ( -- cmd ) { "zip" "-r" archive-name "factor" } ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: linux-release ( -- )
-
-  { "rm" "-rf" "Factor.app" } run-process drop
-
-  { "rm" "-rf" common-files } to-strings run-process drop
-
-  ".." cd
-
-  { "tar" "-cvzf" archive-name "factor" } to-strings run-process drop
-
-  archive-name releases move-file ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: windows-release ( -- )
-
-  { "rm" "-rf" "Factor.app" } run-process drop
-
-  { "rm" "-rf" common-files } to-strings run-process drop
-
-  ".." cd
-
-  { "zip" "-r" archive-name "factor" } to-strings run-process drop
-
-  archive-name releases move-file ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: macosx-release ( -- )
-
-  { "rm" "-rf" common-files } to-strings run-process drop
-
-  ".." cd
-
+: macosx-archive-cmd ( -- cmd )
   { "hdiutil" "create"
               "-srcfolder" "factor"
               "-fs" "HFS+"
               "-volname" "factor"
-              archive-name }
-  to-strings run-process drop
+              archive-name } ;
 
-  archive-name releases move-file ;
+: unix-archive-cmd ( -- cmd ) { "tar" "-cvzf" archive-name "factor" } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: archive-cmd ( -- cmd )
+  {
+    { [ windows? ] [ windows-archive-cmd ] }
+    { [ macosx?  ] [ macosx-archive-cmd  ] }
+    { [ unix?    ] [ unix-archive-cmd    ] }
+  }
+  cond ;
+
+: make-archive ( -- ) archive-cmd to-strings try-process ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: remove-common-files ( -- )
+  { "rm" "-rf" common-files } to-strings try-process ;
+
+: remove-factor-app ( -- )
+  macosx? not [ { "rm" "-rf" "Factor.app" } try-process ] when ;
+
 : release ( -- )
-  os
-    {
-      { "linux"  [ linux-release   ] }
-      { "winnt"  [ windows-release ] }
-      { "macosx" [ macosx-release  ] }
-    }
-  case ;
-  
+  "factor"
+    [
+      remove-factor-app
+      remove-common-files
+    ]
+  with-directory
+  make-archive
+  archive-name releases move-file-into ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: release? ( -- ? )
+  {
+    "./load-everything-vocabs"
+    "./test-all-vocabs"
+  }
+    [ eval-file empty? ]
+  all? ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: maybe-release ( -- ) release? [ release ] when ;

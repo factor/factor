@@ -38,9 +38,6 @@ HELP: listen
 { $description "Prompts for an expression on the " { $link stdio } " stream and evaluates it. On end of file, " { $link quit-flag } " is set to terminate the listener loop." }
 { $errors "If the expression input by the user throws an error, the error is printed to the " { $link stdio } " stream and the word returns normally." } ;
 
-HELP: print-banner
-{ $description "Print Factor version, operating system, and CPU architecture." } ;
-
 HELP: listener
 { $description "Prompts for expressions on the " { $link stdio } " stream and evaluates them until end of file is reached." } ;
 

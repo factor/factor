@@ -1,70 +1,131 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files kernel tools.test db db.sqlite db.tuples
-db.types continuations namespaces db.postgresql math ;
-! tools.time ;
-IN: temporary
+USING: io.files kernel tools.test db db.tuples
+db.types continuations namespaces db.postgresql math
+prettyprint tools.walker db.sqlite ;
+IN: db.tuples.tests
 
-TUPLE: person the-id the-name the-number real ;
+TUPLE: person the-id the-name the-number the-real ;
 : <person> ( name age real -- person )
     {
         set-person-the-name
         set-person-the-number
-        set-person-real
+        set-person-the-real
     } person construct ;
 
-: <assigned-person> ( id name number real -- obj )
+: <assigned-person> ( id name number the-real -- obj )
     <person> [ set-person-the-id ] keep ;
 
-SYMBOL: the-person
+SYMBOL: the-person1
+SYMBOL: the-person2
 
 : test-tuples ( -- )
     [ person drop-table ] [ drop ] recover
     [ ] [ person create-table ] unit-test
+    [ person create-table ] must-fail
     
-    [  ] [ the-person get insert-tuple ] unit-test
+    [ ] [ the-person1 get insert-tuple ] unit-test
 
-    [ 1 ] [ the-person get person-the-id ] unit-test
+    [ 1 ] [ the-person1 get person-the-id ] unit-test
 
-    200 the-person get set-person-the-number
+    200 the-person1 get set-person-the-number
 
-    [ ] [ the-person get update-tuple ] unit-test
+    [ ] [ the-person1 get update-tuple ] unit-test
 
-    [ ] [ the-person get delete-tuple ] unit-test
-    ; ! 1 [ ] [ person drop-table ] unit-test ;
+    [ T{ person f 1 "billy" 200 3.14 } ]
+    [ T{ person f 1 } select-tuple ] unit-test
+    [ ] [ the-person2 get insert-tuple ] unit-test
+    [
+        {
+            T{ person f 1 "billy" 200 3.14 }
+            T{ person f 2 "johnny" 10 3.14 }
+        }
+    ] [ T{ person f f f f 3.14 } select-tuples ] unit-test
+    [
+        {
+            T{ person f 1 "billy" 200 3.14 }
+            T{ person f 2 "johnny" 10 3.14 }
+        }
+    ] [ T{ person f } select-tuples ] unit-test
 
-: test-sqlite ( -- )
-    "tuples-test.db" resource-path <sqlite-db> [
-        test-tuples
-    ] with-db ;
+
+    [ ] [ the-person1 get delete-tuple ] unit-test
+    [ f ] [ T{ person f 1 } select-tuple ] unit-test
+    [ ] [ person drop-table ] unit-test ;
+
+: make-native-person-table ( -- )
+    [ person drop-table ] [ drop ] recover
+    person create-table
+    T{ person f f "billy" 200 3.14 } insert-tuple
+    T{ person f f "johnny" 10 3.14 } insert-tuple
+    ;
+
+: native-person-schema ( -- )
+    person "PERSON"
+    {
+        { "the-id" "ID" +native-id+ }
+        { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
+        { "the-number" "AGE" INTEGER { +default+ 0 } }
+        { "the-real" "REAL" DOUBLE { +default+ 0.3 } }
+    } define-persistent
+    "billy" 10 3.14 <person> the-person1 set
+    "johnny" 10 3.14 <person> the-person2 set ;
+
+: assigned-person-schema ( -- )
+    person "PERSON"
+    {
+        { "the-id" "ID" INTEGER +assigned-id+ }
+        { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
+        { "the-number" "AGE" INTEGER { +default+ 0 } }
+        { "the-real" "REAL" DOUBLE { +default+ 0.3 } }
+    } define-persistent
+    1 "billy" 10 3.14 <assigned-person> the-person1 set
+    2 "johnny" 10 3.14 <assigned-person> the-person2 set ;
+
+
+TUPLE: paste n summary author channel mode contents timestamp annotations ;
+TUPLE: annotation n paste-id summary author mode contents ;
+
+: native-paste-schema ( -- )
+    paste "PASTE"
+    {
+        { "n" "ID" +native-id+ }
+        { "summary" "SUMMARY" TEXT }
+        { "author" "AUTHOR" TEXT }
+        { "channel" "CHANNEL" TEXT }
+        { "mode" "MODE" TEXT }
+        { "contents" "CONTENTS" TEXT }
+        { "date" "DATE" TIMESTAMP }
+        { "annotations" { +has-many+ annotation } }
+    } define-persistent
+
+    annotation "ANNOTATION"
+    {
+        { "n" "ID" +native-id+ }
+        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "n" } }
+        { "summary" "SUMMARY" TEXT }
+        { "author" "AUTHOR" TEXT }
+        { "mode" "MODE" TEXT }
+        { "contents" "CONTENTS" TEXT }
+    } define-persistent ;
+
+! { "localhost" "postgres" "" "factor-test" } postgresql-db [
+    ! [ paste drop-table ] [ drop ] recover
+    ! [ annotation drop-table ] [ drop ] recover
+    ! [ paste drop-table ] [ drop ] recover
+    ! [ annotation drop-table ] [ drop ] recover
+    ! [ ] [ paste create-table ] unit-test
+    ! [ ] [ annotation create-table ] unit-test
+! ] with-db
+
+
+: test-sqlite ( quot -- )
+    >r "tuples-test.db" resource-path sqlite-db r> with-db ;
 
 : test-postgresql ( -- )
-    "localhost" "postgres" "" "factor-test" <postgresql-db> [
-        test-tuples
-    ] with-db ;
+    >r { "localhost" "postgres" "" "factor-test" } postgresql-db r> with-db ;
 
-person "PERSON"
-{
-    { "the-id" "ID" SERIAL +native-id+ }
-    { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
-    { "the-number" "AGE" INTEGER { +default+ 0 } }
-    { "real" "REAL" DOUBLE { +default+ 0.3 } }
-} define-persistent
+[ native-person-schema test-tuples ] test-sqlite
+[ assigned-person-schema test-tuples ] test-sqlite
 
-"billy" 10 3.14 <person> the-person set
-
-! test-sqlite
- test-postgresql
-
-! person "PERSON"
-! {
-    ! { "the-id" "ID" INTEGER +assigned-id+ }
-    ! { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
-    ! { "the-number" "AGE" INTEGER { +default+ 0 } }
-    ! { "real" "REAL" DOUBLE { +default+ 0.3 } }
-! } define-persistent
-
-! 1 "billy" 20 6.28 <assigned-person> the-person set
-
-! test-sqlite
-! test-postgresql
+! [ make-native-person-table ] test-sqlite

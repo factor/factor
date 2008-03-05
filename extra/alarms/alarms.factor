@@ -16,7 +16,7 @@ SYMBOL: alarm-thread
     alarm-thread get-global interrupt ;
 
 : check-alarm
-    dup dt? over not or [ "Not a dt" throw ] unless
+    dup duration? over not or [ "Not a duration" throw ] unless
     over timestamp? [ "Not a timestamp" throw ] unless
     pick callable? [ "Not a quotation" throw ] unless ; inline
 
@@ -29,16 +29,16 @@ SYMBOL: alarm-thread
     notify-alarm-thread ;
 
 : alarm-expired? ( alarm now -- ? )
-    >r alarm-time r> <=> 0 <= ;
+    >r alarm-time r> before=? ;
 
 : reschedule-alarm ( alarm -- )
-    dup alarm-time over alarm-interval +dt
+    dup alarm-time over alarm-interval time+
     over set-alarm-time
     register-alarm ;
 
 : call-alarm ( alarm -- )
-    dup alarm-quot try
     dup alarm-entry box> drop
+    dup alarm-quot try
     dup alarm-interval [ reschedule-alarm ] [ drop ] if ;
 
 : (trigger-alarms) ( alarms now -- )
@@ -46,8 +46,7 @@ SYMBOL: alarm-thread
         2drop
     ] [
         over heap-peek drop over alarm-expired? [
-            over heap-pop drop call-alarm
-            (trigger-alarms)
+            over heap-pop drop call-alarm (trigger-alarms)
         ] [
             2drop
         ] if
@@ -62,7 +61,7 @@ SYMBOL: alarm-thread
 
 : alarm-thread-loop ( -- )
     alarms get-global
-    dup next-alarm nap-until drop
+    dup next-alarm sleep-until
     dup trigger-alarms
     alarm-thread-loop ;
 
@@ -87,5 +86,4 @@ PRIVATE>
     from-now f add-alarm ;
 
 : cancel-alarm ( alarm -- )
-    alarm-entry ?box
-    [ alarms get-global heap-delete ] [ drop ] if ;
+    alarm-entry [ alarms get-global heap-delete ] if-box? ;

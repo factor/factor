@@ -1,6 +1,6 @@
 USING: math sequences classes growable tools.test kernel
 layouts ;
-IN: temporary
+IN: growable.tests
 
 ! erg found this one
 [ fixnum ] [

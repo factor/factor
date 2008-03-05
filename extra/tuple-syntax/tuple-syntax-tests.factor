@@ -1,5 +1,5 @@
 USING: tools.test tuple-syntax ;
-IN: temporary
+IN: tuple-syntax.tests
 
 TUPLE: foo bar baz ;
 

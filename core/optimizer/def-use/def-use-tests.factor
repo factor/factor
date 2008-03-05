@@ -1,4 +1,4 @@
-IN: temporary
+IN: optimizer.def-use.tests
 USING: inference inference.dataflow optimizer optimizer.def-use
 namespaces assocs kernel sequences math tools.test words ;
 

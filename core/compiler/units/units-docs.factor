@@ -61,3 +61,11 @@ HELP: modify-code-heap ( alist -- )
     { { $snippet "{ code labels rel words literals }" } " - in this case, a code heap block is allocated with the given data." }
 } }
 { $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;
+
+HELP: compile
+{ $values { "seq" "a sequence of words" } }
+{ $description "Compiles a set of words." } ;
+
+HELP: compile-call
+{ $values { "quot" "a quotation" } }
+{ $description "Compiles and runs a quotation." } ;

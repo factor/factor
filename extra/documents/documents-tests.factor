@@ -1,4 +1,4 @@
-IN: temporary
+IN: documents.tests
 USING: documents namespaces tools.test ;
 
 ! Tests

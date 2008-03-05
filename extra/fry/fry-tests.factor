@@ -1,4 +1,4 @@
-IN: temporary
+IN: fry.tests
 USING: fry tools.test math prettyprint kernel io arrays
 sequences ;
 
@@ -30,6 +30,10 @@ sequences ;
 [ { { 1 "a" } { 1 "b" } { 1 "c" } } ] [
     '[ 1 _ 2array ]
     { "a" "b" "c" } swap map
+] unit-test
+
+[ 1 2 ] [
+    1 2 '[ _ , ] call
 ] unit-test
 
 [ { { 1 "a" 2 } { 1 "b" 2 } { 1 "c" 2 } } ] [

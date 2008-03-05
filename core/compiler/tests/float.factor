@@ -1,5 +1,5 @@
-IN: temporary
-USING: compiler kernel kernel.private memory math
+IN: compiler.tests
+USING: compiler.units kernel kernel.private memory math
 math.private tools.test math.floats.private ;
 
 [ 5.0 ] [ [ 5.0 ] compile-call data-gc data-gc data-gc ] unit-test

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.ebnf ;
-IN: temporary
+IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
   "abc" 'non-terminal' parse parse-result-ast 

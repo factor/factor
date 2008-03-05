@@ -1,5 +1,5 @@
 USING: cpu.x86.assembler kernel tools.test namespaces ;
-IN: temporary
+IN: cpu.x86.assembler.tests
 
 [ { HEX: 49 HEX: 89 HEX: 04 HEX: 24 } ] [ [ R12 [] RAX MOV ] { } make ] unit-test
 [ { HEX: 49 HEX: 8b HEX: 06 } ] [ [ RAX R14 [] MOV ] { } make ] unit-test

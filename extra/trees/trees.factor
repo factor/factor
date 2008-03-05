@@ -61,10 +61,6 @@ SYMBOL: current-side
     #! side is -1 if k1 < k2, 0 if they are equal, or 1 if k1 > k2
     <=> sgn ;
 
-: key< ( k1 k2 -- ? ) <=> 0 < ;
-: key> ( k1 k2 -- ? ) <=> 0 > ;
-: key= ( k1 k2 -- ? ) <=> zero? ;
-
 : random-side ( -- side ) left right 2array random ;
 
 : choose-branch ( key node -- key node-left/right )
@@ -72,7 +68,7 @@ SYMBOL: current-side
 
 : node-at* ( key node -- value ? )
     [
-        2dup node-key key= [
+        2dup node-key = [
             nip node-value t
         ] [
             choose-branch node-at*
@@ -97,8 +93,8 @@ M: tree set-at ( value key tree -- )
 
 : valid-node? ( node -- ? )
     [
-        dup dup node-left [ node-key swap node-key key< ] when* >r
-        dup dup node-right [ node-key swap node-key key> ] when* r> and swap
+        dup dup node-left [ node-key swap node-key before? ] when* >r
+        dup dup node-right [ node-key swap node-key after? ] when* r> and swap
         dup node-left valid-node? swap node-right valid-node? and and
     ] [ t ] if* ;
 

@@ -26,8 +26,8 @@ IN: opengl.capabilities
 : version-seq ( version-string -- version-seq )
     "." split [ string>number ] map ;
 
-: version<=> ( version1 version2 -- n )
-    swap version-seq swap version-seq <=> ;
+: version-before? ( version1 version2 -- ? )
+    swap version-seq swap version-seq before=? ;
 
 : (gl-version) ( -- version vendor )
     GL_VERSION glGetString " " split1 ;
@@ -36,7 +36,7 @@ IN: opengl.capabilities
 : gl-vendor-version ( -- version )
     (gl-version) nip ;
 : has-gl-version? ( version -- ? )
-    gl-version version<=> 0 <= ;
+    gl-version version-before? ;
 : (make-gl-version-error) ( required-version -- )
     "Required OpenGL version " % % " not supported (" % gl-version % " available)" % ;
 : require-gl-version ( version -- )
@@ -51,7 +51,7 @@ IN: opengl.capabilities
 : glsl-vendor-version ( -- version )
     (glsl-version) nip ;
 : has-glsl-version? ( version -- ? )
-    glsl-version version<=> 0 <= ;
+    glsl-version version-before? ;
 : require-glsl-version ( version -- )
     [ has-glsl-version? ]
     [ "Required GLSL version " % % " not supported (" % glsl-version % " available)" % ]

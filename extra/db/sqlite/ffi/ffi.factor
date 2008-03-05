@@ -112,7 +112,7 @@ FUNCTION: int sqlite3_prepare ( sqlite3* pDb, char* zSql, int nBytes, void* ppSt
 FUNCTION: int sqlite3_finalize ( sqlite3_stmt* pStmt ) ;
 FUNCTION: int sqlite3_reset ( sqlite3_stmt* pStmt ) ;
 FUNCTION: int sqlite3_step ( sqlite3_stmt* pStmt ) ;
-FUNCTION: int sqlite3_last_insert_rowid ( sqlite3* pStmt ) ;
+FUNCTION: sqlite3_int64 sqlite3_last_insert_rowid ( sqlite3* pStmt ) ;
 FUNCTION: int sqlite3_bind_blob ( sqlite3_stmt* pStmt, int index, void* ptr, int len, int destructor ) ;
 FUNCTION: int sqlite3_bind_double ( sqlite3_stmt* pStmt, int index, double x ) ;
 FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n ) ;

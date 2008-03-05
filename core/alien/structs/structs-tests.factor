@@ -1,4 +1,4 @@
-IN: temporary
+IN: alien.structs.tests
 USING: alien alien.syntax alien.c-types kernel tools.test
 sequences system libc words vocabs namespaces ;
 

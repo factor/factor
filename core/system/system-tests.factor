@@ -1,5 +1,5 @@
 USING: math tools.test system prettyprint ;
-IN: temporary
+IN: system.tests
 
 [ t ] [ cell integer? ] unit-test
 [ t ] [ bootstrap-cell integer? ] unit-test

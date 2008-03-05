@@ -1,5 +1,5 @@
 USING: tools.test io.files io io.streams.c ;
-IN: temporary
+IN: io.streams.c.tests
 
 [ "hello world" ] [
     "test.txt" temp-file [

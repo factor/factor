@@ -7,7 +7,7 @@ source-files definitions strings tools.completion tools.crossref
 tuples ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.lists ui.gadgets.scrollers ui.gadgets.tracks
 ui.gestures ui.operations vocabs words vocabs.loader
-tools.browser unicode.case calendar ;
+tools.browser unicode.case calendar ui ;
 IN: ui.tools.search
 
 TUPLE: live-search field list ;
@@ -45,7 +45,8 @@ search-field H{
 } set-gestures
 
 : <search-model> ( producer -- model )
-    >r g live-search-field gadget-model 1/5 seconds <delay>
+    >r g live-search-field gadget-model
+    ui-running? [ 1/5 seconds <delay> ] when
     [ "\n" join ] r> append <filter> ;
 
 : <search-list> ( seq limited? presenter -- gadget )

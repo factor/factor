@@ -4,7 +4,8 @@
 USING: continuations sequences kernel parser namespaces io
 io.files io.streams.lines io.streams.string html html.elements
 source-files debugger combinators math quotations generic
-strings splitting ;
+strings splitting accessors http.server.static http.server
+assocs ;
 
 IN: http.server.templating
 
@@ -80,13 +81,12 @@ DEFER: <% delimiter
             "quiet" on
             parser-notes off
             templating-vocab use+
-            dup source-file file set ! so that reload works properly
-            [
-                ?resource-path file-contents
-                [ eval-template ] [ html-error. drop ] recover
-            ] keep
+            ! so that reload works properly
+            dup source-file file set
+            ?resource-path file-contents
+            [ eval-template ] [ html-error. drop ] recover
         ] with-file-vocabs
-    ] assert-depth drop ;
+    ] curry assert-depth ;
 
 : run-relative-template-file ( filename -- )
     file get source-file-path parent-directory
@@ -94,3 +94,13 @@ DEFER: <% delimiter
 
 : template-convert ( infile outfile -- )
     [ run-template-file ] with-file-writer ;
+
+! file responder integration
+: serve-fhtml ( filename -- response )
+    "text/html" <content>
+    swap [ run-template-file ] curry >>body ;
+
+: enable-fhtml ( responder -- responder )
+    [ serve-fhtml ]
+    "application/x-factor-server-page"
+    pick special>> set-at ;

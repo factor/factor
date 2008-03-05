@@ -1,7 +1,7 @@
 USING: arrays kernel kernel.private math namespaces
 sequences sequences.private strings tools.test vectors
 continuations random growable classes ;
-IN: temporary
+IN: vectors.tests
 
 [ ] [ 10 [ [ -1000000 <vector> ] ignore-errors ] times ] unit-test
 

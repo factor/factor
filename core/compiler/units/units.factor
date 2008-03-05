@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations assocs namespaces sequences words
-vocabs definitions hashtables ;
+vocabs definitions hashtables init ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -37,9 +37,10 @@ SYMBOL: recompile-hook
 
 SYMBOL: definition-observers
 
-definition-observers global [ V{ } like ] change-at
-
 GENERIC: definitions-changed ( assoc obj -- )
+
+[ V{ } clone definition-observers set-global ]
+"compiler.units" add-init-hook
 
 : add-definition-observer ( obj -- )
     definition-observers get push ;
@@ -63,24 +64,45 @@ GENERIC: definitions-changed ( assoc obj -- )
     dup changed-words get update
     dup dup changed-vocabs update ;
 
+: compile ( words -- )
+    recompile-hook get call
+    dup [ drop crossref? ] assoc-contains?
+    modify-code-heap ;
+
+SYMBOL: post-compile-tasks
+
+: after-compilation ( quot -- )
+    post-compile-tasks get push ;
+
+: call-recompile-hook ( -- )
+    changed-words get keys
+    compiled-usages recompile-hook get call ;
+
+: call-post-compile-tasks ( -- )
+    post-compile-tasks get [ call ] each ;
+
 : finish-compilation-unit ( -- )
-    changed-words get keys recompile-hook get call
+    call-recompile-hook
+    call-post-compile-tasks
+    dup [ drop crossref? ] assoc-contains? modify-code-heap
     changed-definitions notify-definition-observers ;
 
 : with-compilation-unit ( quot -- )
     [
         H{ } clone changed-words set
         H{ } clone forgotten-definitions set
+        V{ } clone post-compile-tasks set
         <definitions> new-definitions set
         <definitions> old-definitions set
         [ finish-compilation-unit ]
         [ ] cleanup
     ] with-scope ; inline
 
-: default-recompile-hook
-    [ f ] { } map>assoc
-    dup [ drop crossref? ] assoc-contains?
-    modify-code-heap ;
+: compile-call ( quot -- )
+    [ define-temp ] with-compilation-unit execute ;
+
+: default-recompile-hook ( words -- alist )
+    [ f ] { } map>assoc ;
 
 recompile-hook global
 [ [ default-recompile-hook ] or ]

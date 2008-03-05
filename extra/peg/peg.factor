@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib memoize math.parser match
-       unicode.categories ;
+       unicode.categories sequences.lib compiler.units parser
+       words ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
@@ -306,8 +307,32 @@ MEMO: range ( min max -- parser )
 : seq ( seq -- parser )
   seq-parser construct-boa init-parser ;
 
+: 2seq ( parser1 parser2 -- parser )
+  2array seq ;
+
+: 3seq ( parser1 parser2 parser3 -- parser )
+  3array seq ;
+
+: 4seq ( parser1 parser2 parser3 parser4 -- parser )
+  4array seq ;
+
+: seq* ( quot -- paser )
+  { } make seq ; inline 
+
 : choice ( seq -- parser )
   choice-parser construct-boa init-parser ;
+
+: 2choice ( parser1 parser2 -- parser )
+  2array choice ;
+
+: 3choice ( parser1 parser2 parser3 -- parser )
+  3array choice ;
+
+: 4choice ( parser1 parser2 parser3 parser4 -- parser )
+  4array choice ;
+
+: choice* ( quot -- paser )
+  { } make choice ; inline 
 
 MEMO: repeat0 ( parser -- parser )
   repeat0-parser construct-boa init-parser ;
@@ -336,18 +361,11 @@ MEMO: hide ( parser -- parser )
 MEMO: delay ( parser -- parser )
   delay-parser construct-boa init-parser ;
 
-MEMO: list-of ( items separator -- parser )
-  hide over 2array seq repeat0 [ concat ] action 2array seq [ unclip 1vector swap first append ] action ;
-
-MEMO: 'digit' ( -- parser )
-  [ digit? ] satisfy [ digit> ] action ;
-
-MEMO: 'integer' ( -- parser )
-  'digit' repeat1 [ 10 digits>integer ] action ;
-
-MEMO: 'string' ( -- parser )
-  [
-    [ CHAR: " = ] satisfy hide ,
-    [ CHAR: " = not ] satisfy repeat0 ,
-    [ CHAR: " = ] satisfy hide ,
-  ] { } make seq [ first >string ] action ;
+: PEG:
+  (:) [
+    [
+        call compile
+        [ dup [ parse-result-ast ] [ "Parse failed" throw ] if ]
+        append define
+    ] with-compilation-unit
+  ] 2curry over push-all ; parsing

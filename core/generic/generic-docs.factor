@@ -116,16 +116,18 @@ HELP: method-spec
 { $class-description "The class of method specifiers, which are two-element arrays consisting of a class word followed by a generic word." }
 { $examples { $code "{ fixnum + }" "{ editor draw-gadget* }" } } ;
 
+HELP: method-body
+{ $class-description "The class of method bodies, which are words with special word properties set." } ;
+
 HELP: method
-{ $values { "class" class } { "generic" generic } { "method/f" "a " { $link method } " or " { $link f } } }
-{ $description "Looks up a method definition." }
-{ $class-description "Instances of this class are methods. A method consists of a quotation together with a source location where it was defined." } ;
+{ $values { "class" class } { "generic" generic } { "method/f" "a " { $link method-body } " or " { $link f } } }
+{ $description "Looks up a method definition." } ;
 
 { method define-method POSTPONE: M: } related-words
 
 HELP: <method>
 { $values { "def" "a quotation" } { "method" "a new method definition" } }
-{ $description "Creates a new  "{ $link method } " instance." } ;
+{ $description "Creates a new method." } ;
 
 HELP: methods
 { $values { "word" generic } { "assoc" "an association list mapping classes to quotations" } }

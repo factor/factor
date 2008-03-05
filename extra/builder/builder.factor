@@ -39,41 +39,30 @@ IN: builder
 
 : record-git-id ( -- ) git-id "../git-id" [ . ] with-file-writer ;
 
-: make-clean ( -- desc ) { "make" "clean" } ;
+: do-make-clean ( -- desc ) { "make" "clean" } try-process ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: target ( -- target ) { os [ cpu "." split ] } to-strings "-" join ;
-
 : make-vm ( -- desc )
   <process*>
-    { "make" target } to-strings >>arguments
-    "../compile-log"             >>stdout
-    +stdout+                     >>stderr
+    { "make" }       >>arguments
+    "../compile-log" >>stdout
+    +stdout+         >>stderr
   >desc ;
+
+: do-make-vm ( -- )
+  make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : copy-image ( -- )
-  "../../factor/" my-boot-image-name append
-  "../"           my-boot-image-name append
-  copy-file
-
-  "../../factor/" my-boot-image-name append
-                  my-boot-image-name
-  copy-file ;
+  builds "factor" path+ my-boot-image-name path+ ".." copy-file-into
+  builds "factor" path+ my-boot-image-name path+ "."  copy-file-into ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: factor-binary ( -- name )
-  os
-  { { "macosx" [ "./Factor.app/Contents/MacOS/factor" ] }
-    { "winnt"  [ "./factor-nt.exe" ] }
-    [ drop       "./factor" ] }
-  case ;
-
 : bootstrap-cmd ( -- cmd )
-  { factor-binary { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
+  { "./factor" { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
 
 : bootstrap ( -- desc )
   <process*>
@@ -84,8 +73,11 @@ IN: builder
     20 minutes    >>timeout
   >desc ;
 
+: do-bootstrap ( -- )
+  bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail ;
+
 : builder-test-cmd ( -- cmd )
-  { factor-binary "-run=builder.test" } to-strings ;
+  { "./factor" "-run=builder.test" } to-strings ;
 
 : builder-test ( -- desc )
   <process*>
@@ -95,6 +87,9 @@ IN: builder
     +stdout+         >>stderr
     45 minutes       >>timeout
   >desc ;
+
+: do-builder-test ( -- )
+  builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -108,48 +103,48 @@ SYMBOL: build-status
 
   enter-build-dir
 
-  "report" [
+  "report"
+    [
+      "Build machine:   " write host-name print
+      "CPU:             " write cpu       print
+      "OS:              " write os        print
+      "Build directory: " write cwd       print
 
-    "Build machine:   " write host-name print
-    "CPU:             " write cpu       print
-    "OS:              " write os        print
-    "Build directory: " write cwd       print nl
+      git-clone [ "git clone failed" print ] run-or-bail
 
-    git-clone [ "git clone failed" print ] run-or-bail
+      "factor"
+        [
+          record-git-id
+          do-make-clean
+          do-make-vm
+          copy-image
+          do-bootstrap
+          do-builder-test
+        ]
+      with-directory
 
-    "factor" cd
+      "test-log" delete-file
 
-    record-git-id
+      "git id:          " write "git-id" eval-file print nl
 
-    make-clean run-process drop
+      "Boot time: " write "boot-time" eval-file milli-seconds>time print
+      "Load time: " write "load-time" eval-file milli-seconds>time print
+      "Test time: " write "test-time" eval-file milli-seconds>time print nl
 
-    make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail
+      "Did not pass load-everything: " print "load-everything-vocabs" cat
+      "Did not pass test-all: "        print "test-all-vocabs"        cat
 
-    copy-image
+      "Benchmarks: " print "benchmarks" eval-file benchmarks.
 
-    bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail
+      nl
 
-    builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail
+      show-benchmark-deltas
 
-    "../test-log" delete-file
+      "benchmarks" ".." copy-file-into
 
-    "Boot time: " write "../boot-time" eval-file milli-seconds>time print
-    "Load time: " write "../load-time" eval-file milli-seconds>time print
-    "Test time: " write "../test-time" eval-file milli-seconds>time print nl
-
-    "Did not pass load-everything: " print "../load-everything-vocabs" cat
-    "Did not pass test-all: "        print "../test-all-vocabs"        cat
-
-    "Benchmarks: " print
-    "../benchmarks" [ stdio get contents eval ] with-file-reader benchmarks.
-
-    nl
-    
-    show-benchmark-deltas
-
-    "../benchmarks" "../../benchmarks" copy-file    
-
-  ] with-file-writer
+      maybe-release
+    ]
+  with-file-writer
 
   build-status on ;
 
@@ -168,7 +163,7 @@ SYMBOL: builder-recipients
     builder-from get        >>from
     builder-recipients get  >>to
     subject                 >>subject
-    "../report" file>string >>body
+    "./report" file>string >>body
   send ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -177,10 +172,11 @@ SYMBOL: builder-recipients
   { "bzip2" my-boot-image-name } to-strings run-process drop ;
 
 : build ( -- )
-  [ (build) ] [ drop ] recover
+  [ (build) ] failsafe
+  builds cd stamp> cd
   [ send-builder-email ] [ drop "not sending mail" . ] recover
-  ".." cd { "rm" "-rf" "factor" } run-process drop
-  [ compress-image ] [ drop ] recover ;
+  { "rm" "-rf" "factor" } run-process drop
+  [ compress-image ] failsafe ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -215,8 +211,7 @@ USE: bootstrap.image.download
       [ build ]
     when
   ]
-  [ drop ]
-  recover
+  failsafe
   5 minutes sleep
   build-loop ;
 

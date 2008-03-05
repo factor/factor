@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
-       unicode.categories ;
+       peg.parsers unicode.categories ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;

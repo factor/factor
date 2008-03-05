@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs namespaces sequences kernel ;
+USING: assocs namespaces sequences kernel words ;
 IN: inference.state
 
 ! Nesting state to solve recursion
@@ -30,9 +30,6 @@ SYMBOL: current-node
 
 ! Words that the current dataflow IR depends on
 SYMBOL: dependencies
-
-SYMBOL: +inlined+
-SYMBOL: +called+
 
 : depends-on ( word how -- )
     swap dependencies get dup [

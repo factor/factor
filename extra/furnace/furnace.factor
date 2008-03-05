@@ -35,6 +35,17 @@ SYMBOL: current-action
 SYMBOL: validators-errored
 SYMBOL: validation-errors
 
+: build-url ( str query-params -- newstr )
+    [
+        over %
+        dup assoc-empty? [
+            2drop
+        ] [
+            CHAR: ? rot member? "&" "?" ? %
+            assoc>query %
+        ] if
+    ] "" make ;
+
 : action-link ( query action -- url )
     [
         "/responder/" %
@@ -204,4 +215,3 @@ SYMBOL: model
     ] [
         drop
     ] if ;
-

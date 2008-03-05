@@ -39,12 +39,12 @@ IN: bunny.model
         [ normals ] 2keep 3array
     ] time ;
 
-: model-path "bun_zipper.ply" ;
+: model-path "bun_zipper.ply" temp-file ;
 
 : model-url "http://factorcode.org/bun_zipper.ply" ;
 
 : maybe-download ( -- path )
-    model-path resource-path dup exists? [
+    model-path dup exists? [
         "Downloading bunny from " write
         model-url dup print flush
         over download-to

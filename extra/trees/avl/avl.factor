@@ -53,14 +53,14 @@ TUPLE: avl-node balance ;
 DEFER: avl-set
 
 : avl-insert ( value key node -- node taller? )
-    2dup node-key key< left right ? [
+    2dup node-key before? left right ? [
         [ node-link avl-set ] keep swap
         >r tuck set-node-link r>
         [ dup current-side get change-balance balance-insert ] [ f ] if
     ] with-side ;
 
 : (avl-set) ( value key node -- node taller? )
-    2dup node-key key= [
+    2dup node-key = [
         -rot pick set-node-key over set-node-value f
     ] [ avl-insert ] if ;
 

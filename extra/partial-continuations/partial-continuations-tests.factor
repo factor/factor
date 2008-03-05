@@ -1,6 +1,6 @@
 USING: namespaces math partial-continuations tools.test
 kernel sequences ;
-IN: temporary
+IN: partial-continuations.tests
 
 SYMBOL: sum
 

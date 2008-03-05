@@ -1,4 +1,4 @@
-IN: temporary
+IN: math.quaternions.tests
 USING: tools.test math.quaternions kernel math.vectors
 math.constants ;
 

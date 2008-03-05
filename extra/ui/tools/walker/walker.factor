@@ -7,7 +7,7 @@ ui.tools.workspace ui.gestures ui.gadgets.labels ui threads
 namespaces tools.walker assocs ;
 IN: ui.tools.walker
 
-TUPLE: walker-gadget status continuation thread ;
+TUPLE: walker-gadget status continuation thread traceback ;
 
 : walker-command ( walker msg -- )
     over walker-gadget-thread thread-registered?
@@ -26,12 +26,11 @@ TUPLE: walker-gadget status continuation thread ;
 
 : com-abandon ( walker -- ) abandon walker-command ;
 
-: com-inspect ( walker -- )
-    walker-continuation model-value
-    [ inspect ] curry call-listener ;
-
 M: walker-gadget ungraft*
     dup delegate ungraft* detach walker-command ;
+
+M: walker-gadget focusable-child*
+    walker-gadget-traceback ;
 
 : walker-state-string ( status thread -- string )
     [
@@ -52,10 +51,10 @@ M: walker-gadget ungraft*
     [ walker-state-string ] curry <filter> <label-control> ;
 
 : <walker-gadget> ( status continuation thread -- gadget )
-    walker-gadget construct-boa [
+    over <traceback-gadget> walker-gadget construct-boa [
         toolbar,
         g walker-gadget-status self <thread-status> f track,
-        g walker-gadget-continuation <traceback-gadget> 1 track,
+        g walker-gadget-traceback 1 track,
     ] { 0 1 } build-track ;
 
 : walker-help "ui-walker" help-window ;
@@ -69,12 +68,8 @@ walker-gadget "toolbar" f {
     { T{ key-down f f "b" } com-back }
     { T{ key-down f f "c" } com-continue }
     { T{ key-down f f "a" } com-abandon }
-    { T{ key-down f f "F1" } walker-help }
-} define-command-map
-
-walker-gadget "other" f {
-    { T{ key-down f f "n" } com-inspect }
     { T{ key-down f f "d" } close-window }
+    { T{ key-down f f "F1" } walker-help }
 } define-command-map
 
 : walker-window ( -- )

@@ -1,4 +1,4 @@
-IN: temporary
+IN: float-vectors.tests
 USING: tools.test float-vectors vectors sequences kernel ;
 
 [ 0 ] [ 123 <float-vector> length ] unit-test

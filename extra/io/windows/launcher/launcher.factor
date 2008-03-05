@@ -146,8 +146,8 @@ M: windows-io kill-process* ( handle -- )
 
 : wait-loop ( -- )
     processes get dup assoc-empty?
-    [ drop f nap drop ]
-    [ wait-for-processes [ 100 nap drop ] when ] if ;
+    [ drop f sleep-until ]
+    [ wait-for-processes [ 100 sleep ] when ] if ;
 
 SYMBOL: wait-thread
 
