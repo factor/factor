@@ -143,13 +143,25 @@ M: timestamp year. ( timestamp -- )
 : ymdhms>timestamp ( str -- timestamp )
     [ (ymdhms>timestamp) ] with-string-reader ;
 
+: (hms>timestamp) ( -- timestamp )
+    f f f
+    read-00 ! hour
+    ":" expect
+    read-00 ! minute
+    ":" expect
+    read-00 ! second
+    f <timestamp> ;
+
+: hms>timestamp ( str -- timestamp )
+    [ (hms>timestamp) ] with-string-reader ;
+
 : (ymd>timestamp) ( -- timestamp )
     read-0000 ! year
     "-" expect
     read-00 ! month
     "-" expect
     read-00 ! day
-    0 0 0 0 <timestamp> ;
+    f f f f <timestamp> ;
 
 : ymd>timestamp ( str -- timestamp )
     [ (ymd>timestamp) ] with-string-reader ;
