@@ -42,3 +42,12 @@ ARTICLE: "encodings-descriptors" "Encoding descriptors"
 { $vocab-link "io.encodings.ascii" }
 { $vocab-link "io.encodings.binary" }
 { $vocab-link "io.encodings.utf16" } ;
+
+ARTICLE: "encodings-protocol" "Encoding protocol"
+"An encoding descriptor must implement the following methods. The methods are implemented on tuple classes by instantiating the class and calling the method again."
+{ $subsection decode-step }
+{ $subsection encode-string } ;
+
+ARTICLE: "encodings-string" "Encoding and decoding strings"
+"Strings can be encoded and decoded with the following words:"
+{ $subsection encode-string } ;
