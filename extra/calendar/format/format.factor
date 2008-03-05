@@ -125,6 +125,35 @@ M: timestamp year. ( timestamp -- )
 : rfc3339>timestamp ( str -- timestamp )
     [ (rfc3339>timestamp) ] with-string-reader ;
 
+: (ymdhms>timestamp) ( -- timestamp )
+    read-0000 ! year
+    "-" expect
+    read-00 ! month
+    "-" expect
+    read-00 ! day
+    " " expect
+    read-00 ! hour
+    ":" expect
+    read-00 ! minute
+    ":" expect
+    read-00 ! second
+    0 ! timezone
+    <timestamp> ;
+
+: ymdhms>timestamp ( str -- timestamp )
+    [ (ymdhms>timestamp) ] with-string-reader ;
+
+: (ymd>timestamp) ( -- timestamp )
+    read-0000 ! year
+    "-" expect
+    read-00 ! month
+    "-" expect
+    read-00 ! day
+    0 0 0 0 <timestamp> ;
+
+: ymd>timestamp ( str -- timestamp )
+    [ (ymd>timestamp) ] with-string-reader ;
+
 : file-time-string ( timestamp -- string )
     [
         [ month>> month-abbreviations nth write ] keep bl
