@@ -53,13 +53,6 @@ SYMBOL: counter
         yield yield
     ] time ;
 
-: socket-benchmarks
-    10 clients
-    20 clients
-    40 clients ;
-    ! 80 clients
-    ! 160 clients
-    ! 320 clients
-    ! 640 clients ;
+: socket-benchmarks ;
 
 MAIN: socket-benchmarks
