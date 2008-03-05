@@ -56,8 +56,8 @@ UNION: c a b ;
 [ t ] [ \ c \ tuple class< ] unit-test
 [ f ] [ \ tuple \ c class< ] unit-test
 
-DEFER: bah
-FORGET: bah
+! DEFER: bah
+! FORGET: bah
 UNION: bah fixnum alien ;
 [ bah ] [ \ bah? "predicating" word-prop ] unit-test
 
