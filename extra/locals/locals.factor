@@ -367,14 +367,14 @@ M: lambda-method definer drop \ M:: \ ; ;
 M: lambda-method definition
     "lambda" word-prop lambda-body ;
 
-: method-stack-effect
+: method-stack-effect ( method -- effect )
     dup "lambda" word-prop lambda-vars
     swap "method-generic" word-prop stack-effect
     dup [ effect-out ] when
     <effect> ;
 
 M: lambda-method synopsis*
-    dup dup definer.
+    dup dup dup definer.
     "method-specializer" word-prop pprint*
     "method-generic" word-prop pprint*
     method-stack-effect effect>string comment. ;
