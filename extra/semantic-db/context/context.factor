@@ -3,12 +3,17 @@
 USING: kernel semantic-db semantic-db.type ;
 IN: semantic-db.context
 
-! : all-contexts ( -- contexts )
-!     has-type-relation context-type relation-object-subjects ;
-! 
-! : context-relations ( context -- relations )
-!     has-context-relation swap relation-object-subjects ;
+! contexts:
+!  - have type 'context' in context 'semantic-db'
 
-: ensure-context ( name -- context-id )
+: current-context ( -- context-id )
+    \ current-context get ;
+
+: set-current-context ( context-id -- )
+    \ current-context set ;
+
+: context-id ( name -- context-id )
     context-type swap ensure-node-of-type ;
 
+: with-context ( name quot -- )
+    swap context-id [ set-current-context ] curry swap compose with-scope ;

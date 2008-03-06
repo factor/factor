@@ -1,9 +1,7 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays db db.tuples db.types db.sqlite kernel math new-slots sequences ;
+USING: accessors arrays continuations db db.tuples db.types db.sqlite kernel math math.parser new-slots sequences ;
 IN: semantic-db
-
-! new semantic-db using Doug Coleman's new db abstraction library
 
 TUPLE: node id content ;
 : <node> ( content -- node )
@@ -21,16 +19,14 @@ node "node"
 : create-node ( content -- id )
     <node> dup insert-tuple id>> ;
 
-TUPLE: arc relation subject object ;
+TUPLE: arc id relation subject object ;
 
 : <arc> ( relation subject object -- arc )
-    arc construct-empty
-    f <node> over set-delegate
-    swap >>object swap >>subject swap >>relation ;
+    arc construct-empty swap >>object swap >>subject swap >>relation ;
 
 arc "arc"
 {
-    { "id" "id" INTEGER } ! foreign key to node table?
+    { "id" "id" INTEGER +assigned-id+ } ! foreign key to node table?
     { "relation" "relation" INTEGER +not-null+ }
     { "subject" "subject" INTEGER +not-null+ }
     { "object" "object" INTEGER +not-null+ }
@@ -40,12 +36,7 @@ arc "arc"
     arc create-table ;
 
 : insert-arc ( arc -- )
-    dup delegate insert-tuple
-    insert-tuple ;
-   ! [ ] [ insert-sql ] make-tuple-statement insert-statement drop ;
-
-! : insert-arc ( arc -- )
-!     dup primary-key [ update-tuple ] [ insert-arc ] if ;
+    f <node> dup insert-tuple id>> >>id insert-tuple ;
 
 : delete-arc ( arc -- )
     dup delete-tuple delegate delete-tuple ;
@@ -54,7 +45,7 @@ arc "arc"
     <arc> dup insert-arc id>> ;
 
 : create-bootstrap-nodes ( -- )
-    { "context" "type" "relation" "is of type" "semantic-db" "is in context" }
+    { "context" "type" "relation" "has type" "semantic-db" "has context" }
     [ create-node drop ] each ;
 
 ! TODO: maybe put these in a 'special nodes' table
@@ -65,24 +56,38 @@ arc "arc"
 : semantic-db-context 5 ; inline
 : has-context-relation 6 ; inline
 
+: has-semantic-db-context ( id -- )
+    has-context-relation swap semantic-db-context create-arc drop ;
+
+: has-type-in-semantic-db ( subject type -- )
+    has-type-relation -rot create-arc drop ;
+
 : create-bootstrap-arcs ( -- )
     ! give everything a type
-    has-type-relation context-type type-type create-arc drop
-    has-type-relation type-type type-type create-arc drop
-    has-type-relation relation-type type-type create-arc drop
-    has-type-relation has-type-relation relation-type create-arc drop
-    has-type-relation semantic-db-context context-type create-arc drop
-    has-type-relation has-context-relation relation-type create-arc drop
-    ! give relations a context (semantic-db context)
-    has-context-relation has-type-relation semantic-db-context create-arc drop
-    has-context-relation has-context-relation semantic-db-context create-arc drop ;
+    context-type type-type has-type-in-semantic-db
+    type-type type-type has-type-in-semantic-db
+    relation-type type-type has-type-in-semantic-db
+    has-type-relation relation-type has-type-in-semantic-db
+    semantic-db-context context-type has-type-in-semantic-db
+    has-context-relation relation-type has-type-in-semantic-db
+    ! give relations and types the semantic-db context
+    context-type has-semantic-db-context
+    type-type has-semantic-db-context
+    relation-type has-semantic-db-context
+    has-type-relation has-semantic-db-context
+    has-context-relation has-semantic-db-context ;
 
 : init-semantic-db ( -- )
     create-node-table create-arc-table create-bootstrap-nodes create-bootstrap-arcs ;
 
-: 1result ( array -- result )
-    #! return the first (and hopefully only) element of the array, or f
-    dup length zero? [ drop f ] [ first ] if ;
-
 : param ( value key type -- param )
-    rot 3array ;
+    swapd 3array ;
+
+: single-int-results ( bindings sql -- array )
+    f f <simple-statement> [ do-bound-query ] with-disposal
+    [ first string>number ] map ;
+
+: ensure2 ( x y quot1 quot2 -- z )
+    #! quot1 ( x y -- z/f ) finds an existing z
+    #! quot2 ( x y -- z ) creates a new z if quot1 returns f
+    >r >r 2dup r> call [ 2nip ] r> if* ;

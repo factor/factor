@@ -1,9 +1,7 @@
-USING: accessors db db.sqlite db.tuples kernel math semantic-db semantic-db.type tools.test ;
+USING: accessors arrays db db.sqlite db.tuples kernel math semantic-db semantic-db.type sequences tools.test tools.walker ;
 IN: temporary
 
 [
-USE: tools.walker
-break
     create-node-table create-arc-table
     [ 1 ] [ "first node" create-node ] unit-test
     [ 2 ] [ "second node" create-node ] unit-test
@@ -14,6 +12,15 @@ break
 
 [
     init-semantic-db
-    [ t ] [ "content" ensure-type "this is some content" ensure-node-of-type integer? ] unit-test
-    [ t ] [ "content" select-node-of-type integer? ]
+    type-type 1array [ "type" ensure-type ] unit-test
+    [ { 1 2 3 } ] [ type-type select-nodes-of-type ] unit-test
+    [ 1 ] [ type-type select-node-of-type ] unit-test
+    [ t ] [ "content" ensure-type integer? ] unit-test
+    [ t ] [ "content" ensure-type "content" ensure-type = ] unit-test
+    [ t ] [ "content" ensure-type "first content" create-node-of-type integer? ] unit-test
+    [ t ] [ "content" ensure-type select-node-of-type integer? ] unit-test
+    [ t ] [ "content" ensure-type "first content" select-node-of-type-with-content integer? ] unit-test
+    [ t ] [ "content" ensure-type "first content" ensure-node-of-type integer? ] unit-test
+    [ t ] [ "content" ensure-type "second content" ensure-node-of-type integer? ] unit-test
+    [ 2 ] [ "content" ensure-type select-nodes-of-type length ] unit-test
 ] with-tmp-sqlite
