@@ -9,7 +9,7 @@ assocs ;
 
 IN: http.server.templating.fhtml
 
-: templating-vocab ( -- vocab-name ) "http.server.templating" ;
+: templating-vocab ( -- vocab-name ) "http.server.templating.fhtml" ;
 
 ! See apps/http-server/test/ or libs/furnace/ for template usage
 ! examples
