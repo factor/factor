@@ -73,7 +73,7 @@ M: freetype-renderer free-fonts ( world -- )
 
 : open-face ( font style -- face )
     ttf-name ttf-path
-    dup file-contents >byte-array malloc-byte-array
+    dup malloc-file-contents
     swap file-length
     (open-face) ;
 

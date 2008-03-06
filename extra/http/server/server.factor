@@ -165,7 +165,7 @@ LOG: httpd-hit NOTICE
 
 : httpd ( port -- )
     internet-server "http.server"
-    [ handle-client ] with-server ;
+    binary [ handle-client ] with-server ;
 
 : httpd-main ( -- ) 8888 httpd ;
 

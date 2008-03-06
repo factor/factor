@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces io io.timeouts kernel logging io.sockets
 sequences combinators sequences.lib splitting assocs strings
-math.parser random system calendar calendar.format ;
+math.parser random system calendar io.encodings.ascii calendar.format ;
 
 IN: smtp
 
@@ -20,7 +20,7 @@ SYMBOL: esmtp           t esmtp set-global
 : with-smtp-connection ( quot -- )
     smtp-host get smtp-port get
     2dup log-smtp-connection
-    <inet> <client> [
+    <inet> ascii <client> [
         smtp-domain [ host-name or ] change
         read-timeout get stdio get set-timeout
         call

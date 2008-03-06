@@ -30,7 +30,7 @@ $nl
 ABOUT: "buffers"
 
 HELP: buffer
-{ $class-description "The class of I/O buffers, which resemble FIFO queues, but are optimize for holding bytes, are have underlying storage allocated at a fixed address. Buffers must be de-allocated manually."
+{ $class-description "The class of I/O buffers, which resemble FIFO queues, but are optimized for holding bytes, are have underlying storage allocated at a fixed address. Buffers must be de-allocated manually."
 $nl
 "Buffers have two internal pointers:"
 { $list

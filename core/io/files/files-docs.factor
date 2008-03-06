@@ -10,7 +10,9 @@ ARTICLE: "file-streams" "Reading and writing files"
 "Utility combinators:"
 { $subsection with-file-reader }
 { $subsection with-file-writer }
-{ $subsection with-file-appender } ;
+{ $subsection with-file-appender }
+{ $subsection file-contents }
+{ $subsection file-lines } ;
 
 ARTICLE: "pathnames" "Pathname manipulation"
 "Pathname manipulation:"
@@ -114,33 +116,44 @@ HELP: file-name
 } ;
 
 HELP: <file-reader>
-{ $values { "path" "a pathname string" } { "stream" "an input stream" } }
-{ $description "Outputs an input stream for reading from the specified pathname." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptors" }
+    { "stream" "an input stream" } }
+{ $description "Outputs an input stream for reading from the specified pathname using the given encoding." }
 { $errors "Throws an error if the file is unreadable." } ;
 
 HELP: <file-writer>
-{ $values { "path" "a pathname string" } { "stream" "an output stream" } }
-{ $description "Outputs an output stream for writing to the specified pathname. The file's length is truncated to zero." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "stream" "an output stream" } }
+{ $description "Outputs an output stream for writing to the specified pathname using the given encoding. The file's length is truncated to zero." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: <file-appender>
-{ $values { "path" "a pathname string" } { "stream" "an output stream" } }
-{ $description "Outputs an output stream for writing to the specified pathname. The stream begins writing at the end of the file." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "stream" "an output stream" } }
+{ $description "Outputs an output stream for writing to the specified pathname using the given encoding. The stream begins writing at the end of the file." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: with-file-reader
-{ $values { "path" "a pathname string" } { "quot" "a quotation" } }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
 { $description "Opens a file for reading and calls the quotation using " { $link with-stream } "." }
 { $errors "Throws an error if the file is unreadable." } ;
 
 HELP: with-file-writer
-{ $values { "path" "a pathname string" } { "quot" "a quotation" } }
-{ $description "Opens a file for writing and calls the quotation using " { $link with-stream } "." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
+{ $description "Opens a file for writing using the given encoding and calls the quotation using " { $link with-stream } "." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: with-file-appender
-{ $values { "path" "a pathname string" } { "quot" "a quotation" } }
-{ $description "Opens a file for appending and calls the quotation using " { $link with-stream } "." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
+{ $description "Opens a file for appending using the given encoding and calls the quotation using " { $link with-stream } "." }
+{ $errors "Throws an error if the file cannot be opened for writing." } ;
+
+HELP: file-lines
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "seq" "an array of strings" } }
+{ $description "Opens the file at the given path using the given encoding, and returns a list of the lines in that file." }
+{ $errors "Throws an error if the file cannot be opened for writing." } ;
+
+HELP: file-contents
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "str" "a string" } }
+{ $description "Opens the file at the given path using the given encoding, and the contents of that file as a string." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: cwd

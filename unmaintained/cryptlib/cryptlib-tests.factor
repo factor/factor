@@ -1,5 +1,6 @@
 USING: cryptlib.libcl cryptlib prettyprint kernel alien sequences libc math
-tools.test io io.files continuations alien.c-types splitting generic.math ;
+tools.test io io.files continuations alien.c-types splitting generic.math
+io.encodings.binary ;
 
 "=========================================================" print
 "Envelope/de-envelop test..." print
@@ -152,7 +153,7 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
     ! envelope
     CRYPT_FORMAT_CRYPTLIB [
         "extra/cryptlib/test/large_data.txt" resource-path
-        file-contents set-pop-buffer
+        binary file-contents set-pop-buffer
         envelope-handle CRYPT_ATTRIBUTE_BUFFERSIZE
         get-pop-buffer alien>char-string length 10000 + set-attribute
         envelope-handle CRYPT_ENVINFO_DATASIZE
@@ -192,7 +193,7 @@ tools.test io io.files continuations alien.c-types splitting generic.math ;
     CRYPT_FORMAT_CRYPTLIB [
         envelope-handle CRYPT_ENVINFO_PASSWORD "password" set-attribute-string
         "extra/cryptlib/test/large_data.txt" resource-path
-        file-contents set-pop-buffer
+        binary file-contents set-pop-buffer
         envelope-handle CRYPT_ATTRIBUTE_BUFFERSIZE
         get-pop-buffer alien>char-string length 10000 + set-attribute
         envelope-handle CRYPT_ENVINFO_DATASIZE

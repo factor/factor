@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.backend io.nonblocking io.streams.duplex
-io.timeouts system kernel namespaces strings hashtables
-sequences assocs combinators vocabs.loader init threads
-continuations math ;
+USING: io io.backend io.timeouts system kernel namespaces
+strings hashtables sequences assocs combinators vocabs.loader
+init threads continuations math io.encodings io.streams.duplex
+io.nonblocking ;
 IN: io.launcher
 
 ! Non-blocking process exit notification facility
@@ -125,13 +125,13 @@ M: process set-timeout set-process-timeout ;
 
 M: process timed-out kill-process ;
 
-HOOK: process-stream* io-backend ( desc -- stream process )
+HOOK: (process-stream) io-backend ( desc -- in out process )
 
 TUPLE: process-stream process ;
 
-: <process-stream> ( desc -- stream )
-    >descriptor
-    [ process-stream* ] keep
+: <process-stream> ( desc encoding -- stream )
+    swap >descriptor
+    [ (process-stream) >r rot <encoder-duplex> r> ] keep
     +timeout+ swap at [ over set-timeout ] when*
     { set-delegate set-process-stream-process }
     process-stream construct ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences kernel.private namespaces arrays io
 io.files splitting io.binary math.functions vectors quotations
-combinators ;
+combinators io.encodings.binary ;
 IN: icfp.2006
 
 SYMBOL: regs
@@ -134,7 +134,7 @@ SYMBOL: open-arrays
     [ run-op exec-loop ] unless ;
 
 : load-platters ( path -- )
-    file-contents 4 group [ be> ] map
+    binary file-contents 4 group [ be> ] map
     0 arrays get set-nth ;
 
 : init ( path -- )

@@ -4,7 +4,7 @@ USING: arrays definitions generic assocs kernel math
 namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger 
-io.files io.streams.string io.streams.lines vocabs
+io.files io.streams.string vocabs io.encodings.utf8
 source-files classes hashtables compiler.errors compiler.units ;
 IN: parser
 
@@ -500,7 +500,7 @@ SYMBOL: interactive-vocabs
     [
         [
             [ parsing-file ] keep
-            [ ?resource-path <file-reader> ] keep
+            [ ?resource-path utf8 <file-reader> ] keep
             parse-stream
         ] with-compiler-errors
     ] [

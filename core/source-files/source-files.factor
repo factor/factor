@@ -4,8 +4,8 @@ USING: arrays definitions generic assocs kernel math
 namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger
-io.files io.crc32 io.streams.string io.streams.lines vocabs
-hashtables graphs compiler.units ;
+io.files io.crc32 io.streams.string vocabs
+hashtables graphs compiler.units io.encodings.utf8 ;
 IN: source-files
 
 SYMBOL: source-files
@@ -17,7 +17,7 @@ uses definitions ;
 
 : (source-modified?) ( path modified checksum -- ? )
     pick file-modified rot [ 0 or ] 2apply >
-    [ swap file-lines lines-crc32 = not ] [ 2drop f ] if ;
+    [ swap utf8 file-lines lines-crc32 = not ] [ 2drop f ] if ;
 
 : source-modified? ( path -- ? )
     dup source-files get at [
@@ -70,7 +70,7 @@ uses definitions ;
         swap ?resource-path dup exists?
         [
             over record-modified
-            file-lines swap record-checksum
+            utf8 file-lines swap record-checksum
         ] [ 2drop ] if
     ] assoc-each ;
 

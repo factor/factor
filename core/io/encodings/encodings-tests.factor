@@ -1,9 +1,9 @@
-USING: io.streams.lines io.files io.streams.string io
-tools.test kernel ;
-IN: io.streams.lines.tests
+USING: io.files io.streams.string io
+tools.test kernel io.encodings.ascii ;
+IN: io.streams.encodings.tests
 
 : <resource-reader> ( resource -- stream )
-    resource-path <file-reader> ;
+    resource-path ascii <file-reader> ;
     
 [ { } ]
 [ "/core/io/test/empty-file.txt" <resource-reader> lines ]

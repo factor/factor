@@ -4,7 +4,7 @@ USING: io io.backend io.launcher io.nonblocking io.unix.backend
 io.unix.files io.nonblocking sequences kernel namespaces math
 system alien.c-types debugger continuations arrays assocs
 combinators unix.process strings threads unix
-io.unix.launcher.parser ;
+io.unix.launcher.parser io.encodings.latin1 ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -86,9 +86,9 @@ M: unix-io kill-process* ( pid -- )
         -rot 2dup second close first close
     ] with-fork first swap second rot <process> ;
 
-M: unix-io process-stream*
+M: unix-io (process-stream)
     [
-        spawn-process-stream >r handle>duplex-stream r>
+        spawn-process-stream >r <reader&writer> r>
     ] with-descriptor ;
 
 : find-process ( handle -- process )

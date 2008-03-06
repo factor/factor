@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.streams.string
 USING: io kernel math namespaces sequences sbufs strings
-generic splitting io.streams.plain io.streams.lines growable
-continuations ;
+generic splitting growable continuations io.streams.plain
+io.encodings ;
 
 M: growable dispose drop ;
 
@@ -12,30 +12,11 @@ M: growable stream-write push-all ;
 M: growable stream-flush drop ;
 
 : <string-writer> ( -- stream )
-    512 <sbuf> <plain-writer> ;
+    512 <sbuf> ;
 
 : with-string-writer ( quot -- str )
     <string-writer> swap [ stdio get ] compose with-stream*
     >string ; inline
-
-: format-column ( seq ? -- seq )
-    [
-        [ 0 [ length max ] reduce ] keep
-        swap [ CHAR: \s pad-right ] curry map
-    ] unless ;
-
-: map-last ( seq quot -- seq )
-    swap dup length <reversed>
-    [ zero? rot [ call ] keep swap ] 2map nip ; inline
-
-: format-table ( table -- seq )
-    flip [ format-column ] map-last
-    flip [ " " join ] map ;
-
-M: plain-writer stream-write-table
-    [ drop format-table [ print ] each ] with-stream* ;
-
-M: plain-writer make-cell-stream 2drop <string-writer> ;
 
 M: growable stream-read1 dup empty? [ drop f ] [ pop ] if ;
 
@@ -43,7 +24,7 @@ M: growable stream-read1 dup empty? [ drop f ] [ pop ] if ;
     underlying like ;
 
 : growable-read-until ( growable n -- str )
-    dupd tail-slice swap harden-as dup reverse-here ;
+    >fixnum dupd tail-slice swap harden-as dup reverse-here ;
 
 : find-last-sep swap [ memq? ] curry find-last drop ;
 
@@ -69,7 +50,31 @@ M: growable stream-read-partial
     stream-read ;
 
 : <string-reader> ( str -- stream )
-    >sbuf dup reverse-here <line-reader> ;
+    >sbuf dup reverse-here f <decoder> ;
 
 : with-string-reader ( str quot -- )
     >r <string-reader> r> with-stream ; inline
+
+INSTANCE: growable plain-writer
+
+: format-column ( seq ? -- seq )
+    [
+        [ 0 [ length max ] reduce ] keep
+        swap [ CHAR: \s pad-right ] curry map
+    ] unless ;
+
+: map-last ( seq quot -- seq )
+    swap dup length <reversed>
+    [ zero? rot [ call ] keep swap ] 2map nip ; inline
+
+: format-table ( table -- seq )
+    flip [ format-column ] map-last
+    flip [ " " join ] map ;
+
+M: plain-writer stream-write-table
+    [ drop format-table [ print ] each ] with-stream* ;
+
+M: plain-writer make-cell-stream 2drop <string-writer> ;
+
+M: growable stream-readln ( stream -- str )
+    "\r\n" over stream-read-until handle-readln ;

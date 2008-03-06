@@ -31,17 +31,15 @@ M: win32-socket wince-write ( port port-handle -- )
     windows.winsock:WSAConnect
     windows.winsock:winsock-error!=0/f ;
 
-M: windows-ce-io (client) ( addrspec -- duplex-stream )
-    do-connect <win32-socket> dup handle>duplex-stream ;
+M: windows-ce-io (client) ( addrspec -- reader writer )
+    do-connect <win32-socket> dup <reader&writer> ;
 
-M: windows-ce-io <server> ( addrspec -- duplex-stream )
-    [
-        windows.winsock:SOCK_STREAM server-fd
-        dup listen-on-socket
-        <win32-socket>
-    ] keep <server-port> ;
+M: windows-ce-io (server) ( addrspec -- handle )
+    windows.winsock:SOCK_STREAM server-fd
+    dup listen-on-socket
+    <win32-socket> ;
 
-M: windows-ce-io accept ( server -- client )
+M: windows-ce-io (accept) ( server -- client )
     [
         dup check-server-port
         [
@@ -54,7 +52,7 @@ M: windows-ce-io accept ( server -- client )
                 [ windows.winsock:winsock-error ] when
             ] keep
         ] keep server-port-addr parse-sockaddr swap
-        <win32-socket> dup handle>duplex-stream <client-stream>
+        <win32-socket> <reader&writer>
     ] with-timeout ;
 
 M: windows-ce-io <datagram> ( addrspec -- datagram )
