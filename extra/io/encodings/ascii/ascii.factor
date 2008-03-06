@@ -4,7 +4,7 @@ USING: io io.encodings strings kernel math sequences byte-arrays io.encodings ;
 IN: io.encodings.ascii
 
 : encode-check<= ( string stream max -- )
-    [ pick > [ encode-error ] [ stream-write1 ] if ] 2curry each ;
+    [ pick <= [ encode-error ] [ stream-write1 ] if ] 2curry each ;
 
 TUPLE: ascii ;
 
