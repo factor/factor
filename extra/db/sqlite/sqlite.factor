@@ -80,8 +80,9 @@ M: sqlite-result-set #columns ( result-set -- n )
 M: sqlite-result-set row-column ( result-set n -- obj )
     >r result-set-handle r> sqlite-column ;
 
-M: sqlite-result-set row-column-typed ( result-set n type -- obj )
-    >r result-set-handle r> sqlite-column-typed ;
+M: sqlite-result-set row-column-typed ( result-set n -- obj )
+    dup pick result-set-out-params nth sql-spec-type
+    >r >r result-set-handle r> r> sqlite-column-typed ;
 
 M: sqlite-result-set advance-row ( result-set -- )
     [ result-set-handle sqlite-next ] keep

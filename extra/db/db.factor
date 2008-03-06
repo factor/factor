@@ -34,7 +34,7 @@ HOOK: db-close db ( handle -- )
 TUPLE: statement handle sql in-params out-params bind-params bound? ;
 TUPLE: simple-statement ;
 TUPLE: prepared-statement ;
-TUPLE: result-set sql params handle n max ;
+TUPLE: result-set sql in-params out-params handle n max ;
 : <statement> ( sql in out -- statement )
     { (>>sql) (>>in-params) (>>out-params) } statement construct ;
 
@@ -47,6 +47,7 @@ GENERIC: query-results ( query -- result-set )
 GENERIC: #rows ( result-set -- n )
 GENERIC: #columns ( result-set -- n )
 GENERIC# row-column 1 ( result-set n -- obj )
+GENERIC# row-column-typed 1 ( result-set n -- sql )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 
@@ -67,12 +68,15 @@ GENERIC: more-rows? ( result-set -- ? )
     0 >>n drop ;
 
 : <result-set> ( query handle tuple -- result-set )
-    >r >r { sql>> in-params>> } get-slots r>
-    { (>>sql) (>>params) (>>handle) } result-set
+    >r >r { sql>> in-params>> out-params>> } get-slots r>
+    { (>>sql) (>>in-params) (>>out-params) (>>handle) } result-set
     construct r> construct-delegate ;
 
 : sql-row ( result-set -- seq )
     dup #columns [ row-column ] with map ;
+
+: sql-row-typed ( result-set -- seq )
+    dup #columns [ row-column-typed ] with map ;
 
 : query-each ( statement quot -- )
     over more-rows? [

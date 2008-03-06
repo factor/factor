@@ -94,7 +94,6 @@ IN: db.sqlite.lib
         { TIMESTAMP [ sqlite-bind-text-by-name ] }
         { BLOB [ sqlite-bind-blob-by-name ] }
         { FACTOR-BLOB [
-            break
             [ serialize ] with-string-writer >byte-array
             sqlite-bind-blob-by-name
         ] }
@@ -115,13 +114,31 @@ IN: db.sqlite.lib
 : sqlite-column ( handle index -- string )
     sqlite3_column_text ;
 
+: sqlite-column-blob ( handle index -- byte-array/f )
+    [ sqlite3_column_bytes ] 2keep
+    pick zero? [
+        3drop f
+    ] [
+        sqlite3_column_blob swap memory>byte-array
+    ] if ;
+
 : sqlite-column-typed ( handle index type -- obj )
+    dup array? [ first ] when
     {
+        { +native-id+ [ sqlite3_column_int64 ] }
         { INTEGER [ sqlite3_column_int ] }
         { BIG-INTEGER [ sqlite3_column_int64 ] }
         { TEXT [ sqlite3_column_text ] }
+        { VARCHAR [ sqlite3_column_text ] }
         { DOUBLE [ sqlite3_column_double ] }
-        { TIMESTAMP [ sqlite3_column_double ] }
+        { DATE [ sqlite3_column_text dup [ ymd>timestamp ] when ] }
+        { TIME [ sqlite3_column_text dup [ hms>timestamp ] when ] }
+        { TIMESTAMP [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
+        { DATETIME [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
+        { BLOB [ sqlite-column-blob ] }
+        { FACTOR-BLOB [
+            sqlite-column-blob [ deserialize ] with-string-reader
+        ] }
         ! { NULL [ 2drop f ] }
         [ no-sql-type ]
     } case ;

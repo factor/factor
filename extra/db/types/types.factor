@@ -207,22 +207,3 @@ TUPLE: no-slot-named ;
         >r dup sql-spec-type swap sql-spec-slot-name r>
         get-slot-named swap
     ] curry { } map>assoc ;
-
-: sql-type>factor-type ( obj type -- obj )
-break
-    dup array? [ first ] when
-    {
-        { +native-id+ [ string>number ] }
-        { INTEGER [ string>number ] }
-        { DOUBLE [ string>number ] }
-        { REAL [ string>number ] }
-        { DATE [ dup [ ymd>timestamp ] when ] }
-        { TIME [ dup [ hms>timestamp ] when ] }
-        { DATETIME [ dup [ ymdhms>timestamp ] when ] }
-        { TIMESTAMP [ dup [ ymdhms>timestamp ] when ] }
-        { TEXT [ ] }
-        { VARCHAR [ ] }
-        { BLOB [ ] }
-        { FACTOR-BLOB [ break [ deserialize ] with-string-reader ] }
-        [ "no conversion from sql type to factor type" throw ]
-    } case ;

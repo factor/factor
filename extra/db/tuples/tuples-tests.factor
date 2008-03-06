@@ -61,11 +61,18 @@ SYMBOL: person4
     [ ] [ person3 get insert-tuple ] unit-test
 
     [
-        T{ person f 3 "teddy" 10 3.14
+        T{
+            person
+            f
+            3
+            "teddy"
+            10
+            3.14
             T{ timestamp f 2008 3 5 16 24 11 0 }
             T{ timestamp f 2008 11 22 f f f f }
             T{ timestamp f f f f 12 34 56 f }
-            "storeinablob" }
+            B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
+        }
     ] [ T{ person f 3 } select-tuple ] unit-test
 
     [ ] [ person drop-table ] unit-test ;
@@ -152,8 +159,8 @@ TUPLE: annotation n paste-id summary author mode contents ;
     >r { "localhost" "postgres" "" "factor-test" } postgresql-db r> with-db ;
 
 
-! [ native-person-schema test-tuples ] test-sqlite
-! [ assigned-person-schema test-tuples ] test-sqlite
+[ native-person-schema test-tuples ] test-sqlite
+[ assigned-person-schema test-tuples ] test-sqlite
 
 TUPLE: serialize-me id data ;
 [
@@ -166,7 +173,9 @@ TUPLE: serialize-me id data ;
     [ ] [ serialize-me create-table ] unit-test
 
     [ ] [ T{ serialize-me f f H{ { 1 2 } } } insert-tuple ] unit-test
-    [ ] [ T{ serialize-me f 1 } select-tuples ] unit-test
+    [
+        { T{ serialize-me f 1 H{ { 1 2 } } } }
+    ] [ T{ serialize-me f 1 } select-tuples ] unit-test
 ] test-sqlite
 
 ! [ make-native-person-table ] test-sqlite
