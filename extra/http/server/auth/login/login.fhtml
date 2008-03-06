@@ -1,0 +1,25 @@
+<html>
+<body>
+<h1>Login required</h1>
+
+<form method="POST" action="login">
+<table>
+
+<tr>
+<td>User name:</td>
+<td><input name="name" /></td>
+</tr>
+
+<tr>
+<td>Password:</td>
+<td><input type="password" name="password" /></td>
+</tr>
+
+</table>
+
+<input type="submit" value="Log in" />
+
+</form>
+
+</body>
+</html>

@@ -159,7 +159,7 @@ TUPLE: annotation n paste-id summary author mode contents ;
 ! ] with-db
 
 : test-sqlite ( quot -- )
-    >r "tuples-test.db" resource-path sqlite-db r> with-db ;
+    >r "tuples-test.db" temp-file sqlite-db r> with-db ;
 
 : test-postgresql ( -- )
     >r { "localhost" "postgres" "" "factor-test" } postgresql-db r> with-db ;
