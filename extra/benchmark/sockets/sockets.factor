@@ -1,4 +1,4 @@
-USING: io.sockets io kernel math threads
+USING: io.sockets io kernel math threads io.encodings.ascii
 debugger tools.time prettyprint concurrency.count-downs
 namespaces arrays continuations ;
 IN: benchmark.sockets
@@ -24,13 +24,13 @@ SYMBOL: counter
 
 : simple-server ( -- )
     [
-        server-addr <server> dup "server" set [
+        server-addr ascii <server> dup "server" set [
             server-loop
         ] with-disposal
     ] ignore-errors ;
 
 : simple-client ( -- )
-    server-addr <client> [
+    server-addr ascii <client> [
         CHAR: b write1 flush
         number-of-requests
         [ CHAR: a dup write1 flush read1 assert= ] times
@@ -38,7 +38,7 @@ SYMBOL: counter
     ] with-stream ;
 
 : stop-server ( -- )
-    server-addr <client> [
+    server-addr ascii <client> [
         CHAR: x write1
     ] with-stream ;
 

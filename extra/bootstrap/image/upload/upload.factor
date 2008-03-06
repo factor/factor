@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: bootstrap.image.upload
 USING: http.client crypto.md5 splitting assocs kernel io.files
-bootstrap.image sequences io namespaces io.launcher math ;
+bootstrap.image sequences io namespaces io.launcher math io.encodings.ascii ;
 
 SYMBOL: upload-images-destination
 
@@ -16,7 +16,7 @@ SYMBOL: upload-images-destination
 : boot-image-names images [ boot-image-name ] map ;
 
 : compute-checksums ( -- )
-    checksums [
+    checksums ascii [
         boot-image-names [ dup write bl file>md5str print ] each
     ] with-file-writer ;
 

@@ -102,21 +102,46 @@ DEFINE_PRIMITIVE(fread)
 		}
 		else
 		{
-			dpush(tag_object(memory_to_char_string(
-				(char *)(buf + 1),c)));
+			if(c != size)
+			{
+				REGISTER_UNTAGGED(buf);
+				F_BYTE_ARRAY *new_buf = allot_byte_array(c);
+				UNREGISTER_UNTAGGED(buf);
+				memcpy(new_buf + 1, buf + 1,c);
+				buf = new_buf;
+			}
+			dpush(tag_object(buf));
 			break;
 		}
 	}
 }
 
+DEFINE_PRIMITIVE(fputc)
+{
+	FILE *file = unbox_alien();
+	F_FIXNUM ch = to_fixnum(dpop());
+
+	for(;;)
+	{
+		if(fputc(ch,file) == EOF)
+		{
+			io_error();
+
+			/* Still here? EINTR */
+		}
+		else
+			break;
+	}
+}
+
 DEFINE_PRIMITIVE(fwrite)
 {
-	FILE* file = unbox_alien();
-	F_STRING* text = untag_string(dpop());
-	F_FIXNUM length = untag_fixnum_fast(text->length);
-	char* string = to_char_string(text,false);
+	FILE *file = unbox_alien();
+	F_BYTE_ARRAY *text = untag_byte_array(dpop());
+	F_FIXNUM length = array_capacity(text);
+	char *string = (char *)(text + 1);
 
-	if(string_capacity(text) == 0)
+	if(length == 0)
 		return;
 
 	for(;;)

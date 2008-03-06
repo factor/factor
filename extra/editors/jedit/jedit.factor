@@ -3,11 +3,11 @@
 USING: arrays definitions io kernel math
 namespaces parser prettyprint sequences strings words
 editors io.files io.sockets io.streams.string io.binary
-math.parser ;
+math.parser io.encodings.ascii ;
 IN: editors.jedit
 
 : jedit-server-info ( -- port auth )
-    home "/.jedit/server" path+ [
+    home "/.jedit/server" path+ ascii [
         readln drop
         readln string>number
         readln string>number

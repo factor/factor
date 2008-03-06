@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ascii io.files kernel math math.functions namespaces
-    project-euler.common sequences sequences.lib splitting ;
+    project-euler.common sequences sequences.lib splitting io.encodings.ascii ;
 IN: project-euler.042
 
 ! http://projecteuler.net/index.php?section=problems&id=42
@@ -31,7 +31,7 @@ IN: project-euler.042
 
 : source-042 ( -- seq )
     "extra/project-euler/042/words.txt" resource-path
-    file-contents [ quotable? ] subset "," split ;
+    ascii file-contents [ quotable? ] subset "," split ;
 
 : (triangle-upto) ( limit n -- )
     2dup nth-triangle > [

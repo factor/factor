@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.nonblocking
 USING: math kernel io sequences io.buffers io.timeouts generic
-sbufs system io.streams.lines io.streams.plain io.streams.duplex
+byte-vectors system io.streams.duplex io.encodings
 io.backend continuations debugger classes byte-arrays namespaces
-splitting dlists assocs ;
+splitting dlists assocs io.encodings.binary ;
 
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
@@ -38,16 +38,14 @@ GENERIC: close-handle ( handle -- )
 : <buffered-port> ( handle type -- port )
     default-buffer-size get <buffer> swap <port> ;
 
-: <reader> ( handle -- stream )
-    input-port <buffered-port> <line-reader> ;
+: <reader> ( handle -- input-port )
+    input-port <buffered-port> ;
 
-: <writer> ( handle -- stream )
-    output-port <buffered-port> <plain-writer> ;
+: <writer> ( handle -- output-port )
+    output-port <buffered-port> ;
 
-: handle>duplex-stream ( in-handle out-handle -- stream )
-    <writer>
-    [ >r <reader> r> <duplex-stream> ] [ ] [ dispose ]
-    cleanup ;
+: <reader&writer> ( read-handle write-handle -- input-port output-port )
+    swap <reader> [ swap <writer> ] [ ] [ dispose drop ] cleanup ;
 
 : pending-error ( port -- )
     dup port-error f rot set-port-error [ throw ] when* ;
@@ -73,7 +71,7 @@ GENERIC: (wait-to-read) ( port -- )
 M: input-port stream-read1
     dup wait-to-read1 [ buffer-pop ] unless-eof ;
 
-: read-step ( count port -- string/f )
+: read-step ( count port -- byte-array/f )
     [ wait-to-read ] 2keep
     [ dupd buffer> ] unless-eof nip ;
 
@@ -92,10 +90,10 @@ M: input-port stream-read
     >r 0 max >fixnum r>
     2dup read-step dup [
         pick over length > [
-            pick <sbuf>
+            pick <byte-vector>
             [ push-all ] keep
             [ read-loop ] keep
-            "" like
+            B{ } like
         ] [
             2nip
         ] if
@@ -103,7 +101,7 @@ M: input-port stream-read
         2nip
     ] if ;
 
-: read-until-step ( separators port -- string/f separator/f )
+: read-until-step ( separators port -- byte-array/f separator/f )
     dup wait-to-read1
     dup port-eof? [
         f swap set-port-eof? drop f f
@@ -111,7 +109,7 @@ M: input-port stream-read
         buffer-until
     ] if ;
 
-: read-until-loop ( seps port sbuf -- separator/f )
+: read-until-loop ( seps port byte-vector -- separator/f )
     2over read-until-step over [
         >r over push-all r> dup [
             >r 3drop r>
@@ -122,18 +120,20 @@ M: input-port stream-read
         >r 2drop 2drop r>
     ] if ;
 
-M: input-port stream-read-until ( seps port -- str/f sep/f )
+M: input-port stream-read-until ( seps port -- byte-array/f sep/f )
     2dup read-until-step dup [
         >r 2nip r>
     ] [
         over [
-            drop >sbuf [ read-until-loop ] keep "" like swap
+            drop >byte-vector
+            [ read-until-loop ] keep
+            B{ } like swap
         ] [
             >r 2nip r>
         ] if
     ] if ;
 
-M: input-port stream-read-partial ( max stream -- string/f )
+M: input-port stream-read-partial ( max stream -- byte-array/f )
     >r 0 max >fixnum r> read-step ;
 
 : can-write? ( len writer -- ? )
@@ -171,11 +171,11 @@ M: port dispose
     [ dup port-type >r closed over set-port-type r> close-port ]
     if ;
 
-TUPLE: server-port addr client ;
+TUPLE: server-port addr client client-addr encoding ;
 
-: <server-port> ( handle addr -- server )
-    >r f server-port <port> r>
-    { set-delegate set-server-port-addr }
+: <server-port> ( handle addr encoding -- server )
+    rot f server-port <port>
+    { set-server-port-addr set-server-port-encoding set-delegate }
     server-port construct ;
 
 : check-server-port ( port -- )

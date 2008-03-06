@@ -1,4 +1,4 @@
-USING: io io.files sequences xml xml.utilities ;
+USING: io io.files sequences xml xml.utilities io.encodings.utf8 ;
 IN: msxml-to-csv
 
 : print-csv ( table -- ) [ "," join print ] each ;
@@ -13,6 +13,6 @@ IN: msxml-to-csv
     ] map ;
 
 : msxml>csv ( infile outfile -- )
-    [
+    utf8 [
         file>xml (msxml>csv) print-csv
     ] with-file-writer ;

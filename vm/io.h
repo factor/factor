@@ -3,11 +3,12 @@ void io_error(void);
 int err_no(void);
 
 DECLARE_PRIMITIVE(fopen);
+DECLARE_PRIMITIVE(fgetc);
+DECLARE_PRIMITIVE(fread);
+DECLARE_PRIMITIVE(fputc);
 DECLARE_PRIMITIVE(fwrite);
 DECLARE_PRIMITIVE(fflush);
 DECLARE_PRIMITIVE(fclose);
-DECLARE_PRIMITIVE(fgetc);
-DECLARE_PRIMITIVE(fread);
 
 /* Platform specific primitives */
 DECLARE_PRIMITIVE(open_file);

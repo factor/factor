@@ -25,7 +25,7 @@ LOG: accepted-connection NOTICE
         >r accept r> [ with-client ] 2curry "Client" spawn drop
     ] 2keep accept-loop ; inline
 
-: server-loop ( addrspec quot -- )
+: server-loop ( addrspec encoding quot -- )
     >r <server> dup servers get push r>
     [ accept-loop ] curry with-disposal ; inline
 
@@ -39,12 +39,12 @@ PRIVATE>
 : internet-server ( port -- seq )
     f swap t resolve-host ;
 
-: with-server ( seq service quot -- )
+: with-server ( seq service encoding quot -- )
     V{ } clone [
-        servers [
-            [ server-loop ] curry with-logging
+        swap servers [
+            [ server-loop ] 2curry with-logging
         ] with-variable
-    ] 3curry parallel-each ; inline
+    ] 3curry curry parallel-each ; inline
 
 : stop-server ( -- )
     servers get [ dispose ] each ;

@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
-splitting continuations calendar vectors hashtables
-accessors ;
+splitting calendar continuations accessors vectors io.encodings.binary ;
 IN: http.client
 
 : parse-url ( url -- resource host port )
@@ -79,7 +78,7 @@ PRIVATE>
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
     swap http-get-stream check-response
-    [ swap <file-writer> stream-copy ] with-disposal ;
+    [ swap binary <file-writer> stream-copy ] with-disposal ;
 
 : download ( url -- )
     dup download-name download-to ;

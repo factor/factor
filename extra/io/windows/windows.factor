@@ -20,9 +20,6 @@ TUPLE: win32-file handle ptr ;
 
 C: <win32-file> win32-file
 
-: <win32-duplex-stream> ( in out -- stream )
-    >r f <win32-file> r> f <win32-file> handle>duplex-stream ;
-
 HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )
@@ -112,13 +109,13 @@ C: <FileArgs> FileArgs
     [ FileArgs-lpNumberOfBytesRet ] keep
     FileArgs-lpOverlapped ;
 
-M: windows-io <file-reader> ( path -- stream )
+M: windows-io (file-reader) ( path -- stream )
     open-read <win32-file> <reader> ;
 
-M: windows-io <file-writer> ( path -- stream )
+M: windows-io (file-writer) ( path -- stream )
     open-write <win32-file> <writer> ;
 
-M: windows-io <file-appender> ( path -- stream )
+M: windows-io (file-appender) ( path -- stream )
     open-append <win32-file> <writer> ;
 
 M: windows-io move-file ( from to -- )

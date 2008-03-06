@@ -538,6 +538,8 @@ set-primitive-effect
 
 \ fwrite { string alien } { } <effect> set-primitive-effect
 
+\ fputc { object alien } { } <effect> set-primitive-effect
+
 \ fread { integer string } { object } <effect> set-primitive-effect
 
 \ fflush { alien } { } <effect> set-primitive-effect

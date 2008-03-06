@@ -1,6 +1,6 @@
 USING: xmode.loader xmode.utilities xmode.rules namespaces
 strings splitting assocs sequences kernel io.files xml memoize
-words globs combinators ;
+words globs combinators io.encodings.utf8 ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
@@ -25,7 +25,7 @@ TAGS>
 
 : load-catalog ( -- modes )
     "extra/xmode/modes/catalog" resource-path
-    <file-reader> read-xml parse-modes-tag ;
+    file>xml parse-modes-tag ;
 
 : modes ( -- assoc )
     \ modes get-global [
@@ -38,7 +38,7 @@ TAGS>
 MEMO: (load-mode) ( name -- rule-sets )
     modes at mode-file
     "extra/xmode/modes/" swap append
-    resource-path <file-reader> parse-mode ;
+    resource-path utf8 <file-reader> parse-mode ;
 
 SYMBOL: rule-sets
 

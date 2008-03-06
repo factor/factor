@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays calendar io io.sockets kernel match namespaces
-sequences splitting strings continuations threads ascii ;
+sequences splitting strings continuations threads ascii
+io.encodings.utf8 ;
 IN: irc
 
 ! "setup" objects
@@ -97,7 +98,7 @@ SYMBOL: irc-client
     " hostname servername :irc.factor" irc-print ;
 
 : connect* ( server port -- )
-    <inet> <client> irc-client get set-irc-client-stream ;
+    <inet> utf8 <client> irc-client get set-irc-client-stream ;
 
 : connect ( server -- ) 6667 connect* ;
 

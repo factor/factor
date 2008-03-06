@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files kernel namespaces sequences system
-tools.deploy.backend tools.deploy.config assocs hashtables
-prettyprint cocoa cocoa.application cocoa.classes cocoa.plists ;
+USING: io io.files kernel namespaces sequences
+system tools.deploy.backend tools.deploy.config assocs
+hashtables prettyprint io.unix.backend cocoa io.encodings.utf8
+cocoa.application cocoa.classes cocoa.plists qualified ;
 IN: tools.deploy.macosx
 
 : bundle-dir ( -- dir )
@@ -32,8 +33,8 @@ IN: tools.deploy.macosx
     ] H{ } make-assoc print-plist ;
 
 : create-app-plist ( vocab bundle-name -- )
-    dup "Contents/Info.plist" path+ <file-writer>
-    [ print-app-plist ] with-stream ;
+    dup "Contents/Info.plist" path+
+    utf8 [ print-app-plist ] with-file-writer ;
 
 : create-app-dir ( vocab bundle-name -- vm )
     dup "Frameworks" copy-bundle-dir

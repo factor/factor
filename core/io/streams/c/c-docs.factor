@@ -6,7 +6,6 @@ ARTICLE: "io.streams.c" "ANSI C streams"
 "C streams are found in the " { $vocab-link "io.streams.c" } " vocabulary; they are " { $link "stream-protocol" } " implementations which read and write C " { $snippet "FILE*" } " handles."
 { $subsection <c-reader> }
 { $subsection <c-writer> }
-{ $subsection <duplex-c-stream> }
 "Underlying primitives used to implement the above:"
 { $subsection fopen }
 { $subsection fwrite }
@@ -30,10 +29,6 @@ HELP: <c-writer> ( out -- stream )
 { $values { "out" "a C FILE* handle" } { "stream" "a new stream" } }
 { $description "Creates a stream which writes data by calling C standard library functions." }
 { $notes "Usually C streams are only used during bootstrap, and non-blocking OS-specific I/O routines are used during normal operation." } ;
-
-HELP: <duplex-c-stream>
-{ $values { "in" "a C FILE* handle" } { "out" "a C FILE* handle" } { "stream" "a new stream" } }
-{ $description "Creates a stream which reads and writes data by calling C standard library functions, wrapping the input portion in a " { $link line-reader } " and the output portion in a " { $link plain-writer } "." } ;
 
 HELP: fopen ( path mode -- alien )
 { $values { "path" "a pathname string" } { "mode" "an access mode specifier" } { "alien" "a C FILE* handle" } }

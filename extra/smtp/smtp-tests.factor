@@ -84,6 +84,7 @@ IN: smtp.tests
 
 [ ] [
     [
+        "localhost" smtp-host set
         4321 smtp-port set
 
         "Hi guys\nBye guys"

@@ -7,7 +7,7 @@ strings sbufs vectors words quotations assocs system layouts
 splitting growable classes tuples words.private
 io.binary io.files vocabs vocabs.loader source-files
 definitions debugger float-arrays quotations.private
-sequences.private combinators ;
+sequences.private combinators io.encodings.binary ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
@@ -416,7 +416,7 @@ M: curry '
     "Writing image to " write
     architecture get boot-image-name resource-path
     dup write "..." print flush
-    [ (write-image) ] with-file-writer ;
+    binary <file-writer> [ (write-image) ] with-stream ;
 
 PRIVATE>
 

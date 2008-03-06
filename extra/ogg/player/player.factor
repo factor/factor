@@ -14,7 +14,8 @@ USING: kernel alien ogg ogg.vorbis ogg.theora io byte-arrays
        sequences libc shuffle alien.c-types system openal math
        namespaces threads shuffle opengl arrays ui.gadgets.worlds
        combinators math.parser ui.gadgets ui.render opengl.gl ui
-       continuations io.files hints combinators.lib sequences.lib debugger ;
+       continuations io.files hints combinators.lib sequences.lib
+       io.encodings.binary debugger ;
 
 IN: ogg.player
 
@@ -611,7 +612,7 @@ M: theora-gadget draw-gadget* ( gadget -- )
     <player> play-ogg ;
 
 : play-vorbis-file ( filename -- )
-    <file-reader> play-vorbis-stream ;
+    binary <file-reader> play-vorbis-stream ;
 
 : play-theora-stream ( stream -- )
     <player>
@@ -619,5 +620,5 @@ M: theora-gadget draw-gadget* ( gadget -- )
     play-ogg ;
 
 : play-theora-file ( filename -- )
-    <file-reader> play-theora-stream ;
+    binary <file-reader> play-theora-stream ;
 

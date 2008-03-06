@@ -6,7 +6,7 @@ continuations math definitions mirrors splitting parser classes
 inspector layouts vocabs.loader prettyprint.config prettyprint
 debugger io.streams.c io.streams.duplex io.files io.backend
 quotations io.launcher words.private tools.deploy.config
-bootstrap.image ;
+bootstrap.image io.encodings.utf8 ;
 IN: tools.deploy.backend
 
 : (copy-lines) ( stream -- )
@@ -20,7 +20,7 @@ IN: tools.deploy.backend
     [
         +arguments+ set
         +stdout+ +stderr+ set
-    ] H{ } make-assoc <process-stream>
+    ] H{ } make-assoc utf8 <process-stream>
     dup duplex-stream-out dispose
     dup copy-lines
     process-stream-process wait-for-process zero? [
