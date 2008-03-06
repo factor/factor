@@ -8,10 +8,10 @@ IN: semantic-db.type
 !  - have a context in context 'semantic-db'
 
 : assign-type ( type nid -- arc-id )
-    has-type-relation spin create-arc ;
+    has-type-relation spin arc-id ;
 
 : create-node-of-type ( type content -- node-id )
-    create-node [ assign-type drop ] keep ;
+    node-id [ assign-type drop ] keep ;
 
 : select-nodes-of-type ( type -- node-ids )
     ":type" INTEGER param
@@ -33,7 +33,7 @@ IN: semantic-db.type
     single-int-results ;
 
 : select-node-of-type-with-content ( type content -- node-id/f )
-    select-nodes-of-type-with-content 1result ;
+    select-nodes-of-type-with-content ?first ;
 
 : ensure-node-of-type ( type content -- node-id )
     [ select-node-of-type-with-content ] [ create-node-of-type ] ensure2 ;

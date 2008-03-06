@@ -1,19 +1,16 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel semantic-db semantic-db.type ;
+USING: kernel namespaces semantic-db ;
 IN: semantic-db.context
 
-! contexts:
-!  - have type 'context' in context 'semantic-db'
+: create-context* ( context-name -- context-id ) create-node* ;
+: create-context ( context-name -- ) create-context* drop ;
 
-: current-context ( -- context-id )
-    \ current-context get ;
+: context ( -- context-id )
+    \ context get ;
 
-: set-current-context ( context-id -- )
-    \ current-context set ;
+: set-context ( context-id -- )
+    \ context set ;
 
-: context-id ( name -- context-id )
-    context-type swap ensure-node-of-type ;
-
-: with-context ( name quot -- )
-    swap context-id [ set-current-context ] curry swap compose with-scope ;
+: with-context ( context-id quot -- )
+    >r \ context r> with-variable ;

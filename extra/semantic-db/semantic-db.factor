@@ -7,6 +7,9 @@ TUPLE: node id content ;
 : <node> ( content -- node )
     node construct-empty swap >>content ;
 
+: <id-node> ( id -- node )
+    node construct-empty swap >>id ;
+
 node "node"
 {
     { "id" "id" +native-id+ +autoincrement+ }
@@ -16,13 +19,37 @@ node "node"
 : create-node-table ( -- )
     node create-table ;
 
-: create-node ( content -- id )
+: delete-node ( node-id -- )
+    <id-node> delete-tuple ;
+
+: create-node* ( str -- node-id )
     <node> dup insert-tuple id>> ;
+
+: create-node ( str -- )
+    create-node* drop ;
+
+: node-content ( id -- str )
+    f <node> swap >>id select-tuple content>> ;
 
 TUPLE: arc id relation subject object ;
 
 : <arc> ( relation subject object -- arc )
     arc construct-empty swap >>object swap >>subject swap >>relation ;
+
+: <id-arc> ( id -- arc )
+    arc construct-empty swap >>id ;
+
+: insert-arc ( arc -- )
+    f <node> dup insert-tuple id>> >>id insert-tuple ;
+
+: delete-arc ( arc-id -- )
+    dup delete-node <id-arc> delete-tuple ;
+
+: create-arc* ( relation subject object -- arc-id )
+    <arc> dup insert-arc id>> ;
+
+: create-arc ( relation subject object -- )
+    create-arc* drop ;
 
 arc "arc"
 {
@@ -35,47 +62,15 @@ arc "arc"
 : create-arc-table ( -- )
     arc create-table ;
 
-: insert-arc ( arc -- )
-    f <node> dup insert-tuple id>> >>id insert-tuple ;
-
-: delete-arc ( arc -- )
-    dup delete-tuple delegate delete-tuple ;
-
-: create-arc ( relation subject object -- id )
-    <arc> dup insert-arc id>> ;
-
 : create-bootstrap-nodes ( -- )
-    { "context" "type" "relation" "has type" "semantic-db" "has context" }
-    [ create-node drop ] each ;
+    "semantic-db" create-node
+    "has context" create-node ;
 
-! TODO: maybe put these in a 'special nodes' table
-: context-type 1 ; inline
-: type-type 2 ; inline
-: relation-type 3 ; inline
-: has-type-relation 4 ; inline
-: semantic-db-context 5 ; inline
-: has-context-relation 6 ; inline
-
-: has-semantic-db-context ( id -- )
-    has-context-relation swap semantic-db-context create-arc drop ;
-
-: has-type-in-semantic-db ( subject type -- )
-    has-type-relation -rot create-arc drop ;
+: semantic-db-context 1 ;
+: has-context-relation 2 ;
 
 : create-bootstrap-arcs ( -- )
-    ! give everything a type
-    context-type type-type has-type-in-semantic-db
-    type-type type-type has-type-in-semantic-db
-    relation-type type-type has-type-in-semantic-db
-    has-type-relation relation-type has-type-in-semantic-db
-    semantic-db-context context-type has-type-in-semantic-db
-    has-context-relation relation-type has-type-in-semantic-db
-    ! give relations and types the semantic-db context
-    context-type has-semantic-db-context
-    type-type has-semantic-db-context
-    relation-type has-semantic-db-context
-    has-type-relation has-semantic-db-context
-    has-context-relation has-semantic-db-context ;
+    has-context-relation has-context-relation semantic-db-context create-arc ;    
 
 : init-semantic-db ( -- )
     create-node-table create-arc-table create-bootstrap-nodes create-bootstrap-arcs ;
