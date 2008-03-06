@@ -179,8 +179,7 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
             " where " 0%
             [ ", " 0% ]
             [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
-            ";" 0%
-        ] if
+        ] if ";" 0%
     ] sqlite-make ;
 
 M: sqlite-db modifier-table ( -- hashtable )
@@ -209,8 +208,13 @@ M: sqlite-db type-table ( -- assoc )
         { INTEGER "integer" }
         { TEXT "text" }
         { VARCHAR "text" }
+        { DATE "date" }
+        { TIME "time" }
+        { DATETIME "datetime" }
         { TIMESTAMP "timestamp" }
         { DOUBLE "real" }
+        { BLOB "blob" }
+        { FACTOR-BLOB "blob" }
     } ;
 
 M: sqlite-db create-type-table
