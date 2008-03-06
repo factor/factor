@@ -218,10 +218,10 @@ M: pathname <=> [ pathname-string ] compare ;
     dupd <file-reader> swap file-length <sbuf>
     [ stream-copy ] keep >string ;
 
-: with-file-reader ( path quot -- )
+: with-file-reader ( path encoding quot -- )
     >r <file-reader> r> with-stream ; inline
 
-: with-file-writer ( path quot -- )
+: with-file-writer ( path encoding quot -- )
     >r <file-writer> r> with-stream ; inline
 
 : with-file-appender ( path encoding quot -- )
