@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables io io.streams.string kernel math namespaces
 math.parser assocs sequences strings splitting ascii
-io.encodings.utf8 io.encodings io.encodings.string namespaces
+io.encodings.utf8 io.encodings.string namespaces
 unicode.case combinators vectors sorting new-slots accessors
 calendar calendar.format quotations arrays ;
 IN: http
@@ -18,7 +18,7 @@ IN: http
     swap "/_-." member? or ; foldable
 
 : push-utf8 ( ch -- )
-    1string utf8 encode-string [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each ;
+    1string utf8 encode [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each ;
 
 : url-encode ( str -- str )
     [ [
@@ -50,7 +50,7 @@ IN: http
     ] if ;
 
 : url-decode ( str -- str )
-    [ 0 swap url-decode-iter ] "" make utf8 decode-string ;
+    [ 0 swap url-decode-iter ] "" make utf8 decode ;
 
 : crlf "\r\n" write ;
 

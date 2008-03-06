@@ -36,7 +36,7 @@ TUPLE: x-clipboard atom contents ;
     >r XSelectionEvent-property zero? [
         r> drop f
     ] [
-        r> selection-property 1 window-property utf8 decode-string
+        r> selection-property 1 window-property utf8 decode
     ] if ;
 
 : own-selection ( prop win -- )

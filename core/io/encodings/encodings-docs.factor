@@ -7,7 +7,6 @@ ARTICLE: "io.encodings" "I/O encodings"
 "Many streams deal with bytes, rather than Unicode code points, at some level. The translation between these two things is specified by an encoding. To abstract this away from the programmer, Factor provides a system where these streams are associated with an encoding which is always used when the stream is read from or written to. For most purposes, an encoding descriptor consisting of a symbol is all that is needed when initializing a stream."
 { $subsection "encodings-constructors" }
 { $subsection "encodings-descriptors" }
-{ $subsection "encodings-string" }
 { $subsection "encodings-protocol" } ;
 
 ARTICLE: "encodings-constructors" "Constructing an encoded stream"
@@ -47,10 +46,6 @@ ARTICLE: "encodings-protocol" "Encoding protocol"
 "An encoding descriptor must implement the following methods. The methods are implemented on tuple classes by instantiating the class and calling the method again."
 { $subsection decode-step }
 { $subsection init-decoder }
-{ $subsection encode-string } ;
-
-ARTICLE: "encodings-string" "Encoding and decoding strings"
-"Strings can be encoded and decoded with the following words:"
 { $subsection encode-string } ;
 
 HELP: decode-step ( buf char encoding -- )

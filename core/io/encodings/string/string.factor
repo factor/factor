@@ -1,5 +1,8 @@
-USING: io.encodings io io.streams.byte-array ;
+USING: io io.streams.byte-array ;
 IN: io.encodings.string
 
-: decode-string ( byte-array encoding -- string )
+: decode ( byte-array encoding -- string )
     <byte-reader> contents ;
+
+: encode ( string encoding -- byte-array )
+    [ write ] with-byte-writer ;
