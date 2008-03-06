@@ -60,29 +60,28 @@ M: utf8 init-decoder nip begin over set-utf8-state ;
 ! Encoding UTF-8
 
 : encoded ( char -- )
-    BIN: 111111 bitand BIN: 10000000 bitor , ;
+    BIN: 111111 bitand BIN: 10000000 bitor write1 ;
 
 : char>utf8 ( char -- )
     {
-        { [ dup -7 shift zero? ] [ , ] }
+        { [ dup -7 shift zero? ] [ write1 ] }
         { [ dup -11 shift zero? ] [
-            dup -6 shift BIN: 11000000 bitor ,
+            dup -6 shift BIN: 11000000 bitor write1
             encoded
         ] }
         { [ dup -16 shift zero? ] [
-            dup -12 shift BIN: 11100000 bitor ,
+            dup -12 shift BIN: 11100000 bitor write1
             dup -6 shift encoded
             encoded
         ] }
         { [ t ] [
-            dup -18 shift BIN: 11110000 bitor ,
+            dup -18 shift BIN: 11110000 bitor write1
             dup -12 shift encoded
             dup -6 shift encoded
             encoded
         ] }
     } cond ;
 
-: encode-utf8 ( str -- seq )
-    [ [ char>utf8 ] each ] B{ } make ;
-
-M: utf8 encode-string drop encode-utf8 ;
+M: utf8 stream-write-encoded
+    ! For efficiency, this should be modified to avoid variable reads
+    drop [ [ char>utf8 ] each ] with-stream* ;

@@ -106,25 +106,28 @@ M: utf16le init-decoder nip begin over set-utf16le-state ;
 : char>utf16be ( char -- )
     dup HEX: FFFF > [
         HEX: 10000 -
-        dup encode-first swap , ,
-        encode-second swap , ,
-    ] [ h>b/b , , ] if ;
+        dup encode-first swap write1 write1
+        encode-second swap write1 write1
+    ] [ h>b/b write1 write1 ] if ;
 
-: encode-utf16be ( str -- seq )
-    [ [ char>utf16be ] each ] B{ } make ;
+: stream-write-utf16be ( string stream -- )
+    [ [ char>utf16be ] each ] with-stream* ;
+
+M: utf16be stream-write-encoded ( string stream encoding -- )
+    drop stream-write-utf16be ;
 
 : char>utf16le ( char -- )
     dup HEX: FFFF > [
         HEX: 10000 -
-        dup encode-first , ,
-        encode-second , ,
-    ] [ h>b/b swap , , ] if ; 
+        dup encode-first write1 write1
+        encode-second write1 write1
+    ] [ h>b/b swap write1 write1 ] if ; 
 
-: encode-utf16le ( str -- seq )
-    [ [ char>utf16le ] each ] B{ } make ;
+: stream-write-utf16le ( string stream -- )
+    [ [ char>utf16le ] each ] with-stream* ;
 
-M: utf16le encode-string drop encode-utf16le ;
-M: utf16be encode-string drop encode-utf16be ;
+M: utf16le stream-write-encoded ( string stream encoding -- )
+    drop stream-write-utf16le ;
 
 ! UTF-16
 
@@ -132,19 +135,16 @@ M: utf16be encode-string drop encode-utf16be ;
 
 : bom-be B{ HEX: fe HEX: ff } ; inline
 
-: encode-utf16 ( str -- seq )
-    encode-utf16le bom-le swap append ;
-
 : start-utf16le? ( seq1 -- seq2 ? ) bom-le ?head ;
 
 : start-utf16be? ( seq1 -- seq2 ? ) bom-be ?head ;
 
 TUPLE: utf16 started? ;
 
-M: utf16 encode-string
-    >r encode-utf16le r>
+M: utf16 stream-write-encoded
     dup utf16-started? [ drop ]
-    [ t swap set-utf16-started? bom-le swap append ] if ;
+    [ t swap set-utf16-started? bom-le over stream-write ] if
+    stream-write-utf16le ;
 
 : bom>le/be ( bom -- le/be )
     dup bom-le sequence= [ drop utf16le ] [

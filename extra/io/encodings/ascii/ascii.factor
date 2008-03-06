@@ -3,13 +3,13 @@
 USING: io io.encodings strings kernel math sequences byte-arrays io.encodings ;
 IN: io.encodings.ascii
 
-: encode-check<= ( string max -- byte-array )
-    dupd [ <= ] curry all? [ >byte-array ] [ encode-error ] if ;
+: encode-check<= ( string stream max -- )
+    [ pick > [ encode-error ] [ stream-write1 ] if ] 2curry each ;
 
 TUPLE: ascii ;
 
-M: ascii encode-string
+M: ascii stream-write-encoded ( string stream encoding -- )
     drop 127 encode-check<= ;
 
 M: ascii decode-step
-    drop dup 128 >= [ encode-error ] [ swap push ] if ;
+    drop dup 128 >= [ decode-error ] [ swap push ] if ;

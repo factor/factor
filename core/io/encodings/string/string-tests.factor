@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
 USING: strings io.encodings.utf8 io.encodings.utf16
 io.encodings.string tools.test ;
 IN: io.encodings.string.tests

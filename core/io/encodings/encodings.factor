@@ -15,9 +15,8 @@ GENERIC: init-decoder ( stream encoding -- encoding )
 M: tuple-class init-decoder construct-empty init-decoder ;
 M: object init-decoder nip ;
 
-GENERIC: encode-string ( string encoding -- byte-array )
-M: tuple-class encode-string construct-empty encode-string ;
-M: object encode-string drop >byte-array ;
+GENERIC: stream-write-encoded ( string stream encoding -- byte-array )
+M: object stream-write-encoded drop stream-write ;
 
 ! Decoding
 
@@ -136,7 +135,7 @@ M: encoder stream-write1
     >r 1string r> stream-write ;
 
 M: encoder stream-write
-    [ encoder-code encode-string ] keep delegate stream-write ;
+    { delegate encoder-code } get-slots stream-write-encoded ;
 
 M: encoder dispose delegate dispose ;
 

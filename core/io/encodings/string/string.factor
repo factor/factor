@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
 USING: io io.streams.byte-array ;
 IN: io.encodings.string
 
