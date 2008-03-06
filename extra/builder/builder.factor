@@ -39,7 +39,7 @@ IN: builder
 
 : record-git-id ( -- ) git-id "../git-id" [ . ] with-file-writer ;
 
-: do-make-clean ( -- desc ) { "make" "clean" } try-process ;
+: do-make-clean ( -- ) { "make" "clean" } try-process ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
