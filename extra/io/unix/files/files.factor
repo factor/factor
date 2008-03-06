@@ -89,3 +89,12 @@ M: unix-io file-info ( path -- info )
         [ stat-st_mtim timespec-sec seconds unix-1970 time+ ]
     } cleave
     \ file-info construct-boa ;
+
+M: unix-io link-info ( path -- info )
+    lstat* {
+        [ stat>type ]
+        [ stat-st_size ]
+        [ stat-st_mode ]
+        [ stat-st_mtim timespec-sec seconds unix-1970 time+ ]
+    } cleave
+    \ file-info construct-boa ;
