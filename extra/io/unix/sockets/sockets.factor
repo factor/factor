@@ -42,7 +42,7 @@ M: connect-task do-io-task
 : wait-to-connect ( port -- )
     [ <connect-task> add-io-task ] with-port-continuation drop ;
 
-M: unix-io (client) ( addrspec -- stream )
+M: unix-io (client) ( addrspec -- client-in client-out )
     dup make-sockaddr/size >r >r
     protocol-family SOCK_STREAM socket-fd
     dup r> r> connect
@@ -71,10 +71,10 @@ TUPLE: accept-task ;
     dup <c-object> [ swap heap-size <int> accept ] keep ; inline
 
 : do-accept ( port fd sockaddr -- )
-    rot [
-        server-port-addr parse-sockaddr
-        swap dup <reader&writer> <duplex-stream> <client-stream>
-    ] keep set-server-port-client ;
+    rot
+    [ server-port-addr parse-sockaddr ] keep
+    [ set-server-port-client-addr ] keep
+    set-server-port-client ;
 
 M: accept-task do-io-task
     io-task-port dup accept-sockaddr
@@ -95,13 +95,13 @@ M: unix-io (server) ( addrspec -- handle )
     SOCK_STREAM server-fd
     dup 10 listen zero? [ dup close (io-error) ] unless ;
 
-M: unix-io (accept) ( server -- client-in client-out )
+M: unix-io (accept) ( server -- addrspec handle )
     #! Wait for a client connection.
     dup check-server-port
     dup wait-to-accept
     dup pending-error
-    server-port-client
-    { duplex-stream-in duplex-stream-out } get-slots ;
+    dup server-port-client-addr
+    swap server-port-client ;
 
 ! Datagram sockets - UDP and Unix domain
 M: unix-io <datagram>
