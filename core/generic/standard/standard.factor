@@ -69,7 +69,7 @@ TUPLE: no-method object generic ;
     ] if ;
 
 : default-method ( word -- pair )
-    "default-method" word-prop method-word
+    "default-method" word-prop
     object bootstrap-word swap 2array ;
 
 : method-alist>quot ( alist base-class -- quot )

@@ -10,8 +10,7 @@ IN: inference.backend
     recursive-state get at ;
 
 : inline? ( word -- ? )
-    dup "method" word-prop
-    [ method-generic inline? ] [ "inline" word-prop ] ?if ;
+    dup "method-generic" word-prop swap or "inline" word-prop ;
 
 : local-recursive-state ( -- assoc )
     recursive-state get dup keys
