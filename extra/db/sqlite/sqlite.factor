@@ -142,6 +142,10 @@ M: sqlite-db <insert-assigned-statement> ( tuple -- statement )
     " where " 0%
     find-primary-key dup sql-spec-column-name 0% " = " 0% bind% ;
 
+: where-clause ( specs -- )
+    " where " 0%
+    [ " and " 0% ] [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave ;
+
 M: sqlite-db <update-tuple-statement> ( class -- statement )
     [
         "update " 0%
@@ -174,13 +178,7 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
 
         " from " 0% 0%
         [ sql-spec-slot-name swap get-slot-named ] with subset
-        dup empty? [
-            drop
-        ] [
-            " where " 0%
-            [ ", " 0% ]
-            [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
-        ] if ";" 0%
+        dup empty? [ drop ] [ where-clause ] if ";" 0%
     ] sqlite-make ;
 
 M: sqlite-db modifier-table ( -- hashtable )

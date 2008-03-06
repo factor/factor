@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.tuples
 db.types continuations namespaces db.postgresql math
-prettyprint tools.walker db.sqlite calendar ;
+prettyprint tools.walker db.sqlite calendar
+math.intervals ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real ts date time blob ;
-: <person> ( name age real -- person )
+: <person> ( name age real ts date time blob -- person )
     {
         set-person-the-name
         set-person-the-number
@@ -17,7 +18,7 @@ TUPLE: person the-id the-name the-number the-real ts date time blob ;
         set-person-blob
     } person construct ;
 
-: <assigned-person> ( id name number the-real -- obj )
+: <assigned-person> ( id name age real ts date time blob -- person )
     <person> [ set-person-the-id ] keep ;
 
 SYMBOL: person1
@@ -53,6 +54,12 @@ SYMBOL: person4
             T{ person f 2 "johnny" 10 3.14 }
         }
     ] [ T{ person f } select-tuples ] unit-test
+
+    [
+        {
+            T{ person f 2 "johnny" 10 3.14 }
+        }
+    ] [ T{ person f f f 10 3.14 } select-tuples ] unit-test
 
 
     [ ] [ person1 get delete-tuple ] unit-test
@@ -151,19 +158,18 @@ TUPLE: annotation n paste-id summary author mode contents ;
     ! [ ] [ annotation create-table ] unit-test
 ! ] with-db
 
-
 : test-sqlite ( quot -- )
     >r "tuples-test.db" resource-path sqlite-db r> with-db ;
 
 : test-postgresql ( -- )
     >r { "localhost" "postgres" "" "factor-test" } postgresql-db r> with-db ;
 
-
 [ native-person-schema test-tuples ] test-sqlite
 [ assigned-person-schema test-tuples ] test-sqlite
 
 TUPLE: serialize-me id data ;
-[
+
+: test-serialize ( -- )
     serialize-me "SERIALIZED"
     {
         { "id" "ID" +native-id+ }
@@ -175,7 +181,31 @@ TUPLE: serialize-me id data ;
     [ ] [ T{ serialize-me f f H{ { 1 2 } } } insert-tuple ] unit-test
     [
         { T{ serialize-me f 1 H{ { 1 2 } } } }
-    ] [ T{ serialize-me f 1 } select-tuples ] unit-test
-] test-sqlite
+    ] [ T{ serialize-me f 1 } select-tuples ] unit-test ;
 
-! [ make-native-person-table ] test-sqlite
+! [ test-serialize ] test-sqlite
+
+TUPLE: exam id name score ; 
+
+: test-ranges ( -- )
+    exam "EXAM"
+    {
+        { "id" "ID" +native-id+ }
+        { "name" "NAME" TEXT }
+        { "score" "SCORE" INTEGER }
+    } define-persistent
+    [ exam drop-table ] [ drop ] recover
+    [ ] [ exam create-table ] unit-test
+
+    [ ] [ T{ exam f f "Kyle" 100 } insert-tuple ] unit-test
+    [ ] [ T{ exam f f "Stan" 80 } insert-tuple ] unit-test
+    [ ] [ T{ exam f f "Kenny" 60 } insert-tuple ] unit-test
+    [ ] [ T{ exam f f "Cartman" 41 } insert-tuple ] unit-test
+
+    [
+        T{ exam f 3 "Kenny" 60 }
+        T{ exam f 4 "Cartman" 41 }
+    ] [ T{ exam f 4 f T{ interval f { 0 t } { 70 t } } } select-tuples ] unit-test
+    ;
+
+! [ test-ranges ] test-sqlite
