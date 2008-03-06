@@ -1,11 +1,12 @@
 IN: http.server.auth.providers.db.tests
 USING: http.server.auth.providers
 http.server.auth.providers.db tools.test
-namespaces db db.sqlite db.tuples continuations ;
+namespaces db db.sqlite db.tuples continuations
+io.files ;
 
 db-auth-provider "provider" set
 
-"auth-test.db" sqlite-db [
+"auth-test.db" temp-file sqlite-db [
     
     [ user drop-table ] ignore-errors
     [ user create-table ] ignore-errors
