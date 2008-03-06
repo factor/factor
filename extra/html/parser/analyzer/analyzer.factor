@@ -1,6 +1,5 @@
 USING: assocs html.parser kernel math sequences strings ascii
-arrays shuffle unicode.case namespaces splitting
-http.server.responders ;
+arrays shuffle unicode.case namespaces splitting http ;
 IN: html.parser.analyzer
 
 : remove-blank-text ( vector -- vector' )
@@ -82,8 +81,8 @@ IN: html.parser.analyzer
 : href-contains? ( str tag -- ? )
     tag-attributes "href" swap at* [ subseq? ] [ 2drop f ] if ;
 
-: query>hash* ( str -- hash )
-    "?" split1 nip query>hash ;
+: query>assoc* ( str -- hash )
+    "?" split1 nip query>assoc ;
 
 ! clear "http://fark.com" http-get parse-html find-links [ "go.pl" swap start ] subset [ "=" split peek ] map
 
@@ -91,5 +90,5 @@ IN: html.parser.analyzer
 ! "a" over find-opening-tags-by-name
 ! [ nip "shipposition.phtml?call=GBTT" swap href-contains? ] assoc-subset
 ! first first 8 + over nth
-! tag-attributes "href" swap at query>hash*
+! tag-attributes "href" swap at query>assoc*
 ! "lat" over at "lon" rot at

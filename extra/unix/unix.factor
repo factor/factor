@@ -21,6 +21,7 @@ TYPEDEF: ulong size_t
 
 : MAP_FAILED -1 <alien> ; inline
 
+: ESRCH 3 ; inline
 : EEXIST 17 ; inline
 
 ! ! ! Unix functions

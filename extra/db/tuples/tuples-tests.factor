@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.tuples
-db.types continuations namespaces db.postgresql math
+db.types continuations namespaces math
 prettyprint tools.walker db.sqlite calendar
 math.intervals ;
 IN: db.tuples.tests
@@ -161,8 +161,8 @@ TUPLE: annotation n paste-id summary author mode contents ;
 : test-sqlite ( quot -- )
     >r "tuples-test.db" temp-file sqlite-db r> with-db ;
 
-: test-postgresql ( -- )
-    >r { "localhost" "postgres" "" "factor-test" } postgresql-db r> with-db ;
+! : test-postgresql ( -- )
+!    >r { "localhost" "postgres" "" "factor-test" } postgresql-db r> with-db ;
 
 [ native-person-schema test-tuples ] test-sqlite
 [ assigned-person-schema test-tuples ] test-sqlite

@@ -31,7 +31,8 @@ M: output-task io-task-filter drop EVFILT_WRITE ;
     swap io-task-filter over set-kevent-filter ;
 
 : register-kevent ( kevent mx -- )
-    mx-fd swap 1 f 0 f kevent io-error ;
+    mx-fd swap 1 f 0 f kevent
+    0 < [ err_no ESRCH = [ (io-error) ] unless ] when ;
 
 M: kqueue-mx register-io-task ( task mx -- )
     over EV_ADD make-kevent over register-kevent
