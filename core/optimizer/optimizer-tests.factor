@@ -293,7 +293,7 @@ TUPLE: silly-tuple a b ;
 [ ] [ [ <tuple> ] dataflow optimize drop ] unit-test
 
 ! Make sure we have sane heuristics
-: should-inline? method method-word flat-length 10 <= ;
+: should-inline? method flat-length 10 <= ;
 
 [ t ] [ \ fixnum \ shift should-inline? ] unit-test
 [ f ] [ \ array \ equal? should-inline? ] unit-test

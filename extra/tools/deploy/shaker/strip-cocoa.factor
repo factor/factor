@@ -1,5 +1,6 @@
 USING: cocoa cocoa.messages cocoa.application cocoa.nibs
-assocs namespaces kernel words compiler sequences ui.cocoa ;
+assocs namespaces kernel words compiler.units sequences
+ui.cocoa ;
 
 "stop-after-last-window?" get
 global [

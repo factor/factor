@@ -1,39 +1,61 @@
-USING: webapps.file http.server.responders http
-http.server namespaces io tools.test strings io.server
-logging ;
+USING: http.server tools.test kernel namespaces accessors
+new-slots io http math sequences assocs ;
 IN: http.server.tests
 
-[ ] [ f [ "404 not found" httpd-error ] with-logging ] unit-test
+TUPLE: mock-responder path ;
 
-[ "inspect/global" ] [ "/inspect/global" trim-/ ] unit-test
+C: <mock-responder> mock-responder
 
-[ "index.html" ]
-[ "http://www.jedit.org/index.html" url>path ] unit-test
+M: mock-responder call-responder
+    2nip
+    path>> on
+    "text/plain" <content> ;
 
-[ "foo/bar" ]
-[ "http://www.jedit.org/foo/bar" url>path ] unit-test
+: check-dispatch ( tag path -- ? )
+    over off
+    <request> swap default-host get call-responder
+    write-response get ;
 
-[ "" ]
-[ "http://www.jedit.org/" url>path ] unit-test
+[
+    <dispatcher>
+        "foo" <mock-responder> "foo" add-responder
+        "bar" <mock-responder> "bar" add-responder
+        <dispatcher>
+            "123" <mock-responder> "123" add-responder
+            "default" <mock-responder> >>default
+        "baz" add-responder
+    default-host set
 
-[ "" ]
-[ "http://www.jedit.org" url>path ] unit-test
+    [ "foo" ] [
+        "foo" default-host get find-responder path>> nip
+    ] unit-test
 
-[ "foobar" ]
-[ "foobar" secure-path ] unit-test
+    [ "bar" ] [
+        "bar" default-host get find-responder path>> nip
+    ] unit-test
 
-[ f ]
-[ "foobar/../baz" secure-path ] unit-test
+    [ t ] [ "foo" "foo" check-dispatch ] unit-test
+    [ f ] [ "foo" "bar" check-dispatch ] unit-test
+    [ t ] [ "bar" "bar" check-dispatch ] unit-test
+    [ t ] [ "default" "baz/xxx" check-dispatch ] unit-test
+    [ t ] [ "default" "baz/xxx//" check-dispatch ] unit-test
+    [ t ] [ "default" "/baz/xxx//" check-dispatch ] unit-test
+    [ t ] [ "123" "baz/123" check-dispatch ] unit-test
+    [ t ] [ "123" "baz///123" check-dispatch ] unit-test
 
-[ ] [ f [ "GET ../index.html" parse-request ] with-logging ] unit-test
-[ ] [ f [ "POO" parse-request ] with-logging ] unit-test
+    [ t ] [
+        <request>
+        "baz" >>path
+        "baz" default-host get call-responder
+        dup code>> 300 399 between? >r
+        header>> "location" swap at "baz/" tail? r> and
+    ] unit-test
+] with-scope
 
-[ H{ { "Foo" "Bar" } } ] [ "Foo=Bar" query>hash ] unit-test
+[
+    <dispatcher>
+        "default" <mock-responder> >>default
+    default-host set
 
-[ H{ { "Foo" "Bar" } { "Baz" "Quux" } } ]
-[ "Foo=Bar&Baz=Quux" query>hash ] unit-test
-
-[ H{ { "Baz" " " } } ]
-[ "Baz=%20" query>hash ] unit-test
-
-[ H{ { "Foo" f } } ] [ "Foo" query>hash ] unit-test
+    [ "/default" ] [ "/default" default-host get find-responder drop ] unit-test
+] with-scope

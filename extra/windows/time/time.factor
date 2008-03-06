@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types kernel math windows windows.kernel32
-namespaces calendar.backend ;
+namespaces calendar calendar.backend ;
 IN: windows.time
 
 : >64bit ( lo hi -- n )

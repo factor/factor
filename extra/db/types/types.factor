@@ -3,7 +3,8 @@
 USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep sequences.lib
 words namespaces tools.walker slots slots.private classes
-mirrors tuples combinators ;
+mirrors tuples combinators calendar.format serialize
+io.streams.string ;
 IN: db.types
 
 HOOK: modifier-table db ( -- hash )
@@ -60,14 +61,19 @@ SYMBOL: +has-many+
 : relation? ( spec -- ? ) [ +has-many+ = ] deep-find ;
 
 SYMBOL: INTEGER
-SYMBOL: BIG_INTEGER
+SYMBOL: BIG-INTEGER
 SYMBOL: DOUBLE
 SYMBOL: REAL
 SYMBOL: BOOLEAN
 SYMBOL: TEXT
 SYMBOL: VARCHAR
-SYMBOL: TIMESTAMP
 SYMBOL: DATE
+SYMBOL: TIME
+SYMBOL: DATETIME
+SYMBOL: TIMESTAMP
+SYMBOL: BLOB
+SYMBOL: FACTOR-BLOB
+SYMBOL: NULL
 
 : spec>tuple ( class spec -- tuple )
     [ ?first3 ] keep 3 ?tail*
@@ -79,15 +85,6 @@ SYMBOL: DATE
         set-sql-spec-modifiers
     } sql-spec construct
     dup normalize-spec ;
-
-: sql-type-hash ( -- assoc )
-    H{
-        { INTEGER "integer" }
-        { TEXT "text" }
-        { VARCHAR "varchar" }
-        { DOUBLE "real" }
-        { TIMESTAMP "timestamp" }
-    } ;
 
 TUPLE: no-sql-type ;
 : no-sql-type ( -- * ) T{ no-sql-type } throw ;
@@ -210,15 +207,3 @@ TUPLE: no-slot-named ;
         >r dup sql-spec-type swap sql-spec-slot-name r>
         get-slot-named swap
     ] curry { } map>assoc ;
-
-: sql-type>factor-type ( obj type -- obj )
-    dup array? [ first ] when
-    {
-        { +native-id+ [ string>number ] }
-        { INTEGER [ string>number ] }
-        { DOUBLE [ string>number ] }
-        { REAL [ string>number ] }
-        { TEXT [ ] }
-        { VARCHAR [ ] }
-        [ "no conversion from sql type to factor type" throw ]
-    } case ;

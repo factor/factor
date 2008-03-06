@@ -9,7 +9,7 @@ TUPLE: dummy-destructor obj ;
 
 C: <dummy-destructor> dummy-destructor
 
-M: dummy-destructor destruct ( obj -- )
+M: dummy-destructor dispose ( obj -- )
     dummy-destructor-obj t swap set-dummy-obj-destroyed? ;
 
 : destroy-always

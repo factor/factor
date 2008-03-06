@@ -279,7 +279,7 @@ MACRO: with-locals ( form -- quot ) lambda-rewrite ;
 ! are unified
 : create-method ( class generic -- method )
     2dup method dup
-    [ 2nip method-word ]
+    [ 2nip ]
     [ drop 2dup [ ] -rot define-method create-method ] if ;
 
 : CREATE-METHOD ( -- class generic body )
@@ -367,16 +367,16 @@ M: lambda-method definer drop \ M:: \ ; ;
 M: lambda-method definition
     "lambda" word-prop lambda-body ;
 
-: method-stack-effect
+: method-stack-effect ( method -- effect )
     dup "lambda" word-prop lambda-vars
-    swap "method" word-prop method-generic stack-effect dup [ effect-out ] when
+    swap "method-generic" word-prop stack-effect
+    dup [ effect-out ] when
     <effect> ;
 
 M: lambda-method synopsis*
-    dup definer.
-    dup "method" word-prop dup
-        method-specializer pprint*
-        method-generic pprint*
+    dup dup dup definer.
+    "method-specializer" word-prop pprint*
+    "method-generic" word-prop pprint*
     method-stack-effect effect>string comment. ;
 
 PRIVATE>

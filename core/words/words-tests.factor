@@ -141,7 +141,7 @@ SYMBOL: quot-uses-b
 
 [ { + } ] [ \ quot-uses-b uses ] unit-test
 
-[ "IN: words.tests : undef-test ; << undef-test >>" eval ]
+[ "IN: words.tests FORGET: undef-test : undef-test ; << undef-test >>" eval ]
 [ [ undefined? ] is? ] must-fail-with
 
 [ ] [
