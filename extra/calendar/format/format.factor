@@ -36,7 +36,11 @@ M: timestamp year. ( timestamp -- )
 
 : pad-00 number>string 2 CHAR: 0 pad-left ;
 
+: pad-0000 number>string 4 CHAR: 0 pad-left ;
+
 : write-00 pad-00 write ;
+
+: write-0000 pad-0000 write ;
 
 : (timestamp>string) ( timestamp -- )
     dup day-of-week day-abbreviations3 nth write ", " write
@@ -107,18 +111,16 @@ M: timestamp year. ( timestamp -- )
         60 / + *
     ] if ;
 
+: read-ymd ( -- y m d )
+    read-0000 "-" expect read-00 "-" expect read-00 ;
+
+: read-hms ( -- h m s )
+    read-00 ":" expect read-00 ":" expect read-00 ;
+
 : (rfc3339>timestamp) ( -- timestamp )
-    read-0000 ! year
-    "-" expect
-    read-00 ! month
-    "-" expect
-    read-00 ! day
+    read-ymd
     "Tt" expect
-    read-00 ! hour
-    ":" expect
-    read-00 ! minute
-    ":" expect
-    read-00 ! second
+    read-hms
     read-rfc3339-gmt-offset ! timezone
     <timestamp> ;
 
@@ -126,49 +128,25 @@ M: timestamp year. ( timestamp -- )
     [ (rfc3339>timestamp) ] with-string-reader ;
 
 : (ymdhms>timestamp) ( -- timestamp )
-    read-0000 ! year
-    "-" expect
-    read-00 ! month
-    "-" expect
-    read-00 ! day
-    " " expect
-    read-00 ! hour
-    ":" expect
-    read-00 ! minute
-    ":" expect
-    read-00 ! second
-    0 ! timezone
-    <timestamp> ;
+    read-ymd " " expect read-hms 0 <timestamp> ;
 
 : ymdhms>timestamp ( str -- timestamp )
     [ (ymdhms>timestamp) ] with-string-reader ;
 
 : (hms>timestamp) ( -- timestamp )
-    f f f
-    read-00 ! hour
-    ":" expect
-    read-00 ! minute
-    ":" expect
-    read-00 ! second
-    f <timestamp> ;
+    f f f read-hms f <timestamp> ;
 
 : hms>timestamp ( str -- timestamp )
     [ (hms>timestamp) ] with-string-reader ;
 
 : (ymd>timestamp) ( -- timestamp )
-    read-0000 ! year
-    "-" expect
-    read-00 ! month
-    "-" expect
-    read-00 ! day
-    f f f f <timestamp> ;
+    read-ymd f f f f <timestamp> ;
 
 : ymd>timestamp ( str -- timestamp )
     [ (ymd>timestamp) ] with-string-reader ;
 
-
 : (timestamp>ymd) ( timestamp -- )
-    dup timestamp-year number>string write
+    dup timestamp-year write-0000
     "-" write
     dup timestamp-month write-00
     "-" write
@@ -188,6 +166,7 @@ M: timestamp year. ( timestamp -- )
     [ (timestamp>hms) ] with-string-writer ;
 
 : timestamp>ymdhms ( timestamp -- str )
+    >gmt
     [
         dup (timestamp>ymd)
         " " write
