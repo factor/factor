@@ -4,18 +4,16 @@ USING: continuations io.backend libc kernel namespaces
 sequences system vectors ;
 IN: destructors
 
-GENERIC: destruct ( obj -- )
-
 SYMBOL: error-destructors
 SYMBOL: always-destructors
 
 TUPLE: destructor object destroyed? ;
 
-M: destructor destruct
+M: destructor dispose
     dup destructor-destroyed? [
         drop
     ] [
-        dup destructor-object destruct
+        dup destructor-object dispose 
         t swap set-destructor-destroyed?
     ] if ;
 
@@ -29,10 +27,10 @@ M: destructor destruct
     <destructor> always-destructors get push ;
 
 : do-always-destructors ( -- )
-    always-destructors get [ destruct ] each ;
+    always-destructors get [ dispose ] each ;
 
 : do-error-destructors ( -- )
-    error-destructors get [ destruct ] each ;
+    error-destructors get [ dispose ] each ;
 
 : with-destructors ( quot -- )
     [
@@ -47,7 +45,7 @@ TUPLE: memory-destructor alien ;
 
 C: <memory-destructor> memory-destructor
 
-M: memory-destructor destruct ( obj -- )
+M: memory-destructor dispose ( obj -- )
     memory-destructor-alien free ;
 
 : free-always ( alien -- )
@@ -63,7 +61,7 @@ C: <handle-destructor> handle-destructor
 
 HOOK: destruct-handle io-backend ( obj -- )
 
-M: handle-destructor destruct ( obj -- )
+M: handle-destructor dispose ( obj -- )
     handle-destructor-alien destruct-handle ;
 
 : close-always ( handle -- )
@@ -79,7 +77,7 @@ C: <socket-destructor> socket-destructor
 
 HOOK: destruct-socket io-backend ( obj -- )
 
-M: socket-destructor destruct ( obj -- )
+M: socket-destructor dispose ( obj -- )
     socket-destructor-alien destruct-socket ;
 
 : close-socket-always ( handle -- )

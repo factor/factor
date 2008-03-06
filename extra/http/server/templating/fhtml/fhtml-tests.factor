@@ -1,9 +1,9 @@
-USING: io io.files io.streams.string http.server.templating kernel tools.test
-    sequences ;
-IN: http.server.templating.tests
+USING: io io.files io.streams.string
+http.server.templating.fhtml kernel tools.test sequences ;
+IN: http.server.templating.fhtml.tests
 
 : test-template ( path -- ? )
-    "extra/http/server/templating/test/" swap append
+    "extra/http/server/templating/fhtml/test/" swap append
     [
         ".fhtml" append resource-path
         [ run-template-file ] with-string-writer

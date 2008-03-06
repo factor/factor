@@ -7,7 +7,7 @@ source-files debugger combinators math quotations generic
 strings splitting accessors http.server.static http.server
 assocs ;
 
-IN: http.server.templating
+IN: http.server.templating.fhtml
 
 : templating-vocab ( -- vocab-name ) "http.server.templating" ;
 

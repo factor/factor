@@ -3,7 +3,8 @@
 USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http sequences prettyprint io.server logging calendar
 new-slots html.elements accessors math.parser combinators.lib
-vocabs.loader debugger html continuations random combinators ;
+vocabs.loader debugger html continuations random combinators
+destructors ;
 IN: http.server
 
 GENERIC: call-responder ( request path responder -- response )
@@ -135,7 +136,7 @@ SYMBOL: development-mode
     swap method>> "HEAD" =
     [ drop ] [ write-response-body ] if ;
 
-: do-request ( request -- request )
+: do-request ( request -- response )
     [
         dup dup path>> over host>>
         find-virtual-host call-responder
@@ -149,13 +150,18 @@ LOG: httpd-hit NOTICE
 : log-request ( request -- )
     { method>> host>> path>> } map-exec-with httpd-hit ;
 
-: handle-client ( -- )
-    default-timeout
+: ?refresh-all ( -- )
     development-mode get-global
-    [ global [ refresh-all ] bind ] when
-    read-request
-    dup log-request
-    do-request do-response ;
+    [ global [ refresh-all ] bind ] when ;
+
+: handle-client ( -- )
+    [
+        default-timeout
+        ?refresh-all
+        read-request
+        dup log-request
+        do-request do-response
+    ] with-destructors ;
 
 : httpd ( port -- )
     internet-server "http.server"
