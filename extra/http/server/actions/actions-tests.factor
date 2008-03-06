@@ -1,11 +1,12 @@
 IN: http.server.actions.tests
 USING: http.server.actions tools.test math math.parser
 multiline namespaces http io.streams.string http.server
-sequences ;
+sequences accessors ;
 
-[ + ]
-{ { "a" [ string>number ] } { "b" [ string>number ] } }
-"GET" <action> "action-1" set
+<action>
+    [ "a" get "b" get + ] >>get
+    { { "a" [ string>number ] } { "b" [ string>number ] } } >>get-params
+"action-1" set
 
 STRING: action-request-test-1
 GET http://foo/bar?a=12&b=13 HTTP/1.1
@@ -19,9 +20,10 @@ blah
     "action-1" get call-responder
 ] unit-test
 
-[ "X" <repetition> concat append ]
-{ { +path+ [ ] } { "xxx" [ string>number ] } }
-"POST" <action> "action-2" set
+<action>
+    [ +path+ get "xxx" get "X" <repetition> concat append ] >>post
+    { { +path+ [ ] } { "xxx" [ string>number ] } } >>post-params
+"action-2" set
 
 STRING: action-request-test-2
 POST http://foo/bar/baz HTTP/1.1
