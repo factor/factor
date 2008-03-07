@@ -50,17 +50,20 @@ SYMBOL: +encrypted+
         { +encrypted+ FILE_ATTRIBUTE_ENCRYPTED }
     } get-flags ;
 
+: win32-file-type ( n -- symbol )
+    FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;
+
 : WIN32_FIND_DATA>file-info
     {
-        [ WIN32_FIND_DATA-dwFileAttributes win32-file-attributes ]
+        [ WIN32_FIND_DATA-dwFileAttributes win32-file-type ]
         [
             [ WIN32_FIND_DATA-nFileSizeLow ]
             [ WIN32_FIND_DATA-nFileSizeHigh ] bi >64bit
         ]
         [ WIN32_FIND_DATA-dwFileAttributes ]
-        [
-            WIN32_FIND_DATA-ftLastWriteTime FILETIME>timestamp
-        ]
+        ! [ WIN32_FIND_DATA-ftCreationTime FILETIME>timestamp ]
+        [ WIN32_FIND_DATA-ftLastWriteTime FILETIME>timestamp ]
+        ! [ WIN32_FIND_DATA-ftLastAccessTime FILETIME>timestamp ]
     } cleave
     \ file-info construct-boa ;
 
@@ -73,16 +76,15 @@ SYMBOL: +encrypted+
 
 : BY_HANDLE_FILE_INFORMATION>file-info
     {
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-attributes ]
+        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-type ]
         [
             [ BY_HANDLE_FILE_INFORMATION-nFileSizeLow ]
             [ BY_HANDLE_FILE_INFORMATION-nFileSizeHigh ] bi >64bit
         ]
         [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes ]
-        [
-            BY_HANDLE_FILE_INFORMATION-ftLastWriteTime
-            FILETIME>timestamp
-        ]
+        ! [ BY_HANDLE_FILE_INFORMATION-ftCreationTime FILETIME>timestamp ]
+        [ BY_HANDLE_FILE_INFORMATION-ftLastWriteTime FILETIME>timestamp ]
+        ! [ BY_HANDLE_FILE_INFORMATION-ftLastAccessTime FILETIME>timestamp ]
     } cleave
     \ file-info construct-boa ;
 

@@ -153,33 +153,6 @@ TUPLE: no-sql-modifier ;
     [ lookup-modifier ] map " " join
     dup empty? [ " " swap append ] unless ;
 
-SYMBOL: building-seq 
-: get-building-seq ( n -- seq )
-    building-seq get nth ;
-
-: n, get-building-seq push ;
-: n% get-building-seq push-all ;
-: n# >r number>string r> n% ;
-
-: 0, 0 n, ;
-: 0% 0 n% ;
-: 0# 0 n# ;
-: 1, 1 n, ;
-: 1% 1 n% ;
-: 1# 1 n# ;
-: 2, 2 n, ;
-: 2% 2 n% ;
-: 2# 2 n# ;
-
-: nmake ( quot exemplars -- seqs )
-    dup length dup zero? [ 1+ ] when
-    [
-        [
-            [ drop 1024 swap new-resizable ] 2map
-            [ building-seq set call ] keep
-        ] 2keep >r [ like ] 2map r> firstn 
-    ] with-scope ;
-
 HOOK: bind% db ( spec -- )
 
 TUPLE: no-slot-named ;
