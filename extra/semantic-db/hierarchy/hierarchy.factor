@@ -16,7 +16,7 @@ C: <tree> tree
     parent-child* drop ;
 
 : un-parent-child ( parent child -- )
-    has-parent-relation -rot <arc> select-tuples [ id>> delete-arc ] each ;
+    has-parent-relation spin <arc> select-tuples [ id>> delete-arc ] each ;
 
 : child-arcs ( node-id -- child-arcs )
     has-parent-relation f rot <arc> select-tuples ;
