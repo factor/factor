@@ -3,7 +3,7 @@
 USING: new-slots html.elements http.server.validators
 accessors namespaces kernel io farkup math.parser assocs
 classes words tuples arrays sequences io.files
-http.server.templating.fhtml splitting ;
+http.server.templating.fhtml splitting mirrors ;
 IN: http.server.components
 
 SYMBOL: components
@@ -94,14 +94,10 @@ M: number render-edit*
 M: number render-error*
     render-input render-error ;
 
-: tuple>slots ( tuple -- alist )
-    dup class "slot-names" word-prop swap tuple-slots
-    2array flip ;
-
 : with-components ( tuple components quot -- )
     [
         >r components set
-        dup tuple>slots values set
+        dup make-mirror values set
         tuple set
         r> call
     ] with-scope ; inline
