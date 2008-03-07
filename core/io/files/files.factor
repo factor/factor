@@ -225,6 +225,12 @@ M: pathname <=> [ pathname-string ] compare ;
 : with-file-writer ( path encoding quot -- )
     >r <file-writer> r> with-stream ; inline
 
+: set-file-lines ( seq path encoding -- )
+    [ [ print ] each ] with-file-writer ;
+
+: set-file-contents ( str path encoding -- )
+    [ write ] with-file-writer ;
+
 : with-file-appender ( path encoding quot -- )
     >r <file-appender> r> with-stream ; inline
 
