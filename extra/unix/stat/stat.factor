@@ -74,3 +74,8 @@ FUNCTION: int mkdir ( char* path, mode_t mode ) ;
   "stat" <c-object> dup >r
     stat check-status
   r> ;
+
+: lstat* ( pathname -- stat )
+  "stat" <c-object> dup >r
+    lstat check-status
+  r> ;

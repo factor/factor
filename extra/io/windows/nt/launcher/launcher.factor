@@ -5,7 +5,7 @@ io.windows libc io.nonblocking io.streams.duplex windows.types
 math windows.kernel32 windows namespaces io.launcher kernel
 sequences windows.errors assocs splitting system strings
 io.windows.launcher io.windows.nt.pipes io.backend
-combinators shuffle ;
+combinators shuffle accessors locals ;
 IN: io.windows.nt.launcher
 
 : duplicate-handle ( handle -- handle' )
@@ -31,13 +31,12 @@ IN: io.windows.nt.launcher
 : redirect-closed ( default obj access-mode create-mode -- handle )
     drop 2nip null-pipe ;
 
-: redirect-file ( default path access-mode create-mode -- handle )
-    >r >r >r drop r>
-    normalize-pathname
-    r> ! access-mode
+:: redirect-file ( default path access-mode create-mode -- handle )
+    path normalize-pathname
+    access-mode
     share-mode
     security-attributes-inherit
-    r> ! create-mode
+    create-mode
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
     CreateFile dup invalid-handle? dup close-later ;
@@ -60,24 +59,25 @@ IN: io.windows.nt.launcher
     } cond ;
 
 : default-stdout ( args -- handle )
-    CreateProcess-args-stdout-pipe dup [ pipe-out ] when ;
+    stdout-pipe>> dup [ pipe-out ] when ;
 
-: redirect-stdout ( args -- handle )
+: redirect-stdout ( process args -- handle )
     default-stdout
-    +stdout+ get
+    swap stdout>>
     GENERIC_WRITE
     CREATE_ALWAYS
     redirect
     STD_OUTPUT_HANDLE GetStdHandle or ;
 
-: redirect-stderr ( args -- handle )
-    +stderr+ get +stdout+ eq? [
-        CreateProcess-args-lpStartupInfo
+: redirect-stderr ( process args -- handle )
+    over stderr>> +stdout+ eq? [
+        lpStartupInfo>>
         STARTUPINFO-hStdOutput
+        nip
     ] [
         drop
         f
-        +stderr+ get
+        swap stderr>>
         GENERIC_WRITE
         CREATE_ALWAYS
         redirect
@@ -85,11 +85,11 @@ IN: io.windows.nt.launcher
     ] if ;
 
 : default-stdin ( args -- handle )
-    CreateProcess-args-stdin-pipe dup [ pipe-in ] when ;
+    stdin-pipe>> dup [ pipe-in ] when ;
 
-: redirect-stdin ( args -- handle )
+: redirect-stdin ( process args -- handle )
     default-stdin
-    +stdin+ get
+    swap stdin>>
     GENERIC_READ
     OPEN_EXISTING
     redirect
@@ -97,46 +97,42 @@ IN: io.windows.nt.launcher
 
 : add-pipe-dtors ( pipe -- )
     dup
-    pipe-in close-later
-    pipe-out close-later ;
+    in>> close-later
+    out>> close-later ;
 
-: fill-stdout-pipe
+: fill-stdout-pipe ( args -- args )
     <unique-incoming-pipe>
     dup add-pipe-dtors
     dup pipe-in f set-inherit
-    over set-CreateProcess-args-stdout-pipe ;
+    >>stdout-pipe ;
 
-: fill-stdin-pipe
+: fill-stdin-pipe ( args -- args )
     <unique-outgoing-pipe>
     dup add-pipe-dtors
     dup pipe-out f set-inherit
-    over set-CreateProcess-args-stdin-pipe ;
+    >>stdin-pipe ;
 
-M: windows-nt-io fill-redirection
-    dup CreateProcess-args-lpStartupInfo
-    over redirect-stdout over set-STARTUPINFO-hStdOutput
-    over redirect-stderr over set-STARTUPINFO-hStdError
-    over redirect-stdin over set-STARTUPINFO-hStdInput
-    drop ;
+M: windows-nt-io fill-redirection ( process args -- )
+    [ 2dup redirect-stdout ] keep lpStartupInfo>> set-STARTUPINFO-hStdOutput
+    [ 2dup redirect-stderr ] keep lpStartupInfo>> set-STARTUPINFO-hStdError
+    [ 2dup redirect-stdin  ] keep lpStartupInfo>> set-STARTUPINFO-hStdInput
+    2drop ;
 
-M: windows-nt-io process-stream*
+M: windows-nt-io (process-stream)
     [
-        [
-            make-CreateProcess-args
+        dup make-CreateProcess-args
 
-            fill-stdout-pipe
-            fill-stdin-pipe
+        fill-stdout-pipe
+        fill-stdin-pipe
 
-            fill-redirection
+        tuck fill-redirection
 
-            dup call-CreateProcess
+        dup call-CreateProcess
 
-            dup CreateProcess-args-stdin-pipe pipe-in CloseHandle drop
-            dup CreateProcess-args-stdout-pipe pipe-out CloseHandle drop
+        dup stdin-pipe>> pipe-in CloseHandle drop
+        dup stdout-pipe>> pipe-out CloseHandle drop
 
-            dup CreateProcess-args-stdout-pipe pipe-in
-            over CreateProcess-args-stdin-pipe pipe-out <win32-duplex-stream>
-
-            swap CreateProcess-args-lpProcessInformation <process>
-        ] with-destructors
-    ] with-descriptor ;
+        dup lpProcessInformation>>
+        over stdout-pipe>> in>> f <win32-file>
+        rot stdin-pipe>> out>> f <win32-file>
+    ] with-destructors ;

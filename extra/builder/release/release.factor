@@ -19,7 +19,7 @@ IN: builder.release
   {
     "boot.x86.32.image"
     "boot.x86.64.image"
-    "boot.macosx-ppc.boot"
+    "boot.macosx-ppc.image"
     "vm"
     "temp"
     "logs"

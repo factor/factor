@@ -3,7 +3,7 @@
 
 USING: arrays combinators io io.binary io.files io.paths
 io.encodings.utf16 kernel math math.parser namespaces sequences
-splitting strings assocs unicode.categories ;
+splitting strings assocs unicode.categories io.encodings.binary ;
 
 IN: id3
 
@@ -107,20 +107,20 @@ C: <extended-header> extended-header
   read-header read-frames <tag> ;
 
 : supported-version? ( version -- ? )
-  [ 3 4 ] member? ;
+    { 3 4 } member? ;
 
 : read-id3v2 ( -- tag/f )
   read1 dup supported-version?
   [ (read-id3v2) ] [ drop f ] if ;
 
 : id3v2? ( -- ? )
-  3 read "ID3" = ;
+  3 read "ID3" sequence= ;
 
 : read-tag ( stream -- tag/f )
   id3v2? [ read-id3v2 ] [ f ] if ;
 
 : id3v2 ( filename -- tag/f )
-  [ read-tag ] with-file-reader ;
+  binary [ read-tag ] with-file-reader ;
 
 : file? ( path -- ? )
   stat 3drop not ;
@@ -135,7 +135,7 @@ C: <extended-header> extended-header
   [ mp3? ] subset ;
 
 : id3? ( file -- ? )
-  [ id3v2? ] with-file-reader ;
+  binary [ id3v2? ] with-file-reader ;
 
 : id3s ( files -- id3s )
   [ id3? ] subset ;

@@ -26,4 +26,4 @@ HELP: <string-reader>
 
 HELP: with-string-reader
 { $values { "str" string } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope with " { $link stdio } " rebound to an input stream reading " { $snippet "str" } " from beginning to end. The accumulated string is output when the quotation returns." } ;
+{ $description "Calls the quotation in a new dynamic scope with " { $link stdio } " rebound to an input stream reading " { $snippet "str" } " from beginning to end." } ;

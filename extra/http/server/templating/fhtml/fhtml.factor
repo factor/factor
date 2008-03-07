@@ -2,10 +2,10 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations sequences kernel parser namespaces io
-io.files io.streams.lines io.streams.string html html.elements
+io.files io.streams.string html html.elements
 source-files debugger combinators math quotations generic
 strings splitting accessors http.server.static http.server
-assocs ;
+assocs io.encodings.utf8 ;
 
 IN: http.server.templating.fhtml
 
@@ -83,7 +83,7 @@ DEFER: <% delimiter
             templating-vocab use+
             ! so that reload works properly
             dup source-file file set
-            ?resource-path file-contents
+            ?resource-path utf8 file-contents
             [ eval-template ] [ html-error. drop ] recover
         ] with-file-vocabs
     ] curry assert-depth ;
@@ -93,7 +93,7 @@ DEFER: <% delimiter
     swap path+ run-template-file ;
 
 : template-convert ( infile outfile -- )
-    [ run-template-file ] with-file-writer ;
+    utf8 [ run-template-file ] with-file-writer ;
 
 ! file responder integration
 : serve-fhtml ( filename -- response )

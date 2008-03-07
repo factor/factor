@@ -21,12 +21,14 @@ TUPLE: mirror object slots ;
 : >mirror< ( mirror -- obj slots )
     dup mirror-object swap mirror-slots ;
 
+: mirror@ ( slot-name mirror -- obj slot-spec )
+    >mirror< swapd slot-named ;
+
 M: mirror at*
-    >mirror< swapd slot-of-reader
-    dup [ slot-spec-offset slot t ] [ 2drop f f ] if ;
+    mirror@ dup [ slot-spec-offset slot t ] [ 2drop f f ] if ;
 
 M: mirror set-at ( val key mirror -- )
-    >mirror< swapd slot-of-reader dup [
+    mirror@ dup [
         dup slot-spec-writer [
             slot-spec-offset set-slot
         ] [
@@ -42,7 +44,7 @@ M: mirror delete-at ( key mirror -- )
 M: mirror >alist ( mirror -- alist )
     >mirror<
     [ [ slot-spec-offset slot ] with map ] keep
-    [ slot-spec-reader ] map swap 2array flip ;
+    [ slot-spec-name ] map swap 2array flip ;
 
 M: mirror assoc-size mirror-slots length ;
 

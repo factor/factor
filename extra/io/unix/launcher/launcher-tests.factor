@@ -1,6 +1,7 @@
 IN: io.unix.launcher.tests
 USING: io.files tools.test io.launcher arrays io namespaces
-continuations math ;
+continuations math io.encodings.ascii io.encodings.latin1
+accessors kernel sequences ;
 
 [ ] [
     [ "launcher-test-1" temp-file delete-file ] ignore-errors
@@ -20,26 +21,26 @@ continuations math ;
 ] unit-test
 
 [ ] [
-    [
-        "echo Hello" +command+ set
-        "launcher-test-1" temp-file +stdout+ set
-    ] { } make-assoc try-process
+    <process>
+        "echo Hello" >>command
+        "launcher-test-1" temp-file >>stdout
+    try-process
 ] unit-test
 
 [ "Hello\n" ] [
     "cat"
     "launcher-test-1" temp-file
     2array
-    <process-stream> contents
+    ascii <process-stream> contents
 ] unit-test
 
 [ "" ] [
-    [
+    <process>
         "cat"
         "launcher-test-1" temp-file
-        2array +arguments+ set
-        +inherit+ +stdout+ set
-    ] { } make-assoc <process-stream> contents
+        2array >>command
+        +inherit+ >>stdout
+    ascii <process-stream> contents
 ] unit-test
 
 [ ] [
@@ -47,27 +48,27 @@ continuations math ;
 ] unit-test
 
 [ ] [
-    [
-        "cat" +command+ set
-        +closed+ +stdin+ set
-        "launcher-test-1" temp-file +stdout+ set
-    ] { } make-assoc try-process
+    <process>
+        "cat" >>command
+        +closed+ >>stdin
+        "launcher-test-1" temp-file >>stdout
+    try-process
 ] unit-test
 
 [ "" ] [
     "cat"
     "launcher-test-1" temp-file
     2array
-    <process-stream> contents
+    ascii <process-stream> contents
 ] unit-test
 
 [ ] [
     2 [
-        "launcher-test-1" temp-file <file-appender> [
-            [
-                +stdout+ set
-                "echo Hello" +command+ set
-            ] { } make-assoc try-process
+        "launcher-test-1" temp-file ascii <file-appender> [
+            <process>
+                swap >>stdout
+                "echo Hello" >>command
+            try-process
         ] with-disposal
     ] times
 ] unit-test
@@ -76,5 +77,21 @@ continuations math ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    <process-stream> contents
+    ascii <process-stream> contents
+] unit-test
+
+[ t ] [
+    <process>
+        "env" >>command
+        { { "A" "B" } } >>environment
+    latin1 <process-stream> lines
+    "A=B" swap member?
+] unit-test
+
+[ { "A=B" } ] [
+    <process>
+        "env" >>command
+        { { "A" "B" } } >>environment
+        +replace-environment+ >>environment-mode
+    latin1 <process-stream> lines
 ] unit-test

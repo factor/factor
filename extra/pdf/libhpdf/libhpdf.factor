@@ -9,11 +9,11 @@ USING: alien alien.syntax combinators system ;
 
 IN: pdf.libhpdf
 
-"libhpdf" {
+<< "libhpdf" {
     { [ win32? ] [ "libhpdf.dll" "stdcall" ] }
     { [ macosx? ] [ "libhpdf.dylib" "cdecl" ] }
     { [ unix? ] [ "$LD_LIBRARY_PATH/libhpdf.so" "cdecl" ] }
-} cond add-library
+} cond add-library >>
 
 ! compression mode
 : HPDF_COMP_NONE      HEX: 00 ; inline ! No contents are compressed

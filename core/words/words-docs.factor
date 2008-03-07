@@ -1,5 +1,5 @@
-USING: definitions help.markup help.syntax kernel
-kernel.private parser words.private vocabs classes quotations
+USING: definitions help.markup help.syntax kernel parser
+kernel.private words.private vocabs classes quotations
 strings effects compiler.units ;
 IN: words
 

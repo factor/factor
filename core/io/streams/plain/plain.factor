@@ -1,13 +1,9 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: kernel io io.streams.nested ;
 IN: io.streams.plain
-USING: generic assocs kernel math namespaces sequences
-io.styles io io.streams.nested ;
 
-TUPLE: plain-writer ;
-
-: <plain-writer> ( stream -- new-stream )
-    plain-writer construct-delegate ;
+MIXIN: plain-writer
 
 M: plain-writer stream-nl
     CHAR: \n swap stream-write1 ;

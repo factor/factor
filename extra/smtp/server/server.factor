@@ -1,5 +1,8 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! See http://factorcode.org/license.txt for BSD license.
+USING: combinators kernel prettyprint io io.timeouts io.server
+sequences namespaces io.sockets continuations calendar io.encodings.ascii ;
+IN: smtp.server
 
 ! Mock SMTP server for testing purposes.
 
@@ -26,10 +29,6 @@
 ! QUIT
 ! bye
 ! Connection closed by foreign host.
-
-USING: combinators kernel prettyprint io io.timeouts io.server
-sequences namespaces io.sockets continuations calendar ;
-IN: smtp.server
 
 SYMBOL: data-mode
 
@@ -64,7 +63,7 @@ SYMBOL: data-mode
 
 : smtp-server ( port -- )
     "Starting SMTP server on port " write dup . flush
-    "127.0.0.1" swap <inet4> <server> [
+    "127.0.0.1" swap <inet4> ascii <server> [
         accept [
             1 minutes stdio get set-timeout
             "220 hello\r\n" write flush

@@ -3,8 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces io io.timeouts kernel logging io.sockets
 sequences combinators sequences.lib splitting assocs strings
-math.parser random system calendar calendar.format ;
-
+math.parser random system calendar io.encodings.ascii
+calendar.format new-slots accessors ;
 IN: smtp
 
 SYMBOL: smtp-domain
@@ -20,7 +20,7 @@ SYMBOL: esmtp           t esmtp set-global
 : with-smtp-connection ( quot -- )
     smtp-host get smtp-port get
     2dup log-smtp-connection
-    <inet> <client> [
+    <inet> ascii <client> [
         smtp-domain [ host-name or ] change
         read-timeout get stdio get set-timeout
         call
@@ -49,6 +49,7 @@ SYMBOL: esmtp           t esmtp set-global
     "." over member? [ "Message cannot contain . on a line by itself" throw ] when ;
 
 : send-body ( body -- )
+    string-lines
     validate-message
     [ write crlf ] each
     "." write crlf ;
@@ -89,28 +90,36 @@ LOG: smtp-response DEBUG
 
 : get-ok ( -- ) flush receive-response check-response ;
 
-: send-raw-message ( body to from -- )
-    [
-        helo get-ok
-        mail-from get-ok
-        [ rcpt-to get-ok ] each
-        data get-ok
-        send-body get-ok
-        quit get-ok
-    ] with-smtp-connection ;
-
 : validate-header ( string -- string' )
     dup [ "\r\n" member? ] contains?
     [ "Invalid header string: " swap append throw ] when ;
 
-: prepare-header ( key value -- )
+: write-header ( key value -- )
     swap
-    validate-header %
-    ": " %
-    validate-header % ;
+    validate-header write
+    ": " write
+    validate-header write
+    crlf ;
 
-: prepare-headers ( assoc -- )
-    [ [ prepare-header ] "" make , ] assoc-each ;
+: write-headers ( assoc -- )
+    [ write-header ] assoc-each ;
+
+TUPLE: email from to subject headers body ;
+
+M: email clone
+    (clone) [ clone ] change-headers ;
+
+: (send) ( email -- )
+    [
+        helo get-ok
+        dup from>> mail-from get-ok
+        dup to>> [ rcpt-to get-ok ] each
+        data get-ok
+        dup headers>> write-headers
+        crlf
+        body>> send-body get-ok
+        quit get-ok
+    ] with-smtp-connection ;
 
 : extract-email ( recepient -- email )
     #! This could be much smarter.
@@ -127,30 +136,25 @@ LOG: smtp-response DEBUG
         ">" %
     ] "" make ;
 
-: simple-headers ( subject to from -- headers to from )
-    [
-        >r dup ", " join "To" set [ extract-email ] map r>
-        dup "From" set extract-email
-        rot "Subject" set
-        now timestamp>rfc822-string "Date" set
-        message-id "Message-Id" set
-    ] { } make-assoc -rot ;
+: set-header ( email value key -- email )
+    pick headers>> set-at ;
 
-: prepare-message ( body headers -- body' )
-    [
-        prepare-headers
-        "" ,
-        dup string? [ string-lines ] when %
-    ] { } make ;
+: prepare ( email -- email )
+    clone
+    dup from>> "From" set-header
+    [ extract-email ] change-from
+    dup to>> ", " join "To" set-header
+    [ [ extract-email ] map ] change-to
+    dup subject>> "Subject" set-header
+    now timestamp>rfc822-string "Date" set-header
+    message-id "Message-Id" set-header ;
 
-: prepare-simple-message ( body subject to from -- body' to from )
-    simple-headers >r >r prepare-message r> r> ;
+: <email> ( -- email )
+    email construct-empty
+    H{ } clone >>headers ;
 
-: send-message ( body headers to from -- )
-    >r >r prepare-message r> r> send-raw-message ;
-
-: send-simple-message ( body subject to from -- )
-    prepare-simple-message send-raw-message ;
+: send ( email -- )
+    prepare (send) ;
 
 ! Dirk's old AUTH CRAM-MD5 code. I don't know anything about
 ! CRAM MD5, and the old code didn't work properly either, so here
@@ -171,13 +175,3 @@ LOG: smtp-response DEBUG
 !     (cram-md5-auth) "\r\n" append get-ok ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USE: new-slots
-
-TUPLE: email from to subject body ;
-
-: <email> ( -- email ) email construct-empty ;
-
-: send ( email -- )
-  { email-body email-subject email-to email-from } get-slots
-  send-simple-message ;

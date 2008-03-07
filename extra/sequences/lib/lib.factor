@@ -140,13 +140,13 @@ PRIVATE>
 : strings ( alphabet length -- seqs )
     >r dup length r> number-strings map-alphabet ;
 
-: nths ( nths seq -- subseq )
-    ! nths is a sequence of ones and zeroes
+: switches ( seq1 seq -- subseq )
+    ! seq1 is a sequence of ones and zeroes
     >r [ length ] keep [ nth 1 = ] curry subset r>
     [ nth ] curry { } map-as ;
 
 : power-set ( seq -- subsets )
-    2 over length exact-number-strings swap [ nths ] curry map ;
+    2 over length exact-number-strings swap [ switches ] curry map ;
 
 : push-either ( elt quot accum1 accum2 -- )
     >r >r keep swap r> r> ? push ; inline
@@ -214,3 +214,9 @@ PRIVATE>
 
 : attempt-each ( seq quot -- result )
     (each) iterate-prep (attempt-each-integer) ; inline
+
+: ?nth* ( n seq -- elt/f ? )
+    2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; flushable
+
+: nths ( indices seq -- seq' )
+    [ swap nth ] with map ;

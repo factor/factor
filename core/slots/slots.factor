@@ -110,3 +110,6 @@ PREDICATE: word slot-writer "writing" word-prop >boolean ;
 
 : slot-of-writer ( writer specs -- spec/f )
     [ slot-spec-writer eq? ] with find nip ;
+
+: slot-named ( string specs -- spec/f )
+    [ slot-spec-name = ] with find nip ;

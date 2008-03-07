@@ -1,10 +1,27 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
-system combinators splitting sbufs continuations ;
-
+system combinators splitting sbufs continuations io.encodings
+io.encodings.binary ;
 IN: io.files
+
+HOOK: (file-reader) io-backend ( path -- stream )
+
+HOOK: (file-writer) io-backend ( path -- stream )
+
+HOOK: (file-appender) io-backend ( path -- stream )
+
+: <file-reader> ( path encoding -- stream )
+    swap (file-reader) swap <decoder> ;
+
+: <file-writer> ( path encoding -- stream )
+    swap (file-writer) swap <encoder> ;
+
+: <file-appender> ( path encoding -- stream )
+    swap (file-appender) swap <encoder> ;
+
+HOOK: rename-file io-backend ( from to -- )
 
 ! Pathnames
 : path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
@@ -54,6 +71,7 @@ TUPLE: no-parent-directory path ;
 TUPLE: file-info type size permissions modified ;
 
 HOOK: file-info io-backend ( path -- info )
+HOOK: link-info io-backend ( path -- info )
 
 SYMBOL: +regular-file+
 SYMBOL: +directory+
@@ -146,6 +164,14 @@ HOOK: move-file io-backend ( from to -- )
 ! Copying files
 HOOK: copy-file io-backend ( from to -- )
 
+M: object copy-file
+    dup parent-directory make-directories
+    binary <file-writer> [
+        swap binary <file-reader> [
+            swap stream-copy
+        ] with-disposal
+    ] with-disposal ;
+
 : copy-file-into ( from to -- )
     to-directory copy-file ;
 
@@ -180,14 +206,6 @@ DEFER: copy-tree-into
 : resource-exists? ( path -- ? )
     ?resource-path exists? ;
 
-: temp-directory ( -- path )
-    "temp" resource-path
-    dup exists? not
-      [ dup make-directory ]
-    when ;
-
-: temp-file ( name -- path ) temp-directory swap path+ ;
-
 ! Pathname presentations
 TUPLE: pathname string ;
 
@@ -195,27 +213,28 @@ C: <pathname> pathname
 
 M: pathname <=> [ pathname-string ] compare ;
 
-! Streams
-HOOK: <file-reader> io-backend ( path -- stream )
+: file-lines ( path encoding -- seq ) <file-reader> lines ;
 
-HOOK: <file-writer> io-backend ( path -- stream )
-
-HOOK: <file-appender> io-backend ( path -- stream )
-
-: file-lines ( path -- seq ) <file-reader> lines ;
-
-: file-contents ( path -- str )
-    dup <file-reader> swap file-length <sbuf>
+: file-contents ( path encoding -- str )
+    dupd <file-reader> swap file-length <sbuf>
     [ stream-copy ] keep >string ;
 
-: with-file-reader ( path quot -- )
+: with-file-reader ( path encoding quot -- )
     >r <file-reader> r> with-stream ; inline
 
-: with-file-writer ( path quot -- )
+: with-file-writer ( path encoding quot -- )
     >r <file-writer> r> with-stream ; inline
 
-: with-file-appender ( path quot -- )
+: with-file-appender ( path encoding quot -- )
     >r <file-appender> r> with-stream ; inline
+
+: temp-directory ( -- path )
+    "temp" resource-path
+    dup exists? not
+      [ dup make-directory ]
+    when ;
+
+: temp-file ( name -- path ) temp-directory swap path+ ;
 
 ! Home directory
 : home ( -- dir )

@@ -1,4 +1,4 @@
-USING: io io.files io.streams.string
+USING: io io.files io.streams.string io.encodings.utf8
 http.server.templating.fhtml kernel tools.test sequences ;
 IN: http.server.templating.fhtml.tests
 
@@ -8,7 +8,7 @@ IN: http.server.templating.fhtml.tests
         ".fhtml" append resource-path
         [ run-template-file ] with-string-writer
     ] keep
-    ".html" append resource-path file-contents = ;
+    ".html" append resource-path utf8 file-contents = ;
 
 [ t ] [ "example" test-template ] unit-test
 [ t ] [ "bug" test-template ] unit-test

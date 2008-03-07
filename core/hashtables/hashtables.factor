@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private slots.private math assocs
-math.private sequences sequences.private vectors ;
+       math.private sequences sequences.private vectors ;
 IN: hashtables
 
 <PRIVATE
@@ -16,15 +16,16 @@ IN: hashtables
     2 fixnum+fast over wrap ; inline
 
 : (key@) ( key keys i -- array n ? )
-    3dup swap array-nth dup ((tombstone)) eq? [
-        2drop probe (key@)
-    ] [
-        dup ((empty)) eq? [
-            3drop nip f f
-        ] [
-            = [ rot drop t ] [ probe (key@) ] if
-        ] if
-    ] if ; inline
+    3dup swap array-nth
+    dup ((empty)) eq?
+      [ 3drop nip f f ]
+      [
+        =
+          [ rot drop t ]
+          [ probe (key@) ]
+        if
+      ]
+    if ; inline
 
 : key@ ( key hash -- array n ? )
     hash-array 2dup hash@ (key@) ; inline

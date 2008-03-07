@@ -4,7 +4,7 @@ USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http sequences prettyprint io.server logging calendar
 new-slots html.elements accessors math.parser combinators.lib
 vocabs.loader debugger html continuations random combinators
-destructors ;
+destructors io.encodings.latin1 ;
 IN: http.server
 
 GENERIC: call-responder ( request path responder -- response )
@@ -165,7 +165,7 @@ LOG: httpd-hit NOTICE
 
 : httpd ( port -- )
     internet-server "http.server"
-    [ handle-client ] with-server ;
+    latin1 [ handle-client ] with-server ;
 
 : httpd-main ( -- ) 8888 httpd ;
 

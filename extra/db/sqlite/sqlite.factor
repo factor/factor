@@ -5,7 +5,7 @@ hashtables io.files io.files.tmp kernel math math.parser namespaces
 prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators tools.walker
-combinators.cleave io ;
+combinators.cleave io namespaces.lib ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
