@@ -54,7 +54,7 @@ M: kqueue-mx unregister-io-task ( task mx -- )
 
 : kevent-proc-task ( pid -- )
     dup wait-for-pid swap find-process
-    dup [ notify-exit ] [ 2drop ] if ;
+    dup [ swap notify-exit ] [ 2drop ] if ;
 
 : handle-kevent ( mx kevent -- )
     dup kevent-ident swap kevent-filter {
