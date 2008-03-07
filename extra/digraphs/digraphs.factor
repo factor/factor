@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Alex Chapman
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel new-slots sequences vectors ;
 IN: digraphs
 
@@ -43,3 +45,6 @@ DEFER: (topological-sort)
 : topological-sort ( digraph -- seq )
     dup clone V{ } clone spin
     [ drop (topological-sort) ] assoc-each drop reverse ;
+
+: topological-sorted-values ( digraph -- seq )
+    dup topological-sort swap [ at value>> ] curry map ;
