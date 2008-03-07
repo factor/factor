@@ -64,7 +64,7 @@ $nl
 "This is used in situations where you want a spawn child process with some overridden environment variables." } ;
 
 ARTICLE: "io.launcher.timeouts" "Process run-time timeouts"
-{ $description "The " { $snippet "timeout" } " slot of a " { $link process } " can be set to a " { $link duration } " specifying a maximum running time for the process. If " { $link wait-for-process } " is called and the process does not exit before the duration expires, it will be killed." } ;
+"The " { $snippet "timeout" } " slot of a " { $link process } " can be set to a " { $link duration } " specifying a maximum running time for the process. If " { $link wait-for-process } " is called and the process does not exit before the duration expires, it will be killed." ;
 
 HELP: get-environment
 { $values { "process" process } { "env" "an association" } }
@@ -147,14 +147,17 @@ $nl
 "A " { $link process } " instance can be created directly and passed to launching words for more control. It must be a fresh instance which has never been spawned before. To spawn a process several times from the same descriptor, " { $link clone } " the descriptor first." ;
 
 ARTICLE: "io.launcher.lifecycle" "The process lifecycle"
-"A freshly instantiated " { $link process } " represents a set of launch parameters. Words for launching processes take a fresh process which has never been started before as input, and output a copy as output."
-{ $link process-started? }
+"A freshly instantiated " { $link process } " represents a set of launch parameters."
+{ $subsection process }
+{ $subsection <process> }
+"Words for launching processes take a fresh process which has never been started before as input, and output a copy as output."
+{ $subsection process-started? }
 "The " { $link process } " instance output by launching words contains all original slot values in addition to the " { $snippet "handle" } " slot, which indicates the process is currently running."
-{ $link process-running? }
+{ $subsection process-running? }
 "It is possible to wait for a process to exit:"
-{ $link wait-for-process }
+{ $subsection wait-for-process }
 "A running process can also be killed:"
-{ $link kill-process } ;
+{ $subsection kill-process } ;
 
 ARTICLE: "io.launcher.launch" "Launching processes"
 "Launching processes:"
@@ -164,8 +167,47 @@ ARTICLE: "io.launcher.launch" "Launching processes"
 { $subsection <process-stream> }
 { $subsection with-process-stream } ;
 
+ARTICLE: "io.launcher.examples" "Launcher examples"
+"Starting a command and waiting for it to finish:"
+{ $code
+    "\"ls /etc\" run-process"
+}
+"Starting a program in the background:"
+{ $code
+    "{ \"emacs\" \"foo.txt\" } run-detached"
+}
+"Running a command, throwing an exception if it exits unsuccessfully:"
+{ $code
+    "\"make clean all\" try-process"
+}
+"Running a command, throwing an exception if it exits unsuccessfully or if it takes too long to run:"
+{ $code
+    "<process>"
+    "    \"make test\" >>command"
+    "    5 minutes >>timeout"
+    "try-process"
+}
+"Running a command, throwing an exception if it exits unsuccessfully, and redirecting output and error messages to a log file:"
+{ $code
+    "<process>"
+    "    \"make clean all\" >>command"
+    "    \"log.txt\" >>stdout"
+    "    +stdout+ >>stderr"
+    "try-process"
+}
+"Running a command, appending error messages to a log file, and reading the output for further processing:"
+{ $code
+    "\"log.txt\" <file-appender> ["
+    "    <process>"
+    "        swap >>stderr"
+    "        \"report\" >>command"
+    "    ascii <process-stream> lines sort reverse [ print ] each"
+    "] with-disposal"
+} ;
+
 ARTICLE: "io.launcher" "Operating system processes"
 "The " { $vocab-link "io.launcher" } " vocabulary implements cross-platform process launching."
+{ $subsection "io.launcher.examples" }
 { $subsection "io.launcher.descriptors" }
 { $subsection "io.launcher.launch" }
 "Advanced topics:"

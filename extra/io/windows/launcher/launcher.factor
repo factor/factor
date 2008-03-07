@@ -69,27 +69,26 @@ TUPLE: CreateProcess-args
 
 : fill-dwCreateFlags ( process args -- process args )
     0
-    over pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
-    over detached>> winnt? and [ DETACHED_PROCESS bitor ] when
+    pick pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
+    pick detached>> winnt? and [ DETACHED_PROCESS bitor ] when
     >>dwCreateFlags ;
 
 : fill-lpEnvironment ( process args -- process args )
     over pass-environment? [
         [
             over get-environment
-            [ "=" swap 3append string>u16-alien % ] assoc-each
+            [ swap % "=" % % "\0" % ] assoc-each
             "\0" %
-        ] { } make >c-ushort-array
+        ] "" make >c-ushort-array
         >>lpEnvironment
     ] when ;
 
 : fill-startup-info ( process args -- process args )
-    dup lpStartupInfo>>
-    STARTF_USESTDHANDLES swap set-STARTUPINFO-dwFlags ;
+    STARTF_USESTDHANDLES over lpStartupInfo>> set-STARTUPINFO-dwFlags ;
 
-HOOK: fill-redirection io-backend ( process args -- process args )
+HOOK: fill-redirection io-backend ( process args -- )
 
-M: windows-ce-io fill-redirection ;
+M: windows-ce-io fill-redirection 2drop ;
 
 : make-CreateProcess-args ( process -- args )
     default-CreateProcess-args
@@ -102,14 +101,12 @@ M: windows-ce-io fill-redirection ;
 M: windows-io current-process-handle ( -- handle )
     GetCurrentProcessId ;
 
-M: windows-io run-process* ( desc -- handle )
+M: windows-io run-process* ( process -- handle )
     [
-        [
-            make-CreateProcess-args
-            fill-redirection
-            dup call-CreateProcess
-            CreateProcess-args-lpProcessInformation
-        ] with-descriptor
+        dup make-CreateProcess-args
+        tuck fill-redirection
+        dup call-CreateProcess
+        lpProcessInformation>>
     ] with-destructors ;
 
 M: windows-io kill-process* ( handle -- )
