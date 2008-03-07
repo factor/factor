@@ -96,6 +96,8 @@ check_installed_programs() {
     ensure_program_installed cut
     case $OS in
         netbsd) ensure_program_installed gmake;;
+        openbsd) ensure_program_installed gmake;;
+        freebsd) ensure_program_installed gmake;;
     esac
     check_gcc_version
 }
@@ -265,6 +267,8 @@ cd_factor() {
 invoke_make() {
     case $OS in
         netbsd) make='gmake';;
+        freebsd) make='gmake';;
+        openbsd) make='gmake';;
         *) make='make';;
     esac
    $make $*
