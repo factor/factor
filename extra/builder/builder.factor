@@ -2,6 +2,7 @@
 USING: kernel namespaces sequences splitting system combinators continuations
        parser io io.files io.launcher io.sockets prettyprint threads
        bootstrap.image benchmark vars bake smtp builder.util accessors
+       io.encodings.utf8
        calendar
        builder.common
        builder.benchmark
@@ -35,20 +36,20 @@ IN: builder
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : git-id ( -- id )
-  { "git" "show" } <process-stream> [ readln ] with-stream " " split second ;
+  { "git" "show" } utf8 <process-stream>
+  [ readln ] with-stream " " split second ;
 
-: record-git-id ( -- ) git-id "../git-id" [ . ] with-file-writer ;
+: record-git-id ( -- ) git-id "../git-id" utf8 [ . ] with-file-writer ;
 
 : do-make-clean ( -- ) { "make" "clean" } try-process ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : make-vm ( -- desc )
-  <process*>
-    { "make" }       >>arguments
+  <process>
+    { "make" }       >>command
     "../compile-log" >>stdout
-    +stdout+         >>stderr
-  >desc ;
+    +stdout+         >>stderr ;
 
 : do-make-vm ( -- )
   make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail ;
@@ -65,13 +66,12 @@ IN: builder
   { "./factor" { "-i=" my-boot-image-name } "-no-user-init" } to-strings ;
 
 : bootstrap ( -- desc )
-  <process*>
-    bootstrap-cmd >>arguments
+  <process>
+    bootstrap-cmd >>command
     +closed+      >>stdin
     "../boot-log" >>stdout
     +stdout+      >>stderr
-    20 minutes    >>timeout
-  >desc ;
+    20 minutes    >>timeout ;
 
 : do-bootstrap ( -- )
   bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail ;
@@ -80,13 +80,12 @@ IN: builder
   { "./factor" "-run=builder.test" } to-strings ;
 
 : builder-test ( -- desc )
-  <process*>
-    builder-test-cmd >>arguments
+  <process>
+    builder-test-cmd >>command
     +closed+         >>stdin
     "../test-log"    >>stdout
     +stdout+         >>stderr
-    45 minutes       >>timeout
-  >desc ;
+    45 minutes       >>timeout ;
 
 : do-builder-test ( -- )
   builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail ;

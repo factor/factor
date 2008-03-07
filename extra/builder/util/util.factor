@@ -4,6 +4,7 @@ USING: kernel words namespaces classes parser continuations
        math math.parser
        combinators sequences splitting quotations arrays strings tools.time
        sequences.deep new-slots accessors assocs.lib
+       io.encodings.utf8
        combinators.cleave bake calendar calendar.format ;
 
 IN: builder.util
@@ -14,7 +15,7 @@ IN: builder.util
 
 : minutes>ms ( min -- ms ) 60 * 1000 * ;
 
-: file>string ( file -- string ) [ stdio get contents ] with-file-reader ;
+: file>string ( file -- string ) utf8 [ stdio get contents ] with-file-reader ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -39,18 +40,18 @@ DEFER: to-strings
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: process* arguments stdin stdout stderr timeout ;
+! TUPLE: process* arguments stdin stdout stderr timeout ;
 
-: <process*> process* construct-empty ;
+! : <process*> process* construct-empty ;
 
-: >desc ( process* -- desc )
-  H{ } clone
-    over arguments>> [ +arguments+ swap put-at ] when*
-    over stdin>>     [ +stdin+     swap put-at ] when*
-    over stdout>>    [ +stdout+    swap put-at ] when*
-    over stderr>>    [ +stderr+    swap put-at ] when*
-    over timeout>>   [ +timeout+   swap put-at ] when*
-  nip ;
+! : >desc ( process* -- desc )
+!   H{ } clone
+!     over arguments>> [ +arguments+ swap put-at ] when*
+!     over stdin>>     [ +stdin+     swap put-at ] when*
+!     over stdout>>    [ +stdout+    swap put-at ] when*
+!     over stderr>>    [ +stderr+    swap put-at ] when*
+!     over timeout>>   [ +timeout+   swap put-at ] when*
+!   nip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -71,7 +72,7 @@ TUPLE: process* arguments stdin stdout stderr timeout ;
 
 : eval-file ( file -- obj ) file-contents eval ;
 
-: cat ( file -- ) file-contents print ;
+: cat ( file -- ) utf8 file-contents print ;
 
 : run-or-bail ( desc quot -- )
   [ [ try-process ] curry   ]
@@ -96,7 +97,7 @@ USING: bootstrap.image bootstrap.image.download io.streams.null ;
   if ;
 
 : cat-n ( file n -- )
-  [ file-lines ] [ ] bi*
+  [ utf8 file-lines ] [ ] bi*
   maybe-tail*
   [ print ] each ;
 
@@ -104,7 +105,7 @@ USING: bootstrap.image bootstrap.image.download io.streams.null ;
 
 USE: prettyprint
 
-: to-file ( object file -- ) [ . ] with-file-writer ;
+: to-file ( object file -- ) utf8 [ . ] with-file-writer ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
