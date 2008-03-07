@@ -117,6 +117,29 @@ DEFINE_PRIMITIVE(os_envs)
 	dpush(result);
 }
 
+DEFINE_PRIMITIVE(set_os_envs)
+{
+	F_ARRAY *array = untag_array(dpop());
+	CELL size = array_capacity(array);
+
+	/* Memory leak */
+	char **env = calloc(size + 1,sizeof(CELL));
+
+	CELL i;
+	for(i = 0; i < size; i++)
+	{
+		F_STRING *string = untag_string(array_nth(array,i));
+		CELL length = to_fixnum(string->length);
+
+		char *chars = malloc(length + 1);
+		char_string_to_memory(string,chars);
+		chars[length] = '\0';
+		env[i] = chars;
+	}
+
+	environ = env;
+}
+
 F_SEGMENT *alloc_segment(CELL size)
 {
 	int pagesize = getpagesize();

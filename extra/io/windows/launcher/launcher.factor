@@ -134,7 +134,7 @@ M: windows-io kill-process* ( handle -- )
 : process-exited ( process -- )
     dup process-handle exit-code
     over process-handle dispose-process
-    swap notify-exit ;
+    notify-exit ;
 
 : wait-for-processes ( processes -- ? )
     keys dup
