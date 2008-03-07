@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic io kernel assocs hashtables
 namespaces parser prettyprint sequences strings io.styles
@@ -42,9 +42,9 @@ M: f print-element drop ;
     [ print-element ] with-style ;
 
 : with-default-style ( quot -- )
-    default-style get [
+    default-span-style get [
         last-element off
-        default-style get swap with-nesting
+        default-block-style get swap with-nesting
     ] with-style ; inline
 
 : print-content ( element -- )
