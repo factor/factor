@@ -275,7 +275,7 @@ define-builtin
     }
     {
         { "object" "kernel" }
-        "?"
+        "compiled?"
         { "compiled?" "words" }
         f
     }
