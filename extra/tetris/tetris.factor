@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel ui.gadgets ui.gadgets.labels ui.gadgets.worlds
-ui.gadgets.status-bar ui.gestures ui.render ui tetris.game
-tetris.gl sequences arrays math math.parser namespaces timers ;
+USING: alarms arrays calendar kernel ui.gadgets ui.gadgets.labels
+ui.gadgets.worlds ui.gadgets.status-bar ui.gestures ui.render ui
+tetris.game tetris.gl sequences system math math.parser namespaces ;
 IN: tetris
 
-TUPLE: tetris-gadget tetris ;
+TUPLE: tetris-gadget tetris alarm ;
 
 : <tetris-gadget> ( tetris -- gadget )
     tetris-gadget construct-gadget
@@ -41,14 +41,15 @@ tetris-gadget H{
     { T{ key-down f f "n" }      [ new-tetris ] }
 } set-gestures
 
-M: tetris-gadget tick ( object -- )
+: tick ( gadget -- )
     dup tetris-gadget-tetris maybe-update relayout-1 ;
 
 M: tetris-gadget graft* ( gadget -- )
-    100 1 add-timer ;
+    dup [ tick ] curry 100 milliseconds from-now 100 milliseconds add-alarm
+    swap set-tetris-gadget-alarm ;
 
 M: tetris-gadget ungraft* ( gadget -- )
-    remove-timer ;
+    [ tetris-gadget-alarm cancel-alarm f ] keep set-tetris-gadget-alarm ;
 
 : tetris-window ( -- ) 
     [

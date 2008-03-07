@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays assocs classes compiler db
-hashtables io.files kernel math math.parser namespaces
+hashtables io.files io.files.tmp kernel math math.parser namespaces
 prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators tools.walker
@@ -22,14 +22,22 @@ M: sqlite-db db-close ( handle -- )
 
 M: sqlite-db dispose ( db -- ) dispose-db ;
 
+: with-sqlite ( path quot -- )
+    sqlite-db swap with-db ; inline
+
+: with-tmp-sqlite ( quot -- )
+    ".db" [
+        swap with-sqlite
+    ] with-tmpfile ;
+
 TUPLE: sqlite-statement ;
 
 TUPLE: sqlite-result-set has-more? ;
 
-M: sqlite-db <simple-statement> ( str -- obj )
+M: sqlite-db <simple-statement> ( str in out -- obj )
     <prepared-statement> ;
 
-M: sqlite-db <prepared-statement> ( str -- obj )
+M: sqlite-db <prepared-statement> ( str in out -- obj )
     {
         set-statement-sql
         set-statement-in-params

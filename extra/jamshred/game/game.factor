@@ -1,3 +1,5 @@
+! Copyright (C) 2007 Alex Chapman
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl arrays sequences jamshred.tunnel
 jamshred.player math.vectors ;
 IN: jamshred.game
