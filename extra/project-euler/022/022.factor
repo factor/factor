@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii io.files kernel math project-euler.common sequences sequences.lib
-    sorting splitting ;
+USING: ascii io.encodings.ascii io.files kernel math project-euler.common
+    sequences sequences.lib sorting splitting ;
 IN: project-euler.022
 
 ! http://projecteuler.net/index.php?section=problems&id=22
@@ -29,7 +29,7 @@ IN: project-euler.022
 
 : source-022 ( -- seq )
     "extra/project-euler/022/names.txt" resource-path
-    file-contents [ quotable? ] subset "," split ;
+    ascii file-contents [ quotable? ] subset "," split ;
 
 : name-scores ( seq -- seq )
     [ 1+ swap alpha-value * ] map-index ;
