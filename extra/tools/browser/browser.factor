@@ -2,15 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces splitting sequences io.files kernel assocs
 words vocabs vocabs.loader definitions parser continuations
-inspector debugger io io.styles io.streams.lines hashtables
+inspector debugger io io.styles hashtables
 sorting prettyprint source-files arrays combinators strings
 system math.parser help.markup help.topics help.syntax
-help.stylesheet memoize ;
+help.stylesheet memoize io.encodings.utf8 ;
 IN: tools.browser
 
 MEMO: (vocab-file-contents) ( path -- lines )
     ?resource-path dup exists?
-    [ file-lines ] [ drop f ] if ;
+    [ utf8 file-lines ] [ drop f ] if ;
 
 : vocab-file-contents ( vocab name -- seq )
     vocab-path+ dup [ (vocab-file-contents) ] when ;
@@ -18,7 +18,7 @@ MEMO: (vocab-file-contents) ( path -- lines )
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-path+ [
         ?resource-path
-        [ [ print ] each ] with-file-writer
+        utf8 [ [ print ] each ] with-file-writer
     ] [
         "The " swap vocab-name
         " vocabulary was not loaded from the file system"

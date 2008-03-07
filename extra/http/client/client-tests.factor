@@ -1,14 +1,28 @@
-USING: http.client tools.test ;
+USING: http.client http.client.private http tools.test
+tuple-syntax namespaces ;
 [ "localhost" 80 ] [ "localhost" parse-host ] unit-test
 [ "localhost" 8888 ] [ "localhost:8888" parse-host ] unit-test
-[ "localhost:8888" "/foo" ] [ "http://localhost:8888/foo" parse-url ] unit-test
-[ "localhost:8888" "/" ] [ "http://localhost:8888" parse-url ] unit-test
-[ 404 ] [ "HTTP/1.1 404 File not found" parse-response ] unit-test
-[ 404 ] [ "404 File not found" parse-response ] unit-test
-[ 200 ] [ "HTTP/1.0 200" parse-response ] unit-test
-[ 200 ] [ "HTTP/1.0 200 Success" parse-response ] unit-test
+[ "/foo" "localhost" 8888 ] [ "http://localhost:8888/foo" parse-url ] unit-test
+[ "/" "localhost" 8888 ] [ "http://localhost:8888" parse-url ] unit-test
 
 [ "foo.txt" ] [ "http://www.paulgraham.com/foo.txt" download-name ] unit-test
 [ "foo.txt" ] [ "http://www.arcsucks.com/foo.txt?xxx" download-name ] unit-test
 [ "foo.txt" ] [ "http://www.arcsucks.com/foo.txt/" download-name ] unit-test
 [ "www.arcsucks.com" ] [ "http://www.arcsucks.com////" download-name ] unit-test
+
+[
+    TUPLE{ request
+        method: "GET"
+        host: "www.apple.com"
+        path: "/index.html"
+        port: 80
+        version: "1.1"
+        cookies: V{ }
+    }
+] [
+    [
+        "http://www.apple.com/index.html"
+        <get-request>
+        request-with-url
+    ] with-scope
+] unit-test

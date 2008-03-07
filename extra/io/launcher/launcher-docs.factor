@@ -35,31 +35,41 @@ HELP: +environment-mode+
 HELP: +stdin+
 { $description "Launch descriptor key. Must equal one of the following:"
     { $list
-        { { $link f } " - standard input is inherited" }
+        { { $link f } " - standard input is either inherited from the current process, or is a " { $link <process-stream> } " pipe" }
+        { { $link +inherit+ } " - standard input is inherited from the current process" }
         { { $link +closed+ } " - standard input is closed" }
         { "a path name - standard input is read from the given file, which must exist" }
+        { "a file stream or a socket - standard input is read from the given stream, which must be closed after the process has been started" }
     }
 } ;
 
 HELP: +stdout+
 { $description "Launch descriptor key. Must equal one of the following:"
     { $list
-        { { $link f } " - standard output is inherited" }
+        { { $link f } " - standard output is either inherited from the current process, or is a " { $link <process-stream> } " pipe" }
+        { { $link +inherit+ } " - standard output is inherited from the current process" }
         { { $link +closed+ } " - standard output is closed" }
         { "a path name - standard output is written to the given file, which is overwritten if it already exists" }
+        { "a file stream or a socket - standard output is written to the given stream, which must be closed after the process has been started" }
     }
 } ;
 
 HELP: +stderr+
 { $description "Launch descriptor key. Must equal one of the following:"
     { $list
-        { { $link f } " - standard error is inherited" }
+        { { $link f } " - standard error is inherited from the current process" }
+        { { $link +inherit+ } " - same as above" }
+        { { $link +stdout+ } " - standard error is merged with standard output" }
         { { $link +closed+ } " - standard error is closed" }
         { "a path name - standard error is written to the given file, which is overwritten if it already exists" }
+        { "a file stream or a socket - standard error is written to the given stream, which must be closed after the process has been started" }
     }
 } ;
 
 HELP: +closed+
+{ $description "Possible value for " { $link +stdin+ } ", " { $link +stdout+ } ", and " { $link +stderr+ } " launch descriptors." } ;
+
+HELP: +inherit+
 { $description "Possible value for " { $link +stdin+ } ", " { $link +stdout+ } ", and " { $link +stderr+ } " launch descriptors." } ;
 
 HELP: +prepend-environment+
@@ -149,8 +159,9 @@ HELP: process-stream
 HELP: <process-stream>
 { $values
   { "desc" "a launch descriptor" }
+  { "encoding" "an encoding descriptor" }
   { "stream" "a bidirectional stream" } }
-{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream." }
+{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream of the given encoding." }
 { $notes "Closing the stream will block until the process exits." } ;
 
 HELP: with-process-stream

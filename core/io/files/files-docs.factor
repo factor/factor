@@ -10,7 +10,9 @@ ARTICLE: "file-streams" "Reading and writing files"
 "Utility combinators:"
 { $subsection with-file-reader }
 { $subsection with-file-writer }
-{ $subsection with-file-appender } ;
+{ $subsection with-file-appender }
+{ $subsection file-contents }
+{ $subsection file-lines } ;
 
 ARTICLE: "pathnames" "Pathname manipulation"
 "Pathname manipulation:"
@@ -57,8 +59,8 @@ ARTICLE: "delete-move-copy" "Deleting, moving, copying files"
 "The operations for moving and copying files come in three flavors:"
 { $list
     { "A word named " { $snippet { $emphasis "operation" } } " which takes a source and destination path." }
-    { "A word named " { $snippet { $emphasis "operation" } "-to" } " which takes a source path and destination directory. The destination file will be stored in the destination directory and will have the same file name as the source path." }
-    { "A word named " { $snippet { $emphasis "operation" } "s-to" } " which takes a sequence of source paths and destination directory." }
+    { "A word named " { $snippet { $emphasis "operation" } "-into" } " which takes a source path and destination directory. The destination file will be stored in the destination directory and will have the same file name as the source path." }
+    { "A word named " { $snippet { $emphasis "operation" } "s-into" } " which takes a sequence of source paths and destination directory." }
 }
 "Since both of the above lists apply to copying files, that this means that there are a total of six variations on copying a file."
 $nl
@@ -68,16 +70,16 @@ $nl
 { $subsection delete-tree }
 "Moving files:"
 { $subsection move-file }
-{ $subsection move-file-to }
-{ $subsection move-files-to }
+{ $subsection move-file-into }
+{ $subsection move-files-into }
 "Copying files:"
 { $subsection copy-file }
-{ $subsection copy-file-to }
-{ $subsection copy-files-to }
+{ $subsection copy-file-into }
+{ $subsection copy-files-into }
 "Copying directory trees recursively:"
 { $subsection copy-tree }
-{ $subsection copy-tree-to }
-{ $subsection copy-trees-to }
+{ $subsection copy-tree-into }
+{ $subsection copy-trees-into }
 "On most operating systems, files can only be moved within the same file system. To move files between file systems, use " { $link copy-file } " followed by " { $link delete-file } " on the old name." ;
 
 ARTICLE: "io.files" "Basic file operations"
@@ -87,7 +89,6 @@ ARTICLE: "io.files" "Basic file operations"
 { $subsection "fs-meta" }
 { $subsection "directories" }
 { $subsection "delete-move-copy" }
-{ $subsection "unique" }
 { $see-also "os" } ;
 
 ABOUT: "io.files"
@@ -114,33 +115,44 @@ HELP: file-name
 } ;
 
 HELP: <file-reader>
-{ $values { "path" "a pathname string" } { "stream" "an input stream" } }
-{ $description "Outputs an input stream for reading from the specified pathname." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptors" }
+    { "stream" "an input stream" } }
+{ $description "Outputs an input stream for reading from the specified pathname using the given encoding." }
 { $errors "Throws an error if the file is unreadable." } ;
 
 HELP: <file-writer>
-{ $values { "path" "a pathname string" } { "stream" "an output stream" } }
-{ $description "Outputs an output stream for writing to the specified pathname. The file's length is truncated to zero." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "stream" "an output stream" } }
+{ $description "Outputs an output stream for writing to the specified pathname using the given encoding. The file's length is truncated to zero." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: <file-appender>
-{ $values { "path" "a pathname string" } { "stream" "an output stream" } }
-{ $description "Outputs an output stream for writing to the specified pathname. The stream begins writing at the end of the file." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "stream" "an output stream" } }
+{ $description "Outputs an output stream for writing to the specified pathname using the given encoding. The stream begins writing at the end of the file." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: with-file-reader
-{ $values { "path" "a pathname string" } { "quot" "a quotation" } }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
 { $description "Opens a file for reading and calls the quotation using " { $link with-stream } "." }
 { $errors "Throws an error if the file is unreadable." } ;
 
 HELP: with-file-writer
-{ $values { "path" "a pathname string" } { "quot" "a quotation" } }
-{ $description "Opens a file for writing and calls the quotation using " { $link with-stream } "." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
+{ $description "Opens a file for writing using the given encoding and calls the quotation using " { $link with-stream } "." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: with-file-appender
-{ $values { "path" "a pathname string" } { "quot" "a quotation" } }
-{ $description "Opens a file for appending and calls the quotation using " { $link with-stream } "." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
+{ $description "Opens a file for appending using the given encoding and calls the quotation using " { $link with-stream } "." }
+{ $errors "Throws an error if the file cannot be opened for writing." } ;
+
+HELP: file-lines
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "seq" "an array of strings" } }
+{ $description "Opens the file at the given path using the given encoding, and returns a list of the lines in that file." }
+{ $errors "Throws an error if the file cannot be opened for writing." } ;
+
+HELP: file-contents
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "str" "a string" } }
+{ $description "Opens the file at the given path using the given encoding, and the contents of that file as a string." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: cwd
@@ -267,12 +279,12 @@ HELP: move-file
 { $description "Moves or renames a file." }
 { $errors "Throws an error if the file does not exist or if the move operation fails." } ;
 
-HELP: move-file-to
+HELP: move-file-into
 { $values { "from" "a pathname string" } { "to" "a directory pathname string" } }
 { $description "Moves a file to another directory without renaming it." }
 { $errors "Throws an error if the file does not exist or if the move operation fails." } ;
 
-HELP: move-files-to
+HELP: move-files-into
 { $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
 { $description "Moves a set of files to another directory." }
 { $errors "Throws an error if the file does not exist or if the move operation fails." } ;
@@ -283,12 +295,12 @@ HELP: copy-file
 { $notes "This operation attempts to preserve the original file's attributes, however not all attributes may be preserved." }
 { $errors "Throws an error if the file does not exist or if the copy operation fails." } ;
 
-HELP: copy-file-to
+HELP: copy-file-into
 { $values { "from" "a pathname string" } { "to" "a directory pathname string" } }
 { $description "Copies a file to another directory." }
 { $errors "Throws an error if the file does not exist or if the copy operation fails." } ;
 
-HELP: copy-files-to
+HELP: copy-files-into
 { $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
 { $description "Copies a set of files to another directory." }
 { $errors "Throws an error if the file does not exist or if the copy operation fails." } ;
@@ -299,12 +311,12 @@ HELP: copy-tree
 { $notes "This operation attempts to preserve original file attributes, however not all attributes may be preserved." }
 { $errors "Throws an error if the copy operation fails." } ;
 
-HELP: copy-tree-to
+HELP: copy-tree-into
 { $values { "from" "a pathname string" } { "to" "a directory pathname string" } }
 { $description "Copies a directory tree to another directory, recursively." }
 { $errors "Throws an error if the copy operation fails." } ;
 
-HELP: copy-trees-to
+HELP: copy-trees-into
 { $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
 { $description "Copies a set of directory trees to another directory, recursively." }
 { $errors "Throws an error if the copy operation fails." } ;

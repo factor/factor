@@ -1,4 +1,4 @@
-IN: temporary
+IN: optimizer.control.tests
 USING: tools.test optimizer.control combinators kernel
 sequences inference.dataflow math inference classes strings
 optimizer ;

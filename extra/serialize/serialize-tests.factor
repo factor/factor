@@ -4,7 +4,7 @@
 USING: tools.test kernel serialize io io.streams.string math
 alien arrays byte-arrays sequences math prettyprint parser
 classes math.constants ;
-IN: temporary
+IN: serialize.tests
 
 TUPLE: serialize-test a b ;
 

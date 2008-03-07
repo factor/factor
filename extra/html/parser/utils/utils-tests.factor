@@ -3,7 +3,7 @@ hashtables.private io kernel math
 namespaces prettyprint quotations sequences splitting
 state-parser strings tools.test ;
 USING: html.parser.utils ;
-IN: temporary
+IN: html.parser.utils.tests
 
 [ "'Rome'" ] [ "Rome" single-quote ] unit-test
 [ "\"Roma\"" ] [ "Roma" double-quote ] unit-test

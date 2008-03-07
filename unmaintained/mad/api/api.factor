@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Adam Wendt.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types byte-arrays io io.binary io.files kernel mad
-    namespaces prettyprint sbufs sequences tools.interpreter vars ;
+    namespaces prettyprint sbufs sequences tools.interpreter vars
+    io.encodings.binary ;
 IN: mad.api
 
 VARS: buffer-start buffer-length output-callback-var ;
@@ -79,9 +80,6 @@ VARS: buffer-start buffer-length output-callback-var ;
 
 : make-decoder ( -- decoder )
   "mad_decoder" malloc-object ;
-
-: malloc-file-contents ( path -- alien )
-  file-contents >byte-array malloc-byte-array ;
 
 : mad-run ( -- int )
   make-decoder [ mad-init ] keep MAD_DECODER_MODE_SYNC mad_decoder_run ;

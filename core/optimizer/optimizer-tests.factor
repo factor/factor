@@ -3,7 +3,7 @@ kernel.private math optimizer prettyprint sequences sbufs
 strings tools.test vectors words sequences.private quotations
 optimizer.backend classes inference.dataflow tuples.private
 continuations growable optimizer.inlining namespaces hints ;
-IN: temporary
+IN: optimizer.tests
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
     H{ { 1 2 } { 3 4 } } H{ { 2 5 } } union*
@@ -293,7 +293,7 @@ TUPLE: silly-tuple a b ;
 [ ] [ [ <tuple> ] dataflow optimize drop ] unit-test
 
 ! Make sure we have sane heuristics
-: should-inline? method method-word flat-length 10 <= ;
+: should-inline? method flat-length 10 <= ;
 
 [ t ] [ \ fixnum \ shift should-inline? ] unit-test
 [ f ] [ \ array \ equal? should-inline? ] unit-test

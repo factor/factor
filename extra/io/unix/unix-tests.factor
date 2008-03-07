@@ -1,7 +1,7 @@
 USING: io.files io.sockets io kernel threads
 namespaces tools.test continuations strings byte-arrays
-sequences prettyprint system ;
-IN: temporary
+sequences prettyprint system io.encodings.binary io.encodings.ascii ;
+IN: io.unix.tests
 
 ! Unix domain stream sockets
 : socket-server "unix-domain-socket-test" temp-file ;
@@ -10,12 +10,12 @@ IN: temporary
     [ socket-server delete-file ] ignore-errors
 
     socket-server <local>
-    <server> [
-        stdio get accept [
+    ascii <server> [
+        accept [
             "Hello world" print flush
             readln "XYZ" = "FOO" "BAR" ? print flush
         ] with-stream
-    ] with-stream
+    ] with-disposal
 
     socket-server delete-file
 ] "Test" spawn drop
@@ -24,7 +24,7 @@ yield
 
 [ { "Hello world" "FOO" } ] [
     [
-        socket-server <local> <client>
+        socket-server <local> ascii <client>
         [
             readln ,
             "XYZ" print flush
@@ -125,15 +125,15 @@ datagram-client delete-file
 ! Invalid parameter tests
 
 [
-    image [ stdio get accept ] with-file-reader
+    image binary [ stdio get accept ] with-file-reader
 ] must-fail
 
 [
-    image [ stdio get receive ] with-file-reader
+    image binary [ stdio get receive ] with-file-reader
 ] must-fail
 
 [
-    image [
+    image binary [
         B{ 1 2 } datagram-server <local>
         stdio get send
     ] with-file-reader

@@ -8,31 +8,7 @@ IN: unix
 
 TYPEDEF: uint in_addr_t
 TYPEDEF: uint socklen_t
-TYPEDEF: uint time_t
 TYPEDEF: ulong size_t
-
-C-STRUCT: tm
-    { "int" "sec" }    ! Seconds: 0-59 (K&R says 0-61?)
-    { "int" "min" }    ! Minutes: 0-59
-    { "int" "hour" }   ! Hours since midnight: 0-23
-    { "int" "mday" }   ! Day of the month: 1-31
-    { "int" "mon" }    ! Months *since* january: 0-11
-    { "int" "year" }   ! Years since 1900
-    { "int" "wday" }   ! Days since Sunday (0-6)
-    { "int" "yday" }   ! Days since Jan. 1: 0-365
-    { "int" "isdst" }  ! +1 Daylight Savings Time, 0 No DST,
-    { "long" "gmtoff" } ! Seconds: 0-59 (K&R says 0-61?)
-    { "char*" "zone" } ;
-
-C-STRUCT: timespec
-    { "time_t" "sec" }
-    { "long" "nsec" } ;
-
-: make-timespec ( ms -- timespec )
-    1000 /mod 1000000 *
-    "timespec" <c-object>
-    [ set-timespec-nsec ] keep
-    [ set-timespec-sec ] keep ;
 
 : PROT_NONE   0 ; inline
 : PROT_READ   1 ; inline
@@ -45,6 +21,7 @@ C-STRUCT: timespec
 
 : MAP_FAILED -1 <alien> ; inline
 
+: ESRCH 3 ; inline
 : EEXIST 17 ; inline
 
 ! ! ! Unix functions
@@ -89,7 +66,6 @@ FUNCTION: ushort htons ( ushort n ) ;
 FUNCTION: int ioctl ( int fd, ulong request, char* argp ) ;
 FUNCTION: int lchown ( char* path, uid_t owner, gid_t group ) ;
 FUNCTION: int listen ( int s, int backlog ) ;
-FUNCTION: tm* localtime ( time_t* clock ) ;
 FUNCTION: off_t lseek ( int fildes, off_t offset, int whence ) ;
 FUNCTION: void* mmap ( void* addr, size_t len, int prot, int flags, int fd, off_t offset ) ;
 FUNCTION: int munmap ( void* addr, size_t len ) ;
@@ -117,7 +93,6 @@ FUNCTION: int setuid ( uid_t uid ) ;
 FUNCTION: int socket ( int domain, int type, int protocol ) ;
 FUNCTION: char* strerror ( int errno ) ;
 FUNCTION: int system ( char* command ) ;
-FUNCTION: time_t time ( time_t* t ) ;
 FUNCTION: int unlink ( char* path ) ;
 FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 

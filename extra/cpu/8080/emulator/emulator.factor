@@ -3,7 +3,7 @@
 !
 USING: kernel math sequences words arrays io io.files namespaces
 math.parser assocs quotations parser parser-combinators
-tools.time ;
+tools.time io.encodings.binary ;
 IN: cpu.8080.emulator
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;
@@ -439,7 +439,7 @@ M: cpu reset ( cpu -- )
 : load-rom ( filename cpu -- )
   #! Load the contents of the file into ROM.
   #! (address 0x0000-0x1FFF).
-  cpu-ram swap [ 
+  cpu-ram swap binary [ 
     0 swap (load-rom)
   ] with-file-reader ;
 
@@ -455,7 +455,7 @@ SYMBOL: rom-root
   #! file path shoul dbe relative to the '/roms' resource path.
   rom-dir [
     cpu-ram [
-      swap first2 rom-dir swap path+ [      
+      swap first2 rom-dir swap path+ binary [      
         swap (load-rom)
       ] with-file-reader
     ] curry each 

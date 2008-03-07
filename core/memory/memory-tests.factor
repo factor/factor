@@ -1,6 +1,6 @@
 USING: generic kernel kernel.private math memory prettyprint
 sequences tools.test words namespaces layouts classes ;
-IN: temporary
+IN: memory.tests
 
 TUPLE: testing x y z ;
 

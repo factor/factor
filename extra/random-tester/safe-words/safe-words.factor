@@ -54,7 +54,6 @@ IN: random-tester.safe-words
 
 : method-words
     {
-        method-def
         forget-word
     } ;
 

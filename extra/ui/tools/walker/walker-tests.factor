@@ -1,4 +1,4 @@
 USING: ui.tools.walker tools.test ;
-IN: temporary
+IN: ui.tools.walker.tests
 
 \ <walker-gadget> must-infer

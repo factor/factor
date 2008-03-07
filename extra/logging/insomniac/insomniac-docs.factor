@@ -27,7 +27,7 @@ HELP: schedule-insomniac
 { $values { "alist" "a sequence of pairs of shape " { $snippet "{ service word-names }" } } }
 { $description "Starts a thread which e-mails log reports and rotates logs daily." } ;
 
-ARTICLE: "logging.insomniac" "Automating log analysis and rotation"
+ARTICLE: "logging.insomniac" "Automated log analysis"
 "The " { $vocab-link "logging.insomniac" } " vocabulary builds on the " { $vocab-link "logging.analysis" } " vocabulary. It provides support for e-mailing log reports and rotating logs on a daily basis. E-mails are sent using the " { $vocab-link "smtp" } " vocabulary."
 $nl
 "Required configuration parameters:"

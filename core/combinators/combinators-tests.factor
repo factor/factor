@@ -1,4 +1,4 @@
-IN: temporary
+IN: combinators.tests
 USING: alien strings kernel math tools.test io prettyprint
 namespaces combinators words ;
 

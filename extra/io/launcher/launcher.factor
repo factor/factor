@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.backend io.timeouts system kernel namespaces
 strings hashtables sequences assocs combinators vocabs.loader
-init threads continuations math ;
+init threads continuations math io.encodings io.streams.duplex
+io.nonblocking ;
 IN: io.launcher
 
 ! Non-blocking process exit notification facility
@@ -35,12 +36,15 @@ SYMBOL: +environment-mode+
 SYMBOL: +stdin+
 SYMBOL: +stdout+
 SYMBOL: +stderr+
-SYMBOL: +closed+
+
 SYMBOL: +timeout+
 
 SYMBOL: +prepend-environment+
 SYMBOL: +replace-environment+
 SYMBOL: +append-environment+
+
+SYMBOL: +closed+
+SYMBOL: +inherit+
 
 : default-descriptor
     H{
@@ -121,13 +125,13 @@ M: process set-timeout set-process-timeout ;
 
 M: process timed-out kill-process ;
 
-HOOK: process-stream* io-backend ( desc -- stream process )
+HOOK: (process-stream) io-backend ( desc -- in out process )
 
 TUPLE: process-stream process ;
 
-: <process-stream> ( desc -- stream )
-    >descriptor
-    [ process-stream* ] keep
+: <process-stream> ( desc encoding -- stream )
+    swap >descriptor
+    [ (process-stream) >r rot <encoder-duplex> r> ] keep
     +timeout+ swap at [ over set-timeout ] when*
     { set-delegate set-process-stream-process }
     process-stream construct ;
@@ -141,3 +145,12 @@ TUPLE: process-stream process ;
     [ set-process-status ] keep
     [ processes get delete-at* drop [ resume ] each ] keep
     f swap set-process-handle ;
+
+GENERIC: underlying-handle ( stream -- handle )
+
+M: port underlying-handle port-handle ;
+
+M: duplex-stream underlying-handle
+    dup duplex-stream-in underlying-handle
+    swap duplex-stream-out underlying-handle tuck =
+    [ "Invalid duplex stream" throw ] when ;

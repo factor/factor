@@ -92,6 +92,6 @@ SYMBOL: twidth
 
     ] with-text
 
-    "extra/pdf/test/font_test.pdf" resource-path save-to-file
+    "font_test.pdf" temp-file save-to-file
 
 ] with-pdf

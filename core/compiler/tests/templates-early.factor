@@ -1,5 +1,5 @@
 ! Testing templates machinery without compiling anything
-IN: temporary
+IN: compiler.tests
 USING: compiler generator generator.registers
 generator.registers.private tools.test namespaces sequences
 words kernel math effects definitions compiler.units ;

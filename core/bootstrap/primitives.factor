@@ -623,6 +623,7 @@ builtins get num-tags get tail f union-class define-class
     { "fopen" "io.streams.c" }
     { "fgetc" "io.streams.c" }
     { "fread" "io.streams.c" }
+    { "fputc" "io.streams.c" }
     { "fwrite" "io.streams.c" }
     { "fflush" "io.streams.c" }
     { "fclose" "io.streams.c" }

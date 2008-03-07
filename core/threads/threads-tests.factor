@@ -1,5 +1,5 @@
 USING: namespaces io tools.test threads kernel ;
-IN: temporary
+IN: threads.tests
 
 3 "x" set
 namespace [ [ yield 2 "x" set ] bind ] curry "Test" spawn drop

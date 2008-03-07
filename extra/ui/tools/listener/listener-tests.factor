@@ -3,7 +3,7 @@ ui.tools.listener hashtables kernel namespaces parser sequences
 tools.test ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.panes vocabs words tools.test.ui slots.private
 threads ;
-IN: temporary
+IN: ui.tools.listener.tests
 
 [ f ] [ "word" source-editor command-map empty? ] unit-test
 

@@ -162,6 +162,7 @@ void *primitives[] = {
 	primitive_fopen,
 	primitive_fgetc,
 	primitive_fread,
+	primitive_fputc,
 	primitive_fwrite,
 	primitive_fflush,
 	primitive_fclose,

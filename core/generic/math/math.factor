@@ -43,7 +43,7 @@ TUPLE: no-math-method left right generic ;
 
 : applicable-method ( generic class -- quot )
     over method
-    [ method-word word-def ]
+    [ word-def ]
     [ default-math-method ] ?if ;
 
 : object-method ( generic -- quot )

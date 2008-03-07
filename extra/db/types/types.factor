@@ -3,7 +3,8 @@
 USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep sequences.lib
 words namespaces tools.walker slots slots.private classes
-mirrors tuples combinators ;
+mirrors tuples combinators calendar.format serialize
+io.streams.string ;
 IN: db.types
 
 HOOK: modifier-table db ( -- hash )
@@ -60,14 +61,19 @@ SYMBOL: +has-many+
 : relation? ( spec -- ? ) [ +has-many+ = ] deep-find ;
 
 SYMBOL: INTEGER
-SYMBOL: BIG_INTEGER
+SYMBOL: BIG-INTEGER
 SYMBOL: DOUBLE
 SYMBOL: REAL
 SYMBOL: BOOLEAN
 SYMBOL: TEXT
 SYMBOL: VARCHAR
-SYMBOL: TIMESTAMP
 SYMBOL: DATE
+SYMBOL: TIME
+SYMBOL: DATETIME
+SYMBOL: TIMESTAMP
+SYMBOL: BLOB
+SYMBOL: FACTOR-BLOB
+SYMBOL: NULL
 
 : spec>tuple ( class spec -- tuple )
     [ ?first3 ] keep 3 ?tail*
@@ -79,15 +85,6 @@ SYMBOL: DATE
         set-sql-spec-modifiers
     } sql-spec construct
     dup normalize-spec ;
-
-: sql-type-hash ( -- assoc )
-    H{
-        { INTEGER "integer" }
-        { TEXT "text" }
-        { VARCHAR "varchar" }
-        { DOUBLE "real" }
-        { TIMESTAMP "timestamp" }
-    } ;
 
 TUPLE: no-sql-type ;
 : no-sql-type ( -- * ) T{ no-sql-type } throw ;
@@ -156,33 +153,6 @@ TUPLE: no-sql-modifier ;
     [ lookup-modifier ] map " " join
     dup empty? [ " " swap append ] unless ;
 
-SYMBOL: building-seq 
-: get-building-seq ( n -- seq )
-    building-seq get nth ;
-
-: n, get-building-seq push ;
-: n% get-building-seq push-all ;
-: n# >r number>string r> n% ;
-
-: 0, 0 n, ;
-: 0% 0 n% ;
-: 0# 0 n# ;
-: 1, 1 n, ;
-: 1% 1 n% ;
-: 1# 1 n# ;
-: 2, 2 n, ;
-: 2% 2 n% ;
-: 2# 2 n# ;
-
-: nmake ( quot exemplars -- seqs )
-    dup length dup zero? [ 1+ ] when
-    [
-        [
-            [ drop 1024 swap new-resizable ] 2map
-            [ building-seq set call ] keep
-        ] 2keep >r [ like ] 2map r> firstn 
-    ] with-scope ;
-
 HOOK: bind% db ( spec -- )
 
 TUPLE: no-slot-named ;
@@ -210,15 +180,3 @@ TUPLE: no-slot-named ;
         >r dup sql-spec-type swap sql-spec-slot-name r>
         get-slot-named swap
     ] curry { } map>assoc ;
-
-: sql-type>factor-type ( obj type -- obj )
-    dup array? [ first ] when
-    {
-        { +native-id+ [ string>number ] }
-        { INTEGER [ string>number ] }
-        { DOUBLE [ string>number ] }
-        { REAL [ string>number ] }
-        { TEXT [ ] }
-        { VARCHAR [ ] }
-        [ "no conversion from sql type to factor type" throw ]
-    } case ;

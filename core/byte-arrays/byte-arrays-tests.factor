@@ -1,4 +1,4 @@
-IN: temporary
+IN: byte-arrays.tests
 USING: tools.test byte-arrays ;
 
 [ B{ 1 2 3 0 0 0 } ] [ 6 B{ 1 2 3 } resize-byte-array ] unit-test

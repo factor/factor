@@ -1,34 +1,34 @@
-IN: temporary
-USING: tools.test io.files io threads kernel continuations ;
+IN: io.files.tests
+USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk/" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
 
 [ ] [
-    "test-foo.txt" temp-file [
+    "test-foo.txt" temp-file ascii [
         "Hello world." print
     ] with-file-writer
 ] unit-test
 
 [ ] [
-    "test-foo.txt" temp-file <file-appender> [
+    "test-foo.txt" temp-file ascii [
         "Hello appender." print
-    ] with-stream
+    ] with-file-appender
 ] unit-test
 
 [ ] [
-    "test-bar.txt" temp-file <file-appender> [
+    "test-bar.txt" temp-file ascii [
         "Hello appender." print
-    ] with-stream
+    ] with-file-appender
 ] unit-test
 
 [ "Hello world.\nHello appender.\n" ] [
-    "test-foo.txt" temp-file file-contents
+    "test-foo.txt" temp-file ascii file-contents
 ] unit-test
 
 [ "Hello appender.\n" ] [
-    "test-bar.txt" temp-file file-contents
+    "test-bar.txt" temp-file ascii file-contents
 ] unit-test
 
 [ ] [ "test-foo.txt" temp-file delete-file ] unit-test
@@ -42,7 +42,7 @@ USING: tools.test io.files io threads kernel continuations ;
 [ ] [ "test-blah" temp-file make-directory ] unit-test
 
 [ ] [
-    "test-blah/fooz" temp-file <file-writer> dispose
+    "test-blah/fooz" temp-file ascii <file-writer> dispose
 ] unit-test
 
 [ t ] [
@@ -55,11 +55,11 @@ USING: tools.test io.files io threads kernel continuations ;
 
 [ f ] [ "test-blah" temp-file exists? ] unit-test
 
-[ ] [ "test-quux.txt" temp-file [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
+[ ] [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
 
 [ ] [ "test-quux.txt" temp-file delete-file ] unit-test
 
-[ ] [ "test-quux.txt" temp-file [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
+[ ] [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
 
 [ ] [ "test-quux.txt" "quux-test.txt" [ temp-file ] 2apply move-file ] unit-test
 [ t ] [ "quux-test.txt" temp-file exists? ] unit-test
@@ -70,7 +70,7 @@ USING: tools.test io.files io threads kernel continuations ;
 
 [ ] [
     "delete-tree-test/a/b/c/d" temp-file
-    [ "Hi" print ] with-file-writer
+    ascii [ "Hi" print ] with-file-writer
 ] unit-test
 
 [ ] [
@@ -83,7 +83,7 @@ USING: tools.test io.files io threads kernel continuations ;
 
 [ ] [
     "copy-tree-test/a/b/c/d" temp-file
-    [ "Foobar" write ] with-file-writer
+    ascii [ "Foobar" write ] with-file-writer
 ] unit-test
 
 [ ] [
@@ -92,7 +92,7 @@ USING: tools.test io.files io threads kernel continuations ;
 ] unit-test
 
 [ "Foobar" ] [
-    "copy-destination/a/b/c/d" temp-file file-contents
+    "copy-destination/a/b/c/d" temp-file ascii file-contents
 ] unit-test
 
 [ ] [
@@ -101,19 +101,19 @@ USING: tools.test io.files io threads kernel continuations ;
 
 [ ] [
     "copy-tree-test" temp-file
-    "copy-destination" temp-file copy-tree-to
+    "copy-destination" temp-file copy-tree-into
 ] unit-test
 
 [ "Foobar" ] [
-    "copy-destination/copy-tree-test/a/b/c/d" temp-file file-contents
+    "copy-destination/copy-tree-test/a/b/c/d" temp-file ascii file-contents
 ] unit-test
 
 [ ] [
-    "copy-destination/copy-tree-test/a/b/c/d" temp-file "" temp-file copy-file-to
+    "copy-destination/copy-tree-test/a/b/c/d" temp-file "" temp-file copy-file-into
 ] unit-test
 
 [ "Foobar" ] [
-    "d" temp-file file-contents
+    "d" temp-file ascii file-contents
 ] unit-test
 
 [ ] [ "d" temp-file delete-file ] unit-test
@@ -121,3 +121,5 @@ USING: tools.test io.files io threads kernel continuations ;
 [ ] [ "copy-destination" temp-file delete-tree ] unit-test
 
 [ ] [ "copy-tree-test" temp-file delete-tree ] unit-test
+
+[ t ] [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test

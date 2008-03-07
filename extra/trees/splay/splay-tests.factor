@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test trees.splay math namespaces assocs
 sequences random ;
-IN: temporary
+IN: trees.splay.tests
 
 : randomize-numeric-splay-tree ( splay-tree -- )
     100 [ drop 100 random swap at drop ] with each ;

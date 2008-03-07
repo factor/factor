@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays destructors io io.backend
 io.buffers io.files io.nonblocking io.sockets io.binary
-io.sockets.impl io.windows.files.unique windows.errors
-strings io.streams.duplex kernel math namespaces sequences
-windows windows.kernel32 windows.shell32 windows.types
-windows.winsock splitting continuations math.bitfields ;
+io.sockets.impl windows.errors strings io.streams.duplex
+kernel math namespaces sequences windows windows.kernel32
+windows.shell32 windows.types windows.winsock splitting
+continuations math.bitfields ;
 IN: io.windows
 
 TUPLE: windows-nt-io ;
@@ -19,9 +19,6 @@ M: windows-io destruct-socket closesocket drop ;
 TUPLE: win32-file handle ptr ;
 
 C: <win32-file> win32-file
-
-: <win32-duplex-stream> ( in out -- stream )
-    >r f <win32-file> r> f <win32-file> handle>duplex-stream ;
 
 HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
@@ -55,7 +52,7 @@ M: win32-file close-handle ( handle -- )
 : open-file ( path access-mode create-mode flags -- handle )
     [
         >r >r >r normalize-pathname r>
-        share-mode f r> r> CreateFile-flags f CreateFile
+        share-mode security-attributes-inherit r> r> CreateFile-flags f CreateFile
         dup invalid-handle? dup close-later
         dup add-completion
     ] with-destructors ;
@@ -112,13 +109,13 @@ C: <FileArgs> FileArgs
     [ FileArgs-lpNumberOfBytesRet ] keep
     FileArgs-lpOverlapped ;
 
-M: windows-io <file-reader> ( path -- stream )
+M: windows-io (file-reader) ( path -- stream )
     open-read <win32-file> <reader> ;
 
-M: windows-io <file-writer> ( path -- stream )
+M: windows-io (file-writer) ( path -- stream )
     open-write <win32-file> <writer> ;
 
-M: windows-io <file-appender> ( path -- stream )
+M: windows-io (file-appender) ( path -- stream )
     open-append <win32-file> <writer> ;
 
 M: windows-io move-file ( from to -- )

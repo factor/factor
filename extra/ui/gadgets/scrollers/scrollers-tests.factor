@@ -1,4 +1,4 @@
-IN: temporary
+IN: ui.gadgets.scrollers.tests
 USING: ui.gadgets ui.gadgets.scrollers
 namespaces tools.test kernel models ui.gadgets.viewports
 ui.gadgets.labels ui.gadgets.grids ui.gadgets.frames

@@ -1,8 +1,8 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: io.sockets
 USING: generic kernel io.backend namespaces continuations
-sequences arrays ;
+sequences arrays io.encodings io.nonblocking ;
+IN: io.sockets
 
 TUPLE: local path ;
 
@@ -26,17 +26,26 @@ TUPLE: client-stream addr ;
     { set-client-stream-addr set-delegate }
     client-stream construct ;
 
-HOOK: (client) io-backend ( addrspec -- stream )
+HOOK: (client) io-backend ( addrspec -- client-in client-out )
 
-GENERIC: <client> ( addrspec -- stream )
+GENERIC: client* ( addrspec -- client-in client-out )
+M: array client* [ (client) 2array ] attempt-all first2 ;
+M: object client* (client) ;
 
-M: array <client> [ (client) ] attempt-all ;
+: <client> ( addrspec encoding -- stream )
+    >r client* r> <encoder-duplex> ;
 
-M: object <client> (client) ;
+HOOK: (server) io-backend ( addrspec -- handle )
 
-HOOK: <server> io-backend ( addrspec -- server )
+: <server> ( addrspec encoding -- server )
+    >r [ (server) ] keep r> <server-port> ;
 
-HOOK: accept io-backend ( server -- client )
+HOOK: (accept) io-backend ( server -- addrspec handle )
+
+: accept ( server -- client )
+    [ (accept) dup <reader&writer> ] keep
+    server-port-encoding <encoder-duplex>
+    <client-stream> ;
 
 HOOK: <datagram> io-backend ( addrspec -- datagram )
 
@@ -48,7 +57,7 @@ HOOK: resolve-host io-backend ( host serv passive? -- seq )
 
 HOOK: host-name io-backend ( -- string )
 
-M: inet <client>
+M: inet client*
     dup inet-host swap inet-port f resolve-host
     dup empty? [ "Host name lookup failed" throw ] when
-    <client> ;
+    client* ;

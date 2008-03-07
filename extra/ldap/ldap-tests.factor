@@ -5,10 +5,12 @@ tools.test ;
 
 get-ldp LDAP_OPT_PROTOCOL_VERSION LDAP_VERSION3 <int> set-option
 
-[ B{ 0 0 0 3 } ] [ 
+[ 3 ] [ 
     get-ldp LDAP_OPT_PROTOCOL_VERSION "int*" <c-object> [ get-option ] keep
+    *int
 ] unit-test
 
+[
 get-ldp "cn=jimbob,dc=example,dc=com" "secret" [
 
     ! get-ldp "dc=example,dc=com" LDAP_SCOPE_ONELEVEL "(objectclass=*)" f 0
@@ -52,3 +54,4 @@ get-ldp "cn=jimbob,dc=example,dc=com" "secret" [
     get-ldp get-message next-message msgtype result-type
 
 ] with-bind
+] drop

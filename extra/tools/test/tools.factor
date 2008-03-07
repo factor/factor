@@ -1,4 +1,4 @@
-IN: temporary
+IN: tools.test.tests
 USING: completion words sequences test ;
 
 [ ] [ "swp" apropos ] unit-test

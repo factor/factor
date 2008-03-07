@@ -1,4 +1,4 @@
-IN: temporary
+IN: inference.state.tests
 USING: tools.test inference.state words ;
 
 SYMBOL: a

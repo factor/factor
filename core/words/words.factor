@@ -68,7 +68,7 @@ SYMBOL: bootstrapping?
 : crossref? ( word -- ? )
     {
         { [ dup "forgotten" word-prop ] [ f ] }
-        { [ dup "method" word-prop ] [ t ] }
+        { [ dup "method-def" word-prop ] [ t ] }
         { [ dup word-vocabulary ] [ t ] }
         { [ t ] [ f ] }
     } cond nip ;

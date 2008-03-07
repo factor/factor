@@ -1,6 +1,6 @@
 USING: smtp tools.test io.streams.string threads
 smtp.server kernel sequences namespaces logging ;
-IN: temporary
+IN: smtp.tests
 
 { 0 0 } [ [ ] with-smtp-connection ] must-infer-as
 
@@ -84,6 +84,7 @@ IN: temporary
 
 [ ] [
     [
+        "localhost" smtp-host set
         4321 smtp-port set
 
         "Hi guys\nBye guys"
