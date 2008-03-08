@@ -68,11 +68,11 @@ check_gcc_version() {
 }
 
 set_downloader() {
-    test_program_installed wget
+    test_program_installed wget curl
     if [[ $? -ne 0 ]] ; then
-        DOWNLOAD=wget
+        DOWNLOADER=wget
     else
-        DOWNLOAD="curl -O"
+        DOWNLOADER="curl -O"
     fi
 }
 
@@ -202,6 +202,7 @@ echo_build_info() {
     echo MAKE_IMAGE_TARGET=$MAKE_IMAGE_TARGET
     echo GIT_PROTOCOL=$GIT_PROTOCOL
     echo GIT_URL=$GIT_URL
+    echo DOWNLOADER=$DOWNLOADER
 }
 
 set_build_info() {
@@ -234,6 +235,7 @@ find_build_info() {
     find_word_size
     set_factor_binary
     set_build_info
+	set_downloader
     echo_build_info
 }
 
@@ -303,12 +305,12 @@ get_boot_image() {
 }
 
 get_url() {
-    if [[ $DOWNLOAD -eq "" ]] ; then
+    if [[ $DOWNLOADER -eq "" ]] ; then
         set_downloader;
     fi
-    echo $DOWNLOAD $1 ;
-    $DOWNLOAD $1
-    check_ret $DOWNLOAD
+    echo $DOWNLOADER $1 ;
+    $DOWNLOADER $1
+    check_ret $DOWNLOADER
 }
 
 maybe_download_dlls() {
@@ -371,14 +373,23 @@ make_boot_image() {
 
 }
 
-install_libraries_apt() {
+install_build_system_apt() {
+    ensure_program_installed yes
     yes | sudo apt-get install sudo libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
     check_ret sudo
 }
 
-install_libraries_port() {
-    ensure_program_installed port
-    yes | sudo port install git-core
+install_build_system_port() {
+    test_program_installed git
+    if [[ $? -ne 1 ]] ; then
+    	ensure_program_installed yes
+		echo "git not found."
+		echo "This script requires either git-core or port."
+		echo "If it fails, install git-core or port and try again."
+    	ensure_program_installed port
+		echo "Installing git-core with port...this will take awhile."
+    	yes | sudo port install git-core
+    fi
 }
 
 usage() {
@@ -389,8 +400,8 @@ usage() {
 
 case "$1" in
     install) install ;;
-    install-x11) install_libraries_apt; install ;;
-    install-macosx) install_libraries_port; install ;;
+    install-x11) install_build_system_apt; install ;;
+    install-macosx) install_build_system_port; install ;;
     self-update) update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
