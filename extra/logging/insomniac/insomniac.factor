@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: logging.analysis logging.server logging smtp io.sockets
-kernel io.files io.streams.string namespaces raptor.cron assocs
-io.encodings.utf8 ;
+USING: logging.analysis logging.server logging smtp kernel
+io.files io.streams.string namespaces alarms assocs
+io.encodings.utf8 accessors calendar qualified ;
+QUALIFIED: io.sockets
 IN: logging.insomniac
 
 SYMBOL: insomniac-smtp-host
@@ -25,17 +26,20 @@ SYMBOL: insomniac-recipients
     ] with-scope ; inline
 
 : email-subject ( service -- string )
-    [ "[INSOMNIAC] " % % " on " % host-name % ] "" make ;
+    [
+        "[INSOMNIAC] " % % " on " % io.sockets:host-name %
+    ] "" make ;
 
 : (email-log-report) ( service word-names -- )
     [
-        over >r
-        ?analyze-log dup [
-            r> email-subject
-            insomniac-recipients get
-            insomniac-sender get
-            send-simple-message
-        ] [ r> 2drop ] if
+        dupd ?analyze-log dup [
+            <email>
+                swap >>body
+                insomniac-recipients get >>to
+                insomniac-sender get >>from
+                swap email-subject >>subject
+            send
+        ] [ 2drop ] if
     ] with-insomniac-smtp ;
 
 \ (email-log-report) NOTICE add-error-logging
@@ -44,6 +48,5 @@ SYMBOL: insomniac-recipients
     "logging.insomniac" [ (email-log-report) ] with-logging ;
 
 : schedule-insomniac ( service word-names -- )
-    { 25 } { 6 } f f f <when> -rot [
-        [ email-log-report ] assoc-each rotate-logs
-    ] 2curry schedule ;
+    [ [ email-log-report ] assoc-each rotate-logs ] 2curry
+    1 days every drop ;

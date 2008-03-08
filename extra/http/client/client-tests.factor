@@ -23,6 +23,5 @@ tuple-syntax namespaces ;
     [
         "http://www.apple.com/index.html"
         <get-request>
-        request-with-url
     ] with-scope
 ] unit-test

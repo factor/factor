@@ -127,3 +127,30 @@ read-response-test-1' 1array [
     "rmid=732423sdfs73242; path=/; domain=.example.net; expires=Fri, 31-Dec-2010 23:59:59 GMT"
     dup parse-cookies unparse-cookies =
 ] unit-test
+
+! Live-fire exercise
+USING: http.server http.server.static http.server.actions
+http.client io.server io.files io accessors namespaces threads
+io.encodings.ascii ;
+
+[ ] [
+    [
+        <dispatcher>
+        <action>
+            [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>get
+        "quit" add-responder
+        "extra/http/test" resource-path <static> >>default
+        default-host set
+
+        [ 1237 httpd ] "HTTPD test" spawn drop
+    ] with-scope
+] unit-test
+
+[ t ] [
+    "extra/http/test/foo.html" resource-path ascii file-contents
+    "http://localhost:1237/foo.html" http-get =
+] unit-test
+
+[ "Goodbye" ] [
+    "http://localhost:1237/quit" http-get
+] unit-test

@@ -1,5 +1,6 @@
 USING: assocs html.parser kernel math sequences strings ascii
-arrays shuffle unicode.case namespaces splitting http ;
+arrays shuffle unicode.case namespaces splitting http
+sequences.lib ;
 IN: html.parser.analyzer
 
 : (find-relative)

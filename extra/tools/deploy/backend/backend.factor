@@ -6,7 +6,7 @@ continuations math definitions mirrors splitting parser classes
 inspector layouts vocabs.loader prettyprint.config prettyprint
 debugger io.streams.c io.streams.duplex io.files io.backend
 quotations io.launcher words.private tools.deploy.config
-bootstrap.image io.encodings.utf8 ;
+bootstrap.image io.encodings.utf8 accessors ;
 IN: tools.deploy.backend
 
 : (copy-lines) ( stream -- )
@@ -17,11 +17,11 @@ IN: tools.deploy.backend
     [ (copy-lines) ] with-disposal ;
 
 : run-with-output ( arguments -- )
-    [
-        +arguments+ set
-        +stdout+ +stderr+ set
-    ] H{ } make-assoc utf8 <process-stream>
-    dup duplex-stream-out dispose
+    <process>
+        swap >>command
+        +stdout+ >>stderr
+        +closed+ >>stdin
+    utf8 <process-stream>
     dup copy-lines
     process-stream-process wait-for-process zero? [
         "Deployment failed" throw
