@@ -6,72 +6,76 @@ splitting calendar continuations accessors vectors io.encodings.latin1
 io.encodings.binary ;
 IN: http.client
 
+DEFER: http-request
+
+<PRIVATE
+
 : parse-url ( url -- resource host port )
     "http://" ?head [ "Only http:// supported" throw ] unless
     "/" split1 [ "/" swap append ] [ "/" ] if*
     swap parse-host ;
 
-<PRIVATE
-
 : store-path ( request path -- request )
     "?" split1 >r >>path r> dup [ query>assoc ] when >>query ;
 
-! This is all pretty complex because it needs to handle
-! HTTP redirects, which might be absolute or relative
 : request-with-url ( url request -- request )
-    clone dup "request" set
     swap parse-url >r >r store-path r> >>host r> >>port ;
 
-DEFER: (http-request)
-
+! This is all pretty complex because it needs to handle
+! HTTP redirects, which might be absolute or relative
 : absolute-redirect ( url -- request )
-    "request" get request-with-url ;
+    request get request-with-url ;
 
 : relative-redirect ( path -- request )
-    "request" get swap store-path ;
+    request get swap store-path ;
 
 : do-redirect ( response -- response stream )
     dup response-code 300 399 between? [
+        stdio get dispose
         header>> "location" swap at
         dup "http://" head? [
             absolute-redirect
         ] [
             relative-redirect
-        ] if "GET" >>method (http-request)
+        ] if "GET" >>method http-request
     ] [
         stdio get
     ] if ;
 
-: (http-request) ( request -- response stream )
-    dup host>> over port>> <inet> latin1 <client> stdio set
-    dup "r" set-global  write-request flush read-response
-    do-redirect ;
+: request-addr ( request -- addr )
+    dup host>> swap port>> <inet> ;
+
+: close-on-error ( stream quot -- )
+    [ with-stream* ] curry [ ] pick [ dispose ] curry cleanup ;
+    inline
 
 PRIVATE>
 
-: http-request ( url request -- response stream )
-    [
-        request-with-url
+: http-request ( request -- response stream )
+    dup request [
+        dup request-addr latin1 <client>
+        1 minutes over set-timeout
         [
-            (http-request)
-            1 minutes over set-timeout
-        ] [ ] [ stdio get dispose ] cleanup
-    ] with-scope ;
+            write-request flush
+            read-response
+            do-redirect
+        ] close-on-error
+    ] with-variable ;
 
-: <get-request> ( -- request )
-    <request> "GET" >>method ;
+: <get-request> ( url -- request )
+    <request> request-with-url "GET" >>method ;
 
 : http-get-stream ( url -- response stream )
     <get-request> http-request ;
 
 : success? ( code -- ? ) 200 = ;
 
-: check-response ( response stream -- stream )
-    swap code>> success?
-    [ dispose "HTTP download failed" throw ] unless ;
+: check-response ( response -- )
+    code>> success?
+    [ "HTTP download failed" throw ] unless ;
 
 : http-get ( url -- string )
-    http-get-stream check-response contents ;
+    http-get-stream contents swap check-response ;
 
 : download-name ( url -- name )
     file-name "?" split1 drop "/" ?tail drop ;
@@ -84,12 +88,13 @@ PRIVATE>
 : download ( url -- )
     dup download-name download-to ;
 
-: <post-request> ( content-type content -- request )
+: <post-request> ( content-type content url -- request )
     <request>
+    request-with-url
     "POST" >>method
     swap >>post-data
     swap >>post-data-type ;
 
 : http-post ( content-type content url -- response string )
     #! The content is URL encoded for you.
-    -rot url-encode <post-request> http-request contents ;
+    >r url-encode r> <post-request> http-request contents ;

@@ -3,7 +3,7 @@
 USING: calendar html io io.files kernel math math.parser http
 http.server namespaces parser sequences strings assocs
 hashtables debugger http.mime sorting html.elements logging
-calendar.format new-slots accessors ;
+calendar.format new-slots accessors io.encodings.binary ;
 IN: http.server.static
 
 SYMBOL: responder
@@ -33,7 +33,7 @@ TUPLE: file-responder root hook special ;
         <content>
         over file-length "content-length" set-header
         over file-http-date "last-modified" set-header
-        swap [ <file-reader> stdio get stream-copy ] curry >>body
+        swap [ binary <file-reader> stdio get stream-copy ] curry >>body
     ] <file-responder> ;
 
 : serve-static ( filename mime-type -- response )

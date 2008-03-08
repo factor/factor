@@ -85,5 +85,8 @@ PRIVATE>
 : later ( quot dt -- alarm )
     from-now f add-alarm ;
 
+: every ( quot dt -- alarm )
+    [ from-now ] keep add-alarm ;
+
 : cancel-alarm ( alarm -- )
     alarm-entry [ alarms get-global heap-delete ] if-box? ;
