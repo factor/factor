@@ -3,23 +3,13 @@
 USING: alien.c-types io.files io.windows kernel
 math windows windows.kernel32 combinators.cleave
 windows.time calendar combinators math.functions
-sequences combinators.lib namespaces words ;
+sequences combinators.lib namespaces words symbols ;
 IN: io.windows.files
 
-SYMBOL: +read-only+
-SYMBOL: +hidden+
-SYMBOL: +system+
-SYMBOL: +directory+
-SYMBOL: +archive+
-SYMBOL: +device+
-SYMBOL: +normal+
-SYMBOL: +temporary+
-SYMBOL: +sparse-file+
-SYMBOL: +reparse-point+
-SYMBOL: +compressed+
-SYMBOL: +offline+
-SYMBOL: +not-content-indexed+
-SYMBOL: +encrypted+
+SYMBOLS: +read-only+ +hidden+ +system+
++directory+ +archive+ +device+ +normal+ +temporary+
++sparse-file+ +reparse-point+ +compressed+ +offline+
++not-content-indexed+ +encrypted+ ;
 
 : expand-constants ( word/obj -- obj'/obj )
     dup word? [ execute ] when ;

@@ -1,19 +1,10 @@
 USING: crypto.common kernel splitting math sequences namespaces
-io.binary ;
+io.binary symbols ;
 IN: crypto.sha2
 
 <PRIVATE
 
-SYMBOL: vars
-SYMBOL: M
-SYMBOL: K
-SYMBOL: H
-SYMBOL: S0
-SYMBOL: S1
-SYMBOL: process-M
-SYMBOL: word-size
-SYMBOL: block-size
-SYMBOL: >word
+SYMBOL: vars M K H S0 S1 process-M word-size block-size >word ;
 
 : a 0 ;
 : b 1 ;
@@ -139,4 +130,3 @@ PRIVATE>
 
 : string>sha-256-string ( string -- hexstring )
     string>sha-256 hex-string ;
-

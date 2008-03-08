@@ -4,7 +4,7 @@ USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep sequences.lib
 words namespaces tools.walker slots slots.private classes
 mirrors tuples combinators calendar.format serialize
-io.streams.string ;
+io.streams.string symbols ;
 IN: db.types
 
 HOOK: modifier-table db ( -- hash )
@@ -14,11 +14,10 @@ HOOK: create-type-table db ( -- hash )
 HOOK: compound-type db ( str n -- hash )
 
 TUPLE: sql-spec class slot-name column-name type modifiers primary-key ;
-! ID is the Primary key
-! +native-id+ can be a columns type or a modifier
-SYMBOL: +native-id+
-! +assigned-id+ can only be a modifier
-SYMBOL: +assigned-id+
+
+SYMBOLS: +native-id+ +assigned-id+ +autoincrement+
++serial+ +unique+ +default+ +null+ +not-null+
++foreign-id+ +has-many+ ;
 
 : (primary-key?) ( obj -- ? )
     { +native-id+ +assigned-id+ } member? ;
@@ -45,35 +44,10 @@ SYMBOL: +assigned-id+
 : assigned-id? ( spec -- ? )
     sql-spec-primary-key +assigned-id+ = ;
 
-SYMBOL: +foreign-id+
-
-! Same concept, SQLite has autoincrement, PostgreSQL has serial
-SYMBOL: +autoincrement+
-SYMBOL: +serial+
-SYMBOL: +unique+
-
-SYMBOL: +default+
-SYMBOL: +null+
-SYMBOL: +not-null+
-
-SYMBOL: +has-many+
-
 : relation? ( spec -- ? ) [ +has-many+ = ] deep-find ;
 
-SYMBOL: INTEGER
-SYMBOL: BIG-INTEGER
-SYMBOL: DOUBLE
-SYMBOL: REAL
-SYMBOL: BOOLEAN
-SYMBOL: TEXT
-SYMBOL: VARCHAR
-SYMBOL: DATE
-SYMBOL: TIME
-SYMBOL: DATETIME
-SYMBOL: TIMESTAMP
-SYMBOL: BLOB
-SYMBOL: FACTOR-BLOB
-SYMBOL: NULL
+SYMBOLS: INTEGER BIG-INTEGER DOUBLE REAL BOOLEAN TEXT VARCHAR
+DATE TIME DATETIME TIMESTAMP BLOB FACTOR-BLOB NULL ;
 
 : spec>tuple ( class spec -- tuple )
     [ ?first3 ] keep 3 ?tail*

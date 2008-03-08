@@ -3,7 +3,7 @@
 USING: arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
 math.vectors tuples classes ui.gadgets combinators.lib boxes
-calendar alarms ;
+calendar alarms symbols ;
 IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
@@ -49,10 +49,7 @@ TUPLE: select-all-action ; C: <select-all-action> select-all-action
     tuple>array 1 head* >tuple ;
 
 ! Modifiers
-SYMBOL: C+
-SYMBOL: A+
-SYMBOL: M+
-SYMBOL: S+
+SYMBOLS: C+ A+ M+ S+ ;
 
 TUPLE: key-down mods sym ;
 
