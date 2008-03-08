@@ -40,11 +40,11 @@ PRIVATE>
     f swap t resolve-host ;
 
 : with-server ( seq service encoding quot -- )
-    V{ } clone [
-        swap servers [
+    V{ } clone servers [
+        [
             [ server-loop ] 2curry with-logging
-        ] with-variable
-    ] 3curry curry parallel-each ; inline
+        ] 3curry parallel-each
+    ] with-variable ; inline
 
 : stop-server ( -- )
     servers get [ dispose ] each ;

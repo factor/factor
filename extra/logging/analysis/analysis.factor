@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences namespaces words assocs logging sorting
-prettyprint io io.styles strings logging.parser ;
+prettyprint io io.styles strings logging.parser calendar.format ;
 IN: logging.analysis
 
 SYMBOL: word-names
@@ -42,16 +42,14 @@ SYMBOL: message-histogram
     ] tabular-output ;
 
 : log-entry.
-    [
-        dup first [ write ] with-cell
-        dup second [ pprint ] with-cell
-        dup third [ write ] with-cell
-        fourth "\n" join [ write ] with-cell
-    ] with-row ;
+    "====== " write
+    dup first (timestamp>string) bl
+    dup second pprint bl
+    dup third write nl
+    fourth "\n" join print ;
 
 : errors. ( errors -- )
-    standard-table-style
-    [ [ log-entry. ] each ] tabular-output ;
+    [ log-entry. ] each ;
 
 : analysis. ( errors word-histogram message-histogram -- )
     "==== INTERESTING MESSAGES:" print nl
