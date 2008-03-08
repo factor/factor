@@ -84,7 +84,6 @@ HOOK: insert-tuple* db ( tuple statement -- )
     [ bind-tuple ] keep execute-statement ;
 
 : insert-tuple ( tuple -- )
-    ! break
     dup class db-columns find-primary-key assigned-id? [
         insert-assigned
     ] [
