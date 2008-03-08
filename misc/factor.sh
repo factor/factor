@@ -95,7 +95,7 @@ check_installed_programs() {
     ensure_program_installed md5sum md5
     ensure_program_installed cut
     case $OS in
-        macosx) ensure_program_installed port;;
+        macosx) ensure_program_installed git port;;
         netbsd) ensure_program_installed gmake;;
     esac
     check_gcc_version
