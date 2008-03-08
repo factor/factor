@@ -1,4 +1,5 @@
 USING: continuations xml xml.errors tools.test kernel arrays xml.data state-parser quotations ;
+IN: xml.tests
 
 : xml-error-test ( expected-error xml-string -- )
     [ string>xml ] curry swap [ = ] curry must-fail-with ;

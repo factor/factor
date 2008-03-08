@@ -1,5 +1,6 @@
 USING: arrays calendar kernel math sequences tools.test
 continuations system ;
+IN: calendar.tests
 
 [ f ] [ 2004 12 32 0   0  0 0 <timestamp> valid-timestamp? ] unit-test
 [ f ] [ 2004  2 30 0   0  0 0 <timestamp> valid-timestamp? ] unit-test

@@ -1,4 +1,5 @@
 USING: multiline tools.test ;
+IN: multiline.tests
 
 STRING: test-it
 foo
