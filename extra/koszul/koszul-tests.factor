@@ -1,4 +1,5 @@
-USING: koszul tools.test kernel sequences assocs namespaces ;
+USING: koszul tools.test kernel sequences assocs namespaces
+symbols ;
 IN: koszul.tests
 
 [

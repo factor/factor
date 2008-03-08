@@ -108,25 +108,25 @@ SYMBOLS: vars M K H S0 S1 process-M word-size block-size >word ;
         T1 T2 update-vars
     ] with each vars get H get [ w+ ] 2map H set ;
 
-: seq>string ( n seq -- string )
-    [ swap [ >be % ] curry each ] "" make ;
+: seq>byte-array ( n seq -- string )
+    [ swap [ >be % ] curry each ] B{ } make ;
 
-: string>sha2 ( string -- string )
+: byte-array>sha2 ( byte-array -- string )
     t preprocess-plaintext
     block-size get group [ process-chunk ] each
-    4 H get seq>string ;
+    4 H get seq>byte-array ;
 
 PRIVATE>
 
-: string>sha-256 ( string -- string )
+: byte-array>sha-256 ( string -- string )
     [
         K-256 K set
         initial-H-256 H set
         4 word-size set
         64 block-size set
         \ >32-bit >word set
-        string>sha2
+        byte-array>sha2
     ] with-scope ;
 
-: string>sha-256-string ( string -- hexstring )
-    string>sha-256 hex-string ;
+: byte-array>sha-256-string ( string -- hexstring )
+    byte-array>sha-256 hex-string ;

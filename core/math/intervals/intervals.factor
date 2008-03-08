@@ -141,7 +141,7 @@ C: <interval> interval
     [ drop 0 ] if ;
 
 : interval-closure ( i1 -- i2 )
-    interval>points [ first ] 2apply [a,b] ;
+    dup [ interval>points [ first ] 2apply [a,b] ] when ;
 
 : interval-shift ( i1 i2 -- i3 )
     #! Inaccurate; could be tighter

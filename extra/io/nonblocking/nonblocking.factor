@@ -75,7 +75,7 @@ M: input-port stream-read1
     [ wait-to-read ] 2keep
     [ dupd buffer> ] unless-eof nip ;
 
-: read-loop ( count port sbuf -- )
+: read-loop ( count port accum -- )
     pick over length - dup 0 > [
         pick read-step dup [
             over push-all read-loop
@@ -143,7 +143,7 @@ M: input-port stream-read-partial ( max stream -- byte-array/f )
     tuck can-write? [ drop ] [ stream-flush ] if ;
 
 M: output-port stream-write1
-    1 over wait-to-write ch>buffer ;
+    1 over wait-to-write byte>buffer ;
 
 M: output-port stream-write
     over length over buffer-size > [

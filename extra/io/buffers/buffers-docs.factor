@@ -1,8 +1,8 @@
-USING: help.markup help.syntax strings alien ;
+USING: help.markup help.syntax byte-arrays alien ;
 IN: io.buffers
 
 ARTICLE: "buffers" "Locked I/O buffers"
-"I/O buffers are first-in-first-out queues of characters. Their key feature is that they are backed by manually allocated storage that does not get moved by the garbage collector. They are used to implement native I/O backends."
+"I/O buffers are first-in-first-out queues of bytes. Their key feature is that they are backed by manually allocated storage that does not get moved by the garbage collector. They are used to implement native I/O backends."
 $nl
 "Buffer words are found in the " { $vocab-link "buffers" } " vocabulary."
 { $subsection buffer }
@@ -23,7 +23,7 @@ $nl
 { $subsection buffer-until }
 "Writing to the buffer:"
 { $subsection extend-buffer }
-{ $subsection ch>buffer }
+{ $subsection byte>buffer }
 { $subsection >buffer }
 { $subsection n>buffer } ;
 
@@ -48,7 +48,7 @@ HELP: buffer-free
 { $warning "You " { $emphasis "must" } " free a buffer using this word, before letting the GC collect the buffer tuple instance." } ;
 
 HELP: (buffer>>)
-{ $values { "buffer" buffer } { "string" "a string" } }
+{ $values { "buffer" buffer } { "byte-array" byte-array } }
 { $description "Collects the entire contents of the buffer into a string." } ;
 
 HELP: buffer-reset
@@ -68,15 +68,15 @@ HELP: buffer-end
 { $description "Outputs the memory address of the current fill-pointer." } ;
 
 HELP: (buffer>)
-{ $values { "n" "a non-negative integer" } { "buffer" buffer } { "string" string } }
+{ $values { "n" "a non-negative integer" } { "buffer" buffer } { "byte-array" byte-array } }
 { $description "Outputs a string of the first " { $snippet "n" } " characters at the buffer's current position. If there are less than " { $snippet "n" } " characters available, the output is truncated." } ;
 
 HELP: buffer>
-{ $values { "n" "a non-negative integer" } { "buffer" buffer } { "string" "a string" } }
+{ $values { "n" "a non-negative integer" } { "buffer" buffer } { "byte-array" byte-array } }
 { $description "Collects a string of " { $snippet "n" } " characters starting from the buffer's current position, and advances the position accordingly. If there are less than " { $snippet "n" } " characters available, the output is truncated." } ;
 
 HELP: buffer>>
-{ $values { "buffer" buffer } { "string" "a string" } }
+{ $values { "buffer" buffer } { "byte-array" byte-array } }
 { $description "Collects the contents of the buffer into a string, and resets the position and fill pointer to 0." } ;
 
 HELP: buffer-length
@@ -102,11 +102,11 @@ HELP: check-overflow
 { $errors "Throws an error if the buffer contains unread data, and the new data does not fit." } ;
 
 HELP: >buffer
-{ $values { "string" "a string" } { "buffer" buffer } }
+{ $values { "byte-array" byte-array } { "buffer" buffer } }
 { $description "Copies a string to the buffer's fill pointer, and advances it accordingly." } ;
 
-HELP: ch>buffer
-{ $values { "ch" "a character" } { "buffer" buffer } }
+HELP: byte>buffer
+{ $values { "byte" "a byte" } { "buffer" buffer } }
 { $description "Appends a single byte to a buffer." } ;
 
 HELP: n>buffer
@@ -123,5 +123,5 @@ HELP: buffer-pop
 { $description "Outputs the byte at the buffer position and advances the position." } ;
 
 HELP: buffer-until
-{ $values { "separators" string } { "buffer" buffer } { "string" string } { "separator" "a character or " { $link f } } }
-{ $description "Searches the buffer for a character appearing in " { $snippet "separators" } ", starting from " { $link buffer-pos } ". If a separator is found, all data up to but not including the separator is output, together with the separator itself; otherwise the remainder of the buffer's contents are output together with " { $link f } "." } ;
+{ $values { "separators" "a sequence of bytes" } { "buffer" buffer } { "byte-array" byte-array } { "separator" "a byte or " { $link f } } }
+{ $description "Searches the buffer for a byte appearing in " { $snippet "separators" } ", starting from " { $link buffer-pos } ". If a separator is found, all data up to but not including the separator is output, together with the separator itself; otherwise the remainder of the buffer's contents are output together with " { $link f } "." } ;

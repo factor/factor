@@ -3,7 +3,7 @@
 USING: kernel math sequences ;
 IN: io.binary
 
-: le> ( seq -- x ) B{ } like byte-array>bignum ;
+: le> ( seq -- x ) B{ } like byte-array>bignum >integer ;
 : be> ( seq -- x ) <reversed> le> ;
 
 : mask-byte ( x -- y ) HEX: ff bitand ; inline

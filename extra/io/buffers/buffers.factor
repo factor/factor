@@ -90,7 +90,7 @@ HINTS: search-buffer-until { fixnum fixnum simple-alien string } ;
     [ buffer-end byte-array>memory ] 2keep
     [ buffer-fill swap length + ] keep set-buffer-fill ;
 
-: ch>buffer ( ch buffer -- )
+: byte>buffer ( ch buffer -- )
     1 over check-overflow
     [ buffer-end 0 set-alien-unsigned-1 ] keep
     [ buffer-fill 1+ ] keep set-buffer-fill ;

@@ -1,6 +1,6 @@
 ! See http://www.faqs.org/rfcs/rfc1321.html
 
-USING: kernel io io.binary io.files io.streams.string math
+USING: kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting strings
 sequences crypto.common byte-arrays locals sequences.private
 io.encodings.binary symbols ;
@@ -178,7 +178,14 @@ PRIVATE>
 : stream>md5 ( stream -- byte-array )
     [ initialize-md5 (stream>md5) get-md5 ] with-stream ;
 
-: string>md5 ( string -- byte-array ) <string-reader> stream>md5 ;
-: string>md5str ( string -- md5-string ) string>md5 hex-string ;
-: file>md5 ( path -- byte-array ) binary <file-reader> stream>md5 ;
-: file>md5str ( path -- md5-string ) file>md5 hex-string ;
+: byte-array>md5 ( byte-array -- checksum )
+    binary <byte-reader> stream>md5 ;
+
+: byte-array>md5str ( byte-array -- md5-string )
+    byte-array>md5 hex-string ;
+
+: file>md5 ( path -- byte-array )
+    binary <file-reader> stream>md5 ;
+
+: file>md5str ( path -- md5-string )
+    file>md5 hex-string ;

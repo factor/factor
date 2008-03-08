@@ -156,6 +156,8 @@ IN: math.intervals.tests
     interval-contains?
 ] unit-test
 
+[ f ] [ 1 100 [a,b] -1 1 [a,b] interval/i ] unit-test
+
 ! Interval random tester
 : random-element ( interval -- n )
     dup interval-to first over interval-from first tuck - random +
@@ -200,7 +202,7 @@ IN: math.intervals.tests
         second execute interval-contains?
     ] if ;
 
-[ t ] [ 4000 [ drop interval-test ] all? ] unit-test
+[ t ] [ 40000 [ drop interval-test ] all? ] unit-test
 
 : random-comparison
     {
@@ -219,4 +221,4 @@ IN: math.intervals.tests
         =
     ] if ;
 
-[ t ] [ 4000 [ drop comparison-test ] all? ] unit-test
+[ t ] [ 40000 [ drop comparison-test ] all? ] unit-test
