@@ -6,7 +6,7 @@ IN: crypto.sha1
 
 ! Implemented according to RFC 3174.
 
-SYMBOL: h0 h1 h2 h3 h4 A B C D E w K ;
+SYMBOLS: h0 h1 h2 h3 h4 A B C D E w K ;
 
 : get-wth ( n -- wth ) w get nth ; inline
 : shift-wth ( n -- x ) get-wth 1 bitroll-32 ; inline

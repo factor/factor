@@ -4,7 +4,7 @@ IN: crypto.sha2
 
 <PRIVATE
 
-SYMBOL: vars M K H S0 S1 process-M word-size block-size >word ;
+SYMBOLS: vars M K H S0 S1 process-M word-size block-size >word ;
 
 : a 0 ;
 : b 1 ;
