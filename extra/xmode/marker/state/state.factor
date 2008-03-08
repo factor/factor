@@ -1,20 +1,12 @@
-USING: xmode.marker.context xmode.rules
+USING: xmode.marker.context xmode.rules symbols
 xmode.tokens namespaces kernel sequences assocs math ;
 IN: xmode.marker.state
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 
-SYMBOL: line
-SYMBOL: last-offset
-SYMBOL: position
-SYMBOL: context
-
-SYMBOL: whitespace-end
-SYMBOL: seen-whitespace-end?
-
-SYMBOL: escaped?
-SYMBOL: process-escape?
-SYMBOL: delegate-end-escaped?
+SYMBOLS: line last-offset position context
+ whitespace-end seen-whitespace-end?
+ escaped?  process-escape?  delegate-end-escaped? ;
 
 : current-rule ( -- rule )
     context get line-context-in-rule ;

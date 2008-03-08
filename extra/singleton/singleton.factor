@@ -1,10 +1,10 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel parser quotations prettyprint tuples words ;
+USING: classes.predicate kernel parser quotations words ;
 IN: singleton
 
+
 : SINGLETON:
+    \ word
     CREATE-CLASS
-    dup { } define-tuple-class
-    dup unparse create-in reset-generic
-    dup construct-empty 1quotation define ; parsing
+    dup [ eq? ] curry define-predicate-class ; parsing

@@ -70,7 +70,7 @@ DEFER: to-strings
 : milli-seconds>time ( n -- string )
   1000 /i 60 /mod >r 60 /mod r> 3array [ pad-00 ] map ":" join ;
 
-: eval-file ( file -- obj ) file-contents eval ;
+: eval-file ( file -- obj ) utf8 file-contents eval ;
 
 : cat ( file -- ) utf8 file-contents print ;
 

@@ -102,7 +102,7 @@ SYMBOL: build-status
 
   enter-build-dir
 
-  "report"
+  "report" utf8
     [
       "Build machine:   " write host-name print
       "CPU:             " write cpu       print

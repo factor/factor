@@ -1,23 +1,12 @@
 USING: arrays combinators crypto.common kernel io io.encodings.binary
 io.files io.streams.string math.vectors strings sequences
 namespaces math parser sequences vectors io.binary
-hashtables ;
+hashtables symbols ;
 IN: crypto.sha1
 
 ! Implemented according to RFC 3174.
 
-SYMBOL: h0
-SYMBOL: h1
-SYMBOL: h2
-SYMBOL: h3
-SYMBOL: h4
-SYMBOL: A
-SYMBOL: B
-SYMBOL: C
-SYMBOL: D
-SYMBOL: E
-SYMBOL: w
-SYMBOL: K
+SYMBOL: h0 h1 h2 h3 h4 A B C D E w K ;
 
 : get-wth ( n -- wth ) w get nth ; inline
 : shift-wth ( n -- x ) get-wth 1 bitroll-32 ; inline
