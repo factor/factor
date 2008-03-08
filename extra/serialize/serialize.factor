@@ -13,17 +13,25 @@ vectors byte-arrays bit-arrays quotations hashtables
 assocs help.syntax help.markup float-arrays splitting
 io.encodings.string io.encodings.utf8 combinators ;
 
-! Variable holding a sequence of objects already serialized
+! Variable holding a assoc of objects already serialized
 SYMBOL: serialized
 
-: add-object ( obj -- id )
+TUPLE: id obj ;
+
+C: <id> id
+
+M: id hashcode* id-obj hashcode* ;
+
+M: id equal? over id? [ [ id-obj ] 2apply eq? ] [ 2drop f ] if ;
+
+: add-object ( obj -- )
     #! Add an object to the sequence of already serialized
-    #! objects. Return the id of that object.
-    serialized get [ push ] keep length 1 - ;
+    #! objects.
+    serialized get [ assoc-size swap <id> ] keep set-at ;
 
 : object-id ( obj -- id )
     #! Return the id of an already serialized object 
-    serialized get [ eq? ] with find [ drop f ] unless ;
+    <id> serialized get at ;
 
 ! Serialize object
 GENERIC: (serialize) ( obj -- )
@@ -89,10 +97,8 @@ M: ratio (serialize) ( obj -- )
 
 : serialize-string ( obj code -- )
     write1
-    dup add-object serialize-cell
-    utf8 encode
-    dup length serialize-cell
-    write ;
+    dup utf8 encode dup length serialize-cell write
+    add-object ;
 
 M: string (serialize) ( obj -- )
     [ CHAR: s serialize-string ] serialize-shared ;
@@ -103,15 +109,15 @@ M: string (serialize) ( obj -- )
 M: tuple (serialize) ( obj -- )
     [
         CHAR: T write1
-        dup add-object serialize-cell
-        tuple>array serialize-elements
+        dup tuple>array serialize-elements
+        add-object
     ] serialize-shared ;
 
 : serialize-seq ( seq code -- )
     [
         write1
-        dup add-object serialize-cell
-        serialize-elements
+        dup serialize-elements
+        add-object
     ] curry serialize-shared ;
 
 M: array (serialize) ( obj -- )
@@ -120,16 +126,16 @@ M: array (serialize) ( obj -- )
 M: byte-array (serialize) ( obj -- )
     [
         CHAR: A write1
-        dup add-object serialize-cell 
-        dup length serialize-cell write
+        dup dup length serialize-cell write
+        add-object
     ] serialize-shared ;
 
 M: bit-array (serialize) ( obj -- )
     [
         CHAR: b write1
-        dup add-object serialize-cell
         dup length serialize-cell
-        [ 1 0 ? ] B{ } map-as write
+        dup [ 1 0 ? ] B{ } map-as write
+        add-object
     ] serialize-shared ;
 
 M: quotation (serialize) ( obj -- )
@@ -138,22 +144,25 @@ M: quotation (serialize) ( obj -- )
 M: float-array (serialize) ( obj -- )
     [
         CHAR: f write1
-        dup add-object serialize-cell
         dup length serialize-cell
-        [ double>bits 8 >be write ] each
+        dup [ double>bits 8 >be write ] each
+        add-object
     ] serialize-shared ;
 
 M: hashtable (serialize) ( obj -- )
     [
         CHAR: h write1
-        dup add-object serialize-cell
-        >alist (serialize)
+        dup >alist (serialize)
+        add-object
     ] serialize-shared ;
 
 M: word (serialize) ( obj -- )
-    CHAR: w write1
-    dup word-name (serialize)
-    word-vocabulary (serialize) ;
+    [
+        CHAR: w write1
+        dup word-name (serialize)
+        dup word-vocabulary (serialize)
+        add-object
+    ] serialize-shared ;
 
 M: wrapper (serialize) ( obj -- )
     CHAR: W write1
@@ -161,8 +170,10 @@ M: wrapper (serialize) ( obj -- )
 
 DEFER: (deserialize) ( -- obj )
 
-: intern-object ( id obj -- obj )
-    dup rot serialized get set-nth ;
+SYMBOL: deserialized
+
+: intern-object ( obj -- )
+    deserialized get push ;
 
 : deserialize-false ( -- f )
     f ;
@@ -189,22 +200,22 @@ DEFER: (deserialize) ( -- obj )
     deserialize-cell read utf8 decode ;
 
 : deserialize-string ( -- string )
-    deserialize-cell (deserialize-string) intern-object ;
+    (deserialize-string) dup intern-object ;
 
 : deserialize-word ( -- word )
     (deserialize) dup (deserialize) lookup
-    [ ] [ "Unknown word" throw ] ?if ;
+    [ dup intern-object ] [ "Unknown word" throw ] ?if ;
 
 : deserialize-wrapper ( -- wrapper )
     (deserialize) <wrapper> ;
 
 SYMBOL: +stop+
 
-: (deserialize-seq)
+: (deserialize-seq) ( -- seq )
     [ (deserialize) dup +stop+ get eq? not ] [ ] [ drop ] unfold ;
 
 : deserialize-seq ( seq -- array )
-    >r deserialize-cell (deserialize-seq) r> like intern-object ;
+    >r (deserialize-seq) r> like dup intern-object ;
 
 : deserialize-array ( -- array )
     { } deserialize-seq ;
@@ -216,26 +227,25 @@ SYMBOL: +stop+
     deserialize-cell read B{ } like ;
 
 : deserialize-byte-array ( -- byte-array )
-    deserialize-cell (deserialize-byte-array) intern-object ;
+    (deserialize-byte-array) dup intern-object ;
 
 : deserialize-bit-array ( -- bit-array )
-    deserialize-cell
     (deserialize-byte-array) [ 0 > ] ?{ } map-as
-    intern-object ;
+    dup intern-object ;
 
 : deserialize-float-array ( -- float-array )
-    deserialize-cell deserialize-cell
+    deserialize-cell
     8 * read 8 <groups> [ be> bits>double ] F{ } map-as
-    intern-object ;
+    dup intern-object ;
 
 : deserialize-hashtable ( -- hashtable )
-    deserialize-cell (deserialize) >hashtable intern-object ;
+    (deserialize) >hashtable dup intern-object ;
 
 : deserialize-tuple ( -- array )
-    deserialize-cell (deserialize-seq) >tuple intern-object ;
+    (deserialize-seq) >tuple dup intern-object ;
 
 : deserialize-unknown ( -- object )
-    deserialize-cell serialized get nth ;
+    deserialize-cell deserialized get nth ;
 
 : deserialize-stop ( -- object )
     +stop+ get ;
@@ -270,18 +280,15 @@ SYMBOL: +stop+
 : (deserialize) ( -- obj )
     deserialize* [ "End of stream" throw ] unless ;
 
-: with-serialized ( quot -- )
-    [
-        V{ } clone serialized set
-        gensym +stop+ set
-        call
-    ] with-scope ; inline
-
-: deserialize-sequence ( -- seq )
-    [ [ deserialize* ] [ ] [ drop ] unfold ] with-serialized ;
-
 : deserialize ( -- obj )
-    [ (deserialize) ] with-serialized ;
+    [
+        V{ } clone deserialized set
+        gensym +stop+ set
+        (deserialize)
+    ] with-scope ;
 
 : serialize ( obj -- )
-    [ (serialize) ] with-serialized ;
+    [
+        H{ } clone serialized set
+        (serialize)
+    ] with-scope ;

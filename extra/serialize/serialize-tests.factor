@@ -77,16 +77,5 @@ C: <serialize-test> serialize-test
 [ t ] [ objects [ check-serialize-2 ] all? ] unit-test
 
 [ t ] [ pi check-serialize-1 ] unit-test
-
-[ t ] [
-    { 1 2 3 }
-    binary [
-        [
-            dup (serialize) (serialize)
-        ] with-serialized
-    ] with-byte-writer
-    binary [ deserialize-sequence all-eq? ] with-byte-reader
-] unit-test
-
 [ serialize ] must-infer
 [ deserialize ] must-infer
