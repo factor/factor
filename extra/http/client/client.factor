@@ -82,8 +82,8 @@ PRIVATE>
 
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
-    swap http-get-stream check-response
-    [ swap binary <file-writer> stream-copy ] with-disposal ;
+    swap http-get-stream swap check-response
+    [ swap latin1 <file-writer> stream-copy ] with-disposal ;
 
 : download ( url -- )
     dup download-name download-to ;

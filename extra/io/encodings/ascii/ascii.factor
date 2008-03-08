@@ -9,7 +9,7 @@ IN: io.encodings.ascii
 TUPLE: ascii ;
 
 M: ascii stream-write-encoded ( string stream encoding -- )
-    drop 127 encode-check<= ;
+    drop 128 encode-check<= ;
 
 M: ascii decode-step
     drop dup 128 >= [ decode-error ] [ swap push ] if ;
