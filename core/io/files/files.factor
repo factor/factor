@@ -213,14 +213,14 @@ C: <pathname> pathname
 
 M: pathname <=> [ pathname-string ] compare ;
 
-: file-lines ( path encoding -- seq ) <file-reader> lines ;
-
-: file-contents ( path encoding -- str )
-    dupd <file-reader> swap file-length <sbuf>
-    [ stream-copy ] keep >string ;
+: file-lines ( path encoding -- seq )
+    <file-reader> lines ;
 
 : with-file-reader ( path encoding quot -- )
     >r <file-reader> r> with-stream ; inline
+
+: file-contents ( path encoding -- str )
+    dupd [ file-length read ] with-file-reader ;
 
 : with-file-writer ( path encoding quot -- )
     >r <file-writer> r> with-stream ; inline

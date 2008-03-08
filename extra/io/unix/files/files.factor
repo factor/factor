@@ -68,7 +68,7 @@ M: unix-io delete-directory ( path -- )
     ] with-disposal ;
 
 M: unix-io copy-file ( from to -- )
-    >r dup file-permissions over r> (copy-file) chmod io-error ;
+    [ (copy-file) ] 2keep swap file-permissions chmod io-error ;
 
 : stat>type ( stat -- type )
     stat-st_mode {

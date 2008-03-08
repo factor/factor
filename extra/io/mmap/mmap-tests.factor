@@ -3,7 +3,7 @@ sequences io.encodings.ascii ;
 IN: io.mmap.tests
 
 [ "mmap-test-file.txt" resource-path delete-file ] ignore-errors
-[ ] [ "mmap-test-file.txt" resource-path ascii [ "12345" write ] with-file-writer ] unit-test
+[ ] [ "12345" "mmap-test-file.txt" resource-path ascii set-file-contents ] unit-test
 [ ] [ "mmap-test-file.txt" resource-path dup file-length [ CHAR: 2 0 pick set-nth drop ] with-mapped-file ] unit-test
 [ 5 ] [ "mmap-test-file.txt" resource-path dup file-length [ length ] with-mapped-file ] unit-test
 [ "22345" ] [ "mmap-test-file.txt" resource-path ascii file-contents ] unit-test
