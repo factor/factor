@@ -358,7 +358,7 @@ MEMO: sp ( parser -- parser )
 MEMO: hide ( parser -- parser )
   [ drop ignore ] action ;
 
-MEMO: delay ( parser -- parser )
+MEMO: delay ( quot -- parser )
   delay-parser construct-boa init-parser ;
 
 : PEG:

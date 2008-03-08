@@ -78,6 +78,7 @@ call
     "strings"
     "strings.private"
     "system"
+    "system.private"
     "threads.private"
     "tools.profiler.private"
     "tuples"
@@ -274,7 +275,7 @@ define-builtin
     }
     {
         { "object" "kernel" }
-        "?"
+        "compiled?"
         { "compiled?" "words" }
         f
     }
@@ -623,6 +624,7 @@ builtins get num-tags get tail f union-class define-class
     { "fopen" "io.streams.c" }
     { "fgetc" "io.streams.c" }
     { "fread" "io.streams.c" }
+    { "fputc" "io.streams.c" }
     { "fwrite" "io.streams.c" }
     { "fflush" "io.streams.c" }
     { "fclose" "io.streams.c" }
@@ -645,7 +647,8 @@ builtins get num-tags get tail f union-class define-class
     { "innermost-frame-scan" "kernel.private" }
     { "set-innermost-frame-quot" "kernel.private" }
     { "call-clear" "kernel" }
-    { "(os-envs)" "system" }
+    { "(os-envs)" "system.private" }
+    { "(set-os-envs)" "system.private" }
     { "resize-byte-array" "byte-arrays" }
     { "resize-bit-array" "bit-arrays" }
     { "resize-float-array" "float-arrays" }

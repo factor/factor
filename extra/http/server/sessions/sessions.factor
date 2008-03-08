@@ -11,6 +11,8 @@ IN: http.server.sessions
 
 GENERIC: init-session ( responder -- )
 
+M: dispatcher init-session drop ;
+
 TUPLE: session-manager responder sessions ;
 
 : <session-manager> ( responder class -- responder' )

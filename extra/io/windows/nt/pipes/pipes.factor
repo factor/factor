@@ -3,7 +3,7 @@
 USING: alien alien.c-types arrays destructors io io.windows libc
 windows.types math windows.kernel32 windows namespaces kernel
 sequences windows.errors assocs math.parser system random
-combinators ;
+combinators new-slots accessors ;
 IN: io.windows.nt.pipes
 
 ! This code is based on
@@ -42,8 +42,8 @@ TUPLE: pipe in out ;
 
 : close-pipe ( pipe -- )
     dup
-    pipe-in CloseHandle drop
-    pipe-out CloseHandle drop ;
+    in>> CloseHandle drop
+    out>> CloseHandle drop ;
 
 : <incoming-pipe> ( name -- pipe )
     PIPE_ACCESS_INBOUND GENERIC_WRITE <pipe> ;
@@ -70,13 +70,13 @@ TUPLE: pipe in out ;
 ! /dev/null simulation
 : null-input ( -- pipe )
     <unique-outgoing-pipe>
-    dup pipe-out CloseHandle drop
-    pipe-in ;
+    dup out>> CloseHandle drop
+    in>> ;
 
 : null-output ( -- pipe )
     <unique-incoming-pipe>
-    dup pipe-in CloseHandle drop
-    pipe-out ;
+    dup in>> CloseHandle drop
+    out>> ;
 
 : null-pipe ( mode -- pipe )
     {

@@ -41,18 +41,17 @@ IN: http.server.cgi
         ] when
     ] H{ } make-assoc ;
 
-: cgi-descriptor ( name -- desc )
-    [
-        dup 1array +arguments+ set
-        cgi-variables +environment+ set
-    ] H{ } make-assoc ;
+: <cgi-process> ( name -- desc )
+    <process>
+        over 1array >>command
+        swap cgi-variables >>environment ;
     
 : serve-cgi ( name -- response )
     <raw-response>
     200 >>code
     "CGI output follows" >>message
     swap [
-        stdio get swap cgi-descriptor <process-stream> [
+        stdio get swap <cgi-process> <process-stream> [
             post? [
                 request get post-data>> write flush
             ] when

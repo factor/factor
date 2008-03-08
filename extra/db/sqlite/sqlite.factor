@@ -5,7 +5,7 @@ hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators tools.walker
-combinators.cleave io ;
+combinators.cleave io namespaces.lib ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
@@ -80,8 +80,9 @@ M: sqlite-result-set #columns ( result-set -- n )
 M: sqlite-result-set row-column ( result-set n -- obj )
     >r result-set-handle r> sqlite-column ;
 
-M: sqlite-result-set row-column-typed ( result-set n type -- obj )
-    >r result-set-handle r> sqlite-column-typed ;
+M: sqlite-result-set row-column-typed ( result-set n -- obj )
+    dup pick result-set-out-params nth sql-spec-type
+    >r >r result-set-handle r> r> sqlite-column-typed ;
 
 M: sqlite-result-set advance-row ( result-set -- )
     [ result-set-handle sqlite-next ] keep
@@ -141,6 +142,10 @@ M: sqlite-db <insert-assigned-statement> ( tuple -- statement )
     " where " 0%
     find-primary-key dup sql-spec-column-name 0% " = " 0% bind% ;
 
+: where-clause ( specs -- )
+    " where " 0%
+    [ " and " 0% ] [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave ;
+
 M: sqlite-db <update-tuple-statement> ( class -- statement )
     [
         "update " 0%
@@ -173,14 +178,7 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
 
         " from " 0% 0%
         [ sql-spec-slot-name swap get-slot-named ] with subset
-        dup empty? [
-            drop
-        ] [
-            " where " 0%
-            [ ", " 0% ]
-            [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
-        ] if
-        ";" 0%
+        dup empty? [ drop ] [ where-clause ] if ";" 0%
     ] sqlite-make ;
 
 M: sqlite-db modifier-table ( -- hashtable )
@@ -209,8 +207,13 @@ M: sqlite-db type-table ( -- assoc )
         { INTEGER "integer" }
         { TEXT "text" }
         { VARCHAR "text" }
+        { DATE "date" }
+        { TIME "time" }
+        { DATETIME "datetime" }
         { TIMESTAMP "timestamp" }
         { DOUBLE "real" }
+        { BLOB "blob" }
+        { FACTOR-BLOB "blob" }
     } ;
 
 M: sqlite-db create-type-table

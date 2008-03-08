@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private namespaces io io.encodings
-strings sequences math generic threads.private classes
-io.backend io.streams.duplex io.files continuations
-io.encodings.utf8 ;
+sequences math generic threads.private classes io.backend
+io.streams.duplex io.files continuations byte-arrays ;
 IN: io.streams.c
 
 TUPLE: c-writer handle ;
@@ -11,10 +10,10 @@ TUPLE: c-writer handle ;
 C: <c-writer> c-writer
 
 M: c-writer stream-write1
-    >r 1string r> stream-write ;
+    c-writer-handle fputc ;
 
 M: c-writer stream-write
-    >r >string r> c-writer-handle fwrite ;
+    c-writer-handle fwrite ;
 
 M: c-writer stream-flush
     c-writer-handle fflush ;
@@ -27,7 +26,7 @@ TUPLE: c-reader handle ;
 C: <c-reader> c-reader
 
 M: c-reader stream-read
-    >r >fixnum r> c-reader-handle fread ;
+    c-reader-handle fread ;
 
 M: c-reader stream-read-partial
     stream-read ;
@@ -43,7 +42,7 @@ M: c-reader stream-read1
     ] if ;
 
 M: c-reader stream-read-until
-    [ swap read-until-loop ] "" make swap
+    [ swap read-until-loop ] B{ } make swap
     over empty? over not and [ 2drop f f ] when ;
 
 M: c-reader dispose
@@ -76,4 +75,6 @@ M: object (file-appender)
     #! print stuff from contexts where the I/O system would
     #! otherwise not work (tools.deploy.shaker, the I/O
     #! multiplexer thread).
-    "\r\n" append stdout-handle fwrite stdout-handle fflush ;
+    "\r\n" append >byte-array
+    stdout-handle fwrite
+    stdout-handle fflush ;

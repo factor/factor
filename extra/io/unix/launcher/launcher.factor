@@ -4,14 +4,14 @@ USING: io io.backend io.launcher io.nonblocking io.unix.backend
 io.unix.files io.nonblocking sequences kernel namespaces math
 system alien.c-types debugger continuations arrays assocs
 combinators unix.process strings threads unix
-io.unix.launcher.parser io.encodings.latin1 ;
+io.unix.launcher.parser io.encodings.latin1 accessors new-slots ;
 IN: io.unix.launcher
 
 ! Search unix first
 USE: unix
 
-: get-arguments ( -- seq )
-    +command+ get [ tokenize-command ] [ +arguments+ get ] if* ;
+: get-arguments ( process -- seq )
+    command>> dup string? [ tokenize-command ] when ;
 
 : assoc>env ( assoc -- env )
     [ "=" swap 3append ] { } assoc>map ;
@@ -44,28 +44,27 @@ USE: unix
 
 : ?closed dup +closed+ eq? [ drop "/dev/null" ] when ;
 
-: setup-redirection ( -- )
-    +stdin+ get ?closed read-flags 0 redirect
-    +stdout+ get ?closed write-flags 1 redirect
-    +stderr+ get dup +stdout+ eq?
+: setup-redirection ( process -- process )
+    dup stdin>> ?closed read-flags 0 redirect
+    dup stdout>> ?closed write-flags 1 redirect
+    dup stderr>> dup +stdout+ eq?
     [ drop 1 2 dup2 io-error ] [ ?closed write-flags 2 redirect ] if ;
 
-: spawn-process ( -- )
+: spawn-process ( process -- * )
     [
         setup-redirection
-        get-arguments
-        pass-environment?
-        [ get-environment assoc>env exec-args-with-env ]
-        [ exec-args-with-path ] if
-        io-error
-    ] [ error. :c flush ] recover 1 exit ;
+        dup pass-environment? [
+            dup get-environment set-os-envs
+        ] when
+
+        get-arguments exec-args-with-path
+        (io-error)
+    ] [ 255 exit ] recover ;
 
 M: unix-io current-process-handle ( -- handle ) getpid ;
 
-M: unix-io run-process* ( desc -- pid )
-    [
-        [ spawn-process ] [ ] with-fork <process>
-    ] with-descriptor ;
+M: unix-io run-process* ( process -- pid )
+    [ spawn-process ] curry [ ] with-fork ;
 
 M: unix-io kill-process* ( pid -- )
     SIGTERM kill io-error ;
@@ -78,21 +77,15 @@ M: unix-io kill-process* ( pid -- )
     2dup first close second close
     >r first 0 dup2 drop r> second 1 dup2 drop ;
 
-: spawn-process-stream ( -- in out pid )
-    open-pipe open-pipe [
-        setup-stdio-pipe
-        spawn-process
-    ] [
-        -rot 2dup second close first close
-    ] with-fork first swap second rot <process> ;
-
 M: unix-io (process-stream)
-    [
-        spawn-process-stream >r <reader&writer> r>
-    ] with-descriptor ;
+    >r open-pipe open-pipe r>
+    [ >r setup-stdio-pipe r> spawn-process ] curry
+    [ -rot 2dup second close first close ]
+    with-fork
+    first swap second ;
 
 : find-process ( handle -- process )
-    processes get swap [ nip swap process-handle = ] curry
+    processes get swap [ nip swap handle>> = ] curry
     assoc-find 2drop ;
 
 ! Inefficient process wait polling, used on Linux and Solaris.
@@ -103,7 +96,7 @@ M: unix-io (process-stream)
         2drop t
     ] [
         find-process dup [
-            >r *int WEXITSTATUS r> notify-exit f
+            swap *int WEXITSTATUS notify-exit f
         ] [
             2drop f
         ] if

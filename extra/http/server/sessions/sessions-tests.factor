@@ -4,6 +4,12 @@ kernel accessors ;
 
 : with-session \ session swap with-variable ; inline
 
+TUPLE: foo ;
+
+C: <foo> foo
+
+M: foo init-session drop 0 "x" sset ;
+
 "1234" f <session> [
     [ ] [ 3 "x" sset ] unit-test
     
@@ -18,8 +24,7 @@ kernel accessors ;
 [ t ] [ f <cookie-sessions> cookie-sessions? ] unit-test
 
 [ ] [
-    f <url-sessions>
-        [ 0 "x" sset ] >>init
+    <foo> <url-sessions>
     "manager" set
 ] unit-test
 

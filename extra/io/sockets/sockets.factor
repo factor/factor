@@ -33,17 +33,19 @@ M: array client* [ (client) 2array ] attempt-all first2 ;
 M: object client* (client) ;
 
 : <client> ( addrspec encoding -- stream )
-    over client* rot <encoder-duplex> <client-stream> ;
+    >r client* r> <encoder-duplex> ;
 
 HOOK: (server) io-backend ( addrspec -- handle )
 
 : <server> ( addrspec encoding -- server )
     >r [ (server) ] keep r> <server-port> ;
 
-HOOK: (accept) io-backend ( server -- stream-in stream-out )
+HOOK: (accept) io-backend ( server -- addrspec handle )
 
 : accept ( server -- client )
-    [ (accept) ] keep server-port-encoding <encoder-duplex> ;
+    [ (accept) dup <reader&writer> ] keep
+    server-port-encoding <encoder-duplex>
+    <client-stream> ;
 
 HOOK: <datagram> io-backend ( addrspec -- datagram )
 

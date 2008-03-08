@@ -135,6 +135,7 @@ HELP: hide
 
 HELP: delay
 { $values 
+  { "quot" "a quotation" } 
   { "parser" "a parser" } 
 }
 { $description 

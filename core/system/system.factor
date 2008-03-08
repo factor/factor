@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: system
 USING: kernel kernel.private sequences math namespaces
-splitting assocs ;
+splitting assocs system.private ;
 
 : cell ( -- n ) 7 getenv ; foldable
 
@@ -59,3 +59,6 @@ splitting assocs ;
 
 : os-envs ( -- assoc )
     (os-envs) [ "=" split1 ] H{ } map>assoc ;
+
+: set-os-envs ( assoc -- )
+    [ "=" swap 3append ] { } assoc>map (set-os-envs) ;

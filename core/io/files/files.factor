@@ -71,6 +71,7 @@ TUPLE: no-parent-directory path ;
 TUPLE: file-info type size permissions modified ;
 
 HOOK: file-info io-backend ( path -- info )
+HOOK: link-info io-backend ( path -- info )
 
 SYMBOL: +regular-file+
 SYMBOL: +directory+

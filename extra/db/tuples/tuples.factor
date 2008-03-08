@@ -37,27 +37,24 @@ HOOK: <delete-tuples-statement> db ( class -- obj )
 
 HOOK: <select-by-slots-statement> db ( tuple -- tuple )
 
-HOOK: row-column-typed db ( result-set n type -- sql )
 HOOK: insert-tuple* db ( tuple statement -- )
 
 : resulting-tuple ( row out-params -- tuple )
     dup first sql-spec-class construct-empty [
         [
-            >r [ sql-spec-type sql-type>factor-type ] keep
-            sql-spec-slot-name r> set-slot-named
+            >r sql-spec-slot-name r> set-slot-named
         ] curry 2each
     ] keep ;
 
 : query-tuples ( statement -- seq )
     [ statement-out-params ] keep query-results [
-        [ sql-row swap resulting-tuple ] with query-map
+        [ sql-row-typed swap resulting-tuple ] with query-map
     ] with-disposal ;
  
 : query-modify-tuple ( tuple statement -- )
-    [ query-results [ sql-row ] with-disposal ] keep
+    [ query-results [ sql-row-typed ] with-disposal ] keep
     statement-out-params rot [
-        >r [ sql-spec-type sql-type>factor-type ] keep
-        sql-spec-slot-name r> set-slot-named
+        >r sql-spec-slot-name r> set-slot-named
     ] curry 2each ;
 
 : sql-props ( class -- columns table )

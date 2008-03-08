@@ -141,7 +141,11 @@ SYMBOL: quot-uses-b
 
 [ { + } ] [ \ quot-uses-b uses ] unit-test
 
-[ "IN: words.tests FORGET: undef-test : undef-test ; << undef-test >>" eval ]
+"undef-test" "words.tests" lookup [
+    [ forget ] with-compilation-unit
+] when*
+
+[ "IN: words.tests : undef-test ; << undef-test >>" eval ]
 [ [ undefined? ] is? ] must-fail-with
 
 [ ] [
