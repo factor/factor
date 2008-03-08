@@ -35,6 +35,12 @@ SYMBOL: building-seq
 : 2, 2 n, ;
 : 2% 2 n% ;
 : 2# 2 n# ;
+: 3, 3 n, ;
+: 3% 3 n% ;
+: 3# 3 n# ;
+: 4, 4 n, ;
+: 4% 4 n% ;
+: 4# 4 n# ;
 
 : nmake ( quot exemplars -- seqs )
     dup length dup zero? [ 1+ ] when
