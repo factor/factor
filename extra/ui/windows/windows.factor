@@ -6,7 +6,8 @@ math math.vectors namespaces prettyprint sequences strings
 vectors words windows.kernel32 windows.gdi32 windows.user32
 windows.opengl32 windows.messages windows.types windows.nt
 windows threads libc combinators continuations command-line
-shuffle opengl ui.render unicode.case ascii math.bitfields ;
+shuffle opengl ui.render unicode.case ascii math.bitfields
+locals symbols ;
 IN: ui.windows
 
 TUPLE: windows-ui-backend ;
@@ -67,9 +68,7 @@ M: pasteboard set-clipboard-contents drop copy ;
 TUPLE: win hWnd hDC hRC world title ;
 C: <win> win
 
-SYMBOL: msg-obj
-SYMBOL: class-name-ptr
-SYMBOL: mouse-captured
+SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
 : style ( -- n ) WS_OVERLAPPEDWINDOW ; inline
 : ex-style ( -- n ) WS_EX_APPWINDOW WS_EX_WINDOWEDGE bitor ; inline
@@ -188,30 +187,21 @@ SYMBOL: mouse-captured
         ] if
     ] if ;
 
-SYMBOL: lParam
-SYMBOL: wParam
-SYMBOL: uMsg
-SYMBOL: hWnd
-
-: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
-    lParam set wParam set uMsg set hWnd set
-    wParam get exclude-key-wm-keydown? [
-        wParam get keystroke>gesture <key-down>
-        hWnd get window-focus send-gesture drop 
+:: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
+    wParam exclude-key-wm-keydown? [
+        wParam keystroke>gesture <key-down>
+        hWnd window-focus send-gesture drop
     ] unless ;
 
-: handle-wm-char ( hWnd uMsg wParam lParam -- )
-    lParam set wParam set uMsg set hWnd set
-    wParam get exclude-key-wm-char? ctrl? alt? xor or [
-        wParam get 1string
-        hWnd get window-focus user-input
+:: handle-wm-char ( hWnd uMsg wParam lParam -- )
+    wParam exclude-key-wm-char? ctrl? alt? xor or [
+        wParam 1string
+        hWnd window-focus user-input
     ] unless ;
 
-: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
-    lParam set wParam set uMsg set hWnd set
-    wParam get keystroke>gesture <key-up>
-    hWnd get window-focus send-gesture
-    drop ;
+:: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
+    wParam keystroke>gesture <key-up>
+    hWnd window-focus send-gesture drop ;
 
 : handle-wm-syscommand ( hWnd uMsg wParam lParam -- n )
     dup alpha? [ 4drop 0 ] [ DefWindowProc ] if ;

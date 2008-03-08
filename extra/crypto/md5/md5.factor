@@ -3,19 +3,12 @@
 USING: kernel io io.binary io.files io.streams.string math
 math.functions math.parser namespaces splitting strings
 sequences crypto.common byte-arrays locals sequences.private
-io.encodings.binary ;
+io.encodings.binary symbols ;
 IN: crypto.md5
 
 <PRIVATE
 
-SYMBOL: a
-SYMBOL: b
-SYMBOL: c
-SYMBOL: d
-SYMBOL: old-a
-SYMBOL: old-b
-SYMBOL: old-c
-SYMBOL: old-d
+SYMBOLS: a b c d old-a old-b old-c old-d ;
 
 : T ( N -- Y )
     sin abs 4294967296 * >bignum ; foldable
