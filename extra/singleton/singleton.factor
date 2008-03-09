@@ -1,10 +1,15 @@
-! Copyright (C) 2007 Doug Coleman.
+! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes.predicate kernel parser quotations words ;
+USING: classes.predicate kernel namespaces parser quotations
+sequences words ;
 IN: singleton
 
+: define-singleton ( token -- )
+    \ word swap in get create-class
+    dup [ eq? ] curry define-predicate-class ;
 
 : SINGLETON:
-    \ word
-    CREATE-CLASS
-    dup [ eq? ] curry define-predicate-class ; parsing
+    scan define-singleton ; parsing
+
+: SINGLETONS:
+    ";" parse-tokens [ define-singleton ] each ; parsing

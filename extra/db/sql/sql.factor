@@ -1,7 +1,6 @@
 USING: kernel parser quotations tuples words
-namespaces.lib namespaces sequences bake arrays combinators
-prettyprint strings math.parser new-slots accessors
-sequences.lib math symbols ;
+namespaces.lib namespaces sequences arrays combinators
+prettyprint strings math.parser sequences.lib math symbols ;
 USE: tools.walker
 IN: db.sql
 

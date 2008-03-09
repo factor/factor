@@ -12,3 +12,15 @@ HELP: SINGLETON:
 } { $see-also
     POSTPONE: PREDICATE:
 } ;
+
+HELP: SINGLETONS:
+{ $syntax "SINGLETONS: classes... ;"
+} { $values
+    { "classes" "new singletons to define" }
+} { $description
+    "Defines a new singleton for each class in the list."
+} { $examples
+    { $example "SINGLETONS: foo bar baz ;" "" }
+} { $see-also
+    POSTPONE: SINGLETON:
+} ;

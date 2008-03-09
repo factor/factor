@@ -240,10 +240,13 @@ PREDICATE: unexpected unexpected-eof
 
 : CREATE ( -- word ) scan create-in ;
 
-: CREATE-CLASS ( -- word )
-    scan in get create
+: create-class ( word vocab -- word )
+    create
     dup save-class-location
     dup predicate-word dup set-word save-location ;
+
+: CREATE-CLASS ( -- word )
+    scan in get create-class ;
 
 : word-restarts ( possibilities -- restarts )
     natural-sort [
