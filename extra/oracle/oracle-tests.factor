@@ -1,4 +1,5 @@
-USING: oracle oracle.liboci prettyprint tools.test ;
+USING: oracle oracle.liboci prettyprint tools.test
+kernel ;
 
 [
     "testuser" "testpassword" "//localhost/test1" log-on .
