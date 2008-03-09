@@ -14,9 +14,12 @@ IN: cairo
 
 << "cairo" {
         { [ win32? ] [ "cairo.dll" ] }
-        { [ macosx? ] [ "libcairo.dylib" ] }
+        ! { [ macosx? ] [ "libcairo.dylib" ] }
+        { [ macosx? ] [ "/opt/local/lib/libcairo.dylib" ] }
         { [ unix? ] [ "libcairo.so.2" ] }
   } cond "cdecl" add-library >>
+
+LIBRARY: cairo
 
 ! cairo_status_t
 C-ENUM:
@@ -437,3 +440,18 @@ C-ENUM:
 
 : cairo_pdf_surface_set_size ( surface width height -- )
   "void" "cairo" "cairo_pdf_surface_set_size" [ "void*" "double" "double" ] alien-invoke ;
+
+! Cairo png
+
+TYPEDEF: void* cairo_write_func_t
+TYPEDEF: void* cairo_read_func_t
+TYPEDEF: void* cairo_surface_t*
+TYPEDEF: uint cairo_status_t
+
+FUNCTION: cairo_surface_t* cairo_image_surface_create_from_png ( char* filename ) ;
+
+FUNCTION: cairo_surface_t* cairo_image_surface_create_from_png_stream ( cairo_read_func_t read_func, void* closure ) ;
+
+FUNCTION: cairo_status_t cairo_surface_write_to_png ( cairo_surface_t* surface, char* filename ) ;
+
+FUNCTION: cairo_status_t cairo_surface_write_to_png_stream ( cairo_surface_t* surface, cairo_write_func_t write_func, void* closure ) ;
