@@ -1,12 +1,12 @@
 ! Copyright (C) 2007 Alex Chapman All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel gap-buffer generic trees trees.avl-tree math sequences quotations ;
+USING: assocs kernel gap-buffer generic trees trees.avl math sequences quotations ;
 IN: gap-buffer.cursortree
 
 TUPLE: cursortree cursors ;
 
 : <cursortree> ( seq -- cursortree )
-    <gb> cursortree construct-empty tuck set-delegate <avl-tree>
+    <gb> cursortree construct-empty tuck set-delegate <avl>
     over set-cursortree-cursors ;
 
 GENERIC: cursortree-gb ( cursortree -- gb )
@@ -20,10 +20,11 @@ TUPLE: right-cursor ;
 
 : cursor-index ( cursor -- i ) cursor-i ; inline
 
-: add-cursor ( cursortree cursor -- ) dup cursor-index rot tree-insert ; 
+: add-cursor ( cursortree cursor -- ) dup cursor-index rot avl-insert ; 
 
 : remove-cursor ( cursortree cursor -- )
-    dup [ eq? ] curry swap cursor-index rot cursortree-cursors tree-delete-if ;
+   cursor-index swap delete-at ; 
+   ! dup [ eq? ] curry swap cursor-index rot cursortree-cursors tree-delete-if ;
 
 : set-cursor-index ( index cursor -- )
     dup cursor-tree over remove-cursor tuck set-cursor-i

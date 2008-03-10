@@ -1,5 +1,5 @@
 USING: arrays combinators crypto.common crypto.md5 crypto.sha1
-crypto.md5.private io io.binary io.files io.streams.string
+crypto.md5.private io io.binary io.files io.streams.byte-array
 kernel math math.vectors memoize sequences io.encodings.binary ;
 IN: crypto.hmac
 
@@ -34,8 +34,8 @@ MEMO: opad ( -- seq ) 64 HEX: 5c <array> ;
 : file>sha1-hmac ( K path -- hmac )
     binary <file-reader> stream>sha1-hmac ;
 
-: string>sha1-hmac ( K string -- hmac )
-    <string-reader> stream>sha1-hmac ;
+: byte-array>sha1-hmac ( K string -- hmac )
+    binary <byte-reader> stream>sha1-hmac ;
 
 
 : stream>md5-hmac ( K stream -- hmac )
@@ -44,6 +44,5 @@ MEMO: opad ( -- seq ) 64 HEX: 5c <array> ;
 : file>md5-hmac ( K path -- hmac )
     binary <file-reader> stream>md5-hmac ;
 
-: string>md5-hmac ( K string -- hmac )
-    <string-reader> stream>md5-hmac ;
-
+: byte-array>md5-hmac ( K string -- hmac )
+    binary <byte-reader> stream>md5-hmac ;

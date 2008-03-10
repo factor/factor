@@ -4,7 +4,7 @@ USING: alien arrays assocs classes compiler db
 hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
-words combinators.lib db.types combinators tools.walker
+words combinators.lib db.types combinators
 combinators.cleave io namespaces.lib ;
 IN: db.sqlite
 
@@ -22,14 +22,17 @@ M: sqlite-db db-close ( handle -- )
 
 M: sqlite-db dispose ( db -- ) dispose-db ;
 
+: with-sqlite ( path quot -- )
+    sqlite-db swap with-db ; inline
+
 TUPLE: sqlite-statement ;
 
 TUPLE: sqlite-result-set has-more? ;
 
-M: sqlite-db <simple-statement> ( str -- obj )
+M: sqlite-db <simple-statement> ( str in out -- obj )
     <prepared-statement> ;
 
-M: sqlite-db <prepared-statement> ( str -- obj )
+M: sqlite-db <prepared-statement> ( str in out -- obj )
     {
         set-statement-sql
         set-statement-in-params

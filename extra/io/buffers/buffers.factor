@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.buffers
 USING: alien alien.accessors alien.c-types alien.syntax kernel
-kernel.private libc math sequences strings hints ;
+kernel.private libc math sequences byte-arrays strings hints ;
 
 TUPLE: buffer size ptr fill pos ;
 
@@ -37,18 +37,18 @@ TUPLE: buffer size ptr fill pos ;
 : buffer-pop ( buffer -- ch )
     dup buffer-peek 1 rot buffer-consume ;
 
-: (buffer>) ( n buffer -- string )
+: (buffer>) ( n buffer -- byte-array )
     [ dup buffer-fill swap buffer-pos - min ] keep
-    buffer@ swap memory>char-string ;
+    buffer@ swap memory>byte-array ;
 
-: buffer> ( n buffer -- string )
+: buffer> ( n buffer -- byte-array )
     [ (buffer>) ] 2keep buffer-consume ;
 
-: (buffer>>) ( buffer -- string )
+: (buffer>>) ( buffer -- byte-array )
     dup buffer-pos over buffer-ptr <displaced-alien>
-    over buffer-fill rot buffer-pos - memory>char-string ;
+    over buffer-fill rot buffer-pos - memory>byte-array ;
 
-: buffer>> ( buffer -- string )
+: buffer>> ( buffer -- byte-array )
     dup (buffer>>) 0 rot buffer-reset ;
 
 : search-buffer-until ( start end alien separators -- n )
@@ -56,7 +56,7 @@ TUPLE: buffer size ptr fill pos ;
 
 HINTS: search-buffer-until { fixnum fixnum simple-alien string } ;
 
-: finish-buffer-until ( buffer n -- string separator )
+: finish-buffer-until ( buffer n -- byte-array separator )
     [
         over buffer-pos -
         over buffer>
@@ -65,7 +65,7 @@ HINTS: search-buffer-until { fixnum fixnum simple-alien string } ;
         buffer>> f
     ] if* ;
 
-: buffer-until ( separators buffer -- string separator )
+: buffer-until ( separators buffer -- byte-array separator )
     tuck { buffer-pos buffer-fill buffer-ptr } get-slots roll
     search-buffer-until finish-buffer-until ;
 
@@ -85,12 +85,12 @@ HINTS: search-buffer-until { fixnum fixnum simple-alien string } ;
 : check-overflow ( n buffer -- )
     2dup buffer-capacity > [ extend-buffer ] [ 2drop ] if ;
 
-: >buffer ( string buffer -- )
+: >buffer ( byte-array buffer -- )
     over length over check-overflow
-    [ buffer-end string>char-memory ] 2keep
+    [ buffer-end byte-array>memory ] 2keep
     [ buffer-fill swap length + ] keep set-buffer-fill ;
 
-: ch>buffer ( ch buffer -- )
+: byte>buffer ( ch buffer -- )
     1 over check-overflow
     [ buffer-end 0 set-alien-unsigned-1 ] keep
     [ buffer-fill 1+ ] keep set-buffer-fill ;

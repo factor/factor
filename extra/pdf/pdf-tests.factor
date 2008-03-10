@@ -1,4 +1,5 @@
 USING: io.files kernel math namespaces pdf pdf.libhpdf prettyprint sequences ;
+IN: pdf.tests
 
 SYMBOL: font
 

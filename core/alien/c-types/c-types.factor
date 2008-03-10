@@ -155,19 +155,8 @@ M: float-array byte-length length "double" heap-size * ;
 : memory>byte-array ( alien len -- byte-array )
     dup <byte-array> [ -rot memcpy ] keep ;
 
-: memory>char-string ( alien len -- string )
-    memory>byte-array >string ;
-
-DEFER: c-ushort-array>
-
-: memory>u16-string ( alien len -- string )
-    [ memory>byte-array ] keep 2/ c-ushort-array> >string ;
-
 : byte-array>memory ( byte-array base -- )
     swap dup length memcpy ;
-
-: string>char-memory ( string base -- )
-    >r B{ } like r> byte-array>memory ;
 
 DEFER: >c-ushort-array
 
@@ -274,7 +263,7 @@ M: long-long-type box-return ( type -- )
     ] when ;
 
 : malloc-file-contents ( path -- alien )
-  binary file-contents >byte-array malloc-byte-array ;
+    binary file-contents malloc-byte-array ;
 
 [
     [ alien-cell ]

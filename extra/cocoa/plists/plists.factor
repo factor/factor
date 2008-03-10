@@ -19,5 +19,5 @@ M: hashtable >plist
     >plist 1array "plist" build-tag*
     dup { { "version" "1.0" } } update ;
 
-: print-plist ( obj -- )
-    build-plist build-xml print-xml ;
+: plist>string ( obj -- string )
+    build-plist build-xml xml>string ;

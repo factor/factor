@@ -6,9 +6,8 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 [ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
 
 [ ] [
-    "test-foo.txt" temp-file ascii [
-        "Hello world." print
-    ] with-file-writer
+    { "Hello world." }
+    "test-foo.txt" temp-file ascii set-file-lines
 ] unit-test
 
 [ ] [
@@ -69,8 +68,8 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 [ ] [ "delete-tree-test/a/b/c" temp-file make-directories ] unit-test
 
 [ ] [
-    "delete-tree-test/a/b/c/d" temp-file
-    ascii [ "Hi" print ] with-file-writer
+    { "Hi" }
+    "delete-tree-test/a/b/c/d" temp-file ascii set-file-lines
 ] unit-test
 
 [ ] [
@@ -82,8 +81,9 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 ] unit-test
 
 [ ] [
+    "Foobar"
     "copy-tree-test/a/b/c/d" temp-file
-    ascii [ "Foobar" write ] with-file-writer
+    ascii set-file-contents
 ] unit-test
 
 [ ] [

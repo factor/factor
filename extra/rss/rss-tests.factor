@@ -1,4 +1,5 @@
 USING: rss io kernel io.files tools.test io.encodings.utf8 ;
+IN: rss.tests
 
 : load-news-file ( filename -- feed )
     #! Load an news syndication file and process it, returning

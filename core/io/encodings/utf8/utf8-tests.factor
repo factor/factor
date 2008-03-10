@@ -1,4 +1,5 @@
-USING: io.encodings.utf8 tools.test io.encodings.string strings arrays ;
+USING: io.encodings.utf8 tools.test io.encodings.string strings arrays unicode ;
+IN: io.encodings.utf8.tests
 
 : decode-utf8-w/stream ( array -- newarray )
     utf8 decode >array ;

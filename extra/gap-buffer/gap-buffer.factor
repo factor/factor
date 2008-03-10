@@ -4,7 +4,7 @@
 ! gap buffer -- largely influenced by Strandh and Villeneuve's Flexichain
 ! for a good introduction see:
 ! http://p-cos.net/lisp-ecoop/submissions/StrandhVilleneuveMoore.pdf
-USING: kernel arrays sequences sequences.private circular math generic ;
+USING: kernel arrays sequences sequences.private circular math math.functions generic ;
 IN: gap-buffer
 
 ! gap-start     -- the first element of the gap

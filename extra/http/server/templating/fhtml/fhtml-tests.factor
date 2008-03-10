@@ -1,5 +1,6 @@
 USING: io io.files io.streams.string io.encodings.utf8
-http.server.templating.fhtml kernel tools.test sequences ;
+http.server.templating.fhtml kernel tools.test sequences
+parser ;
 IN: http.server.templating.fhtml.tests
 
 : test-template ( path -- ? )
@@ -14,4 +15,6 @@ IN: http.server.templating.fhtml.tests
 [ t ] [ "bug" test-template ] unit-test
 [ t ] [ "stack" test-template ] unit-test
 
-[ ] [ "<%\n%>" parse-template drop ] unit-test
+[
+    [ ] [ "<%\n%>" parse-template drop ] unit-test
+] with-file-vocabs

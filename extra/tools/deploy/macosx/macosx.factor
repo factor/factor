@@ -9,17 +9,18 @@ IN: tools.deploy.macosx
 : bundle-dir ( -- dir )
     vm parent-directory parent-directory ;
 
-: copy-bundle-dir ( name dir -- )
-    bundle-dir swap path+ swap "Contents" path+ copy-tree ;
+: copy-bundle-dir ( bundle-name dir -- )
+    bundle-dir over path+ -rot
+    "Contents" swap path+ path+ copy-tree ;
 
 : copy-vm ( executable bundle-name -- vm )
     "Contents/MacOS/" path+ swap path+ vm over copy-file ;
 
 : copy-fonts ( name -- )
     "fonts/" resource-path
-    swap "Contents/Resources/" path+ copy-tree ;
+    swap "Contents/Resources/" path+ copy-tree-into ;
 
-: print-app-plist ( executable bundle-name -- )
+: app-plist ( executable bundle-name -- string )
     [
         namespace {
             { "CFBundleInfoDictionaryVersion" "6.0" }
@@ -30,11 +31,12 @@ IN: tools.deploy.macosx
 
         dup "CFBundleExecutable" set
         "org.factor." swap append "CFBundleIdentifier" set
-    ] H{ } make-assoc print-plist ;
+    ] H{ } make-assoc plist>string ;
 
 : create-app-plist ( vocab bundle-name -- )
-    dup "Contents/Info.plist" path+
-    utf8 [ print-app-plist ] with-file-writer ;
+    [ app-plist ] keep
+    "Contents/Info.plist" path+
+    utf8 set-file-contents ;
 
 : create-app-dir ( vocab bundle-name -- vm )
     dup "Frameworks" copy-bundle-dir
@@ -62,7 +64,7 @@ M: macosx-deploy-implementation deploy* ( vocab -- )
     ".app deploy tool" assert.app
     "." resource-path cd
     dup deploy-config [
-        bundle-name delete-tree
+        bundle-name dup exists? [ delete-tree ] [ drop ] if
         [ bundle-name create-app-dir ] keep
         [ bundle-name deploy.app-image ] keep
         namespace make-deploy-image

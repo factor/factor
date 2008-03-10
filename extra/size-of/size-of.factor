@@ -1,7 +1,9 @@
 
 USING: kernel namespaces sequences
-       io io.files io.launcher bake builder.util
-       accessors vars ;
+       io io.files io.launcher io.encodings.ascii
+       bake builder.util
+       accessors vars
+       math.parser ;
 
 IN: size-of
 
@@ -16,7 +18,7 @@ VAR: headers
   {
     "#include <stdio.h>"
     include-headers
-    { "main() { printf( \"%i\\n\" , sizeof( " , " ) ) ; }" }
+    { "main() { printf( \"%i\" , sizeof( " , " ) ) ; }" }
   }
   bake to-strings ;
 
@@ -26,21 +28,12 @@ VAR: headers
 
 : exe ( -- path ) "size-of" temp-file ;
 
-: answer ( -- path ) "size-of-answer" temp-file ;
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : size-of ( type -- n )
-  c-file
-    [ size-of-c-program [ print ] each ]
-  with-file-writer
+  size-of-c-program c-file ascii set-file-lines
 
   { "gcc" c-file "-o" exe } to-strings
   [ "Error compiling generated C program" print ] run-or-bail
-  
-  <process*>
-    { exe } to-strings >>arguments
-    answer             >>stdout
-  >desc run-process drop
 
-  answer eval-file ;
+  exe ascii <process-stream> contents string>number ;

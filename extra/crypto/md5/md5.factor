@@ -1,21 +1,14 @@
 ! See http://www.faqs.org/rfcs/rfc1321.html
 
-USING: kernel io io.binary io.files io.streams.string math
+USING: kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting strings
 sequences crypto.common byte-arrays locals sequences.private
-io.encodings.binary ;
+io.encodings.binary symbols ;
 IN: crypto.md5
 
 <PRIVATE
 
-SYMBOL: a
-SYMBOL: b
-SYMBOL: c
-SYMBOL: d
-SYMBOL: old-a
-SYMBOL: old-b
-SYMBOL: old-c
-SYMBOL: old-d
+SYMBOLS: a b c d old-a old-b old-c old-d ;
 
 : T ( N -- Y )
     sin abs 4294967296 * >bignum ; foldable
@@ -185,7 +178,14 @@ PRIVATE>
 : stream>md5 ( stream -- byte-array )
     [ initialize-md5 (stream>md5) get-md5 ] with-stream ;
 
-: string>md5 ( string -- byte-array ) <string-reader> stream>md5 ;
-: string>md5str ( string -- md5-string ) string>md5 hex-string ;
-: file>md5 ( path -- byte-array ) binary <file-reader> stream>md5 ;
-: file>md5str ( path -- md5-string ) file>md5 hex-string ;
+: byte-array>md5 ( byte-array -- checksum )
+    binary <byte-reader> stream>md5 ;
+
+: byte-array>md5str ( byte-array -- md5-string )
+    byte-array>md5 hex-string ;
+
+: file>md5 ( path -- byte-array )
+    binary <file-reader> stream>md5 ;
+
+: file>md5str ( path -- md5-string )
+    file>md5 hex-string ;

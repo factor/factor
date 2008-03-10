@@ -23,7 +23,7 @@ IN: tools.deploy.backend
         +closed+ >>stdin
     utf8 <process-stream>
     dup copy-lines
-    process-stream-process wait-for-process zero? [
+    process>> wait-for-process zero? [
         "Deployment failed" throw
     ] unless ;
 
@@ -61,7 +61,7 @@ IN: tools.deploy.backend
     ] { } make ;
 
 : run-factor ( vm flags -- )
-    dup . swap add* run-with-output ; inline
+    swap add* dup . run-with-output ; inline
 
 : make-staging-image ( vm config -- )
     staging-command-line run-factor ;

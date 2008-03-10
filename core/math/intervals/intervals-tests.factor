@@ -1,5 +1,5 @@
 USING: math.intervals kernel sequences words math arrays
-prettyprint tools.test random vocabs ;
+prettyprint tools.test random vocabs combinators ;
 IN: math.intervals.tests
 
 [ T{ interval f { 1 t } { 2 t } } ] [ 1 2 [a,b] ] unit-test
@@ -94,33 +94,88 @@ IN: math.intervals.tests
     ] unit-test
 ] when
 
-[ t ] [ 0 5 [a,b] 5 interval<= ] unit-test
+[ t ] [ 1 [a,a] interval-singleton? ] unit-test
 
-[ incomparable ] [ 0 5 [a,b] 5 interval< ] unit-test
+[ f ] [ 1 1 [a,b) interval-singleton? ] unit-test
 
-[ t ] [ 0 5 [a,b) 5 interval< ] unit-test
+[ f ] [ 1 3 [a,b) interval-singleton? ] unit-test
 
-[ f ] [ 0 5 [a,b] -1 interval< ] unit-test
+[ f ] [ 1 1 (a,b) interval-singleton? ] unit-test
 
-[ incomparable ] [ 0 5 [a,b] 1 interval< ] unit-test
+[ 2 ] [ 1 3 [a,b) interval-length ] unit-test
 
-[ t ] [ -1 1 (a,b) -1 interval> ] unit-test
+[ 0 ] [ f interval-length ] unit-test
 
-[ t ] [ -1 1 (a,b) -1 interval>= ] unit-test
+[ t ] [ 0 5 [a,b] 5 [a,a] interval<= ] unit-test
 
-[ f ] [ -1 1 (a,b) -1 interval< ] unit-test
+[ incomparable ] [ 0 5 [a,b] 5 [a,a] interval< ] unit-test
 
-[ f ] [ -1 1 (a,b) -1 interval<= ] unit-test
+[ t ] [ 0 5 [a,b) 5 [a,a] interval< ] unit-test
 
-[ t ] [ -1 1 (a,b] 1 interval<= ] unit-test
+[ f ] [ 0 5 [a,b] -1 [a,a] interval< ] unit-test
+
+[ incomparable ] [ 0 5 [a,b] 1 [a,a] interval< ] unit-test
+
+[ t ] [ -1 1 (a,b) -1 [a,a] interval> ] unit-test
+
+[ t ] [ -1 1 (a,b) -1 [a,a] interval>= ] unit-test
+
+[ f ] [ -1 1 (a,b) -1 [a,a] interval< ] unit-test
+
+[ f ] [ -1 1 (a,b) -1 [a,a] interval<= ] unit-test
+
+[ t ] [ -1 1 (a,b] 1 [a,a] interval<= ] unit-test
+
+[ t ] [ -1 1 (a,b] 1 2 [a,b] interval<= ] unit-test
+
+[ incomparable ] [ -1 1 (a,b] 1 2 [a,b] interval>= ] unit-test
+
+[ incomparable ] [ -1 1 (a,b] 1 2 [a,b] interval> ] unit-test
+
+[ t ] [ -1 1 (a,b] 1 2 (a,b] interval<= ] unit-test
+
+[ f ] [ 0 10 [a,b] 0 [a,a] interval< ] unit-test
+
+[ f ] [ 0 10 [a,b] 10 [a,a] interval> ] unit-test
+
+[ incomparable ] [ 0 [a,a] 0 10 [a,b] interval< ] unit-test
+
+[ incomparable ] [ 10 [a,a] 0 10 [a,b] interval> ] unit-test
+
+[ t ] [ 0 [a,a] 0 10 [a,b] interval<= ] unit-test
+
+[ incomparable ] [ 0 [a,a] 0 10 [a,b] interval>= ] unit-test
+
+[ t ] [ 0 10 [a,b] 0 [a,a] interval>= ] unit-test
+
+[ t ] [
+    418
+    418 423 [a,b)
+    79 893 (a,b]
+    interval-max
+    interval-contains?
+] unit-test
+
+[ f ] [ 1 100 [a,b] -1 1 [a,b] interval/i ] unit-test
 
 ! Interval random tester
 : random-element ( interval -- n )
-    dup interval-to first swap interval-from first tuck -
-    random + ;
+    dup interval-to first over interval-from first tuck - random +
+    2dup swap interval-contains? [
+        nip
+    ] [
+        drop random-element
+    ] if ;
 
 : random-interval ( -- interval )
-    1000 random dup 1 1000 random + + [a,b] ;
+    1000 random dup 2 1000 random + +
+    1 random zero? [ [ neg ] 2apply swap ] when
+    4 random {
+        { 0 [ [a,b] ] }
+        { 1 [ [a,b) ] }
+        { 2 [ (a,b) ] }
+        { 3 [ (a,b] ] }
+    } case ;
 
 : random-op
     {
@@ -138,12 +193,32 @@ IN: math.intervals.tests
     random ;
 
 : interval-test
-    random-interval random-interval random-op
+    random-interval random-interval random-op ! 3dup . . .
     0 pick interval-contains? over first { / /i } member? and [
         3drop t
     ] [
-        [ >r [ random-element ] 2apply r> first execute ] 3keep
+        [ >r [ random-element ] 2apply ! 2dup . .
+        r> first execute ] 3keep
         second execute interval-contains?
     ] if ;
 
-[ t ] [ 1000 [ drop interval-test ] all? ] unit-test
+[ t ] [ 40000 [ drop interval-test ] all? ] unit-test
+
+: random-comparison
+    {
+        { < interval< }
+        { <= interval<= }
+        { > interval> }
+        { >= interval>= }
+    } random ;
+
+: comparison-test
+    random-interval random-interval random-comparison
+    [ >r [ random-element ] 2apply r> first execute ] 3keep
+    second execute dup incomparable eq? [
+        2drop t
+    ] [
+        =
+    ] if ;
+
+[ t ] [ 40000 [ drop comparison-test ] all? ] unit-test

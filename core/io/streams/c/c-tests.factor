@@ -3,9 +3,7 @@ io.encodings.ascii strings ;
 IN: io.streams.c.tests
 
 [ "hello world" ] [
-    "test.txt" temp-file ascii [
-        "hello world" write
-    ] with-file-writer
+    "hello world" "test.txt" temp-file ascii set-file-contents
 
     "test.txt" temp-file "rb" fopen <c-reader> contents
     >string

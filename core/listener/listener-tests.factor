@@ -8,9 +8,11 @@ IN: listener.tests
 : parse-interactive ( string -- quot )
     <string-reader> stream-read-quot ;
 
-[ [ ] ] [
-    "USE: listener.tests hello" parse-interactive
-] unit-test
+[
+    [ [ ] ] [
+        "USE: listener.tests hello" parse-interactive
+    ] unit-test
+] with-file-vocabs
 
 [
     "debugger" use+
@@ -35,8 +37,10 @@ IN: listener.tests
 ] unit-test
 
 [
-    "USE: vocabs.loader.test.c" parse-interactive
-] must-fail
+    [
+        "USE: vocabs.loader.test.c" parse-interactive
+    ] must-fail
+] with-file-vocabs
 
 [ ] [
     [
@@ -44,7 +48,9 @@ IN: listener.tests
     ] with-compilation-unit
 ] unit-test
 
-[ ] [
-    "IN: listener.tests : hello\n\"world\" ;" parse-interactive
+[
+    [ ] [
+        "IN: listener.tests : hello\n\"world\" ;" parse-interactive
     drop
-] unit-test
+    ] unit-test
+] with-file-vocabs
