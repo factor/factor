@@ -127,9 +127,9 @@ IN: db.sqlite.lib
         { +native-id+ [ sqlite3_column_int64 ] }
         { INTEGER [ sqlite3_column_int ] }
         { BIG-INTEGER [ sqlite3_column_int64 ] }
+        { DOUBLE [ sqlite3_column_double ] }
         { TEXT [ sqlite3_column_text ] }
         { VARCHAR [ sqlite3_column_text ] }
-        { DOUBLE [ sqlite3_column_double ] }
         { DATE [ sqlite3_column_text dup [ ymd>timestamp ] when ] }
         { TIME [ sqlite3_column_text dup [ hms>timestamp ] when ] }
         { TIMESTAMP [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }

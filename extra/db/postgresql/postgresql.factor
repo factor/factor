@@ -4,7 +4,8 @@ USING: arrays assocs alien alien.syntax continuations io
 kernel math math.parser namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
 db.tuples db.types tools.annotations math.ranges
-combinators sequences.lib classes locals words tools.walker ;
+combinators sequences.lib classes locals words tools.walker
+combinators.cleave namespaces.lib ;
 IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty db user pass ;
@@ -53,11 +54,12 @@ M: postgresql-result-set #rows ( result-set -- n )
 M: postgresql-result-set #columns ( result-set -- n )
     result-set-handle PQnfields ;
 
-M: postgresql-result-set row-column ( result-set n -- obj )
+M: postgresql-result-set row-column ( result-set column -- obj )
     >r dup result-set-handle swap result-set-n r> PQgetvalue ;
 
-M: postgresql-result-set row-column-typed ( result-set n type -- obj )
-    >r row-column r> sql-type>factor-type ;
+M: postgresql-result-set row-column-typed ( result-set column -- obj )
+    dup pick result-set-out-params nth sql-spec-type
+    >r >r [ result-set-handle ] [ result-set-n ] bi r> r> postgresql-column-typed ;
 
 M: postgresql-statement query-results ( query -- result-set )
     dup statement-bind-params [

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays continuations db io kernel math namespaces
 quotations sequences db.postgresql.ffi alien alien.c-types
-db.types tools.walker ascii splitting ;
+db.types tools.walker ascii splitting math.parser
+combinators combinators.cleave ;
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )
@@ -48,3 +49,22 @@ IN: db.postgresql.lib
     dup postgresql-result-ok? [
         dup postgresql-result-error-message swap PQclear throw
     ] unless ;
+
+: postgresql-column-typed ( handle row column type -- obj )
+    dup array? [ first ] when
+    {
+        { +native-id+ [ ] }
+        { INTEGER [ PQgetvalue string>number ] }
+        { BIG-INTEGER [ PQgetvalue string>number ] }
+        { DOUBLE [ PQgetvalue string>number ] }
+        { TEXT [ PQgetvalue ] }
+        { VARCHAR [ PQgetvalue ] }
+        { DATE [ PQgetvalue ] }
+        { TIME [ PQgetvalue ] }
+        { TIMESTAMP [ PQgetvalue ] }
+        { DATETIME [ PQgetvalue ] }
+        { BLOB [ [ PQgetvalue ] 3keep PQgetlength ] }
+        { FACTOR-BLOB [ [ PQgetvalue ] 3keep PQgetlength ] }
+        [ no-sql-type ]
+    } case ;
+    ! PQgetlength PQgetisnull

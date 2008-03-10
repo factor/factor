@@ -20,8 +20,7 @@ GENERIC: db-open ( db -- )
 HOOK: db-close db ( handle -- )
 : make-db ( seq class -- db ) construct-empty make-db* ;
 
-: dispose-statements ( seq -- )
-    [ dispose drop ] assoc-each ;
+: dispose-statements ( seq -- ) [ dispose drop ] assoc-each ;
 
 : dispose-db ( db -- ) 
     dup db [
@@ -46,8 +45,8 @@ GENERIC: bind-tuple ( tuple statement -- )
 GENERIC: query-results ( query -- result-set )
 GENERIC: #rows ( result-set -- n )
 GENERIC: #columns ( result-set -- n )
-GENERIC# row-column 1 ( result-set n -- obj )
-GENERIC# row-column-typed 1 ( result-set n -- sql )
+GENERIC# row-column 1 ( result-set column -- obj )
+GENERIC# row-column-typed 1 ( result-set column -- sql )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 
