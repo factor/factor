@@ -270,7 +270,8 @@ FUNCTION: char* PQcmdStatus ( PGresult* res ) ;
 FUNCTION: char* PQoidStatus ( PGresult* res ) ;
 FUNCTION: Oid   PQoidValue ( PGresult* res ) ;
 FUNCTION: char* PQcmdTuples ( PGresult* res ) ;
-FUNCTION: char* PQgetvalue ( PGresult* res, int tup_num, int field_num ) ;
+! FUNCTION: char* PQgetvalue ( PGresult* res, int tup_num, int field_num ) ;
+FUNCTION: void* PQgetvalue ( PGresult* res, int tup_num, int field_num ) ;
 FUNCTION: int   PQgetlength ( PGresult* res, int tup_num, int field_num ) ;
 FUNCTION: int   PQgetisnull ( PGresult* res, int tup_num, int field_num ) ;
 

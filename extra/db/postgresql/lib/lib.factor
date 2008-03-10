@@ -3,7 +3,7 @@
 USING: arrays continuations db io kernel math namespaces
 quotations sequences db.postgresql.ffi alien alien.c-types
 db.types tools.walker ascii splitting math.parser
-combinators combinators.cleave ;
+combinators combinators.cleave libc shuffle calendar.format ;
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )
@@ -44,27 +44,46 @@ IN: db.postgresql.lib
     [ statement-sql ] keep
     [ statement-bind-params length f ] keep
     statement-bind-params
-    [ number>string* malloc-char-string ] map >c-void*-array
-    f f 0 PQexecParams
-    dup postgresql-result-ok? [
-        dup postgresql-result-error-message swap PQclear throw
-    ] unless ;
+    [ number>string* dup [ malloc-char-string ] when ] map
+    [
+        [
+            >c-void*-array f f 0 PQexecParams
+            dup postgresql-result-ok? [
+                dup postgresql-result-error-message swap PQclear throw
+            ] unless
+        ] keep
+    ] [ [ free ] each ] [ ] cleanup ;
+
+: pq-get-string ( handle row column -- obj )
+    3dup PQgetvalue alien>char-string
+    dup "" = [ >r PQgetisnull 1 = f r> ? ] [ 3nip ] if ;
+
+: pq-get-number ( handle row column -- obj )
+    pq-get-string dup [ string>number ] when ;
+
+: pq-get-blob ( handle row column -- obj/f )
+    [ PQgetvalue ] 3keep PQgetlength
+    dup 0 > [
+        memory>byte-array
+    ] [
+        2drop f
+    ] if ;
 
 : postgresql-column-typed ( handle row column type -- obj )
     dup array? [ first ] when
     {
-        { +native-id+ [ ] }
-        { INTEGER [ PQgetvalue string>number ] }
-        { BIG-INTEGER [ PQgetvalue string>number ] }
-        { DOUBLE [ PQgetvalue string>number ] }
-        { TEXT [ PQgetvalue ] }
-        { VARCHAR [ PQgetvalue ] }
-        { DATE [ PQgetvalue ] }
-        { TIME [ PQgetvalue ] }
-        { TIMESTAMP [ PQgetvalue ] }
-        { DATETIME [ PQgetvalue ] }
-        { BLOB [ [ PQgetvalue ] 3keep PQgetlength ] }
-        { FACTOR-BLOB [ [ PQgetvalue ] 3keep PQgetlength ] }
+        { +native-id+ [ pq-get-number ] }
+        { INTEGER [ pq-get-number ] }
+        { BIG-INTEGER [ pq-get-number ] }
+        { DOUBLE [ pq-get-number ] }
+        { TEXT [ pq-get-string ] }
+        { VARCHAR [ pq-get-string ] }
+        { DATE [ pq-get-string dup [ ymd>timestamp ] when ] }
+        { TIME [ pq-get-string dup [ hms>timestamp ] when ] }
+        { TIMESTAMP [ pq-get-string dup [ ymdhms>timestamp ] when ] }
+        { DATETIME [ pq-get-string dup [ ymdhms>timestamp ] when ] }
+        { BLOB [ pq-get-blob ] }
+        { FACTOR-BLOB [ pq-get-blob ] }
         [ no-sql-type ]
     } case ;
     ! PQgetlength PQgetisnull

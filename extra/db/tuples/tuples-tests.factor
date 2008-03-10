@@ -3,7 +3,7 @@
 USING: io.files kernel tools.test db db.tuples
 db.types continuations namespaces math
 prettyprint tools.walker db.sqlite calendar
-math.intervals ;
+math.intervals db.postgresql ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real ts date time blob ;
@@ -161,11 +161,14 @@ TUPLE: annotation n paste-id summary author mode contents ;
 : test-sqlite ( quot -- )
     >r "tuples-test.db" temp-file sqlite-db r> with-db ;
 
-! : test-postgresql ( -- )
-!    >r { "localhost" "postgres" "" "factor-test" } postgresql-db r> with-db ;
+: test-postgresql ( -- )
+>r { "localhost" "postgres" "" "factor-test" } postgresql-db r> with-db ;
 
 [ native-person-schema test-tuples ] test-sqlite
 [ assigned-person-schema test-tuples ] test-sqlite
+
+[ native-person-schema test-tuples ] test-postgresql
+[ assigned-person-schema test-tuples ] test-postgresql
 
 TUPLE: serialize-me id data ;
 
