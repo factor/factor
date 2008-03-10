@@ -8,6 +8,7 @@ USING: kernel namespaces sequences assocs builder continuations
        tools.test
        io.encodings.utf8
        combinators.cleave
+       help.lint
        bootstrap.stage2 benchmark builder.util ;
 
 IN: builder.test
@@ -28,6 +29,9 @@ IN: builder.test
     ]
   with-file-writer ;
 
+: do-help-lint ( -- )
+  "" run-help-lint "../help-lint" utf8 [ typos. ] with-file-writer ;
+
 : do-benchmarks ( -- )
   run-benchmarks "../benchmarks" utf8 [ . ] with-file-writer ;
 
@@ -35,6 +39,7 @@ IN: builder.test
   bootstrap-time get   "../boot-time" utf8 [ . ] with-file-writer
   [ do-load  ] runtime "../load-time" utf8 [ . ] with-file-writer
   [ do-tests ] runtime "../test-time" utf8 [ . ] with-file-writer
+  do-help-lint
   do-benchmarks ;
 
 MAIN: do-all

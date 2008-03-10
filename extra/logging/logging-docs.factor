@@ -100,7 +100,7 @@ ARTICLE: "logging.rotation" "Log rotation"
 "The " { $vocab-link "logging.insomniac" } " vocabulary automates log rotation." ;
 
 ARTICLE: "logging.server" "Log implementation"
-"The " { $vocab-link "logging.server" } " vocabulary implements a concurrent log server using " { $vocab-link "concurrency" } ". User code never interacts with the server directly, instead ot uses the words in the " { $link "logging" } " vocabulary. The server is used to synchronize access to log files and ensure that log rotation can proceed in an orderly fashion."
+"The " { $vocab-link "logging.server" } " vocabulary implements a concurrent log server using " { $vocab-link "concurrency" } ". User code never interacts with the server directly, instead it uses the words in the " { $link "logging" } " vocabulary. The server is used to synchronize access to log files and ensure that log rotation can proceed in an orderly fashion."
 $nl
 "The " { $link log-message } " word sends a message to the server which results in the server executing an internal word:"
 { $subsection (log-message) }
