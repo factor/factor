@@ -164,7 +164,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
         { BLOB [ pq-get-blob ] }
         { FACTOR-BLOB [
             pq-get-blob
-            binary [ deserialize ] with-byte-reader ] }
+            dup [ binary [ deserialize ] with-byte-reader ] when ] }
         [ no-sql-type ]
     } case ;
     ! PQgetlength PQgetisnull
