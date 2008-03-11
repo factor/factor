@@ -9,7 +9,7 @@ splitting kernel hashtables continuations ;
         [
             exit-continuation set
             "xxx"
-            <action> [ [ "hello" print 123 ] show-final ] >>get
+            <action> [ [ "hello" print 123 ] show-final ] >>display
             <callback-responder>
             call-responder
         ] callcc1
@@ -24,7 +24,7 @@ splitting kernel hashtables continuations ;
         ] show-page
         "byebye" print
         [ 123 ] show-final
-    ] >>get
+    ] >>display
     <callback-responder> "r" set
 
     [ 123 ] [
