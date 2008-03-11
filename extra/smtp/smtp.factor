@@ -8,19 +8,16 @@ calendar.format new-slots accessors ;
 IN: smtp
 
 SYMBOL: smtp-domain
-SYMBOL: smtp-host       "localhost" smtp-host set-global
-SYMBOL: smtp-port       25 smtp-port set-global
+SYMBOL: smtp-server     "localhost" 25 <inet> smtp-server set-global
 SYMBOL: read-timeout    1 minutes read-timeout set-global
 SYMBOL: esmtp           t esmtp set-global
 
-: log-smtp-connection ( host port -- ) 2drop ;
-
-\ log-smtp-connection NOTICE add-input-logging
+LOG: log-smtp-connection NOTICE ( addrspec -- )
 
 : with-smtp-connection ( quot -- )
-    smtp-host get smtp-port get
-    2dup log-smtp-connection
-    <inet> ascii <client> [
+    smtp-server get
+    dup log-smtp-connection
+    ascii <client> [
         smtp-domain [ host-name or ] change
         read-timeout get stdio get set-timeout
         call
@@ -33,8 +30,8 @@ SYMBOL: esmtp           t esmtp set-global
 
 : validate-address ( string -- string' )
     #! Make sure we send funky stuff to the server by accident.
-    dup [ "\r\n>" member? ] contains?
-    [ "Bad e-mail address: " swap append throw ] when ;
+    dup "\r\n>" seq-intersect empty?
+    [ "Bad e-mail address: " swap append throw ] unless ;
 
 : mail-from ( fromaddr -- )
     "MAIL FROM:<" write validate-address write ">" write crlf ;
@@ -91,8 +88,8 @@ LOG: smtp-response DEBUG
 : get-ok ( -- ) flush receive-response check-response ;
 
 : validate-header ( string -- string' )
-    dup [ "\r\n" member? ] contains?
-    [ "Invalid header string: " swap append throw ] when ;
+    dup "\r\n" seq-intersect empty?
+    [ "Invalid header string: " swap append throw ] unless ;
 
 : write-header ( key value -- )
     swap
@@ -153,7 +150,7 @@ M: email clone
     email construct-empty
     H{ } clone >>headers ;
 
-: send ( email -- )
+: send-email ( email -- )
     prepare (send) ;
 
 ! Dirk's old AUTH CRAM-MD5 code. I don't know anything about
