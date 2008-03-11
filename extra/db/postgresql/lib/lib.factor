@@ -3,7 +3,9 @@
 USING: arrays continuations db io kernel math namespaces
 quotations sequences db.postgresql.ffi alien alien.c-types
 db.types tools.walker ascii splitting math.parser
-combinators combinators.cleave libc shuffle calendar.format ;
+combinators combinators.cleave libc shuffle calendar.format
+byte-arrays destructors prettyprint new-slots accessors
+strings serialize io.encodings.binary io.streams.byte-array ;
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )
@@ -39,34 +41,111 @@ IN: db.postgresql.lib
         dup postgresql-result-error-message swap PQclear throw
     ] unless ;
 
-: do-postgresql-bound-statement ( statement -- res )
-    >r db get db-handle r>
-    [ statement-sql ] keep
-    [ statement-bind-params length f ] keep
-    statement-bind-params
-    [ number>string* dup [ malloc-char-string ] when ] map
+: type>oid ( symbol -- n )
+    dup array? [ first ] when
+    {
+        { BLOB [ BYTEA-OID ] }
+        { FACTOR-BLOB [ BYTEA-OID ] }
+        [ drop 0 ]
+    } case ;
+
+: type>param-format ( symbol -- n )
+    dup array? [ first ] when
+    {
+        { BLOB [ 1 ] }
+        { FACTOR-BLOB [ 1 ] }
+        [ drop 0 ]
+    } case ;
+
+: param-types ( statement -- seq )
+    statement-in-params
+    [ sql-spec-type type>oid ] map
+    >c-uint-array ;
+
+: malloc-byte-array/length
+    [ malloc-byte-array dup free-always ] [ length ] bi ;
+    
+
+: param-values ( statement -- seq seq2 )
+    [ statement-bind-params ]
+    [ statement-in-params ] bi
     [
-        [
-            >c-void*-array f f 0 PQexecParams
-            dup postgresql-result-ok? [
-                dup postgresql-result-error-message swap PQclear throw
-            ] unless
-        ] keep
-    ] [ [ free ] each ] [ ] cleanup ;
+        sql-spec-type {
+            { FACTOR-BLOB [
+                dup [
+                    binary [ serialize ] with-byte-writer
+                    malloc-byte-array/length ] [ 0 ] if ] }
+            { BLOB [
+                dup [ malloc-byte-array/length ] [ 0 ] if ] }
+            [
+                drop number>string* dup [
+                    malloc-char-string dup free-always
+                ] when 0
+            ]
+        } case 2array
+    ] 2map flip dup empty? [
+        drop f f
+    ] [
+        first2 [ >c-void*-array ] [ >c-uint-array ] bi*
+    ] if ;
+
+: param-formats ( statement -- seq )
+    statement-in-params
+    [ sql-spec-type type>param-format ] map
+    >c-uint-array ;
+
+: do-postgresql-bound-statement ( statement -- res )
+    [
+        >r db get db-handle r>
+        {
+            [ statement-sql ]
+            [ statement-bind-params length ]
+            [ param-types ]
+            [ param-values ]
+            [ param-formats ]
+        } cleave
+        0 PQexecParams dup postgresql-result-ok? [
+            dup postgresql-result-error-message swap PQclear throw
+        ] unless
+    ] with-destructors ;
+
+: pq-get-is-null ( handle row column -- ? )
+    PQgetisnull 1 = ;
 
 : pq-get-string ( handle row column -- obj )
     3dup PQgetvalue alien>char-string
-    dup "" = [ >r PQgetisnull 1 = f r> ? ] [ 3nip ] if ;
+    dup "" = [ >r pq-get-is-null f r> ? ] [ 3nip ] if ;
 
 : pq-get-number ( handle row column -- obj )
     pq-get-string dup [ string>number ] when ;
 
+TUPLE: postgresql-malloc-destructor alien ;
+C: <postgresql-malloc-destructor> postgresql-malloc-destructor
+
+M: postgresql-malloc-destructor dispose ( obj -- )
+    alien>> PQfreemem ;
+
+: postgresql-free-always ( alien -- )
+    <postgresql-malloc-destructor> add-always-destructor ;
+
 : pq-get-blob ( handle row column -- obj/f )
-    [ PQgetvalue ] 3keep PQgetlength
+    [ PQgetvalue ] 3keep 3dup PQgetlength
     dup 0 > [
-        memory>byte-array
+        3nip
+        [
+            memory>byte-array >string
+            0 <uint>
+            [
+                PQunescapeBytea dup zero? [
+                    postgresql-result-error-message throw
+                ] [
+                    dup postgresql-free-always
+                ] if
+            ] keep
+            *uint memory>byte-array
+        ] with-destructors 
     ] [
-        2drop f
+        drop pq-get-is-null nip [ f ] [ B{ } clone ] if
     ] if ;
 
 : postgresql-column-typed ( handle row column type -- obj )
@@ -83,7 +162,9 @@ IN: db.postgresql.lib
         { TIMESTAMP [ pq-get-string dup [ ymdhms>timestamp ] when ] }
         { DATETIME [ pq-get-string dup [ ymdhms>timestamp ] when ] }
         { BLOB [ pq-get-blob ] }
-        { FACTOR-BLOB [ pq-get-blob ] }
+        { FACTOR-BLOB [
+            pq-get-blob
+            binary [ deserialize ] with-byte-reader ] }
         [ no-sql-type ]
     } case ;
     ! PQgetlength PQgetisnull
