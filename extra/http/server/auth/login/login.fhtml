@@ -1,3 +1,5 @@
+<% USING: http.server.auth.login http.server.components kernel
+namespaces ; %>
 <html>
 <body>
 <h1>Login required</h1>
@@ -7,19 +9,33 @@
 
 <tr>
 <td>User name:</td>
-<td><input name="name" /></td>
+<td><% "username" component render-edit %></td>
 </tr>
 
 <tr>
 <td>Password:</td>
-<td><input type="password" name="password" /></td>
+<td><% "password" component render-edit %></td>
 </tr>
 
 </table>
 
-<input type="submit" value="Log in" />
+<p><input type="submit" value="Log in" />
+<%
+login-failed? get
+[ "Invalid username or password" render-error ] when
+%>
+</p>
 
 </form>
+
+<p>
+<% allow-registration? [ %>
+    <a href="register">Register</a>
+<% ] when %>
+<% allow-password-recovery? [ %>
+    <a href="recover-password">Recover Password</a>
+<% ] when %>
+</p>
 
 </body>
 </html>

@@ -1,10 +1,10 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables io io.streams.string kernel math namespaces
-math.parser assocs sequences strings splitting ascii
-io.encodings.utf8 io.encodings.string namespaces
-unicode.case combinators vectors sorting new-slots accessors
-calendar calendar.format quotations arrays ;
+USING: fry hashtables io io.streams.string kernel math
+namespaces math.parser assocs sequences strings splitting ascii
+io.encodings.utf8 io.encodings.string namespaces unicode.case
+combinators vectors sorting new-slots accessors calendar
+calendar.format quotations arrays ;
 IN: http
 
 : http-port 80 ; inline
@@ -91,8 +91,8 @@ IN: http
 
 : check-header-string ( str -- str )
     #! http://en.wikipedia.org/wiki/HTTP_Header_Injection
-    dup [ "\r\n" member? ] contains?
-    [ "Header injection attack" throw ] when ;
+    dup "\r\n" seq-intersect empty?
+    [ "Header injection attack" throw ] unless ;
 
 : write-header ( assoc -- )
     >alist sort-keys [
@@ -396,13 +396,13 @@ M: response write-full-response ( request response -- )
     "content-type" set-header ;
 
 : get-cookie ( request/response name -- cookie/f )
-    >r cookies>> r> [ swap name>> = ] curry find nip ;
+    >r cookies>> r> '[ , _ name>> = ] find nip ;
 
 : delete-cookie ( request/response name -- )
     over cookies>> >r get-cookie r> delete ;
 
 : put-cookie ( request/response cookie -- request/response )
-    [ dupd name>> get-cookie [ dupd delete-cookie ] when* ] keep
+    [ name>> dupd get-cookie [ dupd delete-cookie ] when* ] keep
     over cookies>> push ;
 
 TUPLE: raw-response 

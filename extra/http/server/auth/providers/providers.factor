@@ -1,18 +1,56 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel ;
+USING: kernel new-slots accessors random math.parser locals
+sequences math ;
 IN: http.server.auth.providers
 
-GENERIC: check-login ( password user provider -- ? )
+TUPLE: user username realname password email ticket profile ;
 
-GENERIC: new-user ( user provider -- )
+: <user> user construct-empty H{ } clone >>profile ;
 
-GENERIC: set-password ( password user provider -- )
+GENERIC: get-user ( username provider -- user/f )
 
-TUPLE: user-exists name ;
+GENERIC: update-user ( user provider -- )
 
-: user-exists ( name -- * ) \ user-exists construct-boa throw ;
+GENERIC: new-user ( user provider -- user/f )
 
-TUPLE: no-such-user name ;
+: check-login ( password username provider -- user/f )
+    get-user dup [ [ password>> = ] keep and ] [ 2drop f ] if ;
 
-: no-such-user ( name -- * ) \ no-such-user construct-boa throw ;
+:: set-password ( password username provider -- )
+    [let | user [ username provider get-user ] |
+        user [
+            user
+                password >>password
+            provider update-user t
+        ] [ f ] if
+    ] ;
+
+! Password recovery support
+
+:: issue-ticket ( email username provider -- user/f )
+    [let | user [ username provider get-user ] |
+        user [
+            user email>> length 0 > [
+                user email>> email = [
+                    user
+                    random-256 >hex >>ticket
+                    dup provider update-user
+                ] [ f ] if
+            ] [ f ] if
+        ] [ f ] if
+    ] ;
+
+:: claim-ticket ( ticket username provider -- user/f )
+    [let | user [ username provider get-user ] |
+        user [
+            user ticket>> ticket = [
+                user f >>ticket dup provider update-user
+            ] [ f ] if
+        ] [ f ] if
+    ] ;
+
+! For configuration
+
+: add-user ( provider user -- provider )
+    over new-user [ "User exists" throw ] when ;

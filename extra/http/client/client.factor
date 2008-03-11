@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
-splitting calendar continuations accessors vectors io.encodings.latin1
-io.encodings.binary ;
+splitting calendar continuations accessors vectors
+io.encodings.latin1 io.encodings.binary fry ;
 IN: http.client
 
 DEFER: http-request
@@ -46,8 +46,7 @@ DEFER: http-request
     dup host>> swap port>> <inet> ;
 
 : close-on-error ( stream quot -- )
-    [ with-stream* ] curry [ ] pick [ dispose ] curry cleanup ;
-    inline
+    '[ , with-stream* ] [ ] pick '[ , dispose ] cleanup ; inline
 
 PRIVATE>
 
