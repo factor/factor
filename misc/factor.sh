@@ -153,6 +153,8 @@ find_os() {
         *linux*) OS=linux;;
         *Linux*) OS=linux;;
         *NetBSD*) OS=netbsd;;
+        *FreeBSD*) OS=freebsd;;
+        *OpenBSD*) OS=openbsd;;
     esac
 }
 
