@@ -85,29 +85,35 @@ set_md5sum() {
     fi
 }
 
+set_gcc() {
+    case $OS in
+        openbsd) ensure_program_installed egcc; CC=egcc;;
+        *) CC=gcc;;
+    esac
+}
+
+set_make() {
+    case $OS in
+        netbsd) MAKE='gmake';;
+        freebsd) MAKE='gmake';;
+        openbsd) MAKE='gmake';;
+        dragonflybsd) MAKE='gmake';;
+        *) MAKE='make';;
+    esac
+    if ! [[ $MAKE -eq 'gmake' ]] ; then
+    	ensure_program_installed gmake
+    fi
+}
+
 check_installed_programs() {
     ensure_program_installed chmod
     ensure_program_installed uname
     ensure_program_installed git
     ensure_program_installed wget curl
     ensure_program_installed gcc
-    ensure_program_installed make
+    ensure_program_installed make gmake
     ensure_program_installed md5sum md5
     ensure_program_installed cut
-    case $OS in
-        netbsd) ensure_program_installed gmake;;
-        freebsd) ensure_program_installed gmake;;
-        openbsd) ensure_program_installed egcc;
-        	ensure_program_installed gmake;
-		CC=egcc;;
-        *) CC=gcc;;
-    esac
-    case $OS in
-        # winnt) FACTOR_BINARY=factor-nt;;
-        # macosx) FACTOR_BINARY=./Factor.app/Contents/MacOS/factor;;
-        *) FACTOR_BINARY=factor;;
-    esac
-
     check_gcc_version
 }
 
@@ -166,6 +172,7 @@ find_os() {
         *NetBSD*) OS=netbsd;;
         *FreeBSD*) OS=freebsd;;
         *OpenBSD*) OS=openbsd;;
+        *DragonFly*) OS=dragonflybsd;;
     esac
 }
 
@@ -244,7 +251,6 @@ set_build_info() {
 }
 
 find_build_info() {
-    ensure_program_installed egcc gcc
     find_os
     find_architecture
     find_word_size
@@ -275,14 +281,8 @@ cd_factor() {
 }
 
 invoke_make() {
-    case $OS in
-        netbsd) make='gmake';;
-        freebsd) make='gmake';;
-        openbsd) make='gmake';;
-        *) make='make';;
-    esac
-   $make $*
-   check_ret $make
+   $MAKE $*
+   check_ret $MAKE
 }
 
 make_clean() {
@@ -347,6 +347,8 @@ maybe_download_dlls() {
 
 get_config_info() {
     find_build_info
+    set_gcc
+    set_make
     check_installed_programs
     check_libraries
 }
