@@ -270,7 +270,8 @@ FUNCTION: char* PQcmdStatus ( PGresult* res ) ;
 FUNCTION: char* PQoidStatus ( PGresult* res ) ;
 FUNCTION: Oid   PQoidValue ( PGresult* res ) ;
 FUNCTION: char* PQcmdTuples ( PGresult* res ) ;
-FUNCTION: char* PQgetvalue ( PGresult* res, int tup_num, int field_num ) ;
+! FUNCTION: char* PQgetvalue ( PGresult* res, int tup_num, int field_num ) ;
+FUNCTION: void* PQgetvalue ( PGresult* res, int tup_num, int field_num ) ;
 FUNCTION: int   PQgetlength ( PGresult* res, int tup_num, int field_num ) ;
 FUNCTION: int   PQgetisnull ( PGresult* res, int tup_num, int field_num ) ;
 
@@ -297,8 +298,8 @@ FUNCTION: size_t PQescapeStringConn ( PGconn* conn,
 FUNCTION: uchar* PQescapeByteaConn ( PGconn* conn,
                                     char* from, size_t length,
                                     size_t* to_length ) ;
-FUNCTION: uchar* PQunescapeBytea ( uchar* strtext,
-                size_t* retbuflen ) ;
+FUNCTION: void* PQunescapeBytea ( uchar* strtext, size_t* retbuflen ) ;
+! FUNCTION: uchar* PQunescapeBytea ( uchar* strtext, size_t* retbuflen ) ;
 ! These forms are deprecated!
 FUNCTION: size_t PQescapeString ( void* to, char* from, size_t length ) ;
 FUNCTION: uchar* PQescapeBytea ( uchar* bintext, size_t binlen,
@@ -346,3 +347,23 @@ FUNCTION: int    PQdsplen ( uchar* s, int encoding ) ;
 
 ! Get encoding id from environment variable PGCLIENTENCODING
 FUNCTION: int    PQenv2encoding ( ) ;
+
+! From git, include/catalog/pg_type.h
+: BOOL-OID 16 ; inline
+: BYTEA-OID 17 ; inline
+: CHAR-OID 18 ; inline
+: NAME-OID 19 ; inline
+: INT8-OID 20 ; inline
+: INT2-OID 21 ; inline
+: INT4-OID 23 ; inline
+: TEXT-OID 23 ; inline
+: OID-OID 26 ; inline
+: FLOAT4-OID 700 ; inline
+: FLOAT8-OID 701 ; inline
+: VARCHAR-OID 1043 ; inline
+: DATE-OID 1082 ; inline
+: TIME-OID 1083 ; inline
+: TIMESTAMP-OID 1114 ; inline
+: TIMESTAMPTZ-OID 1184 ; inline
+: INTERVAL-OID 1186 ; inline
+: NUMERIC-OID 1700 ; inline
