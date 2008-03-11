@@ -14,11 +14,14 @@ IN: cairo
 
 << "cairo" {
         { [ win32? ] [ "cairo.dll" ] }
-        { [ macosx? ] [ "libcairo.dylib" ] }
+        ! { [ macosx? ] [ "libcairo.dylib" ] }
+        { [ macosx? ] [ "/opt/local/lib/libcairo.dylib" ] }
         { [ unix? ] [ "libcairo.so.2" ] }
   } cond "cdecl" add-library >>
 
-! cairo_status_t
+LIBRARY: cairo
+
+TYPEDEF: int cairo_status_t
 C-ENUM:
     CAIRO_STATUS_SUCCESS
     CAIRO_STATUS_NO_MEMORY
@@ -45,12 +48,12 @@ C-ENUM:
     CAIRO_STATUS_CLIP_NOT_REPRESENTABLE
 ;
 
-! cairo_content_t
+TYPEDEF: int cairo_content_t
 : CAIRO_CONTENT_COLOR HEX: 1000 ;
 : CAIRO_CONTENT_ALPHA HEX: 2000 ;
 : CAIRO_CONTENT_COLOR_ALPHA HEX: 3000 ;
 
-! cairo_operator_t
+TYPEDEF: int cairo_operator_t
 C-ENUM:
     CAIRO_OPERATOR_CLEAR
     CAIRO_OPERATOR_SOURCE
@@ -68,34 +71,34 @@ C-ENUM:
     CAIRO_OPERATOR_SATURATE
 ;
 
-! cairo_line_cap_t
+TYPEDEF: int cairo_line_cap_t
 C-ENUM:
     CAIRO_LINE_CAP_BUTT
     CAIRO_LINE_CAP_ROUND
     CAIRO_LINE_CAP_SQUARE
 ;
 
-! cair_line_join_t
+TYPEDEF: int cair_line_join_t
 C-ENUM:
     CAIRO_LINE_JOIN_MITER
     CAIRO_LINE_JOIN_ROUND
     CAIRO_LINE_JOIN_BEVEL
 ;
 
-! cairo_fill_rule_t
+TYPEDEF: int cairo_fill_rule_t
 C-ENUM:
     CAIRO_FILL_RULE_WINDING
     CAIRO_FILL_RULE_EVEN_ODD
 ;
 
-! cairo_font_slant_t
+TYPEDEF: int cairo_font_slant_t
 C-ENUM:
     CAIRO_FONT_SLANT_NORMAL
     CAIRO_FONT_SLANT_ITALIC
     CAIRO_FONT_SLANT_OBLIQUE
 ;
 
-! cairo_font_weight_t
+TYPEDEF: int cairo_font_weight_t
 C-ENUM:
     CAIRO_FONT_WEIGHT_NORMAL
     CAIRO_FONT_WEIGHT_BOLD
@@ -159,7 +162,7 @@ C-STRUCT: cairo_matrix_t
         { "double" "x0" }
         { "double" "y0" } ;
 
-! cairo_format_t
+TYPEDEF: int cairo_format_t
 C-ENUM:
     CAIRO_FORMAT_ARGB32
     CAIRO_FORMAT_RGB24
@@ -167,7 +170,7 @@ C-ENUM:
     CAIRO_FORMAT_A1
 ;
 
-! cairo_antialias_t
+TYPEDEF: int cairo_antialias_t
 C-ENUM:
     CAIRO_ANTIALIAS_DEFAULT
     CAIRO_ANTIALIAS_NONE
@@ -175,7 +178,7 @@ C-ENUM:
     CAIRO_ANTIALIAS_SUBPIXEL
 ;
 
-! cairo_subpixel_order_t
+TYPEDEF: int cairo_subpixel_order_t
 C-ENUM:
     CAIRO_SUBPIXEL_ORDER_DEFAULT
     CAIRO_SUBPIXEL_ORDER_RGB
@@ -184,7 +187,7 @@ C-ENUM:
     CAIRO_SUBPIXEL_ORDER_VBGR
 ;
 
-! cairo_hint_style_t
+TYPEDEF: int cairo_hint_style_t
 C-ENUM:
     CAIRO_HINT_STYLE_DEFAULT
     CAIRO_HINT_STYLE_NONE
@@ -193,7 +196,7 @@ C-ENUM:
     CAIRO_HINT_STYLE_FULL
 ;
 
-! cairo_hint_metrics_t
+TYPEDEF: int cairo_hint_metrics_t
 C-ENUM:
     CAIRO_HINT_METRICS_DEFAULT
     CAIRO_HINT_METRICS_OFF
@@ -420,7 +423,11 @@ C-ENUM:
 : cairo_get_font_matrix ( cairo_t cairo_matrix_t -- )
         "void" "cairo" "cairo_get_font_matrix" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
 
-
+FUNCTION: uchar* cairo_image_surface_get_data ( cairo_surface_t* surface ) ;
+FUNCTION: cairo_format_t cairo_image_surface_get_format ( cairo_surface_t* surface ) ;
+FUNCTION: int cairo_image_surface_get_width ( cairo_surface_t* surface ) ;
+FUNCTION: int cairo_image_surface_get_height ( cairo_surface_t* surface ) ;
+FUNCTION: int cairo_image_surface_get_stride ( cairo_surface_t* surface ) ;
 
 ! Cairo pdf
 
@@ -437,3 +444,16 @@ C-ENUM:
 
 : cairo_pdf_surface_set_size ( surface width height -- )
   "void" "cairo" "cairo_pdf_surface_set_size" [ "void*" "double" "double" ] alien-invoke ;
+
+! Cairo png
+
+TYPEDEF: void* cairo_write_func_t
+TYPEDEF: void* cairo_read_func_t
+
+FUNCTION: cairo_surface_t* cairo_image_surface_create_from_png ( char* filename ) ;
+
+FUNCTION: cairo_surface_t* cairo_image_surface_create_from_png_stream ( cairo_read_func_t read_func, void* closure ) ;
+
+FUNCTION: cairo_status_t cairo_surface_write_to_png ( cairo_surface_t* surface, char* filename ) ;
+
+FUNCTION: cairo_status_t cairo_surface_write_to_png_stream ( cairo_surface_t* surface, cairo_write_func_t write_func, void* closure ) ;
