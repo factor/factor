@@ -3,7 +3,8 @@
 USING: alien.c-types arrays assocs kernel math math.parser
 namespaces sequences db.sqlite.ffi db combinators
 continuations db.types calendar.format serialize
-io.streams.byte-array byte-arrays io.encodings.binary ;
+io.streams.byte-array byte-arrays io.encodings.binary
+tools.walker ;
 IN: db.sqlite.lib
 
 : sqlite-error ( n -- * )
@@ -137,7 +138,7 @@ IN: db.sqlite.lib
         { BLOB [ sqlite-column-blob ] }
         { FACTOR-BLOB [
             sqlite-column-blob
-            binary [ deserialize ] with-byte-reader
+            dup [ binary [ deserialize ] with-byte-reader ] when
         ] }
         ! { NULL [ 2drop f ] }
         [ no-sql-type ]

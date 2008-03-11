@@ -144,7 +144,8 @@ SYMBOL: person4
     } define-persistent
     1 "billy" 10 3.14 f f f f f <assigned-person> person1 set
     2 "johnny" 10 3.14 f f f f f <assigned-person> person2 set
-    3 "teddy" 10 3.14 "2008-03-05 16:24:11" "2008-11-22" "12:34:56" B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f <assigned-person> person3 set ;
+    3 "teddy" 10 3.14 "2008-03-05 16:24:11" "2008-11-22" "12:34:56" B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f <assigned-person> person3 set
+    4 "eddie" 10 3.14 "2008-03-05 16:24:11" "2008-11-22" "12:34:56" f H{ { 1 2 } { 3 4 } { 5 "lol" } } <assigned-person> person4 set ;
 
 TUPLE: paste n summary author channel mode contents timestamp annotations ;
 TUPLE: annotation n paste-id summary author mode contents ;
@@ -187,11 +188,11 @@ TUPLE: annotation n paste-id summary author mode contents ;
 : test-postgresql ( -- )
 >r { "localhost" "postgres" "" "factor-test" } postgresql-db r> with-db ;
 
-! [ native-person-schema test-tuples ] test-sqlite
-! [ assigned-person-schema test-tuples ] test-sqlite
+[ native-person-schema test-tuples ] test-sqlite
+[ assigned-person-schema test-tuples ] test-sqlite
 
 [ native-person-schema test-tuples ] test-postgresql
-! [ assigned-person-schema test-tuples ] test-postgresql
+[ assigned-person-schema test-tuples ] test-postgresql
 
 TUPLE: serialize-me id data ;
 
@@ -209,7 +210,8 @@ TUPLE: serialize-me id data ;
         { T{ serialize-me f 1 H{ { 1 2 } } } }
     ] [ T{ serialize-me f 1 } select-tuples ] unit-test ;
 
-! [ test-serialize ] test-sqlite
+[ test-serialize ] test-sqlite
+[ test-serialize ] test-postgresql
 
 TUPLE: exam id name score ; 
 
