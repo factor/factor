@@ -244,6 +244,7 @@ set_build_info() {
 }
 
 find_build_info() {
+    ensure_program_installed egcc gcc
     find_os
     find_architecture
     find_word_size
