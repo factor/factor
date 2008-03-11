@@ -167,7 +167,8 @@ C: <group-result> group-result
     "(" ")" surrounded-by ;
 
 : 'range' ( -- parser )
-    any-char-parser "-" token <& any-char-parser <&>
+    [ CHAR: ] = not ] satisfy "-" token <&
+    [ CHAR: ] = not ] satisfy <&>
     [ first2 char-between?-quot ] <@ ;
 
 : 'character-class-term' ( -- parser )
