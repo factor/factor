@@ -1,4 +1,6 @@
-USING: kernel gap-buffer.cursortree tools.test sequences trees arrays strings ;
+USING: assocs kernel gap-buffer.cursortree tools.test sequences trees
+arrays strings ;
+IN: gap-buffer.cursortree.tests
 
 [ t ] [ "this is a test string" <cursortree> 0 <left-cursor> at-beginning? ] unit-test
 [ t ] [ "this is a test string" <cursortree> dup length  <left-cursor> at-end? ] unit-test
@@ -6,7 +8,8 @@ USING: kernel gap-buffer.cursortree tools.test sequences trees arrays strings ;
 [ CHAR: i ] [ "this is a test string" <cursortree> 3 <left-cursor> element< ] unit-test
 [ CHAR: s ] [ "this is a test string" <cursortree> 3 <left-cursor> element> ] unit-test
 [ t ] [ "this is a test string" <cursortree> 3 <left-cursor> CHAR: a over set-element< CHAR: t over set-element> cursor-tree "that is a test string" sequence= ] unit-test
-[ t ] [ "this is a test string" <cursortree> 3 <left-cursor> 8 over set-cursor-pos dup 1array swap cursor-tree cursortree-cursors tree-values sequence= ] unit-test
+[ 0 ] [ "this is a test string" <cursortree> dup dup 3 <left-cursor> remove-cursor cursors length ] unit-test
+[ t ] [ "this is a test string" <cursortree> 3 <left-cursor> 8 over set-cursor-pos dup 1array swap cursor-tree cursors sequence= ] unit-test
 [ "this is no longer a test string" ] [ "this is a test string" <cursortree> 8 <left-cursor> "no longer " over insert cursor-tree >string ] unit-test
 [ "refactor" ] [ "factor" <cursortree> 0 <left-cursor> CHAR: e over insert CHAR: r over insert cursor-tree >string ] unit-test
 [ "refactor" ] [ "factor" <cursortree> 0 <right-cursor> CHAR: r over insert CHAR: e over insert cursor-tree >string ] unit-test
