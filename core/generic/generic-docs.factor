@@ -1,6 +1,6 @@
-USING: help.markup help.syntax generic.math generic.standard
-words classes definitions kernel alien combinators sequences 
-math quotations ;
+USING: help.markup help.syntax words classes definitions kernel
+alien sequences math quotations generic.standard generic.math
+combinators ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"
@@ -33,8 +33,6 @@ $nl
 "New generic words can be defined:"
 { $subsection define-generic }
 { $subsection define-simple-generic }
-"Methods are tuples:"
-{ $subsection <method> }
 "Methods can be added to existing generic words:"
 { $subsection define-method }
 "Method definitions can be looked up:"
@@ -42,8 +40,10 @@ $nl
 { $subsection methods }
 "A generic word contains methods; the list of methods specializing on a class can also be obtained:"
 { $subsection implementors }
-"Low-level words which rebuilds the generic word after methods are added or removed, or the method combination is changed:"
+"Low-level word which rebuilds the generic word after methods are added or removed, or the method combination is changed:"
 { $subsection make-generic }
+"Low-level method constructor:"
+{ $subsection <method> }
 "A " { $emphasis "method specifier" } " refers to a method and implements the " { $link "definition-protocol" } ":"
 { $subsection method-spec } ;
 
@@ -126,7 +126,7 @@ HELP: method
 { method define-method POSTPONE: M: } related-words
 
 HELP: <method>
-{ $values { "def" "a quotation" } { "method" "a new method definition" } }
+{ $values { "quot" quotation } { "class" class } { "generic" generic } { "method" "a new method definition" } }
 { $description "Creates a new method." } ;
 
 HELP: methods
@@ -148,7 +148,7 @@ HELP: with-methods
 $low-level-note ;
 
 HELP: define-method
-{ $values { "method" quotation } { "class" class } { "generic" generic } }
+{ $values { "quot" quotation } { "class" class } { "generic" generic } }
 { $description "Defines a method. This is the runtime equivalent of " { $link POSTPONE: M: } "." } ;
 
 HELP: implementors
@@ -158,3 +158,5 @@ HELP: implementors
 HELP: forget-methods
 { $values { "class" class } }
 { $description "Remove all method definitions which specialize on the class." } ;
+
+{ sort-classes methods order } related-words

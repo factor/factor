@@ -6,17 +6,17 @@ IN: math.primes.factors
 HELP: factors
 { $values { "n" "a positive integer" } { "seq" sequence } }
 { $description { "Return an ordered list of a number's prime factors, possibly repeated." } }
-{ $examples { $example "300 factors ." "{ 2 2 3 5 5 }" } } ;
+{ $examples { $example "USING: math.primes.factors prettyprint ;" "300 factors ." "{ 2 2 3 5 5 }" } } ;
 
 HELP: group-factors
 { $values { "n" "a positive integer" } { "seq" sequence } }
 { $description { "Return a sequence of pairs representing each prime factor in the number and its corresponding power (multiplicity)." } }
-{ $examples { $example "300 group-factors ." "{ { 2 2 } { 3 1 } { 5 2 } }" } } ;
+{ $examples { $example "USING: math.primes.factors prettyprint ;" "300 group-factors ." "{ { 2 2 } { 3 1 } { 5 2 } }" } } ;
 
 HELP: unique-factors
 { $values { "n" "a positive integer" } { "seq" sequence } }
 { $description { "Return an ordered list of a number's unique prime factors." } }
-{ $examples { $example "300 unique-factors ." "{ 2 3 5 }" } } ;
+{ $examples { $example "USING: math.primes.factors prettyprint ;" "300 unique-factors ." "{ 2 3 5 }" } } ;
 
 HELP: totient
 { $values { "n" "a positive integer" } { "t" integer } }

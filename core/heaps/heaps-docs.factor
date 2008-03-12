@@ -77,6 +77,7 @@ HELP: heap-size
 { $description "Returns the number of key/value pairs in the heap." } ;
 
 HELP: heap-delete
-{ $values { "heap" "a heap" } { "key" object } { "value" object } }
-{ $description "Output and remove the first element in the heap." }
+{ $values { "entry" entry } { "heap" "a heap" } }
+{ $description "Remove the specified entry from the heap." }
+{ $errors "Throws an error if the entry is from another heap or if it has already been deleted." }
 { $side-effects "heap" } ;

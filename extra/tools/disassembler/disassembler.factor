@@ -33,6 +33,6 @@ M: pair make-disassemble-cmd
 : tabs>spaces ( str -- str' )
     { { CHAR: \t CHAR: \s } } substitute ;
 
-: disassemble ( word -- )
+: disassemble ( obj -- )
     make-disassemble-cmd run-gdb
     [ tabs>spaces ] map [ print ] each ;

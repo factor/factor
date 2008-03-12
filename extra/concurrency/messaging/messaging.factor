@@ -7,7 +7,7 @@ USING: kernel threads concurrency.mailboxes continuations
 namespaces assocs random ;
 IN: concurrency.messaging
 
-GENERIC: send ( message process -- )
+GENERIC: send ( message thread -- )
 
 : mailbox-of ( thread -- mailbox )
     dup thread-mailbox [ ] [

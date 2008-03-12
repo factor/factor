@@ -33,7 +33,7 @@ HELP: last-split1
 HELP: split
 { $values { "seq" "a sequence" } { "separators" "a sequence" } { "pieces" "a new array" } }
 { $description "Splits " { $snippet "seq" } " at each occurrence of an element of " { $snippet "separators" } ", and outputs an array of pieces. The pieces do not include the elements along which the sequence was split." }
-{ $examples { $example "USE: splitting" "\"hello world-how are you?\" \" -\" split ." "{ \"hello\" \"world\" \"how\" \"are\" \"you?\" }" } } ;
+{ $examples { $example "USING: prettyprint splitting ;" "\"hello world-how are you?\" \" -\" split ." "{ \"hello\" \"world\" \"how\" \"are\" \"you?\" }" } } ;
 
 HELP: groups
 { $class-description "Instances are virtual sequences whose elements are fixed-length subsequences or slices of an underlying sequence. Groups are mutable and resizable if the underlying sequence is mutable and resizable, respectively."
@@ -51,7 +51,7 @@ HELP: <groups>
 { $description "Outputs a virtual sequence whose elements are subsequences consisting of groups of " { $snippet "n" } " elements from the underlying sequence." }
 { $examples
     { $example
-        "USE: splitting"
+        "USING: arrays kernel prettyprint sequences splitting ;"
         "9 >array 3 <groups> dup reverse-here concat >array ." "{ 6 7 8 3 4 5 0 1 2 }"
     }
 } ;
@@ -61,7 +61,7 @@ HELP: <sliced-groups>
 { $description "Outputs a virtual sequence whose elements are slices consisting of groups of " { $snippet "n" } " elements from the underlying sequence." }
 { $examples
     { $example
-        "USE: splitting"
+        "USING: arrays kernel prettyprint sequences splitting ;"
         "9 >array 3 <sliced-groups>"
         "dup [ reverse-here ] each concat >array ."
         "{ 2 1 0 5 4 3 8 7 6 }"
@@ -90,5 +90,5 @@ HELP: string-lines
 { $values { "str" string } { "seq" "a sequence of strings" } }
 { $description "Splits a string along line breaks." }
 { $examples
-    { $example "USE: splitting" "\"Hello\\r\\nworld\\n\" string-lines ." "{ \"Hello\" \"world\" \"\" }" }
+    { $example "USING: prettyprint splitting ;" "\"Hello\\r\\nworld\\n\" string-lines ." "{ \"Hello\" \"world\" \"\" }" }
 } ;

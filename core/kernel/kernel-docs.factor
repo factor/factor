@@ -264,7 +264,7 @@ HELP: compare
 { $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "n" integer } }
 { $description "Compares the results of applying the quotation to both objects via " { $link <=> } "." }
 { $examples
-    { $example "\"hello\" \"hi\" [ length ] compare ." "3" }
+    { $example "USING: kernel prettyprint sequences ;" "\"hello\" \"hi\" [ length ] compare ." "3" }
 } ;
 
 HELP: clone
@@ -296,9 +296,9 @@ HELP: and
 { $notes "This word implements boolean and, so applying it to integers will not yield useful results (all integers have a true value). Bitwise and is the " { $link bitand } " word." }
 { $examples
     "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that if both inputs are true, the second is output:"
-    { $example "t f and ." "f" }
-    { $example "t 7 and ." "7" }
-    { $example "\"hi\" 12.0 and ." "12.0" }
+    { $example "USING: kernel prettyprint ;" "t f and ." "f" }
+    { $example "USING: kernel prettyprint ;" "t 7 and ." "7" }
+    { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 and ." "12.0" }
 } ;
 
 HELP: or
@@ -307,8 +307,8 @@ HELP: or
 { $notes "This word implements boolean inclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise inclusive or is the " { $link bitor } " word." }
 { $examples
     "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that the result will be the first true input:"
-    { $example "t f or ." "t" }
-    { $example "\"hi\" 12.0 or ." "\"hi\"" }
+    { $example "USING: kernel prettyprint ;" "t f or ." "t" }
+    { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 or ." "\"hi\"" }
 } ;
 
 HELP: xor
@@ -320,23 +320,21 @@ HELP: both?
 { $values { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "x" object } { "y" object } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to both " { $snippet "x" } " and " { $snippet "y" } "." }
 { $examples
-    { $example "3 5 [ odd? ] both? ." "t" }
-    { $example "12 7 [ even? ] both? ." "f" }
+    { $example "USING: kernel math prettyprint ;" "3 5 [ odd? ] both? ." "t" }
+    { $example "USING: kernel math prettyprint ;" "12 7 [ even? ] both? ." "f" }
 } ;
 
 HELP: either?
 { $values { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "x" object } { "y" object } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to either " { $snippet "x" } " or " { $snippet "y" } "." }
 { $examples
-    { $example "3 6 [ odd? ] either? ." "t" }
-    { $example "5 7 [ even? ] either? ." "f" }
+    { $example "USING: kernel math prettyprint ;" "3 6 [ odd? ] either? ." "t" }
+    { $example "USING: kernel math prettyprint ;" "5 7 [ even? ] either? ." "f" }
 } ;
 
-HELP: call ( callable -- )
-{ $values { "quot" callable } }
-{ $description "Calls a quotation."
-$nl
-"Under the covers, pushes the current call frame on the call stack, and set the call frame to the given quotation." }
+HELP: call
+{ $values { "callable" callable } }
+{ $description "Calls a quotation." }
 { $examples
     "The following two lines are equivalent:"
     { $code "2 [ 2 + 3 * ] call" "2 2 + 3 *" }
@@ -489,9 +487,9 @@ HELP: curry ( obj quot -- curry )
 $nl
 "This operation is efficient and does not copy the quotation." }
 { $examples
-    { $example "5 [ . ] curry ." "[ 5 . ]" }
-    { $example "\\ = [ see ] curry ." "[ \\ = see ]" }
-    { $example "{ 1 2 3 } 2 [ - ] curry map ." "{ -1 0 1 }" }
+    { $example "USING: kernel prettyprint ;" "5 [ . ] curry ." "[ 5 . ]" }
+    { $example "USING: kernel prettyprint ;" "\\ = [ see ] curry ." "[ \\ = see ]" }
+    { $example "USING: kernel math prettyprint sequences ;" "{ 1 2 3 } 2 [ - ] curry map ." "{ -1 0 1 }" }
 } ;
 
 HELP: 2curry
@@ -499,7 +497,7 @@ HELP: 2curry
 { $description "Outputs a " { $link callable } " which pushes " { $snippet "obj1" } " and " { $snippet "obj2" } " and then calls " { $snippet "quot" } "." }
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
-    { $example "5 4 [ + ] 2curry ." "[ 5 4 + ]" }
+    { $example "USING: kernel math prettyprint ;" "5 4 [ + ] 2curry ." "[ 5 4 + ]" }
 } ;
 
 HELP: 3curry
@@ -516,7 +514,7 @@ HELP: with
 }
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
-    { $example "2 { 1 2 3 } [ - ] with map ." "{ 1 0 -1 }" }
+    { $example "USING: kernel math prettyprint sequences ;" "2 { 1 2 3 } [ - ] with map ." "{ 1 0 -1 }" }
 } ;
 
 HELP: compose

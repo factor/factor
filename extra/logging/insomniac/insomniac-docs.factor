@@ -9,7 +9,7 @@ HELP: insomniac-recipients
 { $var-description "A sequence of e-mail addresses to mail log reports to. Must be set before " { $vocab-link "logging.insomniac" } " is used." } ;
 
 HELP: ?analyze-log
-{ $values { "service" "a log service name" } { "word-names" "a sequence of strings" } { "string" string } }
+{ $values { "service" "a log service name" } { "word-names" "a sequence of strings" } { "string/f" string } }
 { $description "Analyzes the most recent log and outputs the string analysis, or outputs " { $link f } " if it doesn't exist." }
 { $see-also analyze-log } ;
 
@@ -18,7 +18,7 @@ HELP: email-log-report
 { $description "E-mails a log report for the given log service. The " { $link insomniac-sender } " and " { $link insomniac-recipients } " parameters must be set up first. The " { $snippet "word-names" } " parameter is documented in " { $link analyze-entries } "." } ;
 
 HELP: schedule-insomniac
-{ $values { "alist" "a sequence of pairs of shape " { $snippet "{ service word-names }" } } }
+{ $values { "service" "a log service name" } { "word-names" "a sequence of strings" } }
 { $description "Starts a thread which e-mails log reports and rotates logs daily." } ;
 
 ARTICLE: "logging.insomniac" "Automated log analysis"

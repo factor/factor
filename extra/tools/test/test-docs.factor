@@ -89,6 +89,6 @@ HELP: run-all-tests
 { $values { "prefix" "a vocabulary name" } { "failures" "an association list of unit test failures" } }
 { $description "Runs unit tests for all loaded vocabularies and outputs unit test failures as documented in " { $link "tools.test.failure" } "." } ;
 
-HELP: failure.
-{ $values { "failures" "an association list of unit test failures" } }
+HELP: test-failures.
+{ $values { "assoc" "an association list of unit test failures" } }
 { $description "Prints unit test failures output by " { $link run-tests } " or " { $link run-all-tests } " to the " { $link stdio } " stream." } ;
