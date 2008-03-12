@@ -116,6 +116,12 @@ write-test-2 "q" set
 
 [ ] [ 5 write-test-4 drop ] unit-test
 
+! Not really a write test; just enforcing consistency
+:: write-test-5 ( x -- y )
+    [wlet | fun! [ x + ] | 5 fun! ] ;
+
+[ 9 ] [ 4 write-test-5 ] unit-test
+
 SYMBOL: a
 
 :: use-test ( a b c -- a b c )
@@ -160,3 +166,15 @@ M:: string lambda-generic ( a b -- c ) a b lambda-generic-2 ;
 [ ] [ \ lambda-generic-2 see ] unit-test
 
 [ ] [ \ lambda-generic see ] unit-test
+
+[ "[let | a! [ ] | ]" ] [
+    [let | a! [ ] | ] unparse
+] unit-test
+
+[ "[wlet | a! [ ] | ]" ] [
+    [wlet | a! [ ] | ] unparse
+] unit-test
+
+[ "[| a! | ]" ] [
+    [| a! | ] unparse
+] unit-test

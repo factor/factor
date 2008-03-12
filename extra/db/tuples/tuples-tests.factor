@@ -186,7 +186,7 @@ TUPLE: annotation n paste-id summary author mode contents ;
     >r "tuples-test.db" temp-file sqlite-db r> with-db ;
 
 : test-postgresql ( -- )
->r { "localhost" "postgres" "" "factor-test" } postgresql-db r> with-db ;
+>r { "localhost" "postgres" "foob" "factor-test" } postgresql-db r> with-db ;
 
 [ native-person-schema test-tuples ] test-sqlite
 [ assigned-person-schema test-tuples ] test-sqlite

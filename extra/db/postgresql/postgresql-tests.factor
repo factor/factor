@@ -7,7 +7,7 @@ db.tuples db.types unicode.case ;
 IN: db.postgresql.tests
 
 : test-db ( -- postgresql-db )
-    { "localhost" "postgres" "" "factor-test" } postgresql-db ;
+    { "localhost" "postgres" "foob" "factor-test" } postgresql-db ;
 
 [ ] [ test-db [ ] with-db ] unit-test
 

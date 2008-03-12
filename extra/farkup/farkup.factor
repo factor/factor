@@ -42,6 +42,15 @@ MEMO: h2 ( -- parser ) "==" "h2" delimited ;
 MEMO: h3 ( -- parser ) "===" "h3" delimited ;
 MEMO: h4 ( -- parser ) "====" "h4" delimited ;
 
+MEMO: eq ( -- parser )
+    [
+        h1 ensure-not ,
+        h2 ensure-not ,
+        h3 ensure-not ,
+        h4 ensure-not ,
+        "=" token ,
+    ] seq* ;
+
 : render-code ( string mode -- string' )
     >r string-lines r>
     [ [ htmlize-lines ] with-html-stream ] with-string-writer ;
@@ -105,7 +114,7 @@ MEMO: line ( -- parser )
     [
         text , strong , emphasis , link ,
         superscript , subscript , inline-code ,
-        escaped-char , delimiter ,
+        escaped-char , delimiter , eq ,
     ] choice* repeat1 ;
 
 MEMO: paragraph ( -- parser )

@@ -1,8 +1,18 @@
-! Copyright (C) 2007 Chris Double.
+! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax peg peg.parsers.private
 unicode.categories ;
 IN: peg.parsers
+
+HELP: 1token
+{ $values
+    { "ch" "a character" }
+    { "parser" "a parser" }
+} { $description
+    "Calls 1string on a character and returns a parser that matches that character."
+} { $examples
+    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" CHAR: a 1token parse parse-result-ast ." "\"a\"" }
+} { $see-also 'string' } ;
 
 HELP: (list-of)
 { $values

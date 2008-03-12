@@ -21,6 +21,8 @@ M: just-parser compile ( parser -- quot )
 MEMO: just ( parser -- parser )
   just-parser construct-boa init-parser ;
 
+MEMO: 1token ( ch -- parser ) 1string token ;
+
 <PRIVATE
 MEMO: (list-of) ( items separator repeat1? -- parser )
   >r over 2seq r> [ repeat1 ] [ repeat0 ] if [ concat ] action 2seq
