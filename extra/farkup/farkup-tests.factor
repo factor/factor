@@ -43,6 +43,16 @@ IN: farkup.tests
 [ "<p><strong>foo</strong>\n</p><h1>aheading</h1>\n<p>adfasd</p>" ]
 [ "*foo*\n=aheading=\nadfasd" convert-farkup ] unit-test
 
-[ "<p>=foo\n</p>" ] [ "=foo\n" convert-farkup ] unit-test
 [ "<h1>foo</h1>\n" ] [ "=foo=\n" convert-farkup ] unit-test
 [ "<p>lol</p><h1>foo</h1>\n" ] [ "lol=foo=\n" convert-farkup ] unit-test
+[ "<p>=foo\n</p>" ] [ "=foo\n" convert-farkup ] unit-test
+[ "<p>=foo</p>" ] [ "=foo" convert-farkup ] unit-test
+[ "<p>==foo</p>" ] [ "==foo" convert-farkup ] unit-test
+[ "<p>=</p><h1>foo</h1>" ] [ "==foo=" convert-farkup ] unit-test
+[ "<h2>foo</h2>" ] [ "==foo==" convert-farkup ] unit-test
+[ "<h2>foo</h2>" ] [ "==foo==" convert-farkup ] unit-test
+[ "<p>=</p><h2>foo</h2>" ] [ "===foo==" convert-farkup ] unit-test
+
+
+[ "<h1>foo</h1><p>=</p>" ] [ "=foo==" convert-farkup ] unit-test
+
