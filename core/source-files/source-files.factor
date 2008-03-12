@@ -85,7 +85,7 @@ M: pathname where pathname-string 1 2array ;
 M: pathname forget*
     pathname-string forget-source ;
 
-: rollback-source-file ( source-file -- )
+: rollback-source-file ( file -- )
     dup source-file-definitions new-definitions get [ union ] 2map
     swap set-source-file-definitions ;
 

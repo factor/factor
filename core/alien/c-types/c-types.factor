@@ -4,7 +4,7 @@ USING: bit-arrays byte-arrays float-arrays arrays
 generator.registers assocs kernel kernel.private libc math
 namespaces parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
-system compiler.units io.files io.encodings.binary ;
+layouts system compiler.units io.files io.encodings.binary ;
 IN: alien.c-types
 
 DEFER: <int>

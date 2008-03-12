@@ -63,7 +63,7 @@ HELP: modify-code-heap ( alist -- )
 { $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;
 
 HELP: compile
-{ $values { "seq" "a sequence of words" } }
+{ $values { "words" "a sequence of words" } }
 { $description "Compiles a set of words." } ;
 
 HELP: compile-call

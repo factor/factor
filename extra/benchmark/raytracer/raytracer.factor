@@ -3,7 +3,7 @@
 
 USING: float-arrays compiler generic io io.files kernel math
 math.functions math.vectors math.parser namespaces sequences
-sequences.private words io.encodings.ascii ;
+sequences.private words io.encodings.binary ;
 IN: benchmark.raytracer
 
 ! parameters
@@ -167,9 +167,9 @@ DEFER: create ( level c r -- scene )
     levels { 0.0 -1.0 0.0 } 1.0 create ray-trace [
         size size pgm-header
         [ [ oversampling sq / pgm-pixel ] each ] each
-    ] "" make ;
+    ] B{ } make ;
 
 : raytracer-main
-    run "raytracer.pnm" temp-file ascii set-file-contents ;
+    run "raytracer.pnm" temp-file binary set-file-contents ;
 
 MAIN: raytracer-main

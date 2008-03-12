@@ -86,3 +86,4 @@ arc "arc"
     #! quot1 ( x y -- z/f ) finds an existing z
     #! quot2 ( x y -- z ) creates a new z if quot1 returns f
     >r >r 2dup r> call [ 2nip ] r> if* ;
+

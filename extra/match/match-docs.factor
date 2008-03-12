@@ -41,7 +41,7 @@ HELP: match-replace
 { $description "Matches the " { $snippet "object" } " against " { $snippet "pattern1" } ". The pattern match variables in " { $snippet "pattern1" } " are assigned the values from the matching " { $snippet "object" } ". These are then replaced into the " { $snippet "pattern2" } " pattern match variables." } 
 { $examples
   { $example
-      "USE: match"
+      "USING: match prettyprint ;"
       "MATCH-VARS: ?a ?b ;"
       "{ 1 2 } { ?a ?b } { ?b ?a } match-replace ." 
       "{ 2 1 }"

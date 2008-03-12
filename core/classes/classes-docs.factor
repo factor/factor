@@ -1,4 +1,4 @@
-USING: generic help.markup help.syntax kernel kernel.private
+USING: help.markup help.syntax kernel kernel.private
 namespaces sequences words arrays layouts help effects math
 layouts classes.private classes.union classes.mixin
 classes.predicate ;
@@ -7,11 +7,6 @@ IN: classes
 ARTICLE: "builtin-classes" "Built-in classes"
 "Every object is an instance of exactly one canonical " { $emphasis "built-in class" } " which defines its layout in memory and basic behavior."
 $nl
-"Corresponding to every built-in class is a built-in type number. An object can be asked for its built-in type number:"
-{ $subsection type }
-"Built-in type numbers can be converted to classes, and vice versa:"
-{ $subsection type>class }
-{ $subsection type-number }
 "The set of built-in classes is a class:"
 { $subsection builtin-class }
 { $subsection builtin-class? }
@@ -79,7 +74,7 @@ HELP: class
 { $values { "object" object } { "class" class } }
 { $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either its built-in class, or if the object is a tuple, its tuple class." }
 { $class-description "The class of all class words. Subclasses include " { $link builtin-class } ", " { $link union-class } ", " { $link mixin-class } ", " { $link predicate-class } " and " { $link tuple-class } "." }
-{ $examples { $example "USE: classes" "1.0 class ." "float" } { $example "USE: classes" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class ." "point" } } ;
+{ $examples { $example "USING: classes prettyprint ;" "1.0 class ." "float" } { $example "USING: classes prettyprint ;" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class ." "point" } } ;
 
 HELP: classes
 { $values { "seq" "a sequence of class words" } }
@@ -89,14 +84,14 @@ HELP: builtin-class
 { $class-description "The class of built-in classes." }
 { $examples
     "The class of arrays is a built-in class:"
-    { $example "USE: classes" "array builtin-class? ." "t" }
-    "However, a literal array is not a built-in class; it is not even a class:"
-    { $example "USE: classes" "{ 1 2 3 } builtin-class? ." "f" }
+    { $example "USING: arrays classes prettyprint ;" "array builtin-class? ." "t" }
+    "However, an instance of the array class is not a built-in class; it is not even a class:"
+    { $example "USING: classes prettyprint ;" "{ 1 2 3 } builtin-class? ." "f" }
 } ;
 
 HELP: tuple-class
 { $class-description "The class of tuple class words." }
-{ $examples { $example "USE: classes\nTUPLE: name title first last ;\nname tuple-class? ." "t" } } ;
+{ $examples { $example "USING: classes prettyprint ;" "TUPLE: name title first last ;" "name tuple-class? ." "t" } } ;
 
 HELP: typemap
 { $var-description "Hashtable mapping unions to class words, used to implement " { $link class-and } " and " { $link class-or } "." } ;
@@ -167,7 +162,7 @@ HELP: types
 HELP: class-empty?
 { $values { "class" "a class" } { "?" "a boolean" } }
 { $description "Tests if a class is a union class with no members." }
-{ $examples { $example "USE: classes" "null class-empty? ." "t" } } ;
+{ $examples { $example "USING: classes kernel prettyprint ;" "null class-empty? ." "t" } } ;
 
 HELP: (class<)
 { $values { "class1" "a class" } { "class2" "a class" } { "?" "a boolean" } }
@@ -181,8 +176,6 @@ HELP: class<
 HELP: sort-classes
 { $values { "seq" "a sequence of class" } { "newseq" "a new seqence of classes" } }
 { $description "Outputs a topological sort of a sequence of classes. Larger classes come before their subclasses." } ;
-
-{ sort-classes methods order } related-words
 
 HELP: lookup-union
 { $values { "classes" "a hashtable mapping class words to themselves" } { "class" class } }

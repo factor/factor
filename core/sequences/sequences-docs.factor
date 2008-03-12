@@ -288,8 +288,8 @@ HELP: new-resizable
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a resizable mutable sequence" } }
 { $contract "Outputs a resizable mutable sequence with an initial capacity of " { $snippet "n" } " elements and zero length, which can hold the elements of " { $snippet "seq" } "." }
 { $examples
-    { $example "300 V{ } new-resizable ." "V{ }" }
-    { $example "300 SBUF\" \" new-resizable ." "SBUF\" \"" }
+    { $example "USING: prettyprint sequences ;" "300 V{ } new-resizable ." "V{ }" }
+    { $example "USING: prettyprint sequences ;" "300 SBUF\" \" new-resizable ." "SBUF\" \"" }
 } ;
 
 HELP: like
@@ -435,14 +435,16 @@ HELP: reduce
 { $values { "seq" sequence } { "identity" object } { "quot" "a quotation with stack effect " { $snippet "( prev elt -- next )" } } { "result" "the final result" } }
 { $description "Combines successive elements of the sequence using a binary operation, and outputs the final result. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the sequence." }
 { $examples
-    { $example "{ 1 5 3 } 0 [ + ] reduce ." "9" }
+    { $example "USING: math prettyprint sequences ;" "{ 1 5 3 } 0 [ + ] reduce ." "9" }
 } ;
 
 HELP: accumulate
 { $values { "identity" object } { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( prev elt -- next )" } } { "final" "the final result" } { "newseq" "a new sequence" } }
-{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results together with the final result. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the sequence. Given the empty sequence, outputs a one-element sequence consisting of " { $snippet "identity" } "." }
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results together with the final result. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the sequence."
+$nl
+"When given the empty sequence, outputs an empty sequence together with the " { $snippet "identity" } "." }
 { $examples
-    { $example "{ 2 2 2 2 2 } 0 [ + ] accumulate . ." "{ 0 2 4 6 8 }\n10" }
+    { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate . ." "{ 0 2 4 6 8 }\n10" }
 } ;
 
 HELP: map
@@ -546,9 +548,9 @@ HELP: monotonic?
 { $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
 { $examples
     "Testing if a sequence is non-decreasing:"
-    { $example "{ 1 1 2 } [ <= ] monotonic? ." "t" }
+    { $example "USING: math prettyprint sequences ;" "{ 1 1 2 } [ <= ] monotonic? ." "t" }
     "Testing if a sequence is decreasing:"
-    { $example "{ 9 8 6 7 } [ < ] monotonic? ." "f" }
+    { $example "USING: math prettyprint sequences ;" "{ 9 8 6 7 } [ < ] monotonic? ." "f" }
 } ;
 
 { monotonic? all-eq? all-equal? } related-words
@@ -556,7 +558,7 @@ HELP: monotonic?
 HELP: interleave
 { $values { "seq" sequence } { "between" "a quotation" } { "quot" "a quotation with stack effect " { $snippet "( elt -- )" } } }
 { $description "Applies " { $snippet "quot" } " to each element in turn, also invoking " { $snippet "between" } " in-between each pair of elements." }
-{ $example "{ \"a\" \"b\" \"c\" } [ \"X\" write ] [ write ] interleave" "aXbXc" } ;
+{ $example "USING: io sequences ;" "{ \"a\" \"b\" \"c\" } [ \"X\" write ] [ write ] interleave" "aXbXc" } ;
 
 HELP: cache-nth
 { $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( i -- elt )" } } { "elt" object } }
@@ -590,7 +592,7 @@ HELP: memq?
 { $description "Tests if the sequence contains the object." }
 { $examples
     "This word uses identity comparison, so the following will most likely print " { $link f } ":"
-    { $example "\"hello\" { \"hello\" } memq? ." "f" }
+    { $example "USING: prettyprint sequences ;" "\"hello\" { \"hello\" } memq? ." "f" }
 } ;
 
 HELP: remove
@@ -629,6 +631,7 @@ HELP: push-new
 { $description "Removes all elements equal to " { $snippet "elt" } ", and adds " { $snippet "elt" } " at the end of the sequence." }
 { $examples
     { $example
+        "USING: namespaces prettyprint sequences ;"
         "V{ \"beans\" \"salsa\" \"cheese\" } \"v\" set"
         "\"nachos\" \"v\" get push-new"
         "\"salsa\" \"v\" get push-new"
@@ -645,7 +648,7 @@ HELP: add
 { $description "Outputs a new sequence obtained by adding " { $snippet "elt" } " at the end of " { $snippet "seq" } "." }
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." }
 { $examples
-    { $example "{ 1 2 3 } 4 add ." "{ 1 2 3 4 }" }
+    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } 4 add ." "{ 1 2 3 4 }" }
 } ;
 
 HELP: add*
@@ -653,7 +656,7 @@ HELP: add*
 { $description "Outputs a new sequence obtained by adding " { $snippet "elt" } " at the beginning of " { $snippet "seq" } "." }
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." } 
 { $examples
-    { $example "{ 1 2 3 } 0 add* ." "{ 0 1 2 3 }" }
+{ $example "USING: prettyprint sequences ;" "{ 1 2 3 } 0 add* ." "{ 0 1 2 3 }" }
 } ;
 
 HELP: seq-diff
@@ -710,7 +713,7 @@ HELP: mismatch
 HELP: flip
 { $values { "matrix" "a sequence of equal-length sequences" } { "newmatrix" "a sequence of equal-length sequences" } }
 { $description "Transposes the matrix; that is, rows become columns and columns become rows." }
-{ $examples { $example "{ { 1 2 3 } { 4 5 6 } } flip ." "{ { 1 4 } { 2 5 } { 3 6 } }" } } ;
+{ $examples { $example "USING: prettyprint sequences ;" "{ { 1 2 3 } { 4 5 6 } } flip ." "{ { 1 4 } { 2 5 } { 3 6 } }" } } ;
 
 HELP: exchange
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
@@ -728,12 +731,12 @@ HELP: padding
 HELP: pad-left
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "padded" "a new sequence" } }
 { $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the left with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
-{ $examples { $example "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-left print ] each" "---ab\n-quux" } } ;
+{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-left print ] each" "---ab\n-quux" } } ;
 
 HELP: pad-right
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "padded" "a new sequence" } }
 { $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the right with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
-{ $examples { $example "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-right print ] each" "ab---\nquux-" } } ;
+{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-right print ] each" "ab---\nquux-" } } ;
 
 HELP: sequence=
 { $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
@@ -798,6 +801,7 @@ HELP: <column> ( seq n -- column )
 { $description "Outputs a new virtual sequence which presents a fixed column of a matrix represented as a sequence of rows." "The " { $snippet "i" } "th element of a column is the " { $snippet "n" } "th element of the " { $snippet "i" } "th element of" { $snippet "seq" } ". Every element of " { $snippet "seq" } " must be a sequence, and all sequences must have equal length." }
 { $examples
     { $example
+        "USING: arrays prettyprint sequences ;"
         "{ { 1 2 3 } { 4 5 6 } { 7 8 9 } } 0 <column> >array ."
         "{ 1 4 7 }"
     }
@@ -813,8 +817,8 @@ HELP: <repetition> ( len elt -- repetition )
 { $values { "len" "a non-negative integer" } { "elt" object } { "repetition" repetition } }
 { $description "Creates a new " { $link repetition } "." }
 { $examples
-    { $example "10 \"X\" <repetition> >array ." "{ \"X\" \"X\" \"X\" \"X\" \"X\" \"X\" \"X\" \"X\" \"X\" \"X\" }" }
-    { $example "10 \"X\" <repetition> >array concat ." "\"XXXXXXXXXX\"" }
+    { $example "USING: arrays prettyprint sequences ;" "10 \"X\" <repetition> >array ." "{ \"X\" \"X\" \"X\" \"X\" \"X\" \"X\" \"X\" \"X\" \"X\" \"X\" }" }
+    { $example "USING: prettyprint sequences ;" "10 \"X\" <repetition> concat ." "\"XXXXXXXXXX\"" }
 } ;
 HELP: copy
 { $values { "src" sequence } { "i" "an index in " { $snippet "dest" } } { "dst" "a mutable sequence" } }
@@ -936,7 +940,7 @@ HELP: unclip
 { $values { "seq" sequence } { "rest" sequence } { "first" object } }
 { $description "Outputs a tail sequence and the first element of " { $snippet "seq" } "; the tail sequence consists of all elements of " { $snippet "seq" } " but the first." }
 { $examples
-    { $example "{ 1 2 3 } unclip add ." "{ 2 3 1 }" }
+    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } unclip add ." "{ 2 3 1 }" }
 } ;
 
 HELP: unclip-slice
@@ -966,7 +970,7 @@ HELP: unfold
 { $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence at the end." }
 { $examples
     "The following example divides a number by two until we reach zero, and accumulates intermediate results:"
-    { $example "1337 [ dup 0 > ] [ 2/ dup ] [ ] unfold nip ." "{ 668 334 167 83 41 20 10 5 2 1 0 }" }
+    { $example "USING: kernel math prettyprint sequences ;" "1337 [ dup 0 > ] [ 2/ dup ] [ ] unfold nip ." "{ 668 334 167 83 41 20 10 5 2 1 0 }" }
     "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link unfold } " call:"
-    { $unchecked-example "[ 10 random dup 1 > ] [ ] [ drop ] unfold ." "{ 8 2 2 9 }" }
+    { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] [ drop ] unfold ." "{ 8 2 2 9 }" }
 } ;

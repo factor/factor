@@ -46,10 +46,10 @@ HELP: command-name
 { $description "Outputs a human-readable name for the command." }
 { $examples
     { $example
-        "USE: ui.commands"
+        "USING: io ui.commands ;"
         ": com-my-command ;"
         "\\ com-my-command command-name write"
-        "My command"
+        "My Command"
     }
 } ;
 
@@ -104,10 +104,10 @@ HELP: command-string
 { $description "Outputs a string containing the command name followed by the gesture." }
 { $examples
     { $example
-        "USING: ui.commands ui.gestures ;"
+        "USING: io ui.commands ui.gestures ;"
         ": com-my-command ;"
         "T{ key-down f { C+ } \"s\" } \\ com-my-command command-string write"
-        "My command (C+s)"
+        "My Command (C+s)"
     }
 } ;
 

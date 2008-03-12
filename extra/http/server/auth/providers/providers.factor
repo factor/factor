@@ -17,7 +17,7 @@ GENERIC: new-user ( user provider -- user/f )
 : check-login ( password username provider -- user/f )
     get-user dup [ [ password>> = ] keep and ] [ 2drop f ] if ;
 
-:: set-password ( password username provider -- )
+:: set-password ( password username provider -- ? )
     [let | user [ username provider get-user ] |
         user [
             user

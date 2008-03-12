@@ -180,6 +180,7 @@ HELP: construct-empty
 { $description "Creates a new instance of " { $snippet "class" } " with all slots initially set to " { $link f } "." }
 { $examples
     { $example
+        "USING: kernel prettyprint ;"
         "TUPLE: employee number name department ;"
         "employee construct-empty ."
         "T{ employee f f f f }"

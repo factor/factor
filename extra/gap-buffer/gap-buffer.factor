@@ -44,15 +44,36 @@ M: gb like ( seq gb -- seq ) drop <gb> ;
 
 M: gb length ( gb -- n ) [ buffer-length ] keep gap-length - ;
 
+: valid-position? ( pos gb -- ? )
+    #! one element past the end of the buffer is a valid position when we're inserting
+    length -1 swap between? ;
+
+: valid-index? ( i gb -- ? )
+    buffer-length -1 swap between? ;
+
+TUPLE: position-out-of-bounds position gap-buffer ;
+C: <position-out-of-bounds> position-out-of-bounds
+
 : position>index ( pos gb -- i )
-    2dup gb-gap-start >= [
-        gap-length +
-    ] [ drop ] if ;
+    2dup valid-position? [
+        2dup gb-gap-start >= [
+            gap-length +
+        ] [ drop ] if
+    ] [
+        <position-out-of-bounds> throw
+    ] if ;
+
+TUPLE: index-out-of-bounds index gap-buffer ;
+C: <index-out-of-bounds> index-out-of-bounds
 
 : index>position ( i gb -- pos )
-    2dup gb-gap-end >= [
-        gap-length -
-    ] [ drop ] if ;
+    2dup valid-index? [
+        2dup gb-gap-end >= [
+            gap-length -
+        ] [ drop ] if
+    ] [
+        <index-out-of-bounds> throw
+    ] if ;
 
 M: gb virtual@ ( n gb -- n seq ) [ position>index ] keep gb-seq ;
     
@@ -159,6 +180,7 @@ INSTANCE: gb virtual-sequence
 : fix-gap ( n gb -- )
     2dup [ gap-length + ] keep set-gb-gap-end set-gb-gap-start ;
 
+! moving the gap to position 5 means that the element in position 5 will be immediately after the gap
 GENERIC: move-gap ( n gb -- )
 
 M: gb move-gap ( n gb -- ) 2dup [ position>index ] keep (move-gap) fix-gap ;

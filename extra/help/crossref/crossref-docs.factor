@@ -1,4 +1,5 @@
-USING: help.crossref help.topics help.syntax help.markup ;
+USING: help.topics help.syntax help.markup ;
+IN: help.crossref
 
 HELP: article-children
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
@@ -12,7 +13,7 @@ HELP: help-path
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection, traversing all the way up to the root." }
 { $examples
-    { $example "USE: help.crossref" "\"sequences\" help-path ." "{ \"collections\" \"handbook\" }" }
+    { $example "USING: help.crossref prettyprint ;" "\"sequences\" help-path ." "{ \"collections\" \"handbook\" }" }
 } ;
 
 HELP: xref-article

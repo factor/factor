@@ -11,7 +11,8 @@ USING: namespaces sequences kernel math io math.functions
 io.binary strings classes words sbufs tuples arrays
 vectors byte-arrays bit-arrays quotations hashtables
 assocs help.syntax help.markup float-arrays splitting
-io.encodings.string io.encodings.utf8 combinators ;
+io.encodings.string io.encodings.utf8 combinators new-slots
+accessors ;
 
 ! Variable holding a assoc of objects already serialized
 SYMBOL: serialized
@@ -20,9 +21,9 @@ TUPLE: id obj ;
 
 C: <id> id
 
-M: id hashcode* id-obj hashcode* ;
+M: id hashcode* obj>> hashcode* ;
 
-M: id equal? over id? [ [ id-obj ] 2apply eq? ] [ 2drop f ] if ;
+M: id equal? over id? [ [ obj>> ] 2apply eq? ] [ 2drop f ] if ;
 
 : add-object ( obj -- )
     #! Add an object to the sequence of already serialized
@@ -103,7 +104,7 @@ M: ratio (serialize) ( obj -- )
 M: string (serialize) ( obj -- )
     [ CHAR: s serialize-string ] serialize-shared ;
 
-: serialize-elements
+: serialize-elements ( seq -- )
     [ (serialize) ] each CHAR: . write1 ;
 
 M: tuple (serialize) ( obj -- )

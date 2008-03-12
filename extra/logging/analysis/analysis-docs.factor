@@ -16,7 +16,7 @@ HELP: analysis.
 { $description "Prints a logging report output by " { $link analyze-entries } ". Formatted output words are used, so the report looks nice in the UI or if sent to an HTML stream." } ;
 
 HELP: analyze-log
-{ $values { "service" "a log service name" } { "n" integer } { "word-names" "a sequence of strings" } }
+{ $values { "lines" "a parsed log file" } { "word-names" "a sequence of strings" } }
 { $description "Analyzes a log file and prints a formatted report. The " { $snippet "word-names" } " parameter is documented in " { $link analyze-entries } "." } ;
 
 ARTICLE: "logging.analysis" "Log analysis"

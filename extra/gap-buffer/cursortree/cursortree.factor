@@ -1,6 +1,7 @@
 ! Copyright (C) 2007 Alex Chapman All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel gap-buffer generic trees trees.avl math sequences quotations ;
+USING: assocs assocs.lib kernel gap-buffer generic trees trees.avl math
+sequences quotations ;
 IN: gap-buffer.cursortree
 
 TUPLE: cursortree cursors ;
@@ -18,13 +19,12 @@ TUPLE: cursor i tree ;
 TUPLE: left-cursor ;
 TUPLE: right-cursor ;
 
-: cursor-index ( cursor -- i ) cursor-i ; inline
+: cursor-index ( cursor -- i ) cursor-i ;
 
-: add-cursor ( cursortree cursor -- ) dup cursor-index rot avl-insert ; 
+: add-cursor ( cursortree cursor -- ) dup cursor-index rot insert-at ; 
 
 : remove-cursor ( cursortree cursor -- )
-   cursor-index swap delete-at ; 
-   ! dup [ eq? ] curry swap cursor-index rot cursortree-cursors tree-delete-if ;
+    tuck cursor-index swap cursortree-cursors at* [ delete ] [ 2drop ] if ;
 
 : set-cursor-index ( index cursor -- )
     dup cursor-tree over remove-cursor tuck set-cursor-i
@@ -49,14 +49,17 @@ M: right-cursor set-cursor-pos ( n cursor -- ) [ cursor-tree position>index ] ke
 : <right-cursor> ( cursortree pos -- right-cursor )
     right-cursor construct-empty make-cursor ;
 
+: cursors ( cursortree -- seq )
+    cursortree-cursors values concat ;
+
 : cursor-positions ( cursortree -- seq )
-    cursortree-cursors tree-values [ cursor-pos ] map ;
+    cursors [ cursor-pos ] map ;
 
 M: cursortree move-gap ( n cursortree -- )
     #! Get the position of each cursor before the move, then re-set the
     #! position afterwards. This will update any changed cursor indices.
     dup cursor-positions >r tuck cursortree-gb move-gap
-    cursortree-cursors tree-values r> swap [ set-cursor-pos ] 2each ;
+    cursors r> swap [ set-cursor-pos ] 2each ;
 
 : element@< ( cursor -- pos cursortree ) [ cursor-pos 1- ] keep cursor-tree ;
 : element@> ( cursor -- pos cursortree ) [ cursor-pos ] keep cursor-tree ;
@@ -81,7 +84,7 @@ M: right-cursor fix-cursor ( cursortree cursor -- )
     >r gb-gap-end r> set-cursor-index ;
 
 : fix-cursors ( old-gap-end cursortree -- )
-    tuck cursortree-cursors tree-get-all [ fix-cursor ] curry* each ; 
+    tuck cursortree-cursors at [ fix-cursor ] with each ;
 
 M: cursortree delete* ( pos cursortree -- )
     tuck move-gap dup gb-gap-end swap dup (delete*) fix-cursors ;

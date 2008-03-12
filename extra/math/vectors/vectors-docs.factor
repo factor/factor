@@ -69,12 +69,12 @@ HELP: v/
 HELP: vmax
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
 { $description "Creates a sequence where each element is the maximum of the corresponding elements from " { $snippet "u" } " andd " { $snippet "v" } "." }
-{ $examples { $example "USE: math.vectors" "{ 1 2 5 } { -7 6 3 } vmax ." "{ 1 6 5 }" } } ;
+{ $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 5 } { -7 6 3 } vmax ." "{ 1 6 5 }" } } ;
 
 HELP: vmin
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
 { $description "Creates a sequence where each element is the minimum of the corresponding elements from " { $snippet "u" } " andd " { $snippet "v" } "." }
-{ $examples { $example "USE: math.vectors" "{ 1 2 5 } { -7 6 3 } vmin ." "{ -7 2 3 }" } } ;
+{ $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 5 } { -7 6 3 } vmin ." "{ -7 2 3 }" } } ;
 
 HELP: v.
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }
@@ -99,7 +99,7 @@ HELP: normalize
 HELP: set-axis
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "axis" "a sequence of 0/1" } { "w" "a sequence of numbers" } }
 { $description "Using " { $snippet "w" } " as a template, creates a new sequence containing corresponding elements from " { $snippet "u" } " in place of 0, and corresponding elements from " { $snippet "v" } " in place of 1." }
-{ $examples { $example "USE: math.vectors" "{ 1 2 3 } { 4 5 6 } { 0 1 0 } set-axis ." "{ 1 5 3 }" } } ;
+{ $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 3 } { 4 5 6 } { 0 1 0 } set-axis ." "{ 1 5 3 }" } } ;
 
 { 2map v+ v- v* v/ } related-words
 

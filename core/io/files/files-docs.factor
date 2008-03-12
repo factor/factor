@@ -104,18 +104,18 @@ HELP: path-separator?
 HELP: parent-directory
 { $values { "path" "a pathname string" } { "parent" "a pathname string" } }
 { $description "Strips the last component off a pathname." }
-{ $examples { $example "USE: io.files" "\"/etc/passwd\" parent-directory print" "/etc/" } } ;
+{ $examples { $example "USING: io io.files ;" "\"/etc/passwd\" parent-directory print" "/etc/" } } ;
 
 HELP: file-name
 { $values { "path" "a pathname string" } { "string" string } }
 { $description "Outputs the last component of a pathname string." }
 { $examples
-    { "\"/usr/bin/gcc\" file-name ." "\"gcc\"" }
-    { "\"/usr/libexec/awk/\" file-name ." "\"awk\"" }
+    { $example "USING: io.files prettyprint ;" "\"/usr/bin/gcc\" file-name ." "\"gcc\"" }
+    { $example "USING: io.files prettyprint ;" "\"/usr/libexec/awk/\" file-name ." "\"awk\"" }
 } ;
 
 HELP: <file-reader>
-{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptors" }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" { "stream" "an input stream" } }
     { "stream" "an input stream" } }
 { $description "Outputs an input stream for reading from the specified pathname using the given encoding." }
 { $errors "Throws an error if the file is unreadable." } ;

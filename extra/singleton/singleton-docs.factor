@@ -8,7 +8,7 @@ HELP: SINGLETON:
 } { $description
     "Defines a new predicate class whose superclass is " { $link word } ".  Only one instance of a singleton may exist because classes are " { $link eq? } " to themselves.  Methods may be defined on a singleton."
 } { $examples
-    { $example "SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
+    { $example "USING: singleton kernel io ;" "SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
 } { $see-also
     POSTPONE: PREDICATE:
 } ;
@@ -20,7 +20,7 @@ HELP: SINGLETONS:
 } { $description
     "Defines a new singleton for each class in the list."
 } { $examples
-    { $example "SINGLETONS: foo bar baz ;" "" }
+    { $example "USE: singleton" "SINGLETONS: foo bar baz ;" "" }
 } { $see-also
     POSTPONE: SINGLETON:
 } ;

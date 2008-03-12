@@ -213,41 +213,41 @@ HELP: incomparable
 { $description "Output value from " { $link interval<= } ", " { $link interval< } ", " { $link interval>= } " and " { $link interval> } " in the case where the result of the comparison is ambiguous." } ;
 
 HELP: interval<=
-{ $values { "int" interval } { "n" real } { "?" "a boolean or " { $link incomparable } } }
-{ $description "Compares " { $snippet "int" } " with " { $snippet "n" } ", and outputs one of the following:"
+{ $values { "i1" interval } { "i2" interval } { "?" "a boolean or " { $link incomparable } } }
+{ $description "Compares " { $snippet "i1" } " with " { $snippet "i2" } ", and outputs one of the following:"
     { $list
-        { { $link t } " if every point in " { $snippet "int" } " is less than or equal to " { $snippet "n" } }
-        { { $link f } " if every point in " { $snippet "int" } " is greater than " { $snippet "n" } }
+        { { $link t } " if every point in " { $snippet "i1" } " is less than or equal to every point in " { $snippet "i2" } }
+        { { $link f } " if every point in " { $snippet "i1" } " is greater than every point in " { $snippet "i2" } }
         { { $link incomparable } " if neither of the above conditions hold" }
     }
 } ;
 
 HELP: interval<
-{ $values { "int" interval } { "n" real } { "?" "a boolean or " { $link incomparable } } }
-{ $description "Compares " { $snippet "int" } " with " { $snippet "n" } ", and outputs one of the following:"
+{ $values { "i1" interval } { "i2" interval } { "?" "a boolean or " { $link incomparable } } }
+{ $description "Compares " { $snippet "i1" } " with " { $snippet "i2" } ", and outputs one of the following:"
     { $list
-        { { $link t } " if every point in " { $snippet "int" } " is less than " { $snippet "n" } }
-        { { $link f } " if every point in " { $snippet "int" } " is greater than or equal to " { $snippet "n" } }
+        { { $link t } " if every point in " { $snippet "i1" } " is less than every point in " { $snippet "i2" } }
+        { { $link f } " if every point in " { $snippet "i1" } " is greater than or equal to every point in " { $snippet "i2" } }
         { { $link incomparable } " if neither of the above conditions hold" }
     }
 } ;
 
 HELP: interval>=
-{ $values { "int" interval } { "n" real } { "?" "a boolean or " { $link incomparable } } }
-{ $description "Compares " { $snippet "int" } " with " { $snippet "n" } ", and outputs one of the following:"
+{ $values { "i1" interval } { "i2" interval } { "?" "a boolean or " { $link incomparable } } }
+{ $description "Compares " { $snippet "i1" } " with " { $snippet "i2" } ", and outputs one of the following:"
     { $list
-        { { $link t } " if every point in " { $snippet "int" } " is greater than or equal to " { $snippet "n" } }
-        { { $link f } " if every point in " { $snippet "int" } " is less than " { $snippet "n" } }
+        { { $link t } " if every point in " { $snippet "i1" } " is greater than or equal to every point in " { $snippet "i2" } }
+        { { $link f } " if every point in " { $snippet "i1" } " is less than every point in " { $snippet "i2" } }
         { { $link incomparable } " if neither of the above conditions hold" }
     }
 } ;
 
 HELP: interval>
-{ $values { "int" interval } { "n" real } { "?" "a boolean or " { $link incomparable } } }
-{ $description "Compares " { $snippet "int" } " with " { $snippet "n" } ", and outputs one of the following:"
+{ $values { "i1" interval } { "i2" interval } { "?" "a boolean or " { $link incomparable } } }
+{ $description "Compares " { $snippet "i1" } " with " { $snippet "i2" } ", and outputs one of the following:"
     { $list
-        { { $link t } " if every point in " { $snippet "int" } " is greater than " { $snippet "n" } }
-        { { $link f } " if every point in " { $snippet "int" } " is less than or equal to " { $snippet "n" } }
+        { { $link t } " if every point in " { $snippet "i1" } " is greater than every point in " { $snippet "i2" } }
+        { { $link f } " if every point in " { $snippet "i1" } " is less than or equal to every point in " { $snippet "i2" } }
         { { $link incomparable } " if neither of the above conditions hold" }
     }
 } ;
