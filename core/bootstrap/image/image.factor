@@ -191,7 +191,9 @@ M: bignum '
 M: fixnum '
     #! When generating a 32-bit image on a 64-bit system,
     #! some fixnums should be bignums.
-    dup most-negative-fixnum most-positive-fixnum between?
+    dup
+    bootstrap-most-negative-fixnum
+    bootstrap-most-positive-fixnum between?
     [ tag-fixnum ] [ >bignum ' ] if ;
 
 ! Floats
