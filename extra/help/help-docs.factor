@@ -344,7 +344,7 @@ HELP: $side-effects
 
 HELP: $notes
 { $values { "element" "a markup element" } }
-{ $description "Prints the errors subheading found on the help page of some words. This section should usage tips and pitfalls." } ;
+{ $description "Prints the notes subheading found on the help page of some words. This section should document usage tips and pitfalls." } ;
 
 HELP: $see
 { $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
