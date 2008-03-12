@@ -56,7 +56,7 @@ check_ret() {
 
 check_gcc_version() {
     echo -n "Checking gcc version..."
-    GCC_VERSION=`gcc --version`
+    GCC_VERSION=`$CC --version`
     check_ret gcc
     if [[ $GCC_VERSION == *3.3.* ]] ; then
         echo "bad!"
@@ -96,9 +96,18 @@ check_installed_programs() {
     ensure_program_installed cut
     case $OS in
         netbsd) ensure_program_installed gmake;;
-        openbsd) ensure_program_installed gmake;;
         freebsd) ensure_program_installed gmake;;
+        openbsd) ensure_program_installed egcc;
+        	ensure_program_installed gmake;
+		CC=egcc;;
+        *) CC=gcc;;
     esac
+    case $OS in
+        # winnt) FACTOR_BINARY=factor-nt;;
+        # macosx) FACTOR_BINARY=./Factor.app/Contents/MacOS/factor;;
+        *) FACTOR_BINARY=factor;;
+    esac
+
     check_gcc_version
 }
 
@@ -107,7 +116,7 @@ check_library_exists() {
     GCC_OUT=factor-library-test.out
     echo -n "Checking for library $1..."
     echo "int main(){return 0;}" > $GCC_TEST
-    gcc $GCC_TEST -o $GCC_OUT -l $1
+    $CC $GCC_TEST -o $GCC_OUT -l $1
     if [[ $? -ne 0 ]] ; then
         echo "not found!"
         echo "Warning: library $1 not found."
