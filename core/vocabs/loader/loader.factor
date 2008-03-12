@@ -75,7 +75,7 @@ SYMBOL: load-help?
 
 : source-wasn't-loaded f swap set-vocab-source-loaded? ;
 
-: load-source ( vocab-link -- )
+: load-source ( vocab -- )
     [ source-wasn't-loaded ] keep
     [ vocab-source-path bootstrap-file ] keep
     source-was-loaded ;
@@ -84,7 +84,7 @@ SYMBOL: load-help?
 
 : docs-weren't-loaded f swap set-vocab-docs-loaded? ;
 
-: load-docs ( vocab-link -- )
+: load-docs ( vocab -- )
     load-help? get [
         [ docs-weren't-loaded ] keep
         [ vocab-docs-path ?run-file ] keep

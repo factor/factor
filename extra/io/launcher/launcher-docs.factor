@@ -75,8 +75,8 @@ HELP: current-process-handle
 { $description "Returns the handle of the current process." } ;
 
 HELP: run-process*
-{ $values { "desc" "a launch descriptor" } { "handle" "a process handle" } }
-{ $contract "Launches a process using the launch descriptor." }
+{ $values { "process" process } { "handle" "a process handle" } }
+{ $contract "Launches a process." }
 { $notes "User code should call " { $link run-process } " instead." } ;
 
 HELP: run-process

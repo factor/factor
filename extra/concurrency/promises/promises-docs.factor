@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: concurrency.messaging kernel arrays
-continuations help.markup help.syntax quotations ;
+continuations help.markup help.syntax quotations calendar ;
 IN: concurrency.promises
 
 HELP: promise
@@ -12,12 +12,12 @@ HELP: promise-fulfilled?
 { $description "Tests if " { $link fulfill } " has previously been called on the promise, in which case " { $link ?promise } " will return immediately without blocking." } ;
 
 HELP: ?promise-timeout
-{ $values { "promise" promise } { "timeout" "a timeout in milliseconds or " { $link f } } { "value" object } }
+{ $values { "promise" promise } { "timeout" "a " { $link duration } " or " { $link f } } { "result" object } }
 { $description "Waits for another thread to fulfill a promise, returning immediately if the promise has already been fulfilled. A timeout of " { $link f } " indicates that the thread may block indefinitely, otherwise it will wait up to " { $snippet "timeout" } " milliseconds." }
 { $errors "Throws an error if the timeout expires before the promise has been fulfilled." } ;
 
 HELP: ?promise
-{ $values { "promise" promise } { "value" object } }
+{ $values { "promise" promise } { "result" object } }
 { $description "Waits for another thread to fulfill a promise, returning immediately if the promise has already been fulfilled." } ;
 
 HELP: fulfill

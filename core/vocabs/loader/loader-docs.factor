@@ -65,12 +65,12 @@ HELP: load-help?
 { $var-description "If set to a true value, documentation will be automatically loaded when vocabularies are loaded. This variable is usually on, except when Factor has been bootstrapped without the help system." } ;
 
 HELP: load-source
-{ $values { "root" "a pathname string" } { "name" "a vocabulary name" } }
-{ $description "Loads a vocabulary's source code from the specified vocabulary root." } ;
+{ $values { "vocab" "a vocabulary specifier" } }
+{ $description "Loads a vocabulary's source code." } ;
 
 HELP: load-docs
-{ $values { "root" "a pathname string" } { "name" "a vocabulary name" } }
-{ $description "If " { $link load-help? } " is on, loads a vocabulary's documentation from the specified vocabulary root." } ;
+{ $values { "vocab" "a vocabulary specifier" } }
+{ $description "If " { $link load-help? } " is on, loads a vocabulary's documentation." } ;
 
 HELP: reload
 { $values { "name" "a vocabulary name" } }

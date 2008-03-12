@@ -73,8 +73,10 @@ HELP: self
 { $description "Pushes the currently-running thread." } ;
 
 HELP: <thread>
-{ $values { "quot" quotation } { "name" string } { "error-handler" quotation } }
-{ $description "Low-level thread constructor. The thread runs the quotation when spawned; the name is simply used to identify the thread for debugging purposes. The error handler is called if the thread's quotation throws an unhandled error; it should either print the error or notify another thread." }
+{ $values { "quot" quotation } { "name" string } { "thread" thread } }
+{ $description "Low-level thread constructor. The thread runs the quotation when spawned."
+$nl
+"The name is used to identify the thread for debugging purposes; see " { $link "tools.threads" } "." }
 { $notes "In most cases, user code should call " { $link spawn } " instead, however for control over the error handler quotation, threads can be created with " { $link <thread> } " then passed to " { $link (spawn) } "." } ;
 
 HELP: run-queue
@@ -96,7 +98,7 @@ HELP: sleep-queue
 { $var-description "A " { $link min-heap } " storing the queue of sleeping threads." } ;
 
 HELP: sleep-time
-{ $values { "ms" "a non-negative integer or " { $link f } } }
+{ $values { "ms/f" "a non-negative integer or " { $link f } } }
 { $description "Outputs the time until the next sleeping thread is scheduled to wake up, which could be zero if there are threads in the run queue, or threads which need to wake up right now. If there are no runnable or sleeping threads, outputs " { $link f } "." } ;
 
 HELP: stop
@@ -122,11 +124,15 @@ HELP: interrupt
 { $description "Interrupts a sleeping thread." } ;
 
 HELP: suspend
-{ $values { "quot" "a quotation with stack effect " { $snippet "( thread -- )" } } { "obj" object } }
-{ $description "Suspends the current thread and passes it to the quotation. After the quotation returns, control yields to the next runnable thread and the current thread does not execute again until it is resumed, and so the quotation must arrange for another thread to later resume the suspended thread with a call to " { $link resume } " or " { $link resume-with } "." } ;
+{ $values { "quot" "a quotation with stack effect " { $snippet "( thread -- )" } } { "state" string } { "obj" object } }
+{ $description "Suspends the current thread and passes it to the quotation."
+$nl
+"After the quotation returns, control yields to the next runnable thread and the current thread does not execute again until it is resumed, and so the quotation must arrange for another thread to later resume the suspended thread with a call to " { $link resume } " or " { $link resume-with } "."
+$nl
+"The status string is for debugging purposes; see " { $link "tools.threads" } "." } ;
 
 HELP: spawn
-{ $values { "quot" quotation } { "name" string } }
+{ $values { "quot" quotation } { "name" string } { "thread" thread } }
 { $description "Spawns a new thread. The thread begins executing the given quotation; the name is for debugging purposes. The new thread begins running immediately and the current thread is added to the end of the run queue."
 $nl
 "The new thread begins with an empty data stack, an empty retain stack, and an empty catch stack. The name stack is inherited from the parent thread but may be cleared with " { $link init-namespaces } "." }
@@ -138,7 +144,7 @@ $nl
 } ;
 
 HELP: spawn-server
-{ $values { "quot" "a quotation with stack effect " { $snippet "( -- ? )" } } { "name" string } }
+{ $values { "quot" "a quotation with stack effect " { $snippet "( -- ? )" } } { "name" string } { "thread" thread } }
 { $description "Convenience wrapper around " { $link spawn } " which repeatedly calls the quotation in a new thread until it outputs " { $link f } "." }
 { $examples
     "A thread that runs forever:"

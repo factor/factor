@@ -51,7 +51,7 @@ HELP: record-modified
 $low-level-note ;
 
 HELP: record-checksum
-{ $values { "source-file" source-file } { "contents" string } }
+{ $values { "source-file" source-file } { "lines" "a sequence of strings" } }
 { $description "Records the CRC32 checksm of the source file's contents." } 
 $low-level-note ;
 

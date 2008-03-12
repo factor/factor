@@ -26,7 +26,7 @@ HELP: nil?
 { $values { "cons" "a cons object" } { "?" "a boolean" } }
 { $description "Return true if the cons object is the nil cons." } ;
 
-HELP: list? 
+HELP: list? ( object -- ? )
 { $values { "object" "an object" } { "?" "a boolean" } }
 { $description "Returns true if the object conforms to the list protocol." } ;
 
@@ -175,7 +175,7 @@ HELP: lmerge
 { $values { "list1" "a list" } { "list2" "a list" } { "result" "lazy list merging list1 and list2" } }
 { $description "Return the result of merging the two lists in a lazy manner." } 
 { $examples
-  { $example "USE: lazy-lists" "{ 1 2 3 } >list { 4 5 6 } >list lmerge list>array ." "{ 1 4 2 5 3 6 }" }
+  { $example "USING: lazy-lists prettyprint ;" "{ 1 2 3 } >list { 4 5 6 } >list lmerge list>array ." "{ 1 4 2 5 3 6 }" }
 } ;
 
 HELP: lcontents

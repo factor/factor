@@ -29,7 +29,7 @@ HELP: <mirror>
 { $description "Creates a " { $link mirror } " reflecting an object." }
 { $examples
     { $example
-        "USING: assocs mirrors ;"
+        "USING: assocs mirrors prettyprint ;"
         "TUPLE: circle center radius ;"
         "C: <circle> circle"
         "{ 100 50 } 15 <circle> <mirror> >alist ."

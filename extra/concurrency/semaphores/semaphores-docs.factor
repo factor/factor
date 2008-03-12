@@ -9,12 +9,12 @@ HELP: <semaphore>
 { $description "Creates a counting semaphore with the specified initial count." } ;
 
 HELP: acquire-timeout
-{ $values { "semaphore" semaphore } { "timeout" "a " { $link duration } " or " { $link f } } { "value" object } }
+{ $values { "semaphore" semaphore } { "timeout" "a " { $link duration } " or " { $link f } } }
 { $description "If the semaphore has a non-zero count, decrements it and returns immediately. Otherwise, if the timeout is " { $link f } ", waits indefinitely for the semaphore to be released. If the timeout is not " { $link f } ", waits a certain period of time, and if the semaphore still has not been released, throws an error." }
 { $errors "Throws an error if the timeout expires before the semaphore is released." } ;
 
 HELP: acquire
-{ $values { "semaphore" semaphore } { "value" object } }
+{ $values { "semaphore" semaphore } }
 { $description "If the semaphore has a non-zero count, decrements it and returns immediately. Otherwise, waits for it to be released." } ;
 
 HELP: release

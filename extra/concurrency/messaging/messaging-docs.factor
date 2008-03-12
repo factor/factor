@@ -1,12 +1,12 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup concurrency.messaging.private
-threads kernel arrays quotations ;
+threads kernel arrays quotations threads strings ;
 IN: concurrency.messaging
 
 HELP: send
 { $values { "message" object } 
-          { "thread" "a thread object" } 
+          { "thread" thread } 
 }
 { $description "Send the message to the thread by placing it in the threades mailbox. This is an asynchronous operation and will return immediately. The receving thread will act on the message the next time it retrieves that item from its mailbox (usually using the " { $link receive } " word. The message can be any Factor object. For destinations that are instances of remote-thread the message must be a serializable Factor type." } 
 { $see-also receive receive-if } ;
@@ -26,7 +26,8 @@ HELP: receive-if
 
 HELP: spawn-linked
 { $values { "quot" quotation }
-          { "thread" "a thread object" } 
+          { "name" string }
+          { "thread" thread } 
 }
 { $description "Start a thread which runs the given quotation. If that quotation throws an error which is not caught then the error will get propagated to the thread that spawned it. This can be used to set up 'supervisor' threades that restart child threades that crash due to uncaught errors.\n" } 
 { $see-also spawn } ;
