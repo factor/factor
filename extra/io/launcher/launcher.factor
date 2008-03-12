@@ -115,7 +115,7 @@ TUPLE: process-failed code ;
 : process-failed ( code -- * )
     \ process-failed construct-boa throw ;
 
-: try-process ( command/process -- )
+: try-process ( desc -- )
     run-process wait-for-process dup zero?
     [ drop ] [ process-failed ] if ;
 

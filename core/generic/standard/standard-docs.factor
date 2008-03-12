@@ -1,5 +1,5 @@
-USING: generic help.markup help.syntax sequences
-generic.standard ;
+USING: generic help.markup help.syntax sequences ;
+IN: generic.standard
 
 HELP: no-method
 { $values { "object" "an object" } { "generic" "a generic word" } }

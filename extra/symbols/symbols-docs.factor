@@ -5,5 +5,5 @@ HELP: SYMBOLS:
 { $syntax "SYMBOLS: words... ;" }
 { $values { "words" "a sequence of new words to define" } }
 { $description "Creates a new word for every token until the ';'." }
-{ $examples { $example "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } }
+{ $examples { $example "USING: prettyprint symbols ;" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } }
 { $see-also POSTPONE: SYMBOL: } ;

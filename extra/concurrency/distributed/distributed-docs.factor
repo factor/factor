@@ -2,9 +2,7 @@ USING: help.markup help.syntax concurrency.messaging threads ;
 IN: concurrency.distributed
 
 HELP: local-node
-{ $values { "addrspec" "an address specifier" } 
-}
-{ $description "Return the node the current thread is running on." } ;
+{ $var-description "A variable containing the node the current thread is running on." } ;
 
 HELP: start-node
 { $values { "port" "a port number between 0 and 65535" } }

@@ -31,8 +31,8 @@ HELP: listener-hook
 { $var-description "Variable holding a quotation called by the listener before reading an input expression. The UI sets this variable to a quotation which updates the stack display in a listener gadget." } ;
 
 HELP: read-quot
-{ $values { "stream" "an input stream" } { "quot/f" "a parsed quotation, or " { $link f } " indicating end of file" } }
-{ $description "Reads a Factor expression from the stream, possibly spanning more than line. Additional lines of input are read while the parser stack height is greater than one. Since structural parsing words push partial quotations on the stack, this will keep on reading input until all delimited parsing words are terminated." } ;
+{ $values { "quot/f" "a parsed quotation, or " { $link f } " indicating end of file" } }
+{ $description "Reads a Factor expression which possibly spans more than one line from " { $link stdio } " stream. Additional lines of input are read while the parser stack height is greater than one. Since structural parsing words push partial quotations on the stack, this will keep on reading input until all delimited parsing words are terminated." } ;
 
 HELP: listen
 { $description "Prompts for an expression on the " { $link stdio } " stream and evaluates it. On end of file, " { $link quit-flag } " is set to terminate the listener loop." }

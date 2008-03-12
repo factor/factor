@@ -5,7 +5,7 @@ HELP: help-lint-all
 { $description "Checks all word help and articles in all loaded vocabularies." } ;
 
 HELP: help-lint
-{ $values { "vocab" "a vocabulary specifier" } }
+{ $values { "prefix" "a vocabulary specifier" } }
 { $description "Checks all word help and articles in the given vocabulary and all child vocabularies." } ;
 
 ARTICLE: "help.lint" "Help lint tool"

@@ -24,8 +24,8 @@ HELP: compiler-error.
 { $description "Prints a compiler error to the " { $link stdio } " stream." } ;
 
 HELP: compiler-errors.
-{ $values { "errors" "an assoc mapping words to errors" } }
-{ $description "Prints a set of compiler errors to the " { $link stdio } " stream." } ;
+{ $values { "type" symbol } }
+{ $description "Prints compiler errors to the " { $link stdio } " stream. The type parameter is one of " { $link +error+ } ", " { $link +warning+ } ", or " { $link +linkage+ } "." } ;
 HELP: :errors
 { $description "Prints all serious compiler errors from the most recent compile to the " { $link stdio } " stream." } ;
 

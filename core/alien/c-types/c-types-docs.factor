@@ -84,11 +84,11 @@ HELP: alien>u16-string ( c-ptr -- string )
 { $values { "c-ptr" c-ptr } { "string" string } }
 { $description "Reads a null-terminated UCS-2 string from the specified address." } ;
 
-HELP: memory>byte-array ( base len -- string )
-{ $values { "base" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
+HELP: memory>byte-array
+{ $values { "alien" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new byte array." } ;
 
-HELP: byte-array>memory ( string base -- )
+HELP: byte-array>memory
 { $values { "byte-array" byte-array } { "base" c-ptr } }
 { $description "Writes a byte array to memory starting from the " { $snippet "base" } " address." }
 { $warning "This word is unsafe. Improper use can corrupt memory." } ;

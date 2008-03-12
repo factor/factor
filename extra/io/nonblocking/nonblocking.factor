@@ -109,7 +109,7 @@ M: input-port stream-read
         buffer-until
     ] if ;
 
-: read-until-loop ( seps port byte-vector -- separator/f )
+: read-until-loop ( seps port accum -- separator/f )
     2over read-until-step over [
         >r over push-all r> dup [
             >r 3drop r>
@@ -125,7 +125,7 @@ M: input-port stream-read-until ( seps port -- byte-array/f sep/f )
         >r 2nip r>
     ] [
         over [
-            drop >byte-vector
+            drop BV{ } like
             [ read-until-loop ] keep
             B{ } like swap
         ] [

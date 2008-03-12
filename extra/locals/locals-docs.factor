@@ -15,7 +15,7 @@ HELP: [|
 { $description "A lambda abstraction. When called, reads stack values into the bindings from left to right; the body may then refer to these bindings." }
 { $examples
     { $example
-        "USE: locals"
+        "USING: kernel locals math prettyprint ;"
         ":: adder ( n -- quot ) [| m | m n + ] ;"
         "3 5 adder call ."
         "8"
@@ -28,7 +28,7 @@ HELP: [let
 { $description "Introduces a set of lexical bindings and evaluates the body. The values are evaluated in parallel, and may not refer to other bindings within the same " { $link POSTPONE: [let } " form; for Lisp programmers, this means that Factor's " { $link POSTPONE: [let } " is equivalent to the Lisp " { $snippet "let" } ", not " { $snippet "let*" } "." }
 { $examples
     { $example
-        "USING: locals math.functions ;"
+        "USING: kernel locals math math.functions prettyprint sequences ;"
         ":: frobnicate ( n seq -- newseq )"
         "    [let | n' [ n 6 * ] |"
         "        seq [ n' gcd nip ] map ] ;"
@@ -43,7 +43,7 @@ HELP: [wlet
 { $description "Introduces a set of lexically-scoped non-recursive local functions. The bodies may not refer to other bindings within the same " { $link POSTPONE: [wlet } " form; for Lisp programmers, this means that Factor's " { $link POSTPONE: [wlet } " is equivalent to the Lisp " { $snippet "flet" } ", not " { $snippet "labels" } "." }
 { $examples
     { $example
-        "USE: locals"
+        "USING: locals math prettyprint sequences ;"
         ":: quuxify ( n seq -- newseq )"
         "    [wlet | add-n [| m | m n + ] |"
         "        seq [ add-n ] map ] ;"

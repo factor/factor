@@ -56,7 +56,7 @@ check_ret() {
 
 check_gcc_version() {
     echo -n "Checking gcc version..."
-    GCC_VERSION=`gcc --version`
+    GCC_VERSION=`$CC --version`
     check_ret gcc
     if [[ $GCC_VERSION == *3.3.* ]] ; then
         echo "bad!"
@@ -85,18 +85,35 @@ set_md5sum() {
     fi
 }
 
+set_gcc() {
+    case $OS in
+        openbsd) ensure_program_installed egcc; CC=egcc;;
+        *) CC=gcc;;
+    esac
+}
+
+set_make() {
+    case $OS in
+        netbsd) MAKE='gmake';;
+        freebsd) MAKE='gmake';;
+        openbsd) MAKE='gmake';;
+        dragonflybsd) MAKE='gmake';;
+        *) MAKE='make';;
+    esac
+    if ! [[ $MAKE -eq 'gmake' ]] ; then
+    	ensure_program_installed gmake
+    fi
+}
+
 check_installed_programs() {
     ensure_program_installed chmod
     ensure_program_installed uname
     ensure_program_installed git
     ensure_program_installed wget curl
     ensure_program_installed gcc
-    ensure_program_installed make
+    ensure_program_installed make gmake
     ensure_program_installed md5sum md5
     ensure_program_installed cut
-    case $OS in
-        netbsd) ensure_program_installed gmake;;
-    esac
     check_gcc_version
 }
 
@@ -105,7 +122,7 @@ check_library_exists() {
     GCC_OUT=factor-library-test.out
     echo -n "Checking for library $1..."
     echo "int main(){return 0;}" > $GCC_TEST
-    gcc $GCC_TEST -o $GCC_OUT -l $1
+    $CC $GCC_TEST -o $GCC_OUT -l $1
     if [[ $? -ne 0 ]] ; then
         echo "not found!"
         echo "Warning: library $1 not found."
@@ -153,6 +170,9 @@ find_os() {
         *linux*) OS=linux;;
         *Linux*) OS=linux;;
         *NetBSD*) OS=netbsd;;
+        *FreeBSD*) OS=freebsd;;
+        *OpenBSD*) OS=openbsd;;
+        *DragonFly*) OS=dragonflybsd;;
     esac
 }
 
@@ -163,6 +183,7 @@ find_architecture() {
     case $uname_m in
        i386) ARCH=x86;;
        i686) ARCH=x86;;
+       amd64) ARCH=x86;;
        *86) ARCH=x86;;
        *86_64) ARCH=x86;;
        "Power Macintosh") ARCH=ppc;;
@@ -203,6 +224,8 @@ echo_build_info() {
     echo GIT_PROTOCOL=$GIT_PROTOCOL
     echo GIT_URL=$GIT_URL
     echo DOWNLOADER=$DOWNLOADER
+    echo CC=$CC
+    echo MAKE=$MAKE
 }
 
 set_build_info() {
@@ -236,6 +259,8 @@ find_build_info() {
     set_factor_binary
     set_build_info
 	set_downloader
+	set_gcc
+	set_make
     echo_build_info
 }
 
@@ -260,12 +285,8 @@ cd_factor() {
 }
 
 invoke_make() {
-    case $OS in
-        netbsd) make='gmake';;
-        *) make='make';;
-    esac
-   $make $*
-   check_ret $make
+   $MAKE $*
+   check_ret $MAKE
 }
 
 make_clean() {

@@ -23,3 +23,7 @@ IN: lazy-lists.tests
 [ { 5 6 7 8 } ] [ 
   { 1 2 3 } >list { 4 5 } >list 2list { [ first odd? ] } [ first2 + ] lcomp* list>array
 ] unit-test
+
+[ { 4 5 6 } ] [ 
+    3 { 1 2 3 } >list [ + ] lmap-with list>array
+] unit-test
