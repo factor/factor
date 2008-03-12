@@ -224,6 +224,8 @@ echo_build_info() {
     echo GIT_PROTOCOL=$GIT_PROTOCOL
     echo GIT_URL=$GIT_URL
     echo DOWNLOADER=$DOWNLOADER
+    echo CC=$CC
+    echo MAKE=$MAKE
 }
 
 set_build_info() {
@@ -257,6 +259,8 @@ find_build_info() {
     set_factor_binary
     set_build_info
 	set_downloader
+	set_gcc
+	set_make
     echo_build_info
 }
 
@@ -347,8 +351,6 @@ maybe_download_dlls() {
 
 get_config_info() {
     find_build_info
-    set_gcc
-    set_make
     check_installed_programs
     check_libraries
 }
