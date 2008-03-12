@@ -20,4 +20,4 @@ IN: units.tests
 : km/L km 1 L d/ ;
 : mpg miles 1 gallons d/ ;
 
-[ t ] [ 100 10 / km/L [ mpg ] undo 23 1 ~ ] unit-test
+! [ t ] [ 100 10 / km/L [ mpg ] undo 23 1 ~ ] unit-test

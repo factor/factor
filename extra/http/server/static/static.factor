@@ -3,7 +3,8 @@
 USING: calendar html io io.files kernel math math.parser http
 http.server namespaces parser sequences strings assocs
 hashtables debugger http.mime sorting html.elements logging
-calendar.format new-slots accessors io.encodings.binary ;
+calendar.format new-slots accessors io.encodings.binary
+combinators.cleave fry ;
 IN: http.server.static
 
 SYMBOL: responder
@@ -31,21 +32,23 @@ TUPLE: file-responder root hook special ;
 : <static> ( root -- responder )
     [
         <content>
-        over file-length "content-length" set-header
-        over file-http-date "last-modified" set-header
-        swap [ binary <file-reader> stdio get stream-copy ] curry >>body
+        swap
+        [ file-length "content-length" set-header ]
+        [ file-http-date "last-modified" set-header ]
+        [ '[ , binary <file-reader> stdio get stream-copy ] >>body ]
+        tri
     ] <file-responder> ;
 
 : serve-static ( filename mime-type -- response )
     over last-modified-matches?
-    [ 2drop <304> ] [ responder get hook>> call ] if ;
+    [ 2drop <304> ] [ file-responder get hook>> call ] if ;
 
 : serving-path ( filename -- filename )
-    "" or responder get root>> swap path+ ;
+    "" or file-responder get root>> swap path+ ;
 
 : serve-file ( filename -- response )
     dup mime-type
-    dup responder get special>> at
+    dup file-responder get special>> at
     [ call ] [ serve-static ] ?if ;
 
 \ serve-file NOTICE add-input-logging
@@ -56,21 +59,22 @@ TUPLE: file-responder root hook special ;
 
 : directory. ( path -- )
     dup file-name [
-        <h1> dup file-name write </h1>
-        <ul>
-            directory sort-keys
-            [ <li> file. </li> ] assoc-each
-        </ul>
+        [ <h1> file-name write </h1> ]
+        [
+            <ul>
+                directory sort-keys
+                [ <li> file. </li> ] assoc-each
+            </ul>
+        ] bi
     ] simple-html-document ;
 
 : list-directory ( directory -- response )
     "text/html" <content>
-    swap [ directory. ] curry >>body ;
+    swap '[ , directory. ] >>body ;
 
 : find-index ( filename -- path )
-    { "index.html" "index.fhtml" }
-    [ dupd path+ exists? ] find nip
-    dup [ path+ ] [ nip ] if ;
+    { "index.html" "index.fhtml" } [ path+ ] with map
+    [ exists? ] find nip ;
 
 : serve-directory ( filename -- response )
     dup "/" tail? [
@@ -87,15 +91,14 @@ TUPLE: file-responder root hook special ;
         drop <404>
     ] if ;
 
-M: file-responder call-responder ( request path responder -- response )
-    over [
-        ".." pick subseq? [
-            3drop <400>
+M: file-responder call-responder ( path responder -- response )
+    file-responder set
+    dup [
+        ".." over subseq? [
+            drop <400>
         ] [
-            responder set
-            swap request set
             serve-object
         ] if
     ] [
-        2drop redirect-with-/
+        drop redirect-with-/
     ] if ;

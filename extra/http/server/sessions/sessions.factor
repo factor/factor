@@ -2,16 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs calendar kernel math.parser namespaces random
 boxes alarms new-slots accessors http http.server
-quotations hashtables sequences ;
+quotations hashtables sequences fry combinators.cleave ;
 IN: http.server.sessions
 
 ! ! ! ! ! !
 ! WARNING: this session manager is vulnerable to XSRF attacks
 ! ! ! ! ! !
 
-GENERIC: init-session ( responder -- )
+GENERIC: init-session* ( responder -- )
 
-M: dispatcher init-session drop ;
+M: dispatcher init-session* drop ;
 
 TUPLE: session-manager responder sessions ;
 
@@ -19,10 +19,10 @@ TUPLE: session-manager responder sessions ;
     >r H{ } clone session-manager construct-boa r>
     construct-delegate ; inline
 
-TUPLE: session id manager namespace alarm ;
+TUPLE: session manager id namespace alarm ;
 
-: <session> ( id manager -- session )
-    H{ } clone <box> \ session construct-boa ;
+: <session> ( manager -- session )
+    f H{ } clone <box> \ session construct-boa ;
 
 : timeout ( -- dt ) 20 minutes ;
 
@@ -30,13 +30,15 @@ TUPLE: session id manager namespace alarm ;
     alarm>> [ cancel-alarm ] if-box? ;
 
 : delete-session ( session -- )
-    dup cancel-timeout
-    dup manager>> sessions>> delete-at ;
+    [ cancel-timeout ]
+    [ dup manager>> sessions>> delete-at ]
+    bi ;
 
-: touch-session ( session -- )
-    dup cancel-timeout
-    dup [ delete-session ] curry timeout later
-    swap session-alarm >box ;
+: touch-session ( session -- session )
+    [ cancel-timeout ]
+    [ [ '[ , delete-session ] timeout later ] keep alarm>> >box ]
+    [ ]
+    tri ;
 
 : session ( -- assoc ) \ session get namespace>> ;
 
@@ -46,20 +48,20 @@ TUPLE: session id manager namespace alarm ;
 
 : schange ( key quot -- ) session swap change-at ; inline
 
+: init-session ( session -- session )
+    dup dup \ session [
+        manager>> responder>> init-session*
+    ] with-variable ;
+
 : new-session ( responder -- id )
-    [ sessions>> generate-key dup ] keep
-    [ <session> dup touch-session ] keep
-    [ swap \ session [ responder>> init-session ] with-variable ] 2keep
-    >r over r> sessions>> set-at ;
+    [ <session> init-session touch-session ]
+    [ [ sessions>> set-at-unique ] [ drop swap >>id ] 2bi ]
+    bi id>> ;
 
-: get-session ( id responder -- session )
-    sessions>> tuck at* [
-        nip dup touch-session
-    ] [
-        2drop f
-    ] if ;
+: get-session ( id responder -- session/f )
+    sessions>> at* [ touch-session ] when ;
 
-: call-responder/session ( request path responder session -- response )
+: call-responder/session ( path responder session -- response )
     \ session set responder>> call-responder ;
 
 : sessions ( -- manager/f )
@@ -71,6 +73,14 @@ M: object session-link* 2drop url-encode ;
 
 : session-link ( url query -- string ) sessions session-link* ;
 
+TUPLE: null-sessions ;
+
+: <null-sessions>
+    null-sessions <session-manager> ;
+
+M: null-sessions call-responder ( path responder -- response )
+    dup <session> call-responder/session ;
+
 TUPLE: url-sessions ;
 
 : <url-sessions> ( responder -- responder' )
@@ -78,18 +88,21 @@ TUPLE: url-sessions ;
 
 : sess-id "factorsessid" ;
 
-M: url-sessions call-responder ( request path responder -- response )
-    pick sess-id query-param over get-session [
+: current-session ( responder request -- session )
+    sess-id query-param swap get-session ;
+
+M: url-sessions call-responder ( path responder -- response )
+    dup request get current-session [
         call-responder/session
     ] [
-        new-session nip sess-id set-query-param
-        dup request-url <temporary-redirect>
+        nip
+        f swap new-session sess-id associate <temporary-redirect>
     ] if* ;
 
 M: url-sessions session-link*
     drop
+    url-encode
     \ session get id>> sess-id associate union assoc>query
-    >r url-encode r>
     dup assoc-empty? [ drop ] [ "?" swap 3append ] if ;
 
 TUPLE: cookie-sessions ;
@@ -97,15 +110,15 @@ TUPLE: cookie-sessions ;
 : <cookie-sessions> ( responder -- responder' )
     cookie-sessions <session-manager> ;
 
-: get-session-cookie ( request responder -- cookie )
-    >r sess-id get-cookie dup
-    [ value>> r> get-session ] [ r> 2drop f ] if ;
+: get-session-cookie ( responder -- cookie )
+    request get sess-id get-cookie
+    [ value>> swap get-session ] [ drop f ] if* ;
 
 : <session-cookie> ( id -- cookie )
     sess-id <cookie> ;
 
-M: cookie-sessions call-responder ( request path responder -- response )
-    3dup nip get-session-cookie [
+M: cookie-sessions call-responder ( path responder -- response )
+    dup get-session-cookie [
         call-responder/session
     ] [
         dup new-session

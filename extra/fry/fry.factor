@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences combinators parser splitting
-quotations arrays namespaces ;
+quotations arrays namespaces qualified ;
+QUALIFIED: namespaces
 IN: fry
 
 : , "Only valid inside a fry" throw ;
@@ -23,6 +24,10 @@ DEFER: (fry)
         unclip {
             { , [ [ curry ] ((fry)) ] }
             { @ [ [ compose ] ((fry)) ] }
+
+            ! to avoid confusion, remove if fry goes core
+            { namespaces:, [ [ curry ] ((fry)) ] }
+
             [ swap >r add r> (fry) ]
         } case
     ] if ;

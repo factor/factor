@@ -8,9 +8,9 @@ TUPLE: foo ;
 
 C: <foo> foo
 
-M: foo init-session drop 0 "x" sset ;
+M: foo init-session* drop 0 "x" sset ;
 
-"1234" f <session> [
+f <session> [
     [ ] [ 3 "x" sset ] unit-test
     
     [ 9 ] [ "x" sget sq ] unit-test

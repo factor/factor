@@ -66,7 +66,7 @@ workspace "tool-switching" f {
     { T{ key-down f { A+ } "1" } com-listener }
     { T{ key-down f { A+ } "2" } com-browser }
     { T{ key-down f { A+ } "3" } com-inspector }
-    { T{ key-down f { A+ } "5" } com-profiler }
+    { T{ key-down f { A+ } "4" } com-profiler }
 } define-command-map
 
 \ workspace-window

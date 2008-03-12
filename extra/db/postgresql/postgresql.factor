@@ -55,7 +55,7 @@ M: postgresql-result-set #columns ( result-set -- n )
     result-set-handle PQnfields ;
 
 M: postgresql-result-set row-column ( result-set column -- obj )
-    >r dup result-set-handle swap result-set-n r> PQgetvalue ;
+    >r dup result-set-handle swap result-set-n r> pq-get-string ;
 
 M: postgresql-result-set row-column-typed ( result-set column -- obj )
     dup pick result-set-out-params nth sql-spec-type
@@ -238,10 +238,13 @@ M: postgresql-db <select-by-slots-statement> ( tuple class -- statement )
 
         " from " 0% 0%
         [ sql-spec-slot-name swap get-slot-named ] with subset
-        " where " 0%
-        [ ", " 0% ]
-        [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
-        ";" 0%
+        dup empty? [
+            drop
+        ] [
+            " where " 0%
+            [ " and " 0% ]
+            [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
+        ] if ";" 0%
     ] postgresql-make ;
 
 M: postgresql-db type-table ( -- hash )
@@ -251,7 +254,12 @@ M: postgresql-db type-table ( -- hash )
         { VARCHAR "varchar" }
         { INTEGER "integer" }
         { DOUBLE "real" }
+        { DATE "date" }
+        { TIME "time" }
+        { DATETIME "timestamp" }
         { TIMESTAMP "timestamp" }
+        { BLOB "bytea" }
+        { FACTOR-BLOB "bytea" }
     } ;
 
 M: postgresql-db create-type-table ( -- hash )

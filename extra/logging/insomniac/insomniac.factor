@@ -6,8 +6,6 @@ io.encodings.utf8 accessors calendar qualified ;
 QUALIFIED: io.sockets
 IN: logging.insomniac
 
-SYMBOL: insomniac-smtp-host
-SYMBOL: insomniac-smtp-port
 SYMBOL: insomniac-sender
 SYMBOL: insomniac-recipients
 
@@ -18,29 +16,20 @@ SYMBOL: insomniac-recipients
         r> 2drop f
     ] if ;
 
-: with-insomniac-smtp ( quot -- )
-    [
-        insomniac-smtp-host get [ smtp-host set ] when*
-        insomniac-smtp-port get [ smtp-port set ] when*
-        call
-    ] with-scope ; inline
-
 : email-subject ( service -- string )
     [
         "[INSOMNIAC] " % % " on " % io.sockets:host-name %
     ] "" make ;
 
 : (email-log-report) ( service word-names -- )
-    [
-        dupd ?analyze-log dup [
-            <email>
-                swap >>body
-                insomniac-recipients get >>to
-                insomniac-sender get >>from
-                swap email-subject >>subject
-            send
-        ] [ 2drop ] if
-    ] with-insomniac-smtp ;
+    dupd ?analyze-log dup [
+        <email>
+            swap >>body
+            insomniac-recipients get >>to
+            insomniac-sender get >>from
+            swap email-subject >>subject
+        send-email
+    ] [ 2drop ] if ;
 
 \ (email-log-report) NOTICE add-error-logging
 

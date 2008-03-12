@@ -1,4 +1,4 @@
-USING: smtp tools.test io.streams.string threads
+USING: smtp tools.test io.streams.string io.sockets threads
 smtp.server kernel sequences namespaces logging accessors
 assocs sorting ;
 IN: smtp.tests
@@ -62,12 +62,11 @@ IN: smtp.tests
     rot from>>
 ] unit-test
 
-[ ] [ [ 4321 smtp-server ] in-thread ] unit-test
+[ ] [ [ 4321 mock-smtp-server ] in-thread ] unit-test
 
 [ ] [
     [
-        "localhost" smtp-host set
-        4321 smtp-port set
+        "localhost" 4321 <inet> smtp-server set
 
         <email>
             "Hi guys\nBye guys" >>body
@@ -77,6 +76,6 @@ IN: smtp.tests
                 "Ed <dharmatech@factorcode.org>"
             } >>to
             "Doug <erg@factorcode.org>" >>from
-        send
+        send-email
     ] with-scope
 ] unit-test

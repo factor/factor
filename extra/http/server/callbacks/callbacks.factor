@@ -3,7 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: html http http.server io kernel math namespaces
 continuations calendar sequences assocs new-slots hashtables
-accessors arrays alarms quotations combinators ;
+accessors arrays alarms quotations combinators
+combinators.cleave fry ;
 IN: http.server.callbacks
 
 SYMBOL: responder
@@ -21,57 +22,45 @@ TUPLE: callback cont quot expires alarm responder ;
 : timeout 20 minutes ;
 
 : timeout-callback ( callback -- )
-    dup alarm>> cancel-alarm
-    dup responder>> callbacks>> delete-at ;
+    [ alarm>> cancel-alarm ]
+    [ dup responder>> callbacks>> delete-at ]
+    bi ;
 
 : touch-callback ( callback -- )
     dup expires>> [
         dup alarm>> [ cancel-alarm ] when*
-        dup [ timeout-callback ] curry timeout later >>alarm
+        dup '[ , timeout-callback ] timeout later >>alarm
     ] when drop ;
 
 : <callback> ( cont quot expires? -- callback )
-    [ f responder get callback construct-boa ] keep
-    [ dup touch-callback ] when ;
+    f callback-responder get callback construct-boa
+    dup touch-callback ;
 
-: invoke-callback ( request exit-cont callback -- response )
-    [ quot>> 3array ] keep cont>> continue-with ;
+: invoke-callback ( callback -- response )
+    [ touch-callback ]
+    [ quot>> request get exit-continuation get 3array ]
+    [ cont>> continue-with ]
+    tri ;
 
 : register-callback ( cont quot expires? -- id )
-    <callback>
-    responder get callbacks>> generate-key
-    [ responder get callbacks>> set-at ] keep ;
+    <callback> callback-responder get callbacks>> set-at-unique ;
 
-SYMBOL: exit-continuation
-
-: exit-with exit-continuation get continue-with ;
-
-: forward-to-url ( url -- * )
+: forward-to-url ( url query -- * )
     #! When executed inside a 'show' call, this will force a
     #! HTTP 302 to occur to instruct the browser to forward to
     #! the request URL.
-    request get swap <temporary-redirect> exit-with ;
+    <temporary-redirect> exit-with ;
 
 : cont-id "factorcontid" ;
-
-: id>url ( id -- url )
-    request get
-    swap cont-id associate >>query
-    request-url ;
 
 : forward-to-id ( id -- * )
     #! When executed inside a 'show' call, this will force a
     #! HTTP 302 to occur to instruct the browser to forward to
     #! the request URL.
-    id>url forward-to-url ;
+    f swap cont-id associate forward-to-url ;
 
 : restore-request ( pair -- )
-    first3 >r exit-continuation set request set r> call ;
-
-: resume-page ( request page responder callback -- * )
-    dup touch-callback
-    >r 2drop exit-continuation get
-    r> invoke-callback ;
+    first3 exit-continuation set request set call ;
 
 SYMBOL: post-refresh-get?
 
@@ -102,34 +91,27 @@ SYMBOL: current-show
     [ restore-request store-current-show ] when* ;
 
 : show-final ( quot -- * )
-    >r redirect-to-here store-current-show
-    r> call exit-with ; inline
+    >r redirect-to-here store-current-show r>
+    call exit-with ; inline
 
-M: callback-responder call-responder
-    [
-        [
-            exit-continuation set
-            dup responder set
-            pick request set
-            pick cont-id query-param over callbacks>> at [
-                resume-page
-            ] [
-                responder>> call-responder
-                "Continuation responder pages must use show-final" throw
-            ] if*
-        ] with-scope
-    ] callcc1 >r 3drop r> ;
+: resuming-callback ( responder request -- id )
+    cont-id query-param swap callbacks>> at ;
+
+M: callback-responder call-responder ( path responder -- response )
+    [ callback-responder set ]
+    [ request get resuming-callback ] bi
+
+    [ invoke-callback ]
+    [ callback-responder get responder>> call-responder ] ?if ;
 
 : show-page ( quot -- )
     >r redirect-to-here store-current-show r>
     [
-        [ ] register-callback
-        with-scope
-        exit-with
+        [ ] t register-callback swap call exit-with
     ] callcc1 restore-request ; inline
 
 : quot-id ( quot -- id )
     current-show get swap t register-callback ;
 
 : quot-url ( quot -- url )
-    quot-id id>url ;
+    quot-id f swap cont-id associate derive-url ;

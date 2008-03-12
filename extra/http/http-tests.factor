@@ -137,10 +137,10 @@ io.encodings.ascii ;
     [
         <dispatcher>
         <action>
-            [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>get
+            [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>display
         "quit" add-responder
         "extra/http/test" resource-path <static> >>default
-        default-host set
+        main-responder set
 
         [ 1237 httpd ] "HTTPD test" spawn drop
     ] with-scope
