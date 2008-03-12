@@ -317,7 +317,7 @@ M: lambda pprint*
     \ | pprint-word
     t <inset
     <block
-    values [ <block >r pprint-word r> pprint* block> ] 2each
+    values [ <block >r pprint-var r> pprint* block> ] 2each
     block>
     \ | pprint-word
     <block pprint-elements block>
@@ -329,7 +329,7 @@ M: let pprint*
     \ ] pprint-word ;
 
 M: wlet pprint*
-    \ [let pprint-word
+    \ [wlet pprint-word
     { wlet-body wlet-vars wlet-bindings } get-slots pprint-let
     \ ] pprint-word ;
 
