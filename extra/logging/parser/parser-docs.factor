@@ -6,7 +6,7 @@ HELP: parse-log
 { $description "Parses a sequence of log entries. Malformed entries are printed out and ignore. The result is a sequence of arrays of the shape " { $snippet "{ timestamp level word-name message }" } ", where"
     { $list
         { { $snippet "timestamp" } " is a " { $link timestamp } }
-        { { $snippet "level" } " is a log level; see " { $link "logger.levels" } }
+        { { $snippet "level" } " is a log level; see " { $link "logging.levels" } }
         { { $snippet "word-name" } " is a string" }
         { { $snippet "message" } " is a string" }
     }

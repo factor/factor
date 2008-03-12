@@ -6,7 +6,7 @@ namespaces kernel io.encodings.binary ;
 QUALIFIED: io.sockets
 IN: concurrency.distributed
 
-SYMBOL: local-node ( -- addrspec )
+SYMBOL: local-node
 
 : handle-node-client ( -- )
     deserialize first2 get-process send ;

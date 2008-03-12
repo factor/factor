@@ -5,7 +5,7 @@ words strings classes tools.browser namespaces io
 io.streams.string prettyprint definitions arrays vectors
 combinators splitting debugger hashtables sorting effects vocabs
 vocabs.loader assocs editors continuations classes.predicate
-macros combinators.lib sequences.lib ;
+macros combinators.lib sequences.lib math ;
 IN: help.lint
 
 : check-example ( element -- )
@@ -27,8 +27,13 @@ IN: help.lint
     ] unless ;
 
 : effect-values ( word -- seq )
-    stack-effect dup effect-in swap effect-out
-    append [ string? ] subset prune natural-sort ;
+    stack-effect dup effect-in swap effect-out append [
+        {
+            { [ dup word? ] [ word-name ] }
+            { [ dup integer? ] [ drop "object" ] }
+            { [ dup string? ] [ ] }
+        } cond
+    ] map prune natural-sort ;
 
 : contains-funky-elements? ( element -- ? )
     {

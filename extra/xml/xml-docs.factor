@@ -170,7 +170,7 @@ HELP: <instruction> ( text -- instruction )
 HELP: names-match?
 { $values { "name1" "a name" } { "name2" "a name" } { "?" "t or f" } }
 { $description "checks to see if the two names match, that is, if all fields are equal, ignoring fields whose value is f in either name." }
-{ $example "USE: xml.data" "T{ name f \"rpc\" \"methodCall\" f } T{ name f f \"methodCall\" \"http://www.xmlrpc.org/\" } names-match? ." "t" }
+{ $example "USING: prettyprint xml.data ;" "T{ name f \"rpc\" \"methodCall\" f } T{ name f f \"methodCall\" \"http://www.xmlrpc.org/\" } names-match? ." "t" }
 { $see-also name } ;
 
 HELP: xml-chunk
