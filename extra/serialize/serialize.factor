@@ -104,7 +104,7 @@ M: ratio (serialize) ( obj -- )
 M: string (serialize) ( obj -- )
     [ CHAR: s serialize-string ] serialize-shared ;
 
-: serialize-elements
+: serialize-elements ( seq -- )
     [ (serialize) ] each CHAR: . write1 ;
 
 M: tuple (serialize) ( obj -- )
