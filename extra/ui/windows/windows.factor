@@ -340,7 +340,7 @@ H{ } clone wm-handlers set-global
 [ 4dup handle-wm-keydown DefWindowProc ] { WM_KEYDOWN WM_SYSKEYDOWN } add-wm-handler
 [ 4dup handle-wm-char DefWindowProc    ] { WM_CHAR WM_SYSCHAR }       add-wm-handler
 [ 4dup handle-wm-keyup DefWindowProc   ] { WM_KEYUP WM_SYSKEYUP }     add-wm-handler
-               
+
 [ handle-wm-syscommand   ] WM_SYSCOMMAND add-wm-handler
 [ handle-wm-set-focus 0  ] WM_SETFOCUS add-wm-handler
 [ handle-wm-kill-focus 0 ] WM_KILLFOCUS add-wm-handler
