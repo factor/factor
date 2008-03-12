@@ -6,7 +6,7 @@ IN: smtp.server
 
 ! Mock SMTP server for testing purposes.
 
-! Usage: 4321 smtp-server
+! Usage: 4321 mock-smtp-server
 ! $ telnet 127.0.0.1 4321
 ! Trying 127.0.0.1...
 ! Connected to localhost.
@@ -61,7 +61,7 @@ SYMBOL: data-mode
           ] }
     } cond nip [ process ] when ;
 
-: smtp-server ( port -- )
+: mock-smtp-server ( port -- )
     "Starting SMTP server on port " write dup . flush
     "127.0.0.1" swap <inet4> ascii <server> [
         accept [

@@ -441,6 +441,9 @@ PRIVATE>
 : memq? ( obj seq -- ? )
     [ eq? ] with contains? ;
 
+: seq-intersect ( seq1 seq2 -- seq1/\seq2 )
+    swap [ member? ] curry subset ;
+
 : remove ( obj seq -- newseq )
     [ = not ] with subset ;
 

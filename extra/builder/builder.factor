@@ -164,7 +164,7 @@ SYMBOL: builder-recipients
     builder-recipients get  >>to
     subject                 >>subject
     "./report" file>string >>body
-  send ;
+  send-email ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

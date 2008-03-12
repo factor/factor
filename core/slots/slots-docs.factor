@@ -68,7 +68,7 @@ HELP: reader-quot
 HELP: slot-reader
 { $class-description "The class of slot reader words." }
 { $examples
-    { $example "USING: classes slots ;" "TUPLE: circle center radius ;" "\\ circle-center slot-reader? ." "t" }
+    { $example "USING: classes prettyprint slots ;" "TUPLE: circle center radius ;" "\\ circle-center slot-reader? ." "t" }
 } ;
 
 HELP: define-reader
@@ -83,7 +83,7 @@ HELP: writer-effect
 HELP: slot-writer
 { $class-description "The class of slot writer words." }
 { $examples
-    { $example "USING: classes slots ;" "TUPLE: circle center radius ;" "\\ set-circle-center slot-writer? ." "t" }
+    { $example "USING: classes prettyprint slots ;" "TUPLE: circle center radius ;" "\\ set-circle-center slot-writer? ." "t" }
 } ;
 
 HELP: define-writer

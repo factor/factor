@@ -43,7 +43,7 @@ HELP: has-gl-extensions?
 { $description "Returns true if the set of " { $snippet "extensions" } " is a subset of the implementation-supported extensions returned by " { $link gl-extensions } "." } ;
 
 HELP: has-gl-version-or-extensions?
-{ $values { "version" "A version string" } { "extensions" "A sequence of extension name strings" } }
+{ $values { "version" "A version string" } { "extensions" "A sequence of extension name strings" } { "?" "a boolean" } }
 { $description "Returns true if either " { $link has-gl-version? } " or " { $link has-gl-extensions? } " returns true for " { $snippet "version" } " or " { $snippet "extensions" } ", respectively. Intended for use when required OpenGL functionality can be verified either by a minimum version or a set of equivalent extensions." } ;
 
 HELP: require-gl-extensions

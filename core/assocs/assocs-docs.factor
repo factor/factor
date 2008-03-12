@@ -162,6 +162,7 @@ HELP: assoc-each
 { $description "Applies a quotation to each entry in the assoc." }
 { $examples
     { $example
+        "USING: assocs kernel math prettyprint ;"
         "H{ { \"bananas\" 5 } { \"apples\" 42 } { \"pears\" 17 } }"
         "0 swap [ nip + ] assoc-each ."
         "64"

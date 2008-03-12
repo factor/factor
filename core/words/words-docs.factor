@@ -197,7 +197,7 @@ HELP: execute ( word -- )
 { $values { "word" word } }
 { $description "Executes a word." }
 { $examples
-    { $example ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
+    { $example "USING: kernel io words ;" ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
 
 HELP: word-props ( word -- props )
@@ -322,7 +322,7 @@ HELP: create
 HELP: constructor-word
 { $values { "name" string } { "vocab" string } { "word" word } }
 { $description "Creates a new word, surrounding " { $snippet "name" } " in angle brackets." }
-{ $examples { $example "\"salmon\" \"scratchpad\" constructor-word ." "<salmon>" } } ;
+{ $examples { $example "USING: prettyprint words ;" "\"salmon\" \"scratchpad\" constructor-word ." "<salmon>" } } ;
 
 HELP: forget-word
 { $values { "word" word } }

@@ -115,11 +115,11 @@ HELP: n>buffer
 { $errors "Throws an error if the buffer does not contain " { $snippet "n" } " bytes of data." } ;
 
 HELP: buffer-peek
-{ $values { "buffer" buffer } { "ch" "a character" } }
+{ $values { "buffer" buffer } { "byte" "a byte" } }
 { $description "Outputs the byte at the buffer position." } ;
 
 HELP: buffer-pop
-{ $values { "buffer" buffer } { "ch" "a character" } }
+{ $values { "buffer" buffer } { "byte" "a byte" } }
 { $description "Outputs the byte at the buffer position and advances the position." } ;
 
 HELP: buffer-until

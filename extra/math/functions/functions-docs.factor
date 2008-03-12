@@ -273,16 +273,16 @@ HELP: mod-inv
 { $description "Outputs an integer " { $snippet "y" } " such that " { $snippet "xy = 1 (mod n)" } "." }
 { $errors "Throws an error if " { $snippet "n" } " is not invertible modulo " { $snippet "n" } "." }
 { $examples
-    { $example "USE: math.functions" "173 1119 mod-inv ." "815" }
-    { $example "USE: math.functions" "173 815 * 1119 mod ." "1" }
+    { $example "USING: math.functions prettyprint ;" "173 1119 mod-inv ." "815" }
+    { $example "USING: math prettyprint ;" "173 815 * 1119 mod ." "1" }
 } ;
 
 HELP: each-bit
 { $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( ? -- )" } } }
 { $description "Applies the quotation to each bit of the integer, starting from the least significant bit, and stopping at the last bit from which point on all bits are either clear (if the integer is positive) or all bits are set (if the integer is negataive)." }
 { $examples
-    { $example "USE: math.functions" "[ BIN: 1101 [ , ] each-bit ] { } make ." "{ t f t t }" }
-    { $example "USE: math.functions" "[ -3 [ , ] each-bit ] { } make ." "{ t f }" }
+    { $example "USING: math.functions namespaces prettyprint ;" "[ BIN: 1101 [ , ] each-bit ] { } make ." "{ t f t t }" }
+    { $example "USING: math.functions namespaces prettyprint ;" "[ -3 [ , ] each-bit ] { } make ." "{ t f }" }
 } ;
 
 HELP: ~

@@ -57,7 +57,7 @@ HELP: generate
 { $description "Generates machine code for " { $snippet "label" } " from " { $snippet "node" } ". The value of " { $snippet "word" } " is retained for debugging purposes; it is the word which will appear in a call stack trace if this compiled code block throws an error when run." } ;
 
 HELP: word-dataflow
-{ $values { "word" word } { "effect" effect } { "dependencies" sequence } { "dataflow" "a dataflow graph" } }
+{ $values { "word" word } { "effect" effect } { "dataflow" "a dataflow graph" } }
 { $description "Outputs the dataflow graph of a word, taking specializers into account (see " { $link "specializers" } ")." } ;
 
 HELP: define-intrinsics

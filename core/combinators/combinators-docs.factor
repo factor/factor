@@ -82,7 +82,7 @@ HELP: with-datastack
 { $values { "stack" sequence } { "quot" quotation } { "newstack" sequence } }
 { $description "Executes the quotation with the given data stack contents, and outputs the new data stack after the word returns. The input sequence is not modified. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
 { $examples
-    { $example "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }
+    { $example "USING: combinators math prettyprint ;" "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }
 } ;
 
 HELP: recursive-hashcode

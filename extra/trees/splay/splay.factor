@@ -6,7 +6,7 @@ IN: trees.splay
 
 TUPLE: splay ;
 
-: <splay> ( -- splay-tree )
+: <splay> ( -- tree )
     \ splay construct-tree ;
 
 INSTANCE: splay tree-mixin
@@ -130,7 +130,7 @@ M: splay delete-at ( key tree -- )
 M: splay new-assoc
     2drop <splay> ;
 
-: >splay ( assoc -- splay-tree )
+: >splay ( assoc -- tree )
     T{ splay T{ tree f f 0 } } assoc-clone-like ;
 
 : SPLAY{

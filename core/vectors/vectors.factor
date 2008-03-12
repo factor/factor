@@ -5,7 +5,7 @@ IN: vectors
 
 <PRIVATE
 
-: array>vector ( byte-array capacity -- byte-vector )
+: array>vector ( array length -- vector )
     vector construct-boa ; inline
 
 PRIVATE>

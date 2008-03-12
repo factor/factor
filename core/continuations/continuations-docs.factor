@@ -150,7 +150,7 @@ HELP: recover
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
 
 HELP: ignore-errors
-{ $values { "try" quotation } }
+{ $values { "quot" quotation } }
 { $description "Calls the quotation. If an exception is thrown in the dynamic extent of the quotation, restores the data stack and returns." } ;
 
 HELP: rethrow
