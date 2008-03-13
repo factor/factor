@@ -38,7 +38,7 @@ SYMBOL: alarm-thread
 
 : call-alarm ( alarm -- )
     dup alarm-entry box> drop
-    dup alarm-quot try
+    dup alarm-quot "Alarm execution" spawn drop
     dup alarm-interval [ reschedule-alarm ] [ drop ] if ;
 
 : (trigger-alarms) ( alarms now -- )
@@ -62,8 +62,7 @@ SYMBOL: alarm-thread
 : alarm-thread-loop ( -- )
     alarms get-global
     dup next-alarm sleep-until
-    dup trigger-alarms
-    alarm-thread-loop ;
+    trigger-alarms ;
 
 : cancel-alarms ( alarms -- )
     [
@@ -72,7 +71,7 @@ SYMBOL: alarm-thread
 
 : init-alarms ( -- )
     alarms global [ cancel-alarms <min-heap> ] change-at
-    [ alarm-thread-loop ] "Alarms" spawn
+    [ alarm-thread-loop t ] "Alarms" spawn-server
     alarm-thread set-global ;
 
 [ init-alarms ] "alarms" add-init-hook

@@ -127,12 +127,22 @@ ARTICLE: "conditionals" "Conditionals and logic"
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
 ARTICLE: "equality" "Equality and comparison testing"
-"There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object, or you can test if two objects are equal in some sense, usually by being instances of the same class, and having equal slot values. Both notions of equality are equality relations in the mathematical sense."
+"There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object (" { $emphasis "identity comparison" } "), or you can test if two objects are equal in a domain-specific sense, usually by being instances of the same class, and having equal slot values (" { $emphasis "value comparison" } "). Both notions of equality are equality relations in the mathematical sense."
+$nl
+"Identity comparison:"
 { $subsection eq? }
+"Value comparison:"
 { $subsection = }
+"Generic words for custom value comparison methods:"
+{ $subsection equal? }
 "Some types of objects also have an intrinsic order allowing sorting using " { $link natural-sort } ":"
 { $subsection <=> }
 { $subsection compare }
+"Utilities for comparing objects:"
+{ $subsection after? }
+{ $subsection before? }
+{ $subsection after=? }
+{ $subsection before=? }
 "An object can be cloned; the clone has distinct identity but equal value:"
 { $subsection clone } ;
 
@@ -225,21 +235,18 @@ HELP: equal?
 { $contract
     "Tests if two objects are equal."
     $nl
-    "Method definitions should ensure that this is an equality relation:"
+    "User code should call " { $link = } " instead; that word first tests the case where the objects are " { $link eq? } ", and so by extension, methods defined on " { $link equal? } " assume they are never called on " { $link eq? } " objects."
+    $nl
+    "Method definitions should ensure that this is an equality relation, modulo the assumption that the two objects are not " { $link eq? } ". That is, for any three non-" { $link eq? } " objects " { $snippet "a" } ", " { $snippet "b" } " and " { $snippet "c" } ", we must have:"
     { $list
-        { $snippet "a = a" }
         { { $snippet "a = b" } " implies " { $snippet "b = a" } }
         { { $snippet "a = b" } " and " { $snippet "b = c" } " implies " { $snippet "a = c" } }
     }
-    "While user code can define methods for this generic word, it should not call it directly, since it does not handle the case where the two references point to the same object."
 }
 { $examples
-    "The most common reason for defining a method for this generic word to ensure that instances of a specific tuple class are only ever equal to themselves, overriding the default implementation which checks slot values for equality."
+    "To define a tuple class such that two instances are only equal if they are both the same instance, we can add a method to " { $link equal? } " which always returns " { $link f } ". Since " { $link = } " handles the case where the two objects are " { $link eq? } ", this method will never be called with two " { $link eq? } " objects, so such a definition is valid:"
     { $code "TUPLE: foo ;" "M: foo equal? 2drop f ;" }
-    "Note that with the above definition, calling " { $link equal? } " directly will give unexpected results:"
-    { $unchecked-example "T{ foo } dup equal? ." "f" }
-    { $unchecked-example "T{ foo } dup clone equal? ." "f" }
-    "As documented above, " { $link = } " should be called instead:"
+    "By calling " { $link = } " on instances of " { $snippet "foo" } " we get the results we expect:"
     { $unchecked-example "T{ foo } dup = ." "t" }
     { $unchecked-example "T{ foo } dup clone = ." "f" }
 } ;

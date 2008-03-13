@@ -1,7 +1,7 @@
 IN: alien.tests
 USING: alien alien.accessors byte-arrays arrays kernel
 kernel.private namespaces tools.test sequences libc math system
-prettyprint ;
+prettyprint layouts ;
 
 [ t ] [ -1 <alien> alien-address 0 > ] unit-test
 

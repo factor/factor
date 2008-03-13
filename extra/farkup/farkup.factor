@@ -42,13 +42,43 @@ MEMO: h2 ( -- parser ) "==" "h2" delimited ;
 MEMO: h3 ( -- parser ) "===" "h3" delimited ;
 MEMO: h4 ( -- parser ) "====" "h4" delimited ;
 
+MEMO: eq ( -- parser )
+    [
+        h1 ensure-not ,
+        h2 ensure-not ,
+        h3 ensure-not ,
+        h4 ensure-not ,
+        "=" token ,
+    ] seq* ;
+
 : render-code ( string mode -- string' )
     >r string-lines r>
     [ [ htmlize-lines ] with-html-stream ] with-string-writer ;
 
+: escape-link ( href text -- href-esc text-esc )
+    >r escape-quoted-string r> escape-string ;
+
 : make-link ( href text -- seq )
-    >r escape-quoted-string r> escape-string
+    escape-link
     [ "<a href=\"" , >r , r> "\">" , [ , ] when* "</a>" , ] { } make ;
+
+: make-image-link ( href alt -- seq )
+    escape-link
+    [
+        "<img src=\"" , swap , "\"" ,
+        dup empty? [ drop ] [ " alt=\"" , , "\"" , ] if
+        "/>" , ]
+    { } make ;
+
+MEMO: image-link ( -- parser )
+    [
+        "[[image:" token hide ,
+        [ "|]" member? not ] satisfy repeat1 [ >string ] action ,
+        "|" token hide
+            [ CHAR: ] = not ] satisfy repeat0 2seq
+            [ first >string ] action optional ,
+        "]]" token hide ,
+    ] seq* [ first2 make-image-link ] action ;
 
 MEMO: simple-link ( -- parser )
     [
@@ -66,7 +96,7 @@ MEMO: labelled-link ( -- parser )
         "]]" token hide ,
     ] seq* [ first2 make-link ] action ;
 
-MEMO: link ( -- parser ) [ simple-link , labelled-link , ] choice* ;
+MEMO: link ( -- parser ) [ image-link , simple-link , labelled-link , ] choice* ;
 
 DEFER: line
 MEMO: list-item ( -- parser )
@@ -92,20 +122,17 @@ MEMO: table ( -- parser )
 MEMO: code ( -- parser )
     [
         "[" token hide ,
-        [ "{" member? not ] satisfy repeat1 optional [ >string ] action ,
+        [ CHAR: { = not ] satisfy repeat1 optional [ >string ] action ,
         "{" token hide ,
-        [
-            [ any-char , "}]" token ensure-not , ] seq*
-            repeat1 [ concat >string ] action ,
-            [ any-char , "}]" token hide , ] seq* optional [ >string ] action ,
-        ] seq* [ concat ] action ,
+        "}]" token ensure-not any-char 2seq repeat0 [ concat >string ] action ,
+        "}]" token hide ,
     ] seq* [ first2 swap render-code ] action ;
 
 MEMO: line ( -- parser )
     [
         text , strong , emphasis , link ,
         superscript , subscript , inline-code ,
-        escaped-char , delimiter ,
+        escaped-char , delimiter , eq ,
     ] choice* repeat1 ;
 
 MEMO: paragraph ( -- parser )

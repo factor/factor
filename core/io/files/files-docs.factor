@@ -44,6 +44,8 @@ ARTICLE: "directories" "Directories"
 { $subsection make-directories } ;
 
 ARTICLE: "fs-meta" "File meta-data"
+{ $subsection file-info }
+{ $subsection link-info }
 { $subsection exists? }
 { $subsection directory? }
 { $subsection file-length }
@@ -113,6 +115,25 @@ HELP: file-name
     { $example "USING: io.files prettyprint ;" "\"/usr/bin/gcc\" file-name ." "\"gcc\"" }
     { $example "USING: io.files prettyprint ;" "\"/usr/libexec/awk/\" file-name ." "\"awk\"" }
 } ;
+
+! need a $class-description file-info
+
+HELP: file-info
+  { $values { "path" "a pathname string" }
+            { "info" "a file-info tuple" } }
+  { $description "Queries the file system for meta data. "
+                 "If path refers to a symbolic link, it is followed."
+                 "If the file does not exist, an exception is thrown." } ;
+! need a see also to link-info
+
+HELP: link-info
+  { $values { "path" "a pathname string" }
+            { "info" "a file-info tuple" } }
+  { $description "Queries the file system for meta data. "
+                 "If path refers to a symbolic link, information about "
+                 "the symbolic link itself is returned."
+                 "If the file does not exist, an exception is thrown." } ;
+! need a see also to file-info
 
 HELP: <file-reader>
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" { "stream" "an input stream" } }

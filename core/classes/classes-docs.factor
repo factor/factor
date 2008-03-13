@@ -7,11 +7,6 @@ IN: classes
 ARTICLE: "builtin-classes" "Built-in classes"
 "Every object is an instance of exactly one canonical " { $emphasis "built-in class" } " which defines its layout in memory and basic behavior."
 $nl
-"Corresponding to every built-in class is a built-in type number. An object can be asked for its built-in type number:"
-{ $subsection type }
-"Built-in type numbers can be converted to classes, and vice versa:"
-{ $subsection type>class }
-{ $subsection type-number }
 "The set of built-in classes is a class:"
 { $subsection builtin-class }
 { $subsection builtin-class? }

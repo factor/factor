@@ -148,7 +148,7 @@ SYMBOL: ui-thread
     \ ui-running get-global ;
 
 : update-ui-loop ( -- )
-    ui-running? ui-thread get-global self eq? [
+    ui-running? ui-thread get-global self eq? and [
         ui-notify-flag get lower-flag
         [ update-ui ] ui-try
         update-ui-loop
