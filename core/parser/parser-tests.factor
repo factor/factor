@@ -430,3 +430,20 @@ IN: parser.tests
 [ "resource:core/parser/test/assert-depth.factor" run-file ]
 [ relative-overflow-stack { 1 2 3 } sequence= ]
 must-fail-with
+
+2 [
+    [ ] [
+        "IN: parser.tests DEFER: d-f-s d-f-s SYMBOL: d-f-s d-f-s"
+        <string-reader> "d-f-s-test" parse-stream drop
+    ] unit-test
+
+    [ ] [
+        "IN: parser.tests DEFER: d-f-s d-f-s FORGET: d-f-s SYMBOL: d-f-s d-f-s"
+        <string-reader> "d-f-s-test" parse-stream drop
+    ] unit-test
+
+    [ ] [
+        "IN: parser.tests DEFER: d-f-s d-f-s SYMBOL: d-f-s d-f-s"
+        <string-reader> "d-f-s-test" parse-stream drop
+    ] unit-test
+] times
