@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel vocabs vocabs.loader tools.time tools.browser
+USING: kernel vocabs vocabs.loader tools.time tools.vocabs
 arrays assocs io.styles io help.markup prettyprint sequences
 continuations debugger ;
 IN: benchmark

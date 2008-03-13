@@ -23,9 +23,6 @@ $nl
 "Application vocabularies can define a main entry point, giving the user a convenient way to run the application:"
 { $subsection POSTPONE: MAIN: }
 { $subsection run }
-"Reloading source files changed on disk:"
-{ $subsection refresh }
-{ $subsection refresh-all }
 { $see-also "vocabularies" "parser-files" "source-files" } ;
 
 ABOUT: "vocabs.loader"
@@ -80,7 +77,7 @@ HELP: reload
 HELP: require
 { $values { "vocab" "a vocabulary specifier" } }
 { $description "Loads a vocabulary if it has not already been loaded." }
-{ $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files, use " { $link refresh } " or " { $link refresh-all } "." } ;
+{ $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files only, use the words in " { $link "tools.vocabs" } "." } ;
 
 HELP: run
 { $values { "vocab" "a vocabulary specifier" } }
@@ -93,12 +90,3 @@ HELP: vocab-source-path
 HELP: vocab-docs-path
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string or " { $link f } } }
 { $description "Outputs a pathname where the documentation for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
-
-HELP: refresh
-{ $values { "prefix" string } }
-{ $description "Reloads source files and documentation belonging to loaded vocabularies whose names are prefixed by " { $snippet "prefix" } " which have been modified on disk." } ;
-
-HELP: refresh-all
-{ $description "Reloads source files and documentation for all loaded vocabularies which have been modified on disk." } ;
-
-{ refresh refresh-all } related-words
