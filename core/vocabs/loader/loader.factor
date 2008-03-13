@@ -48,27 +48,6 @@ M: string vocab-root
 M: vocab-link vocab-root
     vocab-link-root ;
 
-: vocab-tests ( vocab -- tests )
-    dup vocab-root [
-        [
-            f >vocab-link dup
-
-            dup "-tests.factor" vocab-dir+ vocab-path+
-            dup resource-exists? [ , ] [ drop ] if
-
-            dup vocab-dir "tests" path+ vocab-path+ dup
-            ?resource-path directory keys [ ".factor" tail? ] subset
-            [ path+ , ] with each
-        ] { } make
-    ] [ drop f ] if ;
-
-: vocab-files ( vocab -- seq )
-    f >vocab-link [
-        dup vocab-source-path [ , ] when*
-        dup vocab-docs-path [ , ] when*
-        vocab-tests %
-    ] { } make ;
-
 SYMBOL: load-help?
 
 : source-was-loaded t swap set-vocab-source-loaded? ;

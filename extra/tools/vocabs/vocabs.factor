@@ -3,8 +3,44 @@
 USING: io.files kernel io.encodings.utf8 vocabs.loader vocabs
 sequences namespaces math.parser arrays hashtables assocs
 memoize inspector sorting splitting combinators source-files
-io debugger continuations compiler.errors init ;
+io debugger continuations compiler.errors init io.crc32 ;
 IN: tools.vocabs
+
+: vocab-tests-file, ( vocab -- )
+    dup "-tests.factor" vocab-dir+ vocab-path+
+    dup resource-exists? [ , ] [ drop ] if ;
+
+: vocab-tests-dir, ( vocab -- )
+    dup vocab-dir "tests" path+ vocab-path+
+    dup resource-exists? [
+        dup ?resource-path directory keys
+        [ ".factor" tail? ] subset
+        [ path+ , ] with each
+    ] [ drop ] if ;
+
+: vocab-tests ( vocab -- tests )
+    dup vocab-root [
+        [
+            f >vocab-link dup
+            vocab-tests-file,
+            vocab-tests-dir,
+        ] { } make
+    ] [ drop f ] if ;
+
+: vocab-files ( vocab -- seq )
+    f >vocab-link [
+        dup vocab-source-path [ , ] when*
+        dup vocab-docs-path [ , ] when*
+        vocab-tests %
+    ] { } make ;
+
+: source-modified? ( path -- ? )
+    dup source-files get at [
+        dup source-file-path ?resource-path utf8 file-lines lines-crc32
+        swap source-file-checksum = not
+    ] [
+        resource-exists?
+    ] ?if ;
 
 : modified ( seq quot -- seq )
     [ dup ] swap compose { } map>assoc

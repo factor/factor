@@ -9,10 +9,7 @@ $nl
 { $subsection source-files }
 "The class of source files:"
 { $subsection source-file }
-"Testing if a source file has been changed on disk:"
-{ $subsection source-modified? }
 "Words intended for the parser:"
-{ $subsection record-modified }
 { $subsection record-checksum }
 { $subsection record-form }
 { $subsection xref-source }
@@ -40,15 +37,6 @@ HELP: source-file
         { { $link source-file-definitions } " - a pair of assocs, containing definitions and classes defined in this source file, respectively" }
     }
 } ;
-
-HELP: source-modified?
-{ $values { "path" "a pathname string" } { "?" "a boolean" } }
-{ $description "Tests if the source file has been modified since it was last loaded. This compares the file's modification time and CRC32 checksum of the file's contents against previously-recorded values." } ;
-
-HELP: record-modified
-{ $values { "source-file" source-file } }
-{ $description "Records the modification time of the source file." } 
-$low-level-note ;
 
 HELP: record-checksum
 { $values { "source-file" source-file } { "lines" "a sequence of strings" } }

@@ -484,7 +484,6 @@ SYMBOL: interactive-vocabs
 : finish-parsing ( lines quot -- )
     file get
     [ record-form ] keep
-    [ record-modified ] keep
     [ record-definitions ] keep
     record-checksum ;
 

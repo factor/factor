@@ -25,6 +25,10 @@ ARTICLE: "tools.vocabs" "Vocabulary tools"
 
 ABOUT: "tools.vocabs"
 
+HELP: source-modified?
+{ $values { "path" "a pathname string" } { "?" "a boolean" } }
+{ $description "Tests if the source file has been modified since it was last loaded. This compares the file's CRC32 checksum of the file's contents against the previously-recorded value." } ;
+
 HELP: refresh
 { $values { "prefix" string } }
 { $description "Reloads source files and documentation belonging to loaded vocabularies whose names are prefixed by " { $snippet "prefix" } " which have been modified on disk." } ;
