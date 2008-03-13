@@ -30,9 +30,11 @@ SYMBOL: person3
 SYMBOL: person4
 
 : test-tuples ( -- )
-    [ person drop-table ] [ drop ] recover
+    [ ] [ person ensure-table ] unit-test
+    [ ] [ person drop-table ] unit-test
     [ ] [ person create-table ] unit-test
     [ person create-table ] must-fail
+    [ ] [ person ensure-table ] unit-test
     
     [ ] [ person1 get insert-tuple ] unit-test
 
@@ -191,8 +193,8 @@ TUPLE: annotation n paste-id summary author mode contents ;
 [ native-person-schema test-tuples ] test-sqlite
 [ assigned-person-schema test-tuples ] test-sqlite
 
-[ native-person-schema test-tuples ] test-postgresql
-[ assigned-person-schema test-tuples ] test-postgresql
+! [ native-person-schema test-tuples ] test-postgresql
+! [ assigned-person-schema test-tuples ] test-postgresql
 
 TUPLE: serialize-me id data ;
 
@@ -211,7 +213,7 @@ TUPLE: serialize-me id data ;
     ] [ T{ serialize-me f 1 } select-tuples ] unit-test ;
 
 [ test-serialize ] test-sqlite
-[ test-serialize ] test-postgresql
+! [ test-serialize ] test-postgresql
 
 TUPLE: exam id name score ; 
 

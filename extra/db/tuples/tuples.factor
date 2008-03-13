@@ -3,7 +3,8 @@
 USING: arrays assocs classes db kernel namespaces
 tuples words sequences slots math
 math.parser io prettyprint db.types continuations
-mirrors sequences.lib tools.walker combinators.lib ;
+mirrors sequences.lib tools.walker combinators.lib
+combinators.cleave ;
 IN: db.tuples
 
 : define-persistent ( class table columns -- )
@@ -72,6 +73,9 @@ HOOK: insert-tuple* db ( tuple statement -- )
 
 : drop-table ( class -- )
     drop-sql-statement [ execute-statement ] with-disposals ;
+
+: ensure-table ( class -- )
+    [ dup drop-table ] ignore-errors create-table ;
 
 : insert-native ( tuple -- )
     dup class
