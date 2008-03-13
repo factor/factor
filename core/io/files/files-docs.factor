@@ -141,7 +141,7 @@ HELP: file-info
                               { $link +symbolic-link+ } } } }
 
            { "size"     "Size of the file in bytes" }
-           { "modified" { "Last modification " { $link timestamp } } } }
+           { "modified" "Last modification timestamp." } }
 
   ;
 
@@ -249,10 +249,6 @@ HELP: directory*
 { $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ path dir? }" } " pairs" } }
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
 { $notes "Unlike " { $link directory } ", this word prepends the directory's path to all file names in the list." } ;
-
-! HELP: file-length
-! { $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
-! { $description "Outputs the length of the file in bytes, or " { $link f } " if it does not exist." } ;
 
 HELP: file-modified
 { $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
