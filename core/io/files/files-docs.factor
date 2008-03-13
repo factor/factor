@@ -55,7 +55,7 @@ ARTICLE: "fs-meta" "File meta-data"
 { $subsection link-info }
 { $subsection exists? }
 { $subsection directory? }
-{ $subsection file-modified }
+! { $subsection file-modified }
 { $subsection stat } ;
 
 ARTICLE: "delete-move-copy" "Deleting, moving, copying files"
@@ -222,7 +222,7 @@ HELP: stat ( path -- directory? permissions length modified )
     "Queries the file system for file meta data. If the file does not exist, outputs " { $link f } " for all four values."
 } ;
 
-{ stat exists? directory? file-modified } related-words
+{ stat exists? directory? } related-words
 
 HELP: path+
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
@@ -250,9 +250,9 @@ HELP: directory*
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
 { $notes "Unlike " { $link directory } ", this word prepends the directory's path to all file names in the list." } ;
 
-HELP: file-modified
-{ $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
-{ $description "Outputs a file's last modification time, since midnight January 1, 1970. If the file does not exist, outputs " { $link f } "." } ;
+! HELP: file-modified
+! { $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
+! { $description "Outputs a file's last modification time, since midnight January 1, 1970. If the file does not exist, outputs " { $link f } "." } ;
 
 HELP: resource-path
 { $values { "path" "a pathname string" } { "newpath" "a pathname string" } }

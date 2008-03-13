@@ -219,6 +219,9 @@ M: pathname <=> [ pathname-string ] compare ;
 : with-file-reader ( path encoding quot -- )
     >r <file-reader> r> with-stream ; inline
 
+! : file-contents ( path encoding -- str )
+!     dupd [ file-info file-info-size read ] with-file-reader ;
+
 : file-contents ( path encoding -- str )
     dupd [ file-length read ] with-file-reader ;
 
