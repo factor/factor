@@ -102,17 +102,10 @@ IN: db.sqlite.lib
         [ no-sql-type ]
     } case ;
 
-: sqlite-finalize ( handle -- )
-    sqlite3_finalize sqlite-check-result ;
-
-: sqlite-reset ( handle -- )
-    sqlite3_reset sqlite-check-result ;
-
-: sqlite-#columns ( query -- int )
-    sqlite3_column_count ;
-
-: sqlite-column ( handle index -- string )
-    sqlite3_column_text ;
+: sqlite-finalize ( handle -- ) sqlite3_finalize sqlite-check-result ;
+: sqlite-reset ( handle -- ) sqlite3_reset sqlite-check-result ;
+: sqlite-#columns ( query -- int ) sqlite3_column_count ;
+: sqlite-column ( handle index -- string ) sqlite3_column_text ;
 
 : sqlite-column-blob ( handle index -- byte-array/f )
     [ sqlite3_column_bytes ] 2keep

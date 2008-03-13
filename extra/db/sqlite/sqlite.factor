@@ -17,16 +17,11 @@ M: sqlite-db db-open ( db -- )
     dup sqlite-db-path sqlite-open <db>
     swap set-delegate ;
 
-M: sqlite-db db-close ( handle -- )
-    sqlite-close ;
-
+M: sqlite-db db-close ( handle -- ) sqlite-close ;
 M: sqlite-db dispose ( db -- ) dispose-db ;
-
-: with-sqlite ( path quot -- )
-    sqlite-db swap with-db ; inline
+: with-sqlite ( path quot -- ) sqlite-db swap with-db ; inline
 
 TUPLE: sqlite-statement ;
-
 TUPLE: sqlite-result-set has-more? ;
 
 M: sqlite-db <simple-statement> ( str in out -- obj )
@@ -51,8 +46,7 @@ M: sqlite-result-set dispose ( result-set -- )
 : sqlite-bind ( triples handle -- )
     swap [ first3 sqlite-bind-type ] with each ;
 
-: reset-statement ( statement -- )
-    statement-handle sqlite-reset ;
+: reset-statement ( statement -- ) statement-handle sqlite-reset ;
 
 M: sqlite-statement bind-statement* ( statement -- )
     dup statement-bound? [ dup reset-statement ] when
@@ -98,14 +92,9 @@ M: sqlite-statement query-results ( query -- result-set )
     dup statement-handle sqlite-result-set <result-set>
     dup advance-row ;
 
-M: sqlite-db begin-transaction ( -- )
-    "BEGIN" sql-command ;
-
-M: sqlite-db commit-transaction ( -- )
-    "COMMIT" sql-command ;
-
-M: sqlite-db rollback-transaction ( -- )
-    "ROLLBACK" sql-command ;
+M: sqlite-db begin-transaction ( -- ) "BEGIN" sql-command ;
+M: sqlite-db commit-transaction ( -- ) "COMMIT" sql-command ;
+M: sqlite-db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
 
 : sqlite-make ( class quot -- )
     >r sql-props r>
@@ -123,9 +112,7 @@ M: sqlite-db create-sql-statement ( class -- statement )
     ] sqlite-make ;
 
 M: sqlite-db drop-sql-statement ( class -- statement )
-    [
-        "drop table " 0% 0% ";" 0% drop
-    ] sqlite-make ;
+    [ "drop table " 0% 0% ";" 0% drop ] sqlite-make ;
 
 M: sqlite-db <insert-native-statement> ( tuple -- statement )
     [
@@ -195,10 +182,9 @@ M: sqlite-db modifier-table ( -- hashtable )
         { +not-null+ "not null" }
     } ;
 
-M: sqlite-db compound-modifier ( str obj -- newstr )
-    compound-type ;
+M: sqlite-db compound-modifier ( str obj -- str' ) compound-type ;
 
-M: sqlite-db compound-type ( str seq -- newstr )
+M: sqlite-db compound-type ( str seq -- str' )
     over {
         { "default" [ first number>string join-space ] }
         [ 2drop ] !  "no sqlite compound data type" 3array throw ]
@@ -219,5 +205,4 @@ M: sqlite-db type-table ( -- assoc )
         { FACTOR-BLOB "blob" }
     } ;
 
-M: sqlite-db create-type-table
-    type-table ;
+M: sqlite-db create-type-table ( symbol -- str ) type-table ;
