@@ -9,7 +9,7 @@ HELP: add-alarm
 { $description "Creates and registers an alarm. If " { $snippet "frequency" } " is " { $link f } ", this will be a one-time alarm, otherwise it will fire with the given frequency. The quotation will be called from the alarm thread." } ;
 
 HELP: later
-{ $values { "quot" quotation } { "time" duration } { "alarm" alarm } }
+{ $values { "quot" quotation } { "dt" duration } { "alarm" alarm } }
 { $description "Creates and registers an alarm which calls the quotation once at " { $snippet "time" } { $link from-now } "." } ;
 
 HELP: cancel-alarm

@@ -119,7 +119,8 @@ SYMBOL: drag-timer
 
 : stop-drag-timer ( -- )
     hand-buttons get-global empty? [
-        drag-timer get-global box> cancel-alarm
+        drag-timer get-global ?box
+        [ cancel-alarm ] [ drop ] if
     ] when ;
 
 : fire-motion ( -- )

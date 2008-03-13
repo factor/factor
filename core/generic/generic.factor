@@ -74,7 +74,7 @@ M: method-body stack-effect
         "method-def" set
     ] H{ } make-assoc ;
 
-: <method> ( quot class generic -- word )
+: <method> ( quot class generic -- method )
     check-method
     [ make-method-def ] 3keep
     [ method-word-props ] 2keep

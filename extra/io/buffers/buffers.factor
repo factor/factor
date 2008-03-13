@@ -31,10 +31,10 @@ TUPLE: buffer size ptr fill pos ;
 : buffer-end ( buffer -- alien )
     dup buffer-fill swap buffer-ptr <displaced-alien> ;
 
-: buffer-peek ( buffer -- ch )
+: buffer-peek ( buffer -- byte )
     buffer@ 0 alien-unsigned-1 ;
 
-: buffer-pop ( buffer -- ch )
+: buffer-pop ( buffer -- byte )
     dup buffer-peek 1 rot buffer-consume ;
 
 : (buffer>) ( n buffer -- byte-array )
@@ -90,7 +90,7 @@ HINTS: search-buffer-until { fixnum fixnum simple-alien string } ;
     [ buffer-end byte-array>memory ] 2keep
     [ buffer-fill swap length + ] keep set-buffer-fill ;
 
-: byte>buffer ( ch buffer -- )
+: byte>buffer ( byte buffer -- )
     1 over check-overflow
     [ buffer-end 0 set-alien-unsigned-1 ] keep
     [ buffer-fill 1+ ] keep set-buffer-fill ;

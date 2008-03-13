@@ -8,7 +8,7 @@ namespaces parser prettyprint quotations tools.annotations
 editors tools.profiler tools.test tools.time tools.walker
 ui.commands ui.gadgets.editors ui.gestures ui.operations
 ui.tools.deploy vocabs vocabs.loader words sequences
-tools.browser classes compiler.units ;
+tools.vocabs classes compiler.units ;
 IN: ui.tools.operations
 
 V{ } clone operations set-global
@@ -84,11 +84,7 @@ UNION: definition word method-spec link vocab vocab-link ;
     { +secondary+ t }
 } define-operation
 
-[
-    class
-    { link word vocab vocab-link vocab-tag vocab-author }
-    memq?
-] \ com-follow H{
+[ topic? ] \ com-follow H{
     { +keyboard+ T{ key-down f { C+ } "H" } }
     { +primary+ t }
 } define-operation

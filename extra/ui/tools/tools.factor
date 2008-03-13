@@ -8,7 +8,8 @@ prettyprint quotations sequences ui ui.commands ui.gadgets
 ui.gadgets.books ui.gadgets.buttons ui.gadgets.labelled
 ui.gadgets.scrollers ui.gadgets.tracks ui.gadgets.worlds
 ui.gadgets.presentations ui.gestures words vocabs.loader
-tools.test ui.gadgets.buttons ui.gadgets.status-bar mirrors ;
+tools.test tools.vocabs ui.gadgets.buttons ui.gadgets.status-bar
+mirrors ;
 IN: ui.tools
 
 : <workspace-tabs> ( -- tabs )
@@ -66,7 +67,7 @@ workspace "tool-switching" f {
     { T{ key-down f { A+ } "1" } com-listener }
     { T{ key-down f { A+ } "2" } com-browser }
     { T{ key-down f { A+ } "3" } com-inspector }
-    { T{ key-down f { A+ } "5" } com-profiler }
+    { T{ key-down f { A+ } "4" } com-profiler }
 } define-command-map
 
 \ workspace-window

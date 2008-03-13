@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs io.files combinators
 arrays io.launcher io http.server.static http.server
-http accessors sequences strings math.parser ;
+http accessors sequences strings math.parser fry ;
 IN: http.server.cgi
 
 : post? request get method>> "POST" = ;
@@ -45,19 +45,17 @@ IN: http.server.cgi
     <process>
         over 1array >>command
         swap cgi-variables >>environment ;
-    
+
 : serve-cgi ( name -- response )
     <raw-response>
     200 >>code
     "CGI output follows" >>message
-    swap [
-        stdio get swap <cgi-process> <process-stream> [
-            post? [
-                request get post-data>> write flush
-            ] when
+    swap '[
+        , stdio get swap <cgi-process> <process-stream> [
+            post? [ request get post-data>> write flush ] when
             stdio get swap (stream-copy)
         ] with-stream
-    ] curry >>body ;
+    ] >>body ;
 
 : enable-cgi ( responder -- responder )
     [ serve-cgi ] "application/x-cgi-script"

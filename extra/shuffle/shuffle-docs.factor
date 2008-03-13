@@ -11,7 +11,7 @@ HELP: npick
 "placed on the top of the stack."
 }
 { $examples
-  { $example "USE: shuffle" "1 2 3 4 4 npick .s" "1\n2\n3\n4\n1" }
+  { $example "USING: prettyprint shuffle ;" "1 2 3 4 4 npick .s" "1\n2\n3\n4\n1" }
 }
 { $see-also dup over pick } ;
 
@@ -23,7 +23,7 @@ HELP: ndup
 "placed on the top of the stack."
 }
 { $examples
-  { $example "USE: shuffle" "1 2 3 4 4 ndup .s" "1\n2\n3\n4\n1\n2\n3\n4" }
+  { $example "USING: prettyprint shuffle ;" "1 2 3 4 4 ndup .s" "1\n2\n3\n4\n1\n2\n3\n4" }
 }
 { $see-also dup 2dup 3dup } ;
 
@@ -34,7 +34,7 @@ HELP: nnip
 "for any number of items."
 }
 { $examples
-  { $example "USE: shuffle" "1 2 3 4 3 nnip .s" "4" }
+  { $example "USING: prettyprint shuffle ;" "1 2 3 4 3 nnip .s" "4" }
 }
 { $see-also nip 2nip } ;
 
@@ -45,7 +45,7 @@ HELP: ndrop
 "for any number of items."
 }
 { $examples
-  { $example "USE: shuffle" "1 2 3 4 3 ndrop .s" "1" }
+  { $example "USING: prettyprint shuffle ;" "1 2 3 4 3 ndrop .s" "1" }
 }
 { $see-also drop 2drop 3drop } ;
 
@@ -55,7 +55,7 @@ HELP: nrot
 "number of items on the stack. "
 }
 { $examples
-  { $example "USE: shuffle" "1 2 3 4 4 nrot .s" "2\n3\n4\n1" }
+  { $example "USING: prettyprint shuffle ;" "1 2 3 4 4 nrot .s" "2\n3\n4\n1" }
 }
 { $see-also rot -nrot } ;
 
@@ -65,7 +65,7 @@ HELP: -nrot
 "number of items on the stack. "
 }
 { $examples
-  { $example "USE: shuffle" "1 2 3 4 4 -nrot .s" "4\n1\n2\n3" }
+  { $example "USING: prettyprint shuffle ;" "1 2 3 4 4 -nrot .s" "4\n1\n2\n3" }
 }
 { $see-also rot nrot } ;
 

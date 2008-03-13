@@ -38,7 +38,7 @@ M: object stream-read-quot
 M: duplex-stream stream-read-quot
     duplex-stream-in stream-read-quot ;
 
-: read-quot ( -- quot ) stdio get stream-read-quot ;
+: read-quot ( -- quot/f ) stdio get stream-read-quot ;
 
 : bye ( -- ) quit-flag on ;
 

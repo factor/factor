@@ -7,10 +7,8 @@ IN: combinators.cleave
 ! The cleaver family
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: bi ( obj quot quot -- val val ) >r keep r> call ; inline
-
-: tri ( obj quot quot quot -- val val val )
-  >r pick >r bi r> r> call ; inline
+: bi  ( x p q   -- p(x) q(x)      ) >r keep r> call          ; inline
+: tri ( x p q r -- p(x) q(x) r(x) ) >r pick >r bi r> r> call ; inline
 
 : tetra ( obj quot quot quot quot -- val val val val )
   >r >r pick >r bi r> r> r> bi ; inline
@@ -18,6 +16,9 @@ IN: combinators.cleave
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : 2bi ( obj obj quot quot -- val val ) >r 2keep r> call ; inline
+
+: 2tri ( obj obj quot quot quot -- val val val )
+  >r >r 2keep r> 2keep r> call ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -39,9 +40,9 @@ MACRO: cleave ( seq -- )
 ! The spread family
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: bi* ( obj obj quot quot -- val val ) >r swap slip r> call ; inline
+: bi* ( x y p q -- p(x) q(y) ) >r swap slip r> call ; inline
 
-: tri* ( obj obj obj quot quot quot -- val val val )
+: tri* ( x y z p q r -- p(x) q(y) r(z) )
   >r rot >r bi* r> r> call ; inline
 
 : tetra* ( obj obj obj obj quot quot quot quot -- val val val val )

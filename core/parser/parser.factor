@@ -240,13 +240,13 @@ PREDICATE: unexpected unexpected-eof
 
 : CREATE ( -- word ) scan create-in ;
 
-: create-class ( word vocab -- word )
-    create
+: create-class-in ( word -- word )
+    in get create
     dup save-class-location
     dup predicate-word dup set-word save-location ;
 
 : CREATE-CLASS ( -- word )
-    scan in get create-class ;
+    scan create-class-in ;
 
 : word-restarts ( possibilities -- restarts )
     natural-sort [
@@ -416,6 +416,7 @@ SYMBOL: interactive-vocabs
     "tools.test"
     "tools.threads"
     "tools.time"
+    "tools.vocabs"
     "vocabs"
     "vocabs.loader"
     "words"
@@ -483,7 +484,6 @@ SYMBOL: interactive-vocabs
 : finish-parsing ( lines quot -- )
     file get
     [ record-form ] keep
-    [ record-modified ] keep
     [ record-definitions ] keep
     record-checksum ;
 

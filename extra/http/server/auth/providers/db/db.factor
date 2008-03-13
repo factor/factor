@@ -1,53 +1,45 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: db db.tuples db.types new-slots accessors
-http.server.auth.providers kernel ;
+http.server.auth.providers kernel continuations ;
 IN: http.server.auth.providers.db
-
-TUPLE: user name password ;
-
-: <user> user construct-empty ;
 
 user "USERS"
 {
-    { "name" "NAME" { VARCHAR 256 } +assigned-id+ }
+    { "username" "USERNAME" { VARCHAR 256 } +assigned-id+ }
+    { "realname" "REALNAME" { VARCHAR 256 } }
     { "password" "PASSWORD" { VARCHAR 256 } +not-null+ }
+    { "email" "EMAIL" { VARCHAR 256 } }
+    { "ticket" "TICKET" { VARCHAR 256 } }
+    { "profile" "PROFILE" FACTOR-BLOB }
 } define-persistent
 
 : init-users-table ( -- )
+    [ user drop-table ] ignore-errors
     user create-table ;
 
-TUPLE: db-auth-provider ;
+TUPLE: from-db ;
 
-: db-auth-provider T{ db-auth-provider } ;
+: from-db T{ from-db } ;
 
-M: db-auth-provider check-login
-    drop
+: find-user ( username -- user )
     <user>
-    swap >>name
-    swap >>password
-    select-tuple >boolean ;
+        swap >>username
+    select-tuple ;
 
-M: db-auth-provider new-user
+M: from-db get-user
+    drop
+    find-user ;
+
+M: from-db new-user
     drop
     [
-        <user>
-        swap >>name
-
-        dup select-tuple [ name>> user-exists ] when
-
-        "unassigned" >>password
-
-        insert-tuple
+        dup username>> find-user [
+            drop f
+        ] [
+            dup insert-tuple
+        ] if
     ] with-transaction ;
 
-M: db-auth-provider set-password
-    drop
-    [
-        <user>
-        swap >>name
-
-        dup select-tuple [ ] [ no-such-user ] ?if
-
-        swap >>password update-tuple
-    ] with-transaction ;
+M: from-db update-user
+    drop update-tuple ;

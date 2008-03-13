@@ -3,12 +3,14 @@
 USING: http.server.auth.providers kernel ;
 IN: http.server.auth.providers.null
 
-TUPLE: null-auth-provider ;
+! Named "no" because we can say  no >>users
 
-: null-auth-provider T{ null-auth-provider } ;
+TUPLE: no ;
 
-M: null-auth-provider check-login 3drop f ;
+: no T{ no } ;
 
-M: null-auth-provider new-user 3drop f ;
+M: no get-user 2drop f ;
 
-M: null-auth-provider set-password 3drop f ;
+M: no new-user 2drop f ;
+
+M: no update-user 2drop ;

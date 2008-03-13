@@ -116,6 +116,7 @@ ARTICLE: "objects" "Objects"
 { $subsection "classes" }
 { $subsection "tuples" }
 { $subsection "generic" }
+{ $subsection "slots" }
 { $subsection "mirrors" } ;
 
 USE: random
@@ -195,6 +196,7 @@ ARTICLE: "io" "Input and output"
 { $subsection "io.timeouts" } ;
 
 ARTICLE: "tools" "Developer tools"
+{ $subsection "tools.vocabs" }
 "Exploratory tools:"
 { $subsection "editor" }
 { $subsection "tools.crossref" }
@@ -235,7 +237,7 @@ ARTICLE: "program-org" "Program organization"
 USING: help.cookbook help.tutorial ;
 
 ARTICLE: "handbook" "Factor documentation"
-"Welcome to Factor. Factor is dynamically-typed, stack-based, and very expressive. It is one of the most powerful and flexible programming languages ever invented. Have fun with Factor!"
+"Welcome to Factor."
 { $heading "Starting points" }
 { $subsection "cookbook" }
 { $subsection "first-program" }
@@ -261,6 +263,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "help" }
 { $subsection "inference" }
 { $subsection "compiler" }
+{ $subsection "layouts" }
 { $heading "User interface" }
 { $about "ui" }
 { $about "ui.tools" }

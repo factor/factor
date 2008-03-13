@@ -32,14 +32,17 @@ SYMBOL: walking-thread
 
 \ break t "break?" set-word-prop
 
+: walk ( quot -- quot' )
+    \ break add* [ break rethrow ] recover ;
+
 : add-breakpoint ( quot -- quot' )
     dup [ break ] head? [ \ break add* ] unless ;
 
-: walk ( quot -- ) add-breakpoint call ;
+: (step-into-quot) ( quot -- ) add-breakpoint call ;
 
-: (step-into-if) ? walk ;
+: (step-into-if) ? (step-into-quot) ;
 
-: (step-into-dispatch) nth walk ;
+: (step-into-dispatch) nth (step-into-quot) ;
 
 : (step-into-execute) ( word -- )
     dup "step-into" word-prop [
@@ -48,7 +51,7 @@ SYMBOL: walking-thread
         dup primitive? [
             execute break
         ] [
-            word-def walk
+            word-def (step-into-quot)
         ] if
     ] ?if ;
 
@@ -104,8 +107,8 @@ SYMBOL: +detached+
     [ nip \ break add ] change-frame ;
 
 {
-    { call [ walk ] }
-    { (throw) [ drop walk ] }
+    { call [ (step-into-quot) ] }
+    { (throw) [ drop (step-into-quot) ] }
     { execute [ (step-into-execute) ] }
     { if [ (step-into-if) ] }
     { dispatch [ (step-into-dispatch) ] }

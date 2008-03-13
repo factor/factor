@@ -266,11 +266,6 @@ SYMBOL: nc-buttons
     key-modifiers swap message>button
     [ <button-down> ] [ <button-up> ] if ;
 
-: mouse-buttons ( -- seq ) WM_LBUTTONDOWN WM_RBUTTONDOWN 2array ;
-
-: capture-mouse? ( umsg -- ? )
-    mouse-buttons member? ;
-
 : prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
     nip >r mouse-event>gesture r> >lo-hi rot window ;
 
@@ -287,8 +282,10 @@ SYMBOL: nc-buttons
     mouse-captured off ;
 
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
-    >r >r dup capture-mouse? [ over set-capture ] when r> r>
-    prepare-mouse send-button-down ;
+    >r >r
+    over set-capture
+    dup message>button drop nc-buttons get delete
+    r> r> prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
     mouse-captured get [ release-capture ] when
@@ -340,7 +337,7 @@ H{ } clone wm-handlers set-global
 [ 4dup handle-wm-keydown DefWindowProc ] { WM_KEYDOWN WM_SYSKEYDOWN } add-wm-handler
 [ 4dup handle-wm-char DefWindowProc    ] { WM_CHAR WM_SYSCHAR }       add-wm-handler
 [ 4dup handle-wm-keyup DefWindowProc   ] { WM_KEYUP WM_SYSKEYUP }     add-wm-handler
-               
+
 [ handle-wm-syscommand   ] WM_SYSCOMMAND add-wm-handler
 [ handle-wm-set-focus 0  ] WM_SETFOCUS add-wm-handler
 [ handle-wm-kill-focus 0 ] WM_KILLFOCUS add-wm-handler

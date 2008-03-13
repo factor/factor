@@ -11,7 +11,7 @@ HELP: <splay>
 { $description "Creates an empty splay tree" } ;
 
 HELP: >splay
-{ $values { "assoc" assoc } { "splay" splay } }
+{ $values { "assoc" assoc } { "tree" splay } }
 { $description "Converts any " { $link assoc } " into an splay tree." } ;
 
 HELP: splay

@@ -128,14 +128,14 @@ HELP: prune
 { $values { "seq" "a sequence" } { "newseq" "a sequence" } }
 { $description "Outputs a new sequence with each distinct element of " { $snippet "seq" } " appearing only once. Elements are compared for equality using " { $link = } " and elements are ordered according to their position in " { $snippet "seq" } "." }
 { $examples
-    { $example "USE: hashtables" "{ 1 1 t 3 t } prune ." "V{ 1 t 3 }" }
+    { $example "USING: hashtables prettyprint ;" "{ 1 1 t 3 t } prune ." "V{ 1 t 3 }" }
 } ;
 
 HELP: all-unique?
 { $values { "seq" sequence } { "?" "a boolean" } }
 { $description "Tests whether a sequence contains any repeated elements." }
 { $example
-    "USE: combinators.lib"
+    "USING: hashtables prettyprint ;"
     "{ 0 1 1 2 3 5 } all-unique? ."
     "f"
 } ;

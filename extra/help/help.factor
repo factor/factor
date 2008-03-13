@@ -109,9 +109,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     ] ?if ;
 
 : ($index) ( articles -- )
-    subsection-style get [
-        sort-articles [ nl ] [ ($subsection) ] interleave
-    ] with-style ;
+    sort-articles [ \ $subsection swap 2array ] map print-element ;
 
 : $index ( element -- )
     first call dup empty?

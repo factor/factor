@@ -3,16 +3,13 @@ definitions quotations compiler.units ;
 IN: source-files
 
 ARTICLE: "source-files" "Source files"
-"Words in the " { $vocab-link "source-files" } " vocabulary are used to keep track of loaded source files. This is used to implement features such as " { $link refresh-all } "."
+"Words in the " { $vocab-link "source-files" } " vocabulary are used to keep track of loaded source files. This is used to implement " { $link "tools.vocabs" } "."
 $nl
 "The source file database:"
 { $subsection source-files }
 "The class of source files:"
 { $subsection source-file }
-"Testing if a source file has been changed on disk:"
-{ $subsection source-modified? }
 "Words intended for the parser:"
-{ $subsection record-modified }
 { $subsection record-checksum }
 { $subsection record-form }
 { $subsection xref-source }
@@ -34,24 +31,14 @@ HELP: source-file
 { $class-description "Instances retain information about loaded source files, and have the following slots:"
     { $list
         { { $link source-file-path } " - a pathname string." }
-        { { $link source-file-modified } " - the result of " { $link file-modified } " at the time the source file was most recently loaded." }
         { { $link source-file-checksum } " - the CRC32 checksum of the source file's contents at the time it was most recently loaded." }
         { { $link source-file-uses } " - an assoc whose keys are words referenced from this source file's top level form." }
         { { $link source-file-definitions } " - a pair of assocs, containing definitions and classes defined in this source file, respectively" }
     }
 } ;
 
-HELP: source-modified?
-{ $values { "path" "a pathname string" } { "?" "a boolean" } }
-{ $description "Tests if the source file has been modified since it was last loaded. This compares the file's modification time and CRC32 checksum of the file's contents against previously-recorded values." } ;
-
-HELP: record-modified
-{ $values { "source-file" source-file } }
-{ $description "Records the modification time of the source file." } 
-$low-level-note ;
-
 HELP: record-checksum
-{ $values { "source-file" source-file } { "contents" string } }
+{ $values { "source-file" source-file } { "lines" "a sequence of strings" } }
 { $description "Records the CRC32 checksm of the source file's contents." } 
 $low-level-note ;
 
@@ -75,7 +62,7 @@ HELP: record-form
 $low-level-note ;
 
 HELP: reset-checksums
-{ $description "Resets recorded modification times and CRC32 checksums for all loaded source files, creating a checkpoint for " { $link refresh } "." } ;
+{ $description "Resets recorded modification times and CRC32 checksums for all loaded source files, creating a checkpoint for " { $link "tools.vocabs" } "." } ;
 
 HELP: forget-source
 { $values { "path" "a pathname string" } }

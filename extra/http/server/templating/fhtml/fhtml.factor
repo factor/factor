@@ -2,10 +2,10 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations sequences kernel parser namespaces io
-io.files io.streams.string html html.elements
-source-files debugger combinators math quotations generic
-strings splitting accessors http.server.static http.server
-assocs io.encodings.utf8 ;
+io.files io.streams.string html html.elements source-files
+debugger combinators math quotations generic strings splitting
+accessors http.server.static http.server assocs
+io.encodings.utf8 fry ;
 
 IN: http.server.templating.fhtml
 
@@ -75,9 +75,9 @@ DEFER: <% delimiter
 : html-error. ( error -- )
     <pre> error. </pre> ;
 
-: run-template-file ( filename -- )
-    [
-        [
+: run-template ( filename -- )
+    '[
+        , [
             "quiet" on
             parser-notes off
             templating-vocab use+
@@ -86,21 +86,18 @@ DEFER: <% delimiter
             ?resource-path utf8 file-contents
             [ eval-template ] [ html-error. drop ] recover
         ] with-file-vocabs
-    ] curry assert-depth ;
-
-: run-relative-template-file ( filename -- )
-    file get source-file-path parent-directory
-    swap path+ run-template-file ;
+    ] assert-depth ;
 
 : template-convert ( infile outfile -- )
-    utf8 [ run-template-file ] with-file-writer ;
+    utf8 [ run-template ] with-file-writer ;
+
+! responder integration
+: serve-template ( name -- response )
+    "text/html" <content>
+    swap '[ , run-template ] >>body ;
 
 ! file responder integration
-: serve-fhtml ( filename -- response )
-    "text/html" <content>
-    swap [ run-template-file ] curry >>body ;
-
 : enable-fhtml ( responder -- responder )
-    [ serve-fhtml ]
+    [ serve-template ]
     "application/x-factor-server-page"
     pick special>> set-at ;
