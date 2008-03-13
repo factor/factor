@@ -13,8 +13,7 @@ M: no-edit-hook summary
 SYMBOL: edit-hook
 
 : available-editors ( -- seq )
-    "editors" all-child-vocabs
-    values concat [ vocab-name ] map ;
+    "editors" all-child-vocabs-seq [ vocab-name ] map ;
 
 : editor-restarts ( -- alist )
     available-editors

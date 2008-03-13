@@ -210,11 +210,11 @@ MEMO: all-vocabs-seq ( -- seq )
     ] { } map>assoc
     f rot unrooted-child-vocabs 2array add ;
 
-: load-children ( prefix -- )
-    all-child-vocabs values concat
-    filter-dangerous
-    require-all
-    load-failures. ;
+: all-child-vocabs-seq ( prefix -- assoc )
+    vocab-roots get swap [
+        dupd (all-child-vocabs)
+        [ vocab-dir? ] with subset
+    ] curry map concat ;
 
 : map>set ( seq quot -- )
     map concat prune natural-sort ; inline
