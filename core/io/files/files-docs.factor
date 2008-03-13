@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io io.styles strings calendar
+USING: help.markup help.syntax io io.styles strings
        io.backend io.files.private quotations ;
 IN: io.files
 
