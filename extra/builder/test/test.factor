@@ -4,7 +4,7 @@ USING: kernel namespaces sequences assocs builder continuations
        io
        io.files
        prettyprint
-       tools.browser
+       tools.vocabs
        tools.test
        io.encodings.utf8
        combinators.cleave

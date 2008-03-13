@@ -1,44 +1,25 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic assocs kernel math
-namespaces prettyprint sequences strings vectors words
-quotations inspector io.styles io combinators sorting
-splitting math.parser effects continuations debugger
-io.files io.crc32 io.streams.string vocabs
-hashtables graphs compiler.units io.encodings.utf8 ;
+USING: arrays definitions generic assocs kernel math namespaces
+prettyprint sequences strings vectors words quotations inspector
+io.styles io combinators sorting splitting math.parser effects
+continuations debugger io.files io.crc32 vocabs hashtables
+graphs compiler.units io.encodings.utf8 ;
 IN: source-files
 
 SYMBOL: source-files
 
 TUPLE: source-file
 path
-modified checksum
+checksum
 uses definitions ;
 
-: (source-modified?) ( path modified checksum -- ? )
-    pick file-modified rot [ 0 or ] 2apply >
-    [ swap utf8 file-lines lines-crc32 = not ] [ 2drop f ] if ;
-
-: source-modified? ( path -- ? )
-    dup source-files get at [
-        dup source-file-path ?resource-path
-        over source-file-modified
-        rot source-file-checksum
-        (source-modified?)
-    ] [
-        resource-exists?
-    ] ?if ;
-
-: record-modified ( source-file -- )
-    dup source-file-path ?resource-path file-modified
-    swap set-source-file-modified ;
-
 : record-checksum ( lines source-file -- )
-    swap lines-crc32 swap set-source-file-checksum ;
+    >r lines-crc32 r> set-source-file-checksum ;
 
 : (xref-source) ( source-file -- pathname uses )
-    dup source-file-path <pathname> swap source-file-uses
-    [ crossref? ] subset ;
+    dup source-file-path <pathname>
+    swap source-file-uses [ crossref? ] subset ;
 
 : xref-source ( source-file -- )
     (xref-source) crossref get add-vertex ;
@@ -67,9 +48,7 @@ uses definitions ;
 
 : reset-checksums ( -- )
     source-files get [
-        swap ?resource-path dup exists?
-        [
-            over record-modified
+        swap ?resource-path dup exists? [
             utf8 file-lines swap record-checksum
         ] [ 2drop ] if
     ] assoc-each ;

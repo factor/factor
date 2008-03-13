@@ -59,7 +59,7 @@ M: jamshred-gadget ungraft* ( gadget -- )
 
 USE: vocabs.loader
 jamshred-gadget H{
-    { T{ key-down f f "r" } [ jamshred-restart refresh-all ] }
+    { T{ key-down f f "r" } [ jamshred-restart ] }
     { T{ key-down f f " " } [ jamshred-gadget-jamshred toggle-running ] }
     { T{ motion } [ handle-mouse-motion ] }
 } set-gestures

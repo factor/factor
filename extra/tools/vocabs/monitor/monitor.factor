@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: threads io.files io.monitors init kernel
-tools.browser namespaces continuations vocabs.loader ;
-IN: vocabs.monitor
+vocabs.loader tools.vocabs namespaces continuations ;
+IN: tools.vocabs.monitor
 
 ! Use file system change monitoring to flush the tags/authors
 ! cache
@@ -21,4 +21,4 @@ SYMBOL: vocab-monitor
         [ monitor-thread t ] "Vocabulary monitor" spawn-server drop
     ] ignore-errors ;
 
-[ start-monitor-thread ] "vocabs.monitor" add-init-hook
+[ start-monitor-thread ] "tools.vocabs.monitor" add-init-hook

@@ -7,8 +7,6 @@ calendar.format new-slots accessors io.encodings.binary
 combinators.cleave fry ;
 IN: http.server.static
 
-SYMBOL: responder
-
 ! special maps mime types to quots with effect ( path -- )
 TUPLE: file-responder root hook special ;
 
@@ -16,7 +14,8 @@ TUPLE: file-responder root hook special ;
     >r unix-1970 r> seconds time+ ;
 
 : file-http-date ( filename -- string )
-    file-modified unix-time>timestamp timestamp>http-string ;
+    file-info file-info-modified
+    unix-time>timestamp timestamp>http-string ;
 
 : last-modified-matches? ( filename -- ? )
     file-http-date dup [
@@ -33,7 +32,7 @@ TUPLE: file-responder root hook special ;
     [
         <content>
         swap
-        [ file-length "content-length" set-header ]
+        [ file-info file-info-size "content-length" set-header ]
         [ file-http-date "last-modified" set-header ]
         [ '[ , binary <file-reader> stdio get stream-copy ] >>body ]
         tri

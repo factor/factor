@@ -4,7 +4,7 @@ USING: namespaces arrays prettyprint sequences kernel
 vectors quotations words parser assocs combinators
 continuations debugger io io.files vocabs tools.time
 vocabs.loader source-files compiler.units inspector
-inference effects ;
+inference effects tools.vocabs ;
 IN: tools.test
 
 SYMBOL: failures

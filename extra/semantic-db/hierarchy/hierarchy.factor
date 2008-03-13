@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors db.tuples kernel new-slots semantic-db
-semantic-db.relations sorting sequences sequences.deep ;
+USING: accessors db.tuples hashtables kernel new-slots
+semantic-db semantic-db.relations sequences sequences.deep ;
 IN: semantic-db.hierarchy
 
 TUPLE: tree id children ;
@@ -34,9 +34,6 @@ C: <tree> tree
 : get-node-hierarchy ( node-id -- tree )
     dup children [ get-node-hierarchy ] map <tree> ;
 
-: uniq ( sorted-seq -- seq )
-    f swap [ tuck = not ] subset nip ;
-
 : (get-root-nodes) ( node-id -- root-nodes/node-id )
     dup parents dup empty? [
         drop
@@ -45,4 +42,4 @@ C: <tree> tree
     ] if ;
 
 : get-root-nodes ( node-id -- root-nodes )
-    (get-root-nodes) flatten natural-sort uniq ;
+    (get-root-nodes) flatten prune ;
