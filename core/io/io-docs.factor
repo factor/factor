@@ -5,6 +5,8 @@ IN: io
 ARTICLE: "stream-protocol" "Stream protocol"
 "The stream protocol consists of a large number of generic words, many of which are optional."
 $nl
+"Stream protocol words are rarely called directly, since code which only works with one stream at a time should be written use " { $link "stdio" } " instead, wrapping I/O operations such as " { $link read } " and " { $link write } " in a " { $link with-stream } ". This leads more simpler, more reusable and more robust code."
+$nl
 "All streams must implement the " { $link dispose } " word in addition to the stream protocol."
 $nl
 "Three words are required for input streams:"
@@ -25,7 +27,35 @@ $nl
 { $see-also "io.timeouts" } ;
 
 ARTICLE: "stdio" "The default stream"
-"Various words take an implicit stream parameter from a variable to reduce stack shuffling."
+"Most I/O code only operates on one stream at a time. The " { $emphasis "default stream" } " is an implicit parameter used by many I/O words designed for this particular use-case. Using this idiom improves code in three ways:"
+{ $list
+    { "Code becomes simpler because there is no need to keep a stream around on the stack." }
+    { "Code becomes more robust because " { $link with-stream } " automatically closes the stream if there is an error." }
+    { "Code becomes more reusable because it can be written to not worry about which stream is being used, and instead the caller can use " { $link with-stream } " to specify the source or destination for I/O operations." }
+}
+"For example, here is a program which reads the first line of a file, converts it to an integer, then reads that many characters, and splits them into groups of 16:"
+{ $code
+    "USING: continuations kernel io io.files math.parser splitting ;"
+    "\"data.txt\" <file-reader>"
+    "dup stream-readln number>string over stream-read 16 group"
+    "swap dispose"
+}
+"This code has two problems: it has some unnecessary stack shuffling, and if either " { $link stream-readln } " or " { $link stream-read } " throws an I/O error, the stream is not closed because " { $link dispose } " is never reached. So we can add a call to " { $link with-disposal } " to ensure the stream is always closed:"
+{ $code
+    "USING: continuations kernel io io.files math.parser splitting ;"
+    "\"data.txt\" <file-reader> ["
+    "    dup stream-readln number>string over stream-read"
+    "    16 group"
+    "] with-disposal"
+}
+"This code is robust however it is more complex than it needs to be since. This is where the default stream words come in; using them, the above can be rewritten as follows:"
+{ $code
+    "USING: continuations kernel io io.files math.parser splitting ;"
+    "\"data.txt\" <file-reader> ["
+    "    readln number>string read 16 group"
+    "] with-stream"
+}
+"The default stream is stored in a dynamically-scoped variable:"
 { $subsection stdio }
 "Unless rebound in a child namespace, this variable will be set to a console stream for interacting with the user."
 { $subsection read1 }
@@ -65,52 +95,62 @@ $nl
 
 ARTICLE: "streams" "Streams"
 "Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of characters. Streams also support formatted output, which may be used to present styled text in a manner independent of output medium."
+$nl
+"A stream can either be passed around on the stack or bound to a dynamic variable and used as an implicit " { $emphasis "default stream" } "."
 { $subsection "stream-protocol" }
 { $subsection "stdio" }
 { $subsection "stream-utils" }
-{ $see-also "io.streams.string" "io.streams.lines" "io.streams.plain" "io.streams.duplex" } ;
+{ $see-also "io.streams.string" "io.streams.plain" "io.streams.duplex" } ;
 
 ABOUT: "streams"
 
 HELP: stream-readln
 { $values { "stream" "an input stream" } { "str" string } }
 { $contract "Reads a line of input from the stream. Outputs " { $link f } " on stream exhaustion." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link readln } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-read1
 { $values { "stream" "an input stream" } { "ch/f" "a character or " { $link f } } }
 { $contract "Reads a character of input from the stream. Outputs " { $link f } " on stream exhaustion." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link read1 } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-read
 { $values { "n" "a non-negative integer" } { "stream" "an input stream" } { "str/f" "a string or " { $link f } } }
 { $contract "Reads " { $snippet "n" } " characters of input from the stream. Outputs a truncated string or " { $link f } " on stream exhaustion." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link read1 } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-read-until
 { $values { "seps" string } { "stream" "an input stream" } { "str/f" "a string or " { $link f } } { "sep/f" "a character or " { $link f } } }
 { $contract "Reads characters from the stream, until the first occurrence of a separator character, or stream exhaustion. In the former case, the separator character is pushed on the stack, and is not part of the output string. In the latter case, the entire stream contents are output, along with " { $link f } "." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link read-until } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-write1
 { $values { "ch" "a character" } { "stream" "an output stream" } }
 { $contract "Writes a character of output to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link write1 } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-write
 { $values { "str" string } { "stream" "an output stream" } }
 { $contract "Writes a string of output to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link write } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-flush
 { $values { "stream" "an output stream" } }
 { $contract "Waits for any pending output to complete." }
 { $notes "With many output streams, written output is buffered and not sent to the underlying resource until either the buffer is full, or this word is called." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link flush } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-nl
 { $values { "stream" "an output stream" } }
 { $contract "Writes a line terminator. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link nl } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-format
@@ -118,6 +158,7 @@ HELP: stream-format
 { $contract "Writes formatted text to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output."
 $nl
 "The " { $snippet "style" } " hashtable holds character style information. See " { $link "character-styles" } "." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link format } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: make-block-stream
@@ -127,7 +168,7 @@ $nl
 "Unlike " { $link make-span-stream } ", this creates a new paragraph block in the output."
 $nl
 "The " { $snippet "style" } " hashtable holds paragraph style information. See " { $link "paragraph-styles" } "." }
-{ $notes "Instead of calling this word directly, use " { $link with-nesting } "." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link with-nesting } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-write-table
@@ -135,13 +176,13 @@ HELP: stream-write-table
 { $contract "Prints a table of cells produced by " { $link with-cell } "."
 $nl
 "The " { $snippet "style" } " hashtable holds table style information. See " { $link "table-styles" } "." }
-{ $notes "Instead of calling this word directly, use " { $link tabular-output } "." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link tabular-output } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: make-cell-stream
 { $values { "style" hashtable } { "stream" "an output stream" } { "stream'" object } }
 { $contract "Creates an output stream which writes to a table cell object." }
-{ $notes "Instead of calling this word directly, use " { $link tabular-output } "." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link with-cell } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: make-span-stream
@@ -149,12 +190,13 @@ HELP: make-span-stream
 { $contract "Creates an output stream which wraps " { $snippet "stream" } " and adds " { $snippet "style" } " on calls to " { $link stream-write } " and " { $link stream-format } "."
 $nl
 "Unlike " { $link make-block-stream } ", the stream output is inline, and not nested in a paragraph block." }
-{ $notes "Instead of calling this word directly, use " { $link with-style } "." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link with-style } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-print
 { $values { "str" string } { "stream" "an output stream" } }
 { $description "Writes a newline-terminated string." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link print } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-copy
@@ -167,17 +209,17 @@ HELP: stdio
 
 HELP: readln
 { $values { "str/f" "a string or " { $link f } } }
-{ $contract "Reads a line of input from the " { $link stdio } " stream. Outputs " { $link f } " on stream exhaustion." }
+{ $description "Reads a line of input from the " { $link stdio } " stream. Outputs " { $link f } " on stream exhaustion." }
 $io-error ;
 
 HELP: read1
 { $values { "ch/f" "a character or " { $link f } } }
-{ $contract "Reads a character of input from the " { $link stdio } " stream. Outputs " { $link f } " on stream exhaustion." }
+{ $description "Reads a character of input from the " { $link stdio } " stream. Outputs " { $link f } " on stream exhaustion." }
 $io-error ;
 
 HELP: read
 { $values { "n" "a non-negative integer" } { "str/f" "a string or " { $link f } } }
-{ $contract "Reads " { $snippet "n" } " characters of input from the " { $link stdio } " stream. Outputs a truncated string or " { $link f } " on stream exhaustion." }
+{ $description "Reads " { $snippet "n" } " characters of input from the " { $link stdio } " stream. Outputs a truncated string or " { $link f } " on stream exhaustion." }
 $io-error ;
 
 HELP: read-until
@@ -192,26 +234,26 @@ $io-error ;
 
 HELP: write
 { $values { "str" string } }
-{ $contract "Writes a string of output to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
+{ $description "Writes a string of output to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 $io-error ;
 
 HELP: flush
-{ $contract "Waits for any pending output to the " { $link stdio } " stream to complete." }
+{ $description "Waits for any pending output to the " { $link stdio } " stream to complete." }
 $io-error ;
 
 HELP: nl
-{ $contract "Writes a line terminator to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
+{ $description "Writes a line terminator to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 $io-error ;
 
 HELP: format
 { $values { "str" string } { "style" "a hashtable" } }
-{ $contract "Writes formatted text to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
+{ $description "Writes formatted text to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 { $notes "Details are in the documentation for " { $link stream-format } "." }
 $io-error ;
 
 HELP: with-nesting
 { $values { "style" "a hashtable" } { "quot" "a quotation" } }
-{ $contract "Calls the quotation in a new dynamic scope with the " { $link stdio } " stream rebound to a nested paragraph stream, with formatting information applied." }
+{ $description "Calls the quotation in a new dynamic scope with the " { $link stdio } " stream rebound to a nested paragraph stream, with formatting information applied." }
 { $notes "Details are in the documentation for " { $link make-block-stream } "." }
 $io-error ;
 

@@ -3,8 +3,6 @@
 USING: kernel.private ;
 IN: kernel
 
-: version ( -- str ) "0.92" ; foldable
-
 ! Stack stuff
 : spin ( x y z -- z y x ) swap rot ; inline
 

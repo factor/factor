@@ -18,8 +18,9 @@ IN: sequences.lib
 
 : map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
 
-MACRO: nfirst ( n -- )
-    [ [ swap nth ] curry [ keep ] curry ] map concat [ drop ] compose ;
+MACRO: firstn ( n -- )
+    [ [ swap nth ] curry
+    [ keep ] curry ] map concat [ drop ] compose ;
 
 : prepare-index ( seq quot -- seq n quot )
     >r dup length r> ; inline
@@ -139,13 +140,13 @@ PRIVATE>
 : strings ( alphabet length -- seqs )
     >r dup length r> number-strings map-alphabet ;
 
-: nths ( nths seq -- subseq )
-    ! nths is a sequence of ones and zeroes
+: switches ( seq1 seq -- subseq )
+    ! seq1 is a sequence of ones and zeroes
     >r [ length ] keep [ nth 1 = ] curry subset r>
     [ nth ] curry { } map-as ;
 
 : power-set ( seq -- subsets )
-    2 over length exact-number-strings swap [ nths ] curry map ;
+    2 over length exact-number-strings swap [ switches ] curry map ;
 
 : push-either ( elt quot accum1 accum2 -- )
     >r >r keep swap r> r> ? push ; inline
@@ -182,6 +183,14 @@ PRIVATE>
 : ?first3 ( seq -- 1st/f 2nd/f 3rd/f ) dup ?first2 rot ?third ; inline
 : ?first4 ( seq -- 1st/f 2nd/f 3rd/f 4th/f ) dup ?first3 roll ?fourth ; inline
 
+USE: continuations
+: ?subseq ( from to seq -- subseq )
+    >r >r 0 max r> r>
+    [ length tuck min >r min r> ] keep subseq ;
+
+: ?head* ( seq n -- seq/f ) (head) ?subseq ;
+: ?tail* ( seq n -- seq/f ) (tail) ?subseq ;
+
 : accumulator ( quot -- quot vec )
     V{ } clone [ [ push ] curry compose ] keep ;
 
@@ -205,3 +214,9 @@ PRIVATE>
 
 : attempt-each ( seq quot -- result )
     (each) iterate-prep (attempt-each-integer) ; inline
+
+: ?nth* ( n seq -- elt/f ? )
+    2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; flushable
+
+: nths ( indices seq -- seq' )
+    [ swap nth ] with map ;

@@ -1,23 +1,12 @@
-USING: arrays combinators crypto.common kernel io io.binary
-io.files io.streams.string math.vectors strings sequences
-namespaces math parser sequences vectors
-hashtables ;
+USING: arrays combinators crypto.common kernel io
+io.encodings.binary io.files io.streams.byte-array math.vectors
+strings sequences namespaces math parser sequences vectors
+io.binary hashtables symbols ;
 IN: crypto.sha1
 
 ! Implemented according to RFC 3174.
 
-SYMBOL: h0
-SYMBOL: h1
-SYMBOL: h2
-SYMBOL: h3
-SYMBOL: h4
-SYMBOL: A
-SYMBOL: B
-SYMBOL: C
-SYMBOL: D
-SYMBOL: E
-SYMBOL: w
-SYMBOL: K
+SYMBOLS: h0 h1 h2 h3 h4 A B C D E w K ;
 
 : get-wth ( n -- wth ) w get nth ; inline
 : shift-wth ( n -- x ) get-wth 1 bitroll-32 ; inline
@@ -118,15 +107,22 @@ SYMBOL: K
     [ [ h0 h1 h2 h3 h4 ] [ get 4 >be % ] each ] "" make ;
 
 : stream>sha1 ( stream -- sha1 )
-    [ [ initialize-sha1 (stream>sha1) get-sha1 ] with-stream ] with-scope ;
+    [ initialize-sha1 (stream>sha1) get-sha1 ] with-stream ;
 
-: string>sha1 ( string -- sha1 ) <string-reader> stream>sha1 ;
-: string>sha1str ( string -- str ) string>sha1 hex-string ;
-: string>sha1-bignum ( string -- n ) string>sha1 be> ;
-: file>sha1 ( file -- sha1 ) <file-reader> stream>sha1 ;
+: byte-array>sha1 ( string -- sha1 )
+    binary <byte-reader> stream>sha1 ;
 
-: string>sha1-interleave ( string -- seq )
+: byte-array>sha1str ( string -- str )
+    byte-array>sha1 hex-string ;
+
+: byte-array>sha1-bignum ( string -- n )
+    byte-array>sha1 be> ;
+
+: file>sha1 ( file -- sha1 )
+    binary <file-reader> stream>sha1 ;
+
+: byte-array>sha1-interleave ( string -- seq )
     [ zero? ] left-trim
     dup length odd? [ 1 tail ] when
-    seq>2seq [ string>sha1 ] 2apply
+    seq>2seq [ byte-array>sha1 ] 2apply
     swap 2seq>seq ;

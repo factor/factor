@@ -5,7 +5,7 @@ io.windows io.windows.nt.pipes libc io.nonblocking
 io.streams.duplex windows.types math windows.kernel32 windows
 namespaces io.launcher kernel sequences windows.errors assocs
 splitting system threads init strings combinators
-io.backend ;
+io.backend new-slots accessors ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args
@@ -22,30 +22,25 @@ TUPLE: CreateProcess-args
        stdout-pipe stdin-pipe ;
 
 : default-CreateProcess-args ( -- obj )
-    0
+    CreateProcess-args construct-empty
+    0 >>dwCreateFlags
     "STARTUPINFO" <c-object>
-    "STARTUPINFO" heap-size over set-STARTUPINFO-cb
-    "PROCESS_INFORMATION" <c-object>
-    TRUE
-    {
-        set-CreateProcess-args-dwCreateFlags
-        set-CreateProcess-args-lpStartupInfo
-        set-CreateProcess-args-lpProcessInformation
-        set-CreateProcess-args-bInheritHandles
-    } \ CreateProcess-args construct ;
+    "STARTUPINFO" heap-size over set-STARTUPINFO-cb >>lpStartupInfo
+    "PROCESS_INFORMATION" <c-object> >>lpProcessInformation
+    TRUE >>bInheritHandles ;
 
 : call-CreateProcess ( CreateProcess-args -- )
     {
-        CreateProcess-args-lpApplicationName
-        CreateProcess-args-lpCommandLine
-        CreateProcess-args-lpProcessAttributes
-        CreateProcess-args-lpThreadAttributes
-        CreateProcess-args-bInheritHandles
-        CreateProcess-args-dwCreateFlags
-        CreateProcess-args-lpEnvironment
-        CreateProcess-args-lpCurrentDirectory
-        CreateProcess-args-lpStartupInfo
-        CreateProcess-args-lpProcessInformation
+        lpApplicationName>>
+        lpCommandLine>>
+        lpProcessAttributes>>
+        lpThreadAttributes>>
+        bInheritHandles>>
+        dwCreateFlags>>
+        lpEnvironment>>
+        lpCurrentDirectory>>
+        lpStartupInfo>>
+        lpProcessInformation>>
     } get-slots CreateProcess win32-error=0/f ;
 
 : escape-argument ( str -- newstr )
@@ -54,66 +49,64 @@ TUPLE: CreateProcess-args
 : join-arguments ( args -- cmd-line )
     [ escape-argument ] map " " join ;
 
-: app-name/cmd-line ( -- app-name cmd-line )
-    +command+ get [
+: app-name/cmd-line ( process -- app-name cmd-line )
+    command>> dup string? [
         " " split1
     ] [
-        +arguments+ get unclip swap join-arguments
-    ] if* ;
+        unclip swap join-arguments
+    ] if ;
 
-: cmd-line ( -- cmd-line )
-    +command+ get [ +arguments+ get join-arguments ] unless* ;
+: cmd-line ( process -- cmd-line )
+    command>> dup string? [ join-arguments ] unless ;
 
-: fill-lpApplicationName
-    app-name/cmd-line
-    pick set-CreateProcess-args-lpCommandLine
-    over set-CreateProcess-args-lpApplicationName ;
+: fill-lpApplicationName ( process args -- process args )
+    over app-name/cmd-line
+    >r >>lpApplicationName
+    r> >>lpCommandLine ;
 
-: fill-lpCommandLine
-    cmd-line over set-CreateProcess-args-lpCommandLine ;
+: fill-lpCommandLine ( process args -- process args )
+    over cmd-line >>lpCommandLine ;
 
-: fill-dwCreateFlags
+: fill-dwCreateFlags ( process args -- process args )
     0
-    pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
-    +detached+ get winnt? and [ DETACHED_PROCESS bitor ] when
-    over set-CreateProcess-args-dwCreateFlags ;
+    pick pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
+    pick detached>> winnt? and [ DETACHED_PROCESS bitor ] when
+    >>dwCreateFlags ;
 
-: fill-lpEnvironment
-    pass-environment? [
+: fill-lpEnvironment ( process args -- process args )
+    over pass-environment? [
         [
-            get-environment
-            [ "=" swap 3append string>u16-alien % ] assoc-each
+            over get-environment
+            [ swap % "=" % % "\0" % ] assoc-each
             "\0" %
-        ] { } make >c-ushort-array
-        over set-CreateProcess-args-lpEnvironment
+        ] "" make >c-ushort-array
+        >>lpEnvironment
     ] when ;
 
-: fill-startup-info
-    dup CreateProcess-args-lpStartupInfo
-    STARTF_USESTDHANDLES swap set-STARTUPINFO-dwFlags ;
+: fill-startup-info ( process args -- process args )
+    STARTF_USESTDHANDLES over lpStartupInfo>> set-STARTUPINFO-dwFlags ;
 
-HOOK: fill-redirection io-backend ( args -- args )
+HOOK: fill-redirection io-backend ( process args -- )
 
-M: windows-ce-io fill-redirection ;
+M: windows-ce-io fill-redirection 2drop ;
 
-: make-CreateProcess-args ( -- args )
+: make-CreateProcess-args ( process -- args )
     default-CreateProcess-args
     wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
     fill-dwCreateFlags
     fill-lpEnvironment
-    fill-startup-info ;
+    fill-startup-info
+    nip ;
 
 M: windows-io current-process-handle ( -- handle )
     GetCurrentProcessId ;
 
-M: windows-io run-process* ( desc -- handle )
+M: windows-io run-process* ( process -- handle )
     [
-        [
-            make-CreateProcess-args
-            fill-redirection
-            dup call-CreateProcess
-            CreateProcess-args-lpProcessInformation <process>
-        ] with-descriptor
+        dup make-CreateProcess-args
+        tuck fill-redirection
+        dup call-CreateProcess
+        lpProcessInformation>>
     ] with-destructors ;
 
 M: windows-io kill-process* ( handle -- )
@@ -134,7 +127,7 @@ M: windows-io kill-process* ( handle -- )
 : process-exited ( process -- )
     dup process-handle exit-code
     over process-handle dispose-process
-    swap notify-exit ;
+    notify-exit ;
 
 : wait-for-processes ( processes -- ? )
     keys dup
@@ -146,10 +139,16 @@ M: windows-io kill-process* ( handle -- )
 
 : wait-loop ( -- )
     processes get dup assoc-empty?
-    [ drop t ] [ wait-for-processes ] if
-    [ 250 sleep ] when ;
+    [ drop f sleep-until ]
+    [ wait-for-processes [ 100 sleep ] when ] if ;
+
+SYMBOL: wait-thread
 
 : start-wait-thread ( -- )
-    [ wait-loop t ] "Process wait" spawn-server drop ;
+    [ wait-loop t ] "Process wait" spawn-server
+    wait-thread set-global ;
+
+M: windows-io register-process
+    drop wait-thread get-global interrupt ;
 
 [ start-wait-thread ] "io.windows.launcher" add-init-hook

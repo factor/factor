@@ -109,9 +109,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     ] ?if ;
 
 : ($index) ( articles -- )
-    subsection-style get [
-        sort-articles [ nl ] [ ($subsection) ] interleave
-    ] with-style ;
+    sort-articles [ \ $subsection swap 2array ] map print-element ;
 
 : $index ( element -- )
     first call dup empty?
@@ -122,10 +120,23 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 
 : (:help-multi)
     "This error has multiple delegates:" print
-    ($index) nl ;
+    ($index) nl
+    "Use \\ ... help to get help about a specific delegate." print ;
 
 : (:help-none)
     drop "No help for this error. " print ;
+
+: (:help-debugger)
+    nl
+    "Debugger commands:" print
+    nl
+    ":s    - data stack at error time" print
+    ":r    - retain stack at error time" print
+    ":c    - call stack at error time" print
+    ":edit - jump to source location (parse errors only)" print
+
+    ":get  ( var -- value ) accesses variables at time of the error" print
+    ":vars - list all variables at error time";
 
 : :help ( -- )
     error get delegates [ error-help ] map [ ] subset
@@ -133,7 +144,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
         { [ dup empty? ] [ (:help-none) ] }
         { [ dup length 1 = ] [ first help ] }
         { [ t ] [ (:help-multi) ] }
-    } cond ;
+    } cond (:help-debugger) ;
 
 : remove-article ( name -- )
     dup articles get key? [

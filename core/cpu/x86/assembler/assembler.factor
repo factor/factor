@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generator.fixup io.binary kernel
 combinators kernel.private math namespaces parser sequences
-words system ;
+words system layouts ;
 IN: cpu.x86.assembler
 
 ! A postfix assembler for x86 and AMD64.

@@ -25,15 +25,11 @@ GENERIC: make-default-method ( generic combination -- method )
 
 PREDICATE: word generic "combination" word-prop >boolean ;
 
-M: generic definer drop f f ;
-
 M: generic definition drop f ;
 
 : make-generic ( word -- )
     dup { "unannotated-def" } reset-props
     dup dup "combination" word-prop perform-combination define ;
-
-TUPLE: method word def specializer generic loc ;
 
 : method ( class generic -- method/f )
     "methods" word-prop at ;
@@ -47,7 +43,7 @@ PREDICATE: pair method-spec
 : methods ( word -- assoc )
     "methods" word-prop
     [ keys sort-classes ] keep
-    [ dupd at method-word ] curry { } map>assoc ;
+    [ dupd at ] curry { } map>assoc ;
 
 TUPLE: check-method class generic ;
 
@@ -63,29 +59,33 @@ TUPLE: check-method class generic ;
 : method-word-name ( class word -- string )
     word-name "/" rot word-name 3append ;
 
-: make-method-def ( quot word combination -- quot )
+: make-method-def ( quot class generic -- quot )
     "combination" word-prop method-prologue swap append ;
 
-PREDICATE: word method-body "method" word-prop >boolean ;
+PREDICATE: word method-body "method-def" word-prop >boolean ;
 
 M: method-body stack-effect
-    "method" word-prop method-generic stack-effect ;
+    "method-generic" word-prop stack-effect ;
 
-: <method-word> ( quot class generic -- word )
-    [ make-method-def ] 2keep
-    method-word-name f <word>
-    dup rot define
-    dup xref ;
+: method-word-props ( quot class generic -- assoc )
+    [
+        "method-generic" set
+        "method-class" set
+        "method-def" set
+    ] H{ } make-assoc ;
 
 : <method> ( quot class generic -- method )
     check-method
-    [ <method-word> ] 3keep f \ method construct-boa
-    dup method-word over "method" set-word-prop ;
+    [ make-method-def ] 3keep
+    [ method-word-props ] 2keep
+    method-word-name f <word>
+    tuck set-word-props
+    dup rot define ;
 
 : redefine-method ( quot class generic -- )
-    [ method set-method-def ] 3keep
+    [ method swap "method-def" set-word-prop ] 3keep
     [ make-method-def ] 2keep
-    method method-word swap define ;
+    method swap define ;
 
 : define-method ( quot class generic -- )
     >r bootstrap-word r>
@@ -102,21 +102,36 @@ M: method-body stack-effect
 
 ! Definition protocol
 M: method-spec where
-    dup first2 method [ method-loc ] [ second where ] ?if ;
+    dup first2 method [ ] [ second ] ?if where ;
 
-M: method-spec set-where first2 method set-method-loc ;
+M: method-spec set-where
+    first2 method set-where ;
 
-M: method-spec definer drop \ M: \ ; ;
+M: method-spec definer
+    drop \ M: \ ; ;
 
 M: method-spec definition
-    first2 method dup [ method-def ] when ;
+    first2 method dup
+    [ "method-def" word-prop ] when ;
 
 : forget-method ( class generic -- )
     check-method
     [ delete-at* ] with-methods
-    [ method-word forget ] [ drop ] if ;
+    [ forget-word ] [ drop ] if ;
 
-M: method-spec forget* first2 forget-method ;
+M: method-spec forget*
+    first2 forget-method ;
+
+M: method-body definer
+    drop \ M: \ ; ;
+
+M: method-body definition
+    "method-def" word-prop ;
+
+M: method-body forget*
+    dup "method-class" word-prop
+    swap "method-generic" word-prop
+    forget-method ;
 
 : implementors* ( classes -- words )
     all-words [
@@ -154,8 +169,7 @@ M: word subwords drop f ;
 
 M: generic subwords
     dup "methods" word-prop values
-    swap "default-method" word-prop add
-    [ method-word ] map ;
+    swap "default-method" word-prop add ;
 
 M: generic forget-word
     dup subwords [ forget-word ] each (forget-word) ;

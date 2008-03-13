@@ -1,5 +1,5 @@
 USING: io io.buffers io.backend help.markup help.syntax kernel
-strings sbufs words continuations ;
+byte-arrays sbufs words continuations byte-vectors ;
 IN: io.nonblocking
 
 ARTICLE: "io.nonblocking" "Non-blocking I/O implementation"
@@ -58,17 +58,17 @@ HELP: <port>
 $low-level-note ;
 
 HELP: <buffered-port>
-{ $values { "handle" "a native handle identifying an I/O resource" } { "port" "a new " { $link port } } }
+{ $values { "handle" "a native handle identifying an I/O resource" } { "type" symbol } { "port" "a new " { $link port } } }
 { $description "Creates a new " { $link port } " using the specified native handle and a default-sized I/O buffer." } 
 $low-level-note ;
 
 HELP: <reader>
-{ $values { "handle" "a native handle identifying an I/O resource" } { "stream" "a new " { $link input-port } } }
+{ $values { "handle" "a native handle identifying an I/O resource" } { "input-port" "a new " { $link input-port } } }
 { $description "Creates a new " { $link input-port } " using the specified native handle and a default-sized input buffer." } 
 $low-level-note ;
 
 HELP: <writer>
-{ $values { "handle" "a native handle identifying an I/O resource" } { "stream" "a new " { $link output-port } } }
+{ $values { "handle" "a native handle identifying an I/O resource" } { "output-port" "a new " { $link output-port } } }
 { $description "Creates a new " { $link output-port } " using the specified native handle and a default-sized input buffer." } 
 $low-level-note ;
 
@@ -93,12 +93,12 @@ HELP: unless-eof
 { $description "If the port has reached end of file, outputs " { $link f } ", otherwise applies the quotation to the port." } ;
 
 HELP: read-until-step
-{ $values { "separators" string } { "port" input-port } { "string/f" "a string or " { $link f } } { "separator/f" "a character or " { $link f } } }
+{ $values { "separators" "a sequence of bytes" } { "port" input-port } { "byte-array/f" "a byte array or " { $link f } } { "separator/f" "a byte or " { $link f } } }
 { $description "If the port has reached end of file, outputs " { $link f } { $link f } ", otherwise scans the buffer for a separator and outputs a string up to but not including the separator." } ;
 
 HELP: read-until-loop
-{ $values { "seps" string } { "port" input-port } { "sbuf" sbuf } { "separator/f" "a character or " { $link f } } }
-{ $description "Accumulates data in the string buffer, calling " { $link (wait-to-read) } " as many times as necessary, until either an occurrence of a separator is read, or end of file is reached." } ;
+{ $values { "seps" "a sequence of bytes" } { "port" input-port } { "accum" byte-vector } { "separator/f" "a byte or " { $link f } } }
+{ $description "Accumulates data in the byte vector, calling " { $link (wait-to-read) } " as many times as necessary, until either an occurrence of a separator is read, or end of file is reached." } ;
 
 HELP: can-write?
 { $values { "len" "a positive integer" } { "writer" output-port } { "?" "a boolean" } }

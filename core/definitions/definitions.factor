@@ -43,7 +43,7 @@ M: object uses drop f ;
 
 : xref ( defspec -- ) dup uses crossref get add-vertex ;
 
-: usage ( defspec -- seq ) crossref get at keys ;
+: usage ( defspec -- seq ) \ f or crossref get at keys ;
 
 GENERIC: redefined* ( defspec -- )
 

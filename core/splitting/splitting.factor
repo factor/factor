@@ -69,12 +69,12 @@ INSTANCE: groups sequence
 : split ( seq separators -- pieces ) [ split, ] { } make ;
 
 : string-lines ( str -- seq )
-    dup [ "\r\n" member? ] contains? [
+    dup "\r\n" seq-intersect empty? [
+        1array
+    ] [
         "\n" split [
             1 head-slice* [
                 "\r" ?tail drop "\r" split
             ] map
         ] keep peek "\r" split add concat
-    ] [
-        1array
     ] if ;

@@ -1,6 +1,6 @@
-USING: tools.test compiler quotations math kernel sequences
-assocs namespaces ;
-IN: temporary
+USING: tools.test quotations math kernel sequences
+assocs namespaces compiler.units ;
+IN: compiler.tests
 
 [ 3 ] [ 5 [ [ 2 - ] curry call ] compile-call ] unit-test
 [ 3 ] [ [ 5 [ 2 - ] curry call ] compile-call ] unit-test

@@ -1,5 +1,5 @@
 USING: kernel math math.parser sequences tools.test ;
-IN: temporary
+IN: math.parser.tests
 
 [ f ]
 [ f string>number ]

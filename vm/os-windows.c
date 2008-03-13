@@ -174,7 +174,7 @@ DEFINE_PRIMITIVE(read_dir)
 			GROWABLE_ADD(result,pair);
 		}
 		while (FindNextFile(dir, &find_data));
-		CloseHandle(dir);
+		FindClose(dir);
 	}
 
 	UNREGISTER_ROOT(result);
@@ -232,4 +232,9 @@ long getpagesize(void)
 void sleep_millis(DWORD msec)
 {
 	Sleep(msec);
+}
+
+DECLARE_PRIMITIVE(set_os_envs)
+{
+	not_implemented_error();
 }

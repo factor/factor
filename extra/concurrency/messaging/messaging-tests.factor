@@ -3,48 +3,10 @@
 !
 USING: kernel threads vectors arrays sequences
 namespaces tools.test continuations dlists strings math words
-match quotations concurrency.messaging ;
-IN: temporary
+match quotations concurrency.messaging concurrency.mailboxes ;
+IN: concurrency.messaging.tests
 
-[ ] [ mailbox mailbox-data dlist-delete-all ] unit-test
-
-[ V{ 1 2 3 } ] [
-    0 <vector>
-    <mailbox>
-    [ mailbox-get swap push ] in-thread
-    [ mailbox-get swap push ] in-thread
-    [ mailbox-get swap push ] in-thread
-    1 over mailbox-put
-    2 over mailbox-put
-    3 swap mailbox-put
-] unit-test
-
-[ V{ 1 2 3 } ] [
-    0 <vector>
-    <mailbox>
-    [ [ integer? ] swap mailbox-get? swap push ] in-thread
-    [ [ integer? ] swap mailbox-get? swap push ] in-thread
-    [ [ integer? ] swap mailbox-get? swap push ] in-thread
-    1 over mailbox-put
-    2 over mailbox-put
-    3 swap mailbox-put
-] unit-test
-
-[ V{ 1 "junk" 3 "junk2" } [ 456 ] ] [
-    0 <vector>
-    <mailbox>
-    [ [ integer? ] swap mailbox-get? swap push ] in-thread
-    [ [ integer? ] swap mailbox-get? swap push ] in-thread
-    [ [ string? ] swap mailbox-get? swap push ] in-thread
-    [ [ string? ] swap mailbox-get? swap push ] in-thread
-    1 over mailbox-put
-    "junk" over mailbox-put
-    [ 456 ] over mailbox-put
-    3 over mailbox-put
-    "junk2" over mailbox-put
-    mailbox-get
-] unit-test
-
+[ ] [ my-mailbox mailbox-data dlist-delete-all ] unit-test
 
 [ "received" ] [ 
     [
@@ -67,7 +29,7 @@ IN: temporary
         "crash" throw
     ] "Linked test" spawn-linked drop
     receive
-] [ linked-error "crash" = ] must-fail-with
+] [ delegate "crash" = ] must-fail-with
 
 MATCH-VARS: ?from ?to ?value ;
 SYMBOL: increment

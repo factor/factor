@@ -87,14 +87,14 @@ SYMBOL: html
     #! word.
     foo> [ ">" write-html ] empty-effect html-word ;
 
-: </foo> [ "</" % % ">" % ] "" make ;
+: </foo> "</" swap ">" 3append ;
 
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.
     </foo> dup [ write-html ] curry empty-effect html-word ;
 
-: <foo/> [ "<" % % "/>" % ] "" make ;
+: <foo/> "<" swap "/>" 3append ;
 
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
@@ -161,5 +161,6 @@ SYMBOL: html
         "id" "onclick" "style" "valign" "accesskey"
         "src" "language" "colspan" "onchange" "rel"
         "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
+        "media"
     ] [ define-attribute-word ] each
 ] with-compilation-unit

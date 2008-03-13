@@ -1,4 +1,5 @@
 USING: tools.test bitfields kernel ;
+IN: bitfields.tests
 
 SAFE-BITFIELD: foo bar:5 baz:10 111 bing:2 ;
 

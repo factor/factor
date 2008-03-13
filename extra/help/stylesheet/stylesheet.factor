@@ -3,13 +3,17 @@
 USING: io.styles namespaces ;
 IN: help.stylesheet
 
-SYMBOL: default-style
+SYMBOL: default-span-style
 H{
     { font "sans-serif" }
     { font-size 12 }
     { font-style plain }
+} default-span-style set-global
+
+SYMBOL: default-block-style
+H{
     { wrap-margin 500 }
-} default-style set-global
+} default-block-style set-global
 
 SYMBOL: link-style
 H{

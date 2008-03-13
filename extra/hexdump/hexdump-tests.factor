@@ -1,4 +1,4 @@
-IN: temporary
+IN: hexdump.tests
 USING: hexdump kernel sequences tools.test ;
 
 [ t ] [ "" hexdump "Length: 0, 0h\n" = ] unit-test

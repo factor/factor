@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs hashtables
 kernel kernel.private math namespaces sequences words
-quotations strings alien system combinators math.bitfields
-words.private cpu.architecture ;
+quotations strings alien layouts system combinators
+math.bitfields words.private cpu.architecture ;
 IN: generator.fixup
 
 : no-stack-frame -1 ; inline

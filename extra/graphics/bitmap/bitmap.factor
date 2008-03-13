@@ -4,7 +4,7 @@
 USING: alien arrays byte-arrays combinators
 graphics.viewer io io.binary io.files kernel libc math
 math.functions namespaces opengl opengl.gl prettyprint
-sequences strings ui ui.gadgets.panes ;
+sequences strings ui ui.gadgets.panes io.encodings.binary ;
 IN: graphics.bitmap
 
 ! Currently can only handle 24bit bitmaps.
@@ -59,7 +59,7 @@ TUPLE: bitmap magic size reserved offset header-length width
     dup color-index-length read swap set-bitmap-color-index ;
 
 : load-bitmap ( path -- bitmap )
-    [
+    binary [
         T{ bitmap } clone
         dup parse-file-header
         dup parse-bitmap-header
@@ -69,7 +69,7 @@ TUPLE: bitmap magic size reserved offset header-length width
     raw-bitmap>string >byte-array over set-bitmap-array ;
 
 : save-bitmap ( bitmap path -- )
-    [
+    binary [
         "BM" write
         dup bitmap-array length 14 + 40 + 4 >le write
         0 4 >le write

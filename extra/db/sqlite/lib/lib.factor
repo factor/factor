@@ -2,7 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types arrays assocs kernel math math.parser
 namespaces sequences db.sqlite.ffi db combinators
-continuations db.types ;
+continuations db.types calendar.format serialize
+io.streams.byte-array byte-arrays io.encodings.binary
+tools.walker ;
 IN: db.sqlite.lib
 
 : sqlite-error ( n -- * )
@@ -55,6 +57,10 @@ IN: db.sqlite.lib
 : sqlite-bind-null ( handle i -- )
     sqlite3_bind_null sqlite-check-result ;
 
+: sqlite-bind-blob ( handle i byte-array -- )
+    dup length SQLITE_TRANSIENT
+    sqlite3_bind_blob sqlite-check-result ;
+
 : sqlite-bind-text-by-name ( handle name text -- )
     parameter-index sqlite-bind-text ;
 
@@ -67,19 +73,32 @@ IN: db.sqlite.lib
 : sqlite-bind-double-by-name ( handle name double -- )
     parameter-index sqlite-bind-double ;
 
+: sqlite-bind-blob-by-name ( handle name blob -- )
+    parameter-index sqlite-bind-blob ;
+
 : sqlite-bind-null-by-name ( handle name obj -- )
     parameter-index drop sqlite-bind-null ;
 
 : sqlite-bind-type ( handle key value type -- )
+    over [ drop NULL ] unless
     dup array? [ first ] when
     {
         { INTEGER [ sqlite-bind-int-by-name ] }
-        { BIG_INTEGER [ sqlite-bind-int64-by-name ] }
+        { BIG-INTEGER [ sqlite-bind-int64-by-name ] }
         { TEXT [ sqlite-bind-text-by-name ] }
         { VARCHAR [ sqlite-bind-text-by-name ] }
         { DOUBLE [ sqlite-bind-double-by-name ] }
-        { SERIAL [ sqlite-bind-int-by-name ] }
-        ! { NULL [ sqlite-bind-null-by-name ] }
+        { DATE [ sqlite-bind-text-by-name ] }
+        { TIME [ sqlite-bind-text-by-name ] }
+        { DATETIME [ sqlite-bind-text-by-name ] }
+        { TIMESTAMP [ sqlite-bind-text-by-name ] }
+        { BLOB [ sqlite-bind-blob-by-name ] }
+        { FACTOR-BLOB [
+            binary [ serialize ] with-byte-writer
+            sqlite-bind-blob-by-name
+        ] }
+        { +native-id+ [ sqlite-bind-int-by-name ] }
+        { NULL [ sqlite-bind-null-by-name ] }
         [ no-sql-type ]
     } case ;
 
@@ -92,19 +111,39 @@ IN: db.sqlite.lib
 : sqlite-#columns ( query -- int )
     sqlite3_column_count ;
 
-! TODO
 : sqlite-column ( handle index -- string )
     sqlite3_column_text ;
 
+: sqlite-column-blob ( handle index -- byte-array/f )
+    [ sqlite3_column_bytes ] 2keep
+    pick zero? [
+        3drop f
+    ] [
+        sqlite3_column_blob swap memory>byte-array
+    ] if ;
+
 : sqlite-column-typed ( handle index type -- obj )
+    dup array? [ first ] when
     {
+        { +native-id+ [ sqlite3_column_int64 ] }
         { INTEGER [ sqlite3_column_int ] }
-        { BIG_INTEGER [ sqlite3_column_int64 ] }
-        { TEXT [ sqlite3_column_text ] }
+        { BIG-INTEGER [ sqlite3_column_int64 ] }
         { DOUBLE [ sqlite3_column_double ] }
+        { TEXT [ sqlite3_column_text ] }
+        { VARCHAR [ sqlite3_column_text ] }
+        { DATE [ sqlite3_column_text dup [ ymd>timestamp ] when ] }
+        { TIME [ sqlite3_column_text dup [ hms>timestamp ] when ] }
+        { TIMESTAMP [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
+        { DATETIME [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
+        { BLOB [ sqlite-column-blob ] }
+        { FACTOR-BLOB [
+            sqlite-column-blob
+            dup [ binary [ deserialize ] with-byte-reader ] when
+        ] }
+        ! { NULL [ 2drop f ] }
+        [ no-sql-type ]
     } case ;
 
-! TODO
 : sqlite-row ( handle -- seq )
     dup sqlite-#columns [ sqlite-column ] with map ;
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables io kernel math namespaces
-opengl sequences io.streams.lines strings splitting
+opengl sequences strings splitting
 ui.gadgets ui.gadgets.tracks ui.gadgets.theme ui.render colors
 models ;
 IN: ui.gadgets.labels

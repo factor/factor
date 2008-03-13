@@ -1,6 +1,6 @@
 ! Copyright (C) 2005 Chris Double, 2007 Clemens Hofreither.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: temporary
+IN: coroutines.tests
 USING: coroutines kernel sequences prettyprint tools.test math ;
 
 : test1 ( -- co )

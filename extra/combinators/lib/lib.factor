@@ -3,7 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel combinators namespaces quotations hashtables
 sequences assocs arrays inference effects math math.ranges
-arrays.lib shuffle macros bake combinators.cleave ;
+arrays.lib shuffle macros bake combinators.cleave
+continuations ;
 
 IN: combinators.lib
 
@@ -174,3 +175,6 @@ MACRO: multikeep ( word out-indexes -- ... )
         %
         r> [ drop \ r> , ] each
     ] [ ] make ;
+
+: retry ( quot n -- )
+    [ drop ] rot compose attempt-all ; inline

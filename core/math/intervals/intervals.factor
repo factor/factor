@@ -88,20 +88,6 @@ C: <interval> interval
     [ interval>points [ first integer? ] both? ] both?
     r> [ 2drop f ] if ; inline
 
-: interval-shift ( i1 i2 -- i3 )
-    [ [ shift ] interval-op ] interval-integer-op ;
-
-: interval-shift-safe ( i1 i2 -- i3 )
-    dup interval-to first 100 > [
-        2drop f
-    ] [
-        interval-shift
-    ] if ;
-
-: interval-max ( i1 i2 -- i3 ) [ max ] interval-op ;
-
-: interval-min ( i1 i2 -- i3 ) [ min ] interval-op ;
-
 : interval-1+ ( i1 -- i2 ) 1 [a,a] interval+ ;
 
 : interval-1- ( i1 -- i2 ) -1 [a,a] interval+ ;
@@ -143,8 +129,41 @@ C: <interval> interval
 : interval-contains? ( x int -- ? )
     >r [a,a] r> interval-subset? ;
 
+: interval-singleton? ( int -- ? )
+    interval>points
+    2dup [ second ] 2apply and
+    [ [ first ] 2apply = ]
+    [ 2drop f ] if ;
+
+: interval-length ( int -- n )
+    dup
+    [ interval>points [ first ] 2apply swap - ]
+    [ drop 0 ] if ;
+
 : interval-closure ( i1 -- i2 )
-    interval>points [ first ] 2apply [a,b] ;
+    dup [ interval>points [ first ] 2apply [a,b] ] when ;
+
+: interval-shift ( i1 i2 -- i3 )
+    #! Inaccurate; could be tighter
+    [ [ shift ] interval-op ] interval-integer-op interval-closure ;
+
+: interval-shift-safe ( i1 i2 -- i3 )
+    dup interval-to first 100 > [
+        2drop f
+    ] [
+        interval-shift
+    ] if ;
+
+: interval-max ( i1 i2 -- i3 )
+    #! Inaccurate; could be tighter
+    [ max ] interval-op interval-closure ;
+
+: interval-min ( i1 i2 -- i3 )
+    #! Inaccurate; could be tighter
+    [ min ] interval-op interval-closure ;
+
+: interval-interior ( i1 -- i2 )
+    interval>points [ first ] 2apply (a,b) ;
 
 : interval-division-op ( i1 i2 quot -- i3 )
     >r 0 over interval-closure interval-contains?
@@ -156,7 +175,7 @@ C: <interval> interval
 : interval/i ( i1 i2 -- i3 )
     [
         [ [ /i ] interval-op ] interval-integer-op
-    ] interval-division-op ;
+    ] interval-division-op interval-closure ;
 
 : interval-recip ( i1 -- i2 ) 1 [a,a] swap interval/ ;
 
@@ -164,24 +183,46 @@ C: <interval> interval
 
 SYMBOL: incomparable
 
-: interval-compare ( int n quot -- ? )
-    >r dupd r> call interval-intersect dup [
-        = t incomparable ?
-    ] [
-        2drop f
-    ] if ; inline
+: left-endpoint-< ( i1 i2 -- ? )
+    [ swap interval-subset? ] 2keep
+    [ nip interval-singleton? ] 2keep
+    [ interval-from ] 2apply =
+    and and ;
 
-: interval< ( int n -- ? )
-    [ [-inf,a) ] interval-compare ; inline
+: right-endpoint-< ( i1 i2 -- ? )
+    [ interval-subset? ] 2keep
+    [ drop interval-singleton? ] 2keep
+    [ interval-to ] 2apply =
+    and and ;
 
-: interval<= ( int n -- ? )
-    [ [-inf,a] ] interval-compare ; inline
+: (interval<) over interval-from over interval-from endpoint< ;
 
-: interval> ( int n -- ? )
-    [ (a,inf] ] interval-compare ; inline
+: interval< ( i1 i2 -- ? )
+    {
+        { [ 2dup interval-intersect not ] [ (interval<) ] }
+        { [ 2dup left-endpoint-< ] [ f ] }
+        { [ 2dup right-endpoint-< ] [ f ] }
+        { [ t ] [ incomparable ] }
+    } cond 2nip ;
 
-: interval>= ( int n -- ? )
-    [ [a,inf] ] interval-compare ; inline
+: left-endpoint-<= ( i1 i2 -- ? )
+    >r interval-from r> interval-to = ;
+
+: right-endpoint-<= ( i1 i2 -- ? )
+    >r interval-to r> interval-from = ;
+
+: interval<= ( i1 i2 -- ? )
+    {
+        { [ 2dup interval-intersect not ] [ (interval<) ] }
+        { [ 2dup right-endpoint-<= ] [ t ] }
+        { [ t ] [ incomparable ] }
+    } cond 2nip ;
+
+: interval> ( i1 i2 -- ? )
+    swap interval< ;
+
+: interval>= ( i1 i2 -- ? )
+    swap interval<= ;
 
 : assume< ( i1 i2 -- i3 )
     interval-to first [-inf,a) interval-intersect ;

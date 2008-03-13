@@ -3,7 +3,7 @@
 USING: io io.streams.string io.files kernel math namespaces
 prettyprint sequences arrays generic strings vectors
 xml.char-classes xml.data xml.errors xml.tokenize xml.writer
-xml.utilities state-parser assocs ascii ;
+xml.utilities state-parser assocs ascii io.encodings.utf8 ;
 IN: xml
 
 !   -- Overall parser with data tree
@@ -167,7 +167,8 @@ TUPLE: pull-xml scope ;
     <string-reader> read-xml ;
 
 : file>xml ( filename -- xml )
-    <file-reader> read-xml ;
+    ! Autodetect encoding!
+    utf8 <file-reader> read-xml ;
 
 : xml-reprint ( string -- )
     string>xml print-xml ;

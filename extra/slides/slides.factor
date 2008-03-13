@@ -6,10 +6,14 @@ IN: slides
 
 : stylesheet
     H{
-        { default-style
+        { default-span-style
             H{
                 { font "sans-serif" }
                 { font-size 36 }
+            }
+        }
+        { default-block-style
+            H{
                 { wrap-margin 1000 }
             }
         }

@@ -230,17 +230,17 @@ HELP: $examples
 { $values { "element" "a markup element" } }
 { $description "Prints a heading followed by some examples. Word documentation should include examples, at least if the usage of the word is not entirely obvious." }
 { $examples
-    { $markup-example { $examples { $example "2 2 + ." "4" } } }
+    { $markup-example { $examples { $example "USING: math prettyprint ;" "2 2 + ." "4" } } }
 } ;
 
 HELP: $example
 { $values { "element" "a markup element of the form " { $snippet "{ inputs... output }" } } }
 { $description "Prints a clickable example with sample output. The markup element must be an array of strings. All but the last string are joined by newlines and taken as the input text, and the last string is the output. The example becomes clickable if the output stream supports it, and clicking it opens a listener window with the input text inserted at the input prompt." }
 { $examples
-    "The output text should be a string of what the input prints when executed, not the final stack contents or anything like that. So the following is an incorrect example:"
+    "The input text must contain a correct " { $link POSTPONE: USING: } " declaration, and output text should be a string of what the input prints when executed, not the final stack contents or anything like that. So the following is an incorrect example:"
     { $markup-example { $unchecked-example "2 2 +" "4" } }
     "However the following is right:"
-    { $markup-example { $example "2 2 + ." "4" } }
+    { $markup-example { $example "USING: math prettyprint ;" "2 2 + ." "4" } }
     "Examples can incorporate a call to " { $link .s } " to show multiple output values; the convention is that you may assume the stack is empty before the example evaluates."
 } ;
 
@@ -270,7 +270,7 @@ HELP: textual-list
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- )" } } }
 { $description "Applies the quotation to each element of the sequence, printing a comma between each pair of elements." }
 { $examples
-    { $example "USE: help.markup" "{ \"fish\" \"chips\" \"salt\" } [ write ] textual-list" "fish, chips, salt" }
+    { $example "USING: help.markup io ;" "{ \"fish\" \"chips\" \"salt\" } [ write ] textual-list" "fish, chips, salt" }
 } ;
 
 HELP: $links
@@ -344,7 +344,7 @@ HELP: $side-effects
 
 HELP: $notes
 { $values { "element" "a markup element" } }
-{ $description "Prints the errors subheading found on the help page of some words. This section should usage tips and pitfalls." } ;
+{ $description "Prints the notes subheading found on the help page of some words. This section should document usage tips and pitfalls." } ;
 
 HELP: $see
 { $values { "element" "a markup element of the form " { $snippet "{ word }" } } }

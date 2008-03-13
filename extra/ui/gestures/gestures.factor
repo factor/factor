@@ -1,8 +1,9 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
-math.vectors tuples classes ui.gadgets timers combinators.lib ;
+math.vectors tuples classes ui.gadgets combinators.lib boxes
+calendar alarms symbols ;
 IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
@@ -48,10 +49,7 @@ TUPLE: select-all-action ; C: <select-all-action> select-all-action
     tuple>array 1 head* >tuple ;
 
 ! Modifiers
-SYMBOL: C+
-SYMBOL: A+
-SYMBOL: M+
-SYMBOL: S+
+SYMBOLS: C+ A+ M+ S+ ;
 
 TUPLE: key-down mods sym ;
 
@@ -107,20 +105,22 @@ SYMBOL: double-click-timeout
 : drag-gesture ( -- )
     hand-buttons get-global first <drag> button-gesture ;
 
-TUPLE: drag-timer ;
+SYMBOL: drag-timer
 
-M: drag-timer tick drop drag-gesture ;
-
-drag-timer construct-empty drag-timer set-global
+<box> drag-timer set-global
 
 : start-drag-timer ( -- )
     hand-buttons get-global empty? [
-        drag-timer get-global 100 300 add-timer
+        [ drag-gesture ]
+        300 milliseconds from-now
+        100 milliseconds
+        add-alarm drag-timer get-global >box
     ] when ;
 
 : stop-drag-timer ( -- )
     hand-buttons get-global empty? [
-        drag-timer get-global remove-timer
+        drag-timer get-global ?box
+        [ cancel-alarm ] [ drop ] if
     ] when ;
 
 : fire-motion ( -- )

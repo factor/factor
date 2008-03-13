@@ -2,13 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: system
 USING: kernel kernel.private sequences math namespaces
-splitting assocs ;
-
-: cell ( -- n ) 7 getenv ; foldable
-
-: cells ( m -- n ) cell * ; inline
-
-: cell-bits ( -- n ) 8 cells ; inline
+splitting assocs system.private layouts ;
 
 : cpu ( -- cpu ) 8 getenv ; foldable
 
@@ -51,11 +45,8 @@ splitting assocs ;
 : solaris? ( -- ? )
     os "solaris" = ;
 
-: bootstrap-cell \ cell get cell or ; inline
-
-: bootstrap-cells bootstrap-cell * ; inline
-
-: bootstrap-cell-bits 8 bootstrap-cells ; inline
-
 : os-envs ( -- assoc )
     (os-envs) [ "=" split1 ] H{ } map>assoc ;
+
+: set-os-envs ( assoc -- )
+    [ "=" swap 3append ] { } assoc>map (set-os-envs) ;

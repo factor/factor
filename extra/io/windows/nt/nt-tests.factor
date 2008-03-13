@@ -1,6 +1,6 @@
 USING: io.files kernel tools.test io.backend
 io.windows.nt.files splitting ;
-IN: temporary
+IN: io.windows.nt.tests
 
 [ "c:\\foo\\" ] [ "c:\\foo\\bar" parent-directory ] unit-test
 [ "c:\\" ] [ "c:\\foo\\" parent-directory ] unit-test

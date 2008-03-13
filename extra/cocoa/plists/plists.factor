@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: strings arrays hashtables assocs sequences
 xml.writer xml.utilities kernel namespaces ;
+IN: cocoa.plists
 
 GENERIC: >plist ( obj -- tag )
 
@@ -18,5 +19,5 @@ M: hashtable >plist
     >plist 1array "plist" build-tag*
     dup { { "version" "1.0" } } update ;
 
-: print-plist ( obj -- )
-    build-plist build-xml print-xml ;
+: plist>string ( obj -- string )
+    build-plist build-xml xml>string ;

@@ -84,31 +84,13 @@ HELP: alien>u16-string ( c-ptr -- string )
 { $values { "c-ptr" c-ptr } { "string" string } }
 { $description "Reads a null-terminated UCS-2 string from the specified address." } ;
 
-HELP: memory>byte-array ( base len -- string )
-{ $values { "base" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
+HELP: memory>byte-array
+{ $values { "alien" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new byte array." } ;
 
-HELP: memory>char-string ( base len -- string )
-{ $values { "base" c-ptr } { "len" "a non-negative integer" } { "string" string } }
-{ $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new string." } ;
-
-HELP: memory>u16-string ( base len -- string )
-{ $values { "base" c-ptr } { "len" "a non-negative integer" } { "string" string } }
-{ $description "Reads " { $snippet "len" } " UCS2 characters starting from " { $snippet "base" } " and stores them in a new string." } ;
-
-HELP: byte-array>memory ( string base -- )
+HELP: byte-array>memory
 { $values { "byte-array" byte-array } { "base" c-ptr } }
 { $description "Writes a byte array to memory starting from the " { $snippet "base" } " address." }
-{ $warning "This word is unsafe. Improper use can corrupt memory." } ;
-
-HELP: string>char-memory ( string base -- )
-{ $values { "string" string } { "base" c-ptr } }
-{ $description "Writes a string to memory starting from the " { $snippet "base" } " address." }
-{ $warning "This word is unsafe. Improper use can corrupt memory." } ;
-
-HELP: string>u16-memory ( string base -- )
-{ $values { "string" string } { "base" c-ptr } }
-{ $description "Writes a string to memory starting from the " { $snippet "base" } " address." }
 { $warning "This word is unsafe. Improper use can corrupt memory." } ;
 
 HELP: malloc-array
@@ -293,11 +275,7 @@ ARTICLE: "c-strings" "C strings"
 $nl
 "Finally, a set of words can be used to read and write " { $snippet "char*" } " and " { $snippet "ushort*" } " strings at arbitrary addresses:"
 { $subsection alien>char-string }
-{ $subsection alien>u16-string }
-{ $subsection memory>char-string }
-{ $subsection memory>u16-string }
-{ $subsection string>char-memory }
-{ $subsection string>u16-memory } ;
+{ $subsection alien>u16-string } ;
 
 ARTICLE: "c-data" "Passing data between Factor and C"
 "Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers. Also Factor's garbage collector can move objects in memory, which means that special support has to be provided for passing blocks of memory to C code."

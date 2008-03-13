@@ -1,4 +1,4 @@
-IN: temporary
+IN: html.elements.tests
 USING: tools.test html html.elements io.streams.string ;
 
 : make-html-string

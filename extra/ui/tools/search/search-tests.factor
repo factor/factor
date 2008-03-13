@@ -1,10 +1,8 @@
 USING: assocs ui.tools.search help.topics io.files io.styles
-kernel namespaces sequences source-files threads timers
+kernel namespaces sequences source-files threads
 tools.test ui.gadgets ui.gestures vocabs
 vocabs.loader words tools.test.ui debugger ;
-IN: temporary
-
-timers get [ init-timers ] unless
+IN: ui.tools.search.tests
 
 [ f ] [
     "no such word with this name exists, certainly"
@@ -16,7 +14,7 @@ timers get [ init-timers ] unless
 
 : update-live-search ( search -- seq )
     dup [
-        300 sleep do-timers
+        300 sleep
         live-search-list control-value
     ] with-grafted-gadget ;
 
@@ -33,7 +31,6 @@ timers get [ init-timers ] unless
     dup [
         { "set-word-prop" } over live-search-field set-control-value
         300 sleep
-        do-timers
         search-value \ set-word-prop eq?
     ] with-grafted-gadget
 ] unit-test

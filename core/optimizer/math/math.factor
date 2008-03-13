@@ -371,15 +371,17 @@ most-negative-fixnum most-positive-fixnum [a,b]
 ] assoc-each
 
 ! Remove redundant comparisons
-: known-comparison? ( #call -- ? )
+: intervals-first2 ( #call -- first second )
     dup dup node-in-d first node-interval
-    swap dup node-in-d second node-literal real? and ;
+    swap dup node-in-d second node-interval ;
+
+: known-comparison? ( #call -- ? )
+    intervals-first2 and ;
 
 : perform-comparison ( #call word -- result )
-    >r dup dup node-in-d first node-interval
-    swap dup node-in-d second node-literal r> execute ; inline
+    >r intervals-first2 r> execute ; inline
 
-: foldable-comparison? ( #call word -- )
+: foldable-comparison? ( #call word -- ? )
     >r dup known-comparison? [
         r> perform-comparison incomparable eq? not
     ] [

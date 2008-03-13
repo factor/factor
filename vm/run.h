@@ -64,6 +64,7 @@ typedef enum {
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV
+#define LAST_SAVE_ENV STAGE2_ENV
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
@@ -248,6 +249,7 @@ DECLARE_PRIMITIVE(setenv);
 DECLARE_PRIMITIVE(exit);
 DECLARE_PRIMITIVE(os_env);
 DECLARE_PRIMITIVE(os_envs);
+DECLARE_PRIMITIVE(set_os_envs);
 DECLARE_PRIMITIVE(eq);
 DECLARE_PRIMITIVE(millis);
 DECLARE_PRIMITIVE(sleep);

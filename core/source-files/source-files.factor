@@ -4,8 +4,8 @@ USING: arrays definitions generic assocs kernel math
 namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger
-io.files io.crc32 io.streams.string io.streams.lines vocabs
-hashtables graphs compiler.units ;
+io.files io.crc32 io.streams.string vocabs
+hashtables graphs compiler.units io.encodings.utf8 ;
 IN: source-files
 
 SYMBOL: source-files
@@ -17,7 +17,7 @@ uses definitions ;
 
 : (source-modified?) ( path modified checksum -- ? )
     pick file-modified rot [ 0 or ] 2apply >
-    [ swap file-lines lines-crc32 = not ] [ 2drop f ] if ;
+    [ swap utf8 file-lines lines-crc32 = not ] [ 2drop f ] if ;
 
 : source-modified? ( path -- ? )
     dup source-files get at [
@@ -68,7 +68,10 @@ uses definitions ;
 : reset-checksums ( -- )
     source-files get [
         swap ?resource-path dup exists?
-        [ file-lines swap record-checksum ] [ 2drop ] if
+        [
+            over record-modified
+            utf8 file-lines swap record-checksum
+        ] [ 2drop ] if
     ] assoc-each ;
 
 M: pathname where pathname-string 1 2array ;
@@ -82,7 +85,7 @@ M: pathname where pathname-string 1 2array ;
 M: pathname forget*
     pathname-string forget-source ;
 
-: rollback-source-file ( source-file -- )
+: rollback-source-file ( file -- )
     dup source-file-definitions new-definitions get [ union ] 2map
     swap set-source-file-definitions ;
 
@@ -97,16 +100,8 @@ SYMBOL: file
         [ ] [ file get rollback-source-file ] cleanup
     ] with-scope ; inline
 
-: smart-usage ( word -- definitions )
-    \ f or usage [
-        dup method-body? [
-            "method" word-prop
-            { method-specializer method-generic } get-slots
-            2array
-        ] when
-    ] map ;
-
 : outside-usages ( seq -- usages )
     dup [
-        over smart-usage [ pathname? not ] subset seq-diff
+        over usage
+        [ dup pathname? not swap where and ] subset seq-diff
     ] curry { } map>assoc ;

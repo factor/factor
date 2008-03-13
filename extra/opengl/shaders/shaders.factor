@@ -50,7 +50,7 @@ IN: opengl.shaders
         alien>char-string
     ] with-malloc ;
 
-: check-gl-shader ( shader -- shader* )
+: check-gl-shader ( shader -- shader )
     dup gl-shader-ok? [ dup gl-shader-info-log throw ] unless ;
 
 : delete-gl-shader ( shader -- ) glDeleteShader ; inline
@@ -85,7 +85,7 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
         alien>char-string
     ] with-malloc ;
 
-: check-gl-program ( program -- program* )
+: check-gl-program ( program -- program )
     dup gl-program-ok? [ dup gl-program-info-log throw ] unless ;
 
 : gl-program-shaders-length ( program -- shaders-length )

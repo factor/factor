@@ -9,6 +9,7 @@ M: integer denominator drop 1 ;
 
 M: fixnum >fixnum ;
 M: fixnum >bignum fixnum>bignum ;
+M: fixnum >integer ;
 
 M: fixnum number= eq? ;
 

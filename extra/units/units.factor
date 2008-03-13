@@ -12,9 +12,6 @@ TUPLE: dimensions-not-equal ;
 
 M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
-: seq-intersect ( seq1 seq2 -- seq1/\seq2 )
-    swap [ member? ] curry subset ;
-
 : remove-one ( seq obj -- seq )
     1array split1 append ;
 

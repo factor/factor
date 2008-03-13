@@ -1,4 +1,4 @@
-IN: temporary
+IN: xmode.utilities.tests
 USING: xmode.utilities tools.test xml xml.data kernel strings
 vectors sequences io.files prettyprint assocs unicode.case ;
 
@@ -49,5 +49,5 @@ TAGS>
     }
 ] [
     "extra/xmode/utilities/test.xml"
-    resource-path <file-reader> read-xml parse-company-tag
+    resource-path file>xml parse-company-tag
 ] unit-test

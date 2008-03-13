@@ -2,35 +2,46 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: serialize sequences concurrency.messaging
 threads io io.server qualified arrays
-namespaces kernel ;
+namespaces kernel io.encodings.binary combinators.cleave
+new-slots accessors ;
 QUALIFIED: io.sockets
 IN: concurrency.distributed
 
-SYMBOL: local-node ( -- addrspec )
+SYMBOL: local-node
 
 : handle-node-client ( -- )
-    deserialize first2 get-process send ;
+    deserialize
+    [ first2 get-process send ]
+    [ stop-server ] if* ;
 
 : (start-node) ( addrspecs addrspec -- )
+    local-node set-global
     [
-        local-node set-global
         "concurrency.distributed"
+        binary
         [ handle-node-client ] with-server
-    ] 2curry f spawn drop ;
+    ] curry "Distributed concurrency server" spawn drop ;
 
 : start-node ( port -- )
-    dup internet-server io.sockets:host-name
-    rot io.sockets:<inet> (start-node) ;
+    [ internet-server ]
+    [ io.sockets:host-name swap io.sockets:<inet> ] bi
+    (start-node) ;
 
 TUPLE: remote-process id node ;
 
 C: <remote-process> remote-process
 
+: send-remote-message ( message node -- )
+    binary io.sockets:<client>
+    [ serialize ] with-stream ;
+
 M: remote-process send ( message thread -- )
-    { remote-process-id remote-process-node } get-slots
-    io.sockets:<client> [ 2array serialize ] with-stream ;
+    [ id>> 2array ] [ node>> ] bi
+    send-remote-message ;
 
 M: thread (serialize) ( obj -- )
-    thread-id local-node get-global
-    <remote-process>
+    thread-id local-node get-global <remote-process>
     (serialize) ;
+
+: stop-node ( node -- )
+    f swap send-remote-message ;

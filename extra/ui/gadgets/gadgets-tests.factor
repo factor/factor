@@ -1,4 +1,4 @@
-IN: temporary
+IN: ui.gadgets.tests
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
 namespaces models kernel dlists math
 math.parser ui sequences hashtables assocs io arrays

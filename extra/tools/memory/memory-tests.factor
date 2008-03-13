@@ -1,4 +1,4 @@
 USING: tools.test tools.memory ;
-IN: temporary
+IN: tools.memory.tests
 
 [ ] [ heap-stats. ] unit-test

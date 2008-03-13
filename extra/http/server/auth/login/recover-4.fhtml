@@ -1,0 +1,10 @@
+<% USING: http.server.components http.server.auth.login
+namespaces kernel combinators ; %>
+<html>
+<body>
+<h1>Recover lost password: step 4 of 4</h1>
+
+<p>Your password has been reset. You may now <a href="login">log in</a>.</p>
+
+</body>
+</html>

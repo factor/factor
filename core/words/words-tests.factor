@@ -1,13 +1,13 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
-vocabs continuations tuples compiler.units ;
-IN: temporary
+vocabs continuations tuples compiler.units io.streams.string ;
+IN: words.tests
 
 [ 4 ] [
     [
-        "poo" "temporary" create [ 2 2 + ] define
+        "poo" "words.tests" create [ 2 2 + ] define
     ] with-compilation-unit
-    "poo" "temporary" lookup execute
+    "poo" "words.tests" lookup execute
 ] unit-test
 
 [ t ] [ t vocabs [ words [ word? and ] each ] each ] unit-test
@@ -50,7 +50,7 @@ SYMBOL: a-symbol
 ! See if redefining a generic as a colon def clears some
 ! word props.
 GENERIC: testing
-"IN: temporary : testing ;" eval
+"IN: words.tests : testing ;" eval
 
 [ f ] [ \ testing generic? ] unit-test
 
@@ -112,13 +112,13 @@ M: array freakish ;
 DEFER: x
 [ x ] [ undefined? ] must-fail-with
 
-[ ] [ "no-loc" "temporary" create drop ] unit-test
-[ f ] [ "no-loc" "temporary" lookup where ] unit-test
+[ ] [ "no-loc" "words.tests" create drop ] unit-test
+[ f ] [ "no-loc" "words.tests" lookup where ] unit-test
 
-[ ] [ "IN: temporary : no-loc-2 ;" eval ] unit-test
-[ f ] [ "no-loc-2" "temporary" lookup where ] unit-test
+[ ] [ "IN: words.tests : no-loc-2 ;" eval ] unit-test
+[ f ] [ "no-loc-2" "words.tests" lookup where ] unit-test
 
-[ ] [ "IN: temporary : test-last ( -- ) ;" eval ] unit-test
+[ ] [ "IN: words.tests : test-last ( -- ) ;" eval ] unit-test
 [ "test-last" ] [ word word-name ] unit-test
 
 ! regression
@@ -141,38 +141,44 @@ SYMBOL: quot-uses-b
 
 [ { + } ] [ \ quot-uses-b uses ] unit-test
 
-[ "IN: temporary : undef-test ; << undef-test >>" eval ]
+"undef-test" "words.tests" lookup [
+    [ forget ] with-compilation-unit
+] when*
+
+[ "IN: words.tests : undef-test ; << undef-test >>" eval ]
 [ [ undefined? ] is? ] must-fail-with
 
 [ ] [
-    "IN: temporary GENERIC: symbol-generic" eval
+    "IN: words.tests GENERIC: symbol-generic" eval
 ] unit-test
 
 [ ] [
-    "IN: temporary SYMBOL: symbol-generic" eval
+    "IN: words.tests SYMBOL: symbol-generic" eval
 ] unit-test
 
-[ t ] [ "symbol-generic" "temporary" lookup symbol? ] unit-test
-[ f ] [ "symbol-generic" "temporary" lookup generic? ] unit-test
+[ t ] [ "symbol-generic" "words.tests" lookup symbol? ] unit-test
+[ f ] [ "symbol-generic" "words.tests" lookup generic? ] unit-test
 
 [ ] [
-    "IN: temporary GENERIC: symbol-generic" eval
+    "IN: words.tests GENERIC: symbol-generic" <string-reader>
+    "symbol-generic-test" parse-stream drop
 ] unit-test
 
 [ ] [
-    "IN: temporary TUPLE: symbol-generic ;" eval
+    "IN: words.tests TUPLE: symbol-generic ;" <string-reader>
+    "symbol-generic-test" parse-stream drop
 ] unit-test
 
-[ t ] [ "symbol-generic" "temporary" lookup symbol? ] unit-test
-[ f ] [ "symbol-generic" "temporary" lookup generic? ] unit-test
+[ t ] [ "symbol-generic" "words.tests" lookup symbol? ] unit-test
+[ f ] [ "symbol-generic" "words.tests" lookup generic? ] unit-test
 
 ! Regressions
-[ ] [ "IN: temporary : decl-forget-test ; foldable" eval ] unit-test
-[ t ] [ "decl-forget-test" "temporary" lookup "foldable" word-prop ] unit-test
-[ ] [ "IN: temporary : decl-forget-test ;" eval ] unit-test
-[ f ] [ "decl-forget-test" "temporary" lookup "foldable" word-prop ] unit-test
+[ ] [ "IN: words.tests : decl-forget-test ; foldable" eval ] unit-test
+[ t ] [ "decl-forget-test" "words.tests" lookup "foldable" word-prop ] unit-test
+[ ] [ "IN: words.tests : decl-forget-test ;" eval ] unit-test
+[ f ] [ "decl-forget-test" "words.tests" lookup "foldable" word-prop ] unit-test
 
-[ ] [ "IN: temporary : decl-forget-test ; flushable" eval ] unit-test
-[ t ] [ "decl-forget-test" "temporary" lookup "flushable" word-prop ] unit-test
-[ ] [ "IN: temporary : decl-forget-test ;" eval ] unit-test
-[ f ] [ "decl-forget-test" "temporary" lookup "flushable" word-prop ] unit-test
+[ ] [ "IN: words.tests : decl-forget-test ; flushable" eval ] unit-test
+[ t ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
+[ ] [ "IN: words.tests : decl-forget-test ;" eval ] unit-test
+[ f ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test

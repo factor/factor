@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables io.files kernel math math.parser namespaces sequences ;
+USING: assocs hashtables io.files kernel math math.parser namespaces
+io.encodings.ascii sequences ;
 IN: project-euler.079
 
 ! http://projecteuler.net/index.php?section=problems&id=79
@@ -26,7 +27,7 @@ IN: project-euler.079
 <PRIVATE
 
 : source-079 ( -- seq )
-    "extra/project-euler/079/keylog.txt" resource-path file-lines ;
+    "extra/project-euler/079/keylog.txt" resource-path ascii file-lines ;
 
 : >edges ( seq -- seq )
     [

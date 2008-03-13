@@ -2,65 +2,72 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.backend io.timeouts system kernel namespaces
 strings hashtables sequences assocs combinators vocabs.loader
-init threads continuations math ;
+init threads continuations math io.encodings io.streams.duplex
+io.nonblocking new-slots accessors ;
 IN: io.launcher
+
+
+TUPLE: process
+
+command
+detached
+
+environment
+environment-mode
+
+stdin
+stdout
+stderr
+
+timeout
+
+handle status
+killed ;
+
+SYMBOL: +closed+
+SYMBOL: +inherit+
+SYMBOL: +stdout+
+
+SYMBOL: +prepend-environment+
+SYMBOL: +replace-environment+
+SYMBOL: +append-environment+
+
+: <process> ( -- process )
+    process construct-empty
+    H{ } clone >>environment
+    +append-environment+ >>environment-mode ;
+
+: process-started? ( process -- ? )
+    dup handle>> swap status>> or ;
+
+: process-running? ( process -- ? )
+    process-handle >boolean ;
 
 ! Non-blocking process exit notification facility
 SYMBOL: processes
 
 [ H{ } clone processes set-global ] "io.launcher" add-init-hook
 
-TUPLE: process handle status killed? lapse ;
-
 HOOK: register-process io-backend ( process -- )
 
 M: object register-process drop ;
 
-: <process> ( handle -- process )
-    f f <lapse> process construct-boa
+: process-started ( process handle -- )
+    >>handle
     V{ } clone over processes get set-at
-    dup register-process ;
+    register-process ;
 
 M: process equal? 2drop f ;
 
 M: process hashcode* process-handle hashcode* ;
 
-: process-running? ( process -- ? ) process-status not ;
+: pass-environment? ( process -- ? )
+    dup environment>> assoc-empty? not
+    swap environment-mode>> +replace-environment+ eq? or ;
 
-SYMBOL: +command+
-SYMBOL: +arguments+
-SYMBOL: +detached+
-SYMBOL: +environment+
-SYMBOL: +environment-mode+
-SYMBOL: +stdin+
-SYMBOL: +stdout+
-SYMBOL: +stderr+
-SYMBOL: +closed+
-SYMBOL: +timeout+
-
-SYMBOL: +prepend-environment+
-SYMBOL: +replace-environment+
-SYMBOL: +append-environment+
-
-: default-descriptor
-    H{
-        { +command+ f }
-        { +arguments+ f }
-        { +detached+ f }
-        { +environment+ H{ } }
-        { +environment-mode+ +append-environment+ }
-    } ;
-
-: with-descriptor ( desc quot -- )
-    default-descriptor [ >r clone r> bind ] bind ; inline
-
-: pass-environment? ( -- ? )
-    +environment+ get assoc-empty? not
-    +environment-mode+ get +replace-environment+ eq? or ;
-
-: get-environment ( -- env )
-    +environment+ get
-    +environment-mode+ get {
+: get-environment ( process -- env )
+    dup environment>>
+    swap environment-mode>> {
         { +prepend-environment+ [ os-envs union ] }
         { +append-environment+ [ os-envs swap union ] }
         { +replace-environment+ [ ] }
@@ -69,36 +76,39 @@ SYMBOL: +append-environment+
 : string-array? ( obj -- ? )
     dup sequence? [ [ string? ] all? ] [ drop f ] if ;
 
-: >descriptor ( desc -- desc )
-    {
-        { [ dup string? ] [ +command+ associate ] }
-        { [ dup string-array? ] [ +arguments+ associate ] }
-        { [ dup assoc? ] [ >hashtable ] }
-    } cond ;
+GENERIC: >process ( obj -- process )
+
+M: process >process
+    dup process-started? [
+        "Process has already been started once" throw
+    ] when
+    clone ;
+
+M: object >process <process> swap >>command ;
 
 HOOK: current-process-handle io-backend ( -- handle )
 
-HOOK: run-process* io-backend ( desc -- handle )
+HOOK: run-process* io-backend ( process -- handle )
 
 : wait-for-process ( process -- status )
     [
-        dup process-handle
+        dup handle>>
         [
             dup [ processes get at push ] curry
             "process" suspend drop
         ] when
-        dup process-killed?
-        [ "Process was killed" throw ] [ process-status ] if
+        dup killed>>
+        [ "Process was killed" throw ] [ status>> ] if
     ] with-timeout ;
 
-: run-process ( desc -- process )
-    >descriptor
-    dup run-process*
-    +timeout+ pick at [ over set-timeout ] when*
-    +detached+ rot at [ dup wait-for-process drop ] unless ;
-
 : run-detached ( desc -- process )
-    >descriptor H{ { +detached+ t } } union run-process ;
+    >process
+    dup dup run-process* process-started
+    dup timeout>> [ over set-timeout ] when* ;
+
+: run-process ( desc -- process )
+    run-detached
+    dup detached>> [ dup wait-for-process drop ] unless ;
 
 TUPLE: process-failed code ;
 
@@ -112,30 +122,41 @@ TUPLE: process-failed code ;
 HOOK: kill-process* io-backend ( handle -- )
 
 : kill-process ( process -- )
-    t over set-process-killed?
-    process-handle [ kill-process* ] when* ;
+    t >>killed
+    handle>> [ kill-process* ] when* ;
 
-M: process get-lapse process-lapse ;
+M: process timeout timeout>> ;
+
+M: process set-timeout set-process-timeout ;
 
 M: process timed-out kill-process ;
 
-HOOK: process-stream* io-backend ( desc -- stream process )
+HOOK: (process-stream) io-backend ( process -- handle in out )
 
 TUPLE: process-stream process ;
 
-: <process-stream> ( desc -- stream )
-    >descriptor
-    [ process-stream* ] keep
-    +timeout+ swap at [ over set-timeout ] when*
-    { set-delegate set-process-stream-process }
-    process-stream construct ;
+: <process-stream> ( desc encoding -- stream )
+    >r >process dup dup (process-stream)
+    >r >r process-started process-stream construct-boa
+    r> r> <reader&writer> r> <encoder-duplex>
+    over set-delegate ;
 
 : with-process-stream ( desc quot -- status )
     swap <process-stream>
     [ swap with-stream ] keep
-    process-stream-process wait-for-process ; inline
+    process>> wait-for-process ; inline
 
-: notify-exit ( status process -- )
-    [ set-process-status ] keep
+: notify-exit ( process status -- )
+    >>status
     [ processes get delete-at* drop [ resume ] each ] keep
-    f swap set-process-handle ;
+    f >>handle
+    drop ;
+
+GENERIC: underlying-handle ( stream -- handle )
+
+M: port underlying-handle port-handle ;
+
+M: duplex-stream underlying-handle
+    dup duplex-stream-in underlying-handle
+    swap duplex-stream-out underlying-handle tuck =
+    [ "Invalid duplex stream" throw ] when ;

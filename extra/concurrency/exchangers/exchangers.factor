@@ -17,5 +17,5 @@ TUPLE: exchanger thread object ;
         >r exchanger-thread box> resume-with r>
     ] [
         [ exchanger-object >box ] keep
-        [ exchanger-thread >box ] curry "Exchange wait" suspend
+        [ exchanger-thread >box ] curry "exchange" suspend
     ] if ;

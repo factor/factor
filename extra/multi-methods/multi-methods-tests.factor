@@ -1,4 +1,4 @@
-IN: temporary
+IN: multi-methods.tests
 USING: multi-methods tools.test kernel math arrays sequences
 prettyprint strings classes hashtables assocs namespaces
 debugger continuations ;

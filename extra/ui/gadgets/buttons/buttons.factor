@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.labels ui.gadgets.theme

@@ -222,3 +222,7 @@ IN: regexp-tests
 [ f ] [ "foo bar" "foo\\B bar" f <regexp> matches? ] unit-test
 [ t ] [ "fooxbar" "foo\\Bxbar" f <regexp> matches? ] unit-test
 [ f ] [ "foo" "foo\\Bbar" f <regexp> matches? ] unit-test
+
+[ t ] [ "s@f" "[a-z.-]@[a-z]" f <regexp> matches? ] unit-test
+[ f ] [ "a" "[a-z.-]@[a-z]" f <regexp> matches? ] unit-test
+[ t ] [ ".o" "\\.[a-z]" f <regexp> matches? ] unit-test

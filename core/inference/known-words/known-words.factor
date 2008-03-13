@@ -10,7 +10,8 @@ namespaces.private parser prettyprint quotations
 quotations.private sbufs sbufs.private sequences
 sequences.private slots.private strings strings.private system
 threads.private tuples tuples.private vectors vectors.private
-words words.private assocs inspector compiler.units ;
+words words.private assocs inspector compiler.units
+system.private ;
 IN: inference.known-words
 
 ! Shuffle words
@@ -538,6 +539,8 @@ set-primitive-effect
 
 \ fwrite { string alien } { } <effect> set-primitive-effect
 
+\ fputc { object alien } { } <effect> set-primitive-effect
+
 \ fread { integer string } { object } <effect> set-primitive-effect
 
 \ fflush { alien } { } <effect> set-primitive-effect
@@ -594,6 +597,8 @@ set-primitive-effect
 \ set-innermost-frame-quot { quotation callstack } { } <effect> set-primitive-effect
 
 \ (os-envs) { } { array } <effect> set-primitive-effect
+
+\ (set-os-envs) { array } { } <effect> set-primitive-effect
 
 \ do-primitive [ \ do-primitive no-effect ] "infer" set-word-prop
 

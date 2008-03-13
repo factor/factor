@@ -1,11 +1,11 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.allot
 cpu.architecture kernel kernel.private math namespaces sequences
-generator.registers generator.fixup generator system
+generator.registers generator.fixup generator system layouts
 alien.compiler combinators command-line
-compiler io vocabs.loader ;
+compiler compiler.units io vocabs.loader ;
 IN: cpu.x86.32
 
 PREDICATE: x86-backend x86-32-backend
@@ -281,7 +281,10 @@ T{ x86-backend f 4 } compiler-backend set-global
 
 "-no-sse2" cli-args member? [
     "Checking if your CPU supports SSE2..." print flush
-    [ sse2? ] compile-call [
+    [ optimized-recompile-hook ] recompile-hook [
+        [ sse2? ] compile-call
+    ] with-variable
+    [
         " - yes" print
         "cpu.x86.sse2" require
     ] [

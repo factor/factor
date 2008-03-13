@@ -19,7 +19,7 @@ void default_parameters(F_PARAMETERS *p)
 	p->rs_size = 32 * CELLS;
 
 	p->gen_count = 3;
-	p->code_size = 4 * CELLS;
+	p->code_size = 8 * CELLS;
 	p->young_size = 2 * CELLS;
 	p->aging_size = 4 * CELLS;
 #endif

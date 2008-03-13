@@ -1,5 +1,6 @@
 USING: sequences.deep kernel tools.test strings math arrays
 namespaces sequences ;
+IN: sequences.deep.tests
 
 [ [ "hello" 3 4 swap ] ] [ [ { "hello" V{ 3 4 } } swap ] flatten ] unit-test
 

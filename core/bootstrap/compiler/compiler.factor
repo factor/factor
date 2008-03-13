@@ -16,6 +16,14 @@ IN: bootstrap.compiler
 
 "cpu." cpu append require
 
+: enable-compiler ( -- )
+    [ optimized-recompile-hook ] recompile-hook set-global ;
+
+: disable-compiler ( -- )
+    [ default-recompile-hook ] recompile-hook set-global ;
+
+enable-compiler
+
 nl
 "Compiling some words to speed up bootstrap..." write flush
 
@@ -73,13 +81,5 @@ nl
 {
     malloc free memcpy
 } compile
-
-: enable-compiler ( -- )
-    [ compiled-usages recompile ] recompile-hook set-global ;
-
-: disable-compiler ( -- )
-    [ default-recompile-hook ] recompile-hook set-global ;
-
-enable-compiler
 
 " done" print flush

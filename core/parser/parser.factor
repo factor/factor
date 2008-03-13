@@ -4,7 +4,7 @@ USING: arrays definitions generic assocs kernel math
 namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger 
-io.files io.streams.string io.streams.lines vocabs
+io.files io.streams.string vocabs io.encodings.utf8
 source-files classes hashtables compiler.errors compiler.units ;
 IN: parser
 
@@ -240,10 +240,13 @@ PREDICATE: unexpected unexpected-eof
 
 : CREATE ( -- word ) scan create-in ;
 
-: CREATE-CLASS ( -- word )
-    scan in get create
+: create-class-in ( word -- word )
+    in get create
     dup save-class-location
     dup predicate-word dup set-word save-location ;
+
+: CREATE-CLASS ( -- word )
+    scan create-class-in ;
 
 : word-restarts ( possibilities -- restarts )
     natural-sort [
@@ -352,6 +355,8 @@ TUPLE: bad-number ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
+: (:) CREATE dup reset-generic parse-definition ;
+
 GENERIC: expected>string ( obj -- str )
 
 M: f expected>string drop "end of input" ;
@@ -439,11 +444,12 @@ SYMBOL: interactive-vocabs
         "Warning: the following definitions were removed from sources," print
         "but are still referenced from other definitions:" print
         nl
-        dup stack.
+        dup sorted-definitions.
         nl
         "The following definitions need to be updated:" print
         nl
-        over stack.
+        over sorted-definitions.
+        nl
     ] when 2drop ;
 
 : filter-moved ( assoc -- newassoc )
@@ -463,9 +469,16 @@ SYMBOL: interactive-vocabs
         dup values concat prune swap keys
     ] keep ;
 
+: fix-class-words ( -- )
+    #! If a class word had a compound definition which was
+    #! removed, it must go back to being a symbol.
+    new-definitions get first2 diff
+    [ nip dup reset-generic define-symbol ] assoc-each ;
+
 : forget-smudged ( -- )
     smudged-usage forget-all
-    over empty? [ 2dup smudged-usage-warning ] unless 2drop ;
+    over empty? [ 2dup smudged-usage-warning ] unless 2drop
+    fix-class-words ;
 
 : finish-parsing ( lines quot -- )
     file get
@@ -490,7 +503,7 @@ SYMBOL: interactive-vocabs
     [
         [
             [ parsing-file ] keep
-            [ ?resource-path <file-reader> ] keep
+            [ ?resource-path utf8 <file-reader> ] keep
             parse-stream
         ] with-compiler-errors
     ] [
@@ -499,7 +512,7 @@ SYMBOL: interactive-vocabs
     ] recover ;
 
 : run-file ( file -- )
-    [ [ parse-file call ] keep ] assert-depth drop ;
+    [ dup parse-file call ] assert-depth drop ;
 
 : ?run-file ( path -- )
     dup resource-exists? [ run-file ] [ drop ] if ;

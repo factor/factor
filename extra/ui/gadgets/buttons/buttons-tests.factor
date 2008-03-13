@@ -1,4 +1,4 @@
-IN: temporary
+IN: ui.gadgets.buttons.tests
 USING: ui.commands ui.gadgets.buttons ui.gadgets.labels
 ui.gadgets tools.test namespaces sequences kernel models ;
 

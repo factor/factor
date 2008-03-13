@@ -107,7 +107,7 @@ IN: bootstrap.syntax
     ] define-syntax
 
     ":" [
-        CREATE dup reset-generic parse-definition define
+        (:) define
     ] define-syntax
 
     "GENERIC:" [

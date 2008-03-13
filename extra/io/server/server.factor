@@ -10,10 +10,6 @@ SYMBOL: servers
 
 <PRIVATE
 
-: spawn-vars ( quot vars name -- )
-    >r [ dup get ] H{ } map>assoc [ swap bind ] 2curry r>
-    spawn drop ;
-
 LOG: accepted-connection NOTICE
 
 : with-client ( client quot -- )
@@ -26,11 +22,10 @@ LOG: accepted-connection NOTICE
 
 : accept-loop ( server quot -- )
     [
-        >r accept r> [ with-client ] 2curry
-        { log-service servers } "Client" spawn-vars
+        >r accept r> [ with-client ] 2curry "Client" spawn drop
     ] 2keep accept-loop ; inline
 
-: server-loop ( addrspec quot -- )
+: server-loop ( addrspec encoding quot -- )
     >r <server> dup servers get push r>
     [ accept-loop ] curry with-disposal ; inline
 
@@ -44,12 +39,12 @@ PRIVATE>
 : internet-server ( port -- seq )
     f swap t resolve-host ;
 
-: with-server ( seq service quot -- )
-    V{ } clone [
-        servers [
-            [ server-loop ] curry with-logging
-        ] with-variable
-    ] 3curry parallel-each ; inline
+: with-server ( seq service encoding quot -- )
+    V{ } clone servers [
+        [
+            [ server-loop ] 2curry with-logging
+        ] 3curry parallel-each
+    ] with-variable ; inline
 
 : stop-server ( -- )
     servers get [ dispose ] each ;

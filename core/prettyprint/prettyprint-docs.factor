@@ -242,8 +242,8 @@ HELP: definer
 { $values { "defspec" "a definition specifier" } { "start" word } { "end" "a word or " { $link f } } }
 { $contract "Outputs the parsing words which delimit the definition." }
 { $examples
-    { $example ": foo ; \\ foo definer . ." ";\nPOSTPONE: :" }
-    { $example "SYMBOL: foo \\ foo definer . ." "f\nPOSTPONE: SYMBOL:" }
+    { $example "USING: definitions prettyprint ;" ": foo ; \\ foo definer . ." ";\nPOSTPONE: :" }
+    { $example "USING: definitions prettyprint ;" "SYMBOL: foo \\ foo definer . ." "f\nPOSTPONE: SYMBOL:" }
 }
 { $notes "This word is used in the implementation of " { $link see } "." } ;
 
@@ -251,6 +251,6 @@ HELP: definition
 { $values { "defspec" "a definition specifier" } { "seq" "a sequence" } }
 { $contract "Outputs the body of a definition." }
 { $examples
-    { $example "USE: math" "\\ sq definition ." "[ dup * ]" }
+    { $example "USING: definitions math prettyprint ;" "\\ sq definition ." "[ dup * ]" }
 }
 { $notes "This word is used in the implementation of " { $link see } "." } ;

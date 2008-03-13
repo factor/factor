@@ -255,8 +255,7 @@ PRIVATE>
 
 : (define-class) ( word props -- )
     over reset-class
-    over reset-generic
-    over define-symbol
+    over deferred? [ over define-symbol ] when
     >r dup word-props r> union over set-word-props
     t "class" set-word-prop ;
 

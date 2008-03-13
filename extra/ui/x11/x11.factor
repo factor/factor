@@ -3,7 +3,7 @@
 USING: alien alien.c-types arrays ui ui.gadgets ui.gestures
 ui.backend ui.clipboards ui.gadgets.worlds assocs kernel math
 namespaces opengl sequences strings x11.xlib x11.events x11.xim
-x11.glx x11.clipboard x11.constants x11.windows
+x11.glx x11.clipboard x11.constants x11.windows io.encodings.string
 io.encodings.utf8 combinators debugger system command-line
 ui.render math.vectors tuples opengl.gl threads ;
 IN: ui.x11
@@ -137,7 +137,7 @@ M: world selection-notify-event
 
 : encode-clipboard ( string type -- bytes )
     XSelectionRequestEvent-target XA_UTF8_STRING =
-    [ encode-utf8 ] [ string>char-alien ] if ;
+    [ utf8 encode ] [ string>char-alien ] if ;
 
 : set-selection-prop ( evt -- )
     dpy get swap
@@ -178,7 +178,7 @@ M: world client-event
         next-event dup
         None XFilterEvent zero? [ drop wait-event ] unless
     ] [
-        ui-step 10 sleep wait-event
+        ui-wait wait-event
     ] if ;
 
 : do-events ( -- )
@@ -212,7 +212,7 @@ M: x-clipboard paste-clipboard
 : set-title-new ( dpy window string -- )
     >r
     XA_NET_WM_NAME XA_UTF8_STRING 8 PropModeReplace
-    r> encode-utf8 dup length XChangeProperty drop ;
+    r> utf8 encode dup length XChangeProperty drop ;
 
 M: x11-ui-backend set-title ( string world -- )
     world-handle x11-handle-window swap dpy get -rot
@@ -235,7 +235,7 @@ M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
     world-handle x11-handle-window dup set-closable map-window ;
 
-M: x11-ui-backend raise-window ( world -- )
+M: x11-ui-backend raise-window* ( world -- )
     world-handle [
         dpy get swap x11-handle-window XRaiseWindow drop
     ] when* ;

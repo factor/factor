@@ -4,16 +4,15 @@
 IN: threads
 USING: arrays hashtables heaps kernel kernel.private math
 namespaces sequences vectors continuations continuations.private
-dlists assocs system combinators debugger prettyprint io init
-boxes ;
+dlists assocs system combinators init boxes ;
 
 SYMBOL: initial-thread
 
 TUPLE: thread
-name quot error-handler
-id registered?
+name quot exit-handler
+id
 continuation state
-mailbox variables ;
+mailbox variables sleep-entry ;
 
 : self ( -- thread ) 40 getenv ; inline
 
@@ -37,37 +36,36 @@ threads global [ H{ } assoc-like ] change-at
 
 : thread ( id -- thread ) threads at ;
 
-<PRIVATE
+: thread-registered? ( thread -- ? )
+    thread-id threads key? ;
 
 : check-unregistered
     dup thread-registered?
-    [ "Registering a thread twice" throw ] when ;
+    [ "Thread already stopped" throw ] when ;
 
 : check-registered
     dup thread-registered?
-    [ "Unregistering a thread twice" throw ] unless ;
+    [ "Thread is not running" throw ] unless ;
+
+<PRIVATE
 
 : register-thread ( thread -- )
-    check-unregistered
-    t over set-thread-registered?
-    dup thread-id threads set-at ;
+    check-unregistered dup thread-id threads set-at ;
 
 : unregister-thread ( thread -- )
-    check-registered
-    f over set-thread-registered?
-    thread-id threads delete-at ;
+    check-registered thread-id threads delete-at ;
 
 : set-self ( thread -- ) 40 setenv ; inline
 
 PRIVATE>
 
-: <thread> ( quot name error-handler -- thread )
-    \ thread counter <box> {
+: <thread> ( quot name -- thread )
+    \ thread counter <box> [ ] {
         set-thread-quot
         set-thread-name
-        set-thread-error-handler
         set-thread-id
         set-thread-continuation
+        set-thread-exit-handler
     } \ thread construct ;
 
 : run-queue 42 getenv ;
@@ -75,48 +73,68 @@ PRIVATE>
 : sleep-queue 43 getenv ;
 
 : resume ( thread -- )
+    f over set-thread-state
     check-registered run-queue push-front ;
 
+: resume-now ( thread -- )
+    f over set-thread-state
+    check-registered run-queue push-back ;
+
 : resume-with ( obj thread -- )
+    f over set-thread-state
     check-registered 2array run-queue push-front ;
 
-<PRIVATE
-
-: schedule-sleep ( thread ms -- )
-    >r check-registered r> sleep-queue heap-push ;
-
-: wake-up? ( heap -- ? )
-    dup heap-empty?
-    [ drop f ] [ heap-peek nip millis <= ] if ;
-
-: wake-up ( -- )
-    sleep-queue
-    [ dup wake-up? ] [ dup heap-pop drop resume ] [ ] while
-    drop ;
-
-: next ( -- )
-    walker-hook [
-        continue
-    ] [
-        wake-up
-        run-queue pop-back
-        dup array? [ first2 ] [ f swap ] if dup set-self
-        f over set-thread-state
-        thread-continuation box>
-        continue-with
-    ] if* ;
-
-PRIVATE>
-
-: sleep-time ( -- ms )
+: sleep-time ( -- ms/f )
     {
         { [ run-queue dlist-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
         { [ t ] [ sleep-queue heap-peek nip millis [-] ] }
     } cond ;
 
+<PRIVATE
+
+: schedule-sleep ( thread ms -- )
+    >r check-registered dup r> sleep-queue heap-push*
+    swap set-thread-sleep-entry ;
+
+: expire-sleep? ( heap -- ? )
+    dup heap-empty?
+    [ drop f ] [ heap-peek nip millis <= ] if ;
+
+: expire-sleep ( thread -- )
+    f over set-thread-sleep-entry resume ;
+
+: expire-sleep-loop ( -- )
+    sleep-queue
+    [ dup expire-sleep? ]
+    [ dup heap-pop drop expire-sleep ]
+    [ ] while
+    drop ;
+
+: next ( -- * )
+    expire-sleep-loop
+    run-queue dup dlist-empty? [
+        ! We should never be in a state where the only threads
+        ! are sleeping; the I/O wait thread is always runnable.
+        ! However, if it dies, we handle this case
+        ! semi-gracefully.
+        !
+        ! And if sleep-time outputs f, there are no sleeping
+        ! threads either... so WTF.
+        drop sleep-time [ die 0 ] unless* (sleep) next
+    ] [
+        pop-back
+        dup array? [ first2 ] [ f swap ] if dup set-self
+        f over set-thread-state
+        thread-continuation box>
+        continue-with
+    ] if ;
+
+PRIVATE>
+
 : stop ( -- )
-    self unregister-thread next ;
+    self dup thread-exit-handler call
+    unregister-thread next ;
 
 : suspend ( quot state -- obj )
     [
@@ -125,19 +143,33 @@ PRIVATE>
         self swap call next
     ] callcc1 2nip ; inline
 
-: yield ( -- ) [ resume ] "yield" suspend drop ;
+: yield ( -- ) [ resume ] f suspend drop ;
 
-: sleep ( ms -- )
-    >fixnum millis +
-    [ schedule-sleep ] curry
-    "sleep" suspend drop ;
+GENERIC: sleep-until ( time/f -- )
+
+M: integer sleep-until
+    [ schedule-sleep ] curry "sleep" suspend drop ;
+
+M: f sleep-until
+    drop [ drop ] "interrupt" suspend drop ;
+
+GENERIC: sleep ( ms -- )
+
+M: real sleep
+    millis + >integer sleep-until ;
+
+: interrupt ( thread -- )
+    dup thread-state [
+        dup thread-sleep-entry [ sleep-queue heap-delete ] when*
+        f over set-thread-sleep-entry
+        dup resume
+    ] when drop ;
 
 : (spawn) ( thread -- )
     [
-        resume [
+        resume-now [
             dup set-self
             dup register-thread
-            init-namespaces
             V{ } set-catchstack
             { } set-retainstack
             >r { } set-datastack r>
@@ -146,19 +178,7 @@ PRIVATE>
     ] "spawn" suspend 2drop ;
 
 : spawn ( quot name -- thread )
-    [
-        global [
-            "Error in thread " write
-            dup thread-id pprint
-            " (" write
-            dup thread-name pprint ")" print
-            "spawned to call " write
-            thread-quot short.
-            nl
-            print-error flush
-        ] bind
-    ] <thread>
-    [ (spawn) ] keep ;
+    <thread> [ (spawn) ] keep ;
 
 : spawn-server ( quot name -- thread )
     >r [ [ ] [ ] while ] curry r> spawn ;
@@ -168,6 +188,8 @@ PRIVATE>
     [ >r set-namestack set-datastack r> call ] 3curry
     "Thread" spawn drop ;
 
+GENERIC: error-in-thread ( error thread -- )
+
 <PRIVATE
 
 : init-threads ( -- )
@@ -175,13 +197,13 @@ PRIVATE>
     <dlist> 42 setenv
     <min-heap> 43 setenv
     initial-thread global
-    [ drop f "Initial" [ die ] <thread> ] cache
+    [ drop f "Initial" <thread> ] cache
     <box> over set-thread-continuation
-    f over set-thread-registered?
+    f over set-thread-state
     dup register-thread
     set-self ;
 
-[ self dup thread-error-handler call stop ]
+[ self error-in-thread stop ]
 thread-error-hook set-global
 
 PRIVATE>

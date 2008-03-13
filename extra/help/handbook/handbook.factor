@@ -2,7 +2,7 @@ USING: help help.markup help.syntax help.definitions help.topics
 namespaces words sequences classes assocs vocabs kernel arrays
 prettyprint.backend kernel.private io generic math system
 strings sbufs vectors byte-arrays bit-arrays float-arrays
-quotations ;
+quotations io.streams.byte-array io.encodings.string ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -66,8 +66,7 @@ ARTICLE: "evaluator" "Evaluation semantics"
     { "All other types of objects are pushed on the data stack." }
 }
 "If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $snippet "tail-recursion" } " and allows iterative algorithms to execute without incurring unbounded call stack usage."
-$nl
-"There are various ways of implementing these evaluation semantics. See " { $link "compiler" } " and " { $link "meta-interpreter" } "." ;
+{ $see-also "compiler" } ;
 
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "evaluator" }
@@ -87,7 +86,8 @@ concurrency.futures
 concurrency.locks
 concurrency.semaphores
 concurrency.count-downs
-concurrency.exchangers ;
+concurrency.exchangers
+concurrency.flags ;
 
 ARTICLE: "concurrency" "Concurrency"
 "Factor supports a variety of concurrency abstractions, however they are mostly used to multiplex input/output operations since the thread scheduling is co-operative and only one CPU is used at a time."
@@ -100,12 +100,14 @@ $nl
 { $subsection "concurrency.combinators" }
 { $subsection "concurrency.promises" }
 { $subsection "concurrency.futures" }
+{ $subsection "concurrency.mailboxes" }
 { $subsection "concurrency.messaging" }
 "Shared-state abstractions:"
 { $subsection "concurrency.locks" }
 { $subsection "concurrency.semaphores" }
 { $subsection "concurrency.count-downs" }
 { $subsection "concurrency.exchangers" }
+{ $subsection "concurrency.flags" }
 "Other concurrency abstractions include " { $vocab-link "concurrency.distributed" } " and " { $vocab-link "channels" } "." ;
 
 ARTICLE: "objects" "Objects"
@@ -114,6 +116,7 @@ ARTICLE: "objects" "Objects"
 { $subsection "classes" }
 { $subsection "tuples" }
 { $subsection "generic" }
+{ $subsection "slots" }
 { $subsection "mirrors" } ;
 
 USE: random
@@ -169,23 +172,27 @@ ARTICLE: "collections" "Collections"
 
 USING: io.sockets io.launcher io.mmap io.monitors ;
 
-ARTICLE: "io" "Input and output" 
+ARTICLE: "io" "Input and output"
+{ $heading "Streams" }
 { $subsection "streams" }
-"External streams:"
-{ $subsection "file-streams" }
-{ $subsection "network-streams" }
 "Wrapper streams:"
 { $subsection "io.streams.duplex" }
-{ $subsection "io.streams.lines" }
 { $subsection "io.streams.plain" }
 { $subsection "io.streams.string" }
-"Stream utilities:"
+{ $subsection "io.streams.byte-array" }
+"Utilities:"
 { $subsection "stream-binary" }
 { $subsection "styles" }
-"Advanced features:"
-{ $subsection "io.launcher" }
+{ $heading "Files" }
+{ $subsection "io.files" }
 { $subsection "io.mmap" }
 { $subsection "io.monitors" }
+{ $heading "Encodings" }
+{ $subsection "io.encodings" }
+{ $subsection "io.encodings.string" }
+{ $heading "Other features" }
+{ $subsection "network-streams" }
+{ $subsection "io.launcher" }
 { $subsection "io.timeouts" } ;
 
 ARTICLE: "tools" "Developer tools"
@@ -196,7 +203,7 @@ ARTICLE: "tools" "Developer tools"
 "Debugging tools:"
 { $subsection "tools.annotations" }
 { $subsection "tools.test" }
-{ $subsection "meta-interpreter" }
+{ $subsection "tools.threads" }
 "Performance tools:"
 { $subsection "tools.memory" }
 { $subsection "profiling" }
@@ -229,7 +236,7 @@ ARTICLE: "program-org" "Program organization"
 USING: help.cookbook help.tutorial ;
 
 ARTICLE: "handbook" "Factor documentation"
-"Welcome to Factor. Factor is dynamically-typed, stack-based, and very expressive. It is one of the most powerful and flexible programming languages ever invented. Have fun with Factor!"
+"Welcome to Factor."
 { $heading "Starting points" }
 { $subsection "cookbook" }
 { $subsection "first-program" }
@@ -255,6 +262,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "help" }
 { $subsection "inference" }
 { $subsection "compiler" }
+{ $subsection "layouts" }
 { $heading "User interface" }
 { $about "ui" }
 { $about "ui.tools" }

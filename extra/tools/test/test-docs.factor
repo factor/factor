@@ -43,7 +43,7 @@ $nl
 }
 "The latter is used for vocabularies with more extensive test suites."
 $nl
-"If the test harness needs to define words, they should be placed in the " { $snippet "temporary" } " vocabulary so that they can be forgotten after the tests have been run."
+"If the test harness needs to define words, they should be placed in a vocabulary named " { $snippet { $emphasis "vocab" } ".tests" } " where " { $emphasis "vocab" } " is the vocab being tested."
 { $subsection "tools.test.write" }
 { $subsection "tools.test.run" }
 { $subsection "tools.test.failure" } ;
@@ -89,6 +89,6 @@ HELP: run-all-tests
 { $values { "prefix" "a vocabulary name" } { "failures" "an association list of unit test failures" } }
 { $description "Runs unit tests for all loaded vocabularies and outputs unit test failures as documented in " { $link "tools.test.failure" } "." } ;
 
-HELP: failure.
-{ $values { "failures" "an association list of unit test failures" } }
+HELP: test-failures.
+{ $values { "assoc" "an association list of unit test failures" } }
 { $description "Prints unit test failures output by " { $link run-tests } " or " { $link run-all-tests } " to the " { $link stdio } " stream." } ;

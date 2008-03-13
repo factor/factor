@@ -1,0 +1,75 @@
+<% USING: http.server.components http.server.auth.login
+namespaces kernel combinators ; %>
+<html>
+<body>
+<h1>New user registration</h1>
+
+<form method="POST" action="register">
+<table>
+
+<tr>
+<td>User name:</td>
+<td><% "username" component render-edit %></td>
+</tr>
+
+<tr>
+<td>Real name:</td>
+<td><% "realname" component render-edit %></td>
+</tr>
+
+<tr>
+<td></td>
+<td>Specifying a real name is optional.</td>
+</tr>
+
+<tr>
+<td>Password:</td>
+<td><% "password" component render-edit %></td>
+</tr>
+
+<tr>
+<td>Verify:</td>
+<td><% "verify-password" component render-edit %></td>
+</tr>
+
+<tr>
+<td></td>
+<td>Enter your password twice to ensure it is correct.</td>
+</tr>
+
+<tr>
+<td>E-mail:</td>
+<td><% "email" component render-edit %></td>
+</tr>
+
+<tr>
+<td></td>
+<td>Specifying an e-mail address is optional. It enables the "recover password" feature.</td>
+</tr>
+
+<tr>
+<td>Captcha:</td>
+<td><% "captcha" component render-edit %></td>
+</tr>
+
+<tr>
+<td></td>
+<td>Leave the captcha blank. Spam-bots will fill it indiscriminantly, so their attempts to register will be blocked.</td>
+</tr>
+
+</table>
+
+<p><input type="submit" value="Register" />
+
+<% {
+    { [ password-mismatch? get ] [ "passwords do not match" render-error ] }
+    { [ user-exists? get ] [ "username taken" render-error ] }
+    { [ t ] [ ] }
+} cond %>
+
+</p>
+
+</form>
+
+</body>
+</html>

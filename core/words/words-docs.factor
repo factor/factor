@@ -1,5 +1,5 @@
-USING: definitions help.markup help.syntax kernel
-kernel.private parser words.private vocabs classes quotations
+USING: definitions help.markup help.syntax kernel parser
+kernel.private words.private vocabs classes quotations
 strings effects compiler.units ;
 IN: words
 
@@ -76,9 +76,9 @@ $nl
 ARTICLE: "declarations" "Declarations"
 "Declarations give special behavior to a word. Declarations are parsing words that set a word property in the most recently defined word."
 $nl
-"The first declaration specifies the time when a word runs. It affects both interpreted and compiled definitions."
+"The first declaration specifies the time when a word runs. It affects both the non-optimizing and optimizing compilers:"
 { $subsection POSTPONE: parsing }
-"The remaining declarations only affect compiled definitions. They do not change evaluation semantics of a word, but instead declare that the word follows a certain contract, and thus may be compiled differently."
+"The remaining declarations only affect definitions compiled with the optimizing compiler. They do not change evaluation semantics of a word, but instead declare that the word follows a certain contract, and thus may be compiled differently."
 { $warning "If a generic word is declared " { $link POSTPONE: foldable } " or " { $link POSTPONE: flushable } ", all methods must satisfy the contract, otherwise unpredicable behavior will occur." }
 { $subsection POSTPONE: inline }
 { $subsection POSTPONE: foldable }
@@ -197,7 +197,7 @@ HELP: execute ( word -- )
 { $values { "word" word } }
 { $description "Executes a word." }
 { $examples
-    { $example ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
+    { $example "USING: kernel io words ;" ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
 
 HELP: word-props ( word -- props )
@@ -322,7 +322,7 @@ HELP: create
 HELP: constructor-word
 { $values { "name" string } { "vocab" string } { "word" word } }
 { $description "Creates a new word, surrounding " { $snippet "name" } " in angle brackets." }
-{ $examples { $example "\"salmon\" \"scratchpad\" constructor-word ." "<salmon>" } } ;
+{ $examples { $example "USING: prettyprint words ;" "\"salmon\" \"scratchpad\" constructor-word ." "<salmon>" } } ;
 
 HELP: forget-word
 { $values { "word" word } }

@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables io kernel math memory namespaces
-parser sequences strings io.styles io.streams.lines
+USING: arrays hashtables io kernel math math.parser memory
+namespaces parser sequences strings io.styles
 io.streams.duplex vectors words generic system combinators
 tuples continuations debugger definitions compiler.units ;
 IN: listener
@@ -32,13 +32,13 @@ GENERIC: stream-read-quot ( stream -- quot/f )
         3drop f
     ] if ;
 
-M: line-reader stream-read-quot
+M: object stream-read-quot
     V{ } clone read-quot-loop ;
 
 M: duplex-stream stream-read-quot
     duplex-stream-in stream-read-quot ;
 
-: read-quot ( -- quot ) stdio get stream-read-quot ;
+: read-quot ( -- quot/f ) stdio get stream-read-quot ;
 
 : bye ( -- ) quit-flag on ;
 
@@ -62,11 +62,7 @@ M: duplex-stream stream-read-quot
     [ quit-flag off ]
     [ listen until-quit ] if ; inline
 
-: print-banner ( -- )
-    "Factor " write version write
-    " on " write os write "/" write cpu print ;
-
 : listener ( -- )
-    print-banner [ until-quit ] with-interactive-vocabs ;
+    [ until-quit ] with-interactive-vocabs ;
 
 MAIN: listener

@@ -1,18 +1,15 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators continuations documents
-ui.tools.workspace hashtables io io.styles kernel math
+ hashtables io io.styles kernel math
 math.vectors models namespaces parser prettyprint quotations
 sequences sequences.lib strings threads listener
 tuples ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
-definitions boxes ;
+definitions boxes calendar concurrency.flags ui.tools.workspace ;
 IN: ui.tools.interactor
 
-TUPLE: interactor
-history output
-thread quot
-help ;
+TUPLE: interactor history output flag thread help ;
 
 : interactor-continuation ( interactor -- continuation )
     interactor-thread box-value
@@ -29,17 +26,22 @@ help ;
     ] if ;
 
 : init-caret-help ( interactor -- )
-    dup editor-caret 100 <delay> swap set-interactor-help ;
+    dup editor-caret 1/3 seconds <delay>
+    swap set-interactor-help ;
 
 : init-interactor-history ( interactor -- )
     V{ } clone swap set-interactor-history ;
+
+: init-interactor-state ( interactor -- )
+    <flag> over set-interactor-flag
+    <box> swap set-interactor-thread ;
 
 : <interactor> ( output -- gadget )
     <source-editor>
     interactor construct-editor
     tuck set-interactor-output
-    <box> over set-interactor-thread
     dup init-interactor-history
+    dup init-interactor-state
     dup init-caret-help ;
 
 M: interactor graft*
@@ -96,7 +98,10 @@ M: interactor model-changed
     ] unless drop ;
 
 : interactor-yield ( interactor -- obj )
-    [ interactor-thread >box ] curry "input" suspend ;
+    [
+        [ interactor-thread >box ] keep
+        interactor-flag raise-flag
+    ] curry "input" suspend ;
 
 M: interactor stream-readln
     [ interactor-yield ] keep interactor-finish ?first ;

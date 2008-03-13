@@ -1,6 +1,6 @@
 ! Based on http://shootout.alioth.debian.org/gp4/benchmark.php?test=fasta&lang=java&id=2
 USING: math kernel io io.files locals multiline assocs sequences
-sequences.private benchmark.reverse-complement hints
+sequences.private benchmark.reverse-complement hints io.encodings.ascii
 byte-arrays float-arrays ;
 IN: benchmark.fasta
 
@@ -51,7 +51,7 @@ HINTS: random fixnum ;
     dup keys >byte-array
     swap values >float-array unclip [ + ] accumulate swap add ;
 
-:: select-random | seed chars floats |
+:: select-random ( seed chars floats -- elt )
     floats seed random -rot
     [ >= ] curry find drop
     chars nth-unsafe ; inline
@@ -62,7 +62,7 @@ HINTS: random fixnum ;
 : write-description ( desc id -- )
     ">" write write bl print ; inline
 
-:: split-lines | n quot |
+:: split-lines ( n quot -- )
     n line-length /mod
     [ [ line-length quot call ] times ] dip
     dup zero? [ drop ] quot if ; inline
@@ -71,7 +71,7 @@ HINTS: random fixnum ;
     write-description
     [ make-random-fasta ] 2curry split-lines ; inline
 
-:: make-repeat-fasta | k len alu |
+:: make-repeat-fasta ( k len alu -- )
     [let | kn [ alu length ] |
         len [ k + kn mod alu nth-unsafe ] B{ } map-as print
         k len +
@@ -94,7 +94,7 @@ HINTS: random fixnum ;
            n [ ]
            seed [ initial-seed ] |
 
-        out [
+        out ascii [
             n 2 * ALU "Homo sapiens alu" "ONE" write-repeat-fasta
 
             initial-seed

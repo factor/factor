@@ -5,8 +5,8 @@ sequences strings vectors words quotations effects tools.test
 continuations generic.standard sorting assocs definitions
 prettyprint io inspector tuples classes.union classes.predicate
 debugger threads.private io.streams.string io.timeouts
-sequences.private ;
-IN: temporary
+io.thread sequences.private ;
+IN: inference.tests
 
 { 0 2 } [ 2 "Hello" ] must-infer-as
 { 1 2 } [ dup ] must-infer-as
@@ -440,7 +440,7 @@ DEFER: bar
 \ error. must-infer
 
 ! Test odds and ends
-\ idle-thread must-infer
+\ io-thread must-infer
 
 ! Incorrect stack declarations on inline recursive words should
 ! be caught

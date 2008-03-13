@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel layouts ;
+USING: help.markup help.syntax kernel ;
 IN: math.constants
 
 ARTICLE: "math-constants" "Constants"
@@ -7,9 +7,6 @@ ARTICLE: "math-constants" "Constants"
 { $subsection euler }
 { $subsection phi }
 { $subsection pi }
-"Various limits:"
-{ $subsection most-positive-fixnum }
-{ $subsection most-negative-fixnum }
 { $subsection epsilon } ;
 
 ABOUT: "math-constants"

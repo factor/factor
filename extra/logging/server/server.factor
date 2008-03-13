@@ -3,7 +3,8 @@
 USING: namespaces kernel io calendar sequences io.files
 io.sockets continuations prettyprint assocs math.parser
 words debugger math combinators concurrency.messaging
-threads arrays init math.ranges strings ;
+threads arrays init math.ranges strings calendar.format
+io.encodings.ascii ;
 IN: logging.server
 
 : log-root ( -- string )
@@ -20,7 +21,7 @@ SYMBOL: log-files
 : open-log-stream ( service -- stream )
     log-path
     dup make-directories
-    1 log# <file-appender> ;
+    1 log# ascii <file-appender> ;
 
 : log-stream ( service -- stream )
     log-files get [ open-log-stream ] cache ;
@@ -68,11 +69,11 @@ SYMBOL: log-files
 
 : delete-oldest keep-logs log# ?delete-file ;
 
-: ?rename-file ( old new -- )
-    over exists? [ rename-file ] [ 2drop ] if ;
+: ?move-file ( old new -- )
+    over exists? [ move-file ] [ 2drop ] if ;
 
 : advance-log ( path n -- )
-    [ 1- log# ] 2keep log# ?rename-file ;
+    [ 1- log# ] 2keep log# ?move-file ;
 
 : rotate-log ( service -- )
     dup close-log

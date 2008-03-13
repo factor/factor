@@ -30,5 +30,6 @@ H{
     { "pdf"    "application/pdf"                  }
 
     { "factor" "text/plain"                       }
+    { "cgi"    "application/x-cgi-script"         }
     { "fhtml"  "application/x-factor-server-page" }
 } "mime-types" set-global

@@ -6,7 +6,7 @@ inference.state inference.backend inference.dataflow system
 math.parser classes alien.arrays alien.c-types alien.structs
 alien.syntax cpu.architecture alien inspector quotations assocs
 kernel.private threads continuations.private libc combinators
-compiler.errors continuations ;
+compiler.errors continuations layouts ;
 IN: alien.compiler
 
 ! Common protocol for alien-invoke/alien-callback/alien-indirect
@@ -367,7 +367,7 @@ TUPLE: callback-context ;
     ] if ;
 
 : do-callback ( quot token -- )
-    init-error-handler
+    init-catchstack
     dup 2 setenv
     slip
     wait-to-return ; inline

@@ -1,4 +1,5 @@
 USING: tools.test hash2 kernel ;
+IN: hash2.tests
 
 : sample-hash
     5 <hash2>

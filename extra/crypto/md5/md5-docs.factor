@@ -1,15 +1,15 @@
 USING: help.markup help.syntax kernel math sequences quotations
-crypto.common ;
+crypto.common byte-arrays ;
 IN: crypto.md5
 
 HELP: stream>md5
 { $values { "stream" "a stream" } { "byte-array" "md5 hash" } }
 { $description "Take the MD5 hash until end of stream." }
-{ $notes "Used to implement " { $link string>md5 } " and " { $link file>md5 } ".  Call " { $link hex-string } " to convert to the canonical string representation." } ;
+{ $notes "Used to implement " { $link byte-array>md5 } " and " { $link file>md5 } ".  Call " { $link hex-string } " to convert to the canonical string representation." } ;
 
-HELP: string>md5
-{ $values { "string" "a string" } { "byte-array" "byte-array md5 hash" } }
-{ $description "Outputs the MD5 hash of a string." }
+HELP: byte-array>md5
+{ $values { "byte-array" byte-array } { "checksum" "an md5 hash" } }
+{ $description "Outputs the MD5 hash of a byte array." }
 { $notes "Call " { $link hex-string } " to convert to the canonical string representation." } ;
 
 HELP: file>md5

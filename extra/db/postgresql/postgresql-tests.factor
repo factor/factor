@@ -1,14 +1,13 @@
 ! You will need to run  'createdb factor-test' to create the database.
 ! Set username and password in  the 'connect' word.
 
-USING: kernel db.postgresql alien continuations io prettyprint
-sequences namespaces tools.test db db.types ;
-IN: temporary
+USING: kernel db.postgresql alien continuations io classes
+prettyprint sequences namespaces tools.test db
+db.tuples db.types unicode.case ;
+IN: db.postgresql.tests
 
-IN: scratchpad
 : test-db ( -- postgresql-db )
-    "localhost" "postgres" "" "factor-test" <postgresql-db> ;
-IN: temporary
+    { "localhost" "postgres" "foob" "factor-test" } postgresql-db ;
 
 [ ] [ test-db [ ] with-db ] unit-test
 
@@ -31,24 +30,6 @@ IN: temporary
 ] [
     test-db [
         "select * from person" sql-query
-    ] with-db
-] unit-test
-
-[
-    { { "John" "America" } }
-] [
-    test-db [
-        "select * from person where name = $1 and country = $2"
-        <simple-statement> [
-            { { "Jane" TEXT } { "New Zealand" TEXT } }
-            over do-bound-query
-
-            { { "Jane" "New Zealand" } } =
-            [ "test fails" throw ] unless
-
-            { { "John" TEXT } { "America" TEXT } }
-            swap do-bound-query
-        ] with-disposal
     ] with-db
 ] unit-test
 
@@ -108,3 +89,7 @@ IN: temporary
         "select * from person" sql-query length
     ] with-db
 ] unit-test
+
+
+: with-dummy-db ( quot -- )
+    >r T{ postgresql-db } db r> with-variable ;

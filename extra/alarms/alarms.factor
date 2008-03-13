@@ -1,87 +1,91 @@
-! Copyright (C) 2007 Doug Coleman.
+! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays calendar combinators concurrency.messaging
-threads generic init kernel math namespaces sequences ;
+USING: arrays calendar combinators generic init kernel math
+namespaces sequences heaps boxes threads debugger quotations
+assocs ;
 IN: alarms
 
-TUPLE: alarm time quot ;
-
-C: <alarm> alarm
+TUPLE: alarm quot time interval entry ;
 
 <PRIVATE
 
-! for now a V{ }, eventually a min-heap to store alarms
 SYMBOL: alarms
-SYMBOL: alarm-receiver
-SYMBOL: alarm-looper
+SYMBOL: alarm-thread
 
-: add-alarm ( alarm -- )
-    alarms get-global push ;
+: notify-alarm-thread ( -- )
+    alarm-thread get-global interrupt ;
 
-: remove-alarm ( alarm -- )
-    alarms get-global delete ;
+: check-alarm
+    dup duration? over not or [ "Not a duration" throw ] unless
+    over timestamp? [ "Not a timestamp" throw ] unless
+    pick callable? [ "Not a quotation" throw ] unless ; inline
 
-: handle-alarm ( alarm -- )
-    dup delegate {
-        { "register" [ add-alarm ] }
-        { "unregister" [ remove-alarm  ] }
-    } case ;
-
-: expired-alarms ( -- seq )
-    now alarms get-global
-    [ alarm-time <=> 0 > ] with subset ;
-
-: unexpired-alarms ( -- seq )
-    now alarms get-global
-    [ alarm-time <=> 0 <= ] with subset ;
-
-: call-alarm ( alarm -- )
-    alarm-quot "Alarm invocation" spawn drop ;
-
-: do-alarms ( -- )
-    expired-alarms [ call-alarm ] each
-    unexpired-alarms alarms set-global ;
-
-: alarm-receive-loop ( -- )
-    receive dup alarm? [ handle-alarm ] [ drop ] if
-    alarm-receive-loop ;
-
-: start-alarm-receiver ( -- )
-    [
-        alarm-receive-loop
-    ] "Alarm receiver" spawn alarm-receiver set-global ;
-
-: alarm-loop ( -- )
-    alarms get-global empty? [
-        do-alarms
-    ] unless 100 sleep alarm-loop ;
-
-: start-alarm-looper ( -- )
-    [
-        alarm-loop
-    ] "Alarm looper" spawn alarm-looper set-global ;
-
-: send-alarm ( str alarm -- )
-    over set-delegate
-    alarm-receiver get-global send ;
-
-: start-alarm-daemon ( -- )
-    alarms get-global [ V{ } clone alarms set-global ] unless
-    start-alarm-looper
-    start-alarm-receiver ;
-
-[ start-alarm-daemon ] "alarms" add-init-hook
-PRIVATE>
+: <alarm> ( quot time frequency -- alarm )
+    check-alarm <box> alarm construct-boa ;
 
 : register-alarm ( alarm -- )
-    "register" send-alarm ;
+    dup dup alarm-time alarms get-global heap-push*
+    swap alarm-entry >box
+    notify-alarm-thread ;
 
-: unregister-alarm ( alarm -- )
-    "unregister" send-alarm ;
+: alarm-expired? ( alarm now -- ? )
+    >r alarm-time r> before=? ;
 
-: change-alarm ( alarm-old alarm-new -- )
-    "register" send-alarm
-    "unregister" send-alarm ;
+: reschedule-alarm ( alarm -- )
+    dup alarm-time over alarm-interval time+
+    over set-alarm-time
+    register-alarm ;
 
-! Example:
-! 5 seconds from-now [ "hi" print flush ] <alarm> register-alarm
+: call-alarm ( alarm -- )
+    dup alarm-entry box> drop
+    dup alarm-quot "Alarm execution" spawn drop
+    dup alarm-interval [ reschedule-alarm ] [ drop ] if ;
+
+: (trigger-alarms) ( alarms now -- )
+    over heap-empty? [
+        2drop
+    ] [
+        over heap-peek drop over alarm-expired? [
+            over heap-pop drop call-alarm (trigger-alarms)
+        ] [
+            2drop
+        ] if
+    ] if ;
+
+: trigger-alarms ( alarms -- )
+    now (trigger-alarms) ;
+
+: next-alarm ( alarms -- timestamp/f )
+    dup heap-empty?
+    [ drop f ] [ heap-peek drop alarm-time ] if ;
+
+: alarm-thread-loop ( -- )
+    alarms get-global
+    dup next-alarm sleep-until
+    trigger-alarms ;
+
+: cancel-alarms ( alarms -- )
+    [
+        heap-pop-all [ nip alarm-entry box> drop ] assoc-each
+    ] when* ;
+
+: init-alarms ( -- )
+    alarms global [ cancel-alarms <min-heap> ] change-at
+    [ alarm-thread-loop t ] "Alarms" spawn-server
+    alarm-thread set-global ;
+
+[ init-alarms ] "alarms" add-init-hook
+
+PRIVATE>
+
+: add-alarm ( quot time frequency -- alarm )
+    <alarm> [ register-alarm ] keep ;
+
+: later ( quot dt -- alarm )
+    from-now f add-alarm ;
+
+: every ( quot dt -- alarm )
+    [ from-now ] keep add-alarm ;
+
+: cancel-alarm ( alarm -- )
+    alarm-entry [ alarms get-global heap-delete ] if-box? ;

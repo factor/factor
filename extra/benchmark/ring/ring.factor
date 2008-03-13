@@ -8,7 +8,9 @@ SYMBOL: done
     receive 2dup swap send done eq? [ tunnel ] unless ;
 
 : create-ring ( processes -- target )
-    self swap [ [ tunnel ] "Tunnel" spawn nip ] times ;
+    self swap [
+        dup [ tunnel ] curry "Tunnel" spawn nip
+    ] times ;
 
 : send-messages ( messages target -- )
     dupd [ send ] curry each [ receive drop ] times ; 

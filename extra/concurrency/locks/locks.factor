@@ -25,15 +25,15 @@ TUPLE: lock threads owner reentrant? ;
     lock-threads notify-1 ;
 
 : do-lock ( lock timeout quot acquire release -- )
-    >r swap compose pick >r 2curry r> r> curry [ ] cleanup ;
-    inline
+    >r >r pick rot r> call ! use up  timeout acquire
+    swap r> curry [ ] cleanup ; inline
 
 : (with-lock) ( lock timeout quot -- )
     [ acquire-lock ] [ release-lock ] do-lock ; inline
 
 PRIVATE>
 
-: with-lock ( lock timeout quot -- )
+: with-lock-timeout ( lock timeout quot -- )
     pick lock-reentrant? [
         pick lock-owner self eq? [
             2nip call
@@ -44,6 +44,9 @@ PRIVATE>
         (with-lock)
     ] if ; inline
 
+: with-lock ( lock quot -- )
+    f swap with-lock-timeout ; inline
+
 ! Many-reader/single-writer locks
 TUPLE: rw-lock readers writers reader# writer ;
 
@@ -52,17 +55,23 @@ TUPLE: rw-lock readers writers reader# writer ;
 
 <PRIVATE
 
+: add-reader ( lock -- )
+    dup rw-lock-reader# 1+ swap set-rw-lock-reader# ;
+
 : acquire-read-lock ( lock timeout -- )
     over rw-lock-writer
     [ 2dup >r rw-lock-readers r> "read lock" wait ] when drop
-    dup rw-lock-reader# 1+ swap set-rw-lock-reader# ;
+    add-reader ;
 
 : notify-writer ( lock -- )
     rw-lock-writers notify-1 ;
 
+: remove-reader ( lock -- )
+    dup rw-lock-reader# 1- swap set-rw-lock-reader# ;
+
 : release-read-lock ( lock -- )
-    dup rw-lock-reader# 1- dup pick set-rw-lock-reader#
-    zero? [ notify-writer ] [ drop ] if ;
+    dup remove-reader
+    dup rw-lock-reader# zero? [ notify-writer ] [ drop ] if ;
 
 : acquire-write-lock ( lock timeout -- )
     over rw-lock-writer pick rw-lock-reader# 0 > or
@@ -74,17 +83,34 @@ TUPLE: rw-lock readers writers reader# writer ;
     dup rw-lock-readers dlist-empty?
     [ notify-writer ] [ rw-lock-readers notify-all ] if ;
 
-: do-reentrant-rw-lock ( lock timeout quot quot' -- )
-    >r pick rw-lock-writer self eq? [ 2nip call ] r> if ; inline
+: reentrant-read-lock-ok? ( lock -- ? )
+    #! If we already have a write lock, then we can grab a read
+    #! lock too.
+    rw-lock-writer self eq? ;
+
+: reentrant-write-lock-ok? ( lock -- ? )
+    #! The only case where we have a writer and > 1 reader is
+    #! write -> read re-entrancy, and in this case we prohibit
+    #! a further write -> read -> write re-entrancy.
+    dup rw-lock-writer self eq?
+    swap rw-lock-reader# zero? and ;
 
 PRIVATE>
 
-: with-read-lock ( lock timeout quot -- )
-    [
+: with-read-lock-timeout ( lock timeout quot -- )
+    pick reentrant-read-lock-ok? [
+        [ drop add-reader ] [ remove-reader ] do-lock
+    ] [
         [ acquire-read-lock ] [ release-read-lock ] do-lock
-    ] do-reentrant-rw-lock ; inline
+    ] if ; inline
 
-: with-write-lock ( lock timeout quot -- )
-    [
+: with-read-lock ( lock quot -- )
+    f swap with-read-lock-timeout ; inline
+
+: with-write-lock-timeout ( lock timeout quot -- )
+    pick reentrant-write-lock-ok? [ 2nip call ] [
         [ acquire-write-lock ] [ release-write-lock ] do-lock
-    ] do-reentrant-rw-lock ; inline
+    ] if ; inline
+
+: with-write-lock ( lock quot -- )
+    f swap with-write-lock-timeout ; inline

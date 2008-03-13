@@ -1,39 +1,79 @@
-USING: webapps.file http.server.responders http
-http.server namespaces io tools.test strings io.server
-logging ;
-IN: temporary
+USING: http.server tools.test kernel namespaces accessors
+new-slots io http math sequences assocs ;
+IN: http.server.tests
 
-[ ] [ f [ "404 not found" httpd-error ] with-logging ] unit-test
+[
+    <request>
+    "www.apple.com" >>host
+    "/xxx/bar" >>path
+    { { "a" "b" } } >>query
+    request set
 
-[ "inspect/global" ] [ "/inspect/global" trim-/ ] unit-test
+    [ "http://www.apple.com:80/xxx/bar?a=b" ] [ f f derive-url ] unit-test
+    [ "http://www.apple.com:80/xxx/baz?a=b" ] [ "baz" f derive-url ] unit-test
+    [ "http://www.apple.com:80/xxx/baz?c=d" ] [ "baz" { { "c" "d" } } derive-url ] unit-test
+    [ "http://www.apple.com:80/xxx/bar?c=d" ] [ f { { "c" "d" } } derive-url ] unit-test
+    [ "http://www.apple.com:80/flip?a=b" ] [ "/flip" f derive-url ] unit-test
+    [ "http://www.apple.com:80/flip?c=d" ] [ "/flip" { { "c" "d" } } derive-url ] unit-test
+    [ "http://www.jedit.org" ] [ "http://www.jedit.org" f derive-url ] unit-test
+    [ "http://www.jedit.org?a=b" ] [ "http://www.jedit.org" { { "a" "b" } } derive-url ] unit-test
+] with-scope
 
-[ "index.html" ]
-[ "http://www.jedit.org/index.html" url>path ] unit-test
+TUPLE: mock-responder path ;
 
-[ "foo/bar" ]
-[ "http://www.jedit.org/foo/bar" url>path ] unit-test
+C: <mock-responder> mock-responder
 
-[ "" ]
-[ "http://www.jedit.org/" url>path ] unit-test
+M: mock-responder call-responder
+    nip
+    path>> on
+    "text/plain" <content> ;
 
-[ "" ]
-[ "http://www.jedit.org" url>path ] unit-test
+: check-dispatch ( tag path -- ? )
+    over off
+    main-responder get call-responder
+    write-response get ;
 
-[ "foobar" ]
-[ "foobar" secure-path ] unit-test
+[
+    <dispatcher>
+        "foo" <mock-responder> "foo" add-responder
+        "bar" <mock-responder> "bar" add-responder
+        <dispatcher>
+            "123" <mock-responder> "123" add-responder
+            "default" <mock-responder> >>default
+        "baz" add-responder
+    main-responder set
 
-[ f ]
-[ "foobar/../baz" secure-path ] unit-test
+    [ "foo" ] [
+        "foo" main-responder get find-responder path>> nip
+    ] unit-test
 
-[ ] [ f [ "GET ../index.html" parse-request ] with-logging ] unit-test
-[ ] [ f [ "POO" parse-request ] with-logging ] unit-test
+    [ "bar" ] [
+        "bar" main-responder get find-responder path>> nip
+    ] unit-test
 
-[ H{ { "Foo" "Bar" } } ] [ "Foo=Bar" query>hash ] unit-test
+    [ t ] [ "foo" "foo" check-dispatch ] unit-test
+    [ f ] [ "foo" "bar" check-dispatch ] unit-test
+    [ t ] [ "bar" "bar" check-dispatch ] unit-test
+    [ t ] [ "default" "baz/xxx" check-dispatch ] unit-test
+    [ t ] [ "default" "baz/xxx//" check-dispatch ] unit-test
+    [ t ] [ "default" "/baz/xxx//" check-dispatch ] unit-test
+    [ t ] [ "123" "baz/123" check-dispatch ] unit-test
+    [ t ] [ "123" "baz///123" check-dispatch ] unit-test
 
-[ H{ { "Foo" "Bar" } { "Baz" "Quux" } } ]
-[ "Foo=Bar&Baz=Quux" query>hash ] unit-test
+    [ t ] [
+        <request>
+        "baz" >>path
+        request set
+        "baz" main-responder get call-responder
+        dup code>> 300 399 between? >r
+        header>> "location" swap at "baz/" tail? r> and
+    ] unit-test
+] with-scope
 
-[ H{ { "Baz" " " } } ]
-[ "Baz=%20" query>hash ] unit-test
+[
+    <dispatcher>
+        "default" <mock-responder> >>default
+    main-responder set
 
-[ H{ { "Foo" f } } ] [ "Foo" query>hash ] unit-test
+    [ "/default" ] [ "/default" main-responder get find-responder drop ] unit-test
+] with-scope

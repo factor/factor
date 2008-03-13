@@ -51,8 +51,8 @@ HELP: literalize
 { $values { "obj" object } { "wrapped" object } }
 { $description "Outputs an object which evaluates to " { $snippet "obj" } " when placed in a quotation. If " { $snippet "obj" } " is not self-evaluating (for example, it is a word), then it will be wrapped." }
 { $examples
-    { $example "USE: quotations" "5 literalize ." "5" }
-    { $example "USE: quotations" "[ + ] [ literalize ] map ." "[ \\ + ]" }
+    { $example "USING: prettyprint quotations ;" "5 literalize ." "5" }
+    { $example "USING: math prettyprint quotations sequences ;" "[ + ] [ literalize ] map ." "[ \\ + ]" }
 } ;
 
 { literalize curry <wrapper> POSTPONE: \ POSTPONE: W{ } related-words
