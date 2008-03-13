@@ -1,6 +1,7 @@
-USING: accessors arrays continuations db db.sqlite db.tuples io.files
-kernel math namespaces semantic-db semantic-db.context
-semantic-db.hierarchy semantic-db.relations sequences tools.test
+USING: accessors arrays continuations db db.sqlite
+db.tuples io.files kernel math namespaces semantic-db
+semantic-db.context semantic-db.hierarchy
+semantic-db.relations sequences sorting tools.test
 tools.walker ;
 IN: semantic-db.tests
 
@@ -63,7 +64,7 @@ test-db [
         [ { "bob" "fran" } ] [ "eve" get children [ node-content ] map ] unit-test
         [ { "adam" "eve" } ] [ "bob" get parents [ node-content ] map ] unit-test
         [ "fran" { "charlie" } ] [ "fran" get get-node-hierarchy dup tree-id node-content swap tree-children [ tree-id node-content ] map ] unit-test
-        [ { "adam" "eve" } ] [ "charlie" get get-root-nodes [ node-content ] map ] unit-test
+        [ { "adam" "eve" } ] [ "charlie" get get-root-nodes [ node-content ] map natural-sort >array ] unit-test
         [ { } ] [ "fran" get "charlie" get tuck un-parent-child parents [ node-content ] map ] unit-test
     ] with-context
 ] with-db
