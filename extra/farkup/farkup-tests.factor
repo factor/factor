@@ -52,7 +52,12 @@ IN: farkup.tests
 [ "<h2>foo</h2>" ] [ "==foo==" convert-farkup ] unit-test
 [ "<h2>foo</h2>" ] [ "==foo==" convert-farkup ] unit-test
 [ "<p>=</p><h2>foo</h2>" ] [ "===foo==" convert-farkup ] unit-test
-
-
 [ "<h1>foo</h1><p>=</p>" ] [ "=foo==" convert-farkup ] unit-test
 
+[ "<span class='KEYWORD3'>int</span> <span class='FUNCTION'>main</span><span class='OPERATOR'>(</span><span class='OPERATOR'>)</span><br/>" ]
+[ "[c{int main()}]" convert-farkup ] unit-test
+
+[ "<p><img src=\"lol.jpg\"/></p>" ] [ "[[image:lol.jpg]]" convert-farkup ] unit-test
+[ "<p><img src=\"lol.jpg\" alt=\"teh lol\"/></p>" ] [ "[[image:lol.jpg|teh lol]]" convert-farkup ] unit-test
+[ "<p><a href=\"lol.com\"></a></p>" ] [ "[[lol.com]]" convert-farkup ] unit-test
+[ "<p><a href=\"lol.com\">haha</a></p>" ] [ "[[lol.com|haha]]" convert-farkup ] unit-test
