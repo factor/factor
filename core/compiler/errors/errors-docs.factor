@@ -9,7 +9,7 @@ ARTICLE: "compiler-errors" "Compiler warnings and errors"
 { $subsection :errors }
 { $subsection :warnings }
 { $subsection :linkage }
-"Words such as " { $link require } " and " { $link refresh-all } " use a combinator which counts errors and prints a report at the end:"
+"Words such as " { $link require } " use a combinator which counts errors and prints a report at the end:"
 { $link with-compiler-errors } ;
 
 HELP: compiler-errors
