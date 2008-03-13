@@ -21,15 +21,26 @@ else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorCharErr,factorBackslash,@factorWordOps,factorAlien,factorTuple
+syn cluster factorCluster contains=factorComment,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorCompileDirective,factorString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorCharErr,factorBackslash,@factorWordOps,factorAlien,factorTuple
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
 syn match factorComment /\<#! .*/ contains=factorTodo
 syn match factorComment /\<! .*/ contains=factorTodo
 
-syn region None matchgroup=factorDefinition start=/\<\(C\|M\|G\|UNION\|PREDICATE\)\?:\>/ end=/\<;\>/ contains=@factorCluster,factorStackEffect,factorStackEffectErr,factorArray0,factorQuotation0
+syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorArray0,factorQuotation0
 
-syn region None matchgroup=factorGeneric start=/\<GENERIC:\>/ end=/$/ contains=factorStackEffect,factorStackEffectErr
+syn region factorDefn matchgroup=factorDefnDelims start=/\<\(MACRO\|MEMO\|:\)\?:\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
+syn region factorMethod matchgroup=factorMethodDelims start=/\<M:\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
+syn region factorGeneric matchgroup=factorGenericDelims start=/\<GENERIC:\s\+\S\+\>/ end=/$/ contains=factorStackEffect
+syn region factorGenericN matchgroup=factorGenericNDelims start=/\<GENERIC#\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect
+
+syn region factorPrivateDefn matchgroup=factorPrivateDefnDelims start=/\<\(MACRO\|MEMO\|:\)\?:\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
+syn region factorPrivateMethod matchgroup=factorPrivateMethodDelims start=/\<M:\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
+syn region factorPGeneric matchgroup=factorPGenericDelims start=/\<GENERIC:\s\+\S\+\>/ end=/$/ contains=factorStackEffect contained
+syn region factorPGenericN matchgroup=factorPGenericNDelims start=/\<GENERIC#\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect
+
+syn region None matchgroup=factorPrivate start=/\<<PRIVATE\>/ end=/\<PRIVATE>\>/ contains=@factorDefnContents,factorPrivateDefn,factorPrivateMethod,factorPGeneric,factorPGenericN
+
 
 syn keyword factorBoolean boolean f general-t t
 syn keyword factorCompileDirective inline foldable parsing
@@ -37,15 +48,17 @@ syn keyword factorCompileDirective inline foldable parsing
 
 
 " kernel vocab keywords
-syn keyword factorKeyword continuation-name set-datastack wrapper continuation-catch set-continuation-name slip pick 2slip 2nip tuple set-boot clone with-datastack cpu -roll tuck -rot (continue) set-continuation-retain swapd <continuation> >boolean wrapper? dupd 3dup dup ifcc callstack windows? os-env = over continuation alist>quot ? <wrapper> 2dup cond win64? <quotation> continue 3drop hashcode quotation xor when curry millis set-callstack unless >r die version callcc0 or os callcc1 get-walker-hook depth equal? 3keep no-cond? continue-with if exit tuple? set-retainstack unix? (continue-with) general-t continuation? 3slip <no-cond> macosx? r> rot win32? retainstack 2apply >quotation >continuation< type continuation-call clear call drop continuation-data set-continuation-call 2drop no-cond unit set-continuation-data keep-datastack and when* quotation? ?if literalize datastack swap unless* 2swap set-continuation-catch eq? not roll set-walker-hook continuation-retain with make-dip wrapped keep 2keep <=> if* nip 
-syn keyword factorKeyword sin integer? log2 cot oct> number>string integer first-bignum sech abs repeat tanh real? vmin norm-sq neg between? asech >rect bignum? atanh -i * + fp-nan? - small / sqrt infimum fix-float cosech even? v*n < bits>double > most-positive-fixnum ^theta numerator digit+ >base (random-int) acosech cosh min pi number vmax zero? sum digit> rem bitor supremum string>integer most-negative-fixnum >polar >fraction ceiling acos acot ^ asin acosh /f ratio e fixnum? /i ^n cis coth 1+ 1- conjugate sinh acosec i number= number? double>bits epsilon float product string>number n/v norm max tan acoth absq float? asinh denominator rational? fixnum rect> >fixnum imaginary recip exp sec bitxor w>h/h >bin align base> times log <= [-] init-random sq odd? (repeat) [v-] ^mag bitnot ratio? random-int >digit (next-power-of-2) v* v+ v- v. v/ >float [-1,1]? arg small? bitand set-axis >oct v/n complex rational shift (^) polar> (gcd) cosec next-power-of-2 >float-rect atan sgn >= float>bits normalize real bin> complex? gcd d>w/w hex> mod string>ratio asec floor n*v >hex truncate bits>float vneg >bignum bignum power-of-2? integer, /mod (string>integer) cos 
-syn keyword factorKeyword second sort-values all-eq? pop* find slice-error-reason inject-with prune remove (group) split1-slice slice-error (slice*) split* head-slice* find* split, first remove-nth hash-prune push-if ?push reverse subseq split1 diff subset split new padding column? copy-into-check column@ <column> peek last/first add find-last ?nth add* slice-from cache-nth subseq? <reversed> <slice-error> (3append) replace-slice reversed-seq find-last-with empty? ((append)) reversed? reversed@ map-with find-last-with* set-slice-error-reason set-column-col natural-sort (subst) set-slice-seq index* concat push binsearch slice-seq 3append nsort length tail-slice* reversed ?head sequence= ?tail sequence? memq? join split-next, delete set-nth subst monotonic? group map flip unclip set-reversed-seq find-last* start* max-length assoc min-length all-equal? all? pad-left contains? inject slice <slice> first2 first3 first4 exchange bounds-check? column-seq check-slice pad-right each subset-with unpair tail head interleave (delete) copy-into sort sequence reduce set-slice-from set-slice-to 2map (cut) member? cut rassoc (append) last-index* sort-keys change-nth 2each >sequence nth tail* head* third tail-slice set-length collapse-slice column (mismatch) contains-with? push-new pop tail? head? slice? slice@ delete-all binsearch* move find-with* 2reduce slice-to find-with like slice-error? set-column-seq nappend column-col cut* (split) index each-with last-index fourth append accumulate drop-prefix mismatch head-slice all-with? start 
-syn keyword factorKeyword namespace-error-object inc dec make off bind get-global init-namespaces set-global namespace on ndrop namespace-error? namestack namespace-error +@ # % make-hash global , set-namestack with-scope building <namespace-error> change nest set-namespace-error-object get set counter 
-syn keyword factorKeyword array <array> pair byte-array pair? 1array 2array resize-array 4array 3array byte-array? <byte-array> array? >array 
-syn keyword factorKeyword cwd duplex-stream pathname? set-pathname-string with-log-file directory duplex-stream-out format <nested-style-stream> (readln) duplex-stream? read1 with-stream-style c-stream-error? <file-reader> stream-write1 with-stream line-reader? set-duplex-stream-out server? cr> <check-closed> directory? log-message flush format-column stream-readln nested-style-stream? <line-reader> <file-r/w> set-timeout write-pathname file-modified duplex-stream-closed? print set-duplex-stream-closed? pathname line-reader ?resource-path terpri write-object le> string-out stream-terpri log-client do-nested-style path+ <c-stream-error> set-client-stream-host plain-writer? server-stream resource-path >be parent-dir with-stream* <file-writer> server-loop string-in nested-style-stream stream-close stream-copy c-stream-error <client-stream> with-style client-stream-host stat plain-writer file-length contents <string-reader> stream-read stream-format check-closed? set-client-stream-port <duplex-stream> <server> write1 bl write-outliner map-last (with-stream-style) set-line-reader-cr tabular-output (lines) stream-write log-stream server-client (stream-copy) with-nested-stream lines readln cd client-stream nth-byte with-logging stream-read1 nested-style-stream-style accept check-closed client-stream-port do-nested-quot pathname-string set-nested-style-stream-style read home close with-stream-table stdio be> log-error duplex-stream-out+ server stream-flush set-duplex-stream-in line-reader-cr >le with-client <client> <pathname> <string-writer> (directory) set-server-client stream-print with-server exists? <plain-writer> with-nesting string-lines write duplex-stream-in client-stream? duplex-stream-in+ 
-syn keyword factorKeyword sbuf ch>upper string? LETTER? >sbuf >lower quotable? string>sbuf blank? string sbuf? printable? >string letter? resize-string control? alpha? <string> >upper Letter? ch>lower digit? <sbuf> ch>string 
-syn keyword factorKeyword <vector> >vector array>vector vector? vector 
-syn keyword factorKeyword set-restart-continuation cleanup error-hook restart-name restarts. stack-underflow. expired-error. restart restart? word-xt. (:help-none) set-catchstack c-string-error. condition <assert> debug-help :get datastack-overflow. set-condition-restarts condition? error. objc-error. print-error assert :res catchstack rethrow assert= kernel-error restart-obj assert? undefined-symbol-error. retainstack-overflow. restarts error-help divide-by-zero-error. ffi-error. signal-error. (:help-multi) set-restart-obj xt. memory-error. retainstack-underflow. set-condition-continuation datastack-underflow. try assert-depth error-continuation error-stack-trace assert-expect recover :edit kernel-error? error callstack-overflow. stack-overflow. callstack-underflow. set-assert-got set-restart-name restart-continuation condition-restarts heap-scan-error. :help type-check-error. <condition> assert-got throw negative-array-size-error. :c condition-continuation :trace undefined-word-error. io-error. parse-dump <restart> set-assert-expect :r :s compute-restarts catch restart. 
+syn keyword factorKeyword or construct-delegate set-slots tuck while wrapper nip hashcode wrapper? both? callstack>array die dupd set-delegate callstack callstack? 3dup pick curry build >boolean ?if clone eq? = ? swapd call-clear 2over 2keep 3keep construct general-t clear 2dup when not tuple? 3compose dup call object wrapped unless* if* 2apply >r curry-quot drop when* retainstack -rot delegate with 3slip construct-boa slip compose-first compose-second 3drop construct-empty either? curry? datastack compare curry-obj over 3curry roll throw swap and 2nip set-retainstack (clone) hashcode* get-slots compose spin if <=> unless compose? tuple keep 2curry object? equal? set-datastack 2slip 2drop most <wrapper> null r> set-callstack dip xor rot -roll 
+syn keyword factorKeyword assoc? assoc-clone-like delete-any assoc= delete-at* new-assoc subassoc? assoc-size map>assoc union search-alist assoc-like key? update at* assoc-empty? at+ set-at assoc-all? assoc-hashcode intersect change-at assoc-each assoc-subset values rename-at value-at (assoc-stack) at cache assoc>map assoc-contains? assoc assoc-map assoc-pusher diff (assoc>map) assoc-push-if remove-all >alist (substitute) substitute-here clear-assoc assoc-stack substitute delete-at assoc-find keys 
+syn keyword factorKeyword case dispatch-case-quot with-datastack alist>quot dispatch-case hash-case-table <buckets> hash-case-quot no-cond no-case? cond distribute-buckets (distribute-buckets) contiguous-range? cond>quot no-cond? no-case recursive-hashcode linear-case-quot hash-dispatch-quot case>quot 
+syn keyword factorKeyword byte-array>bignum sgn >bignum number= each-integer next-power-of-2 before? imaginary-part mod recip float>bits rational >float number? 2^ bignum? integer fixnum? after? fixnum before=? bignum sq neg denominator [-] (all-integers?) times find-last-integer (each-integer) bit? * + - / >= bitand find-integer complex < real > log2 integer? max number bits>double double>bits bitor 2/ zero? rem all-integers? (find-integer) real-part align bits>float float? shift between? float 1+ 1- min fp-nan? ratio? bitxor even? ratio <= /mod >integer odd? rational? bitnot real? >fixnum complex? (next-power-of-2) /i numerator after=? /f 
+syn keyword factorKeyword slice-to append left-trim clone-like 3sequence set-column-seq map-as reversed pad-left cut* nth sequence slice? <slice> tail-slice empty? tail* member? unclip virtual-sequence? set-length last-index* <column> drop-prefix bounds-error? set-slice-seq set-column-col seq-diff map start open-slice midpoint@ add* set-immutable-seq move-forward fourth delete set-slice-to all-eq? monotonic? set-reversed-seq like delete-nth first4 repetition-len (open-slice) column? reverse slice padding virtual@ repetition? index 4sequence max-length set-second first2 first3 (3append) supremum unclip-slice index* move-backward tail 3append sequence-hashcode-step right-trim reversed-seq pad-right concat find* set-slice-from flip sum find-last* immutable? 2sequence delete-all start* immutable-sequence? (append) check-slice column-seq sequence? head set-slice-error-reason reduce set-bounds-error-index reverse-here sequence= halves collapse-slice interleave 2map binary-reduce virtual-seq slice-error? product bounds-check? bounds-check immutable find column remove ((append)) set-fourth peek contains? reversed? shorter? push-new find-last head-slice pop* immutable-seq tail-slice* accumulate each pusher all-equal? new-resizable cut-slice head-slice* 2reverse-each pop memq? set-nth ?nth <flat-slice> second change-each join set-repetition-len <reversed> all? virtual-sequence set-repetition-elt subseq? immutable-sequence slice-error-reason new-like length last-index seq-intersect push-if 2all? lengthen column-col joined-length copy set-bounds-error-seq cache-nth move third first slice-from repetition-elt tail? set-first bounds-error add bounds-error-seq bounds-error-index <repetition> unfold exchange slice-seq cut 2reduce change-nth min-length set-third (delete) push-all head? delete-slice sum-lengths new 2each head* infimum subset slice-error subseq replace-slice repetition push trim sequence-hashcode mismatch 
+syn keyword factorKeyword global +@ set-namestack with-variable on set bind dec namestack get get-global change init-namespaces with-scope off set-global namespace % make , inc counter building make-assoc 
+syn keyword factorKeyword <array> 3array >array 4array pair? array pair 2array 1array resize-array array? 
+syn keyword factorKeyword readln stream-read-until stream-read-partial stderr with-stream read with-stream* print contents make-span-stream write1 stream-write1 stream-format make-block-stream stream-copy with-cell stream-write format with-row stream-print stream-read with-nesting (stream-copy) bl write-object nl stream-nl write stdio flush read-until tabular-output make-cell-stream write-cell stream-flush read1 lines stream-read1 stream-write-table with-style stream-readln 
+syn keyword factorKeyword resize-string >string <string> 1string string string? 
+syn keyword factorKeyword vector? <vector> ?push vector >vector 1vector 
+syn keyword factorKeyword rethrow-restarts restarts recover set-restart-name set-continuation-name condition-continuation <restart> ifcc continuation-name set-restart-continuation ignore-errors continuation-retain continue <continuation> restart-continuation with-disposal set-continuation-catch restart-obj error thread-error-hook set-continuation-retain continuation rethrow callcc1 callcc0 condition continuation? continuation-call continuation-data set-condition-restarts set-catchstack >continuation< error-continuation cleanup restart? compute-restarts condition? error-thread set-continuation-call set-condition-continuation <condition> set-restart-obj dispose set-continuation-data throw-restarts catchstack continue-with attempt-all restart restart-name continuation-catch condition-restarts 
 
 
 syn cluster factorReal   contains=factorInt,factorFloat,factorRatio,factorBinary,factorHex,factorOctal
@@ -73,11 +86,16 @@ syn match factorBackslash /\<\\\>\s\+\S\+\>/
 syn region factorUsing start=/\<USING:\>/ end=/;/
 syn region factorRequires start=/\<REQUIRES:\>/ end=/;/
 
-syn cluster factorWordOps contains=factorSymbol,factorPostpone,factorDefer,factorForget
+syn cluster factorWordOps contains=factorSymbol,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
 syn match factorSymbol /\<SYMBOL:\s\+\S\+\>/
 syn match factorPostpone /\<POSTPONE:\s\+\S\+\>/
 syn match factorDefer /\<DEFER:\s\+\S\+\>/
 syn match factorForget /\<FORGET:\s\+\S\+\>/
+syn match factorMixin /\<MIXIN:\s\+\S\+\>/
+syn match factorInstance /\<INSTANCE:\s\+\S\+\s\+\S\+\>/
+syn match factorHook /\<HOOK:\s\+\S\+\s\+\S\+\>/
+syn match factorMain /\<MAIN:\s\+\S\+\>/
+syn match factorConstructor /\<C:\s\+\S\+\s\+\S\+\>/
 
 syn match factorAlien /\<ALIEN:\s\+\d\+\>/
 
@@ -87,8 +105,6 @@ syn region factorTuple start=/\<TUPLE:\>/ end=/\<;\>/
 "misc:
 " HELP:
 " ARTICLE:
-" PROVIDE:
-" MAIN:
 "literals:
 " PRIMITIVE:
 
@@ -106,8 +122,11 @@ syn region factorTuple start=/\<TUPLE:\>/ end=/\<;\>/
 syn region factorString start=/"/ skip=/\\"/ end=/"/ oneline
 syn region factorSbuf start=/SBUF" / skip=/\\"/ end=/"/ oneline
 
-syn match factorStackEffectErr /\<)\>/
-syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
+syn region factorMultiString matchgroup=factorMultiStringDelims start=/\<STRING:\s\+\S\+\>/ end=/^;$/ contains=factorMultiStringContents
+syn match factorMultiStringContents /.*/ contained
+
+"syn match factorStackEffectErr /\<)\>/
+"syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
 syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
 
 "adapted from lisp.vim
@@ -127,18 +146,18 @@ else
 endif
 
 if exists("g:factor_norainbow") 
-    syn region factorArray    matchgroup=factorDelimiter start=/\<\(V\|H\|T\|W\)\?{\>/  matchgroup=factorDelimiter end=/\<}\>/ contains=ALL
+    syn region factorArray    matchgroup=factorDelimiter start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/  matchgroup=factorDelimiter end=/\<}\>/ contains=ALL
 else
-    syn region factorArray0           matchgroup=hlLevel0 start=/\<\(V\|H\|T\|W\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray1,factorQuotation1
-    syn region factorArray1 contained matchgroup=hlLevel1 start=/\<\(V\|H\|T\|W\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray2,factorQuotation2
-    syn region factorArray2 contained matchgroup=hlLevel2 start=/\<\(V\|H\|T\|W\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray3,factorQuotation3
-    syn region factorArray3 contained matchgroup=hlLevel3 start=/\<\(V\|H\|T\|W\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray4,factorQuotation4
-    syn region factorArray4 contained matchgroup=hlLevel4 start=/\<\(V\|H\|T\|W\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray5,factorQuotation5
-    syn region factorArray5 contained matchgroup=hlLevel5 start=/\<\(V\|H\|T\|W\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray6,factorQuotation6
-    syn region factorArray6 contained matchgroup=hlLevel6 start=/\<\(V\|H\|T\|W\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray7,factorQuotation7
-    syn region factorArray7 contained matchgroup=hlLevel7 start=/\<\(V\|H\|T\|W\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray8,factorQuotation8
-    syn region factorArray8 contained matchgroup=hlLevel8 start=/\<\(V\|H\|T\|W\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray9,factorQuotation9
-    syn region factorArray9 contained matchgroup=hlLevel9 start=/\<\(V\|H\|T\|W\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray0,factorQuotation0
+    syn region factorArray0           matchgroup=hlLevel0 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray1,factorQuotation1
+    syn region factorArray1 contained matchgroup=hlLevel1 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray2,factorQuotation2
+    syn region factorArray2 contained matchgroup=hlLevel2 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray3,factorQuotation3
+    syn region factorArray3 contained matchgroup=hlLevel3 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray4,factorQuotation4
+    syn region factorArray4 contained matchgroup=hlLevel4 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray5,factorQuotation5
+    syn region factorArray5 contained matchgroup=hlLevel5 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray6,factorQuotation6
+    syn region factorArray6 contained matchgroup=hlLevel6 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray7,factorQuotation7
+    syn region factorArray7 contained matchgroup=hlLevel7 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray8,factorQuotation8
+    syn region factorArray8 contained matchgroup=hlLevel8 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray9,factorQuotation9
+    syn region factorArray9 contained matchgroup=hlLevel9 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray0,factorQuotation0
 endif
 
 syn match factorBracketErr /\<\]\>/
@@ -163,11 +182,21 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorKeyword	Keyword
     HiLink factorOperator	Operator
     HiLink factorBoolean	Boolean
-    HiLink factorDefinition	Typedef
+    HiLink factorDefnDelims	Typedef
+    HiLink factorMethodDelims	Typedef
+    HiLink factorGenericDelims        Typedef
+    HiLink factorGenericNDelims        Typedef
+    HiLink factorConstructor	Typedef
+    HiLink factorPrivate	Special
+    HiLink factorPrivateDefnDelims	Special
+    HiLink factorPrivateMethodDelims	Special
+    HiLink factorPGenericDelims        Special
+    HiLink factorPGenericNDelims        Special
     HiLink factorString		String
     HiLink factorSbuf		String
+    HiLink factorMultiStringContents		String
+    HiLink factorMultiStringDelims Typedef
     HiLink factorBracketErr     Error
-    HiLink factorStackEffectErr Error
     HiLink factorComplex	Number
     HiLink factorRatio          Number
     HiLink factorBinary         Number
@@ -186,14 +215,17 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorCharErr        Error
     HiLink factorDelimiter      Delimiter
     HiLink factorBackslash      Special
-    HiLink factorCompileDirective Keyword
+    HiLink factorCompileDirective Typedef
     HiLink factorSymbol         Define
+    HiLink factorMixin         Typedef
+    HiLink factorInstance         Typedef
+    HiLink factorHook         Typedef
+    HiLink factorMain         Define
     HiLink factorPostpone       Define
     HiLink factorDefer          Define
     HiLink factorForget         Define
     HiLink factorAlien          Define
     HiLink factorTuple          Typedef
-    HiLink factorGeneric        Define
 
     if &bg == "dark"
 	hi   hlLevel0 ctermfg=red         guifg=red1
@@ -230,3 +262,4 @@ set expandtab
 set autoindent " annoying?
 
 " vim: syntax=vim
+
