@@ -12,5 +12,6 @@ USING: vocabs.loader sequences ;
     "tools.time"
     "tools.threads"
     "tools.vocabs"
+    "tools.vocabs.browser"
     "editors"
 } [ require ] each
