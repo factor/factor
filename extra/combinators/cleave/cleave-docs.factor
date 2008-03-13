@@ -9,6 +9,7 @@ ARTICLE: "cleave-combinators" "Cleave Combinators"
 
 { $subsection bi  }
 { $subsection tri }
+{ $subsection cleave }
 
 { $notes
   "From the Merriam-Webster Dictionary: "
@@ -49,10 +50,17 @@ HELP: tri
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+HELP: cleave
+
+{ $code "( obj { q1 q2 ... qN } -- q1(obj) q2(obj) ... qN(obj) )" } ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 ARTICLE: "spread-combinators" "Spread Combinators"
 
 { $subsection bi* }
-{ $subsection tri* } ;
+{ $subsection tri* }
+{ $subsection spread } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -80,3 +88,9 @@ HELP: tri*
             { "p(x)" "p applied to x" }
             { "q(y)" "q applied to y" }
             { "r(z)" "r applied to z" } } ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+HELP: spread
+
+{ $code "( v1 v2 ... vN { q1 q2 ... qN } -- q1(v1) q2(v2) ... qN(vN) )" } ;
