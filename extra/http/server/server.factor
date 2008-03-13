@@ -3,7 +3,7 @@
 USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http sequences prettyprint io.server logging calendar
 new-slots html.elements accessors math.parser combinators.lib
-vocabs.loader debugger html continuations random combinators
+tools.vocabs debugger html continuations random combinators
 destructors io.encodings.latin1 fry combinators.cleave ;
 IN: http.server
 

@@ -39,19 +39,11 @@ HELP: vocab-main
 HELP: vocab-roots
 { $var-description "A sequence of pathname strings to search for vocabularies." } ;
 
-HELP: vocab-tests
-{ $values { "vocab" "a vocabulary specifier" } { "tests" "a sequence of pathname strings" } }
-{ $description "Outputs a sequence of pathnames where the unit tests for " { $snippet "vocab" } " are located." } ;
-
 HELP: find-vocab-root
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string" } }
 { $description "Searches for a vocabulary in the vocabulary roots." } ;
 
 { vocab-root find-vocab-root } related-words
-
-HELP: vocab-files
-{ $values { "vocab" "a vocabulary specifier" } { "seq" "a sequence of pathname strings" } }
-{ $description "Outputs a sequence of files comprising this vocabulary, or " { $link f } " if the vocabulary does not have a directory on disk." } ;
 
 HELP: no-vocab
 { $values { "name" "a vocabulary name" } } 

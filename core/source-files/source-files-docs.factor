@@ -31,7 +31,6 @@ HELP: source-file
 { $class-description "Instances retain information about loaded source files, and have the following slots:"
     { $list
         { { $link source-file-path } " - a pathname string." }
-        { { $link source-file-modified } " - the result of " { $link file-modified } " at the time the source file was most recently loaded." }
         { { $link source-file-checksum } " - the CRC32 checksum of the source file's contents at the time it was most recently loaded." }
         { { $link source-file-uses } " - an assoc whose keys are words referenced from this source file's top level form." }
         { { $link source-file-definitions } " - a pair of assocs, containing definitions and classes defined in this source file, respectively" }

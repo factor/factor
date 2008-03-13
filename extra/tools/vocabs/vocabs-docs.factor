@@ -25,6 +25,14 @@ ARTICLE: "tools.vocabs" "Vocabulary tools"
 
 ABOUT: "tools.vocabs"
 
+HELP: vocab-files
+{ $values { "vocab" "a vocabulary specifier" } { "seq" "a sequence of pathname strings" } }
+{ $description "Outputs a sequence of files comprising this vocabulary, or " { $link f } " if the vocabulary does not have a directory on disk." } ;
+
+HELP: vocab-tests
+{ $values { "vocab" "a vocabulary specifier" } { "tests" "a sequence of pathname strings" } }
+{ $description "Outputs a sequence of pathnames where the unit tests for " { $snippet "vocab" } " are located." } ;
+
 HELP: source-modified?
 { $values { "path" "a pathname string" } { "?" "a boolean" } }
 { $description "Tests if the source file has been modified since it was last loaded. This compares the file's CRC32 checksum of the file's contents against the previously-recorded value." } ;
