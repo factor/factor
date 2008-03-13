@@ -15,9 +15,9 @@ IN: combinators.cleave
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: 2bi ( obj obj quot quot -- val val ) >r 2keep r> call ; inline
+: 2bi ( x y p q -- p(x,y) q(x,y) ) >r 2keep r> call ; inline
 
-: 2tri ( obj obj quot quot quot -- val val val )
+: 2tri ( x y z p q r -- p(x,y,z) q(x,y,z) r(x,y,z) )
   >r >r 2keep r> 2keep r> call ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -34,6 +34,18 @@ MACRO: cleave ( seq -- )
     [ [ r> ] append ] map concat
   3append
     [ drop ]
+  append ;
+
+MACRO: 2cleave ( seq -- )
+  dup
+    [ drop [ 2dup ] ] map concat
+  swap
+  dup
+    [ drop [ >r >r ] ] map concat
+  swap
+    [ [ r> r> ] append ] map concat
+  3append
+    [ 2drop ]
   append ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -86,11 +86,11 @@ SYMBOL: +unknown+
 : stat ( path -- directory? permissions length modified )
     normalize-pathname (stat) ;
 
-: file-length ( path -- n ) stat drop 2nip ;
+! : file-length ( path -- n ) stat drop 2nip ;
 
 : file-modified ( path -- n ) stat >r 3drop r> ;
 
-: file-permissions ( path -- perm ) stat 2drop nip ;
+! : file-permissions ( path -- perm ) stat 2drop nip ;
 
 : exists? ( path -- ? ) file-modified >boolean ;
 
@@ -219,11 +219,11 @@ M: pathname <=> [ pathname-string ] compare ;
 : with-file-reader ( path encoding quot -- )
     >r <file-reader> r> with-stream ; inline
 
-! : file-contents ( path encoding -- str )
-!     dupd [ file-info file-info-size read ] with-file-reader ;
-
 : file-contents ( path encoding -- str )
-    dupd [ file-length read ] with-file-reader ;
+    dupd [ file-info file-info-size read ] with-file-reader ;
+
+! : file-contents ( path encoding -- str )
+!     dupd [ file-length read ] with-file-reader ;
 
 : with-file-writer ( path encoding quot -- )
     >r <file-writer> r> with-stream ; inline
