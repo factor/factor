@@ -416,6 +416,7 @@ SYMBOL: interactive-vocabs
     "tools.test"
     "tools.threads"
     "tools.time"
+    "tools.vocabs"
     "vocabs"
     "vocabs.loader"
     "words"
