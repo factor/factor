@@ -17,6 +17,9 @@ IN: combinators.cleave
 
 : 2bi ( obj obj quot quot -- val val ) >r 2keep r> call ; inline
 
+: 2tri ( obj obj quot quot quot -- val val val )
+  >r >r 2keep r> 2keep r> call ; inline
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! General cleave
