@@ -12,6 +12,7 @@ GENERIC: call-responder ( path responder -- response )
 : <content> ( content-type -- response )
     <response>
         200 >>code
+        "Document follows" >>message
         swap set-content-type ;
 
 TUPLE: trivial-responder response ;

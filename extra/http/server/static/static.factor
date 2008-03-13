@@ -7,8 +7,6 @@ calendar.format new-slots accessors io.encodings.binary
 combinators.cleave fry ;
 IN: http.server.static
 
-SYMBOL: responder
-
 ! special maps mime types to quots with effect ( path -- )
 TUPLE: file-responder root hook special ;
 
