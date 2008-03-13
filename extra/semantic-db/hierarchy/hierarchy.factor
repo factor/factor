@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors db.tuples hashtables kernel new-slots
-semantic-db semantic-db.relations sorting sequences ;
+semantic-db semantic-db.relations sequences sequences.deep ;
 IN: semantic-db.hierarchy
 
 TUPLE: tree id children ;
