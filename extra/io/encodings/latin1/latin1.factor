@@ -6,7 +6,7 @@ IN: io.encodings.latin1
 TUPLE: latin1 ;
 
 M: latin1 stream-write-encoded 
-    drop 256 encode-check<= ;
+    drop 256 encode-check< ;
 
 M: latin1 decode-step
     drop swap push ;

@@ -9,6 +9,13 @@ IN: http.server
 
 GENERIC: call-responder ( path responder -- response )
 
+: request-params ( -- assoc )
+    request get dup method>> {
+        { "GET" [ query>> ] }
+        { "HEAD" [ query>> ] }
+        { "POST" [ post-data>> ] }
+    } case ;
+
 : <content> ( content-type -- response )
     <response>
         200 >>code
@@ -45,19 +52,27 @@ SYMBOL: 404-responder
 
 [ <404> ] <trivial-responder> 404-responder set-global
 
-: url-redirect ( to query -- url )
-    #! Different host.
-    dup assoc-empty? [
-        drop
-    ] [
-        assoc>query "?" swap 3append
-    ] if ;
+SYMBOL: link-hook
+
+: modify-query ( query -- query )
+    link-hook get [ ] or call ;
+
+: link>string ( url query -- url' )
+    modify-query (link>string) ;
+
+: write-link ( url query -- )
+    link>string write ;
+
+SYMBOL: form-hook
+
+: hidden-form-field ( -- )
+    form-hook get [ ] or call ;
 
 : absolute-redirect ( to query -- url )
     #! Same host.
     request get clone
         swap [ >>query ] when*
-        swap >>path
+        swap url-encode >>path
     request-url ;
 
 : replace-last-component ( path with -- path' )
@@ -67,11 +82,12 @@ SYMBOL: 404-responder
     request get clone
     swap [ >>query ] when*
     swap [ '[ , replace-last-component ] change-path ] when*
+    dup query>> modify-query >>query
     request-url ;
 
 : derive-url ( to query -- url )
     {
-        { [ over "http://" head? ] [ url-redirect ] }
+        { [ over "http://" head? ] [ link>string ] }
         { [ over "/" head? ] [ absolute-redirect ] }
         { [ t ] [ relative-redirect ] }
     } cond ;

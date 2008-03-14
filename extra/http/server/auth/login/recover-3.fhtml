@@ -1,4 +1,4 @@
-<% USING: http.server.components http.server.auth.login
+<% USING: http.server.components http.server.auth.login http.server
 namespaces kernel combinators ; %>
 <html>
 <body>
@@ -7,6 +7,9 @@ namespaces kernel combinators ; %>
 <p>Choose a new password for your account.</p>
 
 <form method="POST" action="new-password">
+
+<% hidden-form-field %>
+
 <table>
 
 <% "username" component render-edit %>
@@ -32,7 +35,7 @@ namespaces kernel combinators ; %>
 <p><input type="submit" value="Set password" />
 
 <% password-mismatch? get [
-"passwords do not match" render-error
+    "passwords do not match" render-error
 ] when %>
 
 </p>

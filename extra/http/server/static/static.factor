@@ -10,12 +10,8 @@ IN: http.server.static
 ! special maps mime types to quots with effect ( path -- )
 TUPLE: file-responder root hook special ;
 
-: unix-time>timestamp ( n -- timestamp )
-    >r unix-1970 r> seconds time+ ;
-
 : file-http-date ( filename -- string )
-    file-info file-info-modified
-    unix-time>timestamp timestamp>http-string ;
+    file-info file-info-modified timestamp>http-string ;
 
 : last-modified-matches? ( filename -- ? )
     file-http-date dup [
