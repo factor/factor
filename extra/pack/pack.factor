@@ -88,7 +88,7 @@ M: string b, ( n string -- ) heap-size b, ;
     read [ zero? ] right-trim dup empty? [ drop f ] when ;
 
 : (read-128-ber) ( n -- n )
-    1 read first
+    read1
     [ >r 7 shift r> 7 clear-bit bitor ] keep
     7 bit? [ (read-128-ber) ] when ;
     
