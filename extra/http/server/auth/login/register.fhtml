@@ -1,10 +1,12 @@
 <% USING: http.server.components http.server.auth.login
-namespaces kernel combinators ; %>
+http.server namespaces kernel combinators ; %>
 <html>
 <body>
 <h1>New user registration</h1>
 
 <form method="POST" action="register">
+<% hidden-form-field %>
+
 <table>
 
 <tr>
