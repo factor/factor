@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs calendar kernel math.parser namespaces random
 boxes alarms new-slots accessors http http.server
-quotations hashtables sequences fry combinators.cleave ;
+quotations hashtables sequences fry combinators.cleave
+html.elements ;
 IN: http.server.sessions
 
 ! ! ! ! ! !
@@ -67,12 +68,6 @@ TUPLE: session manager id namespace alarm ;
 : sessions ( -- manager/f )
     \ session get dup [ manager>> ] when ;
 
-GENERIC: session-link* ( url query sessions -- string )
-
-M: object session-link* 2drop url-encode ;
-
-: session-link ( url query -- string ) sessions session-link* ;
-
 TUPLE: null-sessions ;
 
 : <null-sessions>
@@ -88,22 +83,29 @@ TUPLE: url-sessions ;
 
 : sess-id "factorsessid" ;
 
-: current-session ( responder request -- session )
-    sess-id query-param swap get-session ;
+: current-session ( responder -- session )
+    >r request-params sess-id swap at r> get-session ;
+
+: add-session-id ( query -- query' )
+    \ session get [ id>> sess-id associate union ] when* ;
+
+: session-form-field ( -- )
+    <input
+    "hidden" =type
+    sess-id =id
+    sess-id =name
+    \ session get id>> =value
+    input/> ;
 
 M: url-sessions call-responder ( path responder -- response )
-    dup request get current-session [
+    [ add-session-id ] link-hook set
+    [ session-form-field ] form-hook set
+    dup current-session [
         call-responder/session
     ] [
         nip
         f swap new-session sess-id associate <temporary-redirect>
     ] if* ;
-
-M: url-sessions session-link*
-    drop
-    url-encode
-    \ session get id>> sess-id associate union assoc>query
-    dup assoc-empty? [ drop ] [ "?" swap 3append ] if ;
 
 TUPLE: cookie-sessions ;
 

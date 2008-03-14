@@ -95,5 +95,4 @@ PRIVATE>
     swap >>post-data-type ;
 
 : http-post ( content-type content url -- response string )
-    #! The content is URL encoded for you.
-    >r url-encode r> <post-request> http-request contents ;
+    <post-request> http-request contents ;

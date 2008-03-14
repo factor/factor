@@ -14,4 +14,4 @@ USE: io.backend
 
 T{ windows-nt-io } set-io-backend
 
-"vocabs.monitor" require
+"tools.vocabs.monitor" require

@@ -4,4 +4,4 @@ combinators namespaces system vocabs.loader sequences ;
 
 "io.unix." os append require
 
-"vocabs.monitor" require
+"tools.vocabs.monitor" require

@@ -199,7 +199,7 @@ ARTICLE: "cookbook-io" "Input and output cookbook"
 }
 "Convert a file of 4-byte cells from little to big endian or vice versa, by directly mapping it into memory and operating on it with sequence words:"
 { $code
-    "\"mydata.dat\" dup file-length ["
+    "\"mydata.dat\" dup file-info file-info-length ["
     "    4 <sliced-groups> [ reverse-here ] change-each"
     "] with-mapped-file"
 }

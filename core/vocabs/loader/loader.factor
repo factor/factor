@@ -48,27 +48,6 @@ M: string vocab-root
 M: vocab-link vocab-root
     vocab-link-root ;
 
-: vocab-tests ( vocab -- tests )
-    dup vocab-root [
-        [
-            f >vocab-link dup
-
-            dup "-tests.factor" vocab-dir+ vocab-path+
-            dup resource-exists? [ , ] [ drop ] if
-
-            dup vocab-dir "tests" path+ vocab-path+ dup
-            ?resource-path directory keys [ ".factor" tail? ] subset
-            [ path+ , ] with each
-        ] { } make
-    ] [ drop f ] if ;
-
-: vocab-files ( vocab -- seq )
-    f >vocab-link [
-        dup vocab-source-path [ , ] when*
-        dup vocab-docs-path [ , ] when*
-        vocab-tests %
-    ] { } make ;
-
 SYMBOL: load-help?
 
 : source-was-loaded t swap set-vocab-source-loaded? ;
@@ -119,68 +98,7 @@ SYMBOL: load-help?
         "To define one, refer to \\ MAIN: help" print
     ] ?if ;
 
-: modified ( seq quot -- seq )
-    [ dup ] swap compose { } map>assoc
-    [ nip ] assoc-subset
-    [ nip source-modified? ] assoc-subset keys ; inline
-
-: modified-sources ( vocabs -- seq )
-    [ vocab-source-path ] modified ;
-
-: modified-docs ( vocabs -- seq )
-    [ vocab-docs-path ] modified ;
-
-: update-roots ( vocabs -- )
-    [ dup find-vocab-root swap vocab set-vocab-root ] each ;
-
-: to-refresh ( prefix -- modified-sources modified-docs )
-    child-vocabs
-    dup update-roots
-    dup modified-sources swap modified-docs ;
-
-: vocab-heading. ( vocab -- )
-    nl
-    "==== " write
-    dup vocab-name swap vocab write-object ":" print
-    nl ;
-
-: load-error. ( triple -- )
-    dup first vocab-heading.
-    dup second print-error
-    drop ;
-
-: load-failures. ( failures -- )
-    [ load-error. nl ] each ;
-
 SYMBOL: blacklist
-SYMBOL: failures
-
-: require-all ( vocabs -- failures )
-    [
-        V{ } clone blacklist set
-        V{ } clone failures set
-        [
-            [ require ]
-            [ swap vocab-name failures get set-at ]
-            recover
-        ] each
-        failures get
-    ] with-compiler-errors ;
-
-: do-refresh ( modified-sources modified-docs -- )
-    2dup
-    [ f swap set-vocab-docs-loaded? ] each
-    [ f swap set-vocab-source-loaded? ] each
-    append prune require-all load-failures. ;
-
-: refresh ( prefix -- ) to-refresh do-refresh ;
-
-SYMBOL: sources-changed?
-
-[ t sources-changed? set-global ] "vocabs.loader" add-init-hook
-
-: refresh-all ( -- )
-    "" refresh f sources-changed? set-global ;
 
 GENERIC: (load-vocab) ( name -- vocab )
 

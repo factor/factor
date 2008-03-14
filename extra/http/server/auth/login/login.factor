@@ -30,7 +30,8 @@ SYMBOL: login-failed?
 
 : successful-login ( user -- response )
     logged-in-user sset
-    post-login-url sget f <permanent-redirect> ;
+    post-login-url sget "" or f <permanent-redirect>
+    f post-login-url sset ;
 
 :: <login-action> ( -- action )
     [let | form [ <login-form> ] |
