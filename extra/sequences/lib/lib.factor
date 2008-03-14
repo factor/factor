@@ -3,7 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions mirrors
-arrays math.parser math.private sorting strings ascii macros ;
+arrays math.parser math.private sorting strings ascii macros
+assocs.lib ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -220,3 +221,6 @@ PRIVATE>
 
 : nths ( indices seq -- seq' )
     [ swap nth ] with map ;
+
+: replace ( str oldseq newseq -- str' )
+    H{ } 2seq>assoc [ dupd at* [ nip ] [ drop ] if ] curry map ;
