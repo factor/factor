@@ -13,6 +13,8 @@ QUALIFIED: smtp
 
 TUPLE: login users ;
 
+: users login get users>> ;
+
 SYMBOL: post-login-url
 SYMBOL: login-failed?
 
@@ -49,7 +51,7 @@ SYMBOL: login-failed?
                 form validate-form
 
                 "password" value "username" value
-                login get users>> check-login [
+                users check-login [
                     successful-login
                 ] [
                     login-failed? on
@@ -67,7 +69,7 @@ SYMBOL: login-failed?
             t >>required
             add-field
         "realname" <string> add-field
-        "password" <password>
+        "new-password" <password>
             t >>required
             add-field
         "verify-password" <password>
@@ -80,7 +82,7 @@ SYMBOL: password-mismatch?
 SYMBOL: user-exists?
 
 : same-password-twice ( -- )
-    "password" value "verify-password" value = [ 
+    "new-password" value "verify-password" value = [ 
         password-mismatch? on
         validation-failed
     ] unless ;
@@ -102,19 +104,76 @@ SYMBOL: user-exists?
 
                 same-password-twice
 
-                <user> values get [
-                    "username" get >>username
-                    "realname" get >>realname
-                    "password" get >>password
-                    "email" get >>email
-                ] bind
+                <user>
+                    "username" value >>username
+                    "realname" value >>realname
+                    "new-password" value >>password
+                    "email" value >>email
 
-                login get users>> new-user [
+                users new-user [
                     user-exists? on
                     validation-failed
                 ] unless*
 
                 successful-login
+            ] >>submit
+    ] ;
+
+! ! ! Editing user profile
+
+: <edit-profile-form> ( -- form )
+    "edit-profile" <form>
+        "resource:extra/http/server/auth/login/edit-profile.fhtml" >>edit-template
+        "username" <username> add-field
+        "realname" <string> add-field
+        "password" <password> add-field
+        "new-password" <password> add-field
+        "verify-password" <password> add-field
+        "email" <email> add-field ;
+
+SYMBOL: previous-page
+
+:: <edit-profile-action> ( -- action )
+    [let | form [ <edit-profile-form> ] |
+        <action>
+            [
+                blank-values
+                logged-in-user sget
+                dup username>> "username" set-value
+                dup realname>> "realname" set-value
+                dup email>> "email" set-value
+            ] >>init
+
+            [
+                "text/html" <content>
+                [ form edit-form ] >>body
+            ] >>display
+
+            [
+                blank-values
+                uid "username" set-value
+
+                form validate-form
+
+                "password" value empty? [
+                    logged-in-user sget
+                ] [
+                    same-password-twice
+
+                    "password" value uid users check-login
+                    [ login-failed? on validation-failed ] unless
+
+                    "new-password" value uid users set-password
+                    [ "User deleted" throw ] unless*
+                ] if
+
+                "realname" value >>realname
+                "email" value >>email
+
+                dup users update-user
+                logged-in-user sset
+
+                previous-page sget dup [ f <permanent-redirect> ] when
             ] >>submit
     ] ;
 
@@ -186,7 +245,7 @@ SYMBOL: lost-password-from
                 form validate-form
 
                 "email" value "username" value
-                login get users>> issue-ticket [
+                users issue-ticket [
                     send-password-email
                 ] when*
 
@@ -200,7 +259,7 @@ SYMBOL: lost-password-from
         "username" <username> <hidden>
             t >>required
             add-field
-        "password" <password>
+        "new-password" <password>
             t >>required
             add-field
         "verify-password" <password>
@@ -239,9 +298,9 @@ SYMBOL: lost-password-from
 
                 "ticket" value
                 "username" value
-                login get users>> claim-ticket [
-                    "password" value >>password
-                    login get users>> update-user
+                users claim-ticket [
+                    "new-password" value >>password
+                    users update-user
 
                     "resource:extra/http/server/auth/login/recover-4.fhtml"
                     serve-template
@@ -265,13 +324,18 @@ TUPLE: protected responder ;
 
 C: <protected> protected
 
+: show-login-page ( -- response )
+    request get request-url post-login-url sset
+    "login" f <permanent-redirect> ;
+
 M: protected call-responder ( path responder -- response )
-    logged-in-user sget [ responder>> call-responder ] [
+    logged-in-user sget [
+        request get request-url previous-page sset
+        responder>> call-responder
+    ] [
         2drop
-        request get method>> { "GET" "HEAD" } member? [
-            request get request-url post-login-url sset
-            "login" f <permanent-redirect>
-        ] [ <400> ] if
+        request get method>> { "GET" "HEAD" } member?
+        [ show-login-page ] [ <400> ] if
     ] if ;
 
 M: login call-responder ( path responder -- response )
@@ -287,12 +351,18 @@ M: login call-responder ( path responder -- response )
 
 ! ! ! Configuration
 
+: allow-edit-profile ( login -- login )
+    <edit-profile-action> <protected> "edit-profile" add-responder ;
+
 : allow-registration ( login -- login )
     <register-action> "register" add-responder ;
 
 : allow-password-recovery ( login -- login )
     <recover-action-1> "recover-password" add-responder
     <recover-action-3> "new-password" add-responder ;
+
+: allow-edit-profile? ( -- ? )
+    login get responders>> "edit-profile" swap key? ;
 
 : allow-registration? ( -- ? )
     login get responders>> "register" swap key? ;

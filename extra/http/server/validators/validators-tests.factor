@@ -13,10 +13,10 @@ accessors ;
 ] unit-test
 
 [ "slava@factorcode.o" v-email ]
-[ reason>> "invalid e-mail" = ] must-fail-with
+[ "invalid e-mail" = ] must-fail-with
 
 [ "sla@@factorcode.o" v-email ]
-[ reason>> "invalid e-mail" = ] must-fail-with
+[ "invalid e-mail" = ] must-fail-with
 
 [ "slava@factorcodeorg" v-email ]
-[ reason>> "invalid e-mail" = ] must-fail-with
+[ "invalid e-mail" = ] must-fail-with
