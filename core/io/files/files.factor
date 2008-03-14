@@ -94,7 +94,9 @@ SYMBOL: +unknown+
 
 : exists? ( path -- ? ) file-modified >boolean ;
 
-: directory? ( path -- ? ) stat 3drop ;
+! : directory? ( path -- ? ) stat 3drop ;
+
+: directory? ( path -- ? ) file-info file-info-type +directory+ = ;
 
 ! Current working directory
 HOOK: cd io-backend ( path -- )
