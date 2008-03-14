@@ -6,82 +6,68 @@ IN: io.encodings.utf8
 
 ! Decoding UTF-8
 
-TUPLE: utf8 ch state ;
+TUPLE: utf8 ;
 
-SYMBOL: double
-SYMBOL: triple
-SYMBOL: triple2
-SYMBOL: quad
-SYMBOL: quad2
-SYMBOL: quad3
+<PRIVATE 
 
 : starts-2? ( char -- ? )
-    -6 shift BIN: 10 number= ;
+    dup [ -6 shift BIN: 10 number= ] when ;
 
-: append-nums ( buf bottom top state-out -- buf num state )
-    >r over starts-2?
-    [ 6 shift swap BIN: 111111 bitand bitor r> ]
-    [ r> 3drop push-replacement ] if ;
+: append-nums ( stream byte -- stream char )
+    over stream-read1 dup starts-2?
+    [ 6 shift swap BIN: 111111 bitand bitor ]
+    [ 2drop replacement-char ] if ;
 
-: begin-utf8 ( buf byte -- buf ch state )
+: double ( stream byte -- stream char )
+    BIN: 11111 bitand append-nums ;
+
+: triple ( stream byte -- stream char )
+    BIN: 1111 bitand append-nums append-nums ;
+
+: quad ( stream byte -- stream char )
+    BIN: 111 bitand append-nums append-nums append-nums ;
+
+: begin-utf8 ( stream byte -- stream char )
     {
-        { [ dup -7 shift zero? ] [ push-decoded ] }
-        { [ dup -5 shift BIN: 110 number= ] [ BIN: 11111 bitand double ] }
-        { [ dup -4 shift BIN: 1110 number= ] [ BIN: 1111 bitand triple ] }
-        { [ dup -3 shift BIN: 11110 number= ] [ BIN: 111 bitand quad ] }
-        { [ t ] [ drop push-replacement ] }
+        { [ dup -7 shift zero? ] [ ] }
+        { [ dup -5 shift BIN: 110 number= ] [ double ] }
+        { [ dup -4 shift BIN: 1110 number= ] [ triple ] }
+        { [ dup -3 shift BIN: 11110 number= ] [ quad ] }
+        { [ t ] [ drop replacement-char ] }
     } cond ;
 
-: end-multibyte ( buf byte ch -- buf ch state )
-    f append-nums [ push-decoded ] unless* ;
+: decode-utf8 ( stream -- char/f )
+    dup stream-read1 dup [ begin-utf8 ] when nip ;
 
-: decode-utf8-step ( buf byte ch state -- buf ch state )
-    {
-        { begin [ drop begin-utf8 ] }
-        { double [ end-multibyte ] }
-        { triple [ triple2 append-nums ] }
-        { triple2 [ end-multibyte ] }
-        { quad [ quad2 append-nums ] }
-        { quad2 [ quad3 append-nums ] }
-        { quad3 [ end-multibyte ] }
-    } case ;
-
-: unpack-state ( encoding -- ch state )
-    { utf8-ch utf8-state } get-slots ;
-
-: pack-state ( ch state encoding -- )
-    { set-utf8-ch set-utf8-state } set-slots ;
-
-M: utf8 decode-step ( buf char encoding -- )
-    [ unpack-state decode-utf8-step ] keep pack-state drop ;
-
-M: utf8 init-decoder nip begin over set-utf8-state ;
+M: utf8 decode-char
+    drop decode-utf8 ;
 
 ! Encoding UTF-8
 
-: encoded ( char -- )
-    BIN: 111111 bitand BIN: 10000000 bitor write1 ;
+: encoded ( stream char -- )
+    BIN: 111111 bitand BIN: 10000000 bitor swap stream-write1 ;
 
-: char>utf8 ( char -- )
+: char>utf8 ( stream char -- )
     {
-        { [ dup -7 shift zero? ] [ write1 ] }
+        { [ dup -7 shift zero? ] [ swap stream-write1 ] }
         { [ dup -11 shift zero? ] [
-            dup -6 shift BIN: 11000000 bitor write1
+            2dup -6 shift BIN: 11000000 bitor swap stream-write1
             encoded
         ] }
         { [ dup -16 shift zero? ] [
-            dup -12 shift BIN: 11100000 bitor write1
-            dup -6 shift encoded
+            2dup -12 shift BIN: 11100000 bitor swap stream-write1
+            2dup -6 shift encoded
             encoded
         ] }
         { [ t ] [
-            dup -18 shift BIN: 11110000 bitor write1
-            dup -12 shift encoded
-            dup -6 shift encoded
+            2dup -18 shift BIN: 11110000 bitor swap stream-write1
+            2dup -12 shift encoded
+            2dup -6 shift encoded
             encoded
         ] }
     } cond ;
 
-M: utf8 stream-write-encoded
-    ! For efficiency, this should be modified to avoid variable reads
-    drop [ [ char>utf8 ] each ] with-stream* ;
+M: utf8 encode-char
+    drop swap char>utf8 ;
+
+PRIVATE>

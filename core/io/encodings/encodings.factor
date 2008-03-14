@@ -2,62 +2,36 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces
 growable strings io classes continuations combinators
-io.styles io.streams.plain io.encodings.binary splitting
-io.streams.duplex byte-arrays ;
+io.styles io.streams.plain splitting
+io.streams.duplex byte-arrays sequences.private ;
 IN: io.encodings
 
 ! The encoding descriptor protocol
 
-GENERIC: decode-step ( buf char encoding -- )
-M: object decode-step drop swap push ;
+GENERIC: decode-char ( stream encoding -- char/f )
 
-GENERIC: init-decoder ( stream encoding -- encoding )
-M: tuple-class init-decoder construct-empty init-decoder ;
-M: object init-decoder nip ;
+GENERIC: encode-char ( char stream encoding -- )
 
-GENERIC: stream-write-encoded ( string stream encoding -- byte-array )
-M: object stream-write-encoded drop stream-write ;
+GENERIC: <decoder> ( stream decoding -- newstream )
+
+GENERIC: <encoder> ( stream encoding -- newstream )
+
+: replacement-char HEX: fffd ;
 
 ! Decoding
+
+<PRIVATE
 
 TUPLE: decode-error ;
 
 : decode-error ( -- * ) \ decode-error construct-empty throw ;
 
-SYMBOL: begin
+TUPLE: decoder stream code cr ;
+M: tuple-class <decoder> construct-empty <decoder> ;
+M: tuple <decoder> f decoder construct-boa ;
 
-: push-decoded ( buf ch -- buf ch state )
-    over push 0 begin ;
-
-: push-replacement ( buf -- buf ch state )
-    ! This is the replacement character
-    HEX: fffd push-decoded ;
-
-: space ( resizable -- room-left )
-    dup underlying swap [ length ] 2apply - ;
-
-: full? ( resizable -- ? ) space zero? ;
-
-: end-read-loop ( buf ch state stream quot -- string/f )
-    2drop 2drop >string f like ;
-
-: decode-read-loop ( buf stream encoding -- string/f )
-    pick full? [ 2drop >string ] [
-        over stream-read1 [
-            -rot tuck >r >r >r dupd r> decode-step r> r>
-            decode-read-loop
-        ] [ 2drop >string f like ] if*
-    ] if ;
-
-: decode-read ( length stream encoding -- string )
-    rot <sbuf> -rot decode-read-loop ;
-
-TUPLE: decoder code cr ;
-: <decoder> ( stream encoding -- newstream )
-    dup binary eq? [ drop ] [
-        dupd init-decoder { set-delegate set-decoder-code }
-        decoder construct
-    ] if ;
+: >decoder< ( decoder -- stream encoding )
+    { decoder-stream decoder-code } get-slots ;
 
 : cr+ t swap set-decoder-cr ; inline
 
@@ -82,41 +56,46 @@ TUPLE: decoder code cr ;
     over decoder-cr [
         over cr-
         "\n" ?head [
-            swap stream-read1 [ add ] when*
-        ] [ nip ] if
-    ] [ nip ] if ;
+            over stream-read1 [ add ] when*
+        ] when
+    ] when nip ;
+
+: read-loop ( n stream -- string )
+    over 0 <string> [
+        [
+            >r stream-read1 dup
+            [ swap r> set-nth-unsafe f ] [ r> 3drop t ] if
+        ] 2curry find-integer
+    ] keep swap [ head ] when* ;
 
 M: decoder stream-read
-    tuck { delegate decoder-code } get-slots decode-read fix-read ;
+    tuck read-loop fix-read ;
 
-M: decoder stream-read-partial stream-read ;
-
-: decoder-read-until ( stream delim -- ch )
-    ! Copied from { c-reader stream-read-until }!!!
-    over stream-read1 dup [
-        dup pick memq? [ 2nip ] [ , decoder-read-until ] if
-    ] [
-        2nip
-    ] if ;
+: (read-until) ( buf quot -- string/f sep/f )
+    ! quot: -- char keep-going?
+    dup call
+    [ >r drop "" like r> ]
+    [ pick push (read-until) ] if ; inline
 
 M: decoder stream-read-until
-    ! Copied from { c-reader stream-read-until }!!!
-    [ swap decoder-read-until ] "" make
-    swap over empty? over not and [ 2drop f f ] when ;
+    SBUF" " clone -rot >decoder<
+    [ decode-char dup rot memq? ] 3curry (read-until) ;
 
 : fix-read1 ( stream char -- char )
     over decoder-cr [
         over cr-
         dup CHAR: \n = [
-            drop stream-read1
-        ] [ nip ] if
-    ] [ nip ] if ;
+            drop dup stream-read1
+        ] when
+    ] when nip ;
 
 M: decoder stream-read1
-    1 swap stream-read f like [ first ] [ f ] if* ;
+    dup >decoder< decode-char fix-read1 ;
 
 M: decoder stream-readln ( stream -- str )
     "\r\n" over stream-read-until handle-readln ;
+
+M: decoder dispose decoder-stream dispose ;
 
 ! Encoding
 
@@ -124,30 +103,31 @@ TUPLE: encode-error ;
 
 : encode-error ( -- * ) \ encode-error construct-empty throw ;
 
-TUPLE: encoder code ;
-: <encoder> ( stream encoding -- newstream )
-    dup binary eq? [ drop ] [
-        construct-empty { set-delegate set-encoder-code }
-        encoder construct
-    ] if ;
+TUPLE: encoder stream code ;
+M: tuple-class <encoder> construct-empty <encoder> ;
+M: tuple <encoder> encoder construct-boa ;
+
+: >encoder< ( encoder -- stream encoding )
+    { encoder-stream encoder-code } get-slots ;
 
 M: encoder stream-write1
-    >r 1string r> stream-write ;
+    >encoder< encode-char ;
 
 M: encoder stream-write
-    { delegate encoder-code } get-slots stream-write-encoded ;
+    >encoder< [ encode-char ] 2curry each ;
 
-M: encoder dispose delegate dispose ;
+M: encoder dispose encoder-stream dispose ;
 
 INSTANCE: encoder plain-writer
 
 ! Rebinding duplex streams which have not read anything yet
 
 : reencode ( stream encoding -- newstream )
-    over encoder? [ >r delegate r> ] when <encoder> ;
+    over encoder? [ >r encoder-stream r> ] when <encoder> ;
 
 : redecode ( stream encoding -- newstream )
-    over decoder? [ >r delegate r> ] when <decoder> ;
+    over decoder? [ >r decoder-stream r> ] when <decoder> ;
+PRIVATE>
 
 : <encoder-duplex> ( stream-in stream-out encoding -- duplex )
     tuck reencode >r redecode r> <duplex-stream> ;
