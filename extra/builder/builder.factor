@@ -134,7 +134,9 @@ SYMBOL: build-status
       "Did not pass load-everything: " print "load-everything-vocabs" cat
       
       "Did not pass test-all: "        print "test-all-vocabs"        cat
-      "test-all-vocabs" eval-file test-failures.
+                                             "test-failures"          cat
+      
+!       "test-failures" eval-file test-failures.
       
       "help-lint results:"             print "help-lint"              cat
 
