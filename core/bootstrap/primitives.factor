@@ -105,7 +105,9 @@ H{ } clone update-map set
     ] [ ] make ;
 
 : define-builtin-predicate ( class -- )
-    dup builtin-predicate-quot define-predicate ;
+    dup
+    dup builtin-predicate-quot define-predicate
+    predicate-word make-inline ;
 
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
