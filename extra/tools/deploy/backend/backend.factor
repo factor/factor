@@ -65,8 +65,12 @@ IN: tools.deploy.backend
 : run-factor ( vm flags -- )
     swap add* dup . run-with-output ; inline
 
-: make-staging-image ( vm config -- )
-    staging-command-line run-factor ;
+: make-staging-image ( config -- )
+    vm swap staging-command-line run-factor ;
+
+: ?make-staging-image ( config -- )
+    dup [ staging-image-name ] bind exists?
+    [ drop ] [ make-staging-image ] if ;
 
 : deploy-command-line ( image vocab config -- flags )
     [
@@ -85,9 +89,7 @@ IN: tools.deploy.backend
 
 : make-deploy-image ( vm image vocab config -- )
     make-boot-image
-    dup staging-image-name exists? [
-        >r pick r> tuck make-staging-image
-    ] unless
+    dup ?make-staging-image
     deploy-command-line run-factor ;
 
 SYMBOL: deploy-implementation
