@@ -1,5 +1,5 @@
 IN: io.unix.freebsd
-USING: io.unix.bsd io.backend core-foundation.fsevents ;
+USING: io.unix.bsd io.backend ;
 
 TUPLE: freebsd-io ;
 

@@ -29,6 +29,7 @@ blah
 STRING: action-request-test-2
 POST http://foo/bar/baz HTTP/1.1
 content-length: 5
+content-type: application/x-www-form-urlencoded
 
 xxx=4
 ;

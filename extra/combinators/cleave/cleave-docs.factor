@@ -7,9 +7,17 @@ IN: combinators.cleave
 
 ARTICLE: "cleave-combinators" "Cleave Combinators"
 
+"Basic cleavers:"
+
 { $subsection bi  }
 { $subsection tri }
+
+"General cleave: "
 { $subsection cleave }
+
+"Cleave combinators for quotations with arity 2:"
+{ $subsection 2bi  }
+{ $subsection 2tri }
 
 { $notes
   "From the Merriam-Webster Dictionary: "
@@ -53,6 +61,10 @@ HELP: tri
 HELP: cleave
 
 { $code "( obj { q1 q2 ... qN } -- q1(obj) q2(obj) ... qN(obj) )" } ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+{ bi tri cleave 2bi 2tri } related-words
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

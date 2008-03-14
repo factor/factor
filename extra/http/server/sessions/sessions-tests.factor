@@ -2,6 +2,8 @@ IN: http.server.sessions.tests
 USING: tools.test http.server.sessions math namespaces
 kernel accessors ;
 
+[ H{ } ] [ H{ } add-session-id ] unit-test
+
 : with-session \ session swap with-variable ; inline
 
 TUPLE: foo ;
@@ -10,7 +12,9 @@ C: <foo> foo
 
 M: foo init-session* drop 0 "x" sset ;
 
-f <session> [
+f <session> "123" >>id [
+    [ H{ { "factorsessid" "123" } } ] [ H{ } add-session-id ] unit-test
+
     [ ] [ 3 "x" sset ] unit-test
     
     [ 9 ] [ "x" sget sq ] unit-test

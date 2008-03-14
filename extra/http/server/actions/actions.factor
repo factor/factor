@@ -17,14 +17,6 @@ TUPLE: action init display submit get-params post-params ;
         [ <400> ] >>display
         [ <400> ] >>submit ;
 
-: extract-params ( path -- assoc )
-    +path+ associate
-    request get dup method>> {
-        { "GET" [ query>> ] }
-        { "HEAD" [ query>> ] }
-        { "POST" [ post-data>> query>assoc ] }
-    } case union ;
-
 : with-validator ( string quot -- result error? )
     '[ , @ f ] [
         dup validation-error? [ t ] [ rethrow ] if
@@ -50,12 +42,10 @@ TUPLE: action init display submit get-params post-params ;
     action get display>> call exit-with ;
 
 M: action call-responder ( path action -- response )
-    [ extract-params params set ]
-    [
-        action set
-        request get method>> {
-            { "GET" [ handle-get ] }
-            { "HEAD" [ handle-get ] }
-            { "POST" [ handle-post ] }
-        } case
-    ] bi* ;
+    [ +path+ associate request-params union params set ]
+    [ action set ] bi*
+    request get method>> {
+        { "GET" [ handle-get ] }
+        { "HEAD" [ handle-get ] }
+        { "POST" [ handle-post ] }
+    } case ;

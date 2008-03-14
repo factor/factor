@@ -76,7 +76,7 @@ M: win32-file close-handle ( handle -- )
     ] when drop ;
 
 : open-append ( path -- handle length )
-    dup file-length dup [
+    dup file-info file-info-size dup [
         >r (open-append) r> 2dup set-file-pointer
     ] [
         drop open-write

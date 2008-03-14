@@ -14,9 +14,7 @@ user "USERS"
     { "profile" "PROFILE" FACTOR-BLOB }
 } define-persistent
 
-: init-users-table ( -- )
-    [ user drop-table ] ignore-errors
-    user create-table ;
+: init-users-table user ensure-table ;
 
 TUPLE: from-db ;
 
