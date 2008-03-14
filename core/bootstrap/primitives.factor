@@ -301,6 +301,12 @@ define-builtin
 "f" "syntax" lookup builtins get remove [ ] subset f union-class
 define-class
 
+"f" "syntax" create [ not ] "predicate" set-word-prop
+"f?" "syntax" create "syntax" vocab-words delete-at
+
+"general-t" "kernel" create [ ] "predicate" set-word-prop
+"general-t?" "kernel" create "syntax" vocab-words delete-at
+
 ! Catch-all class for providing a default method.
 "object" "kernel" create [ drop t ] "predicate" set-word-prop
 "object" "kernel" create
