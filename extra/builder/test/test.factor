@@ -16,18 +16,18 @@ IN: builder.test
 : do-load ( -- )
   try-everything keys "../load-everything-vocabs" utf8 [ . ] with-file-writer ;
 
-! : do-tests ( -- )
-!   run-all-tests keys "../test-all-vocabs" utf8 [ . ] with-file-writer ;
-
 : do-tests ( -- )
-  run-all-tests
-  "../test-all-vocabs" utf8
-    [
-        [ keys . ]
-        [ test-failures. ]
-      bi
-    ]
-  with-file-writer ;
+  run-all-tests keys "../test-all-vocabs" utf8 [ . ] with-file-writer ;
+
+! : do-tests ( -- )
+!   run-all-tests
+!   "../test-all-vocabs" utf8
+!     [
+!         [ keys . ]
+!         [ test-failures. ]
+!       bi
+!     ]
+!   with-file-writer ;
 
 : do-help-lint ( -- )
   "" run-help-lint "../help-lint" utf8 [ typos. ] with-file-writer ;

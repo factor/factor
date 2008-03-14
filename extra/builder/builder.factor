@@ -4,6 +4,7 @@ USING: kernel namespaces sequences splitting system combinators continuations
        bootstrap.image benchmark vars bake smtp builder.util accessors
        io.encodings.utf8
        calendar
+       tools.test
        builder.common
        builder.benchmark
        builder.release ;
@@ -131,7 +132,10 @@ SYMBOL: build-status
       "Test time: " write "test-time" eval-file milli-seconds>time print nl
 
       "Did not pass load-everything: " print "load-everything-vocabs" cat
+      
       "Did not pass test-all: "        print "test-all-vocabs"        cat
+      "test-all-vocabs" eval-file test-failures.
+      
       "help-lint results:"             print "help-lint"              cat
 
       "Benchmarks: " print "benchmarks" eval-file benchmarks.
