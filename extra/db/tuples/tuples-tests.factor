@@ -239,3 +239,9 @@ TUPLE: exam id name score ;
     ;
 
 ! [ test-ranges ] test-sqlite
+
+\ insert-tuple must-infer
+\ update-tuple must-infer
+\ delete-tuple must-infer
+\ select-tuple must-infer
+\ define-persistent must-infer
