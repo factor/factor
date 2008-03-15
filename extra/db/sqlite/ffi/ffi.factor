@@ -127,6 +127,6 @@ FUNCTION: char* sqlite3_column_decltype ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: double sqlite3_column_double ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: int sqlite3_column_name ( sqlite3_stmt* pStmt, int col ) ;
+FUNCTION: char* sqlite3_column_name ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: char* sqlite3_column_text ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: int sqlite3_column_type ( sqlite3_stmt* pStmt, int col ) ;
