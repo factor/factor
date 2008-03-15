@@ -187,15 +187,16 @@ M: password render-error*
     render-edit* render-error ;
 
 ! Number fields
-TUPLE: number min-value max-value ;
+TUPLE: number min-value max-value integer ;
 
 : <number> ( id -- component ) number <component> ;
 
 M: number validate*
     [ v-number ] [
+        [ integer>> [ v-integer ] when ]
         [ min-value>> [ v-min-value ] when* ]
         [ max-value>> [ v-max-value ] when* ]
-        bi
+        tri
     ] bi* ;
 
 M: number render-view*
@@ -212,7 +213,7 @@ TUPLE: text ;
 
 : <text> ( id -- component ) text <component> ;
 
-M: text validate* 2drop ;
+M: text validate* drop ;
 
 M: text render-view*
     drop write ;

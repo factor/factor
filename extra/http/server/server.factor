@@ -108,10 +108,6 @@ TUPLE: dispatcher default responders ;
 : <dispatcher> ( -- dispatcher )
     404-responder get H{ } clone dispatcher construct-boa ;
 
-: set-main ( dispatcher name -- dispatcher )
-    '[ , f <permanent-redirect> ] <trivial-responder>
-    >>default ;
-
 : split-path ( path -- rest first )
     [ CHAR: / = ] left-trim "/" split1 swap ;
 
@@ -124,27 +120,35 @@ TUPLE: dispatcher default responders ;
 
 M: dispatcher call-responder ( path dispatcher -- response )
     over [
-        2dup find-responder call-responder [
-            2nip
-        ] [
-            default>> [
-                call-responder
-            ] [
-                drop f
-            ] if*
-        ] if*
+        find-responder call-responder
     ] [
         2drop redirect-with-/
     ] if ;
+
+: <webapp> ( class -- dispatcher )
+    <dispatcher> swap construct-delegate ; inline
+
+TUPLE: vhost-dispatcher default responders ;
+
+: <vhost-dispatcher> ( -- dispatcher )
+    404-responder get H{ } clone vhost-dispatcher construct-boa ;
+
+: find-vhost ( dispatcher -- responder )
+    request get host>> over responders>> at*
+    [ nip ] [ drop default>> ] if ;
+
+M: vhost-dispatcher call-responder ( path dispatcher -- response )
+    find-vhost call-responder ;
+
+: set-main ( dispatcher name -- dispatcher )
+    '[ , f <permanent-redirect> ] <trivial-responder>
+    >>default ;
 
 : add-responder ( dispatcher responder path -- dispatcher )
     pick responders>> set-at ;
 
 : add-main-responder ( dispatcher responder path -- dispatcher )
     [ add-responder ] keep set-main ;
-
-: <webapp> ( class -- dispatcher )
-    <dispatcher> swap construct-delegate ; inline
 
 SYMBOL: main-responder
 
@@ -219,11 +223,3 @@ SYMBOL: exit-continuation
 : httpd-main ( -- ) 8888 httpd ;
 
 MAIN: httpd-main
-
-! Utility
-: generate-key ( assoc -- str )
-    >r random-256 >hex r>
-    2dup key? [ nip generate-key ] [ drop ] if ;
-
-: set-at-unique ( value assoc -- key )
-    dup generate-key [ swap set-at ] keep ;

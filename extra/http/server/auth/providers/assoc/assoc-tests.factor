@@ -3,7 +3,7 @@ USING: http.server.auth.providers
 http.server.auth.providers.assoc tools.test
 namespaces accessors kernel ;
 
-<in-memory> "provider" set
+<users-in-memory> "provider" set
 
 [ t ] [
     <user>

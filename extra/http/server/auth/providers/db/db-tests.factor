@@ -4,12 +4,11 @@ http.server.auth.providers.db tools.test
 namespaces db db.sqlite db.tuples continuations
 io.files accessors kernel ;
 
-from-db "provider" set
+users-in-db "provider" set
 
 "auth-test.db" temp-file sqlite-db [
 
-    [ user drop-table ] ignore-errors
-    [ user create-table ] ignore-errors
+    init-users-table
 
     [ t ] [
         <user>
@@ -32,7 +31,7 @@ from-db "provider" set
 
     [ f ] [ "xx" "blah" "provider" get set-password ] unit-test
 
-    [ t ] [ "fdasf" "slava" "provider" get set-password ] unit-test
+    [ t ] [ "fdasf" "slava" "provider" get set-password >boolean ] unit-test
 
     [ t ] [ "fdasf" "slava" "provider" get check-login >boolean ] unit-test
 

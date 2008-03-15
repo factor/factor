@@ -40,6 +40,9 @@ C: <validation-error> validation-error
 : v-number ( str -- n )
     dup string>number [ ] [ "must be a number" throw ] ?if ;
 
+: v-integer ( n -- n )
+    dup integer? [ "must be an integer" throw ] unless ;
+
 : v-min-value ( x n -- x )
     2dup < [
         [ "must be at least " % # ] "" make throw

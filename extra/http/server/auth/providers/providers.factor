@@ -22,7 +22,7 @@ GENERIC: new-user ( user provider -- user/f )
         user [
             user
                 password >>password
-            provider dup update-user
+            dup provider update-user
         ] [ f ] if
     ] ;
 

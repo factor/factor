@@ -173,7 +173,7 @@ SYMBOL: previous-page
                 dup users update-user
                 logged-in-user sset
 
-                previous-page sget dup [ f <permanent-redirect> ] when
+                previous-page sget f <permanent-redirect>
             ] >>submit
     ] ;
 
@@ -347,7 +347,7 @@ M: login call-responder ( path responder -- response )
         swap <protected> >>default
         <login-action> "login" add-responder
         <logout-action> "logout" add-responder
-        no >>users ;
+        no-users >>users ;
 
 ! ! ! Configuration
 
