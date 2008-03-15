@@ -17,11 +17,6 @@ TUPLE: action init display submit get-params post-params ;
         [ <400> ] >>display
         [ <400> ] >>submit ;
 
-: with-validator ( string quot -- result error? )
-    '[ , @ f ] [
-        dup validation-error? [ t ] [ rethrow ] if
-    ] recover ; inline
-
 : validate-param ( name validator assoc -- error? )
     swap pick
     >r >r at r> with-validator swap r> set ;

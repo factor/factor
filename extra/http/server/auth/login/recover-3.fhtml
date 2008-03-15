@@ -17,7 +17,7 @@ namespaces kernel combinators ; %>
 
 <tr>
 <td>Password:</td>
-<td><% "password" component render-edit %></td>
+<td><% "new-password" component render-edit %></td>
 </tr>
 
 <tr>
