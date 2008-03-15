@@ -21,7 +21,7 @@ SYMBOL: log-files
 : open-log-stream ( service -- stream )
     log-path
     dup make-directories
-    1 log# ascii <file-appender> ;
+    1 log# utf8 <file-appender> ;
 
 : log-stream ( service -- stream )
     log-files get [ open-log-stream ] cache ;
