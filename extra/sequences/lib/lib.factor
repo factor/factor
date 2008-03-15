@@ -223,4 +223,4 @@ PRIVATE>
     [ swap nth ] with map ;
 
 : replace ( str oldseq newseq -- str' )
-    H{ } 2seq>assoc [ dupd at* [ nip ] [ drop ] if ] curry map ;
+    H{ } 2seq>assoc substitute ;

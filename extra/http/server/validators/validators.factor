@@ -5,21 +5,26 @@ math.parser assocs new-slots regexp fry unicode.categories
 combinators.cleave sequences ;
 IN: http.server.validators
 
+SYMBOL: validation-failed?
+
 TUPLE: validation-error value reason ;
 
-: validation-error ( value reason -- * )
-    \ validation-error construct-boa throw ;
+C: <validation-error> validation-error
+
+: with-validator ( value quot -- result )
+    [ validation-failed? on <validation-error> ] recover ;
+    inline
 
 : v-default ( str def -- str )
     over empty? spin ? ;
 
 : v-required ( str -- str )
-    dup empty? [ "required" validation-error ] when ;
+    dup empty? [ "required" throw ] when ;
 
 : v-min-length ( str n -- str )
     over length over < [
         [ "must be at least " % # " characters" % ] "" make
-        validation-error
+        throw
     ] [
         drop
     ] if ;
@@ -27,35 +32,31 @@ TUPLE: validation-error value reason ;
 : v-max-length ( str n -- str )
     over length over > [
         [ "must be no more than " % # " characters" % ] "" make
-        validation-error
+        throw
     ] [
         drop
     ] if ;
 
 : v-number ( str -- n )
-    dup string>number [ ] [
-        "must be a number" validation-error
-    ] ?if ;
+    dup string>number [ ] [ "must be a number" throw ] ?if ;
 
 : v-min-value ( x n -- x )
     2dup < [
-        [ "must be at least " % # ] "" make
-        validation-error
+        [ "must be at least " % # ] "" make throw
     ] [
         drop
     ] if ;
 
 : v-max-value ( x n -- x )
     2dup > [
-        [ "must be no more than " % # ] "" make
-        validation-error
+        [ "must be no more than " % # ] "" make throw
     ] [
         drop
     ] if ;
 
 : v-regexp ( str what regexp -- str )
     >r over r> matches?
-    [ drop ] [ "invalid " swap append validation-error ] if ;
+    [ drop ] [ "invalid " swap append throw ] if ;
 
 : v-email ( str -- str )
     #! From http://www.regular-expressions.info/email.html
@@ -64,12 +65,12 @@ TUPLE: validation-error value reason ;
     v-regexp ;
 
 : v-captcha ( str -- str )
-    dup empty? [ "must remain blank" validation-error ] unless ;
+    dup empty? [ "must remain blank" throw ] unless ;
 
 : v-one-line ( str -- str )
     dup "\r\n" seq-intersect empty?
-    [ "must be a single line" validation-error ] unless ;
+    [ "must be a single line" throw ] unless ;
 
 : v-one-word ( str -- str )
     dup [ alpha? ] all?
-    [ "must be a single word" validation-error ] unless ;
+    [ "must be a single word" throw ] unless ;

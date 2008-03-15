@@ -86,3 +86,16 @@ TUPLE: test-tuple text number more-text ;
 
     [ t ] [ "number" value validation-error? ] unit-test
 ] with-scope
+
+[
+    [ ] [
+        "n" <number>
+            0 >>min-value
+            10 >>max-value
+        "n" set
+    ] unit-test
+
+    [ "123" ] [
+        "123" "n" get validate value>>
+    ] unit-test
+] with-scope
