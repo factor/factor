@@ -98,7 +98,7 @@ M: sqlite-db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
 
 : sqlite-make ( class quot -- )
     >r sql-props r>
-    { "" { } { } } nmake <simple-statement> ;
+    { "" { } { } } nmake <simple-statement> ; inline
 
 M: sqlite-db create-sql-statement ( class -- statement )
     [

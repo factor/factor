@@ -4,7 +4,7 @@
 USING: html http http.server io kernel math namespaces
 continuations calendar sequences assocs new-slots hashtables
 accessors arrays alarms quotations combinators
-combinators.cleave fry ;
+combinators.cleave fry assocs.lib ;
 IN: http.server.callbacks
 
 SYMBOL: responder

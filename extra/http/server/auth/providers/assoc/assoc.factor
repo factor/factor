@@ -4,16 +4,16 @@ IN: http.server.auth.providers.assoc
 USING: new-slots accessors assocs kernel
 http.server.auth.providers ;
 
-TUPLE: in-memory assoc ;
+TUPLE: users-in-memory assoc ;
 
-: <in-memory> ( -- provider )
-    H{ } clone in-memory construct-boa ;
+: <users-in-memory> ( -- provider )
+    H{ } clone users-in-memory construct-boa ;
 
-M: in-memory get-user ( username provider -- user/f )
+M: users-in-memory get-user ( username provider -- user/f )
     assoc>> at ;
 
-M: in-memory update-user ( user provider -- ) 2drop ;
+M: users-in-memory update-user ( user provider -- ) 2drop ;
 
-M: in-memory new-user ( user provider -- user/f )
+M: users-in-memory new-user ( user provider -- user/f )
     >r dup username>> r> assoc>>
     2dup key? [ 3drop f ] [ pick >r set-at r> ] if ;

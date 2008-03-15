@@ -7,7 +7,7 @@ sequences namespaces words symbols ;
 IN: io.windows.files
 
 SYMBOLS: +read-only+ +hidden+ +system+
-+directory+ +archive+ +device+ +normal+ +temporary+
++archive+ +device+ +normal+ +temporary+
 +sparse-file+ +reparse-point+ +compressed+ +offline+
 +not-content-indexed+ +encrypted+ ;
 

@@ -98,4 +98,12 @@ TUPLE: test-tuple text number more-text ;
     [ "123" ] [
         "123" "n" get validate value>>
     ] unit-test
+    
+    [ ] [ "n" get t >>integer drop ] unit-test
+
+    [ 3 ] [
+        "3" "n" get validate
+    ] unit-test
 ] with-scope
+
+[ t ] [ "wake up sheeple" dup "n" <text> validate = ] unit-test

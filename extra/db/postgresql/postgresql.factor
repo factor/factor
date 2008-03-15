@@ -119,8 +119,8 @@ M: postgresql-db bind% ( spec -- )
 
 : postgresql-make ( class quot -- )
     >r sql-props r>
-    [ postgresql-counter off ] swap compose
-    { "" { } { } } nmake <postgresql-statement> ;
+    [ postgresql-counter off call ] { "" { } { } } nmake
+    <postgresql-statement> ; inline
 
 : create-table-sql ( class -- statement )
     [

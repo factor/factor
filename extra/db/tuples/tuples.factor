@@ -36,7 +36,7 @@ HOOK: <update-tuples-statement> db ( class -- obj )
 HOOK: <delete-tuple-statement> db ( class -- obj )
 HOOK: <delete-tuples-statement> db ( class -- obj )
 
-HOOK: <select-by-slots-statement> db ( tuple -- tuple )
+HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 
 HOOK: insert-tuple* db ( tuple statement -- )
 
