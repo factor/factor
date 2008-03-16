@@ -169,7 +169,8 @@ M: f print-element drop ;
         ] if
     ] ($subsection) ;
 
-: $vocab-link ( element -- ) first dup ($vocab-link) ;
+: $vocab-link ( element -- )
+    first dup vocab-name swap ($vocab-link) ;
 
 : $vocabulary ( element -- )
     first word-vocabulary [

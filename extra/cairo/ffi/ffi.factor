@@ -10,7 +10,7 @@
 
 USING: alien alien.syntax combinators system ;
 
-IN: cairo
+IN: cairo.ffi
 
 << "cairo" {
         { [ win32? ] [ "cairo.dll" ] }

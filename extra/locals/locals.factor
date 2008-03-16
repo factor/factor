@@ -5,7 +5,7 @@ inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
 definitions prettyprint hashtables combinators.lib
 prettyprint.sections sequences.private effects generic
-compiler.units ;
+compiler.units combinators.cleave ;
 IN: locals
 
 ! Inspired by
@@ -108,8 +108,8 @@ UNION: special local quote local-word local-reader local-writer ;
     if ;
 
 : (point-free) ( quot args -- newquot )
-    { [ load-locals ] [ point-free-body ] [ point-free-end ] }
-    map-call-with2 concat >quotation ;
+    [ load-locals ] [ point-free-body ] [ point-free-end ]
+    2tri 3append >quotation ;
 
 : point-free ( quot args -- newquot )
     over empty? [ drop ] [ (point-free) ] if ;

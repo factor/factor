@@ -76,11 +76,8 @@ M: win32-file close-handle ( handle -- )
     ] when drop ;
 
 : open-append ( path -- handle length )
-    dup file-length dup [
-        >r (open-append) r> 2dup set-file-pointer
-    ] [
-        drop open-write
-    ] if ;
+    [ dup file-info file-info-size ] [ drop 0 ] recover
+    >r (open-append) r> 2dup set-file-pointer ;
 
 TUPLE: FileArgs
     hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRet lpOverlapped ;

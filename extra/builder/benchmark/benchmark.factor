@@ -21,7 +21,7 @@ IN: builder.benchmark
   [ benchmark-difference ] with map ;
 
 : benchmark-deltas ( -- table )
-  "../../benchmarks" "../benchmarks" [ eval-file ] 2apply
+  "../benchmarks" "benchmarks" [ eval-file ] 2apply
   compare-tables
   sort-values ;
 

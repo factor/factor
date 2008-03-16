@@ -7,7 +7,7 @@ source-files definitions strings tools.completion tools.crossref
 tuples ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.lists ui.gadgets.scrollers ui.gadgets.tracks
 ui.gestures ui.operations vocabs words vocabs.loader
-tools.browser unicode.case calendar ui ;
+tools.vocabs unicode.case calendar ui ;
 IN: ui.tools.search
 
 TUPLE: live-search field list ;

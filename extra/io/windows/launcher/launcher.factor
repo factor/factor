@@ -5,7 +5,7 @@ io.windows io.windows.nt.pipes libc io.nonblocking
 io.streams.duplex windows.types math windows.kernel32 windows
 namespaces io.launcher kernel sequences windows.errors assocs
 splitting system threads init strings combinators
-io.backend new-slots accessors ;
+io.backend new-slots accessors concurrency.flags ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args
@@ -137,18 +137,18 @@ M: windows-io kill-process* ( handle -- )
     dup HEX: ffffffff = [ win32-error ] when
     dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth process-exited f ] if ;
 
+SYMBOL: wait-flag
+
 : wait-loop ( -- )
     processes get dup assoc-empty?
-    [ drop f sleep-until ]
+    [ drop wait-flag get-global lower-flag ]
     [ wait-for-processes [ 100 sleep ] when ] if ;
 
-SYMBOL: wait-thread
-
 : start-wait-thread ( -- )
-    [ wait-loop t ] "Process wait" spawn-server
-    wait-thread set-global ;
+    <flag> wait-flag set-global
+    [ wait-loop t ] "Process wait" spawn-server drop ;
 
 M: windows-io register-process
-    drop wait-thread get-global interrupt ;
+    drop wait-flag get-global raise-flag ;
 
 [ start-wait-thread ] "io.windows.launcher" add-init-hook

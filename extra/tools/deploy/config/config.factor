@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: vocabs.loader io.files io kernel sequences assocs
 splitting parser prettyprint namespaces math vocabs
-hashtables tools.browser ;
+hashtables tools.vocabs ;
 IN: tools.deploy.config
 
 SYMBOL: deploy-name

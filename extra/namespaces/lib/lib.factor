@@ -2,7 +2,7 @@
 ! USING: kernel quotations namespaces sequences assocs.lib ;
 
 USING: kernel namespaces namespaces.private quotations sequences
-       assocs.lib math.parser math sequences.lib ;
+       assocs.lib math.parser math sequences.lib locals ;
 
 IN: namespaces.lib
 
@@ -42,11 +42,19 @@ SYMBOL: building-seq
 : 4% 4 n% ;
 : 4# 4 n# ;
 
-: nmake ( quot exemplars -- seqs )
-    dup length dup zero? [ 1+ ] when
-    [
+MACRO:: nmake ( quot exemplars -- )
+    [let | n [ exemplars length ] |
         [
-            [ drop 1024 swap new-resizable ] 2map
-            [ building-seq set call ] keep
-        ] 2keep >r [ like ] 2map r> firstn 
-    ] with-scope ;
+            [
+                exemplars
+                [ 0 swap new-resizable ] map
+                building-seq set
+
+                quot call
+
+                building-seq get
+                exemplars [ like ] 2map
+                n firstn
+            ] with-scope
+        ]
+    ] ;

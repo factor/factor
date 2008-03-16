@@ -6,7 +6,7 @@
 !  http://cairographics.org/samples/text/
 
 
-USING: cairo math math.constants byte-arrays kernel ui ui.render
+USING: cairo.ffi math math.constants byte-arrays kernel ui ui.render
            ui.gadgets opengl.gl ;
 
 IN: cairo-demo
@@ -22,14 +22,16 @@ IN: cairo-demo
 
 TUPLE: cairo-gadget image-array cairo-t ;
 
-M: cairo-gadget draw-gadget* ( gadget -- )
-   0 0 glRasterPos2i
-   1.0 -1.0 glPixelZoom
-   >r 384 256 GL_RGBA GL_UNSIGNED_BYTE r>
-   cairo-gadget-image-array glDrawPixels ;
+! M: cairo-gadget draw-gadget* ( gadget -- )
+!    0 0 glRasterPos2i
+!    1.0 -1.0 glPixelZoom
+!    >r 384 256 GL_RGBA GL_UNSIGNED_BYTE r>
+!    cairo-gadget-image-array glDrawPixels ;
 
 : create-surface ( gadget -- cairo_surface_t )
-  make-image-array dup >r swap set-cairo-gadget-image-array r> convert-array-to-surface ;
+    make-image-array
+    [ swap set-cairo-gadget-image-array ] keep
+    convert-array-to-surface ;
 
 : init-cairo ( gadget -- cairo_t )
    create-surface cairo_create ;
@@ -56,10 +58,10 @@ M: cairo-gadget pref-dim* drop { 384 256 0 } ;
   cairo_fill ;
 
 M: cairo-gadget graft* ( gadget -- )
-   dup dup init-cairo swap set-cairo-gadget-cairo-t draw-hello-world ;
+  dup dup init-cairo swap set-cairo-gadget-cairo-t draw-hello-world ;
 
-M: cairo-gadget ungraft* ( gadget -- )
-   cairo-gadget-cairo-t cairo_destroy ;
+! M: cairo-gadget ungraft* ( gadget -- )
+!    cairo-gadget-cairo-t cairo_destroy ;
 
 : <cairo-gadget> ( -- gadget )
   cairo-gadget construct-gadget ;

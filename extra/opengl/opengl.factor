@@ -25,7 +25,7 @@ IN: opengl
         "GL error: " over gluErrorString append throw
     ] unless drop ;
 
-: do-state ( what quot -- )
+: do-state ( mode quot -- )
     swap glBegin call glEnd ; inline
 
 : do-enabled ( what quot -- )

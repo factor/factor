@@ -1,11 +1,28 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces continuations.private kernel.private init
-assocs kernel vocabs words sequences memory io system arrays
-continuations math definitions mirrors splitting parser classes
-inspector layouts vocabs.loader prettyprint.config prettyprint
-debugger io.streams.c io.streams.duplex io.files io.backend
-quotations words.private tools.deploy.config compiler.units ;
+USING: qualified io.streams.c init fry namespaces assocs kernel
+parser tools.deploy.config vocabs sequences words words.private
+memory kernel.private continuations io prettyprint
+vocabs.loader debugger system strings ;
+QUALIFIED: bootstrap.stage2
+QUALIFIED: classes
+QUALIFIED: compiler.errors.private
+QUALIFIED: compiler.units
+QUALIFIED: continuations
+QUALIFIED: definitions
+QUALIFIED: init
+QUALIFIED: inspector
+QUALIFIED: io.backend
+QUALIFIED: io.thread
+QUALIFIED: layouts
+QUALIFIED: libc.private
+QUALIFIED: libc.private
+QUALIFIED: listener
+QUALIFIED: prettyprint.config
+QUALIFIED: random.private
+QUALIFIED: source-files
+QUALIFIED: threads
+QUALIFIED: vocabs
 IN: tools.deploy.shaker
 
 : strip-init-hooks ( -- )
@@ -43,9 +60,6 @@ IN: tools.deploy.shaker
         run-file
     ] when ;
 
-: strip-assoc ( retained-keys assoc -- newassoc )
-    swap [ nip member? ] curry assoc-subset ;
-
 : strip-word-names ( words -- )
     "Stripping word names" show
     [ f over set-word-name f swap set-word-vocabulary ] each ;
@@ -57,8 +71,11 @@ IN: tools.deploy.shaker
 : strip-word-props ( retain-props words -- )
     "Stripping word properties" show
     [
-        [ word-props strip-assoc f assoc-like ] keep
-        set-word-props
+        [
+            word-props swap
+            '[ , nip member? ] assoc-subset
+            f assoc-like
+        ] keep set-word-props
     ] with each ;
 
 : retained-props ( -- seq )
@@ -81,10 +98,103 @@ IN: tools.deploy.shaker
     strip-word-names? [ dup strip-word-names ] when
     2drop ;
 
-: strip-environment ( retain-globals -- )
+: strip-recompile-hook ( -- )
+    [ [ f ] { } map>assoc ]
+    compiler.units:recompile-hook
+    set-global ;
+
+: strip-vocab-globals ( except names -- words )
+    [ child-vocabs [ words ] map concat ] map concat seq-diff ;
+
+: stripped-globals ( -- seq )
+    [
+        random.private:mt ,
+
+        {
+            bootstrap.stage2:bootstrap-time
+            continuations:error
+            continuations:error-continuation
+            continuations:error-thread
+            continuations:restarts
+            error-hook
+            init:init-hooks
+            inspector:inspector-hook
+            io.thread:io-thread
+            libc.private:mallocs
+            source-files:source-files
+            stderr
+            stdio
+        } %
+
+        deploy-threads? [
+            threads:initial-thread ,
+        ] unless
+
+        strip-io? [ io.backend:io-backend , ] when
+
+        [
+            io.backend:io-backend
+            "default-buffer-size" "io.nonblocking" lookup ,
+        ] { "alarms" "io" "tools" } strip-vocab-globals %
+
+        strip-dictionary? [
+            { } { "cpu" } strip-vocab-globals %
+
+            {
+                vocabs:dictionary
+                lexer-factory
+                vocabs:load-vocab-hook
+                layouts:num-tags
+                layouts:num-types
+                layouts:tag-mask
+                layouts:tag-numbers
+                layouts:type-numbers
+                classes:typemap
+                vocab-roots
+                definitions:crossref
+                compiled-crossref
+                interactive-vocabs
+                word
+                compiler.units:recompile-hook
+                listener:listener-hook
+                lexer-factory
+                classes:update-map
+                classes:class<map
+            } %
+        ] when
+
+        strip-prettyprint? [
+            {
+                prettyprint.config:margin
+                prettyprint.config:string-limit
+                prettyprint.config:tab-size
+            } %
+        ] when
+
+        strip-debugger? [
+            {
+                compiler.errors.private:compiler-errors
+                continuations:thread-error-hook
+            } %
+        ] when
+
+        deploy-c-types? get [
+            "c-types" "alien.c-types" lookup ,
+        ] unless
+
+        deploy-ui? get [
+            "ui-error-hook" "ui.gadgets.worlds" lookup ,
+        ] when
+    ] { } make ;
+
+: strip-globals ( stripped-globals -- )
     strip-globals? [
-        "Stripping environment" show
-        global strip-assoc 21 setenv
+        "Stripping globals" show
+        global swap
+        '[ drop , member? not ] assoc-subset
+        [ drop string? not ] assoc-subset ! strip CLI args
+        dup keys .
+        21 setenv
     ] [ drop ] if ;
 
 : finish-deploy ( final-image -- )
@@ -108,55 +218,6 @@ SYMBOL: deploy-vocab
     ] [ ] make "Boot quotation: " write dup . flush
     set-boot-quot ;
 
-: retained-globals ( -- seq )
-    [
-        builtins ,
-        strip-io? [ io-backend , ] unless
-
-        strip-dictionary? [
-            {
-                dictionary
-                inspector-hook
-                lexer-factory
-                load-vocab-hook
-                num-tags
-                num-types
-                tag-bits
-                tag-mask
-                tag-numbers
-                typemap
-                vocab-roots
-            } %
-        ] unless
-
-        strip-prettyprint? [
-            {
-                tab-size
-                margin
-            } %
-        ] unless
-
-        deploy-c-types? get [
-            "c-types" "alien.c-types" lookup ,
-        ] when
-
-        native-io? [
-            "default-buffer-size" "io.nonblocking" lookup ,
-        ] when
-
-        deploy-ui? get [
-            "ui" child-vocabs
-            "cocoa" child-vocabs
-            deploy-vocab get child-vocabs 3append
-            global keys [ word? ] subset
-            swap [ >r word-vocabulary r> member? ] curry
-            subset %
-        ] when
-    ] { } make dup . ;
-
-: strip-recompile-hook ( -- )
-    [ [ f ] { } map>assoc ] recompile-hook set-global ;
-
 : strip ( -- )
     strip-libc
     strip-cocoa
@@ -165,7 +226,7 @@ SYMBOL: deploy-vocab
     strip-init-hooks
     deploy-vocab get vocab-main set-boot-quot*
     retained-props >r
-    retained-globals strip-environment
+    stripped-globals strip-globals
     r> strip-words ;
 
 : (deploy) ( final-image vocab config -- )

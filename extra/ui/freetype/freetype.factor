@@ -4,6 +4,7 @@ USING: alien alien.accessors alien.c-types arrays io kernel libc
 math math.vectors namespaces opengl opengl.gl prettyprint assocs
 sequences io.files io.styles continuations freetype
 ui.gadgets.worlds ui.render ui.backend byte-arrays ;
+
 IN: ui.freetype
 
 TUPLE: freetype-renderer ;
@@ -74,7 +75,7 @@ M: freetype-renderer free-fonts ( world -- )
 : open-face ( font style -- face )
     ttf-name ttf-path
     dup malloc-file-contents
-    swap file-length
+    swap file-info file-info-size
     (open-face) ;
 
 SYMBOL: dpi

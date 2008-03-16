@@ -1,5 +1,5 @@
 USING: arrays combinators.lib kernel math math.functions math.vectors namespaces
-       opengl opengl.gl sequences ui ui.gadgets ui.gestures ui.render ;
+       opengl opengl.gl sequences ui ui.gadgets ui.gestures ui.render combinators.cleave ;
 IN: opengl.demo-support
 
 : NEAR-PLANE 1.0 64.0 / ; inline
@@ -47,14 +47,15 @@ M: demo-gadget pref-dim* ( gadget -- dim )
     GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
     GL_MODELVIEW glMatrixMode
     glLoadIdentity
-    { [ >r 0.0 0.0 r> demo-gadget-distance neg glTranslatef ]
-      [ demo-gadget-pitch 1.0 0.0 0.0 glRotatef ]
-      [ demo-gadget-yaw   0.0 1.0 0.0 glRotatef ] } call-with ;
+    [ >r 0.0 0.0 r> demo-gadget-distance neg glTranslatef ]
+    [ demo-gadget-pitch 1.0 0.0 0.0 glRotatef ]
+    [ demo-gadget-yaw   0.0 1.0 0.0 glRotatef ]
+    tri ;
 
 : reset-last-drag-rel ( -- )
-    { 0 0 } last-drag-loc set ;
+    { 0 0 } last-drag-loc set-global ;
 : last-drag-rel ( -- rel )
-    drag-loc [ last-drag-loc get v- ] keep last-drag-loc set ;
+    drag-loc [ last-drag-loc get v- ] keep last-drag-loc set-global ;
 
 : drag-yaw-pitch ( -- yaw pitch )
     last-drag-rel MOUSE-MOTION-SCALE v*n first2 ;

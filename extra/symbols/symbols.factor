@@ -1,8 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser sequences words ;
+USING: parser sequences words kernel ;
 IN: symbols
 
 : SYMBOLS:
-    ";" parse-tokens [ create-in define-symbol ] each ;
+    ";" parse-tokens
+    [ create-in dup reset-generic define-symbol ] each ;
     parsing
