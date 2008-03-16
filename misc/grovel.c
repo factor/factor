@@ -136,5 +136,6 @@ int main() {
 	unix_types();
 #endif
 
+	grovel(long);
 	return 0;
 }
