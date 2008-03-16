@@ -86,15 +86,9 @@ SYMBOL: +unknown+
 : stat ( path -- directory? permissions length modified )
     normalize-pathname (stat) ;
 
-! : file-length ( path -- n ) stat drop 2nip ;
-
 : file-modified ( path -- n ) stat >r 3drop r> ;
 
-! : file-permissions ( path -- perm ) stat 2drop nip ;
-
 : exists? ( path -- ? ) file-modified >boolean ;
-
-! : directory? ( path -- ? ) stat 3drop ;
 
 : directory? ( path -- ? ) file-info file-info-type +directory+ = ;
 
