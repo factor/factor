@@ -178,39 +178,39 @@ UNION: forget-class-bug-2 forget-class-bug-1 dll ;
 
 [ f ] [ forget-class-bug-2 typemap get values [ memq? ] with contains? ] unit-test
 
-DEFER: mixin-forget-test-g
-
-[ "mixin-forget-test" forget-source ] with-compilation-unit
-
-[ ] [
-    {
-        "USING: sequences ;"
-        "IN: classes.tests"
-        "MIXIN: mixin-forget-test"
-        "INSTANCE: sequence mixin-forget-test"
-        "GENERIC: mixin-forget-test-g ( x -- y )"
-        "M: mixin-forget-test mixin-forget-test-g ;"
-    } "\n" join <string-reader> "mixin-forget-test"
-    parse-stream drop
-] unit-test
-
-[ { } ] [ { } mixin-forget-test-g ] unit-test
-[ H{ } mixin-forget-test-g ] must-fail
-
-[ ] [
-    {
-        "USING: hashtables ;"
-        "IN: classes.tests"
-        "MIXIN: mixin-forget-test"
-        "INSTANCE: hashtable mixin-forget-test"
-        "GENERIC: mixin-forget-test-g ( x -- y )"
-        "M: mixin-forget-test mixin-forget-test-g ;"
-    } "\n" join <string-reader> "mixin-forget-test"
-    parse-stream drop
-] unit-test
-
-[ { } mixin-forget-test-g ] must-fail
-[ H{ } ] [ H{ } mixin-forget-test-g ] unit-test
+2 [
+    [ "mixin-forget-test" forget-source ] with-compilation-unit
+    
+    [ ] [
+        {
+            "USING: sequences ;"
+            "IN: classes.tests"
+            "MIXIN: mixin-forget-test"
+            "INSTANCE: sequence mixin-forget-test"
+            "GENERIC: mixin-forget-test-g ( x -- y )"
+            "M: mixin-forget-test mixin-forget-test-g ;"
+        } "\n" join <string-reader> "mixin-forget-test"
+        parse-stream drop
+    ] unit-test
+    
+    [ { } ] [ { } "mixin-forget-test-g" "classes.tests" lookup execute ] unit-test
+    [ H{ } "mixin-forget-test-g" "classes.tests" lookup execute ] must-fail
+    
+    [ ] [
+        {
+            "USING: hashtables ;"
+            "IN: classes.tests"
+            "MIXIN: mixin-forget-test"
+            "INSTANCE: hashtable mixin-forget-test"
+            "GENERIC: mixin-forget-test-g ( x -- y )"
+            "M: mixin-forget-test mixin-forget-test-g ;"
+        } "\n" join <string-reader> "mixin-forget-test"
+        parse-stream drop
+    ] unit-test
+    
+    [ { } "mixin-forget-test-g" "classes.tests" lookup execute ] must-fail
+    [ H{ } ] [ H{ } "mixin-forget-test-g" "classes.tests" lookup execute ] unit-test
+] times
 
 ! Method flattening interfered with mixin update
 MIXIN: flat-mx-1

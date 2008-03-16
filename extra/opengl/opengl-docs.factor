@@ -10,7 +10,11 @@ HELP: gl-error
 { $description "If the most recent OpenGL call resulted in an error, print the error to the " { $link stdio } " stream." } ;
 
 HELP: do-state
-{ $values { "what" integer } { "quot" quotation } }
+  {
+    $values
+      { "mode" { "One of the " { $link "opengl-geometric-primitives" } } }
+      { "quot" quotation }
+  }
 { $description "Wraps a quotation in " { $link glBegin } "/" { $link glEnd } " calls." } ;
 
 HELP: do-enabled

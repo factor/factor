@@ -7,8 +7,6 @@ http.server.actions splitting mirrors hashtables
 combinators.cleave fry continuations math ;
 IN: http.server.components
 
-SYMBOL: validation-failed?
-
 SYMBOL: components
 
 TUPLE: component id required default ;
@@ -30,16 +28,13 @@ SYMBOL: values
 
 : validate ( value component -- result )
     '[
-        , ,
+        ,
         over empty? [
             [ default>> [ v-default ] when* ]
             [ required>> [ v-required ] when ]
             bi
         ] [ validate* ] if
-    ] [
-        dup validation-error?
-        [ validation-failed? on ] [ rethrow ] if
-    ] recover ;
+    ] with-validator ;
 
 : render-view ( component -- )
     [ id>> value ] [ render-view* ] bi ;
@@ -192,15 +187,16 @@ M: password render-error*
     render-edit* render-error ;
 
 ! Number fields
-TUPLE: number min-value max-value ;
+TUPLE: number min-value max-value integer ;
 
 : <number> ( id -- component ) number <component> ;
 
 M: number validate*
     [ v-number ] [
+        [ integer>> [ v-integer ] when ]
         [ min-value>> [ v-min-value ] when* ]
         [ max-value>> [ v-max-value ] when* ]
-        bi
+        tri
     ] bi* ;
 
 M: number render-view*
@@ -215,7 +211,12 @@ M: number render-error*
 ! Text areas
 TUPLE: text ;
 
-: <text> ( id -- component ) <string> text construct-delegate ;
+: <text> ( id -- component ) text <component> ;
+
+M: text validate* drop ;
+
+M: text render-view*
+    drop write ;
 
 : render-textarea
     <textarea

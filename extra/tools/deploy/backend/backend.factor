@@ -34,56 +34,62 @@ IN: tools.deploy.backend
 
 : ?, [ , ] [ drop ] if ;
 
-: bootstrap-profile ( config -- profile )
+: bootstrap-profile ( -- profile )
     [
-        [
-            "math" deploy-math? get ?,
-            "compiler" deploy-compiler? get ?,
-            "ui" deploy-ui? get ?,
-            "io" native-io? ?,
-        ] { } make
-    ] bind ;
+        "math" deploy-math? get ?,
+        "compiler" deploy-compiler? get ?,
+        "ui" deploy-ui? get ?,
+        "io" native-io? ?,
+    ] { } make ;
 
-: staging-image-name ( profile -- name )
-    "staging." swap bootstrap-profile "-" join ".image" 3append ;
+: staging-image-name ( -- name )
+    "staging."
+    bootstrap-profile strip-word-names? [ "strip" add ] when
+    "-" join ".image" 3append ;
 
 : staging-command-line ( config -- flags )
     [
-        "-i=" my-boot-image-name append ,
+        [
+            "-i=" my-boot-image-name append ,
 
-        "-output-image=" over staging-image-name append ,
+            "-output-image=" staging-image-name append ,
 
-        "-include=" swap bootstrap-profile " " join append ,
+            "-include=" bootstrap-profile " " join append ,
 
-        "-no-stack-traces" ,
+            strip-word-names? [ "-no-stack-traces" , ] when
 
-        "-no-user-init" ,
-    ] { } make ;
+            "-no-user-init" ,
+        ] { } make
+    ] bind ;
 
 : run-factor ( vm flags -- )
     swap add* dup . run-with-output ; inline
 
-: make-staging-image ( vm config -- )
-    staging-command-line run-factor ;
+: make-staging-image ( config -- )
+    vm swap staging-command-line run-factor ;
+
+: ?make-staging-image ( config -- )
+    dup [ staging-image-name ] bind exists?
+    [ drop ] [ make-staging-image ] if ;
 
 : deploy-command-line ( image vocab config -- flags )
     [
-        "-i=" swap staging-image-name append ,
+        [
+            "-i=" staging-image-name append ,
 
-        "-run=tools.deploy.shaker" ,
+            "-run=tools.deploy.shaker" ,
 
-        "-deploy-vocab=" swap append ,
+            "-deploy-vocab=" swap append ,
 
-        "-output-image=" swap append ,
+            "-output-image=" swap append ,
 
-        "-no-stack-traces" ,
-    ] { } make ;
+            strip-word-names? [ "-no-stack-traces" , ] when
+        ] { } make
+    ] bind ;
 
 : make-deploy-image ( vm image vocab config -- )
     make-boot-image
-    dup staging-image-name exists? [
-        >r pick r> tuck make-staging-image
-    ] unless
+    dup ?make-staging-image
     deploy-command-line run-factor ;
 
 SYMBOL: deploy-implementation

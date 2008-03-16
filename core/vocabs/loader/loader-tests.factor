@@ -3,7 +3,7 @@ IN: vocabs.loader.tests
 USING: vocabs.loader tools.test continuations vocabs math
 kernel arrays sequences namespaces io.streams.string
 parser source-files words assocs tuples definitions
-debugger compiler.units ;
+debugger compiler.units tools.vocabs ;
 
 ! This vocab should not exist, but just in case...
 [ ] [

@@ -1,15 +1,15 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend io.nonblocking io.unix.backend io.files io
-unix unix.stat unix.time kernel math continuations math.bitfields
-byte-arrays alien combinators combinators.cleave calendar
-io.encodings.binary ;
+unix unix.stat unix.time kernel math continuations
+math.bitfields byte-arrays alien combinators combinators.cleave
+calendar io.encodings.binary ;
 
 IN: io.unix.files
 
 M: unix-io cwd
-    MAXPATHLEN dup <byte-array> swap
-    getcwd [ (io-error) ] unless* ;
+    MAXPATHLEN [ <byte-array> ] [ ] bi getcwd
+    [ (io-error) ] unless* ;
 
 M: unix-io cd
     chdir io-error ;
@@ -68,7 +68,9 @@ M: unix-io delete-directory ( path -- )
     ] with-disposal ;
 
 M: unix-io copy-file ( from to -- )
-    [ (copy-file) ] 2keep swap file-permissions chmod io-error ;
+    [ (copy-file) ]
+    [ swap file-info file-info-permissions chmod  io-error ]
+    2bi ;
 
 : stat>type ( stat -- type )
     stat-st_mode {
@@ -82,8 +84,8 @@ M: unix-io copy-file ( from to -- )
         { [ t            ] [ +unknown+          ] }
       } cond nip ;
 
-M: unix-io file-info ( path -- info )
-    stat* {
+: stat>file-info ( stat -- info )
+    {
         [ stat>type ]
         [ stat-st_size ]
         [ stat-st_mode ]
@@ -91,11 +93,8 @@ M: unix-io file-info ( path -- info )
     } cleave
     \ file-info construct-boa ;
 
+M: unix-io file-info ( path -- info )
+    stat* stat>file-info ;
+
 M: unix-io link-info ( path -- info )
-    lstat* {
-        [ stat>type ]
-        [ stat-st_size ]
-        [ stat-st_mode ]
-        [ stat-st_mtim timespec-sec seconds unix-1970 time+ ]
-    } cleave
-    \ file-info construct-boa ;
+    lstat* stat>file-info ;

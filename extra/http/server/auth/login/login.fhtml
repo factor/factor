@@ -1,10 +1,13 @@
-<% USING: http.server.auth.login http.server.components kernel
-namespaces ; %>
+<% USING: http.server.auth.login http.server.components http.server
+kernel namespaces ; %>
 <html>
 <body>
 <h1>Login required</h1>
 
 <form method="POST" action="login">
+
+<% hidden-form-field %>
+
 <table>
 
 <tr>
@@ -30,10 +33,12 @@ login-failed? get
 
 <p>
 <% allow-registration? [ %>
-    <a href="register">Register</a>
+    <a href="<% "register" f write-link %>">Register</a>
 <% ] when %>
 <% allow-password-recovery? [ %>
-    <a href="recover-password">Recover Password</a>
+    <a href="<% "recover-password" f write-link %>">
+    	Recover Password
+    </a>
 <% ] when %>
 </p>
 

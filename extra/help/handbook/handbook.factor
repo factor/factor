@@ -196,6 +196,7 @@ ARTICLE: "io" "Input and output"
 { $subsection "io.timeouts" } ;
 
 ARTICLE: "tools" "Developer tools"
+{ $subsection "tools.vocabs" }
 "Exploratory tools:"
 { $subsection "editor" }
 { $subsection "tools.crossref" }

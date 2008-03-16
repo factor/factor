@@ -3,43 +3,35 @@
 USING: alien.c-types io.files io.windows kernel
 math windows windows.kernel32 combinators.cleave
 windows.time calendar combinators math.functions
-sequences combinators.lib combinators.cleave
-namespaces words symbols ;
+sequences namespaces words symbols ;
 IN: io.windows.files
 
 SYMBOLS: +read-only+ +hidden+ +system+
-+directory+ +archive+ +device+ +normal+ +temporary+
++archive+ +device+ +normal+ +temporary+
 +sparse-file+ +reparse-point+ +compressed+ +offline+
 +not-content-indexed+ +encrypted+ ;
 
-: expand-constants ( word/obj -- obj'/obj )
-    dup word? [ execute ] when ;
-
-: get-flags ( n seq -- seq' )
-    [
-        [
-            first2 expand-constants
-            [ swapd mask? [ , ] [ drop ] if ] 2curry
-        ] map cleave
-    ] { } make ;
+: win32-file-attribute ( n attr symbol -- n )
+    >r dupd mask? [ r> , ] [ r> drop ] if ;
 
 : win32-file-attributes ( n -- seq )
-    {
-        { +read-only+ FILE_ATTRIBUTE_READONLY }
-        { +hidden+ FILE_ATTRIBUTE_HIDDEN }
-        { +system+ FILE_ATTRIBUTE_SYSTEM }
-        { +directory+ FILE_ATTRIBUTE_DIRECTORY }
-        { +archive+ FILE_ATTRIBUTE_ARCHIVE }
-        { +device+ FILE_ATTRIBUTE_DEVICE }
-        { +normal+ FILE_ATTRIBUTE_NORMAL }
-        { +temporary+ FILE_ATTRIBUTE_TEMPORARY }
-        { +sparse-file+ FILE_ATTRIBUTE_SPARSE_FILE }
-        { +reparse-point+ FILE_ATTRIBUTE_REPARSE_POINT }
-        { +compressed+ FILE_ATTRIBUTE_COMPRESSED }
-        { +offline+ FILE_ATTRIBUTE_OFFLINE }
-        { +not-content-indexed+ FILE_ATTRIBUTE_NOT_CONTENT_INDEXED }
-        { +encrypted+ FILE_ATTRIBUTE_ENCRYPTED }
-    } get-flags ;
+    [
+        FILE_ATTRIBUTE_READONLY +read-only+ win32-file-attribute
+        FILE_ATTRIBUTE_HIDDEN +hidden+ win32-file-attribute
+        FILE_ATTRIBUTE_SYSTEM +system+ win32-file-attribute
+        FILE_ATTRIBUTE_DIRECTORY +directory+ win32-file-attribute
+        FILE_ATTRIBUTE_ARCHIVE +archive+ win32-file-attribute
+        FILE_ATTRIBUTE_DEVICE +device+ win32-file-attribute
+        FILE_ATTRIBUTE_NORMAL +normal+ win32-file-attribute
+        FILE_ATTRIBUTE_TEMPORARY +temporary+ win32-file-attribute
+        FILE_ATTRIBUTE_SPARSE_FILE +sparse-file+ win32-file-attribute
+        FILE_ATTRIBUTE_REPARSE_POINT +reparse-point+ win32-file-attribute
+        FILE_ATTRIBUTE_COMPRESSED +compressed+ win32-file-attribute
+        FILE_ATTRIBUTE_OFFLINE +offline+ win32-file-attribute
+        FILE_ATTRIBUTE_NOT_CONTENT_INDEXED +not-content-indexed+ win32-file-attribute
+        FILE_ATTRIBUTE_ENCRYPTED +encrypted+ win32-file-attribute
+        drop
+    ] { } make ;
 
 : win32-file-type ( n -- symbol )
     FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;

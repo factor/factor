@@ -3,14 +3,12 @@
 USING: http.server.auth.providers kernel ;
 IN: http.server.auth.providers.null
 
-! Named "no" because we can say  no >>users
+TUPLE: no-users ;
 
-TUPLE: no ;
+: no-users T{ no-users } ;
 
-: no T{ no } ;
+M: no-users get-user 2drop f ;
 
-M: no get-user 2drop f ;
+M: no-users new-user 2drop f ;
 
-M: no new-user 2drop f ;
-
-M: no update-user 2drop ;
+M: no-users update-user 2drop ;

@@ -26,11 +26,14 @@ M: destructor dispose
 : add-always-destructor ( obj -- )
     <destructor> always-destructors get push ;
 
+: dispose-each ( seq -- )
+    <reversed> [ dispose ] each ;
+
 : do-always-destructors ( -- )
-    always-destructors get [ dispose ] each ;
+    always-destructors get dispose-each ;
 
 : do-error-destructors ( -- )
-    error-destructors get [ dispose ] each ;
+    error-destructors get dispose-each ;
 
 : with-destructors ( quot -- )
     [

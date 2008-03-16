@@ -130,8 +130,15 @@ MACRO: parallel-call ( quots -- )
 ! map-call and friends
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: (make-call-with) ( quots -- quot ) 
+    [ [ keep ] curry ] map concat [ drop ] append ;
+
 MACRO: map-call-with ( quots -- )
-    [ [ [ keep ] curry ] map concat [ drop ] append ] keep length [ narray ] curry compose ;
+    [ (make-call-with) ] keep length [ narray ] curry compose ;
+
+: (make-call-with2) ( quots -- quot )
+    [ [ 2dup >r >r ] swap append [ r> r> ] append ] map concat
+    [ 2drop ] append ;
 
 MACRO: map-call-with2 ( quots -- )
     [

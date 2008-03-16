@@ -83,7 +83,9 @@
     (" !.*$" . font-lock-comment-face)
     ("( .* )" . font-lock-comment-face)
     "MAIN:"
-    "IN:" "USING:" "TUPLE:" "^C:" "^M:" "USE:" "REQUIRE:" "PROVIDE:"
+    "IN:" "USING:" "TUPLE:" "^C:" "^M:"
+    "METHOD:"
+    "USE:" "REQUIRE:" "PROVIDE:"
     "REQUIRES:"
     "GENERIC:" "GENERIC#" "SYMBOL:" "PREDICATE:" "VAR:" "VARS:"
     "C-STRUCT:"

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io io.styles strings
-io.backend io.files.private quotations ;
+       io.backend io.files.private quotations ;
 IN: io.files
 
 ARTICLE: "file-streams" "Reading and writing files"
@@ -43,13 +43,19 @@ ARTICLE: "directories" "Directories"
 { $subsection make-directory }
 { $subsection make-directories } ;
 
+! ARTICLE: "file-types" "File Types"
+
+!   { $table { +directory+ "" } }
+
+! ;
+
 ARTICLE: "fs-meta" "File meta-data"
+
 { $subsection file-info }
 { $subsection link-info }
 { $subsection exists? }
 { $subsection directory? }
-{ $subsection file-length }
-{ $subsection file-modified }
+! { $subsection file-modified }
 { $subsection stat } ;
 
 ARTICLE: "delete-move-copy" "Deleting, moving, copying files"
@@ -119,11 +125,26 @@ HELP: file-name
 ! need a $class-description file-info
 
 HELP: file-info
+
   { $values { "path" "a pathname string" }
-            { "info" "a file-info tuple" } }
+            { "info" file-info } }
   { $description "Queries the file system for meta data. "
                  "If path refers to a symbolic link, it is followed."
-                 "If the file does not exist, an exception is thrown." } ;
+                 "If the file does not exist, an exception is thrown." }
+
+  { $class-description "File meta data" }
+
+  { $table 
+           { "type" { "One of the following:"
+                      { $list { $link +regular-file+ }
+                              { $link +directory+ }
+                              { $link +symbolic-link+ } } } }
+
+           { "size"     "Size of the file in bytes" }
+           { "modified" "Last modification timestamp." } }
+
+  ;
+
 ! need a see also to link-info
 
 HELP: link-info
@@ -134,6 +155,8 @@ HELP: link-info
                  "the symbolic link itself is returned."
                  "If the file does not exist, an exception is thrown." } ;
 ! need a see also to file-info
+
+{ file-info link-info } related-words
 
 HELP: <file-reader>
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" { "stream" "an input stream" } }
@@ -199,7 +222,7 @@ HELP: stat ( path -- directory? permissions length modified )
     "Queries the file system for file meta data. If the file does not exist, outputs " { $link f } " for all four values."
 } ;
 
-{ stat exists? directory? file-length file-modified } related-words
+{ stat exists? directory? } related-words
 
 HELP: path+
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
@@ -227,13 +250,9 @@ HELP: directory*
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
 { $notes "Unlike " { $link directory } ", this word prepends the directory's path to all file names in the list." } ;
 
-HELP: file-length
-{ $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
-{ $description "Outputs the length of the file in bytes, or " { $link f } " if it does not exist." } ;
-
-HELP: file-modified
-{ $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
-{ $description "Outputs a file's last modification time, since midnight January 1, 1970. If the file does not exist, outputs " { $link f } "." } ;
+! HELP: file-modified
+! { $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
+! { $description "Outputs a file's last modification time, since midnight January 1, 1970. If the file does not exist, outputs " { $link f } "." } ;
 
 HELP: resource-path
 { $values { "path" "a pathname string" } { "newpath" "a pathname string" } }

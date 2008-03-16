@@ -1,7 +1,7 @@
 USING: arrays bunny.model bunny.cel-shaded
 combinators.cleave continuations kernel math multiline
 opengl opengl.shaders opengl.framebuffers opengl.gl
-opengl.capabilities sequences ui.gadgets ;
+opengl.capabilities sequences ui.gadgets combinators.cleave ;
 IN: bunny.outlined
 
 STRING: outlined-pass1-fragment-shader-main-source

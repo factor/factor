@@ -15,7 +15,10 @@ IN: combinators.cleave
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: 2bi ( obj obj quot quot -- val val ) >r 2keep r> call ; inline
+: 2bi ( x y p q -- p(x,y) q(x,y) ) >r 2keep r> call ; inline
+
+: 2tri ( x y z p q r -- p(x,y,z) q(x,y,z) r(x,y,z) )
+  >r >r 2keep r> 2keep r> call ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -31,6 +34,18 @@ MACRO: cleave ( seq -- )
     [ [ r> ] append ] map concat
   3append
     [ drop ]
+  append ;
+
+MACRO: 2cleave ( seq -- )
+  dup
+    [ drop [ 2dup ] ] map concat
+  swap
+  dup
+    [ drop [ >r >r ] ] map concat
+  swap
+    [ [ r> r> ] append ] map concat
+  3append
+    [ 2drop ]
   append ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -55,3 +70,29 @@ MACRO: spread ( seq -- )
   swap
     [ [ r> ] swap append ] map concat
   append ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Cleave into array
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: words quotations fry arrays.lib ;
+
+: >quot ( obj -- quot ) dup word? [ 1quotation ] when ;
+
+: >quots ( seq -- seq ) [ >quot ] map ;
+
+MACRO: <arr> ( seq -- )
+  [ >quots ] [ length ] bi
+ '[ , cleave , narray ] ;
+
+MACRO: <2arr> ( seq -- )
+  [ >quots ] [ length ] bi
+ '[ , 2cleave , narray ] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Spread into array
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MACRO: <arr*> ( seq -- )
+  [ >quots ] [ length ] bi
+ '[ , spread , narray ] ;
