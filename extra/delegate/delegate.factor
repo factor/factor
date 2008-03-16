@@ -7,7 +7,7 @@ IN: delegate
     swap { } like "protocol-words" set-word-prop ;
 
 : PROTOCOL:
-    CREATE dup reset-generic dup define-symbol
+    CREATE-WORD dup define-symbol
     parse-definition swap define-protocol ; parsing
 
 PREDICATE: word protocol "protocol-words" word-prop ;

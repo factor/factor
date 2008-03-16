@@ -12,6 +12,22 @@ ARTICLE: "tuple-constructors" "Constructors and slots"
 $nl
 "A shortcut for defining BOA constructors:"
 { $subsection POSTPONE: C: }
+"Examples of constructors:"
+{ $code
+    "TUPLE: color red green blue alpha ;"
+    ""
+    "C: <rgba> rgba"
+    ": <rgba> color construct-boa ; ! identical to above"
+    ""
+    ": <rgb>"
+    "    { set-color-red set-color-green set-color-blue }"
+    "    color construct ;"
+    ": <rgb> f <rgba> ; ! identical to above"
+    ""
+    ": <color> construct-empty ;"
+    ": <color> { } color construct ; ! identical to above"
+    ": <color> f f f f <rgba> ; ! identical to above"
+}
 "After construction, slots are read and written using various automatically-defined words with names of the form " { $snippet { $emphasis "class-slot" } } " and " { $snippet "set-" { $emphasis "class-slot" } } "." ;
 
 ARTICLE: "tuple-delegation" "Delegation"
@@ -48,8 +64,8 @@ ARTICLE: "tuples" "Tuples"
 "Tuples are user-defined classes composed of named slots. A parsing word defines tuple classes:"
 { $subsection POSTPONE: TUPLE: }
 "An example:"
-{ $code "TUPLE: person name address phone ;" }
-"This defines a class word named " { $snippet "person" } ", along with a predicate " { $snippet "person?" } ", and the following reader/writer words:"
+{ $code "TUPLE: person name address phone ;" "C: <person> person" }
+"This defines a class word named " { $snippet "person" } ", a predicate " { $snippet "person?" } ", a constructor named " { $snippet "<person>" } ", and the following reader/writer words:"
 { $table
     { "Reader" "Writer" }
     { { $snippet "person-name" }    { $snippet "set-person-name" }    }

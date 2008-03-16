@@ -34,7 +34,7 @@ $nl
 { $subsection define-generic }
 { $subsection define-simple-generic }
 "Methods can be added to existing generic words:"
-{ $subsection define-method }
+{ $subsection create-method }
 "Method definitions can be looked up:"
 { $subsection method }
 { $subsection methods }
@@ -123,7 +123,7 @@ HELP: method
 { $values { "class" class } { "generic" generic } { "method/f" "a " { $link method-body } " or " { $link f } } }
 { $description "Looks up a method definition." } ;
 
-{ method define-method POSTPONE: M: } related-words
+{ method create-method POSTPONE: M: } related-words
 
 HELP: <method>
 { $values { "quot" quotation } { "class" class } { "generic" generic } { "method" "a new method definition" } }
@@ -140,16 +140,17 @@ HELP: order
 HELP: check-method
 { $values { "class" class } { "generic" generic } }
 { $description "Asserts that " { $snippet "class" } " is a class word and " { $snippet "generic" } " is a generic word, throwing a " { $link check-method } " error if the assertion fails." }
-{ $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link define-method } " is given an invalid class or generic word." } ;
+{ $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link create-method } " is given an invalid class or generic word." } ;
 
 HELP: with-methods
 { $values { "word" generic } { "quot" "a quotation with stack effect " { $snippet "( methods -- )" } } }
 { $description "Applies a quotation to the generic word's methods hashtable, and regenerates the generic word's definition when the quotation returns." }
 $low-level-note ;
 
-HELP: define-method
-{ $values { "quot" quotation } { "class" class } { "generic" generic } }
-{ $description "Defines a method. This is the runtime equivalent of " { $link POSTPONE: M: } "." } ;
+HELP: create-method
+{ $values { "class" class } { "generic" generic } { "method" method-body } }
+{ $description "Creates a method or returns an existing one. This is the runtime equivalent of " { $link POSTPONE: M: } "." }
+{ $notes "To define a method, pass the output value to " { $link define } "." } ;
 
 HELP: implementors
 { $values { "class" class } { "seq" "a sequence of generic words" } }

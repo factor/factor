@@ -32,8 +32,6 @@ mailbox variables sleep-entry ;
 
 : threads 41 getenv ;
 
-threads global [ H{ } assoc-like ] change-at
-
 : thread ( id -- thread ) threads at ;
 
 : thread-registered? ( thread -- ? )

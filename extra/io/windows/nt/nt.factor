@@ -13,5 +13,3 @@ USE: io.windows.files
 USE: io.backend
 
 T{ windows-nt-io } set-io-backend
-
-"tools.vocabs.monitor" require
