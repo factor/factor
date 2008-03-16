@@ -12,7 +12,7 @@ ARTICLE: "unique" "Making and using unique files"
 
 ABOUT: "unique"
 
-HELP: make-unique-file ( prefix suffix -- path stream )
+HELP: make-unique-file ( prefix suffix -- path )
 { $values { "prefix" "a string" } { "suffix" "a string" }
 { "path" "a pathname string" } }
 { $description "Creates a file that is guaranteed not to exist in a platform-specific temporary directory.  The file name is composed of a prefix, a number of random digits and letters, and the suffix.  Returns the full pathname." }
@@ -26,7 +26,8 @@ HELP: make-unique-directory ( -- path )
 { $see-also with-unique-directory } ;
 
 HELP: with-unique-file ( prefix suffix quot -- )
-{ $values { "quot" "a quotation" } }
+{ $values { "prefix" "a string" } { "suffix" "a string" }
+{ "quot" "a quotation" } }
 { $description "Creates a file with " { $link make-unique-file } " and calls the quotation with the path name on the stack." }
 { $notes "The unique file will be deleted after calling this word." } ;
 
