@@ -127,8 +127,7 @@ PRIVATE>
 
 : LOG:
     #! Syntax: name level
-    CREATE
-    dup reset-generic
+    CREATE-WORD
     dup scan-word
     [ >r >r 1array stack>message r> r> log-message ] 2curry
     define ; parsing

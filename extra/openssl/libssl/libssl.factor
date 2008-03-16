@@ -10,7 +10,7 @@ USING: alien alien.syntax combinators kernel system ;
 IN: openssl.libssl
 
 << "libssl" {
-    { [ win32? ]  [ "ssleay32.dll" "stdcall" ] }
+    { [ win32? ]  [ "ssleay32.dll" "cdecl" ] }
     { [ macosx? ] [ "libssl.dylib" "cdecl" ] }
     { [ unix? ]   [ "libssl.so" "cdecl" ] }
 } cond add-library >>

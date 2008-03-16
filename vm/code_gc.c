@@ -375,6 +375,8 @@ void forward_object_xts(void)
 			F_WORD *word = untag_object(obj);
 
 			word->code = forward_xt(word->code);
+			if(word->profiling)
+				word->profiling = forward_xt(word->profiling);
 		}
 		else if(type_of(obj) == QUOTATION_TYPE)
 		{

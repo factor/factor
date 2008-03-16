@@ -40,6 +40,6 @@ TUPLE: promise quot forced? value ;
   ] [ ] make ;
 
 : LAZY:
-  CREATE dup reset-generic
+  CREATE-WORD
   dup parse-definition
   make-lazy-quot define ; parsing

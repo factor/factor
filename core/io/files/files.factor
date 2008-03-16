@@ -216,10 +216,7 @@ M: pathname <=> [ pathname-string ] compare ;
     >r <file-reader> r> with-stream ; inline
 
 : file-contents ( path encoding -- str )
-    dupd [ file-info file-info-size read ] with-file-reader ;
-
-! : file-contents ( path encoding -- str )
-!     dupd [ file-length read ] with-file-reader ;
+    <file-reader> contents ;
 
 : with-file-writer ( path encoding quot -- )
     >r <file-writer> r> with-stream ; inline
