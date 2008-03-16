@@ -24,16 +24,15 @@ delete-db
 
 test-db [
     init-semantic-db
-    "test content" create-context* [
-        [ 4 ] [ context ] unit-test
-        [ 5 ] [ context "is test content" create-relation* ] unit-test
-        [ 5 ] [ context "is test content" get-relation ] unit-test
-        [ 5 ] [ "is test content" relation-id ] unit-test
-        [ 7 ] [ "has parent" relation-id ] unit-test
-        [ 7 ] [ "has parent" relation-id ] unit-test
-        [ "has parent" ] [ "has parent" relation-id node-content ] unit-test
-        [ "test content" ] [ context node-content ] unit-test
-    ] with-context
+    "test content" create-context* context set
+    [ 4 ] [ context get ] unit-test
+    [ 5 ] [ context get "is test content" create-relation* ] unit-test
+    [ 5 ] [ context get "is test content" get-relation ] unit-test
+    [ 5 ] [ "is test content" relation-id ] unit-test
+    [ 7 ] [ "has parent" relation-id ] unit-test
+    [ 7 ] [ "has parent" relation-id ] unit-test
+    [ "has parent" ] [ "has parent" relation-id node-content ] unit-test
+    [ "test content" ] [ context get node-content ] unit-test
     ! type-type 1array [ "type" ensure-type ] unit-test
     ! [ { 1 2 3 } ] [ type-type select-nodes-of-type ] unit-test
     ! [ 1 ] [ type-type select-node-of-type ] unit-test
@@ -52,21 +51,21 @@ delete-db
 ! test hierarchy
 test-db [
     init-semantic-db
-    "family tree" create-context* [
-        "adam" create-node* "adam" set
-        "eve" create-node* "eve" set
-        "bob" create-node* "bob" set
-        "fran" create-node* "fran" set
-        "charlie" create-node* "charlie" set
-        "gertrude" create-node* "gertrude" set
-        [ t ] [ "adam" get "bob" get parent-child* integer? ] unit-test
-        { { "eve" "bob" } { "eve" "fran" } { "bob" "gertrude" } { "bob" "fran" } { "fran" "charlie" } } [ first2 [ get ] 2apply parent-child ] each
-        [ { "bob" "fran" } ] [ "eve" get children [ node-content ] map ] unit-test
-        [ { "adam" "eve" } ] [ "bob" get parents [ node-content ] map ] unit-test
-        [ "fran" { "charlie" } ] [ "fran" get get-node-hierarchy dup tree-id node-content swap tree-children [ tree-id node-content ] map ] unit-test
-        [ { "adam" "eve" } ] [ "charlie" get get-root-nodes [ node-content ] map natural-sort >array ] unit-test
-        [ { } ] [ "fran" get "charlie" get tuck un-parent-child parents [ node-content ] map ] unit-test
-    ] with-context
+    "family tree" create-context* context set
+    "has parent" relation-id has-parent-relation set
+    "adam" create-node* "adam" set
+    "eve" create-node* "eve" set
+    "bob" create-node* "bob" set
+    "fran" create-node* "fran" set
+    "charlie" create-node* "charlie" set
+    "gertrude" create-node* "gertrude" set
+    [ t ] [ "adam" get "bob" get parent-child* integer? ] unit-test
+    { { "eve" "bob" } { "eve" "fran" } { "bob" "gertrude" } { "bob" "fran" } { "fran" "charlie" } } [ first2 [ get ] 2apply parent-child ] each
+    [ { "bob" "fran" } ] [ "eve" get children [ node-content ] map ] unit-test
+    [ { "adam" "eve" } ] [ "bob" get parents [ node-content ] map ] unit-test
+    [ "fran" { "charlie" } ] [ "fran" get get-node-hierarchy dup tree-id node-content swap tree-children [ tree-id node-content ] map ] unit-test
+    [ { "adam" "eve" } ] [ "charlie" get get-root-nodes [ node-content ] map natural-sort >array ] unit-test
+    [ { } ] [ "fran" get "charlie" get tuck un-parent-child parents [ node-content ] map ] unit-test
 ] with-db
 
 delete-db

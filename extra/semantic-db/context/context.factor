@@ -6,11 +6,5 @@ IN: semantic-db.context
 : create-context* ( context-name -- context-id ) create-node* ;
 : create-context ( context-name -- ) create-context* drop ;
 
-: context ( -- context-id )
-    \ context get ;
+SYMBOL: context
 
-: set-context ( context-id -- )
-    \ context set ;
-
-: with-context ( context-id quot -- )
-    >r \ context r> with-variable ;

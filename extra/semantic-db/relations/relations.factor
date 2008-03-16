@@ -23,4 +23,4 @@ IN: semantic-db.relations
     single-int-results ?first ;
 
 : relation-id ( relation-name -- relation-id )
-    context swap [ get-relation ] [ create-relation* ] ensure2 ;
+    context get swap [ get-relation ] [ create-relation* ] ensure2 ;
