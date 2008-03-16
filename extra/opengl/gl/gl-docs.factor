@@ -3,6 +3,10 @@ USING: help.syntax help.markup ;
 
 IN: opengl.gl
 
+ARTICLE: "opengl-low-level" "OpenGL Library (low level)"
+  { $subsection "opengl-specifying-vertices" }
+  { $subsection "opengl-geometric-primitives" } ;  
+
 ARTICLE: "opengl-specifying-vertices" "Specifying Vertices"
 
   { $subsection glVertex2d }
@@ -34,11 +38,11 @@ ARTICLE: "opengl-geometric-primitives" "OpenGL Geometric Primitives"
 
   { $table
       { { $link GL_POINTS         } "individual points" }
-      { { $link GL_LINES          } "pairs of vertices interpreted as "
-                                    "indivisual line segments" }
+      { { $link GL_LINES          } { "pairs of vertices interpreted as "
+                                      "individual line segments" } }
       { { $link GL_LINE_STRIP     } "series of connected line segments" }
-      { { $link GL_LINE_LOOP      } "same as above, with a segment added "
-                                    "between last and first vertices" }
+      { { $link GL_LINE_LOOP      } { "same as above, with a segment added "
+                                      "between last and first vertices" } }
       { { $link GL_TRIANGLES      }
         "triples of vertices interpreted as triangles" }
       { { $link GL_TRIANGLE_STRIP } "linked strip of triangles" }
@@ -53,3 +57,14 @@ ARTICLE: "opengl-geometric-primitives" "OpenGL Geometric Primitives"
 HELP: glBegin
   { $values { "mode"
               { "One of the " { $link "opengl-geometric-primitives" } } } } ;
+
+HELP: glPolygonMode
+  { $values { "face" { "One of the following:"
+                       { $list { $link GL_FRONT }
+                               { $link GL_BACK }
+                               { $link GL_FRONT_AND_BACK } } } }
+            { "mode" { "One of the following:"
+                       { $list
+                         { $link GL_POINT }
+                         { $link GL_LINE }
+                         { $link GL_FILL } } } } } ;
