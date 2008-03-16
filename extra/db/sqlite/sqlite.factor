@@ -38,7 +38,8 @@ M: sqlite-db <prepared-statement> ( str in out -- obj )
     sqlite-statement construct-delegate ;
 
 M: sqlite-statement dispose ( statement -- )
-    statement-handle sqlite-finalize ;
+    statement-handle
+    [ sqlite3_reset drop ] keep sqlite-finalize ;
 
 M: sqlite-result-set dispose ( result-set -- )
     f swap set-result-set-handle ;

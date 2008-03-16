@@ -193,8 +193,17 @@ TUPLE: annotation n paste-id summary author mode contents ;
 [ native-person-schema test-tuples ] test-sqlite
 [ assigned-person-schema test-tuples ] test-sqlite
 
-! [ native-person-schema test-tuples ] test-postgresql
-! [ assigned-person-schema test-tuples ] test-postgresql
+: test-repeated-insert
+    [ ] [ person ensure-table ] unit-test
+    
+    [ ] [ person1 get insert-tuple ] unit-test
+    [ person1 get insert-tuple ] must-fail ;
+
+[ native-person-schema test-tuples ] test-postgresql
+[ assigned-person-schema test-tuples ] test-postgresql
+
+[ assigned-person-schema test-repeated-insert ] test-sqlite
+[ assigned-person-schema test-repeated-insert ] test-postgresql
 
 TUPLE: serialize-me id data ;
 
