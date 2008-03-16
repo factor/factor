@@ -1,5 +1,6 @@
 IN: io.files.tests
-USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
+USING: tools.test io.files io threads kernel continuations io.encodings.ascii
+io.files.unique sequences strings accessors ;
 
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test
@@ -131,3 +132,15 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 [ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
 
 [ ] [ "append-test" ascii <file-appender> dispose ] unit-test
+
+
+
+[ 123 ] [
+    "core" ".test" [
+        [
+            ascii [
+                123 CHAR: a <repetition> >string write
+            ] with-file-writer
+        ] keep file-info size>>
+    ] with-unique-file
+] unit-test
