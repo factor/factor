@@ -12,16 +12,16 @@ C-STRUCT: stat
     { "gid_t" "st_gid" }
     { "dev_t" "st_rdev" }
     { "int32_t" "st_lspare0" }
-    { "timespec*" "st_atimespec" }
-    { "timespec*" "st_mtimespec" }
-    { "timespec*" "st_ctimespec" }
+    { "timespec*" "st_atim" }
+    { "timespec*" "st_mtim" }
+    { "timespec*" "st_ctim" }
     { "off_t" "st_size" }
     { "int64_t" "st_blocks" }
     { "u_int32_t" "st_blksize" }
     { "u_int32_t" "st_flags" }
     { "u_int32_t" "st_gen" }
     { "int32_t" "st_lspare1" }
-    { "timespec*" "st_birthtimespec" }
+    { "timespec*" "st_birthtim" }
     { "int64_t" "st_qspare1" }
     { "int64_t" "st_qspare2" } ;
 

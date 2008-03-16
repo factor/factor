@@ -21,7 +21,7 @@ C-STRUCT: stat
     { "u_int32_t" "st_flags" }
     { "u_int32_t" "st_gen" }
     { "int32_t" "st_lspare1" }
-    { "timespec*" "st_birthtimespec" }
+    { "timespec*" "st_birthtim" }
     { "int64_t" "st_qspare1" }
     { "int64_t" "st_qspare2" } ;
 
