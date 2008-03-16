@@ -133,9 +133,10 @@ IN: tools.deploy.shaker
         strip-io? [ io.backend:io-backend , ] when
 
         [
-            io.backend:io-backend
+            io.backend:io-backend ,
             "default-buffer-size" "io.nonblocking" lookup ,
-        ] { "alarms" "io" "tools" } strip-vocab-globals %
+        ] { } make
+        { "alarms" "io" "tools" } strip-vocab-globals %
 
         strip-dictionary? [
             { } { "cpu" } strip-vocab-globals %
@@ -193,7 +194,7 @@ IN: tools.deploy.shaker
         global swap
         '[ drop , member? not ] assoc-subset
         [ drop string? not ] assoc-subset ! strip CLI args
-        dup keys .
+        dup keys unparse show
         21 setenv
     ] [ drop ] if ;
 
