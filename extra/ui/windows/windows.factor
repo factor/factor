@@ -376,6 +376,22 @@ SYMBOL: trace-messages?
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
 
+! ! ! !
+: set-world-dim ( dim world -- )
+    swap >r world-handle win-hWnd HWND_TOP 20 20 r> first2 0
+    SetWindowPos drop ;
+USE: random
+USE: arrays
+
+: twiddle
+    100 500 random +
+    100 500 random +
+    2array
+    "x" get-global find-world
+    set-world-dim
+    yield ;
+! ! ! !
+
 : event-loop ( msg -- )
     {
         { [ windows get empty? ] [ drop ] }
@@ -436,17 +452,16 @@ SYMBOL: trace-messages?
 
 : init-win32-ui ( -- )
     V{ } clone nc-buttons set-global
-    "MSG" <c-object> msg-obj set-global
+    "MSG" malloc-object msg-obj set-global
     "Factor-window" malloc-u16-string class-name-ptr set-global
     register-wndclassex drop
     GetDoubleClickTime double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
-    class-name-ptr get-global [
-        dup f UnregisterClass drop
-        free
-    ] when*
-    f class-name-ptr set-global ;
+    class-name-ptr get-global [ dup f UnregisterClass drop free ] when*
+    msg-obj get-global [ free ] when*
+    f class-name-ptr set-global
+    f msg-obj set-global ;
 
 : setup-pixel-format ( hdc -- )
     16 make-pfd [ ChoosePixelFormat dup win32-error=0/f ] 2keep
