@@ -133,6 +133,7 @@ int main() {
 #endif
 
 #ifdef UNIX
+	unix_types();
 #endif
 
 	return 0;
