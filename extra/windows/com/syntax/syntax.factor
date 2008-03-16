@@ -11,10 +11,6 @@ IN: windows.com.syntax
         swap vtbl swap void*-nth
     ] 4 ndip alien-indirect ;
 
-: parse-inheritance
-    scan dup {
-    } case ;
-
 PRIVATE>
 
 : COM-INTERFACE:

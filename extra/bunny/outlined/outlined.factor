@@ -1,5 +1,5 @@
 USING: arrays bunny.model bunny.cel-shaded
-combinators.lib continuations kernel math multiline
+combinators.cleave continuations kernel math multiline
 opengl opengl.shaders opengl.framebuffers opengl.gl
 opengl.capabilities sequences ui.gadgets ;
 IN: bunny.outlined
@@ -177,7 +177,7 @@ TUPLE: bunny-outlined
             [ bunny-outlined-normal-texture [ delete-texture ] when* ]
             [ bunny-outlined-depth-texture  [ delete-texture ] when* ]
             [ f swap set-bunny-outlined-framebuffer-dim ]
-        } call-with
+        } cleave
     ] [ drop ] if ;
 
 : remake-framebuffer-if-needed ( draw -- )
@@ -237,4 +237,4 @@ M: bunny-outlined dispose
         [ bunny-outlined-pass1-program [ delete-gl-program ] when* ]
         [ bunny-outlined-pass2-program [ delete-gl-program ] when* ]
         [ dispose-framebuffer ]
-    } call-with ;
+    } cleave ;

@@ -3,7 +3,8 @@
 USING: alien.c-types io.files io.windows kernel
 math windows windows.kernel32 combinators.cleave
 windows.time calendar combinators math.functions
-sequences combinators.lib namespaces words symbols ;
+sequences combinators.lib combinators.cleave
+namespaces words symbols ;
 IN: io.windows.files
 
 SYMBOLS: +read-only+ +hidden+ +system+
@@ -19,7 +20,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
         [
             first2 expand-constants
             [ swapd mask? [ , ] [ drop ] if ] 2curry
-        ] map call-with
+        ] map cleave
     ] { } make ;
 
 : win32-file-attributes ( n -- seq )

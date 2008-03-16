@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl.gl alien.c-types continuations namespaces
 assocs alien libc opengl math sequences combinators.lib 
-macros arrays ;
+combinators.cleave macros arrays ;
 IN: opengl.shaders
 
 : with-gl-shader-source-ptr ( string quot -- )
@@ -118,7 +118,7 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
 : (make-with-gl-program) ( uniforms quot -- q )
     [
         \ dup ,
-        [ swap (with-gl-program-uniforms) , \ call-with , % ]
+        [ swap (with-gl-program-uniforms) , \ cleave , % ]
         [ ] make ,
         \ (with-gl-program) ,
     ] [ ] make ;

@@ -1,4 +1,5 @@
-USING: arrays combinators.lib kernel math math.functions math.vectors namespaces
+USING: arrays combinators.lib combinators.cleave kernel math
+       math.functions math.vectors namespaces
        opengl opengl.gl sequences ui ui.gadgets ui.gestures ui.render ;
 IN: opengl.demo-support
 
@@ -49,7 +50,7 @@ M: demo-gadget pref-dim* ( gadget -- dim )
     glLoadIdentity
     { [ >r 0.0 0.0 r> demo-gadget-distance neg glTranslatef ]
       [ demo-gadget-pitch 1.0 0.0 0.0 glRotatef ]
-      [ demo-gadget-yaw   0.0 1.0 0.0 glRotatef ] } call-with ;
+      [ demo-gadget-yaw   0.0 1.0 0.0 glRotatef ] } cleave ;
 
 : reset-last-drag-rel ( -- )
     { 0 0 } last-drag-loc set ;
