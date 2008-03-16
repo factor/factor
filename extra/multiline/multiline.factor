@@ -18,7 +18,7 @@ IN: multiline
     lexer get next-line ;
 
 : STRING:
-    CREATE dup reset-generic
+    CREATE-WORD
     parse-here 1quotation define-inline ; parsing
 
 : (parse-multiline-string) ( start-index end-text -- end-index )
