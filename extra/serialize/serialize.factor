@@ -6,14 +6,14 @@
 !
 ! See http://factorcode.org/license.txt for BSD license.
 !
-IN: serialize
 USING: namespaces sequences kernel math io math.functions
-io.binary strings classes words sbufs tuples arrays
-vectors byte-arrays bit-arrays quotations hashtables
-assocs help.syntax help.markup float-arrays splitting
-io.encodings.string io.encodings.utf8 combinators
-combinators.cleave new-slots accessors locals prettyprint
-compiler.units sequences.private tuples.private ;
+io.binary strings classes words sbufs tuples arrays vectors
+byte-arrays bit-arrays quotations hashtables assocs help.syntax
+help.markup float-arrays splitting io.streams.byte-array
+io.encodings.string io.encodings.utf8 io.encodings.binary
+combinators combinators.cleave new-slots accessors locals
+prettyprint compiler.units sequences.private tuples.private ;
+IN: serialize
 
 ! Variable holding a assoc of objects already serialized
 SYMBOL: serialized
