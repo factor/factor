@@ -94,7 +94,7 @@ IN: db.sqlite.lib
         { TIMESTAMP [ sqlite-bind-text-by-name ] }
         { BLOB [ sqlite-bind-blob-by-name ] }
         { FACTOR-BLOB [
-            binary [ serialize ] with-byte-writer
+            object>bytes
             sqlite-bind-blob-by-name
         ] }
         { +native-id+ [ sqlite-bind-int-by-name ] }
@@ -131,7 +131,7 @@ IN: db.sqlite.lib
         { BLOB [ sqlite-column-blob ] }
         { FACTOR-BLOB [
             sqlite-column-blob
-            dup [ binary [ deserialize ] with-byte-reader ] when
+            dup [ bytes>object ] when
         ] }
         ! { NULL [ 2drop f ] }
         [ no-sql-type ]
