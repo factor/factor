@@ -5,7 +5,8 @@ IN: opengl.gl
 
 ARTICLE: "opengl-low-level" "OpenGL Library (low level)"
   { $subsection "opengl-specifying-vertices" }
-  { $subsection "opengl-geometric-primitives" } ;  
+  { $subsection "opengl-geometric-primitives" }
+  { $subsection "opengl-modeling-transformations" } ;
 
 ARTICLE: "opengl-specifying-vertices" "Specifying Vertices"
 
@@ -68,3 +69,17 @@ HELP: glPolygonMode
                          { $link GL_POINT }
                          { $link GL_LINE }
                          { $link GL_FILL } } } } } ;
+
+ARTICLE: "opengl-modeling-transformations" "Modeling Transformations"
+  { $subsection glTranslatef }
+  { $subsection glTranslated }
+  { $subsection glRotatef }
+  { $subsection glRotated }
+  { $subsection glScalef }
+  { $subsection glScaled } ;
+
+
+{ glTranslatef glTranslated glRotatef glRotated glScalef glScaled }
+related-words
+
+
