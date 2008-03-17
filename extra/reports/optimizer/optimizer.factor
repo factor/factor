@@ -1,6 +1,6 @@
 USING: assocs words sequences arrays compiler tools.time
 io.styles io prettyprint vocabs kernel sorting generator
-optimizer math ;
+optimizer math combinators.cleave ;
 IN: report.optimizer
 
 : count-optimization-passes ( nodes n -- n )
@@ -13,16 +13,21 @@ IN: report.optimizer
     standard-table-style
     [
         [ [ [ pprint-cell ] each ] with-row ] each
-    ] tabular-output ;
+    ] tabular-output ; inline
 
-: optimizer-report
+: optimizer-measurements ( -- alist )
     all-words [ compiled? ] subset
     [
         dup [
             word-dataflow nip 1 count-optimization-passes
         ] benchmark nip 2array
-    ] { } map>assoc
-    [ first ] "Worst number of optimizer passes:" results
-    [ second ] "Worst compile times:" results ;
+    ] { } map>assoc ;
+
+: optimizer-measurements. ( alist -- )
+    [ [ first ] "Worst number of optimizer passes:" results ]
+    [ [ second ] "Worst compile times:" results ] bi ;
+
+: optimizer-report ( -- )
+    optimizer-measurements optimizer-measurements. ;
 
 MAIN: optimizer-report
