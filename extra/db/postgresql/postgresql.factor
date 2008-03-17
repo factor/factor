@@ -10,6 +10,7 @@ IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty db user pass ;
 TUPLE: postgresql-statement ;
+INSTANCE: postgresql-statement throwable-statement
 TUPLE: postgresql-result-set ;
 : <postgresql-statement> ( statement in out -- postgresql-statement )
     <statement>
@@ -194,7 +195,7 @@ M: postgresql-db <insert-native-statement> ( class -- statement )
         ");" 0%
     ] postgresql-make ;
 
-M: postgresql-db <insert-assigned-statement> ( class -- statement )
+M: postgresql-db <insert-nonnative-statement> ( class -- statement )
     [
         "insert into " 0% 0%
         "(" 0%

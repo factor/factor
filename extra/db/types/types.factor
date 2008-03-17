@@ -3,7 +3,8 @@
 USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep sequences.lib
 words namespaces tools.walker slots slots.private classes
-mirrors tuples combinators calendar.format symbols ;
+mirrors tuples combinators calendar.format symbols
+singleton ;
 IN: db.types
 
 HOOK: modifier-table db ( -- hash )
@@ -14,34 +15,38 @@ HOOK: compound-type db ( str n -- hash )
 
 TUPLE: sql-spec class slot-name column-name type modifiers primary-key ;
 
-SYMBOLS: +native-id+ +assigned-id+ +autoincrement+
-+serial+ +unique+ +default+ +null+ +not-null+
+
+SINGLETON: +native-id+
+SINGLETON: +assigned-id+
+SINGLETON: +random-id+
+UNION: +primary-key+ +native-id+ +assigned-id+ +random-id+ ;
+UNION: +nonnative-id+ +random-id+ +assigned-id+ ;
+
+! +native-id+ +assigned-id+ +random-assigned-id+
+SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 +foreign-id+ +has-many+ ;
 
-: (primary-key?) ( obj -- ? )
-    { +native-id+ +assigned-id+ } member? ;
-
 : primary-key? ( spec -- ? )
-    sql-spec-primary-key (primary-key?) ;
+    sql-spec-primary-key +primary-key+? ;
+
+: native-id? ( spec -- ? )
+    sql-spec-primary-key +native-id+? ;
+
+: nonnative-id? ( spec -- ? )
+    sql-spec-primary-key +nonnative-id+? ;
 
 : normalize-spec ( spec -- )
-    dup sql-spec-type dup (primary-key?) [
+    dup sql-spec-type dup +primary-key+? [
         swap set-sql-spec-primary-key
     ] [
         drop dup sql-spec-modifiers [
-            (primary-key?)
+            +primary-key+?
         ] deep-find
         [ swap set-sql-spec-primary-key ] [ drop ] if*
     ] if ;
 
 : find-primary-key ( specs -- obj )
     [ sql-spec-primary-key ] find nip ;
-
-: native-id? ( spec -- ? )
-    sql-spec-primary-key +native-id+ = ;
-
-: assigned-id? ( spec -- ? )
-    sql-spec-primary-key +assigned-id+ = ;
 
 : relation? ( spec -- ? ) [ +has-many+ = ] deep-find ;
 
@@ -69,7 +74,7 @@ TUPLE: no-sql-modifier ;
     dup number? [ number>string ] when ;
 
 : maybe-remove-id ( specs -- obj )
-    [ native-id? not ] subset ;
+    [ +native-id+? not ] subset ;
 
 : remove-relations ( specs -- newcolumns )
     [ relation? not ] subset ;

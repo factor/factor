@@ -94,7 +94,7 @@ IN: db.sqlite.lib
         { TIMESTAMP [ sqlite-bind-text-by-name ] }
         { BLOB [ sqlite-bind-blob-by-name ] }
         { FACTOR-BLOB [
-            binary [ serialize ] with-byte-writer
+            object>bytes
             sqlite-bind-blob-by-name
         ] }
         { +native-id+ [ sqlite-bind-int-by-name ] }
@@ -106,6 +106,8 @@ IN: db.sqlite.lib
 : sqlite-reset ( handle -- ) sqlite3_reset sqlite-check-result ;
 : sqlite-#columns ( query -- int ) sqlite3_column_count ;
 : sqlite-column ( handle index -- string ) sqlite3_column_text ;
+: sqlite-column-name ( handle index -- string ) sqlite3_column_name ;
+: sqlite-column-type ( handle index -- string ) sqlite3_column_type ;
 
 : sqlite-column-blob ( handle index -- byte-array/f )
     [ sqlite3_column_bytes ] 2keep
@@ -131,7 +133,7 @@ IN: db.sqlite.lib
         { BLOB [ sqlite-column-blob ] }
         { FACTOR-BLOB [
             sqlite-column-blob
-            dup [ binary [ deserialize ] with-byte-reader ] when
+            dup [ bytes>object ] when
         ] }
         ! { NULL [ 2drop f ] }
         [ no-sql-type ]
@@ -140,7 +142,7 @@ IN: db.sqlite.lib
 : sqlite-row ( handle -- seq )
     dup sqlite-#columns [ sqlite-column ] with map ;
 
-: sqlite-step-has-more-rows? ( step-result -- bool )
+: sqlite-step-has-more-rows? ( prepared -- bool )
     dup SQLITE_ROW =  [
         drop t
     ] [

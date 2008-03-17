@@ -1,8 +1,8 @@
 IN: http.server.sessions.tests
 USING: tools.test http http.server.sessions
 http.server.sessions.storage http.server.sessions.storage.assoc
-http.server math namespaces kernel accessors prettyprint
-io.streams.string splitting destructors ;
+http.server.actions http.server math namespaces kernel accessors
+prettyprint io.streams.string splitting destructors sequences ;
 
 [ H{ } ] [ H{ } add-session-id ] unit-test
 
@@ -72,9 +72,9 @@ M: foo call-responder
 : url-responder-mock-test
     [
         <request>
-        "GET" >>method
-        "id" get session-id-key set-query-param
-        "/" >>path
+            "GET" >>method
+            "id" get session-id-key set-query-param
+            "/" >>path
         request set
         "/" "manager" get call-responder
         [ write-response-body drop ] with-string-writer
@@ -107,9 +107,9 @@ response set
 : cookie-responder-mock-test
     [
         <request>
-        "GET" >>method
-        "cookies" get >>cookies
-        "/" >>path
+            "GET" >>method
+            "cookies" get >>cookies
+            "/" >>path
         request set
         "/" "manager" get call-responder
         [ write-response-body drop ] with-string-writer
@@ -118,3 +118,28 @@ response set
 [ "2" ] [ cookie-responder-mock-test ] unit-test
 [ "3" ] [ cookie-responder-mock-test ] unit-test
 [ "4" ] [ cookie-responder-mock-test ] unit-test
+
+: <exiting-action>
+    <action>
+        [
+            "text/plain" <content> exit-with
+        ] >>display ;
+
+[
+    [ ] [
+        <request>
+            "GET" >>method
+            "id" get session-id-key set-query-param
+            "/" >>path
+        request set
+
+        [
+            "/" <exiting-action> <cookie-sessions>
+            call-responder
+        ] with-destructors response set
+    ] unit-test
+
+    [ "text/plain" ] [ response get "content-type" header ] unit-test
+
+    [ f ] [ response get cookies>> empty? ] unit-test
+] with-scope
