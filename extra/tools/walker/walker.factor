@@ -24,7 +24,11 @@ SYMBOL: walking-thread
 : break ( -- )
     continuation callstack over set-continuation-call
 
-    get-walker-thread send-synchronous {
+USE: prettyprint USE: io.streams.c
+    "BREAK" show
+    get-walker-thread dup unparse-short show "SS" show send-synchronous
+USE: prettyprint USE: io.streams.c
+    unparse-short show {
         { [ dup continuation? ] [ (continue) ] }
         { [ dup quotation? ] [ call ] }
         { [ dup not ] [ "Single stepping abandoned" throw ] }
@@ -146,10 +150,18 @@ SYMBOL: +detached+
     walker-status tget set-model ;
 
 : unassociate-thread ( -- )
-    walker-thread walking-thread tget thread-variables delete-at
-    [ ] walking-thread tget set-thread-exit-handler ;
+    walker-thread walking-thread tget thread-variables at self eq? [
+        walker-thread walking-thread tget thread-variables delete-at
+        [ ] walking-thread tget set-thread-exit-handler
+    ] [
+USE: io
+        global [ "OOPS" print flush ] bind
+    ] if ;
+
+: xshow self unparse-short append show ;
 
 : detach-msg ( -- )
+    "DETACH" xshow
     +detached+ set-status
     unassociate-thread ;
 
@@ -195,6 +207,7 @@ SYMBOL: +detached+
 : walker-suspended ( continuation -- continuation' )
     +suspended+ set-status
     [ status +suspended+ eq? ] [
+        "SUSPENDED" xshow
         dup walker-history tget push
         dup walker-continuation tget set-model
         [
@@ -222,6 +235,7 @@ SYMBOL: +detached+
 : walker-loop ( -- )
     +running+ set-status
     [ status +detached+ eq? not ] [
+        "RUNNING" xshow
         [
             {
                 { detach [ detach-msg f ] }
@@ -241,7 +255,9 @@ SYMBOL: +detached+
                 [ walker-suspended ]
             } case
         ] handle-synchronous
-    ] [ ] while ;
+    ] [ ] while USE: dlists USE: concurrency.mailboxes
+    "EXIT" xshow
+    my-mailbox mailbox-data dlist-empty? [ "Crap" print flush ] unless ;
 
 : associate-thread ( walker -- )
     walker-thread tset

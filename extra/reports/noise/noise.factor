@@ -1,7 +1,7 @@
 USING: assocs math kernel shuffle combinators.lib
 words quotations arrays combinators sequences math.vectors
 io.styles combinators.cleave prettyprint vocabs sorting io
-generic locals.private ;
+generic locals.private math.statistics ;
 IN: reports.noise
 
 : badness ( word -- n )
@@ -12,9 +12,9 @@ IN: reports.noise
         { 2apply 1 }
         { 2curry 1 }
         { 2drop 1 }
-        { 2dup 2 }
-        { 2keep 2 }
-        { 2nip 3 }
+        { 2dup 1 }
+        { 2keep 1 }
+        { 2nip 2 }
         { 2over 4 }
         { 2slip 2 }
         { 2swap 3 }
@@ -33,11 +33,19 @@ IN: reports.noise
         { 4dup 3 }
         { 4slip 4 }
         { compose 1/2 }
-        { curry 1/2 }
+        { curry 1/3 }
         { dip 1 }
         { dipd 2 }
-        { drop 1/2 }
-        { dup 1/2 }
+        { drop 1/3 }
+        { dup 1/3 }
+        { if 1/3 }
+        { when 1/4 }
+        { unless 1/4 }
+        { when* 1/3 }
+        { unless* 1/3 }
+        { ?if 1/2 }
+        { cond 1/2 }
+        { case 1/2 }
         { keep 1 }
         { napply 2 }
         { ncurry 3 }
@@ -62,11 +70,11 @@ IN: reports.noise
         { swap 1 }
         { swapd 3 }
         { tuck 2 }
-        { tuckd 3 }
-        { with 1 }
+        { tuckd 4 }
+        { with 1/2 }
         { with* 2 }
-        { r> 1/2 }
-        { >r 1/2 }
+        { r> 1 }
+        { >r 1 }
 
         { bi 1/2 }
         { tri 1 }
@@ -93,14 +101,30 @@ M: lambda noise lambda-body noise ;
 
 M: object noise drop { 0 0 } ;
 
-M: quotation noise [ noise ] map vsum { 1/3 0 } v+ ;
+M: quotation noise [ noise ] map vsum { 1/4 1/2 } v+ ;
 
-M: array noise [ noise ] map vsum { 1/3 0 } v+ ;
+M: array noise [ noise ] map vsum ;
+
+: noise-factor / 100 * >integer ;
 
 : quot-noise-factor ( quot -- n )
     #! For very short words, noise doesn't count so much
     #! (so dup foo swap bar isn't penalized as badly).
-    noise first2 15 max / 100 * >integer ;
+    noise first2 {
+        { [ over 4 <= ] [ >r drop 0 r> ] }
+        { [ over 15 >= ] [ >r 2 * r> ] }
+        { [ t ] [ ] }
+    } cond
+    {
+        ! short words are easier to read
+        { [ dup 10 <= ] [ >r 2 / r> ] }
+        { [ dup 5 <= ] [ >r 3 / r> ] }
+        ! long words are penalized even more
+        { [ dup 25 >= ] [ >r 2 * r> 20 max ] }
+        { [ dup 20 >= ] [ >r 5/3 * r> ] }
+        { [ dup 15 >= ] [ >r 3/2 * r> ] }
+        { [ t ] [ ] }
+    } cond noise-factor ;
 
 GENERIC: word-noise-factor ( word -- factor )
 
@@ -110,20 +134,41 @@ M: word word-noise-factor
 M: lambda-word word-noise-factor
     "lambda" word-prop quot-noise-factor ;
 
-: noisy-words ( -- alist )
-    all-words [
+: flatten-generics ( words -- words' )
+    [
         dup generic? [ methods values ] [ 1array ] if
-    ] map concat [ dup word-noise-factor ] { } map>assoc
+    ] map concat ;
+
+: noisy-words ( -- alist )
+    all-words flatten-generics
+    [ dup word-noise-factor ] { } map>assoc
     sort-values reverse ;
 
-: noisy-words. ( alist -- )
+: noise. ( alist -- )
     standard-table-style [
         [
             [ [ pprint-cell ] [ pprint-cell ] bi* ] with-row
         ] assoc-each
     ] tabular-output ;
 
+: vocab-noise-factor ( vocab -- factor )
+    words flatten-generics
+    [ word-noise-factor dup 20 < [ drop 0 ] when ] map
+    dup empty? [ drop 0 ] [
+        [ [ sum ] [ length 5 max ] bi /i ]
+        [ supremum ]
+        bi +
+    ] if ;
+
+: noisy-vocabs ( -- alist )
+    vocabs [ dup vocab-noise-factor ] { } map>assoc
+    sort-values reverse ;
+
 : noise-report ( -- )
-    noisy-words 40 head noisy-words. ;
+    "NOISY WORDS:" print
+    noisy-words 80 head noise.
+    nl
+    "NOISY VOCABS:" print
+    noisy-vocabs 80 head noise. ;
 
 MAIN: noise-report

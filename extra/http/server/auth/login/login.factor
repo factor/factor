@@ -7,16 +7,29 @@ http.server.actions http.server.components http.server.sessions
 http.server.templating.fhtml http.server.validators
 http.server.auth http sequences io.files namespaces hashtables
 fry io.sockets combinators.cleave arrays threads locals
-qualified ;
+qualified continuations destructors ;
 IN: http.server.auth.login
 QUALIFIED: smtp
+
+SYMBOL: post-login-url
+SYMBOL: login-failed?
 
 TUPLE: login users ;
 
 : users login get users>> ;
 
-SYMBOL: post-login-url
-SYMBOL: login-failed?
+! Destructor
+TUPLE: user-saver user ;
+
+C: <user-saver> user-saver
+
+M: user-saver dispose
+    user-profile-changed? get [
+        user>> users update-user
+    ] [ drop ] if ;
+
+: save-user-after ( user -- )
+    <user-saver> add-always-destructor ;
 
 ! ! ! Login
 
@@ -116,6 +129,8 @@ SYMBOL: user-exists?
                 ] unless*
 
                 successful-login
+
+                login get responder>> init-user-profile
             ] >>submit
     ] ;
 
@@ -155,23 +170,21 @@ SYMBOL: previous-page
 
                 form validate-form
 
+                logged-in-user sget
+
                 "password" value empty? [
-                    logged-in-user sget
-                ] [
                     same-password-twice
 
                     "password" value uid users check-login
                     [ login-failed? on validation-failed ] unless
 
-                    "new-password" value uid users set-password
-                    [ "User deleted" throw ] unless*
-                ] if
+                    "new-password" value set-password
+                ] unless
 
                 "realname" value >>realname
                 "email" value >>email
 
-                dup users update-user
-                logged-in-user sset
+                user-profile-changed? on
 
                 previous-page sget f <permanent-redirect>
             ] >>submit
@@ -330,6 +343,7 @@ C: <protected> protected
 
 M: protected call-responder ( path responder -- response )
     logged-in-user sget [
+        dup save-user-after
         request get request-url previous-page sset
         responder>> call-responder
     ] [
