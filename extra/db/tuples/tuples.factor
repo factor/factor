@@ -28,7 +28,7 @@ HOOK: create-sql-statement db ( class -- obj )
 HOOK: drop-sql-statement db ( class -- obj )
 
 HOOK: <insert-native-statement> db ( class -- obj )
-HOOK: <insert-assigned-statement> db ( class -- obj )
+HOOK: <insert-nonnative-statement> db ( class -- obj )
 
 HOOK: <update-tuple-statement> db ( class -- obj )
 HOOK: <update-tuples-statement> db ( class -- obj )
@@ -75,21 +75,25 @@ HOOK: insert-tuple* db ( tuple statement -- )
     drop-sql-statement [ execute-statement ] with-disposals ;
 
 : ensure-table ( class -- )
-    [ dup drop-table ] ignore-errors create-table ;
+    [
+        drop-sql-statement make-nonthrowable
+        [ execute-statement ] with-disposals
+    ] [ create-table ] bi ;
 
 : insert-native ( tuple -- )
     dup class
     db get db-insert-statements [ <insert-native-statement> ] cache
     [ bind-tuple ] 2keep insert-tuple* ;
 
-: insert-assigned ( tuple -- )
+: insert-nonnative ( tuple -- )
+! TODO logic here for unique ids
     dup class
-    db get db-insert-statements [ <insert-assigned-statement> ] cache
+    db get db-insert-statements [ <insert-nonnative-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : insert-tuple ( tuple -- )
-    dup class db-columns find-primary-key assigned-id? [
-        insert-assigned
+    dup class db-columns find-primary-key nonnative-id? [
+        insert-nonnative
     ] [
         insert-native
     ] if ;

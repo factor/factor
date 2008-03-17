@@ -9,7 +9,7 @@ IN: db.tuples.tests
 TUPLE: person the-id the-name the-number the-real
 ts date time blob factor-blob ;
 
-: <person> ( name age real ts date time blob -- person )
+: <person> ( name age real ts date time blob factor-blob -- person )
     {
         set-person-the-name
         set-person-the-number
@@ -190,18 +190,16 @@ TUPLE: annotation n paste-id summary author mode contents ;
 : test-postgresql ( -- )
 >r { "localhost" "postgres" "foob" "factor-test" } postgresql-db r> with-db ;
 
-[ native-person-schema test-tuples ] test-sqlite
-[ assigned-person-schema test-tuples ] test-sqlite
-
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test
     
     [ ] [ person1 get insert-tuple ] unit-test
     [ person1 get insert-tuple ] must-fail ;
 
+[ native-person-schema test-tuples ] test-sqlite
+[ assigned-person-schema test-tuples ] test-sqlite
 [ native-person-schema test-tuples ] test-postgresql
 [ assigned-person-schema test-tuples ] test-postgresql
-
 [ assigned-person-schema test-repeated-insert ] test-sqlite
 [ assigned-person-schema test-repeated-insert ] test-postgresql
 
