@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors new-slots sequences kernel assocs combinators
 http.server http.server.validators http hashtables namespaces
-combinators.cleave fry continuations ;
+combinators.cleave fry continuations locals ;
 IN: http.server.actions
 
 SYMBOL: +path+
@@ -17,17 +17,13 @@ TUPLE: action init display submit get-params post-params ;
         [ <400> ] >>display
         [ <400> ] >>submit ;
 
-: with-validator ( string quot -- result error? )
-    '[ , @ f ] [
-        dup validation-error? [ t ] [ rethrow ] if
-    ] recover ; inline
-
-: validate-param ( name validator assoc -- error? )
-    swap pick
-    >r >r at r> with-validator swap r> set ;
+:: validate-param ( name validator assoc -- )
+    name assoc at validator with-validator name set ; inline
 
 : action-params ( validators -- error? )
-    [ params get validate-param ] { } assoc>map [ ] contains? ;
+    validation-failed? off
+    params get '[ , validate-param ] assoc-each
+    validation-failed? get ;
 
 : handle-get ( -- response )
     action get get-params>> action-params [ <400> ] [
@@ -42,10 +38,13 @@ TUPLE: action init display submit get-params post-params ;
     action get display>> call exit-with ;
 
 M: action call-responder ( path action -- response )
-    [ +path+ associate request-params union params set ]
-    [ action set ] bi*
-    request get method>> {
-        { "GET" [ handle-get ] }
-        { "HEAD" [ handle-get ] }
-        { "POST" [ handle-post ] }
-    } case ;
+    '[
+        , ,
+        [ +path+ associate request-params union params set ]
+        [ action set ] bi*
+        request get method>> {
+            { "GET" [ handle-get ] }
+            { "HEAD" [ handle-get ] }
+            { "POST" [ handle-post ] }
+        } case
+    ] with-exit-continuation ;

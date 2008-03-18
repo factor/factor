@@ -65,8 +65,7 @@ HELP: dlclose ( dll -- )
 
 HELP: load-library
 { $values { "name" "a string" } { "dll" "a DLL handle" } }
-{ $description "Loads a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } ". If the library is already loaded, returns the existing handle." }
-{ $errors "Throws an error if the library could not be found, or if loading fails for some other reason." } ;
+{ $description "Loads a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } ". If the library is already loaded, returns the existing handle." } ;
 
 HELP: add-library
 { $values { "name" "a string" } { "path" "a string" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }

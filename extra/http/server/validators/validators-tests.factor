@@ -2,7 +2,8 @@ IN: http.server.validators.tests
 USING: kernel sequences tools.test http.server.validators
 accessors ;
 
-[ "foo" v-number ] [ validation-error? ] must-fail-with
+[ "foo" v-number ] must-fail
+[ 123 ] [ "123" v-number ] unit-test
 
 [ "slava@factorcode.org" ] [
     "slava@factorcode.org" v-email
@@ -13,10 +14,10 @@ accessors ;
 ] unit-test
 
 [ "slava@factorcode.o" v-email ]
-[ reason>> "invalid e-mail" = ] must-fail-with
+[ "invalid e-mail" = ] must-fail-with
 
 [ "sla@@factorcode.o" v-email ]
-[ reason>> "invalid e-mail" = ] must-fail-with
+[ "invalid e-mail" = ] must-fail-with
 
 [ "slava@factorcodeorg" v-email ]
-[ reason>> "invalid e-mail" = ] must-fail-with
+[ "invalid e-mail" = ] must-fail-with

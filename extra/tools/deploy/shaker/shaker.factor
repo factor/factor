@@ -13,7 +13,6 @@ QUALIFIED: definitions
 QUALIFIED: init
 QUALIFIED: inspector
 QUALIFIED: io.backend
-QUALIFIED: io.nonblocking
 QUALIFIED: io.thread
 QUALIFIED: layouts
 QUALIFIED: libc.private
@@ -133,7 +132,10 @@ IN: tools.deploy.shaker
 
         strip-io? [ io.backend:io-backend , ] when
 
-        { io.backend:io-backend io.nonblocking:default-buffer-size }
+        [
+            io.backend:io-backend ,
+            "default-buffer-size" "io.nonblocking" lookup ,
+        ] { } make
         { "alarms" "io" "tools" } strip-vocab-globals %
 
         strip-dictionary? [
@@ -192,7 +194,7 @@ IN: tools.deploy.shaker
         global swap
         '[ drop , member? not ] assoc-subset
         [ drop string? not ] assoc-subset ! strip CLI args
-        dup keys .
+        dup keys unparse show
         21 setenv
     ] [ drop ] if ;
 

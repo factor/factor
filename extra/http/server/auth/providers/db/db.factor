@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: db db.tuples db.types new-slots accessors
-http.server.auth.providers kernel continuations ;
+http.server.auth.providers kernel continuations
+singleton ;
 IN: http.server.auth.providers.db
 
 user "USERS"
@@ -16,20 +17,18 @@ user "USERS"
 
 : init-users-table user ensure-table ;
 
-TUPLE: from-db ;
-
-: from-db T{ from-db } ;
+SINGLETON: users-in-db
 
 : find-user ( username -- user )
     <user>
         swap >>username
     select-tuple ;
 
-M: from-db get-user
+M: users-in-db get-user
     drop
     find-user ;
 
-M: from-db new-user
+M: users-in-db new-user
     drop
     [
         dup username>> find-user [
@@ -39,5 +38,5 @@ M: from-db new-user
         ] if
     ] with-transaction ;
 
-M: from-db update-user
+M: users-in-db update-user
     drop update-tuple ;

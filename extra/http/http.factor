@@ -180,6 +180,7 @@ cookies ;
     request construct-empty
         "1.1" >>version
         http-port >>port
+        H{ } clone >>header
         H{ } clone >>query
         V{ } clone >>cookies ;
 

@@ -429,7 +429,14 @@ $nl
 { $code "[ X ] [ Y ] ?if" "dup [ nip X ] [ drop Y ] if" } } ;
 
 HELP: die
-{ $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." } ;
+{ $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." }
+{ $notes
+    "The term FEP originates from the Lisp machines of old. According to the Jargon File,"
+    $nl
+    { $strong "fepped out" } " /fept owt/ " { $emphasis "adj." }  " The Symbolics 3600 LISP Machine has a Front-End Processor called a `FEP' (compare sense 2 of box). When the main processor gets wedged, the FEP takes control of the keyboard and screen. Such a machine is said to have `fepped out' or `dropped into the fep'." 
+    $nl
+    { $url "http://www.jargon.net/jargonfile/f/feppedout.html" }
+} ;
 
 HELP: (clone) ( obj -- newobj )
 { $values { "obj" object } { "newobj" "a shallow copy" } }

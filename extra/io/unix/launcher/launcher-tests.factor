@@ -34,7 +34,7 @@ accessors kernel sequences ;
     ascii <process-stream> contents
 ] unit-test
 
-[ "" ] [
+[ f ] [
     <process>
         "cat"
         "launcher-test-1" temp-file
@@ -55,7 +55,7 @@ accessors kernel sequences ;
     try-process
 ] unit-test
 
-[ "" ] [
+[ f ] [
     "cat"
     "launcher-test-1" temp-file
     2array

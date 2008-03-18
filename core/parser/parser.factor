@@ -215,9 +215,6 @@ SYMBOL: in
 : set-in ( name -- )
     check-vocab-string dup in set create-vocab (use+) ;
 
-: create-in ( string -- word )
-    in get create dup set-word dup save-location ;
-
 TUPLE: unexpected want got ;
 
 : unexpected ( want got -- * )
@@ -238,7 +235,14 @@ PREDICATE: unexpected unexpected-eof
 : parse-tokens ( end -- seq )
     100 <vector> swap (parse-tokens) >array ;
 
+: create-in ( string -- word )
+    in get create dup set-word dup save-location ;
+
 : CREATE ( -- word ) scan create-in ;
+
+: CREATE-GENERIC ( -- word ) CREATE dup reset-word ;
+
+: CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 
 : create-class-in ( word -- word )
     in get create
@@ -283,6 +287,12 @@ M: no-word summary
             dup string>number [ ] [ no-word ] ?if
         ] ?if
     ] when ;
+
+: create-method-in ( class generic -- method )
+    create-method f set-word dup save-location ;
+
+: CREATE-METHOD ( -- method )
+    scan-word bootstrap-word scan-word create-method-in ;
 
 TUPLE: staging-violation word ;
 
@@ -355,7 +365,9 @@ TUPLE: bad-number ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
-: (:) CREATE dup reset-generic parse-definition ;
+: (:) CREATE-WORD parse-definition ;
+
+: (M:) CREATE-METHOD parse-definition ;
 
 GENERIC: expected>string ( obj -- str )
 

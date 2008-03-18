@@ -14,3 +14,5 @@ yield
 [ 3 ] [
     [ 3 swap resume-with ] "Test suspend" suspend
 ] unit-test
+
+[ f ] [ f get-global ] unit-test

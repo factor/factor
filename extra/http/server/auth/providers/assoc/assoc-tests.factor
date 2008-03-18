@@ -3,7 +3,7 @@ USING: http.server.auth.providers
 http.server.auth.providers.assoc tools.test
 namespaces accessors kernel ;
 
-<in-memory> "provider" set
+<users-in-memory> "provider" set
 
 [ t ] [
     <user>
@@ -22,11 +22,11 @@ namespaces accessors kernel ;
 
 [ f ] [ "fdasf" "slava" "provider" get check-login >boolean ] unit-test
 
-[ t ] [ "foobar" "slava" "provider" get check-login >boolean ] unit-test
+[ ] [ "foobar" "slava" "provider" get check-login "user" set ] unit-test
 
-[ f ] [ "xx" "blah" "provider" get set-password ] unit-test
+[ t ] [ "user" get >boolean ] unit-test
 
-[ t ] [ "fdasf" "slava" "provider" get set-password ] unit-test
+[ ] [ "user" get "fdasf" set-password drop ] unit-test
 
 [ t ] [ "fdasf" "slava" "provider" get check-login >boolean ] unit-test
 

@@ -249,13 +249,14 @@ M: wlet local-rewrite*
     word [ over "declared-effect" set-word-prop ] when*
     effect-in make-locals ;
 
-: ((::)) ( word -- word quot )
+: parse-locals-definition ( word -- word quot )
     scan "(" assert= parse-locals \ ; (parse-lambda) <lambda>
     2dup "lambda" set-word-prop
     lambda-rewrite first ;
 
-: (::) ( -- word quot )
-    CREATE dup reset-generic ((::)) ;
+: (::) CREATE-WORD parse-locals-definition ;
+
+: (M::) CREATE-METHOD parse-locals-definition ;
 
 PRIVATE>
 
@@ -275,18 +276,7 @@ MACRO: with-locals ( form -- quot ) lambda-rewrite ;
 
 : :: (::) define ; parsing
 
-! This will be cleaned up when method tuples and method words
-! are unified
-: create-method ( class generic -- method )
-    2dup method dup
-    [ 2nip ]
-    [ drop 2dup [ ] -rot define-method create-method ] if ;
-
-: CREATE-METHOD ( -- class generic body )
-    scan-word bootstrap-word scan-word 2dup
-    create-method f set-word dup save-location ;
-
-: M:: CREATE-METHOD ((::)) nip -rot define-method ; parsing
+: M:: (M::) define ; parsing
 
 : MACRO:: (::) define-macro ; parsing
 
