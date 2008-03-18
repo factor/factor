@@ -316,10 +316,10 @@ SYMBOL: deserialized
     deserialize* [ "End of stream" throw ] unless ;
 
 : deserialize ( -- obj )
-    [
-        V{ } clone deserialized
-        [ (deserialize) ] with-variable
-    ] with-compilation-unit ;
+    ! [
+    V{ } clone deserialized
+    [ (deserialize) ] with-variable ;
+    ! ] with-compilation-unit ;
 
 : serialize ( obj -- )
     H{ } clone serialized [ (serialize) ] with-variable ;
