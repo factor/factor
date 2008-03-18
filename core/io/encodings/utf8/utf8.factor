@@ -15,7 +15,7 @@ TUPLE: utf8 ;
 
 : append-nums ( stream byte -- stream char )
     over stream-read1 dup starts-2?
-    [ 6 shift swap BIN: 111111 bitand bitor ]
+    [ swap 6 shift swap BIN: 111111 bitand bitor ]
     [ 2drop replacement-char ] if ;
 
 : double ( stream byte -- stream char )

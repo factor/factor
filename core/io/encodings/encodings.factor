@@ -61,25 +61,28 @@ M: tuple <decoder> f decoder construct-boa ;
     ] when nip ;
 
 : read-loop ( n stream -- string )
-    over 0 <string> [
+    SBUF" " clone [
         [
-            >r stream-read1 dup
-            [ swap r> set-nth-unsafe f ] [ r> 3drop t ] if
-        ] 2curry find-integer
-    ] keep swap [ head ] when* ;
+            >r nip stream-read1 dup
+            [ r> push f ] [ r> 2drop t ] if
+        ] 2curry find-integer drop
+    ] keep "" like f like ;
 
 M: decoder stream-read
     tuck read-loop fix-read ;
 
+M: decoder stream-read-partial stream-read ;
+
 : (read-until) ( buf quot -- string/f sep/f )
-    ! quot: -- char keep-going?
+    ! quot: -- char stop?
     dup call
     [ >r drop "" like r> ]
     [ pick push (read-until) ] if ; inline
 
 M: decoder stream-read-until
     SBUF" " clone -rot >decoder<
-    [ decode-char dup rot memq? ] 3curry (read-until) ;
+    [ decode-char [ dup rot memq? ] [ drop f t ] if* ] 3curry
+    (read-until) ;
 
 : fix-read1 ( stream char -- char )
     over decoder-cr [
@@ -117,6 +120,8 @@ M: encoder stream-write
     >encoder< [ encode-char ] 2curry each ;
 
 M: encoder dispose encoder-stream dispose ;
+
+M: encoder stream-flush encoder-stream stream-flush ;
 
 INSTANCE: encoder plain-writer
 

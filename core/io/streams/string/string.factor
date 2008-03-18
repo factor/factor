@@ -49,8 +49,11 @@ M: growable stream-read
 M: growable stream-read-partial
     stream-read ;
 
+TUPLE: null ;
+M: null decode-char drop stream-read1 ;
+
 : <string-reader> ( str -- stream )
-    >sbuf dup reverse-here f <decoder> ;
+    >sbuf dup reverse-here null <decoder> ;
 
 : with-string-reader ( str quot -- )
     >r <string-reader> r> with-stream ; inline
