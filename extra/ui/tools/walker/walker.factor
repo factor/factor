@@ -4,14 +4,18 @@ USING: kernel concurrency.messaging inspector ui.tools.listener
 ui.tools.traceback ui.gadgets.buttons ui.gadgets.status-bar
 ui.gadgets.tracks ui.commands ui.gadgets models
 ui.tools.workspace ui.gestures ui.gadgets.labels ui threads
-namespaces tools.walker assocs ;
+namespaces tools.walker assocs combinators combinators.cleave ;
 IN: ui.tools.walker
 
-TUPLE: walker-gadget status continuation thread traceback ;
+TUPLE: walker-gadget
+status continuation thread
+traceback
+closing? ;
 
 : walker-command ( walker msg -- )
-    over walker-gadget-thread thread-registered?
-    [ swap walker-gadget-thread send-synchronous drop ]
+    swap
+    dup walker-gadget-thread thread-registered?
+    [ walker-gadget-thread send-synchronous drop ]
     [ 2drop ] if ;
 
 : com-step ( walker -- ) step walker-command ;
@@ -27,7 +31,9 @@ TUPLE: walker-gadget status continuation thread traceback ;
 : com-abandon ( walker -- ) abandon walker-command ;
 
 M: walker-gadget ungraft*
-    dup delegate ungraft* detach walker-command ;
+    [ t swap set-walker-gadget-closing? ]
+    [ com-continue ]
+    [ delegate ungraft* ] tri ;
 
 M: walker-gadget focusable-child*
     walker-gadget-traceback ;
@@ -41,7 +47,6 @@ M: walker-gadget focusable-child*
             { +stopped+ "Stopped" }
             { +suspended+ "Suspended" }
             { +running+ "Running" }
-            { +detached+ "Detached" }
         } at %
         ")" %
         drop
@@ -51,7 +56,7 @@ M: walker-gadget focusable-child*
     [ walker-state-string ] curry <filter> <label-control> ;
 
 : <walker-gadget> ( status continuation thread -- gadget )
-    over <traceback-gadget> walker-gadget construct-boa [
+    over <traceback-gadget> f walker-gadget construct-boa [
         toolbar,
         g walker-gadget-status self <thread-status> f track,
         g walker-gadget-traceback 1 track,
@@ -72,16 +77,20 @@ walker-gadget "toolbar" f {
     { T{ key-down f f "F1" } walker-help }
 } define-command-map
 
-: walker-window ( -- )
-    f <model> f <model> 2dup start-walker-thread
-    [ <walker-gadget> ] keep thread-name open-status-window ;
+: walker-for-thread? ( thread gadget -- ? )
+    {
+        { [ dup walker-gadget? not ] [ 2drop f ] }
+        { [ dup walker-gadget-closing? ] [ 2drop f ] }
+        { [ t ] [ walker-gadget-thread eq? ] }
+    } cond ;
 
-[ [ walker-window ] with-ui ] new-walker-hook set-global
+: find-walker-window ( thread -- world/f )
+    [ swap walker-for-thread? ] curry find-window ;
+
+: walker-window ( status continuation thread -- )
+    [ <walker-gadget> ] [ thread-name ] bi open-status-window ;
 
 [
-    [
-        >r dup walker-gadget?
-        [ walker-gadget-thread r> eq? ]
-        [ r> 2drop f ] if
-    ] curry find-window raise-window
+    dup find-walker-window dup
+    [ raise-window 3drop ] [ drop [ walker-window ] with-ui ] if
 ] show-walker-hook set-global

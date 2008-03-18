@@ -292,7 +292,7 @@ M: no-word summary
     create-method f set-word dup save-location ;
 
 : CREATE-METHOD ( -- method )
-    scan-word scan-word create-method-in ;
+    scan-word bootstrap-word scan-word create-method-in ;
 
 TUPLE: staging-violation word ;
 
