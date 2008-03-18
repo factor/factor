@@ -32,7 +32,7 @@ PRIVATE>
     >r >r swapd roll indirect-quot r> r>
     -rot define-declared ;
 
-: DLL" skip-blank parse-string dlopen parsed ; parsing
+: DLL" lexer get skip-blank parse-string dlopen parsed ; parsing
 
 : ALIEN: scan string>number <alien> parsed ; parsing
 
