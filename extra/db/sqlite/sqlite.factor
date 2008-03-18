@@ -190,6 +190,7 @@ M: sqlite-db modifier-table ( -- hashtable )
     H{
         { +native-id+ "primary key" }
         { +assigned-id+ "primary key" }
+        { +random-id+ "primary key" }
         ! { +nonnative-id+ "primary key" }
         { +autoincrement+ "autoincrement" }
         { +unique+ "unique" }
@@ -209,6 +210,7 @@ M: sqlite-db compound-type ( str seq -- str' )
 M: sqlite-db type-table ( -- assoc )
     H{
         { +native-id+ "integer primary key" }
+        { +random-id+ "integer primary key" }
         { INTEGER "integer" }
         { TEXT "text" }
         { VARCHAR "text" }

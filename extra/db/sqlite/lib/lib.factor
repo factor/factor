@@ -121,6 +121,7 @@ IN: db.sqlite.lib
     dup array? [ first ] when
     {
         { +native-id+ [ sqlite3_column_int64 ] }
+        { +random-id+ [ sqlite3_column_int64 ] }
         { INTEGER [ sqlite3_column_int ] }
         { BIG-INTEGER [ sqlite3_column_int64 ] }
         { DOUBLE [ sqlite3_column_double ] }

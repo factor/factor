@@ -15,14 +15,12 @@ HOOK: compound-type db ( str n -- hash )
 
 TUPLE: sql-spec class slot-name column-name type modifiers primary-key ;
 
-
 SINGLETON: +native-id+
 SINGLETON: +assigned-id+
 SINGLETON: +random-id+
 UNION: +primary-key+ +native-id+ +assigned-id+ +random-id+ ;
 UNION: +nonnative-id+ +random-id+ +assigned-id+ ;
 
-! +native-id+ +assigned-id+ +random-assigned-id+
 SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 +foreign-id+ +has-many+ ;
 
