@@ -87,11 +87,7 @@ call
     "words.private"
     "vectors"
     "vectors.private"
-} [
-    dup find-vocab-root swap create-vocab
-    [ set-vocab-root ] keep
-    f swap set-vocab-source-loaded?
-] each
+} [ create-vocab drop ] each
 
 H{ } clone source-files set
 H{ } clone class<map set

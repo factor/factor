@@ -19,16 +19,16 @@ IN: tools.vocabs
     ] [ drop ] if ;
 
 : vocab-tests ( vocab -- tests )
-    dup vocab-root [
+    dup vocab-root dup [
         [
-            f >vocab-link dup
+            >vocab-link dup
             vocab-tests-file,
             vocab-tests-dir,
         ] { } make
-    ] [ drop f ] if ;
+    ] [ 2drop f ] if ;
 
 : vocab-files ( vocab -- seq )
-    f >vocab-link [
+    dup find-vocab-root >vocab-link [
         dup vocab-source-path [ , ] when*
         dup vocab-docs-path [ , ] when*
         vocab-tests %

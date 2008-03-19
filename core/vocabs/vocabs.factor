@@ -15,8 +15,8 @@ source-loaded? docs-loaded? ;
 M: vocab equal? 2drop f ;
 
 : <vocab> ( name -- vocab )
-    H{ } clone t
-    { set-vocab-name set-vocab-words set-vocab-source-loaded? }
+    H{ } clone
+    { set-vocab-name set-vocab-words }
     \ vocab construct ;
 
 GENERIC: vocab ( vocab-spec -- vocab )
@@ -60,9 +60,16 @@ M: f vocab-help ;
 : create-vocab ( name -- vocab )
     dictionary get [ <vocab> ] cache ;
 
-SYMBOL: load-vocab-hook
+TUPLE: no-vocab name ;
 
-: load-vocab ( name -- vocab ) load-vocab-hook get call ;
+: no-vocab ( name -- * )
+    vocab-name \ no-vocab construct-boa throw ;
+
+SYMBOL: load-vocab-hook ! ( name -- )
+
+: load-vocab ( name -- vocab )
+    dup load-vocab-hook get call
+    dup vocab [ ] [ no-vocab ] ?if ;
 
 : vocabs ( -- seq )
     dictionary get keys natural-sort ;
@@ -115,8 +122,3 @@ UNION: vocab-spec vocab vocab-link ;
     vocab-name dictionary get delete-at ;
 
 M: vocab-spec forget* forget-vocab ;
-
-TUPLE: no-vocab name ;
-
-: no-vocab ( name -- * )
-    vocab-name \ no-vocab construct-boa throw ;
