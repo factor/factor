@@ -294,4 +294,6 @@ cell-bits 32 = [
     \ >= inlined?
 ] unit-test
 
-
+[ t ] [
+    [ { vector } declare nth-unsafe ] \ nth-unsafe inlined?
+] unit-test

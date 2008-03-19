@@ -197,15 +197,15 @@ DEFINE_PRIMITIVE(dlsym)
 	F_DLL *d;
 
 	if(dll == F)
-		d = NULL;
+		box_alien(ffi_dlsym(NULL,sym));
 	else
 	{
 		d = untag_dll(dll);
 		if(d->dll == NULL)
 			dpush(F);
+		else
+			box_alien(ffi_dlsym(d,sym));
 	}
-
-	box_alien(ffi_dlsym(d,sym));
 }
 
 /* close a native library handle */
