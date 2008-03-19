@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
-       peg.parsers unicode.categories multiline combinators.lib ;
+       peg.parsers unicode.categories multiline combinators.lib 
+       splitting ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -15,7 +16,7 @@ TUPLE: ebnf-repeat0 group ;
 TUPLE: ebnf-repeat1 group ;
 TUPLE: ebnf-optional elements ;
 TUPLE: ebnf-rule symbol elements ;
-TUPLE: ebnf-action word ;
+TUPLE: ebnf-action code ;
 TUPLE: ebnf rules ;
 
 C: <ebnf-non-terminal> ebnf-non-terminal
@@ -98,7 +99,7 @@ M: ebnf-rule (generate-parser) ( ast -- id )
   swap [ parsers get set-nth ] keep ;
 
 M: ebnf-action (generate-parser) ( ast -- id )
-  ebnf-action-word search 1quotation 
+  ebnf-action-code string-lines parse-lines  
   last-parser get get-parser swap action store-parser ;
 
 M: vector (generate-parser) ( ast -- id )
@@ -237,20 +238,22 @@ DEFER: 'choice'
     dup length 1 = [ first ] [ <ebnf-choice> ] if
   ] action ;
 
-: 'action' ( -- parser )
+: 'factor-code' ( -- parser )
   [
-    "=>" token hide ,
-    [
-      [ blank? ] satisfy ensure-not ,
-      [ drop t ] satisfy ,
-    ] seq* [ first ] action repeat1 [ >string ] action sp ,
-  ] seq* [ first <ebnf-action> ] action ;
+    "]]" token ensure-not ,
+    [ drop t ] satisfy ,
+  ] seq* [ first ] action repeat0 [ >string ] action ;
+
+: 'action' ( -- parser )
+  "[[" 'factor-code' "]]" syntax-pack [ <ebnf-action> ] action ;
   
 : 'rhs' ( -- parser )
   [
     'choice' ,
     'action' sp optional ,
-  ] seq* ;
+  ] seq* repeat1 [ 
+    dup length 1 = [ first ] [ <ebnf-sequence> ] if
+  ] action ;
  
 : 'rule' ( -- parser )
   [

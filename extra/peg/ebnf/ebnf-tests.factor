@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.ebnf ;
+USING: kernel tools.test peg peg.ebnf compiler.units ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -114,4 +114,14 @@ IN: peg.ebnf.tests
   "foo]" 'non-terminal' parse parse-result-ast ebnf-non-terminal-symbol
 ] unit-test
 
+{ V{ "a" "b" } } [
+  "foo='a' 'b'" ebnf>quot with-compilation-unit "ab" foo parse parse-result-ast 
+] unit-test
 
+{ V{ 1 "b" } } [
+  "foo='a' [[ drop 1 ]] 'b'" ebnf>quot with-compilation-unit "ab" foo parse parse-result-ast 
+] unit-test
+
+{ V{ 1 2 } } [
+  "foo='a' [[ drop 1 ]] 'b' [[ drop 2 ]]" ebnf>quot with-compilation-unit "ab" foo parse parse-result-ast 
+] unit-test
