@@ -1,6 +1,7 @@
 IN: tools.deploy.tests
 USING: tools.test system io.files kernel tools.deploy.config
-tools.deploy.backend math sequences io.launcher arrays ;
+tools.deploy.backend math sequences io.launcher arrays
+namespaces ;
 
 : shake-and-bake ( vocab -- )
     "." resource-path [
