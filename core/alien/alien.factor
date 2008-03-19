@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math namespaces sequences system
 kernel.private tuples bit-arrays byte-arrays float-arrays 
-shuffle arrays macros ;
+arrays ;
 IN: alien
 
 ! Some predicate classes used by the compiler for optimization
