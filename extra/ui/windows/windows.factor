@@ -376,22 +376,6 @@ SYMBOL: trace-messages?
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
 
-! ! ! !
-: set-world-dim ( dim world -- )
-    swap >r world-handle win-hWnd HWND_TOP 20 20 r> first2 0
-    SetWindowPos drop ;
-USE: random
-USE: arrays
-
-: twiddle
-    100 500 random +
-    100 500 random +
-    2array
-    "x" get-global find-world
-    set-world-dim
-    yield ;
-! ! ! !
-
 : event-loop ( msg -- )
     {
         { [ windows get empty? ] [ drop ] }

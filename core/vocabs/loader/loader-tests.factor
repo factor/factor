@@ -13,15 +13,15 @@ debugger compiler.units tools.vocabs ;
 ] unit-test
 
 [ T{ vocab-link f "vocabs.loader.test" } ]
-[ "vocabs.loader.test" f >vocab-link ] unit-test
+[ "vocabs.loader.test" >vocab-link ] unit-test
 
 [ t ]
-[ "kernel" f >vocab-link "kernel" vocab = ] unit-test
+[ "kernel" >vocab-link "kernel" vocab = ] unit-test
 
 [ t ] [
     "kernel" vocab-files
     "kernel" vocab vocab-files
-    "kernel" f <vocab-link> vocab-files
+    "kernel" <vocab-link> vocab-files
     3array all-equal?
 ] unit-test
 
@@ -36,7 +36,7 @@ IN: vocabs.loader.tests
 [ { 3 3 3 } ] [
     "vocabs.loader.test.2" run
     "vocabs.loader.test.2" vocab run
-    "vocabs.loader.test.2" f <vocab-link> run
+    "vocabs.loader.test.2" <vocab-link> run
     3array
 ] unit-test
 
@@ -115,7 +115,7 @@ IN: vocabs.loader.tests
 [ 3 ] [ "count-me" get-global ] unit-test
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
-[ "kernel" f <vocab-link> where ] unit-test
+[ "kernel" <vocab-link> where ] unit-test
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
 [ "kernel" vocab where ] unit-test

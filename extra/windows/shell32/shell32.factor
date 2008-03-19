@@ -1,5 +1,6 @@
 USING: alien alien.c-types alien.syntax combinators
-kernel windows windows.user32 ;
+kernel windows windows.user32 windows.ole32
+windows.com windows.com.syntax ;
 IN: windows.shell32
 
 : CSIDL_DESKTOP HEX: 00 ; inline
@@ -68,10 +69,6 @@ IN: windows.shell32
 : CSIDL_FLAG_MASK HEX: ff00 ; inline
 
 
-: S_OK 0 ; inline
-: S_FALSE 1 ; inline
-: E_FAIL HEX: 80004005 ; inline
-: E_INVALIDARG HEX: 80070057 ; inline
 : ERROR_FILE_NOT_FOUND 2 ; inline
 
 : SHGFP_TYPE_CURRENT 0 ; inline
@@ -89,15 +86,7 @@ FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFi
     f "open" rot f f SW_SHOWNORMAL ShellExecute drop ;
 
 : shell32-error ( n -- )
-    dup S_OK = [
-        drop
-    ] [
-        {
-            ! { ERROR_FILE_NOT_FOUND [ "file not found" throw ] }
-            ! { E_INVALIDARG [ "invalid arg" throw ] }
-            [ (win32-error-string) throw ]
-        } case
-    ] if ;
+    ole32-error ; inline
 
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
@@ -130,3 +119,96 @@ FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFi
 
 : program-files-common-x86 ( -- str )
     CSIDL_PROGRAM_FILES_COMMONX86 shell32-directory ;
+
+: SHCONTF_FOLDERS 32 ; inline
+: SHCONTF_NONFOLDERS 64 ; inline
+: SHCONTF_INCLUDEHIDDEN 128 ; inline
+: SHCONTF_INIT_ON_FIRST_NEXT 256 ; inline
+: SHCONTF_NETPRINTERSRCH 512 ; inline
+: SHCONTF_SHAREABLE 1024 ; inline
+: SHCONTF_STORAGE 2048 ; inline
+
+TYPEDEF: DWORD SHCONTF
+
+: SHGDN_NORMAL 0 ; inline
+: SHGDN_INFOLDER 1 ; inline
+: SHGDN_FOREDITING HEX: 1000 ; inline
+: SHGDN_INCLUDE_NONFILESYS HEX: 2000 ; inline
+: SHGDN_FORADDRESSBAR HEX: 4000 ; inline
+: SHGDN_FORPARSING HEX: 8000 ; inline
+
+TYPEDEF: DWORD SHGDNF
+
+: SFGAO_CANCOPY           DROPEFFECT_COPY ; inline
+: SFGAO_CANMOVE           DROPEFFECT_MOVE ; inline
+: SFGAO_CANLINK           DROPEFFECT_LINK ; inline
+: SFGAO_CANRENAME         HEX: 00000010 ; inline
+: SFGAO_CANDELETE         HEX: 00000020 ; inline
+: SFGAO_HASPROPSHEET      HEX: 00000040 ; inline
+: SFGAO_DROPTARGET        HEX: 00000100 ; inline
+: SFGAO_CAPABILITYMASK    HEX: 00000177 ; inline
+: SFGAO_LINK              HEX: 00010000 ; inline
+: SFGAO_SHARE             HEX: 00020000 ; inline
+: SFGAO_READONLY          HEX: 00040000 ; inline
+: SFGAO_GHOSTED           HEX: 00080000 ; inline
+: SFGAO_HIDDEN            HEX: 00080000 ; inline
+: SFGAO_DISPLAYATTRMASK   HEX: 000F0000 ; inline
+: SFGAO_FILESYSANCESTOR   HEX: 10000000 ; inline
+: SFGAO_FOLDER            HEX: 20000000 ; inline
+: SFGAO_FILESYSTEM        HEX: 40000000 ; inline
+: SFGAO_HASSUBFOLDER      HEX: 80000000 ; inline
+: SFGAO_CONTENTSMASK      HEX: 80000000 ; inline
+: SFGAO_VALIDATE          HEX: 01000000 ; inline
+: SFGAO_REMOVABLE         HEX: 02000000 ; inline
+: SFGAO_COMPRESSED        HEX: 04000000 ; inline
+: SFGAO_BROWSABLE         HEX: 08000000 ; inline
+: SFGAO_NONENUMERATED     HEX: 00100000 ; inline
+: SFGAO_NEWCONTENT        HEX: 00200000 ; inline
+
+TYPEDEF: ULONG SFGAOF
+
+C-STRUCT: SHITEMID
+    { "USHORT" "cb" }
+    { "BYTE[1]" "abID" } ;
+TYPEDEF: SHITEMID* LPSHITEMID
+TYPEDEF: SHITEMID* LPCSHITEMID
+
+C-STRUCT: ITEMIDLIST
+    { "SHITEMID" "mkid" } ;
+TYPEDEF: ITEMIDLIST* LPITEMIDLIST
+TYPEDEF: ITEMIDLIST* LPCITEMIDLIST
+TYPEDEF: ITEMIDLIST ITEMID_CHILD
+TYPEDEF: ITEMID_CHILD* PITEMID_CHILD
+TYPEDEF: ITEMID_CHILD* PCUITEMID_CHILD
+
+: STRRET_WSTR 0 ; inline
+: STRRET_OFFSET 1 ; inline
+: STRRET_CSTR 2 ; inline
+
+C-UNION: STRRET-union "LPWSTR" "LPSTR" "UINT" "char[260]" ;
+C-STRUCT: STRRET
+    { "int" "uType" }
+    { "STRRET-union" "union" } ;
+
+COM-INTERFACE: IEnumIDList IUnknown {000214F2-0000-0000-C000-000000000046}
+    HRESULT Next ( ULONG celt, LPITEMIDLIST* rgelt, ULONG* pceltFetched )
+    HRESULT Skip ( ULONG celt )
+    HRESULT Reset ( )
+    HRESULT Clone ( IEnumIDList** ppenum ) ;
+
+COM-INTERFACE: IShellFolder IUnknown {000214E6-0000-0000-C000-000000000046}
+    HRESULT ParseDisplayName ( HWND hwndOwner, void* pbcReserved, LPOLESTR lpszDisplayName, ULONG* pchEaten, LPITEMIDLIST* ppidl, ULONG* pdwAttributes )
+    HRESULT EnumObjects ( HWND hwndOwner, SHCONTF grfFlags, IEnumIDList** ppenumIDList )
+    HRESULT BindToObject ( LPCITEMIDLIST pidl, void* pbcReserved, REFGUID riid, void** ppvOut )
+    HRESULT BindToStorage ( LPCITEMIDLIST pidl, void* pbcReserved, REFGUID riid, void** ppvObj )
+    HRESULT CompareIDs ( LPARAM lParam, LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2 )
+    HRESULT CreateViewObject ( HWND hwndOwner, REFGUID riid, void** ppvOut )
+    HRESULT GetAttributesOf ( UINT cidl, LPCITEMIDLIST* apidl, SFGAOF* rgfInOut )
+    HRESULT GetUIObjectOf ( HWND hwndOwner, UINT cidl, LPCITEMIDLIST* apidl, REFGUID riid, UINT* prgfInOut, void** ppvOut )
+    HRESULT GetDisplayNameOf ( LPCITEMIDLIST pidl, SHGDNF uFlags, STRRET* lpName )
+    HRESULT SetNameOf ( HWND hwnd, LPCITEMIDLIST pidl, LPCOLESTR lpszName, SHGDNF uFlags, LPITEMIDLIST* ppidlOut ) ;
+
+FUNCTION: HRESULT SHGetDesktopFolder ( IShellFolder** ppshf ) ;
+
+FUNCTION: HRESULT StrRetToBufW ( STRRET *pstr, PCUITEMID_CHILD pidl, LPWSTR pszBuf, UINT cchBuf ) ;
+: StrRetToBuf StrRetToBufW ; inline

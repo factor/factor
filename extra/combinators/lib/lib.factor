@@ -134,7 +134,10 @@ MACRO: map-call-with ( quots -- )
     [ 2drop ] append ;
 
 MACRO: map-call-with2 ( quots -- )
-    [ (make-call-with2) ] keep length [ narray ] curry append ;
+    [
+        [ [ 2dup >r >r ] swap append [ r> r> ] append ] map concat
+        [ 2drop ] append    
+    ] keep length [ narray ] curry append ;
 
 MACRO: map-exec-with ( words -- )
     [ 1quotation ] map [ map-call-with ] curry ;
@@ -155,6 +158,13 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
 
 : and? ( obj quot1 quot2 -- ? )
     >r keep r> rot [ call ] [ 2drop f ] if ; inline
+
+MACRO: multikeep ( word out-indexes -- ... )
+    [
+        dup >r [ \ npick \ >r 3array % ] each
+        %
+        r> [ drop \ r> , ] each
+    ] [ ] make ;
 
 : retry ( quot n -- )
     [ drop ] rot compose attempt-all ; inline
