@@ -16,7 +16,7 @@ TUPLE: ebnf-repeat0 group ;
 TUPLE: ebnf-repeat1 group ;
 TUPLE: ebnf-optional elements ;
 TUPLE: ebnf-rule symbol elements ;
-TUPLE: ebnf-action code ;
+TUPLE: ebnf-action parser code ;
 TUPLE: ebnf rules ;
 
 C: <ebnf-non-terminal> ebnf-non-terminal
@@ -34,12 +34,10 @@ C: <ebnf> ebnf
 
 SYMBOL: parsers
 SYMBOL: non-terminals
-SYMBOL: last-parser
 
 : reset-parser-generation ( -- ) 
   V{ } clone parsers set 
-  H{ } clone non-terminals set 
-  f last-parser set ;
+  H{ } clone non-terminals set ;
 
 : store-parser ( parser -- number )
   parsers get [ push ] keep length 1- ;
@@ -57,7 +55,7 @@ SYMBOL: last-parser
 GENERIC: (generate-parser) ( ast -- id )
 
 : generate-parser ( ast -- id )
-  (generate-parser) dup last-parser set ;
+  (generate-parser) ;
 
 M: ebnf-terminal (generate-parser) ( ast -- id )
   ebnf-terminal-symbol token sp store-parser ;
@@ -99,14 +97,11 @@ M: ebnf-rule (generate-parser) ( ast -- id )
   swap [ parsers get set-nth ] keep ;
 
 M: ebnf-action (generate-parser) ( ast -- id )
-  ebnf-action-code string-lines parse-lines  
-  last-parser get get-parser swap action store-parser ;
+  [ ebnf-action-parser generate-parser get-parser ] keep
+  ebnf-action-code string-lines parse-lines action store-parser ;
 
 M: vector (generate-parser) ( ast -- id )
   [ generate-parser ] map peek ;
-
-M: f (generate-parser) ( ast -- id )
-  drop last-parser get ;
 
 M: ebnf (generate-parser) ( ast -- id )
   ebnf-rules [
@@ -199,6 +194,7 @@ DEFER: 'choice'
     "*" token sp ensure-not ,
     "+" token sp ensure-not ,
     "?" token sp ensure-not ,
+    "[[" token sp ensure-not ,
   ] seq* hide grouped ; 
 
 : 'repeat0' ( -- parser )
@@ -209,6 +205,19 @@ DEFER: 'choice'
 
 : 'optional' ( -- parser )
   [ <ebnf-optional> ] "?" syntax grouped ;
+
+: 'factor-code' ( -- parser )
+  [
+    "]]" token ensure-not ,
+    [ drop t ] satisfy ,
+  ] seq* [ first ] action repeat0 [ >string ] action ;
+
+: 'action' ( -- parser )
+  [
+    "(" [ 'choice' sp ] delay ")" syntax-pack ,
+    "[[" 'factor-code' "]]" syntax-pack ,
+  ] seq* [ first2 <ebnf-action> ] action ;
+   
 
 : 'ensure-not' ( -- parser )
   #! Parses the '!' syntax to ensure that 
@@ -229,6 +238,7 @@ DEFER: 'choice'
     'repeat0' sp ,
     'repeat1' sp ,
     'optional' sp , 
+    'action' sp , 
   ] choice* repeat1 [ 
      dup length 1 = [ first ] [ <ebnf-sequence> ] if
   ] action ;  
@@ -237,29 +247,12 @@ DEFER: 'choice'
   'sequence' sp "|" token sp list-of [ 
     dup length 1 = [ first ] [ <ebnf-choice> ] if
   ] action ;
-
-: 'factor-code' ( -- parser )
-  [
-    "]]" token ensure-not ,
-    [ drop t ] satisfy ,
-  ] seq* [ first ] action repeat0 [ >string ] action ;
-
-: 'action' ( -- parser )
-  "[[" 'factor-code' "]]" syntax-pack [ <ebnf-action> ] action ;
-  
-: 'rhs' ( -- parser )
-  [
-    'choice' ,
-    'action' sp optional ,
-  ] seq* repeat1 [ 
-    dup length 1 = [ first ] [ <ebnf-sequence> ] if
-  ] action ;
  
 : 'rule' ( -- parser )
   [
     'non-terminal' [ ebnf-non-terminal-symbol ] action  ,
     "=" syntax  ,
-    'rhs'  ,
+    'choice'  ,
   ] seq* [ first2 <ebnf-rule> ] action ;
 
 : 'ebnf' ( -- parser )
