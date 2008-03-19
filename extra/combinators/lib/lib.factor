@@ -9,13 +9,6 @@ continuations ;
 IN: combinators.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: generate ( generator predicate -- obj )
-    #! Call 'generator' until the result satisfies 'predicate'.
-    [ slip over slip ] 2keep
-    roll [ 2drop ] [ rot drop generate ] if ; inline
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Generalized versions of core combinators
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -165,3 +158,10 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
 
 : retry ( quot n -- )
     [ drop ] rot compose attempt-all ; inline
+
+: do-while ( pred body tail -- )
+    >r tuck 2slip r> while ;
+
+: generate ( generator predicate -- obj )
+    [ dup ] swap [ dup [ nip ] unless not ] 3compose
+    swap [ ] do-while ;
