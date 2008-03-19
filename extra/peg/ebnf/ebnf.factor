@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
-       peg.parsers unicode.categories ;
+       peg.parsers unicode.categories multiline ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -182,4 +182,4 @@ DEFER: 'choice'
     f
    ] if* ;
 
-: <EBNF "EBNF>" parse-tokens " " join ebnf>quot call ; parsing
+: <EBNF "EBNF>" parse-multiline-string ebnf>quot call ; parsing
