@@ -203,8 +203,7 @@ COM-INTERFACE: IShellFolder IUnknown {000214E6-0000-0000-C000-000000000046}
     HRESULT BindToStorage ( LPCITEMIDLIST pidl, void* pbcReserved, REFGUID riid, void** ppvObj )
     HRESULT CompareIDs ( LPARAM lParam, LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2 )
     HRESULT CreateViewObject ( HWND hwndOwner, REFGUID riid, void** ppvOut )
-    HRESULT GetAttributesOf ( UINT cidl, LPCITEMIDLIST* apidl, SFGAOF* rgfInOut
- )
+    HRESULT GetAttributesOf ( UINT cidl, LPCITEMIDLIST* apidl, SFGAOF* rgfInOut )
     HRESULT GetUIObjectOf ( HWND hwndOwner, UINT cidl, LPCITEMIDLIST* apidl, REFGUID riid, UINT* prgfInOut, void** ppvOut )
     HRESULT GetDisplayNameOf ( LPCITEMIDLIST pidl, SHGDNF uFlags, STRRET* lpName )
     HRESULT SetNameOf ( HWND hwnd, LPCITEMIDLIST pidl, LPCOLESTR lpszName, SHGDNF uFlags, LPITEMIDLIST* ppidlOut ) ;
