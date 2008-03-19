@@ -4,10 +4,10 @@ USING: alien alien.c-types arrays assocs ui ui.gadgets
 ui.backend ui.clipboards ui.gadgets.worlds ui.gestures io kernel
 math math.vectors namespaces prettyprint sequences strings
 vectors words windows.kernel32 windows.gdi32 windows.user32
-windows.opengl32 windows.messages windows.types
-windows.nt windows threads timers libc combinators continuations
-command-line shuffle opengl ui.render unicode.case ascii
-math.bitfields ;
+windows.opengl32 windows.messages windows.types windows.nt
+windows threads libc combinators continuations command-line
+shuffle opengl ui.render unicode.case ascii math.bitfields
+locals symbols ;
 IN: ui.windows
 
 TUPLE: windows-ui-backend ;
@@ -16,8 +16,11 @@ TUPLE: windows-ui-backend ;
 : lf>crlf [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
 
 : enum-clipboard ( -- seq )
-    0 [ EnumClipboardFormats win32-error dup dup 0 > ] [ ]
-    { } unfold nip ;
+    0
+    [ EnumClipboardFormats win32-error dup dup 0 > ]
+    [ ]
+    [ drop ]
+    unfold nip ;
 
 : with-clipboard ( quot -- )
     f OpenClipboard win32-error=0/f
@@ -41,13 +44,12 @@ TUPLE: windows-ui-backend ;
 : copy ( str -- )
     lf>crlf [
         string>u16-alien
-        f OpenClipboard win32-error=0/f
         EmptyClipboard win32-error=0/f
         GMEM_MOVEABLE over length 1+ GlobalAlloc
             dup win32-error=0/f
     
         dup GlobalLock dup win32-error=0/f
-        rot dup length memcpy
+        swapd byte-array>memory
         dup GlobalUnlock win32-error=0/f
         CF_UNICODETEXT swap SetClipboardData win32-error=0/f
     ] with-clipboard ;
@@ -66,37 +68,33 @@ M: pasteboard set-clipboard-contents drop copy ;
 TUPLE: win hWnd hDC hRC world title ;
 C: <win> win
 
-SYMBOL: msg-obj
-SYMBOL: class-name-ptr
-SYMBOL: mouse-captured
+SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
 : style ( -- n ) WS_OVERLAPPEDWINDOW ; inline
 : ex-style ( -- n ) WS_EX_APPWINDOW WS_EX_WINDOWEDGE bitor ; inline
 
-: adjust-RECT ( RECT -- )
-    style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
-
-: make-RECT ( width height -- RECT )
-    "RECT" <c-object> [ set-RECT-bottom ] keep [ set-RECT-right ] keep ;
-
-: make-adjusted-RECT ( width height -- RECT )
-    make-RECT dup adjust-RECT ;
-
-: get-RECT-dimensions ( RECT -- width height )
-    [ RECT-right ] keep [ RECT-left - ] keep
-    [ RECT-bottom ] keep RECT-top - ;
-
 : get-RECT-top-left ( RECT -- x y )
     [ RECT-left ] keep RECT-top ;
+
+: get-RECT-dimensions ( RECT -- x y width height )
+    [ get-RECT-top-left ] keep
+    [ RECT-right ] keep [ RECT-left - ] keep
+    [ RECT-bottom ] keep RECT-top - ;
 
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
     #! only paint if width/height both > 0
-    3drop window draw-world ;
+    3drop window relayout-1 yield ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
-    [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array 2nip
-    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ui-step ] if ;
+    2nip
+    [ lo-word ] keep hi-word 2array
+    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ] if ;
+
+: handle-wm-move ( hWnd uMsg wParam lParam -- )
+    2nip
+    [ lo-word ] keep hi-word 2array
+    swap window set-world-loc ;
 
 : wm-keydown-codes ( -- key )
     H{
@@ -189,30 +187,21 @@ SYMBOL: mouse-captured
         ] if
     ] if ;
 
-SYMBOL: lParam
-SYMBOL: wParam
-SYMBOL: uMsg
-SYMBOL: hWnd
-
-: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
-    lParam set wParam set uMsg set hWnd set
-    wParam get exclude-key-wm-keydown? [
-        wParam get keystroke>gesture <key-down>
-        hWnd get window-focus send-gesture drop 
+:: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
+    wParam exclude-key-wm-keydown? [
+        wParam keystroke>gesture <key-down>
+        hWnd window-focus send-gesture drop
     ] unless ;
 
-: handle-wm-char ( hWnd uMsg wParam lParam -- )
-    lParam set wParam set uMsg set hWnd set
-    wParam get exclude-key-wm-char? ctrl? alt? xor or [
-        wParam get 1string
-        hWnd get window-focus user-input
+:: handle-wm-char ( hWnd uMsg wParam lParam -- )
+    wParam exclude-key-wm-char? ctrl? alt? xor or [
+        wParam 1string
+        hWnd window-focus user-input
     ] unless ;
 
-: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
-    lParam set wParam set uMsg set hWnd set
-    wParam get keystroke>gesture <key-up>
-    hWnd get window-focus send-gesture
-    drop ;
+:: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
+    wParam keystroke>gesture <key-up>
+    hWnd window-focus send-gesture drop ;
 
 : handle-wm-syscommand ( hWnd uMsg wParam lParam -- n )
     dup alpha? [ 4drop 0 ] [ DefWindowProc ] if ;
@@ -236,30 +225,46 @@ M: windows-ui-backend (close-window)
 : handle-wm-kill-focus ( hWnd uMsg wParam lParam -- )
     3drop window [ unfocus-world ] when* ;
 
+: message>button ( uMsg -- button down? )
+    {
+        { [ dup WM_LBUTTONDOWN   = ] [ drop 1 t ] }
+        { [ dup WM_LBUTTONUP     = ] [ drop 1 f ] }
+        { [ dup WM_MBUTTONDOWN   = ] [ drop 2 t ] }
+        { [ dup WM_MBUTTONUP     = ] [ drop 2 f ] }
+        { [ dup WM_RBUTTONDOWN   = ] [ drop 3 t ] }
+        { [ dup WM_RBUTTONUP     = ] [ drop 3 f ] }
+
+        { [ dup WM_NCLBUTTONDOWN = ] [ drop 1 t ] }
+        { [ dup WM_NCLBUTTONUP   = ] [ drop 1 f ] }
+        { [ dup WM_NCMBUTTONDOWN = ] [ drop 2 t ] }
+        { [ dup WM_NCMBUTTONUP   = ] [ drop 2 f ] }
+        { [ dup WM_NCRBUTTONDOWN = ] [ drop 3 t ] }
+        { [ dup WM_NCRBUTTONUP   = ] [ drop 3 f ] }
+    } cond ;
+
+! If the user clicks in the window border ("non-client area")
+! Windows sends us an NC[LMR]BUTTONDOWN message; but if the
+! mouse is subsequently released outside the NC area, we receive
+! a [LMR]BUTTONUP message and Factor can get confused. So we
+! ignore BUTTONUP's that are a result of an NC*BUTTONDOWN.
+SYMBOL: nc-buttons
+
+: handle-wm-ncbutton ( hWnd uMsg wParam lParam -- )
+    2drop nip
+    message>button nc-buttons get
+    swap [ push ] [ delete ] if ;
+
 : >lo-hi ( WORD -- array ) [ lo-word ] keep hi-word 2array ;
 : mouse-wheel ( lParam -- array ) >lo-hi [ sgn neg ] map ;
 
 : mouse-absolute>relative ( lparam handle -- array )
     >r >lo-hi r>
-    0 0 make-RECT [ GetWindowRect win32-error=0/f ] keep
+    "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep
     get-RECT-top-left 2array v- ;
 
 : mouse-event>gesture ( uMsg -- button )
-    key-modifiers swap
-    {
-        { [ dup WM_LBUTTONDOWN = ] [ drop 1 <button-down> ] }
-        { [ dup WM_LBUTTONUP = ] [ drop 1 <button-up> ] }
-        { [ dup WM_MBUTTONDOWN = ] [ drop 2 <button-down> ] }
-        { [ dup WM_MBUTTONUP = ] [ drop 2 <button-up> ] }
-        { [ dup WM_RBUTTONDOWN = ] [ drop 3 <button-down> ] }
-        { [ dup WM_RBUTTONUP = ] [ drop 3 <button-up> ] }
-        { [ t ] [ "bad button" throw ] }
-    } cond ;
-
-: mouse-buttons ( -- seq ) WM_LBUTTONDOWN WM_RBUTTONDOWN 2array ;
-
-: capture-mouse? ( umsg -- ? )
-    mouse-buttons member? ;
+    key-modifiers swap message>button
+    [ <button-down> ] [ <button-up> ] if ;
 
 : prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
     nip >r mouse-event>gesture r> >lo-hi rot window ;
@@ -277,12 +282,18 @@ M: windows-ui-backend (close-window)
     mouse-captured off ;
 
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
-    >r over capture-mouse? [ pick set-capture ] when r>
-    prepare-mouse send-button-down ;
+    >r >r
+    over set-capture
+    dup message>button drop nc-buttons get delete
+    r> r> prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
     mouse-captured get [ release-capture ] when
-    prepare-mouse send-button-up ;
+    pick message>button drop dup nc-buttons get member? [
+        nc-buttons get delete 4drop
+    ] [
+        drop prepare-mouse send-button-up
+    ] if ;
 
 : make-TRACKMOUSEEVENT ( hWnd -- alien )
     "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
@@ -308,55 +319,83 @@ M: windows-ui-backend (close-window)
     #! message sent if mouse leaves main application 
     4drop forget-rollover ;
 
+SYMBOL: wm-handlers
+
+H{ } clone wm-handlers set-global
+
+: add-wm-handler ( quot wm -- )
+    dup array?
+    [ [ execute add-wm-handler ] with each ]
+    [ wm-handlers get-global set-at ] if ;
+
+[ handle-wm-close 0                  ] WM_CLOSE add-wm-handler
+[ 4dup handle-wm-paint DefWindowProc ] WM_PAINT add-wm-handler
+
+[ handle-wm-size 0 ] WM_SIZE add-wm-handler
+[ handle-wm-move 0 ] WM_MOVE add-wm-handler
+
+[ 4dup handle-wm-keydown DefWindowProc ] { WM_KEYDOWN WM_SYSKEYDOWN } add-wm-handler
+[ 4dup handle-wm-char DefWindowProc    ] { WM_CHAR WM_SYSCHAR }       add-wm-handler
+[ 4dup handle-wm-keyup DefWindowProc   ] { WM_KEYUP WM_SYSKEYUP }     add-wm-handler
+
+[ handle-wm-syscommand   ] WM_SYSCOMMAND add-wm-handler
+[ handle-wm-set-focus 0  ] WM_SETFOCUS add-wm-handler
+[ handle-wm-kill-focus 0 ] WM_KILLFOCUS add-wm-handler
+
+[ handle-wm-buttondown 0 ] WM_LBUTTONDOWN add-wm-handler
+[ handle-wm-buttondown 0 ] WM_MBUTTONDOWN add-wm-handler
+[ handle-wm-buttondown 0 ] WM_RBUTTONDOWN add-wm-handler
+[ handle-wm-buttonup 0   ] WM_LBUTTONUP   add-wm-handler
+[ handle-wm-buttonup 0   ] WM_MBUTTONUP   add-wm-handler
+[ handle-wm-buttonup 0   ] WM_RBUTTONUP   add-wm-handler
+
+[ 4dup handle-wm-ncbutton DefWindowProc ]
+{ WM_NCLBUTTONDOWN WM_NCMBUTTONDOWN WM_NCRBUTTONDOWN
+WM_NCLBUTTONUP WM_NCMBUTTONUP WM_NCRBUTTONUP }
+add-wm-handler
+
+[ nc-buttons get-global delete-all DefWindowProc ]
+{ WM_EXITSIZEMOVE WM_EXITMENULOOP } add-wm-handler
+
+[ handle-wm-mousemove 0  ] WM_MOUSEMOVE  add-wm-handler
+[ handle-wm-mousewheel 0 ] WM_MOUSEWHEEL add-wm-handler
+[ handle-wm-cancelmode 0 ] WM_CANCELMODE add-wm-handler
+[ handle-wm-mouseleave 0 ] WM_MOUSELEAVE add-wm-handler
+
+SYMBOL: trace-messages?
+
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
         [
-        pick ! global [ dup windows-message-name . ] bind
-            {
-                { [ dup WM_CLOSE = ]    [ drop handle-wm-close 0 ] }
-                { [ dup WM_PAINT = ]
-                      [ drop 4dup handle-wm-paint DefWindowProc ] }
-                { [ dup WM_SIZE = ]      [ drop handle-wm-size 0 ] }
-
-                ! Keyboard events
-                { [ dup WM_KEYDOWN = over WM_SYSKEYDOWN = or ]
-                [ drop 4dup handle-wm-keydown DefWindowProc ] }
-                { [ dup WM_CHAR = over WM_SYSCHAR = or ]
-                    [ drop 4dup handle-wm-char DefWindowProc ] }
-                { [ dup WM_KEYUP = over WM_SYSKEYUP = or ]
-                    [ drop 4dup handle-wm-keyup DefWindowProc ] }
-
-                { [ dup WM_SYSCOMMAND = ] [ drop handle-wm-syscommand ] }
-                { [ dup WM_SETFOCUS = ] [ drop handle-wm-set-focus 0 ] }
-                { [ dup WM_KILLFOCUS = ] [ drop handle-wm-kill-focus 0 ] }
-
-                ! Mouse events
-                { [ dup WM_LBUTTONDOWN = ] [ drop handle-wm-buttondown 0 ] }
-                { [ dup WM_MBUTTONDOWN = ] [ drop handle-wm-buttondown 0 ] }
-                { [ dup WM_RBUTTONDOWN = ] [ drop handle-wm-buttondown 0 ] }
-                { [ dup WM_LBUTTONUP = ] [ drop handle-wm-buttonup 0 ] }
-                { [ dup WM_MBUTTONUP = ] [ drop handle-wm-buttonup 0 ] }
-                { [ dup WM_RBUTTONUP = ] [ drop handle-wm-buttonup 0 ] }
-                { [ dup WM_MOUSEMOVE = ] [ drop handle-wm-mousemove 0 ] }
-                { [ dup WM_MOUSEWHEEL = ] [ drop handle-wm-mousewheel 0 ] }
-                { [ dup WM_CANCELMODE = ] [ drop handle-wm-cancelmode 0 ] }
-                { [ dup WM_MOUSELEAVE = ] [ drop handle-wm-mouseleave 0 ] }
-
-                { [ t ] [ drop DefWindowProc ] }
-            } cond
+            pick
+            trace-messages? get-global [ dup windows-message-name . ] when
+            wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
         ] ui-try
      ] alien-callback ;
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
 
+! ! ! !
+: set-world-dim ( dim world -- )
+    swap >r world-handle win-hWnd HWND_TOP 20 20 r> first2 0
+    SetWindowPos drop ;
+USE: random
+USE: arrays
+
+: twiddle
+    100 500 random +
+    100 500 random +
+    2array
+    "x" get-global find-world
+    set-world-dim
+    yield ;
+! ! ! !
+
 : event-loop ( msg -- )
     {
         { [ windows get empty? ] [ drop ] }
-        { [ dup peek-message? ] [
-            >r [ ui-step 10 sleep ] ui-try
-            r> event-loop
-        ] }
+        { [ dup peek-message? ] [ ui-wait event-loop ] }
         { [ dup MSG-message WM_QUIT = ] [ drop ] }
         { [ t ] [
             dup TranslateMessage drop
@@ -384,13 +423,26 @@ M: windows-ui-backend (close-window)
         RegisterClassEx dup win32-error=0/f
     ] when ;
 
-: create-window ( width height -- hwnd )
+: adjust-RECT ( RECT -- )
+    style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
+
+: make-RECT ( world -- RECT )
+    dup world-loc { 40 40 } vmax dup rot rect-dim v+
+    "RECT" <c-object>
+    over first over set-RECT-right
+    swap second over set-RECT-bottom
+    over first over set-RECT-left
+    swap second over set-RECT-top ;
+
+: make-adjusted-RECT ( rect -- RECT )
+    make-RECT dup adjust-RECT ;
+
+: create-window ( rect -- hwnd )
     make-adjusted-RECT
     >r class-name-ptr get-global f r>
     >r >r >r ex-style r> r>
         { WS_CLIPSIBLINGS WS_CLIPCHILDREN style } flags
-        CW_USEDEFAULT dup r>
-    get-RECT-dimensions
+    r> get-RECT-dimensions
     f f f GetModuleHandle f CreateWindowEx dup win32-error=0/f ;
 
 : show-window ( hWnd -- )
@@ -399,17 +451,17 @@ M: windows-ui-backend (close-window)
     SetFocus drop ;
 
 : init-win32-ui ( -- )
-    "MSG" <c-object> msg-obj set
+    V{ } clone nc-buttons set-global
+    "MSG" malloc-object msg-obj set-global
     "Factor-window" malloc-u16-string class-name-ptr set-global
     register-wndclassex drop
     GetDoubleClickTime double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
-    class-name-ptr get-global [
-        dup f UnregisterClass drop
-        free
-    ] when*
-    f class-name-ptr set-global ;
+    class-name-ptr get-global [ dup f UnregisterClass drop free ] when*
+    msg-obj get-global [ free ] when*
+    f class-name-ptr set-global
+    f msg-obj set-global ;
 
 : setup-pixel-format ( hdc -- )
     16 make-pfd [ ChoosePixelFormat dup win32-error=0/f ] 2keep
@@ -425,7 +477,7 @@ M: windows-ui-backend (close-window)
     get-dc dup setup-pixel-format dup get-rc ;
 
 M: windows-ui-backend (open-window) ( world -- )
-    [ rect-dim first2 create-window dup setup-gl ] keep
+    [ create-window dup setup-gl ] keep
     [ f <win> ] keep
     [ swap win-hWnd register-window ] 2keep
     dupd set-world-handle
@@ -438,17 +490,17 @@ M: windows-ui-backend flush-gl-context ( handle -- )
     win-hDC SwapBuffers win32-error=0/f ;
 
 ! Move window to front
-M: windows-ui-backend raise-window ( world -- )
+M: windows-ui-backend raise-window* ( world -- )
     world-handle [
         win-hWnd SetFocus drop
     ] when* ;
 
 M: windows-ui-backend set-title ( string world -- )
-    world-handle [ nip win-hWnd WM_SETTEXT 0 ] 2keep
+    world-handle
     dup win-title [ free ] when*
     >r malloc-u16-string r>
-    dupd set-win-title alien-address
-    SendMessage drop ;
+    2dup set-win-title
+    win-hWnd WM_SETTEXT 0 roll alien-address SendMessage drop ;
 
 M: windows-ui-backend ui
     [

@@ -1,6 +1,7 @@
-USING: smtp tools.test io.streams.string threads
-smtp.server kernel sequences namespaces logging ;
-IN: temporary
+USING: smtp tools.test io.streams.string io.sockets threads
+smtp.server kernel sequences namespaces logging accessors
+assocs sorting ;
+IN: smtp.tests
 
 { 0 0 } [ [ ] with-smtp-connection ] must-infer-as
 
@@ -12,7 +13,7 @@ IN: temporary
 [ { "hello" "." "world" } validate-message ] must-fail
 
 [ "hello\r\nworld\r\n.\r\n" ] [
-    { "hello" "world" } [ send-body ] string-out
+    "hello\nworld" [ send-body ] with-string-writer
 ] unit-test
 
 [ "500 syntax error" check-response ] must-fail
@@ -20,17 +21,17 @@ IN: temporary
 [ ] [ "220 success" check-response ] unit-test
 
 [ "220 success" ] [
-    "220 success" [ receive-response ] string-in
+    "220 success" [ receive-response ] with-string-reader
 ] unit-test
 
 [ "220 the end" ] [
     "220-a multiline response\r\n250-another line\r\n220 the end"
-    [ receive-response ] string-in
+    [ receive-response ] with-string-reader
 ] unit-test
 
 [ ] [
     "220-a multiline response\r\n250-another line\r\n220 the end"
-    [ get-ok ] string-in
+    [ get-ok ] with-string-reader
 ] unit-test
 
 [
@@ -38,62 +39,43 @@ IN: temporary
 ] must-fail
 
 [
-    V{
-        { "To" "Slava <slava@factorcode.org>, Ed <dharmatech@factorcode.org>" }
+    {
         { "From" "Doug <erg@factorcode.org>" }
         { "Subject" "Factor rules" }
+        { "To" "Slava <slava@factorcode.org>, Ed <dharmatech@factorcode.org>" }
     }
     { "slava@factorcode.org" "dharmatech@factorcode.org" }
     "erg@factorcode.org"
 ] [
-    "Factor rules"
-    {
-        "Slava <slava@factorcode.org>"
-        "Ed <dharmatech@factorcode.org>"
-    }
-    "Doug <erg@factorcode.org>"
-    simple-headers >r >r 2 head* r> r>
-] unit-test
-
-[
-    {
-        "To: Slava <slava@factorcode.org>, Ed <dharmatech@factorcode.org>"
-        "From: Doug <erg@factorcode.org>"
-        "Subject: Factor rules"
-        f
-        f
-        " "
-        "Hi guys"
-        "Bye guys"
-    }
-    { "slava@factorcode.org" "dharmatech@factorcode.org" }
-    "erg@factorcode.org"
-] [
-    "Hi guys\nBye guys"
-    "Factor rules"
-    {
-        "Slava <slava@factorcode.org>"
-        "Ed <dharmatech@factorcode.org>"
-    }
-    "Doug <erg@factorcode.org>"
-    prepare-simple-message
-    >r >r f 3 pick set-nth f 4 pick set-nth r> r>
-] unit-test
-
-[ ] [ [ 4321 smtp-server ] in-thread ] unit-test
-
-[ ] [
-    [
-        4321 smtp-port set
-
-        "Hi guys\nBye guys"
-        "Factor rules"
+    <email>
+        "Factor rules" >>subject
         {
             "Slava <slava@factorcode.org>"
             "Ed <dharmatech@factorcode.org>"
-        }
-        "Doug <erg@factorcode.org>"
+        } >>to
+        "Doug <erg@factorcode.org>" >>from
+    prepare
+    dup headers>> >alist sort-keys [
+        drop { "Date" "Message-Id" } member? not
+    ] assoc-subset
+    over to>>
+    rot from>>
+] unit-test
 
-        send-simple-message
+[ ] [ [ 4321 mock-smtp-server ] in-thread ] unit-test
+
+[ ] [
+    [
+        "localhost" 4321 <inet> smtp-server set
+
+        <email>
+            "Hi guys\nBye guys" >>body
+            "Factor rules" >>subject
+            {
+                "Slava <slava@factorcode.org>"
+                "Ed <dharmatech@factorcode.org>"
+            } >>to
+            "Doug <erg@factorcode.org>" >>from
+        send-email
     ] with-scope
 ] unit-test

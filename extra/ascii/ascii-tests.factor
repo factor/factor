@@ -1,4 +1,4 @@
-IN: temporary
+IN: ascii.tests
 USING: ascii tools.test sequences kernel math ;
 
 [ t ] [ CHAR: a letter? ] unit-test

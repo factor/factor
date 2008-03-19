@@ -1,5 +1,5 @@
 USING: kernel math math-contrib sequences namespaces errors
-hashtables words arrays parser compiler syntax io threads ;
+hashtables words arrays parser compiler syntax io ;
 IN: crypto
 : make-bits ( quot numbits -- n | quot: -- 0/1 )
     0 -rot [ drop dup call rot 1 shift bitor swap ] each drop ;

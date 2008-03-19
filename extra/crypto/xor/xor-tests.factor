@@ -1,5 +1,5 @@
 USING: continuations crypto.xor kernel strings tools.test ;
-IN: temporary
+IN: crypto.xor.tests
 
 ! No key
 [ ""        dup  xor-crypt           ] [ T{ no-xor-key f } = ] must-fail-with

@@ -7,7 +7,7 @@ IN: delegate
     swap { } like "protocol-words" set-word-prop ;
 
 : PROTOCOL:
-    CREATE dup reset-generic dup define-symbol
+    CREATE-WORD dup define-symbol
     parse-definition swap define-protocol ; parsing
 
 PREDICATE: word protocol "protocol-words" word-prop ;
@@ -27,11 +27,11 @@ M: tuple-class group-words
     swap [ slot-spec-writer ] map append ;
 
 : define-consult-method ( word class quot -- )
-    pick add spin define-method ;
+    pick add >r swap create-method r> define ;
 
 : define-consult ( class group quot -- )
-    >r group-words r>
-    swapd [ define-consult-method ] 2curry each ;
+    >r group-words swap r>
+    [ define-consult-method ] 2curry each ;
 
 : CONSULT:
     scan-word scan-word parse-definition swapd define-consult ; parsing
@@ -39,7 +39,8 @@ M: tuple-class group-words
 : define-mimic ( group mimicker mimicked -- )
     >r >r group-words r> r> [
         pick "methods" word-prop at dup
-        [ method-def spin define-method ] [ 3drop ] if
+        [ >r swap create-method r> word-def define ]
+        [ 3drop ] if
     ] 2curry each ; 
 
 : MIMIC:

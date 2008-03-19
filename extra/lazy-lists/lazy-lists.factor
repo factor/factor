@@ -9,13 +9,10 @@ quotations promises combinators io ;
 IN: lazy-lists
 
 ! Lazy List Protocol
+MIXIN: list
 GENERIC: car   ( cons -- car )
 GENERIC: cdr   ( cons -- cdr )
 GENERIC: nil?  ( cons -- ? )
-GENERIC: list? ( object -- ? )
-
-M: object list? ( object -- bool )
-  drop f ;
 
 M: promise car ( promise -- car )
   force car ;
@@ -25,9 +22,6 @@ M: promise cdr ( promise -- cdr )
 
 M: promise nil? ( cons -- bool )
   force nil? ;
-
-M: promise list? ( object -- bool )
-  drop t ;
 
 TUPLE: cons car cdr ;
 
@@ -44,9 +38,6 @@ M: cons cdr ( cons -- cdr )
 
 M: cons nil? ( cons -- bool )
     nil eq? ;
-
-M: cons list? ( object -- bool )
-  drop t ;
 
 : 1list ( obj -- cons )
     nil cons ;
@@ -73,9 +64,6 @@ M: lazy-cons cdr ( lazy-cons -- cdr )
 
 M: lazy-cons nil? ( lazy-cons -- bool )
     nil eq? ;
-
-M: lazy-cons list? ( object -- bool )
-  drop t ;
 
 : 1lazy-list ( a -- lazy-cons )
   [ nil ] lazy-cons ;
@@ -138,9 +126,6 @@ M: memoized-cons nil? ( memoized-cons -- bool )
     memoized-cons-nil?
   ] if ;
 
-M: memoized-cons list? ( object -- bool )
-  drop t ;
-
 TUPLE: lazy-map cons quot ;
 
 C: <lazy-map> lazy-map
@@ -159,31 +144,8 @@ M: lazy-map cdr ( lazy-map -- cdr )
 M: lazy-map nil? ( lazy-map -- bool )
   lazy-map-cons nil? ;
 
-M: lazy-map list? ( object -- bool )
-  drop t ;
-
-TUPLE: lazy-map-with value cons quot ;
-
-C: <lazy-map-with> lazy-map-with
-
 : lmap-with ( value list quot -- result )
-  over nil? [ 3drop nil ] [ <lazy-map-with> <memoized-cons> ] if ;
-
-M: lazy-map-with car ( lazy-map-with -- car )
-  [ lazy-map-with-value ] keep
-  [ lazy-map-with-cons car ] keep
-  lazy-map-with-quot call ;
-
-M: lazy-map-with cdr ( lazy-map-with -- cdr )
-  [ lazy-map-with-value ] keep
-  [ lazy-map-with-cons cdr ] keep
-  lazy-map-with-quot lmap-with ;
-
-M: lazy-map-with nil? ( lazy-map-with -- bool )
-  lazy-map-with-cons nil? ;
-
-M: lazy-map-with list? ( object -- bool )
-  drop t ;
+  with lmap ;
 
 TUPLE: lazy-take n cons ;
 
@@ -206,9 +168,6 @@ M: lazy-take nil? ( lazy-take -- bool )
     lazy-take-cons nil?
   ] if ;
 
-M: lazy-take list? ( object -- bool )
-  drop t ;
-
 TUPLE: lazy-until cons quot ;
 
 C: <lazy-until> lazy-until
@@ -226,9 +185,6 @@ M: lazy-until cdr ( lazy-until -- cdr )
 M: lazy-until nil? ( lazy-until -- bool )
    drop f ;
 
-M: lazy-until list? ( lazy-until -- bool )
-   drop t ;
-
 TUPLE: lazy-while cons quot ;
 
 C: <lazy-while> lazy-while
@@ -244,9 +200,6 @@ M: lazy-while cdr ( lazy-while -- cdr )
 
 M: lazy-while nil? ( lazy-while -- bool )
    [ car ] keep lazy-while-quot call not ;
-
-M: lazy-while list? ( lazy-while -- bool )
-   drop t ;
 
 TUPLE: lazy-subset cons quot ;
 
@@ -285,9 +238,6 @@ M: lazy-subset nil? ( lazy-subset -- bool )
     ] if
   ] if ;
 
-M: lazy-subset list? ( object -- bool )
-  drop t ;
-
 : list>vector ( list -- vector )
   [ [ , ] leach ] V{ } make ;
 
@@ -311,9 +261,6 @@ M: lazy-append cdr ( lazy-append -- cdr )
 M: lazy-append nil? ( lazy-append -- bool )
    drop f ;
 
-M: lazy-append list? ( object -- bool )
-  drop t ;
-
 TUPLE: lazy-from-by n quot ;
 
 C: lfrom-by lazy-from-by ( n quot -- list )
@@ -331,9 +278,6 @@ M: lazy-from-by cdr ( lazy-from-by -- cdr )
 M: lazy-from-by nil? ( lazy-from-by -- bool )
   drop f ;
 
-M: lazy-from-by list? ( object -- bool )
-  drop t ;
-
 TUPLE: lazy-zip list1 list2 ;
 
 C: <lazy-zip> lazy-zip
@@ -350,9 +294,6 @@ M: lazy-zip cdr ( lazy-zip -- cdr )
 
 M: lazy-zip nil? ( lazy-zip -- bool )
     drop f ;
-
-M: lazy-zip list? ( object -- bool )
-  drop t ;
 
 TUPLE: sequence-cons index seq ;
 
@@ -375,9 +316,6 @@ M: sequence-cons cdr ( sequence-cons -- cdr )
 
 M: sequence-cons nil? ( sequence-cons -- bool )
     drop f ;
-
-M: sequence-cons list? ( object -- bool )
-  drop t ;
 
 : >list ( object -- list )
   {
@@ -418,9 +356,6 @@ M: lazy-concat nil? ( lazy-concat -- bool )
   ] [
     drop f
   ] if ;
-
-M: lazy-concat list? ( object -- bool )
-  drop t ;
 
 : lcartesian-product ( list1 list2 -- result )
   swap [ swap [ 2array ] lmap-with ] lmap-with lconcat ;
@@ -492,3 +427,19 @@ M: lazy-io cdr ( lazy-io -- cdr )
 
 M: lazy-io nil? ( lazy-io -- bool )
   car not ;
+
+INSTANCE: cons list
+INSTANCE: sequence-cons list
+INSTANCE: memoized-cons list
+INSTANCE: promise list
+INSTANCE: lazy-io list
+INSTANCE: lazy-concat list
+INSTANCE: lazy-cons list
+INSTANCE: lazy-map list
+INSTANCE: lazy-take list
+INSTANCE: lazy-append list
+INSTANCE: lazy-from-by list
+INSTANCE: lazy-zip list
+INSTANCE: lazy-while list
+INSTANCE: lazy-until list
+INSTANCE: lazy-subset list

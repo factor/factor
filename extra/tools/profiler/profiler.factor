@@ -3,7 +3,7 @@
 USING: words sequences math prettyprint kernel arrays io
 io.styles namespaces assocs kernel.private strings combinators
 sorting math.parser vocabs definitions tools.profiler.private
-continuations ;
+continuations generic ;
 IN: tools.profiler
 
 : profile ( quot -- )
@@ -27,6 +27,10 @@ C: <vocab-profile> vocab-profile
 
 M: string (profile.)
     dup <vocab-profile> write-object ;
+
+M: method-body (profile.)
+    dup synopsis swap "method-generic" word-prop
+    <usage-profile> write-object ;
 
 : counter. ( obj n -- )
     [
@@ -59,5 +63,11 @@ M: string (profile.)
 : vocabs-profile. ( -- )
     "Call counts for all vocabularies:" print
     vocabs [
-        dup words [ profile-counter ] map sum
+        dup words
+        [ "predicating" word-prop not ] subset
+        [ profile-counter ] map sum
     ] { } map>assoc counters. ;
+
+: method-profile. ( -- )
+    all-words [ subwords ] map concat
+    counters counters. ;

@@ -1,43 +1,47 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: serialize sequences concurrency io io.server qualified
-threads arrays namespaces kernel ;
+USING: serialize sequences concurrency.messaging
+threads io io.server qualified arrays
+namespaces kernel io.encodings.binary combinators.cleave
+new-slots accessors ;
 QUALIFIED: io.sockets
 IN: concurrency.distributed
 
-TUPLE: node hostname port ;
-
-C: <node> node
+SYMBOL: local-node
 
 : handle-node-client ( -- )
-    deserialize first2 get-process send ;
+    deserialize
+    [ first2 get-process send ]
+    [ stop-server ] if* ;
 
-: node-server ( port -- )
-    internet-server
-    "concurrency.distributed"
-    [ handle-node-client ] with-server ;
+: (start-node) ( addrspecs addrspec -- )
+    local-node set-global
+    [
+        "concurrency.distributed"
+        binary
+        [ handle-node-client ] with-server
+    ] curry "Distributed concurrency server" spawn drop ;
 
-: send-to-node ( msg pid  host port -- )
-    io.sockets:<inet> io.sockets:<client> [
-        2array serialize
-    ] with-stream ;
+: start-node ( port -- )
+    [ internet-server ]
+    [ io.sockets:host-name swap io.sockets:<inet> ] bi
+    (start-node) ;
 
-: localnode ( -- node )
-    \ localnode get ;
-
-: start-node ( hostname port -- )
-    [ node-server ] in-thread
-    <node> \ localnode set-global ;
-
-TUPLE: remote-process node pid ;
+TUPLE: remote-process id node ;
 
 C: <remote-process> remote-process
 
-M: remote-process send ( message process -- )
-    #! Send the message via the inter-node protocol
-    { remote-process-pid remote-process-node } get-slots
-    { node-hostname node-port } get-slots
-    send-to-node ;
+: send-remote-message ( message node -- )
+    binary io.sockets:<client>
+    [ serialize ] with-stream ;
 
-M: process (serialize) ( obj -- )
-    localnode swap process-pid <remote-process> (serialize) ;
+M: remote-process send ( message thread -- )
+    [ id>> 2array ] [ node>> ] bi
+    send-remote-message ;
+
+M: thread (serialize) ( obj -- )
+    thread-id local-node get-global <remote-process>
+    (serialize) ;
+
+: stop-node ( node -- )
+    f swap send-remote-message ;

@@ -68,7 +68,7 @@ SYMBOL: bootstrapping?
 : crossref? ( word -- ? )
     {
         { [ dup "forgotten" word-prop ] [ f ] }
-        { [ dup "method" word-prop ] [ t ] }
+        { [ dup "method-generic" word-prop ] [ t ] }
         { [ dup word-vocabulary ] [ t ] }
         { [ t ] [ f ] }
     } cond nip ;
@@ -111,11 +111,19 @@ compiled-crossref global [ H{ } assoc-like ] change-at
     dup compiled-unxref
     compiled-crossref get delete-at ;
 
+SYMBOL: +inlined+
+SYMBOL: +called+
+
 : compiled-usage ( word -- assoc )
     compiled-crossref get at ;
 
+: compiled-usages ( words -- seq )
+    [ [ dup ] H{ } map>assoc dup ] keep [
+        compiled-usage [ nip +inlined+ eq? ] assoc-subset update
+    ] with each keys ;
+
 M: word redefined* ( word -- )
-    { "inferred-effect" "base-case" "no-effect" } reset-props ;
+    { "inferred-effect" "no-effect" } reset-props ;
 
 SYMBOL: changed-words
 
@@ -161,7 +169,12 @@ SYMBOL: changed-words
         "declared-effect" "constructor-quot" "delimiter"
     } reset-props ;
 
+GENERIC: subwords ( word -- seq )
+
+M: word subwords drop f ;
+
 : reset-generic ( word -- )
+    dup subwords [ forget ] each
     dup reset-word
     { "methods" "combination" "default-method" } reset-props ;
 
@@ -172,7 +185,9 @@ SYMBOL: changed-words
     gensym dup rot define ;
 
 : reveal ( word -- )
-    dup word-name over word-vocabulary vocab-words set-at ;
+    dup word-name over word-vocabulary dup vocab-words
+    [ ] [ no-vocab ] ?if
+    set-at ;
 
 TUPLE: check-create name vocab ;
 

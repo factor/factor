@@ -445,6 +445,18 @@ C-STRUCT: WIN32_FIND_DATA
     { { "TCHAR" 260 } "cFileName" }
     { { "TCHAR" 14 } "cAlternateFileName" } ;
 
+C-STRUCT: BY_HANDLE_FILE_INFORMATION
+    { "DWORD" "dwFileAttributes" }
+    { "FILETIME" "ftCreationTime" }
+    { "FILETIME" "ftLastAccessTime" }
+    { "FILETIME" "ftLastWriteTime" }
+    { "DWORD" "dwVolumeSerialNumber" }
+    { "DWORD" "nFileSizeHigh" }
+    { "DWORD" "nFileSizeLow" }
+    { "DWORD" "nNumberOfLinks" }
+    { "DWORD" "nFileIndexHigh" }
+    { "DWORD" "nFileIndexLow" } ;
+
 TYPEDEF: WIN32_FIND_DATA* PWIN32_FIND_DATA
 TYPEDEF: WIN32_FIND_DATA* LPWIN32_FIND_DATA
 TYPEDEF: void* POVERLAPPED
@@ -895,7 +907,7 @@ FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
 FUNCTION: BOOL GetCurrentDirectoryW ( DWORD len, LPTSTR buf ) ;
 : GetCurrentDirectory GetCurrentDirectoryW ; inline
 FUNCTION: HANDLE GetCurrentProcess ( ) ;
-! FUNCTION: GetCurrentProcessId
+FUNCTION: DWORD GetCurrentProcessId ( ) ;
 FUNCTION: HANDLE GetCurrentThread ( ) ;
 ! FUNCTION: GetCurrentThreadId
 ! FUNCTION: GetDateFormatA

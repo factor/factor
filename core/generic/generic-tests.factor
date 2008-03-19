@@ -3,7 +3,7 @@ generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
 quotations classes continuations layouts classes.union sorting
 compiler.units ;
-IN: temporary
+IN: generic.tests
 
 GENERIC: foobar ( x -- y )
 M: object foobar drop "Hello world" ;
@@ -87,11 +87,11 @@ M: number union-containment drop 2 ;
 [ 2 ] [ 1.0 union-containment ] unit-test
 
 ! Testing recovery from bad method definitions
-"IN: temporary GENERIC: unhappy ( x -- x )" eval
+"IN: generic.tests GENERIC: unhappy ( x -- x )" eval
 [
-    "IN: temporary M: dictionary unhappy ;" eval
+    "IN: generic.tests M: dictionary unhappy ;" eval
 ] must-fail
-[ ] [ "IN: temporary GENERIC: unhappy ( x -- x )" eval ] unit-test
+[ ] [ "IN: generic.tests GENERIC: unhappy ( x -- x )" eval ] unit-test
 
 GENERIC# complex-combination 1 ( a b -- c )
 M: string complex-combination drop ;
@@ -192,12 +192,12 @@ SYMBOL: redefinition-test-generic
 
 TUPLE: redefinition-test-tuple ;
 
-"IN: temporary M: redefinition-test-tuple redefinition-test-generic ;" eval
+"IN: generic.tests M: redefinition-test-tuple redefinition-test-generic ;" eval
 
 [ t ] [
     [
         redefinition-test-generic ,
-        "IN: temporary TUPLE: redefinition-test-tuple ;" eval
+        "IN: generic.tests TUPLE: redefinition-test-tuple ;" eval
         redefinition-test-generic ,
     ] { } make all-equal?
 ] unit-test
@@ -238,3 +238,31 @@ M: sequence generic-forget-test-2 = ;
     \ = usage [ word? ] subset
     [ word-name "generic-forget-test-2/sequence" = ] contains?
 ] unit-test
+
+GENERIC: generic-forget-test-3
+
+M: f generic-forget-test-3 ;
+
+[ ] [ \ f \ generic-forget-test-3 method "m" set ] unit-test
+
+[ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
+
+[ ] [ "IN: generic.tests M: f generic-forget-test-3 ;" eval ] unit-test
+
+[ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
+
+[ f ] [ f generic-forget-test-3 ] unit-test
+
+: a-word ;
+
+GENERIC: a-generic
+
+M: integer a-generic a-word ;
+
+[ ] [ \ integer \ a-generic method "m" set ] unit-test
+
+[ t ] [ "m" get \ a-word usage memq? ] unit-test
+
+[ ] [ "IN: generic.tests : a-generic ;" eval ] unit-test
+
+[ f ] [ "m" get \ a-word usage memq? ] unit-test

@@ -9,11 +9,13 @@ USING: alien alien.syntax combinators kernel system ;
 
 IN: openssl.libcrypto
 
+<<
 "libcrypto" {
-    { [ win32? ] [ "libeay32.dll" "stdcall" ] }
+    { [ win32? ]  [ "libeay32.dll" "cdecl" ] }
     { [ macosx? ] [ "libcrypto.dylib" "cdecl" ] }
-    { [ unix? ] [ "$LD_LIBRARY_PATH/libcrypto.so" "cdecl" ] }
+    { [ unix? ]   [ "libcrypto.so" "cdecl" ] }
 } cond add-library
+>>
 
 C-STRUCT: bio-method
     { "int" "type" }

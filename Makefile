@@ -45,8 +45,11 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 
-default:
-	@echo "Run 'make' with one of the following parameters:"
+default: misc/wordsize
+	$(MAKE) `./misc/target`
+
+help:
+	@echo "Run '$(MAKE)' with one of the following parameters:"
 	@echo ""
 	@echo "freebsd-x86-32"
 	@echo "freebsd-x86-64"
@@ -142,7 +145,8 @@ wince-arm:
 
 macosx.app: factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
-	cp $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
+	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
+	ln -s Factor.app/Contents/MacOS/factor ./factor
 	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks
 
 	install_name_tool \
@@ -157,6 +161,9 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
+
+misc/wordsize: misc/wordsize.c
+	gcc misc/wordsize.c -o misc/wordsize
 
 clean:
 	rm -f vm/*.o

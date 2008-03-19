@@ -1,25 +1,18 @@
-USING: help.markup help.syntax concurrency ;
+USING: help.markup help.syntax concurrency.messaging threads ;
 IN: concurrency.distributed
 
-HELP: <remote-process>
-{ $values { "node" "a node object" } 
-          { "pid" "a process id" } 
-          { "remote-process" "the constructed remote-process object" } 
-}
-{ $description "Constructs a proxy to a process running on another node. It can be used to send messages to the process it is acting as a proxy for." } 
-{ $see-also <node> <process> spawn send } ;
+HELP: local-node
+{ $var-description "A variable containing the node the current thread is running on." } ;
 
+HELP: start-node
+{ $values { "port" "a port number between 0 and 65535" } }
+{ $description "Starts a node server for receiving messages from remote Factor instances." } ;
 
-HELP: <node> 
-{ $values { "hostname" "the hostname of the node as a string" } 
-          { "port" "the integer port number of the node" } 
-          { "node" "the constructed node object" } 
-}
-{ $description "Processes run on nodes. Each node has a hostname and a port." } 
-{ $see-also localnode } ;
+ARTICLE: "concurrency.distributed" "Distributed message passing"
+"The " { $vocab-link "concurrency.distributed" } " implements transparent distributed message passing."
+{ $subsection start-node }
+"Instances of " { $link thread } " can be sent to remote processes, at which point they are converted to objects holding the thread ID and the current node's host name:"
+{ $subsection remote-process }
+"The " { $vocab-link "serialize" } " vocabulary is used to convert Factor objects to byte arrays for transfer over a socket." ;
 
-HELP: localnode
-{ $values { "node" "a node object" } 
-}
-{ $description "Return the node the process is currently running on." } 
-{ $see-also <node> } ;
+ABOUT: "concurrency.distributed"

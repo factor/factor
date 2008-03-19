@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien io kernel namespaces core-foundation cocoa.messages
-cocoa cocoa.classes cocoa.runtime sequences threads debugger
-init inspector kernel.private ;
+cocoa cocoa.classes cocoa.runtime sequences threads
+debugger init inspector kernel.private ;
 IN: cocoa.application
 
 : <NSString> ( str -- alien ) <CFString> -> autorelease ;

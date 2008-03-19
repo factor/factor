@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generator generator.registers generator.fixup
 hashtables kernel math namespaces sequences words
@@ -6,7 +6,7 @@ inference.state inference.backend inference.dataflow system
 math.parser classes alien.arrays alien.c-types alien.structs
 alien.syntax cpu.architecture alien inspector quotations assocs
 kernel.private threads continuations.private libc combinators
-compiler.errors continuations ;
+compiler.errors continuations layouts ;
 IN: alien.compiler
 
 ! Common protocol for alien-invoke/alien-callback/alien-indirect
@@ -213,30 +213,37 @@ TUPLE: no-such-library name ;
 M: no-such-library summary
     drop "Library not found" ;
 
+M: no-such-library compiler-error-type
+    drop +linkage+ ;
+
 : no-such-library ( name -- )
-    \ no-such-library +linkage+ (inference-error) ;
+    \ no-such-library construct-boa
+    compiling-word get compiler-error ;
 
-: (alien-invoke-dlsym) ( node -- symbol dll )
-    dup alien-invoke-function
-    swap alien-invoke-library [
-        load-library
-    ] [
-        2drop no-such-library
-    ] recover ;
-
-TUPLE: no-such-symbol ;
+TUPLE: no-such-symbol name ;
 
 M: no-such-symbol summary
     drop "Symbol not found" ;
 
-: no-such-symbol ( -- )
-    \ no-such-symbol +linkage+ (inference-error) ;
+M: no-such-symbol compiler-error-type
+    drop +linkage+ ;
 
-: alien-invoke-dlsym ( node -- symbol dll )
-    dup (alien-invoke-dlsym) 2dup dlsym [
-        >r over stdcall-mangle r> 2dup dlsym
-        [ no-such-symbol ] unless
-    ] unless rot drop ;
+: no-such-symbol ( name -- )
+    \ no-such-symbol construct-boa
+    compiling-word get compiler-error ;
+
+: check-dlsym ( symbols dll -- )
+    dup dll-valid? [
+        dupd [ dlsym ] curry contains?
+        [ drop ] [ no-such-symbol ] if
+    ] [
+        dll-path no-such-library drop
+    ] if ;
+
+: alien-invoke-dlsym ( node -- symbols dll )
+    dup alien-invoke-function dup pick stdcall-mangle 2array
+    swap alien-invoke-library library dup [ library-dll ] when
+    2dup check-dlsym ;
 
 \ alien-invoke [
     ! Four literals
@@ -247,8 +254,6 @@ M: no-such-symbol summary
     pop-literal nip over set-alien-invoke-function
     pop-literal nip over set-alien-invoke-library
     pop-literal nip over set-alien-invoke-return
-    ! If symbol doesn't resolve, no stack effect, no compile
-    dup alien-invoke-dlsym 2drop
     ! Quotation which coerces parameters to required types
     dup make-prep-quot recursive-state get infer-quot
     ! Add node to IR
@@ -326,7 +331,7 @@ M: alien-callback-error summary
     drop "Words calling ``alien-callback'' must be compiled with the optimizing compiler." ;
 
 : callback-bottom ( node -- )
-    alien-callback-xt [ word-xt <alien> ] curry
+    alien-callback-xt [ word-xt drop <alien> ] curry
     recursive-state get infer-quot ;
 
 \ alien-callback [
@@ -362,7 +367,7 @@ TUPLE: callback-context ;
     ] if ;
 
 : do-callback ( quot token -- )
-    init-error-handler
+    init-catchstack
     dup 2 setenv
     slip
     wait-to-return ; inline
@@ -398,7 +403,7 @@ TUPLE: callback-context ;
     callback-unwind %unwind ;
 
 : generate-callback ( node -- )
-    dup alien-callback-xt dup rot [
+    dup alien-callback-xt dup [
         init-templates
         %save-word-xt
         %prologue-later
@@ -407,7 +412,7 @@ TUPLE: callback-context ;
             dup wrap-callback-quot %alien-callback
             %callback-return
         ] with-stack-frame
-    ] generate-1 ;
+    ] with-generator ;
 
 M: alien-callback generate-node
     end-basic-block generate-callback iterate-next ;

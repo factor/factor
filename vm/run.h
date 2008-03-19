@@ -1,4 +1,4 @@
-#define USER_ENV 40
+#define USER_ENV 64
 
 typedef enum {
 	NAMESTACK_ENV,            /* used by library only */
@@ -54,10 +54,17 @@ typedef enum {
 
 	STDERR_ENV          = 38, /* stderr FILE* handle */
 
-	STAGE2_ENV          = 39  /* have we bootstrapped? */
+	STAGE2_ENV          = 39, /* have we bootstrapped? */
+
+	CURRENT_THREAD_ENV  = 40,
+
+	THREADS_ENV         = 41,
+	RUN_QUEUE_ENV       = 42,
+	SLEEP_QUEUE_ENV     = 43,
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV
+#define LAST_SAVE_ENV STAGE2_ENV
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
@@ -242,6 +249,7 @@ DECLARE_PRIMITIVE(setenv);
 DECLARE_PRIMITIVE(exit);
 DECLARE_PRIMITIVE(os_env);
 DECLARE_PRIMITIVE(os_envs);
+DECLARE_PRIMITIVE(set_os_envs);
 DECLARE_PRIMITIVE(eq);
 DECLARE_PRIMITIVE(millis);
 DECLARE_PRIMITIVE(sleep);

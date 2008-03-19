@@ -20,7 +20,7 @@ HELP: object-slots
 HELP: mirror
 { $class-description "An associative structure which wraps an object and presents itself as a mapping from slot names to the object's slot values. Mirrors are used to build reflective developer tools."
 $nl
-"Mirrors are mutable, however new keys cannot be inserted and keys cannot be deleted, only values of existing keys can be changed."
+"Mirrors are mutable, however new keys cannot be inserted, only values of existing keys can be changed. Deleting a key has the effect of setting its value to " { $link f } "."
 $nl
 "Mirrors are created by calling " { $link <mirror> } " or " { $link make-mirror } "." } ;
 
@@ -29,11 +29,11 @@ HELP: <mirror>
 { $description "Creates a " { $link mirror } " reflecting an object." }
 { $examples
     { $example
-        "USING: assocs mirrors ;"
+        "USING: assocs mirrors prettyprint ;"
         "TUPLE: circle center radius ;"
         "C: <circle> circle"
         "{ 100 50 } 15 <circle> <mirror> >alist ."
-        "{ { circle-center { 100 50 } } { circle-radius 15 } }"
+        "{ { \"center\" { 100 50 } } { \"radius\" 15 } }"
     }
 } ;
 
@@ -47,5 +47,5 @@ $nl
 "Enumerations are mutable; note that deleting a key calls " { $link delete-nth } ", which results in all subsequent elements being shifted down." } ;
 
 HELP: make-mirror
-{ $values { "obj" object } { "assoc" "an assoc" } }
+{ $values { "obj" object } { "assoc" assoc } }
 { $description "Creates an assoc which reflects the internal structure of the object." } ;

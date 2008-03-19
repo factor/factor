@@ -53,18 +53,11 @@ TUPLE: library path abi dll ;
 
 : library ( name -- library ) libraries get at ;
 
-: <library> ( path abi -- library ) f \ library construct-boa ;
+: <library> ( path abi -- library )
+    over dup [ dlopen ] when \ library construct-boa ;
 
 : load-library ( name -- dll )
-    library dup [
-        dup library-dll [ ] [
-            dup library-path dup [
-                dlopen dup rot set-library-dll
-            ] [
-                2drop f
-            ] if
-        ] ?if
-    ] when ;
+    library dup [ library-dll ] when ;
 
 : add-library ( name path abi -- )
     <library> swap libraries get set-at ;

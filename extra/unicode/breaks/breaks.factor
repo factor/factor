@@ -1,7 +1,7 @@
 USING: unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
 combinators.lib assocs.lib math.ranges unicode.normalize
-unicode.syntax unicode.data compiler.units alien.syntax const ;
+unicode.syntax unicode.data compiler.units alien.syntax io.encodings.ascii ;
 IN: unicode.breaks
 
 C-ENUM: Any L V T Extend Control CR LF graphemes ;
@@ -30,7 +30,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
     concat >set ;
 
 : other-extend-lines ( -- lines )
-    "extra/unicode/PropList.txt" resource-path file-lines ;
+    "extra/unicode/PropList.txt" resource-path ascii file-lines ;
 
 VALUE: other-extend
 

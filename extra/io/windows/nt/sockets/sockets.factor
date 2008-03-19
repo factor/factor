@@ -45,13 +45,12 @@ TUPLE: ConnectEx-args port
     "stdcall" alien-indirect drop
     winsock-error-string [ throw ] when* ;
 
-: connect-continuation ( ConnectEx -- )
-    dup ConnectEx-args-lpOverlapped*
-    swap ConnectEx-args-port duplex-stream-in
-    [ save-callback ] 2keep
+: connect-continuation ( ConnectEx port -- )
+    >r ConnectEx-args-lpOverlapped* r>
+    2dup save-callback
     get-overlapped-result drop ;
 
-M: windows-nt-io (client) ( addrspec -- duplex-stream )
+M: windows-nt-io (client) ( addrspec -- client-in client-out )
     [
         \ ConnectEx-args construct-empty
         over make-sockaddr/size pick init-connect
@@ -61,13 +60,8 @@ M: windows-nt-io (client) ( addrspec -- duplex-stream )
         dup ConnectEx-args-s* INADDR_ANY roll bind-socket
         dup (ConnectEx)
 
-        dup ConnectEx-args-s* <win32-socket> dup handle>duplex-stream
-        over set-ConnectEx-args-port
-
-        dup connect-continuation
-        ConnectEx-args-port
-        [ duplex-stream-in pending-error ] keep
-        [ duplex-stream-out pending-error ] keep
+        dup ConnectEx-args-s* <win32-socket> dup <reader&writer>
+        >r [ connect-continuation ] keep [ pending-error ] keep r>
     ] with-destructors ;
 
 TUPLE: AcceptEx-args port
@@ -91,7 +85,7 @@ TUPLE: AcceptEx-args port
     f over set-AcceptEx-args-lpdwBytesReceived*
     (make-overlapped) swap set-AcceptEx-args-lpOverlapped* ;
 
-: (accept) ( AcceptEx -- )
+: ((accept)) ( AcceptEx -- )
     \ AcceptEx-args >tuple*<
     AcceptEx drop
     winsock-error-string [ throw ] when* ;
@@ -117,38 +111,31 @@ TUPLE: AcceptEx-args port
         ] keep *void*
     ] keep AcceptEx-args-port server-port-addr parse-sockaddr ;
 
-: accept-continuation ( AcceptEx -- client )
+: accept-continuation ( AcceptEx -- addrspec client )
     [ make-accept-continuation ] keep
     [ check-accept-error ] keep
     [ extract-remote-host ] keep
     ! addrspec AcceptEx
-    [
-        AcceptEx-args-sAcceptSocket* add-completion
-    ] keep
-    AcceptEx-args-sAcceptSocket* <win32-socket> dup handle>duplex-stream
-    <client-stream> ;
+    [ AcceptEx-args-sAcceptSocket* add-completion ] keep
+    AcceptEx-args-sAcceptSocket* <win32-socket> ;
 
-M: windows-nt-io accept ( server -- client )
+M: windows-nt-io (accept) ( server -- addrspec handle )
     [
         [
             dup check-server-port
             \ AcceptEx-args construct-empty
             [ init-accept ] keep
-            [ (accept) ] keep
+            [ ((accept)) ] keep
             [ accept-continuation ] keep
             AcceptEx-args-port pending-error
-            dup duplex-stream-in pending-error
-            dup duplex-stream-out pending-error
         ] with-timeout
     ] with-destructors ;
 
-M: windows-nt-io <server> ( addrspec -- server )
+M: windows-nt-io (server) ( addrspec -- handle )
     [
-        [
-            SOCK_STREAM server-fd dup listen-on-socket
-            dup add-completion
-            <win32-socket>
-        ] keep <server-port>
+        SOCK_STREAM server-fd dup listen-on-socket
+        dup add-completion
+        <win32-socket>
     ] with-destructors ;
 
 M: windows-nt-io <datagram> ( addrspec -- datagram )

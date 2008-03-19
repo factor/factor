@@ -22,41 +22,42 @@ HELP: compiled
 { $var-description "During compilation, holds a hashtable mapping words to 5-element arrays holding compiled code." } ;
 
 HELP: compiling-word
-{ $var-description "The word currently being compiled, set by " { $link generate-1 } "." } ;
+{ $var-description "The word currently being compiled, set by " { $link with-generator } "." } ;
 
 HELP: compiling-label
-{ $var-description "The label currently being compiled, set by " { $link generate-1 } "." } ;
+{ $var-description "The label currently being compiled, set by " { $link with-generator } "." } ;
 
 HELP: compiled-stack-traces?
 { $values { "?" "a boolean" } }
 { $description "Iftrue, compiled code blocks will retain what word they were compiled from. This information is used by " { $link :c } " to display call stack traces after an error is thrown from compiled code. This is on by default; the deployment tool switches it off to save some space in the deployed image." } ;
 
 HELP: literal-table
-{ $var-description "Holds a vector of literal objects referenced from the currently compiling word. If " { $link compiled-stack-traces? } " is on, " { $link init-generator } " ensures that the first entry is the word being compiled." } ;
+{ $var-description "Holds a vector of literal objects referenced from the currently compiling word. If " { $link compiled-stack-traces? } " is on, " { $link begin-compiling } " ensures that the first entry is the word being compiled." } ;
 
-HELP: init-generator
+HELP: begin-compiling
+{ $values { "word" word } { "label" word } }
 { $description "Prepares to generate machine code for a word." } ;
 
-HELP: generate-1
-{ $values { "word" word } { "label" word } { "node" "a dataflow node" } { "quot" "a quotation with stack effect " { $snippet "( node -- )" } } }
+HELP: with-generator
+{ $values { "node" "a dataflow node" } { "word" word } { "label" word } { "quot" "a quotation with stack effect " { $snippet "( node -- )" } } }
 { $description "Generates machine code for " { $snippet "label" } " by applying the quotation to the dataflow node." } ;
 
 HELP: generate-node
 { $values { "node" "a dataflow node" } { "next" "a dataflow node" } }
 { $contract "Generates machine code for a dataflow node, and outputs the next node to generate machine code for." }
-{ $notes "This word can only be called from inside the quotation passed to " { $link generate-1 } "." } ;
+{ $notes "This word can only be called from inside the quotation passed to " { $link with-generator } "." } ;
 
 HELP: generate-nodes
 { $values { "node" "a dataflow node" } } 
 { $description "Recursively generate machine code for a dataflow graph." }
-{ $notes "This word can only be called from inside the quotation passed to " { $link generate-1 } "." } ;
+{ $notes "This word can only be called from inside the quotation passed to " { $link with-generator } "." } ;
 
 HELP: generate
 { $values { "word" word } { "label" word } { "node" "a dataflow node" } }
 { $description "Generates machine code for " { $snippet "label" } " from " { $snippet "node" } ". The value of " { $snippet "word" } " is retained for debugging purposes; it is the word which will appear in a call stack trace if this compiled code block throws an error when run." } ;
 
 HELP: word-dataflow
-{ $values { "word" word } { "effect" effect } { "dependencies" sequence } { "dataflow" "a dataflow graph" } }
+{ $values { "word" word } { "effect" effect } { "dataflow" "a dataflow graph" } }
 { $description "Outputs the dataflow graph of a word, taking specializers into account (see " { $link "specializers" } ")." } ;
 
 HELP: define-intrinsics

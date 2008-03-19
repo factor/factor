@@ -33,7 +33,7 @@ DLLEXPORT F_CHAR *error_message(DWORD id);
 void windows_error(void);
 
 void init_ffi(void);
-void ffi_dlopen(F_DLL *dll, bool error);
+void ffi_dlopen(F_DLL *dll);
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);
 void ffi_dlclose(F_DLL *dll);
 

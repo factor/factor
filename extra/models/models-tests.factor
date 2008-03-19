@@ -1,4 +1,4 @@
-IN: temporary
+IN: models.tests
 USING: arrays generic kernel math models namespaces sequences assocs
 tools.test ;
 

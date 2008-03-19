@@ -3,22 +3,18 @@
 USING: kernel io.backend io.monitors io.monitors.private
 io.files io.buffers io.nonblocking io.timeouts io.unix.backend
 io.unix.select io.unix.launcher unix.linux.inotify assocs
-namespaces threads continuations init math alien.c-types alien
-vocabs.loader ;
+namespaces threads continuations init math
+alien.c-types alien vocabs.loader ;
 IN: io.unix.linux
 
 TUPLE: linux-io ;
 
 INSTANCE: linux-io unix-io
 
-TUPLE: linux-monitor path wd callback ;
+TUPLE: linux-monitor ;
 
-: <linux-monitor> ( path wd -- monitor )
-    f (monitor) {
-        set-linux-monitor-path
-        set-linux-monitor-wd
-        set-delegate
-    } linux-monitor construct ;
+: <linux-monitor> ( wd -- monitor )
+    linux-monitor construct-simple-monitor ;
 
 TUPLE: inotify watches ;
 
@@ -26,10 +22,12 @@ TUPLE: inotify watches ;
 
 : wd>monitor ( wd -- monitor ) watches at ;
 
-: <inotify> ( -- port )
+: <inotify> ( -- port/f )
     H{ } clone
-    inotify_init dup io-error inotify <buffered-port>
-    { set-inotify-watches set-delegate } inotify construct ;
+    inotify_init dup 0 < [ 2drop f ] [
+        inotify <buffered-port>
+        { set-inotify-watches set-delegate } inotify construct
+    ] if ;
 
 : inotify-fd inotify get-global port-handle ;
 
@@ -42,34 +40,24 @@ TUPLE: inotify watches ;
     ] when ;
 
 : add-watch ( path mask -- monitor )
-    dupd (add-watch)
-    dup check-existing
+    (add-watch) dup check-existing
     [ <linux-monitor> dup ] keep watches set-at ;
 
 : remove-watch ( monitor -- )
-    dup linux-monitor-wd watches delete-at
-    linux-monitor-wd inotify-fd swap inotify_rm_watch io-error ;
+    dup simple-monitor-handle watches delete-at
+    simple-monitor-handle inotify-fd swap inotify_rm_watch io-error ;
+
+: check-inotify
+    inotify get [
+        "inotify is not supported by this Linux release" throw
+    ] unless ;
 
 M: linux-io <monitor> ( path recursive? -- monitor )
+    check-inotify
     drop IN_CHANGE_EVENTS add-watch ;
 
-: notify-callback ( monitor -- )
-    dup linux-monitor-callback
-    f rot set-linux-monitor-callback
-    [ schedule-thread ] when* ;
-
-M: linux-io fill-queue ( monitor -- )
-    dup linux-monitor-callback [
-        "Cannot wait for changes on the same file from multiple threads" throw
-    ] when
-    [ swap set-linux-monitor-callback stop ] callcc0
-    check-monitor ;
-
 M: linux-monitor dispose ( monitor -- )
-    dup check-monitor
-    t over set-monitor-closed?
-    dup notify-callback
-    remove-watch ;
+    dup delegate dispose remove-watch ;
 
 : ?flag ( n mask symbol -- n )
     pick rot bitand 0 > [ , ] [ drop ] if ;
@@ -123,8 +111,7 @@ TUPLE: inotify-task ;
     f inotify-task <input-task> ;
 
 : init-inotify ( mx -- )
-    <inotify>
-    dup inotify set-global
+    <inotify> dup inotify set-global
     <inotify-task> swap register-io-task ;
 
 M: inotify-task do-io-task ( task -- )
@@ -136,5 +123,3 @@ M: linux-io init-io ( -- )
 T{ linux-io } set-io-backend
 
 [ start-wait-thread ] "io.unix.linux" add-init-hook
-
-"vocabs.monitor" require

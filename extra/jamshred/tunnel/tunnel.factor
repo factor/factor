@@ -1,3 +1,5 @@
+! Copyright (C) 2007 Alex Chapman
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays float-arrays kernel jamshred.oint math math.functions
 math.ranges math.vectors math.constants random sequences vectors ;
 IN: jamshred.tunnel

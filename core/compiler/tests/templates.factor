@@ -3,8 +3,8 @@ USING: arrays compiler kernel kernel.private math
 hashtables.private math.private namespaces sequences
 sequences.private tools.test namespaces.private slots.private
 sequences.private byte-arrays alien alien.accessors layouts
-words definitions compiler.units ;
-IN: temporary
+words definitions compiler.units io combinators ;
+IN: compiler.tests
 
 ! Oops!
 [ 5000 ] [ [ 5000 ] compile-call ] unit-test
@@ -190,4 +190,19 @@ TUPLE: my-tuple ;
 [ 2 1 ] [
     2 1
     [ 2dup fixnum< [ >r die r> ] when ] compile-call
+] unit-test
+
+! Regression
+: a-dummy drop "hi" print ;
+
+[ ] [
+    1 [
+        dup 0 2 3dup pick >= [ >= ] [ 2drop f ] if [
+            drop - >fixnum {
+                [ a-dummy ]
+                [ a-dummy ]
+                [ a-dummy ]
+            } dispatch
+        ] [ 2drop no-case ] if
+    ] compile-call
 ] unit-test

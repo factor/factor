@@ -15,3 +15,7 @@ factor
 .gdb_history
 *.*.marks
 .*.swp
+temp
+logs
+work
+misc/wordsize

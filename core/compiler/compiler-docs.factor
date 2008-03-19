@@ -1,18 +1,14 @@
 USING: generator help.markup help.syntax words io parser
-assocs words.private sequences ;
+assocs words.private sequences compiler.units ;
 IN: compiler
 
 ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 "Normally, new word definitions are recompiled automatically, however in some circumstances the optimizing compiler may need to be called directly."
 $nl
-"The main entry points to the optimizing compiler:"
-{ $subsection compile }
-{ $subsection recompile }
-{ $subsection recompile-all }
+"The main entry point to the optimizing compiler:"
+{ $subsection optimized-recompile-hook }
 "Removing a word's optimized definition:"
-{ $subsection decompile }
-"The optimizing compiler can also compile and call a single quotation:"
-{ $subsection compile-call } ;
+{ $subsection decompile } ;
 
 ARTICLE: "compiler" "Optimizing compiler"
 "Factor is a fully compiled language implementation with two distinct compilers:"
@@ -26,22 +22,6 @@ ARTICLE: "compiler" "Optimizing compiler"
 
 ABOUT: "compiler"
 
-HELP: compile
-{ $values { "seq" "a sequence of words" } }
-{ $description "Compiles a set of words. Ignores words which are already compiled." } ;
-
-HELP: recompile
-{ $values { "seq" "a sequence of words" } }
-{ $description "Compiles a set of words. Re-compiles words which are already compiled." } ;
-
-HELP: compile-call
-{ $values { "quot" "a quotation" } }
-{ $description "Compiles and runs a quotation." }
-{ $errors "Throws an error if the stack effect of the quotation cannot be inferred." } ;
-
-HELP: recompile-all
-{ $description "Recompiles all words." } ;
-
 HELP: decompile
 { $values { "word" word } }
 { $description "Removes a word's optimized definition. The word will be compiled with the non-optimizing compiler until recompiled with the optimizing compiler again." } ;
@@ -49,4 +29,9 @@ HELP: decompile
 HELP: (compile)
 { $values { "word" word } }
 { $description "Compile a single word." }
+{ $notes "This is an internal word, and user code should call " { $link compile } " instead." } ;
+
+HELP: optimized-recompile-hook
+{ $values { "words" "a sequence of words" } { "alist" "an association list" } }
+{ $description "Compile a set of words." }
 { $notes "This is an internal word, and user code should call " { $link compile } " instead." } ;

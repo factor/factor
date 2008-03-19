@@ -4,7 +4,7 @@ USING: namespaces arrays prettyprint sequences kernel
 vectors quotations words parser assocs combinators
 continuations debugger io io.files vocabs tools.time
 vocabs.loader source-files compiler.units inspector
-inference effects ;
+inference effects tools.vocabs ;
 IN: tools.test
 
 SYMBOL: failures
@@ -48,18 +48,10 @@ SYMBOL: this-test
 : must-fail ( quot -- )
     [ drop t ] must-fail-with ;
 
-: ignore-errors ( quot -- )
-    [ drop ] recover ; inline
-
 : (run-test) ( vocab -- )
     dup vocab-source-loaded? [
-        [ "temporary" forget-vocab ] with-compilation-unit
-        vocab-tests dup [ run-file ] each
-        [
-            dup [ forget-source ] each
-            "temporary" forget-vocab
-        ] with-compilation-unit
-    ] when drop ;
+        vocab-tests [ run-file ] each
+    ] [ drop ] if ;
 
 : run-test ( vocab -- failures )
     V{ } clone [

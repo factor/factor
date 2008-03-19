@@ -1,5 +1,5 @@
 USING: namespaces tools.test kernel command-line ;
-IN: temporary
+IN: command-line.tests
 
 [
     [ f ] [ "-no-user-init" cli-arg ] unit-test

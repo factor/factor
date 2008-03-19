@@ -3,7 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions mirrors
-arrays math.parser sorting strings ascii macros ;
+arrays math.parser math.private sorting strings ascii macros
+assocs.lib quotations ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -18,8 +19,10 @@ IN: sequences.lib
 
 : map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
 
-MACRO: nfirst ( n -- )
-    [ [ swap nth ] curry [ keep ] curry ] map concat [ drop ] compose ;
+MACRO: firstn ( n -- )
+    [ [ swap nth ] curry [ keep ] curry ] map
+    concat >quotation
+    [ drop ] compose ;
 
 : prepare-index ( seq quot -- seq n quot )
     >r dup length r> ; inline
@@ -139,13 +142,13 @@ PRIVATE>
 : strings ( alphabet length -- seqs )
     >r dup length r> number-strings map-alphabet ;
 
-: nths ( nths seq -- subseq )
-    ! nths is a sequence of ones and zeroes
+: switches ( seq1 seq -- subseq )
+    ! seq1 is a sequence of ones and zeroes
     >r [ length ] keep [ nth 1 = ] curry subset r>
     [ nth ] curry { } map-as ;
 
 : power-set ( seq -- subsets )
-    2 over length exact-number-strings swap [ nths ] curry map ;
+    2 over length exact-number-strings swap [ switches ] curry map ;
 
 : push-either ( elt quot accum1 accum2 -- )
     >r >r keep swap r> r> ? push ; inline
@@ -178,15 +181,47 @@ PRIVATE>
 : ?third ( seq -- third/f ) 2 swap ?nth ; inline
 : ?fourth ( seq -- fourth/f ) 3 swap ?nth ; inline
 
+: ?first2 ( seq -- 1st/f 2nd/f ) dup ?first swap ?second ; inline
+: ?first3 ( seq -- 1st/f 2nd/f 3rd/f ) dup ?first2 rot ?third ; inline
+: ?first4 ( seq -- 1st/f 2nd/f 3rd/f 4th/f ) dup ?first3 roll ?fourth ; inline
+
+USE: continuations
+: ?subseq ( from to seq -- subseq )
+    >r >r 0 max r> r>
+    [ length tuck min >r min r> ] keep subseq ;
+
+: ?head* ( seq n -- seq/f ) (head) ?subseq ;
+: ?tail* ( seq n -- seq/f ) (tail) ?subseq ;
+
 : accumulator ( quot -- quot vec )
-    V{ } clone [ [ push ] curry compose ] keep ;
+    V{ } clone [ [ push ] curry compose ] keep ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! List the positions of obj in seq
 
 : indices ( seq obj -- seq )
-    >r dup length swap r>
-    [ = [ ] [ drop f ] if ] curry
-    2map
-    [ ] subset ;
+  >r dup length swap r>
+  [ = [ ] [ drop f ] if ] curry
+  2map
+  [ ] subset ;
+
+<PRIVATE
+: (attempt-each-integer) ( i n quot -- result )
+    [
+        iterate-step roll
+        [ 3nip ] [ iterate-next (attempt-each-integer) ] if*
+    ] [ 3drop f ] if-iterate? ; inline
+PRIVATE>
+
+: attempt-each ( seq quot -- result )
+    (each) iterate-prep (attempt-each-integer) ; inline
+
+: ?nth* ( n seq -- elt/f ? )
+    2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; flushable
+
+: nths ( indices seq -- seq' )
+    [ swap nth ] with map ;
+
+: replace ( str oldseq newseq -- str' )
+    H{ } 2seq>assoc substitute ;

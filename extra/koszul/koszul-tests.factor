@@ -1,5 +1,6 @@
-USING: koszul tools.test kernel sequences assocs namespaces ;
-IN: temporary
+USING: koszul tools.test kernel sequences assocs namespaces
+symbols ;
+IN: koszul.tests
 
 [
     { V{ { } } V{ { 1 } } V{ { 2 3 } { 7 8 } } V{ { 4 5 6 } } }

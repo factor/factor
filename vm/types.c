@@ -70,11 +70,13 @@ DEFINE_PRIMITIVE(word)
 	dpush(tag_object(allot_word(vocab,name)));
 }
 
-/* word-xt ( word -- xt ) */
+/* word-xt ( word -- start end ) */
 DEFINE_PRIMITIVE(word_xt)
 {
-	F_WORD *word = untag_word(dpeek());
-	drepl(allot_cell((CELL)word->xt));
+	F_WORD *word = untag_word(dpop());
+	F_COMPILED *code = word->code;
+	dpush(allot_cell((CELL)code + sizeof(F_COMPILED)));
+	dpush(allot_cell((CELL)code + sizeof(F_COMPILED) + code->code_length));
 }
 
 DEFINE_PRIMITIVE(wrapper)

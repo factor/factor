@@ -3,7 +3,6 @@
 void *primitives[] = {
 	primitive_execute,
 	primitive_call,
-	primitive_uncurry,
 	primitive_bignum_to_fixnum,
 	primitive_float_to_fixnum,
 	primitive_fixnum_to_bignum,
@@ -163,6 +162,7 @@ void *primitives[] = {
 	primitive_fopen,
 	primitive_fgetc,
 	primitive_fread,
+	primitive_fputc,
 	primitive_fwrite,
 	primitive_fflush,
 	primitive_fclose,
@@ -178,7 +178,6 @@ void *primitives[] = {
 	primitive_become,
 	primitive_sleep,
 	primitive_float_array,
-	primitive_curry,
 	primitive_tuple_boa,
 	primitive_class_hash,
 	primitive_callstack_to_array,
@@ -187,7 +186,9 @@ void *primitives[] = {
 	primitive_set_innermost_stack_frame_quot,
 	primitive_call_clear,
 	primitive_os_envs,
+	primitive_set_os_envs,
 	primitive_resize_byte_array,
 	primitive_resize_bit_array,
 	primitive_resize_float_array,
+	primitive_dll_validp,
 };

@@ -3,14 +3,14 @@
 USING: kernel math sequences ;
 IN: io.binary
 
-: le> ( seq -- x ) B{ } like byte-array>bignum ;
+: le> ( seq -- x ) B{ } like byte-array>bignum >integer ;
 : be> ( seq -- x ) <reversed> le> ;
 
 : mask-byte ( x -- y ) HEX: ff bitand ; inline
 
 : nth-byte ( x n -- b ) -8 * shift mask-byte ; inline
 
-: >le ( x n -- str ) [ nth-byte ] with "" map-as ;
+: >le ( x n -- str ) [ nth-byte ] with B{ } map-as ;
 : >be ( x n -- str ) >le dup reverse-here ;
 
 : d>w/w ( d -- w1 w2 )

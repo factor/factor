@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces sequences sequences.private assocs
-       math inference.transforms parser words quotations debugger
-       macros arrays macros splitting combinators prettyprint.backend
-       definitions prettyprint hashtables combinators.lib
-       prettyprint.sections ;
+USING: kernel namespaces sequences sequences.private assocs math
+inference.transforms parser words quotations debugger macros
+arrays macros splitting combinators prettyprint.backend
+definitions prettyprint hashtables combinators.lib
+prettyprint.sections sequences.private effects generic
+compiler.units combinators.cleave ;
 IN: locals
 
 ! Inspired by
@@ -69,14 +70,14 @@ C: <quote> quote
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : localize-writer ( obj args -- quot )
-  >r "local-reader" word-prop r> read-local [ set-first ] append ;
+  >r "local-reader" word-prop r> read-local [ 0 swap set-array-nth ] append ;
 
 : localize ( obj args -- quot )
     {
         { [ over local? ]        [ read-local ] }
         { [ over quote? ]        [ >r quote-local r> read-local ] }
         { [ over local-word? ]   [ read-local [ call ] append ] }
-        { [ over local-reader? ] [ read-local [ first ] append ] }
+        { [ over local-reader? ] [ read-local [ 0 swap array-nth ] append ] }
         { [ over local-writer? ] [ localize-writer ] }
         { [ over \ lambda eq? ]  [ 2drop [ ] ] }
         { [ t ]                  [ drop 1quotation ] }
@@ -107,8 +108,8 @@ UNION: special local quote local-word local-reader local-writer ;
     if ;
 
 : (point-free) ( quot args -- newquot )
-    { [ load-locals ] [ point-free-body ] [ point-free-end ] }
-    map-call-with2 concat >quotation ;
+    [ load-locals ] [ point-free-body ] [ point-free-end ]
+    2tri 3append >quotation ;
 
 : point-free ( quot args -- newquot )
     over empty? [ drop ] [ (point-free) ] if ;
@@ -138,33 +139,38 @@ M: quotation free-vars { } [ add-if-free ] reduce ;
 M: lambda free-vars
     dup lambda-vars swap lambda-body free-vars seq-diff ;
 
-M: let free-vars
-    dup let-vars swap let-body free-vars seq-diff ;
-
-M: wlet free-vars
-    dup wlet-vars swap wlet-body free-vars seq-diff ;
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! lambda-rewrite
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 GENERIC: lambda-rewrite* ( obj -- )
 
-: lambda-rewrite [ lambda-rewrite* ] [ ] make ;
+GENERIC: local-rewrite* ( obj -- )
 
-UNION: block quotation lambda ;
+: lambda-rewrite
+    [ local-rewrite* ] [ ] make
+    [ [ lambda-rewrite* ] each ] [ ] make ;
+
+UNION: block callable lambda ;
 
 GENERIC: block-vars ( block -- seq )
 
 GENERIC: block-body ( block -- quot )
 
-M: quotation block-vars drop { } ;
+M: callable block-vars drop { } ;
 
-M: quotation block-body ;
+M: callable block-body ;
+
+M: callable local-rewrite*
+    [ [ local-rewrite* ] each ] [ ] make , ;
 
 M: lambda block-vars lambda-vars ;
 
 M: lambda block-body lambda-body ;
+
+M: lambda local-rewrite*
+    dup lambda-vars swap lambda-body
+    [ local-rewrite* \ call , ] [ ] make <lambda> , ;
 
 M: block lambda-rewrite*
     #! Turn free variables into bound variables, curry them
@@ -176,6 +182,8 @@ M: block lambda-rewrite*
     ] keep length \ curry <repetition> % ;
 
 M: object lambda-rewrite* , ;
+
+M: object local-rewrite* , ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -201,9 +209,6 @@ M: object lambda-rewrite* , ;
 : push-locals ( assoc -- )
     use get push ;
 
-: parse-locals ( -- words assoc )
-    "|" parse-tokens make-locals ;
-
 : pop-locals ( assoc -- )
     use get delete ;
 
@@ -211,7 +216,7 @@ M: object lambda-rewrite* , ;
     over push-locals parse-until >quotation swap pop-locals ;
 
 : parse-lambda ( -- lambda )
-    parse-locals \ ] (parse-lambda) <lambda> ;
+    "|" parse-tokens make-locals \ ] (parse-lambda) <lambda> ;
 
 : (parse-bindings) ( -- )
     scan dup "|" = [
@@ -227,22 +232,31 @@ M: object lambda-rewrite* , ;
 : parse-bindings ( -- alist )
     scan "|" assert= [ (parse-bindings) ] { } make dup keys ;
 
-: let-rewrite ( words body -- )
-    <lambda> lambda-rewrite* \ call , ;
+M: let local-rewrite*
+    { let-bindings let-vars let-body } get-slots -rot
+    [ <reversed> ] 2apply
+    [
+        1array -rot second -rot <lambda>
+        [ call ] curry compose
+    ] 2each local-rewrite* \ call , ;
 
-M: let lambda-rewrite*
-    dup let-bindings values [ lambda-rewrite* \ call , ] each
-    { let-vars let-body } get-slots let-rewrite ;
+M: wlet local-rewrite*
+    dup wlet-bindings values over wlet-vars rot wlet-body
+    <lambda> [ call ] curry compose local-rewrite* \ call , ;
 
-M: wlet lambda-rewrite*
-    dup wlet-bindings values [ lambda-rewrite* ] each
-    { wlet-vars wlet-body } get-slots let-rewrite ;
+: parse-locals
+    parse-effect
+    word [ over "declared-effect" set-word-prop ] when*
+    effect-in make-locals ;
 
-: (::) ( prop -- word quot n )
-    >r CREATE dup reset-generic
-    scan "|" assert= parse-locals \ ; (parse-lambda) <lambda>
-    2dup r> set-word-prop
-    [ lambda-rewrite first ] keep lambda-vars length ;
+: parse-locals-definition ( word -- word quot )
+    scan "(" assert= parse-locals \ ; (parse-lambda) <lambda>
+    2dup "lambda" set-word-prop
+    lambda-rewrite first ;
+
+: (::) CREATE-WORD parse-locals-definition ;
+
+: (M::) CREATE-METHOD parse-locals-definition ;
 
 PRIVATE>
 
@@ -260,9 +274,11 @@ PRIVATE>
 
 MACRO: with-locals ( form -- quot ) lambda-rewrite ;
 
-: :: "lambda" (::) drop define ; parsing
+: :: (::) define ; parsing
 
-: MACRO:: "lambda-macro" (::) (MACRO:) ; parsing
+: M:: (M::) define ; parsing
+
+: MACRO:: (::) define-macro ; parsing
 
 <PRIVATE
 
@@ -291,7 +307,7 @@ M: lambda pprint*
     \ | pprint-word
     t <inset
     <block
-    values [ <block >r pprint-word r> pprint* block> ] 2each
+    values [ <block >r pprint-var r> pprint* block> ] 2each
     block>
     \ | pprint-word
     <block pprint-elements block>
@@ -303,7 +319,7 @@ M: let pprint*
     \ ] pprint-word ;
 
 M: wlet pprint*
-    \ [let pprint-word
+    \ [wlet pprint-word
     { wlet-body wlet-vars wlet-bindings } get-slots pprint-let
     \ ] pprint-word ;
 
@@ -315,26 +331,42 @@ M: lambda-word definer drop \ :: \ ; ;
 M: lambda-word definition
     "lambda" word-prop lambda-body ;
 
-: lambda-word-synopsis ( word prop -- )
-    over definer.
-    over seeing-word
-    over pprint-word
-    \ | pprint-word
-    word-prop lambda-vars pprint-vars
-    \ | pprint-word ;
+: lambda-word-synopsis ( word -- )
+    dup definer.
+    dup seeing-word
+    dup pprint-word
+    stack-effect. ;
 
-M: lambda-word synopsis*
-    "lambda" lambda-word-synopsis ;
+M: lambda-word synopsis* lambda-word-synopsis ;
 
 PREDICATE: macro lambda-macro
-    "lambda-macro" word-prop >boolean ;
+    "lambda" word-prop >boolean ;
 
 M: lambda-macro definer drop \ MACRO:: \ ; ;
 
 M: lambda-macro definition
-    "lambda-macro" word-prop lambda-body ;
+    "lambda" word-prop lambda-body ;
 
-M: lambda-macro synopsis*
-    "lambda-macro" lambda-word-synopsis ;
+M: lambda-macro synopsis* lambda-word-synopsis ;
+
+PREDICATE: method-body lambda-method
+    "lambda" word-prop >boolean ;
+
+M: lambda-method definer drop \ M:: \ ; ;
+
+M: lambda-method definition
+    "lambda" word-prop lambda-body ;
+
+: method-stack-effect ( method -- effect )
+    dup "lambda" word-prop lambda-vars
+    swap "method-generic" word-prop stack-effect
+    dup [ effect-out ] when
+    <effect> ;
+
+M: lambda-method synopsis*
+    dup dup dup definer.
+    "method-specializer" word-prop pprint*
+    "method-generic" word-prop pprint*
+    method-stack-effect effect>string comment. ;
 
 PRIVATE>

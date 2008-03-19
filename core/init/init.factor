@@ -15,7 +15,7 @@ init-hooks global [ drop V{ } clone ] cache drop
     dup init-hooks get at [ over call ] unless
     init-hooks get set-at ;
 
-: boot ( -- ) init-namespaces init-error-handler ;
+: boot ( -- ) init-namespaces init-catchstack ;
 
 : boot-quot ( -- quot ) 20 getenv ;
 

@@ -4,7 +4,7 @@ USING: arrays definitions generic assocs kernel math
 namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger 
-io.files io.streams.string io.streams.lines vocabs
+io.files io.streams.string vocabs io.encodings.utf8
 source-files classes hashtables compiler.errors compiler.units ;
 IN: parser
 
@@ -107,6 +107,7 @@ M: bad-escape summary drop "Bad escape code" ;
 
 : escape ( escape -- ch )
     H{
+        { CHAR: a  CHAR: \a }
         { CHAR: e  CHAR: \e }
         { CHAR: n  CHAR: \n }
         { CHAR: r  CHAR: \r }
@@ -118,22 +119,43 @@ M: bad-escape summary drop "Bad escape code" ;
         { CHAR: \" CHAR: \" }
     } at [ bad-escape ] unless* ;
 
-: next-escape ( m str -- n ch )
-    2dup nth CHAR: u =
-    [ >r 1+ dup 6 + tuck r> subseq hex> ]
-    [ over 1+ -rot nth escape ] if ;
+SYMBOL: name>char-hook
 
-: next-char ( m str -- n ch )
-    2dup nth CHAR: \\ =
-    [ >r 1+ r> next-escape ] [ over 1+ -rot nth ] if ;
+name>char-hook global [
+    [ "Unicode support not available" throw ] or
+] change-at
 
-: (parse-string) ( m str -- n )
-    2dup nth CHAR: " =
-    [ drop 1+ ] [ [ next-char , ] keep (parse-string) ] if ;
+: unicode-escape ( str -- ch str' )
+    "{" ?head-slice [
+        CHAR: } over index cut-slice
+        >r >string name>char-hook get call r>
+        1 tail-slice
+    ] [
+        6 cut-slice >r hex> r>
+    ] if ;
+
+: next-escape ( str -- ch str' )
+    "u" ?head-slice [
+        unicode-escape
+    ] [
+        unclip-slice escape swap
+    ] if ;
+
+: (parse-string) ( str -- m )
+    dup [ "\"\\" member? ] find dup [
+        >r cut-slice >r % r> 1 tail-slice r>
+        dup CHAR: " = [
+            drop slice-from
+        ] [
+            drop next-escape >r , r> (parse-string)
+        ] if
+    ] [
+        "Unterminated string" throw
+    ] if ;
 
 : parse-string ( -- str )
     lexer get [
-        [ (parse-string) ] "" make swap
+        [ swap tail-slice (parse-string) ] "" make swap
     ] change-column ;
 
 TUPLE: parse-error file line col text ;
@@ -193,9 +215,6 @@ SYMBOL: in
 : set-in ( name -- )
     check-vocab-string dup in set create-vocab (use+) ;
 
-: create-in ( string -- word )
-    in get create dup set-word dup save-location ;
-
 TUPLE: unexpected want got ;
 
 : unexpected ( want got -- * )
@@ -216,12 +235,22 @@ PREDICATE: unexpected unexpected-eof
 : parse-tokens ( end -- seq )
     100 <vector> swap (parse-tokens) >array ;
 
+: create-in ( string -- word )
+    in get create dup set-word dup save-location ;
+
 : CREATE ( -- word ) scan create-in ;
 
-: CREATE-CLASS ( -- word )
-    scan in get create
+: CREATE-GENERIC ( -- word ) CREATE dup reset-word ;
+
+: CREATE-WORD ( -- word ) CREATE dup reset-generic ;
+
+: create-class-in ( word -- word )
+    in get create
     dup save-class-location
     dup predicate-word dup set-word save-location ;
+
+: CREATE-CLASS ( -- word )
+    scan create-class-in ;
 
 : word-restarts ( possibilities -- restarts )
     natural-sort [
@@ -258,6 +287,12 @@ M: no-word summary
             dup string>number [ ] [ no-word ] ?if
         ] ?if
     ] when ;
+
+: create-method-in ( class generic -- method )
+    create-method f set-word dup save-location ;
+
+: CREATE-METHOD ( -- method )
+    scan-word bootstrap-word scan-word create-method-in ;
 
 TUPLE: staging-violation word ;
 
@@ -330,6 +365,10 @@ TUPLE: bad-number ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
+: (:) CREATE-WORD parse-definition ;
+
+: (M:) CREATE-METHOD parse-definition ;
+
 GENERIC: expected>string ( obj -- str )
 
 M: f expected>string drop "end of input" ;
@@ -387,7 +426,9 @@ SYMBOL: interactive-vocabs
     "tools.memory"
     "tools.profiler"
     "tools.test"
+    "tools.threads"
     "tools.time"
+    "tools.vocabs"
     "vocabs"
     "vocabs.loader"
     "words"
@@ -416,11 +457,12 @@ SYMBOL: interactive-vocabs
         "Warning: the following definitions were removed from sources," print
         "but are still referenced from other definitions:" print
         nl
-        dup stack.
+        dup sorted-definitions.
         nl
         "The following definitions need to be updated:" print
         nl
-        over stack.
+        over sorted-definitions.
+        nl
     ] when 2drop ;
 
 : filter-moved ( assoc -- newassoc )
@@ -436,18 +478,32 @@ SYMBOL: interactive-vocabs
 : smudged-usage ( -- usages referenced removed )
     removed-definitions filter-moved keys [
         outside-usages
-        [ empty? swap pathname? or not ] assoc-subset
+        [
+            empty? [ drop f ] [
+                {
+                    { [ dup pathname? ] [ f ] }
+                    { [ dup method-body? ] [ f ] }
+                    { [ t ] [ t ] }
+                } cond nip
+            ] if
+        ] assoc-subset
         dup values concat prune swap keys
     ] keep ;
 
+: fix-class-words ( -- )
+    #! If a class word had a compound definition which was
+    #! removed, it must go back to being a symbol.
+    new-definitions get first2 diff
+    [ nip dup reset-generic define-symbol ] assoc-each ;
+
 : forget-smudged ( -- )
     smudged-usage forget-all
-    over empty? [ 2dup smudged-usage-warning ] unless 2drop ;
+    over empty? [ 2dup smudged-usage-warning ] unless 2drop
+    fix-class-words ;
 
 : finish-parsing ( lines quot -- )
     file get
     [ record-form ] keep
-    [ record-modified ] keep
     [ record-definitions ] keep
     record-checksum ;
 
@@ -467,7 +523,7 @@ SYMBOL: interactive-vocabs
     [
         [
             [ parsing-file ] keep
-            [ ?resource-path <file-reader> ] keep
+            [ ?resource-path utf8 <file-reader> ] keep
             parse-stream
         ] with-compiler-errors
     ] [
@@ -476,7 +532,7 @@ SYMBOL: interactive-vocabs
     ] recover ;
 
 : run-file ( file -- )
-    [ [ parse-file call ] keep ] assert-depth drop ;
+    [ dup parse-file call ] assert-depth drop ;
 
 : ?run-file ( path -- )
     dup resource-exists? [ run-file ] [ drop ] if ;
@@ -491,4 +547,4 @@ SYMBOL: interactive-vocabs
     [
         parser-notes off
         [ [ eval ] keep ] try drop
-    ] string-out ;
+    ] with-string-writer ;

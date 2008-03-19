@@ -1,6 +1,6 @@
 USING: ui.gadgets ui.gadgets.grids tools.test kernel arrays
 namespaces ;
-IN: temporary
+IN: ui.gadgets.grids.tests
 
 [ { 0 0 } ] [ { } <grid> pref-dim ] unit-test
 

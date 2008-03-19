@@ -1,7 +1,7 @@
 USING: unicode.syntax ;
 IN: unicode.categories
 
-CATEGORY: blank Zs Zl Zp ;
+CATEGORY: blank Zs Zl Zp \r\n ;
 CATEGORY: letter Ll ;
 CATEGORY: LETTER Lu ;
 CATEGORY: Letter Lu Ll Lt Lm Lo ;

@@ -20,25 +20,9 @@ void init_ffi(void)
 	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
 }
 
-void ffi_dlopen(F_DLL *dll, bool error)
+void ffi_dlopen(F_DLL *dll)
 {
-	void *dllptr = dlopen(alien_offset(dll->path), RTLD_LAZY);
-
-	if(dllptr == NULL)
-	{
-		if(error)
-		{
-			general_error(ERROR_FFI,F,
-				tag_object(from_char_string(dlerror())),
-				NULL);
-		}
-		else
-			dll->dll = NULL;
-
-		return;
-	}
-
-	dll->dll = dllptr;
+	dll->dll = dlopen(alien_offset(dll->path), RTLD_LAZY);
 }
 
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol)
@@ -131,6 +115,29 @@ DEFINE_PRIMITIVE(os_envs)
 	UNREGISTER_ROOT(result);
 	GROWABLE_TRIM(result);
 	dpush(result);
+}
+
+DEFINE_PRIMITIVE(set_os_envs)
+{
+	F_ARRAY *array = untag_array(dpop());
+	CELL size = array_capacity(array);
+
+	/* Memory leak */
+	char **env = calloc(size + 1,sizeof(CELL));
+
+	CELL i;
+	for(i = 0; i < size; i++)
+	{
+		F_STRING *string = untag_string(array_nth(array,i));
+		CELL length = to_fixnum(string->length);
+
+		char *chars = malloc(length + 1);
+		char_string_to_memory(string,chars);
+		chars[length] = '\0';
+		env[i] = chars;
+	}
+
+	environ = env;
 }
 
 F_SEGMENT *alloc_segment(CELL size)

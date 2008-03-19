@@ -39,19 +39,19 @@ HELP: log-message
 { $description "Sends a message to the current log. Does nothing if not executing in a dynamic scope established by " { $link with-logging } "." } ;
 
 HELP: add-logging
-{ $values { "word" word } }
+{ $values { "level" "a log level" } { "word" word } }
 { $description "Causes the word to log a message every time it is called." } ;
 
 HELP: add-input-logging
-{ $values { "word" word } }
+{ $values { "level" "a log level" } { "word" word } }
 { $description "Causes the word to log its input values every time it is called. The word must have a stack effect declaration." } ;
 
 HELP: add-output-logging
-{ $values { "word" word } }
+{ $values { "level" "a log level" } { "word" word } }
 { $description "Causes the word to log its output values every time it is called. The word must have a stack effect declaration." } ;
 
 HELP: add-error-logging
-{ $values { "word" word } }
+{ $values { "level" "a log level" } { "word" word } }
 { $description "Causes the word to log its input values and any errors it throws."
 $nl
 "If the word is not executed in a dynamic scope established by " { $link with-logging } ", its behavior is unchanged, and any errors it throws are passed to the caller."
@@ -63,7 +63,7 @@ HELP: log-error
 { $description "Logs an error." } ;
 
 HELP: log-critical
-{ $values { "critical" "an critical" } { "word" word } }
+{ $values { "error" "an error" } { "word" word } }
 { $description "Logs a critical error." } ;
 
 HELP: LOG:
@@ -100,7 +100,7 @@ ARTICLE: "logging.rotation" "Log rotation"
 "The " { $vocab-link "logging.insomniac" } " vocabulary automates log rotation." ;
 
 ARTICLE: "logging.server" "Log implementation"
-"The " { $vocab-link "logging.server" } " vocabulary implements a concurrent log server using " { $vocab-link "concurrency" } ". User code never interacts with the server directly, instead ot uses the words in the " { $link "logging" } " vocabulary. The server is used to synchronize access to log files and ensure that log rotation can proceed in an orderly fashion."
+"The " { $vocab-link "logging.server" } " vocabulary implements a concurrent log server using " { $vocab-link "concurrency" } ". User code never interacts with the server directly, instead it uses the words in the " { $link "logging" } " vocabulary. The server is used to synchronize access to log files and ensure that log rotation can proceed in an orderly fashion."
 $nl
 "The " { $link log-message } " word sends a message to the server which results in the server executing an internal word:"
 { $subsection (log-message) }
@@ -115,16 +115,10 @@ ARTICLE: "logging" "Logging framework"
 { $subsection "logging.levels" }
 { $subsection "logging.messages" }
 { $subsection "logging.rotation" }
-{ $subsection "logging.parser" }
-{ $subsection "logging.analysis" }
-{ $subsection "logging.insomniac" }
+{ $vocab-subsection "Log file parser" "logging.parser" }
+{ $vocab-subsection "Log analysis" "logging.analysis" }
+{ $vocab-subsection "Automated log analysis" "logging.insomniac" }
 { $subsection "logging.server" } ;
 
 ABOUT: "logging"
 
-! A workaround for circular dependency prohibition
-USING: threads vocabs.loader ;
-[
-    yield
-    "logging.insomniac" require
-] in-thread

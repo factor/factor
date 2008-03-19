@@ -1,16 +1,18 @@
 USING: io io.streams.string io.streams.duplex listener
 tools.test parser math namespaces continuations vocabs kernel
 compiler.units ;
-IN: temporary
+IN: listener.tests
 
 : hello "Hi" print ; parsing
 
 : parse-interactive ( string -- quot )
     <string-reader> stream-read-quot ;
 
-[ [ ] ] [
-    "USE: temporary hello" parse-interactive
-] unit-test
+[
+    [ [ ] ] [
+        "USE: listener.tests hello" parse-interactive
+    ] unit-test
+] with-file-vocabs
 
 [
     "debugger" use+
@@ -35,8 +37,10 @@ IN: temporary
 ] unit-test
 
 [
-    "USE: vocabs.loader.test.c" parse-interactive
-] must-fail
+    [
+        "USE: vocabs.loader.test.c" parse-interactive
+    ] must-fail
+] with-file-vocabs
 
 [ ] [
     [
@@ -44,7 +48,9 @@ IN: temporary
     ] with-compilation-unit
 ] unit-test
 
-[ ] [
-    "IN: temporary : hello\n\"world\" ;" parse-interactive
+[
+    [ ] [
+        "IN: listener.tests : hello\n\"world\" ;" parse-interactive
     drop
-] unit-test
+    ] unit-test
+] with-file-vocabs

@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel io calendar sequences io.files
 io.sockets continuations prettyprint assocs math.parser
-words debugger math combinators concurrency arrays init
-math.ranges strings ;
+words debugger math combinators concurrency.messaging
+threads arrays init math.ranges strings calendar.format
+io.encodings.utf8 ;
 IN: logging.server
 
 : log-root ( -- string )
@@ -20,7 +21,7 @@ SYMBOL: log-files
 : open-log-stream ( service -- stream )
     log-path
     dup make-directories
-    1 log# <file-appender> ;
+    1 log# utf8 <file-appender> ;
 
 : log-stream ( service -- stream )
     log-files get [ open-log-stream ] cache ;
@@ -68,11 +69,11 @@ SYMBOL: log-files
 
 : delete-oldest keep-logs log# ?delete-file ;
 
-: ?rename-file ( old new -- )
-    over exists? [ rename-file ] [ 2drop ] if ;
+: ?move-file ( old new -- )
+    over exists? [ move-file ] [ 2drop ] if ;
 
 : advance-log ( path n -- )
-    [ 1- log# ] 2keep log# ?rename-file ;
+    [ 1- log# ] 2keep log# ?move-file ;
 
 : rotate-log ( service -- )
     dup close-log
@@ -85,17 +86,16 @@ SYMBOL: log-files
     log-root directory [ drop rotate-log ] assoc-each ;
 
 : log-server-loop ( -- )
-    [
-        receive unclip {
-            { "log-message" [ (log-message) ] }
-            { "rotate-logs" [ drop (rotate-logs) ] }
-            { "close-logs" [ drop (close-logs) ] }
-        } case
-    ] [ error. (close-logs) ] recover
-    log-server-loop ;
+    receive unclip {
+        { "log-message" [ (log-message) ] }
+        { "rotate-logs" [ drop (rotate-logs) ] }
+        { "close-logs" [ drop (close-logs) ] }
+    } case log-server-loop ;
 
 : log-server ( -- )
-    [ log-server-loop ] spawn "log-server" set-global ;
+    [ [ log-server-loop ] [ error. (close-logs) ] recover t ]
+    "Log server" spawn-server
+    "log-server" set-global ;
 
 [
     H{ } clone log-files set-global

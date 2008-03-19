@@ -9,8 +9,7 @@ USE: io.windows.nt.launcher
 USE: io.windows.nt.monitors
 USE: io.windows.nt.sockets
 USE: io.windows.mmap
+USE: io.windows.files
 USE: io.backend
 
 T{ windows-nt-io } set-io-backend
-
-"vocabs.monitor" require

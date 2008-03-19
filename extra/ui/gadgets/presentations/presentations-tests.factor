@@ -1,4 +1,4 @@
-IN: temporary
+IN: ui.gadgets.presentations.tests
 USING: math ui.gadgets.presentations ui.gadgets tools.test
 prettyprint ui.gadgets.buttons io io.streams.string kernel
 tuples ;
@@ -10,5 +10,5 @@ tuples ;
 [ "+" ] [
     [
         \ + f \ pprint <command-button> dup button-quot call
-    ] string-out
+    ] with-string-writer
 ] unit-test

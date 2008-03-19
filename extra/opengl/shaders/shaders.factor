@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl.gl alien.c-types continuations namespaces
 assocs alien libc opengl math sequences combinators.lib 
-macros arrays ;
+macros arrays combinators.cleave ;
 IN: opengl.shaders
 
 : with-gl-shader-source-ptr ( string quot -- )
@@ -50,7 +50,7 @@ IN: opengl.shaders
         alien>char-string
     ] with-malloc ;
 
-: check-gl-shader ( shader -- shader* )
+: check-gl-shader ( shader -- shader )
     dup gl-shader-ok? [ dup gl-shader-info-log throw ] unless ;
 
 : delete-gl-shader ( shader -- ) glDeleteShader ; inline
@@ -85,7 +85,7 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
         alien>char-string
     ] with-malloc ;
 
-: check-gl-program ( program -- program* )
+: check-gl-program ( program -- program )
     dup gl-program-ok? [ dup gl-program-info-log throw ] unless ;
 
 : gl-program-shaders-length ( program -- shaders-length )
@@ -117,7 +117,7 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
 : (make-with-gl-program) ( uniforms quot -- q )
     [
         \ dup ,
-        [ swap (with-gl-program-uniforms) , \ call-with , % ]
+        [ swap (with-gl-program-uniforms) , \ cleave , % ]
         [ ] make ,
         \ (with-gl-program) ,
     ] [ ] make ;

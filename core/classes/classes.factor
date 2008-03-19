@@ -31,14 +31,9 @@ PREDICATE: class tuple-class
 
 PREDICATE: word predicate "predicating" word-prop >boolean ;
 
-: define-predicate ( class predicate quot -- )
-    over [
-        dupd predicate-effect define-declared
-        2dup 1quotation "predicate" set-word-prop
-        swap "predicating" set-word-prop
-    ] [
-        3drop
-    ] if ;
+: define-predicate ( class quot -- )
+    >r "predicate" word-prop first
+    r> predicate-effect define-declared ;
 
 : superclass ( class -- super )
     "superclass" word-prop ;
@@ -252,9 +247,10 @@ PRIVATE>
 
 : (define-class) ( word props -- )
     over reset-class
-    over reset-generic
-    over define-symbol
+    over deferred? [ over define-symbol ] when
     >r dup word-props r> union over set-word-props
+    dup predicate-word 2dup 1quotation "predicate" set-word-prop
+    over "predicating" set-word-prop
     t "class" set-word-prop ;
 
 GENERIC: update-predicate ( class -- )

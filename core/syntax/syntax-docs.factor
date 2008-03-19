@@ -100,13 +100,9 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\0" } "a null byte (ASCII 0)" }
     { { $snippet "\\e" } "escape (ASCII 27)" }
     { { $snippet "\\\"" } { $snippet "\"" } }
-}
-"A Unicode character can be specified by its code number by writing " { $snippet "\\u" } " followed by a six-digit hexadecimal number. That is, the following two expressions are equivalent:"
-{ $code
-    "CHAR: \\u000078"
-    "78"
-}
-"While not useful for single characters, this syntax is also permitted inside strings." ;
+    { { $snippet "\\u" { $emphasis "xxxxxx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xxxxxx" } } } }
+    { { $snippet "\\u{" { $emphasis "name" } "}" } { "The Unicode code point named " { $snippet { $emphasis "name" } } } }
+} ;
 
 ARTICLE: "syntax-strings" "Character and string syntax"
 "Factor has no distinct character type, however Unicode character value integers can be read by specifying a literal character, or an escaped representation thereof."
@@ -167,7 +163,7 @@ ARTICLE: "syntax-byte-vectors" "Byte vector syntax"
 
 ARTICLE: "syntax-pathnames" "Pathname syntax"
 { $subsection POSTPONE: P" }
-"Pathnames are documented in " { $link "file-streams" } "." ;
+"Pathnames are documented in " { $link "pathnames" } "." ;
 
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."
@@ -208,7 +204,7 @@ HELP: delimiter
 HELP: parsing
 { $syntax ": foo ... ; parsing" }
 { $description "Declares the most recently defined word as a parsing word." }
-{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example ": hello \"Hello parser!\" print ; parsing\n: world hello ;" "Hello parser!" } } ;
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
 
 HELP: inline
 { $syntax ": foo ... ; inline" }
@@ -371,7 +367,7 @@ HELP: SYMBOL:
 { $syntax "SYMBOL: word" }
 { $values { "word" "a new word to define" } }
 { $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
-{ $examples { $example "SYMBOL: foo\nfoo ." "foo" } } ;
+{ $examples { $example "USE: prettyprint" "SYMBOL: foo\nfoo ." "foo" } } ;
 
 { define-symbol POSTPONE: SYMBOL: } related-words
 
@@ -412,26 +408,35 @@ HELP: IN:
 
 HELP: CHAR:
 { $syntax "CHAR: token" }
-{ $values { "token" "a literal character or escape code" } }
-{ $description "Adds the Unicode code point of the character represented by the token to the parse tree." } ;
+{ $values { "token" "a literal character, escape code, or Unicode character name" } }
+{ $description "Adds a Unicode code point to the parse tree." }
+{ $examples
+    { $code
+        "CHAR: x"
+        "CHAR: \\u000032"
+        "CHAR: \\u{exclamation-mark}"
+        "CHAR: exclamation-mark"
+        "CHAR: ugaritic-letter-samka"
+    }
+} ;
 
 HELP: "
 { $syntax "\"string...\"" }
 { $values { "string" "literal and escaped characters" } }
 { $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", and appends the resulting string to the parse tree. String literals cannot span multiple lines. Strings containing the " { $link POSTPONE: " } " character and various other special characters can be read by inserting escape sequences." }
-{ $examples { $example "\"Hello\\nworld\" print" "Hello\nworld" } } ;
+{ $examples { $example "USE: io" "\"Hello\\nworld\" print" "Hello\nworld" } } ;
 
 HELP: SBUF"
 { $syntax "SBUF\" string... \"" }
 { $values { "string" "literal and escaped characters" } }
 { $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", converts the string to a string buffer, and appends it to the parse tree." }
-{ $examples { $example "SBUF\" Hello world\" >string print" "Hello world" } } ;
+{ $examples { $example "USING: io strings ;" "SBUF\" Hello world\" >string print" "Hello world" } } ;
 
 HELP: P"
 { $syntax "P\" pathname\"" }
 { $values { "pathname" "a pathname string" } }
 { $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", creates a new " { $link pathname } ", and appends it to the parse tree." }
-{ $examples { $example "USE: io.files" "P\" foo.txt\" pathname-string print" "foo.txt" } } ;
+{ $examples { $example "USING: io io.files ;" "P\" foo.txt\" pathname-string print" "foo.txt" } } ;
 
 HELP: (
 { $syntax "( inputs -- outputs )" }
@@ -455,19 +460,19 @@ HELP: HEX:
 { $syntax "HEX: integer" }
 { $values { "integer" "hexadecimal digits (0-9, a-f, A-F)" } }
 { $description "Adds an integer read from a hexadecimal literal to the parse tree." }
-{ $examples { $example "HEX: ff ." "255" } } ;
+{ $examples { $example "USE: prettyprint" "HEX: ff ." "255" } } ;
 
 HELP: OCT:
 { $syntax "OCT: integer" }
 { $values { "integer" "octal digits (0-7)" } }
 { $description "Adds an integer read from an octal literal to the parse tree." }
-{ $examples { $example "OCT: 31337 ." "13023" } } ;
+{ $examples { $example "USE: prettyprint" "OCT: 31337 ." "13023" } } ;
 
 HELP: BIN:
 { $syntax "BIN: integer" }
 { $values { "integer" "binary digits (0 and 1)" } }
 { $description "Adds an integer read from an binary literal to the parse tree." }
-{ $examples { $example "BIN: 100 ." "4" } } ;
+{ $examples { $example "USE: prettyprint" "BIN: 100 ." "4" } } ;
 
 HELP: GENERIC:
 { $syntax "GENERIC: word" }
@@ -495,6 +500,7 @@ HELP: HOOK:
 { $description "Defines a new hook word in the current vocabulary. Hook words are generic words which dispatch on the value of a variable, so methods are defined with " { $link POSTPONE: M: } ". Hook words differ from other generic words in that the dispatch value is removed from the stack before the chosen method is called." }
 { $examples
     { $example
+        "USING: io namespaces ;"
         "SYMBOL: transport"
         "TUPLE: land-transport ;"
         "TUPLE: air-transport ;"

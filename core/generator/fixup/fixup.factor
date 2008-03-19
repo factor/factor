@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs hashtables
 kernel kernel.private math namespaces sequences words
-quotations strings alien system combinators math.bitfields
-words.private cpu.architecture ;
+quotations strings alien layouts system combinators
+math.bitfields words.private cpu.architecture ;
 IN: generator.fixup
 
 : no-stack-frame -1 ; inline
@@ -111,7 +111,8 @@ SYMBOL: literal-table
 : add-literal ( obj -- n ) literal-table get push-new* ;
 
 : string>symbol ( str -- alien )
-    wince? [ string>u16-alien ] [ string>char-alien ] if ;
+    [ wince? [ string>u16-alien ] [ string>char-alien ] if ]
+    over string? [ call ] [ map ] if ;
 
 : add-dlsym-literals ( symbol dll -- )
     >r string>symbol r> 2array literal-table get push-all ;
@@ -140,17 +141,19 @@ SYMBOL: literal-table
     V{ } clone relocation-table set
     V{ } clone label-table set ;
 
-: generate-labels ( -- labels )
-    label-table get [
+: resolve-labels ( labels -- labels' )
+    [
         first3 label-offset
         [ "Unresolved label" throw ] unless*
         3array
     ] map concat ;
 
-: fixup ( code -- relocation-table label-table code )
+: fixup ( code -- literals relocation labels code )
     [
         init-fixup
         dup stack-frame-size swap [ fixup* ] each drop
+
+        literal-table get >array
         relocation-table get >array
-        generate-labels
+        label-table get resolve-labels
     ] { } make ;

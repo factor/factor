@@ -1,7 +1,7 @@
-IN: temporary
-USING: alien alien.accessors byte-arrays arrays kernel
-kernel.private namespaces tools.test sequences libc math system
-prettyprint ;
+IN: alien.tests
+USING: alien alien.accessors alien.syntax byte-arrays arrays
+kernel kernel.private namespaces tools.test sequences libc math
+system prettyprint layouts ;
 
 [ t ] [ -1 <alien> alien-address 0 > ] unit-test
 
@@ -68,3 +68,7 @@ cell 8 = [
 [ f ] [ 0 B{ 1 2 3 } <displaced-alien> pinned-c-ptr? ] unit-test
 
 [ "( displaced alien )" ] [ 0 B{ 1 2 3 } <displaced-alien> unparse ] unit-test
+
+[ f ] [ DLL" fadfasdfsada" dll-valid? ] unit-test
+
+[ f ] [ "does not exist" DLL" fadsfasfdsaf" dlsym ] unit-test

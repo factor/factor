@@ -1283,7 +1283,13 @@ FUNCTION: void SetLastErrorEx ( DWORD dwErrCode, DWORD dwType ) ;
 ! FUNCTION: SetWindowLongA
 ! FUNCTION: SetWindowLongW
 ! FUNCTION: SetWindowPlacement
-! FUNCTION: SetWindowPos
+FUNCTION: BOOL SetWindowPos ( HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags ) ;
+
+: HWND_BOTTOM ALIEN: 1 ;
+: HWND_NOTOPMOST ALIEN: -2 ;
+: HWND_TOP ALIEN: 0 ;
+: HWND_TOPMOST ALIEN: -1 ;
+
 ! FUNCTION: SetWindowRgn
 ! FUNCTION: SetWindowsHookA
 ! FUNCTION: SetWindowsHookExA

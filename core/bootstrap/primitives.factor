@@ -30,7 +30,10 @@ crossref off
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
 H{ } clone changed-words set
-[ drop ] recompile-hook set
+
+! Trivial recompile hook. We don't want to touch the code heap
+! during stage1 bootstrap, it would just waste time.
+[ drop { } ] recompile-hook set
 
 call
 call
@@ -75,6 +78,7 @@ call
     "strings"
     "strings.private"
     "system"
+    "system.private"
     "threads.private"
     "tools.profiler.private"
     "tuples"
@@ -83,37 +87,43 @@ call
     "words.private"
     "vectors"
     "vectors.private"
-} [
-    dup find-vocab-root swap create-vocab
-    [ set-vocab-root ] keep
-    f swap set-vocab-source-loaded?
-] each
+} [ create-vocab drop ] each
 
 H{ } clone source-files set
 H{ } clone class<map set
 H{ } clone update-map set
 
 ! Builtin classes
-: builtin-predicate ( class predicate -- )
+: builtin-predicate-quot ( class -- quot )
     [
-        over "type" word-prop dup
+        "type" word-prop dup
         \ tag-mask get < \ tag \ type ? , , \ eq? ,
-    ] [ ] make define-predicate ;
+    ] [ ] make ;
 
-: register-builtin ( class -- )
-    dup "type" word-prop builtins get set-nth ;
+: define-builtin-predicate ( class -- )
+    dup
+    dup builtin-predicate-quot define-predicate
+    predicate-word make-inline ;
 
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
 
-: define-builtin ( symbol predicate slotspec -- )
-    >r dup make-inline >r
-    dup dup lookup-type-number "type" set-word-prop
+: register-builtin ( class -- )
+    dup
+    dup lookup-type-number "type" set-word-prop
+    dup "type" word-prop builtins get set-nth ;
+
+: define-builtin-slots ( symbol slotspec -- )
+    dupd 1 simple-slots
+    2dup "slots" set-word-prop
+    define-slots ;
+
+: define-builtin ( symbol slotspec -- )
+    >r
+    dup register-builtin
     dup f f builtin-class define-class
-    dup r> builtin-predicate
-    dup r> 1 simple-slots 2dup "slots" set-word-prop
-    dupd define-slots
-    register-builtin ;
+    dup define-builtin-predicate
+    r> define-builtin-slots ;
 
 H{ } clone typemap set
 num-types get f <array> builtins set
@@ -124,17 +134,15 @@ num-types get f <array> builtins set
 
 "null" "kernel" create drop
 
-"fixnum" "math" create "fixnum?" "math" create { } define-builtin
+"fixnum" "math" create { } define-builtin
 "fixnum" "math" create ">fixnum" "math" create 1quotation "coercer" set-word-prop
 
-"bignum" "math" create "bignum?" "math" create { } define-builtin
+"bignum" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
 
-"tuple" "kernel" create "tuple?" "kernel" create
-{ } define-builtin
+"tuple" "kernel" create { } define-builtin
 
-"ratio" "math" create "ratio?" "math" create
-{
+"ratio" "math" create {
     {
         { "integer" "math" }
         "numerator"
@@ -149,11 +157,10 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"float" "math" create "float?" "math" create { } define-builtin
+"float" "math" create { } define-builtin
 "float" "math" create ">float" "math" create 1quotation "coercer" set-word-prop
 
-"complex" "math" create "complex?" "math" create
-{
+"complex" "math" create {
     {
         { "real" "math" }
         "real-part"
@@ -168,14 +175,13 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"f" "syntax" lookup "not" "kernel" create
-{ } define-builtin
+"f" "syntax" lookup { } define-builtin
 
-"array" "arrays" create "array?" "arrays" create
-{ } define-builtin
+! do not word...
 
-"wrapper" "kernel" create "wrapper?" "kernel" create
-{
+"array" "arrays" create { } define-builtin
+
+"wrapper" "kernel" create {
     {
         { "object" "kernel" }
         "wrapped"
@@ -184,8 +190,7 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"string" "strings" create "string?" "strings" create
-{
+"string" "strings" create {
     {
         { "array-capacity" "sequences.private" }
         "length"
@@ -199,8 +204,7 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"quotation" "quotations" create "quotation?" "quotations" create
-{
+"quotation" "quotations" create {
     {
         { "object" "kernel" }
         "array"
@@ -215,8 +219,7 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"dll" "alien" create "dll?" "alien" create
-{
+"dll" "alien" create {
     {
         { "byte-array" "byte-arrays" }
         "path"
@@ -226,8 +229,7 @@ num-types get f <array> builtins set
 }
 define-builtin
 
-"alien" "alien" create "alien?" "alien" create
-{
+"alien" "alien" create {
     {
         { "c-ptr" "alien" }
         "alien"
@@ -242,8 +244,7 @@ define-builtin
 }
 define-builtin
 
-"word" "words" create "word?" "words" create
-{
+"word" "words" create {
     f
     {
         { "object" "kernel" }
@@ -271,7 +272,7 @@ define-builtin
     }
     {
         { "object" "kernel" }
-        "?"
+        "compiled?"
         { "compiled?" "words" }
         f
     }
@@ -283,42 +284,24 @@ define-builtin
     }
 } define-builtin
 
-"byte-array" "byte-arrays" create
-"byte-array?" "byte-arrays" create
-{ } define-builtin
+"byte-array" "byte-arrays" create { } define-builtin
 
-"bit-array" "bit-arrays" create
-"bit-array?" "bit-arrays" create
-{ } define-builtin
+"bit-array" "bit-arrays" create { } define-builtin
 
-"float-array" "float-arrays" create
-"float-array?" "float-arrays" create
-{ } define-builtin
+"float-array" "float-arrays" create { } define-builtin
 
-"curry" "kernel" create
-"curry?" "kernel" create
-{
-    {
-        { "object" "kernel" }
-        "obj"
-        { "curry-obj" "kernel" }
-        f
-    }
-    {
-        { "object" "kernel" }
-        "obj"
-        { "curry-quot" "kernel" }
-        f
-    }
-} define-builtin
-
-"callstack" "kernel" create "callstack?" "kernel" create
-{ } define-builtin
+"callstack" "kernel" create { } define-builtin
 
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create
 "f" "syntax" lookup builtins get remove [ ] subset f union-class
 define-class
+
+"f" "syntax" create [ not ] "predicate" set-word-prop
+"f?" "syntax" create "syntax" vocab-words delete-at
+
+"general-t" "kernel" create [ ] "predicate" set-word-prop
+"general-t?" "kernel" create "syntax" vocab-words delete-at
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create [ drop t ] "predicate" set-word-prop
@@ -440,14 +423,44 @@ builtins get num-tags get tail f union-class define-class
     }
 } define-tuple-class
 
+"curry" "kernel" create
+{
+    {
+        { "object" "kernel" }
+        "obj"
+        { "curry-obj" "kernel" }
+        f
+    } {
+        { "object" "kernel" }
+        "quot"
+        { "curry-quot" "kernel" }
+        f
+    }
+} define-tuple-class
+
+"compose" "kernel" create
+{
+    {
+        { "object" "kernel" }
+        "first"
+        { "compose-first" "kernel" }
+        f
+    } {
+        { "object" "kernel" }
+        "second"
+        { "compose-second" "kernel" }
+        f
+    }
+} define-tuple-class
+
 ! Primitive words
 : make-primitive ( word vocab n -- )
-    >r create dup reset-word r> [ do-primitive ] curry [ ] like define ;
+    >r create dup reset-word r>
+    [ do-primitive ] curry [ ] like define ;
 
 {
     { "(execute)" "words.private" }
     { "(call)" "kernel.private" }
-    { "uncurry" "kernel.private" }
     { "bignum>fixnum" "math.private" }
     { "float>fixnum" "math.private" }
     { "fixnum>bignum" "math.private" }
@@ -607,6 +620,7 @@ builtins get num-tags get tail f union-class define-class
     { "fopen" "io.streams.c" }
     { "fgetc" "io.streams.c" }
     { "fread" "io.streams.c" }
+    { "fputc" "io.streams.c" }
     { "fwrite" "io.streams.c" }
     { "fflush" "io.streams.c" }
     { "fclose" "io.streams.c" }
@@ -622,7 +636,6 @@ builtins get num-tags get tail f union-class define-class
     { "become" "kernel.private" }
     { "(sleep)" "threads.private" }
     { "<float-array>" "float-arrays" }
-    { "curry" "kernel" }
     { "<tuple-boa>" "tuples.private" }
     { "class-hash" "kernel.private" }
     { "callstack>array" "kernel" }
@@ -630,10 +643,12 @@ builtins get num-tags get tail f union-class define-class
     { "innermost-frame-scan" "kernel.private" }
     { "set-innermost-frame-quot" "kernel.private" }
     { "call-clear" "kernel" }
-    { "(os-envs)" "system" }
+    { "(os-envs)" "system.private" }
+    { "(set-os-envs)" "system.private" }
     { "resize-byte-array" "byte-arrays" }
     { "resize-bit-array" "bit-arrays" }
     { "resize-float-array" "float-arrays" }
+    { "dll-valid?" "alien" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 

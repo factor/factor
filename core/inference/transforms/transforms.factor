@@ -35,7 +35,7 @@ IN: inference.transforms
             dup peek swap 1 head*
         ] [
             [ no-case ] swap
-        ] if hash-case>quot
+        ] if case>quot
     ] if
 ] 1 define-transform
 
@@ -93,5 +93,3 @@ M: duplicated-slots-error summary
         \ construct-empty 1 1 <effect> make-call-node
     ] if
 ] "infer" set-word-prop
-
-\ construct-empty 1 1 <effect> "inferred-effect" set-word-prop

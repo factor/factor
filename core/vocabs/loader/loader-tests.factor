@@ -1,9 +1,9 @@
 ! Unit tests for vocabs.loader vocabulary
-IN: temporary
+IN: vocabs.loader.tests
 USING: vocabs.loader tools.test continuations vocabs math
 kernel arrays sequences namespaces io.streams.string
 parser source-files words assocs tuples definitions
-debugger compiler.units ;
+debugger compiler.units tools.vocabs ;
 
 ! This vocab should not exist, but just in case...
 [ ] [
@@ -31,7 +31,7 @@ IN: vocabs.loader.test.2
 
 MAIN: hello
 
-IN: temporary
+IN: vocabs.loader.tests
 
 [ { 3 3 3 } ] [
     "vocabs.loader.test.2" run
@@ -78,6 +78,8 @@ IN: temporary
     ] with-compilation-unit
 ] unit-test
 
+[ f ] [ "vocabs.loader.test.b" vocab-files empty? ] unit-test
+
 [ ] [
     [
         "vocabs.loader.test.b" vocab-files
@@ -117,6 +119,13 @@ IN: temporary
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
 [ "kernel" vocab where ] unit-test
+
+[ ] [
+    [
+        "vocabs.loader.test.c" forget-vocab
+        "vocabs.loader.test.d" forget-vocab
+    ] with-compilation-unit
+] unit-test
 
 [ t ] [
     [ "vocabs.loader.test.d" require ] [ :1 ] recover

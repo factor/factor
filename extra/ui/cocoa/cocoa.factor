@@ -19,7 +19,7 @@ SYMBOL: stop-after-last-window?
 : event-loop ( -- )
     event-loop? [
         [
-            [ NSApp do-events ui-step 10 sleep ] ui-try
+            [ NSApp do-events ui-wait ] ui-try
         ] with-autorelease-pool event-loop
     ] when ;
 
@@ -59,10 +59,10 @@ M: cocoa-ui-backend set-title ( string world -- )
 : exit-fullscreen ( world -- )
     world-handle first f -> exitFullScreenModeWithOptions: ;
 
-M: cocoa-ui-backend set-fullscreen? ( ? world -- )
+M: cocoa-ui-backend set-fullscreen* ( ? world -- )
     swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
-M: cocoa-ui-backend fullscreen? ( world -- ? )
+M: cocoa-ui-backend fullscreen* ( world -- ? )
     world-handle first -> isInFullScreenMode zero? not ;
 
 : auto-position ( world -- )
@@ -85,7 +85,7 @@ M: cocoa-ui-backend close-window ( gadget -- )
         world-handle second f -> performClose:
     ] when* ;
 
-M: cocoa-ui-backend raise-window ( world -- )
+M: cocoa-ui-backend raise-window* ( world -- )
     world-handle [
         second dup f -> orderFront: -> makeKeyWindow
         NSApp 1 -> activateIgnoringOtherApps:

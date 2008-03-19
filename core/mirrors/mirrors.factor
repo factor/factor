@@ -1,8 +1,8 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel sequences generic words
 arrays classes slots slots.private tuples math vectors
-quotations ;
+quotations sorting prettyprint ;
 IN: mirrors
 
 GENERIC: object-slots ( obj -- seq )
@@ -21,12 +21,14 @@ TUPLE: mirror object slots ;
 : >mirror< ( mirror -- obj slots )
     dup mirror-object swap mirror-slots ;
 
+: mirror@ ( slot-name mirror -- obj slot-spec )
+    >mirror< swapd slot-named ;
+
 M: mirror at*
-    >mirror< swapd slot-of-reader
-    dup [ slot-spec-offset slot t ] [ 2drop f f ] if ;
+    mirror@ dup [ slot-spec-offset slot t ] [ 2drop f f ] if ;
 
 M: mirror set-at ( val key mirror -- )
-    >mirror< swapd slot-of-reader dup [
+    mirror@ dup [
         dup slot-spec-writer [
             slot-spec-offset set-slot
         ] [
@@ -42,7 +44,7 @@ M: mirror delete-at ( key mirror -- )
 M: mirror >alist ( mirror -- alist )
     >mirror<
     [ [ slot-spec-offset slot ] with map ] keep
-    [ slot-spec-reader ] map swap 2array flip ;
+    [ slot-spec-name ] map swap 2array flip ;
 
 M: mirror assoc-size mirror-slots length ;
 
@@ -69,8 +71,13 @@ M: enum clear-assoc enum-seq delete-all ;
 
 INSTANCE: enum assoc
 
+: sort-assoc ( assoc -- alist )
+    >alist
+    [ dup first unparse-short swap ] { } map>assoc
+    sort-keys values ;
+
 GENERIC: make-mirror ( obj -- assoc )
-M: hashtable make-mirror ;
+M: hashtable make-mirror sort-assoc ;
 M: integer make-mirror drop f ;
 M: array make-mirror <enum> ;
 M: vector make-mirror <enum> ;

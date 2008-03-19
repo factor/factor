@@ -1,9 +1,9 @@
 USING: html http io io.streams.string io.styles kernel
 namespaces tools.test xml.writer sbufs sequences html.private ;
-IN: temporary
+IN: html.tests
 
 : make-html-string
-    [ with-html-stream ] string-out ;
+    [ with-html-stream ] with-string-writer ;
 
 [ ] [
     512 <sbuf> <html-stream> drop

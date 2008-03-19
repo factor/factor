@@ -9,43 +9,37 @@ TUPLE: mysql-statement ;
 TUPLE: mysql-result-set ;
 
 M: mysql-db db-open ( mysql-db -- )
-    ;
+    drop ;
 
 M: mysql-db dispose ( mysql-db -- )
     mysql-db-handle mysql_close ;
 
-M: mysql-db <simple-statement> ( str -- statement )
-    ;
+M: mysql-db <simple-statement> ( str in out -- statement )
+    3drop f ;
 
-M: mysql-db <prepared-statement> ( str -- statement )
-    ;
+M: mysql-db <prepared-statement> ( str in out -- statement )
+    3drop f ;
 
 M: mysql-statement prepare-statement ( statement -- )
-    ;
+    drop ;
 
 M: mysql-statement bind-statement* ( statement -- )
-    ;
-
-M: mysql-statement rebind-statement ( statement -- )
-    ;
-
-M: mysql-statement execute-statement ( statement -- )
-    ;
+    drop ;
 
 M: mysql-statement query-results ( query -- result-set )
-    ;
+    drop f ;
 
 M: mysql-result-set #rows ( result-set -- n )
-    ;
+    drop 0 ;
 
 M: mysql-result-set #columns ( result-set -- n )
-    ;
+    drop 0 ;
 
 M: mysql-result-set row-column ( result-set n -- obj )
-    ;
+    2drop f ;
 
-M: mysql-result-set advance-row ( result-set -- ? )
-    ;
+M: mysql-result-set advance-row ( result-set -- )
+    drop ;
 
 M: mysql-db begin-transaction ( -- )
     ;

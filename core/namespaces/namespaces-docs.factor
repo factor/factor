@@ -87,7 +87,7 @@ HELP: +@
 { $description "Adds " { $snippet "n" } " to the value of the variable. A variable value of " { $link f } " is interpreted as being zero." }
 { $side-effects "variable" }
 { $examples
-    { $example "SYMBOL: foo\n1 foo +@\n10 foo +@\nfoo get ." "11" }
+    { $example "USING: namespaces prettyprint ;" "SYMBOL: foo\n1 foo +@\n10 foo +@\nfoo get ." "11" }
 } ;
 
 HELP: inc
@@ -168,7 +168,7 @@ HELP: building
 HELP: make
 { $values { "quot" quotation } { "exemplar" "a sequence" } { "seq" "a new sequence" } }
 { $description "Calls the quotation in a new " { $emphasis "dynamic scope" } ". The quotation and any words it calls can execute the " { $link , } " and " { $link % } " words to accumulate elements. When the quotation returns, all accumulated elements are collected into a sequence with the same type as " { $snippet "exemplar" } "." }
-{ $examples { $example "[ 1 , 2 , 3 , ] { } make ." "{ 1 2 3 }" } } ;
+{ $examples { $example "USING: namespaces prettyprint ;" "[ 1 , 2 , 3 , ] { } make ." "{ 1 2 3 }" } } ;
 
 HELP: ,
 { $values { "elt" object } }
@@ -179,8 +179,5 @@ HELP: %
 { $description "Appends a sequence to the end of the sequence being constructed by " { $link make } "." } ;
 
 HELP: init-namespaces
-{ $description "Resets the name stack to its initial state, holding a single copy of the global namespace. This word is called during startup and is rarely useful, except in certain situations such as the example below." }
-{ $examples
-    "You can use this word to spawn a new thread which does not inherit the parent thread's dynamic variable bindings:"
-    { $code "[ init-namestack do-some-work ] in-thread" }
-} ;
+{ $description "Resets the name stack to its initial state, holding a single copy of the global namespace." }
+$low-level-note ;

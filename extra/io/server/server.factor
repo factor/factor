@@ -2,10 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.sockets io.files logging continuations kernel
 math math.parser namespaces parser sequences strings
-prettyprint debugger quotations calendar qualified ;
-QUALIFIED: concurrency
-
+prettyprint debugger quotations calendar
+threads concurrency.combinators assocs ;
 IN: io.server
+
+SYMBOL: servers
+
+<PRIVATE
 
 LOG: accepted-connection NOTICE
 
@@ -15,21 +18,20 @@ LOG: accepted-connection NOTICE
         with-stream*
     ] curry with-disposal ; inline
 
-\ with-client NOTICE add-error-logging
+\ with-client DEBUG add-error-logging
 
 : accept-loop ( server quot -- )
     [
-        >r accept r> [ with-client ] 2curry
-        concurrency:spawn drop
+        >r accept r> [ with-client ] 2curry "Client" spawn drop
     ] 2keep accept-loop ; inline
 
-: server-loop ( server quot -- )
+: server-loop ( addrspec encoding quot -- )
+    >r <server> dup servers get push r>
     [ accept-loop ] curry with-disposal ; inline
 
-: spawn-server ( addrspec quot -- )
-    >r <server> r> server-loop ; inline
+\ server-loop NOTICE add-error-logging
 
-\ spawn-server NOTICE add-error-logging
+PRIVATE>
 
 : local-server ( port -- seq )
     "localhost" swap t resolve-host ;
@@ -37,14 +39,19 @@ LOG: accepted-connection NOTICE
 : internet-server ( port -- seq )
     f swap t resolve-host ;
 
-: with-server ( seq service quot -- )
-    [
-        [ spawn-server ] curry concurrency:parallel-each
-    ] curry with-logging ; inline
+: with-server ( seq service encoding quot -- )
+    V{ } clone servers [
+        [
+            [ server-loop ] 2curry with-logging
+        ] 3curry parallel-each
+    ] with-variable ; inline
 
-: received-datagram ( addrspec -- ) drop ;
+: stop-server ( -- )
+    servers get [ dispose ] each ;
 
-\ received-datagram NOTICE add-input-logging
+<PRIVATE
+
+LOG: received-datagram NOTICE
 
 : datagram-loop ( quot datagram -- )
     [
@@ -57,7 +64,9 @@ LOG: accepted-connection NOTICE
 
 \ spawn-datagrams NOTICE add-input-logging
 
+PRIVATE>
+
 : with-datagrams ( seq service quot -- )
     [
-        [ swap spawn-datagrams ] curry concurrency:parallel-each
+        [ swap spawn-datagrams ] curry parallel-each
     ] curry with-logging ; inline

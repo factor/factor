@@ -2,21 +2,60 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.streams.string
 USING: io kernel math namespaces sequences sbufs strings
-generic splitting io.streams.plain io.streams.lines
-continuations ;
+generic splitting growable continuations io.streams.plain
+io.encodings ;
 
-M: sbuf dispose drop ;
+M: growable dispose drop ;
 
-M: sbuf stream-write1 push ;
-M: sbuf stream-write push-all ;
-M: sbuf stream-flush drop ;
+M: growable stream-write1 push ;
+M: growable stream-write push-all ;
+M: growable stream-flush drop ;
 
 : <string-writer> ( -- stream )
-    512 <sbuf> <plain-writer> ;
+    512 <sbuf> ;
 
-: string-out ( quot -- str )
-    <string-writer> [ call stdio get >string ] with-stream* ;
-    inline
+: with-string-writer ( quot -- str )
+    <string-writer> swap [ stdio get ] compose with-stream*
+    >string ; inline
+
+M: growable stream-read1 dup empty? [ drop f ] [ pop ] if ;
+
+: harden-as ( seq growble-exemplar -- newseq )
+    underlying like ;
+
+: growable-read-until ( growable n -- str )
+    >fixnum dupd tail-slice swap harden-as dup reverse-here ;
+
+: find-last-sep swap [ memq? ] curry find-last drop ;
+
+M: growable stream-read-until
+    [ find-last-sep ] keep over [
+        [ swap 1+ growable-read-until ] 2keep [ nth ] 2keep
+        set-length
+    ] [
+        [ swap drop 0 growable-read-until f like f ] keep
+        delete-all
+    ] if ;
+
+M: growable stream-read
+    dup empty? [
+        2drop f
+    ] [
+        [ length swap - 0 max ] keep
+        [ swap growable-read-until ] 2keep
+        set-length
+    ] if ;
+
+M: growable stream-read-partial
+    stream-read ;
+
+: <string-reader> ( str -- stream )
+    >sbuf dup reverse-here f <decoder> ;
+
+: with-string-reader ( str quot -- )
+    >r <string-reader> r> with-stream ; inline
+
+INSTANCE: growable plain-writer
 
 : format-column ( seq ? -- seq )
     [
@@ -37,36 +76,5 @@ M: plain-writer stream-write-table
 
 M: plain-writer make-cell-stream 2drop <string-writer> ;
 
-M: sbuf stream-read1 dup empty? [ drop f ] [ pop ] if ;
-
-: sbuf-read-until ( sbuf n -- str )
-    tail-slice >string dup reverse-here ;
-
-: find-last-sep swap [ memq? ] curry find-last drop ;
-
-M: sbuf stream-read-until
-    [ find-last-sep ] keep over [
-        [ swap 1+ sbuf-read-until ] 2keep [ nth ] 2keep
-        set-length
-    ] [
-        [ swap drop 0 sbuf-read-until f like f ] keep
-        delete-all
-    ] if ;
-
-M: sbuf stream-read
-    dup empty? [
-        2drop f
-    ] [
-        [ length swap - 0 max ] keep
-        [ swap sbuf-read-until ] 2keep
-        set-length
-    ] if ;
-
-M: sbuf stream-read-partial
-    stream-read ;
-
-: <string-reader> ( str -- stream )
-    >sbuf dup reverse-here <line-reader> ;
-
-: string-in ( str quot -- )
-    >r <string-reader> r> with-stream ; inline
+M: growable stream-readln ( stream -- str )
+    "\r\n" over stream-read-until handle-readln ;

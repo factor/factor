@@ -221,8 +221,8 @@ HELP: <parse-error>
 { $description "Creates a new " { $link parse-error } ", filling in the location information from the current " { $link lexer } "." } ;
 
 HELP: skip
-{ $values { "i" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "n" integer } }
-{ $description "Variant of " { $link find* } " that outputs the length of the sequence instead of " { $link f } " if no elements satisfy the predicate." } ;
+{ $values { "i" "a starting index" } { "seq" sequence } { "?" "a boolean" } { "n" integer } }
+{ $description "Skips to the first space character (if " { $snippet "boolean" } " is " { $link f } ") or the first non-space character (otherwise)." } ;
 
 HELP: change-column
 { $values { "lexer" lexer } { "quot" "a quotation with stack effect " { $snippet "( col line -- newcol )" } } }
@@ -264,21 +264,12 @@ HELP: bad-number
 HELP: escape
 { $values { "escape" "a single-character escape" } { "ch" "a character" } }
 { $description "Converts from a single-character escape code and the corresponding character." }
-{ $examples { $example "CHAR: n escape CHAR: \\n = ." "t" } } ;
-
-HELP: next-escape
-{ $values { "m" "an index into " { $snippet "str" } } { "str" string } { "n" "an index into " { $snippet "str" } } { "ch" "a character" } }
-{ $description "Helper word for " { $link parse-string } " which parses an escape sequence starting at the " { $snippet "m" } "th index of " { $snippet "str" } "." }
-{ $errors "Throws a " { $link bad-escape } " if the string contains an invalid escape sequence." } ;
-
-HELP: next-char
-{ $values { "m" "an index into " { $snippet "str" } } { "str" string } { "n" "an index into " { $snippet "str" } } { "ch" "a character" } }
-{ $description "Helper word for " { $link parse-string } " which parses a character starting at the " { $snippet "m" } "th index of " { $snippet "str" } "." } ;
+{ $examples { $example "USING: kernel parser prettyprint ;" "CHAR: n escape CHAR: \\n = ." "t" } } ;
 
 HELP: parse-string
 { $values { "str" "a new " { $link string } } }
 { $description "Parses the line until a quote (\"), interpreting escape codes along the way." }
-{ $errors "Throws an " { $link bad-escape } " if the string contains an invalid escape sequence." }
+{ $errors "Throws an error if the string contains an invalid escape sequence." }
 $parsing-note ;
 
 HELP: still-parsing?
@@ -349,8 +340,8 @@ HELP: no-word
 { $notes "Apart from a missing " { $link POSTPONE: USE: } ", this error can also indicate an ordering issue. In Factor, words must be defined before they can be called. Mutual recursion can be implemented via " { $link POSTPONE: DEFER: } "." } ;
 
 HELP: search
-{ $values { "str" string } { "word" word } }
-{ $description "Searches for a word by name in the current vocabulary search path. If no such word could be found, throws a " { $link no-word } " error. If the search path does not contain a word with this name but other vocabularies do, the error will have restarts offering to add vocabularies to the search path." }
+{ $values { "str" string } { "word/f" "a word or " { $link f } } }
+{ $description "Searches for a word by name in the current vocabulary search path. If no such word could be found, outputs " { $link f } "." }
 $parsing-note ;
 
 HELP: scan-word
@@ -468,7 +459,7 @@ HELP: forget-smudged
 { $description "Forgets removed definitions and prints a warning message if any of them are still referenced from other source files." } ;
 
 HELP: finish-parsing
-{ $values { "quot" "the quotation just parsed" } }
+{ $values { "lines" "the lines of text just parsed" } { "quot" "the quotation just parsed" } }
 { $description "Records information to the current " { $link file } " and prints warnings about any removed definitions which are still in use." }
 { $notes "This is one of the factors of " { $link parse-stream } "." } ;
 

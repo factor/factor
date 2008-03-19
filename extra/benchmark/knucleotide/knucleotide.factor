@@ -1,4 +1,4 @@
-USING: kernel io io.files splitting strings
+USING: kernel io io.files splitting strings io.encodings.ascii
        hashtables sequences assocs math namespaces prettyprint
        math.parser combinators arrays sorting unicode.case ;
 
@@ -57,8 +57,7 @@ IN: benchmark.knucleotide
 
 : knucleotide ( -- )
     "extra/benchmark/knucleotide/knucleotide-input.txt" resource-path
-    <file-reader>
-    [ read-input ] with-stream
+    ascii [ read-input ] with-file-reader
     process-input ;
 
 MAIN: knucleotide

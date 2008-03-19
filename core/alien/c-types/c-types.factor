@@ -4,7 +4,7 @@ USING: bit-arrays byte-arrays float-arrays arrays
 generator.registers assocs kernel kernel.private libc math
 namespaces parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
-system compiler.units ;
+layouts system compiler.units io.files io.encodings.binary ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -155,19 +155,8 @@ M: float-array byte-length length "double" heap-size * ;
 : memory>byte-array ( alien len -- byte-array )
     dup <byte-array> [ -rot memcpy ] keep ;
 
-: memory>char-string ( alien len -- string )
-    memory>byte-array >string ;
-
-DEFER: c-ushort-array>
-
-: memory>u16-string ( alien len -- string )
-    [ memory>byte-array ] keep 2/ c-ushort-array> >string ;
-
 : byte-array>memory ( byte-array base -- )
     swap dup length memcpy ;
-
-: string>char-memory ( string base -- )
-    >r >byte-array r> byte-array>memory ;
 
 DEFER: >c-ushort-array
 
@@ -272,6 +261,9 @@ M: long-long-type box-return ( type -- )
         unclip >r [ dup word? [ word-def call ] when ] map
         r> add*
     ] when ;
+
+: malloc-file-contents ( path -- alien len )
+    binary file-contents dup malloc-byte-array swap length ;
 
 [
     [ alien-cell ]

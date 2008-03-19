@@ -7,7 +7,7 @@ HELP: generate
 { $description "Loop until the generator quotation generates an object that satisfies predicate quotation." }
 { $unchecked-example
     "! Generate a random 20-bit prime number congruent to 3 (mod 4)"
-    "USE: math.miller-rabin"
+    "USING: combinators.lib math math.miller-rabin prettyprint ;"
     "[ 20 random-prime ] [ 4 mod 3 = ] generate ."
     "526367"
 } ;
@@ -20,8 +20,8 @@ HELP: ndip
 "stack. The quotation can consume and produce any number of items."
 } 
 { $examples
-  { $example "USE: combinators.lib" "1 2 [ dup ] 1 ndip .s" "1\n1\n2" }
-  { $example "USE: combinators.lib" "1 2 3 [ drop ] 2 ndip .s" "2\n3" }
+  { $example "USING: combinators.lib kernel prettyprint ;" "1 2 [ dup ] 1 ndip .s" "1\n1\n2" }
+  { $example "USING: combinators.lib kernel prettyprint ;" "1 2 3 [ drop ] 2 ndip .s" "2\n3" }
 }
 { $see-also dip dipd } ;
 
@@ -32,7 +32,7 @@ HELP: nslip
 "removed from the stack, the quotation called, and the items restored."
 } 
 { $examples
-  { $example "USE: combinators.lib" "[ 99 ] 1 2 3 4 5 5 nslip .s" "99\n1\n2\n3\n4\n5" }
+  { $example "USING: combinators.lib prettyprint ;" "[ 99 ] 1 2 3 4 5 5 nslip .s" "99\n1\n2\n3\n4\n5" }
 }
 { $see-also slip nkeep } ;
 
@@ -43,7 +43,7 @@ HELP: nkeep
 "saved, the quotation called, and the items restored."
 } 
 { $examples
-  { $example "USE: combinators.lib" "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep .s" "99\n1\n2\n3\n4\n5" }
+  { $example "USING: combinators.lib kernel prettyprint ;" "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep .s" "99\n1\n2\n3\n4\n5" }
 }
 { $see-also keep nslip } ;
 

@@ -10,7 +10,7 @@ HELP: tree-write
     "Write the object to the standard output stream, unless "
     "it is an array, in which case recurse through the array "
     "writing each object to the stream." }
-{ $example "{ 65 \"bc\" { 68 \"ef\" } } tree-write" "AbcDef" } ;
+{ $example "USE: peg.search" "{ 65 \"bc\" { 68 \"ef\" } } tree-write" "AbcDef" } ;
 
 HELP: search
 { $values
@@ -24,8 +24,8 @@ HELP: search
     "parser."
 }
 
-{ $example "\"one 123 two 456\" 'integer' search" "V{ 123 456 }" }
-{ $example "\"one 123 \\\"hello\\\" two 456\" 'integer' 'string' 2array choice search" "V{ 123 \"hello\" 456 }" }
+{ $example "USING: peg.parsers peg.search prettyprint ;" "\"one 123 two 456\" 'integer' search ." "V{ 123 456 }" }
+{ $example "USING: peg peg.parsers peg.search prettyprint ;" "\"one 123 \\\"hello\\\" two 456\" 'integer' 'string' 2choice search ." "V{ 123 \"hello\" 456 }" }
 { $see-also replace } ;
 
 HELP: replace
@@ -39,6 +39,6 @@ HELP: replace
     "successfully parse with the given parser replaced with "
     "the result of that parser."
 }
-{ $example "\"one 123 two 456\" 'integer' [ 2 * number>string ] action replace" "\"one 246 two 912\"" }
+{ $example "USING: math math.parser peg peg.parsers peg.search prettyprint ;" "\"one 123 two 456\" 'integer' [ 2 * number>string ] action replace ." "\"one 246 two 912\"" }
 { $see-also search } ;
 

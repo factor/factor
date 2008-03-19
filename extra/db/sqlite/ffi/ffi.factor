@@ -1,17 +1,12 @@
 ! Copyright (C) 2005 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-!
 ! An interface to the sqlite database. Tested against sqlite v3.1.3.
-
-! Not all functions have been wrapped yet. Only those directly involving
-! executing SQL calls and obtaining results.
-
+! Not all functions have been wrapped.
 USING: alien compiler kernel math namespaces sequences strings alien.syntax
     system combinators ;
 IN: db.sqlite.ffi
 
-<<
-    "sqlite" {
+<< "sqlite" {
         { [ winnt? ]  [ "sqlite3.dll" ] }
         { [ macosx? ] [ "/usr/lib/libsqlite3.dylib" ] }
         { [ unix? ]  [ "libsqlite3.so" ] }
@@ -76,8 +71,9 @@ IN: db.sqlite.ffi
     "File opened that is not a database file"
 } ;
 
-: SQLITE_ROW         100  ; inline ! sqlite_step() has another row ready 
-: SQLITE_DONE        101  ; inline ! sqlite_step() has finished executing 
+! Return values from sqlite3_step
+: SQLITE_ROW         100  ; inline
+: SQLITE_DONE        101  ; inline
 
 ! Return values from the sqlite3_column_type function
 : SQLITE_INTEGER     1 ; inline
@@ -103,7 +99,6 @@ IN: db.sqlite.ffi
 : SQLITE_OPEN_SUBJOURNAL       HEX: 00002000 ; inline
 : SQLITE_OPEN_MASTER_JOURNAL   HEX: 00004000 ; inline
 
-
 TYPEDEF: void sqlite3
 TYPEDEF: void sqlite3_stmt
 TYPEDEF: longlong sqlite3_int64
@@ -112,11 +107,12 @@ TYPEDEF: ulonglong sqlite3_uint64
 LIBRARY: sqlite
 FUNCTION: int sqlite3_open ( char* filename, void* ppDb ) ;
 FUNCTION: int sqlite3_close ( sqlite3* pDb ) ;
+FUNCTION: char* sqlite3_errmsg ( sqlite3* pDb ) ;
 FUNCTION: int sqlite3_prepare ( sqlite3* pDb, char* zSql, int nBytes, void* ppStmt, void* pzTail ) ;
 FUNCTION: int sqlite3_finalize ( sqlite3_stmt* pStmt ) ;
 FUNCTION: int sqlite3_reset ( sqlite3_stmt* pStmt ) ;
 FUNCTION: int sqlite3_step ( sqlite3_stmt* pStmt ) ;
-FUNCTION: int sqlite3_last_insert_rowid ( sqlite3* pStmt ) ;
+FUNCTION: sqlite3_int64 sqlite3_last_insert_rowid ( sqlite3* pStmt ) ;
 FUNCTION: int sqlite3_bind_blob ( sqlite3_stmt* pStmt, int index, void* ptr, int len, int destructor ) ;
 FUNCTION: int sqlite3_bind_double ( sqlite3_stmt* pStmt, int index, double x ) ;
 FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n ) ;
@@ -129,6 +125,8 @@ FUNCTION: void* sqlite3_column_blob ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: int sqlite3_column_bytes ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: char* sqlite3_column_decltype ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: int sqlite3_column_name ( sqlite3_stmt* pStmt, int col ) ;
+FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
+FUNCTION: double sqlite3_column_double ( sqlite3_stmt* pStmt, int col ) ;
+FUNCTION: char* sqlite3_column_name ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: char* sqlite3_column_text ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: int sqlite3_column_type ( sqlite3_stmt* pStmt, int col ) ;

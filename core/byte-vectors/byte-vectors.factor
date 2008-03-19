@@ -6,7 +6,7 @@ IN: byte-vectors
 
 <PRIVATE
 
-: byte-array>vector ( byte-array capacity -- byte-vector )
+: byte-array>vector ( byte-array length -- byte-vector )
     byte-vector construct-boa ; inline
 
 PRIVATE>

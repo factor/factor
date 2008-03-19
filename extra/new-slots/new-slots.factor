@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: effects words kernel sequences slots slots.private
-assocs parser mirrors namespaces math vocabs ;
+assocs parser mirrors namespaces math vocabs tuples ;
 IN: new-slots
 
 : create-accessor ( name effect -- word )
@@ -19,12 +19,22 @@ IN: new-slots
 : writer-effect T{ effect f { "value" "object" } { } } ; inline
 
 : writer-word ( name -- word )
-    ">>" swap append writer-effect create-accessor ;
+    "(>>" swap ")" 3append writer-effect create-accessor ;
 
 : define-writer ( class slot name -- )
     writer-word [ set-slot ] define-slot-word ;
 
-: changer-effect T{ effect f { "object" "quot" } } ; inline
+: setter-effect T{ effect f { "object" "value" } { "value" } } ; inline
+
+: setter-word ( name -- word )
+    ">>" swap append setter-effect create-accessor ;
+
+: define-setter ( name -- )
+    dup setter-word dup deferred? [
+        [ \ over , swap writer-word , ] [ ] make define-inline
+    ] [ 2drop ] if ;
+
+: changer-effect T{ effect f { "object" "quot" } { "object" } } ; inline
 
 : changer-word ( name -- word )
     "change-" swap append changer-effect create-accessor ;
@@ -34,18 +44,24 @@ IN: new-slots
         [
             [ over >r >r ] %
             over reader-word ,
-            [ r> call r> ] %
-            swap writer-word ,
-        ] [ ] make define
+            [ r> call r> swap ] %
+            swap setter-word ,
+        ] [ ] make define-inline
     ] [ 2drop ] if ;
 
 : define-new-slot ( class slot name -- )
-    dup define-changer 3dup define-reader define-writer ;
+    dup define-changer
+    dup define-setter
+    3dup define-reader
+    define-writer ;
 
 : define-new-slots ( tuple-class -- )
     [ "slot-names" word-prop <enum> >alist ] keep
     [ swap first2 >r 4 + r> define-new-slot ] curry each ;
 
-: NEW-SLOTS: scan-word define-new-slots ; parsing
+: TUPLE:
+    CREATE-CLASS
+    dup ";" parse-tokens define-tuple-class
+    define-new-slots ; parsing
 
 "accessors" create-vocab drop

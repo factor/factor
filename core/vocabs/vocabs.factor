@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs strings kernel sorting namespaces sequences
 definitions ;
@@ -15,8 +15,8 @@ source-loaded? docs-loaded? ;
 M: vocab equal? 2drop f ;
 
 : <vocab> ( name -- vocab )
-    H{ } clone t
-    { set-vocab-name set-vocab-words set-vocab-source-loaded? }
+    H{ } clone
+    { set-vocab-name set-vocab-words }
     \ vocab construct ;
 
 GENERIC: vocab ( vocab-spec -- vocab )
@@ -55,12 +55,21 @@ M: f vocab-docs-loaded? ;
 
 M: f set-vocab-docs-loaded? 2drop ;
 
+M: f vocab-help ;
+
 : create-vocab ( name -- vocab )
     dictionary get [ <vocab> ] cache ;
 
-SYMBOL: load-vocab-hook
+TUPLE: no-vocab name ;
 
-: load-vocab ( name -- vocab ) load-vocab-hook get call ;
+: no-vocab ( name -- * )
+    vocab-name \ no-vocab construct-boa throw ;
+
+SYMBOL: load-vocab-hook ! ( name -- )
+
+: load-vocab ( name -- vocab )
+    dup load-vocab-hook get call
+    dup vocab [ ] [ no-vocab ] ?if ;
 
 : vocabs ( -- seq )
     dictionary get keys natural-sort ;
@@ -85,7 +94,8 @@ SYMBOL: load-vocab-hook
 
 TUPLE: vocab-link name root ;
 
-C: <vocab-link> vocab-link
+: <vocab-link> ( name root -- vocab-link )
+    [ dup vocab-root ] unless* vocab-link construct-boa ;
 
 M: vocab-link equal?
     over vocab-link?
@@ -103,9 +113,7 @@ M: vocab >vocab-link drop ;
 M: vocab-link >vocab-link drop ;
 
 M: string >vocab-link
-    over vocab dup [ 2nip ] [
-        drop [ dup vocab-root ] unless* <vocab-link>
-    ] if ;
+    over vocab dup [ 2nip ] [ drop <vocab-link> ] if ;
 
 UNION: vocab-spec vocab vocab-link ;
 

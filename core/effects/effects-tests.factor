@@ -1,4 +1,4 @@
-IN: temporary
+IN: effects.tests
 USING: effects tools.test ;
 
 [ t ] [ 1 1 <effect> 2 2 <effect> effect<= ] unit-test

@@ -7,7 +7,7 @@ strings sbufs vectors words quotations assocs system layouts
 splitting growable classes tuples words.private
 io.binary io.files vocabs vocabs.loader source-files
 definitions debugger float-arrays quotations.private
-sequences.private combinators ;
+sequences.private combinators io.encodings.binary ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
@@ -36,7 +36,7 @@ IN: bootstrap.image
 
 : data-base 1024 ; inline
 
-: userenv-size 40 ; inline
+: userenv-size 64 ; inline
 
 : header-size 10 ; inline
 
@@ -191,7 +191,9 @@ M: bignum '
 M: fixnum '
     #! When generating a 32-bit image on a 64-bit system,
     #! some fixnums should be bignums.
-    dup most-negative-fixnum most-positive-fixnum between?
+    dup
+    bootstrap-most-negative-fixnum
+    bootstrap-most-positive-fixnum between?
     [ tag-fixnum ] [ >bignum ' ] if ;
 
 ! Floats
@@ -416,7 +418,7 @@ M: curry '
     "Writing image to " write
     architecture get boot-image-name resource-path
     dup write "..." print flush
-    <file-writer> [ (write-image) ] with-stream ;
+    binary <file-writer> [ (write-image) ] with-stream ;
 
 PRIVATE>
 

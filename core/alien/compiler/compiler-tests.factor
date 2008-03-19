@@ -1,4 +1,4 @@
-IN: temporary
+IN: alien.compiler.tests
 USING: alien alien.c-types alien.syntax compiler kernel
 namespaces namespaces tools.test sequences inference words
 arrays parser quotations continuations inference.backend effects
@@ -315,7 +315,7 @@ FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
     data-gc ;
 
 [ "Hello world" ] [ 
-    [ callback-4 callback_test_1 ] string-out
+    [ callback-4 callback_test_1 ] with-string-writer
 ] unit-test
 
 : callback-5

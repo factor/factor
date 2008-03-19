@@ -1,5 +1,6 @@
-USING: xmode.tokens xmode.marker xmode.catalog kernel html html.elements io
-    io.files sequences words ;
+USING: xmode.tokens xmode.marker xmode.catalog kernel html
+html.elements io io.files sequences words io.encodings.utf8
+namespaces ;
 IN: xmode.code2html
 
 : htmlize-tokens ( tokens -- )
@@ -20,7 +21,7 @@ IN: xmode.code2html
 : default-stylesheet ( -- )
     <style>
         "extra/xmode/code2html/stylesheet.css"
-        resource-path file-contents write
+        resource-path utf8 file-contents write
     </style> ;
 
 : htmlize-stream ( path stream -- )
@@ -40,5 +41,9 @@ IN: xmode.code2html
     </html> ;
 
 : htmlize-file ( path -- )
-    dup <file-reader> over ".html" append <file-writer>
-    [ htmlize-stream ] with-stream ;
+    dup utf8 [
+        stdio get
+        over ".html" append utf8 [
+            htmlize-stream
+        ] with-file-writer
+    ] with-file-reader ;

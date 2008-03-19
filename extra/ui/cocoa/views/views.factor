@@ -297,8 +297,7 @@ CLASS: {
 { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
     [
         [
-            2drop dup view-dim swap window set-gadget-dim
-            ui-step
+            2drop dup view-dim swap window set-gadget-dim yield
         ] ui-try
     ]
 }

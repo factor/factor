@@ -1,6 +1,6 @@
 USING: kernel tools.test math namespaces prettyprint
 sequences inspector io.streams.string ;
-IN: temporary
+IN: inspector.tests
 
 [ 1 2 3 ] describe
 f describe
@@ -8,4 +8,4 @@ f describe
 H{ } describe
 H{ } describe
 
-[ "fixnum instance\n" ] [ [ 3 describe ] string-out ] unit-test
+[ "fixnum instance\n" ] [ [ 3 describe ] with-string-writer ] unit-test

@@ -127,21 +127,27 @@ ARTICLE: "conditionals" "Conditionals and logic"
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
 ARTICLE: "equality" "Equality and comparison testing"
-"There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object, or you can test if two objects are equal in some sense, usually by being instances of the same class, and having equal slot values. Both notions of equality are equality relations in the mathematical sense."
+"There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object (" { $emphasis "identity comparison" } "), or you can test if two objects are equal in a domain-specific sense, usually by being instances of the same class, and having equal slot values (" { $emphasis "value comparison" } "). Both notions of equality are equality relations in the mathematical sense."
+$nl
+"Identity comparison:"
 { $subsection eq? }
+"Value comparison:"
 { $subsection = }
+"Generic words for custom value comparison methods:"
+{ $subsection equal? }
 "Some types of objects also have an intrinsic order allowing sorting using " { $link natural-sort } ":"
 { $subsection <=> }
 { $subsection compare }
+"Utilities for comparing objects:"
+{ $subsection after? }
+{ $subsection before? }
+{ $subsection after=? }
+{ $subsection before=? }
 "An object can be cloned; the clone has distinct identity but equal value:"
 { $subsection clone } ;
 
 ! Defined in handbook.factor
 ABOUT: "dataflow"
-
-HELP: version
-{ $values { "str" string } }
-{ $description "Outputs the version number of the current Factor instance." } ;
 
 HELP: eq? ( obj1 obj2 -- ? )
 { $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
@@ -229,21 +235,18 @@ HELP: equal?
 { $contract
     "Tests if two objects are equal."
     $nl
-    "Method definitions should ensure that this is an equality relation:"
+    "User code should call " { $link = } " instead; that word first tests the case where the objects are " { $link eq? } ", and so by extension, methods defined on " { $link equal? } " assume they are never called on " { $link eq? } " objects."
+    $nl
+    "Method definitions should ensure that this is an equality relation, modulo the assumption that the two objects are not " { $link eq? } ". That is, for any three non-" { $link eq? } " objects " { $snippet "a" } ", " { $snippet "b" } " and " { $snippet "c" } ", we must have:"
     { $list
-        { $snippet "a = a" }
         { { $snippet "a = b" } " implies " { $snippet "b = a" } }
         { { $snippet "a = b" } " and " { $snippet "b = c" } " implies " { $snippet "a = c" } }
     }
-    "While user code can define methods for this generic word, it should not call it directly, since it does not handle the case where the two references point to the same object."
 }
 { $examples
-    "The most common reason for defining a method for this generic word to ensure that instances of a specific tuple class are only ever equal to themselves, overriding the default implementation which checks slot values for equality."
+    "To define a tuple class such that two instances are only equal if they are both the same instance, we can add a method to " { $link equal? } " which always returns " { $link f } ". Since " { $link = } " handles the case where the two objects are " { $link eq? } ", this method will never be called with two " { $link eq? } " objects, so such a definition is valid:"
     { $code "TUPLE: foo ;" "M: foo equal? 2drop f ;" }
-    "Note that with the above definition, calling " { $link equal? } " directly will give unexpected results:"
-    { $unchecked-example "T{ foo } dup equal? ." "f" }
-    { $unchecked-example "T{ foo } dup clone equal? ." "f" }
-    "As documented above, " { $link = } " should be called instead:"
+    "By calling " { $link = } " on instances of " { $snippet "foo" } " we get the results we expect:"
     { $unchecked-example "T{ foo } dup = ." "t" }
     { $unchecked-example "T{ foo } dup clone = ." "f" }
 } ;
@@ -268,7 +271,7 @@ HELP: compare
 { $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "n" integer } }
 { $description "Compares the results of applying the quotation to both objects via " { $link <=> } "." }
 { $examples
-    { $example "\"hello\" \"hi\" [ length ] compare ." "3" }
+    { $example "USING: kernel prettyprint sequences ;" "\"hello\" \"hi\" [ length ] compare ." "3" }
 } ;
 
 HELP: clone
@@ -300,9 +303,9 @@ HELP: and
 { $notes "This word implements boolean and, so applying it to integers will not yield useful results (all integers have a true value). Bitwise and is the " { $link bitand } " word." }
 { $examples
     "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that if both inputs are true, the second is output:"
-    { $example "t f and ." "f" }
-    { $example "t 7 and ." "7" }
-    { $example "\"hi\" 12.0 and ." "12.0" }
+    { $example "USING: kernel prettyprint ;" "t f and ." "f" }
+    { $example "USING: kernel prettyprint ;" "t 7 and ." "7" }
+    { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 and ." "12.0" }
 } ;
 
 HELP: or
@@ -311,8 +314,8 @@ HELP: or
 { $notes "This word implements boolean inclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise inclusive or is the " { $link bitor } " word." }
 { $examples
     "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that the result will be the first true input:"
-    { $example "t f or ." "t" }
-    { $example "\"hi\" 12.0 or ." "\"hi\"" }
+    { $example "USING: kernel prettyprint ;" "t f or ." "t" }
+    { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 or ." "\"hi\"" }
 } ;
 
 HELP: xor
@@ -324,23 +327,21 @@ HELP: both?
 { $values { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "x" object } { "y" object } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to both " { $snippet "x" } " and " { $snippet "y" } "." }
 { $examples
-    { $example "3 5 [ odd? ] both? ." "t" }
-    { $example "12 7 [ even? ] both? ." "f" }
+    { $example "USING: kernel math prettyprint ;" "3 5 [ odd? ] both? ." "t" }
+    { $example "USING: kernel math prettyprint ;" "12 7 [ even? ] both? ." "f" }
 } ;
 
 HELP: either?
 { $values { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "x" object } { "y" object } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to either " { $snippet "x" } " or " { $snippet "y" } "." }
 { $examples
-    { $example "3 6 [ odd? ] either? ." "t" }
-    { $example "5 7 [ even? ] either? ." "f" }
+    { $example "USING: kernel math prettyprint ;" "3 6 [ odd? ] either? ." "t" }
+    { $example "USING: kernel math prettyprint ;" "5 7 [ even? ] either? ." "f" }
 } ;
 
-HELP: call ( quot -- )
-{ $values { "quot" callable } }
-{ $description "Calls a quotation."
-$nl
-"Under the covers, pushes the current call frame on the call stack, and set the call frame to the given quotation." }
+HELP: call
+{ $values { "callable" callable } }
+{ $description "Calls a quotation." }
 { $examples
     "The following two lines are equivalent:"
     { $code "2 [ 2 + 3 * ] call" "2 2 + 3 *" }
@@ -428,7 +429,14 @@ $nl
 { $code "[ X ] [ Y ] ?if" "dup [ nip X ] [ drop Y ] if" } } ;
 
 HELP: die
-{ $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." } ;
+{ $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." }
+{ $notes
+    "The term FEP originates from the Lisp machines of old. According to the Jargon File,"
+    $nl
+    { $strong "fepped out" } " /fept owt/ " { $emphasis "adj." }  " The Symbolics 3600 LISP Machine has a Front-End Processor called a `FEP' (compare sense 2 of box). When the main processor gets wedged, the FEP takes control of the keyboard and screen. Such a machine is said to have `fepped out' or `dropped into the fep'." 
+    $nl
+    { $url "http://www.jargon.net/jargonfile/f/feppedout.html" }
+} ;
 
 HELP: (clone) ( obj -- newobj )
 { $values { "obj" object } { "newobj" "a shallow copy" } }
@@ -493,9 +501,9 @@ HELP: curry ( obj quot -- curry )
 $nl
 "This operation is efficient and does not copy the quotation." }
 { $examples
-    { $example "5 [ . ] curry ." "[ 5 . ]" }
-    { $example "\\ = [ see ] curry ." "[ \\ = see ]" }
-    { $example "{ 1 2 3 } 2 [ - ] curry map ." "{ -1 0 1 }" }
+    { $example "USING: kernel prettyprint ;" "5 [ . ] curry ." "[ 5 . ]" }
+    { $example "USING: kernel prettyprint ;" "\\ = [ see ] curry ." "[ \\ = see ]" }
+    { $example "USING: kernel math prettyprint sequences ;" "{ 1 2 3 } 2 [ - ] curry map ." "{ -1 0 1 }" }
 } ;
 
 HELP: 2curry
@@ -503,7 +511,7 @@ HELP: 2curry
 { $description "Outputs a " { $link callable } " which pushes " { $snippet "obj1" } " and " { $snippet "obj2" } " and then calls " { $snippet "quot" } "." }
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
-    { $example "5 4 [ + ] 2curry ." "[ 5 4 + ]" }
+    { $example "USING: kernel math prettyprint ;" "5 4 [ + ] 2curry ." "[ 5 4 + ]" }
 } ;
 
 HELP: 3curry
@@ -520,7 +528,7 @@ HELP: with
 }
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
-    { $example "2 { 1 2 3 } [ - ] with map ." "{ 1 0 -1 }" }
+    { $example "USING: kernel math prettyprint sequences ;" "2 { 1 2 3 } [ - ] with map ." "{ 1 0 -1 }" }
 } ;
 
 HELP: compose
@@ -532,7 +540,7 @@ HELP: compose
         "compose call"
         "append call"
     }
-    "However, " { $link compose } " runs in constant time, and the compiler is able to compile code which calls composed quotations."
+    "However, " { $link compose } " runs in constant time, and the optimizing compiler is able to compile code which calls composed quotations."
 } ;
 
 HELP: 3compose

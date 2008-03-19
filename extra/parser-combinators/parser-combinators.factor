@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lazy-lists promises kernel sequences strings math
 arrays splitting quotations combinators namespaces
-unicode.case unicode.categories ;
+unicode.case unicode.categories sequences.deep ;
 IN: parser-combinators
 
 ! Parser combinator protocol
@@ -38,7 +38,7 @@ C: <parse-result> parse-result
     [ [ >upper ] 2apply ] when sequence= ;
 
 : string-head? ( str head ignore-case -- ? )
-    pick pick shorter? [
+    2over shorter? [
         3drop f
     ] [
         >r [ length head-slice ] keep r> string=
@@ -328,11 +328,6 @@ LAZY: <(+)> ( parser -- parser )
 
 LAZY: surrounded-by ( parser start end -- parser' )
     [ token ] 2apply swapd pack ;
-
-: flatten* ( obj -- )
-    dup array? [ [ flatten* ] each ] [ , ] if ;
-
-: flatten [ flatten* ] { } make ;
 
 : exactly-n ( parser n -- parser' )
     swap <repetition> <and-parser> [ flatten ] <@ ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test match namespaces arrays ;
-IN: temporary
+IN: match.tests
 
 MATCH-VARS: ?a ?b ;
 

@@ -63,9 +63,9 @@ combinators quotations ;
 
 : pprint-use ( obj -- ) [ pprint* ] with-use ;
 
-: unparse ( obj -- str ) [ pprint ] string-out ;
+: unparse ( obj -- str ) [ pprint ] with-string-writer ;
 
-: unparse-use ( obj -- str ) [ pprint-use ] string-out ;
+: unparse-use ( obj -- str ) [ pprint-use ] with-string-writer ;
 
 : pprint-short ( obj -- )
     H{
@@ -74,6 +74,9 @@ combinators quotations ;
        { nesting-limit 2 }
        { string-limit t }
     } clone [ pprint ] bind ;
+
+: unparse-short ( obj -- str )
+    [ pprint-short ] with-string-writer ;
 
 : short. ( obj -- ) pprint-short nl ;
 
@@ -94,27 +97,18 @@ SYMBOL: ->
 { { foreground { 1 1 1 1 } } { background { 0 0 0 1 } } }
 "word-style" set-word-prop
 
-! This code is ugly and could probably be simplified
-: remove-step-into
-    building get dup empty? [
-        drop \ (step-into) ,
-    ] [
-        pop dup wrapper? [
-            wrapped dup \ break eq?
-            [ drop ] [ , ] if
-        ] [
-            ,
-        ] if
-    ] if ;
+: remove-step-into ( word -- )
+    building get dup empty? [ drop ] [ nip pop wrapped ] if , ;
 
 : (remove-breakpoints) ( quot -- newquot )
     [
         [
             {
-                { break [ ] }
-                { (step-into) [ remove-step-into ] }
-                [ , ]
-            } case
+                { [ dup word? not ] [ , ] }
+                { [ dup "break?" word-prop ] [ drop ] }
+                { [ dup "step-into?" word-prop ] [ remove-step-into ] }
+                { [ t ] [ , ] }
+            } cond
         ] each
     ] [ ] make ;
 
@@ -174,11 +168,17 @@ M: hook-generic synopsis*
     dup definer.
     dup seeing-word
     dup pprint-word
-    dup "combination" word-prop hook-combination-var pprint-word
+    dup "combination" word-prop hook-combination-var pprint*
     stack-effect. ;
 
 M: method-spec synopsis*
-    dup definer. [ pprint-word ] each ;
+    first2 method synopsis* ;
+
+M: method-body synopsis*
+    dup dup
+    definer.
+    "method-class" word-prop pprint-word
+    "method-generic" word-prop pprint-word ;
 
 M: mixin-instance synopsis*
     dup definer.
@@ -192,7 +192,16 @@ M: pathname synopsis* pprint* ;
         0 margin set
         1 line-limit set
         [ synopsis* ] with-in
-    ] string-out ;
+    ] with-string-writer ;
+
+: synopsis-alist ( definitions -- alist )
+    [ dup synopsis swap ] { } map>assoc ;
+
+: definitions. ( alist -- )
+    [ write-object nl ] assoc-each ;
+
+: sorted-definitions. ( definitions -- )
+    synopsis-alist sort-keys definitions. ;
 
 GENERIC: declarations. ( obj -- )
 
@@ -259,7 +268,9 @@ M: builtin-class see-class*
     natural-sort [ nl see ] each ;
 
 : see-implementors ( class -- seq )
-    dup implementors [ 2array ] with map ;
+    dup implementors
+    [ method ] with map
+    natural-sort ;
 
 : see-class ( class -- )
     dup class? [
@@ -269,8 +280,7 @@ M: builtin-class see-class*
     ] when drop ;
 
 : see-methods ( generic -- seq )
-    [ "methods" word-prop keys natural-sort ] keep
-    [ 2array ] curry map ;
+    "methods" word-prop values natural-sort ;
 
 M: word see
     dup see-class

@@ -59,7 +59,16 @@ CELL allot_alien(CELL delegate, CELL displacement)
 	REGISTER_ROOT(delegate);
 	F_ALIEN *alien = allot_object(ALIEN_TYPE,sizeof(F_ALIEN));
 	UNREGISTER_ROOT(delegate);
-	alien->alien = delegate;
+
+	if(type_of(delegate) == ALIEN_TYPE)
+	{
+		F_ALIEN *delegate_alien = untag_object(delegate);
+		displacement += delegate_alien->displacement;
+		alien->alien = F;
+	}
+	else
+		alien->alien = delegate;
+
 	alien->displacement = displacement;
 	alien->expired = F;
 	return tag_object(alien);
@@ -173,7 +182,7 @@ DEFINE_PRIMITIVE(dlopen)
 	F_DLL* dll = allot_object(DLL_TYPE,sizeof(F_DLL));
 	UNREGISTER_ROOT(path);
 	dll->path = path;
-	ffi_dlopen(dll,true);
+	ffi_dlopen(dll);
 	dpush(tag_object(dll));
 }
 
@@ -188,19 +197,31 @@ DEFINE_PRIMITIVE(dlsym)
 	F_DLL *d;
 
 	if(dll == F)
-		d = NULL;
+		box_alien(ffi_dlsym(NULL,sym));
 	else
 	{
 		d = untag_dll(dll);
 		if(d->dll == NULL)
-			general_error(ERROR_EXPIRED,dll,F,NULL);
+			dpush(F);
+		else
+			box_alien(ffi_dlsym(d,sym));
 	}
-
-	box_alien(ffi_dlsym(d,sym));
 }
 
 /* close a native library handle */
 DEFINE_PRIMITIVE(dlclose)
 {
 	ffi_dlclose(untag_dll(dpop()));
+}
+
+DEFINE_PRIMITIVE(dll_validp)
+{
+	CELL dll = dpop();
+	if(dll == F)
+		dpush(T);
+	else
+	{
+		F_DLL *d = untag_dll(dll);
+		dpush(d->dll == NULL ? F : T);
+	}
 }

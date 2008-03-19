@@ -1,4 +1,4 @@
-IN: temporary
+IN: namespaces.tests
 USING: kernel namespaces tools.test words ;
 
 H{ } clone "test-namespace" set

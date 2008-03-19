@@ -1,10 +1,10 @@
-IN: temporary
+IN: inference.class.tests
 USING: arrays math.private kernel math compiler inference
 inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
 slots.private combinators definitions compiler.units
-system ;
+system layouts vectors ;
 
 ! Make sure these compile even though this is invalid code
 [ ] [ [ 10 mod 3.0 /i ] dataflow optimize drop ] unit-test
@@ -282,4 +282,18 @@ cell-bits 32 = [
 [ t ] [
     [ B{ 1 0 } *short dup number? [ 0 number= ] [ drop f ] if ]
     \ number= inlined?
+] unit-test
+
+[ t ] [
+    [ HEX: ff bitand 0 HEX: ff between? ]
+    \ >= inlined?
+] unit-test
+
+[ t ] [
+    [ HEX: ff swap HEX: ff bitand >= ]
+    \ >= inlined?
+] unit-test
+
+[ t ] [
+    [ { vector } declare nth-unsafe ] \ nth-unsafe inlined?
 ] unit-test

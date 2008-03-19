@@ -1,10 +1,10 @@
-USING: tools.test io.files io io.streams.c ;
-IN: temporary
+USING: tools.test io.files io io.streams.c
+io.encodings.ascii strings ;
+IN: io.streams.c.tests
 
 [ "hello world" ] [
-    "test.txt" resource-path <file-writer> [
-        "hello world" write
-    ] with-stream
+    "hello world" "test.txt" temp-file ascii set-file-contents
 
-    "test.txt" resource-path "rb" fopen <c-reader> contents
+    "test.txt" temp-file "rb" fopen <c-reader> contents
+    >string
 ] unit-test

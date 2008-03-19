@@ -1,10 +1,28 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 ! 
-USING: tools.test kernel serialize io io.streams.string math
+USING: tools.test kernel serialize io io.streams.byte-array math
 alien arrays byte-arrays sequences math prettyprint parser
-classes math.constants ;
-IN: temporary
+classes math.constants io.encodings.binary random
+combinators.lib assocs ;
+IN: serialize.tests
+
+: test-serialize-cell
+    2^ random dup
+    binary [ serialize-cell ] with-byte-writer
+    binary [ deserialize-cell ] with-byte-reader = ;
+
+[ t ] [
+    100 [
+        drop
+        {
+            [ 40 [        test-serialize-cell ] all? ]
+            [  4 [ 40 *   test-serialize-cell ] all? ]
+            [  4 [ 400 *  test-serialize-cell ] all? ]
+            [  4 [ 4000 * test-serialize-cell ] all? ]
+        } &&
+    ] all?
+] unit-test
 
 TUPLE: serialize-test a b ;
 
@@ -25,6 +43,7 @@ C: <serialize-test> serialize-test
         { 1 2 "three" }
         V{ 1 2 "three" }
         SBUF" hello world"
+        "hello \u123456 unicode"
         \ dup
         [ \ dup dup ]
         T{ serialize-test f "a" 2 }
@@ -37,18 +56,23 @@ C: <serialize-test> serialize-test
     } ;
 
 : check-serialize-1 ( obj -- ? )
+    "=====" print
     dup class .
-    dup [ serialize ] string-out
-    [ deserialize ] string-in = ;
+    dup .
+    dup
+    object>bytes
+    bytes>object
+    dup . = ;
 
 : check-serialize-2 ( obj -- ? )
     dup number? over wrapper? or [
         drop t ! we don't care if numbers aren't interned
     ] [
+        "=====" print
         dup class .
-        dup 2array
-        [ serialize ] string-out
-        [ deserialize ] string-in
+        dup 2array dup .
+        object>bytes
+        bytes>object dup .
         first2 eq?
     ] if ;
 
@@ -57,13 +81,19 @@ C: <serialize-test> serialize-test
 [ t ] [ objects [ check-serialize-2 ] all? ] unit-test
 
 [ t ] [ pi check-serialize-1 ] unit-test
+[ serialize ] must-infer
+[ deserialize ] must-infer
 
 [ t ] [
-    { 1 2 3 } [
-        [
-            dup (serialize) (serialize)
-        ] with-serialized
-    ] string-out [
-        deserialize-sequence all-eq?
-    ] string-in
+    V{ } dup dup push
+    object>bytes
+    bytes>object
+    dup first eq?
+] unit-test
+
+[ t ] [
+    H{ } dup dup dup set-at
+    object>bytes
+    bytes>object
+    dup keys first eq?
 ] unit-test

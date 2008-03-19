@@ -5,6 +5,7 @@ IN: math
 
 GENERIC: >fixnum ( x -- y ) foldable
 GENERIC: >bignum ( x -- y ) foldable
+GENERIC: >integer ( x -- y ) foldable
 GENERIC: >float ( x -- y ) foldable
 
 MATH: number= ( x y -- ? ) foldable
@@ -15,6 +16,11 @@ MATH: <  ( x y -- ? ) foldable
 MATH: <= ( x y -- ? ) foldable
 MATH: >  ( x y -- ? ) foldable
 MATH: >= ( x y -- ? ) foldable
+
+: after? ( obj1 obj2 -- ? ) <=> 0 > ; inline
+: before? ( obj1 obj2 -- ? ) <=> 0 < ; inline
+: after=? ( obj1 obj2 -- ? ) <=> 0 >= ; inline
+: before=? ( obj1 obj2 -- ? ) <=> 0 <= ; inline
 
 MATH: +   ( x y -- z ) foldable
 MATH: -   ( x y -- z ) foldable

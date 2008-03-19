@@ -189,8 +189,6 @@ CELL unaligned_object_size(CELL pointer)
 		return sizeof(F_ALIEN);
 	case WRAPPER_TYPE:
 		return sizeof(F_WRAPPER);
-	case CURRY_TYPE:
-		return sizeof(F_CURRY);
 	case CALLSTACK_TYPE:
 		return callstack_size(
 			untag_fixnum_fast(((F_CALLSTACK *)pointer)->length));

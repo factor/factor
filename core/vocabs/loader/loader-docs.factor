@@ -23,9 +23,6 @@ $nl
 "Application vocabularies can define a main entry point, giving the user a convenient way to run the application:"
 { $subsection POSTPONE: MAIN: }
 { $subsection run }
-"Reloading source files changed on disk:"
-{ $subsection refresh }
-{ $subsection refresh-all }
 { $see-also "vocabularies" "parser-files" "source-files" } ;
 
 ABOUT: "vocabs.loader"
@@ -42,19 +39,11 @@ HELP: vocab-main
 HELP: vocab-roots
 { $var-description "A sequence of pathname strings to search for vocabularies." } ;
 
-HELP: vocab-tests
-{ $values { "vocab" "a vocabulary specifier" } { "tests" "a sequence of pathname strings" } }
-{ $description "Outputs a sequence of pathnames where the unit tests for " { $snippet "vocab" } " are located." } ;
-
 HELP: find-vocab-root
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string" } }
 { $description "Searches for a vocabulary in the vocabulary roots." } ;
 
 { vocab-root find-vocab-root } related-words
-
-HELP: vocab-files
-{ $values { "vocab" "a vocabulary specifier" } { "seq" "a sequence of pathname strings" } }
-{ $description "Outputs a sequence of files comprising this vocabulary, or " { $link f } " if the vocabulary does not have a directory on disk." } ;
 
 HELP: no-vocab
 { $values { "name" "a vocabulary name" } } 
@@ -65,12 +54,12 @@ HELP: load-help?
 { $var-description "If set to a true value, documentation will be automatically loaded when vocabularies are loaded. This variable is usually on, except when Factor has been bootstrapped without the help system." } ;
 
 HELP: load-source
-{ $values { "root" "a pathname string" } { "name" "a vocabulary name" } }
-{ $description "Loads a vocabulary's source code from the specified vocabulary root." } ;
+{ $values { "vocab" "a vocabulary specifier" } }
+{ $description "Loads a vocabulary's source code." } ;
 
 HELP: load-docs
-{ $values { "root" "a pathname string" } { "name" "a vocabulary name" } }
-{ $description "If " { $link load-help? } " is on, loads a vocabulary's documentation from the specified vocabulary root." } ;
+{ $values { "vocab" "a vocabulary specifier" } }
+{ $description "If " { $link load-help? } " is on, loads a vocabulary's documentation." } ;
 
 HELP: reload
 { $values { "name" "a vocabulary name" } }
@@ -80,7 +69,7 @@ HELP: reload
 HELP: require
 { $values { "vocab" "a vocabulary specifier" } }
 { $description "Loads a vocabulary if it has not already been loaded." }
-{ $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files, use " { $link refresh } " or " { $link refresh-all } "." } ;
+{ $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files only, use the words in " { $link "tools.vocabs" } "." } ;
 
 HELP: run
 { $values { "vocab" "a vocabulary specifier" } }
@@ -93,12 +82,3 @@ HELP: vocab-source-path
 HELP: vocab-docs-path
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string or " { $link f } } }
 { $description "Outputs a pathname where the documentation for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
-
-HELP: refresh
-{ $values { "prefix" string } }
-{ $description "Reloads source files and documentation belonging to loaded vocabularies whose names are prefixed by " { $snippet "prefix" } " which have been modified on disk." } ;
-
-HELP: refresh-all
-{ $description "Reloads source files and documentation for all loaded vocabularies which have been modified on disk." } ;
-
-{ refresh refresh-all } related-words

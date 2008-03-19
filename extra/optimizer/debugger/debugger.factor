@@ -1,9 +1,10 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes inference inference.dataflow io kernel
 kernel.private math.parser namespaces optimizer prettyprint
 prettyprint.backend sequences words arrays match macros
-assocs sequences.private ;
+assocs sequences.private optimizer.specializers generic
+combinators sorting math quotations ;
 IN: optimizer.debugger
 
 ! A simple tool for turning dataflow IR into quotations, for
@@ -66,7 +67,7 @@ M: #shuffle node>quot
     [ , ] [ >r drop t r> ] if*
     dup effect-str "#shuffle: " swap append comment, ;
 
-: pushed-literals node-out-d [ value-literal ] map ;
+: pushed-literals node-out-d [ value-literal literalize ] map ;
 
 M: #push node>quot nip pushed-literals % ;
 
@@ -81,7 +82,11 @@ M: #call node>quot #call>quot ;
 M: #call-label node>quot #call>quot ;
 
 M: #label node>quot
-    [ "#label: " over node-param word-name append comment, ] 2keep
+    [
+        dup node-param literalize ,
+        dup #label-loop? "#loop: " "#label: " ?
+        over node-param word-name append comment,
+    ] 2keep
     node-child swap dataflow>quot , \ call ,  ;
 
 M: #if node>quot
@@ -94,14 +99,18 @@ M: #dispatch node>quot
     node-children swap [ dataflow>quot ] curry map ,
     \ dispatch , ;
 
-M: #return node>quot
-    dup node-param unparse "#return " swap append comment, ;
-
 M: #>r node>quot nip node-in-d length \ >r <array> % ;
 
 M: #r> node>quot nip node-out-d length \ r> <array> % ;
 
-M: object node>quot dup class word-name comment, ;
+M: object node>quot
+    [
+        dup class word-name %
+        " " %
+        dup node-param unparse %
+        " " %
+        dup effect-str %
+    ] "" make comment, ;
 
 : (dataflow>quot) ( ? node -- )
     dup [
@@ -113,7 +122,62 @@ M: object node>quot dup class word-name comment, ;
 : dataflow>quot ( node ? -- quot )
     [ swap (dataflow>quot) ] [ ] make ;
 
-: print-dataflow ( quot ? -- )
+: optimized-quot. ( quot ? -- )
     #! Print dataflow IR for a quotation. Flag indicates if
     #! annotations should be printed or not.
     >r dataflow optimize r> dataflow>quot pprint nl ;
+
+: optimized-word. ( word ? -- ) >r specialized-def r> optimized-quot. ;
+
+SYMBOL: words-called
+SYMBOL: generics-called
+SYMBOL: methods-called
+SYMBOL: intrinsics-called
+SYMBOL: node-count
+
+: dataflow>report ( node -- alist )
+    [
+        H{ } clone words-called set
+        H{ } clone generics-called set
+        H{ } clone methods-called set
+        H{ } clone intrinsics-called set
+
+        0 swap [
+            >r 1+ r>
+            dup #call? [
+                node-param {
+                    { [ dup "intrinsics" word-prop over "if-intrinsics" word-prop or ] [ intrinsics-called ] }
+                    { [ dup generic? ] [ generics-called ] }
+                    { [ dup method-body? ] [ methods-called ] }
+                    { [ t ] [ words-called ] }
+                } cond 1 -rot get at+
+            ] [
+                drop
+            ] if
+        ] each-node
+        node-count set
+    ] H{ } make-assoc ;
+
+: quot-optimize-report ( quot -- report )
+    dataflow optimize dataflow>report ;
+
+: word-optimize-report ( word -- report )
+    word-def quot-optimize-report ;
+
+: report. ( report -- )
+    [
+        "==== Total number of dataflow nodes:" print
+        node-count get .
+
+        {
+            { generics-called "==== Generic word calls:" }
+            { words-called "==== Ordinary word calls:" }
+            { methods-called "==== Non-inlined method calls:" }
+            { intrinsics-called "==== Open-coded intrinsic calls:" }
+        } [
+            nl print get keys natural-sort stack.
+        ] assoc-each
+    ] bind ;
+
+: optimizer-report. ( word -- )
+    word-optimize-report report. ;

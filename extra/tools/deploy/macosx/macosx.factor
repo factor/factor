@@ -1,38 +1,26 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files io.launcher kernel namespaces sequences
+USING: io io.files kernel namespaces sequences
 system tools.deploy.backend tools.deploy.config assocs
-hashtables prettyprint io.unix.backend cocoa
+hashtables prettyprint io.unix.backend cocoa io.encodings.utf8
 cocoa.application cocoa.classes cocoa.plists qualified ;
-QUALIFIED: unix
 IN: tools.deploy.macosx
-
-: touch ( path -- )
-    { "touch" } swap add try-process ;
-
-: rm ( path -- )
-    { "rm" "-rf" } swap add try-process ;
 
 : bundle-dir ( -- dir )
     vm parent-directory parent-directory ;
 
-: copy-bundle-dir ( name dir -- )
+: copy-bundle-dir ( bundle-name dir -- )
     bundle-dir over path+ -rot
-    >r "Contents" path+ r> path+ copy-directory ;
-
-: chmod ( path perms -- )
-    unix:chmod io-error ;
+    "Contents" swap path+ path+ copy-tree ;
 
 : copy-vm ( executable bundle-name -- vm )
-    "Contents/MacOS/" path+ swap path+ vm swap
-    [ copy-file ] keep
-    [ OCT: 755 chmod ] keep ;
+    "Contents/MacOS/" path+ swap path+ vm over copy-file ;
 
 : copy-fonts ( name -- )
     "fonts/" resource-path
-    swap "Contents/Resources/fonts/" path+ copy-directory ;
+    swap "Contents/Resources/" path+ copy-tree-into ;
 
-: print-app-plist ( executable bundle-name -- )
+: app-plist ( executable bundle-name -- string )
     [
         namespace {
             { "CFBundleInfoDictionaryVersion" "6.0" }
@@ -43,11 +31,12 @@ IN: tools.deploy.macosx
 
         dup "CFBundleExecutable" set
         "org.factor." swap append "CFBundleIdentifier" set
-    ] H{ } make-assoc print-plist ;
+    ] H{ } make-assoc plist>string ;
 
 : create-app-plist ( vocab bundle-name -- )
-    dup "Contents/Info.plist" path+ <file-writer>
-    [ print-app-plist ] with-stream ;
+    [ app-plist ] keep
+    "Contents/Info.plist" path+
+    utf8 set-file-contents ;
 
 : create-app-dir ( vocab bundle-name -- vm )
     dup "Frameworks" copy-bundle-dir
@@ -75,7 +64,7 @@ M: macosx-deploy-implementation deploy* ( vocab -- )
     ".app deploy tool" assert.app
     "." resource-path cd
     dup deploy-config [
-        bundle-name rm
+        bundle-name dup exists? [ delete-tree ] [ drop ] if
         [ bundle-name create-app-dir ] keep
         [ bundle-name deploy.app-image ] keep
         namespace make-deploy-image

@@ -1,0 +1,41 @@
+<% USING: http.server.components http.server ; %>
+<html>
+<body>
+<h1>Recover lost password: step 1 of 4</h1>
+
+<p>Enter the username and e-mail address you used to register for this site, and you will receive a link for activating a new password.</p>
+
+<form method="POST" action="recover-password">
+
+<% hidden-form-field %>
+
+<table>
+
+<tr>
+<td>User name:</td>
+<td><% "username" component render-edit %></td>
+</tr>
+
+<tr>
+<td>E-mail:</td>
+<td><% "email" component render-edit %></td>
+</tr>
+
+<tr>
+<td>Captcha:</td>
+<td><% "captcha" component render-edit %></td>
+</tr>
+
+<tr>
+<td></td>
+<td>Leave the captcha blank. Spam-bots will fill it indiscriminantly, so their attempts to e-mail you will be blocked.</td>
+</tr>
+
+</table>
+
+<input type="submit" value="Recover password" />
+
+</form>
+
+</body>
+</html>

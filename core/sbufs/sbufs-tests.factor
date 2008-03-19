@@ -1,6 +1,6 @@
 USING: kernel math namespaces sequences sbufs strings
 tools.test classes ;
-IN: temporary
+IN: sbufs.tests
 
 [ 5 ] [ "Hello" >sbuf length ] unit-test
 

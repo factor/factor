@@ -1,6 +1,6 @@
 USING: io io.files io.streams.duplex kernel sequences
 sequences.private strings vectors words memoize splitting
-hints unicode.case ;
+hints unicode.case continuations io.encodings.latin1 ;
 IN: benchmark.reverse-complement
 
 MEMO: trans-map ( -- str )
@@ -32,14 +32,23 @@ HINTS: do-line vector string ;
     readln [ do-line (reverse-complement) ] [ show-seq ] if* ;
 
 : reverse-complement ( infile outfile -- )
-    <file-writer> >r <file-reader> r> <duplex-stream> [
-        500000 <vector> (reverse-complement)
-    ] with-stream ;
+    latin1 <file-writer> [
+        swap latin1 <file-reader> [
+            swap <duplex-stream> [
+                500000 <vector> (reverse-complement)
+            ] with-stream
+        ] with-disposal
+    ] with-disposal ;
+
+: reverse-complement-in
+    "reverse-complement-in.txt" temp-file ;
+
+: reverse-complement-out
+    "reverse-complement-out.txt" temp-file ;
 
 : reverse-complement-main ( -- )
-    "extra/benchmark/reverse-complement/reverse-complement-test-in.txt"
-    "extra/benchmark/reverse-complement/reverse-complement-test-out.txt"
-    [ resource-path ] 2apply
+    reverse-complement-in
+    reverse-complement-out
     reverse-complement ;
 
 MAIN: reverse-complement-main

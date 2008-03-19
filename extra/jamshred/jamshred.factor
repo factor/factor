@@ -1,9 +1,11 @@
-USING: arrays jamshred.game jamshred.gl kernel math math.constants
-namespaces sequences timers ui ui.gadgets ui.gestures ui.render
+! Copyright (C) 2007, 2008 Alex Chapman
+! See http://factorcode.org/license.txt for BSD license.
+USING: alarms arrays calendar jamshred.game jamshred.gl kernel math
+math.constants namespaces sequences ui ui.gadgets ui.gestures ui.render
 math.vectors ;
 IN: jamshred
 
-TUPLE: jamshred-gadget jamshred last-hand-loc ;
+TUPLE: jamshred-gadget jamshred last-hand-loc alarm ;
 
 : <jamshred-gadget> ( jamshred -- gadget )
     jamshred-gadget construct-gadget tuck set-jamshred-gadget-jamshred ;
@@ -17,13 +19,17 @@ M: jamshred-gadget pref-dim*
 M: jamshred-gadget draw-gadget* ( gadget -- )
     dup jamshred-gadget-jamshred swap rect-dim first2 draw-jamshred ;
 
-M: jamshred-gadget tick ( gadget -- )
+: tick ( gadget -- )
     dup jamshred-gadget-jamshred jamshred-update relayout-1 ;
 
 M: jamshred-gadget graft* ( gadget -- )
-     10 1 add-timer ;
+    [
+        [ tick ] curry 10 milliseconds from-now 10 milliseconds add-alarm
+    ] keep set-jamshred-gadget-alarm ;
 
-M: jamshred-gadget ungraft* ( gadget -- ) remove-timer ;
+M: jamshred-gadget ungraft* ( gadget -- )
+    [ jamshred-gadget-alarm cancel-alarm f ] keep
+    set-jamshred-gadget-alarm ;
 
 : jamshred-restart ( jamshred-gadget -- )
     <jamshred> swap set-jamshred-gadget-jamshred ;
@@ -53,7 +59,7 @@ M: jamshred-gadget ungraft* ( gadget -- ) remove-timer ;
 
 USE: vocabs.loader
 jamshred-gadget H{
-    { T{ key-down f f "r" } [ jamshred-restart refresh-all ] }
+    { T{ key-down f f "r" } [ jamshred-restart ] }
     { T{ key-down f f " " } [ jamshred-gadget-jamshred toggle-running ] }
     { T{ motion } [ handle-mouse-motion ] }
 } set-gestures

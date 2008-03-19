@@ -1,14 +1,15 @@
 USING: arrays io io.files kernel math parser strings system
-tools.test words namespaces ;
-IN: temporary
+tools.test words namespaces io.encodings.latin1
+io.encodings.binary ;
+IN: io.tests
 
 [ f ] [
     "resource:/core/io/test/no-trailing-eol.factor" run-file
-    "foo" "temporary" lookup
+    "foo" "io.tests" lookup
 ] unit-test
 
 : <resource-reader> ( resource -- stream )
-    resource-path <file-reader> ;
+    resource-path latin1 <file-reader> ;
 
 [
     "This is a line.\rThis is another line.\r"
@@ -31,10 +32,10 @@ IN: temporary
 
 ! [ ] [ "123" write 9000 CHAR: x <string> write flush ] unit-test
 
-[ "" ] [
+[
     "/core/io/test/binary.txt" <resource-reader>
     [ 0.2 read ] with-stream
-] unit-test
+] must-fail
 
 [
     {
@@ -53,7 +54,7 @@ IN: temporary
 ] unit-test
 
 [ ] [
-    image <file-reader> [
+    image binary [
         10 [ 65536 read drop ] times
-    ] with-stream
+    ] with-file-reader
 ] unit-test

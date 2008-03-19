@@ -1,5 +1,5 @@
 USING: splitting tools.test ;
-IN: temporary
+IN: splitting.tests
 
 [ { 1 2 3 } 0 group ] must-fail
 

@@ -1,4 +1,4 @@
-IN: temporary
+IN: ui.gadgets.tests
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
 namespaces models kernel dlists math
 math.parser ui sequences hashtables assocs io arrays
@@ -191,7 +191,7 @@ M: mock-gadget ungraft*
         ] with-variable ;
 
     { { f f } { f t } { t f } { t t } } [ notify-combo ] assoc-each
-] string-out print
+] with-string-writer print
 
 \ <gadget> must-infer
 \ unparent must-infer

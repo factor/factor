@@ -1,6 +1,5 @@
-USING: arrays combinators.lib io io.streams.string
-       kernel math math.parser namespaces prettyprint
-       sequences splitting strings ascii ;
+USING: arrays io io.streams.string kernel math math.parser namespaces
+    prettyprint sequences sequences.lib splitting strings ascii ;
 IN: hexdump
 
 <PRIVATE
@@ -26,7 +25,7 @@ PRIVATE>
     [
         dup length header.
         16 <sliced-groups> [ line. ] each-index
-    ] string-out ;
+    ] with-string-writer ;
 
 : hexdump. ( seq -- )
     hexdump write ;

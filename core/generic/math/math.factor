@@ -43,7 +43,7 @@ TUPLE: no-math-method left right generic ;
 
 : applicable-method ( generic class -- quot )
     over method
-    [ method-word word-def ]
+    [ 1quotation ]
     [ default-math-method ] ?if ;
 
 : object-method ( generic -- quot )
@@ -58,15 +58,14 @@ TUPLE: no-math-method left right generic ;
         2drop object-method
     ] if ;
 
-: math-vtable* ( picker max quot -- quot )
+: math-vtable ( picker quot -- quot )
     [
-        rot , \ tag ,
-        [ >r [ bootstrap-type>class ] map r> map % ] { } make ,
+        >r
+        , \ tag ,
+        num-tags get [ bootstrap-type>class ]
+        r> compose map ,
         \ dispatch ,
     ] [ ] make ; inline
-
-: math-vtable ( picker quot -- quot )
-    num-tags get swap math-vtable* ; inline
 
 TUPLE: math-combination ;
 

@@ -42,11 +42,16 @@ SYMBOL: networking-hook
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 USING: io io.files io.streams.lines io.streams.plain io.streams.duplex
-       listener ;
+       listener io.encodings.utf8 ;
 
 : tty-listener ( tty -- )
-  [ <file-reader> ] [ <file-writer> ] bi <duplex-stream>
-  [ listener ] with-stream ;
+  dup utf8 <file-reader> [
+    swap utf8 <file-writer> [
+      <duplex-stream> [
+        listener
+      ] with-stream
+    ] with-disposal
+  ] with-disposal ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

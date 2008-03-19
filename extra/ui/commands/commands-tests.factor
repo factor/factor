@@ -1,4 +1,4 @@
-IN: temporary
+IN: ui.commands.tests
 USING: ui.commands ui.gestures tools.test help.markup io
 io.streams.string ;
 
@@ -27,5 +27,5 @@ testing "testing" "hey" {
 [ "C+x" ] [
     [
         { $command testing "testing" com-test-1 } print-element
-    ] string-out
+    ] with-string-writer
 ] unit-test

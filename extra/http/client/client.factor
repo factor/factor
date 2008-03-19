@@ -1,92 +1,98 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
-splitting continuations assocs.lib ;
+splitting calendar continuations accessors vectors
+io.encodings.latin1 io.encodings.binary fry ;
 IN: http.client
 
-: parse-host ( url -- host port )
-    #! Extract the host name and port number from an HTTP URL.
-    ":" split1 [ string>number ] [ 80 ] if* ;
+DEFER: http-request
 
-SYMBOL: domain
+<PRIVATE
 
-: parse-url ( url -- host resource )
-    dup "https://" head? [
-        "ssl not yet supported: " swap append throw
-    ] when "http://" ?head drop
+: parse-url ( url -- resource host port )
+    "http://" ?head [ "Only http:// supported" throw ] unless
     "/" split1 [ "/" swap append ] [ "/" ] if*
-    >r dup empty? [ drop domain get ] [ dup domain set ] if r> ;
+    swap parse-host ;
 
-: parse-response ( line -- code )
-    "HTTP/" ?head [ " " split1 nip ] when
-    " " split1 drop string>number [
-        "Premature end of stream" throw
-    ] unless* ;
+: store-path ( request path -- request )
+    "?" split1 >r >>path r> dup [ query>assoc ] when >>query ;
 
-: read-response ( -- code header )
-    #! After sending a GET or POST we read a response line and
-    #! header.
-    flush readln parse-response read-header ;
+: request-with-url ( url request -- request )
+    swap parse-url >r >r store-path r> >>host r> >>port ;
 
-: crlf "\r\n" write ;
+! This is all pretty complex because it needs to handle
+! HTTP redirects, which might be absolute or relative
+: absolute-redirect ( url -- request )
+    request get request-with-url ;
 
-: http-request ( host resource method -- )
-    write bl write " HTTP/1.0" write crlf
-    "Host: " write write crlf ;
+: relative-redirect ( path -- request )
+    request get swap store-path ;
 
-: get-request ( host resource -- )
-    "GET" http-request crlf ;
+: do-redirect ( response -- response stream )
+    dup response-code 300 399 between? [
+        stdio get dispose
+        header>> "location" swap at
+        dup "http://" head? [
+            absolute-redirect
+        ] [
+            relative-redirect
+        ] if "GET" >>method http-request
+    ] [
+        stdio get
+    ] if ;
 
-DEFER: http-get-stream
+: request-addr ( request -- addr )
+    dup host>> swap port>> <inet> ;
 
-: do-redirect ( code headers stream -- code headers stream )
-    #! Should this support Location: headers that are
-    #! relative URLs?
-    pick 100 /i 3 = [
-        dispose "location" swap peek-at nip http-get-stream
-    ] when ;
+: close-on-error ( stream quot -- )
+    '[ , with-stream* ] [ ] pick '[ , dispose ] cleanup ; inline
 
-: default-timeout 60 1000 * over set-timeout ;
+PRIVATE>
 
-: http-get-stream ( url -- code headers stream )
-    #! Opens a stream for reading from an HTTP URL.
-    parse-url over parse-host <inet> <client> [
-        [ [ get-request read-response ] with-stream* ] keep
-        default-timeout
-    ] [ ] [ dispose ] cleanup do-redirect ;
+: http-request ( request -- response stream )
+    dup request [
+        dup request-addr latin1 <client>
+        1 minutes over set-timeout
+        [
+            write-request flush
+            read-response
+            do-redirect
+        ] close-on-error
+    ] with-variable ;
+
+: <get-request> ( url -- request )
+    <request> request-with-url "GET" >>method ;
+
+: http-get-stream ( url -- response stream )
+    <get-request> http-request ;
 
 : success? ( code -- ? ) 200 = ;
 
-: check-response ( code headers stream -- stream )
-    nip swap success?
-    [ dispose "HTTP download failed" throw ] unless ;
+: check-response ( response -- )
+    code>> success?
+    [ "HTTP download failed" throw ] unless ;
 
 : http-get ( url -- string )
-    http-get-stream check-response contents ;
+    http-get-stream contents swap check-response ;
 
 : download-name ( url -- name )
     file-name "?" split1 drop "/" ?tail drop ;
 
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
-    >r http-get-stream check-response
-    r> <file-writer> stream-copy ;
+    swap http-get-stream swap check-response
+    [ swap latin1 <file-writer> stream-copy ] with-disposal ;
 
 : download ( url -- )
     dup download-name download-to ;
 
-: post-request ( content-type content host resource -- )
-    #! Note: It is up to the caller to url encode the content if
-    #! it is required according to the content-type.
-    "POST" http-request [
-        "Content-Length: " write length number>string write crlf
-        "Content-Type: " write url-encode write crlf
-        crlf
-    ] keep write ;
+: <post-request> ( content-type content url -- request )
+    <request>
+    request-with-url
+    "POST" >>method
+    swap >>post-data
+    swap >>post-data-type ;
 
-: http-post ( content-type content url -- code headers string )
-    #! Make a POST request. The content is URL encoded for you.
-    parse-url over parse-host <inet> <client> [
-        post-request flush read-response stdio get contents
-    ] with-stream ;
+: http-post ( content-type content url -- response string )
+    <post-request> http-request contents ;

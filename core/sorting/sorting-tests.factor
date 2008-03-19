@@ -1,6 +1,6 @@
 USING: sorting sequences kernel math random tools.test
 vectors ;
-IN: temporary
+IN: sorting.tests
 
 [ [ ] ] [ [ ] natural-sort ] unit-test
 
@@ -11,7 +11,7 @@ unit-test
 [ t ] [
     100 [
         drop
-        100 [ drop 20 random [ drop 1000 random ] map ] map natural-sort [ <=> 0 <= ] monotonic?
+        100 [ drop 20 random [ drop 1000 random ] map ] map natural-sort [ before=? ] monotonic?
     ] all?
 ] unit-test
 

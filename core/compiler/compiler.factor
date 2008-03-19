@@ -4,13 +4,8 @@ USING: kernel namespaces arrays sequences io inference.backend
 inference.state generator debugger math.parser prettyprint words
 compiler.units continuations vocabs assocs alien.compiler dlists
 optimizer definitions math compiler.errors threads graphs
-generic ;
+generic inference ;
 IN: compiler
-
-: compiled-usages ( words -- seq )
-    [ [ dup ] H{ } map>assoc dup ] keep [
-        compiled-usage [ nip +inlined+ eq? ] assoc-subset update
-    ] with each keys ;
 
 : ripple-up ( word -- )
     compiled-usage [ drop queue-compile ] assoc-each ;
@@ -24,13 +19,12 @@ IN: compiler
 
 : finish-compile ( word effect dependencies -- )
     >r dupd save-effect r>
-    f pick compiler-error
     over compiled-unxref
     over crossref? [ compiled-xref ] [ 2drop ] if ;
 
 : compile-succeeded ( word -- effect dependencies )
     [
-        dup word-dataflow >r swap dup r> optimize generate
+        [ word-dataflow optimize ] keep dup generate
     ] computing-dependencies ;
 
 : compile-failed ( word error -- )
@@ -38,6 +32,7 @@ IN: compiler
     swap compiler-error ;
 
 : (compile) ( word -- )
+    f over compiler-error
     [ dup compile-succeeded finish-compile ]
     [ dupd compile-failed f save-effect ]
     recover ;
@@ -49,25 +44,17 @@ IN: compiler
         compile-loop
     ] if ;
 
-: recompile ( words -- )
+: decompile ( word -- )
+    f 2array 1array t modify-code-heap ;
+
+: optimized-recompile-hook ( words -- alist )
     [
         H{ } clone compile-queue set
         H{ } clone compiled set
         [ queue-compile ] each
         compile-queue get compile-loop
-        compiled get >alist modify-code-heap
-    ] with-scope ; inline
-
-: compile ( words -- )
-    [ compiled? not ] subset recompile ;
-
-: compile-call ( quot -- )
-    H{ } clone changed-words
-    [ define-temp dup 1array compile ] with-variable
-    execute ;
+        compiled get >alist
+    ] with-scope ;
 
 : recompile-all ( -- )
-    [ all-words recompile ] with-compiler-errors ;
-
-: decompile ( word -- )
-    f 2array 1array modify-code-heap ;
+    forget-errors all-words compile ;

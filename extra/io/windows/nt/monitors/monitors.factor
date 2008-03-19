@@ -5,7 +5,7 @@ io.windows.nt.backend kernel math windows windows.kernel32
 windows.types libc assocs alien namespaces continuations
 io.monitors io.monitors.private io.nonblocking io.buffers
 io.files io.timeouts io sequences hashtables sorting arrays
-combinators ;
+combinators math.bitfields strings ;
 IN: io.windows.nt.monitors
 
 : open-directory ( path -- handle )
@@ -13,7 +13,7 @@ IN: io.windows.nt.monitors
     share-mode
     f
     OPEN_EXISTING
-    FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED bitor
+    { FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED } flags
     f
     CreateFile
     dup invalid-handle?
@@ -66,6 +66,9 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
         { [ t ] [ +modify-file+ ] }
     } cond nip ;
 
+: memory>u16-string ( alien len -- string )
+    [ memory>byte-array ] keep 2/ c-ushort-array> >string ;
+
 : parse-file-notify ( buffer -- changed path )
     {
         FILE_NOTIFY_INFORMATION-FileName
@@ -78,7 +81,7 @@ M: windows-nt-io <monitor> ( path recursive? -- monitor )
     dup FILE_NOTIFY_INFORMATION-NextEntryOffset dup zero?
     [ 2drop ] [ swap <displaced-alien> (changed-files) ] if ;
 
-M: windows-nt-io fill-queue ( monitor -- )
+M: win32-monitor fill-queue ( monitor -- )
     dup buffer-ptr over read-changes
     [ zero? [ drop ] [ (changed-files) ] if ] H{ } make-assoc
     swap set-monitor-queue ;

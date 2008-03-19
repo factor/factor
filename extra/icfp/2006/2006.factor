@@ -1,17 +1,14 @@
 ! Copyright (C) 2007 Gavin Harrison
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences kernel.private namespaces arrays io io.files
-    splitting io.binary math.functions vectors quotations sequences.private ;
+USING: kernel math sequences kernel.private namespaces arrays io
+io.files splitting io.binary math.functions vectors quotations
+combinators io.encodings.binary ;
 IN: icfp.2006
 
 SYMBOL: regs
 SYMBOL: arrays
 SYMBOL: finger
 SYMBOL: open-arrays
-
-: call-nth ( n array -- )
-    >r >fixnum r> 2dup nth quotation?
-    [ dispatch ] [ "Not a quotation" throw ] if ; inline
 
 : reg-val ( m -- n ) regs get nth ;
 
@@ -117,17 +114,27 @@ SYMBOL: open-arrays
 : run-op ( -- bool )
     advance
     {
-        [ op0 ] [ op1 ] [ op2 ] [ op3 ]
-        [ op4 ] [ op5 ] [ op6 ] [ drop t ]
-        [ op8 ] [ op9 ] [ op10 ] [ op11 ]
-        [ op12 ] [ op13 ]
-    } call-nth ;
+        { 0 [ op0 ] }
+        { 1 [ op1 ] }
+        { 2 [ op2 ] }
+        { 3 [ op3 ] }
+        { 4 [ op4 ] }
+        { 5 [ op5 ] }
+        { 6 [ op6 ] }
+        { 7 [ drop t ] }
+        { 8 [ op8 ] }
+        { 9 [ op9 ] }
+        { 10 [ op10 ] }
+        { 11 [ op11 ] }
+        { 12 [ op12 ] }
+        { 13 [ op13 ] }
+    } case ;
 
 : exec-loop ( bool -- )
     [ run-op exec-loop ] unless ;
 
 : load-platters ( path -- )
-    file-contents 4 group [ be> ] map
+    binary file-contents 4 group [ be> ] map
     0 arrays get set-nth ;
 
 : init ( path -- )

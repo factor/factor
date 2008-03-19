@@ -1,17 +1,14 @@
-! Copyright (C) 2007 Doug Coleman.
+! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 ! tested on debian linux with postgresql 8.1
-
 USING: alien alien.syntax combinators system ;
 IN: db.postgresql.ffi
 
-<<
-"postgresql" {
+<< "postgresql" {
     { [ win32? ]  [ "libpq.dll" ] }
-    { [ macosx? ] [ "/opt/local/lib/postgresql81/libpq.dylib" ] }
+    { [ macosx? ] [ "/opt/local/lib/postgresql82/libpq.dylib" ] }
     { [ unix?  ]  [ "libpq.so" ] }
-} cond "cdecl" add-library
->>
+} cond "cdecl" add-library >>
 
 ! ConnSatusType
 : CONNECTION_OK                     HEX: 0 ; inline
@@ -53,6 +50,8 @@ IN: db.postgresql.ffi
 : PQERRORS_DEFAULT                  HEX: 1 ; inline
 : PQERRORS_VERBOSE                  HEX: 2 ; inline
 
+: InvalidOid 0 ; inline
+
 TYPEDEF: int size_t
 TYPEDEF: int ConnStatusType
 TYPEDEF: int ExecStatusType 
@@ -74,7 +73,6 @@ TYPEDEF: void* FILE*
 TYPEDEF: void* SSL*
 
 LIBRARY: postgresql
-
 
 ! Exported functions of libpq
 
@@ -102,10 +100,6 @@ FUNCTION: PQconninfoOption* PQconndefaults ( ) ;
 ! free the data structure returned by PQconndefaults()
 FUNCTION: void PQconninfoFree ( PQconninfoOption* connOptions ) ;
 
-! 
-! close the current connection and restablish a new one with the same
-! parameters
-!
 ! Asynchronous (non-blocking)
 FUNCTION: int    PQresetStart ( PGconn* conn ) ;
 FUNCTION: PostgresPollingStatusType PQresetPoll ( PGconn* conn ) ;
@@ -276,7 +270,8 @@ FUNCTION: char* PQcmdStatus ( PGresult* res ) ;
 FUNCTION: char* PQoidStatus ( PGresult* res ) ;
 FUNCTION: Oid   PQoidValue ( PGresult* res ) ;
 FUNCTION: char* PQcmdTuples ( PGresult* res ) ;
-FUNCTION: char* PQgetvalue ( PGresult* res, int tup_num, int field_num ) ;
+! FUNCTION: char* PQgetvalue ( PGresult* res, int tup_num, int field_num ) ;
+FUNCTION: void* PQgetvalue ( PGresult* res, int tup_num, int field_num ) ;
 FUNCTION: int   PQgetlength ( PGresult* res, int tup_num, int field_num ) ;
 FUNCTION: int   PQgetisnull ( PGresult* res, int tup_num, int field_num ) ;
 
@@ -303,8 +298,8 @@ FUNCTION: size_t PQescapeStringConn ( PGconn* conn,
 FUNCTION: uchar* PQescapeByteaConn ( PGconn* conn,
                                     char* from, size_t length,
                                     size_t* to_length ) ;
-FUNCTION: uchar* PQunescapeBytea ( uchar* strtext,
-                size_t* retbuflen ) ;
+FUNCTION: void* PQunescapeBytea ( uchar* strtext, size_t* retbuflen ) ;
+! FUNCTION: uchar* PQunescapeBytea ( uchar* strtext, size_t* retbuflen ) ;
 ! These forms are deprecated!
 FUNCTION: size_t PQescapeString ( void* to, char* from, size_t length ) ;
 FUNCTION: uchar* PQescapeBytea ( uchar* bintext, size_t binlen,
@@ -352,3 +347,23 @@ FUNCTION: int    PQdsplen ( uchar* s, int encoding ) ;
 
 ! Get encoding id from environment variable PGCLIENTENCODING
 FUNCTION: int    PQenv2encoding ( ) ;
+
+! From git, include/catalog/pg_type.h
+: BOOL-OID 16 ; inline
+: BYTEA-OID 17 ; inline
+: CHAR-OID 18 ; inline
+: NAME-OID 19 ; inline
+: INT8-OID 20 ; inline
+: INT2-OID 21 ; inline
+: INT4-OID 23 ; inline
+: TEXT-OID 23 ; inline
+: OID-OID 26 ; inline
+: FLOAT4-OID 700 ; inline
+: FLOAT8-OID 701 ; inline
+: VARCHAR-OID 1043 ; inline
+: DATE-OID 1082 ; inline
+: TIME-OID 1083 ; inline
+: TIMESTAMP-OID 1114 ; inline
+: TIMESTAMPTZ-OID 1184 ; inline
+: INTERVAL-OID 1186 ; inline
+: NUMERIC-OID 1700 ; inline

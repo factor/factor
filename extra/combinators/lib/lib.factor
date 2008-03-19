@@ -3,7 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel combinators namespaces quotations hashtables
 sequences assocs arrays inference effects math math.ranges
-arrays.lib shuffle macros bake combinators.cleave ;
+arrays.lib shuffle macros bake combinators.cleave
+continuations ;
 
 IN: combinators.lib
 
@@ -132,18 +133,12 @@ MACRO: parallel-call ( quots -- )
 : (make-call-with) ( quots -- quot ) 
     [ [ keep ] curry ] map concat [ drop ] append ;
 
-MACRO: call-with ( quots -- )
-    (make-call-with) ;
-
 MACRO: map-call-with ( quots -- )
     [ (make-call-with) ] keep length [ narray ] curry compose ;
 
 : (make-call-with2) ( quots -- quot )
     [ [ 2dup >r >r ] swap append [ r> r> ] append ] map concat
     [ 2drop ] append ;
-
-MACRO: call-with2 ( quots -- )
-    (make-call-with2) ;
 
 MACRO: map-call-with2 ( quots -- )
     [ (make-call-with2) ] keep length [ narray ] curry append ;
@@ -167,3 +162,6 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
 
 : and? ( obj quot1 quot2 -- ? )
     >r keep r> rot [ call ] [ 2drop f ] if ; inline
+
+: retry ( quot n -- )
+    [ drop ] rot compose attempt-all ; inline

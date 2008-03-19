@@ -249,32 +249,3 @@ INSTRUCTION: EI           ; opcode FB cycles 04
 INSTRUCTION: CALL M,nn    ; opcode FC cycles 11 
 INSTRUCTION: CP   n       ; opcode FE cycles 07 
 INSTRUCTION: RST  38H     ; opcode FF cycles 11 
-
-! : each-8bit ( n quot -- )
-!   8 [ ! n quot bit
-!    pick over -1 * shift 1 bitand pick call 
-!   ] repeat 2drop ;
-! 
-! : >ppm ( cpu filename -- cpu )
-!   #! Dump the current screen image to a ppm image file with the given name.
-!   <file-writer> [
-!     "P3" print
-!     "256 224" print
-!     "1" print
-!     224 [
-!       32 [
-!         over 32 * over +  HEX: 2400 + ! cpu h w addr
-!         >r pick r> swap cpu-ram nth [
-!           0 = [
-!             " 0 0 0" write
-!           ] [
-!             " 1 1 1" write
-!           ] if
-!         ] each-8bit
-!       ] repeat nl
-!     ] repeat
-!   ] with-stream ;
-
-: time-test ( -- )
-  test-cpu [ 1000000 run-n ] time ;
-

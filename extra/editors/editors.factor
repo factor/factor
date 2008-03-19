@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser kernel namespaces sequences definitions io.files
-inspector continuations tuples tools.crossref tools.browser 
+inspector continuations tuples tools.crossref tools.vocabs 
 io prettyprint source-files assocs vocabs vocabs.loader ;
 IN: editors
 
@@ -13,8 +13,7 @@ M: no-edit-hook summary
 SYMBOL: edit-hook
 
 : available-editors ( -- seq )
-    "editors" all-child-vocabs
-    values concat [ vocab-name ] map ;
+    "editors" all-child-vocabs-seq [ vocab-name ] map ;
 
 : editor-restarts ( -- alist )
     available-editors
@@ -35,6 +34,9 @@ SYMBOL: edit-hook
 : edit ( defspec -- )
     where [ first2 edit-location ] when* ;
 
+: edit-vocab ( name -- )
+    vocab-source-path 1 edit-location ;
+
 : :edit ( -- )
     error get delegates [ parse-error? ] find-last nip [
         dup parse-error-file source-file-path ?resource-path
@@ -43,7 +45,7 @@ SYMBOL: edit-hook
 
 : fix ( word -- )
     "Fixing " write dup pprint " and all usages..." print nl
-    dup smart-usage swap add* [
+    dup usage swap add* [
         "Editing " write dup .
         "RETURN moves on to the next usage, C+d stops." print
         flush

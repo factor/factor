@@ -1,4 +1,5 @@
 USING: tuple-arrays sequences tools.test namespaces kernel math ;
+IN: tuple-arrays.tests
 
 SYMBOL: mat
 TUPLE: foo bar ;

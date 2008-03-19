@@ -1,4 +1,4 @@
-IN: temporary
+IN: alien.structs.tests
 USING: alien alien.syntax alien.c-types kernel tools.test
 sequences system libc words vocabs namespaces ;
 
@@ -9,18 +9,20 @@ C-STRUCT: bar
 [ 36 ] [ "bar" heap-size ] unit-test
 [ t ] [ \ <displaced-alien> "bar" c-type c-type-getter memq? ] unit-test
 
-C-STRUCT: align-test
-    { "int" "x" }
-    { "double" "y" } ;
+! This was actually only correct on Windows/x86:
 
-[ 16 ] [ "align-test" heap-size ] unit-test
-
-cell 4 = [
-    C-STRUCT: one
-    { "long" "a" } { "double" "b" } { "int" "c" } ;
-
-    [ 24 ] [ "one" heap-size ] unit-test
-] when
+! C-STRUCT: align-test
+!     { "int" "x" }
+!     { "double" "y" } ;
+! 
+! [ 16 ] [ "align-test" heap-size ] unit-test
+! 
+! cell 4 = [
+!     C-STRUCT: one
+!     { "long" "a" } { "double" "b" } { "int" "c" } ;
+! 
+!     [ 24 ] [ "one" heap-size ] unit-test
+! ] when
 
 : MAX_FOOS 30 ;
 

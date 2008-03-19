@@ -1,7 +1,7 @@
-USING: compiler tools.test kernel kernel.private
+USING: compiler.units tools.test kernel kernel.private
 sequences.private math.private math combinators strings
 alien arrays memory ;
-IN: temporary
+IN: compiler.tests
 
 ! Test empty word
 [ ] [ [ ] compile-call ] unit-test
@@ -227,3 +227,6 @@ M: f single-combination-test-2 single-combination-test-4 ;
 [ 3 ] [ t single-combination-test-2 ] unit-test
 [ 3 ] [ 3 single-combination-test-2 ] unit-test
 [ f ] [ f single-combination-test-2 ] unit-test
+
+! Regression
+[ 100 ] [ [ 100 [ [ ] times ] keep ] compile-call ] unit-test

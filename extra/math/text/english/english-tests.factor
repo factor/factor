@@ -1,5 +1,5 @@
 USING: math.functions math.text.english tools.test ;
-IN: temporary
+IN: math.text.english.tests
 
 [ "Zero" ] [ 0 number>text ] unit-test
 [ "Twenty-One" ] [ 21 number>text ] unit-test

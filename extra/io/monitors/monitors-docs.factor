@@ -2,13 +2,13 @@ IN: io.monitors
 USING: help.markup help.syntax continuations ;
 
 HELP: <monitor>
-{ $values { "path" "a pathname string" } { "recursive?" "a boolean" } }
+{ $values { "path" "a pathname string" } { "recursive?" "a boolean" } { "monitor" "a new monitor" } }
 { $description "Opens a file system change monitor which listens for changes on " { $snippet "path" } ". The boolean indicates whether changes in subdirectories should be reported."
 $nl
 "Not all operating systems support recursive monitors; if recursive monitoring is not available, an error is thrown and the caller must implement alternative logic for monitoring subdirectories." } ;
 
 HELP: next-change
-{ $values { "monitor" "a monitor" } { "path" "a pathname string" } { "changes" "a change descriptor" } }
+{ $values { "monitor" "a monitor" } { "path" "a pathname string" } { "changed" "a change descriptor" } }
 { $description "Waits for file system changes and outputs the pathname of the first changed file. The change descriptor is aq sequence of symbols documented in " { $link "io.monitors.descriptors" } "." } ;
 
 HELP: with-monitor

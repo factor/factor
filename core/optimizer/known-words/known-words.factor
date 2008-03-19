@@ -8,7 +8,7 @@ assocs quotations sequences.private io.binary io.crc32
 io.streams.string layouts splitting math.intervals
 math.floats.private tuples tuples.private classes
 optimizer.def-use optimizer.backend optimizer.pattern-match
-float-arrays sequences.private combinators ;
+optimizer.inlining float-arrays sequences.private combinators ;
 
 ! the output of <tuple> and <tuple-boa> has the class which is
 ! its second-to-last input
@@ -18,6 +18,11 @@ float-arrays sequences.private combinators ;
         dup class? [ drop tuple ] unless 1array f
     ] "output-classes" set-word-prop
 ] each
+
+\ construct-empty [
+    dup node-in-d peek node-literal
+    dup class? [ drop tuple ] unless 1array f
+] "output-classes" set-word-prop
 
 ! the output of clone has the same type as the input
 { clone (clone) } [
@@ -35,7 +40,7 @@ float-arrays sequences.private combinators ;
 : flip-branches ( #call -- #if )
     #! If a not is followed by an #if, flip branches and
     #! remove the not.
-    dup sole-consumer (flip-branches) [ ] splice-quot ;
+    dup sole-consumer (flip-branches) [ ] f splice-quot ;
 
 \ not {
     { [ dup flip-branches? ] [ flip-branches ] }
@@ -58,7 +63,7 @@ float-arrays sequences.private combinators ;
     [ [ t ] ] { } map>assoc [ drop f ] add [ nip case ] curry ;
 
 : expand-member ( #call -- )
-    dup node-in-d peek value-literal member-quot splice-quot ;
+    dup node-in-d peek value-literal member-quot f splice-quot ;
 
 \ member? {
     { [ dup literal-member? ] [ expand-member ] }

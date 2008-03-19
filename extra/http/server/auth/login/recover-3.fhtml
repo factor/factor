@@ -1,0 +1,46 @@
+<% USING: http.server.components http.server.auth.login http.server
+namespaces kernel combinators ; %>
+<html>
+<body>
+<h1>Recover lost password: step 3 of 4</h1>
+
+<p>Choose a new password for your account.</p>
+
+<form method="POST" action="new-password">
+
+<% hidden-form-field %>
+
+<table>
+
+<% "username" component render-edit %>
+<% "ticket" component render-edit %>
+
+<tr>
+<td>Password:</td>
+<td><% "new-password" component render-edit %></td>
+</tr>
+
+<tr>
+<td>Verify password:</td>
+<td><% "verify-password" component render-edit %></td>
+</tr>
+
+<tr>
+<td></td>
+<td>Enter your password twice to ensure it is correct.</td>
+</tr>
+
+</table>
+
+<p><input type="submit" value="Set password" />
+
+<% password-mismatch? get [
+    "passwords do not match" render-error
+] when %>
+
+</p>
+
+</form>
+
+</body>
+</html>

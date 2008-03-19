@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: logging.server sequences namespaces concurrency
+USING: logging.server sequences namespaces concurrency.messaging
 words kernel arrays shuffle tools.annotations
 prettyprint.config prettyprint debugger io.streams.string
 splitting continuations effects arrays.lib parser strings
@@ -103,7 +103,7 @@ PRIVATE>
 
 : (log-error) ( object word level -- )
     log-service get [
-        >r >r [ print-error ] string-out r> r> log-message
+        >r >r [ print-error ] with-string-writer r> r> log-message
     ] [
         2drop rethrow
     ] if ;
@@ -127,8 +127,7 @@ PRIVATE>
 
 : LOG:
     #! Syntax: name level
-    CREATE
-    dup reset-generic
+    CREATE-WORD
     dup scan-word
     [ >r >r 1array stack>message r> r> log-message ] 2curry
     define ; parsing

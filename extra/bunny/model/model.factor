@@ -1,9 +1,8 @@
-USING: alien alien.c-types arrays sequences math
-math.vectors math.matrices math.parser io io.files kernel opengl
-opengl.gl opengl.glu opengl.capabilities shuffle http.client
-vectors splitting
-tools.time system combinators combinators.lib combinators.cleave
-float-arrays continuations namespaces ;
+USING: alien alien.c-types arrays sequences math math.vectors math.matrices
+    math.parser io io.files kernel opengl opengl.gl opengl.glu io.encodings.ascii
+    opengl.capabilities shuffle http.client vectors splitting tools.time system
+    combinators combinators.cleave float-arrays continuations namespaces
+    sequences.lib ;
 IN: bunny.model
 
 : numbers ( str -- seq )
@@ -18,14 +17,8 @@ IN: bunny.model
         } cond (parse-model)
     ] when* ;
 
-: parse-model ( stream -- vs is )
-    [
-        100000 <vector> 100000 <vector> (parse-model)
-    ] with-stream
-    [
-        over length # " vertices, " %
-        dup length # " triangles" %
-    ] "" make print ;
+: parse-model ( -- vs is )
+    100000 <vector> 100000 <vector> (parse-model) ;
 
 : n ( vs triple -- n )
     swap [ nth ] curry map
@@ -42,15 +35,16 @@ IN: bunny.model
 
 : read-model ( stream -- model )
     "Reading model" print flush [
-        <file-reader> parse-model [ normals ] 2keep 3array
+        ascii [ parse-model ] with-file-reader
+        [ normals ] 2keep 3array
     ] time ;
 
-: model-path "bun_zipper.ply" ;
+: model-path "bun_zipper.ply" temp-file ;
 
 : model-url "http://factorcode.org/bun_zipper.ply" ;
 
 : maybe-download ( -- path )
-    model-path resource-path dup exists? [
+    model-path dup exists? [
         "Downloading bunny from " write
         model-url dup print flush
         over download-to

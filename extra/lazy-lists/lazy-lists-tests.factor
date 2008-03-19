@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: lazy-lists tools.test kernel math io sequences ;
-IN: temporary
+IN: lazy-lists.tests
 
 [ { 1 2 3 4 } ] [
   { 1 2 3 4 } >list list>array
@@ -22,4 +22,8 @@ IN: temporary
 
 [ { 5 6 7 8 } ] [ 
   { 1 2 3 } >list { 4 5 } >list 2list { [ first odd? ] } [ first2 + ] lcomp* list>array
+] unit-test
+
+[ { 4 5 6 } ] [ 
+    3 { 1 2 3 } >list [ + ] lmap-with list>array
 ] unit-test
