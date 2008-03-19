@@ -43,7 +43,7 @@ V{
     vocab-roots get swap [ vocab-dir? ] curry find nip ;
 
 M: string vocab-root
-    dup vocab [ vocab-root ] [ find-vocab-root ] ?if ;
+    vocab dup [ vocab-root ] when ;
 
 M: vocab-link vocab-root
     vocab-link-root ;
@@ -66,24 +66,22 @@ SYMBOL: load-help?
 : load-docs ( vocab -- )
     load-help? get [
         [ docs-weren't-loaded ] keep
-        [ vocab-docs-path ?run-file ] keep
+        [ vocab-docs-path [ ?run-file ] when* ] keep
         docs-were-loaded
     ] [ drop ] if ;
 
-: create-vocab-with-root ( vocab-link -- vocab )
-    dup vocab-name create-vocab
-    swap vocab-root over set-vocab-root ;
+: create-vocab-with-root ( name root -- vocab )
+    swap create-vocab [ set-vocab-root ] keep ;
+
+: update-root ( vocab -- )
+    dup vocab-root
+    [ drop ] [ dup find-vocab-root swap set-vocab-root ] if ;
 
 : reload ( name -- )
     [
-        f >vocab-link
-        dup vocab-root [
-            dup vocab-source-path resource-exists? [
-                create-vocab-with-root
-                dup load-source
-                load-docs
-            ] [ no-vocab ] if
-        ] [ no-vocab ] if
+        dup vocab [
+            dup update-root dup load-source load-docs
+        ] [ no-vocab ] ?if
     ] with-compiler-errors ;
 
 : require ( vocab -- )
@@ -100,33 +98,38 @@ SYMBOL: load-help?
 
 SYMBOL: blacklist
 
-GENERIC: (load-vocab) ( name -- vocab )
-
 : add-to-blacklist ( error vocab -- )
     vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
 
+GENERIC: (load-vocab) ( name -- )
+
 M: vocab (load-vocab)
-    [
-        dup vocab-root [
+    dup update-root
+
+    dup vocab-root [
+        [
             dup vocab-source-loaded? [ dup load-source ] unless
             dup vocab-docs-loaded? [ dup load-docs ] unless
-        ] when
-    ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
+        ] [ [ swap add-to-blacklist ] keep rethrow ] recover
+    ] when drop ;
 
 M: string (load-vocab)
-    [ ".private" ?tail drop reload ] keep vocab ;
+    ! ".private" ?tail drop
+    dup find-vocab-root >vocab-link (load-vocab) ;
 
 M: vocab-link (load-vocab)
-    vocab-name (load-vocab) ;
+    dup vocab-name swap vocab-root dup
+    [ create-vocab-with-root (load-vocab) ] [ 2drop ] if ;
 
 [
-    dup vocab-name blacklist get at* [
-        rethrow
-    ] [
-        drop
-        [ dup vocab swap or (load-vocab) ] with-compiler-errors
-    ] if
-
+    [
+        dup vocab-name blacklist get at* [
+            rethrow
+        ] [
+            drop
+            [ (load-vocab) ] with-compiler-errors
+        ] if
+    ] with-compiler-errors
 ] load-vocab-hook set-global
 
 : vocab-where ( vocab -- loc )

@@ -169,7 +169,12 @@ SYMBOL: changed-words
         "declared-effect" "constructor-quot" "delimiter"
     } reset-props ;
 
+GENERIC: subwords ( word -- seq )
+
+M: word subwords drop f ;
+
 : reset-generic ( word -- )
+    dup subwords [ forget ] each
     dup reset-word
     { "methods" "combination" "default-method" } reset-props ;
 

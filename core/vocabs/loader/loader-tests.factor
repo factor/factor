@@ -78,6 +78,8 @@ IN: vocabs.loader.tests
     ] with-compilation-unit
 ] unit-test
 
+[ f ] [ "vocabs.loader.test.b" vocab-files empty? ] unit-test
+
 [ ] [
     [
         "vocabs.loader.test.b" vocab-files
@@ -117,6 +119,13 @@ IN: vocabs.loader.tests
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
 [ "kernel" vocab where ] unit-test
+
+[ ] [
+    [
+        "vocabs.loader.test.c" forget-vocab
+        "vocabs.loader.test.d" forget-vocab
+    ] with-compilation-unit
+] unit-test
 
 [ t ] [
     [ "vocabs.loader.test.d" require ] [ :1 ] recover
