@@ -12,6 +12,7 @@ TUPLE: ebnf-ensure-not group ;
 TUPLE: ebnf-choice options ;
 TUPLE: ebnf-sequence elements ;
 TUPLE: ebnf-repeat0 group ;
+TUPLE: ebnf-repeat1 group ;
 TUPLE: ebnf-optional elements ;
 TUPLE: ebnf-rule symbol elements ;
 TUPLE: ebnf-action word ;
@@ -24,6 +25,7 @@ C: <ebnf-ensure-not> ebnf-ensure-not
 C: <ebnf-choice> ebnf-choice
 C: <ebnf-sequence> ebnf-sequence
 C: <ebnf-repeat0> ebnf-repeat0
+C: <ebnf-repeat1> ebnf-repeat1
 C: <ebnf-optional> ebnf-optional
 C: <ebnf-rule> ebnf-rule
 C: <ebnf-action> ebnf-action
@@ -83,6 +85,9 @@ M: ebnf-ensure-not (generate-parser) ( ast -- id )
 
 M: ebnf-repeat0 (generate-parser) ( ast -- id )
   ebnf-repeat0-group generate-parser get-parser repeat0 store-parser ;
+
+M: ebnf-repeat1 (generate-parser) ( ast -- id )
+  ebnf-repeat1-group generate-parser get-parser repeat1 store-parser ;
 
 M: ebnf-optional (generate-parser) ( ast -- id )
   ebnf-optional-elements generate-parser get-parser optional store-parser ;
@@ -176,20 +181,30 @@ DEFER: 'rhs'
 
 DEFER: 'choice'
 
-: grouped ( begin quot end -- parser )
-  #! Parse a group of choices, where the delimiter for the
-  #! group is specified by 'begin' and 'end'. The quotation
-  #! should produce the AST to be the result of the parser.
-  [ [ 'choice' sp ] delay swap action ] dip syntax-pack ;
-
+: grouped ( quot suffix  -- parser )
+  #! Parse a group of choices, with a suffix indicating
+  #! the type of group (repeat0, repeat1, etc) and
+  #! an quot that is the action that produces the AST.
+  "(" [ 'choice' sp ] delay ")" syntax-pack 
+  swap 2seq  
+  [ first ] rot compose action ;
+  
 : 'group' ( -- parser )
-  "(" [ ] ")" grouped ;
+  #! A grouping with no suffix. Used for precedence.
+  [ ] [
+    "*" token sp ensure-not ,
+    "+" token sp ensure-not ,
+    "?" token sp ensure-not ,
+  ] seq* hide grouped ; 
 
 : 'repeat0' ( -- parser )
-  "{" [ <ebnf-repeat0> ] "}" grouped ;
+  [ <ebnf-repeat0> ] "*" syntax grouped ;
+
+: 'repeat1' ( -- parser )
+  [ <ebnf-repeat1> ] "+" syntax grouped ;
 
 : 'optional' ( -- parser )
-  "[" [ <ebnf-optional> ] "]" grouped ;
+  [ <ebnf-optional> ] "?" syntax grouped ;
 
 : 'ensure-not' ( -- parser )
   #! Parses the '!' syntax to ensure that 
@@ -208,6 +223,7 @@ DEFER: 'choice'
     'element' sp ,
     'group' sp , 
     'repeat0' sp ,
+    'repeat1' sp ,
     'optional' sp , 
   ] choice* repeat1 [ 
      dup length 1 = [ first ] [ <ebnf-sequence> ] if

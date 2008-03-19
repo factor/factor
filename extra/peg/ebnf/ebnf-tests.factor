@@ -83,7 +83,7 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one {(two | three) four}" 'choice' parse parse-result-ast
+  "one ((two | three) four)*" 'choice' parse parse-result-ast
 ] unit-test
 
 {
@@ -95,7 +95,7 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one [ two ] three" 'choice' parse parse-result-ast
+  "one ( two )? three" 'choice' parse parse-result-ast
 ] unit-test
 
 { "foo" } [
