@@ -7,6 +7,8 @@ IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
 TUPLE: ebnf-terminal symbol ;
+TUPLE: ebnf-any-character ;
+TUPLE: ebnf-ensure-not group ;
 TUPLE: ebnf-choice options ;
 TUPLE: ebnf-sequence elements ;
 TUPLE: ebnf-repeat0 group ;
@@ -17,6 +19,8 @@ TUPLE: ebnf rules ;
 
 C: <ebnf-non-terminal> ebnf-non-terminal
 C: <ebnf-terminal> ebnf-terminal
+C: <ebnf-any-character> ebnf-any-character
+C: <ebnf-ensure-not> ebnf-ensure-not
 C: <ebnf-choice> ebnf-choice
 C: <ebnf-sequence> ebnf-sequence
 C: <ebnf-repeat0> ebnf-repeat0
@@ -61,6 +65,9 @@ M: ebnf-non-terminal (generate-parser) ( ast -- id )
     parsers get , \ nth , [ search ] [ 2drop f ] recover , \ or ,
   ] [ ] make delay sp store-parser ;
 
+M: ebnf-any-character (generate-parser) ( ast -- id )
+  drop [ drop t ] satisfy store-parser ;
+
 M: ebnf-choice (generate-parser) ( ast -- id )
   ebnf-choice-options [
     generate-parser get-parser 
@@ -70,6 +77,9 @@ M: ebnf-sequence (generate-parser) ( ast -- id )
   ebnf-sequence-elements [
     generate-parser get-parser
   ] map seq store-parser ;
+
+M: ebnf-ensure-not (generate-parser) ( ast -- id )
+  ebnf-ensure-not-group generate-parser get-parser ensure-not store-parser ;
 
 M: ebnf-repeat0 (generate-parser) ( ast -- id )
   ebnf-repeat0-group generate-parser get-parser repeat0 store-parser ;
@@ -136,6 +146,8 @@ DEFER: 'rhs'
       [ dup CHAR: ( = ]
       [ dup CHAR: ] = ]
       [ dup CHAR: [ = ]
+      [ dup CHAR: . = ]
+      [ dup CHAR: ! = ]
     } || not nip    
   ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
@@ -144,6 +156,10 @@ DEFER: 'rhs'
   #! and it represents the literal value of the identifier.
   'identifier' [ <ebnf-terminal> ] action ;
 
+: 'any-character' ( -- parser )
+  #! A parser to match the symbol for any character match.
+  [ CHAR: . = ] satisfy [ drop <ebnf-any-character> ] action ;
+ 
 : 'element' ( -- parser )
   #! An element of a rule. It can be a terminal or a 
   #! non-terminal but must not be followed by a "=". 
@@ -153,6 +169,7 @@ DEFER: 'rhs'
     [ 
       'non-terminal' ,
       'terminal' ,
+      'any-character' ,
     ] choice* ,
     "=" syntax ensure-not ,
   ] seq* [ first ] action ;
@@ -174,10 +191,20 @@ DEFER: 'choice'
 : 'optional' ( -- parser )
   "[" [ <ebnf-optional> ] "]" grouped ;
 
+: 'ensure-not' ( -- parser )
+  #! Parses the '!' syntax to ensure that 
+  #! something that matches the following elements do
+  #! not exist in the parse stream.
+  [
+    "!" syntax ,
+    'group' sp ,
+  ] seq* [ first <ebnf-ensure-not> ] action ;
+
 : 'sequence' ( -- parser )
   #! A sequence of terminals and non-terminals, including
   #! groupings of those. 
   [ 
+    'ensure-not' sp ,
     'element' sp ,
     'group' sp , 
     'repeat0' sp ,
