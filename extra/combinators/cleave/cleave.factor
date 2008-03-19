@@ -54,6 +54,8 @@ MACRO: 2cleave ( seq -- )
 
 : bi* ( x y p q -- p(x) q(y) ) >r swap slip r> call ; inline
 
+: 2bi* ( w x y z p q -- p(x) q(y) ) >r -rot 2slip r> call ; inline
+
 : tri* ( x y z p q r -- p(x) q(y) r(z) )
   >r rot >r bi* r> r> call ; inline
 
