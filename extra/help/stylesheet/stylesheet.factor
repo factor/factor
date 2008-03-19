@@ -82,6 +82,7 @@ H{
     { page-color { 0.95 0.95 0.95 1 } }
     { border-color { 1 0 0 1 } }
     { border-width 5 }
+    { wrap-margin 500 }
 } warning-style set-global
 
 SYMBOL: table-content-style
