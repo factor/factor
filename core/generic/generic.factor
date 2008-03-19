@@ -17,10 +17,6 @@ M: object perform-combination
     #! the method will throw an error. We don't want that.
     nip [ "Invalid method combination" throw ] curry [ ] like ;
 
-GENERIC: method-prologue ( class combination -- quot )
-
-M: object method-prologue 2drop [ ] ;
-
 GENERIC: make-default-method ( generic combination -- method )
 
 PREDICATE: word generic "combination" word-prop >boolean ;
@@ -50,55 +46,49 @@ TUPLE: check-method class generic ;
 : check-method ( class generic -- class generic )
     over class? over generic? and [
         \ check-method construct-boa throw
-    ] unless ;
+    ] unless ; inline
 
-: with-methods ( word quot -- )
+: with-methods ( generic quot -- )
     swap [ "methods" word-prop swap call ] keep make-generic ;
     inline
 
 : method-word-name ( class word -- string )
     word-name "/" rot word-name 3append ;
 
-: make-method-def ( quot class generic -- quot )
-    "combination" word-prop method-prologue swap append ;
-
-PREDICATE: word method-body "method-def" word-prop >boolean ;
+PREDICATE: word method-body
+    "method-generic" word-prop >boolean ;
 
 M: method-body stack-effect
     "method-generic" word-prop stack-effect ;
 
-: method-word-props ( quot class generic -- assoc )
+: method-word-props ( class generic -- assoc )
     [
         "method-generic" set
         "method-class" set
-        "method-def" set
     ] H{ } make-assoc ;
 
-: <method> ( quot class generic -- method )
+: <method> ( class generic -- method )
     check-method
-    [ make-method-def ] 3keep
     [ method-word-props ] 2keep
     method-word-name f <word>
-    tuck set-word-props
-    dup rot define ;
+    [ set-word-props ] keep ;
 
-: redefine-method ( quot class generic -- )
-    [ method swap "method-def" set-word-prop ] 3keep
-    [ make-method-def ] 2keep
-    method swap define ;
+: reveal-method ( method class generic -- )
+    [ set-at ] with-methods ;
 
-: define-method ( quot class generic -- )
-    >r bootstrap-word r>
-    2dup method [
-        redefine-method
+: create-method ( class generic -- method )
+    2dup method dup [
+        2nip
     ] [
-        [ <method> ] 2keep
-        [ set-at ] with-methods
+        drop [ <method> dup ] 2keep reveal-method
     ] if ;
 
+: <default-method> ( generic combination -- method )
+    object bootstrap-word pick <method>
+    [ -rot make-default-method define ] keep ;
+
 : define-default-method ( generic combination -- )
-    dupd make-default-method object bootstrap-word pick <method>
-    "default-method" set-word-prop ;
+    dupd <default-method> "default-method" set-word-prop ;
 
 ! Definition protocol
 M: method-spec where
@@ -108,30 +98,31 @@ M: method-spec set-where
     first2 method set-where ;
 
 M: method-spec definer
-    drop \ M: \ ; ;
+    first2 method definer ;
 
 M: method-spec definition
-    first2 method dup
-    [ "method-def" word-prop ] when ;
+    first2 method definition ;
 
 : forget-method ( class generic -- )
-    check-method
-    [ delete-at* ] with-methods
-    [ forget-word ] [ drop ] if ;
+    dup generic? [
+        [ delete-at* ] with-methods
+        [ forget-word ] [ drop ] if
+    ] [
+        2drop
+    ] if ;
 
 M: method-spec forget*
-    first2 forget-method ;
+    first2 method forget* ;
 
 M: method-body definer
     drop \ M: \ ; ;
 
-M: method-body definition
-    "method-def" word-prop ;
-
 M: method-body forget*
-    dup "method-class" word-prop
-    swap "method-generic" word-prop
-    forget-method ;
+    dup "forgotten" word-prop [ drop ] [
+        dup "method-class" word-prop
+        over "method-generic" word-prop forget-method
+        t "forgotten" set-word-prop
+    ] if ;
 
 : implementors* ( classes -- words )
     all-words [
@@ -163,16 +154,12 @@ M: assoc update-methods ( assoc -- )
         make-generic
     ] if ;
 
-GENERIC: subwords ( word -- seq )
-
-M: word subwords drop f ;
-
 M: generic subwords
     dup "methods" word-prop values
     swap "default-method" word-prop add ;
 
 M: generic forget-word
-    dup subwords [ forget-word ] each (forget-word) ;
+    dup subwords [ forget ] each (forget-word) ;
 
 : xref-generics ( -- )
     all-words [ subwords [ xref ] each ] each ;

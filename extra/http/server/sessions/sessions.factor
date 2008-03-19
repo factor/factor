@@ -13,7 +13,7 @@ IN: http.server.sessions
 
 GENERIC: init-session* ( responder -- )
 
-M: dispatcher init-session* drop ;
+M: object init-session* drop ;
 
 TUPLE: session-manager responder sessions ;
 
@@ -56,8 +56,11 @@ M: session-saver dispose
         sessions update-session
     ] [ drop ] if ;
 
+: save-session-after ( id session -- )
+    <session-saver> add-always-destructor ;
+
 : call-responder/session ( path responder id session -- response )
-    [ <session-saver> add-always-destructor ]
+    [ save-session-after ]
     [ [ session-id set ] [ session set ] bi* ] 2bi
     [ session-manager set ] [ responder>> call-responder ] bi ;
 

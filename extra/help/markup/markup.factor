@@ -158,7 +158,8 @@ M: f print-element drop ;
 : $subsection ( element -- )
     [ first ($long-link) ] ($subsection) ;
 
-: ($vocab-link) ( text vocab -- ) f >vocab-link write-link ;
+: ($vocab-link) ( text vocab -- )
+    dup vocab-root >vocab-link write-link ;
 
 : $vocab-subsection ( element -- )
     [

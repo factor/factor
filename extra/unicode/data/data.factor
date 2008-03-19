@@ -5,7 +5,7 @@ IN: unicode.data
 
 <<
 : VALUE:
-    CREATE dup reset-generic { f } clone [ first ] curry define ; parsing
+    CREATE-WORD { f } clone [ first ] curry define ; parsing
 
 : set-value ( value word -- )
     word-def first set-first ;

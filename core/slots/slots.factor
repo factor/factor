@@ -10,7 +10,8 @@ TUPLE: slot-spec type name offset reader writer ;
 C: <slot-spec> slot-spec
 
 : define-typecheck ( class generic quot -- )
-    over define-simple-generic -rot define-method ;
+    over define-simple-generic
+    >r create-method r> define ;
 
 : define-slot-word ( class slot word quot -- )
     rot >fixnum add* define-typecheck ;

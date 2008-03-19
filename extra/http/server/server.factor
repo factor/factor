@@ -185,21 +185,20 @@ SYMBOL: exit-continuation
 
 : exit-with exit-continuation get continue-with ;
 
+: with-exit-continuation ( quot -- )
+    '[ exit-continuation set @ ] callcc1 exit-continuation off ;
+
 : do-request ( request -- response )
-    '[
-        exit-continuation set ,
-        [
-            [ log-request ]
-            [ request set ]
-            [ path>> main-responder get call-responder ] tri
-            [ <404> ] unless*
-        ] [
-            [ \ do-request log-error ]
-            [ <500> ]
-            bi
-        ] recover
-    ] callcc1
-    exit-continuation off ;
+    [
+        [ log-request ]
+        [ request set ]
+        [ path>> main-responder get call-responder ] tri
+        [ <404> ] unless*
+    ] [
+        [ \ do-request log-error ]
+        [ <500> ]
+        bi
+    ] recover ;
 
 : default-timeout 1 minutes stdio get set-timeout ;
 

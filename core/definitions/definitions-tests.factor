@@ -1,10 +1,10 @@
 IN: definitions.tests
 USING: tools.test generic kernel definitions sequences
-compiler.units ;
+compiler.units words ;
 
 TUPLE: combination-1 ;
 
-M: combination-1 perform-combination 2drop { } [ ] each [ ] ;
+M: combination-1 perform-combination 2drop [ ] ;
 
 M: combination-1 make-default-method 2drop [ "No method" throw ] ;
 
@@ -13,7 +13,7 @@ SYMBOL: generic-1
 [
     generic-1 T{ combination-1 } define-generic
 
-    [ ] object \ generic-1 define-method
+    object \ generic-1 create-method [ ] define
 ] with-compilation-unit
 
 [ ] [

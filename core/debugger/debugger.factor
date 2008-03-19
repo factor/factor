@@ -214,7 +214,7 @@ M: check-closed summary
     drop "Attempt to perform I/O on closed stream" ;
 
 M: check-method summary
-    drop "Invalid parameters for define-method" ;
+    drop "Invalid parameters for create-method" ;
 
 M: check-tuple summary
     drop "Invalid class for define-constructor" ;

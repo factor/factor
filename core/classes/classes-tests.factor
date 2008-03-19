@@ -28,6 +28,8 @@ TUPLE: second-one ;
 UNION: both first-one union-class ;
 
 [ t ] [ both tuple classes-intersect? ] unit-test
+[ null ] [ vector virtual-sequence class-and ] unit-test
+[ f ] [ vector virtual-sequence classes-intersect? ] unit-test
 
 [ t ] [ \ fixnum \ integer class< ] unit-test
 [ t ] [ \ fixnum \ fixnum class< ] unit-test

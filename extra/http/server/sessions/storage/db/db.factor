@@ -21,23 +21,18 @@ session "SESSIONS"
     session construct-empty
         swap dup [ string>number ] when >>id ;
 
-USING: namespaces io prettyprint ;
 M: sessions-in-db get-session ( id storage -- namespace/f )
-    global [ "get " write over print flush ] bind
     drop
     dup [
         <session>
-        select-tuple dup [ namespace>> ] when global [ dup . ] bind
+        select-tuple dup [ namespace>> ] when
     ] when ;
 
 M: sessions-in-db update-session ( namespace id storage -- )
-    global [ "update " write over print flush ] bind
     drop
     <session>
-        swap  global [ dup . ] bind >>namespace
-    dup update-tuple
-    id>> <session> select-tuple global [ . flush ] bind
-    ;
+        swap >>namespace
+    update-tuple ;
 
 M: sessions-in-db delete-session ( id storage -- )
     drop
@@ -45,8 +40,7 @@ M: sessions-in-db delete-session ( id storage -- )
     delete-tuple ;
 
 M: sessions-in-db new-session ( namespace storage -- id )
-    global [ "new " print flush ] bind
     drop
     f <session>
-        swap  global [ dup . ] bind >>namespace
+        swap >>namespace
     [ insert-tuple ] [ id>> number>string ] bi ;
