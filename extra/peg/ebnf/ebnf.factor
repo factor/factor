@@ -145,10 +145,17 @@ DEFER: 'rhs'
   'identifier' [ <ebnf-terminal> ] action ;
 
 : 'element' ( -- parser )
-  [ 
-    'non-terminal' ,
-    'terminal' ,
-  ] choice* ;
+  #! An element of a rule. It can be a terminal or a 
+  #! non-terminal but must not be followed by a "=". 
+  #! The latter indicates that it is the beginning of a
+  #! new rule.
+  [
+    [ 
+      'non-terminal' ,
+      'terminal' ,
+    ] choice* ,
+    "=" syntax ensure-not ,
+  ] seq* [ first ] action ;
 
 DEFER: 'choice'
 
@@ -168,6 +175,8 @@ DEFER: 'choice'
   "[" [ <ebnf-optional> ] "]" grouped ;
 
 : 'sequence' ( -- parser )
+  #! A sequence of terminals and non-terminals, including
+  #! groupings of those. 
   [ 
     'element' sp ,
     'group' sp , 
@@ -205,7 +214,7 @@ DEFER: 'choice'
   ] seq* [ first2 <ebnf-rule> ] action ;
 
 : 'ebnf' ( -- parser )
-  'rule' sp "." syntax list-of [ <ebnf> ] action ;
+  'rule' sp repeat1 [ <ebnf> ] action ;
 
 : ebnf>quot ( string -- quot )
   'ebnf' parse [
