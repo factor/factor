@@ -100,33 +100,46 @@ M: ebnf (generate-parser) ( ast -- id )
 DEFER: 'rhs'
 
 : 'non-terminal' ( -- parser )
-  CHAR: a CHAR: z range "-" token [ first ] action  2array choice repeat1 [ >string <ebnf-non-terminal> ] action ;
+  [ 
+    CHAR: a CHAR: z range ,
+    "-" token [ first ] action ,
+  ] choice* repeat1 [ >string <ebnf-non-terminal> ] action ;
 
 : 'terminal' ( -- parser )
-  "'" token hide [ CHAR: ' = not ] satisfy repeat1 "'" token hide 3array seq [ first >string <ebnf-terminal> ] action ;
+  [
+    "'" token hide ,
+    [ CHAR: ' = not ] satisfy repeat1 ,
+    "'" token hide ,
+  ] seq* [ first >string <ebnf-terminal> ] action ;
 
 : 'element' ( -- parser )
-  'non-terminal' 'terminal' 2array choice ;
+  [ 
+    'non-terminal' ,
+    'terminal' ,
+  ] choice* ;
 
 DEFER: 'choice'
 
 : 'group' ( -- parser )
-  "(" token sp hide
-  [ 'choice' sp ] delay
-  ")" token sp hide 
-  3array seq [ first ] action ;
+  [
+    "(" token sp hide ,
+    [ 'choice' sp ] delay ,
+    ")" token sp hide  ,
+  ] seq* [ first ] action ;
 
 : 'repeat0' ( -- parser )
-  "{" token sp hide
-  [ 'choice' sp ] delay
-  "}" token sp hide 
-  3array seq [ first <ebnf-repeat0> ] action ;
+  [
+    "{" token sp hide ,
+    [ 'choice' sp ] delay ,
+    "}" token sp hide  ,
+  ] seq* [ first <ebnf-repeat0> ] action ;
 
 : 'optional' ( -- parser )
-  "[" token sp hide
-  [ 'choice' sp ] delay
-  "]" token sp hide 
-  3array seq [ first <ebnf-optional> ] action ;
+  [
+    "[" token sp hide ,
+    [ 'choice' sp ] delay ,
+    "]" token sp hide  ,
+  ] seq* [ first <ebnf-optional> ] action ;
 
 : 'sequence' ( -- parser )
   [ 
@@ -134,8 +147,7 @@ DEFER: 'choice'
     'group' sp , 
     'repeat0' sp ,
     'optional' sp , 
-   ] { } make  choice  
-   repeat1 [ 
+   ] choice* repeat1 [ 
      dup length 1 = [ first ] [ <ebnf-sequence> ] if
    ] action ;  
 
@@ -145,18 +157,26 @@ DEFER: 'choice'
    ] action ;
 
 : 'action' ( -- parser )
-  "=>" token hide
-  [ blank? ] satisfy ensure-not [ drop t ] satisfy 2array seq [ first ] action repeat1 [ >string ] action sp
-  2array seq [ first <ebnf-action> ] action ;
+  [
+    "=>" token hide ,
+    [
+      [ blank? ] satisfy ensure-not ,
+      [ drop t ] satisfy ,
+    ] seq* [ first ] action repeat1 [ >string ] action sp ,
+  ] seq* [ first <ebnf-action> ] action ;
   
 : 'rhs' ( -- parser )
-  'choice' 'action' sp optional 2array seq ;
+  [
+    'choice' ,
+    'action' sp optional ,
+  ] seq* ;
  
 : 'rule' ( -- parser )
-  'non-terminal' [ ebnf-non-terminal-symbol ] action 
-  "=" token sp hide 
-  'rhs' 
-  3array seq [ first2 <ebnf-rule> ] action ;
+  [
+    'non-terminal' [ ebnf-non-terminal-symbol ] action  ,
+    "=" token sp hide  ,
+    'rhs'  ,
+  ] seq* [ first2 <ebnf-rule> ] action ;
 
 : 'ebnf' ( -- parser )
   'rule' sp "." token sp hide list-of [ <ebnf> ] action ;
