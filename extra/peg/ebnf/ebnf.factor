@@ -104,6 +104,11 @@ DEFER: 'rhs'
   #! does not put the result in the AST.
   token sp hide ;
 
+: syntax-pack ( begin parser end -- parser )
+  #! Parse 'parser' surrounded by syntax elements
+  #! begin and end.
+  [ syntax ] dipd syntax pack ;
+
 : 'identifier' ( -- parser )
   #! Return a parser that parses an identifer delimited by
   #! a quotation character. The quotation can be single
@@ -147,26 +152,20 @@ DEFER: 'rhs'
 
 DEFER: 'choice'
 
+: grouped ( begin quot end -- parser )
+  #! Parse a group of choices, where the delimiter for the
+  #! group is specified by 'begin' and 'end'. The quotation
+  #! should produce the AST to be the result of the parser.
+  [ [ 'choice' sp ] delay swap action ] dip syntax-pack ;
+
 : 'group' ( -- parser )
-  [
-    "(" syntax ,
-    [ 'choice' sp ] delay ,
-    ")" syntax  ,
-  ] seq* [ first ] action ;
+  "(" [ ] ")" grouped ;
 
 : 'repeat0' ( -- parser )
-  [
-    "{" syntax ,
-    [ 'choice' sp ] delay ,
-    "}" syntax  ,
-  ] seq* [ first <ebnf-repeat0> ] action ;
+  "{" [ <ebnf-repeat0> ] "}" grouped ;
 
 : 'optional' ( -- parser )
-  [
-    "[" syntax ,
-    [ 'choice' sp ] delay ,
-    "]" syntax  ,
-  ] seq* [ first <ebnf-optional> ] action ;
+  "[" [ <ebnf-optional> ] "]" grouped ;
 
 : 'sequence' ( -- parser )
   [ 
@@ -174,14 +173,14 @@ DEFER: 'choice'
     'group' sp , 
     'repeat0' sp ,
     'optional' sp , 
-   ] choice* repeat1 [ 
+  ] choice* repeat1 [ 
      dup length 1 = [ first ] [ <ebnf-sequence> ] if
-   ] action ;  
+  ] action ;  
 
 : 'choice' ( -- parser )
   'sequence' sp "|" token sp list-of [ 
     dup length 1 = [ first ] [ <ebnf-choice> ] if
-   ] action ;
+  ] action ;
 
 : 'action' ( -- parser )
   [
