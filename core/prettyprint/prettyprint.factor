@@ -172,13 +172,13 @@ M: hook-generic synopsis*
     stack-effect. ;
 
 M: method-spec synopsis*
-    dup definer. [ pprint-word ] each ;
+    first2 method synopsis* ;
 
 M: method-body synopsis*
     dup dup
     definer.
-    "method-class" word-prop pprint*
-    "method-generic" word-prop pprint* ;
+    "method-class" word-prop pprint-word
+    "method-generic" word-prop pprint-word ;
 
 M: mixin-instance synopsis*
     dup definer.

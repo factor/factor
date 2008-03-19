@@ -238,3 +238,31 @@ M: sequence generic-forget-test-2 = ;
     \ = usage [ word? ] subset
     [ word-name "generic-forget-test-2/sequence" = ] contains?
 ] unit-test
+
+GENERIC: generic-forget-test-3
+
+M: f generic-forget-test-3 ;
+
+[ ] [ \ f \ generic-forget-test-3 method "m" set ] unit-test
+
+[ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
+
+[ ] [ "IN: generic.tests M: f generic-forget-test-3 ;" eval ] unit-test
+
+[ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
+
+[ f ] [ f generic-forget-test-3 ] unit-test
+
+: a-word ;
+
+GENERIC: a-generic
+
+M: integer a-generic a-word ;
+
+[ ] [ \ integer \ a-generic method "m" set ] unit-test
+
+[ t ] [ "m" get \ a-word usage memq? ] unit-test
+
+[ ] [ "IN: generic.tests : a-generic ;" eval ] unit-test
+
+[ f ] [ "m" get \ a-word usage memq? ] unit-test
