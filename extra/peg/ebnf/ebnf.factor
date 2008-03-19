@@ -99,6 +99,11 @@ M: ebnf (generate-parser) ( ast -- id )
 
 DEFER: 'rhs'
 
+: syntax ( string -- parser )
+  #! Parses the string, ignoring white space, and
+  #! does not put the result in the AST.
+  token sp hide ;
+
 : 'identifier' ( -- parser )
   #! Return a parser that parses an identifer delimited by
   #! a quotation character. The quotation can be single
@@ -144,23 +149,23 @@ DEFER: 'choice'
 
 : 'group' ( -- parser )
   [
-    "(" token sp hide ,
+    "(" syntax ,
     [ 'choice' sp ] delay ,
-    ")" token sp hide  ,
+    ")" syntax  ,
   ] seq* [ first ] action ;
 
 : 'repeat0' ( -- parser )
   [
-    "{" token sp hide ,
+    "{" syntax ,
     [ 'choice' sp ] delay ,
-    "}" token sp hide  ,
+    "}" syntax  ,
   ] seq* [ first <ebnf-repeat0> ] action ;
 
 : 'optional' ( -- parser )
   [
-    "[" token sp hide ,
+    "[" syntax ,
     [ 'choice' sp ] delay ,
-    "]" token sp hide  ,
+    "]" syntax  ,
   ] seq* [ first <ebnf-optional> ] action ;
 
 : 'sequence' ( -- parser )
@@ -196,12 +201,12 @@ DEFER: 'choice'
 : 'rule' ( -- parser )
   [
     'non-terminal' [ ebnf-non-terminal-symbol ] action  ,
-    "=" token sp hide  ,
+    "=" syntax  ,
     'rhs'  ,
   ] seq* [ first2 <ebnf-rule> ] action ;
 
 : 'ebnf' ( -- parser )
-  'rule' sp "." token sp hide list-of [ <ebnf> ] action ;
+  'rule' sp "." syntax list-of [ <ebnf> ] action ;
 
 : ebnf>quot ( string -- quot )
   'ebnf' parse [
