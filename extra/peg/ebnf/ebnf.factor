@@ -153,6 +153,9 @@ DEFER: 'rhs'
       [ dup CHAR: [ = ]
       [ dup CHAR: . = ]
       [ dup CHAR: ! = ]
+      [ dup CHAR: * = ]
+      [ dup CHAR: + = ]
+      [ dup CHAR: ? = ]
     } || not nip    
   ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
