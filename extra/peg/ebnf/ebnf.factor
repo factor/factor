@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
-       peg.parsers unicode.categories multiline ;
+       peg.parsers unicode.categories multiline combinators.lib ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -99,18 +99,40 @@ M: ebnf (generate-parser) ( ast -- id )
 
 DEFER: 'rhs'
 
+: 'identifier' ( -- parser )
+  #! Return a parser that parses an identifer delimited by
+  #! a quotation character. The quotation can be single
+  #! or double quotes. The AST produced is the identifier
+  #! between the quotes.
+  [
+    [ CHAR: " = not ] satisfy repeat1 "\"" "\"" surrounded-by ,
+    [ CHAR: ' = not ] satisfy repeat1 "'" "'" surrounded-by ,
+  ] choice* [ >string ] action ;
+  
 : 'non-terminal' ( -- parser )
-  [ 
-    CHAR: a CHAR: z range ,
-    "-" token [ first ] action ,
-  ] choice* repeat1 [ >string <ebnf-non-terminal> ] action ;
+  #! A non-terminal is the name of another rule. It can
+  #! be any non-blank character except for characters used
+  #! in the EBNF syntax itself.
+  [
+    {
+      [ dup blank?    ]
+      [ dup CHAR: " = ]
+      [ dup CHAR: ' = ]
+      [ dup CHAR: | = ]
+      [ dup CHAR: { = ]
+      [ dup CHAR: } = ]
+      [ dup CHAR: = = ]
+      [ dup CHAR: ) = ]
+      [ dup CHAR: ( = ]
+      [ dup CHAR: ] = ]
+      [ dup CHAR: [ = ]
+    } || not nip    
+  ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
 : 'terminal' ( -- parser )
-  [
-    "'" token hide ,
-    [ CHAR: ' = not ] satisfy repeat1 ,
-    "'" token hide ,
-  ] seq* [ first >string <ebnf-terminal> ] action ;
+  #! A terminal is an identifier enclosed in quotations
+  #! and it represents the literal value of the identifier.
+  'identifier' [ <ebnf-terminal> ] action ;
 
 : 'element' ( -- parser )
   [ 

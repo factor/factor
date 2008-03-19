@@ -97,3 +97,20 @@ IN: peg.ebnf.tests
 } [
   "one [ two ] three" 'choice' parse parse-result-ast
 ] unit-test
+
+{ "foo" } [
+  "\"foo\"" 'identifier' parse parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "'foo'" 'identifier' parse parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "foo" 'non-terminal' parse parse-result-ast ebnf-non-terminal-symbol
+] unit-test
+
+{ "foo" } [
+  "foo]" 'non-terminal' parse parse-result-ast ebnf-non-terminal-symbol
+] unit-test
+
