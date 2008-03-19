@@ -26,6 +26,10 @@ tools.deploy.backend math sequences io.launcher arrays ;
 
 [ ] [ "hello-ui" shake-and-bake ] unit-test
 
+[ "staging.math-compiler-ui-strip.image" ] [
+    "hello-ui" deploy-config [ staging-image-name ] bind
+] unit-test
+
 [ t ] [
     2000000 small-enough?
 ] unit-test

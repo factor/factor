@@ -127,7 +127,7 @@ C: <vocab-author> vocab-author
 : $describe-vocab ( element -- )
     first
     dup describe-children
-    dup vocab-root over vocab-dir? [
+    dup find-vocab-root [
         dup describe-summary
         dup describe-tags
         dup describe-authors
