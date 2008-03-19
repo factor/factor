@@ -11,4 +11,5 @@ USING: alien sequences ;
     ! { "gl"       "libGLES_CM.dll"         "stdcall" }
     ! { "glu"      "libGLES_CM.dll"         "stdcall" }
     ! { "freetype" "libfreetype-6.dll"      "stdcall" }
+    { "ole32"    "ole32.dll"    "stdcall" }
 } [ first3 add-library ] each
