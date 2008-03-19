@@ -330,11 +330,11 @@ FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
 
 ! Hack; if we're on ARM, we probably don't have much RAM, so
 ! skip this test.
-cpu "arm" = [
-    [ "testing" ] [
-        "testing" callback-5a callback_test_1
-    ] unit-test
-] unless
+! cpu "arm" = [
+!     [ "testing" ] [
+!         "testing" callback-5a callback_test_1
+!     ] unit-test
+! ] unless
 
 : callback-6
     "void" { } "cdecl" [ [ continue ] callcc0 ] alien-callback ;
