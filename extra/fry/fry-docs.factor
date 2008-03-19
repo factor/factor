@@ -46,7 +46,7 @@ $nl
 }
 "The " { $link , } " and " { $link @ } " specifiers may be freely mixed:"
 { $code
-    "{ 8 13 14 27 } [ even? ] 5 [ @ dup , ? ] map"
+    "{ 8 13 14 27 } [ even? ] 5 '[ @ dup , ? ] map"
     "{ 8 13 14 27 } [ even? ] 5 [ dup ] swap [ ? ] curry 3compose map"
     "{ 8 13 14 27 } [ even? dup 5 ? ] map"
 }

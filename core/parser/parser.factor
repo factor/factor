@@ -478,7 +478,15 @@ SYMBOL: interactive-vocabs
 : smudged-usage ( -- usages referenced removed )
     removed-definitions filter-moved keys [
         outside-usages
-        [ empty? swap pathname? or not ] assoc-subset
+        [
+            empty? [ drop f ] [
+                {
+                    { [ dup pathname? ] [ f ] }
+                    { [ dup method-body? ] [ f ] }
+                    { [ t ] [ t ] }
+                } cond nip
+            ] if
+        ] assoc-subset
         dup values concat prune swap keys
     ] keep ;
 
