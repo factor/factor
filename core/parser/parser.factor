@@ -60,7 +60,7 @@ t parser-notes set-global
     [ swap CHAR: \s eq? xor ] curry find* drop
     [ r> drop ] [ r> length ] if* ;
 
-: change-column ( lexer quot -- )
+: change-lexer-column ( lexer quot -- )
     swap
     [ dup lexer-column swap lexer-line-text rot call ] keep
     set-lexer-column ; inline
@@ -68,14 +68,14 @@ t parser-notes set-global
 GENERIC: skip-blank ( lexer -- )
 
 M: lexer skip-blank ( lexer -- )
-    [ t skip ] change-column ;
+    [ t skip ] change-lexer-column ;
 
 GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word ( lexer -- )
     [
         2dup nth CHAR: " eq? [ drop 1+ ] [ f skip ] if
-    ] change-column ;
+    ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
     dup lexer-line swap lexer-text length <= ;
@@ -153,7 +153,7 @@ name>char-hook global [
 : parse-string ( -- str )
     lexer get [
         [ swap tail-slice (parse-string) ] "" make swap
-    ] change-column ;
+    ] change-lexer-column ;
 
 TUPLE: parse-error file line col text ;
 

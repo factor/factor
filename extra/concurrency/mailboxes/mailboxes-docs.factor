@@ -49,8 +49,8 @@ HELP: while-mailbox-empty
 { $description "Repeatedly call the quotation while there are no items in the mailbox." } ;
 
 HELP: mailbox-get?
-{ $values { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } }
-          { "mailbox" mailbox } 
+{ $values { "mailbox" mailbox } 
+          { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } }
           { "obj" object }
 }
 { $description "Get the first item in the mailbox which satisfies the predicate. 'pred' will be called repeatedly for each item in the mailbox. When 'pred' returns true that item will be returned. If nothing in the mailbox satisfies the predicate then the thread will block until something does." } ;
