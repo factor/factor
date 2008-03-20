@@ -5,7 +5,7 @@ inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
 definitions prettyprint hashtables combinators.lib
 prettyprint.sections sequences.private effects generic
-compiler.units combinators.cleave new-slots accessors ;
+compiler.units combinators.cleave accessors ;
 IN: locals
 
 ! Inspired by

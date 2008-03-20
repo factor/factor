@@ -1,4 +1,4 @@
-USING: kernel random math new-slots accessors  ;
+USING: kernel random math accessors  ;
 IN: random.dummy
 
 TUPLE: random-dummy i ;

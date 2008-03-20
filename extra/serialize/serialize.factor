@@ -11,7 +11,7 @@ io.binary strings classes words sbufs tuples arrays vectors
 byte-arrays bit-arrays quotations hashtables assocs help.syntax
 help.markup float-arrays splitting io.streams.byte-array
 io.encodings.string io.encodings.utf8 io.encodings.binary
-combinators combinators.cleave new-slots accessors locals
+combinators combinators.cleave accessors locals
 prettyprint compiler.units sequences.private tuples.private ;
 IN: serialize
 

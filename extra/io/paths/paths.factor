@@ -1,4 +1,4 @@
-USING: io.files kernel sequences new-slots accessors
+USING: io.files kernel sequences accessors
 dlists arrays sequences.lib ;
 IN: io.paths
 

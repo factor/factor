@@ -1,6 +1,6 @@
 USING: alien alien.c-types kernel windows.ole32
 combinators.lib parser splitting sequences.lib
-sequences namespaces new-slots combinators.cleave
+sequences namespaces combinators.cleave
 assocs quotations shuffle accessors words macros
 alien.syntax fry ;
 IN: windows.com.syntax

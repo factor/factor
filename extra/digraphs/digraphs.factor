@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel new-slots sequences vectors ;
+USING: accessors assocs kernel sequences vectors ;
 IN: digraphs
 
 TUPLE: digraph ;
