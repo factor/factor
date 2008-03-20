@@ -3,7 +3,7 @@ IN: math.ranges
 
 TUPLE: range from length step ;
 
-: <range> ( from to step -- range )
+: <range> ( a b step -- range )
     >r over - r>
     [ / 1+ 0 max >integer ] keep
     range construct-boa ;
@@ -22,19 +22,19 @@ INSTANCE: range immutable-sequence
 
 : ,b) dup neg rot + swap ; inline
 
-: [a,b] twiddle <range> ;
+: [a,b] ( a b -- range ) twiddle <range> ;
 
-: (a,b] twiddle (a, <range> ;
+: (a,b] ( a b -- range ) twiddle (a, <range> ;
 
-: [a,b) twiddle ,b) <range> ;
+: [a,b) ( a b -- range ) twiddle ,b) <range> ;
 
-: (a,b) twiddle (a, ,b) <range> ;
+: (a,b) ( a b -- range ) twiddle (a, ,b) <range> ;
 
-: [0,b] 0 swap [a,b] ;
+: [0,b] ( b -- range ) 0 swap [a,b] ;
 
-: [1,b] 1 swap [a,b] ;
+: [1,b] ( b -- range ) 1 swap [a,b] ;
 
-: [0,b) 0 swap [a,b) ;
+: [0,b) ( b -- range ) 0 swap [a,b) ;
 
 : range-increasing? ( range -- ? )
     range-step 0 > ;
