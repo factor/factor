@@ -34,6 +34,55 @@ C: <ebnf-rule> ebnf-rule
 C: <ebnf-action> ebnf-action
 C: <ebnf> ebnf
 
+GENERIC: (transform) ( ast -- parser )
+
+: transform ( ast -- object )
+  H{ } clone dup dup [ "parser" set swap (transform) "main" set ] bind ;
+
+M: ebnf (transform) ( ast -- parser )
+  ebnf-rules [ (transform) ] map peek ;
+  
+M: ebnf-rule (transform) ( ast -- parser )
+  dup ebnf-rule-elements (transform) [
+    swap ebnf-rule-symbol set
+  ] keep ;
+
+M: ebnf-sequence (transform) ( ast -- parser )
+  ebnf-sequence-elements [ (transform) ] map seq ;
+
+M: ebnf-choice (transform) ( ast -- parser )
+  ebnf-choice-options [ (transform) ] map choice ;
+
+M: ebnf-any-character (transform) ( ast -- parser )
+  drop any-char ;
+
+M: ebnf-range (transform) ( ast -- parser )
+  ebnf-range-pattern range-pattern ;
+
+M: ebnf-ensure-not (transform) ( ast -- parser )
+  ebnf-ensure-not-group (transform) ensure-not ;
+
+M: ebnf-repeat0 (transform) ( ast -- parser )
+  ebnf-repeat0-group (transform) repeat0 ;
+
+M: ebnf-repeat1 (transform) ( ast -- parser )
+  ebnf-repeat1-group (transform) repeat1 ;
+
+M: ebnf-optional (transform) ( ast -- parser )
+  ebnf-optional-elements (transform) optional ;
+
+M: ebnf-action (transform) ( ast -- parser )
+  [ ebnf-action-parser (transform) ] keep
+  ebnf-action-code string-lines parse-lines action ;
+
+M: ebnf-terminal (transform) ( ast -- parser )
+  ebnf-terminal-symbol token sp ;
+
+M: ebnf-non-terminal (transform) ( ast -- parser )
+  ebnf-non-terminal-symbol  [
+    , "parser" get , \ at ,  
+  ] [ ] make delay ;
+
 SYMBOL: parsers
 SYMBOL: non-terminals
 
@@ -294,5 +343,8 @@ DEFER: 'choice'
    ] [
     f
    ] if* ;
+
+: transform-ebnf ( string -- object )
+  'ebnf' parse parse-result-ast transform ;
 
 : <EBNF "EBNF>" parse-multiline-string ebnf>quot call ; parsing
