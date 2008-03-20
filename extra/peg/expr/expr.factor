@@ -9,8 +9,7 @@ IN: peg.expr
  #! { operator rhs } in to a tree structure of the correct precedence.
  swap [ first2 swap call ] reduce ;
 
-<EBNF
-
+EBNF: expr 
 times    = ("*") [[ drop [ * ] ]]
 divide   = ("/") [[ drop [ / ] ]]
 add      = ("+") [[ drop [ + ] ]]
@@ -23,8 +22,8 @@ value    = number | ("(" expr ")") [[ second ]]
 product = (value ((times | divide) value)*) [[ first2 operator-fold ]]
 sum = (product ((add | subtract) product)*) [[ first2 operator-fold ]]
 expr = sum
-EBNF>
+;EBNF
 
 : eval-expr ( string -- number )
-  expr parse parse-result-ast ;
+  expr parse-result-ast ;
 

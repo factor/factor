@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel parser words arrays strings math.parser sequences 
+USING: kernel compiler.units parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
        peg.parsers unicode.categories multiline combinators.lib 
        splitting ;
@@ -33,136 +33,6 @@ C: <ebnf-optional> ebnf-optional
 C: <ebnf-rule> ebnf-rule
 C: <ebnf-action> ebnf-action
 C: <ebnf> ebnf
-
-GENERIC: (transform) ( ast -- parser )
-
-: transform ( ast -- object )
-  H{ } clone dup dup [ "parser" set swap (transform) "main" set ] bind ;
-
-M: ebnf (transform) ( ast -- parser )
-  ebnf-rules [ (transform) ] map peek ;
-  
-M: ebnf-rule (transform) ( ast -- parser )
-  dup ebnf-rule-elements (transform) [
-    swap ebnf-rule-symbol set
-  ] keep ;
-
-M: ebnf-sequence (transform) ( ast -- parser )
-  ebnf-sequence-elements [ (transform) ] map seq ;
-
-M: ebnf-choice (transform) ( ast -- parser )
-  ebnf-choice-options [ (transform) ] map choice ;
-
-M: ebnf-any-character (transform) ( ast -- parser )
-  drop any-char ;
-
-M: ebnf-range (transform) ( ast -- parser )
-  ebnf-range-pattern range-pattern ;
-
-M: ebnf-ensure-not (transform) ( ast -- parser )
-  ebnf-ensure-not-group (transform) ensure-not ;
-
-M: ebnf-repeat0 (transform) ( ast -- parser )
-  ebnf-repeat0-group (transform) repeat0 ;
-
-M: ebnf-repeat1 (transform) ( ast -- parser )
-  ebnf-repeat1-group (transform) repeat1 ;
-
-M: ebnf-optional (transform) ( ast -- parser )
-  ebnf-optional-elements (transform) optional ;
-
-M: ebnf-action (transform) ( ast -- parser )
-  [ ebnf-action-parser (transform) ] keep
-  ebnf-action-code string-lines parse-lines action ;
-
-M: ebnf-terminal (transform) ( ast -- parser )
-  ebnf-terminal-symbol token sp ;
-
-M: ebnf-non-terminal (transform) ( ast -- parser )
-  ebnf-non-terminal-symbol  [
-    , "parser" get , \ at ,  
-  ] [ ] make delay ;
-
-SYMBOL: parsers
-SYMBOL: non-terminals
-
-: reset-parser-generation ( -- ) 
-  V{ } clone parsers set 
-  H{ } clone non-terminals set ;
-
-: store-parser ( parser -- number )
-  parsers get [ push ] keep length 1- ;
-
-: get-parser ( index -- parser )
-  parsers get nth ;
-  
-: non-terminal-index ( name -- number )
-  dup non-terminals get at [
-    nip
-  ] [
-    f store-parser [ swap non-terminals get set-at ] keep
-  ] if* ;
-
-GENERIC: (generate-parser) ( ast -- id )
-
-: generate-parser ( ast -- id )
-  (generate-parser) ;
-
-M: ebnf-terminal (generate-parser) ( ast -- id )
-  ebnf-terminal-symbol token sp store-parser ;
-
-M: ebnf-non-terminal (generate-parser) ( ast -- id )
-  [
-    ebnf-non-terminal-symbol dup non-terminal-index , 
-    parsers get , \ nth , [ search ] [ 2drop f ] recover , \ or ,
-  ] [ ] make delay sp store-parser ;
-
-M: ebnf-any-character (generate-parser) ( ast -- id )
-  drop [ drop t ] satisfy store-parser ;
-
-M: ebnf-range (generate-parser) ( ast -- id )
-  ebnf-range-pattern range-pattern store-parser ;
-
-M: ebnf-choice (generate-parser) ( ast -- id )
-  ebnf-choice-options [
-    generate-parser get-parser 
-  ] map choice store-parser ;
-
-M: ebnf-sequence (generate-parser) ( ast -- id )
-  ebnf-sequence-elements [
-    generate-parser get-parser
-  ] map seq store-parser ;
-
-M: ebnf-ensure-not (generate-parser) ( ast -- id )
-  ebnf-ensure-not-group generate-parser get-parser ensure-not store-parser ;
-
-M: ebnf-repeat0 (generate-parser) ( ast -- id )
-  ebnf-repeat0-group generate-parser get-parser repeat0 store-parser ;
-
-M: ebnf-repeat1 (generate-parser) ( ast -- id )
-  ebnf-repeat1-group generate-parser get-parser repeat1 store-parser ;
-
-M: ebnf-optional (generate-parser) ( ast -- id )
-  ebnf-optional-elements generate-parser get-parser optional store-parser ;
-
-M: ebnf-rule (generate-parser) ( ast -- id )
-  dup ebnf-rule-symbol non-terminal-index swap 
-  ebnf-rule-elements generate-parser get-parser ! nt-id body
-  swap [ parsers get set-nth ] keep ;
-
-M: ebnf-action (generate-parser) ( ast -- id )
-  [ ebnf-action-parser generate-parser get-parser ] keep
-  ebnf-action-code string-lines parse-lines action store-parser ;
-
-M: vector (generate-parser) ( ast -- id )
-  [ generate-parser ] map peek ;
-
-M: ebnf (generate-parser) ( ast -- id )
-  ebnf-rules [
-    generate-parser 
-  ] map peek ;
-
-DEFER: 'rhs'
 
 : syntax ( string -- parser )
   #! Parses the string, ignoring white space, and
@@ -323,28 +193,81 @@ DEFER: 'choice'
 : 'ebnf' ( -- parser )
   'rule' sp repeat1 [ <ebnf> ] action ;
 
-: ebnf>quot ( string -- quot )
-  'ebnf' parse [
-     parse-result-ast [
-         reset-parser-generation
-         generate-parser drop
-         [
-             non-terminals get
-             [
-               get-parser [
-                 swap , \ in , \ get , \ create ,
-                 1quotation , \ define , 
-               ] [
-                 drop
-               ] if*
-             ] assoc-each
-         ] [ ] make
-     ] with-scope
-   ] [
-    f
-   ] if* ;
+GENERIC: (transform) ( ast -- parser )
+
+SYMBOL: parser
+SYMBOL: main
+
+: transform ( ast -- object )
+  H{ } clone dup dup [ parser set swap (transform) main set ] bind ;
+
+M: ebnf (transform) ( ast -- parser )
+  ebnf-rules [ (transform) ] map peek ;
+  
+M: ebnf-rule (transform) ( ast -- parser )
+  dup ebnf-rule-elements (transform) [
+    swap ebnf-rule-symbol set
+  ] keep ;
+
+M: ebnf-sequence (transform) ( ast -- parser )
+  ebnf-sequence-elements [ (transform) ] map seq ;
+
+M: ebnf-choice (transform) ( ast -- parser )
+  ebnf-choice-options [ (transform) ] map choice ;
+
+M: ebnf-any-character (transform) ( ast -- parser )
+  drop any-char ;
+
+M: ebnf-range (transform) ( ast -- parser )
+  ebnf-range-pattern range-pattern ;
+
+M: ebnf-ensure-not (transform) ( ast -- parser )
+  ebnf-ensure-not-group (transform) ensure-not ;
+
+M: ebnf-repeat0 (transform) ( ast -- parser )
+  ebnf-repeat0-group (transform) repeat0 ;
+
+M: ebnf-repeat1 (transform) ( ast -- parser )
+  ebnf-repeat1-group (transform) repeat1 ;
+
+M: ebnf-optional (transform) ( ast -- parser )
+  ebnf-optional-elements (transform) optional ;
+
+M: ebnf-action (transform) ( ast -- parser )
+  [ ebnf-action-parser (transform) ] keep
+  ebnf-action-code string-lines [ parse-lines ] with-compilation-unit action ;
+
+M: ebnf-terminal (transform) ( ast -- parser )
+  ebnf-terminal-symbol token sp ;
+
+M: ebnf-non-terminal (transform) ( ast -- parser )
+  ebnf-non-terminal-symbol  [
+    , parser get , \ at ,  
+  ] [ ] make delay sp ;
 
 : transform-ebnf ( string -- object )
   'ebnf' parse parse-result-ast transform ;
 
-: <EBNF "EBNF>" parse-multiline-string ebnf>quot call ; parsing
+: check-parse-result ( result -- result )
+  dup [
+    dup parse-result-remaining empty? [
+      [ 
+        "Unable to fully parse EBNF. Left to parse was: " %
+        parse-result-remaining % 
+      ] "" make throw
+    ] unless
+  ] [
+    "Could not parse EBNF" throw
+  ] if ;
+
+: ebnf>quot ( string -- hashtable quot )
+  'ebnf' parse check-parse-result 
+  parse-result-ast transform dup main swap at compile ;
+
+: <EBNF "EBNF>" parse-multiline-string ebnf>quot nip parsed ; parsing
+
+: EBNF: 
+  CREATE-WORD dup 
+  ";EBNF" parse-multiline-string
+  ebnf>quot swapd define "ebnf-parser" set-word-prop ; parsing
+
