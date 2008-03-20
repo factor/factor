@@ -227,6 +227,9 @@ HELP: foldable
     }
     "The last restriction ensures that words such as " { $link clone } " do not satisfy the foldable word contract. Indeed, " { $link clone } " will output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since doing so would give incorrect semantics for code that clones mutable objects and proceeds to mutate them."
 }
+{ $notes
+    "Folding optimizations are not applied if the call site of a word is in the same source file as the word. This is a side-effect of the compilation unit system; see " { $link "compilation-units" } "."
+}
 { $examples "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable." } ;
 
 HELP: flushable
