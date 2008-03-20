@@ -16,11 +16,11 @@ TUPLE: just-parser p1 ;
   ] ;
 
 
-M: just-parser compile ( parser -- quot )
-  just-parser-p1 compile just-pattern append ;
+M: just-parser (compile) ( parser -- quot )
+  just-parser-p1 compiled-parser just-pattern curry ;
 
 : just ( parser -- parser )
-  just-parser construct-boa ;
+  just-parser construct-boa init-parser ;
 
 : 1token ( ch -- parser ) 1string token ;
 
