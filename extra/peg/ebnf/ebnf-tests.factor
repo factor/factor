@@ -109,37 +109,37 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { V{ "a" "b" } } [
-  "ab" <EBNF foo='a' 'b' EBNF> call parse-result-ast 
+  "ab" [EBNF foo='a' 'b' EBNF] call parse-result-ast 
 ] unit-test
 
 { V{ 1 "b" } } [
-  "ab" <EBNF foo=('a')[[ drop 1 ]] 'b' EBNF> call parse-result-ast 
+  "ab" [EBNF foo=('a')[[ drop 1 ]] 'b' EBNF] call parse-result-ast 
 ] unit-test
 
 { V{ 1 2 } } [
-  "ab" <EBNF foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]] EBNF> call parse-result-ast 
+  "ab" [EBNF foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]] EBNF] call parse-result-ast 
 ] unit-test
 
 { CHAR: A } [
-  "A" <EBNF foo=[A-Z] EBNF> call parse-result-ast 
+  "A" [EBNF foo=[A-Z] EBNF] call parse-result-ast 
 ] unit-test
 
 { CHAR: Z } [
-  "Z" <EBNF foo=[A-Z] EBNF> call parse-result-ast 
+  "Z" [EBNF foo=[A-Z] EBNF] call parse-result-ast 
 ] unit-test
 
 { f } [
-  "0" <EBNF foo=[A-Z] EBNF> call  
+  "0" [EBNF foo=[A-Z] EBNF] call  
 ] unit-test
 
 { CHAR: 0 } [
-  "0" <EBNF foo=[^A-Z] EBNF> call parse-result-ast 
+  "0" [EBNF foo=[^A-Z] EBNF] call parse-result-ast 
 ] unit-test
 
 { f } [
-  "A" <EBNF foo=[^A-Z] EBNF> call  
+  "A" [EBNF foo=[^A-Z] EBNF] call  
 ] unit-test
 
 { f } [
-  "Z" <EBNF foo=[^A-Z] EBNF> call  
+  "Z" [EBNF foo=[^A-Z] EBNF] call  
 ] unit-test

@@ -264,7 +264,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   'ebnf' parse check-parse-result 
   parse-result-ast transform dup main swap at compile ;
 
-: <EBNF "EBNF>" parse-multiline-string ebnf>quot nip parsed ; parsing
+: [EBNF "EBNF]" parse-multiline-string ebnf>quot nip parsed ; parsing
 
 : EBNF: 
   CREATE-WORD dup 
