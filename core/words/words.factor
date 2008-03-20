@@ -21,9 +21,7 @@ M: word definer drop \ : \ ; ;
 
 M: word definition word-def ;
 
-TUPLE: undefined ;
-
-: undefined ( -- * ) \ undefined construct-empty throw ;
+ERROR: undefined ;
 
 PREDICATE: word deferred ( obj -- ? )
     word-def [ undefined ] = ;
@@ -189,12 +187,11 @@ M: word subwords drop f ;
     [ ] [ no-vocab ] ?if
     set-at ;
 
-TUPLE: check-create name vocab ;
+ERROR: bad-create name vocab ;
 
 : check-create ( name vocab -- name vocab )
-    2dup [ string? ] both? [
-        \ check-create construct-boa throw
-    ] unless ;
+    2dup [ string? ] both?
+    [ bad-create ] unless ;
 
 : create ( name vocab -- word )
     check-create 2dup lookup

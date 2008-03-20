@@ -48,10 +48,7 @@ M: object root-directory? ( path -- ? ) path-separator? ;
 
 : special-directory? ( name -- ? ) { "." ".." } member? ;
 
-TUPLE: no-parent-directory path ;
-
-: no-parent-directory ( path -- * )
-    \ no-parent-directory construct-boa throw ;
+ERROR: no-parent-directory path ;
 
 : parent-directory ( path -- parent )
     right-trim-separators {

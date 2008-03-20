@@ -87,11 +87,11 @@ PRIVATE>
     2dup delegate-slot-spec add* "slots" set-word-prop
     define-slots ;
 
-TUPLE: check-tuple class ;
+ERROR: no-tuple-class class ;
 
 : check-tuple ( class -- )
     dup tuple-class?
-    [ drop ] [ \ check-tuple construct-boa throw ] if ;
+    [ drop ] [ no-tuple-class ] if ;
 
 : define-tuple-class ( class slots -- )
     2dup check-shape

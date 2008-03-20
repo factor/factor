@@ -41,19 +41,14 @@ M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
 : bounds-check? ( n seq -- ? )
     length 1- 0 swap between? ; inline
 
-TUPLE: bounds-error index seq ;
-
-: bounds-error ( n seq -- * )
-    \ bounds-error construct-boa throw ;
+ERROR: bounds-error index seq ;
 
 : bounds-check ( n seq -- n seq )
     2dup bounds-check? [ bounds-error ] unless ; inline
 
 MIXIN: immutable-sequence
 
-TUPLE: immutable seq ;
-
-: immutable ( seq -- * ) \ immutable construct-boa throw ;
+ERROR: immutable seq ;
 
 M: immutable-sequence set-nth immutable ;
 
@@ -190,8 +185,7 @@ TUPLE: slice from to seq ;
 : collapse-slice ( m n slice -- m' n' seq )
     dup slice-from swap slice-seq >r tuck + >r + r> r> ; inline
 
-TUPLE: slice-error reason ;
-: slice-error ( str -- * ) \ slice-error construct-boa throw ;
+ERROR: slice-error reason ;
 
 : check-slice ( from to seq -- from to seq )
     pick 0 < [ "start < 0" slice-error ] when
