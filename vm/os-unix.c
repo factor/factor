@@ -44,7 +44,7 @@ void ffi_dlclose(F_DLL *dll)
 DEFINE_PRIMITIVE(existsp)
 {
 	struct stat sb;
-	box_boolean(stat(unbox_char_string(),&sb) < 0);
+	box_boolean(stat(unbox_char_string(),&sb) >= 0);
 }
 
 /* Allocates memory */
