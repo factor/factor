@@ -34,8 +34,13 @@ IN: tools.vocabs
 
 : source-modified? ( path -- ? )
     dup source-files get at [
-        dup source-file-path ?resource-path utf8 file-lines lines-crc32
-        swap source-file-checksum = not
+        dup source-file-path ?resource-path
+        dup exists? [
+            utf8 file-lines lines-crc32
+            swap source-file-checksum = not
+        ] [
+            2drop f
+        ] if
     ] [
         resource-exists?
     ] ?if ;
