@@ -91,8 +91,9 @@ call
 } [ create-vocab drop ] each
 
 H{ } clone source-files set
-H{ } clone class<map set
 H{ } clone update-map set
+H{ } clone class<map set
+H{ } clone class-map set
 
 ! Builtin classes
 : builtin-predicate-quot ( class -- quot )
@@ -547,7 +548,7 @@ builtins get num-tags get tail f union-class define-class
     { "eq?" "kernel" }
     { "getenv" "kernel.private" }
     { "setenv" "kernel.private" }
-    { "(stat)" "io.files.private" }
+    { "(exists?)" "io.files.private" }
     { "(directory)" "io.files.private" }
     { "data-gc" "memory" }
     { "code-gc" "memory" }

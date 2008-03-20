@@ -88,7 +88,7 @@ void *primitives[] = {
 	primitive_eq,
 	primitive_getenv,
 	primitive_setenv,
-	primitive_stat,
+	primitive_existsp,
 	primitive_read_dir,
 	primitive_data_gc,
 	primitive_code_gc,

@@ -22,6 +22,8 @@ H{ } "s" set
 [ number ] [ number object class-and ] unit-test
 [ number ] [ object number class-and ] unit-test
 [ null ] [ slice reversed class-and ] unit-test
+[ null ] [ general-t \ f class-and ] unit-test
+[ object ] [ general-t \ f class-or ] unit-test
 
 TUPLE: first-one ;
 TUPLE: second-one ;

@@ -54,9 +54,7 @@ ARTICLE: "fs-meta" "File meta-data"
 { $subsection file-info }
 { $subsection link-info }
 { $subsection exists? }
-{ $subsection directory? }
-! { $subsection file-modified }
-{ $subsection stat } ;
+{ $subsection directory? } ;
 
 ARTICLE: "delete-move-copy" "Deleting, moving, copying files"
 "Operations for deleting and copying files come in two forms:"
@@ -216,14 +214,6 @@ HELP: with-directory
 { $description "Changes the current working directory for the duration of a quotation's execution." }
 { $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
 
-HELP: stat ( path -- directory? permissions length modified )
-{ $values { "path" "a pathname string" } { "directory?" "boolean indicating if the file is a directory" } { "permissions" "a Unix permission bitmap (0 on Windows)" } { "length" "the length in bytes as an integer" } { "modified" "the last modification time, as milliseconds since midnight, January 1st 1970 GMT" } }
-{ $description
-    "Queries the file system for file meta data. If the file does not exist, outputs " { $link f } " for all four values."
-} ;
-
-{ stat exists? directory? } related-words
-
 HELP: append-path
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
 { $description "Concatenates two pathnames." } ;
@@ -273,7 +263,7 @@ HELP: normalize-directory
 
 HELP: normalize-pathname
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
-{ $description "Called by the " { $link stat } " word, and possibly " { $link <file-reader> } " and " { $link <file-writer> } ", to prepare a pathname before passing it to underlying code." } ;
+{ $description "Called by words such as " { $link <file-reader> } " and " { $link <file-writer> } " to prepare a pathname before passing it to underlying code." } ;
 
 HELP: <pathname> ( str -- pathname )
 { $values { "str" "a pathname string" } { "pathname" pathname } }

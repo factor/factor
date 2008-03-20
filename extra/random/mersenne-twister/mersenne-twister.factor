@@ -3,9 +3,8 @@
 ! mersenne twister based on 
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
 
-USING: arrays kernel math namespaces sequences
-system init new-slots accessors
-math.ranges combinators.cleave circular random ;
+USING: arrays kernel math namespaces sequences system init
+new-slots accessors math.ranges combinators.cleave random ;
 IN: random.mersenne-twister
 
 <PRIVATE
@@ -76,5 +75,3 @@ M: mersenne-twister random-32 ( mt -- r )
     dup mt-n < [ drop 0 pick mt-generate ] unless
     new-nth mt-temper
     swap [ 1+ ] change-i drop ;
-
-[ millis <mersenne-twister> \ random set-global ] "random" add-init-hook

@@ -59,31 +59,29 @@ SYMBOL: m
 
 PRIVATE>
 
-: julian-day-number ( year month day -- n )
+:: julian-day-number ( year month day -- n )
     #! Returns a composite date number
     #! Not valid before year -4800
-    [
-        14 pick - 12 /i a set
-        pick 4800 + a get - y set
-        over 12 a get * + 3 - m set
-        2nip 153 m get * 2 + 5 /i + 365 y get * +
-        y get 4 /i + y get 100 /i - y get 400 /i + 32045 -
-    ] with-scope ;
+    [let* | a [ 14 month - 12 /i ]
+            y [ year 4800 + a - ]
+            m [ month 12 a * + 3 - ] |
+        day 153 m * 2 + 5 /i + 365 y * +
+        y 4 /i + y 100 /i - y 400 /i + 32045 -
+    ] ;
 
-: julian-day-number>date ( n -- year month day )
+:: julian-day-number>date ( n -- year month day )
     #! Inverse of julian-day-number
-    [
-        32044 + a set
-        4 a get * 3 + 146097 /i b set
-        a get 146097 b get * 4 /i - c set
-        4 c get * 3 + 1461 /i d set
-        c get 1461 d get * 4 /i - e set
-        5 e get * 2 + 153 /i m set
-        100 b get * d get + 4800 -
-        m get 10 /i + m get 3 +
-        12 m get 10 /i * -
-        e get 153 m get * 2 + 5 /i - 1+
-    ] with-scope ;
+    [let* | a [ n 32044 + ]
+            b [ 4 a * 3 + 146097 /i ]
+            c [ a 146097 b * 4 /i - ]
+            d [ 4 c * 3 + 1461 /i ]
+            e [ c 1461 d * 4 /i - ]
+            m [ 5 e * 2 + 153 /i ] |
+        100 b * d + 4800 -
+        m 10 /i + m 3 +
+        12 m 10 /i * -
+        e 153 m * 2 + 5 /i - 1+
+    ] ;
 
 : >date< ( timestamp -- year month day )
     { year>> month>> day>> } get-slots ;

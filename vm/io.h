@@ -12,5 +12,5 @@ DECLARE_PRIMITIVE(fclose);
 
 /* Platform specific primitives */
 DECLARE_PRIMITIVE(open_file);
-DECLARE_PRIMITIVE(stat);
+DECLARE_PRIMITIVE(existsp);
 DECLARE_PRIMITIVE(read_dir);
