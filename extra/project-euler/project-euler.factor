@@ -30,7 +30,7 @@ IN: project-euler
     number>string 3 CHAR: 0 pad-left ;
 
 : solution-path ( n -- str/f )
-    number>euler "project-euler." swap append
+    number>euler "project-euler." prepend
     vocab where dup [ first ?resource-path ] when ;
 
 PRIVATE>
@@ -40,7 +40,7 @@ PRIVATE>
 
 : run-project-euler ( -- )
     problem-prompt dup problem-solved? [
-        dup number>euler "project-euler." swap append run
+        dup number>euler "project-euler." prepend run
         "Answer: " swap dup number? [ number>string ] when append print
         "Source: " swap solution-path append print
     ] [

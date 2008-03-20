@@ -80,7 +80,7 @@ M: hashtable hashcode*
 
 : hash-case-quot ( default assoc -- quot )
     hash-case-table hash-dispatch-quot
-    [ dup hashcode >fixnum ] swap append ;
+    [ dup hashcode >fixnum ] prepend ;
 
 : contiguous-range? ( keys -- from to ? )
     dup [ fixnum? ] all? [

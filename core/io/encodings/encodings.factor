@@ -14,19 +14,26 @@ GENERIC: encode-char ( char stream encoding -- )
 
 GENERIC: <decoder> ( stream decoding -- newstream )
 
-GENERIC: <encoder> ( stream encoding -- newstream )
-
 : replacement-char HEX: fffd ;
 
-! Decoding
-
-<PRIVATE
+TUPLE: decoder stream code cr ;
 
 TUPLE: decode-error ;
 
 : decode-error ( -- * ) \ decode-error construct-empty throw ;
 
-TUPLE: decoder stream code cr ;
+GENERIC: <encoder> ( stream encoding -- newstream )
+
+TUPLE: encoder stream code ;
+
+TUPLE: encode-error ;
+
+: encode-error ( -- * ) \ encode-error construct-empty throw ;
+
+! Decoding
+
+<PRIVATE
+
 M: tuple-class <decoder> construct-empty <decoder> ;
 M: tuple <decoder> f decoder construct-boa ;
 
@@ -101,12 +108,6 @@ M: decoder stream-readln ( stream -- str )
 M: decoder dispose decoder-stream dispose ;
 
 ! Encoding
-
-TUPLE: encode-error ;
-
-: encode-error ( -- * ) \ encode-error construct-empty throw ;
-
-TUPLE: encoder stream code ;
 M: tuple-class <encoder> construct-empty <encoder> ;
 M: tuple <encoder> encoder construct-boa ;
 
@@ -132,6 +133,7 @@ INSTANCE: encoder plain-writer
 
 : redecode ( stream encoding -- newstream )
     over decoder? [ >r decoder-stream r> ] when <decoder> ;
+
 PRIVATE>
 
 : <encoder-duplex> ( stream-in stream-out encoding -- duplex )

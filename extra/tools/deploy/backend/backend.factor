@@ -79,9 +79,9 @@ IN: tools.deploy.backend
 
             "-run=tools.deploy.shaker" ,
 
-            "-deploy-vocab=" swap append ,
+            "-deploy-vocab=" prepend ,
 
-            "-output-image=" swap append ,
+            "-output-image=" prepend ,
 
             strip-word-names? [ "-no-stack-traces" , ] when
         ] { } make

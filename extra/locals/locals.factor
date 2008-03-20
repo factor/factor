@@ -180,7 +180,7 @@ M: block lambda-rewrite*
     #! Turn free variables into bound variables, curry them
     #! onto the body
     dup free-vars [ <quote> ] map dup % [
-        over block-vars swap append
+        over block-vars prepend
         swap block-body [ [ lambda-rewrite* ] each ] [ ] make
         swap point-free ,
     ] keep length \ curry <repetition> % ;

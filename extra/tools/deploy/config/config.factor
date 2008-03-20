@@ -66,7 +66,7 @@ SYMBOL: deploy-image
     } union ;
 
 : deploy-config-path ( vocab -- string )
-    vocab-dir "deploy.factor" path+ ;
+    vocab-dir "deploy.factor" append-path ;
 
 : deploy-config ( vocab -- assoc )
     dup default-config swap

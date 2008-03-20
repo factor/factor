@@ -24,7 +24,7 @@ PRIVATE>
 : make-unique-file ( prefix suffix -- path stream )
     temporary-path -rot
     [
-        unique-length random-name swap 3append path+
+        unique-length random-name swap 3append append-path
         dup (make-unique-file)
     ] 3curry unique-retries retry ;
 
@@ -36,7 +36,7 @@ PRIVATE>
 
 : make-unique-directory ( -- path )
     [
-        temporary-path unique-length random-name path+
+        temporary-path unique-length random-name append-path
         dup make-directory
     ] unique-retries retry ;
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel calendar alarms io.streams.duplex ;
+USING: kernel calendar alarms io.streams.duplex io.encodings ;
 IN: io.timeouts
 
 ! Won't need this with new slot accessors
@@ -11,6 +11,10 @@ M: duplex-stream set-timeout
     2dup
     duplex-stream-in set-timeout
     duplex-stream-out set-timeout ;
+
+M: decoder set-timeout decoder-stream set-timeout ;
+
+M: encoder set-timeout encoder-stream set-timeout ;
 
 GENERIC: timed-out ( obj -- )
 

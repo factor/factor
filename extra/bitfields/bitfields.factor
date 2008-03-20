@@ -88,7 +88,7 @@ M: check< summary drop "Number exceeds upper bound" ;
     >r keys r> define-slots ;
 
 : define-setters ( classname slots -- )
-    >r "with-" swap append r>
+    >r "with-" prepend r>
     dup values [setters]
     >r keys r> define-slots ;
 

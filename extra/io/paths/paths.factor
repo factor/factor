@@ -5,7 +5,7 @@ IN: io.paths
 TUPLE: directory-iterator path bfs queue ;
 
 : qualified-directory ( path -- seq )
-    dup directory [ first2 >r path+ r> 2array ] with map ;
+    dup directory [ first2 >r append-path r> 2array ] with map ;
 
 : push-directory ( path iter -- )
     >r qualified-directory r> [

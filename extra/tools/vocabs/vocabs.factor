@@ -6,29 +6,27 @@ memoize inspector sorting splitting combinators source-files
 io debugger continuations compiler.errors init io.crc32 ;
 IN: tools.vocabs
 
-: vocab-tests-file, ( vocab -- )
-    dup "-tests.factor" vocab-dir+ vocab-path+
-    dup resource-exists? [ , ] [ drop ] if ;
+: vocab-tests-file ( vocab -- path )
+    dup "-tests.factor" vocab-dir+ vocab-append-path dup
+    [ dup resource-exists? [ drop f ] unless ] [ drop f ] if ;
 
-: vocab-tests-dir, ( vocab -- )
-    dup vocab-dir "tests" path+ vocab-path+
-    dup resource-exists? [
-        dup ?resource-path directory keys
-        [ ".factor" tail? ] subset
-        [ path+ , ] with each
-    ] [ drop ] if ;
+: vocab-tests-dir ( vocab -- paths )
+    dup vocab-dir "tests" append-path vocab-append-path dup [
+        dup resource-exists? [
+            dup ?resource-path directory keys
+            [ ".factor" tail? ] subset
+            [ append-path ] with map
+        ] [ drop f ] if
+    ] [ drop f ] if ;
 
 : vocab-tests ( vocab -- tests )
-    dup vocab-root dup [
-        [
-            >vocab-link dup
-            vocab-tests-file,
-            vocab-tests-dir,
-        ] { } make
-    ] [ 2drop f ] if ;
+    [
+        dup vocab-tests-file [ , ] when*
+        vocab-tests-dir [ % ] when*
+    ] { } make ;
 
 : vocab-files ( vocab -- seq )
-    dup find-vocab-root >vocab-link [
+    [
         dup vocab-source-path [ , ] when*
         dup vocab-docs-path [ , ] when*
         vocab-tests %
@@ -53,12 +51,8 @@ IN: tools.vocabs
 : modified-docs ( vocabs -- seq )
     [ vocab-docs-path ] modified ;
 
-: update-roots ( vocabs -- )
-    [ dup find-vocab-root swap vocab set-vocab-root ] each ;
-
 : to-refresh ( prefix -- modified-sources modified-docs )
     child-vocabs
-    dup update-roots
     dup modified-sources swap modified-docs ;
 
 : vocab-heading. ( vocab -- )
@@ -109,10 +103,10 @@ MEMO: (vocab-file-contents) ( path -- lines )
     [ utf8 file-lines ] [ drop f ] if ;
 
 : vocab-file-contents ( vocab name -- seq )
-    vocab-path+ dup [ (vocab-file-contents) ] when ;
+    vocab-append-path dup [ (vocab-file-contents) ] when ;
 
 : set-vocab-file-contents ( seq vocab name -- )
-    dupd vocab-path+ [
+    dupd vocab-append-path [
         ?resource-path utf8 set-file-lines
     ] [
         "The " swap vocab-name
@@ -121,7 +115,7 @@ MEMO: (vocab-file-contents) ( path -- lines )
     ] ?if ;
 
 : vocab-summary-path ( vocab -- string )
-    vocab-dir "summary.txt" path+ ;
+    vocab-dir "summary.txt" append-path ;
 
 : vocab-summary ( vocab -- summary )
     dup dup vocab-summary-path vocab-file-contents
@@ -147,7 +141,7 @@ M: vocab-link summary vocab-summary ;
     set-vocab-file-contents ;
 
 : vocab-tags-path ( vocab -- string )
-    vocab-dir "tags.txt" path+ ;
+    vocab-dir "tags.txt" append-path ;
 
 : vocab-tags ( vocab -- tags )
     dup vocab-tags-path vocab-file-contents ;
@@ -159,7 +153,7 @@ M: vocab-link summary vocab-summary ;
     [ vocab-tags append prune ] keep set-vocab-tags ;
 
 : vocab-authors-path ( vocab -- string )
-    vocab-dir "authors.txt" path+ ;
+    vocab-dir "authors.txt" append-path ;
 
 : vocab-authors ( vocab -- authors )
     dup vocab-authors-path vocab-file-contents ;
@@ -171,7 +165,7 @@ M: vocab-link summary vocab-summary ;
     directory [ second ] subset keys natural-sort ;
 
 : (all-child-vocabs) ( root name -- vocabs )
-    [ vocab-dir path+ ?resource-path subdirs ] keep
+    [ vocab-dir append-path ?resource-path subdirs ] keep
     dup empty? [
         drop
     ] [
@@ -180,7 +174,7 @@ M: vocab-link summary vocab-summary ;
 
 : vocabs-in-dir ( root name -- )
     dupd (all-child-vocabs) [
-        2dup vocab-dir? [ 2dup swap >vocab-link , ] when
+        2dup vocab-dir? [ dup >vocab-link , ] when
         vocabs-in-dir
     ] with each ;
 
@@ -233,7 +227,7 @@ MEMO: all-vocabs-seq ( -- seq )
 : unrooted-child-vocabs ( prefix -- seq )
     dup empty? [ CHAR: . add ] unless
     vocabs
-    [ vocab-root not ] subset
+    [ find-vocab-root not ] subset
     [
         vocab-name swap ?head CHAR: . rot member? not and
     ] with subset
@@ -241,10 +235,9 @@ MEMO: all-vocabs-seq ( -- seq )
 
 : all-child-vocabs ( prefix -- assoc )
     vocab-roots get [
-        over dupd dupd (all-child-vocabs)
-        swap [ >vocab-link ] curry map
+        dup pick (all-child-vocabs) [ >vocab-link ] map
     ] { } map>assoc
-    f rot unrooted-child-vocabs 2array add ;
+    swap unrooted-child-vocabs f swap 2array add ;
 
 : all-child-vocabs-seq ( prefix -- assoc )
     vocab-roots get swap [
@@ -262,6 +255,7 @@ MEMO: all-authors ( -- seq )
     all-vocabs-seq [ vocab-authors ] map>set ;
 
 : reset-cache ( -- )
+    root-cache get-global clear-assoc
     \ (vocab-file-contents) reset-memoized
     \ all-vocabs-seq reset-memoized
     \ all-authors reset-memoized
