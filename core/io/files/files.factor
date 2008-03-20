@@ -86,14 +86,11 @@ SYMBOL: +socket+
 SYMBOL: +unknown+
 
 ! File metadata
-: stat ( path -- directory? permissions length modified )
-    normalize-pathname (stat) ;
+: exists? ( path -- ? )
+    normalize-pathname (exists?) ;
 
-: file-modified ( path -- n ) stat >r 3drop r> ;
-
-: exists? ( path -- ? ) file-modified >boolean ;
-
-: directory? ( path -- ? ) file-info file-info-type +directory+ = ;
+: directory? ( path -- ? )
+    file-info file-info-type +directory+ = ;
 
 ! Current working directory
 HOOK: cd io-backend ( path -- )
