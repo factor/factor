@@ -3,11 +3,10 @@ tuples.private classes slots quotations words arrays
 generic.standard sequences definitions compiler.units ;
 IN: tuples
 
-ARTICLE: "tuple-constructors" "Constructors and slots"
-"Tuples are created by calling one of a number of words:"
+ARTICLE: "tuple-constructors" "Constructors"
+"Tuples are created by calling one of two words:"
 { $subsection construct-empty }
 { $subsection construct-boa }
-{ $subsection construct }
 "By convention, construction logic is encapsulated in a word named after the tuple class surrounded in angle brackets; for example, the constructor word for a " { $snippet "point" } " class might be named " { $snippet "<point>" } "."
 $nl
 "A shortcut for defining BOA constructors:"
@@ -19,18 +18,13 @@ $nl
     "C: <rgba> rgba"
     ": <rgba> color construct-boa ; ! identical to above"
     ""
-    ": <rgb>"
-    "    { set-color-red set-color-green set-color-blue }"
-    "    color construct ;"
-    ": <rgb> f <rgba> ; ! identical to above"
+    ": <rgb> f <rgba> ;"
     ""
     ": <color> construct-empty ;"
-    ": <color> { } color construct ; ! identical to above"
     ": <color> f f f f <rgba> ; ! identical to above"
-}
-"After construction, slots are read and written using various automatically-defined words with names of the form " { $snippet { $emphasis "class-slot" } } " and " { $snippet "set-" { $emphasis "class-slot" } } "." ;
+} ;
 
-ARTICLE: "tuple-delegation" "Delegation"
+ARTICLE: "tuple-delegation" "Tuple delegation"
 "If a generic word having the " { $link standard-combination } " method combination is called on a tuple for which it does not have an applicable method, the method call is forwarded to the tuple's " { $emphasis "delegate" } ". If no delegate is set, a " { $link no-method } " error is thrown."
 { $subsection delegate }
 { $subsection set-delegate }
@@ -48,7 +42,7 @@ $nl
     "{ 0 0 } 10 <ellipse> \"my-ellipse\" set"
     "{ 1 0 0 } <colored> \"my-shape\" set"
     "\"my-ellipse\" get \"my-shape\" get set-delegate"
-    "\"my-shape\" get dup colored-color swap ellipse-center .s"
+    "\"my-shape\" get dup color>> swap center>> .s"
     "{ 0 0 }\n{ 1 0 0 }"
 } ;
 
@@ -58,25 +52,90 @@ ARTICLE: "tuple-introspection" "Tuple introspection"
 { $subsection tuple>array }
 { $subsection tuple-slots }
 "Tuple classes can also be defined at run time:"
-{ $subsection define-tuple-class } ;
+{ $subsection define-tuple-class }
+{ $see-also "slots" "mirrors" } ;
+
+ARTICLE: "tuple-examples" "Tuple examples"
+"An example:"
+{ $code "TUPLE: employee name salary position ;" }
+"This defines a class word named " { $snippet "employee" } ", a predicate " { $snippet "employee?" } ", and the following slot accessors:"
+{ $table
+    { "Reader" "Writer" "Setter" "Changer" }
+    { { $snippet "name>>" }    { $snippet "(>>name)" }    { $snippet ">>name" }    { $snippet "change-name" }    }
+    { { $snippet "salary>>" } { $snippet "(>>salary)" } { $snippet ">>salary" } { $snippet "change-salary" } }
+    { { $snippet "position>>" }   { $snippet "(>>position)" }   { $snippet ">>position" }   { $snippet "change-position" }   }
+}
+"We can define a constructor which makes an empty employee:"
+{ $code ": <employee> ( -- employee )"
+    "    employee construct-empty ;" }
+"Or we may wish the default constructor to always give employees a starting salary:"
+{ $code
+    ": <employee> ( -- employee )"
+    "    employee construct-empty"
+    "        40000 >>salary ;"
+}
+"We can define more refined constructors:"
+{ $code
+    ": <manager> ( -- manager )"
+    "    <employee> \"project manager\" >>position ;" }
+"An alternative strategy is to define the most general BOA constructor first:"
+{ $code
+    ": <employee> ( name position -- person )"
+    "    40000 employee construct-boa ;"
+}
+"Now we can define more specific constructors:"
+{ $code
+    ": <manager> ( name -- person )"
+    "    \"manager\" <person> ;" }
+"An example using reader words:"
+{ $code
+    "TUPLE: check to amount number ;"
+    ""
+    "SYMBOL: checks"
+    ""
+    ": <check> ( to amount -- check )"
+    "    checks counter check construct-boa ;"
+    ""
+    ": biweekly-paycheck ( employee -- check )"
+    "    dup name>> swap salary>> 26 / <check> ;"
+}
+"An example of using a changer:"
+{ $code
+    ": positions"
+    "    {"
+    "        \"junior programmer\""
+    "        \"senior programmer\""
+    "        \"project manager\""
+    "        \"department manager\""
+    "        \"executive\""
+    "        \"CTO\""
+    "        \"CEO\""
+    "        \"enterprise Java world dictator\""
+    "    } ;"
+    ""
+    ": next-position ( role -- newrole )"
+    "    positions [ index 1+ ] keep nth ;"
+    ""
+    ": promote ( person -- person )"
+    "    [ 1.2 * ] change-salary"
+    "    [ next-position ] change-position ;"
+} ;
 
 ARTICLE: "tuples" "Tuples"
-"Tuples are user-defined classes composed of named slots. A parsing word defines tuple classes:"
+"Tuples are user-defined classes composed of named slots."
+{ $subsection "tuple-examples" }
+"A parsing word defines tuple classes:"
 { $subsection POSTPONE: TUPLE: }
-"An example:"
-{ $code "TUPLE: person name address phone ;" "C: <person> person" }
-"This defines a class word named " { $snippet "person" } ", a predicate " { $snippet "person?" } ", a constructor named " { $snippet "<person>" } ", and the following reader/writer words:"
-{ $table
-    { "Reader" "Writer" }
-    { { $snippet "person-name" }    { $snippet "set-person-name" }    }
-    { { $snippet "person-address" } { $snippet "set-person-address" } }
-    { { $snippet "person-phone" }   { $snippet "set-person-phone" }   }
-}
+"For each tuple class, several words are defined. First, there is the class word, a class predicate, and accessor words for each slot."
+$nl
+"The class word is used for defining methods on the tuple class; it has the same name as the tuple class. The predicate is named " { $snippet { $emphasis "name" } "?" } ". Tuple slots are accessed via accessor words:"
+{ $subsection "accessors" }
 "Initially, no specific words are defined for constructing new instances of the tuple. Constructors must be defined explicitly:"
 { $subsection "tuple-constructors" }
 "Further topics:"
 { $subsection "tuple-delegation" }
-{ $subsection "tuple-introspection" } ;
+{ $subsection "tuple-introspection" }
+"Tuple literal syntax is documented in " { $link "syntax-tuples" } "." ;
 
 ABOUT: "tuples"
 
