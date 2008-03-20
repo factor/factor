@@ -10,6 +10,7 @@ TUPLE: ebnf-non-terminal symbol ;
 TUPLE: ebnf-terminal symbol ;
 TUPLE: ebnf-any-character ;
 TUPLE: ebnf-range pattern ;
+TUPLE: ebnf-ensure group ;
 TUPLE: ebnf-ensure-not group ;
 TUPLE: ebnf-choice options ;
 TUPLE: ebnf-sequence elements ;
@@ -24,6 +25,7 @@ C: <ebnf-non-terminal> ebnf-non-terminal
 C: <ebnf-terminal> ebnf-terminal
 C: <ebnf-any-character> ebnf-any-character
 C: <ebnf-range> ebnf-range
+C: <ebnf-ensure> ebnf-ensure
 C: <ebnf-ensure-not> ebnf-ensure-not
 C: <ebnf-choice> ebnf-choice
 C: <ebnf-sequence> ebnf-sequence
@@ -73,6 +75,7 @@ C: <ebnf> ebnf
       [ dup CHAR: [ = ]
       [ dup CHAR: . = ]
       [ dup CHAR: ! = ]
+      [ dup CHAR: & = ]
       [ dup CHAR: * = ]
       [ dup CHAR: + = ]
       [ dup CHAR: ? = ]
@@ -153,11 +156,21 @@ DEFER: 'choice'
     'group' sp ,
   ] seq* [ first <ebnf-ensure-not> ] action ;
 
+: 'ensure' ( -- parser )
+  #! Parses the '&' syntax to ensure that 
+  #! something that matches the following elements does
+  #! exist in the parse stream.
+  [
+    "&" syntax ,
+    'group' sp ,
+  ] seq* [ first <ebnf-ensure> ] action ;
+
 : ('sequence') ( -- parser )
   #! A sequence of terminals and non-terminals, including
   #! groupings of those. 
   [ 
     'ensure-not' sp ,
+    'ensure' sp ,
     'element' sp ,
     'group' sp , 
     'repeat0' sp ,
@@ -220,6 +233,9 @@ M: ebnf-any-character (transform) ( ast -- parser )
 
 M: ebnf-range (transform) ( ast -- parser )
   ebnf-range-pattern range-pattern ;
+
+M: ebnf-ensure (transform) ( ast -- parser )
+  ebnf-ensure-group (transform) ensure ;
 
 M: ebnf-ensure-not (transform) ( ast -- parser )
   ebnf-ensure-not-group (transform) ensure-not ;
