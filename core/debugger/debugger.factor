@@ -202,13 +202,13 @@ M: no-method error.
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
 
-M: check-closed summary
+M: stream-closed-twice summary
     drop "Attempt to perform I/O on closed stream" ;
 
 M: check-method summary
     drop "Invalid parameters for create-method" ;
 
-M: check-tuple summary
+M: no-tuple-class summary
     drop "Invalid class for define-constructor" ;
 
 M: no-cond summary
@@ -246,7 +246,7 @@ M: no-compilation-unit error.
 M: no-vocab summary
     drop "Vocabulary does not exist" ;
 
-M: check-ptr summary
+M: bad-ptr summary
     drop "Memory allocation failed" ;
 
 M: double-free summary
