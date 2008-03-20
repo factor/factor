@@ -22,8 +22,7 @@ C-STRUCT: stat
     { "u_int32_t" "st_gen" }
     { "int32_t" "st_lspare1" }
     { "timespec" "st_birthtim" }
-    { "int64_t" "st_qspare1" }
-    { "int64_t" "st_qspare2" } ;
+    { { "int64_t" 2 } "st_qspare" } ;
 
 FUNCTION: int stat  ( char* pathname, stat* buf ) ;
 FUNCTION: int lstat ( char* pathname, stat* buf ) ;
