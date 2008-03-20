@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
      vectors arrays combinators.lib memoize math.parser match
-     unicode.categories sequences.deep peg peg.private ;
+     unicode.categories sequences.deep peg peg.private 
+     peg.search math.ranges ;
 IN: peg.parsers
 
 TUPLE: just-parser p1 ;
@@ -83,3 +84,30 @@ MEMO: 'string' ( -- parser )
     [ CHAR: " = not ] satisfy repeat0 ,
     [ CHAR: " = ] satisfy hide ,
   ] { } make seq [ first >string ] action ;
+
+: (range-pattern) ( pattern -- string )
+  #! Given a range pattern, produce a string containing
+  #! all characters within that range.
+  [ 
+    any-char , 
+    [ CHAR: - = ] satisfy hide , 
+    any-char , 
+  ] seq* [
+    first2 [a,b] >string    
+  ] action
+  replace ;
+
+MEMO: range-pattern ( pattern -- parser )
+  #! 'pattern' is a set of characters describing the
+  #! parser to be produced. Any single character in
+  #! the pattern matches that character. If the pattern
+  #! begins with a ^ then the set is negated (the element
+  #! matches any character not in the set). Any pair of
+  #! characters separated with a dash (-) represents the
+  #! range of characters from the first to the second,
+  #! inclusive.
+  dup first CHAR: ^ = [
+    1 tail (range-pattern) [ member? not ] curry satisfy 
+  ] [
+    (range-pattern) [ member? ] curry satisfy
+  ] if ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.ebnf ;
+USING: kernel parser words tools.test peg peg.ebnf compiler.units ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -15,11 +15,8 @@ IN: peg.ebnf.tests
 {
   T{ ebnf-rule f 
      "digit"
-     V{ 
-       T{ ebnf-choice f
-          V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
-       }
-       f
+     T{ ebnf-choice f
+        V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
      }
   } 
 } [
@@ -29,11 +26,8 @@ IN: peg.ebnf.tests
 {
   T{ ebnf-rule f 
      "digit" 
-     V{
-       T{ ebnf-sequence f
-          V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
-       }
-       f
+     T{ ebnf-sequence f
+        V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
      }
   }   
 } [
@@ -83,7 +77,7 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one {(two | three) four}" 'choice' parse parse-result-ast
+  "one ((two | three) four)*" 'choice' parse parse-result-ast
 ] unit-test
 
 {
@@ -95,5 +89,57 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one [ two ] three" 'choice' parse parse-result-ast
+  "one ( two )? three" 'choice' parse parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "\"foo\"" 'identifier' parse parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "'foo'" 'identifier' parse parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "foo" 'non-terminal' parse parse-result-ast ebnf-non-terminal-symbol
+] unit-test
+
+{ "foo" } [
+  "foo]" 'non-terminal' parse parse-result-ast ebnf-non-terminal-symbol
+] unit-test
+
+{ V{ "a" "b" } } [
+  "foo='a' 'b'" ebnf>quot with-compilation-unit "ab" "foo" search execute parse parse-result-ast 
+] unit-test
+
+{ V{ 1 "b" } } [
+  "foo=('a')[[ drop 1 ]] 'b'" ebnf>quot with-compilation-unit "ab" "foo" search execute parse parse-result-ast 
+] unit-test
+
+{ V{ 1 2 } } [
+  "foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]]" ebnf>quot with-compilation-unit "ab" "foo" search execute parse parse-result-ast 
+] unit-test
+
+{ CHAR: A } [
+  "foo=[A-Z]" ebnf>quot with-compilation-unit "A" "foo" search execute parse parse-result-ast 
+] unit-test
+
+{ CHAR: Z } [
+  "foo=[A-Z]" ebnf>quot with-compilation-unit "Z" "foo" search execute parse parse-result-ast 
+] unit-test
+
+{ f } [
+  "foo=[A-Z]" ebnf>quot with-compilation-unit "0" "foo" search execute parse  
+] unit-test
+
+{ CHAR: 0 } [
+  "foo=[^A-Z]" ebnf>quot with-compilation-unit "0" "foo" search execute parse parse-result-ast 
+] unit-test
+
+{ f } [
+  "foo=[^A-Z]" ebnf>quot with-compilation-unit "A" "foo" search execute parse  
+] unit-test
+
+{ f } [
+  "foo=[^A-Z]" ebnf>quot with-compilation-unit "Z" "foo" search execute parse  
 ] unit-test
