@@ -25,5 +25,5 @@ C-STRUCT: stat
     { "int64_t" "st_qspare1" }
     { "int64_t" "st_qspare2" } ;
 
-! FUNCTION: int stat  ( char* pathname, stat* buf ) ;
+FUNCTION: int stat  ( char* pathname, stat* buf ) ;
 FUNCTION: int lstat ( char* pathname, stat* buf ) ;
