@@ -21,6 +21,7 @@ IN: bootstrap.syntax
     "C:"
     "CHAR:"
     "DEFER:"
+    "ERROR:"
     "F{"
     "FV{"
     "FORGET:"
