@@ -15,15 +15,13 @@ GENERIC: random-32 ( tuple -- r )
 : (random-bytes) ( tuple n -- byte-array )
     [ drop random-32 ] with map >c-uint-array ;
 
-DEFER: random
+SYMBOL: random-generator
 
 : random-bytes ( n -- r )
     [
         4 /mod zero? [ 1+ ] unless
-        \ random get swap (random-bytes)
+        random-generator get swap (random-bytes)
     ] keep head ;
-
-: random-bits ( n -- r ) 2^ random ;
 
 : random ( seq -- elt )
     dup empty? [
@@ -35,5 +33,7 @@ DEFER: random
         ] keep nth
     ] if ;
 
+: random-bits ( n -- r ) 2^ random ;
+
 : with-random ( tuple quot -- )
-    \ random swap with-variable ; inline
+    random-generator swap with-variable ; inline

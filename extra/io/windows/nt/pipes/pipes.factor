@@ -56,7 +56,7 @@ TUPLE: pipe in out ;
         "\\\\.\\pipe\\factor-" %
         pipe counter #
         "-" %
-        (random) #
+        32 random-bits #
         "-" %
         millis #
     ] "" make ;

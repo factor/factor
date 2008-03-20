@@ -76,5 +76,3 @@ M: mersenne-twister random-32 ( mt -- r )
     dup mt-n < [ drop 0 pick mt-generate ] unless
     new-nth mt-temper
     swap [ 1+ ] change-i drop ;
-
-[ millis <mersenne-twister> \ random set-global ] "random" add-init-hook

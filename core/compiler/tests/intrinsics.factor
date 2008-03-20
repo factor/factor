@@ -261,7 +261,7 @@ cell 8 = [
 : compiled-fixnum* fixnum* ;
 
 : test-fixnum*
-    (random) >fixnum (random) >fixnum
+    32 random-bits >fixnum 32 random-bits >fixnum
     2dup
     [ fixnum* ] 2keep compiled-fixnum* =
     [ 2drop ] [ "Oops" throw ] if ;
@@ -271,7 +271,7 @@ cell 8 = [
 : compiled-fixnum>bignum fixnum>bignum ;
 
 : test-fixnum>bignum
-    (random) >fixnum
+    32 random-bits >fixnum
     dup [ fixnum>bignum ] keep compiled-fixnum>bignum =
     [ drop ] [ "Oops" throw ] if ;
 
@@ -280,7 +280,7 @@ cell 8 = [
 : compiled-bignum>fixnum bignum>fixnum ;
 
 : test-bignum>fixnum
-    5 random [ drop (random) ] map product >bignum
+    5 random [ drop 32 random-bits ] map product >bignum
     dup [ bignum>fixnum ] keep compiled-bignum>fixnum =
     [ drop ] [ "Oops" throw ] if ;
 
