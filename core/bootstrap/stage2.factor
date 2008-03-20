@@ -57,7 +57,7 @@ millis >r
 
 default-image-name "output-image" set-global
 
-"math help handbook compiler tools ui ui.tools io" "include" set-global
+"math help handbook compiler random tools ui ui.tools io" "include" set-global
 "" "exclude" set-global
 
 parse-command-line

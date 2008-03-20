@@ -33,7 +33,7 @@ IN: heaps.tests
 : random-alist ( n -- alist )
     [
         [
-            (random) dup number>string swap set
+            32 random-bits dup number>string swap set
         ] times
     ] H{ } make-assoc ;
 

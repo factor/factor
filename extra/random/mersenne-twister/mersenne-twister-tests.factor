@@ -1,7 +1,6 @@
 USING: kernel math random namespaces random.mersenne-twister
 sequences tools.test ;
 IN: random.mersenne-twister.tests
-USE: tools.walker
 
 : check-random ( max -- ? )
     dup >r random 0 r> between? ;
@@ -17,11 +16,11 @@ USE: tools.walker
 [ f ] [ 1234 [ make-100-randoms make-100-randoms = ] test-rng ] unit-test
 
 [ 1333075495 ] [
-    0 [ 1000 [ drop \ random get random-32 drop ] each \ random get random-32 ] test-rng
+    0 [ 1000 [ drop random-generator get random-32 drop ] each random-generator get random-32 ] test-rng
 ] unit-test
 
 [ 1575309035 ] [
-    0 [ 10000 [ drop \ random get random-32 drop ] each \ random get random-32 ] test-rng
+    0 [ 10000 [ drop random-generator get random-32 drop ] each random-generator get random-32 ] test-rng
 ] unit-test
 
 
