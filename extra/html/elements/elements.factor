@@ -38,7 +38,7 @@ IN: html.elements
 ! <a =href a> "Click me" write </a>
 !
 ! (url -- )
-! <a "http://" swap append =href a> "click" write </a>
+! <a "http://" prepend =href a> "click" write </a>
 !
 ! (url -- )
 ! <a [ "http://" % % ] "" make =href a> "click" write </a>
@@ -72,7 +72,7 @@ SYMBOL: html
     dup <foo> swap [ <foo> write-html ] curry
     empty-effect html-word ;
 
-: <foo "<" swap append ;
+: <foo "<" prepend ;
 
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
@@ -134,7 +134,7 @@ SYMBOL: html
 : attribute-effect T{ effect f { "string" } 0 } ;
 
 : define-attribute-word ( name -- )
-    dup "=" swap append swap
+    dup "=" prepend swap
     [ write-attr ] curry attribute-effect html-word ;
 
 [

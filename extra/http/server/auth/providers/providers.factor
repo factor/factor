@@ -27,7 +27,7 @@ GENERIC: new-user ( user provider -- user/f )
             user email>> length 0 > [
                 user email>> email = [
                     user
-                    random-256 >hex >>ticket
+                    256 random-bits >hex >>ticket
                     dup provider update-user
                 ] [ f ] if
             ] [ f ] if

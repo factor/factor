@@ -19,7 +19,7 @@ ARTICLE: "pathnames" "Pathname manipulation"
 { $subsection parent-directory }
 { $subsection file-name }
 { $subsection last-path-separator }
-{ $subsection path+ }
+{ $subsection append-path }
 "Pathnames relative to Factor's install directory:"
 { $subsection resource-path }
 { $subsection ?resource-path }
@@ -224,7 +224,7 @@ HELP: stat ( path -- directory? permissions length modified )
 
 { stat exists? directory? } related-words
 
-HELP: path+
+HELP: append-path
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
 { $description "Concatenates two pathnames." } ;
 

@@ -12,7 +12,7 @@ DEFER: http-request
 
 : parse-url ( url -- resource host port )
     "http://" ?head [ "Only http:// supported" throw ] unless
-    "/" split1 [ "/" swap append ] [ "/" ] if*
+    "/" split1 [ "/" prepend ] [ "/" ] if*
     swap parse-host ;
 
 : store-path ( request path -- request )

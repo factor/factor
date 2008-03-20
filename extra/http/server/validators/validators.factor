@@ -59,7 +59,7 @@ C: <validation-error> validation-error
 
 : v-regexp ( str what regexp -- str )
     >r over r> matches?
-    [ drop ] [ "invalid " swap append throw ] if ;
+    [ drop ] [ "invalid " prepend throw ] if ;
 
 : v-email ( str -- str )
     #! From http://www.regular-expressions.info/email.html

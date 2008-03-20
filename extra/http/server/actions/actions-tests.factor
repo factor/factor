@@ -27,8 +27,8 @@ blah
 ] unit-test
 
 <action>
-    [ +path+ get "xxx" get "X" <repetition> concat append ] >>submit
-    { { +path+ [ ] } { "xxx" [ v-number ] } } >>post-params
+    [ +append-path get "xxx" get "X" <repetition> concat append ] >>submit
+    { { +append-path [ ] } { "xxx" [ v-number ] } } >>post-params
 "action-2" set
 
 STRING: action-request-test-2

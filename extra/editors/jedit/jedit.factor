@@ -8,7 +8,7 @@ io.encodings.utf8 ;
 IN: editors.jedit
 
 : jedit-server-info ( -- port auth )
-    home "/.jedit/server" path+ ascii [
+    home "/.jedit/server" append-path ascii [
         readln drop
         readln string>number
         readln string>number
@@ -32,7 +32,7 @@ IN: editors.jedit
     ] with-stream ;
 
 : jedit-location ( file line -- )
-    number>string "+line:" swap append 2array
+    number>string "+line:" prepend 2array
     make-jedit-request send-jedit-request ;
 
 : jedit-file ( file -- )

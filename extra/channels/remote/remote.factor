@@ -14,7 +14,7 @@ IN: channels.remote
 PRIVATE>
 
 : publish ( channel -- id )
-    random-256 dup >r remote-channels set-at r> ;
+    256 random-bits dup >r remote-channels set-at r> ;
 
 : get-channel ( id -- channel )
     remote-channels at ;

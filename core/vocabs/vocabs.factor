@@ -92,10 +92,10 @@ SYMBOL: load-vocab-hook ! ( name -- )
 : child-vocabs ( vocab -- seq )
     vocab-name vocabs [ child-vocab? ] with subset ;
 
-TUPLE: vocab-link name root ;
+TUPLE: vocab-link name ;
 
-: <vocab-link> ( name root -- vocab-link )
-    [ dup vocab-root ] unless* vocab-link construct-boa ;
+: <vocab-link> ( name -- vocab-link )
+    vocab-link construct-boa ;
 
 M: vocab-link equal?
     over vocab-link?
@@ -106,16 +106,13 @@ M: vocab-link hashcode*
 
 M: vocab-link vocab-name vocab-link-name ;
 
-GENERIC# >vocab-link 1 ( name root -- vocab )
-
-M: vocab >vocab-link drop ;
-
-M: vocab-link >vocab-link drop ;
-
-M: string >vocab-link
-    over vocab dup [ 2nip ] [ drop <vocab-link> ] if ;
-
 UNION: vocab-spec vocab vocab-link ;
+
+GENERIC: >vocab-link ( name -- vocab )
+
+M: vocab-spec >vocab-link ;
+
+M: string >vocab-link dup vocab [ ] [ <vocab-link> ] ?if ;
 
 : forget-vocab ( vocab -- )
     dup words forget-all

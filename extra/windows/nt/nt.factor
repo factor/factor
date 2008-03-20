@@ -12,4 +12,5 @@ USING: alien sequences ;
     { "gl"       "opengl32.dll" "stdcall" }
     { "glu"      "glu32.dll"    "stdcall" }
     { "freetype" "freetype6.dll" "cdecl"  }
+    { "ole32"    "ole32.dll"    "stdcall" }
 } [ first3 add-library ] each

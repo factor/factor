@@ -83,7 +83,7 @@ FUNCTION: void CFRelease ( void* cf ) ;
     dup <CFBundle> [
         CFBundleLoadExecutable drop
     ] [
-        "Cannot load bundled named " swap append throw
+        "Cannot load bundled named " prepend throw
     ] ?if ;
 
 FUNCTION: CFRunLoopRef CFRunLoopGetMain ( ) ;

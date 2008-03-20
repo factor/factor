@@ -41,7 +41,7 @@ IN: assocs.lib
     >r 2array flip r> assoc-like ;
 
 : generate-key ( assoc -- str )
-    >r random-256 >hex r>
+    >r 256 random-bits >hex r>
     2dup key? [ nip generate-key ] [ drop ] if ;
 
 : set-at-unique ( value assoc -- key )

@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math arrays cocoa cocoa.application command-line
 kernel memory namespaces cocoa.messages cocoa.runtime
@@ -7,6 +7,10 @@ cocoa.classes cocoa.application sequences system ui ui.backend
 ui.clipboards ui.gadgets ui.gadgets.worlds ui.cocoa.views
 core-foundation threads ;
 IN: ui.cocoa
+
+TUPLE: handle view window ;
+
+C: <handle> handle
 
 TUPLE: cocoa-ui-backend ;
 
@@ -47,27 +51,30 @@ M: pasteboard set-clipboard-contents
         dup rot world>NSRect <ViewWindow>
         dup install-window-delegate
         over -> release
-        2array
+        <handle>
     ] keep set-world-handle ;
 
 M: cocoa-ui-backend set-title ( string world -- )
-    world-handle second swap <NSString> -> setTitle: ;
+    world-handle handle-window swap <NSString> -> setTitle: ;
 
 : enter-fullscreen ( world -- )
-    world-handle first NSScreen -> mainScreen f -> enterFullScreenMode:withOptions: drop ;
+    world-handle handle-view
+    NSScreen -> mainScreen
+    f -> enterFullScreenMode:withOptions:
+    drop ;
 
 : exit-fullscreen ( world -- )
-    world-handle first f -> exitFullScreenModeWithOptions: ;
+    world-handle handle-view f -> exitFullScreenModeWithOptions: ;
 
 M: cocoa-ui-backend set-fullscreen* ( ? world -- )
     swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
 M: cocoa-ui-backend fullscreen* ( world -- ? )
-    world-handle first -> isInFullScreenMode zero? not ;
+    world-handle handle-view -> isInFullScreenMode zero? not ;
 
 : auto-position ( world -- )
     dup world-loc { 0 0 } = [
-        world-handle second -> center
+        world-handle handle-window -> center
     ] [
         drop
     ] if ;
@@ -75,27 +82,29 @@ M: cocoa-ui-backend fullscreen* ( world -- ? )
 M: cocoa-ui-backend (open-window) ( world -- )
     dup gadget-window
     dup auto-position
-    world-handle second f -> makeKeyAndOrderFront: ;
+    world-handle handle-window f -> makeKeyAndOrderFront: ;
 
 M: cocoa-ui-backend (close-window) ( handle -- )
-    first unregister-window ;
+    handle-window -> release ;
 
 M: cocoa-ui-backend close-window ( gadget -- )
     find-world [
-        world-handle second f -> performClose:
+        world-handle [
+            handle-window f -> performClose:
+        ] when*
     ] when* ;
 
 M: cocoa-ui-backend raise-window* ( world -- )
     world-handle [
-        second dup f -> orderFront: -> makeKeyWindow
+        handle-window dup f -> orderFront: -> makeKeyWindow
         NSApp 1 -> activateIgnoringOtherApps:
     ] when* ;
 
 M: cocoa-ui-backend select-gl-context ( handle -- )
-    first -> openGLContext -> makeCurrentContext ;
+    handle-view -> openGLContext -> makeCurrentContext ;
 
 M: cocoa-ui-backend flush-gl-context ( handle -- )
-    first -> openGLContext -> flushBuffer ;
+    handle-view -> openGLContext -> flushBuffer ;
 
 SYMBOL: cocoa-init-hook
 

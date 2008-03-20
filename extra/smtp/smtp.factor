@@ -31,7 +31,7 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 : validate-address ( string -- string' )
     #! Make sure we send funky stuff to the server by accident.
     dup "\r\n>" seq-intersect empty?
-    [ "Bad e-mail address: " swap append throw ] unless ;
+    [ "Bad e-mail address: " prepend throw ] unless ;
 
 : mail-from ( fromaddr -- )
     "MAIL FROM:<" write validate-address write ">" write crlf ;
@@ -89,7 +89,7 @@ LOG: smtp-response DEBUG
 
 : validate-header ( string -- string' )
     dup "\r\n" seq-intersect empty?
-    [ "Invalid header string: " swap append throw ] unless ;
+    [ "Invalid header string: " prepend throw ] unless ;
 
 : write-header ( key value -- )
     swap
@@ -143,7 +143,7 @@ M: email clone
     dup to>> ", " join "To" set-header
     [ [ extract-email ] map ] change-to
     dup subject>> "Subject" set-header
-    now timestamp>rfc822-string "Date" set-header
+    now timestamp>rfc822 "Date" set-header
     message-id "Message-Id" set-header ;
 
 : <email> ( -- email )
@@ -164,7 +164,7 @@ M: email clone
 ! : (cram-md5-auth) ( -- response )
 !     swap challenge get 
 !     string>md5-hmac hex-string 
-!     " " swap append append 
+!     " " prepend append 
 !     >base64 ;
 ! 
 ! : cram-md5-auth ( key login  -- )

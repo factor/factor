@@ -74,7 +74,7 @@ TUPLE: document locs ;
     0 swap [ append ] change-nth ;
 
 : append-last ( str seq -- )
-    [ length 1- ] keep [ swap append ] change-nth ;
+    [ length 1- ] keep [ prepend ] change-nth ;
 
 : loc-col/str ( loc document -- str col )
     >r first2 swap r> nth swap ;

@@ -79,7 +79,7 @@ C: <faq> faq
     "br" contained, nl, ;
 
 : toc-link, ( question-list number -- )
-    number>string "#" swap append "href" swap 2array 1array
+    number>string "#" prepend "href" swap 2array 1array
     "a" swap [ question-list-title , ] tag*, br, ;
 
 : toc, ( faq -- )
