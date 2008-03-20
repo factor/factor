@@ -16,16 +16,16 @@ MEMO: number ( -- parser )
 
 <EBNF
 program = block "." 
-block = [ "CONST" ident "=" number { "," ident "=" number } ";" ]
-        [ "VAR" ident { "," ident } ";" ]
-        { "PROCEDURE" ident ";" [ block ";" ] } statement 
-statement = [ ident ":=" expression | "CALL" ident |
-              "BEGIN" statement {";" statement } "END" |
+block = ( "CONST" ident "=" number ( "," ident "=" number )* ";" )?
+        ( "VAR" ident ( "," ident )* ";" )?
+        ( "PROCEDURE" ident ";" ( block ";" )? )* statement 
+statement = ( ident ":=" expression | "CALL" ident |
+              "BEGIN" statement (";" statement )* "END" |
               "IF" condition "THEN" statement |
-              "WHILE" condition "DO" statement ] 
+              "WHILE" condition "DO" statement )?
 condition = "ODD" expression |
             expression ("=" | "#" | "<=" | "<" | ">=" | ">") expression 
-expression = ["+" | "-"] term {("+" | "-") term } 
-term = factor {("*" | "/") factor } 
+expression = ("+" | "-")? term (("+" | "-") term )* 
+term = factor (("*" | "/") factor )* 
 factor = ident | number | "(" expression ")"
 EBNF>
