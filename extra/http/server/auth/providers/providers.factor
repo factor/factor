@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel new-slots accessors random math.parser locals
-sequences math ;
+sequences math crypto.sha2 ;
 IN: http.server.auth.providers
 
 TUPLE: user username realname password email ticket profile ;
@@ -17,14 +17,7 @@ GENERIC: new-user ( user provider -- user/f )
 : check-login ( password username provider -- user/f )
     get-user dup [ [ password>> = ] keep and ] [ 2drop f ] if ;
 
-:: set-password ( password username provider -- user/f )
-    [let | user [ username provider get-user ] |
-        user [
-            user
-                password >>password
-            dup provider update-user
-        ] [ f ] if
-    ] ;
+: set-password ( user password -- user ) >>password ;
 
 ! Password recovery support
 
@@ -34,7 +27,7 @@ GENERIC: new-user ( user provider -- user/f )
             user email>> length 0 > [
                 user email>> email = [
                     user
-                    random-256 >hex >>ticket
+                    256 random-bits >hex >>ticket
                     dup provider update-user
                 ] [ f ] if
             ] [ f ] if

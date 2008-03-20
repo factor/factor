@@ -43,7 +43,7 @@ TUPLE: no-math-method left right generic ;
 
 : applicable-method ( generic class -- quot )
     over method
-    [ word-def ]
+    [ 1quotation ]
     [ default-math-method ] ?if ;
 
 : object-method ( generic -- quot )
@@ -53,7 +53,7 @@ TUPLE: no-math-method left right generic ;
     2dup and [
         2dup math-upgrade >r
         math-class-max over order min-class applicable-method
-        r> swap append
+        r> prepend
     ] [
         2drop object-method
     ] if ;

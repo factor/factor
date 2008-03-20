@@ -13,7 +13,7 @@ TUPLE: component id required default ;
 
 : component ( name -- component )
     dup components get at
-    [ ] [ "No such component: " swap append throw ] ?if ;
+    [ ] [ "No such component: " prepend throw ] ?if ;
 
 GENERIC: validate* ( value component -- result )
 GENERIC: render-view* ( value component -- )

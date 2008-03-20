@@ -44,25 +44,21 @@ $nl { $vocab-link "io.encodings.utf16" } ;
 
 ARTICLE: "encodings-protocol" "Encoding protocol"
 "An encoding descriptor must implement the following methods. The methods are implemented on tuple classes by instantiating the class and calling the method again."
-{ $subsection decode-step }
-{ $subsection init-decoder }
-{ $subsection stream-write-encoded } ;
+{ $subsection decode-char }
+{ $subsection encode-char }
+"The following methods are optional:"
+{ $subsection <encoder> }
+{ $subsection <decoder> } ;
 
-HELP: decode-step ( buf char encoding -- )
-{ $values { "buf" "A string buffer which characters can be pushed to" }
-    { "char" "An octet which is read from a stream" }
+HELP: decode-char ( stream encoding -- char/f )
+{ $values { "stream" "an underlying input stream" }
     { "encoding" "An encoding descriptor tuple" } }
-{ $description "A single step in the decoding process must be defined for the decoding descriptor. When each octet is read, this word is called, and depending on the decoder's internal state, something may be pushed to the buffer or the state may change. This should not be used directly." } ;
+{ $description "Reads a single code point from the underlying stream, interpreting it by the encoding. This should not be used directly." } ;
 
-HELP: stream-write-encoded ( string stream encoding -- )
-{ $values { "string" "a string" }
-    { "stream" "an output stream" }
+HELP: encode-char ( char stream encoding -- )
+{ $values { "char" "a character" }
+    { "stream" "an underlying output stream" }
     { "encoding" "an encoding descriptor" } }
-{ $description "Encodes the string with the given encoding descriptor, outputing the result to the given stream. This should not be used directly." } ;
+{ $description "Writes the code point in the encoding to the underlying stream given. This should not be used directly." } ;
 
-HELP: init-decoder ( stream encoding -- encoding )
-{ $values { "stream" "an input stream" }
-    { "encoding" "an encoding descriptor" } }
-{ $description "Initializes the decoder tuple's state. The stream is exposed so that it can be read, eg for a BOM. This should not be used directly." } ;
-
-{ init-decoder decode-step stream-write-encoded } related-words
+{ encode-char decode-char } related-words

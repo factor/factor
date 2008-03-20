@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io io.files threads
-strings byte-arrays io.streams.lines io.streams.plain ;
+strings byte-arrays io.streams.plain ;
 IN: io.streams.c
 
 ARTICLE: "io.streams.c" "ANSI C streams"

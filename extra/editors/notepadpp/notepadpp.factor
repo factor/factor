@@ -4,7 +4,7 @@ IN: editors.notepadpp
 
 : notepadpp-path
     \ notepadpp-path get-global [
-        program-files "notepad++\\notepad++.exe" path+
+        program-files "notepad++\\notepad++.exe" append-path
     ] unless* ;
 
 : notepadpp ( file line -- )

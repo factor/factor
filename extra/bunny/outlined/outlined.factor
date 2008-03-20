@@ -1,5 +1,5 @@
 USING: arrays bunny.model bunny.cel-shaded
-combinators.lib continuations kernel math multiline
+combinators.cleave continuations kernel math multiline
 opengl opengl.shaders opengl.framebuffers opengl.gl
 opengl.capabilities sequences ui.gadgets combinators.cleave ;
 IN: bunny.outlined

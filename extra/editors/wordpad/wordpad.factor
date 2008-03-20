@@ -5,7 +5,7 @@ IN: editors.wordpad
 
 : wordpad-path ( -- path )
     \ wordpad-path get [
-        program-files "\\Windows NT\\Accessories\\wordpad.exe" path+
+        program-files "\\Windows NT\\Accessories\\wordpad.exe" append-path
     ] unless* ;
 
 : wordpad ( file line -- )

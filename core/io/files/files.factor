@@ -32,9 +32,12 @@ HOOK: rename-file io-backend ( from to -- )
 : left-trim-separators ( str -- newstr )
     [ path-separator? ] left-trim ;
 
-: path+ ( str1 str2 -- str )
+: append-path ( str1 str2 -- str )
     >r right-trim-separators "/" r>
     left-trim-separators 3append ;
+
+: prepend-path ( str1 str2 -- str )
+    swap append-path ; inline
 
 : last-path-separator ( path -- n ? )
     [ length 1- ] keep [ path-separator? ] find-last* ;
@@ -86,15 +89,9 @@ SYMBOL: +unknown+
 : stat ( path -- directory? permissions length modified )
     normalize-pathname (stat) ;
 
-! : file-length ( path -- n ) stat drop 2nip ;
-
 : file-modified ( path -- n ) stat >r 3drop r> ;
 
-! : file-permissions ( path -- perm ) stat 2drop nip ;
-
 : exists? ( path -- ? ) file-modified >boolean ;
-
-! : directory? ( path -- ? ) stat 3drop ;
 
 : directory? ( path -- ? ) file-info file-info-type +directory+ = ;
 
@@ -125,7 +122,7 @@ HOOK: make-directory io-backend ( path -- )
 : fixup-directory ( path seq -- newseq )
     [
         dup string?
-        [ tuck path+ directory? 2array ] [ nip ] if
+        [ tuck append-path directory? 2array ] [ nip ] if
     ] with map
     [ first special-directory? not ] subset ;
 
@@ -133,7 +130,7 @@ HOOK: make-directory io-backend ( path -- )
     normalize-directory dup (directory) fixup-directory ;
 
 : directory* ( path -- seq )
-    dup directory [ first2 >r path+ r> 2array ] with map ;
+    dup directory [ first2 >r append-path r> 2array ] with map ;
 
 ! Touching files
 HOOK: touch-file io-backend ( path -- )
@@ -152,7 +149,7 @@ HOOK: delete-directory io-backend ( path -- )
 : delete-tree ( path -- )
     dup directory? (delete-tree) ;
 
-: to-directory over file-name path+ ;
+: to-directory over file-name append-path ;
 
 ! Moving and renaming files
 HOOK: move-file io-backend ( from to -- )
@@ -185,7 +182,7 @@ DEFER: copy-tree-into
 : copy-tree ( from to -- )
     over directory? [
         >r dup directory swap r> [
-            >r swap first path+ r> copy-tree-into
+            >r swap first append-path r> copy-tree-into
         ] 2curry each
     ] [
         copy-file
@@ -200,7 +197,7 @@ DEFER: copy-tree-into
 ! Special paths
 : resource-path ( path -- newpath )
     \ resource-path get [ image parent-directory ] unless*
-    swap path+ ;
+    prepend-path ;
 
 : ?resource-path ( path -- newpath )
     "resource:" ?head [ resource-path ] when ;
@@ -222,10 +219,7 @@ M: pathname <=> [ pathname-string ] compare ;
     >r <file-reader> r> with-stream ; inline
 
 : file-contents ( path encoding -- str )
-    dupd [ file-info file-info-size read ] with-file-reader ;
-
-! : file-contents ( path encoding -- str )
-!     dupd [ file-length read ] with-file-reader ;
+    <file-reader> contents ;
 
 : with-file-writer ( path encoding quot -- )
     >r <file-writer> r> with-stream ; inline
@@ -245,7 +239,7 @@ M: pathname <=> [ pathname-string ] compare ;
       [ dup make-directory ]
     when ;
 
-: temp-file ( name -- path ) temp-directory swap path+ ;
+: temp-file ( name -- path ) temp-directory prepend-path ;
 
 ! Home directory
 : home ( -- dir )

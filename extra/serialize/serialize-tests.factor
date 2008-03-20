@@ -4,7 +4,7 @@
 USING: tools.test kernel serialize io io.streams.byte-array math
 alien arrays byte-arrays sequences math prettyprint parser
 classes math.constants io.encodings.binary random
-combinators.lib ;
+combinators.lib assocs ;
 IN: serialize.tests
 
 : test-serialize-cell
@@ -56,19 +56,23 @@ C: <serialize-test> serialize-test
     } ;
 
 : check-serialize-1 ( obj -- ? )
+    "=====" print
     dup class .
+    dup .
     dup
-    binary [ serialize ] with-byte-writer
-    binary [ deserialize ] with-byte-reader = ;
+    object>bytes
+    bytes>object
+    dup . = ;
 
 : check-serialize-2 ( obj -- ? )
     dup number? over wrapper? or [
         drop t ! we don't care if numbers aren't interned
     ] [
+        "=====" print
         dup class .
-        dup 2array
-        binary [ serialize ] with-byte-writer
-        binary [ deserialize ] with-byte-reader
+        dup 2array dup .
+        object>bytes
+        bytes>object dup .
         first2 eq?
     ] if ;
 
@@ -79,3 +83,17 @@ C: <serialize-test> serialize-test
 [ t ] [ pi check-serialize-1 ] unit-test
 [ serialize ] must-infer
 [ deserialize ] must-infer
+
+[ t ] [
+    V{ } dup dup push
+    object>bytes
+    bytes>object
+    dup first eq?
+] unit-test
+
+[ t ] [
+    H{ } dup dup dup set-at
+    object>bytes
+    bytes>object
+    dup keys first eq?
+] unit-test

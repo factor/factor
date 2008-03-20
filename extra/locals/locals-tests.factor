@@ -1,5 +1,6 @@
 USING: locals math sequences tools.test hashtables words kernel
-namespaces arrays strings prettyprint ;
+namespaces arrays strings prettyprint io.streams.string parser
+;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -178,3 +179,19 @@ M:: string lambda-generic ( a b -- c ) a b lambda-generic-2 ;
 [ "[| a! | ]" ] [
     [| a! | ] unparse
 ] unit-test
+
+DEFER: xyzzy
+
+[ ] [
+    "IN: locals.tests USE: math GENERIC: xyzzy M: integer xyzzy ;"
+    <string-reader> "lambda-generic-test" parse-stream drop
+] unit-test
+
+[ 10 ] [ 10 xyzzy ] unit-test
+
+[ ] [
+    "IN: locals.tests USE: math USE: locals GENERIC: xyzzy M:: integer xyzzy ( n -- ) 5 ;"
+    <string-reader> "lambda-generic-test" parse-stream drop
+] unit-test
+
+[ 5 ] [ 10 xyzzy ] unit-test

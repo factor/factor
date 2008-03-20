@@ -40,7 +40,7 @@ M: thread send ( message thread -- )
 TUPLE: synchronous data sender tag ;
 
 : <synchronous> ( data -- sync )
-    self random-256 synchronous construct-boa ;
+    self 256 random-bits synchronous construct-boa ;
 
 TUPLE: reply data tag ;
 

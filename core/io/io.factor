@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables generic kernel math namespaces sequences strings
-    continuations assocs io.styles sbufs ;
+USING: hashtables generic kernel math namespaces sequences
+continuations assocs io.styles ;
 IN: io
 
 GENERIC: stream-readln ( stream -- str )
@@ -88,4 +88,6 @@ SYMBOL: stderr
     [ [ readln dup ] [ ] [ drop ] unfold ] with-stream ;
 
 : contents ( stream -- str )
-    2048 <sbuf> [ stream-copy ] keep >string ;
+    [
+        [ 65536 read dup ] [ ] [ drop ] unfold concat f like
+    ] with-stream  ;

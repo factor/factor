@@ -8,10 +8,6 @@ IN: generic.standard
 
 TUPLE: standard-combination # ;
 
-M: standard-combination method-prologue
-    standard-combination-# object
-    <array> swap add* [ declare ] curry ;
-
 C: <standard-combination> standard-combination
 
 SYMBOL: (dispatch#)
@@ -165,7 +161,7 @@ C: <hook-combination> hook-combination
     0 (dispatch#) [
         swap slip
         hook-combination-var [ get ] curry
-        swap append
+        prepend
     ] with-variable ; inline
 
 M: hook-combination make-default-method
@@ -174,7 +170,7 @@ M: hook-combination make-default-method
 M: hook-combination perform-combination
     [
         standard-methods
-        [ [ drop ] swap append ] assoc-map
+        [ [ drop ] prepend ] assoc-map
         single-combination
     ] with-hook ;
 

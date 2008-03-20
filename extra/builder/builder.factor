@@ -58,8 +58,8 @@ IN: builder
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : copy-image ( -- )
-  builds "factor" path+ my-boot-image-name path+ ".." copy-file-into
-  builds "factor" path+ my-boot-image-name path+ "."  copy-file-into ;
+  builds "factor" append-path my-boot-image-name append-path ".." copy-file-into
+  builds "factor" append-path my-boot-image-name append-path "."  copy-file-into ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

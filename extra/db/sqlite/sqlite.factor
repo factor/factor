@@ -6,6 +6,7 @@ prettyprint sequences strings tuples alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators
 combinators.cleave io namespaces.lib ;
+USE: tools.walker
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
@@ -22,6 +23,8 @@ M: sqlite-db dispose ( db -- ) dispose-db ;
 : with-sqlite ( path quot -- ) sqlite-db swap with-db ; inline
 
 TUPLE: sqlite-statement ;
+INSTANCE: sqlite-statement throwable-statement
+
 TUPLE: sqlite-result-set has-more? ;
 
 M: sqlite-db <simple-statement> ( str in out -- obj )
@@ -33,12 +36,20 @@ M: sqlite-db <prepared-statement> ( str in out -- obj )
         set-statement-in-params
         set-statement-out-params
     } statement construct
-    db get db-handle over statement-sql sqlite-prepare
-    over set-statement-handle
     sqlite-statement construct-delegate ;
 
+: sqlite-maybe-prepare ( statement -- statement )
+    dup statement-handle [
+        [
+            delegate
+            db get db-handle over statement-sql sqlite-prepare
+            swap set-statement-handle
+        ] keep
+    ] unless ;
+
 M: sqlite-statement dispose ( statement -- )
-    statement-handle sqlite-finalize ;
+    statement-handle
+    [ [ sqlite3_reset drop ] keep sqlite-finalize ] when* ;
 
 M: sqlite-result-set dispose ( result-set -- )
     f swap set-result-set-handle ;
@@ -46,9 +57,12 @@ M: sqlite-result-set dispose ( result-set -- )
 : sqlite-bind ( triples handle -- )
     swap [ first3 sqlite-bind-type ] with each ;
 
-: reset-statement ( statement -- ) statement-handle sqlite-reset ;
+: reset-statement ( statement -- )
+    sqlite-maybe-prepare
+    statement-handle sqlite-reset ;
 
 M: sqlite-statement bind-statement* ( statement -- )
+    sqlite-maybe-prepare
     dup statement-bound? [ dup reset-statement ] when
     [ statement-bind-params ] [ statement-handle ] bi
     sqlite-bind ;
@@ -57,7 +71,7 @@ M: sqlite-statement bind-tuple ( tuple statement -- )
     [
         statement-in-params
         [
-            [ sql-spec-column-name ":" swap append ]
+            [ sql-spec-column-name ":" prepend ]
             [ sql-spec-slot-name rot get-slot-named ]
             [ sql-spec-type ] tri 3array
         ] with map
@@ -89,6 +103,7 @@ M: sqlite-result-set more-rows? ( result-set -- ? )
     sqlite-result-set-has-more? ;
 
 M: sqlite-statement query-results ( query -- result-set )
+    sqlite-maybe-prepare
     dup statement-handle sqlite-result-set <result-set>
     dup advance-row ;
 
@@ -125,7 +140,7 @@ M: sqlite-db <insert-native-statement> ( tuple -- statement )
         ");" 0%
     ] sqlite-make ;
 
-M: sqlite-db <insert-assigned-statement> ( tuple -- statement )
+M: sqlite-db <insert-nonnative-statement> ( tuple -- statement )
     <insert-native-statement> ;
 
 : where-primary-key% ( specs -- )
@@ -158,7 +173,7 @@ M: sqlite-db <delete-tuple-statement> ( specs table -- sql )
 ! : select-sequence ( seq name -- ) ;
 
 M: sqlite-db bind% ( spec -- )
-    dup 1, sql-spec-column-name ":" swap append 0% ;
+    dup 1, sql-spec-column-name ":" prepend 0% ;
 
 M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
     [
@@ -175,6 +190,8 @@ M: sqlite-db modifier-table ( -- hashtable )
     H{
         { +native-id+ "primary key" }
         { +assigned-id+ "primary key" }
+        { +random-id+ "primary key" }
+        ! { +nonnative-id+ "primary key" }
         { +autoincrement+ "autoincrement" }
         { +unique+ "unique" }
         { +default+ "default" }
@@ -193,6 +210,7 @@ M: sqlite-db compound-type ( str seq -- str' )
 M: sqlite-db type-table ( -- assoc )
     H{
         { +native-id+ "integer primary key" }
+        { +random-id+ "integer primary key" }
         { INTEGER "integer" }
         { TEXT "text" }
         { VARCHAR "text" }

@@ -73,10 +73,7 @@ M: freetype-renderer free-fonts ( world -- )
     ] keep *void* ;
 
 : open-face ( font style -- face )
-    ttf-name ttf-path
-    dup malloc-file-contents
-    swap file-info file-info-size
-    (open-face) ;
+    ttf-name ttf-path malloc-file-contents (open-face) ;
 
 SYMBOL: dpi
 

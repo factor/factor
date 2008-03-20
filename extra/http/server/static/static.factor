@@ -39,7 +39,7 @@ TUPLE: file-responder root hook special ;
     [ 2drop <304> ] [ file-responder get hook>> call ] if ;
 
 : serving-path ( filename -- filename )
-    "" or file-responder get root>> swap path+ ;
+    "" or file-responder get root>> prepend-path ;
 
 : serve-file ( filename -- response )
     dup mime-type
@@ -68,7 +68,7 @@ TUPLE: file-responder root hook special ;
     swap '[ , directory. ] >>body ;
 
 : find-index ( filename -- path )
-    { "index.html" "index.fhtml" } [ path+ ] with map
+    { "index.html" "index.fhtml" } [ append-path ] with map
     [ exists? ] find nip ;
 
 : serve-directory ( filename -- response )

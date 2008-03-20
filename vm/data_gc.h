@@ -263,13 +263,18 @@ DEFPUSHPOP(root_,extra_roots)
 #define REGISTER_UNTAGGED(obj) root_push(obj ? tag_object(obj) : 0)
 #define UNREGISTER_UNTAGGED(obj) obj = untag_object(root_pop())
 
+INLINE bool in_data_heap_p(CELL ptr)
+{
+	return (ptr >= data_heap->segment->start
+		&& ptr <= data_heap->segment->end);
+}
+
 /* We ignore strings which point outside the data heap, but we might be given
 a char* which points inside the data heap, in which case it is a root, for
 example if we call unbox_char_string() the result is placed in a byte array */
 INLINE bool root_push_alien(const void *ptr)
 {
-	if((CELL)ptr > data_heap->segment->start
-		&& (CELL)ptr < data_heap->segment->end)
+	if(in_data_heap_p((CELL)ptr))
 	{
 		F_BYTE_ARRAY *objptr = ((F_BYTE_ARRAY *)ptr) - 1;
 		if(objptr->header == tag_header(BYTE_ARRAY_TYPE))

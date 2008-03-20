@@ -1,9 +1,9 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: io.streams.string
 USING: io kernel math namespaces sequences sbufs strings
 generic splitting growable continuations io.streams.plain
-io.encodings ;
+io.encodings io.encodings.private ;
+IN: io.streams.string
 
 M: growable dispose drop ;
 
@@ -49,8 +49,11 @@ M: growable stream-read
 M: growable stream-read-partial
     stream-read ;
 
+TUPLE: null ;
+M: null decode-char drop stream-read1 ;
+
 : <string-reader> ( str -- stream )
-    >sbuf dup reverse-here f <decoder> ;
+    >sbuf dup reverse-here null <decoder> ;
 
 : with-string-reader ( str quot -- )
     >r <string-reader> r> with-stream ; inline

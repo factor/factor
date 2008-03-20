@@ -27,7 +27,7 @@ TUPLE: list index presenter color hook ;
     swap set-list-index ;
 
 : list-presentation-hook ( list -- quot )
-    list-hook [ [ [ list? ] is? ] find-parent ] swap append ;
+    list-hook [ [ [ list? ] is? ] find-parent ] prepend ;
 
 : <list-presentation> ( hook elt presenter -- gadget )
     keep <presentation>

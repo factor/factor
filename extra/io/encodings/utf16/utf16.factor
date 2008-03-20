@@ -1,133 +1,101 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces io.binary
-io.encodings combinators splitting io byte-arrays ;
+io.encodings combinators splitting io byte-arrays inspector ;
 IN: io.encodings.utf16
+
+TUPLE: utf16be ;
+
+TUPLE: utf16le ;
+
+TUPLE: utf16 ;
+
+<PRIVATE
 
 ! UTF-16BE decoding
 
-TUPLE: utf16be ch state ;
-
-SYMBOL: double
-SYMBOL: quad1
-SYMBOL: quad2
-SYMBOL: quad3
-SYMBOL: ignore
-
-: do-ignore ( -- ch state ) 0 ignore ;
-
 : append-nums ( byte ch -- ch )
-    8 shift bitor ;
+    over [ 8 shift bitor ] [ 2drop replacement-char ] if ;
 
-: end-multibyte ( buf byte ch -- buf ch state )
-    append-nums push-decoded ;
+: double-be ( stream byte -- stream char )
+    over stream-read1 prepend-nums ;
 
-: begin-utf16be ( buf byte -- buf ch state )
+: quad-be ( stream byte -- stream char )
+    double-be over stream-read1 [
+        dup -2 shift BIN: 110111 number= [
+            >r 2 shift r> BIN: 11 bitand bitor
+            over stream-read1 prepend-nums HEX: 10000 +
+        ] [ 2drop dup stream-read1 drop replacement-char ] if
+    ] when* ;
+
+: ignore ( stream -- stream char )
+    dup stream-read1 drop replacement-char ;
+
+: begin-utf16be ( stream byte -- stream char )
     dup -3 shift BIN: 11011 number= [
         dup BIN: 00000100 bitand zero?
-        [ BIN: 11 bitand quad1 ]
-        [ drop do-ignore ] if
-    ] [ double ] if ;
-
-: handle-quad2be ( byte ch -- ch state )
-    swap dup -2 shift BIN: 110111 number= [
-        >r 2 shift r> BIN: 11 bitand bitor quad3
-    ] [ 2drop do-ignore ] if ;
-
-: decode-utf16be-step ( buf byte ch state -- buf ch state )
-    {
-        { begin [ drop begin-utf16be ] }
-        { double [ end-multibyte ] }
-        { quad1 [ append-nums quad2 ] }
-        { quad2 [ handle-quad2be ] }
-        { quad3 [ append-nums HEX: 10000 + push-decoded ] }
-        { ignore [ 2drop push-replacement ] }
-    } case ;
-
-: unpack-state-be ( encoding -- ch state )
-    { utf16be-ch utf16be-state } get-slots ;
-
-: pack-state-be ( ch state encoding -- )
-    { set-utf16be-ch set-utf16be-state } set-slots ;
-
-M: utf16be decode-step
-    [ unpack-state-be decode-utf16be-step ] keep pack-state-be drop ;
-
-M: utf16be init-decoder nip begin over set-utf16be-state ;
+        [ BIN: 11 bitand quad-be ]
+        [ drop ignore ] if
+    ] [ double-be ] if ;
+    
+M: utf16be decode-char
+    drop dup stream-read1 dup [ begin-utf16be ] when nip ;
 
 ! UTF-16LE decoding
 
-TUPLE: utf16le ch state ;
+: quad-le ( stream ch -- stream char )
+    over stream-read1 swap 10 shift bitor
+    over stream-read1 dup -2 shift BIN: 110111 = [
+        BIN: 11 bitand append-nums HEX: 10000 +
+    ] [ 2drop replacement-char ] if ;
 
-: handle-double ( buf byte ch -- buf ch state )
-    swap dup -3 shift BIN: 11011 = [
+: double-le ( stream byte1 byte2 -- stream char )
+    dup -3 shift BIN: 11011 = [
         dup BIN: 100 bitand 0 number=
-        [ BIN: 11 bitand 8 shift bitor quad2 ]
-        [ 2drop push-replacement ] if
-    ] [ end-multibyte ] if ;
+        [ BIN: 11 bitand 8 shift bitor quad-le ]
+        [ 2drop replacement-char ] if
+    ] [ append-nums ] if ;
 
-: handle-quad3le ( buf byte ch -- buf ch state )
-    swap dup -2 shift BIN: 110111 = [
-        BIN: 11 bitand append-nums HEX: 10000 + push-decoded
-    ] [ 2drop push-replacement ] if ;
+: begin-utf16le ( stream byte -- stream char )
+    over stream-read1 [ double-le ] [ drop replacement-char ] if* ;
 
-: decode-utf16le-step ( buf byte ch state -- buf ch state )
-    {
-        { begin [ drop double ] }
-        { double [ handle-double ] }
-        { quad1 [ append-nums quad2 ] }
-        { quad2 [ 10 shift bitor quad3 ] }
-        { quad3 [ handle-quad3le ] }
-    } case ;
-
-: unpack-state-le ( encoding -- ch state )
-    { utf16le-ch utf16le-state } get-slots ;
-
-: pack-state-le ( ch state encoding -- )
-    { set-utf16le-ch set-utf16le-state } set-slots ;
-
-M: utf16le decode-step
-    [ unpack-state-le decode-utf16le-step ] keep pack-state-le drop ;
-
-M: utf16le init-decoder nip begin over set-utf16le-state ;
+M: utf16le decode-char
+    drop dup stream-read1 dup [ begin-utf16le ] when nip ;
 
 ! UTF-16LE/BE encoding
 
-: encode-first
+: encode-first ( char -- byte1 byte2 )
     -10 shift
     dup -8 shift BIN: 11011000 bitor
     swap HEX: FF bitand ;
 
-: encode-second
+: encode-second ( char -- byte3 byte4 )
     BIN: 1111111111 bitand
     dup -8 shift BIN: 11011100 bitor
     swap BIN: 11111111 bitand ;
 
-: char>utf16be ( char -- )
+: stream-write2 ( stream char1 char2 -- )
+    rot [ stream-write1 ] curry 2apply ;
+
+: char>utf16be ( stream char -- )
     dup HEX: FFFF > [
         HEX: 10000 -
-        dup encode-first swap write1 write1
-        encode-second swap write1 write1
-    ] [ h>b/b write1 write1 ] if ;
+        2dup encode-first stream-write2
+        encode-second stream-write2
+    ] [ h>b/b swap stream-write2 ] if ;
 
-: stream-write-utf16be ( string stream -- )
-    [ [ char>utf16be ] each ] with-stream* ;
+M: utf16be encode-char ( char stream encoding -- )
+    drop swap char>utf16be ;
 
-M: utf16be stream-write-encoded ( string stream encoding -- )
-    drop stream-write-utf16be ;
-
-: char>utf16le ( char -- )
+: char>utf16le ( char stream -- )
     dup HEX: FFFF > [
         HEX: 10000 -
-        dup encode-first write1 write1
-        encode-second write1 write1
-    ] [ h>b/b swap write1 write1 ] if ; 
+        2dup encode-first swap stream-write2
+        encode-second swap stream-write2
+    ] [ h>b/b stream-write2 ] if ; 
 
-: stream-write-utf16le ( string stream -- )
-    [ [ char>utf16le ] each ] with-stream* ;
-
-M: utf16le stream-write-encoded ( string stream encoding -- )
-    drop stream-write-utf16le ;
+M: utf16le encode-char ( char stream encoding -- )
+    drop swap char>utf16le ;
 
 ! UTF-16
 
@@ -139,17 +107,18 @@ M: utf16le stream-write-encoded ( string stream encoding -- )
 
 : start-utf16be? ( seq1 -- seq2 ? ) bom-be ?head ;
 
-TUPLE: utf16 started? ;
-
-M: utf16 stream-write-encoded
-    dup utf16-started? [ drop ]
-    [ t swap set-utf16-started? bom-le over stream-write ] if
-    stream-write-utf16le ;
+TUPLE: missing-bom ;
+M: missing-bom summary drop "The BOM for a UTF-16 stream was missing" ;
 
 : bom>le/be ( bom -- le/be )
     dup bom-le sequence= [ drop utf16le ] [
-        bom-be sequence= [ utf16be ] [ decode-error ] if
+        bom-be sequence= [ utf16be ] [ missing-bom ] if
     ] if ;
 
-M: utf16 init-decoder ( stream encoding -- newencoding )
-    2 rot stream-read bom>le/be construct-empty init-decoder ;
+M: utf16 <decoder> ( stream utf16 -- decoder )
+    drop 2 over stream-read bom>le/be <decoder> ;
+
+M: utf16 <encoder> ( stream utf16 -- encoder )
+    drop bom-le over stream-write utf16le <encoder> ;
+
+PRIVATE>

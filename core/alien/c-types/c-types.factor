@@ -262,8 +262,8 @@ M: long-long-type box-return ( type -- )
         r> add*
     ] when ;
 
-: malloc-file-contents ( path -- alien )
-    binary file-contents malloc-byte-array ;
+: malloc-file-contents ( path -- alien len )
+    binary file-contents dup malloc-byte-array swap length ;
 
 [
     [ alien-cell ]

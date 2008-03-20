@@ -30,6 +30,7 @@ crossref off
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
 H{ } clone changed-words set
+H{ } clone root-cache set
 
 ! Trivial recompile hook. We don't want to touch the code heap
 ! during stage1 bootstrap, it would just waste time.
@@ -87,11 +88,7 @@ call
     "words.private"
     "vectors"
     "vectors.private"
-} [
-    dup find-vocab-root swap create-vocab
-    [ set-vocab-root ] keep
-    f swap set-vocab-source-loaded?
-] each
+} [ create-vocab drop ] each
 
 H{ } clone source-files set
 H{ } clone class<map set

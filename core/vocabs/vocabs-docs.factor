@@ -16,7 +16,6 @@ $nl
 { $subsection vocab }
 "Accessors for various vocabulary attributes:"
 { $subsection vocab-name }
-{ $subsection vocab-root }
 { $subsection vocab-main }
 { $subsection vocab-help }
 "Looking up existing vocabularies and creating new vocabularies:"
@@ -49,10 +48,6 @@ HELP: vocab
 HELP: vocab-name
 { $values { "vocab" "a vocabulary specifier" } { "name" string } }
 { $description "Outputs the name of a vocabulary." } ;
-
-HELP: vocab-root
-{ $values { "vocab" "a vocabulary specifier" } { "root" "a pathname string or " { $link f } } }
-{ $description "Outputs the vocabulary root where the source code for a vocabulary is located, or " { $link f } " if the vocabulary is not defined in source files." } ;
 
 HELP: vocab-words
 { $values { "vocab" "a vocabulary specifier" } { "words" "an assoc mapping strings to words" } }
@@ -101,11 +96,11 @@ HELP: child-vocabs
 } ;
 
 HELP: vocab-link
-{ $class-description "Instances of this class identify vocabularies which are potentially not loaded. The " { $link vocab-name } " slot is the vocabulary name, and " { $link vocab-root } " is a pathname string identifying the vocabulary root where the sources to this vocabulary are located, or " { $link f } " if the root is not known."
+{ $class-description "Instances of this class identify vocabularies which are potentially not loaded. The " { $link vocab-name } " slot is the vocabulary name."
 $nl
 "Vocabulary links are created by calling " { $link >vocab-link } "."
 } ;
 
 HELP: >vocab-link
-{ $values { "name" string } { "root" "a pathname string or " { $link f } } { "vocab" "a vocabulary specifier" } }
+{ $values { "name" string } { "vocab" "a vocabulary specifier" } }
 { $description "If the vocabulary is loaded, outputs the corresponding " { $link vocab } " instance, otherwise creates a new " { $link vocab-link } "." } ;
