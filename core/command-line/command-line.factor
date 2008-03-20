@@ -7,12 +7,12 @@ splitting io.files ;
 
 : run-bootstrap-init ( -- )
     "user-init" get [
-        home ".factor-boot-rc" path+ ?run-file
+        home ".factor-boot-rc" append-path ?run-file
     ] when ;
 
 : run-user-init ( -- )
     "user-init" get [
-        home ".factor-rc" path+ ?run-file
+        home ".factor-rc" append-path ?run-file
     ] when ;
 
 : cli-var-param ( name value -- ) swap set-global ;

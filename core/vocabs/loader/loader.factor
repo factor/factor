@@ -25,7 +25,7 @@ V{
 
 : vocab-dir? ( root name -- ? )
     over [
-        ".factor" vocab-dir+ path+ resource-exists?
+        ".factor" vocab-dir+ append-path resource-exists?
     ] [
         2drop f
     ] if ;
@@ -39,14 +39,14 @@ H{ } clone root-cache set-global
         vocab-roots get swap [ vocab-dir? ] curry find nip
     ] cache ;
 
-: vocab-path+ ( vocab path -- newpath )
-    swap find-vocab-root dup [ swap path+ ] [ 2drop f ] if ;
+: vocab-append-path ( vocab path -- newpath )
+    swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
 
 : vocab-source-path ( vocab -- path/f )
-    dup ".factor" vocab-dir+ vocab-path+ ;
+    dup ".factor" vocab-dir+ vocab-append-path ;
 
 : vocab-docs-path ( vocab -- path/f )
-    dup "-docs.factor" vocab-dir+ vocab-path+ ;
+    dup "-docs.factor" vocab-dir+ vocab-append-path ;
 
 SYMBOL: load-help?
 

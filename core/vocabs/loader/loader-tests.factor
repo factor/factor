@@ -136,7 +136,7 @@ IN: vocabs.loader.tests
     [
         { "2" "a" "b" "d" "e" "f" }
         [
-            "vocabs.loader.test." swap append forget-vocab
+            "vocabs.loader.test." prepend forget-vocab
         ] each
     ] with-compilation-unit ;
 

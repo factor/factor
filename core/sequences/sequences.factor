@@ -299,6 +299,8 @@ M: immutable-sequence clone-like like ;
 
 : append ( seq1 seq2 -- newseq ) over (append) ;
 
+: prepend ( seq1 seq2 -- newseq ) swap append ; inline
+
 : 3append ( seq1 seq2 seq3 -- newseq ) pick (3append) ;
 
 : change-nth ( i seq quot -- )

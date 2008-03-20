@@ -35,7 +35,7 @@ IN: optimizer.specializers
     swap "method-class" word-prop add* ;
 
 : specialize-method ( quot method -- quot' )
-    method-declaration [ declare ] curry swap append ;
+    method-declaration [ declare ] curry prepend ;
 
 : specialize-quot ( quot specializer -- quot' )
     dup { number } = [
