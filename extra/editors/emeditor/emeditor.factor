@@ -4,7 +4,7 @@ IN: editors.emeditor
 
 : emeditor-path ( -- path )
     \ emeditor-path get-global [
-        program-files "\\EmEditor\\EmEditor.exe" path+
+        program-files "\\EmEditor\\EmEditor.exe" append-path
     ] unless* ;
 
 : emeditor ( file line -- )

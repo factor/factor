@@ -4,7 +4,7 @@ IN: editors.ted-notepad
 
 : ted-notepad-path
     \ ted-notepad-path get-global [
-        program-files "\\TED Notepad\\TedNPad.exe" path+
+        program-files "\\TED Notepad\\TedNPad.exe" append-path
     ] unless* ;
 
 : ted-notepad ( file line -- )

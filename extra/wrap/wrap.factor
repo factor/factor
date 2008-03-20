@@ -29,4 +29,4 @@ SYMBOL: width
     broken-lines "\n" join ;
 
 : indented-break ( string width indent -- newstring )
-    [ length - broken-lines ] keep [ swap append ] curry map "\n" join ;
+    [ length - broken-lines ] keep [ prepend ] curry map "\n" join ;

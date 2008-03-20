@@ -70,7 +70,7 @@ MACRO: spread ( seq -- )
   dup
     [ drop [ >r ] ]        map concat
   swap
-    [ [ r> ] swap append ] map concat
+    [ [ r> ] prepend ] map concat
   append ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

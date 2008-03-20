@@ -75,11 +75,11 @@ MACRO: && ( quots -- ? )
     [ [ not ] append [ f ] ] t short-circuit ;
 
 MACRO: <-&& ( quots -- )
-    [ [ dup ] swap append [ not ] append [ f ] ] t short-circuit
+    [ [ dup ] prepend [ not ] append [ f ] ] t short-circuit
     [ nip ] append ;
 
 MACRO: <--&& ( quots -- )
-    [ [ 2dup ] swap append [ not ] append [ f ] ] t short-circuit
+    [ [ 2dup ] prepend [ not ] append [ f ] ] t short-circuit
     [ 2nip ] append ;
 
 MACRO: || ( quots -- ? ) [ [ t ] ] f short-circuit ;
@@ -130,12 +130,12 @@ MACRO: map-call-with ( quots -- )
     [ (make-call-with) ] keep length [ narray ] curry compose ;
 
 : (make-call-with2) ( quots -- quot )
-    [ [ 2dup >r >r ] swap append [ r> r> ] append ] map concat
+    [ [ 2dup >r >r ] prepend [ r> r> ] append ] map concat
     [ 2drop ] append ;
 
 MACRO: map-call-with2 ( quots -- )
     [
-        [ [ 2dup >r >r ] swap append [ r> r> ] append ] map concat
+        [ [ 2dup >r >r ] prepend [ r> r> ] append ] map concat
         [ 2drop ] append    
     ] keep length [ narray ] curry append ;
 

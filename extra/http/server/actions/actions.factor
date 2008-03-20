@@ -5,7 +5,7 @@ http.server http.server.validators http hashtables namespaces
 combinators.cleave fry continuations locals ;
 IN: http.server.actions
 
-SYMBOL: +path+
+SYMBOL: +append-path
 
 SYMBOL: params
 
@@ -40,7 +40,7 @@ TUPLE: action init display submit get-params post-params ;
 M: action call-responder ( path action -- response )
     '[
         , ,
-        [ +path+ associate request-params union params set ]
+        [ +append-path associate request-params union params set ]
         [ action set ] bi*
         request get method>> {
             { "GET" [ handle-get ] }

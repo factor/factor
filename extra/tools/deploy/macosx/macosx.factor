@@ -10,15 +10,15 @@ IN: tools.deploy.macosx
     vm parent-directory parent-directory ;
 
 : copy-bundle-dir ( bundle-name dir -- )
-    bundle-dir over path+ -rot
-    "Contents" swap path+ path+ copy-tree ;
+    bundle-dir over append-path -rot
+    "Contents" prepend-path append-path copy-tree ;
 
 : copy-vm ( executable bundle-name -- vm )
-    "Contents/MacOS/" path+ swap path+ vm over copy-file ;
+    "Contents/MacOS/" append-path prepend-path vm over copy-file ;
 
 : copy-fonts ( name -- )
     "fonts/" resource-path
-    swap "Contents/Resources/" path+ copy-tree-into ;
+    swap "Contents/Resources/" append-path copy-tree-into ;
 
 : app-plist ( executable bundle-name -- string )
     [
@@ -30,12 +30,12 @@ IN: tools.deploy.macosx
         file-name "CFBundleName" set
 
         dup "CFBundleExecutable" set
-        "org.factor." swap append "CFBundleIdentifier" set
+        "org.factor." prepend "CFBundleIdentifier" set
     ] H{ } make-assoc plist>string ;
 
 : create-app-plist ( vocab bundle-name -- )
     [ app-plist ] keep
-    "Contents/Info.plist" path+
+    "Contents/Info.plist" append-path
     utf8 set-file-contents ;
 
 : create-app-dir ( vocab bundle-name -- vm )

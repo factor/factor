@@ -22,15 +22,15 @@ IN: io.windows.nt.tests
 
 [ "\\\\?\\C:\\builds\\factor\\log.txt" ] [
     "C:\\builds\\factor\\12345\\"
-    "..\\log.txt" windows-path+
+    "..\\log.txt" windows-append-path
 ] unit-test
 
 [ "\\\\?\\C:\\builds\\" ] [
     "C:\\builds\\factor\\12345\\"
-    "..\\.." windows-path+
+    "..\\.." windows-append-path
 ] unit-test
 
 [ "\\\\?\\C:\\builds\\" ] [
     "C:\\builds\\factor\\12345\\"
-    "..\\.." windows-path+
+    "..\\.." windows-append-path
 ] unit-test
