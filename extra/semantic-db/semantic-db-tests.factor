@@ -14,15 +14,13 @@ SYMBOL: has-parent-relation
 delete-db
 
 test-db [
-    create-node-table create-arc-table
+    node create-table arc create-table
     [ 1 ] [ "first node" create-node ] unit-test
     [ 2 ] [ "second node" create-node ] unit-test
     [ 3 ] [ "third node" create-node ] unit-test
     [ 4 ] [ f create-node ] unit-test
     [ 5 ] [ 1 2 3 create-arc ] unit-test
-] with-db
-
-delete-db
+] with-db delete-db
 
 test-db [
     init-semantic-db
@@ -35,20 +33,7 @@ test-db [
     [ 7 ] [ "has parent" context get relation-id ] unit-test
     [ "has parent" ] [ "has parent" context get relation-id node-content ] unit-test
     [ "test content" ] [ context get node-content ] unit-test
-    ! type-type 1array [ "type" ensure-type ] unit-test
-    ! [ { 1 2 3 } ] [ type-type select-nodes-of-type ] unit-test
-    ! [ 1 ] [ type-type select-node-of-type ] unit-test
-    ! [ t ] [ "content" ensure-type integer? ] unit-test
-    ! [ t ] [ "content" ensure-type "content" ensure-type = ] unit-test
-    ! [ t ] [ "content" ensure-type "first content" create-node-of-type integer? ] unit-test
-    ! [ t ] [ "content" ensure-type select-node-of-type integer? ] unit-test
-    ! [ t ] [ "content" ensure-type "first content" select-node-of-type-with-content integer? ] unit-test
-    ! [ t ] [ "content" ensure-type "first content" ensure-node-of-type integer? ] unit-test
-    ! [ t ] [ "content" ensure-type "second content" ensure-node-of-type integer? ] unit-test
-    ! [ 2 ] [ "content" ensure-type select-nodes-of-type length ] unit-test
-] with-db
-
-delete-db
+] with-db delete-db
 
 ! test hierarchy
 test-db [
@@ -68,6 +53,12 @@ test-db [
     [ "fran" { "charlie" } ] [ "fran" get has-parent-relation get get-node-hierarchy dup tree-id node-content swap tree-children [ tree-id node-content ] map ] unit-test
     [ { "adam" "eve" } ] [ "charlie" get has-parent-relation get get-root-nodes [ node-content ] map natural-sort >array ] unit-test
     [ { } ] [ "fran" get "charlie" get tuck has-parent-relation get un-parent-child has-parent-relation get parents [ node-content ] map ] unit-test
-] with-db
+] with-db delete-db
 
-delete-db
+RELATION: test-relation
+
+test-db [
+    init-semantic-db
+    [ 5 ] [ test-relation ] unit-test
+] with-db delete-db
+
