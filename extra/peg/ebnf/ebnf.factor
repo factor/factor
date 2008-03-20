@@ -9,6 +9,7 @@ IN: peg.ebnf
 TUPLE: ebnf-non-terminal symbol ;
 TUPLE: ebnf-terminal symbol ;
 TUPLE: ebnf-any-character ;
+TUPLE: ebnf-range pattern ;
 TUPLE: ebnf-ensure-not group ;
 TUPLE: ebnf-choice options ;
 TUPLE: ebnf-sequence elements ;
@@ -22,6 +23,7 @@ TUPLE: ebnf rules ;
 C: <ebnf-non-terminal> ebnf-non-terminal
 C: <ebnf-terminal> ebnf-terminal
 C: <ebnf-any-character> ebnf-any-character
+C: <ebnf-range> ebnf-range
 C: <ebnf-ensure-not> ebnf-ensure-not
 C: <ebnf-choice> ebnf-choice
 C: <ebnf-sequence> ebnf-sequence
@@ -68,6 +70,9 @@ M: ebnf-non-terminal (generate-parser) ( ast -- id )
 
 M: ebnf-any-character (generate-parser) ( ast -- id )
   drop [ drop t ] satisfy store-parser ;
+
+M: ebnf-range (generate-parser) ( ast -- id )
+  ebnf-range-pattern range-pattern store-parser ;
 
 M: ebnf-choice (generate-parser) ( ast -- id )
   ebnf-choice-options [
@@ -163,6 +168,14 @@ DEFER: 'rhs'
 : 'any-character' ( -- parser )
   #! A parser to match the symbol for any character match.
   [ CHAR: . = ] satisfy [ drop <ebnf-any-character> ] action ;
+
+: 'range-parser' ( -- parser )
+  #! Match the syntax for declaring character ranges
+  [
+    "[" syntax ,
+    [ CHAR: ] = not ] satisfy repeat1 , 
+    "]" syntax ,
+  ] seq* [ first >string <ebnf-range> ] action ;
  
 : 'element' ( -- parser )
   #! An element of a rule. It can be a terminal or a 
@@ -173,6 +186,7 @@ DEFER: 'rhs'
     [ 
       'non-terminal' ,
       'terminal' ,
+      'range-parser' ,
       'any-character' ,
     ] choice* ,
     "=" syntax ensure-not ,

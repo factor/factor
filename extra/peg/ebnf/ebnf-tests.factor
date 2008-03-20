@@ -119,3 +119,27 @@ IN: peg.ebnf.tests
 { V{ 1 2 } } [
   "foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]]" ebnf>quot with-compilation-unit "ab" foo parse parse-result-ast 
 ] unit-test
+
+{ CHAR: A } [
+  "foo=[A-Z]" ebnf>quot with-compilation-unit "A" foo parse parse-result-ast 
+] unit-test
+
+{ CHAR: Z } [
+  "foo=[A-Z]" ebnf>quot with-compilation-unit "Z" foo parse parse-result-ast 
+] unit-test
+
+{ f } [
+  "foo=[A-Z]" ebnf>quot with-compilation-unit "0" foo parse  
+] unit-test
+
+{ CHAR: 0 } [
+  "foo=[^A-Z]" ebnf>quot with-compilation-unit "0" foo parse parse-result-ast 
+] unit-test
+
+{ f } [
+  "foo=[^A-Z]" ebnf>quot with-compilation-unit "A" foo parse  
+] unit-test
+
+{ f } [
+  "foo=[^A-Z]" ebnf>quot with-compilation-unit "Z" foo parse  
+] unit-test
