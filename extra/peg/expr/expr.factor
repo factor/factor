@@ -10,13 +10,13 @@ IN: peg.expr
  swap [ first2 swap call ] reduce ;
 
 EBNF: expr 
-times    = ("*") [[ drop [ * ] ]]
-divide   = ("/") [[ drop [ / ] ]]
-add      = ("+") [[ drop [ + ] ]]
-subtract = ("-") [[ drop [ - ] ]]
+times    = "*" [[ drop [ * ] ]]
+divide   = "/" [[ drop [ / ] ]]
+add      = "+" [[ drop [ + ] ]]
+subtract = "-" [[ drop [ - ] ]]
 
-digit    = ([0-9]) [[ digit> ]]
-number   = ((digit)+) [[ unclip [ swap 10 * + ] reduce ]]
+digit    = [0-9] [[ digit> ]]
+number   = (digit)+ [[ unclip [ swap 10 * + ] reduce ]]
 
 value    = number | ("(" expr ")") [[ second ]] 
 product = (value ((times | divide) value)*) [[ first2 operator-fold ]]
