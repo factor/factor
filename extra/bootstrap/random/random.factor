@@ -1,5 +1,6 @@
 USING: vocabs.loader sequences system
-random random.mersenne-twister ;
+random random.mersenne-twister combinators init
+namespaces ;
 
 "random.mersenne-twister" require
 

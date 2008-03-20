@@ -18,9 +18,9 @@ M: circular length circular-seq length ;
 
 M: circular virtual@ circular-wrap circular-seq ;
 
-M: circular nth bounds-check virtual@ nth ;
+M: circular nth virtual@ nth ;
 
-M: circular set-nth bounds-check virtual@ set-nth ;
+M: circular set-nth virtual@ set-nth ;
 
 : change-circular-start ( n circular -- )
     #! change start to (start + n) mod length
