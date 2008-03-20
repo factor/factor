@@ -108,6 +108,7 @@ MEMO: (vocab-file-contents) ( path -- lines )
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-append-path [
         ?resource-path utf8 set-file-lines
+        \ (vocab-file-contents) reset-memoized
     ] [
         "The " swap vocab-name
         " vocabulary was not loaded from the file system"
