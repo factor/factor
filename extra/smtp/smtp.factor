@@ -125,7 +125,7 @@ M: email clone
 : message-id ( -- string )
     [
         "<" %
-        2 big-random #
+        64 random-bits #
         "-" %
         millis #
         "@" %
