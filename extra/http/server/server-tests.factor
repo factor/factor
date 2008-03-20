@@ -1,5 +1,5 @@
 USING: http.server tools.test kernel namespaces accessors
-new-slots io http math sequences assocs ;
+io http math sequences assocs ;
 IN: http.server.tests
 
 [

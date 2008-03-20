@@ -4,11 +4,11 @@
 USING: namespaces io io.timeouts kernel logging io.sockets
 sequences combinators sequences.lib splitting assocs strings
 math.parser random system calendar io.encodings.ascii
-calendar.format new-slots accessors ;
+calendar.format accessors ;
 IN: smtp
 
 SYMBOL: smtp-domain
-SYMBOL: smtp-server     "localhost" 25 <inet> smtp-server set-global
+SYMBOL: smtp-server     "localhost" "smtp" <inet> smtp-server set-global
 SYMBOL: read-timeout    1 minutes read-timeout set-global
 SYMBOL: esmtp           t esmtp set-global
 
@@ -25,8 +25,10 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 
 : crlf "\r\n" write ;
 
+: command ( string -- ) write crlf flush ;
+
 : helo ( -- )
-    esmtp get "EHLO " "HELO " ? write host-name write crlf ;
+    esmtp get "EHLO " "HELO " ? host-name append command ;
 
 : validate-address ( string -- string' )
     #! Make sure we send funky stuff to the server by accident.
@@ -34,13 +36,13 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
     [ "Bad e-mail address: " prepend throw ] unless ;
 
 : mail-from ( fromaddr -- )
-    "MAIL FROM:<" write validate-address write ">" write crlf ;
+    "MAIL FROM:<" swap validate-address ">" 3append command ;
 
 : rcpt-to ( to -- )
-    "RCPT TO:<" write validate-address write ">" write crlf ;
+    "RCPT TO:<" swap validate-address ">" 3append command ;
 
 : data ( -- )
-    "DATA" write crlf ;
+    "DATA" command ;
 
 : validate-message ( msg -- msg' )
     "." over member? [ "Message cannot contain . on a line by itself" throw ] when ;
@@ -49,10 +51,10 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
     string-lines
     validate-message
     [ write crlf ] each
-    "." write crlf ;
+    "." command ;
 
 : quit ( -- )
-    "QUIT" write crlf ;
+    "QUIT" command ;
 
 LOG: smtp-response DEBUG
 
@@ -85,7 +87,7 @@ LOG: smtp-response DEBUG
     readln
     dup multiline? [ 3 head process-multiline ] when ;
 
-: get-ok ( -- ) flush receive-response check-response ;
+: get-ok ( -- ) receive-response check-response ;
 
 : validate-header ( string -- string' )
     dup "\r\n" seq-intersect empty?

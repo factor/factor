@@ -12,15 +12,11 @@ $nl
 "The " { $snippet "\"slots\"" } " word property of built-in and tuple classes holds an array of " { $emphasis "slot specifiers" } " describing the slot layout of each instance."
 { $subsection slot-spec }
 "Each slot has a reader word; mutable slots have an optional writer word. All tuple slots are mutable, but some slots on built-in classes are not."
-{ $subsection slot-spec-reader }
-{ $subsection slot-spec-writer }
-"Given a reader or writer word and a class, it is possible to find the slot specifier corresponding to this word:"
-{ $subsection slot-of-reader }
-{ $subsection slot-of-writer }
-"Reader and writer words form classes:"
-{ $subsection slot-reader }
-{ $subsection slot-writer }
-"Slot readers and writers type check, then call unsafe primitives:"
+{ $subsection reader-word }
+{ $subsection writer-word }
+{ $subsection setter-word }
+{ $subsection changer-word }
+"Slot methods type check, then call unsafe primitives:"
 { $subsection slot }
 { $subsection set-slot } ;
 
@@ -59,17 +55,7 @@ $low-level-note ;
 
 HELP: reader-effect
 { $values { "class" class } { "spec" slot-spec } { "effect" "an instance of " { $link effect } } }
-{ $description "The stack effect of slot reader words is " { $snippet "( obj -- value )" } "." } ;
-
-HELP: reader-quot
-{ $values { "decl" class } { "quot" "a quotation with stack effect " { $snippet "( obj n -- value )" } } }
-{ $description "Outputs a quotation which reads the " { $snippet "n" } "th slot of an object and declares it as an instance of a class." } ;
-
-HELP: slot-reader
-{ $class-description "The class of slot reader words." }
-{ $examples
-    { $example "USING: classes prettyprint slots ;" "TUPLE: circle center radius ;" "\\ circle-center slot-reader? ." "t" }
-} ;
+{ $description "The stack effect of slot reader words is " { $snippet "( object -- value )" } "." } ;
 
 HELP: define-reader
 { $values { "class" class } { "spec" slot-spec } }
@@ -80,31 +66,20 @@ HELP: writer-effect
 { $values { "class" class } { "spec" slot-spec } { "effect" "an instance of " { $link effect } } }
 { $description "The stack effect of slot writer words is " { $snippet "( value obj -- )" } "." } ;
 
-HELP: slot-writer
-{ $class-description "The class of slot writer words." }
-{ $examples
-    { $example "USING: classes prettyprint slots ;" "TUPLE: circle center radius ;" "\\ set-circle-center slot-writer? ." "t" }
-} ;
-
 HELP: define-writer
 { $values { "class" class } { "spec" slot-spec } }
 { $description "Defines a generic word " { $snippet "writer" } " to write a new value to a slot in instances of " { $snippet "class" } "." }
 $low-level-note ;
 
-HELP: define-slot
+HELP: define-slot-methods
 { $values { "class" class } { "spec" slot-spec } }
 { $description "Defines a pair of generic words for reading and writing a slot value in instances of " { $snippet "class" } "." }
 $low-level-note ;
 
-HELP: define-slots
+HELP: define-accessors
 { $values { "class" class } { "specs" "a sequence of " { $link slot-spec } " instances" } }
-{ $description "Defines a set of slot reader/writer words." }
+{ $description "Defines slot methods." }
 $low-level-note ;
-
-HELP: simple-slots
-{ $values { "class" class } { "slots" "a sequence of strings" } { "base" "a slot number" } { "specs" "a sequence of " { $link slot-spec } " instances" } }
-{ $description "Constructs a slot specification for " { $link define-slots } " where each slot is named by an element of " { $snippet "slots" } " prefixed by the name of the class. Slots are numbered consecutively starting from " { $snippet "base" } ". Reader and writer words are defined in the current vocabulary, with the reader word having the same name as the slot, and the writer word name prefixed by " { $snippet "\"set-\"" } "." }
-{ $notes "This word is used by " { $link define-tuple-class } " and " { $link POSTPONE: TUPLE: } "." } ;
 
 HELP: slot ( obj m -- value )
 { $values { "obj" object } { "m" "a non-negative fixnum" } { "value" object } }
@@ -116,18 +91,6 @@ HELP: set-slot ( value obj n -- )
 { $description "Writes " { $snippet "value" } " to the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
 { $warning "This word is in the " { $vocab-link "slots.private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
-HELP: slot-of-reader
-{ $values { "reader" slot-reader } { "specs" "a sequence of " { $link slot-spec } " instances" } { "spec/f" "a " { $link slot-spec } " or " { $link f } } }
-{ $description "Outputs the " { $link slot-spec } " whose " { $link slot-spec-reader } " is equal to " { $snippet "reader" } "." } ;
-
-HELP: slot-of-writer
-{ $values { "writer" slot-writer } { "specs" "a sequence of " { $link slot-spec } " instances" } { "spec/f" "a " { $link slot-spec } " or " { $link f } } }
-{ $description "Outputs the " { $link slot-spec } " whose " { $link slot-spec-writer } " is equal to " { $snippet "writer" } "." } ;
-
-HELP: reader-word
-{ $values { "class" string } { "name" string } { "vocab" string } { "word" word } }
-{ $description "Creates a word named " { $snippet { $emphasis "class" } "-" { $emphasis "name" } } " in the " { $snippet "vocab" } " vocabulary." } ;
-
-HELP: writer-word
-{ $values { "class" string } { "name" string } { "vocab" string } { "word" word } }
-{ $description "Creates a word named " { $snippet "set-" { $emphasis "class" } "-" { $emphasis "name" } } " in the " { $snippet "vocab" } " vocabulary." } ;
+HELP: slot-named
+{ $values { "name" string } { "specs" "a sequence of " { $link slot-spec } " instances" } { "spec/f" "a " { $link slot-spec } " or " { $link f } } }
+{ $description "Outputs the " { $link slot-spec } " with the given name." } ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel new-slots accessors random math.parser locals
+USING: kernel accessors random math.parser locals
 sequences math crypto.sha2 ;
 IN: http.server.auth.providers
 

@@ -3,7 +3,7 @@
 
 USING: arrays kernel math math.functions namespaces sequences
 strings tuples system vocabs.loader calendar.backend threads
-new-slots accessors combinators locals ;
+accessors combinators locals ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;

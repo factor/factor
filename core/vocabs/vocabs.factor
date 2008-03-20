@@ -7,8 +7,7 @@ IN: vocabs
 SYMBOL: dictionary
 
 TUPLE: vocab
-name root
-words
+name words
 main help
 source-loaded? docs-loaded? ;
 

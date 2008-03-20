@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs new-slots accessors http.server.sessions.storage
+USING: assocs accessors http.server.sessions.storage
 alarms kernel http.server db.tuples db.types singleton
 combinators.cleave math.parser ;
 IN: http.server.sessions.storage.db
