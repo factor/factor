@@ -5,7 +5,7 @@ inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
 definitions prettyprint hashtables combinators.lib
 prettyprint.sections sequences.private effects generic
-compiler.units combinators.cleave ;
+compiler.units combinators.cleave new-slots accessors ;
 IN: locals
 
 ! Inspired by
@@ -17,11 +17,15 @@ TUPLE: lambda vars body ;
 
 C: <lambda> lambda
 
-TUPLE: let bindings vars body ;
+TUPLE: let bindings body ;
 
 C: <let> let
 
-TUPLE: wlet bindings vars body ;
+TUPLE: let* bindings body ;
+
+C: <let*> let*
+
+TUPLE: wlet bindings body ;
 
 C: <wlet> wlet
 
@@ -137,7 +141,7 @@ M: object free-vars drop { } ;
 M: quotation free-vars { } [ add-if-free ] reduce ;
 
 M: lambda free-vars
-    dup lambda-vars swap lambda-body free-vars seq-diff ;
+    dup vars>> swap body>> free-vars seq-diff ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! lambda-rewrite
@@ -164,12 +168,12 @@ M: callable block-body ;
 M: callable local-rewrite*
     [ [ local-rewrite* ] each ] [ ] make , ;
 
-M: lambda block-vars lambda-vars ;
+M: lambda block-vars vars>> ;
 
-M: lambda block-body lambda-body ;
+M: lambda block-body body>> ;
 
 M: lambda local-rewrite*
-    dup lambda-vars swap lambda-body
+    dup vars>> swap body>>
     [ local-rewrite* \ call , ] [ ] make <lambda> , ;
 
 M: block lambda-rewrite*
@@ -187,24 +191,18 @@ M: object local-rewrite* , ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: make-locals ( seq -- words assoc )
-    [
-        "!" ?tail [ <local-reader> ] [ <local> ] if
-    ] map dup [
-        dup
-        [ dup word-name set ] each
-        [
-            dup local-reader? [
-                <local-writer> dup word-name set
-            ] [
-                drop
-            ] if
-        ] each
-    ] H{ } make-assoc ;
+: make-local ( name -- word )
+    "!" ?tail [
+        <local-reader>
+        dup <local-writer> dup word-name set
+    ] [ <local> ] if
+    dup dup word-name set ;
 
-: make-local-words ( seq -- words assoc )
-    [ dup <local-word> ] { } map>assoc
-    dup values swap ;
+: make-locals ( seq -- words assoc )
+    [ [ make-local ] map ] H{ } make-assoc ;
+
+: make-local-word ( name -- word )
+    <local-word> dup dup word-name set ;
 
 : push-locals ( assoc -- )
     use get push ;
@@ -213,41 +211,75 @@ M: object local-rewrite* , ;
     use get delete ;
 
 : (parse-lambda) ( assoc end -- quot )
-    over push-locals parse-until >quotation swap pop-locals ;
+    parse-until >quotation swap pop-locals ;
 
 : parse-lambda ( -- lambda )
-    "|" parse-tokens make-locals \ ] (parse-lambda) <lambda> ;
+    "|" parse-tokens make-locals dup push-locals
+    \ ] (parse-lambda) <lambda> ;
 
-: (parse-bindings) ( -- )
+: parse-binding ( -- pair/f )
     scan dup "|" = [
-        drop
+        drop f
     ] [
         scan {
             { "[" [ \ ] parse-until >quotation ] }
             { "[|" [ parse-lambda ] }
-        } case 2array ,
-        (parse-bindings)
+        } case 2array
     ] if ;
 
-: parse-bindings ( -- alist )
-    scan "|" assert= [ (parse-bindings) ] { } make dup keys ;
+: (parse-bindings) ( -- )
+    parse-binding [
+        first2 >r make-local r> 2array ,
+        (parse-bindings)
+    ] when* ;
+
+: parse-bindings ( -- bindings vars )
+    [
+        [ (parse-bindings) ] H{ } make-assoc
+        dup push-locals
+    ] { } make swap ;
+
+: parse-bindings* ( -- words assoc )
+    [
+        [
+            namespace push-locals
+
+            (parse-bindings)
+        ] { } make-assoc
+    ] { } make swap ;
+
+: (parse-wbindings) ( -- )
+    parse-binding [
+        first2 >r make-local-word r> 2array ,
+        (parse-wbindings)
+    ] when* ;
+
+: parse-wbindings ( -- bindings vars )
+    [
+        [ (parse-wbindings) ] H{ } make-assoc
+        dup push-locals
+    ] { } make swap ;
+
+: let-rewrite ( body bindings -- )
+    <reversed> [
+        >r 1array r> spin <lambda> [ call ] curry compose
+    ] assoc-each local-rewrite* \ call , ;
 
 M: let local-rewrite*
-    { let-bindings let-vars let-body } get-slots -rot
-    [ <reversed> ] 2apply
-    [
-        1array -rot second -rot <lambda>
-        [ call ] curry compose
-    ] 2each local-rewrite* \ call , ;
+    { body>> bindings>> } get-slots let-rewrite ;
+
+M: let* local-rewrite*
+    { body>> bindings>> } get-slots let-rewrite ;
 
 M: wlet local-rewrite*
-    dup wlet-bindings values over wlet-vars rot wlet-body
-    <lambda> [ call ] curry compose local-rewrite* \ call , ;
+    { body>> bindings>> } get-slots
+    [ [ ] curry ] assoc-map
+    let-rewrite ;
 
-: parse-locals
+: parse-locals ( -- vars assoc )
     parse-effect
     word [ over "declared-effect" set-word-prop ] when*
-    effect-in make-locals ;
+    effect-in make-locals dup push-locals ;
 
 : parse-locals-definition ( word -- word quot )
     scan "(" assert= parse-locals \ ; (parse-lambda) <lambda>
@@ -263,14 +295,17 @@ PRIVATE>
 : [| parse-lambda parsed ; parsing
 
 : [let
-    parse-bindings
-    make-locals \ ] (parse-lambda)
-    <let> parsed ; parsing
+    scan "|" assert= parse-bindings
+\ ] (parse-lambda) <let> parsed ; parsing
+
+: [let*
+    scan "|" assert= parse-bindings*
+    >r \ ] parse-until >quotation <let*> parsed r> pop-locals ;
+    parsing
 
 : [wlet
-    parse-bindings
-    make-local-words \ ] (parse-lambda)
-    <wlet> parsed ; parsing
+    scan "|" assert= parse-wbindings
+    \ ] (parse-lambda) <wlet> parsed ; parsing
 
 MACRO: with-locals ( form -- quot ) lambda-rewrite ;
 
@@ -297,31 +332,30 @@ SYMBOL: |
 M: lambda pprint*
     <flow
     \ [| pprint-word
-    dup lambda-vars pprint-vars
+    dup vars>> pprint-vars
     \ | pprint-word
-    f <inset lambda-body pprint-elements block>
+    f <inset body>> pprint-elements block>
     \ ] pprint-word
     block> ;
 
-: pprint-let ( body vars bindings -- )
+: pprint-let ( let word -- )
+    pprint-word
+    { body>> bindings>> } get-slots
     \ | pprint-word
     t <inset
     <block
-    values [ <block >r pprint-var r> pprint* block> ] 2each
+    [ <block >r pprint-var r> pprint* block> ] assoc-each
     block>
     \ | pprint-word
     <block pprint-elements block>
-    block> ;
-
-M: let pprint*
-    \ [let pprint-word
-    { let-body let-vars let-bindings } get-slots pprint-let
+    block>
     \ ] pprint-word ;
 
-M: wlet pprint*
-    \ [wlet pprint-word
-    { wlet-body wlet-vars wlet-bindings } get-slots pprint-let
-    \ ] pprint-word ;
+M: let pprint* \ [let pprint-let ;
+
+M: wlet pprint* \ [wlet pprint-let ;
+
+M: let* pprint* \ [let* pprint-let ;
 
 PREDICATE: word lambda-word
     "lambda" word-prop >boolean ;
@@ -329,7 +363,7 @@ PREDICATE: word lambda-word
 M: lambda-word definer drop \ :: \ ; ;
 
 M: lambda-word definition
-    "lambda" word-prop lambda-body ;
+    "lambda" word-prop body>> ;
 
 : lambda-word-synopsis ( word -- )
     dup definer.
@@ -345,7 +379,7 @@ PREDICATE: macro lambda-macro
 M: lambda-macro definer drop \ MACRO:: \ ; ;
 
 M: lambda-macro definition
-    "lambda" word-prop lambda-body ;
+    "lambda" word-prop body>> ;
 
 M: lambda-macro synopsis* lambda-word-synopsis ;
 
@@ -355,10 +389,10 @@ PREDICATE: method-body lambda-method
 M: lambda-method definer drop \ M:: \ ; ;
 
 M: lambda-method definition
-    "lambda" word-prop lambda-body ;
+    "lambda" word-prop body>> ;
 
 : method-stack-effect ( method -- effect )
-    dup "lambda" word-prop lambda-vars
+    dup "lambda" word-prop vars>>
     swap "method-generic" word-prop stack-effect
     dup [ effect-out ] when
     <effect> ;

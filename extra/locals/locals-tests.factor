@@ -195,3 +195,36 @@ DEFER: xyzzy
 ] unit-test
 
 [ 5 ] [ 10 xyzzy ] unit-test
+
+:: let*-test-1 ( a -- b )
+    [let* | b [ a 1+ ]
+            c [ b 1+ ] |
+        a b c 3array ] ;
+
+[ { 1 2 3 } ] [ 1 let*-test-1 ] unit-test
+
+:: let*-test-2 ( a -- b )
+    [let* | b [ a 1+ ]
+            c! [ b 1+ ] |
+        a b c 3array ] ;
+
+[ { 1 2 3 } ] [ 1 let*-test-2 ] unit-test
+
+:: let*-test-3 ( a -- b )
+    [let* | b [ a 1+ ]
+            c! [ b 1+ ] |
+        c 1+ c!  a b c 3array ] ;
+
+[ { 1 2 4 } ] [ 1 let*-test-3 ] unit-test
+
+:: let*-test-4 ( a b -- c d )
+    [let | a [ b ]
+           b [ a ] |
+        [let* | a'  [ a  ]
+                a'' [ a' ]
+                b'  [ b  ]
+                b'' [ b' ] |
+            a'' b'' ] ] ;
+
+[ "xxx" "yyy" ] [ "yyy" "xxx" let*-test-4 ] unit-test
+
