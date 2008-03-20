@@ -4,10 +4,6 @@
 USING: kernel tools.test strings namespaces arrays sequences peg peg.private ;
 IN: peg.tests
 
-{ 0 1 2 } [
-  0 next-id set-global get-next-id get-next-id get-next-id 
-] unit-test
-
 { f } [
   "endbegin" "begin" token parse
 ] unit-test
