@@ -16,9 +16,8 @@ divide   = ("/") [[ drop [ / ] ]]
 add      = ("+") [[ drop [ + ] ]]
 subtract = ("-") [[ drop [ - ] ]]
 
-digit    = "0" | "1" | "2" | "3" | "4" |
-           "5" | "6" | "7" | "8" | "9" 
-number   = ((digit)+) [[ concat string>number ]]
+digit    = ([0-9]) [[ digit> ]]
+number   = ((digit)+) [[ unclip [ swap 10 * + ] reduce ]]
 
 value    = number | ("(" expr ")") [[ second ]] 
 product = (value ((times | divide) value)*) [[ first2 operator-fold ]]
