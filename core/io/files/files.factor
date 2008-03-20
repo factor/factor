@@ -190,7 +190,7 @@ DEFER: copy-tree-into
 
 ! Special paths
 : resource-path ( path -- newpath )
-    \ resource-path get [ image parent-directory ] unless*
+    "resource-path" get [ image parent-directory ] unless*
     prepend-path ;
 
 : ?resource-path ( path -- newpath )
