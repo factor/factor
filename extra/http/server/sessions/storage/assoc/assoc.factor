@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs assocs.lib new-slots accessors
+USING: assocs assocs.lib accessors
 http.server.sessions.storage combinators.cleave alarms kernel
 fry http.server ;
 IN: http.server.sessions.storage.assoc

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs calendar kernel math.parser namespaces random
-new-slots accessors http http.server
+accessors http http.server
 http.server.sessions.storage http.server.sessions.storage.assoc
 quotations hashtables sequences fry combinators.cleave
 html.elements symbols continuations destructors ;

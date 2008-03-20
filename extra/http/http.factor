@@ -3,7 +3,7 @@
 USING: fry hashtables io io.streams.string kernel math
 namespaces math.parser assocs sequences strings splitting ascii
 io.encodings.utf8 io.encodings.string namespaces unicode.case
-combinators vectors sorting new-slots accessors calendar
+combinators vectors sorting accessors calendar
 calendar.format quotations arrays combinators.cleave
 combinators.lib byte-arrays ;
 IN: http

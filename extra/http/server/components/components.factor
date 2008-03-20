@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: new-slots html.elements http.server.validators accessors
+USING: html.elements http.server.validators accessors
 namespaces kernel io math.parser assocs classes words tuples
 arrays sequences io.files http.server.templating.fhtml
 http.server.actions splitting mirrors hashtables

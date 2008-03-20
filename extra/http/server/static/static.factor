@@ -3,7 +3,7 @@
 USING: calendar html io io.files kernel math math.parser http
 http.server namespaces parser sequences strings assocs
 hashtables debugger http.mime sorting html.elements logging
-calendar.format new-slots accessors io.encodings.binary
+calendar.format accessors io.encodings.binary
 combinators.cleave fry ;
 IN: http.server.static
 
