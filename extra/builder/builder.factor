@@ -86,7 +86,7 @@ IN: builder
     +closed+         >>stdin
     "../test-log"    >>stdout
     +stdout+         >>stderr
-    45 minutes       >>timeout ;
+    120 minutes      >>timeout ;
 
 : do-builder-test ( -- )
   builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail ;
