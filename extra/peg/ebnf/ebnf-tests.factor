@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.ebnf compiler.units ;
+USING: kernel tools.test peg peg.ebnf ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -109,13 +109,37 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { V{ "a" "b" } } [
-  "foo='a' 'b'" ebnf>quot with-compilation-unit "ab" foo parse parse-result-ast 
+  "ab" [EBNF foo='a' 'b' EBNF] call parse-result-ast 
 ] unit-test
 
 { V{ 1 "b" } } [
-  "foo=('a')[[ drop 1 ]] 'b'" ebnf>quot with-compilation-unit "ab" foo parse parse-result-ast 
+  "ab" [EBNF foo=('a')[[ drop 1 ]] 'b' EBNF] call parse-result-ast 
 ] unit-test
 
 { V{ 1 2 } } [
-  "foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]]" ebnf>quot with-compilation-unit "ab" foo parse parse-result-ast 
+  "ab" [EBNF foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]] EBNF] call parse-result-ast 
+] unit-test
+
+{ CHAR: A } [
+  "A" [EBNF foo=[A-Z] EBNF] call parse-result-ast 
+] unit-test
+
+{ CHAR: Z } [
+  "Z" [EBNF foo=[A-Z] EBNF] call parse-result-ast 
+] unit-test
+
+{ f } [
+  "0" [EBNF foo=[A-Z] EBNF] call  
+] unit-test
+
+{ CHAR: 0 } [
+  "0" [EBNF foo=[^A-Z] EBNF] call parse-result-ast 
+] unit-test
+
+{ f } [
+  "A" [EBNF foo=[^A-Z] EBNF] call  
+] unit-test
+
+{ f } [
+  "Z" [EBNF foo=[^A-Z] EBNF] call  
 ] unit-test

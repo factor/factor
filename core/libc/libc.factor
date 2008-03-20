@@ -23,20 +23,14 @@ SYMBOL: mallocs
 
 PRIVATE>
 
-TUPLE: check-ptr ;
+ERROR: bad-ptr ;
 
 : check-ptr ( c-ptr -- c-ptr )
-    [ \ check-ptr construct-boa throw ] unless* ;
+    [ bad-ptr ] unless* ;
 
-TUPLE: double-free ;
+ERROR: double-free ;
 
-: double-free ( -- * )
-    \ double-free construct-empty throw ;
-
-TUPLE: realloc-error ptr size ;
-
-: realloc-error ( alien size -- * )
-    \ realloc-error construct-boa throw ;
+ERROR: realloc-error ptr size ;
 
 <PRIVATE
 

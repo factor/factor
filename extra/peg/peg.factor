@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
-       vectors arrays combinators.lib memoize math.parser match
+       vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
        words ;
 IN: peg
@@ -10,69 +10,13 @@ TUPLE: parse-result remaining ast ;
 
 GENERIC: compile ( parser -- quot )
 
-: (parse) ( state parser -- result )
+: parse ( state parser -- result )
   compile call ;
 
-
-<PRIVATE
-
-SYMBOL: packrat-cache
 SYMBOL: ignore 
-SYMBOL: not-in-cache
-
-: not-in-cache? ( result -- ? )
-  not-in-cache = ;
 
 : <parse-result> ( remaining ast -- parse-result )
   parse-result construct-boa ;
-
-SYMBOL: next-id 
-
-: get-next-id ( -- number )
-  next-id get-global 0 or dup 1+ next-id set-global ;
-
-TUPLE: parser id ;
-
-: init-parser ( parser -- parser )
-  get-next-id parser construct-boa over set-delegate ;
-
-: from ( slice-or-string -- index )
-  dup slice? [ slice-from ] [ drop 0 ] if ;
-
-: get-cached ( input parser -- result )
-  [ from ] dip parser-id packrat-cache get at at* [ 
-    drop not-in-cache 
-  ] unless ;
-
-: put-cached ( result input parser -- )
-  parser-id dup packrat-cache get at [ 
-    nip
-  ] [ 
-    H{ } clone dup >r swap packrat-cache get set-at r>
-  ] if* 
-  [ from ] dip set-at ;
-
-PRIVATE>
-
-: parse ( input parser -- result )
-  packrat-cache get [
-    2dup get-cached dup not-in-cache? [ 
-!      "cache missed: " write over parser-id number>string write " - " write nl ! pick .
-      drop 
-      #! Protect against left recursion blowing the callstack
-      #! by storing a failed parse in the cache.
-      [ f ] dipd  [ put-cached ] 2keep
-      [ (parse) dup ] 2keep put-cached
-    ] [ 
-!      "cache hit: " write over parser-id number>string write " - " write nl ! pick . 
-      2nip
-    ] if
-  ] [
-    (parse)
-  ] if ;
-
-: packrat-parse ( input parser -- result )
-  H{ } clone packrat-cache [ parse ] with-variable ;
 
 <PRIVATE
 
@@ -295,17 +239,17 @@ M: delay-parser compile ( parser -- quot )
 
 PRIVATE>
 
-MEMO: token ( string -- parser )
-  token-parser construct-boa init-parser ;      
+: token ( string -- parser )
+  token-parser construct-boa ;      
 
 : satisfy ( quot -- parser )
-  satisfy-parser construct-boa init-parser ;
+  satisfy-parser construct-boa ;
 
-MEMO: range ( min max -- parser )
-  range-parser construct-boa init-parser ;
+: range ( min max -- parser )
+  range-parser construct-boa ;
 
 : seq ( seq -- parser )
-  seq-parser construct-boa init-parser ;
+  seq-parser construct-boa ;
 
 : 2seq ( parser1 parser2 -- parser )
   2array seq ;
@@ -320,7 +264,7 @@ MEMO: range ( min max -- parser )
   { } make seq ; inline 
 
 : choice ( seq -- parser )
-  choice-parser construct-boa init-parser ;
+  choice-parser construct-boa ;
 
 : 2choice ( parser1 parser2 -- parser )
   2array choice ;
@@ -334,32 +278,32 @@ MEMO: range ( min max -- parser )
 : choice* ( quot -- paser )
   { } make choice ; inline 
 
-MEMO: repeat0 ( parser -- parser )
-  repeat0-parser construct-boa init-parser ;
+: repeat0 ( parser -- parser )
+  repeat0-parser construct-boa ;
 
-MEMO: repeat1 ( parser -- parser )
-  repeat1-parser construct-boa init-parser ;
+: repeat1 ( parser -- parser )
+  repeat1-parser construct-boa ;
 
-MEMO: optional ( parser -- parser )
-  optional-parser construct-boa init-parser ;
+: optional ( parser -- parser )
+  optional-parser construct-boa ;
 
-MEMO: ensure ( parser -- parser )
-  ensure-parser construct-boa init-parser ;
+: ensure ( parser -- parser )
+  ensure-parser construct-boa ;
 
-MEMO: ensure-not ( parser -- parser )
-  ensure-not-parser construct-boa init-parser ;
+: ensure-not ( parser -- parser )
+  ensure-not-parser construct-boa ;
 
 : action ( parser quot -- parser )
-  action-parser construct-boa init-parser ;
+  action-parser construct-boa ;
 
-MEMO: sp ( parser -- parser )
-  sp-parser construct-boa init-parser ;
+: sp ( parser -- parser )
+  sp-parser construct-boa ;
 
-MEMO: hide ( parser -- parser )
+: hide ( parser -- parser )
   [ drop ignore ] action ;
 
-MEMO: delay ( quot -- parser )
-  delay-parser construct-boa init-parser ;
+: delay ( quot -- parser )
+  delay-parser construct-boa ;
 
 : PEG:
   (:) [

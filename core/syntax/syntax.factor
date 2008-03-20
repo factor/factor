@@ -165,6 +165,7 @@ IN: bootstrap.syntax
 
     "ERROR:" [
         CREATE-CLASS dup ";" parse-tokens define-tuple-class
+        dup save-location
         dup [ construct-boa throw ] curry define
     ] define-syntax
 

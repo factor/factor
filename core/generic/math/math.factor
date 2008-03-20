@@ -33,10 +33,7 @@ PREDICATE: class math-class ( object -- ? )
     dup empty? [ [ dip ] curry [ ] like ] unless
     r> append ;
 
-TUPLE: no-math-method left right generic ;
-
-: no-math-method ( left right generic -- * )
-    \ no-math-method construct-boa throw ;
+ERROR: no-math-method left right generic ;
 
 : default-math-method ( generic -- quot )
     [ no-math-method ] curry [ ] like ;

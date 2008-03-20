@@ -19,7 +19,7 @@ QUALIFIED: libc.private
 QUALIFIED: libc.private
 QUALIFIED: listener
 QUALIFIED: prettyprint.config
-QUALIFIED: random.private
+QUALIFIED: random
 QUALIFIED: source-files
 QUALIFIED: threads
 QUALIFIED: vocabs
@@ -108,7 +108,7 @@ IN: tools.deploy.shaker
 
 : stripped-globals ( -- seq )
     [
-        random.private:mt ,
+        random:random-generator ,
 
         {
             bootstrap.stage2:bootstrap-time

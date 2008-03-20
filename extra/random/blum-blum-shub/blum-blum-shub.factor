@@ -1,6 +1,6 @@
 USING: kernel math sequences namespaces
 math.miller-rabin combinators.cleave combinators.lib
-math.functions new-slots accessors random ;
+math.functions accessors random ;
 IN: random.blum-blum-shub
 
 ! TODO: take (log log M) bits instead of 1 bit

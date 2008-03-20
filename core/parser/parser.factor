@@ -98,10 +98,7 @@ M: lexer skip-word ( lexer -- )
 
 : scan ( -- str/f ) lexer get parse-token ;
 
-TUPLE: bad-escape ;
-
-: bad-escape ( -- * )
-    \ bad-escape construct-empty throw ;
+ERROR: bad-escape ;
 
 M: bad-escape summary drop "Bad escape code" ;
 
@@ -215,10 +212,7 @@ SYMBOL: in
 : set-in ( name -- )
     check-vocab-string dup in set create-vocab (use+) ;
 
-TUPLE: unexpected want got ;
-
-: unexpected ( want got -- * )
-    \ unexpected construct-boa throw ;
+ERROR: unexpected want got ;
 
 PREDICATE: unexpected unexpected-eof
     unexpected-got not ;
@@ -294,10 +288,7 @@ M: no-word summary
 : CREATE-METHOD ( -- method )
     scan-word bootstrap-word scan-word create-method-in ;
 
-TUPLE: staging-violation word ;
-
-: staging-violation ( word -- * )
-    \ staging-violation construct-boa throw ;
+ERROR: staging-violation word ;
 
 M: staging-violation summary
     drop
@@ -352,9 +343,7 @@ SYMBOL: lexer-factory
         ] if
     ] if ;
 
-TUPLE: bad-number ;
-
-: bad-number ( -- * ) \ bad-number construct-boa throw ;
+ERROR: bad-number ;
 
 : parse-base ( parsed base -- parsed )
     scan swap base> [ bad-number ] unless* parsed ;
