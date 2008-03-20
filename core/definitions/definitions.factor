@@ -3,10 +3,7 @@
 IN: definitions
 USING: kernel sequences namespaces assocs graphs ;
 
-TUPLE: no-compilation-unit definition ;
-
-: no-compilation-unit ( definition -- * )
-    \ no-compilation-unit construct-boa throw ;
+ERROR: no-compilation-unit definition ;
 
 GENERIC: where ( defspec -- loc )
 

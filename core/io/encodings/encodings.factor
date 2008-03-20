@@ -18,17 +18,13 @@ GENERIC: <decoder> ( stream decoding -- newstream )
 
 TUPLE: decoder stream code cr ;
 
-TUPLE: decode-error ;
-
-: decode-error ( -- * ) \ decode-error construct-empty throw ;
+ERROR: decode-error ;
 
 GENERIC: <encoder> ( stream encoding -- newstream )
 
 TUPLE: encoder stream code ;
 
-TUPLE: encode-error ;
-
-: encode-error ( -- * ) \ encode-error construct-empty throw ;
+ERROR: encode-error ;
 
 ! Decoding
 

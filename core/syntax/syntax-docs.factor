@@ -560,6 +560,13 @@ HELP: TUPLE:
 $nl
 "Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." } ;
 
+HELP: ERROR:
+{ $syntax "ERROR: class slots... ;" }
+{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
+{ $description "Defines a new tuple class.  Defines a new word " { $snippet "class?" } " that boa-constructs this tuple and throws it." } ;
+
+{ POSTPONE: ERROR: POSTPONE: TUPLE: } related-words
+
 HELP: C:
 { $syntax "C: constructor class" }
 { $values { "constructor" "a new word to define" } { "class" tuple-class } }
