@@ -127,12 +127,14 @@ DEFER: (class<)
 : (class-or) ( class class -- class )
     [ flatten-class ] 2apply class-or-fixup lookup-tuple-union ;
 
-: class-and-fixup ( set set -- set )
-    2dup [ tuple swap key? ] either?
-    [ 2drop H{ { tuple tuple } } ] [ intersect ] if ;
-
 : (class-and) ( class class -- class )
-    [ flatten-class ] 2apply class-and-fixup lookup-tuple-union ;
+    2dup [ tuple swap class< ] either? [
+        [ flatten-builtin-class ] 2apply
+        intersect lookup-union
+    ] [
+        [ flatten-class ] 2apply
+        intersect lookup-tuple-union
+    ] if ;
 
 : tuple-class-and ( class1 class2 -- class )
     dupd eq? [ drop null ] unless ;
