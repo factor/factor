@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg.expr multiline sequences ;
+USING: kernel tools.test peg peg.expr multiline sequences ;
 IN: temporary
 
 { 5 } [

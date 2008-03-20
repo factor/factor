@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.ebnf compiler.units ;
+USING: kernel parser words tools.test peg peg.ebnf compiler.units ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -109,37 +109,37 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { V{ "a" "b" } } [
-  "foo='a' 'b'" ebnf>quot with-compilation-unit "ab" foo parse parse-result-ast 
+  "foo='a' 'b'" ebnf>quot with-compilation-unit "ab" "foo" search execute parse parse-result-ast 
 ] unit-test
 
 { V{ 1 "b" } } [
-  "foo=('a')[[ drop 1 ]] 'b'" ebnf>quot with-compilation-unit "ab" foo parse parse-result-ast 
+  "foo=('a')[[ drop 1 ]] 'b'" ebnf>quot with-compilation-unit "ab" "foo" search execute parse parse-result-ast 
 ] unit-test
 
 { V{ 1 2 } } [
-  "foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]]" ebnf>quot with-compilation-unit "ab" foo parse parse-result-ast 
+  "foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]]" ebnf>quot with-compilation-unit "ab" "foo" search execute parse parse-result-ast 
 ] unit-test
 
 { CHAR: A } [
-  "foo=[A-Z]" ebnf>quot with-compilation-unit "A" foo parse parse-result-ast 
+  "foo=[A-Z]" ebnf>quot with-compilation-unit "A" "foo" search execute parse parse-result-ast 
 ] unit-test
 
 { CHAR: Z } [
-  "foo=[A-Z]" ebnf>quot with-compilation-unit "Z" foo parse parse-result-ast 
+  "foo=[A-Z]" ebnf>quot with-compilation-unit "Z" "foo" search execute parse parse-result-ast 
 ] unit-test
 
 { f } [
-  "foo=[A-Z]" ebnf>quot with-compilation-unit "0" foo parse  
+  "foo=[A-Z]" ebnf>quot with-compilation-unit "0" "foo" search execute parse  
 ] unit-test
 
 { CHAR: 0 } [
-  "foo=[^A-Z]" ebnf>quot with-compilation-unit "0" foo parse parse-result-ast 
+  "foo=[^A-Z]" ebnf>quot with-compilation-unit "0" "foo" search execute parse parse-result-ast 
 ] unit-test
 
 { f } [
-  "foo=[^A-Z]" ebnf>quot with-compilation-unit "A" foo parse  
+  "foo=[^A-Z]" ebnf>quot with-compilation-unit "A" "foo" search execute parse  
 ] unit-test
 
 { f } [
-  "foo=[^A-Z]" ebnf>quot with-compilation-unit "Z" foo parse  
+  "foo=[^A-Z]" ebnf>quot with-compilation-unit "Z" "foo" search execute parse  
 ] unit-test

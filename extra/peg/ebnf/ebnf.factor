@@ -172,7 +172,7 @@ DEFER: 'rhs'
 : 'range-parser' ( -- parser )
   #! Match the syntax for declaring character ranges
   [
-    "[" syntax ,
+    [ "[" syntax , "[" token ensure-not , ] seq* hide ,
     [ CHAR: ] = not ] satisfy repeat1 , 
     "]" syntax ,
   ] seq* [ first >string <ebnf-range> ] action ;
@@ -208,7 +208,6 @@ DEFER: 'choice'
     "*" token sp ensure-not ,
     "+" token sp ensure-not ,
     "?" token sp ensure-not ,
-    "[[" token sp ensure-not ,
   ] seq* hide grouped ; 
 
 : 'repeat0' ( -- parser )
@@ -226,13 +225,6 @@ DEFER: 'choice'
     [ drop t ] satisfy ,
   ] seq* [ first ] action repeat0 [ >string ] action ;
 
-: 'action' ( -- parser )
-  [
-    "(" [ 'choice' sp ] delay ")" syntax-pack ,
-    "[[" 'factor-code' "]]" syntax-pack ,
-  ] seq* [ first2 <ebnf-action> ] action ;
-   
-
 : 'ensure-not' ( -- parser )
   #! Parses the '!' syntax to ensure that 
   #! something that matches the following elements do
@@ -242,7 +234,7 @@ DEFER: 'choice'
     'group' sp ,
   ] seq* [ first <ebnf-ensure-not> ] action ;
 
-: 'sequence' ( -- parser )
+: ('sequence') ( -- parser )
   #! A sequence of terminals and non-terminals, including
   #! groupings of those. 
   [ 
@@ -252,11 +244,21 @@ DEFER: 'choice'
     'repeat0' sp ,
     'repeat1' sp ,
     'optional' sp , 
-    'action' sp , 
+  ] choice* ;  
+
+: 'sequence' ( -- parser )
+  #! A sequence of terminals and non-terminals, including
+  #! groupings of those. 
+  [
+    [ 
+      ('sequence') ,
+      "[[" 'factor-code' "]]" syntax-pack ,
+    ] seq* [ first2 <ebnf-action> ] action ,
+    ('sequence') ,
   ] choice* repeat1 [ 
      dup length 1 = [ first ] [ <ebnf-sequence> ] if
-  ] action ;  
-
+  ] action ;
+  
 : 'choice' ( -- parser )
   'sequence' sp "|" token sp list-of [ 
     dup length 1 = [ first ] [ <ebnf-choice> ] if
