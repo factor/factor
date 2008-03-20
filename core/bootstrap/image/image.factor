@@ -349,7 +349,7 @@ M: curry '
     [
         {
             dictionary source-files
-            typemap builtins class<map update-map
+            typemap builtins class<map class-map update-map
         } [ dup get swap bootstrap-word set ] each
     ] H{ } make-assoc
     bootstrap-global set

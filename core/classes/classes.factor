@@ -8,11 +8,12 @@ vectors math quotations combinators sorting effects graphs ;
 PREDICATE: word class ( obj -- ? ) "class" word-prop ;
 
 SYMBOL: typemap
+SYMBOL: class-map
 SYMBOL: class<map
 SYMBOL: update-map
 SYMBOL: builtins
 
-PREDICATE: word builtin-class
+PREDICATE: class builtin-class
     "metaclass" word-prop builtin-class eq? ;
 
 PREDICATE: class tuple-class
@@ -58,6 +59,7 @@ PREDICATE: word predicate "predicating" word-prop >boolean ;
         { [ dup builtin-class? ] [ dup set ] }
         { [ dup members ] [ members [ (flatten-class) ] each ] }
         { [ dup superclass ] [ superclass (flatten-class) ] }
+        { [ t ] [ drop ] }
     } cond ;
 
 : flatten-class ( class -- assoc )
@@ -108,11 +110,29 @@ DEFER: (class<)
 : lookup-union ( classes -- class )
     typemap get at dup empty? [ drop object ] [ first ] if ;
 
+: lookup-tuple-union ( classes -- class )
+    class-map get at dup empty? [ drop object ] [ first ] if ;
+
+! : (class-or) ( class class -- class )
+!     [ flatten-builtin-class ] 2apply union lookup-union ;
+! 
+! : (class-and) ( class class -- class )
+!     [ flatten-builtin-class ] 2apply intersect lookup-union ;
+
+: class-or-fixup ( set set -- set )
+    union
+    tuple over key?
+    [ [ drop tuple-class? not ] assoc-subset ] when ;
+
 : (class-or) ( class class -- class )
-    [ flatten-builtin-class ] 2apply union lookup-union ;
+    [ flatten-class ] 2apply class-or-fixup lookup-tuple-union ;
+
+: class-and-fixup ( set set -- set )
+    2dup [ tuple swap key? ] either?
+    [ 2drop H{ { tuple tuple } } ] [ intersect ] if ;
 
 : (class-and) ( class class -- class )
-    [ flatten-builtin-class ] 2apply intersect lookup-union ;
+    [ flatten-class ] 2apply class-and-fixup lookup-tuple-union ;
 
 : tuple-class-and ( class1 class2 -- class )
     dupd eq? [ drop null ] unless ;
@@ -219,9 +239,16 @@ M: word reset-class drop ;
 : typemap- ( class -- )
     dup flatten-builtin-class typemap get pop-at ;
 
+! class-map
+: class-map+ ( class -- )
+    dup flatten-class class-map get push-at ;
+
+: class-map- ( class -- )
+    dup flatten-class class-map get pop-at ;
+
 ! Class definition
 : cache-class ( class -- )
-    dup typemap+ dup class<map+ update-map+ ;
+    dup typemap+ dup class-map+ dup class<map+ update-map+ ;
 
 : cache-classes ( assoc -- )
     [ drop cache-class ] assoc-each ;
@@ -229,7 +256,7 @@ M: word reset-class drop ;
 GENERIC: uncache-class ( class -- )
 
 M: class uncache-class
-    dup update-map- dup class<map- typemap- ;
+    dup update-map- dup class<map- dup class-map- typemap- ;
 
 M: word uncache-class drop ;
 
