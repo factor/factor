@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays continuations db db.tuples db.types db.sqlite kernel math math.parser new-slots sequences ;
+USING: accessors arrays continuations db db.tuples db.types db.sqlite kernel math math.parser sequences ;
 IN: semantic-db
 
 TUPLE: node id content ;

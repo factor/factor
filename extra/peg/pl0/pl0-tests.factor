@@ -4,14 +4,6 @@
 USING: kernel tools.test peg peg.pl0 multiline sequences ;
 IN: peg.pl0.tests
 
-{ "abc" } [
-  "abc" ident parse parse-result-ast 
-] unit-test
-
-{ 55 } [
-  "55abc" number parse parse-result-ast 
-] unit-test
-
 { t } [
   <"
 VAR x, squ;
@@ -29,7 +21,7 @@ BEGIN
       x := x + 1;
    END
 END.
-"> program parse parse-result-remaining empty?
+"> pl0 parse-result-remaining empty?
 ] unit-test
 
 { f } [
@@ -95,5 +87,5 @@ BEGIN
   y := 36;
   CALL gcd;
 END.
-  "> program parse parse-result-remaining empty?
+  "> pl0 parse-result-remaining empty?
 ] unit-test

@@ -27,7 +27,7 @@ IN: new-slots
 : setter-effect T{ effect f { "object" "value" } { "value" } } ; inline
 
 : setter-word ( name -- word )
-    ">>" swap append setter-effect create-accessor ;
+    ">>" prepend setter-effect create-accessor ;
 
 : define-setter ( name -- )
     dup setter-word dup deferred? [
@@ -37,7 +37,7 @@ IN: new-slots
 : changer-effect T{ effect f { "object" "quot" } { "object" } } ; inline
 
 : changer-word ( name -- word )
-    "change-" swap append changer-effect create-accessor ;
+    "change-" prepend changer-effect create-accessor ;
 
 : define-changer ( name -- )
     dup changer-word dup deferred? [

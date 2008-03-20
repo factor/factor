@@ -3,7 +3,8 @@
 USING: arrays definitions hashtables kernel
 kernel.private math namespaces sequences sequences.private
 strings vectors words quotations memory combinators generic
-classes classes.private slots slots.private compiler.units ;
+classes classes.private slots slots.deprecated slots.private
+compiler.units ;
 IN: tuples
 
 M: tuple delegate 3 slot ;
@@ -85,7 +86,8 @@ PRIVATE>
     dupd 4 simple-slots
     2dup [ slot-spec-name ] map "slot-names" set-word-prop
     2dup delegate-slot-spec add* "slots" set-word-prop
-    define-slots ;
+    2dup define-slots
+    define-accessors ;
 
 TUPLE: check-tuple class ;
 

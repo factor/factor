@@ -9,7 +9,6 @@ circular strings ;
 [ CHAR: t ] [ "test" <circular> 0 swap nth ] unit-test
 [ "test"  ] [ "test" <circular> >string ] unit-test
 
-[ "test" <circular> 5 swap nth ] must-fail
 [ CHAR: e ] [ "test" <circular> 5 swap nth-unsafe ] unit-test
  
 [ [ 1 2 3 ] ] [ { 1 2 3 } <circular> [ ] like ] unit-test
@@ -18,10 +17,13 @@ circular strings ;
 [ [ 3 1 2 ] ] [ { 1 2 3 } <circular> -100 over change-circular-start [ ] like ] unit-test
 
 [ "fob" ] [ "foo" <circular> CHAR: b 2 pick set-nth >string ] unit-test
-[ "foo" <circular> CHAR: b 3 rot set-nth ] must-fail
 [ "boo" ] [ "foo" <circular> CHAR: b 3 pick set-nth-unsafe >string ] unit-test
 [ "ornact" ] [ "factor" <circular> 4 over change-circular-start CHAR: n 2 pick set-nth >string ] unit-test
 
 [ "bcd" ] [ 3 <circular-string> "abcd" [ over push-circular ] each >string ] unit-test
 
 [ { 0 0 } ] [ { 0 0 } <circular> -1 over change-circular-start >array ] unit-test
+
+! This no longer fails
+! [ "test" <circular> 5 swap nth ] must-fail
+! [ "foo" <circular> CHAR: b 3 rot set-nth ] must-fail

@@ -8,7 +8,7 @@ IN: builder.release
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : releases ( -- path )
-  builds "releases" path+
+  builds "releases" append-path
   dup exists? not
     [ dup make-directory ]
   when ;

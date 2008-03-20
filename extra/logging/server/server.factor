@@ -11,10 +11,10 @@ IN: logging.server
     \ log-root get "logs" resource-path or ;
 
 : log-path ( service -- path )
-    log-root swap path+ ;
+    log-root prepend-path ;
 
 : log# ( path n -- path' )
-    number>string ".log" append path+ ;
+    number>string ".log" append append-path ;
 
 SYMBOL: log-files
 

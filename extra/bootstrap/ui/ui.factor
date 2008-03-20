@@ -8,7 +8,7 @@ vocabs vocabs.loader ;
             { [ windows? ] [ "windows" ] }
             { [ unix? ] [ "x11" ] }
         } cond
-    ] unless* "ui." swap append require
+    ] unless* "ui." prepend require
 
     "ui.freetype" require
 ] when

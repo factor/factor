@@ -4,7 +4,7 @@ USING: arrays continuations db io kernel math namespaces
 quotations sequences db.postgresql.ffi alien alien.c-types
 db.types tools.walker ascii splitting math.parser
 combinators combinators.cleave libc shuffle calendar.format
-byte-arrays destructors prettyprint new-slots accessors
+byte-arrays destructors prettyprint accessors
 strings serialize io.encodings.binary io.streams.byte-array ;
 IN: db.postgresql.lib
 

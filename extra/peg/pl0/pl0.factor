@@ -6,8 +6,7 @@ IN: peg.pl0
 
 #! Grammar for PL/0 based on http://en.wikipedia.org/wiki/PL/0
 
-<EBNF
-program = block "." 
+EBNF: pl0 
 block = ( "CONST" ident "=" number ( "," ident "=" number )* ";" )?
         ( "VAR" ident ( "," ident )* ";" )?
         ( "PROCEDURE" ident ";" ( block ";" )? )* statement 
@@ -23,4 +22,5 @@ factor = ident | number | "(" expression ")"
 ident = (([a-zA-Z])+) [[ >string ]]
 digit = ([0-9]) [[ digit> ]]
 number = ((digit)+) [[ unclip [ swap 10 * + ] reduce ]]
-EBNF>
+program = block "."
+;EBNF

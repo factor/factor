@@ -23,30 +23,30 @@ V{
     [ >r dup peek r> append add ] when*
     "/" join ;
 
-: vocab-path+ ( vocab path -- newpath )
-    swap vocab-root dup [ swap path+ ] [ 2drop f ] if ;
-
-: vocab-source-path ( vocab -- path/f )
-    dup ".factor" vocab-dir+ vocab-path+ ;
-
-: vocab-docs-path ( vocab -- path/f )
-    dup "-docs.factor" vocab-dir+ vocab-path+ ;
-
 : vocab-dir? ( root name -- ? )
     over [
-        ".factor" vocab-dir+ path+ resource-exists?
+        ".factor" vocab-dir+ append-path resource-exists?
     ] [
         2drop f
     ] if ;
 
+SYMBOL: root-cache
+
+H{ } clone root-cache set-global
+
 : find-vocab-root ( vocab -- path/f )
-    vocab-roots get swap [ vocab-dir? ] curry find nip ;
+    vocab-name root-cache get [
+        vocab-roots get swap [ vocab-dir? ] curry find nip
+    ] cache ;
 
-M: string vocab-root
-    dup vocab [ vocab-root ] [ find-vocab-root ] ?if ;
+: vocab-append-path ( vocab path -- newpath )
+    swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
 
-M: vocab-link vocab-root
-    vocab-link-root ;
+: vocab-source-path ( vocab -- path/f )
+    dup ".factor" vocab-dir+ vocab-append-path ;
+
+: vocab-docs-path ( vocab -- path/f )
+    dup "-docs.factor" vocab-dir+ vocab-append-path ;
 
 SYMBOL: load-help?
 
@@ -56,7 +56,7 @@ SYMBOL: load-help?
 
 : load-source ( vocab -- )
     [ source-wasn't-loaded ] keep
-    [ vocab-source-path bootstrap-file ] keep
+    [ vocab-source-path [ bootstrap-file ] when* ] keep
     source-was-loaded ;
 
 : docs-were-loaded t swap set-vocab-docs-loaded? ;
@@ -66,24 +66,13 @@ SYMBOL: load-help?
 : load-docs ( vocab -- )
     load-help? get [
         [ docs-weren't-loaded ] keep
-        [ vocab-docs-path ?run-file ] keep
+        [ vocab-docs-path [ ?run-file ] when* ] keep
         docs-were-loaded
     ] [ drop ] if ;
 
-: create-vocab-with-root ( vocab-link -- vocab )
-    dup vocab-name create-vocab
-    swap vocab-root over set-vocab-root ;
-
 : reload ( name -- )
     [
-        f >vocab-link
-        dup vocab-root [
-            dup vocab-source-path resource-exists? [
-                create-vocab-with-root
-                dup load-source
-                load-docs
-            ] [ no-vocab ] if
-        ] [ no-vocab ] if
+        dup vocab [ dup load-source load-docs ] [ no-vocab ] ?if
     ] with-compiler-errors ;
 
 : require ( vocab -- )
@@ -100,33 +89,33 @@ SYMBOL: load-help?
 
 SYMBOL: blacklist
 
-GENERIC: (load-vocab) ( name -- vocab )
-
 : add-to-blacklist ( error vocab -- )
     vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
 
+GENERIC: (load-vocab) ( name -- )
+
 M: vocab (load-vocab)
     [
-        dup vocab-root [
-            dup vocab-source-loaded? [ dup load-source ] unless
-            dup vocab-docs-loaded? [ dup load-docs ] unless
-        ] when
+        dup vocab-source-loaded? [ dup load-source ] unless
+        dup vocab-docs-loaded? [ dup load-docs ] unless
+        drop
     ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
-M: string (load-vocab)
-    [ ".private" ?tail drop reload ] keep vocab ;
-
 M: vocab-link (load-vocab)
-    vocab-name (load-vocab) ;
+    vocab-name create-vocab (load-vocab) ;
+
+M: string (load-vocab)
+    create-vocab (load-vocab) ;
 
 [
-    dup vocab-name blacklist get at* [
-        rethrow
-    ] [
-        drop
-        [ dup vocab swap or (load-vocab) ] with-compiler-errors
-    ] if
-
+    [
+        dup vocab-name blacklist get at* [
+            rethrow
+        ] [
+            drop
+            [ (load-vocab) ] with-compiler-errors
+        ] if
+    ] with-compiler-errors
 ] load-vocab-hook set-global
 
 : vocab-where ( vocab -- loc )

@@ -6,7 +6,7 @@ strings io.styles vectors words system splitting math.parser
 tuples continuations continuations.private combinators
 generic.math io.streams.duplex classes compiler.units
 generic.standard vocabs threads threads.private init
-kernel.private libc ;
+kernel.private libc io.encodings ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -281,6 +281,10 @@ M: thread error-in-thread ( error thread -- )
             error-in-thread. print-error flush
         ] bind
     ] if ;
+
+M: encode-error summary drop "Character encoding error" ;
+
+M: decode-error summary drop "Character decoding error" ;
 
 <PRIVATE
 

@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math namespaces sequences system
-kernel.private tuples bit-arrays byte-arrays float-arrays ;
+kernel.private tuples bit-arrays byte-arrays float-arrays 
+arrays ;
 IN: alien
 
 ! Some predicate classes used by the compiler for optimization

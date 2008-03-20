@@ -3,7 +3,7 @@
 USING: calendar html io io.files kernel math math.parser http
 http.server namespaces parser sequences strings assocs
 hashtables debugger http.mime sorting html.elements logging
-calendar.format new-slots accessors io.encodings.binary
+calendar.format accessors io.encodings.binary
 combinators.cleave fry ;
 IN: http.server.static
 
@@ -39,7 +39,7 @@ TUPLE: file-responder root hook special ;
     [ 2drop <304> ] [ file-responder get hook>> call ] if ;
 
 : serving-path ( filename -- filename )
-    "" or file-responder get root>> swap path+ ;
+    "" or file-responder get root>> prepend-path ;
 
 : serve-file ( filename -- response )
     dup mime-type
@@ -68,7 +68,7 @@ TUPLE: file-responder root hook special ;
     swap '[ , directory. ] >>body ;
 
 : find-index ( filename -- path )
-    { "index.html" "index.fhtml" } [ path+ ] with map
+    { "index.html" "index.fhtml" } [ append-path ] with map
     [ exists? ] find nip ;
 
 : serve-directory ( filename -- response )
