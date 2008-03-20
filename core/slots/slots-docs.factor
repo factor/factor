@@ -4,21 +4,86 @@ effects generic.standard tuples slots.private classes
 strings math ;
 IN: slots
 
+ARTICLE: "accessors" "Slot accessors"
+"For each tuple slot, methods are defined on two accessor words in the " { $vocab-link "accessors" } " vocabulary:"
+{ $list
+    { "The " { $emphasis "reader" } " is named " { $snippet { $emphasis "slot" } ">>" } " and pushes the value of a slot on the stack." }
+    { "The " { $emphasis "writer" } " is named " { $snippet "(>>" { $emphasis "slot" } ")" } " and stores a value into a slot. It has stack effect " { $snippet "( value object -- )" } "." }
+}
+"In addition, two utility words are defined for each distinct slot name used in the system:"
+{ $list
+    { "The " { $emphasis "setter" } " is named " { $snippet "(>>" { $emphasis "slot" } ")" } " and stores a value into a slot. It has stack effect " { $snippet "( object value -- object )" } "." }
+    { "The " { $emphasis "changer" } " is named " { $snippet "change-" { $emphasis "slot" } } ". It applies a quotation to the current slot value and stores the result back in the slot; it has stack effect " { $snippet "( object quot -- object )" } "." }
+}
+"Since the reader and writer are generic, words can be written which do not depend on the specific class of tuple passed in, but instead work on any tuple that defines slots with certain names."
+$nl
+"In most cases, using the setter is preferred over the writer because the stack effect is better suited to the common case where the tuple is needed again, and where the new slot value was just computed and so is at the top of the stack. For example, consider the case where you want to create a tuple and fill in the slots with literals. The following version uses setters:"
+{ $code
+    "<email>"
+    "    \"Happy birthday\" >>subject"
+    "    { \"bob@bigcorp.com\" } >>to"
+    "    \"alice@bigcorp.com\" >>from"
+    "send-email"
+}
+"The following uses writers, and requires some stack shuffling:"
+{ $code
+    "<email>"
+    "    \"Happy birthday\" over (>>subject)"
+    "    { \"bob@bigcorp.com\" } over (>>to)"
+    "    \"alice@bigcorp.com\" over (>>from)"
+    "send-email"
+}
+"Even if some of the slot values come from the stack underneath the tuple being constructed, setters win:"
+{ $code
+    "<email>"
+    "    swap >>subject"
+    "    swap >>to"
+    "    \"alice@bigcorp.com\" >>from"
+    "send-email"
+}
+"This is because " { $link swap } " is easier to understand than " { $link tuck } ":"
+{ $code
+    "<email>"
+    "    tuck (>>subject)"
+    "    tuck (>>to)"
+    "    \"alice@bigcorp.com\" over (>>from)"
+    "send-email"
+}
+"The changer word abstracts a common pattern where a slot value is read then stored again; so the following is not idiomatic code:"
+{ $code
+    "find-manager"
+    "    salary>> 0.75 * >>salary"
+}
+"The following version is preferred:"
+{ $code
+    "find-manager"
+    "    [ 0.75 * ] change-salary"
+}
+{ $see-also "slots" "mirrors" } ;
+
 ARTICLE: "slots" "Slots"
-"A " { $emphasis "slot" } " is a component of an object which can store a value. The " { $vocab-link "slots" } " vocabulary contains words for introspecting the slots of an object."
+"A " { $emphasis "slot" } " is a component of an object which can store a value."
 $nl
 { $link "tuples" } " are composed entirely of slots, and instances of " { $link "builtin-classes" } " consist of slots together with intrinsic data."
+"The " { $vocab-link "slots" } " vocabulary contains words for introspecting the slots of an object."
 $nl
 "The " { $snippet "\"slots\"" } " word property of built-in and tuple classes holds an array of " { $emphasis "slot specifiers" } " describing the slot layout of each instance."
 { $subsection slot-spec }
-"Each slot has a reader word; mutable slots have an optional writer word. All tuple slots are mutable, but some slots on built-in classes are not."
+"The four words associated with a slot can be looked up in the " { $vocab-link "accessors" } " vocabulary:"
 { $subsection reader-word }
 { $subsection writer-word }
 { $subsection setter-word }
 { $subsection changer-word }
-"Slot methods type check, then call unsafe primitives:"
-{ $subsection slot }
-{ $subsection set-slot } ;
+"Looking up a slot by name:"
+{ $subsection slot-named }
+"Defining slots dynamically:"
+{ $subsection define-reader }
+{ $subsection define-writer }
+{ $subsection define-setter }
+{ $subsection define-changer }
+{ $subsection define-slot-methods }
+{ $subsection define-accessors }
+{ $see-also "accessors" "mirrors" } ;
 
 ABOUT: "slots"
 

@@ -26,10 +26,7 @@ SYMBOL: (dispatch#)
 
 : unpicker ( -- quot ) \ (dispatch#) get unpickers nth ;
 
-TUPLE: no-method object generic ;
-
-: no-method ( object generic -- * )
-    \ no-method construct-boa throw ;
+ERROR: no-method object generic ;
 
 : error-method ( word --  quot )
     picker swap [ no-method ] curry append ;

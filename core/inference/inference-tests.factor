@@ -514,10 +514,10 @@ DEFER: an-inline-word
 
 { 0 1 } [ [ 2 ] [ 2 ] [ + ] compose compose call ] must-infer-as
 
-TUPLE: custom-error ;
+ERROR: custom-error ;
 
 [ T{ effect f 0 0 t } ] [
-    [ custom-error construct-boa throw ] infer
+    [ custom-error ] infer
 ] unit-test
 
 : funny-throw throw ; inline
