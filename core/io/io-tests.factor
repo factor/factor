@@ -28,15 +28,6 @@ IN: io.tests
 ! Make sure we use correct to_c_string form when writing
 [ ] [ "\0" write ] unit-test
 
-[ "" ] [ 0 read ] unit-test
-
-! [ ] [ "123" write 9000 CHAR: x <string> write flush ] unit-test
-
-[
-    "/core/io/test/binary.txt" <resource-reader>
-    [ 0.2 read ] with-stream
-] must-fail
-
 [
     {
         { "It seems " CHAR: J }
@@ -58,3 +49,12 @@ IN: io.tests
         10 [ 65536 read drop ] times
     ] with-file-reader
 ] unit-test
+
+! [ "" ] [ 0 read ] unit-test
+
+! [ ] [ "123" write 9000 CHAR: x <string> write flush ] unit-test
+
+! [
+!     "/core/io/test/binary.txt" <resource-reader>
+!     [ 0.2 read ] with-stream
+! ] must-fail

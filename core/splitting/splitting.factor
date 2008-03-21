@@ -17,7 +17,7 @@ M: groups length
     dup groups-seq length swap groups-n [ + 1- ] keep /i ;
 
 M: groups set-length
-    [ groups-n * ] keep delegate set-length ;
+    [ groups-n * ] keep groups-seq set-length ;
 
 : group@ ( n groups -- from to seq )
     [ groups-n [ * dup ] keep + ] keep

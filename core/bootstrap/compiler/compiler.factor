@@ -79,7 +79,7 @@ nl
 "." write flush
 
 {
-    malloc free memcpy
+    malloc calloc free memcpy
 } compile
 
 " done" print flush

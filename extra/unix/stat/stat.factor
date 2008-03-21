@@ -63,7 +63,8 @@ FUNCTION: int mkdir ( char* path, mode_t mode ) ;
     { "linux"   [ "unix.stat.linux"   require ] }
     { "macosx"  [ "unix.stat.macosx"  require ] }
     { "freebsd" [ "unix.stat.freebsd" require ] }
-    [ drop ]
+    { "netbsd"  [ "unix.stat.netbsd" require ] }
+    { "openbsd" [ "unix.stat.openbsd" require ] }
   }
   case
 >>

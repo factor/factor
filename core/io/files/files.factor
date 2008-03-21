@@ -48,10 +48,7 @@ M: object root-directory? ( path -- ? ) path-separator? ;
 
 : special-directory? ( name -- ? ) { "." ".." } member? ;
 
-TUPLE: no-parent-directory path ;
-
-: no-parent-directory ( path -- * )
-    \ no-parent-directory construct-boa throw ;
+ERROR: no-parent-directory path ;
 
 : parent-directory ( path -- parent )
     right-trim-separators {
@@ -193,7 +190,7 @@ DEFER: copy-tree-into
 
 ! Special paths
 : resource-path ( path -- newpath )
-    \ resource-path get [ image parent-directory ] unless*
+    "resource-path" get [ image parent-directory ] unless*
     prepend-path ;
 
 : ?resource-path ( path -- newpath )

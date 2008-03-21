@@ -28,7 +28,8 @@ namespaces ;
 [ ] [ "hello-ui" shake-and-bake ] unit-test
 
 [ "staging.math-compiler-ui-strip.image" ] [
-    "hello-ui" deploy-config [ staging-image-name ] bind
+    "hello-ui" deploy-config
+    [ bootstrap-profile staging-image-name file-name ] bind
 ] unit-test
 
 [ t ] [

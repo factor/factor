@@ -59,16 +59,12 @@ M: f vocab-help ;
 : create-vocab ( name -- vocab )
     dictionary get [ <vocab> ] cache ;
 
-TUPLE: no-vocab name ;
-
-: no-vocab ( name -- * )
-    vocab-name \ no-vocab construct-boa throw ;
+ERROR: no-vocab name ;
 
 SYMBOL: load-vocab-hook ! ( name -- )
 
 : load-vocab ( name -- vocab )
-    dup load-vocab-hook get call
-    dup vocab [ ] [ no-vocab ] ?if ;
+    dup load-vocab-hook get call vocab ;
 
 : vocabs ( -- seq )
     dictionary get keys natural-sort ;

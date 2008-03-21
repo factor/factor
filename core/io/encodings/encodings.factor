@@ -12,23 +12,19 @@ GENERIC: decode-char ( stream encoding -- char/f )
 
 GENERIC: encode-char ( char stream encoding -- )
 
-GENERIC: <decoder> ( stream decoding -- newstream )
+GENERIC: <decoder> ( stream encoding -- newstream )
 
 : replacement-char HEX: fffd ;
 
 TUPLE: decoder stream code cr ;
 
-TUPLE: decode-error ;
-
-: decode-error ( -- * ) \ decode-error construct-empty throw ;
+ERROR: decode-error ;
 
 GENERIC: <encoder> ( stream encoding -- newstream )
 
 TUPLE: encoder stream code ;
 
-TUPLE: encode-error ;
-
-: encode-error ( -- * ) \ encode-error construct-empty throw ;
+ERROR: encode-error ;
 
 ! Decoding
 

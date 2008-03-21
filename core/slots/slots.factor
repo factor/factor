@@ -23,7 +23,7 @@ C: <slot-spec> slot-spec
         [ drop ] [ 1array , \ declare , ] if
     ] [ ] make ;
 
-: slot-named ( string specs -- spec/f )
+: slot-named ( name specs -- spec/f )
     [ slot-spec-name = ] with find nip ;
 
 : create-accessor ( name effect -- word )

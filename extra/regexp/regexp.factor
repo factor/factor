@@ -292,7 +292,7 @@ TUPLE: regexp source parser ignore-case? ;
 : parse-regexp ( accum end -- accum )
     lexer get dup skip-blank [
         [ index* dup 1+ swap ] 2keep swapd subseq swap
-    ] change-column
+    ] change-lexer-column
     lexer get (parse-token) parse-options <regexp> parsed ;
 
 : R! CHAR: ! parse-regexp ; parsing

@@ -85,7 +85,7 @@ HELP: pop-back*
 { $see-also push-front push-back pop-front pop-front* pop-back } ;
 
 HELP: dlist-find
-{ $values { "quot" quotation } { "dlist" { $link dlist } } { "obj/f" "an object or " { $link f } } { "?" "a boolean" } }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" "an object or " { $link f } } { "?" "a boolean" } }
 { $description "Applies the quotation to each element of the " { $link dlist } " in turn, until it outputs a true value or the end of the " { $link dlist } " is reached.  Outputs either the object it found or " { $link f } ", and a boolean which is true if an object is found." }
 { $notes "Returns a boolean to allow dlists to store " { $link f } "."
     $nl
@@ -93,20 +93,20 @@ HELP: dlist-find
 } ;
 
 HELP: dlist-contains?
-{ $values { "quot" quotation } { "dlist" { $link dlist } } { "?" "a boolean" } }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "?" "a boolean" } }
 { $description "Just like " { $link dlist-find } " except it doesn't return the object." }
 { $notes "This operation is O(n)." } ;
 
 HELP: delete-node-if*
-{ $values { "quot" quotation } { "dlist" { $link dlist } } { "obj/f" "an object or " { $link f } } { "?" "a boolean" } }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" "an object or " { $link f } } { "?" "a boolean" } }
 { $description "Calls " { $link dlist-find } " on the " { $link dlist } " and deletes the node returned, if any.  Returns the value of the deleted node and a boolean to allow the deleted value to distinguished from " { $link f } ", for nothing deleted." }
 { $notes "This operation is O(n)." } ;
 
 HELP: delete-node-if
-{ $values { "quot" quotation } { "dlist" { $link dlist } } { "obj/f" "an object or " { $link f } } }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" "an object or " { $link f } } }
 { $description "Like " { $link delete-node-if* } " but cannot distinguish from deleting a node whose value is " { $link f } " or not deleting an element." }
 { $notes "This operation is O(n)." } ;
 
 HELP: dlist-each
-{ $values { "quot" quotation } { "dlist" { $link dlist } } }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } }
 { $description "Iterate a " { $link dlist } ", calling quot on each element." } ;

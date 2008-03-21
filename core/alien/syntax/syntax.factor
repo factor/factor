@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov, Alex Chapman.
+! Copyright (C) 2005, 2008 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien alien.c-types alien.structs alien.arrays
 kernel math namespaces parser sequences words quotations
@@ -9,7 +9,7 @@ IN: alien.syntax
 <PRIVATE
 
 : parse-arglist ( return seq -- types effect )
-    2 group dup keys swap values
+    2 group dup keys swap values [ "," ?tail drop ] map
     rot dup "void" = [ drop { } ] [ 1array ] if <effect> ;
 
 : function-quot ( type lib func types -- quot )

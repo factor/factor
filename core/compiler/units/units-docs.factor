@@ -9,7 +9,9 @@ $nl
 $nl
 "The parser groups all definitions in a source file into one compilation unit, and parsing words do not need to concern themselves with compilation units. However, if definitions are being created at run time, a compilation unit must be created explicitly:"
 { $subsection with-compilation-unit }
-"Words called to associate a definition with a source file location:"
+"Compiling a set of words:"
+{ $subsection compile }
+"Words called to associate a definition with a compilation unit and a source file location:"
 { $subsection remember-definition }
 { $subsection remember-class }
 "Forward reference checking (see " { $link "definition-checking" } "):"
