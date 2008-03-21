@@ -77,7 +77,7 @@ ERROR: alien-indirect-error ;
 : alien-indirect ( ... funcptr return parameters abi -- )
     alien-indirect-error ;
 
-TUPLE: alien-invoke library function return parameters ;
+TUPLE: alien-invoke library function return parameters abi ;
 
 ERROR: alien-invoke-error library symbol ;
 

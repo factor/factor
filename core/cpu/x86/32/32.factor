@@ -5,7 +5,7 @@ cpu.x86.architecture cpu.x86.intrinsics cpu.x86.allot
 cpu.architecture kernel kernel.private math namespaces sequences
 generator.registers generator.fixup generator system layouts
 alien.compiler combinators command-line
-compiler compiler.units io vocabs.loader ;
+compiler compiler.units io vocabs.loader accessors ;
 IN: cpu.x86.32
 
 PREDICATE: x86-backend x86-32-backend
@@ -244,10 +244,10 @@ M: x86-32-backend %cleanup ( alien-node -- )
     #! have to fix ESP.
     {
         {
-            [ dup alien-node-abi "stdcall" = ]
+            [ dup abi>> "stdcall" = ]
             [ alien-stack-frame ESP swap SUB ]
         } {
-            [ dup alien-node-return large-struct? ]
+            [ dup return>> large-struct? ]
             [ drop EAX PUSH ]
         } {
             [ t ] [ drop ]
