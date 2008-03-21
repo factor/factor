@@ -16,6 +16,8 @@ ARTICLE: "deploy-flags" "Deployment flags"
 "There are two sets of deployment flags. The first set controls the major subsystems which are to be included in the deployment image:"
 { $subsection deploy-math?     }
 { $subsection deploy-compiler? }
+{ $subsection deploy-random?   }
+{ $subsection deploy-threads?  }
 { $subsection deploy-ui?       }
 "The second set of flags controls the level of stripping to be performed on the deployment image; there is a trade-off between image size, and retaining functionality which is required by the application:"
 { $subsection deploy-io          }
@@ -66,15 +68,20 @@ HELP: deploy-math?
 $nl
 "On by default. Often the programmer will use rationals without realizing it. A small amount of space can be saved by stripping these features out, but some code may require changes to work properly." } ;
 
-HELP: deploy-threads?
-{ $description "Deploy flag. If set, the deployed image will contain support for threads."
-$nl
-"On by default. Often the programmer will use threads without realizing it. A small amount of space can be saved by stripping this feature out, but some code may require changes to work properly." } ;
-
 HELP: deploy-compiler?
 { $description "Deploy flag. If set, words in the deployed image will be compiled with the optimizing compiler when possible."
 $nl
 "On by default. Most programs should be compiled, not only for performance but because features which depend on the C library interface only function after compilation." } ;
+
+HELP: deploy-random?
+{ $description "Deploy flag. If set, the random number generator protocol is included, together with two implementations: a native OS-specific random number generator, and the Mersenne Twister."
+$nl
+"On by default. If your program does not generate random numbers you can disable this to save some space." } ;
+
+HELP: deploy-threads?
+{ $description "Deploy flag. If set, thread support will be included in the final image."
+$nl
+"On by default. Most programs depend on libraries which use threads even if they don't use threads directly; for example, alarms, non-blocking I/O, and the UI are built on top of threads. If after testing your program still works without threads, you can disable this feature to save some space." } ;
 
 HELP: deploy-ui?
 { $description "Deploy flag. If set, the Factor UI will be included in the deployed image."
