@@ -137,17 +137,6 @@ void unix_constants()
 }
 	
 int main() {
-	//grovel(char);
-	//grovel(int);
-	//grovel(uint);
-	//grovel(long);
-	//grovel(ulong);
-	//grovel(long long);
-	//grovel(unsigned long long);
-	//grovel(void*);
-	//grovel(char*);
-
-
 #ifdef FREEBSD
 	grovel(blkcnt_t);
 	grovel(blksize_t);
@@ -164,7 +153,5 @@ int main() {
 	unix_constants();
 #endif
 
-	grovel(long);
 	return 0;
 }
-
