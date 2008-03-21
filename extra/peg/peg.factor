@@ -3,7 +3,7 @@
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
-       words quotations ;
+       words quotations effects memoize ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
@@ -13,20 +13,12 @@ SYMBOL: ignore
 : <parse-result> ( remaining ast -- parse-result )
   parse-result construct-boa ;
 
-TUPLE: parser ;
-C: <parser> parser
-M: parser equal? eq? ;
-
-: init-parser ( parser -- parser )
-  #! Set the delegate for the parser
-  <parser> over set-delegate ;
-
 SYMBOL: compiled-parsers
 
 GENERIC: (compile) ( parser -- quot )
 
 : compiled-parser ( parser -- word )
-  #! Look to see if the given parser has been compied.
+  #! Look to see if the given parser has been compiled.
   #! If not, compile it to a temporary word, cache it,
   #! and return it. Otherwise return the existing one.
   dup compiled-parsers get at [
@@ -36,7 +28,7 @@ GENERIC: (compile) ( parser -- quot )
     [ swap compiled-parsers get set-at ] keep
   ] if* ;
 
-: compile ( parser -- word )
+MEMO: compile ( parser -- word )
   H{ } clone compiled-parsers [ 
     [ compiled-parser ] with-compilation-unit 
   ] with-variable ;
@@ -47,6 +39,7 @@ GENERIC: (compile) ( parser -- quot )
 <PRIVATE
 
 TUPLE: token-parser symbol ;
+! M: token-parser equal? eq? ;
 
 MATCH-VARS: ?token ;
 
@@ -259,23 +252,28 @@ M: sp-parser (compile) ( parser -- quot )
 TUPLE: delay-parser quot ;
 
 M: delay-parser (compile) ( parser -- quot )
+  #! For efficiency we memoize the quotation.
+  #! This way it is run only once and the 
+  #! parser constructed once at run time.
   [
-    delay-parser-quot % \ compile , \ execute ,
-  ] [ ] make ;
+    delay-parser-quot % \ compile ,
+  ] [ ] make 
+  { } { "word" } <effect> memoize-quot 
+  [ % \ execute , ] [ ] make ;
 
 PRIVATE>
 
 : token ( string -- parser )
-  token-parser construct-boa init-parser ;      
+  token-parser construct-boa ;      
 
 : satisfy ( quot -- parser )
-  satisfy-parser construct-boa init-parser ;
+  satisfy-parser construct-boa ;
 
 : range ( min max -- parser )
-  range-parser construct-boa init-parser ;
+  range-parser construct-boa ;
 
 : seq ( seq -- parser )
-  seq-parser construct-boa init-parser ;
+  seq-parser construct-boa ;
 
 : 2seq ( parser1 parser2 -- parser )
   2array seq ;
@@ -290,7 +288,7 @@ PRIVATE>
   { } make seq ; inline 
 
 : choice ( seq -- parser )
-  choice-parser construct-boa init-parser ;
+  choice-parser construct-boa ;
 
 : 2choice ( parser1 parser2 -- parser )
   2array choice ;
@@ -305,31 +303,31 @@ PRIVATE>
   { } make choice ; inline 
 
 : repeat0 ( parser -- parser )
-  repeat0-parser construct-boa init-parser ;
+  repeat0-parser construct-boa ;
 
 : repeat1 ( parser -- parser )
-  repeat1-parser construct-boa init-parser ;
+  repeat1-parser construct-boa ;
 
 : optional ( parser -- parser )
-  optional-parser construct-boa init-parser ;
+  optional-parser construct-boa ;
 
 : ensure ( parser -- parser )
-  ensure-parser construct-boa init-parser ;
+  ensure-parser construct-boa ;
 
 : ensure-not ( parser -- parser )
-  ensure-not-parser construct-boa init-parser ;
+  ensure-not-parser construct-boa ;
 
 : action ( parser quot -- parser )
-  action-parser construct-boa init-parser ;
+  action-parser construct-boa ;
 
 : sp ( parser -- parser )
-  sp-parser construct-boa init-parser ;
+  sp-parser construct-boa ;
 
 : hide ( parser -- parser )
   [ drop ignore ] action ;
 
 : delay ( quot -- parser )
-  delay-parser construct-boa init-parser ;
+  delay-parser construct-boa ;
 
 : PEG:
   (:) [
