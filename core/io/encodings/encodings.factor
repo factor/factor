@@ -12,7 +12,7 @@ GENERIC: decode-char ( stream encoding -- char/f )
 
 GENERIC: encode-char ( char stream encoding -- )
 
-GENERIC: <decoder> ( stream decoding -- newstream )
+GENERIC: <decoder> ( stream encoding -- newstream )
 
 : replacement-char HEX: fffd ;
 

@@ -123,8 +123,8 @@ HELP: reader-effect
 { $description "The stack effect of slot reader words is " { $snippet "( object -- value )" } "." } ;
 
 HELP: define-reader
-{ $values { "class" class } { "spec" slot-spec } }
-{ $description "Defines a generic word " { $snippet "reader" } " to read a slot from instances of " { $snippet "class" } "." }
+{ $values { "class" class } { "name" string } { "slot" integer } }
+{ $description "Defines a reader word to read a slot from instances of " { $snippet "class" } "." }
 $low-level-note ;
 
 HELP: writer-effect
@@ -132,13 +132,13 @@ HELP: writer-effect
 { $description "The stack effect of slot writer words is " { $snippet "( value obj -- )" } "." } ;
 
 HELP: define-writer
-{ $values { "class" class } { "spec" slot-spec } }
+{ $values { "class" class } { "name" string } { "slot" integer } }
 { $description "Defines a generic word " { $snippet "writer" } " to write a new value to a slot in instances of " { $snippet "class" } "." }
 $low-level-note ;
 
 HELP: define-slot-methods
-{ $values { "class" class } { "spec" slot-spec } }
-{ $description "Defines a pair of generic words for reading and writing a slot value in instances of " { $snippet "class" } "." }
+{ $values { "class" class } { "name" string } { "slot" integer } }
+{ $description "Defines a reader, writer, setter and changer for a slot in instances of " { $snippet "class" } "." }
 $low-level-note ;
 
 HELP: define-accessors
