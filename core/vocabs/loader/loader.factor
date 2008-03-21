@@ -113,7 +113,11 @@ M: string (load-vocab)
             rethrow
         ] [
             drop
-            [ (load-vocab) ] with-compiler-errors
+            dup find-vocab-root [
+                [ (load-vocab) ] with-compiler-errors
+            ] [
+                dup vocab [ drop ] [ no-vocab ] if
+            ] if
         ] if
     ] with-compiler-errors
 ] load-vocab-hook set-global

@@ -1,7 +1,7 @@
 USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
-sorting tuples compiler.units debugger vocabs.loader ;
+sorting tuples compiler.units debugger vocabs vocabs.loader ;
 IN: parser.tests
 
 [
@@ -461,3 +461,11 @@ must-fail-with
 ] times
 
 [ ] [ "parser" reload ] unit-test
+
+[ ] [
+    [ "this-better-not-exist" forget-vocab ] with-compilation-unit
+] unit-test
+
+[
+    "USE: this-better-not-exist" eval
+] must-fail

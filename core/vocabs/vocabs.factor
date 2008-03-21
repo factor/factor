@@ -64,8 +64,7 @@ ERROR: no-vocab name ;
 SYMBOL: load-vocab-hook ! ( name -- )
 
 : load-vocab ( name -- vocab )
-    dup load-vocab-hook get call
-    dup vocab [ ] [ vocab-name no-vocab ] ?if ;
+    dup load-vocab-hook get call vocab ;
 
 : vocabs ( -- seq )
     dictionary get keys natural-sort ;
