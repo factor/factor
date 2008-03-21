@@ -37,10 +37,11 @@ HELP: <encoder-duplex> ( stream-in stream-out encoding -- duplex )
 
 ARTICLE: "encodings-descriptors" "Encoding descriptors"
 "An encoding descriptor is something which can be used for input or output streams to encode or decode files. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
-$nl { $vocab-link "io.encodings.utf8" }
-$nl { $vocab-link "io.encodings.ascii" }
-$nl { $vocab-link "io.encodings.binary" }
-$nl { $vocab-link "io.encodings.utf16" } ;
+{ $vocab-subsection "io.encodings.utf8" }
+{ $vocab-subsection "io.encodings.ascii" }
+{ $vocab-subsection "io.encodings.8-bit" }
+{ $vocab-subsection "io.encodings.binary" }
+{ $vocab-subsection "io.encodings.utf16" } ;
 
 ARTICLE: "encodings-protocol" "Encoding protocol"
 "An encoding descriptor must implement the following methods. The methods are implemented on tuple classes by instantiating the class and calling the method again."
