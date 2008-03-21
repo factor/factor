@@ -3,7 +3,7 @@
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
-       words ;
+       words quotations ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
@@ -42,7 +42,7 @@ GENERIC: (compile) ( parser -- quot )
   ] with-variable ;
 
 : parse ( state parser -- result )
-  compile call ;
+  compile execute ;
 
 <PRIVATE
 
@@ -260,7 +260,7 @@ TUPLE: delay-parser quot ;
 
 M: delay-parser (compile) ( parser -- quot )
   [
-    delay-parser-quot % \ (compile) , \ call ,
+    delay-parser-quot % \ compile , \ execute ,
   ] [ ] make ;
 
 PRIVATE>
@@ -334,7 +334,7 @@ PRIVATE>
 : PEG:
   (:) [
     [
-        call compile
+        call compile 1quotation
         [ dup [ parse-result-ast ] [ "Parse failed" throw ] if ]
         append define
     ] with-compilation-unit
