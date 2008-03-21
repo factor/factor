@@ -18,7 +18,7 @@ TYPEDEF: ulonglong      u_int64_t
 
 TYPEDEF: __uint32_t     __dev_t
 TYPEDEF: __uint32_t     dev_t
-TYPEDEF: __uint32_t     ino_t
+TYPEDEF: __uint64_t     ino_t
 TYPEDEF: __uint32_t     mode_t
 TYPEDEF: __uint32_t     nlink_t
 TYPEDEF: __uint32_t     uid_t
