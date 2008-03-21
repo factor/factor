@@ -7,3 +7,4 @@ IN: io.encodings.8-bit.tests
 
 [ "bar" ] [ "bar" iso-8859-1 decode ] unit-test
 [ { CHAR: b 233 CHAR: r } ] [ { CHAR: b 233 CHAR: r } iso-8859-1 decode >array ] unit-test
+[ { HEX: fffd HEX: 20AC } ] [ { HEX: 81 HEX: 80 } windows-1252 decode >array ] unit-test

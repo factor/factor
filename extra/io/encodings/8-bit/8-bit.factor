@@ -3,7 +3,7 @@
 USING: math.parser arrays io.encodings sequences kernel
 assocs hashtables io.encodings.ascii combinators.cleave
 generic parser tuples words io io.files splitting namespaces
-classes quotations ;
+classes quotations math compiler.units ;
 IN: io.encodings.8-bit
 
 <PRIVATE
@@ -25,20 +25,22 @@ IN: io.encodings.8-bit
     { "iso-8859-15" "8859-15" }
     { "iso-8859-16" "8859-16" }
     { "koi8-r" "KOI8-R" }
-!    { "windows-1252" "CP1252" }
-!    { "ebcdic" "CP037" }
+    { "windows-1252" "CP1252" }
+    { "ebcdic" "CP037" }
     { "mac-roman" "ROMAN" }
-!    { "gsm-03.38" "GSM0338" }
 } ;
 
 : full-path ( file-name -- path )
     "extra/io/encodings/8-bit/" ".TXT"
     swapd 3append resource-path ;
 
+: tail-if ( seq n -- newseq )
+    2dup swap length <= [ tail ] [ drop ] if ;
+
 : process-contents ( lines -- assoc )
     [ "#" split first ] map
     [ empty? not ] subset
-    [ "\t " split 2 head [ 2 tail hex> ] map ] map ;
+    [ "\t " split 2 head [ 2 tail-if hex> ] map ] map ;
 
 : byte>ch ( assoc -- array )
     256 replacement-char <array>
@@ -73,7 +75,9 @@ IN: io.encodings.8-bit
     \ encode-char [ encode-8-bit ] method-with-data ;
 
 : decode-8-bit ( stream encoding array -- char/f )
-    nip swap stream-read1 [ swap nth ] [ drop f ] if* ;
+    nip swap stream-read1
+    [ swap nth [ replacement-char ] unless* ]
+    [ drop f ] if* ;
 
 : define-decode-char ( class array -- )
     \ decode-char [ decode-8-bit ] method-with-data ;
@@ -86,4 +90,4 @@ IN: io.encodings.8-bit
 
 PRIVATE>
 
-! << mappings [ define-8-bit-encoding ] assoc-each >>
+[ mappings [ define-8-bit-encoding ] assoc-each ] with-compilation-unit
