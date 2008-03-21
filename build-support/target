@@ -12,6 +12,12 @@ then
 elif [ \( `uname -s` = OpenBSD \) -a \( `uname -m` = amd64 \) ]
 then
   echo openbsd-x86-64
+elif [ \( `uname -s` = NetBSD \) -a \( `uname -p` = i386 \) ]
+then
+  echo netbsd-x86-32
+elif [ \( `uname -s` = NetBSD \) -a \( `uname -p` = amd64 \) ]
+then
+  echo netbsd-x86-64
 elif [ \( `uname -s` = Darwin \) -a \( `uname -p` = powerpc \) ]
 then
   echo macosx-ppc
