@@ -17,17 +17,17 @@ TUPLE: mailbox threads data ;
     [ mailbox-data push-front ] keep
     mailbox-threads notify-all yield ;
 
-: block-unless-pred ( pred mailbox timeout -- )
-    2over mailbox-data dlist-contains? [
+: block-unless-pred ( mailbox timeout pred -- )
+    pick mailbox-data over dlist-contains? [
         3drop
     ] [
-        2dup >r mailbox-threads r> "mailbox" wait
+        >r over mailbox-threads over "mailbox" wait r>
         block-unless-pred
     ] if ; inline
 
 : block-if-empty ( mailbox timeout -- mailbox )
     over mailbox-empty? [
-        2dup >r mailbox-threads r> "mailbox" wait
+        over mailbox-threads over "mailbox" wait
         block-if-empty
     ] [
         drop
@@ -58,12 +58,12 @@ TUPLE: mailbox threads data ;
         2drop
     ] if ; inline
 
-: mailbox-get-timeout? ( pred mailbox timeout -- obj )
-    [ block-unless-pred ] 3keep drop
-    mailbox-data delete-node-if ; inline
+: mailbox-get-timeout? ( mailbox timeout pred -- obj )
+    3dup block-unless-pred
+    nip >r mailbox-data r> delete-node-if ; inline
 
-: mailbox-get? ( pred mailbox -- obj )
-    f mailbox-get-timeout? ; inline
+: mailbox-get? ( mailbox pred -- obj )
+    f swap mailbox-get-timeout? ; inline
 
 TUPLE: linked-error thread ;
 
