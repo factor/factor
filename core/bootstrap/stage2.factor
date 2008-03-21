@@ -12,7 +12,7 @@ SYMBOL: bootstrap-time
 
 : default-image-name ( -- string )
     vm file-name windows? [ "." split1 drop ] when
-    ".image" append ;
+    ".image" append resource-path ;
 
 : do-crossref ( -- )
     "Cross-referencing..." print flush
@@ -106,5 +106,5 @@ f error-continuation set-global
     millis r> - dup bootstrap-time set-global
     print-report
 
-    "output-image" get resource-path save-image-and-exit
+    "output-image" get save-image-and-exit
 ] if
