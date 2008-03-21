@@ -8,7 +8,8 @@ $nl
 "The main entry point to the optimizing compiler:"
 { $subsection optimized-recompile-hook }
 "Removing a word's optimized definition:"
-{ $subsection decompile } ;
+{ $subsection decompile }
+"These words are not usually used directly. Instead, use " { $link "compilation-units" } "." ;
 
 ARTICLE: "compiler" "Optimizing compiler"
 "Factor is a fully compiled language implementation with two distinct compilers:"
