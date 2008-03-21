@@ -1,5 +1,5 @@
 USING: arrays io io.files kernel math parser strings system
-tools.test words namespaces io.encodings.latin1
+tools.test words namespaces io.encodings.8-bit
 io.encodings.binary ;
 IN: io.tests
 
@@ -9,7 +9,7 @@ IN: io.tests
 ] unit-test
 
 : <resource-reader> ( resource -- stream )
-    resource-path latin1 <file-reader> ;
+    resource-path iso-8859-1 <file-reader> ;
 
 [
     "This is a line.\rThis is another line.\r"
