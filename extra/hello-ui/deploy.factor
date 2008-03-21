@@ -1,7 +1,7 @@
 USING: tools.deploy.config ;
 H{
     { deploy-word-defs? f }
-    { deploy-random? t }
+    { deploy-random? f }
     { deploy-name "Hello world" }
     { deploy-threads? t }
     { deploy-compiler? t }
