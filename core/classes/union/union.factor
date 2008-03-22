@@ -13,7 +13,7 @@ PREDICATE: class union-class
         drop [ drop f ]
     ] [
         unclip first "predicate" word-prop swap
-        [ >r "predicate" word-prop [ dup ] swap append r> ]
+        [ >r "predicate" word-prop [ dup ] prepend r> ]
         assoc-map alist>quot
     ] if ;
 

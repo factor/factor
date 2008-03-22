@@ -5,7 +5,7 @@ io.windows io.windows.nt.pipes libc io.nonblocking
 io.streams.duplex windows.types math windows.kernel32 windows
 namespaces io.launcher kernel sequences windows.errors assocs
 splitting system threads init strings combinators
-io.backend new-slots accessors concurrency.flags ;
+io.backend accessors concurrency.flags ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args

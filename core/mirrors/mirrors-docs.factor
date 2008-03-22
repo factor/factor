@@ -2,14 +2,17 @@ USING: help.markup help.syntax slots kernel assocs sequences ;
 IN: mirrors
 
 ARTICLE: "mirrors" "Mirrors"
-"A reflective view of an object's slots and their values:"
+"The " { $vocab-link "mirrors" } " vocabulary defines data types which present an object's slots and slot values as an associative structure. This enables idioms such as iteration over all slots in a tuple, or editing of tuples, sequences and assocs in a generic fashion. This functionality is used by developer tools and meta-programming utilities."
+$nl
+"A mirror provides such a view of a tuple:"
 { $subsection mirror }
 { $subsection <mirror> }
-"A view of a sequence as an associative structure:"
+"An enum provides such a view of a sequence:"
 { $subsection enum }
 { $subsection <enum> }
 "Utility word used by developer tools which inspect objects:"
-{ $subsection make-mirror } ;
+{ $subsection make-mirror }
+{ $see-also "slots" } ;
 
 ABOUT: "mirrors"
 

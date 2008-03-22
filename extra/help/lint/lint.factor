@@ -39,8 +39,6 @@ IN: help.lint
     {
         $shuffle
         $values-x/y
-        $slot-reader
-        $slot-writer
         $predicate
         $class-description
         $error-description

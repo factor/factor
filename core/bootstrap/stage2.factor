@@ -12,7 +12,7 @@ SYMBOL: bootstrap-time
 
 : default-image-name ( -- string )
     vm file-name windows? [ "." split1 drop ] when
-    ".image" append ;
+    ".image" append resource-path ;
 
 : do-crossref ( -- )
     "Cross-referencing..." print flush
@@ -25,7 +25,7 @@ SYMBOL: bootstrap-time
     "exclude" "include"
     [ get-global " " split [ empty? not ] subset ] 2apply
     seq-diff
-    [ "bootstrap." swap append require ] each ;
+    [ "bootstrap." prepend require ] each ;
 
 : compile-remaining ( -- )
     "Compiling remaining words..." print flush
@@ -57,7 +57,7 @@ millis >r
 
 default-image-name "output-image" set-global
 
-"math help handbook compiler tools ui ui.tools io" "include" set-global
+"math help handbook compiler random tools ui ui.tools io" "include" set-global
 "" "exclude" set-global
 
 parse-command-line
@@ -106,5 +106,5 @@ f error-continuation set-global
     millis r> - dup bootstrap-time set-global
     print-report
 
-    "output-image" get resource-path save-image-and-exit
+    "output-image" get save-image-and-exit
 ] if

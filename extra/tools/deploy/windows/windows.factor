@@ -6,7 +6,7 @@ prettyprint windows.shell32 windows.user32 ;
 IN: tools.deploy.windows
 
 : copy-vm ( executable bundle-name -- vm )
-    swap path+ ".exe" append
+    prepend-path ".exe" append
     vm over copy-file ;
 
 : copy-fonts ( bundle-name -- )
@@ -23,7 +23,7 @@ IN: tools.deploy.windows
     copy-vm ;
 
 : image-name ( vocab bundle-name -- str )
-    swap path+ ".image" append ;
+    prepend-path ".image" append ;
 
 TUPLE: windows-deploy-implementation ;
 

@@ -49,6 +49,8 @@
 			
 			#if defined(FACTOR_X86)
 				#include "os-freebsd-x86.32.h"
+			#elif defined(FACTOR_AMD64)
+				#include "os-freebsd-x86.64.h"
 			#else
 				#error "Unsupported FreeBSD flavor"
 			#endif

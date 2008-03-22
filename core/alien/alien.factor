@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math namespaces sequences system
 kernel.private tuples bit-arrays byte-arrays float-arrays 
-shuffle arrays macros ;
+arrays ;
 IN: alien
 
 ! Some predicate classes used by the compiler for optimization
@@ -65,21 +65,21 @@ TUPLE: library path abi dll ;
 
 TUPLE: alien-callback return parameters abi quot xt ;
 
-TUPLE: alien-callback-error ;
+ERROR: alien-callback-error ;
 
 : alien-callback ( return parameters abi quot -- alien )
-    \ alien-callback-error construct-empty throw ;
+    alien-callback-error ;
 
 TUPLE: alien-indirect return parameters abi ;
 
-TUPLE: alien-indirect-error ;
+ERROR: alien-indirect-error ;
 
 : alien-indirect ( ... funcptr return parameters abi -- )
-    \ alien-indirect-error construct-empty throw ;
+    alien-indirect-error ;
 
-TUPLE: alien-invoke library function return parameters ;
+TUPLE: alien-invoke library function return parameters abi ;
 
-TUPLE: alien-invoke-error library symbol ;
+ERROR: alien-invoke-error library symbol ;
 
 : alien-invoke ( ... return library function parameters -- ... )
-    2over \ alien-invoke-error construct-boa throw ;
+    2over alien-invoke-error ;

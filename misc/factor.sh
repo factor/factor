@@ -88,6 +88,9 @@ set_md5sum() {
 set_gcc() {
     case $OS in
         openbsd) ensure_program_installed egcc; CC=egcc;;
+	netbsd) if [[ $WORD -eq 64 ]] ; then
+			CC=/usr/pkg/gcc34/bin/gcc
+		fi ;;
         *) CC=gcc;;
     esac
 }
@@ -306,7 +309,10 @@ update_boot_images() {
         get_url http://factorcode.org/images/latest/checksums.txt
         factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`;
         set_md5sum
-        disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '`;
+        case $OS in
+             netbsd) disk_md5=`md5 $BOOT_IMAGE | cut -f4 -d' '`;;
+             *) disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '` ;;
+        esac
         echo "Factorcode md5: $factorcode_md5";
         echo "Disk md5: $disk_md5";
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then

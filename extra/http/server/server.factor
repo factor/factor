@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http sequences prettyprint io.server logging calendar
-new-slots html.elements accessors math.parser combinators.lib
+html.elements accessors math.parser combinators.lib
 tools.vocabs debugger html continuations random combinators
 destructors io.encodings.latin1 fry combinators.cleave ;
 IN: http.server

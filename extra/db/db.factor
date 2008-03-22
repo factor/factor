@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations kernel math
 namespaces sequences sequences.lib tuples words strings
-tools.walker new-slots accessors ;
+tools.walker accessors ;
 IN: db
 
 TUPLE: db

@@ -43,20 +43,20 @@ IN: dlists.tests
     dlist-front dlist-node-next dlist-node-next
 ] unit-test
 
-[ f f ] [ <dlist> [ 1 = ] swap dlist-find ] unit-test
-[ 1 t ] [ <dlist> 1 over push-back [ 1 = ] swap dlist-find ] unit-test
-[ f f ] [ <dlist> 1 over push-back [ 2 = ] swap dlist-find ] unit-test
-[ f ] [ <dlist> 1 over push-back [ 2 = ] swap dlist-contains? ] unit-test
-[ t ] [ <dlist> 1 over push-back [ 1 = ] swap dlist-contains? ] unit-test
+[ f f ] [ <dlist> [ 1 = ] dlist-find ] unit-test
+[ 1 t ] [ <dlist> 1 over push-back [ 1 = ] dlist-find ] unit-test
+[ f f ] [ <dlist> 1 over push-back [ 2 = ] dlist-find ] unit-test
+[ f ] [ <dlist> 1 over push-back [ 2 = ] dlist-contains? ] unit-test
+[ t ] [ <dlist> 1 over push-back [ 1 = ] dlist-contains? ] unit-test
 
-[ 1 ] [ <dlist> 1 over push-back [ 1 = ] swap delete-node-if ] unit-test
-[ t ] [ <dlist> 1 over push-back [ 1 = ] over delete-node-if drop dlist-empty? ] unit-test
-[ t ] [ <dlist> 1 over push-back [ 1 = ] over delete-node-if drop dlist-empty? ] unit-test
-[ 0 ] [ <dlist> 1 over push-back [ 1 = ] over delete-node-if drop dlist-length ] unit-test
-[ 1 ] [ <dlist> 1 over push-back 2 over push-back [ 1 = ] over delete-node-if drop dlist-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back [ 1 = ] over delete-node-if drop dlist-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back [ 2 = ] over delete-node-if drop dlist-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back [ 3 = ] over delete-node-if drop dlist-length ] unit-test
+[ 1 ] [ <dlist> 1 over push-back [ 1 = ] delete-node-if ] unit-test
+[ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop dlist-empty? ] unit-test
+[ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop dlist-empty? ] unit-test
+[ 0 ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop dlist-length ] unit-test
+[ 1 ] [ <dlist> 1 over push-back 2 over push-back dup [ 1 = ] delete-node-if drop dlist-length ] unit-test
+[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 1 = ] delete-node-if drop dlist-length ] unit-test
+[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 2 = ] delete-node-if drop dlist-length ] unit-test
+[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 3 = ] delete-node-if drop dlist-length ] unit-test
 
 [ 0 ] [ <dlist> dlist-length ] unit-test
 [ 1 ] [ <dlist> 1 over push-front dlist-length ] unit-test

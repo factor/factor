@@ -127,7 +127,7 @@ TUPLE: no-sql-modifier ;
 : modifiers ( spec -- str )
     sql-spec-modifiers 
     [ lookup-modifier ] map " " join
-    dup empty? [ " " swap append ] unless ;
+    dup empty? [ " " prepend ] unless ;
 
 HOOK: bind% db ( spec -- )
 

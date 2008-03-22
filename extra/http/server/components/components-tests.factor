@@ -1,6 +1,6 @@
 IN: http.server.components.tests
 USING: http.server.components http.server.validators
-namespaces tools.test kernel accessors new-slots
+namespaces tools.test kernel accessors
 tuple-syntax mirrors http.server.actions ;
 
 validation-failed? off

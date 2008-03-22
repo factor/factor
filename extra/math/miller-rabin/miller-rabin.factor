@@ -19,8 +19,6 @@ SYMBOL: trials
 : next-odd ( m -- n )
     dup even? [ 1+ ] [ 2 + ] if ;
 
-: random-bits ( m -- n ) 2^ random ; foldable
-
 TUPLE: positive-even-expected n ;
 
 : (factor-2s) ( r s -- r s )

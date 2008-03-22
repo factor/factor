@@ -71,7 +71,7 @@ M: sqlite-statement bind-tuple ( tuple statement -- )
     [
         statement-in-params
         [
-            [ sql-spec-column-name ":" swap append ]
+            [ sql-spec-column-name ":" prepend ]
             [ sql-spec-slot-name rot get-slot-named ]
             [ sql-spec-type ] tri 3array
         ] with map
@@ -173,7 +173,7 @@ M: sqlite-db <delete-tuple-statement> ( specs table -- sql )
 ! : select-sequence ( seq name -- ) ;
 
 M: sqlite-db bind% ( spec -- )
-    dup 1, sql-spec-column-name ":" swap append 0% ;
+    dup 1, sql-spec-column-name ":" prepend 0% ;
 
 M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
     [

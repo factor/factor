@@ -26,10 +26,10 @@ M: thread send ( message thread -- )
     my-mailbox swap mailbox-get-timeout ?linked ;
 
 : receive-if ( pred -- message )
-    my-mailbox mailbox-get? ?linked ; inline
+    my-mailbox swap mailbox-get? ?linked ; inline
 
-: receive-if-timeout ( pred timeout -- message )
-    my-mailbox swap mailbox-get-timeout? ?linked ; inline
+: receive-if-timeout ( timeout pred -- message )
+    my-mailbox -rot mailbox-get-timeout? ?linked ; inline
 
 : rethrow-linked ( error process supervisor -- )
     >r <linked-error> r> send ;
@@ -40,7 +40,7 @@ M: thread send ( message thread -- )
 TUPLE: synchronous data sender tag ;
 
 : <synchronous> ( data -- sync )
-    self random-256 synchronous construct-boa ;
+    self 256 random-bits synchronous construct-boa ;
 
 TUPLE: reply data tag ;
 

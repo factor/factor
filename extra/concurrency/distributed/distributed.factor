@@ -3,7 +3,7 @@
 USING: serialize sequences concurrency.messaging
 threads io io.server qualified arrays
 namespaces kernel io.encodings.binary combinators.cleave
-new-slots accessors ;
+accessors ;
 QUALIFIED: io.sockets
 IN: concurrency.distributed
 

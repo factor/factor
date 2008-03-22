@@ -40,48 +40,63 @@ IN: tools.deploy.backend
         "compiler" deploy-compiler? get ?,
         "ui" deploy-ui? get ?,
         "io" native-io? ?,
+        "random" deploy-random? get ?,
     ] { } make ;
 
-: staging-image-name ( -- name )
+: staging-image-name ( profile -- name )
     "staging."
-    bootstrap-profile strip-word-names? [ "strip" add ] when
-    "-" join ".image" 3append ;
+    swap strip-word-names? [ "strip" add ] when
+    "-" join ".image" 3append temp-file ;
 
-: staging-command-line ( config -- flags )
+DEFER: ?make-staging-image
+
+: staging-command-line ( profile -- flags )
     [
-        [
+        dup empty? [
             "-i=" my-boot-image-name append ,
+        ] [
+            dup 1 head* ?make-staging-image
 
-            "-output-image=" staging-image-name append ,
+            "-resource-path=" "" resource-path append ,
 
-            "-include=" bootstrap-profile " " join append ,
+            "-i=" over 1 head* staging-image-name append ,
 
-            strip-word-names? [ "-no-stack-traces" , ] when
+            "-run=tools.deploy.restage" ,
+        ] if
 
-            "-no-user-init" ,
-        ] { } make
-    ] bind ;
+        "-output-image=" over staging-image-name append ,
+
+        "-include=" swap " " join append ,
+
+        strip-word-names? [ "-no-stack-traces" , ] when
+
+        "-no-user-init" ,
+    ] { } make ;
 
 : run-factor ( vm flags -- )
     swap add* dup . run-with-output ; inline
 
-: make-staging-image ( config -- )
+: make-staging-image ( profile -- )
     vm swap staging-command-line run-factor ;
 
-: ?make-staging-image ( config -- )
-    dup [ staging-image-name ] bind exists?
+: ?make-staging-image ( profile -- )
+    dup staging-image-name exists?
     [ drop ] [ make-staging-image ] if ;
 
 : deploy-command-line ( image vocab config -- flags )
     [
+        bootstrap-profile ?make-staging-image
+
         [
-            "-i=" staging-image-name append ,
+            "-i=" bootstrap-profile staging-image-name append ,
+
+            "-resource-path=" "" resource-path append ,
 
             "-run=tools.deploy.shaker" ,
 
-            "-deploy-vocab=" swap append ,
+            "-deploy-vocab=" prepend ,
 
-            "-output-image=" swap append ,
+            "-output-image=" prepend ,
 
             strip-word-names? [ "-no-stack-traces" , ] when
         ] { } make
@@ -89,7 +104,6 @@ IN: tools.deploy.backend
 
 : make-deploy-image ( vm image vocab config -- )
     make-boot-image
-    dup ?make-staging-image
     deploy-command-line run-factor ;
 
 SYMBOL: deploy-implementation

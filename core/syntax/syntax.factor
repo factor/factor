@@ -163,6 +163,12 @@ IN: bootstrap.syntax
         [ construct-boa ] curry define-inline
     ] define-syntax
 
+    "ERROR:" [
+        CREATE-CLASS dup ";" parse-tokens define-tuple-class
+        dup save-location
+        dup [ construct-boa throw ] curry define
+    ] define-syntax
+
     "FORGET:" [
         scan-word
         dup parsing? [ V{ } clone swap execute first ] when

@@ -72,6 +72,9 @@ M: mx unregister-io-task ( task mx -- )
 
 : (io-error) ( -- * ) err_no strerror throw ;
 
+: check-errno ( -- )
+    err_no dup zero? [ drop ] [ strerror throw ] if ;
+
 : check-null ( n -- ) zero? [ (io-error) ] when ;
 
 : io-error ( n -- ) 0 < [ (io-error) ] when ;

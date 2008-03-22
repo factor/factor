@@ -30,8 +30,6 @@ DEFER: start-walker-thread
         2dup start-walker-thread
     ] if* ;
 
-USING: io.streams.c prettyprint ;
-
 : show-walker ( -- thread )
     get-walker-thread
     [ show-walker-hook get call ] keep ;
@@ -40,7 +38,7 @@ USING: io.streams.c prettyprint ;
     {
         { [ dup continuation? ] [ (continue) ] }
         { [ dup quotation? ] [ call ] }
-        { [ dup not ] [ "Single stepping abandoned" throw ] }
+        { [ dup not ] [ "Single stepping abandoned" rethrow ] }
     } cond ;
 
 : break ( -- )
