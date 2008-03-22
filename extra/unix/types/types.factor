@@ -12,5 +12,6 @@ os
     { "freebsd" [ "unix.types.freebsd" require ] }
     { "openbsd" [ "unix.types.openbsd" require ] }
     { "netbsd"  [ "unix.types.netbsd"  require ] }
+    { "winnt" [ ] }
   }
 case

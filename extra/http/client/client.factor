@@ -3,7 +3,7 @@
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
 splitting calendar continuations accessors vectors
-io.encodings.latin1 io.encodings.binary fry ;
+io.encodings.8-bit io.encodings.binary fry ;
 IN: http.client
 
 DEFER: http-request
@@ -52,7 +52,7 @@ PRIVATE>
 
 : http-request ( request -- response stream )
     dup request [
-        dup request-addr latin1 <client>
+        dup request-addr iso-8859-1 <client>
         1 minutes over set-timeout
         [
             write-request flush
@@ -82,7 +82,7 @@ PRIVATE>
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
     swap http-get-stream swap check-response
-    [ swap latin1 <file-writer> stream-copy ] with-disposal ;
+    [ swap iso-8859-1 <file-writer> stream-copy ] with-disposal ;
 
 : download ( url -- )
     dup download-name download-to ;
