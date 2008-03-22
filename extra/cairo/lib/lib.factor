@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types cairo.ffi continuations destructors
-kernel libc locals math combinators.cleave shuffle new-slots
+kernel libc locals math combinators.cleave shuffle
 accessors ;
 IN: cairo.lib
 

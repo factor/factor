@@ -27,6 +27,7 @@ TYPEDEF: ulong size_t
 ! ! ! Unix functions
 LIBRARY: factor
 FUNCTION: int err_no ( ) ;
+FUNCTION: void clear_err_no ( ) ;
 
 LIBRARY: libc
 

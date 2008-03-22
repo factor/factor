@@ -59,7 +59,7 @@ objc-methods global [ H{ } assoc-like ] change-at
 
 : lookup-method ( selector -- method )
     dup objc-methods get at
-    [ ] [ "No such method: " swap append throw ] ?if ;
+    [ ] [ "No such method: " prepend throw ] ?if ;
 
 : make-dip ( quot n -- quot' )
     dup
@@ -90,7 +90,7 @@ MACRO: (send) ( selector super? -- quot )
 ! Runtime introspection
 : (objc-class) ( string word -- class )
     dupd execute
-    [ ] [ "No such class: " swap append throw ] ?if ; inline
+    [ ] [ "No such class: " prepend throw ] ?if ; inline
 
 : objc-class ( string -- class )
     \ objc_getClass (objc-class) ;

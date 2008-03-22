@@ -25,10 +25,6 @@ GENERIC: word-help* ( word -- content )
 
 M: word word-help* drop f ;
 
-M: slot-reader word-help* drop \ $slot-reader ;
-
-M: slot-writer word-help* drop \ $slot-writer ;
-
 M: predicate word-help* drop \ $predicate ;
 
 : all-articles ( -- seq )
@@ -98,7 +94,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 : about ( vocab -- )
     dup require
     dup vocab [ ] [
-        "No such vocabulary: " swap append throw
+        "No such vocabulary: " prepend throw
     ] ?if
     dup vocab-help [
         help

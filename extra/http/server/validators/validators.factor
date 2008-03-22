@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations sequences math namespaces
-math.parser assocs new-slots regexp fry unicode.categories
+math.parser assocs regexp fry unicode.categories
 combinators.cleave sequences ;
 IN: http.server.validators
 
@@ -59,7 +59,7 @@ C: <validation-error> validation-error
 
 : v-regexp ( str what regexp -- str )
     >r over r> matches?
-    [ drop ] [ "invalid " swap append throw ] if ;
+    [ drop ] [ "invalid " prepend throw ] if ;
 
 : v-email ( str -- str )
     #! From http://www.regular-expressions.info/email.html

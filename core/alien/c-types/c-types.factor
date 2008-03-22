@@ -26,9 +26,7 @@ global [
     c-types [ H{ } assoc-like ] change
 ] bind
 
-TUPLE: no-c-type name ;
-
-: no-c-type ( type -- * ) \ no-c-type construct-boa throw ;
+ERROR: no-c-type name ;
 
 : (c-type) ( name -- type/f )
     c-types get-global at dup [

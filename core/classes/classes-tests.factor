@@ -1,6 +1,6 @@
 USING: alien arrays definitions generic assocs hashtables io
 kernel math namespaces parser prettyprint sequences strings
-tools.test vectors words quotations classes io.streams.string
+tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units ;
 IN: classes.tests
@@ -22,6 +22,8 @@ H{ } "s" set
 [ number ] [ number object class-and ] unit-test
 [ number ] [ object number class-and ] unit-test
 [ null ] [ slice reversed class-and ] unit-test
+[ null ] [ general-t \ f class-and ] unit-test
+[ object ] [ general-t \ f class-or ] unit-test
 
 TUPLE: first-one ;
 TUPLE: second-one ;
@@ -62,10 +64,6 @@ UNION: c a b ;
 ! FORGET: bah
 UNION: bah fixnum alien ;
 [ bah ] [ \ bah? "predicating" word-prop ] unit-test
-
-! Test generic see and parsing
-[ "USING: alien math ;\nIN: classes.tests\nUNION: bah fixnum alien ;\n" ]
-[ [ \ bah see ] with-string-writer ] unit-test
 
 ! Test redefinition of classes
 UNION: union-1 fixnum float ;
@@ -180,6 +178,8 @@ UNION: forget-class-bug-2 forget-class-bug-1 dll ;
 
 [ f ] [ forget-class-bug-2 typemap get values [ memq? ] with contains? ] unit-test
 
+USE: io.streams.string
+
 2 [
     [ "mixin-forget-test" forget-source ] with-compilation-unit
     
@@ -224,3 +224,7 @@ MIXIN: flat-mx-2     INSTANCE: flat-mx-2 flat-mx-1
 TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
 
 [ t ] [ T{ flat-mx-2-1 } flat-mx-1? ] unit-test
+
+! Test generic see and parsing
+[ "USING: alien math ;\nIN: classes.tests\nUNION: bah fixnum alien ;\n" ]
+[ [ \ bah see ] with-string-writer ] unit-test

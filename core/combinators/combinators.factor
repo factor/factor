@@ -5,16 +5,12 @@ USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
 hashtables sorting ;
 
-TUPLE: no-cond ;
-
-: no-cond ( -- * ) \ no-cond construct-empty throw ;
+ERROR: no-cond ;
 
 : cond ( assoc -- )
     [ first call ] find nip dup [ second call ] [ no-cond ] if ;
 
-TUPLE: no-case ;
-
-: no-case ( -- * ) \ no-case construct-empty throw ;
+ERROR: no-case ;
 
 : case ( obj assoc -- )
     [ dup array? [ dupd first = ] [ quotation? ] if ] find nip
@@ -80,7 +76,7 @@ M: hashtable hashcode*
 
 : hash-case-quot ( default assoc -- quot )
     hash-case-table hash-dispatch-quot
-    [ dup hashcode >fixnum ] swap append ;
+    [ dup hashcode >fixnum ] prepend ;
 
 : contiguous-range? ( keys -- from to ? )
     dup [ fixnum? ] all? [

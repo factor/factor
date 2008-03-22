@@ -46,7 +46,7 @@ M: array rect-dim drop { 0 0 } ;
 
 TUPLE: gadget
 pref-dim parent children orientation focus
-visible? root? clipped? layout-state graft-state
+visible? root? clipped? layout-state graft-state graft-node
 interior boundary
 model ;
 
@@ -254,17 +254,20 @@ M: gadget layout* drop ;
 : graft-queue \ graft-queue get ;
 
 : unqueue-graft ( gadget -- )
-    dup graft-queue dlist-delete [ "Not queued" throw ] unless
+    graft-queue over gadget-graft-node delete-node
     dup gadget-graft-state first { t t } { f f } ?
     swap set-gadget-graft-state ;
 
+: (queue-graft) ( gadget flags -- )
+    over set-gadget-graft-state
+    dup graft-queue push-front* swap set-gadget-graft-node
+    notify-ui-thread ;
+
 : queue-graft ( gadget -- )
-    { f t } over set-gadget-graft-state
-    graft-queue push-front notify-ui-thread ;
+    { f t } (queue-graft) ;
 
 : queue-ungraft ( gadget -- )
-    { t f } over set-gadget-graft-state
-    graft-queue push-front notify-ui-thread ;
+    { t f } (queue-graft) ;
 
 : graft-later ( gadget -- )
     dup gadget-graft-state {

@@ -158,6 +158,19 @@ HELP: define-out
 { $description "Defines a word " { $snippet "<" { $emphasis "name" } ">" } " with stack effect " { $snippet "( value -- array )" } ". This word allocates a byte array large enough to hold a value with C type " { $snippet "name" } ", and writes the value at the top of the stack to the array." }
 { $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
 
+ARTICLE: "byte-arrays-gc" "Byte arrays and the garbage collector"
+"The Factor garbage collector can move byte arrays around, and it is only safe to pass byte arrays to C functions if the garbage collector will not run while C code still has a reference to the data."
+$nl
+"In particular, a byte array can only be passed as a parameter if the the C function does not use the parameter after one of the following occurs:"
+{ $list
+    "the C function returns"
+    "the C function calls Factor code via a callback"
+}
+"Returning from C to Factor, as well as invoking Factor code via a callback, may trigger garbage collection, and if the function had stored a pointer to the byte array somewhere, this pointer may cease to be valid."
+$nl
+"If this condition is not satisfied, " { $link "malloc" } " must be used instead."
+{ $warning "Failure to comply with these requirements can lead to crashes, data corruption, and security exploits." } ;
+
 ARTICLE: "c-out-params" "Output parameters in C"
 "A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
 $nl
@@ -229,13 +242,11 @@ $nl
 { $subsection <c-object> }
 { $subsection <c-array> }
 { $warning
-"The Factor garbage collector can move byte arrays around, and it is only safe to pass byte arrays to C functions if the function does not store a pointer to the byte array in some global structure, or retain it in any way after returning."
-$nl
-"Long-lived data for use by C libraries can be allocated manually, just as when programming in C. See " { $link "malloc" } "." }
+"The Factor garbage collector can move byte arrays around, and code passing byte arrays to C must obey important guidelines. See " { $link "byte-arrays-gc" } "." }
 { $see-also "c-arrays" } ;
 
 ARTICLE: "malloc" "Manual memory management"
-"Sometimes data passed to C functions must be allocated at a fixed address, and so garbage collector managed byte arrays cannot be used. See the warning at the bottom of " { $link "c-byte-arrays" } " for a description of when this is the case."
+"Sometimes data passed to C functions must be allocated at a fixed address. See " { $link "byte-arrays-gc" } " for an explanation of when this is the case."
 $nl
 "Allocating a C datum with a fixed address:"
 { $subsection malloc-object }
@@ -245,8 +256,6 @@ $nl
 { $subsection malloc }
 { $subsection calloc }
 { $subsection realloc }
-"The return value of the above three words must always be checked for a memory allocation failure:"
-{ $subsection check-ptr }
 "You must always free pointers returned by any of the above words when the block of memory is no longer in use:"
 { $subsection free }
 "You can unsafely copy a range of bytes from one memory location to another:"
@@ -271,20 +280,25 @@ ARTICLE: "c-strings" "C strings"
 { $subsection string>u16-alien }
 { $subsection malloc-char-string }
 { $subsection malloc-u16-string }
-"The first two allocate " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } "."
+"The first two allocate " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } ". See " { $link "byte-arrays-gc" } " for a discussion of the two approaches."
 $nl
 "Finally, a set of words can be used to read and write " { $snippet "char*" } " and " { $snippet "ushort*" } " strings at arbitrary addresses:"
 { $subsection alien>char-string }
-{ $subsection alien>u16-string } ;
+{ $subsection alien>u16-string }
+"For example, if a C function returns a " { $snippet "char*" } " but stipulates that the caller must deallocate the memory afterward, you must define the function as returning " { $snippet "void*" } ", and call one of the above words before passing the pointer to " { $link free } "." ;
 
 ARTICLE: "c-data" "Passing data between Factor and C"
-"Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers. Also Factor's garbage collector can move objects in memory, which means that special support has to be provided for passing blocks of memory to C code."
+"Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers."
+$nl
+"Furthermore, Factor's garbage collector can move objects in memory; for a discussion of the consequences, see " { $link "byte-arrays-gc" } "."
 { $subsection "c-types-specs" }
 { $subsection "c-byte-arrays" }
 { $subsection "malloc" }
 { $subsection "c-strings" }
 { $subsection "c-arrays" }
 { $subsection "c-out-params" }
+"Important guidelines for passing data in byte arrays:"
+{ $subsection "byte-arrays-gc" }
 "C-style enumerated types are supported:"
 { $subsection POSTPONE: C-ENUM: }
 "C types can be aliased for convenience and consitency with native library documentation:"

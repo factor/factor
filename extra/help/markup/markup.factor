@@ -159,7 +159,7 @@ M: f print-element drop ;
     [ first ($long-link) ] ($subsection) ;
 
 : ($vocab-link) ( text vocab -- )
-    dup vocab-root >vocab-link write-link ;
+    >vocab-link write-link ;
 
 : $vocab-subsection ( element -- )
     [
@@ -295,63 +295,6 @@ M: string ($instance)
         "This word should only be called from inside the "
         { $link with-pprint } " combinator."
     } $notes ;
-
-: ($spec-reader-values) ( slot-spec class -- element )
-    dup ?word-name swap 2array
-    over slot-spec-name
-    rot slot-spec-type 2array 2array
-    [ { $instance } swap add ] assoc-map ;
-
-: $spec-reader-values ( slot-spec class -- )
-    ($spec-reader-values) $values ;
-
-: $spec-reader-description ( slot-spec class -- )
-    [
-        "Outputs the value stored in the " ,
-        { $snippet } rot slot-spec-name add ,
-        " slot of " ,
-        { $instance } swap add ,
-        " instance." ,
-    ] { } make $description ;
-
-: $spec-reader ( reader slot-specs class -- )
-    >r slot-of-reader r>
-    over [
-        2dup $spec-reader-values
-        2dup $spec-reader-description
-    ] when 2drop ;
-
-GENERIC: slot-specs ( help-type -- specs )
-
-M: word slot-specs "slots" word-prop ;
-
-: $slot-reader ( reader -- )
-    first dup "reading" word-prop [ slot-specs ] keep
-    $spec-reader ;
-
-: $spec-writer-values ( slot-spec class -- )
-    ($spec-reader-values) reverse $values ;
-
-: $spec-writer-description ( slot-spec class -- )
-    [
-        "Stores a new value to the " ,
-        { $snippet } rot slot-spec-name add ,
-        " slot of " ,
-        { $instance } swap add ,
-        " instance." ,
-    ] { } make $description ;
-
-: $spec-writer ( writer slot-specs class -- )
-    >r slot-of-writer r>
-    over [
-        2dup $spec-writer-values
-        2dup $spec-writer-description
-        dup ?word-name 1array $side-effects
-    ] when 2drop ;
-
-: $slot-writer ( reader -- )
-    first dup "writing" word-prop [ slot-specs ] keep
-    $spec-writer ;
 
 GENERIC: elements* ( elt-type element -- )
 

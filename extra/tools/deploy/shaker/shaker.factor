@@ -19,7 +19,6 @@ QUALIFIED: libc.private
 QUALIFIED: libc.private
 QUALIFIED: listener
 QUALIFIED: prettyprint.config
-QUALIFIED: random.private
 QUALIFIED: source-files
 QUALIFIED: threads
 QUALIFIED: vocabs
@@ -108,8 +107,6 @@ IN: tools.deploy.shaker
 
 : stripped-globals ( -- seq )
     [
-        random.private:mt ,
-
         {
             bootstrap.stage2:bootstrap-time
             continuations:error
@@ -145,12 +142,14 @@ IN: tools.deploy.shaker
                 vocabs:dictionary
                 lexer-factory
                 vocabs:load-vocab-hook
+                root-cache
                 layouts:num-tags
                 layouts:num-types
                 layouts:tag-mask
                 layouts:tag-numbers
                 layouts:type-numbers
                 classes:typemap
+                classes:class-map
                 vocab-roots
                 definitions:crossref
                 compiled-crossref

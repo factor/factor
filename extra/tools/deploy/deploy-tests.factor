@@ -1,6 +1,7 @@
 IN: tools.deploy.tests
 USING: tools.test system io.files kernel tools.deploy.config
-tools.deploy.backend math sequences io.launcher arrays ;
+tools.deploy.backend math sequences io.launcher arrays
+namespaces ;
 
 : shake-and-bake ( vocab -- )
     "." resource-path [
@@ -25,6 +26,11 @@ tools.deploy.backend math sequences io.launcher arrays ;
 ] unit-test
 
 [ ] [ "hello-ui" shake-and-bake ] unit-test
+
+[ "staging.math-compiler-ui-strip.image" ] [
+    "hello-ui" deploy-config
+    [ bootstrap-profile staging-image-name file-name ] bind
+] unit-test
 
 [ t ] [
     2000000 small-enough?

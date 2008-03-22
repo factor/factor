@@ -4,6 +4,6 @@ IN: editors.gvim.windows
 
 M: windows-io gvim-path
     \ gvim-path get-global [
-        program-files "vim" path+
+        program-files "vim" append-path
         t [ "gvim.exe" tail? ] find-file
     ] unless* ;

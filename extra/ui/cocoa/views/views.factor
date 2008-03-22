@@ -313,6 +313,7 @@ CLASS: {
 { "dealloc" "void" { "id" "SEL" }
     [
         drop
+        dup unregister-window
         dup remove-observer
         SUPER-> dealloc
     ]
@@ -349,7 +350,13 @@ CLASS: {
 
 { "windowShouldClose:" "bool" { "id" "SEL" "id" }
     [
-        2nip -> contentView window ungraft t
+        3drop t
+    ]
+}
+
+{ "windowWillClose:" "void" { "id" "SEL" "id" }
+    [
+        2nip -> object -> contentView window ungraft
     ]
 } ;
 

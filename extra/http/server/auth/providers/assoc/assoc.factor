@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: http.server.auth.providers.assoc
-USING: new-slots accessors assocs kernel
+USING: accessors assocs kernel
 http.server.auth.providers ;
 
 TUPLE: users-in-memory assoc ;

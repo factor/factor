@@ -5,7 +5,7 @@ IN: http.server.templating.fhtml.tests
 
 : test-template ( path -- ? )
     "resource:extra/http/server/templating/fhtml/test/"
-    swap append
+    prepend
     [
         ".fhtml" append [ run-template ] with-string-writer
     ] keep

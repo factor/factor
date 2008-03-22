@@ -64,13 +64,10 @@ M: pair (bitfield-quot) ( spec -- quot )
 
 \ get-slots [ [get-slots] ] 1 define-transform
 
-TUPLE: duplicated-slots-error names ;
+ERROR: duplicated-slots-error names ;
 
 M: duplicated-slots-error summary
     drop "Calling set-slots with duplicate slot setters" ;
-
-: duplicated-slots-error ( names -- * )
-    \ duplicated-slots-error construct-boa throw ;
 
 \ set-slots [
     dup all-unique?

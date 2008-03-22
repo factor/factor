@@ -1,12 +1,12 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: bootstrap.primitives
 USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes tuples
 kernel.private vocabs vocabs.loader source-files definitions
-slots classes.union compiler.units bootstrap.image.private
-io.files ;
+slots.deprecated classes.union compiler.units
+bootstrap.image.private io.files ;
+IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
 
@@ -30,6 +30,10 @@ crossref off
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
 H{ } clone changed-words set
+H{ } clone root-cache set
+
+! Vocabulary for slot accessors
+"accessors" create-vocab drop
 
 ! Trivial recompile hook. We don't want to touch the code heap
 ! during stage1 bootstrap, it would just waste time.
@@ -90,8 +94,9 @@ call
 } [ create-vocab drop ] each
 
 H{ } clone source-files set
-H{ } clone class<map set
 H{ } clone update-map set
+H{ } clone class<map set
+H{ } clone class-map set
 
 ! Builtin classes
 : builtin-predicate-quot ( class -- quot )
@@ -546,7 +551,7 @@ builtins get num-tags get tail f union-class define-class
     { "eq?" "kernel" }
     { "getenv" "kernel.private" }
     { "setenv" "kernel.private" }
-    { "(stat)" "io.files.private" }
+    { "(exists?)" "io.files.private" }
     { "(directory)" "io.files.private" }
     { "data-gc" "memory" }
     { "code-gc" "memory" }

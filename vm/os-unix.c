@@ -41,24 +41,10 @@ void ffi_dlclose(F_DLL *dll)
 	dll->dll = NULL;
 }
 
-DEFINE_PRIMITIVE(stat)
+DEFINE_PRIMITIVE(existsp)
 {
 	struct stat sb;
-
-	if(stat(unbox_char_string(),&sb) < 0)
-	{
-		dpush(F);
-		dpush(F);
-		dpush(F);
-		dpush(F);
-	}
-	else
-	{
-		box_boolean(S_ISDIR(sb.st_mode));
-		box_signed_4(sb.st_mode & ~S_IFMT);
-		box_unsigned_8(sb.st_size);
-		box_unsigned_8(sb.st_mtime);
-	}
+	box_boolean(stat(unbox_char_string(),&sb) >= 0);
 }
 
 /* Allocates memory */

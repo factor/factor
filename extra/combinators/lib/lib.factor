@@ -9,13 +9,6 @@ continuations ;
 IN: combinators.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: generate ( generator predicate -- obj )
-    #! Call 'generator' until the result satisfies 'predicate'.
-    [ slip over slip ] 2keep
-    roll [ 2drop ] [ rot drop generate ] if ; inline
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Generalized versions of core combinators
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -82,11 +75,11 @@ MACRO: && ( quots -- ? )
     [ [ not ] append [ f ] ] t short-circuit ;
 
 MACRO: <-&& ( quots -- )
-    [ [ dup ] swap append [ not ] append [ f ] ] t short-circuit
+    [ [ dup ] prepend [ not ] append [ f ] ] t short-circuit
     [ nip ] append ;
 
 MACRO: <--&& ( quots -- )
-    [ [ 2dup ] swap append [ not ] append [ f ] ] t short-circuit
+    [ [ 2dup ] prepend [ not ] append [ f ] ] t short-circuit
     [ 2nip ] append ;
 
 MACRO: || ( quots -- ? ) [ [ t ] ] f short-circuit ;
@@ -137,12 +130,12 @@ MACRO: map-call-with ( quots -- )
     [ (make-call-with) ] keep length [ narray ] curry compose ;
 
 : (make-call-with2) ( quots -- quot )
-    [ [ 2dup >r >r ] swap append [ r> r> ] append ] map concat
+    [ [ 2dup >r >r ] prepend [ r> r> ] append ] map concat
     [ 2drop ] append ;
 
 MACRO: map-call-with2 ( quots -- )
     [
-        [ [ 2dup >r >r ] swap append [ r> r> ] append ] map concat
+        [ [ 2dup >r >r ] prepend [ r> r> ] append ] map concat
         [ 2drop ] append    
     ] keep length [ narray ] curry append ;
 
@@ -175,3 +168,10 @@ MACRO: multikeep ( word out-indexes -- ... )
 
 : retry ( quot n -- )
     [ drop ] rot compose attempt-all ; inline
+
+: do-while ( pred body tail -- )
+    >r tuck 2slip r> while ;
+
+: generate ( generator predicate -- obj )
+    [ dup ] swap [ dup [ nip ] unless not ] 3compose
+    swap [ ] do-while ;
