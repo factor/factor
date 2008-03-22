@@ -6,7 +6,7 @@ strings io.styles vectors words system splitting math.parser
 tuples continuations continuations.private combinators
 generic.math io.streams.duplex classes compiler.units
 generic.standard vocabs threads threads.private init
-kernel.private libc ;
+kernel.private libc io.encodings ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -75,9 +75,7 @@ SYMBOL: error-hook
 : try ( quot -- )
     [ error-hook get call ] recover ;
 
-TUPLE: assert got expect ;
-
-: assert ( got expect -- * ) \ assert construct-boa throw ;
+ERROR: assert got expect ;
 
 : assert= ( a b -- ) 2dup = [ 2drop ] [ assert ] if ;
 
@@ -86,28 +84,22 @@ TUPLE: assert got expect ;
 : trim-datastacks ( seq1 seq2 -- seq1' seq2' )
     2dup [ length ] 2apply min tuck tail >r tail r> ;
 
-TUPLE: relative-underflow stack ;
-
-: relative-underflow ( before after -- * )
-    trim-datastacks nip \ relative-underflow construct-boa throw ;
+ERROR: relative-underflow stack ;
 
 M: relative-underflow summary
     drop "Too many items removed from data stack" ;
 
-TUPLE: relative-overflow stack ;
+ERROR: relative-overflow stack ;
 
 M: relative-overflow summary
     drop "Superfluous items pushed to data stack" ;
 
-: relative-overflow ( before after -- * )
-    trim-datastacks drop \ relative-overflow construct-boa throw ;
-
 : assert-depth ( quot -- )
     >r datastack r> swap slip >r datastack r>
     2dup [ length ] compare sgn {
-        { -1 [ relative-underflow ] }
+        { -1 [ trim-datastacks nip relative-underflow ] }
         { 0 [ 2drop ] }
-        { 1 [ relative-overflow ] }
+        { 1 [ trim-datastacks drop relative-overflow ] }
     } case ; inline
 
 : expired-error. ( obj -- )
@@ -210,13 +202,13 @@ M: no-method error.
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
 
-M: check-closed summary
+M: stream-closed-twice summary
     drop "Attempt to perform I/O on closed stream" ;
 
 M: check-method summary
-    drop "Invalid parameters for define-method" ;
+    drop "Invalid parameters for create-method" ;
 
-M: check-tuple summary
+M: no-tuple-class summary
     drop "Invalid class for define-constructor" ;
 
 M: no-cond summary
@@ -254,7 +246,7 @@ M: no-compilation-unit error.
 M: no-vocab summary
     drop "Vocabulary does not exist" ;
 
-M: check-ptr summary
+M: bad-ptr summary
     drop "Memory allocation failed" ;
 
 M: double-free summary
@@ -281,6 +273,10 @@ M: thread error-in-thread ( error thread -- )
             error-in-thread. print-error flush
         ] bind
     ] if ;
+
+M: encode-error summary drop "Character encoding error" ;
+
+M: decode-error summary drop "Character decoding error" ;
 
 <PRIVATE
 

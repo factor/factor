@@ -436,17 +436,16 @@ SYMBOL: trace-messages?
 
 : init-win32-ui ( -- )
     V{ } clone nc-buttons set-global
-    "MSG" <c-object> msg-obj set-global
+    "MSG" malloc-object msg-obj set-global
     "Factor-window" malloc-u16-string class-name-ptr set-global
     register-wndclassex drop
     GetDoubleClickTime double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
-    class-name-ptr get-global [
-        dup f UnregisterClass drop
-        free
-    ] when*
-    f class-name-ptr set-global ;
+    class-name-ptr get-global [ dup f UnregisterClass drop free ] when*
+    msg-obj get-global [ free ] when*
+    f class-name-ptr set-global
+    f msg-obj set-global ;
 
 : setup-pixel-format ( hdc -- )
     16 make-pfd [ ChoosePixelFormat dup win32-error=0/f ] 2keep

@@ -317,3 +317,15 @@ unit-test
 [ ] [ 1 \ + curry unparse drop ] unit-test
 
 [ ] [ 1 \ + compose unparse drop ] unit-test
+
+GENERIC: generic-see-test-with-f ( obj -- obj )
+
+M: f generic-see-test-with-f ;
+
+[ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
+    [ { POSTPONE: f generic-see-test-with-f } see ] with-string-writer
+] unit-test
+
+[ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
+    [ \ f \ generic-see-test-with-f method see ] with-string-writer
+] unit-test

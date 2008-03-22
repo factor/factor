@@ -6,13 +6,14 @@
 !
 ! See http://factorcode.org/license.txt for BSD license.
 !
-IN: serialize
 USING: namespaces sequences kernel math io math.functions
-io.binary strings classes words sbufs tuples arrays
-vectors byte-arrays bit-arrays quotations hashtables
-assocs help.syntax help.markup float-arrays splitting
-io.encodings.string io.encodings.utf8 combinators new-slots
-accessors ;
+io.binary strings classes words sbufs tuples arrays vectors
+byte-arrays bit-arrays quotations hashtables assocs help.syntax
+help.markup float-arrays splitting io.streams.byte-array
+io.encodings.string io.encodings.utf8 io.encodings.binary
+combinators combinators.cleave accessors locals
+prettyprint compiler.units sequences.private tuples.private ;
+IN: serialize
 
 ! Variable holding a assoc of objects already serialized
 SYMBOL: serialized
@@ -69,7 +70,8 @@ GENERIC: (serialize) ( obj -- )
 
 : serialize-shared ( obj quot -- )
     >r dup object-id
-    [ CHAR: o write1 serialize-cell drop ] r> if* ; inline
+    [ CHAR: o write1 serialize-cell drop ]
+    r> if* ; inline
 
 M: f (serialize) ( obj -- )
     drop CHAR: n write1 ;
@@ -96,74 +98,92 @@ M: ratio (serialize) ( obj -- )
     dup numerator (serialize)
     denominator (serialize) ;
 
-: serialize-string ( obj code -- )
-    write1
-    dup utf8 encode dup length serialize-cell write
-    add-object ;
-
-M: string (serialize) ( obj -- )
-    [ CHAR: s serialize-string ] serialize-shared ;
-
-: serialize-elements ( seq -- )
-    [ (serialize) ] each CHAR: . write1 ;
+: serialize-seq ( obj code -- )
+    [
+        write1
+        [ add-object ]
+        [ length serialize-cell ]
+        [ [ (serialize) ] each ] tri
+    ] curry serialize-shared ;
 
 M: tuple (serialize) ( obj -- )
     [
         CHAR: T write1
-        dup tuple>array serialize-elements
-        add-object
+        [ class (serialize) ]
+        [ add-object ]
+        [ tuple>array 1 tail (serialize) ]
+        tri
     ] serialize-shared ;
-
-: serialize-seq ( seq code -- )
-    [
-        write1
-        dup serialize-elements
-        add-object
-    ] curry serialize-shared ;
 
 M: array (serialize) ( obj -- )
     CHAR: a serialize-seq ;
 
-M: byte-array (serialize) ( obj -- )
-    [
-        CHAR: A write1
-        dup dup length serialize-cell write
-        add-object
-    ] serialize-shared ;
-
-M: bit-array (serialize) ( obj -- )
-    [
-        CHAR: b write1
-        dup length serialize-cell
-        dup [ 1 0 ? ] B{ } map-as write
-        add-object
-    ] serialize-shared ;
-
 M: quotation (serialize) ( obj -- )
-    CHAR: q serialize-seq ;
-
-M: float-array (serialize) ( obj -- )
     [
-        CHAR: f write1
-        dup length serialize-cell
-        dup [ double>bits 8 >be write ] each
-        add-object
+        CHAR: q write1 [ >array (serialize) ] [ add-object ] bi
     ] serialize-shared ;
 
 M: hashtable (serialize) ( obj -- )
     [
         CHAR: h write1
-        dup >alist (serialize)
-        add-object
+        [ add-object ] [ >alist (serialize) ] bi
     ] serialize-shared ;
 
-M: word (serialize) ( obj -- )
+M: bit-array (serialize) ( obj -- )
+    CHAR: b serialize-seq ;
+
+M: byte-array (serialize) ( obj -- )
     [
-        CHAR: w write1
-        dup word-name (serialize)
-        dup word-vocabulary (serialize)
-        add-object
+        CHAR: A write1
+        [ add-object ]
+        [ length serialize-cell ]
+        [ write ] tri
     ] serialize-shared ;
+
+M: float-array (serialize) ( obj -- )
+    [
+        CHAR: f write1
+        [ add-object ]
+        [ length serialize-cell ]
+        [ [ double>bits 8 >be write ] each ]
+        tri
+    ] serialize-shared ;
+
+M: string (serialize) ( obj -- )
+    [
+        CHAR: s write1
+        [ add-object ]
+        [
+            utf8 encode
+            [ length serialize-cell ]
+            [ write ] bi
+        ] bi
+    ] serialize-shared ;
+
+: serialize-true ( word -- )
+    drop CHAR: t write1 ;
+
+: serialize-gensym ( word -- )
+    [
+        CHAR: G write1
+        [ add-object ]
+        [ word-def (serialize) ]
+        [ word-props (serialize) ]
+        tri
+    ] serialize-shared ;
+
+: serialize-word ( word -- )
+    CHAR: w write1
+    [ word-name (serialize) ]
+    [ word-vocabulary (serialize) ]
+    bi ;
+
+M: word (serialize) ( obj -- )
+    {
+        { [ dup t eq? ] [ serialize-true ] }
+        { [ dup word-vocabulary not ] [ serialize-gensym ] }
+        { [ t ] [ serialize-word ] }
+    } cond ;
 
 M: wrapper (serialize) ( obj -- )
     CHAR: W write1
@@ -178,6 +198,9 @@ SYMBOL: deserialized
 
 : deserialize-false ( -- f )
     f ;
+
+: deserialize-true ( -- f )
+    t ;
 
 : deserialize-positive-integer ( -- number )
     deserialize-cell ;
@@ -204,52 +227,62 @@ SYMBOL: deserialized
     (deserialize-string) dup intern-object ;
 
 : deserialize-word ( -- word )
-    (deserialize) dup (deserialize) lookup
-    [ dup intern-object ] [ "Unknown word" throw ] ?if ;
+    (deserialize) (deserialize) 2dup lookup
+    dup [ 2nip ] [
+        "Unknown word: " -rot
+        2array unparse append throw
+    ] if ;
+
+: deserialize-gensym ( -- word )
+    gensym
+    dup intern-object
+    dup (deserialize) define
+    dup (deserialize) swap set-word-props ;
 
 : deserialize-wrapper ( -- wrapper )
     (deserialize) <wrapper> ;
 
-SYMBOL: +stop+
-
-: (deserialize-seq) ( -- seq )
-    [ (deserialize) dup +stop+ get eq? not ] [ ] [ drop ] unfold ;
-
-: deserialize-seq ( seq -- array )
-    >r (deserialize-seq) r> like dup intern-object ;
+:: (deserialize-seq) ( exemplar quot -- seq )
+    deserialize-cell exemplar new
+    [ intern-object ]
+    [ dup [ drop quot call ] change-each ] bi ; inline
 
 : deserialize-array ( -- array )
-    { } deserialize-seq ;
+    { } [ (deserialize) ] (deserialize-seq) ;
 
 : deserialize-quotation ( -- array )
-    [ ] deserialize-seq ;
-
-: (deserialize-byte-array) ( -- byte-array )
-    deserialize-cell read B{ } like ;
+    (deserialize) >quotation dup intern-object ;
 
 : deserialize-byte-array ( -- byte-array )
-    (deserialize-byte-array) dup intern-object ;
+    B{ } [ read1 ] (deserialize-seq) ;
 
 : deserialize-bit-array ( -- bit-array )
-    (deserialize-byte-array) [ 0 > ] ?{ } map-as
-    dup intern-object ;
+    ?{ } [ (deserialize) ] (deserialize-seq) ;
 
 : deserialize-float-array ( -- float-array )
-    deserialize-cell
-    8 * read 8 <groups> [ be> bits>double ] F{ } map-as
-    dup intern-object ;
+    F{ } [ 8 read be> bits>double ] (deserialize-seq) ;
 
 : deserialize-hashtable ( -- hashtable )
-    (deserialize) >hashtable dup intern-object ;
+    H{ } clone
+    [ intern-object ]
+    [ (deserialize) update ]
+    [ ] tri ;
+
+: copy-seq-to-tuple ( seq tuple -- )
+    >r dup length [ 1+ ] map r> [ set-array-nth ] curry 2each ;
 
 : deserialize-tuple ( -- array )
-    (deserialize-seq) >tuple dup intern-object ;
+    #! Ugly because we have to intern the tuple before reading
+    #! slots
+    (deserialize) construct-empty
+    [ intern-object ]
+    [
+        [ (deserialize) ]
+        [ [ copy-seq-to-tuple ] keep ] bi*
+    ] bi ;
 
 : deserialize-unknown ( -- object )
     deserialize-cell deserialized get nth ;
-
-: deserialize-stop ( -- object )
-    +stop+ get ;
 
 : deserialize* ( -- object ? )
     read1 [
@@ -265,14 +298,15 @@ SYMBOL: +stop+
             { CHAR: h [ deserialize-hashtable ] }
             { CHAR: m [ deserialize-negative-integer ] }
             { CHAR: n [ deserialize-false ] }
+            { CHAR: t [ deserialize-true ] }
             { CHAR: o [ deserialize-unknown ] }
             { CHAR: p [ deserialize-positive-integer ] }
             { CHAR: q [ deserialize-quotation ] }
             { CHAR: r [ deserialize-ratio ] }
             { CHAR: s [ deserialize-string ] }
             { CHAR: w [ deserialize-word ] }
+            { CHAR: G [ deserialize-word ] }
             { CHAR: z [ deserialize-zero ] }
-            { CHAR: . [ deserialize-stop ] }
         } case t
     ] [
         f f
@@ -282,14 +316,16 @@ SYMBOL: +stop+
     deserialize* [ "End of stream" throw ] unless ;
 
 : deserialize ( -- obj )
-    [
-        V{ } clone deserialized set
-        gensym +stop+ set
-        (deserialize)
-    ] with-scope ;
+    ! [
+    V{ } clone deserialized
+    [ (deserialize) ] with-variable ;
+    ! ] with-compilation-unit ;
 
 : serialize ( obj -- )
-    [
-        H{ } clone serialized set
-        (serialize)
-    ] with-scope ;
+    H{ } clone serialized [ (serialize) ] with-variable ;
+
+: bytes>object ( bytes -- obj )
+    binary [ deserialize ] with-byte-reader ;
+
+: object>bytes ( obj -- bytes )
+    binary [ serialize ] with-byte-writer ;

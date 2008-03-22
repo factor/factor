@@ -54,6 +54,8 @@ MACRO: 2cleave ( seq -- )
 
 : bi* ( x y p q -- p(x) q(y) ) >r swap slip r> call ; inline
 
+: 2bi* ( w x y z p q -- p(x) q(y) ) >r -rot 2slip r> call ; inline
+
 : tri* ( x y z p q r -- p(x) q(y) r(z) )
   >r rot >r bi* r> r> call ; inline
 
@@ -68,5 +70,31 @@ MACRO: spread ( seq -- )
   dup
     [ drop [ >r ] ]        map concat
   swap
-    [ [ r> ] swap append ] map concat
+    [ [ r> ] prepend ] map concat
   append ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Cleave into array
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: words quotations fry arrays.lib ;
+
+: >quot ( obj -- quot ) dup word? [ 1quotation ] when ;
+
+: >quots ( seq -- seq ) [ >quot ] map ;
+
+MACRO: <arr> ( seq -- )
+  [ >quots ] [ length ] bi
+ '[ , cleave , narray ] ;
+
+MACRO: <2arr> ( seq -- )
+  [ >quots ] [ length ] bi
+ '[ , 2cleave , narray ] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Spread into array
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MACRO: <arr*> ( seq -- )
+  [ >quots ] [ length ] bi
+ '[ , spread , narray ] ;

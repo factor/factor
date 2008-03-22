@@ -15,7 +15,7 @@ TUPLE: tuple-array example ;
     [ set-tuple-array-example ] keep ;
 
 : reconstruct ( seq example -- tuple )
-    swap append >tuple ;
+    prepend >tuple ;
 
 M: tuple-array nth
     [ delegate nth ] keep

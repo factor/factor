@@ -4,7 +4,7 @@ USING: arrays continuations db io kernel math namespaces
 quotations sequences db.postgresql.ffi alien alien.c-types
 db.types tools.walker ascii splitting math.parser
 combinators combinators.cleave libc shuffle calendar.format
-byte-arrays destructors prettyprint new-slots accessors
+byte-arrays destructors prettyprint accessors
 strings serialize io.encodings.binary io.streams.byte-array ;
 IN: db.postgresql.lib
 
@@ -73,7 +73,7 @@ IN: db.postgresql.lib
         sql-spec-type {
             { FACTOR-BLOB [
                 dup [
-                    binary [ serialize ] with-byte-writer
+                    object>bytes
                     malloc-byte-array/length ] [ 0 ] if ] }
             { BLOB [
                 dup [ malloc-byte-array/length ] [ 0 ] if ] }
@@ -164,7 +164,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
         { BLOB [ pq-get-blob ] }
         { FACTOR-BLOB [
             pq-get-blob
-            dup [ binary [ deserialize ] with-byte-reader ] when ] }
+            dup [ bytes>object ] when ] }
         [ no-sql-type ]
     } case ;
     ! PQgetlength PQgetisnull

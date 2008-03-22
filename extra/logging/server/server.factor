@@ -4,24 +4,24 @@ USING: namespaces kernel io calendar sequences io.files
 io.sockets continuations prettyprint assocs math.parser
 words debugger math combinators concurrency.messaging
 threads arrays init math.ranges strings calendar.format
-io.encodings.ascii ;
+io.encodings.utf8 ;
 IN: logging.server
 
 : log-root ( -- string )
     \ log-root get "logs" resource-path or ;
 
 : log-path ( service -- path )
-    log-root swap path+ ;
+    log-root prepend-path ;
 
 : log# ( path n -- path' )
-    number>string ".log" append path+ ;
+    number>string ".log" append append-path ;
 
 SYMBOL: log-files
 
 : open-log-stream ( service -- stream )
     log-path
     dup make-directories
-    1 log# ascii <file-appender> ;
+    1 log# utf8 <file-appender> ;
 
 : log-stream ( service -- stream )
     log-files get [ open-log-stream ] cache ;

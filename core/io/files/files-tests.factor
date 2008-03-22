@@ -1,5 +1,10 @@
 IN: io.files.tests
-USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
+USING: tools.test io.files io threads kernel continuations io.encodings.ascii
+io.files.unique sequences strings accessors ;
+
+[ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
+[ ] [ "blahblah" temp-file make-directory ] unit-test
+[ t ] [ "blahblah" temp-file directory? ] unit-test
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk/" file-name ] unit-test
@@ -123,3 +128,19 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 [ ] [ "copy-tree-test" temp-file delete-tree ] unit-test
 
 [ t ] [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
+
+[ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
+
+[ ] [ "append-test" temp-file ascii <file-appender> dispose ] unit-test
+
+
+
+[ 123 ] [
+    "core" ".test" [
+        [
+            ascii [
+                123 CHAR: a <repetition> >string write
+            ] with-file-writer
+        ] keep file-info size>>
+    ] with-unique-file
+] unit-test

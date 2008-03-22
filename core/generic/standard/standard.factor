@@ -8,10 +8,6 @@ IN: generic.standard
 
 TUPLE: standard-combination # ;
 
-M: standard-combination method-prologue
-    standard-combination-# object
-    <array> swap add* [ declare ] curry ;
-
 C: <standard-combination> standard-combination
 
 SYMBOL: (dispatch#)
@@ -30,10 +26,7 @@ SYMBOL: (dispatch#)
 
 : unpicker ( -- quot ) \ (dispatch#) get unpickers nth ;
 
-TUPLE: no-method object generic ;
-
-: no-method ( object generic -- * )
-    \ no-method construct-boa throw ;
+ERROR: no-method object generic ;
 
 : error-method ( word --  quot )
     picker swap [ no-method ] curry append ;
@@ -165,7 +158,7 @@ C: <hook-combination> hook-combination
     0 (dispatch#) [
         swap slip
         hook-combination-var [ get ] curry
-        swap append
+        prepend
     ] with-variable ; inline
 
 M: hook-combination make-default-method
@@ -174,7 +167,7 @@ M: hook-combination make-default-method
 M: hook-combination perform-combination
     [
         standard-methods
-        [ [ drop ] swap append ] assoc-map
+        [ [ drop ] prepend ] assoc-map
         single-combination
     ] with-hook ;
 

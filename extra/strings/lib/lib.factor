@@ -7,7 +7,7 @@ IN: strings.lib
 
 : >Upper ( str -- str )
     dup empty? [
-        unclip ch>upper 1string swap append
+        unclip ch>upper 1string prepend
     ] unless ;
 
 : >Upper-dashes ( str -- str )

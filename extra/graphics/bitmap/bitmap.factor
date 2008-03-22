@@ -117,16 +117,16 @@ M: bitmap height ( bitmap -- ) bitmap-height ;
     load-bitmap [ <graphics-gadget> "bitmap" open-window ] keep ;
 
 : test-bitmap24 ( -- )
-    "misc/graphics/bmps/thiswayup24.bmp" resource-path bitmap. ;
+    "extra/graphics/bitmap/test-data/thiswayup24.bmp" resource-path bitmap. ;
 
 : test-bitmap8 ( -- )
-    "misc/graphics/bmps/rgb8bit.bmp" resource-path bitmap. ;
+    "extra/graphics/bitmap/test-data/rgb8bit.bmp" resource-path bitmap. ;
 
 : test-bitmap4 ( -- )
-    "misc/graphics/bmps/rgb4bit.bmp" resource-path
+    "extra/graphics/bitmap/test-data/rgb4bit.bmp" resource-path
     load-bitmap ;
     ! bitmap. ;
 
 : test-bitmap1 ( -- )
-    "misc/graphics/bmps/1bit.bmp" resource-path bitmap. ;
+    "extra/graphics/bitmap/test-data/1bit.bmp" resource-path bitmap. ;
 

@@ -3,7 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions mirrors
-arrays math.parser math.private sorting strings ascii macros ;
+arrays math.parser math.private sorting strings ascii macros
+assocs.lib quotations ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -19,8 +20,9 @@ IN: sequences.lib
 : map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
 
 MACRO: firstn ( n -- )
-    [ [ swap nth ] curry
-    [ keep ] curry ] map concat [ drop ] compose ;
+    [ [ swap nth ] curry [ keep ] curry ] map
+    concat >quotation
+    [ drop ] compose ;
 
 : prepare-index ( seq quot -- seq n quot )
     >r dup length r> ; inline
@@ -192,7 +194,7 @@ USE: continuations
 : ?tail* ( seq n -- seq/f ) (tail) ?subseq ;
 
 : accumulator ( quot -- quot vec )
-    V{ } clone [ [ push ] curry compose ] keep ;
+    V{ } clone [ [ push ] curry compose ] keep ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -220,3 +222,9 @@ PRIVATE>
 
 : nths ( indices seq -- seq' )
     [ swap nth ] with map ;
+
+: replace ( str oldseq newseq -- str' )
+    H{ } 2seq>assoc substitute ;
+
+: remove-nth ( seq n -- seq' )
+    cut-slice 1 tail-slice append ;

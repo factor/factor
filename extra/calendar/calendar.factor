@@ -3,19 +3,22 @@
 
 USING: arrays kernel math math.functions namespaces sequences
 strings tuples system vocabs.loader calendar.backend threads
-new-slots accessors combinators ;
+accessors combinators locals ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
 
 C: <timestamp> timestamp
 
-: <date> ( year month day -- timestamp )
-    0 0 0 gmt-offset <timestamp> ;
-
 TUPLE: duration year month day hour minute second ;
 
 C: <duration> duration
+
+: gmt-offset-duration ( -- duration )
+    0 0 0 gmt-offset <duration> ;
+
+: <date> ( year month day -- timestamp )
+    0 0 0 gmt-offset-duration <timestamp> ;
 
 : month-names
     {
@@ -56,31 +59,29 @@ SYMBOL: m
 
 PRIVATE>
 
-: julian-day-number ( year month day -- n )
+:: julian-day-number ( year month day -- n )
     #! Returns a composite date number
     #! Not valid before year -4800
-    [
-        14 pick - 12 /i a set
-        pick 4800 + a get - y set
-        over 12 a get * + 3 - m set
-        2nip 153 m get * 2 + 5 /i + 365 y get * +
-        y get 4 /i + y get 100 /i - y get 400 /i + 32045 -
-    ] with-scope ;
+    [let* | a [ 14 month - 12 /i ]
+            y [ year 4800 + a - ]
+            m [ month 12 a * + 3 - ] |
+        day 153 m * 2 + 5 /i + 365 y * +
+        y 4 /i + y 100 /i - y 400 /i + 32045 -
+    ] ;
 
-: julian-day-number>date ( n -- year month day )
+:: julian-day-number>date ( n -- year month day )
     #! Inverse of julian-day-number
-    [
-        32044 + a set
-        4 a get * 3 + 146097 /i b set
-        a get 146097 b get * 4 /i - c set
-        4 c get * 3 + 1461 /i d set
-        c get 1461 d get * 4 /i - e set
-        5 e get * 2 + 153 /i m set
-        100 b get * d get + 4800 -
-        m get 10 /i + m get 3 +
-        12 m get 10 /i * -
-        e get 153 m get * 2 + 5 /i - 1+
-    ] with-scope ;
+    [let* | a [ n 32044 + ]
+            b [ 4 a * 3 + 146097 /i ]
+            c [ a 146097 b * 4 /i - ]
+            d [ 4 c * 3 + 1461 /i ]
+            e [ c 1461 d * 4 /i - ]
+            m [ 5 e * 2 + 153 /i ] |
+        100 b * d + 4800 -
+        m 10 /i + m 3 +
+        12 m 10 /i * -
+        e 153 m * 2 + 5 /i - 1+
+    ] ;
 
 : >date< ( timestamp -- year month day )
     { year>> month>> day>> } get-slots ;
@@ -226,16 +227,18 @@ M: duration <=> [ dt>years ] compare ;
 : dt>seconds ( dt -- x ) dt>years seconds-per-year * ;
 : dt>milliseconds ( dt -- x ) dt>seconds 1000 * ;
 
-: convert-timezone ( timestamp n -- timestamp )
+GENERIC: time- ( time1 time2 -- time )
+
+: convert-timezone ( timestamp duration -- timestamp )
     over gmt-offset>> over = [ drop ] [
-        [ over gmt-offset>> - hours time+ ] keep >>gmt-offset
+        [ over gmt-offset>> time- time+ ] keep >>gmt-offset
     ] if ;
 
 : >local-time ( timestamp -- timestamp )
-    gmt-offset convert-timezone ;
+    gmt-offset-duration convert-timezone ;
 
 : >gmt ( timestamp -- timestamp )
-    0 convert-timezone ;
+    instant convert-timezone ;
 
 M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
@@ -244,8 +247,6 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt ] 2apply
     [ [ >date< julian-day-number ] 2apply - 86400 * ] 2keep
     [ >time< >r >r 3600 * r> 60 * r> + + ] 2apply - + ;
-
-GENERIC: time- ( time1 time2 -- time )
 
 M: timestamp time-
     #! Exact calendar-time difference
@@ -263,14 +264,14 @@ M: timestamp time-
 M: duration time-
     before time+ ;
 
-: <zero> 0 0 0 0 0 0 0 <timestamp> ;
+: <zero> 0 0 0 0 0 0 instant <timestamp> ;
 
 : valid-timestamp? ( timestamp -- ? )
-    clone 0 >>gmt-offset
+    clone instant >>gmt-offset
     dup <zero> time- <zero> time+ = ;
 
 : unix-1970 ( -- timestamp )
-    1970 1 1 0 0 0 0 <timestamp> ; foldable
+    1970 1 1 0 0 0 instant <timestamp> ; foldable
 
 : millis>timestamp ( n -- timestamp )
     >r unix-1970 r> milliseconds time+ ;

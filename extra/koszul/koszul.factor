@@ -33,7 +33,7 @@ SYMBOL: terms
     {
         { [ dup 1 = ] [ drop " + " ] }
         { [ dup -1 = ] [ drop " - " ] }
-        { [ t ] [ number>string " + " swap append ] }
+        { [ t ] [ number>string " + " prepend ] }
     } cond ;
 
 : (alt.) ( basis n -- str )
@@ -155,7 +155,7 @@ DEFER: (d)
 
 : (tensor) ( seq1 seq2 -- seq )
     [
-        [ swap append natural-sort ] curry map
+        [ prepend natural-sort ] curry map
     ] with map concat ;
 
 : tensor ( graded-basis1 graded-basis2 -- bigraded-basis )
@@ -202,7 +202,7 @@ DEFER: (d)
 : bigraded-betti ( u-generators z-generators -- seq )
     [ basis graded ] 2apply tensor bigraded-ker/im-d
     [ [ [ first ] map ] map ] keep
-    [ [ second ] map 2 head* { 0 0 } swap append ] map
+    [ [ second ] map 2 head* { 0 0 } prepend ] map
     1 tail dup first length 0 <array> add
     [ v- ] 2map ;
 

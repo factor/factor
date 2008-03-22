@@ -97,7 +97,7 @@ IN: bootstrap.syntax
     "parsing" [ word t "parsing" set-word-prop ] define-syntax
 
     "SYMBOL:" [
-        CREATE dup reset-generic define-symbol
+        CREATE-WORD define-symbol
     ] define-syntax
 
     "DEFER:" [
@@ -111,31 +111,26 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "GENERIC:" [
-        CREATE dup reset-word
-        define-simple-generic
+        CREATE-GENERIC define-simple-generic
     ] define-syntax
 
     "GENERIC#" [
-        CREATE dup reset-word
+        CREATE-GENERIC
         scan-word <standard-combination> define-generic
     ] define-syntax
 
     "MATH:" [
-        CREATE dup reset-word
+        CREATE-GENERIC
         T{ math-combination } define-generic
     ] define-syntax
 
     "HOOK:" [
-        CREATE dup reset-word scan-word
+        CREATE-GENERIC scan-word
         <hook-combination> define-generic
     ] define-syntax
 
     "M:" [
-        f set-word
-        location >r
-        scan-word bootstrap-word scan-word
-        [ parse-definition -rot define-method ] 2keep
-        2array r> remember-definition
+        (M:) define
     ] define-syntax
 
     "UNION:" [
@@ -163,9 +158,15 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "C:" [
-        CREATE dup reset-generic
+        CREATE-WORD
         scan-word dup check-tuple
         [ construct-boa ] curry define-inline
+    ] define-syntax
+
+    "ERROR:" [
+        CREATE-CLASS dup ";" parse-tokens define-tuple-class
+        dup save-location
+        dup [ construct-boa throw ] curry define
     ] define-syntax
 
     "FORGET:" [

@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs calendar kernel math.parser namespaces random
-boxes alarms new-slots accessors http http.server
+accessors http http.server
+http.server.sessions.storage http.server.sessions.storage.assoc
 quotations hashtables sequences fry combinators.cleave
-html.elements ;
+html.elements symbols continuations destructors ;
 IN: http.server.sessions
 
 ! ! ! ! ! !
@@ -12,61 +13,56 @@ IN: http.server.sessions
 
 GENERIC: init-session* ( responder -- )
 
-M: dispatcher init-session* drop ;
+M: object init-session* drop ;
 
 TUPLE: session-manager responder sessions ;
 
 : <session-manager> ( responder class -- responder' )
-    >r H{ } clone session-manager construct-boa r>
-    construct-delegate ; inline
+    >r <sessions-in-memory> session-manager construct-boa
+    r> construct-delegate ; inline
 
-TUPLE: session manager id namespace alarm ;
+SYMBOLS: session session-id session-changed? ;
 
-: <session> ( manager -- session )
-    f H{ } clone <box> \ session construct-boa ;
+: sget ( key -- value )
+    session get at ;
 
-: timeout ( -- dt ) 20 minutes ;
+: sset ( value key -- )
+    session get set-at
+    session-changed? on ;
 
-: cancel-timeout ( session -- )
-    alarm>> [ cancel-alarm ] if-box? ;
+: schange ( key quot -- )
+    session get swap change-at
+    session-changed? on ; inline
 
-: delete-session ( session -- )
-    [ cancel-timeout ]
-    [ dup manager>> sessions>> delete-at ]
-    bi ;
+: sessions session-manager get sessions>> ;
 
-: touch-session ( session -- session )
-    [ cancel-timeout ]
-    [ [ '[ , delete-session ] timeout later ] keep alarm>> >box ]
-    [ ]
-    tri ;
+: managed-responder session-manager get responder>> ;
 
-: session ( -- assoc ) \ session get namespace>> ;
+: init-session ( managed -- session )
+    H{ } clone [ session [ init-session* ] with-variable ] keep ;
 
-: sget ( key -- value ) session at ;
+: begin-session ( responder -- id session )
+    [ responder>> init-session ] [ sessions>> ] bi
+    [ new-session ] [ drop ] 2bi ;
 
-: sset ( value key -- ) session set-at ;
+! Destructor
+TUPLE: session-saver id session ;
 
-: schange ( key quot -- ) session swap change-at ; inline
+C: <session-saver> session-saver
 
-: init-session ( session -- session )
-    dup dup \ session [
-        manager>> responder>> init-session*
-    ] with-variable ;
+M: session-saver dispose
+    session-changed? get [
+        [ session>> ] [ id>> ] bi
+        sessions update-session
+    ] [ drop ] if ;
 
-: new-session ( responder -- id )
-    [ <session> init-session touch-session ]
-    [ [ sessions>> set-at-unique ] [ drop swap >>id ] 2bi ]
-    bi id>> ;
+: save-session-after ( id session -- )
+    <session-saver> add-always-destructor ;
 
-: get-session ( id responder -- session/f )
-    sessions>> at* [ touch-session ] when ;
-
-: call-responder/session ( path responder session -- response )
-    \ session set responder>> call-responder ;
-
-: sessions ( -- manager/f )
-    \ session get dup [ manager>> ] when ;
+: call-responder/session ( path responder id session -- response )
+    [ save-session-after ]
+    [ [ session-id set ] [ session set ] bi* ] 2bi
+    [ session-manager set ] [ responder>> call-responder ] bi ;
 
 TUPLE: null-sessions ;
 
@@ -74,56 +70,64 @@ TUPLE: null-sessions ;
     null-sessions <session-manager> ;
 
 M: null-sessions call-responder ( path responder -- response )
-    dup <session> call-responder/session ;
+    H{ } clone f call-responder/session ;
 
 TUPLE: url-sessions ;
 
 : <url-sessions> ( responder -- responder' )
     url-sessions <session-manager> ;
 
-: sess-id "factorsessid" ;
+: session-id-key "factorsessid" ;
 
-: current-session ( responder -- session )
-    >r request-params sess-id swap at r> get-session ;
+: current-url-session ( responder -- id/f session/f )
+    [ request-params session-id-key swap at ] [ sessions>> ] bi*
+    [ drop ] [ get-session ] 2bi ;
 
 : add-session-id ( query -- query' )
-    \ session get [ id>> sess-id associate union ] when* ;
+    session-id get [ session-id-key associate union ] when* ;
 
 : session-form-field ( -- )
     <input
-    "hidden" =type
-    sess-id =id
-    sess-id =name
-    \ session get id>> =value
+        "hidden" =type
+        session-id-key =id
+        session-id-key =name
+        session-id get =value
     input/> ;
+
+: new-url-session ( responder -- response )
+    [ f ] [ begin-session drop session-id-key associate ] bi*
+    <temporary-redirect> ;
 
 M: url-sessions call-responder ( path responder -- response )
     [ add-session-id ] link-hook set
     [ session-form-field ] form-hook set
-    dup current-session [
+    dup current-url-session dup [
         call-responder/session
     ] [
-        nip
-        f swap new-session sess-id associate <temporary-redirect>
-    ] if* ;
+        2drop nip new-url-session
+    ] if ;
 
 TUPLE: cookie-sessions ;
 
 : <cookie-sessions> ( responder -- responder' )
     cookie-sessions <session-manager> ;
 
-: get-session-cookie ( responder -- cookie )
-    request get sess-id get-cookie
-    [ value>> swap get-session ] [ drop f ] if* ;
+: current-cookie-session ( responder -- id namespace/f )
+    request get session-id-key get-cookie dup
+    [ value>> dup rot sessions>> get-session ] [ 2drop f f ] if ;
 
 : <session-cookie> ( id -- cookie )
-    sess-id <cookie> ;
+    session-id-key <cookie> ;
+
+: call-responder/new-session ( path responder -- response )
+    dup begin-session
+    [ call-responder/session ]
+    [ drop <session-cookie> ] 2bi
+    put-cookie ;
 
 M: cookie-sessions call-responder ( path responder -- response )
-    dup get-session-cookie [
+    dup current-cookie-session dup [
         call-responder/session
     ] [
-        dup new-session
-        [ over get-session call-responder/session ] keep
-        <session-cookie> put-cookie
-    ] if* ;
+        2drop call-responder/new-session
+    ] if ;

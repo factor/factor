@@ -37,13 +37,13 @@ TAGS>
 
 MEMO: (load-mode) ( name -- rule-sets )
     modes at mode-file
-    "extra/xmode/modes/" swap append
+    "extra/xmode/modes/" prepend
     resource-path utf8 <file-reader> parse-mode ;
 
 SYMBOL: rule-sets
 
 : no-such-rule-set ( name -- * )
-    "No such rule set: " swap append throw ;
+    "No such rule set: " prepend throw ;
 
 : get-rule-set ( name -- rule-sets rules )
     dup "::" split1 [ swap (load-mode) ] [ rule-sets get ] if*

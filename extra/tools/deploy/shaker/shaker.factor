@@ -13,14 +13,12 @@ QUALIFIED: definitions
 QUALIFIED: init
 QUALIFIED: inspector
 QUALIFIED: io.backend
-QUALIFIED: io.nonblocking
 QUALIFIED: io.thread
 QUALIFIED: layouts
 QUALIFIED: libc.private
 QUALIFIED: libc.private
 QUALIFIED: listener
 QUALIFIED: prettyprint.config
-QUALIFIED: random.private
 QUALIFIED: source-files
 QUALIFIED: threads
 QUALIFIED: vocabs
@@ -109,8 +107,6 @@ IN: tools.deploy.shaker
 
 : stripped-globals ( -- seq )
     [
-        random.private:mt ,
-
         {
             bootstrap.stage2:bootstrap-time
             continuations:error
@@ -133,7 +129,10 @@ IN: tools.deploy.shaker
 
         strip-io? [ io.backend:io-backend , ] when
 
-        { io.backend:io-backend io.nonblocking:default-buffer-size }
+        [
+            io.backend:io-backend ,
+            "default-buffer-size" "io.nonblocking" lookup ,
+        ] { } make
         { "alarms" "io" "tools" } strip-vocab-globals %
 
         strip-dictionary? [
@@ -143,12 +142,14 @@ IN: tools.deploy.shaker
                 vocabs:dictionary
                 lexer-factory
                 vocabs:load-vocab-hook
+                root-cache
                 layouts:num-tags
                 layouts:num-types
                 layouts:tag-mask
                 layouts:tag-numbers
                 layouts:type-numbers
                 classes:typemap
+                classes:class-map
                 vocab-roots
                 definitions:crossref
                 compiled-crossref
@@ -192,7 +193,7 @@ IN: tools.deploy.shaker
         global swap
         '[ drop , member? not ] assoc-subset
         [ drop string? not ] assoc-subset ! strip CLI args
-        dup keys .
+        dup keys unparse show
         21 setenv
     ] [ drop ] if ;
 

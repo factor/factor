@@ -12,4 +12,4 @@ IN: math.haar
     2 group dup averages [ differences ] keep ;
 
 : haar ( seq -- seq )
-    dup length 1 <= [ haar-step haar swap append ] unless ;
+    dup length 1 <= [ haar-step haar prepend ] unless ;

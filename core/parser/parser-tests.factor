@@ -1,7 +1,7 @@
 USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
-sorting tuples compiler.units debugger ;
+sorting tuples compiler.units debugger vocabs vocabs.loader ;
 IN: parser.tests
 
 [
@@ -397,35 +397,47 @@ IN: parser.tests
 ] unit-test
 
 [ ] [
-    "IN: parser.tests TUPLE: foo ; GENERIC: foo"
-    <string-reader> "redefining-a-class-5" parse-stream drop
+    [
+        "redefining-a-class-5" forget-source
+        "redefining-a-class-6" forget-source
+        "redefining-a-class-7" forget-source
+    ] with-compilation-unit
 ] unit-test
 
-[ ] [
-    "IN: parser.tests M: f foo ;"
-    <string-reader> "redefining-a-class-6" parse-stream drop
-] unit-test
+2 [
+    [ ] [
+        "IN: parser.tests TUPLE: foo ; GENERIC: foo"
+        <string-reader> "redefining-a-class-5" parse-stream drop
+    ] unit-test
 
-[ f ] [ f "foo" "parser.tests" lookup execute ] unit-test
+    [ ] [
+        "IN: parser.tests M: f foo ;"
+        <string-reader> "redefining-a-class-6" parse-stream drop
+    ] unit-test
 
-[ ] [
-    "IN: parser.tests TUPLE: foo ; GENERIC: foo"
-    <string-reader> "redefining-a-class-5" parse-stream drop
-] unit-test
+    [ f ] [ f "foo" "parser.tests" lookup execute ] unit-test
 
-[ f ] [ f "foo" "parser.tests" lookup execute ] unit-test
+    [ ] [
+        "IN: parser.tests TUPLE: foo ; GENERIC: foo"
+        <string-reader> "redefining-a-class-5" parse-stream drop
+    ] unit-test
 
-[ ] [
-    "IN: parser.tests TUPLE: foo ; GENERIC: foo"
+    [ f ] [ f "foo" "parser.tests" lookup execute ] unit-test
+
+    [ ] [
+        "IN: parser.tests TUPLE: foo ; GENERIC: foo"
     <string-reader> "redefining-a-class-7" parse-stream drop
-] unit-test
+    ] unit-test
 
-[ ] [
-    "IN: parser.tests TUPLE: foo ;"
-    <string-reader> "redefining-a-class-7" parse-stream drop
-] unit-test
+    [ f ] [ f "foo" "parser.tests" lookup execute ] unit-test
 
-[ t ] [ "foo" "parser.tests" lookup symbol? ] unit-test
+    [ ] [
+        "IN: parser.tests TUPLE: foo ;"
+        <string-reader> "redefining-a-class-7" parse-stream drop
+    ] unit-test
+
+    [ t ] [ "foo" "parser.tests" lookup symbol? ] unit-test
+] times
 
 [ "resource:core/parser/test/assert-depth.factor" run-file ]
 [ relative-overflow-stack { 1 2 3 } sequence= ]
@@ -447,3 +459,13 @@ must-fail-with
         <string-reader> "d-f-s-test" parse-stream drop
     ] unit-test
 ] times
+
+[ ] [ "parser" reload ] unit-test
+
+[ ] [
+    [ "this-better-not-exist" forget-vocab ] with-compilation-unit
+] unit-test
+
+[
+    "USE: this-better-not-exist" eval
+] must-fail

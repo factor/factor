@@ -4,7 +4,7 @@ IN: editors.editplus
 
 : editplus-path ( -- path )
     \ editplus-path get-global [
-        program-files "\\EditPlus 2\\editplus.exe" path+
+        program-files "\\EditPlus 2\\editplus.exe" append-path
     ] unless* ;
 
 : editplus ( file line -- )

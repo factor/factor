@@ -43,8 +43,6 @@ HELP: find-vocab-root
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string" } }
 { $description "Searches for a vocabulary in the vocabulary roots." } ;
 
-{ vocab-root find-vocab-root } related-words
-
 HELP: no-vocab
 { $values { "name" "a vocabulary name" } } 
 { $description "Throws a " { $link no-vocab } "." }

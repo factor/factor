@@ -21,9 +21,7 @@ M: word definer drop \ : \ ; ;
 
 M: word definition word-def ;
 
-TUPLE: undefined ;
-
-: undefined ( -- * ) \ undefined construct-empty throw ;
+ERROR: undefined ;
 
 PREDICATE: word deferred ( obj -- ? )
     word-def [ undefined ] = ;
@@ -68,7 +66,7 @@ SYMBOL: bootstrapping?
 : crossref? ( word -- ? )
     {
         { [ dup "forgotten" word-prop ] [ f ] }
-        { [ dup "method-def" word-prop ] [ t ] }
+        { [ dup "method-generic" word-prop ] [ t ] }
         { [ dup word-vocabulary ] [ t ] }
         { [ t ] [ f ] }
     } cond nip ;
@@ -169,7 +167,12 @@ SYMBOL: changed-words
         "declared-effect" "constructor-quot" "delimiter"
     } reset-props ;
 
+GENERIC: subwords ( word -- seq )
+
+M: word subwords drop f ;
+
 : reset-generic ( word -- )
+    dup subwords [ forget ] each
     dup reset-word
     { "methods" "combination" "default-method" } reset-props ;
 
@@ -184,12 +187,11 @@ SYMBOL: changed-words
     [ ] [ no-vocab ] ?if
     set-at ;
 
-TUPLE: check-create name vocab ;
+ERROR: bad-create name vocab ;
 
 : check-create ( name vocab -- name vocab )
-    2dup [ string? ] both? [
-        \ check-create construct-boa throw
-    ] unless ;
+    2dup [ string? ] both?
+    [ bad-create ] unless ;
 
 : create ( name vocab -- word )
     check-create 2dup lookup

@@ -10,10 +10,10 @@
 
 USING: alien alien.syntax combinators system ;
 
-IN: cairo
+IN: cairo.ffi
 
 << "cairo" {
-        { [ win32? ] [ "cairo.dll" ] }
+        { [ win32? ] [ "libcairo-2.dll" ] }
         ! { [ macosx? ] [ "libcairo.dylib" ] }
         { [ macosx? ] [ "/opt/local/lib/libcairo.dylib" ] }
         { [ unix? ] [ "libcairo.so.2" ] }

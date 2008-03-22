@@ -1,6 +1,6 @@
 IN: http.server.components.tests
 USING: http.server.components http.server.validators
-namespaces tools.test kernel accessors new-slots
+namespaces tools.test kernel accessors
 tuple-syntax mirrors http.server.actions ;
 
 validation-failed? off
@@ -86,3 +86,24 @@ TUPLE: test-tuple text number more-text ;
 
     [ t ] [ "number" value validation-error? ] unit-test
 ] with-scope
+
+[
+    [ ] [
+        "n" <number>
+            0 >>min-value
+            10 >>max-value
+        "n" set
+    ] unit-test
+
+    [ "123" ] [
+        "123" "n" get validate value>>
+    ] unit-test
+    
+    [ ] [ "n" get t >>integer drop ] unit-test
+
+    [ 3 ] [
+        "3" "n" get validate
+    ] unit-test
+] with-scope
+
+[ t ] [ "wake up sheeple" dup "n" <text> validate = ] unit-test

@@ -47,6 +47,7 @@ vocabs.loader system debugger continuations ;
                 "listener" vocab
                 [ restarts. vocab-main execute ]
                 [ die ] if*
+                1 exit
             ] recover
         ] [
             "Cannot find " write write "." print

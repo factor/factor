@@ -32,9 +32,9 @@ M: windows-nt-io root-directory? ( path -- ? )
     } && [ 2 head ] [ "Not an absolute path" throw ] if ;
 
 : prepend-prefix ( string -- string' )
-    unicode-prefix swap append ;
+    unicode-prefix prepend ;
 
-: windows-path+ ( cwd path -- newpath )
+: windows-append-path ( cwd path -- newpath )
     {
         ! empty
         { [ dup empty? ] [ drop ] }
@@ -43,7 +43,7 @@ M: windows-nt-io root-directory? ( path -- ? )
         ! \\\\?\\c:\\foo
         { [ dup unicode-prefix head? ] [ nip ] }
         ! ..\\foo
-        { [ dup "..\\" head? ] [ >r parent-directory r> 3 tail windows-path+ ] }
+        { [ dup "..\\" head? ] [ >r parent-directory r> 3 tail windows-append-path ] }
         ! .\\foo
         { [ dup ".\\" head? ] [ 1 tail append prepend-prefix ] }
         ! \\foo
@@ -62,7 +62,7 @@ M: windows-nt-io normalize-pathname ( string -- string )
     dup string? [ "Pathname must be a string" throw ] unless
     dup empty? [ "Empty pathname" throw ] when
     { { CHAR: / CHAR: \\ } } substitute
-    cwd swap windows-path+
+    cwd swap windows-append-path
     [ "/\\." member? ] right-trim
     dup peek CHAR: : = [ "\\" append ] when ;
 

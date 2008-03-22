@@ -3,32 +3,48 @@
 USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
-sequences.private assocs models ;
+sequences.private assocs models combinators.cleave ;
 IN: tools.walker
 
-SYMBOL: new-walker-hook ! ( -- )
-SYMBOL: show-walker-hook ! ( thread -- )
+SYMBOL: show-walker-hook ! ( status continuation thread -- )
 
-! Thread local
+! Thread local in thread being walked
 SYMBOL: walker-thread
-SYMBOL: walking-thread
 
-: get-walker-thread ( -- thread )
+! Thread local in walker thread
+SYMBOL: walking-thread
+SYMBOL: walker-status
+SYMBOL: walker-continuation
+SYMBOL: walker-history
+
+DEFER: start-walker-thread
+
+: get-walker-thread ( -- status continuation thread )
     walker-thread tget [
-        dup show-walker-hook get call
+        [ thread-variables walker-status swap at ]
+        [ thread-variables walker-continuation swap at ]
+        [ ] tri
     ] [
-        new-walker-hook get call
-        walker-thread tget
+        f <model>
+        f <model>
+        2dup start-walker-thread
     ] if* ;
+
+: show-walker ( -- thread )
+    get-walker-thread
+    [ show-walker-hook get call ] keep ;
+
+: after-break ( object -- )
+    {
+        { [ dup continuation? ] [ (continue) ] }
+        { [ dup quotation? ] [ call ] }
+        { [ dup not ] [ "Single stepping abandoned" rethrow ] }
+    } cond ;
 
 : break ( -- )
     continuation callstack over set-continuation-call
-
-    get-walker-thread send-synchronous {
-        { [ dup continuation? ] [ (continue) ] }
-        { [ dup quotation? ] [ call ] }
-        { [ dup not ] [ "Single stepping abandoned" throw ] }
-    } cond ;
+    show-walker send-synchronous
+    after-break ;
 
 \ break t "break?" set-word-prop
 
@@ -71,15 +87,9 @@ SYMBOL: detach
 SYMBOL: abandon
 SYMBOL: call-in
 
-! Thread locals
-SYMBOL: walker-status
-SYMBOL: walker-continuation
-SYMBOL: walker-history
-
 SYMBOL: +running+
 SYMBOL: +suspended+
 SYMBOL: +stopped+
-SYMBOL: +detached+
 
 : change-frame ( continuation quot -- continuation' )
     #! Applies quot to innermost call frame of the
@@ -145,34 +155,20 @@ SYMBOL: +detached+
 : set-status ( symbol -- )
     walker-status tget set-model ;
 
-: unassociate-thread ( -- )
-    walker-thread walking-thread tget thread-variables delete-at
-    [ ] walking-thread tget set-thread-exit-handler ;
-
-: detach-msg ( -- )
-    +detached+ set-status
-    unassociate-thread ;
-
 : keep-running ( -- )
     +running+ set-status ;
 
 : walker-stopped ( -- )
     +stopped+ set-status
-    [ status +stopped+ eq? ] [
-        [
-            {
-                { detach [ detach-msg ] }
-                [ drop ]
-            } case f
-        ] handle-synchronous
-    ] [ ] while ;
+    [ status +stopped+ eq? ]
+    [ [ drop f ] handle-synchronous ]
+    [ ] while ;
 
 : step-into-all-loop ( -- )
     +running+ set-status
     [ status +running+ eq? ] [
         [
             {
-                { detach [ detach-msg f ] }
                 { step [ f ] }
                 { step-out [ f ] }
                 { step-into [ f ] }
@@ -201,10 +197,6 @@ SYMBOL: +detached+
             {
                 ! These are sent by the walker tool. We reply
                 ! and keep cycling.
-                { detach [ detach-msg ] }
-                ! These change the state of the thread being
-                ! interpreted, so we modify the continuation and
-                ! output f.
                 { step [ step-msg keep-running ] }
                 { step-out [ step-out-msg keep-running ] }
                 { step-into [ step-into-msg keep-running ] }
@@ -221,10 +213,9 @@ SYMBOL: +detached+
 
 : walker-loop ( -- )
     +running+ set-status
-    [ status +detached+ eq? not ] [
+    [ status +stopped+ eq? not ] [
         [
             {
-                { detach [ detach-msg f ] }
                 ! ignore these commands while the thread is
                 ! running
                 { step [ f ] }

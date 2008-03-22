@@ -15,11 +15,8 @@ IN: peg.ebnf.tests
 {
   T{ ebnf-rule f 
      "digit"
-     V{ 
-       T{ ebnf-choice f
-          V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
-       }
-       f
+     T{ ebnf-choice f
+        V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
      }
   } 
 } [
@@ -29,11 +26,8 @@ IN: peg.ebnf.tests
 {
   T{ ebnf-rule f 
      "digit" 
-     V{
-       T{ ebnf-sequence f
-          V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
-       }
-       f
+     T{ ebnf-sequence f
+        V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
      }
   }   
 } [
@@ -83,7 +77,7 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one {(two | three) four}" 'choice' parse parse-result-ast
+  "one ((two | three) four)*" 'choice' parse parse-result-ast
 ] unit-test
 
 {
@@ -95,5 +89,57 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one [ two ] three" 'choice' parse parse-result-ast
+  "one ( two )? three" 'choice' parse parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "\"foo\"" 'identifier' parse parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "'foo'" 'identifier' parse parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "foo" 'non-terminal' parse parse-result-ast ebnf-non-terminal-symbol
+] unit-test
+
+{ "foo" } [
+  "foo]" 'non-terminal' parse parse-result-ast ebnf-non-terminal-symbol
+] unit-test
+
+{ V{ "a" "b" } } [
+  "ab" [EBNF foo='a' 'b' EBNF] call parse-result-ast 
+] unit-test
+
+{ V{ 1 "b" } } [
+  "ab" [EBNF foo=('a')[[ drop 1 ]] 'b' EBNF] call parse-result-ast 
+] unit-test
+
+{ V{ 1 2 } } [
+  "ab" [EBNF foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]] EBNF] call parse-result-ast 
+] unit-test
+
+{ CHAR: A } [
+  "A" [EBNF foo=[A-Z] EBNF] call parse-result-ast 
+] unit-test
+
+{ CHAR: Z } [
+  "Z" [EBNF foo=[A-Z] EBNF] call parse-result-ast 
+] unit-test
+
+{ f } [
+  "0" [EBNF foo=[A-Z] EBNF] call  
+] unit-test
+
+{ CHAR: 0 } [
+  "0" [EBNF foo=[^A-Z] EBNF] call parse-result-ast 
+] unit-test
+
+{ f } [
+  "A" [EBNF foo=[^A-Z] EBNF] call  
+] unit-test
+
+{ f } [
+  "Z" [EBNF foo=[^A-Z] EBNF] call  
 ] unit-test

@@ -65,7 +65,7 @@ MATCH-VARS: ?a ?b ?c ;
 M: #shuffle node>quot
     dup node-in-d over node-out-d pretty-shuffle
     [ , ] [ >r drop t r> ] if*
-    dup effect-str "#shuffle: " swap append comment, ;
+    dup effect-str "#shuffle: " prepend comment, ;
 
 : pushed-literals node-out-d [ value-literal literalize ] map ;
 

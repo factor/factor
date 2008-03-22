@@ -14,7 +14,7 @@ IN: editors.scite
 
 : scite-path ( -- path )
     \ scite-path get-global [
-        program-files "wscite\\SciTE.exe" path+
+        program-files "wscite\\SciTE.exe" append-path
     ] unless* ;
 
 : scite-command ( file line -- cmd )

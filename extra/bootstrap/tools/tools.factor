@@ -13,5 +13,6 @@ USING: vocabs.loader sequences ;
     "tools.threads"
     "tools.vocabs"
     "tools.vocabs.browser"
+    "tools.vocabs.monitor"
     "editors"
 } [ require ] each

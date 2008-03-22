@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations kernel math
 namespaces sequences sequences.lib tuples words strings
-tools.walker new-slots accessors ;
+tools.walker accessors ;
 IN: db
 
 TUPLE: db
@@ -33,6 +33,19 @@ HOOK: db-close db ( handle -- )
 TUPLE: statement handle sql in-params out-params bind-params bound? ;
 TUPLE: simple-statement ;
 TUPLE: prepared-statement ;
+TUPLE: nonthrowable-statement ;
+: make-nonthrowable ( obj -- obj' )
+    dup sequence? [
+        [ make-nonthrowable ] map
+    ] [
+        nonthrowable-statement construct-delegate
+    ] if ;
+
+MIXIN: throwable-statement
+INSTANCE: statement throwable-statement
+INSTANCE: simple-statement throwable-statement
+INSTANCE: prepared-statement throwable-statement
+
 TUPLE: result-set sql in-params out-params handle n max ;
 : <statement> ( sql in out -- statement )
     { (>>sql) (>>in-params) (>>out-params) } statement construct ;
@@ -50,11 +63,20 @@ GENERIC# row-column-typed 1 ( result-set column -- sql )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 
-: execute-statement ( statement -- )
+GENERIC: execute-statement ( statement -- )
+
+M: throwable-statement execute-statement ( statement -- )
     dup sequence? [
         [ execute-statement ] each
     ] [
         query-results dispose
+    ] if ;
+
+M: nonthrowable-statement execute-statement ( statement -- )
+    dup sequence? [
+        [ execute-statement ] each
+    ] [
+        [ query-results dispose ] [ 2drop ] recover
     ] if ;
 
 : bind-statement ( obj statement -- )

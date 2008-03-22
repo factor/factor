@@ -236,7 +236,7 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 
 [
     "IN: tuples.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
-] [ [ check-tuple? ] is? ] must-fail-with
+] [ [ no-tuple-class? ] is? ] must-fail-with
 
 ! Hardcore unit tests
 USE: threads

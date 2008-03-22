@@ -9,7 +9,7 @@ IN: db.tuples.tests
 TUPLE: person the-id the-name the-number the-real
 ts date time blob factor-blob ;
 
-: <person> ( name age real ts date time blob -- person )
+: <person> ( name age real ts date time blob factor-blob -- person )
     {
         set-person-the-name
         set-person-the-number
@@ -190,11 +190,11 @@ TUPLE: annotation n paste-id summary author mode contents ;
 : test-postgresql ( -- )
 >r { "localhost" "postgres" "foob" "factor-test" } postgresql-db r> with-db ;
 
-[ native-person-schema test-tuples ] test-sqlite
-[ assigned-person-schema test-tuples ] test-sqlite
-
-! [ native-person-schema test-tuples ] test-postgresql
-! [ assigned-person-schema test-tuples ] test-postgresql
+: test-repeated-insert
+    [ ] [ person ensure-table ] unit-test
+    
+    [ ] [ person1 get insert-tuple ] unit-test
+    [ person1 get insert-tuple ] must-fail ;
 
 TUPLE: serialize-me id data ;
 
@@ -239,3 +239,34 @@ TUPLE: exam id name score ;
     ;
 
 ! [ test-ranges ] test-sqlite
+
+TUPLE: secret n message ;
+C: <secret> secret
+
+: test-random-id
+    secret "SECRET"
+    {
+        { "n" "ID" +random-id+ }
+        { "message" "MESSAGE" TEXT }
+    } define-persistent
+
+    [ ] [ secret ensure-table ] unit-test
+    [ ] [ f "kilroy was here" <secret> insert-tuple ] unit-test
+    [ ] [ T{ secret } select-tuples ] unit-test
+    ;
+
+
+
+! [ test-random-id ] test-sqlite
+ [ native-person-schema test-tuples ] test-sqlite
+ [ assigned-person-schema test-tuples ] test-sqlite
+! [ assigned-person-schema test-repeated-insert ] test-sqlite
+! [ native-person-schema test-tuples ] test-postgresql
+! [ assigned-person-schema test-tuples ] test-postgresql
+! [ assigned-person-schema test-repeated-insert ] test-postgresql
+
+! \ insert-tuple must-infer
+! \ update-tuple must-infer
+! \ delete-tuple must-infer
+! \ select-tuple must-infer
+! \ define-persistent must-infer

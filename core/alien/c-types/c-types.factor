@@ -26,9 +26,7 @@ global [
     c-types [ H{ } assoc-like ] change
 ] bind
 
-TUPLE: no-c-type name ;
-
-: no-c-type ( type -- * ) \ no-c-type construct-boa throw ;
+ERROR: no-c-type name ;
 
 : (c-type) ( name -- type/f )
     c-types get-global at dup [
@@ -262,8 +260,8 @@ M: long-long-type box-return ( type -- )
         r> add*
     ] when ;
 
-: malloc-file-contents ( path -- alien )
-    binary file-contents malloc-byte-array ;
+: malloc-file-contents ( path -- alien len )
+    binary file-contents dup malloc-byte-array swap length ;
 
 [
     [ alien-cell ]

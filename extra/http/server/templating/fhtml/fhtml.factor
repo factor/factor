@@ -28,7 +28,7 @@ M: template-lexer skip-word
             { [ 2dup swap tail-slice "%>" head? ] [ drop 2 + ] }
             { [ t ] [ f skip ] }
         } cond
-    ] change-column ;
+    ] change-lexer-column ;
 
 DEFER: <% delimiter
 

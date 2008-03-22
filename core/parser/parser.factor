@@ -60,7 +60,7 @@ t parser-notes set-global
     [ swap CHAR: \s eq? xor ] curry find* drop
     [ r> drop ] [ r> length ] if* ;
 
-: change-column ( lexer quot -- )
+: change-lexer-column ( lexer quot -- )
     swap
     [ dup lexer-column swap lexer-line-text rot call ] keep
     set-lexer-column ; inline
@@ -68,14 +68,14 @@ t parser-notes set-global
 GENERIC: skip-blank ( lexer -- )
 
 M: lexer skip-blank ( lexer -- )
-    [ t skip ] change-column ;
+    [ t skip ] change-lexer-column ;
 
 GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word ( lexer -- )
     [
         2dup nth CHAR: " eq? [ drop 1+ ] [ f skip ] if
-    ] change-column ;
+    ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
     dup lexer-line swap lexer-text length <= ;
@@ -98,10 +98,7 @@ M: lexer skip-word ( lexer -- )
 
 : scan ( -- str/f ) lexer get parse-token ;
 
-TUPLE: bad-escape ;
-
-: bad-escape ( -- * )
-    \ bad-escape construct-empty throw ;
+ERROR: bad-escape ;
 
 M: bad-escape summary drop "Bad escape code" ;
 
@@ -156,7 +153,7 @@ name>char-hook global [
 : parse-string ( -- str )
     lexer get [
         [ swap tail-slice (parse-string) ] "" make swap
-    ] change-column ;
+    ] change-lexer-column ;
 
 TUPLE: parse-error file line col text ;
 
@@ -215,13 +212,7 @@ SYMBOL: in
 : set-in ( name -- )
     check-vocab-string dup in set create-vocab (use+) ;
 
-: create-in ( string -- word )
-    in get create dup set-word dup save-location ;
-
-TUPLE: unexpected want got ;
-
-: unexpected ( want got -- * )
-    \ unexpected construct-boa throw ;
+ERROR: unexpected want got ;
 
 PREDICATE: unexpected unexpected-eof
     unexpected-got not ;
@@ -238,7 +229,14 @@ PREDICATE: unexpected unexpected-eof
 : parse-tokens ( end -- seq )
     100 <vector> swap (parse-tokens) >array ;
 
+: create-in ( string -- word )
+    in get create dup set-word dup save-location ;
+
 : CREATE ( -- word ) scan create-in ;
+
+: CREATE-GENERIC ( -- word ) CREATE dup reset-word ;
+
+: CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 
 : create-class-in ( word -- word )
     in get create
@@ -284,10 +282,13 @@ M: no-word summary
         ] ?if
     ] when ;
 
-TUPLE: staging-violation word ;
+: create-method-in ( class generic -- method )
+    create-method f set-word dup save-location ;
 
-: staging-violation ( word -- * )
-    \ staging-violation construct-boa throw ;
+: CREATE-METHOD ( -- method )
+    scan-word bootstrap-word scan-word create-method-in ;
+
+ERROR: staging-violation word ;
 
 M: staging-violation summary
     drop
@@ -342,9 +343,7 @@ SYMBOL: lexer-factory
         ] if
     ] if ;
 
-TUPLE: bad-number ;
-
-: bad-number ( -- * ) \ bad-number construct-boa throw ;
+ERROR: bad-number ;
 
 : parse-base ( parsed base -- parsed )
     scan swap base> [ bad-number ] unless* parsed ;
@@ -355,7 +354,9 @@ TUPLE: bad-number ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
-: (:) CREATE dup reset-generic parse-definition ;
+: (:) CREATE-WORD parse-definition ;
+
+: (M:) CREATE-METHOD parse-definition ;
 
 GENERIC: expected>string ( obj -- str )
 
@@ -466,7 +467,15 @@ SYMBOL: interactive-vocabs
 : smudged-usage ( -- usages referenced removed )
     removed-definitions filter-moved keys [
         outside-usages
-        [ empty? swap pathname? or not ] assoc-subset
+        [
+            empty? [ drop f ] [
+                {
+                    { [ dup pathname? ] [ f ] }
+                    { [ dup method-body? ] [ f ] }
+                    { [ t ] [ t ] }
+                } cond nip
+            ] if
+        ] assoc-subset
         dup values concat prune swap keys
     ] keep ;
 

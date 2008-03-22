@@ -58,8 +58,8 @@ IN: builder
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : copy-image ( -- )
-  builds "factor" path+ my-boot-image-name path+ ".." copy-file-into
-  builds "factor" path+ my-boot-image-name path+ "."  copy-file-into ;
+  builds "factor" append-path my-boot-image-name append-path ".." copy-file-into
+  builds "factor" append-path my-boot-image-name append-path "."  copy-file-into ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -86,7 +86,7 @@ IN: builder
     +closed+         >>stdin
     "../test-log"    >>stdout
     +stdout+         >>stderr
-    45 minutes       >>timeout ;
+    120 minutes      >>timeout ;
 
 : do-builder-test ( -- )
   builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail ;
@@ -134,7 +134,9 @@ SYMBOL: build-status
       "Did not pass load-everything: " print "load-everything-vocabs" cat
       
       "Did not pass test-all: "        print "test-all-vocabs"        cat
-      "test-all-vocabs" eval-file test-failures.
+                                             "test-failures"          cat
+      
+!       "test-failures" eval-file test-failures.
       
       "help-lint results:"             print "help-lint"              cat
 
