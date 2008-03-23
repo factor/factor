@@ -2,15 +2,15 @@ USE: alien.syntax
 IN: unix.kqueue
 
 C-STRUCT: kevent
-    { "ulong"    "ident"  } ! identifier for this event
-    { "uint"     "filter" } ! filter for event
-    { "uint"     "flags"  } ! action flags for kqueue
-    { "uint"     "fflags" } ! filter flag value
-    { "longlong" "data"   } ! filter data value
-    { "void*"    "udata"  } ! opaque user data identifier
+    { "uint"   "ident"  } ! identifier for this event
+    { "short"  "filter" } ! filter for event
+    { "ushort" "flags"  } ! action flags for kqueue
+    { "uint"   "fflags" } ! filter flag value
+    { "int"    "data"   } ! filter data value
+    { "void*"  "udata"  } ! opaque user data identifier
 ;
 
-FUNCTION: int kevent ( int kq, kevent* changelist, size_t nchanges, kevent* eventlist, size_t nevents, timespec* timeout ) ;
+FUNCTION: int kevent ( int kq, kevent* changelist, int nchanges, kevent* eventlist, int nevents, timespec* timeout ) ;
 
 : EVFILT_READ     -1 ; inline
 : EVFILT_WRITE    -2 ; inline
