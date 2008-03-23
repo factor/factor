@@ -10,6 +10,7 @@ ARTICLE: "io.encodings" "I/O encodings"
 { $subsection "encodings-protocol" } ;
 
 ARTICLE: "encodings-constructors" "Constructing an encoded stream"
+"The following words can be used to construct encoded streams. Note that they are usually not used directly, but rather by the stream constructors themselves."
 { $subsection <encoder> }
 { $subsection <decoder> }
 { $subsection <encoder-duplex> } ;
@@ -47,7 +48,7 @@ ARTICLE: "encodings-protocol" "Encoding protocol"
 "An encoding descriptor must implement the following methods. The methods are implemented on tuple classes by instantiating the class and calling the method again."
 { $subsection decode-char }
 { $subsection encode-char }
-"The following methods are optional:"
+"Optionally, an encoding can override the constructor words:" 
 { $subsection <encoder> }
 { $subsection <decoder> } ;
 
