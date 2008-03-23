@@ -12,9 +12,15 @@
 	#define UNIX
 #endif
 
-#if (__OpenBSD__)
+#if defined(__OpenBSD__)
 	#define BSD
 	#define OPENBSD
+	#define UNIX
+#endif
+
+#if defined(__APPLE__)
+	#define BSD
+	#define MACOSX
 	#define UNIX
 #endif
 
@@ -34,6 +40,7 @@
 	#include <sys/stat.h>
 	#include <sys/socket.h>
 	#include <sys/errno.h>
+    #include <sys/mman.h>
 	#include <fcntl.h>
 	#include <unistd.h>
 #endif
@@ -134,6 +141,10 @@ void unix_constants()
 	constant(EINTR);
 	constant(EAGAIN);
 	constant(EINPROGRESS);
+    constant(PROT_READ);
+	constant(PROT_WRITE);
+	constant(MAP_FILE);
+	constant(MAP_SHARED);
 }
 	
 int main() {
