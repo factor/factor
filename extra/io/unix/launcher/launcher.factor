@@ -16,6 +16,17 @@ USE: unix
 : assoc>env ( assoc -- env )
     [ "=" swap 3append ] { } assoc>map ;
 
+: setup-priority ( process -- process )
+    dup priority>> [
+        H{
+            { +lowest-priority+ 20 }
+            { +low-priority+ 10 }
+            { +normal-priority+ 0 }
+            { +high-priority+ -10 }
+            { +highest-priority+ -20 }
+        } at set-priority
+    ] when* ;
+
 : redirect-fd ( oldfd fd -- )
     2dup = [ 2drop ] [ dupd dup2 io-error close ] if ;
 
@@ -47,11 +58,15 @@ USE: unix
 : setup-redirection ( process -- process )
     dup stdin>> ?closed read-flags 0 redirect
     dup stdout>> ?closed write-flags 1 redirect
-    dup stderr>> dup +stdout+ eq?
-    [ drop 1 2 dup2 io-error ] [ ?closed write-flags 2 redirect ] if ;
+    dup stderr>> dup +stdout+ eq? [
+        drop 1 2 dup2 io-error
+    ] [
+        ?closed write-flags 2 redirect
+    ] if ;
 
 : spawn-process ( process -- * )
     [
+        setup-priority
         setup-redirection
         dup pass-environment? [
             dup get-environment set-os-envs

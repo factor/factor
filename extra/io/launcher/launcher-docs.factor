@@ -33,6 +33,17 @@ $nl
     { "a file stream or a socket - the stream is connected to the given Factor stream, which cannot be used again from within Factor and must be closed after the process has been started" }
 } ;
 
+ARTICLE: "io.launcher.priority" "Setting process priority"
+"The priority of the child process can be set by storing one of the below symbols in the " { $snippet "priority" } " slot of a " { $link process } " tuple:"
+{ $list
+    { $link +lowest-priority+ }
+    { $link +low-priority+ }
+    { $link +normal-priority+ }
+    { $link +high-priority+ }
+    { $link +highest-priority+ }
+}
+"The default value is " { $link f } ", which denotes that the child process should inherit the current process priority." ;
+
 HELP: +closed+
 { $description "Possible value for the " { $snippet "stdin" } ", " { $snippet "stdout" } ", and " { $snippet "stderr" } " slots of a " { $link process } "." } ;
 
