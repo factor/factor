@@ -5,9 +5,6 @@ generic.standard effects tuples tuples.private arrays vectors
 strings compiler.units ;
 IN: tuples.tests
 
-[ t ] [ \ tuple-class \ class class< ] unit-test
-[ f ] [ \ class \ tuple-class class< ] unit-test
-
 TUPLE: rect x y w h ;
 : <rect> rect construct-boa ;
 
@@ -90,12 +87,6 @@ TUPLE: delegate-clone ;
 [ T{ delegate-clone T{ empty f } } ]
 [ T{ delegate-clone T{ empty f } } clone ] unit-test
 
-[ t ] [ \ null \ delegate-clone class< ] unit-test
-[ f ] [ \ object \ delegate-clone class< ] unit-test
-[ f ] [ \ object \ delegate-clone class< ] unit-test
-[ t ] [ \ delegate-clone \ tuple class< ] unit-test
-[ f ] [ \ tuple \ delegate-clone class< ] unit-test
-
 ! Compiler regression
 [ t length ] [ no-method-object t eq? ] must-fail-with
 
@@ -121,7 +112,7 @@ TUPLE: yo-momma ;
 [
     [ t ] [ \ yo-momma class? ] unit-test
     [ ] [ \ yo-momma forget ] unit-test
-    [ f ] [ \ yo-momma typemap get values memq? ] unit-test
+    [ f ] [ \ yo-momma update-map get values memq? ] unit-test
 
     [ f ] [ \ yo-momma crossref get at ] unit-test
 ] with-compilation-unit

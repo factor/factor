@@ -148,8 +148,12 @@ IN: tools.deploy.shaker
                 layouts:tag-mask
                 layouts:tag-numbers
                 layouts:type-numbers
-                classes:typemap
-                classes:class-map
+                classes:class<-cache
+                classes:class-not-cache
+                classes:classes-intersect-cache
+                classes:class-and-cache
+                classes:class-or-cache
+                classes:update-map
                 vocab-roots
                 definitions:crossref
                 compiled-crossref
