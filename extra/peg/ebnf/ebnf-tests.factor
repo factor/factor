@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.ebnf ;
+USING: kernel tools.test peg peg.ebnf words ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
