@@ -31,6 +31,10 @@ crossref off
 H{ } clone dictionary set
 H{ } clone changed-words set
 H{ } clone root-cache set
+H{ } clone source-files set
+H{ } clone update-map set
+num-types get f <array> builtins set
+init-caches
 
 ! Vocabulary for slot accessors
 "accessors" create-vocab drop
@@ -93,11 +97,6 @@ call
     "vectors.private"
 } [ create-vocab drop ] each
 
-H{ } clone source-files set
-H{ } clone update-map set
-H{ } clone class<map set
-H{ } clone class-map set
-
 ! Builtin classes
 : builtin-predicate-quot ( class -- quot )
     [
@@ -129,9 +128,6 @@ H{ } clone class-map set
     dup f f builtin-class define-class
     dup define-builtin-predicate
     r> define-builtin-slots ;
-
-H{ } clone typemap set
-num-types get f <array> builtins set
 
 ! Forward definitions
 "object" "kernel" create t "class" set-word-prop

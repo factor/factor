@@ -3,7 +3,7 @@
 USING: arrays assocs kernel kernel.private slots.private math
 namespaces sequences vectors words quotations definitions
 hashtables layouts combinators sequences.private generic
-classes classes.private ;
+classes classes.algebra classes.private ;
 IN: generic.standard
 
 TUPLE: standard-combination # ;

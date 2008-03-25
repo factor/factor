@@ -278,7 +278,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 
 : ebnf>quot ( string -- hashtable quot )
   'ebnf' parse check-parse-result 
-  parse-result-ast transform dup main swap at compile ;
+  parse-result-ast transform dup main swap at compile 1quotation ;
 
 : [EBNF "EBNF]" parse-multiline-string ebnf>quot nip parsed ; parsing
 

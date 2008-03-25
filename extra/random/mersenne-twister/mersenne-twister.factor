@@ -4,13 +4,10 @@
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
 
 USING: arrays kernel math namespaces sequences system init
-accessors math.ranges combinators.cleave random ;
+accessors math.ranges combinators.cleave random new-effects ;
 IN: random.mersenne-twister
 
 <PRIVATE
-
-: new-nth ( seq i -- elt ) swap nth ; inline
-: new-set-nth ( seq obj n -- seq ) pick set-nth ; inline
 
 TUPLE: mersenne-twister seq i ;
 
