@@ -227,6 +227,7 @@ ARTICLE: "io.launcher" "Operating system processes"
 { $subsection "io.launcher.detached" }
 { $subsection "io.launcher.environment" }
 { $subsection "io.launcher.redirection" }
+{ $subsection "io.launcher.priority" }
 { $subsection "io.launcher.timeouts" } ;
 
 ABOUT: "io.launcher"
