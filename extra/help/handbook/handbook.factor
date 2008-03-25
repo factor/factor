@@ -170,7 +170,17 @@ ARTICLE: "collections" "Collections"
 { $subsection "graphs" }
 { $subsection "buffers" } ;
 
-USING: io.sockets io.launcher io.mmap io.monitors ;
+USING: io.sockets io.launcher io.mmap io.monitors
+io.encodings.utf8 io.encodings.binary io.encodings.ascii io.files ;
+
+ARTICLE: "encodings-introduction" "An introduction to encodings"
+"In order to express text in terms of binary, some sort of encoding has to be used. In a modern context, this is understood as a two-way mapping between Unicode code points (characters) and some amount of binary. Since English isn't the only language in the world, ASCII is not sufficient as a mapping from binary to Unicode; it can't even express em-dashes or curly quotes. Unicode was designed as a universal character set that could potentially represent everything." $nl
+"Not all encodings can represent all Unicode code points, but Unicode can represent basically everything that exists in modern encodings. Some encodings are language-specific, and some can represent everything in Unicode. Though the world is moving toward Unicode and UTF-8, the reality today is that there are several encodings which must be taken into account." $nl
+"Factor uses a system of encoding descriptors to denote encodings. Encoding descriptors are objects which describe encodings. Examples are " { $link utf8 } ", " { $link ascii } " and " { $link binary } ". Encoding descriptors can be passed around independently. Each encoding descriptor has some method for constructing an encoded or decoded stream, and the resulting stream has an encoding descriptor stored which has methods for reading or writing characters." $nl
+"Constructors for streams which deal with bytes usually take an encoding as an explicit parameter. For example, to open a text file for reading whose contents are in UTF-8, use the following"
+{ $code "\"filename\" utf8 <file-reader>" }
+"If there is an error in the encoded stream, a replacement character (0xFFFD) will be inserted. To throw an exception upon error, use a strict encoding as follows"
+{ $code "\"filename\" utf8 strict <file-reader>" } ;
 
 ARTICLE: "io" "Input and output"
 { $heading "Streams" }
@@ -188,6 +198,7 @@ ARTICLE: "io" "Input and output"
 { $subsection "io.mmap" }
 { $subsection "io.monitors" }
 { $heading "Encodings" }
+{ $subsection "encodings-introduction" }
 { $subsection "io.encodings" }
 { $subsection "io.encodings.string" }
 { $heading "Other features" }
