@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators.cleave continuations db db.tuples db.types db.sqlite hashtables kernel math math.parser namespaces new-slots parser sequences sequences.deep sequences.lib words ;
+USING: accessors arrays combinators combinators.cleave continuations db db.tuples db.types db.sqlite hashtables kernel math math.parser namespaces new-slots parser sequences sequences.deep sequences.lib strings words ;
 IN: semantic-db
 
 TUPLE: node id content ;
@@ -54,17 +54,17 @@ TUPLE: arc id subject object relation ;
 : select-arc-subjects ( subject object relation -- subject-ids )
     select-arcs [ subject>> ] map ;
 
+: select-subjects ( object relation -- subject-ids )
+    f -rot select-arc-subjects ;
+
 : select-arc-objects ( subject object relation -- object-ids )
     select-arcs [ object>> ] map ;
 
+: select-objects ( subject relation -- object-ids )
+    f swap select-arc-objects ;
+
 : delete-arcs ( subject object relation -- )
     select-arcs [ id>> delete-arc ] each ;
-
-: subject-relation ( subject relation -- subject object relation )
-    f swap ;
-
-: object-relation ( object relation -- subject object relation )
-    f -rot ;
 
 arc "arc"
 {
@@ -139,28 +139,67 @@ arc "arc"
 : relation-id ( relation-name context-id -- relation-id )
     [ get-relation ] [ create-relation ] ensure2 ;
 
-! RELATION: is-fooey
-!  - define a word is-fooey in the current vocab (foo), that when called:
-!    - finds or creates a node called "is-fooey" with context "foo", and returns its id
+TUPLE: relation-definition relate id-word unrelate related? subjects objects ;
+C: <relation-definition> relation-definition
+
+<PRIVATE
+
+: default-word-name ( relate-word-name word-type -- word-name )
+    {
+        { "relate" [ ] }
+        { "id-word" [ "-relation" append ] }
+        { "unrelate" [ "!" swap append ] }
+        { "related?" [ "?" append ] }
+        { "subjects" [ "-subjects" append ] }
+        { "objects" [ "-objects" append ] }
+    } case ;
+
+: choose-word-name ( relation-definition given-word-name word-type -- word-name )
+    over string? [
+        drop nip
+    ] [
+        nip [ relate>> ] dip default-word-name
+    ] if ;
+
+: (define-relation-word) ( id-word word-name definition -- id-word )
+    >r create-in over [ execute ] curry r> compose define ;
+
+: define-relation-word ( relation-definition id-word given-word-name word-type definition -- relation-definition id-word )
+    >r >r [
+        pick swap r> choose-word-name r> (define-relation-word)
+    ] [
+        r> r> 2drop
+    ] if*  ;
+
+: define-relation-words ( relation-definition id-word -- )
+    over relate>> "relate" [ create-arc ] define-relation-word
+    over unrelate>> "unrelate" [ delete-arcs ] define-relation-word
+    over related?>> "related?" [ has-arc? ] define-relation-word
+    over subjects>> "subjects" [ select-subjects ] define-relation-word
+    over objects>> "objects" [ select-objects ] define-relation-word
+    2drop ;
+
+: define-id-word ( relation-definition id-word -- )
+    [ relate>> ] dip tuck word-vocabulary
+    [ context-id relation-id ] 2curry define ;
+
+: create-id-word ( relation-definition -- id-word )
+    dup id-word>> "id-word" choose-word-name create-in ;
+
+PRIVATE>
+
+: define-relation ( relation-definition -- )
+    dup create-id-word 2dup define-id-word define-relation-words ;
+
 : RELATION:
-    CREATE-WORD dup [ word-name ] [ word-vocabulary ] bi
-    [ context-id relation-id ] 2curry define ; parsing
+    scan t t t t t <relation-definition> define-relation ; parsing
 
 ! hierarchy
 TUPLE: tree id children ;
 C: <tree> tree
 
-: parent-child ( parent child has-parent-relation -- arc-id )
-    swapd create-arc ;
-
-: un-parent-child ( parent child has-parent-relation -- )
-    swapd delete-arcs ;
-
-: children ( node-id has-parent-relation -- children )
-    object-relation select-arc-subjects ;
-
-: parents ( node-id has-parent-relation -- parents )
-    subject-relation select-arc-objects ;
+: children ( node-id has-parent-relation -- children ) select-subjects ;
+: parents ( node-id has-parent-relation -- parents ) select-objects ;
 
 : get-node-hierarchy ( node-id has-parent-relation -- tree )
     2dup children >r [ get-node-hierarchy ] curry r> swap map <tree> ;
@@ -175,14 +214,3 @@ C: <tree> tree
 : get-root-nodes ( node-id has-parent-relation -- root-nodes )
     (get-root-nodes) flatten prune ;
 
-! sets
-: in-set ( member set in-set-relation -- arc-id ) create-arc ;
-: in-set? ( member set in-set-relation -- ? ) has-arc? ;
-: set-members ( set in-set-relation -- members )
-    object-relation select-arc-subjects ;
-
-! attributes
-: has-attribute ( node value has-attribute-relation -- arc-id ) create-arc ;
-: has-attribute? ( node value has-attribute-relation -- ? ) has-arc? ;
-: nodes-with-attribute ( value has-attribute-relation -- node-ids )
-    object-relation select-arc-subjects ;
