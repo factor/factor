@@ -346,10 +346,25 @@ maybe_download_dlls() {
         get_url http://factorcode.org/dlls/zlib1.dll
         get_url http://factorcode.org/dlls/OpenAL32.dll
         get_url http://factorcode.org/dlls/alut.dll
+        get_url http://factorcode.org/dlls/comerr32.dll
+        get_url http://factorcode.org/dlls/gssapi32.dll
+        get_url http://factorcode.org/dlls/iconv.dll
+        get_url http://factorcode.org/dlls/k5sprt32.dll
+        get_url http://factorcode.org/dlls/krb5_32.dll
+        get_url http://factorcode.org/dlls/libcairo-2.dll
+        get_url http://factorcode.org/dlls/libeay32.dll
+        get_url http://factorcode.org/dlls/libiconv2.dll
+        get_url http://factorcode.org/dlls/libintl3.dll
+        get_url http://factorcode.org/dlls/libpq.dll
+        get_url http://factorcode.org/dlls/libxml2.dll
+        get_url http://factorcode.org/dlls/libxslt.dll
+        get_url http://factorcode.org/dlls/msvcr71.dll
         get_url http://factorcode.org/dlls/ogg.dll
+        get_url http://factorcode.org/dlls/pgaevent.dll
+        get_url http://factorcode.org/dlls/sqlite3.dll
+        get_url http://factorcode.org/dlls/ssleay32.dll
         get_url http://factorcode.org/dlls/theora.dll
         get_url http://factorcode.org/dlls/vorbis.dll
-        get_url http://factorcode.org/dlls/sqlite3.dll
         chmod 777 *.dll
         check_ret chmod
     fi
@@ -433,6 +448,7 @@ case "$1" in
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
+    dlls) get_config_info; maybe_download_dlls;;
     net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
     *) usage ;;
 esac
