@@ -23,7 +23,7 @@ node "node"
     <node> dup insert-tuple id>> ;
 
 : node-content ( id -- str )
-    f <node> swap >>id select-tuple content>> ;
+    <id-node> select-tuple content>> ;
 
 TUPLE: arc id subject object relation ;
 
