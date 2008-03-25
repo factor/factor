@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words kernel sequences namespaces assocs hashtables
 definitions kernel.private classes classes.private
-quotations arrays vocabs effects ;
+classes.algebra quotations arrays vocabs effects ;
 IN: generic
 
 ! Method combination protocol
@@ -138,7 +138,7 @@ M: method-body forget*
 
 M: class forget* ( class -- )
     dup forget-methods
-    dup uncache-class
+    dup update-map-
     forget-word ;
 
 M: assoc update-methods ( assoc -- )
