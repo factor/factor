@@ -11,7 +11,8 @@ TYPEDEF: longlong       __int64_t
 TYPEDEF: longlong       __uint64_t
 
 TYPEDEF: int            int32_t
-TYPEDEF: int            u_int32_t
+TYPEDEF: uint           u_int32_t
+TYPEDEF: uint           uint32_t
 TYPEDEF: longlong       int64_t
 TYPEDEF: ulonglong      u_int64_t
 

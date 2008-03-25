@@ -45,8 +45,8 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 
-default: misc/wordsize
-	$(MAKE) `./misc/target`
+default: build-support/wordsize
+	$(MAKE) `./build-support/target`
 
 help:
 	@echo "Run '$(MAKE)' with one of the following parameters:"
@@ -162,8 +162,8 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
 
-misc/wordsize: misc/wordsize.c
-	gcc misc/wordsize.c -o misc/wordsize
+build-support/wordsize: build-support/wordsize.c
+	gcc build-support/wordsize.c -o build-support/wordsize
 
 clean:
 	rm -f vm/*.o

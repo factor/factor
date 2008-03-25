@@ -131,7 +131,7 @@ io.files.unique sequences strings accessors ;
 
 [ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
 
-[ ] [ "append-test" ascii <file-appender> dispose ] unit-test
+[ ] [ "append-test" temp-file ascii <file-appender> dispose ] unit-test
 
 
 

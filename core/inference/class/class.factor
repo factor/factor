@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs hashtables inference kernel
 math namespaces sequences words parser math.intervals
-effects classes inference.dataflow inference.backend
-combinators ;
+effects classes classes.algebra inference.dataflow
+inference.backend combinators ;
 IN: inference.class
 
 ! Class inference
@@ -88,8 +88,11 @@ M: interval-constraint apply-constraint
     swap interval-constraint-value intersect-value-interval ;
 
 : set-class-interval ( class value -- )
-    >r "interval" word-prop dup
-    [ r> set-value-interval* ] [ r> 2drop ] if ;
+    over class? [
+        over "interval" word-prop [
+            >r "interval" word-prop r> set-value-interval*
+        ] [ 2drop ] if
+    ] [ 2drop ] if ;
 
 : value-class* ( value -- class )
     value-classes get at object or ;

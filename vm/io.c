@@ -194,3 +194,8 @@ int err_no(void)
 {
 	return errno;
 }
+
+void clear_err_no(void)
+{
+	errno = 0;
+}
