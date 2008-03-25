@@ -1,5 +1,5 @@
 USING: arrays io io.files kernel math parser strings system
-tools.test words namespaces io.encodings.latin1
+tools.test words namespaces io.encodings.8-bit
 io.encodings.binary ;
 IN: io.tests
 
@@ -9,7 +9,7 @@ IN: io.tests
 ] unit-test
 
 : <resource-reader> ( resource -- stream )
-    resource-path latin1 <file-reader> ;
+    resource-path iso-8859-1 <file-reader> ;
 
 [
     "This is a line.\rThis is another line.\r"
@@ -27,15 +27,6 @@ IN: io.tests
 
 ! Make sure we use correct to_c_string form when writing
 [ ] [ "\0" write ] unit-test
-
-[ "" ] [ 0 read ] unit-test
-
-! [ ] [ "123" write 9000 CHAR: x <string> write flush ] unit-test
-
-[
-    "/core/io/test/binary.txt" <resource-reader>
-    [ 0.2 read ] with-stream
-] must-fail
 
 [
     {
@@ -58,3 +49,12 @@ IN: io.tests
         10 [ 65536 read drop ] times
     ] with-file-reader
 ] unit-test
+
+! [ "" ] [ 0 read ] unit-test
+
+! [ ] [ "123" write 9000 CHAR: x <string> write flush ] unit-test
+
+! [
+!     "/core/io/test/binary.txt" <resource-reader>
+!     [ 0.2 read ] with-stream
+! ] must-fail

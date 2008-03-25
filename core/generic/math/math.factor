@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
-sequences.private classes definitions ;
+sequences.private classes classes.algebra definitions ;
 IN: generic.math
 
 PREDICATE: class math-class ( object -- ? )
@@ -16,8 +16,8 @@ PREDICATE: class math-class ( object -- ? )
 
 : math-precedence ( class -- n )
     {
-        { [ dup class-empty? ] [ drop { -1 -1 } ] }
-        { [ dup math-class? ] [ types last/first ] }
+        { [ dup null class< ] [ drop { -1 -1 } ] }
+        { [ dup math-class? ] [ class-types last/first ] }
         { [ t ] [ drop { 100 100 } ] }
     } cond ;
     
@@ -33,10 +33,7 @@ PREDICATE: class math-class ( object -- ? )
     dup empty? [ [ dip ] curry [ ] like ] unless
     r> append ;
 
-TUPLE: no-math-method left right generic ;
-
-: no-math-method ( left right generic -- * )
-    \ no-math-method construct-boa throw ;
+ERROR: no-math-method left right generic ;
 
 : default-math-method ( generic -- quot )
     [ no-math-method ] curry [ ] like ;

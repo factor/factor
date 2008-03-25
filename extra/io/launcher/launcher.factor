@@ -3,9 +3,8 @@
 USING: io io.backend io.timeouts system kernel namespaces
 strings hashtables sequences assocs combinators vocabs.loader
 init threads continuations math io.encodings io.streams.duplex
-io.nonblocking new-slots accessors ;
+io.nonblocking accessors ;
 IN: io.launcher
-
 
 TUPLE: process
 
@@ -19,6 +18,8 @@ stdin
 stdout
 stderr
 
+priority
+
 timeout
 
 handle status
@@ -31,6 +32,12 @@ SYMBOL: +stdout+
 SYMBOL: +prepend-environment+
 SYMBOL: +replace-environment+
 SYMBOL: +append-environment+
+
+SYMBOL: +lowest-priority+
+SYMBOL: +low-priority+
+SYMBOL: +normal-priority+
+SYMBOL: +high-priority+
+SYMBOL: +highest-priority+
 
 : <process> ( -- process )
     process construct-empty

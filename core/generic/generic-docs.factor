@@ -1,6 +1,6 @@
-USING: help.markup help.syntax words classes definitions kernel
-alien sequences math quotations generic.standard generic.math
-combinators ;
+USING: help.markup help.syntax words classes classes.algebra
+definitions kernel alien sequences math quotations
+generic.standard generic.math combinators ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"
@@ -126,7 +126,7 @@ HELP: method
 { method create-method POSTPONE: M: } related-words
 
 HELP: <method>
-{ $values { "quot" quotation } { "class" class } { "generic" generic } { "method" "a new method definition" } }
+{ $values { "class" class } { "generic" generic } { "method" "a new method definition" } }
 { $description "Creates a new method." } ;
 
 HELP: methods
@@ -143,7 +143,7 @@ HELP: check-method
 { $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link create-method } " is given an invalid class or generic word." } ;
 
 HELP: with-methods
-{ $values { "word" generic } { "quot" "a quotation with stack effect " { $snippet "( methods -- )" } } }
+{ $values { "generic" generic } { "quot" "a quotation with stack effect " { $snippet "( methods -- )" } } }
 { $description "Applies a quotation to the generic word's methods hashtable, and regenerates the generic word's definition when the quotation returns." }
 $low-level-note ;
 

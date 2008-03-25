@@ -25,10 +25,6 @@ GENERIC: word-help* ( word -- content )
 
 M: word word-help* drop f ;
 
-M: slot-reader word-help* drop \ $slot-reader ;
-
-M: slot-writer word-help* drop \ $slot-writer ;
-
 M: predicate word-help* drop \ $predicate ;
 
 : all-articles ( -- seq )

@@ -2,7 +2,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: html http http.server io kernel math namespaces
-continuations calendar sequences assocs new-slots hashtables
+continuations calendar sequences assocs hashtables
 accessors arrays alarms quotations combinators
 combinators.cleave fry assocs.lib ;
 IN: http.server.callbacks

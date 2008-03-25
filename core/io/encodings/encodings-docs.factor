@@ -14,19 +14,19 @@ ARTICLE: "encodings-constructors" "Constructing an encoded stream"
 { $subsection <decoder> }
 { $subsection <encoder-duplex> } ;
 
-HELP: <encoder> ( stream encoding -- newstream )
+HELP: <encoder>
 { $values { "stream" "an output stream" }
     { "encoding" "an encoding descriptor" }
     { "newstream" "an encoded output stream" } }
 { $description "Wraps the given stream in a new stream using the given encoding for all output. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." } ;
 
-HELP: <decoder> ( stream encoding -- newstream )
+HELP: <decoder>
 { $values { "stream" "an input stream" }
     { "encoding" "an encoding descriptor" }
     { "newstream" "an encoded output stream" } }
 { $description "Wraps the given stream in a new stream using the given encoding for all input. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." } ;
 
-HELP: <encoder-duplex> ( stream-in stream-out encoding -- duplex )
+HELP: <encoder-duplex>
 { $values { "stream-in" "an input stream" }
     { "stream-out" "an output stream" }
     { "encoding" "an encoding descriptor" }
@@ -37,10 +37,11 @@ HELP: <encoder-duplex> ( stream-in stream-out encoding -- duplex )
 
 ARTICLE: "encodings-descriptors" "Encoding descriptors"
 "An encoding descriptor is something which can be used for input or output streams to encode or decode files. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
-$nl { $vocab-link "io.encodings.utf8" }
-$nl { $vocab-link "io.encodings.ascii" }
-$nl { $vocab-link "io.encodings.binary" }
-$nl { $vocab-link "io.encodings.utf16" } ;
+{ $vocab-subsection "io.encodings.utf8" }
+{ $vocab-subsection "io.encodings.ascii" }
+{ $vocab-subsection "io.encodings.8-bit" }
+{ $vocab-subsection "io.encodings.binary" }
+{ $vocab-subsection "io.encodings.utf16" } ;
 
 ARTICLE: "encodings-protocol" "Encoding protocol"
 "An encoding descriptor must implement the following methods. The methods are implemented on tuple classes by instantiating the class and calling the method again."
@@ -50,12 +51,12 @@ ARTICLE: "encodings-protocol" "Encoding protocol"
 { $subsection <encoder> }
 { $subsection <decoder> } ;
 
-HELP: decode-char ( stream encoding -- char/f )
+HELP: decode-char
 { $values { "stream" "an underlying input stream" }
-    { "encoding" "An encoding descriptor tuple" } }
+    { "encoding" "An encoding descriptor tuple" } { "char/f" "a code point or " { $link f } } }
 { $description "Reads a single code point from the underlying stream, interpreting it by the encoding. This should not be used directly." } ;
 
-HELP: encode-char ( char stream encoding -- )
+HELP: encode-char
 { $values { "char" "a character" }
     { "stream" "an underlying output stream" }
     { "encoding" "an encoding descriptor" } }

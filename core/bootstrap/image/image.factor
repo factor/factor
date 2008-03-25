@@ -348,8 +348,10 @@ M: curry '
 : emit-global ( -- )
     [
         {
-            dictionary source-files
-            typemap builtins class<map class-map update-map
+            dictionary source-files builtins
+            update-map class<-cache class-not-cache
+            classes-intersect-cache class-and-cache
+            class-or-cache
         } [ dup get swap bootstrap-word set ] each
     ] H{ } make-assoc
     bootstrap-global set

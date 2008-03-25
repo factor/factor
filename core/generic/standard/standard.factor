@@ -3,7 +3,7 @@
 USING: arrays assocs kernel kernel.private slots.private math
 namespaces sequences vectors words quotations definitions
 hashtables layouts combinators sequences.private generic
-classes classes.private ;
+classes classes.algebra classes.private ;
 IN: generic.standard
 
 TUPLE: standard-combination # ;
@@ -26,10 +26,7 @@ SYMBOL: (dispatch#)
 
 : unpicker ( -- quot ) \ (dispatch#) get unpickers nth ;
 
-TUPLE: no-method object generic ;
-
-: no-method ( object generic -- * )
-    \ no-method construct-boa throw ;
+ERROR: no-method object generic ;
 
 : error-method ( word --  quot )
     picker swap [ no-method ] curry append ;

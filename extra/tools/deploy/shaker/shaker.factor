@@ -19,7 +19,6 @@ QUALIFIED: libc.private
 QUALIFIED: libc.private
 QUALIFIED: listener
 QUALIFIED: prettyprint.config
-QUALIFIED: random.private
 QUALIFIED: source-files
 QUALIFIED: threads
 QUALIFIED: vocabs
@@ -108,8 +107,6 @@ IN: tools.deploy.shaker
 
 : stripped-globals ( -- seq )
     [
-        random.private:mt ,
-
         {
             bootstrap.stage2:bootstrap-time
             continuations:error
@@ -142,25 +139,29 @@ IN: tools.deploy.shaker
             { } { "cpu" } strip-vocab-globals %
 
             {
-                vocabs:dictionary
-                lexer-factory
-                vocabs:load-vocab-hook
+                classes:class-and-cache
+                classes:class-not-cache
+                classes:class-or-cache
+                classes:class<-cache
+                classes:classes-intersect-cache
+                classes:update-map
+                compiled-crossref
+                compiler.units:recompile-hook
+                definitions:crossref
+                interactive-vocabs
                 layouts:num-tags
                 layouts:num-types
                 layouts:tag-mask
                 layouts:tag-numbers
                 layouts:type-numbers
-                classes:typemap
-                vocab-roots
-                definitions:crossref
-                compiled-crossref
-                interactive-vocabs
-                word
-                compiler.units:recompile-hook
-                listener:listener-hook
                 lexer-factory
-                classes:update-map
-                classes:class<map
+                lexer-factory
+                listener:listener-hook
+                root-cache
+                vocab-roots
+                vocabs:dictionary
+                vocabs:load-vocab-hook
+                word
             } %
         ] when
 

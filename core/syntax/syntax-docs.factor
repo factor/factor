@@ -227,6 +227,9 @@ HELP: foldable
     }
     "The last restriction ensures that words such as " { $link clone } " do not satisfy the foldable word contract. Indeed, " { $link clone } " will output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since doing so would give incorrect semantics for code that clones mutable objects and proceeds to mutate them."
 }
+{ $notes
+    "Folding optimizations are not applied if the call site of a word is in the same source file as the word. This is a side-effect of the compilation unit system; see " { $link "compilation-units" } "."
+}
 { $examples "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable." } ;
 
 HELP: flushable
@@ -556,9 +559,16 @@ HELP: PREDICATE:
 HELP: TUPLE:
 { $syntax "TUPLE: class slots... ;" }
 { $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class with membership predicate " { $snippet "name?" } "."
+{ $description "Defines a new tuple class."
 $nl
 "Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." } ;
+
+HELP: ERROR:
+{ $syntax "ERROR: class slots... ;" }
+{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
+{ $description "Defines a new tuple class.  Defines a new word " { $snippet "class?" } " that boa-constructs this tuple and throws it." } ;
+
+{ POSTPONE: ERROR: POSTPONE: TUPLE: } related-words
 
 HELP: C:
 { $syntax "C: constructor class" }

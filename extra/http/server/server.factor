@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http sequences prettyprint io.server logging calendar
-new-slots html.elements accessors math.parser combinators.lib
+html.elements accessors math.parser combinators.lib
 tools.vocabs debugger html continuations random combinators
-destructors io.encodings.latin1 fry combinators.cleave ;
+destructors io.encodings.8-bit fry combinators.cleave ;
 IN: http.server
 
 GENERIC: call-responder ( path responder -- response )
@@ -217,7 +217,7 @@ SYMBOL: exit-continuation
 
 : httpd ( port -- )
     internet-server "http.server"
-    latin1 [ handle-client ] with-server ;
+    iso-8859-1 [ handle-client ] with-server ;
 
 : httpd-main ( -- ) 8888 httpd ;
 

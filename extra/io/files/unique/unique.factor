@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.bitfields combinators.lib math.parser
 random sequences sequences.lib continuations namespaces
-io.files io.backend io.nonblocking io arrays
-io.files.unique.backend system combinators vocabs.loader ;
+io.files io arrays io.files.unique.backend system
+combinators vocabs.loader ;
 IN: io.files.unique
 
 <PRIVATE
@@ -21,18 +21,15 @@ IN: io.files.unique
 : unique-retries ( -- n ) 10 ; inline
 PRIVATE>
 
-: make-unique-file ( prefix suffix -- path stream )
+: make-unique-file ( prefix suffix -- path )
     temporary-path -rot
     [
         unique-length random-name swap 3append append-path
         dup (make-unique-file)
     ] 3curry unique-retries retry ;
 
-: with-unique-file ( quot -- path )
-    >r f f make-unique-file r> rot [ with-stream ] dip ; inline
-
-: with-temporary-file ( quot -- )
-    with-unique-file delete-file ; inline
+: with-unique-file ( prefix suffix quot -- )
+    >r make-unique-file r> keep delete-file ; inline
 
 : make-unique-directory ( -- path )
     [
@@ -40,12 +37,9 @@ PRIVATE>
         dup make-directory
     ] unique-retries retry ;
 
-: with-unique-directory ( quot -- path )
+: with-unique-directory ( quot -- )
     >r make-unique-directory r>
-    [ with-directory ] curry keep ; inline
-
-: with-temporary-directory ( quot -- )
-    with-unique-directory delete-tree ; inline
+    [ with-directory ] curry keep delete-tree ; inline
 
 {
     { [ unix? ] [ "io.unix.files.unique" ] }

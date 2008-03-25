@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors new-slots sequences kernel assocs combinators
+USING: accessors sequences kernel assocs combinators
 http.server http.server.validators http hashtables namespaces
 combinators.cleave fry continuations locals ;
 IN: http.server.actions
