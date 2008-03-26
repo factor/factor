@@ -2,18 +2,18 @@ USING: definitions generic kernel kernel.private math
 math.constants parser sequences tools.test words assocs
 namespaces quotations sequences.private classes continuations
 generic.standard effects tuples tuples.private arrays vectors
-strings compiler.units ;
+strings compiler.units accessors ;
 IN: tuples.tests
 
 TUPLE: rect x y w h ;
 : <rect> rect construct-boa ;
 
-: move ( x rect -- )
-    [ rect-x + ] keep set-rect-x ;
+: move ( x rect -- rect )
+    [ + ] change-x ;
 
-[ f ] [ 10 20 30 40 <rect> dup clone 5 swap [ move ] keep = ] unit-test
+[ f ] [ 10 20 30 40 <rect> dup clone 5 swap move = ] unit-test
 
-[ t ] [ 10 20 30 40 <rect> dup clone 0 swap [ move ] keep = ] unit-test
+[ t ] [ 10 20 30 40 <rect> dup clone 0 swap move = ] unit-test
 
 GENERIC: delegation-test
 M: object delegation-test drop 3 ;
@@ -34,27 +34,46 @@ TUPLE: quuux-tuple-2 ;
 
 [ 4 ] [ <quux-tuple-2> <quuux-tuple-2> delegation-test-2 ] unit-test
 
+! Make sure we handle tuple class redefinition
+TUPLE: redefinition-test ;
+
+C: <redefinition-test> redefinition-test
+
+<redefinition-test> "redefinition-test" set
+
+[ t ] [ "redefinition-test" get redefinition-test? ] unit-test
+
+"IN: tuples.tests TUPLE: redefinition-test ;" eval
+
+[ t ] [ "redefinition-test" get redefinition-test? ] unit-test
+
 ! Make sure we handle changing shapes!
 TUPLE: point x y ;
 
 C: <point> point
 
-100 200 <point> "p" set
+[ ] [ 100 200 <point> "p" set ] unit-test
 
 ! Use eval to sequence parsing explicitly
-"IN: tuples.tests TUPLE: point x y z ;" eval
+[ ] [ "IN: tuples.tests TUPLE: point x y z ;" eval ] unit-test
 
-[ 100 ] [ "p" get point-x ] unit-test
-[ 200 ] [ "p" get point-y ] unit-test
-[ f ] [ "p" get "point-z" "tuples.tests" lookup execute ] unit-test
+[ 100 ] [ "p" get x>> ] unit-test
+[ 200 ] [ "p" get y>> ] unit-test
+[ f ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
-300 "p" get "set-point-z" "tuples.tests" lookup execute
+"p" get 300 ">>z" "accessors" lookup execute drop
+
+[ 4 ] [ "p" get tuple-size ] unit-test
+
+[ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
 "IN: tuples.tests TUPLE: point z y ;" eval
 
-[ "p" get point-x ] must-fail
-[ 200 ] [ "p" get point-y ] unit-test
-[ 300 ] [ "p" get "point-z" "tuples.tests" lookup execute ] unit-test
+[ 3 ] [ "p" get tuple-size ] unit-test
+
+[ "p" get x>> ] must-fail
+[ 200 ] [ "p" get y>> ] unit-test
+[ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
 TUPLE: predicate-test ;
 
@@ -68,10 +87,10 @@ PREDICATE: tuple silly-pred
     class \ rect = ;
 
 GENERIC: area
-M: silly-pred area dup rect-w swap rect-h * ;
+M: silly-pred area dup w>> swap h>> * ;
 
 TUPLE: circle radius ;
-M: circle area circle-radius sq pi * ;
+M: circle area radius>> sq pi * ;
 
 [ 200 ] [ T{ rect f 0 0 10 20 } area ] unit-test
 
@@ -88,7 +107,7 @@ TUPLE: delegate-clone ;
 [ T{ delegate-clone T{ empty f } } clone ] unit-test
 
 ! Compiler regression
-[ t length ] [ no-method-object t eq? ] must-fail-with
+[ t length ] [ object>> t eq? ] must-fail-with
 
 [ "<constructor-test>" ]
 [ "TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval word word-name ] unit-test
@@ -96,7 +115,7 @@ TUPLE: delegate-clone ;
 TUPLE: size-test a b c d ;
 
 [ t ] [
-    T{ size-test } array-capacity
+    T{ size-test } tuple-size
     size-test tuple-size =
 ] unit-test
 
@@ -213,55 +232,50 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 ! tuples are reshaped
 : cons-test-1 \ erg's-reshape-problem construct-empty ;
 : cons-test-2 \ erg's-reshape-problem construct-boa ;
-: cons-test-3
-    { set-erg's-reshape-problem-a }
-    \ erg's-reshape-problem construct ;
 
-"IN: tuples.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
-
-[ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
-
-[ t ] [ cons-test-1 array-capacity "a" get array-capacity = ] unit-test
-
-[ t ] [ 1 cons-test-3 array-capacity "a" get array-capacity = ] unit-test
-
-[
-    "IN: tuples.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
-] [ [ no-tuple-class? ] is? ] must-fail-with
-
-! Hardcore unit tests
-USE: threads
-
-\ thread "slot-names" word-prop "slot-names" set
-
-[ ] [
-    [
-        \ thread { "xxx" } "slot-names" get append
-        define-tuple-class
-    ] with-compilation-unit
-
-    [ 1337 sleep ] "Test" spawn drop
-
-    [
-        \ thread "slot-names" get
-        define-tuple-class
-    ] with-compilation-unit
-] unit-test
-
-USE: vocabs
-
-\ vocab "slot-names" word-prop "slot-names" set
-
-[ ] [
-    [
-        \ vocab { "xxx" } "slot-names" get append
-        define-tuple-class
-    ] with-compilation-unit
-
-    all-words drop
-
-    [
-        \ vocab "slot-names" get
-        define-tuple-class
-    ] with-compilation-unit
-] unit-test
+! "IN: tuples.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
+! 
+! [ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
+! 
+! [ t ] [ cons-test-1 tuple-size "a" get tuple-size = ] unit-test
+! 
+! [
+!     "IN: tuples.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
+! ] [ [ no-tuple-class? ] is? ] must-fail-with
+! 
+! ! Hardcore unit tests
+! USE: threads
+! 
+! \ thread "slot-names" word-prop "slot-names" set
+! 
+! [ ] [
+!     [
+!         \ thread { "xxx" } "slot-names" get append
+!         define-tuple-class
+!     ] with-compilation-unit
+! 
+!     [ 1337 sleep ] "Test" spawn drop
+! 
+!     [
+!         \ thread "slot-names" get
+!         define-tuple-class
+!     ] with-compilation-unit
+! ] unit-test
+! 
+! USE: vocabs
+! 
+! \ vocab "slot-names" word-prop "slot-names" set
+! 
+! [ ] [
+!     [
+!         \ vocab { "xxx" } "slot-names" get append
+!         define-tuple-class
+!     ] with-compilation-unit
+! 
+!     all-words drop
+! 
+!     [
+!         \ vocab "slot-names" get
+!         define-tuple-class
+!     ] with-compilation-unit
+! ] unit-test
