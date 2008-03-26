@@ -1,6 +1,7 @@
 IN: io.files.tests
-USING: tools.test io.files io threads kernel continuations io.encodings.ascii
-io.files.unique sequences strings accessors ;
+USING: tools.test io.files io threads kernel continuations
+io.encodings.ascii io.files.unique sequences strings accessors
+io.encodings.utf8 ;
 
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test
@@ -82,6 +83,12 @@ io.files.unique sequences strings accessors ;
     "delete-tree-test" temp-file delete-tree
 ] unit-test
 
+[ { { "kernel" t } } ] [
+    "core" resource-path [
+        "." directory [ first "kernel" = ] subset
+    ] with-directory
+] unit-test
+
 [ ] [
     "copy-tree-test/a/b/c" temp-file make-directories
 ] unit-test
@@ -129,6 +136,15 @@ io.files.unique sequences strings accessors ;
 [ ] [ "copy-tree-test" temp-file delete-tree ] unit-test
 
 [ t ] [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
+
+[ t ] [
+    temp-directory [ "hi41" "test41" utf8 set-file-contents ] with-directory
+    temp-directory "test41" append-path utf8 file-contents "hi41" =
+] unit-test
+
+[ t ] [
+    temp-directory [ "test41" file-info size>> ] with-directory 4 =
+] unit-test
 
 [ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
 
