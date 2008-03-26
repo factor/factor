@@ -45,6 +45,8 @@ HOOK: (file-appender) io-backend ( path -- stream )
 ! Pathnames
 : path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
 
+: path-separator ( -- string ) windows? "\\" "/" ? ;
+
 : right-trim-separators ( str -- newstr )
     [ path-separator? ] right-trim ;
 
