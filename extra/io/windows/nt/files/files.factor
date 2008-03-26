@@ -2,7 +2,8 @@ USING: continuations destructors io.buffers io.files io.backend
 io.timeouts io.nonblocking io.windows io.windows.nt.backend
 kernel libc math threads windows windows.kernel32
 alien.c-types alien.arrays sequences combinators combinators.lib
-sequences.lib ascii splitting alien strings assocs ;
+sequences.lib ascii splitting alien strings assocs
+combinators.cleave ;
 IN: io.windows.nt.files
 
 M: windows-nt-io cwd
@@ -18,18 +19,19 @@ M: windows-nt-io cd
 
 M: windows-nt-io root-directory? ( path -- ? )
     dup length 2 = [
-        dup first Letter?
-        swap second CHAR: : = and
+        first2
+        [ Letter? ] [ CHAR: : = ] bi* and
     ] [
         drop f
     ] if ;
 
+ERROR: not-absolute-path ;
 : root-directory ( string -- string' )
     {
         [ dup length 2 >= ]
         [ dup second CHAR: : = ]
         [ dup first Letter? ]
-    } && [ 2 head ] [ "Not an absolute path" throw ] if ;
+    } && [ 2 head ] [ not-absolute-path ] if ;
 
 : prepend-prefix ( string -- string' )
     unicode-prefix prepend ;
@@ -58,9 +60,12 @@ M: windows-nt-io root-directory? ( path -- ? )
         ] }
     } cond ;
 
+ERROR: nonstring-pathname ;
+ERROR: empty-pathname ;
+
 M: windows-nt-io normalize-pathname ( string -- string )
-    dup string? [ "Pathname must be a string" throw ] unless
-    dup empty? [ "Empty pathname" throw ] when
+    dup string? [ nonstring-pathname ] unless
+    dup empty? [ empty-pathname ] when
     { { CHAR: / CHAR: \\ } } substitute
     cwd swap windows-append-path
     [ "/\\." member? ] right-trim
