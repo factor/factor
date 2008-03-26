@@ -6,7 +6,7 @@ IN: io.streams.encodings.tests
     resource-path ascii <file-reader> ;
     
 [ { } ]
-[ "/core/io/test/empty-file.txt" <resource-reader> lines ]
+[ "core/io/test/empty-file.txt" <resource-reader> lines ]
 unit-test
 
 : lines-test ( stream -- line1 line2 )
@@ -16,21 +16,21 @@ unit-test
     "This is a line."
     "This is another line."
 ] [
-    "/core/io/test/windows-eol.txt" <resource-reader> lines-test
+    "core/io/test/windows-eol.txt" <resource-reader> lines-test
 ] unit-test
 
 [
     "This is a line."
     "This is another line."
 ] [
-    "/core/io/test/mac-os-eol.txt" <resource-reader> lines-test
+    "core/io/test/mac-os-eol.txt" <resource-reader> lines-test
 ] unit-test
 
 [
     "This is a line."
     "This is another line."
 ] [
-    "/core/io/test/unix-eol.txt" <resource-reader> lines-test
+    "core/io/test/unix-eol.txt" <resource-reader> lines-test
 ] unit-test
 
 [

@@ -4,7 +4,7 @@ USING: words sequences kernel assocs combinators classes
 generic.standard namespaces arrays math quotations ;
 IN: classes.union
 
-PREDICATE: class union-class
+PREDICATE: union-class < class
     "metaclass" word-prop union-class eq? ;
 
 ! Union classes for dispatch on multiple classes.

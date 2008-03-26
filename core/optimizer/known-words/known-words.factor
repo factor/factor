@@ -11,12 +11,11 @@ classes.algebra optimizer.def-use optimizer.backend
 optimizer.pattern-match optimizer.inlining float-arrays
 sequences.private combinators ;
 
-! the output of <tuple> and <tuple-boa> has the class which is
-! its second-to-last input
 { <tuple> <tuple-boa> } [
     [
-        dup node-in-d dup length 2 - swap nth node-literal
-        dup class? [ drop tuple ] unless 1array f
+        dup node-in-d peek node-literal
+        dup tuple-layout? [ layout-class ] [ drop tuple ] if
+        1array f
     ] "output-classes" set-word-prop
 ] each
 

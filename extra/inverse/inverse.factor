@@ -54,9 +54,9 @@ M: no-inverse summary
 : undo-literal ( object -- quot )
     [ =/fail ] curry ;
 
-PREDICATE: word normal-inverse "inverse" word-prop ;
-PREDICATE: word math-inverse "math-inverse" word-prop ;
-PREDICATE: word pop-inverse "pop-length" word-prop ;
+PREDICATE: normal-inverse < word "inverse" word-prop ;
+PREDICATE: math-inverse < word "math-inverse" word-prop ;
+PREDICATE: pop-inverse < word "pop-length" word-prop ;
 UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : inline-word ( word -- )

@@ -46,7 +46,7 @@ C: <slot-spec> slot-spec
 : define-writer ( class slot name -- )
     writer-word [ set-slot ] define-slot-word ;
 
-: setter-effect T{ effect f { "object" "value" } { "value" } } ; inline
+: setter-effect T{ effect f { "object" "value" } { "object" } } ; inline
 
 : setter-word ( name -- word )
     ">>" prepend setter-effect create-accessor ;

@@ -29,23 +29,23 @@ TUPLE: wlet bindings body ;
 
 C: <wlet> wlet
 
-PREDICATE: word local "local?" word-prop ;
+PREDICATE: local < word "local?" word-prop ;
 
 : <local> ( name -- word )
     #! Create a local variable identifier
     f <word> dup t "local?" set-word-prop ;
 
-PREDICATE: word local-word "local-word?" word-prop ;
+PREDICATE: local-word < word "local-word?" word-prop ;
 
 : <local-word> ( name -- word )
     f <word> dup t "local-word?" set-word-prop ;
 
-PREDICATE: word local-reader "local-reader?" word-prop ;
+PREDICATE: local-reader < word "local-reader?" word-prop ;
 
 : <local-reader> ( name -- word )
     f <word> dup t "local-reader?" set-word-prop ;
 
-PREDICATE: word local-writer "local-writer?" word-prop ;
+PREDICATE: local-writer < word "local-writer?" word-prop ;
 
 : <local-writer> ( reader -- word )
     dup word-name "!" append f <word>
@@ -357,7 +357,7 @@ M: wlet pprint* \ [wlet pprint-let ;
 
 M: let* pprint* \ [let* pprint-let ;
 
-PREDICATE: word lambda-word
+PREDICATE: lambda-word < word
     "lambda" word-prop >boolean ;
 
 M: lambda-word definer drop \ :: \ ; ;
@@ -373,7 +373,7 @@ M: lambda-word definition
 
 M: lambda-word synopsis* lambda-word-synopsis ;
 
-PREDICATE: macro lambda-macro
+PREDICATE: lambda-macro < macro
     "lambda" word-prop >boolean ;
 
 M: lambda-macro definer drop \ MACRO:: \ ; ;
@@ -383,7 +383,7 @@ M: lambda-macro definition
 
 M: lambda-macro synopsis* lambda-word-synopsis ;
 
-PREDICATE: method-body lambda-method
+PREDICATE: lambda-method < method-body
     "lambda" word-prop >boolean ;
 
 M: lambda-method definer drop \ M:: \ ; ;

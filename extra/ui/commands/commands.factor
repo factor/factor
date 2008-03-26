@@ -9,7 +9,7 @@ SYMBOL: +nullary+
 SYMBOL: +listener+
 SYMBOL: +description+
 
-PREDICATE: word listener-command +listener+ word-prop ;
+PREDICATE: listener-command < word +listener+ word-prop ;
 
 GENERIC: invoke-command ( target command -- )
 
