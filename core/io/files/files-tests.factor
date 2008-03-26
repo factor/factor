@@ -10,8 +10,6 @@ io.files.unique sequences strings accessors ;
 [ "awk" ] [ "/usr/libexec/awk/" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
 [ "" ] [ "" file-name ] unit-test
-[ "/" ] [ "/" file-name ] unit-test
-[ "///" ] [ "///" file-name ] unit-test
 
 [ ] [
     { "Hello world." }
@@ -156,18 +154,12 @@ io.files.unique sequences strings accessors ;
 [ "/usr/lib/" ] [ "/usr" "./lib/" append-path ] unit-test
 [ "/lib" ] [ "/usr" "../lib" append-path ] unit-test
 [ "/lib/" ] [ "/usr" "../lib/" append-path ] unit-test
-[ "/lib" ] [ "/" "../lib" append-path ] unit-test
-[ "/lib/" ] [ "/" "../lib/" append-path ] unit-test
 
 [ "" ] [ "" "." append-path ] unit-test
 [ "" ".." append-path ] must-fail
 
 [ "/" ] [ "/" "./." append-path ] unit-test
 [ "/" ] [ "/" "././" append-path ] unit-test
-[ "/" ] [ "/" "../.." append-path ] unit-test
-[ "/" ] [ "/" "../../" append-path ] unit-test
-[ "/lib" ] [ "/" "../../lib" append-path ] unit-test
-[ "/lib/" ] [ "/" "../../lib/" append-path ] unit-test
 [ "/a/b/lib" ] [ "/a/b/c/d/e/f/" "../../../../lib" append-path ] unit-test
 [ "/a/b/lib/" ] [ "/a/b/c/d/e/f/" "../../../../lib/" append-path ] unit-test
 
