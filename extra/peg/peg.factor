@@ -3,7 +3,7 @@
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
-       words quotations effects memoize ;
+       words quotations effects memoize accessors ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
@@ -52,7 +52,7 @@ MATCH-VARS: ?token ;
   ] if ;
 
 M: token-parser (compile) ( parser -- quot )
-  token-parser-symbol [ parse-token ] curry ;
+  symbol>> [ parse-token ] curry ;
       
 TUPLE: satisfy-parser quot ;
 
@@ -72,7 +72,7 @@ MATCH-VARS: ?quot ;
   ] ;
 
 M: satisfy-parser (compile) ( parser -- quot )
-  satisfy-parser-quot \ ?quot satisfy-pattern match-replace ;
+  quot>> \ ?quot satisfy-pattern match-replace ;
 
 TUPLE: range-parser min max ;
 
@@ -100,12 +100,12 @@ TUPLE: seq-parser parsers ;
 : seq-pattern ( -- quot )
   [
     dup [
-      dup parse-result-remaining ?quot [
-        [ parse-result-remaining swap set-parse-result-remaining ] 2keep
-        parse-result-ast dup ignore = [ 
+      dup remaining>> ?quot [
+        [ remaining>> swap (>>remaining) ] 2keep
+        ast>> dup ignore = [ 
           drop  
         ] [ 
-          swap [ parse-result-ast push ] keep 
+          swap [ ast>> push ] keep 
         ] if
       ] [
         drop f 
@@ -118,7 +118,7 @@ TUPLE: seq-parser parsers ;
 M: seq-parser (compile) ( parser -- quot )
   [
     [ V{ } clone <parse-result> ] %
-    seq-parser-parsers [ compiled-parser \ ?quot seq-pattern match-replace % ] each 
+    parsers>> [ compiled-parser \ ?quot seq-pattern match-replace % ] each 
   ] [ ] make ;
 
 TUPLE: choice-parser parsers ;
@@ -135,16 +135,16 @@ TUPLE: choice-parser parsers ;
 M: choice-parser (compile) ( parser -- quot )
   [
     f ,
-    choice-parser-parsers [ compiled-parser \ ?quot choice-pattern match-replace % ] each
+    parsers>> [ compiled-parser \ ?quot choice-pattern match-replace % ] each
     \ nip ,
   ] [ ] make ;
 
 TUPLE: repeat0-parser p1 ;
 
 : (repeat0) ( quot result -- result )
-  2dup parse-result-remaining swap call [
-    [ parse-result-remaining swap set-parse-result-remaining ] 2keep 
-    parse-result-ast swap [ parse-result-ast push ] keep
+  2dup remaining>> swap call [
+    [ remaining>> swap (>>remaining) ] 2keep 
+    ast>> swap [ ast>> push ] keep
     (repeat0) 
  ] [
     nip
@@ -158,7 +158,7 @@ TUPLE: repeat0-parser p1 ;
 M: repeat0-parser (compile) ( parser -- quot )
   [
     [ V{ } clone <parse-result> ] %
-    repeat0-parser-p1 compiled-parser \ ?quot repeat0-pattern match-replace %        
+    p1>> compiled-parser \ ?quot repeat0-pattern match-replace %        
   ] [ ] make ;
 
 TUPLE: repeat1-parser p1 ;
@@ -166,7 +166,7 @@ TUPLE: repeat1-parser p1 ;
 : repeat1-pattern ( -- quot )
   [
     [ ?quot ] swap (repeat0) [
-      dup parse-result-ast empty? [
+      dup ast>> empty? [
         drop f
       ] when  
     ] [
@@ -177,7 +177,7 @@ TUPLE: repeat1-parser p1 ;
 M: repeat1-parser (compile) ( parser -- quot )
   [
     [ V{ } clone <parse-result> ] %
-    repeat1-parser-p1 compiled-parser \ ?quot repeat1-pattern match-replace % 
+    p1>> compiled-parser \ ?quot repeat1-pattern match-replace % 
   ] [ ] make ;
 
 TUPLE: optional-parser p1 ;
@@ -188,7 +188,7 @@ TUPLE: optional-parser p1 ;
   ] ;
 
 M: optional-parser (compile) ( parser -- quot )
-  optional-parser-p1 compiled-parser \ ?quot optional-pattern match-replace ;
+  p1>> compiled-parser \ ?quot optional-pattern match-replace ;
 
 TUPLE: ensure-parser p1 ;
 
@@ -202,7 +202,7 @@ TUPLE: ensure-parser p1 ;
   ] ;
 
 M: ensure-parser (compile) ( parser -- quot )
-  ensure-parser-p1 compiled-parser \ ?quot ensure-pattern match-replace ;
+  p1>> compiled-parser \ ?quot ensure-pattern match-replace ;
 
 TUPLE: ensure-not-parser p1 ;
 
@@ -216,7 +216,7 @@ TUPLE: ensure-not-parser p1 ;
   ] ;
 
 M: ensure-not-parser (compile) ( parser -- quot )
-  ensure-not-parser-p1 compiled-parser \ ?quot ensure-not-pattern match-replace ;
+  p1>> compiled-parser \ ?quot ensure-not-pattern match-replace ;
 
 TUPLE: action-parser p1 quot ;
 
@@ -225,13 +225,13 @@ MATCH-VARS: ?action ;
 : action-pattern ( -- quot )
   [
     ?quot dup [ 
-      dup parse-result-ast ?action call
-      swap [ set-parse-result-ast ] keep
+      dup ast>> ?action call
+      >>ast
     ] when 
   ] ;
 
 M: action-parser (compile) ( parser -- quot )
-  { action-parser-p1 action-parser-quot } get-slots [ compiled-parser ] dip 
+  { p1>> quot>> } get-slots [ compiled-parser ] dip 
   2array { ?quot ?action } action-pattern match-replace ;
 
 : left-trim-slice ( string -- string )
@@ -245,7 +245,7 @@ TUPLE: sp-parser p1 ;
 
 M: sp-parser (compile) ( parser -- quot )
   [
-    \ left-trim-slice , sp-parser-p1 compiled-parser , 
+    \ left-trim-slice , p1>> compiled-parser , 
   ] [ ] make ;
 
 TUPLE: delay-parser quot ;
@@ -255,7 +255,7 @@ M: delay-parser (compile) ( parser -- quot )
   #! This way it is run only once and the 
   #! parser constructed once at run time.
   [
-    delay-parser-quot % \ compile ,
+    quot>> % \ compile ,
   ] [ ] make 
   { } { "word" } <effect> memoize-quot 
   [ % \ execute , ] [ ] make ;
