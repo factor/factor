@@ -3,7 +3,8 @@
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
-       words quotations effects memoize accessors combinators.cleave ;
+       words quotations effects memoize accessors 
+       combinators.cleave locals ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
@@ -14,14 +15,22 @@ SYMBOL: ignore
   parse-result construct-boa ;
 
 SYMBOL: compiled-parsers
+SYMBOL: packrat
+SYMBOL: failed
 
 GENERIC: (compile) ( parser -- quot )
 
+:: run-packrat-parser ( input quot c -- result )
+  input slice? [ input slice-from ] [ 0 ] if
+  quot c [ drop H{ } clone ] cache 
+  [
+    drop input quot call  
+  ] cache* ; inline
+
 : run-parser ( input quot -- result )
-  #! Eventually this will be replaced with something that
-  #! can do packrat parsing by memoizing the results of
-  #! a parser. For now, it just calls the quotation.
-  call ; inline
+  #! If a packrat cache is available, use memoization for
+  #! packrat parsing, otherwise do a standard peg call.
+  packrat get [ run-packrat-parser ] [ call ] if* ; inline
 
 : compiled-parser ( parser -- word )
   #! Look to see if the given parser has been compiled.
