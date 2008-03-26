@@ -17,6 +17,12 @@ SYMBOL: compiled-parsers
 
 GENERIC: (compile) ( parser -- quot )
 
+: run-parser ( input quot -- result )
+  #! Eventually this will be replaced with something that
+  #! can do packrat parsing by memoizing the results of
+  #! a parser. For now, it just calls the quotation.
+  call ; inline
+
 : compiled-parser ( parser -- word )
   #! Look to see if the given parser has been compiled.
   #! If not, compile it to a temporary word, cache it,
@@ -24,7 +30,7 @@ GENERIC: (compile) ( parser -- quot )
   dup compiled-parsers get at [
     nip
   ] [
-    dup (compile) define-temp 
+    dup (compile) [ run-parser ] curry define-temp 
     [ swap compiled-parsers get set-at ] keep
   ] if* ;
 
