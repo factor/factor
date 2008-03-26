@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences vectors classes combinators
-arrays words assocs parser namespaces definitions
+USING: kernel math sequences vectors classes classes.algebra
+combinators arrays words assocs parser namespaces definitions
 prettyprint prettyprint.backend quotations arrays.lib
 debugger io compiler.units kernel.private effects ;
 IN: multi-methods
