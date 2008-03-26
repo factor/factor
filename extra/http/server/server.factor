@@ -217,7 +217,7 @@ SYMBOL: exit-continuation
 
 : httpd ( port -- )
     internet-server "http.server"
-    iso-8859-1 [ handle-client ] with-server ;
+    latin1 [ handle-client ] with-server ;
 
 : httpd-main ( -- ) 8888 httpd ;
 

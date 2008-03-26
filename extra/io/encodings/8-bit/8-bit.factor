@@ -9,21 +9,21 @@ IN: io.encodings.8-bit
 <PRIVATE
 
 : mappings {
-    { "iso-8859-1" "8859-1" }
-    { "iso-8859-2" "8859-2" }
-    { "iso-8859-3" "8859-3" }
-    { "iso-8859-4" "8859-4" }
-    { "iso-8859-5" "8859-5" }
-    { "iso-8859-6" "8859-6" }
-    { "iso-8859-7" "8859-7" }
-    { "iso-8859-8" "8859-8" }
-    { "iso-8859-9" "8859-9" }
-    { "iso-8859-10" "8859-10" }
-    { "iso-8859-11" "8859-11" }
-    { "iso-8859-13" "8859-13" }
-    { "iso-8859-14" "8859-14" }
-    { "iso-8859-15" "8859-15" }
-    { "iso-8859-16" "8859-16" }
+    { "latin1" "8859-1" }
+    { "latin2" "8859-2" }
+    { "latin3" "8859-3" }
+    { "latin4" "8859-4" }
+    { "latin/cyrillic" "8859-5" }
+    { "latin/arabic" "8859-6" }
+    { "latin/greek" "8859-7" }
+    { "latin/hebrew" "8859-8" }
+    { "latin5" "8859-9" }
+    { "latin6" "8859-10" }
+    { "latin/thai" "8859-11" }
+    { "latin7" "8859-13" }
+    { "latin8" "8859-14" }
+    { "latin9" "8859-15" }
+    { "latin10" "8859-16" }
     { "koi8-r" "KOI8-R" }
     { "windows-1252" "CP1252" }
     { "ebcdic" "CP037" }
@@ -50,7 +50,7 @@ IN: io.encodings.8-bit
     [ swap ] assoc-map >hashtable ;
 
 : parse-file ( file-name -- byte>ch ch>byte )
-    full-path ascii file-lines process-contents
+    ascii file-lines process-contents
     [ byte>ch ] [ ch>byte ] bi ;
 
 : empty-tuple-class ( string -- class )
@@ -85,9 +85,9 @@ IN: io.encodings.8-bit
 : 8-bit-methods ( class byte>ch ch>byte -- )
     >r over r> define-encode-char define-decode-char ;
 
-: define-8-bit-encoding ( tuple-name file-name -- )
+: define-8-bit-encoding ( name path -- )
     >r empty-tuple-class r> parse-file 8-bit-methods ;
 
 PRIVATE>
 
-[ mappings [ define-8-bit-encoding ] assoc-each ] with-compilation-unit
+[ mappings [ full-path define-8-bit-encoding ] assoc-each ] with-compilation-unit
