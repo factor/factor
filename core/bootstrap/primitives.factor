@@ -3,8 +3,8 @@
 USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes tuples
-kernel.private vocabs vocabs.loader source-files definitions
-slots.deprecated classes.union compiler.units
+tuples.private kernel.private vocabs vocabs.loader source-files
+definitions slots.deprecated classes.union compiler.units
 bootstrap.image.private io.files ;
 IN: bootstrap.primitives
 
@@ -33,7 +33,6 @@ H{ } clone changed-words set
 H{ } clone root-cache set
 H{ } clone source-files set
 H{ } clone update-map set
-num-types get f <array> builtins set
 init-caches
 
 ! Vocabulary for slot accessors
@@ -46,6 +45,9 @@ init-caches
 call
 call
 call
+
+! After we execute bootstrap/layouts
+num-types get f <array> builtins set
 
 ! Create some empty vocabs where the below primitives and
 ! classes will go
@@ -141,8 +143,6 @@ call
 "bignum" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
 
-"tuple" "kernel" create { } define-builtin
-
 "ratio" "math" create {
     {
         { "integer" "math" }
@@ -177,8 +177,6 @@ call
 } define-builtin
 
 "f" "syntax" lookup { } define-builtin
-
-! do not word...
 
 "array" "arrays" create { } define-builtin
 
@@ -292,6 +290,48 @@ define-builtin
 "float-array" "float-arrays" create { } define-builtin
 
 "callstack" "kernel" create { } define-builtin
+
+"tuple-layout" "tuples.private" create {
+    {
+        { "fixnum" "math" }
+        "hashcode"
+        { "layout-hashcode" "tuples.private" }
+        f
+    }
+    {
+        { "word" "words" }
+        "class"
+        { "layout-class" "tuples.private" }
+        f
+    }
+    {
+        { "fixnum" "math" }
+        "size"
+        { "layout-size" "tuples.private" }
+        f
+    }
+    {
+        { "array" "arrays" }
+        "superclasses"
+        { "layout-superclasses" "tuples.private" }
+        f
+    }
+    {
+        { "fixnum" "math" }
+        "echelon"
+        { "layout-echelon" "tuples.private" }
+        f
+    }
+} define-builtin
+
+"tuple" "kernel" create {
+    {
+        { "tuple-layout" "tuples.private" }
+        "layout"
+        { "tuple-layout" "tuples.private" }
+        f
+    }
+} define-builtin
 
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create
@@ -439,6 +479,10 @@ builtins get num-tags get tail f union-class define-class
     }
 } define-tuple-class
 
+"curry" "kernel" lookup
+dup f "inline" set-word-prop
+dup tuple-layout [ <tuple-boa> ] curry define
+
 "compose" "kernel" create
 {
     {
@@ -453,6 +497,10 @@ builtins get num-tags get tail f union-class define-class
         f
     }
 } define-tuple-class
+
+"compose" "kernel" lookup
+dup f "inline" set-word-prop
+dup tuple-layout [ <tuple-boa> ] curry define
 
 ! Primitive words
 : make-primitive ( word vocab n -- )
@@ -628,11 +676,10 @@ builtins get num-tags get tail f union-class define-class
     { "<wrapper>" "kernel" }
     { "(clone)" "kernel" }
     { "<string>" "strings" }
-    { "(>tuple)" "tuples.private" }
     { "array>quotation" "quotations.private" }
     { "quotation-xt" "quotations" }
     { "<tuple>" "tuples.private" }
-    { "tuple>array" "tuples" }
+    { "<tuple-layout>" "tuples.private" }
     { "profiling" "tools.profiler.private" }
     { "become" "kernel.private" }
     { "(sleep)" "threads.private" }

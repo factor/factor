@@ -155,7 +155,6 @@ IN: tools.deploy.shaker
                 layouts:tag-numbers
                 layouts:type-numbers
                 lexer-factory
-                lexer-factory
                 listener:listener-hook
                 root-cache
                 vocab-roots

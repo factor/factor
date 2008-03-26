@@ -336,19 +336,20 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 \ <tuple> [
-    tuple "n" get 2 + cells [
-        ! Store length
-        1 object@ "n" operand MOV
-        ! Store class
-        2 object@ "class" operand MOV
+    tuple "layout" get layout-size 2 + cells [
+        ! Store layout
+        "layout" get "scratch" get load-literal
+        1 object@ "scratch" operand MOV
         ! Zero out the rest of the tuple
-        "n" operand 1- [ 3 + object@ f v>operand MOV ] each
+        "layout" get layout-size [
+            2 + object@ f v>operand MOV
+        ] each
         ! Store tagged ptr in reg
         "tuple" get tuple %store-tagged
     ] %allot
 ] H{
-    { +input+ { { f "class" } { [ inline-array? ] "n" } } }
-    { +scratch+ { { f "tuple" } } }
+    { +input+ { { [ tuple-layout? ] "layout" } } }
+    { +scratch+ { { f "tuple" } { f "scratch" } } }
     { +output+ { "tuple" } }
 } define-intrinsic
 

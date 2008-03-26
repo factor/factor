@@ -153,10 +153,6 @@ HELP: tuple=
 { $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
 { $warning "This word is in the " { $vocab-link "tuples.private" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
 
-HELP: tuple-class-eq?
-{ $values { "obj" object } { "class" tuple-class } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "obj" } " is an instance of " { $snippet "class" } "." } ;
-
 HELP: permutation
 { $values { "seq1" sequence } { "seq2" sequence } { "permutation" "a sequence whose elements are integers or " { $link f } } }
 { $description "Outputs a permutation for taking " { $snippet "seq1" } " to " { $snippet "seq2" } "." } ;
@@ -246,9 +242,13 @@ HELP: tuple>array ( tuple -- array )
 { $values { "tuple" tuple } { "array" array } }
 { $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and the second is the delegate; the remainder are declared slots." } ;
 
-HELP: <tuple> ( class n -- tuple )
-{ $values { "class" tuple-class } { "n" "a non-negative integer" } { "tuple" tuple } }
-{ $description "Low-level tuple constructor. User code should never call this directly, and instead use the constructor word which is defined for each tuple. See " { $link "tuples" } "." } ;
+HELP: <tuple> ( layout -- tuple )
+{ $values { "layout" tuple-layout } { "tuple" tuple } }
+{ $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link construct-empty } "." } ;
+
+HELP: <tuple-boa> ( ... layout -- tuple )
+{ $values { "..." "values" } { "layout" tuple-layout } { "tuple" tuple } }
+{ $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link construct-boa } "." } ;
 
 HELP: construct-empty
 { $values { "class" tuple-class } { "tuple" tuple } }

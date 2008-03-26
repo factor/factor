@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions hashtables kernel
 kernel.private math namespaces sequences sequences.private
@@ -7,25 +7,47 @@ classes classes.private slots slots.deprecated slots.private
 compiler.units ;
 IN: tuples
 
-M: tuple delegate 3 slot ;
+M: tuple delegate 2 slot ;
 
-M: tuple set-delegate 3 set-slot ;
+M: tuple set-delegate 2 set-slot ;
 
-M: tuple class class-of-tuple ;
+M: tuple class 1 slot 2 slot { word } declare ;
+
+ERROR: no-tuple-class class ;
+
+<PRIVATE
+
+: tuple-size tuple-layout layout-size ; inline
+
+PRIVATE>
+
+: check-tuple ( class -- )
+    dup tuple-class?
+    [ drop ] [ no-tuple-class ] if ;
+
+: tuple>array ( tuple -- array )
+    dup tuple-layout
+    [ layout-size swap [ array-nth ] curry map ] keep
+    layout-class add* ;
+
+: >tuple ( sequence -- tuple )
+    dup first tuple-layout <tuple> [
+        >r 1 tail-slice dup length r>
+        [ tuple-size min ] keep
+        [ set-array-nth ] curry
+        2each
+    ] keep ;
 
 <PRIVATE
 
 : tuple= ( tuple1 tuple2 -- ? )
-    over array-capacity over array-capacity tuck number= [
-        -rot
+    over tuple-layout over tuple-layout eq? [
+        dup tuple-size -rot
         [ >r over r> array-nth >r array-nth r> = ] 2curry
         all-integers?
     ] [
-        3drop f
+        2drop f
     ] if ;
-
-: tuple-class-eq? ( obj class -- ? )
-    over tuple? [ swap 2 slot eq? ] [ 2drop f ] if ; inline
 
 : permutation ( seq1 seq2 -- permutation )
     swap [ index ] curry map ;
@@ -33,7 +55,7 @@ M: tuple class class-of-tuple ;
 : reshape-tuple ( oldtuple permutation -- newtuple )
     >r tuple>array 2 cut r>
     [ [ swap ?nth ] [ drop f ] if* ] with map
-    append (>tuple) ;
+    append >tuple ;
 
 : reshape-tuples ( class newslots -- )
     >r dup "slot-names" word-prop r> permutation
@@ -64,42 +86,42 @@ M: tuple class class-of-tuple ;
         ] unless
     ] when 2drop ;
 
-GENERIC: tuple-size ( class -- size )
-
-M: tuple-class tuple-size "slot-names" word-prop length 2 + ;
-
-PRIVATE>
+M: tuple-class tuple-layout "layout" word-prop ;
 
 : define-tuple-predicate ( class -- )
-    dup [ tuple-class-eq? ] curry define-predicate ;
+    dup tuple-layout
+    [ over tuple? [ swap 1 slot eq? ] [ 2drop f ] if ] curry
+    define-predicate ;
 
 : delegate-slot-spec
     T{ slot-spec f
         object
         "delegate"
-        3
+        2
         delegate
         set-delegate
     } ;
 
 : define-tuple-slots ( class slots -- )
-    dupd 4 simple-slots
+    dupd 3 simple-slots
     2dup [ slot-spec-name ] map "slot-names" set-word-prop
     2dup delegate-slot-spec add* "slots" set-word-prop
     2dup define-slots
     define-accessors ;
 
-ERROR: no-tuple-class class ;
+: define-tuple-layout ( class -- )
+    dup
+    dup "slot-names" word-prop length 1+ { } 0 <tuple-layout>
+    "layout" set-word-prop ;
 
-: check-tuple ( class -- )
-    dup tuple-class?
-    [ drop ] [ no-tuple-class ] if ;
+PRIVATE>
 
 : define-tuple-class ( class slots -- )
     2dup check-shape
     over f tuple tuple-class define-class
-    over define-tuple-predicate
-    define-tuple-slots ;
+    dupd define-tuple-slots
+    dup define-tuple-layout
+    define-tuple-predicate ;
 
 M: tuple clone
     (clone) dup delegate clone over set-delegate ;
@@ -107,21 +129,14 @@ M: tuple clone
 M: tuple equal?
     over tuple? [ tuple= ] [ 2drop f ] if ;
 
-: (delegates) ( obj -- )
-    [ dup , delegate (delegates) ] when* ;
-
 : delegates ( obj -- seq )
     [ dup ] [ [ delegate ] keep ] [ ] unfold nip ;
 
 : is? ( obj quot -- ? ) >r delegates r> contains? ; inline
 
-: >tuple ( seq -- tuple )
-    >vector dup first tuple-size over set-length
-    >array (>tuple) ;
-
 M: tuple hashcode*
     [
-        dup array-capacity -rot 0 -rot [
+        dup tuple-size -rot 0 -rot [
             swapd array-nth hashcode* bitxor
         ] 2curry reduce
     ] recursive-hashcode ;
@@ -131,7 +146,7 @@ M: tuple hashcode*
 ! Definition protocol
 M: tuple-class reset-class
     {
-        "metaclass" "superclass" "slot-names" "slots"
+        "metaclass" "superclass" "slot-names" "slots" "layout"
     } reset-props ;
 
 M: object get-slots ( obj slots -- ... )
@@ -141,10 +156,10 @@ M: object set-slots ( ... obj slots -- )
     <reversed> get-slots ;
 
 M: object construct-empty ( class -- tuple )
-    dup tuple-size <tuple> ;
+    tuple-layout <tuple> ;
 
 M: object construct ( ... slots class -- tuple )
     construct-empty [ swap set-slots ] keep ;
 
 M: object construct-boa ( ... class -- tuple )
-    dup tuple-size <tuple-boa> ;
+    tuple-layout <tuple-boa> ;

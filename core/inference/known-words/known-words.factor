@@ -135,7 +135,7 @@ M: object infer-call
 ! Variadic tuple constructor
 \ <tuple-boa> [
     \ <tuple-boa>
-    peek-d value-literal { tuple } <effect>
+    peek-d value-literal layout-size { tuple } <effect>
     make-call-node
 ] "infer" set-word-prop
 
@@ -565,14 +565,11 @@ set-primitive-effect
 \ quotation-xt { quotation } { integer } <effect> set-primitive-effect
 \ quotation-xt make-flushable
 
-\ <tuple> { word integer } { quotation } <effect> set-primitive-effect
+\ <tuple> { tuple-layout } { tuple } <effect> set-primitive-effect
 \ <tuple> make-flushable
 
-\ (>tuple) { array } { tuple } <effect> set-primitive-effect
-\ (>tuple) make-flushable
-
-\ tuple>array { tuple } { array } <effect> set-primitive-effect
-\ tuple>array make-flushable
+\ <tuple-layout> { word fixnum array fixnum } { tuple-layout } <effect> set-primitive-effect
+\ <tuple-layout> make-foldable
 
 \ datastack { } { array } <effect> set-primitive-effect
 \ datastack make-flushable

@@ -118,10 +118,3 @@ GENERIC: update-methods ( assoc -- )
 GENERIC: class ( object -- class ) inline
 
 M: object class type type>class ;
-
-<PRIVATE
-
-: class-of-tuple ( obj -- class )
-    2 slot { word } declare ; inline
-
-PRIVATE>
