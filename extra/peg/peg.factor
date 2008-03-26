@@ -25,7 +25,7 @@ GENERIC: (compile) ( parser -- quot )
   quot c [ drop H{ } clone ] cache 
   [
     drop input quot call  
-  ] cache* ; inline
+  ] cache ; inline
 
 : run-parser ( input quot -- result )
   #! If a packrat cache is available, use memoization for
