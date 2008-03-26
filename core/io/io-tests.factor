@@ -9,7 +9,7 @@ IN: io.tests
 ] unit-test
 
 : <resource-reader> ( resource -- stream )
-    resource-path iso-8859-1 <file-reader> ;
+    resource-path latin1 <file-reader> ;
 
 [
     "This is a line.\rThis is another line.\r"

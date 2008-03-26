@@ -24,6 +24,7 @@ USE: unix
             { +normal-priority+ 0 }
             { +high-priority+ -10 }
             { +highest-priority+ -20 }
+            { +realtime-priority+ -20 }
         } at set-priority
     ] when* ;
 

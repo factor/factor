@@ -38,6 +38,7 @@ SYMBOL: +low-priority+
 SYMBOL: +normal-priority+
 SYMBOL: +high-priority+
 SYMBOL: +highest-priority+
+SYMBOL: +realtime-priority+
 
 : <process> ( -- process )
     process construct-empty

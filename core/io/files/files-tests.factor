@@ -9,6 +9,7 @@ io.files.unique sequences strings accessors ;
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk/" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
+[ "" ] [ "" file-name ] unit-test
 
 [ ] [
     { "Hello world." }
@@ -144,3 +145,47 @@ io.files.unique sequences strings accessors ;
         ] keep file-info size>>
     ] with-unique-file
 ] unit-test
+
+[ "/usr/lib" ] [ "/usr" "lib" append-path ] unit-test
+[ "/usr/lib" ] [ "/usr/" "lib" append-path ] unit-test
+[ "/lib" ] [ "/usr/" "/lib" append-path ] unit-test
+[ "/lib/" ] [ "/usr/" "/lib/" append-path ] unit-test
+[ "/usr/lib" ] [ "/usr" "./lib" append-path ] unit-test
+[ "/usr/lib/" ] [ "/usr" "./lib/" append-path ] unit-test
+[ "/lib" ] [ "/usr" "../lib" append-path ] unit-test
+[ "/lib/" ] [ "/usr" "../lib/" append-path ] unit-test
+
+[ "" ] [ "" "." append-path ] unit-test
+[ "" ".." append-path ] must-fail
+
+[ "/" ] [ "/" "./." append-path ] unit-test
+[ "/" ] [ "/" "././" append-path ] unit-test
+[ "/a/b/lib" ] [ "/a/b/c/d/e/f/" "../../../../lib" append-path ] unit-test
+[ "/a/b/lib/" ] [ "/a/b/c/d/e/f/" "../../../../lib/" append-path ] unit-test
+
+[ "" "../lib/" append-path ] must-fail
+[ "lib" ] [ "" "lib" append-path ] unit-test
+[ "lib" ] [ "" "./lib" append-path ] unit-test
+
+[ "/lib/bux" ] [ "/usr" "/lib/bux" append-path ] unit-test
+[ "/lib/bux/" ] [ "/usr" "/lib/bux/" append-path ] unit-test
+
+[ "foo/bar/." parent-directory ] must-fail
+[ "foo/bar/./" parent-directory ] must-fail
+[ "foo/bar/baz/.." parent-directory ] must-fail
+[ "foo/bar/baz/../" parent-directory ] must-fail
+
+[ "." parent-directory ] must-fail
+[ "./" parent-directory ] must-fail
+[ ".." parent-directory ] must-fail
+[ "../" parent-directory ] must-fail
+[ "../../" parent-directory ] must-fail
+[ "foo/.." parent-directory ] must-fail
+[ "foo/../" parent-directory ] must-fail
+[ "" parent-directory ] must-fail
+[ "." ] [ "boot.x86.64.image" parent-directory ] unit-test
+
+[ "bar/foo" ] [ "bar/baz" "..///foo" append-path ] unit-test
+[ "bar/baz/foo" ] [ "bar/baz" ".///foo" append-path ] unit-test
+[ "bar/foo" ] [ "bar/baz" "./..//foo" append-path ] unit-test
+[ "bar/foo" ] [ "bar/baz" "./../././././././///foo" append-path ] unit-test
