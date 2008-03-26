@@ -3,7 +3,7 @@ math.constants parser sequences tools.test words assocs
 namespaces quotations sequences.private classes continuations
 generic.standard effects tuples tuples.private arrays vectors
 strings compiler.units accessors classes.algebra calendar
-prettyprint io.streams.string ;
+prettyprint io.streams.string splitting ;
 IN: tuples.tests
 
 TUPLE: rect x y w h ;
@@ -247,8 +247,8 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 ! Inheritance
 TUPLE: computer cpu ram ;
 
-[ "IN: tuples.tests TUPLE: computer cpu ram ;\n" ] [
-    [ \ computer see ] with-string-writer
+[ "TUPLE: computer cpu ram ;" ] [
+    [ \ computer see ] with-string-writer string-lines second
 ] unit-test
 
 TUPLE: laptop < computer battery ;
@@ -264,8 +264,8 @@ C: <laptop> laptop
 [ t ] [ "laptop" get computer? ] unit-test
 [ t ] [ "laptop" get tuple? ] unit-test
 
-[ "IN: tuples.tests TUPLE: laptop < computer battery ;\n" ] [
-    [ \ laptop see ] with-string-writer
+[ "TUPLE: laptop < computer battery ;" ] [
+    [ \ laptop see ] with-string-writer string-lines second
 ] unit-test
 
 TUPLE: server < computer rackmount? ;
@@ -288,8 +288,8 @@ C: <server> server
 [ f ] [ laptop server class< ] unit-test
 [ f ] [ laptop server classes-intersect? ] unit-test
 
-[ "IN: tuples.tests TUPLE: server < computer rackmount ;\n" ] [
-    [ \ server see ] with-string-writer
+[ "TUPLE: server < computer rackmount? ;" ] [
+    [ \ server see ] with-string-writer string-lines second
 ] unit-test
 
 [

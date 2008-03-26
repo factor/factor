@@ -257,6 +257,9 @@ M: predicate-class see-class*
 M: tuple-class see-class*
     <colon \ TUPLE: pprint-word
     dup pprint-word
+    dup superclass tuple eq? [
+        "<" text dup superclass pprint-word
+    ] unless
     "slot-names" word-prop [ text ] each
     pprint-; block> ;
 
