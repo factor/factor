@@ -90,4 +90,3 @@ SYMBOLS: +read-only+ +hidden+ +system+
 
 M: windows-nt-io file-info ( path -- info )
     get-file-information-stat ;
-

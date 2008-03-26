@@ -3,7 +3,7 @@ io.timeouts io.nonblocking io.windows io.windows.nt.backend
 kernel libc math threads windows windows.kernel32
 alien.c-types alien.arrays sequences combinators combinators.lib
 sequences.lib ascii splitting alien strings assocs
-combinators.cleave ;
+combinators.cleave namespaces ;
 IN: io.windows.nt.files
 
 M: windows-nt-io cwd
@@ -63,11 +63,12 @@ ERROR: not-absolute-path ;
 ERROR: nonstring-pathname ;
 ERROR: empty-pathname ;
 
+USE: tools.walker
 M: windows-nt-io normalize-pathname ( string -- string )
     dup string? [ nonstring-pathname ] unless
     dup empty? [ empty-pathname ] when
     { { CHAR: / CHAR: \\ } } substitute
-    cwd swap windows-append-path
+    current-directory get swap windows-append-path
     [ "/\\." member? ] right-trim
     dup peek CHAR: : = [ "\\" append ] when ;
 
