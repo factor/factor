@@ -43,17 +43,16 @@ TUPLE: token-parser symbol ;
 
 MATCH-VARS: ?token ;
 
-: token-pattern ( -- quot )
-  [
-    ?token 2dup head? [
-      dup >r length tail-slice r> <parse-result>
-    ] [
-      2drop f
-    ] if 
-  ] ;
-  
+: parse-token ( input string -- result )
+  #! Parse the string, returning a parse result
+  2dup head? [
+    dup >r length tail-slice r> <parse-result>
+  ] [
+    2drop f
+  ] if ;
+
 M: token-parser (compile) ( parser -- quot )
-  token-parser-symbol \ ?token token-pattern match-replace ;
+  token-parser-symbol [ parse-token ] curry ;
       
 TUPLE: satisfy-parser quot ;
 
