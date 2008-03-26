@@ -125,7 +125,6 @@ TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 : OF_REOPEN    32768 ;
 : OF_VERIFY    1024 ;
 
-
 : INFINITE HEX: FFFFFFFF ; inline
 
 ! From C:\cygwin\usr\include\w32api\winbase.h

@@ -49,6 +49,17 @@ TUPLE: CreateProcess-args
 : join-arguments ( args -- cmd-line )
     [ escape-argument ] map " " join ;
 
+: lookup-priority ( process -- n )
+    priority>> {
+        { +lowest-priority+ [ IDLE_PRIORITY_CLASS ] }
+        { +low-priority+ [ BELOW_NORMAL_PRIORITY_CLASS ] }
+        { +normal-priority+ [ NORMAL_PRIORITY_CLASS ] }
+        { +high-priority+ [ ABOVE_NORMAL_PRIORITY_CLASS ] }
+        { +highest-priority+ [ HIGH_PRIORITY_CLASS ] }
+        { +realtime-priority+ [ REALTIME_PRIORITY_CLASS ] }
+        [ drop f ]
+    } case ;
+
 : app-name/cmd-line ( process -- app-name cmd-line )
     command>> dup string? [
         " " split1
@@ -71,6 +82,7 @@ TUPLE: CreateProcess-args
     0
     pick pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
     pick detached>> winnt? and [ DETACHED_PROCESS bitor ] when
+    pick lookup-priority [ bitor ] when*
     >>dwCreateFlags ;
 
 : fill-lpEnvironment ( process args -- process args )
