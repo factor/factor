@@ -28,7 +28,7 @@ GENERIC: (compile) ( parser -- quot )
     [ swap compiled-parsers get set-at ] keep
   ] if* ;
 
-MEMO: compile ( parser -- word )
+: compile ( parser -- word )
   H{ } clone compiled-parsers [ 
     [ compiled-parser ] with-compilation-unit 
   ] with-variable ;
