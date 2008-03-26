@@ -358,7 +358,9 @@ builtins get num-tags get tail f union-class define-class
 "null" "kernel" create { } f union-class define-class
 
 ! Create special tombstone values
-"tombstone" "hashtables.private" create { } define-tuple-class
+"tombstone" "hashtables.private" create
+"tuple" "kernel" lookup
+{ } define-tuple-class
 
 "((empty))" "hashtables.private" create
 "tombstone" "hashtables.private" lookup f
@@ -370,6 +372,7 @@ builtins get num-tags get tail f union-class define-class
 
 ! Some tuple classes
 "hashtable" "hashtables" create
+"tuple" "kernel" lookup
 {
     {
         { "array-capacity" "sequences.private" }
@@ -390,6 +393,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "sbuf" "sbufs" create
+"tuple" "kernel" lookup
 {
     {
         { "string" "strings" }
@@ -405,6 +409,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "vector" "vectors" create
+"tuple" "kernel" lookup
 {
     {
         { "array" "arrays" }
@@ -420,6 +425,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "byte-vector" "byte-vectors" create
+"tuple" "kernel" lookup
 {
     {
         { "byte-array" "byte-arrays" }
@@ -435,6 +441,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "bit-vector" "bit-vectors" create
+"tuple" "kernel" lookup
 {
     {
         { "bit-array" "bit-arrays" }
@@ -450,6 +457,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "float-vector" "float-vectors" create
+"tuple" "kernel" lookup
 {
     {
         { "float-array" "float-arrays" }
@@ -465,6 +473,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "curry" "kernel" create
+"tuple" "kernel" lookup
 {
     {
         { "object" "kernel" }
@@ -484,6 +493,7 @@ dup f "inline" set-word-prop
 dup tuple-layout [ <tuple-boa> ] curry define
 
 "compose" "kernel" create
+"tuple" "kernel" lookup
 {
     {
         { "object" "kernel" }

@@ -103,32 +103,38 @@ M: tuple-class tuple-layout "layout" word-prop ;
         become
     ] 2curry after-compilation ;
 
-: tuple-class-unchanged 2drop ;
+: tuple-class-unchanged ( class superclass slots -- ) 3drop ;
 
 : prepare-tuple-class ( class slots -- )
     dupd define-tuple-slots
     dup define-tuple-layout
     define-tuple-predicate ;
 
-: redefine-tuple-class ( class slots -- )
+: redefine-tuple-class ( class superclass slots -- )
+    nip
     2dup forget-slots
     2dup reshape-tuples
     over changed-word
     over redefined
     prepare-tuple-class ;
 
-: define-new-tuple-class ( class slots -- )
+: define-new-tuple-class ( class superclass slots -- )
+    nip
     over f tuple tuple-class define-class
     prepare-tuple-class ;
 
 PRIVATE>
 
-: define-tuple-class ( class slots -- )
+: define-tuple-class ( class superclass slots -- )
     {
-        { [ over tuple-class? not ] [ define-new-tuple-class ] }
-        { [ over "slot-names" word-prop over = ] [ tuple-class-unchanged ] }
+        { [ pick tuple-class? not ] [ define-new-tuple-class ] }
+        { [ pick "slot-names" word-prop over = ] [ tuple-class-unchanged ] }
         { [ t ] [ redefine-tuple-class ] }
     } cond ;
+
+: define-error-class ( class superclass slots -- )
+    pick >r define-tuple-class r>
+    dup [ construct-boa throw ] curry define ;
 
 M: tuple clone
     (clone) dup delegate clone over set-delegate ;

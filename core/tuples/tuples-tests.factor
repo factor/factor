@@ -233,49 +233,49 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 : cons-test-1 \ erg's-reshape-problem construct-empty ;
 : cons-test-2 \ erg's-reshape-problem construct-boa ;
 
-! "IN: tuples.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
-! 
-! [ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
-! 
-! [ t ] [ cons-test-1 tuple-size "a" get tuple-size = ] unit-test
-! 
-! [
-!     "IN: tuples.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
-! ] [ [ no-tuple-class? ] is? ] must-fail-with
-! 
-! ! Hardcore unit tests
-! USE: threads
-! 
-! \ thread "slot-names" word-prop "slot-names" set
-! 
-! [ ] [
-!     [
-!         \ thread { "xxx" } "slot-names" get append
-!         define-tuple-class
-!     ] with-compilation-unit
-! 
-!     [ 1337 sleep ] "Test" spawn drop
-! 
-!     [
-!         \ thread "slot-names" get
-!         define-tuple-class
-!     ] with-compilation-unit
-! ] unit-test
-! 
-! USE: vocabs
-! 
-! \ vocab "slot-names" word-prop "slot-names" set
-! 
-! [ ] [
-!     [
-!         \ vocab { "xxx" } "slot-names" get append
-!         define-tuple-class
-!     ] with-compilation-unit
-! 
-!     all-words drop
-! 
-!     [
-!         \ vocab "slot-names" get
-!         define-tuple-class
-!     ] with-compilation-unit
-! ] unit-test
+"IN: tuples.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
+
+[ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
+
+[ t ] [ cons-test-1 tuple-size "a" get tuple-size = ] unit-test
+
+[
+    "IN: tuples.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
+] [ [ no-tuple-class? ] is? ] must-fail-with
+
+! Hardcore unit tests
+USE: threads
+
+\ thread "slot-names" word-prop "slot-names" set
+
+[ ] [
+    [
+        \ thread { "xxx" } "slot-names" get append
+        define-tuple-class
+    ] with-compilation-unit
+
+    [ 1337 sleep ] "Test" spawn drop
+
+    [
+        \ thread "slot-names" get
+        define-tuple-class
+    ] with-compilation-unit
+] unit-test
+
+USE: vocabs
+
+\ vocab "slot-names" word-prop "slot-names" set
+
+[ ] [
+    [
+        \ vocab { "xxx" } "slot-names" get append
+        define-tuple-class
+    ] with-compilation-unit
+
+    all-words drop
+
+    [
+        \ vocab "slot-names" get
+        define-tuple-class
+    ] with-compilation-unit
+] unit-test

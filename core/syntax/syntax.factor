@@ -154,7 +154,7 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "TUPLE:" [
-        CREATE-CLASS ";" parse-tokens define-tuple-class
+        parse-tuple-definition define-tuple-class
     ] define-syntax
 
     "C:" [
@@ -164,9 +164,9 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "ERROR:" [
-        CREATE-CLASS dup ";" parse-tokens define-tuple-class
-        dup save-location
-        dup [ construct-boa throw ] curry define
+        parse-tuple-definition
+        pick save-location
+        define-error-class
     ] define-syntax
 
     "FORGET:" [
