@@ -3,7 +3,7 @@
 USING: math.parser arrays io.encodings sequences kernel
 assocs hashtables io.encodings.ascii combinators.cleave
 generic parser tuples words io io.files splitting namespaces
-classes quotations math compiler.units ;
+classes quotations math compiler.units accessors ;
 IN: io.encodings.8-bit
 
 <PRIVATE
@@ -53,40 +53,27 @@ IN: io.encodings.8-bit
     ascii file-lines process-contents
     [ byte>ch ] [ ch>byte ] bi ;
 
-: empty-tuple-class ( string -- class )
-    in get create
-    dup { f } "slots" set-word-prop
-    dup predicate-word drop
-    dup { } define-tuple-class ;
+TUPLE: 8-bit name decode encode ;
 
-: data-quot ( class word data -- quot )
-    >r [ word-name ] 2apply "/" swap 3append
-    "/data" append in get create dup 1quotation swap r>
-    1quotation define ;
+: encode-8-bit ( char stream assoc -- )
+    swapd at* [ encode-error ] unless swap stream-write1 ;
 
-: method-with-data ( class data word quot -- )
-    >r swap >r 2dup r> data-quot r>
-    compose >r create-method r> define ;
+M: 8-bit encode-char
+    encode>> encode-8-bit ;
 
-: encode-8-bit ( char stream encoding assoc -- )
-    nip swapd at* [ encode-error ] unless swap stream-write1 ;
-
-: define-encode-char ( class assoc -- )
-    \ encode-char [ encode-8-bit ] method-with-data ;
-
-: decode-8-bit ( stream encoding array -- char/f )
-    nip swap stream-read1
+: decode-8-bit ( stream array -- char/f )
+    swap stream-read1 dup
     [ swap nth [ replacement-char ] unless* ]
-    [ drop f ] if* ;
+    [ nip ] if ;
 
-: define-decode-char ( class array -- )
-    \ decode-char [ decode-8-bit ] method-with-data ;
+M: 8-bit decode-char
+    decode>> decode-8-bit ;
 
-: 8-bit-methods ( class byte>ch ch>byte -- )
-    >r over r> define-encode-char define-decode-char ;
+: make-8-bit ( word byte>ch ch>byte -- )
+    [ 8-bit construct-boa ] 2curry dupd curry define ;
 
 : define-8-bit-encoding ( name path -- )
-    >r empty-tuple-class r> parse-file 8-bit-methods ;
+    >r in get create r> parse-file make-8-bit ;
 
 PRIVATE>
 
