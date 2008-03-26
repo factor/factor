@@ -324,14 +324,20 @@ define-builtin
     }
 } define-builtin
 
-"tuple" "kernel" create {
+"tuple" "kernel" create { } define-builtin
+
+"tuple" "kernel" lookup
+{
     {
-        { "tuple-layout" "tuples.private" }
-        "layout"
-        { "tuple-layout" "tuples.private" }
-        f
+        { "object" "kernel" }
+        "delegate"
+        { "delegate" "kernel" }
+        { "set-delegate" "kernel" }
     }
-} define-builtin
+}
+define-tuple-slots
+
+"tuple" "kernel" lookup define-tuple-layout
 
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create

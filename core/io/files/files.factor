@@ -98,8 +98,21 @@ ERROR: no-parent-directory path ;
 
 PRIVATE>
 
+: windows-absolute-path? ( path -- path ? )
+    {
+        { [ dup length 2 < ] [ f ] }
+        { [ dup second CHAR: : = ] [ t ] }
+        { [ t ] [ f ] }
+    } cond ;
+
 : absolute-path? ( path -- ? )
-    dup empty? [ drop f ] [ first path-separator? ] if ;
+    {
+        { [ dup empty? ] [ f ] }
+        { [ dup "resource:" head? ] [ t ] }
+        { [ dup first path-separator? ] [ t ] }
+        { [ windows? ] [ windows-absolute-path? ] }
+        { [ t ] [ f ] }
+    } cond nip ;
 
 : append-path ( str1 str2 -- str )
     {
@@ -258,22 +271,19 @@ DEFER: copy-tree-into
     "resource-path" get [ image parent-directory ] unless*
     prepend-path ;
 
-: ?resource-path ( path -- newpath )
-    "resource:" ?head [ left-trim-separators resource-path ] when ;
-
-: resource-exists? ( path -- ? )
-    ?resource-path exists? ;
-
 : temp-directory ( -- path )
-    "temp" resource-path
-    dup exists? not
-      [ dup make-directory ]
-    when ;
+    "temp" resource-path dup make-directories ;
 
-: temp-file ( name -- path ) temp-directory prepend-path ;
+: temp-file ( name -- path )
+    temp-directory prepend-path ;
 
 M: object normalize-pathname ( path -- path' )
-    current-directory get prepend-path ;
+    "resource:" ?head [
+        left-trim-separators resource-path
+        normalize-pathname
+    ] [
+        current-directory get prepend-path
+    ] if ;
 
 ! Pathname presentations
 TUPLE: pathname string ;

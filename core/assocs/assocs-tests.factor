@@ -99,8 +99,8 @@ unit-test
         3
         H{ } clone
         2 [
-            2dup [ , f ] cache
+            2dup [ , f ] cache drop
         ] times
         2drop
-    ] make
+    ] { } make
 ] unit-test

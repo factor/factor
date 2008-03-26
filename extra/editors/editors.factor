@@ -26,7 +26,7 @@ SYMBOL: edit-hook
 
 : edit-location ( file line -- )
     edit-hook get [
-        >r >r ?resource-path r> r> call
+        call
     ] [
         no-edit-hook edit-location
     ] if* ;
@@ -39,7 +39,7 @@ SYMBOL: edit-hook
 
 : :edit ( -- )
     error get delegates [ parse-error? ] find-last nip [
-        dup parse-error-file source-file-path ?resource-path
+        dup parse-error-file source-file-path
         swap parse-error-line edit-location
     ] when* ;
 
