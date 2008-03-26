@@ -329,3 +329,9 @@ M: f generic-see-test-with-f ;
 [ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
     [ \ f \ generic-see-test-with-f method see ] with-string-writer
 ] unit-test
+
+PREDICATE: predicate-see-test < integer even? ;
+
+[ "USING: math ;\nIN: prettyprint.tests\nPREDICATE: predicate-see-test < integer even? ;\n" ] [
+    [ \ predicate-see-test see ] with-string-writer
+] unit-test

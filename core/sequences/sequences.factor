@@ -60,7 +60,7 @@ INSTANCE: immutable-sequence sequence
     #! A bit of a pain; can't call cell-bits here
     7 getenv 8 * 5 - 2^ 1- ; foldable
 
-PREDICATE: fixnum array-capacity
+PREDICATE: array-capacity < fixnum
     0 max-array-capacity between? ;
 
 : array-capacity ( array -- n )

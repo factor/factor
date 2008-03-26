@@ -5,7 +5,7 @@ io.windows io.windows.nt.pipes libc io.nonblocking
 io.streams.duplex windows.types math windows.kernel32 windows
 namespaces io.launcher kernel sequences windows.errors assocs
 splitting system threads init strings combinators
-io.backend accessors concurrency.flags ;
+io.backend accessors concurrency.flags io.files ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args
@@ -27,7 +27,8 @@ TUPLE: CreateProcess-args
     "STARTUPINFO" <c-object>
     "STARTUPINFO" heap-size over set-STARTUPINFO-cb >>lpStartupInfo
     "PROCESS_INFORMATION" <c-object> >>lpProcessInformation
-    TRUE >>bInheritHandles ;
+    TRUE >>bInheritHandles
+    current-directory get >>lpCurrentDirectory ;
 
 : call-CreateProcess ( CreateProcess-args -- )
     {

@@ -76,7 +76,7 @@ M: duplicated-slots-error summary
 
 \ construct-boa [
     dup +inlined+ depends-on
-    dup tuple-size [ <tuple-boa> ] 2curry
+    tuple-layout [ <tuple-boa> ] curry
 ] 1 define-transform
 
 \ construct-empty [
@@ -84,7 +84,7 @@ M: duplicated-slots-error summary
     peek-d value? [
         pop-literal
         dup +inlined+ depends-on
-        dup tuple-size [ <tuple> ] 2curry
+        tuple-layout [ <tuple> ] curry
         swap infer-quot
     ] [
         \ construct-empty 1 1 <effect> make-call-node

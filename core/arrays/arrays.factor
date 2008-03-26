@@ -31,4 +31,4 @@ INSTANCE: array sequence
 
 : 4array ( w x y z -- array ) { } 4sequence ; flushable
 
-PREDICATE: array pair length 2 number= ;
+PREDICATE: pair < array length 2 number= ;

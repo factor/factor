@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math words kernel alien byte-arrays
 hashtables vectors strings sbufs arrays bit-arrays
-float-arrays quotations assocs layouts tuples ;
+float-arrays quotations assocs layouts tuples tuples.private ;
 
 BIN: 111 tag-mask set
 8 num-tags set
 3 tag-bits set
 
-19 num-types set
+20 num-types set
 
 H{
     { fixnum      BIN: 000 }
@@ -33,4 +33,5 @@ tag-numbers get H{
     { alien 16 }
     { word 17 }
     { byte-array 18 }
+    { tuple-layout 19 }
 } union type-numbers set

@@ -54,10 +54,8 @@ IN: io.encodings.8-bit
     [ byte>ch ] [ ch>byte ] bi ;
 
 : empty-tuple-class ( string -- class )
-    in get create
-    dup { f } "slots" set-word-prop
-    dup predicate-word drop
-    dup { } define-tuple-class ;
+    "io.encodings.8-bit" create
+    dup tuple { } define-tuple-class ;
 
 : data-quot ( class word data -- quot )
     >r [ word-name ] 2apply "/" swap 3append

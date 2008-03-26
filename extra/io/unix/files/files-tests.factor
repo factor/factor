@@ -11,3 +11,13 @@ IN: io.unix.files.tests
 [ t ] [ "/" root-directory? ] unit-test
 [ t ] [ "//" root-directory? ] unit-test
 [ t ] [ "///////" root-directory? ] unit-test
+
+[ "/" ] [ "/" file-name ] unit-test
+[ "///" ] [ "///" file-name ] unit-test
+
+[ "/" ] [ "/" "../.." append-path ] unit-test
+[ "/" ] [ "/" "../../" append-path ] unit-test
+[ "/lib" ] [ "/" "../lib" append-path ] unit-test
+[ "/lib/" ] [ "/" "../lib/" append-path ] unit-test
+[ "/lib" ] [ "/" "../../lib" append-path ] unit-test
+[ "/lib/" ] [ "/" "../../lib/" append-path ] unit-test

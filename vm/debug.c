@@ -57,6 +57,35 @@ void print_array(F_ARRAY* array, CELL nesting)
 		printf("...");
 }
 
+void print_tuple(F_TUPLE* tuple, CELL nesting)
+{
+	F_TUPLE_LAYOUT *layout = untag_object(tuple->layout);
+	CELL length = to_fixnum(layout->size);
+
+	printf(" ");
+	print_nested_obj(layout->class,nesting);
+
+	CELL i;
+	bool trimmed;
+
+	if(length > 10)
+	{
+		trimmed = true;
+		length = 10;
+	}
+	else
+		trimmed = false;
+
+	for(i = 0; i < length; i++)
+	{
+		printf(" ");
+		print_nested_obj(tuple_nth(tuple,i),nesting);
+	}
+
+	if(trimmed)
+		printf("...");
+}
+
 void print_nested_obj(CELL obj, F_FIXNUM nesting)
 {
 	if(nesting <= 0)
@@ -83,7 +112,7 @@ void print_nested_obj(CELL obj, F_FIXNUM nesting)
 		break;
 	case TUPLE_TYPE:
 		printf("T{");
-		print_array(untag_object(obj),nesting - 1);
+		print_tuple(untag_object(obj),nesting - 1);
 		printf(" }");
 		break;
 	case ARRAY_TYPE:

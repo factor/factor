@@ -214,7 +214,7 @@ SYMBOL: in
 
 ERROR: unexpected want got ;
 
-PREDICATE: unexpected unexpected-eof
+PREDICATE: unexpected-eof < unexpected
     unexpected-got not ;
 
 : unexpected-eof ( word -- * ) f unexpected ;
@@ -287,6 +287,14 @@ M: no-word summary
 
 : CREATE-METHOD ( -- method )
     scan-word bootstrap-word scan-word create-method-in ;
+
+: parse-tuple-definition ( -- class superclass slots )
+    CREATE-CLASS
+    scan {
+        { ";" [ tuple f ] }
+        { "<" [ scan-word ";" parse-tokens ] }
+        [ >r tuple ";" parse-tokens r> add* ]
+    } case ;
 
 ERROR: staging-violation word ;
 
