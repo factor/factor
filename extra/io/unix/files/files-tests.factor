@@ -6,3 +6,9 @@ IN: io.unix.files.tests
 [ "/" ] [ "/etc/" parent-directory ] unit-test
 [ "/" ] [ "/etc" parent-directory ] unit-test
 [ "/" ] [ "/" parent-directory ] unit-test
+[ "asdf" parent-directory ] must-fail
+
+[ f ] [ "" root-directory? ] unit-test
+[ t ] [ "/" root-directory? ] unit-test
+[ t ] [ "//" root-directory? ] unit-test
+[ t ] [ "///////" root-directory? ] unit-test
