@@ -3,7 +3,7 @@
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
-       words quotations effects memoize accessors ;
+       words quotations effects memoize accessors combinators.cleave ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
@@ -231,7 +231,7 @@ MATCH-VARS: ?action ;
   ] ;
 
 M: action-parser (compile) ( parser -- quot )
-  { p1>> quot>> } get-slots [ compiled-parser ] dip 
+  { [ p1>> ] [ quot>> ] } cleave [ compiled-parser ] dip 
   2array { ?quot ?action } action-pattern match-replace ;
 
 : left-trim-slice ( string -- string )
