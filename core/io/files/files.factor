@@ -66,14 +66,12 @@ ERROR: no-parent-directory path ;
         right-trim-separators
         dup last-path-separator [
             1+ cut
-            {
-                { "." [ 1 head* parent-directory ] }
-                { ".." [
-                    2 head* parent-directory parent-directory
-                ] }
-                [ drop ]
-            } case
-        ] [ no-parent-directory ] if
+        ] [
+            drop "." swap
+        ] if
+        { "" "." ".." } member? [
+            no-parent-directory
+        ] when
     ] unless ;
 
 <PRIVATE
@@ -156,6 +154,8 @@ HOOK: cd io-backend ( path -- )
 HOOK: cwd io-backend ( -- path )
 
 SYMBOL: current-directory
+
+M: object cwd ( -- path ) "." ;
 
 [ cwd current-directory set-global ] "current-directory" add-init-hook
 
@@ -259,7 +259,7 @@ DEFER: copy-tree-into
     prepend-path ;
 
 : ?resource-path ( path -- newpath )
-    "resource:" ?head [ resource-path ] when ;
+    "resource:" ?head [ left-trim-separators resource-path ] when ;
 
 : resource-exists? ( path -- ? )
     ?resource-path exists? ;

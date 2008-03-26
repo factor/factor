@@ -3,14 +3,14 @@
 USING: kernel sequences strings namespaces math assocs shuffle 
      vectors arrays combinators.lib math.parser match
      unicode.categories sequences.deep peg peg.private 
-     peg.search math.ranges ;
+     peg.search math.ranges words ;
 IN: peg.parsers
 
 TUPLE: just-parser p1 ;
 
 : just-pattern
   [
-    dup [
+    execute dup [
       dup parse-result-remaining empty? [ drop f ] unless
     ] when
   ] ;

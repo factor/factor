@@ -178,10 +178,10 @@ io.files.unique sequences strings accessors ;
 [ "/lib/bux" ] [ "/usr" "/lib/bux" append-path ] unit-test
 [ "/lib/bux/" ] [ "/usr" "/lib/bux/" append-path ] unit-test
 
-[ "foo/" ] [ "foo/bar/." parent-directory ] unit-test
-[ "foo/" ] [ "foo/bar/./" parent-directory ] unit-test
-[ "foo/" ] [ "foo/bar/baz/.." parent-directory ] unit-test
-[ "foo/" ] [ "foo/bar/baz/../" parent-directory ] unit-test
+[ "foo/bar/." parent-directory ] must-fail
+[ "foo/bar/./" parent-directory ] must-fail
+[ "foo/bar/baz/.." parent-directory ] must-fail
+[ "foo/bar/baz/../" parent-directory ] must-fail
 
 [ "." parent-directory ] must-fail
 [ "./" parent-directory ] must-fail
@@ -190,6 +190,8 @@ io.files.unique sequences strings accessors ;
 [ "../../" parent-directory ] must-fail
 [ "foo/.." parent-directory ] must-fail
 [ "foo/../" parent-directory ] must-fail
+[ "" parent-directory ] must-fail
+[ "." ] [ "boot.x86.64.image" parent-directory ] unit-test
 
 [ "bar/foo" ] [ "bar/baz" "..///foo" append-path ] unit-test
 [ "bar/baz/foo" ] [ "bar/baz" ".///foo" append-path ] unit-test
