@@ -165,7 +165,7 @@ HELP: reshape-tuples
 { $values { "class" tuple-class } { "newslots" "a sequence of strings" } }
 { $description "Changes the shape of every instance of " { $snippet "class" } " for a new slot layout." } ;
 
-HELP: old-slots
+HELP: removed-slots
 { $values { "class" tuple-class } { "newslots" "a sequence of strings" } { "seq" "a sequence of strings" } }
 { $description "Outputs the sequence of existing tuple slot names not in " { $snippet "newslots" } "." } ;
 
@@ -190,8 +190,8 @@ HELP: define-tuple-predicate
 { $description "Defines a predicate word that tests if the top of the stack is an instance of " { $snippet "class" } ". This will only work if " { $snippet "class" } " is a tuple class." }
 $low-level-note ;
 
-HELP: check-shape
-{ $values { "class" class } { "newslots" "a sequence of strings" } }
+HELP: redefine-tuple-class
+{ $values { "class" class } { "superclass" class } { "newslots" "a sequence of strings" } }
 { $description "If the new slot layout differs from the existing one, updates all existing instances of this tuple class, and forgets any slot accessor words which are no longer needed."
 $nl
 "If the class is not a tuple class word, this word does nothing." }
@@ -214,8 +214,8 @@ HELP: check-tuple
 { $error-description "Thrown if " { $link POSTPONE: C: } " is called with a word which does not name a tuple class." } ;
 
 HELP: define-tuple-class
-{ $values { "class" word } { "slots" "a sequence of strings" } }
-{ $description "Defines a tuple class with slots named by " { $snippet "slots" } ". This is the run time equivalent of " { $link POSTPONE: TUPLE: } "." }
+{ $values { "class" word } { "superclass" class } { "slots" "a sequence of strings" } }
+{ $description "Defines a tuple class inheriting from " { $snippet "superclass" } " with slots named by " { $snippet "slots" } ". This is the run time equivalent of " { $link POSTPONE: TUPLE: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;
 

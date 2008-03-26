@@ -64,7 +64,8 @@ GENERIC: method-prologue ( combination -- quot )
 
 TUPLE: method word def classes generic loc ;
 
-PREDICATE: word method-body "multi-method" word-prop >boolean ;
+PREDICATE: method-body < word
+    "multi-method" word-prop >boolean ;
 
 M: method-body stack-effect
     "multi-method" word-prop method-generic stack-effect ;
@@ -209,13 +210,13 @@ M: hook-combination generic-prologue
 USE: qualified
 QUALIFIED: syntax
 
-PREDICATE: word generic
+PREDICATE: generic < word
     "multi-combination" word-prop >boolean ;
 
-PREDICATE: word standard-generic
+PREDICATE: standard-generic < word
     "multi-combination" word-prop standard-combination? ;
 
-PREDICATE: word hook-generic
+PREDICATE: hook-generic < word
     "multi-combination" word-prop hook-combination? ;
 
 syntax:M: standard-generic definer drop \ GENERIC: f ;
@@ -233,7 +234,7 @@ syntax:M: hook-generic synopsis*
     dup "multi-combination" word-prop
     hook-combination-var pprint-word stack-effect. ;
 
-PREDICATE: array method-spec
+PREDICATE: method-spec < array
     unclip generic? >r [ class? ] all? r> and ;
 
 syntax:M: method-spec where

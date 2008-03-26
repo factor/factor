@@ -2,7 +2,8 @@ USING: definitions generic kernel kernel.private math
 math.constants parser sequences tools.test words assocs
 namespaces quotations sequences.private classes continuations
 generic.standard effects tuples tuples.private arrays vectors
-strings compiler.units accessors ;
+strings compiler.units accessors classes.algebra calendar
+prettyprint io.streams.string ;
 IN: tuples.tests
 
 TUPLE: rect x y w h ;
@@ -83,7 +84,7 @@ C: <predicate-test> predicate-test
 
 [ t ] [ <predicate-test> predicate-test? ] unit-test
 
-PREDICATE: tuple silly-pred
+PREDICATE: silly-pred < tuple
     class \ rect = ;
 
 GENERIC: area
@@ -243,6 +244,58 @@ C: <erg's-reshape-problem> erg's-reshape-problem
     "IN: tuples.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
 ] [ [ no-tuple-class? ] is? ] must-fail-with
 
+! Inheritance
+TUPLE: computer cpu ram ;
+
+[ "IN: tuples.tests TUPLE: computer cpu ram ;\n" ] [
+    [ \ computer see ] with-string-writer
+] unit-test
+
+TUPLE: laptop < computer battery ;
+C: <laptop> laptop
+
+[ t ] [ laptop tuple-class? ] unit-test
+[ t ] [ laptop tuple class< ] unit-test
+[ t ] [ laptop computer class< ] unit-test
+[ t ] [ laptop computer classes-intersect? ] unit-test
+
+[ ] [ "Pentium" 128 3 hours <laptop> "laptop" set ] unit-test
+[ t ] [ "laptop" get laptop? ] unit-test
+[ t ] [ "laptop" get computer? ] unit-test
+[ t ] [ "laptop" get tuple? ] unit-test
+
+[ "IN: tuples.tests TUPLE: laptop < computer battery ;\n" ] [
+    [ \ laptop see ] with-string-writer
+] unit-test
+
+TUPLE: server < computer rackmount? ;
+C: <server> server
+
+[ t ] [ server tuple-class? ] unit-test
+[ t ] [ server tuple class< ] unit-test
+[ t ] [ server computer class< ] unit-test
+[ t ] [ server computer classes-intersect? ] unit-test
+
+[ ] [ "Pentium" 128 "1U" <server> "server" set ] unit-test
+[ t ] [ "server" get server? ] unit-test
+[ t ] [ "server" get computer? ] unit-test
+[ t ] [ "server" get tuple? ] unit-test
+
+[ f ] [ "server" get laptop? ] unit-test
+[ f ] [ "laptop" get server? ] unit-test
+
+[ f ] [ server laptop class< ] unit-test
+[ f ] [ laptop server class< ] unit-test
+[ f ] [ laptop server classes-intersect? ] unit-test
+
+[ "IN: tuples.tests TUPLE: server < computer rackmount ;\n" ] [
+    [ \ server see ] with-string-writer
+] unit-test
+
+[
+    "IN: tuples.tests TUPLE: bad-superclass < word ;" eval
+] must-fail
+
 ! Hardcore unit tests
 USE: threads
 
@@ -250,14 +303,14 @@ USE: threads
 
 [ ] [
     [
-        \ thread { "xxx" } "slot-names" get append
+        \ thread tuple { "xxx" } "slot-names" get append
         define-tuple-class
     ] with-compilation-unit
 
     [ 1337 sleep ] "Test" spawn drop
 
     [
-        \ thread "slot-names" get
+        \ thread tuple "slot-names" get
         define-tuple-class
     ] with-compilation-unit
 ] unit-test
@@ -268,14 +321,14 @@ USE: vocabs
 
 [ ] [
     [
-        \ vocab { "xxx" } "slot-names" get append
+        \ vocab tuple { "xxx" } "slot-names" get append
         define-tuple-class
     ] with-compilation-unit
 
     all-words drop
 
     [
-        \ vocab "slot-names" get
+        \ vocab tuple "slot-names" get
         define-tuple-class
     ] with-compilation-unit
 ] unit-test

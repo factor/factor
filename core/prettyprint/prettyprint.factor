@@ -247,8 +247,9 @@ M: mixin-class see-class*
 
 M: predicate-class see-class*
     <colon \ PREDICATE: pprint-word
-    dup superclass pprint-word
     dup pprint-word
+    "<" text
+    dup superclass pprint-word
     <block
     "predicate-definition" word-prop pprint-elements
     pprint-; block> block> ;

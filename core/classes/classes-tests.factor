@@ -28,7 +28,7 @@ M: union-1 generic-update-test drop "union-1" ;
 [ f ] [ union-1 number class< ] unit-test
 [ "union-1" ] [ { 1.0 } generic-update-test ] unit-test
 
-"IN: classes.tests USE: math PREDICATE: integer union-1 even? ;" eval
+"IN: classes.tests USE: math PREDICATE: union-1 < integer even? ;" eval
 
 [ f ] [ union-1 union-class? ] unit-test
 [ t ] [ union-1 predicate-class? ] unit-test

@@ -214,7 +214,7 @@ SYMBOL: in
 
 ERROR: unexpected want got ;
 
-PREDICATE: unexpected unexpected-eof
+PREDICATE: unexpected-eof < unexpected
     unexpected-got not ;
 
 : unexpected-eof ( word -- * ) f unexpected ;

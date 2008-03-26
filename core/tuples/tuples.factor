@@ -110,8 +110,11 @@ M: tuple-class tuple-layout "layout" word-prop ;
     dup define-tuple-layout
     define-tuple-predicate ;
 
+: change-superclass "not supported" throw ;
+
 : redefine-tuple-class ( class superclass slots -- )
-    nip
+    >r 2dup swap superclass eq?
+    [ drop ] [ dupd change-superclass ] if r>
     2dup forget-slots
     2dup reshape-tuples
     over changed-word
@@ -119,8 +122,7 @@ M: tuple-class tuple-layout "layout" word-prop ;
     prepare-tuple-class ;
 
 : define-new-tuple-class ( class superclass slots -- )
-    nip
-    over f tuple tuple-class define-class
+    >r dupd f swap tuple-class define-class r>
     prepare-tuple-class ;
 
 PRIVATE>

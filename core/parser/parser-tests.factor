@@ -389,7 +389,7 @@ IN: parser.tests
 ] with-scope
 
 [ ] [
-    "IN: parser.tests USE: kernel PREDICATE: object foo ( x -- y ) ;" eval
+    "IN: parser.tests USE: kernel PREDICATE: foo < object ( x -- y ) ;" eval
 ] unit-test
 
 [ t ] [

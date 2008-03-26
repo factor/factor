@@ -25,15 +25,15 @@ SYMBOL: class-or-cache
     class-and-cache get clear-assoc
     class-or-cache get clear-assoc ;
 
-PREDICATE: word class ( obj -- ? ) "class" word-prop ;
+PREDICATE: class < word ( obj -- ? ) "class" word-prop ;
 
 SYMBOL: update-map
 SYMBOL: builtins
 
-PREDICATE: class builtin-class
+PREDICATE: builtin-class < class
     "metaclass" word-prop builtin-class eq? ;
 
-PREDICATE: class tuple-class
+PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
 : classes ( -- seq ) all-words [ class? ] subset ;
@@ -47,7 +47,7 @@ PREDICATE: class tuple-class
 
 : predicate-effect 1 { "?" } <effect> ;
 
-PREDICATE: word predicate "predicating" word-prop >boolean ;
+PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
 : define-predicate ( class quot -- )
     >r "predicate" word-prop first
