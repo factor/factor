@@ -51,7 +51,7 @@ UNION: both first-one union-class ;
 [ f ] [ \ reversed \ slice class< ] unit-test
 [ f ] [ \ slice \ reversed class< ] unit-test
 
-PREDICATE: word no-docs "documentation" word-prop not ;
+PREDICATE: no-docs < word "documentation" word-prop not ;
 
 UNION: no-docs-union no-docs integer ;
 

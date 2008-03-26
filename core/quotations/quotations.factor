@@ -7,9 +7,9 @@ IN: quotations
 
 M: quotation call (call) ;
 
-M: curry call dup 4 slot swap 5 slot call ;
+M: curry call dup 3 slot swap 4 slot call ;
 
-M: compose call dup 4 slot swap 5 slot slip call ;
+M: compose call dup 3 slot swap 4 slot slip call ;
 
 M: wrapper equal?
     over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;

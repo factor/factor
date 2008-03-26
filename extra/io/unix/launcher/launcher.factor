@@ -4,7 +4,7 @@ USING: io io.backend io.launcher io.nonblocking io.unix.backend
 io.unix.files io.nonblocking sequences kernel namespaces math
 system alien.c-types debugger continuations arrays assocs
 combinators unix.process strings threads unix
-io.unix.launcher.parser accessors ;
+io.unix.launcher.parser accessors io.files ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -67,6 +67,7 @@ USE: unix
 
 : spawn-process ( process -- * )
     [
+        current-directory get cd
         setup-priority
         setup-redirection
         dup pass-environment? [

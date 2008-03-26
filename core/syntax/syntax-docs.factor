@@ -543,8 +543,8 @@ HELP: INSTANCE:
 { $description "Makes " { $snippet "instance" } " an instance of " { $snippet "mixin" } "." } ;
 
 HELP: PREDICATE:
-{ $syntax "PREDICATE: superclass class predicate... ;" }
-{ $values { "superclass" "an existing class word" } { "class" "a new class word to define" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
+{ $syntax "PREDICATE: class < superclass predicate... ;" }
+{ $values { "class" "a new class word to define" } { "superclass" "an existing class word" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
 { $description
     "Defines a predicate class deriving from " { $snippet "superclass" } "."
     $nl
@@ -557,11 +557,9 @@ HELP: PREDICATE:
 } ;
 
 HELP: TUPLE:
-{ $syntax "TUPLE: class slots... ;" }
+{ $syntax "TUPLE: class slots... ;" "TUPLE: class < superclass slots ... ;" }
 { $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class."
-$nl
-"Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." } ;
+{ $description "Defines a new tuple class. The superclass is optional; if left unspecified, it defaults to " { $link tuple } "." } ;
 
 HELP: ERROR:
 { $syntax "ERROR: class slots... ;" }

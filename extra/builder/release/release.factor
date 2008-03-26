@@ -1,6 +1,6 @@
 
 USING: kernel system namespaces sequences splitting combinators
-       io.files io.launcher
+       io io.files io.launcher
        bake combinators.cleave builder.common builder.util ;
 
 IN: builder.release
@@ -91,6 +91,39 @@ IN: builder.release
 : remove-factor-app ( -- )
   macosx? not [ { "rm" "-rf" "Factor.app" } try-process ] when ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: upload-to-factorcode
+
+: platform ( -- string ) { os cpu- } to-strings "-" join ;
+
+: remote-location ( -- dest )
+  "factorcode.org:/var/www/factorcode.org/newsite/downloads"
+  platform
+  append-path ;
+    
+: upload ( -- )
+  { "scp" archive-name remote-location } to-strings
+  [ "Error uploading binary to factorcode" print ]
+  run-or-bail ;
+
+: maybe-upload ( -- )
+  upload-to-factorcode get
+    [ upload ]
+  when ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! : release ( -- )
+!   "factor"
+!     [
+!       remove-factor-app
+!       remove-common-files
+!     ]
+!   with-directory
+!   make-archive
+!   archive-name releases move-file-into ;
+
 : release ( -- )
   "factor"
     [
@@ -99,6 +132,7 @@ IN: builder.release
     ]
   with-directory
   make-archive
+  maybe-upload
   archive-name releases move-file-into ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
