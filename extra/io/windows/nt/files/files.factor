@@ -65,12 +65,17 @@ ERROR: empty-pathname ;
 
 USE: tools.walker
 M: windows-nt-io normalize-pathname ( string -- string )
-    dup string? [ nonstring-pathname ] unless
-    dup empty? [ empty-pathname ] when
-    { { CHAR: / CHAR: \\ } } substitute
-    current-directory get swap windows-append-path
-    [ "/\\." member? ] right-trim
-    dup peek CHAR: : = [ "\\" append ] when ;
+    "resource:" ?head [
+        left-trim-separators resource-path
+        normalize-pathname
+    ] [
+        dup string? [ nonstring-pathname ] unless
+        dup empty? [ empty-pathname ] when
+        { { CHAR: / CHAR: \\ } } substitute
+        current-directory get swap windows-append-path
+        [ "/\\." member? ] right-trim
+        dup peek CHAR: : = [ "\\" append ] when
+    ] if ;
 
 M: windows-nt-io CreateFile-flags ( DWORD -- DWORD )
     FILE_FLAG_OVERLAPPED bitor ;
