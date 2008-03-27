@@ -205,3 +205,7 @@ io.encodings.utf8 ;
 [ "bar/baz/foo" ] [ "bar/baz" ".///foo" append-path ] unit-test
 [ "bar/foo" ] [ "bar/baz" "./..//foo" append-path ] unit-test
 [ "bar/foo" ] [ "bar/baz" "./../././././././///foo" append-path ] unit-test
+
+[ t ] [ "resource:core" absolute-path? ] unit-test
+[ t ] [ "/foo" absolute-path? ] unit-test
+[ f ] [ "" absolute-path? ] unit-test

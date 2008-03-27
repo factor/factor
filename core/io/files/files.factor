@@ -99,7 +99,12 @@ ERROR: no-parent-directory path ;
 PRIVATE>
 
 : absolute-path? ( path -- ? )
-    dup empty? [ drop f ] [ first path-separator? ] if ;
+    {
+        { [ dup empty? ] [ f ] }
+        { [ dup "resource:" head? ] [ t ] }
+        { [ dup first path-separator? ] [ t ] }
+        { [ t ] [ f ] }
+    } cond nip ;
 
 : append-path ( str1 str2 -- str )
     {
@@ -258,12 +263,6 @@ DEFER: copy-tree-into
     "resource-path" get [ image parent-directory ] unless*
     prepend-path ;
 
-: ?resource-path ( path -- newpath )
-    "resource:" ?head [ left-trim-separators resource-path ] when ;
-
-: resource-exists? ( path -- ? )
-    ?resource-path exists? ;
-
 : temp-directory ( -- path )
     "temp" resource-path
     dup exists? not
@@ -273,7 +272,12 @@ DEFER: copy-tree-into
 : temp-file ( name -- path ) temp-directory prepend-path ;
 
 M: object normalize-pathname ( path -- path' )
-    current-directory get prepend-path ;
+    "resource:" ?head [
+        left-trim-separators resource-path
+        normalize-pathname
+    ] [
+        current-directory get prepend-path
+    ] if ;
 
 ! Pathname presentations
 TUPLE: pathname string ;
