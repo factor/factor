@@ -5,7 +5,7 @@
 
 USING: arrays kernel math namespaces sequences system init
 accessors math.ranges combinators.cleave new-effects
-random.backend ;
+random ;
 IN: random.mersenne-twister
 
 <PRIVATE

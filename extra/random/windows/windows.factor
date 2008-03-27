@@ -1,6 +1,5 @@
 USING: accessors alien.c-types byte-arrays continuations
-kernel windows windows.advapi32 init namespaces
-random.backend ;
+kernel windows windows.advapi32 init namespaces random ;
 IN: random.windows
 
 TUPLE: windows-crypto-context handle ;

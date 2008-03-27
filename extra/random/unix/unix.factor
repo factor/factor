@@ -1,5 +1,5 @@
 USING: alien.c-types io io.files io.nonblocking kernel
-namespaces random.backend io.encodings.binary singleton init
+namespaces random io.encodings.binary singleton init
 accessors ;
 IN: random.unix
 

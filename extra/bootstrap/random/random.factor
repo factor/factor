@@ -1,6 +1,6 @@
 USING: vocabs.loader sequences system
 random random.mersenne-twister combinators init
-namespaces ;
+namespaces random.backend ;
 
 "random.mersenne-twister" require
 
@@ -9,5 +9,6 @@ namespaces ;
     { [ unix? ] [ "random.unix" require ] }
 } cond
 
+! [ [ 32 random-bits ] with-secure-random <mersenne-twister> random-generator set-global ]
 [ millis <mersenne-twister> random-generator set-global ]
 "generator.random" add-init-hook

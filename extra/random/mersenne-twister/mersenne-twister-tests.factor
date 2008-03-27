@@ -1,5 +1,5 @@
 USING: kernel math random namespaces random.mersenne-twister
-sequences tools.test random.backend ;
+sequences tools.test ;
 IN: random.mersenne-twister.tests
 
 : check-random ( max -- ? )
