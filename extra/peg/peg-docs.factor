@@ -11,7 +11,36 @@ HELP: parse
 }
 { $description 
     "Given the input string, parse it using the given parser. The result is a <parse-result> object if "
-    "the parse was successful, otherwise it is f." } ;
+    "the parse was successful, otherwise it is f." } 
+{ $see-also compile with-packrat } ;
+
+HELP: with-packrat
+{ $values 
+  { "quot" "a quotation with stack effect ( input -- result )" } 
+  { "result" "the result of the quotation" } 
+}
+{ $description 
+    "Calls the quotation with a packrat cache in scope. Usually the quotation will "
+    "call " { $link parse } " or call a word produced by " { $link compile } "."
+    "The cache is used to avoid the possible exponential time performace that pegs "
+    "can have, instead giving linear time at the cost of increased memory usage."  } 
+{ $see-also compile parse } ;
+
+HELP: compile
+{ $values 
+  { "parser" "a parser" } 
+  { "word" "a word" } 
+}
+{ $description 
+    "Compile the parser to a word. The word will have stack effect ( input -- result )."
+    "The mapping from parser to compiled word is kept in a cache. If you later change "
+    "the definition of a parser you'll need to clear this cache with " 
+    { $link reset-compiled-parsers } " before using " { $link compile } " on that parser again." } 
+{ $see-also compile with-packrat reset-compiled-parsers } ;
+
+HELP: reset-compiled-parsers
+{ $description 
+    "Reset the cache mapping parsers to compiled words." } ;
 
 HELP: token
 { $values 
