@@ -175,6 +175,8 @@ IN: peg.tests
       [ "1" token , "+" token , "1" token , ] seq* ,
     ] choice* 
     "1-1" over parse parse-result-ast swap
-    "1+1" swap parse parse-result-ast
   ] with-packrat
+  [
+    "1+1" swap parse parse-result-ast
+  ] with-packrat 
 ] unit-test
