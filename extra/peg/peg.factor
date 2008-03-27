@@ -39,7 +39,11 @@ GENERIC: (compile) ( parser -- quot )
   #! from the input cache. If the item is not in the cache,
   #! call 'quot' with 'input' on the stack to get the result
   #! and store that in the cache and return it.
-  n input-cache [ drop input quot call ] cache ; inline
+  n input-cache [ 
+    drop
+    f n input-cache set-at
+    input quot call 
+  ] cache ; inline
 
 :: run-packrat-parser ( input quot c -- result )
   input input-from

@@ -180,3 +180,19 @@ IN: peg.tests
     "1+1" swap parse parse-result-ast
   ] with-packrat 
 ] unit-test
+
+: expr ( -- parser ) 
+  #! Test direct left recursion. Currently left recursion should cause a
+  #! failure of that parser.
+  [ expr ] delay "+" token "1" token 3seq "1" token 2choice ;
+
+[
+  #! Not using packrat, so recursion causes data stack overflow  
+  "1+1" expr parse parse-result-ast   
+] must-fail
+
+{ "1" } [
+  #! Using packrat, so expr fails, causing the 2nd choice to be used.  
+  "1+1" expr [ parse ] with-packrat parse-result-ast   
+] unit-test
+
