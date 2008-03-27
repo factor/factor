@@ -1,6 +1,6 @@
 USING: vocabs.loader sequences system
 random random.mersenne-twister combinators init
-namespaces random.backend ;
+namespaces random ;
 
 "random.mersenne-twister" require
 
