@@ -14,8 +14,13 @@ SYMBOL: ignore
 : <parse-result> ( remaining ast -- parse-result )
   parse-result construct-boa ;
 
-SYMBOL: compiled-parsers
 SYMBOL: packrat
+
+: compiled-parsers ( -- cache )
+  \ compiled-parsers get-global [ H{ } clone dup \ compiled-parsers set-global ] unless* ;
+
+: reset-compiled-parsers ( -- )
+  H{ } clone \ compiled-parsers set-global ;
 
 GENERIC: (compile) ( parser -- quot )
 
@@ -35,14 +40,12 @@ GENERIC: (compile) ( parser -- quot )
   #! Look to see if the given parser has been compiled.
   #! If not, compile it to a temporary word, cache it,
   #! and return it. Otherwise return the existing one.
-  compiled-parsers get [
+  compiled-parsers [
     (compile) [ run-parser ] curry define-temp
   ] cache ;
 
 : compile ( parser -- word )
-  H{ } clone compiled-parsers [ 
-    [ compiled-parser ] with-compilation-unit 
-  ] with-variable ;
+  [ compiled-parser ] with-compilation-unit ;
 
 : parse ( state parser -- result )
   compile execute ;
