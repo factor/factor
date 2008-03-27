@@ -10,7 +10,7 @@ SYMBOL: random-generator
 
 GENERIC: seed-random ( tuple seed -- )
 GENERIC: random-32* ( tuple -- r )
-GENERIC: random-bytes* ( n tuple -- bytes )
+GENERIC: random-bytes* ( n tuple -- byte-array )
 
 M: object random-bytes* ( n tuple -- byte-array )
     swap [ drop random-32* ] with map >c-uint-array ;
@@ -23,7 +23,7 @@ M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
 
 M: f random-32* ( obj -- * ) no-random-number-generator ;
 
-: random-bytes ( n -- r )
+: random-bytes ( n -- byte-array )
     [
         dup 4 rem zero? [ 1+ ] unless
         random-generator get random-bytes*
