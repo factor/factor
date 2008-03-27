@@ -81,7 +81,7 @@ IN: tools.deploy.shaker
     [
         "class" ,
         "metaclass" ,
-        "slot-names" ,
+        "layout" ,
         deploy-ui? get [
             "gestures" ,
             "commands" ,

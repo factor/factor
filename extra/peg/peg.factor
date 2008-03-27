@@ -24,12 +24,31 @@ SYMBOL: packrat
 
 GENERIC: (compile) ( parser -- quot )
 
-:: run-packrat-parser ( input quot c -- result )
-  input slice? [ input slice-from ] [ 0 ] if
-  quot c [ drop H{ } clone ] cache 
-  [
-    drop input quot call  
+: input-from ( input -- n )
+  #! Return the index from the original string that the
+  #! input slice is based on.
+  dup slice? [ slice-from ] [ drop 0 ] if ;
+
+: input-cache ( quot cache -- cache )
+  #! From the packrat cache, obtain the cache for the parser quotation 
+  #! that maps the input string position to the parser result.
+  [ drop H{ } clone ] cache ;
+
+:: cached-result ( n input-cache input quot -- result )
+  #! Get the cached result for input position n
+  #! from the input cache. If the item is not in the cache,
+  #! call 'quot' with 'input' on the stack to get the result
+  #! and store that in the cache and return it.
+  n input-cache [ 
+    drop
+    f n input-cache set-at
+    input quot call 
   ] cache ; inline
+
+:: run-packrat-parser ( input quot c -- result )
+  input input-from
+  quot c input-cache 
+  input quot cached-result ; inline
 
 : run-parser ( input quot -- result )
   #! If a packrat cache is available, use memoization for
@@ -48,11 +67,17 @@ GENERIC: (compile) ( parser -- quot )
   [ compiled-parser ] with-compilation-unit ;
 
 : parse ( state parser -- result )
-  compile execute ;
+  compile execute ; inline
 
 : with-packrat ( quot -- result )
   #! Run the quotation with a packrat cache active.
-  [ H{ } clone packrat ] dip with-variable ;
+  [ H{ } clone packrat ] dip with-variable ; inline
+
+: packrat-parse ( state parser -- result )
+  [ parse ] with-packrat ;
+
+: packrat-call ( state quot -- result )
+  with-packrat ; inline
 
 <PRIVATE
 
@@ -313,7 +338,7 @@ MEMO: 3seq ( parser1 parser2 parser3 -- parser )
 MEMO: 4seq ( parser1 parser2 parser3 parser4 -- parser )
   4array seq ;
 
-MEMO: seq* ( quot -- paser )
+: seq* ( quot -- paser )
   { } make seq ; inline 
 
 MEMO: choice ( seq -- parser )
@@ -328,7 +353,7 @@ MEMO: 3choice ( parser1 parser2 parser3 -- parser )
 MEMO: 4choice ( parser1 parser2 parser3 parser4 -- parser )
   4array choice ;
 
-MEMO: choice* ( quot -- paser )
+: choice* ( quot -- paser )
   { } make choice ; inline 
 
 MEMO: repeat0 ( parser -- parser )
