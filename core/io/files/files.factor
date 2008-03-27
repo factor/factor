@@ -170,7 +170,7 @@ SYMBOL: current-directory
 
 M: object cwd ( -- path ) "." ;
 
-[ cwd current-directory set-global ] "current-directory" add-init-hook
+[ cwd current-directory set-global ] "io.files" add-init-hook
 
 : with-directory ( path quot -- )
     >r normalize-pathname r>
