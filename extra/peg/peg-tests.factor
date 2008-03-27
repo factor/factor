@@ -158,3 +158,23 @@ IN: peg.tests
   "a]" "[" token hide "a" token "]" token hide 3array seq parse 
 ] unit-test
 
+
+{ V{ "1" "-" "1" } V{ "1" "+" "1" } } [
+  [
+    [ "1" token , "-" token , "1" token , ] seq* ,
+    [ "1" token , "+" token , "1" token , ] seq* ,
+  ] choice* 
+  "1-1" over parse parse-result-ast swap
+  "1+1" swap parse parse-result-ast
+] unit-test
+
+{ V{ "1" "-" "1" } V{ "1" "+" "1" } } [
+  [ 
+    [
+      [ "1" token , "-" token , "1" token , ] seq* ,
+      [ "1" token , "+" token , "1" token , ] seq* ,
+    ] choice* 
+    "1-1" over parse parse-result-ast swap
+    "1+1" swap parse parse-result-ast
+  ] with-packrat
+] unit-test

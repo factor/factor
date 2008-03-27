@@ -29,12 +29,22 @@ GENERIC: (compile) ( parser -- quot )
   #! input slice is based on.
   dup slice? [ slice-from ] [ drop 0 ] if ;
 
+: input-cache ( quot cache -- cache )
+  #! From the packrat cache, obtain the cache for the parser quotation 
+  #! that maps the input string position to the parser result.
+  [ drop H{ } clone ] cache ;
+
+: cached-result ( n input-cache input quot -- result )
+  #! Get the cached result for input position n
+  #! from the input cache. If the item is not in the cache,
+  #! call 'quot' with 'input' on the stack to get the result
+  #! and store that in the cache and return it.
+  [ nip ] swap compose curry cache ; inline
+
 :: run-packrat-parser ( input quot c -- result )
   input input-from
-  quot c [ drop H{ } clone ] cache 
-  [
-    drop input quot call  
-  ] cache ; inline
+  quot c input-cache 
+  input quot cached-result ; inline
 
 : run-parser ( input quot -- result )
   #! If a packrat cache is available, use memoization for
