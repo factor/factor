@@ -89,6 +89,12 @@ io.encodings.utf8 ;
     ] with-directory
 ] unit-test
 
+[ { { "kernel" t } } ] [
+    "resource:core" [
+        "." directory [ first "kernel" = ] subset
+    ] with-directory
+] unit-test
+
 [ ] [
     "copy-tree-test/a/b/c" temp-file make-directories
 ] unit-test
