@@ -89,4 +89,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
     ] if ;
 
 M: windows-nt-io file-info ( path -- info )
-    get-file-information-stat ;
+    normalize-pathname get-file-information-stat ;
+
+M: windows-nt-io link-info ( path -- info )
+    file-info ;

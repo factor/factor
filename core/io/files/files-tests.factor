@@ -132,15 +132,12 @@ io.encodings.utf8 ;
 [ t ] [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
 
 [ t ] [
-    temp-directory [ "hi" "test41" utf8 set-file-contents ] with-directory
+    temp-directory [ "hi41" "test41" utf8 set-file-contents ] with-directory
     temp-directory "test41" append-path utf8 file-contents "hi41" =
 ] unit-test
 
 [ t ] [
-    temp-directory [
-        "test43" utf8 <file-writer> [ "hi43" write ] with-stream
-    ] with-directory
-    temp-directory "test43" append-path utf8 file-contents "hi43" =
+    temp-directory [ "test41" file-info size>> ] with-directory 4 =
 ] unit-test
 
 [ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
