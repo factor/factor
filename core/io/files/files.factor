@@ -3,7 +3,7 @@
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
 system combinators splitting sbufs continuations io.encodings
-io.encodings.binary init ;
+io.encodings.binary init unicode.categories ;
 IN: io.files
 
 HOOK: (file-reader) io-backend ( path -- stream )
@@ -98,11 +98,19 @@ ERROR: no-parent-directory path ;
 
 PRIVATE>
 
+: windows-absolute-path? ( path -- path ? )
+    {
+        { [ dup length 2 < ] [ f ] }
+        { [ dup first2 >r Letter? r> CHAR: : = and ] [ t ] }
+        { [ t ] [ f ] }
+    } cond ;
+
 : absolute-path? ( path -- ? )
     {
         { [ dup empty? ] [ f ] }
         { [ dup "resource:" head? ] [ t ] }
         { [ dup first path-separator? ] [ t ] }
+        { [ windows? ] [ windows-absolute-path? ] }
         { [ t ] [ f ] }
     } cond nip ;
 
