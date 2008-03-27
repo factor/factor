@@ -272,6 +272,9 @@ DEFER: copy-tree-into
 
 : temp-file ( name -- path ) temp-directory prepend-path ;
 
+M: object normalize-pathname ( path -- path' )
+    current-directory get prepend-path ;
+
 ! Pathname presentations
 TUPLE: pathname string ;
 

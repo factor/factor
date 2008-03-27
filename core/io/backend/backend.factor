@@ -21,8 +21,6 @@ M: object normalize-directory ;
 
 HOOK: normalize-pathname io-backend ( str -- newstr )
 
-M: object normalize-pathname ;
-
 : set-io-backend ( io-backend -- )
     io-backend set-global init-io init-stdio ;
 

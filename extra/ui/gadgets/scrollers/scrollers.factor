@@ -3,13 +3,14 @@
 USING: arrays ui.gadgets
 ui.gadgets.viewports ui.gadgets.frames ui.gadgets.grids
 ui.gadgets.theme ui.gadgets.sliders ui.gestures kernel math
-namespaces sequences models combinators math.vectors ;
+namespaces sequences models combinators math.vectors
+tuples ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller viewport x y follows ;
 
 : find-scroller ( gadget -- scroller/f )
-    [ scroller? ] find-parent ;
+    [ [ scroller? ] is? ] find-parent ;
 
 : scroll-up-page scroller-y -1 swap slide-by-page ;
 
