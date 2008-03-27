@@ -25,11 +25,8 @@ SYMBOL: edit-hook
     require ;
 
 : edit-location ( file line -- )
-    edit-hook get [
-        call
-    ] [
-        no-edit-hook edit-location
-    ] if* ;
+    >r current-directory get prepend-path r>
+    edit-hook get [ call ] [ no-edit-hook edit-location ] if* ;
 
 : edit ( defspec -- )
     where [ first2 edit-location ] when* ;
