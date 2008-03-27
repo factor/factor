@@ -37,7 +37,8 @@ USE: unix
     2nip reset-fd ;
 
 : redirect-file ( obj mode fd -- )
-    >r file-mode open dup io-error r> redirect-fd ;
+    >r >r normalize-pathname r> file-mode
+    open dup io-error r> redirect-fd ;
 
 : redirect-closed ( obj mode fd -- )
     >r >r drop "/dev/null" r> r> redirect-file ;
@@ -67,9 +68,9 @@ USE: unix
 
 : spawn-process ( process -- * )
     [
-        current-directory get cd
         setup-priority
         setup-redirection
+        current-directory get cd
         dup pass-environment? [
             dup get-environment set-os-envs
         ] when
