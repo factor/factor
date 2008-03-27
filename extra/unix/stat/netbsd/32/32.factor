@@ -22,5 +22,8 @@ C-STRUCT: stat
     { "uint32_t" "st_gen" }
     { { "uint32_t" 2 } "st_qspare" } ;
 
-FUNCTION: int stat  ( char* pathname, stat* buf ) ;
-FUNCTION: int lstat ( char* pathname, stat* buf ) ;
+FUNCTION: int __stat30  ( char* pathname, stat* buf ) ;
+FUNCTION: int __lstat30 ( char* pathname, stat* buf ) ;
+
+: stat __stat30 ;
+: lstat __lstat30 ;
