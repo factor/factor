@@ -16,7 +16,6 @@ SYMBOL: ignore
 
 SYMBOL: compiled-parsers
 SYMBOL: packrat
-SYMBOL: failed
 
 GENERIC: (compile) ( parser -- quot )
 
@@ -36,12 +35,9 @@ GENERIC: (compile) ( parser -- quot )
   #! Look to see if the given parser has been compiled.
   #! If not, compile it to a temporary word, cache it,
   #! and return it. Otherwise return the existing one.
-  dup compiled-parsers get at [
-    nip
-  ] [
-    dup (compile) [ run-parser ] curry define-temp 
-    [ swap compiled-parsers get set-at ] keep
-  ] if* ;
+  compiled-parsers get [
+    (compile) [ run-parser ] curry define-temp
+  ] cache ;
 
 : compile ( parser -- word )
   H{ } clone compiled-parsers [ 
