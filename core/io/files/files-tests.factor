@@ -83,6 +83,12 @@ io.encodings.utf8 ;
     "delete-tree-test" temp-file delete-tree
 ] unit-test
 
+[ { { "kernel" t } } ] [
+    "core" resource-path [
+        "." directory [ first "kernel" = ] subset
+    ] with-directory
+] unit-test
+
 [ ] [
     "copy-tree-test/a/b/c" temp-file make-directories
 ] unit-test
