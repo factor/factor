@@ -57,6 +57,9 @@ PREDICATE: predicate < word "predicating" word-prop >boolean ;
     #! Output f for non-classes to work with algebra code
     dup class? [ "superclass" word-prop ] [ drop f ] if ;
 
+: superclasses ( class -- supers )
+    [ dup ] [ dup superclass swap ] [ ] unfold reverse nip ;
+
 : members ( class -- seq )
     #! Output f for non-classes to work with algebra code
     dup class? [ "members" word-prop ] [ drop f ] if ;

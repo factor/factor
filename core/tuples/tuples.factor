@@ -4,7 +4,7 @@ USING: arrays definitions hashtables kernel
 kernel.private math namespaces sequences sequences.private
 strings vectors words quotations memory combinators generic
 classes classes.private slots.deprecated slots.private slots
-compiler.units ;
+compiler.units math.private ;
 IN: tuples
 
 M: tuple delegate 2 slot ;
@@ -16,6 +16,12 @@ M: tuple class 1 slot 2 slot { word } declare ;
 ERROR: no-tuple-class class ;
 
 <PRIVATE
+
+GENERIC: tuple-layout ( object -- layout )
+
+M: class tuple-layout "layout" word-prop ;
+
+M: tuple tuple-layout 1 slot ;
 
 : tuple-size tuple-layout layout-size ; inline
 
@@ -49,33 +55,56 @@ PRIVATE>
         2drop f
     ] if ;
 
-M: tuple-class tuple-layout "layout" word-prop ;
+! Predicate generation. We optimize at the expense of simplicity
+
+: (tuple-predicate-quot) ( class -- quot )
+    #! 4 slot == layout-superclasses
+    #! 5 slot == layout-echelon
+    [
+        [ 1 slot dup 5 slot ] %
+        dup tuple-layout layout-echelon ,
+        [ fixnum>= ] %
+        [
+            dup tuple-layout layout-echelon ,
+            [ swap 4 slot array-nth ] %
+            literalize ,
+            [ eq? ] %
+        ] [ ] make ,
+        [ drop f ] ,
+        \ if ,
+    ] [ ] make ;
+
+: tuple-predicate-quot ( class -- quot )
+    [
+        [ dup tuple? ] %
+        (tuple-predicate-quot) ,
+        [ drop f ] ,
+        \ if ,
+    ] [ ] make ;
 
 : define-tuple-predicate ( class -- )
-    dup tuple-layout
-    [ over tuple? [ swap 1 slot eq? ] [ 2drop f ] if ] curry
-    define-predicate ;
+    dup tuple-predicate-quot define-predicate ;
 
-: delegate-slot-spec
-    T{ slot-spec f
-        object
-        "delegate"
-        2
-        delegate
-        set-delegate
-    } ;
+: superclass-size ( class -- n )
+    superclasses 1 head-slice*
+    [ "slot-names" word-prop length ] map sum ;
+
+: generate-tuple-slots ( class slots -- slot-specs slot-names )
+    over superclass-size 2 + simple-slots
+    dup [ slot-spec-name ] map ;
 
 : define-tuple-slots ( class slots -- )
-    dupd 3 simple-slots
-    2dup [ slot-spec-name ] map "slot-names" set-word-prop
-    2dup delegate-slot-spec add* "slots" set-word-prop
-    2dup define-slots
-    define-accessors ;
+    dupd generate-tuple-slots
+    >r dupd "slots" set-word-prop
+    r> dupd "slot-names" set-word-prop
+    dup "slots" word-prop 2dup define-slots define-accessors ;
+
+: make-tuple-layout ( class -- layout )
+    dup superclass-size over "slot-names" word-prop length +
+    over superclasses dup length 1- <tuple-layout> ;
 
 : define-tuple-layout ( class -- )
-    dup
-    dup "slot-names" word-prop length 1+ { } 0 <tuple-layout>
-    "layout" set-word-prop ;
+    dup make-tuple-layout "layout" set-word-prop ;
 
 : removed-slots ( class newslots -- seq )
     swap "slot-names" word-prop seq-diff ;

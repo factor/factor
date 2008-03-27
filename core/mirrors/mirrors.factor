@@ -10,7 +10,7 @@ GENERIC: object-slots ( obj -- seq )
 M: object object-slots class "slots" word-prop ;
 
 M: tuple object-slots
-    dup class "slots" word-prop
+    dup class superclasses [ "slots" word-prop ] map concat
     swap delegate [ 1 tail-slice ] unless ;
 
 TUPLE: mirror object slots ;
