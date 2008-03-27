@@ -338,7 +338,7 @@ MEMO: 3seq ( parser1 parser2 parser3 -- parser )
 MEMO: 4seq ( parser1 parser2 parser3 parser4 -- parser )
   4array seq ;
 
-MEMO: seq* ( quot -- paser )
+: seq* ( quot -- paser )
   { } make seq ; inline 
 
 MEMO: choice ( seq -- parser )
@@ -353,7 +353,7 @@ MEMO: 3choice ( parser1 parser2 parser3 -- parser )
 MEMO: 4choice ( parser1 parser2 parser3 parser4 -- parser )
   4array choice ;
 
-MEMO: choice* ( quot -- paser )
+: choice* ( quot -- paser )
   { } make choice ; inline 
 
 MEMO: repeat0 ( parser -- parser )
