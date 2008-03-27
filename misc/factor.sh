@@ -306,7 +306,7 @@ update_boot_images() {
     echo "Deleting old images..."
     rm checksums.txt* > /dev/null 2>&1
     rm $BOOT_IMAGE.* > /dev/null 2>&1
-    rm staging.*.image > /dev/null 2>&1
+    rm temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
         get_url http://factorcode.org/images/latest/checksums.txt
         factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`;

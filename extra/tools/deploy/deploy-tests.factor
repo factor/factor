@@ -1,10 +1,11 @@
 IN: tools.deploy.tests
 USING: tools.test system io.files kernel tools.deploy.config
 tools.deploy.backend math sequences io.launcher arrays
-namespaces ;
+namespaces continuations ;
 
 : shake-and-bake ( vocab -- )
-    "." resource-path [
+    [ "test.image" temp-file delete-file ] ignore-errors
+    "resource:" [
         >r vm
         "test.image" temp-file
         r> dup deploy-config make-deploy-image

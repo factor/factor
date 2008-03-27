@@ -156,7 +156,7 @@ M: x86-backend %unbox-small-struct ( size -- )
 
 M: x86-backend struct-small-enough? ( size -- ? )
     { 1 2 4 8 } member?
-    os { "linux" "solaris" } member? not and ;
+    os { "linux" "netbsd" "solaris" } member? not and ;
 
 M: x86-backend %return ( -- ) 0 %unwind ;
 
