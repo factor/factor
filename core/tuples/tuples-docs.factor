@@ -191,7 +191,7 @@ HELP: define-tuple-predicate
 $low-level-note ;
 
 HELP: redefine-tuple-class
-{ $values { "class" class } { "superclass" class } { "newslots" "a sequence of strings" } }
+{ $values { "class" class } { "superclass" class } { "slots" "a sequence of strings" } }
 { $description "If the new slot layout differs from the existing one, updates all existing instances of this tuple class, and forgets any slot accessor words which are no longer needed."
 $nl
 "If the class is not a tuple class word, this word does nothing." }

@@ -489,7 +489,7 @@ IN: cpu.ppc.intrinsics
     ! Store tagged ptr in reg
     "tuple" get tuple %store-tagged
 ] H{
-    { +input+ { { [ tuple-layout? ] "layout" } }
+    { +input+ { { [ tuple-layout? ] "layout" } } }
     { +scratch+ { { f "tuple" } } }
     { +output+ { "tuple" } }
 } define-intrinsic

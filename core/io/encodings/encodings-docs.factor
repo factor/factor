@@ -19,20 +19,23 @@ HELP: <encoder>
 { $values { "stream" "an output stream" }
     { "encoding" "an encoding descriptor" }
     { "newstream" "an encoded output stream" } }
-{ $description "Wraps the given stream in a new stream using the given encoding for all output. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." } ;
+{ $description "Wraps the given stream in a new stream using the given encoding for all output. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." }
+$low-level-note ;
 
 HELP: <decoder>
 { $values { "stream" "an input stream" }
     { "encoding" "an encoding descriptor" }
     { "newstream" "an encoded output stream" } }
-{ $description "Wraps the given stream in a new stream using the given encoding for all input. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." } ;
+{ $description "Wraps the given stream in a new stream using the given encoding for all input. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." }
+$low-level-note ;
 
 HELP: <encoder-duplex>
 { $values { "stream-in" "an input stream" }
     { "stream-out" "an output stream" }
     { "encoding" "an encoding descriptor" }
     { "duplex" "an encoded duplex stream" } }
-{ $description "Wraps the given streams in an encoder or decoder stream, and puts them together in a duplex stream for input and output. If either input stream is already encoded, that encoding is stripped off before it is reencoded. The encoding descriptor must conform to the " { $link "encodings-protocol" } "." } ;
+{ $description "Wraps the given streams in an encoder or decoder stream, and puts them together in a duplex stream for input and output. If either input stream is already encoded, that encoding is stripped off before it is reencoded. The encoding descriptor must conform to the " { $link "encodings-protocol" } "." }
+$low-level-note ;
 
 { <encoder> <decoder> <encoder-duplex> } related-words
 
@@ -58,12 +61,14 @@ ARTICLE: "encodings-protocol" "Encoding protocol"
 HELP: decode-char
 { $values { "stream" "an underlying input stream" }
     { "encoding" "An encoding descriptor tuple" } { "char/f" "a code point or " { $link f } } }
-{ $description "Reads a single code point from the underlying stream, interpreting it by the encoding. This should not be used directly." } ;
+{ $contract "Reads a single code point from the underlying stream, interpreting it by the encoding." }
+$low-level-note ;
 
 HELP: encode-char
 { $values { "char" "a character" }
     { "stream" "an underlying output stream" }
     { "encoding" "an encoding descriptor" } }
-{ $description "Writes the code point in the encoding to the underlying stream given. This should not be used directly." } ;
+{ $contract "Writes the code point in the encoding to the underlying stream given." }
+$low-level-note ;
 
 { encode-char decode-char } related-words

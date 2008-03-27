@@ -264,12 +264,10 @@ DEFER: copy-tree-into
     prepend-path ;
 
 : temp-directory ( -- path )
-    "temp" resource-path
-    dup exists? not
-      [ dup make-directory ]
-    when ;
+    "temp" resource-path dup make-directories ;
 
-: temp-file ( name -- path ) temp-directory prepend-path ;
+: temp-file ( name -- path )
+    temp-directory prepend-path ;
 
 M: object normalize-pathname ( path -- path' )
     "resource:" ?head [

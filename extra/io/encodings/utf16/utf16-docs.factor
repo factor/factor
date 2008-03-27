@@ -11,15 +11,19 @@ ARTICLE: "io.encodings.utf16" "UTF-16"
 ABOUT: "io.encodings.utf16"
 
 HELP: utf16le
-{ $class-description "The encoding descriptor for UTF-16LE, that is, UTF-16 in little endian, without a byte order mark. Streams can be made which read or write wth this encoding." } ;
+{ $class-description "The encoding descriptor for UTF-16LE, that is, UTF-16 in little endian, without a byte order mark. Streams can be made which read or write wth this encoding." }
+{ $see-also "encodings-introduction" } ;
 
 HELP: utf16be
-{ $class-description "The encoding descriptor for UTF-16BE, that is, UTF-16 in big endian, without a byte order mark. Streams can be made which read or write wth this encoding." } ;
+{ $class-description "The encoding descriptor for UTF-16BE, that is, UTF-16 in big endian, without a byte order mark. Streams can be made which read or write wth this encoding." }
+{ $see-also "encodings-introduction" } ;
 
 HELP: utf16
-{ $class-description "The encoding descriptor for UTF-16, that is, UTF-16 with a byte order mark. This is the most useful for general input and output in UTF-16. Streams can be made which read or write wth this encoding." } ;
+{ $class-description "The encoding descriptor for UTF-16, that is, UTF-16 with a byte order mark. This is the most useful for general input and output in UTF-16. Streams can be made which read or write wth this encoding." }
+{ $see-also "encodings-introduction" } ;
 
 HELP: utf16n
-{ $class-description "The encoding descriptor for UTF-16 without a byte order mark in native endian order. This is useful mostly for FFI calls which take input of strings in of wide_t*." } ;
+{ $class-description "The encoding descriptor for UTF-16 without a byte order mark in native endian order. This is useful mostly for FFI calls which take input of strings in of wide_t*." }
+{ $see-also "encodings-introduction" } ;
 
 { utf16 utf16le utf16be utf16n } related-words
