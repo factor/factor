@@ -24,8 +24,13 @@ SYMBOL: packrat
 
 GENERIC: (compile) ( parser -- quot )
 
+: input-from ( input -- n )
+  #! Return the index from the original string that the
+  #! input slice is based on.
+  dup slice? [ slice-from ] [ drop 0 ] if ;
+
 :: run-packrat-parser ( input quot c -- result )
-  input slice? [ input slice-from ] [ 0 ] if
+  input input-from
   quot c [ drop H{ } clone ] cache 
   [
     drop input quot call  
