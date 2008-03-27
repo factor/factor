@@ -67,11 +67,17 @@ GENERIC: (compile) ( parser -- quot )
   [ compiled-parser ] with-compilation-unit ;
 
 : parse ( state parser -- result )
-  compile execute ;
+  compile execute ; inline
 
 : with-packrat ( quot -- result )
   #! Run the quotation with a packrat cache active.
-  [ H{ } clone packrat ] dip with-variable ;
+  [ H{ } clone packrat ] dip with-variable ; inline
+
+: packrat-parse ( state parser -- result )
+  [ parse ] with-packrat ;
+
+: packrat-call ( state quot -- result )
+  with-packrat ; inline
 
 <PRIVATE
 
