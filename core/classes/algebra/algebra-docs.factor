@@ -30,7 +30,7 @@ HELP: class-types
 { $description "Outputs a sequence of builtin type numbers whose instances can possibly be instances of the given class." } ;
 
 HELP: class<
-{ $values { "class1" "a class" } { "class2" "a class" } { "?" "a boolean" } }
+{ $values { "first" "a class" } { "second" "a class" } { "?" "a boolean" } }
 { $description "Tests if all instances of " { $snippet "class1" } " are also instances of " { $snippet "class2" } "." }
 { $notes "Classes are partially ordered. This means that if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class1" } ", then " { $snippet "class1 = class2" } ". Also, if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class3" } ", then " { $snippet "class1 <= class3" } "." } ;
 

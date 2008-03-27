@@ -36,7 +36,7 @@ PRIVATE>
     [ layout-size swap [ array-nth ] curry map ] keep
     layout-class add* ;
 
-: >tuple ( sequence -- tuple )
+: >tuple ( seq -- tuple )
     dup first tuple-layout <tuple> [
         >r 1 tail-slice dup length r>
         [ tuple-size min ] keep
