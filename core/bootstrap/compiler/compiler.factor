@@ -36,7 +36,7 @@ nl
 {
     roll -roll declare not
 
-    tuple-class-eq? array? hashtable? vector?
+    array? hashtable? vector?
     tuple? sbuf? node? tombstone?
 
     array-capacity array-nth set-array-nth

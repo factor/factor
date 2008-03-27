@@ -67,29 +67,7 @@ DEFER: if
     [ >r tuck 2slip r> while ]
     [ 2nip call ] if ; inline
 
-! Quotation building
-USE: tuples.private
-
-: curry ( obj quot -- curry )
-    \ curry 4 <tuple-boa> ;
-
-: 2curry ( obj1 obj2 quot -- curry )
-    curry curry ; inline
-
-: 3curry ( obj1 obj2 obj3 quot -- curry )
-    curry curry curry ; inline
-
-: with ( param obj quot -- obj curry )
-    swapd [ swapd call ] 2curry ; inline
-
-: compose ( quot1 quot2 -- curry )
-    \ compose 4 <tuple-boa> ;
-
-: 3compose ( quot1 quot2 quot3 -- curry )
-    compose compose ; inline
-
 ! Object protocol
-
 GENERIC: delegate ( obj -- delegate )
 
 M: object delegate drop f ;
@@ -118,7 +96,6 @@ M: object clone ;
 M: callstack clone (clone) ;
 
 ! Tuple construction
-
 GENERIC# get-slots 1 ( tuple slots -- ... )
 
 GENERIC# set-slots 1 ( ... tuple slots -- )
@@ -132,8 +109,22 @@ GENERIC: construct-boa ( ... class -- tuple )
 : construct-delegate ( delegate class -- tuple )
     >r { set-delegate } r> construct ; inline
 
-! Booleans
+! Quotation building
+USE: tuples.private
 
+: 2curry ( obj1 obj2 quot -- curry )
+    curry curry ; inline
+
+: 3curry ( obj1 obj2 obj3 quot -- curry )
+    curry curry curry ; inline
+
+: with ( param obj quot -- obj curry )
+    swapd [ swapd call ] 2curry ; inline
+
+: 3compose ( quot1 quot2 quot3 -- curry )
+    compose compose ; inline
+
+! Booleans
 : not ( obj -- ? ) f eq? ; inline
 
 : >boolean ( obj -- ? ) t f ? ; inline

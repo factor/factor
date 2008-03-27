@@ -479,19 +479,17 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 \ <tuple> [
-    tuple "n" get 2 + cells %allot
-    ! Store length
-    "n" operand 12 LI
+    tuple "layout" get layout-size 2 + cells %allot
+    ! Store layout
+    "layout" get 12 load-indirect
     12 11 cell STW
-    ! Store class
-    "class" operand 11 2 cells STW
     ! Zero out the rest of the tuple
     f v>operand 12 LI
-    "n" get 1- [ 12 11 rot 3 + cells STW ] each
+    "layout" get layout-size [ 12 11 rot 2 + cells STW ] each
     ! Store tagged ptr in reg
     "tuple" get tuple %store-tagged
 ] H{
-    { +input+ { { f "class" } { [ inline-array? ] "n" } } }
+    { +input+ { { [ tuple-layout? ] "layout" } } }
     { +scratch+ { { f "tuple" } } }
     { +output+ { "tuple" } }
 } define-intrinsic

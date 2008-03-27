@@ -8,12 +8,12 @@ IN: tools.vocabs
 
 : vocab-tests-file ( vocab -- path )
     dup "-tests.factor" vocab-dir+ vocab-append-path dup
-    [ dup resource-exists? [ drop f ] unless ] [ drop f ] if ;
+    [ dup exists? [ drop f ] unless ] [ drop f ] if ;
 
 : vocab-tests-dir ( vocab -- paths )
     dup vocab-dir "tests" append-path vocab-append-path dup [
-        dup resource-exists? [
-            dup ?resource-path directory keys
+        dup exists? [
+            dup directory keys
             [ ".factor" tail? ] subset
             [ append-path ] with map
         ] [ drop f ] if
@@ -34,7 +34,7 @@ IN: tools.vocabs
 
 : source-modified? ( path -- ? )
     dup source-files get at [
-        dup source-file-path ?resource-path
+        dup source-file-path
         dup exists? [
             utf8 file-lines lines-crc32
             swap source-file-checksum = not
@@ -42,7 +42,7 @@ IN: tools.vocabs
             2drop f
         ] if
     ] [
-        resource-exists?
+        exists?
     ] ?if ;
 
 : modified ( seq quot -- seq )
@@ -104,15 +104,14 @@ SYMBOL: sources-changed?
     "" refresh f sources-changed? set-global ;
 
 MEMO: (vocab-file-contents) ( path -- lines )
-    ?resource-path dup exists?
-    [ utf8 file-lines ] [ drop f ] if ;
+    dup exists? [ utf8 file-lines ] [ drop f ] if ;
 
 : vocab-file-contents ( vocab name -- seq )
     vocab-append-path dup [ (vocab-file-contents) ] when ;
 
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-append-path [
-        ?resource-path utf8 set-file-lines
+        utf8 set-file-lines
         \ (vocab-file-contents) reset-memoized
     ] [
         "The " swap vocab-name
@@ -171,7 +170,7 @@ M: vocab-link summary vocab-summary ;
     directory [ second ] subset keys natural-sort ;
 
 : (all-child-vocabs) ( root name -- vocabs )
-    [ vocab-dir append-path ?resource-path subdirs ] keep
+    [ vocab-dir append-path subdirs ] keep
     dup empty? [
         drop
     ] [

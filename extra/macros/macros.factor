@@ -17,7 +17,7 @@ IN: macros
 : MACRO:
     (:) define-macro ; parsing
 
-PREDICATE: word macro "macro" word-prop >boolean ;
+PREDICATE: macro < word "macro" word-prop >boolean ;
 
 M: macro definer drop \ MACRO: \ ; ;
 

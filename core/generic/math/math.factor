@@ -5,7 +5,7 @@ math namespaces sequences words quotations layouts combinators
 sequences.private classes classes.algebra definitions ;
 IN: generic.math
 
-PREDICATE: class math-class ( object -- ? )
+PREDICATE: math-class < class
     dup null bootstrap-word eq? [
         drop f
     ] [
@@ -79,7 +79,7 @@ M: math-combination perform-combination
         ] if nip
     ] math-vtable nip ;
 
-PREDICATE: generic math-generic ( word -- ? )
+PREDICATE: math-generic < generic ( word -- ? )
     "combination" word-prop math-combination? ;
 
 M: math-generic definer drop \ MATH: f ;

@@ -44,7 +44,7 @@ M: object funny drop 0 ;
 [ 2 ] [ [ { } ] funny ] unit-test
 [ 0 ] [ { } funny ] unit-test
 
-PREDICATE: funnies very-funny number? ;
+PREDICATE: very-funny < funnies number? ;
 
 GENERIC: gooey ( x -- y )
 M: very-funny gooey sq ;

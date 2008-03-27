@@ -39,7 +39,9 @@ TUPLE: file-responder root hook special ;
     [ 2drop <304> ] [ file-responder get hook>> call ] if ;
 
 : serving-path ( filename -- filename )
-    "" or file-responder get root>> prepend-path ;
+    file-responder get root>> right-trim-separators
+    "/"
+    rot "" or left-trim-separators 3append ;
 
 : serve-file ( filename -- response )
     dup mime-type

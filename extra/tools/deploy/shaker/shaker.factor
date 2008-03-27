@@ -81,7 +81,7 @@ IN: tools.deploy.shaker
     [
         "class" ,
         "metaclass" ,
-        "slot-names" ,
+        "layout" ,
         deploy-ui? get [
             "gestures" ,
             "commands" ,
@@ -154,7 +154,6 @@ IN: tools.deploy.shaker
                 layouts:tag-mask
                 layouts:tag-numbers
                 layouts:type-numbers
-                lexer-factory
                 lexer-factory
                 listener:listener-hook
                 root-cache

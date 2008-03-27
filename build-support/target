@@ -1,38 +1,38 @@
 #!/bin/sh
 
-if [ \( `uname -s ` = FreeBSD \) -a \( `uname -p` = i386 \) ]
-then
-  echo freebsd-x86-32
-elif [ \( `uname -s` = FreeBSD \) -a \( `uname -m` = amd64 \) ]
-then
-  echo freebsd-x86-64
-elif [ \( `uname -s` = OpenBSD \) -a \( `uname -m` = i386 \) ]
-then
-  echo openbsd-x86-32
-elif [ \( `uname -s` = OpenBSD \) -a \( `uname -m` = amd64 \) ]
-then
-  echo openbsd-x86-64
-elif [ \( `uname -s` = NetBSD \) -a \( `uname -p` = i386 \) ]
-then
-  echo netbsd-x86-32
-elif [ \( `uname -s` = NetBSD \) -a \( `uname -p` = x86_64 \) ]
-then
-  echo netbsd-x86-64
-elif [ \( `uname -s` = Darwin \) -a \( `uname -p` = powerpc \) ]
-then
-  echo macosx-ppc
-elif [ `uname -s` = Darwin ]
-then
-  echo macosx-x86-`./build-support/wordsize`
-elif [ \( `uname -s` = Linux \) -a \( `uname -m` = i686 \) ]
-then
-  echo linux-x86-32
-elif [ \( `uname -s` = Linux \) -a \( `uname -m` = x86_64 \) ]
-then
-  echo linux-x86-64
-elif [ \( `uname -o` = Cygwin \) -a \( `uname -m` = i686 \) ]
-then
-  echo winnt-x86-`./build-support/wordsize`
-else
-  echo help
+uname_s=`uname -s`
+case $uname_s in
+	CYGWIN_NT-5.2-WOW64) OS=winnt;;
+	*CYGWIN_NT*) OS=winnt;;
+	*CYGWIN*) OS=winnt;;
+	*darwin*) OS=macosx;;
+	*Darwin*) OS=macosx;;
+	*linux*) OS=linux;;
+	*Linux*) OS=linux;;
+	*NetBSD*) OS=netbsd;;
+	*FreeBSD*) OS=freebsd;;
+	*OpenBSD*) OS=openbsd;;
+	*DragonFly*) OS=dragonflybsd;;
+esac
+
+uname_m=`uname -m`
+case $uname_m in
+   i386) ARCH=x86;;
+   i686) ARCH=x86;;
+   amd64) ARCH=x86;;
+   *86) ARCH=x86;;
+   *86_64) ARCH=x86;;
+   "Power Macintosh") ARCH=ppc;;
+esac
+
+WORD=`./build-support/wordsize`
+
+MAKE_TARGET=$OS-$ARCH-$WORD
+if [[ $OS == macosx && $ARCH == ppc ]] ; then
+	MAKE_TARGET=$OS-$ARCH
 fi
+if [[ $OS == linux && $ARCH == ppc ]] ; then
+	MAKE_TARGET=$OS-$ARCH
+fi
+
+echo $MAKE_TARGET
