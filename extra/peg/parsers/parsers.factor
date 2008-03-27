@@ -7,7 +7,6 @@ USING: kernel sequences strings namespaces math assocs shuffle
 IN: peg.parsers
 
 TUPLE: just-parser p1 ;
-M: just-parser equal? 2drop f ;
 
 : just-pattern
   [
@@ -21,7 +20,7 @@ M: just-parser (compile) ( parser -- quot )
   just-parser-p1 compiled-parser just-pattern curry ;
 
 MEMO: just ( parser -- parser )
-  just-parser construct-boa ;
+  just-parser construct-boa init-parser ;
 
 : 1token ( ch -- parser ) 1string token ;
 
