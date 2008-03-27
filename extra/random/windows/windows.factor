@@ -1,5 +1,6 @@
 USING: accessors alien.c-types byte-arrays continuations
-kernel random windows windows.advapi32 init namespaces random ;
+kernel windows windows.advapi32 init namespaces
+random.backend ;
 IN: random.windows
 
 TUPLE: windows-crypto-context handle ;
@@ -26,6 +27,6 @@ M: windows-cryptographic-rng random-bytes* ( tuple n -- bytes )
     CryptAcquireContextW win32-error=0/f *void*
     <windows-crypto-context> ;
 
-[
-    windows-aes-context secure-random-generator set-global
-] "random.windows" add-init-hook
+! [
+    ! windows-aes-context secure-random-generator set-global
+! ] "random.windows" add-init-hook
