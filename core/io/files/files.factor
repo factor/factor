@@ -3,7 +3,7 @@
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
 system combinators splitting sbufs continuations io.encodings
-io.encodings.binary init unicode.categories ;
+io.encodings.binary init ;
 IN: io.files
 
 HOOK: (file-reader) io-backend ( path -- stream )
@@ -101,7 +101,7 @@ PRIVATE>
 : windows-absolute-path? ( path -- path ? )
     {
         { [ dup length 2 < ] [ f ] }
-        { [ dup first2 >r Letter? r> CHAR: : = and ] [ t ] }
+        { [ dup second CHAR: : = ] [ t ] }
         { [ t ] [ f ] }
     } cond ;
 
