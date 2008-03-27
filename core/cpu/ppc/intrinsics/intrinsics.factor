@@ -481,7 +481,7 @@ IN: cpu.ppc.intrinsics
 \ <tuple> [
     tuple "layout" get layout-size 2 + cells %allot
     ! Store layout
-    "layout" operand 12 LOAD32
+    "layout" get 12 load-indirect
     12 11 cell STW
     ! Zero out the rest of the tuple
     f v>operand 12 LI

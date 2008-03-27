@@ -173,7 +173,11 @@ M: object cwd ( -- path ) "." ;
 [ cwd current-directory set-global ] "io.files" add-init-hook
 
 : with-directory ( path quot -- )
+    >r normalize-pathname r>
     current-directory swap with-variable ; inline
+
+: set-current-directory ( path -- )
+    normalize-pathname current-directory set ;
 
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )
