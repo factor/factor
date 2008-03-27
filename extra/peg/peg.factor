@@ -34,16 +34,59 @@ GENERIC: (compile) ( parser -- quot )
   #! that maps the input string position to the parser result.
   packrat get [ drop H{ } clone ] cache ;
 
+TUPLE: left-recursion detected? ;
+C: <left-recursion> left-recursion
+
+USE: prettyprint
+
+:: handle-left-recursive-result ( result -- result )
+  #! If the result is from a left-recursive call,
+  #! note this and fail, otherwise return normal result
+  #! See figure 4 of packrat_TR-2007-002.pdf.
+  result [
+    [let* | ast [ result ast>> ] |
+      ast left-recursion? [ t ast (>>detected?) f ] [ result ] if
+    ]
+  ] [ 
+    f
+  ] if ;
+         
+USE: io
+
+:: grow-lr ( input quot m -- result )
+  #! 'Grow the Seed' algorithm to handle left recursion
+  [let* | ans [ input quot call ] |
+    [ ans not ] [ ans [ ans remaining>> input-from m remaining>> input-from <= ] [ f ] if ] 2array || [ 
+      "recursion exiting with = " write ans . "m was " write m . 
+      ans        
+    ] [
+      "recursion with = " write ans . 
+      input quot ans grow-lr
+    ] if
+  ] ;
+
 :: cached-result ( input-cache input quot -- result )
   #! Get the cached result for input position 
   #! from the input cache. If the item is not in the cache,
   #! call 'quot' with 'input' on the stack to get the result
   #! and store that in the cache and return it.
+  #! See figure 4 of packrat_TR-2007-002.pdf.
+  "cached-result " write input . "quot is " write quot . 
   input input-from input-cache [ 
     drop
-    f input input-from input-cache set-at
-    input quot call 
-  ] cache ; inline
+    [let* | lr  [ f <left-recursion> ] 
+            m   [ input lr <parse-result> ]
+            ans [ m input input-from input-cache set-at input quot call ]
+          |
+      lr detected?>> ans and [
+        input quot ans grow-lr
+      ] [
+        ans
+      ] if
+    ]
+  ] cache 
+  "found in cache: " write dup . "for quot " write quot .  
+  handle-left-recursive-result "after handle " write dup . ;
 
 :: run-packrat-parser ( input quot id -- result )
   id input-cache 
