@@ -141,10 +141,12 @@ void unix_constants()
 	constant(EINTR);
 	constant(EAGAIN);
 	constant(EINPROGRESS);
-    constant(PROT_READ);
+    	constant(PROT_READ);
 	constant(PROT_WRITE);
 	constant(MAP_FILE);
 	constant(MAP_SHARED);
+	grovel(pid_t);
+
 }
 	
 int main() {
@@ -158,6 +160,10 @@ int main() {
 	openbsd_stat();
 	openbsd_types();
 #endif
+	grovel(blkcnt_t);
+        grovel(blksize_t);
+        //grovel(fflags_t);
+        grovel(ssize_t);
 
 #ifdef UNIX
 	unix_types();
