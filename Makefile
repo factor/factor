@@ -46,7 +46,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 EXE_OBJS = $(PLAF_EXE_OBJS)
 
 default:
-	$(MAKE) `./misc/factor.sh make-target`
+	$(MAKE) `./build-support/factor.sh make-target`
 
 help:
 	@echo "Run '$(MAKE)' with one of the following parameters:"
