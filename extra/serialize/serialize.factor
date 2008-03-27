@@ -269,7 +269,7 @@ SYMBOL: deserialized
     [ ] tri ;
 
 : copy-seq-to-tuple ( seq tuple -- )
-    >r dup length [ 1+ ] map r> [ set-array-nth ] curry 2each ;
+    >r dup length r> [ set-array-nth ] curry 2each ;
 
 : deserialize-tuple ( -- array )
     #! Ugly because we have to intern the tuple before reading
