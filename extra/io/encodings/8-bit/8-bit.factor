@@ -3,7 +3,7 @@
 USING: math.parser arrays io.encodings sequences kernel
 assocs hashtables io.encodings.ascii combinators.cleave
 generic parser tuples words io io.files splitting namespaces
-classes quotations math compiler.units accessors ;
+math compiler.units accessors ;
 IN: io.encodings.8-bit
 
 <PRIVATE
@@ -38,9 +38,9 @@ IN: io.encodings.8-bit
     2dup swap length <= [ tail ] [ drop ] if ;
 
 : process-contents ( lines -- assoc )
-    [ "#" split first ] map
+    [ "#" split1 drop ] map
     [ empty? not ] subset
-    [ "\t " split 2 head [ 2 tail-if hex> ] map ] map ;
+    [ "\t" split 2 head [ 2 tail-if hex> ] map ] map ;
 
 : byte>ch ( assoc -- array )
     256 replacement-char <array>
@@ -77,4 +77,8 @@ M: 8-bit decode-char
 
 PRIVATE>
 
-[ mappings [ full-path define-8-bit-encoding ] assoc-each ] with-compilation-unit
+[
+    "io.encodings.8-bit" in [
+        mappings [ full-path define-8-bit-encoding ] assoc-each
+    ] with-variable
+] with-compilation-unit
