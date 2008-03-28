@@ -20,13 +20,18 @@ SYMBOL: packrat
 SYMBOL: pos
 SYMBOL: input
 SYMBOL: fail
+SYMBOL: lrstack
+SYMBOL: heads
 
 TUPLE: memo-entry ans pos ;
 C: <memo-entry> memo-entry
 
-TUPLE: left-recursion detected? ;
+TUPLE: left-recursion seed rule head next ;
 C: <left-recursion> left-recursion
  
+TUPLE: peg-head rule involved-set eval-set ;
+C: <head> peg-head
+
 : rule-parser ( rule -- parser ) 
   #! A rule is the parser compiled down to a word. It has
   #! a "peg" property containing the original parser.
@@ -72,6 +77,7 @@ C: <left-recursion> left-recursion
 
 :: (grow-lr) ( r p m h -- )
   p pos set
+  h involved-set>> clone h (>>eval-set)
   r eval-rule
   dup fail = pos get m pos>> <= or [
     drop
@@ -82,39 +88,97 @@ C: <left-recursion> left-recursion
   ] if ;
  
 :: grow-lr ( r p m h -- ast )
-  #! Placeholder for full left recursion implementation
-  r p m h (grow-lr) m pos>> pos set m ans>>
+  h p heads get set-at
+  r p m h (grow-lr) 
+  p heads get delete-at
+  m pos>> pos set m ans>>
   ;
+
+:: (setup-lr) ( r l s -- )
+  s head>> l head>> eq? [
+    l head>> s (>>head)
+    l head>> [ s rule>> add ] change-involved-set drop
+    r l s next>> (setup-lr)
+  ] unless ;
+
+:: setup-lr ( r l -- )
+  l head>> [
+    r V{ } clone V{ } clone <head> l (>>head)
+  ] unless
+  r l lrstack get (setup-lr) ;
+
+:: lr-answer ( r p m -- ast )
+  [let* |
+          h [ m ans>> head>> ]
+        |
+    h rule>> r eq? [
+      m ans>> seed>> m (>>ans)
+      m ans>> fail = [
+        fail
+      ] [
+        r p m h grow-lr
+      ] if
+    ] [
+      m ans>> seed>>
+    ] if
+  ] ;
+
+:: recall ( r p -- memo-entry )
+  [let* |
+          m [ p r memo ]
+          h [ p heads get at ]
+        |
+    h [
+      m r h involved-set>> h rule>> add member? not and [
+        fail p <memo-entry>
+      ] [
+        r h eval-set>> member? [
+          h [ r swap remove ] change-eval-set drop
+          r eval-rule
+          m (>>ans)
+          pos get m (>>pos)
+          m
+        ] [ 
+          m
+        ] if
+      ] if
+    ] [
+      m
+    ] if
+  ] ;
 
 :: apply-non-memo-rule ( r p -- ast )
   [let* |
-          lr  [ f <left-recursion> ]
-          m   [ lr p <memo-entry> dup p r set-memo ]
+          lr  [ fail r f lrstack get <left-recursion> ]
+          m   [ lr lrstack set lr p <memo-entry> dup p r set-memo ]
           ans [ r eval-rule ]
         |
-    ans m (>>ans)
+    lrstack get next>> lrstack set
     pos get m (>>pos)
-    lr detected?>> ans fail = not and [
-      r p m f grow-lr
+    lr head>> [
+      ans lr (>>seed)
+      r p m lr-answer
     ] [
+      ans m (>>ans)
       ans
-    ] if 
+    ] if
   ] ;
 
-: apply-memo-rule ( m -- ast )
-  [ ans>> ] [ pos>> ] bi 
-  pos set 
-  dup left-recursion? [
-    t swap (>>detected?)
-    fail  
-  ] when ;
+:: apply-memo-rule ( r m -- ast )
+  m pos>> pos set 
+  m ans>> left-recursion? [ 
+    r m ans>> setup-lr
+    m ans>> seed>>
+  ] [
+    m ans>>
+  ] if ;
 
 :: apply-rule ( r p -- ast )
   [let* |
-          m [ p r memo ]
+          m [ r p recall ]
         | 
     m [
-      m apply-memo-rule
+      r m apply-memo-rule
     ] [
       r p apply-non-memo-rule
     ] if 
@@ -125,6 +189,8 @@ C: <left-recursion> left-recursion
   swap [ 
     input set
     0 pos set
+    f lrstack set
+    H{ } clone heads set
     H{ } clone packrat set
   ] H{ } make-assoc swap bind ;
 
