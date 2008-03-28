@@ -73,10 +73,14 @@ GENERIC: (compile) ( parser -- quot )
   #! Look to see if the given parser has been compiled.
   #! If not, compile it to a temporary word, cache it,
   #! and return it. Otherwise return the existing one.
-  compiled-parsers [
-    dup parser-body define-temp 
-    tuck swap "peg" set-word-prop
-  ] cache ;
+  #! Circular parsers are supported by getting the word
+  #! name and storing it in the cache, before compiling, 
+  #! so it is picked up when re-entered.
+  dup id>> compiled-parsers [
+    drop dup gensym swap 2dup id>> compiled-parsers set-at
+    2dup parser-body define 
+    dupd "peg" set-word-prop
+  ] cache nip ;
 
 : compile ( parser -- word )
   [ compiled-parser ] with-compilation-unit ;

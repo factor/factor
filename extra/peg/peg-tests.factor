@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test strings namespaces arrays sequences peg peg.private ;
+USING: kernel tools.test strings namespaces arrays sequences peg peg.private accessors words ;
 IN: peg.tests
 
 { f } [
@@ -196,3 +196,9 @@ IN: peg.tests
   "1+1" expr [ parse ] with-packrat parse-result-ast   
 ] unit-test
 
+{ t } [
+  #! Ensure a circular parser doesn't loop infinitely
+  [ f , "a" token , ] seq*
+  dup parsers>>
+  dupd 0 swap set-nth compile word?
+] unit-test
