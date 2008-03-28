@@ -23,12 +23,12 @@ TUPLE: CreateProcess-args
 
 : default-CreateProcess-args ( -- obj )
     CreateProcess-args construct-empty
-    0 >>dwCreateFlags
     "STARTUPINFO" <c-object>
     "STARTUPINFO" heap-size over set-STARTUPINFO-cb >>lpStartupInfo
     "PROCESS_INFORMATION" <c-object> >>lpProcessInformation
     TRUE >>bInheritHandles
-    current-directory get >>lpCurrentDirectory ;
+    0 >>dwCreateFlags
+    current-directory get normalize-pathname >>lpCurrentDirectory ;
 
 : call-CreateProcess ( CreateProcess-args -- )
     {
