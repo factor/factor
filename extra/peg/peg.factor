@@ -24,6 +24,9 @@ SYMBOL: fail
 TUPLE: memo-entry ans pos ;
 C: <memo-entry> memo-entry
 
+TUPLE: left-recursion detected? ;
+C: <left-recursion> left-recursion
+ 
 : rule-parser ( rule -- parser ) 
   #! A rule is the parser compiled down to a word. It has
   #! a "peg" property containing the original parser.
@@ -48,7 +51,9 @@ C: <memo-entry> memo-entry
   #! Return fail if the rule failed. The rule has
   #! stack effect ( input -- parse-result )
   pos get swap 
-  execute [
+  execute 
+!  drop f f <parse-result>
+  [
     nip
     [ ast>> ] [ remaining>> ] bi
     input-from pos set    
@@ -65,18 +70,44 @@ C: <memo-entry> memo-entry
   #! Store an entry in the cache
   rule-parser input-cache set-at ;
 
+:: (grow-lr) ( r p m h -- )
+  p pos set
+  r eval-rule
+  dup fail = pos get m pos>> <= or [
+    drop
+  ] [
+    m (>>ans)
+    pos get m (>>pos)
+    r p m h (grow-lr)
+  ] if ;
+ 
+:: grow-lr ( r p m h -- ast )
+  #! Placeholder for full left recursion implementation
+  r p m h (grow-lr) m pos>> pos set m ans>>
+  ;
+
 :: apply-non-memo-rule ( r p -- ast )
   [let* |
-          m   [ fail p <memo-entry> dup p r set-memo ]
+          lr  [ f <left-recursion> ]
+          m   [ lr p <memo-entry> dup p r set-memo ]
           ans [ r eval-rule ]
         |
     ans m (>>ans)
     pos get m (>>pos)
-    ans 
+    lr detected?>> ans fail = not and [
+      r p m f grow-lr
+    ] [
+      ans
+    ] if 
   ] ;
 
 : apply-memo-rule ( m -- ast )
-  [ ans>> ] [ pos>> ] bi pos set ;
+  [ ans>> ] [ pos>> ] bi 
+  pos set 
+  dup left-recursion? [
+    t swap (>>detected?)
+    fail  
+  ] when ;
 
 :: apply-rule ( r p -- ast )
   [let* |
