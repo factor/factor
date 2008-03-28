@@ -143,3 +143,31 @@ IN: peg.ebnf.tests
 { f } [
   "Z" [EBNF foo=[^A-Z] EBNF] call  
 ] unit-test
+
+[ 
+  #! Test direct left recursion. Currently left recursion should cause a
+  #! failure of that parser.
+  #! Not using packrat, so recursion causes data stack overflow  
+  "1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF] call
+] must-fail
+
+{ V{ 49 } } [ 
+  #! Test direct left recursion. Currently left recursion should cause a
+  #! failure of that parser.
+  #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
+  "1+1" [ [EBNF num=([0-9])+ expr=expr "+" num | num EBNF] call ] with-packrat parse-result-ast
+] unit-test
+
+[ 
+  #! Test indirect left recursion. Currently left recursion should cause a
+  #! failure of that parser.
+  #! Not using packrat, so recursion causes data stack overflow  
+  "1+1" [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF] call
+] must-fail
+
+{ V{ 49 } } [ 
+  #! Test indirect left recursion. Currently left recursion should cause a
+  #! failure of that parser.
+  #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
+  "1+1" [ [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF] call ] with-packrat parse-result-ast
+] unit-test

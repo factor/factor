@@ -12,7 +12,7 @@ HELP: parse
 { $description 
     "Given the input string, parse it using the given parser. The result is a <parse-result> object if "
     "the parse was successful, otherwise it is f." } 
-{ $see-also compile with-packrat } ;
+{ $see-also compile with-packrat packrat-parse } ;
 
 HELP: with-packrat
 { $values 
@@ -23,8 +23,30 @@ HELP: with-packrat
     "Calls the quotation with a packrat cache in scope. Usually the quotation will "
     "call " { $link parse } " or call a word produced by " { $link compile } "."
     "The cache is used to avoid the possible exponential time performace that pegs "
-    "can have, instead giving linear time at the cost of increased memory usage."  } 
-{ $see-also compile parse } ;
+    "can have, instead giving linear time at the cost of increased memory usage. "
+    "Use of this packrat option also allows direct and indirect recursion to "
+    "be handled in the parser without entering an infinite loop."  } 
+{ $see-also compile parse packrat-parse packrat-call } ;
+
+HELP: packrat-parse
+{ $values 
+  { "input" "a string" } 
+  { "parser" "a parser" } 
+  { "result" "a parse-result or f" } 
+}
+{ $description 
+    "Compiles and calls the parser with a packrat cache in scope."  } 
+{ $see-also compile parse packrat-call with-packrat } ;
+
+HELP: packrat-call
+{ $values 
+  { "input" "a string" } 
+  { "quot" "a quotation with stack effect ( input -- result )" } 
+  { "result" "a parse-result or f" } 
+}
+{ $description 
+    "Calls the compiled parser with a packrat cache in scope."  } 
+{ $see-also compile packrat-call packrat-parse with-packrat } ;
 
 HELP: compile
 { $values 
@@ -36,7 +58,7 @@ HELP: compile
     "The mapping from parser to compiled word is kept in a cache. If you later change "
     "the definition of a parser you'll need to clear this cache with " 
     { $link reset-compiled-parsers } " before using " { $link compile } " on that parser again." } 
-{ $see-also compile with-packrat reset-compiled-parsers } ;
+{ $see-also compile with-packrat reset-compiled-parsers packrat-call packrat-parse } ;
 
 HELP: reset-compiled-parsers
 { $description 

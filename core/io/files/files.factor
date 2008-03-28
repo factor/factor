@@ -45,6 +45,8 @@ HOOK: (file-appender) io-backend ( path -- stream )
 ! Pathnames
 : path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
 
+: path-separator ( -- string ) windows? "\\" "/" ? ;
+
 : right-trim-separators ( str -- newstr )
     [ path-separator? ] right-trim ;
 
@@ -170,7 +172,7 @@ SYMBOL: current-directory
 
 M: object cwd ( -- path ) "." ;
 
-[ cwd current-directory set-global ] "current-directory" add-init-hook
+[ cwd current-directory set-global ] "io.files" add-init-hook
 
 : with-directory ( path quot -- )
     >r normalize-pathname r>
