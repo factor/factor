@@ -144,17 +144,21 @@ IN: peg.ebnf.tests
   "Z" [EBNF foo=[^A-Z] EBNF] call  
 ] unit-test
 
-{ V{ 49 } } [ 
-  #! Test direct left recursion. Currently left recursion should cause a
-  #! failure of that parser.
+{ V{ V{ 49 } "+" V{ 49 } } } [ 
+  #! Test direct left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
   "1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF] call parse-result-ast
 ] unit-test
 
-{ V{ 49 } } [ 
-  #! Test indirect left recursion. Currently left recursion should cause a
-  #! failure of that parser.
+{ V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [ 
+  #! Test direct left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
-  "1+1" [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF] call parse-result-ast
+  "1+1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF] call parse-result-ast
+] unit-test
+
+{ V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [ 
+  #! Test indirect left recursion. 
+  #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
+  "1+1+1" [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF] call parse-result-ast
 ] unit-test
 
