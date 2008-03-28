@@ -38,23 +38,26 @@ TUPLE: left-recursion detected? ;
 C: <left-recursion> left-recursion
 
 USE: prettyprint
+USE: io
+
 
 :: handle-left-recursive-result ( result -- result )
   #! If the result is from a left-recursive call,
   #! note this and fail, otherwise return normal result
   #! See figure 4 of packrat_TR-2007-002.pdf.
+  ">>handle-left-recursive-result " write result . 
   result [
     [let* | ast [ result ast>> ] |
       ast left-recursion? [ t ast (>>detected?) f ] [ result ] if
     ]
   ] [ 
     f
-  ] if ;
+  ] if 
+  "<<handle-left-recursive-result " write dup . ;
          
-USE: io
-
-:: grow-lr ( input quot m -- result )
+:: grow-lr ( input quot parser m -- result )
   #! 'Grow the Seed' algorithm to handle left recursion
+  ">>grow-lr " write input . " for parser " write parser . " m is " write m . 
   [let* | ans [ input quot call ] |
     [ ans not ] [ ans [ ans remaining>> input-from m remaining>> input-from <= ] [ f ] if ] 2array || [ 
       "recursion exiting with = " write ans . "m was " write m . 
@@ -63,34 +66,38 @@ USE: io
       "recursion with = " write ans . 
       input quot ans grow-lr
     ] if
-  ] ;
+  ] 
+  "<<grow-lr " write input . " for parser " write parser . " m is " write m . " result is " write dup .  
+  ;
 
-:: cached-result ( input-cache input quot -- result )
+:: cached-result ( input-cache input quot parser -- result )
   #! Get the cached result for input position 
   #! from the input cache. If the item is not in the cache,
   #! call 'quot' with 'input' on the stack to get the result
   #! and store that in the cache and return it.
   #! See figure 4 of packrat_TR-2007-002.pdf.
-  "cached-result " write input . "quot is " write quot . 
+  ">>cached-result " write input . "  for parser " write parser .
   input input-from input-cache [ 
     drop
     [let* | lr  [ f <left-recursion> ] 
             m   [ input lr <parse-result> ]
             ans [ m input input-from input-cache set-at input quot call ]
           |
+      "--lr is " write lr . " ans is " write ans . " for parser " write parser .
+      ans input input-from input-cache set-at
       lr detected?>> ans and [
-        input quot ans grow-lr
+        input quot parser ans grow-lr
       ] [
         ans
       ] if
     ]
   ] cache 
-  "found in cache: " write dup . "for quot " write quot .  
-  handle-left-recursive-result "after handle " write dup . ;
+  dup [ handle-left-recursive-result ] when  
+  "<<cached-result " write dup . " for parser " write parser . ;
 
-:: run-packrat-parser ( input quot id -- result )
-  id input-cache 
-  input quot cached-result ; inline
+:: run-packrat-parser ( input quot parser -- result )
+  parser id>> input-cache 
+  input quot parser cached-result ; inline
 
 : run-parser ( input quot -- result )
   #! If a packrat cache is available, use memoization for
@@ -101,11 +108,10 @@ USE: io
   #! Return the body of the word that is the compiled version
   #! of the parser.
   [let* | parser-quot [ parser (compile) ] 
-          id          [ parser id>>      ]
         |
     [
       packrat get [ 
-        parser-quot id run-packrat-parser
+        parser-quot parser run-packrat-parser
       ] [
         parser-quot call
       ] if
