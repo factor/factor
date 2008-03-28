@@ -173,8 +173,8 @@ IN: peg.tests
   #! failure of that parser.
   [ expr ] delay "+" token "1" token 3seq "1" token 2choice ;
 
-{ "1" } [
-  "1+1" expr parse parse-result-ast   
+{ V{ V{ "1" "+" "1" } "+" "1" } } [
+  "1+1+1" expr parse parse-result-ast   
 ] unit-test
 
 { t } [
