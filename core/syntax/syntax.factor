@@ -171,7 +171,7 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "FORGET:" [
-        parse-unit forget
+        scan-object forget
     ] define-syntax
 
     "(" [

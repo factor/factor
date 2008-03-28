@@ -16,4 +16,4 @@ IN: help.syntax
     over add-article >link r> remember-definition ; parsing
 
 : ABOUT:
-    parse-unit in get vocab set-vocab-help ; parsing
+    scan-object in get vocab set-vocab-help ; parsing

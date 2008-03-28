@@ -12,7 +12,7 @@ IN: tuple-syntax
 
 : parse-slots ( accum tuple -- accum tuple )
     dup parse-slot-writer
-    [ parse-unit pick rot set-slot parse-slots ] when* ;
+    [ scan-object pick rot set-slot parse-slots ] when* ;
 
 : TUPLE{
     scan-word construct-empty parse-slots parsed ; parsing
