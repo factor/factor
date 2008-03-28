@@ -206,7 +206,7 @@ MEMO: all-vocabs-seq ( -- seq )
         { [ "editors." ?head ] [ t ] }
         { [ ".windows" ?tail ] [ t ] }
         { [ ".unix" ?tail ] [ t ] }
-        { [ "unix." ?head ] [ t ] }
+        { [ "unix" ?head ] [ t ] }
         { [ ".linux" ?tail ] [ t ] }
         { [ ".bsd" ?tail ] [ t ] }
         { [ ".macosx" ?tail ] [ t ] }
