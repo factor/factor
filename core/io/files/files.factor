@@ -276,7 +276,7 @@ DEFER: copy-tree-into
     prepend-path ;
 
 : temp-directory ( -- path )
-    "temp" resource-path dup make-directories ;
+    "resource:temp" dup make-directories ;
 
 : temp-file ( name -- path )
     temp-directory prepend-path ;
