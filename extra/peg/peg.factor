@@ -67,10 +67,12 @@ C: <memo-entry> memo-entry
 
 :: apply-non-memo-rule ( r p -- ast )
   [let* |
+          m   [ fail p <memo-entry> dup p r set-memo ]
           ans [ r eval-rule ]
-          m   [ ans pos get <memo-entry> ]
         |
-    m p r set-memo ans 
+    ans m (>>ans)
+    pos get m (>>pos)
+    ans 
   ] ;
 
 : apply-memo-rule ( m -- ast )
