@@ -15,6 +15,19 @@ SYMBOL: ignore
   parse-result construct-boa ;
 
 SYMBOL: packrat
+SYMBOL: lrstack
+
+TUPLE: phead rule involved-set eval-set ;
+C: <head> phead 
+
+: input-from ( input -- n )
+  #! Return the index from the original string that the
+  #! input slice is based on.
+  dup slice? [ slice-from ] [ drop 0 ] if ;
+
+: heads ( input -- h )
+  input-from \ heads get at ;
+
 
 : compiled-parsers ( -- cache )
   \ compiled-parsers get-global [ H{ } clone dup \ compiled-parsers set-global ] unless* ;
@@ -24,17 +37,12 @@ SYMBOL: packrat
 
 GENERIC: (compile) ( parser -- quot )
 
-: input-from ( input -- n )
-  #! Return the index from the original string that the
-  #! input slice is based on.
-  dup slice? [ slice-from ] [ drop 0 ] if ;
-
 : input-cache ( id -- cache )
   #! From the packrat cache, obtain the cache for the parser quotation 
   #! that maps the input string position to the parser result.
   packrat get [ drop H{ } clone ] cache ;
 
-TUPLE: left-recursion detected? ;
+TUPLE: left-recursion seed rule head next ;
 C: <left-recursion> left-recursion
 
 USE: prettyprint
@@ -54,21 +62,137 @@ USE: io
     f
   ] if 
   "<<handle-left-recursive-result " write dup . ;
-         
-:: grow-lr ( input quot parser m -- result )
+   
+:: (grow-lr) ( input quot parser m h -- result )
   #! 'Grow the Seed' algorithm to handle left recursion
-  ">>grow-lr " write input . " for parser " write parser . " m is " write m . 
-  [let* | ans [ input quot call ] |
-    [ ans not ] [ ans [ ans remaining>> input-from m remaining>> input-from <= ] [ f ] if ] 2array || [ 
+  ">>(grow-lr) " write input . " for parser " write parser . " m is " write m . 
+  [let* |
+          pos [ input ]  
+          ans [ h involved-set>> clone h (>>eval-set) input quot call ] 
+        |
+    [ ans not ] [ ans [ pos input-from m remaining>> input-from <= ] [ f ] if ] 2array || [ 
       "recursion exiting with = " write ans . "m was " write m . 
-      ans        
+      m        
     ] [
       "recursion with = " write ans . 
-      input quot ans grow-lr
+      pos quot parser pos ans ast>> <parse-result> h (grow-lr)
     ] if
   ] 
-  "<<grow-lr " write input . " for parser " write parser . " m is " write m . " result is " write dup .  
+  "<<(grow-lr) " write input . " for parser " write parser . " m is " write m . " result is " write dup .  
   ;
+
+:: grow-lr ( input quot parser m h -- result )
+  h input input-from \ heads get set-at
+  input quot parser m h (grow-lr) 
+  f input input-from \ heads get set-at ;
+
+SYMBOL: not-found
+
+: memo ( parser input -- result )
+  input-from swap id>> input-cache at* [ drop not-found ] unless ;
+
+
+:: involved? ( parser h -- ? )
+  h rule>> parser = [
+    t
+  ] [
+    parser h involved-set>> member?
+  ] if ;
+
+:: recall ( input quot parser -- result )
+  [let* |
+          m [ parser input memo ]
+          h [ input heads ]
+        |
+    #! If not growing a seed pass, just return what is stored
+    #! in the memo table.
+    h [
+      m not-found = parser h involved? not and [
+        f
+      ] [
+        parser h eval-set>> member? [
+          parser h eval-set>> remove h (>>eval-set)
+          input quot call          
+        ] [
+          m
+        ] if
+      ] if
+    ] [
+      m
+    ] if
+  ] ;
+
+:: (setup-lr) ( parser l s -- )
+  s head>> l head>> = [
+    l head>> s (>>head)
+    l head>> [ s rule>> add ] change-involved-set drop
+    parser l s next>> (setup-lr)
+  ] unless ;
+
+:: setup-lr ( parser l -- )
+  [let* |
+          s [ lrstack get ] 
+        |
+    l head>> [ parser V{ } clone V{ } clone <head> l (>>head) ] unless
+    parser l s (setup-lr)
+  ] ;
+
+:: lr-answer ( quot parser input m -- result )
+  [let* |
+          h [ m ast>> head>> ]
+        |
+    h rule>> parser = [
+      "changing memo ast to seed " write 
+      m [ seed>> ast>> dup . ] change-ast drop
+      m input input-from parser id>> input-cache set-at
+      m ast>> not [
+        f
+      ] [
+        input quot parser m h grow-lr
+      ] if      
+    ] [
+      m ast>> seed>>
+    ] if
+  ] ;  
+
+:: (apply-rule) ( quot parser input -- result )
+  [let* |
+          lr  [ f parser f lrstack get <left-recursion> ]
+          m   [ lr lrstack set input lr <parse-result> ]
+          ans [ m input input-from parser id>> input-cache set-at input quot call ]
+        |
+    lrstack get next>> lrstack set
+    lr head>> [
+"setting seed to ans " write ans . 
+      ans lr (>>seed)
+      quot parser input m lr-answer      
+    ] [ 
+      ans 
+    ] if
+  ] ;
+
+:: apply-rule ( quot parser input -- result )
+  [let* |
+          m [ input quot parser recall ]
+        |
+    m not-found = [
+      quot parser input (apply-rule)       
+      dup input input-from parser id>> input-cache set-at      
+    ] [
+      m [
+        m ast>> left-recursion? [
+          "Found left recursion..." print
+          parser m ast>> setup-lr m remaining>> m ast>> seed>> <parse-result>
+          dup input input-from parser id>> input-cache set-at
+        ] [
+          m 
+          dup input input-from parser id>> input-cache set-at
+        ] if
+      ] [
+        f f input input-from parser id>> input-cache set-at
+      ] if
+    ] if
+  ] ;
 
 :: cached-result ( input-cache input quot parser -- result )
   #! Get the cached result for input position 
@@ -96,13 +220,7 @@ USE: io
   "<<cached-result " write dup . " for parser " write parser . ;
 
 :: run-packrat-parser ( input quot parser -- result )
-  parser id>> input-cache 
-  input quot parser cached-result ; inline
-
-: run-parser ( input quot -- result )
-  #! If a packrat cache is available, use memoization for
-  #! packrat parsing, otherwise do a standard peg call.
-  packrat get [ run-packrat-parser ] [ call ] if* ; inline
+  quot parser input apply-rule ;
 
 :: parser-body ( parser -- quot )
   #! Return the body of the word that is the compiled version
@@ -139,7 +257,7 @@ USE: io
 
 : with-packrat ( quot -- result )
   #! Run the quotation with a packrat cache active.
-  [ H{ } clone packrat ] dip with-variable ; inline
+  H{ } clone \ heads [ [ H{ } clone packrat ] dip with-variable ] with-variable ; inline
 
 : packrat-parse ( state parser -- result )
   [ parse ] with-packrat ;
