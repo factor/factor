@@ -16,6 +16,4 @@ IN: help.syntax
     over add-article >link r> remember-definition ; parsing
 
 : ABOUT:
-    scan-word dup parsing? [
-        V{ } clone swap execute first
-    ] when in get vocab set-vocab-help ; parsing
+    parse-unit in get vocab set-vocab-help ; parsing
