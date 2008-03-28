@@ -266,7 +266,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   ] [ ] make delay sp ;
 
 : transform-ebnf ( string -- object )
-  'ebnf' packrat-parse parse-result-ast transform ;
+  'ebnf' parse parse-result-ast transform ;
 
 : check-parse-result ( result -- result )
   dup [
@@ -281,8 +281,8 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   ] if ;
 
 : ebnf>quot ( string -- hashtable quot )
-  'ebnf' packrat-parse check-parse-result 
-  parse-result-ast transform dup main swap at compile 1quotation ;
+  'ebnf' parse check-parse-result 
+  parse-result-ast transform dup main swap at compile [ parse ] curry ;
 
 : [EBNF "EBNF]" parse-multiline-string ebnf>quot nip parsed ; parsing
 
