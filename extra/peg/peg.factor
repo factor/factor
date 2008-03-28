@@ -7,6 +7,8 @@ USING: kernel sequences strings namespaces math assocs shuffle
        combinators.cleave locals ;
 IN: peg
 
+USE: prettyprint
+
 TUPLE: parse-result remaining ast ;
 
 SYMBOL: ignore 
@@ -15,18 +17,83 @@ SYMBOL: ignore
   parse-result construct-boa ;
 
 SYMBOL: packrat
-SYMBOL: lrstack
+SYMBOL: pos
+SYMBOL: input
+SYMBOL: fail
 
-TUPLE: phead rule involved-set eval-set ;
-C: <head> phead 
+TUPLE: memo-entry ans pos ;
+C: <memo-entry> memo-entry
+
+: rule-parser ( rule -- parser ) 
+  #! A rule is the parser compiled down to a word. It has
+  #! a "peg" property containing the original parser.
+  "peg" word-prop ;
+
+: input-slice ( -- slice )
+  #! Return a slice of the input from the current parse position
+  input get pos get tail-slice ;
 
 : input-from ( input -- n )
   #! Return the index from the original string that the
   #! input slice is based on.
   dup slice? [ slice-from ] [ drop 0 ] if ;
 
-: heads ( input -- h )
-  input-from \ heads get at ;
+: input-cache ( parser -- cache )
+  #! From the packrat cache, obtain the cache for the parser 
+  #! that maps the position to the parser result.
+  id>> packrat get [ drop H{ } clone ] cache ;
+
+: eval-rule ( rule -- ast )
+  #! Evaluate a rule, return an ast resulting from it.
+  #! Return fail if the rule failed. The rule has
+  #! stack effect ( input -- parse-result )
+  pos get swap 
+  execute [
+    nip
+    [ ast>> ] [ remaining>> ] bi
+    input-from pos set    
+  ] [ 
+    pos set   
+    fail
+  ] if* ;
+
+: memo ( pos rule -- memo-entry )
+  #! Return the result from the memo cache. 
+  rule-parser input-cache at ;
+
+: set-memo ( memo-entry pos rule -- )
+  #! Store an entry in the cache
+  rule-parser input-cache set-at ;
+
+:: apply-non-memo-rule ( r p -- ast )
+  [let* |
+          ans [ r eval-rule ]
+          m   [ ans pos get <memo-entry> ]
+        |
+    m p r set-memo ans 
+  ] ;
+
+: apply-memo-rule ( m -- ast )
+  [ ans>> ] [ pos>> ] bi pos set ;
+
+:: apply-rule ( r p -- ast )
+  [let* |
+          m [ p r memo ]
+        | 
+    m [
+      m apply-memo-rule
+    ] [
+      r p apply-non-memo-rule
+    ] if 
+  ] ;
+
+: with-packrat ( input quot -- result )
+  #! Run the quotation with a packrat cache active.
+  swap [ 
+    input set
+    0 pos set
+    H{ } clone packrat set
+  ] H{ } make-assoc swap bind ;
 
 
 : compiled-parsers ( -- cache )
@@ -35,203 +102,21 @@ C: <head> phead
 : reset-compiled-parsers ( -- )
   H{ } clone \ compiled-parsers set-global ;
 
+reset-compiled-parsers
+
 GENERIC: (compile) ( parser -- quot )
 
-: input-cache ( id -- cache )
-  #! From the packrat cache, obtain the cache for the parser quotation 
-  #! that maps the input string position to the parser result.
-  packrat get [ drop H{ } clone ] cache ;
-
-TUPLE: left-recursion seed rule head next ;
-C: <left-recursion> left-recursion
-
-USE: prettyprint
-USE: io
-
-
-:: handle-left-recursive-result ( result -- result )
-  #! If the result is from a left-recursive call,
-  #! note this and fail, otherwise return normal result
-  #! See figure 4 of packrat_TR-2007-002.pdf.
-  ">>handle-left-recursive-result " write result . 
-  result [
-    [let* | ast [ result ast>> ] |
-      ast left-recursion? [ t ast (>>detected?) f ] [ result ] if
-    ]
-  ] [ 
-    f
-  ] if 
-  "<<handle-left-recursive-result " write dup . ;
-   
-:: (grow-lr) ( input quot parser m h -- result )
-  #! 'Grow the Seed' algorithm to handle left recursion
-  ">>(grow-lr) " write input . " for parser " write parser . " m is " write m . 
-  [let* |
-          pos [ input ]  
-          ans [ h involved-set>> clone h (>>eval-set) input quot call ] 
-        |
-    [ ans not ] [ ans [ pos input-from m remaining>> input-from <= ] [ f ] if ] 2array || [ 
-      "recursion exiting with = " write ans . "m was " write m . 
-      m        
-    ] [
-      "recursion with = " write ans . 
-      pos quot parser pos ans ast>> <parse-result> h (grow-lr)
-    ] if
-  ] 
-  "<<(grow-lr) " write input . " for parser " write parser . " m is " write m . " result is " write dup .  
-  ;
-
-:: grow-lr ( input quot parser m h -- result )
-  h input input-from \ heads get set-at
-  input quot parser m h (grow-lr) 
-  f input input-from \ heads get set-at ;
-
-SYMBOL: not-found
-
-: memo ( parser input -- result )
-  input-from swap id>> input-cache at* [ drop not-found ] unless ;
-
-
-:: involved? ( parser h -- ? )
-  h rule>> parser = [
-    t
-  ] [
-    parser h involved-set>> member?
-  ] if ;
-
-:: recall ( input quot parser -- result )
-  [let* |
-          m [ parser input memo ]
-          h [ input heads ]
-        |
-    #! If not growing a seed pass, just return what is stored
-    #! in the memo table.
-    h [
-      m not-found = parser h involved? not and [
-        f
-      ] [
-        parser h eval-set>> member? [
-          parser h eval-set>> remove h (>>eval-set)
-          input quot call          
-        ] [
-          m
-        ] if
-      ] if
-    ] [
-      m
-    ] if
-  ] ;
-
-:: (setup-lr) ( parser l s -- )
-  s head>> l head>> = [
-    l head>> s (>>head)
-    l head>> [ s rule>> add ] change-involved-set drop
-    parser l s next>> (setup-lr)
-  ] unless ;
-
-:: setup-lr ( parser l -- )
-  [let* |
-          s [ lrstack get ] 
-        |
-    l head>> [ parser V{ } clone V{ } clone <head> l (>>head) ] unless
-    parser l s (setup-lr)
-  ] ;
-
-:: lr-answer ( quot parser input m -- result )
-  [let* |
-          h [ m ast>> head>> ]
-        |
-    h rule>> parser = [
-      "changing memo ast to seed " write 
-      m [ seed>> ast>> dup . ] change-ast drop
-      m input input-from parser id>> input-cache set-at
-      m ast>> not [
-        f
-      ] [
-        input quot parser m h grow-lr
-      ] if      
-    ] [
-      m ast>> seed>>
-    ] if
-  ] ;  
-
-:: (apply-rule) ( quot parser input -- result )
-  [let* |
-          lr  [ f parser f lrstack get <left-recursion> ]
-          m   [ lr lrstack set input lr <parse-result> ]
-          ans [ m input input-from parser id>> input-cache set-at input quot call ]
-        |
-    lrstack get next>> lrstack set
-    lr head>> [
-"setting seed to ans " write ans . 
-      ans lr (>>seed)
-      quot parser input m lr-answer      
-    ] [ 
-      ans 
-    ] if
-  ] ;
-
-:: apply-rule ( quot parser input -- result )
-  [let* |
-          m [ input quot parser recall ]
-        |
-    m not-found = [
-      quot parser input (apply-rule)       
-      dup input input-from parser id>> input-cache set-at      
-    ] [
-      m [
-        m ast>> left-recursion? [
-          "Found left recursion..." print
-          parser m ast>> setup-lr m remaining>> m ast>> seed>> <parse-result>
-          dup input input-from parser id>> input-cache set-at
-        ] [
-          m 
-          dup input input-from parser id>> input-cache set-at
-        ] if
-      ] [
-        f f input input-from parser id>> input-cache set-at
-      ] if
-    ] if
-  ] ;
-
-:: cached-result ( input-cache input quot parser -- result )
-  #! Get the cached result for input position 
-  #! from the input cache. If the item is not in the cache,
-  #! call 'quot' with 'input' on the stack to get the result
-  #! and store that in the cache and return it.
-  #! See figure 4 of packrat_TR-2007-002.pdf.
-  ">>cached-result " write input . "  for parser " write parser .
-  input input-from input-cache [ 
-    drop
-    [let* | lr  [ f <left-recursion> ] 
-            m   [ input lr <parse-result> ]
-            ans [ m input input-from input-cache set-at input quot call ]
-          |
-      "--lr is " write lr . " ans is " write ans . " for parser " write parser .
-      ans input input-from input-cache set-at
-      lr detected?>> ans and [
-        input quot parser ans grow-lr
-      ] [
-        ans
-      ] if
-    ]
-  ] cache 
-  dup [ handle-left-recursive-result ] when  
-  "<<cached-result " write dup . " for parser " write parser . ;
-
-:: run-packrat-parser ( input quot parser -- result )
-  quot parser input apply-rule ;
 
 :: parser-body ( parser -- quot )
   #! Return the body of the word that is the compiled version
   #! of the parser.
-  [let* | parser-quot [ parser (compile) ] 
+  [let* | rule [ parser (compile) define-temp dup parser "peg" set-word-prop ] 
         |
     [
-      packrat get [ 
-        parser-quot parser run-packrat-parser
+      rule pos get apply-rule dup fail = [ 
+        drop f 
       ] [
-        parser-quot call
+        input-slice swap <parse-result>
       ] if
     ] 
   ] ;
@@ -253,17 +138,8 @@ SYMBOL: not-found
   [ compiled-parser ] with-compilation-unit ;
 
 : parse ( state parser -- result )
-  compile execute ; inline
-
-: with-packrat ( quot -- result )
-  #! Run the quotation with a packrat cache active.
-  H{ } clone \ heads [ [ H{ } clone packrat ] dip with-variable ] with-variable ; inline
-
-: packrat-parse ( state parser -- result )
-  [ parse ] with-packrat ;
-
-: packrat-call ( state quot -- result )
-  with-packrat ; inline
+  dup word? [ compile ] unless
+  [ execute ] curry with-packrat ;
 
 <PRIVATE
 
@@ -287,6 +163,8 @@ C: <parser> parser
 : reset-delegates ( -- )
   H{ } clone \ delegates set-global ;
 
+reset-delegates 
+
 : init-parser ( parser -- parser )
   #! Set the delegate for the parser. Equivalent parsers
   #! get a delegate with the same id.
@@ -307,15 +185,15 @@ MATCH-VARS: ?token ;
   ] if ;
 
 M: token-parser (compile) ( parser -- quot )
-  symbol>> [ parse-token ] curry ;
-      
+  [ \ input-slice , symbol>> , \ parse-token , ] [ ] make ;
+   
 TUPLE: satisfy-parser quot ;
 
 MATCH-VARS: ?quot ;
 
 : satisfy-pattern ( -- quot )
   [
-    dup empty? [
+    input-slice dup empty? [
       drop f 
     ] [
       unclip-slice dup ?quot call [  
@@ -335,7 +213,7 @@ MATCH-VARS: ?min ?max ;
 
 : range-pattern ( -- quot )
   [
-    dup empty? [
+    input-slice dup empty? [
       drop f
     ] [
       0 over nth dup 
@@ -355,7 +233,7 @@ TUPLE: seq-parser parsers ;
 : seq-pattern ( -- quot )
   [
     dup [
-      dup remaining>> ?quot [
+      ?quot [
         [ remaining>> swap (>>remaining) ] 2keep
         ast>> dup ignore = [ 
           drop  
@@ -372,7 +250,7 @@ TUPLE: seq-parser parsers ;
 
 M: seq-parser (compile) ( parser -- quot )
   [
-    [ V{ } clone <parse-result> ] %
+    [ input-slice V{ } clone <parse-result> ] %
     parsers>> [ compiled-parser \ ?quot seq-pattern match-replace % ] each 
   ] [ ] make ;
 
@@ -380,24 +258,19 @@ TUPLE: choice-parser parsers ;
 
 : choice-pattern ( -- quot )
   [
-    dup [
-          
-    ] [
-      drop dup ?quot 
-    ] if
+    [ ?quot ] unless* 
   ] ;
 
 M: choice-parser (compile) ( parser -- quot )
-  [
+  [ 
     f ,
     parsers>> [ compiled-parser \ ?quot choice-pattern match-replace % ] each
-    \ nip ,
   ] [ ] make ;
 
 TUPLE: repeat0-parser p1 ;
 
 : (repeat0) ( quot result -- result )
-  2dup remaining>> swap call [
+  over call [
     [ remaining>> swap (>>remaining) ] 2keep 
     ast>> swap [ ast>> push ] keep
     (repeat0) 
@@ -412,7 +285,7 @@ TUPLE: repeat0-parser p1 ;
 
 M: repeat0-parser (compile) ( parser -- quot )
   [
-    [ V{ } clone <parse-result> ] %
+    [ input-slice V{ } clone <parse-result> ] %
     p1>> compiled-parser \ ?quot repeat0-pattern match-replace %        
   ] [ ] make ;
 
@@ -431,7 +304,7 @@ TUPLE: repeat1-parser p1 ;
 
 M: repeat1-parser (compile) ( parser -- quot )
   [
-    [ V{ } clone <parse-result> ] %
+    [ input-slice V{ } clone <parse-result> ] %
     p1>> compiled-parser \ ?quot repeat1-pattern match-replace % 
   ] [ ] make ;
 
@@ -439,7 +312,7 @@ TUPLE: optional-parser p1 ;
 
 : optional-pattern ( -- quot )
   [
-    dup ?quot swap f <parse-result> or 
+    ?quot [ input-slice f <parse-result> ] unless* 
   ] ;
 
 M: optional-parser (compile) ( parser -- quot )
@@ -449,7 +322,7 @@ TUPLE: ensure-parser p1 ;
 
 : ensure-pattern ( -- quot )
   [
-    dup ?quot [
+    input-slice ?quot [
       ignore <parse-result>
     ] [
       drop f
@@ -463,7 +336,7 @@ TUPLE: ensure-not-parser p1 ;
 
 : ensure-not-pattern ( -- quot )
   [
-    dup ?quot [
+    input-slice ?quot [
       drop f
     ] [
       ignore <parse-result>
@@ -486,7 +359,7 @@ MATCH-VARS: ?action ;
   ] ;
 
 M: action-parser (compile) ( parser -- quot )
-  { [ p1>> ] [ quot>> ] } cleave [ compiled-parser ] dip 
+  [ p1>> compiled-parser ] [ quot>> ] bi  
   2array { ?quot ?action } action-pattern match-replace ;
 
 : left-trim-slice ( string -- string )
@@ -500,7 +373,7 @@ TUPLE: sp-parser p1 ;
 
 M: sp-parser (compile) ( parser -- quot )
   [
-    \ left-trim-slice , p1>> compiled-parser , 
+    \ input-slice , \ left-trim-slice , \ input-from , \ pos , \ set , p1>> compiled-parser , 
   ] [ ] make ;
 
 TUPLE: delay-parser quot ;
