@@ -21,6 +21,40 @@ LIBRARY: advapi32
 : PROV_REPLACE_OWF   23 ; inline
 : PROV_RSA_AES       24 ; inline
 
+: MS_DEF_DH_SCHANNEL_PROV
+    "Microsoft DH Schannel Cryptographic Provider" ; inline
+
+: MS_DEF_DSS_DH_PROV
+    "Microsoft Base DSS and Diffie-Hellman Cryptographic Provider" ; inline
+
+: MS_DEF_DSS_PROV
+    "Microsoft Base DSS Cryptographic Provider" ; inline
+
+: MS_DEF_PROV
+    "Microsoft Base Cryptographic Provider v1.0" ; inline
+
+: MS_DEF_RSA_SCHANNEL_PROV
+    "Microsoft RSA Schannel Cryptographic Provider" ; inline
+
+! Unsupported (!)
+: MS_DEF_RSA_SIG_PROV
+    "Microsoft RSA Signature Cryptographic Provider" ; inline
+
+: MS_ENH_DSS_DH_PROV
+    "Microsoft Enhanced DSS and Diffie-Hellman Cryptographic Provider" ; inline
+
+: MS_ENH_RSA_AES_PROV
+    "Microsoft Enhanced RSA and AES Cryptographic Provider" ; inline
+
+: MS_ENHANCED_PROV
+    "Microsoft Enhanced Cryptographic Provider v1.0" ; inline
+
+: MS_SCARD_PROV
+    "Microsoft Base Smart Card Crypto Provider" ; inline
+
+: MS_STRONG_PROV
+    "Microsoft Strong Cryptographic Provider" ; inline
+
 : CRYPT_VERIFYCONTEXT  HEX: F0000000 ; inline
 : CRYPT_NEWKEYSET      HEX: 8 ; inline
 : CRYPT_DELETEKEYSET   HEX: 10 ; inline
