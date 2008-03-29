@@ -366,6 +366,10 @@ ERROR: bad-number ;
 
 : (M:) CREATE-METHOD parse-definition ;
 
+: scan-object ( -- object )
+    scan-word dup parsing?
+    [ V{ } clone swap execute first ] when ;
+
 GENERIC: expected>string ( obj -- str )
 
 M: f expected>string drop "end of input" ;

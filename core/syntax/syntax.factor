@@ -171,9 +171,7 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "FORGET:" [
-        scan-word
-        dup parsing? [ V{ } clone swap execute first ] when
-        forget
+        scan-object forget
     ] define-syntax
 
     "(" [
