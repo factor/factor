@@ -192,7 +192,7 @@ C: <head> peg-head
     f lrstack set
     H{ } clone heads set
     H{ } clone packrat set
-  ] H{ } make-assoc swap bind ;
+  ] H{ } make-assoc swap bind ; inline
 
 
 : compiled-parsers ( -- cache )
@@ -236,9 +236,11 @@ GENERIC: (compile) ( parser -- quot )
 : compile ( parser -- word )
   [ compiled-parser ] with-compilation-unit ;
 
+: compiled-parse ( state word -- result )
+  swap [ execute ] with-packrat ; inline 
+
 : parse ( state parser -- result )
-  dup word? [ compile ] unless
-  [ execute ] curry with-packrat ;
+  dup word? [ compile ] unless compiled-parse ;
 
 <PRIVATE
 
