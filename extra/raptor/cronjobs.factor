@@ -1,5 +1,5 @@
 
-USING: kernel namespaces threads arrays sequences combinators.cleave
+USING: kernel namespaces threads arrays sequences
        raptor raptor.cron ;
 
 IN: raptor

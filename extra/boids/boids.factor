@@ -6,7 +6,6 @@ USING: kernel namespaces
        math.vectors
        math.trig
        combinators arrays sequences random vars
-       combinators.cleave
        combinators.lib ;
 
 IN: boids

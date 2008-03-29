@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations sequences math namespaces
-math.parser assocs regexp fry unicode.categories
-combinators.cleave sequences ;
+math.parser assocs regexp fry unicode.categories sequences ;
 IN: http.server.validators
 
 SYMBOL: validation-failed?

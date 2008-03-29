@@ -1,5 +1,5 @@
 USING: kernel alien.c-types sequences math unix
-combinators.cleave vectors kernel namespaces continuations
+vectors kernel namespaces continuations
 threads assocs vectors io.unix.backend ;
 
 IN: unix.process

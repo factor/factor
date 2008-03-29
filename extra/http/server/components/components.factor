@@ -4,7 +4,7 @@ USING: html.elements http.server.validators accessors
 namespaces kernel io math.parser assocs classes words tuples
 arrays sequences io.files http.server.templating.fhtml
 http.server.actions splitting mirrors hashtables
-combinators.cleave fry continuations math ;
+fry continuations math ;
 IN: http.server.components
 
 SYMBOL: components

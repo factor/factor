@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators.cleave kernel
-accessors math ui.gadgets ui.render opengl.gl byte-arrays
-namespaces opengl cairo.ffi cairo.lib ;
+USING: arrays kernel accessors math ui.gadgets ui.render
+opengl.gl byte-arrays namespaces opengl cairo.ffi cairo.lib ;
 IN: cairo.png
 
 TUPLE: png surface width height cairo-t array ;

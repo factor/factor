@@ -1,5 +1,5 @@
 USING: kernel math sequences namespaces
-math.miller-rabin combinators.cleave combinators.lib
+math.miller-rabin combinators.lib
 math.functions accessors random ;
 IN: random.blum-blum-shub
 

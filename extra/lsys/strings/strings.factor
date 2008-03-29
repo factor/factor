@@ -1,5 +1,5 @@
 
-USING: kernel sequences math combinators.cleave combinators.lib ;
+USING: kernel sequences math combinators.lib ;
 
 IN: lsys.strings
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: db http.server kernel accessors
-continuations namespaces destructors combinators.cleave ;
+continuations namespaces destructors ;
 IN: http.server.db
 
 TUPLE: db-persistence responder db params ;

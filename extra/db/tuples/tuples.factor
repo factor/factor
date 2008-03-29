@@ -3,8 +3,7 @@
 USING: arrays assocs classes db kernel namespaces
 tuples words sequences slots math
 math.parser io prettyprint db.types continuations
-mirrors sequences.lib tools.walker combinators.lib
-combinators.cleave ;
+mirrors sequences.lib tools.walker combinators.lib ;
 IN: db.tuples
 
 : define-persistent ( class table columns -- )

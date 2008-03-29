@@ -3,8 +3,8 @@
 USING: assocs calendar kernel math.parser namespaces random
 accessors http http.server
 http.server.sessions.storage http.server.sessions.storage.assoc
-quotations hashtables sequences fry combinators.cleave
-html.elements symbols continuations destructors ;
+quotations hashtables sequences fry html.elements symbols
+continuations destructors ;
 IN: http.server.sessions
 
 ! ! ! ! ! !
