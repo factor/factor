@@ -1,12 +1,29 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel math namespaces sequences
-io.backend io.binary combinators system vocabs.loader
-random.backend random.mersenne-twister init ;
-USE: prettyprint
+io.backend io.binary combinators system vocabs.loader ;
 IN: random
 
-: random-bytes ( n -- r )
+SYMBOL: insecure-random-generator
+SYMBOL: secure-random-generator
+SYMBOL: random-generator
+
+GENERIC: seed-random ( tuple seed -- )
+GENERIC: random-32* ( tuple -- r )
+GENERIC: random-bytes* ( n tuple -- byte-array )
+
+M: object random-bytes* ( n tuple -- byte-array )
+    swap [ drop random-32* ] with map >c-uint-array ;
+
+M: object random-32* ( tuple -- r ) 4 random-bytes* le> ;
+
+ERROR: no-random-number-generator ;
+
+M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
+
+M: f random-32* ( obj -- * ) no-random-number-generator ;
+
+: random-bytes ( n -- byte-array )
     [
         dup 4 rem zero? [ 1+ ] unless
         random-generator get random-bytes*
@@ -29,13 +46,3 @@ IN: random
 
 : with-secure-random ( quot -- )
     >r secure-random-generator get r> with-random ; inline
-
-{
-    { [ windows? ] [ "random.windows" require ] }
-    { [ unix? ] [ "random.unix" require ] }
-} cond
-
-[
-    [ 32 random-bits ] with-secure-random
-    <mersenne-twister> random-generator set-global
-] "random" add-init-hook
