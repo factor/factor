@@ -572,7 +572,7 @@ PRIVATE>
 : PEG:
   (:) [
     [
-        call compile 1quotation
+        call compile [ compiled-parse ] curry
         [ dup [ parse-result-ast ] [ "Parse failed" throw ] if ]
         append define
     ] with-compilation-unit
