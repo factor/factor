@@ -1,5 +1,5 @@
 
-USING: kernel sequences macros ;
+USING: kernel sequences macros combinators ;
 
 IN: combinators.cleave
 

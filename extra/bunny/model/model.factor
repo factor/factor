@@ -64,16 +64,19 @@ TUPLE: bunny-buffers array element-array nv ni ;
     bunny-dlist construct-boa ;
 
 : <bunny-buffers> ( model -- geom )
-    [
-        [ first concat ] [ second concat ] bi
-        append >float-array
-        GL_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
-    ] [
-        third concat >c-uint-array
-        GL_ELEMENT_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
-    ]
-    [ first length 3 * ] [ third length 3 * ] tetra
-    bunny-buffers construct-boa ;
+    {
+        [
+            [ first concat ] [ second concat ] bi
+            append >float-array
+            GL_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
+        ]
+        [
+            third concat >c-uint-array
+            GL_ELEMENT_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
+        ]
+        [ first length 3 * ]
+        [ third length 3 * ]
+    } cleave bunny-buffers construct-boa ;
 
 GENERIC: bunny-geom ( geom -- )
 GENERIC: draw-bunny ( geom draw -- )
