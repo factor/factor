@@ -95,8 +95,16 @@
 			#endif
 		#elif defined(__SVR4) && defined(sun)
 			#define FACTOR_OS_STRING "solaris"
+
+			#if defined(FACTOR_X86)
+				#include "os-solaris-x86.32.h"
+			#elif defined(FACTOR_AMD64)
+				#incluide "os-solaris-x86.64.h"
+			#else
+				#error "Unsupported Solaris flavor"
+			#endif
+
 			#include "os-solaris.h"
-			#include "os-unix-ucontext.h"
 		#else
 			#error "Unsupported OS"
 		#endif
