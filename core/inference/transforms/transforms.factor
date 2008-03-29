@@ -39,6 +39,12 @@ IN: inference.transforms
     ] if
 ] 1 define-transform
 
+\ cleave [ cleave>quot ] 1 define-transform
+
+\ 2cleave [ 2cleave>quot ] 1 define-transform
+
+\ spread [ spread>quot ] 1 define-transform
+
 ! Bitfields
 GENERIC: (bitfield-quot) ( spec -- quot )
 

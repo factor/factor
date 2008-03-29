@@ -5,6 +5,26 @@ USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
 hashtables sorting ;
 
+: cleave ( obj seq -- )
+    [ call ] with each ;
+
+: cleave>quot ( seq -- quot )
+    [ [ keep ] curry ] map concat [ drop ] append ;
+
+: 2cleave ( obj seq -- )
+    [ [ call ] 3keep drop ] each 2drop ;
+
+: 2cleave>quot ( seq -- quot )
+    [ [ 2keep ] curry ] map concat [ 2drop ] append ;
+
+: spread>quot ( seq -- quot )
+    [ length [ >r ] <repetition> concat ]
+    [ [ [ r> ] prepend ] map concat ] bi
+    compose ;
+
+: spread ( seq -- )
+    spread>quot call ;
+
 ERROR: no-cond ;
 
 : cond ( assoc -- )
