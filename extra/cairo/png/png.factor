@@ -1,16 +1,34 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel accessors math ui.gadgets ui.render
-opengl.gl byte-arrays namespaces opengl cairo.ffi cairo.lib ;
+opengl.gl byte-arrays namespaces opengl cairo.ffi cairo.lib
+inspector sequences combinators io.backend ;
 IN: cairo.png
 
 TUPLE: png surface width height cairo-t array ;
 TUPLE: png-gadget png ;
 
+ERROR: cairo-error string ;
+
+: check-zero
+    dup zero? [
+        "PNG dimension is 0" cairo-error
+    ] when ;
+
+: cairo-png-error ( n -- )
+    {
+        { [ dup CAIRO_STATUS_NO_MEMORY = ] [ "Cairo: no memory" cairo-error ] }
+        { [ dup CAIRO_STATUS_FILE_NOT_FOUND = ] [ "Cairo: file not found" cairo-error ] }
+        { [ dup CAIRO_STATUS_READ_ERROR = ] [ "Cairo: read error" cairo-error ] }
+        { [ t ] [ drop ] }
+    } cond ;
+
 : <png> ( path -- png )
+    normalize-pathname
     cairo_image_surface_create_from_png
-    dup [ cairo_image_surface_get_width ]
-    [ cairo_image_surface_get_height ] [ ] tri
+    dup cairo_surface_status cairo-png-error
+    dup [ cairo_image_surface_get_width check-zero ]
+    [ cairo_image_surface_get_height check-zero ] [ ] tri
     cairo-surface>array png construct-boa ;
 
 : write-png ( png path -- )
@@ -33,6 +51,7 @@ M: png-gadget draw-gadget* ( gadget -- )
         png>>
         [ width>> ]
         [ height>> GL_RGBA GL_UNSIGNED_BYTE ]
+        ! [ height>> GL_BGRA GL_UNSIGNED_BYTE ]
         [ array>> ] tri
         glDrawPixels
     ] with-translation ;
@@ -42,3 +61,5 @@ M: png-gadget graft* ( gadget -- )
 
 M: png-gadget ungraft* ( gadget -- )
     png>> surface>> cairo_destroy ;
+
+! "resource:misc/icons/Factor_1x16.png" USE: cairo.png <png-gadget> gadget.
