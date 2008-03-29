@@ -7,6 +7,56 @@ io.encodings.utf8 ;
 [ ] [ "blahblah" temp-file make-directory ] unit-test
 [ t ] [ "blahblah" temp-file directory? ] unit-test
 
+[ t ] [
+    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
+    temp-directory [
+        "loldir" make-directory
+    ] with-directory
+    temp-directory "loldir" append-path exists?
+] unit-test
+
+[ ] [
+    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
+    temp-directory [
+        "loldir" make-directory
+        "loldir" delete-directory
+    ] with-directory
+] unit-test
+
+[ "file1 contents" ] [
+    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
+    temp-directory [
+        "file1 contents" "file1" utf8 set-file-contents
+        "file1" "file2" copy-file
+        "file2" utf8 file-contents
+    ] with-directory
+    "file1" temp-file delete-file
+    "file2" temp-file delete-file
+] unit-test
+
+[ "file3 contents" ] [
+    temp-directory [
+        "file3 contents" "file3" utf8 set-file-contents
+        "file3" "file4" move-file
+        "file4" utf8 file-contents
+    ] with-directory
+    "file4" temp-file delete-file
+] unit-test
+
+[ ] [
+    temp-directory [
+        "file5" touch-file
+        "file5" delete-file
+    ] with-directory
+] unit-test
+
+[ ] [
+    temp-directory [
+        "file6" touch-file
+        "file6" link-info drop
+    ] with-directory
+] unit-test
+
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk/" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
@@ -83,6 +133,18 @@ io.encodings.utf8 ;
     "delete-tree-test" temp-file delete-tree
 ] unit-test
 
+[ { { "kernel" t } } ] [
+    "core" resource-path [
+        "." directory [ first "kernel" = ] subset
+    ] with-directory
+] unit-test
+
+[ { { "kernel" t } } ] [
+    "resource:core" [
+        "." directory [ first "kernel" = ] subset
+    ] with-directory
+] unit-test
+
 [ ] [
     "copy-tree-test/a/b/c" temp-file make-directories
 ] unit-test
@@ -132,15 +194,12 @@ io.encodings.utf8 ;
 [ t ] [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
 
 [ t ] [
-    temp-directory [ "hi" "test41" utf8 set-file-contents ] with-directory
+    temp-directory [ "hi41" "test41" utf8 set-file-contents ] with-directory
     temp-directory "test41" append-path utf8 file-contents "hi41" =
 ] unit-test
 
 [ t ] [
-    temp-directory [
-        "test43" utf8 <file-writer> [ "hi43" write ] with-stream
-    ] with-directory
-    temp-directory "test43" append-path utf8 file-contents "hi43" =
+    temp-directory [ "test41" file-info size>> ] with-directory 4 =
 ] unit-test
 
 [ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
@@ -202,3 +261,7 @@ io.encodings.utf8 ;
 [ "bar/baz/foo" ] [ "bar/baz" ".///foo" append-path ] unit-test
 [ "bar/foo" ] [ "bar/baz" "./..//foo" append-path ] unit-test
 [ "bar/foo" ] [ "bar/baz" "./../././././././///foo" append-path ] unit-test
+
+[ t ] [ "resource:core" absolute-path? ] unit-test
+[ t ] [ "/foo" absolute-path? ] unit-test
+[ f ] [ "" absolute-path? ] unit-test

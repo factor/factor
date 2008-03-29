@@ -13,13 +13,13 @@ HOOK: (file-writer) io-backend ( path -- stream )
 HOOK: (file-appender) io-backend ( path -- stream )
 
 : <file-reader> ( path encoding -- stream )
-    swap (file-reader) swap <decoder> ;
+    swap normalize-pathname (file-reader) swap <decoder> ;
 
 : <file-writer> ( path encoding -- stream )
-    swap (file-writer) swap <encoder> ;
+    swap normalize-pathname (file-writer) swap <encoder> ;
 
 : <file-appender> ( path encoding -- stream )
-    swap (file-appender) swap <encoder> ;
+    swap normalize-pathname (file-appender) swap <encoder> ;
 
 : file-lines ( path encoding -- seq )
     <file-reader> lines ;
@@ -44,6 +44,8 @@ HOOK: (file-appender) io-backend ( path -- stream )
 
 ! Pathnames
 : path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
+
+: path-separator ( -- string ) windows? "\\" "/" ? ;
 
 : right-trim-separators ( str -- newstr )
     [ path-separator? ] right-trim ;
@@ -98,8 +100,21 @@ ERROR: no-parent-directory path ;
 
 PRIVATE>
 
+: windows-absolute-path? ( path -- path ? )
+    {
+        { [ dup length 2 < ] [ f ] }
+        { [ dup second CHAR: : = ] [ t ] }
+        { [ t ] [ f ] }
+    } cond ;
+
 : absolute-path? ( path -- ? )
-    dup empty? [ drop f ] [ first path-separator? ] if ;
+    {
+        { [ dup empty? ] [ f ] }
+        { [ dup "resource:" head? ] [ t ] }
+        { [ dup first path-separator? ] [ t ] }
+        { [ windows? ] [ windows-absolute-path? ] }
+        { [ t ] [ f ] }
+    } cond nip ;
 
 : append-path ( str1 str2 -- str )
     {
@@ -157,10 +172,14 @@ SYMBOL: current-directory
 
 M: object cwd ( -- path ) "." ;
 
-[ cwd current-directory set-global ] "current-directory" add-init-hook
+[ cwd current-directory set-global ] "io.files" add-init-hook
 
 : with-directory ( path quot -- )
+    >r normalize-pathname r>
     current-directory swap with-variable ; inline
+
+: set-current-directory ( path -- )
+    normalize-pathname current-directory set ;
 
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )
@@ -258,22 +277,19 @@ DEFER: copy-tree-into
     "resource-path" get [ image parent-directory ] unless*
     prepend-path ;
 
-: ?resource-path ( path -- newpath )
-    "resource:" ?head [ left-trim-separators resource-path ] when ;
-
-: resource-exists? ( path -- ? )
-    ?resource-path exists? ;
-
 : temp-directory ( -- path )
-    "temp" resource-path
-    dup exists? not
-      [ dup make-directory ]
-    when ;
+    "temp" resource-path dup make-directories ;
 
-: temp-file ( name -- path ) temp-directory prepend-path ;
+: temp-file ( name -- path )
+    temp-directory prepend-path ;
 
 M: object normalize-pathname ( path -- path' )
-    current-directory get prepend-path ;
+    "resource:" ?head [
+        left-trim-separators resource-path
+        normalize-pathname
+    ] [
+        current-directory get prepend-path
+    ] if ;
 
 ! Pathname presentations
 TUPLE: pathname string ;

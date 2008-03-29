@@ -67,20 +67,29 @@
 			#endif
 		#elif defined(__NetBSD__)
 			#define FACTOR_OS_STRING "netbsd"
+
+			#if defined(FACTOR_X86)
+				#include "os-netbsd-x86.32.h"
+			#elif defined(FACTOR_AMD64)
+				#include "os-netbsd-x86.64.h"
+			#else
+				#error "Unsupported NetBSD flavor"
+			#endif
+
 			#include "os-netbsd.h"
 		#elif defined(linux)
 			#define FACTOR_OS_STRING "linux"
 			#include "os-linux.h"
 
 			#if defined(FACTOR_X86)
-				#include "os-linux-x86-32.h"
+				#include "os-linux-x86.32.h"
 			#elif defined(FACTOR_PPC)
 				#include "os-unix-ucontext.h"
 				#include "os-linux-ppc.h"
 			#elif defined(FACTOR_ARM)
 				#include "os-linux-arm.h"
 			#elif defined(FACTOR_AMD64)
-				#include "os-linux-x86-64.h"
+				#include "os-linux-x86.64.h"
 			#else
 				#error "Unsupported Linux flavor"
 			#endif

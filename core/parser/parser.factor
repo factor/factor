@@ -520,7 +520,7 @@ SYMBOL: interactive-vocabs
     [
         [
             [ parsing-file ] keep
-            [ ?resource-path utf8 <file-reader> ] keep
+            [ utf8 <file-reader> ] keep
             parse-stream
         ] with-compiler-errors
     ] [
@@ -532,7 +532,7 @@ SYMBOL: interactive-vocabs
     [ dup parse-file call ] assert-depth drop ;
 
 : ?run-file ( path -- )
-    dup resource-exists? [ run-file ] [ drop ] if ;
+    dup exists? [ run-file ] [ drop ] if ;
 
 : bootstrap-file ( path -- )
     [ parse-file % ] [ run-file ] if-bootstrapping ;

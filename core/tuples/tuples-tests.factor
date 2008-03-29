@@ -246,6 +246,7 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 
 ! Inheritance
 TUPLE: computer cpu ram ;
+C: <computer> computer
 
 [ "TUPLE: computer cpu ram ;" ] [
     [ \ computer see ] with-string-writer string-lines second
@@ -264,11 +265,23 @@ C: <laptop> laptop
 [ t ] [ "laptop" get computer? ] unit-test
 [ t ] [ "laptop" get tuple? ] unit-test
 
+[ "Pentium" ] [ "laptop" get cpu>> ] unit-test
+[ 128 ] [ "laptop" get ram>> ] unit-test
+[ t ] [ "laptop" get battery>> 3 hours = ] unit-test
+
+[ laptop ] [
+    "laptop" get tuple-layout
+    dup layout-echelon swap
+    layout-superclasses nth
+] unit-test
+
 [ "TUPLE: laptop < computer battery ;" ] [
     [ \ laptop see ] with-string-writer string-lines second
 ] unit-test
 
-TUPLE: server < computer rackmount? ;
+[ { tuple computer laptop } ] [ laptop superclasses ] unit-test
+
+TUPLE: server < computer rackmount ;
 C: <server> server
 
 [ t ] [ server tuple-class? ] unit-test
@@ -276,10 +289,14 @@ C: <server> server
 [ t ] [ server computer class< ] unit-test
 [ t ] [ server computer classes-intersect? ] unit-test
 
-[ ] [ "Pentium" 128 "1U" <server> "server" set ] unit-test
+[ ] [ "PowerPC" 64 "1U" <server> "server" set ] unit-test
 [ t ] [ "server" get server? ] unit-test
 [ t ] [ "server" get computer? ] unit-test
 [ t ] [ "server" get tuple? ] unit-test
+
+[ "PowerPC" ] [ "server" get cpu>> ] unit-test
+[ 64 ] [ "server" get ram>> ] unit-test
+[ "1U" ] [ "server" get rackmount>> ] unit-test
 
 [ f ] [ "server" get laptop? ] unit-test
 [ f ] [ "laptop" get server? ] unit-test
@@ -288,13 +305,40 @@ C: <server> server
 [ f ] [ laptop server class< ] unit-test
 [ f ] [ laptop server classes-intersect? ] unit-test
 
-[ "TUPLE: server < computer rackmount? ;" ] [
+[ f ] [ 1 2 <computer> laptop? ] unit-test
+[ f ] [ \ + server? ] unit-test
+
+[ "TUPLE: server < computer rackmount ;" ] [
     [ \ server see ] with-string-writer string-lines second
 ] unit-test
 
 [
     "IN: tuples.tests TUPLE: bad-superclass < word ;" eval
 ] must-fail
+
+! Reshaping with inheritance
+TUPLE: electronic-device ;
+
+[ ] [ "IN: tuples.tests TUPLE: computer < electronic-device ;" eval ] unit-test
+
+[ f ] [ electronic-device laptop class< ] unit-test
+[ t ] [ server electronic-device class< ] unit-test
+[ t ] [ laptop server class-or electronic-device class< ] unit-test
+
+[ t ] [ "laptop" get electronic-device? ] unit-test
+[ t ] [ "laptop" get computer? ] unit-test
+[ t ] [ "laptop" get laptop? ] unit-test
+[ f ] [ "laptop" get server? ] unit-test
+
+[ t ] [ "server" get electronic-device? ] unit-test
+[ t ] [ "server" get computer? ] unit-test
+[ f ] [ "server" get laptop? ] unit-test
+[ t ] [ "server" get server? ] unit-test
+
+[ ] [ "IN: tuples.tests TUPLE: computer ;" eval ] unit-test
+
+[ f ] [ "laptop" get electronic-device? ] unit-test
+[ t ] [ "laptop" get computer? ] unit-test
 
 ! Hardcore unit tests
 USE: threads

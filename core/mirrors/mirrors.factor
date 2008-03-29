@@ -5,13 +5,11 @@ arrays classes slots slots.private tuples math vectors
 quotations sorting prettyprint ;
 IN: mirrors
 
-GENERIC: object-slots ( obj -- seq )
+: all-slots ( class -- slots )
+    superclasses [ "slots" word-prop ] map concat ;
 
-M: object object-slots class "slots" word-prop ;
-
-M: tuple object-slots
-    dup class "slots" word-prop
-    swap delegate [ 1 tail-slice ] unless ;
+: object-slots ( obj -- seq )
+    class all-slots ;
 
 TUPLE: mirror object slots ;
 

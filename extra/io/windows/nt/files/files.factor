@@ -18,12 +18,15 @@ M: windows-nt-io cd
     "\\\\?\\" ; inline
 
 M: windows-nt-io root-directory? ( path -- ? )
-    dup length 2 = [
-        first2
-        [ Letter? ] [ CHAR: : = ] bi* and
-    ] [
-        drop f
-    ] if ;
+    {
+        { [ dup empty? ] [ f ] }
+        { [ dup [ path-separator? ] all? ] [ t ] }
+        { [ dup right-trim-separators
+          { [ dup length 2 = ] [ dup second CHAR: : = ] } && nip ] [
+            t
+        ] }
+        { [ t ] [ f ] }
+    } cond nip ;
 
 ERROR: not-absolute-path ;
 : root-directory ( string -- string' )
@@ -36,41 +39,26 @@ ERROR: not-absolute-path ;
 : prepend-prefix ( string -- string' )
     unicode-prefix prepend ;
 
-: windows-append-path ( cwd path -- newpath )
-    {
-        ! empty
-        { [ dup empty? ] [ drop ] }
-        ! ..
-        { [ dup ".." = ] [ drop parent-directory prepend-prefix ] }
-        ! \\\\?\\c:\\foo
-        { [ dup unicode-prefix head? ] [ nip ] }
-        ! ..\\foo
-        { [ dup "..\\" head? ] [ >r parent-directory r> 3 tail windows-append-path ] }
-        ! .\\foo
-        { [ dup ".\\" head? ] [ 1 tail append prepend-prefix ] }
-        ! \\foo
-        { [ dup "\\" head? ] [ >r root-directory r> append prepend-prefix ] }
-        ! c:\\foo
-        { [ dup ?second CHAR: : = ] [ nip prepend-prefix ] }
-        ! foo.txt
-        { [ t ] [
-            >r right-trim-separators "\\" r>
-            left-trim-separators
-            3append prepend-prefix
-        ] }
-    } cond ;
-
 ERROR: nonstring-pathname ;
 ERROR: empty-pathname ;
 
-USE: tools.walker
 M: windows-nt-io normalize-pathname ( string -- string )
-    dup string? [ nonstring-pathname ] unless
-    dup empty? [ empty-pathname ] when
-    { { CHAR: / CHAR: \\ } } substitute
-    current-directory get swap windows-append-path
-    [ "/\\." member? ] right-trim
-    dup peek CHAR: : = [ "\\" append ] when ;
+    "resource:" ?head [
+        left-trim-separators resource-path
+        normalize-pathname
+    ] [
+        dup empty? [ empty-pathname ] when
+        current-directory get prepend-path
+        dup unicode-prefix head? [
+            dup first path-separator? [
+                left-trim-separators
+                current-directory get 2 head
+                prepend-path
+            ] when
+            unicode-prefix prepend
+        ] unless
+        { { CHAR: / CHAR: \\ } } substitute ! necessary
+    ] if ;
 
 M: windows-nt-io CreateFile-flags ( DWORD -- DWORD )
     FILE_FLAG_OVERLAPPED bitor ;
