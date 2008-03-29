@@ -67,7 +67,7 @@ PRIVATE>
 M: mersenne-twister seed-random ( mt seed -- )
     init-mt-seq >>seq drop ;
 
-M: mersenne-twister random-32 ( mt -- r )
+M: mersenne-twister random-32* ( mt -- r )
     dup [ seq>> ] [ i>> ] bi
     dup mt-n < [ drop 0 pick mt-generate ] unless
     new-nth mt-temper

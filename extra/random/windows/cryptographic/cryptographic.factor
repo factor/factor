@@ -26,4 +26,3 @@ M: windows-cryptographic-rng random-bytes* ( tuple n -- bytes )
     dup f f PROV_RSA_AES CRYPT_NEWKEYSET
     CryptAcquireContextW win32-error=0/f *void*
     <windows-crypto-context> ;
-

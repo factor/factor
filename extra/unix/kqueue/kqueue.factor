@@ -7,16 +7,6 @@ IN: unix.kqueue
 
 FUNCTION: int kqueue ( ) ;
 
-: EVFILT_READ     -1 ; inline
-: EVFILT_WRITE    -2 ; inline
-: EVFILT_AIO      -3 ; inline ! attached to aio requests
-: EVFILT_VNODE    -4 ; inline ! attached to vnodes
-: EVFILT_PROC     -5 ; inline ! attached to struct proc
-: EVFILT_SIGNAL   -6 ; inline ! attached to struct proc
-: EVFILT_TIMER    -7 ; inline ! timers
-: EVFILT_MACHPORT -8 ; inline ! Mach ports
-: EVFILT_FS       -9 ; inline ! Filesystem events
-
 ! actions
 : EV_ADD     HEX: 1 ; inline ! add event to kq (implies enable)
 : EV_DELETE  HEX: 2 ; inline ! delete event from kq

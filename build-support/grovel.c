@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <sys/event.h>
 
 #if defined(__FreeBSD__)
 	#define BSD
@@ -165,6 +166,8 @@ int main() {
         //grovel(fflags_t);
         grovel(ssize_t);
 
+	grovel(size_t);
+	grovel(struct kevent);
 #ifdef UNIX
 	unix_types();
 	unix_constants();
