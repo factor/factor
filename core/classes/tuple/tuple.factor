@@ -140,12 +140,11 @@ PRIVATE>
     [ drop f tuple-class define-class ]
     [ nip define-tuple-slots ] [
         2drop
-        class-usages [
-            drop
+        class-usages keys [ tuple-class? ] subset [
             [ define-tuple-layout ]
             [ define-tuple-predicate ]
             bi
-        ] assoc-each
+        ] each
     ] 3tri ;
 
 : redefine-tuple-class ( class superclass slots -- )

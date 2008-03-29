@@ -340,6 +340,19 @@ TUPLE: electronic-device ;
 [ f ] [ "laptop" get electronic-device? ] unit-test
 [ t ] [ "laptop" get computer? ] unit-test
 
+! Redefinition problem
+TUPLE: redefinition-problem ;
+
+UNION: redefinition-problem' redefinition-problem integer ;
+
+[ t ] [ 3 redefinition-problem'? ] unit-test
+
+TUPLE: redefinition-problem-2 ;
+
+"IN: classes.tuple.tests TUPLE: redefinition-problem < redefinition-problem-2 ;" eval
+
+[ t ] [ 3 redefinition-problem'? ] unit-test
+
 ! Hardcore unit tests
 USE: threads
 
