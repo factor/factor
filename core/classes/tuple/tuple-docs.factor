@@ -1,7 +1,7 @@
 USING: generic help.markup help.syntax kernel
-tuples.private classes slots quotations words arrays
+classes.tuple.private classes slots quotations words arrays
 generic.standard sequences definitions compiler.units ;
-IN: tuples
+IN: classes.tuple
 
 ARTICLE: "tuple-constructors" "Constructors"
 "Tuples are created by calling one of two words:"
@@ -151,7 +151,7 @@ HELP: set-delegate
 HELP: tuple=
 { $values { "tuple1" tuple } { "tuple2" tuple } { "?" "a boolean" } }
 { $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
-{ $warning "This word is in the " { $vocab-link "tuples.private" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
+{ $warning "This word is in the " { $vocab-link "classes.tuple.private" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
 
 HELP: permutation
 { $values { "seq1" sequence } { "seq2" sequence } { "permutation" "a sequence whose elements are integers or " { $link f } } }

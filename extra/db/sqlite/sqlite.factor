@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays assocs classes compiler db
 hashtables io.files kernel math math.parser namespaces
-prettyprint sequences strings tuples alien.c-types
+prettyprint sequences strings classes.tuple alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators
 io namespaces.lib ;

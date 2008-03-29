@@ -4,8 +4,8 @@ USING: arrays definitions hashtables kernel
 kernel.private math namespaces sequences sequences.private
 strings vectors words quotations memory combinators generic
 classes classes.private slots.deprecated slots.private slots
-compiler.units math.private accessors ;
-IN: tuples
+compiler.units math.private accessors assocs ;
+IN: classes.tuple
 
 M: tuple delegate 2 slot ;
 

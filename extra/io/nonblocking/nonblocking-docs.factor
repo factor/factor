@@ -92,14 +92,6 @@ HELP: unless-eof
 { $values { "port" input-port } { "quot" "a quotation with stack effect " { $snippet "( port -- value )" } } { "value" object } }
 { $description "If the port has reached end of file, outputs " { $link f } ", otherwise applies the quotation to the port." } ;
 
-HELP: read-until-step
-{ $values { "separators" "a sequence of bytes" } { "port" input-port } { "byte-array/f" "a byte array or " { $link f } } { "separator/f" "a byte or " { $link f } } }
-{ $description "If the port has reached end of file, outputs " { $link f } { $link f } ", otherwise scans the buffer for a separator and outputs a string up to but not including the separator." } ;
-
-HELP: read-until-loop
-{ $values { "seps" "a sequence of bytes" } { "port" input-port } { "accum" byte-vector } { "separator/f" "a byte or " { $link f } } }
-{ $description "Accumulates data in the byte vector, calling " { $link (wait-to-read) } " as many times as necessary, until either an occurrence of a separator is read, or end of file is reached." } ;
-
 HELP: can-write?
 { $values { "len" "a positive integer" } { "writer" output-port } { "?" "a boolean" } }
 { $description "Tests if the port's output buffer can accomodate " { $snippet "len" } " bytes. If the buffer is empty, this always outputs " { $link t } ", since in that case the buffer will be grown automatically." } ;

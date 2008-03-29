@@ -2,7 +2,7 @@ USING: arrays compiler.units generic hashtables inference kernel
 kernel.private math optimizer prettyprint sequences sbufs
 strings tools.test vectors words sequences.private quotations
 optimizer.backend classes classes.algebra inference.dataflow
-tuples.private continuations growable optimizer.inlining
+classes.tuple.private continuations growable optimizer.inlining
 namespaces hints ;
 IN: optimizer.tests
 

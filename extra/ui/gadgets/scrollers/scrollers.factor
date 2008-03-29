@@ -4,7 +4,7 @@ USING: arrays ui.gadgets
 ui.gadgets.viewports ui.gadgets.frames ui.gadgets.grids
 ui.gadgets.theme ui.gadgets.sliders ui.gestures kernel math
 namespaces sequences models combinators math.vectors
-tuples ;
+classes.tuple ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller viewport x y follows ;

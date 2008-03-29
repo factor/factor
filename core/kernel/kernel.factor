@@ -156,8 +156,6 @@ GENERIC: construct-boa ( ... class -- tuple )
     >r { set-delegate } r> construct ; inline
 
 ! Quotation building
-USE: tuples.private
-
 : 2curry ( obj1 obj2 quot -- curry )
     curry curry ; inline
 

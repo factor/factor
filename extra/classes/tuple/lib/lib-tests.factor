@@ -1,5 +1,5 @@
-USING: kernel tools.test tuples.lib ;
-IN: tuples.lib.tests
+USING: kernel tools.test classes.tuple.lib ;
+IN: classes.tuple.lib.tests
 
 TUPLE: foo a b* c d* e f* ;
 

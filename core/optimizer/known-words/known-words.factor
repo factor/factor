@@ -6,7 +6,7 @@ inference.class kernel assocs math math.private kernel.private
 sequences words parser vectors strings sbufs io namespaces
 assocs quotations sequences.private io.binary io.crc32
 io.streams.string layouts splitting math.intervals
-math.floats.private tuples tuples.private classes
+math.floats.private classes.tuple classes.tuple.private classes
 classes.algebra optimizer.def-use optimizer.backend
 optimizer.pattern-match optimizer.inlining float-arrays
 sequences.private combinators ;

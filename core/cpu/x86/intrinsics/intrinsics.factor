@@ -6,8 +6,8 @@ kernel.private math math.private namespaces quotations sequences
 words generic byte-arrays hashtables hashtables.private
 generator generator.registers generator.fixup sequences.private
 sbufs sbufs.private vectors vectors.private layouts system
-tuples.private strings.private slots.private compiler.constants
-;
+classes.tuple.private strings.private slots.private
+compiler.constants ;
 IN: cpu.x86.intrinsics
 
 ! Type checks

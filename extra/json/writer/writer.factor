@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io.streams.string io strings splitting sequences math 
-       math.parser assocs tuples classes words namespaces 
+       math.parser assocs classes.tuple classes words namespaces 
        hashtables ;
 IN: json.writer
 

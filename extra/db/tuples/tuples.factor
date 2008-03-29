@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes db kernel namespaces
-tuples words sequences slots math
+classes.tuple words sequences slots math
 math.parser io prettyprint db.types continuations
 mirrors sequences.lib tools.walker combinators.lib ;
 IN: db.tuples

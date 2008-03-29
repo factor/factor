@@ -1,7 +1,8 @@
 USING: kernel words inspector slots quotations sequences assocs
 math arrays inference effects shuffle continuations debugger
-tuples namespaces vectors bit-arrays byte-arrays strings sbufs
-math.functions macros sequences.private combinators mirrors ;
+classes.tuple namespaces vectors bit-arrays byte-arrays strings
+sbufs math.functions macros sequences.private combinators
+mirrors ;
 IN: inverse
 
 TUPLE: fail ;

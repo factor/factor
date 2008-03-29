@@ -1,7 +1,8 @@
 USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
-sorting tuples compiler.units debugger vocabs vocabs.loader ;
+sorting classes.tuple compiler.units debugger vocabs
+vocabs.loader ;
 IN: parser.tests
 
 [

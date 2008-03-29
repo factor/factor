@@ -1,5 +1,5 @@
 USING: help.syntax help.markup ui.gadgets kernel arrays
-quotations tuples ui.gadgets.grids ;
+quotations classes.tuple ui.gadgets.grids ;
 IN: ui.gadgets.frames
 
 : $ui-frame-constant ( element -- )

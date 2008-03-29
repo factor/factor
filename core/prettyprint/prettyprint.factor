@@ -1,11 +1,11 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint
 USING: alien arrays generic generic.standard assocs io kernel
 math namespaces sequences strings io.styles io.streams.string
 vectors words prettyprint.backend prettyprint.sections
 prettyprint.config sorting splitting math.parser vocabs
-definitions effects tuples io.files classes continuations
+definitions effects classes.tuple io.files classes continuations
 hashtables classes.mixin classes.union classes.predicate
 combinators quotations ;
 

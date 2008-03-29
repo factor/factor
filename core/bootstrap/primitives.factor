@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
-strings vectors words quotations assocs layouts classes tuples
-tuples.private kernel.private vocabs vocabs.loader source-files
-definitions slots.deprecated classes.union compiler.units
-bootstrap.image.private io.files ;
+strings vectors words quotations assocs layouts classes
+classes.tuple classes.tuple.private kernel.private vocabs
+vocabs.loader source-files definitions slots.deprecated
+classes.union compiler.units bootstrap.image.private io.files ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -60,6 +60,8 @@ num-types get f <array> builtins set
     "byte-arrays"
     "byte-vectors"
     "classes.private"
+    "classes.tuple"
+    "classes.tuple.private"
     "compiler.units"
     "continuations.private"
     "float-arrays"
@@ -91,8 +93,6 @@ num-types get f <array> builtins set
     "system.private"
     "threads.private"
     "tools.profiler.private"
-    "tuples"
-    "tuples.private"
     "words"
     "words.private"
     "vectors"
@@ -291,35 +291,35 @@ define-builtin
 
 "callstack" "kernel" create { } define-builtin
 
-"tuple-layout" "tuples.private" create {
+"tuple-layout" "classes.tuple.private" create {
     {
         { "fixnum" "math" }
         "hashcode"
-        { "layout-hashcode" "tuples.private" }
+        { "layout-hashcode" "classes.tuple.private" }
         f
     }
     {
         { "word" "words" }
         "class"
-        { "layout-class" "tuples.private" }
+        { "layout-class" "classes.tuple.private" }
         f
     }
     {
         { "fixnum" "math" }
         "size"
-        { "layout-size" "tuples.private" }
+        { "layout-size" "classes.tuple.private" }
         f
     }
     {
         { "array" "arrays" }
         "superclasses"
-        { "layout-superclasses" "tuples.private" }
+        { "layout-superclasses" "classes.tuple.private" }
         f
     }
     {
         { "fixnum" "math" }
         "echelon"
-        { "layout-echelon" "tuples.private" }
+        { "layout-echelon" "classes.tuple.private" }
         f
     }
 } define-builtin
@@ -694,13 +694,13 @@ dup tuple-layout [ <tuple-boa> ] curry define
     { "<string>" "strings" }
     { "array>quotation" "quotations.private" }
     { "quotation-xt" "quotations" }
-    { "<tuple>" "tuples.private" }
-    { "<tuple-layout>" "tuples.private" }
+    { "<tuple>" "classes.tuple.private" }
+    { "<tuple-layout>" "classes.tuple.private" }
     { "profiling" "tools.profiler.private" }
     { "become" "kernel.private" }
     { "(sleep)" "threads.private" }
     { "<float-array>" "float-arrays" }
-    { "<tuple-boa>" "tuples.private" }
+    { "<tuple-boa>" "classes.tuple.private" }
     { "class-hash" "kernel.private" }
     { "callstack>array" "kernel" }
     { "innermost-frame-quot" "kernel.private" }

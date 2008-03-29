@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: arrays kernel math math.functions namespaces sequences
-strings tuples system vocabs.loader calendar.backend threads
-accessors combinators locals ;
+strings system vocabs.loader calendar.backend threads
+accessors combinators locals classes.tuple ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;

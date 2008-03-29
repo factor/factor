@@ -8,7 +8,7 @@ hashtables io kernel namespaces sequences io.styles strings
 quotations math opengl combinators math.vectors
 io.streams.duplex sorting splitting io.streams.nested assocs
 ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
-ui.gadgets.grid-lines tuples models continuations ;
+ui.gadgets.grid-lines classes.tuple models continuations ;
 IN: ui.gadgets.panes
 
 TUPLE: pane output current prototype scrolls?

@@ -1,10 +1,10 @@
 USING: definitions generic kernel kernel.private math
 math.constants parser sequences tools.test words assocs
 namespaces quotations sequences.private classes continuations
-generic.standard effects tuples tuples.private arrays vectors
-strings compiler.units accessors classes.algebra calendar
-prettyprint io.streams.string splitting ;
-IN: tuples.tests
+generic.standard effects classes.tuple classes.tuple.private
+arrays vectors strings compiler.units accessors classes.algebra
+calendar prettyprint io.streams.string splitting ;
+IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
 : <rect> rect construct-boa ;
@@ -44,7 +44,7 @@ C: <redefinition-test> redefinition-test
 
 [ t ] [ "redefinition-test" get redefinition-test? ] unit-test
 
-"IN: tuples.tests TUPLE: redefinition-test ;" eval
+"IN: classes.tuple.tests TUPLE: redefinition-test ;" eval
 
 [ t ] [ "redefinition-test" get redefinition-test? ] unit-test
 
@@ -56,7 +56,7 @@ C: <point> point
 [ ] [ 100 200 <point> "p" set ] unit-test
 
 ! Use eval to sequence parsing explicitly
-[ ] [ "IN: tuples.tests TUPLE: point x y z ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: point x y z ;" eval ] unit-test
 
 [ 100 ] [ "p" get x>> ] unit-test
 [ 200 ] [ "p" get y>> ] unit-test
@@ -68,7 +68,7 @@ C: <point> point
 
 [ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
-"IN: tuples.tests TUPLE: point z y ;" eval
+"IN: classes.tuple.tests TUPLE: point z y ;" eval
 
 [ 3 ] [ "p" get tuple-size ] unit-test
 
@@ -124,7 +124,7 @@ GENERIC: <yo-momma>
 
 TUPLE: yo-momma ;
 
-"IN: tuples.tests C: <yo-momma> yo-momma" eval
+"IN: classes.tuple.tests C: <yo-momma> yo-momma" eval
 
 [ f ] [ \ <yo-momma> generic? ] unit-test
 
@@ -213,12 +213,12 @@ M: vector silly "z" ;
 SYMBOL: not-a-tuple-class
 
 [
-    "IN: tuples.tests C: <not-a-tuple-class> not-a-tuple-class"
+    "IN: classes.tuple.tests C: <not-a-tuple-class> not-a-tuple-class"
     eval
 ] must-fail
 
 [ t ] [
-    "not-a-tuple-class" "tuples.tests" lookup symbol?
+    "not-a-tuple-class" "classes.tuple.tests" lookup symbol?
 ] unit-test
 
 ! Missing check
@@ -234,14 +234,14 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 : cons-test-1 \ erg's-reshape-problem construct-empty ;
 : cons-test-2 \ erg's-reshape-problem construct-boa ;
 
-"IN: tuples.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
+"IN: classes.tuple.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
 
 [ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
 
 [ t ] [ cons-test-1 tuple-size "a" get tuple-size = ] unit-test
 
 [
-    "IN: tuples.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
+    "IN: classes.tuple.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
 ] [ [ no-tuple-class? ] is? ] must-fail-with
 
 ! Inheritance
@@ -313,13 +313,13 @@ C: <server> server
 ] unit-test
 
 [
-    "IN: tuples.tests TUPLE: bad-superclass < word ;" eval
+    "IN: classes.tuple.tests TUPLE: bad-superclass < word ;" eval
 ] must-fail
 
 ! Reshaping with inheritance
 TUPLE: electronic-device ;
 
-[ ] [ "IN: tuples.tests TUPLE: computer < electronic-device ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: computer < electronic-device ;" eval ] unit-test
 
 [ f ] [ electronic-device laptop class< ] unit-test
 [ t ] [ server electronic-device class< ] unit-test
@@ -335,7 +335,7 @@ TUPLE: electronic-device ;
 [ f ] [ "server" get laptop? ] unit-test
 [ t ] [ "server" get server? ] unit-test
 
-[ ] [ "IN: tuples.tests TUPLE: computer ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: computer ;" eval ] unit-test
 
 [ f ] [ "laptop" get electronic-device? ] unit-test
 [ t ] [ "laptop" get computer? ] unit-test
