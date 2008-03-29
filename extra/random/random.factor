@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel math namespaces sequences
-io.backend io.binary combinators system vocabs.loader ;
+io.backend io.binary combinators system vocabs.loader
+inspector ;
 IN: random
 
 SYMBOL: insecure-random-generator
