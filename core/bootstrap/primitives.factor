@@ -341,7 +341,7 @@ define-tuple-slots
 
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create
-"f" "syntax" lookup builtins get remove [ ] subset f union-class
+f "f" "syntax" lookup builtins get remove [ ] subset union-class
 define-class
 
 "f" "syntax" create [ not ] "predicate" set-word-prop
@@ -353,15 +353,15 @@ define-class
 ! Catch-all class for providing a default method.
 "object" "kernel" create [ drop t ] "predicate" set-word-prop
 "object" "kernel" create
-builtins get [ ] subset f union-class define-class
+f builtins get [ ] subset union-class define-class
 
 ! Class of objects with object tag
 "hi-tag" "classes.private" create
-builtins get num-tags get tail f union-class define-class
+f builtins get num-tags get tail union-class define-class
 
 ! Null class with no instances.
 "null" "kernel" create [ drop f ] "predicate" set-word-prop
-"null" "kernel" create { } f union-class define-class
+"null" "kernel" create f { } union-class define-class
 
 ! Create special tombstone values
 "tombstone" "hashtables.private" create

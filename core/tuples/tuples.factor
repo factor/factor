@@ -124,7 +124,8 @@ PRIVATE>
     [ [ swap ?nth ] [ drop f ] if* ] with map
     append >tuple ;
 
-: reshape-tuples ( class newslots -- )
+: reshape-tuples ( class superclass newslots -- )
+    nip
     >r dup "slot-names" word-prop r> permutation
     [
         >r [ swap class eq? ] curry instances dup r>
@@ -132,36 +133,45 @@ PRIVATE>
         become
     ] 2curry after-compilation ;
 
-: tuple-class-unchanged ( class superclass slots -- ) 3drop ;
-
-: prepare-tuple-class ( class slots -- )
-    dupd define-tuple-slots
-    dup define-tuple-layout
-    define-tuple-predicate ;
-
-: change-superclass "not supported" throw ;
+: define-new-tuple-class ( class superclass slots -- )
+    [ drop f tuple-class define-class ]
+    [ nip define-tuple-slots ]
+    [
+        2drop
+        [ define-tuple-layout ]
+        [ define-tuple-predicate ]
+        bi
+    ]
+    3tri ;
 
 : redefine-tuple-class ( class superclass slots -- )
-    >r 2dup swap superclass eq?
-    [ drop ] [ dupd change-superclass ] if r>
-    2dup forget-slots
-    2dup reshape-tuples
-    over changed-word
-    over redefined
-    prepare-tuple-class ;
+    [ reshape-tuples ]
+    [
+        drop
+        [ forget-slots ]
+        [ drop changed-word ]
+        [ drop redefined ]
+        2tri
+    ]
+    [ define-new-tuple-class ]
+    3tri ;
 
-: define-new-tuple-class ( class superclass slots -- )
-    >r dupd f swap tuple-class define-class r>
-    prepare-tuple-class ;
+: tuple-class-unchanged? ( class superclass slots -- ? )
+    rot tuck
+    [ "superclass" word-prop = ]
+    [ "slot-names" word-prop = ] 2bi* and ;
 
 PRIVATE>
 
-: define-tuple-class ( class superclass slots -- )
-    {
-        { [ pick tuple-class? not ] [ define-new-tuple-class ] }
-        { [ pick "slot-names" word-prop over = ] [ tuple-class-unchanged ] }
-        { [ t ] [ redefine-tuple-class ] }
-    } cond ;
+GENERIC# define-tuple-class 2 ( class superclass slots -- )
+
+M: word define-tuple-class
+    define-new-tuple-class ;
+
+M: tuple-class define-tuple-class
+    3dup tuple-class-unchanged?
+    [ 3dup redefine-tuple-class ] unless
+    3drop ;
 
 : define-error-class ( class superclass slots -- )
     pick >r define-tuple-class r>

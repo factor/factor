@@ -36,7 +36,7 @@ PREDICATE: union-class < class
 M: union-class update-predicate define-union-predicate ;
 
 : define-union-class ( class members -- )
-    dupd f union-class define-class define-union-predicate ;
+    >r dup f r> union-class define-class define-union-predicate ;
 
 M: union-class reset-class
     { "metaclass" "members" } reset-props ;

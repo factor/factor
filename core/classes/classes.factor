@@ -83,13 +83,12 @@ M: word reset-class drop ;
 : update-map- ( class -- )
     dup class-uses update-map get remove-vertex ;
 
-PRIVATE>
-
-: define-class-props ( members superclass metaclass -- assoc )
+: define-class-props ( superclass members metaclass -- assoc )
     [
-        "metaclass" set
-        dup [ bootstrap-word ] when "superclass" set
-        [ bootstrap-word ] map "members" set
+        [ dup [ bootstrap-word ] when "superclass" set ]
+        [ [ bootstrap-word ] map "members" set ]
+        [ "metaclass" set ]
+        tri*
     ] H{ } make-assoc ;
 
 : (define-class) ( word props -- )
@@ -100,6 +99,8 @@ PRIVATE>
     over "predicating" set-word-prop
     t "class" set-word-prop ;
 
+PRIVATE>
+
 GENERIC: update-predicate ( class -- )
 
 M: class update-predicate drop ;
@@ -109,7 +110,7 @@ M: class update-predicate drop ;
 
 GENERIC: update-methods ( assoc -- )
 
-: define-class ( word members superclass metaclass -- )
+: define-class ( word superclass members metaclass -- )
     #! If it was already a class, update methods after.
     reset-caches
     define-class-props
