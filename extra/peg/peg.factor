@@ -191,7 +191,7 @@ C: <head> peg-head
     f lrstack set
     H{ } clone heads set
     H{ } clone packrat set
-  ] H{ } make-assoc swap bind ;
+  ] H{ } make-assoc swap bind ; inline
 
 
 : compiled-parsers ( -- cache )
@@ -235,9 +235,11 @@ GENERIC: (compile) ( parser -- quot )
 : compile ( parser -- word )
   [ compiled-parser ] with-compilation-unit ;
 
+: compiled-parse ( state word -- result )
+  swap [ execute ] with-packrat ; inline 
+
 : parse ( state parser -- result )
-  dup word? [ compile ] unless
-  [ execute ] curry with-packrat ;
+  dup word? [ compile ] unless compiled-parse ;
 
 <PRIVATE
 
@@ -486,6 +488,15 @@ M: delay-parser (compile) ( parser -- quot )
   { } { "word" } <effect> memoize-quot 
   [ % \ execute , ] [ ] make ;
 
+TUPLE: box-parser quot ;
+
+M: box-parser (compile) ( parser -- quot )
+  #! Calls the quotation at compile time
+  #! to produce the parser to be compiled.
+  #! This differs from 'delay' which calls
+  #! it at run time.
+  quot>> call compiled-parser 1quotation ;
+
 PRIVATE>
 
 : token ( string -- parser )
@@ -554,10 +565,13 @@ PRIVATE>
 : delay ( quot -- parser )
   delay-parser construct-boa init-parser ;
 
+: box ( quot -- parser )
+  box-parser construct-boa init-parser ;
+
 : PEG:
   (:) [
     [
-        call compile 1quotation
+        call compile [ compiled-parse ] curry
         [ dup [ parse-result-ast ] [ "Parse failed" throw ] if ]
         append define
     ] with-compilation-unit

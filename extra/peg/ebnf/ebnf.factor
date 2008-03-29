@@ -262,8 +262,8 @@ M: ebnf-terminal (transform) ( ast -- parser )
 
 M: ebnf-non-terminal (transform) ( ast -- parser )
   symbol>>  [
-    , parser get , \ at ,  
-  ] [ ] make delay sp ;
+    , parser get , \ at , \ sp ,   
+  ] [ ] make box ;
 
 : transform-ebnf ( string -- object )
   'ebnf' parse parse-result-ast transform ;
@@ -282,7 +282,8 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 
 : ebnf>quot ( string -- hashtable quot )
   'ebnf' parse check-parse-result 
-  parse-result-ast transform dup main swap at compile [ parse ] curry ;
+  parse-result-ast transform dup dup parser [ main swap at compile ] with-variable
+  [ compiled-parse ] curry ;
 
 : [EBNF "EBNF]" parse-multiline-string ebnf>quot nip parsed ; parsing
 
