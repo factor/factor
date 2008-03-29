@@ -95,3 +95,9 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 : d-infimum ( v -- d ) unclip-slice [ d-min ] reduce ;
 
 : d-supremum ( v -- d ) unclip-slice [ d-max ] reduce ;
+
+\ d+ [ d- ] [ d- ] define-math-inverse
+\ d- [ d+ ] [ d- ] define-math-inverse
+\ d* [ d/ ] [ d/ ] define-math-inverse
+\ d/ [ d* ] [ d/ ] define-math-inverse
+\ d-recip [ d-recip ] define-inverse
