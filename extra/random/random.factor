@@ -15,7 +15,7 @@ GENERIC: random-bytes* ( n tuple -- byte-array )
 M: object random-bytes* ( n tuple -- byte-array )
     swap [ drop random-32* ] with map >c-uint-array ;
 
-M: object random-32* ( tuple -- n ) 4 random-bytes* le> ;
+M: object random-32* ( tuple -- r ) 4 random-bytes* le> ;
 
 ERROR: no-random-number-generator ;
 
