@@ -65,7 +65,7 @@ C: <head> peg-head
   ] [ 
     pos set   
     fail
-  ] if* ;
+  ] if* ; inline
 
 : memo ( pos rule -- memo-entry )
   #! Return the result from the memo cache. 
@@ -85,14 +85,14 @@ C: <head> peg-head
     m (>>ans)
     pos get m (>>pos)
     r p m h (grow-lr)
-  ] if ;
+  ] if ; inline
  
 :: grow-lr ( r p m h -- ast )
   h p heads get set-at
   r p m h (grow-lr) 
   p heads get delete-at
   m pos>> pos set m ans>>
-  ;
+  ; inline
 
 :: (setup-lr) ( r l s -- )
   s head>> l head>> eq? [
@@ -121,7 +121,7 @@ C: <head> peg-head
     ] [
       m ans>> seed>>
     ] if
-  ] ;
+  ] ; inline
 
 :: recall ( r p -- memo-entry )
   [let* |
@@ -145,7 +145,7 @@ C: <head> peg-head
     ] [
       m
     ] if
-  ] ;
+  ] ; inline
 
 :: apply-non-memo-rule ( r p -- ast )
   [let* |
@@ -162,7 +162,7 @@ C: <head> peg-head
       ans m (>>ans)
       ans
     ] if
-  ] ;
+  ] ; inline
 
 :: apply-memo-rule ( r m -- ast )
   m pos>> pos set 
@@ -182,7 +182,7 @@ C: <head> peg-head
     ] [
       r p apply-non-memo-rule
     ] if 
-  ] ;
+  ] ; inline
 
 : with-packrat ( input quot -- result )
   #! Run the quotation with a packrat cache active.
