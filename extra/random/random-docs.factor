@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math random.backend ;
+USING: help.markup help.syntax math ;
 IN: random
 
 ARTICLE: "random-numbers" "Generating random integers"
