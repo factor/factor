@@ -4,7 +4,7 @@ USING: arrays definitions hashtables kernel
 kernel.private math namespaces sequences sequences.private
 strings vectors words quotations memory combinators generic
 classes classes.private slots.deprecated slots.private slots
-compiler.units math.private ;
+compiler.units math.private accessors ;
 IN: tuples
 
 M: tuple delegate 2 slot ;
@@ -43,6 +43,9 @@ PRIVATE>
         [ set-array-nth ] curry
         2each
     ] keep ;
+
+: slot-names ( class -- seq )
+    "slots" word-prop [ name>> ] map ;
 
 <PRIVATE
 
@@ -87,33 +90,33 @@ PRIVATE>
 
 : superclass-size ( class -- n )
     superclasses 1 head-slice*
-    [ "slot-names" word-prop length ] map sum ;
+    [ slot-names length ] map sum ;
 
-: generate-tuple-slots ( class slots -- slot-specs slot-names )
-    over superclass-size 2 + simple-slots
-    dup [ slot-spec-name ] map ;
+: generate-tuple-slots ( class slots -- slots )
+    over superclass-size 2 + simple-slots ;
 
 : define-tuple-slots ( class slots -- )
     dupd generate-tuple-slots
-    >r dupd "slots" set-word-prop
-    r> dupd "slot-names" set-word-prop
-    dup "slots" word-prop 2dup define-slots define-accessors ;
+    [ "slots" set-word-prop ]
+    [ define-accessors ]
+    [ define-slots ] 2tri ;
 
 : make-tuple-layout ( class -- layout )
-    dup superclass-size over "slot-names" word-prop length +
-    over superclasses dup length 1- <tuple-layout> ;
+    [ ]
+    [ [ superclass-size ] [ "slots" word-prop length ] bi + ]
+    [ superclasses dup length 1- ] tri
+    <tuple-layout> ;
 
 : define-tuple-layout ( class -- )
     dup make-tuple-layout "layout" set-word-prop ;
 
 : removed-slots ( class newslots -- seq )
-    swap "slot-names" word-prop seq-diff ;
+    swap slot-names seq-diff ;
 
-: forget-slots ( class newslots -- )
+: forget-slots ( class slots -- )
     dupd removed-slots [
-        2dup
-        reader-word forget-method
-        writer-word forget-method
+        [ reader-word forget-method ]
+        [ writer-word forget-method ] 2bi
     ] with each ;
 
 : permutation ( seq1 seq2 -- permutation )
@@ -126,28 +129,29 @@ PRIVATE>
 
 : reshape-tuples ( class superclass newslots -- )
     nip
-    >r dup "slot-names" word-prop r> permutation
+    >r dup slot-names r> permutation
     [
-        >r [ swap class eq? ] curry instances dup r>
-        [ reshape-tuple ] curry map
+        >r "predicate" word-prop instances dup
+        r> [ reshape-tuple ] curry map
         become
     ] 2curry after-compilation ;
 
 : define-new-tuple-class ( class superclass slots -- )
     [ drop f tuple-class define-class ]
-    [ nip define-tuple-slots ]
-    [
+    [ nip define-tuple-slots ] [
         2drop
-        [ define-tuple-layout ]
-        [ define-tuple-predicate ]
-        bi
-    ]
-    3tri ;
+        class-usages [
+            drop
+            [ define-tuple-layout ]
+            [ define-tuple-predicate ]
+            bi
+        ] assoc-each
+    ] 3tri ;
 
 : redefine-tuple-class ( class superclass slots -- )
     [ reshape-tuples ]
     [
-        drop
+        nip
         [ forget-slots ]
         [ drop changed-word ]
         [ drop redefined ]
@@ -157,9 +161,7 @@ PRIVATE>
     3tri ;
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
-    rot tuck
-    [ "superclass" word-prop = ]
-    [ "slot-names" word-prop = ] 2bi* and ;
+    rot tuck [ superclass = ] [ slot-names = ] 2bi* and ;
 
 PRIVATE>
 
@@ -199,9 +201,7 @@ M: tuple hashcode*
 
 ! Definition protocol
 M: tuple-class reset-class
-    {
-        "metaclass" "superclass" "slot-names" "slots" "layout"
-    } reset-props ;
+    { "metaclass" "superclass" "slots" "layout" } reset-props ;
 
 M: object get-slots ( obj slots -- ... )
     [ execute ] with each ;

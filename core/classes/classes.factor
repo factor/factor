@@ -101,12 +101,12 @@ M: word reset-class drop ;
 
 PRIVATE>
 
-GENERIC: update-predicate ( class -- )
+GENERIC: update-class ( class -- )
 
-M: class update-predicate drop ;
+M: class update-class drop ;
 
-: update-predicates ( assoc -- )
-    [ drop update-predicate ] assoc-each ;
+: update-classes ( assoc -- )
+    [ drop update-class ] assoc-each ;
 
 GENERIC: update-methods ( assoc -- )
 
@@ -114,10 +114,15 @@ GENERIC: update-methods ( assoc -- )
     #! If it was already a class, update methods after.
     reset-caches
     define-class-props
-    over update-map-
-    dupd (define-class)
-    dup update-map+
-    class-usages dup update-predicates update-methods ;
+    [ drop update-map- ]
+    [ (define-class) ] [
+        drop
+        [ update-map+ ] [
+            class-usages
+            [ update-classes ]
+            [ update-methods ] bi
+        ] bi
+    ] 2tri ;
 
 GENERIC: class ( object -- class ) inline
 

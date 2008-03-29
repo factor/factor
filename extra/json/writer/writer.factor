@@ -42,7 +42,7 @@ M: sequence json-print ( array -- string )
 : slots ( object -- values names )
   #! Given an object return an array of slots names and a sequence of slot values
   #! the slot name and the slot value. 
-  [ tuple-slots ] keep class "slot-names" word-prop ;
+  [ tuple-slots ] keep class slot-names ;
 
 : slots>fields ( values names -- array )
   #! Convert the arrays containing the slot names and values

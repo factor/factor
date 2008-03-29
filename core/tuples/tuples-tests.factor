@@ -343,7 +343,7 @@ TUPLE: electronic-device ;
 ! Hardcore unit tests
 USE: threads
 
-\ thread "slot-names" word-prop "slot-names" set
+\ thread slot-names "slot-names" set
 
 [ ] [
     [
@@ -361,7 +361,7 @@ USE: threads
 
 USE: vocabs
 
-\ vocab "slot-names" word-prop "slot-names" set
+\ vocab slot-names "slot-names" set
 
 [ ] [
     [
