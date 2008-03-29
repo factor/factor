@@ -1,30 +1,15 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel math namespaces sequences
-io.backend io.binary ;
+io.backend io.binary combinators system vocabs.loader
+random.backend random.mersenne-twister init ;
+USE: prettyprint
 IN: random
-
-SYMBOL: random-generator
-
-HOOK: os-crypto-random-bytes io-backend ( n -- byte-array )
-HOOK: os-random-bytes io-backend ( n -- byte-array )
-HOOK: os-crypto-random-32 io-backend ( -- r )
-HOOK: os-random-32 io-backend ( -- r )
-
-GENERIC: seed-random ( tuple seed -- )
-GENERIC: random-32* ( tuple -- r )
-GENERIC: random-bytes* ( tuple n -- bytes )
-
-M: object random-bytes* ( tuple n -- byte-array )
-    [ drop random-32* ] with map >c-uint-array ;
-
-M: object random-32* ( tuple -- n )
-    4 random-bytes* le> ;
 
 : random-bytes ( n -- r )
     [
-        4 /mod zero? [ 1+ ] unless
-        random-generator get swap random-bytes*
+        dup 4 rem zero? [ 1+ ] unless
+        random-generator get random-bytes*
     ] keep head ;
 
 : random ( seq -- elt )
@@ -41,3 +26,16 @@ M: object random-32* ( tuple -- n )
 
 : with-random ( tuple quot -- )
     random-generator swap with-variable ; inline
+
+: with-secure-random ( quot -- )
+    >r secure-random-generator get r> with-random ; inline
+
+{
+    { [ windows? ] [ "random.windows" require ] }
+    { [ unix? ] [ "random.unix" require ] }
+} cond
+
+[
+    [ 32 random-bits ] with-secure-random
+    <mersenne-twister> random-generator set-global
+] "random" add-init-hook

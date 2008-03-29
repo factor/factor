@@ -4,7 +4,8 @@
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
 
 USING: arrays kernel math namespaces sequences system init
-accessors math.ranges combinators.cleave random new-effects ;
+accessors math.ranges combinators.cleave random new-effects
+random.backend ;
 IN: random.mersenne-twister
 
 <PRIVATE
