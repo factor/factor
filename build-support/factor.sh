@@ -438,7 +438,7 @@ install_build_system_port() {
 }
 
 usage() {
-    echo "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|net-bootstrap"
+    echo "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|net-bootstrap|make-target"
     echo "If you are behind a firewall, invoke as:"
     echo "env GIT_PROTOCOL=http $0 <command>"
 }
@@ -453,7 +453,6 @@ case "$1" in
     bootstrap) get_config_info; bootstrap ;;
     dlls) get_config_info; maybe_download_dlls;;
     net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
-	#make-target) ECHO=`echo #`; find_build_info; echo $MAKE_TARGET ;;
 	make-target) ECHO=false; find_build_info; echo $MAKE_TARGET ;;
     *) usage ;;
 esac
