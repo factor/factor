@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 uname_s=`uname -s`
 case $uname_s in
