@@ -19,6 +19,9 @@ M: object random-32* ( tuple -- r ) 4 random-bytes* le> ;
 
 ERROR: no-random-number-generator ;
 
+M: no-random-number-generator summary
+    drop "Random number generator is not defined." ;
+
 M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
 
 M: f random-32* ( obj -- * ) no-random-number-generator ;
