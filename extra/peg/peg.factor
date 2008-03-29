@@ -489,6 +489,15 @@ M: delay-parser (compile) ( parser -- quot )
   { } { "word" } <effect> memoize-quot 
   [ % \ execute , ] [ ] make ;
 
+TUPLE: box-parser quot ;
+
+M: box-parser (compile) ( parser -- quot )
+  #! Calls the quotation at compile time
+  #! to produce the parser to be compiled.
+  #! This differs from 'delay' which calls
+  #! it at run time.
+  quot>> call compiled-parser 1quotation ;
+
 PRIVATE>
 
 : token ( string -- parser )
@@ -556,6 +565,9 @@ PRIVATE>
 
 : delay ( quot -- parser )
   delay-parser construct-boa init-parser ;
+
+: box ( quot -- parser )
+  box-parser construct-boa init-parser ;
 
 : PEG:
   (:) [
