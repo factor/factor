@@ -252,13 +252,13 @@ PREDICATE: unexpected-eof < unexpected
         [ "Use the word " swap summary append ] keep
     ] { } map>assoc ;
 
-TUPLE: no-word name ;
+ERROR: no-word-error name ;
 
-M: no-word summary
+M: no-word-error summary
     drop "Word not found in current vocabulary search path" ;
 
 : no-word ( name -- newword )
-    dup \ no-word construct-boa
+    dup no-word-error construct-boa
     swap words-named [ forward-reference? not ] subset
     word-restarts throw-restarts
     dup word-vocabulary (use+) ;
