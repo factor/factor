@@ -7,6 +7,7 @@ set +e
 shopt -s nocaseglob
 #shopt -s nocasematch
 
+ECHO=echo
 OS=
 ARCH=
 WORD=
@@ -25,23 +26,23 @@ ensure_program_installed() {
     installed=0;
     for i in $* ;
     do
-        echo -n "Checking for $i..."
+        $ECHO -n "Checking for $i..."
         test_program_installed $i
         if [[ $? -eq 0 ]]; then
             echo -n "not "
         else    
             installed=$(( $installed + 1 ))
         fi
-        echo "found!"
+        $ECHO "found!"
     done
     if [[ $installed -eq 0 ]] ; then
-        echo -n "Install "
+        $ECHO -n "Install "
         if [[ $# -eq 1 ]] ; then
-            echo -n $1
+            $ECHO -n $1
         else
-            echo -n "any of [ $* ]"
+            $ECHO -n "any of [ $* ]"
         fi
-        echo " and try again."
+        $ECHO " and try again."
         exit 1
     fi
 }
@@ -49,22 +50,22 @@ ensure_program_installed() {
 check_ret() {
     RET=$?
     if [[ $RET -ne 0 ]] ; then
-       echo $1 failed
+       $ECHO $1 failed
        exit 2
     fi
 }
 
 check_gcc_version() {
-    echo -n "Checking gcc version..."
+    $ECHO -n "Checking gcc version..."
     GCC_VERSION=`$CC --version`
     check_ret gcc
     if [[ $GCC_VERSION == *3.3.* ]] ; then
-        echo "bad!"
-        echo "You have a known buggy version of gcc (3.3)"
-        echo "Install gcc 3.4 or higher and try again."
+        $ECHO "bad!"
+        $ECHO "You have a known buggy version of gcc (3.3)"
+        $ECHO "Install gcc 3.4 or higher and try again."
         exit 3
     fi
-    echo "ok."
+    $ECHO "ok."
 }
 
 set_downloader() {
@@ -125,20 +126,20 @@ check_installed_programs() {
 check_library_exists() {
     GCC_TEST=factor-library-test.c
     GCC_OUT=factor-library-test.out
-    echo -n "Checking for library $1..."
-    echo "int main(){return 0;}" > $GCC_TEST
+    $ECHO -n "Checking for library $1..."
+    $ECHO "int main(){return 0;}" > $GCC_TEST
     $CC $GCC_TEST -o $GCC_OUT -l $1
     if [[ $? -ne 0 ]] ; then
-        echo "not found!"
-        echo "Warning: library $1 not found."
-        echo "***Factor will compile NO_UI=1"
+        $ECHO "not found!"
+        $ECHO "Warning: library $1 not found."
+        $ECHO "***Factor will compile NO_UI=1"
         NO_UI=1
     fi
     rm -f $GCC_TEST
     check_ret rm
     rm -f $GCC_OUT
     check_ret rm
-    echo "found."
+    $ECHO "found."
 }
 
 check_X11_libraries() {
@@ -156,14 +157,14 @@ check_libraries() {
 
 check_factor_exists() {
     if [[ -d "factor" ]] ; then
-        echo "A directory called 'factor' already exists."
-        echo "Rename or delete it and try again."
+        $ECHO "A directory called 'factor' already exists."
+        $ECHO "Rename or delete it and try again."
         exit 4
     fi
 }
 
 find_os() {
-    echo "Finding OS..."
+    $ECHO "Finding OS..."
     uname_s=`uname -s`
     check_ret uname
     case $uname_s in
@@ -182,7 +183,7 @@ find_os() {
 }
 
 find_architecture() {
-    echo "Finding ARCH..."
+    $ECHO "Finding ARCH..."
     uname_m=`uname -m`
     check_ret uname
     case $uname_m in
@@ -201,7 +202,7 @@ write_test_program() {
 }
 
 find_word_size() {
-    echo "Finding WORD..."
+    $ECHO "Finding WORD..."
     C_WORD=factor-word-size
     write_test_program
     gcc -o $C_WORD $C_WORD.c
@@ -219,26 +220,26 @@ set_factor_binary() {
 }
 
 echo_build_info() {
-    echo OS=$OS
-    echo ARCH=$ARCH
-    echo WORD=$WORD
-    echo FACTOR_BINARY=$FACTOR_BINARY
-    echo MAKE_TARGET=$MAKE_TARGET
-    echo BOOT_IMAGE=$BOOT_IMAGE
-    echo MAKE_IMAGE_TARGET=$MAKE_IMAGE_TARGET
-    echo GIT_PROTOCOL=$GIT_PROTOCOL
-    echo GIT_URL=$GIT_URL
-    echo DOWNLOADER=$DOWNLOADER
-    echo CC=$CC
-    echo MAKE=$MAKE
+    $ECHO OS=$OS
+    $ECHO ARCH=$ARCH
+    $ECHO WORD=$WORD
+    $ECHO FACTOR_BINARY=$FACTOR_BINARY
+    $ECHO MAKE_TARGET=$MAKE_TARGET
+    $ECHO BOOT_IMAGE=$BOOT_IMAGE
+    $ECHO MAKE_IMAGE_TARGET=$MAKE_IMAGE_TARGET
+    $ECHO GIT_PROTOCOL=$GIT_PROTOCOL
+    $ECHO GIT_URL=$GIT_URL
+    $ECHO DOWNLOADER=$DOWNLOADER
+    $ECHO CC=$CC
+    $ECHO MAKE=$MAKE
 }
 
 set_build_info() {
     if ! [[ -n $OS && -n $ARCH && -n $WORD ]] ; then
-        echo "OS: $OS"
-        echo "ARCH: $ARCH"
-        echo "WORD: $WORD"
-        echo "OS, ARCH, or WORD is empty.  Please report this"
+        $ECHO "OS: $OS"
+        $ECHO "ARCH: $ARCH"
+        $ECHO "WORD: $WORD"
+        $ECHO "OS, ARCH, or WORD is empty.  Please report this"
         exit 5
     fi
 
@@ -452,5 +453,7 @@ case "$1" in
     bootstrap) get_config_info; bootstrap ;;
     dlls) get_config_info; maybe_download_dlls;;
     net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
+	#make-target) ECHO=`echo #`; find_build_info; echo $MAKE_TARGET ;;
+	make-target) ECHO=false; find_build_info; echo $MAKE_TARGET ;;
     *) usage ;;
 esac
