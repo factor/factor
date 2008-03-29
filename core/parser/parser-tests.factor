@@ -322,7 +322,7 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ [ no-word? ] is? ] must-fail-with
+    ] [ [ no-word-error? ] is? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
@@ -332,7 +332,7 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ [ no-word? ] is? ] must-fail-with
+    ] [ [ no-word-error? ] is? ] must-fail-with
 
     [
         "IN: parser.tests : foo ; TUPLE: foo ;"

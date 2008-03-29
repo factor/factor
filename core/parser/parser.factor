@@ -252,7 +252,7 @@ PREDICATE: unexpected-eof < unexpected
         [ "Use the word " swap summary append ] keep
     ] { } map>assoc ;
 
-ERROR: no-word-error name ;
+TUPLE: no-word-error name ;
 
 M: no-word-error summary
     drop "Word not found in current vocabulary search path" ;

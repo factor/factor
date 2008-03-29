@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel math namespaces sequences
-io.backend io.binary combinators system vocabs.loader ;
+io.backend io.binary combinators system vocabs.loader
+inspector ;
 IN: random
 
 SYMBOL: insecure-random-generator
@@ -18,6 +19,9 @@ M: object random-bytes* ( n tuple -- byte-array )
 M: object random-32* ( tuple -- r ) 4 random-bytes* le> ;
 
 ERROR: no-random-number-generator ;
+
+M: no-random-number-generator summary
+    drop "Random number generator is not defined." ;
 
 M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
 
