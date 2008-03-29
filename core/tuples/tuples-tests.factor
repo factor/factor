@@ -316,6 +316,30 @@ C: <server> server
     "IN: tuples.tests TUPLE: bad-superclass < word ;" eval
 ] must-fail
 
+! Reshaping with inheritance
+TUPLE: electronic-device ;
+
+[ ] [ "IN: tuples.tests TUPLE: computer < electronic-device ;" eval ] unit-test
+
+[ f ] [ electronic-device laptop class< ] unit-test
+[ t ] [ server electronic-device class< ] unit-test
+[ t ] [ laptop server class-or electronic-device class< ] unit-test
+
+[ t ] [ "laptop" get electronic-device? ] unit-test
+[ t ] [ "laptop" get computer? ] unit-test
+[ t ] [ "laptop" get laptop? ] unit-test
+[ f ] [ "laptop" get server? ] unit-test
+
+[ t ] [ "server" get electronic-device? ] unit-test
+[ t ] [ "server" get computer? ] unit-test
+[ f ] [ "server" get laptop? ] unit-test
+[ t ] [ "server" get server? ] unit-test
+
+[ ] [ "IN: tuples.tests TUPLE: computer ;" eval ] unit-test
+
+[ f ] [ "laptop" get electronic-device? ] unit-test
+[ t ] [ "laptop" get computer? ] unit-test
+
 ! Hardcore unit tests
 USE: threads
 
