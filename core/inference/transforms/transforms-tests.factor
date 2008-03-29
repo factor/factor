@@ -1,6 +1,6 @@
 IN: inference.transforms.tests
 USING: sequences inference.transforms tools.test math kernel
-quotations inference ;
+quotations inference accessors combinators words arrays ;
 
 : compose-n-quot <repetition> >quotation ;
 : compose-n compose-n-quot call ;

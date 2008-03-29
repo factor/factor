@@ -20,7 +20,7 @@ hashtables sorting ;
 : spread>quot ( seq -- quot )
     [ length [ >r ] <repetition> concat ]
     [ [ [ r> ] prepend ] map concat ] bi
-    compose ;
+    append ;
 
 : spread ( seq -- )
     spread>quot call ;

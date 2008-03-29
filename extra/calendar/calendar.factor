@@ -84,10 +84,10 @@ PRIVATE>
     ] ;
 
 : >date< ( timestamp -- year month day )
-    { year>> month>> day>> } get-slots ;
+    [ year>> ] [ month>> ] [ day>> ] tri ;
 
 : >time< ( timestamp -- hour minute second )
-    { hour>> minute>> second>> } get-slots ;
+    [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
 : instant ( -- dt ) 0 0 0 0 0 0 <duration> ;
 : years ( n -- dt ) instant swap >>year ;
