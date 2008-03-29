@@ -1,10 +1,9 @@
-! Copyright (C) 2007 Chris Double.
+! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
-       words quotations effects memoize accessors 
-       combinators.cleave locals ;
+       words quotations effects memoize accessors locals ;
 IN: peg
 
 USE: prettyprint
