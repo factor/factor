@@ -19,6 +19,7 @@ TUPLE: ebnf-repeat1 group ;
 TUPLE: ebnf-optional group ;
 TUPLE: ebnf-rule symbol elements ;
 TUPLE: ebnf-action parser code ;
+TUPLE: ebnf-var parser name ;
 TUPLE: ebnf rules ;
 
 C: <ebnf-non-terminal> ebnf-non-terminal
@@ -34,6 +35,7 @@ C: <ebnf-repeat1> ebnf-repeat1
 C: <ebnf-optional> ebnf-optional
 C: <ebnf-rule> ebnf-rule
 C: <ebnf-action> ebnf-action
+C: <ebnf-var> ebnf-var
 C: <ebnf> ebnf
 
 : syntax ( string -- parser )
@@ -79,6 +81,7 @@ C: <ebnf> ebnf
       [ dup CHAR: * = ]
       [ dup CHAR: + = ]
       [ dup CHAR: ? = ]
+      [ dup CHAR: : = ]
     } || not nip    
   ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
@@ -200,6 +203,7 @@ DEFER: 'choice'
 : 'actioned-sequence' ( -- parser )
   [
     [ 'sequence' , "=>" syntax , 'action' , ] seq* [ first2 <ebnf-action> ] action ,
+    [ 'sequence' , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , ] seq* [ first2 <ebnf-var> ] action ,
     'sequence' ,
   ] choice* ;
   
@@ -269,6 +273,9 @@ M: ebnf-optional (transform) ( ast -- parser )
 M: ebnf-action (transform) ( ast -- parser )
   [ parser>> (transform) ] keep
   code>> string-lines [ parse-lines ] with-compilation-unit action ;
+
+M: ebnf-var (transform) ( ast -- parser )
+  parser>> (transform) ;
 
 M: ebnf-terminal (transform) ( ast -- parser )
   symbol>> token sp ;
