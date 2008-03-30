@@ -3,7 +3,7 @@
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
-       words quotations effects memoize accessors locals ;
+       words quotations effects memoize accessors locals effects ;
 IN: peg
 
 USE: prettyprint
@@ -208,7 +208,7 @@ GENERIC: (compile) ( parser -- quot )
 :: parser-body ( parser -- quot )
   #! Return the body of the word that is the compiled version
   #! of the parser.
-  [let* | rule [ parser (compile) define-temp dup parser "peg" set-word-prop ] 
+  [let* | rule [ gensym dup parser (compile) 0 1 <effect> define-declared dup parser "peg" set-word-prop ] 
         |
     [
       rule pos get apply-rule dup fail = [ 
@@ -218,7 +218,7 @@ GENERIC: (compile) ( parser -- quot )
       ] if
     ] 
   ] ;
- 
+
 : compiled-parser ( parser -- word )
   #! Look to see if the given parser has been compiled.
   #! If not, compile it to a temporary word, cache it,
@@ -229,7 +229,7 @@ GENERIC: (compile) ( parser -- quot )
   dup compiled>> [
     nip
   ] [
-    gensym tuck >>compiled 2dup parser-body define dupd "peg" set-word-prop
+    gensym tuck >>compiled 2dup parser-body 0 1 <effect> define-declared dupd "peg" set-word-prop
   ] if* ;
 
 : compile ( parser -- word )
@@ -490,8 +490,11 @@ M: box-parser (compile) ( parser -- quot )
   #! Calls the quotation at compile time
   #! to produce the parser to be compiled.
   #! This differs from 'delay' which calls
-  #! it at run time.
-  quot>> call compiled-parser 1quotation ;
+  #! it at run time. Due to using the runtime
+  #! environment at compile time, this parser
+  #! must not be cached, so we clear out the
+  #! delgates cache.
+  f >>compiled quot>> call compiled-parser 1quotation ;
 
 PRIVATE>
 
@@ -562,7 +565,12 @@ PRIVATE>
   delay-parser construct-boa init-parser ;
 
 : box ( quot -- parser )
-  box-parser construct-boa init-parser ;
+  #! because a box has its quotation run at compile time
+  #! it must always have a new parser delgate created, 
+  #! not a cached one. This is because the same box,
+  #! compiled twice can have a different compiled word
+  #! due to running at compile time.
+  box-parser construct-boa next-id f <parser> over set-delegate ;
 
 : PEG:
   (:) [
