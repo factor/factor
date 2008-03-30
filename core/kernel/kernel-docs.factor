@@ -545,12 +545,33 @@ HELP: 2bi
     "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y -- z )" } ", then the following two lines are equivalent:"
     { $code
         "[ p ] [ q ] 2bi"
-        "2dup p swap q"
+        "2dup p -rot q"
     }
     "In general, the following two lines are equivalent:"
     { $code
         "[ p ] [ q ] 2bi"
         "[ p ] 2keep q"
+    }
+} ;
+
+HELP: 3bi
+{ $values { "x" object } { "y" object } { "z" object } { "p" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to the two input values, then applies " { $snippet "q" } " to the two input values." }
+{ $examples
+    "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y z -- )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] 3bi"
+        "3dup p q"
+    }
+    "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y z -- w )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] 3bi"
+        "3dup p -roll q"
+    }
+    "In general, the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] 3bi"
+        "[ p ] 3keep q"
     }
 } ;
 
@@ -588,6 +609,22 @@ HELP: 2tri
     { $code
         "[ p ] [ q ] [ r ] 2tri"
         "[ p ] 2keep [ q ] 2keep r"
+    }
+} ;
+
+HELP: 3tri
+{ $values { "x" object } { "y" object } { "z" object } { "p" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } { "r" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to the three input values, then applies " { $snippet "q" } " to the three input values, and finally applies " { $snippet "r" } " to the three input values." }
+{ $examples
+    "If " { $snippet "[ p ]" } ", " { $snippet "[ q ]" } " and " { $snippet "[ r ]" } " have stack effect " { $snippet "( x y z -- )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] [ r ] 3tri"
+        "3dup p 3dup q r"
+    }
+    "In general, the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] [ r ] 3tri"
+        "[ p ] 3keep [ q ] 3keep r"
     }
 } ;
 
