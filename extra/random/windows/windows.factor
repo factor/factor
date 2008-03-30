@@ -46,9 +46,9 @@ M: windows-rng random-bytes* ( n tuple -- bytes )
     MS_DEF_PROV
     PROV_RSA_FULL <windows-rng> insecure-random-generator set-global
 
-    ! MS_STRONG_PROV
-    ! PROV_RSA_FULL <windows-rng> secure-random-generator set-global
+    MS_STRONG_PROV
+    PROV_RSA_FULL <windows-rng> secure-random-generator set-global
 
-    MS_ENH_RSA_AES_PROV
-    PROV_RSA_AES <windows-rng> secure-random-generator set-global
+    ! MS_ENH_RSA_AES_PROV
+    ! PROV_RSA_AES <windows-rng> secure-random-generator set-global
 ] "random.windows" add-init-hook
