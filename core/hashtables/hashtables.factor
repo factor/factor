@@ -18,14 +18,9 @@ IN: hashtables
 : (key@) ( key keys i -- array n ? )
     3dup swap array-nth
     dup ((empty)) eq?
-      [ 3drop nip f f ]
-      [
-        =
-          [ rot drop t ]
-          [ probe (key@) ]
-        if
-      ]
-    if ; inline
+    [ 3drop nip f f ] [
+        = [ rot drop t ] [ probe (key@) ] if
+    ] if ; inline
 
 : key@ ( key hash -- array n ? )
     hash-array 2dup hash@ (key@) ; inline
@@ -89,7 +84,8 @@ IN: hashtables
         ] if
     ] if ; inline
 
-: find-pair ( array quot -- key value ? ) 0 rot (find-pair) ; inline
+: find-pair ( array quot -- key value ? )
+    0 rot (find-pair) ; inline
 
 : (rehash) ( hash array -- )
     [ swap pick (set-hash) drop f ] find-pair 2drop 2drop ;
@@ -99,8 +95,7 @@ IN: hashtables
     [ hash-array array-capacity ] bi > ;
 
 : hash-stale? ( hash -- ? )
-    [ hash-deleted 10 fixnum*fast ]
-    [ hash-count                  ] bi fixnum> ;
+    [ hash-deleted 10 fixnum*fast ] [ hash-count ] bi fixnum> ;
 
 : grow-hash ( hash -- )
     [ dup hash-array swap assoc-size 1+ ] keep
@@ -185,12 +180,12 @@ M: hashtable assoc-like
 
 : prune ( seq -- newseq )
     [ length <hashtable> ]
-    [ length <vector>    ]
-    [                    ] tri
+    [ length <vector> ]
+    [ ] tri
     [ >r 2dup r> (prune) ] each nip ;
 
 : all-unique? ( seq -- ? )
-    [ length       ]
+    [ length ]
     [ prune length ] bi = ;
 
 INSTANCE: hashtable assoc
