@@ -144,6 +144,23 @@ IN: peg.ebnf.tests
   "Z" [EBNF foo=[^A-Z] EBNF] call  
 ] unit-test
 
+{ V{ "1" "+" "foo" } } [
+  "1+1" [EBNF foo='1' '+' '1' [[ drop "foo" ]] EBNF] call parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "1+1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] EBNF] call parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "1+1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] | '1' '-' '1' => [[ drop "bar" ]] EBNF] call parse-result-ast
+] unit-test
+
+{ "bar" } [
+  "1-1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] | '1' '-' '1' => [[ drop "bar" ]] EBNF] call parse-result-ast
+] unit-test
+
+
 { V{ V{ 49 } "+" V{ 49 } } } [ 
   #! Test direct left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
