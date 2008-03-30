@@ -3,7 +3,7 @@
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
 system combinators splitting sbufs continuations io.encodings
-io.encodings.binary init ;
+io.encodings.binary init accessors ;
 IN: io.files
 
 HOOK: (file-reader) io-backend ( path -- stream )
@@ -145,7 +145,16 @@ PRIVATE>
 TUPLE: file-info type size permissions modified ;
 
 HOOK: file-info io-backend ( path -- info )
+
+! Symlinks
 HOOK: link-info io-backend ( path -- info )
+
+HOOK: make-link io-backend ( path1 path2 -- )
+
+HOOK: read-link io-backend ( path -- info )
+
+: copy-link ( path1 path2 -- )
+    >r read-link r> make-link ;
 
 SYMBOL: +regular-file+
 SYMBOL: +directory+
@@ -218,14 +227,14 @@ HOOK: delete-file io-backend ( path -- )
 
 HOOK: delete-directory io-backend ( path -- )
 
-: (delete-tree) ( path dir? -- )
-    [
-        dup directory* [ (delete-tree) ] assoc-each
-        delete-directory
-    ] [ delete-file ] if ;
-
 : delete-tree ( path -- )
-    dup directory? (delete-tree) ;
+    dup link-info type>> +directory+ = [
+        dup directory over [
+            [ first delete-tree ] each
+        ] with-directory delete-directory
+    ] [
+        delete-file
+    ] if ;
 
 : to-directory over file-name append-path ;
 
@@ -258,13 +267,16 @@ M: object copy-file
 DEFER: copy-tree-into
 
 : copy-tree ( from to -- )
-    over directory? [
-        >r dup directory swap r> [
-            >r swap first append-path r> copy-tree-into
-        ] 2curry each
-    ] [
-        copy-file
-    ] if ;
+    over link-info type>>
+    {
+        { +symbolic-link+ [ copy-link ] }
+        { +directory+ [
+            >r dup directory r> rot [
+                [ >r first r> copy-tree-into ] curry each
+            ] with-directory
+        ] }
+        [ drop copy-file ]
+    } case ;
 
 : copy-tree-into ( from to -- )
     to-directory copy-tree ;
