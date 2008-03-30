@@ -42,6 +42,7 @@
 	#include <sys/socket.h>
 	#include <sys/errno.h>
     #include <sys/mman.h>
+    #include <sys/syslimits.h>
 	#include <fcntl.h>
 	#include <unistd.h>
 #endif
@@ -146,6 +147,7 @@ void unix_constants()
 	constant(PROT_WRITE);
 	constant(MAP_FILE);
 	constant(MAP_SHARED);
+	constant(PATH_MAX);
 	grovel(pid_t);
 
 }
