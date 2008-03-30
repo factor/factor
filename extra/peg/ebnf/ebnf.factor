@@ -3,7 +3,7 @@
 USING: kernel compiler.units parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
        peg.parsers unicode.categories multiline combinators.lib 
-       splitting accessors ;
+       splitting accessors effects ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -310,5 +310,5 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 : EBNF: 
   CREATE-WORD dup 
   ";EBNF" parse-multiline-string
-  ebnf>quot swapd define "ebnf-parser" set-word-prop ; parsing
+  ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop ; parsing
 

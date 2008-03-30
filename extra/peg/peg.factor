@@ -3,7 +3,7 @@
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
-       words quotations effects memoize accessors locals ;
+       words quotations effects memoize accessors locals effects ;
 IN: peg
 
 USE: prettyprint
@@ -206,7 +206,7 @@ GENERIC: (compile) ( parser -- quot )
 :: parser-body ( parser -- quot )
   #! Return the body of the word that is the compiled version
   #! of the parser.
-  [let* | rule [ parser (compile) define-temp dup parser "peg" set-word-prop ] 
+  [let* | rule [ gensym dup parser (compile) 0 1 <effect> define-declared dup parser "peg" set-word-prop ] 
         |
     [
       rule pos get apply-rule dup fail = [ 
@@ -216,7 +216,7 @@ GENERIC: (compile) ( parser -- quot )
       ] if
     ] 
   ] ;
- 
+
 : compiled-parser ( parser -- word )
   #! Look to see if the given parser has been compiled.
   #! If not, compile it to a temporary word, cache it,
@@ -227,7 +227,7 @@ GENERIC: (compile) ( parser -- quot )
   dup compiled>> [
     nip
   ] [
-    gensym tuck >>compiled 2dup parser-body define dupd "peg" set-word-prop
+    gensym tuck >>compiled 2dup parser-body 0 1 <effect> define-declared dupd "peg" set-word-prop
   ] if* ;
 
 : compile ( parser -- word )
