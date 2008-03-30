@@ -98,14 +98,14 @@ DEFER: if
     >r -rot 2slip r> call ; inline
 
 ! Appliers
-: bi@ ( x y p -- )
+: bi@ ( x y quot -- )
     tuck 2slip call ; inline
 
-: tri@ ( x y z p -- )
+: tri@ ( x y z quot -- )
     tuck >r bi@ r> call ; inline
 
 ! Double appliers
-: 2bi@ ( w x y z p -- )
+: 2bi@ ( w x y z quot -- )
     dup -roll 3slip call ; inline
 
 : while ( pred body tail -- )
