@@ -43,29 +43,86 @@ $nl
 "An alternative to using " { $link >r } " and " { $link r> } " is the following:"
 { $subsection dip } ;
 
-ARTICLE: "basic-combinators" "Basic combinators"
-"The following pair of words invoke words and quotations reflectively:"
-{ $subsection call }
-{ $subsection execute }
-"These words are used to implement " { $emphasis "combinators" } ", which are words that take code from the stack. Note that combinator definitions must be followed by the " { $link POSTPONE: inline } " declaration in order to compile in the optimizing compiler; for example:"
-{ $code
-    ": keep ( x quot -- x )"
-    "    over >r call r> ; inline"
-}
-"Word inlining is documented in " { $link "declarations" } "."
+ARTICLE: "cleave-combinators" "Cleave combinators"
+"The cleave combinators apply multiple quotations to a single value."
 $nl
-"There are some words that combine shuffle words with " { $link call } ". They are useful for implementing higher-level combinators."
-{ $subsection slip }
-{ $subsection 2slip }
-{ $subsection keep }
-{ $subsection 2keep }
-{ $subsection 3keep }
+"Two quotations:"
+{ $subsection bi }
+{ $subsection 2bi }
+"Three quotations:"
+{ $subsection tri }
+{ $subsection 2tri }
+"Technically, the cleave combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on the top of the stack can be written in one of two ways:"
+{ $code
+    "! First alternative; uses keep"
+    "[ 1 + ] keep"
+    "[ 1 - ] keep"
+    "2 *"
+    "! Second alternative: uses tri"
+    "[ 1 + ]"
+    "[ 1 - ]"
+    "[ 2 * ] tri"
+}
+"The latter is more aesthetically pleasing than the former."
+$nl
+"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
+$nl
+"From the Merriam-Webster Dictionary: "
+$nl
+{ $strong "cleave" }
+{ $list
+  { $emphasis "To divide by or as if by a cutting blow" }
+  { $emphasis "To separate into distinct parts and especially into groups having divergent views" }
+} ;
+
+ARTICLE: "spread-combinators" "Spread combinators"
+"The spread combinators apply multiple quotations to multiple values. The " { $snippet "*" } " suffix signifies spreading."
+$nl
+"Two quotations:"
+{ $subsection bi* }
+{ $subsection 2bi* }
+"Three quotations:"
+{ $subsection tri* }
+"Technically, the spread combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on three related values can be written in one of two ways:"
+{ $code
+    "! First alternative; uses retain stack explicitly"
+    ">r >r 1 +"
+    "r> 1 -"
+    "r> 2 *"
+    "! Second alternative: uses tri*"
+    "[ 1 + ]"
+    "[ 1 - ]"
+    "[ 2 * ] tri*"
+}
+
+$nl
+"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "." ;
+
+ARTICLE: "apply-combinators" "Apply combinators"
+"The apply combinators apply multiple quotations to multiple values. The " { $snippet "@" } " suffix signifies application."
+$nl
+"Two quotations:"
 { $subsection bi@ }
+{ $subsection 2bi@ }
+"Three quotations:"
+{ $subsection tri@ }
 "A pair of utility words built from " { $link bi@ } ":"
 { $subsection both? }
-{ $subsection either? }
-"A looping combinator:"
-{ $subsection while }
+{ $subsection either? } ;
+
+ARTICLE: "slip-keep-combinators" "The slip and keep combinators"
+"The slip combinators invoke a quotation further down on the stack. They are most useful for implementing other combinators:"
+{ $subsection slip }
+{ $subsection 2slip }
+{ $subsection 3slip }
+"The dip combinator invokes the quotation at the top of the stack, hiding the value underneath:"
+{ $subsection dip }
+"The keep combinators invoke a quotation which takes a number of values off the stack, and then they restore those values:"
+{ $subsection keep }
+{ $subsection 2keep }
+{ $subsection 3keep } ;
+
+ARTICLE: "compositional-combinators" "Compositional combinators"
 "Quotations can be composed using efficient quotation-specific operations:"
 { $subsection curry }
 { $subsection 2curry }
@@ -73,8 +130,21 @@ $nl
 { $subsection with }
 { $subsection compose }
 { $subsection 3compose }
-"Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } "."
-{ $see-also "combinators" } ;
+"Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } "." ;
+
+ARTICLE: "implementing-combinators" "Implementing combinators"
+"The following pair of words invoke words and quotations reflectively:"
+{ $subsection call }
+{ $subsection execute }
+"These words are used to implement combinators. Note that combinator definitions must be followed by the " { $link POSTPONE: inline } " declaration in order to compile in the optimizing compiler; for example:"
+{ $code
+    ": keep ( x quot -- x )"
+    "    over >r call r> ; inline"
+}
+"Word inlining is documented in " { $link "declarations" } "."
+$nl
+"A looping combinator:"
+{ $subsection while } ;
 
 ARTICLE: "booleans" "Booleans"
 "In Factor, any object that is not " { $link f } " has a true value, and " { $link f } " has a false value. The " { $link t } " object is the canonical true value."
@@ -115,15 +185,13 @@ ARTICLE: "conditionals" "Conditionals and logic"
 { $subsection ?if }
 "Sometimes instead of branching, you just need to pick one of two values:"
 { $subsection ? }
-"Forms which abstract away common patterns involving multiple nested branches:"
-{ $subsection cond }
-{ $subsection case }
 "There are some logical operations on booleans:"
 { $subsection >boolean }
 { $subsection not }
 { $subsection and }
 { $subsection or }
 { $subsection xor }
+"See " { $link "combinators" } " for forms which abstract away common patterns involving multiple nested branches."
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
 ARTICLE: "equality" "Equality and comparison testing"
@@ -146,7 +214,23 @@ $nl
 "An object can be cloned; the clone has distinct identity but equal value:"
 { $subsection clone } ;
 
-! Defined in handbook.factor
+ARTICLE: "dataflow" "Data and control flow"
+{ $subsection "evaluator" }
+{ $subsection "words" }
+{ $subsection "effects" }
+{ $subsection "booleans" }
+{ $subsection "shuffle-words" }
+"A central concept in Factor is that of a " { $emphasis "combinator" } ", which is a word taking code as input."
+{ $subsection "cleave-combinators" }
+{ $subsection "spread-combinators" }
+{ $subsection "apply-combinators" }
+{ $subsection "slip-keep-combinators" }
+{ $subsection "conditionals" }
+{ $subsection "combinators" }
+"Advanced topics:"
+{ $subsection "implementing-combinators" }
+{ $subsection "continuations" } ;
+
 ABOUT: "dataflow"
 
 HELP: eq? ( obj1 obj2 -- ? )
@@ -242,6 +326,8 @@ HELP: equal?
         { { $snippet "a = b" } " implies " { $snippet "b = a" } }
         { { $snippet "a = b" } " and " { $snippet "b = c" } " implies " { $snippet "a = c" } }
     }
+    $nl
+    "If a class defines a custom equality comparison test, it should also define a compatible method for the " { $link hashcode* } " generic word."
 }
 { $examples
     "To define a tuple class such that two instances are only equal if they are both the same instance, we can add a method to " { $link equal? } " which always returns " { $link f } ". Since " { $link = } " handles the case where the two objects are " { $link eq? } ", this method will never be called with two " { $link eq? } " objects, so such a definition is valid:"
@@ -376,9 +462,152 @@ HELP: 3keep
 { $values { "quot" "a quotation with stack effect " { $snippet "( x y z -- )" } } { "x" object } { "y" object } { "z" object } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
+HELP: bi
+{ $values { "x" object } { "p" "a quotation with stack effect " { $snippet "( x -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( x -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "x" } "." }
+{ $examples
+    "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x -- )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] bi"
+        "dup p q"
+    }
+    "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x -- y )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] bi"
+        "dup p swap q"
+    }
+    "In general, the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] bi"
+        "[ p ] keep q"
+    }
+    
+} ;
+
+HELP: 2bi
+{ $values { "x" object } { "y" object } { "p" "a quotation with stack effect " { $snippet "( x y -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( x y -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to the two input values, then applies " { $snippet "q" } " to the two input values." }
+{ $examples
+    "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y -- )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] 2bi"
+        "2dup p q"
+    }
+    "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y -- z )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] 2bi"
+        "2dup p swap q"
+    }
+    "In general, the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] 2bi"
+        "[ p ] 2keep q"
+    }
+} ;
+
+HELP: tri
+{ $values { "x" object } { "p" "a quotation with stack effect " { $snippet "( x -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( x -- ... )" } } { "r" "a quotation with stack effect " { $snippet "( x -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "x" } ", and finally applies " { $snippet "r" } " to " { $snippet "x" } "." }
+{ $examples
+    "If " { $snippet "[ p ]" } ", " { $snippet "[ q ]" } " and " { $snippet "[ r ]" } " have stack effect " { $snippet "( x -- )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] [ r ] tri"
+        "dup p dup q r"
+    }
+    "If " { $snippet "[ p ]" } ", " { $snippet "[ q ]" } " and " { $snippet "[ r ]" } " have stack effect " { $snippet "( x -- y )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] [ r ] tri"
+        "dup p over q rot r"
+    }
+    "In general, the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] [ r ] tri"
+        "[ p ] keep [ q ] keep r"
+    }
+} ;
+
+HELP: 2tri
+{ $values { "x" object } { "y" object } { "p" "a quotation with stack effect " { $snippet "( x y -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( x y -- ... )" } } { "r" "a quotation with stack effect " { $snippet "( x y -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to the two input values, then applies " { $snippet "q" } " to the two input values, and finally applies " { $snippet "r" } " to the two input values." }
+{ $examples
+    "If " { $snippet "[ p ]" } ", " { $snippet "[ q ]" } " and " { $snippet "[ r ]" } " have stack effect " { $snippet "( x y -- )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] [ r ] 2tri"
+        "2dup p 2dup q r"
+    }
+    "In general, the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] [ r ] 2tri"
+        "[ p ] 2keep [ q ] 2keep r"
+    }
+} ;
+
+
+HELP: bi*
+{ $values { "x" object } { "y" object } { "p" "a quotation with stack effect " { $snippet "( x -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( y -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "y" } "." }
+{ $examples
+    "The following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] bi*"
+        ">r p r> q"
+    }
+} ;
+
+HELP: 2bi*
+{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "p" "a quotation with stack effect " { $snippet "( w x -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( y z -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to " { $snippet "w" } " and " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "y" } " and " { $snippet "z" } "." }
+{ $examples
+    "The following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] 2bi*"
+        ">r >r q r> r> q"
+    }
+} ;
+
+HELP: tri*
+{ $values { "x" object } { "y" object } { "z" object } { "p" "a quotation with stack effect " { $snippet "( x -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( y -- ... )" } } { "r" "a quotation with stack effect " { $snippet "( z -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "y" } ", and finally applies " { $snippet "r" } " to " { $snippet "z" } "." }
+{ $examples
+    "The following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] [ r ] tri*"
+        ">r >r q r> q r> r"
+    }
+} ;
+
 HELP: bi@
-{ $values { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } { "x" object } { "y" object } }
-{ $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } "." } ;
+{ $values { "x" object } { "y" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } }
+{ $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } "." }
+{ $examples
+    "The following two lines are equivalent:"
+    { $code
+        "[ p ] bi@"
+        ">r p r> p"
+    }
+} ;
+
+HELP: 2bi@
+{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "quot" "a quotation with stack effect " { $snippet "( obj1 obj2 -- )" } } }
+{ $description "Applies the quotation to " { $snippet "w" } " and " { $snippet "x" } ", then to " { $snippet "y" } " and " { $snippet "z" } "." }
+{ $examples
+    "The following two lines are equivalent:"
+    { $code
+        "[ p ] 2bi@"
+        ">r >r p r> r> p"
+    }
+} ;
+
+HELP: tri@
+{ $values { "x" object } { "y" object } { "z" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } }
+{ $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } ", and finally to " { $snippet "z" } "." }
+{ $examples
+    "The following two lines are equivalent:"
+    { $code
+        "[ p ] tri@"
+        ">r >r p r> p r> p"
+    }
+} ;
 
 HELP: if ( cond true false -- )
 { $values { "cond" "a generalized boolean" } { "true" quotation } { "false" quotation } }

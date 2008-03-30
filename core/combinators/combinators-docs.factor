@@ -10,17 +10,53 @@ ARTICLE: "combinators-quot" "Quotation construction utilities"
 { $subsection alist>quot } ;
 
 ARTICLE: "combinators" "Additional combinators"
-"The " { $vocab-link "combinators" } " vocabulary is usually used because it provides two combinators which abstract out nested chains of " { $link if } ":"
+"The " { $vocab-link "combinators" } " vocabulary provides generalizations of certain combinators from the " { $vocab-link "kernel" } " vocabulary."
+$nl
+"Generalization of " { $link bi } " and " { $link tri } ":"
+{ $subsection cleave }
+"Generalization of " { $link bi* } " and " { $link tri* } ":"
+{ $subsection spread }
+"Two combinators which abstract out nested chains of " { $link if } ":"
 { $subsection cond }
 { $subsection case }
+"The " { $vocab-link "combinators" } " also provides some less frequently-used features."
+$nl
 "A combinator which can help with implementing methods on " { $link hashcode* } ":"
 { $subsection recursive-hashcode }
 "An oddball combinator:"
 { $subsection with-datastack }
 { $subsection "combinators-quot" }
-{ $see-also "quotations" "basic-combinators" } ;
+{ $see-also "quotations" "dataflow" } ;
 
 ABOUT: "combinators"
+
+HELP: cleave
+{ $values { "x" object } { "seq" "a sequence of quotations with stack effect " { $snippet "( x -- ... )" } } }
+{ $description "Applies each quotation to the object in turn." }
+{ $examples
+    "The " { $link bi } " combinator takes one value and two quotations; the " { $link tri } " combinator takes one value and three quotations. The " { $link cleave } " combinator takes one value and any number of quotations, and is essentially equivalent to a chain of " { $link keep } " forms:"
+    { $code
+        "! Equivalent"
+        "{ [ p ] [ q ] [ r ] [ s ] } cleave"
+        "[ p ] keep [ q ] keep [ r ] keep s"
+    }
+} ;
+
+{ bi tri cleave } related-words
+
+HELP: spread
+{ $values { "obj..." "objects" } { "seq" "a sequence of quotations with stack effect " { $snippet "( x -- ... )" } } }
+{ $description "Applies each quotation to the object in turn." }
+{ $examples
+    "The " { $link bi* } " combinator takes two values and two quotations; the " { $link tri* } " combinator takes three values and three quotations. The " { $link spread } " combinator takes " { $snippet "n" } " values and " { $snippet "n" } " quotations, where " { $snippet "n" } " is the length of the input sequence, and is essentially equivalent to series of retain stack manipulations:"
+    { $code
+        "! Equivalent"
+        "{ [ p ] [ q ] [ r ] [ s ] } spread"
+        ">r >r >r p r> q r> r r> s"
+    }
+} ;
+
+{ bi* tri* spread } related-words
 
 HELP: alist>quot
 { $values { "default" "a quotation" } { "assoc" "a sequence of quotation pairs" } { "quot" "a new quotation" } }
