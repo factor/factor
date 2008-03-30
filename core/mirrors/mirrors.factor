@@ -1,17 +1,15 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel sequences generic words
-arrays classes slots slots.private tuples math vectors
+arrays classes slots slots.private classes.tuple math vectors
 quotations sorting prettyprint ;
 IN: mirrors
 
-GENERIC: object-slots ( obj -- seq )
+: all-slots ( class -- slots )
+    superclasses [ "slots" word-prop ] map concat ;
 
-M: object object-slots class "slots" word-prop ;
-
-M: tuple object-slots
-    dup class "slots" word-prop
-    swap delegate [ 1 tail-slice ] unless ;
+: object-slots ( obj -- seq )
+    class all-slots ;
 
 TUPLE: mirror object slots ;
 

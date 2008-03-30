@@ -18,14 +18,9 @@ IN: hashtables
 : (key@) ( key keys i -- array n ? )
     3dup swap array-nth
     dup ((empty)) eq?
-      [ 3drop nip f f ]
-      [
-        =
-          [ rot drop t ]
-          [ probe (key@) ]
-        if
-      ]
-    if ; inline
+    [ 3drop nip f f ] [
+        = [ rot drop t ] [ probe (key@) ] if
+    ] if ; inline
 
 : key@ ( key hash -- array n ? )
     hash-array 2dup hash@ (key@) ; inline
@@ -89,17 +84,18 @@ IN: hashtables
         ] if
     ] if ; inline
 
-: find-pair ( array quot -- key value ? ) 0 rot (find-pair) ; inline
+: find-pair ( array quot -- key value ? )
+    0 rot (find-pair) ; inline
 
 : (rehash) ( hash array -- )
     [ swap pick (set-hash) drop f ] find-pair 2drop 2drop ;
 
 : hash-large? ( hash -- ? )
-    dup hash-count 3 fixnum*fast
-    swap hash-array array-capacity > ;
+    [ hash-count 3 fixnum*fast  ]
+    [ hash-array array-capacity ] bi > ;
 
 : hash-stale? ( hash -- ? )
-    dup hash-deleted 10 fixnum*fast swap hash-count fixnum> ;
+    [ hash-deleted 10 fixnum*fast ] [ hash-count ] bi fixnum> ;
 
 : grow-hash ( hash -- )
     [ dup hash-array swap assoc-size 1+ ] keep
@@ -160,7 +156,7 @@ M: hashtable clone
 
 M: hashtable equal?
     over hashtable? [
-        2dup [ assoc-size ] 2apply number=
+        2dup [ assoc-size ] bi@ number=
         [ assoc= ] [ 2drop f ] if
     ] [ 2drop f ] if ;
 
@@ -183,10 +179,13 @@ M: hashtable assoc-like
     [ 3drop ] [ dupd dupd set-at swap push ] if ; inline
 
 : prune ( seq -- newseq )
-    dup length <hashtable> over length <vector>
-    rot [ >r 2dup r> (prune) ] each nip ;
+    [ length <hashtable> ]
+    [ length <vector> ]
+    [ ] tri
+    [ >r 2dup r> (prune) ] each nip ;
 
 : all-unique? ( seq -- ? )
-    dup prune [ length ] 2apply = ;
+    [ length ]
+    [ prune length ] bi = ;
 
 INSTANCE: hashtable assoc

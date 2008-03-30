@@ -4,7 +4,7 @@ USING: kernel concurrency.messaging inspector ui.tools.listener
 ui.tools.traceback ui.gadgets.buttons ui.gadgets.status-bar
 ui.gadgets.tracks ui.commands ui.gadgets models
 ui.tools.workspace ui.gestures ui.gadgets.labels ui threads
-namespaces tools.walker assocs combinators combinators.cleave ;
+namespaces tools.walker assocs combinators ;
 IN: ui.tools.walker
 
 TUPLE: walker-gadget

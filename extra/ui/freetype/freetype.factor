@@ -62,7 +62,7 @@ M: freetype-renderer free-fonts ( world -- )
     } at ;
 
 : ttf-path ( name -- string )
-    "/fonts/" swap ".ttf" 3append resource-path ;
+    "resource:fonts/" swap ".ttf" 3append ;
 
 : (open-face) ( path length -- face )
     #! We use FT_New_Memory_Face, not FT_New_Face, since

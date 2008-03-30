@@ -93,3 +93,14 @@ unit-test
 ] [
     F{ 1.0 2.0 } [ dup ] H{ } map>assoc
 ] unit-test
+
+[ { 3 } ] [
+    [
+        3
+        H{ } clone
+        2 [
+            2dup [ , f ] cache drop
+        ] times
+        2drop
+    ] { } make
+] unit-test

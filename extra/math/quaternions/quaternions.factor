@@ -14,7 +14,7 @@ IN: math.quaternions
 
 : ** conjugate * ; inline
 
-: 2q ( u v -- u' u'' v' v'' ) [ first2 ] 2apply ; inline
+: 2q ( u v -- u' u'' v' v'' ) [ first2 ] bi@ ; inline
 
 : q*a ( u v -- a ) 2q swapd ** >r * r> - ; inline
 

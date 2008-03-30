@@ -2,63 +2,9 @@ USING: alien arrays definitions generic assocs hashtables io
 kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
-vectors definitions source-files compiler.units ;
+classes.algebra vectors definitions source-files
+compiler.units ;
 IN: classes.tests
-
-H{ } "s" set
-
-[ ] [ 1 2 "s" get push-at ] unit-test
-[ 1 ] [ 2 "s" get at first ] unit-test
-[ ] [ 1 2 "s" get pop-at ] unit-test
-[ t ] [ 2 "s" get at empty? ] unit-test
-
-[ object ] [ object object class-and ] unit-test
-[ fixnum ] [ fixnum object class-and ] unit-test
-[ fixnum ] [ object fixnum class-and ] unit-test
-[ fixnum ] [ fixnum fixnum class-and ] unit-test
-[ fixnum ] [ fixnum integer class-and ] unit-test
-[ fixnum ] [ integer fixnum class-and ] unit-test
-[ null ] [ vector fixnum class-and ] unit-test
-[ number ] [ number object class-and ] unit-test
-[ number ] [ object number class-and ] unit-test
-[ null ] [ slice reversed class-and ] unit-test
-[ null ] [ general-t \ f class-and ] unit-test
-[ object ] [ general-t \ f class-or ] unit-test
-
-TUPLE: first-one ;
-TUPLE: second-one ;
-UNION: both first-one union-class ;
-
-[ t ] [ both tuple classes-intersect? ] unit-test
-[ null ] [ vector virtual-sequence class-and ] unit-test
-[ f ] [ vector virtual-sequence classes-intersect? ] unit-test
-
-[ t ] [ \ fixnum \ integer class< ] unit-test
-[ t ] [ \ fixnum \ fixnum class< ] unit-test
-[ f ] [ \ integer \ fixnum class< ] unit-test
-[ t ] [ \ integer \ object class< ] unit-test
-[ f ] [ \ integer \ null class< ] unit-test
-[ t ] [ \ null \ object class< ] unit-test
-
-[ t ] [ \ generic \ word class< ] unit-test
-[ f ] [ \ word \ generic class< ] unit-test
-
-[ f ] [ \ reversed \ slice class< ] unit-test
-[ f ] [ \ slice \ reversed class< ] unit-test
-
-PREDICATE: word no-docs "documentation" word-prop not ;
-
-UNION: no-docs-union no-docs integer ;
-
-[ t ] [ no-docs no-docs-union class< ] unit-test
-[ f ] [ no-docs-union no-docs class< ] unit-test
-
-TUPLE: a ;
-TUPLE: b ;
-UNION: c a b ;
-
-[ t ] [ \ c \ tuple class< ] unit-test
-[ f ] [ \ tuple \ c class< ] unit-test
 
 ! DEFER: bah
 ! FORGET: bah
@@ -76,17 +22,13 @@ M: union-1 generic-update-test drop "union-1" ;
 [ t ] [ union-1 number class< ] unit-test
 [ "union-1" ] [ 1.0 generic-update-test ] unit-test
 
-[ union-1 ] [ fixnum float class-or ] unit-test
-
 "IN: classes.tests USE: math USE: arrays UNION: union-1 rational array ;" eval
 
 [ t ] [ bignum union-1 class< ] unit-test
 [ f ] [ union-1 number class< ] unit-test
 [ "union-1" ] [ { 1.0 } generic-update-test ] unit-test
 
-[ object ] [ fixnum float class-or ] unit-test
-
-"IN: classes.tests USE: math PREDICATE: integer union-1 even? ;" eval
+"IN: classes.tests USE: math PREDICATE: union-1 < integer even? ;" eval
 
 [ f ] [ union-1 union-class? ] unit-test
 [ t ] [ union-1 predicate-class? ] unit-test
@@ -118,6 +60,9 @@ M: assoc-mixin collection-size assoc-size ;
 [ 2 ] [ H{ { 1 2 } { 2 3 } } collection-size ] unit-test
 
 ! Test mixing in of new classes after the fact
+DEFER: mx1
+FORGET: mx1
+
 MIXIN: mx1
 
 INSTANCE: integer mx1
@@ -131,11 +76,7 @@ INSTANCE: integer mx1
 [ t ] [ array mx1 class< ] unit-test
 [ f ] [ mx1 number class< ] unit-test
 
-[ mx1 ] [ array integer class-or ] unit-test
-
 [ \ mx1 forget ] with-compilation-unit
-
-[ f ] [ array integer class-or mx1 = ] unit-test
 
 ! Empty unions were causing problems
 GENERIC: empty-union-test
@@ -155,28 +96,12 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 
 [ t ] [ fixnum redefine-bug-2 class< ] unit-test
 [ t ] [ quotation redefine-bug-2 class< ] unit-test
-[ redefine-bug-2 ] [ fixnum quotation class-or ] unit-test
 
 [ ] [ "IN: classes.tests USE: math UNION: redefine-bug-1 bignum ;" eval ] unit-test
 
 [ t ] [ bignum redefine-bug-1 class< ] unit-test
 [ f ] [ fixnum redefine-bug-2 class< ] unit-test
 [ t ] [ bignum redefine-bug-2 class< ] unit-test
-[ f ] [ fixnum quotation class-or redefine-bug-2 eq? ] unit-test
-[ redefine-bug-2 ] [ bignum quotation class-or ] unit-test
-
-! Another issue similar to the above
-UNION: forget-class-bug-1 integer ;
-UNION: forget-class-bug-2 forget-class-bug-1 dll ;
-
-[
-    \ forget-class-bug-1 forget
-    \ forget-class-bug-2 forget
-] with-compilation-unit
-
-[ f ] [ forget-class-bug-1 typemap get values [ memq? ] with contains? ] unit-test
-
-[ f ] [ forget-class-bug-2 typemap get values [ memq? ] with contains? ] unit-test
 
 USE: io.streams.string
 

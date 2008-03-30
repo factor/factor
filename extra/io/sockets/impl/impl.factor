@@ -64,8 +64,8 @@ M: inet6 inet-ntop ( data addrspec -- str )
 
 M: inet6 inet-pton ( str addrspec -- data )
     drop "::" split1
-    [ [ ":" split [ hex> dup 0 ? ] map ] [ f ] if* ] 2apply
-    2dup [ length ] 2apply + 8 swap - 0 <array> swap 3append
+    [ [ ":" split [ hex> dup 0 ? ] map ] [ f ] if* ] bi@
+    2dup [ length ] bi@ + 8 swap - 0 <array> swap 3append
     [ 2 >be ] map concat >byte-array ;
 
 M: inet6 address-size drop 16 ;

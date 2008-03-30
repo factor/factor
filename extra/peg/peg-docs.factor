@@ -11,7 +11,18 @@ HELP: parse
 }
 { $description 
     "Given the input string, parse it using the given parser. The result is a <parse-result> object if "
-    "the parse was successful, otherwise it is f." } ;
+    "the parse was successful, otherwise it is f." } 
+{ $see-also compile } ;
+
+HELP: compile
+{ $values 
+  { "parser" "a parser" } 
+  { "word" "a word" } 
+}
+{ $description 
+    "Compile the parser to a word. The word will have stack effect ( -- result )."
+} 
+{ $see-also parse } ;
 
 HELP: token
 { $values 
@@ -141,4 +152,17 @@ HELP: delay
 { $description 
     "Delays the construction of a parser until it is actually required to parse. This " 
     "allows for calling a parser that results in a recursive call to itself. The quotation "
-    "should return the constructed parser." } ;
+    "should return the constructed parser and is called the first time the parser is run."
+    "The compiled result is memoized for future runs. See " { $link box } " for a word "
+    "that calls the quotation at compile time." } ;
+
+HELP: box
+{ $values 
+  { "quot" "a quotation" } 
+  { "parser" "a parser" } 
+}
+{ $description 
+    "Delays the construction of a parser until the parser is compiled. The quotation "
+    "should return the constructed parser and is called when the parser is compiled."
+    "The compiled result is memoized for future runs. See " { $link delay } " for a word "
+    "that calls the quotation at runtime." } ;

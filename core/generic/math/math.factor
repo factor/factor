@@ -1,11 +1,11 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
-sequences.private classes definitions ;
+sequences.private classes classes.algebra definitions ;
 IN: generic.math
 
-PREDICATE: class math-class ( object -- ? )
+PREDICATE: math-class < class
     dup null bootstrap-word eq? [
         drop f
     ] [
@@ -16,8 +16,8 @@ PREDICATE: class math-class ( object -- ? )
 
 : math-precedence ( class -- n )
     {
-        { [ dup class-empty? ] [ drop { -1 -1 } ] }
-        { [ dup math-class? ] [ types last/first ] }
+        { [ dup null class< ] [ drop { -1 -1 } ] }
+        { [ dup math-class? ] [ class-types last/first ] }
         { [ t ] [ drop { 100 100 } ] }
     } cond ;
     
@@ -79,7 +79,7 @@ M: math-combination perform-combination
         ] if nip
     ] math-vtable nip ;
 
-PREDICATE: generic math-generic ( word -- ? )
+PREDICATE: math-generic < generic ( word -- ? )
     "combination" word-prop math-combination? ;
 
 M: math-generic definer drop \ MATH: f ;

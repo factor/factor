@@ -35,7 +35,7 @@ linkname magic version uname gname devmajor devminor prefix ;
 
 : header-checksum ( seq -- x )
     148 cut-slice 8 tail-slice
-    [ sum ] 2apply + 256 + ;
+    [ sum ] bi@ + 256 + ;
 
 TUPLE: checksum-error ;
 TUPLE: malformed-block-error ;

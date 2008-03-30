@@ -4,24 +4,19 @@ USING: kernel arrays strings math.parser sequences
 peg peg.ebnf peg.parsers memoize math ;
 IN: peg.expr
 
-: operator-fold ( lhs seq -- value )
- #! Perform a fold of a lhs, followed by a sequence of pairs being
- #! { operator rhs } in to a tree structure of the correct precedence.
- swap [ first2 swap call ] reduce ;
-
 EBNF: expr 
-times    = "*" [[ drop [ * ] ]]
-divide   = "/" [[ drop [ / ] ]]
-add      = "+" [[ drop [ + ] ]]
-subtract = "-" [[ drop [ - ] ]]
+digit    = [0-9]            => [[ digit> ]]
+number   = (digit)+         => [[ 10 digits>integer ]]
+value    =   number 
+           | ("(" exp ")")  => [[ second ]]
 
-digit    = [0-9] [[ digit> ]]
-number   = (digit)+ [[ unclip [ swap 10 * + ] reduce ]]
+fac      =   fac "*" value  => [[ first3 nip * ]]
+           | fac "/" value  => [[ first3 nip / ]]
+           | number
 
-value    = number | ("(" expr ")") [[ second ]] 
-product = (value ((times | divide) value)*) [[ first2 operator-fold ]]
-sum = (product ((add | subtract) product)*) [[ first2 operator-fold ]]
-expr = sum
+exp      =   exp "+" fac    => [[ first3 nip + ]]
+           | exp "-" fac    => [[ first3 nip - ]]
+           | fac
 ;EBNF
 
 : eval-expr ( string -- number )

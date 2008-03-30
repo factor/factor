@@ -72,17 +72,17 @@ unit-test
 ] unit-test
 
 [ 12 13 ] [
-    -12 -13 [ [ 0 swap fixnum-fast ] 2apply ] compile-call
+    -12 -13 [ [ 0 swap fixnum-fast ] bi@ ] compile-call
 ] unit-test
 
 [ -1 2 ] [ 1 2 [ >r 0 swap fixnum- r> ] compile-call ] unit-test
 
 [ 12 13 ] [
-    -12 -13 [ [ 0 swap fixnum- ] 2apply ] compile-call
+    -12 -13 [ [ 0 swap fixnum- ] bi@ ] compile-call
 ] unit-test
 
-[ 2 ] [
-    SBUF" " [ 2 slot 2 [ slot ] keep ] compile-call nip
+[ 1 ] [
+    SBUF" " [ 1 slot 1 [ slot ] keep ] compile-call nip
 ] unit-test
 
 ! Test slow shuffles

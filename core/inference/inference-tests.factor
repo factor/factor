@@ -3,9 +3,9 @@ inference.dataflow kernel classes kernel.private math
 math.parser math.private namespaces namespaces.private parser
 sequences strings vectors words quotations effects tools.test
 continuations generic.standard sorting assocs definitions
-prettyprint io inspector tuples classes.union classes.predicate
-debugger threads.private io.streams.string io.timeouts
-io.thread sequences.private ;
+prettyprint io inspector classes.tuple classes.union
+classes.predicate debugger threads.private io.streams.string
+io.timeouts io.thread sequences.private ;
 IN: inference.tests
 
 { 0 2 } [ 2 "Hello" ] must-infer-as
@@ -224,7 +224,7 @@ DEFER: do-crap*
 MATH: xyz
 M: fixnum xyz 2array ;
 M: float xyz
-    [ 3 ] 2apply swapd >r 2array swap r> 2array swap ;
+    [ 3 ] bi@ swapd >r 2array swap r> 2array swap ;
 
 [ [ xyz ] infer ] [ inference-error? ] must-fail-with
 

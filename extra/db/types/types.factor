@@ -3,7 +3,7 @@
 USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep sequences.lib
 words namespaces tools.walker slots slots.private classes
-mirrors tuples combinators calendar.format symbols
+mirrors classes.tuple combinators calendar.format symbols
 singleton ;
 IN: db.types
 

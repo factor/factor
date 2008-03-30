@@ -1,6 +1,6 @@
-! Copyright (C) 2007 Slava Pestov
+! Copyright (C) 2007, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tuples kernel assocs ;
+USING: classes.tuple kernel assocs accessors ;
 IN: refs
 
 TUPLE: ref assoc key ;
@@ -8,7 +8,7 @@ TUPLE: ref assoc key ;
 : <ref> ( assoc key class -- tuple )
     >r ref construct-boa r> construct-delegate ; inline
 
-: >ref< ( ref -- key assoc ) dup ref-key swap ref-assoc ;
+: >ref< ( ref -- key assoc ) [ key>> ] [ assoc>> ] bi ;
 
 : delete-ref ( ref -- ) >ref< delete-at ;
 GENERIC: get-ref ( ref -- obj )

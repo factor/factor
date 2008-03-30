@@ -3,7 +3,7 @@
 USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
-sequences.private assocs models combinators.cleave ;
+sequences.private assocs models ;
 IN: tools.walker
 
 SYMBOL: show-walker-hook ! ( status continuation thread -- )

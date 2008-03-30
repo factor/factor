@@ -13,6 +13,12 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! : cd ( path -- ) current-directory set ;
+
+: cd ( path -- ) set-current-directory ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : prepare-build-machine ( -- )
   builds make-directory
   builds cd

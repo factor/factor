@@ -1,6 +1,6 @@
 
 USING: kernel parser namespaces quotations arrays vectors strings
-       sequences assocs tuples math combinators ;
+       sequences assocs classes.tuple math combinators ;
 
 IN: bake
 

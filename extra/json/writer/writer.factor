@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io.streams.string io strings splitting sequences math 
-       math.parser assocs tuples classes words namespaces 
-       hashtables ;
+       math.parser assocs classes words namespaces prettyprint
+       hashtables mirrors ;
 IN: json.writer
 
 #! Writes the object out to a stream in JSON format
@@ -39,25 +39,19 @@ M: sequence json-print ( array -- string )
   #! javascript variable names.
   [ (jsvar-encode) ] map ;
   
-: slots ( object -- values names )
-  #! Given an object return an array of slots names and a sequence of slot values
-  #! the slot name and the slot value. 
-  [ tuple-slots ] keep class "slot-names" word-prop ;
+: tuple>fields ( object -- string )
+  <mirror> [
+    [ swap jsvar-encode >json % " : " % >json % ] "" make
+  ] { } assoc>map ;
 
-: slots>fields ( values names -- array )
-  #! Convert the arrays containing the slot names and values
-  #! to an array of strings suitable for describing that slot
-  #! as a field in a javascript object.
-  [ 
-    [ jsvar-encode >json % " : " % >json % ] "" make 
-  ] 2map ;
-
-M: object json-print ( object -- string )
-  CHAR: { write1 slots slots>fields "," join write CHAR: } write1 ;
+M: tuple json-print ( tuple -- string )
+  CHAR: { write1 tuple>fields "," join write CHAR: } write1 ;
 
 M: hashtable json-print ( hashtable -- string )
   CHAR: { write1 
   [ [ swap jsvar-encode >json % CHAR: : , >json % ] "" make ]
   { } assoc>map "," join write 
   CHAR: } write1 ;
-  
+
+M: object json-print ( object -- string )
+    unparse json-print ;

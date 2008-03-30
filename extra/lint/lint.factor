@@ -71,7 +71,7 @@ def-hash get-global [
 
 ! Remove set-alien-cell, etc.
 [
-    drop [ accessor-words swap seq-diff ] keep [ length ] 2apply =
+    drop [ accessor-words swap seq-diff ] keep [ length ] bi@ =
 ] assoc-subset
 
 ! Remove trivial defs
@@ -148,7 +148,7 @@ GENERIC: run-lint ( obj -- obj )
 : filter-symbols ( alist -- alist )
     [
         nip first dup def-hash get at
-        [ first ] 2apply literalize = not
+        [ first ] bi@ literalize = not
     ] assoc-subset ;
 
 M: sequence run-lint ( seq -- seq )

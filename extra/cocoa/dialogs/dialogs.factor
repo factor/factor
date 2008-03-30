@@ -26,7 +26,7 @@ IN: cocoa.dialogs
     [ -> filenames CF>string-array ] [ drop f ] if ;
 
 : split-path ( path -- dir file )
-    "/" last-split1 [ <NSString> ] 2apply ;
+    "/" last-split1 [ <NSString> ] bi@ ;
 
 : save-panel ( path -- paths )
     <NSSavePanel> dup

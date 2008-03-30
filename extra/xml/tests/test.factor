@@ -26,7 +26,7 @@ SYMBOL: xml-file
 ] unit-test
 [ V{ "fa&g" } ] [ xml-file get "x" get-id tag-children ] unit-test
 [ "that" ] [ xml-file get "this" swap at ] unit-test
-[ "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><a b=\"c\"/>" ]
+[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b=\"c\"/>" ]
     [ "<a b='c'/>" string>xml xml>string ] unit-test
 [ "abcd" ] [
     "<main>a<sub>bc</sub>d<nothing/></main>" string>xml
@@ -44,7 +44,7 @@ SYMBOL: xml-file
     at swap "z" >r tuck r> swap set-at
     T{ name f "blah" "z" f } swap at ] unit-test
 [ "foo" ] [ "<boo><![CDATA[foo]]></boo>" string>xml children>string ] unit-test
-[ "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><foo>bar baz</foo>" ]
+[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>bar baz</foo>" ]
 [ "<foo>bar</foo>" string>xml [ " baz" append ] map xml>string ] unit-test
-[ "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<foo>\n  bar\n</foo>" ]
+[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  bar\n</foo>" ]
 [ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test

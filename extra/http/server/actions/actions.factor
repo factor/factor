@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences kernel assocs combinators
 http.server http.server.validators http hashtables namespaces
-combinators.cleave fry continuations locals ;
+fry continuations locals ;
 IN: http.server.actions
 
 SYMBOL: +append-path

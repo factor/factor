@@ -5,7 +5,7 @@ IN: editors.ultraedit
 : ultraedit-path ( -- path )
     \ ultraedit-path get-global [
         program-files
-        "\\IDM Computer Solutions\\UltraEdit-32\\uedit32.exe" append-path
+        "IDM Computer Solutions\\UltraEdit-32\\uedit32.exe" append-path
     ] unless* ;
 
 : ultraedit ( file line -- )
