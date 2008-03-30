@@ -11,7 +11,11 @@ USE: prettyprint
 TUPLE: parse-result remaining ast ;
 
 TUPLE: parser id compiled ;
+
 M: parser equal? [ id>> ] bi@ = ;
+
+M: parser hashcode* id>> hashcode* ;
+
 C: <parser> parser
 
 SYMBOL: ignore 

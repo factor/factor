@@ -111,7 +111,10 @@ C: <ebnf> ebnf
       'range-parser' ,
       'any-character' ,
     ] choice* ,
-    "=" syntax ensure-not ,
+    [
+      "=" syntax ensure-not ,
+      "=>" syntax ensure ,
+    ] choice* ,
   ] seq* [ first ] action ;
 
 DEFER: 'choice'
@@ -176,7 +179,10 @@ DEFER: 'choice'
     'repeat0' sp ,
     'repeat1' sp ,
     'optional' sp , 
-  ] choice* ;  
+  ] choice* ;
+
+: 'action' ( -- parser )
+   "[[" 'factor-code' "]]" syntax-pack ;
 
 : 'sequence' ( -- parser )
   #! A sequence of terminals and non-terminals, including
@@ -184,15 +190,21 @@ DEFER: 'choice'
   [
     [ 
       ('sequence') ,
-      "[[" 'factor-code' "]]" syntax-pack ,
+      'action' ,
     ] seq* [ first2 <ebnf-action> ] action ,
     ('sequence') ,
   ] choice* repeat1 [ 
      dup length 1 = [ first ] [ <ebnf-sequence> ] if
   ] action ;
+
+: 'actioned-sequence' ( -- parser )
+  [
+    [ 'sequence' , "=>" syntax , 'action' , ] seq* [ first2 <ebnf-action> ] action ,
+    'sequence' ,
+  ] choice* ;
   
 : 'choice' ( -- parser )
-  'sequence' sp "|" token sp list-of [ 
+  'actioned-sequence' sp "|" token sp list-of [ 
     dup length 1 = [ first ] [ <ebnf-choice> ] if
   ] action ;
  
@@ -200,7 +212,8 @@ DEFER: 'choice'
   [
     'non-terminal' [ symbol>> ] action  ,
     "=" syntax  ,
-    'choice'  ,
+    ">" token ensure-not ,
+    'choice' ,
   ] seq* [ first2 <ebnf-rule> ] action ;
 
 : 'ebnf' ( -- parser )
