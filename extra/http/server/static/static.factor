@@ -3,8 +3,7 @@
 USING: calendar html io io.files kernel math math.parser http
 http.server namespaces parser sequences strings assocs
 hashtables debugger http.mime sorting html.elements logging
-calendar.format accessors io.encodings.binary
-combinators.cleave fry ;
+calendar.format accessors io.encodings.binary fry ;
 IN: http.server.static
 
 ! special maps mime types to quots with effect ( path -- )

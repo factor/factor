@@ -94,7 +94,7 @@ TUPLE: vocab-link name ;
 
 M: vocab-link equal?
     over vocab-link?
-    [ [ vocab-link-name ] 2apply = ] [ 2drop f ] if ;
+    [ [ vocab-link-name ] bi@ = ] [ 2drop f ] if ;
 
 M: vocab-link hashcode*
     vocab-link-name hashcode* ;

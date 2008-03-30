@@ -9,9 +9,9 @@ kernel.private math math.private memory namespaces
 namespaces.private parser prettyprint quotations
 quotations.private sbufs sbufs.private sequences
 sequences.private slots.private strings strings.private system
-threads.private tuples tuples.private vectors vectors.private
-words words.private assocs inspector compiler.units
-system.private ;
+threads.private classes.tuple classes.tuple.private vectors
+vectors.private words words.private assocs inspector
+compiler.units system.private ;
 IN: inference.known-words
 
 ! Shuffle words

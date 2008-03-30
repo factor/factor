@@ -58,7 +58,8 @@ M: win32-file close-handle ( handle -- )
     ] with-destructors ;
 
 : open-pipe-r/w ( path -- handle )
-    GENERIC_READ GENERIC_WRITE bitor OPEN_EXISTING 0 open-file ;
+    { GENERIC_READ GENERIC_WRITE } flags
+    OPEN_EXISTING 0 open-file ;
 
 : open-read ( path -- handle length )
     GENERIC_READ OPEN_EXISTING 0 open-file 0 ;
@@ -68,6 +69,24 @@ M: win32-file close-handle ( handle -- )
 
 : (open-append) ( path -- handle )
     GENERIC_WRITE OPEN_ALWAYS 0 open-file ;
+
+: open-existing ( path -- handle )
+    { GENERIC_READ GENERIC_WRITE } flags
+    share-mode
+    f
+    OPEN_EXISTING
+    FILE_FLAG_BACKUP_SEMANTICS
+    f CreateFileW dup win32-error=0/f ;
+
+: maybe-create-file ( path -- handle ? )
+    #! return true if file was just created
+    { GENERIC_READ GENERIC_WRITE } flags
+    share-mode
+    f
+    OPEN_ALWAYS
+    0 CreateFile-flags
+    f CreateFileW dup win32-error=0/f
+    GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length -- )
     dupd d>w/w <uint> FILE_BEGIN SetFilePointer
@@ -116,14 +135,14 @@ M: windows-io (file-appender) ( path -- stream )
     open-append <win32-file> <writer> ;
 
 M: windows-io move-file ( from to -- )
-    [ normalize-pathname ] 2apply MoveFile win32-error=0/f ;
+    [ normalize-pathname ] bi@ MoveFile win32-error=0/f ;
 
 M: windows-io delete-file ( path -- )
     normalize-pathname DeleteFile win32-error=0/f ;
 
 M: windows-io copy-file ( from to -- )
     dup parent-directory make-directories
-    [ normalize-pathname ] 2apply 0 CopyFile win32-error=0/f ;
+    [ normalize-pathname ] bi@ 0 CopyFile win32-error=0/f ;
 
 M: windows-io make-directory ( path -- )
     normalize-pathname

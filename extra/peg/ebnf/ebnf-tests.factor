@@ -144,6 +144,23 @@ IN: peg.ebnf.tests
   "Z" [EBNF foo=[^A-Z] EBNF] call  
 ] unit-test
 
+{ V{ "1" "+" "foo" } } [
+  "1+1" [EBNF foo='1' '+' '1' [[ drop "foo" ]] EBNF] call parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "1+1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] EBNF] call parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "1+1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] | '1' '-' '1' => [[ drop "bar" ]] EBNF] call parse-result-ast
+] unit-test
+
+{ "bar" } [
+  "1-1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] | '1' '-' '1' => [[ drop "bar" ]] EBNF] call parse-result-ast
+] unit-test
+
+
 { V{ V{ 49 } "+" V{ 49 } } } [ 
   #! Test direct left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
@@ -162,3 +179,47 @@ IN: peg.ebnf.tests
   "1+1+1" [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF] call parse-result-ast
 ] unit-test
 
+EBNF: primary 
+Primary = PrimaryNoNewArray
+PrimaryNoNewArray =  ClassInstanceCreationExpression 
+                   | MethodInvocation
+                   | FieldAccess
+                   | ArrayAccess
+                   | "this"
+ClassInstanceCreationExpression =  "new" ClassOrInterfaceType "(" ")"
+                                 | Primary "." "new" Identifier "(" ")"
+MethodInvocation =  Primary "." MethodName "(" ")"
+                  | MethodName "(" ")"
+FieldAccess =  Primary "." Identifier
+             | "super" "." Identifier  
+ArrayAccess =  Primary "[" Expression "]"
+             | ExpressionName "[" Expression "]"
+ClassOrInterfaceType = ClassName | InterfaceTypeName
+ClassName = "C" | "D"
+InterfaceTypeName = "I" | "J"
+Identifier = "x" | "y" | ClassOrInterfaceType
+MethodName = "m" | "n"
+ExpressionName = Identifier
+Expression = "i" | "j"
+main = Primary
+;EBNF 
+
+{ "this" } [
+  "this" primary parse-result-ast
+] unit-test
+
+{ V{ "this" "." "x" } } [
+  "this.x" primary parse-result-ast
+] unit-test
+
+{ V{ V{ "this" "." "x" } "." "y" } } [
+  "this.x.y" primary parse-result-ast
+] unit-test
+
+{ V{ V{ "this" "." "x" } "." "m" "(" ")" } } [
+  "this.x.m()" primary parse-result-ast
+] unit-test
+
+{ V{ V{ V{ "x" "[" "i" "]" } "[" "j" "]" } "." "y" } } [
+  "x[i][j].y" primary parse-result-ast
+] unit-test

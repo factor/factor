@@ -20,8 +20,10 @@ C-STRUCT: stat
     { "uint32_t" "st_flags" }
     { "uint32_t" "st_gen" }
     { "uint32_t" "st_spare0" }
-    { "timespec" "st_birthtim" }
-    { "int" "__pad5" } ;
+    { "timespec" "st_birthtim" } ;
 
-FUNCTION: int stat  ( char* pathname, stat* buf ) ;
-FUNCTION: int lstat ( char* pathname, stat* buf ) ;
+FUNCTION: int __stat13 ( char* pathname, stat* buf ) ;
+FUNCTION: int __lstat13 ( char* pathname, stat* buf ) ;
+
+: stat __stat13 ; inline
+: lstat __lstat13 ; inline

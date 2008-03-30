@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations kernel math
-namespaces sequences sequences.lib tuples words strings
+namespaces sequences sequences.lib classes.tuple words strings
 tools.walker accessors ;
 IN: db
 

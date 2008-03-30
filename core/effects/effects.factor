@@ -18,8 +18,8 @@ TUPLE: effect in out terminated? ;
         { [ dup not ] [ t ] }
         { [ over effect-terminated? ] [ t ] }
         { [ dup effect-terminated? ] [ f ] }
-        { [ 2dup [ effect-in length ] 2apply > ] [ f ] }
-        { [ 2dup [ effect-height ] 2apply = not ] [ f ] }
+        { [ 2dup [ effect-in length ] bi@ > ] [ f ] }
+        { [ 2dup [ effect-height ] bi@ = not ] [ f ] }
         { [ t ] [ t ] }
     } cond 2nip ;
 

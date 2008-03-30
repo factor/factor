@@ -4,7 +4,8 @@ USING: arrays ui.gadgets.buttons ui.gadgets.borders
 ui.gadgets.labels ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gadgets.theme ui.gadgets.frames
 ui.gadgets.grids io kernel math models namespaces prettyprint
-sequences sequences words tuples ui.gadgets ui.render colors ;
+sequences sequences words classes.tuple ui.gadgets ui.render
+colors ;
 IN: ui.gadgets.labelled
 
 TUPLE: labelled-gadget content ;

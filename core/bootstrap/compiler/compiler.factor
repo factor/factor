@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler cpu.architecture vocabs.loader system sequences
 namespaces parser kernel kernel.private classes classes.private
-arrays hashtables vectors tuples sbufs inference.dataflow
-hashtables.private sequences.private math tuples.private
+arrays hashtables vectors classes.tuple sbufs inference.dataflow
+hashtables.private sequences.private math classes.tuple.private
 growable namespaces.private assocs words generator command-line
 vocabs io prettyprint libc compiler.units ;
 IN: bootstrap.compiler

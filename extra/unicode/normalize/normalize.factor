@@ -38,7 +38,7 @@ IN: unicode.normalize
 
 : (insert) ( seq n quot -- )
     over 0 = [ 3drop ] [
-        [ >r dup 1- rot [ nth ] curry 2apply r> 2apply > ] 3keep
+        [ >r dup 1- rot [ nth ] curry bi@ r> bi@ > ] 3keep
         roll [ 3drop ]
         [ >r [ dup 1- rot exchange ] 2keep 1- r> (insert) ] if
     ] if ; inline

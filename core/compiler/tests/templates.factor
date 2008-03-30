@@ -72,13 +72,13 @@ unit-test
 ] unit-test
 
 [ 12 13 ] [
-    -12 -13 [ [ 0 swap fixnum-fast ] 2apply ] compile-call
+    -12 -13 [ [ 0 swap fixnum-fast ] bi@ ] compile-call
 ] unit-test
 
 [ -1 2 ] [ 1 2 [ >r 0 swap fixnum- r> ] compile-call ] unit-test
 
 [ 12 13 ] [
-    -12 -13 [ [ 0 swap fixnum- ] 2apply ] compile-call
+    -12 -13 [ [ 0 swap fixnum- ] bi@ ] compile-call
 ] unit-test
 
 [ 1 ] [

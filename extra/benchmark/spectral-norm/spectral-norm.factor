@@ -7,7 +7,7 @@ IN: benchmark.spectral-norm
 : fast-truncate >fixnum >float ; inline
 
 : eval-A ( i j -- n )
-    [ >float ] 2apply
+    [ >float ] bi@
     dupd + dup 1+ * 2 /f fast-truncate + 1+
     recip ; inline
 

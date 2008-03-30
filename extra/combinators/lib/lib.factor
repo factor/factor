@@ -4,8 +4,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel combinators fry namespaces quotations hashtables
 sequences assocs arrays inference effects math math.ranges
-arrays.lib shuffle macros bake combinators.cleave
-continuations ;
+arrays.lib shuffle macros bake continuations ;
 
 IN: combinators.lib
 

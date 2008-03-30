@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.union words kernel sequences
-definitions combinators arrays ;
+definitions combinators arrays accessors ;
 IN: classes.mixin
 
 PREDICATE: mixin-class < union-class "mixin" word-prop ;
@@ -47,14 +47,13 @@ TUPLE: mixin-instance loc class mixin ;
 M: mixin-instance equal?
     {
         { [ over mixin-instance? not ] [ f ] }
-        { [ 2dup [ mixin-instance-class ] 2apply = not ] [ f ] }
-        { [ 2dup [ mixin-instance-mixin ] 2apply = not ] [ f ] }
+        { [ 2dup [ mixin-instance-class ] bi@ = not ] [ f ] }
+        { [ 2dup [ mixin-instance-mixin ] bi@ = not ] [ f ] }
         { [ t ] [ t ] }
     } cond 2nip ;
 
 M: mixin-instance hashcode*
-    { mixin-instance-class mixin-instance-mixin } get-slots
-    2array hashcode* ;
+    [ class>> ] [ mixin>> ] bi 2array hashcode* ;
 
 : <mixin-instance> ( class mixin -- definition )
     { set-mixin-instance-class set-mixin-instance-mixin }

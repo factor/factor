@@ -1,15 +1,22 @@
-! Copyright (C) 2007 Chris Double.
+! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
-       words quotations effects memoize accessors 
-       combinators.cleave locals ;
+       words quotations effects memoize accessors locals ;
 IN: peg
 
 USE: prettyprint
 
 TUPLE: parse-result remaining ast ;
+
+TUPLE: parser id compiled ;
+
+M: parser equal? [ id>> ] bi@ = ;
+
+M: parser hashcode* id>> hashcode* ;
+
+C: <parser> parser
 
 SYMBOL: ignore 
 
@@ -65,7 +72,7 @@ C: <head> peg-head
   ] [ 
     pos set   
     fail
-  ] if* ;
+  ] if* ; inline
 
 : memo ( pos rule -- memo-entry )
   #! Return the result from the memo cache. 
@@ -85,14 +92,14 @@ C: <head> peg-head
     m (>>ans)
     pos get m (>>pos)
     r p m h (grow-lr)
-  ] if ;
+  ] if ; inline
  
 :: grow-lr ( r p m h -- ast )
   h p heads get set-at
   r p m h (grow-lr) 
   p heads get delete-at
   m pos>> pos set m ans>>
-  ;
+  ; inline
 
 :: (setup-lr) ( r l s -- )
   s head>> l head>> eq? [
@@ -121,7 +128,7 @@ C: <head> peg-head
     ] [
       m ans>> seed>>
     ] if
-  ] ;
+  ] ; inline
 
 :: recall ( r p -- memo-entry )
   [let* |
@@ -145,7 +152,7 @@ C: <head> peg-head
     ] [
       m
     ] if
-  ] ;
+  ] ; inline
 
 :: apply-non-memo-rule ( r p -- ast )
   [let* |
@@ -162,7 +169,7 @@ C: <head> peg-head
       ans m (>>ans)
       ans
     ] if
-  ] ;
+  ] ; inline
 
 :: apply-memo-rule ( r m -- ast )
   m pos>> pos set 
@@ -182,7 +189,7 @@ C: <head> peg-head
     ] [
       r p apply-non-memo-rule
     ] if 
-  ] ;
+  ] ; inline
 
 : with-packrat ( input quot -- result )
   #! Run the quotation with a packrat cache active.
@@ -192,16 +199,8 @@ C: <head> peg-head
     f lrstack set
     H{ } clone heads set
     H{ } clone packrat set
-  ] H{ } make-assoc swap bind ;
+  ] H{ } make-assoc swap bind ; inline
 
-
-: compiled-parsers ( -- cache )
-  \ compiled-parsers get-global [ H{ } clone dup \ compiled-parsers set-global ] unless* ;
-
-: reset-compiled-parsers ( -- )
-  H{ } clone \ compiled-parsers set-global ;
-
-reset-compiled-parsers
 
 GENERIC: (compile) ( parser -- quot )
 
@@ -227,18 +226,20 @@ GENERIC: (compile) ( parser -- quot )
   #! Circular parsers are supported by getting the word
   #! name and storing it in the cache, before compiling, 
   #! so it is picked up when re-entered.
-  dup id>> compiled-parsers [
-    drop dup gensym swap 2dup id>> compiled-parsers set-at
-    2dup parser-body define 
-    dupd "peg" set-word-prop
-  ] cache nip ;
+  dup compiled>> [
+    nip
+  ] [
+    gensym tuck >>compiled 2dup parser-body define dupd "peg" set-word-prop
+  ] if* ;
 
 : compile ( parser -- word )
   [ compiled-parser ] with-compilation-unit ;
 
+: compiled-parse ( state word -- result )
+  swap [ execute ] with-packrat ; inline 
+
 : parse ( state parser -- result )
-  dup word? [ compile ] unless
-  [ execute ] curry with-packrat ;
+  dup word? [ compile ] unless compiled-parse ;
 
 <PRIVATE
 
@@ -252,10 +253,6 @@ SYMBOL: id
     1 id set-global 0
   ] if* ;
 
-TUPLE: parser id ;
-M: parser equal? [ id>> ] 2apply = ;
-C: <parser> parser
-
 : delegates ( -- cache )
   \ delegates get-global [ H{ } clone dup \ delegates set-global ] unless* ;
 
@@ -268,7 +265,7 @@ reset-delegates
   #! Set the delegate for the parser. Equivalent parsers
   #! get a delegate with the same id.
   dup clone delegates [
-    drop next-id <parser> 
+    drop next-id f <parser> 
   ] cache over set-delegate ;
 
 TUPLE: token-parser symbol ;
@@ -487,6 +484,15 @@ M: delay-parser (compile) ( parser -- quot )
   { } { "word" } <effect> memoize-quot 
   [ % \ execute , ] [ ] make ;
 
+TUPLE: box-parser quot ;
+
+M: box-parser (compile) ( parser -- quot )
+  #! Calls the quotation at compile time
+  #! to produce the parser to be compiled.
+  #! This differs from 'delay' which calls
+  #! it at run time.
+  quot>> call compiled-parser 1quotation ;
+
 PRIVATE>
 
 : token ( string -- parser )
@@ -555,10 +561,13 @@ PRIVATE>
 : delay ( quot -- parser )
   delay-parser construct-boa init-parser ;
 
+: box ( quot -- parser )
+  box-parser construct-boa init-parser ;
+
 : PEG:
   (:) [
     [
-        call compile 1quotation
+        call compile [ compiled-parse ] curry
         [ dup [ parse-result-ast ] [ "Parse failed" throw ] if ]
         append define
     ] with-compilation-unit

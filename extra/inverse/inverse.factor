@@ -1,8 +1,8 @@
 USING: kernel words inspector slots quotations sequences assocs
 math arrays inference effects shuffle continuations debugger
-tuples namespaces vectors bit-arrays byte-arrays strings sbufs
-math.functions macros sequences.private combinators mirrors
-combinators.lib ;
+classes.tuple namespaces vectors bit-arrays byte-arrays strings
+sbufs math.functions macros sequences.private combinators
+mirrors combinators.lib ;
 IN: inverse
 
 TUPLE: fail ;
@@ -151,10 +151,10 @@ MACRO: undo ( quot -- ) [undo] ;
 \ - [ + ] [ - ] define-math-inverse
 \ * [ / ] [ / ] define-math-inverse
 \ / [ * ] [ / ] define-math-inverse
-\ ^ [ recip ^ ] [ [ log ] 2apply / ] define-math-inverse
+\ ^ [ recip ^ ] [ [ log ] bi@ / ] define-math-inverse
 
 \ ? 2 [
-    [ assert-literal ] 2apply
+    [ assert-literal ] bi@
     [ swap >r over = r> swap [ 2drop f ] [ = [ t ] [ fail ] if ] if ]
     2curry
 ] define-pop-inverse

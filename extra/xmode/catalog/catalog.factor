@@ -63,7 +63,7 @@ SYMBOL: rule-sets
     over [ dupd update ] [ nip clone ] if ;
 
 : import-keywords ( parent child -- )
-    over >r [ rule-set-keywords ] 2apply ?update
+    over >r [ rule-set-keywords ] bi@ ?update
     r> set-rule-set-keywords ;
 
 : import-rules ( parent child -- )

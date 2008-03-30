@@ -31,7 +31,7 @@ IN: project-euler.009
 : abc ( p q -- triplet )
     [
         2dup * ,                    ! a = p * q
-        [ sq ] 2apply 2dup - 2 / ,  ! b = (p² - q²) / 2
+        [ sq ] bi@ 2dup - 2 / ,  ! b = (p² - q²) / 2
         + 2 / ,                     ! c = (p² + q²) / 2
     ] { } make natural-sort ;
 

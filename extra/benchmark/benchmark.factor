@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel vocabs vocabs.loader tools.time tools.vocabs
 arrays assocs io.styles io help.markup prettyprint sequences
-continuations debugger combinators.cleave ;
+continuations debugger ;
 IN: benchmark
 
 : run-benchmark ( vocab -- result )

@@ -1,5 +1,5 @@
-USING: ui.gadgets help.markup help.syntax generic kernel tuples
-quotations ;
+USING: ui.gadgets help.markup help.syntax generic kernel
+classes.tuple quotations ;
 IN: ui.gadgets.packs
 
 HELP: pack

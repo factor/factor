@@ -6,9 +6,9 @@ kernel.private math math.private namespaces sequences words
 generic quotations byte-arrays hashtables hashtables.private
 generator generator.registers generator.fixup sequences.private
 sbufs vectors system layouts math.floats.private
-classes tuples tuples.private sbufs.private vectors.private
-strings.private slots.private combinators bit-arrays
-float-arrays compiler.constants ;
+classes classes.tuple classes.tuple.private sbufs.private
+vectors.private strings.private slots.private combinators
+bit-arrays float-arrays compiler.constants ;
 IN: cpu.ppc.intrinsics
 
 : %slot-literal-known-tag

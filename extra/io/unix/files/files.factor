@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend io.nonblocking io.unix.backend io.files io
 unix unix.stat unix.time kernel math continuations
-math.bitfields byte-arrays alien combinators combinators.cleave
-calendar io.encodings.binary ;
+math.bitfields byte-arrays alien combinators calendar
+io.encodings.binary ;
 
 IN: io.unix.files
 
@@ -49,7 +49,7 @@ M: unix-io touch-file ( path -- )
     close ;
 
 M: unix-io move-file ( from to -- )
-    [ normalize-pathname ] 2apply rename io-error ;
+    [ normalize-pathname ] bi@ rename io-error ;
 
 M: unix-io delete-file ( path -- )
     normalize-pathname unlink io-error ;
@@ -69,7 +69,7 @@ M: unix-io delete-directory ( path -- )
     ] with-disposal ;
 
 M: unix-io copy-file ( from to -- )
-    [ normalize-pathname ] 2apply
+    [ normalize-pathname ] bi@
     [ (copy-file) ]
     [ swap file-info file-info-permissions chmod io-error ]
     2bi ;

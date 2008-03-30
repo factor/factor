@@ -1,7 +1,7 @@
 IN: ui.gadgets.presentations.tests
 USING: math ui.gadgets.presentations ui.gadgets tools.test
 prettyprint ui.gadgets.buttons io io.streams.string kernel
-tuples ;
+classes.tuple ;
 
 [ t ] [
     "Hi" \ + <presentation> [ gadget? ] is?

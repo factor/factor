@@ -33,7 +33,7 @@ IN: cpu.ppc.allot
     f fresh-object ;
 
 M: ppc-backend %box-float ( dst src -- )
-    [ v>operand ] 2apply %allot-float 12 MR ;
+    [ v>operand ] bi@ %allot-float 12 MR ;
 
 : %allot-bignum ( #digits -- )
     #! 1 cell header, 1 cell length, 1 cell sign, + digits

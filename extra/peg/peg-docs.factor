@@ -21,15 +21,8 @@ HELP: compile
 }
 { $description 
     "Compile the parser to a word. The word will have stack effect ( -- result )."
-    "The mapping from parser to compiled word is kept in a cache. If you later change "
-    "the definition of a parser you'll need to clear this cache with " 
-    { $link reset-compiled-parsers } " before using " { $link compile } " on that parser again." 
 } 
 { $see-also parse } ;
-
-HELP: reset-compiled-parsers
-{ $description 
-    "Reset the cache mapping parsers to compiled words." } ;
 
 HELP: token
 { $values 
@@ -159,4 +152,17 @@ HELP: delay
 { $description 
     "Delays the construction of a parser until it is actually required to parse. This " 
     "allows for calling a parser that results in a recursive call to itself. The quotation "
-    "should return the constructed parser." } ;
+    "should return the constructed parser and is called the first time the parser is run."
+    "The compiled result is memoized for future runs. See " { $link box } " for a word "
+    "that calls the quotation at compile time." } ;
+
+HELP: box
+{ $values 
+  { "quot" "a quotation" } 
+  { "parser" "a parser" } 
+}
+{ $description 
+    "Delays the construction of a parser until the parser is compiled. The quotation "
+    "should return the constructed parser and is called when the parser is compiled."
+    "The compiled result is memoized for future runs. See " { $link delay } " for a word "
+    "that calls the quotation at runtime." } ;

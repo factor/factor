@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel sequences generic words
-arrays classes slots slots.private tuples math vectors
+arrays classes slots slots.private classes.tuple math vectors
 quotations sorting prettyprint ;
 IN: mirrors
 

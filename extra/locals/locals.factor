@@ -5,7 +5,7 @@ inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
 definitions prettyprint hashtables combinators.lib
 prettyprint.sections sequences.private effects generic
-compiler.units combinators.cleave accessors ;
+compiler.units accessors ;
 IN: locals
 
 ! Inspired by
@@ -266,13 +266,13 @@ M: object local-rewrite* , ;
     ] assoc-each local-rewrite* \ call , ;
 
 M: let local-rewrite*
-    { body>> bindings>> } get-slots let-rewrite ;
+    [ body>> ] [ bindings>> ] bi let-rewrite ;
 
 M: let* local-rewrite*
-    { body>> bindings>> } get-slots let-rewrite ;
+    [ body>> ] [ bindings>> ] bi let-rewrite ;
 
 M: wlet local-rewrite*
-    { body>> bindings>> } get-slots
+    [ body>> ] [ bindings>> ] bi
     [ [ ] curry ] assoc-map
     let-rewrite ;
 
@@ -340,7 +340,7 @@ M: lambda pprint*
 
 : pprint-let ( let word -- )
     pprint-word
-    { body>> bindings>> } get-slots
+    [ body>> ] [ bindings>> ] bi
     \ | pprint-word
     t <inset
     <block

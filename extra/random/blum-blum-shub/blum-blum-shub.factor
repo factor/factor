@@ -1,5 +1,5 @@
 USING: kernel math sequences namespaces
-math.miller-rabin combinators.cleave combinators.lib
+math.miller-rabin combinators.lib
 math.functions accessors random ;
 IN: random.blum-blum-shub
 
@@ -32,5 +32,5 @@ IN: crypto
     ! ! #! Cryptographically secure random number using Blum-Blum-Shub 256
     ! [ log2 1+ random-bits ] keep dupd >= [ -1 shift ] when ;
 
-M: blum-blum-shub random-32 ( bbs -- r )
+M: blum-blum-shub random-32* ( bbs -- r )
     ;

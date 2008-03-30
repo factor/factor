@@ -5,7 +5,7 @@ io.files kernel ;
 [ "c071aa7e007a9770b2fb4304f55a17e5" ] [
     "extra/benchmark/reverse-complement/reverse-complement-test-in.txt"
     "extra/benchmark/reverse-complement/reverse-complement-test-out.txt"
-    [ resource-path ] 2apply
+    [ resource-path ] bi@
     reverse-complement
 
     "extra/benchmark/reverse-complement/reverse-complement-test-out.txt"
