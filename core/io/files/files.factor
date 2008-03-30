@@ -153,6 +153,9 @@ HOOK: make-link io-backend ( path1 path2 -- )
 
 HOOK: read-link io-backend ( path -- info )
 
+: copy-link ( path1 path2 -- )
+    >r read-link r> make-link ;
+
 SYMBOL: +regular-file+
 SYMBOL: +directory+
 SYMBOL: +character-device+
@@ -264,13 +267,16 @@ M: object copy-file
 DEFER: copy-tree-into
 
 : copy-tree ( from to -- )
-    over link-info type>> +directory+ = [
-        >r dup directory r> rot [
-            [ >r first r> copy-tree-into ] curry each
-        ] with-directory
-    ] [
-        copy-file
-    ] if ;
+    over link-info type>>
+    {
+        { +symbolic-link+ [ copy-link ] }
+        { +directory+ [
+            >r dup directory r> rot [
+                [ >r first r> copy-tree-into ] curry each
+            ] with-directory
+        ] }
+        [ drop copy-file ]
+    } case ;
 
 : copy-tree-into ( from to -- )
     to-directory copy-tree ;

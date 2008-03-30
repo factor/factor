@@ -108,6 +108,3 @@ M: unix-io read-link ( path -- path' )
     normalize-pathname
     PATH_MAX [ <byte-array> tuck ] [ ] bi readlink
     dup io-error head-slice >string ;
-
-: copy-link ( path1 path2 -- )
-    >r read-link r> make-link ;
