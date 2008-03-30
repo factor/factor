@@ -295,12 +295,12 @@ HELP: hashcode*
 { $values { "depth" integer } { "obj" object } { "code" fixnum } }
 { $contract "Outputs the hashcode of an object. The hashcode operation must satisfy the following properties:"
 { $list
-    { "if two objects are equal under " { $link = } ", they must have equal hashcodes" }
-    { "if the hashcode of an object depends on the values of its slots, the hashcode of the slots must be computed recursively by calling " { $link hashcode* } " with a " { $snippet "level" } " parameter decremented by one. This avoids excessive work while still computing well-distributed hashcodes. The " { $link recursive-hashcode } " combinator can help with implementing this logic" }
-    { "the hashcode should be a " { $link fixnum } ", however returning a " { $link bignum } " will not cause any problems other than potential performance degradation."
-    "the hashcode is only permitted to change between two invocations if the object was mutated in some way" }
+    { "If two objects are equal under " { $link = } ", they must have equal hashcodes." }
+    { "If the hashcode of an object depends on the values of its slots, the hashcode of the slots must be computed recursively by calling " { $link hashcode* } " with a " { $snippet "level" } " parameter decremented by one. This avoids excessive work while still computing well-distributed hashcodes. The " { $link recursive-hashcode } " combinator can help with implementing this logic," }
+    { "The hashcode should be a " { $link fixnum } ", however returning a " { $link bignum } " will not cause any problems other than potential performance degradation." }
+    { "The hashcode is only permitted to change between two invocations if the object or one of its slot values was mutated." }
 }
-"If mutable objects are used as hashtable keys, they must not be mutated in such a way that their hashcode changes. Doing so will violate bucket sorting invariants and result in undefined behavior." } ;
+"If mutable objects are used as hashtable keys, they must not be mutated in such a way that their hashcode changes. Doing so will violate bucket sorting invariants and result in undefined behavior. See " { $link "hashtables.keys" } " for details." } ;
 
 HELP: hashcode
 { $values { "obj" object } { "code" fixnum } }
