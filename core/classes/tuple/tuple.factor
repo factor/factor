@@ -23,7 +23,14 @@ M: class tuple-layout "layout" word-prop ;
 
 M: tuple tuple-layout 1 slot ;
 
+M: tuple-layout tuple-layout ;
 : tuple-size tuple-layout layout-size ; inline
+
+: prepare-tuple>array ( tuple -- n tuple layout )
+    [ tuple-size ] [ ] [ tuple-layout ] tri ;
+
+: copy-tuple-slots ( n tuple first -- array )
+    [ array-nth ] curry map r> add* ;
 
 PRIVATE>
 
@@ -32,28 +39,29 @@ PRIVATE>
     [ drop ] [ no-tuple-class ] if ;
 
 : tuple>array ( tuple -- array )
-    dup tuple-layout
-    [ layout-size swap [ array-nth ] curry map ] keep
-    layout-class add* ;
+    prepare-tuple>array >r copy-tuple-slots r> layout-class add* ;
 
-: >tuple ( seq -- tuple )
-    dup first tuple-layout <tuple> [
-        >r 1 tail-slice dup length r>
-        [ tuple-size min ] keep
-        [ set-array-nth ] curry
-        2each
+: tuple-slots ( tuple -- array )
+    prepare-tuple>array drop copy-tuple-slots ;
+
+: slots>tuple ( tuple class -- array )
+    tuple-layout <tuple> [
+        [ tuple-size ] [ [ set-array-nth ] curry ] bi 2each
     ] keep ;
 
+: >tuple ( tuple -- array )
+    unclip slots>tuple ;
+
 : slot-names ( class -- seq )
-    "slots" word-prop [ name>> ] map ;
+    "slot-names" word-prop ;
 
 <PRIVATE
 
 : tuple= ( tuple1 tuple2 -- ? )
-    over tuple-layout over tuple-layout eq? [
-        dup tuple-size -rot
-        [ >r over r> array-nth >r array-nth r> = ] 2curry
-        all-integers?
+    2dup [ tuple-layout ] bi@ eq? [
+        [ drop tuple-size ]
+        [ [ [ drop array-nth ] [ nip array-nth ] 3bi = ] 2curry ]
+        2bi all-integers?
     ] [
         2drop f
     ] if ;
@@ -92,18 +100,19 @@ PRIVATE>
     superclasses 1 head-slice*
     [ slot-names length ] map sum ;
 
-: generate-tuple-slots ( class slots -- slots )
+: generate-tuple-slots ( class slots -- slot-specs )
     over superclass-size 2 + simple-slots ;
 
-: define-tuple-slots ( class slots -- )
-    dupd generate-tuple-slots
+: define-tuple-slots ( class -- )
+    dup dup slot-names generate-tuple-slots
     [ "slots" set-word-prop ]
-    [ define-accessors ]
-    [ define-slots ] 2tri ;
+    [ define-accessors ] ! new
+    [ define-slots ] ! old
+    2tri ;
 
 : make-tuple-layout ( class -- layout )
     [ ]
-    [ [ superclass-size ] [ "slots" word-prop length ] bi + ]
+    [ [ superclass-size ] [ slot-names length ] bi + ]
     [ superclasses dup length 1- ] tri
     <tuple-layout> ;
 
@@ -113,7 +122,7 @@ PRIVATE>
 : removed-slots ( class newslots -- seq )
     swap slot-names seq-diff ;
 
-: forget-slots ( class slots -- )
+: forget-removed-slots ( class slots -- )
     dupd removed-slots [
         [ reader-word forget-method ]
         [ writer-word forget-method ] 2bi
@@ -122,36 +131,48 @@ PRIVATE>
 : permutation ( seq1 seq2 -- permutation )
     swap [ index ] curry map ;
 
-: reshape-tuple ( oldtuple permutation -- newtuple )
-    >r tuple>array 2 cut r>
-    [ [ swap ?nth ] [ drop f ] if* ] with map
-    append >tuple ;
+: all-slot-names ( class -- slots )
+    superclasses [ slot-names ] map concat \ class add* ;
 
-: reshape-tuples ( class superclass newslots -- )
-    nip
-    >r dup slot-names r> permutation
-    [
-        >r "predicate" word-prop instances dup
-        r> [ reshape-tuple ] curry map
-        become
-    ] 2curry after-compilation ;
+: slot-permutation ( class superclass newslots -- n permutation )
+    [ all-slot-names ] [ all-slot-names ] [ ] tri* append
+    [ drop length ] [ permutation ] 2bi ;
+
+: permute-direct-slots ( oldslots permutation -- newslots )
+    [ [ swap ?nth ] [ drop f ] if* ] with map ;
+
+: permute-all-slots ( oldslots n permutation -- newslots )
+    [ >r head r> permute-direct-slots ] [ drop tail ] 3bi append ;
+
+: change-tuple ( tuple quot -- newtuple )
+    >r tuple>array r> call >tuple ; inline
+
+: update-tuples ( predicate n permutation -- )
+    [ permute-all-slots ] 2curry [ change-tuple ] curry
+    >r "predicate" word-prop instances dup r> map
+    become ; inline
+
+: update-tuples-after ( class superclass newslots -- )
+    [ 2drop ] [ slot-permutation ] 3bi
+    [ update-tuples ] 3curry after-compilation ;
 
 : define-new-tuple-class ( class superclass slots -- )
     [ drop f tuple-class define-class ]
-    [ nip define-tuple-slots ] [
+    [ nip "slot-names" set-word-prop ] [
         2drop
         class-usages keys [ tuple-class? ] subset [
+            [ define-tuple-slots ]
             [ define-tuple-layout ]
             [ define-tuple-predicate ]
-            bi
+            tri
         ] each
     ] 3tri ;
 
 : redefine-tuple-class ( class superclass slots -- )
-    [ reshape-tuples ]
+    [ update-tuples-after ]
     [
         nip
-        [ forget-slots ]
+        [ forget-removed-slots ]
         [ drop changed-word ]
         [ drop redefined ]
         2tri
@@ -175,7 +196,7 @@ M: tuple-class define-tuple-class
     3drop ;
 
 : define-error-class ( class superclass slots -- )
-    pick >r define-tuple-class r>
+    [ define-tuple-class ] [ 2drop ] 3bi
     dup [ construct-boa throw ] curry define ;
 
 M: tuple clone
@@ -195,8 +216,6 @@ M: tuple hashcode*
             swapd array-nth hashcode* bitxor
         ] 2curry reduce
     ] recursive-hashcode ;
-
-: tuple-slots ( tuple -- seq ) tuple>array 2 tail ;
 
 ! Definition protocol
 M: tuple-class reset-class
