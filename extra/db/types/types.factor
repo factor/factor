@@ -131,25 +131,17 @@ TUPLE: no-sql-modifier ;
 
 HOOK: bind% db ( spec -- )
 
-TUPLE: no-slot-named ;
-: no-slot-named ( -- * ) T{ no-slot-named } throw ;
-
-: slot-spec-named ( str class -- slot-spec )
-    "slots" word-prop [ slot-spec-name = ] with find nip
-    [ no-slot-named ] unless* ;
-
 : offset-of-slot ( str obj -- n )
-    class slot-spec-named slot-spec-offset ;
+    class "slots" word-prop slot-named slot-spec-offset ;
 
-: get-slot-named ( str obj -- value )
-    tuck offset-of-slot [ no-slot-named ] unless* slot ;
+: get-slot-named ( name obj -- value )
+    tuck offset-of-slot slot ;
 
-: set-slot-named ( value str obj -- )
-    tuck offset-of-slot [ no-slot-named ] unless* set-slot ;
+: set-slot-named ( value name obj -- )
+    tuck offset-of-slot set-slot ;
 
 : tuple>filled-slots ( tuple -- alist )
-    dup <mirror> mirror-slots [ slot-spec-name ] map
-    swap tuple-slots 2array flip [ nip ] assoc-subset ;
+    <mirror> [ nip ] assoc-subset ;
 
 : tuple>params ( specs tuple -- obj )
     [
