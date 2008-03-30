@@ -3,7 +3,7 @@ IN: benchmark.typecheck4
 
 TUPLE: hello n ;
 
-: hello-n* 4 slot ;
+: hello-n* 3 slot ;
 
 : foo 0 100000000 [ over hello-n* + ] times ;
 

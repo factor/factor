@@ -71,7 +71,7 @@ M: ds-loc loc>operand ds-loc-n cells neg ds-reg swap ;
 M: rs-loc loc>operand rs-loc-n cells neg rs-reg swap ;
 
 M: immediate load-literal
-    [ v>operand ] 2apply LOAD ;
+    [ v>operand ] bi@ LOAD ;
 
 M: ppc-backend load-indirect ( obj reg -- )
     [ 0 swap LOAD32 rc-absolute-ppc-2/2 rel-literal ] keep
@@ -138,7 +138,7 @@ M: ppc-backend %replace
     >r v>operand r> loc>operand STW ;
 
 M: ppc-backend %unbox-float ( dst src -- )
-    [ v>operand ] 2apply float-offset LFD ;
+    [ v>operand ] bi@ float-offset LFD ;
 
 M: ppc-backend %inc-d ( n -- ) ds-reg dup rot cells ADDI ;
 
@@ -291,10 +291,10 @@ M: ppc-backend %unbox-small-struct
 
 ! Alien intrinsics
 M: ppc-backend %unbox-byte-array ( dst src -- )
-    [ v>operand ] 2apply byte-array-offset ADDI ;
+    [ v>operand ] bi@ byte-array-offset ADDI ;
 
 M: ppc-backend %unbox-alien ( dst src -- )
-    [ v>operand ] 2apply alien-offset LWZ ;
+    [ v>operand ] bi@ alien-offset LWZ ;
 
 M: ppc-backend %unbox-f ( dst src -- )
     drop 0 swap v>operand LI ;

@@ -78,7 +78,7 @@ M: utf16le decode-char
     swap BIN: 11111111 bitand ;
 
 : stream-write2 ( stream char1 char2 -- )
-    rot [ stream-write1 ] curry 2apply ;
+    rot [ stream-write1 ] curry bi@ ;
 
 : char>utf16be ( stream char -- )
     dup HEX: FFFF > [

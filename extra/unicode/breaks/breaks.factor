@@ -26,7 +26,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 : process-other-extend ( lines -- set )
     [ "#" split1 drop ";" split1 drop trim-blank ] map
     [ empty? not ] subset
-    [ ".." split1 [ dup ] unless* [ hex> ] 2apply [a,b] ] map
+    [ ".." split1 [ dup ] unless* [ hex> ] bi@ [a,b] ] map
     concat >set ;
 
 : other-extend-lines ( -- lines )
@@ -83,7 +83,7 @@ VALUE: grapheme-table
     grapheme-table nth nth not ;
 
 : chars ( i str n -- str[i] str[i+n] )
-    swap >r dupd + r> [ ?nth ] curry 2apply ;
+    swap >r dupd + r> [ ?nth ] curry bi@ ;
 
 : find-index ( seq quot -- i ) find drop ; inline
 : find-last-index ( seq quot -- i ) find-last drop ; inline

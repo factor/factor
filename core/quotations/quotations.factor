@@ -12,7 +12,7 @@ M: curry call dup 3 slot swap 4 slot call ;
 M: compose call dup 3 slot swap 4 slot slip call ;
 
 M: wrapper equal?
-    over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
+    over wrapper? [ [ wrapped ] bi@ = ] [ 2drop f ] if ;
 
 UNION: callable quotation curry compose ;
 

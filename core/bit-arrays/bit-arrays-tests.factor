@@ -21,7 +21,7 @@ IN: bit-arrays.tests
     { t f t } { f t f }
 ] [
     { t f t } >bit-array dup clone dup [ not ] change-each
-    [ >array ] 2apply
+    [ >array ] bi@
 ] unit-test
 
 [

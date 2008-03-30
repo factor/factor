@@ -88,7 +88,7 @@ USING: bootstrap.image bootstrap.image.download io.streams.null ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: longer? ( seq seq -- ? ) [ length ] 2apply > ; 
+: longer? ( seq seq -- ? ) [ length ] bi@ > ; 
 
 : maybe-tail* ( seq n -- seq )
   2dup longer?

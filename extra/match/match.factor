@@ -32,10 +32,10 @@ SYMBOL: _
         { [ 2dup = ] [ 2drop t ] }
         { [ 2dup [ _ eq? ] either? ] [ 2drop t ] }
         { [ 2dup [ sequence? ] both? ] [
-            2dup [ length ] 2apply =
+            2dup [ length ] bi@ =
             [ [ (match) ] 2all? ] [ 2drop f ] if ] }
         { [ 2dup [ tuple? ] both? ]
-          [ [ tuple>array ] 2apply [ (match) ] 2all? ] }
+          [ [ tuple>array ] bi@ [ (match) ] 2all? ] }
         { [ t ] [ 2drop f ] }
     } cond ;
 

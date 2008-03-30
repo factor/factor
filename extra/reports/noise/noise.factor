@@ -9,7 +9,7 @@ IN: reports.noise
         { -nrot 5 }
         { -roll 4 }
         { -rot 3 }
-        { 2apply 1 }
+        { bi@ 1 }
         { 2curry 1 }
         { 2drop 1 }
         { 2dup 1 }

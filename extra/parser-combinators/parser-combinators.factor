@@ -35,7 +35,7 @@ C: <parse-result> parse-result
     ] if ;
 
 : string= ( str1 str2 ignore-case -- ? )
-    [ [ >upper ] 2apply ] when sequence= ;
+    [ [ >upper ] bi@ ] when sequence= ;
 
 : string-head? ( str head ignore-case -- ? )
     2over shorter? [
@@ -327,7 +327,7 @@ LAZY: <(+)> ( parser -- parser )
     nonempty-list-of { } succeed <|> ;
 
 LAZY: surrounded-by ( parser start end -- parser' )
-    [ token ] 2apply swapd pack ;
+    [ token ] bi@ swapd pack ;
 
 : exactly-n ( parser n -- parser' )
     swap <repetition> <and-parser> [ flatten ] <@ ;

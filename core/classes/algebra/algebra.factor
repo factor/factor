@@ -67,7 +67,7 @@ C: <anonymous-complement> anonymous-complement
     members>> [ class< ] with all? ;
 
 : anonymous-complement< ( first second -- ? )
-    [ class>> ] 2apply swap class< ;
+    [ class>> ] bi@ swap class< ;
 
 : (class<) ( first second -- -1/0/1 )  
     {

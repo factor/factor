@@ -66,46 +66,46 @@ DEFER: if
     >r 3dup r> -roll 3slip ; inline
 
 ! Cleavers
-: bi ( x p q -- p[x] q[x] )
+: bi ( x p q -- )
     >r keep r> call ; inline
 
-: tri ( x p q r -- p[x] q[x] r[x] )
+: tri ( x p q r -- )
     >r pick >r bi r> r> call ; inline
 
 ! Double cleavers
-: 2bi ( x y p q -- p[x,y] q[x,y] )
+: 2bi ( x y p q -- )
     >r 2keep r> call ; inline
 
-: 2tri ( x y p q r -- p[x,y] q[x,y] r[x,y] )
+: 2tri ( x y p q r -- )
     >r >r 2keep r> 2keep r> call ; inline
 
 ! Triple cleavers
-: 3bi ( x y z p q -- p[x,y,z] q[x,y,z] )
+: 3bi ( x y z p q -- )
     >r 3keep r> call ; inline
 
-: 3tri ( x y z p q r -- p[x,y,z] q[x,y,z] r[x,y,z] )
+: 3tri ( x y z p q r -- )
     >r >r 3keep r> 3keep r> call ; inline
 
 ! Spreaders
-: bi* ( x y p q -- p[x] q[y] )
+: bi* ( x y p q -- )
     >r swap slip r> call ; inline
 
-: tri* ( x y z p q r -- p[x] q[y] r[z] )
+: tri* ( x y z p q r -- )
     >r rot >r bi* r> r> call ; inline
 
 ! Double spreaders
-: 2bi* ( w x y z p q -- p[w,x] q[y,z] )
+: 2bi* ( w x y z p q -- )
     >r -rot 2slip r> call ; inline
 
 ! Appliers
-: bi@ ( x y p -- p[x] p[y] )
+: bi@ ( x y quot -- )
     tuck 2slip call ; inline
 
-: tri@ ( x y z p -- p[x] p[y] p[z] )
+: tri@ ( x y z quot -- )
     tuck >r bi@ r> call ; inline
 
 ! Double appliers
-: 2bi@ ( w x y z p -- p[w,x] p[y,z] )
+: 2bi@ ( w x y z quot -- )
     dup -roll 3slip call ; inline
 
 : while ( pred body tail -- )
@@ -199,6 +199,3 @@ GENERIC: construct-boa ( ... class -- tuple )
 : do-primitive ( number -- ) "Improper primitive call" throw ;
 
 PRIVATE>
-
-! Deprecated
-: 2apply bi@ ; inline

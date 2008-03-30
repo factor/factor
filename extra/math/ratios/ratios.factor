@@ -7,7 +7,7 @@ USING: kernel kernel.private math math.functions math.private ;
     dup numerator swap denominator ; inline
 
 : 2>fraction ( a/b c/d -- a c b d )
-    [ >fraction ] 2apply swapd ; inline
+    [ >fraction ] bi@ swapd ; inline
 
 <PRIVATE
 
@@ -26,7 +26,7 @@ M: integer /
     dup zero? [
         "Division by zero" throw
     ] [
-        dup 0 < [ [ neg ] 2apply ] when
+        dup 0 < [ [ neg ] bi@ ] when
         2dup gcd nip tuck /i >r /i r> fraction>
     ] if ;
 

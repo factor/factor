@@ -63,7 +63,7 @@ M: arm-backend load-indirect ( obj reg -- )
 
 M: immediate load-literal
     over v>operand small-enough? [
-        [ v>operand ] 2apply swap MOV
+        [ v>operand ] bi@ swap MOV
     ] [
         v>operand load-indirect
     ] if ;
@@ -322,10 +322,10 @@ M: arm-backend fp-shadows-int? ( -- ? ) f ;
 
 ! Alien intrinsics
 M: arm-backend %unbox-byte-array ( dst src -- )
-    [ v>operand ] 2apply byte-array-offset ADD ;
+    [ v>operand ] bi@ byte-array-offset ADD ;
 
 M: arm-backend %unbox-alien ( dst src -- )
-    [ v>operand ] 2apply alien-offset <+> LDR ;
+    [ v>operand ] bi@ alien-offset <+> LDR ;
 
 M: arm-backend %unbox-f ( dst src -- )
     drop v>operand 0 MOV ;

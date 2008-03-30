@@ -24,7 +24,7 @@ C: <id> id
 
 M: id hashcode* obj>> hashcode* ;
 
-M: id equal? over id? [ [ obj>> ] 2apply eq? ] [ 2drop f ] if ;
+M: id equal? over id? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
 
 : add-object ( obj -- )
     #! Add an object to the sequence of already serialized

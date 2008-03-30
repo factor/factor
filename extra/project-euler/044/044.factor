@@ -31,7 +31,7 @@ IN: project-euler.044
     dup 3 * 1- * 2 / ;
 
 : sum-and-diff? ( m n -- ? )
-    2dup + -rot - [ pentagonal? ] 2apply and ;
+    2dup + -rot - [ pentagonal? ] bi@ and ;
 
 PRIVATE>
 
