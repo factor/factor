@@ -3,7 +3,7 @@
 USING: io.backend io.nonblocking io.unix.backend io.files io
 unix unix.stat unix.time kernel math continuations
 math.bitfields byte-arrays alien combinators calendar
-io.encodings.binary ;
+io.encodings.binary accessors sequences strings ;
 
 IN: io.unix.files
 
@@ -84,7 +84,7 @@ M: unix-io copy-file ( from to -- )
         { [ dup S_ISLNK  ] [ +symbolic-link+    ] }
         { [ dup S_ISSOCK ] [ +socket+           ] }
         { [ t            ] [ +unknown+          ] }
-      } cond nip ;
+    } cond nip ;
 
 : stat>file-info ( stat -- info )
     {
@@ -100,3 +100,11 @@ M: unix-io file-info ( path -- info )
 
 M: unix-io link-info ( path -- info )
     normalize-pathname lstat* stat>file-info ;
+
+M: unix-io make-link ( path1 path2 -- )
+    normalize-pathname symlink io-error ;
+
+M: unix-io read-link ( path -- path' )
+    normalize-pathname
+    PATH_MAX [ <byte-array> tuck ] [ ] bi readlink
+    dup io-error head-slice >string ;
