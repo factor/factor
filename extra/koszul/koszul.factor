@@ -57,7 +57,7 @@ SYMBOL: terms
     terms get [ [ swap +@ ] assoc-each ] bind ;
 
 : alt+ ( x y -- x+y )
-    [ >alt ] 2apply [ (alt+) (alt+) ] with-terms ;
+    [ >alt ] bi@ [ (alt+) (alt+) ] with-terms ;
 
 ! Multiplication
 : alt*n ( vec n -- vec )
@@ -79,7 +79,7 @@ SYMBOL: terms
     ] curry each ;
 
 : duplicates? ( seq -- ? )
-    dup prune [ length ] 2apply > ;
+    dup prune [ length ] bi@ > ;
 
 : (wedge) ( n basis1 basis2 -- n basis )
     append dup duplicates? [
@@ -90,7 +90,7 @@ SYMBOL: terms
     ] if ;
 
 : wedge ( x y -- x.y )
-    [ >alt ] 2apply [
+    [ >alt ] bi@ [
         swap [
             [
                 2swap [
@@ -200,7 +200,7 @@ DEFER: (d)
     ] with map ;
 
 : bigraded-betti ( u-generators z-generators -- seq )
-    [ basis graded ] 2apply tensor bigraded-ker/im-d
+    [ basis graded ] bi@ tensor bigraded-ker/im-d
     [ [ [ first ] map ] map ] keep
     [ [ second ] map 2 head* { 0 0 } prepend ] map
     1 tail dup first length 0 <array> add
@@ -278,7 +278,7 @@ DEFER: (d)
     ] with map ;
 
 : bigraded-laplacian ( u-generators z-generators quot -- seq )
-    >r [ basis graded ] 2apply tensor bigraded-triples r>
+    >r [ basis graded ] bi@ tensor bigraded-triples r>
     [ [ first3 ] swap compose map ] curry map ; inline
 
 : bigraded-laplacian-betti ( u-generators z-generators -- seq )

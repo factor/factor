@@ -199,6 +199,3 @@ GENERIC: construct-boa ( ... class -- tuple )
 : do-primitive ( number -- ) "Improper primitive call" throw ;
 
 PRIVATE>
-
-! Deprecated
-: 2apply bi@ ; inline

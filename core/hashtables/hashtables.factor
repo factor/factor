@@ -156,7 +156,7 @@ M: hashtable clone
 
 M: hashtable equal?
     over hashtable? [
-        2dup [ assoc-size ] 2apply number=
+        2dup [ assoc-size ] bi@ number=
         [ assoc= ] [ 2drop f ] if
     ] [ 2drop f ] if ;
 

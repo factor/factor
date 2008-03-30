@@ -52,7 +52,7 @@ M: cons nil? ( cons -- bool )
 TUPLE: lazy-cons car cdr ;
 
 : lazy-cons ( car cdr -- promise )
-    [ promise ] 2apply \ lazy-cons construct-boa
+    [ promise ] bi@ \ lazy-cons construct-boa
     T{ promise f f t f } clone
     [ set-promise-value ] keep ;
 

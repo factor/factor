@@ -82,7 +82,7 @@ ERROR: assert got expect ;
 : depth ( -- n ) datastack length ;
 
 : trim-datastacks ( seq1 seq2 -- seq1' seq2' )
-    2dup [ length ] 2apply min tuck tail >r tail r> ;
+    2dup [ length ] bi@ min tuck tail >r tail r> ;
 
 ERROR: relative-underflow stack ;
 

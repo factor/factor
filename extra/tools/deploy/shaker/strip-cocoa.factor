@@ -14,7 +14,7 @@ global [
 
     sent-messages get
     super-sent-messages get
-    [ keys [ objc-methods get at dup ] H{ } map>assoc ] 2apply
+    [ keys [ objc-methods get at dup ] H{ } map>assoc ] bi@
     super-message-senders [ intersect ] change
     message-senders [ intersect ] change
 

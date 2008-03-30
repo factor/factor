@@ -49,7 +49,7 @@ M: unix-io touch-file ( path -- )
     close ;
 
 M: unix-io move-file ( from to -- )
-    [ normalize-pathname ] 2apply rename io-error ;
+    [ normalize-pathname ] bi@ rename io-error ;
 
 M: unix-io delete-file ( path -- )
     normalize-pathname unlink io-error ;
@@ -69,7 +69,7 @@ M: unix-io delete-directory ( path -- )
     ] with-disposal ;
 
 M: unix-io copy-file ( from to -- )
-    [ normalize-pathname ] 2apply
+    [ normalize-pathname ] bi@
     [ (copy-file) ]
     [ swap file-info file-info-permissions chmod io-error ]
     2bi ;

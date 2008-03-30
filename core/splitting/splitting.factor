@@ -56,7 +56,7 @@ INSTANCE: groups sequence
     ] if ;
 
 : last-split1 ( seq subseq -- before after )
-    [ <reversed> ] 2apply split1 [ reverse ] 2apply
+    [ <reversed> ] bi@ split1 [ reverse ] bi@
     dup [ swap ] when ;
 
 : (split) ( separators n seq -- )

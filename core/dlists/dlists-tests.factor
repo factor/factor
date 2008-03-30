@@ -63,7 +63,7 @@ IN: dlists.tests
 [ 0 ] [ <dlist> 1 over push-front dup pop-front* dlist-length ] unit-test
 
 : assert-same-elements
-    [ prune natural-sort ] 2apply assert= ;
+    [ prune natural-sort ] bi@ assert= ;
 
 : dlist-push-all [ push-front ] curry each ;
 

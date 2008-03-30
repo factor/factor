@@ -161,5 +161,5 @@ TUPLE: datagram-port addr packet packet-addr ;
 
 : check-datagram-send ( packet addrspec port -- )
     dup check-datagram-port
-    datagram-port-addr [ class ] 2apply assert=
+    datagram-port-addr [ class ] bi@ assert=
     class byte-array assert= ;

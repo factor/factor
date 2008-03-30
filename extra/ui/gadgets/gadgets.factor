@@ -22,7 +22,7 @@ M: array rect-dim drop { 0 0 } ;
 : rect-extent ( rect -- loc ext ) rect-bounds over v+ ;
 
 : 2rect-extent ( rect rect -- loc1 loc2 ext1 ext2 )
-    [ rect-extent ] 2apply swapd ;
+    [ rect-extent ] bi@ swapd ;
 
 : <extent-rect> ( loc ext -- rect ) over [v-] <rect> ;
 

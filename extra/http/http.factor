@@ -106,7 +106,7 @@ IN: http
 : query>assoc ( query -- assoc )
     dup [
         "&" split [
-            "=" split1 [ dup [ url-decode ] when ] 2apply
+            "=" split1 [ dup [ url-decode ] when ] bi@
         ] H{ } map>assoc
     ] when ;
 

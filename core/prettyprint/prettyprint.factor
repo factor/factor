@@ -114,7 +114,7 @@ SYMBOL: ->
 
 : remove-breakpoints ( quot pos -- quot' )
     over quotation? [
-        1+ cut [ (remove-breakpoints) ] 2apply
+        1+ cut [ (remove-breakpoints) ] bi@
         [ -> ] swap 3append
     ] [
         drop

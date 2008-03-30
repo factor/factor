@@ -25,13 +25,13 @@ IN: ui.gadgets.grids.tests
 [ { 100 200 } ] [
     100x100
     100x100
-    [ 1array ] 2apply 2array <grid> pref-dim
+    [ 1array ] bi@ 2array <grid> pref-dim
 ] unit-test
 
 [ ] [
     100x100
     100x100
-    [ 1array ] 2apply 2array <grid> layout
+    [ 1array ] bi@ 2array <grid> layout
 ] unit-test
 
 [ { 230 120 } { 100 100 } { 100 100 } ] [

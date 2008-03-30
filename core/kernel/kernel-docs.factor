@@ -60,8 +60,8 @@ $nl
 { $subsection keep }
 { $subsection 2keep }
 { $subsection 3keep }
-{ $subsection 2apply }
-"A pair of utility words built from " { $link 2apply } ":"
+{ $subsection bi@ }
+"A pair of utility words built from " { $link bi@ } ":"
 { $subsection both? }
 { $subsection either? }
 "A looping combinator:"
@@ -376,7 +376,7 @@ HELP: 3keep
 { $values { "quot" "a quotation with stack effect " { $snippet "( x y z -- )" } } { "x" object } { "y" object } { "z" object } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
-HELP: 2apply
+HELP: bi@
 { $values { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } { "x" object } { "y" object } }
 { $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } "." } ;
 

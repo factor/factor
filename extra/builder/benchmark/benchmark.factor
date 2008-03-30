@@ -19,11 +19,11 @@ IN: builder.benchmark
   2array ;
 
 : compare-tables ( old new -- table )
-  [ passing-benchmarks ] 2apply
+  [ passing-benchmarks ] bi@
   [ benchmark-difference ] with map ;
 
 : benchmark-deltas ( -- table )
-  "../benchmarks" "benchmarks" [ eval-file ] 2apply
+  "../benchmarks" "benchmarks" [ eval-file ] bi@
   compare-tables
   sort-values ;
 

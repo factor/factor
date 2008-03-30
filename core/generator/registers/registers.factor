@@ -79,7 +79,7 @@ M: ds-loc minimal-ds-loc* ds-loc-n min ;
 M: ds-loc operand-class* ds-loc-class ;
 M: ds-loc set-operand-class set-ds-loc-class ;
 M: ds-loc live-loc?
-    over ds-loc? [ [ ds-loc-n ] 2apply = not ] [ 2drop t ] if ;
+    over ds-loc? [ [ ds-loc-n ] bi@ = not ] [ 2drop t ] if ;
 
 ! A retain stack location.
 TUPLE: rs-loc n class ;
@@ -89,7 +89,7 @@ TUPLE: rs-loc n class ;
 M: rs-loc operand-class* rs-loc-class ;
 M: rs-loc set-operand-class set-rs-loc-class ;
 M: rs-loc live-loc?
-    over rs-loc? [ [ rs-loc-n ] 2apply = not ] [ 2drop t ] if ;
+    over rs-loc? [ [ rs-loc-n ] bi@ = not ] [ 2drop t ] if ;
 
 UNION: loc ds-loc rs-loc ;
 
@@ -206,7 +206,7 @@ INSTANCE: constant value
     %move ;
 
 : %move ( dst src -- )
-    2dup [ move-spec ] 2apply 2array {
+    2dup [ move-spec ] bi@ 2array {
         { { f f } [ %move-bug ] }
         { { f unboxed-c-ptr } [ %move-bug ] }
         { { f unboxed-byte-array } [ %move-bug ] }
@@ -318,7 +318,7 @@ M: phantom-stack cut-phantom
 
 : phantoms ( -- phantom phantom ) phantom-d get phantom-r get ;
 
-: each-phantom ( quot -- ) phantoms rot 2apply ; inline
+: each-phantom ( quot -- ) phantoms rot bi@ ; inline
 
 : finalize-heights ( -- ) [ finalize-height ] each-phantom ;
 
@@ -442,7 +442,7 @@ M: loc lazy-store
 : fast-shuffle? ( live-locs -- ? )
     #! Test if we have enough free registers to load all
     #! shuffle inputs at once.
-    T{ int-regs } free-vregs [ length ] 2apply <= ;
+    T{ int-regs } free-vregs [ length ] bi@ <= ;
 
 : finalize-locs ( -- )
     #! Perform any deferred stack shuffling.
@@ -488,7 +488,7 @@ M: loc lazy-store
 
 : phantom&spec ( phantom spec -- phantom' spec' )
     [ length f pad-left ] keep
-    [ <reversed> ] 2apply ; inline
+    [ <reversed> ] bi@ ; inline
 
 : phantom&spec-agree? ( phantom spec quot -- ? )
     >r phantom&spec r> 2all? ; inline
@@ -520,7 +520,7 @@ M: loc lazy-store
     swap lazy-load ;
 
 : output-vregs ( -- seq seq )
-    +output+ +clobber+ [ get [ get ] map ] 2apply ;
+    +output+ +clobber+ [ get [ get ] map ] bi@ ;
 
 : clash? ( seq -- ? )
     phantoms append [

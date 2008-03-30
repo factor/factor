@@ -13,10 +13,10 @@ IN: math.polynomials
 <PRIVATE
 : 2pad-left ( p p n -- p p ) 0 [ pad-left swap ] 2keep pad-left swap ;
 : 2pad-right ( p p n -- p p ) 0 [ pad-right swap ] 2keep pad-right swap ;
-: pextend ( p p -- p p ) 2dup [ length ] 2apply max 2pad-right ;
-: pextend-left ( p p -- p p ) 2dup [ length ] 2apply max 2pad-left ;
+: pextend ( p p -- p p ) 2dup [ length ] bi@ max 2pad-right ;
+: pextend-left ( p p -- p p ) 2dup [ length ] bi@ max 2pad-left ;
 : unempty ( seq -- seq ) dup empty? [ drop { 0 } ] when ;
-: 2unempty ( seq seq -- seq seq ) [ unempty ] 2apply ;
+: 2unempty ( seq seq -- seq seq ) [ unempty ] bi@ ;
 
 PRIVATE>
 : p= ( p p -- ? ) pextend = ;
@@ -24,7 +24,7 @@ PRIVATE>
 : ptrim ( p -- p )
     dup singleton? [ [ zero? ] right-trim ] unless ;
 
-: 2ptrim ( p p -- p p ) [ ptrim ] 2apply ;
+: 2ptrim ( p p -- p p ) [ ptrim ] bi@ ;
 : p+ ( p p -- p ) pextend v+ ;
 : p- ( p p -- p ) pextend v- ;
 : n*p ( n p -- n*p ) n*v ;
@@ -32,7 +32,7 @@ PRIVATE>
 ! convolution
 : pextend-conv ( p p -- p p )
     #! extend to: p_m + p_n - 1 
-    2dup [ length ] 2apply + 1- 2pad-right [ >vector ] 2apply ;
+    2dup [ length ] bi@ + 1- 2pad-right [ >vector ] bi@ ;
 
 : p* ( p p -- p )
     #! Multiply two polynomials.
@@ -46,13 +46,13 @@ PRIVATE>
 
 : p/mod-setup ( p p -- p p n )
     2ptrim
-    2dup [ length ] 2apply -
+    2dup [ length ] bi@ -
     dup 1 < [ drop 1 ] when
     [ over length + 0 pad-left pextend ] keep 1+ ;
 
 : /-last ( seq seq -- a )
     #! divide the last two numbers in the sequences
-    [ peek ] 2apply / ;
+    [ peek ] bi@ / ;
 
 : (p/mod)
     2dup /-last
@@ -74,7 +74,7 @@ PRIVATE>
     ] if ;
 
 : pgcd ( p p -- p q )
-    swap V{ 0 } clone V{ 1 } clone 2swap (pgcd) [ >array ] 2apply ;
+    swap V{ 0 } clone V{ 1 } clone 2swap (pgcd) [ >array ] bi@ ;
 
 : pdiff ( p -- p' )
     #! Polynomial derivative.

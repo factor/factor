@@ -16,7 +16,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
     1array split1 append ;
 
 : 2remove-one ( seq seq obj -- seq seq )
-    [ remove-one ] curry 2apply ;
+    [ remove-one ] curry bi@ ;
 
 : symbolic-reduce ( seq seq -- seq seq )
     2dup seq-intersect dup empty?
@@ -24,7 +24,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
 : <dimensioned> ( n top bot -- obj )
     symbolic-reduce
-    [ natural-sort ] 2apply
+    [ natural-sort ] bi@
     dimensioned construct-boa ;
 
 : >dimensioned< ( d -- n top bot )
@@ -37,10 +37,10 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
     { dimensioned-top dimensioned-bot } get-slots ;
 
 : check-dimensions ( d d -- )
-    [ dimensions 2array ] 2apply =
+    [ dimensions 2array ] bi@ =
     [ dimensions-not-equal ] unless ;
 
-: 2values [ dimensioned-value ] 2apply ;
+: 2values [ dimensioned-value ] bi@ ;
 
 : <dimension-op
     2dup check-dimensions dup dimensions 2swap 2values ;
@@ -56,9 +56,9 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
     { } { } <dimensioned> ;
 
 : d* ( d d -- d )
-    [ dup number? [ scalar ] when ] 2apply
-    [ [ dimensioned-top ] 2apply append ] 2keep
-    [ [ dimensioned-bot ] 2apply append ] 2keep
+    [ dup number? [ scalar ] when ] bi@
+    [ [ dimensioned-top ] bi@ append ] 2keep
+    [ [ dimensioned-bot ] bi@ append ] 2keep
     2values * dimension-op> ;
 
 : d-neg ( d -- d ) -1 d* ;
