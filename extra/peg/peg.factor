@@ -488,8 +488,11 @@ M: box-parser (compile) ( parser -- quot )
   #! Calls the quotation at compile time
   #! to produce the parser to be compiled.
   #! This differs from 'delay' which calls
-  #! it at run time.
-  quot>> call compiled-parser 1quotation ;
+  #! it at run time. Due to using the runtime
+  #! environment at compile time, this parser
+  #! must not be cached, so we clear out the
+  #! delgates cache.
+  f >>compiled quot>> call compiled-parser 1quotation ;
 
 PRIVATE>
 
@@ -560,7 +563,12 @@ PRIVATE>
   delay-parser construct-boa init-parser ;
 
 : box ( quot -- parser )
-  box-parser construct-boa init-parser ;
+  #! because a box has its quotation run at compile time
+  #! it must always have a new parser delgate created, 
+  #! not a cached one. This is because the same box,
+  #! compiled twice can have a different compiled word
+  #! due to running at compile time.
+  box-parser construct-boa next-id f <parser> over set-delegate ;
 
 : PEG:
   (:) [
