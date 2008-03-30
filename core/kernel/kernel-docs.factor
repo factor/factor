@@ -7,6 +7,8 @@ IN: kernel
 ARTICLE: "shuffle-words" "Shuffle words"
 "Shuffle words rearrange items at the top of the data stack. They control the flow of data between words that perform actions."
 $nl
+"The " { $link "cleave-combinators" } " and " { $link "spread-combinators" } " are closely related to shuffle words and should be used instead where possible because they can result in clearer code; also, see the advice in " { $link "cookbook-philosophy" } "."
+$nl
 "Removing stack elements:"
 { $subsection drop }
 { $subsection 2drop }
@@ -39,9 +41,28 @@ $nl
 { $code
     ": foo ( m ? n -- m+n/n )"
     "    >r [ r> + ] [ drop r> ] if ; ! This is OK"
-}
-"An alternative to using " { $link >r } " and " { $link r> } " is the following:"
-{ $subsection dip } ;
+} ;
+
+ARTICLE: "cleave-shuffle-equivalence" "Expressing shuffle words with cleave combinators"
+"Cleave combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to cleave combinators are discussed in the documentation for " { $link bi } ", " { $link 2bi } ", " { $link 3bi } ", " { $link tri } ", " { $link 2tri } " and " { $link 3tri } "."
+$nl
+"Certain shuffle words can also be expressed in terms of the cleave combinators. Internalizing such identities can help with understanding and writing code using cleave combinators:"
+{ $code
+    ": keep  [ ] bi ;"
+    ": 2keep [ ] 2bi ;"
+    ": 3keep [ ] 3bi ;"
+    ""
+    ": dup   [ ] [ ] bi ;"
+    ": 2dup  [ ] [ ] 2bi ;"
+    ": 3dup  [ ] [ ] 3bi ;"
+    ""
+    ": tuck  [ nip ] [ ] 2bi ;"
+    ": swap  [ nip ] [ drop ] 2bi ;"
+    ""
+    ": over  [ ] [ drop ] 2bi ;"
+    ": pick  [ ] [ 2drop ] 3bi ;"
+    ": 2over [ ] [ drop ] 3bi ;"
+} ;
 
 ARTICLE: "cleave-combinators" "Cleave combinators"
 "The cleave combinators apply multiple quotations to a single value."
@@ -49,9 +70,11 @@ $nl
 "Two quotations:"
 { $subsection bi }
 { $subsection 2bi }
+{ $subsection 3bi }
 "Three quotations:"
 { $subsection tri }
 { $subsection 2tri }
+{ $subsection 3tri }
 "Technically, the cleave combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on the top of the stack can be written in one of two ways:"
 { $code
     "! First alternative; uses keep"
@@ -66,13 +89,38 @@ $nl
 "The latter is more aesthetically pleasing than the former."
 $nl
 "A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
+{ $subsection "cleave-shuffle-equivalence" } ;
+
+ARTICLE: "spread-shuffle-equivalence" "Expressing shuffle words with spread combinators"
+"Spread combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to spread combinators are discussed in the documentation for " { $link bi* } ", " { $link 2bi* } ", and " { $link tri* } "."
 $nl
-"From the Merriam-Webster Dictionary: "
-$nl
-{ $strong "cleave" }
-{ $list
-  { $emphasis "To divide by or as if by a cutting blow" }
-  { $emphasis "To separate into distinct parts and especially into groups having divergent views" }
+"Certain shuffle words can also be expressed in terms of the spread combinators. Internalizing such identities can help with understanding and writing code using spread combinators:"
+{ $code
+    ": dip   [ ] bi* ;"
+    ""
+    ": slip  [ call ] [ ] bi* ;"
+    ": 2slip [ call ] [ ] [ ] tri* ;"
+    ""
+    ": nip   [ drop ] [ ] bi* ;"
+    ": 2nip  [ drop ] [ drop ] [ ] tri* ;"
+    ""
+    ": rot"
+    "    [ [ drop ] [      ] [ drop ] tri* ]"
+    "    [ [ drop ] [ drop ] [      ] tri* ]"
+    "    [ [      ] [ drop ] [ drop ] tri* ]"
+    "    3tri ;"
+    ""
+    ": -rot"
+    "    [ [ drop ] [ drop ] [      ] tri* ]"
+    "    [ [      ] [ drop ] [ drop ] tri* ]"
+    "    [ [ drop ] [      ] [ drop ] tri* ]"
+    "    3tri ;"
+    ""
+    ": spin"
+    "    [ [ drop ] [ drop ] [      ] tri* ]"
+    "    [ [ drop ] [      ] [ drop ] tri* ]"
+    "    [ [      ] [ drop ] [ drop ] tri* ]"
+    "    3tri ;"
 } ;
 
 ARTICLE: "spread-combinators" "Spread combinators"
@@ -96,7 +144,8 @@ $nl
 }
 
 $nl
-"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "." ;
+"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
+{ $subsection "spread-shuffle-equivalence" } ;
 
 ARTICLE: "apply-combinators" "Apply combinators"
 "The apply combinators apply multiple quotations to multiple values. The " { $snippet "@" } " suffix signifies application."
