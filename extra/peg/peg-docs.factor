@@ -21,15 +21,8 @@ HELP: compile
 }
 { $description 
     "Compile the parser to a word. The word will have stack effect ( -- result )."
-    "The mapping from parser to compiled word is kept in a cache. If you later change "
-    "the definition of a parser you'll need to clear this cache with " 
-    { $link reset-compiled-parsers } " before using " { $link compile } " on that parser again." 
 } 
 { $see-also parse } ;
-
-HELP: reset-compiled-parsers
-{ $description 
-    "Reset the cache mapping parsers to compiled words." } ;
 
 HELP: token
 { $values 

@@ -10,6 +10,10 @@ USE: prettyprint
 
 TUPLE: parse-result remaining ast ;
 
+TUPLE: parser id compiled ;
+M: parser equal? [ id>> ] 2apply = ;
+C: <parser> parser
+
 SYMBOL: ignore 
 
 : <parse-result> ( remaining ast -- parse-result )
@@ -194,14 +198,6 @@ C: <head> peg-head
   ] H{ } make-assoc swap bind ; inline
 
 
-: compiled-parsers ( -- cache )
-  \ compiled-parsers get-global [ H{ } clone dup \ compiled-parsers set-global ] unless* ;
-
-: reset-compiled-parsers ( -- )
-  H{ } clone \ compiled-parsers set-global ;
-
-reset-compiled-parsers
-
 GENERIC: (compile) ( parser -- quot )
 
 
@@ -226,11 +222,11 @@ GENERIC: (compile) ( parser -- quot )
   #! Circular parsers are supported by getting the word
   #! name and storing it in the cache, before compiling, 
   #! so it is picked up when re-entered.
-  dup id>> compiled-parsers [
-    drop dup gensym swap 2dup id>> compiled-parsers set-at
-    2dup parser-body define 
-    dupd "peg" set-word-prop
-  ] cache nip ;
+  dup compiled>> [
+    nip
+  ] [
+    gensym tuck >>compiled 2dup parser-body define dupd "peg" set-word-prop
+  ] if* ;
 
 : compile ( parser -- word )
   [ compiled-parser ] with-compilation-unit ;
@@ -253,10 +249,6 @@ SYMBOL: id
     1 id set-global 0
   ] if* ;
 
-TUPLE: parser id ;
-M: parser equal? [ id>> ] 2apply = ;
-C: <parser> parser
-
 : delegates ( -- cache )
   \ delegates get-global [ H{ } clone dup \ delegates set-global ] unless* ;
 
@@ -269,7 +261,7 @@ reset-delegates
   #! Set the delegate for the parser. Equivalent parsers
   #! get a delegate with the same id.
   dup clone delegates [
-    drop next-id <parser> 
+    drop next-id f <parser> 
   ] cache over set-delegate ;
 
 TUPLE: token-parser symbol ;
