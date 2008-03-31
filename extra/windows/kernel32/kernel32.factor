@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax windows.types ;
+USING: alien alien.syntax kernel windows.types ;
 IN: windows.kernel32
 
 : MAX_PATH 260 ; inline
@@ -1564,3 +1564,6 @@ FUNCTION: BOOL WriteProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* 
 ! FUNCTION: WriteTapemark
 ! FUNCTION: WTSGetActiveConsoleSessionId
 ! FUNCTION: ZombifyActCtx
+
+: with-global-lock ( HGLOBAL quot -- )
+    swap [ GlobalLock swap call ] keep GlobalUnlock drop ; inline
