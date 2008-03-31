@@ -4,10 +4,13 @@
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
 
 USING: arrays kernel math namespaces sequences system init
-accessors math.ranges new-effects random ;
+accessors math.ranges random ;
 IN: random.mersenne-twister
 
 <PRIVATE
+
+: curry2 ( w quot1 quot2 -- quot1 quot2 )
+    >r over r> [ curry ] 2bi@ ;
 
 TUPLE: mersenne-twister seq i ;
 
@@ -19,34 +22,33 @@ TUPLE: mersenne-twister seq i ;
 : wrap ( x n -- y ) 2dup >= [ - ] [ drop ] if ; inline
 : mt-wrap ( x -- y ) mt-n wrap ; inline
 
-: set-generated ( mt y from-elt to -- )
-    >r >r [ 2/ ] [ odd? mt-a 0 ? ] bi
-    r> bitxor bitxor r> new-set-nth drop ; inline
+: set-generated ( y from-elt to seq -- )
+    >r >r >r [ 2/ ] [ odd? mt-a 0 ? ] bi
+    r> bitxor bitxor r> r> set-nth ; inline
 
-: calculate-y ( mt y1 y2 -- y )
-    >r over r>
-    [ new-nth mt-hi ] [ new-nth mt-lo ] 2bi* bitor ; inline
+: calculate-y ( y1 y2 mt -- y )
+    [ nth mt-hi ] [ nth mt-lo ] curry2 bi* bitor ; inline
 
-: (mt-generate) ( mt-seq n -- y to from-elt )
-    [ dup 1+ mt-wrap calculate-y ]
-    [ mt-m + mt-wrap new-nth ]
-    [ nip ] 2tri ;
+: (mt-generate) ( n mt-seq -- y to from-elt )
+    [ >r dup 1+ mt-wrap r> calculate-y ]
+    [ >r mt-m + mt-wrap r> nth ]
+    [ drop ] 2tri ;
 
 : mt-generate ( mt -- )
-    [ seq>> mt-n [ dupd (mt-generate) set-generated ] with each ]
+    [ >r mt-n r> seq>> [ [ (mt-generate) ] keep set-generated ] curry each ]
     [ 0 >>i drop ] bi ;
 
 : init-mt-first ( seed -- seq )
     >r mt-n 0 <array> r>
-    HEX: ffffffff bitand 0 new-set-nth ;
+    HEX: ffffffff bitand 0 pick set-nth ;
 
 : init-mt-formula ( seq i -- f(seq[i]) )
-    tuck new-nth dup -30 shift bitxor 1812433253 * +
+    tuck swap nth dup -30 shift bitxor 1812433253 * +
     1+ HEX: ffffffff bitand ;
 
 : init-mt-rest ( seq -- )
     mt-n 1- [0,b) [
-        dupd [ init-mt-formula ] keep 1+ new-set-nth drop
+        dupd [ init-mt-formula ] keep 1+ rot set-nth
     ] with each ;
 
 : init-mt-seq ( seed -- seq )
@@ -68,7 +70,7 @@ M: mersenne-twister seed-random ( mt seed -- )
     init-mt-seq >>seq drop ;
 
 M: mersenne-twister random-32* ( mt -- r )
-    dup [ seq>> ] [ i>> ] bi
-    dup mt-n < [ drop 0 pick mt-generate ] unless
-    new-nth mt-temper
+    dup [ i>> ] [ seq>> ] bi
+    over mt-n < [ nip >r dup mt-generate 0 r> ] unless
+    nth mt-temper
     swap [ 1+ ] change-i drop ;
