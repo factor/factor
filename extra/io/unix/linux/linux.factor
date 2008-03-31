@@ -119,7 +119,7 @@ M: inotify-task do-io-task ( task -- )
 M: linux-io init-io ( -- )
     <select-mx>
     [ mx set-global ]
-    [ [ init-inotify ] ignore-errors ] bi ;
+    [ [ init-inotify ] curry ignore-errors ] bi ;
 
 T{ linux-io } set-io-backend
 
