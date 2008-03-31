@@ -3,7 +3,7 @@ math.constants parser sequences tools.test words assocs
 namespaces quotations sequences.private classes continuations
 generic.standard effects classes.tuple classes.tuple.private
 arrays vectors strings compiler.units accessors classes.algebra
-calendar prettyprint io.streams.string splitting ;
+calendar prettyprint io.streams.string splitting inspector ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -417,6 +417,48 @@ test-a/b
 ] with-compilation-unit
 
 test-a/b
+
+! Moving slots up and down
+TUPLE: move-up-1 a b ;
+TUPLE: move-up-2 < move-up-1 c ;
+
+T{ move-up-2 f "a" "b" "c" } "move-up" set
+
+: test-move-up
+    [ "a" ] [ "move-up" get a>> ] unit-test
+    [ "b" ] [ "move-up" get b>> ] unit-test
+    [ "c" ] [ "move-up" get c>> ] unit-test ;
+
+test-move-up
+
+[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 a b c ; TUPLE: move-up-2 < move-up-1 ;" eval ] unit-test
+
+test-move-up
+
+[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 a c ; TUPLE: move-up-2 < move-up-1 b ;" eval ] unit-test
+
+test-move-up
+
+[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 c ; TUPLE: move-up-2 < move-up-1 b a ;" eval ] unit-test
+
+test-move-up
+
+[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 ; TUPLE: move-up-2 < move-up-1 a b c ;" eval ] unit-test
+
+! Constructors must be recompiled when changing superclass
+TUPLE: constructor-update-1 xxx ;
+
+TUPLE: constructor-update-2 < constructor-update-1 yyy zzz ;
+
+C: <constructor-update-2> constructor-update-2
+
+{ 3 1 } [ <constructor-update-2> ] must-infer-as
+
+[ ] [ "IN: classes.tuple.tests TUPLE: constructor-update-1 xxx ttt www ;" eval ] unit-test
+
+{ 5 1 } [ <constructor-update-2> ] must-infer-as
+
+[ { f 1 2 3 4 5 } ] [ 1 2 3 4 5 <constructor-update-2> tuple-slots ] unit-test
 
 ! Redefinition problem
 TUPLE: redefinition-problem ;

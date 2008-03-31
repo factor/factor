@@ -184,15 +184,14 @@ PRIVATE>
 : redefine-tuple-class ( class superclass slots -- )
     [
         2drop
-        [ update-tuples-after ] each-subclass
+        [
+            [ update-tuples-after ]
+            [ changed-word ]
+            [ redefined ]
+            tri
+        ] each-subclass
     ]
-    [
-        nip
-        [ forget-removed-slots ]
-        [ drop changed-word ]
-        [ drop redefined ]
-        2tri
-    ]
+    [ nip forget-removed-slots ]
     [ define-new-tuple-class ]
     3tri ;
 
