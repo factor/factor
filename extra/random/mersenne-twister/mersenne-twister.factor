@@ -9,9 +9,6 @@ IN: random.mersenne-twister
 
 <PRIVATE
 
-: curry2 ( w quot1 quot2 -- quot1 quot2 )
-    >r over r> [ curry ] 2bi@ ; inline
-
 TUPLE: mersenne-twister seq i ;
 
 : mt-n 624 ; inline
@@ -27,7 +24,7 @@ TUPLE: mersenne-twister seq i ;
     r> bitxor bitxor r> r> set-nth ; inline
 
 : calculate-y ( y1 y2 mt -- y )
-    [ nth mt-hi ] [ nth mt-lo ] curry2 bi* bitor ; inline
+    tuck [ nth mt-hi ] [ nth mt-lo ] 2bi* bitor ; inline
 
 : (mt-generate) ( n mt-seq -- y to from-elt )
     [ >r dup 1+ mt-wrap r> calculate-y ]
