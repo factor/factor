@@ -102,7 +102,7 @@ C: <ebnf> ebnf
     "]" syntax ,
   ] seq* [ first >string <ebnf-range> ] action ;
  
-: 'element' ( -- parser )
+: ('element') ( -- parser )
   #! An element of a rule. It can be a terminal or a 
   #! non-terminal but must not be followed by a "=". 
   #! The latter indicates that it is the beginning of a
@@ -119,6 +119,12 @@ C: <ebnf> ebnf
       "=>" syntax ensure ,
     ] choice* ,
   ] seq* [ first ] action ;
+
+: 'element' ( -- parser )
+  [
+    [ ('element') , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , ] seq* [ first2 <ebnf-var> ] action ,
+    ('element') ,
+  ] choice* ;
 
 DEFER: 'choice'
 
