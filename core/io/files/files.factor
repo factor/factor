@@ -4,7 +4,6 @@ USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
 system combinators splitting sbufs continuations io.encodings
 io.encodings.binary init accessors ;
-USE: tools.walker
 IN: io.files
 
 HOOK: (file-reader) io-backend ( path -- stream )
