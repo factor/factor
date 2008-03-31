@@ -283,7 +283,7 @@ M: ebnf-optional (transform) ( ast -- parser )
     drop
   ] [
     [
-      "[let* | " %
+      "USING: locals namespaces ;  [let* | " %
       [ dup % " [ \"" % % "\" get ] " % ] each
       " | " %
       %  
