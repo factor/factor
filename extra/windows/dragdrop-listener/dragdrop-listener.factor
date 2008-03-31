@@ -1,4 +1,4 @@
-USING: windows.com windows.com.wrapper combinators.cleave
+USING: windows.com windows.com.wrapper combinators
 windows.kernel32 windows.ole32 windows.shell32 kernel accessors
 prettyprint namespaces ui.tools.listener ui.tools.workspace
 alien.c-types alien sequences math ;
