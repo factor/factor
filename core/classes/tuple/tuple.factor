@@ -24,13 +24,14 @@ M: class tuple-layout "layout" word-prop ;
 M: tuple tuple-layout 1 slot ;
 
 M: tuple-layout tuple-layout ;
+
 : tuple-size tuple-layout layout-size ; inline
 
 : prepare-tuple>array ( tuple -- n tuple layout )
     [ tuple-size ] [ ] [ tuple-layout ] tri ;
 
-: copy-tuple-slots ( n tuple first -- array )
-    [ array-nth ] curry map r> add* ;
+: copy-tuple-slots ( n tuple -- array )
+    [ array-nth ] curry map ;
 
 PRIVATE>
 
@@ -128,48 +129,63 @@ PRIVATE>
         [ writer-word forget-method ] 2bi
     ] with each ;
 
-: permutation ( seq1 seq2 -- permutation )
-    swap [ index ] curry map ;
-
 : all-slot-names ( class -- slots )
     superclasses [ slot-names ] map concat \ class add* ;
 
-: slot-permutation ( class superclass newslots -- n permutation )
-    [ all-slot-names ] [ all-slot-names ] [ ] tri* append
-    [ drop length ] [ permutation ] 2bi ;
+: compute-slot-permutation ( class old-slot-names -- permutation )
+    >r all-slot-names r> [ index ] curry map ;
 
-: permute-direct-slots ( oldslots permutation -- newslots )
+: apply-slot-permutation ( old-values permutation -- new-values )
     [ [ swap ?nth ] [ drop f ] if* ] with map ;
 
-: permute-all-slots ( oldslots n permutation -- newslots )
-    [ >r head r> permute-direct-slots ] [ drop tail ] 3bi append ;
+: permute-slots ( old-values -- new-values )
+    dup first dup outdated-tuples get at
+    compute-slot-permutation
+    apply-slot-permutation ;
 
 : change-tuple ( tuple quot -- newtuple )
     >r tuple>array r> call >tuple ; inline
 
-: update-tuples ( predicate n permutation -- )
-    [ permute-all-slots ] 2curry [ change-tuple ] curry
-    >r "predicate" word-prop instances dup r> map
-    become ; inline
+: update-tuple ( tuple -- newtuple )
+    [ permute-slots ] change-tuple ;
 
-: update-tuples-after ( class superclass newslots -- )
-    [ 2drop ] [ slot-permutation ] 3bi
-    [ update-tuples ] 3curry after-compilation ;
+: update-tuples ( -- )
+    outdated-tuples get
+    dup assoc-empty? [ drop ] [
+        [ >r class r> key? ] curry instances
+        dup [ update-tuple ] map become
+    ] if ;
+
+[ update-tuples ] update-tuples-hook set-global
+
+: update-tuples-after ( class -- )
+    outdated-tuples get [ all-slot-names ] cache drop ;
+
+: subclasses ( class -- classes )
+    class-usages keys [ tuple-class? ] subset ;
+
+: each-subclass ( class quot -- )
+    >r subclasses r> each ; inline
+
+: define-tuple-shape ( class -- )
+    [ define-tuple-slots ]
+    [ define-tuple-layout ]
+    [ define-tuple-predicate ]
+    tri ;
 
 : define-new-tuple-class ( class superclass slots -- )
     [ drop f tuple-class define-class ]
-    [ nip "slot-names" set-word-prop ] [
+    [ nip "slot-names" set-word-prop ]
+    [
         2drop
-        class-usages keys [ tuple-class? ] subset [
-            [ define-tuple-slots ]
-            [ define-tuple-layout ]
-            [ define-tuple-predicate ]
-            tri
-        ] each
+        [ define-tuple-shape ] each-subclass
     ] 3tri ;
 
 : redefine-tuple-class ( class superclass slots -- )
-    [ update-tuples-after ]
+    [
+        2drop
+        [ update-tuples-after ] each-subclass
+    ]
     [
         nip
         [ forget-removed-slots ]
@@ -205,11 +221,6 @@ M: tuple clone
 M: tuple equal?
     over tuple? [ tuple= ] [ 2drop f ] if ;
 
-: delegates ( obj -- seq )
-    [ dup ] [ [ delegate ] keep ] [ ] unfold nip ;
-
-: is? ( obj quot -- ? ) >r delegates r> contains? ; inline
-
 M: tuple hashcode*
     [
         dup tuple-size -rot 0 -rot [
@@ -217,21 +228,26 @@ M: tuple hashcode*
         ] 2curry reduce
     ] recursive-hashcode ;
 
-! Definition protocol
 M: tuple-class reset-class
     { "metaclass" "superclass" "slots" "layout" } reset-props ;
 
 M: object get-slots ( obj slots -- ... )
     [ execute ] with each ;
 
-M: object set-slots ( ... obj slots -- )
-    <reversed> get-slots ;
-
 M: object construct-empty ( class -- tuple )
     tuple-layout <tuple> ;
+
+M: object construct-boa ( ... class -- tuple )
+    tuple-layout <tuple-boa> ;
+
+! Deprecated
+M: object set-slots ( ... obj slots -- )
+    <reversed> get-slots ;
 
 M: object construct ( ... slots class -- tuple )
     construct-empty [ swap set-slots ] keep ;
 
-M: object construct-boa ( ... class -- tuple )
-    tuple-layout <tuple-boa> ;
+: delegates ( obj -- seq )
+    [ dup ] [ [ delegate ] keep ] [ ] unfold nip ;
+
+: is? ( obj quot -- ? ) >r delegates r> contains? ; inline
