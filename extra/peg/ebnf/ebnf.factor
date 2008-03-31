@@ -3,7 +3,7 @@
 USING: kernel compiler.units parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
        peg.parsers unicode.categories multiline combinators.lib 
-       splitting accessors effects ;
+       splitting accessors effects sequences.deep ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -227,15 +227,17 @@ GENERIC: (transform) ( ast -- parser )
 
 SYMBOL: parser
 SYMBOL: main
+SYMBOL: vars
 
 : transform ( ast -- object )
-  H{ } clone dup dup [ parser set swap (transform) main set ] bind ;
+  H{ } clone dup dup [ parser set V{ } vars set swap (transform) main set ] bind ;
 
 M: ebnf (transform) ( ast -- parser )
   rules>> [ (transform) ] map peek ;
   
 M: ebnf-rule (transform) ( ast -- parser )
-  dup elements>> (transform) [
+  dup elements>> 
+  vars get clone vars [ (transform) ] with-variable [
     swap symbol>> set
   ] keep ;
 
@@ -270,12 +272,26 @@ M: ebnf-repeat1 (transform) ( ast -- parser )
 M: ebnf-optional (transform) ( ast -- parser )
   transform-group optional ;
 
+: build-locals ( string vars -- string )
+  dup empty? [
+    drop
+  ] [
+    [
+      "[let* | " %
+      [ dup % " [ \"" % % "\" get ] " % ] each
+      " | " %
+      %  
+      " ] with-locals" %     
+    ] "" make 
+  ] if ;
+
 M: ebnf-action (transform) ( ast -- parser )
   [ parser>> (transform) ] keep
-  code>> string-lines [ parse-lines ] with-compilation-unit action ;
+  code>> vars get build-locals string-lines [ parse-lines ] with-compilation-unit action ;
 
 M: ebnf-var (transform) ( ast -- parser )
-  parser>> (transform) ;
+  [ parser>> (transform) ] [ name>> ] bi 
+  dup vars get push [ dupd set ] curry action ;
 
 M: ebnf-terminal (transform) ( ast -- parser )
   symbol>> token sp ;
@@ -303,7 +319,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 : ebnf>quot ( string -- hashtable quot )
   'ebnf' parse check-parse-result 
   parse-result-ast transform dup dup parser [ main swap at compile ] with-variable
-  [ compiled-parse ] curry ;
+  [ compiled-parse ] curry [ with-scope ] curry ;
 
 : [EBNF "EBNF]" parse-multiline-string ebnf>quot nip parsed ; parsing
 
