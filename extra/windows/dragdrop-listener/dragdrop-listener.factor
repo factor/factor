@@ -2,7 +2,7 @@ USING: windows.com windows.com.wrapper combinators
 windows.kernel32 windows.ole32 windows.shell32 kernel accessors
 prettyprint namespaces ui.tools.listener ui.tools.workspace
 alien.c-types alien sequences math ;
-IN: windows.dragdrop
+IN: windows.dragdrop-listener
 
 : filenames-from-hdrop ( hdrop -- filenames )
     dup HEX: FFFFFFFF f 0 DragQueryFile ! get count of files
@@ -54,9 +54,7 @@ SYMBOL: +listener-dragdrop-wrapper+
                 first unparse [ "USE: parser " % % " run-file" % ] "" make
                 eval-listener
                 DROPEFFECT_COPY
-            ] [
-                2drop DROPEFFECT_NONE
-            ] if
+            ] [ 2drop DROPEFFECT_NONE ] if
             0 r> set-ulong-nth
             S_OK
         ]
