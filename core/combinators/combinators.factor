@@ -5,13 +5,13 @@ USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
 hashtables sorting ;
 
-: cleave ( obj seq -- )
+: cleave ( x seq -- )
     [ call ] with each ;
 
 : cleave>quot ( seq -- quot )
     [ [ keep ] curry ] map concat [ drop ] append ;
 
-: 2cleave ( obj seq -- )
+: 2cleave ( x seq -- )
     [ [ call ] 3keep drop ] each 2drop ;
 
 : 2cleave>quot ( seq -- quot )
@@ -22,7 +22,7 @@ hashtables sorting ;
     [ [ [ r> ] prepend ] map concat ] bi
     append ;
 
-: spread ( seq -- )
+: spread ( objs... seq -- )
     spread>quot call ;
 
 ERROR: no-cond ;

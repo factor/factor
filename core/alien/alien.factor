@@ -39,7 +39,7 @@ M: alien equal?
         2dup [ expired? ] either? [
             [ expired? ] both?
         ] [
-            [ alien-address ] 2apply =
+            [ alien-address ] bi@ =
         ] if
     ] [
         2drop f

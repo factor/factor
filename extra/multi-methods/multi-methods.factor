@@ -113,7 +113,7 @@ TUPLE: no-method arguments generic ;
     ] curry assoc-map ;
 
 : sorted-methods ( alist -- alist' )
-    [ [ first ] 2apply classes< ] topological-sort ;
+    [ [ first ] bi@ classes< ] topological-sort ;
 
 : niceify-method [ dup \ f eq? [ drop f ] when ] map ;
 

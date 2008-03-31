@@ -182,7 +182,7 @@ M: timestamp year. ( timestamp -- )
     [
         [ month>> month-abbreviations nth write ] keep bl
         [ day>> number>string 2 32 pad-left write ] keep bl
-        dup now [ year>> ] 2apply = [
+        dup now [ year>> ] bi@ = [
             [ hour>> write-00 ] keep ":" write
             minute>> write-00
         ] [

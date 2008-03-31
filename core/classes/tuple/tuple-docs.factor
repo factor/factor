@@ -162,7 +162,7 @@ HELP: reshape-tuple
 { $description "Permutes the slots of a tuple. If a tuple class is redefined at runtime, this word is called on every instance to change its shape to conform to the new layout." } ;
 
 HELP: reshape-tuples
-{ $values { "class" tuple-class } { "newslots" "a sequence of strings" } }
+{ $values { "class" tuple-class } { "superclass" class } { "newslots" "a sequence of strings" } }
 { $description "Changes the shape of every instance of " { $snippet "class" } " for a new slot layout." } ;
 
 HELP: removed-slots
@@ -170,7 +170,7 @@ HELP: removed-slots
 { $description "Outputs the sequence of existing tuple slot names not in " { $snippet "newslots" } "." } ;
 
 HELP: forget-slots
-{ $values { "class" tuple-class } { "newslots" "a sequence of strings" } }
+{ $values { "class" tuple-class } { "slots" "a sequence of strings" } }
 { $description "Forgets accessor words for existing tuple slots which are not in " { $snippet "newslots" } "." } ;
 
 HELP: tuple

@@ -17,7 +17,7 @@ HELP: random-32*
 { $description "Generates a random 32-bit unsigned integer." } ;
 
 HELP: random-bytes*
-{ $values { "n" "an integer" } { "tuple" "a random number generator" } { "bytes" "a sequence of random bytes" } }
+{ $values { "n" "an integer" } { "tuple" "a random number generator" } { "byte-array" "a sequence of random bytes" } }
 { $description "Generates a byte-array of random bytes." } ;
 
 HELP: random
@@ -26,7 +26,7 @@ HELP: random
 { $notes "Since integers are sequences, passing an integer " { $snippet "n" } " yields a random integer in the interval " { $snippet "[0,n)" } "." } ;
 
 HELP: random-bytes
-{ $values { "n" "an integer" } { "bytes" "a random integer" } }
+{ $values { "n" "an integer" } { "byte-array" "a random integer" } }
 { $description "Outputs an integer with n bytes worth of bits." } ;
 
 HELP: random-bits

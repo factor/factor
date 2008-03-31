@@ -46,13 +46,13 @@ IN: math.statistics
 
 : ((r)) ( mean(x) mean(y) {x} {y} -- (r) )
     ! finds sigma((xi-mean(x))(yi-mean(y))
-    0 [ [ >r pick r> swap - ] 2apply * + ] 2reduce 2nip ;
+    0 [ [ >r pick r> swap - ] bi@ * + ] 2reduce 2nip ;
 
 : (r) ( mean(x) mean(y) {x} {y} sx sy -- r )
     * recip >r [ ((r)) ] keep length 1- / r> * ;
 
 : [r] ( {{x,y}...} -- mean(x) mean(y) {x} {y} sx sy )
-    first2 [ [ [ mean ] 2apply ] 2keep ] 2keep [ std ] 2apply ;
+    first2 [ [ [ mean ] bi@ ] 2keep ] 2keep [ std ] bi@ ;
 
 : r ( {{x,y}...} -- r )
     [r] (r) ;

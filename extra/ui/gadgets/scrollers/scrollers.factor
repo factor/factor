@@ -57,7 +57,7 @@ scroller H{
     2dup control-value = [ 2drop ] [ set-control-value ] if ;
 
 : rect-min ( rect1 rect2 -- rect )
-    >r [ rect-loc ] keep r> [ rect-dim ] 2apply vmin <rect> ;
+    >r [ rect-loc ] keep r> [ rect-dim ] bi@ vmin <rect> ;
 
 : (scroll>rect) ( rect scroller -- )
     [

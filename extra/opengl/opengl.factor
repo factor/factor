@@ -8,9 +8,9 @@ math.parser opengl.gl opengl.glu combinators arrays sequences
 splitting words byte-arrays assocs combinators.lib ;
 IN: opengl
 
-: coordinates [ first2 ] 2apply ;
+: coordinates [ first2 ] bi@ ;
 
-: fix-coordinates [ first2 [ >fixnum ] 2apply ] 2apply ;
+: fix-coordinates [ first2 [ >fixnum ] bi@ ] bi@ ;
 
 : gl-color ( color -- ) first4 glColor4d ; inline
 
@@ -85,7 +85,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
 
 : unit-circle dup [ sin ] map swap [ cos ] map ;
 
-: adjust-points [ [ 1 + 0.5 * ] map ] 2apply ;
+: adjust-points [ [ 1 + 0.5 * ] map ] bi@ ;
 
 : scale-points 2array flip [ v* ] with map [ v+ ] with map ;
 

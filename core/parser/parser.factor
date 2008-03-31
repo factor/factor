@@ -475,7 +475,7 @@ SYMBOL: interactive-vocabs
 
 : removed-definitions ( -- definitions )
     new-definitions old-definitions
-    [ get first2 union ] 2apply diff ;
+    [ get first2 union ] bi@ diff ;
 
 : smudged-usage ( -- usages referenced removed )
     removed-definitions filter-moved keys [

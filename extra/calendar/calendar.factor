@@ -185,7 +185,7 @@ M: number +second ( timestamp n -- timestamp )
     [ month>>  +month  ] keep
     [ year>>   +year   ] keep ; inline
 
-: +slots [ 2apply + ] curry 2keep ; inline
+: +slots [ bi@ + ] curry 2keep ; inline
 
 PRIVATE>
 
@@ -244,9 +244,9 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
 
 : (time-) ( timestamp timestamp -- n )
-    [ >gmt ] 2apply
-    [ [ >date< julian-day-number ] 2apply - 86400 * ] 2keep
-    [ >time< >r >r 3600 * r> 60 * r> + + ] 2apply - + ;
+    [ >gmt ] bi@
+    [ [ >date< julian-day-number ] bi@ - 86400 * ] 2keep
+    [ >time< >r >r 3600 * r> 60 * r> + + ] bi@ - + ;
 
 M: timestamp time-
     #! Exact calendar-time difference

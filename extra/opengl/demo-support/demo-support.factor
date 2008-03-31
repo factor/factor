@@ -38,7 +38,7 @@ M: demo-gadget pref-dim* ( gadget -- dim )
 
 : demo-gadget-frustum ( -- -x x -y y near far )
     FOV-RATIO NEAR-PLANE FOV / v*n
-    first2 [ -+ ] 2apply NEAR-PLANE FAR-PLANE ;
+    first2 [ -+ ] bi@ NEAR-PLANE FAR-PLANE ;
 
 : demo-gadget-set-matrices ( gadget -- )
     GL_PROJECTION glMatrixMode

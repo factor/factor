@@ -169,13 +169,13 @@ unit-test
 
 [ f ] [ { "a" "b" "c" } { "a" "b" "c" } mismatch ] unit-test
 
-[ V{ } V{ } ] [ { "a" "b" } { "a" "b" } drop-prefix [ >vector ] 2apply ] unit-test
+[ V{ } V{ } ] [ { "a" "b" } { "a" "b" } drop-prefix [ >vector ] bi@ ] unit-test
 
-[ V{ "C" } V{ "c" } ] [ { "a" "b" "C" } { "a" "b" "c" } drop-prefix [ >vector ] 2apply ] unit-test
+[ V{ "C" } V{ "c" } ] [ { "a" "b" "C" } { "a" "b" "c" } drop-prefix [ >vector ] bi@ ] unit-test
 
 [ -1 1 "abc" <slice> ] must-fail
 
-[ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] 2apply ] unit-test
+[ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] bi@ ] unit-test
 
 [ -1 ] [ "ab" "abc" <=> ] unit-test
 [ 1 ] [ "abc" "ab" <=> ] unit-test

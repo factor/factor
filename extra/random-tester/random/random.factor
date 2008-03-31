@@ -54,7 +54,7 @@ IN: random-tester
     ] if ;
 
 : random-ratio ( -- ratio )
-    1000000000 dup [ random ] 2apply 1+ / 50% [ neg ] when dup [ drop random-ratio ] unless 10% [ drop 0 ] when ;
+    1000000000 dup [ random ] bi@ 1+ / 50% [ neg ] when dup [ drop random-ratio ] unless 10% [ drop 0 ] when ;
 
 : random-float ( -- float )
     50% [ random-ratio ] [ special-floats get random ] if

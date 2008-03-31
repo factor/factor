@@ -35,7 +35,7 @@ IN: project-euler.079
     ] { } make ;
 
 : find-source ( seq -- elt )
-    dup values swap keys [ prune ] 2apply seq-diff
+    dup values swap keys [ prune ] bi@ seq-diff
     dup empty? [ "Topological sort failed" throw ] [ first ] if ;
 
 : remove-source ( seq elt -- seq )

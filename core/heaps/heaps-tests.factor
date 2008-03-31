@@ -66,8 +66,8 @@ IN: heaps.tests
         dup heap-data clone swap
     ] keep 3 /i [ 2dup >r delete-random r> heap-delete ] times
     heap-data
-    [ [ entry-key ] map ] 2apply
-    [ natural-sort ] 2apply ;
+    [ [ entry-key ] map ] bi@
+    [ natural-sort ] bi@ ;
 
 11 [
     [ t ] swap [ 2^ delete-test sequence= ] curry unit-test

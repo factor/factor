@@ -17,7 +17,7 @@ SYMBOL: d
 SYMBOL: costs
 
 : init-d ( str1 str2 -- )
-    [ length 1+ ] 2apply 2dup <matrix> d set
+    [ length 1+ ] bi@ 2dup <matrix> d set
     [ 0 over ->d ] each
     [ dup 0 ->d ] each ; inline
 
@@ -39,7 +39,7 @@ SYMBOL: costs
     [
         2dup init-d
         2dup compute-costs
-        [ length ] 2apply [
+        [ length ] bi@ [
             [ levenshtein-step ] curry each
         ] with each
         levenshtein-result

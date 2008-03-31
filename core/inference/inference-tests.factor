@@ -224,7 +224,7 @@ DEFER: do-crap*
 MATH: xyz
 M: fixnum xyz 2array ;
 M: float xyz
-    [ 3 ] 2apply swapd >r 2array swap r> 2array swap ;
+    [ 3 ] bi@ swapd >r 2array swap r> 2array swap ;
 
 [ [ xyz ] infer ] [ inference-error? ] must-fail-with
 

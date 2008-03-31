@@ -70,7 +70,7 @@ MEMO: pack ( begin body end -- parser )
   >r >r hide r> r> hide 3seq [ first ] action ;
 
 : surrounded-by ( parser begin end -- parser' )
-  [ token ] 2apply swapd pack ;
+  [ token ] bi@ swapd pack ;
 
 : 'digit' ( -- parser )
   [ digit? ] satisfy [ digit> ] action ;
