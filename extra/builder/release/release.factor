@@ -1,6 +1,6 @@
 
 USING: kernel system namespaces sequences splitting combinators
-       io.files io.launcher
+       io io.files io.launcher
        bake combinators.cleave builder.common builder.util ;
 
 IN: builder.release
@@ -20,21 +20,15 @@ IN: builder.release
     "boot.x86.32.image"
     "boot.x86.64.image"
     "boot.macosx-ppc.image"
+    "boot.linux-ppc.image"
     "vm"
     "temp"
     "logs"
     ".git"
     ".gitignore"
     "Makefile"
-    "cp_dir"
     "unmaintained"
-    "misc/target"
-    "misc/wordsize"
-    "misc/wordsize.c"
-    "misc/macos-release.sh"
-    "misc/source-release.sh"
-    "misc/windows-release.sh"
-    "misc/version.sh"
+    "build-support"
   } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -91,6 +85,39 @@ IN: builder.release
 : remove-factor-app ( -- )
   macosx? not [ { "rm" "-rf" "Factor.app" } try-process ] when ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: upload-to-factorcode
+
+: platform ( -- string ) { os cpu- } to-strings "-" join ;
+
+: remote-location ( -- dest )
+  "factorcode.org:/var/www/factorcode.org/newsite/downloads"
+  platform
+  append-path ;
+    
+: upload ( -- )
+  { "scp" archive-name remote-location } to-strings
+  [ "Error uploading binary to factorcode" print ]
+  run-or-bail ;
+
+: maybe-upload ( -- )
+  upload-to-factorcode get
+    [ upload ]
+  when ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! : release ( -- )
+!   "factor"
+!     [
+!       remove-factor-app
+!       remove-common-files
+!     ]
+!   with-directory
+!   make-archive
+!   archive-name releases move-file-into ;
+
 : release ( -- )
   "factor"
     [
@@ -99,6 +126,7 @@ IN: builder.release
     ]
   with-directory
   make-archive
+  maybe-upload
   archive-name releases move-file-into ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

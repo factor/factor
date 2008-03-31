@@ -82,7 +82,7 @@ SYMBOL: load-vocab-hook ! ( name -- )
 
 : child-vocab? ( prefix name -- ? )
     2dup = pick empty? or
-    [ 2drop t ] [ swap CHAR: . add head? ] if ;
+    [ 2drop t ] [ swap CHAR: . suffix head? ] if ;
 
 : child-vocabs ( vocab -- seq )
     vocab-name vocabs [ child-vocab? ] with subset ;
@@ -94,7 +94,7 @@ TUPLE: vocab-link name ;
 
 M: vocab-link equal?
     over vocab-link?
-    [ [ vocab-link-name ] 2apply = ] [ 2drop f ] if ;
+    [ [ vocab-link-name ] bi@ = ] [ 2drop f ] if ;
 
 M: vocab-link hashcode*
     vocab-link-name hashcode* ;

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <sys/event.h>
 
 #if defined(__FreeBSD__)
 	#define BSD
@@ -41,6 +42,7 @@
 	#include <sys/socket.h>
 	#include <sys/errno.h>
     #include <sys/mman.h>
+    #include <sys/syslimits.h>
 	#include <fcntl.h>
 	#include <unistd.h>
 #endif
@@ -141,10 +143,13 @@ void unix_constants()
 	constant(EINTR);
 	constant(EAGAIN);
 	constant(EINPROGRESS);
-    constant(PROT_READ);
+    	constant(PROT_READ);
 	constant(PROT_WRITE);
 	constant(MAP_FILE);
 	constant(MAP_SHARED);
+	constant(PATH_MAX);
+	grovel(pid_t);
+
 }
 	
 int main() {
@@ -158,7 +163,13 @@ int main() {
 	openbsd_stat();
 	openbsd_types();
 #endif
+	grovel(blkcnt_t);
+        grovel(blksize_t);
+        //grovel(fflags_t);
+        grovel(ssize_t);
 
+	grovel(size_t);
+	grovel(struct kevent);
 #ifdef UNIX
 	unix_types();
 	unix_constants();

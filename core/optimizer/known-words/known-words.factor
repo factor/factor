@@ -6,17 +6,16 @@ inference.class kernel assocs math math.private kernel.private
 sequences words parser vectors strings sbufs io namespaces
 assocs quotations sequences.private io.binary io.crc32
 io.streams.string layouts splitting math.intervals
-math.floats.private tuples tuples.private classes
+math.floats.private classes.tuple classes.tuple.private classes
 classes.algebra optimizer.def-use optimizer.backend
 optimizer.pattern-match optimizer.inlining float-arrays
 sequences.private combinators ;
 
-! the output of <tuple> and <tuple-boa> has the class which is
-! its second-to-last input
 { <tuple> <tuple-boa> } [
     [
-        dup node-in-d dup length 2 - swap nth node-literal
-        dup class? [ drop tuple ] unless 1array f
+        dup node-in-d peek node-literal
+        dup tuple-layout? [ layout-class ] [ drop tuple ] if
+        1array f
     ] "output-classes" set-word-prop
 ] each
 
@@ -61,7 +60,7 @@ sequences.private combinators ;
     [ value-literal sequence? ] [ drop f ] if ;
 
 : member-quot ( seq -- newquot )
-    [ [ t ] ] { } map>assoc [ drop f ] add [ nip case ] curry ;
+    [ [ t ] ] { } map>assoc [ drop f ] suffix [ nip case ] curry ;
 
 : expand-member ( #call -- )
     dup node-in-d peek value-literal member-quot f splice-quot ;

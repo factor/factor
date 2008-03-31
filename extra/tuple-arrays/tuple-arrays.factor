@@ -1,6 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: splitting tuples classes math kernel sequences arrays ;
+USING: splitting classes.tuple classes math kernel sequences
+arrays ;
 IN: tuple-arrays
 
 TUPLE: tuple-array example ;

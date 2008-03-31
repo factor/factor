@@ -2,16 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend io.nonblocking io.unix.backend io.files io
 unix unix.stat unix.time kernel math continuations
-math.bitfields byte-arrays alien combinators combinators.cleave
-calendar io.encodings.binary ;
+math.bitfields byte-arrays alien combinators calendar
+io.encodings.binary accessors sequences strings ;
 
 IN: io.unix.files
 
-M: unix-io cwd
+M: unix-io cwd ( -- path )
     MAXPATHLEN [ <byte-array> ] [ ] bi getcwd
     [ (io-error) ] unless* ;
 
-M: unix-io cd
+M: unix-io cd ( path -- )
     chdir io-error ;
 
 : read-flags O_RDONLY ; inline
@@ -39,25 +39,26 @@ M: unix-io (file-writer) ( path -- stream )
 M: unix-io (file-appender) ( path -- stream )
     open-append <writer> ;
 
-: touch-mode
+: touch-mode ( -- n )
     { O_WRONLY O_APPEND O_CREAT O_EXCL } flags ; foldable
 
 M: unix-io touch-file ( path -- )
+    normalize-pathname
     touch-mode file-mode open
     dup 0 < [ err_no EEXIST = [ err_no io-error ] unless ] when
     close ;
 
 M: unix-io move-file ( from to -- )
-    rename io-error ;
+    [ normalize-pathname ] bi@ rename io-error ;
 
 M: unix-io delete-file ( path -- )
-    unlink io-error ;
+    normalize-pathname unlink io-error ;
 
 M: unix-io make-directory ( path -- )
-    OCT: 777 mkdir io-error ;
+    normalize-pathname OCT: 777 mkdir io-error ;
 
 M: unix-io delete-directory ( path -- )
-    rmdir io-error ;
+    normalize-pathname rmdir io-error ;
 
 : (copy-file) ( from to -- )
     dup parent-directory make-directories
@@ -68,8 +69,9 @@ M: unix-io delete-directory ( path -- )
     ] with-disposal ;
 
 M: unix-io copy-file ( from to -- )
+    [ normalize-pathname ] bi@
     [ (copy-file) ]
-    [ swap file-info file-info-permissions chmod  io-error ]
+    [ swap file-info file-info-permissions chmod io-error ]
     2bi ;
 
 : stat>type ( stat -- type )
@@ -82,7 +84,7 @@ M: unix-io copy-file ( from to -- )
         { [ dup S_ISLNK  ] [ +symbolic-link+    ] }
         { [ dup S_ISSOCK ] [ +socket+           ] }
         { [ t            ] [ +unknown+          ] }
-      } cond nip ;
+    } cond nip ;
 
 : stat>file-info ( stat -- info )
     {
@@ -94,7 +96,15 @@ M: unix-io copy-file ( from to -- )
     \ file-info construct-boa ;
 
 M: unix-io file-info ( path -- info )
-    stat* stat>file-info ;
+    normalize-pathname stat* stat>file-info ;
 
 M: unix-io link-info ( path -- info )
-    lstat* stat>file-info ;
+    normalize-pathname lstat* stat>file-info ;
+
+M: unix-io make-link ( path1 path2 -- )
+    normalize-pathname symlink io-error ;
+
+M: unix-io read-link ( path -- path' )
+    normalize-pathname
+    PATH_MAX [ <byte-array> tuck ] [ ] bi readlink
+    dup io-error head-slice >string ;

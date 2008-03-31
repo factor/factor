@@ -35,7 +35,7 @@ C: <parse-result> parse-result
     ] if ;
 
 : string= ( str1 str2 ignore-case -- ? )
-    [ [ >upper ] 2apply ] when sequence= ;
+    [ [ >upper ] bi@ ] when sequence= ;
 
 : string-head? ( str head ignore-case -- ? )
     2over shorter? [
@@ -132,7 +132,7 @@ TUPLE: and-parser parsers ;
 
 : <&> ( parser1 parser2 -- parser )
     over and-parser? [
-        >r and-parser-parsers r> add
+        >r and-parser-parsers r> suffix
     ] [
         2array
     ] if and-parser construct-boa ;
@@ -239,11 +239,11 @@ M: some-parser parse ( input parser -- result )
 
 : <:&> ( parser1 parser2 -- result )
     #! Same as <&> except flatten the result.
-    <&> [ first2 add ] <@ ;
+    <&> [ first2 suffix ] <@ ;
 
 : <&:> ( parser1 parser2 -- result )
     #! Same as <&> except flatten the result.
-    <&> [ first2 swap add* ] <@ ;
+    <&> [ first2 swap prefix ] <@ ;
 
 : <:&:> ( parser1 parser2 -- result )
     #! Same as <&> except flatten the result.
@@ -327,7 +327,7 @@ LAZY: <(+)> ( parser -- parser )
     nonempty-list-of { } succeed <|> ;
 
 LAZY: surrounded-by ( parser start end -- parser' )
-    [ token ] 2apply swapd pack ;
+    [ token ] bi@ swapd pack ;
 
 : exactly-n ( parser n -- parser' )
     swap <repetition> <and-parser> [ flatten ] <@ ;

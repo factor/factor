@@ -4,7 +4,7 @@ USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http sequences prettyprint io.server logging calendar
 html.elements accessors math.parser combinators.lib
 tools.vocabs debugger html continuations random combinators
-destructors io.encodings.8-bit fry combinators.cleave ;
+destructors io.encodings.8-bit fry ;
 IN: http.server
 
 GENERIC: call-responder ( path responder -- response )
@@ -217,7 +217,7 @@ SYMBOL: exit-continuation
 
 : httpd ( port -- )
     internet-server "http.server"
-    iso-8859-1 [ handle-client ] with-server ;
+    latin1 [ handle-client ] with-server ;
 
 : httpd-main ( -- ) 8888 httpd ;
 

@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel sequences sbufs vectors namespaces
-growable strings io classes continuations combinators
-io.styles io.streams.plain splitting
-io.streams.duplex byte-arrays sequences.private ;
+USING: math kernel sequences sbufs vectors namespaces growable
+strings io classes continuations combinators io.styles
+io.streams.plain splitting io.streams.duplex byte-arrays
+sequences.private accessors ;
 IN: io.encodings
 
 ! The encoding descriptor protocol
@@ -34,7 +34,7 @@ M: tuple-class <decoder> construct-empty <decoder> ;
 M: tuple <decoder> f decoder construct-boa ;
 
 : >decoder< ( decoder -- stream encoding )
-    { decoder-stream decoder-code } get-slots ;
+    [ stream>> ] [ code>> ] bi ;
 
 : cr+ t swap set-decoder-cr ; inline
 
@@ -59,7 +59,7 @@ M: tuple <decoder> f decoder construct-boa ;
     over decoder-cr [
         over cr-
         "\n" ?head [
-            over stream-read1 [ add ] when*
+            over stream-read1 [ suffix ] when*
         ] when
     ] when nip ;
 
@@ -108,7 +108,7 @@ M: tuple-class <encoder> construct-empty <encoder> ;
 M: tuple <encoder> encoder construct-boa ;
 
 : >encoder< ( encoder -- stream encoding )
-    { encoder-stream encoder-code } get-slots ;
+    [ stream>> ] [ code>> ] bi ;
 
 M: encoder stream-write1
     >encoder< encode-char ;

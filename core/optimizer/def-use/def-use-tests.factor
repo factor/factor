@@ -99,7 +99,7 @@ namespaces assocs kernel sequences math tools.test words ;
 ] unit-test
 
 : regression-2 ( x y -- x.y )
-    [ p1 ] 2apply [
+    [ p1 ] bi@ [
         [
             rot
             [ 2swap [ swapd * -rot p2 +@ ] 2keep ]

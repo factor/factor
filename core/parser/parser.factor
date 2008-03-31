@@ -5,16 +5,18 @@ namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger 
 io.files io.streams.string vocabs io.encodings.utf8
-source-files classes hashtables compiler.errors compiler.units ;
+source-files classes hashtables compiler.errors compiler.units
+accessors ;
 IN: parser
 
 TUPLE: lexer text line line-text line-length column ;
 
 : next-line ( lexer -- )
-    0 over set-lexer-column
-    dup lexer-line over lexer-text ?nth over set-lexer-line-text
-    dup lexer-line-text length over set-lexer-line-length
-    dup lexer-line 1+ swap set-lexer-line ;
+    dup [ line>> ] [ text>> ] bi ?nth >>line-text
+    dup line-text>> length >>line-length
+    [ 1+ ] change-line
+    0 >>column
+    drop ;
 
 : <lexer> ( text -- lexer )
     0 { set-lexer-text set-lexer-line } lexer construct
@@ -159,8 +161,7 @@ TUPLE: parse-error file line col text ;
 
 : <parse-error> ( msg -- error )
     file get
-    lexer get
-    { lexer-line lexer-column lexer-line-text } get-slots
+    lexer get [ line>> ] [ column>> ] [ line-text>> ] tri
     parse-error construct-boa
     [ set-delegate ] keep ;
 
@@ -214,7 +215,7 @@ SYMBOL: in
 
 ERROR: unexpected want got ;
 
-PREDICATE: unexpected unexpected-eof
+PREDICATE: unexpected-eof < unexpected
     unexpected-got not ;
 
 : unexpected-eof ( word -- * ) f unexpected ;
@@ -251,13 +252,13 @@ PREDICATE: unexpected unexpected-eof
         [ "Use the word " swap summary append ] keep
     ] { } map>assoc ;
 
-TUPLE: no-word name ;
+TUPLE: no-word-error name ;
 
-M: no-word summary
+M: no-word-error summary
     drop "Word not found in current vocabulary search path" ;
 
 : no-word ( name -- newword )
-    dup \ no-word construct-boa
+    dup no-word-error construct-boa
     swap words-named [ forward-reference? not ] subset
     word-restarts throw-restarts
     dup word-vocabulary (use+) ;
@@ -287,6 +288,14 @@ M: no-word summary
 
 : CREATE-METHOD ( -- method )
     scan-word bootstrap-word scan-word create-method-in ;
+
+: parse-tuple-definition ( -- class superclass slots )
+    CREATE-CLASS
+    scan {
+        { ";" [ tuple f ] }
+        { "<" [ scan-word ";" parse-tokens ] }
+        [ >r tuple ";" parse-tokens r> prefix ]
+    } case ;
 
 ERROR: staging-violation word ;
 
@@ -357,6 +366,10 @@ ERROR: bad-number ;
 : (:) CREATE-WORD parse-definition ;
 
 : (M:) CREATE-METHOD parse-definition ;
+
+: scan-object ( -- object )
+    scan-word dup parsing?
+    [ V{ } clone swap execute first ] when ;
 
 GENERIC: expected>string ( obj -- str )
 
@@ -462,7 +475,7 @@ SYMBOL: interactive-vocabs
 
 : removed-definitions ( -- definitions )
     new-definitions old-definitions
-    [ get first2 union ] 2apply diff ;
+    [ get first2 union ] bi@ diff ;
 
 : smudged-usage ( -- usages referenced removed )
     removed-definitions filter-moved keys [
@@ -512,7 +525,7 @@ SYMBOL: interactive-vocabs
     [
         [
             [ parsing-file ] keep
-            [ ?resource-path utf8 <file-reader> ] keep
+            [ utf8 <file-reader> ] keep
             parse-stream
         ] with-compiler-errors
     ] [
@@ -524,7 +537,7 @@ SYMBOL: interactive-vocabs
     [ dup parse-file call ] assert-depth drop ;
 
 : ?run-file ( path -- )
-    dup resource-exists? [ run-file ] [ drop ] if ;
+    dup exists? [ run-file ] [ drop ] if ;
 
 : bootstrap-file ( path -- )
     [ parse-file % ] [ run-file ] if-bootstrapping ;

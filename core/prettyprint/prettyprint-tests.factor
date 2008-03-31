@@ -192,7 +192,7 @@ unit-test
         "IN: prettyprint.tests"
         ": another-soft-break-layout ( node -- quot )"
         "    parse-error-file"
-        "    [ <reversed> \"hello world foo\" add ] [ ] make ;"
+        "    [ <reversed> \"hello world foo\" suffix ] [ ] make ;"
     } ;
 
 [ t ] [
@@ -328,4 +328,10 @@ M: f generic-see-test-with-f ;
 
 [ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
     [ \ f \ generic-see-test-with-f method see ] with-string-writer
+] unit-test
+
+PREDICATE: predicate-see-test < integer even? ;
+
+[ "USING: math ;\nIN: prettyprint.tests\nPREDICATE: predicate-see-test < integer even? ;\n" ] [
+    [ \ predicate-see-test see ] with-string-writer
 ] unit-test

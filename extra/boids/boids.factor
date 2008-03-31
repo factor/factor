@@ -6,7 +6,6 @@ USING: kernel namespaces
        math.vectors
        math.trig
        combinators arrays sequences random vars
-       combinators.cleave
        combinators.lib ;
 
 IN: boids
@@ -81,7 +80,7 @@ VAR: separation-radius
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: relative-position ( self other -- v ) swap [ boid-pos ] 2apply v- ;
+: relative-position ( self other -- v ) swap [ boid-pos ] bi@ v- ;
 
 : relative-angle ( self other -- angle )
 over boid-vel -rot relative-position angle-between ;

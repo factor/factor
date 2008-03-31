@@ -109,9 +109,9 @@ M: x86-backend %dispatch-label ( word -- )
     0 cell, rc-absolute-cell rel-word ;
 
 M: x86-backend %unbox-float ( dst src -- )
-    [ v>operand ] 2apply float-offset [+] MOVSD ;
+    [ v>operand ] bi@ float-offset [+] MOVSD ;
 
-M: x86-backend %peek [ v>operand ] 2apply MOV ;
+M: x86-backend %peek [ v>operand ] bi@ MOV ;
 
 M: x86-backend %replace swap %peek ;
 
@@ -156,16 +156,16 @@ M: x86-backend %unbox-small-struct ( size -- )
 
 M: x86-backend struct-small-enough? ( size -- ? )
     { 1 2 4 8 } member?
-    os { "linux" "solaris" } member? not and ;
+    os { "linux" "netbsd" "solaris" } member? not and ;
 
 M: x86-backend %return ( -- ) 0 %unwind ;
 
 ! Alien intrinsics
 M: x86-backend %unbox-byte-array ( dst src -- )
-    [ v>operand ] 2apply byte-array-offset [+] LEA ;
+    [ v>operand ] bi@ byte-array-offset [+] LEA ;
 
 M: x86-backend %unbox-alien ( dst src -- )
-    [ v>operand ] 2apply alien-offset [+] MOV ;
+    [ v>operand ] bi@ alien-offset [+] MOV ;
 
 M: x86-backend %unbox-f ( dst src -- )
     drop v>operand 0 MOV ;

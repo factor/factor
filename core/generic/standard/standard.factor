@@ -34,8 +34,8 @@ ERROR: no-method object generic ;
 : empty-method ( word -- quot )
     [
         picker % [ delegate dup ] %
-        unpicker over add ,
-        error-method \ drop add* , \ if ,
+        unpicker over suffix ,
+        error-method \ drop prefix , \ if ,
     ] [ ] make ;
 
 : class-predicates ( assoc -- assoc )
@@ -137,7 +137,7 @@ ERROR: no-method object generic ;
     ] if ;
 
 : standard-methods ( word -- alist )
-    dup methods swap default-method add*
+    dup methods swap default-method prefix
     [ 1quotation ] assoc-map ;
 
 M: standard-combination make-default-method
@@ -174,13 +174,13 @@ M: hook-combination perform-combination
 : define-simple-generic ( word -- )
     T{ standard-combination f 0 } define-generic ;
 
-PREDICATE: generic standard-generic
+PREDICATE: standard-generic < generic
     "combination" word-prop standard-combination? ;
 
-PREDICATE: standard-generic simple-generic
+PREDICATE: simple-generic < standard-generic
     "combination" word-prop standard-combination-# zero? ;
 
-PREDICATE: generic hook-generic
+PREDICATE: hook-generic < generic
     "combination" word-prop hook-combination? ;
 
 GENERIC: dispatch# ( word -- n )

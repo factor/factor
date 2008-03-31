@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
-math.vectors tuples classes ui.gadgets combinators.lib boxes
+math.vectors classes.tuple classes ui.gadgets combinators.lib
+boxes
 calendar alarms symbols ;
 IN: ui.gestures
 

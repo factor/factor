@@ -101,6 +101,6 @@ M: x86-backend %box-alien ( dst src -- )
         ] %allot
         "end" get JMP
         "f" resolve-label
-        f [ v>operand ] 2apply MOV
+        f [ v>operand ] bi@ MOV
         "end" resolve-label
     ] with-scope ;

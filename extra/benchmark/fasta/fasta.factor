@@ -49,7 +49,7 @@ HINTS: random fixnum ;
 
 : make-cumulative ( freq -- chars floats )
     dup keys >byte-array
-    swap values >float-array unclip [ + ] accumulate swap add ;
+    swap values >float-array unclip [ + ] accumulate swap suffix ;
 
 :: select-random ( seed chars floats -- seed elt )
     floats seed random -rot

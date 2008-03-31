@@ -7,12 +7,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: namespaces sequences kernel math io math.functions
-io.binary strings classes words sbufs tuples arrays vectors
-byte-arrays bit-arrays quotations hashtables assocs help.syntax
-help.markup float-arrays splitting io.streams.byte-array
-io.encodings.string io.encodings.utf8 io.encodings.binary
-combinators combinators.cleave accessors locals
-prettyprint compiler.units sequences.private tuples.private ;
+io.binary strings classes words sbufs classes.tuple arrays
+vectors byte-arrays bit-arrays quotations hashtables assocs
+help.syntax help.markup float-arrays splitting
+io.streams.byte-array io.encodings.string io.encodings.utf8
+io.encodings.binary combinators accessors locals prettyprint
+compiler.units sequences.private classes.tuple.private ;
 IN: serialize
 
 ! Variable holding a assoc of objects already serialized
@@ -24,7 +24,7 @@ C: <id> id
 
 M: id hashcode* obj>> hashcode* ;
 
-M: id equal? over id? [ [ obj>> ] 2apply eq? ] [ 2drop f ] if ;
+M: id equal? over id? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
 
 : add-object ( obj -- )
     #! Add an object to the sequence of already serialized
@@ -90,13 +90,13 @@ M: float (serialize) ( obj -- )
 
 M: complex (serialize) ( obj -- )
     CHAR: c write1
-    dup real-part (serialize)
-    imaginary-part (serialize) ;
+    [ real-part (serialize) ]
+    [ imaginary-part (serialize) ] bi ;
 
 M: ratio (serialize) ( obj -- )
     CHAR: r write1
-    dup numerator (serialize)
-    denominator (serialize) ;
+    [ numerator (serialize) ]
+    [ denominator (serialize) ] bi ;
 
 : serialize-seq ( obj code -- )
     [
@@ -120,7 +120,8 @@ M: array (serialize) ( obj -- )
 
 M: quotation (serialize) ( obj -- )
     [
-        CHAR: q write1 [ >array (serialize) ] [ add-object ] bi
+        CHAR: q write1
+        [ >array (serialize) ] [ add-object ] bi
     ] serialize-shared ;
 
 M: hashtable (serialize) ( obj -- )
@@ -234,10 +235,12 @@ SYMBOL: deserialized
     ] if ;
 
 : deserialize-gensym ( -- word )
-    gensym
-    dup intern-object
-    dup (deserialize) define
-    dup (deserialize) swap set-word-props ;
+    gensym {
+        [ intern-object ]
+        [ (deserialize) define ]
+        [ (deserialize) swap set-word-props ]
+        [ ]
+    } cleave ;
 
 : deserialize-wrapper ( -- wrapper )
     (deserialize) <wrapper> ;
@@ -269,7 +272,7 @@ SYMBOL: deserialized
     [ ] tri ;
 
 : copy-seq-to-tuple ( seq tuple -- )
-    >r dup length [ 1+ ] map r> [ set-array-nth ] curry 2each ;
+    >r dup length r> [ set-array-nth ] curry 2each ;
 
 : deserialize-tuple ( -- array )
     #! Ugly because we have to intern the tuple before reading

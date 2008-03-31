@@ -63,7 +63,7 @@ M: closer process
     V{ } clone xml-stack set f push-xml ;
 
 : default-prolog ( -- prolog )
-    "1.0" "iso-8859-1" f <prolog> ;
+    "1.0" "UTF-8" f <prolog> ;
 
 : reset-prolog ( -- )
     default-prolog prolog-data set ;

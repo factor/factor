@@ -18,7 +18,7 @@ SYMBOL: board
 : cell-contains? ( n x y i -- ? ) 3 /mod pair+ board> = ;
 
 : box-contains? ( n x y -- ? )
-    [ 3 /i 3 * ] 2apply
+    [ 3 /i 3 * ] bi@
     9 [ >r 3dup r> cell-contains? ] contains?
     >r 3drop r> ;
 

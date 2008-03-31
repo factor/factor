@@ -4,7 +4,7 @@ USING: io io.backend io.launcher io.nonblocking io.unix.backend
 io.unix.files io.nonblocking sequences kernel namespaces math
 system alien.c-types debugger continuations arrays assocs
 combinators unix.process strings threads unix
-io.unix.launcher.parser accessors ;
+io.unix.launcher.parser accessors io.files ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -24,6 +24,7 @@ USE: unix
             { +normal-priority+ 0 }
             { +high-priority+ -10 }
             { +highest-priority+ -20 }
+            { +realtime-priority+ -20 }
         } at set-priority
     ] when* ;
 
@@ -36,7 +37,8 @@ USE: unix
     2nip reset-fd ;
 
 : redirect-file ( obj mode fd -- )
-    >r file-mode open dup io-error r> redirect-fd ;
+    >r >r normalize-pathname r> file-mode
+    open dup io-error r> redirect-fd ;
 
 : redirect-closed ( obj mode fd -- )
     >r >r drop "/dev/null" r> r> redirect-file ;
@@ -68,6 +70,7 @@ USE: unix
     [
         setup-priority
         setup-redirection
+        current-directory get resource-path cd
         dup pass-environment? [
             dup get-environment set-os-envs
         ] when

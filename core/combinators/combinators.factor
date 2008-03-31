@@ -5,6 +5,26 @@ USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
 hashtables sorting ;
 
+: cleave ( x seq -- )
+    [ call ] with each ;
+
+: cleave>quot ( seq -- quot )
+    [ [ keep ] curry ] map concat [ drop ] append ;
+
+: 2cleave ( x seq -- )
+    [ [ call ] 3keep drop ] each 2drop ;
+
+: 2cleave>quot ( seq -- quot )
+    [ [ 2keep ] curry ] map concat [ 2drop ] append ;
+
+: spread>quot ( seq -- quot )
+    [ length [ >r ] <repetition> concat ]
+    [ [ [ r> ] prepend ] map concat ] bi
+    append ;
+
+: spread ( objs... seq -- )
+    spread>quot call ;
+
 ERROR: no-cond ;
 
 : cond ( assoc -- )
@@ -23,7 +43,7 @@ ERROR: no-case ;
 : with-datastack ( stack quot -- newstack )
     datastack >r
     >r >array set-datastack r> call
-    datastack r> swap add set-datastack 2nip ; inline
+    datastack r> swap suffix set-datastack 2nip ; inline
 
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ rot 1- -rot call ] if ; inline
@@ -46,7 +66,7 @@ M: hashtable hashcode*
     reverse [ no-cond ] swap alist>quot ;
 
 : linear-case-quot ( default assoc -- quot )
-    [ >r [ dupd = ] curry r> \ drop add* ] assoc-map
+    [ >r [ dupd = ] curry r> \ drop prefix ] assoc-map
     alist>quot ;
 
 : (distribute-buckets) ( buckets pair keys -- )

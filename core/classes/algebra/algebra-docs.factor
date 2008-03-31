@@ -30,7 +30,7 @@ HELP: class-types
 { $description "Outputs a sequence of builtin type numbers whose instances can possibly be instances of the given class." } ;
 
 HELP: class<
-{ $values { "class1" "a class" } { "class2" "a class" } { "?" "a boolean" } }
+{ $values { "first" "a class" } { "second" "a class" } { "?" "a boolean" } }
 { $description "Tests if all instances of " { $snippet "class1" } " are also instances of " { $snippet "class2" } "." }
 { $notes "Classes are partially ordered. This means that if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class1" } ", then " { $snippet "class1 = class2" } ". Also, if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class3" } ", then " { $snippet "class1 <= class3" } "." } ;
 
@@ -39,15 +39,15 @@ HELP: sort-classes
 { $description "Outputs a topological sort of a sequence of classes. Larger classes come before their subclasses." } ;
 
 HELP: class-or
-{ $values { "class1" class } { "class2" class } { "class" class } }
+{ $values { "first" class } { "second" class } { "class" class } }
 { $description "Outputs the smallest anonymous class containing both " { $snippet "class1" } " and " { $snippet "class2" } "." } ;
 
 HELP: class-and
-{ $values { "class1" class } { "class2" class } { "class" class } }
+{ $values { "first" class } { "second" class } { "class" class } }
 { $description "Outputs the largest anonymous class contained in both " { $snippet "class1" } " and " { $snippet "class2" } "." } ;
 
 HELP: classes-intersect?
-{ $values { "class1" class } { "class2" class } { "?" "a boolean" } }
+{ $values { "first" class } { "second" class } { "?" "a boolean" } }
 { $description "Tests if two classes have a non-empty intersection. If the intersection is empty, no object can be an instance of both classes at once." } ;
 
 HELP: min-class

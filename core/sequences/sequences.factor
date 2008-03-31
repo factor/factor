@@ -60,7 +60,7 @@ INSTANCE: immutable-sequence sequence
     #! A bit of a pain; can't call cell-bits here
     7 getenv 8 * 5 - 2^ 1- ; foldable
 
-PREDICATE: fixnum array-capacity
+PREDICATE: array-capacity < fixnum
     0 max-array-capacity between? ;
 
 : array-capacity ( array -- n )
@@ -300,9 +300,9 @@ M: immutable-sequence clone-like like ;
 : change-nth ( i seq quot -- )
     [ >r nth r> call ] 3keep drop set-nth ; inline
 
-: min-length ( seq1 seq2 -- n ) [ length ] 2apply min ; inline
+: min-length ( seq1 seq2 -- n ) [ length ] bi@ min ; inline
 
-: max-length ( seq1 seq2 -- n ) [ length ] 2apply max ; inline
+: max-length ( seq1 seq2 -- n ) [ length ] bi@ max ; inline
 
 <PRIVATE
 
@@ -369,7 +369,7 @@ PRIVATE>
     (2each) each-integer ; inline
 
 : 2reverse-each ( seq1 seq2 quot -- )
-    >r [ <reversed> ] 2apply r> 2each ; inline
+    >r [ <reversed> ] bi@ r> 2each ; inline
 
 : 2reduce ( seq1 seq2 identity quot -- result )
     >r -rot r> 2each ; inline
@@ -460,7 +460,7 @@ M: sequence <=>
     [ -rot 2nth-unsafe <=> ] [ [ length ] compare ] if* ;
 
 : sequence= ( seq1 seq2 -- ? )
-    2dup [ length ] 2apply number=
+    2dup [ length ] bi@ number=
     [ mismatch not ] [ 2drop f ] if ; inline
 
 : move ( to from seq -- )
@@ -478,16 +478,16 @@ M: sequence <=>
 
 : push-new ( elt seq -- ) [ delete ] 2keep push ;
 
-: add ( seq elt -- newseq )
-    over >r over length 1+ r> [
-        [ >r over length r> set-nth-unsafe ] keep
-        [ 0 swap copy ] keep
-    ] new-like ;
-
-: add* ( seq elt -- newseq )
+: prefix ( seq elt -- newseq )
     over >r over length 1+ r> [
         [ 0 swap set-nth-unsafe ] keep
         [ 1 swap copy ] keep
+    ] new-like ;
+
+: suffix ( seq elt -- newseq )
+    over >r over length 1+ r> [
+        [ >r over length r> set-nth-unsafe ] keep
+        [ 0 swap copy ] keep
     ] new-like ;
 
 : seq-diff ( seq1 seq2 -- newseq )
@@ -620,12 +620,12 @@ M: sequence <=>
             [ drop nip ]
             [ 2drop first ]
             [ >r drop first2 r> call ]
-            [ >r drop first3 r> 2apply ]
+            [ >r drop first3 r> bi@ ]
         } dispatch
     ] [
         drop
         >r >r halves r> r>
-        [ [ binary-reduce ] 2curry 2apply ] keep
+        [ [ binary-reduce ] 2curry bi@ ] keep
         call
     ] if ; inline
 

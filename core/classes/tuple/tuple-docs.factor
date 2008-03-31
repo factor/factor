@@ -1,7 +1,7 @@
 USING: generic help.markup help.syntax kernel
-tuples.private classes slots quotations words arrays
+classes.tuple.private classes slots quotations words arrays
 generic.standard sequences definitions compiler.units ;
-IN: tuples
+IN: classes.tuple
 
 ARTICLE: "tuple-constructors" "Constructors"
 "Tuples are created by calling one of two words:"
@@ -151,30 +151,14 @@ HELP: set-delegate
 HELP: tuple=
 { $values { "tuple1" tuple } { "tuple2" tuple } { "?" "a boolean" } }
 { $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
-{ $warning "This word is in the " { $vocab-link "tuples.private" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
+{ $warning "This word is in the " { $vocab-link "classes.tuple.private" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
 
-HELP: tuple-class-eq?
-{ $values { "obj" object } { "class" tuple-class } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "obj" } " is an instance of " { $snippet "class" } "." } ;
-
-HELP: permutation
-{ $values { "seq1" sequence } { "seq2" sequence } { "permutation" "a sequence whose elements are integers or " { $link f } } }
-{ $description "Outputs a permutation for taking " { $snippet "seq1" } " to " { $snippet "seq2" } "." } ;
-
-HELP: reshape-tuple
-{ $values { "oldtuple" tuple } { "permutation" "a sequence whose elements are integers or " { $link f } } { "newtuple" tuple } }
-{ $description "Permutes the slots of a tuple. If a tuple class is redefined at runtime, this word is called on every instance to change its shape to conform to the new layout." } ;
-
-HELP: reshape-tuples
-{ $values { "class" tuple-class } { "newslots" "a sequence of strings" } }
-{ $description "Changes the shape of every instance of " { $snippet "class" } " for a new slot layout." } ;
-
-HELP: old-slots
+HELP: removed-slots
 { $values { "class" tuple-class } { "newslots" "a sequence of strings" } { "seq" "a sequence of strings" } }
 { $description "Outputs the sequence of existing tuple slot names not in " { $snippet "newslots" } "." } ;
 
-HELP: forget-slots
-{ $values { "class" tuple-class } { "newslots" "a sequence of strings" } }
+HELP: forget-removed-slots
+{ $values { "class" tuple-class } { "slots" "a sequence of strings" } }
 { $description "Forgets accessor words for existing tuple slots which are not in " { $snippet "newslots" } "." } ;
 
 HELP: tuple
@@ -194,8 +178,8 @@ HELP: define-tuple-predicate
 { $description "Defines a predicate word that tests if the top of the stack is an instance of " { $snippet "class" } ". This will only work if " { $snippet "class" } " is a tuple class." }
 $low-level-note ;
 
-HELP: check-shape
-{ $values { "class" class } { "newslots" "a sequence of strings" } }
+HELP: redefine-tuple-class
+{ $values { "class" class } { "superclass" class } { "slots" "a sequence of strings" } }
 { $description "If the new slot layout differs from the existing one, updates all existing instances of this tuple class, and forgets any slot accessor words which are no longer needed."
 $nl
 "If the class is not a tuple class word, this word does nothing." }
@@ -218,8 +202,8 @@ HELP: check-tuple
 { $error-description "Thrown if " { $link POSTPONE: C: } " is called with a word which does not name a tuple class." } ;
 
 HELP: define-tuple-class
-{ $values { "class" word } { "slots" "a sequence of strings" } }
-{ $description "Defines a tuple class with slots named by " { $snippet "slots" } ". This is the run time equivalent of " { $link POSTPONE: TUPLE: } "." }
+{ $values { "class" word } { "superclass" class } { "slots" "a sequence of strings" } }
+{ $description "Defines a tuple class inheriting from " { $snippet "superclass" } " with slots named by " { $snippet "slots" } ". This is the run time equivalent of " { $link POSTPONE: TUPLE: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;
 
@@ -246,9 +230,13 @@ HELP: tuple>array ( tuple -- array )
 { $values { "tuple" tuple } { "array" array } }
 { $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and the second is the delegate; the remainder are declared slots." } ;
 
-HELP: <tuple> ( class n -- tuple )
-{ $values { "class" tuple-class } { "n" "a non-negative integer" } { "tuple" tuple } }
-{ $description "Low-level tuple constructor. User code should never call this directly, and instead use the constructor word which is defined for each tuple. See " { $link "tuples" } "." } ;
+HELP: <tuple> ( layout -- tuple )
+{ $values { "layout" tuple-layout } { "tuple" tuple } }
+{ $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link construct-empty } "." } ;
+
+HELP: <tuple-boa> ( ... layout -- tuple )
+{ $values { "..." "values" } { "layout" tuple-layout } { "tuple" tuple } }
+{ $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link construct-boa } "." } ;
 
 HELP: construct-empty
 { $values { "class" tuple-class } { "tuple" tuple } }

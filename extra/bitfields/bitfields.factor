@@ -63,7 +63,7 @@ M: check< summary drop "Number exceeds upper bound" ;
     [ range>accessor ] map ;
 
 : clear-range ( range -- num )
-    first2 dupd + [ 2^ 1- ] 2apply bitnot bitor ;
+    first2 dupd + [ 2^ 1- ] bi@ bitnot bitor ;
 
 : range>setter ( range -- quot )
     [

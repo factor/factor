@@ -69,7 +69,7 @@ C: <faq> faq
 
 : html>faq ( div -- faq )
     unclip swap { "h3" "ol" } [ tags-named ] with map
-    first2 >r f add* r> [ html>question-list ] 2map <faq> ;
+    first2 >r f prefix r> [ html>question-list ] 2map <faq> ;
 
 : header, ( faq -- )
     dup faq-header ,
@@ -91,7 +91,7 @@ C: <faq> faq
 : faq-sections, ( question-lists -- )
     unclip question-list-seq length 1+ dupd
     [ question-list-seq length + ] accumulate nip
-    0 -rot [ pick question-list>html [ , nl, ] 2apply 1+ ] 2each drop ;
+    0 -rot [ pick question-list>html [ , nl, ] bi@ 1+ ] 2each drop ;
 
 : faq>html ( faq -- div )
     "div" [

@@ -46,5 +46,5 @@ M: windows-ce-io (init-stdio) ( -- )
             1 _getstdfilex _fileno
             2 _getstdfilex _fileno
         ] if [ f <win32-file> ] 3apply
-        rot <reader> -rot [ <writer> ] 2apply
+        rot <reader> -rot [ <writer> ] bi@
     ] with-variable ;

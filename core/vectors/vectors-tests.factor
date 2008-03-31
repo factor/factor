@@ -77,7 +77,7 @@ IN: vectors.tests
 
 [ f ] [
     V{ 1 2 3 4 } dup clone
-    [ underlying ] 2apply eq?
+    [ underlying ] bi@ eq?
 ] unit-test
 
 [ 0 ] [

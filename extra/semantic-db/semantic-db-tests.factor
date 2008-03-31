@@ -60,7 +60,7 @@ test-db [
         "charlie" create-node* "charlie" set
         "gertrude" create-node* "gertrude" set
         [ t ] [ "adam" get "bob" get parent-child* integer? ] unit-test
-        { { "eve" "bob" } { "eve" "fran" } { "bob" "gertrude" } { "bob" "fran" } { "fran" "charlie" } } [ first2 [ get ] 2apply parent-child ] each
+        { { "eve" "bob" } { "eve" "fran" } { "bob" "gertrude" } { "bob" "fran" } { "fran" "charlie" } } [ first2 [ get ] bi@ parent-child ] each
         [ { "bob" "fran" } ] [ "eve" get children [ node-content ] map ] unit-test
         [ { "adam" "eve" } ] [ "bob" get parents [ node-content ] map ] unit-test
         [ "fran" { "charlie" } ] [ "fran" get get-node-hierarchy dup tree-id node-content swap tree-children [ tree-id node-content ] map ] unit-test

@@ -67,7 +67,7 @@ C: <interval> interval
 
 : (interval-op) ( p1 p2 quot -- p3 )
     2over >r >r
-    >r [ first ] 2apply r> call
+    >r [ first ] bi@ r> call
     r> r> [ second ] both? 2array ; inline
 
 : interval-op ( i1 i2 quot -- i3 )
@@ -108,7 +108,7 @@ C: <interval> interval
 
 : interval-intersect ( i1 i2 -- i3 )
     2dup and [
-        [ interval>points ] 2apply swapd
+        [ interval>points ] bi@ swapd
         [ swap endpoint> ] most
         >r [ swap endpoint< ] most r>
         make-interval
@@ -118,7 +118,7 @@ C: <interval> interval
 
 : interval-union ( i1 i2 -- i3 )
     2dup and [
-        [ interval>points 2array ] 2apply append points>interval
+        [ interval>points 2array ] bi@ append points>interval
     ] [
         2drop f
     ] if ;
@@ -131,17 +131,17 @@ C: <interval> interval
 
 : interval-singleton? ( int -- ? )
     interval>points
-    2dup [ second ] 2apply and
-    [ [ first ] 2apply = ]
+    2dup [ second ] bi@ and
+    [ [ first ] bi@ = ]
     [ 2drop f ] if ;
 
 : interval-length ( int -- n )
     dup
-    [ interval>points [ first ] 2apply swap - ]
+    [ interval>points [ first ] bi@ swap - ]
     [ drop 0 ] if ;
 
 : interval-closure ( i1 -- i2 )
-    dup [ interval>points [ first ] 2apply [a,b] ] when ;
+    dup [ interval>points [ first ] bi@ [a,b] ] when ;
 
 : interval-shift ( i1 i2 -- i3 )
     #! Inaccurate; could be tighter
@@ -163,7 +163,7 @@ C: <interval> interval
     [ min ] interval-op interval-closure ;
 
 : interval-interior ( i1 -- i2 )
-    interval>points [ first ] 2apply (a,b) ;
+    interval>points [ first ] bi@ (a,b) ;
 
 : interval-division-op ( i1 i2 quot -- i3 )
     >r 0 over interval-closure interval-contains?
@@ -186,13 +186,13 @@ SYMBOL: incomparable
 : left-endpoint-< ( i1 i2 -- ? )
     [ swap interval-subset? ] 2keep
     [ nip interval-singleton? ] 2keep
-    [ interval-from ] 2apply =
+    [ interval-from ] bi@ =
     and and ;
 
 : right-endpoint-< ( i1 i2 -- ? )
     [ interval-subset? ] 2keep
     [ drop interval-singleton? ] 2keep
-    [ interval-to ] 2apply =
+    [ interval-to ] bi@ =
     and and ;
 
 : (interval<) over interval-from over interval-from endpoint< ;

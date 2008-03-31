@@ -1,5 +1,5 @@
 USING: arrays combinators.lib kernel math math.functions math.vectors namespaces
-       opengl opengl.gl sequences ui ui.gadgets ui.gestures ui.render combinators.cleave ;
+       opengl opengl.gl sequences ui ui.gadgets ui.gestures ui.render ;
 IN: opengl.demo-support
 
 : NEAR-PLANE 1.0 64.0 / ; inline
@@ -38,7 +38,7 @@ M: demo-gadget pref-dim* ( gadget -- dim )
 
 : demo-gadget-frustum ( -- -x x -y y near far )
     FOV-RATIO NEAR-PLANE FOV / v*n
-    first2 [ -+ ] 2apply NEAR-PLANE FAR-PLANE ;
+    first2 [ -+ ] bi@ NEAR-PLANE FAR-PLANE ;
 
 : demo-gadget-set-matrices ( gadget -- )
     GL_PROJECTION glMatrixMode

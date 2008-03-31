@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs assocs.lib accessors
-http.server.sessions.storage combinators.cleave alarms kernel
-fry http.server ;
+USING: assocs assocs.lib accessors http.server.sessions.storage
+alarms kernel fry http.server ;
 IN: http.server.sessions.storage.assoc
 
 TUPLE: sessions-in-memory sessions alarms ;

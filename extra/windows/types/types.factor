@@ -113,6 +113,7 @@ TYPEDEF: HANDLE              HSZ
 TYPEDEF: HANDLE              WINSTA   ! MS docs say  typedef HANDLE WINSTA ;
 TYPEDEF: HANDLE              HWINSTA  ! typo??
 TYPEDEF: HANDLE              HWND
+TYPEDEF: HANDLE              HCRYPTPROV
 TYPEDEF: WORD                LANGID
 TYPEDEF: DWORD               LCID
 TYPEDEF: DWORD               LCTYPE

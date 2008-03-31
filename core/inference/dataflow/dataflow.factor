@@ -102,7 +102,7 @@ TUPLE: #label word loop? ;
 : #label ( word label -- node )
     \ #label param-node [ set-#label-word ] keep ;
 
-PREDICATE: #label #loop #label-loop? ;
+PREDICATE: #loop < #label #label-loop? ;
 
 TUPLE: #entry ;
 
@@ -205,7 +205,7 @@ UNION: #branch #if #dispatch ;
         2dup 2slip rot [
             2drop t
         ] [
-            >r dup node-children swap node-successor add r>
+            >r dup node-children swap node-successor suffix r>
             [ node-exists? ] curry contains?
         ] if
     ] [
@@ -309,9 +309,9 @@ SYMBOL: node-stack
 
 DEFER: #tail?
 
-PREDICATE: #merge #tail-merge node-successor #tail? ;
+PREDICATE: #tail-merge < #merge node-successor #tail? ;
 
-PREDICATE: #values #tail-values node-successor #tail? ;
+PREDICATE: #tail-values < #values node-successor #tail? ;
 
 UNION: #tail
     POSTPONE: f #return #tail-values #tail-merge #terminate ;

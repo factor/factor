@@ -52,7 +52,7 @@ M: cons nil? ( cons -- bool )
 TUPLE: lazy-cons car cdr ;
 
 : lazy-cons ( car cdr -- promise )
-    [ promise ] 2apply \ lazy-cons construct-boa
+    [ promise ] bi@ \ lazy-cons construct-boa
     T{ promise f f t f } clone
     [ set-promise-value ] keep ;
 
@@ -365,7 +365,7 @@ M: lazy-concat nil? ( lazy-concat -- bool )
     drop nil
   ] [
     [ car ] keep cdr [ car lcartesian-product ] keep cdr list>array swap [
-      swap [ swap [ add ] lmap-with ] lmap-with lconcat
+      swap [ swap [ suffix ] lmap-with ] lmap-with lconcat
     ] reduce
   ] if ;
 

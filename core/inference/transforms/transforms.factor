@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel words sequences generic math namespaces
 quotations assocs combinators math.bitfields inference.backend
-inference.dataflow inference.state tuples.private effects
+inference.dataflow inference.state classes.tuple.private effects
 inspector hashtables ;
 IN: inference.transforms
 
@@ -39,6 +39,12 @@ IN: inference.transforms
     ] if
 ] 1 define-transform
 
+\ cleave [ cleave>quot ] 1 define-transform
+
+\ 2cleave [ 2cleave>quot ] 1 define-transform
+
+\ spread [ spread>quot ] 1 define-transform
+
 ! Bitfields
 GENERIC: (bitfield-quot) ( spec -- quot )
 
@@ -50,7 +56,7 @@ M: pair (bitfield-quot) ( spec -- quot )
     [ shift bitor ] append 2curry ;
 
 : bitfield-quot ( spec -- quot )
-    [ (bitfield-quot) ] map [ 0 ] add* concat ;
+    [ (bitfield-quot) ] map [ 0 ] prefix concat ;
 
 \ bitfield [ bitfield-quot ] 1 define-transform
 
@@ -76,7 +82,7 @@ M: duplicated-slots-error summary
 
 \ construct-boa [
     dup +inlined+ depends-on
-    dup tuple-size [ <tuple-boa> ] 2curry
+    tuple-layout [ <tuple-boa> ] curry
 ] 1 define-transform
 
 \ construct-empty [
@@ -84,7 +90,7 @@ M: duplicated-slots-error summary
     peek-d value? [
         pop-literal
         dup +inlined+ depends-on
-        dup tuple-size [ <tuple> ] 2curry
+        tuple-layout [ <tuple> ] curry
         swap infer-quot
     ] [
         \ construct-empty 1 1 <effect> make-call-node

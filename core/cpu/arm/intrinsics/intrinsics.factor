@@ -5,8 +5,8 @@ cpu.arm.architecture cpu.arm.allot kernel kernel.private math
 math.private namespaces sequences words
 quotations byte-arrays hashtables.private hashtables generator
 generator.registers generator.fixup sequences.private sbufs
-sbufs.private vectors vectors.private system tuples.private
-layouts strings.private slots.private ;
+sbufs.private vectors vectors.private system
+classes.tuple.private layouts strings.private slots.private ;
 IN: cpu.arm.intrinsics
 
 : %slot-literal-known-tag

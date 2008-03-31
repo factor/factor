@@ -4,7 +4,8 @@ USING: arrays byte-arrays byte-vectors bit-arrays bit-vectors
 generic hashtables io assocs kernel math namespaces sequences
 strings sbufs io.styles vectors words prettyprint.config
 prettyprint.sections quotations io io.files math.parser effects
-tuples classes float-arrays float-vectors ;
+classes.tuple classes.tuple.private classes float-arrays
+float-vectors ;
 IN: prettyprint.backend
 
 GENERIC: pprint* ( obj -- )
@@ -202,3 +203,6 @@ M: wrapper pprint*
     ] [
         pprint-object
     ] if ;
+
+M: tuple-layout pprint*
+    "( tuple layout )" swap present-text ;

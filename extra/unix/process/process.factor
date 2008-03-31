@@ -1,5 +1,5 @@
 USING: kernel alien.c-types sequences math unix
-combinators.cleave vectors kernel namespaces continuations
+vectors kernel namespaces continuations
 threads assocs vectors io.unix.backend ;
 
 IN: unix.process
@@ -9,7 +9,7 @@ IN: unix.process
 ! io.launcher instead.
 
 : >argv ( seq -- alien )
-    [ malloc-char-string ] map f add >c-void*-array ;
+    [ malloc-char-string ] map f suffix >c-void*-array ;
 
 : exec ( pathname argv -- int )
     [ malloc-char-string ] [ >argv ] bi* execv ;

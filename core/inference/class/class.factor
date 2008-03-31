@@ -26,8 +26,8 @@ C: <literal-constraint> literal-constraint
 M: literal-constraint equal?
     over literal-constraint? [
         2dup
-        [ literal-constraint-literal ] 2apply eql? >r
-        [ literal-constraint-value ] 2apply = r> and
+        [ literal-constraint-literal ] bi@ eql? >r
+        [ literal-constraint-value ] bi@ = r> and
     ] [
         2drop f
     ] if ;
@@ -289,7 +289,7 @@ M: #label infer-classes-around ( #label -- )
     dup annotate-node
     dup infer-classes-before
     dup infer-children
-    dup collect-recursion over add
+    dup collect-recursion over suffix
     pick annotate-entry
     node-child (infer-classes) ;
 

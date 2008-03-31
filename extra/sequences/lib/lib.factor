@@ -94,7 +94,7 @@ MACRO: firstn ( n -- )
 
 : monotonic-split ( seq quot -- newseq )
     [
-        >r dup unclip add r>
+        >r dup unclip suffix r>
         v, [ pick ,, call [ v, ] unless ] curry 2each ,v
     ] { } make ;
 
