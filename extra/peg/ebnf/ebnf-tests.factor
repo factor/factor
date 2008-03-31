@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.ebnf words ;
+USING: kernel tools.test peg peg.ebnf words math math.parser ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -160,6 +160,25 @@ IN: peg.ebnf.tests
   "1-1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] | '1' '-' '1' => [[ drop "bar" ]] EBNF] call parse-result-ast
 ] unit-test
 
+{ 6 } [
+  "4+2" [EBNF num=[0-9] => [[ digit> ]] foo=num:x '+' num:y => [[ drop x y + ]] EBNF] call parse-result-ast
+] unit-test
+
+{ 6 } [
+  "4+2" [EBNF foo=[0-9]:x '+' [0-9]:y => [[ drop x digit> y digit> + ]] EBNF] call parse-result-ast
+] unit-test
+
+{ 10 } [
+  { 1 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call parse-result-ast
+] unit-test
+
+{ f } [
+  { "a" 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call 
+] unit-test
+
+{ 3 } [
+  { 1 2 "a" 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call parse-result-ast
+] unit-test
 
 { V{ V{ 49 } "+" V{ 49 } } } [ 
   #! Test direct left recursion. 

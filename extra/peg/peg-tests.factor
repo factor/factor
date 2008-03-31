@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test strings namespaces arrays sequences peg peg.private accessors words ;
+USING: kernel tools.test strings namespaces arrays sequences peg peg.private accessors words math ;
 IN: peg.tests
 
 { f } [
@@ -183,3 +183,12 @@ IN: peg.tests
   dup parsers>>
   dupd 0 swap set-nth compile word?
 ] unit-test
+
+{ f } [
+  "A" [ drop t ] satisfy [ 66 >= ] semantic parse 
+] unit-test
+
+{ CHAR: B } [
+  "B" [ drop t ] satisfy [ 66 >= ] semantic parse parse-result-ast
+] unit-test
+
