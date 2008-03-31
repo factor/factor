@@ -410,6 +410,14 @@ test-a/b
 
 test-a/b
 
+! Twice in the same compilation unit
+[
+    test1 tuple { "a" "x" "y" } define-tuple-class
+    test1 tuple { "a" "y" } define-tuple-class
+] with-compilation-unit
+
+test-a/b
+
 ! Redefinition problem
 TUPLE: redefinition-problem ;
 
