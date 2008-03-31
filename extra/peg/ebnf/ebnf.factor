@@ -20,6 +20,7 @@ TUPLE: ebnf-optional group ;
 TUPLE: ebnf-rule symbol elements ;
 TUPLE: ebnf-action parser code ;
 TUPLE: ebnf-var parser name ;
+TUPLE: ebnf-semantic parser code ;
 TUPLE: ebnf rules ;
 
 C: <ebnf-non-terminal> ebnf-non-terminal
@@ -36,6 +37,7 @@ C: <ebnf-optional> ebnf-optional
 C: <ebnf-rule> ebnf-rule
 C: <ebnf-action> ebnf-action
 C: <ebnf-var> ebnf-var
+C: <ebnf-semantic> ebnf-semantic
 C: <ebnf> ebnf
 
 : syntax ( string -- parser )
@@ -156,6 +158,7 @@ DEFER: 'choice'
 : 'factor-code' ( -- parser )
   [
     "]]" token ensure-not ,
+    "]?" token ensure-not ,
     [ drop t ] satisfy ,
   ] seq* [ first ] action repeat0 [ >string ] action ;
 
@@ -193,14 +196,15 @@ DEFER: 'choice'
 : 'action' ( -- parser )
    "[[" 'factor-code' "]]" syntax-pack ;
 
+: 'semantic' ( -- parser )
+   "?[" 'factor-code' "]?" syntax-pack ;
+
 : 'sequence' ( -- parser )
   #! A sequence of terminals and non-terminals, including
   #! groupings of those. 
   [
-    [ 
-      ('sequence') ,
-      'action' ,
-    ] seq* [ first2 <ebnf-action> ] action ,
+    [ ('sequence') , 'action' , ] seq* [ first2 <ebnf-action> ] action ,
+    [ ('sequence') , 'semantic' , ] seq* [ first2 <ebnf-semantic> ] action ,
     ('sequence') ,
   ] choice* repeat1 [ 
      dup length 1 = [ first ] [ <ebnf-sequence> ] if
@@ -294,6 +298,10 @@ M: ebnf-optional (transform) ( ast -- parser )
 M: ebnf-action (transform) ( ast -- parser )
   [ parser>> (transform) ] keep
   code>> vars get build-locals string-lines [ parse-lines ] with-compilation-unit action ;
+
+M: ebnf-semantic (transform) ( ast -- parser )
+  [ parser>> (transform) ] keep
+  code>> vars get build-locals string-lines [ parse-lines ] with-compilation-unit semantic ;
 
 M: ebnf-var (transform) ( ast -- parser )
   [ parser>> (transform) ] [ name>> ] bi 
