@@ -414,6 +414,23 @@ TUPLE: optional-parser p1 ;
 M: optional-parser (compile) ( parser -- quot )
   p1>> compiled-parser \ ?quot optional-pattern match-replace ;
 
+TUPLE: semantic-parser p1 quot ;
+
+MATCH-VARS: ?parser ;
+
+: semantic-pattern ( -- quot )
+  [
+    ?parser [
+      dup parse-result-ast ?quot call [ drop f ] unless
+    ] [
+      f
+    ] if*
+  ] ;
+
+M: semantic-parser (compile) ( parser -- quot )
+  [ p1>> compiled-parser ] [ quot>> ] bi  
+  2array { ?parser ?quot } semantic-pattern match-replace ;
+
 TUPLE: ensure-parser p1 ;
 
 : ensure-pattern ( -- quot )
@@ -545,6 +562,9 @@ PRIVATE>
 
 : optional ( parser -- parser )
   optional-parser construct-boa init-parser ;
+
+: semantic ( parser quot -- parser )
+  semantic-parser construct-boa init-parser ;
 
 : ensure ( parser -- parser )
   ensure-parser construct-boa init-parser ;
