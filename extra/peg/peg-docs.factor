@@ -137,7 +137,7 @@ HELP: action
     "Returns a parser that calls the 'p1' parser and applies the quotation to the AST resulting "
     "from that parse. The result of the quotation is then used as the final AST. This can be used "
     "for manipulating the parse tree to produce a AST better suited for the task at hand rather than "
-    "the default AST." }
+    "the default AST. If the quotation returns " { $link fail } " then the parser fails." }
 { $code "CHAR: 0 CHAR: 9 range [ to-digit ] action" } ;
 
 HELP: sp
