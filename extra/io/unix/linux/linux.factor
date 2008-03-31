@@ -3,8 +3,8 @@
 USING: kernel io.backend io.monitors io.monitors.private
 io.files io.buffers io.nonblocking io.timeouts io.unix.backend
 io.unix.select io.unix.launcher unix.linux.inotify assocs
-namespaces threads continuations init math
-alien.c-types alien vocabs.loader ;
+namespaces threads continuations init math alien.c-types alien
+vocabs.loader accessors ;
 IN: io.unix.linux
 
 TUPLE: linux-io ;
@@ -18,18 +18,16 @@ TUPLE: linux-monitor ;
 
 TUPLE: inotify watches ;
 
-: watches ( -- assoc ) inotify get-global inotify-watches ;
+: watches ( -- assoc ) inotify get-global watches>> ;
 
 : wd>monitor ( wd -- monitor ) watches at ;
 
 : <inotify> ( -- port/f )
     H{ } clone
-    inotify_init dup 0 < [ 2drop f ] [
-        inotify <buffered-port>
-        { set-inotify-watches set-delegate } inotify construct
-    ] if ;
+    inotify_init [ io-error ] [ inotify <buffered-port> ] bi
+    { set-inotify-watches set-delegate } inotify construct ;
 
-: inotify-fd inotify get-global port-handle ;
+: inotify-fd inotify get-global handle>> ;
 
 : (add-watch) ( path mask -- wd )
     inotify-fd -rot inotify_add_watch dup io-error ;
@@ -80,10 +78,10 @@ M: linux-monitor dispose ( monitor -- )
     parse-action swap alien>char-string ;
 
 : events-exhausted? ( i buffer -- ? )
-    buffer-fill >= ;
+    fill>> >= ;
 
 : inotify-event@ ( i buffer -- alien )
-    buffer-ptr <displaced-alien> ;
+    ptr>> <displaced-alien> ;
 
 : next-event ( i buffer -- i buffer )
     2dup inotify-event@
@@ -111,14 +109,17 @@ TUPLE: inotify-task ;
     f inotify-task <input-task> ;
 
 : init-inotify ( mx -- )
-    <inotify> dup inotify set-global
+    <inotify>
+    dup inotify set-global
     <inotify-task> swap register-io-task ;
 
 M: inotify-task do-io-task ( task -- )
     io-task-port read-notifications f ;
 
 M: linux-io init-io ( -- )
-    <select-mx> dup mx set-global init-inotify ;
+    <select-mx>
+    [ mx set-global ]
+    [ [ init-inotify ] curry ignore-errors ] bi ;
 
 T{ linux-io } set-io-backend
 
