@@ -5,7 +5,8 @@ hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes
 classes.tuple classes.tuple.private kernel.private vocabs
 vocabs.loader source-files definitions slots.deprecated
-classes.union compiler.units bootstrap.image.private io.files ;
+classes.union compiler.units bootstrap.image.private io.files
+accessors combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -102,33 +103,36 @@ num-types get f <array> builtins set
 ! Builtin classes
 : builtin-predicate-quot ( class -- quot )
     [
-        "type" word-prop dup
-        \ tag-mask get < \ tag \ type ? , , \ eq? ,
+        "type" word-prop
+        [ tag-mask get < \ tag \ type ? , ] [ , ] bi
+        \ eq? ,
     ] [ ] make ;
 
 : define-builtin-predicate ( class -- )
-    dup
-    dup builtin-predicate-quot define-predicate
-    predicate-word make-inline ;
+    [ dup builtin-predicate-quot define-predicate ]
+    [ predicate-word make-inline ]
+    bi ;
 
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
 
 : register-builtin ( class -- )
-    dup
-    dup lookup-type-number "type" set-word-prop
-    dup "type" word-prop builtins get set-nth ;
+    [ dup lookup-type-number "type" set-word-prop ]
+    [ dup "type" word-prop builtins get set-nth ]
+    bi ;
 
 : define-builtin-slots ( symbol slotspec -- )
-    dupd 1 simple-slots
-    2dup "slots" set-word-prop
-    define-slots ;
+    [ drop ] [ 1 simple-slots ] 2bi
+    [ "slots" set-word-prop ] [ define-slots ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
     >r
-    dup register-builtin
-    dup f f builtin-class define-class
-    dup define-builtin-predicate
+    {
+        [ register-builtin ]
+        [ f f builtin-class define-class ]
+        [ define-builtin-predicate ]
+        [ ]
+    } cleave
     r> define-builtin-slots ;
 
 ! Forward definitions
@@ -335,7 +339,10 @@ define-builtin
         { "set-delegate" "kernel" }
     }
 }
-define-tuple-slots
+[ drop ] [ generate-tuple-slots ] 2bi
+[ [ name>> ] map "slot-names" set-word-prop ]
+[ "slots" set-word-prop ]
+[ define-slots ] 2tri
 
 "tuple" "kernel" lookup define-tuple-layout
 
@@ -495,8 +502,9 @@ f builtins get num-tags get tail union-class define-class
 } define-tuple-class
 
 "curry" "kernel" lookup
-dup f "inline" set-word-prop
-dup tuple-layout [ <tuple-boa> ] curry define
+[ f "inline" set-word-prop ]
+[ ]
+[ tuple-layout [ <tuple-boa> ] curry ] tri define
 
 "compose" "kernel" create
 "tuple" "kernel" lookup
@@ -515,8 +523,9 @@ dup tuple-layout [ <tuple-boa> ] curry define
 } define-tuple-class
 
 "compose" "kernel" lookup
-dup f "inline" set-word-prop
-dup tuple-layout [ <tuple-boa> ] curry define
+[ f "inline" set-word-prop ]
+[ ]
+[ tuple-layout [ <tuple-boa> ] curry ] tri define
 
 ! Primitive words
 : make-primitive ( word vocab n -- )
