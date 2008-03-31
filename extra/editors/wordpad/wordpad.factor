@@ -5,10 +5,10 @@ IN: editors.wordpad
 
 : wordpad-path ( -- path )
     \ wordpad-path get [
-        program-files "\\Windows NT\\Accessories\\wordpad.exe" append-path
+        program-files "Windows NT\\Accessories\\wordpad.exe" append-path
     ] unless* ;
 
 : wordpad ( file line -- )
-    drop wordpad-path swap 2array run-detached drop ;
+    drop wordpad-path swap 2array dup . run-detached drop ;
 
 [ wordpad ] edit-hook set-global

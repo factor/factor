@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words kernel sequences namespaces assocs hashtables
 definitions kernel.private classes classes.private
-quotations arrays vocabs effects ;
+classes.algebra quotations arrays vocabs effects ;
 IN: generic
 
 ! Method combination protocol
@@ -19,7 +19,8 @@ M: object perform-combination
 
 GENERIC: make-default-method ( generic combination -- method )
 
-PREDICATE: word generic "combination" word-prop >boolean ;
+PREDICATE: generic < word
+    "combination" word-prop >boolean ;
 
 M: generic definition drop f ;
 
@@ -30,7 +31,7 @@ M: generic definition drop f ;
 : method ( class generic -- method/f )
     "methods" word-prop at ;
 
-PREDICATE: pair method-spec
+PREDICATE: method-spec < pair
     first2 generic? swap class? and ;
 
 : order ( generic -- seq )
@@ -55,7 +56,7 @@ TUPLE: check-method class generic ;
 : method-word-name ( class word -- string )
     word-name "/" rot word-name 3append ;
 
-PREDICATE: word method-body
+PREDICATE: method-body < word
     "method-generic" word-prop >boolean ;
 
 M: method-body stack-effect
@@ -138,7 +139,7 @@ M: method-body forget*
 
 M: class forget* ( class -- )
     dup forget-methods
-    dup uncache-class
+    dup update-map-
     forget-word ;
 
 M: assoc update-methods ( assoc -- )

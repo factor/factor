@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.ebnf ;
+USING: kernel tools.test peg peg.ebnf words math math.parser ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -142,4 +142,103 @@ IN: peg.ebnf.tests
 
 { f } [
   "Z" [EBNF foo=[^A-Z] EBNF] call  
+] unit-test
+
+{ V{ "1" "+" "foo" } } [
+  "1+1" [EBNF foo='1' '+' '1' [[ drop "foo" ]] EBNF] call parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "1+1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] EBNF] call parse-result-ast
+] unit-test
+
+{ "foo" } [
+  "1+1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] | '1' '-' '1' => [[ drop "bar" ]] EBNF] call parse-result-ast
+] unit-test
+
+{ "bar" } [
+  "1-1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] | '1' '-' '1' => [[ drop "bar" ]] EBNF] call parse-result-ast
+] unit-test
+
+{ 6 } [
+  "4+2" [EBNF num=[0-9] => [[ digit> ]] foo=num:x '+' num:y => [[ drop x y + ]] EBNF] call parse-result-ast
+] unit-test
+
+{ 6 } [
+  "4+2" [EBNF foo=[0-9]:x '+' [0-9]:y => [[ drop x digit> y digit> + ]] EBNF] call parse-result-ast
+] unit-test
+
+{ 10 } [
+  { 1 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call parse-result-ast
+] unit-test
+
+{ f } [
+  { "a" 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call 
+] unit-test
+
+{ 3 } [
+  { 1 2 "a" 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call parse-result-ast
+] unit-test
+
+{ V{ V{ 49 } "+" V{ 49 } } } [ 
+  #! Test direct left recursion. 
+  #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
+  "1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF] call parse-result-ast
+] unit-test
+
+{ V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [ 
+  #! Test direct left recursion. 
+  #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
+  "1+1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF] call parse-result-ast
+] unit-test
+
+{ V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [ 
+  #! Test indirect left recursion. 
+  #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
+  "1+1+1" [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF] call parse-result-ast
+] unit-test
+
+EBNF: primary 
+Primary = PrimaryNoNewArray
+PrimaryNoNewArray =  ClassInstanceCreationExpression 
+                   | MethodInvocation
+                   | FieldAccess
+                   | ArrayAccess
+                   | "this"
+ClassInstanceCreationExpression =  "new" ClassOrInterfaceType "(" ")"
+                                 | Primary "." "new" Identifier "(" ")"
+MethodInvocation =  Primary "." MethodName "(" ")"
+                  | MethodName "(" ")"
+FieldAccess =  Primary "." Identifier
+             | "super" "." Identifier  
+ArrayAccess =  Primary "[" Expression "]"
+             | ExpressionName "[" Expression "]"
+ClassOrInterfaceType = ClassName | InterfaceTypeName
+ClassName = "C" | "D"
+InterfaceTypeName = "I" | "J"
+Identifier = "x" | "y" | ClassOrInterfaceType
+MethodName = "m" | "n"
+ExpressionName = Identifier
+Expression = "i" | "j"
+main = Primary
+;EBNF 
+
+{ "this" } [
+  "this" primary parse-result-ast
+] unit-test
+
+{ V{ "this" "." "x" } } [
+  "this.x" primary parse-result-ast
+] unit-test
+
+{ V{ V{ "this" "." "x" } "." "y" } } [
+  "this.x.y" primary parse-result-ast
+] unit-test
+
+{ V{ V{ "this" "." "x" } "." "m" "(" ")" } } [
+  "this.x.m()" primary parse-result-ast
+] unit-test
+
+{ V{ V{ V{ "x" "[" "i" "]" } "[" "j" "]" } "." "y" } } [
+  "x[i][j].y" primary parse-result-ast
 ] unit-test

@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
-strings vectors words quotations assocs layouts classes tuples
-kernel.private vocabs vocabs.loader source-files definitions
-slots.deprecated classes.union compiler.units
-bootstrap.image.private io.files ;
+strings vectors words quotations assocs layouts classes
+classes.tuple classes.tuple.private kernel.private vocabs
+vocabs.loader source-files definitions slots.deprecated
+classes.union compiler.units bootstrap.image.private io.files
+accessors combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -31,6 +32,9 @@ crossref off
 H{ } clone dictionary set
 H{ } clone changed-words set
 H{ } clone root-cache set
+H{ } clone source-files set
+H{ } clone update-map set
+init-caches
 
 ! Vocabulary for slot accessors
 "accessors" create-vocab drop
@@ -43,6 +47,9 @@ call
 call
 call
 
+! After we execute bootstrap/layouts
+num-types get f <array> builtins set
+
 ! Create some empty vocabs where the below primitives and
 ! classes will go
 {
@@ -54,6 +61,8 @@ call
     "byte-arrays"
     "byte-vectors"
     "classes.private"
+    "classes.tuple"
+    "classes.tuple.private"
     "compiler.units"
     "continuations.private"
     "float-arrays"
@@ -85,53 +94,46 @@ call
     "system.private"
     "threads.private"
     "tools.profiler.private"
-    "tuples"
-    "tuples.private"
     "words"
     "words.private"
     "vectors"
     "vectors.private"
 } [ create-vocab drop ] each
 
-H{ } clone source-files set
-H{ } clone update-map set
-H{ } clone class<map set
-H{ } clone class-map set
-
 ! Builtin classes
 : builtin-predicate-quot ( class -- quot )
     [
-        "type" word-prop dup
-        \ tag-mask get < \ tag \ type ? , , \ eq? ,
+        "type" word-prop
+        [ tag-mask get < \ tag \ type ? , ] [ , ] bi
+        \ eq? ,
     ] [ ] make ;
 
 : define-builtin-predicate ( class -- )
-    dup
-    dup builtin-predicate-quot define-predicate
-    predicate-word make-inline ;
+    [ dup builtin-predicate-quot define-predicate ]
+    [ predicate-word make-inline ]
+    bi ;
 
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
 
 : register-builtin ( class -- )
-    dup
-    dup lookup-type-number "type" set-word-prop
-    dup "type" word-prop builtins get set-nth ;
+    [ dup lookup-type-number "type" set-word-prop ]
+    [ dup "type" word-prop builtins get set-nth ]
+    bi ;
 
 : define-builtin-slots ( symbol slotspec -- )
-    dupd 1 simple-slots
-    2dup "slots" set-word-prop
-    define-slots ;
+    [ drop ] [ 1 simple-slots ] 2bi
+    [ "slots" set-word-prop ] [ define-slots ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
     >r
-    dup register-builtin
-    dup f f builtin-class define-class
-    dup define-builtin-predicate
+    {
+        [ register-builtin ]
+        [ f f builtin-class define-class ]
+        [ define-builtin-predicate ]
+        [ ]
+    } cleave
     r> define-builtin-slots ;
-
-H{ } clone typemap set
-num-types get f <array> builtins set
 
 ! Forward definitions
 "object" "kernel" create t "class" set-word-prop
@@ -144,8 +146,6 @@ num-types get f <array> builtins set
 
 "bignum" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
-
-"tuple" "kernel" create { } define-builtin
 
 "ratio" "math" create {
     {
@@ -181,8 +181,6 @@ num-types get f <array> builtins set
 } define-builtin
 
 "f" "syntax" lookup { } define-builtin
-
-! do not word...
 
 "array" "arrays" create { } define-builtin
 
@@ -297,9 +295,60 @@ define-builtin
 
 "callstack" "kernel" create { } define-builtin
 
+"tuple-layout" "classes.tuple.private" create {
+    {
+        { "fixnum" "math" }
+        "hashcode"
+        { "layout-hashcode" "classes.tuple.private" }
+        f
+    }
+    {
+        { "word" "words" }
+        "class"
+        { "layout-class" "classes.tuple.private" }
+        f
+    }
+    {
+        { "fixnum" "math" }
+        "size"
+        { "layout-size" "classes.tuple.private" }
+        f
+    }
+    {
+        { "array" "arrays" }
+        "superclasses"
+        { "layout-superclasses" "classes.tuple.private" }
+        f
+    }
+    {
+        { "fixnum" "math" }
+        "echelon"
+        { "layout-echelon" "classes.tuple.private" }
+        f
+    }
+} define-builtin
+
+"tuple" "kernel" create { } define-builtin
+
+"tuple" "kernel" lookup
+{
+    {
+        { "object" "kernel" }
+        "delegate"
+        { "delegate" "kernel" }
+        { "set-delegate" "kernel" }
+    }
+}
+[ drop ] [ generate-tuple-slots ] 2bi
+[ [ name>> ] map "slot-names" set-word-prop ]
+[ "slots" set-word-prop ]
+[ define-slots ] 2tri
+
+"tuple" "kernel" lookup define-tuple-layout
+
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create
-"f" "syntax" lookup builtins get remove [ ] subset f union-class
+f "f" "syntax" lookup builtins get remove [ ] subset union-class
 define-class
 
 "f" "syntax" create [ not ] "predicate" set-word-prop
@@ -311,18 +360,20 @@ define-class
 ! Catch-all class for providing a default method.
 "object" "kernel" create [ drop t ] "predicate" set-word-prop
 "object" "kernel" create
-builtins get [ ] subset f union-class define-class
+f builtins get [ ] subset union-class define-class
 
 ! Class of objects with object tag
 "hi-tag" "classes.private" create
-builtins get num-tags get tail f union-class define-class
+f builtins get num-tags get tail union-class define-class
 
 ! Null class with no instances.
 "null" "kernel" create [ drop f ] "predicate" set-word-prop
-"null" "kernel" create { } f union-class define-class
+"null" "kernel" create f { } union-class define-class
 
 ! Create special tombstone values
-"tombstone" "hashtables.private" create { } define-tuple-class
+"tombstone" "hashtables.private" create
+"tuple" "kernel" lookup
+{ } define-tuple-class
 
 "((empty))" "hashtables.private" create
 "tombstone" "hashtables.private" lookup f
@@ -334,6 +385,7 @@ builtins get num-tags get tail f union-class define-class
 
 ! Some tuple classes
 "hashtable" "hashtables" create
+"tuple" "kernel" lookup
 {
     {
         { "array-capacity" "sequences.private" }
@@ -354,6 +406,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "sbuf" "sbufs" create
+"tuple" "kernel" lookup
 {
     {
         { "string" "strings" }
@@ -369,6 +422,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "vector" "vectors" create
+"tuple" "kernel" lookup
 {
     {
         { "array" "arrays" }
@@ -384,6 +438,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "byte-vector" "byte-vectors" create
+"tuple" "kernel" lookup
 {
     {
         { "byte-array" "byte-arrays" }
@@ -399,6 +454,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "bit-vector" "bit-vectors" create
+"tuple" "kernel" lookup
 {
     {
         { "bit-array" "bit-arrays" }
@@ -414,6 +470,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "float-vector" "float-vectors" create
+"tuple" "kernel" lookup
 {
     {
         { "float-array" "float-arrays" }
@@ -429,6 +486,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "curry" "kernel" create
+"tuple" "kernel" lookup
 {
     {
         { "object" "kernel" }
@@ -443,7 +501,13 @@ builtins get num-tags get tail f union-class define-class
     }
 } define-tuple-class
 
+"curry" "kernel" lookup
+[ f "inline" set-word-prop ]
+[ ]
+[ tuple-layout [ <tuple-boa> ] curry ] tri define
+
 "compose" "kernel" create
+"tuple" "kernel" lookup
 {
     {
         { "object" "kernel" }
@@ -457,6 +521,11 @@ builtins get num-tags get tail f union-class define-class
         f
     }
 } define-tuple-class
+
+"compose" "kernel" lookup
+[ f "inline" set-word-prop ]
+[ ]
+[ tuple-layout [ <tuple-boa> ] curry ] tri define
 
 ! Primitive words
 : make-primitive ( word vocab n -- )
@@ -632,16 +701,15 @@ builtins get num-tags get tail f union-class define-class
     { "<wrapper>" "kernel" }
     { "(clone)" "kernel" }
     { "<string>" "strings" }
-    { "(>tuple)" "tuples.private" }
     { "array>quotation" "quotations.private" }
     { "quotation-xt" "quotations" }
-    { "<tuple>" "tuples.private" }
-    { "tuple>array" "tuples" }
+    { "<tuple>" "classes.tuple.private" }
+    { "<tuple-layout>" "classes.tuple.private" }
     { "profiling" "tools.profiler.private" }
     { "become" "kernel.private" }
     { "(sleep)" "threads.private" }
     { "<float-array>" "float-arrays" }
-    { "<tuple-boa>" "tuples.private" }
+    { "<tuple-boa>" "classes.tuple.private" }
     { "class-hash" "kernel.private" }
     { "callstack>array" "kernel" }
     { "innermost-frame-quot" "kernel.private" }

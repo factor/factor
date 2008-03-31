@@ -1,5 +1,5 @@
 USING: kernel alien.c-types sequences math unix
-combinators.cleave vectors kernel namespaces continuations
+vectors kernel namespaces continuations
 threads assocs vectors io.unix.backend ;
 
 IN: unix.process
@@ -34,3 +34,6 @@ IN: unix.process
 
 : wait-for-pid ( pid -- status )
     0 <int> [ 0 waitpid drop ] keep *int WEXITSTATUS ;
+
+: set-priority ( n -- )
+    0 0 rot setpriority io-error ;

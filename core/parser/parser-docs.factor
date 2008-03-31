@@ -333,11 +333,13 @@ HELP: CREATE
 { $errors "Throws an error if the end of the line is reached." }
 $parsing-note ;
 
-HELP: no-word
-{ $values { "name" string } { "newword" word } }
-{ $description "Throws a " { $link no-word } " error." }
+HELP: no-word-error
 { $error-description "Thrown if the parser encounters a token which does not name a word in the current vocabulary search path. If any words with this name exist in vocabularies not part of the search path, a number of restarts will offer to add those vocabularies to the search path and use the chosen word." }
 { $notes "Apart from a missing " { $link POSTPONE: USE: } ", this error can also indicate an ordering issue. In Factor, words must be defined before they can be called. Mutual recursion can be implemented via " { $link POSTPONE: DEFER: } "." } ;
+
+HELP: no-word
+{ $values { "name" string } { "newword" word } }
+{ $description "Throws a " { $link no-word-error } "." } ;
 
 HELP: search
 { $values { "str" string } { "word/f" "a word or " { $link f } } }

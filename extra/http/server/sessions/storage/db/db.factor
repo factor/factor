@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors http.server.sessions.storage
 alarms kernel http.server db.tuples db.types singleton
-combinators.cleave math.parser ;
+math.parser ;
 IN: http.server.sessions.storage.db
 
 SINGLETON: sessions-in-db

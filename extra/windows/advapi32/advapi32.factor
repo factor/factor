@@ -2,6 +2,66 @@ USING: alien.syntax kernel math windows.types math.bitfields ;
 IN: windows.advapi32
 LIBRARY: advapi32
 
+: PROV_RSA_FULL       1 ; inline
+: PROV_RSA_SIG        2 ; inline
+: PROV_DSS            3 ; inline
+: PROV_FORTEZZA       4 ; inline
+: PROV_MS_EXCHANGE    5 ; inline
+: PROV_SSL            6 ; inline
+: PROV_RSA_SCHANNEL  12 ; inline
+: PROV_DSS_DH        13 ; inline
+: PROV_EC_ECDSA_SIG  14 ; inline
+: PROV_EC_ECNRA_SIG  15 ; inline
+: PROV_EC_ECDSA_FULL 16 ; inline
+: PROV_EC_ECNRA_FULL 17 ; inline
+: PROV_DH_SCHANNEL   18 ; inline
+: PROV_SPYRUS_LYNKS  20 ; inline
+: PROV_RNG           21 ; inline
+: PROV_INTEL_SEC     22 ; inline
+: PROV_REPLACE_OWF   23 ; inline
+: PROV_RSA_AES       24 ; inline
+
+: MS_DEF_DH_SCHANNEL_PROV
+    "Microsoft DH Schannel Cryptographic Provider" ; inline
+
+: MS_DEF_DSS_DH_PROV
+    "Microsoft Base DSS and Diffie-Hellman Cryptographic Provider" ; inline
+
+: MS_DEF_DSS_PROV
+    "Microsoft Base DSS Cryptographic Provider" ; inline
+
+: MS_DEF_PROV
+    "Microsoft Base Cryptographic Provider v1.0" ; inline
+
+: MS_DEF_RSA_SCHANNEL_PROV
+    "Microsoft RSA Schannel Cryptographic Provider" ; inline
+
+! Unsupported (!)
+: MS_DEF_RSA_SIG_PROV
+    "Microsoft RSA Signature Cryptographic Provider" ; inline
+
+: MS_ENH_DSS_DH_PROV
+    "Microsoft Enhanced DSS and Diffie-Hellman Cryptographic Provider" ; inline
+
+: MS_ENH_RSA_AES_PROV
+    "Microsoft Enhanced RSA and AES Cryptographic Provider" ; inline
+
+: MS_ENHANCED_PROV
+    "Microsoft Enhanced Cryptographic Provider v1.0" ; inline
+
+: MS_SCARD_PROV
+    "Microsoft Base Smart Card Crypto Provider" ; inline
+
+: MS_STRONG_PROV
+    "Microsoft Strong Cryptographic Provider" ; inline
+
+: CRYPT_VERIFYCONTEXT  HEX: F0000000 ; inline
+: CRYPT_NEWKEYSET      HEX: 8 ; inline
+: CRYPT_DELETEKEYSET   HEX: 10 ; inline
+: CRYPT_MACHINE_KEYSET HEX: 20 ; inline
+: CRYPT_SILENT         HEX: 40 ; inline
+
+
 ! : I_ScGetCurrentGroupStateW ;
 ! : A_SHAFinal ;
 ! : A_SHAInit ;
@@ -143,7 +203,13 @@ FUNCTION: BOOL AdjustTokenPrivileges ( HANDLE TokenHandle,
 ! : CredpDecodeCredential ;
 ! : CredpEncodeCredential ;
 ! : CryptAcquireContextA ;
-! : CryptAcquireContextW ;
+FUNCTION: BOOL CryptAcquireContextW ( HCRYPTPROV* phProv,
+                                      LPCTSTR pszContainer,
+                                      LPCTSTR pszProvider,
+                                      DWORD dwProvType,
+                                      DWORD dwFlags ) ;
+
+: CryptAcquireContext CryptAcquireContextW ;
 ! : CryptContextAddRef ;
 ! : CryptCreateHash ;
 ! : CryptDecrypt ;
@@ -159,7 +225,7 @@ FUNCTION: BOOL AdjustTokenPrivileges ( HANDLE TokenHandle,
 ! : CryptEnumProvidersW ;
 ! : CryptExportKey ;
 ! : CryptGenKey ;
-! : CryptGenRandom ;
+FUNCTION: BOOL CryptGenRandom ( HCRYPTPROV hProv, DWORD dwLen, BYTE* pbBuffer ) ;
 ! : CryptGetDefaultProviderA ;
 ! : CryptGetDefaultProviderW ;
 ! : CryptGetHashParam ;
@@ -169,7 +235,7 @@ FUNCTION: BOOL AdjustTokenPrivileges ( HANDLE TokenHandle,
 ! : CryptHashData ;
 ! : CryptHashSessionKey ;
 ! : CryptImportKey ;
-! : CryptReleaseContext ;
+FUNCTION: BOOL CryptReleaseContext ( HCRYPTPROV hProv, DWORD dwFlags ) ;
 ! : CryptSetHashParam ;
 ! : CryptSetKeyParam ;
 ! : CryptSetProvParam ;

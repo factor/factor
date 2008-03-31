@@ -6,7 +6,6 @@ init threads continuations math io.encodings io.streams.duplex
 io.nonblocking accessors ;
 IN: io.launcher
 
-
 TUPLE: process
 
 command
@@ -18,6 +17,8 @@ environment-mode
 stdin
 stdout
 stderr
+
+priority
 
 timeout
 
@@ -31,6 +32,13 @@ SYMBOL: +stdout+
 SYMBOL: +prepend-environment+
 SYMBOL: +replace-environment+
 SYMBOL: +append-environment+
+
+SYMBOL: +lowest-priority+
+SYMBOL: +low-priority+
+SYMBOL: +normal-priority+
+SYMBOL: +high-priority+
+SYMBOL: +highest-priority+
+SYMBOL: +realtime-priority+
 
 : <process> ( -- process )
     process construct-empty

@@ -35,7 +35,7 @@ IN: unicode.syntax
     ] [ ] make ;
 
 : define-category ( word categories -- )
-    [category] fixnum -rot define-predicate-class ;
+    [category] integer swap define-predicate-class ;
 
 : CATEGORY:
     CREATE ";" parse-tokens define-category ; parsing

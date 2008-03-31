@@ -3,8 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: html http http.server io kernel math namespaces
 continuations calendar sequences assocs hashtables
-accessors arrays alarms quotations combinators
-combinators.cleave fry assocs.lib ;
+accessors arrays alarms quotations combinators fry assocs.lib ;
 IN: http.server.callbacks
 
 SYMBOL: responder

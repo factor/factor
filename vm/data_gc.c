@@ -156,10 +156,12 @@ CELL untagged_object_size(CELL pointer)
 /* Size of the data area of an object pointed to by an untagged pointer */
 CELL unaligned_object_size(CELL pointer)
 {
+	F_TUPLE *tuple;
+	F_TUPLE_LAYOUT *layout;
+
 	switch(untag_header(get(pointer)))
 	{
 	case ARRAY_TYPE:
-	case TUPLE_TYPE:
 	case BIGNUM_TYPE:
 		return array_size(array_capacity((F_ARRAY*)pointer));
 	case BYTE_ARRAY_TYPE:
@@ -173,6 +175,10 @@ CELL unaligned_object_size(CELL pointer)
 			float_array_capacity((F_FLOAT_ARRAY*)pointer));
 	case STRING_TYPE:
 		return string_size(string_capacity((F_STRING*)pointer));
+	case TUPLE_TYPE:
+		tuple = untag_object(pointer);
+		layout = untag_object(tuple->layout);
+		return tuple_size(layout);
 	case QUOTATION_TYPE:
 		return sizeof(F_QUOTATION);
 	case WORD_TYPE:
@@ -192,6 +198,8 @@ CELL unaligned_object_size(CELL pointer)
 	case CALLSTACK_TYPE:
 		return callstack_size(
 			untag_fixnum_fast(((F_CALLSTACK *)pointer)->length));
+	case TUPLE_LAYOUT_TYPE:
+		return sizeof(F_TUPLE_LAYOUT);
 	default:
 		critical_error("Invalid header",pointer);
 		return -1; /* can't happen */

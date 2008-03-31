@@ -77,6 +77,7 @@ FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
 FUNCTION: void* popen ( char* command, char* type ) ;
 FUNCTION: ssize_t read ( int fd, void* buf, size_t nbytes ) ;
+FUNCTION: ssize_t readlink ( char* path, char* buf, size_t bufsize ) ;
 FUNCTION: ssize_t recv ( int s, void* buf, size_t nbytes, int flags ) ;
 FUNCTION: ssize_t recvfrom ( int s, void* buf, size_t nbytes, int flags, sockaddr-in* from, socklen_t* fromlen ) ;
 FUNCTION: int rename ( char* from, char* to ) ;
@@ -93,6 +94,7 @@ FUNCTION: int setsockopt ( int s, int level, int optname, void* optval, socklen_
 FUNCTION: int setuid ( uid_t uid ) ;
 FUNCTION: int socket ( int domain, int type, int protocol ) ;
 FUNCTION: char* strerror ( int errno ) ;
+FUNCTION: int symlink ( char* path1, char* path2 ) ;
 FUNCTION: int system ( char* command ) ;
 FUNCTION: int unlink ( char* path ) ;
 FUNCTION: int utimes ( char* path, timeval[2] times ) ;
@@ -101,6 +103,19 @@ FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 : SIGTERM 15 ; inline
 
 FUNCTION: int kill ( pid_t pid, int sig ) ;
+
+: PATH_MAX 1024 ; inline
+
+: PRIO_PROCESS 0 ; inline
+: PRIO_PGRP 1 ; inline
+: PRIO_USER 2 ; inline
+
+: PRIO_MIN -20 ; inline
+: PRIO_MAX 20 ; inline
+
+! which/who = 0 for current process
+FUNCTION: int getpriority ( int which, int who ) ;
+FUNCTION: int setpriority ( int which, int who, int prio ) ;
 
 ! Flags for waitpid
 
@@ -149,6 +164,5 @@ FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
     { [ linux? ] [ "unix.linux" require ] }
     { [ bsd? ] [ "unix.bsd" require ] }
     { [ solaris? ] [ "unix.solaris" require ] }
-    { [ t ] [ ] }
 } cond
 

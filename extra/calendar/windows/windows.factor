@@ -1,6 +1,5 @@
 USING: calendar.backend namespaces alien.c-types
-windows windows.kernel32 kernel math combinators.cleave
-combinators ;
+windows windows.kernel32 kernel math combinators ;
 IN: calendar.windows
 
 TUPLE: windows-calendar ;

@@ -135,7 +135,7 @@ M: editor ungraft*
         dup editor-caret-color gl-color
         dup caret-loc origin get v+
         swap caret-dim over v+
-        [ { 0.5 -0.5 } v+ ] 2apply gl-line
+        [ { 0.5 -0.5 } v+ ] bi@ gl-line
     ] when ;
 
 : line-translation ( n -- loc )

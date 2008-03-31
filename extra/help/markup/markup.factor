@@ -14,7 +14,7 @@ IN: help.markup
 
 ! Element types are words whose name begins with $.
 
-PREDICATE: array simple-element
+PREDICATE: simple-element < array
     dup empty? [ drop t ] [ first word? not ] if ;
 
 SYMBOL: last-element
@@ -138,8 +138,7 @@ M: f print-element drop ;
     link-style get [ write-object ] with-style ;
 
 : ($link) ( article -- )
-    dup article-name swap >link write-link
-    span last-element set ;
+    [ dup article-name swap >link write-link ] ($span) ;
 
 : $link ( element -- )
     first ($link) ;

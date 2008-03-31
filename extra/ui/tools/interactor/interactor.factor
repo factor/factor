@@ -4,7 +4,7 @@ USING: arrays assocs combinators continuations documents
  hashtables io io.styles kernel math
 math.vectors models namespaces parser prettyprint quotations
 sequences sequences.lib strings threads listener
-tuples ui.commands ui.gadgets ui.gadgets.editors
+classes.tuple ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
 definitions boxes calendar concurrency.flags ui.tools.workspace ;
 IN: ui.tools.interactor

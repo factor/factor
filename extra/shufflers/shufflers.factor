@@ -20,7 +20,7 @@ IN: shufflers
 
 : put-effect ( word -- )
     dup word-name "-" split1
-    [ >array [ 1string ] map ] 2apply
+    [ >array [ 1string ] map ] bi@
     <effect> "declared-effect" set-word-prop ;
 
 : in-shuffle ( -- ) in get ".shuffle" append set-in ;

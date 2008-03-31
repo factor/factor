@@ -1,6 +1,5 @@
 
-USING: kernel parser namespaces threads arrays sequences unix unix.process
-       combinators.cleave bake ;
+USING: kernel parser namespaces threads arrays sequences unix unix.process bake ;
 
 IN: raptor
 

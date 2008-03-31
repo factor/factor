@@ -1,30 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax ;
+USING: alien.syntax system sequences vocabs.loader ;
 IN: unix.kqueue
 
+<< "unix.kqueue." os append require >>
+
 FUNCTION: int kqueue ( ) ;
-
-FUNCTION: int kevent ( int kq, kevent* changelist, int nchanges, kevent* eventlist, int nevents, timespec* timeout ) ;
-
-C-STRUCT: kevent
-    { "ulong"  "ident"  } ! identifier for this event
-    { "short"  "filter" } ! filter for event
-    { "ushort" "flags"  } ! action flags for kqueue
-    { "uint"   "fflags" } ! filter flag value
-    { "long"   "data"   } ! filter data value
-    { "void*"  "udata"  } ! opaque user data identifier
-;
-
-: EVFILT_READ     -1 ; inline
-: EVFILT_WRITE    -2 ; inline
-: EVFILT_AIO      -3 ; inline ! attached to aio requests
-: EVFILT_VNODE    -4 ; inline ! attached to vnodes
-: EVFILT_PROC     -5 ; inline ! attached to struct proc
-: EVFILT_SIGNAL   -6 ; inline ! attached to struct proc
-: EVFILT_TIMER    -7 ; inline ! timers
-: EVFILT_MACHPORT -8 ; inline ! Mach ports
-: EVFILT_FS       -9 ; inline ! Filesystem events
 
 ! actions
 : EV_ADD     HEX: 1 ; inline ! add event to kq (implies enable)

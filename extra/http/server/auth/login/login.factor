@@ -6,8 +6,8 @@ http.server.auth.providers http.server.auth.providers.null
 http.server.actions http.server.components http.server.sessions
 http.server.templating.fhtml http.server.validators
 http.server.auth http sequences io.files namespaces hashtables
-fry io.sockets combinators.cleave arrays threads locals
-qualified continuations destructors ;
+fry io.sockets arrays threads locals qualified continuations
+destructors ;
 IN: http.server.auth.login
 QUALIFIED: smtp
 

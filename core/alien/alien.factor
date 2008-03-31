@@ -1,13 +1,12 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math namespaces sequences system
-kernel.private tuples bit-arrays byte-arrays float-arrays 
-arrays ;
+kernel.private bit-arrays byte-arrays float-arrays arrays ;
 IN: alien
 
 ! Some predicate classes used by the compiler for optimization
 ! purposes
-PREDICATE: alien simple-alien
+PREDICATE: simple-alien < alien
     underlying-alien not ;
 
 UNION: simple-c-ptr
@@ -18,7 +17,7 @@ alien POSTPONE: f byte-array bit-array float-array ;
 
 DEFER: pinned-c-ptr?
 
-PREDICATE: alien pinned-alien
+PREDICATE: pinned-alien < alien
     underlying-alien pinned-c-ptr? ;
 
 UNION: pinned-c-ptr
@@ -40,7 +39,7 @@ M: alien equal?
         2dup [ expired? ] either? [
             [ expired? ] both?
         ] [
-            [ alien-address ] 2apply =
+            [ alien-address ] bi@ =
         ] if
     ] [
         2drop f

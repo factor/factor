@@ -69,21 +69,19 @@ GENERIC: definitions-changed ( assoc obj -- )
     dup [ drop crossref? ] assoc-contains?
     modify-code-heap ;
 
-SYMBOL: post-compile-tasks
-
-: after-compilation ( quot -- )
-    post-compile-tasks get push ;
+SYMBOL: outdated-tuples
+SYMBOL: update-tuples-hook
 
 : call-recompile-hook ( -- )
     changed-words get keys
     compiled-usages recompile-hook get call ;
 
-: call-post-compile-tasks ( -- )
-    post-compile-tasks get [ call ] each ;
+: call-update-tuples-hook ( -- )
+    update-tuples-hook get call ;
 
 : finish-compilation-unit ( -- )
     call-recompile-hook
-    call-post-compile-tasks
+    call-update-tuples-hook
     dup [ drop crossref? ] assoc-contains? modify-code-heap
     changed-definitions notify-definition-observers ;
 
@@ -91,7 +89,7 @@ SYMBOL: post-compile-tasks
     [
         H{ } clone changed-words set
         H{ } clone forgotten-definitions set
-        V{ } clone post-compile-tasks set
+        H{ } clone outdated-tuples set
         <definitions> new-definitions set
         <definitions> old-definitions set
         [ finish-compilation-unit ]

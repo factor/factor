@@ -59,7 +59,7 @@ IN: help.lint
 
 : check-see-also ( word element -- )
     nip \ $see-also swap elements [
-        1 tail dup prune [ length ] 2apply assert=
+        1 tail dup prune [ length ] bi@ assert=
     ] each ;
 
 : vocab-exists? ( name -- ? )

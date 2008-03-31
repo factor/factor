@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: arrays kernel math math.functions namespaces sequences
-strings tuples system vocabs.loader calendar.backend threads
-accessors combinators locals ;
+strings system vocabs.loader calendar.backend threads
+accessors combinators locals classes.tuple ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
@@ -84,10 +84,10 @@ PRIVATE>
     ] ;
 
 : >date< ( timestamp -- year month day )
-    { year>> month>> day>> } get-slots ;
+    [ year>> ] [ month>> ] [ day>> ] tri ;
 
 : >time< ( timestamp -- hour minute second )
-    { hour>> minute>> second>> } get-slots ;
+    [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
 : instant ( -- dt ) 0 0 0 0 0 0 <duration> ;
 : years ( n -- dt ) instant swap >>year ;
@@ -185,7 +185,7 @@ M: number +second ( timestamp n -- timestamp )
     [ month>>  +month  ] keep
     [ year>>   +year   ] keep ; inline
 
-: +slots [ 2apply + ] curry 2keep ; inline
+: +slots [ bi@ + ] curry 2keep ; inline
 
 PRIVATE>
 
@@ -244,9 +244,9 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
 
 : (time-) ( timestamp timestamp -- n )
-    [ >gmt ] 2apply
-    [ [ >date< julian-day-number ] 2apply - 86400 * ] 2keep
-    [ >time< >r >r 3600 * r> 60 * r> + + ] 2apply - + ;
+    [ >gmt ] bi@
+    [ [ >date< julian-day-number ] bi@ - 86400 * ] 2keep
+    [ >time< >r >r 3600 * r> 60 * r> + + ] bi@ - + ;
 
 M: timestamp time-
     #! Exact calendar-time difference

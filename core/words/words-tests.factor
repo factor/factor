@@ -1,6 +1,7 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
-vocabs continuations tuples compiler.units io.streams.string ;
+vocabs continuations classes.tuple compiler.units
+io.streams.string ;
 IN: words.tests
 
 [ 4 ] [

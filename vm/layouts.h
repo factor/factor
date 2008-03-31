@@ -58,8 +58,9 @@ typedef signed long long s64;
 #define ALIEN_TYPE 16
 #define WORD_TYPE 17
 #define BYTE_ARRAY_TYPE 18
+#define TUPLE_LAYOUT_TYPE 19
 
-#define TYPE_COUNT 19
+#define TYPE_COUNT 20
 
 INLINE bool immediate_p(CELL obj)
 {
@@ -224,3 +225,25 @@ typedef struct
 	/* Frame size in bytes */
 	CELL size;
 } F_STACK_FRAME;
+
+typedef struct
+{
+	CELL header;
+	/* tagged fixnum */
+	CELL hashcode;
+	/* tagged */
+	CELL class;
+	/* tagged fixnum */
+	CELL size;
+	/* tagged array */
+	CELL superclasses;
+	/* tagged fixnum */
+	CELL echelon;
+} F_TUPLE_LAYOUT;
+
+typedef struct
+{
+	CELL header;
+	/* tagged layout */
+	CELL layout;
+} F_TUPLE;

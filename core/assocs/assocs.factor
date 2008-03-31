@@ -115,7 +115,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     swap [ swapd set-at ] curry assoc-each ;
 
 : union ( assoc1 assoc2 -- union )
-    2dup [ assoc-size ] 2apply + pick new-assoc
+    2dup [ assoc-size ] bi@ + pick new-assoc
     [ rot update ] keep [ swap update ] keep ;
 
 : diff ( assoc1 assoc2 -- diff )
@@ -134,11 +134,11 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     (substitute) map ;
 
 : cache ( key assoc quot -- value )
-    2over at [
+    2over at* [
         >r 3drop r>
     ] [
-        pick rot >r >r call dup r> r> set-at
-    ] if* ; inline
+        drop pick rot >r >r call dup r> r> set-at
+    ] if ; inline
 
 : change-at ( key assoc quot -- )
     [ >r at r> call ] 3keep drop set-at ; inline

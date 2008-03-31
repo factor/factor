@@ -1,11 +1,10 @@
-USING: alien alien.c-types arrays sequences math
-math.vectors math.matrices math.parser io io.files kernel opengl
-opengl.gl opengl.glu shuffle http.client vectors
-namespaces ui.gadgets ui.gadgets.canvas ui.render ui splitting
-combinators tools.time system combinators.lib combinators.cleave
-float-arrays continuations opengl.demo-support multiline
-ui.gestures
-bunny.fixed-pipeline bunny.cel-shaded bunny.outlined bunny.model ;
+USING: alien alien.c-types arrays sequences math math.vectors
+math.matrices math.parser io io.files kernel opengl opengl.gl
+opengl.glu shuffle http.client vectors namespaces ui.gadgets
+ui.gadgets.canvas ui.render ui splitting combinators tools.time
+system combinators.lib float-arrays continuations
+opengl.demo-support multiline ui.gestures bunny.fixed-pipeline
+bunny.cel-shaded bunny.outlined bunny.model ;
 IN: bunny
 
 TUPLE: bunny-gadget model geom draw-seq draw-n ;

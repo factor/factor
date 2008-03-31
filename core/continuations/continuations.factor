@@ -1,7 +1,8 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
-namespaces math splitting sorting quotations assocs ;
+namespaces math splitting sorting quotations assocs
+combinators accessors ;
 IN: continuations
 
 SYMBOL: error
@@ -43,12 +44,12 @@ C: <continuation> continuation
 
 : >continuation< ( continuation -- data call retain name catch )
     {
-        continuation-data
-        continuation-call
-        continuation-retain
-        continuation-name
-        continuation-catch
-    } get-slots ;
+        [ data>>   ]
+        [ call>>   ]
+        [ retain>> ]
+        [ name>>   ]
+        [ catch>>  ]
+    } cleave ;
 
 : ifcc ( capture restore -- )
     #! After continuation is being captured, the stacks looks
