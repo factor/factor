@@ -478,17 +478,30 @@ M: sequence <=>
 
 : push-new ( elt seq -- ) [ delete ] 2keep push ;
 
+: add* ( seq elt -- newseq )
+    over >r over length 1+ r> [
+        [ 0 swap set-nth-unsafe ] keep
+        [ 1 swap copy ] keep
+    ] new-like ;
+
+: prefix ( seq elt -- newseq )
+    over >r over length 1+ r> [
+        [ 0 swap set-nth-unsafe ] keep
+        [ 1 swap copy ] keep
+    ] new-like ;
+
 : add ( seq elt -- newseq )
     over >r over length 1+ r> [
         [ >r over length r> set-nth-unsafe ] keep
         [ 0 swap copy ] keep
     ] new-like ;
 
-: add* ( seq elt -- newseq )
+: suffix ( seq elt -- newseq )
     over >r over length 1+ r> [
-        [ 0 swap set-nth-unsafe ] keep
-        [ 1 swap copy ] keep
+        [ >r over length r> set-nth-unsafe ] keep
+        [ 0 swap copy ] keep
     ] new-like ;
+
 
 : seq-diff ( seq1 seq2 -- newseq )
     swap [ member? not ] curry subset ;
