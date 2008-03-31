@@ -189,7 +189,7 @@ M: local protocol-family drop PF_UNIX ;
 M: local sockaddr-type drop "sockaddr-un" c-type ;
 
 M: local make-sockaddr
-    local-path
+    local-path normalize-pathname
     dup length 1 + max-un-path > [ "Path too long" throw ] when
     "sockaddr-un" <c-object>
     AF_UNIX over set-sockaddr-un-family
