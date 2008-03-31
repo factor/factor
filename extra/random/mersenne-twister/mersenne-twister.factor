@@ -10,7 +10,7 @@ IN: random.mersenne-twister
 <PRIVATE
 
 : curry2 ( w quot1 quot2 -- quot1 quot2 )
-    >r over r> [ curry ] 2bi@ ;
+    >r over r> [ curry ] 2bi@ ; inline
 
 TUPLE: mersenne-twister seq i ;
 
