@@ -86,7 +86,15 @@ HELP: error-hook
 
 HELP: try
 { $values { "quot" "a quotation" } }
-{ $description "Calls the quotation. If it throws an error, calls " { $link error-hook } " with the error and restores the data stack." } ;
+{ $description "Attempts to call a quotation; if it throws an error, the " { $link error-hook } " gets called, stacks are restored, and execution continues after the call to " { $link try } "." }
+{ $examples
+    "The following example prints an error and keeps going:"
+    { $code
+        "[ \"error\" throw ] try"
+        "\"still running...\" print"
+    }
+    { $link "listener" } " uses " { $link try } " to recover from user errors."
+} ;
 
 HELP: expired-error.
 { $error-description "Thrown by " { $link alien-address } " and " { $link alien-invoke } " if an " { $link alien } " object passed in as a parameter has expired. Alien objects expire if they are saved an image which is subsequently loaded; this prevents a certain class of programming errors, usually attempts to use uninitialized objects, since holding a C address is meaningless between sessions." }
