@@ -70,7 +70,7 @@ MACRO: match-cond ( assoc -- )
     dup length zero? not [ 1 tail ] [ drop f ] if ;
 
 : (match-first) ( seq pattern-seq -- bindings leftover/f )
-    2dup [ length ] 2apply < [ 2drop f f ]
+    2dup [ length ] bi@ < [ 2drop f f ]
     [
         2dup length head over match
         [ nip swap ?1-tail ] [ >r 1 tail r> (match-first) ] if*
