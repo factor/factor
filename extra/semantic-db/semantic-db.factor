@@ -110,7 +110,7 @@ arc "arc"
     [ node-result ] map ;
 
 : subjects-with-cor ( content object relation -- sql-results )
-    [ id>> ] 2apply
+    [ id>> ] bi@
     [
         ":relation" INTEGER param ,
         ":object" INTEGER param ,
@@ -119,7 +119,7 @@ arc "arc"
     "select n.id, n.content from node n, arc a where n.content = :content and n.id = a.subject and a.relation = :relation and a.object = :object" results ;
 
 : objects-with-csr ( content subject relation -- sql-results )
-    [ id>> ] 2apply
+    [ id>> ] bi@
     [
         ":relation" INTEGER param ,
         ":subject" INTEGER param ,

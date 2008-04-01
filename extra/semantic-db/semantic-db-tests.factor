@@ -54,10 +54,10 @@ test-db [
      "charlie" create-node "charlie" set
      "gertrude" create-node "gertrude" set
       [ ] [ "bob" get "adam" get has-parent ] unit-test
-     { { "bob" "eve" } { "fran" "eve" } { "gertrude" "bob" } { "fran" "bob" } { "charlie" "fran" } } [ first2 [ get ] 2apply has-parent ] each
+     { { "bob" "eve" } { "fran" "eve" } { "gertrude" "bob" } { "fran" "bob" } { "charlie" "fran" } } [ first2 [ get ] bi@ has-parent ] each
      [ { "bob" "fran" } ] [ "eve" get has-parent-relation children [ node-content ] map ] unit-test
      [ { "adam" "eve" } ] [ "bob" get has-parent-relation parents [ node-content ] map ] unit-test
-     [ "fran" { "charlie" } ] [ "fran" get has-parent-relation get-node-hierarchy dup node>> node-content swap children>> [ node>> node-content ] map ] unit-test
+     [ "fran" { "charlie" } ] [ "fran" get has-parent-relation get-node-tree-s dup node>> node-content swap children>> [ node>> node-content ] map ] unit-test
      [ { "adam" "eve" } ] [ "charlie" get has-parent-relation get-root-nodes [ node-content ] map natural-sort >array ] unit-test
      [ { } ] [ "charlie" get dup "fran" get !has-parent has-parent-relation parents [ node-content ] map ] unit-test
      [ { "adam" "eve" } ] [ has-parent-relation ultimate-objects node-results [ node-content ] map ] unit-test
