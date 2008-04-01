@@ -10,8 +10,8 @@ IN: quotations.tests
 ] unit-test
 
 [ [ 1 2 3 4 ] ] [ [ 1 2 ] [ 3 4 ] append ] unit-test
-[ [ 1 2 3 ] ] [ [ 1 2 ] 3 add ] unit-test
-[ [ 3 1 2 ] ] [ [ 1 2 ] 3 add* ] unit-test
+[ [ 1 2 3 ] ] [ [ 1 2 ] 3 suffix ] unit-test
+[ [ 3 1 2 ] ] [ [ 1 2 ] 3 prefix ] unit-test
 
 [ [ "hi" ] ] [ "hi" 1quotation ] unit-test
 
