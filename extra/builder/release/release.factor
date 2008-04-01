@@ -20,21 +20,15 @@ IN: builder.release
     "boot.x86.32.image"
     "boot.x86.64.image"
     "boot.macosx-ppc.image"
+    "boot.linux-ppc.image"
     "vm"
     "temp"
     "logs"
     ".git"
     ".gitignore"
     "Makefile"
-    "cp_dir"
     "unmaintained"
-    "misc/target"
-    "misc/wordsize"
-    "misc/wordsize.c"
-    "misc/macos-release.sh"
-    "misc/source-release.sh"
-    "misc/windows-release.sh"
-    "misc/version.sh"
+    "build-support"
   } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

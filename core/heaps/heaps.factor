@@ -2,7 +2,7 @@
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences arrays assocs sequences.private
-growable ;
+growable accessors ;
 IN: heaps
 
 MIXIN: priority-queue
@@ -161,7 +161,7 @@ M: priority-queue heap-push* ( value key heap -- entry )
     [ swapd heap-push ] curry assoc-each ;
 
 : >entry< ( entry -- key value )
-    { entry-value entry-key } get-slots ;
+    [ value>> ] [ key>> ] bi ;
 
 M: priority-queue heap-peek ( heap -- value key )
     data-first >entry< ;

@@ -133,7 +133,7 @@ DEFER: create ( level c r -- scene )
     pick 1 = [ <sphere> nip ] [ create-group ] if ;
 
 : ss-point ( dx dy -- point )
-    [ oversampling /f ] 2apply 0.0 3float-array ;
+    [ oversampling /f ] bi@ 0.0 3float-array ;
 
 : ss-grid ( -- ss-grid )
     oversampling [ oversampling [ ss-point ] with map ] map ;
@@ -150,7 +150,7 @@ DEFER: create ( level c r -- scene )
 : pixel-grid ( -- grid )
     size reverse [
         size [
-            [ size 0.5 * - ] 2apply swap size
+            [ size 0.5 * - ] bi@ swap size
             3float-array
         ] with map
     ] map ;

@@ -68,17 +68,6 @@ ARTICLE: "evaluator" "Evaluation semantics"
 "If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $snippet "tail-recursion" } " and allows iterative algorithms to execute without incurring unbounded call stack usage."
 { $see-also "compiler" } ;
 
-ARTICLE: "dataflow" "Data and control flow"
-{ $subsection "evaluator" }
-{ $subsection "words" }
-{ $subsection "effects" }
-{ $subsection "shuffle-words" }
-{ $subsection "booleans" }
-{ $subsection "conditionals" }
-{ $subsection "basic-combinators" }
-{ $subsection "combinators" }
-{ $subsection "continuations" } ;
-
 USING: concurrency.combinators
 concurrency.messaging
 concurrency.promises
@@ -217,6 +206,7 @@ ARTICLE: "tools" "Developer tools"
 { $subsection "tools.vocabs" }
 "Exploratory tools:"
 { $subsection "editor" }
+{ $subsection "listener" }
 { $subsection "tools.crossref" }
 { $subsection "inspector" }
 "Debugging tools:"

@@ -13,6 +13,12 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! : cd ( path -- ) current-directory set ;
+
+: cd ( path -- ) set-current-directory ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : prepare-build-machine ( -- )
   builds make-directory
   builds cd
@@ -42,15 +48,31 @@ IN: builder
 
 : record-git-id ( -- ) git-id "../git-id" utf8 [ . ] with-file-writer ;
 
-: do-make-clean ( -- ) { "make" "clean" } try-process ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: gnu-make ( -- string )
+  os { "freebsd" "openbsd" "netbsd" } member?
+    [ "gmake" ]
+    [ "make"  ]
+  if ;
+
+! : do-make-clean ( -- ) { "make" "clean" } try-process ;
+
+: do-make-clean ( -- ) { gnu-make "clean" } to-strings try-process ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! : make-vm ( -- desc )
+!   <process>
+!     { "make" }       >>command
+!     "../compile-log" >>stdout
+!     +stdout+         >>stderr ;
+
 : make-vm ( -- desc )
   <process>
-    { "make" }       >>command
-    "../compile-log" >>stdout
-    +stdout+         >>stderr ;
+    { gnu-make } to-strings >>command
+    "../compile-log"        >>stdout
+    +stdout+                >>stderr ;
 
 : do-make-vm ( -- )
   make-vm [ "vm compile error" print "../compile-log" cat ] run-or-bail ;

@@ -1,7 +1,7 @@
 IN: tools.deploy.tests
 USING: tools.test system io.files kernel tools.deploy.config
 tools.deploy.backend math sequences io.launcher arrays
-namespaces continuations ;
+namespaces continuations layouts ;
 
 : shake-and-bake ( vocab -- )
     [ "test.image" temp-file delete-file ] ignore-errors
@@ -17,7 +17,7 @@ namespaces continuations ;
 [ ] [ "hello-world" shake-and-bake ] unit-test
 
 [ t ] [
-    500000 small-enough?
+    cell 8 = 8 5 ? 100000 * small-enough?
 ] unit-test
 
 [ ] [ "sudoku" shake-and-bake ] unit-test

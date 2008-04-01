@@ -5,16 +5,18 @@ namespaces prettyprint sequences strings vectors words
 quotations inspector io.styles io combinators sorting
 splitting math.parser effects continuations debugger 
 io.files io.streams.string vocabs io.encodings.utf8
-source-files classes hashtables compiler.errors compiler.units ;
+source-files classes hashtables compiler.errors compiler.units
+accessors ;
 IN: parser
 
 TUPLE: lexer text line line-text line-length column ;
 
 : next-line ( lexer -- )
-    0 over set-lexer-column
-    dup lexer-line over lexer-text ?nth over set-lexer-line-text
-    dup lexer-line-text length over set-lexer-line-length
-    dup lexer-line 1+ swap set-lexer-line ;
+    dup [ line>> ] [ text>> ] bi ?nth >>line-text
+    dup line-text>> length >>line-length
+    [ 1+ ] change-line
+    0 >>column
+    drop ;
 
 : <lexer> ( text -- lexer )
     0 { set-lexer-text set-lexer-line } lexer construct
@@ -159,8 +161,7 @@ TUPLE: parse-error file line col text ;
 
 : <parse-error> ( msg -- error )
     file get
-    lexer get
-    { lexer-line lexer-column lexer-line-text } get-slots
+    lexer get [ line>> ] [ column>> ] [ line-text>> ] tri
     parse-error construct-boa
     [ set-delegate ] keep ;
 
@@ -251,13 +252,13 @@ PREDICATE: unexpected-eof < unexpected
         [ "Use the word " swap summary append ] keep
     ] { } map>assoc ;
 
-TUPLE: no-word name ;
+TUPLE: no-word-error name ;
 
-M: no-word summary
+M: no-word-error summary
     drop "Word not found in current vocabulary search path" ;
 
 : no-word ( name -- newword )
-    dup \ no-word construct-boa
+    dup no-word-error construct-boa
     swap words-named [ forward-reference? not ] subset
     word-restarts throw-restarts
     dup word-vocabulary (use+) ;
@@ -366,6 +367,10 @@ ERROR: bad-number ;
 
 : (M:) CREATE-METHOD parse-definition ;
 
+: scan-object ( -- object )
+    scan-word dup parsing?
+    [ V{ } clone swap execute first ] when ;
+
 GENERIC: expected>string ( obj -- str )
 
 M: f expected>string drop "end of input" ;
@@ -470,7 +475,7 @@ SYMBOL: interactive-vocabs
 
 : removed-definitions ( -- definitions )
     new-definitions old-definitions
-    [ get first2 union ] 2apply diff ;
+    [ get first2 union ] bi@ diff ;
 
 : smudged-usage ( -- usages referenced removed )
     removed-definitions filter-moved keys [

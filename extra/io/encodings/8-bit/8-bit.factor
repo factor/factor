@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.parser arrays io.encodings sequences kernel
-assocs hashtables io.encodings.ascii combinators.cleave
-generic parser tuples words io io.files splitting namespaces
-math compiler.units accessors ;
+USING: math.parser arrays io.encodings sequences kernel assocs
+hashtables io.encodings.ascii generic parser classes.tuple words
+io io.files splitting namespaces math compiler.units accessors ;
 IN: io.encodings.8-bit
 
 <PRIVATE

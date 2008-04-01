@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel macros sequences slots words mirrors ;
-IN: tuples.lib
+IN: classes.tuple.lib
 
 : reader-slots ( seq -- quot )
     [ slot-spec-reader ] map [ get-slots ] curry ;

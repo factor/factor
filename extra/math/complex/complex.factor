@@ -8,11 +8,11 @@ math.functions.private sequences parser ;
 M: real real-part ;
 M: real imaginary-part drop 0 ;
 
-M: complex absq >rect [ sq ] 2apply + ;
+M: complex absq >rect [ sq ] bi@ + ;
 
 : 2>rect ( x y -- xr yr xi yi )
-    [ [ real-part ] 2apply ] 2keep
-    [ imaginary-part ] 2apply ; inline
+    [ [ real-part ] bi@ ] 2keep
+    [ imaginary-part ] bi@ ; inline
 
 M: complex number=
     2>rect number= [ number= ] [ 2drop f ] if ;

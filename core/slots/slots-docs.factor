@@ -1,6 +1,6 @@
 USING: help.markup help.syntax generic kernel.private parser
 words kernel quotations namespaces sequences words arrays
-effects generic.standard tuples slots.private classes
+effects generic.standard classes.tuple slots.private classes
 strings math ;
 IN: slots
 

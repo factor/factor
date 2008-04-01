@@ -1,7 +1,8 @@
 USING: kernel words inspector slots quotations sequences assocs
 math arrays inference effects shuffle continuations debugger
-tuples namespaces vectors bit-arrays byte-arrays strings sbufs
-math.functions macros sequences.private combinators mirrors ;
+classes.tuple namespaces vectors bit-arrays byte-arrays strings
+sbufs math.functions macros sequences.private combinators
+mirrors combinators.lib ;
 IN: inverse
 
 TUPLE: fail ;
@@ -59,37 +60,43 @@ PREDICATE: math-inverse < word "math-inverse" word-prop ;
 PREDICATE: pop-inverse < word "pop-length" word-prop ;
 UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
-: inline-word ( word -- )
-    {
-        { [ dup word? not over symbol? or ] [ , ] }
-        { [ dup explicit-inverse? ] [ , ] }
-        ! { [ dup compound? over { if dispatch } member? not and ]
-          ! [ word-def [ inline-word ] each ] }
-        { [ dup word? over { if dispatch } member? not and ]
-          [ word-def [ inline-word ] each ] }
-        { [ drop t ] [ "Quotation is not invertible" throw ] }
-    } cond ;
+: enough? ( stack quot -- ? )
+    [ >r length r> 1quotation infer effect-in >= ] [ 3drop f ]
+    recover ;
 
-: math-exp? ( n n word -- ? )
-    { + - * / ^ } member? -rot [ number? ] both? and ;
+: fold-word ( stack quot -- stack )
+    2dup enough?
+    [ 1quotation with-datastack ] [ >r % r> , { } ] if ;
 
-: (fold-constants) ( quot -- )
-    dup length 3 < [ % ] [
-        dup first3 3dup math-exp?
-        [ execute , 3 ] [ 2drop , 1 ] if
-        tail-slice (fold-constants) 
-    ] if ;
+: fold ( quot -- folded-quot )
+    [ { } swap [ fold-word ] each % ] [ ] make ; 
 
-: fold-constants ( quot -- folded )
-    [ (fold-constants) ] [ ] make ;
+: flattenable? ( object -- ? )
+    [ [ word? ] [ primitive? not ] and? ] [
+        { "inverse" "math-inverse" "pop-inverse" }
+        [ word-prop ] with contains? not
+    ] and? ; 
 
-: do-inlining ( quot -- inlined-quot )
-    [ [ inline-word ] each ] [ ] make fold-constants ;
+: (flatten) ( quot -- )
+    [ dup flattenable? [ word-def (flatten) ] [ , ] if ] each ;
+
+ : retain-stack-overflow? ( error -- ? )
+    { "kernel-error" 14 f f } = ;
+
+: flatten ( quot -- expanded )
+    [ [ (flatten) ] [ ] make ] [
+        dup retain-stack-overflow?
+        [ drop "No inverse defined on recursive word" ] when
+        throw
+    ] recover ;
 
 GENERIC: inverse ( revquot word -- revquot* quot )
 
 M: object inverse undo-literal ;
+
 M: symbol inverse undo-literal ;
+
+M: word inverse drop "Inverse is undefined" throw ;
 
 M: normal-inverse inverse
     "inverse" word-prop ;
@@ -108,7 +115,7 @@ M: pop-inverse inverse
     [ unclip-slice inverse % (undo) ] if ;
 
 : [undo] ( quot -- undo )
-    do-inlining reverse [ (undo) ] [ ] make ;
+    flatten fold reverse [ (undo) ] [ ] make ;
 
 MACRO: undo ( quot -- ) [undo] ;
 
@@ -144,10 +151,10 @@ MACRO: undo ( quot -- ) [undo] ;
 \ - [ + ] [ - ] define-math-inverse
 \ * [ / ] [ / ] define-math-inverse
 \ / [ * ] [ / ] define-math-inverse
-\ ^ [ recip ^ ] [ [ log ] 2apply / ] define-math-inverse
+\ ^ [ recip ^ ] [ [ log ] bi@ / ] define-math-inverse
 
 \ ? 2 [
-    [ assert-literal ] 2apply
+    [ assert-literal ] bi@
     [ swap >r over = r> swap [ 2drop f ] [ = [ t ] [ fail ] if ] if ]
     2curry
 ] define-pop-inverse

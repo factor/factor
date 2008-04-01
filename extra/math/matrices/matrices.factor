@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences math math.functions
-math.vectors combinators.cleave ;
+math.vectors ;
 IN: math.matrices
 
 ! Matrices

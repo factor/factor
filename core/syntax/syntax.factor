@@ -3,7 +3,7 @@
 USING: alien arrays bit-arrays bit-vectors byte-arrays
 byte-vectors definitions generic hashtables kernel math
 namespaces parser sequences strings sbufs vectors words
-quotations io assocs splitting tuples generic.standard
+quotations io assocs splitting classes.tuple generic.standard
 generic.math classes io.files vocabs float-arrays float-vectors
 classes.union classes.mixin classes.predicate compiler.units
 combinators debugger ;
@@ -171,9 +171,7 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "FORGET:" [
-        scan-word
-        dup parsing? [ V{ } clone swap execute first ] when
-        forget
+        scan-object forget
     ] define-syntax
 
     "(" [

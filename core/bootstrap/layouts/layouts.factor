@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math words kernel alien byte-arrays
 hashtables vectors strings sbufs arrays bit-arrays
-float-arrays quotations assocs layouts tuples tuples.private ;
+float-arrays quotations assocs layouts classes.tuple.private ;
 
 BIN: 111 tag-mask set
 8 num-tags set

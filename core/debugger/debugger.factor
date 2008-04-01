@@ -3,7 +3,7 @@
 USING: arrays definitions generic hashtables inspector io kernel
 math namespaces prettyprint sequences assocs sequences.private
 strings io.styles vectors words system splitting math.parser
-tuples continuations continuations.private combinators
+classes.tuple continuations continuations.private combinators
 generic.math io.streams.duplex classes compiler.units
 generic.standard vocabs threads threads.private init
 kernel.private libc io.encodings ;
@@ -82,7 +82,7 @@ ERROR: assert got expect ;
 : depth ( -- n ) datastack length ;
 
 : trim-datastacks ( seq1 seq2 -- seq1' seq2' )
-    2dup [ length ] 2apply min tuck tail >r tail r> ;
+    2dup [ length ] bi@ min tuck tail >r tail r> ;
 
 ERROR: relative-underflow stack ;
 

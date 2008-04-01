@@ -5,7 +5,7 @@ ui.backend ui.clipboards ui.gadgets.worlds assocs kernel math
 namespaces opengl sequences strings x11.xlib x11.events x11.xim
 x11.glx x11.clipboard x11.constants x11.windows io.encodings.string
 io.encodings.utf8 combinators debugger system command-line
-ui.render math.vectors tuples opengl.gl threads ;
+ui.render math.vectors classes.tuple opengl.gl threads ;
 IN: ui.x11
 
 TUPLE: x11-ui-backend ;

@@ -1,6 +1,6 @@
 USING: generic help.syntax help.markup kernel math parser words
-effects classes generic.standard tuples generic.math arrays
-io.files vocabs.loader io sequences assocs ;
+effects classes generic.standard classes.tuple generic.math
+arrays io.files vocabs.loader io sequences assocs ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"

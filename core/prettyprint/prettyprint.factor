@@ -1,11 +1,11 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint
 USING: alien arrays generic generic.standard assocs io kernel
 math namespaces sequences strings io.styles io.streams.string
 vectors words prettyprint.backend prettyprint.sections
 prettyprint.config sorting splitting math.parser vocabs
-definitions effects tuples io.files classes continuations
+definitions effects classes.tuple io.files classes continuations
 hashtables classes.mixin classes.union classes.predicate
 combinators quotations ;
 
@@ -114,7 +114,7 @@ SYMBOL: ->
 
 : remove-breakpoints ( quot pos -- quot' )
     over quotation? [
-        1+ cut [ (remove-breakpoints) ] 2apply
+        1+ cut [ (remove-breakpoints) ] bi@
         [ -> ] swap 3append
     ] [
         drop
@@ -260,7 +260,7 @@ M: tuple-class see-class*
     dup superclass tuple eq? [
         "<" text dup superclass pprint-word
     ] unless
-    "slot-names" word-prop [ text ] each
+    slot-names [ text ] each
     pprint-; block> ;
 
 M: word see-class* drop ;

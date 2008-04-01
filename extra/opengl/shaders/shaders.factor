@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl.gl alien.c-types continuations namespaces
-assocs alien libc opengl math sequences combinators.lib 
-combinators.cleave macros arrays ;
+assocs alien libc opengl math sequences combinators
+combinators.lib macros arrays ;
 IN: opengl.shaders
 
 : with-gl-shader-source-ptr ( string quot -- )

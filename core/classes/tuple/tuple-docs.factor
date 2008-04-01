@@ -1,7 +1,7 @@
 USING: generic help.markup help.syntax kernel
-tuples.private classes slots quotations words arrays
+classes.tuple.private classes slots quotations words arrays
 generic.standard sequences definitions compiler.units ;
-IN: tuples
+IN: classes.tuple
 
 ARTICLE: "tuple-constructors" "Constructors"
 "Tuples are created by calling one of two words:"
@@ -151,26 +151,14 @@ HELP: set-delegate
 HELP: tuple=
 { $values { "tuple1" tuple } { "tuple2" tuple } { "?" "a boolean" } }
 { $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
-{ $warning "This word is in the " { $vocab-link "tuples.private" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
-
-HELP: permutation
-{ $values { "seq1" sequence } { "seq2" sequence } { "permutation" "a sequence whose elements are integers or " { $link f } } }
-{ $description "Outputs a permutation for taking " { $snippet "seq1" } " to " { $snippet "seq2" } "." } ;
-
-HELP: reshape-tuple
-{ $values { "oldtuple" tuple } { "permutation" "a sequence whose elements are integers or " { $link f } } { "newtuple" tuple } }
-{ $description "Permutes the slots of a tuple. If a tuple class is redefined at runtime, this word is called on every instance to change its shape to conform to the new layout." } ;
-
-HELP: reshape-tuples
-{ $values { "class" tuple-class } { "newslots" "a sequence of strings" } }
-{ $description "Changes the shape of every instance of " { $snippet "class" } " for a new slot layout." } ;
+{ $warning "This word is in the " { $vocab-link "classes.tuple.private" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
 
 HELP: removed-slots
 { $values { "class" tuple-class } { "newslots" "a sequence of strings" } { "seq" "a sequence of strings" } }
 { $description "Outputs the sequence of existing tuple slot names not in " { $snippet "newslots" } "." } ;
 
-HELP: forget-slots
-{ $values { "class" tuple-class } { "newslots" "a sequence of strings" } }
+HELP: forget-removed-slots
+{ $values { "class" tuple-class } { "slots" "a sequence of strings" } }
 { $description "Forgets accessor words for existing tuple slots which are not in " { $snippet "newslots" } "." } ;
 
 HELP: tuple
