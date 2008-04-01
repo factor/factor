@@ -1,5 +1,5 @@
 
-USING: kernel sequences macros combinators ;
+USING: kernel arrays sequences macros combinators ;
 
 IN: combinators.cleave
 
@@ -22,9 +22,26 @@ MACRO: <2arr> ( seq -- )
  '[ , 2cleave , narray ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: {1} ( x     -- {x}     ) 1array ; inline
+: {2} ( x y   -- {x,y}   ) 2array ; inline
+: {3} ( x y z -- {x,y,z} ) 3array ; inline
+
+: {n} narray ;
+
+: {bi}  ( x p q   -- {p(x),q(x)}      ) bi  {2} ; inline
+
+: {tri} ( x p q r -- {p(x),q(x),r(x)} ) tri {3} ; inline
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Spread into array
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 MACRO: <arr*> ( seq -- )
   [ >quots ] [ length ] bi
  '[ , spread , narray ] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: {bi*}  ( x y p q     -- {p(x),q(y)}      ) bi*  {2} ; inline
+: {tri*} ( x y z p q r -- {p(x),q(y),r(z)} ) tri* {3} ; inline
