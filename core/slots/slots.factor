@@ -23,9 +23,6 @@ C: <slot-spec> slot-spec
         [ drop ] [ 1array , \ declare , ] if
     ] [ ] make ;
 
-: slot-named ( name specs -- spec/f )
-    [ slot-spec-name = ] with find nip ;
-
 : create-accessor ( name effect -- word )
     >r "accessors" create dup r>
     "declared-effect" set-word-prop ;
@@ -82,3 +79,6 @@ C: <slot-spec> slot-spec
         dup slot-spec-offset swap slot-spec-name
         define-slot-methods
     ] with each ;
+
+: slot-named ( name specs -- spec/f )
+    [ slot-spec-name = ] with find nip ;

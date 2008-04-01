@@ -153,23 +153,11 @@ HELP: tuple=
 { $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
 { $warning "This word is in the " { $vocab-link "classes.tuple.private" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
 
-HELP: permutation
-{ $values { "seq1" sequence } { "seq2" sequence } { "permutation" "a sequence whose elements are integers or " { $link f } } }
-{ $description "Outputs a permutation for taking " { $snippet "seq1" } " to " { $snippet "seq2" } "." } ;
-
-HELP: reshape-tuple
-{ $values { "oldtuple" tuple } { "permutation" "a sequence whose elements are integers or " { $link f } } { "newtuple" tuple } }
-{ $description "Permutes the slots of a tuple. If a tuple class is redefined at runtime, this word is called on every instance to change its shape to conform to the new layout." } ;
-
-HELP: reshape-tuples
-{ $values { "class" tuple-class } { "superclass" class } { "newslots" "a sequence of strings" } }
-{ $description "Changes the shape of every instance of " { $snippet "class" } " for a new slot layout." } ;
-
 HELP: removed-slots
 { $values { "class" tuple-class } { "newslots" "a sequence of strings" } { "seq" "a sequence of strings" } }
 { $description "Outputs the sequence of existing tuple slot names not in " { $snippet "newslots" } "." } ;
 
-HELP: forget-slots
+HELP: forget-removed-slots
 { $values { "class" tuple-class } { "slots" "a sequence of strings" } }
 { $description "Forgets accessor words for existing tuple slots which are not in " { $snippet "newslots" } "." } ;
 

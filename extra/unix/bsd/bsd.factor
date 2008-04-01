@@ -24,16 +24,6 @@ IN: unix
 : F_SETFL 4 ; inline
 : O_NONBLOCK 4 ; inline
 
-C-STRUCT: addrinfo
-    { "int" "flags" }
-    { "int" "family" }
-    { "int" "socktype" }
-    { "int" "protocol" }
-    { "socklen_t" "addrlen" }
-    { "char*" "canonname" }
-    { "void*" "addr" }
-    { "addrinfo*" "next" } ;
-
 C-STRUCT: sockaddr-in
     { "uchar" "len" }
     { "uchar" "family" }

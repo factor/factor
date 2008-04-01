@@ -95,6 +95,19 @@ HELP: optional
     "Returns a parser that parses 0 or 1 instances of the 'p1' parser. The AST produced is "
     "'f' if 0 instances are parsed the AST produced is 'f', otherwise it is the AST produced by 'p1'." } ;
 
+HELP: semantic
+{ $values 
+  { "parser" "a parser" } 
+  { "quot" "a quotation with stack effect ( object -- bool )" } 
+}
+{ $description 
+    "Returns a parser that succeeds if the 'p1' parser succeeds and the quotation called with "
+    "the AST produced by 'p1' on the stack returns true." }
+{ $examples 
+  { $example "\"A\" [ drop t ] satisfy [ 66 > ] semantic parse" "f" } 
+  { $example "\"C\" [ drop t ] satisfy [ 66 > ] semantic parse parse-result-ast " "67" } 
+} ;
+
 HELP: ensure
 { $values 
   { "parser" "a parser" } 
@@ -124,7 +137,7 @@ HELP: action
     "Returns a parser that calls the 'p1' parser and applies the quotation to the AST resulting "
     "from that parse. The result of the quotation is then used as the final AST. This can be used "
     "for manipulating the parse tree to produce a AST better suited for the task at hand rather than "
-    "the default AST." }
+    "the default AST. If the quotation returns " { $link fail } " then the parser fails." }
 { $code "CHAR: 0 CHAR: 9 range [ to-digit ] action" } ;
 
 HELP: sp
