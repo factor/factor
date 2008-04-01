@@ -76,10 +76,10 @@ PRIVATE>
     dup first 2 tail* swap second 2 head = ;
 
 : clean ( seq -- seq )
-    [ unclip 1 head add* concat ] map [ all-unique? ] subset ;
+    [ unclip 1 head prefix concat ] map [ all-unique? ] subset ;
 
 : add-missing-digit ( seq -- seq )
-    dup natural-sort 10 seq-diff first add* ;
+    dup natural-sort 10 seq-diff first prefix ;
 
 : interesting-pandigitals ( -- seq )
     17 candidates { 13 11 7 5 3 2 } [

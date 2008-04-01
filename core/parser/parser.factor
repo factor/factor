@@ -294,7 +294,7 @@ M: no-word-error summary
     scan {
         { ";" [ tuple f ] }
         { "<" [ scan-word ";" parse-tokens ] }
-        [ >r tuple ";" parse-tokens r> add* ]
+        [ >r tuple ";" parse-tokens r> prefix ]
     } case ;
 
 ERROR: staging-violation word ;

@@ -38,7 +38,7 @@ reset-gl-function-number-counter
     gl-function-calling-convention
     scan
     scan dup
-    scan drop "}" parse-tokens swap add*
+    scan drop "}" parse-tokens swap prefix
     gl-function-number
     [ gl-function-pointer ] 2curry swap
     ";" parse-tokens [ "()" subseq? not ] subset

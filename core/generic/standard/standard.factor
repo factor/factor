@@ -34,8 +34,8 @@ ERROR: no-method object generic ;
 : empty-method ( word -- quot )
     [
         picker % [ delegate dup ] %
-        unpicker over add ,
-        error-method \ drop add* , \ if ,
+        unpicker over suffix ,
+        error-method \ drop prefix , \ if ,
     ] [ ] make ;
 
 : class-predicates ( assoc -- assoc )
@@ -137,7 +137,7 @@ ERROR: no-method object generic ;
     ] if ;
 
 : standard-methods ( word -- alist )
-    dup methods swap default-method add*
+    dup methods swap default-method prefix
     [ 1quotation ] assoc-map ;
 
 M: standard-combination make-default-method

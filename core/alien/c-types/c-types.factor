@@ -45,7 +45,7 @@ GENERIC: c-type ( name -- type ) foldable
 
 : parse-array-type ( name -- array )
     "[" split unclip
-    >r [ "]" ?tail drop string>number ] map r> add* ;
+    >r [ "]" ?tail drop string>number ] map r> prefix ;
 
 M: string c-type ( name -- type )
     CHAR: ] over member? [
@@ -162,7 +162,7 @@ DEFER: >c-ushort-array
     >r >c-ushort-array r> byte-array>memory ;
 
 : (define-nth) ( word type quot -- )
-    >r heap-size [ rot * ] swap add* r> append define-inline ;
+    >r heap-size [ rot * ] swap prefix r> append define-inline ;
 
 : nth-word ( name vocab -- word )
     >r "-nth" append r> create ;
@@ -199,12 +199,12 @@ M: long-long-type box-return ( type -- )
     f swap box-parameter ;
 
 : define-deref ( name vocab -- )
-    >r dup CHAR: * add* r> create
-    swap c-getter 0 add* define-inline ;
+    >r dup CHAR: * prefix r> create
+    swap c-getter 0 prefix define-inline ;
 
 : define-out ( name vocab -- )
     over [ <c-object> tuck 0 ] over c-setter append swap
-    >r >r constructor-word r> r> add* define-inline ;
+    >r >r constructor-word r> r> prefix define-inline ;
 
 : c-bool> ( int -- ? )
     zero? not ;
@@ -257,7 +257,7 @@ M: long-long-type box-return ( type -- )
     #! staging violations
     dup array? [
         unclip >r [ dup word? [ word-def call ] when ] map
-        r> add*
+        r> prefix
     ] when ;
 
 : malloc-file-contents ( path -- alien len )

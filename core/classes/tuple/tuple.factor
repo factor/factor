@@ -34,7 +34,7 @@ PRIVATE>
 : tuple>array ( tuple -- array )
     dup tuple-layout
     [ layout-size swap [ array-nth ] curry map ] keep
-    layout-class add* ;
+    layout-class prefix ;
 
 : >tuple ( seq -- tuple )
     dup first tuple-layout <tuple> [
