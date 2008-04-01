@@ -39,9 +39,7 @@ ERROR: no-method object generic ;
     ] [ ] make ;
 
 : class-predicates ( assoc -- assoc )
-    [
-        >r >r picker r> "predicate" word-prop append r>
-    ] assoc-map ;
+    [ >r "predicate" word-prop picker prepend r> ] assoc-map ;
 
 : (simplify-alist) ( class i assoc -- default assoc )
     2dup length 1- = [
