@@ -1,14 +1,13 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators combinators.cleave continuations db db.tuples db.types db.sqlite hashtables kernel math math.parser namespaces new-slots parser sequences sequences.deep sequences.lib strings words ;
+USING: accessors arrays combinators combinators.cleave combinators.lib
+continuations db db.tuples db.types db.sqlite hashtables kernel math
+math.parser namespaces parser sequences sequences.deep
+sequences.lib strings words ;
 IN: semantic-db
 
 TUPLE: node id content ;
-: <node> ( content -- node )
-    node construct-empty swap >>content ;
-
-: <id-node> ( id -- node )
-    node construct-empty swap >>id ;
+C: <node> node
 
 node "node"
 {
@@ -16,15 +15,14 @@ node "node"
     { "content" "content" TEXT }
 } define-persistent
 
-: delete-node ( node-id -- )
-    <id-node> delete-tuple ;
+: delete-node ( node -- ) delete-tuple ;
+: create-node ( content -- node ) f swap <node> dup insert-tuple ;
+: load-node ( id -- node ) f <node> select-tuple ;
 
-: create-node ( str -- node-id )
-    <node> dup insert-tuple id>> ;
+: node-content ( node -- content )
+    dup content>> [ nip ] [ select-tuple content>> ] if* ;
 
-: node-content ( id -- str )
-    <id-node> select-tuple content>> ;
-
+! TODO: get rid of arc id and write our own sql
 TUPLE: arc id subject object relation ;
 
 : <arc> ( subject object relation -- arc )
@@ -33,42 +31,50 @@ TUPLE: arc id subject object relation ;
 : <id-arc> ( id -- arc )
     arc construct-empty swap >>id ;
 
-: insert-arc ( arc -- )
-    f <node> dup insert-tuple id>> >>id insert-tuple ;
+: delete-arc ( arc -- ) delete-tuple ;
 
-: delete-arc ( arc-id -- )
-    dup delete-node <id-arc> delete-tuple ;
+: create-arc ( subject object relation -- )
+    [ id>> ] 3apply <arc> insert-tuple ;
 
-: create-arc ( subject object relation -- arc-id )
-    <arc> dup insert-arc id>> ;
-
-: has-arc? ( subject object relation -- ? )
-    <arc> select-tuples length 0 > ;
+: nodes>arc ( subject object relation -- arc )
+    [ [ id>> ] [ f ] if* ] 3apply <arc> ;
 
 : select-arcs ( subject object relation -- arcs )
-    <arc> select-tuples ;
+    nodes>arc select-tuples ;
 
-: select-arc-ids ( subject object relation -- arc-ids )
-    select-arcs [ id>> ] map ;
+: has-arc? ( subject object relation -- ? )
+    select-arcs length 0 > ;
 
-: select-arc-subjects ( subject object relation -- subject-ids )
-    select-arcs [ subject>> ] map ;
+: select-arc-subjects ( subject object relation -- subjects )
+    select-arcs [ subject>> f <node> ] map ;
 
-: select-subjects ( object relation -- subject-ids )
+: select-arc-subject ( subject object relation -- subject )
+    select-arcs ?first [ subject>> f <node> ] [ f ] if* ;
+
+: select-subjects ( object relation -- subjects )
     f -rot select-arc-subjects ;
 
-: select-arc-objects ( subject object relation -- object-ids )
-    select-arcs [ object>> ] map ;
+: select-subject ( object relation -- subject )
+    f -rot select-arc-subject ;
 
-: select-objects ( subject relation -- object-ids )
+: select-arc-objects ( subject object relation -- objects )
+    select-arcs [ object>> f <node> ] map ;
+
+: select-arc-object ( subject object relation -- object )
+    select-arcs ?first [ object>> f <node> ] [ f ] if* ;
+
+: select-objects ( subject relation -- objects )
     f swap select-arc-objects ;
 
+: select-object ( subject relation -- object )
+    f swap select-arc-object ;
+
 : delete-arcs ( subject object relation -- )
-    select-arcs [ id>> delete-arc ] each ;
+    select-arcs [ delete-arc ] each ;
 
 arc "arc"
 {
-    { "id" "id" INTEGER +assigned-id+ } ! foreign key to node table?
+    { "id" "id" +native-id+ +autoincrement+ }
     { "relation" "relation" INTEGER +not-null+ }
     { "subject" "subject" INTEGER +not-null+ }
     { "object" "object" INTEGER +not-null+ }
@@ -78,66 +84,99 @@ arc "arc"
     "semantic-db" create-node drop
     "has-context" create-node drop ;
 
-: semantic-db-context  1 ;
-: has-context-relation 2 ;
+: semantic-db-context  T{ node f 1 "semantic-db" } ;
+: has-context-relation T{ node f 2 "has-context" } ;
 
 : create-bootstrap-arcs ( -- )
-    has-context-relation semantic-db-context has-context-relation create-arc drop ;
+    has-context-relation semantic-db-context has-context-relation create-arc ;
 
 : init-semantic-db ( -- )
-    node create-table
-    arc create-table
+    node create-table arc create-table
     create-bootstrap-nodes create-bootstrap-arcs ;
 
-: param ( value key type -- param )
-    swapd 3array ;
+: param ( value key type -- param ) swapd 3array ;
 
-: single-int-results ( bindings sql -- array )
-    f f <simple-statement> [ do-bound-query ] with-disposal
-    [ first string>number ] map ;
+! db utilities
+: results ( bindings sql -- array )
+    f f <simple-statement> [ do-bound-query ] with-disposal ;
 
-: ensure1 ( x quot1 quot2 -- y )
-    #! quot1 ( x -- y/f ) tries to find an existing y
-    #! quot2 ( x -- y ) creates a new y if quot1 returns f
-    >r dupd call [ nip ] r> if* ;
+: node-result ( result -- node )
+    dup first string>number swap second <node> ;
 
-: ensure2 ( x y quot1 quot2 -- z )
-    #! quot1 ( x y -- z/f ) tries to find an existing z
-    #! quot2 ( x y -- z ) creates a new z if quot1 returns f
-    >r >r 2dup r> call [ 2nip ] r> if* ;
+: ?1node-result ( results -- node )
+    ?first [ node-result ] [ f ] if* ;
+
+: node-results ( results -- nodes )
+    [ node-result ] map ;
+
+: subjects-with-cor ( content object relation -- sql-results )
+    [ id>> ] 2apply
+    [
+        ":relation" INTEGER param ,
+        ":object" INTEGER param ,
+        ":content" TEXT param ,
+    ] { } make
+    "select n.id, n.content from node n, arc a where n.content = :content and n.id = a.subject and a.relation = :relation and a.object = :object" results ;
+
+: objects-with-csr ( content subject relation -- sql-results )
+    [ id>> ] 2apply
+    [
+        ":relation" INTEGER param ,
+        ":subject" INTEGER param ,
+        ":content" TEXT param ,
+    ] { } make
+    "select n.id, n.content from node n, arc a where n.content = :content and n.id = a.object and a.relation = :relation and a.subject = :subject" results ;
+
+: (with-relation) ( content relation -- bindings sql )
+    id>> [ ":relation" INTEGER param , ":content" TEXT param , ] { } make
+    "select distinct n.id, n.content from node n, arc a where n.content = :content and a.relation = :relation" ;
+
+: subjects-with-relation ( content relation -- sql-results )
+    (with-relation) " and a.object = n.id" append results ;
+
+: objects-with-relation ( content relation -- sql-results )
+    (with-relation) " and a.subject = n.id" append results ;
+
+: (ultimate) ( relation b a -- sql-results )
+    [
+        "select distinct n.id, n.content from node n, arc a where a.relation = :relation and n.id = a." % % " and n.id not in (select b." % % " from arc b where b.relation = :relation)" %
+    ] "" make [ id>> ":relation" INTEGER param 1array ] dip results ;
+
+: ultimate-objects ( relation -- sql-results )
+    "subject" "object" (ultimate) ;
+
+: ultimate-subjects ( relation -- sql-results )
+    "object" "subject" (ultimate) ;
 
 ! contexts:
 !  - a node n is a context iff there exists a relation r such that r has context n
-: create-context ( context-name -- context-id ) create-node ;
+: create-context ( context-name -- context ) create-node ;
 
-: get-context ( context-name -- context-id/f )
-    [
-        ":name" TEXT param ,
-        has-context-relation ":has_context" INTEGER param ,
-    ] { } make
-    "select distinct n.id from node n, arc a where n.content = :name and a.relation = :has_context and a.object = n.id"
-    single-int-results ?first ;
+: get-context ( context-name -- context/f )
+    has-context-relation subjects-with-relation ?1node-result ;
 
-: context-id ( context-name -- context-id )
-    [ get-context ] [ create-context ] ensure1 ;
+: ensure-context ( context-name -- context )
+    dup get-context [
+        nip
+    ] [
+        create-context
+    ] if* ;
 
 ! relations:
 !  - have a context in context 'semantic-db'
 
-: create-relation ( relation-name context-id -- relation-id )
-    [ create-node dup ] dip has-context-relation create-arc drop ;
+: create-relation ( relation-name context -- relation )
+    [ create-node dup ] dip has-context-relation create-arc ;
 
-: get-relation ( relation-name context-id -- relation-id/f )
-    [
-        ":context" INTEGER param ,
-        ":name" TEXT param ,
-        has-context-relation ":has_context" INTEGER param ,
-    ] { } make
-    "select n.id from node n, arc a where n.content = :name and n.id = a.subject and a.relation = :has_context and a.object = :context"
-    single-int-results ?first ;
+: get-relation ( relation-name context -- relation/f )
+    has-context-relation subjects-with-cor ?1node-result ;
 
-: relation-id ( relation-name context-id -- relation-id )
-    [ get-relation ] [ create-relation ] ensure2 ;
+: ensure-relation ( relation-name context -- relation )
+    2dup get-relation [
+        2nip
+    ] [
+        create-relation
+    ] if* ;
 
 TUPLE: relation-definition relate id-word unrelate related? subjects objects ;
 C: <relation-definition> relation-definition
@@ -181,7 +220,7 @@ C: <relation-definition> relation-definition
 
 : define-id-word ( relation-definition id-word -- )
     [ relate>> ] dip tuck word-vocabulary
-    [ context-id relation-id ] 2curry define ;
+    [ ensure-context ensure-relation ] 2curry define ;
 
 : create-id-word ( relation-definition -- id-word )
     dup id-word>> "id-word" choose-word-name create-in ;
@@ -195,22 +234,46 @@ PRIVATE>
     scan t t t t t <relation-definition> define-relation ; parsing
 
 ! hierarchy
-TUPLE: tree id children ;
-C: <tree> tree
+TUPLE: node-tree node children ;
+C: <node-tree> node-tree
 
-: children ( node-id has-parent-relation -- children ) select-subjects ;
-: parents ( node-id has-parent-relation -- parents ) select-objects ;
+: children ( node has-parent-relation -- children ) select-subjects ;
+: parents ( node has-parent-relation -- parents ) select-objects ;
 
-: get-node-hierarchy ( node-id has-parent-relation -- tree )
-    2dup children >r [ get-node-hierarchy ] curry r> swap map <tree> ;
+: get-node-tree ( node child-selector -- node-tree )
+    2dup call >r [ get-node-tree ] curry r> swap map <node-tree> ;
 
-: (get-root-nodes) ( node-id has-parent-relation -- root-nodes/node-id )
+! : get-node-tree ( node has-parent-relation -- node-tree )
+!     2dup children >r [ get-node-tree ] curry r> swap map <node-tree> ;
+: get-node-tree-s ( node has-parent-relation -- tree )
+    [ select-subjects ] curry get-node-tree ;
+
+: get-node-tree-o ( node has-child-relation -- tree )
+    [ select-objects ] curry get-node-tree ;
+
+: (get-node-chain) ( node next-selector seq -- seq )
+    pick [
+        over push >r [ call ] keep r> (get-node-chain)
+    ] [
+        2nip
+    ] if* ;
+
+: get-node-chain ( node next-selector -- seq )
+    V{ } clone (get-node-chain) ;
+
+: get-node-chain-o ( node relation -- seq )
+    [ select-object ] curry get-node-chain ;
+
+: get-node-chain-s ( node relation -- seq )
+    [ select-subject ] curry get-node-chain ;
+
+: (get-root-nodes) ( node has-parent-relation -- root-nodes/node )
     2dup parents dup empty? [
         2drop
     ] [
         >r nip [ (get-root-nodes) ] curry r> swap map
     ] if ;
 
-: get-root-nodes ( node-id has-parent-relation -- root-nodes )
+: get-root-nodes ( node has-parent-relation -- root-nodes )
     (get-root-nodes) flatten prune ;
 
