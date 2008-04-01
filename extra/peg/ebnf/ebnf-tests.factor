@@ -180,6 +180,55 @@ IN: peg.ebnf.tests
   { 1 2 "a" 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call parse-result-ast
 ] unit-test
 
+{ f } [
+  "ab" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call 
+] unit-test
+
+{ V{ "a" " " "b" } } [
+  "a b" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" "\t" "b" } } [
+  "a\tb" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call parse-result-ast 
+] unit-test
+
+{ V{ "a" "\n" "b" } } [
+  "a\nb" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" f "b" } } [
+  "ab" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" " " "b" } } [
+  "a b" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+] unit-test
+
+
+{ V{ "a" "\t" "b" } } [
+  "a\tb" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" "\n" "b" } } [
+  "a\nb" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" "b" } } [
+  "ab" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" "b" } } [
+  "a\tb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" "b" } } [
+  "a\nb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call parse-result-ast
+] unit-test
+
+{ f } [
+  "axb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call 
+] unit-test
+
 { V{ V{ 49 } "+" V{ 49 } } } [ 
   #! Test direct left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
@@ -200,7 +249,7 @@ IN: peg.ebnf.tests
 
 EBNF: primary 
 Primary = PrimaryNoNewArray
-PrimaryNoNewArray =  ClassInstanceCreationExpression 
+PrimaryNoNewArray =  ClassInstanceCreationExpression
                    | MethodInvocation
                    | FieldAccess
                    | ArrayAccess
@@ -211,7 +260,7 @@ MethodInvocation =  Primary "." MethodName "(" ")"
                   | MethodName "(" ")"
 FieldAccess =  Primary "." Identifier
              | "super" "." Identifier  
-ArrayAccess =  Primary "[" Expression "]"
+ArrayAccess =  Primary "[" Expression "]" 
              | ExpressionName "[" Expression "]"
 ClassOrInterfaceType = ClassName | InterfaceTypeName
 ClassName = "C" | "D"

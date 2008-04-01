@@ -3,7 +3,7 @@
 USING: kernel compiler.units parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
        peg.parsers unicode.categories multiline combinators.lib 
-       splitting accessors effects sequences.deep ;
+       splitting accessors effects sequences.deep peg.search ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -308,7 +308,7 @@ M: ebnf-var (transform) ( ast -- parser )
   dup vars get push [ dupd set ] curry action ;
 
 M: ebnf-terminal (transform) ( ast -- parser )
-  symbol>> token sp ;
+  symbol>> token ;
 
 : parser-not-found ( name -- * )
   [
@@ -317,7 +317,7 @@ M: ebnf-terminal (transform) ( ast -- parser )
 
 M: ebnf-non-terminal (transform) ( ast -- parser )
   symbol>>  [
-    , \ dup , parser get , \ at , [ parser-not-found ] , \ unless* , \ sp , \ nip ,   
+    , \ dup , parser get , \ at , [ parser-not-found ] , \ unless* , \ nip ,    
   ] [ ] make box ;
 
 : transform-ebnf ( string -- object )
@@ -340,10 +340,13 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   parse-result-ast transform dup dup parser [ main swap at compile ] with-variable
   [ compiled-parse ] curry [ with-scope ] curry ;
 
-: [EBNF "EBNF]" parse-multiline-string ebnf>quot nip parsed ; parsing
+: replace-escapes ( string -- string )
+  "\\t" token [ drop "\t" ] action  "\\n" token [ drop "\n" ] action 2choice replace ;
+
+: [EBNF "EBNF]" parse-multiline-string replace-escapes ebnf>quot nip parsed ; parsing
 
 : EBNF: 
   CREATE-WORD dup 
-  ";EBNF" parse-multiline-string
+  ";EBNF" parse-multiline-string replace-escapes
   ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop ; parsing
 
