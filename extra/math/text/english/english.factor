@@ -79,7 +79,7 @@ SYMBOL: and-needed?
     ] if ;
 
 : recombine ( seq -- str )
-    dup singleton? [
+    dup length 1 = [
         first 3digits>text
     ] [
         dup set-conjunction "" swap

@@ -98,9 +98,6 @@ MACRO: firstn ( n -- )
         v, [ pick ,, call [ v, ] unless ] curry 2each ,v
     ] { } make ;
 
-: singleton? ( seq -- ? )
-    length 1 = ;
-
 : delete-random ( seq -- value )
     [ length random ] keep [ nth ] 2keep delete-nth ;
 
