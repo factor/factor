@@ -3,8 +3,7 @@
 USING: classes.predicate kernel namespaces parser quotations
 sequences words prettyprint prettyprint.backend prettyprint.sections
 compiler.units classes ;
-USE: tools.walker
-IN: singleton
+IN: classes.singleton
 
 PREDICATE: singleton < predicate-class
     [ "predicate-definition" word-prop ]

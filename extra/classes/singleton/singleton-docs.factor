@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel words ;
-IN: singleton
+IN: classes.singleton
 
 HELP: SINGLETON:
 { $syntax "SINGLETON: class"
