@@ -1,4 +1,4 @@
-USING: kernel singleton tools.test ;
+USING: kernel singleton tools.test prettyprint io.streams.string ;
 IN: singleton.tests
 
 [ ] [ SINGLETON: bzzt ] unit-test
@@ -7,3 +7,6 @@ IN: singleton.tests
 GENERIC: zammo ( obj -- )
 [ ] [ M: bzzt zammo drop "yes!" ; ] unit-test
 [ "yes!" ] [ bzzt zammo ] unit-test
+[ ] [ SINGLETON: omg ] unit-test
+[ t ] [ omg singleton? ] unit-test
+[ "USING: singleton ;\nIN: singleton.tests\nSINGLETON: omg\n" ] [ [ omg see ] with-string-writer ] unit-test
