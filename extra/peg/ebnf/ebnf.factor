@@ -310,9 +310,14 @@ M: ebnf-var (transform) ( ast -- parser )
 M: ebnf-terminal (transform) ( ast -- parser )
   symbol>> token sp ;
 
+: parser-not-found ( name -- * )
+  [
+    "Parser " % % " not found." %
+  ] "" make throw ;
+
 M: ebnf-non-terminal (transform) ( ast -- parser )
   symbol>>  [
-    , parser get , \ at , \ sp ,   
+    , \ dup , parser get , \ at , [ parser-not-found ] , \ unless* , \ sp , \ nip ,   
   ] [ ] make box ;
 
 : transform-ebnf ( string -- object )
