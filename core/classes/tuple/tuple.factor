@@ -40,7 +40,7 @@ PRIVATE>
     [ drop ] [ no-tuple-class ] if ;
 
 : tuple>array ( tuple -- array )
-    prepare-tuple>array >r copy-tuple-slots r> layout-class add* ;
+    prepare-tuple>array >r copy-tuple-slots r> layout-class prefix ;
 
 : tuple-slots ( tuple -- array )
     prepare-tuple>array drop copy-tuple-slots ;
@@ -130,7 +130,7 @@ PRIVATE>
     ] with each ;
 
 : all-slot-names ( class -- slots )
-    superclasses [ slot-names ] map concat \ class add* ;
+    superclasses [ slot-names ] map concat \ class prefix ;
 
 : compute-slot-permutation ( class old-slot-names -- permutation )
     >r all-slot-names r> [ index ] curry map ;

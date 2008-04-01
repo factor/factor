@@ -138,10 +138,10 @@ C: <anonymous-complement> anonymous-complement
     members>> [ class-and ] with map <anonymous-union> ;
 
 : left-anonymous-intersection-and ( first second -- class )
-    >r members>> r> add <anonymous-intersection> ;
+    >r members>> r> suffix <anonymous-intersection> ;
 
 : right-anonymous-intersection-and ( first second -- class )
-    members>> swap add <anonymous-intersection> ;
+    members>> swap suffix <anonymous-intersection> ;
 
 : (class-and) ( first second -- class )
     {
@@ -158,10 +158,10 @@ C: <anonymous-complement> anonymous-complement
     } cond ;
 
 : left-anonymous-union-or ( first second -- class )
-    >r members>> r> add <anonymous-union> ;
+    >r members>> r> suffix <anonymous-union> ;
 
 : right-anonymous-union-or ( first second -- class )
-    members>> swap add <anonymous-union> ;
+    members>> swap suffix <anonymous-union> ;
 
 : (class-or) ( first second -- class )
     {

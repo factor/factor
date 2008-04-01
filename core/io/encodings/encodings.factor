@@ -59,7 +59,7 @@ M: tuple <decoder> f decoder construct-boa ;
     over decoder-cr [
         over cr-
         "\n" ?head [
-            over stream-read1 [ add ] when*
+            over stream-read1 [ suffix ] when*
         ] when
     ] when nip ;
 

@@ -205,7 +205,7 @@ UNION: #branch #if #dispatch ;
         2dup 2slip rot [
             2drop t
         ] [
-            >r dup node-children swap node-successor add r>
+            >r dup node-children swap node-successor suffix r>
             [ node-exists? ] curry contains?
         ] if
     ] [

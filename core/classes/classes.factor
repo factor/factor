@@ -72,7 +72,7 @@ M: word reset-class drop ;
 
 ! update-map
 : class-uses ( class -- seq )
-    dup members swap superclass [ add ] when* ;
+    dup members swap superclass [ suffix ] when* ;
 
 : class-usages ( class -- assoc )
     [ update-map get at ] closure ;

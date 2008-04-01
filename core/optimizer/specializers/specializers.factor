@@ -32,7 +32,7 @@ IN: optimizer.specializers
 
 : method-declaration ( method -- quot )
     dup "method-generic" word-prop dispatch# object <array>
-    swap "method-class" word-prop add* ;
+    swap "method-class" word-prop prefix ;
 
 : specialize-method ( quot method -- quot' )
     method-declaration [ declare ] curry prepend ;

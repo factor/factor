@@ -92,7 +92,7 @@ M: wrapper apply-object
     r> recursive-state set ;
 
 : infer-quot-recursive ( quot word label -- )
-    recursive-state get -rot 2array add* infer-quot ;
+    recursive-state get -rot 2array prefix infer-quot ;
 
 : time-bomb ( error -- )
     [ throw ] curry recursive-state get infer-quot ;
@@ -109,7 +109,7 @@ TUPLE: recursive-quotation-error quot ;
         dup value-literal callable? [
             dup value-literal
             over value-recursion
-            rot f 2array add* infer-quot
+            rot f 2array prefix infer-quot
         ] [
             drop bad-call
         ] if
@@ -430,7 +430,7 @@ M: #call-label collect-recursion*
     [ [ swap collect-recursion* ] curry each-node ] { } make ;
 
 : join-values ( node -- )
-    collect-recursion [ node-in-d ] map meta-d get add
+    collect-recursion [ node-in-d ] map meta-d get suffix
     unify-lengths unify-stacks
     meta-d [ length tail* ] change ;
 

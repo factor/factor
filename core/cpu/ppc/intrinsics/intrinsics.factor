@@ -94,14 +94,14 @@ IN: cpu.ppc.intrinsics
 } define-intrinsics
 
 : fixnum-register-op ( op -- pair )
-    [ "out" operand "y" operand "x" operand ] swap add H{
+    [ "out" operand "y" operand "x" operand ] swap suffix H{
         { +input+ { { f "x" } { f "y" } } }
         { +scratch+ { { f "out" } } }
         { +output+ { "out" } }
     } 2array ;
 
 : fixnum-value-op ( op -- pair )
-    [ "out" operand "x" operand "y" operand ] swap add H{
+    [ "out" operand "x" operand "y" operand ] swap suffix H{
         { +input+ { { f "x" } { [ small-tagged? ] "y" } } }
         { +scratch+ { { f "out" } } }
         { +output+ { "out" } }
@@ -205,11 +205,11 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 : fixnum-register-jump ( op -- pair )
-    [ "x" operand 0 "y" operand CMP ] swap add
+    [ "x" operand 0 "y" operand CMP ] swap suffix
     { { f "x" } { f "y" } } 2array ;
 
 : fixnum-value-jump ( op -- pair )
-    [ 0 "x" operand "y" operand CMPI ] swap add
+    [ 0 "x" operand "y" operand CMPI ] swap suffix
     { { f "x" } { [ small-tagged? ] "y" } } 2array ;
 
 : define-fixnum-jump ( word op -- )
@@ -336,7 +336,7 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 : define-float-op ( word op -- )
-    [ "z" operand "x" operand "y" operand ] swap add H{
+    [ "z" operand "x" operand "y" operand ] swap suffix H{
         { +input+ { { float "x" } { float "y" } } }
         { +scratch+ { { float "z" } } }
         { +output+ { "z" } }
@@ -352,7 +352,7 @@ IN: cpu.ppc.intrinsics
 ] each
 
 : define-float-jump ( word op -- )
-    [ "x" operand 0 "y" operand FCMPU ] swap add
+    [ "x" operand 0 "y" operand FCMPU ] swap suffix
     { { float "x" } { float "y" } } define-if-intrinsic ;
 
 {

@@ -27,7 +27,7 @@ M: tuple-class group-words
     swap [ slot-spec-writer ] map append ;
 
 : define-consult-method ( word class quot -- )
-    pick add >r swap create-method r> define ;
+    pick suffix >r swap create-method r> define ;
 
 : define-consult ( class group quot -- )
     >r group-words swap r>

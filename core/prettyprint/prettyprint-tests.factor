@@ -192,7 +192,7 @@ unit-test
         "IN: prettyprint.tests"
         ": another-soft-break-layout ( node -- quot )"
         "    parse-error-file"
-        "    [ <reversed> \"hello world foo\" add ] [ ] make ;"
+        "    [ <reversed> \"hello world foo\" suffix ] [ ] make ;"
     } ;
 
 [ t ] [

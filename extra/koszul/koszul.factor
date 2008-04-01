@@ -184,7 +184,7 @@ DEFER: (d)
     [ length ] keep [ (graded-ker/im-d) ] curry map ;
 
 : graded-betti ( generators -- seq )
-    basis graded graded-ker/im-d flip first2 1 head* 0 add* v- ;
+    basis graded graded-ker/im-d flip first2 1 head* 0 prefix v- ;
 
 ! Bi-graded for two-step complexes
 : (bigraded-ker/im-d) ( u-deg z-deg bigraded-basis -- null/rank )
@@ -203,7 +203,7 @@ DEFER: (d)
     [ basis graded ] bi@ tensor bigraded-ker/im-d
     [ [ [ first ] map ] map ] keep
     [ [ second ] map 2 head* { 0 0 } prepend ] map
-    1 tail dup first length 0 <array> add
+    1 tail dup first length 0 <array> suffix
     [ v- ] 2map ;
 
 ! Laplacian

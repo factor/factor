@@ -35,7 +35,7 @@ TUPLE: check-mixin-class mixin ;
     swap redefine-mixin-class ; inline
 
 : add-mixin-instance ( class mixin -- )
-    [ 2drop ] [ [ add ] change-mixin-class ] if-mixin-member? ;
+    [ 2drop ] [ [ suffix ] change-mixin-class ] if-mixin-member? ;
 
 : remove-mixin-instance ( class mixin -- )
     [ [ swap remove ] change-mixin-class ] [ 2drop ] if-mixin-member? ;

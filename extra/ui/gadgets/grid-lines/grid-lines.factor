@@ -18,7 +18,7 @@ SYMBOL: grid-dim
     grid-dim get spin set-axis ;
 
 : draw-grid-lines ( gaps orientation -- )
-    grid get rot grid-positions grid get rect-dim add [
+    grid get rot grid-positions grid get rect-dim suffix [
         grid-line-from/to gl-line
     ] with each ;
 

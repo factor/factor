@@ -4,7 +4,7 @@ IN: qualified
 
 : define-qualified ( vocab-name -- )
     dup require
-    dup vocab-words swap CHAR: : add
+    dup vocab-words swap CHAR: : suffix
     [ -rot >r append r> ] curry assoc-map
     use get push ;
 

@@ -43,7 +43,7 @@ SYMBOL: edit-hook
 
 : fix ( word -- )
     "Fixing " write dup pprint " and all usages..." print nl
-    dup usage swap add* [
+    dup usage swap prefix [
         "Editing " write dup .
         "RETURN moves on to the next usage, C+d stops." print
         flush

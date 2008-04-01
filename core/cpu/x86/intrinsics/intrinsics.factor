@@ -156,7 +156,7 @@ IN: cpu.x86.intrinsics
 
 ! Fixnums
 : fixnum-op ( op hash -- pair )
-    >r [ "x" operand "y" operand ] swap add r> 2array ;
+    >r [ "x" operand "y" operand ] swap suffix r> 2array ;
 
 : fixnum-value-op ( op -- pair )
     H{
@@ -251,7 +251,7 @@ IN: cpu.x86.intrinsics
 \ fixnum- \ SUB overflow-template
 
 : fixnum-jump ( op inputs -- pair )
-    >r [ "x" operand "y" operand CMP ] swap add r> 2array ;
+    >r [ "x" operand "y" operand CMP ] swap suffix r> 2array ;
 
 : fixnum-value-jump ( op -- pair )
     { { f "x" } { [ small-tagged? ] "y" } } fixnum-jump ;

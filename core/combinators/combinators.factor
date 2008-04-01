@@ -49,7 +49,7 @@ ERROR: no-case ;
 : with-datastack ( stack quot -- newstack )
     datastack >r
     >r >array set-datastack r> call
-    datastack r> swap add set-datastack 2nip ; inline
+    datastack r> swap suffix set-datastack 2nip ; inline
 
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ rot 1- -rot call ] if ; inline
@@ -72,7 +72,7 @@ M: hashtable hashcode*
     reverse [ no-cond ] swap alist>quot ;
 
 : linear-case-quot ( default assoc -- quot )
-    [ >r [ dupd = ] curry r> \ drop add* ] assoc-map
+    [ >r [ dupd = ] curry r> \ drop prefix ] assoc-map
     alist>quot ;
 
 : (distribute-buckets) ( buckets pair keys -- )

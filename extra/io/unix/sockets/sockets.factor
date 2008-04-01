@@ -7,7 +7,7 @@ USING: alien alien.c-types generic io kernel math namespaces
 io.nonblocking parser threads unix sequences
 byte-arrays io.sockets io.binary io.unix.backend
 io.streams.duplex io.sockets.impl math.parser continuations libc
-combinators io.backend ;
+combinators io.backend io.files ;
 IN: io.unix.sockets
 
 : pending-init-error ( port -- )
@@ -189,7 +189,7 @@ M: local protocol-family drop PF_UNIX ;
 M: local sockaddr-type drop "sockaddr-un" c-type ;
 
 M: local make-sockaddr
-    local-path normalize-pathname
+    local-path cwd prepend-path
     dup length 1 + max-un-path > [ "Path too long" throw ] when
     "sockaddr-un" <c-object>
     AF_UNIX over set-sockaddr-un-family

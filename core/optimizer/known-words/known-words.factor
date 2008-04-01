@@ -60,7 +60,7 @@ sequences.private combinators ;
     [ value-literal sequence? ] [ drop f ] if ;
 
 : member-quot ( seq -- newquot )
-    [ [ t ] ] { } map>assoc [ drop f ] add [ nip case ] curry ;
+    [ [ t ] ] { } map>assoc [ drop f ] suffix [ nip case ] curry ;
 
 : expand-member ( #call -- )
     dup node-in-d peek value-literal member-quot f splice-quot ;

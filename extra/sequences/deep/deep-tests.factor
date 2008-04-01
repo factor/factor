@@ -11,7 +11,7 @@ IN: sequences.deep.tests
 [ { { "foo" } "bar" } t ] [ { { "foo" } "bar" } [ array? ] deep-find* ] unit-test
 
 : change-something ( seq -- newseq )
-    dup array? [ "hi" add ] [ "hello" append ] if ;
+    dup array? [ "hi" suffix ] [ "hello" append ] if ;
 
 [ { { "heyhello" "hihello" } "hihello" } ]
 [ "hey" 1array 1array [ change-something ] deep-map ] unit-test
