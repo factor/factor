@@ -130,7 +130,7 @@ PRIVATE>
     ] with each ;
 
 : all-slot-names ( class -- slots )
-    superclasses [ slot-names ] map concat \ class add* ;
+    superclasses [ slot-names ] map concat \ class prefix ;
 
 : compute-slot-permutation ( class old-slot-names -- permutation )
     >r all-slot-names r> [ index ] curry map ;

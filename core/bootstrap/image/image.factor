@@ -305,7 +305,7 @@ M: float-array ' float-array emit-dummy-array ;
 ! Tuples
 : (emit-tuple) ( tuple -- pointer )
     [ tuple>array 1 tail-slice ]
-    [ class transfer-word tuple-layout ] bi add* [ ' ] map
+    [ class transfer-word tuple-layout ] bi prefix [ ' ] map
     tuple type-number dup [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
