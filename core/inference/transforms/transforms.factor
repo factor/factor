@@ -43,6 +43,8 @@ IN: inference.transforms
 
 \ 2cleave [ 2cleave>quot ] 1 define-transform
 
+\ 3cleave [ 3cleave>quot ] 1 define-transform
+
 \ spread [ spread>quot ] 1 define-transform
 
 ! Bitfields

@@ -12,10 +12,16 @@ hashtables sorting ;
     [ [ keep ] curry ] map concat [ drop ] append ;
 
 : 2cleave ( x seq -- )
-    [ [ call ] 3keep drop ] each 2drop ;
+    [ 2keep ] each 2drop ;
 
 : 2cleave>quot ( seq -- quot )
     [ [ 2keep ] curry ] map concat [ 2drop ] append ;
+
+: 3cleave ( x seq -- )
+    [ 3keep ] each 3drop ;
+
+: 3cleave>quot ( seq -- quot )
+    [ [ 3keep ] curry ] map concat [ 3drop ] append ;
 
 : spread>quot ( seq -- quot )
     [ length [ >r ] <repetition> concat ]
