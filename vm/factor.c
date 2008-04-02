@@ -36,21 +36,35 @@ void do_stage1_init(void)
 	fprintf(stderr,"*** Stage 2 early init... ");
 	fflush(stderr);
 
+	GROWABLE_ARRAY(words);
+
 	begin_scan();
 
 	CELL obj;
 	while((obj = next_object()) != F)
 	{
 		if(type_of(obj) == WORD_TYPE)
-		{
-			F_WORD *word = untag_object(obj);
-			default_word_code(word,false);
-			update_word_xt(word);
-		}
+			GROWABLE_ADD(words,obj);
 	}
 
 	/* End heap scan */
 	gc_off = false;
+
+	GROWABLE_TRIM(words);
+	REGISTER_ROOT(words);
+
+	CELL i;
+	CELL length = array_capacity(untag_object(words));
+	for(i = 0; i < length; i++)
+	{
+		F_WORD *word = untag_word(array_nth(untag_array(words),i));
+		REGISTER_UNTAGGED(word);
+		default_word_code(word,false);
+		UNREGISTER_UNTAGGED(word);
+		update_word_xt(word);
+	}
+
+	UNREGISTER_ROOT(words);
 
 	iterate_code_heap(relocate_code_block);
 

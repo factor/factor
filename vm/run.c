@@ -22,8 +22,11 @@ void fix_stacks(void)
 be stored in registers, so callbacks must save and restore the correct values */
 void save_stacks(void)
 {
-	stack_chain->datastack = ds;
-	stack_chain->retainstack = rs;
+	if(stack_chain)
+	{
+		stack_chain->datastack = ds;
+		stack_chain->retainstack = rs;
+	}
 }
 
 /* called on entry into a compiled callback */
