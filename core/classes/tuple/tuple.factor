@@ -161,25 +161,23 @@ PRIVATE>
 : update-tuples-after ( class -- )
     outdated-tuples get [ all-slot-names ] cache drop ;
 
-: subclasses ( class -- classes )
-    class-usages keys [ tuple-class? ] subset ;
-
-: each-subclass ( class quot -- )
-    >r subclasses r> each ; inline
-
-: define-tuple-shape ( class -- )
-    [ define-tuple-slots ]
+M: tuple-class update-class
     [ define-tuple-layout ]
+    [ define-tuple-slots ]
     [ define-tuple-predicate ]
     tri ;
 
 : define-new-tuple-class ( class superclass slots -- )
     [ drop f tuple-class define-class ]
     [ nip "slot-names" set-word-prop ]
-    [
-        2drop
-        [ define-tuple-shape ] each-subclass
-    ] 3tri ;
+    [ 2drop update-classes ]
+    3tri ;
+
+: subclasses ( class -- classes )
+    class-usages keys [ tuple-class? ] subset ;
+
+: each-subclass ( class quot -- )
+    >r subclasses r> each ; inline
 
 : redefine-tuple-class ( class superclass slots -- )
     [
@@ -214,6 +212,9 @@ M: tuple-class define-tuple-class
     [ define-tuple-class ] [ 2drop ] 3bi
     dup [ construct-boa throw ] curry define ;
 
+M: tuple-class reset-class
+    { "metaclass" "superclass" "slots" "layout" } reset-props ;
+
 M: tuple clone
     (clone) dup delegate clone over set-delegate ;
 
@@ -227,12 +228,6 @@ M: tuple hashcode*
         ] 2curry reduce
     ] recursive-hashcode ;
 
-M: tuple-class reset-class
-    { "metaclass" "superclass" "slots" "layout" } reset-props ;
-
-M: object get-slots ( obj slots -- ... )
-    [ execute ] with each ;
-
 M: object construct-empty ( class -- tuple )
     tuple-layout <tuple> ;
 
@@ -240,6 +235,9 @@ M: object construct-boa ( ... class -- tuple )
     tuple-layout <tuple-boa> ;
 
 ! Deprecated
+M: object get-slots ( obj slots -- ... )
+    [ execute ] with each ;
+
 M: object set-slots ( ... obj slots -- )
     <reversed> get-slots ;
 

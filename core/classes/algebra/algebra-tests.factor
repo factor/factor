@@ -4,7 +4,7 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes classes.algebra
 classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units growable
-random inference effects ;
+random inference effects kernel.private ;
 
 : class= [ class< ] 2keep swap class< and ;
 

@@ -62,13 +62,13 @@ C: <point> point
 [ 200 ] [ "p" get y>> ] unit-test
 [ f ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
-"p" get 300 ">>z" "accessors" lookup execute drop
+[ ] [ "p" get 300 ">>z" "accessors" lookup execute drop ] unit-test
 
 [ 4 ] [ "p" get tuple-size ] unit-test
 
 [ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
-"IN: classes.tuple.tests TUPLE: point z y ;" eval
+[ ] [ "IN: classes.tuple.tests TUPLE: point z y ;" eval ] unit-test
 
 [ 3 ] [ "p" get tuple-size ] unit-test
 

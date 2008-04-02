@@ -1,9 +1,7 @@
-IN: generic.standard.new.tests
+IN: generic.standard.tests
 USING: tools.test math math.functions math.constants
-generic.standard.new strings sequences arrays kernel accessors
+generic.standard strings sequences arrays kernel accessors
 words float-arrays byte-arrays bit-arrays parser ;
-
-<< : GENERIC: CREATE-GENERIC define-simple-generic ; parsing >>
 
 GENERIC: lo-tag-test
 
@@ -24,7 +22,7 @@ GENERIC: hi-tag-test
 
 M: string hi-tag-test ", in bed" append ;
 
-M: number hi-tag-test 3 + ;
+M: integer hi-tag-test 3 + ;
 
 M: array hi-tag-test [ hi-tag-test ] map ;
 

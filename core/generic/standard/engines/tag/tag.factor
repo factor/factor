@@ -1,7 +1,6 @@
 USING: classes.private generic.standard.engines namespaces
-arrays mirrors assocs sequences.private quotations
-kernel.private layouts math slots.private math.private
-kernel accessors ;
+arrays assocs sequences.private quotations kernel.private
+layouts math slots.private math.private kernel accessors ;
 IN: generic.standard.engines.tag
 
 TUPLE: lo-tag-dispatch-engine methods ;

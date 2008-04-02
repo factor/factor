@@ -63,15 +63,6 @@ ARTICLE: "method-combination" "Custom method combination"
 "Developing a custom method combination requires that a parsing word calling " { $link define-generic } " be defined; additionally, it is a good idea to implement the definition protocol words " { $link definer } " and " { $link synopsis* } " on the class of words having this method combination, to properly support developer tools."
 $nl
 "The combination quotation passed to " { $link define-generic } " has stack effect " { $snippet "( word -- quot )" } ". It's job is to call various introspection words, including at least obtaining the set of methods defined on the generic word, then combining these methods in some way to produce a quotation."
-$nl
-"Method combination utilities:"
-{ $subsection single-combination }
-{ $subsection class-predicates }
-{ $subsection simplify-alist }
-{ $subsection math-upgrade }
-{ $subsection object-method }
-{ $subsection error-method }
-"More quotation construction utilities can be found in " { $link "quotations" } " and " { $link "combinators-quot" } "."
 { $see-also "generic-introspection" } ;
 
 ARTICLE: "generic" "Generic words and methods"

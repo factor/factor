@@ -83,7 +83,7 @@ M: word reset-class drop ;
 : update-map- ( class -- )
     dup class-uses update-map get remove-vertex ;
 
-: define-class-props ( superclass members metaclass -- assoc )
+: make-class-props ( superclass members metaclass -- assoc )
     [
         [ dup [ bootstrap-word ] when "superclass" set ]
         [ [ bootstrap-word ] map "members" set ]
@@ -92,12 +92,16 @@ M: word reset-class drop ;
     ] H{ } make-assoc ;
 
 : (define-class) ( word props -- )
-    over reset-class
-    over deferred? [ over define-symbol ] when
-    >r dup word-props r> union over set-word-props
-    dup predicate-word 2dup 1quotation "predicate" set-word-prop
-    over "predicating" set-word-prop
-    t "class" set-word-prop ;
+    >r
+    dup reset-class
+    dup deferred? [ dup define-symbol ] when
+    dup word-props
+    r> union over set-word-props
+    dup predicate-word
+    [ 1quotation "predicate" set-word-prop ]
+    [ swap "predicating" set-word-prop ]
+    [ drop t "class" set-word-prop ]
+    2tri ;
 
 PRIVATE>
 
@@ -105,24 +109,22 @@ GENERIC: update-class ( class -- )
 
 M: class update-class drop ;
 
-: update-classes ( assoc -- )
-    [ drop update-class ] assoc-each ;
-
 GENERIC: update-methods ( assoc -- )
+
+: update-classes ( class -- )
+    class-usages
+    [ [ drop update-class ] assoc-each ]
+    [ update-methods ]
+    bi ;
 
 : define-class ( word superclass members metaclass -- )
     #! If it was already a class, update methods after.
     reset-caches
-    define-class-props
+    make-class-props
     [ drop update-map- ]
-    [ (define-class) ] [
-        drop
-        [ update-map+ ] [
-            class-usages
-            [ update-classes ]
-            [ update-methods ] bi
-        ] bi
-    ] 2tri ;
+    [ (define-class) ]
+    [ drop update-map+ ]
+    2tri ;
 
 GENERIC: class ( object -- class )
 

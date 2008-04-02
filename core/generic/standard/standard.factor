@@ -3,32 +3,23 @@
 USING: arrays assocs kernel kernel.private slots.private math
 namespaces sequences vectors words quotations definitions
 hashtables layouts combinators sequences.private generic
-classes classes.algebra classes.private ;
+classes classes.algebra classes.private generic.standard.engines
+generic.standard.engines.tag generic.standard.engines.predicate
+generic.standard.engines.tuple accessors ;
 IN: generic.standard
 
-TUPLE: standard-combination # ;
-
-C: <standard-combination> standard-combination
-
-SYMBOL: (dispatch#)
-
-: (picker) ( n -- quot )
+: unpickers
     {
-        { 0 [ [ dup ] ] }
-        { 1 [ [ over ] ] }
-        { 2 [ [ pick ] ] }
-        [ 1- (picker) [ >r ] swap [ r> swap ] 3append ]
-    } case ;
-
-: picker ( -- quot ) \ (dispatch#) get (picker) ;
-
-: unpickers { [ nip ] [ >r nip r> swap ] [ >r >r nip r> r> -rot ] } ; inline
+        [ nip ]
+        [ >r nip r> swap ]
+        [ >r >r nip r> r> -rot ]
+    } ; inline
 
 : unpicker ( -- quot ) \ (dispatch#) get unpickers nth ;
 
 ERROR: no-method object generic ;
 
-: error-method ( word --  quot )
+: error-method ( word -- quot )
     picker swap [ no-method ] curry append ;
 
 : empty-method ( word -- quot )
@@ -38,144 +29,112 @@ ERROR: no-method object generic ;
         error-method \ drop prefix , \ if ,
     ] [ ] make ;
 
-: class-predicates ( assoc -- assoc )
-    [ >r "predicate" word-prop picker prepend r> ] assoc-map ;
-
-: simplify-alist ( class assoc -- default assoc' )
-    {
-        { [ dup empty? ] [ 2drop [ "Unreachable" throw ] { } ] }
-        { [ dup length 1 = ] [ nip first second { } ] }
-        { [ 2dup second first class< ] [ 1 tail-slice simplify-alist ] }
-        { [ t ] [ nip [ first second ] [ 1 tail-slice ] bi ] }
-    } cond ;
-
 : default-method ( word -- pair )
     "default-method" word-prop
     object bootstrap-word swap 2array ;
 
-: method-alist>quot ( alist base-class -- quot )
-    bootstrap-word swap simplify-alist
-    class-predicates alist>quot ;
-
-: small-generic ( methods -- def )
-    object method-alist>quot ;
-
-: hash-methods ( methods -- buckets )
-    V{ } clone [
-        tuple bootstrap-word over class< [
-            drop t
-        ] [
-            class-hashes
-        ] if
-    ] distribute-buckets ;
-
-: class-hash-dispatch-quot ( methods quot picker -- quot )
-    >r >r hash-methods r> map
-    hash-dispatch-quot r> [ class-hash ] rot 3append ; inline
-
-: big-generic ( methods -- quot )
-    [ small-generic ] picker class-hash-dispatch-quot ;
-
-: vtable-class ( n -- class )
-    bootstrap-type>class [ \ hi-tag bootstrap-word ] unless* ;
-
-: group-methods ( assoc -- vtable )
-    #! Input is a predicate -> method association.
-    #! n is vtable size (either num-types or num-tags).
-    num-tags get [
-        vtable-class
-        [ swap first classes-intersect? ] curry subset
-    ] with map ;
-
-: build-type-vtable ( alist-seq -- alist-seq )
-    dup length [
-        vtable-class
-        swap simplify-alist
-        class-predicates alist>quot
-    ] 2map ;
-
-: tag-generic ( methods -- quot )
+: push-method ( method specializer atomic assoc -- )
     [
-        picker %
-        \ tag ,
-        group-methods build-type-vtable ,
-        \ dispatch ,
-    ] [ ] make ;
+        [ H{ } clone <predicate-dispatch-engine> ] unless*
+        [ methods>> set-at ] keep
+    ] change-at ;
 
-: flatten-method ( class body -- )
-    over members pick object bootstrap-word eq? not and [
-        >r members r> [ flatten-method ] curry each
-    ] [
-        swap set
-    ] if ;
+: flatten-method ( class method assoc -- )
+    >r >r dup flatten-class keys swap r> r> [
+        >r spin r> push-method
+    ] 3curry each ;
 
-: flatten-methods ( methods -- newmethods )
-    [ [ flatten-method ] assoc-each ] V{ } make-assoc ;
+: flatten-methods ( assoc -- assoc' )
+    H{ } clone [
+        [
+            flatten-method
+        ] curry assoc-each
+    ] keep ;
 
-: dispatched-types ( methods -- seq )
-    keys object bootstrap-word swap remove prune ;
+: <big-dispatch-engine> ( assoc -- engine )
+    flatten-methods
+    convert-tuple-methods
+    convert-hi-tag-methods
+    <lo-tag-dispatch-engine> ;
 
-: single-combination ( methods -- quot )
-    dup length 4 <= [
-        small-generic
-    ] [
-        flatten-methods
-        dup dispatched-types [ number class< ] all?
-        [ tag-generic ] [ big-generic ] if
-    ] if ;
+: find-default ( methods -- quot )
+    #! Side-effects methods.
+    object swap delete-at* [
+        drop generic get "default-method" word-prop 1quotation
+    ] unless ;
 
-: standard-methods ( word -- alist )
-    dup methods swap default-method prefix
-    [ 1quotation ] assoc-map ;
+GENERIC: mangle-method ( method generic -- quot )
 
-M: standard-combination make-default-method
-    standard-combination-# (dispatch#)
-    [ empty-method ] with-variable ;
-
-M: standard-combination perform-combination
-    standard-combination-# (dispatch#) [
-        [ standard-methods ] keep "inline" word-prop
-        [ small-generic ] [ single-combination ] if
-    ] with-variable ;
-
-TUPLE: hook-combination var ;
-
-C: <hook-combination> hook-combination
-
-: with-hook ( combination quot -- quot' )
-    0 (dispatch#) [
-        swap slip
-        hook-combination-var [ get ] curry
-        prepend
-    ] with-variable ; inline
-
-M: hook-combination make-default-method
-    [ error-method ] with-hook ;
-
-M: hook-combination perform-combination
+: single-combination ( words -- quot )
     [
-        standard-methods
-        [ [ drop ] prepend ] assoc-map
-        single-combination
-    ] with-hook ;
+        object bootstrap-word assumed set
+        [ generic set ]
+        [
+            "methods" word-prop
+            [ generic get mangle-method ] assoc-map
+            [ find-default default set ]
+            [
+                generic get "inline" word-prop [
+                    <predicate-dispatch-engine>
+                ] [
+                    <big-dispatch-engine>
+                ] if
+            ] bi
+            engine>quot
+        ] bi
+    ] with-scope ;
 
-: define-simple-generic ( word -- )
-    T{ standard-combination f 0 } define-generic ;
+TUPLE: standard-combination # ;
+
+C: <standard-combination> standard-combination
 
 PREDICATE: standard-generic < generic
     "combination" word-prop standard-combination? ;
 
 PREDICATE: simple-generic < standard-generic
-    "combination" word-prop standard-combination-# zero? ;
+    "combination" word-prop #>> zero? ;
+
+: define-simple-generic ( word -- )
+    T{ standard-combination f 0 } define-generic ;
+
+: with-standard ( combination quot -- quot' )
+    >r #>> (dispatch#) r> with-variable ;
+
+M: standard-generic mangle-method
+    drop 1quotation ;
+
+M: standard-combination make-default-method
+    [ empty-method ] with-standard ;
+
+M: standard-combination perform-combination
+    [ single-combination ] with-standard ;
+
+TUPLE: hook-combination var ;
+
+C: <hook-combination> hook-combination
 
 PREDICATE: hook-generic < generic
     "combination" word-prop hook-combination? ;
+
+: with-hook ( combination quot -- quot' )
+    0 (dispatch#) [
+        dip var>> [ get ] curry prepend
+    ] with-variable ; inline
+
+M: hook-generic mangle-method
+    drop 1quotation [ drop ] prepend ;
+
+M: hook-combination make-default-method
+    [ error-method ] with-hook ;
+
+M: hook-combination perform-combination
+    [ single-combination ] with-hook ;
 
 GENERIC: dispatch# ( word -- n )
 
 M: word dispatch# "combination" word-prop dispatch# ;
 
-M: standard-combination dispatch# standard-combination-# ;
+M: standard-combination dispatch# #>> ;
 
 M: hook-combination dispatch# drop 0 ;
 
