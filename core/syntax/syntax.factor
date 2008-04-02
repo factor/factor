@@ -55,7 +55,7 @@ IN: bootstrap.syntax
     "BIN:" [ 2 parse-base ] define-syntax
 
     "f" [ f parsed ] define-syntax
-    "t" "syntax" lookup define-symbol
+    "t" "syntax" lookup define-singleton-class
 
     "CHAR:" [
         scan {
