@@ -8,5 +8,5 @@ GENERIC: zammo ( obj -- str )
 [ ] [ M: bzzt zammo drop "yes!" ; ] unit-test
 [ "yes!" ] [ bzzt zammo ] unit-test
 [ ] [ SINGLETON: omg ] unit-test
-[ t ] [ omg singleton? ] unit-test
+[ t ] [ omg singleton-class? ] unit-test
 [ "IN: classes.singleton.tests\nSINGLETON: omg\n" ] [ [ omg see ] with-string-writer ] unit-test
