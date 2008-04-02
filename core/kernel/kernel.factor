@@ -194,7 +194,7 @@ GENERIC: construct-boa ( ... class -- tuple )
 
 <PRIVATE
 
-: hi-tag ( obj -- n ) 0 slot ;
+: hi-tag ( obj -- n ) 0 slot ; inline
 
 : declare ( spec -- ) drop ;
 

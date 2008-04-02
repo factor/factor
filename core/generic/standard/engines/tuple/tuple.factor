@@ -2,7 +2,7 @@ IN: generic.standard.engines.tuple
 USING: kernel classes.tuple.private hashtables assocs sorting
 accessors combinators sequences slots.private math.parser words
 effects namespaces generic generic.standard.engines
-classes.algebra math math.private quotations ;
+classes.algebra math math.private quotations arrays ;
 
 TUPLE: echelon-dispatch-engine n methods ;
 
@@ -27,17 +27,25 @@ TUPLE: tuple-dispatch-engine echelons ;
 
 : <tuple-dispatch-engine> ( methods -- engine )
     echelon-sort
-    [ dupd <echelon-dispatch-engine> ] assoc-map
+    [
+        over zero? [
+            dup assoc-empty?
+            [ drop f ] [ values first ] if
+        ] [
+            dupd <echelon-dispatch-engine>
+        ] if
+    ] assoc-map [ nip ] assoc-subset
     \ tuple-dispatch-engine construct-boa ;
 
 : convert-tuple-methods ( assoc -- assoc' )
-    tuple \ <tuple-dispatch-engine> convert-methods ;
+    tuple bootstrap-word
+    \ <tuple-dispatch-engine> convert-methods ;
 
 M: trivial-tuple-dispatch-engine engine>quot
     methods>> engines>quots* linear-dispatch-quot ;
 
 : hash-methods ( methods -- buckets )
-    >alist V{ } clone [ class-hashes ] distribute-buckets
+    >alist V{ } clone [ hashcode 1array ] distribute-buckets
     [ <trivial-tuple-dispatch-engine> ] map ;
 
 : class-hash-dispatch-quot ( methods -- quot )
@@ -60,12 +68,20 @@ PREDICATE: tuple-dispatch-engine-word < word
 M: tuple-dispatch-engine-word stack-effect
     "tuple-dispatch-generic" word-prop stack-effect ;
 
+M: tuple-dispatch-engine-word crossref?
+    drop t ;
+
+: remember-engine ( word -- )
+    generic get "engines" word-prop push ;
+
 : <tuple-dispatch-engine-word> ( engine -- word )
     tuple-dispatch-engine-word-name f <word>
-    [ t "tuple-dispatch-engine" set-word-prop ]
-    [ generic get "tuple-dispatch-generic" set-word-prop ]
-    [ ]
-    tri ;
+    {
+        [ t "tuple-dispatch-engine" set-word-prop ]
+        [ generic get "tuple-dispatch-generic" set-word-prop ]
+        [ remember-engine ]
+        [ ]
+    } cleave ;
 
 : define-tuple-dispatch-engine-word ( engine quot -- word )
     >r <tuple-dispatch-engine-word> dup r> define ;
@@ -104,6 +120,9 @@ M: tuple-dispatch-engine engine>quot
         picker %
         [ 1 slot 5 slot ] %
         echelons>>
-        [ [ engine>quot dup default set ] assoc-map ] with-scope
+        [
+            tuple assumed set
+            [ engine>quot dup default set ] assoc-map
+        ] with-scope
         >=-case-quot %
     ] [ ] make ;

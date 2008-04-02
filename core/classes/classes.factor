@@ -25,9 +25,11 @@ SYMBOL: class-or-cache
     class-and-cache get clear-assoc
     class-or-cache get clear-assoc ;
 
-PREDICATE: class < word ( obj -- ? ) "class" word-prop ;
-
 SYMBOL: update-map
+
+PREDICATE: class < word
+    "class" word-prop ;
+
 SYMBOL: builtins
 
 PREDICATE: builtin-class < class
@@ -58,7 +60,7 @@ PREDICATE: predicate < word "predicating" word-prop >boolean ;
     dup class? [ "superclass" word-prop ] [ drop f ] if ;
 
 : superclasses ( class -- supers )
-    [ dup ] [ dup superclass swap ] [ ] unfold reverse nip ;
+    [ dup ] [ [ superclass ] keep ] [ ] unfold nip reverse ;
 
 : members ( class -- seq )
     #! Output f for non-classes to work with algebra code
@@ -72,7 +74,7 @@ M: word reset-class drop ;
 
 ! update-map
 : class-uses ( class -- seq )
-    dup members swap superclass [ suffix ] when* ;
+    [ members ] [ superclass ] bi [ suffix ] when* ;
 
 : class-usages ( class -- assoc )
     [ update-map get at ] closure ;

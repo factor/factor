@@ -171,37 +171,6 @@ M: f tag-and-f 4 ;
 
 [ 3.4 3 ] [ 3.4 tag-and-f ] unit-test
 
-! define-class hashing issue
-TUPLE: debug-combination ;
-
-M: debug-combination make-default-method
-    2drop [ "Oops" throw ] ;
-
-M: debug-combination perform-combination
-    drop
-    order [ dup class-hashes ] { } map>assoc sort-keys
-    1quotation ;
-
-SYMBOL: redefinition-test-generic
-
-[
-    redefinition-test-generic
-    T{ debug-combination }
-    define-generic
-] with-compilation-unit
-
-TUPLE: redefinition-test-tuple ;
-
-"IN: generic.tests M: redefinition-test-tuple redefinition-test-generic ;" eval
-
-[ t ] [
-    [
-        redefinition-test-generic ,
-        "IN: generic.tests TUPLE: redefinition-test-tuple ;" eval
-        redefinition-test-generic ,
-    ] { } make all-equal?
-] unit-test
-
 ! Issues with forget
 GENERIC: generic-forget-test-1
 

@@ -25,8 +25,9 @@ PREDICATE: generic < word
 M: generic definition drop f ;
 
 : make-generic ( word -- )
-    dup { "unannotated-def" } reset-props
-    dup dup "combination" word-prop perform-combination define ;
+    [ { "unannotated-def" } reset-props ]
+    [ dup "combination" word-prop perform-combination ]
+    bi ;
 
 : method ( class generic -- method/f )
     "methods" word-prop at ;
@@ -36,13 +37,6 @@ PREDICATE: method-spec < pair
 
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
-
-: sort-methods ( assoc -- assoc' )
-    [ keys sort-classes ]
-    [ [ dupd at ] curry ] bi { } map>assoc ;
-
-: methods ( word -- assoc )
-    "methods" word-prop sort-methods ;
 
 TUPLE: check-method class generic ;
 
@@ -63,6 +57,9 @@ PREDICATE: method-body < word
 
 M: method-body stack-effect
     "method-generic" word-prop stack-effect ;
+
+M: method-body crossref?
+    drop t ;
 
 : method-word-props ( class generic -- assoc )
     [
@@ -122,9 +119,12 @@ M: method-body definer
 
 M: method-body forget*
     dup "forgotten" word-prop [ drop ] [
-        dup "method-class" word-prop
-        over "method-generic" word-prop forget-method
-        t "forgotten" set-word-prop
+        [
+            [  "method-class" word-prop ]
+            [ "method-generic" word-prop ] bi
+            forget-method
+        ]
+        [ t "forgotten" set-word-prop ] bi
     ] if ;
 
 : implementors* ( classes -- words )
@@ -137,12 +137,13 @@ M: method-body forget*
     dup associate implementors* ;
 
 : forget-methods ( class -- )
-    [ implementors ] keep [ swap 2array ] curry map forget-all ;
+    [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
 
 M: class forget* ( class -- )
-    dup forget-methods
-    dup update-map-
-    forget-word ;
+    [ forget-methods ]
+    [ update-map- ]
+    [ forget-word ]
+    tri ;
 
 M: assoc update-methods ( assoc -- )
     implementors* [ make-generic ] each ;
@@ -158,11 +159,15 @@ M: assoc update-methods ( assoc -- )
     ] if ;
 
 M: generic subwords
-    dup "methods" word-prop values
-    swap "default-method" word-prop suffix ;
+    [
+        [ "default-method" word-prop , ]
+        [ "methods" word-prop values % ]
+        [ "engines" word-prop % ]
+        tri
+    ] { } make ;
 
 M: generic forget-word
-    dup subwords [ forget ] each (forget-word) ;
+    [ subwords forget-all ] [ (forget-word) ] bi ;
 
 : xref-generics ( -- )
     all-words [ subwords [ xref ] each ] each ;

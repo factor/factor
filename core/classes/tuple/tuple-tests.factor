@@ -394,7 +394,9 @@ test-server-slot-values
 ! Reshape crash
 TUPLE: test1 a ; TUPLE: test2 < test1 b ;
 
-T{ test2 f "a" "b" } "test" set
+C: <test2> test2
+
+"a" "b" <test2> "test" set
 
 : test-a/b
     [ "a" ] [ "test" get a>> ] unit-test

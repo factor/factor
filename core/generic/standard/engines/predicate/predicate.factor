@@ -21,6 +21,10 @@ C: <predicate-dispatch-engine> predicate-dispatch-engine
         { [ t ] [ [ first second ] [ 1 tail-slice ] bi ] }
     } cond ;
 
+: sort-methods ( assoc -- assoc' )
+    [ keys sort-classes ]
+    [ [ dupd at ] curry ] bi { } map>assoc ;
+
 M: predicate-dispatch-engine engine>quot
     methods>> clone
     default get object bootstrap-word pick set-at engines>quots

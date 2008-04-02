@@ -71,13 +71,15 @@ M: math-combination make-default-method
 
 M: math-combination perform-combination
     drop
+    dup
     \ over [
         dup math-class? [
             \ dup [ >r 2dup r> math-method ] math-vtable
         ] [
             over object-method
         ] if nip
-    ] math-vtable nip ;
+    ] math-vtable nip
+    define ;
 
 PREDICATE: math-generic < generic ( word -- ? )
     "combination" word-prop math-combination? ;

@@ -31,6 +31,7 @@ crossref off
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
 H{ } clone changed-words set
+H{ } clone forgotten-definitions set
 H{ } clone root-cache set
 H{ } clone source-files set
 H{ } clone update-map set
@@ -126,27 +127,49 @@ num-types get f <array> builtins set
 : register-builtin ( class -- )
     [ dup lookup-type-number "type" set-word-prop ]
     [ dup "type" word-prop builtins get set-nth ]
-    bi ;
+    [ f f builtin-class define-class ]
+    tri ;
 
 : define-builtin-slots ( symbol slotspec -- )
     [ drop ] [ 1 simple-slots ] 2bi
     [ "slots" set-word-prop ] [ define-slots ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
-    >r
-    {
-        [ register-builtin ]
-        [ f f builtin-class define-class ]
-        [ define-builtin-predicate ]
-        [ ]
-    } cleave
+    >r [ define-builtin-predicate ] keep
     r> define-builtin-slots ;
 
-! Forward definitions
-"object" "kernel" create t "class" set-word-prop
-"object" "kernel" create union-class "metaclass" set-word-prop
+"fixnum" "math" create register-builtin
+"bignum" "math" create register-builtin
+"tuple" "kernel" create register-builtin
+"ratio" "math" create register-builtin
+"float" "math" create register-builtin
+"complex" "math" create register-builtin
+"f" "syntax" lookup register-builtin
+"array" "arrays" create register-builtin
+"wrapper" "kernel" create register-builtin
+"float-array" "float-arrays" create register-builtin
+"callstack" "kernel" create register-builtin
+"string" "strings" create register-builtin
+"bit-array" "bit-arrays" create register-builtin
+"quotation" "quotations" create register-builtin
+"dll" "alien" create register-builtin
+"alien" "alien" create register-builtin
+"word" "words" create register-builtin
+"byte-array" "byte-arrays" create register-builtin
+"tuple-layout" "classes.tuple.private" create register-builtin
 
-"null" "kernel" create drop
+! Catch-all class for providing a default method.
+"object" "kernel" create [ drop t ] "predicate" set-word-prop
+"object" "kernel" create
+f builtins get [ ] subset union-class define-class
+
+! Class of objects with object tag
+"hi-tag" "kernel.private" create
+f builtins get num-tags get tail union-class define-class
+
+! Empty class with no instances
+"null" "kernel" create [ drop f ] "predicate" set-word-prop
+"null" "kernel" create f { } union-class define-class
 
 "fixnum" "math" create { } define-builtin
 "fixnum" "math" create ">fixnum" "math" create 1quotation "coercer" set-word-prop
@@ -335,23 +358,25 @@ define-builtin
     }
 } define-builtin
 
-"tuple" "kernel" create { } define-builtin
-
-"tuple" "kernel" lookup
-{
-    {
-        { "object" "kernel" }
-        "delegate"
-        { "delegate" "kernel" }
-        { "set-delegate" "kernel" }
-    }
-}
-[ drop ] [ generate-tuple-slots ] 2bi
-[ [ name>> ] map "slot-names" set-word-prop ]
-[ "slots" set-word-prop ]
-[ define-slots ] 2tri
-
-"tuple" "kernel" lookup define-tuple-layout
+"tuple" "kernel" create {
+    [ { } define-builtin ]
+    [ { "delegate" } "slot-names" set-word-prop ]
+    [ define-tuple-layout ]
+    [
+        {
+            {
+                { "object" "kernel" }
+                "delegate"
+                { "delegate" "kernel" }
+                { "set-delegate" "kernel" }
+            }
+        }
+        [ drop ] [ generate-tuple-slots ] 2bi
+        [ "slots" set-word-prop ]
+        [ define-slots ]
+        2bi
+    ]
+} cleave
 
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create
@@ -359,23 +384,10 @@ f "f" "syntax" lookup builtins get remove [ ] subset union-class
 define-class
 
 "f" "syntax" create [ not ] "predicate" set-word-prop
-"f?" "syntax" create "syntax" vocab-words delete-at
+"f?" "syntax" vocab-words delete-at
 
 "general-t" "kernel" create [ ] "predicate" set-word-prop
-"general-t?" "kernel" create "syntax" vocab-words delete-at
-
-! Catch-all class for providing a default method.
-"object" "kernel" create [ drop t ] "predicate" set-word-prop
-"object" "kernel" create
-f builtins get [ ] subset union-class define-class
-
-! Class of objects with object tag
-"hi-tag" "kernel.private" create
-f builtins get num-tags get tail union-class define-class
-
-! Null class with no instances.
-"null" "kernel" create [ drop f ] "predicate" set-word-prop
-"null" "kernel" create f { } union-class define-class
+"general-t?" "kernel" vocab-words delete-at
 
 ! Create special tombstone values
 "tombstone" "hashtables.private" create

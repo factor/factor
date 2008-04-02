@@ -63,10 +63,11 @@ SYMBOL: bootstrapping?
 : bootstrap-word ( word -- target )
     [ target-word ] [ ] if-bootstrapping ;
 
-: crossref? ( word -- ? )
+GENERIC: crossref? ( word -- ? )
+
+M: word crossref?
     {
         { [ dup "forgotten" word-prop ] [ f ] }
-        { [ dup "method-generic" word-prop ] [ t ] }
         { [ dup word-vocabulary ] [ t ] }
         { [ t ] [ f ] }
     } cond nip ;

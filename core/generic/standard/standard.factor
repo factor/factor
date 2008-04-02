@@ -59,29 +59,32 @@ ERROR: no-method object generic ;
 
 : find-default ( methods -- quot )
     #! Side-effects methods.
-    object swap delete-at* [
+    object bootstrap-word swap delete-at* [
         drop generic get "default-method" word-prop 1quotation
     ] unless ;
 
 GENERIC: mangle-method ( method generic -- quot )
 
-: single-combination ( words -- quot )
+: single-combination ( word -- quot )
     [
-        object bootstrap-word assumed set
-        [ generic set ]
-        [
-            "methods" word-prop
-            [ generic get mangle-method ] assoc-map
-            [ find-default default set ]
+        object bootstrap-word assumed set {
+            [ generic set ]
+            [ "engines" word-prop forget-all ]
+            [ V{ } clone "engines" set-word-prop ]
             [
-                generic get "inline" word-prop [
-                    <predicate-dispatch-engine>
-                ] [
-                    <big-dispatch-engine>
-                ] if
-            ] bi
-            engine>quot
-        ] bi
+                "methods" word-prop
+                [ generic get mangle-method ] assoc-map
+                [ find-default default set ]
+                [
+                    generic get "inline" word-prop [
+                        <predicate-dispatch-engine>
+                    ] [
+                        <big-dispatch-engine>
+                    ] if
+                ] bi
+                engine>quot
+            ]
+        } cleave
     ] with-scope ;
 
 TUPLE: standard-combination # ;
@@ -107,7 +110,7 @@ M: standard-combination make-default-method
     [ empty-method ] with-standard ;
 
 M: standard-combination perform-combination
-    [ single-combination ] with-standard ;
+    [ drop ] [ [ single-combination ] with-standard ] 2bi define ;
 
 TUPLE: hook-combination var ;
 
@@ -128,7 +131,7 @@ M: hook-combination make-default-method
     [ error-method ] with-hook ;
 
 M: hook-combination perform-combination
-    [ single-combination ] with-hook ;
+    [ drop ] [ [ single-combination ] with-hook ] 2bi define ;
 
 GENERIC: dispatch# ( word -- n )
 
