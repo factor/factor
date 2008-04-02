@@ -15,8 +15,5 @@ PREDICATE: singleton < predicate-class
     \ singleton
     over [ eq? ] curry define-predicate-class ;
 
-: SINGLETON:
-    scan define-singleton ; parsing
-
 M: singleton see-class* ( class -- )
     <colon \ SINGLETON: pprint-word pprint-word ;
