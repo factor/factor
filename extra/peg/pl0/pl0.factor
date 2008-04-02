@@ -7,22 +7,52 @@ IN: peg.pl0
 #! Grammar for PL/0 based on http://en.wikipedia.org/wiki/PL/0
 
 EBNF: pl0 
-- = (" " | "\t" | "\n")+ => [[ drop ignore ]]
 _ = (" " | "\t" | "\n")* => [[ drop ignore ]]
-block = ( _ "CONST" - ident _ "=" _ number ( _ "," _ ident _ "=" _ number )* _ ";" )?
-        ( _ "VAR" - ident ( _ "," _ ident )* _ ";" )?
-        ( _ "PROCEDURE" - ident _ ";" ( _ block _ ";" )? )* _ statement
-statement = ( ident _ ":=" _ expression | "CALL" - ident |
-              "BEGIN" - statement ( _ ";" _ statement )* _ "END" |
-              "IF" - condition _ "THEN" - statement |
-              "WHILE" - condition _ "DO" - statement )?
-condition = "ODD" - expression |
-            expression _ ("=" | "#" | "<=" | "<" | ">=" | ">") _ expression
-expression = ("+" | "-")? term ( _ ("+" | "-") _ term )* 
-term = factor ( _ ("*" | "/") _ factor )* 
-factor = ident | number | "(" _ expression _ ")"
-ident = (([a-zA-Z])+) [[ >string ]]
-digit = ([0-9]) [[ digit> ]]
-number = ((digit)+) [[ unclip [ swap 10 * + ] reduce ]]
-program = block "."
+
+BEGIN       = "BEGIN" _
+CALL        = "CALL" _
+CONST       = "CONST" _
+DO          = "DO" _
+END         = "END" _
+IF          = "IF" _
+THEN        = "THEN" _
+ODD         = "ODD" _
+PROCEDURE   = "PROCEDURE" _
+VAR         = "VAR" _
+WHILE       = "WHILE" _
+EQ          = "=" _
+LTEQ        = "<=" _
+LT          = "<" _
+GT          = ">" _
+GTEQ        = ">=" _
+NEQ         = "#" _
+COMMA       = "," _
+SEMICOLON   = ";" _
+ASSIGN      = ":=" _
+
+ADD         = "+" _
+SUBTRACT    = "-" _
+MULTIPLY    = "*" _
+DIVIDE      = "/" _
+
+LPAREN      = "(" _
+RPAREN      = ")" _
+
+block       =  ( CONST ident EQ number ( COMMA ident EQ number )* SEMICOLON )? 
+               ( VAR ident ( COMMA ident )* SEMICOLON )? 
+               ( PROCEDURE ident SEMICOLON ( block SEMICOLON )? )* statement 
+statement   =  (  ident ASSIGN expression 
+                | CALL ident 
+                | BEGIN statement ( SEMICOLON statement )* END 
+                | IF condition THEN statement 
+                | WHILE condition DO statement )?  
+condition   =  ODD expression 
+             | expression (EQ | NEQ | LTEQ | LT | GTEQ | GT) expression
+expression  = (ADD | SUBTRACT)? term ( (ADD | SUBTRACT) term )* _
+term        = factor ( (MULTIPLY | DIVIDE) factor )* 
+factor      = ident | number | LPAREN expression RPAREN
+ident       = (([a-zA-Z])+) _ => [[ >string ]]
+digit       = ([0-9])         => [[ digit> ]]
+number      = ((digit)+) _    => [[ 10 digits>integer ]]
+program     = _ block "."
 ;EBNF

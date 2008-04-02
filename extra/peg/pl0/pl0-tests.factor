@@ -4,40 +4,40 @@
 USING: kernel tools.test peg peg.pl0 multiline sequences words assocs ;
 IN: peg.pl0.tests
 
-{ f } [
-  "CONST foo = 1;" \ pl0 "ebnf-parser" word-prop "block" swap at parse not 
+{ t } [
+  "CONST foo = 1;" \ pl0 "ebnf-parser" word-prop "block" swap at parse parse-result-remaining empty? 
 ] unit-test
 
-{ f } [
-  "VAR foo;" \ pl0 "ebnf-parser" word-prop "block" swap at parse not 
+{ t } [
+  "VAR foo;" \ pl0 "ebnf-parser" word-prop "block" swap at parse parse-result-remaining empty?
 ] unit-test
 
-{ f } [
-  "VAR foo,bar , baz;" \ pl0 "ebnf-parser" word-prop "block" swap at parse not 
+{ t } [
+  "VAR foo,bar , baz;" \ pl0 "ebnf-parser" word-prop "block" swap at parse parse-result-remaining empty? 
 ] unit-test
 
-{ f } [
-  "foo := 5;" \ pl0 "ebnf-parser" word-prop "statement" swap at parse not 
+{ t } [
+  "foo := 5" \ pl0 "ebnf-parser" word-prop "statement" swap at parse parse-result-remaining empty? 
 ] unit-test
 
-{ f } [
-  "BEGIN foo := 5; END" \ pl0 "ebnf-parser" word-prop "statement" swap at parse not 
+{ t } [
+  "BEGIN foo := 5 END" \ pl0 "ebnf-parser" word-prop "statement" swap at parse parse-result-remaining empty? 
 ] unit-test
 
-{ f } [
-  "IF 1=1 THEN foo := 5; END" \ pl0 "ebnf-parser" word-prop "statement" swap at parse not 
+{ t } [
+  "IF 1=1 THEN foo := 5" \ pl0 "ebnf-parser" word-prop "statement" swap at parse parse-result-remaining empty? 
 ] unit-test
 
-{ f } [
-  "WHILE 1=1 DO foo := 5; END" \ pl0 "ebnf-parser" word-prop "statement" swap at parse not 
+{ t } [
+  "WHILE 1=1 DO foo := 5" \ pl0 "ebnf-parser" word-prop "statement" swap at parse parse-result-remaining empty? 
 ] unit-test
 
-{ f } [
-  "WHILE ODD 1=1 DO foo := 5; END" \ pl0 "ebnf-parser" word-prop "statement" swap at parse not 
+{ t } [
+  "WHILE ODD 1 DO foo := 5" \ pl0 "ebnf-parser" word-prop "statement" swap at parse parse-result-remaining empty? 
 ] unit-test
 
-{ f } [
-  "PROCEDURE square; BEGIN squ=x*x END" \ pl0 "ebnf-parser" word-prop "block" swap at parse not 
+{ t } [
+  "PROCEDURE square; BEGIN squ:=x*x END" \ pl0 "ebnf-parser" word-prop "block" swap at parse parse-result-remaining empty? 
 ] unit-test
 
 { f } [
