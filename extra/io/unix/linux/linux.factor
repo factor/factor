@@ -24,8 +24,10 @@ TUPLE: inotify watches ;
 
 : <inotify> ( -- port/f )
     H{ } clone
-    inotify_init [ io-error ] [ inotify <buffered-port> ] bi
-    { set-inotify-watches set-delegate } inotify construct ;
+    inotify_init dup 0 < [ 2drop f ] [
+        inotify <buffered-port>
+        { set-inotify-watches set-delegate } inotify construct
+    ] if ;
 
 : inotify-fd inotify get-global handle>> ;
 
@@ -109,9 +111,12 @@ TUPLE: inotify-task ;
     f inotify-task <input-task> ;
 
 : init-inotify ( mx -- )
-    <inotify>
-    dup inotify set-global
-    <inotify-task> swap register-io-task ;
+    <inotify> dup [
+        dup inotify set-global
+        <inotify-task> swap register-io-task
+    ] [
+        2drop
+    ] if ;
 
 M: inotify-task do-io-task ( task -- )
     io-task-port read-notifications f ;
@@ -119,7 +124,7 @@ M: inotify-task do-io-task ( task -- )
 M: linux-io init-io ( -- )
     <select-mx>
     [ mx set-global ]
-    [ [ init-inotify ] curry ignore-errors ] bi ;
+    [ init-inotify ] bi ;
 
 T{ linux-io } set-io-backend
 
