@@ -87,29 +87,6 @@ sequences.private combinators ;
     { { @ @ } [ 2drop t ] }
 } define-identities
 
-! type applied to an object of a known type can be folded
-: known-type? ( node -- ? )
-    node-class-first class-types length 1 number= ;
-
-: fold-known-type ( node -- node )
-    dup node-class-first class-types inline-literals ;
-
-\ type [
-    { [ dup known-type? ] [ fold-known-type ] }
-] define-optimizers
-
-! if the result of type is n, then the object has type n
-{ tag type } [
-    [
-        num-types get swap [
-            [
-                [ type>class object or 0 `input class, ] keep
-                0 `output literal,
-            ] set-constraints
-        ] curry each
-    ] "constraints" set-word-prop
-] each
-
 ! Specializers
 { 1+ 1- sq neg recip sgn } [
     { number } "specializer" set-word-prop

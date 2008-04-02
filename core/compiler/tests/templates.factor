@@ -26,10 +26,6 @@ IN: compiler.tests
 [ { 1 2 3 } { 1 4 3 } [ over tag over tag ] compile-call ]
 unit-test
 
-[ { 1 2 3 } { 1 4 3 } 8 8 ]
-[ { 1 2 3 } { 1 4 3 } [ over type over type ] compile-call ]
-unit-test
-
 ! Test literals in either side of a shuffle
 [ 4 1 ] [ 1 [ [ 3 fixnum+ ] keep ] compile-call ] unit-test
 

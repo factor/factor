@@ -3,14 +3,23 @@
 USING: inference.dataflow inference.state arrays generic io
 io.streams.string kernel math namespaces parser prettyprint
 sequences strings vectors words quotations effects classes
-continuations debugger assocs combinators compiler.errors ;
+continuations debugger assocs combinators compiler.errors
+generic.standard.engines.tuple ;
 IN: inference.backend
 
 : recursive-label ( word -- label/f )
     recursive-state get at ;
 
-: inline? ( word -- ? )
-    dup "method-generic" word-prop swap or "inline" word-prop ;
+GENERIC: inline? ( word -- ? )
+
+M: method-body inline?
+    "method-generic" word-prop inline? ;
+
+M: tuple-dispatch-engine-word inline?
+    "tuple-dispatch-generic" word-prop inline? ;
+
+M: word inline?
+    "inline" word-prop ;
 
 : local-recursive-state ( -- assoc )
     recursive-state get dup keys

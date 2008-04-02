@@ -120,7 +120,7 @@ M: object xyz ;
     [
         [ no-cond ] 1
         [ 1array dup quotation? [ >quotation ] unless ] times
-    ] \ type inlined?
+    ] \ quotation? inlined?
 ] unit-test
 
 [ f ] [ [ <reversed> length ] \ slot inlined? ] unit-test

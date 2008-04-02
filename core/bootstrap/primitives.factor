@@ -101,17 +101,24 @@ num-types get f <array> builtins set
 } [ create-vocab drop ] each
 
 ! Builtin classes
-: builtin-predicate-quot ( class -- quot )
+: lo-tag-eq-quot ( n -- quot )
+    [ \ tag , , \ eq? , ] [ ] make ;
+
+: hi-tag-eq-quot ( n -- quot )
     [
-        "type" word-prop
-        [ tag-mask get < \ tag \ type ? , ] [ , ] bi
-        \ eq? ,
+        [ dup tag ] % \ hi-tag tag-number , \ eq? ,
+        [ [ hi-tag ] % , \ eq? , ] [ ] make ,
+        [ drop f ] ,
+        \ if ,
     ] [ ] make ;
 
+: builtin-predicate-quot ( class -- quot )
+    "type" word-prop
+    dup tag-mask get <
+    [ lo-tag-eq-quot ] [ hi-tag-eq-quot ] if ;
+
 : define-builtin-predicate ( class -- )
-    [ dup builtin-predicate-quot define-predicate ]
-    [ predicate-word make-inline ]
-    bi ;
+    dup builtin-predicate-quot define-predicate ;
 
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
@@ -363,7 +370,7 @@ define-class
 f builtins get [ ] subset union-class define-class
 
 ! Class of objects with object tag
-"hi-tag" "classes.private" create
+"hi-tag" "kernel.private" create
 f builtins get num-tags get tail union-class define-class
 
 ! Null class with no instances.

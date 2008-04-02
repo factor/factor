@@ -41,23 +41,13 @@ ERROR: no-method object generic ;
 : class-predicates ( assoc -- assoc )
     [ >r "predicate" word-prop picker prepend r> ] assoc-map ;
 
-: (simplify-alist) ( class i assoc -- default assoc )
-    2dup length 1- = [
-        nth second { } rot drop
-    ] [
-        3dup >r 1+ r> nth first class< [
-            >r 1+ r> (simplify-alist)
-        ] [
-            [ nth second ] 2keep swap 1+ tail rot drop
-        ] if
-    ] if ;
-
-: simplify-alist ( class assoc -- default assoc )
-    dup empty? [
-        2drop [ "Unreachable" throw ] { }
-    ] [
-        0 swap (simplify-alist)
-    ] if ;
+: simplify-alist ( class assoc -- default assoc' )
+    {
+        { [ dup empty? ] [ 2drop [ "Unreachable" throw ] { } ] }
+        { [ dup length 1 = ] [ nip first second { } ] }
+        { [ 2dup second first class< ] [ 1 tail-slice simplify-alist ] }
+        { [ t ] [ nip [ first second ] [ 1 tail-slice ] bi ] }
+    } cond ;
 
 : default-method ( word -- pair )
     "default-method" word-prop

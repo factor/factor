@@ -413,12 +413,6 @@ HELP: clone
 { $values { "obj" object } { "cloned" "a new object" } }
 { $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." } ;
 
-HELP: type ( object -- n )
-{ $values { "object" object } { "n" "a type number" } }
-{ $description "Outputs an object's type number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
-
-{ type tag type>class } related-words
-
 HELP: ? ( ? true false -- true/false )
 { $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" "one two input objects" } }
 { $description "Chooses between two values depending on the boolean value of " { $snippet "cond" } "." } ;

@@ -19,58 +19,6 @@ IN: cpu.x86.intrinsics
     { +output+ { "in" } }
 } define-intrinsic
 
-\ type [
-    "end" define-label
-    ! Make a copy
-    "x" operand "obj" operand MOV
-    ! Get the tag
-    "x" operand tag-mask get AND
-    ! Tag the tag
-    "x" operand %tag-fixnum
-    ! Compare with object tag number (3).
-    "x" operand object tag-number tag-fixnum CMP
-    "end" get JNE
-    ! If we have equality, load type from header
-    "x" operand "obj" operand -3 [+] MOV
-    "end" resolve-label
-] H{
-    { +input+ { { f "obj" } } }
-    { +scratch+ { { f "x" } } }
-    { +output+ { "x" } }
-} define-intrinsic
-
-\ class-hash [
-    "end" define-label
-    "tuple" define-label
-    "object" define-label
-    ! Make a copy
-    "x" operand "obj" operand MOV
-    ! Get the tag
-    "x" operand tag-mask get AND
-    ! Tag the tag
-    "x" operand %tag-fixnum
-    ! Compare with tuple tag number (2).
-    "x" operand tuple tag-number tag-fixnum CMP
-    "tuple" get JE
-    ! Compare with object tag number (3).
-    "x" operand object tag-number tag-fixnum CMP
-    "object" get JE
-    "end" get JMP
-    "object" get resolve-label
-    ! Load header type
-    "x" operand "obj" operand header-offset [+] MOV
-    "end" get JMP
-    "tuple" get resolve-label
-    ! Load class hash
-    "x" operand "obj" operand tuple-class-offset [+] MOV
-    "x" operand dup class-hash-offset [+] MOV
-    "end" resolve-label
-] H{
-    { +input+ { { f "obj" } } }
-    { +scratch+ { { f "x" } } }
-    { +output+ { "x" } }
-} define-intrinsic
-
 ! Slots
 : %slot-literal-known-tag
     "obj" operand

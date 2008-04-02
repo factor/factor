@@ -9,24 +9,24 @@ hashtables sorting ;
     [ call ] with each ;
 
 : cleave>quot ( seq -- quot )
-    [ [ keep ] curry ] map concat [ drop ] append ;
+    [ [ keep ] curry ] map concat [ drop ] append [ ] like ;
 
 : 2cleave ( x seq -- )
     [ 2keep ] each 2drop ;
 
 : 2cleave>quot ( seq -- quot )
-    [ [ 2keep ] curry ] map concat [ 2drop ] append ;
+    [ [ 2keep ] curry ] map concat [ 2drop ] append [ ] like ;
 
 : 3cleave ( x seq -- )
     [ 3keep ] each 3drop ;
 
 : 3cleave>quot ( seq -- quot )
-    [ [ 3keep ] curry ] map concat [ 3drop ] append ;
+    [ [ 3keep ] curry ] map concat [ 3drop ] append [ ] like ;
 
 : spread>quot ( seq -- quot )
     [ length [ >r ] <repetition> concat ]
     [ [ [ r> ] prepend ] map concat ] bi
-    append ;
+    append [ ] like ;
 
 : spread ( objs... seq -- )
     spread>quot call ;

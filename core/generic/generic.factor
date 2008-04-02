@@ -37,10 +37,12 @@ PREDICATE: method-spec < pair
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
 
+: sort-methods ( assoc -- assoc' )
+    [ keys sort-classes ]
+    [ [ dupd at ] curry ] bi { } map>assoc ;
+
 : methods ( word -- assoc )
-    "methods" word-prop
-    [ keys sort-classes ] keep
-    [ dupd at ] curry { } map>assoc ;
+    "methods" word-prop sort-methods ;
 
 TUPLE: check-method class generic ;
 

@@ -124,6 +124,8 @@ GENERIC: update-methods ( assoc -- )
         ] bi
     ] 2tri ;
 
-GENERIC: class ( object -- class ) inline
+GENERIC: class ( object -- class )
 
-M: object class type type>class ;
+M: hi-tag class hi-tag type>class ;
+
+M: object class tag type>class ;

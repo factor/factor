@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel.private ;
+USING: kernel.private slots.private ;
 IN: kernel
 
 ! Stack stuff
@@ -99,14 +99,14 @@ DEFER: if
 
 ! Appliers
 : bi@ ( x y quot -- )
-    tuck 2slip call ; inline
+    dup bi* ; inline
 
 : tri@ ( x y z quot -- )
-    tuck >r bi@ r> call ; inline
+    dup dup tri* ; inline
 
 ! Double appliers
 : 2bi@ ( w x y z quot -- )
-    dup -roll 3slip call ; inline
+    dup 2bi* ; inline
 
 : while ( pred body tail -- )
     >r >r dup slip r> r> roll
@@ -193,6 +193,8 @@ GENERIC: construct-boa ( ... class -- tuple )
 : throw ( error -- * ) 5 getenv [ die ] or 1 (throw) ;
 
 <PRIVATE
+
+: hi-tag ( obj -- n ) 0 slot ;
 
 : declare ( spec -- ) drop ;
 
