@@ -17,9 +17,16 @@ IN: newfx
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: nth-is ( seq i val -- seq ) swap pick set-nth ;
+: nth-is ( seq   i val -- seq ) swap pick set-nth ;
+: is-nth ( seq val   i -- seq )      pick set-nth ;
 
-: is-nth ( seq val i -- seq )      pick set-nth ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: mutate-nth    ( seq i val -- ) swap rot set-nth ;
+: mutate-at-nth ( seq val i -- )      rot set-nth ;
+
+: mutate-nth-of    (   i val seq -- ) swapd set-nth ;
+: mutate-at-nth-of ( val   i seq -- )       set-nth ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -30,6 +37,14 @@ IN: newfx
 
 : key-is ( tbl key val -- tbl ) swap pick set-at ;
 : is-key ( tbl val key -- tbl )      pick set-at ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: mutate-key    ( tbl key val -- ) swap rot set-at ;
+: mutate-at-key ( tbl val key -- )      rot set-at ;
+
+: mutate-key-of    ( key val tbl -- ) swapd set-at ;
+: mutate-at-key-of ( val key tbl -- )       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -48,3 +63,6 @@ IN: newfx
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! A note about the 'mutate' qualifier. Other words also technically mutate
+! their primary object. However, the 'mutate' qualifier is supposed to
+! indicate that this is the main objective of the word, as a side effect.
