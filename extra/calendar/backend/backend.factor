@@ -1,5 +1,4 @@
-USING: kernel ;
+USING: kernel system ;
 IN: calendar.backend
 
-SYMBOL: calendar-backend
-HOOK: gmt-offset calendar-backend ( -- hours minutes seconds )
+HOOK: gmt-offset os ( -- hours minutes seconds )
