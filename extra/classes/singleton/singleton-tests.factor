@@ -9,4 +9,4 @@ GENERIC: zammo ( obj -- )
 [ "yes!" ] [ bzzt zammo ] unit-test
 [ ] [ SINGLETON: omg ] unit-test
 [ t ] [ omg singleton? ] unit-test
-[ "USING: singleton ;\nIN: classes.singleton.tests\nSINGLETON: omg\n" ] [ [ omg see ] with-string-writer ] unit-test
+[ "USING: classes.singleton ;\nIN: classes.singleton.tests\nSINGLETON: omg\n" ] [ [ omg see ] with-string-writer ] unit-test
