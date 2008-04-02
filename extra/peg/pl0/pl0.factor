@@ -7,18 +7,20 @@ IN: peg.pl0
 #! Grammar for PL/0 based on http://en.wikipedia.org/wiki/PL/0
 
 EBNF: pl0 
-block = ( "CONST" ident "=" number ( "," ident "=" number )* ";" )?
-        ( "VAR" ident ( "," ident )* ";" )?
-        ( "PROCEDURE" ident ";" ( block ";" )? )* statement 
-statement = ( ident ":=" expression | "CALL" ident |
-              "BEGIN" statement (";" statement )* "END" |
-              "IF" condition "THEN" statement |
-              "WHILE" condition "DO" statement )?
-condition = "ODD" expression |
-            expression ("=" | "#" | "<=" | "<" | ">=" | ">") expression 
-expression = ("+" | "-")? term (("+" | "-") term )* 
-term = factor (("*" | "/") factor )* 
-factor = ident | number | "(" expression ")"
+- = (" " | "\t" | "\n")+ => [[ drop ignore ]]
+_ = (" " | "\t" | "\n")* => [[ drop ignore ]]
+block = ( _ "CONST" - ident _ "=" _ number ( _ "," _ ident _ "=" _ number )* _ ";" )?
+        ( _ "VAR" - ident ( _ "," _ ident )* _ ";" )?
+        ( _ "PROCEDURE" - ident _ ";" ( _ block _ ";" )? )* _ statement
+statement = ( ident _ ":=" _ expression | "CALL" - ident |
+              "BEGIN" - statement ( _ ";" _ statement )* _ "END" |
+              "IF" - condition _ "THEN" - statement |
+              "WHILE" - condition _ "DO" - statement )?
+condition = "ODD" - expression |
+            expression _ ("=" | "#" | "<=" | "<" | ">=" | ">") _ expression
+expression = ("+" | "-")? term ( _ ("+" | "-") _ term )* 
+term = factor ( _ ("*" | "/") _ factor )* 
+factor = ident | number | "(" _ expression _ ")"
 ident = (([a-zA-Z])+) [[ >string ]]
 digit = ([0-9]) [[ digit> ]]
 number = ((digit)+) [[ unclip [ swap 10 * + ] reduce ]]

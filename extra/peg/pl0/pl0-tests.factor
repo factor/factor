@@ -1,8 +1,53 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.pl0 multiline sequences ;
+USING: kernel tools.test peg peg.pl0 multiline sequences words assocs ;
 IN: peg.pl0.tests
+
+{ f } [
+  "CONST foo = 1;" \ pl0 "ebnf-parser" word-prop "block" swap at parse not 
+] unit-test
+
+{ f } [
+  "VAR foo;" \ pl0 "ebnf-parser" word-prop "block" swap at parse not 
+] unit-test
+
+{ f } [
+  "VAR foo,bar , baz;" \ pl0 "ebnf-parser" word-prop "block" swap at parse not 
+] unit-test
+
+{ f } [
+  "foo := 5;" \ pl0 "ebnf-parser" word-prop "statement" swap at parse not 
+] unit-test
+
+{ f } [
+  "BEGIN foo := 5; END" \ pl0 "ebnf-parser" word-prop "statement" swap at parse not 
+] unit-test
+
+{ f } [
+  "IF 1=1 THEN foo := 5; END" \ pl0 "ebnf-parser" word-prop "statement" swap at parse not 
+] unit-test
+
+{ f } [
+  "WHILE 1=1 DO foo := 5; END" \ pl0 "ebnf-parser" word-prop "statement" swap at parse not 
+] unit-test
+
+{ f } [
+  "WHILE ODD 1=1 DO foo := 5; END" \ pl0 "ebnf-parser" word-prop "statement" swap at parse not 
+] unit-test
+
+{ f } [
+  "PROCEDURE square; BEGIN squ=x*x END" \ pl0 "ebnf-parser" word-prop "block" swap at parse not 
+] unit-test
+
+{ f } [
+  <"
+PROCEDURE square; 
+BEGIN 
+  squ := x * x 
+END;
+"> \ pl0 "ebnf-parser" word-prop "block" swap at parse not 
+] unit-test
 
 { t } [
   <"
