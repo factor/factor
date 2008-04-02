@@ -14,7 +14,7 @@ IN: bootstrap.compiler
     "alien.remote-control" require
 ] unless
 
-"cpu." cpu append require
+"cpu." cpu word-name append require
 
 : enable-compiler ( -- )
     [ optimized-recompile-hook ] recompile-hook set-global ;

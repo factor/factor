@@ -2,11 +2,39 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: system
 USING: kernel kernel.private sequences math namespaces
-splitting assocs system.private layouts ;
+init splitting assocs system.private layouts words ;
 
-: cpu ( -- cpu ) 8 getenv ; foldable
+! : cpu ( -- cpu ) 8 getenv ; foldable
 
 : os ( -- os ) 9 getenv ; foldable
+
+SINGLETON: x86.32
+SINGLETON: x86.64
+SINGLETON: arm
+SINGLETON: ppc
+
+: cpu ( -- class ) \ cpu get ;
+
+! SINGLETON: winnt
+! SINGLETON: wince
+
+! MIXIN: windows
+! INSTANCE: winnt windows
+! INSTANCE: wince windows
+
+! SINGLETON: freebsd
+! SINGLETON: netbsd
+! SINGLETON: openbsd
+! SINGLETON: solaris
+! SINGLETON: macosx
+! SINGLETON: linux
+
+! : os ( -- class ) \ os get ;
+
+[
+    8 getenv "system" lookup \ cpu set-global
+    ! 9 getenv "system" lookup \ os set-global
+] "system" add-init-hook
 
 : image ( -- path ) 13 getenv ;
 

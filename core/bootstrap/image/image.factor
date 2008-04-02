@@ -12,7 +12,8 @@ io.encodings.binary ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
-    cpu dup "ppc" = [ >r os "-" r> 3append ] when ;
+    cpu word-name
+    dup "ppc" = [ >r os "-" r> 3append ] when ;
 
 : boot-image-name ( arch -- string )
     "boot." swap ".image" 3append ;
