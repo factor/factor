@@ -8,7 +8,7 @@ math.floats.private layouts quotations ;
 IN: cpu.x86.sse2
 
 : define-float-op ( word op -- )
-    [ "x" operand "y" operand ] swap add H{
+    [ "x" operand "y" operand ] swap suffix H{
         { +input+ { { float "x" } { float "y" } } }
         { +output+ { "x" } }
     } define-intrinsic ;
@@ -23,7 +23,7 @@ IN: cpu.x86.sse2
 ] each
 
 : define-float-jump ( word op -- )
-    [ "x" operand "y" operand UCOMISD ] swap add
+    [ "x" operand "y" operand UCOMISD ] swap suffix
     { { float "x" } { float "y" } } define-if-intrinsic ;
 
 {

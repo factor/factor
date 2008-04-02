@@ -40,7 +40,7 @@ unless
 : (parse-com-function) ( tokens -- definition )
     [ second ]
     [ first ]
-    [ 3 tail 2 group [ first ] map "void*" add* ]
+    [ 3 tail 2 group [ first ] map "void*" prefix ]
     tri
     <com-function-definition> ;
 

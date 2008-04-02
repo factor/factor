@@ -191,14 +191,14 @@ M: hook-combination generic-prologue
     [ delete-at ] with-methods ;
 
 : method>spec ( method -- spec )
-    dup method-classes swap method-generic add* ;
+    dup method-classes swap method-generic prefix ;
 
 : parse-method ( -- quot classes generic )
     parse-definition dup 2 tail over second rot first ;
 
 : METHOD:
     location
-    >r parse-method [ define-method ] 2keep add* r>
+    >r parse-method [ define-method ] 2keep prefix r>
     remember-definition ; parsing
 
 ! For compatibility

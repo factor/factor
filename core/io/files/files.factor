@@ -267,6 +267,7 @@ M: object copy-file
 DEFER: copy-tree-into
 
 : copy-tree ( from to -- )
+    normalize-pathname
     over link-info type>>
     {
         { +symbolic-link+ [ copy-link ] }

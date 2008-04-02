@@ -112,7 +112,7 @@ C: <head> peg-head
 :: (setup-lr) ( r l s -- )
   s head>> l head>> eq? [
     l head>> s (>>head)
-    l head>> [ s rule>> add ] change-involved-set drop
+    l head>> [ s rule>> suffix ] change-involved-set drop
     r l s next>> (setup-lr)
   ] unless ;
 
@@ -144,7 +144,7 @@ C: <head> peg-head
           h [ p heads get at ]
         |
     h [
-      m r h involved-set>> h rule>> add member? not and [
+      m r h involved-set>> h rule>> suffix member? not and [
         fail p <memo-entry>
       ] [
         r h eval-set>> member? [

@@ -14,7 +14,7 @@ C: <slot-spec> slot-spec
     >r create-method r> define ;
 
 : define-slot-word ( class slot word quot -- )
-    rot >fixnum add* define-typecheck ;
+    rot >fixnum prefix define-typecheck ;
 
 : reader-quot ( decl -- quot )
     [
@@ -22,9 +22,6 @@ C: <slot-spec> slot-spec
         dup object bootstrap-word eq?
         [ drop ] [ 1array , \ declare , ] if
     ] [ ] make ;
-
-: slot-named ( name specs -- spec/f )
-    [ slot-spec-name = ] with find nip ;
 
 : create-accessor ( name effect -- word )
     >r "accessors" create dup r>
@@ -82,3 +79,6 @@ C: <slot-spec> slot-spec
         dup slot-spec-offset swap slot-spec-name
         define-slot-methods
     ] with each ;
+
+: slot-named ( name specs -- spec/f )
+    [ slot-spec-name = ] with find nip ;

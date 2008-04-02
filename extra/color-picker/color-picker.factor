@@ -21,7 +21,7 @@ M: color-preview model-changed
     swap model-value over set-gadget-interior relayout-1 ;
 
 : <color-model> ( model -- model )
-    [ [ 256 /f ] map 1 add <solid> ] <filter> ;
+    [ [ 256 /f ] map 1 suffix <solid> ] <filter> ;
 
 : <color-sliders> ( -- model gadget )
     3 [ drop 0 0 0 255 <range> ] map

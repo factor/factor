@@ -49,10 +49,10 @@ DEFER: start-walker-thread
 \ break t "break?" set-word-prop
 
 : walk ( quot -- quot' )
-    \ break add* [ break rethrow ] recover ;
+    \ break prefix [ break rethrow ] recover ;
 
 : add-breakpoint ( quot -- quot' )
-    dup [ break ] head? [ \ break add* ] unless ;
+    dup [ break ] head? [ \ break prefix ] unless ;
 
 : (step-into-quot) ( quot -- ) add-breakpoint call ;
 
@@ -114,7 +114,7 @@ SYMBOL: +stopped+
     ] change-frame ;
 
 : step-out-msg ( continuation -- continuation' )
-    [ nip \ break add ] change-frame ;
+    [ nip \ break suffix ] change-frame ;
 
 {
     { call [ (step-into-quot) ] }

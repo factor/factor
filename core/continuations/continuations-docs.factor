@@ -29,6 +29,7 @@ $nl
 { $subsection ignore-errors }
 "Unhandled errors are reported in the listener and can be debugged using various tools. See " { $link "debugger" } "."
 { $subsection "errors-restartable" }
+{ $subsection "debugger" }
 { $subsection "errors-post-mortem" }
 "When Factor encouters a critical error, it calls the following word:"
 { $subsection die } ;

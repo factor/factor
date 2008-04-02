@@ -65,3 +65,26 @@ MACRO: match-cond ( assoc -- )
     -rot
     match [ "Pattern does not match" throw ] unless*
     [ replace-patterns ] bind ;
+
+: ?1-tail ( seq -- tail/f )
+    dup length zero? not [ 1 tail ] [ drop f ] if ;
+
+: (match-first) ( seq pattern-seq -- bindings leftover/f )
+    2dup [ length ] bi@ < [ 2drop f f ]
+    [
+        2dup length head over match
+        [ nip swap ?1-tail ] [ >r 1 tail r> (match-first) ] if*
+    ] if ;
+    
+: match-first ( seq pattern-seq -- bindings )
+    (match-first) drop ;
+
+: (match-all) ( seq pattern-seq -- )
+    tuck (match-first) swap 
+    [ 
+        , [ swap (match-all) ] [ drop ] if* 
+    ] [ 2drop ] if* ;
+
+: match-all ( seq pattern-seq -- bindings-seq )
+    [ (match-all) ] { } make ;
+    

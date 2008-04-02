@@ -206,6 +206,7 @@ ARTICLE: "tools" "Developer tools"
 { $subsection "tools.vocabs" }
 "Exploratory tools:"
 { $subsection "editor" }
+{ $subsection "listener" }
 { $subsection "tools.crossref" }
 { $subsection "inspector" }
 "Debugging tools:"

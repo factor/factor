@@ -56,7 +56,7 @@ M: pair (bitfield-quot) ( spec -- quot )
     [ shift bitor ] append 2curry ;
 
 : bitfield-quot ( spec -- quot )
-    [ (bitfield-quot) ] map [ 0 ] add* concat ;
+    [ (bitfield-quot) ] map [ 0 ] prefix concat ;
 
 \ bitfield [ bitfield-quot ] 1 define-transform
 

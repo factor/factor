@@ -76,5 +76,5 @@ INSTANCE: groups sequence
             1 head-slice* [
                 "\r" ?tail drop "\r" split
             ] map
-        ] keep peek "\r" split add concat
+        ] keep peek "\r" split suffix concat
     ] if ;

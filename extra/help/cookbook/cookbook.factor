@@ -267,16 +267,33 @@ $nl
 } ;
 
 ARTICLE: "cookbook-philosophy" "Factor philosophy"
-"Factor is a high-level language with automatic memory management, runtime type checking, and strong typing. Factor code should be as simple as possible, but not simpler. If you are coming to Factor from another programming language, one of your first observations might be related to the amount of code you " { $emphasis "don't" } " have to write."
+"Learning a stack language is like learning to ride a bicycle: it takes a bit of practice and you might graze your knees a couple of times, but once you get the hang of it, it becomes second nature."
 $nl
-"If you try to write Factor word definitions which are longer than a couple of lines, you will find it hard to keep track of the stack contents. Well-written Factor code is " { $emphasis "factored" } " into short definitions, where each definition is easy to test interactively, and has a clear purpose. Well-chosen word names are critical, and having a thesaurus on hand really helps."
+"The most common difficulty encountered by beginners is trouble reading and writing code as a result of trying to place too many values on the stack at a time."
 $nl
-"If you run into problems with stack shuffling, take a deep breath and a step back, and reconsider the problem. A much simpler solution is waiting right around the corner, a natural solution which requires far less stack shuffling and far less code. As a last resort, if no simple solution exists, consider defining a domain-specific language."
-$nl
-"Every time you define a word which simply manipulates sequences, hashtables or objects in an abstract way which is not related to your program domain, check the library to see if you can reuse an existing definition and save yourself some debugging time."
-$nl
-"In addition to writing short definitions and testing them interactively, a great habit to get into is writing unit tests. Factor provides good support for unit testing; see " { $link "tools.test" } "."
-$nl
+"Keep the following guidelines in mind to avoid losing your sense of balance:"
+{ $list
+    "SImplify, simplify, simplify. Break your program up into small words which operate on a few values at a time. Most word definitions should fit on a single line; very rarely should they exceed two or three lines."
+    "In addition to keeping your words short, keep them meaningful. Give them good names, and make sure each word only does one thing. Try documenting your words; if the documentation for a word is unclear or complex, chances are the word definition is too. Don't be afraid to refactor your code."
+    "If your code looks repetitive, factor it some more."
+    "If after factoring, your code still looks repetitive, introduce combinators."
+    "If after introducing combinators, your code still looks repetitive, look into using meta-programming techniques."
+    "Try to place items on the stack in the order in which they are needed. If everything is in the correct order, no shuffling needs to be performed."
+    "If you find yourself writing a stack comment in the middle of a word, break the word up."
+    { "Use " { $link "cleave-combinators" } " and " { $link "spread-combinators" } " instead of " { $link "shuffle-words" } " to give your code more structure." }
+    { "Not everything has to go on the stack. The " { $vocab-link "namespaces" } " vocabulary provides dynamically-scoped variables, and the " { $vocab-link "locals" } " vocabulary provides lexically-scoped variables. Learn both and use them where they make sense, but keep in mind that overuse of variables makes code harder to factor." }
+    "Every time you define a word which simply manipulates sequences, hashtables or objects in an abstract way which is not related to your program domain, check the library to see if you can reuse an existing definition."
+    { "Learn to use the " { $link "inference" } " tool." }
+    { "Write unit tests. Factor provides good support for unit testing; see " { $link "tools.test" } ". Once your program has a good test suite you can refactor with confidence and catch regressions early." }
+    "Don't write Factor as if it were C. Imperitive programming and indexed loops are almost always not the most idiomatic solution."
+    { "Use sequences, assocs and objects to group related data. Object allocation is very cheap. Don't be afraid to create tuples, pairs and triples. Don't be afraid of operations which allocate new objects either, such as " { $link append } "." }
+    { "If you find yourself writing a loop with a sequence and an index, there's almost always a better way. Learn the " { $link "sequences-combinators" } " by heart." }
+    { "If you find yourself writing a heavily nested loop which performs several steps on each iteration, there is almost always a better way. Break the problem down into a series of passes over the data instead, gradually transforming it into the desired result with a series of simple loops. Factor the loops out and reuse them. If you're working on anything math-related, learn " { $link "math-vectors" } " by heart." }
+    { "If you find yourself wishing you could iterate over the datastack, or capture the contents of the datastack into a sequence, or push each element of a sequence onto the datastack, there is almost always a better way. Use " { $link "sequences" } " instead." }
+    "Don't use meta-programming if there's a simpler way."
+    "Don't worry about efficiency unless your program is too slow. Don't prefer complex code to simple code just because you feel it will be more efficient. The Factor compiler is designed to make idiomatic code run fast."
+    { "None of the above are hard-and-fast rules: there are exceptions to all of them. But one rule unconditionally holds: " { $emphasis "there is always a simpler way" } "." }
+}
 "Factor tries to implement as much of itself as possible, because this improves simplicity and performance. One consequence is that Factor exposes its internals for extension and study. You even have the option of using low-level features not usually found in high-level languages, such manual memory management, pointer arithmetic, and inline assembly code."
 $nl
 "Unsafe features are tucked away so that you will not invoke them by accident, or have to use them to solve conventional programming problems. However when the need arises, unsafe features are invaluable, for example you might have to do some pointer arithmetic when interfacing directly with C libraries." ;

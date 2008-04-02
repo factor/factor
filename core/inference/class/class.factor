@@ -289,7 +289,7 @@ M: #label infer-classes-around ( #label -- )
     dup annotate-node
     dup infer-classes-before
     dup infer-children
-    dup collect-recursion over add
+    dup collect-recursion over suffix
     pick annotate-entry
     node-child (infer-classes) ;
 

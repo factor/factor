@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel words ;
-IN: singleton
+IN: classes.singleton
 
 HELP: SINGLETON:
 { $syntax "SINGLETON: class"
@@ -11,16 +11,4 @@ HELP: SINGLETON:
     { $example "USING: singleton kernel io ;" "SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
 } { $see-also
     POSTPONE: PREDICATE:
-} ;
-
-HELP: SINGLETONS:
-{ $syntax "SINGLETONS: classes... ;"
-} { $values
-    { "classes" "new singletons to define" }
-} { $description
-    "Defines a new singleton for each class in the list."
-} { $examples
-    { $example "USE: singleton" "SINGLETONS: foo bar baz ;" "" }
-} { $see-also
-    POSTPONE: SINGLETON:
 } ;

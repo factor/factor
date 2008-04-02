@@ -157,7 +157,7 @@ M: assoc update-methods ( assoc -- )
 
 M: generic subwords
     dup "methods" word-prop values
-    swap "default-method" word-prop add ;
+    swap "default-method" word-prop suffix ;
 
 M: generic forget-word
     dup subwords [ forget ] each (forget-word) ;
