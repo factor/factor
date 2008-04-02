@@ -25,7 +25,7 @@ HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )
 
 M: windows-io normalize-directory ( string -- string )
-    normalize-pathname "\\" ?tail drop "\\*" append ;
+    normalize-path "\\" ?tail drop "\\*" append ;
 
 : share-mode ( -- fixnum )
     {
@@ -135,21 +135,21 @@ M: windows-io (file-appender) ( path -- stream )
     open-append <win32-file> <writer> ;
 
 M: windows-io move-file ( from to -- )
-    [ normalize-pathname ] bi@ MoveFile win32-error=0/f ;
+    [ normalize-path ] bi@ MoveFile win32-error=0/f ;
 
 M: windows-io delete-file ( path -- )
-    normalize-pathname DeleteFile win32-error=0/f ;
+    normalize-path DeleteFile win32-error=0/f ;
 
 M: windows-io copy-file ( from to -- )
     dup parent-directory make-directories
-    [ normalize-pathname ] bi@ 0 CopyFile win32-error=0/f ;
+    [ normalize-path ] bi@ 0 CopyFile win32-error=0/f ;
 
 M: windows-io make-directory ( path -- )
-    normalize-pathname
+    normalize-path
     f CreateDirectory win32-error=0/f ;
 
 M: windows-io delete-directory ( path -- )
-    normalize-pathname
+    normalize-path
     RemoveDirectory win32-error=0/f ;
 
 HOOK: WSASocket-flags io-backend ( -- DWORD )

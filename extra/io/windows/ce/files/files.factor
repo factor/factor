@@ -4,7 +4,7 @@ prettyprint sequences strings threads threads.private
 windows windows.kernel32 io.windows.ce.backend ;
 IN: windows.ce.files
 
-! M: windows-ce-io normalize-pathname ( string -- string )
+! M: windows-ce-io normalize-path ( string -- string )
     ! dup 1 tail* CHAR: \\ = [ "*" append ] [ "\\*" append ] if ;
 
 M: windows-ce-io CreateFile-flags ( DWORD -- DWORD )

@@ -1,4 +1,4 @@
-USING: kernel singleton tools.test prettyprint io.streams.string ;
+USING: kernel classes.singleton tools.test prettyprint io.streams.string ;
 IN: classes.singleton.tests
 
 [ ] [ SINGLETON: bzzt ] unit-test
