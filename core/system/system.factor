@@ -13,14 +13,14 @@ SINGLETON: x86.64
 SINGLETON: arm
 SINGLETON: ppc
 
+UNION: x86 x86.32 x86.64 ;
+
 : cpu ( -- class ) \ cpu get ;
 
 ! SINGLETON: winnt
 ! SINGLETON: wince
 
-! MIXIN: windows
-! INSTANCE: winnt windows
-! INSTANCE: wince windows
+! UNION: windows winnt wince ;
 
 ! SINGLETON: freebsd
 ! SINGLETON: netbsd
@@ -29,11 +29,23 @@ SINGLETON: ppc
 ! SINGLETON: macosx
 ! SINGLETON: linux
 
+<PRIVATE
+
+: string>cpu ( str -- class )
+    H{
+        { "x86.32" x86.32 }
+        { "x86.64" x86.64 }
+        { "arm" arm }
+        { "ppc" ppc }
+    } at ;
+
+PRIVATE>
+
 ! : os ( -- class ) \ os get ;
 
 [
-    8 getenv "system" lookup \ cpu set-global
-    ! 9 getenv "system" lookup \ os set-global
+    8 getenv string>cpu \ cpu set-global
+    ! 9 getenv string>os \ os set-global
 ] "system" add-init-hook
 
 : image ( -- path ) 13 getenv ;

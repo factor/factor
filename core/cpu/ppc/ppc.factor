@@ -12,8 +12,6 @@ namespaces alien.c-types kernel system combinators ;
     ] }
 } cond
 
-T{ ppc-backend } compiler-backend set-global
-
 macosx? [
     4 "double" c-type set-c-type-align
 ] when
