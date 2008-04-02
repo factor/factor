@@ -252,7 +252,7 @@ M: ebnf-rule (transform) ( ast -- parser )
   ] keep ;
 
 M: ebnf-sequence (transform) ( ast -- parser )
-  elements>> [ (transform) ] map seq ;
+  elements>> [ (transform) ] map seq [ dup length 1 = [ first ] when ] action ;
 
 M: ebnf-choice (transform) ( ast -- parser )
   options>> [ (transform) ] map choice ;
