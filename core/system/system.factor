@@ -64,14 +64,6 @@ PRIVATE>
 
 : vm ( -- path ) 14 getenv ;
 
-: win32? ( -- ? )
-    os winnt?
-    cell 4 = and ; foldable
-
-: win64? ( -- ? )
-    os winnt?
-    cell 8 = and ; foldable
-
 : embedded? ( -- ? ) 15 getenv ;
 
 : os-envs ( -- assoc )

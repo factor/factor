@@ -5,8 +5,6 @@ IN: system
 ARTICLE: "os" "System interface"
 "Operating system detection:"
 { $subsection os }
-{ $subsection win32? }
-{ $subsection win64? }
 "Processor detection:"
 { $subsection cpu }
 "Reading environment variables:"
@@ -85,14 +83,6 @@ HELP: set-os-envs
 { $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
 
 { os-env os-envs set-os-envs } related-words
-
-HELP: win32?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on 32-bit Windows." } ;
-
-HELP: win64?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on 64-bit Windows." } ;
 
 HELP: image
 { $values { "path" "a pathname string" } }

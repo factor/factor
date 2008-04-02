@@ -11,7 +11,7 @@ IN: openssl.libcrypto
 
 <<
 "libcrypto" {
-    { [ os win32? ]  [ "libeay32.dll" "cdecl" ] }
+    { [ os winnt? ]  [ "libeay32.dll" "cdecl" ] }
     { [ os macosx? ] [ "libcrypto.dylib" "cdecl" ] }
     { [ os unix? ]   [ "libcrypto.so" "cdecl" ] }
 } cond add-library

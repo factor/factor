@@ -1,20 +1,23 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-IN: openal
 USING: kernel alien system combinators alien.syntax namespaces
        alien.c-types sequences vocabs.loader shuffle combinators.lib
        openal.backend ;
+IN: openal
 
 << "alut" {
-        { [ os win32? ]  [ "alut.dll" ] }
-        { [ os macosx? ] [ "/System/Library/Frameworks/OpenAL.framework/OpenAL" ] }
+        { [ os windows? ]  [ "alut.dll" ] }
+        { [ os macosx? ] [
+            "/System/Library/Frameworks/OpenAL.framework/OpenAL"
+        ] }
         { [ os unix?  ]  [ "libalut.so" ] }
     } cond "cdecl" add-library >>
 
 << "openal" {
-        { [ os win32? ]  [ "OpenAL32.dll" ] }
-        { [ os macosx? ] [ "/System/Library/Frameworks/OpenAL.framework/OpenAL" ] }
+        { [ os windows? ]  [ "OpenAL32.dll" ] }
+        { [ os macosx? ] [
+            "/System/Library/Frameworks/OpenAL.framework/OpenAL"
+        ] }
         { [ os unix?  ]  [ "libopenal.so" ] }
     } cond "cdecl" add-library >>
 
@@ -290,4 +293,3 @@ os macosx? "openal.macosx" "openal.other" ? require
 
 : source-playing? ( source -- bool )
   AL_SOURCE_STATE get-source-param AL_PLAYING = ;
-
