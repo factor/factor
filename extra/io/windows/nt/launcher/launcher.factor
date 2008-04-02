@@ -32,7 +32,7 @@ IN: io.windows.nt.launcher
     drop 2nip null-pipe ;
 
 :: redirect-file ( default path access-mode create-mode -- handle )
-    path normalize-pathname
+    path normalize-path
     access-mode
     share-mode
     security-attributes-inherit

@@ -18,9 +18,9 @@ HOOK: io-multiplex io-backend ( ms -- )
 
 HOOK: normalize-directory io-backend ( str -- newstr )
 
-HOOK: normalize-pathname io-backend ( str -- newstr )
+HOOK: normalize-path io-backend ( str -- newstr )
 
-M: object normalize-directory normalize-pathname ;
+M: object normalize-directory normalize-path ;
 
 : set-io-backend ( io-backend -- )
     io-backend set-global init-io init-stdio

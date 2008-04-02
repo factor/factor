@@ -40,8 +40,8 @@ ERROR: not-absolute-path ;
         unicode-prefix prepend
     ] unless ;
 
-M: windows-nt-io normalize-pathname ( string -- string' )
-    (normalize-pathname)
+M: windows-nt-io normalize-path ( string -- string' )
+    (normalize-path)
     { { CHAR: / CHAR: \\ } } substitute
     prepend-prefix ;
 

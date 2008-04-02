@@ -89,14 +89,14 @@ SYMBOLS: +read-only+ +hidden+ +system+
     ] if ;
 
 M: windows-nt-io file-info ( path -- info )
-    normalize-pathname get-file-information-stat ;
+    normalize-path get-file-information-stat ;
 
 M: windows-nt-io link-info ( path -- info )
     file-info ;
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
-        normalize-pathname open-existing dup close-always
+        normalize-path open-existing dup close-always
         "FILETIME" <c-object>
         "FILETIME" <c-object>
         "FILETIME" <c-object>
@@ -112,7 +112,7 @@ M: windows-nt-io link-info ( path -- info )
     #! timestamp order: creation access write
     [
         >r >r >r
-            normalize-pathname open-existing dup close-always
+            normalize-path open-existing dup close-always
         r> r> r> (set-file-times)
     ] with-destructors ;
 
@@ -127,7 +127,7 @@ M: windows-nt-io link-info ( path -- info )
 
 M: windows-nt-io touch-file ( path -- )
     [
-        normalize-pathname
+        normalize-path
         maybe-create-file over close-always
         [ drop ] [ f now dup (set-file-times) ] if
     ] with-destructors ;

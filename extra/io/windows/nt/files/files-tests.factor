@@ -29,21 +29,21 @@ IN: io.windows.nt.files.tests
 
 [ ] [ "" resource-path cd ] unit-test
 
-[ "\\foo\\bar" ] [ "/foo/bar" normalize-pathname ":" split1 nip ] unit-test
+[ "\\foo\\bar" ] [ "/foo/bar" normalize-path ":" split1 nip ] unit-test
 
 [ "\\\\?\\C:\\builds\\factor\\log.txt" ] [
     "C:\\builds\\factor\\12345\\"
-    "..\\log.txt" append-path normalize-pathname
+    "..\\log.txt" append-path normalize-path
 ] unit-test
 
 [ "\\\\?\\C:\\builds\\" ] [
     "C:\\builds\\factor\\12345\\"
-    "..\\.." append-path normalize-pathname
+    "..\\.." append-path normalize-path
 ] unit-test
 
 [ "\\\\?\\C:\\builds\\" ] [
     "C:\\builds\\factor\\12345\\"
-    "..\\.." append-path normalize-pathname
+    "..\\.." append-path normalize-path
 ] unit-test
 
 [ "c:\\blah" ] [ "c:\\foo\\bar" "\\blah" append-path ] unit-test
