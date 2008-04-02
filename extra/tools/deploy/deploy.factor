@@ -5,5 +5,5 @@ IN: tools.deploy
 
 : deploy ( vocab -- ) deploy* ;
 
-macosx? [ "tools.deploy.macosx" require ] when
-winnt? [ "tools.deploy.windows" require ] when
+os macosx? [ "tools.deploy.macosx" require ] when
+os winnt? [ "tools.deploy.windows" require ] when

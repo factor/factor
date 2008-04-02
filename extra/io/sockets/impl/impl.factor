@@ -6,8 +6,8 @@ alien.c-types combinators namespaces alien parser ;
 IN: io.sockets.impl
 
 << {
-    { [ windows? ] [ "windows.winsock" ] }
-    { [ unix? ] [ "unix" ] }
+    { [ os windows? ] [ "windows.winsock" ] }
+    { [ os unix? ] [ "unix" ] }
 } cond use+ >>
 
 GENERIC: protocol-family ( addrspec -- af )

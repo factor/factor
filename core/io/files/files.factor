@@ -43,9 +43,9 @@ HOOK: (file-appender) io-backend ( path -- stream )
     >r <file-appender> r> with-stream ; inline
 
 ! Pathnames
-: path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
+: path-separator? ( ch -- ? ) os windows? "/\\" "/" ? member? ;
 
-: path-separator ( -- string ) windows? "\\" "/" ? ;
+: path-separator ( -- string ) os windows? "\\" "/" ? ;
 
 : right-trim-separators ( str -- newstr )
     [ path-separator? ] right-trim ;
@@ -112,7 +112,7 @@ PRIVATE>
     {
         { [ dup empty? ] [ f ] }
         { [ dup "resource:" head? ] [ t ] }
-        { [ windows? ] [ windows-absolute-path? ] }
+        { [ os windows? ] [ windows-absolute-path? ] }
         { [ dup first path-separator? ] [ t ] }
         { [ t ] [ f ] }
     } cond nip ;
@@ -322,7 +322,7 @@ M: pathname <=> [ pathname-string ] compare ;
 ! Home directory
 : home ( -- dir )
     {
-        { [ winnt? ] [ "USERPROFILE" os-env ] }
-        { [ wince? ] [ "" resource-path ] }
-        { [ unix? ] [ "HOME" os-env ] }
+        { [ os winnt? ] [ "USERPROFILE" os-env ] }
+        { [ os wince? ] [ "" resource-path ] }
+        { [ os unix? ] [ "HOME" os-env ] }
     } cond ;

@@ -8,9 +8,9 @@ IN: hardware-info
 
 <<
 {
-    { [ windows? ] [ "hardware-info.windows" ] }
-    { [ linux? ] [ "hardware-info.linux" ] }
-    { [ macosx? ] [ "hardware-info.macosx" ] }
+    { [ os windows? ] [ "hardware-info.windows" ] }
+    { [ os linux? ] [ "hardware-info.linux" ] }
+    { [ os macosx? ] [ "hardware-info.macosx" ] }
     { [ t ] [ f ] }
 } cond [ require ] when* >>
 

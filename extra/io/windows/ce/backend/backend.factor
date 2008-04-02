@@ -37,7 +37,7 @@ M: windows-ce-io (init-stdio) ( -- )
     #! We support Windows NT too, to make this I/O backend
     #! easier to debug.
     512 default-buffer-size [
-        winnt? [
+        os winnt? [
             STD_INPUT_HANDLE GetStdHandle
             STD_OUTPUT_HANDLE GetStdHandle
             STD_ERROR_HANDLE GetStdHandle

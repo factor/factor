@@ -7,15 +7,15 @@ USING: kernel alien system combinators alien.syntax namespaces
        openal.backend ;
 
 << "alut" {
-        { [ win32? ]  [ "alut.dll" ] }
-        { [ macosx? ] [ "/System/Library/Frameworks/OpenAL.framework/OpenAL" ] }
-        { [ unix?  ]  [ "libalut.so" ] }
+        { [ os win32? ]  [ "alut.dll" ] }
+        { [ os macosx? ] [ "/System/Library/Frameworks/OpenAL.framework/OpenAL" ] }
+        { [ os unix?  ]  [ "libalut.so" ] }
     } cond "cdecl" add-library >>
 
 << "openal" {
-        { [ win32? ]  [ "OpenAL32.dll" ] }
-        { [ macosx? ] [ "/System/Library/Frameworks/OpenAL.framework/OpenAL" ] }
-        { [ unix?  ]  [ "libopenal.so" ] }
+        { [ os win32? ]  [ "OpenAL32.dll" ] }
+        { [ os macosx? ] [ "/System/Library/Frameworks/OpenAL.framework/OpenAL" ] }
+        { [ os unix?  ]  [ "libopenal.so" ] }
     } cond "cdecl" add-library >>
 
 LIBRARY: openal
@@ -257,7 +257,7 @@ SYMBOL: init
     "create-buffer-from-file failed" throw
   ] when ;
 
-macosx? "openal.macosx" "openal.other" ? require
+os macosx? "openal.macosx" "openal.other" ? require
 
 : create-buffer-from-wav ( filename -- buffer )
   gen-buffer dup rot load-wav-file

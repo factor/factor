@@ -13,6 +13,6 @@ t vim-detach set-global ! don't block the ui
 T{ gvim } vim-editor set-global
 
 {
-    { [ unix? ] [ "editors.gvim.unix" ] }
-    { [ windows? ] [ "editors.gvim.windows" ] }
+    { [ os unix? ] [ "editors.gvim.unix" ] }
+    { [ os windows? ] [ "editors.gvim.windows" ] }
 } cond require

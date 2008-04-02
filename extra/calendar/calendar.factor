@@ -377,6 +377,6 @@ M: timestamp sleep-until timestamp>millis sleep-until ;
 M: duration sleep from-now sleep-until ;
 
 {
-    { [ unix? ] [ "calendar.unix" ] }
-    { [ windows? ] [ "calendar.windows" ] }
+    { [ os unix? ] [ "calendar.unix" ] }
+    { [ os windows? ] [ "calendar.windows" ] }
 } cond require

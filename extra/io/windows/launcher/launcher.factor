@@ -82,7 +82,7 @@ TUPLE: CreateProcess-args
 : fill-dwCreateFlags ( process args -- process args )
     0
     pick pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
-    pick detached>> winnt? and [ DETACHED_PROCESS bitor ] when
+    pick detached>> os winnt? and [ DETACHED_PROCESS bitor ] when
     pick lookup-priority [ bitor ] when*
     >>dwCreateFlags ;
 
@@ -105,7 +105,7 @@ M: windows-ce-io fill-redirection 2drop ;
 
 : make-CreateProcess-args ( process -- args )
     default-CreateProcess-args
-    wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
+    os wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
     fill-dwCreateFlags
     fill-lpEnvironment
     fill-startup-info

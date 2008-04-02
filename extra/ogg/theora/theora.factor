@@ -6,9 +6,9 @@ IN: ogg.theora
 
 <<
 "theora" {
-    { [ win32? ]  [ "theora.dll" ] }
-    { [ macosx? ] [ "libtheora.0.dylib" ] }
-    { [ unix? ]   [ "libtheora.so" ] }
+    { [ os win32? ]  [ "theora.dll" ] }
+    { [ os macosx? ] [ "libtheora.0.dylib" ] }
+    { [ os unix? ]   [ "libtheora.so" ] }
 } cond "cdecl" add-library
 >>
 

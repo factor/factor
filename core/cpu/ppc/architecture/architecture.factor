@@ -19,14 +19,14 @@ IN: cpu.ppc.architecture
 
 : reserved-area-size
     os {
-        { "linux" [ 2 ] }
-        { "macosx" [ 6 ] }
+        { linux [ 2 ] }
+        { macosx [ 6 ] }
     } case cells ; foldable
 
 : lr-save
     os {
-        { "linux" [ 1 ] }
-        { "macosx" [ 2 ] }
+        { linux [ 1 ] }
+        { macosx [ 2 ] }
     } case cells ; foldable
 
 : param@ ( n -- x ) reserved-area-size + ; inline
@@ -58,8 +58,8 @@ M: int-regs vregs
 M: float-regs return-reg drop 1 ;
 M: float-regs param-regs 
     drop os H{
-        { "macosx" { 1 2 3 4 5 6 7 8 9 10 11 12 13 } }
-        { "linux" { 1 2 3 4 5 6 7 8 } }
+        { macosx { 1 2 3 4 5 6 7 8 9 10 11 12 13 } }
+        { linux { 1 2 3 4 5 6 7 8 } }
     } at ;
 M: float-regs vregs drop { 0 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
 
@@ -273,9 +273,9 @@ M: ppc %cleanup ( alien-node -- ) drop ;
 M: ppc value-structs?
     #! On Linux/PPC, value structs are passed in the same way
     #! as reference structs, we just have to make a copy first.
-    linux? not ;
+    os linux? not ;
 
-M: ppc fp-shadows-int? ( -- ? ) macosx? ;
+M: ppc fp-shadows-int? ( -- ? ) os macosx? ;
 
 M: ppc small-enough? ( n -- ? ) -32768 32767 between? ;
 

@@ -5,14 +5,8 @@ IN: system
 ARTICLE: "os" "System interface"
 "Operating system detection:"
 { $subsection os }
-{ $subsection unix? }
-{ $subsection macosx? }
-{ $subsection solaris? }
-{ $subsection windows? }
-{ $subsection winnt? }
 { $subsection win32? }
 { $subsection win64? }
-{ $subsection wince? }
 "Processor detection:"
 { $subsection cpu }
 "Reading environment variables:"
@@ -32,57 +26,29 @@ ABOUT: "os"
 HELP: cpu
 { $values { "cpu" string } }
 { $description
-    "Outputs a string descriptor of the current CPU architecture. Currently, this set of descriptors is:"
-    { $code "x86.32" "x86.64" "ppc" "arm" }
+    "Outputs a singleton class with the name of the current CPU architecture. Currently, this set of descriptors is:"
+    { $code x86.32 x86.64 ppc arm }
 } ;
 
 HELP: os
 { $values { "os" string } }
 { $description
-    "Outputs a string descriptor of the current operating system family. Currently, this set of descriptors is:"
+    "Outputs a singleton class with the name of the current operating system family. Currently, this set of descriptors is:"
     { $code
-        "freebsd"
-        "linux"
-        "macosx"
-        "openbsd"
-        "netbsd"
-        "solaris"
-        "wince"
-        "winnt"
+        freebsd
+        linux
+        macosx
+        openbsd
+        netbsd
+        solaris
+        wince
+        winnt
     }
 } ;
 
 HELP: embedded?
 { $values { "?" "a boolean" } }
 { $description "Tests if this Factor instance is embedded in another application." } ;
-
-HELP: windows?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Windows." } ;
-
-HELP: winnt?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Windows XP or Vista." } ;
-
-HELP: wince?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Windows CE." } ;
-
-HELP: macosx?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Mac OS X." } ;
-
-HELP: linux?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Linux." } ;
-
-HELP: solaris?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Solaris." } ;
-
-HELP: bsd?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on FreeBSD/OpenBSD/NetBSD." } ;
 
 HELP: exit ( n -- )
 { $values { "n" "an integer exit code" } }
@@ -135,7 +101,3 @@ HELP: image
 HELP: vm
 { $values { "path" "a pathname string" } }
 { $description "Outputs the pathname of the currently running Factor VM." } ;
-
-HELP: unix?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on a Unix-like system. While this is a rather vague notion, one can use it to make certain assumptions about system calls and file structure which are not valid on Windows." } ;
