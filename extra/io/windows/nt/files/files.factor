@@ -36,28 +36,14 @@ ERROR: not-absolute-path ;
     } && [ 2 head ] [ not-absolute-path ] if ;
 
 : prepend-prefix ( string -- string' )
-    unicode-prefix prepend ;
+    dup unicode-prefix head? [
+        unicode-prefix prepend
+    ] unless ;
 
-ERROR: nonstring-pathname ;
-ERROR: empty-pathname ;
-
-M: windows-nt-io normalize-pathname ( string -- string )
-    "resource:" ?head [
-        left-trim-separators resource-path
-        normalize-pathname
-    ] [
-        dup empty? [ empty-pathname ] when
-        current-directory get prepend-path
-        dup unicode-prefix head? [
-            dup first path-separator? [
-                left-trim-separators
-                current-directory get 2 head
-                prepend-path
-            ] when
-            unicode-prefix prepend
-        ] unless
-        { { CHAR: / CHAR: \\ } } substitute ! necessary
-    ] if ;
+M: windows-nt-io normalize-pathname ( string -- string' )
+    (normalize-pathname)
+    { { CHAR: / CHAR: \\ } } substitute
+    prepend-prefix ;
 
 M: windows-nt-io CreateFile-flags ( DWORD -- DWORD )
     FILE_FLAG_OVERLAPPED bitor ;

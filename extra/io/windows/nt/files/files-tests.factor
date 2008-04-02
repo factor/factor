@@ -1,9 +1,9 @@
 USING: io.files kernel tools.test io.backend
-io.windows.nt.files splitting ;
+io.windows.nt.files splitting sequences ;
 IN: io.windows.nt.files.tests
 
-[ t ] [ "\\foo" absolute-path? ] unit-test
-[ t ] [ "\\\\?\\foo" absolute-path? ] unit-test
+[ f ] [ "\\foo" absolute-path? ] unit-test
+[ t ] [ "\\\\?\\c:\\foo" absolute-path? ] unit-test
 [ t ] [ "c:\\foo" absolute-path? ] unit-test
 [ t ] [ "c:" absolute-path? ] unit-test
 
@@ -45,3 +45,6 @@ IN: io.windows.nt.files.tests
     "C:\\builds\\factor\\12345\\"
     "..\\.." append-path normalize-pathname
 ] unit-test
+
+[ "c:\\blah" ] [ "c:\\foo\\bar" "\\blah" append-path ] unit-test
+[ t ] [ "" resource-path 2 tail exists? ] unit-test

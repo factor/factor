@@ -102,6 +102,7 @@ PRIVATE>
 
 : windows-absolute-path? ( path -- path ? )
     {
+        { [ dup "\\\\?\\" head? ] [ t ] }
         { [ dup length 2 < ] [ f ] }
         { [ dup second CHAR: : = ] [ t ] }
         { [ t ] [ f ] }
@@ -111,8 +112,8 @@ PRIVATE>
     {
         { [ dup empty? ] [ f ] }
         { [ dup "resource:" head? ] [ t ] }
-        { [ dup first path-separator? ] [ t ] }
         { [ windows? ] [ windows-absolute-path? ] }
+        { [ dup first path-separator? ] [ t ] }
         { [ t ] [ f ] }
     } cond nip ;
 
@@ -125,6 +126,9 @@ PRIVATE>
         { [ dup head..? ] [
             2 tail left-trim-separators
             >r parent-directory r> append-path
+        ] }
+        { [ over absolute-path? over first path-separator? and ] [
+            >r 2 head r> append
         ] }
         { [ t ] [
             >r right-trim-separators "/" r>
@@ -296,13 +300,16 @@ DEFER: copy-tree-into
 : temp-file ( name -- path )
     temp-directory prepend-path ;
 
-M: object normalize-pathname ( path -- path' )
+: (normalize-pathname) ( path -- path' )
     "resource:" ?head [
         left-trim-separators resource-path
-        normalize-pathname
+        (normalize-pathname)
     ] [
         current-directory get prepend-path
     ] if ;
+
+M: object normalize-pathname ( path -- path' )
+    (normalize-pathname) ;
 
 ! Pathname presentations
 TUPLE: pathname string ;
