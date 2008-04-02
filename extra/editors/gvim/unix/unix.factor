@@ -1,7 +1,8 @@
-USING: io.unix.backend kernel namespaces editors.gvim.backend ;
+USING: io.unix.backend kernel namespaces editors.gvim.backend
+system ;
 IN: editors.gvim.unix
 
-M: unix-io gvim-path
+M: unix gvim-path
     \ gvim-path get-global [
         "gvim"
     ] unless* ;
