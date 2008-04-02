@@ -37,7 +37,7 @@ USE: unix
     2nip reset-fd ;
 
 : redirect-file ( obj mode fd -- )
-    >r >r normalize-pathname r> file-mode
+    >r >r normalize-path r> file-mode
     open dup io-error r> redirect-fd ;
 
 : redirect-closed ( obj mode fd -- )

@@ -43,6 +43,7 @@ IN: bootstrap.syntax
     "PRIMITIVE:"
     "PRIVATE>"
     "SBUF\""
+    "SINGLETON:"
     "SYMBOL:"
     "TUPLE:"
     "T{"

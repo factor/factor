@@ -5,8 +5,8 @@ byte-vectors definitions generic hashtables kernel math
 namespaces parser sequences strings sbufs vectors words
 quotations io assocs splitting classes.tuple generic.standard
 generic.math classes io.files vocabs float-arrays float-vectors
-classes.union classes.mixin classes.predicate compiler.units
-combinators debugger ;
+classes.union classes.mixin classes.predicate classes.singleton
+compiler.units combinators debugger ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -152,6 +152,11 @@ IN: bootstrap.syntax
         scan "<" assert=
         scan-word
         parse-definition define-predicate-class
+    ] define-syntax
+
+    "SINGLETON:" [
+        scan create-class-in
+        dup save-location define-singleton-class
     ] define-syntax
 
     "TUPLE:" [

@@ -43,22 +43,22 @@ M: unix-io (file-appender) ( path -- stream )
     { O_WRONLY O_APPEND O_CREAT O_EXCL } flags ; foldable
 
 M: unix-io touch-file ( path -- )
-    normalize-pathname
+    normalize-path
     touch-mode file-mode open
     dup 0 < [ err_no EEXIST = [ err_no io-error ] unless ] when
     close ;
 
 M: unix-io move-file ( from to -- )
-    [ normalize-pathname ] bi@ rename io-error ;
+    [ normalize-path ] bi@ rename io-error ;
 
 M: unix-io delete-file ( path -- )
-    normalize-pathname unlink io-error ;
+    normalize-path unlink io-error ;
 
 M: unix-io make-directory ( path -- )
-    normalize-pathname OCT: 777 mkdir io-error ;
+    normalize-path OCT: 777 mkdir io-error ;
 
 M: unix-io delete-directory ( path -- )
-    normalize-pathname rmdir io-error ;
+    normalize-path rmdir io-error ;
 
 : (copy-file) ( from to -- )
     dup parent-directory make-directories
@@ -69,7 +69,7 @@ M: unix-io delete-directory ( path -- )
     ] with-disposal ;
 
 M: unix-io copy-file ( from to -- )
-    [ normalize-pathname ] bi@
+    [ normalize-path ] bi@
     [ (copy-file) ]
     [ swap file-info file-info-permissions chmod io-error ]
     2bi ;
@@ -96,15 +96,15 @@ M: unix-io copy-file ( from to -- )
     \ file-info construct-boa ;
 
 M: unix-io file-info ( path -- info )
-    normalize-pathname stat* stat>file-info ;
+    normalize-path stat* stat>file-info ;
 
 M: unix-io link-info ( path -- info )
-    normalize-pathname lstat* stat>file-info ;
+    normalize-path lstat* stat>file-info ;
 
 M: unix-io make-link ( path1 path2 -- )
-    normalize-pathname symlink io-error ;
+    normalize-path symlink io-error ;
 
 M: unix-io read-link ( path -- path' )
-    normalize-pathname
+    normalize-path
     PATH_MAX [ <byte-array> tuck ] [ ] bi readlink
     dup io-error head-slice >string ;

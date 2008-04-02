@@ -13,13 +13,13 @@ HOOK: (file-writer) io-backend ( path -- stream )
 HOOK: (file-appender) io-backend ( path -- stream )
 
 : <file-reader> ( path encoding -- stream )
-    swap normalize-pathname (file-reader) swap <decoder> ;
+    swap normalize-path (file-reader) swap <decoder> ;
 
 : <file-writer> ( path encoding -- stream )
-    swap normalize-pathname (file-writer) swap <encoder> ;
+    swap normalize-path (file-writer) swap <encoder> ;
 
 : <file-appender> ( path encoding -- stream )
-    swap normalize-pathname (file-appender) swap <encoder> ;
+    swap normalize-path (file-appender) swap <encoder> ;
 
 : file-lines ( path encoding -- seq )
     <file-reader> lines ;
@@ -102,6 +102,7 @@ PRIVATE>
 
 : windows-absolute-path? ( path -- path ? )
     {
+        { [ dup "\\\\?\\" head? ] [ t ] }
         { [ dup length 2 < ] [ f ] }
         { [ dup second CHAR: : = ] [ t ] }
         { [ t ] [ f ] }
@@ -111,8 +112,8 @@ PRIVATE>
     {
         { [ dup empty? ] [ f ] }
         { [ dup "resource:" head? ] [ t ] }
-        { [ dup first path-separator? ] [ t ] }
         { [ windows? ] [ windows-absolute-path? ] }
+        { [ dup first path-separator? ] [ t ] }
         { [ t ] [ f ] }
     } cond nip ;
 
@@ -125,6 +126,9 @@ PRIVATE>
         { [ dup head..? ] [
             2 tail left-trim-separators
             >r parent-directory r> append-path
+        ] }
+        { [ over absolute-path? over first path-separator? and ] [
+            >r 2 head r> append
         ] }
         { [ t ] [
             >r right-trim-separators "/" r>
@@ -167,7 +171,7 @@ SYMBOL: +unknown+
 
 ! File metadata
 : exists? ( path -- ? )
-    normalize-pathname (exists?) ;
+    normalize-path (exists?) ;
 
 : directory? ( path -- ? )
     file-info file-info-type +directory+ = ;
@@ -183,18 +187,33 @@ M: object cwd ( -- path ) "." ;
 
 [ cwd current-directory set-global ] "io.files" add-init-hook
 
+: resource-path ( path -- newpath )
+    "resource-path" get [ image parent-directory ] unless*
+    prepend-path ;
+
+: (normalize-path) ( path -- path' )
+    "resource:" ?head [
+        left-trim-separators resource-path
+        (normalize-path)
+    ] [
+        current-directory get prepend-path
+    ] if ;
+
+M: object normalize-path ( path -- path' )
+    (normalize-path) ;
+
 : with-directory ( path quot -- )
-    >r normalize-pathname r>
+    >r (normalize-path) r>
     current-directory swap with-variable ; inline
 
 : set-current-directory ( path -- )
-    normalize-pathname current-directory set ;
+    normalize-path current-directory set ;
 
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )
 
 : make-directories ( path -- )
-    normalize-pathname right-trim-separators {
+    normalize-path right-trim-separators {
         { [ dup "." = ] [ ] }
         { [ dup root-directory? ] [ ] }
         { [ dup empty? ] [ ] }
@@ -267,7 +286,7 @@ M: object copy-file
 DEFER: copy-tree-into
 
 : copy-tree ( from to -- )
-    normalize-pathname
+    normalize-path
     over link-info type>>
     {
         { +symbolic-link+ [ copy-link ] }
@@ -286,23 +305,12 @@ DEFER: copy-tree-into
     [ copy-tree-into ] curry each ;
 
 ! Special paths
-: resource-path ( path -- newpath )
-    "resource-path" get [ image parent-directory ] unless*
-    prepend-path ;
 
 : temp-directory ( -- path )
     "temp" resource-path dup make-directories ;
 
 : temp-file ( name -- path )
     temp-directory prepend-path ;
-
-M: object normalize-pathname ( path -- path' )
-    "resource:" ?head [
-        left-trim-separators resource-path
-        normalize-pathname
-    ] [
-        current-directory get prepend-path
-    ] if ;
 
 ! Pathname presentations
 TUPLE: pathname string ;

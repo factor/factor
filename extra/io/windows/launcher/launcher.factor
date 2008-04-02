@@ -28,7 +28,7 @@ TUPLE: CreateProcess-args
     "PROCESS_INFORMATION" <c-object> >>lpProcessInformation
     TRUE >>bInheritHandles
     0 >>dwCreateFlags
-    current-directory get normalize-pathname >>lpCurrentDirectory ;
+    current-directory get (normalize-path) >>lpCurrentDirectory ;
 
 : call-CreateProcess ( CreateProcess-args -- )
     {

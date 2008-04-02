@@ -4,7 +4,7 @@
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
 
 USING: arrays kernel math namespaces sequences system init
-accessors math.ranges random ;
+accessors math.ranges random circular ;
 IN: random.mersenne-twister
 
 <PRIVATE
@@ -16,8 +16,6 @@ TUPLE: mersenne-twister seq i ;
 : mt-a HEX: 9908b0df ; inline
 : mt-hi HEX: 80000000 bitand ; inline
 : mt-lo HEX: 7fffffff bitand ; inline
-: wrap ( x n -- y ) 2dup >= [ - ] [ drop ] if ; inline
-: mt-wrap ( x -- y ) mt-n wrap ; inline
 
 : set-generated ( y from-elt to seq -- )
     >r >r >r [ 2/ ] [ odd? mt-a 0 ? ] bi
@@ -27,8 +25,8 @@ TUPLE: mersenne-twister seq i ;
     tuck [ nth mt-hi ] [ nth mt-lo ] 2bi* bitor ; inline
 
 : (mt-generate) ( n mt-seq -- y to from-elt )
-    [ >r dup 1+ mt-wrap r> calculate-y ]
-    [ >r mt-m + mt-wrap r> nth ]
+    [ >r dup 1+ r> calculate-y ]
+    [ >r mt-m + r> nth ]
     [ drop ] 2tri ;
 
 : mt-generate ( mt -- )
@@ -36,7 +34,7 @@ TUPLE: mersenne-twister seq i ;
     [ 0 >>i drop ] bi ;
 
 : init-mt-first ( seed -- seq )
-    >r mt-n 0 <array> r>
+    >r mt-n 0 <array> <circular> r>
     HEX: ffffffff bitand 0 pick set-nth ;
 
 : init-mt-formula ( seq i -- f(seq[i]) )
