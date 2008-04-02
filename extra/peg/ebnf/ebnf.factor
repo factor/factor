@@ -350,3 +350,6 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   ";EBNF" parse-multiline-string replace-escapes
   ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop ; parsing
 
+: rule ( name word -- parser )
+  #! Given an EBNF word produced from EBNF: return the EBNF rule
+  "ebnf-parser" word-prop at ;

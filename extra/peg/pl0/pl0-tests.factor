@@ -1,52 +1,43 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.pl0 multiline sequences words assocs ;
+USING: kernel tools.test peg peg.ebnf peg.pl0 multiline sequences ;
 IN: peg.pl0.tests
 
 { t } [
-  "CONST foo = 1;" \ pl0 "ebnf-parser" word-prop "block" swap at parse parse-result-remaining empty? 
+  "CONST foo = 1;" "block" \ pl0 rule parse parse-result-remaining empty? 
 ] unit-test
 
 { t } [
-  "VAR foo;" \ pl0 "ebnf-parser" word-prop "block" swap at parse parse-result-remaining empty?
+  "VAR foo;" "block" \ pl0 rule parse parse-result-remaining empty?
 ] unit-test
 
 { t } [
-  "VAR foo,bar , baz;" \ pl0 "ebnf-parser" word-prop "block" swap at parse parse-result-remaining empty? 
+  "VAR foo,bar , baz;" "block" \ pl0 rule parse parse-result-remaining empty? 
 ] unit-test
 
 { t } [
-  "foo := 5" \ pl0 "ebnf-parser" word-prop "statement" swap at parse parse-result-remaining empty? 
+  "foo := 5" "statement" \ pl0 rule parse parse-result-remaining empty? 
 ] unit-test
 
 { t } [
-  "BEGIN foo := 5 END" \ pl0 "ebnf-parser" word-prop "statement" swap at parse parse-result-remaining empty? 
+  "BEGIN foo := 5 END" "statement" \ pl0 rule parse parse-result-remaining empty? 
 ] unit-test
 
 { t } [
-  "IF 1=1 THEN foo := 5" \ pl0 "ebnf-parser" word-prop "statement" swap at parse parse-result-remaining empty? 
+  "IF 1=1 THEN foo := 5" "statement" \ pl0 rule parse parse-result-remaining empty? 
 ] unit-test
 
 { t } [
-  "WHILE 1=1 DO foo := 5" \ pl0 "ebnf-parser" word-prop "statement" swap at parse parse-result-remaining empty? 
+  "WHILE 1=1 DO foo := 5" "statement" \ pl0 rule parse parse-result-remaining empty? 
 ] unit-test
 
 { t } [
-  "WHILE ODD 1 DO foo := 5" \ pl0 "ebnf-parser" word-prop "statement" swap at parse parse-result-remaining empty? 
+  "WHILE ODD 1 DO foo := 5" "statement" \ pl0 rule parse parse-result-remaining empty? 
 ] unit-test
 
 { t } [
-  "PROCEDURE square; BEGIN squ:=x*x END" \ pl0 "ebnf-parser" word-prop "block" swap at parse parse-result-remaining empty? 
-] unit-test
-
-{ f } [
-  <"
-PROCEDURE square; 
-BEGIN 
-  squ := x * x 
-END;
-"> \ pl0 "ebnf-parser" word-prop "block" swap at parse not 
+  "PROCEDURE square; BEGIN squ:=x*x END" "block" \ pl0 rule parse parse-result-remaining empty? 
 ] unit-test
 
 { t } [
