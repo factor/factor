@@ -13,7 +13,7 @@ TUPLE: hi-tag-dispatch-engine methods ;
 C: <hi-tag-dispatch-engine> hi-tag-dispatch-engine
 
 : convert-hi-tag-methods ( assoc -- assoc' )
-    hi-tag \ <hi-tag-dispatch-engine> convert-methods ;
+    \ hi-tag \ <hi-tag-dispatch-engine> convert-methods ;
 
 : direct-dispatch-quot ( alist n -- quot )
     default get <array>

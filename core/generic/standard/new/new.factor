@@ -100,6 +100,9 @@ PREDICATE: simple-generic < standard-generic
 : with-standard ( combination quot -- quot' )
     >r #>> (dispatch#) r> with-variable ;
 
+M: standard-generic mangle-method
+    drop ;
+
 M: standard-combination make-default-method
     [ empty-method ] with-standard ;
 
@@ -117,6 +120,9 @@ PREDICATE: hook-generic < generic
     0 (dispatch#) [
         dip var>> [ get ] curry prepend
     ] with-variable ; inline
+
+M: hook-generic mangle-method
+    drop [ drop ] prepend ;
 
 M: hook-combination make-default-method
     [ error-method ] with-hook ;
