@@ -8,16 +8,12 @@ io.files.private ;
 
 IN: io.unix.files
 
-<PRIVATE
-
 M: unix cwd ( -- path )
     MAXPATHLEN [ <byte-array> ] [ ] bi getcwd
     [ (io-error) ] unless* ;
 
 M: unix cd ( path -- )
     chdir io-error ;
-
-PRIVATE>
 
 : read-flags O_RDONLY ; inline
 
