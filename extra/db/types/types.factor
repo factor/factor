@@ -4,7 +4,7 @@ USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep sequences.lib
 words namespaces tools.walker slots slots.private classes
 mirrors classes.tuple combinators calendar.format symbols
-singleton ;
+classes.singleton ;
 IN: db.types
 
 HOOK: modifier-table db ( -- hash )

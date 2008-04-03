@@ -6,7 +6,7 @@ init threads continuations math io.encodings io.streams.duplex
 io.nonblocking accessors ;
 IN: io.launcher
 
-TUPLE: process
+TUPLE: process < identity-tuple
 
 command
 detached
@@ -64,8 +64,6 @@ M: object register-process drop ;
     >>handle
     V{ } clone over processes get set-at
     register-process ;
-
-M: process equal? 2drop f ;
 
 M: process hashcode* process-handle hashcode* ;
 

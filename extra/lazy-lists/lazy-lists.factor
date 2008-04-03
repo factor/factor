@@ -365,7 +365,7 @@ M: lazy-concat nil? ( lazy-concat -- bool )
     drop nil
   ] [
     [ car ] keep cdr [ car lcartesian-product ] keep cdr list>array swap [
-      swap [ swap [ add ] lmap-with ] lmap-with lconcat
+      swap [ swap [ suffix ] lmap-with ] lmap-with lconcat
     ] reduce
   ] if ;
 

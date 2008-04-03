@@ -12,7 +12,8 @@ io.encodings.binary ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
-    cpu dup "ppc" = [ >r os "-" r> 3append ] when ;
+    cpu word-name
+    dup "ppc" = [ >r os word-name "-" r> 3append ] when ;
 
 : boot-image-name ( arch -- string )
     "boot." swap ".image" 3append ;
@@ -305,7 +306,7 @@ M: float-array ' float-array emit-dummy-array ;
 ! Tuples
 : (emit-tuple) ( tuple -- pointer )
     [ tuple>array 1 tail-slice ]
-    [ class transfer-word tuple-layout ] bi add* [ ' ] map
+    [ class transfer-word tuple-layout ] bi prefix [ ' ] map
     tuple type-number dup [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )

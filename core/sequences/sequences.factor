@@ -416,6 +416,9 @@ PRIVATE>
         swap >r [ push ] curry compose r> while
     ] keep { } like ; inline
 
+: follow ( obj quot -- seq )
+    >r [ dup ] r> [ keep ] curry [ ] unfold nip ; inline
+
 : index ( obj seq -- n )
     [ = ] with find drop ;
 
@@ -478,16 +481,16 @@ M: sequence <=>
 
 : push-new ( elt seq -- ) [ delete ] 2keep push ;
 
-: add ( seq elt -- newseq )
-    over >r over length 1+ r> [
-        [ >r over length r> set-nth-unsafe ] keep
-        [ 0 swap copy ] keep
-    ] new-like ;
-
-: add* ( seq elt -- newseq )
+: prefix ( seq elt -- newseq )
     over >r over length 1+ r> [
         [ 0 swap set-nth-unsafe ] keep
         [ 1 swap copy ] keep
+    ] new-like ;
+
+: suffix ( seq elt -- newseq )
+    over >r over length 1+ r> [
+        [ >r over length r> set-nth-unsafe ] keep
+        [ 0 swap copy ] keep
     ] new-like ;
 
 : seq-diff ( seq1 seq2 -- newseq )

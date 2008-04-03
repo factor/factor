@@ -152,6 +152,7 @@ ARTICLE: "collections" "Collections"
 "Implementations:"
 { $subsection "hashtables" }
 { $subsection "alists" }
+{ $subsection "enums" }
 { $heading "Other collections" }
 { $subsection "boxes" }
 { $subsection "dlists" }
@@ -261,7 +262,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "collections" }
 { $subsection "io" }
 { $subsection "concurrency" }
-{ $subsection "os" }
+{ $subsection "system" }
 { $subsection "alien" }
 { $heading "Environment reference" }
 { $subsection "cli" }

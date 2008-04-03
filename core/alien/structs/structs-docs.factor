@@ -8,7 +8,7 @@ kernel words slots assocs namespaces ;
     dup ?word-name swap 2array
     over slot-spec-name
     rot slot-spec-type 2array 2array
-    [ { $instance } swap add ] assoc-map ;
+    [ { $instance } swap suffix ] assoc-map ;
 
 : $spec-reader-values ( slot-spec class -- )
     ($spec-reader-values) $values ;
@@ -16,9 +16,9 @@ kernel words slots assocs namespaces ;
 : $spec-reader-description ( slot-spec class -- )
     [
         "Outputs the value stored in the " ,
-        { $snippet } rot slot-spec-name add ,
+        { $snippet } rot slot-spec-name suffix ,
         " slot of " ,
-        { $instance } swap add ,
+        { $instance } swap suffix ,
         " instance." ,
     ] { } make $description ;
 
@@ -43,9 +43,9 @@ M: word slot-specs "slots" word-prop ;
 : $spec-writer-description ( slot-spec class -- )
     [
         "Stores a new value to the " ,
-        { $snippet } rot slot-spec-name add ,
+        { $snippet } rot slot-spec-name suffix ,
         " slot of " ,
-        { $instance } swap add ,
+        { $instance } swap suffix ,
         " instance." ,
     ] { } make $description ;
 

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private math
 namespaces sequences vectors words strings layouts combinators
-sequences.private classes generic.standard assocs ;
+sequences.private classes generic.standard
+generic.standard.engines assocs ;
 IN: optimizer.specializers
 
 : (make-specializer) ( class picker -- quot )
@@ -32,7 +33,7 @@ IN: optimizer.specializers
 
 : method-declaration ( method -- quot )
     dup "method-generic" word-prop dispatch# object <array>
-    swap "method-class" word-prop add* ;
+    swap "method-class" word-prop prefix ;
 
 : specialize-method ( quot method -- quot' )
     method-declaration [ declare ] curry prepend ;

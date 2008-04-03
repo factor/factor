@@ -14,7 +14,7 @@ C: <slot-spec> slot-spec
     >r create-method r> define ;
 
 : define-slot-word ( class slot word quot -- )
-    rot >fixnum add* define-typecheck ;
+    rot >fixnum prefix define-typecheck ;
 
 : reader-quot ( decl -- quot )
     [

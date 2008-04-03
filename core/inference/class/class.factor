@@ -176,9 +176,18 @@ M: pair constraint-satisfied?
 
 : predicate-constraints ( class #call -- )
     [
-        0 `input class,
-        general-t 0 `output class,
-    ] set-constraints ;
+        ! If word outputs true, input is an instance of class
+        [
+            0 `input class,
+            \ f class-not 0 `output class,
+        ] set-constraints
+    ] [
+        ! If word outputs false, input is not an instance of class
+        [
+            class-not 0 `input class,
+            \ f 0 `output class,
+        ] set-constraints
+    ] 2bi ;
 
 : compute-constraints ( #call -- )
     dup node-param "constraints" word-prop [
@@ -209,7 +218,7 @@ M: #push infer-classes-before
 
 M: #if child-constraints
     [
-        general-t 0 `input class,
+        \ f class-not 0 `input class,
         f 0 `input literal,
     ] make-constraints ;
 
@@ -265,7 +274,7 @@ DEFER: (infer-classes)
     (merge-intervals) r> set-intervals ;
 
 : annotate-merge ( nodes #merge/#entry -- )
-    2dup merge-classes merge-intervals ;
+    [ merge-classes ] [ merge-intervals ] 2bi ;
 
 : merge-children ( node -- )
     dup node-successor dup #merge? [
@@ -281,28 +290,31 @@ DEFER: (infer-classes)
 M: #label infer-classes-before ( #label -- )
     #! First, infer types under the hypothesis which hold on
     #! entry to the recursive label.
-    dup 1array swap annotate-entry ;
+    [ 1array ] keep annotate-entry ;
 
 M: #label infer-classes-around ( #label -- )
     #! Now merge the types at every recursion point with the
     #! entry types.
-    dup annotate-node
-    dup infer-classes-before
-    dup infer-children
-    dup collect-recursion over add
-    pick annotate-entry
-    node-child (infer-classes) ;
+    {
+        [ annotate-node ]
+        [ infer-classes-before ]
+        [ infer-children ]
+        [ [ collect-recursion ] [ suffix ] [ annotate-entry ] tri ]
+        [ node-child (infer-classes) ]
+    } cleave ;
 
 M: object infer-classes-around
-    dup infer-classes-before
-    dup annotate-node
-    dup infer-children
-    merge-children ;
+    {
+        [ infer-classes-before ]
+        [ annotate-node ]
+        [ infer-children ]
+        [ merge-children ]
+    } cleave ;
 
 : (infer-classes) ( node -- )
     [
-        dup infer-classes-around
-        node-successor (infer-classes)
+        [ infer-classes-around ]
+        [ node-successor (infer-classes) ] bi
     ] when* ;
 
 : infer-classes-with ( node classes literals intervals -- )

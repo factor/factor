@@ -113,7 +113,7 @@ M: regexp text-hash-char drop f ;
 : rule-chars* ( rule -- string )
     dup rule-chars
     swap rule-start matcher-text
-    text-hash-char [ add ] when* ;
+    text-hash-char [ suffix ] when* ;
 
 : add-rule ( rule ruleset -- )
     >r dup rule-chars* >upper swap

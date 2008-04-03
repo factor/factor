@@ -14,11 +14,19 @@ PREDICATE: predicate-class < class
     ] [ ] make ;
 
 : define-predicate-class ( class superclass definition -- )
-    >r dupd f predicate-class define-class
-    r> dupd "predicate-definition" set-word-prop
-    dup predicate-quot define-predicate ;
+    [ drop f predicate-class define-class ]
+    [ nip "predicate-definition" set-word-prop ]
+    [
+        2drop
+        [ dup predicate-quot define-predicate ]
+        [ update-classes ]
+        bi
+    ] 3tri ;
 
 M: predicate-class reset-class
     {
-        "metaclass" "predicate-definition" "superclass"
+        "class"
+        "metaclass"
+        "predicate-definition"
+        "superclass"
     } reset-props ;

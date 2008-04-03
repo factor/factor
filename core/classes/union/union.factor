@@ -1,33 +1,21 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel assocs combinators classes
-generic.standard namespaces arrays math quotations ;
+namespaces arrays math quotations ;
 IN: classes.union
 
 PREDICATE: union-class < class
     "metaclass" word-prop union-class eq? ;
 
 ! Union classes for dispatch on multiple classes.
-: small-union-predicate-quot ( members -- quot )
+: union-predicate-quot ( members -- quot )
     dup empty? [
         drop [ drop f ]
     ] [
-        unclip first "predicate" word-prop swap
-        [ >r "predicate" word-prop [ dup ] prepend r> ]
-        assoc-map alist>quot
-    ] if ;
-
-: big-union-predicate-quot ( members -- quot )
-    [ small-union-predicate-quot ] [ dup ]
-    class-hash-dispatch-quot ;
-
-: union-predicate-quot ( members -- quot )
-    [ [ drop t ] ] { } map>assoc
-    dup length 4 <= [
-        small-union-predicate-quot
-    ] [
-        flatten-methods
-        big-union-predicate-quot
+        unclip "predicate" word-prop swap [
+            "predicate" word-prop [ dup ] prepend
+            [ drop t ]
+        ] { } map>assoc alist>quot
     ] if ;
 
 : define-union-predicate ( class -- )
@@ -36,7 +24,9 @@ PREDICATE: union-class < class
 M: union-class update-class define-union-predicate ;
 
 : define-union-class ( class members -- )
-    f swap union-class define-class ;
+    [ f swap union-class define-class ]
+    [ drop update-classes ]
+    2bi ;
 
 M: union-class reset-class
-    { "metaclass" "members" } reset-props ;
+    { "class" "metaclass" "members" } reset-props ;

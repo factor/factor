@@ -7,7 +7,7 @@ IN: classes.mixin
 PREDICATE: mixin-class < union-class "mixin" word-prop ;
 
 M: mixin-class reset-class
-    { "metaclass" "members" "mixin" } reset-props ;
+    { "class" "metaclass" "members" "mixin" } reset-props ;
 
 : redefine-mixin-class ( class members -- )
     dupd define-union-class
@@ -35,7 +35,7 @@ TUPLE: check-mixin-class mixin ;
     swap redefine-mixin-class ; inline
 
 : add-mixin-instance ( class mixin -- )
-    [ 2drop ] [ [ add ] change-mixin-class ] if-mixin-member? ;
+    [ 2drop ] [ [ suffix ] change-mixin-class ] if-mixin-member? ;
 
 : remove-mixin-instance ( class mixin -- )
     [ [ swap remove ] change-mixin-class ] [ 2drop ] if-mixin-member? ;

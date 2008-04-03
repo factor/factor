@@ -1,12 +1,8 @@
-USING: calendar.backend namespaces alien.c-types
+USING: calendar.backend namespaces alien.c-types system
 windows windows.kernel32 kernel math combinators ;
 IN: calendar.windows
 
-TUPLE: windows-calendar ;
-
-T{ windows-calendar } calendar-backend set-global
-
-M: windows-calendar gmt-offset ( -- hours minutes seconds )
+M: windows gmt-offset ( -- hours minutes seconds )
     "TIME_ZONE_INFORMATION" <c-object>
     dup GetTimeZoneInformation {
         { [ dup TIME_ZONE_ID_INVALID = ] [ win32-error-string throw ] }

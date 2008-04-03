@@ -7,9 +7,9 @@ USING: alien compiler kernel math namespaces sequences strings alien.syntax
 IN: db.sqlite.ffi
 
 << "sqlite" {
-        { [ winnt? ]  [ "sqlite3.dll" ] }
-        { [ macosx? ] [ "/usr/lib/libsqlite3.dylib" ] }
-        { [ unix? ]  [ "libsqlite3.so" ] }
+        { [ os winnt? ]  [ "sqlite3.dll" ] }
+        { [ os macosx? ] [ "/usr/lib/libsqlite3.dylib" ] }
+        { [ os unix? ]  [ "libsqlite3.so" ] }
     } cond "cdecl" add-library >>
 
 ! Return values from sqlite functions

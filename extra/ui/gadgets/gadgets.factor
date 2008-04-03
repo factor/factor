@@ -44,13 +44,11 @@ M: array rect-dim drop { 0 0 } ;
 : rect-union ( rect1 rect2 -- newrect )
     (rect-union) <extent-rect> ;
 
-TUPLE: gadget
+TUPLE: gadget < identity-tuple
 pref-dim parent children orientation focus
 visible? root? clipped? layout-state graft-state graft-node
 interior boundary
 model ;
-
-M: gadget equal? 2drop f ;
 
 M: gadget hashcode* drop gadget hashcode* ;
 
@@ -354,7 +352,7 @@ SYMBOL: in-layout?
     swap [ over (add-gadget) ] each relayout ;
 
 : parents ( gadget -- seq )
-    [ dup ] [ [ gadget-parent ] keep ] [ ] unfold nip ;
+    [ gadget-parent ] follow ;
 
 : each-parent ( gadget quot -- ? )
     >r parents r> all? ; inline
@@ -401,7 +399,7 @@ M: f request-focus-on 2drop ;
     dup focusable-child swap request-focus-on ;
 
 : focus-path ( world -- seq )
-    [ dup ] [ [ gadget-focus ] keep ] [ ] unfold nip ;
+    [ gadget-parent ] follow ;
 
 : make-gadget ( quot gadget -- gadget )
     [ \ make-gadget rot with-variable ] keep ; inline

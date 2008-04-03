@@ -3,7 +3,7 @@
 IN: io.unix.bsd
 USING: io.backend io.unix.backend io.unix.kqueue io.unix.select
 io.launcher io.unix.launcher namespaces kernel assocs
-threads continuations ;
+threads continuations system ;
 
 ! On Mac OS X, we use select() for the top-level
 ! multiplexer, and we hang a kqueue off of it for process exit
@@ -12,16 +12,12 @@ threads continuations ;
 ! kqueue is buggy with files and ptys so we can't use it as the
 ! main multiplexer.
 
-MIXIN: bsd-io
-
-INSTANCE: bsd-io unix-io
-
-M: bsd-io init-io ( -- )
+M: bsd init-io ( -- )
     <select-mx> mx set-global
     <kqueue-mx> kqueue-mx set-global
     kqueue-mx get-global <mx-port> <mx-task> dup io-task-fd
     2dup mx get-global mx-reads set-at
     mx get-global mx-writes set-at ;
 
-M: bsd-io register-process ( process -- )
+M: bsd register-process ( process -- )
     process-handle kqueue-mx get-global add-pid-task ;

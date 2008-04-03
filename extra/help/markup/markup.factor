@@ -234,7 +234,7 @@ M: string ($instance)
 
 : values-row ( seq -- seq )
     unclip \ $snippet swap ?word-name 2array
-    swap dup first word? [ \ $instance add* ] when 2array ;
+    swap dup first word? [ \ $instance prefix ] when 2array ;
 
 : $values ( element -- )
     "Inputs and outputs" $heading

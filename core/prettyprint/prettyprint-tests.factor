@@ -57,8 +57,6 @@ unit-test
 
 [ ] [ \ integer see ] unit-test
 
-[ ] [ \ general-t see ] unit-test
-
 [ ] [ \ generic see ] unit-test
 
 [ ] [ \ duplex-stream see ] unit-test
@@ -192,7 +190,7 @@ unit-test
         "IN: prettyprint.tests"
         ": another-soft-break-layout ( node -- quot )"
         "    parse-error-file"
-        "    [ <reversed> \"hello world foo\" add ] [ ] make ;"
+        "    [ <reversed> \"hello world foo\" suffix ] [ ] make ;"
     } ;
 
 [ t ] [

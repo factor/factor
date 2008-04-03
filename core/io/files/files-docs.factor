@@ -252,7 +252,7 @@ HELP: normalize-directory
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
 { $description "Called by the " { $link directory } " word to prepare a pathname before passing it to the " { $link (directory) } " primitive." } ;
 
-HELP: normalize-pathname
+HELP: normalize-path
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
 { $description "Called by words such as " { $link <file-reader> } " and " { $link <file-writer> } " to prepare a pathname before passing it to underlying code." } ;
 

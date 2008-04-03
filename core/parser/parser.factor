@@ -294,7 +294,7 @@ M: no-word-error summary
     scan {
         { ";" [ tuple f ] }
         { "<" [ scan-word ";" parse-tokens ] }
-        [ >r tuple ";" parse-tokens r> add* ]
+        [ >r tuple ";" parse-tokens r> prefix ]
     } case ;
 
 ERROR: staging-violation word ;
@@ -365,7 +365,17 @@ ERROR: bad-number ;
 
 : (:) CREATE-WORD parse-definition ;
 
-: (M:) CREATE-METHOD parse-definition ;
+SYMBOL: current-class
+SYMBOL: current-generic
+
+: (M:)
+    CREATE-METHOD
+    [
+        [ "method-class" word-prop current-class set ]
+        [ "method-generic" word-prop current-generic set ]
+        [ ] tri
+        parse-definition
+    ] with-scope ;
 
 : scan-object ( -- object )
     scan-word dup parsing?
@@ -467,18 +477,22 @@ SYMBOL: interactive-vocabs
         nl
     ] when 2drop ;
 
-: filter-moved ( assoc -- newassoc )
-    [
+: filter-moved ( assoc1 assoc2 -- seq )
+    diff [
         drop where dup [ first ] when
         file get source-file-path =
-    ] assoc-subset ;
+    ] assoc-subset keys ;
 
-: removed-definitions ( -- definitions )
+: removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions
-    [ get first2 union ] bi@ diff ;
+    [ get first2 union ] bi@ ;
+
+: removed-classes ( -- assoc1 assoc2 )
+    new-definitions old-definitions
+    [ get second ] bi@ ;
 
 : smudged-usage ( -- usages referenced removed )
-    removed-definitions filter-moved keys [
+    removed-definitions filter-moved [
         outside-usages
         [
             empty? [ drop f ] [
@@ -495,8 +509,10 @@ SYMBOL: interactive-vocabs
 : fix-class-words ( -- )
     #! If a class word had a compound definition which was
     #! removed, it must go back to being a symbol.
-    new-definitions get first2 diff
-    [ nip dup reset-generic define-symbol ] assoc-each ;
+    new-definitions get first2
+    filter-moved [ [ reset-generic ] [ define-symbol ] bi ] each
+    removed-classes
+    filter-moved [ class? ] subset [ reset-class ] each ;
 
 : forget-smudged ( -- )
     smudged-usage forget-all
@@ -505,9 +521,10 @@ SYMBOL: interactive-vocabs
 
 : finish-parsing ( lines quot -- )
     file get
-    [ record-form ] keep
-    [ record-definitions ] keep
-    record-checksum ;
+    [ record-form ]
+    [ record-definitions ]
+    [ record-checksum ]
+    tri ;
 
 : parse-stream ( stream name -- quot )
     [

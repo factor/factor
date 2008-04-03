@@ -4,12 +4,8 @@ USING: kernel io.backend io.monitors io.monitors.private
 io.files io.buffers io.nonblocking io.timeouts io.unix.backend
 io.unix.select io.unix.launcher unix.linux.inotify assocs
 namespaces threads continuations init math alien.c-types alien
-vocabs.loader accessors ;
+vocabs.loader accessors system ;
 IN: io.unix.linux
-
-TUPLE: linux-io ;
-
-INSTANCE: linux-io unix-io
 
 TUPLE: linux-monitor ;
 
@@ -24,8 +20,10 @@ TUPLE: inotify watches ;
 
 : <inotify> ( -- port/f )
     H{ } clone
-    inotify_init [ io-error ] [ inotify <buffered-port> ] bi
-    { set-inotify-watches set-delegate } inotify construct ;
+    inotify_init dup 0 < [ 2drop f ] [
+        inotify <buffered-port>
+        { set-inotify-watches set-delegate } inotify construct
+    ] if ;
 
 : inotify-fd inotify get-global handle>> ;
 
@@ -50,7 +48,7 @@ TUPLE: inotify watches ;
         "inotify is not supported by this Linux release" throw
     ] unless ;
 
-M: linux-io <monitor> ( path recursive? -- monitor )
+M: linux <monitor> ( path recursive? -- monitor )
     check-inotify
     drop IN_CHANGE_EVENTS add-watch ;
 
@@ -109,18 +107,21 @@ TUPLE: inotify-task ;
     f inotify-task <input-task> ;
 
 : init-inotify ( mx -- )
-    <inotify>
-    dup inotify set-global
-    <inotify-task> swap register-io-task ;
+    <inotify> dup [
+        dup inotify set-global
+        <inotify-task> swap register-io-task
+    ] [
+        2drop
+    ] if ;
 
 M: inotify-task do-io-task ( task -- )
     io-task-port read-notifications f ;
 
-M: linux-io init-io ( -- )
+M: linux init-io ( -- )
     <select-mx>
     [ mx set-global ]
-    [ [ init-inotify ] curry ignore-errors ] bi ;
+    [ init-inotify ] bi ;
 
-T{ linux-io } set-io-backend
+linux set-io-backend
 
 [ start-wait-thread ] "io.unix.linux" add-init-hook

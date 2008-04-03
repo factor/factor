@@ -1,8 +1,3 @@
-IN: io.unix.openbsd
-USING: io.unix.bsd io.backend core-foundation.fsevents ;
+USING: io.unix.bsd io.backend core-foundation.fsevents system ;
 
-TUPLE: openbsd-io ;
-
-INSTANCE: openbsd-io bsd-io
-
-T{ openbsd-io } set-io-backend
+openbsd set-io-backend
