@@ -261,7 +261,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "collections" }
 { $subsection "io" }
 { $subsection "concurrency" }
-{ $subsection "os" }
+{ $subsection "system" }
 { $subsection "alien" }
 { $heading "Environment reference" }
 { $subsection "cli" }

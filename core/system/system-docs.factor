@@ -1,12 +1,12 @@
 USING: generic help.markup help.syntax kernel math memory
-namespaces sequences kernel.private strings ;
+namespaces sequences kernel.private strings classes.singleton ;
 IN: system
 
-ARTICLE: "os" "System interface"
-"Operating system detection:"
-{ $subsection os }
-"Processor detection:"
-{ $subsection cpu }
+ABOUT: "system"
+
+ARTICLE: "system" "System interface"
+{ $subsection "cpu" }
+{ $subsection "os" }
 "Reading environment variables:"
 { $subsection os-env }
 { $subsection os-envs }
@@ -19,29 +19,45 @@ ARTICLE: "os" "System interface"
 { $subsection exit }
 { $see-also "io.files" "io.mmap" "io.monitors" "network-streams" "io.launcher" } ;
 
-ABOUT: "os"
+ARTICLE: "cpu" "Processor Detection"
+"Processor detection:"
+{ $subsection cpu }
+"Supported processors:"
+{ $subsection x86.32 }
+{ $subsection x86.64 }
+{ $subsection ppc }
+{ $subsection arm }
+"Processor families:"
+{ $subsection x86 } ;
+
+ARTICLE: "os" "Operating System Detection"
+"Operating system detection:"
+{ $subsection os }
+"Supported operating systems:"
+{ $subsection freebsd }
+{ $subsection linux }
+{ $subsection macosx }
+{ $subsection openbsd }
+{ $subsection netbsd }
+{ $subsection solaris }
+{ $subsection wince }
+{ $subsection winnt }
+"Operating system families:"
+{ $subsection bsd }
+{ $subsection unix }
+{ $subsection windows } ;
+
 
 HELP: cpu
-{ $values { "cpu" string } }
+{ $values { "class" singleton-class } }
 { $description
-    "Outputs a singleton class with the name of the current CPU architecture. Currently, this set of descriptors is:"
-    { $code x86.32 x86.64 ppc arm }
+    "Outputs a singleton class with the name of the current CPU architecture."
 } ;
 
 HELP: os
-{ $values { "os" string } }
+{ $values { "class" singleton-class } }
 { $description
-    "Outputs a singleton class with the name of the current operating system family. Currently, this set of descriptors is:"
-    { $code
-        freebsd
-        linux
-        macosx
-        openbsd
-        netbsd
-        solaris
-        wince
-        winnt
-    }
+    "Outputs a singleton class with the name of the current operating system family."
 } ;
 
 HELP: embedded?
