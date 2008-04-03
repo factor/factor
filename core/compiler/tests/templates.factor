@@ -172,14 +172,14 @@ TUPLE: my-tuple ;
 [ 1 t ] [
     B{ 1 2 3 4 } [
         { c-ptr } declare
-        [ 0 alien-unsigned-1 ] keep type
+        [ 0 alien-unsigned-1 ] keep hi-tag
     ] compile-call byte-array type-number =
 ] unit-test
 
 [ t ] [
     B{ 1 2 3 4 } [
         { c-ptr } declare
-        0 alien-cell type
+        0 alien-cell hi-tag
     ] compile-call alien type-number =
 ] unit-test
 
