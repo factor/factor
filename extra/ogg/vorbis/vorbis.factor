@@ -6,9 +6,9 @@ IN: ogg.vorbis
 
 <<
 "vorbis" {
-    { [ win32? ]  [ "vorbis.dll" ] }
-    { [ macosx? ] [ "libvorbis.0.dylib" ] }
-    { [ unix? ]   [ "libvorbis.so" ] }
+    { [ os winnt? ]  [ "vorbis.dll" ] }
+    { [ os macosx? ] [ "libvorbis.0.dylib" ] }
+    { [ os unix? ]   [ "libvorbis.so" ] }
 } cond "cdecl" add-library 
 >>
 

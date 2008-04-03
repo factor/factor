@@ -32,7 +32,7 @@ IN: io.windows.nt.launcher
     drop 2nip null-pipe ;
 
 :: redirect-file ( default path access-mode create-mode -- handle )
-    path normalize-pathname
+    path normalize-path
     access-mode
     share-mode
     security-attributes-inherit
@@ -112,13 +112,13 @@ IN: io.windows.nt.launcher
     dup pipe-out f set-inherit
     >>stdin-pipe ;
 
-M: windows-nt-io fill-redirection ( process args -- )
+M: winnt fill-redirection ( process args -- )
     [ 2dup redirect-stdout ] keep lpStartupInfo>> set-STARTUPINFO-hStdOutput
     [ 2dup redirect-stderr ] keep lpStartupInfo>> set-STARTUPINFO-hStdError
     [ 2dup redirect-stdin  ] keep lpStartupInfo>> set-STARTUPINFO-hStdInput
     2drop ;
 
-M: windows-nt-io (process-stream)
+M: winnt (process-stream)
     [
         dup make-CreateProcess-args
 

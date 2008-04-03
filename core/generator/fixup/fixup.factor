@@ -111,7 +111,7 @@ SYMBOL: literal-table
 : add-literal ( obj -- n ) literal-table get push-new* ;
 
 : string>symbol ( str -- alien )
-    [ wince? [ string>u16-alien ] [ string>char-alien ] if ]
+    [ os wince? [ string>u16-alien ] [ string>char-alien ] if ]
     over string? [ call ] [ map ] if ;
 
 : add-dlsym-literals ( symbol dll -- )

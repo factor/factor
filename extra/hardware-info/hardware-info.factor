@@ -6,11 +6,9 @@ IN: hardware-info
 : megs. ( x -- ) 20 2^ /f . ;
 : gigs. ( x -- ) 30 2^ /f . ;
 
-<<
-{
-    { [ windows? ] [ "hardware-info.windows" ] }
-    { [ linux? ] [ "hardware-info.linux" ] }
-    { [ macosx? ] [ "hardware-info.macosx" ] }
+<< {
+    { [ os windows? ] [ "hardware-info.windows" ] }
+    { [ os linux? ] [ "hardware-info.linux" ] }
+    { [ os macosx? ] [ "hardware-info.macosx" ] }
     { [ t ] [ f ] }
 } cond [ require ] when* >>
-

@@ -388,6 +388,6 @@ M: long-long-type box-return ( type -- )
 
     [ string>u16-alien ] "ushort*" c-type set-c-type-prep
     
-    win64? "longlong" "long" ? "ptrdiff_t" typedef
+    os winnt? cpu x86.64? and "longlong" "long" ? "ptrdiff_t" typedef
     
 ] with-compilation-unit

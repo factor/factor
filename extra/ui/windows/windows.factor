@@ -10,7 +10,7 @@ shuffle opengl ui.render unicode.case ascii math.bitfields
 locals symbols ;
 IN: ui.windows
 
-TUPLE: windows-ui-backend ;
+SINGLETON: windows-ui-backend
 
 : crlf>lf CHAR: \r swap remove ;
 : lf>crlf [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
@@ -496,6 +496,6 @@ M: windows-ui-backend ui
         ] [ cleanup-win32-ui ] [ ] cleanup
     ] ui-running ;
 
-T{ windows-ui-backend } ui-backend set-global
+windows-ui-backend ui-backend set-global
 
 [ "ui" ] main-vocab-hook set-global

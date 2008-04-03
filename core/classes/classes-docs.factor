@@ -46,6 +46,7 @@ $nl
 "Other sorts of classes:"
 { $subsection "builtin-classes" }
 { $subsection "unions" }
+{ $subsection "singletons" }
 { $subsection "mixins" }
 { $subsection "predicates" }
 "Classes can be inspected and operated upon:"

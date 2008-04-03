@@ -29,7 +29,7 @@ M: f expired? drop t ;
     f <displaced-alien> { simple-c-ptr } declare ; inline
 
 : alien>native-string ( alien -- string )
-    windows? [ alien>u16-string ] [ alien>char-string ] if ;
+    os windows? [ alien>u16-string ] [ alien>char-string ] if ;
 
 : dll-path ( dll -- string )
     (dll-path) alien>native-string ;

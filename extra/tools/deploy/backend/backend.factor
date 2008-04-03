@@ -107,6 +107,4 @@ DEFER: ?make-staging-image
     make-boot-image
     deploy-command-line run-factor ;
 
-SYMBOL: deploy-implementation
-
-HOOK: deploy* deploy-implementation ( vocab -- )
+HOOK: deploy* os ( vocab -- )

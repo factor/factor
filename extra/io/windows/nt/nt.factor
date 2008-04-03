@@ -11,5 +11,6 @@ USE: io.windows.nt.sockets
 USE: io.windows.mmap
 USE: io.windows.files
 USE: io.backend
+USE: system
 
-T{ windows-nt-io } set-io-backend
+winnt set-io-backend
