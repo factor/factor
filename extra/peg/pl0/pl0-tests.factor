@@ -1,8 +1,44 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.pl0 multiline sequences ;
+USING: kernel tools.test peg peg.ebnf peg.pl0 multiline sequences ;
 IN: peg.pl0.tests
+
+{ t } [
+  "CONST foo = 1;" "block" \ pl0 rule parse parse-result-remaining empty? 
+] unit-test
+
+{ t } [
+  "VAR foo;" "block" \ pl0 rule parse parse-result-remaining empty?
+] unit-test
+
+{ t } [
+  "VAR foo,bar , baz;" "block" \ pl0 rule parse parse-result-remaining empty? 
+] unit-test
+
+{ t } [
+  "foo := 5" "statement" \ pl0 rule parse parse-result-remaining empty? 
+] unit-test
+
+{ t } [
+  "BEGIN foo := 5 END" "statement" \ pl0 rule parse parse-result-remaining empty? 
+] unit-test
+
+{ t } [
+  "IF 1=1 THEN foo := 5" "statement" \ pl0 rule parse parse-result-remaining empty? 
+] unit-test
+
+{ t } [
+  "WHILE 1=1 DO foo := 5" "statement" \ pl0 rule parse parse-result-remaining empty? 
+] unit-test
+
+{ t } [
+  "WHILE ODD 1 DO foo := 5" "statement" \ pl0 rule parse parse-result-remaining empty? 
+] unit-test
+
+{ t } [
+  "PROCEDURE square; BEGIN squ:=x*x END" "block" \ pl0 rule parse parse-result-remaining empty? 
+] unit-test
 
 { t } [
   <"
