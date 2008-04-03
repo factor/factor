@@ -4,7 +4,7 @@ USING: io io.backend io.launcher io.nonblocking io.unix.backend
 io.unix.files io.nonblocking sequences kernel namespaces math
 system alien.c-types debugger continuations arrays assocs
 combinators unix.process strings threads unix
-io.unix.launcher.parser accessors io.files ;
+io.unix.launcher.parser accessors io.files io.files.private ;
 IN: io.unix.launcher
 
 ! Search unix first
