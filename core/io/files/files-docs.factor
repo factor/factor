@@ -28,11 +28,14 @@ ARTICLE: "pathnames" "Pathname manipulation"
 { $subsection <pathname> } ;
 
 ARTICLE: "directories" "Directories"
-"Current and home directories:"
+"Current directory:"
+{ $subsection with-directory }
+{ $subsection current-directory }
+"Home directory:"
+{ $subsection home }
+"Current system directory:"
 { $subsection cwd }
 { $subsection cd }
-{ $subsection with-directory }
-{ $subsection home }
 "Directory listing:"
 { $subsection directory }
 { $subsection directory* }
