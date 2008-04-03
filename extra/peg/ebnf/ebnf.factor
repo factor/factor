@@ -237,17 +237,16 @@ GENERIC: (transform) ( ast -- parser )
 
 SYMBOL: parser
 SYMBOL: main
-SYMBOL: vars
 
 : transform ( ast -- object )
-  H{ } clone dup dup [ parser set V{ } vars set swap (transform) main set ] bind ;
+  H{ } clone dup dup [ parser set swap (transform) main set ] bind ;
 
 M: ebnf (transform) ( ast -- parser )
   rules>> [ (transform) ] map peek ;
   
 M: ebnf-rule (transform) ( ast -- parser )
   dup elements>> 
-  vars get clone vars [ (transform) ] with-variable [
+  (transform) [
     swap symbol>> set
   ] keep ;
 
@@ -282,30 +281,50 @@ M: ebnf-repeat1 (transform) ( ast -- parser )
 M: ebnf-optional (transform) ( ast -- parser )
   transform-group optional ;
 
-: build-locals ( string vars -- string )
-  dup empty? [
-    drop
-  ] [
+GENERIC: build-locals ( code ast -- code )
+
+M: ebnf-sequence build-locals ( code ast -- code )
+  elements>> dup [ ebnf-var? ] subset empty? [
+    drop 
+  ] [ 
     [
-      "USING: locals namespaces ;  [let* | " %
-      [ dup % " [ \"" % % "\" get ] " % ] each
-      " | " %
-      %  
-      " ] with-locals" %     
+      "USING: locals sequences ;  [let* | " %
+        dup length swap [
+          dup ebnf-var? [
+            name>> % 
+            " [ " % # " over nth ] " %
+          ] [
+            2drop
+          ] if
+        ] 2each
+        " | " %
+        %  
+        " ] with-locals" %     
     ] "" make 
   ] if ;
 
+M: ebnf-var build-locals ( code ast -- )
+  [
+    "USING: locals kernel ;  [let* | " %
+    name>> % " [ dup ] " %
+    " | " %
+    %  
+    " ] with-locals" %     
+  ] "" make ;
+
+M: object build-locals ( code ast -- )
+  drop ;
+   
 M: ebnf-action (transform) ( ast -- parser )
-  [ parser>> (transform) ] keep
-  code>> vars get build-locals string-lines [ parse-lines ] with-compilation-unit action ;
+  [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
+  string-lines [ parse-lines ] with-compilation-unit action ;
 
 M: ebnf-semantic (transform) ( ast -- parser )
-  [ parser>> (transform) ] keep
-  code>> vars get build-locals string-lines [ parse-lines ] with-compilation-unit semantic ;
+  [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
+  string-lines [ parse-lines ] with-compilation-unit semantic ;
 
 M: ebnf-var (transform) ( ast -- parser )
-  [ parser>> (transform) ] [ name>> ] bi 
-  dup vars get push [ dupd set ] curry action ;
+  parser>> (transform) ;
 
 M: ebnf-terminal (transform) ( ast -- parser )
   symbol>> token ;
