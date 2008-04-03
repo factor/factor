@@ -135,6 +135,7 @@ M: standard-generic next-method-quot
         ]
         [ [ inconsistent-next-method ] 2curry , ]
         2tri
+        \ if ,
     ] [ ] make ;
 
 TUPLE: hook-combination var ;
