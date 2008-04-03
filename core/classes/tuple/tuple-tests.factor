@@ -542,3 +542,14 @@ USE: vocabs
 [ f ] [ "x" accessor-exists? ] unit-test
 [ f ] [ "y" accessor-exists? ] unit-test
 [ f ] [ "z" accessor-exists? ] unit-test
+
+TUPLE: another-forget-accessors-test ;
+
+
+[ [ ] ] [
+    "IN: classes.tuple.tests GENERIC: another-forget-accessors-test"
+    <string-reader>
+    "another-forget-accessors-test" parse-stream
+] unit-test
+
+[ t ] [ \ another-forget-accessors-test class? ] unit-test

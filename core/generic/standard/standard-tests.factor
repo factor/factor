@@ -1,7 +1,7 @@
 IN: generic.standard.tests
 USING: tools.test math math.functions math.constants
 generic.standard strings sequences arrays kernel accessors
-words float-arrays byte-arrays bit-arrays parser ;
+words float-arrays byte-arrays bit-arrays parser namespaces ;
 
 GENERIC: lo-tag-test
 
@@ -137,3 +137,99 @@ M: byte-array small-lo-tag drop "byte-array" ;
 [ "fixnum" ] [ 3 small-lo-tag ] unit-test
 
 [ "float-array" ] [ F{ 1.0 } small-lo-tag ] unit-test
+
+! Testing next-method
+TUPLE: person ;
+
+TUPLE: intern < person ;
+
+TUPLE: employee < person ;
+
+TUPLE: tape-monkey < employee ;
+
+TUPLE: manager < employee ;
+
+TUPLE: junior-manager < manager ;
+
+TUPLE: middle-manager < manager ;
+
+TUPLE: senior-manager < manager ;
+
+TUPLE: executive < senior-manager ;
+
+TUPLE: ceo < executive ;
+
+GENERIC: salary ( person -- n )
+
+M: intern salary
+    #! Intentional mistake.
+    call-next-method ;
+
+M: employee salary drop 24000 ;
+
+M: manager salary call-next-method 12000 + ;
+
+M: middle-manager salary call-next-method 5000 + ;
+
+M: senior-manager salary call-next-method 15000 + ;
+
+M: executive salary call-next-method 2 * ;
+
+M: ceo salary
+    #! Intentional error.
+    drop 5 call-next-method 3 * ;
+
+[ salary ] must-infer
+
+[ 24000 ] [ employee construct-boa salary ] unit-test
+
+[ 24000 ] [ tape-monkey construct-boa salary ] unit-test
+
+[ 36000 ] [ junior-manager construct-boa salary ] unit-test
+
+[ 41000 ] [ middle-manager construct-boa salary ] unit-test
+
+[ 51000 ] [ senior-manager construct-boa salary ] unit-test
+
+[ 102000 ] [ executive construct-boa salary ] unit-test
+
+[ ceo construct-boa salary ]
+[ T{ inconsistent-next-method f 5 ceo salary } = ] must-fail-with
+
+[ intern construct-boa salary ]
+[ T{ no-next-method f intern salary } = ] must-fail-with
+
+! Weird shit
+TUPLE: a ;
+TUPLE: b ;
+TUPLE: c ;
+
+UNION: x a b ;
+UNION: y a c ;
+
+UNION: z x y ;
+
+GENERIC: funky* ( obj -- )
+
+M: z funky* "z" , drop ;
+
+M: x funky* "x" , call-next-method ;
+
+M: y funky* "y" , call-next-method ;
+
+M: a funky* "a" , call-next-method ;
+
+M: b funky* "b" , call-next-method ;
+
+M: c funky* "c" , call-next-method ;
+
+: funky [ funky* ] { } make ;
+
+[ { "b" "x" "z" } ] [ T{ b } funky ] unit-test
+
+[ { "c" "y" "z" } ] [ T{ c } funky ] unit-test
+
+[ t ] [
+    T{ a } funky
+    { { "a" "x" "z" } { "a" "y" "z" } } member?
+] unit-test

@@ -233,6 +233,20 @@ M: fixnum annotate-entry-test-1 drop ;
     \ >float inlined?
 ] unit-test
 
+GENERIC: detect-float ( a -- b )
+
+M: float detect-float ;
+
+[ t ] [
+    [ { real float } declare + detect-float ]
+    \ detect-float inlined?
+] unit-test
+
+[ t ] [
+    [ { float real } declare + detect-float ]
+    \ detect-float inlined?
+] unit-test
+
 [ t ] [
     [ 3 + = ] \ equal? inlined?
 ] unit-test

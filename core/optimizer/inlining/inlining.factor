@@ -71,8 +71,13 @@ DEFER: (flat-length)
 
 ! Partial dispatch of math-generic words
 : normalize-math-class ( class -- class' )
-    { fixnum bignum ratio float complex }
-    [ class< ] with find nip object or ;
+    {
+        fixnum bignum integer
+        ratio rational
+        float real
+        complex number
+        object
+    } [ class< ] with find nip ;
 
 : math-both-known? ( word left right -- ? )
     math-class-max swap specific-method ;

@@ -477,18 +477,22 @@ SYMBOL: interactive-vocabs
         nl
     ] when 2drop ;
 
-: filter-moved ( assoc -- newassoc )
-    [
+: filter-moved ( assoc1 assoc2 -- seq )
+    diff [
         drop where dup [ first ] when
         file get source-file-path =
-    ] assoc-subset ;
+    ] assoc-subset keys ;
 
-: removed-definitions ( -- definitions )
+: removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions
-    [ get first2 union ] bi@ diff ;
+    [ get first2 union ] bi@ ;
+
+: removed-classes ( -- assoc1 assoc2 )
+    new-definitions old-definitions
+    [ get second ] bi@ ;
 
 : smudged-usage ( -- usages referenced removed )
-    removed-definitions filter-moved keys [
+    removed-definitions filter-moved [
         outside-usages
         [
             empty? [ drop f ] [
@@ -506,9 +510,9 @@ SYMBOL: interactive-vocabs
     #! If a class word had a compound definition which was
     #! removed, it must go back to being a symbol.
     new-definitions get first2
-    [ diff values [ [ reset-generic ] [ define-symbol ] bi ] each ]
-    [ swap diff values [ class? ] subset [ reset-class ] each ]
-    2bi ;
+    filter-moved [ [ reset-generic ] [ define-symbol ] bi ] each
+    removed-classes
+    filter-moved [ class? ] subset [ reset-class ] each ;
 
 : forget-smudged ( -- )
     smudged-usage forget-all
