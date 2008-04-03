@@ -207,8 +207,8 @@ M: tuple-class define-tuple-class
 M: tuple-class reset-class
     [
         dup "slot-names" word-prop [
-            [ reader-word forget-method ]
-            [ writer-word forget-method ] 2bi
+            [ reader-word method forget ]
+            [ writer-word method forget ] 2bi
         ] with each
     ] [
         {

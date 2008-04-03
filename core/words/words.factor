@@ -212,19 +212,13 @@ M: word where "loc" word-prop ;
 
 M: word set-where swap "loc" set-word-prop ;
 
-GENERIC: forget-word ( word -- )
-
-: (forget-word) ( word -- )
+M: word forget*
     dup "forgotten" word-prop [
         dup delete-xref
         dup delete-compiled-xref
         dup word-name over word-vocabulary vocab-words delete-at
         dup t "forgotten" set-word-prop
     ] unless drop ;
-
-M: word forget-word (forget-word) ;
-
-M: word forget* forget-word ;
 
 M: word hashcode*
     nip 1 slot { fixnum } declare ;

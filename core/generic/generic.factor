@@ -106,14 +106,6 @@ M: method-spec definer
 M: method-spec definition
     first2 method definition ;
 
-: forget-method ( class generic -- )
-    dup generic? [
-        [ delete-at* ] with-methods
-        [ forget-word ] [ drop ] if
-    ] [
-        2drop
-    ] if ;
-
 M: method-spec forget*
     first2 method forget* ;
 
@@ -123,9 +115,12 @@ M: method-body definer
 M: method-body forget*
     dup "forgotten" word-prop [ drop ] [
         [
-            [  "method-class" word-prop ]
+            [   "method-class" word-prop ]
             [ "method-generic" word-prop ] bi
-            forget-method
+            dup generic? [
+                [ delete-at* ] with-methods
+                [ call-next-method ] [ drop ] if
+            ] [ 2drop ] if
         ]
         [ t "forgotten" set-word-prop ] bi
     ] if ;
@@ -145,7 +140,7 @@ M: method-body forget*
 M: class forget* ( class -- )
     [ forget-methods ]
     [ update-map- ]
-    [ forget-word ]
+    [ call-next-method ]
     tri ;
 
 M: assoc update-methods ( assoc -- )
@@ -169,8 +164,8 @@ M: generic subwords
         tri
     ] { } make ;
 
-M: generic forget-word
-    [ subwords forget-all ] [ (forget-word) ] bi ;
+M: generic forget*
+    [ subwords forget-all ] [ call-next-method ] bi ;
 
 : xref-generics ( -- )
     all-words [ subwords [ xref ] each ] each ;
