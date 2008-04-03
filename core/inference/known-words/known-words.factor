@@ -383,14 +383,8 @@ set-primitive-effect
 \ millis { } { integer } <effect> set-primitive-effect
 \ millis make-flushable
 
-\ type { object } { fixnum } <effect> set-primitive-effect
-\ type make-foldable
-
 \ tag { object } { fixnum } <effect> set-primitive-effect
 \ tag make-foldable
-
-\ class-hash { object } { fixnum } <effect> set-primitive-effect
-\ class-hash make-foldable
 
 \ cwd { } { string } <effect> set-primitive-effect
 

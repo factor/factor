@@ -153,14 +153,6 @@ HELP: tuple=
 { $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
 { $warning "This word is in the " { $vocab-link "classes.tuple.private" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
 
-HELP: removed-slots
-{ $values { "class" tuple-class } { "newslots" "a sequence of strings" } { "seq" "a sequence of strings" } }
-{ $description "Outputs the sequence of existing tuple slot names not in " { $snippet "newslots" } "." } ;
-
-HELP: forget-removed-slots
-{ $values { "class" tuple-class } { "slots" "a sequence of strings" } }
-{ $description "Forgets accessor words for existing tuple slots which are not in " { $snippet "newslots" } "." } ;
-
 HELP: tuple
 { $class-description "The class of tuples. This class is further partitioned into disjoint subclasses; each tuple shape defined by " { $link POSTPONE: TUPLE: } " is a new class."
 $nl

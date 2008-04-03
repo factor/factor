@@ -62,13 +62,13 @@ C: <point> point
 [ 200 ] [ "p" get y>> ] unit-test
 [ f ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
-"p" get 300 ">>z" "accessors" lookup execute drop
+[ ] [ "p" get 300 ">>z" "accessors" lookup execute drop ] unit-test
 
 [ 4 ] [ "p" get tuple-size ] unit-test
 
 [ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
-"IN: classes.tuple.tests TUPLE: point z y ;" eval
+[ ] [ "IN: classes.tuple.tests TUPLE: point z y ;" eval ] unit-test
 
 [ 3 ] [ "p" get tuple-size ] unit-test
 
@@ -394,7 +394,9 @@ test-server-slot-values
 ! Reshape crash
 TUPLE: test1 a ; TUPLE: test2 < test1 b ;
 
-T{ test2 f "a" "b" } "test" set
+C: <test2> test2
+
+"a" "b" <test2> "test" set
 
 : test-a/b
     [ "a" ] [ "test" get a>> ] unit-test
@@ -509,3 +511,45 @@ USE: vocabs
         define-tuple-class
     ] with-compilation-unit
 ] unit-test
+
+[ "USE: words T{ word }" eval ] [ [ no-method? ] is? ] must-fail-with
+
+! Accessors not being forgotten...
+[ [ ] ] [
+    "IN: classes.tuple.tests TUPLE: forget-accessors-test x y z ;"
+    <string-reader>
+    "forget-accessors-test" parse-stream
+] unit-test
+
+[ t ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
+
+: accessor-exists? ( class name -- ? )
+    >r "forget-accessors-test" "classes.tuple.tests" lookup r>
+    ">>" append "accessors" lookup method >boolean ;
+
+[ t ] [ "x" accessor-exists? ] unit-test
+[ t ] [ "y" accessor-exists? ] unit-test
+[ t ] [ "z" accessor-exists? ] unit-test
+
+[ [ ] ] [
+    "IN: classes.tuple.tests GENERIC: forget-accessors-test"
+    <string-reader>
+    "forget-accessors-test" parse-stream
+] unit-test
+
+[ f ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
+
+[ f ] [ "x" accessor-exists? ] unit-test
+[ f ] [ "y" accessor-exists? ] unit-test
+[ f ] [ "z" accessor-exists? ] unit-test
+
+TUPLE: another-forget-accessors-test ;
+
+
+[ [ ] ] [
+    "IN: classes.tuple.tests GENERIC: another-forget-accessors-test"
+    <string-reader>
+    "another-forget-accessors-test" parse-stream
+] unit-test
+
+[ t ] [ \ another-forget-accessors-test class? ] unit-test

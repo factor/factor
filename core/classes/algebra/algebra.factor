@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel classes combinators accessors sequences arrays
 vectors assocs namespaces words sorting layouts math hashtables
-;
+kernel.private ;
 IN: classes.algebra
 
 : 2cache ( key1 key2 assoc quot -- value )
@@ -211,12 +211,6 @@ C: <anonymous-complement> anonymous-complement
 : flatten-class ( class -- assoc )
     [ (flatten-class) ] H{ } make-assoc ;
 
-: class-hashes ( class -- seq )
-    flatten-class keys [
-        dup builtin-class?
-        [ "type" word-prop ] [ hashcode ] if
-    ] map ;
-
 : flatten-builtin-class ( class -- assoc )
     flatten-class [
         dup tuple class< [ 2drop tuple tuple ] when
@@ -229,5 +223,5 @@ C: <anonymous-complement> anonymous-complement
 : class-tags ( class -- tag/f )
     class-types [
         dup num-tags get >=
-        [ drop object tag-number ] when
+        [ drop \ hi-tag tag-number ] when
     ] map prune ;

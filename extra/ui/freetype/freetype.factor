@@ -27,9 +27,8 @@ DEFER: freetype
     \ freetype get-global expired? [ init-freetype ] when
     \ freetype get-global ;
 
-TUPLE: font ascent descent height handle widths ;
-
-M: font equal? 2drop f ;
+TUPLE: font < identity-tuple
+ascent descent height handle widths ;
 
 M: font hashcode* drop font hashcode* ;
 

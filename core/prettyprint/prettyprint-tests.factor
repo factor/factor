@@ -57,8 +57,6 @@ unit-test
 
 [ ] [ \ integer see ] unit-test
 
-[ ] [ \ general-t see ] unit-test
-
 [ ] [ \ generic see ] unit-test
 
 [ ] [ \ duplex-stream see ] unit-test

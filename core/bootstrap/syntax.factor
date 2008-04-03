@@ -67,6 +67,7 @@ IN: bootstrap.syntax
     "CS{"
     "<<"
     ">>"
+    "call-next-method"
 } [ "syntax" create drop ] each
 
 "t" "syntax" lookup define-symbol

@@ -63,10 +63,11 @@ SYMBOL: bootstrapping?
 : bootstrap-word ( word -- target )
     [ target-word ] [ ] if-bootstrapping ;
 
-: crossref? ( word -- ? )
+GENERIC: crossref? ( word -- ? )
+
+M: word crossref?
     {
         { [ dup "forgotten" word-prop ] [ f ] }
-        { [ dup "method-generic" word-prop ] [ t ] }
         { [ dup word-vocabulary ] [ t ] }
         { [ t ] [ f ] }
     } cond nip ;
@@ -172,7 +173,7 @@ GENERIC: subwords ( word -- seq )
 M: word subwords drop f ;
 
 : reset-generic ( word -- )
-    dup subwords [ forget ] each
+    dup subwords forget-all
     dup reset-word
     { "methods" "combination" "default-method" } reset-props ;
 
@@ -211,19 +212,13 @@ M: word where "loc" word-prop ;
 
 M: word set-where swap "loc" set-word-prop ;
 
-GENERIC: forget-word ( word -- )
-
-: (forget-word) ( word -- )
+M: word forget*
     dup "forgotten" word-prop [
         dup delete-xref
         dup delete-compiled-xref
         dup word-name over word-vocabulary vocab-words delete-at
         dup t "forgotten" set-word-prop
     ] unless drop ;
-
-M: word forget-word (forget-word) ;
-
-M: word forget* forget-word ;
 
 M: word hashcode*
     nip 1 slot { fixnum } declare ;

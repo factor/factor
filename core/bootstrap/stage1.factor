@@ -19,7 +19,6 @@ vocabs.loader system debugger continuations ;
         ! Rehash hashtables, since bootstrap.image creates them
         ! using the host image's hashing algorithms
         [ hashtable? ] instances [ rehash ] each
-
         boot
     ] %
 

@@ -1,6 +1,7 @@
 IN: inference.transforms.tests
 USING: sequences inference.transforms tools.test math kernel
-quotations inference accessors combinators words arrays ;
+quotations inference accessors combinators words arrays
+classes ;
 
 : compose-n-quot <repetition> >quotation ;
 : compose-n compose-n-quot call ;
@@ -56,3 +57,5 @@ C: <color> color
 [ 16 -3 1/6 ] [ 4 3 6 spread-test ] unit-test
 
 [ 16 -3 1/6 ] [ 4 3 6 \ spread-test word-def call ] unit-test
+
+[ fixnum instance? ] must-infer

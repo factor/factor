@@ -6,12 +6,10 @@ IN: vocabs
 
 SYMBOL: dictionary
 
-TUPLE: vocab
+TUPLE: vocab < identity-tuple
 name words
 main help
 source-loaded? docs-loaded? ;
-
-M: vocab equal? 2drop f ;
 
 : <vocab> ( name -- vocab )
     H{ } clone
@@ -91,10 +89,6 @@ TUPLE: vocab-link name ;
 
 : <vocab-link> ( name -- vocab-link )
     vocab-link construct-boa ;
-
-M: vocab-link equal?
-    over vocab-link?
-    [ [ vocab-link-name ] bi@ = ] [ 2drop f ] if ;
 
 M: vocab-link hashcode*
     vocab-link-name hashcode* ;

@@ -106,7 +106,7 @@ LOG: smtp-response DEBUG
 TUPLE: email from to subject headers body ;
 
 M: email clone
-    (clone) [ clone ] change-headers ;
+    call-next-method [ clone ] change-headers ;
 
 : (send) ( email -- )
     [

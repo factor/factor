@@ -250,8 +250,9 @@ $nl
 { $subsection eq? }
 "Value comparison:"
 { $subsection = }
-"Generic words for custom value comparison methods:"
+"Custom value comparison methods:"
 { $subsection equal? }
+{ $subsection identity-tuple }
 "Some types of objects also have an intrinsic order allowing sorting using " { $link natural-sort } ":"
 { $subsection <=> }
 { $subsection compare }
@@ -377,10 +378,13 @@ HELP: equal?
     }
     $nl
     "If a class defines a custom equality comparison test, it should also define a compatible method for the " { $link hashcode* } " generic word."
-}
+} ;
+
+HELP: identity-tuple
+{ $class-description "A class defining an " { $link equal? } " method which always returns f." }
 { $examples
-    "To define a tuple class such that two instances are only equal if they are both the same instance, we can add a method to " { $link equal? } " which always returns " { $link f } ". Since " { $link = } " handles the case where the two objects are " { $link eq? } ", this method will never be called with two " { $link eq? } " objects, so such a definition is valid:"
-    { $code "TUPLE: foo ;" "M: foo equal? 2drop f ;" }
+    "To define a tuple class such that two instances are only equal if they are both the same instance, inherit from the " { $link identity-tuple } " class. This class defines a method on " { $link equal? } " which always returns " { $link f } ". Since " { $link = } " handles the case where the two objects are " { $link eq? } ", this method will never be called with two " { $link eq? } " objects, so such a definition is valid:"
+    { $code "TUPLE: foo < identity-tuple ;" }
     "By calling " { $link = } " on instances of " { $snippet "foo" } " we get the results we expect:"
     { $unchecked-example "T{ foo } dup = ." "t" }
     { $unchecked-example "T{ foo } dup clone = ." "f" }
@@ -412,12 +416,6 @@ HELP: compare
 HELP: clone
 { $values { "obj" object } { "cloned" "a new object" } }
 { $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." } ;
-
-HELP: type ( object -- n )
-{ $values { "object" object } { "n" "a type number" } }
-{ $description "Outputs an object's type number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
-
-{ type tag type>class } related-words
 
 HELP: ? ( ? true false -- true/false )
 { $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" "one two input objects" } }
@@ -671,6 +669,11 @@ HELP: bi@
         "[ p ] bi@"
         ">r p r> p"
     }
+    "The following two lines are also equivalent:"
+    { $code
+        "[ p ] bi@"
+        "[ p ] [ p ] bi*"
+    }
 } ;
 
 HELP: 2bi@
@@ -682,6 +685,11 @@ HELP: 2bi@
         "[ p ] 2bi@"
         ">r >r p r> r> p"
     }
+    "The following two lines are also equivalent:"
+    { $code
+        "[ p ] 2bi@"
+        "[ p ] [ p ] 2bi*"
+    }
 } ;
 
 HELP: tri@
@@ -692,6 +700,11 @@ HELP: tri@
     { $code
         "[ p ] tri@"
         ">r >r p r> p r> p"
+    }
+    "The following two lines are also equivalent:"
+    { $code
+        "[ p ] tri@"
+        "[ p ] [ p ] [ p ] tri*"
     }
 } ;
 
@@ -789,19 +802,6 @@ HELP: object
 HELP: null
 { $class-description
     "The canonical empty class with no instances."
-} ;
-
-HELP: general-t
-{ $class-description
-    "The class of all objects not equal to " { $link f } "."
-}
-{ $examples
-    "Here is an implementation of " { $link if } " using generic words:"
-    { $code
-        "GENERIC# my-if 2 ( ? true false -- )"
-        "M: f my-if 2nip call ;"
-        "M: general-t my-if drop nip call ;"
-    }
 } ;
 
 HELP: most
