@@ -29,4 +29,4 @@ M: union-class update-class define-union-predicate ;
     2bi ;
 
 M: union-class reset-class
-    { "metaclass" "members" } reset-props ;
+    { "class" "metaclass" "members" } reset-props ;

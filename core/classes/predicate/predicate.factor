@@ -25,5 +25,8 @@ PREDICATE: predicate-class < class
 
 M: predicate-class reset-class
     {
-        "metaclass" "predicate-definition" "superclass"
+        "class"
+        "metaclass"
+        "predicate-definition"
+        "superclass"
     } reset-props ;

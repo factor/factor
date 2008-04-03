@@ -212,6 +212,7 @@ M: tuple-class reset-class
         ] with each
     ] [
         {
+            "class"
             "metaclass"
             "superclass"
             "layout"

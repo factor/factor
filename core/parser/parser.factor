@@ -505,8 +505,10 @@ SYMBOL: interactive-vocabs
 : fix-class-words ( -- )
     #! If a class word had a compound definition which was
     #! removed, it must go back to being a symbol.
-    new-definitions get first2 diff
-    [ nip dup reset-generic define-symbol ] assoc-each ;
+    new-definitions get first2
+    [ diff values [ [ reset-generic ] [ define-symbol ] bi ] each ]
+    [ swap diff values [ class? ] subset [ reset-class ] each ]
+    2bi ;
 
 : forget-smudged ( -- )
     smudged-usage forget-all
@@ -515,9 +517,10 @@ SYMBOL: interactive-vocabs
 
 : finish-parsing ( lines quot -- )
     file get
-    [ record-form ] keep
-    [ record-definitions ] keep
-    record-checksum ;
+    [ record-form ]
+    [ record-definitions ]
+    [ record-checksum ]
+    tri ;
 
 : parse-stream ( stream name -- quot )
     [
