@@ -656,7 +656,6 @@ define-builtin
     { "code-room" "memory" }
     { "os-env" "system" }
     { "millis" "system" }
-    { "type" "kernel.private" }
     { "tag" "kernel.private" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
@@ -728,7 +727,6 @@ define-builtin
     { "(sleep)" "threads.private" }
     { "<float-array>" "float-arrays" }
     { "<tuple-boa>" "classes.tuple.private" }
-    { "class-hash" "kernel.private" }
     { "callstack>array" "kernel" }
     { "innermost-frame-quot" "kernel.private" }
     { "innermost-frame-scan" "kernel.private" }

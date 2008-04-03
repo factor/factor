@@ -307,30 +307,9 @@ DEFINE_PRIMITIVE(sleep)
 	sleep_millis(to_cell(dpop()));
 }
 
-DEFINE_PRIMITIVE(type)
-{
-	drepl(tag_fixnum(type_of(dpeek())));
-}
-
 DEFINE_PRIMITIVE(tag)
 {
 	drepl(tag_fixnum(TAG(dpeek())));
-}
-
-DEFINE_PRIMITIVE(class_hash)
-{
-	CELL obj = dpeek();
-	CELL tag = TAG(obj);
-	if(tag == TUPLE_TYPE)
-	{
-		F_TUPLE *tuple = untag_object(obj);
-		F_TUPLE_LAYOUT *layout = untag_object(tuple->layout);
-		drepl(layout->hashcode);
-	}
-	else if(tag == OBJECT_TYPE)
-		drepl(get(UNTAG(obj)));
-	else
-		drepl(tag_fixnum(tag));
 }
 
 DEFINE_PRIMITIVE(slot)
