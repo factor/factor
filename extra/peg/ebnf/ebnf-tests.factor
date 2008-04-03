@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.ebnf words math math.parser ;
+USING: kernel tools.test peg peg.ebnf words math math.parser sequences ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -245,6 +245,10 @@ IN: peg.ebnf.tests
   #! Test indirect left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
   "1+1+1" [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF] call parse-result-ast
+] unit-test
+
+{ t } [
+  "abcd='9' | ('8'):x => [[ drop x ]]" 'ebnf' parse parse-result-remaining empty?
 ] unit-test
 
 EBNF: primary 
