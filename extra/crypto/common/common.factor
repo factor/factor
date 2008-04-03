@@ -1,11 +1,8 @@
 USING: arrays kernel io io.binary sbufs splitting strings sequences
-namespaces math math.parser parser hints ;
+namespaces math math.parser parser hints math.bitfields.lib ;
 IN: crypto.common
 
-: >32-bit ( x -- y ) HEX: ffffffff bitand ; inline
-: >64-bit ( x -- y ) HEX: ffffffffffffffff bitand ; inline
-
-: w+ ( int int -- int ) + >32-bit ; inline
+: w+ ( int int -- int ) + 32-bit ; inline
 
 : (nth-int) ( string n -- int )
     2 shift dup 4 + rot <slice> ; inline
@@ -39,25 +36,8 @@ SYMBOL: big-endian?
         3 shift 8 rot [ >be ] [ >le ] if %
     ] "" make 64 group ;
 
-: shift-mod ( n s w -- n )
-    >r shift r> 2^ 1- bitand ; inline
-
 : update-old-new ( old new -- )
     [ get >r get r> ] 2keep >r >r w+ dup r> set r> set ; inline
-
-: bitroll ( x s w -- y )
-     [ 1 - bitand ] keep
-     over 0 < [ [ + ] keep ] when
-     [ shift-mod ] 3keep
-     [ - ] keep shift-mod bitor ; inline
-
-: bitroll-32 ( n s -- n' ) 32 bitroll ;
-
-HINTS: bitroll-32 bignum fixnum ;
-
-: bitroll-64 ( n s -- n' ) 64 bitroll ;
-
-HINTS: bitroll-64 bignum fixnum ;
 
 : hex-string ( seq -- str )
     [ [ >hex 2 48 pad-left % ] each ] "" make ;
