@@ -7,10 +7,6 @@ namespaces threads continuations init math alien.c-types alien
 vocabs.loader accessors ;
 IN: io.unix.linux
 
-TUPLE: linux-io ;
-
-INSTANCE: linux-io unix-io
-
 TUPLE: linux-monitor ;
 
 : <linux-monitor> ( wd -- monitor )
@@ -50,7 +46,7 @@ TUPLE: inotify watches ;
         "inotify is not supported by this Linux release" throw
     ] unless ;
 
-M: linux-io <monitor> ( path recursive? -- monitor )
+M: linux <monitor> ( path recursive? -- monitor )
     check-inotify
     drop IN_CHANGE_EVENTS add-watch ;
 
@@ -116,11 +112,11 @@ TUPLE: inotify-task ;
 M: inotify-task do-io-task ( task -- )
     io-task-port read-notifications f ;
 
-M: linux-io init-io ( -- )
+M: linux init-io ( -- )
     <select-mx>
     [ mx set-global ]
     [ [ init-inotify ] curry ignore-errors ] bi ;
 
-T{ linux-io } set-io-backend
+linux set-io-backend
 
 [ start-wait-thread ] "io.unix.linux" add-init-hook

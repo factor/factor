@@ -1,8 +1,3 @@
-IN: io.unix.freebsd
-USING: io.unix.bsd io.backend ;
+USING: io.unix.bsd io.backend system ;
 
-TUPLE: freebsd-io ;
-
-INSTANCE: freebsd-io bsd-io
-
-T{ freebsd-io } set-io-backend
+freebsd set-io-backend

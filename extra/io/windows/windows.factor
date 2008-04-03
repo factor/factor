@@ -5,16 +5,12 @@ io.buffers io.files io.nonblocking io.sockets io.binary
 io.sockets.impl windows.errors strings io.streams.duplex
 kernel math namespaces sequences windows windows.kernel32
 windows.shell32 windows.types windows.winsock splitting
-continuations math.bitfields ;
+continuations math.bitfields system ;
 IN: io.windows
 
-TUPLE: windows-nt-io ;
-TUPLE: windows-ce-io ;
-UNION: windows-io windows-nt-io windows-ce-io ;
+M: windows destruct-handle CloseHandle drop ;
 
-M: windows-io destruct-handle CloseHandle drop ;
-
-M: windows-io destruct-socket closesocket drop ;
+M: windows destruct-socket closesocket drop ;
 
 TUPLE: win32-file handle ptr ;
 
@@ -24,7 +20,7 @@ HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )
 
-M: windows-io normalize-directory ( string -- string )
+M: windows normalize-directory ( string -- string )
     normalize-path "\\" ?tail drop "\\*" append ;
 
 : share-mode ( -- fixnum )
@@ -125,30 +121,30 @@ C: <FileArgs> FileArgs
     [ FileArgs-lpNumberOfBytesRet ] keep
     FileArgs-lpOverlapped ;
 
-M: windows-io (file-reader) ( path -- stream )
+M: windows (file-reader) ( path -- stream )
     open-read <win32-file> <reader> ;
 
-M: windows-io (file-writer) ( path -- stream )
+M: windows (file-writer) ( path -- stream )
     open-write <win32-file> <writer> ;
 
-M: windows-io (file-appender) ( path -- stream )
+M: windows (file-appender) ( path -- stream )
     open-append <win32-file> <writer> ;
 
-M: windows-io move-file ( from to -- )
+M: windows move-file ( from to -- )
     [ normalize-path ] bi@ MoveFile win32-error=0/f ;
 
-M: windows-io delete-file ( path -- )
+M: windows delete-file ( path -- )
     normalize-path DeleteFile win32-error=0/f ;
 
-M: windows-io copy-file ( from to -- )
+M: windows copy-file ( from to -- )
     dup parent-directory make-directories
     [ normalize-path ] bi@ 0 CopyFile win32-error=0/f ;
 
-M: windows-io make-directory ( path -- )
+M: windows make-directory ( path -- )
     normalize-path
     f CreateDirectory win32-error=0/f ;
 
-M: windows-io delete-directory ( path -- )
+M: windows delete-directory ( path -- )
     normalize-path
     RemoveDirectory win32-error=0/f ;
 
@@ -194,7 +190,7 @@ USE: namespaces
 M: win32-socket dispose ( stream -- )
     win32-file-handle closesocket drop ;
 
-M: windows-io addrinfo-error ( n -- )
+M: windows addrinfo-error ( n -- )
     winsock-return-check ;
 
 : tcp-socket ( addrspec -- socket )

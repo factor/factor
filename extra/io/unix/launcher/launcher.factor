@@ -79,12 +79,12 @@ USE: unix
         (io-error)
     ] [ 255 exit ] recover ;
 
-M: unix-io current-process-handle ( -- handle ) getpid ;
+M: unix current-process-handle ( -- handle ) getpid ;
 
-M: unix-io run-process* ( process -- pid )
+M: unix run-process* ( process -- pid )
     [ spawn-process ] curry [ ] with-fork ;
 
-M: unix-io kill-process* ( pid -- )
+M: unix kill-process* ( pid -- )
     SIGTERM kill io-error ;
 
 : open-pipe ( -- pair )
@@ -95,7 +95,7 @@ M: unix-io kill-process* ( pid -- )
     2dup first close second close
     >r first 0 dup2 drop r> second 1 dup2 drop ;
 
-M: unix-io (process-stream)
+M: unix (process-stream)
     >r open-pipe open-pipe r>
     [ >r setup-stdio-pipe r> spawn-process ] curry
     [ -rot 2dup second close first close ]
