@@ -30,6 +30,14 @@ SYMBOL: fail
 SYMBOL: lrstack
 SYMBOL: heads
 
+: delegates ( -- cache )
+  \ delegates get-global [ H{ } clone dup \ delegates set-global ] unless* ;
+
+: reset-pegs ( -- )
+  H{ } clone \ delegates set-global ;
+
+reset-pegs 
+
 TUPLE: memo-entry ans pos ;
 C: <memo-entry> memo-entry
 
@@ -252,14 +260,6 @@ SYMBOL: id
   ] [
     1 id set-global 0
   ] if* ;
-
-: delegates ( -- cache )
-  \ delegates get-global [ H{ } clone dup \ delegates set-global ] unless* ;
-
-: reset-delegates ( -- )
-  H{ } clone \ delegates set-global ;
-
-reset-delegates 
 
 : init-parser ( parser -- parser )
   #! Set the delegate for the parser. Equivalent parsers
@@ -590,7 +590,13 @@ PRIVATE>
   #! not a cached one. This is because the same box,
   #! compiled twice can have a different compiled word
   #! due to running at compile time.
-  box-parser construct-boa next-id f <parser> over set-delegate ;
+  #! Why the [ ] action at the end? Box parsers don't get
+  #! memoized during parsing due to all box parsers being
+  #! unique. This breaks left recursion detection during the
+  #! parse. The action adds an indirection with a parser type
+  #! that gets memoized and fixes this. Need to rethink how
+  #! to fix boxes so this isn't needed...
+  box-parser construct-boa next-id f <parser> over set-delegate [ ] action ;
 
 : PEG:
   (:) [
