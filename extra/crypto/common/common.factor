@@ -2,7 +2,7 @@ USING: arrays kernel io io.binary sbufs splitting strings sequences
 namespaces math math.parser parser hints math.bitfields.lib ;
 IN: crypto.common
 
-: w+ ( int int -- int ) + 32-bit ; inline
+: w+ ( int int -- int ) + 32 bits ; inline
 
 : (nth-int) ( string n -- int )
     2 shift dup 4 + rot <slice> ; inline

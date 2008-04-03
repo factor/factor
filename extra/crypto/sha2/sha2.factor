@@ -4,7 +4,7 @@ IN: crypto.sha2
 
 <PRIVATE
 
-SYMBOLS: vars M K H S0 S1 process-M word-size block-size >word ;
+SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
 
 : a 0 ; inline
 : b 1 ; inline
@@ -124,7 +124,6 @@ PRIVATE>
         initial-H-256 H set
         4 word-size set
         64 block-size set
-        \ 32-bit >word set
         byte-array>sha2
     ] with-scope ;
 
