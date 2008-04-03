@@ -1,5 +1,5 @@
 USING: math.miller-rabin kernel math math.functions namespaces
-sequences ;
+sequences accessors ;
 IN: crypto.rsa
 
 ! The private key is the only secret.
@@ -39,7 +39,7 @@ PRIVATE>
     public-key <rsa> ;
 
 : rsa-encrypt ( message rsa -- encrypted )
-    [ rsa-public-key ] keep rsa-modulus ^mod ;
+    [ public-key>> ] [ modulus>> ] bi ^mod ;
 
 : rsa-decrypt ( encrypted rsa -- message )
-    [ rsa-private-key ] keep rsa-modulus ^mod ;
+    [ private-key>> ] [ modulus>> ] bi ^mod ;

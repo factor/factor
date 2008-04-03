@@ -1,8 +1,8 @@
 USING: crypto.common kernel math sequences ;
 IN: crypto.xor
 
-TUPLE: no-xor-key ;
+ERROR: no-xor-key ;
 
-: xor-crypt ( key seq -- seq )
-    over empty? [ no-xor-key construct-empty throw ] when
+: xor-crypt ( key seq -- seq' )
+    over empty? [ no-xor-key ] when
     dup length rot [ mod-nth bitxor ] curry 2map ;

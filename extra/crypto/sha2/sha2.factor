@@ -1,19 +1,19 @@
 USING: crypto.common kernel splitting math sequences namespaces
-io.binary symbols ;
+io.binary symbols math.bitfields.lib ;
 IN: crypto.sha2
 
 <PRIVATE
 
-SYMBOLS: vars M K H S0 S1 process-M word-size block-size >word ;
+SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
 
-: a 0 ;
-: b 1 ;
-: c 2 ;
-: d 3 ;
-: e 4 ;
-: f 5 ;
-: g 6 ;
-: h 7 ;
+: a 0 ; inline
+: b 1 ; inline
+: c 2 ; inline
+: d 3 ; inline
+: e 4 ; inline
+: f 5 ; inline
+: g 6 ; inline
+: h 7 ; inline
 
 : initial-H-256 ( -- seq )
     {
@@ -124,7 +124,6 @@ PRIVATE>
         initial-H-256 H set
         4 word-size set
         64 block-size set
-        \ >32-bit >word set
         byte-array>sha2
     ] with-scope ;
 

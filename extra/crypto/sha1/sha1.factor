@@ -1,7 +1,7 @@
 USING: arrays combinators crypto.common kernel io
 io.encodings.binary io.files io.streams.byte-array math.vectors
 strings sequences namespaces math parser sequences vectors
-io.binary hashtables symbols ;
+io.binary hashtables symbols math.bitfields.lib ;
 IN: crypto.sha1
 
 ! Implemented according to RFC 3174.
@@ -66,7 +66,7 @@ SYMBOLS: h0 h1 h2 h3 h4 A B C D E w K ;
         K get nth ,
         A get 5 bitroll-32 ,
         E get ,
-    ] { } make sum >32-bit ; inline
+    ] { } make sum 32 bits ; inline
 
 : set-vars ( temp -- )
     ! E = D;  D = C;  C = S^30(B);  B = A; A = TEMP;

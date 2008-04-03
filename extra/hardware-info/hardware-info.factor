@@ -1,10 +1,13 @@
-USING: alien.syntax kernel math prettyprint
+USING: alien.syntax kernel math prettyprint io math.parser
 combinators vocabs.loader hardware-info.backend system ;
 IN: hardware-info
 
-: kb. ( x -- ) 10 2^ /f . ;
-: megs. ( x -- ) 20 2^ /f . ;
-: gigs. ( x -- ) 30 2^ /f . ;
+: write-unit ( x n str -- )
+    [ 2^ /i number>string write bl ] [ write ] bi* ;
+
+: kb ( x -- ) 10 "kB" write-unit ;
+: megs ( x -- ) 20 "MB" write-unit ;
+: gigs ( x -- ) 30 "GB" write-unit ;
 
 << {
     { [ os windows? ] [ "hardware-info.windows" ] }
@@ -12,3 +15,7 @@ IN: hardware-info
     { [ os macosx? ] [ "hardware-info.macosx" ] }
     { [ t ] [ f ] }
 } cond [ require ] when* >>
+
+: hardware-report. ( -- )
+    "CPUs: " write cpus number>string write nl
+    "Physical RAM: " write physical-mem megs nl ;
