@@ -15,7 +15,7 @@ C: <unix-random> unix-random
 M: unix-random random-bytes* ( n tuple -- byte-array )
     path>> file-read-unbuffered ;
 
-os "openbsd" = [
+os openbsd? [
     [
         "/dev/srandom" <unix-random> secure-random-generator set-global
         "/dev/prandom" <unix-random> insecure-random-generator set-global

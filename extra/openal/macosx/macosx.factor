@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel alien alien.syntax shuffle
-combinators.lib openal.backend namespaces ;
+combinators.lib openal.backend namespaces system ;
 IN: openal.macosx
 
 LIBRARY: alut
