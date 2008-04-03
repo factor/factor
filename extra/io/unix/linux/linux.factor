@@ -4,7 +4,7 @@ USING: kernel io.backend io.monitors io.monitors.private
 io.files io.buffers io.nonblocking io.timeouts io.unix.backend
 io.unix.select io.unix.launcher unix.linux.inotify assocs
 namespaces threads continuations init math alien.c-types alien
-vocabs.loader accessors ;
+vocabs.loader accessors system ;
 IN: io.unix.linux
 
 TUPLE: linux-monitor ;
