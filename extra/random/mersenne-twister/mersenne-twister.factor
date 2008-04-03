@@ -15,14 +15,13 @@ TUPLE: mersenne-twister seq i ;
 : mt-m 397 ; inline
 : mt-a HEX: 9908b0df ; inline
 
-: calculate-y ( y1 y2 mt -- y )
-    tuck
+: calculate-y ( n seq -- y )
     [ nth 32 mask-bit ]
-    [ nth 31 bits ] 2bi* bitor ; inline
+    [ [ 1+ ] [ nth ] bi* 31 bits ] 2bi bitor ; inline
 
-: (mt-generate) ( n mt-seq -- next-mt )
+: (mt-generate) ( n seq -- next-mt )
     [
-        [ dup 1+ ] [ calculate-y ] bi*
+        calculate-y
         [ 2/ ] [ odd? mt-a 0 ? ] bi bitxor
     ] [
         [ mt-m + ] [ nth ] bi*
