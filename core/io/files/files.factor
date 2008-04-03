@@ -176,14 +176,17 @@ SYMBOL: +unknown+
 : directory? ( path -- ? )
     file-info file-info-type +directory+ = ;
 
-! Current working directory
+<PRIVATE
+
 HOOK: cd io-backend ( path -- )
 
 HOOK: cwd io-backend ( -- path )
 
-SYMBOL: current-directory
-
 M: object cwd ( -- path ) "." ;
+
+PRIVATE>
+
+SYMBOL: current-directory
 
 [ cwd current-directory set-global ] "io.files" add-init-hook
 

@@ -5,6 +5,8 @@ alien.c-types alien.arrays sequences combinators combinators.lib
 sequences.lib ascii splitting alien strings assocs namespaces ;
 IN: io.windows.nt.files
 
+<PRIVATE
+
 M: winnt cwd
     MAX_UNICODE_PATH dup "ushort" <c-array>
     [ GetCurrentDirectory win32-error=0/f ] keep
@@ -12,6 +14,8 @@ M: winnt cwd
 
 M: winnt cd
     SetCurrentDirectory win32-error=0/f ;
+
+PRIVATE>
 
 : unicode-prefix ( -- seq )
     "\\\\?\\" ; inline

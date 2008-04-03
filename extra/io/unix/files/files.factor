@@ -3,9 +3,12 @@
 USING: io.backend io.nonblocking io.unix.backend io.files io
 unix unix.stat unix.time kernel math continuations
 math.bitfields byte-arrays alien combinators calendar
-io.encodings.binary accessors sequences strings system ;
+io.encodings.binary accessors sequences strings system
+io.files.private ;
 
 IN: io.unix.files
+
+<PRIVATE
 
 M: unix cwd ( -- path )
     MAXPATHLEN [ <byte-array> ] [ ] bi getcwd
@@ -13,6 +16,8 @@ M: unix cwd ( -- path )
 
 M: unix cd ( path -- )
     chdir io-error ;
+
+PRIVATE>
 
 : read-flags O_RDONLY ; inline
 
