@@ -27,8 +27,7 @@ TUPLE: CreateProcess-args
     "STARTUPINFO" heap-size over set-STARTUPINFO-cb >>lpStartupInfo
     "PROCESS_INFORMATION" <c-object> >>lpProcessInformation
     TRUE >>bInheritHandles
-    0 >>dwCreateFlags
-    current-directory get (normalize-path) >>lpCurrentDirectory ;
+    0 >>dwCreateFlags ;
 
 : call-CreateProcess ( CreateProcess-args -- )
     {
@@ -118,6 +117,7 @@ M: windows run-process* ( process -- handle )
     [
         dup make-CreateProcess-args
         tuck fill-redirection
+        current-directory get (normalize-path) cd
         dup call-CreateProcess
         lpProcessInformation>>
     ] with-destructors ;
