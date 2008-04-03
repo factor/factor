@@ -16,6 +16,20 @@ $nl
 "To make an assoc into an alist:"
 { $subsection >alist } ;
 
+ARTICLE: "enums" "Enumerations"
+"An enumeration provides a view of a sequence as an assoc mapping integer indices to elements:"
+{ $subsection enum }
+{ $subsection <enum> } ;
+
+HELP: enum
+{ $class-description "An associative structure which wraps a sequence and maps integers to the corresponding elements of the sequence."
+$nl
+"Enumerations are mutable; note that deleting a key calls " { $link delete-nth } ", which results in all subsequent elements being shifted down." } ;
+
+HELP: <enum>
+{ $values { "seq" sequence } { "enum" enum } }
+{ $description "Creates a new enumeration." } ;
+
 ARTICLE: "assocs-protocol" "Associative mapping protocol"
 "All associative mappings must be instances of a mixin class:"
 { $subsection assoc }

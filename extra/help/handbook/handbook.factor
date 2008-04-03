@@ -152,6 +152,7 @@ ARTICLE: "collections" "Collections"
 "Implementations:"
 { $subsection "hashtables" }
 { $subsection "alists" }
+{ $subsection "enums" }
 { $heading "Other collections" }
 { $subsection "boxes" }
 { $subsection "dlists" }
