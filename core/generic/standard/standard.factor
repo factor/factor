@@ -118,6 +118,10 @@ M: standard-combination perform-combination
 
 M: standard-combination dispatch# #>> ;
 
+M: standard-generic effective-method
+    [ dispatch# (picker) call ] keep
+    [ order [ instance? ] with find-last nip ] keep method ;
+
 ERROR: inconsistent-next-method object class generic ;
 
 ERROR: no-next-method class generic ;

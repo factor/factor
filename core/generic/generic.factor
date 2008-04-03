@@ -29,6 +29,8 @@ PREDICATE: method-spec < pair
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
 
+GENERIC: effective-method ( ... generic -- method )
+
 : next-method-class ( class generic -- class/f )
     order [ class< ] with subset reverse dup length 1 =
     [ drop f ] [ second ] if ;
