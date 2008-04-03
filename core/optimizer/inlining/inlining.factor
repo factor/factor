@@ -70,12 +70,20 @@ DEFER: (flat-length)
     ] if ;
 
 ! Partial dispatch of math-generic words
+: normalize-math-class ( class -- class' )
+    { fixnum bignum ratio float complex }
+    [ class< ] with find nip object or ;
+
 : math-both-known? ( word left right -- ? )
     math-class-max swap specific-method ;
 
 : inline-math-method ( #call word -- node )
-    over node-input-classes first2 3dup math-both-known?
-    [ math-method f splice-quot ] [ 2drop 2drop t ] if ;
+    over node-input-classes
+    [ first normalize-math-class ]
+    [ second normalize-math-class ] bi
+    3dup math-both-known?
+    [ math-method f splice-quot ]
+    [ 2drop 2drop t ] if ;
 
 : inline-method ( #call -- node )
     dup node-param {

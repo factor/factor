@@ -21,19 +21,6 @@ M: word   class-of drop "word"   ;
 [ "Hello world" ] [ 4 foobar foobar ] unit-test
 [ "Goodbye cruel world" ] [ 4 foobar ] unit-test
 
-GENERIC: bool>str ( x -- y )
-M: general-t bool>str drop "true" ;
-M: f bool>str drop "false" ;
-
-: str>bool
-    H{
-        { "true" t }
-        { "false" f }
-    } at ;
-
-[ t ] [ t bool>str str>bool ] unit-test
-[ f ] [ f bool>str str>bool ] unit-test
-
 ! Testing unions
 UNION: funnies quotation float complex ;
 
@@ -50,16 +37,6 @@ GENERIC: gooey ( x -- y )
 M: very-funny gooey sq ;
 
 [ 0.25 ] [ 0.5 gooey ] unit-test
-
-DEFER: complement-test
-FORGET: complement-test
-GENERIC: complement-test ( x -- y )
-
-M: f         complement-test drop "f" ;
-M: general-t complement-test drop "general-t" ;
-
-[ "general-t" ] [ 5 complement-test ] unit-test
-[ "f" ] [ f complement-test ] unit-test
 
 GENERIC: empty-method-test ( x -- y )
 M: object empty-method-test ;

@@ -75,7 +75,7 @@ sequences.private combinators ;
     dup node-in-d second dup value? [
         swap [
             value-literal 0 `input literal,
-            general-t 0 `output class,
+            \ f class-not 0 `output class,
         ] set-constraints
     ] [
         2drop

@@ -9,14 +9,12 @@ IN: inference.dataflow
 : <computed> \ <computed> counter ;
 
 ! Literal value
-TUPLE: value literal uid recursion ;
+TUPLE: value < identity-tuple literal uid recursion ;
 
 : <value> ( obj -- value )
     <computed> recursive-state get value construct-boa ;
 
 M: value hashcode* nip value-uid ;
-
-M: value equal? 2drop f ;
 
 ! Result of curry
 TUPLE: curried obj quot ;
@@ -30,12 +28,11 @@ C: <composed> composed
 
 UNION: special curried composed ;
 
-TUPLE: node param
+TUPLE: node < identity-tuple
+param
 in-d out-d in-r out-r
 classes literals intervals
 history successor children ;
-
-M: node equal? 2drop f ;
 
 M: node hashcode* drop node hashcode* ;
 

@@ -185,4 +185,10 @@ IN: bootstrap.syntax
         [ \ >> parse-until >quotation ] with-compilation-unit
         call
     ] define-syntax
+
+    "call-next-method" [
+        current-class get literalize parsed
+        current-generic get literalize parsed
+        \ (call-next-method) parsed
+    ] define-syntax
 ] with-compilation-unit

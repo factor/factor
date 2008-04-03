@@ -269,7 +269,7 @@ generic.standard system ;
 : comparison-constraints ( node true false -- )
     >r >r dup node set intervals dup [
         2dup
-        r> general-t (comparison-constraints)
+        r> \ f class-not (comparison-constraints)
         r> \ f (comparison-constraints)
     ] [
         r> r> 2drop 2drop

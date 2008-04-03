@@ -19,7 +19,7 @@ ERROR: no-tuple-class class ;
 
 GENERIC: tuple-layout ( object -- layout )
 
-M: class tuple-layout "layout" word-prop ;
+M: tuple-class tuple-layout "layout" word-prop ;
 
 M: tuple tuple-layout 1 slot ;
 
@@ -40,7 +40,9 @@ PRIVATE>
     [ drop ] [ no-tuple-class ] if ;
 
 : tuple>array ( tuple -- array )
-    prepare-tuple>array >r copy-tuple-slots r> layout-class prefix ;
+    prepare-tuple>array
+    >r copy-tuple-slots r>
+    layout-class prefix ;
 
 : tuple-slots ( tuple -- array )
     prepare-tuple>array drop copy-tuple-slots ;
@@ -120,15 +122,6 @@ PRIVATE>
 : define-tuple-layout ( class -- )
     dup make-tuple-layout "layout" set-word-prop ;
 
-: removed-slots ( class newslots -- seq )
-    swap slot-names seq-diff ;
-
-: forget-removed-slots ( class slots -- )
-    dupd removed-slots [
-        [ reader-word forget-method ]
-        [ writer-word forget-method ] 2bi
-    ] with each ;
-
 : all-slot-names ( class -- slots )
     superclasses [ slot-names ] map concat \ class prefix ;
 
@@ -189,9 +182,8 @@ M: tuple-class update-class
             tri
         ] each-subclass
     ]
-    [ nip forget-removed-slots ]
     [ define-new-tuple-class ]
-    3tri ;
+    3bi ;
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
     rot tuck [ superclass = ] [ slot-names = ] 2bi* and ;
@@ -213,7 +205,19 @@ M: tuple-class define-tuple-class
     dup [ construct-boa throw ] curry define ;
 
 M: tuple-class reset-class
-    { "metaclass" "superclass" "slots" "layout" } reset-props ;
+    [
+        dup "slot-names" word-prop [
+            [ reader-word forget-method ]
+            [ writer-word forget-method ] 2bi
+        ] with each
+    ] [
+        {
+            "metaclass"
+            "superclass"
+            "layout"
+            "slots"
+        } reset-props
+    ] bi ;
 
 M: tuple clone
     (clone) dup delegate clone over set-delegate ;
@@ -228,12 +232,6 @@ M: tuple hashcode*
         ] 2curry reduce
     ] recursive-hashcode ;
 
-M: object construct-empty ( class -- tuple )
-    tuple-layout <tuple> ;
-
-M: object construct-boa ( ... class -- tuple )
-    tuple-layout <tuple-boa> ;
-
 ! Deprecated
 M: object get-slots ( obj slots -- ... )
     [ execute ] with each ;
@@ -241,10 +239,6 @@ M: object get-slots ( obj slots -- ... )
 M: object set-slots ( ... obj slots -- )
     <reversed> get-slots ;
 
-M: object construct ( ... slots class -- tuple )
-    construct-empty [ swap set-slots ] keep ;
-
-: delegates ( obj -- seq )
-    [ dup ] [ [ delegate ] keep ] [ ] unfold nip ;
+: delegates ( obj -- seq ) [ delegate ] follow ;
 
 : is? ( obj quot -- ? ) >r delegates r> contains? ; inline

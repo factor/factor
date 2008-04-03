@@ -243,7 +243,7 @@ HELP: flushable
 HELP: t
 { $syntax "t" }
 { $values { "t" "the canonical truth value" } }
-{ $description "The canonical instance of " { $link general-t } ". It is just a symbol." } ;
+{ $class-description "The canonical truth value, which is an instance of itself." } ;
 
 HELP: f
 { $syntax "f" }

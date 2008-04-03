@@ -56,5 +56,11 @@ IN: compiler
         compiled get >alist
     ] with-scope ;
 
+: enable-compiler ( -- )
+    [ optimized-recompile-hook ] recompile-hook set-global ;
+
+: disable-compiler ( -- )
+    [ default-recompile-hook ] recompile-hook set-global ;
+
 : recompile-all ( -- )
     forget-errors all-words compile ;

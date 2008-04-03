@@ -23,8 +23,8 @@ random inference effects kernel.private ;
 [ t ] [ number    object   number class-and* ] unit-test
 [ t ] [ object    number   number class-and* ] unit-test
 [ t ] [ slice     reversed null   class-and* ] unit-test
-[ t ] [ general-t \ f      null   class-and* ] unit-test
-[ t ] [ general-t \ f      object class-or*  ] unit-test
+[ t ] [ \ f class-not \ f      null   class-and* ] unit-test
+[ t ] [ \ f class-not \ f      object class-or*  ] unit-test
 
 TUPLE: first-one ;
 TUPLE: second-one ;

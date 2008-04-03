@@ -511,3 +511,34 @@ USE: vocabs
         define-tuple-class
     ] with-compilation-unit
 ] unit-test
+
+[ "USE: words T{ word }" eval ] [ [ no-method? ] is? ] must-fail-with
+
+! Accessors not being forgotten...
+[ [ ] ] [
+    "IN: classes.tuple.tests TUPLE: forget-accessors-test x y z ;"
+    <string-reader>
+    "forget-accessors-test" parse-stream
+] unit-test
+
+[ t ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
+
+: accessor-exists? ( class name -- ? )
+    >r "forget-accessors-test" "classes.tuple.tests" lookup r>
+    ">>" append "accessors" lookup method >boolean ;
+
+[ t ] [ "x" accessor-exists? ] unit-test
+[ t ] [ "y" accessor-exists? ] unit-test
+[ t ] [ "z" accessor-exists? ] unit-test
+
+[ [ ] ] [
+    "IN: classes.tuple.tests GENERIC: forget-accessors-test"
+    <string-reader>
+    "forget-accessors-test" parse-stream
+] unit-test
+
+[ f ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
+
+[ f ] [ "x" accessor-exists? ] unit-test
+[ f ] [ "y" accessor-exists? ] unit-test
+[ f ] [ "z" accessor-exists? ] unit-test

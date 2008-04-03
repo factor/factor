@@ -159,17 +159,24 @@ num-types get f <array> builtins set
 "tuple-layout" "classes.tuple.private" create register-builtin
 
 ! Catch-all class for providing a default method.
-"object" "kernel" create [ drop t ] "predicate" set-word-prop
 "object" "kernel" create
-f builtins get [ ] subset union-class define-class
+[ f builtins get [ ] subset union-class define-class ]
+[ [ drop t ] "predicate" set-word-prop ]
+bi
+
+"object?" "kernel" vocab-words delete-at
 
 ! Class of objects with object tag
 "hi-tag" "kernel.private" create
-f builtins get num-tags get tail union-class define-class
+builtins get num-tags get tail define-union-class
 
 ! Empty class with no instances
-"null" "kernel" create [ drop f ] "predicate" set-word-prop
-"null" "kernel" create f { } union-class define-class
+"null" "kernel" create
+[ f { } union-class define-class ]
+[ [ drop f ] "predicate" set-word-prop ]
+bi
+
+"null?" "kernel" vocab-words delete-at
 
 "fixnum" "math" create { } define-builtin
 "fixnum" "math" create ">fixnum" "math" create 1quotation "coercer" set-word-prop
@@ -378,16 +385,8 @@ define-builtin
     ]
 } cleave
 
-! Define general-t type, which is any object that is not f.
-"general-t" "kernel" create
-f "f" "syntax" lookup builtins get remove [ ] subset union-class
-define-class
-
 "f" "syntax" create [ not ] "predicate" set-word-prop
 "f?" "syntax" vocab-words delete-at
-
-"general-t" "kernel" create [ ] "predicate" set-word-prop
-"general-t?" "kernel" vocab-words delete-at
 
 ! Create special tombstone values
 "tombstone" "hashtables.private" create

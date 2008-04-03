@@ -16,12 +16,6 @@ IN: bootstrap.compiler
 
 "cpu." cpu append require
 
-: enable-compiler ( -- )
-    [ optimized-recompile-hook ] recompile-hook set-global ;
-
-: disable-compiler ( -- )
-    [ default-recompile-hook ] recompile-hook set-global ;
-
 enable-compiler
 
 nl

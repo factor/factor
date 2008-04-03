@@ -4,7 +4,7 @@ compiler.units words ;
 
 TUPLE: combination-1 ;
 
-M: combination-1 perform-combination 2drop [ ] ;
+M: combination-1 perform-combination drop [ ] define ;
 
 M: combination-1 make-default-method 2drop [ "No method" throw ] ;
 

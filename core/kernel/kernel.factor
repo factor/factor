@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel.private slots.private ;
+USING: kernel.private slots.private classes.tuple.private ;
 IN: kernel
 
 ! Stack stuff
@@ -114,12 +114,6 @@ DEFER: if
     [ 2nip call ] if ; inline
 
 ! Object protocol
-GENERIC: delegate ( obj -- delegate )
-
-M: object delegate drop f ;
-
-GENERIC: set-delegate ( delegate tuple -- )
-
 GENERIC: hashcode* ( depth obj -- code )
 
 M: object hashcode* 2drop 0 ;
@@ -129,6 +123,10 @@ M: object hashcode* 2drop 0 ;
 GENERIC: equal? ( obj1 obj2 -- ? )
 
 M: object equal? 2drop f ;
+
+TUPLE: identity-tuple ;
+
+M: identity-tuple equal? 2drop f ;
 
 : = ( obj1 obj2 -- ? )
     2dup eq? [ 2drop t ] [ equal? ] if ; inline
@@ -142,18 +140,11 @@ M: object clone ;
 M: callstack clone (clone) ;
 
 ! Tuple construction
-GENERIC# get-slots 1 ( tuple slots -- ... )
+: construct-empty ( class -- tuple )
+    tuple-layout <tuple> ;
 
-GENERIC# set-slots 1 ( ... tuple slots -- )
-
-GENERIC: construct-empty ( class -- tuple )
-
-GENERIC: construct ( ... slots class -- tuple ) inline
-
-GENERIC: construct-boa ( ... class -- tuple )
-
-: construct-delegate ( delegate class -- tuple )
-    >r { set-delegate } r> construct ; inline
+: construct-boa ( ... class -- tuple )
+    tuple-layout <tuple-boa> ;
 
 ! Quotation building
 : 2curry ( obj1 obj2 quot -- curry )
@@ -201,3 +192,20 @@ GENERIC: construct-boa ( ... class -- tuple )
 : do-primitive ( number -- ) "Improper primitive call" throw ;
 
 PRIVATE>
+
+! Deprecated
+GENERIC: delegate ( obj -- delegate )
+
+M: object delegate drop f ;
+
+GENERIC: set-delegate ( delegate tuple -- )
+
+GENERIC# get-slots 1 ( tuple slots -- ... )
+
+GENERIC# set-slots 1 ( ... tuple slots -- )
+
+: construct ( ... slots class -- tuple )
+    construct-empty [ swap set-slots ] keep ; inline
+
+: construct-delegate ( delegate class -- tuple )
+    >r { set-delegate } r> construct ; inline

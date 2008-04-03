@@ -15,7 +15,7 @@ C: <trivial-tuple-dispatch-engine> trivial-tuple-dispatch-engine
 TUPLE: tuple-dispatch-engine echelons ;
 
 : push-echelon ( class method assoc -- )
-    >r swap dup tuple-layout layout-echelon r>
+    >r swap dup "layout" word-prop layout-echelon r>
     [ ?set-at ] change-at ;
 
 : echelon-sort ( assoc -- assoc' )

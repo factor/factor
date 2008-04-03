@@ -12,9 +12,9 @@ PREDICATE: math-class < class
         number bootstrap-word class<
     ] if ;
 
-: last/first ( seq -- pair ) dup peek swap first 2array ;
+: last/first ( seq -- pair ) [ peek ] [ first ] bi 2array ;
 
-: math-precedence ( class -- n )
+: math-precedence ( class -- pair )
     {
         { [ dup null class< ] [ drop { -1 -1 } ] }
         { [ dup math-class? ] [ class-types last/first ] }

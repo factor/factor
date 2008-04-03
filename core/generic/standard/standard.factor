@@ -8,6 +8,10 @@ generic.standard.engines.tag generic.standard.engines.predicate
 generic.standard.engines.tuple accessors ;
 IN: generic.standard
 
+GENERIC: dispatch# ( word -- n )
+
+M: word dispatch# "combination" word-prop dispatch# ;
+
 : unpickers
     {
         [ nip ]
@@ -101,7 +105,7 @@ PREDICATE: simple-generic < standard-generic
     T{ standard-combination f 0 } define-generic ;
 
 : with-standard ( combination quot -- quot' )
-    >r #>> (dispatch#) r> with-variable ;
+    >r #>> (dispatch#) r> with-variable ; inline
 
 M: standard-generic mangle-method
     drop 1quotation ;
@@ -111,6 +115,27 @@ M: standard-combination make-default-method
 
 M: standard-combination perform-combination
     [ drop ] [ [ single-combination ] with-standard ] 2bi define ;
+
+M: standard-combination dispatch# #>> ;
+
+ERROR: inconsistent-next-method object class generic ;
+
+ERROR: no-next-method class generic ;
+
+M: standard-generic next-method-quot
+    [
+        [
+            [ [ instance? ] curry ]
+            [ dispatch# (picker) ] bi* prepend %
+        ]
+        [
+            2dup next-method
+            [ 2nip 1quotation ]
+            [ [ no-next-method ] 2curry ] if* ,
+        ]
+        [ [ inconsistent-next-method ] 2curry , ]
+        2tri
+    ] [ ] make ;
 
 TUPLE: hook-combination var ;
 
@@ -124,6 +149,8 @@ PREDICATE: hook-generic < generic
         dip var>> [ get ] curry prepend
     ] with-variable ; inline
 
+M: hook-combination dispatch# drop 0 ;
+
 M: hook-generic mangle-method
     drop 1quotation [ drop ] prepend ;
 
@@ -132,14 +159,6 @@ M: hook-combination make-default-method
 
 M: hook-combination perform-combination
     [ drop ] [ [ single-combination ] with-hook ] 2bi define ;
-
-GENERIC: dispatch# ( word -- n )
-
-M: word dispatch# "combination" word-prop dispatch# ;
-
-M: standard-combination dispatch# #>> ;
-
-M: hook-combination dispatch# drop 0 ;
 
 M: simple-generic definer drop \ GENERIC: f ;
 

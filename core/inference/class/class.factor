@@ -176,9 +176,18 @@ M: pair constraint-satisfied?
 
 : predicate-constraints ( class #call -- )
     [
-        0 `input class,
-        general-t 0 `output class,
-    ] set-constraints ;
+        ! If word outputs true, input is an instance of class
+        [
+            0 `input class,
+            \ f class-not 0 `output class,
+        ] set-constraints
+    ] [
+        ! If word outputs false, input is not an instance of class
+        [
+            class-not 0 `input class,
+            \ f 0 `output class,
+        ] set-constraints
+    ] 2bi ;
 
 : compute-constraints ( #call -- )
     dup node-param "constraints" word-prop [
@@ -209,7 +218,7 @@ M: #push infer-classes-before
 
 M: #if child-constraints
     [
-        general-t 0 `input class,
+        \ f class-not 0 `input class,
         f 0 `input literal,
     ] make-constraints ;
 

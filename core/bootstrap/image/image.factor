@@ -444,7 +444,6 @@ PRIVATE>
         "resource:/core/bootstrap/stage1.factor" run-file
         build-image
         write-image
-        \ word-props target-word
     ] with-scope ;
 
 : make-images ( -- )

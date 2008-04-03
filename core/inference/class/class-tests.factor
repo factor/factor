@@ -21,7 +21,7 @@ GENERIC: mynot ( x -- y )
 
 M: f mynot drop t ;
 
-M: general-t mynot drop f ;
+M: object mynot drop f ;
 
 GENERIC: detect-f ( x -- y )
 
@@ -296,4 +296,16 @@ cell-bits 32 = [
 
 [ t ] [
     [ { vector } declare nth-unsafe ] \ nth-unsafe inlined?
+] unit-test
+
+[ t ] [
+    [
+        dup integer? [
+            dup fixnum? [
+                1 +
+            ] [
+                2 +
+            ] if
+        ] when
+    ] \ + inlined?
 ] unit-test

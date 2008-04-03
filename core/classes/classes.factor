@@ -60,7 +60,7 @@ PREDICATE: predicate < word "predicating" word-prop >boolean ;
     dup class? [ "superclass" word-prop ] [ drop f ] if ;
 
 : superclasses ( class -- supers )
-    [ dup ] [ [ superclass ] keep ] [ ] unfold nip reverse ;
+    [ superclass ] follow reverse ;
 
 : members ( class -- seq )
     #! Output f for non-classes to work with algebra code
@@ -133,3 +133,6 @@ GENERIC: class ( object -- class )
 M: hi-tag class hi-tag type>class ;
 
 M: object class tag type>class ;
+
+: instance? ( obj class -- ? )
+    "predicate" word-prop call ;

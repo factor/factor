@@ -365,7 +365,17 @@ ERROR: bad-number ;
 
 : (:) CREATE-WORD parse-definition ;
 
-: (M:) CREATE-METHOD parse-definition ;
+SYMBOL: current-class
+SYMBOL: current-generic
+
+: (M:)
+    CREATE-METHOD
+    [
+        [ "method-class" word-prop current-class set ]
+        [ "method-generic" word-prop current-generic set ]
+        [ ] tri
+        parse-definition
+    ] with-scope ;
 
 : scan-object ( -- object )
     scan-word dup parsing?

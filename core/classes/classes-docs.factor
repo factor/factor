@@ -21,7 +21,6 @@ $nl
     { { $link f } { $snippet "[ not ]" } { "The conventional name for a word which outputs true when given false is " { $link not } "; " { $snippet "f?" } " would be confusing." } }
     { { $link object } { $snippet "[ drop t ]" } { "All objects are instances of " { $link object } } }
     { { $link null } { $snippet "[ drop f ]" } { "No object is an instance of " { $link null } } }
-    { { $link general-t } { $snippet "[ ]" } { "All objects with a true value are instances of " { $link general-t } } }
 }
 "The set of class predicate words is a class:"
 { $subsection predicate }

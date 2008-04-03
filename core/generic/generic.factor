@@ -6,16 +6,7 @@ classes.algebra quotations arrays vocabs effects ;
 IN: generic
 
 ! Method combination protocol
-GENERIC: perform-combination ( word combination -- quot )
-
-M: object perform-combination
-    #! We delay the invalid method combination error for a
-    #! reason. If we call forget-vocab on a vocabulary which
-    #! defines a method combination, a generic using this
-    #! method combination, and a method on the generic, and the
-    #! method combination is forgotten first, then forgetting
-    #! the method will throw an error. We don't want that.
-    nip [ "Invalid method combination" throw ] curry [ ] like ;
+GENERIC: perform-combination ( word combination -- )
 
 GENERIC: make-default-method ( generic combination -- method )
 
@@ -37,6 +28,18 @@ PREDICATE: method-spec < pair
 
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
+
+: next-method-class ( class generic -- class/f )
+    order [ class< ] with subset reverse dup length 1 =
+    [ drop f ] [ second ] if ;
+
+: next-method ( class generic -- class/f )
+    [ next-method-class ] keep method ;
+
+GENERIC: next-method-quot ( class generic -- quot )
+
+: (call-next-method) ( class generic -- )
+    next-method-quot call ;
 
 TUPLE: check-method class generic ;
 
