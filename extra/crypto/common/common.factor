@@ -50,9 +50,8 @@ SYMBOL: big-endian?
 
 : 2seq>seq ( seq1 seq2 -- seq )
     #! { aceg } { bdfh } -> { abcdefgh }
-    swap ! error?
     [ 2array flip concat ] keep like ;
 
 : mod-nth ( n seq -- elt )
     #! 5 "abcd" -> b
-    [ length mod ] keep nth ;
+    [ length mod ] [ nth ] bi ;
