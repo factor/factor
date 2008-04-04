@@ -6,6 +6,7 @@ memory kernel.private continuations io prettyprint
 vocabs.loader debugger system strings ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
+QUALIFIED: command-line
 QUALIFIED: compiler.errors.private
 QUALIFIED: compiler.units
 QUALIFIED: continuations
@@ -139,14 +140,17 @@ IN: tools.deploy.shaker
             { } { "cpu" } strip-vocab-globals %
 
             {
+                gensym
                 classes:class-and-cache
                 classes:class-not-cache
                 classes:class-or-cache
                 classes:class<-cache
                 classes:classes-intersect-cache
                 classes:update-map
+                command-line:main-vocab-hook
                 compiled-crossref
                 compiler.units:recompile-hook
+                compiler.units:update-tuples-hook
                 definitions:crossref
                 interactive-vocabs
                 layouts:num-tags
@@ -187,7 +191,7 @@ IN: tools.deploy.shaker
             "ui-error-hook" "ui.gadgets.worlds" lookup ,
         ] when
 
-        "<counter>" "inference.dataflow" lookup [ , ] when*
+        "<computer>" "inference.dataflow" lookup [ , ] when*
 
         "windows-messages" "windows.messages" lookup [ , ] when*
 
