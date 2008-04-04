@@ -127,10 +127,10 @@ SYMBOL: build-status
 
   "report" utf8
     [
-      "Build machine:   " write host-name print
-      "CPU:             " write cpu       print
-      "OS:              " write os        print
-      "Build directory: " write cwd       print
+      "Build machine:   " write host-name             print
+      "CPU:             " write cpu                   print
+      "OS:              " write os                    print
+      "Build directory: " write current-directory get print
 
       git-clone [ "git clone failed" print ] run-or-bail
 
