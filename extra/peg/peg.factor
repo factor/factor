@@ -185,7 +185,7 @@ C: <head> peg-head
     [ setup-lr ] keep seed>>
   ] [
     nip
-  ] if ; inline
+  ] if ; 
 
 : apply-rule ( r p -- ast )
    2dup recall [
