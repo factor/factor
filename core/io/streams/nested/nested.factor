@@ -34,9 +34,11 @@ M: filter-writer stream-write-table
     stream>> stream-write-table ;
 
 M: filter-writer dispose
-    drop ;
+    stream>> dispose ;
 
 TUPLE: ignore-close-stream < filter-writer ;
+
+M: ignore-close-stream dispose drop ;
 
 C: <ignore-close-stream> ignore-close-stream
 

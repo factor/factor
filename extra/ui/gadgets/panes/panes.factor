@@ -166,7 +166,7 @@ M: pane-stream dispose drop ;
 M: pane-stream stream-flush drop ;
 
 M: pane-stream make-span-stream
-    swap <style-stream> ;
+    swap <style-stream> <ignore-close-stream> ;
 
 ! Character styles
 
