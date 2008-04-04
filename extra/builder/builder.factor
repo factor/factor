@@ -13,8 +13,6 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : cd ( path -- ) current-directory set ;
-
 : cd ( path -- ) set-current-directory ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -51,22 +49,14 @@ IN: builder
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : gnu-make ( -- string )
-  os { "freebsd" "openbsd" "netbsd" } member?
+  os { freebsd openbsd netbsd } member?
     [ "gmake" ]
     [ "make"  ]
   if ;
 
-! : do-make-clean ( -- ) { "make" "clean" } try-process ;
-
 : do-make-clean ( -- ) { gnu-make "clean" } to-strings try-process ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! : make-vm ( -- desc )
-!   <process>
-!     { "make" }       >>command
-!     "../compile-log" >>stdout
-!     +stdout+         >>stderr ;
 
 : make-vm ( -- desc )
   <process>
@@ -94,7 +84,7 @@ IN: builder
     +closed+      >>stdin
     "../boot-log" >>stdout
     +stdout+      >>stderr
-    20 minutes    >>timeout ;
+    60 minutes    >>timeout ;
 
 : do-bootstrap ( -- )
   bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail ;
@@ -127,10 +117,10 @@ SYMBOL: build-status
 
   "report" utf8
     [
-      "Build machine:   " write host-name print
-      "CPU:             " write cpu       print
-      "OS:              " write os        print
-      "Build directory: " write cwd       print
+      "Build machine:   " write host-name             print
+      "CPU:             " write cpu                   .
+      "OS:              " write os                    .
+      "Build directory: " write current-directory get print
 
       git-clone [ "git clone failed" print ] run-or-bail
 
@@ -157,8 +147,6 @@ SYMBOL: build-status
       
       "Did not pass test-all: "        print "test-all-vocabs"        cat
                                              "test-failures"          cat
-      
-!       "test-failures" eval-file test-failures.
       
       "help-lint results:"             print "help-lint"              cat
 
