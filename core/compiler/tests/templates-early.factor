@@ -173,12 +173,12 @@ SYMBOL: template-chosen
     ] unit-test
 
     [ ] [
-        2 phantom-d get phantom-input
+        2 phantom-datastack get phantom-input
         [ { { f "a" } { f "b" } } lazy-load ] { } make drop
     ] unit-test
     
     [ t ] [
-        phantom-d get [ cached? ] all?
+        phantom-datastack get [ cached? ] all?
     ] unit-test
 
     ! >r

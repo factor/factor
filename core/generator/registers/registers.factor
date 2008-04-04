@@ -230,48 +230,44 @@ INSTANCE: constant value
     } case ;
 
 ! A compile-time stack
-TUPLE: phantom-stack height ;
+TUPLE: phantom-stack height stack ;
+
+M: phantom-stack clone
+    call-next-method [ clone ] change-stack ;
 
 GENERIC: finalize-height ( stack -- )
 
-SYMBOL: phantom-d
-SYMBOL: phantom-r
-
-: <phantom-stack> ( class -- stack )
-    >r
-    V{ } clone 0
-    { set-delegate set-phantom-stack-height }
-    phantom-stack construct
-    r> construct-delegate ;
+: construct-phantom-stack ( class -- stack )
+    >r 0 V{ } clone r> construct-boa ; inline
 
 : (loc)
     #! Utility for methods on <loc>
-    phantom-stack-height - ;
+    height>> - ;
 
 : (finalize-height) ( stack word -- )
     #! We consolidate multiple stack height changes until the
     #! last moment, and we emit the final height changing
     #! instruction here.
-    swap [
-        phantom-stack-height
-        dup zero? [ 2drop ] [ swap execute ] if
-        0
-    ] keep set-phantom-stack-height ; inline
+    [
+        over zero? [ 2drop ] [ execute ] if 0
+    ] curry change-height drop ; inline
 
 GENERIC: <loc> ( n stack -- loc )
 
-TUPLE: phantom-datastack ;
+TUPLE: phantom-datastack < phantom-stack ;
 
-: <phantom-datastack> phantom-datastack <phantom-stack> ;
+: <phantom-datastack> ( -- stack )
+    phantom-datastack construct-phantom-stack ;
 
 M: phantom-datastack <loc> (loc) <ds-loc> ;
 
 M: phantom-datastack finalize-height
     \ %inc-d (finalize-height) ;
 
-TUPLE: phantom-retainstack ;
+TUPLE: phantom-retainstack < phantom-stack ;
 
-: <phantom-retainstack> phantom-retainstack <phantom-stack> ;
+: <phantom-retainstack> ( -- stack )
+    phantom-retainstack construct-phantom-stack ;
 
 M: phantom-retainstack <loc> (loc) <rs-loc> ;
 
@@ -283,34 +279,33 @@ M: phantom-retainstack finalize-height
     >r <reversed> r> [ <loc> ] curry map ;
 
 : phantom-locs* ( phantom -- locs )
-    dup length swap phantom-locs ;
+    [ stack>> length ] keep phantom-locs ;
+
+: phantoms ( -- phantom phantom )
+    phantom-datastack get phantom-retainstack get ;
 
 : (each-loc) ( phantom quot -- )
-    >r dup phantom-locs* swap r> 2each ; inline
+    >r [ phantom-locs* ] [ stack>> ] bi r> 2each ; inline
 
 : each-loc ( quot -- )
-    >r phantom-d get r> phantom-r get over
-    >r >r (each-loc) r> r> (each-loc) ; inline
+    phantoms 2array swap [ (each-loc) ] curry each ; inline
 
 : adjust-phantom ( n phantom -- )
-    [ phantom-stack-height + ] keep set-phantom-stack-height ;
+    swap [ + ] curry change-height drop ;
 
-GENERIC: cut-phantom ( n phantom -- seq )
-
-M: phantom-stack cut-phantom
-    [ delegate swap cut* swap ] keep set-delegate ;
+: cut-phantom ( n phantom -- seq )
+    swap [ cut* swap ] curry change-stack drop ;
 
 : phantom-append ( seq stack -- )
-    over length over adjust-phantom push-all ;
+    over length over adjust-phantom stack>> push-all ;
 
 : add-locs ( n phantom -- )
-    2dup length <= [
+    2dup stack>> length <= [
         2drop
     ] [
         [ phantom-locs ] keep
-        [ length head-slice* ] keep
-        [ append >vector ] keep
-        delegate set-delegate
+        [ stack>> length head-slice* ] keep
+        [ append >vector ] change-stack drop
     ] if ;
 
 : phantom-input ( n phantom -- seq )
@@ -318,18 +313,16 @@ M: phantom-stack cut-phantom
     2dup cut-phantom
     >r >r neg r> adjust-phantom r> ;
 
-: phantoms ( -- phantom phantom ) phantom-d get phantom-r get ;
-
 : each-phantom ( quot -- ) phantoms rot bi@ ; inline
 
 : finalize-heights ( -- ) [ finalize-height ] each-phantom ;
 
 : live-vregs ( -- seq )
-    [ [ [ live-vregs* ] each ] each-phantom ] { } make ;
+    [ [ stack>> [ live-vregs* ] each ] each-phantom ] { } make ;
 
 : (live-locs) ( phantom -- seq )
     #! Discard locs which haven't moved
-    dup phantom-locs* swap 2array flip
+    [ phantom-locs* ] [ stack>> ] bi 2array flip
     [ live-loc? ] assoc-subset
     values ;
 
@@ -349,7 +342,7 @@ SYMBOL: fresh-objects
     \ free-vregs get at ;
 
 : alloc-vreg ( spec -- reg )
-    dup reg-spec>class free-vregs pop swap {
+    [ reg-spec>class free-vregs pop ] keep {
         { f [ <tagged> ] }
         { unboxed-alien [ <unboxed-alien> ] }
         { unboxed-byte-array [ <unboxed-byte-array> ] }
@@ -375,8 +368,8 @@ SYMBOL: fresh-objects
     } cond ;
 
 : alloc-vreg-for ( value spec -- vreg )
-    swap operand-class swap alloc-vreg
-    dup tagged? [ tuck set-tagged-class ] [ nip ] if ;
+    alloc-vreg swap operand-class
+    over tagged? [ >>class ] [ drop ] if ;
 
 M: value (lazy-load)
     2dup allocation [
@@ -419,7 +412,7 @@ M: loc lazy-store
     #! When shuffling more values than can fit in registers, we
     #! need to find an area on the data stack which isn't in
     #! use.
-    dup phantom-stack-height neg [ minimal-ds-loc* ] reduce ;
+    [ stack>> ] [ height>> neg ] bi [ minimal-ds-loc* ] reduce ;
 
 : find-tmp-loc ( -- n )
     #! Find an area of the data stack which is not referenced
@@ -463,13 +456,13 @@ M: loc lazy-store
     #! Kill register assignments but preserve constants and
     #! class information.
     dup phantom-locs*
-    over [
+    over stack>> [
         dup constant? [ nip ] [
             operand-class over set-operand-class
         ] if
     ] 2map
-    over delete-all
-    swap push-all ;
+    over stack>> delete-all
+    swap stack>> push-all ;
 
 : reset-phantoms ( -- )
     [ reset-phantom ] each-phantom ;
@@ -488,6 +481,7 @@ M: loc lazy-store
     >r int-regs free-vregs length <= r> and ;
 
 : phantom&spec ( phantom spec -- phantom' spec' )
+    >r stack>> r>
     [ length f pad-left ] keep
     [ <reversed> ] bi@ ; inline
 
@@ -505,7 +499,7 @@ M: loc lazy-store
 : substitute-vregs ( values vregs -- )
     [ vreg-substitution ] 2map
     [ substitute-vreg? ] assoc-subset >hashtable
-    [ substitute-here ] curry each-phantom ;
+    [ >r stack>> r> substitute-here ] curry each-phantom ;
 
 : set-operand ( value var -- )
     >r dup constant? [ constant-value ] when r> set ;
@@ -517,14 +511,15 @@ M: loc lazy-store
     substitute-vregs ;
 
 : load-inputs ( -- )
-    +input+ get dup length phantom-d get phantom-input
-    swap lazy-load ;
+    +input+ get
+    [ length phantom-datastack get phantom-input ] keep
+    lazy-load ;
 
 : output-vregs ( -- seq seq )
     +output+ +clobber+ [ get [ get ] map ] bi@ ;
 
 : clash? ( seq -- ? )
-    phantoms append [
+    phantoms [ stack>> ] bi@ append [
         dup cached? [ cached-vreg ] when swap member?
     ] with contains? ;
 
@@ -542,15 +537,14 @@ M: loc lazy-store
     [ first reg-spec>class ] map count-vregs ;
 
 : guess-vregs ( dinput rinput scratch -- int# float# )
-    H{
-        { int-regs 0 }
-        { double-float-regs 0 }
-    } clone [
+    [
+        0 int-regs set
+        0 double-float-regs set
         count-scratch-regs
-        phantom-r get swap count-input-vregs
-        phantom-d get swap count-input-vregs
+        phantom-retainstack get swap count-input-vregs
+        phantom-datastack get swap count-input-vregs
         int-regs get double-float-regs get
-    ] bind ;
+    ] with-scope ;
 
 : alloc-scratch ( -- )
     +scratch+ get [ >r alloc-vreg r> set ] assoc-each ;
@@ -567,7 +561,7 @@ M: loc lazy-store
     outputs-clash? [ finalize-contents ] when ;
 
 : template-outputs ( -- )
-    +output+ get [ get ] map phantom-d get phantom-append ;
+    +output+ get [ get ] map phantom-datastack get phantom-append ;
 
 : value-matches? ( value spec -- ? )
     #! If the spec is a quotation and the value is a literal
@@ -597,7 +591,7 @@ M: loc lazy-store
     >r >r operand-class 2 r> ?nth class-matches? r> and ;
 
 : template-matches? ( spec -- ? )
-    phantom-d get +input+ rot at
+    phantom-datastack get +input+ rot at
     [ spec-matches? ] phantom&spec-agree? ;
 
 : ensure-template-vregs ( -- )
@@ -606,14 +600,14 @@ M: loc lazy-store
     ] unless ;
 
 : clear-phantoms ( -- )
-    [ delete-all ] each-phantom ;
+    [ stack>> delete-all ] each-phantom ;
 
 PRIVATE>
 
 : set-operand-classes ( classes -- )
-    phantom-d get
+    phantom-datastack get
     over length over add-locs
-    [ set-operand-class ] 2reverse-each ;
+    stack>> [ set-operand-class ] 2reverse-each ;
 
 : end-basic-block ( -- )
     #! Commit all deferred stacking shuffling, and ensure the
@@ -622,7 +616,7 @@ PRIVATE>
     finalize-contents
     clear-phantoms
     finalize-heights
-    fresh-objects get dup empty? swap delete-all [ %gc ] unless ;
+    fresh-objects get [ empty? [ %gc ] unless ] [ delete-all ] bi ;
 
 : with-template ( quot hash -- )
     clone [
@@ -642,16 +636,16 @@ PRIVATE>
 : init-templates ( -- )
     #! Initialize register allocator.
     V{ } clone fresh-objects set
-    <phantom-datastack> phantom-d set
-    <phantom-retainstack> phantom-r set
+    <phantom-datastack> phantom-datastack set
+    <phantom-retainstack> phantom-retainstack set
     compute-free-vregs ;
 
 : copy-templates ( -- )
     #! Copies register allocator state, used when compiling
     #! branches.
     fresh-objects [ clone ] change
-    phantom-d [ clone ] change
-    phantom-r [ clone ] change
+    phantom-datastack [ clone ] change
+    phantom-retainstack [ clone ] change
     compute-free-vregs ;
 
 : find-template ( templates -- pair/f )
@@ -667,17 +661,17 @@ UNION: immediate fixnum POSTPONE: f ;
     operand-class immediate class< ;
 
 : phantom-push ( obj -- )
-    1 phantom-d get adjust-phantom
-    phantom-d get push ;
+    1 phantom-datastack get adjust-phantom
+    phantom-datastack get stack>> push ;
 
 : phantom-shuffle ( shuffle -- )
-    [ effect-in length phantom-d get phantom-input ] keep
-    shuffle* phantom-d get phantom-append ;
+    [ effect-in length phantom-datastack get phantom-input ] keep
+    shuffle* phantom-datastack get phantom-append ;
 
 : phantom->r ( n -- )
-    phantom-d get phantom-input
-    phantom-r get phantom-append ;
+    phantom-datastack get phantom-input
+    phantom-retainstack get phantom-append ;
 
 : phantom-r> ( n -- )
-    phantom-r get phantom-input
-    phantom-d get phantom-append ;
+    phantom-retainstack get phantom-input
+    phantom-datastack get phantom-append ;
