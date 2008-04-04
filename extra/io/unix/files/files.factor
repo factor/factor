@@ -3,7 +3,8 @@
 USING: io.backend io.nonblocking io.unix.backend io.files io
 unix unix.stat unix.time kernel math continuations
 math.bitfields byte-arrays alien combinators calendar
-io.encodings.binary accessors sequences strings system ;
+io.encodings.binary accessors sequences strings system
+io.files.private ;
 
 IN: io.unix.files
 

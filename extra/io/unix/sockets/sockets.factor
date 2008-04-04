@@ -7,7 +7,7 @@ USING: alien alien.c-types generic io kernel math namespaces
 io.nonblocking parser threads unix sequences
 byte-arrays io.sockets io.binary io.unix.backend
 io.streams.duplex io.sockets.impl math.parser continuations libc
-combinators io.backend io.files system ;
+combinators io.backend io.files io.files.private system ;
 IN: io.unix.sockets
 
 : pending-init-error ( port -- )

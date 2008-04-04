@@ -121,8 +121,28 @@ SYMBOL: +called+
         compiled-usage [ nip +inlined+ eq? ] assoc-subset update
     ] with each keys ;
 
-M: word redefined* ( word -- )
-    { "inferred-effect" "no-effect" } reset-props ;
+<PRIVATE
+
+SYMBOL: visited
+
+: reset-on-redefine { "inferred-effect" "no-effect" } ; inline
+
+: (redefined) ( word -- )
+    dup visited get key? [ drop ] [
+        [ reset-on-redefine reset-props ]
+        [ dup visited get set-at ]
+        [
+            crossref get at keys [ word? ] subset [
+                reset-on-redefine [ word-prop ] with contains?
+            ] subset
+            [ (redefined) ] each
+        ] tri
+    ] if ;
+
+PRIVATE>
+
+: redefined ( word -- )
+    H{ } clone visited [ (redefined) ] with-variable ;
 
 SYMBOL: changed-words
 

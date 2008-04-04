@@ -1,6 +1,7 @@
 USING: alien arrays generic generic.math help.markup help.syntax
 kernel math memory strings sbufs vectors io io.files classes
-help generic.standard continuations system debugger.private ;
+help generic.standard continuations system debugger.private
+io.files.private ;
 IN: debugger
 
 ARTICLE: "errors-assert" "Assertions"

@@ -4,7 +4,6 @@ IN: math.bitfields.lib
 : clear-bit ( x n -- y ) 2^ bitnot bitand ; foldable
 : set-bit ( x n -- y ) 2^ bitor ; foldable
 : bit-clear? ( x n -- ? ) 2^ bitand zero? ; foldable
-: bit-set? ( x n -- ? ) bit-clear? not ; foldable
 : unmask ( x n -- ? ) bitnot bitand ; foldable
 : unmask? ( x n -- ? ) unmask 0 > ; foldable
 : mask ( x n -- ? ) bitand ; foldable
@@ -18,8 +17,8 @@ IN: math.bitfields.lib
 
 : bitroll ( x s w -- y )
      [ wrap ] keep
-     [ shift-mod ] 3keep
-     [ - ] keep shift-mod bitor ; inline
+     [ shift-mod ]
+     [ [ - ] keep shift-mod ] 3bi bitor ; inline
 
 : bitroll-32 ( n s -- n' ) 32 bitroll ;
 

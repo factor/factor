@@ -42,13 +42,6 @@ M: object uses drop f ;
 
 : usage ( defspec -- seq ) \ f or crossref get at keys ;
 
-GENERIC: redefined* ( defspec -- )
-
-M: object redefined* drop ;
-
-: redefined ( defspec -- )
-    [ crossref get at ] closure [ drop redefined* ] assoc-each ;
-
 : unxref ( defspec -- )
     dup uses crossref get remove-vertex ;
 
