@@ -464,19 +464,6 @@ SYMBOL: interactive-vocabs
         "Loading " write <pathname> . flush
     ] if ;
 
-: smudged-usage-warning ( usages removed -- )
-    parser-notes? [
-        "Warning: the following definitions were removed from sources," print
-        "but are still referenced from other definitions:" print
-        nl
-        dup sorted-definitions.
-        nl
-        "The following definitions need to be updated:" print
-        nl
-        over sorted-definitions.
-        nl
-    ] when 2drop ;
-
 : filter-moved ( assoc1 assoc2 -- seq )
     diff [
         drop where dup [ first ] when
@@ -491,32 +478,22 @@ SYMBOL: interactive-vocabs
     new-definitions old-definitions
     [ get second ] bi@ ;
 
-: smudged-usage ( -- usages referenced removed )
-    removed-definitions filter-moved [
-        outside-usages
-        [
-            empty? [ drop f ] [
-                {
-                    { [ dup pathname? ] [ f ] }
-                    { [ dup method-body? ] [ f ] }
-                    { [ t ] [ t ] }
-                } cond nip
-            ] if
-        ] assoc-subset
-        dup values concat prune swap keys
-    ] keep ;
+: forget-removed-definitions ( -- )
+    removed-definitions filter-moved forget-all ;
+
+: reset-removed-classes ( -- )
+    removed-classes
+    filter-moved [ class? ] subset [ reset-class ] each ;
 
 : fix-class-words ( -- )
     #! If a class word had a compound definition which was
     #! removed, it must go back to being a symbol.
     new-definitions get first2
-    filter-moved [ [ reset-generic ] [ define-symbol ] bi ] each
-    removed-classes
-    filter-moved [ class? ] subset [ reset-class ] each ;
+    filter-moved [ [ reset-generic ] [ define-symbol ] bi ] each ;
 
 : forget-smudged ( -- )
-    smudged-usage forget-all
-    over empty? [ 2dup smudged-usage-warning ] unless 2drop
+    forget-removed-definitions
+    reset-removed-classes
     fix-class-words ;
 
 : finish-parsing ( lines quot -- )

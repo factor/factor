@@ -56,10 +56,14 @@ uses definitions ;
 M: pathname where pathname-string 1 2array ;
 
 : forget-source ( path -- )
-    dup source-file
-    dup unxref-source
-    source-file-definitions [ keys forget-all ] each
-    source-files get delete-at ;
+    [
+        source-file
+        [ unxref-source ]
+        [ definitions>> [ keys forget-all ] each ]
+        bi
+    ]
+    [ source-files get delete-at ]
+    bi ;
 
 M: pathname forget*
     pathname-string forget-source ;
@@ -78,9 +82,3 @@ SYMBOL: file
         source-file-definitions old-definitions set
         [ ] [ file get rollback-source-file ] cleanup
     ] with-scope ; inline
-
-: outside-usages ( seq -- usages )
-    dup [
-        over usage
-        [ dup pathname? not swap where and ] subset seq-diff
-    ] curry { } map>assoc ;

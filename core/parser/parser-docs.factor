@@ -445,17 +445,9 @@ HELP: eval
 { $description "Parses Factor source code from a string, and calls the resulting quotation." }
 { $errors "Throws an error if the input is malformed, or if the evaluation itself throws an error." } ;
 
-HELP: outside-usages
-{ $values { "seq" "a sequence of definitions" } { "usages" "an association list mapping definitions to sequences of definitions" } }
-{ $description "Outputs an association list mapping elements of " { $snippet "seq" } " to lists of usages which exclude the definitions in " { $snippet "seq" } " themselves." } ;
-
 HELP: filter-moved
 { $values { "assoc" "an assoc where the keys are definitions" } { "newassoc" "an assoc where the keys are definitions" } }
 { $description "Removes all definitions from the assoc which are no longer present in the current " { $link file } "." } ;
-
-HELP: smudged-usage
-{ $values { "usages" "a sequence of definitions which reference removed definitions" } { "referenced" "a sequence of definitions removed from this source file which are still referenced elsewhere" } { "removed" "a sequence of definitions removed from this source file" } }
-{ $description "Collects information about changed word definitioins after parsing." } ;
 
 HELP: forget-smudged
 { $description "Forgets removed definitions and prints a warning message if any of them are still referenced from other source files." } ;

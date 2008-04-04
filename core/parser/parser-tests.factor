@@ -348,47 +348,6 @@ IN: parser.tests
     ] must-fail
 ] with-file-vocabs
 
-[
-    << file get parsed >> file set
-
-    : ~a ;
-
-    DEFER: ~b
-
-    "IN: parser.tests : ~b ~a ;" <string-reader>
-    "smudgy" parse-stream drop
-
-    : ~c ;
-    : ~d ;
-
-    { H{ { ~a ~a } { ~b ~b } { ~c ~c } { ~d ~d } } H{ } } old-definitions set
-    
-    { H{ { ~b ~b } { ~d ~d } } H{ } } new-definitions set
-    
-    [ V{ ~b } { ~a } { ~a ~c } ] [
-        smudged-usage
-        natural-sort
-    ] unit-test
-] with-scope
-
-[
-    << file get parsed >> file set
-
-    GENERIC: ~e
-
-    : ~f ~e ;
-
-    : ~g ;
-
-    { H{ { ~e ~e } { ~f ~f } { ~g ~g } } H{ } } old-definitions set
-    
-    { H{ { ~g ~g } } H{ } } new-definitions set
-
-    [ V{ } { } { ~e ~f } ]
-    [ smudged-usage natural-sort ]
-    unit-test
-] with-scope
-
 [ ] [
     "IN: parser.tests USE: kernel PREDICATE: foo < object ( x -- y ) ;" eval
 ] unit-test
