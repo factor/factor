@@ -382,7 +382,7 @@ DEFER: lmerge
   [
     dup [ car ] curry -rot
     [
-      [ cdr ] bi lmerge
+      [ cdr ] bi@ lmerge
     ] 2curry lazy-cons
   ] 2curry lazy-cons ;
 
