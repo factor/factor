@@ -186,6 +186,11 @@ IN: tools.deploy.shaker
         deploy-ui? get [
             "ui-error-hook" "ui.gadgets.worlds" lookup ,
         ] when
+
+        "<counter>" "inference.dataflow" lookup [ , ] when*
+
+        "windows-messages" "windows.messages" lookup [ , ] when*
+
     ] { } make ;
 
 : strip-globals ( stripped-globals -- )
