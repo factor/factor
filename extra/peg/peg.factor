@@ -188,16 +188,12 @@ C: <head> peg-head
     m ans>>
   ] if ;
 
-:: apply-rule ( r p -- ast )
-  [let* |
-          m [ r p recall ]
-        | 
-    m [
-      r m apply-memo-rule
-    ] [
-      r p apply-non-memo-rule
-    ] if 
-  ] ; inline
+: apply-rule ( r p -- ast )
+   2dup recall [
+     nip apply-memo-rule
+   ] [
+     apply-non-memo-rule
+   ] if* ; inline
 
 : with-packrat ( input quot -- result )
   #! Run the quotation with a packrat cache active.
