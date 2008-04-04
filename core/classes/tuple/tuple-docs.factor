@@ -140,7 +140,7 @@ $nl
 }
 { $subsection "tuple-inheritance-example" }
 { $subsection "tuple-inheritance-anti-example" } 
-{ $see-also "call-next-method" "parametrized-constructors" } ;
+{ $see-also "call-next-method" "parametrized-constructors" "unions" "mixins" } ;
 
 ARTICLE: "tuple-introspection" "Tuple introspection"
 "In addition to the slot reader and writer words which " { $link POSTPONE: TUPLE: } " defines for every tuple class, it is possible to construct and take apart entire tuples in a generic way."

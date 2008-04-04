@@ -1,5 +1,5 @@
 USING: help.markup help.syntax help words compiler.units
-classes ;
+classes sequences ;
 IN: classes.mixin
 
 ARTICLE: "mixins" "Mixin classes"
@@ -10,7 +10,9 @@ ARTICLE: "mixins" "Mixin classes"
 { $subsection add-mixin-instance }
 "The set of mixin classes is a class:"
 { $subsection mixin-class }
-{ $subsection mixin-class? } ;
+{ $subsection mixin-class? }
+"Mixins are used to defines suites of behavior which are generally useful and can be applied to user-defined classes. For example, the " { $link immutable-sequence } " mixin can be used with user-defined sequences to make them immutable."
+{ $see-also "unions" "tuple-subclassing" } ;
 
 HELP: mixin-class
 { $class-description "The class of mixin classes." } ;
