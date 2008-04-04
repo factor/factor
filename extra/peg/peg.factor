@@ -179,14 +179,13 @@ C: <head> peg-head
     ] if
   ] ; inline
 
-:: apply-memo-rule ( r m -- ast )
-  m pos>> pos set 
-  m ans>> left-recursion? [ 
-    r m ans>> setup-lr
-    m ans>> seed>>
+: apply-memo-rule ( r m -- ast )
+  [ ans>> ] [ pos>> ] bi pos set
+  dup left-recursion? [ 
+    [ setup-lr ] keep seed>>
   ] [
-    m ans>>
-  ] if ;
+    nip
+  ] if ; inline
 
 : apply-rule ( r p -- ast )
    2dup recall [
