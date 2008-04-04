@@ -7,10 +7,6 @@ classes classes.private slots.deprecated slots.private slots
 compiler.units math.private accessors assocs ;
 IN: classes.tuple
 
-M: tuple delegate 2 slot ;
-
-M: tuple set-delegate 2 set-slot ;
-
 M: tuple class 1 slot 2 slot { word } declare ;
 
 ERROR: no-tuple-class class ;

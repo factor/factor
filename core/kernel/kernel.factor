@@ -194,11 +194,7 @@ M: callstack clone (clone) ;
 PRIVATE>
 
 ! Deprecated
-GENERIC: delegate ( obj -- delegate )
-
 M: object delegate drop f ;
-
-GENERIC: set-delegate ( delegate tuple -- )
 
 GENERIC# get-slots 1 ( tuple slots -- ... )
 
