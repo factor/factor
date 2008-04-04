@@ -11,37 +11,38 @@ SYMBOL: position
 SYMBOL: recursion-check
 SYMBOL: pprinter-stack
 
-SYMBOL: last-newline
-SYMBOL: line-count
-SYMBOL: end-printing
-SYMBOL: indent
-
 ! We record vocabs of all words
 SYMBOL: pprinter-in
 SYMBOL: pprinter-use
+
+TUPLE: pprinter last-newline line-count end-printing indent ;
+
+: <pprinter> ( -- pprinter ) 0 1 f 0 pprinter construct-boa ;
 
 : record-vocab ( word -- )
     word-vocabulary [ dup pprinter-use get set-at ] when* ;
 
 ! Utility words
 : line-limit? ( -- ? )
-    line-limit get dup [ line-count get <= ] when ;
+    line-limit get dup [ pprinter get line-count>> <= ] when ;
 
-: do-indent ( -- ) indent get CHAR: \s <string> write ;
+: do-indent ( -- ) pprinter get indent>> CHAR: \s <string> write ;
 
 : fresh-line ( n -- )
-    dup last-newline get = [
+    dup pprinter get last-newline>> = [
         drop
     ] [
-        last-newline set
-        line-limit? [ "..." write end-printing get continue ] when
-        line-count inc
+        pprinter get (>>last-newline)
+        line-limit? [
+            "..." write pprinter get end-printing>> continue
+        ] when
+        pprinter get [ 1+ ] change-line-count drop
         nl do-indent
     ] if ;
 
 : text-fits? ( len -- ? )
     margin get dup zero?
-    [ 2drop t ] [ >r indent get + r> <= ] if ;
+    [ 2drop t ] [ >r pprinter get indent>> + r> <= ] if ;
 
 ! break only if position margin 2 / >
 SYMBOL: soft
@@ -78,7 +79,9 @@ style overhang ;
         0 >>overhang ; inline
 
 M: section section-fits? ( section -- ? )
-    [ end>> last-newline get - ] [ overhang>> ] bi + text-fits? ;
+    [ end>> pprinter get last-newline>> - ]
+    [ overhang>> ] bi
+    + text-fits? ;
 
 M: section indent-section? drop f ;
 
@@ -88,12 +91,14 @@ M: section newline-after? drop f ;
 
 M: object short-section? section-fits? ;
 
-: change-indent ( section n -- )
-    swap indent-section? [ indent +@ ] [ drop ] if ;
+: indent+ ( section n -- )
+    swap indent-section? [
+        pprinter get [ + ] change-indent drop
+    ] [ drop ] if ;
 
-: <indent ( section -- ) tab-size get change-indent ;
+: <indent ( section -- ) tab-size get indent+ ;
 
-: indent> ( section -- ) tab-size get neg change-indent ;
+: indent> ( section -- ) tab-size get neg indent+ ;
 
 : <fresh-line ( section -- )
     start>> fresh-line ;
@@ -108,17 +113,14 @@ M: object short-section? section-fits? ;
 : long-section> ( section -- )
     dup indent> fresh-line> ;
 
-: with-style* ( style quot -- )
-    swap stdio [ <style-stream> ] change
-    call stdio [ delegate ] change ; inline
-
 : pprint-section ( section -- )
     dup short-section? [
-        dup section-style [ short-section ] with-style*
+        dup section-style [ short-section ] with-style
     ] [
-        dup <long-section
-        dup section-style [ dup long-section ] with-style*
-        long-section>
+        [ <long-section ]
+        [ dup section-style [ long-section ] with-style ]
+        [ long-section> ]
+        tri
     ] if ;
 
 ! Break section
@@ -159,7 +161,7 @@ TUPLE: block < section sections ;
     last-section t >>end-group? drop ;
 
 : advance ( section -- )
-    [ start>> last-newline get = not ]
+    [ start>> pprinter get last-newline>> = not ]
     [ short-section? ] bi
     and [ bl ] when ;
 
@@ -178,9 +180,10 @@ M: block short-section ( block -- )
     [ advance ] pprint-sections ;
 
 : do-break ( break -- )
-    dup type>> hard eq?
-    over section-end last-newline get - margin get 2/ > or
-    [ <fresh-line ] [ drop ] if ;
+    [ ]
+    [ type>> hard eq? ]
+    [ end>> pprinter get last-newline>> - margin get 2/ > ] tri
+    or [ <fresh-line ] [ drop ] if ;
 
 : empty-block? ( block -- ? ) sections>> empty? ;
 
@@ -267,22 +270,17 @@ M: colon unindent-first-line? drop t ;
     pprinter-stack get pop
     [ [ save-end-position ] [ add-section ] bi ] if-nonempty ;
 
-: with-section-state ( quot -- )
-    [
-        0 indent set
-        0 last-newline set
-        1 line-count set
-        call
-    ] with-scope ; inline
-
 : do-pprint ( block -- )
-    [
+    <pprinter> pprinter [
         [
             dup style>> [
-                [ end-printing set dup short-section ] callcc0
-            ] with-nesting drop
+                [
+                    >r pprinter get (>>end-printing) r>
+                    short-section
+                ] curry callcc0
+            ] with-nesting
         ] if-nonempty
-    ] with-section-state ;
+    ] with-variable ;
 
 ! Long section layout algorithm
 : chop-break ( seq -- seq )

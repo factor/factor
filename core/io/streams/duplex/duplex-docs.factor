@@ -10,7 +10,7 @@ ARTICLE: "io.streams.duplex" "Duplex streams"
 ABOUT: "io.streams.duplex"
 
 HELP: duplex-stream
-{ $class-description "A bidirectional stream delegating to a pair of streams, sending input to one delegate and output to another." } ;
+{ $class-description "A bidirectional stream wrapping an input and output stream." } ;
 
 HELP: <duplex-stream>
 { $values { "in" "an input stream" } { "out" "an output stream" } { "stream" " a duplex stream" } }

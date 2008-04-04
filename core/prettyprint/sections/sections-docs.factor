@@ -86,7 +86,7 @@ HELP: section
     { { $snippet "overhang" } " - number of columns which must be left blank before the wrap margin for the prettyprinter to consider emitting this section as a " { $link short-section } ". Avoids lone hanging closing brackets" }
 } } ;
 
-HELP: <section>
+HELP: construct-section
 { $values { "style" hashtable } { "length" integer } { "section" section } }
 { $description "Creates a new section with the given length starting from " { $link position } ", advancing " { $link position } "." } ;
 
