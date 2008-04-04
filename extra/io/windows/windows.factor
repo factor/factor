@@ -32,7 +32,8 @@ M: windows normalize-directory ( string -- string )
 
 : default-security-attributes ( -- obj )
     "SECURITY_ATTRIBUTES" <c-object>
-    "SECURITY_ATTRIBUTES" heap-size over set-SECURITY_ATTRIBUTES-nLength ;
+    "SECURITY_ATTRIBUTES" heap-size
+    over set-SECURITY_ATTRIBUTES-nLength ;
 
 : security-attributes-inherit ( -- obj )
     default-security-attributes
@@ -47,8 +48,8 @@ M: win32-file close-handle ( handle -- )
 ! Clean up resources (open handle) if add-completion fails
 : open-file ( path access-mode create-mode flags -- handle )
     [
-        >r >r
-        share-mode security-attributes-inherit r> r> CreateFile-flags f CreateFile
+        >r >r share-mode security-attributes-inherit r> r>
+        CreateFile-flags f CreateFile
         dup invalid-handle? dup close-later
         dup add-completion
     ] with-destructors ;
@@ -95,7 +96,8 @@ M: win32-file close-handle ( handle -- )
     >r (open-append) r> 2dup set-file-pointer ;
 
 TUPLE: FileArgs
-    hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRet lpOverlapped ;
+    hFile lpBuffer nNumberOfBytesToRead
+    lpNumberOfBytesRet lpOverlapped ;
 
 C: <FileArgs> FileArgs
 
@@ -195,4 +197,3 @@ M: windows addrinfo-error ( n -- )
 
 : tcp-socket ( addrspec -- socket )
     protocol-family SOCK_STREAM open-socket ;
-
