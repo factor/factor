@@ -121,6 +121,7 @@ $nl
     "..."
     "TUPLE: shape color ... ;"
 }
+"The " { $vocab-link "delegate" } " library provides a language abstraction for expressing has-a relationships."
 { $heading "Anti-pattern #2: subclassing for implementation sharing only" }
 "Tuple subclassing purely for sharing implementations of methods is not a good idea either. If a class " { $snippet "A" } " is a subclass of a class " { $snippet "B" } ", then instances of " { $snippet "A" } " should be usable anywhere that an instance of " { $snippet "B" } " is. If this properly does not hold, then subclassing should not be used."
 $nl
@@ -237,15 +238,6 @@ $nl
 
 ABOUT: "tuples"
 
-HELP: delegate
-{ $values { "obj" object } { "delegate" object } }
-{ $description "Returns an object's delegate, or " { $link f } " if no delegate is set." }
-{ $notes "A direct consequence of this behavior is that an object may not have a delegate of " { $link f } "." } ;
-
-HELP: set-delegate
-{ $values { "delegate" object } { "tuple" tuple } }
-{ $description "Sets a tuple's delegate. Method calls not handled by the tuple's class will now be passed on to the delegate." } ;
-
 HELP: tuple=
 { $values { "tuple1" tuple } { "tuple2" tuple } { "?" "a boolean" } }
 { $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
@@ -299,26 +291,16 @@ HELP: define-tuple-class
 
 { tuple-class define-tuple-class POSTPONE: TUPLE: } related-words
 
-HELP: delegates
-{ $values { "obj" object } { "seq" sequence } }
-{ $description "Outputs the delegation chain of an object. The first element of " { $snippet "seq" } " is " { $snippet "obj" } " itself. If " { $snippet "obj" } " is " { $link f } ", an empty sequence is output." } ;
-
-HELP: is?
-{ $values { "obj" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "?" "a boolean" } }
-{ $description "Tests if the object or one of its delegates satisfies the predicate quotation."
-$nl
-"Class membership test predicates only test if an object is a direct instance of that class. Sometimes, you need to check delegates, since this gives a clearer picture of what operations the object supports." } ;
-
 HELP: >tuple
 { $values { "seq" sequence } { "tuple" tuple } }
-{ $description "Creates a tuple with slot values taken from a sequence. The first element of the sequence must be a tuple class word, the second a delegate, and the remainder the declared slots."
+{ $description "Creates a tuple with slot values taken from a sequence. The first element of the sequence must be a tuple class word and the remainder the declared slots."
 $nl
 "If the sequence has too many elements, they are ignored, and if it has too few, the remaining slots in the tuple are set to " { $link f } "." }
 { $errors "Throws an error if the first element of the sequence is not a tuple class word." } ;
 
 HELP: tuple>array ( tuple -- array )
 { $values { "tuple" tuple } { "array" array } }
-{ $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and the second is the delegate; the remainder are declared slots." } ;
+{ $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and remainder are declared slots." } ;
 
 HELP: <tuple> ( layout -- tuple )
 { $values { "layout" tuple-layout } { "tuple" tuple } }

@@ -157,23 +157,33 @@ name>char-hook global [
         [ swap tail-slice (parse-string) ] "" make swap
     ] change-lexer-column ;
 
-TUPLE: parse-error file line col text ;
+TUPLE: parse-error file line column line-text error ;
 
 : <parse-error> ( msg -- error )
-    file get
-    lexer get [ line>> ] [ column>> ] [ line-text>> ] tri
-    parse-error construct-boa
-    [ set-delegate ] keep ;
+    \ parse-error construct-empty
+        file get >>file
+        lexer get line>> >>line
+        lexer get column>> >>column
+        lexer get line-text>> >>line-text
+        swap >>error ;
 
 : parse-dump ( error -- )
-    dup parse-error-file file.
-    dup parse-error-line number>string print
-    dup parse-error-text dup string? [ print ] [ drop ] if
-    parse-error-col 0 or CHAR: \s <string> write
+    {
+        [ file>> file. ]
+        [ line>> number>string print ]
+        [ line-text>> dup string? [ print ] [ drop ] if ]
+        [ column>> 0 or CHAR: \s <string> write ]
+    } cleave
     "^" print ;
 
 M: parse-error error.
-    dup parse-dump  delegate error. ;
+    [ parse-dump ] [ error>> error. ] bi ;
+
+M: parse-error summary
+    error>> summary ;
+
+M: parse-error compute-restarts
+    error>> compute-restarts ;
 
 SYMBOL: use
 SYMBOL: in
@@ -409,6 +419,7 @@ SYMBOL: bootstrap-syntax
 SYMBOL: interactive-vocabs
 
 {
+    "accessors"
     "arrays"
     "assocs"
     "combinators"

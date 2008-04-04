@@ -4,7 +4,7 @@ USING: inference.dataflow inference.state arrays generic io
 io.streams.string kernel math namespaces parser prettyprint
 sequences strings vectors words quotations effects classes
 continuations debugger assocs combinators compiler.errors
-generic.standard.engines.tuple ;
+generic.standard.engines.tuple accessors ;
 IN: inference.backend
 
 : recursive-label ( word -- label/f )
@@ -32,18 +32,14 @@ M: word inline?
 : recursive-quotation? ( quot -- ? )
     local-recursive-state [ first eq? ] with contains? ;
 
-TUPLE: inference-error rstate type ;
+TUPLE: inference-error error type rstate ;
 
-M: inference-error compiler-error-type
-    inference-error-type ;
+M: inference-error compiler-error-type type>> ;
 
 : (inference-error) ( ... class type -- * )
     >r construct-boa r>
-    recursive-state get {
-        set-delegate
-        set-inference-error-type
-        set-inference-error-rstate
-    } \ inference-error construct throw ; inline
+    recursive-state get
+    \ inference-error construct-boa throw ; inline
 
 : inference-error ( ... class -- * )
     +error+ (inference-error) ; inline

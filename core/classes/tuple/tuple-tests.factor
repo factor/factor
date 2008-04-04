@@ -16,25 +16,6 @@ TUPLE: rect x y w h ;
 
 [ t ] [ 10 20 30 40 <rect> dup clone 0 swap move = ] unit-test
 
-GENERIC: delegation-test
-M: object delegation-test drop 3 ;
-TUPLE: quux-tuple ;
-: <quux-tuple> quux-tuple construct-empty ;
-M: quux-tuple delegation-test drop 4 ;
-TUPLE: quuux-tuple ;
-: <quuux-tuple> { set-delegate } quuux-tuple construct ;
-
-[ 3 ] [ <quux-tuple> <quuux-tuple> delegation-test ] unit-test
-
-GENERIC: delegation-test-2
-TUPLE: quux-tuple-2 ;
-: <quux-tuple-2> quux-tuple-2 construct-empty ;
-M: quux-tuple-2 delegation-test-2 drop 4 ;
-TUPLE: quuux-tuple-2 ;
-: <quuux-tuple-2> { set-delegate } quuux-tuple-2 construct ;
-
-[ 4 ] [ <quux-tuple-2> <quuux-tuple-2> delegation-test-2 ] unit-test
-
 ! Make sure we handle tuple class redefinition
 TUPLE: redefinition-test ;
 
@@ -101,11 +82,6 @@ TUPLE: empty ;
 C: <empty> empty
 
 [ t ] [ <empty> hashcode fixnum? ] unit-test
-
-TUPLE: delegate-clone ;
-
-[ T{ delegate-clone T{ empty f } } ]
-[ T{ delegate-clone T{ empty f } } clone ] unit-test
 
 ! Compiler regression
 [ t length ] [ object>> t eq? ] must-fail-with

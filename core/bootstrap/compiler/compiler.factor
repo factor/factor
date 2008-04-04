@@ -37,8 +37,6 @@ nl
 
     wrap probe
 
-    delegate
-
     underlying
 
     find-pair-next namestack*

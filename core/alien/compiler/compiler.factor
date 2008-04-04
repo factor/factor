@@ -9,6 +9,14 @@ kernel.private threads continuations.private libc combinators
 compiler.errors continuations layouts accessors ;
 IN: alien.compiler
 
+TUPLE: #alien-node < node return parameters abi ;
+
+TUPLE: #alien-callback < #alien-node quot xt ;
+
+TUPLE: #alien-indirect < #alien-node ;
+
+TUPLE: #alien-invoke < #alien-node library function ;
+
 : large-struct? ( ctype -- ? )
     dup c-struct? [
         heap-size struct-small-enough? not
@@ -229,32 +237,32 @@ M: no-such-symbol compiler-error-type
     ] if ;
 
 : alien-invoke-dlsym ( node -- symbols dll )
-    dup alien-invoke-function dup pick stdcall-mangle 2array
-    swap alien-invoke-library library dup [ library-dll ] when
+    dup function>> dup pick stdcall-mangle 2array
+    swap library>> library dup [ dll>> ] when
     2dup check-dlsym ;
 
 \ alien-invoke [
     ! Four literals
     4 ensure-values
-    \ alien-invoke empty-node
+    #alien-invoke construct-empty
     ! Compile-time parameters
-    pop-parameters over set-alien-invoke-parameters
-    pop-literal nip over set-alien-invoke-function
-    pop-literal nip over set-alien-invoke-library
-    pop-literal nip over set-alien-invoke-return
+    pop-parameters >>parameters
+    pop-literal nip >>function
+    pop-literal nip >>library
+    pop-literal nip >>return
     ! Quotation which coerces parameters to required types
     dup make-prep-quot recursive-state get infer-quot
     ! Set ABI
-    dup alien-invoke-library
-    library [ library-abi ] [ "cdecl" ] if*
-    over set-alien-invoke-abi
+    dup library>>
+    library [ abi>> ] [ "cdecl" ] if*
+    >>abi
     ! Add node to IR
     dup node,
     ! Magic #: consume exactly the number of inputs
     0 alien-invoke-stack
 ] "infer" set-word-prop
 
-M: alien-invoke generate-node
+M: #alien-invoke generate-node
     dup alien-invoke-frame [
         end-basic-block
         %prepare-alien-invoke
@@ -273,11 +281,11 @@ M: alien-indirect-error summary
     ! Three literals and function pointer
     4 ensure-values
     4 reify-curries
-    \ alien-indirect empty-node
+    #alien-indirect construct-empty
     ! Compile-time parameters
-    pop-literal nip over set-alien-indirect-abi
-    pop-parameters over set-alien-indirect-parameters
-    pop-literal nip over set-alien-indirect-return
+    pop-literal nip >>abi
+    pop-parameters >>parameters
+    pop-literal nip >>return
     ! Quotation which coerces parameters to required types
     dup make-prep-quot [ dip ] curry recursive-state get infer-quot
     ! Add node to IR
@@ -286,7 +294,7 @@ M: alien-indirect-error summary
     1 alien-invoke-stack
 ] "infer" set-word-prop
 
-M: alien-indirect generate-node
+M: #alien-indirect generate-node
     dup alien-invoke-frame [
         ! Flush registers
         end-basic-block
@@ -320,12 +328,12 @@ M: alien-callback-error summary
 
 \ alien-callback [
     4 ensure-values
-    \ alien-callback empty-node dup node,
-    pop-literal nip over set-alien-callback-quot
-    pop-literal nip over set-alien-callback-abi
-    pop-parameters over set-alien-callback-parameters
-    pop-literal nip over set-alien-callback-return
-    gensym dup register-callback over set-alien-callback-xt
+    #alien-callback construct-empty dup node,
+    pop-literal nip >>quot
+    pop-literal nip >>abi
+    pop-parameters >>parameters
+    pop-literal nip >>return
+    gensym dup register-callback >>xt
     callback-bottom
 ] "infer" set-word-prop
 
@@ -398,5 +406,5 @@ TUPLE: callback-context ;
         ] with-stack-frame
     ] with-generator ;
 
-M: alien-callback generate-node
+M: #alien-callback generate-node
     end-basic-block generate-callback iterate-next ;

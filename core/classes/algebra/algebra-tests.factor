@@ -68,13 +68,13 @@ UNION: c a b ;
 [ t ] [ \ tuple-class \ class class< ] unit-test
 [ f ] [ \ class \ tuple-class class< ] unit-test
 
-TUPLE: delegate-clone ;
+TUPLE: tuple-example ;
 
-[ t ] [ \ null \ delegate-clone class< ] unit-test
-[ f ] [ \ object \ delegate-clone class< ] unit-test
-[ f ] [ \ object \ delegate-clone class< ] unit-test
-[ t ] [ \ delegate-clone \ tuple class< ] unit-test
-[ f ] [ \ tuple \ delegate-clone class< ] unit-test
+[ t ] [ \ null \ tuple-example class< ] unit-test
+[ f ] [ \ object \ tuple-example class< ] unit-test
+[ f ] [ \ object \ tuple-example class< ] unit-test
+[ t ] [ \ tuple-example \ tuple class< ] unit-test
+[ f ] [ \ tuple \ tuple-example class< ] unit-test
 
 TUPLE: a1 ;
 TUPLE: b1 ;
