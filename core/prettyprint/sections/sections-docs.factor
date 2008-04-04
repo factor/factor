@@ -5,17 +5,8 @@ strings definitions ;
 HELP: position
 { $var-description "The prettyprinter's current character position." } ;
 
-HELP: last-newline
-{ $var-description "The character position of the last newline output by the prettyprinter." } ;
-
 HELP: recursion-check
 { $var-description "The current nesting of collections being output by the prettyprinter, used to detect circularity and prevent infinite recursion." } ;
-
-HELP: line-count
-{ $var-description "The number of lines output by the prettyprinter so far, used for line limiting (see " { $link line-limit } ")." } ;
-
-HELP: end-printing
-{ $var-description "A continuation captured by " { $link do-pprint } " that breaks out of the printer." } ;
 
 HELP: line-limit?
 { $values { "?" "a boolean" } }
@@ -89,10 +80,6 @@ HELP: section
 HELP: construct-section
 { $values { "style" hashtable } { "length" integer } { "section" section } }
 { $description "Creates a new section with the given length starting from " { $link position } ", advancing " { $link position } "." } ;
-
-HELP: change-indent
-{ $values { "section" section } { "n" integer } }
-{ $description "If the section requests indentation, adds " { $snippet "n" } " to the indent level, otherwise does nothing." } ;
 
 HELP: <indent
 { $values { "section" section } }
