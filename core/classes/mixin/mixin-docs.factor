@@ -3,7 +3,7 @@ classes ;
 IN: classes.mixin
 
 ARTICLE: "mixins" "Mixin classes"
-"An object is an instance of a union class if it is an instance of one of its members. In this respect, mixin classes are identical to union classes. However, new classes can be made into instances of a mixin class after the original definition of the mixin."
+"An object is an instance of a union class if it is an instance of one of its members. In this respect, mixin classes are identical to union classes. However, mixin classes have the additional property that they are " { $emphasis "open" } "; new classes can be added to the mixin after the original definition of the mixin."
 { $subsection POSTPONE: MIXIN: }
 { $subsection POSTPONE: INSTANCE: }
 { $subsection define-mixin-class }

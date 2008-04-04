@@ -37,6 +37,8 @@ $nl
 { $subsection create-method }
 "Method definitions can be looked up:"
 { $subsection method }
+"Finding the most specific method for an object:"
+{ $subsection effective-method }
 "A generic word contains methods; the list of methods specializing on a class can also be obtained:"
 { $subsection implementors }
 "Low-level word which rebuilds the generic word after methods are added or removed, or the method combination is changed:"
@@ -64,6 +66,16 @@ $nl
 "The combination quotation passed to " { $link define-generic } " has stack effect " { $snippet "( word -- quot )" } ". It's job is to call various introspection words, including at least obtaining the set of methods defined on the generic word, then combining these methods in some way to produce a quotation."
 { $see-also "generic-introspection" } ;
 
+ARTICLE: "call-next-method" "Calling less-specific methods"
+"If a generic word is called with an object and multiple methods specialize on classes that this object is an instance of, usually the most specific method is called (" { $link "method-order" } ")."
+$nl
+"Less-specific methods can be called directly:"
+{ $subsection POSTPONE: call-next-method }
+"A lower-level word which the above expands into:"
+{ $subsection (call-next-method) }
+"To look up the next applicable method reflectively:"
+{ $subsection next-method } ;
+
 ARTICLE: "generic" "Generic words and methods"
 "A " { $emphasis "generic word" } " is composed of zero or more " { $emphasis "methods" } " together with a " { $emphasis "method combination" } ". A method " { $emphasis "specializes" } " on a class; when a generic word executed, the method combination chooses the most appropriate method and calls its definition."
 $nl
@@ -81,6 +93,7 @@ $nl
 { $subsection POSTPONE: M: }
 "Generic words must declare their stack effect in order to compile. See " { $link "effect-declaration" } "."
 { $subsection "method-order" }
+{ $subsection "call-next-method" }
 { $subsection "generic-introspection" }
 { $subsection "method-combination" }
 "Generic words specialize behavior based on the class of an object; sometimes behavior needs to be specialized on the object's " { $emphasis "structure" } "; this is known as " { $emphasis "pattern matching" } " and is implemented in the " { $vocab-link "match" } " vocabulary." ;

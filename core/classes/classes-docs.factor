@@ -38,17 +38,21 @@ $nl
 { $subsection class? }
 "You can ask an object for its class:"
 { $subsection class }
+"Testing if an object is an instance of a class:"
+{ $subsection instance? }
 "There is a universal class which all objects are an instance of, and an empty class with no instances:"
 { $subsection object }
 { $subsection null }
 "Obtaining a list of all defined classes:"
 { $subsection classes }
-"Other sorts of classes:"
+"There are several sorts of classes:"
 { $subsection "builtin-classes" }
 { $subsection "unions" }
-{ $subsection "singletons" }
 { $subsection "mixins" }
 { $subsection "predicates" }
+{ $subsection "singletons" }
+{ $link "tuples" } " are documented in their own section."
+$nl
 "Classes can be inspected and operated upon:"
 { $subsection "class-operations" }
 { $see-also "class-index" } ;

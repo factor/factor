@@ -162,7 +162,7 @@ M: tuple-class update-class
 
 : define-new-tuple-class ( class superclass slots -- )
     [ drop f tuple-class define-class ]
-    [ nip "slot-names" set-word-prop ]
+    [ nip [ dup array? [ second ] when ] map "slot-names" set-word-prop ]
     [ 2drop update-classes ]
     3tri ;
 

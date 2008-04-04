@@ -276,6 +276,7 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "apply-combinators" }
 { $subsection "slip-keep-combinators" }
 { $subsection "conditionals" }
+{ $subsection "compositional-combinators" }
 { $subsection "combinators" }
 "Advanced topics:"
 { $subsection "implementing-combinators" }
@@ -846,11 +847,15 @@ HELP: with
     { $example "USING: kernel math prettyprint sequences ;" "2 { 1 2 3 } [ - ] with map ." "{ 1 0 -1 }" }
 } ;
 
-HELP: compose
-{ $values { "quot1" callable } { "quot2" callable } { "curry" curry } }
+HELP: compose ( quot1 quot2 -- compose )
+{ $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } " followed by " { $snippet "quot2" } "." }
 { $notes
-    "The following two lines are equivalent:"
+    "The two quotations must leave the retain stack in the same state on exit as it was on entry, so the following code is not allowed:"
+    { $code
+        "[ 3 >r ] [ r> . ] compose"
+    }
+    "Except for this restriction, the following two lines are equivalent:"
     { $code
         "compose call"
         "append call"
@@ -862,7 +867,15 @@ HELP: 3compose
 { $values { "quot1" callable } { "quot2" callable } { "quot3" callable } { "curry" curry } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } ", " { $snippet "quot2" } " and then " { $snippet "quot3" } "." }
 { $notes
-    "The following two lines are equivalent:"
+    "The three quotations must leave the retain stack in the same state on exit as it was on entry, so for example, the following code is not allowed:"
+    { $code
+        "[ >r ] swap [ r> ] 3compose"
+    }
+    "The correct way to achieve the effect of the above is the following:"
+    { $code
+        "[ dip ] curry"
+    }
+    "Excepting the retain stack restriction, the following two lines are equivalent:"
     { $code
         "3compose call"
         "3append call"

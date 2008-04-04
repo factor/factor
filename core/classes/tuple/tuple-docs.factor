@@ -3,14 +3,63 @@ classes.tuple.private classes slots quotations words arrays
 generic.standard sequences definitions compiler.units ;
 IN: classes.tuple
 
-ARTICLE: "tuple-constructors" "Constructors"
-"Tuples are created by calling one of two words:"
+ARTICLE: "parametrized-constructors" "Parameterized constructors"
+"A " { $emphasis "parametrized constructor" } " is a word which directly or indirectly calls " { $link construct-empty } " or " { $link construct-boa } ", but instead of passing a literal class symbol, it takes the class symbol as an input from the stack."
+$nl
+"Parametrized constructors are useful in many situations, in particular with subclassing. For example, consider the following code:"
+{ $code
+    "TUPLE: vehicle max-speed occupants ;"
+    ""
+    ": add-occupant ( person vehicle -- ) occupants>> push ;"
+    ""
+    "TUPLE: car < vehicle engine ;"
+    ": <car> ( max-speed engine -- car )"
+    "    car construct-empty"
+    "        V{ } clone >>occupants"
+    "        swap >>engine"
+    "        swap >>max-speed ;"
+    ""
+    "TUPLE: aeroplane < vehicle max-altitude ;"
+    ": <aeroplane> ( max-speed max-altitude -- aeroplane )"
+    "    aeroplane construct-empty"
+    "        V{ } clone >>occupants"
+    "        swap >>max-altitude"
+    "        swap >>max-speed ;"
+}
+"The two constructors depend on the implementation of " { $snippet "vehicle" } " because they are responsible for initializing the " { $snippet "occupants" } " slot to an empty vector. If this slot is changed to contain a hashtable instead, there will be two places instead of one. A better approach is to use a parametrized constructor for vehicles:"
+{ $code
+    "TUPLE: vehicle max-speed occupants ;"
+    ""
+    ": add-occupant ( person vehicle -- ) occupants>> push ;"
+    ""
+    ": construct-vehicle ( class -- vehicle )"
+    "    construct-empty"
+    "        V{ } clone >>occupants ;"
+    ""
+    "TUPLE: car < vehicle engine ;"
+    ": <car> ( max-speed engine -- car )"
+    "    car construct-vehicle"
+    "        swap >>engine"
+    "        swap >>max-speed ;"
+    ""
+    "TUPLE: aeroplane < vehicle max-altitude ;"
+    ": <aeroplane> ( max-speed max-altitude -- aeroplane )"
+    "    aeroplane construct-vehicle"
+    "        swap >>max-altitude"
+    "        swap >>max-speed ;"
+}
+"The naming convention for parametrized constructors is " { $snippet "construct-" { $emphasis "class" } } "." ;
+
+ARTICLE: "tuple-constructors" "Tuple constructors"
+"Tuples are created by calling one of two constructor primitives:"
 { $subsection construct-empty }
 { $subsection construct-boa }
-"By convention, construction logic is encapsulated in a word named after the tuple class surrounded in angle brackets; for example, the constructor word for a " { $snippet "point" } " class might be named " { $snippet "<point>" } "."
-$nl
 "A shortcut for defining BOA constructors:"
 { $subsection POSTPONE: C: }
+"By convention, construction logic is encapsulated in a word named after the tuple class surrounded in angle brackets; for example, the constructor word for a " { $snippet "point" } " class might be named " { $snippet "<point>" } "."
+$nl
+"All tuple construction should be done through constructor words, and construction primitives should be encapsulated and never called outside of the vocabulary where the class is defined, because this encourages looser coupling. For example, a constructor word could be changed to use memoization instead of always constructing a new instance, or it could be changed to construt a different class, without breaking callers."
+$nl
 "Examples of constructors:"
 { $code
     "TUPLE: color red green blue alpha ;"
@@ -22,29 +71,76 @@ $nl
     ""
     ": <color> construct-empty ;"
     ": <color> f f f f <rgba> ; ! identical to above"
+}
+{ $subsection "parametrized-constructors" } ;
+
+ARTICLE: "tuple-inheritance-example" "Tuple subclassing example"
+"Rectangles, parallelograms and circles are all shapes. We support two operations on shapes:"
+{ $list
+    "Computing the area"
+    "Computing the perimiter"
+}
+"Rectangles and parallelograms use the same algorithm for computing the area, whereas they use different algorithms for computing perimiter. Also, rectangles and parallelograms both have " { $snippet "width" } " and " { $snippet "height" } " slots. We can exploit this with subclassing:"
+{ $code
+    "GENERIC: area ( shape -- n )"
+    "GENERIC: perimiter ( shape -- n )"
+    ""
+    "TUPLE: shape ;"
+    ""
+    "TUPLE: circle < shape radius ;"
+    "M: area circle radius>> sq pi * ;"
+    "M: perimiter circle radius>> 2 * pi * ;"
+    ""
+    "TUPLE: quad < shape width height"
+    "M: area quad [ width>> ] [ height>> ] bi * ;"
+    ""
+    "TUPLE: rectangle < quad ;"
+    "M: rectangle perimiter [ width>> 2 * ] [ height>> 2 * ] bi + ;"
+    ""
+    ": hypot ( a b -- c ) [ sq ] bi@ + sqrt ;"
+    ""
+    "TUPLE: parallelogram < quad skew ;"
+    "M: parallelogram perimiter"
+    "    [ width>> 2 * ] [ [ height>> ] [ skew>> ] bi hypot 2 * ] bi + ;"
 } ;
 
-ARTICLE: "tuple-delegation" "Tuple delegation"
-"If a generic word having the " { $link standard-combination } " method combination is called on a tuple for which it does not have an applicable method, the method call is forwarded to the tuple's " { $emphasis "delegate" } ". If no delegate is set, a " { $link no-method } " error is thrown."
-{ $subsection delegate }
-{ $subsection set-delegate }
-"A tuple's delegate should either be another tuple, or " { $link f } ", indicating no delegate is set. Delegation from a tuple to an object of some other type is not fully supported and should be used with caution."
+ARTICLE: "tuple-inheritance-anti-example" "When not to use tuple subclassing"
+"Tuple subclassing should only be used for " { $emphasis "is-a" } " relationships; for example, a car " { $emphasis "is a" } " vehicle, and a circle " { $emphasis "is a" } " shape."
+{ $heading "Anti-pattern #1: subclassing for has-a" }
+"Subclassing should not be used for " { $emphasis "has-a" } " relationships. For example, if a shape " { $emphasis "has a" } " color, then " { $snippet "shape" } " should not subclass " { $snippet "color" } ". Using tuple subclassing in inappropriate situations leads to code which is more brittle and less flexible than it should be."
 $nl
-"Factor uses delegation in place of implementation inheritance, but it is not a direct substitute; in particular, the semantics differ in that a delegated method call receives the delegate on the stack, not the original object."
+"For example, suppose that " { $snippet "shape" } " inherits from " { $snippet "color" } ":"
+{ $code
+    "TUPLE: color r g b ;"
+    "TUPLE: shape < color ... ;"
+}
+"Now, the implementation of " { $snippet "shape" } " depends on a specific representation of colors as RGB colors. If a new generic color protocol is devised which also allows HSB and YUV colors to be used, the shape class will not be able to take advantage of them without changes. A better approach is to store the color in a slot:"
+{ $code
+    "TUPLE: rgb-color r g b ;"
+    "TUPLE: hsv-color h s v ;"
+    "..."
+    "TUPLE: shape color ... ;"
+}
+{ $heading "Anti-pattern #2: subclassing for implementation sharing only" }
+"Tuple subclassing purely for sharing implementations of methods is not a good idea either. If a class " { $snippet "A" } " is a subclass of a class " { $snippet "B" } ", then instances of " { $snippet "A" } " should be usable anywhere that an instance of " { $snippet "B" } " is. If this properly does not hold, then subclassing should not be used."
 $nl
-"A pair of words examine delegation chains:"
-{ $subsection delegates }
-{ $subsection is? }
-"An example:"
-{ $example
-    "TUPLE: ellipse center radius ;"
-    "TUPLE: colored color ;"
-    "{ 0 0 } 10 <ellipse> \"my-ellipse\" set"
-    "{ 1 0 0 } <colored> \"my-shape\" set"
-    "\"my-ellipse\" get \"my-shape\" get set-delegate"
-    "\"my-shape\" get dup color>> swap center>> .s"
-    "{ 0 0 }\n{ 1 0 0 }"
-} ;
+"There are two alternatives which are preferred to subclassing in this case. The first is " { $link "mixins" } "."
+$nl
+"The second is to use ad-hoc slot polymorphism. If two classes define a slot with the same name, then code which uses " { $link "accessors" } " can operate on instances of both objects, assuming the values stored in that slot implement a common protocol. This allows code to be shared without creating contrieved relationships between classes."
+{ $heading "Anti-pattern #3: subclassing to override a method definition" }
+"While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of ``monkey patching'' methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document that subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link construct-empty } ", " { $link construct-boa } ", or a custom parametrized constructor."
+{ $see-also "parametrized-constructors" } ;
+
+ARTICLE: "tuple-subclassing" "Tuple subclassing"
+"Tuple subclassing can be used to express natural relationships between classes at the language level. For example, every car " { $emphasis "is a" } " vehicle, so if the " { $snippet "car" } " class subclasses the " { $snippet "vehicle" } " class, it can " { $emphasis "inherit" } " the slots and methods of " { $snippet "vehicle" } "."
+$nl
+"To define one tuple class as a subclass of another, use the optional superclass parameter to " { $link POSTPONE: TUPLE: } ":"
+{ $code
+    "TUPLE: subclass < superclass ... ;"
+}
+{ $subsection "tuple-inheritance-example" }
+{ $subsection "tuple-inheritance-anti-example" } 
+{ $see-also "call-next-method" "parametrized-constructors" } ;
 
 ARTICLE: "tuple-introspection" "Tuple introspection"
 "In addition to the slot reader and writer words which " { $link POSTPONE: TUPLE: } " defines for every tuple class, it is possible to construct and take apart entire tuples in a generic way."
@@ -119,7 +215,8 @@ ARTICLE: "tuple-examples" "Tuple examples"
     ": promote ( person -- person )"
     "    [ 1.2 * ] change-salary"
     "    [ next-position ] change-position ;"
-} ;
+}
+"An example using subclassing can be found in " { $link "tuple-inheritance-example" } "." ;
 
 ARTICLE: "tuples" "Tuples"
 "Tuples are user-defined classes composed of named slots."
@@ -132,8 +229,9 @@ $nl
 { $subsection "accessors" }
 "Initially, no specific words are defined for constructing new instances of the tuple. Constructors must be defined explicitly:"
 { $subsection "tuple-constructors" }
-"Further topics:"
-{ $subsection "tuple-delegation" }
+"Expressing relationships through the object system:"
+{ $subsection "tuple-subclassing" }
+"Introspection:"
 { $subsection "tuple-introspection" }
 "Tuple literal syntax is documented in " { $link "syntax-tuples" } "." ;
 
