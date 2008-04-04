@@ -153,19 +153,19 @@ HOOK: file-info io-backend ( path -- info )
 ! Symlinks
 HOOK: link-info io-backend ( path -- info )
 
-HOOK: make-link io-backend ( path1 path2 -- )
+HOOK: make-link io-backend ( target symlink -- )
 
-HOOK: read-link io-backend ( path -- info )
+HOOK: read-link io-backend ( symlink -- path )
 
-: copy-link ( path1 path2 -- )
+: copy-link ( target symlink -- )
     >r read-link r> make-link ;
 
 SYMBOL: +regular-file+
 SYMBOL: +directory+
+SYMBOL: +symbolic-link+
 SYMBOL: +character-device+
 SYMBOL: +block-device+
 SYMBOL: +fifo+
-SYMBOL: +symbolic-link+
 SYMBOL: +socket+
 SYMBOL: +unknown+
 
