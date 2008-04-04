@@ -1,5 +1,11 @@
-USING: delegate kernel arrays tools.test ;
+USING: delegate kernel arrays tools.test words math ;
 IN: delegate.tests
+
+DEFER: example
+[ 1 ] [ \ example 1 "prop" set-word-prop \ example "prop" word-prop ] unit-test
+[ ] [ \ example "prop" [ 1+ ] change-word-prop ] unit-test
+[ 2 ] [ \ example "prop" word-prop ] unit-test
+
 
 TUPLE: hello this that ;
 C: <hello> hello

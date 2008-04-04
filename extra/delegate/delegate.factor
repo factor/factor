@@ -1,6 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser generic kernel classes words slots assocs sequences arrays ;
+USING: parser generic kernel classes words slots assocs sequences arrays
+vectors ;
 IN: delegate
 
 : define-protocol ( wordlist protocol -- )
@@ -18,7 +19,7 @@ M: protocol group-words
     "protocol-words" word-prop ;
 
 M: generic group-words
-    1array ;
+   1array ;
 
 M: tuple-class group-words
     "slots" word-prop 1 tail ! The first slot is the delegate
@@ -27,10 +28,19 @@ M: tuple-class group-words
     swap [ slot-spec-writer ] map append ;
 
 : define-consult-method ( word class quot -- )
-    pick add >r swap create-method r> define ;
+    pick add >r swap create-method-in r> define ;
+
+: 3bi ( x y z p q -- p(x,y,z) q(x,y,z) )
+    >r 3keep r> call ; inline
+
+: change-word-prop ( word prop quot -- )
+    >r swap word-props r> change-at ; inline
+
+: declare-consult ( class group -- )
+    "protocol-users" [ ?push ] change-word-prop ;
 
 : define-consult ( class group quot -- )
-    >r group-words swap r>
+    >r 2dup declare-consult group-words swap r>
     [ define-consult-method ] 2curry each ;
 
 : CONSULT:
