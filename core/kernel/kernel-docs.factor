@@ -341,6 +341,9 @@ HELP: set-callstack ( cs -- )
 HELP: clear
 { $description "Clears the data stack." } ;
 
+HELP: build
+{ $description "The current build number. Factor increments this number whenever a new boot image is created." } ;
+
 HELP: hashcode*
 { $values { "depth" integer } { "obj" object } { "code" fixnum } }
 { $contract "Outputs the hashcode of an object. The hashcode operation must satisfy the following properties:"
@@ -393,7 +396,7 @@ HELP: identity-tuple
 HELP: <=>
 { $values { "obj1" object } { "obj2" object } { "n" real } }
 { $contract
-    "Compares two objects using an intrinsic partial order, for example, the natural order for real numbers and lexicographic order for strings."
+    "Compares two objects using an intrinsic total order, for example, the natural order for real numbers and lexicographic order for strings."
     $nl
     "The output value is one of the following:"
     { $list
