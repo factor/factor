@@ -30,7 +30,7 @@ MEMO: fn ( n -- x )
     {
         { [ dup 2 < ]  [ drop 1 ] }
         { [ dup odd? ] [ 2/ fn ] }
-        { [ t ]        [ 2/ [ fn ] [ 1- fn + ] bi ] }
+        { [ t ]        [ 2/ [ fn ] [ 1- fn + ] bi + ] }
     } cond ;
 
 : euler169 ( -- result )
