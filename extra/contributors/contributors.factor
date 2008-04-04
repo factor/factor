@@ -5,8 +5,9 @@ sequences sequences.lib assocs system sorting math.parser ;
 IN: contributors
 
 : changelog ( -- authors )
-    image parent-directory cd
-    "git-log --pretty=format:%an" <process-stream> lines ;
+    image parent-directory [
+        "git-log --pretty=format:%an" <process-stream> lines
+    ] with-directory ;
 
 : patch-counts ( authors -- assoc )
     dup prune
