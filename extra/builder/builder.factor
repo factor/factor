@@ -13,8 +13,6 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : cd ( path -- ) current-directory set ;
-
 : cd ( path -- ) set-current-directory ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -56,17 +54,9 @@ IN: builder
     [ "make"  ]
   if ;
 
-! : do-make-clean ( -- ) { "make" "clean" } try-process ;
-
 : do-make-clean ( -- ) { gnu-make "clean" } to-strings try-process ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! : make-vm ( -- desc )
-!   <process>
-!     { "make" }       >>command
-!     "../compile-log" >>stdout
-!     +stdout+         >>stderr ;
 
 : make-vm ( -- desc )
   <process>
@@ -94,7 +84,7 @@ IN: builder
     +closed+      >>stdin
     "../boot-log" >>stdout
     +stdout+      >>stderr
-    20 minutes    >>timeout ;
+    60 minutes    >>timeout ;
 
 : do-bootstrap ( -- )
   bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail ;
