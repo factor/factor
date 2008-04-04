@@ -269,7 +269,7 @@ $low-level-note ;
 
 HELP: tuple-slots
 { $values { "tuple" tuple } { "seq" sequence } }
-{ $description "Pushes a sequence of tuple slot values, not including the tuple class word and delegate." } ;
+{ $description "Pushes a sequence of tuple slot values, not including the tuple class word." } ;
 
 { tuple-slots tuple>array } related-words
 

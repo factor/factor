@@ -1,9 +1,9 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays generic hashtables io kernel math assocs
 namespaces sequences strings io.styles vectors words
 prettyprint.config splitting classes continuations
-io.streams.nested ;
+io.streams.nested accessors ;
 IN: prettyprint.sections
 
 ! State
@@ -70,17 +70,15 @@ start end
 start-group? end-group?
 style overhang ;
 
-: <section> ( style length -- section )
-    position [ dup rot + dup ] change 0 {
-        set-section-style
-        set-section-start
-        set-section-end
-        set-section-overhang
-    } section construct ;
+: construct-section ( length class -- section )
+    construct-empty
+        position get >>start
+        swap position [ + ] change
+        position get >>end
+        0 >>overhang ; inline
 
 M: section section-fits? ( section -- ? )
-    dup section-end last-newline get -
-    swap section-overhang + text-fits? ;
+    [ end>> last-newline get - ] [ overhang>> ] bi + text-fits? ;
 
 M: section indent-section? drop f ;
 
@@ -98,10 +96,10 @@ M: object short-section? section-fits? ;
 : indent> ( section -- ) tab-size get neg change-indent ;
 
 : <fresh-line ( section -- )
-    section-start fresh-line ;
+    start>> fresh-line ;
 
 : fresh-line> ( section -- )
-    dup newline-after? [ section-end fresh-line ] [ drop ] if ;
+    dup newline-after? [ end>> fresh-line ] [ drop ] if ;
 
 : <long-section ( section -- )
     dup unindent-first-line?
@@ -124,53 +122,54 @@ M: object short-section? section-fits? ;
     ] if ;
 
 ! Break section
-TUPLE: line-break type ;
+TUPLE: line-break < section type ;
 
 : <line-break> ( type -- section )
-    H{ } 0 <section>
-    { set-line-break-type set-delegate }
-    \ line-break construct ;
+    0 \ line-break construct-section
+        swap >>type ;
 
 M: line-break short-section drop ;
 
 M: line-break long-section drop ;
 
 ! Block sections
-TUPLE: block sections ;
+TUPLE: block < section sections ;
+
+: construct-block ( style class -- block )
+    0 swap construct-section
+        V{ } clone >>sections
+        swap >>style ; inline
 
 : <block> ( style -- block )
-    0 <section> V{ } clone
-    { set-delegate set-block-sections } block construct ;
-
-: delegate>block ( obj -- ) H{ } <block> swap set-delegate ;
+    block construct-block ;
 
 : pprinter-block ( -- block ) pprinter-stack get peek ;
 
 : add-section ( section -- )
-    pprinter-block block-sections push ;
+    pprinter-block sections>> push ;
 
 : last-section ( -- section )
-    pprinter-block block-sections
+    pprinter-block sections>>
     [ line-break? not ] find-last nip ;
 
 : start-group ( -- )
-    t last-section set-section-start-group? ;
+    last-section t >>start-group? drop ;
 
 : end-group ( -- )
-    t last-section set-section-end-group? ;
+    last-section t >>end-group? drop ;
 
 : advance ( section -- )
-    dup section-start last-newline get = not
-    swap short-section? and
-    [ bl ] when ;
+    [ start>> last-newline get = not ]
+    [ short-section? ] bi
+    and [ bl ] when ;
 
 : line-break ( type -- ) [ <line-break> add-section ] when* ;
 
 M: block section-fits? ( section -- ? )
-    line-limit? [ drop t ] [ delegate section-fits? ] if ;
+    line-limit? [ drop t ] [ call-next-method ] if ;
 
 : pprint-sections ( block advancer -- )
-    swap block-sections [ line-break? not ] subset
+    swap sections>> [ line-break? not ] subset
     unclip pprint-section [
         dup rot call pprint-section
     ] with each ; inline
@@ -179,28 +178,28 @@ M: block short-section ( block -- )
     [ advance ] pprint-sections ;
 
 : do-break ( break -- )
-    dup line-break-type hard eq?
+    dup type>> hard eq?
     over section-end last-newline get - margin get 2/ > or
     [ <fresh-line ] [ drop ] if ;
 
-: empty-block? ( block -- ? ) block-sections empty? ;
+: empty-block? ( block -- ? ) sections>> empty? ;
 
 : if-nonempty ( block quot -- )
     >r dup empty-block? [ drop ] r> if ; inline
 
 : (<block) pprinter-stack get push ;
 
-: <block H{ } <block> (<block) ;
+: <block f <block> (<block) ;
 
 : <object ( obj -- ) presented associate <block> (<block) ;
 
 ! Text section
-TUPLE: text string ;
+TUPLE: text < section string ;
 
 : <text> ( string style -- text )
-    over length 1+ <section>
-    { set-text-string set-delegate }
-    \ text construct ;
+    over length 1+ \ text construct-section
+        swap >>style
+        swap >>string ;
 
 M: text short-section text-string write ;
 
@@ -211,18 +210,18 @@ M: text long-section short-section ;
 : text ( string -- ) H{ } styled-text ;
 
 ! Inset section
-TUPLE: inset narrow? ;
+TUPLE: inset < block narrow? ;
 
 : <inset> ( narrow? -- block )
-    2 H{ } <block>
-    { set-inset-narrow? set-section-overhang set-delegate }
-    inset construct ;
+    H{ } inset construct-block
+        2 >>overhang
+        swap >>narrow? ;
 
 M: inset long-section
-    dup inset-narrow? [
+    dup narrow?>> [
         [ <fresh-line ] pprint-sections
     ] [
-        delegate long-section
+        call-next-method
     ] if ;
 
 M: inset indent-section? drop t ;
@@ -232,25 +231,26 @@ M: inset newline-after? drop t ;
 : <inset ( narrow? -- ) <inset> (<block) ;
 
 ! Flow section
-TUPLE: flow ;
+TUPLE: flow < block ;
 
 : <flow> ( -- block )
-    H{ } <block> flow construct-delegate ;
+    H{ } flow construct-block ;
 
 M: flow short-section? ( section -- ? )
     #! If we can make room for this entire block by inserting
     #! a newline, do it; otherwise, don't bother, print it as
     #! a short section
-    dup section-fits?
-    over section-end rot section-start - text-fits? not or ;
+    [ section-fits? ]
+    [ [ end>> ] [ start>> ] bi - text-fits? not ] bi
+    or ;
 
 : <flow ( -- ) <flow> (<block) ;
 
 ! Colon definition section
-TUPLE: colon ;
+TUPLE: colon < block ;
 
 : <colon> ( -- block )
-    H{ } <block> colon construct-delegate ;
+    H{ } colon construct-block ;
 
 M: colon long-section short-section ;
 
@@ -261,11 +261,11 @@ M: colon unindent-first-line? drop t ;
 : <colon ( -- ) <colon> (<block) ;
 
 : save-end-position ( block -- )
-    position get swap set-section-end ;
+    position get >>end drop ;
 
 : block> ( -- )
     pprinter-stack get pop
-    [ dup save-end-position add-section ] if-nonempty ;
+    [ [ save-end-position ] [ add-section ] bi ] if-nonempty ;
 
 : with-section-state ( quot -- )
     [
@@ -278,7 +278,7 @@ M: colon unindent-first-line? drop t ;
 : do-pprint ( block -- )
     [
         [
-            dup section-style [
+            dup style>> [
                 [ end-printing set dup short-section ] callcc0
             ] with-nesting drop
         ] if-nonempty
@@ -298,9 +298,9 @@ M: f section-start-group? drop t ;
 M: f section-end-group? drop f ;
 
 : split-before ( section -- )
-    dup section-start-group? prev get section-end-group? and
-    swap flow? prev get flow? not and
-    or split-groups ;
+    [ section-start-group? prev get section-end-group? and ]
+    [ flow? prev get flow? not and ]
+    bi or split-groups ;
 
 : split-after ( section -- )
     section-end-group? split-groups ;
@@ -315,19 +315,19 @@ M: f section-end-group? drop f ;
     ] { } make { t } split [ empty? not ] subset ;
 
 : break-group? ( seq -- ? )
-    dup first section-fits? swap peek section-fits? not and ;
+    [ first section-fits? ] [ peek section-fits? not ] bi and ;
 
 : ?break-group ( seq -- )
     dup break-group? [ first <fresh-line ] [ drop ] if ;
 
 M: block long-section ( block -- )
     [
-        block-sections chop-break group-flow [
+        sections>> chop-break group-flow [
             dup ?break-group [
                 dup line-break? [
                     do-break
                 ] [
-                    dup advance pprint-section
+                    [ advance ] [ pprint-section ] bi
                 ] if
             ] each
         ] each

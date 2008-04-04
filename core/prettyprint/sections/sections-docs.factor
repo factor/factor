@@ -67,7 +67,7 @@ HELP: short-section?
 { $contract "Tests if a section should be output as a " { $link short-section } ". The default implementation calls " { $link section-fits? } " but this behavior can be cutomized." } ;
 
 HELP: section
-{ $class-description "A piece of prettyprinter output. Instances of this class are not used directly, instead one instantiates various classes which delegate to this class:"
+{ $class-description "A piece of prettyprinter output. Instances of this class are not used directly, instead one instantiates various subclasses of this class:"
 { $list
     { $link text }
     { $link line-break }
@@ -78,12 +78,12 @@ HELP: section
 }
 "Instances of this class have the following slots:"
 { $list
-    { { $link section-start } " - the start of the section, measured in characters from the beginning of the prettyprinted output" }
-    { { $link section-end } " - the end of the section, measured in characters from the beginning of the prettyprinted output" }
-    { { $link section-start-group? } " - see " { $link start-group } }
-    { { $link section-end } " - see " { $link end-group } }
-    { { $link section-style } " - character and/or paragraph styles to use when outputting this section. See " { $link "styles" } }
-    { { $link section-overhang } " - number of columns which must be left blank before the wrap margin for the prettyprinter to consider emitting this section as a " { $link short-section } ". Avoids lone hanging closing brackets" }
+    { { $snippet "start" } " - the start of the section, measured in characters from the beginning of the prettyprinted output" }
+    { { $snippet "end" } " - the end of the section, measured in characters from the beginning of the prettyprinted output" }
+    { { $snippet "start-group?" } " - see " { $link start-group } }
+    { { $snippet "end-group?" } " - see " { $link end-group } }
+    { { $snippet "style" } " - character and/or paragraph styles to use when outputting this section. See " { $link "styles" } }
+    { { $snippet "overhang" } " - number of columns which must be left blank before the wrap margin for the prettyprinter to consider emitting this section as a " { $link short-section } ". Avoids lone hanging closing brackets" }
 } } ;
 
 HELP: <section>
