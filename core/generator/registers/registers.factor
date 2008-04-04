@@ -3,7 +3,8 @@
 USING: arrays assocs classes classes.private classes.algebra
 combinators cpu.architecture generator.fixup hashtables kernel
 layouts math namespaces quotations sequences system vectors
-words effects alien byte-arrays bit-arrays float-arrays ;
+words effects alien byte-arrays bit-arrays float-arrays
+accessors ;
 IN: generator.registers
 
 SYMBOL: +input+
@@ -13,9 +14,11 @@ SYMBOL: +clobber+
 SYMBOL: known-tag
 
 ! Register classes
-TUPLE: int-regs ;
-
-TUPLE: float-regs size ;
+SINGLETON: int-regs
+SINGLETON: single-float-regs
+SINGLETON: double-float-regs
+UNION: float-regs single-float-regs double-float-regs ;
+UNION: reg-class int-regs float-regs ;
 
 <PRIVATE
 
@@ -48,13 +51,13 @@ M: value minimal-ds-loc* drop ;
 M: value lazy-store 2drop ;
 
 ! A scratch register for computations
-TUPLE: vreg n ;
+TUPLE: vreg n reg-class ;
 
-: <vreg> ( n reg-class -- vreg )
-    { set-vreg-n set-delegate } vreg construct ;
+C: <vreg> vreg ( n reg-class -- vreg )
 
-M: vreg v>operand dup vreg-n swap vregs nth ;
+M: vreg v>operand [ n>> ] [ reg-class>> ] bi vregs nth ;
 M: vreg live-vregs* , ;
+M: vreg move-spec reg-class>> move-spec ;
 
 INSTANCE: vreg value
 
@@ -62,9 +65,9 @@ M: float-regs move-spec drop float ;
 M: float-regs operand-class* drop float ;
 
 ! Temporary register for stack shuffling
-TUPLE: temp-reg ;
+TUPLE: temp-reg reg-class>> ;
 
-: temp-reg T{ temp-reg T{ int-regs } } ;
+: temp-reg T{ temp-reg f int-regs } ;
 
 M: temp-reg move-spec drop f ;
 
@@ -73,7 +76,7 @@ INSTANCE: temp-reg value
 ! A data stack location.
 TUPLE: ds-loc n class ;
 
-: <ds-loc> { set-ds-loc-n } ds-loc construct ;
+: <ds-loc> f ds-loc construct-boa ;
 
 M: ds-loc minimal-ds-loc* ds-loc-n min ;
 M: ds-loc operand-class* ds-loc-class ;
@@ -84,8 +87,7 @@ M: ds-loc live-loc?
 ! A retain stack location.
 TUPLE: rs-loc n class ;
 
-: <rs-loc> { set-rs-loc-n } rs-loc construct ;
-
+: <rs-loc> f rs-loc construct-boa ;
 M: rs-loc operand-class* rs-loc-class ;
 M: rs-loc set-operand-class set-rs-loc-class ;
 M: rs-loc live-loc?
@@ -126,7 +128,7 @@ INSTANCE: cached value
 TUPLE: tagged vreg class ;
 
 : <tagged> ( vreg -- tagged )
-    { set-tagged-vreg } tagged construct ;
+    f tagged construct-boa ;
 
 M: tagged v>operand tagged-vreg v>operand ;
 M: tagged set-operand-class set-tagged-class ;
@@ -340,8 +342,7 @@ SYMBOL: fresh-objects
 
 ! Computing free registers and initializing allocator
 : reg-spec>class ( spec -- class )
-    float eq?
-    T{ float-regs f 8 } T{ int-regs } ? ;
+    float eq? double-float-regs int-regs ? ;
 
 : free-vregs ( reg-class -- seq )
     #! Free vregs in a given register class
@@ -393,7 +394,7 @@ M: value (lazy-load)
 : compute-free-vregs ( -- )
     #! Create a new hashtable for thee free-vregs variable.
     live-vregs
-    { T{ int-regs } T{ float-regs f 8 } }
+    { int-regs double-float-regs }
     [ 2dup (compute-free-vregs) ] H{ } map>assoc
     \ free-vregs set
     drop ;
@@ -442,7 +443,7 @@ M: loc lazy-store
 : fast-shuffle? ( live-locs -- ? )
     #! Test if we have enough free registers to load all
     #! shuffle inputs at once.
-    T{ int-regs } free-vregs [ length ] bi@ <= ;
+    int-regs free-vregs [ length ] bi@ <= ;
 
 : finalize-locs ( -- )
     #! Perform any deferred stack shuffling.
@@ -483,8 +484,8 @@ M: loc lazy-store
 
 ! Loading stacks to vregs
 : free-vregs? ( int# float# -- ? )
-    T{ float-regs f 8 } free-vregs length <=
-    >r T{ int-regs } free-vregs length <= r> and ;
+    double-float-regs free-vregs length <=
+    >r int-regs free-vregs length <= r> and ;
 
 : phantom&spec ( phantom spec -- phantom' spec' )
     [ length f pad-left ] keep
@@ -534,7 +535,7 @@ M: loc lazy-store
 
 : count-input-vregs ( phantom spec -- )
     phantom&spec [
-        >r dup cached? [ cached-vreg ] when r> allocation
+        >r dup cached? [ cached-vreg ] when r> first allocation
     ] 2map count-vregs ;
 
 : count-scratch-regs ( spec -- )
@@ -542,13 +543,13 @@ M: loc lazy-store
 
 : guess-vregs ( dinput rinput scratch -- int# float# )
     H{
-        { T{ int-regs } 0 }
-        { T{ float-regs 8 } 0 }
+        { int-regs 0 }
+        { double-float-regs 0 }
     } clone [
         count-scratch-regs
         phantom-r get swap count-input-vregs
         phantom-d get swap count-input-vregs
-        T{ int-regs } get T{ float-regs 8 } get
+        int-regs get double-float-regs get
     ] bind ;
 
 : alloc-scratch ( -- )
@@ -580,12 +581,6 @@ M: loc lazy-store
     ] [
         2drop t
     ] if ;
-
-: class-tags ( class -- tag/f )
-    class-types [
-        dup num-tags get >=
-        [ drop object tag-number ] when
-    ] map prune ;
 
 : class-tag ( class -- tag/f )
     class-tags dup length 1 = [ first ] [ drop f ] if ;

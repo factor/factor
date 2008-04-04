@@ -333,8 +333,8 @@ HELP: C{
 { $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: T{
-{ $syntax "T{ class delegate slots... }" }
-{ $values { "class" "a tuple class word" } { "delegate" "a delegate" } { "slots" "list of objects" } }
+{ $syntax "T{ class slots... }" }
+{ $values { "class" "a tuple class word" } { "slots" "list of objects" } }
 { $description "Marks the beginning of a literal tuple. Literal tuples are terminated by " { $link POSTPONE: } } "."
 $nl
 "The class word must always be specified. If an insufficient number of values is given after the class word, the remaining slots of the tuple are set to " { $link f } ". If too many values are given, they are ignored." } ;

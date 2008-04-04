@@ -70,29 +70,36 @@ GENERIC: reg-size ( register-class -- n )
 
 M: int-regs reg-size drop cell ;
 
-M: float-regs reg-size float-regs-size ;
+M: single-float-regs reg-size drop 4 ;
+
+M: double-float-regs reg-size drop 8 ;
+
+GENERIC: reg-class-variable ( register-class -- symbol )
+
+M: reg-class reg-class-variable ;
+
+M: float-regs reg-class-variable drop float-regs ;
 
 GENERIC: inc-reg-class ( register-class -- )
 
-: (inc-reg-class)
-    dup class inc
+M: reg-class inc-reg-class
+    dup reg-class-variable inc
     fp-shadows-int? [ reg-size stack-params +@ ] [ drop ] if ;
 
-M: int-regs inc-reg-class
-    (inc-reg-class) ;
-
 M: float-regs inc-reg-class
-    dup (inc-reg-class)
+    dup call-next-method
     fp-shadows-int? [ reg-size cell /i int-regs +@ ] [ drop ] if ;
 
 : reg-class-full? ( class -- ? )
-    dup class get swap param-regs length >= ;
+    [ reg-class-variable get ] [ param-regs length ] bi >= ;
 
 : spill-param ( reg-class -- n reg-class )
-    reg-size stack-params dup get -rot +@ T{ stack-params } ;
+    stack-params get
+    >r reg-size stack-params +@ r>
+    stack-params ;
 
 : fastcall-param ( reg-class -- n reg-class )
-    [ dup class get swap inc-reg-class ] keep ;
+    [ reg-class-variable get ] [ inc-reg-class ] [ ] tri ;
 
 : alloc-parameter ( parameter -- reg reg-class )
     c-type-reg-class dup reg-class-full?
@@ -323,7 +330,7 @@ M: alien-callback-error summary
     drop "Words calling ``alien-callback'' must be compiled with the optimizing compiler." ;
 
 : callback-bottom ( node -- )
-    alien-callback-xt [ word-xt drop <alien> ] curry
+    xt>> [ word-xt drop <alien> ] curry
     recursive-state get infer-quot ;
 
 \ alien-callback [
@@ -373,8 +380,7 @@ TUPLE: callback-context ;
 
 : wrap-callback-quot ( node -- quot )
     [
-        dup alien-callback-quot
-        swap prepare-callback-return append ,
+        [ quot>> ] [ prepare-callback-return ] bi append ,
         [ callback-context construct-empty do-callback ] %
     ] [ ] make ;
 
@@ -395,7 +401,7 @@ TUPLE: callback-context ;
     callback-unwind %unwind ;
 
 : generate-callback ( node -- )
-    dup alien-callback-xt dup [
+    dup xt>> dup [
         init-templates
         %save-word-xt
         %prologue-later

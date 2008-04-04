@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.compiler arrays
 cpu.x86.assembler cpu.architecture kernel kernel.private math
@@ -22,7 +22,11 @@ M: rs-loc v>operand rs-loc-n rs-reg reg-stack ;
 M: int-regs %save-param-reg drop >r stack@ r> MOV ;
 M: int-regs %load-param-reg drop swap stack@ MOV ;
 
-: MOVSS/D float-regs-size 4 = [ MOVSS ] [ MOVSD ] if ;
+GENERIC: MOVSS/D ( dst src reg-class -- )
+
+M: single-float-regs MOVSS/D drop MOVSS ;
+
+M: double-float-regs MOVSS/D drop MOVSD ;
 
 M: float-regs %save-param-reg >r >r stack@ r> r> MOVSS/D ;
 M: float-regs %load-param-reg >r swap stack@ r> MOVSS/D ;

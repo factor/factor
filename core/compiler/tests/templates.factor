@@ -202,3 +202,47 @@ TUPLE: my-tuple ;
         ] [ 2drop no-case ] if
     ] compile-call
 ] unit-test
+
+: float-spill-bug
+    {
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+    } cleave ;
+
+[ t ] [ \ float-spill-bug compiled? ] unit-test

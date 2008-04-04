@@ -218,7 +218,7 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 
 [
     "IN: classes.tuple.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
-] [ [ no-tuple-class? ] is? ] must-fail-with
+] [ error>> no-tuple-class? ] must-fail-with
 
 ! Inheritance
 TUPLE: computer cpu ram ;
@@ -488,7 +488,7 @@ USE: vocabs
     ] with-compilation-unit
 ] unit-test
 
-[ "USE: words T{ word }" eval ] [ [ no-method? ] is? ] must-fail-with
+[ "USE: words T{ word }" eval ] [ error>> no-method? ] must-fail-with
 
 ! Accessors not being forgotten...
 [ [ ] ] [

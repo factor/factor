@@ -155,7 +155,7 @@ M: x86.32 %box ( n reg-class func -- )
     #! integer, push [ESP+n]:[ESP+n+4] on the stack; we are
     #! boxing a parameter being passed to a callback from C.
     [
-        T{ int-regs } box@
+        int-regs box@
         EDX over stack@ MOV
         EAX swap cell - stack@ MOV 
     ] when*

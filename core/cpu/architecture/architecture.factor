@@ -6,7 +6,7 @@ byte-arrays bit-arrays float-arrays combinators words ;
 IN: cpu.architecture
 
 ! A pseudo-register class for parameters spilled on the stack
-TUPLE: stack-params ;
+SINGLETON: stack-params
 
 ! Return values of this class go here
 GENERIC: return-reg ( register-class -- reg )

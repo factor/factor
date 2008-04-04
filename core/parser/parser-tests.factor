@@ -2,7 +2,7 @@ USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
 sorting classes.tuple compiler.units debugger vocabs
-vocabs.loader ;
+vocabs.loader accessors ;
 IN: parser.tests
 
 [
@@ -297,12 +297,12 @@ IN: parser.tests
     [
         "IN: parser.tests TUPLE: another-pred-test ; GENERIC: another-pred-test?"
         <string-reader> "removing-the-predicate" parse-stream
-    ] [ [ redefine-error? ] is? ] must-fail-with
+    ] [ error>> error>> redefine-error? ] must-fail-with
 
     [
         "IN: parser.tests TUPLE: class-redef-test ; TUPLE: class-redef-test ;"
         <string-reader> "redefining-a-class-1" parse-stream
-    ] [ [ redefine-error? ] is? ] must-fail-with
+    ] [ error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test"
@@ -312,7 +312,7 @@ IN: parser.tests
     [
         "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test : class-redef-test ;"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ [ redefine-error? ] is? ] must-fail-with
+    ] [ error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-fwd-test ;"
@@ -322,7 +322,7 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ [ no-word-error? ] is? ] must-fail-with
+    ] [ error>> error>> no-word-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
@@ -332,12 +332,12 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ [ no-word-error? ] is? ] must-fail-with
+    ] [ error>> error>> no-word-error? ] must-fail-with
 
     [
         "IN: parser.tests : foo ; TUPLE: foo ;"
         <string-reader> "redefining-a-class-4" parse-stream drop
-    ] [ [ redefine-error? ] is? ] must-fail-with
+    ] [ error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests : foo ( x y -- z ) 1 2 ; : bar ( a -- b ) ;" eval

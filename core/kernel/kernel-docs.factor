@@ -217,9 +217,7 @@ $nl
 { $example "\\ f class ." "word" }
 "On the other hand, " { $link t } " is just a word, and there is no class which it is a unique instance of."
 { $example "t \\ t eq? ." "t" }
-"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "."
-$nl
-"A tuple cannot delegate to " { $link f } " at all, since a delegate of " { $link f } " actually denotes that no delegate is set. See " { $link set-delegate } "." ;
+"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
 
 ARTICLE: "conditionals" "Conditionals and logic"
 "The basic conditionals:"
