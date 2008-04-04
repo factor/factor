@@ -565,9 +565,17 @@ HELP: TUPLE:
 HELP: ERROR:
 { $syntax "ERROR: class slots... ;" }
 { $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class.  Defines a new word " { $snippet "class?" } " that boa-constructs this tuple and throws it." } ;
-
-{ POSTPONE: ERROR: POSTPONE: TUPLE: } related-words
+{ $description "Defines a new tuple class whose class word throws a new instance of the error." }
+{ $notes
+    "The following two snippets are equivalent:"
+    { $code
+        "ERROR: invalid-values x y ;"
+        ""
+        "TUPLE: invalid-values x y ;"
+        ": invalid-values ( x y -- * )"
+        "    \\ invalid-values construct-boa throw ;"
+    }
+} ;
 
 HELP: C:
 { $syntax "C: constructor class" }

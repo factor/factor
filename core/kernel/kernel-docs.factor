@@ -278,6 +278,7 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "combinators" }
 "Advanced topics:"
 { $subsection "implementing-combinators" }
+{ $subsection "errors" }
 { $subsection "continuations" } ;
 
 ABOUT: "dataflow"

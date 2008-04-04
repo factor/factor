@@ -219,6 +219,26 @@ ARTICLE: "tuple-examples" "Tuple examples"
 }
 "An example using subclassing can be found in " { $link "tuple-inheritance-example" } "." ;
 
+ARTICLE: "tuple-redefinition" "Tuple redefinition"
+"In the following, the " { $emphasis "direct slots" } " of a tuple class refers to the slot names specified in the " { $link POSTPONE: TUPLE: } " form defining the tuple class, and the " { $emphasis "effective slots" } " refers to the concatenation of the direct slots together with slots defined on superclasses."
+$nl
+"When a tuple class is redefined, all instances of the class, including subclasses, are updated. For each instance, the list of effective slots is compared with the previous list. If any slots were removed, the values are removed from the instance and are lost forever. If any slots were added, the instance gains these slots with an initial value of " { $link f } "."
+$nl
+"There are three ways to change the list of effective slots of a class:"
+{ $list
+    "Adding or removing direct slots of the class"
+    "Adding or removing direct slots of a superclass of the class"
+    "Changing the inheritance hierarchy by redefining a class to have a different superclass"
+}
+"In all cases, the new effective slots are compared with the old effective slots, and each instance is updated as follows:"
+{ $list
+    "If any slots were removed, the values are removed from the instance and are lost forever."
+    { "If any slots were added, the instance gains these slots with an initial value of " { $link f } "." }
+    "If any slots are permuted, their values in instances do not change; only the layout of the instance changes in memory."
+    "If the number or order of effective slots changes, any BOA constructors are recompiled."
+}
+"Note that if a slot is moved from a class to its superclass (or vice versa) in the same compilation unit, the value of the slot is preserved in existing instances, because tuple instance update always runs at the end of a compilation unit. However, if it is removed in one compilation unit and added in another, the value in existing instances is lost." ;
+
 ARTICLE: "tuples" "Tuples"
 "Tuples are user-defined classes composed of named slots."
 { $subsection "tuple-examples" }
@@ -234,6 +254,8 @@ $nl
 { $subsection "tuple-subclassing" }
 "Introspection:"
 { $subsection "tuple-introspection" }
+"Tuple classes can be redefined; this updates existing instances:"
+{ $subsection "tuple-redefinition" }
 "Tuple literal syntax is documented in " { $link "syntax-tuples" } "." ;
 
 ABOUT: "tuples"
