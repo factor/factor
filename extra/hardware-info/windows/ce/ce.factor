@@ -1,5 +1,5 @@
 USING: alien.c-types hardware-info kernel math namespaces
-windows windows.kernel32 hardware-info.backend ;
+windows windows.kernel32 hardware-info.backend system ;
 IN: hardware-info.windows.ce
 
 : memory-status ( -- MEMORYSTATUS )
