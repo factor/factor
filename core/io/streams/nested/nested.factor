@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs kernel namespaces strings
-quotations io continuations accessors ;
+quotations io continuations accessors sequences ;
 IN: io.streams.nested
 
 TUPLE: filter-writer stream ;
@@ -66,3 +66,7 @@ M: style-stream make-block-stream
 M: style-stream make-cell-stream
     [ do-nested-style make-cell-stream ] [ style>> ] bi
     <style-stream> ;
+
+M: style-stream stream-write-table
+    [ [ [ stream>> ] map ] map ] [ ] [ stream>> ] tri*
+    stream-write-table ;
