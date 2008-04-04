@@ -22,11 +22,16 @@ IN: newfx
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: nth-is-of (   i val seq -- seq ) dup >r swapd set-nth r> ;
+: is-nth-of ( val   i seq -- seq ) dup >r       set-nth r> ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : mutate-nth    ( seq i val -- ) swap rot set-nth ;
-: mutate-at-nth ( seq val i -- )      rot set-nth ;
+: mutate-nth-at ( seq val i -- )      rot set-nth ;
 
 : mutate-nth-of    (   i val seq -- ) swapd set-nth ;
-: mutate-at-nth-of ( val   i seq -- )       set-nth ;
+: mutate-nth-at-of ( val   i seq -- )       set-nth ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
