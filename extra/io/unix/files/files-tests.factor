@@ -22,8 +22,8 @@ IN: io.unix.files.tests
 [ "/lib" ] [ "/" "../../lib" append-path ] unit-test
 [ "/lib/" ] [ "/" "../../lib/" append-path ] unit-test
 
-{ [ "/lib" ] [ "/usr/" "/lib" append-path ] }
-{ [ "/lib/" ] [ "/usr/" "/lib/" append-path ] }
-{ [ "/lib/bux" ] [ "/usr" "/lib/bux" append-path ] }
-{ [ "/lib/bux/" ] [ "/usr" "/lib/bux/" append-path ] }
-{ [ t ] [ "/foo" absolute-path? ] }
+[ "/lib" ] [ "/usr/" "/lib" append-path ] unit-test
+[ "/lib/" ] [ "/usr/" "/lib/" append-path ] unit-test
+[ "/lib/bux" ] [ "/usr" "/lib/bux" append-path ] unit-test
+[ "/lib/bux/" ] [ "/usr" "/lib/bux/" append-path ] unit-test
+[ t ] [ "/foo" absolute-path? ] unit-test

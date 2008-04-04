@@ -416,6 +416,9 @@ PRIVATE>
         swap >r [ push ] curry compose r> while
     ] keep { } like ; inline
 
+: follow ( obj quot -- seq )
+    >r [ dup ] r> [ keep ] curry [ ] unfold nip ; inline
+
 : index ( obj seq -- n )
     [ = ] with find drop ;
 

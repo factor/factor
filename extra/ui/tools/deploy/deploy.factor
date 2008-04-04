@@ -49,7 +49,7 @@ TUPLE: deploy-gadget vocab settings ;
         [
             bundle-name
             deploy-ui
-            macosx? [ exit-when-windows-closed ] when
+            os macosx? [ exit-when-windows-closed ] when
             io-settings
             reflection-settings
             advanced-settings

@@ -2,13 +2,13 @@ USING: alien alien.accessors alien.c-types byte-arrays
 continuations destructors io.nonblocking io.timeouts io.sockets
 io.sockets.impl io namespaces io.streams.duplex io.windows
 io.windows.nt.backend windows.winsock kernel libc math sequences
-threads classes.tuple.lib ;
+threads classes.tuple.lib system ;
 IN: io.windows.nt.sockets
 
 : malloc-int ( object -- object )
     "int" heap-size malloc tuck 0 set-alien-signed-4 ; inline
 
-M: windows-nt-io WSASocket-flags ( -- DWORD )
+M: winnt WSASocket-flags ( -- DWORD )
     WSA_FLAG_OVERLAPPED ;
 
 : get-ConnectEx-ptr ( socket -- void* )
@@ -50,7 +50,7 @@ TUPLE: ConnectEx-args port
     2dup save-callback
     get-overlapped-result drop ;
 
-M: windows-nt-io (client) ( addrspec -- client-in client-out )
+M: winnt (client) ( addrspec -- client-in client-out )
     [
         \ ConnectEx-args construct-empty
         over make-sockaddr/size pick init-connect
@@ -119,7 +119,7 @@ TUPLE: AcceptEx-args port
     [ AcceptEx-args-sAcceptSocket* add-completion ] keep
     AcceptEx-args-sAcceptSocket* <win32-socket> ;
 
-M: windows-nt-io (accept) ( server -- addrspec handle )
+M: winnt (accept) ( server -- addrspec handle )
     [
         [
             dup check-server-port
@@ -131,14 +131,14 @@ M: windows-nt-io (accept) ( server -- addrspec handle )
         ] with-timeout
     ] with-destructors ;
 
-M: windows-nt-io (server) ( addrspec -- handle )
+M: winnt (server) ( addrspec -- handle )
     [
         SOCK_STREAM server-fd dup listen-on-socket
         dup add-completion
         <win32-socket>
     ] with-destructors ;
 
-M: windows-nt-io <datagram> ( addrspec -- datagram )
+M: winnt <datagram> ( addrspec -- datagram )
     [
         [
             SOCK_DGRAM server-fd
@@ -190,7 +190,7 @@ TUPLE: WSARecvFrom-args port
     [ WSARecvFrom-args-lpFrom* ] keep
     WSARecvFrom-args-port datagram-port-addr parse-sockaddr ;
 
-M: windows-nt-io receive ( datagram -- packet addrspec )
+M: winnt receive ( datagram -- packet addrspec )
     [
         dup check-datagram-port
         \ WSARecvFrom-args construct-empty
@@ -242,7 +242,7 @@ TUPLE: WSASendTo-args port
 
 USE: io.sockets
 
-M: windows-nt-io send ( packet addrspec datagram -- )
+M: winnt send ( packet addrspec datagram -- )
     [
         3dup check-datagram-send
         \ WSASendTo-args construct-empty

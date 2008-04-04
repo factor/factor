@@ -51,7 +51,7 @@ GENERIC: optimize-node* ( node -- node/t changed? )
 DEFER: optimize-nodes
 
 : optimize-children ( node -- )
-    [ optimize-nodes ] change-children ;
+    [ optimize-nodes ] map-children ;
 
 : optimize-node ( node -- node )
     dup [

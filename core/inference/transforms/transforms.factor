@@ -3,7 +3,7 @@
 USING: arrays kernel words sequences generic math namespaces
 quotations assocs combinators math.bitfields inference.backend
 inference.dataflow inference.state classes.tuple.private effects
-inspector hashtables ;
+inspector hashtables classes generic ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )
@@ -42,6 +42,8 @@ IN: inference.transforms
 \ cleave [ cleave>quot ] 1 define-transform
 
 \ 2cleave [ 2cleave>quot ] 1 define-transform
+
+\ 3cleave [ 3cleave>quot ] 1 define-transform
 
 \ spread [ spread>quot ] 1 define-transform
 
@@ -96,3 +98,11 @@ M: duplicated-slots-error summary
         \ construct-empty 1 1 <effect> make-call-node
     ] if
 ] "infer" set-word-prop
+
+\ instance? [
+    [ +inlined+ depends-on ] [ "predicate" word-prop ] bi
+] 1 define-transform
+
+\ (call-next-method) [
+    [ [ +inlined+ depends-on ] bi@ ] [ next-method-quot ] 2bi
+] 2 define-transform

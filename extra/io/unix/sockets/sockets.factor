@@ -7,7 +7,7 @@ USING: alien alien.c-types generic io kernel math namespaces
 io.nonblocking parser threads unix sequences
 byte-arrays io.sockets io.binary io.unix.backend
 io.streams.duplex io.sockets.impl math.parser continuations libc
-combinators io.backend io.files ;
+combinators io.backend io.files io.files.private system ;
 IN: io.unix.sockets
 
 : pending-init-error ( port -- )
@@ -23,7 +23,7 @@ IN: io.unix.sockets
 : sockopt ( fd level opt -- )
     1 <int> "int" heap-size setsockopt io-error ;
 
-M: unix-io addrinfo-error ( n -- )
+M: unix addrinfo-error ( n -- )
     dup zero? [ drop ] [ gai_strerror throw ] if ;
 
 ! Client sockets - TCP and Unix domain
@@ -42,7 +42,7 @@ M: connect-task do-io-task
 : wait-to-connect ( port -- )
     [ <connect-task> add-io-task ] with-port-continuation drop ;
 
-M: unix-io (client) ( addrspec -- client-in client-out )
+M: unix (client) ( addrspec -- client-in client-out )
     dup make-sockaddr/size >r >r
     protocol-family SOCK_STREAM socket-fd
     dup r> r> connect
@@ -91,11 +91,11 @@ USE: io.sockets
     dup rot make-sockaddr/size bind
     zero? [ dup close (io-error) ] unless ;
 
-M: unix-io (server) ( addrspec -- handle )
+M: unix (server) ( addrspec -- handle )
     SOCK_STREAM server-fd
     dup 10 listen zero? [ dup close (io-error) ] unless ;
 
-M: unix-io (accept) ( server -- addrspec handle )
+M: unix (accept) ( server -- addrspec handle )
     #! Wait for a client connection.
     dup check-server-port
     dup wait-to-accept
@@ -104,7 +104,7 @@ M: unix-io (accept) ( server -- addrspec handle )
     swap server-port-client ;
 
 ! Datagram sockets - UDP and Unix domain
-M: unix-io <datagram>
+M: unix <datagram>
     [ SOCK_DGRAM server-fd ] keep <datagram-port> ;
 
 SYMBOL: receive-buffer
@@ -147,7 +147,7 @@ M: receive-task do-io-task
 : wait-receive ( stream -- )
     [ <receive-task> add-io-task ] with-port-continuation drop ;
 
-M: unix-io receive ( datagram -- packet addrspec )
+M: unix receive ( datagram -- packet addrspec )
     dup check-datagram-port
     dup wait-receive
     dup pending-error
@@ -179,7 +179,7 @@ M: send-task do-io-task
     [ <send-task> add-io-task ] with-port-continuation
     2drop 2drop ;
 
-M: unix-io send ( packet addrspec datagram -- )
+M: unix send ( packet addrspec datagram -- )
     3dup check-datagram-send
     [ >r make-sockaddr/size r> wait-send ] keep
     pending-error ;

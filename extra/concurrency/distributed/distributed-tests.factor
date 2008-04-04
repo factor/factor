@@ -5,8 +5,8 @@ concurrency.messaging continuations ;
 
 : test-node
     {
-        { [ unix? ] [ "distributed-concurrency-test" temp-file <local> ] }
-        { [ windows? ] [ "127.0.0.1" 1238 <inet4> ] }
+        { [ os unix? ] [ "distributed-concurrency-test" temp-file <local> ] }
+        { [ os windows? ] [ "127.0.0.1" 1238 <inet4> ] }
     } cond ;
 
 [ ] [ [ "distributed-concurrency-test" temp-file delete-file ] ignore-errors ] unit-test

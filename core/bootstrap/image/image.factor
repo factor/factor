@@ -4,15 +4,16 @@ USING: alien arrays bit-arrays byte-arrays generic assocs
 hashtables assocs hashtables.private io kernel kernel.private
 math namespaces parser prettyprint sequences sequences.private
 strings sbufs vectors words quotations assocs system layouts
-splitting growable classes classes.tuple classes.tuple.private
-words.private io.binary io.files vocabs vocabs.loader
-source-files definitions debugger float-arrays
+splitting growable classes classes.builtin classes.tuple
+classes.tuple.private words.private io.binary io.files vocabs
+vocabs.loader source-files definitions debugger float-arrays
 quotations.private sequences.private combinators
 io.encodings.binary ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
-    cpu dup "ppc" = [ >r os "-" r> 3append ] when ;
+    cpu word-name
+    dup "ppc" = [ >r os word-name "-" r> 3append ] when ;
 
 : boot-image-name ( arch -- string )
     "boot." swap ".image" 3append ;

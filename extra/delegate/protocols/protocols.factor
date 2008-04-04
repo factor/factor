@@ -21,12 +21,5 @@ PROTOCOL: stream-protocol
     make-cell-stream stream-write-table ;
 
 PROTOCOL: definition-protocol
-    where set-where forget uses redefined*
+    where set-where forget uses
     synopsis* definer definition ;
-
-PROTOCOL: prettyprint-section-protocol
-    section-fits? indent-section? unindent-first-line?
-    newline-after?  short-section? short-section long-section
-    <section> delegate>block add-section ;
-
-

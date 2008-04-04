@@ -16,25 +16,6 @@ TUPLE: rect x y w h ;
 
 [ t ] [ 10 20 30 40 <rect> dup clone 0 swap move = ] unit-test
 
-GENERIC: delegation-test
-M: object delegation-test drop 3 ;
-TUPLE: quux-tuple ;
-: <quux-tuple> quux-tuple construct-empty ;
-M: quux-tuple delegation-test drop 4 ;
-TUPLE: quuux-tuple ;
-: <quuux-tuple> { set-delegate } quuux-tuple construct ;
-
-[ 3 ] [ <quux-tuple> <quuux-tuple> delegation-test ] unit-test
-
-GENERIC: delegation-test-2
-TUPLE: quux-tuple-2 ;
-: <quux-tuple-2> quux-tuple-2 construct-empty ;
-M: quux-tuple-2 delegation-test-2 drop 4 ;
-TUPLE: quuux-tuple-2 ;
-: <quuux-tuple-2> { set-delegate } quuux-tuple-2 construct ;
-
-[ 4 ] [ <quux-tuple-2> <quuux-tuple-2> delegation-test-2 ] unit-test
-
 ! Make sure we handle tuple class redefinition
 TUPLE: redefinition-test ;
 
@@ -62,13 +43,13 @@ C: <point> point
 [ 200 ] [ "p" get y>> ] unit-test
 [ f ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
-"p" get 300 ">>z" "accessors" lookup execute drop
+[ ] [ "p" get 300 ">>z" "accessors" lookup execute drop ] unit-test
 
 [ 4 ] [ "p" get tuple-size ] unit-test
 
 [ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
-"IN: classes.tuple.tests TUPLE: point z y ;" eval
+[ ] [ "IN: classes.tuple.tests TUPLE: point z y ;" eval ] unit-test
 
 [ 3 ] [ "p" get tuple-size ] unit-test
 
@@ -101,11 +82,6 @@ TUPLE: empty ;
 C: <empty> empty
 
 [ t ] [ <empty> hashcode fixnum? ] unit-test
-
-TUPLE: delegate-clone ;
-
-[ T{ delegate-clone T{ empty f } } ]
-[ T{ delegate-clone T{ empty f } } clone ] unit-test
 
 ! Compiler regression
 [ t length ] [ object>> t eq? ] must-fail-with
@@ -242,7 +218,7 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 
 [
     "IN: classes.tuple.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
-] [ [ no-tuple-class? ] is? ] must-fail-with
+] [ error>> no-tuple-class? ] must-fail-with
 
 ! Inheritance
 TUPLE: computer cpu ram ;
@@ -394,7 +370,9 @@ test-server-slot-values
 ! Reshape crash
 TUPLE: test1 a ; TUPLE: test2 < test1 b ;
 
-T{ test2 f "a" "b" } "test" set
+C: <test2> test2
+
+"a" "b" <test2> "test" set
 
 : test-a/b
     [ "a" ] [ "test" get a>> ] unit-test
@@ -509,3 +487,45 @@ USE: vocabs
         define-tuple-class
     ] with-compilation-unit
 ] unit-test
+
+[ "USE: words T{ word }" eval ] [ error>> no-method? ] must-fail-with
+
+! Accessors not being forgotten...
+[ [ ] ] [
+    "IN: classes.tuple.tests TUPLE: forget-accessors-test x y z ;"
+    <string-reader>
+    "forget-accessors-test" parse-stream
+] unit-test
+
+[ t ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
+
+: accessor-exists? ( class name -- ? )
+    >r "forget-accessors-test" "classes.tuple.tests" lookup r>
+    ">>" append "accessors" lookup method >boolean ;
+
+[ t ] [ "x" accessor-exists? ] unit-test
+[ t ] [ "y" accessor-exists? ] unit-test
+[ t ] [ "z" accessor-exists? ] unit-test
+
+[ [ ] ] [
+    "IN: classes.tuple.tests GENERIC: forget-accessors-test"
+    <string-reader>
+    "forget-accessors-test" parse-stream
+] unit-test
+
+[ f ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
+
+[ f ] [ "x" accessor-exists? ] unit-test
+[ f ] [ "y" accessor-exists? ] unit-test
+[ f ] [ "z" accessor-exists? ] unit-test
+
+TUPLE: another-forget-accessors-test ;
+
+
+[ [ ] ] [
+    "IN: classes.tuple.tests GENERIC: another-forget-accessors-test"
+    <string-reader>
+    "another-forget-accessors-test" parse-stream
+] unit-test
+
+[ t ] [ \ another-forget-accessors-test class? ] unit-test

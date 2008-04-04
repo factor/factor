@@ -1,11 +1,13 @@
 USING: alien alien.syntax combinators kernel parser sequences
 system words namespaces hashtables init math arrays assocs 
 sequences.lib continuations ;
+
+ERROR: unknown-gl-platform ;
 << {
-    { [ windows? ] [ "opengl.gl.windows" ] }
-    { [ macosx? ]  [ "opengl.gl.macosx" ] }
-    { [ unix? ] [ "opengl.gl.unix" ] }
-    { [ t ] [ "Unknown OpenGL platform" throw ] }
+    { [ os windows? ] [ "opengl.gl.windows" ] }
+    { [ os macosx? ]  [ "opengl.gl.macosx" ] }
+    { [ os unix? ] [ "opengl.gl.unix" ] }
+    { [ t ] [ unknown-gl-platform ] }
 } cond use+ >>
 IN: opengl.gl.extensions
 

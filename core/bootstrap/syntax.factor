@@ -43,6 +43,7 @@ IN: bootstrap.syntax
     "PRIMITIVE:"
     "PRIVATE>"
     "SBUF\""
+    "SINGLETON:"
     "SYMBOL:"
     "TUPLE:"
     "T{"
@@ -66,6 +67,7 @@ IN: bootstrap.syntax
     "CS{"
     "<<"
     ">>"
+    "call-next-method"
 } [ "syntax" create drop ] each
 
 "t" "syntax" lookup define-symbol

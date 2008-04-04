@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: inspector ui.tools.interactor ui.tools.inspector
 ui.tools.workspace help.markup io io.streams.duplex io.styles
@@ -7,7 +7,7 @@ ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
 prettyprint listener debugger threads boxes concurrency.flags
-math arrays ;
+math arrays generic accessors ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;
@@ -101,16 +101,26 @@ M: listener-operation invoke-command ( target command -- )
 : clear-stack ( listener -- )
     [ clear ] swap (call-listener) ;
 
-: word-completion-string ( word listener -- string )
-    >r dup word-name swap word-vocabulary dup vocab-words r>
-    listener-gadget-input interactor-use memq?
+GENERIC# word-completion-string 1 ( word listener -- string )
+
+M: method-body word-completion-string
+    >r "method-generic" word-prop r> word-completion-string ;
+
+USE: generic.standard.engines.tuple
+
+M: tuple-dispatch-engine-word word-completion-string
+    >r "engine-generic" word-prop r> word-completion-string ;
+
+M: word word-completion-string ( word listener -- string )
+    >r [ word-name ] [ word-vocabulary ] bi dup vocab-words r>
+    input>> interactor-use memq?
     [ drop ] [ [ "USE: " % % " " % % ] "" make ] if ;
 
 : insert-word ( word -- )
     get-workspace
     workspace-listener
     [ word-completion-string ] keep
-    listener-gadget-input user-input ;
+    input>> user-input ;
 
 : quot-action ( interactor -- lines )
     dup control-value

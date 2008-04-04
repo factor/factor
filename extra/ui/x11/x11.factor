@@ -8,7 +8,7 @@ io.encodings.utf8 combinators debugger system command-line
 ui.render math.vectors classes.tuple opengl.gl threads ;
 IN: ui.x11
 
-TUPLE: x11-ui-backend ;
+SINGLETON: x11-ui-backend
 
 : XA_NET_WM_NAME "_NET_WM_NAME" x-atom ;
 
@@ -259,7 +259,7 @@ M: x11-ui-backend ui ( -- )
         ] with-x
     ] ui-running ;
 
-T{ x11-ui-backend } ui-backend set-global
+x11-ui-backend ui-backend set-global
 
 [ "DISPLAY" os-env "ui" "listener" ? ]
 main-vocab-hook set-global

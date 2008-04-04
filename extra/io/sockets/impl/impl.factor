@@ -6,8 +6,8 @@ alien.c-types combinators namespaces alien parser ;
 IN: io.sockets.impl
 
 << {
-    { [ windows? ] [ "windows.winsock" ] }
-    { [ unix? ] [ "unix" ] }
+    { [ os windows? ] [ "windows.winsock" ] }
+    { [ os unix? ] [ "unix" ] }
 } cond use+ >>
 
 GENERIC: protocol-family ( addrspec -- af )
@@ -96,14 +96,13 @@ M: inet6 parse-sockaddr
 M: f parse-sockaddr nip ;
 
 : addrinfo>addrspec ( addrinfo -- addrspec )
-    dup addrinfo-addr
-    swap addrinfo-family addrspec-of-family
+    [ addrinfo-addr ] [ addrinfo-family addrspec-of-family ] bi
     parse-sockaddr ;
 
 : parse-addrinfo-list ( addrinfo -- seq )
-    [ dup ]
-    [ dup addrinfo-next swap addrinfo>addrspec ]
-    [ ] unfold nip [ ] subset ;
+    [ addrinfo-next ] follow
+    [ addrinfo>addrspec ] map
+    [ ] subset ;
 
 : prepare-resolve-host ( host serv passive? -- host' serv' flags )
     #! If the port is a number, we resolve for 'http' then

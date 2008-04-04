@@ -730,7 +730,6 @@ void garbage_collection(CELL gen,
 
 	/* collect objects referenced from stacks and environment */
 	collect_roots();
-	
 	/* collect objects referenced from older generations */
 	collect_cards();
 

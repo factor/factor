@@ -83,6 +83,29 @@ HELP: >=
 { $values { "x" real } { "y" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is greater than or equal to " { $snippet "y" } "." } ;
 
+HELP: before?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes before " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+HELP: after?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes after " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+HELP: before=?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes before or equals " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+HELP: after=?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes after or equals " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+{ before? after? before=? after=? } related-words
+
+
 HELP: +
 { $values { "x" number } { "y" number } { "z" number } }
 { $description

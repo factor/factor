@@ -65,6 +65,6 @@ IN: hardware-info.windows
 
 <<
 {
-    { [ wince? ] [ "hardware-info.windows.ce" ] }
-    { [ winnt? ] [ "hardware-info.windows.nt" ] }
+    { [ os wince? ] [ "hardware-info.windows.ce" ] }
+    { [ os winnt? ] [ "hardware-info.windows.nt" ] }
 } cond [ require ] when* >>

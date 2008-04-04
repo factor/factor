@@ -1,6 +1,7 @@
-! Copyright (C) 2007 Daniel Ehrenberg
+! Copyright (C) 2007, 2008 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences arrays math sequences.private vectors ;
+USING: kernel sequences arrays math sequences.private vectors
+accessors ;
 IN: assocs
 
 MIXIN: assoc
@@ -189,3 +190,24 @@ M: f clear-assoc drop ;
 M: f assoc-like drop dup assoc-empty? [ drop f ] when ;
 
 INSTANCE: sequence assoc
+
+TUPLE: enum seq ;
+
+C: <enum> enum
+
+M: enum at*
+    seq>> 2dup bounds-check?
+    [ nth t ] [ 2drop f f ] if ;
+
+M: enum set-at seq>> set-nth ;
+
+M: enum delete-at enum-seq delete-nth ;
+
+M: enum >alist ( enum -- alist )
+    seq>> [ length ] keep 2array flip ;
+
+M: enum assoc-size seq>> length ;
+
+M: enum clear-assoc seq>> delete-all ;
+
+INSTANCE: enum assoc

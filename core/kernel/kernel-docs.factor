@@ -217,9 +217,7 @@ $nl
 { $example "\\ f class ." "word" }
 "On the other hand, " { $link t } " is just a word, and there is no class which it is a unique instance of."
 { $example "t \\ t eq? ." "t" }
-"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "."
-$nl
-"A tuple cannot delegate to " { $link f } " at all, since a delegate of " { $link f } " actually denotes that no delegate is set. See " { $link set-delegate } "." ;
+"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
 
 ARTICLE: "conditionals" "Conditionals and logic"
 "The basic conditionals:"
@@ -250,8 +248,9 @@ $nl
 { $subsection eq? }
 "Value comparison:"
 { $subsection = }
-"Generic words for custom value comparison methods:"
+"Custom value comparison methods:"
 { $subsection equal? }
+{ $subsection identity-tuple }
 "Some types of objects also have an intrinsic order allowing sorting using " { $link natural-sort } ":"
 { $subsection <=> }
 { $subsection compare }
@@ -275,9 +274,11 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "apply-combinators" }
 { $subsection "slip-keep-combinators" }
 { $subsection "conditionals" }
+{ $subsection "compositional-combinators" }
 { $subsection "combinators" }
 "Advanced topics:"
 { $subsection "implementing-combinators" }
+{ $subsection "errors" }
 { $subsection "continuations" } ;
 
 ABOUT: "dataflow"
@@ -340,6 +341,9 @@ HELP: set-callstack ( cs -- )
 HELP: clear
 { $description "Clears the data stack." } ;
 
+HELP: build
+{ $description "The current build number. Factor increments this number whenever a new boot image is created." } ;
+
 HELP: hashcode*
 { $values { "depth" integer } { "obj" object } { "code" fixnum } }
 { $contract "Outputs the hashcode of an object. The hashcode operation must satisfy the following properties:"
@@ -377,10 +381,13 @@ HELP: equal?
     }
     $nl
     "If a class defines a custom equality comparison test, it should also define a compatible method for the " { $link hashcode* } " generic word."
-}
+} ;
+
+HELP: identity-tuple
+{ $class-description "A class defining an " { $link equal? } " method which always returns f." }
 { $examples
-    "To define a tuple class such that two instances are only equal if they are both the same instance, we can add a method to " { $link equal? } " which always returns " { $link f } ". Since " { $link = } " handles the case where the two objects are " { $link eq? } ", this method will never be called with two " { $link eq? } " objects, so such a definition is valid:"
-    { $code "TUPLE: foo ;" "M: foo equal? 2drop f ;" }
+    "To define a tuple class such that two instances are only equal if they are both the same instance, inherit from the " { $link identity-tuple } " class. This class defines a method on " { $link equal? } " which always returns " { $link f } ". Since " { $link = } " handles the case where the two objects are " { $link eq? } ", this method will never be called with two " { $link eq? } " objects, so such a definition is valid:"
+    { $code "TUPLE: foo < identity-tuple ;" }
     "By calling " { $link = } " on instances of " { $snippet "foo" } " we get the results we expect:"
     { $unchecked-example "T{ foo } dup = ." "t" }
     { $unchecked-example "T{ foo } dup clone = ." "f" }
@@ -389,7 +396,7 @@ HELP: equal?
 HELP: <=>
 { $values { "obj1" object } { "obj2" object } { "n" real } }
 { $contract
-    "Compares two objects using an intrinsic partial order, for example, the natural order for real numbers and lexicographic order for strings."
+    "Compares two objects using an intrinsic total order, for example, the natural order for real numbers and lexicographic order for strings."
     $nl
     "The output value is one of the following:"
     { $list
@@ -412,12 +419,6 @@ HELP: compare
 HELP: clone
 { $values { "obj" object } { "cloned" "a new object" } }
 { $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." } ;
-
-HELP: type ( object -- n )
-{ $values { "object" object } { "n" "a type number" } }
-{ $description "Outputs an object's type number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
-
-{ type tag type>class } related-words
 
 HELP: ? ( ? true false -- true/false )
 { $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" "one two input objects" } }
@@ -671,6 +672,11 @@ HELP: bi@
         "[ p ] bi@"
         ">r p r> p"
     }
+    "The following two lines are also equivalent:"
+    { $code
+        "[ p ] bi@"
+        "[ p ] [ p ] bi*"
+    }
 } ;
 
 HELP: 2bi@
@@ -682,6 +688,11 @@ HELP: 2bi@
         "[ p ] 2bi@"
         ">r >r p r> r> p"
     }
+    "The following two lines are also equivalent:"
+    { $code
+        "[ p ] 2bi@"
+        "[ p ] [ p ] 2bi*"
+    }
 } ;
 
 HELP: tri@
@@ -692,6 +703,11 @@ HELP: tri@
     { $code
         "[ p ] tri@"
         ">r >r p r> p r> p"
+    }
+    "The following two lines are also equivalent:"
+    { $code
+        "[ p ] tri@"
+        "[ p ] [ p ] [ p ] tri*"
     }
 } ;
 
@@ -791,19 +807,6 @@ HELP: null
     "The canonical empty class with no instances."
 } ;
 
-HELP: general-t
-{ $class-description
-    "The class of all objects not equal to " { $link f } "."
-}
-{ $examples
-    "Here is an implementation of " { $link if } " using generic words:"
-    { $code
-        "GENERIC# my-if 2 ( ? true false -- )"
-        "M: f my-if 2nip call ;"
-        "M: general-t my-if drop nip call ;"
-    }
-} ;
-
 HELP: most
 { $values { "x" object } { "y" object } { "quot" "a quotation with stack effect " { $snippet "( x y -- ? )" } } { "z" "either " { $snippet "x" } " or " { $snippet "y" } } }
 { $description "If the quotation yields a true value when applied to " { $snippet "x" } " and " { $snippet "y" } ", outputs " { $snippet "x" } ", otherwise outputs " { $snippet "y" } "." } ;
@@ -846,11 +849,15 @@ HELP: with
     { $example "USING: kernel math prettyprint sequences ;" "2 { 1 2 3 } [ - ] with map ." "{ 1 0 -1 }" }
 } ;
 
-HELP: compose
-{ $values { "quot1" callable } { "quot2" callable } { "curry" curry } }
+HELP: compose ( quot1 quot2 -- compose )
+{ $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } " followed by " { $snippet "quot2" } "." }
 { $notes
-    "The following two lines are equivalent:"
+    "The two quotations must leave the retain stack in the same state on exit as it was on entry, so the following code is not allowed:"
+    { $code
+        "[ 3 >r ] [ r> . ] compose"
+    }
+    "Except for this restriction, the following two lines are equivalent:"
     { $code
         "compose call"
         "append call"
@@ -862,7 +869,15 @@ HELP: 3compose
 { $values { "quot1" callable } { "quot2" callable } { "quot3" callable } { "curry" curry } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } ", " { $snippet "quot2" } " and then " { $snippet "quot3" } "." }
 { $notes
-    "The following two lines are equivalent:"
+    "The three quotations must leave the retain stack in the same state on exit as it was on entry, so for example, the following code is not allowed:"
+    { $code
+        "[ >r ] swap [ r> ] 3compose"
+    }
+    "The correct way to achieve the effect of the above is the following:"
+    { $code
+        "[ dip ] curry"
+    }
+    "Excepting the retain stack restriction, the following two lines are equivalent:"
     { $code
         "3compose call"
         "3append call"

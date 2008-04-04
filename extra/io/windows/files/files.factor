@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types io.backend io.files io.windows kernel math
 windows windows.kernel32 windows.time calendar combinators
-math.functions sequences namespaces words symbols
-combinators.lib io.nonblocking destructors ;
+math.functions sequences namespaces words symbols system
+combinators.lib io.nonblocking destructors math.bitfields.lib ;
 IN: io.windows.files
 
 SYMBOLS: +read-only+ +hidden+ +system+
@@ -88,10 +88,10 @@ SYMBOLS: +read-only+ +hidden+ +system+
         get-file-information BY_HANDLE_FILE_INFORMATION>file-info
     ] if ;
 
-M: windows-nt-io file-info ( path -- info )
+M: winnt file-info ( path -- info )
     normalize-path get-file-information-stat ;
 
-M: windows-nt-io link-info ( path -- info )
+M: winnt link-info ( path -- info )
     file-info ;
 
 : file-times ( path -- timestamp timestamp timestamp )
@@ -125,7 +125,7 @@ M: windows-nt-io link-info ( path -- info )
 : set-file-write-time ( path timestamp -- )
     >r f f r> set-file-times ;
 
-M: windows-nt-io touch-file ( path -- )
+M: winnt touch-file ( path -- )
     [
         normalize-path
         maybe-create-file over close-always

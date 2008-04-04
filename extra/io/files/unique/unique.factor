@@ -42,6 +42,6 @@ PRIVATE>
     [ with-directory ] curry keep delete-tree ; inline
 
 {
-    { [ unix? ] [ "io.unix.files.unique" ] }
-    { [ windows? ] [ "io.windows.files.unique" ] }
+    { [ os unix? ] [ "io.unix.files.unique" ] }
+    { [ os windows? ] [ "io.windows.files.unique" ] }
 } cond require
