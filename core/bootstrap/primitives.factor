@@ -5,7 +5,8 @@ hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes
 classes.tuple classes.tuple.private kernel.private vocabs
 vocabs.loader source-files definitions slots.deprecated
-classes.union compiler.units bootstrap.image.private io.files ;
+classes.union compiler.units bootstrap.image.private io.files
+accessors combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -30,6 +31,7 @@ crossref off
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
 H{ } clone changed-words set
+H{ } clone forgotten-definitions set
 H{ } clone root-cache set
 H{ } clone source-files set
 H{ } clone update-map set
@@ -100,42 +102,81 @@ num-types get f <array> builtins set
 } [ create-vocab drop ] each
 
 ! Builtin classes
-: builtin-predicate-quot ( class -- quot )
+: lo-tag-eq-quot ( n -- quot )
+    [ \ tag , , \ eq? , ] [ ] make ;
+
+: hi-tag-eq-quot ( n -- quot )
     [
-        "type" word-prop dup
-        \ tag-mask get < \ tag \ type ? , , \ eq? ,
+        [ dup tag ] % \ hi-tag tag-number , \ eq? ,
+        [ [ hi-tag ] % , \ eq? , ] [ ] make ,
+        [ drop f ] ,
+        \ if ,
     ] [ ] make ;
 
+: builtin-predicate-quot ( class -- quot )
+    "type" word-prop
+    dup tag-mask get <
+    [ lo-tag-eq-quot ] [ hi-tag-eq-quot ] if ;
+
 : define-builtin-predicate ( class -- )
-    dup
-    dup builtin-predicate-quot define-predicate
-    predicate-word make-inline ;
+    dup builtin-predicate-quot define-predicate ;
 
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
 
 : register-builtin ( class -- )
-    dup
-    dup lookup-type-number "type" set-word-prop
-    dup "type" word-prop builtins get set-nth ;
+    [ dup lookup-type-number "type" set-word-prop ]
+    [ dup "type" word-prop builtins get set-nth ]
+    [ f f builtin-class define-class ]
+    tri ;
 
 : define-builtin-slots ( symbol slotspec -- )
-    dupd 1 simple-slots
-    2dup "slots" set-word-prop
-    define-slots ;
+    [ drop ] [ 1 simple-slots ] 2bi
+    [ "slots" set-word-prop ] [ define-slots ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
-    >r
-    dup register-builtin
-    dup f f builtin-class define-class
-    dup define-builtin-predicate
+    >r [ define-builtin-predicate ] keep
     r> define-builtin-slots ;
 
-! Forward definitions
-"object" "kernel" create t "class" set-word-prop
-"object" "kernel" create union-class "metaclass" set-word-prop
+"fixnum" "math" create register-builtin
+"bignum" "math" create register-builtin
+"tuple" "kernel" create register-builtin
+"ratio" "math" create register-builtin
+"float" "math" create register-builtin
+"complex" "math" create register-builtin
+"f" "syntax" lookup register-builtin
+"array" "arrays" create register-builtin
+"wrapper" "kernel" create register-builtin
+"float-array" "float-arrays" create register-builtin
+"callstack" "kernel" create register-builtin
+"string" "strings" create register-builtin
+"bit-array" "bit-arrays" create register-builtin
+"quotation" "quotations" create register-builtin
+"dll" "alien" create register-builtin
+"alien" "alien" create register-builtin
+"word" "words" create register-builtin
+"byte-array" "byte-arrays" create register-builtin
+"tuple-layout" "classes.tuple.private" create register-builtin
 
-"null" "kernel" create drop
+! Catch-all class for providing a default method.
+"object" "kernel" create
+[ f builtins get [ ] subset union-class define-class ]
+[ [ drop t ] "predicate" set-word-prop ]
+bi
+
+"object?" "kernel" vocab-words delete-at
+
+! Class of objects with object tag
+"hi-tag" "kernel.private" create
+builtins get num-tags get tail define-union-class
+
+! Empty class with no instances
+"null" "kernel" create
+[ f { } union-class define-class ]
+[ [ drop f ] "predicate" set-word-prop ]
+bi
+
+"null?" "kernel" vocab-words delete-at
 
 "fixnum" "math" create { } define-builtin
 "fixnum" "math" create ">fixnum" "math" create 1quotation "coercer" set-word-prop
@@ -324,44 +365,28 @@ define-builtin
     }
 } define-builtin
 
-"tuple" "kernel" create { } define-builtin
-
-"tuple" "kernel" lookup
-{
-    {
-        { "object" "kernel" }
-        "delegate"
-        { "delegate" "kernel" }
-        { "set-delegate" "kernel" }
-    }
-}
-define-tuple-slots
-
-"tuple" "kernel" lookup define-tuple-layout
-
-! Define general-t type, which is any object that is not f.
-"general-t" "kernel" create
-f "f" "syntax" lookup builtins get remove [ ] subset union-class
-define-class
+"tuple" "kernel" create {
+    [ { } define-builtin ]
+    [ { "delegate" } "slot-names" set-word-prop ]
+    [ define-tuple-layout ]
+    [
+        {
+            {
+                { "object" "kernel" }
+                "delegate"
+                { "delegate" "kernel" }
+                { "set-delegate" "kernel" }
+            }
+        }
+        [ drop ] [ generate-tuple-slots ] 2bi
+        [ "slots" set-word-prop ]
+        [ define-slots ]
+        2bi
+    ]
+} cleave
 
 "f" "syntax" create [ not ] "predicate" set-word-prop
-"f?" "syntax" create "syntax" vocab-words delete-at
-
-"general-t" "kernel" create [ ] "predicate" set-word-prop
-"general-t?" "kernel" create "syntax" vocab-words delete-at
-
-! Catch-all class for providing a default method.
-"object" "kernel" create [ drop t ] "predicate" set-word-prop
-"object" "kernel" create
-f builtins get [ ] subset union-class define-class
-
-! Class of objects with object tag
-"hi-tag" "classes.private" create
-f builtins get num-tags get tail union-class define-class
-
-! Null class with no instances.
-"null" "kernel" create [ drop f ] "predicate" set-word-prop
-"null" "kernel" create f { } union-class define-class
+"f?" "syntax" vocab-words delete-at
 
 ! Create special tombstone values
 "tombstone" "hashtables.private" create
@@ -495,8 +520,9 @@ f builtins get num-tags get tail union-class define-class
 } define-tuple-class
 
 "curry" "kernel" lookup
-dup f "inline" set-word-prop
-dup tuple-layout [ <tuple-boa> ] curry define
+[ f "inline" set-word-prop ]
+[ ]
+[ tuple-layout [ <tuple-boa> ] curry ] tri define
 
 "compose" "kernel" create
 "tuple" "kernel" lookup
@@ -515,8 +541,9 @@ dup tuple-layout [ <tuple-boa> ] curry define
 } define-tuple-class
 
 "compose" "kernel" lookup
-dup f "inline" set-word-prop
-dup tuple-layout [ <tuple-boa> ] curry define
+[ f "inline" set-word-prop ]
+[ ]
+[ tuple-layout [ <tuple-boa> ] curry ] tri define
 
 ! Primitive words
 : make-primitive ( word vocab n -- )
@@ -629,7 +656,6 @@ dup tuple-layout [ <tuple-boa> ] curry define
     { "code-room" "memory" }
     { "os-env" "system" }
     { "millis" "system" }
-    { "type" "kernel.private" }
     { "tag" "kernel.private" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
@@ -701,7 +727,6 @@ dup tuple-layout [ <tuple-boa> ] curry define
     { "(sleep)" "threads.private" }
     { "<float-array>" "float-arrays" }
     { "<tuple-boa>" "classes.tuple.private" }
-    { "class-hash" "kernel.private" }
     { "callstack>array" "kernel" }
     { "innermost-frame-quot" "kernel.private" }
     { "innermost-frame-scan" "kernel.private" }

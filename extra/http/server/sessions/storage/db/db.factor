@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors http.server.sessions.storage
-alarms kernel http.server db.tuples db.types singleton
-math.parser ;
+alarms kernel http.server db.tuples db.types math.parser
+classes.singleton ;
 IN: http.server.sessions.storage.db
 
 SINGLETON: sessions-in-db

@@ -3,7 +3,7 @@
 USING: kernel sequences strings namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
-       words quotations effects memoize accessors locals ;
+       words quotations effects memoize accessors locals effects ;
 IN: peg
 
 USE: prettyprint
@@ -29,6 +29,14 @@ SYMBOL: input
 SYMBOL: fail
 SYMBOL: lrstack
 SYMBOL: heads
+
+: delegates ( -- cache )
+  \ delegates get-global [ H{ } clone dup \ delegates set-global ] unless* ;
+
+: reset-pegs ( -- )
+  H{ } clone \ delegates set-global ;
+
+reset-pegs 
 
 TUPLE: memo-entry ans pos ;
 C: <memo-entry> memo-entry
@@ -104,7 +112,7 @@ C: <head> peg-head
 :: (setup-lr) ( r l s -- )
   s head>> l head>> eq? [
     l head>> s (>>head)
-    l head>> [ s rule>> add ] change-involved-set drop
+    l head>> [ s rule>> suffix ] change-involved-set drop
     r l s next>> (setup-lr)
   ] unless ;
 
@@ -136,7 +144,7 @@ C: <head> peg-head
           h [ p heads get at ]
         |
     h [
-      m r h involved-set>> h rule>> add member? not and [
+      m r h involved-set>> h rule>> suffix member? not and [
         fail p <memo-entry>
       ] [
         r h eval-set>> member? [
@@ -208,7 +216,7 @@ GENERIC: (compile) ( parser -- quot )
 :: parser-body ( parser -- quot )
   #! Return the body of the word that is the compiled version
   #! of the parser.
-  [let* | rule [ parser (compile) define-temp dup parser "peg" set-word-prop ] 
+  [let* | rule [ gensym dup parser (compile) 0 1 <effect> define-declared dup parser "peg" set-word-prop ] 
         |
     [
       rule pos get apply-rule dup fail = [ 
@@ -218,7 +226,7 @@ GENERIC: (compile) ( parser -- quot )
       ] if
     ] 
   ] ;
- 
+
 : compiled-parser ( parser -- word )
   #! Look to see if the given parser has been compiled.
   #! If not, compile it to a temporary word, cache it,
@@ -229,7 +237,7 @@ GENERIC: (compile) ( parser -- quot )
   dup compiled>> [
     nip
   ] [
-    gensym tuck >>compiled 2dup parser-body define dupd "peg" set-word-prop
+    gensym tuck >>compiled 2dup parser-body 0 1 <effect> define-declared dupd "peg" set-word-prop
   ] if* ;
 
 : compile ( parser -- word )
@@ -252,14 +260,6 @@ SYMBOL: id
   ] [
     1 id set-global 0
   ] if* ;
-
-: delegates ( -- cache )
-  \ delegates get-global [ H{ } clone dup \ delegates set-global ] unless* ;
-
-: reset-delegates ( -- )
-  H{ } clone \ delegates set-global ;
-
-reset-delegates 
 
 : init-parser ( parser -- parser )
   #! Set the delegate for the parser. Equivalent parsers
@@ -414,6 +414,23 @@ TUPLE: optional-parser p1 ;
 M: optional-parser (compile) ( parser -- quot )
   p1>> compiled-parser \ ?quot optional-pattern match-replace ;
 
+TUPLE: semantic-parser p1 quot ;
+
+MATCH-VARS: ?parser ;
+
+: semantic-pattern ( -- quot )
+  [
+    ?parser [
+      dup parse-result-ast ?quot call [ drop f ] unless
+    ] [
+      f
+    ] if*
+  ] ;
+
+M: semantic-parser (compile) ( parser -- quot )
+  [ p1>> compiled-parser ] [ quot>> ] bi  
+  2array { ?parser ?quot } semantic-pattern match-replace ;
+
 TUPLE: ensure-parser p1 ;
 
 : ensure-pattern ( -- quot )
@@ -490,8 +507,11 @@ M: box-parser (compile) ( parser -- quot )
   #! Calls the quotation at compile time
   #! to produce the parser to be compiled.
   #! This differs from 'delay' which calls
-  #! it at run time.
-  quot>> call compiled-parser 1quotation ;
+  #! it at run time. Due to using the runtime
+  #! environment at compile time, this parser
+  #! must not be cached, so we clear out the
+  #! delgates cache.
+  f >>compiled quot>> call compiled-parser 1quotation ;
 
 PRIVATE>
 
@@ -543,6 +563,9 @@ PRIVATE>
 : optional ( parser -- parser )
   optional-parser construct-boa init-parser ;
 
+: semantic ( parser quot -- parser )
+  semantic-parser construct-boa init-parser ;
+
 : ensure ( parser -- parser )
   ensure-parser construct-boa init-parser ;
 
@@ -562,7 +585,18 @@ PRIVATE>
   delay-parser construct-boa init-parser ;
 
 : box ( quot -- parser )
-  box-parser construct-boa init-parser ;
+  #! because a box has its quotation run at compile time
+  #! it must always have a new parser delgate created, 
+  #! not a cached one. This is because the same box,
+  #! compiled twice can have a different compiled word
+  #! due to running at compile time.
+  #! Why the [ ] action at the end? Box parsers don't get
+  #! memoized during parsing due to all box parsers being
+  #! unique. This breaks left recursion detection during the
+  #! parse. The action adds an indirection with a parser type
+  #! that gets memoized and fixes this. Need to rethink how
+  #! to fix boxes so this isn't needed...
+  box-parser construct-boa next-id f <parser> over set-delegate [ ] action ;
 
 : PEG:
   (:) [

@@ -18,7 +18,7 @@ IN: alien.compiler
 
 : alien-node-parameters* ( node -- seq )
     dup parameters>>
-    swap return>> large-struct? [ "void*" add* ] when ;
+    swap return>> large-struct? [ "void*" prefix ] when ;
 
 : alien-node-return* ( node -- ctype )
     return>> dup large-struct? [ drop "void" ] when ;

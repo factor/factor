@@ -37,7 +37,6 @@ $nl
 { $subsection create-method }
 "Method definitions can be looked up:"
 { $subsection method }
-{ $subsection methods }
 "A generic word contains methods; the list of methods specializing on a class can also be obtained:"
 { $subsection implementors }
 "Low-level word which rebuilds the generic word after methods are added or removed, or the method combination is changed:"
@@ -63,15 +62,6 @@ ARTICLE: "method-combination" "Custom method combination"
 "Developing a custom method combination requires that a parsing word calling " { $link define-generic } " be defined; additionally, it is a good idea to implement the definition protocol words " { $link definer } " and " { $link synopsis* } " on the class of words having this method combination, to properly support developer tools."
 $nl
 "The combination quotation passed to " { $link define-generic } " has stack effect " { $snippet "( word -- quot )" } ". It's job is to call various introspection words, including at least obtaining the set of methods defined on the generic word, then combining these methods in some way to produce a quotation."
-$nl
-"Method combination utilities:"
-{ $subsection single-combination }
-{ $subsection class-predicates }
-{ $subsection simplify-alist }
-{ $subsection math-upgrade }
-{ $subsection object-method }
-{ $subsection error-method }
-"More quotation construction utilities can be found in " { $link "quotations" } " and " { $link "combinators-quot" } "."
 { $see-also "generic-introspection" } ;
 
 ARTICLE: "generic" "Generic words and methods"
@@ -129,10 +119,6 @@ HELP: <method>
 { $values { "class" class } { "generic" generic } { "method" "a new method definition" } }
 { $description "Creates a new method." } ;
 
-HELP: methods
-{ $values { "word" generic } { "assoc" "an association list mapping classes to quotations" } }
-{ $description "Outputs a sequence of pairs, where the first element of each pair is a class and the second element is the corresponding method quotation. The methods are sorted by class order; see " { $link sort-classes } "." } ;
-
 HELP: order
 { $values { "generic" generic } { "seq" "a sequence of classes" } }
 { $description "Outputs a sequence of classes for which methods have been defined on this generic word. The sequence is sorted in method dispatch order." } ;
@@ -160,4 +146,4 @@ HELP: forget-methods
 { $values { "class" class } }
 { $description "Remove all method definitions which specialize on the class." } ;
 
-{ sort-classes methods order } related-words
+{ sort-classes order } related-words

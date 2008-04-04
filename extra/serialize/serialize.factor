@@ -90,13 +90,13 @@ M: float (serialize) ( obj -- )
 
 M: complex (serialize) ( obj -- )
     CHAR: c write1
-    dup real-part (serialize)
-    imaginary-part (serialize) ;
+    [ real-part (serialize) ]
+    [ imaginary-part (serialize) ] bi ;
 
 M: ratio (serialize) ( obj -- )
     CHAR: r write1
-    dup numerator (serialize)
-    denominator (serialize) ;
+    [ numerator (serialize) ]
+    [ denominator (serialize) ] bi ;
 
 : serialize-seq ( obj code -- )
     [
@@ -120,7 +120,8 @@ M: array (serialize) ( obj -- )
 
 M: quotation (serialize) ( obj -- )
     [
-        CHAR: q write1 [ >array (serialize) ] [ add-object ] bi
+        CHAR: q write1
+        [ >array (serialize) ] [ add-object ] bi
     ] serialize-shared ;
 
 M: hashtable (serialize) ( obj -- )
@@ -234,10 +235,12 @@ SYMBOL: deserialized
     ] if ;
 
 : deserialize-gensym ( -- word )
-    gensym
-    dup intern-object
-    dup (deserialize) define
-    dup (deserialize) swap set-word-props ;
+    gensym {
+        [ intern-object ]
+        [ (deserialize) define ]
+        [ (deserialize) swap set-word-props ]
+        [ ]
+    } cleave ;
 
 : deserialize-wrapper ( -- wrapper )
     (deserialize) <wrapper> ;

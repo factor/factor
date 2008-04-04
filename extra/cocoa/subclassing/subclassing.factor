@@ -76,7 +76,7 @@ IN: cocoa.subclassing
     r> <method-list> class_addMethods ;
 
 : encode-types ( return types -- encoding )
-    swap add* [
+    swap prefix [
         alien>objc-types get at "0" append
     ] map concat ;
 

@@ -7,6 +7,8 @@ IN: kernel
 ARTICLE: "shuffle-words" "Shuffle words"
 "Shuffle words rearrange items at the top of the data stack. They control the flow of data between words that perform actions."
 $nl
+"The " { $link "cleave-combinators" } " and " { $link "spread-combinators" } " are closely related to shuffle words and should be used instead where possible because they can result in clearer code; also, see the advice in " { $link "cookbook-philosophy" } "."
+$nl
 "Removing stack elements:"
 { $subsection drop }
 { $subsection 2drop }
@@ -39,9 +41,28 @@ $nl
 { $code
     ": foo ( m ? n -- m+n/n )"
     "    >r [ r> + ] [ drop r> ] if ; ! This is OK"
-}
-"An alternative to using " { $link >r } " and " { $link r> } " is the following:"
-{ $subsection dip } ;
+} ;
+
+ARTICLE: "cleave-shuffle-equivalence" "Expressing shuffle words with cleave combinators"
+"Cleave combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to cleave combinators are discussed in the documentation for " { $link bi } ", " { $link 2bi } ", " { $link 3bi } ", " { $link tri } ", " { $link 2tri } " and " { $link 3tri } "."
+$nl
+"Certain shuffle words can also be expressed in terms of the cleave combinators. Internalizing such identities can help with understanding and writing code using cleave combinators:"
+{ $code
+    ": keep  [ ] bi ;"
+    ": 2keep [ ] 2bi ;"
+    ": 3keep [ ] 3bi ;"
+    ""
+    ": dup   [ ] [ ] bi ;"
+    ": 2dup  [ ] [ ] 2bi ;"
+    ": 3dup  [ ] [ ] 3bi ;"
+    ""
+    ": tuck  [ nip ] [ ] 2bi ;"
+    ": swap  [ nip ] [ drop ] 2bi ;"
+    ""
+    ": over  [ ] [ drop ] 2bi ;"
+    ": pick  [ ] [ 2drop ] 3bi ;"
+    ": 2over [ ] [ drop ] 3bi ;"
+} ;
 
 ARTICLE: "cleave-combinators" "Cleave combinators"
 "The cleave combinators apply multiple quotations to a single value."
@@ -49,9 +70,11 @@ $nl
 "Two quotations:"
 { $subsection bi }
 { $subsection 2bi }
+{ $subsection 3bi }
 "Three quotations:"
 { $subsection tri }
 { $subsection 2tri }
+{ $subsection 3tri }
 "Technically, the cleave combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on the top of the stack can be written in one of two ways:"
 { $code
     "! First alternative; uses keep"
@@ -66,13 +89,38 @@ $nl
 "The latter is more aesthetically pleasing than the former."
 $nl
 "A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
+{ $subsection "cleave-shuffle-equivalence" } ;
+
+ARTICLE: "spread-shuffle-equivalence" "Expressing shuffle words with spread combinators"
+"Spread combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to spread combinators are discussed in the documentation for " { $link bi* } ", " { $link 2bi* } ", and " { $link tri* } "."
 $nl
-"From the Merriam-Webster Dictionary: "
-$nl
-{ $strong "cleave" }
-{ $list
-  { $emphasis "To divide by or as if by a cutting blow" }
-  { $emphasis "To separate into distinct parts and especially into groups having divergent views" }
+"Certain shuffle words can also be expressed in terms of the spread combinators. Internalizing such identities can help with understanding and writing code using spread combinators:"
+{ $code
+    ": dip   [ ] bi* ;"
+    ""
+    ": slip  [ call ] [ ] bi* ;"
+    ": 2slip [ call ] [ ] [ ] tri* ;"
+    ""
+    ": nip   [ drop ] [ ] bi* ;"
+    ": 2nip  [ drop ] [ drop ] [ ] tri* ;"
+    ""
+    ": rot"
+    "    [ [ drop ] [      ] [ drop ] tri* ]"
+    "    [ [ drop ] [ drop ] [      ] tri* ]"
+    "    [ [      ] [ drop ] [ drop ] tri* ]"
+    "    3tri ;"
+    ""
+    ": -rot"
+    "    [ [ drop ] [ drop ] [      ] tri* ]"
+    "    [ [      ] [ drop ] [ drop ] tri* ]"
+    "    [ [ drop ] [      ] [ drop ] tri* ]"
+    "    3tri ;"
+    ""
+    ": spin"
+    "    [ [ drop ] [ drop ] [      ] tri* ]"
+    "    [ [ drop ] [      ] [ drop ] tri* ]"
+    "    [ [      ] [ drop ] [ drop ] tri* ]"
+    "    3tri ;"
 } ;
 
 ARTICLE: "spread-combinators" "Spread combinators"
@@ -96,7 +144,8 @@ $nl
 }
 
 $nl
-"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "." ;
+"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
+{ $subsection "spread-shuffle-equivalence" } ;
 
 ARTICLE: "apply-combinators" "Apply combinators"
 "The apply combinators apply multiple quotations to multiple values. The " { $snippet "@" } " suffix signifies application."
@@ -201,8 +250,9 @@ $nl
 { $subsection eq? }
 "Value comparison:"
 { $subsection = }
-"Generic words for custom value comparison methods:"
+"Custom value comparison methods:"
 { $subsection equal? }
+{ $subsection identity-tuple }
 "Some types of objects also have an intrinsic order allowing sorting using " { $link natural-sort } ":"
 { $subsection <=> }
 { $subsection compare }
@@ -328,10 +378,13 @@ HELP: equal?
     }
     $nl
     "If a class defines a custom equality comparison test, it should also define a compatible method for the " { $link hashcode* } " generic word."
-}
+} ;
+
+HELP: identity-tuple
+{ $class-description "A class defining an " { $link equal? } " method which always returns f." }
 { $examples
-    "To define a tuple class such that two instances are only equal if they are both the same instance, we can add a method to " { $link equal? } " which always returns " { $link f } ". Since " { $link = } " handles the case where the two objects are " { $link eq? } ", this method will never be called with two " { $link eq? } " objects, so such a definition is valid:"
-    { $code "TUPLE: foo ;" "M: foo equal? 2drop f ;" }
+    "To define a tuple class such that two instances are only equal if they are both the same instance, inherit from the " { $link identity-tuple } " class. This class defines a method on " { $link equal? } " which always returns " { $link f } ". Since " { $link = } " handles the case where the two objects are " { $link eq? } ", this method will never be called with two " { $link eq? } " objects, so such a definition is valid:"
+    { $code "TUPLE: foo < identity-tuple ;" }
     "By calling " { $link = } " on instances of " { $snippet "foo" } " we get the results we expect:"
     { $unchecked-example "T{ foo } dup = ." "t" }
     { $unchecked-example "T{ foo } dup clone = ." "f" }
@@ -363,12 +416,6 @@ HELP: compare
 HELP: clone
 { $values { "obj" object } { "cloned" "a new object" } }
 { $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." } ;
-
-HELP: type ( object -- n )
-{ $values { "object" object } { "n" "a type number" } }
-{ $description "Outputs an object's type number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
-
-{ type tag type>class } related-words
 
 HELP: ? ( ? true false -- true/false )
 { $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" "one two input objects" } }
@@ -496,12 +543,33 @@ HELP: 2bi
     "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y -- z )" } ", then the following two lines are equivalent:"
     { $code
         "[ p ] [ q ] 2bi"
-        "2dup p swap q"
+        "2dup p -rot q"
     }
     "In general, the following two lines are equivalent:"
     { $code
         "[ p ] [ q ] 2bi"
         "[ p ] 2keep q"
+    }
+} ;
+
+HELP: 3bi
+{ $values { "x" object } { "y" object } { "z" object } { "p" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to the two input values, then applies " { $snippet "q" } " to the two input values." }
+{ $examples
+    "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y z -- )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] 3bi"
+        "3dup p q"
+    }
+    "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y z -- w )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] 3bi"
+        "3dup p -roll q"
+    }
+    "In general, the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] 3bi"
+        "[ p ] 3keep q"
     }
 } ;
 
@@ -539,6 +607,22 @@ HELP: 2tri
     { $code
         "[ p ] [ q ] [ r ] 2tri"
         "[ p ] 2keep [ q ] 2keep r"
+    }
+} ;
+
+HELP: 3tri
+{ $values { "x" object } { "y" object } { "z" object } { "p" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } { "r" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to the three input values, then applies " { $snippet "q" } " to the three input values, and finally applies " { $snippet "r" } " to the three input values." }
+{ $examples
+    "If " { $snippet "[ p ]" } ", " { $snippet "[ q ]" } " and " { $snippet "[ r ]" } " have stack effect " { $snippet "( x y z -- )" } ", then the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] [ r ] 3tri"
+        "3dup p 3dup q r"
+    }
+    "In general, the following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] [ r ] 3tri"
+        "[ p ] 3keep [ q ] 3keep r"
     }
 } ;
 
@@ -585,6 +669,11 @@ HELP: bi@
         "[ p ] bi@"
         ">r p r> p"
     }
+    "The following two lines are also equivalent:"
+    { $code
+        "[ p ] bi@"
+        "[ p ] [ p ] bi*"
+    }
 } ;
 
 HELP: 2bi@
@@ -596,6 +685,11 @@ HELP: 2bi@
         "[ p ] 2bi@"
         ">r >r p r> r> p"
     }
+    "The following two lines are also equivalent:"
+    { $code
+        "[ p ] 2bi@"
+        "[ p ] [ p ] 2bi*"
+    }
 } ;
 
 HELP: tri@
@@ -606,6 +700,11 @@ HELP: tri@
     { $code
         "[ p ] tri@"
         ">r >r p r> p r> p"
+    }
+    "The following two lines are also equivalent:"
+    { $code
+        "[ p ] tri@"
+        "[ p ] [ p ] [ p ] tri*"
     }
 } ;
 
@@ -703,19 +802,6 @@ HELP: object
 HELP: null
 { $class-description
     "The canonical empty class with no instances."
-} ;
-
-HELP: general-t
-{ $class-description
-    "The class of all objects not equal to " { $link f } "."
-}
-{ $examples
-    "Here is an implementation of " { $link if } " using generic words:"
-    { $code
-        "GENERIC# my-if 2 ( ? true false -- )"
-        "M: f my-if 2nip call ;"
-        "M: general-t my-if drop nip call ;"
-    }
 } ;
 
 HELP: most

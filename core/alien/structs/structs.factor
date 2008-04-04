@@ -16,7 +16,7 @@ IN: alien.structs
     ] reduce ;
 
 : define-struct-slot-word ( spec word quot -- )
-    rot slot-spec-offset add* define-inline ;
+    rot slot-spec-offset prefix define-inline ;
 
 : define-getter ( type spec -- )
     [ set-reader-props ] keep

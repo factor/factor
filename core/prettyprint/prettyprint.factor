@@ -7,7 +7,7 @@ vectors words prettyprint.backend prettyprint.sections
 prettyprint.config sorting splitting math.parser vocabs
 definitions effects classes.tuple io.files classes continuations
 hashtables classes.mixin classes.union classes.predicate
-combinators quotations ;
+classes.singleton combinators quotations ;
 
 : make-pprint ( obj quot -- block in use )
     [
@@ -253,6 +253,9 @@ M: predicate-class see-class*
     <block
     "predicate-definition" word-prop pprint-elements
     pprint-; block> block> ;
+
+M: singleton-class see-class* ( class -- )
+    \ SINGLETON: pprint-word pprint-word ;
 
 M: tuple-class see-class*
     <colon \ TUPLE: pprint-word

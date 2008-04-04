@@ -132,7 +132,7 @@ TUPLE: and-parser parsers ;
 
 : <&> ( parser1 parser2 -- parser )
     over and-parser? [
-        >r and-parser-parsers r> add
+        >r and-parser-parsers r> suffix
     ] [
         2array
     ] if and-parser construct-boa ;
@@ -239,11 +239,11 @@ M: some-parser parse ( input parser -- result )
 
 : <:&> ( parser1 parser2 -- result )
     #! Same as <&> except flatten the result.
-    <&> [ first2 add ] <@ ;
+    <&> [ first2 suffix ] <@ ;
 
 : <&:> ( parser1 parser2 -- result )
     #! Same as <&> except flatten the result.
-    <&> [ first2 swap add* ] <@ ;
+    <&> [ first2 swap prefix ] <@ ;
 
 : <:&:> ( parser1 parser2 -- result )
     #! Same as <&> except flatten the result.

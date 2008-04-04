@@ -72,7 +72,7 @@ PRIVATE>
 
 : max-path ( triangle -- n )
     dup length 1 > [
-        2 cut* first2 max-children [ + ] 2map add max-path
+        2 cut* first2 max-children [ + ] 2map suffix max-path
     ] [
         first first
     ] if ;
@@ -95,7 +95,7 @@ PRIVATE>
 ! Not strictly needed, but it is nice to be able to dump the triangle after the
 ! propagation
 : propagate-all ( triangle -- newtriangle )
-    reverse [ first dup ] keep 1 tail [ propagate dup ] map nip reverse swap add ;
+    reverse [ first dup ] keep 1 tail [ propagate dup ] map nip reverse swap suffix ;
 
 : sum-divisors ( n -- sum )
     dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;

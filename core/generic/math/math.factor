@@ -12,9 +12,9 @@ PREDICATE: math-class < class
         number bootstrap-word class<
     ] if ;
 
-: last/first ( seq -- pair ) dup peek swap first 2array ;
+: last/first ( seq -- pair ) [ peek ] [ first ] bi 2array ;
 
-: math-precedence ( class -- n )
+: math-precedence ( class -- pair )
     {
         { [ dup null class< ] [ drop { -1 -1 } ] }
         { [ dup math-class? ] [ class-types last/first ] }
@@ -71,13 +71,15 @@ M: math-combination make-default-method
 
 M: math-combination perform-combination
     drop
+    dup
     \ over [
         dup math-class? [
             \ dup [ >r 2dup r> math-method ] math-vtable
         ] [
             over object-method
         ] if nip
-    ] math-vtable nip ;
+    ] math-vtable nip
+    define ;
 
 PREDICATE: math-generic < generic ( word -- ? )
     "combination" word-prop math-combination? ;

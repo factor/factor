@@ -21,7 +21,7 @@ GENERIC: mynot ( x -- y )
 
 M: f mynot drop t ;
 
-M: general-t mynot drop f ;
+M: object mynot drop f ;
 
 GENERIC: detect-f ( x -- y )
 
@@ -120,7 +120,7 @@ M: object xyz ;
     [
         [ no-cond ] 1
         [ 1array dup quotation? [ >quotation ] unless ] times
-    ] \ type inlined?
+    ] \ quotation? inlined?
 ] unit-test
 
 [ f ] [ [ <reversed> length ] \ slot inlined? ] unit-test
@@ -233,6 +233,20 @@ M: fixnum annotate-entry-test-1 drop ;
     \ >float inlined?
 ] unit-test
 
+GENERIC: detect-float ( a -- b )
+
+M: float detect-float ;
+
+[ t ] [
+    [ { real float } declare + detect-float ]
+    \ detect-float inlined?
+] unit-test
+
+[ t ] [
+    [ { float real } declare + detect-float ]
+    \ detect-float inlined?
+] unit-test
+
 [ t ] [
     [ 3 + = ] \ equal? inlined?
 ] unit-test
@@ -296,4 +310,16 @@ cell-bits 32 = [
 
 [ t ] [
     [ { vector } declare nth-unsafe ] \ nth-unsafe inlined?
+] unit-test
+
+[ t ] [
+    [
+        dup integer? [
+            dup fixnum? [
+                1 +
+            ] [
+                2 +
+            ] if
+        ] when
+    ] \ + inlined?
 ] unit-test

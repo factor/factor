@@ -28,11 +28,14 @@ ARTICLE: "pathnames" "Pathname manipulation"
 { $subsection <pathname> } ;
 
 ARTICLE: "directories" "Directories"
-"Current and home directories:"
+"Current directory:"
+{ $subsection with-directory }
+{ $subsection current-directory }
+"Home directory:"
+{ $subsection home }
+"Current system directory:"
 { $subsection cwd }
 { $subsection cd }
-{ $subsection with-directory }
-{ $subsection home }
 "Directory listing:"
 { $subsection directory }
 { $subsection directory* }
@@ -197,19 +200,20 @@ HELP: file-contents
 HELP: cwd
 { $values { "path" "a pathname string" } }
 { $description "Outputs the current working directory of the Factor process." }
-{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
+{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." }
+{ $warning "Modifying the current directory through system calls is unsafe.  Use the " { $link with-directory } " word instead." } ;
 
 HELP: cd
 { $values { "path" "a pathname string" } }
 { $description "Changes the current working directory of the Factor process." }
-{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
+{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." }
+{ $warning "Modifying the current directory through system calls is unsafe.  Use the " { $link with-directory } " word instead." } ;
 
-{ cd cwd with-directory } related-words
+{ cd cwd current-directory with-directory } related-words
 
 HELP: with-directory
 { $values { "path" "a pathname string" } { "quot" quotation } }
-{ $description "Changes the current working directory for the duration of a quotation's execution." }
-{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
+{ $description "Changes the " { $link current-directory } " variable for the duration of a quotation's execution.  Words that use the file-system should call " { $link normalize-path } " in order to obtain a path relative to the current directory." } ;
 
 HELP: append-path
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
@@ -252,7 +256,7 @@ HELP: normalize-directory
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
 { $description "Called by the " { $link directory } " word to prepare a pathname before passing it to the " { $link (directory) } " primitive." } ;
 
-HELP: normalize-pathname
+HELP: normalize-path
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
 { $description "Called by words such as " { $link <file-reader> } " and " { $link <file-writer> } " to prepare a pathname before passing it to underlying code." } ;
 

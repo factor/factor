@@ -28,7 +28,7 @@ TUPLE: CreateProcess-args
     "PROCESS_INFORMATION" <c-object> >>lpProcessInformation
     TRUE >>bInheritHandles
     0 >>dwCreateFlags
-    current-directory get normalize-pathname >>lpCurrentDirectory ;
+    current-directory get (normalize-path) >>lpCurrentDirectory ;
 
 : call-CreateProcess ( CreateProcess-args -- )
     {
@@ -82,7 +82,7 @@ TUPLE: CreateProcess-args
 : fill-dwCreateFlags ( process args -- process args )
     0
     pick pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
-    pick detached>> winnt? and [ DETACHED_PROCESS bitor ] when
+    pick detached>> os winnt? and [ DETACHED_PROCESS bitor ] when
     pick lookup-priority [ bitor ] when*
     >>dwCreateFlags ;
 
@@ -101,20 +101,20 @@ TUPLE: CreateProcess-args
 
 HOOK: fill-redirection io-backend ( process args -- )
 
-M: windows-ce-io fill-redirection 2drop ;
+M: wince fill-redirection 2drop ;
 
 : make-CreateProcess-args ( process -- args )
     default-CreateProcess-args
-    wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
+    os wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
     fill-dwCreateFlags
     fill-lpEnvironment
     fill-startup-info
     nip ;
 
-M: windows-io current-process-handle ( -- handle )
+M: windows current-process-handle ( -- handle )
     GetCurrentProcessId ;
 
-M: windows-io run-process* ( process -- handle )
+M: windows run-process* ( process -- handle )
     [
         dup make-CreateProcess-args
         tuck fill-redirection
@@ -122,7 +122,7 @@ M: windows-io run-process* ( process -- handle )
         lpProcessInformation>>
     ] with-destructors ;
 
-M: windows-io kill-process* ( handle -- )
+M: windows kill-process* ( handle -- )
     PROCESS_INFORMATION-hProcess
     255 TerminateProcess win32-error=0/f ;
 
@@ -161,7 +161,7 @@ SYMBOL: wait-flag
     <flag> wait-flag set-global
     [ wait-loop t ] "Process wait" spawn-server drop ;
 
-M: windows-io register-process
+M: windows register-process
     drop wait-flag get-global raise-flag ;
 
 [ start-wait-thread ] "io.windows.launcher" add-init-hook

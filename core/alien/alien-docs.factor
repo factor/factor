@@ -76,8 +76,8 @@ $nl
 { $examples "Here is a typical usage of " { $link add-library } ":"
 { $code
     "<< \"freetype\" {"
-    "    { [ macosx? ] [ \"libfreetype.6.dylib\" \"cdecl\" add-library ] }"
-    "    { [ windows? ] [ \"freetype6.dll\" \"cdecl\" add-library ] }"
+    "    { [ os macosx? ] [ \"libfreetype.6.dylib\" \"cdecl\" add-library ] }"
+    "    { [ os windows? ] [ \"freetype6.dll\" \"cdecl\" add-library ] }"
     "    { [ t ] [ drop ] }"
     "} cond >>"
 }

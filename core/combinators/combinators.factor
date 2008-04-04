@@ -9,18 +9,24 @@ hashtables sorting ;
     [ call ] with each ;
 
 : cleave>quot ( seq -- quot )
-    [ [ keep ] curry ] map concat [ drop ] append ;
+    [ [ keep ] curry ] map concat [ drop ] append [ ] like ;
 
 : 2cleave ( x seq -- )
-    [ [ call ] 3keep drop ] each 2drop ;
+    [ 2keep ] each 2drop ;
 
 : 2cleave>quot ( seq -- quot )
-    [ [ 2keep ] curry ] map concat [ 2drop ] append ;
+    [ [ 2keep ] curry ] map concat [ 2drop ] append [ ] like ;
+
+: 3cleave ( x seq -- )
+    [ 3keep ] each 3drop ;
+
+: 3cleave>quot ( seq -- quot )
+    [ [ 3keep ] curry ] map concat [ 3drop ] append [ ] like ;
 
 : spread>quot ( seq -- quot )
     [ length [ >r ] <repetition> concat ]
     [ [ [ r> ] prepend ] map concat ] bi
-    append ;
+    append [ ] like ;
 
 : spread ( objs... seq -- )
     spread>quot call ;
@@ -43,7 +49,7 @@ ERROR: no-case ;
 : with-datastack ( stack quot -- newstack )
     datastack >r
     >r >array set-datastack r> call
-    datastack r> swap add set-datastack 2nip ; inline
+    datastack r> swap suffix set-datastack 2nip ; inline
 
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ rot 1- -rot call ] if ; inline
@@ -66,7 +72,7 @@ M: hashtable hashcode*
     reverse [ no-cond ] swap alist>quot ;
 
 : linear-case-quot ( default assoc -- quot )
-    [ >r [ dupd = ] curry r> \ drop add* ] assoc-map
+    [ >r [ dupd = ] curry r> \ drop prefix ] assoc-map
     alist>quot ;
 
 : (distribute-buckets) ( buckets pair keys -- )

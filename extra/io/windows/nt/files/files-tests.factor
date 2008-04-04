@@ -1,9 +1,9 @@
 USING: io.files kernel tools.test io.backend
-io.windows.nt.files splitting ;
+io.windows.nt.files splitting sequences ;
 IN: io.windows.nt.files.tests
 
-[ t ] [ "\\foo" absolute-path? ] unit-test
-[ t ] [ "\\\\?\\foo" absolute-path? ] unit-test
+[ f ] [ "\\foo" absolute-path? ] unit-test
+[ t ] [ "\\\\?\\c:\\foo" absolute-path? ] unit-test
 [ t ] [ "c:\\foo" absolute-path? ] unit-test
 [ t ] [ "c:" absolute-path? ] unit-test
 
@@ -29,19 +29,22 @@ IN: io.windows.nt.files.tests
 
 [ ] [ "" resource-path cd ] unit-test
 
-[ "\\foo\\bar" ] [ "/foo/bar" normalize-pathname ":" split1 nip ] unit-test
+[ "\\foo\\bar" ] [ "/foo/bar" normalize-path ":" split1 nip ] unit-test
 
 [ "\\\\?\\C:\\builds\\factor\\log.txt" ] [
     "C:\\builds\\factor\\12345\\"
-    "..\\log.txt" append-path normalize-pathname
+    "..\\log.txt" append-path normalize-path
 ] unit-test
 
 [ "\\\\?\\C:\\builds\\" ] [
     "C:\\builds\\factor\\12345\\"
-    "..\\.." append-path normalize-pathname
+    "..\\.." append-path normalize-path
 ] unit-test
 
 [ "\\\\?\\C:\\builds\\" ] [
     "C:\\builds\\factor\\12345\\"
-    "..\\.." append-path normalize-pathname
+    "..\\.." append-path normalize-path
 ] unit-test
+
+[ "c:\\blah" ] [ "c:\\foo\\bar" "\\blah" append-path ] unit-test
+[ t ] [ "" resource-path 2 tail exists? ] unit-test

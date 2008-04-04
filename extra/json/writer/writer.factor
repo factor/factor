@@ -26,32 +26,27 @@ M: number json-print ( num -- )
 M: integer json-print ( num -- )  
   number>string write ;
 
-M: sequence json-print ( array -- string ) 
+M: sequence json-print ( array -- ) 
   CHAR: [ write1 [ >json ] map "," join write CHAR: ] write1 ;
-
-: (jsvar-encode) ( char -- char )
-  #! Convert the given character to a character usable in
-  #! javascript variable names.
-  dup H{ { CHAR: - CHAR: _ } } at dup [ nip ] [ drop ] if ;
 
 : jsvar-encode ( string -- string )
   #! Convert the string so that it contains characters usable within
   #! javascript variable names.
-  [ (jsvar-encode) ] map ;
+  { { CHAR: - CHAR: _ } } substitute ;
   
-: tuple>fields ( object -- string )
+: tuple>fields ( object -- seq )
   <mirror> [
     [ swap jsvar-encode >json % " : " % >json % ] "" make
   ] { } assoc>map ;
 
-M: tuple json-print ( tuple -- string )
+M: tuple json-print ( tuple -- )
   CHAR: { write1 tuple>fields "," join write CHAR: } write1 ;
 
-M: hashtable json-print ( hashtable -- string )
+M: hashtable json-print ( hashtable -- )
   CHAR: { write1 
   [ [ swap jsvar-encode >json % CHAR: : , >json % ] "" make ]
   { } assoc>map "," join write 
   CHAR: } write1 ;
 
-M: object json-print ( object -- string )
+M: object json-print ( object -- )
     unparse json-print ;

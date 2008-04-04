@@ -48,27 +48,6 @@ M: mirror assoc-size mirror-slots length ;
 
 INSTANCE: mirror assoc
 
-TUPLE: enum seq ;
-
-C: <enum> enum
-
-M: enum at*
-    enum-seq 2dup bounds-check?
-    [ nth t ] [ 2drop f f ] if ;
-
-M: enum set-at enum-seq set-nth ;
-
-M: enum delete-at enum-seq delete-nth ;
-
-M: enum >alist ( enum -- alist )
-    enum-seq dup length swap 2array flip ;
-
-M: enum assoc-size enum-seq length ;
-
-M: enum clear-assoc enum-seq delete-all ;
-
-INSTANCE: enum assoc
-
 : sort-assoc ( assoc -- alist )
     >alist
     [ dup first unparse-short swap ] { } map>assoc

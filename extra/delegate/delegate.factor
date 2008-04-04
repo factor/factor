@@ -28,7 +28,7 @@ M: tuple-class group-words
     swap [ slot-spec-writer ] map append ;
 
 : define-consult-method ( word class quot -- )
-    pick add >r swap create-method-in r> define ;
+    pick suffix >r swap create-method r> define ;
 
 : 3bi ( x y z p q -- p(x,y,z) q(x,y,z) )
     >r 3keep r> call ; inline

@@ -61,8 +61,8 @@ ARTICLE: "sequences-access" "Accessing sequence elements"
 
 ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 "Adding elements:"
-{ $subsection add }
-{ $subsection add* }
+{ $subsection prefix }
+{ $subsection suffix }
 "Removing elements:"
 { $subsection remove }
 { $subsection seq-diff } ;
@@ -641,22 +641,22 @@ HELP: push-new
 }
 { $side-effects "seq" } ;
 
-{ push push-new add add* } related-words
+{ push push-new prefix suffix } related-words
 
-HELP: add
+HELP: suffix
 { $values { "seq" sequence } { "elt" object } { "newseq" sequence } }
 { $description "Outputs a new sequence obtained by adding " { $snippet "elt" } " at the end of " { $snippet "seq" } "." }
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." }
 { $examples
-    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } 4 add ." "{ 1 2 3 4 }" }
+    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } 4 suffix ." "{ 1 2 3 4 }" }
 } ;
 
-HELP: add*
+HELP: prefix
 { $values { "seq" sequence } { "elt" object } { "newseq" sequence } }
 { $description "Outputs a new sequence obtained by adding " { $snippet "elt" } " at the beginning of " { $snippet "seq" } "." }
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." } 
 { $examples
-{ $example "USING: prettyprint sequences ;" "{ 1 2 3 } 0 add* ." "{ 0 1 2 3 }" }
+{ $example "USING: prettyprint sequences ;" "{ 1 2 3 } 0 prefix ." "{ 0 1 2 3 }" }
 } ;
 
 HELP: seq-diff
@@ -940,7 +940,7 @@ HELP: unclip
 { $values { "seq" sequence } { "rest" sequence } { "first" object } }
 { $description "Outputs a tail sequence and the first element of " { $snippet "seq" } "; the tail sequence consists of all elements of " { $snippet "seq" } " but the first." }
 { $examples
-    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } unclip add ." "{ 2 3 1 }" }
+    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } unclip suffix ." "{ 2 3 1 }" }
 } ;
 
 HELP: unclip-slice

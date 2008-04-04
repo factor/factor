@@ -2,11 +2,11 @@ USING: alien alien.c-types combinators io io.backend io.buffers
 io.nonblocking io.sockets io.sockets.impl io.windows kernel libc
 math namespaces prettyprint qualified sequences strings threads
 threads.private windows windows.kernel32 io.windows.ce.backend
-byte-arrays ;
+byte-arrays system ;
 QUALIFIED: windows.winsock
 IN: io.windows.ce
 
-M: windows-ce-io WSASocket-flags ( -- DWORD ) 0 ;
+M: wince WSASocket-flags ( -- DWORD ) 0 ;
 
 M: win32-socket wince-read ( port port-handle -- )
     win32-file-handle over buffer-end pick buffer-capacity 0
@@ -31,15 +31,15 @@ M: win32-socket wince-write ( port port-handle -- )
     windows.winsock:WSAConnect
     windows.winsock:winsock-error!=0/f ;
 
-M: windows-ce-io (client) ( addrspec -- reader writer )
+M: wince (client) ( addrspec -- reader writer )
     do-connect <win32-socket> dup <reader&writer> ;
 
-M: windows-ce-io (server) ( addrspec -- handle )
+M: wince (server) ( addrspec -- handle )
     windows.winsock:SOCK_STREAM server-fd
     dup listen-on-socket
     <win32-socket> ;
 
-M: windows-ce-io (accept) ( server -- client )
+M: wince (accept) ( server -- client )
     [
         dup check-server-port
         [
@@ -55,7 +55,7 @@ M: windows-ce-io (accept) ( server -- client )
         <win32-socket> <reader&writer>
     ] with-timeout ;
 
-M: windows-ce-io <datagram> ( addrspec -- datagram )
+M: wince <datagram> ( addrspec -- datagram )
     [
         windows.winsock:SOCK_DGRAM server-fd <win32-socket>
     ] keep <datagram-port> ;
@@ -81,7 +81,7 @@ M: windows-ce-io <datagram> ( addrspec -- datagram )
 
 packet-size <byte-array> receive-buffer set-global
 
-M: windows-ce-io receive ( datagram -- packet addrspec )
+M: wince receive ( datagram -- packet addrspec )
     dup check-datagram-port
     [
         port-handle win32-file-handle
@@ -104,7 +104,7 @@ M: windows-ce-io receive ( datagram -- packet addrspec )
     dup length receive-buffer rot pick memcpy
     receive-buffer make-WSABUF ;
 
-M: windows-ce-io send ( packet addrspec datagram -- )
+M: wince send ( packet addrspec datagram -- )
     3dup check-datagram-send
     port-handle win32-file-handle
     rot send-WSABUF

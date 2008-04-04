@@ -50,17 +50,13 @@ IN: tools.deploy.macosx
 : bundle-name ( -- string )
     deploy-name get ".app" append ;
 
-TUPLE: macosx-deploy-implementation ;
-
-T{ macosx-deploy-implementation } deploy-implementation set-global
-
 : show-in-finder ( path -- )
     NSWorkspace
     -> sharedWorkspace
     over <NSString> rot parent-directory <NSString>
     -> selectFile:inFileViewerRootedAtPath: drop ;
 
-M: macosx-deploy-implementation deploy* ( vocab -- )
+M: macosx deploy* ( vocab -- )
     ".app deploy tool" assert.app
     "resource:" [
         dup deploy-config [

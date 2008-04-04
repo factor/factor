@@ -152,6 +152,7 @@ ARTICLE: "collections" "Collections"
 "Implementations:"
 { $subsection "hashtables" }
 { $subsection "alists" }
+{ $subsection "enums" }
 { $heading "Other collections" }
 { $subsection "boxes" }
 { $subsection "dlists" }
@@ -206,6 +207,7 @@ ARTICLE: "tools" "Developer tools"
 { $subsection "tools.vocabs" }
 "Exploratory tools:"
 { $subsection "editor" }
+{ $subsection "listener" }
 { $subsection "tools.crossref" }
 { $subsection "inspector" }
 "Debugging tools:"
@@ -260,7 +262,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "collections" }
 { $subsection "io" }
 { $subsection "concurrency" }
-{ $subsection "os" }
+{ $subsection "system" }
 { $subsection "alien" }
 { $heading "Environment reference" }
 { $subsection "cli" }

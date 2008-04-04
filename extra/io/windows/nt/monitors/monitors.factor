@@ -5,7 +5,7 @@ io.windows.nt.backend kernel math windows windows.kernel32
 windows.types libc assocs alien namespaces continuations
 io.monitors io.monitors.private io.nonblocking io.buffers
 io.files io.timeouts io sequences hashtables sorting arrays
-combinators math.bitfields strings ;
+combinators math.bitfields strings system ;
 IN: io.windows.nt.monitors
 
 : open-directory ( path -- handle )
@@ -30,7 +30,7 @@ TUPLE: win32-monitor path recursive? ;
         set-delegate
     } win32-monitor construct ;
 
-M: windows-nt-io <monitor> ( path recursive? -- monitor )
+M: winnt <monitor> ( path recursive? -- monitor )
     [
         over open-directory win32-monitor <buffered-port>
         <win32-monitor>

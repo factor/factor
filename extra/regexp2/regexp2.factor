@@ -21,7 +21,7 @@ SYMBOL: ignore-case?
     if 2curry ;
     
 : or-predicates ( quots -- quot )
-    [ \ dup add* ] map [ [ t ] ] f short-circuit \ nip add ;
+    [ \ dup prefix ] map [ [ t ] ] f short-circuit \ nip suffix ;
 
 : literal-action [ nip ] curry action ;
 
