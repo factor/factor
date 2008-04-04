@@ -2,7 +2,8 @@ USING: help help.markup help.syntax help.definitions help.topics
 namespaces words sequences classes assocs vocabs kernel arrays
 prettyprint.backend kernel.private io generic math system
 strings sbufs vectors byte-arrays bit-arrays float-arrays
-quotations io.streams.byte-array io.encodings.string ;
+quotations io.streams.byte-array io.encodings.string
+classes.builtin ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"

@@ -3,10 +3,10 @@
 USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes
-classes.tuple classes.tuple.private kernel.private vocabs
-vocabs.loader source-files definitions slots.deprecated
-classes.union compiler.units bootstrap.image.private io.files
-accessors combinators ;
+classes.builtin classes.tuple classes.tuple.private
+kernel.private vocabs vocabs.loader source-files definitions
+slots.deprecated classes.union compiler.units
+bootstrap.image.private io.files accessors combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush

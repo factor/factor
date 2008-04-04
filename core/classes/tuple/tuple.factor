@@ -56,7 +56,8 @@ PRIVATE>
     unclip slots>tuple ;
 
 : slot-names ( class -- seq )
-    "slot-names" word-prop ;
+    "slot-names" word-prop
+    [ dup array? [ second ] when ] map ;
 
 <PRIVATE
 
@@ -107,7 +108,7 @@ PRIVATE>
     over superclass-size 2 + simple-slots ;
 
 : define-tuple-slots ( class -- )
-    dup dup slot-names generate-tuple-slots
+    dup dup "slot-names" word-prop generate-tuple-slots
     [ "slots" set-word-prop ]
     [ define-accessors ] ! new
     [ define-slots ] ! old
@@ -162,7 +163,7 @@ M: tuple-class update-class
 
 : define-new-tuple-class ( class superclass slots -- )
     [ drop f tuple-class define-class ]
-    [ nip [ dup array? [ second ] when ] map "slot-names" set-word-prop ]
+    [ nip "slot-names" set-word-prop ]
     [ 2drop update-classes ]
     3tri ;
 

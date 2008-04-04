@@ -74,7 +74,10 @@ $nl
 "A lower-level word which the above expands into:"
 { $subsection (call-next-method) }
 "To look up the next applicable method reflectively:"
-{ $subsection next-method } ;
+{ $subsection next-method }
+"Errors thrown by improper calls to " { $link POSTPONE: call-next-method } ":"
+{ $subsection inconsistent-next-method }
+{ $subsection no-next-method } ;
 
 ARTICLE: "generic" "Generic words and methods"
 "A " { $emphasis "generic word" } " is composed of zero or more " { $emphasis "methods" } " together with a " { $emphasis "method combination" } ". A method " { $emphasis "specializes" } " on a class; when a generic word executed, the method combination chooses the most appropriate method and calls its definition."
@@ -160,3 +163,8 @@ HELP: forget-methods
 { $description "Remove all method definitions which specialize on the class." } ;
 
 { sort-classes order } related-words
+
+HELP: (call-next-method)
+{ $values { "class" class } { "generic" generic } }
+{ $description "Low-level word implementing " { $link POSTPONE: call-next-method } "." }
+{ $notes "In most cases, " { $link POSTPONE: call-next-method } " should be used instead." } ;
