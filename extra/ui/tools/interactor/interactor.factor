@@ -3,7 +3,7 @@
 USING: arrays assocs combinators continuations documents
  hashtables io io.styles kernel math
 math.vectors models namespaces parser prettyprint quotations
-sequences sequences.lib strings threads listener
+sequences strings threads listener
 classes.tuple ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
 definitions boxes calendar concurrency.flags ui.tools.workspace
@@ -105,7 +105,8 @@ M: interactor model-changed
     ] curry "input" suspend ;
 
 M: interactor stream-readln
-    [ interactor-yield ] keep interactor-finish ?first ;
+    [ interactor-yield ] keep interactor-finish
+    dup [ first ] when ;
 
 : interactor-call ( quot interactor -- )
     dup interactor-busy? [
