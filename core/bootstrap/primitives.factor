@@ -640,8 +640,7 @@ define-builtin
     { "setenv" "kernel.private" }
     { "(exists?)" "io.files.private" }
     { "(directory)" "io.files.private" }
-    { "data-gc" "memory" }
-    { "code-gc" "memory" }
+    { "gc" "memory" }
     { "gc-time" "memory" }
     { "save-image" "memory" }
     { "save-image-and-exit" "memory" }

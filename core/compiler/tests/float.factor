@@ -2,7 +2,7 @@ IN: compiler.tests
 USING: compiler.units kernel kernel.private memory math
 math.private tools.test math.floats.private ;
 
-[ 5.0 ] [ [ 5.0 ] compile-call data-gc data-gc data-gc ] unit-test
+[ 5.0 ] [ [ 5.0 ] compile-call gc gc gc ] unit-test
 [ 2.0 3.0 ] [ 3.0 [ 2.0 swap ] compile-call ] unit-test
 
 [ 1 2 3 4.0 ] [ [ 1 2 3 4.0 ] compile-call ] unit-test

@@ -8,8 +8,6 @@ IN: memory.tests
 
 : leak-loop 100 [ leak-step ] times ;
 
-[ ] [ leak-step leak-step leak-step data-gc ] unit-test
-
 [ ] [ leak-loop ] unit-test
 
 TUPLE: testing x y z ;

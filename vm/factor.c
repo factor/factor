@@ -13,15 +13,17 @@ void default_parameters(F_PARAMETERS *p)
 	p->gen_count = 2;
 	p->code_size = 4;
 	p->young_size = 1;
-	p->aging_size = 6;
+	p->aging_size = 1;
+	p->tenured_size = 6;
 #else
 	p->ds_size = 32 * CELLS;
 	p->rs_size = 32 * CELLS;
 
 	p->gen_count = 3;
 	p->code_size = 8 * CELLS;
-	p->young_size = 2 * CELLS;
-	p->aging_size = 4 * CELLS;
+	p->young_size = 2;
+	p->aging_size = 2;
+	p->tenured_size = 4 * CELLS;
 #endif
 
 	p->secure_gc = false;
@@ -84,6 +86,7 @@ void init_factor(F_PARAMETERS *p)
 	/* Megabytes */
 	p->young_size <<= 20;
 	p->aging_size <<= 20;
+	p->tenured_size <<= 20;
 	p->code_size <<= 20;
 
 	/* Disable GC during init as a sanity check */
@@ -153,6 +156,7 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 		else if(factor_arg(argv[i],STR_FORMAT("-generations=%d"),&p.gen_count));
 		else if(factor_arg(argv[i],STR_FORMAT("-young=%d"),&p.young_size));
 		else if(factor_arg(argv[i],STR_FORMAT("-aging=%d"),&p.aging_size));
+		else if(factor_arg(argv[i],STR_FORMAT("-tenured=%d"),&p.tenured_size));
 		else if(factor_arg(argv[i],STR_FORMAT("-codeheap=%d"),&p.code_size));
 		else if(STRCMP(argv[i],STR_FORMAT("-securegc")) == 0)
 			p.secure_gc = true;

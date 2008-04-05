@@ -57,10 +57,9 @@ void set_profiling(bool profiling)
 
 	profiling_p = profiling;
 
-	/* Push everything to tenured space so that we can heap scan,
-	also code GC so that we can allocate profiling blocks if
-	necessary */
-	code_gc();
+	/* Push everything to tenured space so that we can heap scan
+	and allocate profiling blocks if necessary */
+	gc();
 
 	/* Update word XTs and saved callstack objects */
 	begin_scan();

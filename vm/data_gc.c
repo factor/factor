@@ -1,8 +1,6 @@
 #include "master.h"
 
-#define GC_DEBUG 0
-
-#define ALLOC_DATA_HEAP "alloc_data_heap: gens=%ld, young_size=%ld, aging_size=%ld\n"
+#define ALLOC_DATA_HEAP "alloc_data_heap: gens=%ld, young_size=%ld, aging_size=%ld, tenured_size=%ld\n"
 #define GC_REQUESTED "garbage_collection: growing_data_heap=%d, requested_bytes=%ld\n"
 #define BEGIN_GC "begin_gc: growing_data_heap=%d, collecting_gen=%ld\n"
 #define END_GC "end_gc: gc_elapsed=%ld\n"
@@ -31,25 +29,28 @@ void init_cards_offset(void)
 
 F_DATA_HEAP *alloc_data_heap(CELL gens,
 	CELL young_size,
-	CELL aging_size)
+	CELL aging_size,
+	CELL tenured_size)
 {
-	GC_PRINT(ALLOC_DATA_HEAP,gens,young_size,aging_size);
+	GC_PRINT(ALLOC_DATA_HEAP,gens,young_size,aging_size,tenured_size);
 
 	young_size = align_page(young_size);
 	aging_size = align_page(aging_size);
+	tenured_size = align_page(tenured_size);
 
 	F_DATA_HEAP *data_heap = safe_malloc(sizeof(F_DATA_HEAP));
 	data_heap->young_size = young_size;
 	data_heap->aging_size = aging_size;
+	data_heap->tenured_size = tenured_size;
 	data_heap->gen_count = gens;
 
 	CELL total_size;
 	if(data_heap->gen_count == 1)
-		total_size = 2 * aging_size;
+		total_size = 2 * tenured_size;
 	else if(data_heap->gen_count == 2)
-		total_size = (gens - 1) * young_size + 2 * aging_size;
+		total_size = young_size + 2 * tenured_size;
 	else if(data_heap->gen_count == 3)
-		total_size = gens * young_size + 2 * aging_size;
+		total_size = young_size + 2 * aging_size + 2 * tenured_size;
 	else
 	{
 		fatal_error("Invalid number of generations",data_heap->gen_count);
@@ -58,8 +59,8 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 
 	data_heap->segment = alloc_segment(total_size);
 
-	data_heap->generations = safe_malloc(sizeof(F_ZONE) * gens);
-	data_heap->semispaces = safe_malloc(sizeof(F_ZONE) * gens);
+	data_heap->generations = safe_malloc(sizeof(F_ZONE) * data_heap->gen_count);
+	data_heap->semispaces = safe_malloc(sizeof(F_ZONE) * data_heap->gen_count);
 
 	CELL cards_size = total_size / CARD_SIZE;
 	data_heap->cards = safe_malloc(cards_size);
@@ -67,31 +68,19 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 
 	CELL alloter = data_heap->segment->start;
 
-	alloter = init_zone(&data_heap->semispaces[NURSERY],0,alloter);
+	alloter = init_zone(&data_heap->generations[TENURED],tenured_size,alloter);
+	alloter = init_zone(&data_heap->semispaces[TENURED],tenured_size,alloter);
 
-	alloter = init_zone(&data_heap->generations[TENURED],aging_size,alloter);
-	alloter = init_zone(&data_heap->semispaces[TENURED],aging_size,alloter);
-
-	int i;
-
-	if(data_heap->gen_count > 2)
+	if(data_heap->gen_count == 3)
 	{
-		alloter = init_zone(&data_heap->generations[AGING],young_size,alloter);
-		alloter = init_zone(&data_heap->semispaces[AGING],young_size,alloter);
-
-		for(i = gens - 3; i >= 0; i--)
-		{
-			alloter = init_zone(&data_heap->generations[i],
-				young_size,alloter);
-		}
+		alloter = init_zone(&data_heap->generations[AGING],aging_size,alloter);
+		alloter = init_zone(&data_heap->semispaces[AGING],aging_size,alloter);
 	}
-	else
+
+	if(data_heap->gen_count >= 2)
 	{
-		for(i = gens - 2; i >= 0; i--)
-		{
-			alloter = init_zone(&data_heap->generations[i],
-				young_size,alloter);
-		}
+		alloter = init_zone(&data_heap->generations[NURSERY],young_size,alloter);
+		alloter = init_zone(&data_heap->semispaces[NURSERY],0,alloter);
 	}
 
 	if(alloter != data_heap->segment->end)
@@ -104,10 +93,12 @@ F_DATA_HEAP *grow_data_heap(F_DATA_HEAP *data_heap, CELL requested_bytes)
 {
 	CELL new_young_size = (data_heap->young_size * 2) + requested_bytes;
 	CELL new_aging_size = (data_heap->aging_size * 2) + requested_bytes;
+	CELL new_tenured_size = (data_heap->tenured_size * 2) + requested_bytes;
 
 	return alloc_data_heap(data_heap->gen_count,
 		new_young_size,
-		new_aging_size);
+		new_aging_size,
+		new_tenured_size);
 }
 
 void dealloc_data_heap(F_DATA_HEAP *data_heap)
@@ -141,9 +132,10 @@ void set_data_heap(F_DATA_HEAP *data_heap_)
 void init_data_heap(CELL gens,
 	CELL young_size,
 	CELL aging_size,
+	CELL tenured_size,
 	bool secure_gc_)
 {
-	set_data_heap(alloc_data_heap(gens,young_size,aging_size));
+	set_data_heap(alloc_data_heap(gens,young_size,aging_size,tenured_size));
 
 	gc_locals_region = alloc_segment(getpagesize());
 	gc_locals = gc_locals_region->start - CELLS;
@@ -258,7 +250,7 @@ void begin_scan(void)
 
 DEFINE_PRIMITIVE(begin_scan)
 {
-	data_gc();
+	gc();
 	begin_scan();
 }
 
@@ -645,7 +637,7 @@ void begin_gc(CELL requested_bytes)
 	printf("Newspace: ");
 	dump_zone(newspace);
 	printf("\n");
-#endif;
+#endif
 }
 
 void end_gc(void)
@@ -788,14 +780,14 @@ void garbage_collection(CELL gen,
 	performing_gc = false;
 }
 
-void data_gc(void)
+void gc(void)
 {
 	garbage_collection(TENURED,false,0);
 }
 
-DEFINE_PRIMITIVE(data_gc)
+DEFINE_PRIMITIVE(gc)
 {
-	data_gc();
+	gc();
 }
 
 /* Push total time spent on GC */
@@ -806,7 +798,8 @@ DEFINE_PRIMITIVE(gc_time)
 
 void simple_gc(void)
 {
-	maybe_gc(0);
+	if(nursery->here + ALLOT_BUFFER_ZONE > nursery->end)
+		garbage_collection(NURSERY,false,0);
 }
 
 DEFINE_PRIMITIVE(become)
@@ -828,5 +821,5 @@ DEFINE_PRIMITIVE(become)
 		forward_object(old_obj,new_obj);
 	}
 
-	data_gc();
+	gc();
 }
