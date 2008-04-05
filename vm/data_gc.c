@@ -91,13 +91,11 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 
 F_DATA_HEAP *grow_data_heap(F_DATA_HEAP *data_heap, CELL requested_bytes)
 {
-	CELL new_young_size = (data_heap->young_size * 2) + requested_bytes;
-	CELL new_aging_size = (data_heap->aging_size * 2) + requested_bytes;
 	CELL new_tenured_size = (data_heap->tenured_size * 2) + requested_bytes;
 
 	return alloc_data_heap(data_heap->gen_count,
-		new_young_size,
-		new_aging_size,
+		data_heap->young_size,
+		data_heap->aging_size,
 		new_tenured_size);
 }
 

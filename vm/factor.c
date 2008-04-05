@@ -21,7 +21,7 @@ void default_parameters(F_PARAMETERS *p)
 
 	p->gen_count = 3;
 	p->code_size = 8 * CELLS;
-	p->young_size = 2;
+	p->young_size = 1;
 	p->aging_size = 2;
 	p->tenured_size = 4 * CELLS;
 #endif
