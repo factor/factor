@@ -297,24 +297,19 @@ M: satisfy-parser (compile) ( parser -- quot )
 
 TUPLE: range-parser min max ;
 
-MATCH-VARS: ?min ?max ;
-
-: range-pattern ( -- quot )
-  [
-    input-slice dup empty? [
+: parse-range ( input min max -- result )
+  pick empty? [ 
+    3drop f 
+  ] [
+    pick first -rot between? [
+      unclip-slice <parse-result>
+    ] [ 
       drop f
-    ] [
-      0 over nth dup 
-      ?min ?max between? [
-         [ 1 tail-slice ] dip <parse-result>
-      ] [
-        2drop f
-      ] if
-    ] if 
-  ] ;
+    ] if
+  ] if ;
 
 M: range-parser (compile) ( parser -- quot )
-  T{ range-parser _ ?min ?max } range-pattern match-replace ;
+  [ min>> ] [ max>> ] bi '[ input-slice , , parse-range ] ;
 
 TUPLE: seq-parser parsers ;
 
