@@ -1,5 +1,5 @@
 USING: io.files kernel tools.test io.backend
-io.windows.nt.files splitting sequences io.files.private ;
+io.windows.nt.files splitting sequences ;
 IN: io.windows.nt.files.tests
 
 [ f ] [ "\\foo" absolute-path? ] unit-test
@@ -26,8 +26,6 @@ IN: io.windows.nt.files.tests
 [ f ] [ "c:\\foo" root-directory? ] unit-test
 [ f ] [ "." root-directory? ] unit-test
 [ f ] [ ".." root-directory? ] unit-test
-
-[ ] [ "" resource-path cd ] unit-test
 
 [ "\\foo\\bar" ] [ "/foo/bar" normalize-path ":" split1 nip ] unit-test
 
