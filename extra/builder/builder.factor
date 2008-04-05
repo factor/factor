@@ -2,7 +2,7 @@
 USING: kernel namespaces sequences splitting system combinators continuations
        parser io io.files io.launcher io.sockets prettyprint threads
        bootstrap.image benchmark vars bake smtp builder.util accessors
-       io.encodings.utf8
+       debugger io.encodings.utf8
        calendar
        tools.test
        builder.common
@@ -17,10 +17,18 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: builds/factor ( -- path ) builds "factor" append-path ;
+: build-dir     ( -- path ) builds stamp>   append-path ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : prepare-build-machine ( -- )
   builds make-directory
-  builds cd
-  { "git" "clone" "git://factorcode.org/git/factor.git" } run-process drop ;
+  builds
+    [
+      { "git" "clone" "git://factorcode.org/git/factor.git" } try-process
+    ]
+  with-directory ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -70,8 +78,8 @@ IN: builder
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : copy-image ( -- )
-  builds "factor" append-path my-boot-image-name append-path ".." copy-file-into
-  builds "factor" append-path my-boot-image-name append-path "."  copy-file-into ;
+  builds/factor my-boot-image-name append-path ".." copy-file-into
+  builds/factor my-boot-image-name append-path "."  copy-file-into ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -184,15 +192,27 @@ SYMBOL: builder-recipients
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: compress-image ( -- )
-  { "bzip2" my-boot-image-name } to-strings run-process drop ;
+: compress-image ( -- ) { "bzip2" my-boot-image-name } to-strings try-process ;
+
+! : build ( -- )
+!   [ (build) ] try
+!   builds cd stamp> cd
+!   [ send-builder-email ] try
+!   { "rm" "-rf" "factor" } [ ] run-or-bail
+!   [ compress-image ] try ;
 
 : build ( -- )
-  [ (build) ] failsafe
-  builds cd stamp> cd
-  [ send-builder-email ] [ drop "not sending mail" . ] recover
-  { "rm" "-rf" "factor" } run-process drop
-  [ compress-image ] failsafe ;
+  [
+    (build)
+    build-dir
+      [
+        { "rm" "-rf" "factor" } try-process
+        compress-image
+      ]
+    with-directory
+  ]
+  try
+  send-builder-email ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -209,7 +229,7 @@ USE: bootstrap.image.download
 
 : updates-available? ( -- ? )
   git-id
-  git-pull run-process drop
+  git-pull try-process
   git-id
   = not ;
 
@@ -222,12 +242,15 @@ USE: bootstrap.image.download
 : build-loop ( -- )
   builds-check
   [
-    builds "/factor" append cd
-    updates-available? new-image-available? or
-      [ build ]
-    when
+    builds/factor
+      [
+        updates-available? new-image-available? or
+          [ build ]
+        when
+      ]
+    with-directory
   ]
-  failsafe
+  try
   5 minutes sleep
   build-loop ;
 
