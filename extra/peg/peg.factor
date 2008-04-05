@@ -405,31 +405,19 @@ M: semantic-parser (compile) ( parser -- quot )
 
 TUPLE: ensure-parser p1 ;
 
-: ensure-pattern ( -- quot )
-  [
-    input-slice ?quot [
-      ignore <parse-result>
-    ] [
-      drop f
-    ] if
-  ] ;
+: check-ensure ( old-input result -- result )
+  [ ignore <parse-result> ] [ drop f ] if ;
 
 M: ensure-parser (compile) ( parser -- quot )
-  p1>> compiled-parser \ ?quot ensure-pattern match-replace ;
+  p1>> compiled-parser 1quotation '[ input-slice @ check-ensure ] ;
 
 TUPLE: ensure-not-parser p1 ;
 
-: ensure-not-pattern ( -- quot )
-  [
-    input-slice ?quot [
-      drop f
-    ] [
-      ignore <parse-result>
-    ] if
-  ] ;
+: check-ensure-not ( old-input result -- result )
+  [ drop f ] [ ignore <parse-result> ] if ;
 
 M: ensure-not-parser (compile) ( parser -- quot )
-  p1>> compiled-parser \ ?quot ensure-not-pattern match-replace ;
+  p1>> compiled-parser 1quotation '[ input-slice @ check-ensure-not ] ;
 
 TUPLE: action-parser p1 quot ;
 
