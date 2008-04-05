@@ -225,9 +225,10 @@ M: tuple equal?
 
 M: tuple hashcode*
     [
-        dup tuple-size -rot 0 -rot [
-            swapd array-nth hashcode* bitxor
-        ] 2curry reduce
+        [ class hashcode ] [ tuple-size ] [ ] tri
+        >r rot r> [
+            swapd array-nth hashcode* sequence-hashcode-step
+        ] 2curry each
     ] recursive-hashcode ;
 
 ! Deprecated
