@@ -27,9 +27,9 @@ SYMBOL: bootstrap-time
     seq-diff
     [ "bootstrap." prepend require ] each ;
 
-: compile-remaining ( -- )
-    "Compiling remaining words..." print flush
-    vocabs [ words [ compiled? not ] subset compile ] each ;
+! : compile-remaining ( -- )
+!     "Compiling remaining words..." print flush
+!     vocabs [ words [ compiled? not ] subset compile ] each ;
 
 : count-words ( pred -- )
     all-words swap subset length number>string write ;
@@ -57,7 +57,7 @@ millis >r
 
 default-image-name "output-image" set-global
 
-"math help handbook compiler random tools ui ui.tools io" "include" set-global
+"math compiler help random tools ui ui.tools io handbook" "include" set-global
 "" "exclude" set-global
 
 parse-command-line
@@ -79,10 +79,6 @@ os winnt? [ "windows.nt" require ] when
     load-components
 
     run-bootstrap-init
-
-    "bootstrap.compiler" vocab [
-        compile-remaining
-    ] when
 ] with-compiler-errors
 :errors
 

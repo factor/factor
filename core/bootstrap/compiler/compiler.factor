@@ -19,7 +19,7 @@ IN: bootstrap.compiler
 enable-compiler
 
 nl
-"Compiling some words to speed up bootstrap..." write flush
+"Compiling..." write flush
 
 ! Compile a set of words ahead of the full compile.
 ! This set of words was determined semi-empirically
@@ -73,5 +73,7 @@ nl
 {
     malloc calloc free memcpy
 } compile
+
+vocabs [ words [ compiled? not ] subset compile "." write flush ] each
 
 " done" print flush
