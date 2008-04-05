@@ -70,7 +70,7 @@ USE: unix
     [
         setup-priority
         setup-redirection
-        current-directory get resource-path cd
+        current-directory get (normalize-path) cd
         dup pass-environment? [
             dup get-environment set-os-envs
         ] when
