@@ -351,48 +351,36 @@ M: choice-parser (compile) ( parser -- quot )
 
 TUPLE: repeat0-parser p1 ;
 
-MATCH-VARS: ?quot ;
-
-: (repeat0) ( quot result -- result )
+: (repeat) ( quot result -- result )
   over call [
     [ remaining>> swap (>>remaining) ] 2keep 
     ast>> swap [ ast>> push ] keep
-    (repeat0) 
- ] [
+    (repeat) 
+  ] [
     nip
   ] if* ; inline
 
-: repeat0-pattern ( -- quot )
-  [
-    [ ?quot ] swap (repeat0) 
-  ] ;
-
 M: repeat0-parser (compile) ( parser -- quot )
-  [
-    [ input-slice V{ } clone <parse-result> ] %
-    p1>> compiled-parser \ ?quot repeat0-pattern match-replace %        
-  ] [ ] make ;
+  p1>> compiled-parser 1quotation '[ 
+    input-slice V{ } clone <parse-result> , swap (repeat) 
+  ] ; 
 
 TUPLE: repeat1-parser p1 ;
 
-: repeat1-pattern ( -- quot )
+: repeat1-empty-check ( result -- result )
   [
-    [ ?quot ] swap (repeat0) [
-      dup ast>> empty? [
-        drop f
-      ] when  
-    ] [
-      f 
-    ] if*
-  ] ;
+    dup ast>> empty? [ drop f ] when
+  ] [
+    f
+  ] if* ;
 
 M: repeat1-parser (compile) ( parser -- quot )
-  [
-    [ input-slice V{ } clone <parse-result> ] %
-    p1>> compiled-parser \ ?quot repeat1-pattern match-replace % 
-  ] [ ] make ;
+  p1>> compiled-parser 1quotation '[ 
+    input-slice V{ } clone <parse-result> , swap (repeat) repeat1-empty-check  
+  ] ; 
 
 TUPLE: optional-parser p1 ;
+MATCH-VARS: ?quot ;
 
 : optional-pattern ( -- quot )
   [
