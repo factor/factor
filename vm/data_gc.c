@@ -1,5 +1,20 @@
 #include "master.h"
 
+#define GC_DEBUG 1
+
+#define ALLOC_DATA_HEAP "alloc_data_heap: gens=%ld, young_size=%ld, aging_size=%ld\n"
+#define GC_REQUESTED "garbage_collection: code_gc=%d, growing_data_heap=%d, requested_bytes=%ld\n"
+#define BEGIN_GC "begin_gc: code_gc=%d, growing_data_heap=%d, collecting_gen=%ld\n"
+#define END_GC "end_gc: gc_elapsed=%ld\n"
+#define END_AGING_GC "end_gc: aging_collections=%ld, cards_scanned=%ld\n"
+#define END_NURSERY_GC "end_gc: nursery_collections=%ld, cards_scanned=%ld\n"
+
+#ifdef GC_DEBUG
+	#define GC_PRINT printf
+#else
+	INLINE void GC_PRINT(...) { }
+#endif
+
 CELL init_zone(F_ZONE *z, CELL size, CELL start)
 {
 	z->size = size;
@@ -16,6 +31,8 @@ void init_cards_offset(void)
 
 F_DATA_HEAP *alloc_data_heap(CELL gens, CELL young_size, CELL aging_size)
 {
+	GC_PRINT(ALLOC_DATA_HEAP,gens,young_size,aging_size);
+
 	young_size = align_page(young_size);
 	aging_size = align_page(aging_size);
 
@@ -133,7 +150,8 @@ void init_data_heap(CELL gens,
 	extra_roots = extra_roots_region->start - CELLS;
 
 	gc_time = 0;
-	minor_collections = 0;
+	aging_collections = 0;
+	nursery_collections = 0;
 	cards_scanned = 0;
 	secure_gc = secure_gc_;
 }
@@ -618,16 +636,14 @@ void begin_gc(CELL requested_bytes)
 		so we set the newspace so the next generation. */
 		newspace = &data_heap->generations[collecting_gen + 1];
 	}
-}
 
-void major_gc_message(void)
-{
-	fprintf(stderr,"*** %s GC (%ld minor, %ld cards)\n",
-		collecting_code ? "Code and data" : "Data",
-		minor_collections,cards_scanned);
-	fflush(stderr);
-	minor_collections = 0;
-	cards_scanned = 0;
+#ifdef GC_DEBUG
+	//printf("\n");
+	dump_generations();
+	printf("Newspace: ");
+	dump_zone(newspace);
+	//printf("\n");
+#endif;
 }
 
 void end_gc(void)
@@ -637,9 +653,6 @@ void end_gc(void)
 		dealloc_data_heap(old_data_heap);
 		old_data_heap = NULL;
 		growing_data_heap = false;
-
-		fprintf(stderr,"*** Data heap resized to %lu bytes\n",
-			data_heap->segment->size);
 	}
 
 	if(collecting_accumulation_gen_p())
@@ -651,9 +664,19 @@ void end_gc(void)
 			reset_generations(NURSERY,collecting_gen - 1);
 
 		if(collecting_gen == TENURED)
-			major_gc_message();
+		{
+			GC_PRINT(END_AGING_GC,aging_collections,cards_scanned);
+			aging_collections = 0;
+			cards_scanned = 0;
+		}
 		else if(HAVE_AGING_P && collecting_gen == AGING)
-			minor_collections++;
+		{
+			aging_collections++;
+
+			GC_PRINT(END_NURSERY_GC,nursery_collections,cards_scanned);
+			nursery_collections = 0;
+			cards_scanned = 0;
+		}
 	}
 	else
 	{
@@ -661,7 +684,7 @@ void end_gc(void)
 		collected are now empty */
 		reset_generations(NURSERY,collecting_gen);
 
-		minor_collections++;
+		nursery_collections++;
 	}
 
 	if(collecting_code)
@@ -688,6 +711,8 @@ void garbage_collection(CELL gen,
 		return;
 	}
 
+	GC_PRINT(GC_REQUESTED,code_gc,growing_data_heap_,requested_bytes);
+
 	s64 start = current_millis();
 
 	performing_gc = true;
@@ -702,11 +727,15 @@ void garbage_collection(CELL gen,
 		resort to growing the data heap */
 		if(collecting_gen == TENURED)
 		{
-			growing_data_heap = true;
-
-			/* see the comment in unmark_marked() */
 			if(collecting_code)
+			{
+				growing_data_heap = true;
+
+				/* see the comment in unmark_marked() */
 				unmark_marked(&code_heap);
+			}
+			else
+				collecting_code = true;
 		}
 		/* we try collecting AGING space twice before going on to
 		collect TENURED */
@@ -723,6 +752,7 @@ void garbage_collection(CELL gen,
 		}
 	}
 
+	GC_PRINT(BEGIN_GC,collecting_code,growing_data_heap,collecting_gen);
 	begin_gc(requested_bytes);
 
 	/* initialize chase pointer */
@@ -754,9 +784,12 @@ void garbage_collection(CELL gen,
 	while(scan < newspace->here)
 		scan = collect_next(scan);
 
+	CELL gc_elapsed = (current_millis() - start);
+
+	GC_PRINT(END_GC,gc_elapsed);
 	end_gc();
 
-	gc_time += (current_millis() - start);
+	gc_time += gc_elapsed;
 	performing_gc = false;
 }
 

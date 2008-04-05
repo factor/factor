@@ -218,10 +218,10 @@ void dump_memory(CELL from, CELL to)
 		dump_cell(from);
 }
 
-void dump_zone(F_ZONE z)
+void dump_zone(F_ZONE *z)
 {
-	printf("start=%lx, size=%lx, end=%lx, here=%lx\n",
-		z.start,z.size,z.end,z.here - z.start);
+	printf("start=%ld, size=%ld, here=%ld\n",
+		z->start,z->size,z->here - z->start);
 }
 
 void dump_generations(void)
@@ -230,13 +230,13 @@ void dump_generations(void)
 	for(i = 0; i < data_heap->gen_count; i++)
 	{
 		printf("Generation %d: ",i);
-		dump_zone(data_heap->generations[i]);
+		dump_zone(&data_heap->generations[i]);
 	}
 
 	for(i = 0; i < data_heap->gen_count; i++)
 	{
 		printf("Semispace %d: ",i);
-		dump_zone(data_heap->semispaces[i]);
+		dump_zone(&data_heap->semispaces[i]);
 	}
 
 	printf("Cards: base=%lx, size=%lx\n",

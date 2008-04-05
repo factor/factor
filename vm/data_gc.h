@@ -138,7 +138,8 @@ void init_data_heap(CELL gens,
 
 /* statistics */
 s64 gc_time;
-CELL minor_collections;
+CELL nursery_collections;
+CELL aging_collections;
 CELL cards_scanned;
 
 /* only meaningful during a GC */
