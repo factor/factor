@@ -181,7 +181,6 @@ void free_unmarked(F_HEAP *heap)
 			}
 			break;
 		case B_FREE:
-			printf("RECLAIMED\n");
 			if(prev && prev->status == B_FREE)
 				prev->size += scan->size;
 			break;
@@ -290,7 +289,7 @@ DEFINE_PRIMITIVE(code_room)
 
 void code_gc(void)
 {
-	garbage_collection(TENURED,true,false,0);
+	garbage_collection(TENURED,false,0);
 }
 
 DEFINE_PRIMITIVE(code_gc)

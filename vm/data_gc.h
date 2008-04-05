@@ -145,7 +145,6 @@ CELL cards_scanned;
 /* only meaningful during a GC */
 bool performing_gc;
 CELL collecting_gen;
-bool collecting_code;
 
 /* if true, we collecting AGING space for the second time, so if it is still
 full, we go on to collect TENURED */
@@ -222,7 +221,6 @@ CELL heap_scan_ptr;
 bool gc_off;
 
 void garbage_collection(volatile CELL gen,
-	bool code_gc,
 	bool growing_data_heap_,
 	CELL requested_bytes);
 
@@ -308,18 +306,27 @@ allocation (which does not call GC because of possible roots in volatile
 registers) does not run out of memory */
 #define ALLOT_BUFFER_ZONE 1024
 
+#define SUFFICIENT_ROOM(a) (nursery->here + ALLOT_BUFFER_ZONE + a <= nursery->end)
+
 INLINE void maybe_gc(CELL a)
 {
-	/* If we are requesting a huge object, grow immediately */
-	if(nursery->size - ALLOT_BUFFER_ZONE <= a)
-		garbage_collection(TENURED,false,true,a);
-	/* If we have enough space in the nursery, just return.
-	Otherwise, perform a GC - this may grow the heap if
-	tenured space cannot hold all live objects from the nursery
-	even after a full GC */
-	else if(a + ALLOT_BUFFER_ZONE + nursery->here > nursery->end)
-		garbage_collection(NURSERY,false,false,0);
-	/* There is now sufficient room in the nursery for 'a' */
+	/* If there is enough room, return */
+	if(SUFFICIENT_ROOM(a))
+		return;
+	/* If the object is bigger than the nursery, grow immediately */
+	else if(nursery->size - ALLOT_BUFFER_ZONE <= a)
+		garbage_collection(TENURED,true,a);
+	/* Otherwise, collect the nursery */
+	else
+	{
+		garbage_collection(NURSERY,false,0);
+
+		/* If there is still insufficient room, try growing the heap.
+		This can only happen if the number of generations is 1. */
+		if(SUFFICIENT_ROOM(a)) return;
+
+		garbage_collection(TENURED,true,a);
+	}
 }
 
 /*
