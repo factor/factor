@@ -15,8 +15,7 @@ ARTICLE: "tools.memory" "Object memory tools"
 "You can check an object's the heap memory usage:"
 { $subsection size }
 "The garbage collector can be invoked manually:"
-{ $subsection data-gc }
-{ $subsection code-gc }
+{ $subsection gc }
 { $see-also "images" } ;
 
 ABOUT: "tools.memory"
