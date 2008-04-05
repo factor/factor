@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences strings namespaces math assocs shuffle 
+USING: kernel sequences strings fry namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
        words quotations effects memoize accessors locals effects ;
@@ -282,21 +282,20 @@ TUPLE: satisfy-parser quot ;
 
 MATCH-VARS: ?quot ;
 
-: satisfy-pattern ( -- quot )
-  [
-    input-slice dup empty? [
-      drop f 
-    ] [
-      unclip-slice dup ?quot call [  
-        <parse-result>
-      ] [
-        2drop f
-      ] if
-    ] if 
-  ] ;
+: parse-satisfy ( input quot -- result )
+  swap dup empty? [
+    2drop f 
+  ] [
+    unclip-slice rot dupd call [
+      <parse-result>
+    ] [  
+      2drop f
+    ] if
+  ] if ; inline
+
 
 M: satisfy-parser (compile) ( parser -- quot )
-  quot>> \ ?quot satisfy-pattern match-replace ;
+  quot>> '[ input-slice , parse-satisfy ] ;
 
 TUPLE: range-parser min max ;
 
