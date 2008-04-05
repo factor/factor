@@ -31,8 +31,7 @@ void init_cards_offset(void)
 
 F_DATA_HEAP *alloc_data_heap(CELL gens,
 	CELL young_size,
-	CELL aging_size,
-	CELL tenured_size)
+	CELL aging_size)
 {
 	GC_PRINT(ALLOC_DATA_HEAP,gens,young_size,aging_size);
 
