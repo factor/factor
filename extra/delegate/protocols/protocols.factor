@@ -9,10 +9,8 @@ PROTOCOL: sequence-protocol
     set-nth set-nth-unsafe length set-length lengthen ;
 
 PROTOCOL: assoc-protocol
-    at* assoc-size >alist set-at assoc-clone-like
+    at* assoc-size >alist set-at assoc-clone-like { assoc-find 1 }
     delete-at clear-assoc new-assoc assoc-like ;
-    ! assoc-find excluded because GENERIC# 1
-    ! everything should work, just slower (with >alist)
 
 PROTOCOL: stream-protocol
     stream-read1 stream-read stream-read-until dispose
