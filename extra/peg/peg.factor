@@ -343,20 +343,15 @@ M: seq-parser (compile) ( parser -- quot )
 
 TUPLE: choice-parser parsers ;
 
-MATCH-VARS: ?quot ;
-
-: choice-pattern ( -- quot )
-  [
-    [ ?quot ] unless* 
-  ] ;
-
 M: choice-parser (compile) ( parser -- quot )
   [ 
     f ,
-    parsers>> [ compiled-parser \ ?quot choice-pattern match-replace % ] each
+    parsers>> [ compiled-parser 1quotation , \ unless* , ] each
   ] [ ] make ;
 
 TUPLE: repeat0-parser p1 ;
+
+MATCH-VARS: ?quot ;
 
 : (repeat0) ( quot result -- result )
   over call [
