@@ -431,8 +431,7 @@ MATCH-VARS: ?action ;
   ] if ; inline
 
 M: action-parser (compile) ( parser -- quot )
-  [ p1>> compiled-parser 1quotation ] [ quot>> ] bi '[
-    @ , check-action ] ;
+  [ p1>> compiled-parser 1quotation ] [ quot>> ] bi '[ @ , check-action ] ;
 
 : left-trim-slice ( string -- string )
   #! Return a new string without any leading whitespace
@@ -444,9 +443,9 @@ M: action-parser (compile) ( parser -- quot )
 TUPLE: sp-parser p1 ;
 
 M: sp-parser (compile) ( parser -- quot )
-  [
-    \ input-slice , \ left-trim-slice , \ input-from , \ pos , \ set , p1>> compiled-parser , 
-  ] [ ] make ;
+  p1>> compiled-parser 1quotation '[ 
+    input-slice left-trim-slice input-from pos set @ 
+  ] ;
 
 TUPLE: delay-parser quot ;
 
