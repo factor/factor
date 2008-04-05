@@ -1,3 +1,3 @@
-USING: io.backend system ;
+USING: io.unix.bsd io.backend system ;
 
 freebsd set-io-backend
