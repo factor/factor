@@ -3,7 +3,7 @@
 USING: kernel sequences strings fry namespaces math assocs shuffle 
        vectors arrays combinators.lib math.parser match
        unicode.categories sequences.lib compiler.units parser
-       words quotations effects memoize accessors locals effects ;
+       words quotations effects memoize accessors locals effects splitting ;
 IN: peg
 
 USE: prettyprint
@@ -269,18 +269,16 @@ MATCH-VARS: ?token ;
 
 : parse-token ( input string -- result )
   #! Parse the string, returning a parse result
-  2dup head? [
-    dup >r length tail-slice r> <parse-result>
+  dup >r ?head-slice [
+    r> <parse-result> 
   ] [
-    2drop f
+    r> 2drop f
   ] if ;
 
 M: token-parser (compile) ( parser -- quot )
-  [ \ input-slice , symbol>> , \ parse-token , ] [ ] make ;
+  symbol>> '[ input-slice , parse-token ] ;
    
 TUPLE: satisfy-parser quot ;
-
-MATCH-VARS: ?quot ;
 
 : parse-satisfy ( input quot -- result )
   swap dup empty? [
@@ -319,6 +317,8 @@ M: range-parser (compile) ( parser -- quot )
   T{ range-parser _ ?min ?max } range-pattern match-replace ;
 
 TUPLE: seq-parser parsers ;
+
+MATCH-VARS: ?quot ;
 
 : seq-pattern ( -- quot )
   [
