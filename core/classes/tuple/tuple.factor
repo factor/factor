@@ -174,7 +174,7 @@ M: tuple-class update-class
         2drop
         [
             [ update-tuples-after ]
-            [ changed-word ]
+            [ changed-definition ]
             [ redefined ]
             tri
         ] each-subclass
