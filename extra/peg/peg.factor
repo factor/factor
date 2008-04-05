@@ -380,17 +380,15 @@ M: repeat1-parser (compile) ( parser -- quot )
   ] ; 
 
 TUPLE: optional-parser p1 ;
-MATCH-VARS: ?quot ;
 
-: optional-pattern ( -- quot )
-  [
-    ?quot [ input-slice f <parse-result> ] unless* 
-  ] ;
+: check-optional ( result -- result )
+  [ input-slice f <parse-result> ] unless* ;
 
 M: optional-parser (compile) ( parser -- quot )
-  p1>> compiled-parser \ ?quot optional-pattern match-replace ;
+  p1>> compiled-parser 1quotation '[ @ check-optional ] ;
 
 TUPLE: semantic-parser p1 quot ;
+MATCH-VARS: ?quot ;
 
 MATCH-VARS: ?parser ;
 
