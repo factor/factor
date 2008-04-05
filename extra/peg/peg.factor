@@ -453,11 +453,7 @@ M: delay-parser (compile) ( parser -- quot )
   #! For efficiency we memoize the quotation.
   #! This way it is run only once and the 
   #! parser constructed once at run time.
-  [
-    quot>> % \ compile ,
-  ] [ ] make 
-  { } { "word" } <effect> memoize-quot 
-  [ % \ execute , ] [ ] make ;
+  quot>> '[ @ compile ] { } { "word" } <effect> memoize-quot '[ @ execute ] ; 
 
 TUPLE: box-parser quot ;
 
