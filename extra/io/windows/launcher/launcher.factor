@@ -116,9 +116,10 @@ M: windows current-process-handle ( -- handle )
 
 M: windows run-process* ( process -- handle )
     [
+        current-directory get (normalize-path) cd
+
         dup make-CreateProcess-args
         tuck fill-redirection
-        current-directory get (normalize-path) cd
         dup call-CreateProcess
         lpProcessInformation>>
     ] with-destructors ;

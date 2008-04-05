@@ -120,6 +120,8 @@ M: winnt fill-redirection ( process args -- )
 
 M: winnt (process-stream)
     [
+        current-directory get (normalize-path) cd
+
         dup make-CreateProcess-args
 
         fill-stdout-pipe
