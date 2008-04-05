@@ -205,12 +205,11 @@ SYMBOL: current-directory
 M: object normalize-path ( path -- path' )
     (normalize-path) ;
 
-: with-directory ( path quot -- )
-    >r (normalize-path) r>
-    current-directory swap with-variable ; inline
-
 : set-current-directory ( path -- )
-    normalize-path current-directory set ;
+    (normalize-path) current-directory set ;
+
+: with-directory ( path quot -- )
+    >r (normalize-path) current-directory r> with-variable ; inline
 
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )
