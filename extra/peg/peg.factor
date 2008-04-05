@@ -423,17 +423,16 @@ TUPLE: action-parser p1 quot ;
 
 MATCH-VARS: ?action ;
 
-: action-pattern ( -- quot )
-  [
-    ?quot dup [ 
-      dup ast>> ?action call
-      >>ast
-    ] when 
-  ] ;
+: check-action ( result quot -- result )
+  over [
+    over ast>> swap call >>ast
+  ] [
+    drop
+  ] if ; inline
 
 M: action-parser (compile) ( parser -- quot )
-  [ p1>> compiled-parser ] [ quot>> ] bi  
-  2array { ?quot ?action } action-pattern match-replace ;
+  [ p1>> compiled-parser 1quotation ] [ quot>> ] bi '[
+    @ , check-action ] ;
 
 : left-trim-slice ( string -- string )
   #! Return a new string without any leading whitespace
