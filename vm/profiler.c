@@ -61,17 +61,19 @@ void set_profiling(bool profiling)
 	and allocate profiling blocks if necessary */
 	gc();
 
-	/* Update word XTs and saved callstack objects */
-	begin_scan();
+	CELL words = find_all_words();
 
-	CELL obj;
-	while((obj = next_object()) != F)
+	REGISTER_ROOT(words);
+
+	CELL i;
+	CELL length = array_capacity(untag_object(words));
+	for(i = 0; i < length; i++)
 	{
-		if(type_of(obj) == WORD_TYPE)
-			update_word_xt(untag_object(obj));
+		F_WORD *word = untag_word(array_nth(untag_array(words),i));
+		update_word_xt(word);
 	}
 
-	gc_off = false; /* end heap scan */
+	UNREGISTER_ROOT(words);
 
 	/* Update XTs in code heap */
 	iterate_code_heap(relocate_code_block);

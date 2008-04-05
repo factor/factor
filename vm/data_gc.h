@@ -365,3 +365,5 @@ DLLEXPORT void simple_gc(void);
 DECLARE_PRIMITIVE(gc);
 DECLARE_PRIMITIVE(gc_time);
 DECLARE_PRIMITIVE(become);
+
+CELL find_all_words(void);

@@ -821,3 +821,24 @@ DEFINE_PRIMITIVE(become)
 
 	gc();
 }
+
+CELL find_all_words(void)
+{
+	GROWABLE_ARRAY(words);
+
+	begin_scan();
+
+	CELL obj;
+	while((obj = next_object()) != F)
+	{
+		if(type_of(obj) == WORD_TYPE)
+			GROWABLE_ADD(words,obj);
+	}
+
+	/* End heap scan */
+	gc_off = false;
+
+	GROWABLE_TRIM(words);
+
+	return words;
+}

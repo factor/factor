@@ -38,21 +38,8 @@ void do_stage1_init(void)
 	fprintf(stderr,"*** Stage 2 early init... ");
 	fflush(stderr);
 
-	GROWABLE_ARRAY(words);
+	CELL words = find_all_words();
 
-	begin_scan();
-
-	CELL obj;
-	while((obj = next_object()) != F)
-	{
-		if(type_of(obj) == WORD_TYPE)
-			GROWABLE_ADD(words,obj);
-	}
-
-	/* End heap scan */
-	gc_off = false;
-
-	GROWABLE_TRIM(words);
 	REGISTER_ROOT(words);
 
 	CELL i;
