@@ -144,26 +144,10 @@ M: windows kill-process* ( handle -- )
     over process-handle dispose-process
     notify-exit ;
 
-: wait-for-processes ( processes -- ? )
-    keys dup
+M: windows wait-for-processes ( -- ? )
+    processes get keys dup
     [ process-handle PROCESS_INFORMATION-hProcess ] map
     dup length swap >c-void*-array 0 0
     WaitForMultipleObjects
     dup HEX: ffffffff = [ win32-error ] when
     dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth process-exited f ] if ;
-
-SYMBOL: wait-flag
-
-: wait-loop ( -- )
-    processes get dup assoc-empty?
-    [ drop wait-flag get-global lower-flag ]
-    [ wait-for-processes [ 100 sleep ] when ] if ;
-
-: start-wait-thread ( -- )
-    <flag> wait-flag set-global
-    [ wait-loop t ] "Process wait" spawn-server drop ;
-
-M: windows register-process
-    drop wait-flag get-global raise-flag ;
-
-[ start-wait-thread ] "io.windows.launcher" add-init-hook

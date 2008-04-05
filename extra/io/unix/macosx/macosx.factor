@@ -1,4 +1,4 @@
-USING: io.unix.bsd io.backend io.monitors io.monitors.private
+USING: io.backend io.monitors io.monitors.private
 continuations kernel core-foundation.fsevents sequences
 namespaces arrays system ;
 IN: io.unix.macosx
