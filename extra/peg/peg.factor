@@ -313,33 +313,37 @@ M: range-parser (compile) ( parser -- quot )
 
 TUPLE: seq-parser parsers ;
 
-MATCH-VARS: ?quot ;
+: ignore? ( ast -- bool )
+  ignore = ;
 
-: seq-pattern ( -- quot )
+: calc-seq-result ( prev-result current-result -- next-result )
   [
-    dup [
-      ?quot [
-        [ remaining>> swap (>>remaining) ] 2keep
-        ast>> dup ignore = [ 
-          drop  
-        ] [ 
-          swap [ ast>> push ] keep 
-        ] if
-      ] [
-        drop f 
-      ] if*
+    [ remaining>> swap (>>remaining) ] 2keep
+    ast>> dup ignore? [  
+      drop
     ] [
-      drop f
-    ] if  
-  ] ;
+      swap [ ast>> push ] keep
+    ] if
+  ] [
+    drop f
+  ] if* ;
+
+: parse-seq-element ( result quot -- result )
+  over [
+    call calc-seq-result
+  ] [
+    2drop f
+  ] if ; inline
 
 M: seq-parser (compile) ( parser -- quot )
   [
     [ input-slice V{ } clone <parse-result> ] %
-    parsers>> [ compiled-parser \ ?quot seq-pattern match-replace % ] each 
+    parsers>> [ compiled-parser 1quotation , \ parse-seq-element , ] each 
   ] [ ] make ;
 
 TUPLE: choice-parser parsers ;
+
+MATCH-VARS: ?quot ;
 
 : choice-pattern ( -- quot )
   [
