@@ -1,6 +1,6 @@
 #include "master.h"
 
-#define GC_DEBUG 1
+//#define GC_DEBUG 1
 
 #define ALLOC_DATA_HEAP "alloc_data_heap: gens=%ld, young_size=%ld, aging_size=%ld\n"
 #define GC_REQUESTED "garbage_collection: code_gc=%d, growing_data_heap=%d, requested_bytes=%ld\n"
@@ -12,7 +12,7 @@
 #ifdef GC_DEBUG
 	#define GC_PRINT printf
 #else
-	INLINE void GC_PRINT(...) { }
+	INLINE void GC_PRINT() { }
 #endif
 
 CELL init_zone(F_ZONE *z, CELL size, CELL start)
@@ -584,7 +584,10 @@ CELL collect_next(CELL scan)
 	do_slots(scan,copy_handle);
 
 	if(collecting_code)
+	{
+		printf("do_code_slots\n");
 		do_code_slots(scan);
+	}
 
 	return scan + untagged_object_size(scan);
 }
@@ -720,6 +723,8 @@ void garbage_collection(CELL gen,
 	growing_data_heap = growing_data_heap_;
 	collecting_gen = gen;
 
+	//if(collecting_gen == TENURED) collecting_code = true;
+
 	/* we come back here if a generation is full */
 	if(setjmp(gc_jmp))
 	{
@@ -727,15 +732,15 @@ void garbage_collection(CELL gen,
 		resort to growing the data heap */
 		if(collecting_gen == TENURED)
 		{
-			if(collecting_code)
+			//if(collecting_code)
 			{
 				growing_data_heap = true;
 
 				/* see the comment in unmark_marked() */
 				unmark_marked(&code_heap);
 			}
-			else
-				collecting_code = true;
+			//else
+			//	collecting_code = true;
 		}
 		/* we try collecting AGING space twice before going on to
 		collect TENURED */

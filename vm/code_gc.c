@@ -181,6 +181,7 @@ void free_unmarked(F_HEAP *heap)
 			}
 			break;
 		case B_FREE:
+			printf("RECLAIMED\n");
 			if(prev && prev->status == B_FREE)
 				prev->size += scan->size;
 			break;
