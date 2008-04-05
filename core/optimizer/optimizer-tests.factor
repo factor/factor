@@ -140,12 +140,6 @@ GENERIC: void-generic ( obj -- * )
 [ breakage ] must-fail
 
 ! regression
-: test-0 ( n -- ) dup 0 = [ drop ] [ 1- test-0 ] if ; inline
-: test-1 ( n -- ) t [ test-0 ] [ delegate dup [ test-1 ] [ drop ] if ] if ; inline
-: test-2 ( -- ) 5 test-1 ;
-
-[ f ] [ f test-2 ] unit-test
-
 : branch-fold-regression-0 ( m -- n )
     t [ ] [ 1+ branch-fold-regression-0 ] if ; inline
 

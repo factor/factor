@@ -5,6 +5,13 @@ USING: kernel sequences namespaces assocs graphs ;
 
 ERROR: no-compilation-unit definition ;
 
+SYMBOL: changed-definitions
+
+: changed-definition ( defspec -- )
+    dup changed-definitions get
+    [ no-compilation-unit ] unless*
+    set-at ;
+
 GENERIC: where ( defspec -- loc )
 
 M: object where drop f ;

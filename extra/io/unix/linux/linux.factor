@@ -123,5 +123,3 @@ M: linux init-io ( -- )
     [ init-inotify ] bi ;
 
 linux set-io-backend
-
-[ start-wait-thread ] "io.unix.linux" add-init-hook

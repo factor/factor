@@ -23,7 +23,7 @@ HELP: utf16
 { $see-also "encodings-introduction" } ;
 
 HELP: utf16n
-{ $class-description "The encoding descriptor for UTF-16 without a byte order mark in native endian order. This is useful mostly for FFI calls which take input of strings in of wide_t*." }
+{ $class-description "The encoding descriptor for UTF-16 without a byte order mark in native endian order. This is useful mostly for FFI calls which take input of strings of the type wchar_t*" }
 { $see-also "encodings-introduction" } ;
 
 { utf16 utf16le utf16be utf16n } related-words

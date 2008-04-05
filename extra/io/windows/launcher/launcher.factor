@@ -1,11 +1,12 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays continuations destructors io
+USING: alien alien.c-types arrays continuations io
 io.windows io.windows.nt.pipes libc io.nonblocking
-io.streams.duplex windows.types math windows.kernel32 windows
-namespaces io.launcher kernel sequences windows.errors assocs
+io.streams.duplex windows.types math windows.kernel32
+namespaces io.launcher kernel sequences windows.errors
 splitting system threads init strings combinators
-io.backend accessors concurrency.flags io.files ;
+io.backend accessors concurrency.flags io.files assocs
+io.files.private windows destructors ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args
@@ -27,8 +28,7 @@ TUPLE: CreateProcess-args
     "STARTUPINFO" heap-size over set-STARTUPINFO-cb >>lpStartupInfo
     "PROCESS_INFORMATION" <c-object> >>lpProcessInformation
     TRUE >>bInheritHandles
-    0 >>dwCreateFlags
-    current-directory get (normalize-path) >>lpCurrentDirectory ;
+    0 >>dwCreateFlags ;
 
 : call-CreateProcess ( CreateProcess-args -- )
     {
@@ -116,6 +116,8 @@ M: windows current-process-handle ( -- handle )
 
 M: windows run-process* ( process -- handle )
     [
+        current-directory get (normalize-path) cd
+
         dup make-CreateProcess-args
         tuck fill-redirection
         dup call-CreateProcess
@@ -142,26 +144,10 @@ M: windows kill-process* ( handle -- )
     over process-handle dispose-process
     notify-exit ;
 
-: wait-for-processes ( processes -- ? )
-    keys dup
+M: windows wait-for-processes ( -- ? )
+    processes get keys dup
     [ process-handle PROCESS_INFORMATION-hProcess ] map
     dup length swap >c-void*-array 0 0
     WaitForMultipleObjects
     dup HEX: ffffffff = [ win32-error ] when
     dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth process-exited f ] if ;
-
-SYMBOL: wait-flag
-
-: wait-loop ( -- )
-    processes get dup assoc-empty?
-    [ drop wait-flag get-global lower-flag ]
-    [ wait-for-processes [ 100 sleep ] when ] if ;
-
-: start-wait-thread ( -- )
-    <flag> wait-flag set-global
-    [ wait-loop t ] "Process wait" spawn-server drop ;
-
-M: windows register-process
-    drop wait-flag get-global raise-flag ;
-
-[ start-wait-thread ] "io.windows.launcher" add-init-hook

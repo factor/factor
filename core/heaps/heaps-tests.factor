@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: arrays kernel math namespaces tools.test
-heaps heaps.private math.parser random assocs sequences sorting ;
+heaps heaps.private math.parser random assocs sequences sorting
+accessors ;
 IN: heaps.tests
 
 [ <min-heap> heap-pop ] must-fail
@@ -47,7 +48,7 @@ IN: heaps.tests
 : test-entry-indices ( n -- ? )
     random-alist
     <min-heap> [ heap-push-all ] keep
-    heap-data dup length swap [ entry-index ] map sequence= ;
+    data>> dup length swap [ entry-index ] map sequence= ;
 
 14 [
     [ t ] swap [ 2^ test-entry-indices ] curry unit-test
@@ -63,9 +64,9 @@ IN: heaps.tests
     [
         random-alist
         <min-heap> [ heap-push-all ] keep
-        dup heap-data clone swap
+        dup data>> clone swap
     ] keep 3 /i [ 2dup >r delete-random r> heap-delete ] times
-    heap-data
+    data>>
     [ [ entry-key ] map ] bi@
     [ natural-sort ] bi@ ;
 

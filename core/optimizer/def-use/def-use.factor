@@ -100,7 +100,7 @@ M: #r> kill-node* [ node-in-r empty? ] prune-if ;
     dup [
         dup [ dead-literals get swap remove-all ] modify-values
         dup kill-node* dup t eq? [
-            drop dup [ kill-nodes ] change-children
+            drop dup [ kill-nodes ] map-children
         ] [
             nip kill-node
         ] if

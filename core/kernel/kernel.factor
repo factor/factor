@@ -118,6 +118,8 @@ GENERIC: hashcode* ( depth obj -- code )
 
 M: object hashcode* 2drop 0 ;
 
+M: f hashcode* 2drop 31337 ;
+
 : hashcode ( obj -- code ) 3 swap hashcode* ; inline
 
 GENERIC: equal? ( obj1 obj2 -- ? )
@@ -194,11 +196,7 @@ M: callstack clone (clone) ;
 PRIVATE>
 
 ! Deprecated
-GENERIC: delegate ( obj -- delegate )
-
 M: object delegate drop f ;
-
-GENERIC: set-delegate ( delegate tuple -- )
 
 GENERIC# get-slots 1 ( tuple slots -- ... )
 

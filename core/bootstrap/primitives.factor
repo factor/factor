@@ -3,10 +3,10 @@
 USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes
-classes.tuple classes.tuple.private kernel.private vocabs
-vocabs.loader source-files definitions slots.deprecated
-classes.union compiler.units bootstrap.image.private io.files
-accessors combinators ;
+classes.builtin classes.tuple classes.tuple.private
+kernel.private vocabs vocabs.loader source-files definitions
+slots.deprecated classes.union compiler.units
+bootstrap.image.private io.files accessors combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -30,7 +30,7 @@ crossref off
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
-H{ } clone changed-words set
+H{ } clone changed-definitions set
 H{ } clone forgotten-definitions set
 H{ } clone root-cache set
 H{ } clone source-files set
@@ -640,8 +640,7 @@ define-builtin
     { "setenv" "kernel.private" }
     { "(exists?)" "io.files.private" }
     { "(directory)" "io.files.private" }
-    { "data-gc" "memory" }
-    { "code-gc" "memory" }
+    { "gc" "memory" }
     { "gc-time" "memory" }
     { "save-image" "memory" }
     { "save-image-and-exit" "memory" }

@@ -70,7 +70,7 @@ USE: unix
     [
         setup-priority
         setup-redirection
-        current-directory get resource-path cd
+        current-directory get (normalize-path) cd
         dup pass-environment? [
             dup get-environment set-os-envs
         ] when
@@ -108,7 +108,7 @@ M: unix (process-stream)
 
 ! Inefficient process wait polling, used on Linux and Solaris.
 ! On BSD and Mac OS X, we use kqueue() which scales better.
-: wait-for-processes ( -- ? )
+M: unix wait-for-processes ( -- ? )
     -1 0 <int> tuck WNOHANG waitpid
     dup 0 <= [
         2drop t
@@ -119,7 +119,3 @@ M: unix (process-stream)
             2drop f
         ] if
     ] if ;
-
-: start-wait-thread ( -- )
-    [ wait-for-processes [ 250 sleep ] when t ]
-    "Process reaper" spawn-server drop ;

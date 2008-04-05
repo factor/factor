@@ -7,10 +7,6 @@ classes classes.private slots.deprecated slots.private slots
 compiler.units math.private accessors assocs ;
 IN: classes.tuple
 
-M: tuple delegate 2 slot ;
-
-M: tuple set-delegate 2 set-slot ;
-
 M: tuple class 1 slot 2 slot { word } declare ;
 
 ERROR: no-tuple-class class ;
@@ -44,7 +40,7 @@ PRIVATE>
     >r copy-tuple-slots r>
     layout-class prefix ;
 
-: tuple-slots ( tuple -- array )
+: tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
 
 : slots>tuple ( tuple class -- array )
@@ -52,11 +48,12 @@ PRIVATE>
         [ tuple-size ] [ [ set-array-nth ] curry ] bi 2each
     ] keep ;
 
-: >tuple ( tuple -- array )
+: >tuple ( tuple -- seq )
     unclip slots>tuple ;
 
 : slot-names ( class -- seq )
-    "slot-names" word-prop ;
+    "slot-names" word-prop
+    [ dup array? [ second ] when ] map ;
 
 <PRIVATE
 
@@ -107,7 +104,7 @@ PRIVATE>
     over superclass-size 2 + simple-slots ;
 
 : define-tuple-slots ( class -- )
-    dup dup slot-names generate-tuple-slots
+    dup dup "slot-names" word-prop generate-tuple-slots
     [ "slots" set-word-prop ]
     [ define-accessors ] ! new
     [ define-slots ] ! old
@@ -177,7 +174,7 @@ M: tuple-class update-class
         2drop
         [
             [ update-tuples-after ]
-            [ changed-word ]
+            [ changed-definition ]
             [ redefined ]
             tri
         ] each-subclass
@@ -228,9 +225,10 @@ M: tuple equal?
 
 M: tuple hashcode*
     [
-        dup tuple-size -rot 0 -rot [
-            swapd array-nth hashcode* bitxor
-        ] 2curry reduce
+        [ class hashcode ] [ tuple-size ] [ ] tri
+        >r rot r> [
+            swapd array-nth hashcode* sequence-hashcode-step
+        ] 2curry each
     ] recursive-hashcode ;
 
 ! Deprecated

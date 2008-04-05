@@ -3,9 +3,8 @@
 USING: kernel namespaces sequences sequences.private assocs math
 inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
-definitions prettyprint hashtables combinators.lib
-prettyprint.sections sequences.private effects generic
-compiler.units accessors ;
+definitions prettyprint hashtables prettyprint.sections
+sequences.private effects generic compiler.units accessors ;
 IN: locals
 
 ! Inspired by

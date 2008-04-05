@@ -1,3 +1,3 @@
-USING: io.backend system ;
+USING: io.unix.bsd io.backend system ;
 
 netbsd set-io-backend

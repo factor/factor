@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel parser sequences words help help.topics
 namespaces vocabs definitions compiler.units ;
@@ -16,4 +16,7 @@ IN: help.syntax
     over add-article >link r> remember-definition ; parsing
 
 : ABOUT:
-    scan-object in get vocab set-vocab-help ; parsing
+    scan-object
+    in get vocab
+    dup changed-definition
+    set-vocab-help ; parsing

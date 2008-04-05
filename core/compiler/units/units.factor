@@ -56,12 +56,12 @@ GENERIC: definitions-changed ( assoc obj -- )
     [ drop word? ] assoc-subset
     [ drop word-vocabulary dup [ vocab ] when dup ] assoc-map ;
 
-: changed-definitions ( -- assoc )
+: updated-definitions ( -- assoc )
     H{ } clone
     dup forgotten-definitions get update
     dup new-definitions get first update
     dup new-definitions get second update
-    dup changed-words get update
+    dup changed-definitions get update
     dup dup changed-vocabs update ;
 
 : compile ( words -- )
@@ -73,7 +73,7 @@ SYMBOL: outdated-tuples
 SYMBOL: update-tuples-hook
 
 : call-recompile-hook ( -- )
-    changed-words get keys
+    changed-definitions get keys [ word? ] subset
     compiled-usages recompile-hook get call ;
 
 : call-update-tuples-hook ( -- )
@@ -83,11 +83,11 @@ SYMBOL: update-tuples-hook
     call-recompile-hook
     call-update-tuples-hook
     dup [ drop crossref? ] assoc-contains? modify-code-heap
-    changed-definitions notify-definition-observers ;
+    updated-definitions notify-definition-observers ;
 
 : with-compilation-unit ( quot -- )
     [
-        H{ } clone changed-words set
+        H{ } clone changed-definitions set
         H{ } clone forgotten-definitions set
         H{ } clone outdated-tuples set
         <definitions> new-definitions set

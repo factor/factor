@@ -3,7 +3,8 @@
 USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
-sequences.private assocs models arrays accessors ;
+sequences.private assocs models arrays accessors
+generic generic.standard ;
 IN: tools.walker
 
 SYMBOL: show-walker-hook ! ( status continuation thread -- )
@@ -68,15 +69,12 @@ M: object add-breakpoint ;
 : (step-into-dispatch) nth (step-into-quot) ;
 
 : (step-into-execute) ( word -- )
-    dup "step-into" word-prop [
-        call
-    ] [
-        dup primitive? [
-            execute break
-        ] [
-            word-def (step-into-quot)
-        ] if
-    ] ?if ;
+    {
+        { [ dup "step-into" word-prop ] [ "step-into" word-prop call ] }
+        { [ dup standard-generic? ] [ effective-method (step-into-execute) ] }
+        { [ dup primitive? ] [ execute break ] }
+        { [ t ] [ word-def (step-into-quot) ] }
+    } cond ;
 
 \ (step-into-execute) t "step-into?" set-word-prop
 

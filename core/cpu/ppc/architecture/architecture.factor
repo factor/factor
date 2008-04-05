@@ -146,11 +146,19 @@ M: int-regs %save-param-reg drop 1 rot local@ STW ;
 
 M: int-regs %load-param-reg drop 1 rot local@ LWZ ;
 
-: STF float-regs-size 4 = [ STFS ] [ STFD ] if ;
+GENERIC: STF ( src dst reg-class -- )
+
+M: single-float-regs STF drop STFS ;
+
+M: double-float-regs STF drop STFD ;
 
 M: float-regs %save-param-reg >r 1 rot local@ r> STF ;
 
-: LF float-regs-size 4 = [ LFS ] [ LFD ] if ;
+GENERIC: LF ( src dst reg-class -- )
+
+M: single-float-regs LF drop LFS ;
+
+M: double-float-regs LF drop LFD ;
 
 M: float-regs %load-param-reg >r 1 rot local@ r> LF ;
 

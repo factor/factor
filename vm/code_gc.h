@@ -85,8 +85,6 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter);
 void collect_literals(void);
 void recursive_mark(F_BLOCK *block);
 void dump_heap(F_HEAP *heap);
-void code_gc(void);
 void compact_code_heap(void);
 
 DECLARE_PRIMITIVE(code_room);
-DECLARE_PRIMITIVE(code_gc);

@@ -125,4 +125,4 @@ SYMBOLS: h0 h1 h2 h3 h4 A B C D E w K ;
     [ zero? ] left-trim
     dup length odd? [ 1 tail ] when
     seq>2seq [ byte-array>sha1 ] bi@
-    swap 2seq>seq ;
+    2seq>seq ;
