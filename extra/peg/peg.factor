@@ -392,18 +392,16 @@ MATCH-VARS: ?quot ;
 
 MATCH-VARS: ?parser ;
 
-: semantic-pattern ( -- quot )
-  [
-    ?parser [
-      dup parse-result-ast ?quot call [ drop f ] unless
-    ] [
-      f
-    ] if*
-  ] ;
+: check-semantic ( result quot -- result )
+  over [
+    over ast>> swap call [ drop f ] unless
+  ] [
+    drop
+  ] if ; inline
 
 M: semantic-parser (compile) ( parser -- quot )
-  [ p1>> compiled-parser ] [ quot>> ] bi  
-  2array { ?parser ?quot } semantic-pattern match-replace ;
+  [ p1>> compiled-parser 1quotation ] [ quot>> ] bi  
+  '[ @ , check-semantic ] ;
 
 TUPLE: ensure-parser p1 ;
 
