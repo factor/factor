@@ -40,7 +40,7 @@ PRIVATE>
     >r copy-tuple-slots r>
     layout-class prefix ;
 
-: tuple-slots ( tuple -- array )
+: tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
 
 : slots>tuple ( tuple class -- array )
@@ -48,7 +48,7 @@ PRIVATE>
         [ tuple-size ] [ [ set-array-nth ] curry ] bi 2each
     ] keep ;
 
-: >tuple ( tuple -- array )
+: >tuple ( tuple -- seq )
     unclip slots>tuple ;
 
 : slot-names ( class -- seq )

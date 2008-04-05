@@ -296,7 +296,7 @@ HELP: tuple-slots
 { tuple-slots tuple>array } related-words
 
 HELP: define-tuple-slots
-{ $values { "class" tuple-class } { "slots" "a sequence of strings" } }
+{ $values { "class" tuple-class } }
 { $description "Defines slot accessor and mutator words for the tuple." }
 $low-level-note ;
 

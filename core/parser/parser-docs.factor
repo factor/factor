@@ -1,7 +1,7 @@
 USING: help.markup help.syntax kernel sequences words
 math strings vectors quotations generic effects classes
 vocabs.loader definitions io vocabs source-files
-quotations namespaces compiler.units ;
+quotations namespaces compiler.units assocs ;
 IN: parser
 
 ARTICLE: "vocabulary-search-shadow" "Shadowing word names"
@@ -446,8 +446,8 @@ HELP: eval
 { $errors "Throws an error if the input is malformed, or if the evaluation itself throws an error." } ;
 
 HELP: filter-moved
-{ $values { "assoc" "an assoc where the keys are definitions" } { "newassoc" "an assoc where the keys are definitions" } }
-{ $description "Removes all definitions from the assoc which are no longer present in the current " { $link file } "." } ;
+{ $values { "assoc1" assoc } { "assoc2" assoc } { "seq" "an seqence of definitions" } }
+{ $description "Removes all definitions from " { $snippet "assoc2" } " which are in " { $snippet "assoc1" } " or are are no longer present in the current " { $link file } "." } ;
 
 HELP: forget-smudged
 { $description "Forgets removed definitions and prints a warning message if any of them are still referenced from other source files." } ;

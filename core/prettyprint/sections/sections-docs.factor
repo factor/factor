@@ -1,6 +1,7 @@
 USING: prettyprint io kernel help.markup help.syntax
-prettyprint.sections prettyprint.config words hashtables math
+prettyprint.config words hashtables math
 strings definitions ;
+IN: prettyprint.sections
 
 HELP: position
 { $var-description "The prettyprinter's current character position." } ;
@@ -78,7 +79,7 @@ HELP: section
 } } ;
 
 HELP: construct-section
-{ $values { "style" hashtable } { "length" integer } { "section" section } }
+{ $values { "length" integer } { "class" "a subclass of " { $link section } } { "section" section } }
 { $description "Creates a new section with the given length starting from " { $link position } ", advancing " { $link position } "." } ;
 
 HELP: <indent
