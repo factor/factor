@@ -2,7 +2,7 @@
 IN: compiler.tests
 USING: compiler generator generator.registers
 generator.registers.private tools.test namespaces sequences
-words kernel math effects definitions compiler.units ;
+words kernel math effects definitions compiler.units accessors ;
 
 : <int-vreg> ( n -- vreg ) int-regs <vreg> ;
 
@@ -178,7 +178,7 @@ SYMBOL: template-chosen
     ] unit-test
     
     [ t ] [
-        phantom-datastack get [ cached? ] all?
+        phantom-datastack get stack>> [ cached? ] all?
     ] unit-test
 
     ! >r
