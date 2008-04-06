@@ -48,4 +48,4 @@ SYMBOL: (dispatch#)
 
 : picker ( -- quot ) \ (dispatch#) get (picker) ;
 
-GENERIC: extra-values ( method generic -- n )
+GENERIC: extra-values ( generic -- n )
