@@ -31,6 +31,6 @@ M: winnt deploy*
             [ deploy-name get create-exe-dir ] keep
             [ deploy-name get image-name ] keep
             [ namespace make-deploy-image ] keep
-            open-in-explorer
+            (normalize-path) open-in-explorer
         ] bind
     ] with-directory ;

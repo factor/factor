@@ -36,6 +36,8 @@ TUPLE: inference-error error type rstate ;
 
 M: inference-error compiler-error-type type>> ;
 
+M: inference-error error-help error>> error-help ;
+
 : (inference-error) ( ... class type -- * )
     >r construct-boa r>
     recursive-state get
@@ -359,7 +361,7 @@ TUPLE: effect-error word effect ;
     \ effect-error inference-error ;
 
 : check-effect ( word effect -- )
-    dup pick "declared-effect" word-prop effect<=
+    dup pick stack-effect effect<=
     [ 2drop ] [ effect-error ] if ;
 
 : finish-word ( word -- )
