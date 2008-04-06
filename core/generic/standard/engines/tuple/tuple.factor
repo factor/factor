@@ -66,7 +66,9 @@ PREDICATE: tuple-dispatch-engine-word < word
     "tuple-dispatch-engine" word-prop ;
 
 M: tuple-dispatch-engine-word stack-effect
-    "tuple-dispatch-generic" word-prop stack-effect ;
+    "tuple-dispatch-generic" word-prop
+    [ extra-values ] [ stack-effect clone ] bi
+    [ length + ] change-in ;
 
 M: tuple-dispatch-engine-word crossref?
     drop t ;

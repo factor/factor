@@ -47,3 +47,5 @@ SYMBOL: (dispatch#)
     } case ;
 
 : picker ( -- quot ) \ (dispatch#) get (picker) ;
+
+GENERIC: extra-values ( method generic -- n )

@@ -1,7 +1,8 @@
 IN: generic.standard.tests
 USING: tools.test math math.functions math.constants
 generic.standard strings sequences arrays kernel accessors
-words float-arrays byte-arrays bit-arrays parser namespaces ;
+words float-arrays byte-arrays bit-arrays parser namespaces
+quotations inference vectors growable ;
 
 GENERIC: lo-tag-test
 
@@ -194,7 +195,7 @@ M: ceo salary
 [ 102000 ] [ executive construct-boa salary ] unit-test
 
 [ ceo construct-boa salary ]
-[ T{ inconsistent-next-method f 5 ceo salary } = ] must-fail-with
+[ T{ inconsistent-next-method f ceo salary } = ] must-fail-with
 
 [ intern construct-boa salary ]
 [ T{ no-next-method f intern salary } = ] must-fail-with
@@ -232,4 +233,38 @@ M: c funky* "c" , call-next-method ;
 [ t ] [
     T{ a } funky
     { { "a" "x" "z" } { "a" "y" "z" } } member?
+] unit-test
+
+! Hooks
+SYMBOL: my-var
+HOOK: my-hook my-var ( -- x )
+
+M: integer my-hook "an integer" ;
+M: string my-hook "a string" ;
+
+[ "an integer" ] [ 3 my-var set my-hook ] unit-test
+[ "a string" ] [ my-hook my-var set my-hook ] unit-test
+[ 1.0 my-var set my-hook ] [ T{ no-method f 1.0 my-hook } = ] must-fail-with
+
+HOOK: my-tuple-hook my-var ( -- x )
+
+M: sequence my-tuple-hook my-hook ;
+
+[ f ] [
+    \ my-tuple-hook [ "engines" word-prop ] keep prefix
+    [ 1quotation infer ] map all-equal?
+] unit-test
+
+HOOK: call-next-hooker my-var ( -- x )
+
+M: sequence call-next-hooker "sequence" ;
+
+M: array call-next-hooker call-next-method "array " prepend ;
+
+M: vector call-next-hooker call-next-method "vector " prepend ;
+
+M: growable call-next-hooker call-next-method "growable " prepend ;
+
+[ "vector growable sequence" ] [
+    V{ } my-var [ call-next-hooker ] with-variable
 ] unit-test
