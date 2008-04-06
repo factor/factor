@@ -31,7 +31,10 @@ USE: unix
 : redirect-fd ( oldfd fd -- )
     2dup = [ 2drop ] [ dupd dup2 io-error close ] if ;
 
-: reset-fd ( fd -- ) F_SETFL 0 fcntl io-error ;
+: reset-fd ( fd -- )
+    #! We drop the error code because on *BSD, fcntl of
+    #! /dev/null fails.
+    F_SETFL 0 fcntl drop ;
 
 : redirect-inherit ( obj mode fd -- )
     2nip reset-fd ;
