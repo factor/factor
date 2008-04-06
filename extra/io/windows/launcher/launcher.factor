@@ -44,8 +44,21 @@ TUPLE: CreateProcess-args
         lpProcessInformation>>
     } get-slots CreateProcess win32-error=0/f ;
 
+: count-trailing-backslashes ( str n -- str n )
+    >r "\\" ?tail [
+        r> 1+ count-trailing-backslashes
+    ] [
+        r>
+    ] if ;
+
+: fix-trailing-backslashes ( str -- str' )
+    0 count-trailing-backslashes
+    2 * CHAR: \\ <repetition> append ;
+
 : escape-argument ( str -- newstr )
-    CHAR: \s over member? [ "\"" swap "\"" 3append ] when ;
+    CHAR: \s over member? [
+        "\"" swap fix-trailing-backslashes "\"" 3append
+    ] when ;
 
 : join-arguments ( args -- cmd-line )
     [ escape-argument ] map " " join ;
