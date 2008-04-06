@@ -43,6 +43,7 @@ FUNCTION: int dup2 ( int oldd, int newd ) ;
 FUNCTION: int execv ( char* path, char** argv ) ;
 FUNCTION: int execvp ( char* path, char** argv ) ;
 FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
+FUNCTION: int _exit ( int status ) ;
 FUNCTION: int fchdir ( int fd ) ;
 FUNCTION: int fchown ( int fd, uid_t owner, gid_t group ) ;
 FUNCTION: int fcntl ( int fd, int cmd, int arg ) ;

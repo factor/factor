@@ -77,7 +77,7 @@ USE: unix
 
         get-arguments exec-args-with-path
         (io-error)
-    ] [ 255 exit ] recover ;
+    ] [ 255 _exit "Exit failed" throw ] recover ;
 
 M: unix current-process-handle ( -- handle ) getpid ;
 
