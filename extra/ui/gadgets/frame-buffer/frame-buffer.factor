@@ -3,7 +3,7 @@ USING: kernel alien.c-types combinators sequences splitting
        opengl.gl ui.gadgets ui.render
        math math.vectors accessors ;
 
-IN: frame-buffer
+IN: ui.gadgets.frame-buffer
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
