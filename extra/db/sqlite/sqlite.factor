@@ -5,61 +5,49 @@ hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings classes.tuple alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators
-io namespaces.lib ;
-USE: tools.walker
+io namespaces.lib accessors ;
 IN: db.sqlite
 
-TUPLE: sqlite-db path ;
+TUPLE: sqlite-db < db path ;
 
 M: sqlite-db make-db* ( path db -- db )
-    [ set-sqlite-db-path ] keep ;
+    swap >>path ;
 
-M: sqlite-db db-open ( db -- )
-    dup sqlite-db-path sqlite-open <db>
-    swap set-delegate ;
+M: sqlite-db db-open ( db -- db )
+    [ path>> sqlite-open ] [ swap >>handle ] bi ;
 
 M: sqlite-db db-close ( handle -- ) sqlite-close ;
 M: sqlite-db dispose ( db -- ) dispose-db ;
-: with-sqlite ( path quot -- ) sqlite-db swap with-db ; inline
 
-TUPLE: sqlite-statement ;
-INSTANCE: sqlite-statement throwable-statement
+TUPLE: sqlite-statement < throwable-statement ;
+! INSTANCE: sqlite-statement throwable-statement
 
-TUPLE: sqlite-result-set has-more? ;
+TUPLE: sqlite-result-set < result-set has-more? ;
 
 M: sqlite-db <simple-statement> ( str in out -- obj )
     <prepared-statement> ;
 
 M: sqlite-db <prepared-statement> ( str in out -- obj )
-    {
-        set-statement-sql
-        set-statement-in-params
-        set-statement-out-params
-    } statement construct
-    sqlite-statement construct-delegate ;
+    sqlite-statement construct-statement ;
 
 : sqlite-maybe-prepare ( statement -- statement )
-    dup statement-handle [
-        [
-            delegate
-            db get db-handle over statement-sql sqlite-prepare
-            swap set-statement-handle
-        ] keep
+    dup handle>> [
+        db get handle>> over sql>> sqlite-prepare
+        >>handle
     ] unless ;
 
 M: sqlite-statement dispose ( statement -- )
-    statement-handle
+    handle>>
     [ [ sqlite3_reset drop ] keep sqlite-finalize ] when* ;
 
 M: sqlite-result-set dispose ( result-set -- )
-    f swap set-result-set-handle ;
+    f >>handle drop ;
 
 : sqlite-bind ( triples handle -- )
     swap [ first3 sqlite-bind-type ] with each ;
 
 : reset-statement ( statement -- )
-    sqlite-maybe-prepare
-    statement-handle sqlite-reset ;
+    sqlite-maybe-prepare handle>> sqlite-reset ;
 
 M: sqlite-statement bind-statement* ( statement -- )
     sqlite-maybe-prepare
@@ -104,7 +92,7 @@ M: sqlite-result-set more-rows? ( result-set -- ? )
 
 M: sqlite-statement query-results ( query -- result-set )
     sqlite-maybe-prepare
-    dup statement-handle sqlite-result-set <result-set>
+    dup statement-handle sqlite-result-set construct-result-set
     dup advance-row ;
 
 M: sqlite-db begin-transaction ( -- ) "BEGIN" sql-command ;
