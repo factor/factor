@@ -66,18 +66,18 @@ USE: unix
         ?closed write-flags 2 redirect
     ] if ;
 
-: spawn-process ( process -- * )
-    [
-        setup-priority
-        setup-redirection
-        current-directory get (normalize-path) cd
-        dup pass-environment? [
-            dup get-environment set-os-envs
-        ] when
+: setup-environment ( process -- process )
+    dup pass-environment? [
+        dup get-environment set-os-envs
+    ] when ;
 
-        get-arguments exec-args-with-path
-        (io-error)
-    ] [ 255 exit ] recover ;
+: spawn-process ( process -- * )
+    [ setup-priority ] [ 250 _exit ] recover
+    [ setup-redirection ] [ 251 _exit ] recover
+    [ current-directory get (normalize-path) cd ] [ 252 _exit ] recover
+    [ setup-environment ] [ 253 _exit ] recover
+    [ get-arguments exec-args-with-path ] [ 254 _exit ] recover
+    255 _exit ;
 
 M: unix current-process-handle ( -- handle ) getpid ;
 
