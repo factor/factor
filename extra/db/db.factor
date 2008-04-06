@@ -11,14 +11,19 @@ TUPLE: db
     update-statements
     delete-statements ;
 
-: <db> ( handle -- obj )
-    H{ } clone H{ } clone H{ } clone
-    db construct-boa ;
+: construct-db ( class -- obj )
+    construct-empty
+        H{ } clone >>insert-statements
+        H{ } clone >>update-statements
+        H{ } clone >>delete-statements ;
 
 GENERIC: make-db* ( seq class -- db )
-GENERIC: db-open ( db -- )
+
+: make-db ( seq class -- db )
+    construct-db make-db* ;
+
+GENERIC: db-open ( db -- db )
 HOOK: db-close db ( handle -- )
-: make-db ( seq class -- db ) construct-empty make-db* ;
 
 : dispose-statements ( seq -- ) [ dispose drop ] assoc-each ;
 
@@ -30,10 +35,12 @@ HOOK: db-close db ( handle -- )
         handle>> db-close
     ] with-variable ;
 
+! TUPLE: sql sql in-params out-params ;
 TUPLE: statement handle sql in-params out-params bind-params bound? ;
-TUPLE: simple-statement ;
-TUPLE: prepared-statement ;
-TUPLE: nonthrowable-statement ;
+TUPLE: simple-statement < statement ;
+TUPLE: prepared-statement < statement ;
+TUPLE: nonthrowable-statement < statement ;
+TUPLE: throwable-statement < statement ;
 : make-nonthrowable ( obj -- obj' )
     dup sequence? [
         [ make-nonthrowable ] map
@@ -41,14 +48,12 @@ TUPLE: nonthrowable-statement ;
         nonthrowable-statement construct-delegate
     ] if ;
 
-MIXIN: throwable-statement
-INSTANCE: statement throwable-statement
-INSTANCE: simple-statement throwable-statement
-INSTANCE: prepared-statement throwable-statement
-
 TUPLE: result-set sql in-params out-params handle n max ;
-: <statement> ( sql in out -- statement )
-    { (>>sql) (>>in-params) (>>out-params) } statement construct ;
+: construct-statement ( sql in out class -- statement )
+    construct-empty
+        swap >>out-params
+        swap >>in-params
+        swap >>sql ;
 
 HOOK: <simple-statement> db ( str in out -- statement )
 HOOK: <prepared-statement> db ( str in out -- statement )
@@ -88,10 +93,17 @@ M: nonthrowable-statement execute-statement ( statement -- )
     dup #rows >>max
     0 >>n drop ;
 
-: <result-set> ( query handle tuple -- result-set )
-    >r >r { sql>> in-params>> out-params>> } get-slots r>
-    { (>>sql) (>>in-params) (>>out-params) (>>handle) } result-set
-    construct r> construct-delegate ;
+: construct-result-set ( query handle class -- result-set )
+    construct-empty
+        swap >>handle
+        >r [ sql>> ] [ in-params>> ] [ out-params>> ] tri r>
+        swap >>out-params
+        swap >>in-params
+        swap >>sql ;
+    
+    ! >r >r { sql>> in-params>> out-params>> } get-slots r>
+    ! { (>>sql) (>>in-params) (>>out-params) (>>handle) } result-set
+    ! construct r> construct-delegate ;
 
 : sql-row ( result-set -- seq )
     dup #columns [ row-column ] with map ;
@@ -110,7 +122,7 @@ M: nonthrowable-statement execute-statement ( statement -- )
     accumulator >r query-each r> { } like ; inline
 
 : with-db ( db seq quot -- )
-    >r make-db dup db-open db r>
+    >r make-db db-open db r>
     [ db get swap [ drop ] swap compose with-disposal ] curry with-variable ;
 
 : default-query ( query -- result-set )
