@@ -4,8 +4,9 @@ USING: alien alien.c-types arrays ui ui.gadgets ui.gestures
 ui.backend ui.clipboards ui.gadgets.worlds assocs kernel math
 namespaces opengl sequences strings x11.xlib x11.events x11.xim
 x11.glx x11.clipboard x11.constants x11.windows io.encodings.string
-io.encodings.utf8 combinators debugger system command-line
+io.encodings.utf8 combinators debugger command-line qualified
 ui.render math.vectors classes.tuple opengl.gl threads ;
+QUALIFIED: system
 IN: ui.x11
 
 SINGLETON: x11-ui-backend
@@ -261,5 +262,5 @@ M: x11-ui-backend ui ( -- )
 
 x11-ui-backend ui-backend set-global
 
-[ "DISPLAY" os-env "ui" "listener" ? ]
+[ "DISPLAY" system:os-env "ui" "listener" ? ]
 main-vocab-hook set-global
