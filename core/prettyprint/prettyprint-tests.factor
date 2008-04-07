@@ -333,3 +333,6 @@ PREDICATE: predicate-see-test < integer even? ;
 [ "USING: math ;\nIN: prettyprint.tests\nPREDICATE: predicate-see-test < integer even? ;\n" ] [
     [ \ predicate-see-test see ] with-string-writer
 ] unit-test
+
+[ ] [ \ compose see ] unit-test
+[ ] [ \ curry see ] unit-test

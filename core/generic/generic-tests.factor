@@ -123,17 +123,6 @@ M: integer wii drop 6 ;
 
 [ 3 ] [ T{ first-one } wii ] unit-test
 
-! Hooks
-SYMBOL: my-var
-HOOK: my-hook my-var ( -- x )
-
-M: integer my-hook "an integer" ;
-M: string my-hook "a string" ;
-
-[ "an integer" ] [ 3 my-var set my-hook ] unit-test
-[ "a string" ] [ my-hook my-var set my-hook ] unit-test
-[ 1.0 my-var set my-hook ] [ T{ no-method f 1.0 my-hook } = ] must-fail-with
-
 GENERIC: tag-and-f ( x -- x x )
 
 M: fixnum tag-and-f 1 ;

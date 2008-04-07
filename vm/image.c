@@ -17,10 +17,14 @@ INLINE void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 {
 	CELL good_size = h->data_size + (1 << 20);
 
-	if(good_size > p->aging_size)
-		p->aging_size = good_size;
+	if(good_size > p->tenured_size)
+		p->tenured_size = good_size;
 
-	init_data_heap(p->gen_count,p->young_size,p->aging_size,p->secure_gc);
+	init_data_heap(p->gen_count,
+		p->young_size,
+		p->aging_size,
+		p->tenured_size,
+		p->secure_gc);
 
 	F_ZONE *tenured = &data_heap->generations[TENURED];
 
@@ -145,7 +149,7 @@ void save_image(const F_CHAR *filename)
 DEFINE_PRIMITIVE(save_image)
 {
 	/* do a full GC to push everything into tenured space */
-	code_gc();
+	gc();
 
 	save_image(unbox_native_string());
 }

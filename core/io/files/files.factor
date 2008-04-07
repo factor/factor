@@ -153,19 +153,19 @@ HOOK: file-info io-backend ( path -- info )
 ! Symlinks
 HOOK: link-info io-backend ( path -- info )
 
-HOOK: make-link io-backend ( path1 path2 -- )
+HOOK: make-link io-backend ( target symlink -- )
 
-HOOK: read-link io-backend ( path -- info )
+HOOK: read-link io-backend ( symlink -- path )
 
-: copy-link ( path1 path2 -- )
+: copy-link ( target symlink -- )
     >r read-link r> make-link ;
 
 SYMBOL: +regular-file+
 SYMBOL: +directory+
+SYMBOL: +symbolic-link+
 SYMBOL: +character-device+
 SYMBOL: +block-device+
 SYMBOL: +fifo+
-SYMBOL: +symbolic-link+
 SYMBOL: +socket+
 SYMBOL: +unknown+
 
@@ -176,14 +176,17 @@ SYMBOL: +unknown+
 : directory? ( path -- ? )
     file-info file-info-type +directory+ = ;
 
-! Current working directory
+<PRIVATE
+
 HOOK: cd io-backend ( path -- )
 
 HOOK: cwd io-backend ( -- path )
 
-SYMBOL: current-directory
-
 M: object cwd ( -- path ) "." ;
+
+PRIVATE>
+
+SYMBOL: current-directory
 
 [ cwd current-directory set-global ] "io.files" add-init-hook
 
@@ -202,12 +205,11 @@ M: object cwd ( -- path ) "." ;
 M: object normalize-path ( path -- path' )
     (normalize-path) ;
 
-: with-directory ( path quot -- )
-    >r (normalize-path) r>
-    current-directory swap with-variable ; inline
-
 : set-current-directory ( path -- )
-    normalize-path current-directory set ;
+    (normalize-path) current-directory set ;
+
+: with-directory ( path quot -- )
+    >r (normalize-path) current-directory r> with-variable ; inline
 
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )

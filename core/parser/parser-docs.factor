@@ -1,7 +1,7 @@
 USING: help.markup help.syntax kernel sequences words
 math strings vectors quotations generic effects classes
 vocabs.loader definitions io vocabs source-files
-quotations namespaces compiler.units ;
+quotations namespaces compiler.units assocs ;
 IN: parser
 
 ARTICLE: "vocabulary-search-shadow" "Shadowing word names"
@@ -284,10 +284,6 @@ HELP: use
 HELP: in
 { $var-description "A variable holding the name of the current vocabulary for new definitions." } ;
 
-HELP: shadow-warnings
-{ $values { "vocab" "an assoc mapping strings to words" } { "vocabs" "a sequence of assocs" } }
-{ $description "Tests if any keys in " { $snippet "vocab" } " shadow keys in the elements of " { $snippet "vocabs" } ", and if so, prints a warning message. These warning messages can be disabled by setting " { $link parser-notes } " to " { $link f } "." } ;
-
 HELP: (use+)
 { $values { "vocab" "an assoc mapping strings to words" } }
 { $description "Adds an assoc at the front of the search path." }
@@ -445,17 +441,9 @@ HELP: eval
 { $description "Parses Factor source code from a string, and calls the resulting quotation." }
 { $errors "Throws an error if the input is malformed, or if the evaluation itself throws an error." } ;
 
-HELP: outside-usages
-{ $values { "seq" "a sequence of definitions" } { "usages" "an association list mapping definitions to sequences of definitions" } }
-{ $description "Outputs an association list mapping elements of " { $snippet "seq" } " to lists of usages which exclude the definitions in " { $snippet "seq" } " themselves." } ;
-
 HELP: filter-moved
-{ $values { "assoc" "an assoc where the keys are definitions" } { "newassoc" "an assoc where the keys are definitions" } }
-{ $description "Removes all definitions from the assoc which are no longer present in the current " { $link file } "." } ;
-
-HELP: smudged-usage
-{ $values { "usages" "a sequence of definitions which reference removed definitions" } { "referenced" "a sequence of definitions removed from this source file which are still referenced elsewhere" } { "removed" "a sequence of definitions removed from this source file" } }
-{ $description "Collects information about changed word definitioins after parsing." } ;
+{ $values { "assoc1" assoc } { "assoc2" assoc } { "seq" "an seqence of definitions" } }
+{ $description "Removes all definitions from " { $snippet "assoc2" } " which are in " { $snippet "assoc1" } " or are are no longer present in the current " { $link file } "." } ;
 
 HELP: forget-smudged
 { $description "Forgets removed definitions and prints a warning message if any of them are still referenced from other source files." } ;

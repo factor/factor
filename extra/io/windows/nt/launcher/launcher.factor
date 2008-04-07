@@ -4,8 +4,8 @@ USING: alien alien.c-types arrays continuations destructors io
 io.windows libc io.nonblocking io.streams.duplex windows.types
 math windows.kernel32 windows namespaces io.launcher kernel
 sequences windows.errors assocs splitting system strings
-io.windows.launcher io.windows.nt.pipes io.backend
-combinators shuffle accessors locals ;
+io.windows.launcher io.windows.nt.pipes io.backend io.files
+io.files.private combinators shuffle accessors locals ;
 IN: io.windows.nt.launcher
 
 : duplicate-handle ( handle -- handle' )
@@ -39,7 +39,7 @@ IN: io.windows.nt.launcher
     create-mode
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
-    CreateFile dup invalid-handle? dup close-later ;
+    CreateFile dup invalid-handle? dup close-always ;
 
 : set-inherit ( handle ? -- )
     >r HANDLE_FLAG_INHERIT r> >BOOLEAN SetHandleInformation win32-error=0/f ;
@@ -120,6 +120,8 @@ M: winnt fill-redirection ( process args -- )
 
 M: winnt (process-stream)
     [
+        current-directory get (normalize-path) cd
+
         dup make-CreateProcess-args
 
         fill-stdout-pipe

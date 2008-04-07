@@ -104,8 +104,8 @@ HELP: semantic
     "Returns a parser that succeeds if the 'p1' parser succeeds and the quotation called with "
     "the AST produced by 'p1' on the stack returns true." }
 { $examples 
-  { $example "\"A\" [ drop t ] satisfy [ 66 > ] semantic parse" "f" } 
-  { $example "\"C\" [ drop t ] satisfy [ 66 > ] semantic parse parse-result-ast " "67" } 
+  { $example "USING: kernel math peg prettyprint ;" "\"A\" [ drop t ] satisfy [ 66 > ] semantic parse ." "f" } 
+  { $example "USING: kernel math peg prettyprint ;" "\"C\" [ drop t ] satisfy [ 66 > ] semantic parse parse-result-ast ." "67" } 
 } ;
 
 HELP: ensure

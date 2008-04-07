@@ -396,10 +396,10 @@ M: gadget request-focus-on gadget-parent request-focus-on ;
 M: f request-focus-on 2drop ;
 
 : request-focus ( gadget -- )
-    dup focusable-child swap request-focus-on ;
+    [ focusable-child ] keep request-focus-on ;
 
 : focus-path ( world -- seq )
-    [ gadget-parent ] follow ;
+    [ gadget-focus ] follow ;
 
 : make-gadget ( quot gadget -- gadget )
     [ \ make-gadget rot with-variable ] keep ; inline

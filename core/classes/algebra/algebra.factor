@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel classes combinators accessors sequences arrays
-vectors assocs namespaces words sorting layouts math hashtables
-kernel.private ;
+USING: kernel classes classes.builtin combinators accessors
+sequences arrays vectors assocs namespaces words sorting layouts
+math hashtables kernel.private ;
 IN: classes.algebra
 
 : 2cache ( key1 key2 assoc quot -- value )
@@ -103,7 +103,7 @@ C: <anonymous-complement> anonymous-complement
     {
         { [ over tuple eq? ] [ 2drop t ] }
         { [ over builtin-class? ] [ 2drop f ] }
-        { [ over tuple-class? ] [ [ class< ] 2keep swap class< or ] }
+        { [ over tuple-class? ] [ [ class< ] [ swap class< ] 2bi or ] }
         { [ t ] [ swap classes-intersect? ] }
     } cond ;
 

@@ -287,16 +287,6 @@ DEFINE_PRIMITIVE(code_room)
 	dpush(tag_fixnum((code_heap.segment->size) / 1024));
 }
 
-void code_gc(void)
-{
-	garbage_collection(TENURED,true,false,0);
-}
-
-DEFINE_PRIMITIVE(code_gc)
-{
-	code_gc();
-}
-
 /* Dump all code blocks for debugging */
 void dump_heap(F_HEAP *heap)
 {
@@ -444,7 +434,7 @@ critical here */
 void compact_code_heap(void)
 {
 	/* Free all unreachable code blocks */
-	code_gc();
+	gc();
 
 	fprintf(stderr,"*** Code heap compaction...\n");
 	fflush(stderr);

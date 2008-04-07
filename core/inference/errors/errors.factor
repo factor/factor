@@ -1,15 +1,15 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference.errors
 USING: inference.backend inference.dataflow kernel generic
 sequences prettyprint io words arrays inspector effects debugger
-assocs ;
+assocs accessors ;
 
 M: inference-error error.
-    dup inference-error-rstate
+    dup rstate>>
     keys [ dup value? [ value-literal ] when ] map
     dup empty? [ "Word: " write dup peek . ] unless
-    swap delegate error. "Nesting: " write . ;
+    swap error>> error. "Nesting: " write . ;
 
 M: inference-error error-help drop f ;
 

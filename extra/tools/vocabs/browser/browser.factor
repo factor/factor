@@ -79,7 +79,7 @@ C: <vocab-author> vocab-author
 
 : describe-help ( vocab -- )
     vocab-help [
-        "Documentation" $heading nl ($link)
+        "Documentation" $heading ($link)
     ] when* ;
 
 : describe-children ( vocab -- )

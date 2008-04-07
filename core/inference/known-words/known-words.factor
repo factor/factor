@@ -358,9 +358,7 @@ M: object infer-call
 
 \ (directory) { string } { array } <effect> set-primitive-effect
 
-\ data-gc { } { } <effect> set-primitive-effect
-
-\ code-gc { } { } <effect> set-primitive-effect
+\ gc { } { } <effect> set-primitive-effect
 
 \ gc-time { } { integer } <effect> set-primitive-effect
 
@@ -596,3 +594,5 @@ set-primitive-effect
 \ dll-valid? { object } { object } <effect> set-primitive-effect
 
 \ modify-code-heap { array object } { } <effect> set-primitive-effect
+
+\ unimplemented { } { } <effect> set-primitive-effect

@@ -62,21 +62,15 @@ TUPLE: library path abi dll ;
 : add-library ( name path abi -- )
     <library> swap libraries get set-at ;
 
-TUPLE: alien-callback return parameters abi quot xt ;
-
 ERROR: alien-callback-error ;
 
 : alien-callback ( return parameters abi quot -- alien )
     alien-callback-error ;
 
-TUPLE: alien-indirect return parameters abi ;
-
 ERROR: alien-indirect-error ;
 
 : alien-indirect ( ... funcptr return parameters abi -- )
     alien-indirect-error ;
-
-TUPLE: alien-invoke library function return parameters abi ;
 
 ERROR: alien-invoke-error library symbol ;
 

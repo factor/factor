@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types io.backend io.files io.windows kernel math
 windows windows.kernel32 windows.time calendar combinators
-math.functions sequences namespaces words symbols
-combinators.lib io.nonblocking destructors system ;
+math.functions sequences namespaces words symbols system
+combinators.lib io.nonblocking destructors math.bitfields.lib ;
 IN: io.windows.files
 
 SYMBOLS: +read-only+ +hidden+ +system+

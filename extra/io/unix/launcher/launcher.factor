@@ -4,7 +4,7 @@ USING: io io.backend io.launcher io.nonblocking io.unix.backend
 io.unix.files io.nonblocking sequences kernel namespaces math
 system alien.c-types debugger continuations arrays assocs
 combinators unix.process strings threads unix
-io.unix.launcher.parser accessors io.files ;
+io.unix.launcher.parser accessors io.files io.files.private ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -31,7 +31,10 @@ USE: unix
 : redirect-fd ( oldfd fd -- )
     2dup = [ 2drop ] [ dupd dup2 io-error close ] if ;
 
-: reset-fd ( fd -- ) F_SETFL 0 fcntl io-error ;
+: reset-fd ( fd -- )
+    #! We drop the error code because on *BSD, fcntl of
+    #! /dev/null fails.
+    F_SETFL 0 fcntl drop ;
 
 : redirect-inherit ( obj mode fd -- )
     2nip reset-fd ;
@@ -66,18 +69,18 @@ USE: unix
         ?closed write-flags 2 redirect
     ] if ;
 
-: spawn-process ( process -- * )
-    [
-        setup-priority
-        setup-redirection
-        current-directory get resource-path cd
-        dup pass-environment? [
-            dup get-environment set-os-envs
-        ] when
+: setup-environment ( process -- process )
+    dup pass-environment? [
+        dup get-environment set-os-envs
+    ] when ;
 
-        get-arguments exec-args-with-path
-        (io-error)
-    ] [ 255 exit ] recover ;
+: spawn-process ( process -- * )
+    [ setup-priority ] [ 250 _exit ] recover
+    [ setup-redirection ] [ 251 _exit ] recover
+    [ current-directory get (normalize-path) cd ] [ 252 _exit ] recover
+    [ setup-environment ] [ 253 _exit ] recover
+    [ get-arguments exec-args-with-path ] [ 254 _exit ] recover
+    255 _exit ;
 
 M: unix current-process-handle ( -- handle ) getpid ;
 
@@ -108,7 +111,7 @@ M: unix (process-stream)
 
 ! Inefficient process wait polling, used on Linux and Solaris.
 ! On BSD and Mac OS X, we use kqueue() which scales better.
-: wait-for-processes ( -- ? )
+M: unix wait-for-processes ( -- ? )
     -1 0 <int> tuck WNOHANG waitpid
     dup 0 <= [
         2drop t
@@ -119,7 +122,3 @@ M: unix (process-stream)
             2drop f
         ] if
     ] if ;
-
-: start-wait-thread ( -- )
-    [ wait-for-processes [ 250 sleep ] when t ]
-    "Process reaper" spawn-server drop ;

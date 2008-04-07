@@ -22,11 +22,3 @@ TUPLE: color red green blue ;
 
 [ T{ color f f f f } ]
 [ [ color construct-empty ] compile-call ] unit-test
-
-[ T{ color "a" f "b" f } ] [
-    "a" "b"
-    [ { set-delegate set-color-green } color construct ]
-    compile-call
-] unit-test
-
-[ T{ color f f f f } ] [ [ { } color construct ] compile-call ] unit-test

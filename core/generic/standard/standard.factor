@@ -67,7 +67,9 @@ ERROR: no-method object generic ;
         drop generic get "default-method" word-prop 1quotation
     ] unless ;
 
-GENERIC: mangle-method ( method generic -- quot )
+: mangle-method ( method generic -- quot )
+    [ 1quotation ] [ extra-values \ drop <repetition> ] bi*
+    prepend [ ] like ;
 
 : single-combination ( word -- quot )
     [
@@ -91,6 +93,23 @@ GENERIC: mangle-method ( method generic -- quot )
         } cleave
     ] with-scope ;
 
+ERROR: inconsistent-next-method class generic ;
+
+ERROR: no-next-method class generic ;
+
+: single-next-method-quot ( class generic -- quot )
+    [
+        [ drop [ instance? ] curry % ]
+        [
+            2dup next-method
+            [ 2nip 1quotation ]
+            [ [ no-next-method ] 2curry ] if* ,
+        ]
+        [ [ inconsistent-next-method ] 2curry , ]
+        2tri
+        \ if ,
+    ] [ ] make ;
+
 TUPLE: standard-combination # ;
 
 C: <standard-combination> standard-combination
@@ -107,8 +126,7 @@ PREDICATE: simple-generic < standard-generic
 : with-standard ( combination quot -- quot' )
     >r #>> (dispatch#) r> with-variable ; inline
 
-M: standard-generic mangle-method
-    drop 1quotation ;
+M: standard-generic extra-values drop 0 ;
 
 M: standard-combination make-default-method
     [ empty-method ] with-standard ;
@@ -118,25 +136,14 @@ M: standard-combination perform-combination
 
 M: standard-combination dispatch# #>> ;
 
-ERROR: inconsistent-next-method object class generic ;
-
-ERROR: no-next-method class generic ;
-
-M: standard-generic next-method-quot
+M: standard-combination next-method-quot*
     [
-        [
-            [ [ instance? ] curry ]
-            [ dispatch# (picker) ] bi* prepend %
-        ]
-        [
-            2dup next-method
-            [ 2nip 1quotation ]
-            [ [ no-next-method ] 2curry ] if* ,
-        ]
-        [ [ inconsistent-next-method ] 2curry , ]
-        2tri
-        \ if ,
-    ] [ ] make ;
+        single-next-method-quot picker prepend
+    ] with-standard ;
+
+M: standard-generic effective-method
+    [ dispatch# (picker) call ] keep
+    [ order [ instance? ] with find-last nip ] keep method ;
 
 TUPLE: hook-combination var ;
 
@@ -152,14 +159,16 @@ PREDICATE: hook-generic < generic
 
 M: hook-combination dispatch# drop 0 ;
 
-M: hook-generic mangle-method
-    drop 1quotation [ drop ] prepend ;
+M: hook-generic extra-values drop 1 ;
 
 M: hook-combination make-default-method
     [ error-method ] with-hook ;
 
 M: hook-combination perform-combination
     [ drop ] [ [ single-combination ] with-hook ] 2bi define ;
+
+M: hook-combination next-method-quot*
+    [ single-next-method-quot ] with-hook ;
 
 M: simple-generic definer drop \ GENERIC: f ;
 

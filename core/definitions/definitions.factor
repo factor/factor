@@ -5,6 +5,13 @@ USING: kernel sequences namespaces assocs graphs ;
 
 ERROR: no-compilation-unit definition ;
 
+SYMBOL: changed-definitions
+
+: changed-definition ( defspec -- )
+    dup changed-definitions get
+    [ no-compilation-unit ] unless*
+    set-at ;
+
 GENERIC: where ( defspec -- loc )
 
 M: object where drop f ;
@@ -41,13 +48,6 @@ M: object uses drop f ;
 : xref ( defspec -- ) dup uses crossref get add-vertex ;
 
 : usage ( defspec -- seq ) \ f or crossref get at keys ;
-
-GENERIC: redefined* ( defspec -- )
-
-M: object redefined* drop ;
-
-: redefined ( defspec -- )
-    [ crossref get at ] closure [ drop redefined* ] assoc-each ;
 
 : unxref ( defspec -- )
     dup uses crossref get remove-vertex ;

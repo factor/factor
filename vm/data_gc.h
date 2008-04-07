@@ -19,6 +19,8 @@ DECLARE_PRIMITIVE(begin_scan);
 DECLARE_PRIMITIVE(next_object);
 DECLARE_PRIMITIVE(end_scan);
 
+void gc(void);
+
 /* generational copying GC divides memory into zones */
 typedef struct {
 	/* allocation pointer is 'here'; its offset is hardcoded in the
@@ -34,6 +36,7 @@ typedef struct {
 
 	CELL young_size;
 	CELL aging_size;
+	CELL tenured_size;
 
 	CELL gen_count;
 
@@ -134,17 +137,18 @@ CELL init_zone(F_ZONE *z, CELL size, CELL base);
 void init_data_heap(CELL gens,
 	CELL young_size,
 	CELL aging_size,
+	CELL tenured_size,
 	bool secure_gc_);
 
 /* statistics */
 s64 gc_time;
-CELL minor_collections;
+CELL nursery_collections;
+CELL aging_collections;
 CELL cards_scanned;
 
 /* only meaningful during a GC */
 bool performing_gc;
 CELL collecting_gen;
-bool collecting_code;
 
 /* if true, we collecting AGING space for the second time, so if it is still
 full, we go on to collect TENURED */
@@ -186,10 +190,7 @@ INLINE void do_slots(CELL obj, void (* iter)(CELL *))
 	}
 }
 
-/* test if the pointer is in generation being collected, or a younger one.
-init_data_heap() arranges things so that the older generations are first,
-so we have to check that the pointer occurs after the beginning of
-the requested generation. */
+/* test if the pointer is in generation being collected, or a younger one. */
 INLINE bool should_copy(CELL untagged)
 {
 	if(in_zone(newspace,untagged))
@@ -221,7 +222,6 @@ CELL heap_scan_ptr;
 bool gc_off;
 
 void garbage_collection(volatile CELL gen,
-	bool code_gc,
 	bool growing_data_heap_,
 	CELL requested_bytes);
 
@@ -307,28 +307,53 @@ allocation (which does not call GC because of possible roots in volatile
 registers) does not run out of memory */
 #define ALLOT_BUFFER_ZONE 1024
 
-INLINE void maybe_gc(CELL a)
-{
-	/* If we are requesting a huge object, grow immediately */
-	if(nursery->size - ALLOT_BUFFER_ZONE <= a)
-		garbage_collection(TENURED,false,true,a);
-	/* If we have enough space in the nursery, just return.
-	Otherwise, perform a GC - this may grow the heap if
-	tenured space cannot hold all live objects from the nursery
-	even after a full GC */
-	else if(a + ALLOT_BUFFER_ZONE + nursery->here > nursery->end)
-		garbage_collection(NURSERY,false,false,0);
-	/* There is now sufficient room in the nursery for 'a' */
-}
-
 /*
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-INLINE void* allot_object(CELL type, CELL length)
+INLINE void* allot_object(CELL type, CELL a)
 {
-	maybe_gc(length);
-	CELL* object = allot_zone(nursery,length);
+	CELL *object;
+
+	/* If the object is bigger than the nursery, allocate it in
+	tenured space */
+	if(nursery->size - ALLOT_BUFFER_ZONE > a)
+	{
+		/* If there is insufficient room, collect the nursery */
+		if(nursery->here + ALLOT_BUFFER_ZONE + a > nursery->end)
+			garbage_collection(NURSERY,false,0);
+
+		object = allot_zone(nursery,a);
+	}
+	else
+	{
+		F_ZONE *tenured = &data_heap->generations[TENURED];
+
+		/* If tenured space does not have enough room, collect */
+		if(tenured->here + a > tenured->end)
+		{
+			gc();
+			tenured = &data_heap->generations[TENURED];
+		}
+
+		/* If it still won't fit, grow the heap */
+		if(tenured->here + a > tenured->end)
+		{
+			garbage_collection(TENURED,true,a);
+			tenured = &data_heap->generations[TENURED];
+		}
+
+		object = allot_zone(tenured,a);
+
+		/* We have to do this */
+		allot_barrier((CELL)object);
+
+		/* Allows initialization code to store old->new pointers
+		without hitting the write barrier in the common case of
+		a nursery allocation */
+		write_barrier((CELL)object);
+	}
+
 	*object = tag_header(type);
 	return object;
 }
@@ -337,8 +362,8 @@ CELL collect_next(CELL scan);
 
 DLLEXPORT void simple_gc(void);
 
-void data_gc(void);
-
-DECLARE_PRIMITIVE(data_gc);
+DECLARE_PRIMITIVE(gc);
 DECLARE_PRIMITIVE(gc_time);
 DECLARE_PRIMITIVE(become);
+
+CELL find_all_words(void);
