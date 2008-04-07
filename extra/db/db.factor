@@ -41,6 +41,7 @@ TUPLE: simple-statement < statement ;
 TUPLE: prepared-statement < statement ;
 TUPLE: nonthrowable-statement < statement ;
 TUPLE: throwable-statement < statement ;
+
 : make-nonthrowable ( obj -- obj' )
     dup sequence? [
         [ make-nonthrowable ] map
@@ -49,6 +50,7 @@ TUPLE: throwable-statement < statement ;
     ] if ;
 
 TUPLE: result-set sql in-params out-params handle n max ;
+
 : construct-statement ( sql in out class -- statement )
     construct-empty
         swap >>out-params
@@ -101,10 +103,6 @@ M: nonthrowable-statement execute-statement ( statement -- )
         swap >>in-params
         swap >>sql ;
     
-    ! >r >r { sql>> in-params>> out-params>> } get-slots r>
-    ! { (>>sql) (>>in-params) (>>out-params) (>>handle) } result-set
-    ! construct r> construct-delegate ;
-
 : sql-row ( result-set -- seq )
     dup #columns [ row-column ] with map ;
 
