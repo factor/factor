@@ -26,8 +26,7 @@ M: pair make-disassemble-cmd
 M: method-spec make-disassemble-cmd
     first2 method make-disassemble-cmd ;
 
-: gdb-binary ( -- string )
-    os freebsd? "gdb66" "gdb" ? ;
+: gdb-binary ( -- string ) "gdb" ;
 
 : run-gdb ( -- lines )
     <process>
