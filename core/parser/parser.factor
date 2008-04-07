@@ -191,22 +191,8 @@ SYMBOL: in
 : word/vocab% ( word -- )
     "(" % dup word-vocabulary % " " % word-name % ")" % ;
 
-: shadow-warning ( new old -- )
-    2dup eq? [
-        2drop
-    ] [
-        [ word/vocab% " shadowed by " % word/vocab% ] "" make
-        note.
-    ] if ;
-
-: shadow-warnings ( vocab vocabs -- )
-    [
-        swapd assoc-stack dup
-        [ shadow-warning ] [ 2drop ] if
-    ] curry assoc-each ;
-
 : (use+) ( vocab -- )
-    vocab-words use get 2dup shadow-warnings push ;
+    vocab-words use get push ;
 
 : use+ ( vocab -- )
     load-vocab (use+) ;

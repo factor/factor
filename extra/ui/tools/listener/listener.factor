@@ -7,7 +7,7 @@ ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
 prettyprint listener debugger threads boxes concurrency.flags
-math arrays generic accessors ;
+math arrays generic accessors combinators ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;
@@ -101,26 +101,32 @@ M: listener-operation invoke-command ( target command -- )
 : clear-stack ( listener -- )
     [ clear ] swap (call-listener) ;
 
-GENERIC# word-completion-string 1 ( word listener -- string )
+GENERIC: word-completion-string ( word -- string )
+
+M: word word-completion-string
+    word-name ;
 
 M: method-body word-completion-string
-    >r "method-generic" word-prop r> word-completion-string ;
+    "method-generic" word-prop word-completion-string ;
 
 USE: generic.standard.engines.tuple
 
 M: tuple-dispatch-engine-word word-completion-string
-    >r "engine-generic" word-prop r> word-completion-string ;
+    "engine-generic" word-prop word-completion-string ;
 
-M: word word-completion-string ( word listener -- string )
-    >r [ word-name ] [ word-vocabulary ] bi dup vocab-words r>
-    input>> interactor-use memq?
-    [ drop ] [ [ "USE: " % % " " % % ] "" make ] if ;
+: use-if-necessary ( word seq -- )
+    >r word-vocabulary vocab-words r>
+    {
+        { [ dup not ] [ 2drop ] }
+        { [ 2dup memq? ] [ 2drop ] }
+        { [ t ] [ push ] }
+    } cond ;
 
 : insert-word ( word -- )
-    get-workspace
-    workspace-listener
-    [ word-completion-string ] keep
-    input>> user-input ;
+    get-workspace workspace-listener input>>
+    [ >r word-completion-string r> user-input ]
+    [ interactor-use use-if-necessary ]
+    2bi ;
 
 : quot-action ( interactor -- lines )
     dup control-value

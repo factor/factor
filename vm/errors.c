@@ -145,3 +145,9 @@ DEFINE_PRIMITIVE(call_clear)
 {
 	throw_impl(dpop(),stack_chain->callstack_bottom);
 }
+
+/* For testing purposes */
+DEFINE_PRIMITIVE(unimplemented)
+{
+	not_implemented_error();
+}

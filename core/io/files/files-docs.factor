@@ -7,14 +7,15 @@ ARTICLE: "file-streams" "Reading and writing files"
 { $subsection <file-reader> }
 { $subsection <file-writer> }
 { $subsection <file-appender> }
+"Reading and writing the entire contents of a file; this is only recommended for smaller files:"
+{ $subsection file-contents }
+{ $subsection set-file-contents }
+{ $subsection file-lines }
+{ $subsection set-file-lines }
 "Utility combinators:"
 { $subsection with-file-reader }
 { $subsection with-file-writer }
-{ $subsection with-file-appender }
-{ $subsection set-file-contents }
-{ $subsection file-contents }
-{ $subsection set-file-lines }
-{ $subsection file-lines } ;
+{ $subsection with-file-appender } ;
 
 ARTICLE: "pathnames" "Pathname manipulation"
 "Pathname manipulation:"
