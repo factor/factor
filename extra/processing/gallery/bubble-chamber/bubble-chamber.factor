@@ -21,7 +21,7 @@ USING: kernel namespaces sequences combinators arrays threads
        processing.gadget
        processing.color ;
 
-IN: bubble-chamber
+IN: processing.gallery.bubble-chamber
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -472,6 +472,6 @@ METHOD: move { axion }
 
   ;
 
-: go ( -- ) [ bubble-chamber 500 sleep run ] with-ui ;
+: go ( -- ) [ bubble-chamber run ] with-ui ;
 
 MAIN: go
