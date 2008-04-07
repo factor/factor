@@ -70,6 +70,9 @@ PREDICATE: method-body < word
 M: method-body stack-effect
     "multi-method" word-prop method-generic stack-effect ;
 
+M: method-body crossref?
+    drop t ;
+
 : method-word-name ( classes generic -- string )
     [
         word-name %
