@@ -70,7 +70,7 @@ M: sqlite-statement bind-tuple ( tuple statement -- )
     dup zero? [ "last-id failed" throw ] when ;
 
 M: sqlite-db insert-tuple* ( tuple statement -- )
-    execute-statement last-insert-id >>primary-key drop ;
+    execute-statement last-insert-id swap set-primary-key ;
 
 M: sqlite-result-set #columns ( result-set -- n )
     handle>> sqlite-#columns ;
@@ -168,7 +168,7 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
         [ dup column-name>> 0% 2, ] interleave
 
         " from " 0% 0%
-        [ column-name>> swap get-slot-named ] with subset
+        [ slot-name>> swap get-slot-named ] with subset
         dup empty? [ drop ] [ where-clause ] if ";" 0%
     ] sqlite-make ;
 
