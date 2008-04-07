@@ -5,8 +5,8 @@ namespaces random ;
 "random.mersenne-twister" require
 
 {
-    { [ windows? ] [ "random.windows" require ] }
-    { [ unix? ] [ "random.unix" require ] }
+    { [ os windows? ] [ "random.windows" require ] }
+    { [ os unix? ] [ "random.unix" require ] }
 } cond
 
 ! [ [ 32 random-bits ] with-secure-random <mersenne-twister> random-generator set-global ]

@@ -4,9 +4,9 @@ vocabs vocabs.loader ;
 "bootstrap.compiler" vocab [
     "ui-backend" get [
         {
-            { [ macosx? ] [ "cocoa" ] }
-            { [ windows? ] [ "windows" ] }
-            { [ unix? ] [ "x11" ] }
+            { [ os macosx? ] [ "cocoa" ] }
+            { [ os windows? ] [ "windows" ] }
+            { [ os unix? ] [ "x11" ] }
         } cond
     ] unless* "ui." prepend require
 

@@ -1,8 +1,7 @@
 USING: alien alien.c-types arrays assocs byte-arrays inference
-inference.transforms io io.binary io.streams.string kernel
-math math.parser namespaces parser prettyprint
-quotations sequences strings vectors
-words macros math.functions ;
+inference.transforms io io.binary io.streams.string kernel math
+math.parser namespaces parser prettyprint quotations sequences
+strings vectors words macros math.functions math.bitfields.lib ;
 IN: pack
 
 SYMBOL: big-endian

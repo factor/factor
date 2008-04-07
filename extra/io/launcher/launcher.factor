@@ -3,10 +3,10 @@
 USING: io io.backend io.timeouts system kernel namespaces
 strings hashtables sequences assocs combinators vocabs.loader
 init threads continuations math io.encodings io.streams.duplex
-io.nonblocking accessors ;
+io.nonblocking accessors concurrency.flags ;
 IN: io.launcher
 
-TUPLE: process
+TUPLE: process < identity-tuple
 
 command
 detached
@@ -56,16 +56,25 @@ SYMBOL: processes
 
 [ H{ } clone processes set-global ] "io.launcher" add-init-hook
 
-HOOK: register-process io-backend ( process -- )
+HOOK: wait-for-processes io-backend ( -- ? )
 
-M: object register-process drop ;
+SYMBOL: wait-flag
+
+: wait-loop ( -- )
+    processes get assoc-empty?
+    [ wait-flag get-global lower-flag ]
+    [ wait-for-processes [ 100 sleep ] when ] if ;
+
+: start-wait-thread ( -- )
+    <flag> wait-flag set-global
+    [ wait-loop t ] "Process wait" spawn-server drop ;
+
+[ start-wait-thread ] "io.launcher" add-init-hook
 
 : process-started ( process handle -- )
     >>handle
-    V{ } clone over processes get set-at
-    register-process ;
-
-M: process equal? 2drop f ;
+    V{ } clone swap processes get set-at
+    wait-flag get-global raise-flag ;
 
 M: process hashcode* process-handle hashcode* ;
 

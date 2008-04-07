@@ -73,8 +73,8 @@ C-STRUCT: sockaddr-un
 : SEEK_END 2 ; inline
 
 os {
-    { "macosx"  [ "unix.bsd.macosx"  require ] }
-    { "freebsd" [ "unix.bsd.freebsd" require ] }
-    { "openbsd" [ "unix.bsd.openbsd" require ] }
-    { "netbsd"  [ "unix.bsd.netbsd"  require ] }
+    { macosx  [ "unix.bsd.macosx"  require ] }
+    { freebsd [ "unix.bsd.freebsd" require ] }
+    { openbsd [ "unix.bsd.openbsd" require ] }
+    { netbsd  [ "unix.bsd.netbsd"  require ] }
 } case

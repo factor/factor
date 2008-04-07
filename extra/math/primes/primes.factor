@@ -45,7 +45,7 @@ PRIVATE>
 
 : primes-between ( low high -- seq )
   primes-upto
-  >r 1- next-prime r>
+  [ 1- next-prime ] dip
   [ [ <=> ] binsearch ] keep [ length ] keep <slice> ; foldable
 
 : coprime? ( a b -- ? ) gcd nip 1 = ; foldable

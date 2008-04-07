@@ -2,9 +2,9 @@
 IN: compiler.tests
 USING: compiler generator generator.registers
 generator.registers.private tools.test namespaces sequences
-words kernel math effects definitions compiler.units ;
+words kernel math effects definitions compiler.units accessors ;
 
-: <int-vreg> ( n -- vreg ) T{ int-regs } <vreg> ;
+: <int-vreg> ( n -- vreg ) int-regs <vreg> ;
 
 [
     [ ] [ init-templates ] unit-test
@@ -15,18 +15,18 @@ words kernel math effects definitions compiler.units ;
     
     [ ] [ compute-free-vregs ] unit-test
     
-    [ f ] [ 0 <int-vreg> T{ int-regs } free-vregs member? ] unit-test
+    [ f ] [ 0 <int-vreg> int-regs free-vregs member? ] unit-test
     
     [ f ] [
         [
             copy-templates
             1 <int-vreg> phantom-push
             compute-free-vregs
-            1 <int-vreg> T{ int-regs } free-vregs member?
+            1 <int-vreg> int-regs free-vregs member?
         ] with-scope
     ] unit-test
     
-    [ t ] [ 1 <int-vreg> T{ int-regs } free-vregs member? ] unit-test
+    [ t ] [ 1 <int-vreg> int-regs free-vregs member? ] unit-test
 ] with-scope
 
 [
@@ -173,12 +173,12 @@ SYMBOL: template-chosen
     ] unit-test
 
     [ ] [
-        2 phantom-d get phantom-input
+        2 phantom-datastack get phantom-input
         [ { { f "a" } { f "b" } } lazy-load ] { } make drop
     ] unit-test
     
     [ t ] [
-        phantom-d get [ cached? ] all?
+        phantom-datastack get stack>> [ cached? ] all?
     ] unit-test
 
     ! >r

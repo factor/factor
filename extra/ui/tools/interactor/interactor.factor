@@ -3,10 +3,11 @@
 USING: arrays assocs combinators continuations documents
  hashtables io io.styles kernel math
 math.vectors models namespaces parser prettyprint quotations
-sequences sequences.lib strings threads listener
+sequences strings threads listener
 classes.tuple ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
-definitions boxes calendar concurrency.flags ui.tools.workspace ;
+definitions boxes calendar concurrency.flags ui.tools.workspace
+accessors ;
 IN: ui.tools.interactor
 
 TUPLE: interactor history output flag thread help ;
@@ -104,7 +105,8 @@ M: interactor model-changed
     ] curry "input" suspend ;
 
 M: interactor stream-readln
-    [ interactor-yield ] keep interactor-finish ?first ;
+    [ interactor-yield ] keep interactor-finish
+    dup [ first ] when ;
 
 : interactor-call ( quot interactor -- )
     dup interactor-busy? [
@@ -123,12 +125,12 @@ M: interactor stream-read-partial
     stream-read ;
 
 : go-to-error ( interactor error -- )
-    dup parse-error-line 1- swap parse-error-col 2array
+    [ line>> 1- ] [ column>> ] bi 2array
     over set-caret
     mark>caret ;
 
 : handle-parse-error ( interactor error -- )
-    dup parse-error? [ 2dup go-to-error delegate ] when
+    dup parse-error? [ 2dup go-to-error error>> ] when
     swap find-workspace debugger-popup ;
 
 : try-parse ( lines interactor -- quot/error/f )

@@ -4,12 +4,11 @@ USING: generic kernel math sequences arrays assocs alarms
 calendar ;
 IN: models
 
-TUPLE: model value connections dependencies ref locked? ;
+TUPLE: model < identity-tuple
+value connections dependencies ref locked? ;
 
 : <model> ( value -- model )
     V{ } clone V{ } clone 0 f model construct-boa ;
-
-M: model equal? 2drop f ;
 
 M: model hashcode* drop model hashcode* ;
 

@@ -1,21 +1,13 @@
 USING: prettyprint io kernel help.markup help.syntax
-prettyprint.sections prettyprint.config words hashtables math
+prettyprint.config words hashtables math
 strings definitions ;
+IN: prettyprint.sections
 
 HELP: position
 { $var-description "The prettyprinter's current character position." } ;
 
-HELP: last-newline
-{ $var-description "The character position of the last newline output by the prettyprinter." } ;
-
 HELP: recursion-check
 { $var-description "The current nesting of collections being output by the prettyprinter, used to detect circularity and prevent infinite recursion." } ;
-
-HELP: line-count
-{ $var-description "The number of lines output by the prettyprinter so far, used for line limiting (see " { $link line-limit } ")." } ;
-
-HELP: end-printing
-{ $var-description "A continuation captured by " { $link do-pprint } " that breaks out of the printer." } ;
 
 HELP: line-limit?
 { $values { "?" "a boolean" } }
@@ -67,7 +59,7 @@ HELP: short-section?
 { $contract "Tests if a section should be output as a " { $link short-section } ". The default implementation calls " { $link section-fits? } " but this behavior can be cutomized." } ;
 
 HELP: section
-{ $class-description "A piece of prettyprinter output. Instances of this class are not used directly, instead one instantiates various classes which delegate to this class:"
+{ $class-description "A piece of prettyprinter output. Instances of this class are not used directly, instead one instantiates various subclasses of this class:"
 { $list
     { $link text }
     { $link line-break }
@@ -78,21 +70,17 @@ HELP: section
 }
 "Instances of this class have the following slots:"
 { $list
-    { { $link section-start } " - the start of the section, measured in characters from the beginning of the prettyprinted output" }
-    { { $link section-end } " - the end of the section, measured in characters from the beginning of the prettyprinted output" }
-    { { $link section-start-group? } " - see " { $link start-group } }
-    { { $link section-end } " - see " { $link end-group } }
-    { { $link section-style } " - character and/or paragraph styles to use when outputting this section. See " { $link "styles" } }
-    { { $link section-overhang } " - number of columns which must be left blank before the wrap margin for the prettyprinter to consider emitting this section as a " { $link short-section } ". Avoids lone hanging closing brackets" }
+    { { $snippet "start" } " - the start of the section, measured in characters from the beginning of the prettyprinted output" }
+    { { $snippet "end" } " - the end of the section, measured in characters from the beginning of the prettyprinted output" }
+    { { $snippet "start-group?" } " - see " { $link start-group } }
+    { { $snippet "end-group?" } " - see " { $link end-group } }
+    { { $snippet "style" } " - character and/or paragraph styles to use when outputting this section. See " { $link "styles" } }
+    { { $snippet "overhang" } " - number of columns which must be left blank before the wrap margin for the prettyprinter to consider emitting this section as a " { $link short-section } ". Avoids lone hanging closing brackets" }
 } } ;
 
-HELP: <section>
-{ $values { "style" hashtable } { "length" integer } { "section" section } }
+HELP: construct-section
+{ $values { "length" integer } { "class" "a subclass of " { $link section } } { "section" section } }
 { $description "Creates a new section with the given length starting from " { $link position } ", advancing " { $link position } "." } ;
-
-HELP: change-indent
-{ $values { "section" section } { "n" integer } }
-{ $description "If the section requests indentation, adds " { $snippet "n" } " to the indent level, otherwise does nothing." } ;
 
 HELP: <indent
 { $values { "section" section } }

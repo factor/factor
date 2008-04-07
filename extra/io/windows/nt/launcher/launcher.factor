@@ -4,8 +4,8 @@ USING: alien alien.c-types arrays continuations destructors io
 io.windows libc io.nonblocking io.streams.duplex windows.types
 math windows.kernel32 windows namespaces io.launcher kernel
 sequences windows.errors assocs splitting system strings
-io.windows.launcher io.windows.nt.pipes io.backend
-combinators shuffle accessors locals ;
+io.windows.launcher io.windows.nt.pipes io.backend io.files
+io.files.private combinators shuffle accessors locals ;
 IN: io.windows.nt.launcher
 
 : duplicate-handle ( handle -- handle' )
@@ -112,14 +112,16 @@ IN: io.windows.nt.launcher
     dup pipe-out f set-inherit
     >>stdin-pipe ;
 
-M: windows-nt-io fill-redirection ( process args -- )
+M: winnt fill-redirection ( process args -- )
     [ 2dup redirect-stdout ] keep lpStartupInfo>> set-STARTUPINFO-hStdOutput
     [ 2dup redirect-stderr ] keep lpStartupInfo>> set-STARTUPINFO-hStdError
     [ 2dup redirect-stdin  ] keep lpStartupInfo>> set-STARTUPINFO-hStdInput
     2drop ;
 
-M: windows-nt-io (process-stream)
+M: winnt (process-stream)
     [
+        current-directory get (normalize-path) cd
+
         dup make-CreateProcess-args
 
         fill-stdout-pipe

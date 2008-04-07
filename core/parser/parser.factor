@@ -157,23 +157,33 @@ name>char-hook global [
         [ swap tail-slice (parse-string) ] "" make swap
     ] change-lexer-column ;
 
-TUPLE: parse-error file line col text ;
+TUPLE: parse-error file line column line-text error ;
 
 : <parse-error> ( msg -- error )
-    file get
-    lexer get [ line>> ] [ column>> ] [ line-text>> ] tri
-    parse-error construct-boa
-    [ set-delegate ] keep ;
+    \ parse-error construct-empty
+        file get >>file
+        lexer get line>> >>line
+        lexer get column>> >>column
+        lexer get line-text>> >>line-text
+        swap >>error ;
 
 : parse-dump ( error -- )
-    dup parse-error-file file.
-    dup parse-error-line number>string print
-    dup parse-error-text dup string? [ print ] [ drop ] if
-    parse-error-col 0 or CHAR: \s <string> write
+    {
+        [ file>> file. ]
+        [ line>> number>string print ]
+        [ line-text>> dup string? [ print ] [ drop ] if ]
+        [ column>> 0 or CHAR: \s <string> write ]
+    } cleave
     "^" print ;
 
 M: parse-error error.
-    dup parse-dump  delegate error. ;
+    [ parse-dump ] [ error>> error. ] bi ;
+
+M: parse-error summary
+    error>> summary ;
+
+M: parse-error compute-restarts
+    error>> compute-restarts ;
 
 SYMBOL: use
 SYMBOL: in
@@ -365,7 +375,17 @@ ERROR: bad-number ;
 
 : (:) CREATE-WORD parse-definition ;
 
-: (M:) CREATE-METHOD parse-definition ;
+SYMBOL: current-class
+SYMBOL: current-generic
+
+: (M:)
+    CREATE-METHOD
+    [
+        [ "method-class" word-prop current-class set ]
+        [ "method-generic" word-prop current-generic set ]
+        [ ] tri
+        parse-definition
+    ] with-scope ;
 
 : scan-object ( -- object )
     scan-word dup parsing?
@@ -399,6 +419,7 @@ SYMBOL: bootstrap-syntax
 SYMBOL: interactive-vocabs
 
 {
+    "accessors"
     "arrays"
     "assocs"
     "combinators"
@@ -454,60 +475,44 @@ SYMBOL: interactive-vocabs
         "Loading " write <pathname> . flush
     ] if ;
 
-: smudged-usage-warning ( usages removed -- )
-    parser-notes? [
-        "Warning: the following definitions were removed from sources," print
-        "but are still referenced from other definitions:" print
-        nl
-        dup sorted-definitions.
-        nl
-        "The following definitions need to be updated:" print
-        nl
-        over sorted-definitions.
-        nl
-    ] when 2drop ;
-
-: filter-moved ( assoc -- newassoc )
-    [
+: filter-moved ( assoc1 assoc2 -- seq )
+    diff [
         drop where dup [ first ] when
         file get source-file-path =
-    ] assoc-subset ;
+    ] assoc-subset keys ;
 
-: removed-definitions ( -- definitions )
+: removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions
-    [ get first2 union ] bi@ diff ;
+    [ get first2 union ] bi@ ;
 
-: smudged-usage ( -- usages referenced removed )
-    removed-definitions filter-moved keys [
-        outside-usages
-        [
-            empty? [ drop f ] [
-                {
-                    { [ dup pathname? ] [ f ] }
-                    { [ dup method-body? ] [ f ] }
-                    { [ t ] [ t ] }
-                } cond nip
-            ] if
-        ] assoc-subset
-        dup values concat prune swap keys
-    ] keep ;
+: removed-classes ( -- assoc1 assoc2 )
+    new-definitions old-definitions
+    [ get second ] bi@ ;
+
+: forget-removed-definitions ( -- )
+    removed-definitions filter-moved forget-all ;
+
+: reset-removed-classes ( -- )
+    removed-classes
+    filter-moved [ class? ] subset [ reset-class ] each ;
 
 : fix-class-words ( -- )
     #! If a class word had a compound definition which was
     #! removed, it must go back to being a symbol.
-    new-definitions get first2 diff
-    [ nip dup reset-generic define-symbol ] assoc-each ;
+    new-definitions get first2
+    filter-moved [ [ reset-generic ] [ define-symbol ] bi ] each ;
 
 : forget-smudged ( -- )
-    smudged-usage forget-all
-    over empty? [ 2dup smudged-usage-warning ] unless 2drop
+    forget-removed-definitions
+    reset-removed-classes
     fix-class-words ;
 
 : finish-parsing ( lines quot -- )
     file get
-    [ record-form ] keep
-    [ record-definitions ] keep
-    record-checksum ;
+    [ record-form ]
+    [ record-definitions ]
+    [ record-checksum ]
+    tri ;
 
 : parse-stream ( stream name -- quot )
     [

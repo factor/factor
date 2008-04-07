@@ -3,7 +3,7 @@
 USING: parser kernel namespaces sequences definitions io.files
 inspector continuations tools.crossref tools.vocabs 
 io prettyprint source-files assocs vocabs vocabs.loader
-io.backend splitting classes.tuple ;
+io.backend splitting accessors ;
 IN: editors
 
 TUPLE: no-edit-hook ;
@@ -18,7 +18,7 @@ SYMBOL: edit-hook
 
 : editor-restarts ( -- alist )
     available-editors
-    [ "Load " over append swap ] { } map>assoc ;
+    [ [ "Load " prepend ] keep ] { } map>assoc ;
 
 : no-edit-hook ( -- )
     \ no-edit-hook construct-empty
@@ -26,7 +26,7 @@ SYMBOL: edit-hook
     require ;
 
 : edit-location ( file line -- )
-    >r (normalize-path) "\\\\?\\" ?head drop r>
+    >r (normalize-path) r>
     edit-hook get [ call ] [ no-edit-hook edit-location ] if* ;
 
 : edit ( defspec -- )
@@ -35,18 +35,31 @@ SYMBOL: edit-hook
 : edit-vocab ( name -- )
     vocab-source-path 1 edit-location ;
 
+GENERIC: find-parse-error ( error -- error' )
+
+M: parse-error find-parse-error
+    dup error>> find-parse-error [ ] [ ] ?if ;
+
+M: condition find-parse-error
+    error>> find-parse-error ;
+
+M: object find-parse-error
+    drop f ;
+
 : :edit ( -- )
-    error get delegates [ parse-error? ] find-last nip [
-        dup parse-error-file source-file-path
-        swap parse-error-line edit-location
+    error get find-parse-error [
+        [ file>> path>> ] [ line>> ] bi edit-location
     ] when* ;
 
 : fix ( word -- )
-    "Fixing " write dup pprint " and all usages..." print nl
-    dup usage swap prefix [
-        "Editing " write dup .
-        "RETURN moves on to the next usage, C+d stops." print
-        flush
-        edit
-        readln
+    [ "Fixing " write pprint " and all usages..." print nl ]
+    [ [ usage ] keep prefix ] bi
+    [
+        [ "Editing " write . ]
+        [
+            "RETURN moves on to the next usage, C+d stops." print
+            flush
+            edit
+            readln
+        ] bi
     ] all? drop ;

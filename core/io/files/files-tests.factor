@@ -1,7 +1,7 @@
 IN: io.files.tests
-USING: tools.test io.files io threads kernel continuations
-io.encodings.ascii io.files.unique sequences strings accessors
-io.encodings.utf8 ;
+USING: tools.test io.files io.files.private io threads kernel
+continuations io.encodings.ascii io.files.unique sequences
+strings accessors io.encodings.utf8 ;
 
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test

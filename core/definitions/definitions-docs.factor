@@ -12,8 +12,6 @@ $nl
 { $subsection forget }
 "Definitions can answer a sequence of definitions they directly depend on:"
 { $subsection uses }
-"When a definition is changed, all definitions which depend on it are notified via a hook:"
-{ $subsection redefined* }
 "Definitions must implement a few operations used for printing them in source form:"
 { $subsection synopsis* }
 { $subsection definer }
@@ -107,11 +105,6 @@ HELP: usage
 { $values { "defspec" "a definition specifier" } { "seq" "a sequence of definition specifiers" } }
 { $description "Outputs a sequence of definitions that directly call the given definition." }
 { $notes "The sequence might include the definition itself, if it is a recursive word." } ;
-
-HELP: redefined*
-{ $values { "defspec" "a definition specifier" } }
-{ $contract "Updates the definition to cope with a callee being redefined." }
-$low-level-note ;
 
 HELP: unxref
 { $values { "defspec" "a definition specifier" } }

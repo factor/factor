@@ -1,23 +1,19 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: strings arrays hashtables assocs sequences
-xml.writer xml.utilities kernel namespaces ;
+cocoa.messages cocoa.classes cocoa.application cocoa kernel
+namespaces io.backend ;
 IN: cocoa.plists
 
-GENERIC: >plist ( obj -- tag )
+: assoc>NSDictionary ( assoc -- alien )
+    NSMutableDictionary over assoc-size -> dictionaryWithCapacity:
+    [
+        [
+            spin [ <NSString> ] bi@ -> setObject:forKey:
+        ] curry assoc-each
+    ] keep ;
 
-M: string >plist "string" build-tag ;
-
-M: array >plist
-    [ >plist ] map "array" build-tag* ;
-
-M: hashtable >plist
-    >alist [ >r "key" build-tag r> >plist ] assoc-map concat
-    "dict" build-tag* ;
-
-: build-plist ( obj -- tag )
-    >plist 1array "plist" build-tag*
-    dup { { "version" "1.0" } } update ;
-
-: plist>string ( obj -- string )
-    build-plist build-xml xml>string ;
+: write-plist ( assoc path -- )
+    >r assoc>NSDictionary
+    r> normalize-path <NSString> 0 -> writeToFile:atomically:
+    [ "write-plist failed" throw ] unless ;

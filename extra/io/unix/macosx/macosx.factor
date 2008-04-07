@@ -1,13 +1,9 @@
-IN: io.unix.macosx
 USING: io.unix.bsd io.backend io.monitors io.monitors.private
 continuations kernel core-foundation.fsevents sequences
-namespaces arrays ;
+namespaces arrays system ;
+IN: io.unix.macosx
 
-TUPLE: macosx-io ;
-
-INSTANCE: macosx-io bsd-io
-
-T{ macosx-io } set-io-backend
+macosx set-io-backend
 
 TUPLE: macosx-monitor ;
 
@@ -16,7 +12,7 @@ TUPLE: macosx-monitor ;
     [ [ first { +modify-file+ } swap changed-file ] each ] bind
     notify-callback ;
 
-M: macosx-io <monitor>
+M: macosx <monitor>
     drop
     f macosx-monitor construct-simple-monitor
     dup [ enqueue-notifications ] curry

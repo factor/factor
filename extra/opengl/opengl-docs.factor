@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io kernel math quotations
-opengl.gl multiline assocs vocabs.loader sequences ;
+opengl.gl assocs vocabs.loader sequences ;
 IN: opengl
 
 HELP: gl-color

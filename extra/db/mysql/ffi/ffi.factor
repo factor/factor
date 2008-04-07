@@ -6,9 +6,9 @@ USING: alien alien.syntax combinators kernel system ;
 IN: db.mysql.ffi
 
 << "mysql" {
-    { [ win32? ] [ "libmySQL.dll" "stdcall" ] }
-    { [ macosx? ] [ "libmysqlclient.14.dylib" "cdecl" ] }
-    { [ unix? ] [ "libmysqlclient.so.14" "cdecl" ] }
+    { [ os winnt? ] [ "libmySQL.dll" "stdcall" ] }
+    { [ os macosx? ] [ "libmysqlclient.14.dylib" "cdecl" ] }
+    { [ os unix? ] [ "libmysqlclient.so.14" "cdecl" ] }
 } cond add-library >>
 
 LIBRARY: mysql

@@ -1,22 +1,23 @@
 USING: continuations destructors io.buffers io.files io.backend
 io.timeouts io.nonblocking io.windows io.windows.nt.backend
-kernel libc math threads windows windows.kernel32
+kernel libc math threads windows windows.kernel32 system
 alien.c-types alien.arrays sequences combinators combinators.lib
-sequences.lib ascii splitting alien strings assocs namespaces ;
+sequences.lib ascii splitting alien strings assocs namespaces
+io.files.private ;
 IN: io.windows.nt.files
 
-M: windows-nt-io cwd
+M: winnt cwd
     MAX_UNICODE_PATH dup "ushort" <c-array>
     [ GetCurrentDirectory win32-error=0/f ] keep
     alien>u16-string ;
 
-M: windows-nt-io cd
+M: winnt cd
     SetCurrentDirectory win32-error=0/f ;
 
 : unicode-prefix ( -- seq )
     "\\\\?\\" ; inline
 
-M: windows-nt-io root-directory? ( path -- ? )
+M: winnt root-directory? ( path -- ? )
     {
         { [ dup empty? ] [ f ] }
         { [ dup [ path-separator? ] all? ] [ t ] }
@@ -40,15 +41,15 @@ ERROR: not-absolute-path ;
         unicode-prefix prepend
     ] unless ;
 
-M: windows-nt-io normalize-path ( string -- string' )
+M: winnt normalize-path ( string -- string' )
     (normalize-path)
     { { CHAR: / CHAR: \\ } } substitute
     prepend-prefix ;
 
-M: windows-nt-io CreateFile-flags ( DWORD -- DWORD )
+M: winnt CreateFile-flags ( DWORD -- DWORD )
     FILE_FLAG_OVERLAPPED bitor ;
 
-M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
+M: winnt FileArgs-overlapped ( port -- overlapped )
     make-overlapped ;
 
 : update-file-ptr ( n port -- )

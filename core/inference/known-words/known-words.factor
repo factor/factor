@@ -358,9 +358,7 @@ M: object infer-call
 
 \ (directory) { string } { array } <effect> set-primitive-effect
 
-\ data-gc { } { } <effect> set-primitive-effect
-
-\ code-gc { } { } <effect> set-primitive-effect
+\ gc { } { } <effect> set-primitive-effect
 
 \ gc-time { } { integer } <effect> set-primitive-effect
 
@@ -383,14 +381,8 @@ set-primitive-effect
 \ millis { } { integer } <effect> set-primitive-effect
 \ millis make-flushable
 
-\ type { object } { fixnum } <effect> set-primitive-effect
-\ type make-foldable
-
 \ tag { object } { fixnum } <effect> set-primitive-effect
 \ tag make-foldable
-
-\ class-hash { object } { fixnum } <effect> set-primitive-effect
-\ class-hash make-foldable
 
 \ cwd { } { string } <effect> set-primitive-effect
 

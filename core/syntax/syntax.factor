@@ -55,7 +55,7 @@ IN: bootstrap.syntax
     "BIN:" [ 2 parse-base ] define-syntax
 
     "f" [ f parsed ] define-syntax
-    "t" "syntax" lookup define-symbol
+    "t" "syntax" lookup define-singleton-class
 
     "CHAR:" [
         scan {
@@ -189,5 +189,11 @@ IN: bootstrap.syntax
     "<<" [
         [ \ >> parse-until >quotation ] with-compilation-unit
         call
+    ] define-syntax
+
+    "call-next-method" [
+        current-class get literalize parsed
+        current-generic get literalize parsed
+        \ (call-next-method) parsed
     ] define-syntax
 ] with-compilation-unit

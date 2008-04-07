@@ -7,10 +7,6 @@ classes classes.private slots.deprecated slots.private slots
 compiler.units math.private accessors assocs ;
 IN: classes.tuple
 
-M: tuple delegate 2 slot ;
-
-M: tuple set-delegate 2 set-slot ;
-
 M: tuple class 1 slot 2 slot { word } declare ;
 
 ERROR: no-tuple-class class ;
@@ -19,7 +15,7 @@ ERROR: no-tuple-class class ;
 
 GENERIC: tuple-layout ( object -- layout )
 
-M: class tuple-layout "layout" word-prop ;
+M: tuple-class tuple-layout "layout" word-prop ;
 
 M: tuple tuple-layout 1 slot ;
 
@@ -40,9 +36,11 @@ PRIVATE>
     [ drop ] [ no-tuple-class ] if ;
 
 : tuple>array ( tuple -- array )
-    prepare-tuple>array >r copy-tuple-slots r> layout-class prefix ;
+    prepare-tuple>array
+    >r copy-tuple-slots r>
+    layout-class prefix ;
 
-: tuple-slots ( tuple -- array )
+: tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
 
 : slots>tuple ( tuple class -- array )
@@ -50,11 +48,12 @@ PRIVATE>
         [ tuple-size ] [ [ set-array-nth ] curry ] bi 2each
     ] keep ;
 
-: >tuple ( tuple -- array )
+: >tuple ( tuple -- seq )
     unclip slots>tuple ;
 
 : slot-names ( class -- seq )
-    "slot-names" word-prop ;
+    "slot-names" word-prop
+    [ dup array? [ second ] when ] map ;
 
 <PRIVATE
 
@@ -105,7 +104,7 @@ PRIVATE>
     over superclass-size 2 + simple-slots ;
 
 : define-tuple-slots ( class -- )
-    dup dup slot-names generate-tuple-slots
+    dup dup "slot-names" word-prop generate-tuple-slots
     [ "slots" set-word-prop ]
     [ define-accessors ] ! new
     [ define-slots ] ! old
@@ -119,15 +118,6 @@ PRIVATE>
 
 : define-tuple-layout ( class -- )
     dup make-tuple-layout "layout" set-word-prop ;
-
-: removed-slots ( class newslots -- seq )
-    swap slot-names seq-diff ;
-
-: forget-removed-slots ( class slots -- )
-    dupd removed-slots [
-        [ reader-word forget-method ]
-        [ writer-word forget-method ] 2bi
-    ] with each ;
 
 : all-slot-names ( class -- slots )
     superclasses [ slot-names ] map concat \ class prefix ;
@@ -161,39 +151,36 @@ PRIVATE>
 : update-tuples-after ( class -- )
     outdated-tuples get [ all-slot-names ] cache drop ;
 
-: subclasses ( class -- classes )
-    class-usages keys [ tuple-class? ] subset ;
-
-: each-subclass ( class quot -- )
-    >r subclasses r> each ; inline
-
-: define-tuple-shape ( class -- )
-    [ define-tuple-slots ]
+M: tuple-class update-class
     [ define-tuple-layout ]
+    [ define-tuple-slots ]
     [ define-tuple-predicate ]
     tri ;
 
 : define-new-tuple-class ( class superclass slots -- )
     [ drop f tuple-class define-class ]
     [ nip "slot-names" set-word-prop ]
-    [
-        2drop
-        [ define-tuple-shape ] each-subclass
-    ] 3tri ;
+    [ 2drop update-classes ]
+    3tri ;
+
+: subclasses ( class -- classes )
+    class-usages keys [ tuple-class? ] subset ;
+
+: each-subclass ( class quot -- )
+    >r subclasses r> each ; inline
 
 : redefine-tuple-class ( class superclass slots -- )
     [
         2drop
         [
             [ update-tuples-after ]
-            [ changed-word ]
+            [ changed-definition ]
             [ redefined ]
             tri
         ] each-subclass
     ]
-    [ nip forget-removed-slots ]
     [ define-new-tuple-class ]
-    3tri ;
+    3bi ;
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
     rot tuck [ superclass = ] [ slot-names = ] 2bi* and ;
@@ -214,6 +201,22 @@ M: tuple-class define-tuple-class
     [ define-tuple-class ] [ 2drop ] 3bi
     dup [ construct-boa throw ] curry define ;
 
+M: tuple-class reset-class
+    [
+        dup "slot-names" word-prop [
+            [ reader-word method forget ]
+            [ writer-word method forget ] 2bi
+        ] with each
+    ] [
+        {
+            "class"
+            "metaclass"
+            "superclass"
+            "layout"
+            "slots"
+        } reset-props
+    ] bi ;
+
 M: tuple clone
     (clone) dup delegate clone over set-delegate ;
 
@@ -222,31 +225,19 @@ M: tuple equal?
 
 M: tuple hashcode*
     [
-        dup tuple-size -rot 0 -rot [
-            swapd array-nth hashcode* bitxor
-        ] 2curry reduce
+        [ class hashcode ] [ tuple-size ] [ ] tri
+        >r rot r> [
+            swapd array-nth hashcode* sequence-hashcode-step
+        ] 2curry each
     ] recursive-hashcode ;
 
-M: tuple-class reset-class
-    { "metaclass" "superclass" "slots" "layout" } reset-props ;
-
+! Deprecated
 M: object get-slots ( obj slots -- ... )
     [ execute ] with each ;
 
-M: object construct-empty ( class -- tuple )
-    tuple-layout <tuple> ;
-
-M: object construct-boa ( ... class -- tuple )
-    tuple-layout <tuple-boa> ;
-
-! Deprecated
 M: object set-slots ( ... obj slots -- )
     <reversed> get-slots ;
 
-M: object construct ( ... slots class -- tuple )
-    construct-empty [ swap set-slots ] keep ;
-
-: delegates ( obj -- seq )
-    [ dup ] [ [ delegate ] keep ] [ ] unfold nip ;
+: delegates ( obj -- seq ) [ delegate ] follow ;
 
 : is? ( obj quot -- ? ) >r delegates r> contains? ; inline

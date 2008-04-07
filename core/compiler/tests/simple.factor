@@ -48,7 +48,7 @@ IN: compiler.tests
 [ 4 1 3 ] [ 0 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
 [ 3 1 3 ] [ 1 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
 
-[ 2 3 ] [ 1 [ { [ code-gc 1 ] [ code-gc 2 ] } dispatch 3 ] compile-call ] unit-test
+[ 2 3 ] [ 1 [ { [ gc 1 ] [ gc 2 ] } dispatch 3 ] compile-call ] unit-test
 
 ! Labels
 

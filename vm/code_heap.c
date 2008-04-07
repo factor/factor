@@ -224,7 +224,7 @@ CELL allot_code_block(CELL size)
 	/* If allocation failed, do a code GC */
 	if(start == 0)
 	{
-		code_gc();
+		gc();
 		start = heap_allot(&code_heap,size);
 
 		/* Insufficient room even after code GC, give up */

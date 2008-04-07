@@ -1,6 +1,6 @@
 
 USING: kernel system namespaces sequences splitting combinators
-       io io.files io.launcher
+       io io.files io.launcher prettyprint
        bake combinators.cleave builder.common builder.util ;
 
 IN: builder.release
@@ -33,22 +33,22 @@ IN: builder.release
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: cpu- ( -- cpu ) cpu "." split "-" join ;
+: cpu- ( -- cpu ) cpu unparse "." split "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: base-name ( -- string ) { "factor" os cpu- stamp> } to-strings "-" join ;
+: base-name ( -- string )
+  { "factor" [ os unparse ] cpu- stamp> } to-strings "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : extension ( -- extension )
-  os
   {
-    { "linux" [ ".tar.gz" ] }
-    { "winnt" [ ".zip" ] }
-    { "macosx" [ ".dmg" ] }
+    { [ os winnt?  ] [ ".zip"    ] }  
+    { [ os macosx? ] [ ".dmg"    ] }
+    { [ os unix?   ] [ ".tar.gz" ] }
   }
-  case ;
+  cond ;
 
 : archive-name ( -- string ) base-name extension append ;
 
@@ -69,9 +69,9 @@ IN: builder.release
 
 : archive-cmd ( -- cmd )
   {
-    { [ windows? ] [ windows-archive-cmd ] }
-    { [ macosx?  ] [ macosx-archive-cmd  ] }
-    { [ unix?    ] [ unix-archive-cmd    ] }
+    { [ os windows? ] [ windows-archive-cmd ] }
+    { [ os macosx?  ] [ macosx-archive-cmd  ] }
+    { [ os unix?    ] [ unix-archive-cmd    ] }
   }
   cond ;
 
@@ -83,13 +83,13 @@ IN: builder.release
   { "rm" "-rf" common-files } to-strings try-process ;
 
 : remove-factor-app ( -- )
-  macosx? not [ { "rm" "-rf" "Factor.app" } try-process ] when ;
+  os macosx? not [ { "rm" "-rf" "Factor.app" } try-process ] when ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: upload-to-factorcode
 
-: platform ( -- string ) { os cpu- } to-strings "-" join ;
+: platform ( -- string ) { [ os unparse ] cpu- } to-strings "-" join ;
 
 : remote-location ( -- dest )
   "factorcode.org:/var/www/factorcode.org/newsite/downloads"

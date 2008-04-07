@@ -1,7 +1,9 @@
 USING: kernel unicode.data sequences sequences.next namespaces
-assocs.lib unicode.normalize math unicode.categories combinators
+unicode.normalize math unicode.categories combinators
 assocs strings splitting ;
 IN: unicode.case
+
+: at-default ( key assoc -- value/key ) over >r at r> or ;
 
 : ch>lower ( ch -- lower ) simple-lower at-default ;
 : ch>upper ( ch -- upper ) simple-upper at-default ;

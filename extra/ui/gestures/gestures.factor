@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
-math.vectors classes.tuple classes ui.gadgets combinators.lib
-boxes
-calendar alarms symbols ;
+math.vectors classes.tuple classes ui.gadgets boxes
+calendar alarms symbols combinators ;
 IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
@@ -188,11 +187,12 @@ SYMBOL: drag-timer
 
 : multi-click? ( button -- ? )
     {
-        [ multi-click-timeout? ]
-        [ multi-click-button? ]
-        [ multi-click-position? ]
-        [ multi-click-position? ]
-    } && nip ;
+        { [ multi-click-timeout?  not ] [ f ] }
+        { [ multi-click-button?   not ] [ f ] }
+        { [ multi-click-position? not ] [ f ] }
+        { [ multi-click-position? not ] [ f ] }
+        { [ t ] [ t ] }
+    } cond nip ;
 
 : update-click# ( button -- )
     global [

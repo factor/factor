@@ -26,10 +26,6 @@ IN: compiler.tests
 [ { 1 2 3 } { 1 4 3 } [ over tag over tag ] compile-call ]
 unit-test
 
-[ { 1 2 3 } { 1 4 3 } 8 8 ]
-[ { 1 2 3 } { 1 4 3 } [ over type over type ] compile-call ]
-unit-test
-
 ! Test literals in either side of a shuffle
 [ 4 1 ] [ 1 [ [ 3 fixnum+ ] keep ] compile-call ] unit-test
 
@@ -176,14 +172,14 @@ TUPLE: my-tuple ;
 [ 1 t ] [
     B{ 1 2 3 4 } [
         { c-ptr } declare
-        [ 0 alien-unsigned-1 ] keep type
+        [ 0 alien-unsigned-1 ] keep hi-tag
     ] compile-call byte-array type-number =
 ] unit-test
 
 [ t ] [
     B{ 1 2 3 4 } [
         { c-ptr } declare
-        0 alien-cell type
+        0 alien-cell hi-tag
     ] compile-call alien type-number =
 ] unit-test
 
@@ -206,3 +202,47 @@ TUPLE: my-tuple ;
         ] [ 2drop no-case ] if
     ] compile-call
 ] unit-test
+
+: float-spill-bug
+    {
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+    } cleave ;
+
+[ t ] [ \ float-spill-bug compiled? ] unit-test

@@ -22,11 +22,16 @@ IN: newfx
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: nth-is-of (   i val seq -- seq ) dup >r swapd set-nth r> ;
+: is-nth-of ( val   i seq -- seq ) dup >r       set-nth r> ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : mutate-nth    ( seq i val -- ) swap rot set-nth ;
-: mutate-at-nth ( seq val i -- )      rot set-nth ;
+: mutate-nth-at ( seq val i -- )      rot set-nth ;
 
 : mutate-nth-of    (   i val seq -- ) swapd set-nth ;
-: mutate-at-nth-of ( val   i seq -- )       set-nth ;
+: mutate-nth-at-of ( val   i seq -- )       set-nth ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -60,6 +65,29 @@ IN: newfx
 
 : delete-at-key ( tbl key -- tbl ) over delete-at ;
 : delete-key-of ( key tbl -- tbl ) tuck delete-at ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: delete      ( seq elt -- seq ) over sequences:delete ;
+: delete-from ( elt seq -- seq ) tuck sequences:delete ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: deleted      ( seq elt -- ) swap sequences:delete ;
+: deleted-from ( elt seq -- )      sequences:delete ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: remove      ( seq obj -- seq ) swap sequences:remove ;
+: remove-from ( obj seq -- seq )      sequences:remove ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: subset-of ( quot seq -- seq ) swap subset ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: map-over ( quot seq -- seq ) swap map ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
