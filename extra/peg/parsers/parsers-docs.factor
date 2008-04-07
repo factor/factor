@@ -173,7 +173,7 @@ HELP: range-pattern
 "of characters separated with a dash (-) represents the "
 "range of characters from the first to the second, inclusive."
 { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" \"_a-zA-Z\" range-pattern parse parse-result-ast 1string ." "\"a\"" } 
-    { $example "USING: peg peg.parsers prettyprint ;" "\"0\" \"^0-9\" range-pattern parse ." "f" } 
+    { $example "USING: peg peg.parsers prettyprint strings ;" "\"a\" \"_a-zA-Z\" range-pattern parse parse-result-ast 1string ." "\"a\"" } 
+    { $example "USING: peg peg.parsers prettyprint ;\n\"0\" \"^0-9\" range-pattern parse ." "f" } 
 }
 }  ;

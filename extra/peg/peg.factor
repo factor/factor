@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings fry namespaces math assocs shuffle 
-       vectors arrays combinators.lib math.parser match
+       vectors arrays combinators.lib math.parser 
        unicode.categories sequences.lib compiler.units parser
        words quotations effects memoize accessors locals effects splitting ;
 IN: peg
@@ -241,7 +241,7 @@ GENERIC: (compile) ( parser -- quot )
 : compiled-parse ( state word -- result )
   swap [ execute ] with-packrat ; inline 
 
-: parse ( state parser -- result )
+: parse ( input parser -- result )
   dup word? [ compile ] unless compiled-parse ;
 
 <PRIVATE
@@ -264,8 +264,6 @@ SYMBOL: id
   ] cache over set-delegate ;
 
 TUPLE: token-parser symbol ;
-
-MATCH-VARS: ?token ;
 
 : parse-token ( input string -- result )
   #! Parse the string, returning a parse result
@@ -388,9 +386,6 @@ M: optional-parser (compile) ( parser -- quot )
   p1>> compiled-parser 1quotation '[ @ check-optional ] ;
 
 TUPLE: semantic-parser p1 quot ;
-MATCH-VARS: ?quot ;
-
-MATCH-VARS: ?parser ;
 
 : check-semantic ( result quot -- result )
   over [
@@ -420,8 +415,6 @@ M: ensure-not-parser (compile) ( parser -- quot )
   p1>> compiled-parser 1quotation '[ input-slice @ check-ensure-not ] ;
 
 TUPLE: action-parser p1 quot ;
-
-MATCH-VARS: ?action ;
 
 : check-action ( result quot -- result )
   over [
