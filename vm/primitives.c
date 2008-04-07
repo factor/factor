@@ -187,4 +187,5 @@ void *primitives[] = {
 	primitive_resize_bit_array,
 	primitive_resize_float_array,
 	primitive_dll_validp,
+	primitive_unimplemented,
 };
