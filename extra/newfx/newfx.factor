@@ -68,6 +68,29 @@ IN: newfx
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: delete      ( seq elt -- seq ) over sequences:delete ;
+: delete-from ( elt seq -- seq ) tuck sequences:delete ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: deleted      ( seq elt -- ) swap sequences:delete ;
+: deleted-from ( elt seq -- )      sequences:delete ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: remove      ( seq obj -- seq ) swap sequences:remove ;
+: remove-from ( obj seq -- seq )      sequences:remove ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: subset-of ( quot seq -- seq ) swap subset ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: map-over ( quot seq -- seq ) swap map ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 ! A note about the 'mutate' qualifier. Other words also technically mutate
 ! their primary object. However, the 'mutate' qualifier is supposed to
 ! indicate that this is the main objective of the word, as a side effect.
