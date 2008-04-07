@@ -39,7 +39,7 @@ IN: io.windows.nt.launcher
     create-mode
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
-    CreateFile dup invalid-handle? dup close-later ;
+    CreateFile dup invalid-handle? dup close-always ;
 
 : set-inherit ( handle ? -- )
     >r HANDLE_FLAG_INHERIT r> >BOOLEAN SetHandleInformation win32-error=0/f ;

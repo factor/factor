@@ -1,7 +1,7 @@
 IN: io.windows.launcher.nt.tests
 USING: io.launcher tools.test calendar accessors
 namespaces kernel system arrays io io.files io.encodings.ascii
-sequences parser assocs hashtables ;
+sequences parser assocs hashtables math ;
 
 [ ] [
     <process>
@@ -129,3 +129,14 @@ sequences parser assocs hashtables ;
 
     "HOME" swap at "XXX" =
 ] unit-test
+
+2 [
+    [ ] [
+        <process>
+            "cmd.exe /c dir" >>command
+            "dir.txt" temp-file >>stdout
+        try-process
+    ] unit-test
+
+    [ ] [ "dir.txt" temp-file delete-file ] unit-test
+] times

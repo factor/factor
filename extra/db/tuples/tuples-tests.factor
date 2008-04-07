@@ -260,10 +260,10 @@ C: <secret> secret
 ! [ test-random-id ] test-sqlite
  [ native-person-schema test-tuples ] test-sqlite
  [ assigned-person-schema test-tuples ] test-sqlite
-! [ assigned-person-schema test-repeated-insert ] test-sqlite
-! [ native-person-schema test-tuples ] test-postgresql
-! [ assigned-person-schema test-tuples ] test-postgresql
-! [ assigned-person-schema test-repeated-insert ] test-postgresql
+ [ assigned-person-schema test-repeated-insert ] test-sqlite
+ [ native-person-schema test-tuples ] test-postgresql
+ [ assigned-person-schema test-tuples ] test-postgresql
+ [ assigned-person-schema test-repeated-insert ] test-postgresql
 
 ! \ insert-tuple must-infer
 ! \ update-tuple must-infer
