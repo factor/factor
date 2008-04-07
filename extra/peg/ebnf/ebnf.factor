@@ -318,11 +318,11 @@ M: object build-locals ( code ast -- )
    
 M: ebnf-action (transform) ( ast -- parser )
   [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
-  string-lines [ parse-lines ] with-compilation-unit action ;
+  string-lines parse-lines action ;
 
 M: ebnf-semantic (transform) ( ast -- parser )
   [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
-  string-lines [ parse-lines ] with-compilation-unit semantic ;
+  string-lines parse-lines semantic ;
 
 M: ebnf-var (transform) ( ast -- parser )
   parser>> (transform) ;
