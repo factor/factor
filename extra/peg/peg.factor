@@ -241,7 +241,7 @@ GENERIC: (compile) ( parser -- quot )
 : compiled-parse ( state word -- result )
   swap [ execute ] with-packrat ; inline 
 
-: parse ( state parser -- result )
+: parse ( input parser -- result )
   dup word? [ compile ] unless compiled-parse ;
 
 <PRIVATE
