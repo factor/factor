@@ -21,7 +21,7 @@ USING: kernel namespaces sequences combinators arrays threads
        processing.gadget
        processing.color ;
 
-IN: bubble-chamber
+IN: processing.gallery.bubble-chamber
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
