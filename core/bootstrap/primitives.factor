@@ -737,6 +737,7 @@ define-builtin
     { "resize-bit-array" "bit-arrays" }
     { "resize-float-array" "float-arrays" }
     { "dll-valid?" "alien" }
+    { "unimplemented" "kernel.private" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 

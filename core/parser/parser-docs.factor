@@ -284,10 +284,6 @@ HELP: use
 HELP: in
 { $var-description "A variable holding the name of the current vocabulary for new definitions." } ;
 
-HELP: shadow-warnings
-{ $values { "vocab" "an assoc mapping strings to words" } { "vocabs" "a sequence of assocs" } }
-{ $description "Tests if any keys in " { $snippet "vocab" } " shadow keys in the elements of " { $snippet "vocabs" } ", and if so, prints a warning message. These warning messages can be disabled by setting " { $link parser-notes } " to " { $link f } "." } ;
-
 HELP: (use+)
 { $values { "vocab" "an assoc mapping strings to words" } }
 { $description "Adds an assoc at the front of the search path." }
