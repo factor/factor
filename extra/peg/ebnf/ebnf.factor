@@ -361,7 +361,11 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   [ compiled-parse ] curry [ with-scope ] curry ;
 
 : replace-escapes ( string -- string )
-  "\\t" token [ drop "\t" ] action  "\\n" token [ drop "\n" ] action 2choice replace ;
+  [
+    "\\t" token [ drop "\t" ] action ,
+    "\\n" token [ drop "\n" ] action ,
+    "\\r" token [ drop "\r" ] action ,
+  ] choice* replace ;
 
 : [EBNF "EBNF]" parse-multiline-string replace-escapes ebnf>quot nip parsed ; parsing
 
