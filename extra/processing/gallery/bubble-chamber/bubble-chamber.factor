@@ -7,6 +7,7 @@ USING: kernel namespaces sequences combinators arrays threads
        math.ranges
        math.constants
        math.functions
+       math.points
 
        ui
        ui.gadgets
@@ -76,17 +77,8 @@ VARS: particles muons quarks hadrons axions ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: x>> ( particle -- x ) pos>> first  ;
-: y>> ( particle -- x ) pos>> second ;
-
-: >>x ( particle x -- particle ) over y>>      2array >>pos ;
-: >>y ( particle y -- particle ) over x>> swap 2array >>pos ;
-
-: x x>> ;
-: y y>> ;
-
-: v+y ( seq y -- seq ) >r first2 r> + 2array ;
-: v-y ( seq y -- seq ) >r first2 r> - 2array ;
+: x ( particle -- x ) pos>> first  ;
+: y ( particle -- x ) pos>> second ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
