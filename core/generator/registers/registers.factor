@@ -322,7 +322,7 @@ M: phantom-retainstack finalize-height
 
 : (live-locs) ( phantom -- seq )
     #! Discard locs which haven't moved
-    [ phantom-locs* ] [ stack>> ] bi 2array flip
+    [ phantom-locs* ] [ stack>> ] bi zip
     [ live-loc? ] assoc-subset
     values ;
 
@@ -421,7 +421,7 @@ M: loc lazy-store
 
 : slow-shuffle-mapping ( locs tmp -- pairs )
     >r dup length r>
-    [ swap - <ds-loc> ] curry map 2array flip ;
+    [ swap - <ds-loc> ] curry map zip ;
 
 : slow-shuffle ( locs -- )
     #! We don't have enough free registers to load all shuffle

@@ -155,6 +155,9 @@ M: assoc >alist [ 2array ] { } assoc>map ;
 : value-at ( value assoc -- key/f )
     swap [ = nip ] curry assoc-find 2drop ;
 
+: zip ( keys values -- alist )
+    2array flip ; inline
+
 : search-alist ( key alist -- pair i )
     [ first = ] with find swap ; inline
 
@@ -204,7 +207,7 @@ M: enum set-at seq>> set-nth ;
 M: enum delete-at enum-seq delete-nth ;
 
 M: enum >alist ( enum -- alist )
-    seq>> [ length ] keep 2array flip ;
+    seq>> [ length ] keep zip ;
 
 M: enum assoc-size seq>> length ;
 
