@@ -4,7 +4,7 @@
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions mirrors
 arrays math.parser math.private sorting strings ascii macros
-assocs.lib quotations ;
+assocs.lib quotations hashtables ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -221,7 +221,7 @@ PRIVATE>
     [ swap nth ] with map ;
 
 : replace ( str oldseq newseq -- str' )
-    H{ } 2seq>assoc substitute ;
+    zip >hashtable substitute ;
 
 : remove-nth ( seq n -- seq' )
     cut-slice 1 tail-slice append ;
