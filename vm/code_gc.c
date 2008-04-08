@@ -198,20 +198,33 @@ void free_unmarked(F_HEAP *heap)
 	build_free_list(heap,heap->segment->size);
 }
 
-/* Compute total sum of sizes of free blocks */
-CELL heap_usage(F_HEAP *heap, F_BLOCK_STATUS status)
+/* Compute total sum of sizes of free blocks, and size of largest free block */
+void heap_usage(F_HEAP *heap, CELL *used, CELL *total_free, CELL *max_free)
 {
-	CELL size = 0;
+	*used = 0;
+	*total_free = 0;
+	*max_free = 0;
+
 	F_BLOCK *scan = first_block(heap);
 
 	while(scan)
 	{
-		if(scan->status == status)
-			size += scan->size;
+		switch(scan->status)
+		{
+		case B_ALLOCATED:
+			*used += scan->size;
+			break;
+		case B_FREE:
+			*total_free += scan->size;
+			if(scan->size > *max_free)
+				*max_free = scan->size;
+			break;
+		default:
+			critical_error("Invalid scan->status",(CELL)scan);
+		}
+
 		scan = next_block(heap,scan);
 	}
-
-	return size;
 }
 
 /* The size of the heap, not including the last block if it's free */
@@ -283,8 +296,12 @@ void recursive_mark(F_BLOCK *block)
 /* Push the free space and total size of the code heap */
 DEFINE_PRIMITIVE(code_room)
 {
-	dpush(tag_fixnum(heap_usage(&code_heap,B_FREE) / 1024));
+	CELL used, total_free, max_free;
+	heap_usage(&code_heap,&used,&total_free,&max_free);
 	dpush(tag_fixnum((code_heap.segment->size) / 1024));
+	dpush(tag_fixnum(used / 1024));
+	dpush(tag_fixnum(total_free / 1024));
+	dpush(tag_fixnum(max_free / 1024));
 }
 
 /* Dump all code blocks for debugging */
