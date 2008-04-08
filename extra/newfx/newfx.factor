@@ -1,7 +1,8 @@
 
-USING: kernel sequences assocs qualified ;
+USING: kernel sequences assocs qualified circular ;
 
 QUALIFIED: sequences
+QUALIFIED: circular
 
 IN: newfx
 
@@ -53,8 +54,10 @@ IN: newfx
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: push    ( seq obj -- seq ) over sequences:push ;
-: push-on ( obj seq -- seq ) tuck sequences:push ;
+: push      ( seq obj -- seq ) over sequences:push ;
+: push-on   ( obj seq -- seq ) tuck sequences:push ;
+: pushed    ( seq obj --     ) swap sequences:push ;
+: pushed-on ( obj seq --     )      sequences:push ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -88,6 +91,10 @@ IN: newfx
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : map-over ( quot seq -- seq ) swap map ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: push-circular ( seq elt -- seq ) over circular:push-circular ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
