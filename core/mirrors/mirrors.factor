@@ -42,7 +42,7 @@ M: mirror delete-at ( key mirror -- )
 M: mirror >alist ( mirror -- alist )
     >mirror<
     [ [ slot-spec-offset slot ] with map ] keep
-    [ slot-spec-name ] map swap 2array flip ;
+    [ slot-spec-name ] map swap zip ;
 
 M: mirror assoc-size mirror-slots length ;
 

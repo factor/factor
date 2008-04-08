@@ -1,27 +1,12 @@
 
-USING: kernel arrays sequences math qualified circular processing ui ;
+USING: kernel arrays sequences math qualified
+       sequences.lib circular processing ui newfx ;
 
 IN: processing.gallery.trails
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! Example 33-15 from the Processing book
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-QUALIFIED: circular
-
-: push-circular ( seq elt -- seq ) over circular:push-circular ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: each-percent ( seq quot -- )
-  >r
-  dup length
-  dup [ / ] curry
-  [ 1+ ] swap compose
-  r> compose
-  2each ;                       inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

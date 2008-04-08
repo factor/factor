@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings fry namespaces math assocs shuffle 
-       vectors arrays combinators.lib math.parser 
-       unicode.categories sequences.lib compiler.units parser
+       vectors arrays math.parser 
+       unicode.categories compiler.units parser
        words quotations effects memoize accessors locals effects splitting ;
 IN: peg
 

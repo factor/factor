@@ -315,8 +315,6 @@ INLINE void* allot_object(CELL type, CELL a)
 {
 	CELL *object;
 
-	/* If the object is bigger than the nursery, allocate it in
-	tenured space */
 	if(nursery->size - ALLOT_BUFFER_ZONE > a)
 	{
 		/* If there is insufficient room, collect the nursery */
@@ -325,6 +323,8 @@ INLINE void* allot_object(CELL type, CELL a)
 
 		object = allot_zone(nursery,a);
 	}
+	/* If the object is bigger than the nursery, allocate it in
+	tenured space */
 	else
 	{
 		F_ZONE *tenured = &data_heap->generations[TENURED];

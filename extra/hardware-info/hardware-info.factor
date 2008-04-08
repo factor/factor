@@ -3,11 +3,12 @@ combinators vocabs.loader hardware-info.backend system ;
 IN: hardware-info
 
 : write-unit ( x n str -- )
-    [ 2^ /i number>string write bl ] [ write ] bi* ;
+    [ 2^ /f number>string write bl ] [ write ] bi* ;
 
 : kb ( x -- ) 10 "kB" write-unit ;
 : megs ( x -- ) 20 "MB" write-unit ;
 : gigs ( x -- ) 30 "GB" write-unit ;
+: ghz ( x -- ) 1000000000 /f number>string write bl "GHz" write ;
 
 << {
     { [ os windows? ] [ "hardware-info.windows" ] }
@@ -18,4 +19,5 @@ IN: hardware-info
 
 : hardware-report. ( -- )
     "CPUs: " write cpus number>string write nl
+    "CPU Speed: " write cpu-mhz ghz nl
     "Physical RAM: " write physical-mem megs nl ;

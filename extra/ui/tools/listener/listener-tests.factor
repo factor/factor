@@ -2,7 +2,7 @@ USING: continuations documents ui.tools.interactor
 ui.tools.listener hashtables kernel namespaces parser sequences
 tools.test ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.panes vocabs words tools.test.ui slots.private
-threads ;
+threads arrays generic ;
 IN: ui.tools.listener.tests
 
 [ f ] [ "word" source-editor command-map empty? ] unit-test
@@ -13,11 +13,11 @@ IN: ui.tools.listener.tests
 
 "listener" get [
     [ "dup" ] [
-        \ dup "listener" get word-completion-string
+        \ dup word-completion-string
     ] unit-test
 
-    [ "USE: slots.private slot" ]
-    [ \ slot "listener" get word-completion-string ] unit-test
+    [ "equal?" ]
+    [ \ array \ equal? method word-completion-string ] unit-test
 
     <pane> <interactor> "i" set
 
