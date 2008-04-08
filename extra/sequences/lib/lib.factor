@@ -37,6 +37,16 @@ MACRO: firstn ( n -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: each-percent ( seq quot -- )
+  >r
+  dup length
+  dup [ / ] curry
+  [ 1+ ] swap compose
+  r> compose
+  2each ;                       inline
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : sigma ( seq quot -- n )
     [ rot slip + ] curry 0 swap reduce ; inline
 
