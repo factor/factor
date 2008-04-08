@@ -373,7 +373,7 @@ set-primitive-effect
 \ data-room { } { integer array } <effect> set-primitive-effect
 \ data-room make-flushable
 
-\ code-room { } { integer integer } <effect> set-primitive-effect
+\ code-room { } { integer integer integer integer } <effect> set-primitive-effect
 \ code-room  make-flushable
 
 \ os-env { string } { object } <effect> set-primitive-effect
@@ -594,3 +594,5 @@ set-primitive-effect
 \ dll-valid? { object } { object } <effect> set-primitive-effect
 
 \ modify-code-heap { array object } { } <effect> set-primitive-effect
+
+\ unimplemented { } { } <effect> set-primitive-effect

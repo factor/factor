@@ -146,7 +146,7 @@ M: int-regs %save-param-reg drop 1 rot local@ STW ;
 
 M: int-regs %load-param-reg drop 1 rot local@ LWZ ;
 
-GENERIC: STF ( src dst reg-class -- )
+GENERIC: STF ( src dst off reg-class -- )
 
 M: single-float-regs STF drop STFS ;
 
@@ -154,7 +154,7 @@ M: double-float-regs STF drop STFD ;
 
 M: float-regs %save-param-reg >r 1 rot local@ r> STF ;
 
-GENERIC: LF ( src dst reg-class -- )
+GENERIC: LF ( dst src off reg-class -- )
 
 M: single-float-regs LF drop LFS ;
 

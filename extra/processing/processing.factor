@@ -1,6 +1,6 @@
 
 USING: kernel namespaces threads combinators sequences arrays
-       math math.functions
+       math math.functions math.ranges random
        opengl.gl opengl.glu vars multi-methods shuffle
        ui
        ui.gestures
@@ -13,6 +13,18 @@ USING: kernel namespaces threads combinators sequences arrays
        processing.gadget ;
        
 IN: processing
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: 2random ( a b -- num ) 2dup swap - 100 / <range> random ;
+
+: 1random ( b -- num ) 0 swap 2random ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: chance ( fraction -- ? ) 0 1 2random > ;
+
+: percent-chance ( percent -- ? ) 100 / chance ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

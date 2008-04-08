@@ -1,12 +1,11 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic assocs kernel math
-namespaces prettyprint sequences strings vectors words
-quotations inspector io.styles io combinators sorting
-splitting math.parser effects continuations debugger 
-io.files io.streams.string vocabs io.encodings.utf8
-source-files classes hashtables compiler.errors compiler.units
-accessors ;
+USING: arrays definitions generic assocs kernel math namespaces
+prettyprint sequences strings vectors words quotations inspector
+io.styles io combinators sorting splitting math.parser effects
+continuations debugger io.files io.streams.string vocabs
+io.encodings.utf8 source-files classes classes.tuple hashtables
+compiler.errors compiler.units accessors ;
 IN: parser
 
 TUPLE: lexer text line line-text line-length column ;
@@ -191,22 +190,8 @@ SYMBOL: in
 : word/vocab% ( word -- )
     "(" % dup word-vocabulary % " " % word-name % ")" % ;
 
-: shadow-warning ( new old -- )
-    2dup eq? [
-        2drop
-    ] [
-        [ word/vocab% " shadowed by " % word/vocab% ] "" make
-        note.
-    ] if ;
-
-: shadow-warnings ( vocab vocabs -- )
-    [
-        swapd assoc-stack dup
-        [ shadow-warning ] [ 2drop ] if
-    ] curry assoc-each ;
-
 : (use+) ( vocab -- )
-    vocab-words use get 2dup shadow-warnings push ;
+    vocab-words use get push ;
 
 : use+ ( vocab -- )
     load-vocab (use+) ;
@@ -299,13 +284,27 @@ M: no-word-error summary
 : CREATE-METHOD ( -- method )
     scan-word bootstrap-word scan-word create-method-in ;
 
+: shadowed-slots ( superclass slots -- shadowed )
+    >r all-slot-names r> seq-intersect ;
+
+: check-slot-shadowing ( class superclass slots -- )
+    shadowed-slots [
+        [
+            "Definition of slot ``" %
+            %
+            "'' in class ``" %
+            word-name %
+            "'' shadows a superclass slot" %
+        ] "" make note.
+    ] with each ;
+
 : parse-tuple-definition ( -- class superclass slots )
     CREATE-CLASS
     scan {
         { ";" [ tuple f ] }
         { "<" [ scan-word ";" parse-tokens ] }
         [ >r tuple ";" parse-tokens r> prefix ]
-    } case ;
+    } case 3dup check-slot-shadowing ;
 
 ERROR: staging-violation word ;
 

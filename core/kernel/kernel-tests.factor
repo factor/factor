@@ -108,3 +108,12 @@ IN: kernel.tests
     H{ } values swap >r dup length swap r> 0 -roll (loop) ;
 
 [ loop ] must-fail
+
+! Discovered on Windows
+: total-failure-1 "" [ ] map unimplemented ;
+
+[ total-failure-1 ] must-fail
+
+: total-failure-2 [ ] (call) unimplemented ;
+
+[ total-failure-2 ] must-fail

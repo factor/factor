@@ -7,6 +7,7 @@ USING: kernel namespaces sequences combinators arrays threads
        math.ranges
        math.constants
        math.functions
+       math.points
 
        ui
        ui.gadgets
@@ -21,13 +22,7 @@ USING: kernel namespaces sequences combinators arrays threads
        processing.gadget
        processing.color ;
 
-IN: bubble-chamber
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: 2random ( a b -- num ) 2dup swap - 100 / <range> random ;
-
-: 1random ( b -- num ) 0 swap 2random ;
+IN: processing.gallery.bubble-chamber
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -82,17 +77,8 @@ VARS: particles muons quarks hadrons axions ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: x>> ( particle -- x ) pos>> first  ;
-: y>> ( particle -- x ) pos>> second ;
-
-: >>x ( particle x -- particle ) over y>>      2array >>pos ;
-: >>y ( particle y -- particle ) over x>> swap 2array >>pos ;
-
-: x x>> ;
-: y y>> ;
-
-: v+y ( seq y -- seq ) >r first2 r> + 2array ;
-: v-y ( seq y -- seq ) >r first2 r> - 2array ;
+: x ( particle -- x ) pos>> first  ;
+: y ( particle -- x ) pos>> second ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -103,23 +89,34 @@ VARS: particles muons quarks hadrons axions ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+TUPLE: particle pos vel speed speed-d theta theta-d theta-dd myc mya ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: initialize-particle ( particle -- particle )
+
+  0 0 {2} >>pos
+  0 0 {2} >>vel
+
+  0 >>speed
+  0 >>speed-d
+  0 >>theta
+  0 >>theta-d
+  0 >>theta-dd
+
+  0 0 0 1 <rgba> >>myc
+  0 0 0 1 <rgba> >>mya ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 GENERIC: collide ( particle -- )
 GENERIC: move    ( particle -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: muon pos speed theta speed-d theta-d theta-dd myc mya ;
+TUPLE: muon < particle ;
 
-: <muon> ( -- muon )
-  muon construct-empty
-    0 0 2array     >>pos
-    0              >>speed
-    0              >>speed-d
-    0              >>theta
-    0              >>theta-d
-    0              >>theta-dd
-    0 0 0 1 <rgba> >>myc
-    0 0 0 1 <rgba> >>mya ;
+: <muon> ( -- muon ) muon construct-empty initialize-particle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -177,18 +174,9 @@ METHOD: move { muon }
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: quark pos vel speed theta speed-d theta-d theta-dd myc ;
+TUPLE: quark < particle ;
 
-: <quark> ( -- quark )
-  quark construct-empty
-    0 0 2array     >>pos
-    0 0 2array     >>vel
-    0              >>speed
-    0              >>speed-d
-    0              >>theta
-    0              >>theta-d
-    0              >>theta-dd
-    0 0 0 1 <rgba> >>myc ;
+: <quark> ( -- quark ) quark construct-empty initialize-particle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -228,7 +216,8 @@ METHOD: move { quark }
   [ ] [ theta-d>> ] [ theta-dd>> ] tri + >>theta-d
   [ ] [ speed>>   ] [ speed-d>>  ] tri * >>speed
 
-  1000 random 997 >
+  ! 1000 random 997 >
+  3/1000 chance
     [
       dup speed>> neg    >>speed
       2 over speed-d>> - >>speed-d
@@ -242,18 +231,9 @@ METHOD: move { quark }
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: hadron pos vel speed theta speed-d theta-d theta-dd myc ;
+TUPLE: hadron < particle ;
 
-: <hadron> ( -- hadron )
-  hadron construct-empty
-    0 0 2array     >>pos
-    0 0 2array     >>vel
-    0              >>speed
-    0              >>speed-d
-    0              >>theta
-    0              >>theta-d
-    0              >>theta-dd
-    0 0 0 1 <rgba> >>myc ;
+: <hadron> ( -- hadron ) hadron construct-empty initialize-particle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -296,12 +276,14 @@ METHOD: move { hadron }
   [ ] [ theta-d>> ] [ theta-dd>> ] tri + >>theta-d
   [ ] [ speed>>   ] [ speed-d>>  ] tri * >>speed
 
-  1000 random 997 >
+  ! 1000 random 997 >
+  3/1000 chance
     [
       1.0     >>speed-d
       0.00001 >>theta-dd
 
-      100 random 70 >
+      ! 100 random 70 >
+      30/100 chance
         [
           dim 2 / dup 2array >>pos
           dup collide
@@ -317,17 +299,9 @@ METHOD: move { hadron }
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: axion pos vel speed theta speed-d theta-d theta-dd ;
+TUPLE: axion < particle ;
 
-: <axion> ( -- axion )
-  axion construct-empty
-    0 0 2array     >>pos
-    0 0 2array     >>vel
-    0              >>speed
-    0              >>speed-d
-    0              >>theta
-    0              >>theta-d
-    0              >>theta-dd ;
+: <axion> ( -- axion ) axion construct-empty initialize-particle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -381,12 +355,14 @@ METHOD: move { axion }
 
   [ ] [ speed-d>> 0.9999 * ] bi >>speed-d
 
-  1000 random 996 >
+  ! 1000 random 996 >
+  4/1000 chance
     [
       dup speed>> neg       >>speed
       dup speed-d>> neg 2 + >>speed-d
 
-      100 random 30 >
+      ! 100 random 30 >
+      70/100 chance
         [
           dim 2 / dup 2array >>pos
           collide
@@ -472,6 +448,6 @@ METHOD: move { axion }
 
   ;
 
-: go ( -- ) [ bubble-chamber 500 sleep run ] with-ui ;
+: go ( -- ) [ bubble-chamber run ] with-ui ;
 
 MAIN: go

@@ -215,7 +215,7 @@ void sleep_millis(DWORD msec)
 	Sleep(msec);
 }
 
-DECLARE_PRIMITIVE(set_os_envs)
+DEFINE_PRIMITIVE(set_os_envs)
 {
 	not_implemented_error();
 }
