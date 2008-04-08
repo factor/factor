@@ -42,7 +42,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	UNREGISTER_ROOT(name);
 	UNREGISTER_ROOT(vocab);
 
-	word->hashcode = tag_fixnum(rand());
+	word->hashcode = tag_fixnum((rand() << 16) ^ rand());
 	word->vocabulary = vocab;
 	word->name = name;
 	word->def = userenv[UNDEFINED_ENV];

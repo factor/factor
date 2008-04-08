@@ -3,13 +3,9 @@
 USING: kernel io.backend io.monitors io.monitors.private
 io.files io.buffers io.nonblocking io.timeouts io.unix.backend
 io.unix.select io.unix.launcher unix.linux.inotify assocs
-namespaces threads continuations init math
-alien.c-types alien vocabs.loader ;
+namespaces threads continuations init math alien.c-types alien
+vocabs.loader accessors system ;
 IN: io.unix.linux
-
-TUPLE: linux-io ;
-
-INSTANCE: linux-io unix-io
 
 TUPLE: linux-monitor ;
 
@@ -18,7 +14,7 @@ TUPLE: linux-monitor ;
 
 TUPLE: inotify watches ;
 
-: watches ( -- assoc ) inotify get-global inotify-watches ;
+: watches ( -- assoc ) inotify get-global watches>> ;
 
 : wd>monitor ( wd -- monitor ) watches at ;
 
@@ -29,7 +25,7 @@ TUPLE: inotify watches ;
         { set-inotify-watches set-delegate } inotify construct
     ] if ;
 
-: inotify-fd inotify get-global port-handle ;
+: inotify-fd inotify get-global handle>> ;
 
 : (add-watch) ( path mask -- wd )
     inotify-fd -rot inotify_add_watch dup io-error ;
@@ -52,7 +48,7 @@ TUPLE: inotify watches ;
         "inotify is not supported by this Linux release" throw
     ] unless ;
 
-M: linux-io <monitor> ( path recursive? -- monitor )
+M: linux <monitor> ( path recursive? -- monitor )
     check-inotify
     drop IN_CHANGE_EVENTS add-watch ;
 
@@ -80,10 +76,10 @@ M: linux-monitor dispose ( monitor -- )
     parse-action swap alien>char-string ;
 
 : events-exhausted? ( i buffer -- ? )
-    buffer-fill >= ;
+    fill>> >= ;
 
 : inotify-event@ ( i buffer -- alien )
-    buffer-ptr <displaced-alien> ;
+    ptr>> <displaced-alien> ;
 
 : next-event ( i buffer -- i buffer )
     2dup inotify-event@
@@ -111,15 +107,19 @@ TUPLE: inotify-task ;
     f inotify-task <input-task> ;
 
 : init-inotify ( mx -- )
-    <inotify> dup inotify set-global
-    <inotify-task> swap register-io-task ;
+    <inotify> dup [
+        dup inotify set-global
+        <inotify-task> swap register-io-task
+    ] [
+        2drop
+    ] if ;
 
 M: inotify-task do-io-task ( task -- )
     io-task-port read-notifications f ;
 
-M: linux-io init-io ( -- )
-    <select-mx> dup mx set-global init-inotify ;
+M: linux init-io ( -- )
+    <select-mx>
+    [ mx set-global ]
+    [ init-inotify ] bi ;
 
-T{ linux-io } set-io-backend
-
-[ start-wait-thread ] "io.unix.linux" add-init-hook
+linux set-io-backend

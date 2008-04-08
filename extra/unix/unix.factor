@@ -43,6 +43,9 @@ FUNCTION: int dup2 ( int oldd, int newd ) ;
 FUNCTION: int execv ( char* path, char** argv ) ;
 FUNCTION: int execvp ( char* path, char** argv ) ;
 FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
+: _exit ( status -- * )
+    #! We throw to give this a terminating stack effect.
+    "int" f "_exit" { "int" } alien-invoke "Exit failed" throw ;
 FUNCTION: int fchdir ( int fd ) ;
 FUNCTION: int fchown ( int fd, uid_t owner, gid_t group ) ;
 FUNCTION: int fcntl ( int fd, int cmd, int arg ) ;
@@ -161,8 +164,8 @@ FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 
 {
-    { [ linux? ] [ "unix.linux" require ] }
-    { [ bsd? ] [ "unix.bsd" require ] }
-    { [ solaris? ] [ "unix.solaris" require ] }
+    { [ os linux? ] [ "unix.linux" require ] }
+    { [ os bsd? ] [ "unix.bsd" require ] }
+    { [ os solaris? ] [ "unix.solaris" require ] }
 } cond
 

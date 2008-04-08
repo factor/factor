@@ -7,9 +7,6 @@ $nl
 "A mirror provides such a view of a tuple:"
 { $subsection mirror }
 { $subsection <mirror> }
-"An enum provides such a view of a sequence:"
-{ $subsection enum }
-{ $subsection <enum> }
 "Utility word used by developer tools which inspect objects:"
 { $subsection make-mirror }
 { $see-also "slots" } ;
@@ -43,11 +40,6 @@ HELP: <mirror>
 HELP: >mirror<
 { $values { "mirror" mirror } { "obj" object } { "slots" "a sequence of " { $link slot-spec } " instances" } }
 { $description "Pushes the object being viewed in the mirror together with its slots." } ;
-
-HELP: enum
-{ $class-description "An associative structure which wraps a sequence and maps integers to the corresponding elements of the sequence."
-$nl
-"Enumerations are mutable; note that deleting a key calls " { $link delete-nth } ", which results in all subsequent elements being shifted down." } ;
 
 HELP: make-mirror
 { $values { "obj" object } { "assoc" assoc } }

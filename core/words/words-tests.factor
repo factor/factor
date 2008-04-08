@@ -1,7 +1,7 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
 vocabs continuations classes.tuple compiler.units
-io.streams.string ;
+io.streams.string accessors ;
 IN: words.tests
 
 [ 4 ] [
@@ -147,7 +147,7 @@ SYMBOL: quot-uses-b
 ] when*
 
 [ "IN: words.tests : undef-test ; << undef-test >>" eval ]
-[ [ undefined? ] is? ] must-fail-with
+[ error>> undefined? ] must-fail-with
 
 [ ] [
     "IN: words.tests GENERIC: symbol-generic" eval

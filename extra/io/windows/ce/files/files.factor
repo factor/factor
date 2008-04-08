@@ -1,15 +1,15 @@
 USING: alien alien.c-types combinators io io.backend io.buffers
 io.files io.nonblocking io.windows kernel libc math namespaces
 prettyprint sequences strings threads threads.private
-windows windows.kernel32 io.windows.ce.backend ;
+windows windows.kernel32 io.windows.ce.backend system ;
 IN: windows.ce.files
 
-! M: windows-ce-io normalize-pathname ( string -- string )
+! M: wince normalize-path ( string -- string )
     ! dup 1 tail* CHAR: \\ = [ "*" append ] [ "\\*" append ] if ;
 
-M: windows-ce-io CreateFile-flags ( DWORD -- DWORD )
+M: wince CreateFile-flags ( DWORD -- DWORD )
     FILE_ATTRIBUTE_NORMAL bitor ;
-M: windows-ce-io FileArgs-overlapped ( port -- f ) drop f ;
+M: wince FileArgs-overlapped ( port -- f ) drop f ;
 
 : finish-read ( port status bytes-ret -- )
     swap [ drop port-errored ] [ swap n>buffer ] if ;

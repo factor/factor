@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel classes combinators accessors sequences arrays
-vectors assocs namespaces words sorting layouts math hashtables
-;
+USING: kernel classes classes.builtin combinators accessors
+sequences arrays vectors assocs namespaces words sorting layouts
+math hashtables kernel.private ;
 IN: classes.algebra
 
 : 2cache ( key1 key2 assoc quot -- value )
@@ -103,7 +103,7 @@ C: <anonymous-complement> anonymous-complement
     {
         { [ over tuple eq? ] [ 2drop t ] }
         { [ over builtin-class? ] [ 2drop f ] }
-        { [ over tuple-class? ] [ [ class< ] 2keep swap class< or ] }
+        { [ over tuple-class? ] [ [ class< ] [ swap class< ] 2bi or ] }
         { [ t ] [ swap classes-intersect? ] }
     } cond ;
 
@@ -138,10 +138,10 @@ C: <anonymous-complement> anonymous-complement
     members>> [ class-and ] with map <anonymous-union> ;
 
 : left-anonymous-intersection-and ( first second -- class )
-    >r members>> r> add <anonymous-intersection> ;
+    >r members>> r> suffix <anonymous-intersection> ;
 
 : right-anonymous-intersection-and ( first second -- class )
-    members>> swap add <anonymous-intersection> ;
+    members>> swap suffix <anonymous-intersection> ;
 
 : (class-and) ( first second -- class )
     {
@@ -158,10 +158,10 @@ C: <anonymous-complement> anonymous-complement
     } cond ;
 
 : left-anonymous-union-or ( first second -- class )
-    >r members>> r> add <anonymous-union> ;
+    >r members>> r> suffix <anonymous-union> ;
 
 : right-anonymous-union-or ( first second -- class )
-    members>> swap add <anonymous-union> ;
+    members>> swap suffix <anonymous-union> ;
 
 : (class-or) ( first second -- class )
     {
@@ -211,12 +211,6 @@ C: <anonymous-complement> anonymous-complement
 : flatten-class ( class -- assoc )
     [ (flatten-class) ] H{ } make-assoc ;
 
-: class-hashes ( class -- seq )
-    flatten-class keys [
-        dup builtin-class?
-        [ "type" word-prop ] [ hashcode ] if
-    ] map ;
-
 : flatten-builtin-class ( class -- assoc )
     flatten-class [
         dup tuple class< [ 2drop tuple tuple ] when
@@ -229,5 +223,5 @@ C: <anonymous-complement> anonymous-complement
 : class-tags ( class -- tag/f )
     class-types [
         dup num-tags get >=
-        [ drop object tag-number ] when
+        [ drop \ hi-tag tag-number ] when
     ] map prune ;

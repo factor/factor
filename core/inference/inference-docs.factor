@@ -105,7 +105,7 @@ HELP: inference-error
 { $error-description
     "Thrown by " { $link infer } " and " { $link dataflow } " when the stack effect of a quotation cannot be inferred."
     $nl
-    "This error always delegates to one of the following classes of errors, which indicate the specific issue preventing a stack effect from being inferred:"
+    "The " { $snippet "error" } " slot contains one of the following classes of errors, which indicate the specific issue preventing a stack effect from being inferred:"
     { $list
         { $link no-effect }
         { $link literal-expected }

@@ -32,7 +32,7 @@ IN: cpu.ppc.allot
     12 11 float tag-number ORI
     f fresh-object ;
 
-M: ppc-backend %box-float ( dst src -- )
+M: ppc %box-float ( dst src -- )
     [ v>operand ] bi@ %allot-float 12 MR ;
 
 : %allot-bignum ( #digits -- )
@@ -78,7 +78,7 @@ M: ppc-backend %box-float ( dst src -- )
         "end" resolve-label
     ] with-scope ;
 
-M: ppc-backend %box-alien ( dst src -- )
+M: ppc %box-alien ( dst src -- )
     { "end" "f" } [ define-label ] each
     0 over v>operand 0 CMPI
     "f" get BEQ

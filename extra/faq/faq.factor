@@ -69,7 +69,7 @@ C: <faq> faq
 
 : html>faq ( div -- faq )
     unclip swap { "h3" "ol" } [ tags-named ] with map
-    first2 >r f add* r> [ html>question-list ] 2map <faq> ;
+    first2 >r f prefix r> [ html>question-list ] 2map <faq> ;
 
 : header, ( faq -- )
     dup faq-header ,

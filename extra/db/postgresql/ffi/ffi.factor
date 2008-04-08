@@ -5,9 +5,10 @@ USING: alien alien.syntax combinators system ;
 IN: db.postgresql.ffi
 
 << "postgresql" {
-    { [ win32? ]  [ "libpq.dll" ] }
-    { [ macosx? ] [ "/opt/local/lib/postgresql82/libpq.dylib" ] }
-    { [ unix?  ]  [ "libpq.so" ] }
+    { [ os winnt? ]  [ "libpq.dll" ] }
+    { [ os macosx? ] [ "/opt/local/lib/postgresql83/libpq.dylib" ] }
+    ! { [ os macosx? ] [ "libpq.dylib" ] }
+    { [ os unix?  ]  [ "libpq.so" ] }
 } cond "cdecl" add-library >>
 
 ! ConnSatusType

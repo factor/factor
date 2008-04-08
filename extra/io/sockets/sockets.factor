@@ -6,7 +6,8 @@ IN: io.sockets
 
 TUPLE: local path ;
 
-C: <local> local
+: <local> ( path -- addrspec )
+    normalize-path local construct-boa ;
 
 TUPLE: inet4 host port ;
 

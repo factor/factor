@@ -166,7 +166,7 @@ M: pane-stream dispose drop ;
 M: pane-stream stream-flush drop ;
 
 M: pane-stream make-span-stream
-    <style-stream> <ignore-close-stream> ;
+    swap <style-stream> <ignore-close-stream> ;
 
 ! Character styles
 
@@ -352,7 +352,7 @@ M: f sloppy-pick-up*
 
 : sloppy-pick-up ( loc gadget -- path )
     2dup sloppy-pick-up* dup
-    [ [ wet-and-sloppy sloppy-pick-up ] keep add* ]
+    [ [ wet-and-sloppy sloppy-pick-up ] keep prefix ]
     [ 3drop { } ]
     if ;
 

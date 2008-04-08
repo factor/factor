@@ -230,7 +230,7 @@ MEMO: all-vocabs-seq ( -- seq )
     try-everything load-failures. ;
 
 : unrooted-child-vocabs ( prefix -- seq )
-    dup empty? [ CHAR: . add ] unless
+    dup empty? [ CHAR: . suffix ] unless
     vocabs
     [ find-vocab-root not ] subset
     [
@@ -242,7 +242,7 @@ MEMO: all-vocabs-seq ( -- seq )
     vocab-roots get [
         dup pick (all-child-vocabs) [ >vocab-link ] map
     ] { } map>assoc
-    swap unrooted-child-vocabs f swap 2array add ;
+    swap unrooted-child-vocabs f swap 2array suffix ;
 
 : all-child-vocabs-seq ( prefix -- assoc )
     vocab-roots get swap [

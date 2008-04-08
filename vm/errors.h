@@ -55,3 +55,5 @@ void *signal_callstack_top;
 void memory_signal_handler_impl(void);
 void divide_by_zero_signal_handler_impl(void);
 void misc_signal_handler_impl(void);
+
+DECLARE_PRIMITIVE(unimplemented);

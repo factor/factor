@@ -188,7 +188,7 @@ IN: math.intervals.tests
         { max interval-max }
     }
     "math.ratios.private" vocab [
-        { / interval/ } add
+        { / interval/ } suffix
     ] when
     random ;
 

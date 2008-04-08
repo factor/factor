@@ -37,7 +37,7 @@ TUPLE: board width height rows ;
 
 : add-row ( board -- )
     dup board-rows over board-width f <array>
-    add* swap set-board-rows ;
+    prefix swap set-board-rows ;
 
 : top-up-rows ( board -- )
     dup board-height over board-rows length = [

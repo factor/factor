@@ -1,7 +1,11 @@
-USING: io.backend io.windows io.windows.ce.backend
-io.windows.ce.files io.windows.ce.sockets io.windows.ce.launcher
-namespaces io.windows.mmap ;
-IN: io.windows.ce
-
+USE: io.backend
+USE: io.windows
+USE: io.windows.ce.backend
+USE: io.windows.ce.files
+USE: io.windows.ce.sockets
+USE: io.windows.ce.launcher
+USE: io.windows.mmap system
 USE: io.windows.files
-T{ windows-ce-io } set-io-backend
+USE: system
+
+wince set-io-backend

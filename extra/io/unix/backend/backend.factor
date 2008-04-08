@@ -8,8 +8,6 @@ qualified namespaces io.timeouts io.encodings.utf8 accessors ;
 QUALIFIED: io
 IN: io.unix.backend
 
-MIXIN: unix-io
-
 ! I/O tasks
 TUPLE: io-task port callbacks ;
 
@@ -120,7 +118,7 @@ M: integer close-handle ( fd -- )
     [ dup reads>> handle-timeout ]
     [ dup writes>> handle-timeout ] 2bi ;
 
-M: unix-io cancel-io ( port -- )
+M: unix cancel-io ( port -- )
     mx get-global cancel-io-tasks ;
 
 ! Readers
@@ -180,10 +178,10 @@ M: write-task do-io-task
 M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
-M: unix-io io-multiplex ( ms/f -- )
+M: unix io-multiplex ( ms/f -- )
     mx get-global wait-for-events ;
 
-M: unix-io (init-stdio) ( -- )
+M: unix (init-stdio) ( -- )
     0 <reader>
     1 <writer>
     2 <writer> ;

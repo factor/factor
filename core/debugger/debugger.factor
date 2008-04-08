@@ -4,9 +4,9 @@ USING: arrays definitions generic hashtables inspector io kernel
 math namespaces prettyprint sequences assocs sequences.private
 strings io.styles vectors words system splitting math.parser
 classes.tuple continuations continuations.private combinators
-generic.math io.streams.duplex classes compiler.units
-generic.standard vocabs threads threads.private init
-kernel.private libc io.encodings ;
+generic.math io.streams.duplex classes.builtin classes
+compiler.units generic.standard vocabs threads threads.private
+init kernel.private libc io.encodings accessors ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -202,6 +202,12 @@ M: no-method error.
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
 
+M: no-next-method summary
+    drop "Executing call-next-method from least-specific method" ;
+
+M: inconsistent-next-method summary
+    drop "Executing call-next-method with inconsistent parameters" ;
+
 M: stream-closed-twice summary
     drop "Attempt to perform I/O on closed stream" ;
 
@@ -223,9 +229,11 @@ M: slice-error error.
 
 M: bounds-error summary drop "Sequence index out of bounds" ;
 
-M: condition error. delegate error. ;
+M: condition error. error>> error. ;
 
-M: condition error-help drop f ;
+M: condition summary error>> summary ;
+
+M: condition error-help error>> error-help ;
 
 M: assert summary drop "Assertion failed" ;
 

@@ -136,7 +136,7 @@ M: lambda-word word-noise-factor
 
 : flatten-generics ( words -- words' )
     [
-        dup generic? [ methods values ] [ 1array ] if
+        dup generic? [ "methods" word-prop values ] [ 1array ] if
     ] map concat ;
 
 : noisy-words ( -- alist )

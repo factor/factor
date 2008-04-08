@@ -141,14 +141,9 @@ GENERIC: dispose ( object -- )
 : with-disposal ( object quot -- )
     over [ dispose ] curry [ ] cleanup ; inline
 
-TUPLE: condition restarts continuation ;
+TUPLE: condition error restarts continuation ;
 
-: <condition> ( error restarts cc -- condition )
-    {
-        set-delegate
-        set-condition-restarts
-        set-condition-continuation
-    } condition construct ;
+C: <condition> condition ( error restarts cc -- condition )
 
 : throw-restarts ( error restarts -- restart )
     [ <condition> throw ] callcc1 2nip ;
@@ -161,15 +156,14 @@ TUPLE: restart name obj continuation ;
 C: <restart> restart
 
 : restart ( restart -- )
-    dup restart-obj swap restart-continuation continue-with ;
+    [ obj>> ] [ continuation>> ] bi continue-with ;
 
 M: object compute-restarts drop { } ;
 
-M: tuple compute-restarts delegate compute-restarts ;
-
 M: condition compute-restarts
-    [ delegate compute-restarts ] keep
-    [ condition-restarts ] keep
-    condition-continuation
-    [ <restart> ] curry { } assoc>map
-    append ;
+    [ error>> compute-restarts ]
+    [
+        [ restarts>> ]
+        [ condition-continuation [ <restart> ] curry ] bi
+        { } assoc>map
+    ] bi append ;

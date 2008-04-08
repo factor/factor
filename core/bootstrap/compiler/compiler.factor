@@ -14,18 +14,12 @@ IN: bootstrap.compiler
     "alien.remote-control" require
 ] unless
 
-"cpu." cpu append require
-
-: enable-compiler ( -- )
-    [ optimized-recompile-hook ] recompile-hook set-global ;
-
-: disable-compiler ( -- )
-    [ default-recompile-hook ] recompile-hook set-global ;
+"cpu." cpu word-name append require
 
 enable-compiler
 
 nl
-"Compiling some words to speed up bootstrap..." write flush
+"Compiling..." write flush
 
 ! Compile a set of words ahead of the full compile.
 ! This set of words was determined semi-empirically
@@ -42,8 +36,6 @@ nl
     array-capacity array-nth set-array-nth
 
     wrap probe
-
-    delegate
 
     underlying
 
@@ -81,5 +73,7 @@ nl
 {
     malloc calloc free memcpy
 } compile
+
+vocabs [ words [ compiled? not ] subset compile "." write flush ] each
 
 " done" print flush
