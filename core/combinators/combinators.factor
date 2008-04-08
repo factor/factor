@@ -59,6 +59,10 @@ ERROR: no-case ;
 M: sequence hashcode*
     [ sequence-hashcode ] recursive-hashcode ;
 
+M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
+
+M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
+
 M: hashtable hashcode*
     [
         dup assoc-size 1 number=
