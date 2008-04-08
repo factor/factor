@@ -41,7 +41,7 @@ M: macosx physical-mem ( -- n ) { 6 5 } sysctl-query-uint ;
 : machine-arch ( -- n ) { 6 12 } sysctl-query-string ;
 : vector-unit ( -- n ) { 6 13 } sysctl-query-uint ;
 : bus-frequency ( -- n ) { 6 14 } sysctl-query-uint ;
-: cpu-frequency ( -- n ) { 6 15 } sysctl-query-uint ;
+M: macosx cpu-mhz ( -- n ) { 6 15 } sysctl-query-uint ;
 : cacheline-size ( -- n ) { 6 16 } sysctl-query-uint ;
 : l1-icache-size ( -- n ) { 6 17 } sysctl-query-uint ;
 : l1-dcache-size ( -- n ) { 6 18 } sysctl-query-uint ;
