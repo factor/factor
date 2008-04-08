@@ -55,6 +55,9 @@ PRIVATE>
     "slot-names" word-prop
     [ dup array? [ second ] when ] map ;
 
+: all-slot-names ( class -- slots )
+    superclasses [ slot-names ] map concat \ class prefix ;
+
 <PRIVATE
 
 : tuple= ( tuple1 tuple2 -- ? )
@@ -118,9 +121,6 @@ PRIVATE>
 
 : define-tuple-layout ( class -- )
     dup make-tuple-layout "layout" set-word-prop ;
-
-: all-slot-names ( class -- slots )
-    superclasses [ slot-names ] map concat \ class prefix ;
 
 : compute-slot-permutation ( class old-slot-names -- permutation )
     >r all-slot-names r> [ index ] curry map ;

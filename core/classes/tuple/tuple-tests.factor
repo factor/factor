@@ -529,3 +529,12 @@ TUPLE: another-forget-accessors-test ;
 ] unit-test
 
 [ t ] [ \ another-forget-accessors-test class? ] unit-test
+
+! Shadowing test
+[ f ] [
+    t parser-notes? [
+        [
+            "IN: classes.tuple.tests TUPLE: shadow-1 a b ; TUPLE: shadow-2 < shadow-1 a b ;" eval
+        ] with-string-writer empty?
+    ] with-variable
+] unit-test
