@@ -172,7 +172,9 @@ TUPLE: reversed seq ;
 C: <reversed> reversed
 
 M: reversed virtual-seq reversed-seq ;
+
 M: reversed virtual@ reversed-seq [ length swap - 1- ] keep ;
+
 M: reversed length reversed-seq length ;
 
 INSTANCE: reversed virtual-sequence
@@ -198,7 +200,9 @@ ERROR: slice-error reason ;
     slice construct-boa ; inline
 
 M: slice virtual-seq slice-seq ;
+
 M: slice virtual@ [ slice-from + ] keep slice-seq ;
+
 M: slice length dup slice-to swap slice-from - ;
 
 : head-slice ( seq n -- slice ) (head) <slice> ;
@@ -466,6 +470,21 @@ M: sequence <=>
     2dup [ length ] bi@ number=
     [ mismatch not ] [ 2drop f ] if ; inline
 
+: sequence-hashcode-step ( oldhash newpart -- newhash )
+    swap [
+        dup -2 fixnum-shift-fast swap 5 fixnum-shift-fast
+        fixnum+fast fixnum+fast
+    ] keep fixnum-bitxor ; inline
+
+: sequence-hashcode ( n seq -- x )
+    0 -rot [
+        hashcode* >fixnum sequence-hashcode-step
+    ] with each ; inline
+
+M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
+
+M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
+
 : move ( to from seq -- )
     2over number=
     [ 3drop ] [ [ nth swap ] keep set-nth ] if ; inline
@@ -692,14 +711,3 @@ PRIVATE>
         dup [ length ] map infimum
         [ <column> dup like ] with map
     ] unless ;
-
-: sequence-hashcode-step ( oldhash newpart -- newhash )
-    swap [
-        dup -2 fixnum-shift-fast swap 5 fixnum-shift-fast
-        fixnum+fast fixnum+fast
-    ] keep fixnum-bitxor ; inline
-
-: sequence-hashcode ( n seq -- x )
-    0 -rot [
-        hashcode* >fixnum sequence-hashcode-step
-    ] with each ; inline
