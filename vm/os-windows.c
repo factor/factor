@@ -217,17 +217,17 @@ void sleep_millis(DWORD msec)
 
 DEFINE_PRIMITIVE(set_os_env)
 {
-	char *key = unbox_char_string();
+	F_CHAR *key = unbox_u16_string();
 	REGISTER_C_STRING(key);
-	char *value = unbox_char_string();
+	F_CHAR *value = unbox_u16_string();
 	UNREGISTER_C_STRING(key);
 	SetEnvironmentVariable(key, value);
 }
 
 DEFINE_PRIMITIVE(unset_os_env)
 {
-	char *key = unbox_char_string();
-	SetEnvironmentVariable(key, f);
+	F_CHAR *key = unbox_u16_string();
+	SetEnvironmentVariable(key, NULL);
 }
 
 DEFINE_PRIMITIVE(set_os_envs)
