@@ -30,6 +30,9 @@ SYMBOL: fail
 SYMBOL: lrstack
 SYMBOL: heads
 
+: failed? ( obj -- ? )
+  fail = ;
+
 : delegates ( -- cache )
   \ delegates get-global [ H{ } clone dup \ delegates set-global ] unless* ;
 
@@ -66,21 +69,18 @@ C: <head> peg-head
   #! that maps the position to the parser result.
   id>> packrat get [ drop H{ } clone ] cache ;
 
+: process-rule-result ( p result -- result )
+  [
+    nip [ ast>> ] [ remaining>> ] bi input-from pos set    
+  ] [ 
+    pos set fail
+  ] if* ; 
+
 : eval-rule ( rule -- ast )
   #! Evaluate a rule, return an ast resulting from it.
   #! Return fail if the rule failed. The rule has
   #! stack effect ( input -- parse-result )
-  pos get swap 
-  execute 
-!  drop f f <parse-result>
-  [
-    nip
-    [ ast>> ] [ remaining>> ] bi
-    input-from pos set    
-  ] [ 
-    pos set   
-    fail
-  ] if* ; inline
+  pos get swap execute process-rule-result ; inline
 
 : memo ( pos rule -- memo-entry )
   #! Return the result from the memo cache. 
@@ -90,21 +90,29 @@ C: <head> peg-head
   #! Store an entry in the cache
   rule-parser input-cache set-at ;
 
-:: (grow-lr) ( r p m h -- )
-  p pos set
-  h involved-set>> clone h (>>eval-set)
+: update-m ( ast m -- )
+  swap >>ans pos get >>pos drop ;
+
+: stop-growth? ( ast m -- ? )
+  [ failed? pos get ] dip 
+  pos>> <= or ;
+
+: setup-growth ( h p -- )
+  pos set dup involved-set>> clone >>eval-set drop ;
+
+:: (grow-lr) ( h p r m -- )
+  h p setup-growth
   r eval-rule
-  dup fail = pos get m pos>> <= or [
+  dup m stop-growth? [
     drop
   ] [
-    m (>>ans)
-    pos get m (>>pos)
-    r p m h (grow-lr)
+    m update-m
+     h p r m (grow-lr)
   ] if ; inline
  
-:: grow-lr ( r p m h -- ast )
+:: grow-lr ( h p r m -- ast )
   h p heads get set-at
-  r p m h (grow-lr) 
+  h p r m (grow-lr) 
   p heads get delete-at
   m pos>> pos set m ans>>
   ; inline
@@ -128,10 +136,10 @@ C: <head> peg-head
         |
     h rule>> r eq? [
       m ans>> seed>> m (>>ans)
-      m ans>> fail = [
+      m ans>> failed? [
         fail
       ] [
-        r p m h grow-lr
+        h p r m grow-lr
       ] if
     ] [
       m ans>> seed>>
@@ -150,8 +158,7 @@ C: <head> peg-head
         r h eval-set>> member? [
           h [ r swap remove ] change-eval-set drop
           r eval-rule
-          m (>>ans)
-          pos get m (>>pos)
+          m update-m
           m
         ] [ 
           m
@@ -207,20 +214,18 @@ C: <head> peg-head
 
 GENERIC: (compile) ( parser -- quot )
 
+: execute-parser ( word -- result )
+  pos get apply-rule dup failed? [ 
+    drop f 
+  ] [
+    input-slice swap <parse-result>
+  ] if ; inline
 
-:: parser-body ( parser -- quot )
+: parser-body ( parser -- quot )
   #! Return the body of the word that is the compiled version
   #! of the parser.
-  [let* | rule [ gensym dup parser (compile) 0 1 <effect> define-declared dup parser "peg" set-word-prop ] 
-        |
-    [
-      rule pos get apply-rule dup fail = [ 
-        drop f 
-      ] [
-        input-slice swap <parse-result>
-      ] if
-    ] 
-  ] ;
+  gensym 2dup swap (compile) 0 1 <effect> define-declared swap dupd "peg" set-word-prop
+  [ execute-parser ] curry ;
 
 : compiled-parser ( parser -- word )
   #! Look to see if the given parser has been compiled.
