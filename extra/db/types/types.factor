@@ -3,7 +3,8 @@
 USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep sequences.lib
 words namespaces tools.walker slots slots.private classes
-mirrors tuples combinators calendar.format symbols ;
+mirrors classes.tuple combinators calendar.format symbols
+classes.singleton ;
 IN: db.types
 
 HOOK: modifier-table db ( -- hash )
@@ -14,34 +15,36 @@ HOOK: compound-type db ( str n -- hash )
 
 TUPLE: sql-spec class slot-name column-name type modifiers primary-key ;
 
-SYMBOLS: +native-id+ +assigned-id+ +autoincrement+
-+serial+ +unique+ +default+ +null+ +not-null+
+SINGLETON: +native-id+
+SINGLETON: +assigned-id+
+SINGLETON: +random-id+
+UNION: +primary-key+ +native-id+ +assigned-id+ +random-id+ ;
+UNION: +nonnative-id+ +random-id+ +assigned-id+ ;
+
+SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 +foreign-id+ +has-many+ ;
 
-: (primary-key?) ( obj -- ? )
-    { +native-id+ +assigned-id+ } member? ;
-
 : primary-key? ( spec -- ? )
-    sql-spec-primary-key (primary-key?) ;
+    sql-spec-primary-key +primary-key+? ;
+
+: native-id? ( spec -- ? )
+    sql-spec-primary-key +native-id+? ;
+
+: nonnative-id? ( spec -- ? )
+    sql-spec-primary-key +nonnative-id+? ;
 
 : normalize-spec ( spec -- )
-    dup sql-spec-type dup (primary-key?) [
+    dup sql-spec-type dup +primary-key+? [
         swap set-sql-spec-primary-key
     ] [
         drop dup sql-spec-modifiers [
-            (primary-key?)
+            +primary-key+?
         ] deep-find
         [ swap set-sql-spec-primary-key ] [ drop ] if*
     ] if ;
 
 : find-primary-key ( specs -- obj )
     [ sql-spec-primary-key ] find nip ;
-
-: native-id? ( spec -- ? )
-    sql-spec-primary-key +native-id+ = ;
-
-: assigned-id? ( spec -- ? )
-    sql-spec-primary-key +assigned-id+ = ;
 
 : relation? ( spec -- ? ) [ +has-many+ = ] deep-find ;
 
@@ -69,7 +72,7 @@ TUPLE: no-sql-modifier ;
     dup number? [ number>string ] when ;
 
 : maybe-remove-id ( specs -- obj )
-    [ native-id? not ] subset ;
+    [ +native-id+? not ] subset ;
 
 : remove-relations ( specs -- newcolumns )
     [ relation? not ] subset ;
@@ -124,29 +127,21 @@ TUPLE: no-sql-modifier ;
 : modifiers ( spec -- str )
     sql-spec-modifiers 
     [ lookup-modifier ] map " " join
-    dup empty? [ " " swap append ] unless ;
+    dup empty? [ " " prepend ] unless ;
 
 HOOK: bind% db ( spec -- )
 
-TUPLE: no-slot-named ;
-: no-slot-named ( -- * ) T{ no-slot-named } throw ;
-
-: slot-spec-named ( str class -- slot-spec )
-    "slots" word-prop [ slot-spec-name = ] with find nip
-    [ no-slot-named ] unless* ;
-
 : offset-of-slot ( str obj -- n )
-    class slot-spec-named slot-spec-offset ;
+    class "slots" word-prop slot-named slot-spec-offset ;
 
-: get-slot-named ( str obj -- value )
-    tuck offset-of-slot [ no-slot-named ] unless* slot ;
+: get-slot-named ( name obj -- value )
+    tuck offset-of-slot slot ;
 
-: set-slot-named ( value str obj -- )
-    tuck offset-of-slot [ no-slot-named ] unless* set-slot ;
+: set-slot-named ( value name obj -- )
+    tuck offset-of-slot set-slot ;
 
 : tuple>filled-slots ( tuple -- alist )
-    dup <mirror> mirror-slots [ slot-spec-name ] map
-    swap tuple-slots 2array flip [ nip ] assoc-subset ;
+    <mirror> [ nip ] assoc-subset ;
 
 : tuple>params ( specs tuple -- obj )
     [

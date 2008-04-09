@@ -4,10 +4,12 @@ USING: kernel continuations arrays assocs sequences sorting math
 
 IN: builder.benchmark
 
-: passing-benchmarks ( table -- table )
-  [ second first2 number? swap number? and ] subset ;
+! : passing-benchmarks ( table -- table )
+!   [ second first2 number? swap number? and ] subset ;
 
-: simplify-table ( table -- table ) [ first2 second 2array ] map ;
+: passing-benchmarks ( table -- table ) [ second number? ] subset ;
+
+! : simplify-table ( table -- table ) [ first2 second 2array ] map ;
 
 : benchmark-difference ( old-table benchmark-result -- result-diff )
   first2 >r
@@ -17,11 +19,11 @@ IN: builder.benchmark
   2array ;
 
 : compare-tables ( old new -- table )
-  [ passing-benchmarks simplify-table ] 2apply
+  [ passing-benchmarks ] bi@
   [ benchmark-difference ] with map ;
 
 : benchmark-deltas ( -- table )
-  "../../benchmarks" "../benchmarks" [ eval-file ] 2apply
+  "../benchmarks" "benchmarks" [ eval-file ] bi@
   compare-tables
   sort-values ;
 

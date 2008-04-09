@@ -56,12 +56,12 @@ GENERIC: definitions-changed ( assoc obj -- )
     [ drop word? ] assoc-subset
     [ drop word-vocabulary dup [ vocab ] when dup ] assoc-map ;
 
-: changed-definitions ( -- assoc )
+: updated-definitions ( -- assoc )
     H{ } clone
     dup forgotten-definitions get update
     dup new-definitions get first update
     dup new-definitions get second update
-    dup changed-words get update
+    dup changed-definitions get update
     dup dup changed-vocabs update ;
 
 : compile ( words -- )
@@ -69,29 +69,27 @@ GENERIC: definitions-changed ( assoc obj -- )
     dup [ drop crossref? ] assoc-contains?
     modify-code-heap ;
 
-SYMBOL: post-compile-tasks
-
-: after-compilation ( quot -- )
-    post-compile-tasks get push ;
+SYMBOL: outdated-tuples
+SYMBOL: update-tuples-hook
 
 : call-recompile-hook ( -- )
-    changed-words get keys
+    changed-definitions get keys [ word? ] subset
     compiled-usages recompile-hook get call ;
 
-: call-post-compile-tasks ( -- )
-    post-compile-tasks get [ call ] each ;
+: call-update-tuples-hook ( -- )
+    update-tuples-hook get call ;
 
 : finish-compilation-unit ( -- )
     call-recompile-hook
-    call-post-compile-tasks
+    call-update-tuples-hook
     dup [ drop crossref? ] assoc-contains? modify-code-heap
-    changed-definitions notify-definition-observers ;
+    updated-definitions notify-definition-observers ;
 
 : with-compilation-unit ( quot -- )
     [
-        H{ } clone changed-words set
+        H{ } clone changed-definitions set
         H{ } clone forgotten-definitions set
-        V{ } clone post-compile-tasks set
+        H{ } clone outdated-tuples set
         <definitions> new-definitions set
         <definitions> old-definitions set
         [ finish-compilation-unit ]

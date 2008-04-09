@@ -6,9 +6,9 @@ kernel.private math math.private namespaces sequences words
 generic quotations byte-arrays hashtables hashtables.private
 generator generator.registers generator.fixup sequences.private
 sbufs vectors system layouts math.floats.private
-classes tuples tuples.private sbufs.private vectors.private
-strings.private slots.private combinators bit-arrays
-float-arrays compiler.constants ;
+classes classes.tuple classes.tuple.private sbufs.private
+vectors.private strings.private slots.private combinators
+bit-arrays float-arrays compiler.constants ;
 IN: cpu.ppc.intrinsics
 
 : %slot-literal-known-tag
@@ -94,14 +94,14 @@ IN: cpu.ppc.intrinsics
 } define-intrinsics
 
 : fixnum-register-op ( op -- pair )
-    [ "out" operand "y" operand "x" operand ] swap add H{
+    [ "out" operand "y" operand "x" operand ] swap suffix H{
         { +input+ { { f "x" } { f "y" } } }
         { +scratch+ { { f "out" } } }
         { +output+ { "out" } }
     } 2array ;
 
 : fixnum-value-op ( op -- pair )
-    [ "out" operand "x" operand "y" operand ] swap add H{
+    [ "out" operand "x" operand "y" operand ] swap suffix H{
         { +input+ { { f "x" } { [ small-tagged? ] "y" } } }
         { +scratch+ { { f "out" } } }
         { +output+ { "out" } }
@@ -205,11 +205,11 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 : fixnum-register-jump ( op -- pair )
-    [ "x" operand 0 "y" operand CMP ] swap add
+    [ "x" operand 0 "y" operand CMP ] swap suffix
     { { f "x" } { f "y" } } 2array ;
 
 : fixnum-value-jump ( op -- pair )
-    [ 0 "x" operand "y" operand CMPI ] swap add
+    [ 0 "x" operand "y" operand CMPI ] swap suffix
     { { f "x" } { [ small-tagged? ] "y" } } 2array ;
 
 : define-fixnum-jump ( word op -- )
@@ -336,7 +336,7 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 : define-float-op ( word op -- )
-    [ "z" operand "x" operand "y" operand ] swap add H{
+    [ "z" operand "x" operand "y" operand ] swap suffix H{
         { +input+ { { float "x" } { float "y" } } }
         { +scratch+ { { float "z" } } }
         { +output+ { "z" } }
@@ -352,7 +352,7 @@ IN: cpu.ppc.intrinsics
 ] each
 
 : define-float-jump ( word op -- )
-    [ "x" operand 0 "y" operand FCMPU ] swap add
+    [ "x" operand 0 "y" operand FCMPU ] swap suffix
     { { float "x" } { float "y" } } define-if-intrinsic ;
 
 {
@@ -402,55 +402,6 @@ IN: cpu.ppc.intrinsics
     { +output+ { "out" } }
 } define-intrinsic
 
-\ type [
-    "end" define-label
-    ! Get the tag
-    "y" operand "obj" operand tag-mask get ANDI
-    ! Tag the tag
-    "y" operand "x" operand %tag-fixnum
-    ! Compare with object tag number (3).
-    0 "y" operand object tag-number CMPI
-    ! Jump if the object doesn't store type info in its header
-    "end" get BNE
-    ! It does store type info in its header
-    "x" operand "obj" operand header-offset LWZ
-    "end" resolve-label
-] H{
-    { +input+ { { f "obj" } } }
-    { +scratch+ { { f "x" } { f "y" } } }
-    { +output+ { "x" } }
-} define-intrinsic
-
-\ class-hash [
-    "end" define-label
-    "tuple" define-label
-    "object" define-label
-    ! Get the tag
-    "y" operand "obj" operand tag-mask get ANDI
-    ! Compare with tuple tag number (2).
-    0 "y" operand tuple tag-number CMPI
-    "tuple" get BEQ
-    ! Compare with object tag number (3).
-    0 "y" operand object tag-number CMPI
-    "object" get BEQ
-    ! Tag the tag
-    "y" operand "x" operand %tag-fixnum
-    "end" get B
-    "object" get resolve-label
-    ! Load header type
-    "x" operand "obj" operand header-offset LWZ
-    "end" get B
-    "tuple" get resolve-label
-    ! Load class hash
-    "x" operand "obj" operand tuple-class-offset LWZ
-    "x" operand dup class-hash-offset LWZ
-    "end" resolve-label
-] H{
-    { +input+ { { f "obj" } } }
-    { +scratch+ { { f "x" } { f "y" } } }
-    { +output+ { "x" } }
-} define-intrinsic
-
 : userenv ( reg -- )
     #! Load the userenv pointer in a register.
     "userenv" f rot %load-dlsym ;
@@ -479,19 +430,17 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 \ <tuple> [
-    tuple "n" get 2 + cells %allot
-    ! Store length
-    "n" operand 12 LI
+    tuple "layout" get layout-size 2 + cells %allot
+    ! Store layout
+    "layout" get 12 load-indirect
     12 11 cell STW
-    ! Store class
-    "class" operand 11 2 cells STW
     ! Zero out the rest of the tuple
     f v>operand 12 LI
-    "n" get 1- [ 12 11 rot 3 + cells STW ] each
+    "layout" get layout-size [ 12 11 rot 2 + cells STW ] each
     ! Store tagged ptr in reg
     "tuple" get tuple %store-tagged
 ] H{
-    { +input+ { { f "class" } { [ inline-array? ] "n" } } }
+    { +input+ { { [ tuple-layout? ] "layout" } } }
     { +scratch+ { { f "tuple" } } }
     { +output+ { "tuple" } }
 } define-intrinsic

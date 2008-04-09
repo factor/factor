@@ -3,8 +3,8 @@
 USING: fry hashtables io io.streams.string kernel math
 namespaces math.parser assocs sequences strings splitting ascii
 io.encodings.utf8 io.encodings.string namespaces unicode.case
-combinators vectors sorting new-slots accessors calendar
-calendar.format quotations arrays ;
+combinators vectors sorting accessors calendar
+calendar.format quotations arrays combinators.lib byte-arrays ;
 IN: http
 
 : http-port 80 ; inline
@@ -12,18 +12,21 @@ IN: http
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
     #! URL-encoding?
-    dup letter?
-    over LETTER? or
-    over digit? or
-    swap "/_-." member? or ; foldable
+    {
+        [ dup letter? ]
+        [ dup LETTER? ]
+        [ dup digit? ]
+        [ dup "/_-.:" member? ]
+    } || nip ; foldable
 
 : push-utf8 ( ch -- )
-    1string utf8 encode [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each ;
+    1string utf8 encode
+    [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each ;
 
 : url-encode ( str -- str )
-    [ [
-        dup url-quotable? [ , ] [ push-utf8 ] if
-    ] each ] "" make ;
+    [
+        [ dup url-quotable? [ , ] [ push-utf8 ] if ] each
+    ] "" make ;
 
 : url-decode-hex ( index str -- )
     2dup length 2 - >= [
@@ -103,12 +106,17 @@ IN: http
 : query>assoc ( query -- assoc )
     dup [
         "&" split [
-            "=" split1 [ dup [ url-decode ] when ] 2apply
+            "=" split1 [ dup [ url-decode ] when ] bi@
         ] H{ } map>assoc
     ] when ;
 
 : assoc>query ( hash -- str )
-    [ [ url-encode ] 2apply "=" swap 3append ] { } assoc>map
+    [
+        [ url-encode ]
+        [ dup number? [ number>string ] when url-encode ]
+        bi*
+        "=" swap 3append
+    ] { } assoc>map
     "&" join ;
 
 TUPLE: cookie name value path domain expires http-only ;
@@ -169,10 +177,11 @@ cookies ;
 
 : <request>
     request construct-empty
-    "1.1" >>version
-    http-port >>port
-    H{ } clone >>query
-    V{ } clone >>cookies ;
+        "1.1" >>version
+        http-port >>port
+        H{ } clone >>header
+        H{ } clone >>query
+        V{ } clone >>cookies ;
 
 : query-param ( request key -- value )
     swap query>> at ;
@@ -245,6 +254,10 @@ SYMBOL: max-post-request
 : extract-post-data-type ( request -- request )
     dup "content-type" header >>post-data-type ;
 
+: parse-post-data ( request -- request )
+    dup post-data-type>> "application/x-www-form-urlencoded" =
+    [ dup post-data>> query>assoc >>post-data ] when ;
+
 : extract-cookies ( request -- request )
     dup "cookie" header [ parse-cookies >>cookies ] when* ;
 
@@ -257,23 +270,30 @@ SYMBOL: max-post-request
     read-post-data
     extract-host
     extract-post-data-type
+    parse-post-data
     extract-cookies ;
 
 : write-method ( request -- request )
     dup method>> write bl ;
 
-: write-url ( request -- request )
-    dup path>> url-encode write
-    dup query>> dup assoc-empty? [ drop ] [
-        "?" write
-        assoc>query write
-    ] if ;
+: (link>string) ( url query -- url' )
+    [ url-encode ] [ assoc>query ] bi*
+    dup empty? [ drop ] [ "?" swap 3append ] if ;
+
+: write-url ( request -- )
+    [ path>> ] [ query>> ] bi (link>string) write ;
 
 : write-request-url ( request -- request )
-    write-url bl ;
+    dup write-url bl ;
 
 : write-version ( request -- request )
     "HTTP/" write dup request-version write crlf ;
+
+: unparse-post-data ( request -- request )
+    dup post-data>> dup sequence? [ drop ] [
+        assoc>query >>post-data
+        "application/x-www-form-urlencoded" >>post-data-type
+    ] if ;
 
 : write-request-header ( request -- request )
     dup header>> >hashtable
@@ -287,6 +307,7 @@ SYMBOL: max-post-request
     dup post-data>> [ write ] when* ;
 
 : write-request ( request -- )
+    unparse-post-data
     write-method
     write-request-url
     write-version
@@ -297,15 +318,16 @@ SYMBOL: max-post-request
 
 : request-url ( request -- url )
     [
-        dup host>> [
-            "http://" write
-            dup host>> url-encode write
-            ":" write
-            dup port>> number>string write
-        ] when
-        dup path>> "/" head? [ "/" write ] unless
-        write-url
-        drop
+        [
+            dup host>> [
+                [ "http://" write host>> url-encode write ]
+                [ ":" write port>> number>string write ]
+                bi
+            ] [ drop ] if
+        ]
+        [ path>> "/" head? [ "/" write ] unless ]
+        [ write-url ]
+        tri
     ] with-string-writer ;
 
 : set-header ( request/response value key -- request/response )

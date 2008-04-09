@@ -8,7 +8,7 @@ hashtables io kernel namespaces sequences io.styles strings
 quotations math opengl combinators math.vectors
 io.streams.duplex sorting splitting io.streams.nested assocs
 ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
-ui.gadgets.grid-lines tuples models continuations ;
+ui.gadgets.grid-lines classes.tuple models continuations ;
 IN: ui.gadgets.panes
 
 TUPLE: pane output current prototype scrolls?
@@ -166,7 +166,7 @@ M: pane-stream dispose drop ;
 M: pane-stream stream-flush drop ;
 
 M: pane-stream make-span-stream
-    <style-stream> <ignore-close-stream> ;
+    swap <style-stream> <ignore-close-stream> ;
 
 ! Character styles
 
@@ -352,7 +352,7 @@ M: f sloppy-pick-up*
 
 : sloppy-pick-up ( loc gadget -- path )
     2dup sloppy-pick-up* dup
-    [ [ wet-and-sloppy sloppy-pick-up ] keep add* ]
+    [ [ wet-and-sloppy sloppy-pick-up ] keep prefix ]
     [ 3drop { } ]
     if ;
 

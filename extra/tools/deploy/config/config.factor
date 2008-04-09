@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: vocabs.loader io.files io kernel sequences assocs
 splitting parser prettyprint namespaces math vocabs
-hashtables tools.browser ;
+hashtables tools.vocabs ;
 IN: tools.deploy.config
 
 SYMBOL: deploy-name
@@ -10,6 +10,7 @@ SYMBOL: deploy-name
 SYMBOL: deploy-ui?
 SYMBOL: deploy-compiler?
 SYMBOL: deploy-math?
+SYMBOL: deploy-random?
 SYMBOL: deploy-threads?
 
 SYMBOL: deploy-io
@@ -57,6 +58,7 @@ SYMBOL: deploy-image
         { deploy-reflection         1 }
         { deploy-compiler?          t }
         { deploy-threads?           t }
+        { deploy-random?            t }
         { deploy-math?              t }
         { deploy-word-props?        f }
         { deploy-word-defs?         f }
@@ -66,7 +68,7 @@ SYMBOL: deploy-image
     } union ;
 
 : deploy-config-path ( vocab -- string )
-    vocab-dir "deploy.factor" path+ ;
+    vocab-dir "deploy.factor" append-path ;
 
 : deploy-config ( vocab -- assoc )
     dup default-config swap

@@ -37,13 +37,13 @@ TAGS>
 
 MEMO: (load-mode) ( name -- rule-sets )
     modes at mode-file
-    "extra/xmode/modes/" swap append
+    "extra/xmode/modes/" prepend
     resource-path utf8 <file-reader> parse-mode ;
 
 SYMBOL: rule-sets
 
 : no-such-rule-set ( name -- * )
-    "No such rule set: " swap append throw ;
+    "No such rule set: " prepend throw ;
 
 : get-rule-set ( name -- rule-sets rules )
     dup "::" split1 [ swap (load-mode) ] [ rule-sets get ] if*
@@ -63,7 +63,7 @@ SYMBOL: rule-sets
     over [ dupd update ] [ nip clone ] if ;
 
 : import-keywords ( parent child -- )
-    over >r [ rule-set-keywords ] 2apply ?update
+    over >r [ rule-set-keywords ] bi@ ?update
     r> set-rule-set-keywords ;
 
 : import-rules ( parent child -- )

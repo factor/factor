@@ -22,8 +22,8 @@ M: port set-timeout set-port-timeout ;
 
 SYMBOL: closed
 
-PREDICATE: port input-port port-type input-port eq? ;
-PREDICATE: port output-port port-type output-port eq? ;
+PREDICATE: input-port < port port-type input-port eq? ;
+PREDICATE: output-port < port port-type output-port eq? ;
 
 GENERIC: init-handle ( handle -- )
 GENERIC: close-handle ( handle -- )
@@ -73,7 +73,7 @@ M: input-port stream-read1
 
 : read-step ( count port -- byte-array/f )
     [ wait-to-read ] 2keep
-    [ dupd buffer> ] unless-eof nip ;
+    [ dupd buffer-read ] unless-eof nip ;
 
 : read-loop ( count port accum -- )
     pick over length - dup 0 > [
@@ -99,38 +99,6 @@ M: input-port stream-read
         ] if
     ] [
         2nip
-    ] if ;
-
-: read-until-step ( separators port -- byte-array/f separator/f )
-    dup wait-to-read1
-    dup port-eof? [
-        f swap set-port-eof? drop f f
-    ] [
-        buffer-until
-    ] if ;
-
-: read-until-loop ( seps port accum -- separator/f )
-    2over read-until-step over [
-        >r over push-all r> dup [
-            >r 3drop r>
-        ] [
-            drop read-until-loop
-        ] if
-    ] [
-        >r 2drop 2drop r>
-    ] if ;
-
-M: input-port stream-read-until ( seps port -- byte-array/f sep/f )
-    2dup read-until-step dup [
-        >r 2nip r>
-    ] [
-        over [
-            drop BV{ } like
-            [ read-until-loop ] keep
-            B{ } like swap
-        ] [
-            >r 2nip r>
-        ] if
     ] if ;
 
 M: input-port stream-read-partial ( max stream -- byte-array/f )
@@ -193,5 +161,5 @@ TUPLE: datagram-port addr packet packet-addr ;
 
 : check-datagram-send ( packet addrspec port -- )
     dup check-datagram-port
-    datagram-port-addr [ class ] 2apply assert=
+    datagram-port-addr [ class ] bi@ assert=
     class byte-array assert= ;

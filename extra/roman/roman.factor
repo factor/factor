@@ -23,7 +23,7 @@ TUPLE: roman-range-error n ;
     ] if ;
 
 : roman<= ( ch1 ch2 -- ? )
-    [ 1string roman-digits index ] 2apply >= ;
+    [ 1string roman-digits index ] bi@ >= ;
 
 : roman>n ( ch -- n )
     1string roman-digits index roman-values nth ;
@@ -57,7 +57,7 @@ PRIVATE>
 <PRIVATE
 
 : 2roman> ( str1 str2 -- m n )
-    [ roman> ] 2apply ;
+    [ roman> ] bi@ ;
 
 : binary-roman-op ( str1 str2 quot -- str3 )
     >r 2roman> r> call >roman ; inline

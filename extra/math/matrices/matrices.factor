@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences math math.functions
 math.vectors ;
@@ -33,23 +33,22 @@ IN: math.matrices
 : mmax ( m -- n ) >r -1/0. r> [ [ max ] each ] each ;
 : mnorm ( m -- n ) dup mmax abs m/n ;
 
-: cross-i ( vec1 vec2 -- i )
-    over third over second * >r
-    swap second swap third * r> - ;
+<PRIVATE
 
-: cross-j ( vec1 vec2 -- j )
-    over first over third * >r
-    swap third swap first * r> - ;
+: x first ; inline
+: y second ; inline
+: z third ; inline
 
-: cross-k ( vec1 vec2 -- k )
-    over first over second * >r
-    swap second swap first * r> - ;
+: i [ [ y ] [ z ] bi* * ] [ [ z ] [ y ] bi* * ] 2bi - ;
+: j [ [ z ] [ x ] bi* * ] [ [ x ] [ z ] bi* * ] 2bi - ;
+: k [ [ y ] [ x ] bi* * ] [ [ x ] [ y ] bi* * ] 2bi - ;
 
-: cross ( vec1 vec2 -- vec3 )
-    [ cross-i ] 2keep [ cross-j ] 2keep cross-k 3array ;
+PRIVATE>
+
+: cross ( vec1 vec2 -- vec3 ) [ i ] [ j ] [ k ] 2tri 3array ;
 
 : proj ( v u -- w )
-    [ [ v. ] keep norm-sq / ] keep n*v ;
+    [ [ v. ] [ norm-sq ] bi / ] keep n*v ;
 
 : (gram-schmidt) ( v seq -- newseq )
     [ dupd proj v- ] each ;

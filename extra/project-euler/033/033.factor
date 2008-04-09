@@ -33,10 +33,10 @@ IN: project-euler.033
     10 99 [a,b] dup cartesian-product [ first2 < ] subset ;
 
 : safe? ( ax xb -- ? )
-    [ 10 /mod ] 2apply -roll = rot zero? not and nip ;
+    [ 10 /mod ] bi@ -roll = rot zero? not and nip ;
 
 : ax/xb ( ax xb -- z/f )
-    2dup safe? [ [ 10 /mod ] 2apply 2nip / ] [ 2drop f ] if ;
+    2dup safe? [ [ 10 /mod ] bi@ 2nip / ] [ 2drop f ] if ;
 
 : curious? ( m n -- ? )
     2dup / [ ax/xb ] dip = ;

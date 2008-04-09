@@ -1,5 +1,5 @@
 USING: ui.gadgets ui.gestures help.markup help.syntax
-kernel classes strings opengl.gl ;
+kernel classes strings opengl.gl models ;
 IN: ui.render
 
 HELP: gadget
@@ -15,7 +15,7 @@ HELP: gadget
         { { $link gadget-clipped? } " - a boolean indicating if clipping will be enabled when drawing this gadget's children." }
         { { $link gadget-interior } " - an object whose class implements the " { $link draw-interior } " generic word." }
         { { $link gadget-boundary } " - an object whose class implements the " { $link draw-boundary } " generic word." }
-        { { $link gadget-model } " - XXX" }
+        { { $link gadget-model } " - a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } }
     }
 "Gadgets delegate to " { $link rect } " instances holding their location and dimensions." }
 { $notes

@@ -1,6 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
-effects classes generic.standard tuples generic.math arrays
-io.files vocabs.loader io sequences assocs ;
+effects classes generic.standard classes.tuple generic.math
+generic.standard arrays io.files vocabs.loader io sequences
+assocs ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -227,6 +228,9 @@ HELP: foldable
     }
     "The last restriction ensures that words such as " { $link clone } " do not satisfy the foldable word contract. Indeed, " { $link clone } " will output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since doing so would give incorrect semantics for code that clones mutable objects and proceeds to mutate them."
 }
+{ $notes
+    "Folding optimizations are not applied if the call site of a word is in the same source file as the word. This is a side-effect of the compilation unit system; see " { $link "compilation-units" } "."
+}
 { $examples "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable." } ;
 
 HELP: flushable
@@ -240,7 +244,7 @@ HELP: flushable
 HELP: t
 { $syntax "t" }
 { $values { "t" "the canonical truth value" } }
-{ $description "The canonical instance of " { $link general-t } ". It is just a symbol." } ;
+{ $class-description "The canonical truth value, which is an instance of itself." } ;
 
 HELP: f
 { $syntax "f" }
@@ -329,8 +333,8 @@ HELP: C{
 { $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: T{
-{ $syntax "T{ class delegate slots... }" }
-{ $values { "class" "a tuple class word" } { "delegate" "a delegate" } { "slots" "list of objects" } }
+{ $syntax "T{ class slots... }" }
+{ $values { "class" "a tuple class word" } { "slots" "list of objects" } }
 { $description "Marks the beginning of a literal tuple. Literal tuples are terminated by " { $link POSTPONE: } } "."
 $nl
 "The class word must always be specified. If an insufficient number of values is given after the class word, the remaining slots of the tuple are set to " { $link f } ". If too many values are given, they are ignored." } ;
@@ -540,8 +544,8 @@ HELP: INSTANCE:
 { $description "Makes " { $snippet "instance" } " an instance of " { $snippet "mixin" } "." } ;
 
 HELP: PREDICATE:
-{ $syntax "PREDICATE: superclass class predicate... ;" }
-{ $values { "superclass" "an existing class word" } { "class" "a new class word to define" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
+{ $syntax "PREDICATE: class < superclass predicate... ;" }
+{ $values { "class" "a new class word to define" } { "superclass" "an existing class word" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
 { $description
     "Defines a predicate class deriving from " { $snippet "superclass" } "."
     $nl
@@ -554,11 +558,24 @@ HELP: PREDICATE:
 } ;
 
 HELP: TUPLE:
-{ $syntax "TUPLE: class slots... ;" }
+{ $syntax "TUPLE: class slots... ;" "TUPLE: class < superclass slots ... ;" }
 { $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class with membership predicate " { $snippet "name?" } "."
-$nl
-"Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." } ;
+{ $description "Defines a new tuple class. The superclass is optional; if left unspecified, it defaults to " { $link tuple } "." } ;
+
+HELP: ERROR:
+{ $syntax "ERROR: class slots... ;" }
+{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
+{ $description "Defines a new tuple class whose class word throws a new instance of the error." }
+{ $notes
+    "The following two snippets are equivalent:"
+    { $code
+        "ERROR: invalid-values x y ;"
+        ""
+        "TUPLE: invalid-values x y ;"
+        ": invalid-values ( x y -- * )"
+        "    \\ invalid-values construct-boa throw ;"
+    }
+} ;
 
 HELP: C:
 { $syntax "C: constructor class" }
@@ -624,5 +641,19 @@ HELP: <<
 HELP: >>
 { $syntax ">>" }
 { $description "Marks the end of a parse time code block." } ;
+
+HELP: call-next-method
+{ $description "Calls the next applicable method. Only valid inside a method definition. The values at the top of the stack are passed on to the next method, and they must be compatible with that method's class specializer." }
+{ $notes "This is syntax sugar around " { $link (call-next-method) } ". The following two lines are equivalent:"
+    { $code
+        "M: my-class my-generic ... call-next-method ... ;"
+        "M: my-class my-generic ... \\ my-class \\ my-generic (call-next-method) ... ;"
+    }
+"In most cases, this word should be called with the original input values on the stack. Calling it with other values is usually a sign of poor design." }
+{ $errors
+    "Throws a " { $link no-next-method } " error if this is the least specific method, and throws an " { $link inconsistent-next-method } " error if the values at the top of the stack are not compatible with the current method's specializer."
+} ;
+
+{ POSTPONE: call-next-method (call-next-method) next-method } related-words
 
 { POSTPONE: << POSTPONE: >> } related-words

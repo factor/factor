@@ -46,9 +46,6 @@ IN: sequences.lib.tests
 [ { 1 -1 5 2 4 } [ < ] monotonic-split [ >array ] map ] unit-test
 [ { { 1 1 1 1 } { 2 2 } { 3 } { 4 } { 5 } { 6 6 6 } } ]
 [ { 1 1 1 1 2 2 3 4 5 6 6 6 } [ = ] monotonic-split [ >array ] map ] unit-test
-[ f ] [ { } singleton? ] unit-test
-[ t ] [ { "asdf" } singleton? ] unit-test
-[ f ] [ { "asdf" "bsdf" } singleton? ] unit-test
 
 [ 2 ] [ V{ 10 20 30 } [ delete-random drop ] keep length ] unit-test
 [ V{ } [ delete-random drop ] keep length ] must-fail
@@ -79,3 +76,6 @@ IN: sequences.lib.tests
 [ { 910 911 912 } ] [ 10 900 3 [ + + ] map-with2 ] unit-test
 
 [ 1 2 3 4 ] [ { 1 2 3 4 } 4 firstn ] unit-test
+
+[ ] [ { } 0 firstn ] unit-test
+[ "a" ] [ { "a" } 1 firstn ] unit-test

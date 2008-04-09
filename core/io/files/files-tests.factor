@@ -1,9 +1,66 @@
 IN: io.files.tests
-USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
+USING: tools.test io.files io.files.private io threads kernel
+continuations io.encodings.ascii io.files.unique sequences
+strings accessors io.encodings.utf8 ;
+
+[ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
+[ ] [ "blahblah" temp-file make-directory ] unit-test
+[ t ] [ "blahblah" temp-file directory? ] unit-test
+
+[ t ] [
+    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
+    temp-directory [
+        "loldir" make-directory
+    ] with-directory
+    temp-directory "loldir" append-path exists?
+] unit-test
+
+[ ] [
+    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
+    temp-directory [
+        "loldir" make-directory
+        "loldir" delete-directory
+    ] with-directory
+] unit-test
+
+[ "file1 contents" ] [
+    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
+    temp-directory [
+        "file1 contents" "file1" utf8 set-file-contents
+        "file1" "file2" copy-file
+        "file2" utf8 file-contents
+    ] with-directory
+    "file1" temp-file delete-file
+    "file2" temp-file delete-file
+] unit-test
+
+[ "file3 contents" ] [
+    temp-directory [
+        "file3 contents" "file3" utf8 set-file-contents
+        "file3" "file4" move-file
+        "file4" utf8 file-contents
+    ] with-directory
+    "file4" temp-file delete-file
+] unit-test
+
+[ ] [
+    temp-directory [
+        "file5" touch-file
+        "file5" delete-file
+    ] with-directory
+] unit-test
+
+[ ] [
+    temp-directory [
+        "file6" touch-file
+        "file6" link-info drop
+    ] with-directory
+] unit-test
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk/" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
+[ "" ] [ "" file-name ] unit-test
 
 [ ] [
     { "Hello world." }
@@ -60,7 +117,7 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 
 [ ] [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
 
-[ ] [ "test-quux.txt" "quux-test.txt" [ temp-file ] 2apply move-file ] unit-test
+[ ] [ "test-quux.txt" "quux-test.txt" [ temp-file ] bi@ move-file ] unit-test
 [ t ] [ "quux-test.txt" temp-file exists? ] unit-test
 
 [ ] [ "quux-test.txt" temp-file delete-file ] unit-test
@@ -74,6 +131,18 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 
 [ ] [
     "delete-tree-test" temp-file delete-tree
+] unit-test
+
+[ { { "kernel" t } } ] [
+    "core" resource-path [
+        "." directory [ first "kernel" = ] subset
+    ] with-directory
+] unit-test
+
+[ { { "kernel" t } } ] [
+    "resource:core" [
+        "." directory [ first "kernel" = ] subset
+    ] with-directory
 ] unit-test
 
 [ ] [
@@ -123,3 +192,70 @@ USING: tools.test io.files io threads kernel continuations io.encodings.ascii ;
 [ ] [ "copy-tree-test" temp-file delete-tree ] unit-test
 
 [ t ] [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
+
+[ t ] [
+    temp-directory [ "hi41" "test41" utf8 set-file-contents ] with-directory
+    temp-directory "test41" append-path utf8 file-contents "hi41" =
+] unit-test
+
+[ t ] [
+    temp-directory [ "test41" file-info size>> ] with-directory 4 =
+] unit-test
+
+[ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
+
+[ ] [ "append-test" temp-file ascii <file-appender> dispose ] unit-test
+
+
+
+[ 123 ] [
+    "core" ".test" [
+        [
+            ascii [
+                123 CHAR: a <repetition> >string write
+            ] with-file-writer
+        ] keep file-info size>>
+    ] with-unique-file
+] unit-test
+
+[ "/usr/lib" ] [ "/usr" "lib" append-path ] unit-test
+[ "/usr/lib" ] [ "/usr/" "lib" append-path ] unit-test
+[ "/usr/lib" ] [ "/usr" "./lib" append-path ] unit-test
+[ "/usr/lib/" ] [ "/usr" "./lib/" append-path ] unit-test
+[ "/lib" ] [ "/usr" "../lib" append-path ] unit-test
+[ "/lib/" ] [ "/usr" "../lib/" append-path ] unit-test
+
+[ "" ] [ "" "." append-path ] unit-test
+[ "" ".." append-path ] must-fail
+
+[ "/" ] [ "/" "./." append-path ] unit-test
+[ "/" ] [ "/" "././" append-path ] unit-test
+[ "/a/b/lib" ] [ "/a/b/c/d/e/f/" "../../../../lib" append-path ] unit-test
+[ "/a/b/lib/" ] [ "/a/b/c/d/e/f/" "../../../../lib/" append-path ] unit-test
+
+[ "" "../lib/" append-path ] must-fail
+[ "lib" ] [ "" "lib" append-path ] unit-test
+[ "lib" ] [ "" "./lib" append-path ] unit-test
+
+[ "foo/bar/." parent-directory ] must-fail
+[ "foo/bar/./" parent-directory ] must-fail
+[ "foo/bar/baz/.." parent-directory ] must-fail
+[ "foo/bar/baz/../" parent-directory ] must-fail
+
+[ "." parent-directory ] must-fail
+[ "./" parent-directory ] must-fail
+[ ".." parent-directory ] must-fail
+[ "../" parent-directory ] must-fail
+[ "../../" parent-directory ] must-fail
+[ "foo/.." parent-directory ] must-fail
+[ "foo/../" parent-directory ] must-fail
+[ "" parent-directory ] must-fail
+[ "." ] [ "boot.x86.64.image" parent-directory ] unit-test
+
+[ "bar/foo" ] [ "bar/baz" "..///foo" append-path ] unit-test
+[ "bar/baz/foo" ] [ "bar/baz" ".///foo" append-path ] unit-test
+[ "bar/foo" ] [ "bar/baz" "./..//foo" append-path ] unit-test
+[ "bar/foo" ] [ "bar/baz" "./../././././././///foo" append-path ] unit-test
+
+[ t ] [ "resource:core" absolute-path? ] unit-test
+[ f ] [ "" absolute-path? ] unit-test

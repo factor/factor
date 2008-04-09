@@ -5,11 +5,11 @@ IN: http.server.templating.fhtml.tests
 
 : test-template ( path -- ? )
     "resource:extra/http/server/templating/fhtml/test/"
-    swap append
+    prepend
     [
         ".fhtml" append [ run-template ] with-string-writer
     ] keep
-    ".html" append ?resource-path utf8 file-contents = ;
+    ".html" append utf8 file-contents = ;
 
 [ t ] [ "example" test-template ] unit-test
 [ t ] [ "bug" test-template ] unit-test

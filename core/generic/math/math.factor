@@ -1,23 +1,24 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
-sequences.private classes definitions ;
+sequences.private classes classes.builtin classes.algebra
+definitions ;
 IN: generic.math
 
-PREDICATE: class math-class ( object -- ? )
+PREDICATE: math-class < class
     dup null bootstrap-word eq? [
         drop f
     ] [
         number bootstrap-word class<
     ] if ;
 
-: last/first ( seq -- pair ) dup peek swap first 2array ;
+: last/first ( seq -- pair ) [ peek ] [ first ] bi 2array ;
 
-: math-precedence ( class -- n )
+: math-precedence ( class -- pair )
     {
-        { [ dup class-empty? ] [ drop { -1 -1 } ] }
-        { [ dup math-class? ] [ types last/first ] }
+        { [ dup null class< ] [ drop { -1 -1 } ] }
+        { [ dup math-class? ] [ class-types last/first ] }
         { [ t ] [ drop { 100 100 } ] }
     } cond ;
     
@@ -33,17 +34,14 @@ PREDICATE: class math-class ( object -- ? )
     dup empty? [ [ dip ] curry [ ] like ] unless
     r> append ;
 
-TUPLE: no-math-method left right generic ;
-
-: no-math-method ( left right generic -- * )
-    \ no-math-method construct-boa throw ;
+ERROR: no-math-method left right generic ;
 
 : default-math-method ( generic -- quot )
     [ no-math-method ] curry [ ] like ;
 
 : applicable-method ( generic class -- quot )
     over method
-    [ word-def ]
+    [ 1quotation ]
     [ default-math-method ] ?if ;
 
 : object-method ( generic -- quot )
@@ -53,7 +51,7 @@ TUPLE: no-math-method left right generic ;
     2dup and [
         2dup math-upgrade >r
         math-class-max over order min-class applicable-method
-        r> swap append
+        r> prepend
     ] [
         2drop object-method
     ] if ;
@@ -74,15 +72,17 @@ M: math-combination make-default-method
 
 M: math-combination perform-combination
     drop
+    dup
     \ over [
         dup math-class? [
             \ dup [ >r 2dup r> math-method ] math-vtable
         ] [
             over object-method
         ] if nip
-    ] math-vtable nip ;
+    ] math-vtable nip
+    define ;
 
-PREDICATE: generic math-generic ( word -- ? )
+PREDICATE: math-generic < generic ( word -- ? )
     "combination" word-prop math-combination? ;
 
 M: math-generic definer drop \ MATH: f ;

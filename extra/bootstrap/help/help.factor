@@ -9,11 +9,10 @@ IN: bootstrap.help
 
     t load-help? set-global
 
-    [ vocab ] load-vocab-hook [
+    [ drop ] load-vocab-hook [
         vocabs
-        [ vocab-root ] subset
-        [ vocab-source-loaded? ] subset
-        [ dup vocab-docs-loaded? [ drop ] [ load-docs ] if ] each
+        [ vocab-docs-loaded? not ] subset
+        [ load-docs ] each
     ] with-variable ;
 
 load-help

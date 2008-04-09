@@ -4,14 +4,16 @@ USING: alien arrays bit-arrays byte-arrays generic assocs
 hashtables assocs hashtables.private io kernel kernel.private
 math namespaces parser prettyprint sequences sequences.private
 strings sbufs vectors words quotations assocs system layouts
-splitting growable classes tuples words.private
-io.binary io.files vocabs vocabs.loader source-files
-definitions debugger float-arrays quotations.private
-sequences.private combinators io.encodings.binary ;
+splitting growable classes classes.builtin classes.tuple
+classes.tuple.private words.private io.binary io.files vocabs
+vocabs.loader source-files definitions debugger float-arrays
+quotations.private sequences.private combinators
+io.encodings.binary ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
-    cpu dup "ppc" = [ os "-" rot 3append ] when ;
+    cpu word-name
+    dup "ppc" = [ >r os word-name "-" r> 3append ] when ;
 
 : boot-image-name ( arch -- string )
     "boot." swap ".image" 3append ;
@@ -54,7 +56,7 @@ IN: bootstrap.image
 : quot-xt@ 3 bootstrap-cells object tag-number - ;
 
 : jit-define ( quot rc rt offset name -- )
-    >r >r >r >r { } make r> r> r> 4array r> set ;
+    >r { [ { } make ] [ ] [ ] [ ] } spread 4array r> set ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -133,10 +135,10 @@ SYMBOL: undefined-quot
 
 : here ( -- size ) heap-size data-base + ;
 
-: here-as ( tag -- pointer ) here swap bitor ;
+: here-as ( tag -- pointer ) here bitor ;
 
 : align-here ( -- )
-    here 8 mod 4 = [ heap-size drop 0 emit ] when ;
+    here 8 mod 4 = [ 0 emit ] when ;
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
@@ -163,7 +165,7 @@ GENERIC: ' ( obj -- ptr )
     userenv-size [ f ' emit ] times ;
 
 : emit-userenv ( symbol -- )
-    dup get ' swap userenv-offset fixup ;
+    [ get ' ] [ userenv-offset ] bi fixup ;
 
 ! Bignums
 
@@ -174,14 +176,15 @@ GENERIC: ' ( obj -- ptr )
 : bignum>seq ( n -- seq )
     #! n is positive or zero.
     [ dup 0 > ]
-    [ dup bignum-bits neg shift swap bignum-radix bitand ]
+    [ [ bignum-bits neg shift ] [ bignum-radix bitand ] bi ]
     [ ] unfold nip ;
 
-USE: continuations
 : emit-bignum ( n -- )
-    dup 0 < [ 1 swap neg ] [ 0 swap ] if bignum>seq
-    dup length 1+ emit-fixnum
-    swap emit emit-seq ;
+    dup dup 0 < [ neg ] when bignum>seq
+    [ nip length 1+ emit-fixnum ]
+    [ drop 0 < 1 0 ? emit ]
+    [ nip emit-seq ]
+    2tri ;
 
 M: bignum '
     bignum tag-number dup [ emit-bignum ] emit-object ;
@@ -191,7 +194,9 @@ M: bignum '
 M: fixnum '
     #! When generating a 32-bit image on a 64-bit system,
     #! some fixnums should be bignums.
-    dup most-negative-fixnum most-positive-fixnum between?
+    dup
+    bootstrap-most-negative-fixnum
+    bootstrap-most-positive-fixnum between?
     [ tag-fixnum ] [ >bignum ' ] if ;
 
 ! Floats
@@ -218,28 +223,33 @@ M: f '
 ! Words
 
 : emit-word ( word -- )
-    dup subwords [ emit-word ] each
     [
-        dup hashcode ' ,
-        dup word-name ' ,
-        dup word-vocabulary ' ,
-        dup word-def ' ,
-        dup word-props ' ,
-        f ' ,
-        0 , ! count
-        0 , ! xt
-        0 , ! code
-        0 , ! profiling
-    ] { } make
-    \ word type-number object tag-number
-    [ emit-seq ] emit-object
-    swap objects get set-at ;
+        [ subwords [ emit-word ] each ]
+        [
+            [
+                {
+                    [ hashcode , ]
+                    [ word-name , ]
+                    [ word-vocabulary , ]
+                    [ word-def , ]
+                    [ word-props , ]
+                } cleave
+                f ,
+                0 , ! count
+                0 , ! xt
+                0 , ! code
+                0 , ! profiling
+            ] { } make [ ' ] map
+        ] bi
+        \ word type-number object tag-number
+        [ emit-seq ] emit-object
+    ] keep objects get set-at ;
 
 : word-error ( word msg -- * )
     [ % dup word-vocabulary % " " % word-name % ] "" make throw ;
 
 : transfer-word ( word -- word )
-    dup target-word swap or ;
+    [ target-word ] keep or ;
 
 : fixup-word ( word -- offset )
     transfer-word dup objects get at
@@ -282,9 +292,10 @@ M: string '
     length 0 assert= ;
 
 : emit-dummy-array ( obj type -- ptr )
-    swap assert-empty
-    type-number object tag-number
-    [ 0 emit-fixnum ] emit-object ;
+    [ assert-empty ] [
+        type-number object tag-number
+        [ 0 emit-fixnum ] emit-object
+    ] bi* ;
 
 M: byte-array ' byte-array emit-dummy-array ;
 
@@ -292,31 +303,42 @@ M: bit-array ' bit-array emit-dummy-array ;
 
 M: float-array ' float-array emit-dummy-array ;
 
-! Arrays
-: emit-array ( list type tag -- pointer )
-    >r >r [ ' ] map r> r> [
-        dup length emit-fixnum
-        emit-seq
-    ] emit-object ;
+! Tuples
+: (emit-tuple) ( tuple -- pointer )
+    [ tuple>array 1 tail-slice ]
+    [ class transfer-word tuple-layout ] bi prefix [ ' ] map
+    tuple type-number dup [ emit-seq ] emit-object ;
 
-: emit-tuple ( obj -- pointer )
-    [
-        [ tuple>array unclip transfer-word , % ] { } make
-        tuple type-number dup emit-array
-    ]
-    ! Hack
-    over class word-name "tombstone" =
-    [ objects get swap cache ] [ call ] if ;
+: emit-tuple ( tuple -- pointer )
+    dup class word-name "tombstone" =
+    [ objects get [ (emit-tuple) ] cache ] [ (emit-tuple) ] if ;
 
 M: tuple ' emit-tuple ;
+
+M: tuple-layout '
+    objects get [
+        [
+            {
+                [ layout-hashcode , ]
+                [ layout-class , ]
+                [ layout-size , ]
+                [ layout-superclasses , ]
+                [ layout-echelon , ]
+            } cleave
+        ] { } make [ ' ] map
+        \ tuple-layout type-number
+        object tag-number [ emit-seq ] emit-object
+    ] cache ;
 
 M: tombstone '
     delegate
     "((tombstone))" "((empty))" ? "hashtables.private" lookup
     word-def first objects get [ emit-tuple ] cache ;
 
+! Arrays
 M: array '
-    array type-number object tag-number emit-array ;
+    [ ' ] map array type-number object tag-number
+    [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
 
 ! Quotations
 
@@ -331,13 +353,6 @@ M: quotation '
         ] emit-object
     ] cache ;
 
-! Curries
-
-M: curry '
-    dup curry-quot ' swap curry-obj '
-    \ curry type-number object tag-number
-    [ emit emit ] emit-object ;
-
 ! End of the image
 
 : emit-words ( -- )
@@ -346,8 +361,10 @@ M: curry '
 : emit-global ( -- )
     [
         {
-            dictionary source-files
-            typemap builtins class<map update-map
+            dictionary source-files builtins
+            update-map class<-cache class-not-cache
+            classes-intersect-cache class-and-cache
+            class-or-cache
         } [ dup get swap bootstrap-word set ] each
     ] H{ } make-assoc
     bootstrap-global set
@@ -415,8 +432,8 @@ M: curry '
 : write-image ( image -- )
     "Writing image to " write
     architecture get boot-image-name resource-path
-    dup write "..." print flush
-    binary <file-writer> [ (write-image) ] with-stream ;
+    [ write "..." print flush ]
+    [ binary <file-writer> [ (write-image) ] with-stream ] bi ;
 
 PRIVATE>
 

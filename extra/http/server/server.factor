@@ -2,16 +2,24 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http sequences prettyprint io.server logging calendar
-new-slots html.elements accessors math.parser combinators.lib
-vocabs.loader debugger html continuations random combinators
-destructors io.encodings.latin1 fry combinators.cleave ;
+html.elements accessors math.parser combinators.lib
+tools.vocabs debugger html continuations random combinators
+destructors io.encodings.8-bit fry ;
 IN: http.server
 
 GENERIC: call-responder ( path responder -- response )
 
+: request-params ( -- assoc )
+    request get dup method>> {
+        { "GET" [ query>> ] }
+        { "HEAD" [ query>> ] }
+        { "POST" [ post-data>> ] }
+    } case ;
+
 : <content> ( content-type -- response )
     <response>
         200 >>code
+        "Document follows" >>message
         swap set-content-type ;
 
 TUPLE: trivial-responder response ;
@@ -44,19 +52,27 @@ SYMBOL: 404-responder
 
 [ <404> ] <trivial-responder> 404-responder set-global
 
-: url-redirect ( to query -- url )
-    #! Different host.
-    dup assoc-empty? [
-        drop
-    ] [
-        assoc>query "?" swap 3append
-    ] if ;
+SYMBOL: link-hook
+
+: modify-query ( query -- query )
+    link-hook get [ ] or call ;
+
+: link>string ( url query -- url' )
+    modify-query (link>string) ;
+
+: write-link ( url query -- )
+    link>string write ;
+
+SYMBOL: form-hook
+
+: hidden-form-field ( -- )
+    form-hook get [ ] or call ;
 
 : absolute-redirect ( to query -- url )
     #! Same host.
     request get clone
         swap [ >>query ] when*
-        swap >>path
+        swap url-encode >>path
     request-url ;
 
 : replace-last-component ( path with -- path' )
@@ -66,11 +82,12 @@ SYMBOL: 404-responder
     request get clone
     swap [ >>query ] when*
     swap [ '[ , replace-last-component ] change-path ] when*
+    dup query>> modify-query >>query
     request-url ;
 
 : derive-url ( to query -- url )
     {
-        { [ over "http://" head? ] [ url-redirect ] }
+        { [ over "http://" head? ] [ link>string ] }
         { [ over "/" head? ] [ absolute-redirect ] }
         { [ t ] [ relative-redirect ] }
     } cond ;
@@ -91,10 +108,6 @@ TUPLE: dispatcher default responders ;
 : <dispatcher> ( -- dispatcher )
     404-responder get H{ } clone dispatcher construct-boa ;
 
-: set-main ( dispatcher name -- dispatcher )
-    '[ , f <permanent-redirect> ] <trivial-responder>
-    >>default ;
-
 : split-path ( path -- rest first )
     [ CHAR: / = ] left-trim "/" split1 swap ;
 
@@ -107,27 +120,35 @@ TUPLE: dispatcher default responders ;
 
 M: dispatcher call-responder ( path dispatcher -- response )
     over [
-        2dup find-responder call-responder [
-            2nip
-        ] [
-            default>> [
-                call-responder
-            ] [
-                drop f
-            ] if*
-        ] if*
+        find-responder call-responder
     ] [
         2drop redirect-with-/
     ] if ;
+
+: <webapp> ( class -- dispatcher )
+    <dispatcher> swap construct-delegate ; inline
+
+TUPLE: vhost-dispatcher default responders ;
+
+: <vhost-dispatcher> ( -- dispatcher )
+    404-responder get H{ } clone vhost-dispatcher construct-boa ;
+
+: find-vhost ( dispatcher -- responder )
+    request get host>> over responders>> at*
+    [ nip ] [ drop default>> ] if ;
+
+M: vhost-dispatcher call-responder ( path dispatcher -- response )
+    find-vhost call-responder ;
+
+: set-main ( dispatcher name -- dispatcher )
+    '[ , f <permanent-redirect> ] <trivial-responder>
+    >>default ;
 
 : add-responder ( dispatcher responder path -- dispatcher )
     pick responders>> set-at ;
 
 : add-main-responder ( dispatcher responder path -- dispatcher )
     [ add-responder ] keep set-main ;
-
-: <webapp> ( class -- dispatcher )
-    <dispatcher> swap construct-delegate ; inline
 
 SYMBOL: main-responder
 
@@ -164,21 +185,20 @@ SYMBOL: exit-continuation
 
 : exit-with exit-continuation get continue-with ;
 
+: with-exit-continuation ( quot -- )
+    '[ exit-continuation set @ ] callcc1 exit-continuation off ;
+
 : do-request ( request -- response )
-    '[
-        exit-continuation set ,
-        [
-            [ log-request ]
-            [ request set ]
-            [ path>> main-responder get call-responder ] tri
-            [ <404> ] unless*
-        ] [
-            [ \ do-request log-error ]
-            [ <500> ]
-            bi
-        ] recover
-    ] callcc1
-    exit-continuation off ;
+    [
+        [ log-request ]
+        [ request set ]
+        [ path>> main-responder get call-responder ] tri
+        [ <404> ] unless*
+    ] [
+        [ \ do-request log-error ]
+        [ <500> ]
+        bi
+    ] recover ;
 
 : default-timeout 1 minutes stdio get set-timeout ;
 
@@ -202,11 +222,3 @@ SYMBOL: exit-continuation
 : httpd-main ( -- ) 8888 httpd ;
 
 MAIN: httpd-main
-
-! Utility
-: generate-key ( assoc -- str )
-    >r random-256 >hex r>
-    2dup key? [ nip generate-key ] [ drop ] if ;
-
-: set-at-unique ( value assoc -- key )
-    dup generate-key [ swap set-at ] keep ;

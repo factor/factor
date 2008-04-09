@@ -18,7 +18,7 @@ IN: math.combinatorics
     0 [ over 0 > ] [ 1+ [ /mod ] keep swap ] [ ] unfold reverse 2nip ;
 
 : (>permutation) ( seq n -- seq )
-    [ [ dupd >= [ 1+ ] when ] curry map ] keep add* ;
+    [ [ dupd >= [ 1+ ] when ] curry map ] keep prefix ;
 
 : >permutation ( factoradic -- permutation )
     reverse 1 cut [ (>permutation) ] each ;

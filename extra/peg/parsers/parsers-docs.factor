@@ -1,8 +1,18 @@
-! Copyright (C) 2007 Chris Double.
+! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax peg peg.parsers.private
 unicode.categories ;
 IN: peg.parsers
+
+HELP: 1token
+{ $values
+    { "ch" "a character" }
+    { "parser" "a parser" }
+} { $description
+    "Calls 1string on a character and returns a parser that matches that character."
+} { $examples
+    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" CHAR: a 1token parse parse-result-ast ." "\"a\"" }
+} { $see-also 'string' } ;
 
 HELP: (list-of)
 { $values
@@ -149,3 +159,21 @@ HELP: 'string'
 } { $description
     "Returns a parser that matches an string composed of a \", anything that is not \", and another \"."
 } { $see-also 'integer' } ;
+
+HELP: range-pattern
+{ $values
+    { "pattern" "a string" }
+    { "parser" "a parser" }
+} { $description
+"Returns a parser that matches a single character based on the set "
+"of characters in the pattern string."
+"Any single character in the pattern matches that character. "
+"If the pattern begins with a ^ then the set is negated "
+"(the element matches any character not in the set). Any pair "
+"of characters separated with a dash (-) represents the "
+"range of characters from the first to the second, inclusive."
+{ $examples
+    { $example "USING: peg peg.parsers prettyprint strings ;" "\"a\" \"_a-zA-Z\" range-pattern parse parse-result-ast 1string ." "\"a\"" } 
+    { $example "USING: peg peg.parsers prettyprint ;\n\"0\" \"^0-9\" range-pattern parse ." "f" } 
+}
+}  ;

@@ -1,11 +1,11 @@
 USING: assocs math kernel sequences io.files hashtables
-quotations splitting arrays math.parser combinators.lib hash2
+quotations splitting arrays math.parser hash2
 byte-arrays words namespaces words compiler.units parser io.encodings.ascii  ;
 IN: unicode.data
 
 <<
 : VALUE:
-    CREATE dup reset-generic { f } clone [ first ] curry define ; parsing
+    CREATE-WORD { f } clone [ first ] curry define ; parsing
 
 : set-value ( value word -- )
     word-def first set-first ;
@@ -44,7 +44,7 @@ IN: unicode.data
     dup [ swap (chain-decomposed) ] curry assoc-map ;
 
 : first* ( seq -- ? )
-    second [ empty? ] [ first ] either ;
+    second dup empty? [ ] [ first ] ?if ;
 
 : (process-decomposed) ( data -- alist )
     5 swap (process-data)

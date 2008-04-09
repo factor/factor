@@ -1,11 +1,12 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays continuations destructors io
+USING: alien alien.c-types arrays continuations io
 io.windows io.windows.nt.pipes libc io.nonblocking
-io.streams.duplex windows.types math windows.kernel32 windows
-namespaces io.launcher kernel sequences windows.errors assocs
+io.streams.duplex windows.types math windows.kernel32
+namespaces io.launcher kernel sequences windows.errors
 splitting system threads init strings combinators
-io.backend new-slots accessors ;
+io.backend accessors concurrency.flags io.files assocs
+io.files.private windows destructors ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args
@@ -23,11 +24,11 @@ TUPLE: CreateProcess-args
 
 : default-CreateProcess-args ( -- obj )
     CreateProcess-args construct-empty
-    0 >>dwCreateFlags
     "STARTUPINFO" <c-object>
     "STARTUPINFO" heap-size over set-STARTUPINFO-cb >>lpStartupInfo
     "PROCESS_INFORMATION" <c-object> >>lpProcessInformation
-    TRUE >>bInheritHandles ;
+    TRUE >>bInheritHandles
+    0 >>dwCreateFlags ;
 
 : call-CreateProcess ( CreateProcess-args -- )
     {
@@ -43,11 +44,35 @@ TUPLE: CreateProcess-args
         lpProcessInformation>>
     } get-slots CreateProcess win32-error=0/f ;
 
+: count-trailing-backslashes ( str n -- str n )
+    >r "\\" ?tail [
+        r> 1+ count-trailing-backslashes
+    ] [
+        r>
+    ] if ;
+
+: fix-trailing-backslashes ( str -- str' )
+    0 count-trailing-backslashes
+    2 * CHAR: \\ <repetition> append ;
+
 : escape-argument ( str -- newstr )
-    CHAR: \s over member? [ "\"" swap "\"" 3append ] when ;
+    CHAR: \s over member? [
+        "\"" swap fix-trailing-backslashes "\"" 3append
+    ] when ;
 
 : join-arguments ( args -- cmd-line )
     [ escape-argument ] map " " join ;
+
+: lookup-priority ( process -- n )
+    priority>> {
+        { +lowest-priority+ [ IDLE_PRIORITY_CLASS ] }
+        { +low-priority+ [ BELOW_NORMAL_PRIORITY_CLASS ] }
+        { +normal-priority+ [ NORMAL_PRIORITY_CLASS ] }
+        { +high-priority+ [ ABOVE_NORMAL_PRIORITY_CLASS ] }
+        { +highest-priority+ [ HIGH_PRIORITY_CLASS ] }
+        { +realtime-priority+ [ REALTIME_PRIORITY_CLASS ] }
+        [ drop f ]
+    } case ;
 
 : app-name/cmd-line ( process -- app-name cmd-line )
     command>> dup string? [
@@ -70,7 +95,8 @@ TUPLE: CreateProcess-args
 : fill-dwCreateFlags ( process args -- process args )
     0
     pick pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
-    pick detached>> winnt? and [ DETACHED_PROCESS bitor ] when
+    pick detached>> os winnt? and [ DETACHED_PROCESS bitor ] when
+    pick lookup-priority [ bitor ] when*
     >>dwCreateFlags ;
 
 : fill-lpEnvironment ( process args -- process args )
@@ -88,28 +114,30 @@ TUPLE: CreateProcess-args
 
 HOOK: fill-redirection io-backend ( process args -- )
 
-M: windows-ce-io fill-redirection 2drop ;
+M: wince fill-redirection 2drop ;
 
 : make-CreateProcess-args ( process -- args )
     default-CreateProcess-args
-    wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
+    os wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
     fill-dwCreateFlags
     fill-lpEnvironment
     fill-startup-info
     nip ;
 
-M: windows-io current-process-handle ( -- handle )
+M: windows current-process-handle ( -- handle )
     GetCurrentProcessId ;
 
-M: windows-io run-process* ( process -- handle )
+M: windows run-process* ( process -- handle )
     [
+        current-directory get (normalize-path) cd
+
         dup make-CreateProcess-args
         tuck fill-redirection
         dup call-CreateProcess
         lpProcessInformation>>
     ] with-destructors ;
 
-M: windows-io kill-process* ( handle -- )
+M: windows kill-process* ( handle -- )
     PROCESS_INFORMATION-hProcess
     255 TerminateProcess win32-error=0/f ;
 
@@ -129,26 +157,10 @@ M: windows-io kill-process* ( handle -- )
     over process-handle dispose-process
     notify-exit ;
 
-: wait-for-processes ( processes -- ? )
-    keys dup
+M: windows wait-for-processes ( -- ? )
+    processes get keys dup
     [ process-handle PROCESS_INFORMATION-hProcess ] map
     dup length swap >c-void*-array 0 0
     WaitForMultipleObjects
     dup HEX: ffffffff = [ win32-error ] when
     dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth process-exited f ] if ;
-
-: wait-loop ( -- )
-    processes get dup assoc-empty?
-    [ drop f sleep-until ]
-    [ wait-for-processes [ 100 sleep ] when ] if ;
-
-SYMBOL: wait-thread
-
-: start-wait-thread ( -- )
-    [ wait-loop t ] "Process wait" spawn-server
-    wait-thread set-global ;
-
-M: windows-io register-process
-    drop wait-thread get-global interrupt ;
-
-[ start-wait-thread ] "io.windows.launcher" add-init-hook

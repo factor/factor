@@ -1,6 +1,6 @@
 USING: unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
-combinators.lib assocs.lib math.ranges unicode.normalize
+math.ranges unicode.normalize
 unicode.syntax unicode.data compiler.units alien.syntax io.encodings.ascii ;
 IN: unicode.breaks
 
@@ -26,8 +26,8 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 : process-other-extend ( lines -- set )
     [ "#" split1 drop ";" split1 drop trim-blank ] map
     [ empty? not ] subset
-    [ ".." split1 [ dup ] unless* [ hex> ] 2apply [a,b] ] map
-    concat >set ;
+    [ ".." split1 [ dup ] unless* [ hex> ] bi@ [a,b] ] map
+    concat [ dup ] H{ } map>assoc ;
 
 : other-extend-lines ( -- lines )
     "extra/unicode/PropList.txt" resource-path ascii file-lines ;
@@ -36,7 +36,7 @@ VALUE: other-extend
 
 CATEGORY: (extend) Me Mn ;
 : extend? ( ch -- ? )
-    [ (extend)? ] [ other-extend key? ] either ;
+    dup (extend)? [ ] [ other-extend key? ] ?if ;
 
 : grapheme-class ( ch -- class )
     {
@@ -83,7 +83,7 @@ VALUE: grapheme-table
     grapheme-table nth nth not ;
 
 : chars ( i str n -- str[i] str[i+n] )
-    swap >r dupd + r> [ ?nth ] curry 2apply ;
+    swap >r dupd + r> [ ?nth ] curry bi@ ;
 
 : find-index ( seq quot -- i ) find drop ; inline
 : find-last-index ( seq quot -- i ) find-last drop ; inline

@@ -3,7 +3,7 @@
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
 splitting calendar continuations accessors vectors
-io.encodings.latin1 io.encodings.binary fry ;
+io.encodings.8-bit io.encodings.binary fry ;
 IN: http.client
 
 DEFER: http-request
@@ -12,7 +12,7 @@ DEFER: http-request
 
 : parse-url ( url -- resource host port )
     "http://" ?head [ "Only http:// supported" throw ] unless
-    "/" split1 [ "/" swap append ] [ "/" ] if*
+    "/" split1 [ "/" prepend ] [ "/" ] if*
     swap parse-host ;
 
 : store-path ( request path -- request )
@@ -95,5 +95,4 @@ PRIVATE>
     swap >>post-data-type ;
 
 : http-post ( content-type content url -- response string )
-    #! The content is URL encoded for you.
-    >r url-encode r> <post-request> http-request contents ;
+    <post-request> http-request contents ;

@@ -1,6 +1,6 @@
 
 USING: kernel namespaces threads sequences calendar
-       combinators.cleave combinators.lib debugger ;
+       combinators.lib debugger ;
 
 IN: raptor.cron
 

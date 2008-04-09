@@ -1,44 +1,37 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.files io.windows kernel
-math windows windows.kernel32 combinators.cleave
-windows.time calendar combinators math.functions
-sequences combinators.lib namespaces words symbols ;
+USING: alien.c-types io.backend io.files io.windows kernel math
+windows windows.kernel32 windows.time calendar combinators
+math.functions sequences namespaces words symbols system
+combinators.lib io.nonblocking destructors math.bitfields.lib ;
 IN: io.windows.files
 
 SYMBOLS: +read-only+ +hidden+ +system+
-+directory+ +archive+ +device+ +normal+ +temporary+
++archive+ +device+ +normal+ +temporary+
 +sparse-file+ +reparse-point+ +compressed+ +offline+
 +not-content-indexed+ +encrypted+ ;
 
-: expand-constants ( word/obj -- obj'/obj )
-    dup word? [ execute ] when ;
-
-: get-flags ( n seq -- seq' )
-    [
-        [
-            first2 expand-constants
-            [ swapd mask? [ , ] [ drop ] if ] 2curry
-        ] map call-with
-    ] { } make ;
+: win32-file-attribute ( n attr symbol -- n )
+    >r dupd mask? [ r> , ] [ r> drop ] if ;
 
 : win32-file-attributes ( n -- seq )
-    {
-        { +read-only+ FILE_ATTRIBUTE_READONLY }
-        { +hidden+ FILE_ATTRIBUTE_HIDDEN }
-        { +system+ FILE_ATTRIBUTE_SYSTEM }
-        { +directory+ FILE_ATTRIBUTE_DIRECTORY }
-        { +archive+ FILE_ATTRIBUTE_ARCHIVE }
-        { +device+ FILE_ATTRIBUTE_DEVICE }
-        { +normal+ FILE_ATTRIBUTE_NORMAL }
-        { +temporary+ FILE_ATTRIBUTE_TEMPORARY }
-        { +sparse-file+ FILE_ATTRIBUTE_SPARSE_FILE }
-        { +reparse-point+ FILE_ATTRIBUTE_REPARSE_POINT }
-        { +compressed+ FILE_ATTRIBUTE_COMPRESSED }
-        { +offline+ FILE_ATTRIBUTE_OFFLINE }
-        { +not-content-indexed+ FILE_ATTRIBUTE_NOT_CONTENT_INDEXED }
-        { +encrypted+ FILE_ATTRIBUTE_ENCRYPTED }
-    } get-flags ;
+    [
+        FILE_ATTRIBUTE_READONLY +read-only+ win32-file-attribute
+        FILE_ATTRIBUTE_HIDDEN +hidden+ win32-file-attribute
+        FILE_ATTRIBUTE_SYSTEM +system+ win32-file-attribute
+        FILE_ATTRIBUTE_DIRECTORY +directory+ win32-file-attribute
+        FILE_ATTRIBUTE_ARCHIVE +archive+ win32-file-attribute
+        FILE_ATTRIBUTE_DEVICE +device+ win32-file-attribute
+        FILE_ATTRIBUTE_NORMAL +normal+ win32-file-attribute
+        FILE_ATTRIBUTE_TEMPORARY +temporary+ win32-file-attribute
+        FILE_ATTRIBUTE_SPARSE_FILE +sparse-file+ win32-file-attribute
+        FILE_ATTRIBUTE_REPARSE_POINT +reparse-point+ win32-file-attribute
+        FILE_ATTRIBUTE_COMPRESSED +compressed+ win32-file-attribute
+        FILE_ATTRIBUTE_OFFLINE +offline+ win32-file-attribute
+        FILE_ATTRIBUTE_NOT_CONTENT_INDEXED +not-content-indexed+ win32-file-attribute
+        FILE_ATTRIBUTE_ENCRYPTED +encrypted+ win32-file-attribute
+        drop
+    ] { } make ;
 
 : win32-file-type ( n -- symbol )
     FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;
@@ -95,6 +88,46 @@ SYMBOLS: +read-only+ +hidden+ +system+
         get-file-information BY_HANDLE_FILE_INFORMATION>file-info
     ] if ;
 
-M: windows-nt-io file-info ( path -- info )
-    get-file-information-stat ;
+M: winnt file-info ( path -- info )
+    normalize-path get-file-information-stat ;
 
+M: winnt link-info ( path -- info )
+    file-info ;
+
+: file-times ( path -- timestamp timestamp timestamp )
+    [
+        normalize-path open-existing dup close-always
+        "FILETIME" <c-object>
+        "FILETIME" <c-object>
+        "FILETIME" <c-object>
+        [ GetFileTime win32-error=0/f ] 3keep
+        [ FILETIME>timestamp >local-time ] 3apply
+    ] with-destructors ;
+
+: (set-file-times) ( handle timestamp/f timestamp/f timestamp/f -- )
+    [ timestamp>FILETIME ] 3apply
+    SetFileTime win32-error=0/f ;
+
+: set-file-times ( path timestamp/f timestamp/f timestamp/f -- )
+    #! timestamp order: creation access write
+    [
+        >r >r >r
+            normalize-path open-existing dup close-always
+        r> r> r> (set-file-times)
+    ] with-destructors ;
+
+: set-file-create-time ( path timestamp -- )
+    f f set-file-times ;
+
+: set-file-access-time ( path timestamp -- )
+    >r f r> f set-file-times ;
+
+: set-file-write-time ( path timestamp -- )
+    >r f f r> set-file-times ;
+
+M: winnt touch-file ( path -- )
+    [
+        normalize-path
+        maybe-create-file over close-always
+        [ drop ] [ f now dup (set-file-times) ] if
+    ] with-destructors ;

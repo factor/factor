@@ -3,9 +3,7 @@
 USING: words sequences vocabs kernel ;
 IN: bootstrap.syntax
 
-"syntax" create-vocab
-"resource:core" over set-vocab-root
-f swap set-vocab-source-loaded?
+"syntax" create-vocab drop
 
 {
     "!"
@@ -23,6 +21,7 @@ f swap set-vocab-source-loaded?
     "C:"
     "CHAR:"
     "DEFER:"
+    "ERROR:"
     "F{"
     "FV{"
     "FORGET:"
@@ -44,6 +43,7 @@ f swap set-vocab-source-loaded?
     "PRIMITIVE:"
     "PRIVATE>"
     "SBUF\""
+    "SINGLETON:"
     "SYMBOL:"
     "TUPLE:"
     "T{"
@@ -67,6 +67,7 @@ f swap set-vocab-source-loaded?
     "CS{"
     "<<"
     ">>"
+    "call-next-method"
 } [ "syntax" create drop ] each
 
 "t" "syntax" lookup define-symbol

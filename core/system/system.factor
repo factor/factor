@@ -2,60 +2,69 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: system
 USING: kernel kernel.private sequences math namespaces
-splitting assocs system.private ;
+init splitting assocs system.private layouts words ;
 
-: cell ( -- n ) 7 getenv ; foldable
+SINGLETON: x86.32
+SINGLETON: x86.64
+SINGLETON: arm
+SINGLETON: ppc
 
-: cells ( m -- n ) cell * ; inline
+UNION: x86 x86.32 x86.64 ;
 
-: cell-bits ( -- n ) 8 cells ; inline
+: cpu ( -- class ) \ cpu get ;
 
-: cpu ( -- cpu ) 8 getenv ; foldable
+SINGLETON: winnt
+SINGLETON: wince
 
-: os ( -- os ) 9 getenv ; foldable
+UNION: windows winnt wince ;
+
+SINGLETON: freebsd
+SINGLETON: netbsd
+SINGLETON: openbsd
+SINGLETON: solaris
+SINGLETON: macosx
+SINGLETON: linux
+
+UNION: bsd freebsd netbsd openbsd macosx ;
+
+UNION: unix bsd solaris linux ;
+
+: os ( -- class ) \ os get ;
+
+<PRIVATE
+
+: string>cpu ( str -- class )
+    H{
+        { "x86.32" x86.32 }
+        { "x86.64" x86.64 }
+        { "arm" arm }
+        { "ppc" ppc }
+    } at ;
+
+: string>os ( str -- class )
+    H{
+        { "winnt" winnt }
+        { "wince" wince }
+        { "freebsd" freebsd }
+        { "netbsd" netbsd }
+        { "openbsd" openbsd }
+        { "solaris" solaris }
+        { "macosx" macosx }
+        { "linux" linux }
+    } at ;
+
+PRIVATE>
+
+[
+    8 getenv string>cpu \ cpu set-global
+    9 getenv string>os \ os set-global
+] "system" add-init-hook
 
 : image ( -- path ) 13 getenv ;
 
 : vm ( -- path ) 14 getenv ;
 
-: wince? ( -- ? )
-    os "wince" = ; foldable
-
-: winnt? ( -- ? )
-    os "winnt" = ; foldable
-
-: windows? ( -- ? )
-    wince? winnt? or ; foldable
-
-: win32? ( -- ? )
-    winnt? cell 4 = and ; foldable
-
-: win64? ( -- ? )
-    winnt? cell 8 = and ; foldable
-
-: macosx? ( -- ? ) os "macosx" = ; foldable
-
 : embedded? ( -- ? ) 15 getenv ;
-
-: unix? ( -- ? )
-    os {
-        "freebsd" "openbsd" "netbsd" "linux" "macosx" "solaris"
-    } member? ;
-
-: bsd? ( -- ? )
-    os { "freebsd" "openbsd" "netbsd" "macosx" } member? ;
-
-: linux? ( -- ? )
-    os "linux" = ;
-
-: solaris? ( -- ? )
-    os "solaris" = ;
-
-: bootstrap-cell \ cell get cell or ; inline
-
-: bootstrap-cells bootstrap-cell * ; inline
-
-: bootstrap-cell-bits 8 bootstrap-cells ; inline
 
 : os-envs ( -- assoc )
     (os-envs) [ "=" split1 ] H{ } map>assoc ;

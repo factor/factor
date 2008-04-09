@@ -57,8 +57,6 @@ unit-test
 
 [ ] [ \ integer see ] unit-test
 
-[ ] [ \ general-t see ] unit-test
-
 [ ] [ \ generic see ] unit-test
 
 [ ] [ \ duplex-stream see ] unit-test
@@ -192,7 +190,7 @@ unit-test
         "IN: prettyprint.tests"
         ": another-soft-break-layout ( node -- quot )"
         "    parse-error-file"
-        "    [ <reversed> \"hello world foo\" add ] [ ] make ;"
+        "    [ <reversed> \"hello world foo\" suffix ] [ ] make ;"
     } ;
 
 [ t ] [
@@ -317,3 +315,24 @@ unit-test
 [ ] [ 1 \ + curry unparse drop ] unit-test
 
 [ ] [ 1 \ + compose unparse drop ] unit-test
+
+GENERIC: generic-see-test-with-f ( obj -- obj )
+
+M: f generic-see-test-with-f ;
+
+[ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
+    [ { POSTPONE: f generic-see-test-with-f } see ] with-string-writer
+] unit-test
+
+[ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
+    [ \ f \ generic-see-test-with-f method see ] with-string-writer
+] unit-test
+
+PREDICATE: predicate-see-test < integer even? ;
+
+[ "USING: math ;\nIN: prettyprint.tests\nPREDICATE: predicate-see-test < integer even? ;\n" ] [
+    [ \ predicate-see-test see ] with-string-writer
+] unit-test
+
+[ ] [ \ compose see ] unit-test
+[ ] [ \ curry see ] unit-test

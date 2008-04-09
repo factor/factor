@@ -10,9 +10,9 @@ USING: alien alien.syntax combinators kernel system ;
 IN: openssl.libssl
 
 << "libssl" {
-    { [ win32? ] [ "ssleay32.dll" "stdcall" ] }
-    { [ macosx? ] [ "libssl.dylib" "cdecl" ] }
-    { [ unix? ] [ "$LD_LIBRARY_PATH/libssl.so" "cdecl" ] }
+    { [ os winnt? ]  [ "ssleay32.dll" "cdecl" ] }
+    { [ os macosx? ] [ "libssl.dylib" "cdecl" ] }
+    { [ os unix? ]   [ "libssl.so" "cdecl" ] }
 } cond add-library >>
 
 : X509_FILETYPE_PEM       1 ; inline

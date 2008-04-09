@@ -1,8 +1,7 @@
 USING: alien alien.c-types arrays assocs byte-arrays inference
-inference.transforms io io.binary io.streams.string kernel
-math math.parser namespaces parser prettyprint
-quotations sequences strings vectors
-words macros math.functions ;
+inference.transforms io io.binary io.streams.string kernel math
+math.parser namespaces parser prettyprint quotations sequences
+strings vectors words macros math.functions math.bitfields.lib ;
 IN: pack
 
 SYMBOL: big-endian
@@ -88,7 +87,7 @@ M: string b, ( n string -- ) heap-size b, ;
     read [ zero? ] right-trim dup empty? [ drop f ] when ;
 
 : (read-128-ber) ( n -- n )
-    1 read first
+    read1
     [ >r 7 shift r> 7 clear-bit bitor ] keep
     7 bit? [ (read-128-ber) ] when ;
     

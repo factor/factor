@@ -1,4 +1,4 @@
-<% USING: http.server.components ; %>
+<% USING: http.server.components http.server ; %>
 <html>
 <body>
 <h1>Recover lost password: step 1 of 4</h1>
@@ -6,6 +6,9 @@
 <p>Enter the username and e-mail address you used to register for this site, and you will receive a link for activating a new password.</p>
 
 <form method="POST" action="recover-password">
+
+<% hidden-form-field %>
+
 <table>
 
 <tr>

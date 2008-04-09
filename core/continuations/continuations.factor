@@ -1,7 +1,8 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
-namespaces math splitting sorting quotations assocs ;
+namespaces math splitting sorting quotations assocs
+combinators accessors ;
 IN: continuations
 
 SYMBOL: error
@@ -43,12 +44,12 @@ C: <continuation> continuation
 
 : >continuation< ( continuation -- data call retain name catch )
     {
-        continuation-data
-        continuation-call
-        continuation-retain
-        continuation-name
-        continuation-catch
-    } get-slots ;
+        [ data>>   ]
+        [ call>>   ]
+        [ retain>> ]
+        [ name>>   ]
+        [ catch>>  ]
+    } cleave ;
 
 : ifcc ( capture restore -- )
     #! After continuation is being captured, the stacks looks
@@ -140,14 +141,9 @@ GENERIC: dispose ( object -- )
 : with-disposal ( object quot -- )
     over [ dispose ] curry [ ] cleanup ; inline
 
-TUPLE: condition restarts continuation ;
+TUPLE: condition error restarts continuation ;
 
-: <condition> ( error restarts cc -- condition )
-    {
-        set-delegate
-        set-condition-restarts
-        set-condition-continuation
-    } condition construct ;
+C: <condition> condition ( error restarts cc -- condition )
 
 : throw-restarts ( error restarts -- restart )
     [ <condition> throw ] callcc1 2nip ;
@@ -160,15 +156,14 @@ TUPLE: restart name obj continuation ;
 C: <restart> restart
 
 : restart ( restart -- )
-    dup restart-obj swap restart-continuation continue-with ;
+    [ obj>> ] [ continuation>> ] bi continue-with ;
 
 M: object compute-restarts drop { } ;
 
-M: tuple compute-restarts delegate compute-restarts ;
-
 M: condition compute-restarts
-    [ delegate compute-restarts ] keep
-    [ condition-restarts ] keep
-    condition-continuation
-    [ <restart> ] curry { } assoc>map
-    append ;
+    [ error>> compute-restarts ]
+    [
+        [ restarts>> ]
+        [ condition-continuation [ <restart> ] curry ] bi
+        { } assoc>map
+    ] bi append ;

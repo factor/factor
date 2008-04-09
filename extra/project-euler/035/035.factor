@@ -34,7 +34,7 @@ IN: project-euler.035
     ] if ;
 
 : rotate ( seq n -- seq )
-    cut* swap append ;
+    cut* prepend ;
 
 : (circular?) ( seq n -- ? )
     dup 0 > [

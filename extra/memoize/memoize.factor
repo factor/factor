@@ -40,9 +40,9 @@ IN: memoize
     over make-memoizer define ;
 
 : MEMO:
-    CREATE dup reset-generic parse-definition define-memoized ; parsing
+    CREATE-WORD parse-definition define-memoized ; parsing
 
-PREDICATE: word memoized "memoize" word-prop ;
+PREDICATE: memoized < word "memoize" word-prop ;
 
 M: memoized definer drop \ MEMO: \ ; ;
 M: memoized definition "memo-quot" word-prop ;

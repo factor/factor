@@ -1,11 +1,11 @@
-USING: io.files kernel sequences new-slots accessors
+USING: io.files kernel sequences accessors
 dlists arrays sequences.lib ;
 IN: io.paths
 
 TUPLE: directory-iterator path bfs queue ;
 
 : qualified-directory ( path -- seq )
-    dup directory [ first2 >r path+ r> 2array ] with map ;
+    dup directory [ first2 >r append-path r> 2array ] with map ;
 
 : push-directory ( path iter -- )
     >r qualified-directory r> [
@@ -44,7 +44,7 @@ TUPLE: directory-iterator path bfs queue ;
 
 : find-all-files ( path bfs? quot -- paths )
     >r <directory-iterator> r>
-    pusher >r iterate-directory drop r> ; inline
+    pusher >r [ f ] compose iterate-directory drop r> ; inline
 
 : recursive-directory ( path bfs? -- paths )
     [ ] accumulator >r each-file r> ;

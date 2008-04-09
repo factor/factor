@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences parser kernel help help.markup help.topics
-words strings classes tools.browser namespaces io
+words strings classes tools.vocabs namespaces io
 io.streams.string prettyprint definitions arrays vectors
 combinators splitting debugger hashtables sorting effects vocabs
 vocabs.loader assocs editors continuations classes.predicate
@@ -39,8 +39,6 @@ IN: help.lint
     {
         $shuffle
         $values-x/y
-        $slot-reader
-        $slot-writer
         $predicate
         $class-description
         $error-description
@@ -61,7 +59,7 @@ IN: help.lint
 
 : check-see-also ( word element -- )
     nip \ $see-also swap elements [
-        1 tail dup prune [ length ] 2apply assert=
+        1 tail dup prune [ length ] bi@ assert=
     ] each ;
 
 : vocab-exists? ( name -- ? )

@@ -5,9 +5,10 @@ USING: alien alien.accessors arrays generic hashtables kernel
 assocs math math.private kernel.private sequences words parser
 inference.class inference.dataflow vectors strings sbufs io
 namespaces assocs quotations math.intervals sequences.private
-combinators splitting layouts math.parser classes generic.math
-optimizer.pattern-match optimizer.backend optimizer.def-use
-optimizer.inlining generic.standard system ;
+combinators splitting layouts math.parser classes
+classes.algebra generic.math optimizer.pattern-match
+optimizer.backend optimizer.def-use optimizer.inlining
+generic.standard system ;
 
 { + bignum+ float+ fixnum+fast } {
     { { number 0 } [ drop ] }
@@ -112,7 +113,7 @@ optimizer.inlining generic.standard system ;
 : post-process ( class interval node -- classes intervals )
     dupd won't-overflow?
     [ >r dup { f integer } member? [ drop fixnum ] when r> ] when
-    [ dup [ 1array ] when ] 2apply ;
+    [ dup [ 1array ] when ] bi@ ;
 
 : math-output-interval-1 ( node word -- interval )
     dup [
@@ -146,7 +147,7 @@ optimizer.inlining generic.standard system ;
 ] each
 
 : intervals ( node -- i1 i2 )
-    node-in-d first2 [ value-interval* ] 2apply ;
+    node-in-d first2 [ value-interval* ] bi@ ;
 
 : math-output-interval-2 ( node word -- interval )
     dup [
@@ -268,7 +269,7 @@ optimizer.inlining generic.standard system ;
 : comparison-constraints ( node true false -- )
     >r >r dup node set intervals dup [
         2dup
-        r> general-t (comparison-constraints)
+        r> \ f class-not (comparison-constraints)
         r> \ f (comparison-constraints)
     ] [
         r> r> 2drop 2drop

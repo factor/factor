@@ -17,7 +17,7 @@ SYMBOL: CRITICAL
     { DEBUG NOTICE NOTICE WARNING ERROR CRITICAL } ;
 
 : send-to-log-server ( array string -- )
-    add* "log-server" get send ;
+    prefix "log-server" get send ;
 
 SYMBOL: log-service
 
@@ -127,8 +127,7 @@ PRIVATE>
 
 : LOG:
     #! Syntax: name level
-    CREATE
-    dup reset-generic
+    CREATE-WORD
     dup scan-word
     [ >r >r 1array stack>message r> r> log-message ] 2curry
     define ; parsing

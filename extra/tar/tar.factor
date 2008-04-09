@@ -35,7 +35,7 @@ linkname magic version uname gname devmajor devminor prefix ;
 
 : header-checksum ( seq -- x )
     148 cut-slice 8 tail-slice
-    [ sum ] 2apply + 256 + ;
+    [ sum ] bi@ + 256 + ;
 
 TUPLE: checksum-error ;
 TUPLE: malformed-block-error ;
@@ -89,12 +89,12 @@ TUPLE: unimplemented-typeflag header ;
     tar-header-typeflag
     1string \ unimplemented-typeflag construct-boa ;
 
-: tar-path+ ( path -- newpath )
-    base-dir get swap path+ ;
+: tar-append-path ( path -- newpath )
+    base-dir get prepend-path ;
 
 ! Normal file
 : typeflag-0
-  tar-header-name tar-path+ binary <file-writer>
+  tar-header-name tar-append-path binary <file-writer>
   [ read-data-blocks ] keep dispose ;
 
 ! Hard link
@@ -115,7 +115,7 @@ TUPLE: unimplemented-typeflag header ;
 
 ! Directory
 : typeflag-5 ( header -- )
-    tar-header-name tar-path+ make-directories ;
+    tar-header-name tar-append-path make-directories ;
 
 ! FIFO
 : typeflag-6 ( header -- )
@@ -166,7 +166,7 @@ TUPLE: unimplemented-typeflag header ;
     <string-writer> [ read-data-blocks ] keep
     >string [ zero? ] right-trim filename set
     global [ "long filename: " write filename get . flush ] bind
-    filename get tar-path+ make-directories ;
+    filename get tar-append-path make-directories ;
 
 ! Multi volume continuation entry
 : typeflag-M ( header -- )
@@ -226,7 +226,7 @@ TUPLE: unimplemented-typeflag header ;
             ! drop
         ! ] [
             ! dup tar-header-name
-            ! dup parent-dir base-dir swap path+
+            ! dup parent-dir base-dir prepend-path
             ! global [ dup [ . flush ] when* ] bind 
             ! make-directories <file-writer>
             ! out-stream set

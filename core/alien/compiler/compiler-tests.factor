@@ -87,7 +87,7 @@ FUNCTION: tiny ffi_test_17 int x ;
 [ -1 indirect-test-1 ] must-fail
 
 : indirect-test-2
-    "int" { "int" "int" } "cdecl" alien-indirect data-gc ;
+    "int" { "int" "int" } "cdecl" alien-indirect gc ;
 
 { 3 1 } [ indirect-test-2 ] must-infer-as
 
@@ -97,7 +97,7 @@ unit-test
 
 : indirect-test-3
     "int" { "int" "int" "int" "int" } "stdcall" alien-indirect
-    data-gc ;
+    gc ;
 
 << "f-stdcall" f "stdcall" add-library >>
 
@@ -106,13 +106,13 @@ unit-test
 
 : ffi_test_18 ( w x y z -- int )
     "int" "f-stdcall" "ffi_test_18" { "int" "int" "int" "int" }
-    alien-invoke data-gc ;
+    alien-invoke gc ;
 
 [ 25 ] [ 2 3 4 5 ffi_test_18 ] unit-test
 
 : ffi_test_19 ( x y z -- bar )
     "bar" "f-stdcall" "ffi_test_19" { "long" "long" "long" }
-    alien-invoke data-gc ;
+    alien-invoke gc ;
 
 [ 11 6 -7 ] [
     11 6 -7 ffi_test_19 dup bar-x over bar-y rot bar-z
@@ -143,7 +143,7 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
     "void"
     f "ffi_test_31"
     { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
-    alien-invoke code-gc 3 ;
+    alien-invoke gc 3 ;
 
 [ 3 ] [ 42 [ ] each ffi_test_31 ] unit-test
 
@@ -312,14 +312,14 @@ FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
 
 : callback-4
     "void" { } "cdecl" [ "Hello world" write ] alien-callback
-    data-gc ;
+    gc ;
 
 [ "Hello world" ] [ 
     [ callback-4 callback_test_1 ] with-string-writer
 ] unit-test
 
 : callback-5
-    "void" { } "cdecl" [ data-gc ] alien-callback ;
+    "void" { } "cdecl" [ gc ] alien-callback ;
 
 [ "testing" ] [
     "testing" callback-5 callback_test_1
@@ -330,11 +330,11 @@ FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
 
 ! Hack; if we're on ARM, we probably don't have much RAM, so
 ! skip this test.
-cpu "arm" = [
-    [ "testing" ] [
-        "testing" callback-5a callback_test_1
-    ] unit-test
-] unless
+! cpu "arm" = [
+!     [ "testing" ] [
+!         "testing" callback-5a callback_test_1
+!     ] unit-test
+! ] unless
 
 : callback-6
     "void" { } "cdecl" [ [ continue ] callcc0 ] alien-callback ;

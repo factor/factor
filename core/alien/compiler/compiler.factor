@@ -6,13 +6,16 @@ inference.state inference.backend inference.dataflow system
 math.parser classes alien.arrays alien.c-types alien.structs
 alien.syntax cpu.architecture alien inspector quotations assocs
 kernel.private threads continuations.private libc combinators
-compiler.errors continuations ;
+compiler.errors continuations layouts accessors ;
 IN: alien.compiler
 
-! Common protocol for alien-invoke/alien-callback/alien-indirect
-GENERIC: alien-node-parameters ( node -- seq )
-GENERIC: alien-node-return ( node -- ctype )
-GENERIC: alien-node-abi ( node -- str )
+TUPLE: #alien-node < node return parameters abi ;
+
+TUPLE: #alien-callback < #alien-node quot xt ;
+
+TUPLE: #alien-indirect < #alien-node ;
+
+TUPLE: #alien-invoke < #alien-node library function ;
 
 : large-struct? ( ctype -- ? )
     dup c-struct? [
@@ -22,11 +25,11 @@ GENERIC: alien-node-abi ( node -- str )
     ] if ;
 
 : alien-node-parameters* ( node -- seq )
-    dup alien-node-parameters
-    swap alien-node-return large-struct? [ "void*" add* ] when ;
+    dup parameters>>
+    swap return>> large-struct? [ "void*" prefix ] when ;
 
 : alien-node-return* ( node -- ctype )
-    alien-node-return dup large-struct? [ drop "void" ] when ;
+    return>> dup large-struct? [ drop "void" ] when ;
 
 : c-type-stack-align ( type -- align )
     dup c-type-stack-align? [ c-type-align ] [ drop cell ] if ;
@@ -51,7 +54,7 @@ GENERIC: alien-node-abi ( node -- str )
 
 : alien-invoke-frame ( node -- n )
     #! One cell is temporary storage, temp@
-    dup alien-node-return return-size
+    dup return>> return-size
     swap alien-stack-frame +
     cell + ;
 
@@ -67,29 +70,36 @@ GENERIC: reg-size ( register-class -- n )
 
 M: int-regs reg-size drop cell ;
 
-M: float-regs reg-size float-regs-size ;
+M: single-float-regs reg-size drop 4 ;
+
+M: double-float-regs reg-size drop 8 ;
+
+GENERIC: reg-class-variable ( register-class -- symbol )
+
+M: reg-class reg-class-variable ;
+
+M: float-regs reg-class-variable drop float-regs ;
 
 GENERIC: inc-reg-class ( register-class -- )
 
-: (inc-reg-class)
-    dup class inc
+M: reg-class inc-reg-class
+    dup reg-class-variable inc
     fp-shadows-int? [ reg-size stack-params +@ ] [ drop ] if ;
 
-M: int-regs inc-reg-class
-    (inc-reg-class) ;
-
 M: float-regs inc-reg-class
-    dup (inc-reg-class)
+    dup call-next-method
     fp-shadows-int? [ reg-size cell /i int-regs +@ ] [ drop ] if ;
 
 : reg-class-full? ( class -- ? )
-    dup class get swap param-regs length >= ;
+    [ reg-class-variable get ] [ param-regs length ] bi >= ;
 
 : spill-param ( reg-class -- n reg-class )
-    reg-size stack-params dup get -rot +@ T{ stack-params } ;
+    stack-params get
+    >r reg-size stack-params +@ r>
+    stack-params ;
 
 : fastcall-param ( reg-class -- n reg-class )
-    [ dup class get swap inc-reg-class ] keep ;
+    [ reg-class-variable get ] [ inc-reg-class ] [ ] tri ;
 
 : alloc-parameter ( parameter -- reg reg-class )
     c-type-reg-class dup reg-class-full?
@@ -147,9 +157,9 @@ M: long-long-type flatten-value-type ( type -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
 
 : alien-invoke-stack ( node extra -- )
-    over alien-node-parameters length + dup reify-curries
+    over parameters>> length + dup reify-curries
     over consume-values
-    dup alien-node-return "void" = 0 1 ?
+    dup return>> "void" = 0 1 ?
     swap produce-values ;
 
 : (make-prep-quot) ( parameters -- )
@@ -161,11 +171,11 @@ M: long-long-type flatten-value-type ( type -- )
     ] if ;
 
 : make-prep-quot ( node -- quot )
-    alien-node-parameters
+    parameters>>
     [ <reversed> (make-prep-quot) ] [ ] make ;
 
 : unbox-parameters ( offset node -- )
-    alien-node-parameters [
+    parameters>> [
         %prepare-unbox >r over + r> unbox-parameter
     ] reverse-each-parameter drop ;
 
@@ -174,7 +184,7 @@ M: long-long-type flatten-value-type ( type -- )
     #! parameters. If the C function is returning a structure,
     #! the first parameter is an implicit target area pointer,
     #! so we need to use a different offset.
-    alien-node-return dup large-struct?
+    return>> dup large-struct?
     [ heap-size %prepare-box-struct cell ] [ drop 0 ] if ;
 
 : objects>registers ( node -- )
@@ -188,14 +198,7 @@ M: long-long-type flatten-value-type ( type -- )
     ] with-param-regs ;
 
 : box-return* ( node -- )
-    alien-node-return [ ] [ box-return ] if-void ;
-
-M: alien-invoke alien-node-parameters alien-invoke-parameters ;
-M: alien-invoke alien-node-return alien-invoke-return ;
-
-M: alien-invoke alien-node-abi
-    alien-invoke-library library
-    [ library-abi ] [ "cdecl" ] if* ;
+    return>> [ ] [ box-return ] if-void ;
 
 M: alien-invoke-error summary
     drop
@@ -205,7 +208,7 @@ M: alien-invoke-error summary
 
 : stdcall-mangle ( symbol node -- symbol )
     "@"
-    swap alien-node-parameters parameter-sizes drop
+    swap parameters>> parameter-sizes drop
     number>string 3append ;
 
 TUPLE: no-such-library name ;
@@ -241,28 +244,32 @@ M: no-such-symbol compiler-error-type
     ] if ;
 
 : alien-invoke-dlsym ( node -- symbols dll )
-    dup alien-invoke-function dup pick stdcall-mangle 2array
-    swap alien-invoke-library library dup [ library-dll ] when
+    dup function>> dup pick stdcall-mangle 2array
+    swap library>> library dup [ dll>> ] when
     2dup check-dlsym ;
 
 \ alien-invoke [
     ! Four literals
     4 ensure-values
-    \ alien-invoke empty-node
+    #alien-invoke construct-empty
     ! Compile-time parameters
-    pop-parameters over set-alien-invoke-parameters
-    pop-literal nip over set-alien-invoke-function
-    pop-literal nip over set-alien-invoke-library
-    pop-literal nip over set-alien-invoke-return
+    pop-parameters >>parameters
+    pop-literal nip >>function
+    pop-literal nip >>library
+    pop-literal nip >>return
     ! Quotation which coerces parameters to required types
     dup make-prep-quot recursive-state get infer-quot
+    ! Set ABI
+    dup library>>
+    library [ abi>> ] [ "cdecl" ] if*
+    >>abi
     ! Add node to IR
     dup node,
     ! Magic #: consume exactly the number of inputs
     0 alien-invoke-stack
 ] "infer" set-word-prop
 
-M: alien-invoke generate-node
+M: #alien-invoke generate-node
     dup alien-invoke-frame [
         end-basic-block
         %prepare-alien-invoke
@@ -274,10 +281,6 @@ M: alien-invoke generate-node
         iterate-next
     ] with-stack-frame ;
 
-M: alien-indirect alien-node-parameters alien-indirect-parameters ;
-M: alien-indirect alien-node-return alien-indirect-return ;
-M: alien-indirect alien-node-abi alien-indirect-abi ;
-
 M: alien-indirect-error summary
     drop "Words calling ``alien-indirect'' must be compiled with the optimizing compiler." ;
 
@@ -285,11 +288,11 @@ M: alien-indirect-error summary
     ! Three literals and function pointer
     4 ensure-values
     4 reify-curries
-    \ alien-indirect empty-node
+    #alien-indirect construct-empty
     ! Compile-time parameters
-    pop-literal nip over set-alien-indirect-abi
-    pop-parameters over set-alien-indirect-parameters
-    pop-literal nip over set-alien-indirect-return
+    pop-literal nip >>abi
+    pop-parameters >>parameters
+    pop-literal nip >>return
     ! Quotation which coerces parameters to required types
     dup make-prep-quot [ dip ] curry recursive-state get infer-quot
     ! Add node to IR
@@ -298,7 +301,7 @@ M: alien-indirect-error summary
     1 alien-invoke-stack
 ] "infer" set-word-prop
 
-M: alien-indirect generate-node
+M: #alien-indirect generate-node
     dup alien-invoke-frame [
         ! Flush registers
         end-basic-block
@@ -323,25 +326,21 @@ callbacks global [ H{ } assoc-like ] change-at
 
 : register-callback ( word -- ) dup callbacks get set-at ;
 
-M: alien-callback alien-node-parameters alien-callback-parameters ;
-M: alien-callback alien-node-return alien-callback-return ;
-M: alien-callback alien-node-abi alien-callback-abi ;
-
 M: alien-callback-error summary
     drop "Words calling ``alien-callback'' must be compiled with the optimizing compiler." ;
 
 : callback-bottom ( node -- )
-    alien-callback-xt [ word-xt drop <alien> ] curry
+    xt>> [ word-xt drop <alien> ] curry
     recursive-state get infer-quot ;
 
 \ alien-callback [
     4 ensure-values
-    \ alien-callback empty-node dup node,
-    pop-literal nip over set-alien-callback-quot
-    pop-literal nip over set-alien-callback-abi
-    pop-parameters over set-alien-callback-parameters
-    pop-literal nip over set-alien-callback-return
-    gensym dup register-callback over set-alien-callback-xt
+    #alien-callback construct-empty dup node,
+    pop-literal nip >>quot
+    pop-literal nip >>abi
+    pop-parameters >>parameters
+    pop-literal nip >>return
+    gensym dup register-callback >>xt
     callback-bottom
 ] "infer" set-word-prop
 
@@ -373,7 +372,7 @@ TUPLE: callback-context ;
     wait-to-return ; inline
 
 : prepare-callback-return ( ctype -- quot )
-    alien-node-return {
+    return>> {
         { [ dup "void" = ] [ drop [ ] ] }
         { [ dup large-struct? ] [ heap-size [ memcpy ] curry ] }
         { [ t ] [ c-type c-type-prep ] }
@@ -381,8 +380,7 @@ TUPLE: callback-context ;
 
 : wrap-callback-quot ( node -- quot )
     [
-        dup alien-callback-quot
-        swap prepare-callback-return append ,
+        [ quot>> ] [ prepare-callback-return ] bi append ,
         [ callback-context construct-empty do-callback ] %
     ] [ ] make ;
 
@@ -390,8 +388,8 @@ TUPLE: callback-context ;
 
 : callback-unwind ( node -- n )
     {
-        { [ dup alien-node-abi "stdcall" = ] [ alien-stack-frame ] }
-        { [ dup alien-node-return large-struct? ] [ drop 4 ] }
+        { [ dup abi>> "stdcall" = ] [ alien-stack-frame ] }
+        { [ dup return>> large-struct? ] [ drop 4 ] }
         { [ t ] [ drop 0 ] }
     } cond ;
 
@@ -403,7 +401,7 @@ TUPLE: callback-context ;
     callback-unwind %unwind ;
 
 : generate-callback ( node -- )
-    dup alien-callback-xt dup [
+    dup xt>> dup [
         init-templates
         %save-word-xt
         %prologue-later
@@ -414,5 +412,5 @@ TUPLE: callback-context ;
         ] with-stack-frame
     ] with-generator ;
 
-M: alien-callback generate-node
+M: #alien-callback generate-node
     end-basic-block generate-callback iterate-next ;

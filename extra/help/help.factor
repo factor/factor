@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io kernel namespaces parser prettyprint sequences
 words assocs definitions generic quotations effects slots
-continuations tuples debugger combinators vocabs help.stylesheet
-help.topics help.crossref help.markup sorting classes
-vocabs.loader ;
+continuations classes.tuple debugger combinators vocabs
+help.stylesheet help.topics help.crossref help.markup sorting
+classes vocabs.loader ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -24,10 +24,6 @@ GENERIC: word-help* ( word -- content )
     ] { } make $description ;
 
 M: word word-help* drop f ;
-
-M: slot-reader word-help* drop \ $slot-reader ;
-
-M: slot-writer word-help* drop \ $slot-writer ;
 
 M: predicate word-help* drop \ $predicate ;
 
@@ -98,7 +94,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 : about ( vocab -- )
     dup require
     dup vocab [ ] [
-        "No such vocabulary: " swap append throw
+        "No such vocabulary: " prepend throw
     ] ?if
     dup vocab-help [
         help
@@ -136,7 +132,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     ":edit - jump to source location (parse errors only)" print
 
     ":get  ( var -- value ) accesses variables at time of the error" print
-    ":vars - list all variables at error time";
+    ":vars - list all variables at error time" print ;
 
 : :help ( -- )
     error get delegates [ error-help ] map [ ] subset

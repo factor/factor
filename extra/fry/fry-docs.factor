@@ -46,7 +46,7 @@ $nl
 }
 "The " { $link , } " and " { $link @ } " specifiers may be freely mixed:"
 { $code
-    "{ 8 13 14 27 } [ even? ] 5 [ @ dup , ? ] map"
+    "{ 8 13 14 27 } [ even? ] 5 '[ @ dup , ? ] map"
     "{ 8 13 14 27 } [ even? ] 5 [ dup ] swap [ ? ] curry 3compose map"
     "{ 8 13 14 27 } [ even? dup 5 ? ] map"
 }
@@ -69,7 +69,7 @@ $nl
     { { $link curry } { $snippet ": curry '[ , @ ] ;" } }
     { { $link with } { $snippet ": with swapd '[ , _ @ ] ;" } }
     { { $link compose } { $snippet ": compose '[ @ @ ] ;" } }
-    { { $link 2apply } { $snippet ": 2apply tuck '[ , @ , @ ] call ;" } }
+    { { $link bi@ } { $snippet ": bi@ tuck '[ , @ , @ ] call ;" } }
 } ;
 
 ARTICLE: "fry.philosophy" "Fried quotation philosophy"

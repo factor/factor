@@ -1,6 +1,6 @@
-IN: calendar.format
 USING: math math.parser kernel sequences io calendar
 accessors arrays io.streams.string combinators accessors ;
+IN: calendar.format
 
 GENERIC: day. ( obj -- )
 
@@ -54,17 +54,17 @@ M: timestamp year. ( timestamp -- )
 : timestamp>string ( timestamp -- str )
     [ (timestamp>string) ] with-string-writer ;
 
-: (write-gmt-offset) ( ratio -- )
-    1 /mod swap write-00 60 * write-00 ;
+: (write-gmt-offset) ( duration -- )
+    [ hour>> write-00 ] [ minute>> write-00 ] bi ;
 
 : write-gmt-offset ( gmt-offset -- )
-    {
-        { [ dup zero? ] [ drop "GMT" write ] }
-        { [ dup 0 < ] [ "-" write neg (write-gmt-offset) ] }
-        { [ dup 0 > ] [ "+" write (write-gmt-offset) ] }
+    dup instant <=> {
+        { [ dup 0 = ] [ 2drop "GMT" write ] }
+        { [ dup 0 < ] [ drop "-" write before (write-gmt-offset) ] }
+        { [ dup 0 > ] [ drop "+" write (write-gmt-offset) ] }
     } cond ;
 
-: timestamp>rfc822-string ( timestamp -- str )
+: timestamp>rfc822 ( timestamp -- str )
     #! RFC822 timestamp format
     #! Example: Tue, 15 Nov 1994 08:12:31 +0200
     [
@@ -76,14 +76,19 @@ M: timestamp year. ( timestamp -- )
 : timestamp>http-string ( timestamp -- str )
     #! http timestamp format
     #! Example: Tue, 15 Nov 1994 08:12:31 GMT
-    >gmt timestamp>rfc822-string ;
+    >gmt timestamp>rfc822 ;
 
-: write-rfc3339-gmt-offset ( n -- )
-    dup zero? [ drop "Z" write ] [
-        dup 0 < [ CHAR: - write1 neg ] [ CHAR: + write1 ] if
-        60 * 60 /mod swap write-00 CHAR: : write1 write-00
-    ] if ;
+: (write-rfc3339-gmt-offset) ( duration -- )
+    [ hour>> write-00 CHAR: : write1 ]
+    [ minute>> write-00 ] bi ;
 
+: write-rfc3339-gmt-offset ( duration -- )
+    dup instant <=> {
+        { [ dup 0 = ] [ 2drop "Z" write ] }
+        { [ dup 0 < ] [ drop CHAR: - write1 before (write-rfc3339-gmt-offset) ] }
+        { [ dup 0 > ] [ drop CHAR: + write1 (write-rfc3339-gmt-offset) ] }
+    } cond ;
+    
 : (timestamp>rfc3339) ( timestamp -- )
     dup year>> number>string write CHAR: - write1
     dup month>> write-00 CHAR: - write1
@@ -177,7 +182,7 @@ M: timestamp year. ( timestamp -- )
     [
         [ month>> month-abbreviations nth write ] keep bl
         [ day>> number>string 2 32 pad-left write ] keep bl
-        dup now [ year>> ] 2apply = [
+        dup now [ year>> ] bi@ = [
             [ hour>> write-00 ] keep ":" write
             minute>> write-00
         ] [

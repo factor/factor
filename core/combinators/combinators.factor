@@ -5,16 +5,38 @@ USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
 hashtables sorting ;
 
-TUPLE: no-cond ;
+: cleave ( x seq -- )
+    [ call ] with each ;
 
-: no-cond ( -- * ) \ no-cond construct-empty throw ;
+: cleave>quot ( seq -- quot )
+    [ [ keep ] curry ] map concat [ drop ] append [ ] like ;
+
+: 2cleave ( x seq -- )
+    [ 2keep ] each 2drop ;
+
+: 2cleave>quot ( seq -- quot )
+    [ [ 2keep ] curry ] map concat [ 2drop ] append [ ] like ;
+
+: 3cleave ( x seq -- )
+    [ 3keep ] each 3drop ;
+
+: 3cleave>quot ( seq -- quot )
+    [ [ 3keep ] curry ] map concat [ 3drop ] append [ ] like ;
+
+: spread>quot ( seq -- quot )
+    [ length [ >r ] <repetition> concat ]
+    [ [ [ r> ] prepend ] map concat ] bi
+    append [ ] like ;
+
+: spread ( objs... seq -- )
+    spread>quot call ;
+
+ERROR: no-cond ;
 
 : cond ( assoc -- )
     [ first call ] find nip dup [ second call ] [ no-cond ] if ;
 
-TUPLE: no-case ;
-
-: no-case ( -- * ) \ no-case construct-empty throw ;
+ERROR: no-case ;
 
 : case ( obj assoc -- )
     [ dup array? [ dupd first = ] [ quotation? ] if ] find nip
@@ -27,7 +49,7 @@ TUPLE: no-case ;
 : with-datastack ( stack quot -- newstack )
     datastack >r
     >r >array set-datastack r> call
-    datastack r> swap add set-datastack 2nip ; inline
+    datastack r> swap suffix set-datastack 2nip ; inline
 
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ rot 1- -rot call ] if ; inline
@@ -36,6 +58,10 @@ TUPLE: no-case ;
 ! two depend on combinators
 M: sequence hashcode*
     [ sequence-hashcode ] recursive-hashcode ;
+
+M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
+
+M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: hashtable hashcode*
     [
@@ -50,7 +76,7 @@ M: hashtable hashcode*
     reverse [ no-cond ] swap alist>quot ;
 
 : linear-case-quot ( default assoc -- quot )
-    [ >r [ dupd = ] curry r> \ drop add* ] assoc-map
+    [ >r [ dupd = ] curry r> \ drop prefix ] assoc-map
     alist>quot ;
 
 : (distribute-buckets) ( buckets pair keys -- )
@@ -80,7 +106,7 @@ M: hashtable hashcode*
 
 : hash-case-quot ( default assoc -- quot )
     hash-case-table hash-dispatch-quot
-    [ dup hashcode >fixnum ] swap append ;
+    [ dup hashcode >fixnum ] prepend ;
 
 : contiguous-range? ( keys -- from to ? )
     dup [ fixnum? ] all? [

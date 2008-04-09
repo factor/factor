@@ -49,9 +49,9 @@ HINTS: random fixnum ;
 
 : make-cumulative ( freq -- chars floats )
     dup keys >byte-array
-    swap values >float-array unclip [ + ] accumulate swap add ;
+    swap values >float-array unclip [ + ] accumulate swap suffix ;
 
-:: select-random ( seed chars floats -- elt )
+:: select-random ( seed chars floats -- seed elt )
     floats seed random -rot
     [ >= ] curry find drop
     chars nth-unsafe ; inline
@@ -71,7 +71,7 @@ HINTS: random fixnum ;
     write-description
     [ make-random-fasta ] 2curry split-lines ; inline
 
-:: make-repeat-fasta ( k len alu -- )
+:: make-repeat-fasta ( k len alu -- k' )
     [let | kn [ alu length ] |
         len [ k + kn mod alu nth-unsafe ] B{ } map-as print
         k len +

@@ -4,6 +4,7 @@ USING: alien alien.accessors alien.c-types arrays io kernel libc
 math math.vectors namespaces opengl opengl.gl prettyprint assocs
 sequences io.files io.styles continuations freetype
 ui.gadgets.worlds ui.render ui.backend byte-arrays ;
+
 IN: ui.freetype
 
 TUPLE: freetype-renderer ;
@@ -26,9 +27,8 @@ DEFER: freetype
     \ freetype get-global expired? [ init-freetype ] when
     \ freetype get-global ;
 
-TUPLE: font ascent descent height handle widths ;
-
-M: font equal? 2drop f ;
+TUPLE: font < identity-tuple
+ascent descent height handle widths ;
 
 M: font hashcode* drop font hashcode* ;
 
@@ -61,7 +61,7 @@ M: freetype-renderer free-fonts ( world -- )
     } at ;
 
 : ttf-path ( name -- string )
-    "/fonts/" swap ".ttf" 3append resource-path ;
+    "resource:fonts/" swap ".ttf" 3append ;
 
 : (open-face) ( path length -- face )
     #! We use FT_New_Memory_Face, not FT_New_Face, since
@@ -72,10 +72,7 @@ M: freetype-renderer free-fonts ( world -- )
     ] keep *void* ;
 
 : open-face ( font style -- face )
-    ttf-name ttf-path
-    dup malloc-file-contents
-    swap file-length
-    (open-face) ;
+    ttf-name ttf-path malloc-file-contents (open-face) ;
 
 SYMBOL: dpi
 

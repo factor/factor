@@ -5,39 +5,39 @@ kernel math math.parser namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
 db.tuples db.types tools.annotations math.ranges
 combinators sequences.lib classes locals words tools.walker
-combinators.cleave namespaces.lib ;
+namespaces.lib accessors ;
 IN: db.postgresql
 
-TUPLE: postgresql-db host port pgopts pgtty db user pass ;
-TUPLE: postgresql-statement ;
-TUPLE: postgresql-result-set ;
+TUPLE: postgresql-db < db
+    host port pgopts pgtty db user pass ;
+
+TUPLE: postgresql-statement < throwable-statement ;
+
+TUPLE: postgresql-result-set < result-set ;
+
 : <postgresql-statement> ( statement in out -- postgresql-statement )
-    <statement>
-    postgresql-statement construct-delegate ;
+    postgresql-statement construct-statement ;
 
 M: postgresql-db make-db* ( seq tuple -- db )
-    >r first4 r> [
-        {
-            set-postgresql-db-host
-            set-postgresql-db-user
-            set-postgresql-db-pass
-            set-postgresql-db-db
-        } set-slots
-    ] keep ;
+    >r first4 r>
+        swap >>db
+        swap >>pass
+        swap >>user
+        swap >>host ;
 
-M: postgresql-db db-open ( db -- )
-        dup {
-        postgresql-db-host
-        postgresql-db-port
-        postgresql-db-pgopts
-        postgresql-db-pgtty
-        postgresql-db-db
-        postgresql-db-user
-        postgresql-db-pass
-    } get-slots connect-postgres <db> swap set-delegate ;
+M: postgresql-db db-open ( db -- db )
+    dup {
+        [ host>> ]
+        [ port>> ]
+        [ pgopts>> ]
+        [ pgtty>> ]
+        [ db>> ]
+        [ user>> ]
+        [ pass>> ]
+    } cleave connect-postgres >>handle ;
 
 M: postgresql-db dispose ( db -- )
-    db-handle PQfinish ;
+    handle>> PQfinish ;
 
 M: postgresql-statement bind-statement* ( statement -- )
     drop ;
@@ -49,10 +49,10 @@ M: postgresql-statement bind-tuple ( tuple statement -- )
     ] keep set-statement-bind-params ;
 
 M: postgresql-result-set #rows ( result-set -- n )
-    result-set-handle PQntuples ;
+    handle>> PQntuples ;
 
 M: postgresql-result-set #columns ( result-set -- n )
-    result-set-handle PQnfields ;
+    handle>> PQnfields ;
 
 M: postgresql-result-set row-column ( result-set column -- obj )
     >r dup result-set-handle swap result-set-n r> pq-get-string ;
@@ -68,7 +68,7 @@ M: postgresql-statement query-results ( query -- result-set )
     ] [
         dup do-postgresql-statement
     ] if*
-    postgresql-result-set <result-set>
+    postgresql-result-set construct-result-set
     dup init-result-set ;
 
 M: postgresql-result-set advance-row ( result-set -- )
@@ -89,7 +89,7 @@ M: postgresql-result-set dispose ( result-set -- )
 
 M: postgresql-statement prepare-statement ( statement -- )
     [
-        >r db get db-handle "" r>
+        >r db get handle>> "" r>
         dup statement-sql swap statement-in-params
         length f PQprepare postgresql-error
     ] keep set-statement-handle ;
@@ -119,8 +119,8 @@ M: postgresql-db bind% ( spec -- )
 
 : postgresql-make ( class quot -- )
     >r sql-props r>
-    [ postgresql-counter off ] swap compose
-    { "" { } { } } nmake <postgresql-statement> ;
+    [ postgresql-counter off call ] { "" { } { } } nmake
+    <postgresql-statement> ; inline
 
 : create-table-sql ( class -- statement )
     [
@@ -194,7 +194,7 @@ M: postgresql-db <insert-native-statement> ( class -- statement )
         ");" 0%
     ] postgresql-make ;
 
-M: postgresql-db <insert-assigned-statement> ( class -- statement )
+M: postgresql-db <insert-nonnative-statement> ( class -- statement )
     [
         "insert into " 0% 0%
         "(" 0%

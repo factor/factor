@@ -1,15 +1,22 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.encodings strings kernel math sequences byte-arrays io.encodings ;
+USING: io io.encodings kernel math io.encodings.private ;
 IN: io.encodings.ascii
 
-: encode-check<= ( string stream max -- )
-    [ pick <= [ encode-error ] [ stream-write1 ] if ] 2curry each ;
+<PRIVATE
+: encode-if< ( char stream encoding max -- )
+    nip 1- pick < [ encode-error ] [ stream-write1 ] if ;
+
+: decode-if< ( stream encoding max -- character )
+    nip swap stream-read1
+    [ tuck > [ drop replacement-char ] unless ]
+    [ drop f ] if* ;
+PRIVATE>
 
 TUPLE: ascii ;
 
-M: ascii stream-write-encoded ( string stream encoding -- )
-    drop 128 encode-check<= ;
+M: ascii encode-char
+    128 encode-if< ;
 
-M: ascii decode-step
-    drop dup 128 >= [ decode-error ] [ swap push ] if ;
+M: ascii decode-char
+    128 decode-if< ;

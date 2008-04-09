@@ -1,8 +1,9 @@
 USING: arrays compiler.units generic hashtables inference kernel
 kernel.private math optimizer prettyprint sequences sbufs
 strings tools.test vectors words sequences.private quotations
-optimizer.backend classes inference.dataflow tuples.private
-continuations growable optimizer.inlining namespaces hints ;
+optimizer.backend classes classes.algebra inference.dataflow
+classes.tuple.private continuations growable optimizer.inlining
+namespaces hints ;
 IN: optimizer.tests
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
@@ -139,12 +140,6 @@ GENERIC: void-generic ( obj -- * )
 [ breakage ] must-fail
 
 ! regression
-: test-0 ( n -- ) dup 0 = [ drop ] [ 1- test-0 ] if ; inline
-: test-1 ( n -- ) t [ test-0 ] [ delegate dup [ test-1 ] [ drop ] if ] if ; inline
-: test-2 ( -- ) 5 test-1 ;
-
-[ f ] [ f test-2 ] unit-test
-
 : branch-fold-regression-0 ( m -- n )
     t [ ] [ 1+ branch-fold-regression-0 ] if ; inline
 
@@ -375,4 +370,7 @@ HINTS: recursive-inline-hang-2 array ;
 
 HINTS: recursive-inline-hang-3 array ;
 
+! Regression
+USE: sequences.private
 
+[ ] [ { (3append) } compile ] unit-test

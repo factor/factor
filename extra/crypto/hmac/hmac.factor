@@ -37,7 +37,6 @@ MEMO: opad ( -- seq ) 64 HEX: 5c <array> ;
 : byte-array>sha1-hmac ( K string -- hmac )
     binary <byte-reader> stream>sha1-hmac ;
 
-
 : stream>md5-hmac ( K stream -- hmac )
     [ init-hmac md5-hmac ] with-stream ;
 

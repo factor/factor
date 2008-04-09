@@ -2,14 +2,14 @@ USING: help.markup help.syntax slots kernel assocs sequences ;
 IN: mirrors
 
 ARTICLE: "mirrors" "Mirrors"
-"A reflective view of an object's slots and their values:"
+"The " { $vocab-link "mirrors" } " vocabulary defines data types which present an object's slots and slot values as an associative structure. This enables idioms such as iteration over all slots in a tuple, or editing of tuples, sequences and assocs in a generic fashion. This functionality is used by developer tools and meta-programming utilities."
+$nl
+"A mirror provides such a view of a tuple:"
 { $subsection mirror }
 { $subsection <mirror> }
-"A view of a sequence as an associative structure:"
-{ $subsection enum }
-{ $subsection <enum> }
 "Utility word used by developer tools which inspect objects:"
-{ $subsection make-mirror } ;
+{ $subsection make-mirror }
+{ $see-also "slots" } ;
 
 ABOUT: "mirrors"
 
@@ -33,18 +33,13 @@ HELP: <mirror>
         "TUPLE: circle center radius ;"
         "C: <circle> circle"
         "{ 100 50 } 15 <circle> <mirror> >alist ."
-        "{ { \"center\" { 100 50 } } { \"radius\" 15 } }"
+        "{ { \"delegate\" f } { \"center\" { 100 50 } } { \"radius\" 15 } }"
     }
 } ;
 
 HELP: >mirror<
 { $values { "mirror" mirror } { "obj" object } { "slots" "a sequence of " { $link slot-spec } " instances" } }
 { $description "Pushes the object being viewed in the mirror together with its slots." } ;
-
-HELP: enum
-{ $class-description "An associative structure which wraps a sequence and maps integers to the corresponding elements of the sequence."
-$nl
-"Enumerations are mutable; note that deleting a key calls " { $link delete-nth } ", which results in all subsequent elements being shifted down." } ;
 
 HELP: make-mirror
 { $values { "obj" object } { "assoc" assoc } }

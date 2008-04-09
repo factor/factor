@@ -11,11 +11,10 @@ TUPLE: duplex-stream in out closed? ;
 : <duplex-stream> ( in out -- stream )
     f duplex-stream construct-boa ;
 
-TUPLE: check-closed ;
+ERROR: stream-closed-twice ;
 
 : check-closed ( stream -- )
-    duplex-stream-closed?
-    [ \ check-closed construct-boa throw ] when ;
+    duplex-stream-closed? [ stream-closed-twice ] when ;
 
 : duplex-stream-in+ ( duplex -- stream )
     dup check-closed duplex-stream-in ;

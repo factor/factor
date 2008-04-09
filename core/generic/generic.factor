@@ -2,103 +2,101 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words kernel sequences namespaces assocs hashtables
 definitions kernel.private classes classes.private
-quotations arrays vocabs effects ;
+classes.algebra quotations arrays vocabs effects ;
 IN: generic
 
 ! Method combination protocol
-GENERIC: perform-combination ( word combination -- quot )
-
-M: object perform-combination
-    #! We delay the invalid method combination error for a
-    #! reason. If we call forget-vocab on a vocabulary which
-    #! defines a method combination, a generic using this
-    #! method combination, and a method on the generic, and the
-    #! method combination is forgotten first, then forgetting
-    #! the method will throw an error. We don't want that.
-    nip [ "Invalid method combination" throw ] curry [ ] like ;
-
-GENERIC: method-prologue ( class combination -- quot )
-
-M: object method-prologue 2drop [ ] ;
+GENERIC: perform-combination ( word combination -- )
 
 GENERIC: make-default-method ( generic combination -- method )
 
-PREDICATE: word generic "combination" word-prop >boolean ;
+PREDICATE: generic < word
+    "combination" word-prop >boolean ;
 
 M: generic definition drop f ;
 
 : make-generic ( word -- )
-    dup { "unannotated-def" } reset-props
-    dup dup "combination" word-prop perform-combination define ;
+    [ { "unannotated-def" } reset-props ]
+    [ dup "combination" word-prop perform-combination ]
+    bi ;
 
 : method ( class generic -- method/f )
     "methods" word-prop at ;
 
-PREDICATE: pair method-spec
+PREDICATE: method-spec < pair
     first2 generic? swap class? and ;
 
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
 
-: methods ( word -- assoc )
-    "methods" word-prop
-    [ keys sort-classes ] keep
-    [ dupd at ] curry { } map>assoc ;
+GENERIC: effective-method ( ... generic -- method )
+
+: next-method-class ( class generic -- class/f )
+    order [ class< ] with subset reverse dup length 1 =
+    [ drop f ] [ second ] if ;
+
+: next-method ( class generic -- class/f )
+    [ next-method-class ] keep method ;
+
+GENERIC: next-method-quot* ( class generic -- quot )
+
+: next-method-quot ( class generic -- quot )
+    dup "combination" word-prop next-method-quot* ;
+
+: (call-next-method) ( class generic -- )
+    next-method-quot call ;
 
 TUPLE: check-method class generic ;
 
 : check-method ( class generic -- class generic )
     over class? over generic? and [
         \ check-method construct-boa throw
-    ] unless ;
+    ] unless ; inline
 
-: with-methods ( word quot -- )
+: with-methods ( generic quot -- )
     swap [ "methods" word-prop swap call ] keep make-generic ;
     inline
 
 : method-word-name ( class word -- string )
     word-name "/" rot word-name 3append ;
 
-: make-method-def ( quot class generic -- quot )
-    "combination" word-prop method-prologue swap append ;
-
-PREDICATE: word method-body "method-def" word-prop >boolean ;
+PREDICATE: method-body < word
+    "method-generic" word-prop >boolean ;
 
 M: method-body stack-effect
     "method-generic" word-prop stack-effect ;
 
-: method-word-props ( quot class generic -- assoc )
+M: method-body crossref?
+    drop t ;
+
+: method-word-props ( class generic -- assoc )
     [
         "method-generic" set
         "method-class" set
-        "method-def" set
     ] H{ } make-assoc ;
 
-: <method> ( quot class generic -- method )
+: <method> ( class generic -- method )
     check-method
-    [ make-method-def ] 3keep
     [ method-word-props ] 2keep
     method-word-name f <word>
-    tuck set-word-props
-    dup rot define ;
+    [ set-word-props ] keep ;
 
-: redefine-method ( quot class generic -- )
-    [ method swap "method-def" set-word-prop ] 3keep
-    [ make-method-def ] 2keep
-    method swap define ;
+: reveal-method ( method class generic -- )
+    [ set-at ] with-methods ;
 
-: define-method ( quot class generic -- )
-    >r bootstrap-word r>
-    2dup method [
-        redefine-method
+: create-method ( class generic -- method )
+    2dup method dup [
+        2nip
     ] [
-        [ <method> ] 2keep
-        [ set-at ] with-methods
+        drop [ <method> dup ] 2keep reveal-method
     ] if ;
 
+: <default-method> ( generic combination -- method )
+    object bootstrap-word pick <method>
+    [ -rot make-default-method define ] keep ;
+
 : define-default-method ( generic combination -- )
-    dupd make-default-method object bootstrap-word pick <method>
-    "default-method" set-word-prop ;
+    dupd <default-method> "default-method" set-word-prop ;
 
 ! Definition protocol
 M: method-spec where
@@ -108,30 +106,29 @@ M: method-spec set-where
     first2 method set-where ;
 
 M: method-spec definer
-    drop \ M: \ ; ;
+    first2 method definer ;
 
 M: method-spec definition
-    first2 method dup
-    [ "method-def" word-prop ] when ;
-
-: forget-method ( class generic -- )
-    check-method
-    [ delete-at* ] with-methods
-    [ forget-word ] [ drop ] if ;
+    first2 method definition ;
 
 M: method-spec forget*
-    first2 forget-method ;
+    first2 method forget* ;
 
 M: method-body definer
     drop \ M: \ ; ;
 
-M: method-body definition
-    "method-def" word-prop ;
-
 M: method-body forget*
-    dup "method-class" word-prop
-    swap "method-generic" word-prop
-    forget-method ;
+    dup "forgotten" word-prop [ drop ] [
+        [
+            [   "method-class" word-prop ]
+            [ "method-generic" word-prop ] bi
+            dup generic? [
+                [ delete-at* ] with-methods
+                [ call-next-method ] [ drop ] if
+            ] [ 2drop ] if
+        ]
+        [ t "forgotten" set-word-prop ] bi
+    ] if ;
 
 : implementors* ( classes -- words )
     all-words [
@@ -143,12 +140,13 @@ M: method-body forget*
     dup associate implementors* ;
 
 : forget-methods ( class -- )
-    [ implementors ] keep [ swap 2array ] curry map forget-all ;
+    [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
 
 M: class forget* ( class -- )
-    dup forget-methods
-    dup uncache-class
-    forget-word ;
+    [ forget-methods ]
+    [ update-map- ]
+    [ call-next-method ]
+    tri ;
 
 M: assoc update-methods ( assoc -- )
     implementors* [ make-generic ] each ;
@@ -163,16 +161,16 @@ M: assoc update-methods ( assoc -- )
         make-generic
     ] if ;
 
-GENERIC: subwords ( word -- seq )
-
-M: word subwords drop f ;
-
 M: generic subwords
-    dup "methods" word-prop values
-    swap "default-method" word-prop add ;
+    [
+        [ "default-method" word-prop , ]
+        [ "methods" word-prop values % ]
+        [ "engines" word-prop % ]
+        tri
+    ] { } make ;
 
-M: generic forget-word
-    dup subwords [ forget-word ] each (forget-word) ;
+M: generic forget*
+    [ subwords forget-all ] [ call-next-method ] bi ;
 
 : xref-generics ( -- )
     all-words [ subwords [ xref ] each ] each ;

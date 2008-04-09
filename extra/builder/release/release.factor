@@ -1,6 +1,6 @@
 
 USING: kernel system namespaces sequences splitting combinators
-       io.files io.launcher
+       io io.files io.launcher prettyprint
        bake combinators.cleave builder.common builder.util ;
 
 IN: builder.release
@@ -8,7 +8,7 @@ IN: builder.release
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : releases ( -- path )
-  builds "releases" path+
+  builds "releases" append-path
   dup exists? not
     [ dup make-directory ]
   when ;
@@ -20,41 +20,35 @@ IN: builder.release
     "boot.x86.32.image"
     "boot.x86.64.image"
     "boot.macosx-ppc.image"
+    "boot.linux-ppc.image"
     "vm"
     "temp"
     "logs"
     ".git"
     ".gitignore"
     "Makefile"
-    "cp_dir"
     "unmaintained"
-    "misc/target"
-    "misc/wordsize"
-    "misc/wordsize.c"
-    "misc/macos-release.sh"
-    "misc/source-release.sh"
-    "misc/windows-release.sh"
-    "misc/version.sh"
+    "build-support"
   } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: cpu- ( -- cpu ) cpu "." split "-" join ;
+: cpu- ( -- cpu ) cpu unparse "." split "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: base-name ( -- string ) { "factor" os cpu- stamp> } to-strings "-" join ;
+: base-name ( -- string )
+  { "factor" [ os unparse ] cpu- stamp> } to-strings "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : extension ( -- extension )
-  os
   {
-    { "linux" [ ".tar.gz" ] }
-    { "winnt" [ ".zip" ] }
-    { "macosx" [ ".dmg" ] }
+    { [ os winnt?  ] [ ".zip"    ] }  
+    { [ os macosx? ] [ ".dmg"    ] }
+    { [ os unix?   ] [ ".tar.gz" ] }
   }
-  case ;
+  cond ;
 
 : archive-name ( -- string ) base-name extension append ;
 
@@ -75,9 +69,9 @@ IN: builder.release
 
 : archive-cmd ( -- cmd )
   {
-    { [ windows? ] [ windows-archive-cmd ] }
-    { [ macosx?  ] [ macosx-archive-cmd  ] }
-    { [ unix?    ] [ unix-archive-cmd    ] }
+    { [ os windows? ] [ windows-archive-cmd ] }
+    { [ os macosx?  ] [ macosx-archive-cmd  ] }
+    { [ os unix?    ] [ unix-archive-cmd    ] }
   }
   cond ;
 
@@ -89,7 +83,40 @@ IN: builder.release
   { "rm" "-rf" common-files } to-strings try-process ;
 
 : remove-factor-app ( -- )
-  macosx? not [ { "rm" "-rf" "Factor.app" } try-process ] when ;
+  os macosx? not [ { "rm" "-rf" "Factor.app" } try-process ] when ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: upload-to-factorcode
+
+: platform ( -- string ) { [ os unparse ] cpu- } to-strings "-" join ;
+
+: remote-location ( -- dest )
+  "factorcode.org:/var/www/factorcode.org/newsite/downloads"
+  platform
+  append-path ;
+    
+: upload ( -- )
+  { "scp" archive-name remote-location } to-strings
+  [ "Error uploading binary to factorcode" print ]
+  run-or-bail ;
+
+: maybe-upload ( -- )
+  upload-to-factorcode get
+    [ upload ]
+  when ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! : release ( -- )
+!   "factor"
+!     [
+!       remove-factor-app
+!       remove-common-files
+!     ]
+!   with-directory
+!   make-archive
+!   archive-name releases move-file-into ;
 
 : release ( -- )
   "factor"
@@ -99,6 +126,7 @@ IN: builder.release
     ]
   with-directory
   make-archive
+  maybe-upload
   archive-name releases move-file-into ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

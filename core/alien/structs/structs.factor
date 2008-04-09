@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private math
 namespaces parser sequences strings words libc slots
-alien.c-types cpu.architecture ;
+slots.deprecated alien.c-types cpu.architecture ;
 IN: alien.structs
 
 : align-offset ( offset type -- offset )
@@ -16,7 +16,7 @@ IN: alien.structs
     ] reduce ;
 
 : define-struct-slot-word ( spec word quot -- )
-    rot slot-spec-offset add* define-inline ;
+    rot slot-spec-offset prefix define-inline ;
 
 : define-getter ( type spec -- )
     [ set-reader-props ] keep

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes db kernel namespaces
-tuples words sequences slots math
+classes.tuple words sequences slots math
 math.parser io prettyprint db.types continuations
 mirrors sequences.lib tools.walker combinators.lib ;
 IN: db.tuples
@@ -27,7 +27,7 @@ HOOK: create-sql-statement db ( class -- obj )
 HOOK: drop-sql-statement db ( class -- obj )
 
 HOOK: <insert-native-statement> db ( class -- obj )
-HOOK: <insert-assigned-statement> db ( class -- obj )
+HOOK: <insert-nonnative-statement> db ( class -- obj )
 
 HOOK: <update-tuple-statement> db ( class -- obj )
 HOOK: <update-tuples-statement> db ( class -- obj )
@@ -35,7 +35,7 @@ HOOK: <update-tuples-statement> db ( class -- obj )
 HOOK: <delete-tuple-statement> db ( class -- obj )
 HOOK: <delete-tuples-statement> db ( class -- obj )
 
-HOOK: <select-by-slots-statement> db ( tuple -- tuple )
+HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 
 HOOK: insert-tuple* db ( tuple statement -- )
 
@@ -73,19 +73,26 @@ HOOK: insert-tuple* db ( tuple statement -- )
 : drop-table ( class -- )
     drop-sql-statement [ execute-statement ] with-disposals ;
 
+: ensure-table ( class -- )
+    [
+        drop-sql-statement make-nonthrowable
+        [ execute-statement ] with-disposals
+    ] [ create-table ] bi ;
+
 : insert-native ( tuple -- )
     dup class
     db get db-insert-statements [ <insert-native-statement> ] cache
     [ bind-tuple ] 2keep insert-tuple* ;
 
-: insert-assigned ( tuple -- )
+: insert-nonnative ( tuple -- )
+! TODO logic here for unique ids
     dup class
-    db get db-insert-statements [ <insert-assigned-statement> ] cache
+    db get db-insert-statements [ <insert-nonnative-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : insert-tuple ( tuple -- )
-    dup class db-columns find-primary-key assigned-id? [
-        insert-assigned
+    dup class db-columns find-primary-key nonnative-id? [
+        insert-nonnative
     ] [
         insert-native
     ] if ;

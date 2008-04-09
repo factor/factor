@@ -39,7 +39,7 @@ IN: project-euler.014
     dup even? [ 2 / ] [ 3 * 1+ ] if ;
 
 : longest ( seq seq -- seq )
-    2dup [ length ] 2apply > [ drop ] [ nip ] if ;
+    2dup [ length ] bi@ > [ drop ] [ nip ] if ;
 
 PRIVATE>
 

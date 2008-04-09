@@ -72,7 +72,7 @@ TUPLE: segment number color radius ;
 : sub-tunnel ( from to sements -- segments )
     #! return segments between from and to, after clamping from and to to
     #! valid values
-    [ sequence-index-range [ clamp-to-range ] curry 2apply ] keep <slice> ;
+    [ sequence-index-range [ clamp-to-range ] curry bi@ ] keep <slice> ;
 
 : nearer-segment ( segment segment oint -- segment )
     #! return whichever of the two segments is nearer to the oint

@@ -30,7 +30,8 @@ IN: cocoa.windows
 : <ViewWindow> ( view rect -- window )
     <NSWindow> [ swap -> setContentView: ] keep
     dup dup -> contentView -> setInitialFirstResponder:
-    dup 1 -> setAcceptsMouseMovedEvents: ;
+    dup 1 -> setAcceptsMouseMovedEvents:
+    dup 0 -> setReleasedWhenClosed: ;
 
 : window-content-rect ( window -- rect )
     NSWindow over -> frame rot -> styleMask

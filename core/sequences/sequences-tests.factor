@@ -1,6 +1,6 @@
 USING: arrays kernel math namespaces sequences kernel.private
 sequences.private strings sbufs tools.test vectors bit-arrays
-generic ;
+generic vocabs.loader ;
 IN: sequences.tests
 
 [ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
@@ -100,6 +100,16 @@ unit-test
 [ [ ] ] [ [ 1 2 3 ] 3 tail ] unit-test
 [ [ 3 ] ] [ [ 1 2 3 ] 2 tail ] unit-test
 
+[ "blah" ] [ "blahxx" 2 head* ] unit-test
+
+[ "xx" ] [ "blahxx" 2 tail* ] unit-test
+
+[ t ] [ "xxfoo" 2 head-slice "xxbar" 2 head-slice = ] unit-test
+[ t ] [ "xxfoo" 2 head-slice "xxbar" 2 head-slice [ hashcode ] bi@ = ] unit-test
+
+[ t ] [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* = ] unit-test
+[ t ] [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* [ hashcode ] bi@ = ] unit-test
+
 [ t ] [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
 [ t ] [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test
 [ t ] [ { 1 2 3 } [ 1 2 3 ] sequence= ] unit-test
@@ -169,13 +179,13 @@ unit-test
 
 [ f ] [ { "a" "b" "c" } { "a" "b" "c" } mismatch ] unit-test
 
-[ V{ } V{ } ] [ { "a" "b" } { "a" "b" } drop-prefix [ >vector ] 2apply ] unit-test
+[ V{ } V{ } ] [ { "a" "b" } { "a" "b" } drop-prefix [ >vector ] bi@ ] unit-test
 
-[ V{ "C" } V{ "c" } ] [ { "a" "b" "C" } { "a" "b" "c" } drop-prefix [ >vector ] 2apply ] unit-test
+[ V{ "C" } V{ "c" } ] [ { "a" "b" "C" } { "a" "b" "c" } drop-prefix [ >vector ] bi@ ] unit-test
 
 [ -1 1 "abc" <slice> ] must-fail
 
-[ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] 2apply ] unit-test
+[ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] bi@ ] unit-test
 
 [ -1 ] [ "ab" "abc" <=> ] unit-test
 [ 1 ] [ "abc" "ab" <=> ] unit-test
@@ -194,6 +204,12 @@ unit-test
 
 ! Pathological case
 [ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test
+
+[ t ] [ "hi" <reversed> SBUF" hi" <reversed> = ] unit-test
+
+[ t ] [ "hi" <reversed> SBUF" hi" <reversed> = ] unit-test
+
+[ t ] [ "hi" <reversed> SBUF" hi" <reversed> [ hashcode ] bi@ = ] unit-test
 
 [ -10 "hi" "bye" copy ] must-fail
 [ 10 "hi" "bye" copy ] must-fail
@@ -244,3 +260,5 @@ unit-test
 [ "asdf " ] [ " asdf " [ CHAR: \s = ] left-trim ] unit-test
 [ " asdf" ] [ " asdf " [ CHAR: \s = ] right-trim ] unit-test
 
+! Hardcore
+[ ] [ "sequences" reload ] unit-test

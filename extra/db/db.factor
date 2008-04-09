@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations kernel math
-namespaces sequences sequences.lib tuples words strings
-tools.walker new-slots accessors ;
+namespaces sequences sequences.lib classes.tuple words strings
+tools.walker accessors ;
 IN: db
 
 TUPLE: db
@@ -11,14 +11,19 @@ TUPLE: db
     update-statements
     delete-statements ;
 
-: <db> ( handle -- obj )
-    H{ } clone H{ } clone H{ } clone
-    db construct-boa ;
+: construct-db ( class -- obj )
+    construct-empty
+        H{ } clone >>insert-statements
+        H{ } clone >>update-statements
+        H{ } clone >>delete-statements ;
 
 GENERIC: make-db* ( seq class -- db )
-GENERIC: db-open ( db -- )
+
+: make-db ( seq class -- db )
+    construct-db make-db* ;
+
+GENERIC: db-open ( db -- db )
 HOOK: db-close db ( handle -- )
-: make-db ( seq class -- db ) construct-empty make-db* ;
 
 : dispose-statements ( seq -- ) [ dispose drop ] assoc-each ;
 
@@ -30,12 +35,27 @@ HOOK: db-close db ( handle -- )
         handle>> db-close
     ] with-variable ;
 
+! TUPLE: sql sql in-params out-params ;
 TUPLE: statement handle sql in-params out-params bind-params bound? ;
-TUPLE: simple-statement ;
-TUPLE: prepared-statement ;
+TUPLE: simple-statement < statement ;
+TUPLE: prepared-statement < statement ;
+TUPLE: nonthrowable-statement < statement ;
+TUPLE: throwable-statement < statement ;
+
+: make-nonthrowable ( obj -- obj' )
+    dup sequence? [
+        [ make-nonthrowable ] map
+    ] [
+        nonthrowable-statement construct-delegate
+    ] if ;
+
 TUPLE: result-set sql in-params out-params handle n max ;
-: <statement> ( sql in out -- statement )
-    { (>>sql) (>>in-params) (>>out-params) } statement construct ;
+
+: construct-statement ( sql in out class -- statement )
+    construct-empty
+        swap >>out-params
+        swap >>in-params
+        swap >>sql ;
 
 HOOK: <simple-statement> db ( str in out -- statement )
 HOOK: <prepared-statement> db ( str in out -- statement )
@@ -50,11 +70,20 @@ GENERIC# row-column-typed 1 ( result-set column -- sql )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 
-: execute-statement ( statement -- )
+GENERIC: execute-statement ( statement -- )
+
+M: throwable-statement execute-statement ( statement -- )
     dup sequence? [
         [ execute-statement ] each
     ] [
         query-results dispose
+    ] if ;
+
+M: nonthrowable-statement execute-statement ( statement -- )
+    dup sequence? [
+        [ execute-statement ] each
+    ] [
+        [ query-results dispose ] [ 2drop ] recover
     ] if ;
 
 : bind-statement ( obj statement -- )
@@ -66,11 +95,14 @@ GENERIC: more-rows? ( result-set -- ? )
     dup #rows >>max
     0 >>n drop ;
 
-: <result-set> ( query handle tuple -- result-set )
-    >r >r { sql>> in-params>> out-params>> } get-slots r>
-    { (>>sql) (>>in-params) (>>out-params) (>>handle) } result-set
-    construct r> construct-delegate ;
-
+: construct-result-set ( query handle class -- result-set )
+    construct-empty
+        swap >>handle
+        >r [ sql>> ] [ in-params>> ] [ out-params>> ] tri r>
+        swap >>out-params
+        swap >>in-params
+        swap >>sql ;
+    
 : sql-row ( result-set -- seq )
     dup #columns [ row-column ] with map ;
 
@@ -88,7 +120,7 @@ GENERIC: more-rows? ( result-set -- ? )
     accumulator >r query-each r> { } like ; inline
 
 : with-db ( db seq quot -- )
-    >r make-db dup db-open db r>
+    >r make-db db-open db r>
     [ db get swap [ drop ] swap compose with-disposal ] curry with-variable ;
 
 : default-query ( query -- result-set )

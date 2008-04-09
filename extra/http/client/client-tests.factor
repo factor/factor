@@ -18,6 +18,7 @@ tuple-syntax namespaces ;
         port: 80
         version: "1.1"
         cookies: V{ }
+        header: H{ }
     }
 ] [
     [

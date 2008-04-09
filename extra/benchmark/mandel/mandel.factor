@@ -1,7 +1,7 @@
 IN: benchmark.mandel
-USING: arrays io kernel math namespaces sequences strings sbufs
-math.functions math.parser io.files colors.hsv
-io.encodings.ascii ;
+USING: arrays io kernel math namespaces sequences
+byte-arrays byte-vectors math.functions math.parser io.files
+colors.hsv io.encodings.binary ;
 
 : max-color 360 ; inline
 : zoom-fact 0.8 ; inline
@@ -54,18 +54,18 @@ SYMBOL: cols
 : ppm-header ( w h -- )
     "P6\n" % swap # " " % # "\n255\n" % ;
 
-: sbuf-size width height * 3 * 100 + ;
+: buf-size width height * 3 * 100 + ;
 
-: mandel ( -- string )
+: mandel ( -- data )
     [
-        sbuf-size <sbuf> building set
+        buf-size <byte-vector> building set
         width height ppm-header
         nb-iter max-color min <color-map> cols set
         render
-        building get >string
+        building get >byte-array
     ] with-scope ;
 
 : mandel-main ( -- )
-    mandel "mandel.ppm" temp-file ascii set-file-contents ;
+    mandel "mandel.ppm" temp-file binary set-file-contents ;
 
 MAIN: mandel-main

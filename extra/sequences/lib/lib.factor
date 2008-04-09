@@ -3,7 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions mirrors
-arrays math.parser math.private sorting strings ascii macros ;
+arrays math.parser math.private sorting strings ascii macros
+assocs.lib quotations hashtables ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -19,8 +20,9 @@ IN: sequences.lib
 : map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
 
 MACRO: firstn ( n -- )
-    [ [ swap nth ] curry
-    [ keep ] curry ] map concat [ drop ] compose ;
+    [ [ swap nth ] curry [ keep ] curry ] map
+    concat >quotation
+    [ drop ] compose ;
 
 : prepare-index ( seq quot -- seq n quot )
     >r dup length r> ; inline
@@ -32,6 +34,16 @@ MACRO: firstn ( n -- )
 : map-index ( seq quot -- )
     #! quot: ( elt index -- obj )
     prepare-index 2map ; inline
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: each-percent ( seq quot -- )
+  >r
+  dup length
+  dup [ / ] curry
+  [ 1+ ] swap compose
+  r> compose
+  2each ;                       inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -92,12 +104,9 @@ MACRO: firstn ( n -- )
 
 : monotonic-split ( seq quot -- newseq )
     [
-        >r dup unclip add r>
+        >r dup unclip suffix r>
         v, [ pick ,, call [ v, ] unless ] curry 2each ,v
     ] { } make ;
-
-: singleton? ( seq -- ? )
-    length 1 = ;
 
 : delete-random ( seq -- value )
     [ length random ] keep [ nth ] 2keep delete-nth ;
@@ -192,7 +201,7 @@ USE: continuations
 : ?tail* ( seq n -- seq/f ) (tail) ?subseq ;
 
 : accumulator ( quot -- quot vec )
-    V{ } clone [ [ push ] curry compose ] keep ;
+    V{ } clone [ [ push ] curry compose ] keep ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -220,3 +229,9 @@ PRIVATE>
 
 : nths ( indices seq -- seq' )
     [ swap nth ] with map ;
+
+: replace ( str oldseq newseq -- str' )
+    zip >hashtable substitute ;
+
+: remove-nth ( seq n -- seq' )
+    cut-slice 1 tail-slice append ;

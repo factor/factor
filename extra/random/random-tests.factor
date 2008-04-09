@@ -1,15 +1,8 @@
-USING: kernel math random namespaces sequences tools.test ;
+USING: random sequences tools.test ;
 IN: random.tests
 
-: check-random ( max -- ? )
-    dup >r random 0 r> between? ;
+[ 4 ] [ 4 random-bytes length ] unit-test
+[ 7 ] [ 7 random-bytes length ] unit-test
 
-[ t ] [ 100 [ drop 674 check-random ] all? ] unit-test
-
-: make-100-randoms
-    [ 100 [ 100 random , ] times ] { } make ;
-
-[ f ] [ make-100-randoms make-100-randoms = ] unit-test
-
-[ 1333075495 ] [ 0 init-random 1000 [ drop (random) drop ] each (random) ] unit-test
-[ 1575309035 ] [ 0 init-random 10000 [ drop (random) drop ] each (random) ] unit-test
+[ 4 ] [ [ 4 random-bytes length ] with-secure-random ] unit-test
+[ 7 ] [ [ 7 random-bytes length ] with-secure-random ] unit-test

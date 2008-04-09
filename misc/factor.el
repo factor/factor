@@ -83,7 +83,9 @@
     (" !.*$" . font-lock-comment-face)
     ("( .* )" . font-lock-comment-face)
     "MAIN:"
-    "IN:" "USING:" "TUPLE:" "^C:" "^M:" "USE:" "REQUIRE:" "PROVIDE:"
+    "IN:" "USING:" "TUPLE:" "^C:" "^M:"
+    "METHOD:"
+    "USE:" "REQUIRE:" "PROVIDE:"
     "REQUIRES:"
     "GENERIC:" "GENERIC#" "SYMBOL:" "PREDICATE:" "VAR:" "VARS:"
     "C-STRUCT:"
@@ -156,6 +158,11 @@
       (insert str)
       (comint-send-input))))
 
+(defun factor-send-definition ()
+  (interactive)
+  (factor-send-region (search-backward ":")
+                      (search-forward  ";")))
+
 (defun factor-see ()
   (interactive)
   (comint-send-string "*factor*" "\\ ")
@@ -185,6 +192,7 @@
 
 (define-key factor-mode-map "\C-c\C-f" 'factor-run-file)
 (define-key factor-mode-map "\C-c\C-r" 'factor-send-region)
+(define-key factor-mode-map "\C-c\C-d" 'factor-send-definition)
 (define-key factor-mode-map "\C-c\C-s" 'factor-see)
 (define-key factor-mode-map "\C-ce"    'factor-edit)
 (define-key factor-mode-map "\C-c\C-h" 'factor-help)
@@ -210,3 +218,5 @@
 (defun factor-refresh-all ()
   (interactive)
   (comint-send-string "*factor*" "refresh-all\n"))
+
+

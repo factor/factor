@@ -1,6 +1,6 @@
 IN: alarms.tests
-USING: alarms kernel calendar sequences tools.test threads
-concurrency.count-downs ;
+USING: alarms alarms.private kernel calendar sequences
+tools.test threads concurrency.count-downs ;
 
 [ ] [
     1 <count-down>
@@ -15,3 +15,5 @@ concurrency.count-downs ;
         [ resume ] curry instant later drop
     ] "test" suspend drop
 ] unit-test
+
+\ alarm-thread-loop must-infer

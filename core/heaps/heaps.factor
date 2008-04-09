@@ -2,7 +2,7 @@
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences arrays assocs sequences.private
-growable ;
+growable accessors ;
 IN: heaps
 
 MIXIN: priority-queue
@@ -17,10 +17,10 @@ GENERIC: heap-size ( heap -- n )
 
 <PRIVATE
 
-: heap-data delegate ; inline
+TUPLE: heap data ;
 
 : <heap> ( class -- heap )
-    >r V{ } clone r> construct-delegate ; inline
+    >r V{ } clone r> construct-boa ; inline
 
 TUPLE: entry value key heap index ;
 
@@ -28,11 +28,11 @@ TUPLE: entry value key heap index ;
 
 PRIVATE>
 
-TUPLE: min-heap ;
+TUPLE: min-heap < heap ;
 
 : <min-heap> ( -- min-heap ) min-heap <heap> ;
 
-TUPLE: max-heap ;
+TUPLE: max-heap < heap ;
 
 : <max-heap> ( -- max-heap ) max-heap <heap> ;
 
@@ -40,10 +40,10 @@ INSTANCE: min-heap priority-queue
 INSTANCE: max-heap priority-queue
 
 M: priority-queue heap-empty? ( heap -- ? )
-    heap-data empty? ;
+    data>> empty? ;
 
 M: priority-queue heap-size ( heap -- n )
-    heap-data length ;
+    data>> length ;
 
 <PRIVATE
 
@@ -54,7 +54,7 @@ M: priority-queue heap-size ( heap -- n )
 : up ( n -- m ) 1- 2/ ; inline
 
 : data-nth ( n heap -- entry )
-    heap-data nth-unsafe ; inline
+    data>> nth-unsafe ; inline
 
 : up-value ( n heap -- entry )
     >r up r> data-nth ; inline
@@ -67,24 +67,24 @@ M: priority-queue heap-size ( heap -- n )
 
 : data-set-nth ( entry n heap -- )
     >r [ swap set-entry-index ] 2keep r>
-    heap-data set-nth-unsafe ;
+    data>> set-nth-unsafe ;
 
 : data-push ( entry heap -- n )
     dup heap-size [
-        swap 2dup heap-data ensure 2drop data-set-nth
+        swap 2dup data>> ensure 2drop data-set-nth
     ] keep ; inline
 
 : data-pop ( heap -- entry )
-    heap-data pop ; inline
+    data>> pop ; inline
 
 : data-pop* ( heap -- )
-    heap-data pop* ; inline
+    data>> pop* ; inline
 
 : data-peek ( heap -- entry )
-    heap-data peek ; inline
+    data>> peek ; inline
 
 : data-first ( heap -- entry )
-    heap-data first ; inline
+    data>> first ; inline
 
 : data-exchange ( m n heap -- )
     [ tuck data-nth >r data-nth r> ] 3keep
@@ -161,7 +161,7 @@ M: priority-queue heap-push* ( value key heap -- entry )
     [ swapd heap-push ] curry assoc-each ;
 
 : >entry< ( entry -- key value )
-    { entry-value entry-key } get-slots ;
+    [ value>> ] [ key>> ] bi ;
 
 M: priority-queue heap-peek ( heap -- value key )
     data-first >entry< ;

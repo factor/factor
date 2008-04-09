@@ -48,3 +48,7 @@ IN: peg.parsers.tests
 
 [ V{ } ]
 [ "" epsilon parse parse-result-ast ] unit-test
+
+{ "a" } [
+  "a" "a" token just parse parse-result-ast
+] unit-test

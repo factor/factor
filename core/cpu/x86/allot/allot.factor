@@ -46,7 +46,7 @@ IN: cpu.x86.allot
     allot-reg swap tag-number OR
     allot-reg MOV ;
 
-M: x86-backend %box-float ( dst src -- )
+M: x86 %box-float ( dst src -- )
     #! Only called by pentium4 backend, uses SSE2 instruction
     #! dest is a loc or a vreg
     float 16 [
@@ -86,7 +86,7 @@ M: x86-backend %box-float ( dst src -- )
         "end" resolve-label
     ] with-scope ;
 
-M: x86-backend %box-alien ( dst src -- )
+M: x86 %box-alien ( dst src -- )
     [
         { "end" "f" } [ define-label ] each
         dup v>operand 0 CMP
@@ -101,6 +101,6 @@ M: x86-backend %box-alien ( dst src -- )
         ] %allot
         "end" get JMP
         "f" resolve-label
-        f [ v>operand ] 2apply MOV
+        f [ v>operand ] bi@ MOV
         "end" resolve-label
     ] with-scope ;

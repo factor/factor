@@ -150,7 +150,8 @@ SYMBOL: event-stream-callbacks
 : event-stream-counter \ event-stream-counter counter ;
 
 [
-    H{ } clone event-stream-callbacks set-global
+    event-stream-callbacks global
+    [ [ drop expired? not ] assoc-subset ] change-at
     1 \ event-stream-counter set-global
 ] "core-foundation" add-init-hook
 

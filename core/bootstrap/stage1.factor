@@ -19,7 +19,6 @@ vocabs.loader system debugger continuations ;
         ! Rehash hashtables, since bootstrap.image creates them
         ! using the host image's hashing algorithms
         [ hashtable? ] instances [ rehash ] each
-
         boot
     ] %
 
@@ -39,7 +38,7 @@ vocabs.loader system debugger continuations ;
 
     [
         "resource:core/bootstrap/stage2.factor"
-        dup resource-exists? [
+        dup exists? [
             [ run-file ]
             [
                 :c
@@ -47,6 +46,7 @@ vocabs.loader system debugger continuations ;
                 "listener" vocab
                 [ restarts. vocab-main execute ]
                 [ die ] if*
+                1 exit
             ] recover
         ] [
             "Cannot find " write write "." print

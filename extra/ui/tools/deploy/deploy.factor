@@ -35,6 +35,7 @@ TUPLE: deploy-gadget vocab settings ;
     deploy-compiler? get "Use optimizing compiler" <checkbox> gadget,
     deploy-math? get "Rational and complex number support" <checkbox> gadget,
     deploy-threads? get "Threading support" <checkbox> gadget,
+    deploy-random? get "Random number generator support" <checkbox> gadget,
     deploy-word-props? get "Retain all word properties" <checkbox> gadget,
     deploy-word-defs? get "Retain all word definitions" <checkbox> gadget,
     deploy-c-types? get "Retain all C types" <checkbox> gadget, ;
@@ -48,7 +49,7 @@ TUPLE: deploy-gadget vocab settings ;
         [
             bundle-name
             deploy-ui
-            macosx? [ exit-when-windows-closed ] when
+            os macosx? [ exit-when-windows-closed ] when
             io-settings
             reflection-settings
             advanced-settings

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs hashtables
 kernel kernel.private math namespaces sequences words
-quotations strings alien system combinators math.bitfields
-words.private cpu.architecture ;
+quotations strings alien layouts system combinators
+math.bitfields words.private cpu.architecture ;
 IN: generator.fixup
 
 : no-stack-frame -1 ; inline
@@ -111,7 +111,7 @@ SYMBOL: literal-table
 : add-literal ( obj -- n ) literal-table get push-new* ;
 
 : string>symbol ( str -- alien )
-    [ wince? [ string>u16-alien ] [ string>char-alien ] if ]
+    [ os wince? [ string>u16-alien ] [ string>char-alien ] if ]
     over string? [ call ] [ map ] if ;
 
 : add-dlsym-literals ( symbol dll -- )

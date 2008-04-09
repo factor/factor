@@ -174,11 +174,6 @@ sequences.private ;
 [ -6 ] [ 2 [ -3 fixnum* ] compile-call ] unit-test
 [ -6 ] [ [ 2 -3 fixnum* ] compile-call ] unit-test
 
-[ t ] [ 3 type 3 [ type ] compile-call eq? ] unit-test
-[ t ] [ 3 >bignum type 3 >bignum [ type ] compile-call eq? ] unit-test
-[ t ] [ "hey" type "hey" [ type ] compile-call eq? ] unit-test
-[ t ] [ f type f [ type ] compile-call eq? ] unit-test
-
 [ 5 ] [ 1 2 [ eq? [ 3 ] [ 5 ] if ] compile-call ] unit-test
 [ 3 ] [ 2 2 [ eq? [ 3 ] [ 5 ] if ] compile-call ] unit-test
 [ 3 ] [ 1 2 [ fixnum< [ 3 ] [ 5 ] if ] compile-call ] unit-test
@@ -224,9 +219,6 @@ sequences.private ;
 [ t ] [ f [ f eq? ] compile-call ] unit-test
 
 ! regression
-[ t ] [ { 1 2 3 } { 1 2 3 } [ over type over type eq? ] compile-call 2nip ] unit-test
-
-! regression
 [ 3 ] [
     100001 f <array> 3 100000 pick set-nth
     [ 100000 swap array-nth ] compile-call
@@ -261,7 +253,7 @@ cell 8 = [
 : compiled-fixnum* fixnum* ;
 
 : test-fixnum*
-    (random) >fixnum (random) >fixnum
+    32 random-bits >fixnum 32 random-bits >fixnum
     2dup
     [ fixnum* ] 2keep compiled-fixnum* =
     [ 2drop ] [ "Oops" throw ] if ;
@@ -271,7 +263,7 @@ cell 8 = [
 : compiled-fixnum>bignum fixnum>bignum ;
 
 : test-fixnum>bignum
-    (random) >fixnum
+    32 random-bits >fixnum
     dup [ fixnum>bignum ] keep compiled-fixnum>bignum =
     [ drop ] [ "Oops" throw ] if ;
 
@@ -280,7 +272,7 @@ cell 8 = [
 : compiled-bignum>fixnum bignum>fixnum ;
 
 : test-bignum>fixnum
-    5 random [ drop (random) ] map product >bignum
+    5 random [ drop 32 random-bits ] map product >bignum
     dup [ bignum>fixnum ] keep compiled-bignum>fixnum =
     [ drop ] [ "Oops" throw ] if ;
 
@@ -385,7 +377,7 @@ cell 8 = [
 [ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
 [ -4 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-signed-1 ] compile-call ] unit-test
 
-: xword-def word-def [ { fixnum } declare ] swap append ;
+: xword-def word-def [ { fixnum } declare ] prepend ;
 
 [ -100 ] [ -100 <char> [ { byte-array } declare *char ] compile-call ] unit-test
 [ 156 ] [ -100 <uchar> [ { byte-array } declare *uchar ] compile-call ] unit-test

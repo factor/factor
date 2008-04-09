@@ -41,19 +41,14 @@ M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
 : bounds-check? ( n seq -- ? )
     length 1- 0 swap between? ; inline
 
-TUPLE: bounds-error index seq ;
-
-: bounds-error ( n seq -- * )
-    \ bounds-error construct-boa throw ;
+ERROR: bounds-error index seq ;
 
 : bounds-check ( n seq -- n seq )
     2dup bounds-check? [ bounds-error ] unless ; inline
 
 MIXIN: immutable-sequence
 
-TUPLE: immutable seq ;
-
-: immutable ( seq -- * ) \ immutable construct-boa throw ;
+ERROR: immutable seq ;
 
 M: immutable-sequence set-nth immutable ;
 
@@ -65,7 +60,7 @@ INSTANCE: immutable-sequence sequence
     #! A bit of a pain; can't call cell-bits here
     7 getenv 8 * 5 - 2^ 1- ; foldable
 
-PREDICATE: fixnum array-capacity
+PREDICATE: array-capacity < fixnum
     0 max-array-capacity between? ;
 
 : array-capacity ( array -- n )
@@ -177,7 +172,9 @@ TUPLE: reversed seq ;
 C: <reversed> reversed
 
 M: reversed virtual-seq reversed-seq ;
+
 M: reversed virtual@ reversed-seq [ length swap - 1- ] keep ;
+
 M: reversed length reversed-seq length ;
 
 INSTANCE: reversed virtual-sequence
@@ -190,8 +187,7 @@ TUPLE: slice from to seq ;
 : collapse-slice ( m n slice -- m' n' seq )
     dup slice-from swap slice-seq >r tuck + >r + r> r> ; inline
 
-TUPLE: slice-error reason ;
-: slice-error ( str -- * ) \ slice-error construct-boa throw ;
+ERROR: slice-error reason ;
 
 : check-slice ( from to seq -- from to seq )
     pick 0 < [ "start < 0" slice-error ] when
@@ -204,7 +200,9 @@ TUPLE: slice-error reason ;
     slice construct-boa ; inline
 
 M: slice virtual-seq slice-seq ;
+
 M: slice virtual@ [ slice-from + ] keep slice-seq ;
+
 M: slice length dup slice-to swap slice-from - ;
 
 : head-slice ( seq n -- slice ) (head) <slice> ;
@@ -299,14 +297,16 @@ M: immutable-sequence clone-like like ;
 
 : append ( seq1 seq2 -- newseq ) over (append) ;
 
+: prepend ( seq1 seq2 -- newseq ) swap append ; inline
+
 : 3append ( seq1 seq2 seq3 -- newseq ) pick (3append) ;
 
 : change-nth ( i seq quot -- )
     [ >r nth r> call ] 3keep drop set-nth ; inline
 
-: min-length ( seq1 seq2 -- n ) [ length ] 2apply min ; inline
+: min-length ( seq1 seq2 -- n ) [ length ] bi@ min ; inline
 
-: max-length ( seq1 seq2 -- n ) [ length ] 2apply max ; inline
+: max-length ( seq1 seq2 -- n ) [ length ] bi@ max ; inline
 
 <PRIVATE
 
@@ -373,7 +373,7 @@ PRIVATE>
     (2each) each-integer ; inline
 
 : 2reverse-each ( seq1 seq2 quot -- )
-    >r [ <reversed> ] 2apply r> 2each ; inline
+    >r [ <reversed> ] bi@ r> 2each ; inline
 
 : 2reduce ( seq1 seq2 identity quot -- result )
     >r -rot r> 2each ; inline
@@ -420,6 +420,9 @@ PRIVATE>
         swap >r [ push ] curry compose r> while
     ] keep { } like ; inline
 
+: follow ( obj quot -- seq )
+    >r [ dup ] r> [ keep ] curry [ ] unfold nip ; inline
+
 : index ( obj seq -- n )
     [ = ] with find drop ;
 
@@ -464,8 +467,23 @@ M: sequence <=>
     [ -rot 2nth-unsafe <=> ] [ [ length ] compare ] if* ;
 
 : sequence= ( seq1 seq2 -- ? )
-    2dup [ length ] 2apply number=
+    2dup [ length ] bi@ number=
     [ mismatch not ] [ 2drop f ] if ; inline
+
+: sequence-hashcode-step ( oldhash newpart -- newhash )
+    swap [
+        dup -2 fixnum-shift-fast swap 5 fixnum-shift-fast
+        fixnum+fast fixnum+fast
+    ] keep fixnum-bitxor ; inline
+
+: sequence-hashcode ( n seq -- x )
+    0 -rot [
+        hashcode* >fixnum sequence-hashcode-step
+    ] with each ; inline
+
+M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
+
+M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 : move ( to from seq -- )
     2over number=
@@ -482,16 +500,16 @@ M: sequence <=>
 
 : push-new ( elt seq -- ) [ delete ] 2keep push ;
 
-: add ( seq elt -- newseq )
-    over >r over length 1+ r> [
-        [ >r over length r> set-nth-unsafe ] keep
-        [ 0 swap copy ] keep
-    ] new-like ;
-
-: add* ( seq elt -- newseq )
+: prefix ( seq elt -- newseq )
     over >r over length 1+ r> [
         [ 0 swap set-nth-unsafe ] keep
         [ 1 swap copy ] keep
+    ] new-like ;
+
+: suffix ( seq elt -- newseq )
+    over >r over length 1+ r> [
+        [ >r over length r> set-nth-unsafe ] keep
+        [ 0 swap copy ] keep
     ] new-like ;
 
 : seq-diff ( seq1 seq2 -- newseq )
@@ -624,12 +642,12 @@ M: sequence <=>
             [ drop nip ]
             [ 2drop first ]
             [ >r drop first2 r> call ]
-            [ >r drop first3 r> 2apply ]
+            [ >r drop first3 r> bi@ ]
         } dispatch
     ] [
         drop
         >r >r halves r> r>
-        [ [ binary-reduce ] 2curry 2apply ] keep
+        [ [ binary-reduce ] 2curry bi@ ] keep
         call
     ] if ; inline
 
@@ -693,14 +711,3 @@ PRIVATE>
         dup [ length ] map infimum
         [ <column> dup like ] with map
     ] unless ;
-
-: sequence-hashcode-step ( oldhash newpart -- newhash )
-    swap [
-        dup -2 fixnum-shift-fast swap 5 fixnum-shift-fast
-        fixnum+fast fixnum+fast
-    ] keep fixnum-bitxor ; inline
-
-: sequence-hashcode ( n seq -- x )
-    0 -rot [
-        hashcode* >fixnum sequence-hashcode-step
-    ] with each ; inline

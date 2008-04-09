@@ -3,6 +3,12 @@ smtp.server kernel sequences namespaces logging accessors
 assocs sorting ;
 IN: smtp.tests
 
+[ t ] [
+    <email>
+    dup clone "a" "b" set-header drop
+    headers>> assoc-empty?
+] unit-test
+
 { 0 0 } [ [ ] with-smtp-connection ] must-infer-as
 
 [ "hello\nworld" validate-address ] must-fail

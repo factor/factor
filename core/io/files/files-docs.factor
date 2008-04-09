@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io io.styles strings
-io.backend io.files.private quotations ;
+       io.backend io.files.private quotations ;
 IN: io.files
 
 ARTICLE: "file-streams" "Reading and writing files"
@@ -7,22 +7,22 @@ ARTICLE: "file-streams" "Reading and writing files"
 { $subsection <file-reader> }
 { $subsection <file-writer> }
 { $subsection <file-appender> }
+"Reading and writing the entire contents of a file; this is only recommended for smaller files:"
+{ $subsection file-contents }
+{ $subsection set-file-contents }
+{ $subsection file-lines }
+{ $subsection set-file-lines }
 "Utility combinators:"
 { $subsection with-file-reader }
 { $subsection with-file-writer }
-{ $subsection with-file-appender }
-{ $subsection file-contents }
-{ $subsection file-lines } ;
+{ $subsection with-file-appender } ;
 
 ARTICLE: "pathnames" "Pathname manipulation"
 "Pathname manipulation:"
 { $subsection parent-directory }
 { $subsection file-name }
 { $subsection last-path-separator }
-{ $subsection path+ }
-"Pathnames relative to Factor's install directory:"
-{ $subsection resource-path }
-{ $subsection ?resource-path }
+{ $subsection append-path }
 "Pathnames relative to Factor's temporary files directory:"
 { $subsection temp-directory }
 { $subsection temp-file }
@@ -30,11 +30,21 @@ ARTICLE: "pathnames" "Pathname manipulation"
 { $subsection pathname }
 { $subsection <pathname> } ;
 
+ARTICLE: "symbolic-links" "Symbolic links"
+"Reading and creating links:"
+{ $subsection read-link }
+{ $subsection make-link }
+"Copying links:"
+{ $subsection copy-link }
+"Not all operating systems support symbolic links."
+{ $see-also link-info } ;
+
 ARTICLE: "directories" "Directories"
-"Current and home directories:"
-{ $subsection cwd }
-{ $subsection cd }
+"Current directory:"
+{ $subsection current-directory }
+{ $subsection set-current-directory }
 { $subsection with-directory }
+"Home directory:"
 { $subsection home }
 "Directory listing:"
 { $subsection directory }
@@ -43,12 +53,26 @@ ARTICLE: "directories" "Directories"
 { $subsection make-directory }
 { $subsection make-directories } ;
 
-ARTICLE: "fs-meta" "File meta-data"
+ARTICLE: "file-types" "File Types"
+"Platform-independent types:"
+{ $subsection +regular-file+ }
+{ $subsection +directory+ }
+"Platform-specific types:"
+{ $subsection +character-device+ }
+{ $subsection +block-device+ }
+{ $subsection +fifo+ }
+{ $subsection +symbolic-link+ }
+{ $subsection +socket+ }
+{ $subsection +unknown+ } ;
+
+ARTICLE: "fs-meta" "File metadata"
+"Querying file-system metadata:"
+{ $subsection file-info }
+{ $subsection link-info }
 { $subsection exists? }
 { $subsection directory? }
-{ $subsection file-length }
-{ $subsection file-modified }
-{ $subsection stat } ;
+"File types:"
+{ $subsection "file-types" } ;
 
 ARTICLE: "delete-move-copy" "Deleting, moving, copying files"
 "Operations for deleting and copying files come in two forms:"
@@ -114,6 +138,43 @@ HELP: file-name
     { $example "USING: io.files prettyprint ;" "\"/usr/libexec/awk/\" file-name ." "\"awk\"" }
 } ;
 
+! need a $class-description file-info
+
+HELP: file-info
+{ $values { "path" "a pathname string" } { "info" file-info } }
+{ $description "Queries the file system for metadata. If " { $snippet "path" } " refers to a symbolic link, it is followed. See the article " { $link "file-types" } " for a list of metadata symbols." }
+{ $errors "Throws an error if the file does not exist." } ;
+
+HELP: link-info
+{ $values { "path" "a pathname string" } { "info" "a file-info tuple" } }
+{ $description "Queries the file system for metadata. If path refers to a symbolic link, information about the symbolic link itself is returned. If the file does not exist, an exception is thrown." } ;
+
+{ file-info link-info } related-words
+
+HELP: +regular-file+
+{ $description "A regular file. This type exists on all platforms. See " { $link "file-streams" } " for words operating on files." } ;
+
+HELP: +directory+
+{ $description "A directory. This type exists on all platforms. See " { $link "directories" } " for words operating on directories." } ;
+
+HELP: +symbolic-link+
+{ $description "A symbolic link file.  This type is currently implemented on Unix platforms only. See " { $link "symbolic-links" } " for words operating on symbolic links." } ;
+
+HELP: +character-device+
+{ $description "A Unix character device file. This type exists on unix platforms only." } ;
+
+HELP: +block-device+
+{ $description "A Unix block device file. This type exists on unix platforms only." } ;
+
+HELP: +fifo+
+{ $description "A Unix fifo file. This type exists on unix platforms only." } ;
+
+HELP: +socket+
+{ $description "A Unix socket file. This type exists on unix platforms only." } ;
+
+HELP: +unknown+
+{ $description "A unknown file type." } ;
+
 HELP: <file-reader>
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" { "stream" "an input stream" } }
     { "stream" "an input stream" } }
@@ -145,44 +206,72 @@ HELP: with-file-appender
 { $description "Opens a file for appending using the given encoding and calls the quotation using " { $link with-stream } "." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
+HELP: set-file-lines
+{ $values { "seq" "an array of strings" } { "path" "a pathname string" } { "encoding" "an encoding descriptor" } }
+{ $description "Sets the contents of a file to the strings with the given encoding." }
+{ $errors "Throws an error if the file cannot be opened for writing." } ;
+
 HELP: file-lines
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "seq" "an array of strings" } }
 { $description "Opens the file at the given path using the given encoding, and returns a list of the lines in that file." }
+{ $errors "Throws an error if the file cannot be opened for reading." } ;
+
+HELP: set-file-contents
+{ $values { "str" "a string" } { "path" "a pathname string" } { "encoding" "an encoding descriptor" } }
+{ $description "Sets the contents of a file to a string with the given encoding." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: file-contents
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "str" "a string" } }
 { $description "Opens the file at the given path using the given encoding, and the contents of that file as a string." }
-{ $errors "Throws an error if the file cannot be opened for writing." } ;
+{ $errors "Throws an error if the file cannot be opened for reading." } ;
+
+{ set-file-lines file-lines set-file-contents file-contents } related-words
 
 HELP: cwd
 { $values { "path" "a pathname string" } }
 { $description "Outputs the current working directory of the Factor process." }
-{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
+{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." }
+{ $notes "User code should use " { $link with-directory } " or " { $link set-current-directory } " instead." } ;
 
 HELP: cd
 { $values { "path" "a pathname string" } }
 { $description "Changes the current working directory of the Factor process." }
-{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
+{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." }
+{ $notes "User code should use " { $link with-directory } " or " { $link set-current-directory } " instead." } ;
 
-{ cd cwd with-directory } related-words
+{ cd cwd current-directory set-current-directory with-directory } related-words
+
+HELP: current-directory
+{ $description "A variable holding the current directory. Words that use the filesystem do so in relation to this variable.  On startup, an init hook sets this word to the directory from which Factor was run." } ;
 
 HELP: with-directory
 { $values { "path" "a pathname string" } { "quot" quotation } }
-{ $description "Changes the current working directory for the duration of a quotation's execution." }
-{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
+{ $description "Changes the " { $link current-directory } " variable for the duration of a quotation's execution.  Words that use the file-system should call " { $link normalize-path } " in order to obtain a path relative to the current directory." } ;
 
-HELP: stat ( path -- directory? permissions length modified )
-{ $values { "path" "a pathname string" } { "directory?" "boolean indicating if the file is a directory" } { "permissions" "a Unix permission bitmap (0 on Windows)" } { "length" "the length in bytes as an integer" } { "modified" "the last modification time, as milliseconds since midnight, January 1st 1970 GMT" } }
-{ $description
-    "Queries the file system for file meta data. If the file does not exist, outputs " { $link f } " for all four values."
-} ;
-
-{ stat exists? directory? file-length file-modified } related-words
-
-HELP: path+
+HELP: append-path
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
 { $description "Concatenates two pathnames." } ;
+
+HELP: prepend-path
+{ $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
+{ $description "Concatenates two pathnames." } ;
+
+{ append-path prepend-path } related-words
+
+HELP: absolute-path?
+{ $values { "path" "a pathname string" } { "?" "a boolean" } }
+{ $description "Tests if a pathname is absolute. Examples of absolute pathnames are " { $snippet "/foo/bar" } " on Unix and " { $snippet "c:\\foo\\bar" } " on Windows." } ;
+
+HELP: windows-absolute-path?
+{ $values { "path" "a pathname string" } { "?" "a boolean" } }
+{ $description "Tests if a pathname is absolute on Windows. Examples of absolute pathnames on Windows are " { $snippet "c:\\foo\\bar" } " and " { $snippet "\\\\?\\c:\\foo\\bar" } " for absolute Unicode pathnames." } ;
+
+HELP: root-directory?
+{ $values { "path" "a pathname string" } { "?" "a boolean" } }
+{ $description "Tests if a pathname is a root directory. Examples of root directory pathnames are " { $snippet "/" } " on Unix and " { $snippet "c:\\" } " on Windows." } ;
+
+{ absolute-path? windows-absolute-path? root-directory? } related-words
 
 HELP: exists?
 { $values { "path" "a pathname string" } { "?" "a boolean" } }
@@ -206,23 +295,13 @@ HELP: directory*
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
 { $notes "Unlike " { $link directory } ", this word prepends the directory's path to all file names in the list." } ;
 
-HELP: file-length
-{ $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
-{ $description "Outputs the length of the file in bytes, or " { $link f } " if it does not exist." } ;
-
-HELP: file-modified
-{ $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
-{ $description "Outputs a file's last modification time, since midnight January 1, 1970. If the file does not exist, outputs " { $link f } "." } ;
+! HELP: file-modified
+! { $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
+! { $description "Outputs a file's last modification time, since midnight January 1, 1970. If the file does not exist, outputs " { $link f } "." } ;
 
 HELP: resource-path
 { $values { "path" "a pathname string" } { "newpath" "a pathname string" } }
 { $description "Resolve a path relative to the Factor source code location. This first checks if the " { $link resource-path } " variable is set to a path, and if not, uses the parent directory of the current image." } ;
-
-HELP: ?resource-path
-{ $values { "path" "a pathname string" } { "newpath" "a string" } }
-{ $description "If the path is prefixed with " { $snippet "\"resource:\"" } ", prepends the resource path." } ;
-
-{ resource-path ?resource-path } related-words
 
 HELP: pathname
 { $class-description "Class of pathname presentations. Path name presentations can be created by calling " { $link <pathname> } ". Instances can be passed to " { $link write-object } " to output a clickable pathname." } ;
@@ -231,13 +310,27 @@ HELP: normalize-directory
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
 { $description "Called by the " { $link directory } " word to prepare a pathname before passing it to the " { $link (directory) } " primitive." } ;
 
-HELP: normalize-pathname
+HELP: normalize-path
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
-{ $description "Called by the " { $link stat } " word, and possibly " { $link <file-reader> } " and " { $link <file-writer> } ", to prepare a pathname before passing it to underlying code." } ;
+{ $description "Called by words such as " { $link <file-reader> } " and " { $link <file-writer> } " to prepare a pathname before passing it to underlying code." } ;
 
 HELP: <pathname> ( str -- pathname )
 { $values { "str" "a pathname string" } { "pathname" pathname } }
 { $description "Creates a new " { $link pathname } "." } ;
+
+HELP: make-link
+{ $values { "target" "a path to the symbolic link's target" } { "symlink" "a path to new symbolic link" } }
+{ $description "Creates a symbolic link." } ;
+
+HELP: read-link
+{ $values { "symlink" "a path to an existing symbolic link" } { "path" "the path pointed to by the symbolic link" } }
+{ $description "Reads the symbolic link and returns its target path." } ;
+
+HELP: copy-link
+{ $values { "target" "a path to an existing symlink" } { "symlink" "a path to a new symbolic link" } }
+{ $description "Copies a symbolic link without following the link." } ;
+
+{ make-link read-link copy-link } related-words
 
 HELP: home
 { $values { "dir" string } }

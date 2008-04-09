@@ -30,15 +30,6 @@ M: real sqrt
         2dup >r >r >r odd? r> call r> 2/ r> each-bit
     ] if ; inline
 
-: clear-bit ( x n -- y ) 2^ bitnot bitand ; foldable
-: set-bit ( x n -- y ) 2^ bitor ; foldable
-: bit-clear? ( x n -- ? ) 2^ bitand zero? ; foldable
-: bit-set? ( x n -- ? ) bit-clear? not ; foldable
-: unmask ( x n -- ? ) bitnot bitand ; foldable
-: unmask? ( x n -- ? ) unmask 0 > ; foldable
-: mask ( x n -- ? ) bitand ; foldable
-: mask? ( x n -- ? ) mask 0 > ; foldable
-
 GENERIC: (^) ( x y -- z ) foldable
 
 : ^n ( z w -- z^w )
@@ -101,7 +92,7 @@ M: real absq sq ;
     >r - abs r> < ;
 
 : ~rel ( x y epsilon -- ? )
-    >r [ - abs ] 2keep [ abs ] 2apply + r> * < ;
+    >r [ - abs ] 2keep [ abs ] bi@ + r> * < ;
 
 : ~ ( x y epsilon -- ? )
     {
@@ -124,7 +115,7 @@ M: real absq sq ;
 : arg ( z -- arg ) >float-rect swap fatan2 ; inline
 
 : >polar ( z -- abs arg )
-    >float-rect [ [ sq ] 2apply + fsqrt ] 2keep swap fatan2 ;
+    >float-rect [ [ sq ] bi@ + fsqrt ] 2keep swap fatan2 ;
     inline
 
 : cis ( arg -- z ) dup fcos swap fsin rect> ; inline

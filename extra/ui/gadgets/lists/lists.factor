@@ -4,7 +4,7 @@ USING: ui.commands ui.gestures ui.render ui.gadgets
 ui.gadgets.labels ui.gadgets.scrollers
 kernel sequences models opengl math namespaces
 ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs
-math.vectors tuples ;
+math.vectors classes.tuple ;
 IN: ui.gadgets.lists
 
 TUPLE: list index presenter color hook ;
@@ -27,7 +27,7 @@ TUPLE: list index presenter color hook ;
     swap set-list-index ;
 
 : list-presentation-hook ( list -- quot )
-    list-hook [ [ [ list? ] is? ] find-parent ] swap append ;
+    list-hook [ [ [ list? ] is? ] find-parent ] prepend ;
 
 : <list-presentation> ( hook elt presenter -- gadget )
     keep <presentation>

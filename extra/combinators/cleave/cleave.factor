@@ -1,59 +1,47 @@
 
-USING: kernel sequences macros ;
+USING: kernel arrays sequences macros combinators ;
 
 IN: combinators.cleave
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! The cleaver family
+! Cleave into array
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: bi ( obj quot quot -- val val ) >r keep r> call ; inline
+USING: words quotations fry arrays.lib ;
 
-: tri ( obj quot quot quot -- val val val )
-  >r pick >r bi r> r> call ; inline
+: >quot ( obj -- quot ) dup word? [ 1quotation ] when ;
 
-: tetra ( obj quot quot quot quot -- val val val val )
-  >r >r pick >r bi r> r> r> bi ; inline
+: >quots ( seq -- seq ) [ >quot ] map ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+MACRO: <arr> ( seq -- )
+  [ >quots ] [ length ] bi
+ '[ , cleave , narray ] ;
 
-: 2bi ( obj obj quot quot -- val val ) >r 2keep r> call ; inline
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! General cleave
-
-MACRO: cleave ( seq -- )
-  dup
-    [ drop [ dup ] ] map concat
-  swap
-  dup
-    [ drop [ >r ] ]  map concat
-  swap
-    [ [ r> ] append ] map concat
-  3append
-    [ drop ]
-  append ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! The spread family
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: bi* ( obj obj quot quot -- val val ) >r swap slip r> call ; inline
-
-: tri* ( obj obj obj quot quot quot -- val val val )
-  >r rot >r bi* r> r> call ; inline
-
-: tetra* ( obj obj obj obj quot quot quot quot -- val val val val )
-  >r roll >r tri* r> r> call ; inline
+MACRO: <2arr> ( seq -- )
+  [ >quots ] [ length ] bi
+ '[ , 2cleave , narray ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! General spread
+: {1} ( x     -- {x}     ) 1array ; inline
+: {2} ( x y   -- {x,y}   ) 2array ; inline
+: {3} ( x y z -- {x,y,z} ) 3array ; inline
 
-MACRO: spread ( seq -- )
-  dup
-    [ drop [ >r ] ]        map concat
-  swap
-    [ [ r> ] swap append ] map concat
-  append ;
+: {n} narray ;
+
+: {bi}  ( x p q   -- {p(x),q(x)}      ) bi  {2} ; inline
+
+: {tri} ( x p q r -- {p(x),q(x),r(x)} ) tri {3} ; inline
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Spread into array
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MACRO: <arr*> ( seq -- )
+  [ >quots ] [ length ] bi
+ '[ , spread , narray ] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: {bi*}  ( x y p q     -- {p(x),q(y)}      ) bi*  {2} ; inline
+: {tri*} ( x y z p q r -- {p(x),q(y),r(z)} ) tri* {3} ; inline

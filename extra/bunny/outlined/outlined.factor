@@ -1,7 +1,6 @@
-USING: arrays bunny.model bunny.cel-shaded
-combinators.lib continuations kernel math multiline
-opengl opengl.shaders opengl.framebuffers opengl.gl
-opengl.capabilities sequences ui.gadgets ;
+USING: arrays bunny.model bunny.cel-shaded continuations kernel
+math multiline opengl opengl.shaders opengl.framebuffers
+opengl.gl opengl.capabilities sequences ui.gadgets combinators ;
 IN: bunny.outlined
 
 STRING: outlined-pass1-fragment-shader-main-source
@@ -177,7 +176,7 @@ TUPLE: bunny-outlined
             [ bunny-outlined-normal-texture [ delete-texture ] when* ]
             [ bunny-outlined-depth-texture  [ delete-texture ] when* ]
             [ f swap set-bunny-outlined-framebuffer-dim ]
-        } call-with
+        } cleave
     ] [ drop ] if ;
 
 : remake-framebuffer-if-needed ( draw -- )
@@ -237,4 +236,4 @@ M: bunny-outlined dispose
         [ bunny-outlined-pass1-program [ delete-gl-program ] when* ]
         [ bunny-outlined-pass2-program [ delete-gl-program ] when* ]
         [ dispose-framebuffer ]
-    } call-with ;
+    } cleave ;

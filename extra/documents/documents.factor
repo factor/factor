@@ -12,7 +12,7 @@ IN: documents
 
 : =line ( n loc -- newloc ) second 2array ;
 
-: lines-equal? ( loc1 loc2 -- ? ) [ first ] 2apply number= ;
+: lines-equal? ( loc1 loc2 -- ? ) [ first ] bi@ number= ;
 
 TUPLE: document locs ;
 
@@ -46,7 +46,7 @@ TUPLE: document locs ;
     2over = [
         3drop
     ] [
-        >r [ first ] 2apply 1+ dup <slice> r> each
+        >r [ first ] bi@ 1+ dup <slice> r> each
     ] if ; inline
 
 : start/end-on-line ( from to line# -- n1 n2 )
@@ -74,7 +74,7 @@ TUPLE: document locs ;
     0 swap [ append ] change-nth ;
 
 : append-last ( str seq -- )
-    [ length 1- ] keep [ swap append ] change-nth ;
+    [ length 1- ] keep [ prepend ] change-nth ;
 
 : loc-col/str ( loc document -- str col )
     >r first2 swap r> nth swap ;
@@ -85,7 +85,7 @@ TUPLE: document locs ;
 
 : (set-doc-range) ( newlines from to lines -- )
     [ prepare-insert ] 3keep
-    >r [ first ] 2apply 1+ r>
+    >r [ first ] bi@ 1+ r>
     replace-slice ;
 
 : set-doc-range ( string from to document -- )

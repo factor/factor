@@ -1,4 +1,5 @@
-USING: assocs kernel vectors sequences namespaces ;
+USING: arrays assocs kernel vectors sequences namespaces
+random math.parser ;
 IN: assocs.lib
 
 : >set ( seq -- hash )
@@ -35,3 +36,10 @@ IN: assocs.lib
     [ with each ] curry assoc-each ; inline
 
 : insert ( value variable -- ) namespace insert-at ;
+
+: generate-key ( assoc -- str )
+    >r 256 random-bits >hex r>
+    2dup key? [ nip generate-key ] [ drop ] if ;
+
+: set-at-unique ( value assoc -- key )
+    dup generate-key [ swap set-at ] keep ;

@@ -1,9 +1,9 @@
 USING: alien alien.c-types arrays assocs combinators
 continuations destructors io io.backend io.nonblocking
 io.windows libc kernel math namespaces sequences
-threads tuples.lib windows windows.errors
+threads classes.tuple.lib windows windows.errors
 windows.kernel32 strings splitting io.files qualified ascii
-combinators.lib ;
+combinators.lib system ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
 
@@ -28,7 +28,7 @@ SYMBOL: master-completion-port
 : <master-completion-port> ( -- handle )
     INVALID_HANDLE_VALUE f <completion-port> ;
 
-M: windows-nt-io add-completion ( handle -- )
+M: winnt add-completion ( handle -- )
     master-completion-port get-global <completion-port> drop ;
 
 : eof? ( error -- ? )
@@ -89,13 +89,13 @@ M: windows-nt-io add-completion ( handle -- )
 : drain-overlapped ( timeout -- )
     handle-overlapped [ 0 drain-overlapped ] unless ;
 
-M: windows-nt-io cancel-io
+M: winnt cancel-io
     port-handle win32-file-handle CancelIo drop ;
 
-M: windows-nt-io io-multiplex ( ms -- )
+M: winnt io-multiplex ( ms -- )
     drain-overlapped ;
 
-M: windows-nt-io init-io ( -- )
+M: winnt init-io ( -- )
     <master-completion-port> master-completion-port set-global
     H{ } clone io-hash set-global
     windows.winsock:init-winsock ;

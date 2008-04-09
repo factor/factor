@@ -3,7 +3,7 @@
 USING: alien alien.c-types arrays destructors io io.windows libc
 windows.types math windows.kernel32 windows namespaces kernel
 sequences windows.errors assocs math.parser system random
-combinators new-slots accessors ;
+combinators accessors ;
 IN: io.windows.nt.pipes
 
 ! This code is based on
@@ -56,7 +56,7 @@ TUPLE: pipe in out ;
         "\\\\.\\pipe\\factor-" %
         pipe counter #
         "-" %
-        (random) #
+        32 random-bits #
         "-" %
         millis #
     ] "" make ;

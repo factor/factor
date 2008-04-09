@@ -1,5 +1,6 @@
 USING: locals math sequences tools.test hashtables words kernel
-namespaces arrays strings prettyprint ;
+namespaces arrays strings prettyprint io.streams.string parser
+;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -116,6 +117,12 @@ write-test-2 "q" set
 
 [ ] [ 5 write-test-4 drop ] unit-test
 
+! Not really a write test; just enforcing consistency
+:: write-test-5 ( x -- y )
+    [wlet | fun! [ x + ] | 5 fun! ] ;
+
+[ 9 ] [ 4 write-test-5 ] unit-test
+
 SYMBOL: a
 
 :: use-test ( a b c -- a b c )
@@ -160,3 +167,64 @@ M:: string lambda-generic ( a b -- c ) a b lambda-generic-2 ;
 [ ] [ \ lambda-generic-2 see ] unit-test
 
 [ ] [ \ lambda-generic see ] unit-test
+
+[ "[let | a! [ ] | ]" ] [
+    [let | a! [ ] | ] unparse
+] unit-test
+
+[ "[wlet | a! [ ] | ]" ] [
+    [wlet | a! [ ] | ] unparse
+] unit-test
+
+[ "[| a! | ]" ] [
+    [| a! | ] unparse
+] unit-test
+
+DEFER: xyzzy
+
+[ ] [
+    "IN: locals.tests USE: math GENERIC: xyzzy M: integer xyzzy ;"
+    <string-reader> "lambda-generic-test" parse-stream drop
+] unit-test
+
+[ 10 ] [ 10 xyzzy ] unit-test
+
+[ ] [
+    "IN: locals.tests USE: math USE: locals GENERIC: xyzzy M:: integer xyzzy ( n -- ) 5 ;"
+    <string-reader> "lambda-generic-test" parse-stream drop
+] unit-test
+
+[ 5 ] [ 10 xyzzy ] unit-test
+
+:: let*-test-1 ( a -- b )
+    [let* | b [ a 1+ ]
+            c [ b 1+ ] |
+        a b c 3array ] ;
+
+[ { 1 2 3 } ] [ 1 let*-test-1 ] unit-test
+
+:: let*-test-2 ( a -- b )
+    [let* | b [ a 1+ ]
+            c! [ b 1+ ] |
+        a b c 3array ] ;
+
+[ { 1 2 3 } ] [ 1 let*-test-2 ] unit-test
+
+:: let*-test-3 ( a -- b )
+    [let* | b [ a 1+ ]
+            c! [ b 1+ ] |
+        c 1+ c!  a b c 3array ] ;
+
+[ { 1 2 4 } ] [ 1 let*-test-3 ] unit-test
+
+:: let*-test-4 ( a b -- c d )
+    [let | a [ b ]
+           b [ a ] |
+        [let* | a'  [ a  ]
+                a'' [ a' ]
+                b'  [ b  ]
+                b'' [ b' ] |
+            a'' b'' ] ] ;
+
+[ "xxx" "yyy" ] [ "yyy" "xxx" let*-test-4 ] unit-test
+

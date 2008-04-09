@@ -3,10 +3,10 @@
 USING: arrays generic assocs inference inference.class
 inference.dataflow inference.backend inference.state io kernel
 math namespaces sequences vectors words quotations hashtables
-combinators classes generic.math continuations optimizer.def-use
-optimizer.backend generic.standard optimizer.specializers
-optimizer.def-use optimizer.pattern-match generic.standard
-optimizer.control kernel.private ;
+combinators classes classes.algebra generic.math continuations
+optimizer.def-use optimizer.backend generic.standard
+optimizer.specializers optimizer.def-use optimizer.pattern-match
+generic.standard optimizer.control kernel.private ;
 IN: optimizer.inlining
 
 : remember-inlining ( node history -- )
@@ -70,12 +70,25 @@ DEFER: (flat-length)
     ] if ;
 
 ! Partial dispatch of math-generic words
+: normalize-math-class ( class -- class' )
+    {
+        fixnum bignum integer
+        ratio rational
+        float real
+        complex number
+        object
+    } [ class< ] with find nip ;
+
 : math-both-known? ( word left right -- ? )
     math-class-max swap specific-method ;
 
 : inline-math-method ( #call word -- node )
-    over node-input-classes first2 3dup math-both-known?
-    [ math-method f splice-quot ] [ 2drop 2drop t ] if ;
+    over node-input-classes
+    [ first normalize-math-class ]
+    [ second normalize-math-class ] bi
+    3dup math-both-known?
+    [ math-method f splice-quot ]
+    [ 2drop 2drop t ] if ;
 
 : inline-method ( #call -- node )
     dup node-param {
@@ -175,7 +188,7 @@ DEFER: (flat-length)
 : optimistic-inline? ( #call -- ? )
     dup node-param "specializer" word-prop dup [
         >r node-input-classes r> specialized-length tail*
-        [ types length 1 = ] all?
+        [ class-types length 1 = ] all?
     ] [
         2drop f
     ] if ;

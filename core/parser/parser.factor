@@ -1,20 +1,21 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic assocs kernel math
-namespaces prettyprint sequences strings vectors words
-quotations inspector io.styles io combinators sorting
-splitting math.parser effects continuations debugger 
-io.files io.streams.string vocabs io.encodings.utf8
-source-files classes hashtables compiler.errors compiler.units ;
+USING: arrays definitions generic assocs kernel math namespaces
+prettyprint sequences strings vectors words quotations inspector
+io.styles io combinators sorting splitting math.parser effects
+continuations debugger io.files io.streams.string vocabs
+io.encodings.utf8 source-files classes classes.tuple hashtables
+compiler.errors compiler.units accessors ;
 IN: parser
 
 TUPLE: lexer text line line-text line-length column ;
 
 : next-line ( lexer -- )
-    0 over set-lexer-column
-    dup lexer-line over lexer-text ?nth over set-lexer-line-text
-    dup lexer-line-text length over set-lexer-line-length
-    dup lexer-line 1+ swap set-lexer-line ;
+    dup [ line>> ] [ text>> ] bi ?nth >>line-text
+    dup line-text>> length >>line-length
+    [ 1+ ] change-line
+    0 >>column
+    drop ;
 
 : <lexer> ( text -- lexer )
     0 { set-lexer-text set-lexer-line } lexer construct
@@ -60,7 +61,7 @@ t parser-notes set-global
     [ swap CHAR: \s eq? xor ] curry find* drop
     [ r> drop ] [ r> length ] if* ;
 
-: change-column ( lexer quot -- )
+: change-lexer-column ( lexer quot -- )
     swap
     [ dup lexer-column swap lexer-line-text rot call ] keep
     set-lexer-column ; inline
@@ -68,14 +69,14 @@ t parser-notes set-global
 GENERIC: skip-blank ( lexer -- )
 
 M: lexer skip-blank ( lexer -- )
-    [ t skip ] change-column ;
+    [ t skip ] change-lexer-column ;
 
 GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word ( lexer -- )
     [
         2dup nth CHAR: " eq? [ drop 1+ ] [ f skip ] if
-    ] change-column ;
+    ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
     dup lexer-line swap lexer-text length <= ;
@@ -98,10 +99,7 @@ M: lexer skip-word ( lexer -- )
 
 : scan ( -- str/f ) lexer get parse-token ;
 
-TUPLE: bad-escape ;
-
-: bad-escape ( -- * )
-    \ bad-escape construct-empty throw ;
+ERROR: bad-escape ;
 
 M: bad-escape summary drop "Bad escape code" ;
 
@@ -156,26 +154,35 @@ name>char-hook global [
 : parse-string ( -- str )
     lexer get [
         [ swap tail-slice (parse-string) ] "" make swap
-    ] change-column ;
+    ] change-lexer-column ;
 
-TUPLE: parse-error file line col text ;
+TUPLE: parse-error file line column line-text error ;
 
 : <parse-error> ( msg -- error )
-    file get
-    lexer get
-    { lexer-line lexer-column lexer-line-text } get-slots
-    parse-error construct-boa
-    [ set-delegate ] keep ;
+    \ parse-error construct-empty
+        file get >>file
+        lexer get line>> >>line
+        lexer get column>> >>column
+        lexer get line-text>> >>line-text
+        swap >>error ;
 
 : parse-dump ( error -- )
-    dup parse-error-file file.
-    dup parse-error-line number>string print
-    dup parse-error-text dup string? [ print ] [ drop ] if
-    parse-error-col 0 or CHAR: \s <string> write
+    {
+        [ file>> file. ]
+        [ line>> number>string print ]
+        [ line-text>> dup string? [ print ] [ drop ] if ]
+        [ column>> 0 or CHAR: \s <string> write ]
+    } cleave
     "^" print ;
 
 M: parse-error error.
-    dup parse-dump  delegate error. ;
+    [ parse-dump ] [ error>> error. ] bi ;
+
+M: parse-error summary
+    error>> summary ;
+
+M: parse-error compute-restarts
+    error>> compute-restarts ;
 
 SYMBOL: use
 SYMBOL: in
@@ -183,22 +190,8 @@ SYMBOL: in
 : word/vocab% ( word -- )
     "(" % dup word-vocabulary % " " % word-name % ")" % ;
 
-: shadow-warning ( new old -- )
-    2dup eq? [
-        2drop
-    ] [
-        [ word/vocab% " shadowed by " % word/vocab% ] "" make
-        note.
-    ] if ;
-
-: shadow-warnings ( vocab vocabs -- )
-    [
-        swapd assoc-stack dup
-        [ shadow-warning ] [ 2drop ] if
-    ] curry assoc-each ;
-
 : (use+) ( vocab -- )
-    vocab-words use get 2dup shadow-warnings push ;
+    vocab-words use get push ;
 
 : use+ ( vocab -- )
     load-vocab (use+) ;
@@ -215,15 +208,9 @@ SYMBOL: in
 : set-in ( name -- )
     check-vocab-string dup in set create-vocab (use+) ;
 
-: create-in ( string -- word )
-    in get create dup set-word dup save-location ;
+ERROR: unexpected want got ;
 
-TUPLE: unexpected want got ;
-
-: unexpected ( want got -- * )
-    \ unexpected construct-boa throw ;
-
-PREDICATE: unexpected unexpected-eof
+PREDICATE: unexpected-eof < unexpected
     unexpected-got not ;
 
 : unexpected-eof ( word -- * ) f unexpected ;
@@ -238,7 +225,14 @@ PREDICATE: unexpected unexpected-eof
 : parse-tokens ( end -- seq )
     100 <vector> swap (parse-tokens) >array ;
 
+: create-in ( string -- word )
+    in get create dup set-word dup save-location ;
+
 : CREATE ( -- word ) scan create-in ;
+
+: CREATE-GENERIC ( -- word ) CREATE dup reset-word ;
+
+: CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 
 : create-class-in ( word -- word )
     in get create
@@ -253,13 +247,13 @@ PREDICATE: unexpected unexpected-eof
         [ "Use the word " swap summary append ] keep
     ] { } map>assoc ;
 
-TUPLE: no-word name ;
+TUPLE: no-word-error name ;
 
-M: no-word summary
+M: no-word-error summary
     drop "Word not found in current vocabulary search path" ;
 
 : no-word ( name -- newword )
-    dup \ no-word construct-boa
+    dup no-word-error construct-boa
     swap words-named [ forward-reference? not ] subset
     word-restarts throw-restarts
     dup word-vocabulary (use+) ;
@@ -284,10 +278,35 @@ M: no-word summary
         ] ?if
     ] when ;
 
-TUPLE: staging-violation word ;
+: create-method-in ( class generic -- method )
+    create-method f set-word dup save-location ;
 
-: staging-violation ( word -- * )
-    \ staging-violation construct-boa throw ;
+: CREATE-METHOD ( -- method )
+    scan-word bootstrap-word scan-word create-method-in ;
+
+: shadowed-slots ( superclass slots -- shadowed )
+    >r all-slot-names r> seq-intersect ;
+
+: check-slot-shadowing ( class superclass slots -- )
+    shadowed-slots [
+        [
+            "Definition of slot ``" %
+            %
+            "'' in class ``" %
+            word-name %
+            "'' shadows a superclass slot" %
+        ] "" make note.
+    ] with each ;
+
+: parse-tuple-definition ( -- class superclass slots )
+    CREATE-CLASS
+    scan {
+        { ";" [ tuple f ] }
+        { "<" [ scan-word ";" parse-tokens ] }
+        [ >r tuple ";" parse-tokens r> prefix ]
+    } case 3dup check-slot-shadowing ;
+
+ERROR: staging-violation word ;
 
 M: staging-violation summary
     drop
@@ -342,9 +361,7 @@ SYMBOL: lexer-factory
         ] if
     ] if ;
 
-TUPLE: bad-number ;
-
-: bad-number ( -- * ) \ bad-number construct-boa throw ;
+ERROR: bad-number ;
 
 : parse-base ( parsed base -- parsed )
     scan swap base> [ bad-number ] unless* parsed ;
@@ -355,7 +372,23 @@ TUPLE: bad-number ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
-: (:) CREATE dup reset-generic parse-definition ;
+: (:) CREATE-WORD parse-definition ;
+
+SYMBOL: current-class
+SYMBOL: current-generic
+
+: (M:)
+    CREATE-METHOD
+    [
+        [ "method-class" word-prop current-class set ]
+        [ "method-generic" word-prop current-generic set ]
+        [ ] tri
+        parse-definition
+    ] with-scope ;
+
+: scan-object ( -- object )
+    scan-word dup parsing?
+    [ V{ } clone swap execute first ] when ;
 
 GENERIC: expected>string ( obj -- str )
 
@@ -385,6 +418,7 @@ SYMBOL: bootstrap-syntax
 SYMBOL: interactive-vocabs
 
 {
+    "accessors"
     "arrays"
     "assocs"
     "combinators"
@@ -416,6 +450,7 @@ SYMBOL: interactive-vocabs
     "tools.test"
     "tools.threads"
     "tools.time"
+    "tools.vocabs"
     "vocabs"
     "vocabs.loader"
     "words"
@@ -439,53 +474,44 @@ SYMBOL: interactive-vocabs
         "Loading " write <pathname> . flush
     ] if ;
 
-: smudged-usage-warning ( usages removed -- )
-    parser-notes? [
-        "Warning: the following definitions were removed from sources," print
-        "but are still referenced from other definitions:" print
-        nl
-        dup sorted-definitions.
-        nl
-        "The following definitions need to be updated:" print
-        nl
-        over sorted-definitions.
-        nl
-    ] when 2drop ;
-
-: filter-moved ( assoc -- newassoc )
-    [
+: filter-moved ( assoc1 assoc2 -- seq )
+    diff [
         drop where dup [ first ] when
         file get source-file-path =
-    ] assoc-subset ;
+    ] assoc-subset keys ;
 
-: removed-definitions ( -- definitions )
+: removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions
-    [ get first2 union ] 2apply diff ;
+    [ get first2 union ] bi@ ;
 
-: smudged-usage ( -- usages referenced removed )
-    removed-definitions filter-moved keys [
-        outside-usages
-        [ empty? swap pathname? or not ] assoc-subset
-        dup values concat prune swap keys
-    ] keep ;
+: removed-classes ( -- assoc1 assoc2 )
+    new-definitions old-definitions
+    [ get second ] bi@ ;
+
+: forget-removed-definitions ( -- )
+    removed-definitions filter-moved forget-all ;
+
+: reset-removed-classes ( -- )
+    removed-classes
+    filter-moved [ class? ] subset [ reset-class ] each ;
 
 : fix-class-words ( -- )
     #! If a class word had a compound definition which was
     #! removed, it must go back to being a symbol.
-    new-definitions get first2 diff
-    [ nip dup reset-generic define-symbol ] assoc-each ;
+    new-definitions get first2
+    filter-moved [ [ reset-generic ] [ define-symbol ] bi ] each ;
 
 : forget-smudged ( -- )
-    smudged-usage forget-all
-    over empty? [ 2dup smudged-usage-warning ] unless 2drop
+    forget-removed-definitions
+    reset-removed-classes
     fix-class-words ;
 
 : finish-parsing ( lines quot -- )
     file get
-    [ record-form ] keep
-    [ record-modified ] keep
-    [ record-definitions ] keep
-    record-checksum ;
+    [ record-form ]
+    [ record-definitions ]
+    [ record-checksum ]
+    tri ;
 
 : parse-stream ( stream name -- quot )
     [
@@ -503,7 +529,7 @@ SYMBOL: interactive-vocabs
     [
         [
             [ parsing-file ] keep
-            [ ?resource-path utf8 <file-reader> ] keep
+            [ utf8 <file-reader> ] keep
             parse-stream
         ] with-compiler-errors
     ] [
@@ -515,7 +541,7 @@ SYMBOL: interactive-vocabs
     [ dup parse-file call ] assert-depth drop ;
 
 : ?run-file ( path -- )
-    dup resource-exists? [ run-file ] [ drop ] if ;
+    dup exists? [ run-file ] [ drop ] if ;
 
 : bootstrap-file ( path -- )
     [ parse-file % ] [ run-file ] if-bootstrapping ;

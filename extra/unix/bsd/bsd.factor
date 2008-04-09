@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: alien.syntax combinators system vocabs.loader ;
 IN: unix
-USING: alien.syntax ;
 
 ! FreeBSD
 
@@ -15,8 +15,6 @@ USING: alien.syntax ;
 : O_TRUNC   HEX: 0400 ; inline
 : O_EXCL    HEX: 0800 ; inline
 
-: FD_SETSIZE 1024 ; inline
-
 : SOL_SOCKET HEX: ffff ; inline
 : SO_REUSEADDR HEX: 4 ; inline
 : SO_OOBINLINE HEX: 100 ; inline
@@ -25,16 +23,6 @@ USING: alien.syntax ;
 
 : F_SETFL 4 ; inline
 : O_NONBLOCK 4 ; inline
-
-C-STRUCT: addrinfo
-    { "int" "flags" }
-    { "int" "family" }
-    { "int" "socktype" }
-    { "int" "protocol" }
-    { "socklen_t" "addrlen" }
-    { "char*" "canonname" }
-    { "void*" "addr" }
-    { "addrinfo*" "next" } ;
 
 C-STRUCT: sockaddr-in
     { "uchar" "len" }
@@ -83,3 +71,10 @@ C-STRUCT: sockaddr-un
 : SEEK_SET 0 ; inline
 : SEEK_CUR 1 ; inline
 : SEEK_END 2 ; inline
+
+os {
+    { macosx  [ "unix.bsd.macosx"  require ] }
+    { freebsd [ "unix.bsd.freebsd" require ] }
+    { openbsd [ "unix.bsd.openbsd" require ] }
+    { netbsd  [ "unix.bsd.netbsd"  require ] }
+} case

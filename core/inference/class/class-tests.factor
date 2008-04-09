@@ -4,7 +4,7 @@ inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
 slots.private combinators definitions compiler.units
-system ;
+system layouts vectors ;
 
 ! Make sure these compile even though this is invalid code
 [ ] [ [ 10 mod 3.0 /i ] dataflow optimize drop ] unit-test
@@ -21,7 +21,7 @@ GENERIC: mynot ( x -- y )
 
 M: f mynot drop t ;
 
-M: general-t mynot drop f ;
+M: object mynot drop f ;
 
 GENERIC: detect-f ( x -- y )
 
@@ -120,7 +120,7 @@ M: object xyz ;
     [
         [ no-cond ] 1
         [ 1array dup quotation? [ >quotation ] unless ] times
-    ] \ type inlined?
+    ] \ quotation? inlined?
 ] unit-test
 
 [ f ] [ [ <reversed> length ] \ slot inlined? ] unit-test
@@ -233,6 +233,20 @@ M: fixnum annotate-entry-test-1 drop ;
     \ >float inlined?
 ] unit-test
 
+GENERIC: detect-float ( a -- b )
+
+M: float detect-float ;
+
+[ t ] [
+    [ { real float } declare + detect-float ]
+    \ detect-float inlined?
+] unit-test
+
+[ t ] [
+    [ { float real } declare + detect-float ]
+    \ detect-float inlined?
+] unit-test
+
 [ t ] [
     [ 3 + = ] \ equal? inlined?
 ] unit-test
@@ -294,4 +308,18 @@ cell-bits 32 = [
     \ >= inlined?
 ] unit-test
 
+[ t ] [
+    [ { vector } declare nth-unsafe ] \ nth-unsafe inlined?
+] unit-test
 
+[ t ] [
+    [
+        dup integer? [
+            dup fixnum? [
+                1 +
+            ] [
+                2 +
+            ] if
+        ] when
+    ] \ + inlined?
+] unit-test

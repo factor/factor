@@ -1,7 +1,10 @@
+#include <i386/signal.h>
+
 INLINE void *openbsd_stack_pointer(void *uap)
 {
-	ucontext_t *ucontext = (ucontext_t *)uap;
-	return (void *)ucontext->sc_esp;
+	struct sigcontext *sc = (struct sigcontext*) uap;
+	return (void *)sc->sc_esp;
 }
 
 #define ucontext_stack_pointer openbsd_stack_pointer
+#define UAP_PROGRAM_COUNTER(uap) (((struct sigcontext*)(uap))->sc_eip)

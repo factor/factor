@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private math
 namespaces sequences vectors words strings layouts combinators
-sequences.private classes generic.standard assocs ;
+sequences.private classes generic.standard
+generic.standard.engines assocs ;
 IN: optimizer.specializers
 
 : (make-specializer) ( class picker -- quot )
@@ -24,20 +25,40 @@ IN: optimizer.specializers
         \ dispatch ,
     ] [ ] make ;
 
-: specializer-methods ( quot word -- default alist )
+: specializer-cases ( quot word -- default alist )
     dup [ array? ] all? [ 1array ] unless [
         [ make-specializer ] keep
         [ declare ] curry pick append
     ] { } map>assoc ;
 
+: method-declaration ( method -- quot )
+    dup "method-generic" word-prop dispatch# object <array>
+    swap "method-class" word-prop prefix ;
+
+: specialize-method ( quot method -- quot' )
+    method-declaration [ declare ] curry prepend ;
+
+: specialize-quot ( quot specializer -- quot' )
+    dup { number } = [
+        drop tag-specializer
+    ] [
+        specializer-cases alist>quot
+    ] if ;
+
+: standard-method? ( method -- ? )
+    dup method-body? [
+        "method-generic" word-prop standard-generic?
+    ] [ drop f ] if ;
+
 : specialized-def ( word -- quot )
-    dup word-def swap "specializer" word-prop [
-        dup { number } = [
-            drop tag-specializer
-        ] [
-            specializer-methods alist>quot
-        ] if
-    ] when* ;
+    dup word-def swap {
+        { [ dup standard-method? ] [ specialize-method ] }
+        {
+            [ dup "specializer" word-prop ]
+            [ "specializer" word-prop specialize-quot ]
+        }
+        { [ t ] [ drop ] }
+    } cond ;
 
 : specialized-length ( specializer -- n )
     dup [ array? ] all? [ first ] when length ;

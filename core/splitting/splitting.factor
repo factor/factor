@@ -17,7 +17,7 @@ M: groups length
     dup groups-seq length swap groups-n [ + 1- ] keep /i ;
 
 M: groups set-length
-    [ groups-n * ] keep delegate set-length ;
+    [ groups-n * ] keep groups-seq set-length ;
 
 : group@ ( n groups -- from to seq )
     [ groups-n [ * dup ] keep + ] keep
@@ -56,7 +56,7 @@ INSTANCE: groups sequence
     ] if ;
 
 : last-split1 ( seq subseq -- before after )
-    [ <reversed> ] 2apply split1 [ reverse ] 2apply
+    [ <reversed> ] bi@ split1 [ reverse ] bi@
     dup [ swap ] when ;
 
 : (split) ( separators n seq -- )
@@ -76,5 +76,5 @@ INSTANCE: groups sequence
             1 head-slice* [
                 "\r" ?tail drop "\r" split
             ] map
-        ] keep peek "\r" split add concat
+        ] keep peek "\r" split suffix concat
     ] if ;

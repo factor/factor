@@ -3,7 +3,7 @@ USING: kernel words namespaces classes parser continuations
        io io.files io.launcher io.sockets
        math math.parser
        combinators sequences splitting quotations arrays strings tools.time
-       sequences.deep new-slots accessors assocs.lib
+       sequences.deep accessors assocs.lib
        io.encodings.utf8
        combinators.cleave bake calendar calendar.format ;
 
@@ -88,7 +88,7 @@ USING: bootstrap.image bootstrap.image.download io.streams.null ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: longer? ( seq seq -- ? ) [ length ] 2apply > ; 
+: longer? ( seq seq -- ? ) [ length ] bi@ > ; 
 
 : maybe-tail* ( seq n -- seq )
   2dup longer?

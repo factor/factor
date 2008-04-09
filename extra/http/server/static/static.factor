@@ -3,20 +3,14 @@
 USING: calendar html io io.files kernel math math.parser http
 http.server namespaces parser sequences strings assocs
 hashtables debugger http.mime sorting html.elements logging
-calendar.format new-slots accessors io.encodings.binary
-combinators.cleave fry ;
+calendar.format accessors io.encodings.binary fry ;
 IN: http.server.static
-
-SYMBOL: responder
 
 ! special maps mime types to quots with effect ( path -- )
 TUPLE: file-responder root hook special ;
 
-: unix-time>timestamp ( n -- timestamp )
-    >r unix-1970 r> seconds time+ ;
-
 : file-http-date ( filename -- string )
-    file-modified unix-time>timestamp timestamp>http-string ;
+    file-info file-info-modified timestamp>http-string ;
 
 : last-modified-matches? ( filename -- ? )
     file-http-date dup [
@@ -33,7 +27,7 @@ TUPLE: file-responder root hook special ;
     [
         <content>
         swap
-        [ file-length "content-length" set-header ]
+        [ file-info file-info-size "content-length" set-header ]
         [ file-http-date "last-modified" set-header ]
         [ '[ , binary <file-reader> stdio get stream-copy ] >>body ]
         tri
@@ -44,7 +38,9 @@ TUPLE: file-responder root hook special ;
     [ 2drop <304> ] [ file-responder get hook>> call ] if ;
 
 : serving-path ( filename -- filename )
-    "" or file-responder get root>> swap path+ ;
+    file-responder get root>> right-trim-separators
+    "/"
+    rot "" or left-trim-separators 3append ;
 
 : serve-file ( filename -- response )
     dup mime-type
@@ -73,7 +69,7 @@ TUPLE: file-responder root hook special ;
     swap '[ , directory. ] >>body ;
 
 : find-index ( filename -- path )
-    { "index.html" "index.fhtml" } [ path+ ] with map
+    { "index.html" "index.fhtml" } [ append-path ] with map
     [ exists? ] find nip ;
 
 : serve-directory ( filename -- response )

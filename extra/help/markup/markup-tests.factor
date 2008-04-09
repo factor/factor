@@ -4,18 +4,6 @@ IN: help.markup.tests
 
 TUPLE: blahblah quux ;
 
-: test-slot blahblah "slots" word-prop second ;
-
-[
-    { { "blahblah" { $instance blahblah } } { "quux" { $instance object } } }
-] [
-    test-slot blahblah ($spec-reader-values)
-] unit-test
-
-[ ] [
-    test-slot blahblah $spec-reader-values
-] unit-test
-
 [ "an int" ] [ [ { "int" } $instance ] with-string-writer ] unit-test
 
 [ ] [ \ blahblah-quux help ] unit-test

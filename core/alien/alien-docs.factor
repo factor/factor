@@ -65,8 +65,7 @@ HELP: dlclose ( dll -- )
 
 HELP: load-library
 { $values { "name" "a string" } { "dll" "a DLL handle" } }
-{ $description "Loads a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } ". If the library is already loaded, returns the existing handle." }
-{ $errors "Throws an error if the library could not be found, or if loading fails for some other reason." } ;
+{ $description "Loads a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } ". If the library is already loaded, returns the existing handle." } ;
 
 HELP: add-library
 { $values { "name" "a string" } { "path" "a string" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }
@@ -77,8 +76,8 @@ $nl
 { $examples "Here is a typical usage of " { $link add-library } ":"
 { $code
     "<< \"freetype\" {"
-    "    { [ macosx? ] [ \"libfreetype.6.dylib\" \"cdecl\" add-library ] }"
-    "    { [ windows? ] [ \"freetype6.dll\" \"cdecl\" add-library ] }"
+    "    { [ os macosx? ] [ \"libfreetype.6.dylib\" \"cdecl\" add-library ] }"
+    "    { [ os windows? ] [ \"freetype6.dll\" \"cdecl\" add-library ] }"
     "    { [ t ] [ drop ] }"
     "} cond >>"
 }
@@ -205,14 +204,15 @@ ARTICLE: "alien-callback-gc" "Callbacks and code GC"
 "A callback consits of two parts; the callback word, which pushes the address of the callback on the stack when executed, and the callback body itself. If the callback word is redefined, removed from the dictionary using " { $link forget } ", or recompiled, the callback body will not be reclaimed by the garbage collector, since potentially C code may be holding a reference to the callback body."
 $nl
 "This is the safest approach, however it can lead to code heap leaks when repeatedly reloading code which defines callbacks. If you are " { $emphasis "completely sure" } " that no running C code is holding a reference to any callbacks, you can blow them all away:"
-{ $code "USE: alien callbacks get clear-hash code-gc" }
+{ $code "USE: alien callbacks get clear-hash gc" }
 "This will reclaim all callback bodies which are otherwise unreachable from the dictionary (that is, their associated callback words have since been redefined, recompiled or forgotten)." ;
 
 ARTICLE: "alien-callback" "Calling Factor from C"
 "Callbacks can be defined and passed to C code as function pointers; the C code can then invoke the callback and run Factor code:"
 { $subsection alien-callback }
-"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "."
-{ $subsection "alien-callback-gc" } ;
+"There are some caveats concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "."
+{ $subsection "alien-callback-gc" }
+{ $see-also "byte-arrays-gc" } ;
 
 ARTICLE: "dll.private" "DLL handles"
 "DLL handles are a built-in class of objects which represent loaded native libraries. DLL handles are instances of the " { $link dll } " class, and have a literal syntax used for debugging prinouts; see " { $link "syntax-aliens" } "."
@@ -291,7 +291,7 @@ $nl
 "The C library interface is entirely self-contained; there is no C code which one must write in order to wrap a library."
 $nl
 "C library interface words are found in the " { $vocab-link "alien" } " vocabulary."
-{ $warning "Since C does not retain runtime type information or do any kind of runtime type checking, any C library interface is not pointer safe. Improper use of C functions can crash the runtime or corrupt memory in unpredictible ways." }
+{ $warning "C does not perform runtime type checking, automatic memory management or array bounds checks. Incorrect usage of C library functions can lead to crashes, data corruption, and security exploits." }
 { $subsection "loading-libs" }
 { $subsection "alien-invoke" }
 { $subsection "alien-callback" }

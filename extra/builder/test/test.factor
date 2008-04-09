@@ -1,33 +1,34 @@
 
-USING: kernel namespaces sequences assocs builder continuations
-       vocabs vocabs.loader
-       io
-       io.files
-       prettyprint
-       tools.browser
-       tools.test
-       io.encodings.utf8
-       combinators.cleave
+! USING: kernel namespaces sequences assocs continuations
+!        vocabs vocabs.loader
+!        io
+!        io.files
+!        prettyprint
+!        tools.vocabs
+!        tools.test
+!        io.encodings.utf8
+!        combinators.cleave
+!        help.lint
+!        bootstrap.stage2 benchmark builder.util ;
+
+USING: kernel namespaces assocs
+       io.files io.encodings.utf8 prettyprint 
        help.lint
-       bootstrap.stage2 benchmark builder.util ;
+       benchmark
+       bootstrap.stage2
+       tools.test tools.vocabs
+       builder.util ;
 
 IN: builder.test
 
 : do-load ( -- )
   try-everything keys "../load-everything-vocabs" utf8 [ . ] with-file-writer ;
 
-! : do-tests ( -- )
-!   run-all-tests keys "../test-all-vocabs" utf8 [ . ] with-file-writer ;
-
 : do-tests ( -- )
   run-all-tests
-  "../test-all-vocabs" utf8
-    [
-        [ keys . ]
-        [ test-failures. ]
-      bi
-    ]
-  with-file-writer ;
+    [ keys "../test-all-vocabs" utf8 [ .              ] with-file-writer ]
+    [      "../test-failures"   utf8 [ test-failures. ] with-file-writer ]
+  bi ;
 
 : do-help-lint ( -- )
   "" run-help-lint "../help-lint" utf8 [ typos. ] with-file-writer ;
