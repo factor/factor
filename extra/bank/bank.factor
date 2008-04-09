@@ -1,33 +1,69 @@
-USING: accessors calendar kernel money new-slots sequences ;
+USING: accessors calendar kernel math money sequences ;
 IN: bank
 
-MIXIN: policy
-TUPLE: simple-policy interest-rate ;
-INSTANCE: simple-policy policy
-C: <simple-policy> simple-policy
+TUPLE: account name interest-rate interest-payment-day opening-date transactions unpaid-interest interest-last-paid ;
 
-GENERIC: interest-rate ( date account policy -- rate )
-M: simple-policy interest-rate 2nip interest-rate>> ;
-
-: daily-interest-rate ( date account policy -- rate )
-    pick days-in-year >r interest-rate r> / ;
-
-TUPLE: account name balance transactions ;
-
-: <account> ( name -- account )
-    0 V{ } clone account construct-boa ;
+: <account> ( name interest-rate interest-payment-day opening-date -- account )
+    V{ } clone 0 pick account construct-boa ;
 
 TUPLE: transaction date amount description ;
-
 C: <transaction> transaction
 
 : >>transaction ( account transaction -- account )
     over transactions>> push ;
 
-: open-account ( date opening-balance name -- account )
-    <account> >r "Account Opened" <transaction> >>transaction ;
+: total ( transactions -- balance )
+    0 [ amount>> + ] reduce ;
 
-: open-account-now ( opening-balance name -- account )
-    now -rot open-account ;
+: balance>> ( account -- balance ) transactions>> total ;
 
+: open-account ( name interest-rate interest-payment-day opening-date opening-balance -- account )
+    >r [ <account> ] keep r> "Account Opened" <transaction> >>transaction ;
 
+: daily-rate ( yearly-rate day -- daily-rate )
+    days-in-year / ;
+
+: daily-rate>> ( account date -- rate )
+    [ interest-rate>> ] dip daily-rate ;
+
+: before? ( date date -- ? ) <=> 0 < ;
+
+: transactions-on-date ( account date -- transactions )
+    [ before? ] curry subset ;
+
+: balance-on-date ( account date -- balance )
+    transactions-on-date total ;
+
+: pay-interest ( account date -- )
+    over unpaid-interest>> "Interest Credit" <transaction>
+    >>transaction 0 >>unpaid-interest drop ;
+
+: interest-payment-day? ( account date -- ? )
+    day>> swap interest-payment-day>> = ;
+
+: ?pay-interest ( account date -- )
+    2dup interest-payment-day? [ pay-interest ] [ 2drop ] if ;
+
+: unpaid-interest+ ( account amount -- account )
+    over unpaid-interest>> + >>unpaid-interest ;
+
+: accumulate-interest ( account date -- )
+    [ dupd daily-rate>> over balance>> * unpaid-interest+ ] keep
+    >>interest-last-paid drop ;
+
+: process-day ( account date -- )
+    2dup accumulate-interest ?pay-interest ;
+
+: each-day ( quot start end -- )
+    2dup before? [
+        >r dup >r over >r swap call r> r> 1 days time+ r> each-day
+    ] [
+        3drop
+    ] if ;
+
+: process-to-date ( account date -- account )
+    over interest-last-paid>> 1 days time+
+    [ dupd process-day ] spin each-day ;
+
+: inserting-transactions ( account transactions -- account )
+    [ [ date>> process-to-date ] keep >>transaction ] each ;
