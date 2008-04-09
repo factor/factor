@@ -103,6 +103,21 @@ DEFINE_PRIMITIVE(os_envs)
 	dpush(result);
 }
 
+DEFINE_PRIMITIVE(set_os_env)
+{
+	char *key = unbox_char_string();
+	REGISTER_C_STRING(key);
+	char *value = unbox_char_string();
+	UNREGISTER_C_STRING(key);
+	setenv(key, value, 1);
+}
+
+DEFINE_PRIMITIVE(unset_os_env)
+{
+	char *key = unbox_char_string();
+	unsetenv(key);
+}
+
 DEFINE_PRIMITIVE(set_os_envs)
 {
 	F_ARRAY *array = untag_array(dpop());

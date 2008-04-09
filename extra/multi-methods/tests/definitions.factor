@@ -29,6 +29,4 @@ DEFER: fake
     [ ] [ \ testing define-generic ] unit-test
 
     [ t ] [ \ testing generic? ] unit-test
-
-    [ t ] [ \ testing "default-multi-method" word-prop method-body? ] unit-test
 ] with-compilation-unit

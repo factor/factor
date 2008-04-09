@@ -587,6 +587,10 @@ set-primitive-effect
 
 \ (os-envs) { } { array } <effect> set-primitive-effect
 
+\ set-os-env { string string } { } <effect> set-primitive-effect
+
+\ unset-os-env { string } { } <effect> set-primitive-effect
+
 \ (set-os-envs) { array } { } <effect> set-primitive-effect
 
 \ do-primitive [ \ do-primitive no-effect ] "infer" set-word-prop

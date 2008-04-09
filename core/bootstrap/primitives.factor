@@ -732,6 +732,8 @@ define-builtin
     { "set-innermost-frame-quot" "kernel.private" }
     { "call-clear" "kernel" }
     { "(os-envs)" "system.private" }
+    { "set-os-env" "system" }
+    { "unset-os-env" "system" }
     { "(set-os-envs)" "system.private" }
     { "resize-byte-array" "byte-arrays" }
     { "resize-bit-array" "bit-arrays" }
