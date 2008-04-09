@@ -11,27 +11,37 @@ IN: tools.vocabs.monitor
 
 : path>vocab-name ( path -- vocab )
     dup ".factor" tail? [ parent-directory ] when
-    dup [ vocab-dir>vocab-name ] when ;
+     ;
+
+: chop-vocab-root ( path -- path' )
+    "resource:" prepend-path (normalize-path)
+    dup vocab-roots get
+    [ (normalize-path) ] map
+    [ head? ] with find nip
+    ?head drop ;
+
+: path>vocab ( path -- vocab )
+    chop-vocab-root path>vocab-name vocab-dir>vocab-name ;
 
 : changed-vocab ( vocab -- )
     dup vocab
     [ dup changed-vocabs get-global set-at ] [ drop ] if ;
 
-: monitor-thread ( path monitor -- )
+: monitor-thread ( monitor -- )
     #! On OS X, monitors give us the full path, so we chop it
     #! off if its there.
-    next-change drop swap ?head drop
-    path>vocab-name changed-vocab reset-cache ;
+    next-change drop path>vocab changed-vocab reset-cache ;
 
-: start-monitor-thread ( root -- )
+: start-monitor-thread ( monitor -- )
     #! Silently ignore errors during monitor creation since
     #! monitors are not supported on all platforms.
-    (normalize-path) dup t <monitor> [ monitor-thread t ] 2curry
-    "Vocabulary monitor" spawn-server drop ;
+    [ monitor-thread t ] curry
+    "Vocabulary monitor" spawn-server
+    drop ;
 
 : start-monitor-threads ( -- )
     [
-        vocab-roots get [ start-monitor-thread ] each
+        "" resource-path t <monitor> start-monitor-thread
         H{ } clone changed-vocabs set-global
         vocabs [ changed-vocab ] each
     ] ignore-errors ;
