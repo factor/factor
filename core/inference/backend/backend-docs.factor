@@ -4,7 +4,7 @@ kernel.private combinators sequences.private ;
 
 HELP: literal-expected
 { $error-description "Thrown when inference encounters a " { $link call } " or " { $link if } " being applied to a value which is not known to be a literal. Such a form can have an arbitrary stack effect, and does not compile." }
-{ $notes "This error will be thrown when compiling any combinator, such as " { $link each } ". However, words calling combinators can compile of the combinator is declared " { $link POSTPONE: inline } " and the quotation being passed in is a literal." } ;
+{ $notes "This error will be thrown when compiling any combinator, such as " { $link each } ". However, words calling combinators can compile if the combinator is declared " { $link POSTPONE: inline } " and the quotation being passed in is a literal." } ;
 
 HELP: too-many->r
 { $error-description "Thrown if inference notices a quotation pushing elements on the retain stack without popping them at the end." }
