@@ -1,6 +1,7 @@
 USING: help.syntax help.markup words effects inference.dataflow
-inference.state inference.backend kernel sequences
+inference.state kernel sequences
 kernel.private combinators sequences.private ;
+IN: inference.backend
 
 HELP: literal-expected
 { $error-description "Thrown when inference encounters a " { $link call } " or " { $link if } " being applied to a value which is not known to be a literal. Such a form can have an arbitrary stack effect, and does not compile." }
