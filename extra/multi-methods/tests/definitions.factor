@@ -4,7 +4,6 @@ kernel strings words compiler.units quotations ;
 
 \ GENERIC: must-infer
 \ create-method-in must-infer
-\ define-default-method must-infer
 
 DEFER: fake
 \ fake H{ } clone "multi-methods" set-word-prop
@@ -17,11 +16,9 @@ DEFER: fake
 [ t ] [ { } \ fake <method> method-body? ] unit-test
 
 [
-    [ ] [ \ fake define-default-method ] unit-test
-
     [ { } [ ] ] [ \ fake methods prepare-methods >r sort-methods r> ] unit-test
 
-    [ t ] [ { } \ fake multi-dispatch-quot quotation? ] unit-test
+    [ t ] [ { } \ fake multi-dispatch-quot callable? ] unit-test
 
     [ t ] [ \ fake make-generic quotation? ] unit-test
 

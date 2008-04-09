@@ -1,7 +1,7 @@
 IN: multi-methods.tests
 USING: multi-methods tools.test math sequences namespaces system
 kernel strings definitions prettyprint debugger arrays
-hashtables continuations classes assocs ;
+hashtables continuations classes assocs accessors ;
 
 GENERIC: first-test
 
@@ -25,6 +25,7 @@ METHOD: beats? { thing thing } f ;
 [ { } 3 play ] must-fail
 [ t ] [ error get no-method? ] unit-test
 [ ] [ error get error. ] unit-test
+[ { { } 3 } ] [ error get arguments>> ] unit-test
 [ t ] [ paper scissors play ] unit-test
 [ f ] [ scissors paper play ] unit-test
 
@@ -44,6 +45,11 @@ METHOD: hook-test { hashtable { some-var number } } assoc-size ;
 [ fixnum ] [ 3 hook-test ] unit-test
 5.0 some-var set
 [ 0 ] [ H{ } hook-test ] unit-test
+
+"error" some-var set
+[ H{ } hook-test ] must-fail
+[ t ] [ error get no-method? ] unit-test
+[ { H{ } "error" } ] [ error get arguments>> ] unit-test
 
 MIXIN: busted
 

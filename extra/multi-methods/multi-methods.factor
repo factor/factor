@@ -117,9 +117,18 @@ SYMBOL: total
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
     ] if ;
 
+: argument-count ( methods -- n )
+    keys 0 [ length max ] reduce ;
+
+ERROR: no-method arguments generic ;
+
+: make-default-method ( methods generic -- quot )
+    >r argument-count r> [ >r narray r> no-method ] 2curry ;
+
 : multi-dispatch-quot ( methods generic -- quot )
-    "default-multi-method" word-prop 1quotation swap
-    [ >r multi-predicate r> ] assoc-map reverse alist>quot ;
+    [ make-default-method ]
+    [ drop [ >r multi-predicate r> ] assoc-map reverse ]
+    2bi alist>quot ;
 
 ! Generic words
 PREDICATE: generic < word
@@ -178,11 +187,6 @@ M: method-body crossref?
         drop [ <method> dup ] 2keep reveal-method
     ] if ;
 
-TUPLE: no-method arguments generic ;
-
-: no-method ( argument-count generic -- * )
-    >r narray r> \ no-method construct-boa throw ; inline
-
 : niceify-method [ dup \ f eq? [ drop f ] when ] map ;
 
 M: no-method error.
@@ -196,18 +200,8 @@ M: no-method error.
     dup arguments>> [ class ] map niceify-method .
     nl
     "Available methods: " print
-    generic>> methods keys
-    [ niceify-method ] map stack. ;
-
-: make-default-method ( generic -- quot )
-    [ 0 swap no-method ] curry ;
-
-: <default-method> ( generic -- method )
-    [ { } swap <method> ] keep
-    [ drop ] [ make-default-method define ] 2bi ;
-
-: define-default-method ( generic -- )
-    dup <default-method> "default-multi-method" set-word-prop ;
+    generic>> methods canonicalize-specializers drop sort-methods
+    keys [ niceify-method ] map stack. ;
 
 : forget-method ( specializer generic -- )
     [ delete-at ] with-methods ;
@@ -221,9 +215,8 @@ M: no-method error.
         drop
     ] [
         [ H{ } clone "multi-methods" set-word-prop ]
-        [ define-default-method ]
         [ update-generic ]
-        tri
+        bi
     ] if ;
 
 ! Syntax
