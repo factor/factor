@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: threads io.files io.monitors init kernel
 vocabs vocabs.loader tools.vocabs namespaces continuations
-sequences splitting assocs ;
+sequences splitting assocs command-line ;
 IN: tools.vocabs.monitor
 
 : vocab-dir>vocab-name ( path -- vocab )
@@ -32,18 +32,20 @@ IN: tools.vocabs.monitor
     #! off if its there.
     next-change drop path>vocab changed-vocab reset-cache ;
 
-: start-monitor-thread ( monitor -- )
+: start-monitor-thread ( -- )
     #! Silently ignore errors during monitor creation since
     #! monitors are not supported on all platforms.
-    [ monitor-thread t ] curry
-    "Vocabulary monitor" spawn-server
-    drop ;
-
-: start-monitor-threads ( -- )
     [
-        "" resource-path t <monitor> start-monitor-thread
+        "" resource-path t <monitor> [ monitor-thread t ] curry
+        "Vocabulary monitor" spawn-server drop
+
         H{ } clone changed-vocabs set-global
+
         vocabs [ changed-vocab ] each
     ] ignore-errors ;
 
-[ start-monitor-threads ] "tools.vocabs.monitor" add-init-hook
+[
+    "-no-monitors" cli-args get member? [
+        start-monitor-thread
+    ] unless
+] "tools.vocabs.monitor" add-init-hook
