@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays calendar combinators channels concurrency.messaging fry io
        io.encodings.8-bit io.sockets kernel math namespaces sequences
-       sequences.lib singleton splitting strings threads
+       sequences.lib splitting strings threads
        continuations classes.tuple ascii accessors ;
 IN: irc
 
@@ -209,7 +209,7 @@ M: nick-in-use handle-irc ( obj -- )
         { "KICK" [ \ kick ] }
         [ drop \ unhandled ]
     } case
-    [ [ tuple-slots ] [ parameters>> ] bi append ] dip add* >tuple ;
+    [ [ tuple-slots ] [ parameters>> ] bi append ] dip prefix >tuple ;
 
 ! Reader
 : handle-reader-message ( irc-client irc-message -- )

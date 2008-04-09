@@ -21,15 +21,15 @@ IN: tools.vocabs
 
 : vocab-tests ( vocab -- tests )
     [
-        dup vocab-tests-file [ , ] when*
-        vocab-tests-dir [ % ] when*
+        [ vocab-tests-file [ , ] when* ]
+        [ vocab-tests-dir [ % ] when* ] bi
     ] { } make ;
 
 : vocab-files ( vocab -- seq )
     [
-        dup vocab-source-path [ , ] when*
-        dup vocab-docs-path [ , ] when*
-        vocab-tests %
+        [ vocab-source-path [ , ] when* ]
+        [ vocab-docs-path [ , ] when* ]
+        [ vocab-tests % ] tri
     ] { } make ;
 
 : source-modified? ( path -- ? )
@@ -56,20 +56,27 @@ IN: tools.vocabs
 : modified-docs ( vocabs -- seq )
     [ vocab-docs-path ] modified ;
 
+SYMBOL: changed-vocabs
+
+[ f changed-vocabs set-global ] "tools.vocabs" add-init-hook
+
+: filter-changed ( vocabs -- vocabs' )
+    changed-vocabs get [
+        [ delete-at* nip ] curry subset
+    ] when* ;
+
 : to-refresh ( prefix -- modified-sources modified-docs )
-    child-vocabs
-    dup modified-sources swap modified-docs ;
+    child-vocabs filter-changed
+    [ modified-sources ] [ modified-docs ] bi ;
 
 : vocab-heading. ( vocab -- )
     nl
     "==== " write
-    dup vocab-name swap vocab write-object ":" print
+    [ vocab-name ] [ vocab write-object ] bi ":" print
     nl ;
 
 : load-error. ( triple -- )
-    dup first vocab-heading.
-    dup second print-error
-    drop ;
+    [ first vocab-heading. ] [ second print-error ] bi ;
 
 : load-failures. ( failures -- )
     [ load-error. nl ] each ;
@@ -89,30 +96,24 @@ SYMBOL: failures
     ] with-compiler-errors ;
 
 : do-refresh ( modified-sources modified-docs -- )
-    2dup
-    [ f swap set-vocab-docs-loaded? ] each
-    [ f swap set-vocab-source-loaded? ] each
-    append prune require-all load-failures. ;
+    [
+        [ [ f swap set-vocab-source-loaded? ] each ]
+        [ [ f swap set-vocab-docs-loaded? ] each ] bi*
+    ]
+    [ append prune require-all load-failures. ] 2bi ;
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 
-SYMBOL: sources-changed?
+: refresh-all ( -- ) "" refresh ;
 
-[ t sources-changed? set-global ] "tools.vocabs" add-init-hook
-
-: refresh-all ( -- )
-    "" refresh f sources-changed? set-global ;
-
-MEMO: (vocab-file-contents) ( path -- lines )
-    dup exists? [ utf8 file-lines ] [ drop f ] if ;
-
-: vocab-file-contents ( vocab name -- seq )
-    vocab-append-path dup [ (vocab-file-contents) ] when ;
+MEMO: vocab-file-contents ( vocab name -- seq )
+    vocab-append-path dup
+    [ dup exists? [ utf8 file-lines ] [ drop f ] if ] when ;
 
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-append-path [
         utf8 set-file-lines
-        \ (vocab-file-contents) reset-memoized
+        \ vocab-file-contents reset-memoized
     ] [
         "The " swap vocab-name
         " vocabulary was not loaded from the file system"
@@ -261,7 +262,7 @@ MEMO: all-authors ( -- seq )
 
 : reset-cache ( -- )
     root-cache get-global clear-assoc
-    \ (vocab-file-contents) reset-memoized
+    \ vocab-file-contents reset-memoized
     \ all-vocabs-seq reset-memoized
     \ all-authors reset-memoized
     \ all-tags reset-memoized ;
