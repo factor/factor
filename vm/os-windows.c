@@ -215,6 +215,21 @@ void sleep_millis(DWORD msec)
 	Sleep(msec);
 }
 
+DEFINE_PRIMITIVE(set_os_env)
+{
+	F_CHAR *key = unbox_u16_string();
+	REGISTER_C_STRING(key);
+	F_CHAR *value = unbox_u16_string();
+	UNREGISTER_C_STRING(key);
+	SetEnvironmentVariable(key, value);
+}
+
+DEFINE_PRIMITIVE(unset_os_env)
+{
+	F_CHAR *key = unbox_u16_string();
+	SetEnvironmentVariable(key, NULL);
+}
+
 DEFINE_PRIMITIVE(set_os_envs)
 {
 	not_implemented_error();
