@@ -10,8 +10,7 @@ IN: tools.vocabs.monitor
     { { CHAR: / CHAR: . } { CHAR: \\ CHAR: . } } substitute ;
 
 : path>vocab-name ( path -- vocab )
-    dup ".factor" tail? [ parent-directory ] when
-     ;
+    dup ".factor" tail? [ parent-directory ] when ;
 
 : chop-vocab-root ( path -- path' )
     "resource:" prepend-path (normalize-path)
@@ -22,10 +21,6 @@ IN: tools.vocabs.monitor
 
 : path>vocab ( path -- vocab )
     chop-vocab-root path>vocab-name vocab-dir>vocab-name ;
-
-: changed-vocab ( vocab -- )
-    dup vocab
-    [ dup changed-vocabs get-global set-at ] [ drop ] if ;
 
 : monitor-thread ( monitor -- )
     #! On OS X, monitors give us the full path, so we chop it
