@@ -31,4 +31,8 @@ os { winnt macosx linux } member? [
     [ ] [ "monitor-test/xyz/test.txt" temp-file touch-file ] unit-test
 
     [ ] [ "c" get 30 seconds await-timeout ] unit-test
+
+    [ ] [ "m" get dispose ] unit-test
+
+    [ "m" get dispose ] must-fail
 ] when
