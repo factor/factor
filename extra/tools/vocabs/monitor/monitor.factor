@@ -45,7 +45,7 @@ IN: tools.vocabs.monitor
     ] ignore-errors ;
 
 [
-    "-no-monitors" cli-args get member? [
+    "-no-monitors" cli-args member? [
         start-monitor-thread
     ] unless
 ] "tools.vocabs.monitor" add-init-hook
