@@ -32,6 +32,8 @@ IN: processing.gallery.bubble-chamber
 
 : dim ( -- dim ) 1000 ;
 
+: center ( -- point ) dim 2 / dup {2} ; foldable
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 VAR: collision-theta
@@ -73,7 +75,7 @@ VARS: particles muons quarks hadrons axions ;
     T{ rgba f 0.47 0.42 0.56 1 }
   } ;
 
-: good-color ( i -- color ) good-colors nth-of ;
+: anti-colors ( -- seq ) good-colors <reversed> ; 
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -86,6 +88,26 @@ VARS: particles muons quarks hadrons axions ;
   dup
   { [ x dim neg < ] [ x dim 2 * > ] [ y dim neg < ] [ y dim 2 * > ] } cleave
   or or or ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: theta-dd-small? ( par limit -- par ? ) >r dup theta-dd>> abs r> < ;
+
+: random-theta-dd  ( par a b -- par ) 2random >>theta-dd ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: turn ( particle -- particle )
+  dup
+    [ speed>> ] [ theta>> { sin cos } <arr> ] bi n*v
+  >>vel ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: step-theta     ( p -- p ) [ ] [ theta>>   ] [ theta-d>>  ] tri + >>theta   ;
+: step-theta-d   ( p -- p ) [ ] [ theta-d>> ] [ theta-dd>> ] tri + >>theta-d ;
+: step-speed-sub ( p -- p ) [ ] [ speed>>   ] [ speed-d>>  ] tri - >>speed   ;
+: step-speed-mul ( p -- p ) [ ] [ speed>>   ] [ speed-d>>  ] tri * >>speed   ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -120,32 +142,36 @@ TUPLE: muon < particle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: color-fraction ( particle -- particle fraction ) dup theta>> pi + 2 pi * / ;
+
+: set-good-color ( particle -- particle )
+  color-fraction dup 0 1 between?
+    [ good-colors at-fraction-of >>myc ]
+    [ drop ]
+  if ;
+
+: set-anti-color ( particle -- particle )
+  color-fraction dup 0 1 between?
+    [ anti-colors at-fraction-of >>mya ]
+    [ drop ]
+  if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 METHOD: collide { muon }
 
-  dim 2 / dup 2array     >>pos
-  2 32 [a,b] random      >>speed
-  0.0001 0.001 2random   >>speed-d
+  center               >>pos
+  2 32 [a,b] random    >>speed
+  0.0001 0.001 2random >>speed-d
 
   collision-theta>  -0.1 0.1 2random + >>theta
   0                                    >>theta-d
   0                                    >>theta-dd
 
-  [ dup theta-dd>> abs 0.001 < ]
-    [ -0.1 0.1 2random >>theta-dd ]
-    [ ]
-  while
+  [ 0.001 theta-dd-small? ] [ -0.1 0.1 random-theta-dd ] [ ] while
 
-  dup theta>> pi         +
-  2 pi *                 /
-  good-colors length 1 - *
-  [ ] [ good-colors length >= ] [ 0 < ] tri or
-    [ drop ]
-    [
-      [ good-color >>myc ]
-      [ good-colors length swap - 1 - good-color >>mya ]
-      bi
-    ]
-  if
+  set-good-color
+  set-anti-color
 
   drop ;
 
@@ -163,14 +189,11 @@ METHOD: move { muon }
     [ speed>> ] [ theta>> { sin cos } <arr> ] bi n*v
   move-by
 
-  [ ] [ theta>>   ] [ theta-d>>  ] tri + >>theta
-  [ ] [ theta-d>> ] [ theta-dd>> ] tri + >>theta-d
-  [ ] [ speed>>   ] [ speed-d>>  ] tri - >>speed
+  step-theta
+  step-theta-d
+  step-speed-sub
 
-  out-of-bounds?
-    [ collide ]
-    [ drop    ]
-  if ;
+  out-of-bounds? [ collide ] [ drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -182,7 +205,7 @@ TUPLE: quark < particle ;
 
 METHOD: collide { quark }
 
-  dim 2 / dup 2array                     >>pos
+  center                     >>pos
   collision-theta> -0.11 0.11 2random +  >>theta
   0.5 3.0 2random                        >>speed
 
@@ -190,10 +213,7 @@ METHOD: collide { quark }
   0                                      >>theta-d
   0                                      >>theta-dd
 
-  [ dup theta-dd>> abs 0.00001 < ]
-    [ -0.001 0.001 2random >>theta-dd ]
-    [ ]
-  while
+  [ 0.00001 theta-dd-small? ] [ -0.001 0.001 random-theta-dd ] [ ] while
 
   drop ;
 
@@ -208,26 +228,20 @@ METHOD: move { quark }
 
   [ ] [ vel>> ] bi move-by
 
-  dup
-    [ speed>> ] [ theta>> { sin cos } <arr> ] bi n*v
-  >>vel
+  turn
 
-  [ ] [ theta>>   ] [ theta-d>>  ] tri + >>theta
-  [ ] [ theta-d>> ] [ theta-dd>> ] tri + >>theta-d
-  [ ] [ speed>>   ] [ speed-d>>  ] tri * >>speed
+  step-theta
+  step-theta-d
+  step-speed-mul
 
-  ! 1000 random 997 >
-  3/1000 chance
+  1000 random 997 >
     [
       dup speed>> neg    >>speed
       2 over speed-d>> - >>speed-d
     ]
   when
 
-  out-of-bounds?
-    [ collide ]
-    [ drop    ]
-  if ;
+  out-of-bounds? [ collide ] [ drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -239,18 +253,14 @@ TUPLE: hadron < particle ;
 
 METHOD: collide { hadron }
 
-  dim 2 / dup 2array >>pos
-  2 pi *  1random    >>theta
-  0.5 3.5 2random    >>speed
-
+  center              >>pos
+  2 pi *      1random >>theta
+  0.5   3.5   2random >>speed
   0.996 1.001 2random >>speed-d
   0                   >>theta-d
   0                   >>theta-dd
 
-  [ dup theta-dd>> abs 0.00001 < ]
-    [ -0.001 0.001 2random >>theta-dd ]
-    [ ]
-  while
+  [ 0.00001 theta-dd-small? ] [ -0.001 0.001 random-theta-dd ] [ ] while
 
   0 1 0 <rgb> >>myc
 
@@ -268,34 +278,22 @@ METHOD: move { hadron }
 
   dup vel>> move-by
 
-  dup
-    [ speed>> ] [ theta>> { sin cos } <arr> ] bi n*v
-  >>vel
+  turn
 
-  [ ] [ theta>>   ] [ theta-d>>  ] tri + >>theta
-  [ ] [ theta-d>> ] [ theta-dd>> ] tri + >>theta-d
-  [ ] [ speed>>   ] [ speed-d>>  ] tri * >>speed
+  step-theta
+  step-theta-d
+  step-speed-mul
 
-  ! 1000 random 997 >
-  3/1000 chance
+  1000 random 997 >
     [
       1.0     >>speed-d
       0.00001 >>theta-dd
 
-      ! 100 random 70 >
-      30/100 chance
-        [
-          dim 2 / dup 2array >>pos
-          dup collide
-        ]
-      when
+      100 random 70 > [ dup collide ] when
     ]
   when
 
-  out-of-bounds?
-    [ collide ]
-    [ drop ]
-  if ;
+  out-of-bounds? [ collide ] [ drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -307,20 +305,26 @@ TUPLE: axion < particle ;
 
 METHOD: collide { axion }
 
-  dim 2 / dup 2array >>pos
-  2 pi * 1random     >>theta
-  1.0 6.0 2random    >>speed
-
+  center              >>pos
+  2 pi *      1random >>theta
+  1.0   6.0   2random >>speed
   0.998 1.000 2random >>speed-d
   0                   >>theta-d
   0                   >>theta-dd
 
-  [ dup theta-dd>> abs 0.00001 < ]
-    [ -0.001 0.001 2random >>theta-dd ]
-    [ ]
-  while
+  [ 0.00001 theta-dd-small? ] [ -0.001 0.001 random-theta-dd ] [ ] while
 
   drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: dy>alpha ( dy -- alpha ) neg 6 * 30 + 255.0 / ;
+
+: axion-white ( dy -- dy ) dup 1 swap dy>alpha {2} stroke ;
+: axion-black ( dy -- dy ) dup 0 swap dy>alpha {2} stroke ;
+
+: axion-point- ( particle dy -- particle ) >r dup pos>> r> v-y point ;
+: axion-point+ ( particle dy -- particle ) >r dup pos>> r> v+y point ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -329,57 +333,28 @@ METHOD: move { axion }
   { 0.06 0.59 } stroke
   dup pos>>  point
 
-  1 4 [a,b]
-    [| dy |
-      1 30 dy 6 * - 255.0 / 2array stroke
-      dup pos>> 0 dy neg 2array v+ point
-    ] with-locals
-  each
-
-  1 4 [a,b]
-    [| dy |
-      0 30 dy 6 * - 255.0 / 2array stroke
-      dup pos>> dy v+y point
-    ] with-locals
-  each
+  1 4 [a,b] [ axion-white axion-point- ] each
+  1 4 [a,b] [ axion-black axion-point+ ] each
 
   dup vel>> move-by
 
-  dup
-    [ speed>> ] [ theta>> { sin cos } <arr> ] bi n*v
-  >>vel
+  turn
 
-  [ ] [ theta>>   ] [ theta-d>>  ] tri + >>theta
-  [ ] [ theta-d>> ] [ theta-dd>> ] tri + >>theta-d
-  [ ] [ speed>>   ] [ speed-d>>  ] tri * >>speed
+  step-theta
+  step-theta-d
+  step-speed-mul
 
   [ ] [ speed-d>> 0.9999 * ] bi >>speed-d
 
-  ! 1000 random 996 >
-  4/1000 chance
+  1000 random 996 >
     [
-      dup speed>> neg       >>speed
+      dup speed>>   neg     >>speed
       dup speed-d>> neg 2 + >>speed-d
 
-      ! 100 random 30 >
-      70/100 chance
-        [
-          dim 2 / dup 2array >>pos
-          collide
-        ]
-        [ drop ]
-      if
+      100 random 30 > [ collide ] [ drop ] if
     ]
     [ drop ]
   if ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! : draw ( -- )
-
-!   boom>
-!     [ particles> [ move ] each ]
-!   when ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
