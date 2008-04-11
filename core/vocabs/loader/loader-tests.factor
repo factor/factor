@@ -3,7 +3,7 @@ IN: vocabs.loader.tests
 USING: vocabs.loader tools.test continuations vocabs math
 kernel arrays sequences namespaces io.streams.string
 parser source-files words assocs classes.tuple definitions
-debugger compiler.units tools.vocabs ;
+debugger compiler.units tools.vocabs accessors ;
 
 ! This vocab should not exist, but just in case...
 [ ] [
@@ -68,7 +68,7 @@ IN: vocabs.loader.tests
     <string-reader>
     "resource:core/vocabs/loader/test/a/a.factor"
     parse-stream
-] [ [ no-word-error? ] is? ] must-fail-with
+] [ error>> error>> no-word-error? ] must-fail-with
 
 0 "count-me" set-global
 
@@ -109,6 +109,8 @@ IN: vocabs.loader.tests
         [ forget-source ] each
     ] with-compilation-unit
 ] unit-test
+
+[ ] [ "vocabs.loader.test.b" changed-vocab ] unit-test
 
 [ ] [ "vocabs.loader.test.b" refresh ] unit-test
 

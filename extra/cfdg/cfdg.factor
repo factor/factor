@@ -32,7 +32,7 @@ VAR: color
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: hsva>rgba ( hsva -- rgba ) [ 3 head hsv>rgb ] [ peek ] bi add ;
+: hsva>rgba ( hsva -- rgba ) [ 3 head hsv>rgb ] [ peek ] bi suffix ;
 
 : gl-set-hsba ( hsva -- ) hsva>rgba gl-color ;
 

@@ -3,7 +3,7 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
 classes.algebra vectors definitions source-files
-compiler.units ;
+compiler.units kernel.private ;
 IN: classes.tests
 
 ! DEFER: bah
@@ -153,3 +153,10 @@ TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
 ! Test generic see and parsing
 [ "USING: alien math ;\nIN: classes.tests\nUNION: bah fixnum alien ;\n" ]
 [ [ \ bah see ] with-string-writer ] unit-test
+
+[ t ] [ 3 object instance? ] unit-test
+[ t ] [ 3 fixnum instance? ] unit-test
+[ f ] [ 3 float instance? ] unit-test
+[ t ] [ 3 number instance? ] unit-test
+[ f ] [ 3 null instance? ] unit-test
+[ t ] [ "hi" \ hi-tag instance? ] unit-test

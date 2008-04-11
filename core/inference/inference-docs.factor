@@ -79,6 +79,18 @@ ARTICLE: "dataflow-graphs" "Inspecting the dataflow graph"
 "The " { $vocab-link "optimizer.debugger" } " tool prints the dataflow graph in human readable form."
 $nl ;
 
+ARTICLE: "inference-errors" "Inference errors"
+"Main wrapper for all inference errors:"
+{ $subsection inference-error }
+"Specific inference errors:"
+{ $subsection no-effect }
+{ $subsection literal-expected }
+{ $subsection too-many->r }
+{ $subsection too-many-r> }
+{ $subsection unbalanced-branches-error }
+{ $subsection effect-error }
+{ $subsection recursive-declare-error } ;
+
 ARTICLE: "inference" "Stack effect inference"
 "The stack effect inference tool is used to check correctness of code before it is run. It is also used by the compiler to build a dataflow graph on which optimizations can be performed. Only words for which a stack effect can be inferred will compile."
 $nl
@@ -93,7 +105,8 @@ $nl
 { $subsection "inference-combinators" }
 { $subsection "inference-branches" }
 { $subsection "inference-recursive" } 
-{ $subsection "inference-limitations" } 
+{ $subsection "inference-limitations" }
+{ $subsection "inference-errors" }
 { $subsection "dataflow-graphs" }
 { $subsection "compiler-transforms" } ;
 
@@ -105,16 +118,7 @@ HELP: inference-error
 { $error-description
     "Thrown by " { $link infer } " and " { $link dataflow } " when the stack effect of a quotation cannot be inferred."
     $nl
-    "This error always delegates to one of the following classes of errors, which indicate the specific issue preventing a stack effect from being inferred:"
-    { $list
-        { $link no-effect }
-        { $link literal-expected }
-        { $link too-many->r }
-        { $link too-many-r> }
-        { $link unbalanced-branches-error }
-        { $link effect-error }
-        { $link recursive-declare-error }
-    }
+    "The " { $snippet "error" } " slot contains one of several possible " { $link "inference-errors" } "."
 } ;
 
 

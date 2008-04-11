@@ -2,7 +2,7 @@
 USING: kernel namespaces sequences splitting system combinators continuations
        parser io io.files io.launcher io.sockets prettyprint threads
        bootstrap.image benchmark vars bake smtp builder.util accessors
-       io.encodings.utf8
+       debugger io.encodings.utf8
        calendar
        tools.test
        builder.common
@@ -13,16 +13,22 @@ IN: builder
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : cd ( path -- ) current-directory set ;
-
 : cd ( path -- ) set-current-directory ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: builds/factor ( -- path ) builds "factor" append-path ;
+: build-dir     ( -- path ) builds stamp>   append-path ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : prepare-build-machine ( -- )
   builds make-directory
-  builds cd
-  { "git" "clone" "git://factorcode.org/git/factor.git" } run-process drop ;
+  builds
+    [
+      { "git" "clone" "git://factorcode.org/git/factor.git" } try-process
+    ]
+  with-directory ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -51,22 +57,14 @@ IN: builder
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : gnu-make ( -- string )
-  os { "freebsd" "openbsd" "netbsd" } member?
+  os { freebsd openbsd netbsd } member?
     [ "gmake" ]
     [ "make"  ]
   if ;
 
-! : do-make-clean ( -- ) { "make" "clean" } try-process ;
-
 : do-make-clean ( -- ) { gnu-make "clean" } to-strings try-process ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! : make-vm ( -- desc )
-!   <process>
-!     { "make" }       >>command
-!     "../compile-log" >>stdout
-!     +stdout+         >>stderr ;
 
 : make-vm ( -- desc )
   <process>
@@ -80,8 +78,8 @@ IN: builder
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : copy-image ( -- )
-  builds "factor" append-path my-boot-image-name append-path ".." copy-file-into
-  builds "factor" append-path my-boot-image-name append-path "."  copy-file-into ;
+  builds/factor my-boot-image-name append-path ".." copy-file-into
+  builds/factor my-boot-image-name append-path "."  copy-file-into ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -94,7 +92,7 @@ IN: builder
     +closed+      >>stdin
     "../boot-log" >>stdout
     +stdout+      >>stderr
-    20 minutes    >>timeout ;
+    60 minutes    >>timeout ;
 
 : do-bootstrap ( -- )
   bootstrap [ "Bootstrap error" print "../boot-log" cat ] run-or-bail ;
@@ -108,7 +106,7 @@ IN: builder
     +closed+         >>stdin
     "../test-log"    >>stdout
     +stdout+         >>stderr
-    120 minutes      >>timeout ;
+    240 minutes      >>timeout ;
 
 : do-builder-test ( -- )
   builder-test [ "Test error" print "../test-log" 100 cat-n ] run-or-bail ;
@@ -127,10 +125,10 @@ SYMBOL: build-status
 
   "report" utf8
     [
-      "Build machine:   " write host-name print
-      "CPU:             " write cpu       print
-      "OS:              " write os        print
-      "Build directory: " write cwd       print
+      "Build machine:   " write host-name             print
+      "CPU:             " write cpu                   .
+      "OS:              " write os                    .
+      "Build directory: " write current-directory get print
 
       git-clone [ "git clone failed" print ] run-or-bail
 
@@ -157,8 +155,6 @@ SYMBOL: build-status
       
       "Did not pass test-all: "        print "test-all-vocabs"        cat
                                              "test-failures"          cat
-      
-!       "test-failures" eval-file test-failures.
       
       "help-lint results:"             print "help-lint"              cat
 
@@ -196,15 +192,27 @@ SYMBOL: builder-recipients
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: compress-image ( -- )
-  { "bzip2" my-boot-image-name } to-strings run-process drop ;
+: compress-image ( -- ) { "bzip2" my-boot-image-name } to-strings try-process ;
+
+! : build ( -- )
+!   [ (build) ] try
+!   builds cd stamp> cd
+!   [ send-builder-email ] try
+!   { "rm" "-rf" "factor" } [ ] run-or-bail
+!   [ compress-image ] try ;
 
 : build ( -- )
-  [ (build) ] failsafe
-  builds cd stamp> cd
-  [ send-builder-email ] [ drop "not sending mail" . ] recover
-  { "rm" "-rf" "factor" } run-process drop
-  [ compress-image ] failsafe ;
+  [
+    (build)
+    build-dir
+      [
+        { "rm" "-rf" "factor" } try-process
+        compress-image
+      ]
+    with-directory
+  ]
+  try
+  send-builder-email ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -221,7 +229,7 @@ USE: bootstrap.image.download
 
 : updates-available? ( -- ? )
   git-id
-  git-pull run-process drop
+  git-pull try-process
   git-id
   = not ;
 
@@ -234,12 +242,15 @@ USE: bootstrap.image.download
 : build-loop ( -- )
   builds-check
   [
-    builds "/factor" append cd
-    updates-available? new-image-available? or
-      [ build ]
-    when
+    builds/factor
+      [
+        updates-available? new-image-available? or
+          [ build ]
+        when
+      ]
+    with-directory
   ]
-  failsafe
+  try
   5 minutes sleep
   build-loop ;
 

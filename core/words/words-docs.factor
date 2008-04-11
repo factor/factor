@@ -324,11 +324,7 @@ HELP: constructor-word
 { $description "Creates a new word, surrounding " { $snippet "name" } " in angle brackets." }
 { $examples { $example "USING: prettyprint words ;" "\"salmon\" \"scratchpad\" constructor-word ." "<salmon>" } } ;
 
-HELP: forget-word
-{ $values { "word" word } }
-{ $description "Removes a word from its vocabulary. User code should call " { $link forget } " instead, since it also does the right thing when forgetting class words." } ;
-
-{ POSTPONE: FORGET: forget forget-word forget-vocab } related-words
+{ POSTPONE: FORGET: forget forget* forget-vocab } related-words
 
 HELP: target-word
 { $values { "word" word } { "target" word } }

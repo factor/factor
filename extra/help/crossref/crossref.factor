@@ -14,7 +14,7 @@ M: link uses
     collect-elements [ \ f or ] map ;
 
 : help-path ( topic -- seq )
-    [ dup ] [ [ article-parent ] keep ] [ ] unfold nip 1 tail ;
+    [ article-parent ] follow 1 tail ;
 
 : set-article-parents ( parent article -- )
     article-children [ set-article-parent ] with each ;

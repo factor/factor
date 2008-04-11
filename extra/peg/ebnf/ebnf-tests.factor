@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.ebnf words math math.parser ;
+USING: kernel tools.test peg peg.ebnf words math math.parser sequences ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -180,6 +180,55 @@ IN: peg.ebnf.tests
   { 1 2 "a" 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call parse-result-ast
 ] unit-test
 
+{ f } [
+  "ab" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call 
+] unit-test
+
+{ V{ "a" " " "b" } } [
+  "a b" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" "\t" "b" } } [
+  "a\tb" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call parse-result-ast 
+] unit-test
+
+{ V{ "a" "\n" "b" } } [
+  "a\nb" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" f "b" } } [
+  "ab" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" " " "b" } } [
+  "a b" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+] unit-test
+
+
+{ V{ "a" "\t" "b" } } [
+  "a\tb" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" "\n" "b" } } [
+  "a\nb" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" "b" } } [
+  "ab" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" "b" } } [
+  "a\tb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call parse-result-ast
+] unit-test
+
+{ V{ "a" "b" } } [
+  "a\nb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call parse-result-ast
+] unit-test
+
+{ f } [
+  "axb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call 
+] unit-test
+
 { V{ V{ 49 } "+" V{ 49 } } } [ 
   #! Test direct left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
@@ -198,9 +247,13 @@ IN: peg.ebnf.tests
   "1+1+1" [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF] call parse-result-ast
 ] unit-test
 
+{ t } [
+  "abcd='9' | ('8'):x => [[ drop x ]]" 'ebnf' parse parse-result-remaining empty?
+] unit-test
+
 EBNF: primary 
 Primary = PrimaryNoNewArray
-PrimaryNoNewArray =  ClassInstanceCreationExpression 
+PrimaryNoNewArray =  ClassInstanceCreationExpression
                    | MethodInvocation
                    | FieldAccess
                    | ArrayAccess
@@ -211,7 +264,7 @@ MethodInvocation =  Primary "." MethodName "(" ")"
                   | MethodName "(" ")"
 FieldAccess =  Primary "." Identifier
              | "super" "." Identifier  
-ArrayAccess =  Primary "[" Expression "]"
+ArrayAccess =  Primary "[" Expression "]" 
              | ExpressionName "[" Expression "]"
 ClassOrInterfaceType = ClassName | InterfaceTypeName
 ClassName = "C" | "D"

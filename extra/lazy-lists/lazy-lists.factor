@@ -78,7 +78,7 @@ M: lazy-cons nil? ( lazy-cons -- bool )
   swap [ cdr ] times car ;
 
 : (llength) ( list acc -- n )
-  over nil? [ nip ] [ >r cdr r> 1+ (llength) ] if ;
+  over nil? [ nip ] [ [ cdr ] dip 1+ (llength) ] if ;
 
 : llength ( list -- n )
   0 (llength) ;
@@ -273,7 +273,7 @@ M: lazy-from-by car ( lazy-from-by -- car )
 
 M: lazy-from-by cdr ( lazy-from-by -- cdr )
   [ lazy-from-by-n ] keep
-  lazy-from-by-quot dup >r call r> lfrom-by ;
+  lazy-from-by-quot dup slip lfrom-by ;
 
 M: lazy-from-by nil? ( lazy-from-by -- bool )
   drop f ;
@@ -365,15 +365,15 @@ M: lazy-concat nil? ( lazy-concat -- bool )
     drop nil
   ] [
     [ car ] keep cdr [ car lcartesian-product ] keep cdr list>array swap [
-      swap [ swap [ add ] lmap-with ] lmap-with lconcat
+      swap [ swap [ suffix ] lmap-with ] lmap-with lconcat
     ] reduce
   ] if ;
 
 : lcomp ( list quot -- result )
-  >r lcartesian-product* r> lmap ;
+  [ lcartesian-product* ] dip lmap ;
 
 : lcomp* ( list guards quot -- result )
-  >r >r lcartesian-product* r> [ lsubset ] each r> lmap ;
+  [ [ lcartesian-product* ] dip [ lsubset ] each ] dip lmap ;
 
 DEFER: lmerge
 
@@ -382,7 +382,7 @@ DEFER: lmerge
   [
     dup [ car ] curry -rot
     [
-      >r cdr r> cdr lmerge
+      [ cdr ] bi@ lmerge
     ] 2curry lazy-cons
   ] 2curry lazy-cons ;
 
@@ -419,7 +419,7 @@ M: lazy-io cdr ( lazy-io -- cdr )
     [ lazy-io-stream ] keep
     [ lazy-io-quot ] keep
     car [
-      >r f f r> <lazy-io> [ swap set-lazy-io-cdr ] keep
+      [ f f ] dip <lazy-io> [ swap set-lazy-io-cdr ] keep
     ] [
       3drop nil
     ] if

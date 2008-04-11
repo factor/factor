@@ -52,11 +52,6 @@ IN: random-tester.safe-words
         >r r>
     } ;
 
-: method-words
-    {
-        forget-word
-    } ;
-
 : stateful-words
     {
         counter
@@ -82,7 +77,6 @@ IN: random-tester.safe-words
         bignum-words %
         initialization-words %
         stack-words %
-        method-words %
         stateful-words %
         exit-words %
         foo-words %

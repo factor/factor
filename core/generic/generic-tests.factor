@@ -21,19 +21,6 @@ M: word   class-of drop "word"   ;
 [ "Hello world" ] [ 4 foobar foobar ] unit-test
 [ "Goodbye cruel world" ] [ 4 foobar ] unit-test
 
-GENERIC: bool>str ( x -- y )
-M: general-t bool>str drop "true" ;
-M: f bool>str drop "false" ;
-
-: str>bool
-    H{
-        { "true" t }
-        { "false" f }
-    } at ;
-
-[ t ] [ t bool>str str>bool ] unit-test
-[ f ] [ f bool>str str>bool ] unit-test
-
 ! Testing unions
 UNION: funnies quotation float complex ;
 
@@ -50,16 +37,6 @@ GENERIC: gooey ( x -- y )
 M: very-funny gooey sq ;
 
 [ 0.25 ] [ 0.5 gooey ] unit-test
-
-DEFER: complement-test
-FORGET: complement-test
-GENERIC: complement-test ( x -- y )
-
-M: f         complement-test drop "f" ;
-M: general-t complement-test drop "general-t" ;
-
-[ "general-t" ] [ 5 complement-test ] unit-test
-[ "f" ] [ f complement-test ] unit-test
 
 GENERIC: empty-method-test ( x -- y )
 M: object empty-method-test ;
@@ -146,17 +123,6 @@ M: integer wii drop 6 ;
 
 [ 3 ] [ T{ first-one } wii ] unit-test
 
-! Hooks
-SYMBOL: my-var
-HOOK: my-hook my-var ( -- x )
-
-M: integer my-hook "an integer" ;
-M: string my-hook "a string" ;
-
-[ "an integer" ] [ 3 my-var set my-hook ] unit-test
-[ "a string" ] [ my-hook my-var set my-hook ] unit-test
-[ 1.0 my-var set my-hook ] [ T{ no-method f 1.0 my-hook } = ] must-fail-with
-
 GENERIC: tag-and-f ( x -- x x )
 
 M: fixnum tag-and-f 1 ;
@@ -170,37 +136,6 @@ M: f tag-and-f 4 ;
 [ f 4 ] [ f tag-and-f ] unit-test
 
 [ 3.4 3 ] [ 3.4 tag-and-f ] unit-test
-
-! define-class hashing issue
-TUPLE: debug-combination ;
-
-M: debug-combination make-default-method
-    2drop [ "Oops" throw ] ;
-
-M: debug-combination perform-combination
-    drop
-    order [ dup class-hashes ] { } map>assoc sort-keys
-    1quotation ;
-
-SYMBOL: redefinition-test-generic
-
-[
-    redefinition-test-generic
-    T{ debug-combination }
-    define-generic
-] with-compilation-unit
-
-TUPLE: redefinition-test-tuple ;
-
-"IN: generic.tests M: redefinition-test-tuple redefinition-test-generic ;" eval
-
-[ t ] [
-    [
-        redefinition-test-generic ,
-        "IN: generic.tests TUPLE: redefinition-test-tuple ;" eval
-        redefinition-test-generic ,
-    ] { } make all-equal?
-] unit-test
 
 ! Issues with forget
 GENERIC: generic-forget-test-1

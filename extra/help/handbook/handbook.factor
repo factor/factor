@@ -2,7 +2,8 @@ USING: help help.markup help.syntax help.definitions help.topics
 namespaces words sequences classes assocs vocabs kernel arrays
 prettyprint.backend kernel.private io generic math system
 strings sbufs vectors byte-arrays bit-arrays float-arrays
-quotations io.streams.byte-array io.encodings.string ;
+quotations io.streams.byte-array io.encodings.string
+classes.builtin ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -152,6 +153,7 @@ ARTICLE: "collections" "Collections"
 "Implementations:"
 { $subsection "hashtables" }
 { $subsection "alists" }
+{ $subsection "enums" }
 { $heading "Other collections" }
 { $subsection "boxes" }
 { $subsection "dlists" }
@@ -261,7 +263,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "collections" }
 { $subsection "io" }
 { $subsection "concurrency" }
-{ $subsection "os" }
+{ $subsection "system" }
 { $subsection "alien" }
 { $heading "Environment reference" }
 { $subsection "cli" }

@@ -25,16 +25,12 @@ IN: tools.deploy.windows
 : image-name ( vocab bundle-name -- str )
     prepend-path ".image" append ;
 
-TUPLE: windows-deploy-implementation ;
-
-T{ windows-deploy-implementation } deploy-implementation set-global
-
-M: windows-deploy-implementation deploy*
+M: winnt deploy*
     "." resource-path [
         dup deploy-config [
             [ deploy-name get create-exe-dir ] keep
             [ deploy-name get image-name ] keep
             [ namespace make-deploy-image ] keep
-            open-in-explorer
+            (normalize-path) open-in-explorer
         ] bind
     ] with-directory ;

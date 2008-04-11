@@ -1,7 +1,7 @@
 USING: help.markup help.syntax generic kernel.private parser
 words kernel quotations namespaces sequences words arrays
-effects generic.standard classes.tuple slots.private classes
-strings math ;
+effects generic.standard classes.tuple classes.builtin
+slots.private classes strings math ;
 IN: slots
 
 ARTICLE: "accessors" "Slot accessors"

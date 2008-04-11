@@ -236,13 +236,13 @@ C: <connection> connection
 
 : fetch-each ( object -- object )
     fetch-statement [
-        buf get alien>char-string res get swap add res set
+        buf get alien>char-string res get swap suffix res set
         fetch-each
     ] [ ] if ;
 
 : run-query ( object -- object )
     execute-statement [
-        buf get alien>char-string res get swap add res set
+        buf get alien>char-string res get swap suffix res set
         fetch-each
     ] [ ] if ;
 

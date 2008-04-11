@@ -24,7 +24,7 @@ ERROR: cairo-error string ;
     } cond ;
 
 : <png> ( path -- png )
-    normalize-pathname
+    normalize-path
     cairo_image_surface_create_from_png
     dup cairo_surface_status cairo-png-error
     dup [ cairo_image_surface_get_width check-zero ]

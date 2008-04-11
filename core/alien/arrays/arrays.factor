@@ -25,7 +25,7 @@ M: array box-return drop "void*" box-return ;
 
 M: array stack-size drop "void*" stack-size ;
 
-M: value-type c-type-reg-class drop T{ int-regs } ;
+M: value-type c-type-reg-class drop int-regs ;
 
 M: value-type c-type-prep drop f ;
 

@@ -3,7 +3,7 @@
 USING: kernel compiler.units parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
        peg.parsers unicode.categories multiline combinators.lib 
-       splitting accessors effects sequences.deep ;
+       splitting accessors effects sequences.deep peg.search ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -213,6 +213,7 @@ DEFER: 'choice'
 : 'actioned-sequence' ( -- parser )
   [
     [ 'sequence' , "=>" syntax , 'action' , ] seq* [ first2 <ebnf-action> ] action ,
+    [ 'sequence' , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , "=>" syntax , 'action' , ] seq* [ first3 >r <ebnf-var> r> <ebnf-action> ] action ,
     [ 'sequence' , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , ] seq* [ first2 <ebnf-var> ] action ,
     'sequence' ,
   ] choice* ;
@@ -237,22 +238,21 @@ GENERIC: (transform) ( ast -- parser )
 
 SYMBOL: parser
 SYMBOL: main
-SYMBOL: vars
 
 : transform ( ast -- object )
-  H{ } clone dup dup [ parser set V{ } vars set swap (transform) main set ] bind ;
+  H{ } clone dup dup [ parser set swap (transform) main set ] bind ;
 
 M: ebnf (transform) ( ast -- parser )
   rules>> [ (transform) ] map peek ;
   
 M: ebnf-rule (transform) ( ast -- parser )
   dup elements>> 
-  vars get clone vars [ (transform) ] with-variable [
+  (transform) [
     swap symbol>> set
   ] keep ;
 
 M: ebnf-sequence (transform) ( ast -- parser )
-  elements>> [ (transform) ] map seq ;
+  elements>> [ (transform) ] map seq [ dup length 1 = [ first ] when ] action ;
 
 M: ebnf-choice (transform) ( ast -- parser )
   options>> [ (transform) ] map choice ;
@@ -282,37 +282,62 @@ M: ebnf-repeat1 (transform) ( ast -- parser )
 M: ebnf-optional (transform) ( ast -- parser )
   transform-group optional ;
 
-: build-locals ( string vars -- string )
-  dup empty? [
-    drop
-  ] [
+GENERIC: build-locals ( code ast -- code )
+
+M: ebnf-sequence build-locals ( code ast -- code )
+  elements>> dup [ ebnf-var? ] subset empty? [
+    drop 
+  ] [ 
     [
-      "USING: locals namespaces ;  [let* | " %
-      [ dup % " [ \"" % % "\" get ] " % ] each
-      " | " %
-      %  
-      " ] with-locals" %     
+      "USING: locals sequences ;  [let* | " %
+        dup length swap [
+          dup ebnf-var? [
+            name>> % 
+            " [ " % # " over nth ] " %
+          ] [
+            2drop
+          ] if
+        ] 2each
+        " | " %
+        %  
+        " ] with-locals" %     
     ] "" make 
   ] if ;
 
+M: ebnf-var build-locals ( code ast -- )
+  [
+    "USING: locals kernel ;  [let* | " %
+    name>> % " [ dup ] " %
+    " | " %
+    %  
+    " ] with-locals" %     
+  ] "" make ;
+
+M: object build-locals ( code ast -- )
+  drop ;
+   
 M: ebnf-action (transform) ( ast -- parser )
-  [ parser>> (transform) ] keep
-  code>> vars get build-locals string-lines [ parse-lines ] with-compilation-unit action ;
+  [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
+  string-lines parse-lines action ;
 
 M: ebnf-semantic (transform) ( ast -- parser )
-  [ parser>> (transform) ] keep
-  code>> vars get build-locals string-lines [ parse-lines ] with-compilation-unit semantic ;
+  [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
+  string-lines parse-lines semantic ;
 
 M: ebnf-var (transform) ( ast -- parser )
-  [ parser>> (transform) ] [ name>> ] bi 
-  dup vars get push [ dupd set ] curry action ;
+  parser>> (transform) ;
 
 M: ebnf-terminal (transform) ( ast -- parser )
-  symbol>> token sp ;
+  symbol>> token ;
+
+: parser-not-found ( name -- * )
+  [
+    "Parser " % % " not found." %
+  ] "" make throw ;
 
 M: ebnf-non-terminal (transform) ( ast -- parser )
   symbol>>  [
-    , parser get , \ at , \ sp ,   
+    , \ dup , parser get , \ at , [ parser-not-found ] , \ unless* , \ nip ,    
   ] [ ] make box ;
 
 : transform-ebnf ( string -- object )
@@ -320,7 +345,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 
 : check-parse-result ( result -- result )
   dup [
-    dup parse-result-remaining empty? [
+    dup parse-result-remaining [ blank? ] trim empty? [
       [ 
         "Unable to fully parse EBNF. Left to parse was: " %
         parse-result-remaining % 
@@ -335,10 +360,20 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   parse-result-ast transform dup dup parser [ main swap at compile ] with-variable
   [ compiled-parse ] curry [ with-scope ] curry ;
 
-: [EBNF "EBNF]" parse-multiline-string ebnf>quot nip parsed ; parsing
+: replace-escapes ( string -- string )
+  [
+    "\\t" token [ drop "\t" ] action ,
+    "\\n" token [ drop "\n" ] action ,
+    "\\r" token [ drop "\r" ] action ,
+  ] choice* replace ;
+
+: [EBNF "EBNF]" parse-multiline-string replace-escapes ebnf>quot nip parsed ; parsing
 
 : EBNF: 
   CREATE-WORD dup 
-  ";EBNF" parse-multiline-string
+  ";EBNF" parse-multiline-string replace-escapes
   ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop ; parsing
 
+: rule ( name word -- parser )
+  #! Given an EBNF word produced from EBNF: return the EBNF rule
+  "ebnf-parser" word-prop at ;

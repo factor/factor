@@ -10,7 +10,7 @@ CLASS: {
     "foo:"
     "void"
     { "id" "SEL" "NSRect" }
-    [ data-gc "x" set 2drop ]
+    [ gc "x" set 2drop ]
 } ;
 
 : test-foo

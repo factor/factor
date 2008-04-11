@@ -3,9 +3,8 @@
 USING: kernel namespaces sequences sequences.private assocs math
 inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
-definitions prettyprint hashtables combinators.lib
-prettyprint.sections sequences.private effects generic
-compiler.units accessors ;
+definitions prettyprint hashtables prettyprint.sections
+sequences.private effects generic compiler.units accessors ;
 IN: locals
 
 ! Inspired by
@@ -108,7 +107,7 @@ UNION: special local quote local-word local-reader local-writer ;
 : point-free-end ( quot args -- newquot )
     over peek special?
     [ drop-locals >r >r peek r> localize r> append ]
-    [ drop-locals nip swap peek add ]
+    [ drop-locals nip swap peek suffix ]
     if ;
 
 : (point-free) ( quot args -- newquot )
@@ -130,9 +129,9 @@ GENERIC: free-vars ( form -- vars )
 
 : add-if-free ( vars object -- vars )
   {
-      { [ dup local-writer? ] [ "local-reader" word-prop add ] }
-      { [ dup lexical? ]      [ add ] }
-      { [ dup quote? ]        [ quote-local add ] }
+      { [ dup local-writer? ] [ "local-reader" word-prop suffix ] }
+      { [ dup lexical? ]      [ suffix ] }
+      { [ dup quote? ]        [ quote-local suffix ] }
       { [ t ]                 [ free-vars append ] }
   } cond ;
 

@@ -224,12 +224,21 @@ CELL allot_code_block(CELL size)
 	/* If allocation failed, do a code GC */
 	if(start == 0)
 	{
-		code_gc();
+		gc();
 		start = heap_allot(&code_heap,size);
 
 		/* Insufficient room even after code GC, give up */
 		if(start == 0)
+		{
+			CELL used, total_free, max_free;
+			heap_usage(&code_heap,&used,&total_free,&max_free);
+
+			fprintf(stderr,"Code heap stats:\n");
+			fprintf(stderr,"Used: %ld\n",used);
+			fprintf(stderr,"Total free space: %ld\n",total_free);
+			fprintf(stderr,"Largest free block: %ld\n",max_free);
 			fatal_error("Out of memory in add-compiled-block",0);
+		}
 	}
 
 	return start;

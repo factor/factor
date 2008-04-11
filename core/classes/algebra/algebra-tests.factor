@@ -4,7 +4,7 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes classes.algebra
 classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units growable
-random inference effects ;
+random inference effects kernel.private ;
 
 : class= [ class< ] 2keep swap class< and ;
 
@@ -23,8 +23,8 @@ random inference effects ;
 [ t ] [ number    object   number class-and* ] unit-test
 [ t ] [ object    number   number class-and* ] unit-test
 [ t ] [ slice     reversed null   class-and* ] unit-test
-[ t ] [ general-t \ f      null   class-and* ] unit-test
-[ t ] [ general-t \ f      object class-or*  ] unit-test
+[ t ] [ \ f class-not \ f      null   class-and* ] unit-test
+[ t ] [ \ f class-not \ f      object class-or*  ] unit-test
 
 TUPLE: first-one ;
 TUPLE: second-one ;
@@ -68,13 +68,13 @@ UNION: c a b ;
 [ t ] [ \ tuple-class \ class class< ] unit-test
 [ f ] [ \ class \ tuple-class class< ] unit-test
 
-TUPLE: delegate-clone ;
+TUPLE: tuple-example ;
 
-[ t ] [ \ null \ delegate-clone class< ] unit-test
-[ f ] [ \ object \ delegate-clone class< ] unit-test
-[ f ] [ \ object \ delegate-clone class< ] unit-test
-[ t ] [ \ delegate-clone \ tuple class< ] unit-test
-[ f ] [ \ tuple \ delegate-clone class< ] unit-test
+[ t ] [ \ null \ tuple-example class< ] unit-test
+[ f ] [ \ object \ tuple-example class< ] unit-test
+[ f ] [ \ object \ tuple-example class< ] unit-test
+[ t ] [ \ tuple-example \ tuple class< ] unit-test
+[ f ] [ \ tuple \ tuple-example class< ] unit-test
 
 TUPLE: a1 ;
 TUPLE: b1 ;
@@ -96,7 +96,7 @@ UNION: z1 b1 c1 ;
 
 [ f ] [ a1 c1 class-or b1 c1 class-or class-and a1 b1 class-or classes-intersect? ] unit-test
 
-[ f ] [ growable hi-tag classes-intersect? ] unit-test
+[ f ] [ growable \ hi-tag classes-intersect? ] unit-test
 
 [ t ] [
     growable tuple sequence class-and class<

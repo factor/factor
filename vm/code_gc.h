@@ -32,7 +32,7 @@ void build_free_list(F_HEAP *heap, CELL size);
 CELL heap_allot(F_HEAP *heap, CELL size);
 void unmark_marked(F_HEAP *heap);
 void free_unmarked(F_HEAP *heap);
-CELL heap_usage(F_HEAP *heap, F_BLOCK_STATUS status);
+void heap_usage(F_HEAP *heap, CELL *used, CELL *total_free, CELL *max_free);
 CELL heap_size(F_HEAP *heap);
 
 INLINE F_BLOCK *next_block(F_HEAP *heap, F_BLOCK *block)
@@ -85,8 +85,6 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter);
 void collect_literals(void);
 void recursive_mark(F_BLOCK *block);
 void dump_heap(F_HEAP *heap);
-void code_gc(void);
 void compact_code_heap(void);
 
 DECLARE_PRIMITIVE(code_room);
-DECLARE_PRIMITIVE(code_gc);

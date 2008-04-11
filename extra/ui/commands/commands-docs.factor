@@ -14,7 +14,7 @@ IN: ui.commands
 : command-map. ( command-map -- )
     [ command-map-row ] map
     { "Shortcut" "Command" "Word" "Notes" }
-    [ \ $strong swap ] { } map>assoc add*
+    [ \ $strong swap ] { } map>assoc prefix
     $table ;
 
 : $command-map ( element -- )

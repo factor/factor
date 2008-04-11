@@ -17,7 +17,7 @@ SYMBOL: CRITICAL
     { DEBUG NOTICE NOTICE WARNING ERROR CRITICAL } ;
 
 : send-to-log-server ( array string -- )
-    add* "log-server" get send ;
+    prefix "log-server" get send ;
 
 SYMBOL: log-service
 
