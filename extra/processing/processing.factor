@@ -8,7 +8,7 @@ USING: kernel namespaces threads combinators sequences arrays
        combinators
        combinators.lib
        combinators.cleave
-       rewrite-closures fry accessors
+       rewrite-closures fry accessors newfx
        processing.color
        processing.gadget ;
        
@@ -25,6 +25,14 @@ IN: processing
 : chance ( fraction -- ? ) 0 1 2random > ;
 
 : percent-chance ( percent -- ? ) 100 / chance ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! : at-fraction ( seq fraction -- val ) over length 1- * nth-at ;
+
+: at-fraction ( seq fraction -- val ) over length 1- * at ;
+
+: at-fraction-of ( fraction seq -- val ) swap at-fraction ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -282,7 +290,7 @@ VAR: frame-rate-value
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-VAR: slate
+! VAR: slate
 
 VAR: loop-flag
 
