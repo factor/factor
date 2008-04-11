@@ -7,7 +7,7 @@ ERROR: unknown-gl-platform ;
     { [ os windows? ] [ "opengl.gl.windows" ] }
     { [ os macosx? ]  [ "opengl.gl.macosx" ] }
     { [ os unix? ] [ "opengl.gl.unix" ] }
-    { [ t ] [ unknown-gl-platform ] }
+    [ unknown-gl-platform ]
 } cond use+ >>
 IN: opengl.gl.extensions
 

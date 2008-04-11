@@ -99,7 +99,7 @@ M: real absq sq ;
         { [ pick fp-nan? pick fp-nan? or ] [ 3drop f ] }
         { [ dup zero? ] [ drop number= ] }
         { [ dup 0 < ] [ ~rel ] }
-        { [ t ] [ ~abs ] }
+        [ ~abs ]
     } cond ;
 
 : power-of-2? ( n -- ? )

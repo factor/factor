@@ -58,7 +58,7 @@ MACRO: match-cond ( assoc -- )
         { [ dup match-var? ] [ get ] }
         { [ dup sequence? ] [ [ replace-patterns ] map ] }
         { [ dup tuple? ] [ tuple>array replace-patterns >tuple ] }
-        { [ t ] [ ] }
+        [ ]
     } cond ;
 
 : match-replace ( object pattern1 pattern2 -- result )

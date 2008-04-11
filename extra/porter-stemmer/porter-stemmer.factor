@@ -60,7 +60,7 @@ USING: kernel math parser sequences combinators splitting ;
         { [ 1 over consonant-end? not ] [ drop f ] }
         { [ 2 over consonant-end? ] [ drop f ] }
         { [ 3 over consonant-end? not ] [ drop f ] }
-        { [ t ] [ "wxy" last-is? not ] }
+        [ "wxy" last-is? not ]
     } cond ;
 
 : r ( str oldsuffix newsuffix -- str )
@@ -75,7 +75,7 @@ USING: kernel math parser sequences combinators splitting ;
             { [ "ies" ?tail ] [ "i" append ] }
             { [ dup "ss" tail? ] [ ] }
             { [ "s" ?tail ] [ ] }
-            { [ t ] [ ] }
+            [ ]
         } cond
     ] when ;
 
@@ -114,11 +114,11 @@ USING: kernel math parser sequences combinators splitting ;
                 {
                     { [ "ed" ?tail ] [ -ed ] }
                     { [ "ing" ?tail ] [ -ing ] }
-                    { [ t ] [ f ] }
+                    [ f ]
                 } cond
             ] [ -ed/ing ]
         }
-        { [ t ] [ ] }
+        [ ]
     } cond ;
 
 : step1c ( str -- newstr )
@@ -149,7 +149,7 @@ USING: kernel math parser sequences combinators splitting ;
         { [ "iviti"   ?tail ] [ "iviti"   "ive"  r ] }
         { [ "biliti"  ?tail ] [ "biliti"  "ble"  r ] }
         { [ "logi"    ?tail ] [ "logi"    "log"  r ] }
-        { [ t ] [ ] }
+        [ ]
     } cond ;
 
 : step3 ( str -- newstr )
@@ -161,7 +161,7 @@ USING: kernel math parser sequences combinators splitting ;
         { [ "ical"  ?tail ] [ "ical"  "ic" r ] }
         { [ "ful"   ?tail ] [ "ful"   ""   r ] }
         { [ "ness"  ?tail ] [ "ness"  ""   r ] }
-        { [ t ] [ ] }
+        [ ]
     } cond ;
 
 : -ion ( str -- newstr )
@@ -192,7 +192,7 @@ USING: kernel math parser sequences combinators splitting ;
         { [ "ous"   ?tail ] [ ] }
         { [ "ive"   ?tail ] [ ] }
         { [ "ize"   ?tail ] [ ] }
-        { [ t ] [ ] }
+        [ ]
     } cond dup consonant-seq 1 > [ nip ] [ drop ] if ;
 
 : remove-e? ( str -- ? )
@@ -210,7 +210,7 @@ USING: kernel math parser sequences combinators splitting ;
         { [ dup peek CHAR: l = not ] [ ] }
         { [ dup length 1- over double-consonant? not ] [ ] }
         { [ dup consonant-seq 1 > ] [ butlast ] }
-        { [ t ] [ ] }
+        [ ]
     } cond ;
 
 : step5 ( str -- newstr ) remove-e ll->l ;

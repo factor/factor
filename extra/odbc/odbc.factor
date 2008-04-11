@@ -88,38 +88,38 @@ SYMBOL: SQL-TYPE-UNKNOWN
 
 : convert-sql-type ( number -- symbol )
   {
-    { [ dup 1 = ] [ drop SQL-CHAR ] }
-    { [ dup 12 = ] [ drop SQL-VARCHAR ] }
-    { [ dup -1 = ] [ drop SQL-LONGVARCHAR ] }
-    { [ dup -8 = ] [ drop SQL-WCHAR ] }
-    { [ dup -9 = ] [ drop SQL-WCHARVAR ] }
-    { [ dup -10 = ] [ drop SQL-WLONGCHARVAR ] }
-    { [ dup 3 = ] [ drop SQL-DECIMAL ] }
-    { [ dup 5 = ] [ drop SQL-SMALLINT ] }
-    { [ dup 2 = ] [ drop SQL-NUMERIC ] }
-    { [ dup 4 = ] [ drop SQL-INTEGER ] }
-    { [ dup 7 = ] [ drop SQL-REAL ] }
-    { [ dup 6 = ] [ drop SQL-FLOAT ] }
-    { [ dup 8 = ] [ drop SQL-DOUBLE ] }
-    { [ dup -7 = ] [ drop SQL-BIT ] }
-    { [ dup -6 = ] [ drop SQL-TINYINT ] }
-    { [ dup -5 = ] [ drop SQL-BIGINT ] }
-    { [ dup -2 = ] [ drop SQL-BINARY ] }
-    { [ dup -3 = ] [ drop SQL-VARBINARY ] }   
-    { [ dup -4 = ] [ drop SQL-LONGVARBINARY ] }
-    { [ dup 91 = ] [ drop SQL-TYPE-DATE ] }
-    { [ dup 92 = ] [ drop SQL-TYPE-TIME ] }
-    { [ dup 93 = ] [ drop SQL-TYPE-TIMESTAMP ] }
-    { [ t ] [ drop SQL-TYPE-UNKNOWN ] }
-  } cond ;
+    { 1 [ SQL-CHAR ] }
+    { 12  [ SQL-VARCHAR ] }
+    { -1  [ SQL-LONGVARCHAR ] }
+    { -8  [ SQL-WCHAR ] }
+    { -9  [ SQL-WCHARVAR ] }
+    { -10 [ SQL-WLONGCHARVAR ] }
+    { 3 [ SQL-DECIMAL ] }
+    { 5 [ SQL-SMALLINT ] }
+    { 2 [ SQL-NUMERIC ] }
+    { 4 [ SQL-INTEGER ] }
+    { 7 [ SQL-REAL ] }
+    { 6 [ SQL-FLOAT ] }
+    { 8 [ SQL-DOUBLE ] }
+    { -7 [ SQL-BIT ] }
+    { -6 [ SQL-TINYINT ] }
+    { -5 [ SQL-BIGINT ] }
+    { -2 [ SQL-BINARY ] }
+    { -3 [ SQL-VARBINARY ] }   
+    { -4 [ SQL-LONGVARBINARY ] }
+    { 91 [ SQL-TYPE-DATE ] }
+    { 92 [ SQL-TYPE-TIME ] }
+    { 93 [ SQL-TYPE-TIMESTAMP ] }
+    [ drop SQL-TYPE-UNKNOWN ]
+  } case ;
 
 : succeeded? ( n -- bool )
   #! Did the call succeed (SQL-SUCCESS or SQL-SUCCESS-WITH-INFO)
   {
-    { [ dup SQL-SUCCESS = ] [ drop t ] }
-    { [ dup SQL-SUCCESS-WITH-INFO = ] [ drop t ] }
-    { [ t ] [ drop f ] }
-  } cond ;  
+    { \ SQL-SUCCESS [ t ] }
+    { \ SQL-SUCCESS-WITH-INFO [ t ] }
+    [ drop f ]
+  } case ;  
 
 FUNCTION: SQLRETURN SQLAllocHandle ( SQLSMALLINT handleType, SQLHANDLE inputHandle, SQLHANDLE* outputHandlePtr ) ;
 FUNCTION: SQLRETURN SQLSetEnvAttr ( SQLHENV environmentHandle, SQLINTEGER attribute, SQLPOINTER valuePtr, SQLINTEGER stringLength ) ;
@@ -213,21 +213,21 @@ C: <column> column
 
 : dereference-type-pointer ( byte-array column -- object )
   column-type {
-    { [ dup SQL-CHAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-VARCHAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-LONGVARCHAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-WCHAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-WCHARVAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-WLONGCHARVAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-SMALLINT = ] [ drop *short ] }
-    { [ dup SQL-INTEGER = ] [ drop *long ] }
-    { [ dup SQL-REAL = ] [ drop *float ] }
-    { [ dup SQL-FLOAT = ] [ drop *double ] }
-    { [ dup SQL-DOUBLE = ] [ drop *double ] }
-    { [ dup SQL-TINYINT = ] [ drop *char  ] }
-    { [ dup SQL-BIGINT = ] [ drop *longlong ] }
-    { [ t ] [ nip [ "Unknown SQL Type: " % word-name % ] "" make ] }    
-  } cond ;
+    { SQL-CHAR [ alien>char-string ] }
+    { SQL-VARCHAR [ alien>char-string ] }
+    { SQL-LONGVARCHAR [ alien>char-string ] }
+    { SQL-WCHAR [ alien>char-string ] }
+    { SQL-WCHARVAR [ alien>char-string ] }
+    { SQL-WLONGCHARVAR [ alien>char-string ] }
+    { SQL-SMALLINT [ *short ] }
+    { SQL-INTEGER [ *long ] }
+    { SQL-REAL [ *float ] }
+    { SQL-FLOAT [ *double ] }
+    { SQL-DOUBLE [ *double ] }
+    { SQL-TINYINT [ *char  ] }
+    { SQL-BIGINT [ *longlong ] }
+    [ nip [ "Unknown SQL Type: " % word-name % ] "" make ]    
+  } case ;
 
 TUPLE: field value column ;
 

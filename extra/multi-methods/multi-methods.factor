@@ -89,7 +89,7 @@ SYMBOL: total
             { [ 2dup [ class< ] 2keep swap class< and ] [ 0 ] }
             { [ 2dup class< ] [ -1 ] }
             { [ 2dup swap class< ] [ 1 ] }
-            { [ t ] [ 0 ] }
+            [ 0 ]
         } cond 2nip
     ] 2map [ zero? not ] find nip 0 or ;
 

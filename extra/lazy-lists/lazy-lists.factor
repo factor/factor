@@ -321,7 +321,7 @@ M: sequence-cons nil? ( sequence-cons -- bool )
   {
     { [ dup sequence? ] [ 0 swap seq>list ] }
     { [ dup list?     ] [ ] }
-    { [ t ] [ "Could not convert object to a list" throw ] }
+    [ "Could not convert object to a list" throw ]
   } cond ;
 
 TUPLE: lazy-concat car cdr ;

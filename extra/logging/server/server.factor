@@ -40,10 +40,10 @@ SYMBOL: log-files
     rot [ empty? not ] subset {
         { [ dup empty? ] [ 3drop ] }
         { [ dup length 1 = ] [ first -rot f (write-message) ] }
-        { [ t ] [
+        [
             [ first -rot f (write-message) ] 3keep
             1 tail -rot [ t (write-message) ] 2curry each
-        ] }
+        ]
     } cond ;
 
 : (log-message) ( msg -- )
