@@ -100,21 +100,21 @@ C: <head> peg-head
 : setup-growth ( h p -- )
   pos set dup involved-set>> clone >>eval-set drop ;
 
-:: (grow-lr) ( h p r m -- )
-  h p setup-growth
-  r eval-rule
-  dup m stop-growth? [
-    drop
+: (grow-lr) ( h p r m -- )
+  >r >r [ setup-growth ] 2keep r> r>
+  >r dup eval-rule r> swap
+  dup pick stop-growth? [
+    4drop drop
   ] [
-    m update-m
-     h p r m (grow-lr)
+    over update-m
+    (grow-lr)
   ] if ; inline
  
-:: grow-lr ( h p r m -- ast )
-  h p heads get set-at
-  h p r m (grow-lr) 
-  p heads get delete-at
-  m pos>> pos set m ans>>
+: grow-lr ( h p r m -- ast )
+  >r >r [ heads get set-at ] 2keep r> r>
+  pick over >r >r (grow-lr) r> r>
+  swap heads get delete-at
+  dup pos>> pos set ans>>
   ; inline
 
 :: (setup-lr) ( r l s -- )
