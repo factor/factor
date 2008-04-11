@@ -30,10 +30,10 @@ M: unix addrinfo-error ( n -- )
 : init-client-socket ( fd -- )
     SOL_SOCKET SO_OOBINLINE sockopt ;
 
-TUPLE: connect-task ;
+TUPLE: connect-task < output-task ;
 
 : <connect-task> ( port continuation -- task )
-    connect-task <output-task> ;
+    connect-task <io-task> ;
 
 M: connect-task do-io-task
     io-task-port dup port-handle f 0 write
@@ -61,10 +61,10 @@ USE: unix
 : init-server-socket ( fd -- )
     SOL_SOCKET SO_REUSEADDR sockopt ;
 
-TUPLE: accept-task ;
+TUPLE: accept-task < input-task ;
 
 : <accept-task> ( port continuation  -- task )
-    accept-task <input-task> ;
+    accept-task <io-task> ;
 
 : accept-sockaddr ( port -- fd sockaddr )
     dup port-handle swap server-port-addr sockaddr-type
@@ -128,10 +128,10 @@ packet-size <byte-array> receive-buffer set-global
         rot head
     ] if ;
 
-TUPLE: receive-task ;
+TUPLE: receive-task < input-task ;
 
 : <receive-task> ( stream continuation  -- task )
-    receive-task <input-task> ;
+    receive-task <io-task> ;
 
 M: receive-task do-io-task
     io-task-port
@@ -157,10 +157,10 @@ M: unix receive ( datagram -- packet addrspec )
 : do-send ( socket data sockaddr len -- n )
     >r >r dup length 0 r> r> sendto ;
 
-TUPLE: send-task packet sockaddr len ;
+TUPLE: send-task < output-task packet sockaddr len ;
 
 : <send-task> ( packet sockaddr len stream continuation -- task )
-    send-task <output-task> [
+    send-task <io-task> [
         {
             set-send-task-packet
             set-send-task-sockaddr

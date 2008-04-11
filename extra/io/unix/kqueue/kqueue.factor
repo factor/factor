@@ -8,7 +8,7 @@ io.nonblocking io.unix.backend io.launcher io.unix.launcher
 io.monitors ;
 IN: io.unix.kqueue
 
-TUPLE: kqueue-mx events monitors ;
+TUPLE: kqueue-mx < mx events monitors ;
 
 : max-events ( -- n )
     #! We read up to 256 events at a time. This is an arbitrary
@@ -43,12 +43,14 @@ M: io-task io-task-fflags drop 0 ;
     0 < [ err_no ESRCH = [ (io-error) ] unless ] when ;
 
 M: kqueue-mx register-io-task ( task mx -- )
-    over EV_ADD make-kevent over register-kevent
-    delegate register-io-task ;
+    [ >r EV_ADD make-kevent r> register-kevent ]
+    [ call-next-method ]
+    2bi ;
 
 M: kqueue-mx unregister-io-task ( task mx -- )
-    2dup delegate unregister-io-task
-    swap EV_DELETE make-kevent swap register-kevent ;
+    [ call-next-method ]
+    [ >r EV_DELETE make-kevent r> register-kevent ]
+    2bi ;
 
 : wait-kevent ( mx timespec -- n )
     >r [ fd>> f 0 ] keep events>> max-events r> kevent

@@ -14,18 +14,13 @@ TUPLE: io-task port callbacks ;
 : io-task-fd port>> handle>> ;
 
 : <io-task> ( port continuation/f class -- task )
-    >r [ 1vector ] [ V{ } clone ] if* io-task construct-boa
-    r> construct-delegate ; inline
+    construct-empty
+        swap [ 1vector ] [ V{ } clone ] if* >>callbacks
+        swap >>port ; inline
 
-TUPLE: input-task ;
+TUPLE: input-task < io-task ;
 
-: <input-task> ( port continuation class -- task )
-    >r input-task <io-task> r> construct-delegate ; inline
-
-TUPLE: output-task ;
-
-: <output-task> ( port continuation class -- task )
-    >r output-task <io-task> r> construct-delegate ; inline
+TUPLE: output-task < io-task ;
 
 GENERIC: do-io-task ( task -- ? )
 GENERIC: io-task-container ( mx task -- hashtable )
@@ -37,9 +32,10 @@ M: input-task io-task-container drop reads>> ;
 
 M: output-task io-task-container drop writes>> ;
 
-: <mx> ( -- mx ) f H{ } clone H{ } clone mx construct-boa ;
-
-: construct-mx ( class -- obj ) <mx> swap construct-delegate ;
+: construct-mx ( class -- obj )
+    construct-empty
+        H{ } clone >>reads
+        H{ } clone >>writes ; inline
 
 GENERIC: register-io-task ( task mx -- )
 GENERIC: unregister-io-task ( task mx -- )
@@ -140,10 +136,10 @@ M: unix cancel-io ( port -- )
         drop t
     ] if ;
 
-TUPLE: read-task ;
+TUPLE: read-task < input-task ;
 
 : <read-task> ( port continuation -- task )
-    read-task <input-task> ;
+    read-task <io-task> ;
 
 M: read-task do-io-task
     io-task-port dup refill
@@ -158,10 +154,10 @@ M: input-port (wait-to-read)
     dup [ handle>> ] [ buffer@ ] [ buffer-length ] tri write
     dup 0 >= [ swap buffer-consume f ] [ drop defer-error ] if ;
 
-TUPLE: write-task ;
+TUPLE: write-task < output-task ;
 
 : <write-task> ( port continuation -- task )
-    write-task <output-task> ;
+    write-task <io-task> ;
 
 M: write-task do-io-task
     io-task-port dup [ buffer-empty? ] [ port-error ] bi or
@@ -193,7 +189,7 @@ TUPLE: mx-port mx ;
     dup fd>> f mx-port <port>
     { set-mx-port-mx set-delegate } mx-port construct ;
 
-TUPLE: mx-task ;
+TUPLE: mx-task < io-task ;
 
 : <mx-task> ( port -- task )
     f mx-task <io-task> ;
