@@ -152,11 +152,10 @@ M: windows delete-directory ( path -- )
 
 HOOK: WSASocket-flags io-backend ( -- DWORD )
 
-TUPLE: win32-socket ;
+TUPLE: win32-socket < win32-file ;
 
 : <win32-socket> ( handle -- win32-socket )
-    f <win32-file>
-    \ win32-socket construct-delegate ;
+    f win32-file construct-boa ;
 
 : open-socket ( family type -- socket )
     0 f 0 WSASocket-flags WSASocket dup socket-error ;

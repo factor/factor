@@ -1,45 +1,38 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-IN: io.nonblocking
 USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.streams.duplex io.encodings
 io.backend continuations debugger classes byte-arrays namespaces
 splitting dlists assocs io.encodings.binary accessors ;
+IN: io.nonblocking
 
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
 
-! Common delegate of native stream readers and writers
-TUPLE: port
-handle
-buffer
-error
-timeout
-type eof ;
+TUPLE: port handle buffer error timeout closed eof ;
 
-M: port timeout port-timeout ;
+M: port timeout timeout>> ;
 
-M: port set-timeout set-port-timeout ;
-
-SYMBOL: closed
-
-PREDICATE: input-port < port port-type input-port eq? ;
-PREDICATE: output-port < port port-type output-port eq? ;
+M: port set-timeout (>>timeout) ;
 
 GENERIC: init-handle ( handle -- )
+
 GENERIC: close-handle ( handle -- )
 
-: <port> ( handle type -- port )
-    port construct-empty
-        swap >>type
-        swap dup init-handle >>handle ;
+: <port> ( handle class -- port )
+    construct-empty
+        swap dup init-handle >>handle ; inline
 
-: <buffered-port> ( handle type -- port )
+: <buffered-port> ( handle class -- port )
     <port>
-        default-buffer-size get <buffer> >>buffer ;
+        default-buffer-size get <buffer> >>buffer ; inline
+
+TUPLE: input-port < port ;
 
 : <reader> ( handle -- input-port )
     input-port <buffered-port> ;
+
+TUPLE: output-port < port ;
 
 : <writer> ( handle -- output-port )
     output-port <buffered-port> ;
@@ -49,6 +42,9 @@ GENERIC: close-handle ( handle -- )
 
 : pending-error ( port -- )
     [ f ] change-error drop [ throw ] when* ;
+
+: check-closed ( port -- port )
+    dup closed>> [ "Port closed" throw ] when ;
 
 HOOK: cancel-io io-backend ( port -- )
 
@@ -69,6 +65,7 @@ GENERIC: (wait-to-read) ( port -- )
     [ f >>eof drop f ] r> if ; inline
 
 M: input-port stream-read1
+    check-closed
     dup wait-to-read1 [ buffer>> buffer-pop ] unless-eof ;
 
 : read-step ( count port -- byte-array/f )
@@ -87,6 +84,7 @@ M: input-port stream-read1
     ] if ;
 
 M: input-port stream-read
+    check-closed
     >r 0 max >fixnum r>
     2dup read-step dup [
         pick over length > [
@@ -98,6 +96,7 @@ M: input-port stream-read
     ] [ 2nip ] if ;
 
 M: input-port stream-read-partial ( max stream -- byte-array/f )
+    check-closed
     >r 0 max >fixnum r> read-step ;
 
 : can-write? ( len buffer -- ? )
@@ -107,10 +106,12 @@ M: input-port stream-read-partial ( max stream -- byte-array/f )
     tuck buffer>> can-write? [ drop ] [ stream-flush ] if ;
 
 M: output-port stream-write1
+    check-closed
     1 over wait-to-write
     buffer>> byte>buffer ;
 
 M: output-port stream-write
+    check-closed
     over length over buffer>> buffer-size > [
         [ buffer>> buffer-size <groups> ]
         [ [ stream-write ] curry ] bi
@@ -123,41 +124,43 @@ M: output-port stream-write
 GENERIC: port-flush ( port -- )
 
 M: output-port stream-flush ( port -- )
+    check-closed
     [ port-flush ] [ pending-error ] bi ;
 
-: close-port ( port type -- )
-    output-port eq? [ dup port-flush ] when
+GENERIC: close-port ( port -- )
+
+M: output-port close-port
+    [ port-flush ] [ call-next-method ] bi ;
+
+M: port close-port
     dup cancel-io
     dup handle>> close-handle
     [ [ buffer-free ] when* f ] change-buffer drop ;
 
 M: port dispose
-    dup type>> closed eq?
-    [ drop ]
-    [ [ closed ] change-type swap close-port ]
-    if ;
+    dup closed>> [ drop ] [ t >>closed close-port ] if ;
 
-TUPLE: server-port addr client client-addr encoding ;
+TUPLE: server-port < port addr client client-addr encoding ;
 
 : <server-port> ( handle addr encoding -- server )
     rot server-port <port>
-    { set-server-port-addr set-server-port-encoding set-delegate }
-    server-port construct ;
+        swap >>encoding
+        swap >>addr ;
 
-: check-server-port ( port -- )
-    port-type server-port assert= ;
+: check-server-port ( port -- port )
+    dup server-port? [ "Not a server port" throw ] unless ; inline
 
-TUPLE: datagram-port addr packet packet-addr ;
+TUPLE: datagram-port < port addr packet packet-addr ;
 
 : <datagram-port> ( handle addr -- datagram )
-    >r datagram-port <port> r>
-    { set-delegate set-datagram-port-addr }
-    datagram-port construct ;
+    swap datagram-port <port>
+        swap >>addr ;
 
-: check-datagram-port ( port -- )
-    port-type datagram-port assert= ;
+: check-datagram-port ( port -- port )
+    check-closed
+    dup datagram-port? [ "Not a datagram port" throw ] unless ; inline
 
-: check-datagram-send ( packet addrspec port -- )
-    dup check-datagram-port
-    datagram-port-addr [ class ] bi@ assert=
-    class byte-array assert= ;
+: check-datagram-send ( packet addrspec port -- packet addrspec port )
+    check-datagram-port
+    2dup addr>> [ class ] bi@ assert=
+    pick class byte-array assert= ;

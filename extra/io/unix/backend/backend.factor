@@ -178,7 +178,7 @@ M: write-task do-io-task
 : (wait-to-write) ( port -- )
     [ add-write-io-task ] with-port-continuation drop ;
 
-M: port port-flush ( port -- )
+M: output-port port-flush ( port -- )
     dup buffer>> buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: unix io-multiplex ( ms/f -- )
@@ -190,11 +190,10 @@ M: unix (init-stdio) ( -- )
     2 <writer> ;
 
 ! mx io-task for embedding an fd-based mx inside another mx
-TUPLE: mx-port mx ;
+TUPLE: mx-port < port mx ;
 
 : <mx-port> ( mx -- port )
-    dup fd>> mx-port <port>
-    { set-mx-port-mx set-delegate } mx-port construct ;
+    dup fd>> mx-port <port> swap >>mx ;
 
 TUPLE: mx-task < io-task ;
 

@@ -122,7 +122,7 @@ TUPLE: AcceptEx-args port
 M: winnt (accept) ( server -- addrspec handle )
     [
         [
-            dup check-server-port
+            check-server-port
             \ AcceptEx-args construct-empty
             [ init-accept ] keep
             [ ((accept)) ] keep
@@ -159,7 +159,7 @@ TUPLE: WSARecvFrom-args port
 : init-WSARecvFrom ( datagram WSARecvFrom -- )
     [ set-WSARecvFrom-args-port ] 2keep
     [
-        >r delegate port-handle delegate win32-file-handle r>
+        >r handle>> handle>> r>
         set-WSARecvFrom-args-s*
     ] 2keep [
         >r datagram-port-addr sockaddr-type heap-size r>
@@ -192,7 +192,7 @@ TUPLE: WSARecvFrom-args port
 
 M: winnt receive ( datagram -- packet addrspec )
     [
-        dup check-datagram-port
+        check-datagram-port
         \ WSARecvFrom-args construct-empty
         [ init-WSARecvFrom ] keep
         [ call-WSARecvFrom ] keep
@@ -244,7 +244,7 @@ USE: io.sockets
 
 M: winnt send ( packet addrspec datagram -- )
     [
-        3dup check-datagram-send
+        check-datagram-send
         \ WSASendTo-args construct-empty
         [ init-WSASendTo ] keep
         [ call-WSASendTo ] keep

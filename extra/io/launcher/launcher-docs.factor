@@ -129,9 +129,6 @@ HELP: <process>
 { $values { "process" process } }
 { $description "Creates a new, empty process. It must be filled in before being passed to " { $link run-process } "." } ;
 
-HELP: process-stream
-{ $class-description "A bidirectional stream for interacting with a running process. Instances are created by calling " { $link <process-stream> } ". The " { $link process-stream-process } " slot holds a " { $link process } " instance." } ;
-
 HELP: <process-stream>
 { $values
   { "desc" "a launch descriptor" }
@@ -144,7 +141,7 @@ HELP: with-process-stream
   { "desc" "a launch descriptor" }
   { "quot" quotation }
   { "status" "an exit code" } }
-{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a " { $link process-stream } ". After the quotation returns, waits for the process to end and outputs the exit code." } ;
+{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a process stream. After the quotation returns, waits for the process to end and outputs the exit code." } ;
 
 HELP: wait-for-process
 { $values { "process" process } { "status" integer } }

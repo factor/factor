@@ -7,7 +7,7 @@ USING: alien alien.c-types generic io kernel math namespaces
 io.nonblocking parser threads unix sequences
 byte-arrays io.sockets io.binary io.unix.backend
 io.streams.duplex io.sockets.impl math.parser continuations libc
-combinators io.backend io.files io.files.private system ;
+combinators io.backend io.files io.files.private system accessors ;
 IN: io.unix.sockets
 
 : pending-init-error ( port -- )
@@ -42,7 +42,7 @@ M: connect-task do-io-task
 : wait-to-connect ( port -- )
     [ <connect-task> add-io-task ] with-port-continuation drop ;
 
-M: unix (client) ( addrspec -- client-in client-out )
+M: unix ((client)) ( addrspec -- client-in client-out )
     dup make-sockaddr/size >r >r
     protocol-family SOCK_STREAM socket-fd
     dup r> r> connect
@@ -97,11 +97,10 @@ M: unix (server) ( addrspec -- handle )
 
 M: unix (accept) ( server -- addrspec handle )
     #! Wait for a client connection.
-    dup check-server-port
-    dup wait-to-accept
-    dup pending-error
-    dup server-port-client-addr
-    swap server-port-client ;
+    check-server-port
+    [ wait-to-accept ]
+    [ pending-error ]
+    [ [ client-addr>> ] [ client>> ] bi ] tri ;
 
 ! Datagram sockets - UDP and Unix domain
 M: unix <datagram>
@@ -148,11 +147,10 @@ M: receive-task do-io-task
     [ <receive-task> add-io-task ] with-port-continuation drop ;
 
 M: unix receive ( datagram -- packet addrspec )
-    dup check-datagram-port
-    dup wait-receive
-    dup pending-error
-    dup datagram-port-packet
-    swap datagram-port-packet-addr ;
+    check-datagram-port
+    [ wait-receive ]
+    [ pending-error ]
+    [ [ packet>> ] [ packet-addr>> ] bi ] tri ;
 
 : do-send ( socket data sockaddr len -- n )
     >r >r dup length 0 r> r> sendto ;
@@ -180,7 +178,7 @@ M: send-task do-io-task
     2drop 2drop ;
 
 M: unix send ( packet addrspec datagram -- )
-    3dup check-datagram-send
+    check-datagram-send
     [ >r make-sockaddr/size r> wait-send ] keep
     pending-error ;
 

@@ -36,10 +36,10 @@ HELP: port
 $nl
 "Ports have the following slots:"
 { $list
-    { { $link port-handle } " - a native handle identifying the underlying native resource used by the port" }
-    { { $link port-error } " - the most recent I/O error, if any. This error is thrown to the waiting thread when " { $link pending-error } " is called by stream operations" }
-    { { $link port-type } " - a symbol identifying the port's intended purpose" }
-    { { $link port-eof? } " - a flag indicating if the port has reached the end of file while reading" }
+    { { $snippet "handle" } " - a native handle identifying the underlying native resource used by the port" }
+    { { $snippet "error" } " - the most recent I/O error, if any. This error is thrown to the waiting thread when " { $link pending-error } " is called by stream operations" }
+    { { $snippet "type" } " - a symbol identifying the port's intended purpose" }
+    { { $snippet "eof" } " - a flag indicating if the port has reached the end of file while reading" }
 } } ;
 
 HELP: input-port
