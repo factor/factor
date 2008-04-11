@@ -85,10 +85,11 @@ SYMBOL: changed-vocabs
 : unchanged-vocabs ( vocabs -- )
     [ unchanged-vocab ] each ;
 
+: changed-vocab? ( vocab -- ? )
+    changed-vocabs get dup [ key? ] [ 2drop t ] if ;
+
 : filter-changed ( vocabs -- vocabs' )
-    changed-vocabs get [
-        [ key? ] curry subset
-    ] when* ;
+    [ changed-vocab? ] subset ;
 
 SYMBOL: modified-sources
 SYMBOL: modified-docs
@@ -96,7 +97,7 @@ SYMBOL: modified-docs
 : (to-refresh) ( vocab variable loaded? path -- )
     dup [
         swap [
-            pick changed-vocabs get key? [
+            pick changed-vocab? [
                 source-modified? [ get push ] [ 2drop ] if
             ] [ 3drop ] if
         ] [ drop get push ] if
