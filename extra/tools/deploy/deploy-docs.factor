@@ -7,7 +7,12 @@ ARTICLE: "tools.deploy" "Application deployment"
 $nl
 "For example, we can deploy the " { $vocab-link "hello-world" } " demo which comes with Factor:"
 { $code "\"hello-ui\" deploy" }
-"On Mac OS X, this yields a program named " { $snippet "Hello world.app" } ". On Windows, it yields a directory named " { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui.exe" } ". On Linux, it yields a directory named" { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui" } ". In all cases, running the program displays a window with a message."
+{ $list
+   { "On Mac OS X, this yields a program named " { $snippet "Hello world.app" } "." }
+   { "On Windows, it yields a directory named " { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui.exe" } "." }
+   { "On Linux, it yields a directory named " { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui" } "." }
+}
+"In all cases, running the program displays a window with a message."
 $nl
 "The deployment tool works by bootstrapping a fresh image, loading the vocabulary into this image, then applying various heuristics to strip the image down to minimal size."
 $nl
