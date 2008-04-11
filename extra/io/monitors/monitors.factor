@@ -29,7 +29,8 @@ M: monitor set-timeout (>>timeout) ;
         swap >>path ; inline
 
 : queue-change ( path changes monitor -- )
-    dup [ [ 3array ] keep queue>> mailbox-put ] [ 3drop ] if ;
+    3dup and and
+    [ [ 3array ] keep queue>> mailbox-put ] [ 3drop ] if ;
 
 HOOK: (monitor) io-backend ( path recursive? mailbox -- monitor )
 
