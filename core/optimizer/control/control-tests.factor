@@ -9,23 +9,23 @@ optimizer ;
             { [ over #label? not ] [ 2drop f ] }
             { [ over #label-word over eq? not ] [ 2drop f ] }
             { [ over #label-loop? not ] [ 2drop f ] }
-            { [ t ] [ 2drop t ] }
+            [ 2drop t ]
         } cond
     ] curry node-exists? ;
 
 : label-is-not-loop? ( node word -- ? )
     [
         {
-            { [ over #label? not ] [ 2drop f ] }
-            { [ over #label-word over eq? not ] [ 2drop f ] }
-            { [ over #label-loop? ] [ 2drop f ] }
-            { [ t ] [ 2drop t ] }
-        } cond
+            { [ over #label? not ] [ f ] }
+            { [ over #label-word over eq? not ] [ f ] }
+            { [ over #label-loop? ] [ f ] }
+            [ t ]
+        } cond 2nip
     ] curry node-exists? ;
 
 : loop-test-1 ( a -- )
     dup [ 1+ loop-test-1 ] [ drop ] if ; inline
-
+                          
 [ t ] [
     [ loop-test-1 ] dataflow dup detect-loops
     \ loop-test-1 label-is-loop?

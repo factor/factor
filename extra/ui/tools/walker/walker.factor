@@ -81,7 +81,7 @@ walker-gadget "toolbar" f {
     {
         { [ dup walker-gadget? not ] [ 2drop f ] }
         { [ dup walker-gadget-closing? ] [ 2drop f ] }
-        { [ t ] [ walker-gadget-thread eq? ] }
+        [ walker-gadget-thread eq? ]
     } cond ;
 
 : find-walker-window ( thread -- world/f )

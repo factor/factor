@@ -126,7 +126,7 @@ PRIVATE>
     {
         { [ over front>> over eq? ] [ drop pop-front* ] }
         { [ over back>> over eq? ] [ drop pop-back* ] }
-        { [ t ] [ unlink-node dec-length ] }
+        [ unlink-node dec-length ]
     } cond ;
 
 : delete-node-if* ( dlist quot -- obj/f ? )

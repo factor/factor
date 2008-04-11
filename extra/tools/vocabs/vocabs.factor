@@ -255,7 +255,7 @@ MEMO: all-vocabs-seq ( -- seq )
         { [ ".test" ?tail ] [ t ] }
         { [ "raptor" ?head ] [ t ] }
         { [ dup "tools.deploy.app" = ] [ t ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond nip ;
 
 : filter-dangerous ( seq -- seq' )

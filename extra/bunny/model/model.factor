@@ -13,7 +13,7 @@ IN: bunny.model
         numbers {
             { [ dup length 5 = ] [ 3 head pick push ] }
             { [ dup first 3 = ] [ 1 tail over push ] }
-            { [ t ] [ drop ] }
+            [ drop ]
         } cond (parse-model)
     ] when* ;
 

@@ -55,7 +55,7 @@ TUPLE: miller-rabin-bounds ;
         { [ dup 1 <= ] [ 3drop f ] }
         { [ dup 2 = ] [ 3drop t ] }
         { [ dup even? ] [ 3drop f ] }
-        { [ t ] [ [ drop trials set t (miller-rabin) ] with-scope ] }
+        [ [ drop trials set t (miller-rabin) ] with-scope ]
     } cond ;
 
 : miller-rabin ( n -- ? ) 10 miller-rabin* ;

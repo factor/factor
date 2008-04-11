@@ -25,7 +25,7 @@ M: winnt root-directory? ( path -- ? )
           { [ dup length 2 = ] [ dup second CHAR: : = ] } && nip ] [
             t
         ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond nip ;
 
 ERROR: not-absolute-path ;

@@ -43,7 +43,7 @@ CATEGORY: (extend) Me Mn ;
         { [ dup jamo? ] [ jamo-class ] }
         { [ dup grapheme-control? ] [ control-class ] }
         { [ extend? ] [ Extend ] }
-        { [ t ] [ Any ] }
+        [ Any ]
     } cond ;
 
 : init-grapheme-table ( -- table )

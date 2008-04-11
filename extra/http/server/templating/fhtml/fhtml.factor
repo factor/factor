@@ -26,7 +26,7 @@ M: template-lexer skip-word
         {
             { [ 2dup nth CHAR: " = ] [ drop 1+ ] }
             { [ 2dup swap tail-slice "%>" head? ] [ drop 2 + ] }
-            { [ t ] [ f skip ] }
+            [ f skip ]
         } cond
     ] change-lexer-column ;
 

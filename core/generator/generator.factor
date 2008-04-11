@@ -16,7 +16,7 @@ SYMBOL: compiled
         { [ dup compiled get key? ] [ drop ] }
         { [ dup inlined-block? ] [ drop ] }
         { [ dup primitive? ] [ drop ] }
-        { [ t ] [ dup compile-queue get set-at ] }
+        [ dup compile-queue get set-at ]
     } cond ;
 
 : maybe-compile ( word -- )

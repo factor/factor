@@ -39,7 +39,7 @@ M: winnt add-completion ( handle -- )
         GetLastError {
             { [ dup expected-io-error? ] [ 2drop t ] }
             { [ dup eof? ] [ drop t swap set-port-eof? f ] }
-            { [ t ] [ (win32-error-string) throw ] }
+            [ (win32-error-string) throw ]
         } cond
     ] [
         drop t

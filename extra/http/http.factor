@@ -145,10 +145,10 @@ TUPLE: cookie name value path domain expires http-only ;
 
 : (unparse-cookie) ( key value -- )
     {
-        { [ dup f eq? ] [ 2drop ] }
-        { [ dup t eq? ] [ drop , ] }
-        { [ t ] [ "=" swap 3append , ] }
-    } cond ;
+        { f [ drop ] }
+        { t [ , ] }
+        [ "=" swap 3append , ]
+    } case ;
 
 : unparse-cookie ( cookie -- strings )
     [
@@ -399,7 +399,7 @@ body ;
         { [ dup not ] [ drop ] }
         { [ dup string? ] [ write ] }
         { [ dup callable? ] [ call ] }
-        { [ t ] [ stdio get stream-copy ] }
+        [ stdio get stream-copy ]
     } cond ;
 
 M: response write-response ( respose -- )

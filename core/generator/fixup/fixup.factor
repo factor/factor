@@ -40,8 +40,8 @@ M: label fixup*
 
 M: word fixup*
     {
-        { %prologue-later [ dup [ %prologue ] if-stack-frame ] }
-        { %epilogue-later [ dup [ %epilogue ] if-stack-frame ] }
+        { \ %prologue-later [ dup [ %prologue ] if-stack-frame ] }
+        { \ %epilogue-later [ dup [ %epilogue ] if-stack-frame ] }
     } case ;
 
 SYMBOL: relocation-table

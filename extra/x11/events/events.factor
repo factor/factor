@@ -52,22 +52,22 @@ GENERIC: client-event ( event window -- )
 
 : handle-event ( event window -- )
     over XAnyEvent-type {
-        { [ dup Expose = ] [ drop expose-event ] }
-        { [ dup ConfigureNotify = ] [ drop configure-event ] }
-        { [ dup ButtonPress = ] [ drop button-down-event$ ] }
-        { [ dup ButtonRelease = ] [ drop button-up-event$ ] }
-        { [ dup EnterNotify = ] [ drop enter-event ] }
-        { [ dup LeaveNotify = ] [ drop leave-event ] }
-        { [ dup MotionNotify = ] [ drop motion-event ] }
-        { [ dup KeyPress = ] [ drop key-down-event ] }
-        { [ dup KeyRelease = ] [ drop key-up-event ] }
-        { [ dup FocusIn = ] [ drop focus-in-event ] }
-        { [ dup FocusOut = ] [ drop focus-out-event ] }
-        { [ dup SelectionNotify = ] [ drop selection-notify-event ] }
-        { [ dup SelectionRequest = ] [ drop selection-request-event ] }
-        { [ dup ClientMessage = ] [ drop client-event ] }
-        { [ t ] [ 3drop ] }
-    } cond ;
+        { Expose [ expose-event ] }
+        { ConfigureNotify [ configure-event ] }
+        { ButtonPress [ button-down-event$ ] }
+        { ButtonRelease [ button-up-event$ ] }
+        { EnterNotify [ enter-event ] }
+        { LeaveNotify [ leave-event ] }
+        { MotionNotify [ motion-event ] }
+        { KeyPress [ key-down-event ] }
+        { KeyRelease [ key-up-event ] }
+        { FocusIn [ focus-in-event ] }
+        { FocusOut [ focus-out-event ] }
+        { SelectionNotify [ selection-notify-event ] }
+        { SelectionRequest [ selection-request-event ] }
+        { ClientMessage [ client-event ] }
+        [ 3drop ]
+    } case ;
 
 : configured-loc ( event -- dim )
     dup XConfigureEvent-x swap XConfigureEvent-y 2array ;
