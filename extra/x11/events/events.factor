@@ -52,20 +52,20 @@ GENERIC: client-event ( event window -- )
 
 : handle-event ( event window -- )
     over XAnyEvent-type {
-        { \ Expose [ expose-event ] }
-        { \ ConfigureNotify [ configure-event ] }
-        { \ ButtonPress [ button-down-event$ ] }
-        { \ ButtonRelease [ button-up-event$ ] }
-        { \ EnterNotify [ enter-event ] }
-        { \ LeaveNotify [ leave-event ] }
-        { \ MotionNotify [ motion-event ] }
-        { \ KeyPress [ key-down-event ] }
-        { \ KeyRelease [ key-up-event ] }
-        { \ FocusIn [ focus-in-event ] }
-        { \ FocusOut [ focus-out-event ] }
-        { \ SelectionNotify [ selection-notify-event ] }
-        { \ SelectionRequest [ selection-request-event ] }
-        { \ ClientMessage [ client-event ] }
+        { Expose [ expose-event ] }
+        { ConfigureNotify [ configure-event ] }
+        { ButtonPress [ button-down-event$ ] }
+        { ButtonRelease [ button-up-event$ ] }
+        { EnterNotify [ enter-event ] }
+        { LeaveNotify [ leave-event ] }
+        { MotionNotify [ motion-event ] }
+        { KeyPress [ key-down-event ] }
+        { KeyRelease [ key-up-event ] }
+        { FocusIn [ focus-in-event ] }
+        { FocusOut [ focus-out-event ] }
+        { SelectionNotify [ selection-notify-event ] }
+        { SelectionRequest [ selection-request-event ] }
+        { ClientMessage [ client-event ] }
         [ 3drop ]
     } case ;
 
