@@ -89,7 +89,7 @@ SYMBOL: form-hook
     {
         { [ over "http://" head? ] [ link>string ] }
         { [ over "/" head? ] [ absolute-redirect ] }
-        { [ t ] [ relative-redirect ] }
+        [ relative-redirect ]
     } cond ;
 
 : <redirect> ( to query code message -- response )
