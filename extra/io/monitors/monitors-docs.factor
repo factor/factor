@@ -69,15 +69,13 @@ $nl
 { $heading "Linux" }
 "Factor uses " { $snippet "inotify" } " to implement monitors on Linux. This requires Linux kernel version 2.6.16 or later."
 $nl
-"Since " { $snippet "inotify" } " can only monitor a single directory, Factor simulates recursive monitors by creating a hierarchy of monitors for every subdirectory. This is transparent to user code."
+"Factor simulates recursive monitors by creating a hierarchy of monitors for every subdirectory, since " { $snippet "inotify" } " can only monitor a single directory. This is transparent to user code."
 $nl
 "Inside a single " { $link with-monitors } " scope, only one monitor may be created for any given directory."
 { $heading "BSD" }
 "Factor uses " { $snippet "kqueue" } " to implement monitors on BSD."
 $nl
-"Since " { $snippet "kqueue" } " can only monitor a single directory, Factor simulates recursive monitors by creating a hierarchy of monitors for every subdirectory. This is transparent to user code."
-$nl
-"Because " { $snippet "kqueue" } " requires that a file descriptor is allocated for each directory being monitored, monitoring of large directory hierarchies may exhaust file descriptors or exhibit suboptimal performance. Furthermore, unmounting a subdirectory of a recursively-monitored directory is not possible."
+"The " { $snippet "kqueue" } " system is limited to monitoring individual files and directories. Monitoring a directory only notifies of files being added and removed to the directory itself, not of changes to file contents."
 { $heading "Windows CE" }
 "Windows CE does not support monitors." ;
 

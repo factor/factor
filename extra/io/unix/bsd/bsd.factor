@@ -18,4 +18,5 @@ M: bsd init-monitors ;
 M: bsd dispose-monitors ;
 
 M: bsd (monitor) ( path recursive? mailbox -- )
-    nip <vnode-monitor> ;
+    swap [ "Recursive kqueue monitors not supported" throw ] when
+    <vnode-monitor> ;
