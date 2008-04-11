@@ -318,11 +318,11 @@ M: object build-locals ( code ast -- )
    
 M: ebnf-action (transform) ( ast -- parser )
   [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
-  string-lines [ parse-lines ] with-compilation-unit action ;
+  string-lines parse-lines action ;
 
 M: ebnf-semantic (transform) ( ast -- parser )
   [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
-  string-lines [ parse-lines ] with-compilation-unit semantic ;
+  string-lines parse-lines semantic ;
 
 M: ebnf-var (transform) ( ast -- parser )
   parser>> (transform) ;
@@ -361,7 +361,11 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   [ compiled-parse ] curry [ with-scope ] curry ;
 
 : replace-escapes ( string -- string )
-  "\\t" token [ drop "\t" ] action  "\\n" token [ drop "\n" ] action 2choice replace ;
+  [
+    "\\t" token [ drop "\t" ] action ,
+    "\\n" token [ drop "\n" ] action ,
+    "\\r" token [ drop "\r" ] action ,
+  ] choice* replace ;
 
 : [EBNF "EBNF]" parse-multiline-string replace-escapes ebnf>quot nip parsed ; parsing
 

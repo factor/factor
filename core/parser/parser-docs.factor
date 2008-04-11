@@ -153,6 +153,8 @@ ARTICLE: "parser-files" "Parsing source files"
 { $subsection parse-file }
 { $subsection bootstrap-file }
 "The parser cross-references source files and definitions. This allows it to keep track of removed definitions, and prevent forward references and accidental redefinitions."
+$nl
+"While the above words are useful for one-off experiments, real programs should be written to use the vocabulary system instead; see " { $link "vocabs.loader" } "."
 { $see-also "source-files" } ;
 
 ARTICLE: "parser-usage" "Reflective parser usage"
@@ -161,6 +163,13 @@ ARTICLE: "parser-usage" "Reflective parser usage"
 "The parser can also parse from a stream:"
 { $subsection parse-stream } ;
 
+ARTICLE: "top-level-forms" "Top level forms"
+"Any code outside of a definition is known as a " { $emphasis "top-level form" } "; top-level forms are run after the entire source file has been parsed, regardless of their position in the file."
+$nl
+"Top-level forms do not have access to the " { $link in } " and " { $link use } " variables that were set at parse time, nor do they run inside " { $link with-compilation-unit } "; so meta-programming might require extra work in a top-level form compared with a parsing word."
+$nl
+"Also, top-level forms run in a new dynamic scope, so using " { $link set } " to store values is almost always wrong, since the values will be lost after the top-level form completes. To save values computed by a top-level form, either use " { $link set-global } " or define a new word with the value." ;
+
 ARTICLE: "parser" "The parser"
 "This parser is a general facility for reading textual representations of objects and definitions. The parser is implemented in the " { $vocab-link "parser" } " and " { $vocab-link "syntax" } " vocabularies."
 $nl
@@ -168,6 +177,7 @@ $nl
 { $subsection "vocabulary-search" }
 { $subsection "parser-files" }
 { $subsection "parser-usage" }
+{ $subsection "top-level-forms" }
 "The parser can be extended."
 { $subsection "parsing-words" }
 { $subsection "parser-lexer" }

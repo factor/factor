@@ -224,7 +224,7 @@ $nl
     ":errors - print 2 compiler errors."
     ":warnings - print 50 compiler warnings."
 }
-"These warnings arise from the compiler's stack effect checker. Warnings are non-fatal conditions -- not all code has a static stack effect, so you try to minimize warnings but understand that in many cases they cannot be eliminated. Errors indicate programming mistakes, such as erronous stack effect declarations."
+"These warnings arise from the compiler's stack effect checker. Warnings are non-fatal conditions -- not all code has a static stack effect, so you try to minimize warnings but understand that in many cases they cannot be eliminated. Errors indicate programming mistakes, such as erroneous stack effect declarations."
 { $references
     "To learn more about the compiler and static stack effect inference, read these articles:"
     "compiler"
@@ -259,7 +259,7 @@ $nl
 { $code "#! /usr/bin/env factor -script" }
 "Running the text file will run it through Factor, assuming the " { $snippet "factor" } " binary is in your " { $snippet "$PATH" } "."
 $nl
-"The space between " { $snippet "#!" } " and " { $snippet "/usr/bin/env" } " is necessary, since " { $link POSTPONE: #! } " is a parsing word, and a syntax error would otherwise result. The " { $snippet "-script" } " switch supresses compiler messages, and exits Factor when the script finishes."
+"The space between " { $snippet "#!" } " and " { $snippet "/usr/bin/env" } " is necessary, since " { $link POSTPONE: #! } " is a parsing word, and a syntax error would otherwise result. The " { $snippet "-script" } " switch suppresses compiler messages, and exits Factor when the script finishes."
 { $references
     { }
     "cli"
@@ -273,7 +273,7 @@ $nl
 $nl
 "Keep the following guidelines in mind to avoid losing your sense of balance:"
 { $list
-    "SImplify, simplify, simplify. Break your program up into small words which operate on a few values at a time. Most word definitions should fit on a single line; very rarely should they exceed two or three lines."
+    "Simplify, simplify, simplify. Break your program up into small words which operate on a few values at a time. Most word definitions should fit on a single line; very rarely should they exceed two or three lines."
     "In addition to keeping your words short, keep them meaningful. Give them good names, and make sure each word only does one thing. Try documenting your words; if the documentation for a word is unclear or complex, chances are the word definition is too. Don't be afraid to refactor your code."
     "If your code looks repetitive, factor it some more."
     "If after factoring, your code still looks repetitive, introduce combinators."
@@ -285,7 +285,7 @@ $nl
     "Every time you define a word which simply manipulates sequences, hashtables or objects in an abstract way which is not related to your program domain, check the library to see if you can reuse an existing definition."
     { "Learn to use the " { $link "inference" } " tool." }
     { "Write unit tests. Factor provides good support for unit testing; see " { $link "tools.test" } ". Once your program has a good test suite you can refactor with confidence and catch regressions early." }
-    "Don't write Factor as if it were C. Imperitive programming and indexed loops are almost always not the most idiomatic solution."
+    "Don't write Factor as if it were C. Imperative programming and indexed loops are almost always not the most idiomatic solution."
     { "Use sequences, assocs and objects to group related data. Object allocation is very cheap. Don't be afraid to create tuples, pairs and triples. Don't be afraid of operations which allocate new objects either, such as " { $link append } "." }
     { "If you find yourself writing a loop with a sequence and an index, there's almost always a better way. Learn the " { $link "sequences-combinators" } " by heart." }
     { "If you find yourself writing a heavily nested loop which performs several steps on each iteration, there is almost always a better way. Break the problem down into a series of passes over the data instead, gradually transforming it into the desired result with a series of simple loops. Factor the loops out and reuse them. If you're working on anything math-related, learn " { $link "math-vectors" } " by heart." }
@@ -312,7 +312,7 @@ ARTICLE: "cookbook-pitfalls" "Pitfalls to avoid"
     $nl
     "Unit tests for the " { $vocab-link "inference" } " vocabulary can be used to ensure that any methods your vocabulary defines on core generic words have static stack effects:"
     { $code "\"inference\" test" }
-    "In general, you should strive to write code with inferrable stack effects, even for sections of a program which are not performance sensitive; the " { $link infer. } " tool together with the optimizing compiler's error reporting can catch many bugs ahead of time." }
+    "In general, you should strive to write code with inferable stack effects, even for sections of a program which are not performance sensitive; the " { $link infer. } " tool together with the optimizing compiler's error reporting can catch many bugs ahead of time." }
     { "Be careful when calling words which access variables from a " { $link make-assoc } " which constructs an assoc with arbitrary keys, since those keys might shadow variables." }
     { "If " { $link run-file } " throws a stack depth assertion, it means that the top-level form in the file left behind values on the stack. The stack depth is compared before and after loading a source file, since this type of situation is almost always an error. If you have a legitimate need to load a source file which returns data in some manner, define a word in the source file which produces this data on the stack and call the word after loading the file." }
 } ;
