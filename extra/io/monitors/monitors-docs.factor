@@ -9,7 +9,7 @@ $nl
 
 HELP: next-change
 { $values { "monitor" "a monitor" } { "path" "a pathname string" } { "changed" "a change descriptor" } }
-{ $description "Waits for file system changes and outputs the pathname of the first changed file. The change descriptor is aq sequence of symbols documented in " { $link "io.monitors.descriptors" } "." } ;
+{ $description "Waits for file system changes and outputs the pathname of the first changed file. The change descriptor is a sequence of symbols documented in " { $link "io.monitors.descriptors" } "." } ;
 
 HELP: with-monitor
 { $values { "path" "a pathname string" } { "recursive?" "a boolean" } { "quot" "a quotation with stack effect " { $snippet "( monitor -- )" } } }

@@ -7,9 +7,7 @@ ABOUT: "system"
 ARTICLE: "system" "System interface"
 { $subsection "cpu" }
 { $subsection "os" }
-"Reading environment variables:"
-{ $subsection os-env }
-{ $subsection os-envs }
+{ $subsection "environment-variables" }
 "Getting the path to the Factor VM and image:"
 { $subsection vm }
 { $subsection image }
@@ -19,7 +17,16 @@ ARTICLE: "system" "System interface"
 { $subsection exit }
 { $see-also "io.files" "io.mmap" "io.monitors" "network-streams" "io.launcher" } ;
 
-ARTICLE: "cpu" "Processor Detection"
+ARTICLE: "environment-variables" "Environment variables"
+"Reading environment variables:"
+{ $subsection os-env }
+{ $subsection os-envs }
+"Writing environment variables:"
+{ $subsection set-os-env }
+{ $subsection unset-os-env }
+{ $subsection set-os-envs } ;
+
+ARTICLE: "cpu" "Processor detection"
 "Processor detection:"
 { $subsection cpu }
 "Supported processors:"
@@ -30,7 +37,7 @@ ARTICLE: "cpu" "Processor Detection"
 "Processor families:"
 { $subsection x86 } ;
 
-ARTICLE: "os" "Operating System Detection"
+ARTICLE: "os" "Operating system detection"
 "Operating system detection:"
 { $subsection os }
 "Supported operating systems:"
@@ -98,7 +105,23 @@ HELP: set-os-envs
 }
 { $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
 
-{ os-env os-envs set-os-envs } related-words
+HELP: set-os-env ( value key -- )
+{ $values { "value" string } { "key" string } }
+{ $description "Set an environment variable." }
+{ $notes
+    "Names and values of environment variables are operating system-specific."
+}
+{ $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
+
+HELP: unset-os-env ( key -- )
+{ $values { "key" string } }
+{ $description "Unset an environment variable." }
+{ $notes
+    "Names and values of environment variables are operating system-specific."
+}
+{ $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
+
+{ os-env os-envs set-os-env unset-os-env set-os-envs } related-words
 
 HELP: image
 { $values { "path" "a pathname string" } }

@@ -280,16 +280,6 @@ DEFINE_PRIMITIVE(exit)
 	exit(to_fixnum(dpop()));
 }
 
-DEFINE_PRIMITIVE(os_env)
-{
-	char *name = unbox_char_string();
-	char *value = getenv(name);
-	if(value == NULL)
-		dpush(F);
-	else
-		box_char_string(value);
-}
-
 DEFINE_PRIMITIVE(eq)
 {
 	CELL lhs = dpop();

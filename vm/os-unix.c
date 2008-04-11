@@ -85,6 +85,16 @@ DEFINE_PRIMITIVE(read_dir)
 	dpush(result);
 }
 
+DEFINE_PRIMITIVE(os_env)
+{
+	char *name = unbox_char_string();
+	char *value = getenv(name);
+	if(value == NULL)
+		dpush(F);
+	else
+		box_char_string(value);
+}
+
 DEFINE_PRIMITIVE(os_envs)
 {
 	GROWABLE_ARRAY(result);
@@ -101,6 +111,21 @@ DEFINE_PRIMITIVE(os_envs)
 	UNREGISTER_ROOT(result);
 	GROWABLE_TRIM(result);
 	dpush(result);
+}
+
+DEFINE_PRIMITIVE(set_os_env)
+{
+	char *key = unbox_char_string();
+	REGISTER_C_STRING(key);
+	char *value = unbox_char_string();
+	UNREGISTER_C_STRING(key);
+	setenv(key, value, 1);
+}
+
+DEFINE_PRIMITIVE(unset_os_env)
+{
+	char *key = unbox_char_string();
+	unsetenv(key);
 }
 
 DEFINE_PRIMITIVE(set_os_envs)

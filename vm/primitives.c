@@ -182,6 +182,8 @@ void *primitives[] = {
 	primitive_set_innermost_stack_frame_quot,
 	primitive_call_clear,
 	primitive_os_envs,
+	primitive_set_os_env,
+	primitive_unset_os_env,
 	primitive_set_os_envs,
 	primitive_resize_byte_array,
 	primitive_resize_bit_array,

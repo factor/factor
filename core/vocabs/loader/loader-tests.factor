@@ -110,6 +110,8 @@ IN: vocabs.loader.tests
     ] with-compilation-unit
 ] unit-test
 
+[ ] [ "vocabs.loader.test.b" changed-vocab ] unit-test
+
 [ ] [ "vocabs.loader.test.b" refresh ] unit-test
 
 [ 3 ] [ "count-me" get-global ] unit-test
