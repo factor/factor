@@ -65,7 +65,7 @@ GENERIC: (serialize) ( obj -- )
     read1 {
         { [ dup HEX: ff = ] [ drop deserialize-cell read be> ] }
         { [ dup HEX: 80 >= ] [ HEX: 80 bitxor ] }
-        { [ t ] [ read be> ] }
+        [ read be> ]
     } cond ;
 
 : serialize-shared ( obj quot -- )
@@ -183,7 +183,7 @@ M: word (serialize) ( obj -- )
     {
         { [ dup t eq? ] [ serialize-true ] }
         { [ dup word-vocabulary not ] [ serialize-gensym ] }
-        { [ t ] [ serialize-word ] }
+        [ serialize-word ]
     } cond ;
 
 M: wrapper (serialize) ( obj -- )

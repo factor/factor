@@ -73,7 +73,7 @@ M: object add-breakpoint ;
         { [ dup "step-into" word-prop ] [ "step-into" word-prop call ] }
         { [ dup standard-generic? ] [ effective-method (step-into-execute) ] }
         { [ dup primitive? ] [ execute break ] }
-        { [ t ] [ word-def (step-into-quot) ] }
+        [ word-def (step-into-quot) ]
     } cond ;
 
 \ (step-into-execute) t "step-into?" set-word-prop
@@ -153,7 +153,7 @@ SYMBOL: +stopped+
                 { [ dup quotation? ] [ add-breakpoint , \ break , ] }
                 { [ dup array? ] [ add-breakpoint , \ break , ] }
                 { [ dup word? ] [ literalize , \ (step-into-execute) , ] }
-                { [ t ] [ , \ break , ] }
+                [ , \ break , ]
             } cond %
         ] [ ] make
     ] change-frame ;

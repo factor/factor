@@ -9,7 +9,7 @@ IN: rot13
     {
         { [ dup letter? ] [ CHAR: a rotate ] }
         { [ dup LETTER? ] [ CHAR: A rotate ] }
-        { [ t ] [ ] }
+        [ ]
     } cond ;
 
 : rot13 ( string -- string ) [ rot-letter ] map ;

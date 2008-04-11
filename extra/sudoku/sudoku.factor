@@ -32,7 +32,7 @@ DEFER: search
         { [ 3dup nip row-contains? ] [ 3drop ] }
         { [ 3dup drop col-contains? ] [ 3drop ] }
         { [ 3dup box-contains? ] [ 3drop ] }
-        { [ t ] [ assume ] }
+        [ assume ]
     } cond ;
 
 : solve ( x y -- ) 9 [ 1+ 2over attempt ] each 2drop ;
@@ -62,7 +62,7 @@ DEFER: search
         { [ over 9 = ] [ >r drop 0 r> 1+ search ] }
         { [ over 0 = over 9 = and ] [ 2drop solution. ] }
         { [ 2dup board> ] [ >r 1+ r> search ] }
-        { [ t ] [ solve ] }
+        [ solve ]
     } cond ;
 
 : sudoku ( board -- )
