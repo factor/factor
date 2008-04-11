@@ -1001,3 +1001,25 @@ windows-messages set-global
 : LM_GETIDEALHEIGHT WM_USER  HEX: 0301 +  ; inline
 : LM_SETITEM WM_USER  HEX: 0302 + ; inline
 : LM_GETITEM WM_USER  HEX: 0303 + ; inline
+
+
+: WA_INACTIVE 0 ; inline
+: WA_ACTIVE 1 ; inline
+: WA_CLICKACTIVE 2 ; inline
+
+: SC_SIZE         HEX: f000 ; inline
+: SC_MOVE         HEX: f010 ; inline
+: SC_MINIMIZE     HEX: f020 ; inline
+: SC_MAXIMIZE     HEX: f030 ; inline
+: SC_NEXTWINDOW   HEX: f040 ; inline
+: SC_PREVWINDOW   HEX: f050 ; inline
+: SC_CLOSE        HEX: f060 ; inline
+: SC_VSCROLL      HEX: f070 ; inline
+: SC_HSCROLL      HEX: f080 ; inline
+: SC_MOUSEMENU    HEX: f090 ; inline
+: SC_KEYMENU      HEX: f100 ; inline
+: SC_ARRANGE      HEX: f110 ; inline
+: SC_RESTORE      HEX: f120 ; inline
+: SC_TASKLIST     HEX: f130 ; inline
+: SC_SCREENSAVE   HEX: f140 ; inline
+: SC_HOTKEY       HEX: f150 ; inline
