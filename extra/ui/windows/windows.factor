@@ -7,7 +7,7 @@ vectors words windows.kernel32 windows.gdi32 windows.user32
 windows.opengl32 windows.messages windows.types windows.nt
 windows threads libc combinators continuations command-line
 shuffle opengl ui.render unicode.case ascii math.bitfields
-locals symbols ;
+locals symbols accessors ;
 IN: ui.windows
 
 SINGLETON: windows-ui-backend
@@ -203,8 +203,18 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
     wParam keystroke>gesture <key-up>
     hWnd window-focus send-gesture drop ;
 
+: set-window-active ( hwnd uMsg wParam lParam ? -- n )
+    >r 4dup r> 2nip nip
+    swap window set-world-active? DefWindowProc ;
+
 : handle-wm-syscommand ( hWnd uMsg wParam lParam -- n )
-    dup alpha? [ 4drop 0 ] [ DefWindowProc ] if ;
+    {
+        { [ over SC_MINIMIZE = ] [ f set-window-active ] }
+        { [ over SC_RESTORE = ] [ t set-window-active ] }
+        { [ over SC_MAXIMIZE = ] [ t set-window-active ] }
+        { [ dup alpha? ] [ 4drop 0 ] }
+        { [ t ] [ DefWindowProc ] }
+    } cond ;
 
 : cleanup-window ( handle -- )
     dup win-title [ free ] when*

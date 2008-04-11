@@ -32,43 +32,6 @@ IN: tools.vocabs
         [ vocab-tests % ] tri
     ] { } make ;
 
-: source-modified? ( path -- ? )
-    dup source-files get at [
-        dup source-file-path
-        dup exists? [
-            utf8 file-lines lines-crc32
-            swap source-file-checksum = not
-        ] [
-            2drop f
-        ] if
-    ] [
-        exists?
-    ] ?if ;
-
-: modified ( seq quot -- seq )
-    [ dup ] swap compose { } map>assoc
-    [ nip ] assoc-subset
-    [ nip source-modified? ] assoc-subset keys ; inline
-
-: modified-sources ( vocabs -- seq )
-    [ vocab-source-path ] modified ;
-
-: modified-docs ( vocabs -- seq )
-    [ vocab-docs-path ] modified ;
-
-SYMBOL: changed-vocabs
-
-[ f changed-vocabs set-global ] "tools.vocabs" add-init-hook
-
-: filter-changed ( vocabs -- vocabs' )
-    changed-vocabs get [
-        [ delete-at* nip ] curry subset
-    ] when* ;
-
-: to-refresh ( prefix -- modified-sources modified-docs )
-    child-vocabs filter-changed
-    [ modified-sources ] [ modified-docs ] bi ;
-
 : vocab-heading. ( vocab -- )
     nl
     "==== " write
@@ -95,12 +58,88 @@ SYMBOL: failures
         failures get
     ] with-compiler-errors ;
 
-: do-refresh ( modified-sources modified-docs -- )
+: source-modified? ( path -- ? )
+    dup source-files get at [
+        dup source-file-path
+        dup exists? [
+            utf8 file-lines lines-crc32
+            swap source-file-checksum = not
+        ] [
+            2drop f
+        ] if
+    ] [
+        exists?
+    ] ?if ;
+
+SYMBOL: changed-vocabs
+
+[ f changed-vocabs set-global ] "tools.vocabs" add-init-hook
+
+: changed-vocab ( vocab -- )
+    dup vocab changed-vocabs get and
+    [ dup changed-vocabs get set-at ] [ drop ] if ;
+
+: unchanged-vocab ( vocab -- )
+    changed-vocabs get delete-at ;
+
+: unchanged-vocabs ( vocabs -- )
+    [ unchanged-vocab ] each ;
+
+: changed-vocab? ( vocab -- ? )
+    changed-vocabs get dup [ key? ] [ 2drop t ] if ;
+
+: filter-changed ( vocabs -- vocabs' )
+    [ changed-vocab? ] subset ;
+
+SYMBOL: modified-sources
+SYMBOL: modified-docs
+
+: (to-refresh) ( vocab variable loaded? path -- )
+    dup [
+        swap [
+            pick changed-vocab? [
+                source-modified? [ get push ] [ 2drop ] if
+            ] [ 3drop ] if
+        ] [ drop get push ] if
+    ] [ 2drop 2drop ] if ;
+
+: to-refresh ( prefix -- modified-sources modified-docs unchanged )
+    [
+        V{ } clone modified-sources set
+        V{ } clone modified-docs set
+
+        child-vocabs [
+            [
+                [
+                    [ modified-sources ]
+                    [ vocab-source-loaded? ]
+                    [ vocab-source-path ]
+                    tri (to-refresh)
+                ] [
+                    [ modified-docs ]
+                    [ vocab-docs-loaded? ]
+                    [ vocab-docs-path ]
+                    tri (to-refresh)
+                ] bi
+            ] each
+
+            modified-sources get
+            modified-docs get
+        ]
+        [ modified-sources get modified-docs get append swap seq-diff ] bi
+    ] with-scope ;
+
+: do-refresh ( modified-sources modified-docs unchanged -- )
+    unchanged-vocabs
     [
         [ [ f swap set-vocab-source-loaded? ] each ]
         [ [ f swap set-vocab-docs-loaded? ] each ] bi*
     ]
-    [ append prune require-all load-failures. ] 2bi ;
+    [
+        append prune
+        [ unchanged-vocabs ]
+        [ require-all load-failures. ] bi
+    ] 2bi ;
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 

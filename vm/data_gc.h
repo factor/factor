@@ -315,7 +315,7 @@ INLINE void* allot_object(CELL type, CELL a)
 {
 	CELL *object;
 
-	if(nursery->size - ALLOT_BUFFER_ZONE > a)
+	if(HAVE_NURSERY_P && nursery->size - ALLOT_BUFFER_ZONE > a)
 	{
 		/* If there is insufficient room, collect the nursery */
 		if(nursery->here + ALLOT_BUFFER_ZONE + a > nursery->end)

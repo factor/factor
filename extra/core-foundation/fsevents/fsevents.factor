@@ -151,11 +151,9 @@ SYMBOL: event-stream-callbacks
 
 [
     event-stream-callbacks global
-    [ [ drop expired? not ] assoc-subset ] change-at
+    [ [ drop expired? not ] assoc-subset H{ } assoc-like ] change-at
     1 \ event-stream-counter set-global
 ] "core-foundation" add-init-hook
-
-event-stream-callbacks global [ H{ } assoc-like ] change-at
 
 : add-event-source-callback ( quot -- id )
     event-stream-counter <alien>

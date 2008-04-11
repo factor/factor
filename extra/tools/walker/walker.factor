@@ -72,6 +72,7 @@ M: object add-breakpoint ;
     {
         { [ dup "step-into" word-prop ] [ "step-into" word-prop call ] }
         { [ dup standard-generic? ] [ effective-method (step-into-execute) ] }
+        { [ dup hook-generic? ] [ effective-method (step-into-execute) ] }
         { [ dup primitive? ] [ execute break ] }
         [ word-def (step-into-quot) ]
     } cond ;

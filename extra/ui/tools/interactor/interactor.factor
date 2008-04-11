@@ -138,7 +138,9 @@ M: interactor stream-read-partial
         drop parse-lines-interactive
     ] [
         2nip
-        dup delegate unexpected-eof? [ drop f ] when
+        dup parse-error? [
+            dup error>> unexpected-eof? [ drop f ] when
+        ] when
     ] recover ;
 
 : handle-interactive ( lines interactor -- quot/f ? )

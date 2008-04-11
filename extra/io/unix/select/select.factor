@@ -29,7 +29,6 @@ TUPLE: select-mx read-fdset write-fdset ;
     [ handle-fd ] 2curry assoc-each ;
 
 : init-fdset ( tasks fdset -- )
-    ! dup clear-bits
     [ >r drop t swap munge r> set-nth ] curry assoc-each ;
 
 : read-fdset/tasks
@@ -45,9 +44,9 @@ TUPLE: select-mx read-fdset write-fdset ;
     [ reads>> max-fd ] [ writes>> max-fd ] bi max 1+ ;
 
 : init-fdsets ( mx -- nfds read write except )
-    [ num-fds ] keep
-    [ read-fdset/tasks tuck init-fdset ] keep
-    write-fdset/tasks tuck init-fdset
+    [ num-fds ]
+    [ read-fdset/tasks tuck init-fdset ]
+    [ write-fdset/tasks tuck init-fdset ] tri
     f ;
 
 M: select-mx wait-for-events ( ms mx -- )

@@ -1,6 +1,7 @@
 USING: alien alien.syntax combinators kernel parser sequences
 system words namespaces hashtables init math arrays assocs
 continuations ;
+IN: opengl.gl.extensions
 
 ERROR: unknown-gl-platform ;
 << {
@@ -9,7 +10,6 @@ ERROR: unknown-gl-platform ;
     { [ os unix? ] [ "opengl.gl.unix" ] }
     [ unknown-gl-platform ]
 } cond use+ >>
-IN: opengl.gl.extensions
 
 SYMBOL: +gl-function-number-counter+
 SYMBOL: +gl-function-pointers+
