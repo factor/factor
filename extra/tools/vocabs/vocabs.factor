@@ -76,11 +76,11 @@ SYMBOL: changed-vocabs
 [ f changed-vocabs set-global ] "tools.vocabs" add-init-hook
 
 : changed-vocab ( vocab -- )
-    dup vocab
-    [ dup changed-vocabs get-global set-at ] [ drop ] if ;
+    dup vocab changed-vocabs get and
+    [ dup changed-vocabs get set-at ] [ drop ] if ;
 
 : unchanged-vocab ( vocab -- )
-    changed-vocabs get-global delete-at ;
+    changed-vocabs get delete-at ;
 
 : unchanged-vocabs ( vocabs -- )
     [ unchanged-vocab ] each ;
