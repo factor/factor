@@ -128,9 +128,9 @@ M: unix cancel-io ( port -- )
 
 : refill ( port -- ? )
     #! Return f if there is a recoverable error
-    dup buffer-empty? [
+    dup buffer>> buffer-empty? [
         dup (refill)  dup 0 >= [
-            swap n>buffer t
+            swap buffer>> n>buffer t
         ] [
             drop defer-error
         ] if

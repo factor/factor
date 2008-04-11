@@ -1,5 +1,5 @@
 USING: io io.mmap io.files kernel tools.test continuations
-sequences io.encodings.ascii ;
+sequences io.encodings.ascii accessors ;
 IN: io.mmap.tests
 
 [ "mmap-test-file.txt" resource-path delete-file ] ignore-errors

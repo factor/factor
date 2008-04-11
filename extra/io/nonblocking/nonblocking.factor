@@ -4,7 +4,7 @@ IN: io.nonblocking
 USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.streams.duplex io.encodings
 io.backend continuations debugger classes byte-arrays namespaces
-splitting dlists assocs io.encodings.binary ;
+splitting dlists assocs io.encodings.binary accessors ;
 
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
