@@ -284,7 +284,7 @@ HELP: <word>
 
 HELP: gensym
 { $values { "word" word } }
-{ $description "Creates an uninterned word that is not equal to any other word in the system. Gensyms have an automatically-generated name based on a prefix and an incrementing counter." }
+{ $description "Creates an uninterned word that is not equal to any other word in the system." }
 { $examples { $unchecked-example "gensym ." "G:260561" } }
 { $notes "Gensyms are often used as placeholder values that have no meaning of their own but must be unique. For example, the compiler uses gensyms to label sections of code." } ;
 
