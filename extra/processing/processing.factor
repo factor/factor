@@ -28,7 +28,9 @@ IN: processing
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: at-fraction ( seq fraction -- val ) over length 1- * nth-at ;
+! : at-fraction ( seq fraction -- val ) over length 1- * nth-at ;
+
+: at-fraction ( seq fraction -- val ) over length 1- * at ;
 
 : at-fraction-of ( fraction seq -- val ) swap at-fraction ;
 
