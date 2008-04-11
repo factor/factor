@@ -76,16 +76,16 @@ M: unix copy-file ( from to -- )
     2bi ;
 
 : stat>type ( stat -- type )
-    stat-st_mode {
-        { [ dup S_ISREG  ] [ +regular-file+     ] }
-        { [ dup S_ISDIR  ] [ +directory+        ] }
-        { [ dup S_ISCHR  ] [ +character-device+ ] }
-        { [ dup S_ISBLK  ] [ +block-device+     ] }
-        { [ dup S_ISFIFO ] [ +fifo+             ] }
-        { [ dup S_ISLNK  ] [ +symbolic-link+    ] }
-        { [ dup S_ISSOCK ] [ +socket+           ] }
-        { [ t            ] [ +unknown+          ] }
-    } cond nip ;
+    stat-st_mode S_IFMT bitand {
+        { S_IFREG [ +regular-file+ ] }
+        { S_IFDIR [ +directory+ ] }
+        { S_IFCHR [ +character-device+ ] }
+        { S_IFBLK [ +block-device+ ] }
+        { S_IFIFO [ +fifo+ ] }
+        { S_IFLNK [ +symbolic-link+ ] }
+        { S_IFSOCK [ +socket+ ] }
+        [ drop +unknown+ ]
+    } case ;
 
 : stat>file-info ( stat -- info )
     {

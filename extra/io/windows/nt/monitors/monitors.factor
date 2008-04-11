@@ -58,13 +58,13 @@ M: winnt <monitor> ( path recursive? -- monitor )
 
 : parse-action ( action -- changed )
     {
-        { [ dup FILE_ACTION_ADDED = ] [ +add-file+ ] }
-        { [ dup FILE_ACTION_REMOVED = ] [ +remove-file+ ] }
-        { [ dup FILE_ACTION_MODIFIED = ] [ +modify-file+ ] }
-        { [ dup FILE_ACTION_RENAMED_OLD_NAME = ] [ +rename-file+ ] }
-        { [ dup FILE_ACTION_RENAMED_NEW_NAME = ] [ +rename-file+ ] }
-        { [ t ] [ +modify-file+ ] }
-    } cond nip ;
+        { \ FILE_ACTION_ADDED [ +add-file+ ] }
+        { \ FILE_ACTION_REMOVED [ +remove-file+ ] }
+        { \ FILE_ACTION_MODIFIED [ +modify-file+ ] }
+        { \ FILE_ACTION_RENAMED_OLD_NAME [ +rename-file+ ] }
+        { \ FILE_ACTION_RENAMED_NEW_NAME [ +rename-file+ ] }
+        [ drop +modify-file+ ]
+    } case ;
 
 : memory>u16-string ( alien len -- string )
     [ memory>byte-array ] keep 2/ c-ushort-array> >string ;
