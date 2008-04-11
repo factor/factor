@@ -85,5 +85,3 @@ FUNCTION: void CFRelease ( void* cf ) ;
     ] [
         "Cannot load bundled named " prepend throw
     ] ?if ;
-
-FUNCTION: CFRunLoopRef CFRunLoopGetMain ( ) ;
