@@ -189,7 +189,7 @@ UNION: operand register indirect ;
     {
         { [ dup register-128? ] [ drop operand-64? ] }
         { [ dup not ] [ drop operand-64? ] }
-        { [ t ] [ nip operand-64? ] }
+        [ nip operand-64? ]
     } cond and ;
 
 : rex.r

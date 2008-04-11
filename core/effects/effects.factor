@@ -20,7 +20,7 @@ TUPLE: effect in out terminated? ;
         { [ dup effect-terminated? ] [ f ] }
         { [ 2dup [ effect-in length ] bi@ > ] [ f ] }
         { [ 2dup [ effect-height ] bi@ = not ] [ f ] }
-        { [ t ] [ t ] }
+        [ t ]
     } cond 2nip ;
 
 GENERIC: (stack-picture) ( obj -- str )

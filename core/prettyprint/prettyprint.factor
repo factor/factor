@@ -107,7 +107,7 @@ SYMBOL: ->
                 { [ dup word? not ] [ , ] }
                 { [ dup "break?" word-prop ] [ drop ] }
                 { [ dup "step-into?" word-prop ] [ remove-step-into ] }
-                { [ t ] [ , ] }
+                [ , ]
             } cond
         ] each
     ] [ ] make ;

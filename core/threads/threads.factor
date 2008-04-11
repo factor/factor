@@ -86,7 +86,7 @@ PRIVATE>
     {
         { [ run-queue dlist-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
-        { [ t ] [ sleep-queue heap-peek nip millis [-] ] }
+        [ sleep-queue heap-peek nip millis [-] ]
     } cond ;
 
 <PRIVATE

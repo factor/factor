@@ -57,7 +57,7 @@ IN: optimizer.specializers
             [ dup "specializer" word-prop ]
             [ "specializer" word-prop specialize-quot ]
         }
-        { [ t ] [ drop ] }
+        [ drop ]
     } cond ;
 
 : specialized-length ( specializer -- n )
