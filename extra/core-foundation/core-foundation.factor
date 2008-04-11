@@ -9,9 +9,9 @@ TYPEDEF: void* CFBundleRef
 TYPEDEF: void* CFStringRef
 TYPEDEF: void* CFURLRef
 TYPEDEF: void* CFUUIDRef
-TYPEDEF: void* CFRunLoopRef
 TYPEDEF: bool Boolean
 TYPEDEF: int CFIndex
+TYPEDEF: int SInt32
 TYPEDEF: double CFTimeInterval
 TYPEDEF: double CFAbsoluteTime
 
