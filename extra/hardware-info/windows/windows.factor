@@ -1,7 +1,7 @@
 USING: alien alien.c-types kernel libc math namespaces
 windows windows.kernel32 windows.advapi32
 words combinators vocabs.loader hardware-info.backend
-system ;
+system alien.strings ;
 IN: hardware-info.windows
 
 : system-info ( -- SYSTEM_INFO )
