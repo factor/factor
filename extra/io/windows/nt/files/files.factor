@@ -64,7 +64,7 @@ M: winnt FileArgs-overlapped ( port -- overlapped )
     dup pending-error
     tuck get-overlapped-result
     dup pick update-file-ptr
-    swap buffer-consume ;
+    swap buffer>> buffer-consume ;
 
 : (flush-output) ( port -- )
     dup make-FileArgs
@@ -73,7 +73,7 @@ M: winnt FileArgs-overlapped ( port -- overlapped )
         >r FileArgs-lpOverlapped r>
         [ save-callback ] 2keep
         [ finish-flush ] keep
-        dup buffer-empty? [ drop ] [ (flush-output) ] if
+        dup buffer>> buffer-empty? [ drop ] [ (flush-output) ] if
     ] [
         2drop
     ] if ;
@@ -82,7 +82,7 @@ M: winnt FileArgs-overlapped ( port -- overlapped )
     [ [ (flush-output) ] with-timeout ] with-destructors ;
 
 M: port port-flush
-    dup buffer-empty? [ dup flush-output ] unless drop ;
+    dup buffer>> buffer-empty? [ dup flush-output ] unless drop ;
 
 : finish-read ( overlapped port -- )
     dup pending-error

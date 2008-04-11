@@ -92,7 +92,7 @@ M: win32-file close-handle ( handle -- )
     ] when drop ;
 
 : open-append ( path -- handle length )
-    [ dup file-info file-info-size ] [ drop 0 ] recover
+    [ dup file-info size>> ] [ drop 0 ] recover
     >r (open-append) r> 2dup set-file-pointer ;
 
 TUPLE: FileArgs
@@ -103,9 +103,9 @@ C: <FileArgs> FileArgs
 
 : make-FileArgs ( port -- <FileArgs> )
     [ port-handle win32-file-handle ] keep
-    [ delegate ] keep
+    [ buffer>> ] keep
     [
-        buffer-length
+        buffer>> buffer-length
         "DWORD" <c-object>
     ] keep FileArgs-overlapped <FileArgs> ;
 

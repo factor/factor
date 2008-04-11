@@ -72,7 +72,7 @@ M: unix delete-directory ( path -- )
 M: unix copy-file ( from to -- )
     [ normalize-path ] bi@
     [ (copy-file) ]
-    [ swap file-info file-info-permissions chmod io-error ]
+    [ swap file-info permissions>> chmod io-error ]
     2bi ;
 
 : stat>type ( stat -- type )

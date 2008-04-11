@@ -12,7 +12,7 @@ namespaces continuations layouts ;
     ] with-directory ;
 
 : small-enough? ( n -- ? )
-    >r "test.image" temp-file file-info file-info-size r> <= ;
+    >r "test.image" temp-file file-info size>> r> <= ;
 
 [ ] [ "hello-world" shake-and-bake ] unit-test
 

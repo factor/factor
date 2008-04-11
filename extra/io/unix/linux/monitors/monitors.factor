@@ -103,8 +103,8 @@ M: linux-monitor dispose ( monitor -- )
 
 : inotify-read-loop ( port -- )
     dup wait-to-read1
-    0 over parse-file-notifications
-    0 over buffer-reset
+    0 over buffer>> parse-file-notifications
+    0 over buffer>> buffer-reset
     inotify-read-loop ;
 
 : inotify-read-thread ( port -- )

@@ -119,10 +119,12 @@ M: unix cancel-io ( port -- )
 
 ! Readers
 : reader-eof ( reader -- )
-    dup buffer-empty? [ t >>eof? ] when drop ;
+    dup buffer>> buffer-empty? [ t >>eof ] when drop ;
 
 : (refill) ( port -- n )
-    [ handle>> ] [ buffer-end ] [ buffer-capacity ] tri read ;
+    [ handle>> ]
+    [ buffer>> buffer-end ]
+    [ buffer>> buffer-capacity ] tri read ;
 
 : refill ( port -- ? )
     #! Return f if there is a recoverable error
@@ -151,8 +153,13 @@ M: input-port (wait-to-read)
 
 ! Writers
 : write-step ( port -- ? )
-    dup [ handle>> ] [ buffer@ ] [ buffer-length ] tri write
-    dup 0 >= [ swap buffer-consume f ] [ drop defer-error ] if ;
+    dup
+    [ handle>> ]
+    [ buffer>> buffer@ ]
+    [ buffer>> buffer-length ] tri
+    write dup 0 >=
+    [ swap buffer>> buffer-consume f ]
+    [ drop defer-error ] if ;
 
 TUPLE: write-task < output-task ;
 
@@ -160,11 +167,11 @@ TUPLE: write-task < output-task ;
     write-task <io-task> ;
 
 M: write-task do-io-task
-    io-task-port dup [ buffer-empty? ] [ port-error ] bi or
-    [ 0 swap buffer-reset t ] [ write-step ] if ;
+    io-task-port dup [ buffer>> buffer-empty? ] [ port-error ] bi or
+    [ 0 swap buffer>> buffer-reset t ] [ write-step ] if ;
 
 : add-write-io-task ( port continuation -- )
-    over port-handle mx get-global mx-writes at*
+    over handle>> mx get-global writes>> at*
     [ io-task-callbacks push drop ]
     [ drop <write-task> add-io-task ] if ;
 
@@ -172,7 +179,7 @@ M: write-task do-io-task
     [ add-write-io-task ] with-port-continuation drop ;
 
 M: port port-flush ( port -- )
-    dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
+    dup buffer>> buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: unix io-multiplex ( ms/f -- )
     mx get-global wait-for-events ;
@@ -186,7 +193,7 @@ M: unix (init-stdio) ( -- )
 TUPLE: mx-port mx ;
 
 : <mx-port> ( mx -- port )
-    dup fd>> f mx-port <port>
+    dup fd>> mx-port <port>
     { set-mx-port-mx set-delegate } mx-port construct ;
 
 TUPLE: mx-task < io-task ;

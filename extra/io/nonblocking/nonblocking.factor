@@ -12,9 +12,10 @@ SYMBOL: default-buffer-size
 ! Common delegate of native stream readers and writers
 TUPLE: port
 handle
+buffer
 error
 timeout
-type eof? ;
+type eof ;
 
 M: port timeout port-timeout ;
 
@@ -28,15 +29,14 @@ PREDICATE: output-port < port port-type output-port eq? ;
 GENERIC: init-handle ( handle -- )
 GENERIC: close-handle ( handle -- )
 
-: <port> ( handle buffer type -- port )
-    pick init-handle {
-        set-port-handle
-        set-delegate
-        set-port-type
-    } port construct ;
+: <port> ( handle type -- port )
+    port construct-empty
+        swap >>type
+        swap dup init-handle >>handle ;
 
 : <buffered-port> ( handle type -- port )
-    default-buffer-size get <buffer> swap <port> ;
+    <port>
+        default-buffer-size get <buffer> >>buffer ;
 
 : <reader> ( handle -- input-port )
     input-port <buffered-port> ;
@@ -48,7 +48,7 @@ GENERIC: close-handle ( handle -- )
     swap <reader> [ swap <writer> ] [ ] [ dispose drop ] cleanup ;
 
 : pending-error ( port -- )
-    dup port-error f rot set-port-error [ throw ] when* ;
+    [ f ] change-error drop [ throw ] when* ;
 
 HOOK: cancel-io io-backend ( port -- )
 
@@ -59,21 +59,21 @@ M: port timed-out cancel-io ;
 GENERIC: (wait-to-read) ( port -- )
 
 : wait-to-read ( count port -- )
-    tuck buffer-length > [ (wait-to-read) ] [ drop ] if ;
+    tuck buffer>> buffer-length > [ (wait-to-read) ] [ drop ] if ;
 
 : wait-to-read1 ( port -- )
     1 swap wait-to-read ;
 
 : unless-eof ( port quot -- value )
-    >r dup buffer-empty? over port-eof? and
-    [ f swap set-port-eof? f ] r> if ; inline
+    >r dup buffer>> buffer-empty? over eof>> and
+    [ f >>eof drop f ] r> if ; inline
 
 M: input-port stream-read1
-    dup wait-to-read1 [ buffer-pop ] unless-eof ;
+    dup wait-to-read1 [ buffer>> buffer-pop ] unless-eof ;
 
 : read-step ( count port -- byte-array/f )
     [ wait-to-read ] 2keep
-    [ dupd buffer-read ] unless-eof nip ;
+    [ dupd buffer>> buffer-read ] unless-eof nip ;
 
 : read-loop ( count port accum -- )
     pick over length - dup 0 > [
@@ -94,55 +94,53 @@ M: input-port stream-read
             [ push-all ] keep
             [ read-loop ] keep
             B{ } like
-        ] [
-            2nip
-        ] if
-    ] [
-        2nip
-    ] if ;
+        ] [ 2nip ] if
+    ] [ 2nip ] if ;
 
 M: input-port stream-read-partial ( max stream -- byte-array/f )
     >r 0 max >fixnum r> read-step ;
 
-: can-write? ( len writer -- ? )
+: can-write? ( len buffer -- ? )
     [ buffer-fill + ] keep buffer-capacity <= ;
 
 : wait-to-write ( len port -- )
-    tuck can-write? [ drop ] [ stream-flush ] if ;
+    tuck buffer>> can-write? [ drop ] [ stream-flush ] if ;
 
 M: output-port stream-write1
-    1 over wait-to-write byte>buffer ;
+    1 over wait-to-write
+    buffer>> byte>buffer ;
 
 M: output-port stream-write
-    over length over buffer-size > [
-        [ buffer-size <groups> ] keep
-        [ stream-write ] curry each
+    over length over buffer>> buffer-size > [
+        [ buffer>> buffer-size <groups> ]
+        [ [ stream-write ] curry ] bi
+        each
     ] [
-        over length over wait-to-write >buffer
+        [ >r length r> wait-to-write ]
+        [ buffer>> >buffer ] 2bi
     ] if ;
 
 GENERIC: port-flush ( port -- )
 
 M: output-port stream-flush ( port -- )
-    dup port-flush pending-error ;
+    [ port-flush ] [ pending-error ] bi ;
 
 : close-port ( port type -- )
     output-port eq? [ dup port-flush ] when
     dup cancel-io
-    dup port-handle close-handle
-    dup delegate [ buffer-free ] when*
-    f swap set-delegate ;
+    dup handle>> close-handle
+    [ [ buffer-free ] when* f ] change-buffer drop ;
 
 M: port dispose
-    dup port-type closed eq?
+    dup type>> closed eq?
     [ drop ]
-    [ dup port-type >r closed over set-port-type r> close-port ]
+    [ [ closed ] change-type swap close-port ]
     if ;
 
 TUPLE: server-port addr client client-addr encoding ;
 
 : <server-port> ( handle addr encoding -- server )
-    rot f server-port <port>
+    rot server-port <port>
     { set-server-port-addr set-server-port-encoding set-delegate }
     server-port construct ;
 
@@ -152,7 +150,7 @@ TUPLE: server-port addr client client-addr encoding ;
 TUPLE: datagram-port addr packet packet-addr ;
 
 : <datagram-port> ( handle addr -- datagram )
-    >r f datagram-port <port> r>
+    >r datagram-port <port> r>
     { set-delegate set-datagram-port-addr }
     datagram-port construct ;
 

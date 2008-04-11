@@ -37,10 +37,12 @@ M: winnt <monitor> ( path recursive? -- monitor )
     ] with-destructors ;
 
 : begin-reading-changes ( monitor -- overlapped )
-    dup port-handle win32-file-handle
-    over buffer-ptr
-    pick buffer-size
-    roll win32-monitor-recursive? 1 0 ?
+    {
+        [ handle>> handle>> ]
+        [ buffer>> buffer-ptr ]
+        [ buffer>> buffer-size ]
+        [ win32-monitor-recursive? 1 0 ? ]
+    } cleave
     FILE_NOTIFY_CHANGE_ALL
     0 <uint>
     (make-overlapped)
@@ -82,6 +84,6 @@ M: winnt <monitor> ( path recursive? -- monitor )
     [ 2drop ] [ swap <displaced-alien> (changed-files) ] if ;
 
 M: win32-monitor fill-queue ( monitor -- )
-    dup buffer-ptr over read-changes
+    dup buffer>> buffer-ptr over read-changes
     [ zero? [ drop ] [ (changed-files) ] if ] H{ } make-assoc
     swap set-monitor-queue ;
