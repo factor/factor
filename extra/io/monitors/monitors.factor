@@ -45,6 +45,7 @@ SYMBOL: +remove-file+
 SYMBOL: +modify-file+
 SYMBOL: +rename-file-old+
 SYMBOL: +rename-file-new+
+SYMBOL: +rename-file+
 
 : with-monitor ( path recursive? quot -- )
     >r <monitor> r> with-disposal ; inline

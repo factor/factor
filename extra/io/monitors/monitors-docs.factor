@@ -42,13 +42,17 @@ HELP: +rename-file-old+
 HELP: +rename-file-new+
 { $description "Indicates that a file has been renamed, and this is the new name." } ;
 
+HELP: +rename-file+
+{ $description "Indicates that a file has been renamed." } ;
+
 ARTICLE: "io.monitors.descriptors" "File system change descriptors"
 "Change descriptors output by " { $link next-change } ":"
 { $subsection +add-file+ }
 { $subsection +remove-file+ }
 { $subsection +modify-file+ }
 { $subsection +rename-file-old+ }
-{ $subsection +rename-file-new+ } ;
+{ $subsection +rename-file-new+ }
+{ $subsection +rename-file+ } ;
 
 ARTICLE: "io.monitors.platforms" "Monitors on different platforms"
 "Whether the " { $snippet "path" } " output value of " { $link next-change } " contains an absolute path or a path relative to the path given to " { $link <monitor> } " is platform-specific. User code should not assume either case."

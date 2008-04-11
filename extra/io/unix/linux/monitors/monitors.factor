@@ -55,9 +55,6 @@ M: linux-monitor dispose ( monitor -- )
     [ wd>> watches get delete-at ]
     [ wd>> inotify-fd swap inotify_rm_watch io-error ] bi ;
 
-: ?flag ( n mask symbol -- n )
-    pick rot bitand 0 > [ , ] [ drop ] if ;
-
 : ignore-flags? ( mask -- ? )
     {
         IN_DELETE_SELF
@@ -76,7 +73,7 @@ M: linux-monitor dispose ( monitor -- )
         IN_MOVED_FROM +rename-file-old+ ?flag
         IN_MOVED_TO +rename-file-new+ ?flag
         drop
-    ] { } make ;
+    ] { } make prune ;
 
 : parse-file-notify ( buffer -- path changed )
     dup inotify-event-mask ignore-flags? [

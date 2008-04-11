@@ -203,3 +203,6 @@ M: mx-task do-io-task
 
 : multiplexer-error ( n -- )
     0 < [ err_no ignorable-error? [ (io-error) ] unless ] when ;
+
+: ?flag ( n mask symbol -- n )
+    pick rot bitand 0 > [ , ] [ drop ] if ;

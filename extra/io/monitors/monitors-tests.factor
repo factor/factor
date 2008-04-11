@@ -3,7 +3,7 @@ USING: io.monitors tools.test io.files system sequences
 continuations namespaces concurrency.count-downs kernel io
 threads calendar prettyprint ;
 
-os wince? [
+os { winnt linux macosx } member? [
     [
         [ "monitor-test" temp-file delete-tree ] ignore-errors
 
@@ -88,4 +88,4 @@ os wince? [
 
         [ ] [ "m" get dispose ] unit-test
     ] with-monitors
-] unless
+] when
