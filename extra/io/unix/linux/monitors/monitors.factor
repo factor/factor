@@ -4,7 +4,7 @@ USING: kernel io.backend io.monitors io.monitors.recursive
 io.files io.buffers io.monitors io.nonblocking io.timeouts
 io.unix.backend io.unix.select unix.linux.inotify assocs
 namespaces threads continuations init math math.bitfields
-alien.c-types alien vocabs.loader accessors system ;
+alien.c-types alien vocabs.loader accessors system hashtables ;
 IN: io.unix.linux.monitors
 
 TUPLE: linux-monitor < monitor wd ;
