@@ -191,7 +191,7 @@ SYMBOL: drag-timer
         { [ multi-click-button?   not ] [ f ] }
         { [ multi-click-position? not ] [ f ] }
         { [ multi-click-position? not ] [ f ] }
-        { [ t ] [ t ] }
+        [ t ]
     } cond nip ;
 
 : update-click# ( button -- )
