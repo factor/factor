@@ -2,6 +2,7 @@
 USING: kernel words namespaces classes parser continuations
        io io.files io.launcher io.sockets
        math math.parser
+       system
        combinators sequences splitting quotations arrays strings tools.time
        sequences.deep accessors assocs.lib
        io.encodings.utf8
@@ -94,4 +95,6 @@ USE: prettyprint
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: failsafe ( quot -- ) [ drop ] recover ;
+: cpu- ( -- cpu ) cpu unparse "." split "-" join ;
+
+: platform ( -- string ) { [ os unparse ] cpu- } to-strings "-" join ;
