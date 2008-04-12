@@ -40,21 +40,6 @@ DEFER: to-strings
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! TUPLE: process* arguments stdin stdout stderr timeout ;
-
-! : <process*> process* construct-empty ;
-
-! : >desc ( process* -- desc )
-!   H{ } clone
-!     over arguments>> [ +arguments+ swap put-at ] when*
-!     over stdin>>     [ +stdin+     swap put-at ] when*
-!     over stdout>>    [ +stdout+    swap put-at ] when*
-!     over stderr>>    [ +stderr+    swap put-at ] when*
-!     over timeout>>   [ +timeout+   swap put-at ] when*
-!   nip ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : host-name* ( -- name ) host-name "." split first ;
 
 : datestamp ( -- string )
