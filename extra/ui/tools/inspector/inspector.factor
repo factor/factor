@@ -43,5 +43,9 @@ inspector-gadget "toolbar" f {
     { T{ key-down f f "F1" } inspector-help }
 } define-command-map
 
+inspector-gadget "multi-touch" f {
+    { T{ left-action } &back }
+} define-command-map
+
 M: inspector-gadget tool-scroller
     inspector-gadget-pane find-scroller ;

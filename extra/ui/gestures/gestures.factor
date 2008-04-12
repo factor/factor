@@ -39,11 +39,19 @@ TUPLE: lose-focus ;         C: <lose-focus> lose-focus
 TUPLE: gain-focus ;         C: <gain-focus> gain-focus
 
 ! Higher-level actions
-TUPLE: cut-action ;        C: <cut-action> cut-action
-TUPLE: copy-action ;       C: <copy-action> copy-action
-TUPLE: paste-action ;      C: <paste-action> paste-action
-TUPLE: delete-action ;     C: <delete-action> delete-action
-TUPLE: select-all-action ; C: <select-all-action> select-all-action
+TUPLE: cut-action ;         C: <cut-action> cut-action
+TUPLE: copy-action ;        C: <copy-action> copy-action
+TUPLE: paste-action ;       C: <paste-action> paste-action
+TUPLE: delete-action ;      C: <delete-action> delete-action
+TUPLE: select-all-action ;  C: <select-all-action> select-all-action
+
+TUPLE: left-action ;        C: <left-action> left-action
+TUPLE: right-action ;       C: <right-action> right-action
+TUPLE: up-action ;          C: <up-action> up-action
+TUPLE: down-action ;        C: <down-action> down-action
+
+TUPLE: zoom-in-action ;  C: <zoom-in-action> zoom-in-action
+TUPLE: zoom-out-action ; C: <zoom-out-action> zoom-out-action
 
 : generalize-gesture ( gesture -- newgesture )
     tuple>array 1 head* >tuple ;

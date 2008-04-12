@@ -76,3 +76,8 @@ browser-gadget "toolbar" f {
     { T{ key-down f { A+ } "v" } com-vocabularies }
     { T{ key-down f f "F1" } browser-help }
 } define-command-map
+
+browser-gadget "multi-touch" f {
+    { T{ left-action } com-back }
+    { T{ right-action } com-forward }
+} define-command-map

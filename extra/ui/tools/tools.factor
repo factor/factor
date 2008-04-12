@@ -70,6 +70,11 @@ workspace "tool-switching" f {
     { T{ key-down f { A+ } "4" } com-profiler }
 } define-command-map
 
+workspace "multi-touch" f {
+    { T{ zoom-out-action } com-listener }
+    { T{ up-action } refresh-all }
+} define-command-map
+
 \ workspace-window
 H{ { +nullary+ t } } define-command
 
