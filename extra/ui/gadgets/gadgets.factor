@@ -378,7 +378,7 @@ SYMBOL: in-layout?
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ dup not ] [ 2drop f ] }
-        { [ t ] [ gadget-parent child? ] }
+        [ gadget-parent child? ]
     } cond ;
 
 GENERIC: focusable-child* ( gadget -- child/t )

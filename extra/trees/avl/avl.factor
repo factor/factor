@@ -29,7 +29,7 @@ TUPLE: avl-node balance ;
     avl-node-balance {
         { [ dup zero? ] [ 2drop 0 0 ] }
         { [ over = ] [ neg 0 ] }
-        { [ t ] [ 0 swap ] }
+        [ 0 swap ]
     } cond ;
 
 : double-rotate ( node -- node )
@@ -89,7 +89,7 @@ M: avl set-at ( value key node -- node )
     current-side get over avl-node-balance {
         { [ dup zero? ] [ drop neg over set-avl-node-balance f ] }
         { [ dupd = ] [ drop 0 over set-avl-node-balance t ] }
-        { [ t ] [ dupd neg change-balance rebalance-delete ] }
+        [ dupd neg change-balance rebalance-delete ]
     } cond ;
 
 : avl-replace-with-extremity ( to-replace node -- node shorter? )

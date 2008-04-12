@@ -70,7 +70,7 @@ DEFER: (gadget-subtree)
         { [ pick empty? ] [ rot drop traverse-to-path ] }
         { [ over empty? ] [ nip traverse-from-path ] }
         { [ pick first pick first = ] [ traverse-child ] }
-        { [ t ] [ traverse-middle ] }
+        [ traverse-middle ]
     } cond ;
 
 : gadget-subtree ( frompath topath gadget -- seq )

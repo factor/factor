@@ -35,7 +35,7 @@ unicode.categories ;
         { [ 2dup length 1- number= ] [ 2drop 4 ] }
         { [ 2dup >r 1- r> nth Letter? not ] [ 2drop 10 ] }
         { [ 2dup >r 1+ r> nth Letter? not ] [ 2drop 4 ] }
-        { [ t ] [ 2drop 1 ] }
+        [ 2drop 1 ]
     } cond ;
 
 : score ( full fuzzy -- n )

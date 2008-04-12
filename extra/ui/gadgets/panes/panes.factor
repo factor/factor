@@ -88,7 +88,7 @@ C: <pane-stream> pane-stream
     dup gadget-children {
         { [ dup empty? ] [ 2drop "" <label> ] }
         { [ dup length 1 = ] [ nip first ] }
-        { [ t ] [ drop ] }
+        [ drop ]
     } cond ;
 
 : smash-pane ( pane -- gadget ) pane-output smash-line ;

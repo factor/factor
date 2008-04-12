@@ -86,7 +86,7 @@ SYMBOL: ns-stack
         { [ dup not ] [ 2drop ] }
         { [ 2dup = ] [ 2drop next ] }
         { [ dup CHAR: & = ] [ drop parse-entity (parse-char) ] }
-        { [ t ] [ , next (parse-char) ] }
+        [ , next (parse-char) ]
     } cond ;
 
 : parse-char ( ch -- string )
@@ -194,9 +194,9 @@ SYMBOL: ns-stack
     {
         { [ get-char dup CHAR: ! = ] [ drop next direct ] }
         { [ CHAR: ? = ] [ next instruct ] } 
-        { [ t ] [
+        [
             start-tag [ dup add-ns pop-ns <closer> ]
             [ middle-tag end-tag ] if
             CHAR: > expect
-        ] }
+        ]
     } cond ;

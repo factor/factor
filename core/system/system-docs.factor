@@ -101,7 +101,7 @@ HELP: set-os-envs
 { $values { "assoc" "an association mapping strings to strings" } }
 { $description "Replaces the current set of environment variables." }
 { $notes
-    "Names and values of environment variables are operating system-specific."
+    "Names and values of environment variables are operating system-specific. Windows NT allows values up to 32766 characters in length."
 }
 { $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
 

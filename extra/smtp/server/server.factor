@@ -56,15 +56,15 @@ SYMBOL: data-mode
             "220 OK\r\n" write flush t
           ] }
         { [ data-mode get ] [ dup global [ print ] bind t ] }
-        { [ t ] [ 
+        [ 
             "500 ERROR\r\n" write flush t
-          ] }
+        ]
     } cond nip [ process ] when ;
 
 : mock-smtp-server ( port -- )
     "Starting SMTP server on port " write dup . flush
     "127.0.0.1" swap <inet4> ascii <server> [
-        accept [
+        accept drop [
             1 minutes stdio get set-timeout
             "220 hello\r\n" write flush
             process

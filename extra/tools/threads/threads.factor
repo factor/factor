@@ -22,7 +22,7 @@ heaps.private system math math.parser ;
 : threads. ( -- )
     standard-table-style [
         [
-            { "ID" "Name" "Waiting on" "Remaining sleep" }
+            { "ID:" "Name:" "Waiting on:" "Remaining sleep:" }
             [ [ write ] with-cell ] each
         ] with-row
 

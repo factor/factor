@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup io.encodings.8-bit.private ;
+USING: help.syntax help.markup io.encodings.8-bit.private
+strings ;
 IN: io.encodings.8-bit
 
 ARTICLE: "io.encodings.8-bit" "8-bit encodings"
@@ -34,8 +35,8 @@ HELP: 8-bit
 { $class-description "Describes an 8-bit encoding, including its name (a symbol) and a table used for encoding and decoding." } ;
 
 HELP: define-8-bit-encoding
-{ $values { "name" "a string" } { "path" "a path" } }
-{ $description "Creates a new encoding with the given name, using the resource file at the path to tell how to encode and decode octets. The resource file should be in a similar format to those at " { $url "ftp://ftp.unicode.org/Public/MAPPINGS/ISO8859/" } } ;
+{ $values { "name" string } { "stream" "an input stream" } }
+{ $description "Creates a new encoding. The stream should be in a similar format to those at " { $url "ftp://ftp.unicode.org/Public/MAPPINGS/ISO8859/" } } ;
 
 HELP: latin1
 { $description "This is the ISO-8859-1 encoding, also called Latin-1: Western European. It is an 8-bit superset of ASCII which is the default for a mimetype starting with 'text' and provides the characters necessary for most western European languages." } 

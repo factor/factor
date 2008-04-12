@@ -66,7 +66,7 @@ MEMO: 'log-line' ( -- parser )
             parse-log-line {
                 { [ dup malformed? ] [ malformed-line ] }
                 { [ dup multiline? ] [ add-multiline ] }
-                { [ t ] [ , ] }
+                [ , ]
             } cond
         ] each
     ] { } make ;

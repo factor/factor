@@ -11,7 +11,7 @@ IN: io.unix.tests
 
     socket-server <local>
     ascii <server> [
-        accept [
+        accept drop [
             "Hello world" print flush
             readln "XYZ" = "FOO" "BAR" ? print flush
         ] with-stream

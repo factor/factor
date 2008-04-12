@@ -10,7 +10,7 @@ IN: tools.vocabs.browser
     {
         { [ dup not ] [ drop "" ] }
         { [ dup vocab-main ] [ drop "[Runnable]" ] }
-        { [ t ] [ drop "[Loaded]" ] }
+        [ drop "[Loaded]" ]
     } cond ;
 
 : write-status ( vocab -- )

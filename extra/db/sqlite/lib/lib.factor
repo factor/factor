@@ -20,7 +20,7 @@ IN: db.sqlite.lib
     {
         { [ dup SQLITE_OK = ] [ drop ] }
         { [ dup SQLITE_ERROR = ] [ sqlite-statement-error ] }
-        { [ t ] [ sqlite-error ] }
+        [ sqlite-error ]
     } cond ;
 
 : sqlite-open ( filename -- db )

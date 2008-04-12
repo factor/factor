@@ -95,7 +95,7 @@ ERROR: no-parent-directory path ;
             1 tail left-trim-separators append-path-empty
         ] }
         { [ dup head..? ] [ drop no-parent-directory ] }
-        { [ t ] [ nip ] }
+        [ nip ]
     } cond ;
 
 PRIVATE>
@@ -105,7 +105,7 @@ PRIVATE>
         { [ dup "\\\\?\\" head? ] [ t ] }
         { [ dup length 2 < ] [ f ] }
         { [ dup second CHAR: : = ] [ t ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond ;
 
 : absolute-path? ( path -- ? )
@@ -114,7 +114,7 @@ PRIVATE>
         { [ dup "resource:" head? ] [ t ] }
         { [ os windows? ] [ windows-absolute-path? ] }
         { [ dup first path-separator? ] [ t ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond nip ;
 
 : append-path ( str1 str2 -- str )
@@ -130,10 +130,10 @@ PRIVATE>
         { [ over absolute-path? over first path-separator? and ] [
             >r 2 head r> append
         ] }
-        { [ t ] [
+        [
             >r right-trim-separators "/" r>
             left-trim-separators 3append
-        ] }
+        ]
     } cond ;
 
 : prepend-path ( str1 str2 -- str )
@@ -220,10 +220,10 @@ HOOK: make-directory io-backend ( path -- )
         { [ dup root-directory? ] [ ] }
         { [ dup empty? ] [ ] }
         { [ dup exists? ] [ ] }
-        { [ t ] [
+        [
             dup parent-directory make-directories
             dup make-directory
-        ] }
+        ]
     } cond drop ;
 
 ! Directory listings
@@ -322,9 +322,10 @@ C: <pathname> pathname
 M: pathname <=> [ pathname-string ] compare ;
 
 ! Home directory
-: home ( -- dir )
-    {
-        { [ os winnt? ] [ "USERPROFILE" os-env ] }
-        { [ os wince? ] [ "" resource-path ] }
-        { [ os unix? ] [ "HOME" os-env ] }
-    } cond ;
+HOOK: home os ( -- dir )
+
+M: winnt home "USERPROFILE" os-env ;
+
+M: wince home "" resource-path ;
+
+M: unix home "HOME" os-env ;

@@ -246,9 +246,8 @@ M: x86.32 %cleanup ( alien-node -- )
         } {
             [ dup return>> large-struct? ]
             [ drop EAX PUSH ]
-        } {
-            [ t ] [ drop ]
         }
+        [ drop ]
     } cond ;
 
 M: x86.32 %unwind ( n -- ) %epilogue-later RET ;

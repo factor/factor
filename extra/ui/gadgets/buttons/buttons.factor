@@ -55,7 +55,7 @@ C: <button-paint> button-paint
         { [ dup button-pressed? ] [ drop button-paint-pressed ] }
         { [ dup button-selected? ] [ drop button-paint-selected ] }
         { [ dup button-rollover? ] [ drop button-paint-rollover ] }
-        { [ t ] [ drop button-paint-plain ] }
+        [ drop button-paint-plain ]
     } cond ;
 
 M: button-paint draw-interior

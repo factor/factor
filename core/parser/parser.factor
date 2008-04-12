@@ -324,7 +324,7 @@ M: staging-violation summary
         { [ dup not ] [ drop unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
         { [ dup parsing? ] [ nip execute-parsing t ] }
-        { [ t ] [ pick push drop t ] }
+        [ pick push drop t ]
     } cond ;
 
 : (parse-until) ( accum end -- accum )

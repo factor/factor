@@ -375,7 +375,7 @@ TUPLE: callback-context ;
     return>> {
         { [ dup "void" = ] [ drop [ ] ] }
         { [ dup large-struct? ] [ heap-size [ memcpy ] curry ] }
-        { [ t ] [ c-type c-type-prep ] }
+        [ c-type c-type-prep ]
     } cond ;
 
 : wrap-callback-quot ( node -- quot )
@@ -390,7 +390,7 @@ TUPLE: callback-context ;
     {
         { [ dup abi>> "stdcall" = ] [ alien-stack-frame ] }
         { [ dup return>> large-struct? ] [ drop 4 ] }
-        { [ t ] [ drop 0 ] }
+        [ drop 0 ]
     } cond ;
 
 : %callback-return ( node -- )

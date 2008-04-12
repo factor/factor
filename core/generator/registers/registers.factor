@@ -195,7 +195,7 @@ INSTANCE: constant value
         { [ dup byte-array class< ] [ drop %unbox-byte-array ] }
         { [ dup bit-array class< ] [ drop %unbox-byte-array ] }
         { [ dup float-array class< ] [ drop %unbox-byte-array ] }
-        { [ t ] [ drop %unbox-any-c-ptr ] }
+        [ drop %unbox-any-c-ptr ]
     } cond ; inline
 
 : %move-via-temp ( dst src -- )
@@ -357,14 +357,14 @@ SYMBOL: fresh-objects
         { [ dup unboxed-c-ptr eq? ] [
             over { unboxed-byte-array unboxed-alien } member?
         ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond 2nip ;
 
 : allocation ( value spec -- reg-class )
     {
         { [ dup quotation? ] [ 2drop f ] }
         { [ 2dup compatible? ] [ 2drop f ] }
-        { [ t ] [ nip reg-spec>class ] }
+        [ nip reg-spec>class ]
     } cond ;
 
 : alloc-vreg-for ( value spec -- vreg )

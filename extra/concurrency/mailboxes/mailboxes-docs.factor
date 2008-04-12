@@ -57,7 +57,7 @@ HELP: mailbox-get?
 
 
 ARTICLE: "concurrency.mailboxes" "Mailboxes"
-"A " { $emphasis "mailbox" } " is a first-in-first-out queue where the operation of removing an element blocks if the queue is empty, instead of throwing an error."
+"A " { $emphasis "mailbox" } " is a first-in-first-out queue where the operation of removing an element blocks if the queue is empty, instead of throwing an error. Mailboxes are implemented in the " { $vocab-link "concurrency.mailboxes" } " vocabulary."
 { $subsection mailbox }
 { $subsection <mailbox> }
 "Removing the first element:"
@@ -73,3 +73,5 @@ ARTICLE: "concurrency.mailboxes" "Mailboxes"
 "Testing if a mailbox is empty:"
 { $subsection mailbox-empty? }
 { $subsection while-mailbox-empty } ;
+
+ABOUT: "concurrency.mailboxes"

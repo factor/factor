@@ -160,7 +160,7 @@ PREDICATE: kernel-error < array
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }
-        { [ t ] [ second 0 15 between? ] }
+        [ second 0 15 between? ]
     } cond ;
 
 : kernel-errors
