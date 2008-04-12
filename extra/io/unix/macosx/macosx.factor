@@ -12,10 +12,6 @@ TUPLE: macosx-monitor < monitor handle ;
         >r first { +modify-file+ } r> queue-change
     ] curry each ;
 
-M: macosx init-monitors ;
-
-M: macosx dispose-monitors ;
-
 M:: macosx (monitor) ( path recursive? mailbox -- monitor )
     path mailbox macosx-monitor construct-monitor
     dup [ enqueue-notifications ] curry

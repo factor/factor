@@ -3,7 +3,7 @@ io.timeouts io.nonblocking io.windows io.windows.nt.backend
 kernel libc math threads windows windows.kernel32 system
 alien.c-types alien.arrays sequences combinators combinators.lib
 sequences.lib ascii splitting alien strings assocs namespaces
-io.files.private ;
+io.files.private accessors ;
 IN: io.windows.nt.files
 
 M: winnt cwd
@@ -87,9 +87,9 @@ M: port port-flush
 : finish-read ( overlapped port -- )
     dup pending-error
     tuck get-overlapped-result dup zero? [
-        drop t swap set-port-eof?
+        drop t >>eof drop
     ] [
-        dup pick n>buffer
+        dup pick buffer>> n>buffer
         swap update-file-ptr
     ] if ;
 

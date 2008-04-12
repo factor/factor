@@ -4,7 +4,7 @@ USING: alien alien.c-types libc destructors locals
 kernel math assocs namespaces continuations sequences hashtables
 sorting arrays combinators math.bitfields strings system
 io.windows io.windows.nt.backend io.monitors io.nonblocking
-io.buffers io.files io.timeouts io
+io.buffers io.files io.timeouts io accessors threads
 windows windows.kernel32 windows.types ;
 IN: io.windows.nt.monitors
 
@@ -21,7 +21,9 @@ IN: io.windows.nt.monitors
     dup add-completion
     f <win32-file> ;
 
-TUPLE: win32-monitor < monitor port recursive ;
+TUPLE: win32-monitor-port < input-port recursive ;
+
+TUPLE: win32-monitor < monitor port ;
 
 : begin-reading-changes ( port -- overlapped )
     {
@@ -83,9 +85,11 @@ TUPLE: win32-monitor < monitor port recursive ;
 M:: winnt (monitor) ( path recursive? mailbox -- monitor )
     [
         path mailbox win32-monitor construct-monitor
-            path open-directory <buffered-port> >>port
-            recursive? >>recursive
-        dup port>> [ fill-queue-thread ] curry spawn drop
+            path open-directory \ win32-monitor-port <buffered-port>
+                recursive? >>recursive
+            >>port
+        dup [ fill-queue-thread ] curry
+        "Windows monitor thread" spawn drop
     ] with-destructors ;
 
 M: win32-monitor dispose

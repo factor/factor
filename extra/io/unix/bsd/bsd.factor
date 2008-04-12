@@ -13,10 +13,6 @@ M: bsd init-io ( -- )
     [ mx get-global reads>> set-at ]
     [ mx get-global writes>> set-at ] 2bi ;
 
-M: bsd init-monitors ;
-
-M: bsd dispose-monitors ;
-
 M: bsd (monitor) ( path recursive? mailbox -- )
     swap [ "Recursive kqueue monitors not supported" throw ] when
     <vnode-monitor> ;
