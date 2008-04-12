@@ -1,5 +1,5 @@
 USING: io io.buffers io.backend help.markup help.syntax kernel
-byte-arrays sbufs words continuations byte-vectors ;
+byte-arrays sbufs words continuations byte-vectors classes ;
 IN: io.nonblocking
 
 ARTICLE: "io.nonblocking" "Non-blocking I/O implementation"
@@ -53,12 +53,12 @@ HELP: init-handle
 { $contract "Prepares a native handle for use by the port; called by " { $link <port> } "." } ;
 
 HELP: <port>
-{ $values { "handle" "a native handle identifying an I/O resource" } { "type" symbol } { "port" "a new " { $link port } } }
+{ $values { "handle" "a native handle identifying an I/O resource" } { "class" class } { "port" "a new " { $link port } } }
 { $description "Creates a new " { $link port } " with no buffer." }
 $low-level-note ;
 
 HELP: <buffered-port>
-{ $values { "handle" "a native handle identifying an I/O resource" } { "type" symbol } { "port" "a new " { $link port } } }
+{ $values { "handle" "a native handle identifying an I/O resource" } { "class" class } { "port" "a new " { $link port } } }
 { $description "Creates a new " { $link port } " using the specified native handle and a default-sized I/O buffer." } 
 $low-level-note ;
 
@@ -93,5 +93,5 @@ HELP: unless-eof
 { $description "If the port has reached end of file, outputs " { $link f } ", otherwise applies the quotation to the port." } ;
 
 HELP: can-write?
-{ $values { "len" "a positive integer" } { "writer" output-port } { "?" "a boolean" } }
+{ $values { "len" "a positive integer" } { "buffer" buffer } { "?" "a boolean" } }
 { $description "Tests if the port's output buffer can accomodate " { $snippet "len" } " bytes. If the buffer is empty, this always outputs " { $link t } ", since in that case the buffer will be grown automatically." } ;

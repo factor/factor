@@ -64,7 +64,7 @@ SYMBOL: data-mode
 : mock-smtp-server ( port -- )
     "Starting SMTP server on port " write dup . flush
     "127.0.0.1" swap <inet4> ascii <server> [
-        accept [
+        accept drop [
             1 minutes stdio get set-timeout
             "220 hello\r\n" write flush
             process
