@@ -105,5 +105,14 @@ DEFER: ?make-staging-image
 : make-deploy-image ( vm image vocab config -- )
     make-boot-image
     deploy-command-line run-factor ;
+    
+: copy-vm ( executable bundle-name extension -- vm )
+  [ prepend-path ] dip append vm over copy-file ;
+  
+: copy-fonts ( name dir -- )  
+  "fonts/" resource-path swap append-path copy-tree-into ;
+  
+: image-name ( vocab bundle-name -- str )  
+  prepend-path ".image" append ;
 
 HOOK: deploy* os ( vocab -- )
