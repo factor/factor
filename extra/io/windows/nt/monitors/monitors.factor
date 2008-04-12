@@ -21,7 +21,7 @@ IN: io.windows.nt.monitors
     dup add-completion
     f <win32-file> ;
 
-TUPLE: win32-monitor < monitor port path recursive ;
+TUPLE: win32-monitor < monitor port recursive ;
 
 : begin-reading-changes ( port -- overlapped )
     {
@@ -56,13 +56,13 @@ TUPLE: win32-monitor < monitor port path recursive ;
     } case ;
 
 : memory>u16-string ( alien len -- string )
-    [ memory>byte-array ] [ 2/ ] bi c-ushort-array> >string ;
+    [ memory>byte-array ] keep 2/ c-ushort-array> >string ;
 
 : parse-notify-record ( buffer -- changed path )
     [ FILE_NOTIFY_INFORMATION-Action parse-action ]
     [ FILE_NOTIFY_INFORMATION-FileName ]
-    [ FILE_NOTIFY_INFORMATION-FileNameLength ]
-    tri memory>u16-string ;
+    [ FILE_NOTIFY_INFORMATION-FileNameLength ] tri
+    memory>u16-string ;
 
 : file-notify-records ( buffer -- seq )
     [ dup FILE_NOTIFY_INFORMATION-NextEntryOffset 0 > ]
