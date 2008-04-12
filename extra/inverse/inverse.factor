@@ -60,11 +60,13 @@ PREDICATE: math-inverse < word "math-inverse" word-prop ;
 PREDICATE: pop-inverse < word "pop-length" word-prop ;
 UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
-: enough? ( stack quot -- ? )
-    [ >r length r> 1quotation infer effect-in >= ] [ 3drop f ]
-    recover ;
+: enough? ( stack word -- ? )
+    dup deferred? [ 2drop f ] [
+        [ >r length r> 1quotation infer effect-in >= ]
+        [ 3drop f ] recover
+    ] if ;
 
-: fold-word ( stack quot -- stack )
+: fold-word ( stack word -- stack )
     2dup enough?
     [ 1quotation with-datastack ] [ >r % r> , { } ] if ;
 
@@ -72,10 +74,10 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     [ { } swap [ fold-word ] each % ] [ ] make ; 
 
 : flattenable? ( object -- ? )
-    [ [ word? ] [ primitive? not ] and? ] [
+    { [ word? ] [ primitive? not ] [
         { "inverse" "math-inverse" "pop-inverse" }
         [ word-prop ] with contains? not
-    ] and? ; 
+    ] } <-&& ; 
 
 : (flatten) ( quot -- )
     [ dup flattenable? [ word-def (flatten) ] [ , ] if ] each ;
@@ -159,7 +161,7 @@ MACRO: undo ( quot -- ) [undo] ;
     2curry
 ] define-pop-inverse
 
-: _ f ;
+DEFER: _
 \ _ [ drop ] define-inverse
 
 : both ( object object -- object )
@@ -256,6 +258,7 @@ M: no-match summary drop "Fall through in switch" ;
     [ no-match ] [ swap \ recover-fail 3array >quotation ] reduce ;
 
 : [switch]  ( quot-alist -- quot )
+    [ dup quotation? [ [ ] swap 2array ] when ] map
     reverse [ >r [undo] r> compose ] { } assoc>map
     recover-chain ;
 

@@ -75,13 +75,13 @@ os { winnt linux macosx } member? [
         
         [ ] [ "monitor-test/xyz/test.txt" temp-file touch-file ] unit-test
 
-        [ ] [ "c1" get 5 seconds await-timeout ] unit-test
+        [ ] [ "c1" get 15 seconds await-timeout ] unit-test
         
         [ ] [ "monitor-test/subdir/blah/yxy" temp-file make-directories ] unit-test
 
         [ ] [ "monitor-test/subdir/blah/yxy/test.txt" temp-file touch-file ] unit-test
 
-        [ ] [ "c2" get 5 seconds await-timeout ] unit-test
+        [ ] [ "c2" get 15 seconds await-timeout ] unit-test
 
         ! Dispose twice
         [ ] [ "m" get dispose ] unit-test

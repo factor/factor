@@ -36,10 +36,10 @@ HELP: port
 $nl
 "Ports have the following slots:"
 { $list
-    { { $link port-handle } " - a native handle identifying the underlying native resource used by the port" }
-    { { $link port-error } " - the most recent I/O error, if any. This error is thrown to the waiting thread when " { $link pending-error } " is called by stream operations" }
-    { { $link port-type } " - a symbol identifying the port's intended purpose" }
-    { { $link port-eof? } " - a flag indicating if the port has reached the end of file while reading" }
+    { { $snippet "handle" } " - a native handle identifying the underlying native resource used by the port" }
+    { { $snippet "error" } " - the most recent I/O error, if any. This error is thrown to the waiting thread when " { $link pending-error } " is called by stream operations" }
+    { { $snippet "type" } " - a symbol identifying the port's intended purpose" }
+    { { $snippet "eof" } " - a flag indicating if the port has reached the end of file while reading" }
 } } ;
 
 HELP: input-port
@@ -53,8 +53,8 @@ HELP: init-handle
 { $contract "Prepares a native handle for use by the port; called by " { $link <port> } "." } ;
 
 HELP: <port>
-{ $values { "handle" "a native handle identifying an I/O resource" } { "buffer" "a " { $link buffer } " or " { $link f } } { "type" symbol } { "port" "a new " { $link port } } }
-{ $description "Creates a new " { $link port } " using the specified native handle and I/O buffer." }
+{ $values { "handle" "a native handle identifying an I/O resource" } { "type" symbol } { "port" "a new " { $link port } } }
+{ $description "Creates a new " { $link port } " with no buffer." }
 $low-level-note ;
 
 HELP: <buffered-port>

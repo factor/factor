@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel math sequences
-namespaces assocs init continuations core-foundation ;
+namespaces assocs init accessors continuations combinators
+core-foundation core-foundation.run-loop ;
 IN: core-foundation.fsevents
 
 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
@@ -182,11 +183,11 @@ SYMBOL: event-stream-callbacks
     }
     "cdecl" [
         [ >event-triple ] 3curry map
-        swap event-stream-callbacks get at call
-        drop
+        swap event-stream-callbacks get at
+        dup [ call drop ] [ 3drop ] if
     ] alien-callback ;
 
-TUPLE: event-stream info handle ;
+TUPLE: event-stream info handle closed ;
 
 : <event-stream> ( quot paths latency flags -- event-stream )
     >r >r >r
@@ -194,9 +195,15 @@ TUPLE: event-stream info handle ;
     >r master-event-source-callback r>
     r> r> r> <FSEventStream>
     dup enable-event-stream
-    event-stream construct-boa ;
+    f event-stream construct-boa ;
 
 M: event-stream dispose
-    dup event-stream-info remove-event-source-callback
-    event-stream-handle dup disable-event-stream
-    FSEventStreamRelease ;
+    dup closed>> [ drop ] [
+        t >>closed
+        {
+            [ info>> remove-event-source-callback ]
+            [ handle>> disable-event-stream ]
+            [ handle>> FSEventStreamInvalidate ]
+            [ handle>> FSEventStreamRelease ]
+        } cleave
+    ] if ;

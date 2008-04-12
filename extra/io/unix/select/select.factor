@@ -5,7 +5,7 @@ bit-arrays sequences assocs unix math namespaces structs
 accessors ;
 IN: io.unix.select
 
-TUPLE: select-mx read-fdset write-fdset ;
+TUPLE: select-mx < mx read-fdset write-fdset ;
 
 ! Factor's bit-arrays are an array of bytes, OS X expects
 ! FD_SET to be an array of cells, so we have to account for
@@ -15,8 +15,8 @@ TUPLE: select-mx read-fdset write-fdset ;
 
 : <select-mx> ( -- mx )
     select-mx construct-mx
-    FD_SETSIZE 8 * <bit-array> >>read-fdset
-    FD_SETSIZE 8 * <bit-array> >>write-fdset ;
+        FD_SETSIZE 8 * <bit-array> >>read-fdset
+        FD_SETSIZE 8 * <bit-array> >>write-fdset ;
 
 : clear-nth ( n seq -- ? )
     [ nth ] [ f -rot set-nth ] 2bi ;
