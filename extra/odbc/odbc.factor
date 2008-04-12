@@ -105,7 +105,7 @@ SYMBOL: SQL-TYPE-UNKNOWN
     { -6 [ SQL-TINYINT ] }
     { -5 [ SQL-BIGINT ] }
     { -2 [ SQL-BINARY ] }
-    { -3 [ SQL-VARBINARY ] }   
+    { -3 [ SQL-VARBINARY ] }
     { -4 [ SQL-LONGVARBINARY ] }
     { 91 [ SQL-TYPE-DATE ] }
     { 92 [ SQL-TYPE-TIME ] }
@@ -116,14 +116,14 @@ SYMBOL: SQL-TYPE-UNKNOWN
 : succeeded? ( n -- bool )
   #! Did the call succeed (SQL-SUCCESS or SQL-SUCCESS-WITH-INFO)
   {
-    { \ SQL-SUCCESS [ t ] }
-    { \ SQL-SUCCESS-WITH-INFO [ t ] }
+    { SQL-SUCCESS [ t ] }
+    { SQL-SUCCESS-WITH-INFO [ t ] }
     [ drop f ]
-  } case ;  
+  } case ;
 
 FUNCTION: SQLRETURN SQLAllocHandle ( SQLSMALLINT handleType, SQLHANDLE inputHandle, SQLHANDLE* outputHandlePtr ) ;
 FUNCTION: SQLRETURN SQLSetEnvAttr ( SQLHENV environmentHandle, SQLINTEGER attribute, SQLPOINTER valuePtr, SQLINTEGER stringLength ) ;
-FUNCTION: SQLRETURN SQLDriverConnect ( SQLHDBC connectionHandle, SQLHWND windowHandle, SQLCHAR* inConnectionString, SQLSMALLINT stringLength, SQLCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLength2Ptr, SQLUSMALLINT driverCompletion ) ; 
+FUNCTION: SQLRETURN SQLDriverConnect ( SQLHDBC connectionHandle, SQLHWND windowHandle, SQLCHAR* inConnectionString, SQLSMALLINT stringLength, SQLCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLength2Ptr, SQLUSMALLINT driverCompletion ) ;
 FUNCTION: SQLRETURN SQLDisconnect ( SQLHDBC connectionHandle ) ;
 FUNCTION: SQLRETURN SQLPrepare ( SQLHSTMT statementHandle, SQLCHAR* statementText, SQLINTEGER length ) ;
 FUNCTION: SQLRETURN SQLExecute ( SQLHSTMT statementHandle ) ;
@@ -154,18 +154,18 @@ FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNu
 
 : odbc-init ( -- env )
   alloc-env-handle
-  [ 
-    SQL-ATTR-ODBC-VERSION SQL-OV-ODBC3 0 SQLSetEnvAttr 
+  [
+    SQL-ATTR-ODBC-VERSION SQL-OV-ODBC3 0 SQLSetEnvAttr
     succeeded? [ "odbc-init failed" throw ] unless
   ] keep ;
 
 : odbc-connect ( env dsn -- dbc )
-   >r alloc-dbc-handle dup r> 
-   f swap dup length 1024 temp-string 0 <short> SQL-DRIVER-NOPROMPT 
+   >r alloc-dbc-handle dup r>
+   f swap dup length 1024 temp-string 0 <short> SQL-DRIVER-NOPROMPT
    SQLDriverConnect succeeded? [ "odbc-connect failed" throw ] unless ;
 
 : odbc-disconnect ( dbc -- )
-  SQLDisconnect succeeded? [ "odbc-disconnect failed" throw ] unless ;     
+  SQLDisconnect succeeded? [ "odbc-disconnect failed" throw ] unless ;
 
 : odbc-prepare ( dbc string -- statement )
   >r alloc-stmt-handle dup r> dup length SQLPrepare succeeded? [ "odbc-prepare failed" throw ] unless ;
@@ -193,19 +193,19 @@ C: <column> column
 : odbc-describe-column ( statement n -- column )
   dup >r
   1024 CHAR: \space <string> string>char-alien dup >r
-  1024 
+  1024
   0 <short>
   0 <short> dup >r
   0 <uint> dup >r
   0 <short> dup >r
   0 <short> dup >r
   SQLDescribeCol succeeded? [
-    r> *short 
-    r> *short 
-    r> *uint 
-    r> *short convert-sql-type 
-    r> alien>char-string 
-    r> <column> 
+    r> *short
+    r> *short
+    r> *uint
+    r> *short convert-sql-type
+    r> alien>char-string
+    r> <column>
   ] [
     r> drop r> drop r> drop r> drop r> drop r> drop
     "odbc-describe-column failed" throw
@@ -226,7 +226,7 @@ C: <column> column
     { SQL-DOUBLE [ *double ] }
     { SQL-TINYINT [ *char  ] }
     { SQL-BIGINT [ *longlong ] }
-    [ nip [ "Unknown SQL Type: " % word-name % ] "" make ]    
+    [ nip [ "Unknown SQL Type: " % word-name % ] "" make ]
   } case ;
 
 TUPLE: field value column ;
@@ -237,13 +237,13 @@ C: <field> field
   dup column? [ dupd odbc-describe-column ] unless dup >r column-number
   SQL-C-DEFAULT
   8192 CHAR: \space <string> string>char-alien dup >r
-  8192 
+  8192
   f SQLGetData succeeded? [
     r> r> [ dereference-type-pointer ] keep <field>
   ] [
-    r> drop r> [ 
-      "SQLGetData Failed for Column: " % 
-      dup column-name % 
+    r> drop r> [
+      "SQLGetData Failed for Column: " %
+      dup column-name %
       " of type: " % dup column-type word-name %
     ] "" make swap <field>
   ] if ;
@@ -252,15 +252,15 @@ C: <field> field
   [
     dup odbc-number-of-columns [
       1+ odbc-get-field field-value ,
-    ] with each 
+    ] with each
   ] { } make ;
 
 : (odbc-get-all-rows) ( statement -- )
-  dup odbc-next-row [ dup odbc-get-row-fields , yield (odbc-get-all-rows) ] [ drop ] if ; 
-    
+  dup odbc-next-row [ dup odbc-get-row-fields , yield (odbc-get-all-rows) ] [ drop ] if ;
+
 : odbc-get-all-rows ( statement -- seq )
   [ (odbc-get-all-rows) ] { } make ;
-  
+
 : odbc-query ( string dsn -- result )
   odbc-init swap odbc-connect [
     swap odbc-prepare
