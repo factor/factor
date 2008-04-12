@@ -1,7 +1,10 @@
 
 USING: kernel system namespaces sequences splitting combinators
        io io.files io.launcher prettyprint bootstrap.image
-       bake combinators.cleave builder.common builder.util ;
+       bake combinators.cleave
+       builder.util
+       builder.common
+       builder.release.archive ;
 
 IN: builder.release
 
@@ -30,48 +33,6 @@ IN: builder.release
     "unmaintained"
     "build-support"
   } ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: base-name ( -- string )
-  { "factor" [ os unparse ] cpu- stamp> } to-strings "-" join ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: extension ( -- extension )
-  {
-    { [ os winnt?  ] [ ".zip"    ] }  
-    { [ os macosx? ] [ ".dmg"    ] }
-    { [ os unix?   ] [ ".tar.gz" ] }
-  }
-  cond ;
-
-: archive-name ( -- string ) base-name extension append ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: windows-archive-cmd ( -- cmd ) { "zip" "-r" archive-name "factor" } ;
-
-: macosx-archive-cmd ( -- cmd )
-  { "hdiutil" "create"
-              "-srcfolder" "factor"
-              "-fs" "HFS+"
-              "-volname" "factor"
-              archive-name } ;
-
-: unix-archive-cmd ( -- cmd ) { "tar" "-cvzf" archive-name "factor" } ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: archive-cmd ( -- cmd )
-  {
-    { [ os windows? ] [ windows-archive-cmd ] }
-    { [ os macosx?  ] [ macosx-archive-cmd  ] }
-    { [ os unix?    ] [ unix-archive-cmd    ] }
-  }
-  cond ;
-
-: make-archive ( -- ) archive-cmd to-strings try-process ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
