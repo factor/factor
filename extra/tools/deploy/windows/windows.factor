@@ -15,9 +15,6 @@ IN: tools.deploy.windows
     dup "" copy-fonts
     ".exe" copy-vm ;
 
-: image-name ( vocab bundle-name -- str )
-    prepend-path ".image" append ;
-
 M: winnt deploy*
     "." resource-path [
         dup deploy-config [
