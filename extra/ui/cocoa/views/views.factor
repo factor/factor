@@ -223,10 +223,6 @@ CLASS: {
         } case
     ]
 }
-! 
-! { "rotateWithEvent:" "void" { "id" "SEL" "id" }
-!     [ "ROTATE" show ]
-! }
 
 { "swipeWithEvent:" "void" { "id" "SEL" "id" }
     [
@@ -246,6 +242,8 @@ CLASS: {
         } case
     ]
 }
+
+! "rotateWithEvent:" "void" { "id" "SEL" "id" }}
 
 { "acceptsFirstResponder" "bool" { "id" "SEL" }
     [ 2drop 1 ]
