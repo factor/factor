@@ -2,6 +2,7 @@
 USING: kernel words namespaces classes parser continuations
        io io.files io.launcher io.sockets
        math math.parser
+       system
        combinators sequences splitting quotations arrays strings tools.time
        sequences.deep accessors assocs.lib
        io.encodings.utf8
@@ -37,21 +38,6 @@ DEFER: to-strings
     [ ]
     [ [ to-string ] map flatten ]
   if ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! TUPLE: process* arguments stdin stdout stderr timeout ;
-
-! : <process*> process* construct-empty ;
-
-! : >desc ( process* -- desc )
-!   H{ } clone
-!     over arguments>> [ +arguments+ swap put-at ] when*
-!     over stdin>>     [ +stdin+     swap put-at ] when*
-!     over stdout>>    [ +stdout+    swap put-at ] when*
-!     over stderr>>    [ +stderr+    swap put-at ] when*
-!     over timeout>>   [ +timeout+   swap put-at ] when*
-!   nip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -109,4 +95,6 @@ USE: prettyprint
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: failsafe ( quot -- ) [ drop ] recover ;
+: cpu- ( -- cpu ) cpu unparse "." split "-" join ;
+
+: platform ( -- string ) { [ os unparse ] cpu- } to-strings "-" join ;

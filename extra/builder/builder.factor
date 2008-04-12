@@ -166,7 +166,7 @@ SYMBOL: build-status
 
       "benchmarks" ".." copy-file-into
 
-      maybe-release
+      release
     ]
   with-file-writer
 
