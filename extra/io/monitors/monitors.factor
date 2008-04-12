@@ -7,7 +7,11 @@ IN: io.monitors
 
 HOOK: init-monitors io-backend ( -- )
 
+M: object init-monitors ;
+
 HOOK: dispose-monitors io-backend ( -- )
+
+M: object dispose-monitors ;
 
 : with-monitors ( quot -- )
     [
