@@ -8,8 +8,8 @@ HELP: QUALIFIED:
     "QUALIFIED: math\n1 2 math:+ ! ==> 3" } } ;
 
 HELP: QUALIFIED-WITH:
-{ $syntax "QUALIFIED-WITH: vocab prefix" }
-{ $description "Works like " { $link POSTPONE: QUALIFIED: } " but uses the specified prefix." }
+{ $syntax "QUALIFIED-WITH: vocab word-prefix" }
+{ $description "Works like " { $link POSTPONE: QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
 { $examples { $code
     "QUALIFIED-WITH: math m\n1 2 m:+ ! ==> 3" } } ;
 
