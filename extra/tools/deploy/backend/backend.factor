@@ -110,7 +110,7 @@ DEFER: ?make-staging-image
   [ prepend-path ] dip append vm over copy-file ;
   
 : copy-fonts ( name dir -- )  
-  "fonts/" resource-path swap append-path copy-tree-into ;
+  append-path "fonts/" resource-path swap copy-tree-into ;
   
 : image-name ( vocab bundle-name -- str )  
   prepend-path ".image" append ;
