@@ -17,9 +17,9 @@ ERROR: cairo-error string ;
 
 : cairo-png-error ( n -- )
     {
-        { \ CAIRO_STATUS_NO_MEMORY [ "Cairo: no memory" cairo-error ] }
-        { \ CAIRO_STATUS_FILE_NOT_FOUND [ "Cairo: file not found" cairo-error ] }
-        { \ CAIRO_STATUS_READ_ERROR [ "Cairo: read error" cairo-error ] }
+        { CAIRO_STATUS_NO_MEMORY [ "Cairo: no memory" cairo-error ] }
+        { CAIRO_STATUS_FILE_NOT_FOUND [ "Cairo: file not found" cairo-error ] }
+        { CAIRO_STATUS_READ_ERROR [ "Cairo: read error" cairo-error ] }
         [ drop ]
     } cond ;
 

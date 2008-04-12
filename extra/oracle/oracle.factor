@@ -35,18 +35,18 @@ C: <connection> connection
 
 : check-result ( result -- )
     {
-        { \ OCI_SUCCESS [ ] }
-        { \ OCI_ERROR [ err get get-oci-error ] }
-        { \ OCI_INVALID_HANDLE [ "invalid handle" throw ] }
+        { OCI_SUCCESS [ ] }
+        { OCI_ERROR [ err get get-oci-error ] }
+        { OCI_INVALID_HANDLE [ "invalid handle" throw ] }
         [ "operation failed" throw ]
     } case ;
 
 : check-status ( status -- bool )
     {
-        { \ OCI_SUCCESS [ t ] }
-        { \ OCI_ERROR [ err get get-oci-error ] }
-        { \ OCI_INVALID_HANDLE [ "invalid handle" throw ] }
-        { \ OCI_NO_DATA [ f ] }
+        { OCI_SUCCESS [ t ] }
+        { OCI_ERROR [ err get get-oci-error ] }
+        { OCI_INVALID_HANDLE [ "invalid handle" throw ] }
+        { OCI_NO_DATA [ f ] }
         [ "operation failed" throw ]
     } case ;
 
@@ -155,12 +155,12 @@ C: <connection> connection
 
 : calculate-size ( type -- size )
     {
-        { \ SQLT_INT [ "int" heap-size ] }
-        { \ SQLT_FLT [ "float" heap-size ] }
-        { \ SQLT_CHR [ "char" heap-size ] }
-        { \ SQLT_NUM [ "int" heap-size 10 * ] }
-        { \ SQLT_STR [ 64 ] }
-        { \ SQLT_ODT [ 256 ] }
+        { SQLT_INT [ "int" heap-size ] }
+        { SQLT_FLT [ "float" heap-size ] }
+        { SQLT_CHR [ "char" heap-size ] }
+        { SQLT_NUM [ "int" heap-size 10 * ] }
+        { SQLT_STR [ 64 ] }
+        { SQLT_ODT [ 256 ] }
     } case ;
 
 : define-by-position ( position type -- )
