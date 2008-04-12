@@ -1,5 +1,5 @@
 
-USING: combinators system sequences io.launcher prettyprint
+USING: kernel combinators system sequences io.files io.launcher prettyprint
        builder.util
        builder.common ;
 
@@ -47,3 +47,12 @@ IN: builder.release.archive
 
 : make-archive ( -- ) archive-cmd to-strings try-process ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: releases ( -- path )
+  builds "releases" append-path
+  dup exists? not
+    [ dup make-directory ]
+  when ;
+
+: save-archive ( -- ) archive-name releases move-file-into ;

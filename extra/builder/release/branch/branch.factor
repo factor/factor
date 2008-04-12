@@ -1,6 +1,8 @@
 
-USING: system sequences prettyprint io.files io.launcher bootstrap.image
-       builder.util ;
+USING: kernel system namespaces sequences prettyprint io.files io.launcher
+       bootstrap.image
+       builder.util
+       builder.common ;
 
 IN: builder.release.branch
 
@@ -24,7 +26,7 @@ IN: builder.release.branch
   to-strings
   try-process ;
 
-: update-clean-branch ( -- )
+: (update-clean-branch) ( -- )
   "factor"
     [
       push-to-clean-branch
@@ -32,3 +34,7 @@ IN: builder.release.branch
     ]
   with-directory ;
 
+: update-clean-branch ( -- )
+  upload-to-factorcode get
+    [ update-clean-branch ]
+  when ;
