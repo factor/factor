@@ -111,6 +111,7 @@
   (use-local-map factor-mode-map)
   (setq major-mode 'factor-mode)
   (setq mode-name "Factor")
+  (set (make-local-variable 'indent-line-function) #'factor-indent-line)
   (make-local-variable 'comment-start)
   (setq comment-start "! ")
   (make-local-variable 'font-lock-defaults)
@@ -224,6 +225,48 @@
 (define-key factor-mode-map "\C-c\C-h" 'factor-help)
 (define-key factor-mode-map "\C-cc"    'comment-region)
 (define-key factor-mode-map [return]   'newline-and-indent)
+(define-key factor-mode-map [tab]      'indent-for-tab-command)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; factor-indent-line
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun factor-calculate-indentation ()
+  "Calculate Factor indentation for line at point."
+  (let ((not-indented t)
+        (cur-indent 0))
+    (save-excursion
+      (beginning-of-line)
+      (if (bobp)
+          (setq cur-indent 0)
+        (save-excursion
+          (while not-indented
+            (forward-line -1)
+            ;; Check that we are after the end of previous word
+            (if (looking-at ".*;[ \t]*$")
+                (progn
+                  (setq cur-indent (- (current-indentation) default-tab-width))
+                  (setq not-indented nil))
+              (if (looking-at "^\\(\\|:\\): ")
+                  (progn
+                    (setq cur-indent (+ (current-indentation) default-tab-width))
+                    (setq not-indented nil))
+                (if (bobp)
+                    (setq not-indented nil))))))))
+        cur-indent))
+
+(defun factor-indent-line ()
+  "Indent current line as Factor code"
+  (let ((target (factor-calculate-indentation))
+        (pos (- (point-max) (point))))
+    (if (= target (current-indentation))
+        (if (< (current-column) (current-indentation))
+            (back-to-indentation))
+      (beginning-of-line)
+      (delete-horizontal-space)
+      (indent-to target)
+      (if (> (- (point-max) pos) (point))
+          (goto-char (- (point-max) pos))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; factor-listener-mode
@@ -244,5 +287,3 @@
 (defun factor-refresh-all ()
   (interactive)
   (comint-send-string "*factor*" "refresh-all\n"))
-
-
