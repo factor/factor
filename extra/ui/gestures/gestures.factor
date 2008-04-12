@@ -281,4 +281,16 @@ M: button-down gesture>string
         button-down-# [ " " % # ] when*
     ] "" make ;
 
+M: left-action gesture>string drop "Swipe left" ;
+
+M: right-action gesture>string drop "Swipe right" ;
+
+M: up-action gesture>string drop "Swipe up" ;
+
+M: down-action gesture>string drop "Swipe down" ;
+
+M: zoom-in-action gesture>string drop "Zoom in" ;
+
+M: zoom-out-action gesture>string drop "Zoom out (pinch)" ;
+
 M: object gesture>string drop f ;
