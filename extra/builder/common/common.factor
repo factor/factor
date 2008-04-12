@@ -16,3 +16,4 @@ SYMBOL: builds-dir
 
 VAR: stamp
 
+SYMBOL: upload-to-factorcode
