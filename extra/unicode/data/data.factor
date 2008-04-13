@@ -12,9 +12,6 @@ IN: unicode.data
 >>
 
 ! Convenience functions
-: 1+* ( n/f _ -- n+1 )
-    drop [ 1+ ] [ 0 ] if* ;
-
 : ?between? ( n/f from to -- ? )
     pick [ between? ] [ 3drop f ] if ;
 

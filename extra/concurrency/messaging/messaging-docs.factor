@@ -32,7 +32,7 @@ HELP: spawn-linked
 { $description "Start a thread which runs the given quotation. If that quotation throws an error which is not caught then the error will get propagated to the thread that spawned it. This can be used to set up 'supervisor' threades that restart child threades that crash due to uncaught errors.\n" } 
 { $see-also spawn } ;
 
-ARTICLE: { "concurrency" "messaging" } "Mailboxes"
+ARTICLE: { "concurrency" "messaging" } "Sending and receiving messages"
 "Each thread has an associated mailbox. Other threads can place items on this queue by sending the thread a message. A thread can check its mailbox for messages, blocking if none are pending, and thread them as they are queued."
 $nl
 "The messages that are sent from thread to thread are any Factor value. Factor tuples are ideal for this sort of thing as you can send a tuple to a thread and the generic word dispatch mechanism can be used to perform actions depending on what the type of the tuple is."
@@ -43,7 +43,8 @@ $nl
 { $subsection receive }
 { $subsection receive-timeout }
 { $subsection receive-if }
-{ $subsection receive-if-timeout } ;
+{ $subsection receive-if-timeout }
+{ $see-also "concurrency.mailboxes" } ;
 
 ARTICLE: { "concurrency" "synchronous-sends" } "Synchronous sends"
 "The " { $link send } " word sends a message asynchronously, and the sending thread continues immediately. It is also possible to send a message to a thread and block until a response is received:"

@@ -64,9 +64,9 @@ HELP: alist>quot
 { $notes "This word is used to implement compile-time behavior for " { $link cond } ", and it is also used by the generic word system. Note that unlike " { $link cond } ", the constructed quotation performs the tests starting from the end and not the beginning." } ;
 
 HELP: cond
-{ $values { "assoc" "a sequence of quotation pairs" } }
+{ $values { "assoc" "a sequence of quotation pairs and an optional quotation" } }
 { $description
-    "Calls the second quotation in the first pair whose first quotation yields a true value."
+    "Calls the second quotation in the first pair whose first quotation yields a true value. A single quotation will always yield a true value."
     $nl
     "The following two phrases are equivalent:"
     { $code "{ { [ X ] [ Y ] } { [ Z ] [ T ] } } cond" }
@@ -78,7 +78,7 @@ HELP: cond
         "{"
         "    { [ dup 0 > ] [ \"positive\" ] }"
         "    { [ dup 0 < ] [ \"negative\" ] }"
-        "    { [ dup zero? ] [ \"zero\" ] }"
+        "    [ \"zero\" ]"
         "} cond"
     }
 } ;
@@ -88,9 +88,9 @@ HELP: no-cond
 { $error-description "Thrown by " { $link cond } " if none of the test quotations yield a true value. Some uses of " { $link cond } " include a default case where the test quotation is " { $snippet "[ t ]" } "; such a " { $link cond } " form will never throw this error." } ;
 
 HELP: case
-{ $values { "obj" object } { "assoc" "a sequence of object/quotation pairs, with an optional quotation at the end" } }
+{ $values { "obj" object } { "assoc" "a sequence of object/word,quotation pairs, with an optional quotation at the end" } }
 { $description
-    "Compares " { $snippet "obj" } " against the first element of every pair. If some pair matches, removes " { $snippet "obj" } " from the stack and calls the second element of that pair, which must be a quotation."
+    "Compares " { $snippet "obj" } " against the first element of every pair, first evaluating the first element if it is a word. If some pair matches, removes " { $snippet "obj" } " from the stack and calls the second element of that pair, which must be a quotation."
     $nl
     "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "cases" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-cond } " error is rasied."
     $nl

@@ -38,9 +38,8 @@ PRIVATE>
     { [ dup 2 < ] [ drop { } ] }
     { [ dup 1000003 < ]
       [ primes-under-million [ [ <=> ] binsearch 1+ 0 swap ] keep <slice> ] }
-    { [ t ]
-      [ primes-under-million 1000003 lprimes-from
-        rot [ <= ] curry lwhile list>array append ] }
+    [ primes-under-million 1000003 lprimes-from
+        rot [ <= ] curry lwhile list>array append ]
   } cond ; foldable
 
 : primes-between ( low high -- seq )

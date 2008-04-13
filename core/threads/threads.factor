@@ -4,7 +4,7 @@
 IN: threads
 USING: arrays hashtables heaps kernel kernel.private math
 namespaces sequences vectors continuations continuations.private
-dlists assocs system combinators init boxes ;
+dlists assocs system combinators init boxes accessors ;
 
 SYMBOL: initial-thread
 
@@ -18,11 +18,10 @@ mailbox variables sleep-entry ;
 
 ! Thread-local storage
 : tnamespace ( -- assoc )
-    self dup thread-variables
-    [ ] [ H{ } clone dup rot set-thread-variables ] ?if ;
+    self variables>> [ H{ } clone dup self (>>variables) ] unless* ;
 
 : tget ( key -- value )
-    self thread-variables at ;
+    self variables>> at ;
 
 : tset ( value key -- )
     tnamespace set-at ;
@@ -35,7 +34,7 @@ mailbox variables sleep-entry ;
 : thread ( id -- thread ) threads at ;
 
 : thread-registered? ( thread -- ? )
-    thread-id threads key? ;
+    id>> threads key? ;
 
 : check-unregistered
     dup thread-registered?
@@ -48,59 +47,58 @@ mailbox variables sleep-entry ;
 <PRIVATE
 
 : register-thread ( thread -- )
-    check-unregistered dup thread-id threads set-at ;
+    check-unregistered dup id>> threads set-at ;
 
 : unregister-thread ( thread -- )
-    check-registered thread-id threads delete-at ;
+    check-registered id>> threads delete-at ;
 
 : set-self ( thread -- ) 40 setenv ; inline
 
 PRIVATE>
 
 : <thread> ( quot name -- thread )
-    \ thread counter <box> [ ] {
-        set-thread-quot
-        set-thread-name
-        set-thread-id
-        set-thread-continuation
-        set-thread-exit-handler
-    } \ thread construct ;
+    \ thread construct-empty
+        swap >>name
+        swap >>quot
+        \ thread counter >>id
+        <box> >>continuation
+        [ ] >>exit-handler ;
 
 : run-queue 42 getenv ;
 
 : sleep-queue 43 getenv ;
 
 : resume ( thread -- )
-    f over set-thread-state
+    f >>state
     check-registered run-queue push-front ;
 
 : resume-now ( thread -- )
-    f over set-thread-state
+    f >>state
     check-registered run-queue push-back ;
 
 : resume-with ( obj thread -- )
-    f over set-thread-state
+    f >>state
     check-registered 2array run-queue push-front ;
 
 : sleep-time ( -- ms/f )
     {
         { [ run-queue dlist-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
-        { [ t ] [ sleep-queue heap-peek nip millis [-] ] }
+        [ sleep-queue heap-peek nip millis [-] ]
     } cond ;
 
 <PRIVATE
 
 : schedule-sleep ( thread ms -- )
     >r check-registered dup r> sleep-queue heap-push*
-    swap set-thread-sleep-entry ;
+    >>sleep-entry drop ;
 
 : expire-sleep? ( heap -- ? )
     dup heap-empty?
     [ drop f ] [ heap-peek nip millis <= ] if ;
 
 : expire-sleep ( thread -- )
-    f over set-thread-sleep-entry resume ;
+    f >>sleep-entry resume ;
 
 : expire-sleep-loop ( -- )
     sleep-queue
@@ -123,21 +121,21 @@ PRIVATE>
     ] [
         pop-back
         dup array? [ first2 ] [ f swap ] if dup set-self
-        f over set-thread-state
-        thread-continuation box>
+        f >>state
+        continuation>> box>
         continue-with
     ] if ;
 
 PRIVATE>
 
 : stop ( -- )
-    self dup thread-exit-handler call
+    self dup exit-handler>> call
     unregister-thread next ;
 
 : suspend ( quot state -- obj )
     [
-        self thread-continuation >box
-        self set-thread-state
+        self continuation>> >box
+        self (>>state)
         self swap call next
     ] callcc1 2nip ; inline
 
@@ -157,9 +155,9 @@ M: real sleep
     millis + >integer sleep-until ;
 
 : interrupt ( thread -- )
-    dup thread-state [
-        dup thread-sleep-entry [ sleep-queue heap-delete ] when*
-        f over set-thread-sleep-entry
+    dup state>> [
+        dup sleep-entry>> [ sleep-queue heap-delete ] when*
+        f >>sleep-entry
         dup resume
     ] when drop ;
 
@@ -171,7 +169,7 @@ M: real sleep
             V{ } set-catchstack
             { } set-retainstack
             >r { } set-datastack r>
-            thread-quot [ call stop ] call-clear
+            quot>> [ call stop ] call-clear
         ] 1 (throw)
     ] "spawn" suspend 2drop ;
 
@@ -196,8 +194,8 @@ GENERIC: error-in-thread ( error thread -- )
     <min-heap> 43 setenv
     initial-thread global
     [ drop f "Initial" <thread> ] cache
-    <box> over set-thread-continuation
-    f over set-thread-state
+    <box> >>continuation
+    f >>state
     dup register-thread
     set-self ;
 

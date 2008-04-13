@@ -49,7 +49,7 @@ M: mixin-instance equal?
         { [ over mixin-instance? not ] [ f ] }
         { [ 2dup [ mixin-instance-class ] bi@ = not ] [ f ] }
         { [ 2dup [ mixin-instance-mixin ] bi@ = not ] [ f ] }
-        { [ t ] [ t ] }
+        [ t ]
     } cond 2nip ;
 
 M: mixin-instance hashcode*

@@ -184,6 +184,9 @@ M: parse-error summary
 M: parse-error compute-restarts
     error>> compute-restarts ;
 
+M: parse-error error-help
+    error>> error-help ;
+
 SYMBOL: use
 SYMBOL: in
 
@@ -298,12 +301,35 @@ M: no-word-error summary
         ] "" make note.
     ] with each ;
 
+ERROR: invalid-slot-name name ;
+
+M: invalid-slot-name summary
+    drop
+    "Invalid slot name" ;
+
+: (parse-tuple-slots) ( -- )
+    #! This isn't meant to enforce any kind of policy, just
+    #! to check for mistakes of this form:
+    #!
+    #! TUPLE: blahblah foo bing
+    #!
+    #! : ...
+    scan {
+        { [ dup not ] [ unexpected-eof ] }
+        { [ dup { ":" "(" "<" } member? ] [ invalid-slot-name ] }
+        { [ dup ";" = ] [ drop ] }
+        [ , (parse-tuple-slots) ]
+    } cond ;
+
+: parse-tuple-slots ( -- seq )
+    [ (parse-tuple-slots) ] { } make ;
+
 : parse-tuple-definition ( -- class superclass slots )
     CREATE-CLASS
     scan {
         { ";" [ tuple f ] }
-        { "<" [ scan-word ";" parse-tokens ] }
-        [ >r tuple ";" parse-tokens r> prefix ]
+        { "<" [ scan-word parse-tuple-slots ] }
+        [ >r tuple parse-tuple-slots r> prefix ]
     } case 3dup check-slot-shadowing ;
 
 ERROR: staging-violation word ;
@@ -324,7 +350,7 @@ M: staging-violation summary
         { [ dup not ] [ drop unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
         { [ dup parsing? ] [ nip execute-parsing t ] }
-        { [ t ] [ pick push drop t ] }
+        [ pick push drop t ]
     } cond ;
 
 : (parse-until) ( accum end -- accum )

@@ -1,56 +1,113 @@
 
 USING: kernel sequences assocs qualified circular ;
 
+USING: math multi-methods ;
+
 QUALIFIED: sequences
+QUALIFIED: assocs
 QUALIFIED: circular
 
 IN: newfx
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Now, we can see a new world coming into view.
 ! A world in which there is the very real prospect of a new world order.
 !
 !    - George Herbert Walker Bush
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+GENERIC: at ( col key -- val )
+GENERIC: of ( key col -- val )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: nth-at ( seq i -- val ) swap nth ;
-: nth-of ( i seq -- val )      nth ;
+GENERIC: grab ( col key -- col val )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: nth-is ( seq   i val -- seq ) swap pick set-nth ;
-: is-nth ( seq val   i -- seq )      pick set-nth ;
+GENERIC: is ( col key val -- col )
+GENERIC: as ( col val key -- col )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: nth-is-of (   i val seq -- seq ) dup >r swapd set-nth r> ;
-: is-nth-of ( val   i seq -- seq ) dup >r       set-nth r> ;
+GENERIC: is-of ( key val col -- col )
+GENERIC: as-of ( val key col -- col )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: mutate-nth    ( seq i val -- ) swap rot set-nth ;
-: mutate-nth-at ( seq val i -- )      rot set-nth ;
-
-: mutate-nth-of    (   i val seq -- ) swapd set-nth ;
-: mutate-nth-at-of ( val   i seq -- )       set-nth ;
+GENERIC: mutate-at ( col key val -- )
+GENERIC: mutate-as ( col val key -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: at-key ( tbl key -- val ) swap at ;
-: key-of ( key tbl -- val )      at ;
+GENERIC: at-mutate ( key val col -- )
+GENERIC: as-mutate ( val key col -- )
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! sequence
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+METHOD: at { sequence number  } swap nth ;
+METHOD: of { number  sequence }      nth ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: key-is ( tbl key val -- tbl ) swap pick set-at ;
-: is-key ( tbl val key -- tbl )      pick set-at ;
+METHOD: grab { sequence number } dupd swap nth ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: mutate-key    ( tbl key val -- ) swap rot set-at ;
-: mutate-at-key ( tbl val key -- )      rot set-at ;
+METHOD: is { sequence number object  } swap pick set-nth ;
+METHOD: as { sequence object  number }      pick set-nth ;
 
-: mutate-key-of    ( key val tbl -- ) swapd set-at ;
-: mutate-at-key-of ( val key tbl -- )       set-at ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+METHOD: is-of { number object  sequence } dup >r swapd set-nth r> ;
+METHOD: as-of { object  number sequence } dup >r       set-nth r> ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+METHOD: mutate-at { sequence number object  } swap rot set-nth ;
+METHOD: mutate-as { sequence object  number }      rot set-nth ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+METHOD: at-mutate { number object  sequence } swapd set-nth ;
+METHOD: as-mutate { object  number sequence }       set-nth ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! assoc
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+METHOD: at { assoc object } swap assocs:at ;
+METHOD: of { object assoc }      assocs:at ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+METHOD: grab { assoc object } dupd swap assocs:at ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+METHOD: is { assoc object object } swap pick set-at ;
+METHOD: as { assoc object object }      pick set-at ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+METHOD: is-of { object object assoc } dup >r swapd set-at r> ;
+METHOD: as-of { object object assoc } dup >r       set-at r> ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+METHOD: mutate-at { assoc object object } swap rot set-at ;
+METHOD: mutate-as { assoc object object }      rot set-at ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+METHOD: at-mutate { object object assoc } swapd set-at ;
+METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -119,7 +119,7 @@ M: tuple-dispatch-engine-word word-completion-string
     {
         { [ dup not ] [ 2drop ] }
         { [ 2dup memq? ] [ 2drop ] }
-        { [ t ] [ push ] }
+        [ push ]
     } cond ;
 
 : insert-word ( word -- )

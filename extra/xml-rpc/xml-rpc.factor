@@ -111,7 +111,7 @@ TAG: boolean xml>item
     dup children>string {
         { [ dup "1" = ] [ 2drop t ] }
         { [ "0" = ] [ drop f ] }
-        { [ t ] [ "Bad boolean" server-error ] }
+        [ "Bad boolean" server-error ]
     } cond ;
 
 : unstruct-member ( tag -- )

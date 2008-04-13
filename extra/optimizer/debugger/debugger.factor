@@ -149,7 +149,7 @@ SYMBOL: node-count
                     { [ dup "intrinsics" word-prop over "if-intrinsics" word-prop or ] [ intrinsics-called ] }
                     { [ dup generic? ] [ generics-called ] }
                     { [ dup method-body? ] [ methods-called ] }
-                    { [ t ] [ words-called ] }
+                    [ words-called ]
                 } cond 1 -rot get at+
             ] [
                 drop

@@ -233,6 +233,7 @@ $nl
 { $subsection "sequences-split" }
 { $subsection "sequences-destructive" }
 { $subsection "sequences-stacks" }
+{ $subsection "sequences-sorting" }
 "For inner loops:"
 { $subsection "sequences-unsafe" } ;
 

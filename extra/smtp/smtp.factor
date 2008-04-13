@@ -70,7 +70,7 @@ LOG: smtp-response DEBUG
         { [ dup "50" head? ] [ smtp-response "syntax error" throw ] }
         { [ dup "53" head? ] [ smtp-response "invalid authentication data" throw ] }
         { [ dup "55" head? ] [ smtp-response "fatal error" throw ] }
-        { [ t ] [ "unknown error" throw ] }
+        [ "unknown error" throw ]
     } cond ;
 
 : multiline? ( response -- boolean )

@@ -179,7 +179,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     num-audio-buffers-processed {
         { [ over player-buffers length 1 = over zero? and ] [ drop append-new-audio-buffer t ] }
         { [ over player-buffers length 2 = over zero? and ] [ yield drop f ] }
-        { [ t ] [ fill-processed-audio-buffer t ] }
+        [ fill-processed-audio-buffer t ]
     } cond ;
 
 : start-audio ( player -- player bool )
@@ -284,7 +284,7 @@ HINTS: yuv>rgb byte-array byte-array ;
         decode-packet {
             { [ is-vorbis-packet? ] [ handle-initial-vorbis-header ] }
             { [ is-theora-packet? ] [ handle-initial-theora-header ] }
-            { [ t ]                 [ handle-initial-unknown-header ] }
+            [ handle-initial-unknown-header ]
         } cond t
     ] [
         f

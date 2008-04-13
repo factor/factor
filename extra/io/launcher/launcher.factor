@@ -150,18 +150,18 @@ M: process timed-out kill-process ;
 
 HOOK: (process-stream) io-backend ( process -- handle in out )
 
-TUPLE: process-stream process ;
+: <process-stream*> ( desc encoding -- stream process )
+    >r >process dup dup (process-stream) <reader&writer>
+    r> <encoder-duplex> -roll
+    process-started ;
 
 : <process-stream> ( desc encoding -- stream )
-    >r >process dup dup (process-stream)
-    >r >r process-started process-stream construct-boa
-    r> r> <reader&writer> r> <encoder-duplex>
-    over set-delegate ;
+    <process-stream*> drop ; inline
 
 : with-process-stream ( desc quot -- status )
-    swap <process-stream>
+    swap <process-stream*> >r
     [ swap with-stream ] keep
-    process>> wait-for-process ; inline
+    r> wait-for-process ; inline
 
 : notify-exit ( process status -- )
     >>status

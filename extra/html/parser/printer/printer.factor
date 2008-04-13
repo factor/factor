@@ -92,7 +92,7 @@ M: printer print-tag ( tag -- )
             [ print-closing-named-tag ] }
         { [ dup tag-name string? ]
             [ print-opening-named-tag ] }
-        { [ t ] [ <unknown-tag-error> throw ] }
+        [ <unknown-tag-error> throw ]
     } cond ;
 
 SYMBOL: tablestack

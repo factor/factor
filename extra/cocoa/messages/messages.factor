@@ -154,7 +154,7 @@ H{
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
         { [ dup CHAR: [ = ] [ 3drop "void*" ] }
-        { [ t ] [ 2nip 1string objc>alien-types get at ] }
+        [ 2nip 1string objc>alien-types get at ]
     } cond ;
 
 : parse-objc-type ( string -- ctype ) 0 swap (parse-objc-type) ;

@@ -3,7 +3,8 @@
 !
 USING: kernel threads vectors arrays sequences
 namespaces tools.test continuations dlists strings math words
-match quotations concurrency.messaging concurrency.mailboxes ;
+match quotations concurrency.messaging concurrency.mailboxes
+concurrency.count-downs ;
 IN: concurrency.messaging.tests
 
 [ ] [ my-mailbox mailbox-data dlist-delete-all ] unit-test
@@ -53,3 +54,14 @@ SYMBOL: exit
     receive
     exit "counter" get send
 ] unit-test
+
+! Not yet
+
+! 1 <count-down> "c" set
+
+! [
+!     "c" get count-down
+!     receive drop
+! ] "Bad synchronous send" spawn "t" set
+
+! [ 3 "t" get send-synchronous ] must-fail

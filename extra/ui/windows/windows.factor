@@ -391,11 +391,11 @@ SYMBOL: trace-messages?
         { [ windows get empty? ] [ drop ] }
         { [ dup peek-message? ] [ ui-wait event-loop ] }
         { [ dup MSG-message WM_QUIT = ] [ drop ] }
-        { [ t ] [
+        [
             dup TranslateMessage drop
             dup DispatchMessage drop
             event-loop
-        ] }
+        ]
     } cond ;
 
 : register-wndclassex ( -- class )

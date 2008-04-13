@@ -29,9 +29,10 @@ IN: io.encodings.8-bit
     { "mac-roman" "ROMAN" }
 } ;
 
-: full-path ( file-name -- path )
+: encoding-file ( file-name -- stream )
     "extra/io/encodings/8-bit/" ".TXT"
-    swapd 3append resource-path ;
+    swapd 3append resource-path
+    ascii <file-reader> ;
 
 : tail-if ( seq n -- newseq )
     2dup swap length <= [ tail ] [ drop ] if ;
@@ -48,8 +49,8 @@ IN: io.encodings.8-bit
 : ch>byte ( assoc -- newassoc )
     [ swap ] assoc-map >hashtable ;
 
-: parse-file ( file-name -- byte>ch ch>byte )
-    ascii file-lines process-contents
+: parse-file ( path -- byte>ch ch>byte )
+    lines process-contents
     [ byte>ch ] [ ch>byte ] bi ;
 
 TUPLE: 8-bit name decode encode ;
@@ -71,13 +72,13 @@ M: 8-bit decode-char
 : make-8-bit ( word byte>ch ch>byte -- )
     [ 8-bit construct-boa ] 2curry dupd curry define ;
 
-: define-8-bit-encoding ( name path -- )
+: define-8-bit-encoding ( name stream -- )
     >r in get create r> parse-file make-8-bit ;
 
 PRIVATE>
 
 [
     "io.encodings.8-bit" in [
-        mappings [ full-path define-8-bit-encoding ] assoc-each
+        mappings [ encoding-file define-8-bit-encoding ] assoc-each
     ] with-variable
 ] with-compilation-unit
