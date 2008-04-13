@@ -25,11 +25,11 @@ DEFER: to-strings
 : to-string ( obj -- str )
   dup class
     {
-      { string    [ ] }
-      { quotation [ call ] }
-      { word      [ execute ] }
-      { fixnum    [ number>string ] }
-      { array     [ to-strings concat ] }
+      { \ string    [ ] }
+      { \ quotation [ call ] }
+      { \ word      [ execute ] }
+      { \ fixnum    [ number>string ] }
+      { \ array     [ to-strings concat ] }
     }
   case ;
 
@@ -98,3 +98,14 @@ USE: prettyprint
 : cpu- ( -- cpu ) cpu unparse "." split "-" join ;
 
 : platform ( -- string ) { [ os unparse ] cpu- } to-strings "-" join ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: gnu-make ( -- string )
+  os { freebsd openbsd netbsd } member? [ "gmake" ] [ "make" ] if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: git-id ( -- id )
+  { "git" "show" } utf8 <process-stream> [ readln ] with-stream
+  " " split second ;
