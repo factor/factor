@@ -43,11 +43,7 @@ TUPLE: disjoint-set parents ranks counts ;
     [ rank ] curry bi@ ; inline
 
 :: branch ( a b neg zero pos -- )
-    a b 2dup = [
-        2drop zero call
-    ] [
-        < [ neg call ] [ pos call ] if
-    ] if ; inline
+    a b = zero [ a b < neg pos if ] if ; inline
 
 PRIVATE>
 
