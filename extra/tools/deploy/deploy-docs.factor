@@ -10,7 +10,7 @@ $nl
 { $list
    { "On Mac OS X, this yields a program named " { $snippet "Hello world.app" } "." }
    { "On Windows, it yields a directory named " { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui.exe" } "." }
-   { "On Linux, it yields a directory named " { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui" } "." }
+   { "On Unix-like systems (Linux, BSD, Solaris, etc), it yields a directory named " { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui" } "." }
 }
 "In all cases, running the program displays a window with a message."
 $nl
