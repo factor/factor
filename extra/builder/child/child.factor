@@ -62,8 +62,6 @@ IN: builder.child
   test         status-test on
                status      on ;
 
-! : build-child ( -- ) "factor" [ (build-child) ] with-directory ;
-
 : build-child ( -- )
   "factor" set-current-directory
     [ (build-child) ] try
