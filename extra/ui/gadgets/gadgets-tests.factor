@@ -114,7 +114,7 @@ C: <fooey> fooey
 TUPLE: mock-gadget graft-called ungraft-called ;
 
 : <mock-gadget>
-    0 0 mock-gadget construct-boa <gadget> over set-delegate ;
+    0 0 mock-gadget boa <gadget> over set-delegate ;
 
 M: mock-gadget graft*
     dup mock-gadget-graft-called 1+

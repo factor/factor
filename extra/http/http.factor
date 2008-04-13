@@ -122,7 +122,7 @@ IN: http
 TUPLE: cookie name value path domain expires http-only ;
 
 : <cookie> ( value name -- cookie )
-    cookie construct-empty
+    cookie new
     swap >>name swap >>value ;
 
 : parse-cookies ( string -- seq )
@@ -176,7 +176,7 @@ post-data-type
 cookies ;
 
 : <request>
-    request construct-empty
+    request new
         "1.1" >>version
         http-port >>port
         H{ } clone >>header
@@ -346,7 +346,7 @@ cookies
 body ;
 
 : <response>
-    response construct-empty
+    response new
     "1.1" >>version
     H{ } clone >>header
     "close" "connection" set-header
@@ -434,7 +434,7 @@ message
 body ;
 
 : <raw-response> ( -- response )
-    raw-response construct-empty
+    raw-response new
     "1.1" >>version ;
 
 M: raw-response write-response ( respose -- )

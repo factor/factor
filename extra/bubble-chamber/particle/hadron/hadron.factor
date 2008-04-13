@@ -11,7 +11,7 @@ IN: bubble-chamber.particle.hadron
 
 TUPLE: hadron < particle ;
 
-: <hadron> ( -- hadron ) hadron construct-empty initialize-particle ;
+: <hadron> ( -- hadron ) hadron new initialize-particle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

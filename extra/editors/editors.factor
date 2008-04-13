@@ -21,7 +21,7 @@ SYMBOL: edit-hook
     [ [ "Load " prepend ] keep ] { } map>assoc ;
 
 : no-edit-hook ( -- )
-    \ no-edit-hook construct-empty
+    \ no-edit-hook new
     editor-restarts throw-restarts
     require ;
 

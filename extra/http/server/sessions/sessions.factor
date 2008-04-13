@@ -18,7 +18,7 @@ M: object init-session* drop ;
 TUPLE: session-manager responder sessions ;
 
 : <session-manager> ( responder class -- responder' )
-    >r <sessions-in-memory> session-manager construct-boa
+    >r <sessions-in-memory> session-manager boa
     r> construct-delegate ; inline
 
 SYMBOLS: session session-id session-changed? ;

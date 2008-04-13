@@ -24,7 +24,7 @@ TUPLE: check< number bound ;
 M: check< summary drop "Number exceeds upper bound" ;
 
 : check< ( num cmp -- num )
-    2dup < [ drop ] [ \ check< construct-boa throw ] if ;
+    2dup < [ drop ] [ \ check< boa throw ] if ;
 
 : ?check ( length -- )
     safe-bitfields? get [ 2^ , \ check< , ] [ drop ] if ;

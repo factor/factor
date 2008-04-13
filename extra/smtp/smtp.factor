@@ -149,7 +149,7 @@ M: email clone
     message-id "Message-Id" set-header ;
 
 : <email> ( -- email )
-    email construct-empty
+    email new
     H{ } clone >>headers ;
 
 : send-email ( email -- )

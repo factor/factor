@@ -28,7 +28,7 @@ TUPLE: input-scroller ;
 
 : <input-scroller> ( interactor -- scroller )
     <scroller>
-    input-scroller construct-empty
+    input-scroller new
     [ set-gadget-delegate ] keep ;
 
 M: input-scroller pref-dim*
@@ -136,7 +136,7 @@ M: tuple-dispatch-engine-word word-completion-string
 TUPLE: stack-display ;
 
 : <stack-display> ( -- gadget )
-    stack-display construct-empty
+    stack-display new
     g workspace-listener swap [
         dup <toolbar> f track,
         listener-gadget-stack [ stack. ]
@@ -178,7 +178,7 @@ M: stack-display tool-scroller
     f <model> swap set-listener-gadget-stack ;
 
 : <listener-gadget> ( -- gadget )
-    listener-gadget construct-empty dup init-listener
+    listener-gadget new dup init-listener
     [ listener-output, listener-input, ] { 0 1 } build-track ;
 
 : listener-help "ui-listener" help-window ;

@@ -15,7 +15,7 @@ TUPLE: blum-blum-shub x n ;
 : <blum-blum-shub> ( numbits -- blum-blum-shub )
     generate-bbs-primes *
     [ find-relative-prime ] keep
-    blum-blum-shub construct-boa ;
+    blum-blum-shub boa ;
 
 : next-bbs-bit ( bbs -- bit )
     [ [ x>> 2 ] [ n>> ] bi ^mod ] keep

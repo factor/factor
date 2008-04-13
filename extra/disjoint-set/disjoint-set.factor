@@ -51,7 +51,7 @@ PRIVATE>
     [ >array ]
     [ 0 <array> ]
     [ 1 <array> ] tri
-    disjoint-set construct-boa ;
+    disjoint-set boa ;
 
 : equiv-set-size ( a disjoint-set -- n )
     [ representative ] keep count ;

@@ -48,7 +48,7 @@ SYMBOL: elements
 
 TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 
-: <element> element construct-empty ;
+: <element> element new ;
 
 : set-id ( -- boolean )
     read1 dup elements get set-element-id ;
@@ -172,7 +172,7 @@ SYMBOL: tagnum
 
 TUPLE: tag value ;
 
-: <tag> ( -- <tag> ) 4 tag construct-boa ;
+: <tag> ( -- <tag> ) 4 tag boa ;
 
 : with-ber ( quot -- )
     [

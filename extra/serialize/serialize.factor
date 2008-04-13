@@ -277,7 +277,7 @@ SYMBOL: deserialized
 : deserialize-tuple ( -- array )
     #! Ugly because we have to intern the tuple before reading
     #! slots
-    (deserialize) construct-empty
+    (deserialize) new
     [ intern-object ]
     [
         [ (deserialize) ]

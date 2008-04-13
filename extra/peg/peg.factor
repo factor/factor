@@ -21,7 +21,7 @@ C: <parser> parser
 SYMBOL: ignore 
 
 : <parse-result> ( remaining ast -- parse-result )
-  parse-result construct-boa ;
+  parse-result boa ;
 
 SYMBOL: packrat
 SYMBOL: pos
@@ -468,16 +468,16 @@ M: box-parser (compile) ( parser -- quot )
 PRIVATE>
 
 : token ( string -- parser )
-  token-parser construct-boa init-parser ;      
+  token-parser boa init-parser ;      
 
 : satisfy ( quot -- parser )
-  satisfy-parser construct-boa init-parser ;
+  satisfy-parser boa init-parser ;
 
 : range ( min max -- parser )
-  range-parser construct-boa init-parser ;
+  range-parser boa init-parser ;
 
 : seq ( seq -- parser )
-  seq-parser construct-boa init-parser ;
+  seq-parser boa init-parser ;
 
 : 2seq ( parser1 parser2 -- parser )
   2array seq ;
@@ -492,7 +492,7 @@ PRIVATE>
   { } make seq ; inline 
 
 : choice ( seq -- parser )
-  choice-parser construct-boa init-parser ;
+  choice-parser boa init-parser ;
 
 : 2choice ( parser1 parser2 -- parser )
   2array choice ;
@@ -507,34 +507,34 @@ PRIVATE>
   { } make choice ; inline 
 
 : repeat0 ( parser -- parser )
-  repeat0-parser construct-boa init-parser ;
+  repeat0-parser boa init-parser ;
 
 : repeat1 ( parser -- parser )
-  repeat1-parser construct-boa init-parser ;
+  repeat1-parser boa init-parser ;
 
 : optional ( parser -- parser )
-  optional-parser construct-boa init-parser ;
+  optional-parser boa init-parser ;
 
 : semantic ( parser quot -- parser )
-  semantic-parser construct-boa init-parser ;
+  semantic-parser boa init-parser ;
 
 : ensure ( parser -- parser )
-  ensure-parser construct-boa init-parser ;
+  ensure-parser boa init-parser ;
 
 : ensure-not ( parser -- parser )
-  ensure-not-parser construct-boa init-parser ;
+  ensure-not-parser boa init-parser ;
 
 : action ( parser quot -- parser )
-  action-parser construct-boa init-parser ;
+  action-parser boa init-parser ;
 
 : sp ( parser -- parser )
-  sp-parser construct-boa init-parser ;
+  sp-parser boa init-parser ;
 
 : hide ( parser -- parser )
   [ drop ignore ] action ;
 
 : delay ( quot -- parser )
-  delay-parser construct-boa init-parser ;
+  delay-parser boa init-parser ;
 
 : box ( quot -- parser )
   #! because a box has its quotation run at compile time
@@ -548,7 +548,7 @@ PRIVATE>
   #! parse. The action adds an indirection with a parser type
   #! that gets memoized and fixes this. Need to rethink how
   #! to fix boxes so this isn't needed...
-  box-parser construct-boa next-id f <parser> over set-delegate [ ] action ;
+  box-parser boa next-id f <parser> over set-delegate [ ] action ;
 
 : PEG:
   (:) [

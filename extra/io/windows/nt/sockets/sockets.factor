@@ -52,7 +52,7 @@ TUPLE: ConnectEx-args port
 
 M: winnt ((client)) ( addrspec -- client-in client-out )
     [
-        \ ConnectEx-args construct-empty
+        \ ConnectEx-args new
         over make-sockaddr/size pick init-connect
         over tcp-socket over set-ConnectEx-args-s*
         dup ConnectEx-args-s* add-completion
@@ -123,7 +123,7 @@ M: winnt (accept) ( server -- addrspec handle )
     [
         [
             check-server-port
-            \ AcceptEx-args construct-empty
+            \ AcceptEx-args new
             [ init-accept ] keep
             [ ((accept)) ] keep
             [ accept-continuation ] keep
@@ -193,7 +193,7 @@ TUPLE: WSARecvFrom-args port
 M: winnt receive ( datagram -- packet addrspec )
     [
         check-datagram-port
-        \ WSARecvFrom-args construct-empty
+        \ WSARecvFrom-args new
         [ init-WSARecvFrom ] keep
         [ call-WSARecvFrom ] keep
         [ WSARecvFrom-continuation ] keep
@@ -245,7 +245,7 @@ USE: io.sockets
 M: winnt send ( packet addrspec datagram -- )
     [
         check-datagram-send
-        \ WSASendTo-args construct-empty
+        \ WSASendTo-args new
         [ init-WSASendTo ] keep
         [ call-WSASendTo ] keep
         [ WSASendTo-continuation ] keep

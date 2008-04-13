@@ -20,7 +20,7 @@ GENERIC: init-handle ( handle -- )
 GENERIC: close-handle ( handle -- )
 
 : <port> ( handle class -- port )
-    construct-empty
+    new
         swap dup init-handle >>handle ; inline
 
 : <buffered-port> ( handle class -- port )

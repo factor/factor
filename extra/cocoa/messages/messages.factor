@@ -43,7 +43,7 @@ super-message-senders global [ H{ } assoc-like ] change-at
 
 TUPLE: selector name object ;
 
-MEMO: <selector> ( name -- sel ) f \ selector construct-boa ;
+MEMO: <selector> ( name -- sel ) f \ selector boa ;
 
 : selector ( selector -- alien )
     dup selector-object expired? [

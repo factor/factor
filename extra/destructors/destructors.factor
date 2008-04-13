@@ -18,7 +18,7 @@ M: destructor dispose
     ] if ;
 
 : <destructor> ( obj -- newobj )
-    f destructor construct-boa ;
+    f destructor boa ;
 
 : add-error-destructor ( obj -- )
     <destructor> error-destructors get push ;

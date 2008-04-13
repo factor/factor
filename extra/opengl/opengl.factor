@@ -159,7 +159,7 @@ MACRO: set-draw-buffers ( buffers -- )
 TUPLE: sprite loc dim dim2 dlist texture ;
 
 : <sprite> ( loc dim dim2 -- sprite )
-    f f sprite construct-boa ;
+    f f sprite boa ;
 
 : sprite-size2 sprite-dim2 first2 ;
 

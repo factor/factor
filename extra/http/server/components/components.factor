@@ -50,7 +50,7 @@ SYMBOL: values
     ] if ;
 
 : <component> ( id class -- component )
-    \ component construct-empty
+    \ component new
     swap construct-delegate
     swap >>id ; inline
 

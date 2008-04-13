@@ -113,7 +113,7 @@ M: fail-parser parse ( input parser -- list )
 TUPLE: ensure-parser test ;
 
 : ensure ( parser -- ensure )
-    ensure-parser construct-boa ;
+    ensure-parser boa ;
 
 M: ensure-parser parse ( input parser -- list )
     2dup ensure-parser-test parse nil?
@@ -122,7 +122,7 @@ M: ensure-parser parse ( input parser -- list )
 TUPLE: ensure-not-parser test ;
 
 : ensure-not ( parser -- ensure )
-    ensure-not-parser construct-boa ;
+    ensure-not-parser boa ;
 
 M: ensure-not-parser parse ( input parser -- list )
     2dup ensure-not-parser-test parse nil?
@@ -135,10 +135,10 @@ TUPLE: and-parser parsers ;
         >r and-parser-parsers r> suffix
     ] [
         2array
-    ] if and-parser construct-boa ;
+    ] if and-parser boa ;
 
 : <and-parser> ( parsers -- parser )
-    dup length 1 = [ first ] [ and-parser construct-boa ] if ;
+    dup length 1 = [ first ] [ and-parser boa ] if ;
 
 : and-parser-parse ( list p1  -- list )
     swap [
@@ -161,7 +161,7 @@ M: and-parser parse ( input parser -- list )
 TUPLE: or-parser parsers ;
 
 : <or-parser> ( parsers -- parser )
-    dup length 1 = [ first ] [ or-parser construct-boa ] if ;
+    dup length 1 = [ first ] [ or-parser boa ] if ;
 
 : <|> ( parser1 parser2 -- parser )
     2array <or-parser> ;
@@ -265,7 +265,7 @@ LAZY: <?> ( parser -- parser )
 TUPLE: only-first-parser p1 ;
 
 LAZY: only-first ( parser -- parser )
-    only-first-parser construct-boa ;
+    only-first-parser boa ;
 
 M: only-first-parser parse ( input parser -- list )
     #! Transform a parser into a parser that only yields

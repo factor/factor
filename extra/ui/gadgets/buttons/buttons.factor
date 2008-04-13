@@ -40,7 +40,7 @@ button H{
 } set-gestures
 
 : <button> ( gadget quot -- button )
-    button construct-empty
+    button new
     [ set-button-quot ] keep
     [ set-gadget-delegate ] keep ;
 
@@ -93,7 +93,7 @@ repeat-button H{
 : <repeat-button> ( label quot -- button )
     #! Button that calls the quotation every 100ms as long as
     #! the mouse is held down.
-    repeat-button construct-empty
+    repeat-button new
     [ >r <bevel-button> r> set-gadget-delegate ] keep ;
 
 TUPLE: checkmark-paint color ;

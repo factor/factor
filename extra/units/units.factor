@@ -8,7 +8,7 @@ TUPLE: dimensioned value top bot ;
 TUPLE: dimensions-not-equal ;
 
 : dimensions-not-equal ( -- * )
-    \ dimensions-not-equal construct-empty throw ;
+    \ dimensions-not-equal new throw ;
 
 M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
@@ -25,7 +25,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 : <dimensioned> ( n top bot -- obj )
     symbolic-reduce
     [ natural-sort ] bi@
-    dimensioned construct-boa ;
+    dimensioned boa ;
 
 : >dimensioned< ( d -- n top bot )
     { dimensioned-value dimensioned-top dimensioned-bot }

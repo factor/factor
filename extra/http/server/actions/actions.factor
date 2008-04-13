@@ -12,7 +12,7 @@ SYMBOL: params
 TUPLE: action init display submit get-params post-params ;
 
 : <action>
-    action construct-empty
+    action new
         [ ] >>init
         [ <400> ] >>display
         [ <400> ] >>submit ;

@@ -9,7 +9,7 @@ IN: concurrency.exchangers
 TUPLE: exchanger thread object ;
 
 : <exchanger> ( -- exchanger )
-    <box> <box> exchanger construct-boa ;
+    <box> <box> exchanger boa ;
 
 : exchange ( obj exchanger -- newobj )
     dup exchanger-thread box-full? [

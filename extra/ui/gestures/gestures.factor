@@ -62,7 +62,7 @@ SYMBOLS: C+ A+ M+ S+ ;
 TUPLE: key-down mods sym ;
 
 : <key-gesture> ( mods sym action? class -- mods' sym' )
-    >r [ S+ rot remove swap ] unless r> construct-boa ; inline
+    >r [ S+ rot remove swap ] unless r> boa ; inline
 
 : <key-down> ( mods sym action? -- key-down )
     key-down <key-gesture> ;

@@ -41,7 +41,7 @@ SYMBOL: +highest-priority+
 SYMBOL: +realtime-priority+
 
 : <process> ( -- process )
-    process construct-empty
+    process new
     H{ } clone >>environment
     +append-environment+ >>environment-mode ;
 
@@ -130,7 +130,7 @@ HOOK: run-process* io-backend ( process -- handle )
 TUPLE: process-failed code ;
 
 : process-failed ( code -- * )
-    \ process-failed construct-boa throw ;
+    \ process-failed boa throw ;
 
 : try-process ( desc -- )
     run-process wait-for-process dup zero?

@@ -104,7 +104,7 @@ deploy-gadget "toolbar" f {
     g <toolbar> { 10 10 } over set-pack-gap gadget, ;
 
 : <deploy-gadget> ( vocab -- gadget )
-    f deploy-gadget construct-boa [
+    f deploy-gadget boa [
         dup <deploy-settings>
         g-> set-deploy-gadget-settings gadget,
         buttons,
