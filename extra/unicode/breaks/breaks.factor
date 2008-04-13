@@ -21,7 +21,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
     } case ;
 
 : trim-blank ( str -- newstr )
-    [ blank? ] trim-right ;
+    [ blank? ] right-trim ;
 
 : process-other-extend ( lines -- set )
     [ "#" split1 drop ";" split1 drop trim-blank ] map
