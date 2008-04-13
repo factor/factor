@@ -1,4 +1,4 @@
-CFLAGS = -fomit-frame-pointer
+CFLAGS += -fomit-frame-pointer
 
 EXE_SUFFIX =
 DLL_PREFIX = lib
