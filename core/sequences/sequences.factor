@@ -9,13 +9,13 @@ GENERIC: length ( seq -- n ) flushable
 GENERIC: set-length ( n seq -- )
 GENERIC: nth ( n seq -- elt ) flushable
 GENERIC: set-nth ( elt n seq -- )
-GENERIC: new ( len seq -- newseq ) flushable
+GENERIC: new-sequence ( len seq -- newseq ) flushable
 GENERIC: new-resizable ( len seq -- newseq ) flushable
 GENERIC: like ( seq exemplar -- newseq ) flushable
 GENERIC: clone-like ( seq exemplar -- newseq ) flushable
 
 : new-like ( len exemplar quot -- seq )
-    over >r >r new r> call r> like ; inline
+    over >r >r new-sequence r> call r> like ; inline
 
 M: sequence like drop ;
 
@@ -162,7 +162,7 @@ M: virtual-sequence set-nth virtual@ set-nth ;
 M: virtual-sequence nth-unsafe virtual@ nth-unsafe ;
 M: virtual-sequence set-nth-unsafe virtual@ set-nth-unsafe ;
 M: virtual-sequence like virtual-seq like ;
-M: virtual-sequence new virtual-seq new ;
+M: virtual-sequence new-sequence virtual-seq new-sequence ;
 
 INSTANCE: virtual-sequence sequence
 
@@ -250,7 +250,7 @@ INSTANCE: repetition immutable-sequence
     dup 0 <= [ 2drop 2drop ] [ 1- ((copy)) (copy) ] if ; inline
 
 : prepare-subseq ( from to seq -- dst i src j n )
-    [ >r swap - r> new dup 0 ] 3keep
+    [ >r swap - r> new-sequence dup 0 ] 3keep
     -rot drop roll length ; inline
 
 : check-copy ( src n dst -- )
@@ -275,7 +275,7 @@ PRIVATE>
     (copy) drop ; inline
 
 M: sequence clone-like
-    >r dup length r> new [ 0 swap copy ] keep ;
+    >r dup length r> new-sequence [ 0 swap copy ] keep ;
 
 M: immutable-sequence clone-like like ;
 

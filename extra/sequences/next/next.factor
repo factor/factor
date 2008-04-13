@@ -17,6 +17,6 @@ PRIVATE>
 
 : map-next ( seq quot -- newseq )
     ! quot: next-elt elt -- newelt
-    over dup length swap new >r
+    over dup length swap new-sequence >r
     iterate-seq [ (map-next) ] 2curry
     r> [ collect ] keep ; inline

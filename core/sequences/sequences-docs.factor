@@ -33,7 +33,7 @@ ARTICLE: "sequence-protocol" "Sequence protocol"
 "An optional generic word for creating sequences of the same class as a given sequence:"
 { $subsection like }
 "Optional generic words for optimization purposes:"
-{ $subsection new }
+{ $subsection new-sequence }
 { $subsection new-resizable }
 { $see-also "sequences-unsafe" } ;
 
@@ -281,7 +281,7 @@ HELP: immutable
 { $description "Throws an " { $link immutable } " error." }
 { $error-description "Thrown if an attempt is made to modify an immutable sequence." } ;
 
-HELP: new
+HELP: new-sequence
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a mutable sequence" } }
 { $contract "Outputs a mutable sequence of length " { $snippet "n" } " which can hold the elements of " { $snippet "seq" } "." } ;
 

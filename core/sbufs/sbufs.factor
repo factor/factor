@@ -16,7 +16,7 @@ PRIVATE>
 M: sbuf set-nth-unsafe
     underlying >r >r >fixnum r> >fixnum r> set-string-nth ;
 
-M: sbuf new drop [ 0 <string> ] keep >fixnum string>sbuf ;
+M: sbuf new-sequence drop [ 0 <string> ] keep >fixnum string>sbuf ;
 
 : >sbuf ( seq -- sbuf ) SBUF" " clone-like ; inline
 
