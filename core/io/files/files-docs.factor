@@ -39,11 +39,19 @@ ARTICLE: "symbolic-links" "Symbolic links"
 "Not all operating systems support symbolic links."
 { $see-also link-info } ;
 
-ARTICLE: "directories" "Directories"
-"Current directory:"
+ARTICLE: "current-directory" "Current working directory"
+"File system I/O operations use the value of a variable to resolve relative pathnames:"
 { $subsection current-directory }
+"This variable can be changed with a pair of words:"
 { $subsection set-current-directory }
 { $subsection with-directory }
+"This variable is independent of the operating system notion of ``current working directory''. While all Factor I/O operations use the variable and not the operating system's value, care must be taken when making FFI calls which expect a pathname. The first option is to resolve relative paths:"
+{ $subsection (normalize-path) }
+"The second is to change the working directory of the current process:"
+{ $subsection cd }
+{ $subsection cwd } ;
+
+ARTICLE: "directories" "Directories"
 "Home directory:"
 { $subsection home }
 "Directory listing:"
@@ -51,7 +59,8 @@ ARTICLE: "directories" "Directories"
 { $subsection directory* }
 "Creating directories:"
 { $subsection make-directory }
-{ $subsection make-directories } ;
+{ $subsection make-directories }
+{ $subsection "current-directory" } ;
 
 ARTICLE: "file-types" "File Types"
 "Platform-independent types:"
@@ -242,11 +251,21 @@ HELP: cd
 { cd cwd current-directory set-current-directory with-directory } related-words
 
 HELP: current-directory
-{ $description "A variable holding the current directory. Words that use the filesystem do so in relation to this variable.  On startup, an init hook sets this word to the directory from which Factor was run." } ;
+{ $description "A variable holding the current directory as an absolute path. Words that use the filesystem do so in relation to this variable."
+$nl
+"This variable should never be set directly; instead, use " { $link set-current-directory } " or " { $link with-directory } ". This preserves the invariant that the value of this variable is an absolute path." } ;
+
+HELP: set-current-directory
+{ $values { "path" "a pathname string" } }
+{ $description "Changes the " { $link current-directory } " variable."
+$nl
+"If " { $snippet "path" } " is relative, it is first resolved relative to the current directory. If " { $snippet "path" } " is absolute, it becomes the new current directory." } ;
 
 HELP: with-directory
 { $values { "path" "a pathname string" } { "quot" quotation } }
-{ $description "Changes the " { $link current-directory } " variable for the duration of a quotation's execution.  Words that use the file-system should call " { $link normalize-path } " in order to obtain a path relative to the current directory." } ;
+{ $description "Calls the quotation in a new dynamic scope with the " { $link current-directory } " variable rebound."
+$nl
+"If " { $snippet "path" } " is relative, it is first resolved relative to the current directory. If " { $snippet "path" } " is absolute, it becomes the new current directory." } ;
 
 HELP: append-path
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
@@ -300,7 +319,7 @@ HELP: directory*
 
 HELP: resource-path
 { $values { "path" "a pathname string" } { "newpath" "a pathname string" } }
-{ $description "Resolve a path relative to the Factor source code location. This first checks if the " { $link resource-path } " variable is set to a path, and if not, uses the parent directory of the current image." } ;
+{ $description "Resolve a path relative to the Factor source code location." } ;
 
 HELP: pathname
 { $class-description "Class of pathname presentations. Path name presentations can be created by calling " { $link <pathname> } ". Instances can be passed to " { $link write-object } " to output a clickable pathname." } ;

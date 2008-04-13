@@ -29,9 +29,7 @@ SYMBOL: indenter
     xml-pprint? get [ -1 indentation +@ ] when ;
 
 : trim-whitespace ( string -- no-whitespace )
-    [ [ blank? not ] find drop 0 or ] keep
-    [ [ blank? not ] find-last drop [ 1+ ] [ 0 ] if* ] keep
-    subseq ;
+    [ blank? ] trim ;
 
 : ?filter-children ( children -- no-whitespace )
     xml-pprint? get [

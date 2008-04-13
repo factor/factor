@@ -1,5 +1,5 @@
 
-USING: kernel system namespaces sequences splitting combinators
+USING: kernel debugger system namespaces sequences splitting combinators
        io io.files io.launcher prettyprint bootstrap.image
        bake combinators.cleave
        builder.util
@@ -18,9 +18,10 @@ IN: builder.release
   tidy
   make-archive
   upload
-  save-archive ;
+  save-archive
+  status-release on ;
 
 : clean-build? ( -- ? )
   { "load-everything-vocabs" "test-all-vocabs" } [ eval-file empty? ] all? ;
 
-: release ( -- ) clean-build? [ (release) ] when ;
+: release ( -- ) [ clean-build? [ (release) ] when ] try ;

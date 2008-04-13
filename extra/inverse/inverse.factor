@@ -195,6 +195,10 @@ DEFER: _
 \ first3 [ 3array ] define-inverse
 \ first4 [ 4array ] define-inverse
 
+\ prefix [ unclip ] define-inverse
+\ unclip [ prefix ] define-inverse
+\ suffix [ dup 1 head* swap peek ] define-inverse
+
 ! Constructor inverse
 : deconstruct-pred ( class -- quot )
     "predicate" word-prop [ dupd call assure ] curry ;

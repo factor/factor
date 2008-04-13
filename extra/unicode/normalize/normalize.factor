@@ -67,7 +67,7 @@ IN: unicode.normalize
     0 reorder-loop ;
 
 : reorder-back ( string i -- )
-    over [ non-starter? not ] find-last* 1+* reorder-next 2drop ;
+    over [ non-starter? not ] find-last* drop ?1+ reorder-next 2drop ;
 
 : decompose ( string quot -- decomposed )
     ! When there are 8 and 32-bit strings, this'll be

@@ -63,14 +63,14 @@ M: trivial-tuple-dispatch-engine engine>quot
     ] "" make ;
 
 PREDICATE: tuple-dispatch-engine-word < word
-    "tuple-dispatch-engine" word-prop ;
+    "tuple-dispatch-generic" word-prop generic? ;
 
 M: tuple-dispatch-engine-word stack-effect
     "tuple-dispatch-generic" word-prop
-    [ extra-values ] [ stack-effect clone ] bi
-    [ length + ] change-in ;
+    [ extra-values ] [ stack-effect ] bi
+    dup [ clone [ length + ] change-in ] [ 2drop f ] if ;
 
-M: tuple-dispatch-engine-word crossref?
+M: tuple-dispatch-engine-word compiled-crossref?
     drop t ;
 
 : remember-engine ( word -- )
@@ -78,12 +78,10 @@ M: tuple-dispatch-engine-word crossref?
 
 : <tuple-dispatch-engine-word> ( engine -- word )
     tuple-dispatch-engine-word-name f <word>
-    {
-        [ t "tuple-dispatch-engine" set-word-prop ]
-        [ generic get "tuple-dispatch-generic" set-word-prop ]
-        [ remember-engine ]
-        [ ]
-    } cleave ;
+    [ generic get "tuple-dispatch-generic" set-word-prop ]
+    [ remember-engine ]
+    [ ]
+    tri ;
 
 : define-tuple-dispatch-engine-word ( engine quot -- word )
     >r <tuple-dispatch-engine-word> dup r> define ;

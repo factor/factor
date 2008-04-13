@@ -71,6 +71,10 @@ M: word crossref?
         word-vocabulary >boolean
     ] if ;
 
+GENERIC: compiled-crossref? ( word -- ? )
+
+M: word compiled-crossref? crossref? ;
+
 GENERIC# (quot-uses) 1 ( obj assoc -- )
 
 M: object (quot-uses) 2drop ;
@@ -97,7 +101,7 @@ SYMBOL: compiled-crossref
 compiled-crossref global [ H{ } assoc-like ] change-at
 
 : compiled-xref ( word dependencies -- )
-    [ drop crossref? ] assoc-subset
+    [ drop compiled-crossref? ] assoc-subset
     2dup "compiled-uses" set-word-prop
     compiled-crossref get add-vertex* ;
 
