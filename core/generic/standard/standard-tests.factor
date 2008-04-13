@@ -2,7 +2,8 @@ IN: generic.standard.tests
 USING: tools.test math math.functions math.constants
 generic.standard strings sequences arrays kernel accessors
 words float-arrays byte-arrays bit-arrays parser namespaces
-quotations inference vectors growable ;
+quotations inference vectors growable hashtables sbufs
+prettyprint ;
 
 GENERIC: lo-tag-test
 
@@ -268,3 +269,13 @@ M: growable call-next-hooker call-next-method "growable " prepend ;
 [ "vector growable sequence" ] [
     V{ } my-var [ call-next-hooker ] with-variable
 ] unit-test
+
+GENERIC: no-stack-effect-decl
+
+M: hashtable no-stack-effect-decl ;
+M: vector no-stack-effect-decl ;
+M: sbuf no-stack-effect-decl ;
+
+[ ] [ \ no-stack-effect-decl see ] unit-test
+
+[ ] [ \ no-stack-effect-decl word-def . ] unit-test
