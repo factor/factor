@@ -111,7 +111,7 @@ M: gadget children-on nip gadget-children ;
 : fast-children-on ( rect axis children -- from to )
     3dup
     >r >r dup rect-loc swap rect-dim v+
-    r> r> (fast-children-on) [ 1+ ] [ 0 ] if*
+    r> r> (fast-children-on) ?1+
     >r
     >r >r rect-loc
     r> r> (fast-children-on) 0 or

@@ -21,7 +21,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
     } case ;
 
 : trim-blank ( str -- newstr )
-    dup [ blank? not ] find-last 1+* head ;
+    [ blank? ] trim-right ;
 
 : process-other-extend ( lines -- set )
     [ "#" split1 drop ";" split1 drop trim-blank ] map
@@ -110,8 +110,7 @@ VALUE: grapheme-table
 
 : last-grapheme ( str -- i )
     unclip-last-slice grapheme-class swap
-    [ grapheme-class dup rot grapheme-break? ] find-last-index
-    nip -1 or 1+ ;
+    [ grapheme-class dup rot grapheme-break? ] find-last-index ?1+ nip ;
 
 [
     other-extend-lines process-other-extend \ other-extend set-value
