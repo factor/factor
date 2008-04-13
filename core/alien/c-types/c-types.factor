@@ -19,7 +19,7 @@ getter setter
 reg-class size align stack-align? ;
 
 : construct-c-type ( class -- type )
-    construct-empty
+    new
         int-regs >>reg-class ;
 
 : <c-type> ( -- type )

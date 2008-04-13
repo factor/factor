@@ -197,7 +197,7 @@ ERROR: slice-error reason ;
 : <slice> ( from to seq -- slice )
     dup slice? [ collapse-slice ] when
     check-slice
-    slice construct-boa ; inline
+    slice boa ; inline
 
 M: slice virtual-seq slice-seq ;
 

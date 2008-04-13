@@ -7,7 +7,7 @@ IN: float-vectors
 <PRIVATE
 
 : float-array>vector ( float-array length -- float-vector )
-    float-vector construct-boa ; inline
+    float-vector boa ; inline
 
 PRIVATE>
 

@@ -116,7 +116,7 @@ IN: hashtables
 PRIVATE>
 
 : <hashtable> ( n -- hash )
-    hashtable construct-empty [ reset-hash ] keep ;
+    hashtable new [ reset-hash ] keep ;
 
 M: hashtable at* ( key hash -- value ? )
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;

@@ -17,7 +17,7 @@ SYMBOL: pprinter-use
 
 TUPLE: pprinter last-newline line-count end-printing indent ;
 
-: <pprinter> ( -- pprinter ) 0 1 f 0 pprinter construct-boa ;
+: <pprinter> ( -- pprinter ) 0 1 f 0 pprinter boa ;
 
 : record-vocab ( word -- )
     word-vocabulary [ dup pprinter-use get set-at ] when* ;
@@ -72,7 +72,7 @@ start-group? end-group?
 style overhang ;
 
 : construct-section ( length class -- section )
-    construct-empty
+    new
         position get >>start
         swap position [ + ] change
         position get >>end

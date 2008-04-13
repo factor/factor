@@ -7,7 +7,7 @@ IN: sbufs
 <PRIVATE
 
 : string>sbuf ( string length -- sbuf )
-    sbuf construct-boa ; inline
+    sbuf boa ; inline
 
 PRIVATE>
 

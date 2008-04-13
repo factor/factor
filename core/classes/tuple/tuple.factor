@@ -199,7 +199,7 @@ M: tuple-class define-tuple-class
 
 : define-error-class ( class superclass slots -- )
     [ define-tuple-class ] [ 2drop ] 3bi
-    dup [ construct-boa throw ] curry define ;
+    dup [ boa throw ] curry define ;
 
 M: tuple-class reset-class
     [

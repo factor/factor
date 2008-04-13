@@ -57,7 +57,7 @@ mailbox variables sleep-entry ;
 PRIVATE>
 
 : <thread> ( quot name -- thread )
-    \ thread construct-empty
+    \ thread new
         swap >>name
         swap >>quot
         \ thread counter >>id

@@ -35,7 +35,7 @@ TUPLE: tuple-dispatch-engine echelons ;
             dupd <echelon-dispatch-engine>
         ] if
     ] assoc-map [ nip ] assoc-subset
-    \ tuple-dispatch-engine construct-boa ;
+    \ tuple-dispatch-engine boa ;
 
 : convert-tuple-methods ( assoc -- assoc' )
     tuple bootstrap-word

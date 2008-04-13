@@ -82,12 +82,12 @@ M: duplicated-slots-error summary
     [ <reversed> [get-slots] ] [ duplicated-slots-error ] if
 ] 1 define-transform
 
-\ construct-boa [
+\ boa [
     dup +inlined+ depends-on
     tuple-layout [ <tuple-boa> ] curry
 ] 1 define-transform
 
-\ construct-empty [
+\ new [
     1 ensure-values
     peek-d value? [
         pop-literal
@@ -95,7 +95,7 @@ M: duplicated-slots-error summary
         tuple-layout [ <tuple> ] curry
         swap infer-quot
     ] [
-        \ construct-empty 1 1 <effect> make-call-node
+        \ new 1 1 <effect> make-call-node
     ] if
 ] "infer" set-word-prop
 

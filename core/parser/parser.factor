@@ -159,7 +159,7 @@ name>char-hook global [
 TUPLE: parse-error file line column line-text error ;
 
 : <parse-error> ( msg -- error )
-    \ parse-error construct-empty
+    \ parse-error new
         file get >>file
         lexer get line>> >>line
         lexer get column>> >>column
@@ -256,7 +256,7 @@ M: no-word-error summary
     drop "Word not found in current vocabulary search path" ;
 
 : no-word ( name -- newword )
-    dup no-word-error construct-boa
+    dup no-word-error boa
     swap words-named [ forward-reference? not ] subset
     word-restarts throw-restarts
     dup word-vocabulary (use+) ;

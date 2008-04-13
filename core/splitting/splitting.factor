@@ -8,7 +8,7 @@ TUPLE: groups seq n sliced? ;
 : check-groups 0 <= [ "Invalid group count" throw ] when ;
 
 : <groups> ( seq n -- groups )
-    dup check-groups f groups construct-boa ; inline
+    dup check-groups f groups boa ; inline
 
 : <sliced-groups> ( seq n -- groups )
     <groups> t over set-groups-sliced? ;

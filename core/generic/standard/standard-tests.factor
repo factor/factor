@@ -183,22 +183,22 @@ M: ceo salary
 
 [ salary ] must-infer
 
-[ 24000 ] [ employee construct-boa salary ] unit-test
+[ 24000 ] [ employee boa salary ] unit-test
 
-[ 24000 ] [ tape-monkey construct-boa salary ] unit-test
+[ 24000 ] [ tape-monkey boa salary ] unit-test
 
-[ 36000 ] [ junior-manager construct-boa salary ] unit-test
+[ 36000 ] [ junior-manager boa salary ] unit-test
 
-[ 41000 ] [ middle-manager construct-boa salary ] unit-test
+[ 41000 ] [ middle-manager boa salary ] unit-test
 
-[ 51000 ] [ senior-manager construct-boa salary ] unit-test
+[ 51000 ] [ senior-manager boa salary ] unit-test
 
-[ 102000 ] [ executive construct-boa salary ] unit-test
+[ 102000 ] [ executive boa salary ] unit-test
 
-[ ceo construct-boa salary ]
+[ ceo boa salary ]
 [ T{ inconsistent-next-method f ceo salary } = ] must-fail-with
 
-[ intern construct-boa salary ]
+[ intern boa salary ]
 [ T{ no-next-method f intern salary } = ] must-fail-with
 
 ! Weird shit

@@ -220,7 +220,7 @@ M: no-such-library compiler-error-type
     drop +linkage+ ;
 
 : no-such-library ( name -- )
-    \ no-such-library construct-boa
+    \ no-such-library boa
     compiling-word get compiler-error ;
 
 TUPLE: no-such-symbol name ;
@@ -232,7 +232,7 @@ M: no-such-symbol compiler-error-type
     drop +linkage+ ;
 
 : no-such-symbol ( name -- )
-    \ no-such-symbol construct-boa
+    \ no-such-symbol boa
     compiling-word get compiler-error ;
 
 : check-dlsym ( symbols dll -- )
@@ -251,7 +251,7 @@ M: no-such-symbol compiler-error-type
 \ alien-invoke [
     ! Four literals
     4 ensure-values
-    #alien-invoke construct-empty
+    #alien-invoke new
     ! Compile-time parameters
     pop-parameters >>parameters
     pop-literal nip >>function
@@ -288,7 +288,7 @@ M: alien-indirect-error summary
     ! Three literals and function pointer
     4 ensure-values
     4 reify-curries
-    #alien-indirect construct-empty
+    #alien-indirect new
     ! Compile-time parameters
     pop-literal nip >>abi
     pop-parameters >>parameters
@@ -335,7 +335,7 @@ M: alien-callback-error summary
 
 \ alien-callback [
     4 ensure-values
-    #alien-callback construct-empty dup node,
+    #alien-callback new dup node,
     pop-literal nip >>quot
     pop-literal nip >>abi
     pop-parameters >>parameters
@@ -381,7 +381,7 @@ TUPLE: callback-context ;
 : wrap-callback-quot ( node -- quot )
     [
         [ quot>> ] [ prepare-callback-return ] bi append ,
-        [ callback-context construct-empty do-callback ] %
+        [ callback-context new do-callback ] %
     ] [ ] make ;
 
 : %unnest-stacks ( -- ) "unnest_stacks" f %alien-invoke ;

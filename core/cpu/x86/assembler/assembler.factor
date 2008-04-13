@@ -104,7 +104,7 @@ M: indirect extended? indirect-base extended? ;
     canonicalize-ESP ;
 
 : <indirect> ( base index scale displacement -- indirect )
-    indirect construct-boa dup canonicalize ;
+    indirect boa dup canonicalize ;
 
 : reg-code "register" word-prop 7 bitand ;
 

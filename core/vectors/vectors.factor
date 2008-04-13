@@ -6,7 +6,7 @@ IN: vectors
 <PRIVATE
 
 : array>vector ( array length -- vector )
-    vector construct-boa ; inline
+    vector boa ; inline
 
 PRIVATE>
 
