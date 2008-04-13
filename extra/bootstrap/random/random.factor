@@ -10,6 +10,6 @@ namespaces random ;
 } cond
 
 [
-    [ 32 random-bits ] with-secure-random
+    [ 32 random-bits ] with-system-random
     <mersenne-twister> random-generator set-global
 ] "generator.random" add-init-hook
