@@ -50,7 +50,7 @@ TUPLE: ConnectEx-args port
     2dup save-callback
     get-overlapped-result drop ;
 
-M: winnt (client) ( addrspec -- client-in client-out )
+M: winnt ((client)) ( addrspec -- client-in client-out )
     [
         \ ConnectEx-args construct-empty
         over make-sockaddr/size pick init-connect

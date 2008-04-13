@@ -3,7 +3,7 @@
 USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.streams.duplex io.encodings
 io.backend continuations debugger classes byte-arrays namespaces
-splitting dlists assocs io.encodings.binary accessors ;
+splitting dlists assocs io.encodings.binary inspector accessors ;
 IN: io.nonblocking
 
 SYMBOL: default-buffer-size
@@ -43,8 +43,13 @@ TUPLE: output-port < port ;
 : pending-error ( port -- )
     [ f ] change-error drop [ throw ] when* ;
 
+ERROR: port-closed-error port ;
+
+M: port-closed-error summary
+    drop "Port has been closed" ;
+
 : check-closed ( port -- port )
-    dup closed>> [ "Port closed" throw ] when ;
+    dup closed>> [ port-closed-error ] when ;
 
 HOOK: cancel-io io-backend ( port -- )
 

@@ -36,5 +36,5 @@ IN: builder.release.branch
 
 : update-clean-branch ( -- )
   upload-to-factorcode get
-    [ update-clean-branch ]
+    [ (update-clean-branch) ]
   when ;
