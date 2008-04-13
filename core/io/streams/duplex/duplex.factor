@@ -11,9 +11,9 @@ TUPLE: duplex-stream in out closed ;
 : <duplex-stream> ( in out -- stream )
     f duplex-stream construct-boa ;
 
-<PRIVATE
-
 ERROR: stream-closed-twice ;
+
+<PRIVATE
 
 : check-closed ( stream -- stream )
     dup closed>> [ stream-closed-twice ] when ; inline
