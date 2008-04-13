@@ -4,8 +4,7 @@ IN: io.streams.duplex
 ARTICLE: "io.streams.duplex" "Duplex streams"
 "Duplex streams combine an input stream and an output stream into a bidirectional stream."
 { $subsection duplex-stream }
-{ $subsection <duplex-stream> }
-{ $subsection check-closed } ;
+{ $subsection <duplex-stream> } ;
 
 ABOUT: "io.streams.duplex"
 
