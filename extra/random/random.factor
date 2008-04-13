@@ -5,7 +5,7 @@ io.backend io.binary combinators system vocabs.loader
 inspector ;
 IN: random
 
-SYMBOL: insecure-random-generator
+SYMBOL: system-random-generator
 SYMBOL: secure-random-generator
 SYMBOL: random-generator
 
@@ -48,5 +48,8 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 : with-random ( tuple quot -- )
     random-generator swap with-variable ; inline
 
+: with-system-random ( quot -- )
+    system-random-generator get swap with-random ; inline
+
 : with-secure-random ( quot -- )
-    >r secure-random-generator get r> with-random ; inline
+    secure-random-generator get swap with-random ; inline
