@@ -194,7 +194,7 @@ M: html-stream stream-nl ( stream -- )
 
 ! Utilities
 : with-html-stream ( quot -- )
-    stdio get <html-stream> swap with-stream* ;
+    stdio get <html-stream> swap with-stream* ; inline
 
 : xhtml-preamble
     "<?xml version=\"1.0\"?>" write-html
