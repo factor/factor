@@ -64,8 +64,7 @@ ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 { $subsection prefix }
 { $subsection suffix }
 "Removing elements:"
-{ $subsection remove }
-{ $subsection diff } ;
+{ $subsection remove } ;
 
 ARTICLE: "sequences-reshape" "Reshaping sequences"
 "A " { $emphasis "repetition" } " is a virtual sequence consisting of a single element repeated multiple times:"

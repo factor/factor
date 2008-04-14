@@ -1,5 +1,5 @@
 USING: kernel sequences assocs hashtables parser vocabs words namespaces
-vocabs.loader debugger ;
+vocabs.loader debugger sets ;
 IN: qualified
 
 : define-qualified ( vocab-name prefix-name -- )

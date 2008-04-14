@@ -3,7 +3,7 @@
 USING: kernel namespaces sequences sequences.private assocs math
 inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
-definitions prettyprint hashtables prettyprint.sections
+definitions prettyprint hashtables prettyprint.sections sets
 sequences.private effects generic compiler.units accessors ;
 IN: locals
 

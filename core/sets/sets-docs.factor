@@ -54,3 +54,5 @@ HELP: union
 { $examples
     { $example "USING: sequences prettyprint ;" "{ 1 2 3 } { 2 3 4 } union ." "{ 1 2 3 4 }" }
 } ;
+
+{ diff intersect union } related-words

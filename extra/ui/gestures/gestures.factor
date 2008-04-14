@@ -3,7 +3,7 @@
 USING: arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
 math.vectors classes.tuple classes ui.gadgets boxes
-calendar alarms symbols combinators ;
+calendar alarms symbols combinators sets ;
 IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;

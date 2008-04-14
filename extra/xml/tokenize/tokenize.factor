@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xml.errors xml.data xml.utilities xml.char-classes
+USING: xml.errors xml.data xml.utilities xml.char-classes sets
 xml.entities kernel state-parser kernel namespaces strings math
 math.parser sequences assocs arrays splitting combinators unicode.case ;
 IN: xml.tokenize

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences splitting opengl.gl
-continuations math.parser math arrays ;
+continuations math.parser math arrays sets ;
 IN: opengl.capabilities
 
 : (require-gl) ( thing require-quot make-error-quot -- )

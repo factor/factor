@@ -1,6 +1,6 @@
 IN: ui.gadgets.tests
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
-namespaces models kernel dlists math
+namespaces models kernel dlists math sets
 math.parser ui sequences hashtables assocs io arrays
 prettyprint io.streams.string ;
 

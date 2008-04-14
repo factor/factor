@@ -3,7 +3,8 @@
 USING: io.files kernel io.encodings.utf8 vocabs.loader vocabs
 sequences namespaces math.parser arrays hashtables assocs
 memoize inspector sorting splitting combinators source-files
-io debugger continuations compiler.errors init io.crc32 ;
+io debugger continuations compiler.errors init io.crc32 
+sets ;
 IN: tools.vocabs
 
 : vocab-tests-file ( vocab -- path )
