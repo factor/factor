@@ -16,7 +16,7 @@ IN: http.server.templating.fhtml
 TUPLE: template-lexer < lexer ;
 
 : <template-lexer> ( lines -- lexer )
-    template-lexer construct-lexer ;
+    template-lexer new-lexer ;
 
 M: template-lexer skip-word
     [

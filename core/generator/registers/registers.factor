@@ -237,7 +237,7 @@ M: phantom-stack clone
 
 GENERIC: finalize-height ( stack -- )
 
-: construct-phantom-stack ( class -- stack )
+: new-phantom-stack ( class -- stack )
     >r 0 V{ } clone r> boa ; inline
 
 : (loc)
@@ -257,7 +257,7 @@ GENERIC: <loc> ( n stack -- loc )
 TUPLE: phantom-datastack < phantom-stack ;
 
 : <phantom-datastack> ( -- stack )
-    phantom-datastack construct-phantom-stack ;
+    phantom-datastack new-phantom-stack ;
 
 M: phantom-datastack <loc> (loc) <ds-loc> ;
 
@@ -267,7 +267,7 @@ M: phantom-datastack finalize-height
 TUPLE: phantom-retainstack < phantom-stack ;
 
 : <phantom-retainstack> ( -- stack )
-    phantom-retainstack construct-phantom-stack ;
+    phantom-retainstack new-phantom-stack ;
 
 M: phantom-retainstack <loc> (loc) <rs-loc> ;
 

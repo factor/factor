@@ -17,7 +17,7 @@ M: object init-session* drop ;
 
 TUPLE: session-manager responder sessions ;
 
-: construct-session-manager ( responder class -- responder' )
+: new-session-manager ( responder class -- responder' )
     new
         <sessions-in-memory> >>sessions
         swap >>responder ; inline
@@ -68,7 +68,7 @@ M: session-saver dispose
 TUPLE: null-sessions < session-manager ;
 
 : <null-sessions>
-    null-sessions construct-session-manager ;
+    null-sessions new-session-manager ;
 
 M: null-sessions call-responder ( path responder -- response )
     H{ } clone f call-responder/session ;
@@ -76,7 +76,7 @@ M: null-sessions call-responder ( path responder -- response )
 TUPLE: url-sessions < session-manager ;
 
 : <url-sessions> ( responder -- responder' )
-    url-sessions construct-session-manager ;
+    url-sessions new-session-manager ;
 
 : session-id-key "factorsessid" ;
 
@@ -111,7 +111,7 @@ M: url-sessions call-responder ( path responder -- response )
 TUPLE: cookie-sessions < session-manager ;
 
 : <cookie-sessions> ( responder -- responder' )
-    cookie-sessions construct-session-manager ;
+    cookie-sessions new-session-manager ;
 
 : current-cookie-session ( responder -- id namespace/f )
     request get session-id-key get-cookie dup

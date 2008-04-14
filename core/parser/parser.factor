@@ -17,14 +17,14 @@ TUPLE: lexer text line line-text line-length column ;
     0 >>column
     drop ;
 
-: construct-lexer ( text class -- lexer )
-    construct-empty
+: new-lexer ( text class -- lexer )
+    new
         0 >>line
         swap >>text
     dup next-line ; inline
 
 : <lexer> ( text -- lexer )
-    lexer construct-lexer ;
+    lexer new-lexer ;
 
 : location ( -- loc )
     file get lexer get lexer-line 2dup and

@@ -60,8 +60,8 @@ $nl
 { $subsection short-section }
 { $subsection long-section }
 "Utilities to use when implementing sections:"
-{ $subsection construct-section }
-{ $subsection construct-block }
+{ $subsection new-section }
+{ $subsection new-block }
 { $subsection add-section } ;
 
 ARTICLE: "prettyprint-sections" "Prettyprinter sections"

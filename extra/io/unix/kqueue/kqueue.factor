@@ -16,7 +16,7 @@ TUPLE: kqueue-mx < mx events monitors ;
     256 ; inline
 
 : <kqueue-mx> ( -- mx )
-    kqueue-mx construct-mx
+    kqueue-mx new-mx
         H{ } clone >>monitors
         kqueue dup io-error >>fd
         max-events "kevent" <c-array> >>events ;
@@ -142,7 +142,7 @@ TUPLE: vnode-monitor < monitor fd ;
 
 : <vnode-monitor> ( path mailbox -- monitor )
     >r [ O_RDONLY 0 open dup io-error ] keep r>
-    vnode-monitor construct-monitor swap >>fd
+    vnode-monitor new-monitor swap >>fd
     [ dup kqueue-mx get register-monitor ] [ ] [ fd>> close ] cleanup ;
 
 M: vnode-monitor dispose
