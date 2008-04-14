@@ -188,7 +188,7 @@ M: tuple-class update-class
     rot tuck [ superclass = ] [ slot-names = ] 2bi* and ;
 
 : valid-superclass? ( class -- ? )
-    [ tuple-class? ] [ tuple bootstrap-word eq? ] bi or ;
+    [ tuple-class? ] [ tuple eq? ] bi or ;
 
 : check-superclass ( superclass -- )
     dup valid-superclass? [ bad-superclass ] unless drop ;
