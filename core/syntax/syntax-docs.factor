@@ -573,21 +573,21 @@ HELP: ERROR:
         ""
         "TUPLE: invalid-values x y ;"
         ": invalid-values ( x y -- * )"
-        "    \\ invalid-values construct-boa throw ;"
+        "    \\ invalid-values boa throw ;"
     }
 } ;
 
 HELP: C:
 { $syntax "C: constructor class" }
 { $values { "constructor" "a new word to define" } { "class" tuple-class } }
-{ $description "Define a constructor word for a tuple class which simply performs BOA (by order of arguments) construction using " { $link construct-boa } "." }
+{ $description "Define a constructor word for a tuple class which simply performs BOA (by order of arguments) construction using " { $link boa } "." }
 { $examples
     "Suppose the following tuple has been defined:"
     { $code "TUPLE: color red green blue ;" }
     "The following two lines are equivalent:"
     { $code
         "C: <color> color"
-        ": <color> color construct-boa ;"
+        ": <color> color boa ;"
     }
     "In both cases, a word " { $snippet "<color>" } " is defined, which reads three values from the stack and creates a " { $snippet "color" } " instance having these values in the " { $snippet "red" } ", " { $snippet "green" } " and " { $snippet "blue" } " slots, respectively."
 } ;

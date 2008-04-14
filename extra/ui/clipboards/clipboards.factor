@@ -5,7 +5,7 @@ IN: ui.clipboards
 
 ! Two text transfer buffers
 TUPLE: clipboard contents ;
-: <clipboard> "" clipboard construct-boa ;
+: <clipboard> "" clipboard boa ;
 
 GENERIC: paste-clipboard ( gadget clipboard -- )
 

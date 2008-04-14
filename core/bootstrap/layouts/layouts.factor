@@ -36,4 +36,4 @@ tag-numbers get H{
     { word 17 }
     { byte-array 18 }
     { tuple-layout 19 }
-} union type-numbers set
+} assoc-union type-numbers set

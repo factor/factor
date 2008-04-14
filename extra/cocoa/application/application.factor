@@ -49,7 +49,7 @@ IN: cocoa.application
 TUPLE: objc-error alien reason ;
 
 : objc-error ( alien -- * )
-    dup -> reason CF>string \ objc-error construct-boa throw ;
+    dup -> reason CF>string \ objc-error boa throw ;
 
 M: objc-error summary ( error -- )
     drop "Objective C exception" ;

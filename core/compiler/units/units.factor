@@ -10,7 +10,7 @@ SYMBOL: new-definitions
 TUPLE: redefine-error def ;
 
 : redefine-error ( definition -- )
-    \ redefine-error construct-boa
+    \ redefine-error boa
     { { "Continue" t } } throw-restarts drop ;
 
 : add-once ( key assoc -- )

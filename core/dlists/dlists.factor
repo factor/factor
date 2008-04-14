@@ -7,7 +7,7 @@ IN: dlists
 TUPLE: dlist front back length ;
 
 : <dlist> ( -- obj )
-    dlist construct-empty
+    dlist new
     0 >>length ;
 
 : dlist-empty? ( dlist -- ? ) front>> not ;

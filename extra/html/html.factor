@@ -32,7 +32,7 @@ TUPLE: html-stream last-div? ;
 TUPLE: html-sub-stream style stream ;
 
 : (html-sub-stream) ( style stream -- stream )
-    html-sub-stream construct-boa
+    html-sub-stream boa
     512 <sbuf> <html-stream> over set-delegate ;
 
 : <html-sub-stream> ( style stream class -- stream )

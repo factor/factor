@@ -32,7 +32,7 @@ M: funky browser-link-href
 
 [ "<a href='http://www.funky-town.com/austin'>&lt;</a>" ] [
     [
-        "<" "austin" funky construct-boa write-object
+        "<" "austin" funky boa write-object
     ] make-html-string
 ] unit-test
 

@@ -45,7 +45,7 @@ C: <ignore-close-stream> ignore-close-stream
 TUPLE: style-stream < filter-writer style ;
 
 : do-nested-style ( style style-stream -- style stream )
-    [ style>> swap union ] [ stream>> ] bi ; inline
+    [ style>> swap assoc-union ] [ stream>> ] bi ; inline
 
 C: <style-stream> style-stream
 

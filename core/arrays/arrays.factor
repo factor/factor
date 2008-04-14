@@ -12,9 +12,9 @@ M: array resize resize-array ;
 
 : >array ( seq -- array ) { } clone-like ;
 
-M: object new drop f <array> ;
+M: object new-sequence drop f <array> ;
 
-M: f new drop dup zero? [ drop f ] [ f <array> ] if ;
+M: f new-sequence drop dup zero? [ drop f ] [ f <array> ] if ;
 
 M: array like drop dup array? [ >array ] unless ;
 

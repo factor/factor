@@ -29,7 +29,7 @@ ERROR: cairo-error string ;
     dup cairo_surface_status cairo-png-error
     dup [ cairo_image_surface_get_width check-zero ]
     [ cairo_image_surface_get_height check-zero ] [ ] tri
-    cairo-surface>array png construct-boa ;
+    cairo-surface>array png boa ;
 
 : write-png ( png path -- )
     >r png-surface r>

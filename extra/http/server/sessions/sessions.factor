@@ -18,7 +18,7 @@ M: object init-session* drop ;
 TUPLE: session-manager responder sessions ;
 
 : construct-session-manager ( responder class -- responder' )
-    construct-empty
+    new
         <sessions-in-memory> >>sessions
         swap >>responder ; inline
 
@@ -85,7 +85,7 @@ TUPLE: url-sessions < session-manager ;
     [ drop ] [ get-session ] 2bi ;
 
 : add-session-id ( query -- query' )
-    session-id get [ session-id-key associate union ] when* ;
+    session-id get [ session-id-key associate assoc-union ] when* ;
 
 : session-form-field ( -- )
     <input

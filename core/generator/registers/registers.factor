@@ -4,7 +4,7 @@ USING: arrays assocs classes classes.private classes.algebra
 combinators cpu.architecture generator.fixup hashtables kernel
 layouts math namespaces quotations sequences system vectors
 words effects alien byte-arrays bit-arrays float-arrays
-accessors ;
+accessors sets ;
 IN: generator.registers
 
 SYMBOL: +input+
@@ -76,7 +76,7 @@ INSTANCE: temp-reg value
 ! A data stack location.
 TUPLE: ds-loc n class ;
 
-: <ds-loc> f ds-loc construct-boa ;
+: <ds-loc> f ds-loc boa ;
 
 M: ds-loc minimal-ds-loc* ds-loc-n min ;
 M: ds-loc operand-class* ds-loc-class ;
@@ -87,7 +87,7 @@ M: ds-loc live-loc?
 ! A retain stack location.
 TUPLE: rs-loc n class ;
 
-: <rs-loc> f rs-loc construct-boa ;
+: <rs-loc> f rs-loc boa ;
 M: rs-loc operand-class* rs-loc-class ;
 M: rs-loc set-operand-class set-rs-loc-class ;
 M: rs-loc live-loc?
@@ -128,7 +128,7 @@ INSTANCE: cached value
 TUPLE: tagged vreg class ;
 
 : <tagged> ( vreg -- tagged )
-    f tagged construct-boa ;
+    f tagged boa ;
 
 M: tagged v>operand tagged-vreg v>operand ;
 M: tagged set-operand-class set-tagged-class ;
@@ -238,7 +238,7 @@ M: phantom-stack clone
 GENERIC: finalize-height ( stack -- )
 
 : construct-phantom-stack ( class -- stack )
-    >r 0 V{ } clone r> construct-boa ; inline
+    >r 0 V{ } clone r> boa ; inline
 
 : (loc)
     #! Utility for methods on <loc>
@@ -381,7 +381,7 @@ M: value (lazy-load)
 : (compute-free-vregs) ( used class -- vector )
     #! Find all vregs in 'class' which are not in 'used'.
     [ vregs length reverse ] keep
-    [ <vreg> ] curry map seq-diff
+    [ <vreg> ] curry map diff
     >vector ;
 
 : compute-free-vregs ( -- )

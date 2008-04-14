@@ -33,7 +33,7 @@ ARTICLE: "sequence-protocol" "Sequence protocol"
 "An optional generic word for creating sequences of the same class as a given sequence:"
 { $subsection like }
 "Optional generic words for optimization purposes:"
-{ $subsection new }
+{ $subsection new-sequence }
 { $subsection new-resizable }
 { $see-also "sequences-unsafe" } ;
 
@@ -64,8 +64,7 @@ ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 { $subsection prefix }
 { $subsection suffix }
 "Removing elements:"
-{ $subsection remove }
-{ $subsection seq-diff } ;
+{ $subsection remove } ;
 
 ARTICLE: "sequences-reshape" "Reshaping sequences"
 "A " { $emphasis "repetition" } " is a virtual sequence consisting of a single element repeated multiple times:"
@@ -234,6 +233,7 @@ $nl
 { $subsection "sequences-destructive" }
 { $subsection "sequences-stacks" }
 { $subsection "sequences-sorting" }
+{ $subsection "sets" }
 "For inner loops:"
 { $subsection "sequences-unsafe" } ;
 
@@ -281,7 +281,7 @@ HELP: immutable
 { $description "Throws an " { $link immutable } " error." }
 { $error-description "Thrown if an attempt is made to modify an immutable sequence." } ;
 
-HELP: new
+HELP: new-sequence
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a mutable sequence" } }
 { $contract "Outputs a mutable sequence of length " { $snippet "n" } " which can hold the elements of " { $snippet "seq" } "." } ;
 
@@ -659,10 +659,6 @@ HELP: prefix
 { $examples
 { $example "USING: prettyprint sequences ;" "{ 1 2 3 } 0 prefix ." "{ 0 1 2 3 }" }
 } ;
-
-HELP: seq-diff
-{ $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
-{ $description "Outputs a sequence consisting of elements present in " { $snippet "seq2" } " but not " { $snippet "seq1" } ", comparing elements for equality." } ;
 
 HELP: sum-lengths
 { $values { "seq" "a sequence of sequences" } { "n" integer } }

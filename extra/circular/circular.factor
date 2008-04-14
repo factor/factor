@@ -9,7 +9,7 @@ IN: circular
 TUPLE: circular seq start ;
 
 : <circular> ( seq -- circular )
-    0 circular construct-boa ;
+    0 circular boa ;
 
 : circular-wrap ( n circular -- n circular )
     [ start>> + ] keep

@@ -11,7 +11,7 @@ IN: ui.gadgets.labelled
 TUPLE: labelled-gadget content ;
 
 : <labelled-gadget> ( gadget title -- newgadget )
-    labelled-gadget construct-empty
+    labelled-gadget new
     [
         <label> dup reverse-video-theme f track,
         g-> set-labelled-gadget-content 1 track,
@@ -50,7 +50,7 @@ TUPLE: closable-gadget content ;
     [ [ closable-gadget? ] is? ] find-parent ;
 
 : <closable-gadget> ( gadget title quot -- gadget )
-    closable-gadget construct-empty
+    closable-gadget new
     [
         <title-bar> @top frame,
         g-> set-closable-gadget-content @center frame,

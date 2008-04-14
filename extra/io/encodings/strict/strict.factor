@@ -7,7 +7,7 @@ TUPLE: strict code ;
 C: strict strict
 
 TUPLE: decode-error ;
-: decode-error ( -- * ) \ decode-error construct-empty throw ;
+: decode-error ( -- * ) \ decode-error new throw ;
 M: decode-error summary
     drop "Error in decoding input stream" ;
 

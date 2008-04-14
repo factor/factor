@@ -45,7 +45,7 @@ validation-failed? off
 
 TUPLE: test-tuple text number more-text ;
 
-: <test-tuple> test-tuple construct-empty ;
+: <test-tuple> test-tuple new ;
 
 : <test-form> ( -- form )
     "test" <form>

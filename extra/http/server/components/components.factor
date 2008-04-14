@@ -96,7 +96,7 @@ PRIVATE>
     ] with-validator ;
 
 : new-component ( id class renderer -- component )
-    swap construct-empty
+    swap new
         swap >>renderer
         swap >>id
         init ; inline

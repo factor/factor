@@ -14,7 +14,7 @@ M: mailbox dispose
     t >>closed threads>> notify-all ;
 
 : <mailbox> ( -- mailbox )
-    <dlist> <dlist> f mailbox construct-boa ;
+    <dlist> <dlist> f mailbox boa ;
 
 : mailbox-empty? ( mailbox -- bool )
     data>> dlist-empty? ;

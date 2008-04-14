@@ -23,7 +23,7 @@ TUPLE: CreateProcess-args
        stdout-pipe stdin-pipe ;
 
 : default-CreateProcess-args ( -- obj )
-    CreateProcess-args construct-empty
+    CreateProcess-args new
     "STARTUPINFO" <c-object>
     "STARTUPINFO" heap-size over set-STARTUPINFO-cb >>lpStartupInfo
     "PROCESS_INFORMATION" <c-object> >>lpProcessInformation

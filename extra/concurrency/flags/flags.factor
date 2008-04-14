@@ -5,7 +5,7 @@ IN: concurrency.flags
 
 TUPLE: flag value? thread ;
 
-: <flag> ( -- flag ) f <box> flag construct-boa ;
+: <flag> ( -- flag ) f <box> flag boa ;
 
 : raise-flag ( flag -- )
     dup flag-value? [

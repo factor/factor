@@ -7,7 +7,7 @@ http.server.auth.providers ;
 TUPLE: users-in-memory assoc ;
 
 : <users-in-memory> ( -- provider )
-    H{ } clone users-in-memory construct-boa ;
+    H{ } clone users-in-memory boa ;
 
 M: users-in-memory get-user ( username provider -- user/f )
     assoc>> at ;

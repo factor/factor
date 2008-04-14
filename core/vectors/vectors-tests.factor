@@ -94,6 +94,6 @@ IN: vectors.tests
     100 >array dup >vector <reversed> >array >r reverse r> =
 ] unit-test
 
-[ fixnum ] [ 1 >bignum V{ } new length class ] unit-test
+[ fixnum ] [ 1 >bignum V{ } new-sequence length class ] unit-test
 
 [ fixnum ] [ 1 >bignum [ ] V{ } map-as length class ] unit-test

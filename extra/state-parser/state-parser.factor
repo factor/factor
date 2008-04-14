@@ -23,7 +23,7 @@ C: <spot> spot
 ! * Errors
 TUPLE: parsing-error line column ;
 : <parsing-error> ( -- parsing-error )
-    get-line get-column parsing-error construct-boa ;
+    get-line get-column parsing-error boa ;
 
 : construct-parsing-error ( ... slots class -- error )
     construct <parsing-error> over set-delegate ; inline

@@ -14,7 +14,7 @@ INSTANCE: avl tree-mixin
 TUPLE: avl-node balance ;
 
 : <avl-node> ( key value -- node )
-    swap <node> 0 avl-node construct-boa tuck set-delegate ;
+    swap <node> 0 avl-node boa tuck set-delegate ;
 
 : change-balance ( node amount -- )
     over avl-node-balance + swap set-avl-node-balance ;

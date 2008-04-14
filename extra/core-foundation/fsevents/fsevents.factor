@@ -194,7 +194,7 @@ TUPLE: event-stream info handle closed ;
     >r master-event-source-callback r>
     r> r> r> <FSEventStream>
     dup enable-event-stream
-    f event-stream construct-boa ;
+    f event-stream boa ;
 
 M: event-stream dispose
     dup closed>> [ drop ] [

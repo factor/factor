@@ -18,7 +18,7 @@ session "SESSIONS"
 : init-sessions-table session ensure-table ;
 
 : <session> ( id -- session )
-    session construct-empty
+    session new
         swap dup [ string>number ] when >>id ;
 
 M: sessions-in-db get-session ( id storage -- namespace/f )

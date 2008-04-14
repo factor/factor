@@ -8,7 +8,7 @@ TUPLE: effect in out terminated? ;
 
 : <effect> ( in out -- effect )
     dup { "*" } sequence= [ drop { } t ] [ f ] if
-    effect construct-boa ;
+    effect boa ;
 
 : effect-height ( effect -- n )
     dup effect-out length swap effect-in length - ;

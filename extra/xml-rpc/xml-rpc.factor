@@ -92,7 +92,7 @@ M: rpc-fault send-rpc
 TUPLE: server-error tag message ;
 
 : server-error ( tag message -- * )
-    \ server-error construct-boa throw ;
+    \ server-error boa throw ;
 
 M: server-error error.
     "Error in XML supplied to server" print

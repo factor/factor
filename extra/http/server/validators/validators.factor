@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel continuations sequences math namespaces
+USING: kernel continuations sequences math namespaces sets
 math.parser assocs regexp fry unicode.categories sequences ;
 IN: http.server.validators
 
@@ -70,7 +70,7 @@ C: <validation-error> validation-error
     dup empty? [ "must remain blank" throw ] unless ;
 
 : v-one-line ( str -- str )
-    dup "\r\n" seq-intersect empty?
+    dup "\r\n" intersect empty?
     [ "must be a single line" throw ] unless ;
 
 : v-one-word ( str -- str )

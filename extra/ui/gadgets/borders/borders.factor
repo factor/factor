@@ -7,7 +7,7 @@ IN: ui.gadgets.borders
 TUPLE: border size fill ;
 
 : <border> ( child gap -- border )
-    dup 2array { 0 0 } border construct-boa
+    dup 2array { 0 0 } border boa
     <gadget> over set-delegate
     tuck add-gadget ;
 

@@ -7,7 +7,7 @@ IN: byte-vectors
 <PRIVATE
 
 : byte-array>vector ( byte-array length -- byte-vector )
-    byte-vector construct-boa ; inline
+    byte-vector boa ; inline
 
 PRIVATE>
 
@@ -22,7 +22,7 @@ M: byte-vector like
         [ dup length byte-array>vector ] [ >byte-vector ] if
     ] unless ;
 
-M: byte-vector new
+M: byte-vector new-sequence
     drop [ <byte-array> ] keep >fixnum byte-array>vector ;
 
 M: byte-vector equal?

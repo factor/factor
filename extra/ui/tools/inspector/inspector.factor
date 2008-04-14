@@ -14,7 +14,7 @@ TUPLE: inspector-gadget object pane ;
     ] with-pane ;
 
 : <inspector-gadget> ( -- gadget )
-    inspector-gadget construct-empty
+    inspector-gadget new
     [
         toolbar,
         <pane> g-> set-inspector-gadget-pane <scroller> 1 track,

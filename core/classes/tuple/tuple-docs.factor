@@ -4,7 +4,7 @@ generic.standard sequences definitions compiler.units ;
 IN: classes.tuple
 
 ARTICLE: "parametrized-constructors" "Parameterized constructors"
-"A " { $emphasis "parametrized constructor" } " is a word which directly or indirectly calls " { $link construct-empty } " or " { $link construct-boa } ", but instead of passing a literal class symbol, it takes the class symbol as an input from the stack."
+"A " { $emphasis "parametrized constructor" } " is a word which directly or indirectly calls " { $link new } " or " { $link boa } ", but instead of passing a literal class symbol, it takes the class symbol as an input from the stack."
 $nl
 "Parametrized constructors are useful in many situations, in particular with subclassing. For example, consider the following code:"
 { $code
@@ -14,14 +14,14 @@ $nl
     ""
     "TUPLE: car < vehicle engine ;"
     ": <car> ( max-speed engine -- car )"
-    "    car construct-empty"
+    "    car new"
     "        V{ } clone >>occupants"
     "        swap >>engine"
     "        swap >>max-speed ;"
     ""
     "TUPLE: aeroplane < vehicle max-altitude ;"
     ": <aeroplane> ( max-speed max-altitude -- aeroplane )"
-    "    aeroplane construct-empty"
+    "    aeroplane new"
     "        V{ } clone >>occupants"
     "        swap >>max-altitude"
     "        swap >>max-speed ;"
@@ -33,7 +33,7 @@ $nl
     ": add-occupant ( person vehicle -- ) occupants>> push ;"
     ""
     ": construct-vehicle ( class -- vehicle )"
-    "    construct-empty"
+    "    new"
     "        V{ } clone >>occupants ;"
     ""
     "TUPLE: car < vehicle engine ;"
@@ -52,8 +52,8 @@ $nl
 
 ARTICLE: "tuple-constructors" "Tuple constructors"
 "Tuples are created by calling one of two constructor primitives:"
-{ $subsection construct-empty }
-{ $subsection construct-boa }
+{ $subsection new }
+{ $subsection boa }
 "A shortcut for defining BOA constructors:"
 { $subsection POSTPONE: C: }
 "By convention, construction logic is encapsulated in a word named after the tuple class surrounded in angle brackets; for example, the constructor word for a " { $snippet "point" } " class might be named " { $snippet "<point>" } "."
@@ -65,11 +65,11 @@ $nl
     "TUPLE: color red green blue alpha ;"
     ""
     "C: <rgba> rgba"
-    ": <rgba> color construct-boa ; ! identical to above"
+    ": <rgba> color boa ; ! identical to above"
     ""
     ": <rgb> f <rgba> ;"
     ""
-    ": <color> construct-empty ;"
+    ": <color> new ;"
     ": <color> f f f f <rgba> ; ! identical to above"
 }
 { $subsection "parametrized-constructors" } ;
@@ -129,7 +129,7 @@ $nl
 $nl
 "The second is to use ad-hoc slot polymorphism. If two classes define a slot with the same name, then code which uses " { $link "accessors" } " can operate on instances of both objects, assuming the values stored in that slot implement a common protocol. This allows code to be shared without creating contrieved relationships between classes."
 { $heading "Anti-pattern #3: subclassing to override a method definition" }
-"While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of ``monkey patching'' methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document that subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link construct-empty } ", " { $link construct-boa } ", or a custom parametrized constructor."
+"While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of ``monkey patching'' methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document that subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link new } ", " { $link boa } ", or a custom parametrized constructor."
 { $see-also "parametrized-constructors" } ;
 
 ARTICLE: "tuple-subclassing" "Tuple subclassing"
@@ -164,11 +164,11 @@ ARTICLE: "tuple-examples" "Tuple examples"
 }
 "We can define a constructor which makes an empty employee:"
 { $code ": <employee> ( -- employee )"
-    "    employee construct-empty ;" }
+    "    employee new ;" }
 "Or we may wish the default constructor to always give employees a starting salary:"
 { $code
     ": <employee> ( -- employee )"
-    "    employee construct-empty"
+    "    employee new"
     "        40000 >>salary ;"
 }
 "We can define more refined constructors:"
@@ -178,7 +178,7 @@ ARTICLE: "tuple-examples" "Tuple examples"
 "An alternative strategy is to define the most general BOA constructor first:"
 { $code
     ": <employee> ( name position -- person )"
-    "    40000 employee construct-boa ;"
+    "    40000 employee boa ;"
 }
 "Now we can define more specific constructors:"
 { $code
@@ -191,7 +191,7 @@ ARTICLE: "tuple-examples" "Tuple examples"
     "SYMBOL: checks"
     ""
     ": <check> ( to amount -- check )"
-    "    checks counter check construct-boa ;"
+    "    checks counter check boa ;"
     ""
     ": biweekly-paycheck ( employee -- check )"
     "    dup name>> swap salary>> 26 / <check> ;"
@@ -326,20 +326,20 @@ HELP: tuple>array ( tuple -- array )
 
 HELP: <tuple> ( layout -- tuple )
 { $values { "layout" tuple-layout } { "tuple" tuple } }
-{ $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link construct-empty } "." } ;
+{ $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link new } "." } ;
 
 HELP: <tuple-boa> ( ... layout -- tuple )
 { $values { "..." "values" } { "layout" tuple-layout } { "tuple" tuple } }
-{ $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link construct-boa } "." } ;
+{ $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link boa } "." } ;
 
-HELP: construct-empty
+HELP: new
 { $values { "class" tuple-class } { "tuple" tuple } }
 { $description "Creates a new instance of " { $snippet "class" } " with all slots initially set to " { $link f } "." }
 { $examples
     { $example
         "USING: kernel prettyprint ;"
         "TUPLE: employee number name department ;"
-        "employee construct-empty ."
+        "employee new ."
         "T{ employee f f f f }"
     }
 } ;
@@ -361,12 +361,12 @@ HELP: construct
         "    color construct ;"
     }
     "The last definition is actually equivalent to the following:"
-    { $code ": <rgba> ( r g b a -- color ) rgba construct-boa ;" }
+    { $code ": <rgba> ( r g b a -- color ) rgba boa ;" }
     "Which can be abbreviated further:"
     { $code "C: <rgba> color" }
 } ;
 
-HELP: construct-boa
+HELP: boa
 { $values { "..." "slot values" } { "class" tuple-class } { "tuple" tuple } }
 { $description "Creates a new instance of " { $snippet "class" } " and fill in the slots from the stack, with the top-most stack element being stored in the right-most slot." }
-{ $notes "The " { $snippet "-boa" } " suffix is shorthand for ``by order of arguments'', and ``BOA constructor'' is a pun on ``boa constrictor''." } ;
+{ $notes "The name " { $snippet "boa" } " is shorthand for ``by order of arguments'', and ``BOA constructor'' is a pun on ``boa constrictor''." } ;

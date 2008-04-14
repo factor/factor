@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser generic kernel classes words slots assocs sequences arrays
-vectors definitions prettyprint combinators.lib math ;
+vectors definitions prettyprint combinators.lib math sets ;
 IN: delegate
 
 ! Protocols
@@ -23,7 +23,7 @@ IN: delegate
 
 : forget-old-definitions ( protocol new-wordlist -- )
     >r users-and-words r>
-    seq-diff forget-all-methods ;
+    diff forget-all-methods ;
 
 : define-protocol ( protocol wordlist -- )
     ! 2dup forget-old-definitions

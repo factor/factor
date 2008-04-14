@@ -5,7 +5,7 @@ prettyprint sequences strings vectors words quotations inspector
 io.styles io combinators sorting splitting math.parser effects
 continuations debugger io.files io.streams.string vocabs
 io.encodings.utf8 source-files classes classes.tuple hashtables
-compiler.errors compiler.units accessors ;
+compiler.errors compiler.units accessors sets ;
 IN: parser
 
 TUPLE: lexer text line line-text line-length column ;
@@ -164,7 +164,7 @@ name>char-hook global [
 TUPLE: parse-error file line column line-text error ;
 
 : <parse-error> ( msg -- error )
-    \ parse-error construct-empty
+    \ parse-error new
         file get >>file
         lexer get line>> >>line
         lexer get column>> >>column
@@ -261,7 +261,7 @@ M: no-word-error summary
     drop "Word not found in current vocabulary search path" ;
 
 : no-word ( name -- newword )
-    dup no-word-error construct-boa
+    dup no-word-error boa
     swap words-named [ forward-reference? not ] subset
     word-restarts throw-restarts
     dup word-vocabulary (use+) ;
@@ -293,7 +293,7 @@ M: no-word-error summary
     scan-word bootstrap-word scan-word create-method-in ;
 
 : shadowed-slots ( superclass slots -- shadowed )
-    >r all-slot-names r> seq-intersect ;
+    >r all-slot-names r> intersect ;
 
 : check-slot-shadowing ( class superclass slots -- )
     shadowed-slots [
@@ -506,14 +506,14 @@ SYMBOL: interactive-vocabs
     ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
-    diff [
+    assoc-diff [
         drop where dup [ first ] when
         file get source-file-path =
     ] assoc-subset keys ;
 
 : removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions
-    [ get first2 union ] bi@ ;
+    [ get first2 assoc-union ] bi@ ;
 
 : removed-classes ( -- assoc1 assoc2 )
     new-definitions old-definitions

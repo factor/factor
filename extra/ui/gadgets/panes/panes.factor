@@ -46,7 +46,7 @@ M: pane gadget-selection
     selection-color swap set-pane-selection-color ;
 
 : <pane> ( -- pane )
-    pane construct-empty
+    pane new
     <pile> over set-delegate
     <shelf> over set-pane-prototype
     <pile> <incremental> over add-output

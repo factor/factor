@@ -9,7 +9,7 @@ TUPLE: mode file file-name-glob first-line-glob ;
 
 TAG: MODE
     "NAME" over at >r
-    mode construct-empty {
+    mode new {
         { "FILE" f set-mode-file }
         { "FILE_NAME_GLOB" f set-mode-file-name-glob }
         { "FIRST_LINE_GLOB" f set-mode-first-line-glob }

@@ -9,7 +9,7 @@ IN: io.streams.duplex
 TUPLE: duplex-stream in out closed ;
 
 : <duplex-stream> ( in out -- stream )
-    f duplex-stream construct-boa ;
+    f duplex-stream boa ;
 
 ERROR: stream-closed-twice ;
 

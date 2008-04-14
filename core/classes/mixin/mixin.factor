@@ -24,7 +24,7 @@ TUPLE: check-mixin-class mixin ;
 
 : check-mixin-class ( mixin -- mixin )
     dup mixin-class? [
-        \ check-mixin-class construct-boa throw
+        \ check-mixin-class boa throw
     ] unless ;
 
 : if-mixin-member? ( class mixin true false -- )

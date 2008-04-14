@@ -6,7 +6,7 @@ IN: vectors
 <PRIVATE
 
 : array>vector ( array length -- vector )
-    vector construct-boa ; inline
+    vector boa ; inline
 
 PRIVATE>
 
@@ -19,7 +19,7 @@ M: vector like
         dup array? [ dup length array>vector ] [ >vector ] if
     ] unless ;
 
-M: vector new drop [ f <array> ] keep >fixnum array>vector ;
+M: vector new-sequence drop [ f <array> ] keep >fixnum array>vector ;
 
 M: vector equal?
     over vector? [ sequence= ] [ 2drop f ] if ;

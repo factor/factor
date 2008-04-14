@@ -57,7 +57,7 @@ search-field H{
     swap <list> ;
 
 : <live-search> ( string seq limited? presenter -- gadget )
-    live-search construct-empty
+    live-search new
     [
         <search-field> g-> set-live-search-field f track,
         <search-list> g-> set-live-search-list

@@ -62,7 +62,7 @@ M: attrs set-at
     ] if* ;
 
 M: attrs assoc-size attrs-alist length ;
-M: attrs new-assoc drop V{ } new <attrs> ;
+M: attrs new-assoc drop V{ } new-sequence <attrs> ;
 M: attrs >alist attrs-alist ;
 
 : >attrs ( assoc -- attrs )

@@ -9,14 +9,14 @@ global [
     [ "MiniFactor.nib" load-nib ] cocoa-init-hook set-global
 
     ! Only keeps those methods that we actually call
-    sent-messages get super-sent-messages get union
-    objc-methods [ intersect ] change
+    sent-messages get super-sent-messages get assoc-union
+    objc-methods [ assoc-intersect ] change
 
     sent-messages get
     super-sent-messages get
     [ keys [ objc-methods get at dup ] H{ } map>assoc ] bi@
-    super-message-senders [ intersect ] change
-    message-senders [ intersect ] change
+    super-message-senders [ assoc-intersect ] change
+    message-senders [ assoc-intersect ] change
 
     sent-messages off
     super-sent-messages off

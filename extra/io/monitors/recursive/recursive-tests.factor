@@ -30,8 +30,8 @@ M: mock-io-backend (monitor)
 M: mock-io-backend link-info
     global [ link-info ] bind ;
 
-[ ] [ 0 counter construct-boa dummy-monitor-created set ] unit-test
-[ ] [ 0 counter construct-boa dummy-monitor-disposed set ] unit-test
+[ ] [ 0 counter boa dummy-monitor-created set ] unit-test
+[ ] [ 0 counter boa dummy-monitor-disposed set ] unit-test
 
 [ ] [
     mock-io-backend io-backend [
