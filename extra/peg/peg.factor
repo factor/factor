@@ -240,8 +240,21 @@ GENERIC: (compile) ( parser -- quot )
     gensym tuck >>compiled 2dup parser-body 0 1 <effect> define-declared dupd "peg" set-word-prop
   ] if* ;
 
+SYMBOL: delayed
+
+: fixup-delayed ( -- )
+  #! Work through all delayed parsers and recompile their
+  #! words to have the correct bodies.
+  delayed get [
+    call compiled-parser 1quotation 0 1 <effect> define-declared
+  ] assoc-each ;
+
 : compile ( parser -- word )
-  [ compiled-parser ] with-compilation-unit ;
+  [
+    H{ } clone delayed [ 
+      compiled-parser fixup-delayed 
+    ] with-variable
+  ] with-compilation-unit ;
 
 : compiled-parse ( state word -- result )
   swap [ execute ] with-packrat ; inline 
@@ -451,7 +464,7 @@ M: delay-parser (compile) ( parser -- quot )
   #! For efficiency we memoize the quotation.
   #! This way it is run only once and the 
   #! parser constructed once at run time.
-  quot>> '[ @ compile ] { } { "word" } <effect> memoize-quot '[ @ execute ] ; 
+  quot>> gensym [ delayed get set-at ] keep 1quotation ; 
 
 TUPLE: box-parser quot ;
 
