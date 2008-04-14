@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser generic kernel classes words slots assocs sequences arrays
-vectors definitions prettyprint combinators.lib math ;
+vectors definitions prettyprint combinators.lib math sets ;
 IN: delegate
 
 ! Protocols
