@@ -14,7 +14,7 @@ IN: mirrors
 TUPLE: mirror object slots ;
 
 : <mirror> ( object -- mirror )
-    dup object-slots mirror construct-boa ;
+    dup object-slots mirror boa ;
 
 : >mirror< ( mirror -- obj slots )
     dup mirror-object swap mirror-slots ;

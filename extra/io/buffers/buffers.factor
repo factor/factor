@@ -9,7 +9,7 @@ accessors ;
 TUPLE: buffer size ptr fill pos ;
 
 : <buffer> ( n -- buffer )
-    dup malloc 0 0 buffer construct-boa ;
+    dup malloc 0 0 buffer boa ;
 
 : buffer-free ( buffer -- )
     dup buffer-ptr free  f swap set-buffer-ptr ;

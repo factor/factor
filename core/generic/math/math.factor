@@ -19,7 +19,7 @@ PREDICATE: math-class < class
     {
         { [ dup null class< ] [ drop { -1 -1 } ] }
         { [ dup math-class? ] [ class-types last/first ] }
-        { [ t ] [ drop { 100 100 } ] }
+        [ drop { 100 100 } ]
     } cond ;
     
 : math-class-max ( class class -- class )

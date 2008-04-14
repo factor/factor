@@ -13,7 +13,7 @@ IN: bunny.model
         numbers {
             { [ dup length 5 = ] [ 3 head pick push ] }
             { [ dup first 3 = ] [ 1 tail over push ] }
-            { [ t ] [ drop ] }
+            [ drop ]
         } cond (parse-model)
     ] when* ;
 
@@ -61,7 +61,7 @@ TUPLE: bunny-buffers array element-array nv ni ;
 
 : <bunny-dlist> ( model -- geom )
     GL_COMPILE [ first3 draw-triangles ] make-dlist
-    bunny-dlist construct-boa ;
+    bunny-dlist boa ;
 
 : <bunny-buffers> ( model -- geom )
     {
@@ -76,7 +76,7 @@ TUPLE: bunny-buffers array element-array nv ni ;
         ]
         [ first length 3 * ]
         [ third length 3 * ]
-    } cleave bunny-buffers construct-boa ;
+    } cleave bunny-buffers boa ;
 
 GENERIC: bunny-geom ( geom -- )
 GENERIC: draw-bunny ( geom draw -- )

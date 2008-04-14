@@ -55,7 +55,7 @@ USE: unix
         { [ pick string? ] [ redirect-file ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
         { [ pick +inherit+ eq? ] [ redirect-closed ] }
-        { [ t ] [ redirect-stream ] }
+        [ redirect-stream ]
     } cond ;
 
 : ?closed dup +closed+ eq? [ drop "/dev/null" ] when ;

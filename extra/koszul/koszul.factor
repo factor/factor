@@ -3,7 +3,7 @@
 USING: arrays assocs hashtables assocs io kernel math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
-splitting sorting shuffle symbols ;
+splitting sorting shuffle symbols sets ;
 IN: koszul
 
 ! Utilities
@@ -15,7 +15,7 @@ IN: koszul
         { [ dup number? ] [ { } associate ] }
         { [ dup array? ] [ 1 swap associate ] }
         { [ dup hashtable? ] [ ] }
-        { [ t ] [ 1array >alt ] }
+        [ 1array >alt ]
     } cond ;
 
 : canonicalize
@@ -31,10 +31,10 @@ SYMBOL: terms
 ! Printing elements
 : num-alt. ( n -- str )
     {
-        { [ dup 1 = ] [ drop " + " ] }
-        { [ dup -1 = ] [ drop " - " ] }
-        { [ t ] [ number>string " + " prepend ] }
-    } cond ;
+        { 1 [ " + " ] }
+        { -1 [ " - " ] }
+        [ number>string " + " prepend ]
+    } case ;
 
 : (alt.) ( basis n -- str )
     over empty? [

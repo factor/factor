@@ -89,7 +89,7 @@ M: word reset-class drop ;
     dup reset-class
     dup deferred? [ dup define-symbol ] when
     dup word-props
-    r> union over set-word-props
+    r> assoc-union over set-word-props
     dup predicate-word
     [ 1quotation "predicate" set-word-prop ]
     [ swap "predicating" set-word-prop ]

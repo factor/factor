@@ -3,7 +3,7 @@ namespaces words sequences classes assocs vocabs kernel arrays
 prettyprint.backend kernel.private io generic math system
 strings sbufs vectors byte-arrays bit-arrays float-arrays
 quotations io.streams.byte-array io.encodings.string
-classes.builtin ;
+classes.builtin parser ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -25,6 +25,7 @@ $nl
     { { $snippet { $emphasis "foo" } "?" } "outputs a boolean" { { $link empty? } } }
     { { $snippet "?" { $emphasis "foo" } } { "conditionally performs " { $snippet { $emphasis "foo" } } } { { $links ?nth } } }
     { { $snippet "<" { $emphasis "foo" } ">" } { "creates a new " { $snippet "foo" } } { { $link <array> } } }
+    { { $snippet "new-" { $emphasis "foo" } } { "creates a new " { $snippet "foo" } ", taking some kind of parameter from the stack which determines the type of the object to be created" } { { $link new-sequence } ", " { $link new-lexer } ", " { $link new } } }
     { { $snippet { $emphasis "foo" } "*" } { "alternative form of " { $snippet "foo" } ", or a generic word called by " { $snippet "foo" } } { { $links at* pprint* } } }
     { { $snippet "(" { $emphasis "foo" } ")" } { "implementation detail word used by " { $snippet "foo" } } { { $link (clone) } } }
     { { $snippet "set-" { $emphasis "foo" } } { "sets " { $snippet "foo" } " to a new value" } { $links set-length } }

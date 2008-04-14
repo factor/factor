@@ -37,7 +37,7 @@ TUPLE: pipe in out ;
     [
         >r over >r create-named-pipe dup close-later
         r> r> open-other-end dup close-later
-        pipe construct-boa
+        pipe boa
     ] with-destructors ;
 
 : close-pipe ( pipe -- )

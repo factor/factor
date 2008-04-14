@@ -89,6 +89,11 @@ set_md5sum() {
 set_gcc() {
     case $OS in
         openbsd) ensure_program_installed egcc; CC=egcc;;
+	netbsd) if [[ $WORD -eq 64 ]] ; then
+			CC=/usr/pkg/gcc34/bin/gcc
+		else
+			CC=gcc
+		fi ;;
         *) CC=gcc;;
     esac
 }
@@ -185,6 +190,7 @@ find_architecture() {
        i386) ARCH=x86;;
        i686) ARCH=x86;;
        amd64) ARCH=x86;;
+       ppc64) ARCH=ppc;;
        *86) ARCH=x86;;
        *86_64) ARCH=x86;;
        "Power Macintosh") ARCH=ppc;;

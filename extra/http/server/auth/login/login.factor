@@ -1,20 +1,29 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors quotations assocs kernel splitting
-base64 html.elements io combinators http.server
-http.server.auth.providers http.server.auth.providers.null
-http.server.actions http.server.components http.server.sessions
-http.server.templating.fhtml http.server.validators
-http.server.auth http sequences io.files namespaces hashtables
+base64 io combinators sequences io.files namespaces hashtables
 fry io.sockets arrays threads locals qualified continuations
-destructors ;
+destructors
+
+html.elements
+http
+http.server
+http.server.auth
+http.server.auth.providers
+http.server.auth.providers.null
+http.server.actions
+http.server.components
+http.server.forms
+http.server.sessions
+http.server.templating.fhtml
+http.server.validators ;
 IN: http.server.auth.login
 QUALIFIED: smtp
 
 SYMBOL: post-login-url
 SYMBOL: login-failed?
 
-TUPLE: login users ;
+TUPLE: login < dispatcher users ;
 
 : users login get users>> ;
 
@@ -130,7 +139,7 @@ SYMBOL: user-exists?
 
                 successful-login
 
-                login get responder>> init-user-profile
+                login get default>> responder>> init-user-profile
             ] >>submit
     ] ;
 
@@ -178,7 +187,7 @@ SYMBOL: previous-page
                     "password" value uid users check-login
                     [ login-failed? on validation-failed ] unless
 
-                    "new-password" value set-password
+                    "new-password" value >>password
                 ] unless
 
                 "realname" value >>realname
@@ -269,7 +278,8 @@ SYMBOL: lost-password-from
 : <recover-form-3>
     "new-password" <form>
         "resource:extra/http/server/auth/login/recover-3.fhtml" >>edit-template
-        "username" <username> <hidden>
+        "username" <username>
+            hidden >>renderer
             t >>required
             add-field
         "new-password" <password>
@@ -278,7 +288,8 @@ SYMBOL: lost-password-from
         "verify-password" <password>
             t >>required
             add-field
-        "ticket" <string> <hidden>
+        "ticket" <string>
+            hidden >>renderer
             t >>required
             add-field ;
 
@@ -342,22 +353,22 @@ C: <protected> protected
     "login" f <permanent-redirect> ;
 
 M: protected call-responder ( path responder -- response )
-    logged-in-user sget [
-        dup save-user-after
+    logged-in-user sget dup [
+        save-user-after
         request get request-url previous-page sset
         responder>> call-responder
     ] [
-        2drop
+        3drop
         request get method>> { "GET" "HEAD" } member?
         [ show-login-page ] [ <400> ] if
     ] if ;
 
 M: login call-responder ( path responder -- response )
     dup login set
-    delegate call-responder ;
+    call-next-method ;
 
 : <login> ( responder -- auth )
-    login <webapp>
+    login new-dispatcher
         swap <protected> >>default
         <login-action> "login" add-responder
         <logout-action> "logout" add-responder

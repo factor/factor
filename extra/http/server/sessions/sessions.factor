@@ -17,9 +17,10 @@ M: object init-session* drop ;
 
 TUPLE: session-manager responder sessions ;
 
-: <session-manager> ( responder class -- responder' )
-    >r <sessions-in-memory> session-manager construct-boa
-    r> construct-delegate ; inline
+: new-session-manager ( responder class -- responder' )
+    new
+        <sessions-in-memory> >>sessions
+        swap >>responder ; inline
 
 SYMBOLS: session session-id session-changed? ;
 
@@ -64,18 +65,18 @@ M: session-saver dispose
     [ [ session-id set ] [ session set ] bi* ] 2bi
     [ session-manager set ] [ responder>> call-responder ] bi ;
 
-TUPLE: null-sessions ;
+TUPLE: null-sessions < session-manager ;
 
 : <null-sessions>
-    null-sessions <session-manager> ;
+    null-sessions new-session-manager ;
 
 M: null-sessions call-responder ( path responder -- response )
     H{ } clone f call-responder/session ;
 
-TUPLE: url-sessions ;
+TUPLE: url-sessions < session-manager ;
 
 : <url-sessions> ( responder -- responder' )
-    url-sessions <session-manager> ;
+    url-sessions new-session-manager ;
 
 : session-id-key "factorsessid" ;
 
@@ -84,7 +85,7 @@ TUPLE: url-sessions ;
     [ drop ] [ get-session ] 2bi ;
 
 : add-session-id ( query -- query' )
-    session-id get [ session-id-key associate union ] when* ;
+    session-id get [ session-id-key associate assoc-union ] when* ;
 
 : session-form-field ( -- )
     <input
@@ -107,10 +108,10 @@ M: url-sessions call-responder ( path responder -- response )
         2drop nip new-url-session
     ] if ;
 
-TUPLE: cookie-sessions ;
+TUPLE: cookie-sessions < session-manager ;
 
 : <cookie-sessions> ( responder -- responder' )
-    cookie-sessions <session-manager> ;
+    cookie-sessions new-session-manager ;
 
 : current-cookie-session ( responder -- id namespace/f )
     request get session-id-key get-cookie dup

@@ -12,7 +12,7 @@ IN: inference.dataflow
 TUPLE: value < identity-tuple literal uid recursion ;
 
 : <value> ( obj -- value )
-    <computed> recursive-state get value construct-boa ;
+    <computed> recursive-state get value boa ;
 
 M: value hashcode* nip value-uid ;
 
@@ -68,16 +68,16 @@ M: object flatten-curry , ;
     [ in-d>> ] [ out-d>> ] bi <effect> ;
 
 : param-node ( param class -- node )
-    construct-empty swap >>param ; inline
+    new swap >>param ; inline
 
 : in-node ( seq class -- node )
-    construct-empty swap >>in-d ; inline
+    new swap >>in-d ; inline
 
 : all-in-node ( class -- node )
     flatten-meta-d swap in-node ; inline
 
 : out-node ( seq class -- node )
-    construct-empty swap >>out-d ; inline
+    new swap >>out-d ; inline
 
 : all-out-node ( class -- node )
     flatten-meta-d swap out-node ; inline
@@ -111,19 +111,19 @@ TUPLE: #call-label < node ;
 
 TUPLE: #push < node ;
 
-: #push ( -- node ) \ #push construct-empty ;
+: #push ( -- node ) \ #push new ;
 
 TUPLE: #shuffle < node ;
 
-: #shuffle ( -- node ) \ #shuffle construct-empty ;
+: #shuffle ( -- node ) \ #shuffle new ;
 
 TUPLE: #>r < node ;
 
-: #>r ( -- node ) \ #>r construct-empty ;
+: #>r ( -- node ) \ #>r new ;
 
 TUPLE: #r> < node ;
 
-: #r> ( -- node ) \ #r> construct-empty ;
+: #r> ( -- node ) \ #r> new ;
 
 TUPLE: #values < node ;
 
@@ -150,7 +150,7 @@ TUPLE: #merge < node ;
 
 TUPLE: #terminate < node ;
 
-: #terminate ( -- node ) \ #terminate construct-empty ;
+: #terminate ( -- node ) \ #terminate new ;
 
 TUPLE: #declare < node ;
 

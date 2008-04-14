@@ -79,7 +79,7 @@ M: f print-element drop ;
     [ strong-style get print-element* ] ($heading) ;
 
 : ($code-style) ( presentation -- hash )
-    presented associate code-style get union ;
+    presented associate code-style get assoc-union ;
 
 : ($code) ( presentation quot -- )
     [

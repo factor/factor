@@ -8,7 +8,7 @@ SYMBOL: current-coro
 TUPLE: coroutine resumecc exitcc ;
 
 : cocreate ( quot -- co )
-  coroutine construct-empty
+  coroutine new
   dup current-coro associate
   [ swapd , , \ bind , 
     "Coroutine has terminated illegally." , \ throw ,

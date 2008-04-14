@@ -36,7 +36,7 @@ DEFER: (flat-length)
         ! not inline
         { [ dup inline? not ] [ drop 1 ] }
         ! inline
-        { [ t ] [ dup dup set word-def (flat-length) ] }
+        [ dup dup set word-def (flat-length) ]
     } cond ;
 
 : (flat-length) ( seq -- n )
@@ -45,7 +45,7 @@ DEFER: (flat-length)
             { [ dup quotation? ] [ (flat-length) 1+ ] }
             { [ dup array? ] [ (flat-length) ] }
             { [ dup word? ] [ word-flat-length ] }
-            { [ t ] [ drop 1 ] }
+            [ drop 1 ]
         } cond
     ] map sum ;
 
@@ -94,7 +94,7 @@ DEFER: (flat-length)
     dup node-param {
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
-        { [ t ] [ 2drop t ] }
+        [ 2drop t ]
     } cond ;
 
 ! Resolve type checks at compile time where possible
@@ -217,5 +217,5 @@ M: #call optimize-node*
         { [ dup optimize-predicate? ] [ optimize-predicate ] }
         { [ dup optimistic-inline? ] [ optimistic-inline ] }
         { [ dup method-body-inline? ] [ optimistic-inline ] }
-        { [ t ] [ inline-method ] }
+        [ inline-method ]
     } cond dup not ;

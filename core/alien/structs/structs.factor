@@ -68,7 +68,7 @@ M: struct-type stack-size
 
 : (define-struct) ( name vocab size align fields -- )
     >r [ align ] keep r>
-    struct-type construct-boa
+    struct-type boa
     -rot define-c-type ;
 
 : make-field ( struct-name vocab type field-name -- spec )

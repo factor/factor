@@ -1,7 +1,12 @@
 
 USING: help.syntax help.markup ;
 
-IN: processing.gallery.bubble-chamber
+USING: bubble-chamber.particle.muon
+       bubble-chamber.particle.quark
+       bubble-chamber.particle.hadron
+       bubble-chamber.particle.axion ;
+
+IN: bubble-chamber
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

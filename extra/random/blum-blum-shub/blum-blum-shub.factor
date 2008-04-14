@@ -3,34 +3,26 @@ math.miller-rabin combinators.lib
 math.functions accessors random ;
 IN: random.blum-blum-shub
 
-! TODO: take (log log M) bits instead of 1 bit
-! Blum Blum Shub, M = pq
+! Blum Blum Shub, n = pq, x_i+1 = x_i ^ 2 mod n
+! return low bit of x+1
 TUPLE: blum-blum-shub x n ;
 
-C: <blum-blum-shub> blum-blum-shub
+<PRIVATE
 
 : generate-bbs-primes ( numbits -- p q )
-    #! two primes congruent to 3 (mod 4)
     [ [ random-prime ] curry [ 4 mod 3 = ] generate ] dup bi ;
 
-IN: crypto
 : <blum-blum-shub> ( numbits -- blum-blum-shub )
-    #! returns a Blum-Blum-Shub tuple
     generate-bbs-primes *
     [ find-relative-prime ] keep
-    blum-blum-shub construct-boa ;
-
-! 256 make-bbs blum-blum-shub set-global
+    blum-blum-shub boa ;
 
 : next-bbs-bit ( bbs -- bit )
-    #! x = x^2 mod n, return low bit of calculated x
-    [ [ x>> 2 ] [ n>> ] bi ^mod ]
-    [ [ >>x ] keep x>> 1 bitand ] bi ;
+    [ [ x>> 2 ] [ n>> ] bi ^mod ] keep
+    over >>x drop 1 bitand ;
 
-IN: crypto
-! : random ( n -- n )
-    ! ! #! Cryptographically secure random number using Blum-Blum-Shub 256
-    ! [ log2 1+ random-bits ] keep dupd >= [ -1 shift ] when ;
+PRIVATE>
 
 M: blum-blum-shub random-32* ( bbs -- r )
-    ;
+    0 32 rot
+    [ next-bbs-bit swap 1 shift bitor ] curry times ;

@@ -142,10 +142,10 @@ M: object clone ;
 M: callstack clone (clone) ;
 
 ! Tuple construction
-: construct-empty ( class -- tuple )
+: new ( class -- tuple )
     tuple-layout <tuple> ;
 
-: construct-boa ( ... class -- tuple )
+: boa ( ... class -- tuple )
     tuple-layout <tuple-boa> ;
 
 ! Quotation building
@@ -203,7 +203,7 @@ GENERIC# get-slots 1 ( tuple slots -- ... )
 GENERIC# set-slots 1 ( ... tuple slots -- )
 
 : construct ( ... slots class -- tuple )
-    construct-empty [ swap set-slots ] keep ; inline
+    new [ swap set-slots ] keep ; inline
 
 : construct-delegate ( delegate class -- tuple )
     >r { set-delegate } r> construct ; inline

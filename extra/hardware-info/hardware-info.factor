@@ -14,7 +14,7 @@ IN: hardware-info
     { [ os windows? ] [ "hardware-info.windows" ] }
     { [ os linux? ] [ "hardware-info.linux" ] }
     { [ os macosx? ] [ "hardware-info.macosx" ] }
-    { [ t ] [ f ] }
+    [ f ]
 } cond [ require ] when* >>
 
 : hardware-report. ( -- )

@@ -39,9 +39,9 @@ M: inference-error compiler-error-type type>> ;
 M: inference-error error-help error>> error-help ;
 
 : (inference-error) ( ... class type -- * )
-    >r construct-boa r>
+    >r boa r>
     recursive-state get
-    \ inference-error construct-boa throw ; inline
+    \ inference-error boa throw ; inline
 
 : inference-error ( ... class -- * )
     +error+ (inference-error) ; inline
@@ -251,7 +251,7 @@ TUPLE: cannot-unify-specials ;
         { [ dup [ curried? ] all? ] [ unify-curries ] }
         { [ dup [ composed? ] all? ] [ unify-composed ] }
         { [ dup [ special? ] contains? ] [ cannot-unify-specials ] }
-        { [ t ] [ drop <computed> ] }
+        [ drop <computed> ]
     } cond ;
 
 : unify-stacks ( seq -- stack )
@@ -395,7 +395,7 @@ TUPLE: effect-error word effect ;
         { [ dup "infer" word-prop ] [ custom-infer ] }
         { [ dup "no-effect" word-prop ] [ no-effect ] }
         { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
-        { [ t ] [ dup infer-word make-call-node ] }
+        [ dup infer-word make-call-node ]
     } cond ;
 
 TUPLE: recursive-declare-error word ;

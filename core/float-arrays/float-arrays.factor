@@ -24,7 +24,7 @@ M: float-array set-nth-unsafe
 M: float-array like
     drop dup float-array? [ >float-array ] unless ;
 
-M: float-array new drop 0.0 <float-array> ;
+M: float-array new-sequence drop 0.0 <float-array> ;
 
 M: float-array equal?
     over float-array? [ sequence= ] [ 2drop f ] if ;

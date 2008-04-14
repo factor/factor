@@ -113,7 +113,7 @@ M: array noise [ noise ] map vsum ;
     noise first2 {
         { [ over 4 <= ] [ >r drop 0 r> ] }
         { [ over 15 >= ] [ >r 2 * r> ] }
-        { [ t ] [ ] }
+        [ ]
     } cond
     {
         ! short words are easier to read
@@ -123,7 +123,7 @@ M: array noise [ noise ] map vsum ;
         { [ dup 25 >= ] [ >r 2 * r> 20 max ] }
         { [ dup 20 >= ] [ >r 5/3 * r> ] }
         { [ dup 15 >= ] [ >r 3/2 * r> ] }
-        { [ t ] [ ] }
+        [ ]
     } cond noise-factor ;
 
 GENERIC: word-noise-factor ( word -- factor )

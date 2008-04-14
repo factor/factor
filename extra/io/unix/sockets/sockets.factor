@@ -7,7 +7,7 @@ USING: alien alien.c-types generic io kernel math namespaces
 io.nonblocking parser threads unix sequences
 byte-arrays io.sockets io.binary io.unix.backend
 io.streams.duplex io.sockets.impl math.parser continuations libc
-combinators io.backend io.files io.files.private system ;
+combinators io.backend io.files io.files.private system accessors ;
 IN: io.unix.sockets
 
 : pending-init-error ( port -- )
@@ -30,10 +30,10 @@ M: unix addrinfo-error ( n -- )
 : init-client-socket ( fd -- )
     SOL_SOCKET SO_OOBINLINE sockopt ;
 
-TUPLE: connect-task ;
+TUPLE: connect-task < output-task ;
 
 : <connect-task> ( port continuation -- task )
-    connect-task <output-task> ;
+    connect-task <io-task> ;
 
 M: connect-task do-io-task
     io-task-port dup port-handle f 0 write
@@ -42,7 +42,7 @@ M: connect-task do-io-task
 : wait-to-connect ( port -- )
     [ <connect-task> add-io-task ] with-port-continuation drop ;
 
-M: unix (client) ( addrspec -- client-in client-out )
+M: unix ((client)) ( addrspec -- client-in client-out )
     dup make-sockaddr/size >r >r
     protocol-family SOCK_STREAM socket-fd
     dup r> r> connect
@@ -61,10 +61,10 @@ USE: unix
 : init-server-socket ( fd -- )
     SOL_SOCKET SO_REUSEADDR sockopt ;
 
-TUPLE: accept-task ;
+TUPLE: accept-task < input-task ;
 
 : <accept-task> ( port continuation  -- task )
-    accept-task <input-task> ;
+    accept-task <io-task> ;
 
 : accept-sockaddr ( port -- fd sockaddr )
     dup port-handle swap server-port-addr sockaddr-type
@@ -97,11 +97,10 @@ M: unix (server) ( addrspec -- handle )
 
 M: unix (accept) ( server -- addrspec handle )
     #! Wait for a client connection.
-    dup check-server-port
-    dup wait-to-accept
-    dup pending-error
-    dup server-port-client-addr
-    swap server-port-client ;
+    check-server-port
+    [ wait-to-accept ]
+    [ pending-error ]
+    [ [ client-addr>> ] [ client>> ] bi ] tri ;
 
 ! Datagram sockets - UDP and Unix domain
 M: unix <datagram>
@@ -128,10 +127,10 @@ packet-size <byte-array> receive-buffer set-global
         rot head
     ] if ;
 
-TUPLE: receive-task ;
+TUPLE: receive-task < input-task ;
 
 : <receive-task> ( stream continuation  -- task )
-    receive-task <input-task> ;
+    receive-task <io-task> ;
 
 M: receive-task do-io-task
     io-task-port
@@ -148,19 +147,18 @@ M: receive-task do-io-task
     [ <receive-task> add-io-task ] with-port-continuation drop ;
 
 M: unix receive ( datagram -- packet addrspec )
-    dup check-datagram-port
-    dup wait-receive
-    dup pending-error
-    dup datagram-port-packet
-    swap datagram-port-packet-addr ;
+    check-datagram-port
+    [ wait-receive ]
+    [ pending-error ]
+    [ [ packet>> ] [ packet-addr>> ] bi ] tri ;
 
 : do-send ( socket data sockaddr len -- n )
     >r >r dup length 0 r> r> sendto ;
 
-TUPLE: send-task packet sockaddr len ;
+TUPLE: send-task < output-task packet sockaddr len ;
 
 : <send-task> ( packet sockaddr len stream continuation -- task )
-    send-task <output-task> [
+    send-task <io-task> [
         {
             set-send-task-packet
             set-send-task-sockaddr
@@ -180,7 +178,7 @@ M: send-task do-io-task
     2drop 2drop ;
 
 M: unix send ( packet addrspec datagram -- )
-    3dup check-datagram-send
+    check-datagram-send
     [ >r make-sockaddr/size r> wait-send ] keep
     pending-error ;
 

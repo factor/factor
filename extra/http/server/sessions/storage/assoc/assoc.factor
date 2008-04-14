@@ -7,7 +7,7 @@ IN: http.server.sessions.storage.assoc
 TUPLE: sessions-in-memory sessions alarms ;
 
 : <sessions-in-memory> ( -- storage )
-    H{ } clone H{ } clone sessions-in-memory construct-boa ;
+    H{ } clone H{ } clone sessions-in-memory boa ;
 
 : cancel-session-timeout ( id storage -- )
     alarms>> at [ cancel-alarm ] when* ;

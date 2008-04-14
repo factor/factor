@@ -46,6 +46,6 @@ M: string resize resize-string ;
 
 : >string ( seq -- str ) "" clone-like ;
 
-M: string new drop 0 <string> ;
+M: string new-sequence drop 0 <string> ;
 
 INSTANCE: string sequence

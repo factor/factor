@@ -21,7 +21,7 @@ TUPLE: browser-gadget pane history ;
     swap set-browser-gadget-history ;
 
 : <browser-gadget> ( -- gadget )
-    browser-gadget construct-empty
+    browser-gadget new
     dup init-history [
         toolbar,
         g <help-pane> g-> set-browser-gadget-pane
@@ -75,4 +75,9 @@ browser-gadget "toolbar" f {
     { T{ key-down f { A+ } "h" } com-documentation }
     { T{ key-down f { A+ } "v" } com-vocabularies }
     { T{ key-down f f "F1" } browser-help }
+} define-command-map
+
+browser-gadget "multi-touch" f {
+    { T{ left-action } com-back }
+    { T{ right-action } com-forward }
 } define-command-map

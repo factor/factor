@@ -215,6 +215,36 @@ void sleep_millis(DWORD msec)
 	Sleep(msec);
 }
 
+DEFINE_PRIMITIVE(os_env)
+{
+	F_CHAR *key = unbox_u16_string();
+	F_CHAR *value = safe_malloc(MAX_UNICODE_PATH * 2);
+	int ret;
+	ret = GetEnvironmentVariable(key, value, MAX_UNICODE_PATH * 2);
+	if(ret == 0)
+		dpush(F);
+	else
+		dpush(tag_object(from_u16_string(value)));
+	free(value);
+}
+
+DEFINE_PRIMITIVE(set_os_env)
+{
+	F_CHAR *key = unbox_u16_string();
+	REGISTER_C_STRING(key);
+	F_CHAR *value = unbox_u16_string();
+	UNREGISTER_C_STRING(key);
+	if(!SetEnvironmentVariable(key, value))
+		general_error(ERROR_IO, tag_object(get_error_message()), F, NULL);
+}
+
+DEFINE_PRIMITIVE(unset_os_env)
+{
+	if(!SetEnvironmentVariable(unbox_u16_string(), NULL)
+		&& GetLastError() != ERROR_ENVVAR_NOT_FOUND)
+		general_error(ERROR_IO, tag_object(get_error_message()), F, NULL);
+}
+
 DEFINE_PRIMITIVE(set_os_envs)
 {
 	not_implemented_error();

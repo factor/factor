@@ -31,7 +31,7 @@ users-in-db "provider" set
 
     [ t ] [ "user" get >boolean ] unit-test
 
-    [ ] [ "user" get "fdasf" set-password drop ] unit-test
+    [ ] [ "user" get "fdasf" >>password drop ] unit-test
 
     [ ] [ "user" get "provider" get update-user ] unit-test
 

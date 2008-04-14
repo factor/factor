@@ -50,7 +50,7 @@ TUPLE: check-method class generic ;
 
 : check-method ( class generic -- class generic )
     over class? over generic? and [
-        \ check-method construct-boa throw
+        \ check-method boa throw
     ] unless ; inline
 
 : with-methods ( generic quot -- )

@@ -187,7 +187,7 @@ DEFER: countdown-b
             { [ dup string? ] [ drop "string" ] }
             { [ dup float? ] [ drop "float" ] }
             { [ dup alien? ] [ drop "alien" ] }
-            { [ t ] [ drop "neither" ] }
+            [ drop "neither" ]
         } cond
     ] compile-call
 ] unit-test
@@ -196,7 +196,7 @@ DEFER: countdown-b
     [
         3 {
             { [ dup fixnum? ] [ ] }
-            { [ t ] [ drop t ] }
+            [ drop t ]
         } cond
     ] compile-call
 ] unit-test

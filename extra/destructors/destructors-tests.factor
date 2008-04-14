@@ -3,7 +3,7 @@ IN: destructors.tests
 
 TUPLE: dummy-obj destroyed? ;
 
-: <dummy-obj> dummy-obj construct-empty ;
+: <dummy-obj> dummy-obj new ;
 
 TUPLE: dummy-destructor obj ;
 

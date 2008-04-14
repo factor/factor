@@ -53,7 +53,7 @@ nl
 "." write flush
 
 {
-    new nth push pop peek
+    new-sequence nth push pop peek
 } compile
 
 "." write flush

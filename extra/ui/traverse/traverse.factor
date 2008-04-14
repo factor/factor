@@ -9,7 +9,7 @@ TUPLE: node value children ;
 : traverse-step ( path gadget -- path' gadget' )
     >r unclip r> gadget-children ?nth ;
 
-: make-node ( quot -- ) { } make node construct-boa , ; inline
+: make-node ( quot -- ) { } make node boa , ; inline
 
 : traverse-to-path ( topath gadget -- )
     dup not [
@@ -70,7 +70,7 @@ DEFER: (gadget-subtree)
         { [ pick empty? ] [ rot drop traverse-to-path ] }
         { [ over empty? ] [ nip traverse-from-path ] }
         { [ pick first pick first = ] [ traverse-child ] }
-        { [ t ] [ traverse-middle ] }
+        [ traverse-middle ]
     } cond ;
 
 : gadget-subtree ( frompath topath gadget -- seq )
