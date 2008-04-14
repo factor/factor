@@ -32,7 +32,7 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 
 : validate-address ( string -- string' )
     #! Make sure we send funky stuff to the server by accident.
-    dup "\r\n>" seq-intersect empty?
+    dup "\r\n>" intersect empty?
     [ "Bad e-mail address: " prepend throw ] unless ;
 
 : mail-from ( fromaddr -- )
@@ -90,7 +90,7 @@ LOG: smtp-response DEBUG
 : get-ok ( -- ) receive-response check-response ;
 
 : validate-header ( string -- string' )
-    dup "\r\n" seq-intersect empty?
+    dup "\r\n" intersect empty?
     [ "Invalid header string: " prepend throw ] unless ;
 
 : write-header ( key value -- )

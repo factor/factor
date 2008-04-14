@@ -65,7 +65,7 @@ ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 { $subsection suffix }
 "Removing elements:"
 { $subsection remove }
-{ $subsection seq-diff } ;
+{ $subsection diff } ;
 
 ARTICLE: "sequences-reshape" "Reshaping sequences"
 "A " { $emphasis "repetition" } " is a virtual sequence consisting of a single element repeated multiple times:"
@@ -660,7 +660,7 @@ HELP: prefix
 { $example "USING: prettyprint sequences ;" "{ 1 2 3 } 0 prefix ." "{ 0 1 2 3 }" }
 } ;
 
-HELP: seq-diff
+HELP: diff
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
 { $description "Outputs a sequence consisting of elements present in " { $snippet "seq2" } " but not " { $snippet "seq1" } ", comparing elements for equality." } ;
 

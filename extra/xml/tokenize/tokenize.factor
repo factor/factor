@@ -162,7 +162,7 @@ SYMBOL: ns-stack
         T{ name f "" "version" f }
         T{ name f "" "encoding" f }
         T{ name f "" "standalone" f }
-    } swap seq-diff
+    } swap diff
     dup empty? [ drop ] [ <extra-attrs> throw ] if ; 
 
 : good-version ( version -- version )

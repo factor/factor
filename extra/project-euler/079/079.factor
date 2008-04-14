@@ -35,7 +35,7 @@ IN: project-euler.079
     ] { } make ;
 
 : find-source ( seq -- elt )
-    dup values swap keys [ prune ] bi@ seq-diff
+    dup values swap keys [ prune ] bi@ diff
     dup empty? [ "Topological sort failed" throw ] [ first ] if ;
 
 : remove-source ( seq elt -- seq )
@@ -52,7 +52,7 @@ PRIVATE>
 
 : topological-sort ( seq -- seq )
     [ [ (topological-sort) ] { } make ] keep
-    concat prune dupd seq-diff append ;
+    concat prune dupd diff append ;
 
 : euler079 ( -- answer )
     source-079 >edges topological-sort 10 digits>integer ;
@@ -60,7 +60,7 @@ PRIVATE>
 ! [ euler079 ] 100 ave-time
 ! 2 ms run / 0 ms GC ave time - 100 trials
 
-! TODO: prune and seq-diff are relatively slow; topological sort could be
+! TODO: prune and diff are relatively slow; topological sort could be
 ! cleaned up and generalized much better, but it works for this problem
 
 MAIN: euler079

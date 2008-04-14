@@ -19,7 +19,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
     [ remove-one ] curry bi@ ;
 
 : symbolic-reduce ( seq seq -- seq seq )
-    2dup seq-intersect dup empty?
+    2dup intersect dup empty?
     [ drop ] [ first 2remove-one symbolic-reduce ] if ;
 
 : <dimensioned> ( n top bot -- obj )

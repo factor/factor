@@ -79,7 +79,7 @@ PRIVATE>
     [ unclip 1 head prefix concat ] map [ all-unique? ] subset ;
 
 : add-missing-digit ( seq -- seq )
-    dup natural-sort 10 seq-diff first prefix ;
+    dup natural-sort 10 diff first prefix ;
 
 : interesting-pandigitals ( -- seq )
     17 candidates { 13 11 7 5 3 2 } [

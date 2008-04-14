@@ -140,7 +140,7 @@ M: object free-vars drop { } ;
 M: quotation free-vars { } [ add-if-free ] reduce ;
 
 M: lambda free-vars
-    dup vars>> swap body>> free-vars seq-diff ;
+    dup vars>> swap body>> free-vars diff ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! lambda-rewrite

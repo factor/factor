@@ -51,7 +51,7 @@ IN: project-euler.023
 PRIVATE>
 
 : euler023 ( -- answer )
-    20161 abundants-upto possible-sums source-023 seq-diff sum ;
+    20161 abundants-upto possible-sums source-023 diff sum ;
 
 ! TODO: solution is still too slow, although it takes under 1 minute
 

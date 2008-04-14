@@ -104,7 +104,7 @@ IN: tools.deploy.shaker
     set-global ;
 
 : strip-vocab-globals ( except names -- words )
-    [ child-vocabs [ words ] map concat ] map concat seq-diff ;
+    [ child-vocabs [ words ] map concat ] map concat diff ;
 
 : stripped-globals ( -- seq )
     [

@@ -381,7 +381,7 @@ M: value (lazy-load)
 : (compute-free-vregs) ( used class -- vector )
     #! Find all vregs in 'class' which are not in 'used'.
     [ vregs length reverse ] keep
-    [ <vreg> ] curry map seq-diff
+    [ <vreg> ] curry map diff
     >vector ;
 
 : compute-free-vregs ( -- )

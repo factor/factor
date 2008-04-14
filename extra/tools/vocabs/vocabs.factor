@@ -126,7 +126,7 @@ SYMBOL: modified-docs
             modified-sources get
             modified-docs get
         ]
-        [ modified-sources get modified-docs get append swap seq-diff ] bi
+        [ modified-sources get modified-docs get append swap diff ] bi
     ] with-scope ;
 
 : do-refresh ( modified-sources modified-docs unchanged -- )

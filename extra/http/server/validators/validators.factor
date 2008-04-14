@@ -70,7 +70,7 @@ C: <validation-error> validation-error
     dup empty? [ "must remain blank" throw ] unless ;
 
 : v-one-line ( str -- str )
-    dup "\r\n" seq-intersect empty?
+    dup "\r\n" intersect empty?
     [ "must be a single line" throw ] unless ;
 
 : v-one-word ( str -- str )

@@ -444,7 +444,7 @@ PRIVATE>
 : memq? ( obj seq -- ? )
     [ eq? ] with contains? ;
 
-: seq-intersect ( seq1 seq2 -- seq1/\seq2 )
+: intersect ( seq1 seq2 -- seq1/\seq2 )
     swap [ member? ] curry subset ;
 
 : remove ( obj seq -- newseq )
@@ -512,7 +512,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
         [ 0 swap copy ] keep
     ] new-like ;
 
-: seq-diff ( seq1 seq2 -- newseq )
+: diff ( seq1 seq2 -- newseq )
     swap [ member? not ] curry subset ;
 
 : peek ( seq -- elt ) dup length 1- swap nth ;

@@ -24,7 +24,7 @@ SYMBOL: bootstrap-time
 : load-components ( -- )
     "exclude" "include"
     [ get-global " " split [ empty? not ] subset ] bi@
-    seq-diff
+    diff
     [ "bootstrap." prepend require ] each ;
 
 ! : compile-remaining ( -- )

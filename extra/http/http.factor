@@ -94,7 +94,7 @@ IN: http
 
 : check-header-string ( str -- str )
     #! http://en.wikipedia.org/wiki/HTTP_Header_Injection
-    dup "\r\n" seq-intersect empty?
+    dup "\r\n" intersect empty?
     [ "Header injection attack" throw ] unless ;
 
 : write-header ( assoc -- )

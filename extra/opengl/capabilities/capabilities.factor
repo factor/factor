@@ -15,7 +15,7 @@ IN: opengl.capabilities
 : has-gl-extensions? ( extensions -- ? )
     gl-extensions swap [ over member? ] all? nip ;
 : (make-gl-extensions-error) ( required-extensions -- )
-    gl-extensions swap seq-diff
+    gl-extensions swap diff
     "Required OpenGL extensions not supported:\n" %
     [ "    " % % "\n" % ] each ;
 : require-gl-extensions ( extensions -- )

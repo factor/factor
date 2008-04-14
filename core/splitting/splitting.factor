@@ -69,7 +69,7 @@ INSTANCE: groups sequence
 : split ( seq separators -- pieces ) [ split, ] { } make ;
 
 : string-lines ( str -- seq )
-    dup "\r\n" seq-intersect empty? [
+    dup "\r\n" intersect empty? [
         1array
     ] [
         "\n" split [

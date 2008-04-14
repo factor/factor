@@ -28,7 +28,7 @@ IN: project-euler.035
 
 : possible? ( seq -- ? )
     dup length 1 > [
-        dup { 0 2 4 5 6 8 } swap seq-diff =
+        dup { 0 2 4 5 6 8 } swap diff =
     ] [
         drop t
     ] if ;

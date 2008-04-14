@@ -23,7 +23,7 @@ IN: delegate
 
 : forget-old-definitions ( protocol new-wordlist -- )
     >r users-and-words r>
-    seq-diff forget-all-methods ;
+    diff forget-all-methods ;
 
 : define-protocol ( protocol wordlist -- )
     ! 2dup forget-old-definitions

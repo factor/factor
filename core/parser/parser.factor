@@ -288,7 +288,7 @@ M: no-word-error summary
     scan-word bootstrap-word scan-word create-method-in ;
 
 : shadowed-slots ( superclass slots -- shadowed )
-    >r all-slot-names r> seq-intersect ;
+    >r all-slot-names r> intersect ;
 
 : check-slot-shadowing ( class superclass slots -- )
     shadowed-slots [
