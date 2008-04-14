@@ -1,7 +1,10 @@
 IN: http.server.components.tests
-USING: http.server.components http.server.validators
-namespaces tools.test kernel accessors
-tuple-syntax mirrors http.server.actions ;
+USING: http.server.components http.server.forms
+http.server.validators namespaces tools.test kernel accessors
+tuple-syntax mirrors http.server.actions
+io.streams.string io.streams.null ;
+
+\ render-edit must-infer
 
 validation-failed? off
 
@@ -99,11 +102,31 @@ TUPLE: test-tuple text number more-text ;
         "123" "n" get validate value>>
     ] unit-test
     
-    [ ] [ "n" get t >>integer drop ] unit-test
+    [ ] [ "i" <integer> "i" set ] unit-test
 
     [ 3 ] [
-        "3" "n" get validate
+        "3" "i" get validate
     ] unit-test
+    
+    [ t ] [
+        "3.9" "i" get validate validation-error?
+    ] unit-test
+
+    H{ } clone values set
+
+    [ ] [ 3 "i" set-value ] unit-test
+
+    [ "3" ] [ [ "i" get render-view ] with-string-writer ] unit-test
+
+    [ ] [ [ "i" get render-edit ] with-null-stream ] unit-test
+
+    [ ] [ "t" <text> "t" set ] unit-test
+
+    [ ] [ "hello world" "t" set-value ] unit-test
+
+    [ ] [ [ "t" get render-edit ] with-null-stream ] unit-test
 ] with-scope
 
 [ t ] [ "wake up sheeple" dup "n" <text> validate = ] unit-test
+
+[ ] [ "password" <password> "p" set ] unit-test

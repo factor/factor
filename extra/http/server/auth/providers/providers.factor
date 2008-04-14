@@ -17,8 +17,6 @@ GENERIC: new-user ( user provider -- user/f )
 : check-login ( password username provider -- user/f )
     get-user dup [ [ password>> = ] keep and ] [ 2drop f ] if ;
 
-: set-password ( user password -- user ) >>password ;
-
 ! Password recovery support
 
 :: issue-ticket ( email username provider -- user/f )
