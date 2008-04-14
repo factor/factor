@@ -3,7 +3,7 @@
 USING: qualified io.streams.c init fry namespaces assocs kernel
 parser tools.deploy.config vocabs sequences words words.private
 memory kernel.private continuations io prettyprint
-vocabs.loader debugger system strings ;
+vocabs.loader debugger system strings sets ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line

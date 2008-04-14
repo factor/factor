@@ -29,7 +29,7 @@ M: tuple-array set-nth ( elt n seq -- )
     tuck >r >r tuple-array-example deconstruct r> r>
     delegate set-nth ;
 
-M: tuple-array new tuple-array-example >tuple <tuple-array> ;
+M: tuple-array new-sequence tuple-array-example >tuple <tuple-array> ;
 
 : >tuple-array ( seq -- tuple-array/seq )
     dup empty? [

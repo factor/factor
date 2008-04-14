@@ -4,7 +4,7 @@
 USING: namespaces io io.timeouts kernel logging io.sockets
 sequences combinators sequences.lib splitting assocs strings
 math.parser random system calendar io.encodings.ascii
-calendar.format accessors ;
+calendar.format accessors sets ;
 IN: smtp
 
 SYMBOL: smtp-domain

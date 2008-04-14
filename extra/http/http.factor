@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry hashtables io io.streams.string kernel math
+USING: fry hashtables io io.streams.string kernel math sets
 namespaces math.parser assocs sequences strings splitting ascii
 io.encodings.utf8 io.encodings.string namespaces unicode.case
 combinators vectors sorting accessors calendar

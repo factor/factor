@@ -1,6 +1,6 @@
 USING: arrays io kernel math namespaces splitting prettyprint
 sequences sorting vectors words inverse inspector shuffle
-math.functions ;
+math.functions sets ;
 IN: units
 
 TUPLE: dimensioned value top bot ;
