@@ -1,7 +1,9 @@
 USING: kernel help.markup help.syntax sequences ;
 IN: sets
 
-ARTICLE: "sets" "Set theoretic operations"
+ARTICLE: "sets" "Set-theoretic operations on sequences"
+"Set-theoretic operations on sequences are defined on the " { $vocab-link "sets" } " vocabulary. These operations use hashtables internally to achieve linear running time."
+$nl
 "Remove duplicates:"
 { $subsection prune }
 "Test for duplicates:"
@@ -9,7 +11,8 @@ ARTICLE: "sets" "Set theoretic operations"
 "Set operations on sequences:"
 { $subsection diff }
 { $subsection intersect }
-{ $subsection union } ;
+{ $subsection union }
+{ $see-also member? memq? contains? all? "assocs-sets" } ;
 
 HELP: unique
 { $values { "seq" "a sequence" } { "assoc" "an assoc" } }

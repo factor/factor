@@ -528,12 +528,7 @@ HELP: contains?
 
 HELP: all?
 { $values { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "?" "a boolean" } }
-{ $description "Tests if all elements in the sequence satisfy the predicate by checking each element in turn. Given an empty sequence, vacuously outputs " { $link t } "." }
-{ $notes
-    "The implementation makes use of a well-known logical identity:" 
-    $nl
-    { $snippet "P[x] for all x <==> not ((not P[x]) for some x)" }
-} ;
+{ $description "Tests if all elements in the sequence satisfy the predicate by checking each element in turn. Given an empty sequence, vacuously outputs " { $link t } "." } ;
 
 HELP: push-if
 { $values { "elt" object } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "accum" "a resizable mutable sequence" } }
