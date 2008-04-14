@@ -5,7 +5,7 @@ prettyprint sequences strings vectors words quotations inspector
 io.styles io combinators sorting splitting math.parser effects
 continuations debugger io.files io.streams.string vocabs
 io.encodings.utf8 source-files classes classes.tuple hashtables
-compiler.errors compiler.units accessors ;
+compiler.errors compiler.units accessors sets ;
 IN: parser
 
 TUPLE: lexer text line line-text line-length column ;

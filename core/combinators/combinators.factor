@@ -3,7 +3,7 @@
 IN: combinators
 USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
-hashtables sorting words ;
+hashtables sorting words sets ;
 
 : cleave ( x seq -- )
     [ call ] with each ;

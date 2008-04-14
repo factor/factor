@@ -4,7 +4,7 @@ USING: arrays assocs classes classes.private classes.algebra
 combinators cpu.architecture generator.fixup hashtables kernel
 layouts math namespaces quotations sequences system vectors
 words effects alien byte-arrays bit-arrays float-arrays
-accessors ;
+accessors sets ;
 IN: generator.registers
 
 SYMBOL: +input+

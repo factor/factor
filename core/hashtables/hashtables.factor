@@ -174,18 +174,4 @@ M: hashtable assoc-like
 : ?set-at ( value key assoc/f -- assoc )
     [ [ set-at ] keep ] [ associate ] if* ;
 
-: (prune) ( hash vec elt -- )
-    rot 2dup key?
-    [ 3drop ] [ dupd dupd set-at swap push ] if ; inline
-
-M: sequence prune ( seq -- newseq )
-    [ length <hashtable> ]
-    [ length <vector> ]
-    [ ] tri
-    [ >r 2dup r> (prune) ] each nip ;
-
-: all-unique? ( seq -- ? )
-    [ length ]
-    [ prune length ] bi = ;
-
 INSTANCE: hashtable assoc

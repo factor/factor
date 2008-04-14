@@ -5,7 +5,7 @@ kernel.private math memory continuations kernel io.files
 io.backend system parser vocabs sequences prettyprint
 vocabs.loader combinators splitting source-files strings
 definitions assocs compiler.errors compiler.units
-math.parser generic ;
+math.parser generic sets ;
 IN: bootstrap.stage2
 
 SYMBOL: bootstrap-time

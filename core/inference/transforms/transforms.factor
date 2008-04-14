@@ -3,7 +3,7 @@
 USING: arrays kernel words sequences generic math namespaces
 quotations assocs combinators math.bitfields inference.backend
 inference.dataflow inference.state classes.tuple.private effects
-inspector hashtables classes generic ;
+inspector hashtables classes generic sets ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )

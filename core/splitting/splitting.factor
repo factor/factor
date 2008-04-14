@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math namespaces strings arrays vectors sequences ;
+USING: kernel math namespaces strings arrays vectors sequences
+sets ;
 IN: splitting
 
 TUPLE: groups seq n sliced? ;

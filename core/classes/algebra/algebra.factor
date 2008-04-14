@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel classes classes.builtin combinators accessors
 sequences arrays vectors assocs namespaces words sorting layouts
-math hashtables kernel.private ;
+math hashtables kernel.private sets ;
 IN: classes.algebra
 
 : 2cache ( key1 key2 assoc quot -- value )

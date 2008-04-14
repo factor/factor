@@ -164,6 +164,3 @@ H{ } "x" set
 [ { "one" "two" 3 } ] [
     { 1 2 3 } H{ { 1 "one" } { 2 "two" } } substitute
 ] unit-test
-
-[ f ] [ { 0 1 1 2 3 5 } all-unique? ] unit-test
-[ t ] [ { 0 1 2 3 4 5 } all-unique? ] unit-test
