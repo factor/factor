@@ -240,7 +240,7 @@ unit-test
 
 [ ?{ f t } ] [ 0 2 ?{ f t f } subseq ] unit-test
 
-[ V{ f f f } ] [ 3 V{ } new ] unit-test
+[ V{ f f f } ] [ 3 V{ } new-sequence ] unit-test
 [ SBUF" \0\0\0" ] [ 3 SBUF" " new ] unit-test
 
 [ 0 ] [ f length ] unit-test

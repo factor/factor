@@ -85,8 +85,8 @@ M: process hashcode* process-handle hashcode* ;
 : get-environment ( process -- env )
     dup environment>>
     swap environment-mode>> {
-        { +prepend-environment+ [ os-envs union ] }
-        { +append-environment+ [ os-envs swap union ] }
+        { +prepend-environment+ [ os-envs assoc-union ] }
+        { +append-environment+ [ os-envs swap assoc-union ] }
         { +replace-environment+ [ ] }
     } case ;
 

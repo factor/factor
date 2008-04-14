@@ -69,10 +69,10 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 "It is often useful to use the keys of an associative mapping as a set, exploiting the constant or logarithmic lookup time of most implementations (" { $link "alists" } " being a notable exception)."
 { $subsection subassoc? }
-{ $subsection intersect }
+{ $subsection assoc-intersect }
 { $subsection update }
-{ $subsection union }
-{ $subsection diff }
+{ $subsection assoc-union }
+{ $subsection assoc-diff }
 { $subsection remove-all }
 { $subsection substitute }
 { $subsection substitute-here }
@@ -260,7 +260,7 @@ HELP: values
 
 { keys values } related-words
 
-HELP: intersect
+HELP: assoc-intersect
 { $values { "assoc1" assoc } { "assoc2" assoc } { "intersection" "a new assoc" } }
 { $description "Outputs an assoc consisting of all entries from " { $snippet "assoc2" } " such that the key is also present in " { $snippet "assoc1" } "." }
 { $notes "The values of the keys in " { $snippet "assoc1" } " are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." } ;
@@ -270,11 +270,11 @@ HELP: update
 { $description "Adds all entries from " { $snippet "assoc2" } " to " { $snippet "assoc1" } "." }
 { $side-effects "assoc1" } ;
 
-HELP: union
+HELP: assoc-union
 { $values { "assoc1" assoc } { "assoc2" assoc } { "union" "a new assoc" } }
 { $description "Outputs a assoc consisting of all entries from " { $snippet "assoc1" } " and " { $snippet "assoc2" } ", with entries from " { $snippet "assoc2" } " taking precedence in case the corresponding values are not equal." } ;
 
-HELP: diff
+HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
 { $description "Outputs an assoc consisting of all entries from " { $snippet "assoc2" } " whose key is not contained in " { $snippet "assoc1" } "." } 
 ;

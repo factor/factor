@@ -202,7 +202,7 @@ M: #dispatch generate-node
 : define-if>boolean-intrinsics ( word intrinsics -- )
     [
         >r [ if>boolean-intrinsic ] curry r>
-        { { f "if-scratch" } } +scratch+ associate union
+        { { f "if-scratch" } } +scratch+ associate assoc-union
     ] assoc-map "intrinsics" set-word-prop ;
 
 : define-if-intrinsics ( word intrinsics -- )

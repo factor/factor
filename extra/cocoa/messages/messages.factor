@@ -139,7 +139,7 @@ H{
     { "NSRect" "{_NSRect=ffff}" }
     { "NSSize" "{_NSSize=ff}" }
     { "NSRange" "{_NSRange=II}" }
-} union alien>objc-types set-global
+} assoc-union alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
     2dup CHAR: = -rot index* swap subseq

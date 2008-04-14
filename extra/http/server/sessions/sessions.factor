@@ -84,7 +84,7 @@ TUPLE: url-sessions ;
     [ drop ] [ get-session ] 2bi ;
 
 : add-session-id ( query -- query' )
-    session-id get [ session-id-key associate union ] when* ;
+    session-id get [ session-id-key associate assoc-union ] when* ;
 
 : session-form-field ( -- )
     <input

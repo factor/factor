@@ -11,7 +11,7 @@ TUPLE: tuple-array example ;
     swap tuple>array length over length - ;
 
 : <tuple-array> ( length example -- tuple-array )
-    prepare-example [ rot * { } new ] keep
+    prepare-example [ rot * { } new-sequence ] keep
     <sliced-groups> tuple-array construct-delegate
     [ set-tuple-array-example ] keep ;
 

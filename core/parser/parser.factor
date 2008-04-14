@@ -501,14 +501,14 @@ SYMBOL: interactive-vocabs
     ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
-    diff [
+    assoc-diff [
         drop where dup [ first ] when
         file get source-file-path =
     ] assoc-subset keys ;
 
 : removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions
-    [ get first2 union ] bi@ ;
+    [ get first2 assoc-union ] bi@ ;
 
 : removed-classes ( -- assoc1 assoc2 )
     new-definitions old-definitions

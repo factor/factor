@@ -5,7 +5,7 @@ io definitions kernel continuations ;
 IN: delegate.protocols
 
 PROTOCOL: sequence-protocol
-    clone clone-like like new new-resizable nth nth-unsafe
+    clone clone-like like new-sequence new-resizable nth nth-unsafe
     set-nth set-nth-unsafe length set-length lengthen ;
 
 PROTOCOL: assoc-protocol

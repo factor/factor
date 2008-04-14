@@ -40,7 +40,7 @@ TUPLE: action init display submit get-params post-params ;
 M: action call-responder ( path action -- response )
     '[
         , ,
-        [ +append-path associate request-params union params set ]
+        [ +append-path associate request-params assoc-union params set ]
         [ action set ] bi*
         request get method>> {
             { "GET" [ handle-get ] }
