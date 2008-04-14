@@ -178,7 +178,7 @@ M: hashtable assoc-like
     rot 2dup key?
     [ 3drop ] [ dupd dupd set-at swap push ] if ; inline
 
-: prune ( seq -- newseq )
+M: sequence prune ( seq -- newseq )
     [ length <hashtable> ]
     [ length <vector> ]
     [ ] tri

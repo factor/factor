@@ -260,5 +260,9 @@ unit-test
 [ "asdf " ] [ " asdf " [ CHAR: \s = ] left-trim ] unit-test
 [ " asdf" ] [ " asdf " [ CHAR: \s = ] right-trim ] unit-test
 
+[ { 1 2 3 4 } ] [ { 1 2 3 } { 2 3 4 } union ] unit-test
+[ { 4 } ] [ { 1 2 3 } { 2 3 4 } diff ] unit-test
+[ { 2 3 } ] [ { 1 2 3 } { 2 3 4 } intersect ] unit-test
+
 ! Hardcore
 [ ] [ "sequences" reload ] unit-test
