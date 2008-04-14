@@ -4,7 +4,7 @@
 USING: kernel threads vectors arrays sequences
 namespaces tools.test continuations dlists strings math words
 match quotations concurrency.messaging concurrency.mailboxes
-concurrency.count-downs ;
+concurrency.count-downs accessors ;
 IN: concurrency.messaging.tests
 
 [ ] [ my-mailbox mailbox-data dlist-delete-all ] unit-test
@@ -30,7 +30,7 @@ IN: concurrency.messaging.tests
         "crash" throw
     ] "Linked test" spawn-linked drop
     receive
-] [ delegate "crash" = ] must-fail-with
+] [ error>> "crash" = ] must-fail-with
 
 MATCH-VARS: ?from ?to ?value ;
 SYMBOL: increment

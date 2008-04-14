@@ -1,9 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: kernel namespaces db.tuples math.parser
+accessors fry locals hashtables
+http.server
+http.server.actions
+http.server.components
+http.server.forms
+http.server.validators ;
 IN: http.server.crud
-USING: kernel namespaces db.tuples math.parser http.server
-http.server.actions http.server.components
-http.server.validators accessors fry locals hashtables ;
 
 :: <view-action> ( form ctor -- action )
     <action>

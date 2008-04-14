@@ -1,5 +1,5 @@
 USING: dlists dlists.private kernel tools.test random assocs
-hashtables sequences namespaces sorting debugger io prettyprint
+sets sequences namespaces sorting debugger io prettyprint
 math ;
 IN: dlists.tests
 
