@@ -1,0 +1,26 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:style include="resource:extra/webapps/todo/todo.css" />
+
+	<t:style include="resource:extra/xmode/code2html/stylesheet.css" />
+
+	<div class="navbar">
+		  <t:a href="list">List Items</t:a>
+		| <t:a href="edit">New Items</t:a>
+
+		<t:if code="http.server.auth.login:allow-edit-profile?">
+			| <t:a href="edit-profile">Edit Profile</t:a>
+		</t:if>
+
+		<t:form action="logout" class="inline">
+			| <button type="submit" class="link-button link">Logout</button>
+		</t:form>
+	</div>
+
+	<h1><t:write-title /></h1>
+
+	<t:call-next-template />
+
+</t:chloe>
