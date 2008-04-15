@@ -55,7 +55,8 @@ MEMO: eq ( -- parser )
 
 : render-code ( string mode -- string' )
     >r string-lines r>
-    [ [ htmlize-lines ] with-html-stream ] with-string-writer ;
+    [ [ htmlize-lines ] with-html-stream ] with-string-writer
+    "pre" surround-with-foo ;
 
 : escape-link ( href text -- href-esc text-esc )
     >r escape-quoted-string r> escape-string ;
