@@ -15,7 +15,9 @@ http.server.actions
 http.server.components
 http.server.forms
 http.server.sessions
-http.server.templating.fhtml
+http.server.boilerplate
+http.server.templating
+http.server.templating.chloe
 http.server.validators ;
 IN: http.server.auth.login
 QUALIFIED: smtp
@@ -40,11 +42,15 @@ M: user-saver dispose
 : save-user-after ( user -- )
     <user-saver> add-always-destructor ;
 
+: login-template ( name -- template )
+    "resource:extra/http/server/auth/login/" swap ".xml"
+    3append <chloe> ;
+
 ! ! ! Login
 
 : <login-form>
     "login" <form>
-        "resource:extra/http/server/auth/login/login.fhtml" >>edit-template
+        "login" login-template >>edit-template
         "username" <username>
             t >>required
             add-field
@@ -86,7 +92,7 @@ M: user-saver dispose
 
 : <register-form> ( -- form )
     "register" <form>
-        "resource:extra/http/server/auth/login/register.fhtml" >>edit-template
+        "register" login-template >>edit-template
         "username" <username>
             t >>required
             add-field
@@ -147,7 +153,7 @@ SYMBOL: user-exists?
 
 : <edit-profile-form> ( -- form )
     "edit-profile" <form>
-        "resource:extra/http/server/auth/login/edit-profile.fhtml" >>edit-template
+        "edit-profile" login-template >>edit-template
         "username" <username> add-field
         "realname" <string> add-field
         "password" <password> add-field
@@ -242,7 +248,7 @@ SYMBOL: lost-password-from
 
 : <recover-form-1> ( -- form )
     "register" <form>
-        "resource:extra/http/server/auth/login/recover-1.fhtml" >>edit-template
+        "recover-1" login-template >>edit-template
         "username" <username>
             t >>required
             add-field
@@ -271,13 +277,13 @@ SYMBOL: lost-password-from
                     send-password-email
                 ] when*
 
-                "resource:extra/http/server/auth/login/recover-2.fhtml" serve-template
+                "recover-2" login-template serve-template
             ] >>submit
     ] ;
 
 : <recover-form-3>
     "new-password" <form>
-        "resource:extra/http/server/auth/login/recover-3.fhtml" >>edit-template
+        "recover-3" login-template >>edit-template
         "username" <username>
             hidden >>renderer
             t >>required
@@ -326,8 +332,7 @@ SYMBOL: lost-password-from
                     "new-password" value >>password
                     users update-user
 
-                    "resource:extra/http/server/auth/login/recover-4.fhtml"
-                    serve-template
+                    "recover-4" login-template serve-template
                 ] [
                     <400>
                 ] if*
@@ -367,24 +372,32 @@ M: login call-responder ( path responder -- response )
     dup login set
     call-next-method ;
 
+: <login-boilerplate> ( responder -- responder' )
+    <boilerplate>
+        "boilerplate" login-template >>template ;
+
 : <login> ( responder -- auth )
     login new-dispatcher
         swap <protected> >>default
-        <login-action> "login" add-responder
-        <logout-action> "logout" add-responder
+        <login-action> <login-boilerplate> "login" add-responder
+        <logout-action> <login-boilerplate> "logout" add-responder
         no-users >>users ;
 
 ! ! ! Configuration
 
 : allow-edit-profile ( login -- login )
-    <edit-profile-action> <protected> "edit-profile" add-responder ;
+    <edit-profile-action> <protected> <login-boilerplate>
+        "edit-profile" add-responder ;
 
 : allow-registration ( login -- login )
-    <register-action> "register" add-responder ;
+    <register-action> <login-boilerplate>
+        "register" add-responder ;
 
 : allow-password-recovery ( login -- login )
-    <recover-action-1> "recover-password" add-responder
-    <recover-action-3> "new-password" add-responder ;
+    <recover-action-1> <login-boilerplate>
+        "recover-password" add-responder
+    <recover-action-3> <login-boilerplate>
+        "new-password" add-responder ;
 
 : allow-edit-profile? ( -- ? )
     login get responders>> "edit-profile" swap key? ;

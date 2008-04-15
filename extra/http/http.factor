@@ -394,13 +394,16 @@ body ;
     [ unparse-cookies "set-cookie" pick set-at ] when*
     write-header ;
 
-: write-response-body ( response -- response )
-    dup body>> {
-        { [ dup not ] [ drop ] }
-        { [ dup string? ] [ write ] }
-        { [ dup callable? ] [ call ] }
-        [ stdio get stream-copy ]
+: body>quot ( body -- quot )
+    {
+        { [ dup not ] [ drop [ ] ] }
+        { [ dup string? ] [ [ write ] curry ] }
+        { [ dup callable? ] [ ] }
+        [ [ stdio get stream-copy ] curry ]
     } cond ;
+
+: write-response-body ( response -- response )
+    dup body>> body>quot call ;
 
 M: response write-response ( respose -- )
     write-response-version

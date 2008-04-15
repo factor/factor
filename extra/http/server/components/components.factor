@@ -203,22 +203,35 @@ M: captcha validate*
     drop v-captcha ;
 
 ! Text areas
-TUPLE: textarea-renderer ;
+TUPLE: textarea-renderer rows cols ;
 
-: textarea-renderer T{ textarea-renderer } ;
+: new-textarea-renderer ( class -- renderer )
+    new
+        60 >>cols
+        20 >>rows ;
+
+: <textarea-renderer> ( -- renderer )
+    textarea-renderer new-textarea-renderer ;
 
 M: textarea-renderer render-view*
     drop write ;
 
 M: textarea-renderer render-edit*
-    drop <textarea [ =id ] [ =name ] bi textarea> write </textarea> ;
+    <textarea
+        [ rows>> [ number>string =rows ] when* ]
+        [ cols>> [ number>string =cols ] when* ] bi
+        [ =id   ]
+        [ =name ] bi
+    textarea>
+        write
+    </textarea> ;
 
 TUPLE: text < string ;
 
 : new-text ( id class -- component )
     new-string
         f >>one-line
-        textarea-renderer >>renderer ;
+        <textarea-renderer> >>renderer ;
 
 : <text> ( id -- component )
     text new-text ;
