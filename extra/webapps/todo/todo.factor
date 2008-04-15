@@ -7,7 +7,7 @@ http.server.forms http.server.templating.chloe
 http.server.boilerplate http.server.crud http.server.auth
 http.server.actions http.server.db
 http.server ;
-IN: todo
+IN: webapps.todo
 
 TUPLE: todo uid id priority summary description ;
 
@@ -86,7 +86,7 @@ http.server.sessions.storage.db ;
 : test-db "todo.db" resource-path sqlite-db ;
 
 : <todo-app> ( -- responder )
-    <todo-app>
+    <todo-responder>
     <login>
         users-in-db >>users
         allow-registration
@@ -108,4 +108,6 @@ http.server.sessions.storage.db ;
         init-sessions-table
     ] with-db
 
-    <todo-app> main-responder set-global ;
+    <dispatcher>
+        <todo-app> "todo" add-responder
+    main-responder set-global ;

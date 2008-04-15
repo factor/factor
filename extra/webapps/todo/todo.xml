@@ -8,7 +8,7 @@
 
 	<div class="navbar">
 		  <t:a href="list">List Items</t:a>
-		| <t:a href="edit">New Items</t:a>
+		| <t:a href="edit">Add Item</t:a>
 
 		<t:if code="http.server.auth.login:allow-edit-profile?">
 			| <t:a href="edit-profile">Edit Profile</t:a>
