@@ -7,6 +7,10 @@ IN: builder.common
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+SYMBOL: upload-to-factorcode
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 SYMBOL: builds-dir
 
 : builds ( -- path )
@@ -20,15 +24,6 @@ VAR: stamp
 
 : builds/factor ( -- path ) builds "factor" append-path ;
 : build-dir     ( -- path ) builds stamp>   append-path ;
-
-: create-build-dir ( -- )
-  datestamp >stamp
-  build-dir make-directory ;
-  
-: enter-build-dir  ( -- ) build-dir set-current-directory ;
-
-: clone-builds-factor ( -- )
-  { "git" "clone" builds/factor } to-strings try-process ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -57,8 +52,3 @@ SYMBOL: status
   { status-vm status-boot status-test status-build status-release status }
     [ off ]
   each ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: upload-to-factorcode
-
