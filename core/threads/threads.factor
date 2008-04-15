@@ -56,13 +56,16 @@ mailbox variables sleep-entry ;
 
 PRIVATE>
 
-: <thread> ( quot name -- thread )
-    \ thread construct-empty
+: new-thread ( quot name class -- thread )
+    new
         swap >>name
         swap >>quot
         \ thread counter >>id
         <box> >>continuation
-        [ ] >>exit-handler ;
+        [ ] >>exit-handler ; inline
+
+: <thread> ( quot name -- thread )
+    \ thread new-thread ;
 
 : run-queue 42 getenv ;
 

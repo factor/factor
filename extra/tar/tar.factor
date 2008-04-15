@@ -9,7 +9,7 @@ IN: tar
 TUPLE: tar-header name mode uid gid size mtime checksum typeflag
 linkname magic version uname gname devmajor devminor prefix ;
 
-: <tar-header> ( -- obj ) tar-header construct-empty ;
+: <tar-header> ( -- obj ) tar-header new ;
 
 : tar-trim ( seq -- newseq )
     [ "\0 " member? ] trim ;
@@ -68,13 +68,13 @@ SYMBOL: filename
 : parse-tar-header ( seq -- obj )
     [ header-checksum ] keep over zero-checksum = [
         2drop
-        \ tar-header construct-empty
+        \ tar-header new
         0 over set-tar-header-size
         0 over set-tar-header-checksum
     ] [
         [ read-tar-header ] with-string-reader
         [ tar-header-checksum = [
-                \ checksum-error construct-empty throw
+                \ checksum-error new throw
             ] unless
         ] keep
     ] if ;

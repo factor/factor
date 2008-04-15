@@ -22,7 +22,7 @@ TUPLE: frame ;
 : @bottom-right 2 2 ;
 
 : <frame> ( -- frame )
-    frame construct-empty
+    frame new
     <frame-grid> <grid> over set-gadget-delegate ;
 
 : (fill-center) ( vec n -- )

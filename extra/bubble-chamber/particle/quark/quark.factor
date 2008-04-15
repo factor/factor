@@ -8,7 +8,7 @@ IN: bubble-chamber.particle.quark
 
 TUPLE: quark < particle ;
 
-: <quark> ( -- quark ) quark construct-empty initialize-particle ;
+: <quark> ( -- quark ) quark new initialize-particle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -7,7 +7,7 @@ IN: float-vectors
 <PRIVATE
 
 : float-array>vector ( float-array length -- float-vector )
-    float-vector construct-boa ; inline
+    float-vector boa ; inline
 
 PRIVATE>
 
@@ -22,7 +22,7 @@ M: float-vector like
         [ dup length float-array>vector ] [ >float-vector ] if
     ] unless ;
 
-M: float-vector new
+M: float-vector new-sequence
     drop [ 0.0 <float-array> ] keep >fixnum float-array>vector ;
 
 M: float-vector equal?

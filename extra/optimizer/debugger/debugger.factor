@@ -19,7 +19,7 @@ M: comment pprint*
     swap comment-node present-text ;
 
 : comment, ( ? node text -- )
-    rot [ \ comment construct-boa , ] [ 2drop ] if ;
+    rot [ \ comment boa , ] [ 2drop ] if ;
 
 : values% ( prefix values -- )
     swap [

@@ -11,7 +11,7 @@ IN: promises
 TUPLE: promise quot forced? value ;
 
 : promise ( quot -- promise )
-  f f \ promise construct-boa ;
+  f f \ promise boa ;
 
 : promise-with ( value quot -- promise )
   curry promise ;

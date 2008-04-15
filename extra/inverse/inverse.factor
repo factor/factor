@@ -6,7 +6,7 @@ mirrors combinators.lib ;
 IN: inverse
 
 TUPLE: fail ;
-: fail ( -- * ) \ fail construct-empty throw ;
+: fail ( -- * ) \ fail new throw ;
 M: fail summary drop "Unification failed" ;
 
 : assure ( ? -- ) [ fail ] unless ;
@@ -26,7 +26,7 @@ M: fail summary drop "Unification failed" ;
     "pop-inverse" set-word-prop ;
 
 TUPLE: no-inverse word ;
-: no-inverse ( word -- * ) \ no-inverse construct-empty throw ;
+: no-inverse ( word -- * ) \ no-inverse new throw ;
 M: no-inverse summary
     drop "The word cannot be used in pattern matching" ;
 
@@ -214,14 +214,14 @@ DEFER: _
 : boa-inverse ( class -- quot )
     [ deconstruct-pred ] keep slot-readers compose ;
 
-\ construct-boa 1 [ ?wrapped boa-inverse ] define-pop-inverse
+\ boa 1 [ ?wrapped boa-inverse ] define-pop-inverse
 
 : empty-inverse ( class -- quot )
     deconstruct-pred
     [ tuple>array 1 tail [ ] contains? [ fail ] when ]
     compose ;
 
-\ construct-empty 1 [ ?wrapped empty-inverse ] define-pop-inverse
+\ new 1 [ ?wrapped empty-inverse ] define-pop-inverse
 
 : writer>reader ( word -- word' )
     [ "writing" word-prop "slots" word-prop ] keep
@@ -255,7 +255,7 @@ DEFER: _
 MACRO: matches? ( quot -- ? ) [matches?] ;
 
 TUPLE: no-match ;
-: no-match ( -- * ) \ no-match construct-empty throw ;
+: no-match ( -- * ) \ no-match new throw ;
 M: no-match summary drop "Fall through in switch" ;
 
 : recover-chain ( seq -- quot )

@@ -19,7 +19,7 @@ sequences.private combinators ;
     ] "output-classes" set-word-prop
 ] each
 
-\ construct-empty [
+\ new [
     dup node-in-d peek node-literal
     dup class? [ drop tuple ] unless 1array f
 ] "output-classes" set-word-prop

@@ -7,7 +7,7 @@ calendar prettyprint io.streams.string splitting inspector ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
-: <rect> rect construct-boa ;
+: <rect> rect boa ;
 
 : move ( x rect -- rect )
     [ + ] change-x ;
@@ -198,8 +198,8 @@ SYMBOL: not-a-tuple-class
 ] unit-test
 
 ! Missing check
-[ not-a-tuple-class construct-boa ] must-fail
-[ not-a-tuple-class construct-empty ] must-fail
+[ not-a-tuple-class boa ] must-fail
+[ not-a-tuple-class new ] must-fail
 
 TUPLE: erg's-reshape-problem a b c d ;
 
@@ -207,8 +207,8 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 
 ! We want to make sure constructors are recompiled when
 ! tuples are reshaped
-: cons-test-1 \ erg's-reshape-problem construct-empty ;
-: cons-test-2 \ erg's-reshape-problem construct-boa ;
+: cons-test-1 \ erg's-reshape-problem new ;
+: cons-test-2 \ erg's-reshape-problem boa ;
 
 "IN: classes.tuple.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
 
@@ -538,3 +538,6 @@ TUPLE: another-forget-accessors-test ;
         ] with-string-writer empty?
     ] with-variable
 ] unit-test
+
+! Missing error check
+[ "IN: tuples.test USE: words TUPLE: wrong-superclass < word ;" eval ] must-fail

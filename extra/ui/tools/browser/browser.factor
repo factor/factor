@@ -21,7 +21,7 @@ TUPLE: browser-gadget pane history ;
     swap set-browser-gadget-history ;
 
 : <browser-gadget> ( -- gadget )
-    browser-gadget construct-empty
+    browser-gadget new
     dup init-history [
         toolbar,
         g <help-pane> g-> set-browser-gadget-pane

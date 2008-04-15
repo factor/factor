@@ -390,7 +390,7 @@ define-builtin
 
 ! Create special tombstone values
 "tombstone" "hashtables.private" create
-"tuple" "kernel" lookup
+tuple
 { } define-tuple-class
 
 "((empty))" "hashtables.private" create
@@ -403,7 +403,7 @@ define-builtin
 
 ! Some tuple classes
 "hashtable" "hashtables" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "array-capacity" "sequences.private" }
@@ -424,7 +424,7 @@ define-builtin
 } define-tuple-class
 
 "sbuf" "sbufs" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "string" "strings" }
@@ -440,7 +440,7 @@ define-builtin
 } define-tuple-class
 
 "vector" "vectors" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "array" "arrays" }
@@ -456,7 +456,7 @@ define-builtin
 } define-tuple-class
 
 "byte-vector" "byte-vectors" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "byte-array" "byte-arrays" }
@@ -472,7 +472,7 @@ define-builtin
 } define-tuple-class
 
 "bit-vector" "bit-vectors" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "bit-array" "bit-arrays" }
@@ -488,7 +488,7 @@ define-builtin
 } define-tuple-class
 
 "float-vector" "float-vectors" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "float-array" "float-arrays" }
@@ -504,7 +504,7 @@ define-builtin
 } define-tuple-class
 
 "curry" "kernel" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "object" "kernel" }
@@ -525,7 +525,7 @@ define-builtin
 [ tuple-layout [ <tuple-boa> ] curry ] tri define
 
 "compose" "kernel" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "object" "kernel" }

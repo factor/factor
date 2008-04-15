@@ -6,6 +6,8 @@ io.streams.string html peg.parsers html.elements sequences.deep
 unicode.categories ;
 IN: farkup
 
+<PRIVATE
+
 : delimiters ( -- string )
     "*_^~%[-=|\\\n" ; inline
 
@@ -143,6 +145,8 @@ MEMO: paragraph ( -- parser )
         dup [ dup string? not swap [ blank? ] all? or ] deep-all?
         [ "<p>" swap "</p>" 3array ] unless
     ] action ;
+
+PRIVATE>
 
 PEG: parse-farkup ( -- parser )
     [

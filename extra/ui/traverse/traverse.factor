@@ -9,7 +9,7 @@ TUPLE: node value children ;
 : traverse-step ( path gadget -- path' gadget' )
     >r unclip r> gadget-children ?nth ;
 
-: make-node ( quot -- ) { } make node construct-boa , ; inline
+: make-node ( quot -- ) { } make node boa , ; inline
 
 : traverse-to-path ( topath gadget -- )
     dup not [

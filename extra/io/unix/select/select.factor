@@ -14,7 +14,7 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
     little-endian? [ BIN: 11000 bitxor ] unless ; inline
 
 : <select-mx> ( -- mx )
-    select-mx construct-mx
+    select-mx new-mx
         FD_SETSIZE 8 * <bit-array> >>read-fdset
         FD_SETSIZE 8 * <bit-array> >>write-fdset ;
 

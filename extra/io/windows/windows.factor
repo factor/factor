@@ -155,7 +155,7 @@ HOOK: WSASocket-flags io-backend ( -- DWORD )
 TUPLE: win32-socket < win32-file ;
 
 : <win32-socket> ( handle -- win32-socket )
-    f win32-file construct-boa ;
+    f win32-file boa ;
 
 : open-socket ( family type -- socket )
     0 f 0 WSASocket-flags WSASocket dup socket-error ;

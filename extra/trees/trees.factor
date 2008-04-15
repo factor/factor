@@ -10,10 +10,10 @@ MIXIN: tree-mixin
 TUPLE: tree root count ;
 
 : <tree> ( -- tree )
-    f 0 tree construct-boa ;
+    f 0 tree boa ;
 
 : construct-tree ( class -- tree )
-    construct-empty <tree> over set-delegate ; inline
+    new <tree> over set-delegate ; inline
 
 INSTANCE: tree tree-mixin
 
@@ -21,7 +21,7 @@ INSTANCE: tree-mixin assoc
 
 TUPLE: node key value left right ;
 : <node> ( key value -- node )
-    f f node construct-boa ;
+    f f node boa ;
 
 SYMBOL: current-side
 

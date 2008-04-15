@@ -19,7 +19,7 @@ TUPLE: roman-range-error n ;
     dup 1 3999 between? [
         drop
     ] [
-        roman-range-error construct-boa throw
+        roman-range-error boa throw
     ] if ;
 
 : roman<= ( ch1 ch2 -- ? )

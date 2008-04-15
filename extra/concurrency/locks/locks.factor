@@ -8,10 +8,10 @@ IN: concurrency.locks
 TUPLE: lock threads owner reentrant? ;
 
 : <lock> ( -- lock )
-    <dlist> f f lock construct-boa ;
+    <dlist> f f lock boa ;
 
 : <reentrant-lock> ( -- lock )
-    <dlist> f t lock construct-boa ;
+    <dlist> f t lock boa ;
 
 <PRIVATE
 
@@ -51,7 +51,7 @@ PRIVATE>
 TUPLE: rw-lock readers writers reader# writer ;
 
 : <rw-lock> ( -- lock )
-    <dlist> <dlist> 0 f rw-lock construct-boa ;
+    <dlist> <dlist> 0 f rw-lock boa ;
 
 <PRIVATE
 

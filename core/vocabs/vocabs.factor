@@ -88,7 +88,7 @@ SYMBOL: load-vocab-hook ! ( name -- )
 TUPLE: vocab-link name ;
 
 : <vocab-link> ( name -- vocab-link )
-    vocab-link construct-boa ;
+    vocab-link boa ;
 
 M: vocab-link hashcode*
     vocab-link-name hashcode* ;

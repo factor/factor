@@ -21,7 +21,7 @@ SYMBOL: alarm-thread
     pick callable? [ "Not a quotation" throw ] unless ; inline
 
 : <alarm> ( quot time frequency -- alarm )
-    check-alarm <box> alarm construct-boa ;
+    check-alarm <box> alarm boa ;
 
 : register-alarm ( alarm -- )
     dup dup alarm-time alarms get-global heap-push*

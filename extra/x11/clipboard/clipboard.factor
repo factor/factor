@@ -15,7 +15,7 @@ IN: x11.clipboard
 TUPLE: x-clipboard atom contents ;
 
 : <x-clipboard> ( atom -- clipboard )
-    "" x-clipboard construct-boa ;
+    "" x-clipboard boa ;
 
 : selection-property ( -- n )
     "org.factorcode.Factor.SELECTION" x-atom ;

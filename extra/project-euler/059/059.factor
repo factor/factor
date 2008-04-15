@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs hashtables io.encodings.ascii io.files kernel math
     math.parser namespaces sequences sequences.lib sequences.private sorting
-    splitting strings ;
+    splitting strings sets ;
 IN: project-euler.059
 
 ! http://projecteuler.net/index.php?section=problems&id=59

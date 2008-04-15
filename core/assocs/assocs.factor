@@ -109,17 +109,17 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
         >r over r> hashcode* 2/ >r dupd hashcode* r> bitxor
     ] { } assoc>map hashcode* ;
 
-: intersect ( assoc1 assoc2 -- intersection )
+: assoc-intersect ( assoc1 assoc2 -- intersection )
     swap [ nip key? ] curry assoc-subset ;
 
 : update ( assoc1 assoc2 -- )
     swap [ swapd set-at ] curry assoc-each ;
 
-: union ( assoc1 assoc2 -- union )
+: assoc-union ( assoc1 assoc2 -- union )
     2dup [ assoc-size ] bi@ + pick new-assoc
     [ rot update ] keep [ swap update ] keep ;
 
-: diff ( assoc1 assoc2 -- diff )
+: assoc-diff ( assoc1 assoc2 -- diff )
     swap [ nip key? not ] curry assoc-subset ;
 
 : remove-all ( assoc seq -- subseq )

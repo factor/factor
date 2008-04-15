@@ -58,7 +58,7 @@ TUPLE: mersenne-twister seq i ;
 PRIVATE>
 
 : <mersenne-twister> ( seed -- obj )
-    init-mt-seq 0 mersenne-twister construct-boa
+    init-mt-seq 0 mersenne-twister boa
     dup mt-generate ;
 
 M: mersenne-twister seed-random ( mt seed -- )

@@ -21,7 +21,7 @@ TUPLE: file-responder root hook special ;
     304 "Not modified" <trivial-response> ;
 
 : <file-responder> ( root hook -- responder )
-    H{ } clone file-responder construct-boa ;
+    H{ } clone file-responder boa ;
 
 : <static> ( root -- responder )
     [
