@@ -12,16 +12,15 @@ TUPLE: blum-blum-shub x n ;
 : generate-bbs-primes ( numbits -- p q )
     [ [ random-prime ] curry [ 4 mod 3 = ] generate ] dup bi ;
 
+: next-bbs-bit ( bbs -- bit )
+    [ [ x>> 2 ] [ n>> ] bi ^mod dup ] keep (>>x) 1 bitand ;
+
+PRIVATE>
+
 : <blum-blum-shub> ( numbits -- blum-blum-shub )
     generate-bbs-primes *
     [ find-relative-prime ] keep
     blum-blum-shub boa ;
-
-: next-bbs-bit ( bbs -- bit )
-    [ [ x>> 2 ] [ n>> ] bi ^mod ] keep
-    over >>x drop 1 bitand ;
-
-PRIVATE>
 
 M: blum-blum-shub random-32* ( bbs -- r )
     0 32 rot
