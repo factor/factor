@@ -183,8 +183,7 @@ TUPLE: bunny-outlined
     dup bunny-outlined-gadget rect-dim
     over bunny-outlined-framebuffer-dim
     over =
-    [ 2drop ]
-    [
+    [ 2drop ] [
         swap dup dispose-framebuffer >r
         dup GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
         swap dup GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
@@ -228,12 +227,11 @@ TUPLE: bunny-outlined
     } [ { -1.0 -1.0 } { 1.0 1.0 } rect-vertices ] with-gl-program ;
 
 M: bunny-outlined draw-bunny
-    dup remake-framebuffer-if-needed
-    [ (pass1) ] keep (pass2) ;
+    [ remake-framebuffer-if-needed ]
+    [ (pass1) ]
+    [ (pass2) ] tri ;
 
 M: bunny-outlined dispose
-    {
-        [ bunny-outlined-pass1-program [ delete-gl-program ] when* ]
-        [ bunny-outlined-pass2-program [ delete-gl-program ] when* ]
-        [ dispose-framebuffer ]
-    } cleave ;
+    [ bunny-outlined-pass1-program [ delete-gl-program ] when* ]
+    [ bunny-outlined-pass2-program [ delete-gl-program ] when* ]
+    [ dispose-framebuffer ] tri
