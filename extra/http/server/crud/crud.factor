@@ -15,10 +15,7 @@ IN: http.server.crud
 
         [ "id" get ctor call select-tuple from-tuple ] >>init
 
-        [
-            "text/html" <content>
-            [ form view-form ] >>body
-        ] >>display ;
+        [ form view-form ] >>display ;
 
 : <id-redirect> ( id next -- response )
     swap number>string "id" associate <permanent-redirect> ;
@@ -36,10 +33,7 @@ IN: http.server.crud
             if
         ] >>init
 
-        [
-            "text/html" <content>
-            [ form edit-form ] >>body
-        ] >>display
+        [ form edit-form ] >>display
 
         [
             f ctor call from-tuple
@@ -65,12 +59,9 @@ IN: http.server.crud
 :: <list-action> ( form ctor -- action )
     <action>
         [
-            "text/html" <content>
-            [
-                blank-values
+            blank-values
 
-                f ctor call select-tuples "list" set-value
+            f ctor call select-tuples "list" set-value
 
-                form view-form
-            ] >>body
+            form view-form
         ] >>display ;

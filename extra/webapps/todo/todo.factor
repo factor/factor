@@ -53,7 +53,7 @@ todo "TODO"
 : <todo-list-form> ( -- form )
     "todo-list" <form>
         "todo-list" todo-template >>view-template
-        "list" <todo-form> <list>
+        "list" <todo-form> +plain+ <list>
         add-field ;
 
 TUPLE: todo-responder < dispatcher ;
