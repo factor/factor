@@ -27,23 +27,23 @@ DEFER: sql%
 : sql-array% ( array -- )
     unclip
     {
-        { columns [ "," (sql-interleave) ] }
-        { from [ "from" "," sql-interleave ] }
-        { where [ "where" "and" sql-interleave ] }
-        { group-by [ "group by" "," sql-interleave ] }
-        { having [ "having" "," sql-interleave ] }
-        { order-by [ "order by" "," sql-interleave ] }
-        { offset [ "offset" sql% sql% ] }
-        { limit [ "limit" sql% sql% ] }
-        { select [ "(select" sql% sql% ")" sql% ] }
-        { table [ sql% ] }
-        { set [ "set" "," sql-interleave ] }
-        { values [ "values(" sql% "," (sql-interleave) ")" sql% ] }
-        { count [ "count" sql-function, ] }
-        { sum [ "sum" sql-function, ] }
-        { avg [ "avg" sql-function, ] }
-        { min [ "min" sql-function, ] }
-        { max [ "max" sql-function, ] }
+        { \ columns [ "," (sql-interleave) ] }
+        { \ from [ "from" "," sql-interleave ] }
+        { \ where [ "where" "and" sql-interleave ] }
+        { \ group-by [ "group by" "," sql-interleave ] }
+        { \ having [ "having" "," sql-interleave ] }
+        { \ order-by [ "order by" "," sql-interleave ] }
+        { \ offset [ "offset" sql% sql% ] }
+        { \ limit [ "limit" sql% sql% ] }
+        { \ select [ "(select" sql% sql% ")" sql% ] }
+        { \ table [ sql% ] }
+        { \ set [ "set" "," sql-interleave ] }
+        { \ values [ break "values(" sql% "," (sql-interleave) ")" sql% ] }
+        { \ count [ "count" sql-function, ] }
+        { \ sum [ "sum" sql-function, ] }
+        { \ avg [ "avg" sql-function, ] }
+        { \ min [ "min" sql-function, ] }
+        { \ max [ "max" sql-function, ] }
         [ sql% [ sql% ] each ]
     } case ;
 

@@ -28,7 +28,7 @@ TUPLE: person name age ;
                     { select
                         { columns "salary" }
                         { from "staff" }
-                        { where { "branchno" "b003" } }
+                        { where { "branchno" = "b003" } }
                     }
                 }
                 { "branchno" > 3 } }
