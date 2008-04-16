@@ -138,24 +138,26 @@ M: interactor stream-read-partial
         drop parse-lines-interactive
     ] [
         2nip
-        dup delegate unexpected-eof? [ drop f ] when
+        dup parse-error? [
+            dup error>> unexpected-eof? [ drop f ] when
+        ] when
     ] recover ;
 
 : handle-interactive ( lines interactor -- quot/f ? )
     tuck try-parse {
         { [ dup quotation? ] [ nip t ] }
         { [ dup not ] [ drop "\n" swap user-input f f ] }
-        { [ t ] [ handle-parse-error f f ] }
+        [ handle-parse-error f f ]
     } cond ;
 
 M: interactor stream-read-quot
     [ interactor-yield ] keep {
         { [ over not ] [ drop ] }
         { [ over callable? ] [ drop ] }
-        { [ t ] [
+        [
             [ handle-interactive ] keep swap
             [ interactor-finish ] [ nip stream-read-quot ] if
-        ] }
+        ]
     } cond ;
 
 M: interactor pref-dim*

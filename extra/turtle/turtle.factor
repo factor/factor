@@ -8,7 +8,7 @@ IN: turtle
 TUPLE: turtle ;
 
 : <turtle> ( -- turtle )
-turtle construct-empty
+turtle new
 { 0 0 0 } clone <pos>
 3 identity-matrix <ori>
 rot

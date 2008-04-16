@@ -3,7 +3,7 @@ continuations destructors io io.backend io.nonblocking
 io.windows libc kernel math namespaces sequences
 threads classes.tuple.lib windows windows.errors
 windows.kernel32 strings splitting io.files qualified ascii
-combinators.lib system ;
+combinators.lib system accessors ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
 
@@ -38,15 +38,15 @@ M: winnt add-completion ( handle -- )
     zero? [
         GetLastError {
             { [ dup expected-io-error? ] [ 2drop t ] }
-            { [ dup eof? ] [ drop t swap set-port-eof? f ] }
-            { [ t ] [ (win32-error-string) throw ] }
+            { [ dup eof? ] [ drop t >>eof drop f ] }
+            [ (win32-error-string) throw ]
         } cond
     ] [
         drop t
     ] if ;
 
 : get-overlapped-result ( overlapped port -- bytes-transferred )
-    dup port-handle win32-file-handle rot 0 <uint>
+    dup handle>> handle>> rot 0 <uint>
     [ 0 GetOverlappedResult overlapped-error? drop ] keep *uint ;
 
 : save-callback ( overlapped port -- )
@@ -75,11 +75,11 @@ M: winnt add-completion ( handle -- )
         ] [
             dup eof? [
                 drop lookup-callback
-                dup io-callback-port t swap set-port-eof?
+                dup port>> t >>eof drop
             ] [
                 (win32-error-string) swap lookup-callback
-                [ io-callback-port set-port-error ] keep
-            ] if io-callback-thread resume f
+                [ port>> set-port-error ] keep
+            ] if thread>> resume f
         ] if
     ] [
         lookup-callback
@@ -90,7 +90,7 @@ M: winnt add-completion ( handle -- )
     handle-overlapped [ 0 drain-overlapped ] unless ;
 
 M: winnt cancel-io
-    port-handle win32-file-handle CancelIo drop ;
+    handle>> handle>> CancelIo drop ;
 
 M: winnt io-multiplex ( ms -- )
     drain-overlapped ;

@@ -8,7 +8,7 @@ TUPLE: model < identity-tuple
 value connections dependencies ref locked? ;
 
 : <model> ( value -- model )
-    V{ } clone V{ } clone 0 f model construct-boa ;
+    V{ } clone V{ } clone 0 f model boa ;
 
 M: model hashcode* drop model hashcode* ;
 

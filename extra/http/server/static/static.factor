@@ -10,7 +10,7 @@ IN: http.server.static
 TUPLE: file-responder root hook special ;
 
 : file-http-date ( filename -- string )
-    file-info file-info-modified timestamp>http-string ;
+    file-info modified>> timestamp>http-string ;
 
 : last-modified-matches? ( filename -- ? )
     file-http-date dup [
@@ -21,13 +21,13 @@ TUPLE: file-responder root hook special ;
     304 "Not modified" <trivial-response> ;
 
 : <file-responder> ( root hook -- responder )
-    H{ } clone file-responder construct-boa ;
+    H{ } clone file-responder boa ;
 
 : <static> ( root -- responder )
     [
         <content>
         swap
-        [ file-info file-info-size "content-length" set-header ]
+        [ file-info size>> "content-length" set-header ]
         [ file-http-date "last-modified" set-header ]
         [ '[ , binary <file-reader> stdio get stream-copy ] >>body ]
         tri

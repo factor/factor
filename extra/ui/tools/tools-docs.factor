@@ -2,8 +2,9 @@ USING: editors help.markup help.syntax inspector io listener
 parser prettyprint tools.profiler tools.walker ui.commands
 ui.gadgets.editors ui.gadgets.panes ui.gadgets.presentations
 ui.gadgets.slots ui.operations ui.tools.browser
-ui.tools.interactor ui.tools.listener ui.tools.operations
-ui.tools.profiler ui.tools.walker ui.tools.workspace vocabs ;
+ui.tools.interactor ui.tools.inspector ui.tools.listener
+ui.tools.operations ui.tools.profiler ui.tools.walker
+ui.tools.workspace vocabs ;
 IN: ui.tools
 
 ARTICLE: "ui-presentations" "Presentations in the UI"
@@ -46,12 +47,14 @@ $nl
 $nl
 "The slot editor has a toolbar containing various commands."
 { $command-map slot-editor "toolbar" }
+{ $command-map inspector-gadget "multi-touch" }
 "The following commands are also available."
 { $command-map source-editor "word" } ;
 
 ARTICLE: "ui-browser" "UI browser"
 "The browser is used to display Factor code, documentation, and vocabularies."
 { $command-map browser-gadget "toolbar" }
+{ $command-map browser-gadget "multi-touch" }
 "Browsers are instances of " { $link browser-gadget } "." ;
 
 ARTICLE: "ui-profiler" "UI profiler" 
@@ -110,6 +113,7 @@ ARTICLE: "ui-workspace-keys" "UI keyboard shortcuts"
 { $command-map workspace "tool-switching" }
 { $command-map workspace "scrolling" }
 { $command-map workspace "workflow" }
+{ $command-map workspace "multi-touch" }
 { $heading "Implementation" }
 "Workspaces are instances of " { $link workspace } "." ;
 

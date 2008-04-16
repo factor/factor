@@ -160,7 +160,7 @@ PREDICATE: kernel-error < array
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }
-        { [ t ] [ second 0 15 between? ] }
+        [ second 0 15 between? ]
     } cond ;
 
 : kernel-errors
@@ -215,7 +215,10 @@ M: check-method summary
     drop "Invalid parameters for create-method" ;
 
 M: no-tuple-class summary
-    drop "Invalid class for define-constructor" ;
+    drop "BOA constructors can only be defined for tuple classes" ;
+
+M: bad-superclass summary
+    drop "Tuple classes can only inherit from other tuple classes" ;
 
 M: no-cond summary
     drop "Fall-through in cond" ;

@@ -1,6 +1,6 @@
 USING: arrays io kernel math namespaces splitting prettyprint
 sequences sorting vectors words inverse inspector shuffle
-math.functions ;
+math.functions sets ;
 IN: units
 
 TUPLE: dimensioned value top bot ;
@@ -8,7 +8,7 @@ TUPLE: dimensioned value top bot ;
 TUPLE: dimensions-not-equal ;
 
 : dimensions-not-equal ( -- * )
-    \ dimensions-not-equal construct-empty throw ;
+    \ dimensions-not-equal new throw ;
 
 M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
@@ -19,13 +19,13 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
     [ remove-one ] curry bi@ ;
 
 : symbolic-reduce ( seq seq -- seq seq )
-    2dup seq-intersect dup empty?
+    2dup intersect dup empty?
     [ drop ] [ first 2remove-one symbolic-reduce ] if ;
 
 : <dimensioned> ( n top bot -- obj )
     symbolic-reduce
     [ natural-sort ] bi@
-    dimensioned construct-boa ;
+    dimensioned boa ;
 
 : >dimensioned< ( d -- n top bot )
     { dimensioned-value dimensioned-top dimensioned-bot }

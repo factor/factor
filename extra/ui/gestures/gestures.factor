@@ -3,7 +3,7 @@
 USING: arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
 math.vectors classes.tuple classes ui.gadgets boxes
-calendar alarms symbols combinators ;
+calendar alarms symbols combinators sets ;
 IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
@@ -39,11 +39,19 @@ TUPLE: lose-focus ;         C: <lose-focus> lose-focus
 TUPLE: gain-focus ;         C: <gain-focus> gain-focus
 
 ! Higher-level actions
-TUPLE: cut-action ;        C: <cut-action> cut-action
-TUPLE: copy-action ;       C: <copy-action> copy-action
-TUPLE: paste-action ;      C: <paste-action> paste-action
-TUPLE: delete-action ;     C: <delete-action> delete-action
-TUPLE: select-all-action ; C: <select-all-action> select-all-action
+TUPLE: cut-action ;         C: <cut-action> cut-action
+TUPLE: copy-action ;        C: <copy-action> copy-action
+TUPLE: paste-action ;       C: <paste-action> paste-action
+TUPLE: delete-action ;      C: <delete-action> delete-action
+TUPLE: select-all-action ;  C: <select-all-action> select-all-action
+
+TUPLE: left-action ;        C: <left-action> left-action
+TUPLE: right-action ;       C: <right-action> right-action
+TUPLE: up-action ;          C: <up-action> up-action
+TUPLE: down-action ;        C: <down-action> down-action
+
+TUPLE: zoom-in-action ;  C: <zoom-in-action> zoom-in-action
+TUPLE: zoom-out-action ; C: <zoom-out-action> zoom-out-action
 
 : generalize-gesture ( gesture -- newgesture )
     tuple>array 1 head* >tuple ;
@@ -54,7 +62,7 @@ SYMBOLS: C+ A+ M+ S+ ;
 TUPLE: key-down mods sym ;
 
 : <key-gesture> ( mods sym action? class -- mods' sym' )
-    >r [ S+ rot remove swap ] unless r> construct-boa ; inline
+    >r [ S+ rot remove swap ] unless r> boa ; inline
 
 : <key-down> ( mods sym action? -- key-down )
     key-down <key-gesture> ;
@@ -191,7 +199,7 @@ SYMBOL: drag-timer
         { [ multi-click-button?   not ] [ f ] }
         { [ multi-click-position? not ] [ f ] }
         { [ multi-click-position? not ] [ f ] }
-        { [ t ] [ t ] }
+        [ t ]
     } cond nip ;
 
 : update-click# ( button -- )
@@ -272,5 +280,17 @@ M: button-down gesture>string
         "Press Button" %
         button-down-# [ " " % # ] when*
     ] "" make ;
+
+M: left-action gesture>string drop "Swipe left" ;
+
+M: right-action gesture>string drop "Swipe right" ;
+
+M: up-action gesture>string drop "Swipe up" ;
+
+M: down-action gesture>string drop "Swipe down" ;
+
+M: zoom-in-action gesture>string drop "Zoom in" ;
+
+M: zoom-out-action gesture>string drop "Zoom out (pinch)" ;
 
 M: object gesture>string drop f ;

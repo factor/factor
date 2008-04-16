@@ -20,11 +20,11 @@ GENERIC: heap-size ( heap -- n )
 TUPLE: heap data ;
 
 : <heap> ( class -- heap )
-    >r V{ } clone r> construct-boa ; inline
+    >r V{ } clone r> boa ; inline
 
 TUPLE: entry value key heap index ;
 
-: <entry> ( value key heap -- entry ) f entry construct-boa ;
+: <entry> ( value key heap -- entry ) f entry boa ;
 
 PRIVATE>
 

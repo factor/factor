@@ -119,7 +119,7 @@ scroller H{
         { [ dup t eq? ] [ drop (scroll>bottom) ] }
         { [ dup rect? ] [ swap (scroll>rect) ] }
         { [ dup ] [ swap (scroll>gadget) ] }
-        { [ t ] [ drop dup scroller-value swap scroll ] }
+        [ drop dup scroller-value swap scroll ]
     } cond ;
 
 M: scroller layout*

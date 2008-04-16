@@ -90,7 +90,11 @@ ABOUT: "continuations"
 
 HELP: dispose
 { $values { "object" "a disposable object" } }
-{ $contract "Releases operating system resources associated with a disposable object. No further operations can be performed on a disposable object after this call. Disposable objects include streams, memory mapped files, and so on." }
+{ $contract "Releases operating system resources associated with a disposable object. Disposable objects include streams, memory mapped files, and so on."
+$nl
+"No further operations can be performed on a disposable object after this call."
+$nl
+"Disposing an object which has already been disposed should have no effect, and in particular it should not fail with an error." }
 { $notes "You must close disposable objects after you are finished working with them, to avoid leaking operating system resources. A convenient way to automate this is by using the " { $link with-disposal } " word." } ;
 
 HELP: with-disposal

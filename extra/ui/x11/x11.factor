@@ -133,7 +133,7 @@ M: world selection-notify-event
     {
         { [ dup XA_PRIMARY = ] [ drop selection get ] }
         { [ dup XA_CLIPBOARD = ] [ drop clipboard get ] }
-        { [ t ] [ drop <clipboard> ] }
+        [ drop <clipboard> ]
     } cond ;
 
 : encode-clipboard ( string type -- bytes )
@@ -156,7 +156,7 @@ M: world selection-request-event
         { [ dup supported-type? ] [ drop dup set-selection-prop send-notify-success ] }
         { [ dup "TARGETS" x-atom = ] [ drop dup set-targets-prop send-notify-success ] }
         { [ dup "TIMESTAMP" x-atom = ] [ drop dup set-timestamp-prop send-notify-success ] }
-        { [ t ] [ drop send-notify-failure ] }
+        [ drop send-notify-failure ]
     } cond ;
 
 M: x11-ui-backend (close-window) ( handle -- )

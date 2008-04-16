@@ -14,7 +14,7 @@ TUPLE: directory-iterator path bfs queue ;
     ] curry each ;
 
 : <directory-iterator> ( path bfs? -- iterator )
-    <dlist> directory-iterator construct-boa
+    <dlist> directory-iterator boa
     dup path>> over push-directory ;
 
 : next-file ( iter -- file/f )

@@ -90,7 +90,7 @@ M: inet6 parse-sockaddr
         { [ dup AF_INET = ] [ T{ inet4 } ] }
         { [ dup AF_INET6 = ] [ T{ inet6 } ] }
         { [ dup AF_UNIX = ] [ T{ local } ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond nip ;
 
 M: f parse-sockaddr nip ;

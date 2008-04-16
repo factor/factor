@@ -10,17 +10,17 @@ TUPLE: png-gadget png ;
 
 ERROR: cairo-error string ;
 
-: check-zero
+: check-zero ( n -- n )
     dup zero? [
         "PNG dimension is 0" cairo-error
     ] when ;
 
 : cairo-png-error ( n -- )
     {
-        { [ dup CAIRO_STATUS_NO_MEMORY = ] [ "Cairo: no memory" cairo-error ] }
-        { [ dup CAIRO_STATUS_FILE_NOT_FOUND = ] [ "Cairo: file not found" cairo-error ] }
-        { [ dup CAIRO_STATUS_READ_ERROR = ] [ "Cairo: read error" cairo-error ] }
-        { [ t ] [ drop ] }
+        { CAIRO_STATUS_NO_MEMORY [ "Cairo: no memory" cairo-error ] }
+        { CAIRO_STATUS_FILE_NOT_FOUND [ "Cairo: file not found" cairo-error ] }
+        { CAIRO_STATUS_READ_ERROR [ "Cairo: read error" cairo-error ] }
+        [ drop ]
     } cond ;
 
 : <png> ( path -- png )
@@ -29,7 +29,7 @@ ERROR: cairo-error string ;
     dup cairo_surface_status cairo-png-error
     dup [ cairo_image_surface_get_width check-zero ]
     [ cairo_image_surface_get_height check-zero ] [ ] tri
-    cairo-surface>array png construct-boa ;
+    cairo-surface>array png boa ;
 
 : write-png ( png path -- )
     >r png-surface r>

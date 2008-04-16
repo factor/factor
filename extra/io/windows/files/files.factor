@@ -48,7 +48,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
         [ WIN32_FIND_DATA-ftLastWriteTime FILETIME>timestamp ]
         ! [ WIN32_FIND_DATA-ftLastAccessTime FILETIME>timestamp ]
     } cleave
-    \ file-info construct-boa ;
+    \ file-info boa ;
 
 : find-first-file-stat ( path -- WIN32_FIND_DATA )
     "WIN32_FIND_DATA" <c-object> [
@@ -69,7 +69,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
         [ BY_HANDLE_FILE_INFORMATION-ftLastWriteTime FILETIME>timestamp ]
         ! [ BY_HANDLE_FILE_INFORMATION-ftLastAccessTime FILETIME>timestamp ]
     } cleave
-    \ file-info construct-boa ;
+    \ file-info boa ;
 
 : get-file-information ( handle -- BY_HANDLE_FILE_INFORMATION )
     [

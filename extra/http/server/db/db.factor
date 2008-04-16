@@ -9,8 +9,8 @@ TUPLE: db-persistence responder db params ;
 C: <db-persistence> db-persistence
 
 : connect-db ( db-persistence -- )
-    [ db>> ] [ params>> ] bi make-db
-    [ db set ] [ db-open ] [ add-always-destructor ] tri ;
+    [ db>> ] [ params>> ] bi make-db db-open
+    [ db set ] [ add-always-destructor ] bi ;
 
 M: db-persistence call-responder
     [ connect-db ] [ responder>> call-responder ] bi ;

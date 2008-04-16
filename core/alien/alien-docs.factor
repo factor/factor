@@ -78,7 +78,7 @@ $nl
     "<< \"freetype\" {"
     "    { [ os macosx? ] [ \"libfreetype.6.dylib\" \"cdecl\" add-library ] }"
     "    { [ os windows? ] [ \"freetype6.dll\" \"cdecl\" add-library ] }"
-    "    { [ t ] [ drop ] }"
+    "    [ drop ]"
     "} cond >>"
 }
 "Note the parse time evaluation with " { $link POSTPONE: << } "." } ;

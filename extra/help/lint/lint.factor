@@ -5,7 +5,7 @@ words strings classes tools.vocabs namespaces io
 io.streams.string prettyprint definitions arrays vectors
 combinators splitting debugger hashtables sorting effects vocabs
 vocabs.loader assocs editors continuations classes.predicate
-macros combinators.lib sequences.lib math ;
+macros combinators.lib sequences.lib math sets ;
 IN: help.lint
 
 : check-example ( element -- )

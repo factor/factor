@@ -1,87 +1,130 @@
 ! Copyright (C) 2007 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays calendar io io.sockets kernel match namespaces
-sequences splitting strings continuations threads ascii
-io.encodings.utf8 ;
+USING: arrays calendar combinators channels concurrency.messaging fry io
+       io.encodings.8-bit io.sockets kernel math namespaces sequences
+       sequences.lib splitting strings threads
+       continuations classes.tuple ascii accessors ;
 IN: irc
 
-! "setup" objects
-TUPLE: profile server port nickname password default-channels ;
-C: <profile> profile
+! utils
+: split-at-first ( seq separators -- before after )
+    dupd '[ , member? ] find
+        [ cut 1 tail ]
+        [ swap ]
+    if ;
 
-TUPLE: channel-profile name password auto-rejoin ;
-C: <channel-profile> channel-profile
+: spawn-server-linked ( quot name -- thread )
+    >r '[ , [ ] [ ] while ] r>
+    spawn-linked ;
+! ---
+
+! Default irc port
+: irc-port 6667 ;
+
+! Message used when the client isn't running anymore
+SINGLETON: irc-end
+
+! "setup" objects
+TUPLE: irc-profile server port nickname password default-channels  ;
+C: <irc-profile> irc-profile
+
+TUPLE: irc-channel-profile name password auto-rejoin ;
+C: <irc-channel-profile> irc-channel-profile
 
 ! "live" objects
-TUPLE: irc-client profile nick stream stream-process controller-process ;
-C: <irc-client> irc-client
-
 TUPLE: nick name channels log ;
 C: <nick> nick
 
-TUPLE: channel name topic members log attributes ;
-C: <channel> channel
+TUPLE: irc-client profile nick stream stream-channel controller-channel
+       listeners is-running ;
+: <irc-client> ( profile -- irc-client )
+    f V{ } clone V{ } clone <nick>
+    f <channel> <channel> V{ } clone f irc-client boa ;
+
+USE: prettyprint
+TUPLE: irc-listener channel ;
+! FIXME: spawn-server-linked con manejo de excepciones, mandar un mensaje final (ya se maneja esto al recibir mensajes del channel? )
+! tener la opción de dejar de correr un client??
+: <irc-listener> ( quot -- irc-listener )
+    <channel> irc-listener boa swap
+    [
+        [ channel>> '[ , from ] ]
+        [ '[ , curry f spawn drop ] ]
+        bi* compose "irc-listener" spawn-server-linked drop
+    ] [ drop ] 2bi ;
+
+! TUPLE: irc-channel name topic members log attributes ;
+! C: <irc-channel> irc-channel
 
 ! the delegate of all irc messages
-TUPLE: irc-message timestamp ;
+TUPLE: irc-message line prefix command parameters trailing timestamp ;
 C: <irc-message> irc-message
 
 ! "irc message" objects
-TUPLE: logged-in name text ;
+TUPLE: logged-in < irc-message name ;
 C: <logged-in> logged-in
 
-TUPLE: ping name ;
+TUPLE: ping < irc-message ;
 C: <ping> ping
 
-TUPLE: join name channel ;
-C: <join> join
+TUPLE: join_ < irc-message ;
+C: <join> join_
 
-TUPLE: part name channel text ;
+TUPLE: part < irc-message name channel ;
 C: <part> part
 
-TUPLE: quit text ;
+TUPLE: quit ;
 C: <quit> quit
 
-TUPLE: privmsg name text ;
+TUPLE: privmsg < irc-message name ;
 C: <privmsg> privmsg
 
-TUPLE: kick channel er ee text ;
+TUPLE: kick < irc-message channel who ;
 C: <kick> kick
 
-TUPLE: roomlist channel names ;
+TUPLE: roomlist < irc-message channel names ;
 C: <roomlist> roomlist
 
-TUPLE: nick-in-use name ;
+TUPLE: nick-in-use < irc-message name ;
 C: <nick-in-use> nick-in-use
 
-TUPLE: notice type text ;
+TUPLE: notice < irc-message type ;
 C: <notice> notice
 
-TUPLE: mode name channel mode text ;
+TUPLE: mode < irc-message name channel mode ;
 C: <mode> mode
-! TUPLE: members
 
-TUPLE: unhandled text ;
+TUPLE: unhandled < irc-message ;
 C: <unhandled> unhandled
 
-! "control message" objects
-TUPLE: command sender ;
-TUPLE: service predicate quot enabled? ;
-TUPLE: chat-command from to text ;
-TUPLE: join-command channel password ;
-TUPLE: part-command channel text ;
-
 SYMBOL: irc-client
-: irc-stream> ( -- stream ) irc-client get irc-client-stream ;
-: trim-: ( seq -- seq ) [ CHAR: : = ] left-trim ;
+: irc-client> ( -- irc-client ) irc-client get ;
+: irc-stream> ( -- stream ) irc-client> stream>> ;
+
+: remove-heading-: ( seq -- seq ) dup ":" head? [ 1 tail ] when ;
+
 : parse-name ( string -- string )
-    trim-: "!" split first ;
-: irc-split ( string -- seq )
-    1 swap [ [ CHAR: : = ] find* ] keep
-    swap [ swap cut trim-: ] [ nip f ] if >r [ blank? ] trim trim-:
-    " " split r> [ 1array append ] when* ;
+    remove-heading-: "!" split-at-first drop ;
+
+: sender>> ( obj -- string )
+    prefix>> parse-name ;
+
+: split-prefix ( string -- string/f string )
+    dup ":" head?
+        [ remove-heading-: " " split1 ]
+        [ f swap ]
+    if ;
+
+: split-trailing ( string -- string string/f )
+    ":" split1 ;
+
+: string>irc-message ( string -- object )
+    dup split-prefix split-trailing
+    [ [ blank? ] trim " " split unclip swap ] dip
+    now <irc-message> ;
+
 : me? ( name -- ? )
-    irc-client get irc-client-nick nick-name = ;
+    irc-client> nick>> name>> = ;
 
 : irc-write ( s -- )
     irc-stream> stream-write ;
@@ -89,123 +132,155 @@ SYMBOL: irc-client
 : irc-print ( s -- )
     irc-stream> [ stream-print ] keep stream-flush ;
 
-: nick ( nick -- )
+! Irc commands    
+
+: NICK ( nick -- )
     "NICK " irc-write irc-print ;
 
-: login ( nick -- )
-    dup nick
+: LOGIN ( nick -- )
+    dup NICK
     "USER " irc-write irc-write
     " hostname servername :irc.factor" irc-print ;
 
-: connect* ( server port -- )
-    <inet> utf8 <client> irc-client get set-irc-client-stream ;
+: CONNECT ( server port -- stream )
+    <inet> latin1 <client> ;
 
-: connect ( server -- ) 6667 connect* ;
-
-: join ( channel password -- )
+: JOIN ( channel password -- )
     "JOIN " irc-write
-    [ >r " :" r> 3append ] when* irc-print ;
+    [ " :" swap 3append ] when* irc-print ;
 
-: part ( channel text -- )
-    >r "PART " irc-write irc-write r>
+: PART ( channel text -- )
+    [ "PART " irc-write irc-write ] dip
     " :" irc-write irc-print ;
 
-: say ( line nick -- )
-    "PRIVMSG " irc-write irc-write " :" irc-write irc-print ;
+: KICK ( channel who -- )
+    [ "KICK " irc-write irc-write ] dip
+    " " irc-write irc-print ;
+    
+: PRIVMSG ( nick line -- )
+    [ "PRIVMSG " irc-write irc-write ] dip
+    " :" irc-write irc-print ;
 
-: quit ( text -- )
+: SAY ( nick line -- )
+    PRIVMSG ;
+
+: ACTION ( nick line -- )
+    [ 1 , "ACTION " % % 1 , ] "" make PRIVMSG ;
+
+: QUIT ( text -- )
     "QUIT :" irc-write irc-print ;
 
+: join-channel ( channel-profile -- )
+    [ name>> ] keep password>> JOIN ;
 
+: irc-connect ( irc-client -- )
+    [ profile>> [ server>> ] keep port>> CONNECT ] keep
+    swap >>stream t >>is-running drop ;
+    
 GENERIC: handle-irc ( obj -- )
 
 M: object handle-irc ( obj -- )
-    "Unhandled irc object" print drop ;
+    drop ;
 
 M: logged-in handle-irc ( obj -- )
-    logged-in-name irc-client get [ irc-client-nick set-nick-name ] keep
-    
-    irc-client-profile profile-default-channels
-    [
-        [ channel-profile-name ] keep
-        channel-profile-password join
-    ] each ;
+    name>>
+    irc-client> [ nick>> swap >>name drop ] keep 
+    profile>> default-channels>> [ join-channel ] each ;
 
 M: ping handle-irc ( obj -- )
     "PONG " irc-write
-    ping-name irc-print ;
+    trailing>> irc-print ;
 
 M: nick-in-use handle-irc ( obj -- )
-    nick-in-use-name "_" append nick ;
+    name>> "_" append NICK ;
 
-: delegate-timestamp ( obj -- obj )
-    now <irc-message> over set-delegate ;
+: parse-irc-line ( string -- message )
+    string>irc-message
+    dup command>> {
+        { "PING" [ \ ping ] }
+        { "NOTICE" [ \ notice ] }
+        { "001" [ \ logged-in ] }
+        { "433" [ \ nick-in-use ] }
+        { "JOIN" [ \ join_ ] }
+        { "PART" [ \ part ] }
+        { "PRIVMSG" [ \ privmsg ] }
+        { "QUIT" [ \ quit ] }
+        { "MODE" [ \ mode ] }
+        { "KICK" [ \ kick ] }
+        [ drop \ unhandled ]
+    } case
+    [ [ tuple-slots ] [ parameters>> ] bi append ] dip prefix >tuple ;
 
-MATCH-VARS: ?name ?name2 ?channel ?text ?mode ;
-SYMBOL: line
-: match-irc ( string -- )
-    dup line set
-    dup print flush
-    irc-split
-    {
-        { { "PING" ?name }
-          [ ?name <ping> ] }
-        { { ?name "001" ?name2 ?text }
-          [ ?name2 ?text <logged-in> ] }
-        { { ?name "433" _ ?name2 "Nickname is already in use." }
-          [ ?name2 <nick-in-use> ] }
+! Reader
+: handle-reader-message ( irc-client irc-message -- )
+    dup handle-irc swap stream-channel>> to ;
 
-        { { ?name "JOIN" ?channel }
-          [ ?name ?channel <join> ] }
-        { { ?name "PART" ?channel ?text }
-          [ ?name ?channel ?text <part> ] }
-        { { ?name "PRIVMSG" ?channel ?text }
-          [ ?name ?channel ?text <privmsg> ] }
-        { { ?name "QUIT" ?text }
-          [ ?name ?text <quit> ] }
+: reader-loop ( irc-client -- )
+    dup stream>> stream-readln [
+        dup print parse-irc-line handle-reader-message
+    ] [
+        f >>is-running
+        dup stream>> dispose
+        irc-end over controller-channel>> to
+        stream-channel>> irc-end swap to
+    ] if* ;
 
-        { { "NOTICE" ?name ?text }
-          [ ?name ?text <notice> ] }
-        { { ?name "MODE" ?channel ?mode ?text }
-          [ ?name ?channel ?mode ?text <mode> ] }
-        { { ?name "KICK" ?channel ?name2 ?text }
-          [  ?channel ?name ?name2 ?text <kick> ] }
+! Controller commands
+GENERIC: handle-command ( obj -- )
 
-        ! { { ?name "353" ?name2 _ ?channel ?text }
-         ! [ ?text ?channel ?name2 make-member-list ] }
-        { _ [ line get <unhandled> ] }
-    } match-cond
-    delegate-timestamp handle-irc flush ;
+M: object handle-command ( obj -- )
+    . ;
 
-: irc-loop ( -- )
-    irc-stream> stream-readln
-    [ match-irc irc-loop ] when* ;
+TUPLE: send-message to text ;
+C: <send-message> send-message
+M: send-message handle-command ( obj -- )
+    dup to>> swap text>> SAY ;
 
+TUPLE: send-action to text ;
+C: <send-action> send-action
+M: send-action handle-command ( obj -- )
+    dup to>> swap text>> ACTION ;
+
+TUPLE: send-quit text ;
+C: <send-quit> send-quit
+M: send-quit handle-command ( obj -- )
+    text>> QUIT ;
+
+: irc-listen ( irc-client quot -- )
+    [ listeners>> ] [ <irc-listener> ] bi* swap push ;
+
+! Controller loop
+: controller-loop ( irc-client -- )
+    controller-channel>> from handle-command ;
+
+! Multiplexer
+: multiplex-message ( irc-client message -- )
+    swap listeners>> [ channel>> ] map
+    [ '[ , , to ] "message" spawn drop ] each-with ;
+
+: multiplexer-loop ( irc-client -- )
+    dup stream-channel>> from multiplex-message ;
+
+! process looping and starting
+: (spawn-irc-loop) ( irc-client quot name -- )
+    [ over >r curry r> '[ @ , is-running>> ] ] dip
+    spawn-server-linked drop ;
+
+: spawn-irc-loop ( irc-client quot name -- )
+    '[ , , , [ (spawn-irc-loop) receive ] [ print ] recover ]
+    f spawn drop ;
+
+: spawn-irc ( irc-client -- )
+    [ [ reader-loop ] "reader-loop" spawn-irc-loop ]
+    [ [ controller-loop ] "controller-loop" spawn-irc-loop ]
+    [ [ multiplexer-loop ] "multiplexer-loop" spawn-irc-loop ]
+    tri ;
+    
 : do-irc ( irc-client -- )
-    dup irc-client set
-    dup irc-client-profile profile-server
-    over irc-client-profile profile-port connect*
-    dup irc-client-profile profile-nickname login
-    [ irc-loop ] [ irc-stream> dispose ] [ ] cleanup ;
-
-: with-infinite-loop ( quot timeout -- quot timeout )
-    "looping" print flush
-    over [ drop ] recover dup sleep with-infinite-loop ;
-
-: start-irc ( irc-client -- )
-    ! [ [ do-irc ] curry 3000 with-infinite-loop ] with-scope ;
-    [ do-irc ] curry 3000 with-infinite-loop ;
-
-
-! For testing
-: make-factorbot
-    "irc.freenode.org" 6667 "factorbot" f
-    [
-        "#concatenative-flood" f f <channel-profile> ,
-    ] { } make <profile>
-    f V{ } clone V{ } clone <nick>
-    f f f <irc-client> ;
-
-: test-factorbot
-    make-factorbot start-irc ;
-
+    irc-client [
+        irc-client>
+        [ irc-connect ]
+        [ profile>> nickname>> LOGIN ]
+        [ spawn-irc ]
+        tri
+    ] with-variable ;

@@ -43,7 +43,7 @@ TUPLE: variables-gadget ;
 
 : <variables-gadget> ( model -- gadget )
     <namestack-display> <scroller>
-    variables-gadget construct-empty
+    variables-gadget new
     [ set-gadget-delegate ] keep ;
 
 M: variables-gadget pref-dim* drop { 400 400 } ;

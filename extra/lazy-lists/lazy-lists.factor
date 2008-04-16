@@ -52,7 +52,7 @@ M: cons nil? ( cons -- bool )
 TUPLE: lazy-cons car cdr ;
 
 : lazy-cons ( car cdr -- promise )
-    [ promise ] bi@ \ lazy-cons construct-boa
+    [ promise ] bi@ \ lazy-cons boa
     T{ promise f f t f } clone
     [ set-promise-value ] keep ;
 
@@ -103,7 +103,7 @@ TUPLE: memoized-cons original car cdr nil? ;
 
 : <memoized-cons> ( cons -- memoized-cons )
   not-memoized not-memoized not-memoized
-  memoized-cons construct-boa ;
+  memoized-cons boa ;
 
 M: memoized-cons car ( memoized-cons -- car )
   dup memoized-cons-car not-memoized? [
@@ -321,7 +321,7 @@ M: sequence-cons nil? ( sequence-cons -- bool )
   {
     { [ dup sequence? ] [ 0 swap seq>list ] }
     { [ dup list?     ] [ ] }
-    { [ t ] [ "Could not convert object to a list" throw ] }
+    [ "Could not convert object to a list" throw ]
   } cond ;
 
 TUPLE: lazy-concat car cdr ;

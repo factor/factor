@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions graphs assocs kernel kernel.private
 slots.private math namespaces sequences strings vectors sbufs
-quotations assocs hashtables sorting math.parser words.private
-vocabs combinators ;
+quotations assocs hashtables sorting words.private vocabs ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
@@ -66,11 +65,15 @@ SYMBOL: bootstrapping?
 GENERIC: crossref? ( word -- ? )
 
 M: word crossref?
-    {
-        { [ dup "forgotten" word-prop ] [ f ] }
-        { [ dup word-vocabulary ] [ t ] }
-        { [ t ] [ f ] }
-    } cond nip ;
+    dup "forgotten" word-prop [
+        drop f
+    ] [
+        word-vocabulary >boolean
+    ] if ;
+
+GENERIC: compiled-crossref? ( word -- ? )
+
+M: word compiled-crossref? crossref? ;
 
 GENERIC# (quot-uses) 1 ( obj assoc -- )
 
@@ -98,7 +101,7 @@ SYMBOL: compiled-crossref
 compiled-crossref global [ H{ } assoc-like ] change-at
 
 : compiled-xref ( word dependencies -- )
-    [ drop crossref? ] assoc-subset
+    [ drop compiled-crossref? ] assoc-subset
     2dup "compiled-uses" set-word-prop
     compiled-crossref get add-vertex* ;
 
@@ -191,7 +194,7 @@ M: word subwords drop f ;
     { "methods" "combination" "default-method" } reset-props ;
 
 : gensym ( -- word )
-    "G:" \ gensym counter number>string append f <word> ;
+    "( gensym )" f <word> ;
 
 : define-temp ( quot -- word )
     gensym dup rot define ;

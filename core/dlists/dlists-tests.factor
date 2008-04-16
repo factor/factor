@@ -1,5 +1,5 @@
 USING: dlists dlists.private kernel tools.test random assocs
-hashtables sequences namespaces sorting debugger io prettyprint
+sets sequences namespaces sorting debugger io prettyprint
 math ;
 IN: dlists.tests
 
@@ -79,7 +79,7 @@ IN: dlists.tests
         [ dlist-push-all ] keep
         [ dlist-delete-all ] keep
         dlist>array
-    ] 2keep seq-diff assert-same-elements
+    ] 2keep diff assert-same-elements
 ] unit-test
 
 [ ] [

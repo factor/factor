@@ -15,7 +15,7 @@ TUPLE: count-down n promise ;
 
 : <count-down> ( n -- count-down )
     dup 0 < [ "Invalid count for count down" throw ] when
-    <promise> \ count-down construct-boa
+    <promise> \ count-down boa
     dup count-down-check ;
 
 : count-down ( count-down -- )

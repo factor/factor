@@ -33,7 +33,7 @@ TUPLE: utf8 ;
         { [ dup -5 shift BIN: 110 number= ] [ double ] }
         { [ dup -4 shift BIN: 1110 number= ] [ triple ] }
         { [ dup -3 shift BIN: 11110 number= ] [ quad ] }
-        { [ t ] [ drop replacement-char ] }
+        [ drop replacement-char ]
     } cond ;
 
 : decode-utf8 ( stream -- char/f )
@@ -59,12 +59,12 @@ M: utf8 decode-char
             2dup -6 shift encoded
             encoded
         ] }
-        { [ t ] [
+        [
             2dup -18 shift BIN: 11110000 bitor swap stream-write1
             2dup -12 shift encoded
             2dup -6 shift encoded
             encoded
-        ] }
+        ]
     } cond ;
 
 M: utf8 encode-char

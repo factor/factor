@@ -55,7 +55,7 @@ IN: io.windows.nt.launcher
         { [ pick +inherit+ eq? ] [ redirect-inherit ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
         { [ pick string? ] [ redirect-file ] }
-        { [ t ] [ redirect-stream ] }
+        [ redirect-stream ]
     } cond ;
 
 : default-stdout ( args -- handle )

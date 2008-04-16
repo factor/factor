@@ -6,7 +6,7 @@ TUPLE: range from length step ;
 : <range> ( a b step -- range )
     >r over - r>
     [ / 1+ 0 max >integer ] keep
-    range construct-boa ;
+    range boa ;
 
 M: range length ( seq -- n )
     range-length ;

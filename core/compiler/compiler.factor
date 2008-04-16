@@ -20,7 +20,7 @@ IN: compiler
 : finish-compile ( word effect dependencies -- )
     >r dupd save-effect r>
     over compiled-unxref
-    over crossref? [ compiled-xref ] [ 2drop ] if ;
+    over compiled-crossref? [ compiled-xref ] [ 2drop ] if ;
 
 : compile-succeeded ( word -- effect dependencies )
     [

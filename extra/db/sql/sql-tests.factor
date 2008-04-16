@@ -38,5 +38,3 @@ TUPLE: person name age ;
         { offset 40 }
         { limit 20 }
     } ;
-
-

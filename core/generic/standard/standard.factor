@@ -110,6 +110,9 @@ ERROR: no-next-method class generic ;
         \ if ,
     ] [ ] make ;
 
+: single-effective-method ( obj word -- method )
+    [ order [ instance? ] with find-last nip ] keep method ;
+
 TUPLE: standard-combination # ;
 
 C: <standard-combination> standard-combination
@@ -142,8 +145,7 @@ M: standard-combination next-method-quot*
     ] with-standard ;
 
 M: standard-generic effective-method
-    [ dispatch# (picker) call ] keep
-    [ order [ instance? ] with find-last nip ] keep method ;
+    [ dispatch# (picker) call ] keep single-effective-method ;
 
 TUPLE: hook-combination var ;
 
@@ -160,6 +162,10 @@ PREDICATE: hook-generic < generic
 M: hook-combination dispatch# drop 0 ;
 
 M: hook-generic extra-values drop 1 ;
+
+M: hook-generic effective-method
+    [ "combination" word-prop var>> get ] keep
+    single-effective-method ;
 
 M: hook-combination make-default-method
     [ error-method ] with-hook ;

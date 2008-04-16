@@ -8,7 +8,7 @@ IN: ui.tools.profiler
 TUPLE: profiler-gadget pane ;
 
 : <profiler-gadget> ( -- gadget )
-    profiler-gadget construct-empty
+    profiler-gadget new
     [
         toolbar,
         <pane> g-> set-profiler-gadget-pane

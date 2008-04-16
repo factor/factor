@@ -18,7 +18,7 @@ TUPLE: processing-gadget button-down button-up key-down key-up ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : <processing-gadget> ( -- gadget )
-  processing-gadget construct-empty
+  processing-gadget new
     <frame-buffer> set-gadget-delegate ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

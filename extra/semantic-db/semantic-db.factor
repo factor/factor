@@ -31,7 +31,7 @@ TUPLE: arc id subject object relation ;
     arc construct-empty swap >>relation swap >>object swap >>subject ;
 
 : <id-arc> ( id -- arc )
-    arc construct-empty swap >>id ;
+    arc new swap >>id ;
 
 : delete-arc ( arc -- ) delete-tuple ;
 

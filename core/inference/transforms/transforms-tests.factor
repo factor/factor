@@ -20,7 +20,7 @@ classes ;
 
 [ 512 ] [ 1 { { 1+ 8 } } bitfield-quot call ] unit-test
 
-\ construct-empty must-infer
+\ new must-infer
 
 TUPLE: a-tuple x y z ;
 

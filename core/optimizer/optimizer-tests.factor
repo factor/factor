@@ -283,7 +283,7 @@ TUPLE: silly-tuple a b ;
 
 [ t ] [ \ node-successor-f-bug compiled? ] unit-test
 
-[ ] [ [ construct-empty ] dataflow optimize drop ] unit-test
+[ ] [ [ new ] dataflow optimize drop ] unit-test
 
 [ ] [ [ <tuple> ] dataflow optimize drop ] unit-test
 

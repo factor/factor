@@ -12,7 +12,7 @@ TUPLE: db
     delete-statements ;
 
 : construct-db ( class -- obj )
-    construct-empty
+    new
         H{ } clone >>insert-statements
         H{ } clone >>update-statements
         H{ } clone >>delete-statements ;
@@ -52,7 +52,7 @@ TUPLE: throwable-statement < statement ;
 TUPLE: result-set sql in-params out-params handle n max ;
 
 : construct-statement ( sql in out class -- statement )
-    construct-empty
+    new
         swap >>out-params
         swap >>in-params
         swap >>sql ;
@@ -96,7 +96,7 @@ M: nonthrowable-statement execute-statement ( statement -- )
     0 >>n drop ;
 
 : construct-result-set ( query handle class -- result-set )
-    construct-empty
+    new
         swap >>handle
         >r [ sql>> ] [ in-params>> ] [ out-params>> ] tri r>
         swap >>out-params

@@ -21,7 +21,7 @@ C: <parser> parser
 SYMBOL: ignore 
 
 : <parse-result> ( remaining ast -- parse-result )
-  parse-result construct-boa ;
+  parse-result boa ;
 
 SYMBOL: packrat
 SYMBOL: pos
@@ -29,6 +29,9 @@ SYMBOL: input
 SYMBOL: fail
 SYMBOL: lrstack
 SYMBOL: heads
+
+: failed? ( obj -- ? )
+  fail = ;
 
 : delegates ( -- cache )
   \ delegates get-global [ H{ } clone dup \ delegates set-global ] unless* ;
@@ -66,21 +69,18 @@ C: <head> peg-head
   #! that maps the position to the parser result.
   id>> packrat get [ drop H{ } clone ] cache ;
 
+: process-rule-result ( p result -- result )
+  [
+    nip [ ast>> ] [ remaining>> ] bi input-from pos set    
+  ] [ 
+    pos set fail
+  ] if* ; 
+
 : eval-rule ( rule -- ast )
   #! Evaluate a rule, return an ast resulting from it.
   #! Return fail if the rule failed. The rule has
   #! stack effect ( input -- parse-result )
-  pos get swap 
-  execute 
-!  drop f f <parse-result>
-  [
-    nip
-    [ ast>> ] [ remaining>> ] bi
-    input-from pos set    
-  ] [ 
-    pos set   
-    fail
-  ] if* ; inline
+  pos get swap execute process-rule-result ; inline
 
 : memo ( pos rule -- memo-entry )
   #! Return the result from the memo cache. 
@@ -90,23 +90,31 @@ C: <head> peg-head
   #! Store an entry in the cache
   rule-parser input-cache set-at ;
 
-:: (grow-lr) ( r p m h -- )
-  p pos set
-  h involved-set>> clone h (>>eval-set)
-  r eval-rule
-  dup fail = pos get m pos>> <= or [
-    drop
+: update-m ( ast m -- )
+  swap >>ans pos get >>pos drop ;
+
+: stop-growth? ( ast m -- ? )
+  [ failed? pos get ] dip 
+  pos>> <= or ;
+
+: setup-growth ( h p -- )
+  pos set dup involved-set>> clone >>eval-set drop ;
+
+: (grow-lr) ( h p r m -- )
+  >r >r [ setup-growth ] 2keep r> r>
+  >r dup eval-rule r> swap
+  dup pick stop-growth? [
+    4drop drop
   ] [
-    m (>>ans)
-    pos get m (>>pos)
-    r p m h (grow-lr)
+    over update-m
+    (grow-lr)
   ] if ; inline
  
-:: grow-lr ( r p m h -- ast )
-  h p heads get set-at
-  r p m h (grow-lr) 
-  p heads get delete-at
-  m pos>> pos set m ans>>
+: grow-lr ( h p r m -- ast )
+  >r >r [ heads get set-at ] 2keep r> r>
+  pick over >r >r (grow-lr) r> r>
+  swap heads get delete-at
+  dup pos>> pos set ans>>
   ; inline
 
 :: (setup-lr) ( r l s -- )
@@ -128,10 +136,10 @@ C: <head> peg-head
         |
     h rule>> r eq? [
       m ans>> seed>> m (>>ans)
-      m ans>> fail = [
+      m ans>> failed? [
         fail
       ] [
-        r p m h grow-lr
+        h p r m grow-lr
       ] if
     ] [
       m ans>> seed>>
@@ -150,8 +158,7 @@ C: <head> peg-head
         r h eval-set>> member? [
           h [ r swap remove ] change-eval-set drop
           r eval-rule
-          m (>>ans)
-          pos get m (>>pos)
+          m update-m
           m
         ] [ 
           m
@@ -207,20 +214,18 @@ C: <head> peg-head
 
 GENERIC: (compile) ( parser -- quot )
 
+: execute-parser ( word -- result )
+  pos get apply-rule dup failed? [ 
+    drop f 
+  ] [
+    input-slice swap <parse-result>
+  ] if ; inline
 
-:: parser-body ( parser -- quot )
+: parser-body ( parser -- quot )
   #! Return the body of the word that is the compiled version
   #! of the parser.
-  [let* | rule [ gensym dup parser (compile) 0 1 <effect> define-declared dup parser "peg" set-word-prop ] 
-        |
-    [
-      rule pos get apply-rule dup fail = [ 
-        drop f 
-      ] [
-        input-slice swap <parse-result>
-      ] if
-    ] 
-  ] ;
+  gensym 2dup swap (compile) 0 1 <effect> define-declared swap dupd "peg" set-word-prop
+  [ execute-parser ] curry ;
 
 : compiled-parser ( parser -- word )
   #! Look to see if the given parser has been compiled.
@@ -235,8 +240,21 @@ GENERIC: (compile) ( parser -- quot )
     gensym tuck >>compiled 2dup parser-body 0 1 <effect> define-declared dupd "peg" set-word-prop
   ] if* ;
 
+SYMBOL: delayed
+
+: fixup-delayed ( -- )
+  #! Work through all delayed parsers and recompile their
+  #! words to have the correct bodies.
+  delayed get [
+    call compiled-parser 1quotation 0 1 <effect> define-declared
+  ] assoc-each ;
+
 : compile ( parser -- word )
-  [ compiled-parser ] with-compilation-unit ;
+  [
+    H{ } clone delayed [ 
+      compiled-parser fixup-delayed 
+    ] with-variable
+  ] with-compilation-unit ;
 
 : compiled-parse ( state word -- result )
   swap [ execute ] with-packrat ; inline 
@@ -446,7 +464,7 @@ M: delay-parser (compile) ( parser -- quot )
   #! For efficiency we memoize the quotation.
   #! This way it is run only once and the 
   #! parser constructed once at run time.
-  quot>> '[ @ compile ] { } { "word" } <effect> memoize-quot '[ @ execute ] ; 
+  quot>> gensym [ delayed get set-at ] keep 1quotation ; 
 
 TUPLE: box-parser quot ;
 
@@ -463,16 +481,16 @@ M: box-parser (compile) ( parser -- quot )
 PRIVATE>
 
 : token ( string -- parser )
-  token-parser construct-boa init-parser ;      
+  token-parser boa init-parser ;      
 
 : satisfy ( quot -- parser )
-  satisfy-parser construct-boa init-parser ;
+  satisfy-parser boa init-parser ;
 
 : range ( min max -- parser )
-  range-parser construct-boa init-parser ;
+  range-parser boa init-parser ;
 
 : seq ( seq -- parser )
-  seq-parser construct-boa init-parser ;
+  seq-parser boa init-parser ;
 
 : 2seq ( parser1 parser2 -- parser )
   2array seq ;
@@ -487,7 +505,7 @@ PRIVATE>
   { } make seq ; inline 
 
 : choice ( seq -- parser )
-  choice-parser construct-boa init-parser ;
+  choice-parser boa init-parser ;
 
 : 2choice ( parser1 parser2 -- parser )
   2array choice ;
@@ -502,34 +520,34 @@ PRIVATE>
   { } make choice ; inline 
 
 : repeat0 ( parser -- parser )
-  repeat0-parser construct-boa init-parser ;
+  repeat0-parser boa init-parser ;
 
 : repeat1 ( parser -- parser )
-  repeat1-parser construct-boa init-parser ;
+  repeat1-parser boa init-parser ;
 
 : optional ( parser -- parser )
-  optional-parser construct-boa init-parser ;
+  optional-parser boa init-parser ;
 
 : semantic ( parser quot -- parser )
-  semantic-parser construct-boa init-parser ;
+  semantic-parser boa init-parser ;
 
 : ensure ( parser -- parser )
-  ensure-parser construct-boa init-parser ;
+  ensure-parser boa init-parser ;
 
 : ensure-not ( parser -- parser )
-  ensure-not-parser construct-boa init-parser ;
+  ensure-not-parser boa init-parser ;
 
 : action ( parser quot -- parser )
-  action-parser construct-boa init-parser ;
+  action-parser boa init-parser ;
 
 : sp ( parser -- parser )
-  sp-parser construct-boa init-parser ;
+  sp-parser boa init-parser ;
 
 : hide ( parser -- parser )
   [ drop ignore ] action ;
 
 : delay ( quot -- parser )
-  delay-parser construct-boa init-parser ;
+  delay-parser boa init-parser ;
 
 : box ( quot -- parser )
   #! because a box has its quotation run at compile time
@@ -543,7 +561,7 @@ PRIVATE>
   #! parse. The action adds an indirection with a parser type
   #! that gets memoized and fixes this. Need to rethink how
   #! to fix boxes so this isn't needed...
-  box-parser construct-boa next-id f <parser> over set-delegate [ ] action ;
+  box-parser boa next-id f <parser> over set-delegate [ ] action ;
 
 : PEG:
   (:) [

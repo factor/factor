@@ -10,7 +10,7 @@ SYMBOL: new-definitions
 TUPLE: redefine-error def ;
 
 : redefine-error ( definition -- )
-    \ redefine-error construct-boa
+    \ redefine-error boa
     { { "Continue" t } } throw-restarts drop ;
 
 : add-once ( key assoc -- )
@@ -66,7 +66,7 @@ GENERIC: definitions-changed ( assoc obj -- )
 
 : compile ( words -- )
     recompile-hook get call
-    dup [ drop crossref? ] assoc-contains?
+    dup [ drop compiled-crossref? ] assoc-contains?
     modify-code-heap ;
 
 SYMBOL: outdated-tuples
@@ -82,7 +82,7 @@ SYMBOL: update-tuples-hook
 : finish-compilation-unit ( -- )
     call-recompile-hook
     call-update-tuples-hook
-    dup [ drop crossref? ] assoc-contains? modify-code-heap
+    dup [ drop compiled-crossref? ] assoc-contains? modify-code-heap
     updated-definitions notify-definition-observers ;
 
 : with-compilation-unit ( quot -- )

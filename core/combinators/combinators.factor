@@ -3,7 +3,7 @@
 IN: combinators
 USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
-hashtables sorting ;
+hashtables sorting words sets ;
 
 : cleave ( x seq -- )
     [ call ] with each ;
@@ -34,13 +34,24 @@ hashtables sorting ;
 ERROR: no-cond ;
 
 : cond ( assoc -- )
-    [ first call ] find nip dup [ second call ] [ no-cond ] if ;
+    [ dup callable? [ drop t ] [ first call ] if ] find nip
+    [ dup callable? [ call ] [ second call ] if ]
+    [ no-cond ] if* ;
 
 ERROR: no-case ;
+: case-find ( obj assoc -- obj' )
+    [
+        dup array? [
+            dupd first dup word? [
+                execute
+            ] [
+                dup wrapper? [ wrapped ] when
+            ] if =
+        ] [ quotation? ] if
+    ] find nip ;
 
 : case ( obj assoc -- )
-    [ dup array? [ dupd first = ] [ quotation? ] if ] find nip
-    {
+    case-find {
         { [ dup array? ] [ nip second call ] }
         { [ dup quotation? ] [ call ] }
         { [ dup not ] [ no-case ] }
@@ -73,11 +84,14 @@ M: hashtable hashcode*
     [ rot \ if 3array append [ ] like ] assoc-each ;
 
 : cond>quot ( assoc -- quot )
+    [ dup callable? [ [ t ] swap 2array ] when ] map
     reverse [ no-cond ] swap alist>quot ;
 
 : linear-case-quot ( default assoc -- quot )
-    [ >r [ dupd = ] curry r> \ drop prefix ] assoc-map
-    alist>quot ;
+    [
+        [ 1quotation \ dup prefix \ = suffix ]
+        [ \ drop prefix ] bi*
+    ] assoc-map alist>quot ;
 
 : (distribute-buckets) ( buckets pair keys -- )
     dup t eq? [
@@ -135,7 +149,9 @@ M: hashtable hashcode*
     dup empty? [
         drop
     ] [
-        dup length 4 <= [
+        dup length 4 <=
+        over keys [ word? ] contains? or
+        [
             linear-case-quot
         ] [
             dup keys contiguous-range? [

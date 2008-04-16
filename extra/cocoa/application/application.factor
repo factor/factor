@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien io kernel namespaces core-foundation cocoa.messages
-cocoa cocoa.classes cocoa.runtime sequences threads
-debugger init inspector kernel.private ;
+USING: alien io kernel namespaces core-foundation
+core-foundation.run-loop cocoa.messages cocoa cocoa.classes
+cocoa.runtime sequences threads debugger init inspector
+kernel.private ;
 IN: cocoa.application
 
 : <NSString> ( str -- alien ) <CFString> -> autorelease ;
@@ -20,8 +21,6 @@ IN: cocoa.application
 
 : with-cocoa ( quot -- )
     [ NSApp drop call ] with-autorelease-pool ;
-
-: CFRunLoopDefaultMode "kCFRunLoopDefaultMode" <NSString> ;
 
 : next-event ( app -- event )
     0 f CFRunLoopDefaultMode 1
@@ -50,7 +49,7 @@ IN: cocoa.application
 TUPLE: objc-error alien reason ;
 
 : objc-error ( alien -- * )
-    dup -> reason CF>string \ objc-error construct-boa throw ;
+    dup -> reason CF>string \ objc-error boa throw ;
 
 M: objc-error summary ( error -- )
     drop "Objective C exception" ;

@@ -27,7 +27,6 @@
 	#include "os-unix.h"
 
 	#ifdef __APPLE__
-		#include "os-unix-ucontext.h"
 		#include "os-macosx.h"
 		#include "mach_signal.h"
 		
@@ -84,7 +83,6 @@
 			#if defined(FACTOR_X86)
 				#include "os-linux-x86.32.h"
 			#elif defined(FACTOR_PPC)
-				#include "os-unix-ucontext.h"
 				#include "os-linux-ppc.h"
 			#elif defined(FACTOR_ARM)
 				#include "os-linux-arm.h"
