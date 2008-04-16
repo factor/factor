@@ -103,7 +103,7 @@ C: <interval> interval
             2drop over second over second and
             [ <interval> ] [ 2drop f ] if
         ] }
-        { [ t ] [ 2drop <interval> ] }
+        [ 2drop <interval> ]
     } cond ;
 
 : interval-intersect ( i1 i2 -- i3 )
@@ -202,7 +202,7 @@ SYMBOL: incomparable
         { [ 2dup interval-intersect not ] [ (interval<) ] }
         { [ 2dup left-endpoint-< ] [ f ] }
         { [ 2dup right-endpoint-< ] [ f ] }
-        { [ t ] [ incomparable ] }
+        [ incomparable ]
     } cond 2nip ;
 
 : left-endpoint-<= ( i1 i2 -- ? )
@@ -215,7 +215,7 @@ SYMBOL: incomparable
     {
         { [ 2dup interval-intersect not ] [ (interval<) ] }
         { [ 2dup right-endpoint-<= ] [ t ] }
-        { [ t ] [ incomparable ] }
+        [ incomparable ]
     } cond 2nip ;
 
 : interval> ( i1 i2 -- ? )

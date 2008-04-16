@@ -1,1 +1,0 @@
-A efficient implementation of a disjoint-set datastructure

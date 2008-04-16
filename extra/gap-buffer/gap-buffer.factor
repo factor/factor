@@ -27,7 +27,7 @@ M: gb set-gb-seq ( seq gb -- ) set-delegate ;
     tuck gb-expand-factor * ceiling >fixnum swap gb-min-size max ;
 
 : <gb> ( seq -- gb )
-    gb construct-empty
+    gb new
     5 over set-gb-min-size
     1.5 over set-gb-expand-factor
     [ >r length r> set-gb-gap-start ] 2keep

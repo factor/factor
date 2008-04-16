@@ -269,7 +269,7 @@ TUPLE: regexp source parser ignore-case? ;
         ignore-case? [
             dup 'regexp' just parse-1
         ] with-variable
-    ] keep regexp construct-boa ;
+    ] keep regexp boa ;
 
 : do-ignore-case ( string regexp -- string regexp )
     dup regexp-ignore-case? [ >r >upper r> ] when ;

@@ -80,7 +80,7 @@ DEFER: draw-gadget
     {
         { [ dup gadget-visible? not ] [ drop ] }
         { [ dup gadget-clipped? not ] [ (draw-gadget) ] }
-        { [ t ] [ [ (draw-gadget) ] with-clipping ] }
+        [ [ (draw-gadget) ] with-clipping ]
     } cond ;
 
 ! Pen paint properties

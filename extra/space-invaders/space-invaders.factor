@@ -306,7 +306,7 @@ M: invaders-gadget draw-gadget* ( gadget -- )
     { [ dup 184 238 within pick 0 223 within and ] [ 2drop green ] }
     { [ dup 240 247 within pick 16 133 within and ] [ 2drop green ] }
     { [ dup 247 215 - 247 184 - within pick 0 223 within and ] [ 2drop red ] }
-    { [ t ] [ 2drop white ] }
+    [ 2drop white ]
   } cond ;
 
 : plot-bitmap-bits ( bitmap point byte bit -- )

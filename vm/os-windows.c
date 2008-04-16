@@ -218,9 +218,9 @@ void sleep_millis(DWORD msec)
 DEFINE_PRIMITIVE(os_env)
 {
 	F_CHAR *key = unbox_u16_string();
-	F_CHAR *value = safe_malloc(MAX_UNICODE_PATH);
+	F_CHAR *value = safe_malloc(MAX_UNICODE_PATH * 2);
 	int ret;
-	ret = GetEnvironmentVariable(key, value, MAX_UNICODE_PATH);
+	ret = GetEnvironmentVariable(key, value, MAX_UNICODE_PATH * 2);
 	if(ret == 0)
 		dpush(F);
 	else

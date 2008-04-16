@@ -1,5 +1,6 @@
 USING: http tools.test multiline tuple-syntax
-io.streams.string kernel arrays splitting sequences     ;
+io.streams.string kernel arrays splitting sequences
+assocs io.sockets ;
 IN: http.tests
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test
@@ -136,10 +137,12 @@ io.encodings.ascii ;
 [ ] [
     [
         <dispatcher>
-        <action>
-            [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>display
-        "quit" add-responder
-        "extra/http/test" resource-path <static> >>default
+            <action>
+                [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>display
+            "quit" add-responder
+            <dispatcher>
+                "extra/http/test" resource-path <static> >>default
+            "nested" add-responder
         main-responder set
 
         [ 1237 httpd ] "HTTPD test" spawn drop
@@ -148,7 +151,17 @@ io.encodings.ascii ;
 
 [ t ] [
     "extra/http/test/foo.html" resource-path ascii file-contents
-    "http://localhost:1237/foo.html" http-get =
+    "http://localhost:1237/nested/foo.html" http-get =
+] unit-test
+
+! Try with a slightly malformed request
+[ t ] [
+    "localhost" 1237 <inet> ascii <client> [
+        "GET nested HTTP/1.0\r\n" write flush
+        "\r\n" write flush
+        readln drop
+        read-header USE: prettyprint
+    ] with-stream dup . "location" swap at "/" head?
 ] unit-test
 
 [ "Goodbye" ] [

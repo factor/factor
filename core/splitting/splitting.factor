@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math namespaces strings arrays vectors sequences ;
+USING: kernel math namespaces strings arrays vectors sequences
+sets ;
 IN: splitting
 
 TUPLE: groups seq n sliced? ;
@@ -8,7 +9,7 @@ TUPLE: groups seq n sliced? ;
 : check-groups 0 <= [ "Invalid group count" throw ] when ;
 
 : <groups> ( seq n -- groups )
-    dup check-groups f groups construct-boa ; inline
+    dup check-groups f groups boa ; inline
 
 : <sliced-groups> ( seq n -- groups )
     <groups> t over set-groups-sliced? ;
@@ -69,7 +70,7 @@ INSTANCE: groups sequence
 : split ( seq separators -- pieces ) [ split, ] { } make ;
 
 : string-lines ( str -- seq )
-    dup "\r\n" seq-intersect empty? [
+    dup "\r\n" intersect empty? [
         1array
     ] [
         "\n" split [

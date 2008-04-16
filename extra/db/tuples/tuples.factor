@@ -40,7 +40,7 @@ HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 HOOK: insert-tuple* db ( tuple statement -- )
 
 : resulting-tuple ( row out-params -- tuple )
-    dup first sql-spec-class construct-empty [
+    dup first sql-spec-class new [
         [
             >r sql-spec-slot-name r> set-slot-named
         ] curry 2each

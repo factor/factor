@@ -1,14 +1,16 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types destructors io.windows
-io.windows.nt.backend kernel math windows windows.kernel32
-windows.types libc assocs alien namespaces continuations
-io.monitors io.monitors.private io.nonblocking io.buffers
-io.files io.timeouts io sequences hashtables sorting arrays
-combinators math.bitfields strings system ;
+USING: alien alien.c-types libc destructors locals
+kernel math assocs namespaces continuations sequences hashtables
+sorting arrays combinators math.bitfields strings system
+accessors threads
+io.backend io.windows io.windows.nt.backend io.monitors
+io.nonblocking io.buffers io.files io.timeouts io
+windows windows.kernel32 windows.types ;
 IN: io.windows.nt.monitors
 
 : open-directory ( path -- handle )
+    normalize-path
     FILE_LIST_DIRECTORY
     share-mode
     f
@@ -21,67 +23,88 @@ IN: io.windows.nt.monitors
     dup add-completion
     f <win32-file> ;
 
-TUPLE: win32-monitor path recursive? ;
+TUPLE: win32-monitor-port < input-port recursive ;
 
-: <win32-monitor> ( path recursive? port -- monitor )
-    (monitor) {
-        set-win32-monitor-path
-        set-win32-monitor-recursive?
-        set-delegate
-    } win32-monitor construct ;
+TUPLE: win32-monitor < monitor port ;
 
-M: winnt <monitor> ( path recursive? -- monitor )
-    [
-        over open-directory win32-monitor <buffered-port>
-        <win32-monitor>
-    ] with-destructors ;
-
-: begin-reading-changes ( monitor -- overlapped )
-    dup port-handle win32-file-handle
-    over buffer-ptr
-    pick buffer-size
-    roll win32-monitor-recursive? 1 0 ?
+: begin-reading-changes ( port -- overlapped )
+    {
+        [ handle>> handle>> ]
+        [ buffer>> ptr>> ]
+        [ buffer>> size>> ]
+        [ recursive>> 1 0 ? ]
+    } cleave
     FILE_NOTIFY_CHANGE_ALL
     0 <uint>
     (make-overlapped)
     [ f ReadDirectoryChangesW win32-error=0/f ] keep ;
 
-: read-changes ( monitor -- bytes )
+: read-changes ( port -- bytes )
     [
-        [
-            dup begin-reading-changes
-            swap [ save-callback ] 2keep
-            dup check-monitor ! we may have closed it...
-            get-overlapped-result
-        ] with-timeout
+        dup begin-reading-changes
+        swap [ save-callback ] 2keep
+        check-closed ! we may have closed it...
+        dup eof>> [ "EOF??" throw ] when
+        get-overlapped-result
     ] with-destructors ;
 
 : parse-action ( action -- changed )
     {
-        { [ dup FILE_ACTION_ADDED = ] [ +add-file+ ] }
-        { [ dup FILE_ACTION_REMOVED = ] [ +remove-file+ ] }
-        { [ dup FILE_ACTION_MODIFIED = ] [ +modify-file+ ] }
-        { [ dup FILE_ACTION_RENAMED_OLD_NAME = ] [ +rename-file+ ] }
-        { [ dup FILE_ACTION_RENAMED_NEW_NAME = ] [ +rename-file+ ] }
-        { [ t ] [ +modify-file+ ] }
-    } cond nip ;
+        { FILE_ACTION_ADDED [ +add-file+ ] }
+        { FILE_ACTION_REMOVED [ +remove-file+ ] }
+        { FILE_ACTION_MODIFIED [ +modify-file+ ] }
+        { FILE_ACTION_RENAMED_OLD_NAME [ +rename-file+ ] }
+        { FILE_ACTION_RENAMED_NEW_NAME [ +rename-file+ ] }
+        [ drop +modify-file+ ]
+    } case 1array ;
 
 : memory>u16-string ( alien len -- string )
     [ memory>byte-array ] keep 2/ c-ushort-array> >string ;
 
-: parse-file-notify ( buffer -- changed path )
-    {
-        FILE_NOTIFY_INFORMATION-FileName
-        FILE_NOTIFY_INFORMATION-FileNameLength
-        FILE_NOTIFY_INFORMATION-Action
-    } get-slots parse-action 1array -rot memory>u16-string ;
+: parse-notify-record ( buffer -- path changed )
+    [
+        [ FILE_NOTIFY_INFORMATION-FileName ]
+        [ FILE_NOTIFY_INFORMATION-FileNameLength ]
+        bi memory>u16-string
+    ]
+    [ FILE_NOTIFY_INFORMATION-Action parse-action ] bi ;
 
-: (changed-files) ( buffer -- )
-    dup parse-file-notify changed-file
-    dup FILE_NOTIFY_INFORMATION-NextEntryOffset dup zero?
-    [ 2drop ] [ swap <displaced-alien> (changed-files) ] if ;
+: (file-notify-records) ( buffer -- buffer )
+    dup ,
+    dup FILE_NOTIFY_INFORMATION-NextEntryOffset zero? [
+        [ FILE_NOTIFY_INFORMATION-NextEntryOffset ] keep <displaced-alien>
+        (file-notify-records)
+    ] unless ;
 
-M: win32-monitor fill-queue ( monitor -- )
-    dup buffer-ptr over read-changes
-    [ zero? [ drop ] [ (changed-files) ] if ] H{ } make-assoc
-    swap set-monitor-queue ;
+: file-notify-records ( buffer -- seq )
+    [ (file-notify-records) drop ] { } make ;
+
+: parse-notify-records ( monitor buffer -- )
+    file-notify-records
+    [ parse-notify-record rot queue-change ] with each ;
+
+: fill-queue ( monitor -- )
+    dup port>> check-closed
+    [ buffer>> ptr>> ] [ read-changes zero? ] bi
+    [ 2dup parse-notify-records ] unless
+    2drop ;
+
+: (fill-queue-thread) ( monitor -- )
+    dup fill-queue (fill-queue-thread) ;
+
+: fill-queue-thread ( monitor -- )
+    [ dup fill-queue (fill-queue-thread) ]
+    [ dup port-closed-error? [ 2drop ] [ rethrow ] if ] recover ;
+
+M:: winnt (monitor) ( path recursive? mailbox -- monitor )
+    [
+        path mailbox win32-monitor new-monitor
+            path open-directory \ win32-monitor-port <buffered-port>
+                recursive? >>recursive
+            >>port
+        dup [ fill-queue-thread ] curry
+        "Windows monitor thread" spawn drop
+    ] with-destructors ;
+
+M: win32-monitor dispose
+    port>> dispose ;

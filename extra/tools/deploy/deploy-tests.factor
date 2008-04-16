@@ -1,7 +1,7 @@
 IN: tools.deploy.tests
 USING: tools.test system io.files kernel tools.deploy.config
 tools.deploy.backend math sequences io.launcher arrays
-namespaces continuations layouts ;
+namespaces continuations layouts accessors ;
 
 : shake-and-bake ( vocab -- )
     [ "test.image" temp-file delete-file ] ignore-errors
@@ -12,7 +12,7 @@ namespaces continuations layouts ;
     ] with-directory ;
 
 : small-enough? ( n -- ? )
-    >r "test.image" temp-file file-info file-info-size r> <= ;
+    >r "test.image" temp-file file-info size>> r> <= ;
 
 [ ] [ "hello-world" shake-and-bake ] unit-test
 

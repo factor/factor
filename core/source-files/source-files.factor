@@ -69,7 +69,7 @@ M: pathname forget*
     pathname-string forget-source ;
 
 : rollback-source-file ( file -- )
-    dup source-file-definitions new-definitions get [ union ] 2map
+    dup source-file-definitions new-definitions get [ assoc-union ] 2map
     swap set-source-file-definitions ;
 
 SYMBOL: file

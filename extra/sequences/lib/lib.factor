@@ -227,8 +227,8 @@ PRIVATE>
 : ?nth* ( n seq -- elt/f ? )
     2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; flushable
 
-: nths ( indices seq -- seq' )
-    [ swap nth ] with map ;
+: nths ( seq indices -- seq' )
+    swap [ nth ] curry map ;
 
 : replace ( str oldseq newseq -- str' )
     zip >hashtable substitute ;

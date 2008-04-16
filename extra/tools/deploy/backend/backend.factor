@@ -22,9 +22,8 @@ IN: tools.deploy.backend
         +stdout+ >>stderr
         +closed+ >>stdin
         +low-priority+ >>priority
-    utf8 <process-stream>
-    dup copy-lines
-    process>> wait-for-process zero? [
+    utf8 <process-stream*>
+    >r copy-lines r> wait-for-process zero? [
         "Deployment failed" throw
     ] unless ;
 

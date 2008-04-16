@@ -1,16 +1,4 @@
 
-! USING: kernel namespaces sequences assocs continuations
-!        vocabs vocabs.loader
-!        io
-!        io.files
-!        prettyprint
-!        tools.vocabs
-!        tools.test
-!        io.encodings.utf8
-!        combinators.cleave
-!        help.lint
-!        bootstrap.stage2 benchmark builder.util ;
-
 USING: kernel namespaces assocs
        io.files io.encodings.utf8 prettyprint 
        help.lint

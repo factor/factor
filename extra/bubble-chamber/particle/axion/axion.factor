@@ -9,7 +9,7 @@ IN: bubble-chamber.particle.axion
 
 TUPLE: axion < particle ;
 
-: <axion> ( -- axion ) axion construct-empty initialize-particle ;
+: <axion> ( -- axion ) axion new initialize-particle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

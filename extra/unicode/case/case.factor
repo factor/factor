@@ -51,7 +51,7 @@ SYMBOL: locale ! Just casing locale, or overall?
             drop dot-over =
             dup CHAR: i HEX: 131 ? ,
         ] }
-        { [ t ] [ , drop f ] }
+        [ , drop f ]
     } cond ;
 
 : turk>lower ( string -- lower-i )

@@ -22,25 +22,32 @@ IN: tools.vocabs.monitor
 : path>vocab ( path -- vocab )
     chop-vocab-root path>vocab-name vocab-dir>vocab-name ;
 
-: monitor-thread ( monitor -- )
+: monitor-loop ( monitor -- )
     #! On OS X, monitors give us the full path, so we chop it
     #! off if its there.
-    next-change drop path>vocab changed-vocab reset-cache ;
+    dup next-change drop path>vocab changed-vocab
+    reset-cache
+    monitor-loop ;
+
+: monitor-thread ( -- )
+    [
+        [
+            "" resource-path t <monitor>
+            
+            H{ } clone changed-vocabs set-global
+            vocabs [ changed-vocab ] each
+            
+            monitor-loop
+        ] with-monitors
+    ] ignore-errors ;
 
 : start-monitor-thread ( -- )
     #! Silently ignore errors during monitor creation since
     #! monitors are not supported on all platforms.
-    [
-        "" resource-path t <monitor> [ monitor-thread t ] curry
-        "Vocabulary monitor" spawn-server drop
-
-        H{ } clone changed-vocabs set-global
-
-        vocabs [ changed-vocab ] each
-    ] ignore-errors ;
+    [ monitor-thread ] "Vocabulary monitor" spawn drop ;
 
 [
-    "-no-monitors" cli-args get member? [
+    "-no-monitors" cli-args member? [
         start-monitor-thread
     ] unless
 ] "tools.vocabs.monitor" add-init-hook

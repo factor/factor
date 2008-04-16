@@ -6,7 +6,7 @@ IN: concurrency.promises
 TUPLE: promise mailbox ;
 
 : <promise> ( -- promise )
-    <mailbox> promise construct-boa ;
+    <mailbox> promise boa ;
 
 : promise-fulfilled? ( promise -- ? )
     promise-mailbox mailbox-empty? not ;

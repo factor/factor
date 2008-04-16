@@ -7,7 +7,7 @@ HELP: >tuple<
 { $example
     "USING: kernel prettyprint classes.tuple.lib ;"
     "TUPLE: foo a b c ;"
-    "1 2 3 \\ foo construct-boa \\ foo >tuple< .s"
+    "1 2 3 \\ foo boa \\ foo >tuple< .s"
     "1\n2\n3"
 }
 { $notes "Words using " { $snippet ">tuple<" } " may be compiled." }
@@ -19,7 +19,7 @@ HELP: >tuple*<
 { $example
     "USING: kernel prettyprint classes.tuple.lib ;"
     "TUPLE: foo a bb* ccc dddd* ;"
-    "1 2 3 4 \\ foo construct-boa \\ foo >tuple*< .s"
+    "1 2 3 4 \\ foo boa \\ foo >tuple*< .s"
     "2\n4"
 }
 { $notes "Words using " { $snippet ">tuple*<" } " may be compiled." }

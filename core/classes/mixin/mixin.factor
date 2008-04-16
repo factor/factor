@@ -24,7 +24,7 @@ TUPLE: check-mixin-class mixin ;
 
 : check-mixin-class ( mixin -- mixin )
     dup mixin-class? [
-        \ check-mixin-class construct-boa throw
+        \ check-mixin-class boa throw
     ] unless ;
 
 : if-mixin-member? ( class mixin true false -- )
@@ -49,7 +49,7 @@ M: mixin-instance equal?
         { [ over mixin-instance? not ] [ f ] }
         { [ 2dup [ mixin-instance-class ] bi@ = not ] [ f ] }
         { [ 2dup [ mixin-instance-mixin ] bi@ = not ] [ f ] }
-        { [ t ] [ t ] }
+        [ t ]
     } cond 2nip ;
 
 M: mixin-instance hashcode*

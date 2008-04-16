@@ -78,7 +78,7 @@ HELP: section
     { { $snippet "overhang" } " - number of columns which must be left blank before the wrap margin for the prettyprinter to consider emitting this section as a " { $link short-section } ". Avoids lone hanging closing brackets" }
 } } ;
 
-HELP: construct-section
+HELP: new-section
 { $values { "length" integer } { "class" "a subclass of " { $link section } } { "section" section } }
 { $description "Creates a new section with the given length starting from " { $link position } ", advancing " { $link position } "." } ;
 

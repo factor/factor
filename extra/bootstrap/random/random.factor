@@ -9,6 +9,7 @@ namespaces random ;
     { [ os unix? ] [ "random.unix" require ] }
 } cond
 
-! [ [ 32 random-bits ] with-secure-random <mersenne-twister> random-generator set-global ]
-[ millis <mersenne-twister> random-generator set-global ]
-"generator.random" add-init-hook
+[
+    [ 32 random-bits ] with-system-random
+    <mersenne-twister> random-generator set-global
+] "generator.random" add-init-hook

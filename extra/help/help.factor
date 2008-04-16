@@ -139,7 +139,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     {
         { [ dup empty? ] [ (:help-none) ] }
         { [ dup length 1 = ] [ first help ] }
-        { [ t ] [ (:help-multi) ] }
+        [ (:help-multi) ]
     } cond (:help-debugger) ;
 
 : remove-article ( name -- )

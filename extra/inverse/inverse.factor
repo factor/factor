@@ -6,7 +6,7 @@ mirrors combinators.lib ;
 IN: inverse
 
 TUPLE: fail ;
-: fail ( -- * ) \ fail construct-empty throw ;
+: fail ( -- * ) \ fail new throw ;
 M: fail summary drop "Unification failed" ;
 
 : assure ( ? -- ) [ fail ] unless ;
@@ -26,7 +26,7 @@ M: fail summary drop "Unification failed" ;
     "pop-inverse" set-word-prop ;
 
 TUPLE: no-inverse word ;
-: no-inverse ( word -- * ) \ no-inverse construct-empty throw ;
+: no-inverse ( word -- * ) \ no-inverse new throw ;
 M: no-inverse summary
     drop "The word cannot be used in pattern matching" ;
 
@@ -60,11 +60,13 @@ PREDICATE: math-inverse < word "math-inverse" word-prop ;
 PREDICATE: pop-inverse < word "pop-length" word-prop ;
 UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
-: enough? ( stack quot -- ? )
-    [ >r length r> 1quotation infer effect-in >= ] [ 3drop f ]
-    recover ;
+: enough? ( stack word -- ? )
+    dup deferred? [ 2drop f ] [
+        [ >r length r> 1quotation infer effect-in >= ]
+        [ 3drop f ] recover
+    ] if ;
 
-: fold-word ( stack quot -- stack )
+: fold-word ( stack word -- stack )
     2dup enough?
     [ 1quotation with-datastack ] [ >r % r> , { } ] if ;
 
@@ -72,10 +74,10 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     [ { } swap [ fold-word ] each % ] [ ] make ; 
 
 : flattenable? ( object -- ? )
-    [ [ word? ] [ primitive? not ] and? ] [
+    { [ word? ] [ primitive? not ] [
         { "inverse" "math-inverse" "pop-inverse" }
         [ word-prop ] with contains? not
-    ] and? ; 
+    ] } <-&& ; 
 
 : (flatten) ( quot -- )
     [ dup flattenable? [ word-def (flatten) ] [ , ] if ] each ;
@@ -159,7 +161,7 @@ MACRO: undo ( quot -- ) [undo] ;
     2curry
 ] define-pop-inverse
 
-: _ f ;
+DEFER: _
 \ _ [ drop ] define-inverse
 
 : both ( object object -- object )
@@ -193,6 +195,10 @@ MACRO: undo ( quot -- ) [undo] ;
 \ first3 [ 3array ] define-inverse
 \ first4 [ 4array ] define-inverse
 
+\ prefix [ unclip ] define-inverse
+\ unclip [ prefix ] define-inverse
+\ suffix [ dup 1 head* swap peek ] define-inverse
+
 ! Constructor inverse
 : deconstruct-pred ( class -- quot )
     "predicate" word-prop [ dupd call assure ] curry ;
@@ -208,14 +214,14 @@ MACRO: undo ( quot -- ) [undo] ;
 : boa-inverse ( class -- quot )
     [ deconstruct-pred ] keep slot-readers compose ;
 
-\ construct-boa 1 [ ?wrapped boa-inverse ] define-pop-inverse
+\ boa 1 [ ?wrapped boa-inverse ] define-pop-inverse
 
 : empty-inverse ( class -- quot )
     deconstruct-pred
     [ tuple>array 1 tail [ ] contains? [ fail ] when ]
     compose ;
 
-\ construct-empty 1 [ ?wrapped empty-inverse ] define-pop-inverse
+\ new 1 [ ?wrapped empty-inverse ] define-pop-inverse
 
 : writer>reader ( word -- word' )
     [ "writing" word-prop "slots" word-prop ] keep
@@ -249,13 +255,14 @@ MACRO: undo ( quot -- ) [undo] ;
 MACRO: matches? ( quot -- ? ) [matches?] ;
 
 TUPLE: no-match ;
-: no-match ( -- * ) \ no-match construct-empty throw ;
+: no-match ( -- * ) \ no-match new throw ;
 M: no-match summary drop "Fall through in switch" ;
 
 : recover-chain ( seq -- quot )
     [ no-match ] [ swap \ recover-fail 3array >quotation ] reduce ;
 
 : [switch]  ( quot-alist -- quot )
+    [ dup quotation? [ [ ] swap 2array ] when ] map
     reverse [ >r [undo] r> compose ] { } assoc>map
     recover-chain ;
 

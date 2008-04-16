@@ -3,7 +3,8 @@
 USING: io.files kernel io.encodings.utf8 vocabs.loader vocabs
 sequences namespaces math.parser arrays hashtables assocs
 memoize inspector sorting splitting combinators source-files
-io debugger continuations compiler.errors init io.crc32 ;
+io debugger continuations compiler.errors init io.crc32 
+sets ;
 IN: tools.vocabs
 
 : vocab-tests-file ( vocab -- path )
@@ -85,10 +86,11 @@ SYMBOL: changed-vocabs
 : unchanged-vocabs ( vocabs -- )
     [ unchanged-vocab ] each ;
 
+: changed-vocab? ( vocab -- ? )
+    changed-vocabs get dup [ key? ] [ 2drop t ] if ;
+
 : filter-changed ( vocabs -- vocabs' )
-    changed-vocabs get [
-        [ key? ] curry subset
-    ] when* ;
+    [ changed-vocab? ] subset ;
 
 SYMBOL: modified-sources
 SYMBOL: modified-docs
@@ -96,7 +98,7 @@ SYMBOL: modified-docs
 : (to-refresh) ( vocab variable loaded? path -- )
     dup [
         swap [
-            pick changed-vocabs get key? [
+            pick changed-vocab? [
                 source-modified? [ get push ] [ 2drop ] if
             ] [ 3drop ] if
         ] [ drop get push ] if
@@ -125,7 +127,7 @@ SYMBOL: modified-docs
             modified-sources get
             modified-docs get
         ]
-        [ modified-sources get modified-docs get append swap seq-diff ] bi
+        [ modified-sources get modified-docs get append swap diff ] bi
     ] with-scope ;
 
 : do-refresh ( modified-sources modified-docs unchanged -- )
@@ -254,7 +256,7 @@ MEMO: all-vocabs-seq ( -- seq )
         { [ ".test" ?tail ] [ t ] }
         { [ "raptor" ?head ] [ t ] }
         { [ dup "tools.deploy.app" = ] [ t ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond nip ;
 
 : filter-dangerous ( seq -- seq' )

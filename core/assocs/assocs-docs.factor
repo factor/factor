@@ -69,14 +69,14 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 "It is often useful to use the keys of an associative mapping as a set, exploiting the constant or logarithmic lookup time of most implementations (" { $link "alists" } " being a notable exception)."
 { $subsection subassoc? }
-{ $subsection intersect }
+{ $subsection assoc-intersect }
 { $subsection update }
-{ $subsection union }
-{ $subsection diff }
+{ $subsection assoc-union }
+{ $subsection assoc-diff }
 { $subsection remove-all }
 { $subsection substitute }
 { $subsection substitute-here }
-{ $see-also key? } ;
+{ $see-also key? assoc-contains? assoc-all? "sets" } ;
 
 ARTICLE: "assocs-mutation" "Storing keys and values in assocs"
 "Utility operations built up from the " { $link "assocs-protocol" } ":"
@@ -97,6 +97,7 @@ $nl
 { $subsection assoc-map }
 { $subsection assoc-push-if }
 { $subsection assoc-subset }
+{ $subsection assoc-contains? }
 { $subsection assoc-all? }
 "Three additional combinators:"
 { $subsection cache }
@@ -206,9 +207,13 @@ HELP: assoc-subset
 { $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "subassoc" "a new assoc" } }
 { $description "Outputs an assoc of the same type as " { $snippet "assoc" } " consisting of all entries for which the predicate quotation yields true." } ;
 
+HELP: assoc-contains?
+{ $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "?" "a boolean" } }
+{ $description "Tests if the assoc contains an entry satisfying a predicate by applying the quotation to each entry in turn. Iteration stops if an entry is found for which the quotation outputs a true value." } ;
+
 HELP: assoc-all?
 { $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "?" "a boolean" } }
-{ $description "Applies a predicate quotation to entry in the assoc. Outputs true if the assoc yields true for each entry (which includes the case where the assoc is empty)." } ;
+{ $description "Tests if all entries in the assoc satisfy a predicate by applying the quotation to each entry in turn. a predicate quotation to entry in the assoc. Iteration stops if an entry is found for which the quotation outputs " { $link f } ". If the assoc is empty, always outputs " { $link t } "." } ;
 
 HELP: subassoc?
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" "a new assoc" } }
@@ -260,7 +265,7 @@ HELP: values
 
 { keys values } related-words
 
-HELP: intersect
+HELP: assoc-intersect
 { $values { "assoc1" assoc } { "assoc2" assoc } { "intersection" "a new assoc" } }
 { $description "Outputs an assoc consisting of all entries from " { $snippet "assoc2" } " such that the key is also present in " { $snippet "assoc1" } "." }
 { $notes "The values of the keys in " { $snippet "assoc1" } " are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." } ;
@@ -270,11 +275,11 @@ HELP: update
 { $description "Adds all entries from " { $snippet "assoc2" } " to " { $snippet "assoc1" } "." }
 { $side-effects "assoc1" } ;
 
-HELP: union
+HELP: assoc-union
 { $values { "assoc1" assoc } { "assoc2" assoc } { "union" "a new assoc" } }
 { $description "Outputs a assoc consisting of all entries from " { $snippet "assoc1" } " and " { $snippet "assoc2" } ", with entries from " { $snippet "assoc2" } " taking precedence in case the corresponding values are not equal." } ;
 
-HELP: diff
+HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
 { $description "Outputs an assoc consisting of all entries from " { $snippet "assoc2" } " whose key is not contained in " { $snippet "assoc1" } "." } 
 ;
