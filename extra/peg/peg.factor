@@ -100,21 +100,21 @@ C: <head> peg-head
 : setup-growth ( h p -- )
   pos set dup involved-set>> clone >>eval-set drop ;
 
-:: (grow-lr) ( h p r m -- )
-  h p setup-growth
-  r eval-rule
-  dup m stop-growth? [
-    drop
+: (grow-lr) ( h p r m -- )
+  >r >r [ setup-growth ] 2keep r> r>
+  >r dup eval-rule r> swap
+  dup pick stop-growth? [
+    4drop drop
   ] [
-    m update-m
-     h p r m (grow-lr)
+    over update-m
+    (grow-lr)
   ] if ; inline
  
-:: grow-lr ( h p r m -- ast )
-  h p heads get set-at
-  h p r m (grow-lr) 
-  p heads get delete-at
-  m pos>> pos set m ans>>
+: grow-lr ( h p r m -- ast )
+  >r >r [ heads get set-at ] 2keep r> r>
+  pick over >r >r (grow-lr) r> r>
+  swap heads get delete-at
+  dup pos>> pos set ans>>
   ; inline
 
 :: (setup-lr) ( r l s -- )
@@ -240,8 +240,21 @@ GENERIC: (compile) ( parser -- quot )
     gensym tuck >>compiled 2dup parser-body 0 1 <effect> define-declared dupd "peg" set-word-prop
   ] if* ;
 
+SYMBOL: delayed
+
+: fixup-delayed ( -- )
+  #! Work through all delayed parsers and recompile their
+  #! words to have the correct bodies.
+  delayed get [
+    call compiled-parser 1quotation 0 1 <effect> define-declared
+  ] assoc-each ;
+
 : compile ( parser -- word )
-  [ compiled-parser ] with-compilation-unit ;
+  [
+    H{ } clone delayed [ 
+      compiled-parser fixup-delayed 
+    ] with-variable
+  ] with-compilation-unit ;
 
 : compiled-parse ( state word -- result )
   swap [ execute ] with-packrat ; inline 
@@ -451,7 +464,7 @@ M: delay-parser (compile) ( parser -- quot )
   #! For efficiency we memoize the quotation.
   #! This way it is run only once and the 
   #! parser constructed once at run time.
-  quot>> '[ @ compile ] { } { "word" } <effect> memoize-quot '[ @ execute ] ; 
+  quot>> gensym [ delayed get set-at ] keep 1quotation ; 
 
 TUPLE: box-parser quot ;
 

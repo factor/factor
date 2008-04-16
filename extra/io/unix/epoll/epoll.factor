@@ -13,7 +13,7 @@ TUPLE: epoll-mx < mx events ;
     256 ; inline
 
 : <epoll-mx> ( -- mx )
-    epoll-mx construct-mx
+    epoll-mx new-mx
     max-events epoll_create dup io-error over set-mx-fd
     max-events "epoll-event" <c-array> over set-epoll-mx-events ;
 

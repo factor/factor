@@ -8,6 +8,8 @@ IN: builder.cleanup
 
 SYMBOL: builder-debug
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : compress-image ( -- ) { "bzip2" my-boot-image-name } to-strings try-process ;
 
 : delete-child-factor ( -- )

@@ -32,23 +32,23 @@ $nl
     ""
     ": add-occupant ( person vehicle -- ) occupants>> push ;"
     ""
-    ": construct-vehicle ( class -- vehicle )"
+    ": new-vehicle ( class -- vehicle )"
     "    new"
     "        V{ } clone >>occupants ;"
     ""
     "TUPLE: car < vehicle engine ;"
     ": <car> ( max-speed engine -- car )"
-    "    car construct-vehicle"
+    "    car new-vehicle"
     "        swap >>engine"
     "        swap >>max-speed ;"
     ""
     "TUPLE: aeroplane < vehicle max-altitude ;"
     ": <aeroplane> ( max-speed max-altitude -- aeroplane )"
-    "    aeroplane construct-vehicle"
+    "    aeroplane new-vehicle"
     "        swap >>max-altitude"
     "        swap >>max-speed ;"
 }
-"The naming convention for parametrized constructors is " { $snippet "construct-" { $emphasis "class" } } "." ;
+"The naming convention for parametrized constructors is " { $snippet "new-" { $emphasis "class" } } "." ;
 
 ARTICLE: "tuple-constructors" "Tuple constructors"
 "Tuples are created by calling one of two constructor primitives:"
@@ -64,13 +64,16 @@ $nl
 { $code
     "TUPLE: color red green blue alpha ;"
     ""
+    "! The following two are equivalent"
     "C: <rgba> rgba"
-    ": <rgba> color boa ; ! identical to above"
+    ": <rgba> color boa ;"
     ""
+    "! We can define constructors which call other constructors"
     ": <rgb> f <rgba> ;"
     ""
-    ": <color> new ;"
-    ": <color> f f f f <rgba> ; ! identical to above"
+    "! The following two are equivalent"
+    ": <color> color new ;"
+    ": <color> f f f f <rgba> ;"
 }
 { $subsection "parametrized-constructors" } ;
 

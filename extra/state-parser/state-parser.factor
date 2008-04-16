@@ -97,7 +97,7 @@ SYMBOL: prolog-data
     #! advance spot to after the substring.
     [ [
         dup slip swap dup [ get-char , ] unless
-    ] skip-until ] "" make nip ;
+    ] skip-until ] "" make nip ; inline
 
 : rest ( -- string )
     [ f ] take-until ;

@@ -215,7 +215,10 @@ M: check-method summary
     drop "Invalid parameters for create-method" ;
 
 M: no-tuple-class summary
-    drop "Invalid class for define-constructor" ;
+    drop "BOA constructors can only be defined for tuple classes" ;
+
+M: bad-superclass summary
+    drop "Tuple classes can only inherit from other tuple classes" ;
 
 M: no-cond summary
     drop "Fall-through in cond" ;

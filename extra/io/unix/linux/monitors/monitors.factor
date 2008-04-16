@@ -10,7 +10,7 @@ IN: io.unix.linux.monitors
 TUPLE: linux-monitor < monitor wd ;
 
 : <linux-monitor> ( wd path mailbox -- monitor )
-    linux-monitor construct-monitor
+    linux-monitor new-monitor
         swap >>wd ;
 
 SYMBOL: watches

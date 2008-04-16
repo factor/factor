@@ -246,7 +246,7 @@ SYMBOL: deserialized
     (deserialize) <wrapper> ;
 
 :: (deserialize-seq) ( exemplar quot -- seq )
-    deserialize-cell exemplar new
+    deserialize-cell exemplar new-sequence
     [ intern-object ]
     [ dup [ drop quot call ] change-each ] bi ; inline
 

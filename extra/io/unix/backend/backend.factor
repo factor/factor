@@ -32,7 +32,7 @@ M: input-task io-task-container drop reads>> ;
 
 M: output-task io-task-container drop writes>> ;
 
-: construct-mx ( class -- obj )
+: new-mx ( class -- obj )
     new
         H{ } clone >>reads
         H{ } clone >>writes ; inline

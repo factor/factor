@@ -538,3 +538,6 @@ TUPLE: another-forget-accessors-test ;
         ] with-string-writer empty?
     ] with-variable
 ] unit-test
+
+! Missing error check
+[ "IN: tuples.test USE: words TUPLE: wrong-superclass < word ;" eval ] must-fail

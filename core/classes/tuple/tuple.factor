@@ -58,6 +58,8 @@ PRIVATE>
 : all-slot-names ( class -- slots )
     superclasses [ slot-names ] map concat \ class prefix ;
 
+ERROR: bad-superclass class ;
+
 <PRIVATE
 
 : tuple= ( tuple1 tuple2 -- ? )
@@ -185,16 +187,23 @@ M: tuple-class update-class
 : tuple-class-unchanged? ( class superclass slots -- ? )
     rot tuck [ superclass = ] [ slot-names = ] 2bi* and ;
 
+: valid-superclass? ( class -- ? )
+    [ tuple-class? ] [ tuple eq? ] bi or ;
+
+: check-superclass ( superclass -- )
+    dup valid-superclass? [ bad-superclass ] unless drop ;
+
 PRIVATE>
 
 GENERIC# define-tuple-class 2 ( class superclass slots -- )
 
 M: word define-tuple-class
+    over check-superclass
     define-new-tuple-class ;
 
 M: tuple-class define-tuple-class
     3dup tuple-class-unchanged?
-    [ 3dup redefine-tuple-class ] unless
+    [ over check-superclass 3dup redefine-tuple-class ] unless
     3drop ;
 
 : define-error-class ( class superclass slots -- )

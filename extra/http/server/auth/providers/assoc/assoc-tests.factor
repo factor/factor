@@ -26,7 +26,7 @@ namespaces accessors kernel ;
 
 [ t ] [ "user" get >boolean ] unit-test
 
-[ ] [ "user" get "fdasf" set-password drop ] unit-test
+[ ] [ "user" get "fdasf" >>password drop ] unit-test
 
 [ t ] [ "fdasf" "slava" "provider" get check-login >boolean ] unit-test
 

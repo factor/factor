@@ -27,7 +27,7 @@ M: monitor timeout timeout>> ;
 
 M: monitor set-timeout (>>timeout) ;
 
-: construct-monitor ( path mailbox class -- monitor )
+: new-monitor ( path mailbox class -- monitor )
     new
         swap >>queue
         swap >>path ; inline

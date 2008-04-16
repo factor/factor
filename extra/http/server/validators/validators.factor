@@ -11,14 +11,16 @@ TUPLE: validation-error value reason ;
 C: <validation-error> validation-error
 
 : with-validator ( value quot -- result )
-    [ validation-failed? on <validation-error> ] recover ;
-    inline
+    [ validation-failed? on <validation-error> ] recover ; inline
 
 : v-default ( str def -- str )
     over empty? spin ? ;
 
 : v-required ( str -- str )
     dup empty? [ "required" throw ] when ;
+
+: v-optional ( str quot -- str )
+    over empty? [ 2drop f ] [ call ] if ; inline
 
 : v-min-length ( str n -- str )
     over length over < [

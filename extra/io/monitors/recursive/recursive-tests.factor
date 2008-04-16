@@ -21,7 +21,7 @@ M: dummy-monitor dispose
 M: mock-io-backend (monitor)
     nip
     over exists? [
-        dummy-monitor construct-monitor
+        dummy-monitor new-monitor
         dummy-monitor-created get [ 1+ ] change-i drop
     ] [
         "Does not exist" throw
