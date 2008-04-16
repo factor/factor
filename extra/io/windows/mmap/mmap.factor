@@ -78,7 +78,7 @@ M: windows <mapped-file> ( path length -- mmap )
         PAGE_READWRITE SEC_COMMIT bitor
         FILE_MAP_ALL_ACCESS mmap-open
         -rot 2array
-        f \ mapped-file construct-boa
+        f \ mapped-file boa
     ] with-destructors ;
 
 M: windows close-mapped-file ( mapped-file -- )

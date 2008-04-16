@@ -44,7 +44,7 @@ M: windows-rng random-bytes* ( n tuple -- bytes )
 
 [
     MS_DEF_PROV
-    PROV_RSA_FULL <windows-rng> insecure-random-generator set-global
+    PROV_RSA_FULL <windows-rng> system-random-generator set-global
 
     MS_STRONG_PROV
     PROV_RSA_FULL <windows-rng> secure-random-generator set-global

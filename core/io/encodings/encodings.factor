@@ -30,8 +30,8 @@ ERROR: encode-error ;
 
 <PRIVATE
 
-M: tuple-class <decoder> construct-empty <decoder> ;
-M: tuple <decoder> f decoder construct-boa ;
+M: tuple-class <decoder> new <decoder> ;
+M: tuple <decoder> f decoder boa ;
 
 : >decoder< ( decoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ;
@@ -104,8 +104,8 @@ M: decoder stream-readln ( stream -- str )
 M: decoder dispose decoder-stream dispose ;
 
 ! Encoding
-M: tuple-class <encoder> construct-empty <encoder> ;
-M: tuple <encoder> encoder construct-boa ;
+M: tuple-class <encoder> new <encoder> ;
+M: tuple <encoder> encoder boa ;
 
 : >encoder< ( encoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ;

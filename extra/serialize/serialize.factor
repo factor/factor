@@ -246,7 +246,7 @@ SYMBOL: deserialized
     (deserialize) <wrapper> ;
 
 :: (deserialize-seq) ( exemplar quot -- seq )
-    deserialize-cell exemplar new
+    deserialize-cell exemplar new-sequence
     [ intern-object ]
     [ dup [ drop quot call ] change-each ] bi ; inline
 
@@ -277,7 +277,7 @@ SYMBOL: deserialized
 : deserialize-tuple ( -- array )
     #! Ugly because we have to intern the tuple before reading
     #! slots
-    (deserialize) construct-empty
+    (deserialize) new
     [ intern-object ]
     [
         [ (deserialize) ]

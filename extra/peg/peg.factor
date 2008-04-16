@@ -21,7 +21,7 @@ C: <parser> parser
 SYMBOL: ignore 
 
 : <parse-result> ( remaining ast -- parse-result )
-  parse-result construct-boa ;
+  parse-result boa ;
 
 SYMBOL: packrat
 SYMBOL: pos
@@ -100,21 +100,21 @@ C: <head> peg-head
 : setup-growth ( h p -- )
   pos set dup involved-set>> clone >>eval-set drop ;
 
-:: (grow-lr) ( h p r m -- )
-  h p setup-growth
-  r eval-rule
-  dup m stop-growth? [
-    drop
+: (grow-lr) ( h p r m -- )
+  >r >r [ setup-growth ] 2keep r> r>
+  >r dup eval-rule r> swap
+  dup pick stop-growth? [
+    4drop drop
   ] [
-    m update-m
-     h p r m (grow-lr)
+    over update-m
+    (grow-lr)
   ] if ; inline
  
-:: grow-lr ( h p r m -- ast )
-  h p heads get set-at
-  h p r m (grow-lr) 
-  p heads get delete-at
-  m pos>> pos set m ans>>
+: grow-lr ( h p r m -- ast )
+  >r >r [ heads get set-at ] 2keep r> r>
+  pick over >r >r (grow-lr) r> r>
+  swap heads get delete-at
+  dup pos>> pos set ans>>
   ; inline
 
 :: (setup-lr) ( r l s -- )
@@ -240,8 +240,21 @@ GENERIC: (compile) ( parser -- quot )
     gensym tuck >>compiled 2dup parser-body 0 1 <effect> define-declared dupd "peg" set-word-prop
   ] if* ;
 
+SYMBOL: delayed
+
+: fixup-delayed ( -- )
+  #! Work through all delayed parsers and recompile their
+  #! words to have the correct bodies.
+  delayed get [
+    call compiled-parser 1quotation 0 1 <effect> define-declared
+  ] assoc-each ;
+
 : compile ( parser -- word )
-  [ compiled-parser ] with-compilation-unit ;
+  [
+    H{ } clone delayed [ 
+      compiled-parser fixup-delayed 
+    ] with-variable
+  ] with-compilation-unit ;
 
 : compiled-parse ( state word -- result )
   swap [ execute ] with-packrat ; inline 
@@ -451,7 +464,7 @@ M: delay-parser (compile) ( parser -- quot )
   #! For efficiency we memoize the quotation.
   #! This way it is run only once and the 
   #! parser constructed once at run time.
-  quot>> '[ @ compile ] { } { "word" } <effect> memoize-quot '[ @ execute ] ; 
+  quot>> gensym [ delayed get set-at ] keep 1quotation ; 
 
 TUPLE: box-parser quot ;
 
@@ -468,16 +481,16 @@ M: box-parser (compile) ( parser -- quot )
 PRIVATE>
 
 : token ( string -- parser )
-  token-parser construct-boa init-parser ;      
+  token-parser boa init-parser ;      
 
 : satisfy ( quot -- parser )
-  satisfy-parser construct-boa init-parser ;
+  satisfy-parser boa init-parser ;
 
 : range ( min max -- parser )
-  range-parser construct-boa init-parser ;
+  range-parser boa init-parser ;
 
 : seq ( seq -- parser )
-  seq-parser construct-boa init-parser ;
+  seq-parser boa init-parser ;
 
 : 2seq ( parser1 parser2 -- parser )
   2array seq ;
@@ -492,7 +505,7 @@ PRIVATE>
   { } make seq ; inline 
 
 : choice ( seq -- parser )
-  choice-parser construct-boa init-parser ;
+  choice-parser boa init-parser ;
 
 : 2choice ( parser1 parser2 -- parser )
   2array choice ;
@@ -507,34 +520,34 @@ PRIVATE>
   { } make choice ; inline 
 
 : repeat0 ( parser -- parser )
-  repeat0-parser construct-boa init-parser ;
+  repeat0-parser boa init-parser ;
 
 : repeat1 ( parser -- parser )
-  repeat1-parser construct-boa init-parser ;
+  repeat1-parser boa init-parser ;
 
 : optional ( parser -- parser )
-  optional-parser construct-boa init-parser ;
+  optional-parser boa init-parser ;
 
 : semantic ( parser quot -- parser )
-  semantic-parser construct-boa init-parser ;
+  semantic-parser boa init-parser ;
 
 : ensure ( parser -- parser )
-  ensure-parser construct-boa init-parser ;
+  ensure-parser boa init-parser ;
 
 : ensure-not ( parser -- parser )
-  ensure-not-parser construct-boa init-parser ;
+  ensure-not-parser boa init-parser ;
 
 : action ( parser quot -- parser )
-  action-parser construct-boa init-parser ;
+  action-parser boa init-parser ;
 
 : sp ( parser -- parser )
-  sp-parser construct-boa init-parser ;
+  sp-parser boa init-parser ;
 
 : hide ( parser -- parser )
   [ drop ignore ] action ;
 
 : delay ( quot -- parser )
-  delay-parser construct-boa init-parser ;
+  delay-parser boa init-parser ;
 
 : box ( quot -- parser )
   #! because a box has its quotation run at compile time
@@ -548,7 +561,7 @@ PRIVATE>
   #! parse. The action adds an indirection with a parser type
   #! that gets memoized and fixes this. Need to rethink how
   #! to fix boxes so this isn't needed...
-  box-parser construct-boa next-id f <parser> over set-delegate [ ] action ;
+  box-parser boa next-id f <parser> over set-delegate [ ] action ;
 
 : PEG:
   (:) [

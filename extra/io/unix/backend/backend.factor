@@ -14,7 +14,7 @@ TUPLE: io-task port callbacks ;
 : io-task-fd port>> handle>> ;
 
 : <io-task> ( port continuation/f class -- task )
-    construct-empty
+    new
         swap [ 1vector ] [ V{ } clone ] if* >>callbacks
         swap >>port ; inline
 
@@ -32,8 +32,8 @@ M: input-task io-task-container drop reads>> ;
 
 M: output-task io-task-container drop writes>> ;
 
-: construct-mx ( class -- obj )
-    construct-empty
+: new-mx ( class -- obj )
+    new
         H{ } clone >>reads
         H{ } clone >>writes ; inline
 

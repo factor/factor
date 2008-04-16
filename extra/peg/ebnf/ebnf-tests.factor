@@ -295,3 +295,5 @@ main = Primary
 { V{ V{ V{ "x" "[" "i" "]" } "[" "j" "]" } "." "y" } } [
   "x[i][j].y" primary parse-result-ast
 ] unit-test
+
+'ebnf' compile must-infer

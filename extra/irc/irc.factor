@@ -39,14 +39,14 @@ TUPLE: irc-client profile nick stream stream-channel controller-channel
        listeners is-running ;
 : <irc-client> ( profile -- irc-client )
     f V{ } clone V{ } clone <nick>
-    f <channel> <channel> V{ } clone f irc-client construct-boa ;
+    f <channel> <channel> V{ } clone f irc-client boa ;
 
 USE: prettyprint
 TUPLE: irc-listener channel ;
 ! FIXME: spawn-server-linked con manejo de excepciones, mandar un mensaje final (ya se maneja esto al recibir mensajes del channel? )
 ! tener la opción de dejar de correr un client??
 : <irc-listener> ( quot -- irc-listener )
-    <channel> irc-listener construct-boa swap
+    <channel> irc-listener boa swap
     [
         [ channel>> '[ , from ] ]
         [ '[ , curry f spawn drop ] ]

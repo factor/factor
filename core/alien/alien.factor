@@ -54,7 +54,7 @@ TUPLE: library path abi dll ;
 : library ( name -- library ) libraries get at ;
 
 : <library> ( path abi -- library )
-    over dup [ dlopen ] when \ library construct-boa ;
+    over dup [ dlopen ] when \ library boa ;
 
 : load-library ( name -- dll )
     library dup [ library-dll ] when ;

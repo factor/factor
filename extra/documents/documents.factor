@@ -184,8 +184,7 @@ M: one-char-elt next-elt 2drop ;
     [ >r blank? r> xor ] curry ; inline
 
 : (prev-word) ( ? col str -- col )
-    rot break-detector find-last*
-    drop [ 1+ ] [ 0 ] if* ;
+    rot break-detector find-last* drop ?1+ ;
 
 : (next-word) ( ? col str -- col )
     [ rot break-detector find* drop ] keep

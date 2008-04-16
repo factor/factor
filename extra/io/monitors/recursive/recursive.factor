@@ -98,7 +98,7 @@ M: recursive-monitor dispose
 
 : <recursive-monitor> ( path mailbox -- monitor )
     >r (normalize-path) r>
-    recursive-monitor construct-monitor
+    recursive-monitor new-monitor
         H{ } clone >>children
         <promise> >>ready
     dup start-pump-thread

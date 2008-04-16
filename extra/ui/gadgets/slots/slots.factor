@@ -69,7 +69,7 @@ M: value-ref finish-editing
 } define-command
 
 : <slot-editor> ( ref -- gadget )
-    slot-editor construct-empty
+    slot-editor new
     [ set-slot-editor-ref ] keep
     [
         toolbar,
@@ -118,7 +118,7 @@ TUPLE: editable-slot printer ref ;
 } set-gestures
 
 : <editable-slot> ( gadget ref -- editable-slot )
-    editable-slot construct-empty
+    editable-slot new
     { 1 0 } <track> over set-gadget-delegate
     [ drop <gadget> ] over set-editable-slot-printer
     [ set-editable-slot-ref ] keep

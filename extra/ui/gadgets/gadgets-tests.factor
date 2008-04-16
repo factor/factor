@@ -1,6 +1,6 @@
 IN: ui.gadgets.tests
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
-namespaces models kernel dlists math
+namespaces models kernel dlists math sets
 math.parser ui sequences hashtables assocs io arrays
 prettyprint io.streams.string ;
 
@@ -114,7 +114,7 @@ C: <fooey> fooey
 TUPLE: mock-gadget graft-called ungraft-called ;
 
 : <mock-gadget>
-    0 0 mock-gadget construct-boa <gadget> over set-delegate ;
+    0 0 mock-gadget boa <gadget> over set-delegate ;
 
 M: mock-gadget graft*
     dup mock-gadget-graft-called 1+

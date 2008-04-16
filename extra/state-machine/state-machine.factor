@@ -12,7 +12,7 @@ IN: state-machine
 TUPLE: state place data ;
 
 TUPLE: missing-state ;
-: missing-state \ missing-state construct-empty throw ;
+: missing-state \ missing-state new throw ;
 M: missing-state error.
     drop "Missing state" print ;
 

@@ -9,7 +9,7 @@ IN: jamshred.tunnel
 TUPLE: segment number color radius ;
 
 : <segment> ( number color radius location forward up left -- segment )
-    <oint> >r segment construct-boa r> over set-delegate ;
+    <oint> >r segment boa r> over set-delegate ;
 
 : segment-vertex ( theta segment -- vertex )
      tuck 2dup oint-up swap sin v*n

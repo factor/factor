@@ -18,12 +18,12 @@ boxer prep unboxer
 getter setter
 reg-class size align stack-align? ;
 
-: construct-c-type ( class -- type )
-    construct-empty
+: new-c-type ( class -- type )
+    new
         int-regs >>reg-class ;
 
 : <c-type> ( -- type )
-    \ c-type construct-c-type ;
+    \ c-type new-c-type ;
 
 SYMBOL: c-types
 
@@ -189,7 +189,7 @@ DEFER: >c-ushort-array
 TUPLE: long-long-type < c-type ;
 
 : <long-long-type> ( -- type )
-    long-long-type construct-c-type ;
+    long-long-type new-c-type ;
 
 M: long-long-type unbox-parameter ( n type -- )
     c-type-unboxer %unbox-long-long ;

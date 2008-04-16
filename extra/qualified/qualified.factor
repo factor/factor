@@ -1,5 +1,5 @@
 USING: kernel sequences assocs hashtables parser vocabs words namespaces
-vocabs.loader debugger ;
+vocabs.loader debugger sets ;
 IN: qualified
 
 : define-qualified ( vocab-name prefix-name -- )
@@ -23,7 +23,7 @@ IN: qualified
     ] curry map zip ;
 
 : partial-vocab-ignoring ( words name -- assoc )
-    [ vocab-words keys seq-diff ] keep partial-vocab ;
+    [ vocab-words keys diff ] keep partial-vocab ;
 
 : EXCLUDE:
     #! Syntax: EXCLUDE: vocab => words ... ;

@@ -153,7 +153,6 @@ SYMBOL: event-stream-callbacks
 [
     event-stream-callbacks global
     [ [ drop expired? not ] assoc-subset H{ } assoc-like ] change-at
-    1 \ event-stream-counter set-global
 ] "core-foundation" add-init-hook
 
 : add-event-source-callback ( quot -- id )
@@ -195,7 +194,7 @@ TUPLE: event-stream info handle closed ;
     >r master-event-source-callback r>
     r> r> r> <FSEventStream>
     dup enable-event-stream
-    f event-stream construct-boa ;
+    f event-stream boa ;
 
 M: event-stream dispose
     dup closed>> [ drop ] [

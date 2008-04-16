@@ -21,7 +21,7 @@ M: dummy-monitor dispose
 M: mock-io-backend (monitor)
     nip
     over exists? [
-        dummy-monitor construct-monitor
+        dummy-monitor new-monitor
         dummy-monitor-created get [ 1+ ] change-i drop
     ] [
         "Does not exist" throw
@@ -30,8 +30,8 @@ M: mock-io-backend (monitor)
 M: mock-io-backend link-info
     global [ link-info ] bind ;
 
-[ ] [ 0 counter construct-boa dummy-monitor-created set ] unit-test
-[ ] [ 0 counter construct-boa dummy-monitor-disposed set ] unit-test
+[ ] [ 0 counter boa dummy-monitor-created set ] unit-test
+[ ] [ 0 counter boa dummy-monitor-disposed set ] unit-test
 
 [ ] [
     mock-io-backend io-backend [

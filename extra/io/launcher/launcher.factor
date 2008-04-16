@@ -41,7 +41,7 @@ SYMBOL: +highest-priority+
 SYMBOL: +realtime-priority+
 
 : <process> ( -- process )
-    process construct-empty
+    process new
     H{ } clone >>environment
     +append-environment+ >>environment-mode ;
 
@@ -85,8 +85,8 @@ M: process hashcode* process-handle hashcode* ;
 : get-environment ( process -- env )
     dup environment>>
     swap environment-mode>> {
-        { +prepend-environment+ [ os-envs union ] }
-        { +append-environment+ [ os-envs swap union ] }
+        { +prepend-environment+ [ os-envs assoc-union ] }
+        { +append-environment+ [ os-envs swap assoc-union ] }
         { +replace-environment+ [ ] }
     } case ;
 
@@ -130,7 +130,7 @@ HOOK: run-process* io-backend ( process -- handle )
 TUPLE: process-failed code ;
 
 : process-failed ( code -- * )
-    \ process-failed construct-boa throw ;
+    \ process-failed boa throw ;
 
 : try-process ( desc -- )
     run-process wait-for-process dup zero?

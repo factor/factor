@@ -14,7 +14,7 @@ TUPLE: callback-responder responder callbacks ;
     #! A continuation responder is a special type of session
     #! manager. However it works entirely differently from
     #! the URL and cookie session managers.
-    H{ } clone callback-responder construct-boa ;
+    H{ } clone callback-responder boa ;
 
 TUPLE: callback cont quot expires alarm responder ;
 
@@ -32,7 +32,7 @@ TUPLE: callback cont quot expires alarm responder ;
     ] when drop ;
 
 : <callback> ( cont quot expires? -- callback )
-    f callback-responder get callback construct-boa
+    f callback-responder get callback boa
     dup touch-callback ;
 
 : invoke-callback ( callback -- response )

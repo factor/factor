@@ -7,10 +7,10 @@ TUPLE: digraph ;
 TUPLE: vertex value edges ;
 
 : <digraph> ( -- digraph )
-    digraph construct-empty H{ } clone over set-delegate ;
+    digraph new H{ } clone over set-delegate ;
 
 : <vertex> ( value -- vertex )
-    V{ } clone vertex construct-boa ;
+    V{ } clone vertex boa ;
 
 : add-vertex ( key value digraph -- )
     >r <vertex> swap r> set-at ;

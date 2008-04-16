@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors db.tuples hashtables kernel
+USING: accessors db.tuples hashtables kernel sets
 semantic-db semantic-db.relations sequences sequences.deep ;
 IN: semantic-db.hierarchy
 

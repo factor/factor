@@ -94,7 +94,7 @@ M: unix copy-file ( from to -- )
         [ stat-st_mode ]
         [ stat-st_mtim timespec-sec seconds unix-1970 time+ ]
     } cleave
-    \ file-info construct-boa ;
+    \ file-info boa ;
 
 M: unix file-info ( path -- info )
     normalize-path stat* stat>file-info ;

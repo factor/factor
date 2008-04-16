@@ -4,7 +4,7 @@ IN: io.streams.duplex.tests
 ! Test duplex stream close behavior
 TUPLE: closing-stream closed? ;
 
-: <closing-stream> closing-stream construct-empty ;
+: <closing-stream> closing-stream new ;
 
 M: closing-stream dispose
     dup closing-stream-closed? [
@@ -15,7 +15,7 @@ M: closing-stream dispose
 
 TUPLE: unclosable-stream ;
 
-: <unclosable-stream> unclosable-stream construct-empty ;
+: <unclosable-stream> unclosable-stream new ;
 
 M: unclosable-stream dispose
     "Can't close me!" throw ;

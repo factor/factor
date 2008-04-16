@@ -6,7 +6,6 @@ implementation. It is not an introduction to the language itself.
 
 * Contents
 
-- Platform support
 - Compiling the Factor VM
 - Libraries needed for compilation
 - Bootstrapping the Factor image
@@ -19,79 +18,49 @@ implementation. It is not an introduction to the language itself.
 - Source organization
 - Community
 
-* Platform support
-
-Factor supports the following platforms:
-
-  Linux/x86
-  Linux/AMD64
-  Linux/PowerPC
-  Linux/ARM
-  Mac OS X/x86
-  Mac OS X/PowerPC
-  FreeBSD/x86
-  FreeBSD/AMD64
-  OpenBSD/x86
-  OpenBSD/AMD64
-  Solaris/x86
-  Solaris/AMD64
-  MS Windows/x86 (XP and above)
-  MS Windows CE/ARM
-
-Please donate time or hardware if you wish to see Factor running on
-other platforms. In particular, we are interested in:
-
-  Windows/AMD64
-  Mac OS X/AMD64
-  Solaris/UltraSPARC
-  Linux/MIPS
-
 * Compiling the Factor VM
 
 The Factor runtime is written in GNU C99, and is built with GNU make and
 gcc.
 
-Factor requires gcc 3.4 or later. On x86, it /will not/ build using gcc
-3.3 or earlier. If you are using gcc 4.3, you might get an unusable
-Factor binary unless you add 'SITE_CFLAGS=-fno-forward-propagate' to the
-command-line arguments for make.
+Factor supports various platforms. For an up-to-date list, see
+<http://factorcode.org/getfactor.fhtml>.
 
-Run 'make' (or 'gmake' on *BSD) with no parameters to see a list of
-targets and build options. Then run 'make' with the appropriate target
-for your platform.
+Factor requires gcc 3.4 or later.
+
+On x86, Factor /will not/ build using gcc 3.3 or earlier.
+
+If you are using gcc 4.3, you might get an unusable Factor binary unless
+you add 'SITE_CFLAGS=-fno-forward-propagate' to the command-line
+arguments for make.
+
+Run 'make' ('gmake' on *BSD) with no parameters to build the Factor VM.
 
 Compilation will yield an executable named 'factor' on Unix,
-'factor-nt.exe' on Windows XP/Vista, and 'factor-ce.exe' on Windows CE.
+'factor.exe' on Windows XP/Vista, and 'factor-ce.exe' on Windows CE.
 
 * Libraries needed for compilation
 
-For X11 support, you need recent development libraries for libc, Freetype,
-X11, OpenGL and GLUT. On a Debian-derived Linux distribution (like Ubuntu),
-you can use the line
+For X11 support, you need recent development libraries for libc,
+Freetype, X11, OpenGL and GLUT. On a Debian-derived Linux distribution
+(like Ubuntu), you can use the line
 
-sudo apt-get install libc6-dev libfreetype6-dev libx11-dev glutg3-dev
+    sudo apt-get install libc6-dev libfreetype6-dev libx11-dev glutg3-dev
 
-to grab everything (if you're on a non-debian-derived distro please tell us
-what the equivalent command is on there and it can be added :)
+to grab everything (if you're on a non-debian-derived distro please tell
+us what the equivalent command is on there and it can be added).
 
 * Bootstrapping the Factor image
-
-The boot images are no longer included with the Factor distribution
-due to size concerns. Instead, download a boot image from:
-
-  http://factorcode.org/images/
 
 Once you have compiled the Factor runtime, you must bootstrap the Factor
 system using the image that corresponds to your CPU architecture.
 
-Once you download the right image, bootstrap the system with the
+Boot images can be obtained from <http://factorcode.org/images/latest/>.
+
+Once you download the right image, bootstrap Factor with the
 following command line:
 
 ./factor -i=boot.<cpu>.image
-
-Or this command for Mac OS X systems:
-
-./Factor.app/Contents/MacOS/factor -i=boot.<cpu>.image
 
 Bootstrap can take a while, depending on your system. When the process
 completes, a 'factor.image' file will be generated. Note that this image
@@ -122,9 +91,8 @@ The latter keeps the terminal listener running.
 
 * Running Factor on Mac OS X - Cocoa UI
 
-On Mac OS X 10.4 and later, a Cocoa UI is available in addition to the
-terminal listener. If you are using Mac OS X 10.3, you can only run the
-X11 UI, as documented in the next section.
+On Mac OS X, a Cocoa UI is available in addition to the terminal
+listener.
 
 The 'factor' executable runs the terminal listener:
 
@@ -136,17 +104,16 @@ contains factor.image and the library sources.
 
 * Running Factor on Mac OS X - X11 UI
 
-The X11 UI is available on Mac OS X, however its use is not recommended
-since it does not integrate with the host OS. However, if you are
-running Mac OS X 10.3, it is your only choice.
+The X11 UI is also available on Mac OS X, however its use is not
+recommended since it does not integrate with the host OS.
 
 When compiling Factor, pass the X11=1 parameter:
 
-  make macosx-ppc X11=1
+  make X11=1
 
 Then bootstrap with the following switches:
 
-  ./factor -i=boot.ppc.image -ui-backend=x11
+  ./factor -i=boot.<cpu>.image -ui-backend=x11
 
 Now if $DISPLAY is set, running ./factor will start the UI.
 
@@ -155,40 +122,36 @@ Now if $DISPLAY is set, running ./factor will start the UI.
 If you did not download the binary package, you can bootstrap Factor in
 the command prompt:
 
-  factor-nt.exe -i=boot.x86.32.image
+  factor.exe -i=boot.<cpu>.image
 
 Once bootstrapped, double-clicking factor.exe starts the Factor UI.
 
 To run the listener in the command prompt:
 
-  factor-nt.exe -run=listener
+  factor.exe -run=listener
 
 * The Factor FAQ
 
-The Factor FAQ lives online at http://factorcode.org/faq.fhtml
+The Factor FAQ is available at <http://factorcode.org/faq.fhtml>.
 
 * Command line usage
 
-The Factor VM supports a number of command line switches. To read
-command line usage documentation, either enter the following in the UI
-listener:
+Factor supports a number of command line switches. To read command line
+usage documentation, enter the following in the UI listener:
 
   "command-line" about
 
 * Source organization
 
-The following two directories are managed by the module system; consult
-the documentation for details:
+The Factor source tree is organized as follows:
 
+  build-support/ - scripts used for compiling Factor
   core/ - Factor core library and compiler
   extra/ - more libraries
-
-The following directories contain additional files:
-
-  misc/ - editor modes, icons, etc
-  vm/ - sources for the Factor runtime, written in C
   fonts/ - TrueType fonts used by UI
+  misc/ - editor modes, icons, etc
   unmaintained/ - unmaintained contributions, please help!
+  vm/ - sources for the Factor VM, written in C
 
 * Community
 

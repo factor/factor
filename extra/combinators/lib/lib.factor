@@ -137,7 +137,7 @@ MACRO: map-exec-with ( words -- )
     [ 1quotation ] map [ map-call-with ] curry ;
 
 MACRO: construct-slots ( assoc tuple-class -- tuple ) 
-    [ construct-empty ] curry swap [
+    [ new ] curry swap [
         [ dip ] curry swap 1quotation [ keep ] curry compose
     ] { } assoc>map concat compose ;
 

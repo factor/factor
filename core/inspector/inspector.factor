@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables io kernel assocs math
 namespaces prettyprint sequences strings io.styles vectors words
-quotations mirrors splitting math.parser classes vocabs refs ;
+quotations mirrors splitting math.parser classes vocabs refs
+sets ;
 IN: inspector
 
 GENERIC: summary ( object -- string )

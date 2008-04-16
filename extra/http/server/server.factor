@@ -105,8 +105,13 @@ SYMBOL: form-hook
 
 TUPLE: dispatcher default responders ;
 
+: new-dispatcher ( class -- dispatcher )
+    new
+        404-responder get >>default
+        H{ } clone >>responders ; inline
+
 : <dispatcher> ( -- dispatcher )
-    404-responder get H{ } clone dispatcher construct-boa ;
+    dispatcher new-dispatcher ;
 
 : split-path ( path -- rest first )
     [ CHAR: / = ] left-trim "/" split1 swap ;
@@ -125,13 +130,10 @@ M: dispatcher call-responder ( path dispatcher -- response )
         2drop redirect-with-/
     ] if ;
 
-: <webapp> ( class -- dispatcher )
-    <dispatcher> swap construct-delegate ; inline
-
 TUPLE: vhost-dispatcher default responders ;
 
 : <vhost-dispatcher> ( -- dispatcher )
-    404-responder get H{ } clone vhost-dispatcher construct-boa ;
+    404-responder get H{ } clone vhost-dispatcher boa ;
 
 : find-vhost ( dispatcher -- responder )
     request get host>> over responders>> at*

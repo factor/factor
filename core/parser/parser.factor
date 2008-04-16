@@ -5,7 +5,7 @@ prettyprint sequences strings vectors words quotations inspector
 io.styles io combinators sorting splitting math.parser effects
 continuations debugger io.files io.streams.string vocabs
 io.encodings.utf8 source-files classes classes.tuple hashtables
-compiler.errors compiler.units accessors ;
+compiler.errors compiler.units accessors sets ;
 IN: parser
 
 TUPLE: lexer text line line-text line-length column ;
@@ -17,9 +17,14 @@ TUPLE: lexer text line line-text line-length column ;
     0 >>column
     drop ;
 
+: new-lexer ( text class -- lexer )
+    new
+        0 >>line
+        swap >>text
+    dup next-line ; inline
+
 : <lexer> ( text -- lexer )
-    0 { set-lexer-text set-lexer-line } lexer construct
-    dup next-line ;
+    lexer new-lexer ;
 
 : location ( -- loc )
     file get lexer get lexer-line 2dup and
@@ -159,7 +164,7 @@ name>char-hook global [
 TUPLE: parse-error file line column line-text error ;
 
 : <parse-error> ( msg -- error )
-    \ parse-error construct-empty
+    \ parse-error new
         file get >>file
         lexer get line>> >>line
         lexer get column>> >>column
@@ -183,6 +188,9 @@ M: parse-error summary
 
 M: parse-error compute-restarts
     error>> compute-restarts ;
+
+M: parse-error error-help
+    error>> error-help ;
 
 SYMBOL: use
 SYMBOL: in
@@ -253,7 +261,7 @@ M: no-word-error summary
     drop "Word not found in current vocabulary search path" ;
 
 : no-word ( name -- newword )
-    dup no-word-error construct-boa
+    dup no-word-error boa
     swap words-named [ forward-reference? not ] subset
     word-restarts throw-restarts
     dup word-vocabulary (use+) ;
@@ -285,7 +293,7 @@ M: no-word-error summary
     scan-word bootstrap-word scan-word create-method-in ;
 
 : shadowed-slots ( superclass slots -- shadowed )
-    >r all-slot-names r> seq-intersect ;
+    >r all-slot-names r> intersect ;
 
 : check-slot-shadowing ( class superclass slots -- )
     shadowed-slots [
@@ -298,12 +306,35 @@ M: no-word-error summary
         ] "" make note.
     ] with each ;
 
+ERROR: invalid-slot-name name ;
+
+M: invalid-slot-name summary
+    drop
+    "Invalid slot name" ;
+
+: (parse-tuple-slots) ( -- )
+    #! This isn't meant to enforce any kind of policy, just
+    #! to check for mistakes of this form:
+    #!
+    #! TUPLE: blahblah foo bing
+    #!
+    #! : ...
+    scan {
+        { [ dup not ] [ unexpected-eof ] }
+        { [ dup { ":" "(" "<" } member? ] [ invalid-slot-name ] }
+        { [ dup ";" = ] [ drop ] }
+        [ , (parse-tuple-slots) ]
+    } cond ;
+
+: parse-tuple-slots ( -- seq )
+    [ (parse-tuple-slots) ] { } make ;
+
 : parse-tuple-definition ( -- class superclass slots )
     CREATE-CLASS
     scan {
         { ";" [ tuple f ] }
-        { "<" [ scan-word ";" parse-tokens ] }
-        [ >r tuple ";" parse-tokens r> prefix ]
+        { "<" [ scan-word parse-tuple-slots ] }
+        [ >r tuple parse-tuple-slots r> prefix ]
     } case 3dup check-slot-shadowing ;
 
 ERROR: staging-violation word ;
@@ -475,14 +506,14 @@ SYMBOL: interactive-vocabs
     ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
-    diff [
+    assoc-diff [
         drop where dup [ first ] when
         file get source-file-path =
     ] assoc-subset keys ;
 
 : removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions
-    [ get first2 union ] bi@ ;
+    [ get first2 assoc-union ] bi@ ;
 
 : removed-classes ( -- assoc1 assoc2 )
     new-definitions old-definitions

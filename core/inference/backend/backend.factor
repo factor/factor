@@ -39,9 +39,9 @@ M: inference-error compiler-error-type type>> ;
 M: inference-error error-help error>> error-help ;
 
 : (inference-error) ( ... class type -- * )
-    >r construct-boa r>
+    >r boa r>
     recursive-state get
-    \ inference-error construct-boa throw ; inline
+    \ inference-error boa throw ; inline
 
 : inference-error ( ... class -- * )
     +error+ (inference-error) ; inline

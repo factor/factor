@@ -425,7 +425,7 @@ M: cpu reset ( cpu -- )
   [ HEX: 10 swap set-cpu-last-interrupt ] keep
   0 swap set-cpu-cycles ;
 
-: <cpu> ( -- cpu ) cpu construct-empty dup reset ;
+: <cpu> ( -- cpu ) cpu new dup reset ;
 
 : (load-rom) ( n ram -- )
   read1 [ ! n ram ch

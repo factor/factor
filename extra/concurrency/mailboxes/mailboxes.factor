@@ -14,7 +14,7 @@ M: mailbox dispose
     t >>closed threads>> notify-all ;
 
 : <mailbox> ( -- mailbox )
-    <dlist> <dlist> f mailbox construct-boa ;
+    <dlist> <dlist> f mailbox boa ;
 
 : mailbox-empty? ( mailbox -- bool )
     data>> dlist-empty? ;
@@ -81,23 +81,19 @@ M: mailbox dispose
 : wait-for-close ( mailbox -- )
     f wait-for-close-timeout ;
 
-TUPLE: linked-error thread ;
+TUPLE: linked-error error thread ;
 
-: <linked-error> ( error thread -- linked )
-    { set-delegate set-linked-error-thread }
-    linked-error construct ;
+C: <linked-error> linked-error
 
 : ?linked dup linked-error? [ rethrow ] when ;
 
-TUPLE: linked-thread supervisor ;
+TUPLE: linked-thread < thread supervisor ;
 
 M: linked-thread error-in-thread
-    [ <linked-error> ] keep
-    linked-thread-supervisor mailbox-put ;
+    [ <linked-error> ] [ supervisor>> ] bi mailbox-put ;
 
 : <linked-thread> ( quot name mailbox -- thread' )
-    >r <thread> linked-thread construct-delegate r>
-    over set-linked-thread-supervisor ;
+    >r linked-thread new-thread r> >>supervisor ;
 
 : spawn-linked-to ( quot name mailbox -- thread )
     <linked-thread> [ (spawn) ] keep ;

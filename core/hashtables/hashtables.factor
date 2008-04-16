@@ -116,7 +116,7 @@ IN: hashtables
 PRIVATE>
 
 : <hashtable> ( n -- hash )
-    hashtable construct-empty [ reset-hash ] keep ;
+    hashtable new [ reset-hash ] keep ;
 
 M: hashtable at* ( key hash -- value ? )
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;
@@ -173,19 +173,5 @@ M: hashtable assoc-like
 
 : ?set-at ( value key assoc/f -- assoc )
     [ [ set-at ] keep ] [ associate ] if* ;
-
-: (prune) ( hash vec elt -- )
-    rot 2dup key?
-    [ 3drop ] [ dupd dupd set-at swap push ] if ; inline
-
-: prune ( seq -- newseq )
-    [ length <hashtable> ]
-    [ length <vector> ]
-    [ ] tri
-    [ >r 2dup r> (prune) ] each nip ;
-
-: all-unique? ( seq -- ? )
-    [ length ]
-    [ prune length ] bi = ;
 
 INSTANCE: hashtable assoc

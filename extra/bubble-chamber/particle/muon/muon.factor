@@ -17,7 +17,7 @@ IN: bubble-chamber.particle.muon
 
 TUPLE: muon < particle ;
 
-: <muon> ( -- muon ) muon construct-empty initialize-particle ;
+: <muon> ( -- muon ) muon new initialize-particle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

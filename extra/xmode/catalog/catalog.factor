@@ -9,7 +9,7 @@ TUPLE: mode file file-name-glob first-line-glob ;
 
 TAG: MODE
     "NAME" over at >r
-    mode construct-empty {
+    mode new {
         { "FILE" f set-mode-file }
         { "FILE_NAME_GLOB" f set-mode-file-name-glob }
         { "FIRST_LINE_GLOB" f set-mode-first-line-glob }
@@ -36,9 +36,13 @@ TAGS>
     f \ modes set-global ;
 
 MEMO: (load-mode) ( name -- rule-sets )
-    modes at mode-file
-    "extra/xmode/modes/" prepend
-    resource-path utf8 <file-reader> parse-mode ;
+    modes at [
+        mode-file
+        "extra/xmode/modes/" prepend
+        resource-path utf8 <file-reader> parse-mode
+    ] [
+        "text" (load-mode)
+    ] if* ;
 
 SYMBOL: rule-sets
 
