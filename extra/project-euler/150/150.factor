@@ -1,46 +1,44 @@
-USING: kernel math math.ranges math.parser sequences io locals namespaces ;
-
+! Copyright (c) 2008 Eric Mertens
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel math sequences locals ;
 IN: project-euler.150
 
-: next-t ( t -- t' )
-    615949 * 797807 + 1 20 shift rem ; inline
+<PRIVATE
 
-: next-s ( t -- s )
-    1 19 shift - ; inline
-
-: generate ( -- seq )
-    0 500500 [ drop next-t dup next-s ] map nip ;
-
-: start-index ( i -- n )
-    dup 1- * 2/ ; inline
+! sequence helper functions
 
 : partial-sums ( seq -- seq )
     0 [ + ] accumulate swap suffix ; inline
 
-: as-triangle ( i seq -- slices )
-    swap [1,b] [ [ start-index dup ] keep + rot <slice> ] with map ;
+: generate ( n quot -- seq )
+    [ drop ] swap compose map ; inline
 
-: sums-triangle ( -- seqs )
-    1000 generate as-triangle [ partial-sums ] map ;
+: map-infimum ( seq quot -- min )
+    [ min ] compose 0 swap reduce ; inline
 
-SYMBOL: best
 
-: check-best ( i -- )
-    best [ min ] change ; inline
+! triangle generator functions
+
+: next ( t -- new-t s )
+    615949 * 797807 + 1 20 shift mod dup 1 19 shift - ; inline
+
+: sums-triangle ( -- seq )
+    0 1000 [ 1+ [ next ] generate partial-sums ] map nip ;
+
+PRIVATE>
 
 :: (euler150) ( m -- n )
-    [ [let | table [ sums-triangle ] |
-        0 best set
+    [let | table [ sums-triangle ] |
         m [| x |
-            x 1+ [| y | 
-                1000 x - [| z |
+            x 1+ [| y |
+                m x - [| z |
                     x z + table nth
-                    [ y z + 1+ swap nth ] [ y swap nth ] bi -
-                ] map partial-sums infimum check-best
-            ] each
-        ] each
-      ]
-    best get ] with-scope ;
+                    [ y z + 1+ swap nth ]
+                    [ y        swap nth ] bi -
+                ] map partial-sums infimum
+            ] map-infimum
+        ] map-infimum
+    ] ;
 
 : euler150 ( -- n )
     1000 (euler150) ;
