@@ -426,18 +426,22 @@ most-negative-fixnum most-positive-fixnum [a,b]
     swap sole-consumer
     dup #call? [ node-param eq? ] [ 2drop f ] if ;
 
-: coereced-to-fixnum? ( #call -- ? )
-    \ >fixnum consumed-by? ;
+: coerced-to-fixnum? ( #call -- ? )
+    dup dup node-in-d [ node-class integer class< ] with all?
+    [ \ >fixnum consumed-by? ] [ drop f ] if ;
 
 {
     { fixnum+ [ fixnum+fast ] }
     { fixnum- [ fixnum-fast ] }
     { fixnum* [ fixnum*fast ] }
+    { + [ >r >fixnum r> >fixnum fixnum+fast ] }
+    { - [ >r >fixnum r> >fixnum fixnum-fast ] }
+    { * [ >r >fixnum r> >fixnum fixnum*fast ] }
 } [
     [
         [
             dup remove-overflow-check?
-            over coereced-to-fixnum? or
+            over coerced-to-fixnum? or
         ] ,
         [ f splice-quot ] curry ,
     ] { } make 1array define-optimizers
@@ -465,5 +469,51 @@ most-negative-fixnum most-positive-fixnum [a,b]
     {
         [ dup fixnum-shift-fast? ]
         [ [ fixnum-shift-fast ] f splice-quot ]
+    }
+} define-optimizers
+
+: convert-rem-to-and? ( #call -- ? )
+    dup node-in-d {
+        { [ 2dup first node-class integer class< not ] [ f ] }
+        { [ 2dup second node-literal integer? not ] [ f ] }
+        { [ 2dup second node-literal power-of-2? not ] [ f ] }
+        [ t ]
+    } cond 2nip ;
+
+: convert-mod-to-and? ( #call -- ? )
+    dup dup node-in-d first node-interval 0 [a,inf] interval-subset?
+    [ convert-rem-to-and? ] [ drop f ] if ;
+
+: convert-mod-to-and ( #call -- node )
+    dup
+    dup node-in-d second node-literal 1-
+    [ nip bitand ] curry f splice-quot ;
+
+{ mod bignum-mod fixnum-mod } [
+    {
+        {
+            [ dup convert-mod-to-and? ]
+            [ convert-mod-to-and ]
+        }
+    } define-optimizers
+] each
+
+\ rem {
+    {
+        [ dup convert-rem-to-and? ]
+        [ convert-mod-to-and ]
+    }
+} define-optimizers
+
+: fixnumify-bitand? ( #call -- ? )
+    dup node-in-d second node-interval fixnum fits? ;
+
+: fixnumify-bitand ( #call -- node )
+    [ >r >fixnum r> >fixnum fixnum-bitand ] f splice-quot ;
+
+\ bitand {
+    {
+        [ dup fixnumify-bitand? ]
+        [ fixnumify-bitand ]
     }
 } define-optimizers

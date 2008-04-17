@@ -13,9 +13,10 @@ system layouts vectors ;
 ! Ensure type inference works as it is supposed to by checking
 ! if various methods get inlined
 
-: inlined? ( quot word -- ? )
+: inlined? ( quot seq/word -- ? )
+    dup word? [ 1array ] when
     swap dataflow optimize
-    [ node-param eq? ] with node-exists? not ;
+    [ node-param swap member? ] with node-exists? not ;
 
 GENERIC: mynot ( x -- y )
 
@@ -322,4 +323,49 @@ cell-bits 32 = [
             ] if
         ] when
     ] \ + inlined?
+] unit-test
+
+[ f ] [
+    [
+        256 mod
+    ] { mod fixnum-mod } inlined?
+] unit-test
+
+[ f ] [
+    [
+        dup 0 >= [ 256 mod ] when
+    ] { mod fixnum-mod } inlined?
+] unit-test
+
+[ t ] [
+    [
+        { integer } declare dup 0 >= [ 256 mod ] when
+    ] { mod fixnum-mod } inlined?
+] unit-test
+
+[ t ] [
+    [
+        { integer } declare 256 rem
+    ] { mod fixnum-mod } inlined?
+] unit-test
+
+! [ t ] [
+!     [
+!         { integer } declare [ 256 mod ] map
+!     ] { mod fixnum-mod } inlined?
+! ] unit-test
+! 
+! [ t ] [
+!     [
+!         { integer } declare [ 0 >= ] map
+!     ] { >= fixnum>= } inlined?
+! ] unit-test
+
+[ t ] [
+    [
+        { integer } declare
+        dup 0 >= [
+            615949 * 797807 + 20 2^ mod dup 19 2^ -
+        ] [ dup ] if
+    ] { * + shift mod fixnum-mod fixnum* fixnum+ fixnum- } inlined?
 ] unit-test
