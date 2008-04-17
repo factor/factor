@@ -368,6 +368,25 @@ cell-bits 32 = [
     ] { * + shift mod fixnum-mod fixnum* fixnum+ fixnum- } inlined?
 ] unit-test
 
+: fib ( m -- n )
+    dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ; inline
+
+[ t ] [
+    [ 27.0 fib ] { < - } inlined?
+] unit-test
+
+[ t ] [
+    [ 27 fib ] { < - } inlined?
+] unit-test
+
+[ t ] [
+    [ 27 >bignum fib ] { < - } inlined?
+] unit-test
+
+[ f ] [
+    [ 27/2 fib ] { < - } inlined?
+] unit-test
+
 ! Later
 
 ! [ t ] [

@@ -10,12 +10,7 @@ classes.algebra generic.math optimizer.pattern-match
 optimizer.backend optimizer.def-use optimizer.inlining
 generic.standard system ;
 
-{ + bignum+ float+ fixnum+fast } {
-    { { number 0 } [ drop ] }
-    { { 0 number } [ nip ] }
-} define-identities
-
-{ fixnum+ } {
+{ + bignum+ float+ fixnum+ fixnum+fast } {
     { { number 0 } [ drop ] }
     { { 0 number } [ nip ] }
 } define-identities
@@ -41,7 +36,7 @@ generic.standard system ;
     { { @ @ } [ 2drop t ] }
 } define-identities
 
-{ * fixnum* bignum* float* } {
+{ * fixnum* fixnum*fast bignum* float* } {
     { { number 1 } [ drop ] }
     { { 1 number } [ nip ] }
     { { number 0 } [ nip ] }
@@ -89,7 +84,7 @@ generic.standard system ;
 } define-identities
 
 : math-closure ( class -- newclass )
-    { fixnum integer rational real }
+    { fixnum bignum integer rational float real number }
     [ class< ] with find nip number or ;
 
 : fits? ( interval class -- ? )
@@ -354,15 +349,17 @@ most-negative-fixnum most-positive-fixnum [a,b]
     { + [ fixnum+fast ] }
     { - [ fixnum-fast ] }
     { * [ fixnum*fast ] }
+    { shift [ fixnum-shift-fast ] }
     { fixnum+ [ fixnum+fast ] }
     { fixnum- [ fixnum-fast ] }
     { fixnum* [ fixnum*fast ] }
+    { fixnum-shift [ fixnum-shift-fast ] }
     ! these are here as an optimization. if they weren't given
     ! explicitly, the same would be inferred after an extra
     ! optimization step (see optimistic-inline?)
     { 1+ [ 1 fixnum+fast ] }
     { 1- [ 1 fixnum-fast ] }
-    { 2/ [ -1 fixnum-shift ] }
+    { 2/ [ -1 fixnum-shift-fast ] }
     { neg [ 0 swap fixnum-fast ] }
 } [
     [
@@ -446,31 +443,6 @@ most-negative-fixnum most-positive-fixnum [a,b]
         [ f splice-quot ] curry ,
     ] { } make 1array define-optimizers
 ] assoc-each
-
-: fixnum-shift-fast-pos? ( node -- ? )
-    #! Shifting 1 to the left won't overflow if the shift
-    #! count is small enough
-    dup dup node-in-d first node-literal 1 = [
-        dup node-in-d second node-interval
-        0 cell-bits tag-bits get - 2 - [a,b] interval-subset?
-    ] [ drop f ] if ;
-
-: fixnum-shift-fast-neg? ( node -- ? )
-    #! Shifting any number to the right won't overflow if the
-    #! shift count is small enough
-    dup node-in-d second node-interval
-    cell-bits 1- neg 0 [a,b] interval-subset? ;
-
-: fixnum-shift-fast? ( node -- ? )
-    dup fixnum-shift-fast-pos?
-    [ drop t ] [ fixnum-shift-fast-neg? ] if ;
-
-\ fixnum-shift {
-    {
-        [ dup fixnum-shift-fast? ]
-        [ [ fixnum-shift-fast ] f splice-quot ]
-    }
-} define-optimizers
 
 : convert-rem-to-and? ( #call -- ? )
     dup node-in-d {
