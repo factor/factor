@@ -7,9 +7,6 @@ USING: xml.utilities kernel assocs xml.generator
     http.client namespaces xml.generator hashtables
     calendar.format accessors continuations ;
 
-: ?children>string ( tag/f -- string/f )
-    [ children>string ] [ f ] if* ;
-
 : any-tag-named ( tag names -- tag-inside )
     f -rot [ tag-named nip dup ] with find 2drop ;
 
@@ -26,7 +23,7 @@ C: <entry> entry
     [ "link" tag-named children>string ] keep
     [ "description" tag-named children>string ] keep
     f "date" "http://purl.org/dc/elements/1.1/" <name>
-    tag-named ?children>string rfc3339>timestamp
+    tag-named dup [ children>string rfc3339>timestamp ] when
     <entry> ;
 
 : rss1.0 ( xml -- feed )
