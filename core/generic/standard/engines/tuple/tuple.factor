@@ -30,14 +30,7 @@ TUPLE: tuple-dispatch-engine echelons ;
 
 : <tuple-dispatch-engine> ( methods -- engine )
     echelon-sort
-    [
-        ! over zero? [
-        !     dup assoc-empty?
-        !     [ drop f ] [ values first ] if
-        ! ] [
-            dupd <echelon-dispatch-engine>
-        ! ] if
-    ] assoc-map ! [ nip ] assoc-subset
+    [ dupd <echelon-dispatch-engine> ] assoc-map
     \ tuple-dispatch-engine boa ;
 
 : convert-tuple-methods ( assoc -- assoc' )
