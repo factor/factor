@@ -27,7 +27,7 @@ mailbox variables sleep-entry ;
     tnamespace set-at ;
 
 : tchange ( key quot -- )
-    tnamespace change-at ; inline
+    tnamespace swap change-at ; inline
 
 : threads 41 getenv ;
 
