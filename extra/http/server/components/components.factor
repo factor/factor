@@ -7,8 +7,11 @@ continuations math ;
 IN: http.server.components
 
 ! Renderer protocol
+GENERIC: render-summary* ( value renderer -- )
 GENERIC: render-view* ( value renderer -- )
 GENERIC: render-edit* ( value id renderer -- )
+
+M: object render-summary* render-view* ;
 
 TUPLE: field type ;
 
@@ -203,22 +206,67 @@ M: captcha validate*
     drop v-captcha ;
 
 ! Text areas
-TUPLE: textarea-renderer ;
+TUPLE: textarea-renderer rows cols ;
 
-: textarea-renderer T{ textarea-renderer } ;
+: new-textarea-renderer ( class -- renderer )
+    new
+        60 >>cols
+        20 >>rows ;
+
+: <textarea-renderer> ( -- renderer )
+    textarea-renderer new-textarea-renderer ;
 
 M: textarea-renderer render-view*
     drop write ;
 
 M: textarea-renderer render-edit*
-    drop <textarea [ =id ] [ =name ] bi textarea> write </textarea> ;
+    <textarea
+        [ rows>> [ number>string =rows ] when* ]
+        [ cols>> [ number>string =cols ] when* ] bi
+        [ =id   ]
+        [ =name ] bi
+    textarea>
+        write
+    </textarea> ;
 
 TUPLE: text < string ;
 
 : new-text ( id class -- component )
     new-string
         f >>one-line
-        textarea-renderer >>renderer ;
+        <textarea-renderer> >>renderer ;
 
 : <text> ( id -- component )
     text new-text ;
+
+! List components
+SYMBOL: +plain+
+SYMBOL: +ordered+
+SYMBOL: +unordered+
+
+TUPLE: list-renderer component type ;
+
+C: <list-renderer> list-renderer
+
+: render-list ( value component -- )
+    [ render-summary* ] curry each ;
+
+: render-ordered-list ( value component -- )
+    [ <li> render-summary* </li> ] curry each ;
+
+: render-unordered-list ( value component -- )
+    [ <li> render-summary* </li> ] curry each ;
+
+M: list-renderer render-view*
+    [ component>> ] [ type>> ] bi {
+        { +plain+ [ render-list ] }
+        { +ordered+ [ <ol> render-ordered-list </ol> ] }
+        { +unordered+ [ <ul> render-unordered-list </ul> ] }
+    } case ;
+
+TUPLE: list < component ;
+
+: <list> ( id component type -- list )
+    <list-renderer> list swap new-component ;
+
+M: list component-string drop ;

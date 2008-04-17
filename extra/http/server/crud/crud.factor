@@ -15,49 +15,33 @@ IN: http.server.crud
 
         [ "id" get ctor call select-tuple from-tuple ] >>init
 
-        [
-            "text/html" <content>
-            [ form view-form ] >>body
-        ] >>display ;
+        [ form view-form ] >>display ;
 
 : <id-redirect> ( id next -- response )
     swap number>string "id" associate <permanent-redirect> ;
 
-:: <create-action> ( form ctor next -- action )
-    <action>
-        [ f ctor call from-tuple form set-defaults ] >>init
-
-        [
-            "text/html" <content>
-            [ form edit-form ] >>body
-        ] >>display
-
-        [
-            f ctor call from-tuple
-
-            form validate-form
-
-            values-tuple insert-tuple
-
-            "id" value next <id-redirect>
-        ] >>submit ;
-
 :: <edit-action> ( form ctor next -- action )
     <action>
-        { { "id" [ v-number ] } } >>get-params
-        [ "id" get ctor call select-tuple from-tuple ] >>init
+        { { "id" [ [ v-number ] v-optional ] } } >>get-params
 
         [
-            "text/html" <content>
-            [ form edit-form ] >>body
-        ] >>display
+            "id" get ctor call
+
+            "id" get
+            [ select-tuple from-tuple ]
+            [ from-tuple form set-defaults ]
+            if
+        ] >>init
+
+        [ form edit-form ] >>display
 
         [
             f ctor call from-tuple
 
             form validate-form
 
-            values-tuple update-tuple
+            values-tuple
+            "id" value [ update-tuple ] [ insert-tuple ] if
 
             "id" value next <id-redirect>
         ] >>submit ;
@@ -71,3 +55,13 @@ IN: http.server.crud
 
             next f <permanent-redirect>
         ] >>submit ;
+
+:: <list-action> ( form ctor -- action )
+    <action>
+        [
+            blank-values
+
+            f ctor call select-tuples "list" set-value
+
+            form view-form
+        ] >>display ;

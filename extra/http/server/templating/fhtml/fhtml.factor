@@ -1,12 +1,12 @@
 ! Copyright (C) 2005 Alex Chapman
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations sequences kernel parser namespaces io
-io.files io.streams.string html html.elements source-files
-debugger combinators math quotations generic strings splitting
-accessors http.server.static http.server assocs
-io.encodings.utf8 fry accessors ;
-
+USING: continuations sequences kernel namespaces debugger
+combinators math quotations generic strings splitting
+accessors assocs fry
+parser io io.files io.streams.string io.encodings.utf8 source-files
+html html.elements
+http.server.static http.server http.server.templating ;
 IN: http.server.templating.fhtml
 
 : templating-vocab ( -- vocab-name ) "http.server.templating.fhtml" ;
@@ -72,9 +72,13 @@ DEFER: <% delimiter
 : html-error. ( error -- )
     <pre> error. </pre> ;
 
-: run-template ( filename -- )
+TUPLE: fhtml path ;
+
+C: <fhtml> fhtml
+
+M: fhtml call-template ( filename -- )
     '[
-        , [
+        , path>> [
             "quiet" on
             parser-notes off
             templating-vocab use+
@@ -85,16 +89,10 @@ DEFER: <% delimiter
         ] with-file-vocabs
     ] assert-depth ;
 
-: template-convert ( infile outfile -- )
-    utf8 [ run-template ] with-file-writer ;
-
-! responder integration
-: serve-template ( name -- response )
-    "text/html" <content>
-    swap '[ , run-template ] >>body ;
-
 ! file responder integration
 : enable-fhtml ( responder -- responder )
-    [ serve-template ]
+    [ <fhtml> serve-template ]
     "application/x-factor-server-page"
     pick special>> set-at ;
+
+INSTANCE: fhtml template

@@ -6,11 +6,12 @@ IN: http.server.components.farkup
 
 TUPLE: farkup-renderer < textarea-renderer ;
 
-: farkup-renderer T{ farkup-renderer } ;
+: <farkup-renderer>
+    farkup-renderer new-textarea-renderer ;
 
 M: farkup-renderer render-view*
     drop string-lines "\n" join convert-farkup write ;
 
 : <farkup> ( id -- component )
     <text>
-        farkup-renderer >>renderer ;
+        <farkup-renderer> >>renderer ;
