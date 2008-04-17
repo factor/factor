@@ -267,7 +267,7 @@ os windows? [
     EDX 26 SHR
     EDX 1 AND
     { EAX EBX ECX EDX } [ POP ] each
-    JNE
+    JE
 ] { } define-if-intrinsic
 
 "-no-sse2" cli-args member? [
