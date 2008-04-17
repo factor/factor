@@ -1,13 +1,10 @@
 USING: arrays combinators.lib kernel math math.functions math.vectors namespaces
-       opengl opengl.gl sequences ui ui.gadgets ui.gestures ui.render ;
+       opengl opengl.gl sequences ui ui.gadgets ui.gestures ui.render accessors ;
 IN: opengl.demo-support
 
 : FOV 2.0 sqrt 1+ ; inline
 : MOUSE-MOTION-SCALE 0.5 ; inline
 : KEY-ROTATE-STEP 1.0 ; inline
-: DIMS { 640 480 } ; inline
-
-: FOV-RATIO ( -- fov ) DIMS dup first2 min v/n ;
 
 SYMBOL: last-drag-loc
 
@@ -15,7 +12,7 @@ TUPLE: demo-gadget yaw pitch distance ;
 
 : <demo-gadget> ( yaw pitch distance -- gadget )
     demo-gadget construct-gadget 
-    [ { set-demo-gadget-yaw set-demo-gadget-pitch set-demo-gadget-distance } set-slots ] keep ;
+    [ { (>>yaw) (>>pitch) (>>distance) } set-slots ] keep ;
 
 GENERIC: far-plane ( gadget -- z )
 GENERIC: near-plane ( gadget -- z )
@@ -28,6 +25,8 @@ M: demo-gadget near-plane ( gadget -- z )
 M: demo-gadget distance-step ( gadget -- dz )
     drop 1.0 64.0 / ;
 
+: fov-ratio ( gadget -- fov ) dim>> dup first2 min v/n ;
+
 : yaw-demo-gadget ( yaw gadget -- )
     [ [ demo-gadget-yaw + ] keep set-demo-gadget-yaw ] keep relayout-1 ;
 
@@ -38,16 +37,16 @@ M: demo-gadget distance-step ( gadget -- dz )
     [ [ demo-gadget-distance + ] keep set-demo-gadget-distance ] keep relayout-1 ;
 
 M: demo-gadget pref-dim* ( gadget -- dim )
-    drop DIMS ;
+    drop { 640 480 } ;
 
 : -+ ( x -- -x x )
     dup neg swap ;
 
 : demo-gadget-frustum ( gadget -- -x x -y y near far )
-    [ near-plane ] [ far-plane ] bi [
-        drop FOV-RATIO swap FOV / v*n
+    [ near-plane ] [ far-plane ] [ fov-ratio ] tri [
+        nip swap FOV / v*n
         first2 [ -+ ] bi@
-    ] 2keep ;
+    ] 3keep drop ;
 
 : demo-gadget-set-matrices ( gadget -- )
     GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
@@ -58,9 +57,9 @@ M: demo-gadget pref-dim* ( gadget -- dim )
     ] [
         GL_MODELVIEW glMatrixMode
         glLoadIdentity
-        [ >r 0.0 0.0 r> demo-gadget-distance neg glTranslatef ]
-        [ demo-gadget-pitch 1.0 0.0 0.0 glRotatef ]
-        [ demo-gadget-yaw   0.0 1.0 0.0 glRotatef ]
+        [ >r 0.0 0.0 r> distance>> neg glTranslatef ]
+        [ pitch>> 1.0 0.0 0.0 glRotatef ]
+        [ yaw>>   0.0 1.0 0.0 glRotatef ]
         tri
     ] bi ;
 

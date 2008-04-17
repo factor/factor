@@ -234,4 +234,4 @@ M: bunny-outlined draw-bunny
 M: bunny-outlined dispose
     [ bunny-outlined-pass1-program [ delete-gl-program ] when* ]
     [ bunny-outlined-pass2-program [ delete-gl-program ] when* ]
-    [ dispose-framebuffer ] tri
+    [ dispose-framebuffer ] tri ;
