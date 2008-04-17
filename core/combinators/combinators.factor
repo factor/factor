@@ -3,18 +3,55 @@
 IN: combinators
 USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
-hashtables sorting ;
+hashtables sorting words sets ;
+
+: cleave ( x seq -- )
+    [ call ] with each ;
+
+: cleave>quot ( seq -- quot )
+    [ [ keep ] curry ] map concat [ drop ] append [ ] like ;
+
+: 2cleave ( x seq -- )
+    [ 2keep ] each 2drop ;
+
+: 2cleave>quot ( seq -- quot )
+    [ [ 2keep ] curry ] map concat [ 2drop ] append [ ] like ;
+
+: 3cleave ( x seq -- )
+    [ 3keep ] each 3drop ;
+
+: 3cleave>quot ( seq -- quot )
+    [ [ 3keep ] curry ] map concat [ 3drop ] append [ ] like ;
+
+: spread>quot ( seq -- quot )
+    [ length [ >r ] <repetition> concat ]
+    [ [ [ r> ] prepend ] map concat ] bi
+    append [ ] like ;
+
+: spread ( objs... seq -- )
+    spread>quot call ;
 
 ERROR: no-cond ;
 
 : cond ( assoc -- )
-    [ first call ] find nip dup [ second call ] [ no-cond ] if ;
+    [ dup callable? [ drop t ] [ first call ] if ] find nip
+    [ dup callable? [ call ] [ second call ] if ]
+    [ no-cond ] if* ;
 
 ERROR: no-case ;
+: case-find ( obj assoc -- obj' )
+    [
+        dup array? [
+            dupd first dup word? [
+                execute
+            ] [
+                dup wrapper? [ wrapped ] when
+            ] if =
+        ] [ quotation? ] if
+    ] find nip ;
 
 : case ( obj assoc -- )
-    [ dup array? [ dupd first = ] [ quotation? ] if ] find nip
-    {
+    case-find {
         { [ dup array? ] [ nip second call ] }
         { [ dup quotation? ] [ call ] }
         { [ dup not ] [ no-case ] }
@@ -23,7 +60,7 @@ ERROR: no-case ;
 : with-datastack ( stack quot -- newstack )
     datastack >r
     >r >array set-datastack r> call
-    datastack r> swap add set-datastack 2nip ; inline
+    datastack r> swap suffix set-datastack 2nip ; inline
 
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ rot 1- -rot call ] if ; inline
@@ -32,6 +69,10 @@ ERROR: no-case ;
 ! two depend on combinators
 M: sequence hashcode*
     [ sequence-hashcode ] recursive-hashcode ;
+
+M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
+
+M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: hashtable hashcode*
     [
@@ -43,11 +84,14 @@ M: hashtable hashcode*
     [ rot \ if 3array append [ ] like ] assoc-each ;
 
 : cond>quot ( assoc -- quot )
+    [ dup callable? [ [ t ] swap 2array ] when ] map
     reverse [ no-cond ] swap alist>quot ;
 
 : linear-case-quot ( default assoc -- quot )
-    [ >r [ dupd = ] curry r> \ drop add* ] assoc-map
-    alist>quot ;
+    [
+        [ 1quotation \ dup prefix \ = suffix ]
+        [ \ drop prefix ] bi*
+    ] assoc-map alist>quot ;
 
 : (distribute-buckets) ( buckets pair keys -- )
     dup t eq? [
@@ -105,7 +149,9 @@ M: hashtable hashcode*
     dup empty? [
         drop
     ] [
-        dup length 4 <= [
+        dup length 4 <=
+        over keys [ word? ] contains? or
+        [
             linear-case-quot
         ] [
             dup keys contiguous-range? [

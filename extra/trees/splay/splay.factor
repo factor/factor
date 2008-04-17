@@ -107,7 +107,7 @@ DEFER: (splay)
     2dup get-splay [ 2nip set-node-value ] [
        drop dup inc-count
        2dup splay-split rot
-       >r >r swapd r> node construct-boa r> set-tree-root
+       >r >r swapd r> node boa r> set-tree-root
     ] if ;
 
 : new-root ( value key tree -- )

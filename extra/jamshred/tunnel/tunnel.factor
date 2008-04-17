@@ -9,7 +9,7 @@ IN: jamshred.tunnel
 TUPLE: segment number color radius ;
 
 : <segment> ( number color radius location forward up left -- segment )
-    <oint> >r segment construct-boa r> over set-delegate ;
+    <oint> >r segment boa r> over set-delegate ;
 
 : segment-vertex ( theta segment -- vertex )
      tuck 2dup oint-up swap sin v*n
@@ -72,7 +72,7 @@ TUPLE: segment number color radius ;
 : sub-tunnel ( from to sements -- segments )
     #! return segments between from and to, after clamping from and to to
     #! valid values
-    [ sequence-index-range [ clamp-to-range ] curry 2apply ] keep <slice> ;
+    [ sequence-index-range [ clamp-to-range ] curry bi@ ] keep <slice> ;
 
 : nearer-segment ( segment segment oint -- segment )
     #! return whichever of the two segments is nearer to the oint

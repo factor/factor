@@ -1,6 +1,6 @@
 IN: io.buffers.tests
 USING: alien alien.c-types io.buffers kernel kernel.private libc
-sequences tools.test namespaces byte-arrays strings ;
+sequences tools.test namespaces byte-arrays strings accessors ;
 
 : buffer-set ( string buffer -- )
     over >byte-array over buffer-ptr byte-array>memory
@@ -9,24 +9,29 @@ sequences tools.test namespaces byte-arrays strings ;
 : string>buffer ( string -- buffer )
     dup length <buffer> tuck buffer-set ;
 
+: buffer-read-all ( buffer -- byte-array )
+    [ [ pos>> ] [ ptr>> ] bi <displaced-alien> ]
+    [ buffer-length ] bi
+    memory>byte-array ;
+
 [ B{ } 65536 ] [
     65536 <buffer>
-    dup (buffer>>)
+    dup buffer-read-all
     over buffer-capacity
     rot buffer-free
 ] unit-test
 
 [ "hello world" "" ] [
     "hello world" string>buffer
-    dup (buffer>>) >string
+    dup buffer-read-all >string
     0 pick buffer-reset
-    over (buffer>>) >string
+    over buffer-read-all >string
     rot buffer-free
 ] unit-test
 
 [ "hello" ] [
     "hello world" string>buffer
-    5 over buffer> >string swap buffer-free
+    5 over buffer-read >string swap buffer-free
 ] unit-test
 
 [ 11 ] [
@@ -37,7 +42,7 @@ sequences tools.test namespaces byte-arrays strings ;
 [ "hello world" ] [
     "hello" 1024 <buffer> [ buffer-set ] keep
     " world" >byte-array over >buffer
-    dup (buffer>>) >string swap buffer-free
+    dup buffer-read-all >string swap buffer-free
 ] unit-test
 
 [ CHAR: e ] [
@@ -45,33 +50,8 @@ sequences tools.test namespaces byte-arrays strings ;
     1 over buffer-consume [ buffer-pop ] keep buffer-free
 ] unit-test
 
-[ "hello" CHAR: \r ] [
-    "hello\rworld" string>buffer
-    "\r" over buffer-until >r >string r>
-    rot buffer-free
-] unit-test
-
-[ "hello" CHAR: \r ] [
-    "hello\rworld" string>buffer
-    "\n\r" over buffer-until >r >string r>
-    rot buffer-free
-] unit-test
-
-[ "hello\rworld" f ] [
-    "hello\rworld" string>buffer
-    "X" over buffer-until >r >string r>
-    rot buffer-free
-] unit-test
-
-[ "hello" CHAR: \r "world" CHAR: \n ] [
-    "hello\rworld\n" string>buffer
-    [ "\r\n" swap buffer-until >r >string r> ] keep
-    [ "\r\n" swap buffer-until >r >string r> ] keep
-    buffer-free
-] unit-test
-
 "hello world" string>buffer "b" set
-[ "hello world" ] [ 1000 "b" get buffer> >string ] unit-test
+[ "hello world" ] [ 1000 "b" get buffer-read >string ] unit-test
 "b" get buffer-free
 
 100 <buffer> "b" set

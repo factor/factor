@@ -3,7 +3,7 @@ USING: kernel alien.c-types combinators namespaces arrays
        sequences sequences.lib namespaces.lib splitting
        math math.functions math.vectors math.trig
        opengl.gl opengl.glu opengl ui ui.gadgets.slate
-       combinators.cleave vars
+       vars
        random-weighted colors.hsv cfdg.gl ;
 
 IN: cfdg
@@ -32,7 +32,7 @@ VAR: color
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: hsva>rgba ( hsva -- rgba ) [ 3 head hsv>rgb ] [ peek ] bi add ;
+: hsva>rgba ( hsva -- rgba ) [ 3 head hsv>rgb ] [ peek ] bi suffix ;
 
 : gl-set-hsba ( hsva -- ) hsva>rgba gl-color ;
 

@@ -51,14 +51,14 @@ SYMBOL: open-arrays
 
 : binary-op ( quot -- ? )
     >r get-cba r>
-    swap >r >r [ reg-val ] 2apply swap r> call r>
+    swap >r >r [ reg-val ] bi@ swap r> call r>
     set-reg f ; inline
 
 : op1 ( opcode -- ? )
     [ swap arr-val ] binary-op ;
 
 : op2 ( opcode -- ? )
-    get-cba >r [ reg-val ] 2apply r> reg-val set-arr f ;
+    get-cba >r [ reg-val ] bi@ r> reg-val set-arr f ;
 
 : op3 ( opcode -- ? )
     [ + >32bit ] binary-op ;

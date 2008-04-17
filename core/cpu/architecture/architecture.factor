@@ -2,13 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic kernel kernel.private math memory
 namespaces sequences layouts system hashtables classes alien
-byte-arrays bit-arrays float-arrays combinators words ;
+byte-arrays bit-arrays float-arrays combinators words sets ;
 IN: cpu.architecture
 
-SYMBOL: compiler-backend
-
 ! A pseudo-register class for parameters spilled on the stack
-TUPLE: stack-params ;
+SINGLETON: stack-params
 
 ! Return values of this class go here
 GENERIC: return-reg ( register-class -- reg )
@@ -26,122 +24,122 @@ GENERIC: vregs ( register-class -- regs )
 ! Load a literal (immediate or indirect)
 GENERIC# load-literal 1 ( obj vreg -- )
 
-HOOK: load-indirect compiler-backend ( obj reg -- )
+HOOK: load-indirect cpu ( obj reg -- )
 
-HOOK: stack-frame compiler-backend ( frame-size -- n )
+HOOK: stack-frame cpu ( frame-size -- n )
 
 : stack-frame* ( -- n )
     \ stack-frame get stack-frame ;
 
 ! Set up caller stack frame
-HOOK: %prologue compiler-backend ( n -- )
+HOOK: %prologue cpu ( n -- )
 
 : %prologue-later \ %prologue-later , ;
 
 ! Tear down stack frame
-HOOK: %epilogue compiler-backend ( n -- )
+HOOK: %epilogue cpu ( n -- )
 
 : %epilogue-later \ %epilogue-later , ;
 
 ! Store word XT in stack frame
-HOOK: %save-word-xt compiler-backend ( -- )
+HOOK: %save-word-xt cpu ( -- )
 
 ! Store dispatch branch XT in stack frame
-HOOK: %save-dispatch-xt compiler-backend ( -- )
+HOOK: %save-dispatch-xt cpu ( -- )
 
 M: object %save-dispatch-xt %save-word-xt ;
 
 ! Call another word
-HOOK: %call compiler-backend ( word -- )
+HOOK: %call cpu ( word -- )
 
 ! Local jump for branches
-HOOK: %jump-label compiler-backend ( label -- )
+HOOK: %jump-label cpu ( label -- )
 
 ! Test if vreg is 'f' or not
-HOOK: %jump-t compiler-backend ( label -- )
+HOOK: %jump-t cpu ( label -- )
 
-HOOK: %dispatch compiler-backend ( -- )
+HOOK: %dispatch cpu ( -- )
 
-HOOK: %dispatch-label compiler-backend ( word -- )
+HOOK: %dispatch-label cpu ( word -- )
 
 ! Return to caller
-HOOK: %return compiler-backend ( -- )
+HOOK: %return cpu ( -- )
 
 ! Change datastack height
-HOOK: %inc-d compiler-backend ( n -- )
+HOOK: %inc-d cpu ( n -- )
 
 ! Change callstack height
-HOOK: %inc-r compiler-backend ( n -- )
+HOOK: %inc-r cpu ( n -- )
 
 ! Load stack into vreg
-HOOK: %peek compiler-backend ( vreg loc -- )
+HOOK: %peek cpu ( vreg loc -- )
 
 ! Store vreg to stack
-HOOK: %replace compiler-backend ( vreg loc -- )
+HOOK: %replace cpu ( vreg loc -- )
 
 ! Box and unbox floats
-HOOK: %unbox-float compiler-backend ( dst src -- )
-HOOK: %box-float compiler-backend ( dst src -- )
+HOOK: %unbox-float cpu ( dst src -- )
+HOOK: %box-float cpu ( dst src -- )
 
 ! FFI stuff
 
 ! Is this integer small enough to appear in value template
 ! slots?
-HOOK: small-enough? compiler-backend ( n -- ? )
+HOOK: small-enough? cpu ( n -- ? )
 
 ! Is this structure small enough to be returned in registers?
-HOOK: struct-small-enough? compiler-backend ( size -- ? )
+HOOK: struct-small-enough? cpu ( size -- ? )
 
 ! Do we pass explode value structs?
-HOOK: value-structs? compiler-backend ( -- ? )
+HOOK: value-structs? cpu ( -- ? )
 
 ! If t, fp parameters are shadowed by dummy int parameters
-HOOK: fp-shadows-int? compiler-backend ( -- ? )
+HOOK: fp-shadows-int? cpu ( -- ? )
 
-HOOK: %prepare-unbox compiler-backend ( -- )
+HOOK: %prepare-unbox cpu ( -- )
 
-HOOK: %unbox compiler-backend ( n reg-class func -- )
+HOOK: %unbox cpu ( n reg-class func -- )
 
-HOOK: %unbox-long-long compiler-backend ( n func -- )
+HOOK: %unbox-long-long cpu ( n func -- )
 
-HOOK: %unbox-small-struct compiler-backend ( size -- )
+HOOK: %unbox-small-struct cpu ( size -- )
 
-HOOK: %unbox-large-struct compiler-backend ( n size -- )
+HOOK: %unbox-large-struct cpu ( n size -- )
 
-HOOK: %box compiler-backend ( n reg-class func -- )
+HOOK: %box cpu ( n reg-class func -- )
 
-HOOK: %box-long-long compiler-backend ( n func -- )
+HOOK: %box-long-long cpu ( n func -- )
 
-HOOK: %prepare-box-struct compiler-backend ( size -- )
+HOOK: %prepare-box-struct cpu ( size -- )
 
-HOOK: %box-small-struct compiler-backend ( size -- )
+HOOK: %box-small-struct cpu ( size -- )
 
-HOOK: %box-large-struct compiler-backend ( n size -- )
+HOOK: %box-large-struct cpu ( n size -- )
 
 GENERIC: %save-param-reg ( stack reg reg-class -- )
 
 GENERIC: %load-param-reg ( stack reg reg-class -- )
 
-HOOK: %prepare-alien-invoke compiler-backend ( -- )
+HOOK: %prepare-alien-invoke cpu ( -- )
 
-HOOK: %prepare-var-args compiler-backend ( -- )
+HOOK: %prepare-var-args cpu ( -- )
 
 M: object %prepare-var-args ;
 
-HOOK: %alien-invoke compiler-backend ( function library -- )
+HOOK: %alien-invoke cpu ( function library -- )
 
-HOOK: %cleanup compiler-backend ( alien-node -- )
+HOOK: %cleanup cpu ( alien-node -- )
 
-HOOK: %alien-callback compiler-backend ( quot -- )
+HOOK: %alien-callback cpu ( quot -- )
 
-HOOK: %callback-value compiler-backend ( ctype -- )
+HOOK: %callback-value cpu ( ctype -- )
 
 ! Return to caller with stdcall unwinding (only for x86)
-HOOK: %unwind compiler-backend ( n -- )
+HOOK: %unwind cpu ( n -- )
 
-HOOK: %prepare-alien-indirect compiler-backend ( -- )
+HOOK: %prepare-alien-indirect cpu ( -- )
 
-HOOK: %alien-indirect compiler-backend ( -- )
+HOOK: %alien-indirect cpu ( -- )
 
 M: stack-params param-reg drop ;
 
@@ -153,11 +151,11 @@ M: f v>operand drop \ f tag-number ;
 
 M: object load-literal v>operand load-indirect ;
 
-PREDICATE: integer small-slot cells small-enough? ;
+PREDICATE: small-slot < integer cells small-enough? ;
 
-PREDICATE: integer small-tagged v>operand small-enough? ;
+PREDICATE: small-tagged < integer v>operand small-enough? ;
 
-PREDICATE: integer inline-array 32 < ;
+PREDICATE: inline-array < integer 32 < ;
 
 : if-small-struct ( n size true false -- ? )
     >r >r over not over struct-small-enough? and
@@ -179,15 +177,15 @@ PREDICATE: integer inline-array 32 < ;
     ] if-small-struct ;
 
 ! Alien accessors
-HOOK: %unbox-byte-array compiler-backend ( dst src -- )
+HOOK: %unbox-byte-array cpu ( dst src -- )
 
-HOOK: %unbox-alien compiler-backend ( dst src -- )
+HOOK: %unbox-alien cpu ( dst src -- )
 
-HOOK: %unbox-f compiler-backend ( dst src -- )
+HOOK: %unbox-f cpu ( dst src -- )
 
-HOOK: %unbox-any-c-ptr compiler-backend ( dst src -- )
+HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 
-HOOK: %box-alien compiler-backend ( dst src -- )
+HOOK: %box-alien cpu ( dst src -- )
 
 : operand ( var -- op ) get v>operand ; inline
 

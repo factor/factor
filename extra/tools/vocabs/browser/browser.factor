@@ -10,7 +10,7 @@ IN: tools.vocabs.browser
     {
         { [ dup not ] [ drop "" ] }
         { [ dup vocab-main ] [ drop "[Runnable]" ] }
-        { [ t ] [ drop "[Loaded]" ] }
+        [ drop "[Loaded]" ]
     } cond ;
 
 : write-status ( vocab -- )
@@ -79,7 +79,7 @@ C: <vocab-author> vocab-author
 
 : describe-help ( vocab -- )
     vocab-help [
-        "Documentation" $heading nl ($link)
+        "Documentation" $heading ($link)
     ] when* ;
 
 : describe-children ( vocab -- )

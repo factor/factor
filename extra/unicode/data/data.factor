@@ -1,5 +1,5 @@
 USING: assocs math kernel sequences io.files hashtables
-quotations splitting arrays math.parser combinators.lib hash2
+quotations splitting arrays math.parser hash2
 byte-arrays words namespaces words compiler.units parser io.encodings.ascii  ;
 IN: unicode.data
 
@@ -12,9 +12,6 @@ IN: unicode.data
 >>
 
 ! Convenience functions
-: 1+* ( n/f _ -- n+1 )
-    drop [ 1+ ] [ 0 ] if* ;
-
 : ?between? ( n/f from to -- ? )
     pick [ between? ] [ 3drop f ] if ;
 
@@ -44,7 +41,7 @@ IN: unicode.data
     dup [ swap (chain-decomposed) ] curry assoc-map ;
 
 : first* ( seq -- ? )
-    second [ empty? ] [ first ] either ;
+    second dup empty? [ ] [ first ] ?if ;
 
 : (process-decomposed) ( data -- alist )
     5 swap (process-data)
@@ -138,7 +135,7 @@ load-data
 dup process-names \ name-map set-value
 13 over process-data \ simple-lower set-value
 12 over process-data tuck \ simple-upper set-value
-14 over process-data swapd union \ simple-title set-value
+14 over process-data swapd assoc-union \ simple-title set-value
 dup process-combining \ class-map set-value
 dup process-canonical \ canonical-map set-value
     \ combine-map set-value

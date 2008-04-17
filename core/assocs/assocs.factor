@@ -1,6 +1,7 @@
-! Copyright (C) 2007 Daniel Ehrenberg
+! Copyright (C) 2007, 2008 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences arrays math sequences.private vectors ;
+USING: kernel sequences arrays math sequences.private vectors
+accessors ;
 IN: assocs
 
 MIXIN: assoc
@@ -108,17 +109,17 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
         >r over r> hashcode* 2/ >r dupd hashcode* r> bitxor
     ] { } assoc>map hashcode* ;
 
-: intersect ( assoc1 assoc2 -- intersection )
+: assoc-intersect ( assoc1 assoc2 -- intersection )
     swap [ nip key? ] curry assoc-subset ;
 
 : update ( assoc1 assoc2 -- )
     swap [ swapd set-at ] curry assoc-each ;
 
-: union ( assoc1 assoc2 -- union )
-    2dup [ assoc-size ] 2apply + pick new-assoc
+: assoc-union ( assoc1 assoc2 -- union )
+    2dup [ assoc-size ] bi@ + pick new-assoc
     [ rot update ] keep [ swap update ] keep ;
 
-: diff ( assoc1 assoc2 -- diff )
+: assoc-diff ( assoc1 assoc2 -- diff )
     swap [ nip key? not ] curry assoc-subset ;
 
 : remove-all ( assoc seq -- subseq )
@@ -134,11 +135,11 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     (substitute) map ;
 
 : cache ( key assoc quot -- value )
-    2over at [
+    2over at* [
         >r 3drop r>
     ] [
-        pick rot >r >r call dup r> r> set-at
-    ] if* ; inline
+        drop pick rot >r >r call dup r> r> set-at
+    ] if ; inline
 
 : change-at ( key assoc quot -- )
     [ >r at r> call ] 3keep drop set-at ; inline
@@ -153,6 +154,9 @@ M: assoc >alist [ 2array ] { } assoc>map ;
 
 : value-at ( value assoc -- key/f )
     swap [ = nip ] curry assoc-find 2drop ;
+
+: zip ( keys values -- alist )
+    2array flip ; inline
 
 : search-alist ( key alist -- pair i )
     [ first = ] with find swap ; inline
@@ -189,3 +193,24 @@ M: f clear-assoc drop ;
 M: f assoc-like drop dup assoc-empty? [ drop f ] when ;
 
 INSTANCE: sequence assoc
+
+TUPLE: enum seq ;
+
+C: <enum> enum
+
+M: enum at*
+    seq>> 2dup bounds-check?
+    [ nth t ] [ 2drop f f ] if ;
+
+M: enum set-at seq>> set-nth ;
+
+M: enum delete-at enum-seq delete-nth ;
+
+M: enum >alist ( enum -- alist )
+    seq>> [ length ] keep zip ;
+
+M: enum assoc-size seq>> length ;
+
+M: enum clear-assoc seq>> delete-all ;
+
+INSTANCE: enum assoc

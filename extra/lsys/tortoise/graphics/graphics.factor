@@ -77,7 +77,7 @@ VAR: color-table
   { 0.25 0.25 0.25 } ! dark grey
   { 0.75 0.75 0.75 } ! medium grey
   { 1    1    1 }    ! white
-} [ 1 add ] map >color-table ;
+} [ 1 suffix ] map >color-table ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

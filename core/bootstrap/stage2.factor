@@ -5,13 +5,13 @@ kernel.private math memory continuations kernel io.files
 io.backend system parser vocabs sequences prettyprint
 vocabs.loader combinators splitting source-files strings
 definitions assocs compiler.errors compiler.units
-math.parser generic ;
+math.parser generic sets ;
 IN: bootstrap.stage2
 
 SYMBOL: bootstrap-time
 
 : default-image-name ( -- string )
-    vm file-name windows? [ "." split1 drop ] when
+    vm file-name os windows? [ "." split1 drop ] when
     ".image" append resource-path ;
 
 : do-crossref ( -- )
@@ -23,13 +23,13 @@ SYMBOL: bootstrap-time
 
 : load-components ( -- )
     "exclude" "include"
-    [ get-global " " split [ empty? not ] subset ] 2apply
-    seq-diff
+    [ get-global " " split [ empty? not ] subset ] bi@
+    diff
     [ "bootstrap." prepend require ] each ;
 
-: compile-remaining ( -- )
-    "Compiling remaining words..." print flush
-    vocabs [ words [ compiled? not ] subset compile ] each ;
+! : compile-remaining ( -- )
+!     "Compiling remaining words..." print flush
+!     vocabs [ words [ compiled? not ] subset compile ] each ;
 
 : count-words ( pred -- )
     all-words swap subset length number>string write ;
@@ -57,7 +57,7 @@ millis >r
 
 default-image-name "output-image" set-global
 
-"math help handbook compiler random tools ui ui.tools io" "include" set-global
+"math compiler help random tools ui ui.tools io handbook" "include" set-global
 "" "exclude" set-global
 
 parse-command-line
@@ -65,8 +65,8 @@ parse-command-line
 "-no-crossref" cli-args member? [ do-crossref ] unless
 
 ! Set dll paths
-wince? [ "windows.ce" require ] when
-winnt? [ "windows.nt" require ] when
+os wince? [ "windows.ce" require ] when
+os winnt? [ "windows.nt" require ] when
 
 "deploy-vocab" get [
     "stage2: deployment mode" print
@@ -79,10 +79,6 @@ winnt? [ "windows.nt" require ] when
     load-components
 
     run-bootstrap-init
-
-    "bootstrap.compiler" vocab [
-        compile-remaining
-    ] when
 ] with-compiler-errors
 :errors
 

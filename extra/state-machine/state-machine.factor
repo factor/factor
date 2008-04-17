@@ -6,13 +6,13 @@ IN: state-machine
     ! STATES: set-name state1 state2 ... ;
     ";" parse-tokens
     [ length ] keep
-    unclip add
+    unclip suffix
     [ create-in swap 1quotation define ] 2each ; parsing
 
 TUPLE: state place data ;
 
 TUPLE: missing-state ;
-: missing-state \ missing-state construct-empty throw ;
+: missing-state \ missing-state new throw ;
 M: missing-state error.
     drop "Missing state" print ;
 

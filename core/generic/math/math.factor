@@ -2,23 +2,24 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
-sequences.private classes classes.algebra definitions ;
+sequences.private classes classes.builtin classes.algebra
+definitions ;
 IN: generic.math
 
-PREDICATE: class math-class ( object -- ? )
+PREDICATE: math-class < class
     dup null bootstrap-word eq? [
         drop f
     ] [
         number bootstrap-word class<
     ] if ;
 
-: last/first ( seq -- pair ) dup peek swap first 2array ;
+: last/first ( seq -- pair ) [ peek ] [ first ] bi 2array ;
 
-: math-precedence ( class -- n )
+: math-precedence ( class -- pair )
     {
         { [ dup null class< ] [ drop { -1 -1 } ] }
         { [ dup math-class? ] [ class-types last/first ] }
-        { [ t ] [ drop { 100 100 } ] }
+        [ drop { 100 100 } ]
     } cond ;
     
 : math-class-max ( class class -- class )
@@ -71,15 +72,17 @@ M: math-combination make-default-method
 
 M: math-combination perform-combination
     drop
+    dup
     \ over [
         dup math-class? [
             \ dup [ >r 2dup r> math-method ] math-vtable
         ] [
             over object-method
         ] if nip
-    ] math-vtable nip ;
+    ] math-vtable nip
+    define ;
 
-PREDICATE: generic math-generic ( word -- ? )
+PREDICATE: math-generic < generic ( word -- ? )
     "combination" word-prop math-combination? ;
 
 M: math-generic definer drop \ MATH: f ;

@@ -10,7 +10,7 @@ IN: compiler.tests
 [ 3 ] [ 5 2 [ [ - ] 2curry 9 swap call /i ] compile-call ] unit-test
 [ 3 ] [ 5 2 [ [ - ] 2curry >r 9 r> call /i ] compile-call ] unit-test
 
-[ -10 -20 ] [ 10 20 -1 [ [ * ] curry 2apply ] compile-call ] unit-test
+[ -10 -20 ] [ 10 20 -1 [ [ * ] curry bi@ ] compile-call ] unit-test
 
 [ [ 5 2 - ] ] [ 5 [ [ 2 - ] curry ] compile-call >quotation ] unit-test
 [ [ 5 2 - ] ] [ [ 5 [ 2 - ] curry ] compile-call >quotation ] unit-test

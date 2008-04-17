@@ -3,7 +3,7 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
 classes.algebra vectors definitions source-files
-compiler.units ;
+compiler.units kernel.private ;
 IN: classes.tests
 
 ! DEFER: bah
@@ -28,7 +28,7 @@ M: union-1 generic-update-test drop "union-1" ;
 [ f ] [ union-1 number class< ] unit-test
 [ "union-1" ] [ { 1.0 } generic-update-test ] unit-test
 
-"IN: classes.tests USE: math PREDICATE: integer union-1 even? ;" eval
+"IN: classes.tests USE: math PREDICATE: union-1 < integer even? ;" eval
 
 [ f ] [ union-1 union-class? ] unit-test
 [ t ] [ union-1 predicate-class? ] unit-test
@@ -153,3 +153,10 @@ TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
 ! Test generic see and parsing
 [ "USING: alien math ;\nIN: classes.tests\nUNION: bah fixnum alien ;\n" ]
 [ [ \ bah see ] with-string-writer ] unit-test
+
+[ t ] [ 3 object instance? ] unit-test
+[ t ] [ 3 fixnum instance? ] unit-test
+[ f ] [ 3 float instance? ] unit-test
+[ t ] [ 3 number instance? ] unit-test
+[ f ] [ 3 null instance? ] unit-test
+[ t ] [ "hi" \ hi-tag instance? ] unit-test

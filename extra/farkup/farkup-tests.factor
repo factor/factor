@@ -54,7 +54,7 @@ IN: farkup.tests
 [ "<p>=</p><h2>foo</h2>" ] [ "===foo==" convert-farkup ] unit-test
 [ "<h1>foo</h1><p>=</p>" ] [ "=foo==" convert-farkup ] unit-test
 
-[ "<span class='KEYWORD3'>int</span> <span class='FUNCTION'>main</span><span class='OPERATOR'>(</span><span class='OPERATOR'>)</span><br/>" ]
+[ "<div style='white-space: pre; font-family: monospace; '><span class='KEYWORD3'>int</span> <span class='FUNCTION'>main</span><span class='OPERATOR'>(</span><span class='OPERATOR'>)</span><br/></div>" ]
 [ "[c{int main()}]" convert-farkup ] unit-test
 
 [ "<p><img src=\"lol.jpg\"/></p>" ] [ "[[image:lol.jpg]]" convert-farkup ] unit-test

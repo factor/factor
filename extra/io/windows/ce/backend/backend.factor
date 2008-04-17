@@ -7,10 +7,10 @@ IN: io.windows.ce.backend
 : port-errored ( port -- )
     win32-error-string swap set-port-error ;
 
-M: windows-ce-io io-multiplex ( ms -- )
+M: wince io-multiplex ( ms -- )
     60 60 * 1000 * or (sleep) ;
 
-M: windows-ce-io add-completion ( handle -- ) drop ;
+M: wince add-completion ( handle -- ) drop ;
 
 GENERIC: wince-read ( port port-handle -- )
 
@@ -26,18 +26,18 @@ M: port port-flush
         dup dup port-handle wince-write port-flush
     ] if ;
 
-M: windows-ce-io init-io ( -- )
+M: wince init-io ( -- )
     init-winsock ;
 
 LIBRARY: libc
 FUNCTION: void* _getstdfilex int fd ;
 FUNCTION: void* _fileno void* file ;
 
-M: windows-ce-io (init-stdio) ( -- )
+M: wince (init-stdio) ( -- )
     #! We support Windows NT too, to make this I/O backend
     #! easier to debug.
     512 default-buffer-size [
-        winnt? [
+        os winnt? [
             STD_INPUT_HANDLE GetStdHandle
             STD_OUTPUT_HANDLE GetStdHandle
             STD_ERROR_HANDLE GetStdHandle
@@ -46,5 +46,5 @@ M: windows-ce-io (init-stdio) ( -- )
             1 _getstdfilex _fileno
             2 _getstdfilex _fileno
         ] if [ f <win32-file> ] 3apply
-        rot <reader> -rot [ <writer> ] 2apply
+        rot <reader> -rot [ <writer> ] bi@
     ] with-variable ;

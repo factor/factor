@@ -3,13 +3,14 @@
 USING: arrays ui.gadgets
 ui.gadgets.viewports ui.gadgets.frames ui.gadgets.grids
 ui.gadgets.theme ui.gadgets.sliders ui.gestures kernel math
-namespaces sequences models combinators math.vectors ;
+namespaces sequences models combinators math.vectors
+classes.tuple ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller viewport x y follows ;
 
 : find-scroller ( gadget -- scroller/f )
-    [ scroller? ] find-parent ;
+    [ [ scroller? ] is? ] find-parent ;
 
 : scroll-up-page scroller-y -1 swap slide-by-page ;
 
@@ -56,7 +57,7 @@ scroller H{
     2dup control-value = [ 2drop ] [ set-control-value ] if ;
 
 : rect-min ( rect1 rect2 -- rect )
-    >r [ rect-loc ] keep r> [ rect-dim ] 2apply vmin <rect> ;
+    >r [ rect-loc ] keep r> [ rect-dim ] bi@ vmin <rect> ;
 
 : (scroll>rect) ( rect scroller -- )
     [
@@ -118,7 +119,7 @@ scroller H{
         { [ dup t eq? ] [ drop (scroll>bottom) ] }
         { [ dup rect? ] [ swap (scroll>rect) ] }
         { [ dup ] [ swap (scroll>gadget) ] }
-        { [ t ] [ drop dup scroller-value swap scroll ] }
+        [ drop dup scroller-value swap scroll ]
     } cond ;
 
 M: scroller layout*

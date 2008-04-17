@@ -11,7 +11,7 @@ IN: jamshred.oint
 TUPLE: oint location forward up left ;
 
 : <oint> ( location forward up left -- oint )
-    oint construct-boa ;
+    oint boa ;
 
 ! : x-rotation ( theta -- matrix )
 !     #! construct this matrix:

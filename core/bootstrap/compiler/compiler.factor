@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler cpu.architecture vocabs.loader system sequences
 namespaces parser kernel kernel.private classes classes.private
-arrays hashtables vectors tuples sbufs inference.dataflow
-hashtables.private sequences.private math tuples.private
+arrays hashtables vectors classes.tuple sbufs inference.dataflow
+hashtables.private sequences.private math classes.tuple.private
 growable namespaces.private assocs words generator command-line
 vocabs io prettyprint libc compiler.units ;
 IN: bootstrap.compiler
@@ -14,18 +14,12 @@ IN: bootstrap.compiler
     "alien.remote-control" require
 ] unless
 
-"cpu." cpu append require
-
-: enable-compiler ( -- )
-    [ optimized-recompile-hook ] recompile-hook set-global ;
-
-: disable-compiler ( -- )
-    [ default-recompile-hook ] recompile-hook set-global ;
+"cpu." cpu word-name append require
 
 enable-compiler
 
 nl
-"Compiling some words to speed up bootstrap..." write flush
+"Compiling..." write flush
 
 ! Compile a set of words ahead of the full compile.
 ! This set of words was determined semi-empirically
@@ -36,14 +30,12 @@ nl
 {
     roll -roll declare not
 
-    tuple-class-eq? array? hashtable? vector?
+    array? hashtable? vector?
     tuple? sbuf? node? tombstone?
 
     array-capacity array-nth set-array-nth
 
     wrap probe
-
-    delegate
 
     underlying
 
@@ -61,7 +53,7 @@ nl
 "." write flush
 
 {
-    new nth push pop peek
+    new-sequence nth push pop peek
 } compile
 
 "." write flush
@@ -81,5 +73,7 @@ nl
 {
     malloc calloc free memcpy
 } compile
+
+vocabs [ words [ compiled? not ] subset compile "." write flush ] each
 
 " done" print flush

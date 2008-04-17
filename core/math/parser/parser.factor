@@ -62,7 +62,7 @@ SYMBOL: negative?
     {
         { [ dup empty? ] [ drop f ] }
         { [ f over memq? ] [ drop f ] }
-        { [ t ] [ radix get [ < ] curry all? ] }
+        [ radix get [ < ] curry all? ]
     } cond ;
 
 : string>integer ( str -- n/f )
@@ -77,7 +77,7 @@ PRIVATE>
         {
             { [ CHAR: / over member? ] [ string>ratio ] }
             { [ CHAR: . over member? ] [ string>float ] }
-            { [ t ] [ string>integer ] }
+            [ string>integer ]
         } cond
         r> [ dup [ neg ] when ] when
     ] with-radix ;
@@ -134,10 +134,8 @@ M: ratio >base
         } {
             [ CHAR: . over member? ]
             [ ]
-        } {
-            [ t ]
-            [ ".0" append ]
         }
+        [ ".0" append ]
     } cond ;
 
 M: float >base
@@ -145,7 +143,7 @@ M: float >base
         { [ dup 1.0/0.0 = ] [ drop "1.0/0.0" ] }
         { [ dup -1.0/0.0 = ] [ drop "-1.0/0.0" ] }
         { [ dup fp-nan? ] [ drop "0.0/0.0" ] }
-        { [ t ] [ float>string fix-float ] }
+        [ float>string fix-float ]
     } cond ;
 
 : number>string ( n -- str ) 10 >base ;

@@ -5,10 +5,10 @@ IN: semantic-db
 
 TUPLE: node id content ;
 : <node> ( content -- node )
-    node construct-empty swap >>content ;
+    node new swap >>content ;
 
 : <id-node> ( id -- node )
-    node construct-empty swap >>id ;
+    node new swap >>id ;
 
 node "node"
 {
@@ -34,10 +34,10 @@ node "node"
 TUPLE: arc id relation subject object ;
 
 : <arc> ( relation subject object -- arc )
-    arc construct-empty swap >>object swap >>subject swap >>relation ;
+    arc new swap >>object swap >>subject swap >>relation ;
 
 : <id-arc> ( id -- arc )
-    arc construct-empty swap >>id ;
+    arc new swap >>id ;
 
 : insert-arc ( arc -- )
     f <node> dup insert-tuple id>> >>id insert-tuple ;

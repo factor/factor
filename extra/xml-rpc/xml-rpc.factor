@@ -17,7 +17,7 @@ M: integer item>xml
     [ "Integers must fit in 32 bits" throw ] unless
     number>string "i4" build-tag ;
 
-PREDICATE: object boolean { t f } member? ;
+PREDICATE: boolean < object { t f } member? ;
 
 M: boolean item>xml
     "1" "0" ? "boolean" build-tag ;
@@ -92,7 +92,7 @@ M: rpc-fault send-rpc
 TUPLE: server-error tag message ;
 
 : server-error ( tag message -- * )
-    \ server-error construct-boa throw ;
+    \ server-error boa throw ;
 
 M: server-error error.
     "Error in XML supplied to server" print
@@ -111,7 +111,7 @@ TAG: boolean xml>item
     dup children>string {
         { [ dup "1" = ] [ 2drop t ] }
         { [ "0" = ] [ drop f ] }
-        { [ t ] [ "Bad boolean" server-error ] }
+        [ "Bad boolean" server-error ]
     } cond ;
 
 : unstruct-member ( tag -- )

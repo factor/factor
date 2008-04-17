@@ -57,6 +57,35 @@ void print_array(F_ARRAY* array, CELL nesting)
 		printf("...");
 }
 
+void print_tuple(F_TUPLE* tuple, CELL nesting)
+{
+	F_TUPLE_LAYOUT *layout = untag_object(tuple->layout);
+	CELL length = to_fixnum(layout->size);
+
+	printf(" ");
+	print_nested_obj(layout->class,nesting);
+
+	CELL i;
+	bool trimmed;
+
+	if(length > 10)
+	{
+		trimmed = true;
+		length = 10;
+	}
+	else
+		trimmed = false;
+
+	for(i = 0; i < length; i++)
+	{
+		printf(" ");
+		print_nested_obj(tuple_nth(tuple,i),nesting);
+	}
+
+	if(trimmed)
+		printf("...");
+}
+
 void print_nested_obj(CELL obj, F_FIXNUM nesting)
 {
 	if(nesting <= 0)
@@ -83,7 +112,7 @@ void print_nested_obj(CELL obj, F_FIXNUM nesting)
 		break;
 	case TUPLE_TYPE:
 		printf("T{");
-		print_array(untag_object(obj),nesting - 1);
+		print_tuple(untag_object(obj),nesting - 1);
 		printf(" }");
 		break;
 	case ARRAY_TYPE:
@@ -117,6 +146,18 @@ void print_objects(CELL start, CELL end)
 	}
 }
 
+void print_datastack(void)
+{
+	printf("==== DATA STACK:\n");
+	print_objects(ds_bot,ds);
+}
+
+void print_retainstack(void)
+{
+	printf("==== RETAIN STACK:\n");
+	print_objects(rs_bot,rs);
+}
+
 void print_stack_frame(F_STACK_FRAME *frame)
 {
 	print_obj(frame_executing(frame));
@@ -129,6 +170,7 @@ void print_stack_frame(F_STACK_FRAME *frame)
 
 void print_callstack(void)
 {
+	printf("==== CALL STACK:\n");
 	CELL bottom = (CELL)stack_chain->callstack_bottom;
 	CELL top = (CELL)stack_chain->callstack_top;
 	iterate_callstack(top,bottom,print_stack_frame);
@@ -176,10 +218,10 @@ void dump_memory(CELL from, CELL to)
 		dump_cell(from);
 }
 
-void dump_zone(F_ZONE z)
+void dump_zone(F_ZONE *z)
 {
-	printf("start=%lx, size=%lx, end=%lx, here=%lx\n",
-		z.start,z.size,z.end,z.here - z.start);
+	printf("start=%ld, size=%ld, here=%ld\n",
+		z->start,z->size,z->here - z->start);
 }
 
 void dump_generations(void)
@@ -188,13 +230,13 @@ void dump_generations(void)
 	for(i = 0; i < data_heap->gen_count; i++)
 	{
 		printf("Generation %d: ",i);
-		dump_zone(data_heap->generations[i]);
+		dump_zone(&data_heap->generations[i]);
 	}
 
 	for(i = 0; i < data_heap->gen_count; i++)
 	{
 		printf("Semispace %d: ",i);
-		dump_zone(data_heap->semispaces[i]);
+		dump_zone(&data_heap->semispaces[i]);
 	}
 
 	printf("Cards: base=%lx, size=%lx\n",
@@ -204,7 +246,7 @@ void dump_generations(void)
 
 void dump_objects(F_FIXNUM type)
 {
-	data_gc();
+	gc();
 	begin_scan();
 
 	CELL obj;
@@ -307,6 +349,8 @@ void factorbug(void)
 	printf("push <addr>      -- push object on data stack - NOT SAFE\n");
 	printf("code             -- code heap dump\n");
 
+	bool seen_command = false;
+
 	for(;;)
 	{
 		char cmd[1024];
@@ -315,7 +359,22 @@ void factorbug(void)
 		fflush(stdout);
 
 		if(scanf("%1000s",cmd) <= 0)
+		{
+			if(!seen_command)
+			{
+				/* If we exit with an EOF immediately, then
+				dump stacks. This is useful for builder and
+				other cases where Factor is run with stdin
+				redirected to /dev/null */
+				print_datastack();
+				print_retainstack();
+				print_callstack();
+			}
+
 			exit(1);
+		}
+
+		seen_command = true;
 
 		if(strcmp(cmd,"d") == 0)
 		{
@@ -342,9 +401,9 @@ void factorbug(void)
 		else if(strcmp(cmd,"r") == 0)
 			dump_memory(rs_bot,rs);
 		else if(strcmp(cmd,".s") == 0)
-			print_objects(ds_bot,ds);
+			print_datastack();
 		else if(strcmp(cmd,".r") == 0)
-			print_objects(rs_bot,rs);
+			print_retainstack();
 		else if(strcmp(cmd,".c") == 0)
 			print_callstack();
 		else if(strcmp(cmd,"e") == 0)

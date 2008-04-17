@@ -6,3 +6,24 @@ IN: io.unix.files.tests
 [ "/" ] [ "/etc/" parent-directory ] unit-test
 [ "/" ] [ "/etc" parent-directory ] unit-test
 [ "/" ] [ "/" parent-directory ] unit-test
+
+[ f ] [ "" root-directory? ] unit-test
+[ t ] [ "/" root-directory? ] unit-test
+[ t ] [ "//" root-directory? ] unit-test
+[ t ] [ "///////" root-directory? ] unit-test
+
+[ "/" ] [ "/" file-name ] unit-test
+[ "///" ] [ "///" file-name ] unit-test
+
+[ "/" ] [ "/" "../.." append-path ] unit-test
+[ "/" ] [ "/" "../../" append-path ] unit-test
+[ "/lib" ] [ "/" "../lib" append-path ] unit-test
+[ "/lib/" ] [ "/" "../lib/" append-path ] unit-test
+[ "/lib" ] [ "/" "../../lib" append-path ] unit-test
+[ "/lib/" ] [ "/" "../../lib/" append-path ] unit-test
+
+[ "/lib" ] [ "/usr/" "/lib" append-path ] unit-test
+[ "/lib/" ] [ "/usr/" "/lib/" append-path ] unit-test
+[ "/lib/bux" ] [ "/usr" "/lib/bux" append-path ] unit-test
+[ "/lib/bux/" ] [ "/usr" "/lib/bux/" append-path ] unit-test
+[ t ] [ "/foo" absolute-path? ] unit-test

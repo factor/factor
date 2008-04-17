@@ -7,16 +7,14 @@
 !  - most of the matrix stuff
 !  - most of the query functions
 
-
 USING: alien alien.syntax combinators system ;
-
 IN: cairo.ffi
 
 << "cairo" {
-        { [ win32? ] [ "libcairo-2.dll" ] }
-        ! { [ macosx? ] [ "libcairo.dylib" ] }
-        { [ macosx? ] [ "/opt/local/lib/libcairo.dylib" ] }
-        { [ unix? ] [ "libcairo.so.2" ] }
+        { [ os winnt? ] [ "libcairo-2.dll" ] }
+        ! { [ os macosx? ] [ "libcairo.dylib" ] }
+        { [ os macosx? ] [ "/opt/local/lib/libcairo.dylib" ] }
+        { [ os unix? ] [ "libcairo.so.2" ] }
   } cond "cdecl" add-library >>
 
 LIBRARY: cairo
@@ -202,6 +200,9 @@ C-ENUM:
     CAIRO_HINT_METRICS_OFF
     CAIRO_HINT_METRICS_ON
 ;
+
+FUNCTION: char* cairo_status_to_string ( cairo_status_t status ) ;
+FUNCTION: cairo_status_t cairo_status ( cairo_t* cr ) ;
 
 : cairo_create ( cairo_surface_t -- cairo_t )
     "cairo_t*" "cairo" "cairo_create" [ "void*" ] alien-invoke ;

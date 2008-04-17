@@ -47,7 +47,7 @@ SYMBOL: main-vocab-hook
     ] bind ;
 
 : ignore-cli-args? ( -- ? )
-    macosx? "run" get "ui" = and ;
+    os macosx? "run" get "ui" = and ;
 
 : script-mode ( -- )
     t "quiet" set-global

@@ -58,24 +58,24 @@ H{ } clone "cache-test" set
 ] [
     H{ { "factor" "rocks" } { "dup" "sq" } { 3 4 } }
     H{ { "factor" "rocks" } { 1 2 } { 2 3 } { 3 4 } }
-    intersect
+    assoc-intersect
 ] unit-test
 
 [
     H{ { 1 2 } { 2 3 } { 6 5 } }
 ] [
     H{ { 2 4 } { 6 5 } } H{ { 1 2 } { 2 3 } }
-    union
+    assoc-union
 ] unit-test
 
 [ H{ { 1 2 } { 2 3 } } t ] [
-    f H{ { 1 2 } { 2 3 } } [ union ] 2keep swap union dupd =
+    f H{ { 1 2 } { 2 3 } } [ assoc-union ] 2keep swap assoc-union dupd =
 ] unit-test
 
 [
     H{ { 1 f } }
 ] [
-    H{ { 1 f } } H{ { 1 f } } intersect
+    H{ { 1 f } } H{ { 1 f } } assoc-intersect
 ] unit-test
 
 [ { 1 3 } ] [ H{ { 2 2 } } { 1 2 3 } remove-all ] unit-test
@@ -92,4 +92,15 @@ unit-test
     H{ { 1.0 1.0 } { 2.0 2.0 } }
 ] [
     F{ 1.0 2.0 } [ dup ] H{ } map>assoc
+] unit-test
+
+[ { 3 } ] [
+    [
+        3
+        H{ } clone
+        2 [
+            2dup [ , f ] cache drop
+        ] times
+        2drop
+    ] { } make
 ] unit-test

@@ -12,7 +12,7 @@ TUPLE: handle view window ;
 
 C: <handle> handle
 
-TUPLE: cocoa-ui-backend ;
+SINGLETON: cocoa-ui-backend
 
 SYMBOL: stop-after-last-window?
 
@@ -119,6 +119,6 @@ M: cocoa-ui-backend ui
         ] ui-running
     ] with-cocoa ;
 
-T{ cocoa-ui-backend } ui-backend set-global
+cocoa-ui-backend ui-backend set-global
 
 [ running.app? "ui" "listener" ? ] main-vocab-hook set-global

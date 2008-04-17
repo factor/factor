@@ -9,7 +9,7 @@ TUPLE: mysql-statement ;
 TUPLE: mysql-result-set ;
 
 M: mysql-db db-open ( mysql-db -- )
-    drop ;
+    ;
 
 M: mysql-db dispose ( mysql-db -- )
     mysql-db-handle mysql_close ;

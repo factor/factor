@@ -20,12 +20,12 @@ V{
 
 : vocab-dir+ ( vocab str/f -- path )
     >r vocab-name "." split r>
-    [ >r dup peek r> append add ] when*
+    [ >r dup peek r> append suffix ] when*
     "/" join ;
 
 : vocab-dir? ( root name -- ? )
     over [
-        ".factor" vocab-dir+ append-path resource-exists?
+        ".factor" vocab-dir+ append-path exists?
     ] [
         2drop f
     ] if ;

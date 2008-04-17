@@ -21,9 +21,9 @@ IN: tools.deploy.backend
         swap >>command
         +stdout+ >>stderr
         +closed+ >>stdin
-    utf8 <process-stream>
-    dup copy-lines
-    process>> wait-for-process zero? [
+        +low-priority+ >>priority
+    utf8 <process-stream*>
+    >r copy-lines r> wait-for-process zero? [
         "Deployment failed" throw
     ] unless ;
 
@@ -45,7 +45,7 @@ IN: tools.deploy.backend
 
 : staging-image-name ( profile -- name )
     "staging."
-    swap strip-word-names? [ "strip" add ] when
+    swap strip-word-names? [ "strip" suffix ] when
     "-" join ".image" 3append temp-file ;
 
 DEFER: ?make-staging-image
@@ -74,7 +74,7 @@ DEFER: ?make-staging-image
     ] { } make ;
 
 : run-factor ( vm flags -- )
-    swap add* dup . run-with-output ; inline
+    swap prefix dup . run-with-output ; inline
 
 : make-staging-image ( profile -- )
     vm swap staging-command-line run-factor ;
@@ -106,6 +106,4 @@ DEFER: ?make-staging-image
     make-boot-image
     deploy-command-line run-factor ;
 
-SYMBOL: deploy-implementation
-
-HOOK: deploy* deploy-implementation ( vocab -- )
+HOOK: deploy* os ( vocab -- )

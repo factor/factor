@@ -6,8 +6,8 @@ alien.c-types combinators namespaces alien parser ;
 IN: io.sockets.impl
 
 << {
-    { [ windows? ] [ "windows.winsock" ] }
-    { [ unix? ] [ "unix" ] }
+    { [ os windows? ] [ "windows.winsock" ] }
+    { [ os unix? ] [ "unix" ] }
 } cond use+ >>
 
 GENERIC: protocol-family ( addrspec -- af )
@@ -64,8 +64,8 @@ M: inet6 inet-ntop ( data addrspec -- str )
 
 M: inet6 inet-pton ( str addrspec -- data )
     drop "::" split1
-    [ [ ":" split [ hex> dup 0 ? ] map ] [ f ] if* ] 2apply
-    2dup [ length ] 2apply + 8 swap - 0 <array> swap 3append
+    [ [ ":" split [ hex> dup 0 ? ] map ] [ f ] if* ] bi@
+    2dup [ length ] bi@ + 8 swap - 0 <array> swap 3append
     [ 2 >be ] map concat >byte-array ;
 
 M: inet6 address-size drop 16 ;
@@ -90,20 +90,19 @@ M: inet6 parse-sockaddr
         { [ dup AF_INET = ] [ T{ inet4 } ] }
         { [ dup AF_INET6 = ] [ T{ inet6 } ] }
         { [ dup AF_UNIX = ] [ T{ local } ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond nip ;
 
 M: f parse-sockaddr nip ;
 
 : addrinfo>addrspec ( addrinfo -- addrspec )
-    dup addrinfo-addr
-    swap addrinfo-family addrspec-of-family
+    [ addrinfo-addr ] [ addrinfo-family addrspec-of-family ] bi
     parse-sockaddr ;
 
 : parse-addrinfo-list ( addrinfo -- seq )
-    [ dup ]
-    [ dup addrinfo-next swap addrinfo>addrspec ]
-    [ ] unfold nip [ ] subset ;
+    [ addrinfo-next ] follow
+    [ addrinfo>addrspec ] map
+    [ ] subset ;
 
 : prepare-resolve-host ( host serv passive? -- host' serv' flags )
     #! If the port is a number, we resolve for 'http' then

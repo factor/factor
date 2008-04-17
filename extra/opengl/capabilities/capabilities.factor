@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences splitting opengl.gl
-continuations math.parser math arrays ;
+continuations math.parser math arrays sets ;
 IN: opengl.capabilities
 
 : (require-gl) ( thing require-quot make-error-quot -- )
@@ -15,7 +15,7 @@ IN: opengl.capabilities
 : has-gl-extensions? ( extensions -- ? )
     gl-extensions swap [ over member? ] all? nip ;
 : (make-gl-extensions-error) ( required-extensions -- )
-    gl-extensions swap seq-diff
+    gl-extensions swap diff
     "Required OpenGL extensions not supported:\n" %
     [ "    " % % "\n" % ] each ;
 : require-gl-extensions ( extensions -- )

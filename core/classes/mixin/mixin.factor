@@ -1,13 +1,13 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.union words kernel sequences
-definitions combinators arrays ;
+definitions combinators arrays accessors ;
 IN: classes.mixin
 
-PREDICATE: union-class mixin-class "mixin" word-prop ;
+PREDICATE: mixin-class < union-class "mixin" word-prop ;
 
 M: mixin-class reset-class
-    { "metaclass" "members" "mixin" } reset-props ;
+    { "class" "metaclass" "members" "mixin" } reset-props ;
 
 : redefine-mixin-class ( class members -- )
     dupd define-union-class
@@ -24,7 +24,7 @@ TUPLE: check-mixin-class mixin ;
 
 : check-mixin-class ( mixin -- mixin )
     dup mixin-class? [
-        \ check-mixin-class construct-boa throw
+        \ check-mixin-class boa throw
     ] unless ;
 
 : if-mixin-member? ( class mixin true false -- )
@@ -35,7 +35,7 @@ TUPLE: check-mixin-class mixin ;
     swap redefine-mixin-class ; inline
 
 : add-mixin-instance ( class mixin -- )
-    [ 2drop ] [ [ add ] change-mixin-class ] if-mixin-member? ;
+    [ 2drop ] [ [ suffix ] change-mixin-class ] if-mixin-member? ;
 
 : remove-mixin-instance ( class mixin -- )
     [ [ swap remove ] change-mixin-class ] [ 2drop ] if-mixin-member? ;
@@ -47,14 +47,13 @@ TUPLE: mixin-instance loc class mixin ;
 M: mixin-instance equal?
     {
         { [ over mixin-instance? not ] [ f ] }
-        { [ 2dup [ mixin-instance-class ] 2apply = not ] [ f ] }
-        { [ 2dup [ mixin-instance-mixin ] 2apply = not ] [ f ] }
-        { [ t ] [ t ] }
+        { [ 2dup [ mixin-instance-class ] bi@ = not ] [ f ] }
+        { [ 2dup [ mixin-instance-mixin ] bi@ = not ] [ f ] }
+        [ t ]
     } cond 2nip ;
 
 M: mixin-instance hashcode*
-    { mixin-instance-class mixin-instance-mixin } get-slots
-    2array hashcode* ;
+    [ class>> ] [ mixin>> ] bi 2array hashcode* ;
 
 : <mixin-instance> ( class mixin -- definition )
     { set-mixin-instance-class set-mixin-instance-mixin }

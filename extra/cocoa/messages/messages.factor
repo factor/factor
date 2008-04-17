@@ -43,7 +43,7 @@ super-message-senders global [ H{ } assoc-like ] change-at
 
 TUPLE: selector name object ;
 
-MEMO: <selector> ( name -- sel ) f \ selector construct-boa ;
+MEMO: <selector> ( name -- sel ) f \ selector boa ;
 
 : selector ( selector -- alien )
     dup selector-object expired? [
@@ -139,7 +139,7 @@ H{
     { "NSRect" "{_NSRect=ffff}" }
     { "NSSize" "{_NSSize=ff}" }
     { "NSRange" "{_NSRange=II}" }
-} union alien>objc-types set-global
+} assoc-union alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
     2dup CHAR: = -rot index* swap subseq
@@ -154,7 +154,7 @@ H{
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
         { [ dup CHAR: [ = ] [ 3drop "void*" ] }
-        { [ t ] [ 2nip 1string objc>alien-types get at ] }
+        [ 2nip 1string objc>alien-types get at ]
     } cond ;
 
 : parse-objc-type ( string -- ctype ) 0 swap (parse-objc-type) ;

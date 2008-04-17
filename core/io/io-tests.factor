@@ -4,24 +4,24 @@ io.encodings.binary ;
 IN: io.tests
 
 [ f ] [
-    "resource:/core/io/test/no-trailing-eol.factor" run-file
+    "resource:core/io/test/no-trailing-eol.factor" run-file
     "foo" "io.tests" lookup
 ] unit-test
 
 : <resource-reader> ( resource -- stream )
-    resource-path iso-8859-1 <file-reader> ;
+    resource-path latin1 <file-reader> ;
 
 [
     "This is a line.\rThis is another line.\r"
 ] [
-    "/core/io/test/mac-os-eol.txt" <resource-reader>
+    "core/io/test/mac-os-eol.txt" <resource-reader>
     [ 500 read ] with-stream
 ] unit-test
 
 [
     255
 ] [
-    "/core/io/test/binary.txt" <resource-reader>
+    "core/io/test/binary.txt" <resource-reader>
     [ read1 ] with-stream >fixnum
 ] unit-test
 
@@ -36,7 +36,7 @@ IN: io.tests
     }
 ] [
     [
-        "/core/io/test/separator-test.txt" <resource-reader> [
+        "core/io/test/separator-test.txt" <resource-reader> [
             "J" read-until 2array ,
             "i" read-until 2array ,
             "X" read-until 2array ,

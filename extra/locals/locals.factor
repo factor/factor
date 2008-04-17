@@ -3,9 +3,8 @@
 USING: kernel namespaces sequences sequences.private assocs math
 inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
-definitions prettyprint hashtables combinators.lib
-prettyprint.sections sequences.private effects generic
-compiler.units combinators.cleave accessors ;
+definitions prettyprint hashtables prettyprint.sections sets
+sequences.private effects generic compiler.units accessors ;
 IN: locals
 
 ! Inspired by
@@ -29,23 +28,23 @@ TUPLE: wlet bindings body ;
 
 C: <wlet> wlet
 
-PREDICATE: word local "local?" word-prop ;
+PREDICATE: local < word "local?" word-prop ;
 
 : <local> ( name -- word )
     #! Create a local variable identifier
     f <word> dup t "local?" set-word-prop ;
 
-PREDICATE: word local-word "local-word?" word-prop ;
+PREDICATE: local-word < word "local-word?" word-prop ;
 
 : <local-word> ( name -- word )
     f <word> dup t "local-word?" set-word-prop ;
 
-PREDICATE: word local-reader "local-reader?" word-prop ;
+PREDICATE: local-reader < word "local-reader?" word-prop ;
 
 : <local-reader> ( name -- word )
     f <word> dup t "local-reader?" set-word-prop ;
 
-PREDICATE: word local-writer "local-writer?" word-prop ;
+PREDICATE: local-writer < word "local-writer?" word-prop ;
 
 : <local-writer> ( reader -- word )
     dup word-name "!" append f <word>
@@ -108,7 +107,7 @@ UNION: special local quote local-word local-reader local-writer ;
 : point-free-end ( quot args -- newquot )
     over peek special?
     [ drop-locals >r >r peek r> localize r> append ]
-    [ drop-locals nip swap peek add ]
+    [ drop-locals nip swap peek suffix ]
     if ;
 
 : (point-free) ( quot args -- newquot )
@@ -130,9 +129,9 @@ GENERIC: free-vars ( form -- vars )
 
 : add-if-free ( vars object -- vars )
   {
-      { [ dup local-writer? ] [ "local-reader" word-prop add ] }
-      { [ dup lexical? ]      [ add ] }
-      { [ dup quote? ]        [ quote-local add ] }
+      { [ dup local-writer? ] [ "local-reader" word-prop suffix ] }
+      { [ dup lexical? ]      [ suffix ] }
+      { [ dup quote? ]        [ quote-local suffix ] }
       { [ t ]                 [ free-vars append ] }
   } cond ;
 
@@ -141,7 +140,7 @@ M: object free-vars drop { } ;
 M: quotation free-vars { } [ add-if-free ] reduce ;
 
 M: lambda free-vars
-    dup vars>> swap body>> free-vars seq-diff ;
+    dup vars>> swap body>> free-vars diff ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! lambda-rewrite
@@ -266,13 +265,13 @@ M: object local-rewrite* , ;
     ] assoc-each local-rewrite* \ call , ;
 
 M: let local-rewrite*
-    { body>> bindings>> } get-slots let-rewrite ;
+    [ body>> ] [ bindings>> ] bi let-rewrite ;
 
 M: let* local-rewrite*
-    { body>> bindings>> } get-slots let-rewrite ;
+    [ body>> ] [ bindings>> ] bi let-rewrite ;
 
 M: wlet local-rewrite*
-    { body>> bindings>> } get-slots
+    [ body>> ] [ bindings>> ] bi
     [ [ ] curry ] assoc-map
     let-rewrite ;
 
@@ -340,7 +339,7 @@ M: lambda pprint*
 
 : pprint-let ( let word -- )
     pprint-word
-    { body>> bindings>> } get-slots
+    [ body>> ] [ bindings>> ] bi
     \ | pprint-word
     t <inset
     <block
@@ -357,7 +356,7 @@ M: wlet pprint* \ [wlet pprint-let ;
 
 M: let* pprint* \ [let* pprint-let ;
 
-PREDICATE: word lambda-word
+PREDICATE: lambda-word < word
     "lambda" word-prop >boolean ;
 
 M: lambda-word definer drop \ :: \ ; ;
@@ -373,7 +372,7 @@ M: lambda-word definition
 
 M: lambda-word synopsis* lambda-word-synopsis ;
 
-PREDICATE: macro lambda-macro
+PREDICATE: lambda-macro < macro
     "lambda" word-prop >boolean ;
 
 M: lambda-macro definer drop \ MACRO:: \ ; ;
@@ -383,7 +382,7 @@ M: lambda-macro definition
 
 M: lambda-macro synopsis* lambda-word-synopsis ;
 
-PREDICATE: method-body lambda-method
+PREDICATE: lambda-method < method-body
     "lambda" word-prop >boolean ;
 
 M: lambda-method definer drop \ M:: \ ; ;

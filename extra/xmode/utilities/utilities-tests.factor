@@ -12,7 +12,7 @@ vectors sequences io.files prettyprint assocs unicode.case ;
 
 TUPLE: company employees type ;
 
-: <company> V{ } clone f company construct-boa ;
+: <company> V{ } clone f company boa ;
 
 : add-employee company-employees push ;
 
@@ -21,7 +21,7 @@ TUPLE: company employees type ;
 TUPLE: employee name description ;
 
 TAG: employee
-    employee construct-empty
+    employee new
     { { "name" f set-employee-name } { f set-employee-description } }
     init-from-tag swap add-employee ;
 

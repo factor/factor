@@ -7,7 +7,7 @@ IN: bit-vectors
 <PRIVATE
 
 : bit-array>vector ( bit-array length -- bit-vector )
-    bit-vector construct-boa ; inline
+    bit-vector boa ; inline
 
 PRIVATE>
 
@@ -22,7 +22,7 @@ M: bit-vector like
         [ dup length bit-array>vector ] [ >bit-vector ] if
     ] unless ;
 
-M: bit-vector new
+M: bit-vector new-sequence
     drop [ <bit-array> ] keep >fixnum bit-array>vector ;
 
 M: bit-vector equal?

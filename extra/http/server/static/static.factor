@@ -3,15 +3,14 @@
 USING: calendar html io io.files kernel math math.parser http
 http.server namespaces parser sequences strings assocs
 hashtables debugger http.mime sorting html.elements logging
-calendar.format accessors io.encodings.binary
-combinators.cleave fry ;
+calendar.format accessors io.encodings.binary fry ;
 IN: http.server.static
 
 ! special maps mime types to quots with effect ( path -- )
 TUPLE: file-responder root hook special ;
 
 : file-http-date ( filename -- string )
-    file-info file-info-modified timestamp>http-string ;
+    file-info modified>> timestamp>http-string ;
 
 : last-modified-matches? ( filename -- ? )
     file-http-date dup [
@@ -22,13 +21,13 @@ TUPLE: file-responder root hook special ;
     304 "Not modified" <trivial-response> ;
 
 : <file-responder> ( root hook -- responder )
-    H{ } clone file-responder construct-boa ;
+    H{ } clone file-responder boa ;
 
 : <static> ( root -- responder )
     [
         <content>
         swap
-        [ file-info file-info-size "content-length" set-header ]
+        [ file-info size>> "content-length" set-header ]
         [ file-http-date "last-modified" set-header ]
         [ '[ , binary <file-reader> stdio get stream-copy ] >>body ]
         tri
@@ -39,7 +38,9 @@ TUPLE: file-responder root hook special ;
     [ 2drop <304> ] [ file-responder get hook>> call ] if ;
 
 : serving-path ( filename -- filename )
-    "" or file-responder get root>> prepend-path ;
+    file-responder get root>> right-trim-separators
+    "/"
+    rot "" or left-trim-separators 3append ;
 
 : serve-file ( filename -- response )
     dup mime-type

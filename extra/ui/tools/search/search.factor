@@ -4,7 +4,7 @@ USING: assocs ui.tools.interactor ui.tools.listener
 ui.tools.workspace help help.topics io.files io.styles kernel
 models namespaces prettyprint quotations sequences sorting
 source-files definitions strings tools.completion tools.crossref
-tuples ui.commands ui.gadgets ui.gadgets.editors
+classes.tuple ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.lists ui.gadgets.scrollers ui.gadgets.tracks
 ui.gestures ui.operations vocabs words vocabs.loader
 tools.vocabs unicode.case calendar ui ;
@@ -57,7 +57,7 @@ search-field H{
     swap <list> ;
 
 : <live-search> ( string seq limited? presenter -- gadget )
-    live-search construct-empty
+    live-search new
     [
         <search-field> g-> set-live-search-field f track,
         <search-list> g-> set-live-search-list

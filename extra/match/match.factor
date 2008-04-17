@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Based on pattern matching code from Paul Graham's book 'On Lisp'.
-USING: parser kernel words namespaces sequences tuples
+USING: parser kernel words namespaces sequences classes.tuple
 combinators macros assocs math ;
 IN: match
 
@@ -32,10 +32,10 @@ SYMBOL: _
         { [ 2dup = ] [ 2drop t ] }
         { [ 2dup [ _ eq? ] either? ] [ 2drop t ] }
         { [ 2dup [ sequence? ] both? ] [
-            2dup [ length ] 2apply =
+            2dup [ length ] bi@ =
             [ [ (match) ] 2all? ] [ 2drop f ] if ] }
         { [ 2dup [ tuple? ] both? ]
-          [ [ tuple>array ] 2apply [ (match) ] 2all? ] }
+          [ [ tuple>array ] bi@ [ (match) ] 2all? ] }
         { [ t ] [ 2drop f ] }
     } cond ;
 
@@ -58,10 +58,33 @@ MACRO: match-cond ( assoc -- )
         { [ dup match-var? ] [ get ] }
         { [ dup sequence? ] [ [ replace-patterns ] map ] }
         { [ dup tuple? ] [ tuple>array replace-patterns >tuple ] }
-        { [ t ] [ ] }
+        [ ]
     } cond ;
 
 : match-replace ( object pattern1 pattern2 -- result )
     -rot
     match [ "Pattern does not match" throw ] unless*
     [ replace-patterns ] bind ;
+
+: ?1-tail ( seq -- tail/f )
+    dup length zero? not [ 1 tail ] [ drop f ] if ;
+
+: (match-first) ( seq pattern-seq -- bindings leftover/f )
+    2dup [ length ] bi@ < [ 2drop f f ]
+    [
+        2dup length head over match
+        [ nip swap ?1-tail ] [ >r 1 tail r> (match-first) ] if*
+    ] if ;
+    
+: match-first ( seq pattern-seq -- bindings )
+    (match-first) drop ;
+
+: (match-all) ( seq pattern-seq -- )
+    tuck (match-first) swap 
+    [ 
+        , [ swap (match-all) ] [ drop ] if* 
+    ] [ 2drop ] if* ;
+
+: match-all ( seq pattern-seq -- bindings-seq )
+    [ (match-all) ] { } make ;
+    

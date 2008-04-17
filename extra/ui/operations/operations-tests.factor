@@ -5,7 +5,7 @@ io.streams.string math help help.markup ;
 
 : my-pprint pprint ;
 
-[ drop t ] \ my-pprint [ ] [ ] f operation construct-boa "op" set
+[ drop t ] \ my-pprint [ ] [ ] f operation boa "op" set
 
 [ [ 3 my-pprint ] ] [
     3 "op" get operation-command command-quot
@@ -13,7 +13,7 @@ io.streams.string math help help.markup ;
 
 [ "3" ] [ [ 3 "op" get invoke-command ] with-string-writer ] unit-test
 
-[ drop t ] \ my-pprint [ ] [ editor-string ] f operation construct-boa
+[ drop t ] \ my-pprint [ ] [ editor-string ] f operation boa
 "op" set
 
 [ "\"4\"" ] [

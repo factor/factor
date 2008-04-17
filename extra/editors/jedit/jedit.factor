@@ -4,11 +4,11 @@ USING: arrays definitions io kernel math
 namespaces parser prettyprint sequences strings words
 editors io.files io.sockets io.streams.byte-array io.binary
 math.parser io.encodings.ascii io.encodings.binary
-io.encodings.utf8 ;
+io.encodings.utf8 io.files.private ;
 IN: editors.jedit
 
 : jedit-server-info ( -- port auth )
-    home "/.jedit/server" append-path ascii [
+    home ".jedit/server" append-path ascii [
         readln drop
         readln string>number
         readln string>number

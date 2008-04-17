@@ -16,7 +16,7 @@ IN: alien.structs
     ] reduce ;
 
 : define-struct-slot-word ( spec word quot -- )
-    rot slot-spec-offset add* define-inline ;
+    rot slot-spec-offset prefix define-inline ;
 
 : define-getter ( type spec -- )
     [ set-reader-props ] keep
@@ -68,7 +68,7 @@ M: struct-type stack-size
 
 : (define-struct) ( name vocab size align fields -- )
     >r [ align ] keep r>
-    struct-type construct-boa
+    struct-type boa
     -rot define-c-type ;
 
 : make-field ( struct-name vocab type field-name -- spec )

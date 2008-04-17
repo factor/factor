@@ -4,7 +4,7 @@
 USING: namespaces io io.timeouts kernel logging io.sockets
 sequences combinators sequences.lib splitting assocs strings
 math.parser random system calendar io.encodings.ascii
-calendar.format accessors ;
+calendar.format accessors sets ;
 IN: smtp
 
 SYMBOL: smtp-domain
@@ -32,7 +32,7 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 
 : validate-address ( string -- string' )
     #! Make sure we send funky stuff to the server by accident.
-    dup "\r\n>" seq-intersect empty?
+    dup "\r\n>" intersect empty?
     [ "Bad e-mail address: " prepend throw ] unless ;
 
 : mail-from ( fromaddr -- )
@@ -70,7 +70,7 @@ LOG: smtp-response DEBUG
         { [ dup "50" head? ] [ smtp-response "syntax error" throw ] }
         { [ dup "53" head? ] [ smtp-response "invalid authentication data" throw ] }
         { [ dup "55" head? ] [ smtp-response "fatal error" throw ] }
-        { [ t ] [ "unknown error" throw ] }
+        [ "unknown error" throw ]
     } cond ;
 
 : multiline? ( response -- boolean )
@@ -90,7 +90,7 @@ LOG: smtp-response DEBUG
 : get-ok ( -- ) receive-response check-response ;
 
 : validate-header ( string -- string' )
-    dup "\r\n" seq-intersect empty?
+    dup "\r\n" intersect empty?
     [ "Invalid header string: " prepend throw ] unless ;
 
 : write-header ( key value -- )
@@ -106,7 +106,7 @@ LOG: smtp-response DEBUG
 TUPLE: email from to subject headers body ;
 
 M: email clone
-    (clone) [ clone ] change-headers ;
+    call-next-method [ clone ] change-headers ;
 
 : (send) ( email -- )
     [
@@ -149,7 +149,7 @@ M: email clone
     message-id "Message-Id" set-header ;
 
 : <email> ( -- email )
-    email construct-empty
+    email new
     H{ } clone >>headers ;
 
 : send-email ( email -- )

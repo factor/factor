@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io kernel namespaces parser prettyprint sequences
 words assocs definitions generic quotations effects slots
-continuations tuples debugger combinators vocabs help.stylesheet
-help.topics help.crossref help.markup sorting classes
-vocabs.loader ;
+continuations classes.tuple debugger combinators vocabs
+help.stylesheet help.topics help.crossref help.markup sorting
+classes vocabs.loader ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -139,7 +139,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     {
         { [ dup empty? ] [ (:help-none) ] }
         { [ dup length 1 = ] [ first help ] }
-        { [ t ] [ (:help-multi) ] }
+        [ (:help-multi) ]
     } cond (:help-debugger) ;
 
 : remove-article ( name -- )

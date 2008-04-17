@@ -1,4 +1,4 @@
-USING: kernel parser quotations tuples words
+USING: kernel parser quotations classes.tuple words
 namespaces.lib namespaces sequences arrays combinators
 prettyprint strings math.parser sequences.lib math symbols ;
 USE: tools.walker
@@ -55,7 +55,7 @@ TUPLE: no-sql-match ;
         { [ dup number? ] [ number>string sql% ] }
         { [ dup symbol? ] [ unparse sql% ] }
         { [ dup word? ] [ unparse sql% ] }
-        { [ t ] [ T{ no-sql-match } throw ] }
+        [ T{ no-sql-match } throw ]
     } cond ;
 
 : parse-sql ( obj -- sql in-spec out-spec in out )

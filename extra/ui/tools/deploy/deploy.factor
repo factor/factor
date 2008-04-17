@@ -49,7 +49,7 @@ TUPLE: deploy-gadget vocab settings ;
         [
             bundle-name
             deploy-ui
-            macosx? [ exit-when-windows-closed ] when
+            os macosx? [ exit-when-windows-closed ] when
             io-settings
             reflection-settings
             advanced-settings
@@ -104,7 +104,7 @@ deploy-gadget "toolbar" f {
     g <toolbar> { 10 10 } over set-pack-gap gadget, ;
 
 : <deploy-gadget> ( vocab -- gadget )
-    f deploy-gadget construct-boa [
+    f deploy-gadget boa [
         dup <deploy-settings>
         g-> set-deploy-gadget-settings gadget,
         buttons,

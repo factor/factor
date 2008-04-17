@@ -3,17 +3,18 @@
 USING: io.files kernel io.encodings.utf8 vocabs.loader vocabs
 sequences namespaces math.parser arrays hashtables assocs
 memoize inspector sorting splitting combinators source-files
-io debugger continuations compiler.errors init io.crc32 ;
+io debugger continuations compiler.errors init io.crc32 
+sets ;
 IN: tools.vocabs
 
 : vocab-tests-file ( vocab -- path )
     dup "-tests.factor" vocab-dir+ vocab-append-path dup
-    [ dup resource-exists? [ drop f ] unless ] [ drop f ] if ;
+    [ dup exists? [ drop f ] unless ] [ drop f ] if ;
 
 : vocab-tests-dir ( vocab -- paths )
     dup vocab-dir "tests" append-path vocab-append-path dup [
-        dup resource-exists? [
-            dup ?resource-path directory keys
+        dup exists? [
+            dup directory keys
             [ ".factor" tail? ] subset
             [ append-path ] with map
         ] [ drop f ] if
@@ -21,55 +22,25 @@ IN: tools.vocabs
 
 : vocab-tests ( vocab -- tests )
     [
-        dup vocab-tests-file [ , ] when*
-        vocab-tests-dir [ % ] when*
+        [ vocab-tests-file [ , ] when* ]
+        [ vocab-tests-dir [ % ] when* ] bi
     ] { } make ;
 
 : vocab-files ( vocab -- seq )
     [
-        dup vocab-source-path [ , ] when*
-        dup vocab-docs-path [ , ] when*
-        vocab-tests %
+        [ vocab-source-path [ , ] when* ]
+        [ vocab-docs-path [ , ] when* ]
+        [ vocab-tests % ] tri
     ] { } make ;
-
-: source-modified? ( path -- ? )
-    dup source-files get at [
-        dup source-file-path ?resource-path
-        dup exists? [
-            utf8 file-lines lines-crc32
-            swap source-file-checksum = not
-        ] [
-            2drop f
-        ] if
-    ] [
-        resource-exists?
-    ] ?if ;
-
-: modified ( seq quot -- seq )
-    [ dup ] swap compose { } map>assoc
-    [ nip ] assoc-subset
-    [ nip source-modified? ] assoc-subset keys ; inline
-
-: modified-sources ( vocabs -- seq )
-    [ vocab-source-path ] modified ;
-
-: modified-docs ( vocabs -- seq )
-    [ vocab-docs-path ] modified ;
-
-: to-refresh ( prefix -- modified-sources modified-docs )
-    child-vocabs
-    dup modified-sources swap modified-docs ;
 
 : vocab-heading. ( vocab -- )
     nl
     "==== " write
-    dup vocab-name swap vocab write-object ":" print
+    [ vocab-name ] [ vocab write-object ] bi ":" print
     nl ;
 
 : load-error. ( triple -- )
-    dup first vocab-heading.
-    dup second print-error
-    drop ;
+    [ first vocab-heading. ] [ second print-error ] bi ;
 
 : load-failures. ( failures -- )
     [ load-error. nl ] each ;
@@ -88,32 +59,101 @@ SYMBOL: failures
         failures get
     ] with-compiler-errors ;
 
-: do-refresh ( modified-sources modified-docs -- )
-    2dup
-    [ f swap set-vocab-docs-loaded? ] each
-    [ f swap set-vocab-source-loaded? ] each
-    append prune require-all load-failures. ;
+: source-modified? ( path -- ? )
+    dup source-files get at [
+        dup source-file-path
+        dup exists? [
+            utf8 file-lines lines-crc32
+            swap source-file-checksum = not
+        ] [
+            2drop f
+        ] if
+    ] [
+        exists?
+    ] ?if ;
+
+SYMBOL: changed-vocabs
+
+[ f changed-vocabs set-global ] "tools.vocabs" add-init-hook
+
+: changed-vocab ( vocab -- )
+    dup vocab changed-vocabs get and
+    [ dup changed-vocabs get set-at ] [ drop ] if ;
+
+: unchanged-vocab ( vocab -- )
+    changed-vocabs get delete-at ;
+
+: unchanged-vocabs ( vocabs -- )
+    [ unchanged-vocab ] each ;
+
+: changed-vocab? ( vocab -- ? )
+    changed-vocabs get dup [ key? ] [ 2drop t ] if ;
+
+: filter-changed ( vocabs -- vocabs' )
+    [ changed-vocab? ] subset ;
+
+SYMBOL: modified-sources
+SYMBOL: modified-docs
+
+: (to-refresh) ( vocab variable loaded? path -- )
+    dup [
+        swap [
+            pick changed-vocab? [
+                source-modified? [ get push ] [ 2drop ] if
+            ] [ 3drop ] if
+        ] [ drop get push ] if
+    ] [ 2drop 2drop ] if ;
+
+: to-refresh ( prefix -- modified-sources modified-docs unchanged )
+    [
+        V{ } clone modified-sources set
+        V{ } clone modified-docs set
+
+        child-vocabs [
+            [
+                [
+                    [ modified-sources ]
+                    [ vocab-source-loaded? ]
+                    [ vocab-source-path ]
+                    tri (to-refresh)
+                ] [
+                    [ modified-docs ]
+                    [ vocab-docs-loaded? ]
+                    [ vocab-docs-path ]
+                    tri (to-refresh)
+                ] bi
+            ] each
+
+            modified-sources get
+            modified-docs get
+        ]
+        [ modified-sources get modified-docs get append swap diff ] bi
+    ] with-scope ;
+
+: do-refresh ( modified-sources modified-docs unchanged -- )
+    unchanged-vocabs
+    [
+        [ [ f swap set-vocab-source-loaded? ] each ]
+        [ [ f swap set-vocab-docs-loaded? ] each ] bi*
+    ]
+    [
+        append prune
+        [ unchanged-vocabs ]
+        [ require-all load-failures. ] bi
+    ] 2bi ;
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 
-SYMBOL: sources-changed?
+: refresh-all ( -- ) "" refresh ;
 
-[ t sources-changed? set-global ] "tools.vocabs" add-init-hook
-
-: refresh-all ( -- )
-    "" refresh f sources-changed? set-global ;
-
-MEMO: (vocab-file-contents) ( path -- lines )
-    ?resource-path dup exists?
-    [ utf8 file-lines ] [ drop f ] if ;
-
-: vocab-file-contents ( vocab name -- seq )
-    vocab-append-path dup [ (vocab-file-contents) ] when ;
+MEMO: vocab-file-contents ( vocab name -- seq )
+    vocab-append-path dup
+    [ dup exists? [ utf8 file-lines ] [ drop f ] if ] when ;
 
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-append-path [
-        ?resource-path utf8 set-file-lines
-        \ (vocab-file-contents) reset-memoized
+        utf8 set-file-lines
+        \ vocab-file-contents reset-memoized
     ] [
         "The " swap vocab-name
         " vocabulary was not loaded from the file system"
@@ -171,7 +211,7 @@ M: vocab-link summary vocab-summary ;
     directory [ second ] subset keys natural-sort ;
 
 : (all-child-vocabs) ( root name -- vocabs )
-    [ vocab-dir append-path ?resource-path subdirs ] keep
+    [ vocab-dir append-path subdirs ] keep
     dup empty? [
         drop
     ] [
@@ -207,7 +247,7 @@ MEMO: all-vocabs-seq ( -- seq )
         { [ "editors." ?head ] [ t ] }
         { [ ".windows" ?tail ] [ t ] }
         { [ ".unix" ?tail ] [ t ] }
-        { [ "unix." ?head ] [ t ] }
+        { [ "unix" ?head ] [ t ] }
         { [ ".linux" ?tail ] [ t ] }
         { [ ".bsd" ?tail ] [ t ] }
         { [ ".macosx" ?tail ] [ t ] }
@@ -216,7 +256,7 @@ MEMO: all-vocabs-seq ( -- seq )
         { [ ".test" ?tail ] [ t ] }
         { [ "raptor" ?head ] [ t ] }
         { [ dup "tools.deploy.app" = ] [ t ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond nip ;
 
 : filter-dangerous ( seq -- seq' )
@@ -231,7 +271,7 @@ MEMO: all-vocabs-seq ( -- seq )
     try-everything load-failures. ;
 
 : unrooted-child-vocabs ( prefix -- seq )
-    dup empty? [ CHAR: . add ] unless
+    dup empty? [ CHAR: . suffix ] unless
     vocabs
     [ find-vocab-root not ] subset
     [
@@ -243,7 +283,7 @@ MEMO: all-vocabs-seq ( -- seq )
     vocab-roots get [
         dup pick (all-child-vocabs) [ >vocab-link ] map
     ] { } map>assoc
-    swap unrooted-child-vocabs f swap 2array add ;
+    swap unrooted-child-vocabs f swap 2array suffix ;
 
 : all-child-vocabs-seq ( prefix -- assoc )
     vocab-roots get swap [
@@ -262,7 +302,7 @@ MEMO: all-authors ( -- seq )
 
 : reset-cache ( -- )
     root-cache get-global clear-assoc
-    \ (vocab-file-contents) reset-memoized
+    \ vocab-file-contents reset-memoized
     \ all-vocabs-seq reset-memoized
     \ all-authors reset-memoized
     \ all-tags reset-memoized ;

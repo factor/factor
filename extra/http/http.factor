@@ -1,11 +1,10 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry hashtables io io.streams.string kernel math
+USING: fry hashtables io io.streams.string kernel math sets
 namespaces math.parser assocs sequences strings splitting ascii
 io.encodings.utf8 io.encodings.string namespaces unicode.case
 combinators vectors sorting accessors calendar
-calendar.format quotations arrays combinators.cleave
-combinators.lib byte-arrays ;
+calendar.format quotations arrays combinators.lib byte-arrays ;
 IN: http
 
 : http-port 80 ; inline
@@ -95,7 +94,7 @@ IN: http
 
 : check-header-string ( str -- str )
     #! http://en.wikipedia.org/wiki/HTTP_Header_Injection
-    dup "\r\n" seq-intersect empty?
+    dup "\r\n" intersect empty?
     [ "Header injection attack" throw ] unless ;
 
 : write-header ( assoc -- )
@@ -107,7 +106,7 @@ IN: http
 : query>assoc ( query -- assoc )
     dup [
         "&" split [
-            "=" split1 [ dup [ url-decode ] when ] 2apply
+            "=" split1 [ dup [ url-decode ] when ] bi@
         ] H{ } map>assoc
     ] when ;
 
@@ -123,7 +122,7 @@ IN: http
 TUPLE: cookie name value path domain expires http-only ;
 
 : <cookie> ( value name -- cookie )
-    cookie construct-empty
+    cookie new
     swap >>name swap >>value ;
 
 : parse-cookies ( string -- seq )
@@ -146,10 +145,10 @@ TUPLE: cookie name value path domain expires http-only ;
 
 : (unparse-cookie) ( key value -- )
     {
-        { [ dup f eq? ] [ 2drop ] }
-        { [ dup t eq? ] [ drop , ] }
-        { [ t ] [ "=" swap 3append , ] }
-    } cond ;
+        { f [ drop ] }
+        { t [ , ] }
+        [ "=" swap 3append , ]
+    } case ;
 
 : unparse-cookie ( cookie -- strings )
     [
@@ -177,7 +176,7 @@ post-data-type
 cookies ;
 
 : <request>
-    request construct-empty
+    request new
         "1.1" >>version
         http-port >>port
         H{ } clone >>header
@@ -347,7 +346,7 @@ cookies
 body ;
 
 : <response>
-    response construct-empty
+    response new
     "1.1" >>version
     H{ } clone >>header
     "close" "connection" set-header
@@ -395,13 +394,16 @@ body ;
     [ unparse-cookies "set-cookie" pick set-at ] when*
     write-header ;
 
-: write-response-body ( response -- response )
-    dup body>> {
-        { [ dup not ] [ drop ] }
-        { [ dup string? ] [ write ] }
-        { [ dup callable? ] [ call ] }
-        { [ t ] [ stdio get stream-copy ] }
+: body>quot ( body -- quot )
+    {
+        { [ dup not ] [ drop [ ] ] }
+        { [ dup string? ] [ [ write ] curry ] }
+        { [ dup callable? ] [ ] }
+        [ [ stdio get stream-copy ] curry ]
     } cond ;
+
+: write-response-body ( response -- response )
+    dup body>> body>quot call ;
 
 M: response write-response ( respose -- )
     write-response-version
@@ -435,7 +437,7 @@ message
 body ;
 
 : <raw-response> ( -- response )
-    raw-response construct-empty
+    raw-response new
     "1.1" >>version ;
 
 M: raw-response write-response ( respose -- )

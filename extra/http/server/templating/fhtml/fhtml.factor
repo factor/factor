@@ -1,50 +1,47 @@
 ! Copyright (C) 2005 Alex Chapman
-! Copyright (C) 2006, 2007 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations sequences kernel parser namespaces io
-io.files io.streams.string html html.elements source-files
-debugger combinators math quotations generic strings splitting
-accessors http.server.static http.server assocs
-io.encodings.utf8 fry ;
-
+USING: continuations sequences kernel namespaces debugger
+combinators math quotations generic strings splitting
+accessors assocs fry
+parser io io.files io.streams.string io.encodings.utf8 source-files
+html html.elements
+http.server.static http.server http.server.templating ;
 IN: http.server.templating.fhtml
 
 : templating-vocab ( -- vocab-name ) "http.server.templating.fhtml" ;
 
-! See apps/http-server/test/ or libs/furnace/ for template usage
-! examples
-
 ! We use a custom lexer so that %> ends a token even if not
 ! followed by whitespace
-TUPLE: template-lexer ;
+TUPLE: template-lexer < lexer ;
 
 : <template-lexer> ( lines -- lexer )
-    <lexer> template-lexer construct-delegate ;
+    template-lexer new-lexer ;
 
 M: template-lexer skip-word
     [
         {
             { [ 2dup nth CHAR: " = ] [ drop 1+ ] }
             { [ 2dup swap tail-slice "%>" head? ] [ drop 2 + ] }
-            { [ t ] [ f skip ] }
+            [ f skip ]
         } cond
     ] change-lexer-column ;
 
 DEFER: <% delimiter
 
 : check-<% ( lexer -- col )
-    "<%" over lexer-line-text rot lexer-column start* ;
+    "<%" over line-text>> rot column>> start* ;
 
 : found-<% ( accum lexer col -- accum )
     [
-        over lexer-line-text
-        >r >r lexer-column r> r> subseq parsed
+        over line-text>>
+        >r >r column>> r> r> subseq parsed
         \ write-html parsed
-    ] 2keep 2 + swap set-lexer-column ;
+    ] 2keep 2 + >>column drop ;
 
 : still-looking ( accum lexer -- accum )
     [
-        dup lexer-line-text swap lexer-column tail
+        [ line-text>> ] [ column>> ] bi tail
         parsed \ print-html parsed
     ] keep next-line ;
 
@@ -75,29 +72,25 @@ DEFER: <% delimiter
 : html-error. ( error -- )
     <pre> error. </pre> ;
 
-: run-template ( filename -- )
+TUPLE: fhtml path ;
+
+C: <fhtml> fhtml
+
+M: fhtml call-template ( filename -- )
     '[
-        , [
+        , path>> [
             "quiet" on
             parser-notes off
             templating-vocab use+
             ! so that reload works properly
             dup source-file file set
-            ?resource-path utf8 file-contents
+            utf8 file-contents
             [ eval-template ] [ html-error. drop ] recover
         ] with-file-vocabs
     ] assert-depth ;
 
-: template-convert ( infile outfile -- )
-    utf8 [ run-template ] with-file-writer ;
-
-! responder integration
-: serve-template ( name -- response )
-    "text/html" <content>
-    swap '[ , run-template ] >>body ;
-
 ! file responder integration
 : enable-fhtml ( responder -- responder )
-    [ serve-template ]
+    [ <fhtml> serve-template ]
     "application/x-factor-server-page"
     pick special>> set-at ;

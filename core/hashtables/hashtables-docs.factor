@@ -32,14 +32,24 @@ $nl
 { $code "H{ } clone" }
 "To convert an assoc to a hashtable:"
 { $subsection >hashtable }
+"Further topics:"
+{ $subsection "hashtables.keys" }
+{ $subsection "hashtables.utilities" }
+{ $subsection "hashtables.private" } ;
+
+ARTICLE: "hashtables.keys" "Hashtable keys"
+"Hashtables rely on the " { $link hashcode } " word to rapidly locate values associated with keys. The objects used as keys in a hashtable must obey certain restrictions."
+$nl
+"The " { $link hashcode } " of a key is a function of the its slot values, and if the hashcode changes then the hashtable will be left in an inconsistent state. The easiest way to avoid this problem is to never mutate objects used as hashtable keys."
+$nl
+"In certain advanced applications, this cannot be avoided and the best design involves mutating hashtable keys. In this case, a custom " { $link hashcode* } " method must be defined which only depends on immutable slots."
+$nl
+"In addition, the " { $link equal? } " and " { $link hashcode* } " methods must be congruent, and if one is defined the other should be defined also. This is documented in detail in the documentation for these respective words." ;
+
+ARTICLE: "hashtables.utilities" "Hashtable utilities"
 "Utility words to create a new hashtable from a single key/value pair:"
 { $subsection associate }
-{ $subsection ?set-at }
-"The final two words pertain to sequences but use a hashtable internally. Removing duplicate elements from a sequence in linear time, using a hashtable:"
-{ $subsection prune }
-"Test if a sequence contains duplicates in linear time:"
-{ $subsection all-unique? }
-{ $subsection "hashtables.private" } ;
+{ $subsection ?set-at } ;
 
 ABOUT: "hashtables"
 
@@ -123,22 +133,6 @@ HELP: associate
 HELP: >hashtable
 { $values { "assoc" "an assoc" } { "hashtable" "a hashtable" } }
 { $description "Constructs a hashtable from any assoc." } ;
-
-HELP: prune
-{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Outputs a new sequence with each distinct element of " { $snippet "seq" } " appearing only once. Elements are compared for equality using " { $link = } " and elements are ordered according to their position in " { $snippet "seq" } "." }
-{ $examples
-    { $example "USING: hashtables prettyprint ;" "{ 1 1 t 3 t } prune ." "V{ 1 t 3 }" }
-} ;
-
-HELP: all-unique?
-{ $values { "seq" sequence } { "?" "a boolean" } }
-{ $description "Tests whether a sequence contains any repeated elements." }
-{ $example
-    "USING: hashtables prettyprint ;"
-    "{ 0 1 1 2 3 5 } all-unique? ."
-    "f"
-} ;
 
 HELP: rehash
 { $values { "hash" hashtable } }

@@ -2,10 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words parser io inspector quotations sequences
 prettyprint continuations effects definitions compiler.units
-namespaces assocs tools.walker ;
+namespaces assocs tools.walker generic ;
 IN: tools.annotations
 
-: reset ( word -- )
+GENERIC: reset ( word -- )
+
+M: generic reset
+    [ call-next-method ]
+    [ subwords [ reset ] each ] bi ;
+
+M: word reset
     dup "unannotated-def" word-prop [
         [
             dup dup "unannotated-def" word-prop define
@@ -60,8 +66,16 @@ IN: tools.annotations
 : watch-vars ( word vars -- )
     dupd [ (watch-vars) ] 2curry annotate ;
 
+GENERIC# annotate-methods 1 ( word quot -- )
+
+M: generic annotate-methods
+    >r "methods" word-prop values r> [ annotate ] curry each ;
+
+M: word annotate-methods
+    annotate ;
+
 : breakpoint ( word -- )
-    [ add-breakpoint ] annotate ;
+    [ add-breakpoint ] annotate-methods ;
 
 : breakpoint-if ( word quot -- )
-    [ [ [ break ] when ] rot 3append ] curry annotate ;
+    [ [ [ break ] when ] rot 3append ] curry annotate-methods ;

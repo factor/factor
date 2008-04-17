@@ -1,8 +1,8 @@
+USING: system ;
 IN: hardware-info.backend
 
-SYMBOL: os
 HOOK: cpus os ( -- n )
-
+HOOK: cpu-mhz os ( -- n )
 HOOK: memory-load os ( -- n )
 HOOK: physical-mem os ( -- n )
 HOOK: available-mem os ( -- n )

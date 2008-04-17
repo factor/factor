@@ -1,5 +1,5 @@
 USING: ui.gadgets.packs help.markup help.syntax ui.gadgets
-arrays kernel quotations tuples ;
+arrays kernel quotations classes.tuple ;
 IN: ui.gadgets.tracks
 
 HELP: track

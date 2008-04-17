@@ -15,7 +15,7 @@ IN: compiler.constants
 : byte-array-offset 2 bootstrap-cells object tag-number - ;
 : alien-offset 3 bootstrap-cells object tag-number - ;
 : underlying-alien-offset bootstrap-cell object tag-number - ;
-: tuple-class-offset 2 bootstrap-cells tuple tag-number - ;
+: tuple-class-offset bootstrap-cell tuple tag-number - ;
 : class-hash-offset bootstrap-cell object tag-number - ;
 : word-xt-offset 8 bootstrap-cells object tag-number - ;
 : word-code-offset 9 bootstrap-cells object tag-number - ;

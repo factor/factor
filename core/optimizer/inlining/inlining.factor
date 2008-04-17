@@ -36,7 +36,7 @@ DEFER: (flat-length)
         ! not inline
         { [ dup inline? not ] [ drop 1 ] }
         ! inline
-        { [ t ] [ dup dup set word-def (flat-length) ] }
+        [ dup dup set word-def (flat-length) ]
     } cond ;
 
 : (flat-length) ( seq -- n )
@@ -45,7 +45,7 @@ DEFER: (flat-length)
             { [ dup quotation? ] [ (flat-length) 1+ ] }
             { [ dup array? ] [ (flat-length) ] }
             { [ dup word? ] [ word-flat-length ] }
-            { [ t ] [ drop 1 ] }
+            [ drop 1 ]
         } cond
     ] map sum ;
 
@@ -70,18 +70,31 @@ DEFER: (flat-length)
     ] if ;
 
 ! Partial dispatch of math-generic words
+: normalize-math-class ( class -- class' )
+    {
+        fixnum bignum integer
+        ratio rational
+        float real
+        complex number
+        object
+    } [ class< ] with find nip ;
+
 : math-both-known? ( word left right -- ? )
     math-class-max swap specific-method ;
 
 : inline-math-method ( #call word -- node )
-    over node-input-classes first2 3dup math-both-known?
-    [ math-method f splice-quot ] [ 2drop 2drop t ] if ;
+    over node-input-classes
+    [ first normalize-math-class ]
+    [ second normalize-math-class ] bi
+    3dup math-both-known?
+    [ math-method f splice-quot ]
+    [ 2drop 2drop t ] if ;
 
 : inline-method ( #call -- node )
     dup node-param {
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
-        { [ t ] [ 2drop t ] }
+        [ 2drop t ]
     } cond ;
 
 ! Resolve type checks at compile time where possible
@@ -204,5 +217,5 @@ M: #call optimize-node*
         { [ dup optimize-predicate? ] [ optimize-predicate ] }
         { [ dup optimistic-inline? ] [ optimistic-inline ] }
         { [ dup method-body-inline? ] [ optimistic-inline ] }
-        { [ t ] [ inline-method ] }
+        [ inline-method ]
     } cond dup not ;

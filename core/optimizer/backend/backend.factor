@@ -17,7 +17,7 @@ SYMBOL: optimizer-changed
 GENERIC: optimize-node* ( node -- node/t changed? )
 
 : ?union ( assoc/f assoc -- hash )
-    over [ union ] [ nip ] if ;
+    over [ assoc-union ] [ nip ] if ;
 
 : add-node-literals ( assoc node -- )
     over assoc-empty? [
@@ -51,7 +51,7 @@ GENERIC: optimize-node* ( node -- node/t changed? )
 DEFER: optimize-nodes
 
 : optimize-children ( node -- )
-    [ optimize-nodes ] change-children ;
+    [ optimize-nodes ] map-children ;
 
 : optimize-node ( node -- node )
     dup [
@@ -82,7 +82,7 @@ M: node optimize-node* drop t f ;
     2dup at* [ swap follow nip ] [ 2drop ] if ;
 
 : union* ( assoc1 assoc2 -- assoc )
-    union [ keys ] keep
+    assoc-union [ keys ] keep
     [ dupd follow ] curry
     H{ } map>assoc ;
 

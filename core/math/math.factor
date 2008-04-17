@@ -62,6 +62,8 @@ M: object zero? drop f ;
 : neg ( x -- -x ) 0 swap - ; foldable
 : recip ( x -- y ) 1 swap / ; foldable
 
+: ?1+ [ 1+ ] [ 0 ] if* ; inline
+
 : /f  ( x y -- z ) >r >float r> >float float/f ; inline
 
 : max ( x y -- z ) [ > ] most ; foldable

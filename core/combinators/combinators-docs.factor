@@ -10,17 +10,53 @@ ARTICLE: "combinators-quot" "Quotation construction utilities"
 { $subsection alist>quot } ;
 
 ARTICLE: "combinators" "Additional combinators"
-"The " { $vocab-link "combinators" } " vocabulary is usually used because it provides two combinators which abstract out nested chains of " { $link if } ":"
+"The " { $vocab-link "combinators" } " vocabulary provides generalizations of certain combinators from the " { $vocab-link "kernel" } " vocabulary."
+$nl
+"Generalization of " { $link bi } " and " { $link tri } ":"
+{ $subsection cleave }
+"Generalization of " { $link bi* } " and " { $link tri* } ":"
+{ $subsection spread }
+"Two combinators which abstract out nested chains of " { $link if } ":"
 { $subsection cond }
 { $subsection case }
+"The " { $vocab-link "combinators" } " also provides some less frequently-used features."
+$nl
 "A combinator which can help with implementing methods on " { $link hashcode* } ":"
 { $subsection recursive-hashcode }
 "An oddball combinator:"
 { $subsection with-datastack }
 { $subsection "combinators-quot" }
-{ $see-also "quotations" "basic-combinators" } ;
+{ $see-also "quotations" "dataflow" } ;
 
 ABOUT: "combinators"
+
+HELP: cleave
+{ $values { "x" object } { "seq" "a sequence of quotations with stack effect " { $snippet "( x -- ... )" } } }
+{ $description "Applies each quotation to the object in turn." }
+{ $examples
+    "The " { $link bi } " combinator takes one value and two quotations; the " { $link tri } " combinator takes one value and three quotations. The " { $link cleave } " combinator takes one value and any number of quotations, and is essentially equivalent to a chain of " { $link keep } " forms:"
+    { $code
+        "! Equivalent"
+        "{ [ p ] [ q ] [ r ] [ s ] } cleave"
+        "[ p ] keep [ q ] keep [ r ] keep s"
+    }
+} ;
+
+{ bi tri cleave } related-words
+
+HELP: spread
+{ $values { "objs..." "objects" } { "seq" "a sequence of quotations with stack effect " { $snippet "( x -- ... )" } } }
+{ $description "Applies each quotation to the object in turn." }
+{ $examples
+    "The " { $link bi* } " combinator takes two values and two quotations; the " { $link tri* } " combinator takes three values and three quotations. The " { $link spread } " combinator takes " { $snippet "n" } " values and " { $snippet "n" } " quotations, where " { $snippet "n" } " is the length of the input sequence, and is essentially equivalent to series of retain stack manipulations:"
+    { $code
+        "! Equivalent"
+        "{ [ p ] [ q ] [ r ] [ s ] } spread"
+        ">r >r >r p r> q r> r r> s"
+    }
+} ;
+
+{ bi* tri* spread } related-words
 
 HELP: alist>quot
 { $values { "default" "a quotation" } { "assoc" "a sequence of quotation pairs" } { "quot" "a new quotation" } }
@@ -28,9 +64,9 @@ HELP: alist>quot
 { $notes "This word is used to implement compile-time behavior for " { $link cond } ", and it is also used by the generic word system. Note that unlike " { $link cond } ", the constructed quotation performs the tests starting from the end and not the beginning." } ;
 
 HELP: cond
-{ $values { "assoc" "a sequence of quotation pairs" } }
+{ $values { "assoc" "a sequence of quotation pairs and an optional quotation" } }
 { $description
-    "Calls the second quotation in the first pair whose first quotation yields a true value."
+    "Calls the second quotation in the first pair whose first quotation yields a true value. A single quotation will always yield a true value."
     $nl
     "The following two phrases are equivalent:"
     { $code "{ { [ X ] [ Y ] } { [ Z ] [ T ] } } cond" }
@@ -42,7 +78,7 @@ HELP: cond
         "{"
         "    { [ dup 0 > ] [ \"positive\" ] }"
         "    { [ dup 0 < ] [ \"negative\" ] }"
-        "    { [ dup zero? ] [ \"zero\" ] }"
+        "    [ \"zero\" ]"
         "} cond"
     }
 } ;
@@ -52,9 +88,9 @@ HELP: no-cond
 { $error-description "Thrown by " { $link cond } " if none of the test quotations yield a true value. Some uses of " { $link cond } " include a default case where the test quotation is " { $snippet "[ t ]" } "; such a " { $link cond } " form will never throw this error." } ;
 
 HELP: case
-{ $values { "obj" object } { "assoc" "a sequence of object/quotation pairs, with an optional quotation at the end" } }
+{ $values { "obj" object } { "assoc" "a sequence of object/word,quotation pairs, with an optional quotation at the end" } }
 { $description
-    "Compares " { $snippet "obj" } " against the first element of every pair. If some pair matches, removes " { $snippet "obj" } " from the stack and calls the second element of that pair, which must be a quotation."
+    "Compares " { $snippet "obj" } " against the first element of every pair, first evaluating the first element if it is a word. If some pair matches, removes " { $snippet "obj" } " from the stack and calls the second element of that pair, which must be a quotation."
     $nl
     "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "cases" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-cond } " error is rasied."
     $nl

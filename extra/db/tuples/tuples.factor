@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes db kernel namespaces
-tuples words sequences slots math
+classes.tuple words sequences slots math
 math.parser io prettyprint db.types continuations
-mirrors sequences.lib tools.walker combinators.lib
-combinators.cleave ;
+mirrors sequences.lib tools.walker combinators.lib ;
 IN: db.tuples
 
 : define-persistent ( class table columns -- )
@@ -41,7 +40,7 @@ HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 HOOK: insert-tuple* db ( tuple statement -- )
 
 : resulting-tuple ( row out-params -- tuple )
-    dup first sql-spec-class construct-empty [
+    dup first sql-spec-class new [
         [
             >r sql-spec-slot-name r> set-slot-named
         ] curry 2each

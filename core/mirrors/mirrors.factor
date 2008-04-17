@@ -1,22 +1,20 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel sequences generic words
-arrays classes slots slots.private tuples math vectors
+arrays classes slots slots.private classes.tuple math vectors
 quotations sorting prettyprint ;
 IN: mirrors
 
-GENERIC: object-slots ( obj -- seq )
+: all-slots ( class -- slots )
+    superclasses [ "slots" word-prop ] map concat ;
 
-M: object object-slots class "slots" word-prop ;
-
-M: tuple object-slots
-    dup class "slots" word-prop
-    swap delegate [ 1 tail-slice ] unless ;
+: object-slots ( obj -- seq )
+    class all-slots ;
 
 TUPLE: mirror object slots ;
 
 : <mirror> ( object -- mirror )
-    dup object-slots mirror construct-boa ;
+    dup object-slots mirror boa ;
 
 : >mirror< ( mirror -- obj slots )
     dup mirror-object swap mirror-slots ;
@@ -44,32 +42,11 @@ M: mirror delete-at ( key mirror -- )
 M: mirror >alist ( mirror -- alist )
     >mirror<
     [ [ slot-spec-offset slot ] with map ] keep
-    [ slot-spec-name ] map swap 2array flip ;
+    [ slot-spec-name ] map swap zip ;
 
 M: mirror assoc-size mirror-slots length ;
 
 INSTANCE: mirror assoc
-
-TUPLE: enum seq ;
-
-C: <enum> enum
-
-M: enum at*
-    enum-seq 2dup bounds-check?
-    [ nth t ] [ 2drop f f ] if ;
-
-M: enum set-at enum-seq set-nth ;
-
-M: enum delete-at enum-seq delete-nth ;
-
-M: enum >alist ( enum -- alist )
-    enum-seq dup length swap 2array flip ;
-
-M: enum assoc-size enum-seq length ;
-
-M: enum clear-assoc enum-seq delete-all ;
-
-INSTANCE: enum assoc
 
 : sort-assoc ( assoc -- alist )
     >alist

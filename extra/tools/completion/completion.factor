@@ -35,12 +35,12 @@ unicode.categories ;
         { [ 2dup length 1- number= ] [ 2drop 4 ] }
         { [ 2dup >r 1- r> nth Letter? not ] [ 2drop 10 ] }
         { [ 2dup >r 1+ r> nth Letter? not ] [ 2drop 4 ] }
-        { [ t ] [ 2drop 1 ] }
+        [ 2drop 1 ]
     } cond ;
 
 : score ( full fuzzy -- n )
     dup [
-        [ [ length ] 2apply - 15 swap [-] 3 /f ] 2keep
+        [ [ length ] bi@ - 15 swap [-] 3 /f ] 2keep
         runs [
             [ 0 [ pick score-1 max ] reduce nip ] keep
             length * +
@@ -57,7 +57,7 @@ unicode.categories ;
 
 : complete ( full short -- score )
     [ dupd fuzzy score ] 2keep
-    [ <reversed> ] 2apply
+    [ <reversed> ] bi@
     dupd fuzzy score max ;
 
 : completion ( short candidate -- result )

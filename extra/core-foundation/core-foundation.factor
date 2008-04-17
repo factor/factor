@@ -9,9 +9,9 @@ TYPEDEF: void* CFBundleRef
 TYPEDEF: void* CFStringRef
 TYPEDEF: void* CFURLRef
 TYPEDEF: void* CFUUIDRef
-TYPEDEF: void* CFRunLoopRef
 TYPEDEF: bool Boolean
 TYPEDEF: int CFIndex
+TYPEDEF: int SInt32
 TYPEDEF: double CFTimeInterval
 TYPEDEF: double CFAbsoluteTime
 
@@ -85,5 +85,3 @@ FUNCTION: void CFRelease ( void* cf ) ;
     ] [
         "Cannot load bundled named " prepend throw
     ] ?if ;
-
-FUNCTION: CFRunLoopRef CFRunLoopGetMain ( ) ;

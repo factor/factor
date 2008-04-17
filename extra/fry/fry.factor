@@ -22,13 +22,13 @@ DEFER: (fry)
         drop 1quotation
     ] [
         unclip {
-            { , [ [ curry ] ((fry)) ] }
-            { @ [ [ compose ] ((fry)) ] }
+            { \ , [ [ curry ] ((fry)) ] }
+            { \ @ [ [ compose ] ((fry)) ] }
 
             ! to avoid confusion, remove if fry goes core
-            { namespaces:, [ [ curry ] ((fry)) ] }
+            { \ namespaces:, [ [ curry ] ((fry)) ] }
 
-            [ swap >r add r> (fry) ]
+            [ swap >r suffix r> (fry) ]
         } case
     ] if ;
 

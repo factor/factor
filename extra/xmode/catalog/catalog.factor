@@ -9,7 +9,7 @@ TUPLE: mode file file-name-glob first-line-glob ;
 
 TAG: MODE
     "NAME" over at >r
-    mode construct-empty {
+    mode new {
         { "FILE" f set-mode-file }
         { "FILE_NAME_GLOB" f set-mode-file-name-glob }
         { "FIRST_LINE_GLOB" f set-mode-first-line-glob }
@@ -63,7 +63,7 @@ SYMBOL: rule-sets
     over [ dupd update ] [ nip clone ] if ;
 
 : import-keywords ( parent child -- )
-    over >r [ rule-set-keywords ] 2apply ?update
+    over >r [ rule-set-keywords ] bi@ ?update
     r> set-rule-set-keywords ;
 
 : import-rules ( parent child -- )

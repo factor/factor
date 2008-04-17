@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test strings namespaces arrays sequences peg peg.private ;
+USING: kernel tools.test strings namespaces arrays sequences peg peg.private accessors words math ;
 IN: peg.tests
 
 { f } [
@@ -156,5 +156,39 @@ IN: peg.tests
 
 { f } [
   "a]" "[" token hide "a" token "]" token hide 3array seq parse 
+] unit-test
+
+
+{ V{ "1" "-" "1" } V{ "1" "+" "1" } } [
+  [
+    [ "1" token , "-" token , "1" token , ] seq* ,
+    [ "1" token , "+" token , "1" token , ] seq* ,
+  ] choice* 
+  "1-1" over parse parse-result-ast swap
+  "1+1" swap parse parse-result-ast
+] unit-test
+
+: expr ( -- parser ) 
+  #! Test direct left recursion. Currently left recursion should cause a
+  #! failure of that parser.
+  [ expr ] delay "+" token "1" token 3seq "1" token 2choice ;
+
+{ V{ V{ "1" "+" "1" } "+" "1" } } [
+  "1+1+1" expr parse parse-result-ast   
+] unit-test
+
+{ t } [
+  #! Ensure a circular parser doesn't loop infinitely
+  [ f , "a" token , ] seq*
+  dup parsers>>
+  dupd 0 swap set-nth compile word?
+] unit-test
+
+{ f } [
+  "A" [ drop t ] satisfy [ 66 >= ] semantic parse 
+] unit-test
+
+{ CHAR: B } [
+  "B" [ drop t ] satisfy [ 66 >= ] semantic parse parse-result-ast
 ] unit-test
 

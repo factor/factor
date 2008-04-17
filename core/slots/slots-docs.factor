@@ -1,7 +1,7 @@
 USING: help.markup help.syntax generic kernel.private parser
 words kernel quotations namespaces sequences words arrays
-effects generic.standard tuples slots.private classes
-strings math ;
+effects generic.standard classes.tuple classes.builtin
+slots.private classes strings math ;
 IN: slots
 
 ARTICLE: "accessors" "Slot accessors"
@@ -12,7 +12,7 @@ ARTICLE: "accessors" "Slot accessors"
 }
 "In addition, two utility words are defined for each distinct slot name used in the system:"
 { $list
-    { "The " { $emphasis "setter" } " is named " { $snippet "(>>" { $emphasis "slot" } ")" } " and stores a value into a slot. It has stack effect " { $snippet "( object value -- object )" } "." }
+    { "The " { $emphasis "setter" } " is named " { $snippet ">>" { $emphasis "slot" } } " and stores a value into a slot. It has stack effect " { $snippet "( object value -- object )" } "." }
     { "The " { $emphasis "changer" } " is named " { $snippet "change-" { $emphasis "slot" } } ". It applies a quotation to the current slot value and stores the result back in the slot; it has stack effect " { $snippet "( object quot -- object )" } "." }
 }
 "Since the reader and writer are generic, words can be written which do not depend on the specific class of tuple passed in, but instead work on any tuple that defines slots with certain names."

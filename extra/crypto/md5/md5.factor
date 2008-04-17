@@ -3,7 +3,7 @@
 USING: kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting strings
 sequences crypto.common byte-arrays locals sequences.private
-io.encodings.binary symbols ;
+io.encodings.binary symbols math.bitfields.lib ;
 IN: crypto.md5
 
 <PRIVATE
@@ -43,11 +43,11 @@ SYMBOLS: a b c d old-a old-b old-c old-d ;
 
 : F ( X Y Z -- FXYZ )
     #! F(X,Y,Z) = XY v not(X) Z
-    pick bitnot bitand >r bitand r> bitor ;
+    pick bitnot bitand [ bitand ] [ bitor ] bi* ;
 
 : G ( X Y Z -- GXYZ )
     #! G(X,Y,Z) = XZ v Y not(Z)
-    dup bitnot rot bitand >r bitand r> bitor ;
+    dup bitnot rot bitand [ bitand ] [ bitor ] bi* ;
 
 : H ( X Y Z -- HXYZ )
     #! H(X,Y,Z) = X xor Y xor Z

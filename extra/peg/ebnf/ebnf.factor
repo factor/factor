@@ -3,7 +3,7 @@
 USING: kernel compiler.units parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
        peg.parsers unicode.categories multiline combinators.lib 
-       splitting ;
+       splitting accessors effects sequences.deep peg.search ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -16,9 +16,11 @@ TUPLE: ebnf-choice options ;
 TUPLE: ebnf-sequence elements ;
 TUPLE: ebnf-repeat0 group ;
 TUPLE: ebnf-repeat1 group ;
-TUPLE: ebnf-optional elements ;
+TUPLE: ebnf-optional group ;
 TUPLE: ebnf-rule symbol elements ;
 TUPLE: ebnf-action parser code ;
+TUPLE: ebnf-var parser name ;
+TUPLE: ebnf-semantic parser code ;
 TUPLE: ebnf rules ;
 
 C: <ebnf-non-terminal> ebnf-non-terminal
@@ -34,6 +36,8 @@ C: <ebnf-repeat1> ebnf-repeat1
 C: <ebnf-optional> ebnf-optional
 C: <ebnf-rule> ebnf-rule
 C: <ebnf-action> ebnf-action
+C: <ebnf-var> ebnf-var
+C: <ebnf-semantic> ebnf-semantic
 C: <ebnf> ebnf
 
 : syntax ( string -- parser )
@@ -79,6 +83,7 @@ C: <ebnf> ebnf
       [ dup CHAR: * = ]
       [ dup CHAR: + = ]
       [ dup CHAR: ? = ]
+      [ dup CHAR: : = ]
     } || not nip    
   ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
@@ -99,7 +104,7 @@ C: <ebnf> ebnf
     "]" syntax ,
   ] seq* [ first >string <ebnf-range> ] action ;
  
-: 'element' ( -- parser )
+: ('element') ( -- parser )
   #! An element of a rule. It can be a terminal or a 
   #! non-terminal but must not be followed by a "=". 
   #! The latter indicates that it is the beginning of a
@@ -111,8 +116,17 @@ C: <ebnf> ebnf
       'range-parser' ,
       'any-character' ,
     ] choice* ,
-    "=" syntax ensure-not ,
+    [
+      "=" syntax ensure-not ,
+      "=>" syntax ensure ,
+    ] choice* ,
   ] seq* [ first ] action ;
+
+: 'element' ( -- parser )
+  [
+    [ ('element') , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , ] seq* [ first2 <ebnf-var> ] action ,
+    ('element') ,
+  ] choice* ;
 
 DEFER: 'choice'
 
@@ -144,6 +158,7 @@ DEFER: 'choice'
 : 'factor-code' ( -- parser )
   [
     "]]" token ensure-not ,
+    "]?" token ensure-not ,
     [ drop t ] satisfy ,
   ] seq* [ first ] action repeat0 [ >string ] action ;
 
@@ -176,31 +191,44 @@ DEFER: 'choice'
     'repeat0' sp ,
     'repeat1' sp ,
     'optional' sp , 
-  ] choice* ;  
+  ] choice* ;
+
+: 'action' ( -- parser )
+   "[[" 'factor-code' "]]" syntax-pack ;
+
+: 'semantic' ( -- parser )
+   "?[" 'factor-code' "]?" syntax-pack ;
 
 : 'sequence' ( -- parser )
   #! A sequence of terminals and non-terminals, including
   #! groupings of those. 
   [
-    [ 
-      ('sequence') ,
-      "[[" 'factor-code' "]]" syntax-pack ,
-    ] seq* [ first2 <ebnf-action> ] action ,
+    [ ('sequence') , 'action' , ] seq* [ first2 <ebnf-action> ] action ,
+    [ ('sequence') , 'semantic' , ] seq* [ first2 <ebnf-semantic> ] action ,
     ('sequence') ,
   ] choice* repeat1 [ 
      dup length 1 = [ first ] [ <ebnf-sequence> ] if
   ] action ;
+
+: 'actioned-sequence' ( -- parser )
+  [
+    [ 'sequence' , "=>" syntax , 'action' , ] seq* [ first2 <ebnf-action> ] action ,
+    [ 'sequence' , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , "=>" syntax , 'action' , ] seq* [ first3 >r <ebnf-var> r> <ebnf-action> ] action ,
+    [ 'sequence' , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , ] seq* [ first2 <ebnf-var> ] action ,
+    'sequence' ,
+  ] choice* ;
   
 : 'choice' ( -- parser )
-  'sequence' sp "|" token sp list-of [ 
+  'actioned-sequence' sp "|" token sp list-of [ 
     dup length 1 = [ first ] [ <ebnf-choice> ] if
   ] action ;
  
 : 'rule' ( -- parser )
   [
-    'non-terminal' [ ebnf-non-terminal-symbol ] action  ,
+    'non-terminal' [ symbol>> ] action  ,
     "=" syntax  ,
-    'choice'  ,
+    ">" token ensure-not ,
+    'choice' ,
   ] seq* [ first2 <ebnf-rule> ] action ;
 
 : 'ebnf' ( -- parser )
@@ -215,58 +243,109 @@ SYMBOL: main
   H{ } clone dup dup [ parser set swap (transform) main set ] bind ;
 
 M: ebnf (transform) ( ast -- parser )
-  ebnf-rules [ (transform) ] map peek ;
+  rules>> [ (transform) ] map peek ;
   
 M: ebnf-rule (transform) ( ast -- parser )
-  dup ebnf-rule-elements (transform) [
-    swap ebnf-rule-symbol set
+  dup elements>> 
+  (transform) [
+    swap symbol>> set
   ] keep ;
 
 M: ebnf-sequence (transform) ( ast -- parser )
-  ebnf-sequence-elements [ (transform) ] map seq ;
+  elements>> [ (transform) ] map seq [ dup length 1 = [ first ] when ] action ;
 
 M: ebnf-choice (transform) ( ast -- parser )
-  ebnf-choice-options [ (transform) ] map choice ;
+  options>> [ (transform) ] map choice ;
 
 M: ebnf-any-character (transform) ( ast -- parser )
   drop any-char ;
 
 M: ebnf-range (transform) ( ast -- parser )
-  ebnf-range-pattern range-pattern ;
+  pattern>> range-pattern ;
+
+: transform-group ( ast -- parser ) 
+  #! convert a ast node with groups to a parser for that group
+  group>> (transform) ;
 
 M: ebnf-ensure (transform) ( ast -- parser )
-  ebnf-ensure-group (transform) ensure ;
+  transform-group ensure ;
 
 M: ebnf-ensure-not (transform) ( ast -- parser )
-  ebnf-ensure-not-group (transform) ensure-not ;
+  transform-group ensure-not ;
 
 M: ebnf-repeat0 (transform) ( ast -- parser )
-  ebnf-repeat0-group (transform) repeat0 ;
+  transform-group repeat0 ;
 
 M: ebnf-repeat1 (transform) ( ast -- parser )
-  ebnf-repeat1-group (transform) repeat1 ;
+  transform-group repeat1 ;
 
 M: ebnf-optional (transform) ( ast -- parser )
-  ebnf-optional-elements (transform) optional ;
+  transform-group optional ;
 
+GENERIC: build-locals ( code ast -- code )
+
+M: ebnf-sequence build-locals ( code ast -- code )
+  elements>> dup [ ebnf-var? ] subset empty? [
+    drop 
+  ] [ 
+    [
+      "USING: locals sequences ;  [let* | " %
+        dup length swap [
+          dup ebnf-var? [
+            name>> % 
+            " [ " % # " over nth ] " %
+          ] [
+            2drop
+          ] if
+        ] 2each
+        " | " %
+        %  
+        " ] with-locals" %     
+    ] "" make 
+  ] if ;
+
+M: ebnf-var build-locals ( code ast -- )
+  [
+    "USING: locals kernel ;  [let* | " %
+    name>> % " [ dup ] " %
+    " | " %
+    %  
+    " ] with-locals" %     
+  ] "" make ;
+
+M: object build-locals ( code ast -- )
+  drop ;
+   
 M: ebnf-action (transform) ( ast -- parser )
-  [ ebnf-action-parser (transform) ] keep
-  ebnf-action-code string-lines [ parse-lines ] with-compilation-unit action ;
+  [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
+  string-lines parse-lines action ;
+
+M: ebnf-semantic (transform) ( ast -- parser )
+  [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
+  string-lines parse-lines semantic ;
+
+M: ebnf-var (transform) ( ast -- parser )
+  parser>> (transform) ;
 
 M: ebnf-terminal (transform) ( ast -- parser )
-  ebnf-terminal-symbol token sp ;
+  symbol>> token ;
+
+: parser-not-found ( name -- * )
+  [
+    "Parser " % % " not found." %
+  ] "" make throw ;
 
 M: ebnf-non-terminal (transform) ( ast -- parser )
-  ebnf-non-terminal-symbol  [
-    , parser get , \ at ,  
-  ] [ ] make delay sp ;
+  symbol>>  [
+    , \ dup , parser get , \ at , [ parser-not-found ] , \ unless* , \ nip ,    
+  ] [ ] make box ;
 
 : transform-ebnf ( string -- object )
   'ebnf' parse parse-result-ast transform ;
 
 : check-parse-result ( result -- result )
   dup [
-    dup parse-result-remaining empty? [
+    dup parse-result-remaining [ blank? ] trim empty? [
       [ 
         "Unable to fully parse EBNF. Left to parse was: " %
         parse-result-remaining % 
@@ -278,12 +357,23 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 
 : ebnf>quot ( string -- hashtable quot )
   'ebnf' parse check-parse-result 
-  parse-result-ast transform dup main swap at compile 1quotation ;
+  parse-result-ast transform dup dup parser [ main swap at compile ] with-variable
+  [ compiled-parse ] curry [ with-scope ] curry ;
 
-: [EBNF "EBNF]" parse-multiline-string ebnf>quot nip parsed ; parsing
+: replace-escapes ( string -- string )
+  [
+    "\\t" token [ drop "\t" ] action ,
+    "\\n" token [ drop "\n" ] action ,
+    "\\r" token [ drop "\r" ] action ,
+  ] choice* replace ;
+
+: [EBNF "EBNF]" parse-multiline-string replace-escapes ebnf>quot nip parsed ; parsing
 
 : EBNF: 
   CREATE-WORD dup 
-  ";EBNF" parse-multiline-string
-  ebnf>quot swapd define "ebnf-parser" set-word-prop ; parsing
+  ";EBNF" parse-multiline-string replace-escapes
+  ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop ; parsing
 
+: rule ( name word -- parser )
+  #! Given an EBNF word produced from EBNF: return the EBNF rule
+  "ebnf-parser" word-prop at ;

@@ -16,12 +16,12 @@ SYMBOL: ignore-case?
 
 : char-between?-quot ( ch1 ch2 -- quot )
     ignore-case? get
-    [ [ ch>upper ] 2apply [ >r >r ch>upper r> r> between? ] ]
+    [ [ ch>upper ] bi@ [ >r >r ch>upper r> r> between? ] ]
     [ [ between? ] ]
     if 2curry ;
 
 : or-predicates ( quots -- quot )
-    [ \ dup add* ] map [ [ t ] ] f short-circuit \ nip add ;
+    [ \ dup prefix ] map [ [ t ] ] f short-circuit \ nip suffix ;
 
 : <@literal [ nip ] curry <@ ;
 
@@ -269,7 +269,7 @@ TUPLE: regexp source parser ignore-case? ;
         ignore-case? [
             dup 'regexp' just parse-1
         ] with-variable
-    ] keep regexp construct-boa ;
+    ] keep regexp boa ;
 
 : do-ignore-case ( string regexp -- string regexp )
     dup regexp-ignore-case? [ >r >upper r> ] when ;

@@ -16,7 +16,7 @@ SYMBOL: compiled
         { [ dup compiled get key? ] [ drop ] }
         { [ dup inlined-block? ] [ drop ] }
         { [ dup primitive? ] [ drop ] }
-        { [ t ] [ dup compile-queue get set-at ] }
+        [ dup compile-queue get set-at ]
     } cond ;
 
 : maybe-compile ( word -- )
@@ -202,7 +202,7 @@ M: #dispatch generate-node
 : define-if>boolean-intrinsics ( word intrinsics -- )
     [
         >r [ if>boolean-intrinsic ] curry r>
-        { { f "if-scratch" } } +scratch+ associate union
+        { { f "if-scratch" } } +scratch+ associate assoc-union
     ] assoc-map "intrinsics" set-word-prop ;
 
 : define-if-intrinsics ( word intrinsics -- )

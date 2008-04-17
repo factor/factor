@@ -71,7 +71,7 @@ TAGS>
     ] keep ;
 
 : merge-rule-set-props ( props rule-set -- )
-    [ rule-set-props union ] keep set-rule-set-props ;
+    [ rule-set-props assoc-union ] keep set-rule-set-props ;
 
 ! Top-level entry points
 : parse-mode-tag ( tag -- rule-sets )

@@ -25,29 +25,22 @@ SYMBOL: class-or-cache
     class-and-cache get clear-assoc
     class-or-cache get clear-assoc ;
 
-PREDICATE: word class ( obj -- ? ) "class" word-prop ;
-
 SYMBOL: update-map
-SYMBOL: builtins
 
-PREDICATE: class builtin-class
-    "metaclass" word-prop builtin-class eq? ;
+PREDICATE: class < word
+    "class" word-prop ;
 
-PREDICATE: class tuple-class
+PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
 : classes ( -- seq ) all-words [ class? ] subset ;
-
-: type>class ( n -- class ) builtins get-global nth ;
-
-: bootstrap-type>class ( n -- class ) builtins get nth ;
 
 : predicate-word ( word -- predicate )
     [ word-name "?" append ] keep word-vocabulary create ;
 
 : predicate-effect 1 { "?" } <effect> ;
 
-PREDICATE: word predicate "predicating" word-prop >boolean ;
+PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
 : define-predicate ( class quot -- )
     >r "predicate" word-prop first
@@ -56,6 +49,9 @@ PREDICATE: word predicate "predicating" word-prop >boolean ;
 : superclass ( class -- super )
     #! Output f for non-classes to work with algebra code
     dup class? [ "superclass" word-prop ] [ drop f ] if ;
+
+: superclasses ( class -- supers )
+    [ superclass ] follow reverse ;
 
 : members ( class -- seq )
     #! Output f for non-classes to work with algebra code
@@ -69,7 +65,7 @@ M: word reset-class drop ;
 
 ! update-map
 : class-uses ( class -- seq )
-    dup members swap superclass [ add ] when* ;
+    [ members ] [ superclass ] bi [ suffix ] when* ;
 
 : class-usages ( class -- assoc )
     [ update-map get at ] closure ;
@@ -80,48 +76,50 @@ M: word reset-class drop ;
 : update-map- ( class -- )
     dup class-uses update-map get remove-vertex ;
 
-PRIVATE>
-
-: define-class-props ( members superclass metaclass -- assoc )
+: make-class-props ( superclass members metaclass -- assoc )
     [
-        "metaclass" set
-        dup [ bootstrap-word ] when "superclass" set
-        [ bootstrap-word ] map "members" set
+        [ dup [ bootstrap-word ] when "superclass" set ]
+        [ [ bootstrap-word ] map "members" set ]
+        [ "metaclass" set ]
+        tri*
     ] H{ } make-assoc ;
 
 : (define-class) ( word props -- )
-    over reset-class
-    over deferred? [ over define-symbol ] when
-    >r dup word-props r> union over set-word-props
-    dup predicate-word 2dup 1quotation "predicate" set-word-prop
-    over "predicating" set-word-prop
-    t "class" set-word-prop ;
+    >r
+    dup reset-class
+    dup deferred? [ dup define-symbol ] when
+    dup word-props
+    r> assoc-union over set-word-props
+    dup predicate-word
+    [ 1quotation "predicate" set-word-prop ]
+    [ swap "predicating" set-word-prop ]
+    [ drop t "class" set-word-prop ]
+    2tri ;
 
-GENERIC: update-predicate ( class -- )
+PRIVATE>
 
-M: class update-predicate drop ;
+GENERIC: update-class ( class -- )
 
-: update-predicates ( assoc -- )
-    [ drop update-predicate ] assoc-each ;
+M: class update-class drop ;
 
 GENERIC: update-methods ( assoc -- )
 
-: define-class ( word members superclass metaclass -- )
+: update-classes ( class -- )
+    class-usages
+    [ [ drop update-class ] assoc-each ]
+    [ update-methods ]
+    bi ;
+
+: define-class ( word superclass members metaclass -- )
     #! If it was already a class, update methods after.
     reset-caches
-    define-class-props
-    over update-map-
-    dupd (define-class)
-    dup update-map+
-    class-usages dup update-predicates update-methods ;
+    make-class-props
+    [ drop update-map- ]
+    [ (define-class) ]
+    [ drop update-map+ ]
+    2tri ;
 
-GENERIC: class ( object -- class ) inline
+GENERIC: class ( object -- class )
 
-M: object class type type>class ;
-
-<PRIVATE
-
-: class-of-tuple ( obj -- class )
-    2 slot { word } declare ; inline
-
-PRIVATE>
+: instance? ( obj class -- ? )
+    "predicate" word-prop call ;

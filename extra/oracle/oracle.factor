@@ -35,20 +35,20 @@ C: <connection> connection
 
 : check-result ( result -- )
     {
-        { [ dup OCI_SUCCESS = ] [ drop ] }
-        { [ dup OCI_ERROR = ] [ err get get-oci-error ] }
-        { [ dup OCI_INVALID_HANDLE = ] [ "invalid handle" throw ] }
-        { [ t ] [ "operation failed" throw ] }
-    } cond ;
+        { OCI_SUCCESS [ ] }
+        { OCI_ERROR [ err get get-oci-error ] }
+        { OCI_INVALID_HANDLE [ "invalid handle" throw ] }
+        [ "operation failed" throw ]
+    } case ;
 
 : check-status ( status -- bool )
     {
-        { [ dup OCI_SUCCESS = ] [ drop t ] }
-        { [ dup OCI_ERROR = ] [ err get get-oci-error ] }
-        { [ dup OCI_INVALID_HANDLE = ] [ "invalid handle" throw ] }
-        { [ dup OCI_NO_DATA = ] [ drop f ] }
-        { [ t ] [ "operation failed" throw ] }
-    } cond ;
+        { OCI_SUCCESS [ t ] }
+        { OCI_ERROR [ err get get-oci-error ] }
+        { OCI_INVALID_HANDLE [ "invalid handle" throw ] }
+        { OCI_NO_DATA [ f ] }
+        [ "operation failed" throw ]
+    } case ;
 
 ! =========================================================
 ! Initialization and handle-allocation routines
@@ -153,19 +153,19 @@ C: <connection> connection
     >r stm get err get r> dup length swap malloc-char-string swap
     OCI_NTV_SYNTAX OCI_DEFAULT OCIStmtPrepare check-result ;
 
-: calculate-size ( type -- size object )
+: calculate-size ( type -- size )
     {
-        { [ dup SQLT_INT = ] [ "int" heap-size ] }
-        { [ dup SQLT_FLT = ] [ "float" heap-size ] }
-        { [ dup SQLT_CHR = ] [ "char" heap-size ] }
-        { [ dup SQLT_NUM = ] [ "int" heap-size 10 * ] }
-        { [ dup SQLT_STR = ] [ 64 ] }
-        { [ dup SQLT_ODT = ] [ 256 ] }
-    } cond ;
+        { SQLT_INT [ "int" heap-size ] }
+        { SQLT_FLT [ "float" heap-size ] }
+        { SQLT_CHR [ "char" heap-size ] }
+        { SQLT_NUM [ "int" heap-size 10 * ] }
+        { SQLT_STR [ 64 ] }
+        { SQLT_ODT [ 256 ] }
+    } case ;
 
 : define-by-position ( position type -- )
     >r >r stm get f <void*> err get
-    r> r> calculate-size swap >r [ "char" malloc-array dup buf set ] keep 1+
+    r> r> dup calculate-size >r [ "char" malloc-array dup buf set ] keep 1+
     r> f f f OCI_DEFAULT OCIDefineByPos check-result ;
 
 : execute-statement ( -- bool )
@@ -236,13 +236,13 @@ C: <connection> connection
 
 : fetch-each ( object -- object )
     fetch-statement [
-        buf get alien>char-string res get swap add res set
+        buf get alien>char-string res get swap suffix res set
         fetch-each
     ] [ ] if ;
 
 : run-query ( object -- object )
     execute-statement [
-        buf get alien>char-string res get swap add res set
+        buf get alien>char-string res get swap suffix res set
         fetch-each
     ] [ ] if ;
 

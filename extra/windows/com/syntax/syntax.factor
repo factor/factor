@@ -1,8 +1,6 @@
-USING: alien alien.c-types kernel windows.ole32
-combinators.lib parser splitting sequences.lib
-sequences namespaces combinators.cleave
-assocs quotations shuffle accessors words macros
-alien.syntax fry ;
+USING: alien alien.c-types kernel windows.ole32 combinators.lib
+parser splitting sequences.lib sequences namespaces assocs
+quotations shuffle accessors words macros alien.syntax fry ;
 IN: windows.com.syntax
 
 <PRIVATE
@@ -42,7 +40,7 @@ unless
 : (parse-com-function) ( tokens -- definition )
     [ second ]
     [ first ]
-    [ 3 tail 2 group [ first ] map "void*" add* ]
+    [ 3 tail 2 group [ first ] map "void*" prefix ]
     tri
     <com-function-definition> ;
 
@@ -57,8 +55,12 @@ unless
 : (function-word) ( function interface -- word )
     name>> "::" rot name>> 3append create-in ;
 
-: all-functions ( definition -- functions )
-    dup parent>> [ all-functions ] [ { } ] if*
+: family-tree ( definition -- definitions )
+    dup parent>> [ family-tree ] [ { } ] if*
+    swap add ;
+
+: family-tree-functions ( definition -- functions )
+    dup parent>> [ family-tree-functions ] [ { } ] if*
     swap functions>> append ;
 
 : (define-word-for-function) ( function interface n -- )
@@ -71,7 +73,7 @@ unless
     [ [ (iid-word) ] [ iid>> 1quotation ] bi define ]
     [ name>> "com-interface" swap typedef ]
     [
-        dup all-functions
+        dup family-tree-functions
         [ (define-word-for-function) ] with each-index
     ]
     tri ;

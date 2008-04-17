@@ -167,6 +167,15 @@ TYPEDEF: DWORD SHGDNF
 
 TYPEDEF: ULONG SFGAOF
 
+C-STRUCT: DROPFILES
+    { "DWORD" "pFiles" }
+    { "POINT" "pt" }
+    { "BOOL" "fNC" }
+    { "BOOL" "fWide" } ;
+TYPEDEF: DROPFILES* LPDROPFILES
+TYPEDEF: DROPFILES* LPCDROPFILES
+TYPEDEF: HANDLE HDROP
+
 C-STRUCT: SHITEMID
     { "USHORT" "cb" }
     { "BYTE[1]" "abID" } ;
@@ -210,5 +219,6 @@ COM-INTERFACE: IShellFolder IUnknown {000214E6-0000-0000-C000-000000000046}
 
 FUNCTION: HRESULT SHGetDesktopFolder ( IShellFolder** ppshf ) ;
 
-FUNCTION: HRESULT StrRetToBufW ( STRRET *pstr, PCUITEMID_CHILD pidl, LPWSTR pszBuf, UINT cchBuf ) ;
-: StrRetToBuf StrRetToBufW ; inline
+FUNCTION: UINT DragQueryFileW ( HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch ) ;
+: DragQueryFile DragQueryFileW ; inline
+

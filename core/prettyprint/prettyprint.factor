@@ -1,13 +1,14 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint
 USING: alien arrays generic generic.standard assocs io kernel
 math namespaces sequences strings io.styles io.streams.string
 vectors words prettyprint.backend prettyprint.sections
 prettyprint.config sorting splitting math.parser vocabs
-definitions effects tuples io.files classes continuations
-hashtables classes.mixin classes.union classes.predicate
-combinators quotations ;
+definitions effects classes.builtin classes.tuple io.files
+classes continuations hashtables classes.mixin classes.union
+classes.predicate classes.singleton combinators quotations
+sets ;
 
 : make-pprint ( obj quot -- block in use )
     [
@@ -107,14 +108,14 @@ SYMBOL: ->
                 { [ dup word? not ] [ , ] }
                 { [ dup "break?" word-prop ] [ drop ] }
                 { [ dup "step-into?" word-prop ] [ remove-step-into ] }
-                { [ t ] [ , ] }
+                [ , ]
             } cond
         ] each
     ] [ ] make ;
 
 : remove-breakpoints ( quot pos -- quot' )
     over quotation? [
-        1+ cut [ (remove-breakpoints) ] 2apply
+        1+ cut [ (remove-breakpoints) ] bi@
         [ -> ] swap 3append
     ] [
         drop
@@ -247,16 +248,23 @@ M: mixin-class see-class*
 
 M: predicate-class see-class*
     <colon \ PREDICATE: pprint-word
-    dup superclass pprint-word
     dup pprint-word
+    "<" text
+    dup superclass pprint-word
     <block
     "predicate-definition" word-prop pprint-elements
     pprint-; block> block> ;
 
+M: singleton-class see-class* ( class -- )
+    \ SINGLETON: pprint-word pprint-word ;
+
 M: tuple-class see-class*
     <colon \ TUPLE: pprint-word
     dup pprint-word
-    "slot-names" word-prop [ text ] each
+    dup superclass tuple eq? [
+        "<" text dup superclass pprint-word
+    ] unless
+    slot-names [ text ] each
     pprint-; block> ;
 
 M: word see-class* drop ;

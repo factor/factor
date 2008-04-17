@@ -4,7 +4,8 @@ USING: bit-arrays byte-arrays float-arrays arrays
 generator.registers assocs kernel kernel.private libc math
 namespaces parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
-layouts system compiler.units io.files io.encodings.binary ;
+layouts system compiler.units io.files io.encodings.binary
+accessors combinators ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -17,8 +18,12 @@ boxer prep unboxer
 getter setter
 reg-class size align stack-align? ;
 
+: new-c-type ( class -- type )
+    new
+        int-regs >>reg-class ;
+
 : <c-type> ( -- type )
-    T{ int-regs } { set-c-type-reg-class } \ c-type construct ;
+    \ c-type new-c-type ;
 
 SYMBOL: c-types
 
@@ -45,7 +50,7 @@ GENERIC: c-type ( name -- type ) foldable
 
 : parse-array-type ( name -- array )
     "[" split unclip
-    >r [ "]" ?tail drop string>number ] map r> add* ;
+    >r [ "]" ?tail drop string>number ] map r> prefix ;
 
 M: string c-type ( name -- type )
     CHAR: ] over member? [
@@ -162,7 +167,7 @@ DEFER: >c-ushort-array
     >r >c-ushort-array r> byte-array>memory ;
 
 : (define-nth) ( word type quot -- )
-    >r heap-size [ rot * ] swap add* r> append define-inline ;
+    >r heap-size [ rot * ] swap prefix r> append define-inline ;
 
 : nth-word ( name vocab -- word )
     >r "-nth" append r> create ;
@@ -181,10 +186,10 @@ DEFER: >c-ushort-array
 : define-c-type ( type name vocab -- )
     >r tuck typedef r> [ define-nth ] 2keep define-set-nth ;
 
-TUPLE: long-long-type ;
+TUPLE: long-long-type < c-type ;
 
-: <long-long-type> ( type -- type )
-    long-long-type construct-delegate ;
+: <long-long-type> ( -- type )
+    long-long-type new-c-type ;
 
 M: long-long-type unbox-parameter ( n type -- )
     c-type-unboxer %unbox-long-long ;
@@ -199,12 +204,12 @@ M: long-long-type box-return ( type -- )
     f swap box-parameter ;
 
 : define-deref ( name vocab -- )
-    >r dup CHAR: * add* r> create
-    swap c-getter 0 add* define-inline ;
+    >r dup CHAR: * prefix r> create
+    swap c-getter 0 prefix define-inline ;
 
 : define-out ( name vocab -- )
     over [ <c-object> tuck 0 ] over c-setter append swap
-    >r >r constructor-word r> r> add* define-inline ;
+    >r >r constructor-word r> r> prefix define-inline ;
 
 : c-bool> ( int -- ? )
     zero? not ;
@@ -235,159 +240,179 @@ M: long-long-type box-return ( type -- )
 : define-from-array ( type vocab -- )
     [ from-array-word ] 2keep c-array>quot define ;
 
-: <primitive-type> ( getter setter width boxer unboxer -- type )
-    <c-type>
-    [ set-c-type-unboxer ] keep
-    [ set-c-type-boxer ] keep
-    [ set-c-type-size ] 2keep
-    [ set-c-type-align ] keep
-    [ set-c-type-setter ] keep
-    [ set-c-type-getter ] keep ;
-
 : define-primitive-type ( type name -- )
     "alien.c-types"
-    [ define-c-type ] 2keep
-    [ define-deref ] 2keep
-    [ define-to-array ] 2keep
-    [ define-from-array ] 2keep
-    define-out ;
+    {
+        [ define-c-type ]
+        [ define-deref ]
+        [ define-to-array ]
+        [ define-from-array ]
+        [ define-out ]
+    } 2cleave ;
 
 : expand-constants ( c-type -- c-type' )
     #! We use word-def call instead of execute to get around
     #! staging violations
     dup array? [
         unclip >r [ dup word? [ word-def call ] when ] map
-        r> add*
+        r> prefix
     ] when ;
 
 : malloc-file-contents ( path -- alien len )
     binary file-contents dup malloc-byte-array swap length ;
 
 [
-    [ alien-cell ]
-    [ set-alien-cell ]
-    bootstrap-cell
-    "box_alien"
-    "alien_offset" <primitive-type>
+    <c-type>
+        [ alien-cell ] >>getter
+        [ set-alien-cell ] >>setter
+        bootstrap-cell >>size
+        bootstrap-cell >>align
+        "box_alien" >>boxer
+        "alien_offset" >>unboxer
     "void*" define-primitive-type
 
-    [ alien-signed-8 ]
-    [ set-alien-signed-8 ]
-    8
-    "box_signed_8"
-    "to_signed_8" <primitive-type> <long-long-type>
+    <long-long-type>
+        [ alien-signed-8 ] >>getter
+        [ set-alien-signed-8 ] >>setter
+        8 >>size
+        8 >>align
+        "box_signed_8" >>boxer
+        "to_signed_8" >>unboxer
     "longlong" define-primitive-type
 
-    [ alien-unsigned-8 ]
-    [ set-alien-unsigned-8 ]
-    8
-    "box_unsigned_8"
-    "to_unsigned_8" <primitive-type> <long-long-type>
+    <long-long-type>
+        [ alien-unsigned-8 ] >>getter
+        [ set-alien-unsigned-8 ] >>setter
+        8 >>size
+        8 >>align
+        "box_unsigned_8" >>boxer
+        "to_unsigned_8" >>unboxer
     "ulonglong" define-primitive-type
 
-    [ alien-signed-cell ]
-    [ set-alien-signed-cell ]
-    bootstrap-cell
-    "box_signed_cell"
-    "to_fixnum" <primitive-type>
+    <c-type>
+        [ alien-signed-cell ] >>getter
+        [ set-alien-signed-cell ] >>setter
+        bootstrap-cell >>size
+        bootstrap-cell >>align
+        "box_signed_cell" >>boxer
+        "to_fixnum" >>unboxer
     "long" define-primitive-type
 
-    [ alien-unsigned-cell ]
-    [ set-alien-unsigned-cell ]
-    bootstrap-cell
-    "box_unsigned_cell"
-    "to_cell" <primitive-type>
+    <c-type>
+        [ alien-unsigned-cell ] >>getter
+        [ set-alien-unsigned-cell ] >>setter
+        bootstrap-cell >>size
+        bootstrap-cell >>align
+        "box_unsigned_cell" >>boxer
+        "to_cell" >>unboxer
     "ulong" define-primitive-type
 
-    [ alien-signed-4 ]
-    [ set-alien-signed-4 ]
-    4
-    "box_signed_4"
-    "to_fixnum" <primitive-type>
+    <c-type>
+        [ alien-signed-4 ] >>getter
+        [ set-alien-signed-4 ] >>setter
+        4 >>size
+        4 >>align
+        "box_signed_4" >>boxer
+        "to_fixnum" >>unboxer
     "int" define-primitive-type
 
-    [ alien-unsigned-4 ]
-    [ set-alien-unsigned-4 ]
-    4
-    "box_unsigned_4"
-    "to_cell" <primitive-type>
+    <c-type>
+        [ alien-unsigned-4 ] >>getter
+        [ set-alien-unsigned-4 ] >>setter
+        4 >>size
+        4 >>align
+        "box_unsigned_4" >>boxer
+        "to_cell" >>unboxer
     "uint" define-primitive-type
 
-    [ alien-signed-2 ]
-    [ set-alien-signed-2 ]
-    2
-    "box_signed_2"
-    "to_fixnum" <primitive-type>
+    <c-type>
+        [ alien-signed-2 ] >>getter
+        [ set-alien-signed-2 ] >>setter
+        2 >>size
+        2 >>align
+        "box_signed_2" >>boxer
+        "to_fixnum" >>unboxer
     "short" define-primitive-type
 
-    [ alien-unsigned-2 ]
-    [ set-alien-unsigned-2 ]
-    2
-    "box_unsigned_2"
-    "to_cell" <primitive-type>
+    <c-type>
+        [ alien-unsigned-2 ] >>getter
+        [ set-alien-unsigned-2 ] >>setter
+        2 >>size
+        2 >>align
+        "box_unsigned_2" >>boxer
+        "to_cell" >>unboxer
     "ushort" define-primitive-type
 
-    [ alien-signed-1 ]
-    [ set-alien-signed-1 ]
-    1
-    "box_signed_1"
-    "to_fixnum" <primitive-type>
+    <c-type>
+        [ alien-signed-1 ] >>getter
+        [ set-alien-signed-1 ] >>setter
+        1 >>size
+        1 >>align
+        "box_signed_1" >>boxer
+        "to_fixnum" >>unboxer
     "char" define-primitive-type
 
-    [ alien-unsigned-1 ]
-    [ set-alien-unsigned-1 ]
-    1
-    "box_unsigned_1"
-    "to_cell" <primitive-type>
+    <c-type>
+        [ alien-unsigned-1 ] >>getter
+        [ set-alien-unsigned-1 ] >>setter
+        1 >>size
+        1 >>align
+        "box_unsigned_1" >>boxer
+        "to_cell" >>unboxer
     "uchar" define-primitive-type
 
-    [ alien-unsigned-4 zero? not ]
-    [ 1 0 ? set-alien-unsigned-4 ]
-    4
-    "box_boolean"
-    "to_boolean" <primitive-type>
+    <c-type>
+        [ alien-unsigned-4 zero? not ] >>getter
+        [ 1 0 ? set-alien-unsigned-4 ] >>setter
+        4 >>size
+        4 >>align
+        "box_boolean" >>boxer
+        "to_boolean" >>unboxer
     "bool" define-primitive-type
 
-    [ alien-float ]
-    [ >r >r >float r> r> set-alien-float ]
-    4
-    "box_float"
-    "to_float" <primitive-type>
+    <c-type>
+        [ alien-float ] >>getter
+        [ >r >r >float r> r> set-alien-float ] >>setter
+        4 >>size
+        4 >>align
+        "box_float" >>boxer
+        "to_float" >>unboxer
+        single-float-regs >>reg-class
+        [ >float ] >>prep
     "float" define-primitive-type
 
-    T{ float-regs f 4 } "float" c-type set-c-type-reg-class
-    [ >float ] "float" c-type set-c-type-prep
-
-    [ alien-double ]
-    [ >r >r >float r> r> set-alien-double ]
-    8
-    "box_double"
-    "to_double" <primitive-type>
+    <c-type>
+        [ alien-double ] >>getter
+        [ >r >r >float r> r> set-alien-double ] >>setter
+        8 >>size
+        8 >>align
+        "box_double" >>boxer
+        "to_double" >>unboxer
+        double-float-regs >>reg-class
+        [ >float ] >>prep
     "double" define-primitive-type
 
-    T{ float-regs f 8 } "double" c-type set-c-type-reg-class
-    [ >float ] "double" c-type set-c-type-prep
-
-    [ alien-cell alien>char-string ]
-    [ set-alien-cell ]
-    bootstrap-cell
-    "box_char_string"
-    "alien_offset" <primitive-type>
+    <c-type>
+        [ alien-cell alien>char-string ] >>getter
+        [ set-alien-cell ] >>setter
+        bootstrap-cell >>size
+        bootstrap-cell >>align
+        "box_char_string" >>boxer
+        "alien_offset" >>unboxer
+        [ string>char-alien ] >>prep
     "char*" define-primitive-type
 
     "char*" "uchar*" typedef
 
-    [ string>char-alien ] "char*" c-type set-c-type-prep
-
-    [ alien-cell alien>u16-string ]
-    [ set-alien-cell ]
-    4
-    "box_u16_string"
-    "alien_offset" <primitive-type>
+    <c-type>
+        [ alien-cell alien>u16-string ] >>getter
+        [ set-alien-cell ] >>setter
+        4 >>size
+        4 >>align
+        "box_u16_string" >>boxer
+        "alien_offset" >>unboxer
+        [ string>u16-alien ] >>prep
     "ushort*" define-primitive-type
 
-    [ string>u16-alien ] "ushort*" c-type set-c-type-prep
-    
-    win64? "longlong" "long" ? "ptrdiff_t" typedef
-    
+    os winnt? cpu x86.64? and "longlong" "long" ? "ptrdiff_t" typedef
 ] with-compilation-unit

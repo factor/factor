@@ -68,7 +68,7 @@ INSTANCE: x30 g
     "benchmark.dispatch5" words [ tuple-class? ] subset ;
 
 : a-bunch-of-objects ( -- seq )
-    my-classes [ construct-empty ] map ;
+    my-classes [ new ] map ;
 
 : dispatch-benchmark ( -- )
     1000000 a-bunch-of-objects
