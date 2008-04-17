@@ -107,7 +107,7 @@ M: ppc %call ( label -- ) BL ;
 M: ppc %jump-label ( label -- ) B ;
 
 M: ppc %jump-f ( label -- )
-    0 "flag" operand f v>operand CMPI BE ;
+    0 "flag" operand f v>operand CMPI BEQ ;
 
 M: ppc %dispatch ( -- )
     [
