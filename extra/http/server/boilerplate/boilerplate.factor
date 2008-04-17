@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces boxes sequences strings
 io io.streams.string
+http
 http.server
 http.server.templating ;
 IN: http.server.boilerplate
@@ -27,6 +28,8 @@ SYMBOL: style
 : write-style ( -- )
     style get >string write ;
 
+SYMBOL: nested-template?
+
 SYMBOL: next-template
 
 : call-next-template ( -- )
@@ -39,9 +42,15 @@ M: f call-template drop call-next-template ;
         title get [ <box> title set ] unless
         style get [ SBUF" " clone style set ] unless
 
-        swap with-string-writer next-template set
-
-        call-template
+        [
+            [
+                nested-template? on
+                write-response-body*
+            ] with-string-writer
+            next-template set
+        ]
+        [ call-template ]
+        bi*
     ] with-scope ; inline
 
 M: boilerplate call-responder

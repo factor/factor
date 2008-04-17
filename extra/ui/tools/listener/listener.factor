@@ -111,7 +111,7 @@ M: method-body word-completion-string
 
 USE: generic.standard.engines.tuple
 
-M: tuple-dispatch-engine-word word-completion-string
+M: engine-word word-completion-string
     "engine-generic" word-prop word-completion-string ;
 
 : use-if-necessary ( word seq -- )

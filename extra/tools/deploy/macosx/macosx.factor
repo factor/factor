@@ -14,13 +14,6 @@ IN: tools.deploy.macosx
     bundle-dir over append-path -rot
     "Contents" prepend-path append-path copy-tree ;
 
-: copy-vm ( executable bundle-name -- vm )
-    "Contents/MacOS/" append-path prepend-path vm over copy-file ;
-
-: copy-fonts ( name -- )
-    "fonts/" resource-path
-    swap "Contents/Resources/" append-path copy-tree-into ;
-
 : app-plist ( executable bundle-name -- assoc )
     [
         "6.0" "CFBundleInfoDictionaryVersion" set
@@ -40,8 +33,8 @@ IN: tools.deploy.macosx
 : create-app-dir ( vocab bundle-name -- vm )
     dup "Frameworks" copy-bundle-dir
     dup "Resources/English.lproj/MiniFactor.nib" copy-bundle-dir
-    dup copy-fonts
-    2dup create-app-plist copy-vm ;
+    dup "Contents/Resources/" copy-fonts
+    2dup create-app-plist "Contents/MacOS/" append-path "" copy-vm ;
 
 : deploy.app-image ( vocab bundle-name -- str )
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;

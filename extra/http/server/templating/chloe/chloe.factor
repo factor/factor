@@ -156,13 +156,19 @@ SYMBOL: tags
     [
         V{ } clone tags set
 
-        {
-            [ xml-prolog write-prolog ]
-            [ xml-before write-chunk  ]
-            [ process-template        ]
-            [ xml-after write-chunk   ]
-        } cleave
+        nested-template? get [
+            process-template
+        ] [
+            {
+                [ xml-prolog write-prolog ]
+                [ xml-before write-chunk  ]
+                [ process-template        ]
+                [ xml-after write-chunk   ]
+            } cleave
+        ] if
     ] with-scope ;
 
 M: chloe call-template
     path>> utf8 <file-reader> read-xml process-chloe ;
+
+INSTANCE: chloe template

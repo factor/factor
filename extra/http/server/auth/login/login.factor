@@ -68,10 +68,7 @@ M: user-saver dispose
         <action>
             [ blank-values ] >>init
 
-            [
-                "text/html" <content>
-                [ form edit-form ] >>body
-            ] >>display
+            [ form edit-form ] >>display
 
             [
                 blank-values
@@ -120,10 +117,7 @@ SYMBOL: user-exists?
         <action>
             [ blank-values ] >>init
 
-            [
-                "text/html" <content>
-                [ form edit-form ] >>body
-            ] >>display
+            [ form edit-form ] >>display
 
             [
                 blank-values
@@ -174,10 +168,7 @@ SYMBOL: previous-page
                 dup email>> "email" set-value
             ] >>init
 
-            [
-                "text/html" <content>
-                [ form edit-form ] >>body
-            ] >>display
+            [ form edit-form ] >>display
 
             [
                 blank-values
@@ -262,10 +253,7 @@ SYMBOL: lost-password-from
         <action>
             [ blank-values ] >>init
 
-            [
-                "text/html" <content>
-                [ form edit-form ] >>body
-            ] >>display
+            [ form edit-form ] >>display
 
             [
                 blank-values
@@ -314,10 +302,7 @@ SYMBOL: lost-password-from
                 ] H{ } make-assoc values set
             ] >>init
 
-            [
-                "text/html" <content>
-                [ <recover-form-3> edit-form ] >>body
-            ] >>display
+            [ <recover-form-3> edit-form ] >>display
 
             [
                 blank-values
