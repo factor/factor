@@ -9,7 +9,6 @@ IN: cpu.x86.architecture
 HOOK: ds-reg cpu
 HOOK: rs-reg cpu
 HOOK: stack-reg cpu
-HOOK: xt-reg cpu
 HOOK: stack-save-reg cpu
 
 : stack@ stack-reg swap [+] ;

@@ -403,7 +403,6 @@ TUPLE: callback-context ;
 : generate-callback ( node -- )
     dup xt>> dup [
         init-templates
-        %save-word-xt
         %prologue-later
         dup alien-stack-frame [
             dup registers>objects
