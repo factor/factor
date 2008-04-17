@@ -260,18 +260,14 @@ DEFER: (infer-classes)
 : merge-classes ( nodes node -- )
     >r (merge-classes) r> set-classes ;
 
-: (merge-intervals) ( nodes quot -- seq )
-    >r
-    [ node-input-intervals ] map
-    f pad-all flip
-    r> map ; inline
-
 : set-intervals ( seq node -- )
     node-out-d [ set-value-interval* ] 2reverse-each ;
 
 : merge-intervals ( nodes node -- )
-    >r [ dup first [ interval-union ] reduce ]
-    (merge-intervals) r> set-intervals ;
+    >r
+    [ node-input-intervals ] map f pad-all flip
+    [ dup first [ interval-union ] reduce ] map
+    r> set-intervals ;
 
 : annotate-merge ( nodes #merge/#entry -- )
     [ merge-classes ] [ merge-intervals ] 2bi ;

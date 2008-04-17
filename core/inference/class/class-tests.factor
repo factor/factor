@@ -349,6 +349,27 @@ cell-bits 32 = [
     ] { mod fixnum-mod } inlined?
 ] unit-test
 
+[ t ] [
+    [
+        { integer } declare [ 256 rem ] map
+    ] { mod fixnum-mod rem } inlined?
+] unit-test
+
+[ t ] [
+    [ 1000 [ 1+ ] map ] { 1+ fixnum+ } inlined?
+] unit-test
+
+[ t ] [
+    [
+        { integer } declare
+        dup 0 >= [
+            615949 * 797807 + 20 2^ mod dup 19 2^ -
+        ] [ dup ] if
+    ] { * + shift mod fixnum-mod fixnum* fixnum+ fixnum- } inlined?
+] unit-test
+
+! Later
+
 ! [ t ] [
 !     [
 !         { integer } declare [ 256 mod ] map
@@ -360,12 +381,3 @@ cell-bits 32 = [
 !         { integer } declare [ 0 >= ] map
 !     ] { >= fixnum>= } inlined?
 ! ] unit-test
-
-[ t ] [
-    [
-        { integer } declare
-        dup 0 >= [
-            615949 * 797807 + 20 2^ mod dup 19 2^ -
-        ] [ dup ] if
-    ] { * + shift mod fixnum-mod fixnum* fixnum+ fixnum- } inlined?
-] unit-test
