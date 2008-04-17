@@ -82,6 +82,8 @@ IN: locals.tests
 
 0 write-test-1 "q" set
 
+{ 1 1 } "q" get must-infer-as
+
 [ 1 ] [ 1 "q" get call ] unit-test
 
 [ 2 ] [ 1 "q" get call ] unit-test

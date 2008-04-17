@@ -8,6 +8,15 @@ debugger io.streams.c io.streams.duplex io.files io.backend
 quotations io.launcher words.private tools.deploy.config
 bootstrap.image io.encodings.utf8 accessors ;
 IN: tools.deploy.backend
+    
+: copy-vm ( executable bundle-name extension -- vm )
+  [ prepend-path ] dip append vm over copy-file ;
+  
+: copy-fonts ( name dir -- )  
+  append-path "fonts/" resource-path swap copy-tree-into ;
+  
+: image-name ( vocab bundle-name -- str )  
+  prepend-path ".image" append ;
 
 : (copy-lines) ( stream -- )
     dup stream-readln dup

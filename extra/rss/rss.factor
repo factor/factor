@@ -4,10 +4,8 @@ IN: rss
 USING: xml.utilities kernel assocs xml.generator
     strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities io.files io
-    http.client namespaces xml.generator hashtables ;
-
-: ?children>string ( tag/f -- string/f )
-    [ children>string ] [ f ] if* ;
+    http.client namespaces xml.generator hashtables
+    calendar.format accessors continuations ;
 
 : any-tag-named ( tag names -- tag-inside )
     f -rot [ tag-named nip dup ] with find 2drop ;
@@ -25,7 +23,7 @@ C: <entry> entry
     [ "link" tag-named children>string ] keep
     [ "description" tag-named children>string ] keep
     f "date" "http://purl.org/dc/elements/1.1/" <name>
-    tag-named ?children>string
+    tag-named dup [ children>string rfc3339>timestamp ] when
     <entry> ;
 
 : rss1.0 ( xml -- feed )
@@ -41,7 +39,7 @@ C: <entry> entry
     [ "link" tag-named ] keep
     [ "guid" tag-named dupd ? children>string ] keep
     [ "description" tag-named children>string ] keep
-    "pubDate" tag-named children>string <entry> ;
+    "pubDate" tag-named children>string rfc3339>timestamp <entry> ;
 
 : rss2.0 ( xml -- feed )
     "channel" tag-named 
@@ -59,7 +57,7 @@ C: <entry> entry
         [ children>string ] if
     ] keep
     { "published" "updated" "issued" "modified" } any-tag-named
-    children>string <entry> ;
+    children>string rfc3339>timestamp <entry> ;
 
 : atom1.0 ( xml -- feed )
     [ "title" tag-named children>string ] keep
@@ -78,10 +76,10 @@ C: <entry> entry
 
 : download-feed ( url -- feed )
     #! Retrieve an news syndication file, return as a feed tuple.
-    http-get-stream rot success? [
-        nip read-feed
+    http-get-stream swap code>> success? [
+        read-feed
     ] [
-        2drop "Error retrieving newsfeed file" throw
+        dispose "Error retrieving newsfeed file" throw
     ] if ;
 
 ! Atom generation
@@ -95,7 +93,7 @@ C: <entry> entry
     "entry" [
         dup entry-title "title" { { "type" "html" } } simple-tag*,
         "link" over entry-link "href" associate contained*,
-        dup entry-pub-date "published" simple-tag,
+        dup entry-pub-date timestamp>rfc3339 "published" simple-tag,
         entry-description [ "content" { { "type" "html" } } simple-tag*, ] when*
     ] tag, ;
 

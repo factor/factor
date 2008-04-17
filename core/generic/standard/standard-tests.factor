@@ -251,6 +251,14 @@ HOOK: my-tuple-hook my-var ( -- x )
 
 M: sequence my-tuple-hook my-hook ;
 
+TUPLE: m-t-h-a ;
+
+M: m-t-h-a my-tuple-hook "foo" ;
+
+TUPLE: m-t-h-b < m-t-h-a ;
+
+M: m-t-h-b my-tuple-hook "bar" ;
+
 [ f ] [
     \ my-tuple-hook [ "engines" word-prop ] keep prefix
     [ 1quotation infer ] map all-equal?

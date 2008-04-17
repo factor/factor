@@ -54,9 +54,9 @@ IN: inference.known-words
     { swap  T{ effect f 2 { 1 0         } } }
 } [ define-shuffle ] assoc-each
 
-\ >r [ infer->r ] "infer" set-word-prop
+\ >r [ 1 infer->r ] "infer" set-word-prop
 
-\ r> [ infer-r> ] "infer" set-word-prop
+\ r> [ 1 infer-r> ] "infer" set-word-prop
 
 \ declare [
     1 ensure-values
@@ -81,8 +81,8 @@ M: curried infer-call
 
 M: composed infer-call
     infer-uncurry
-    infer->r peek-d infer-call
-    terminated? get [ infer-r> peek-d infer-call ] unless ;
+    1 infer->r peek-d infer-call
+    terminated? get [ 1 infer-r> peek-d infer-call ] unless ;
 
 M: object infer-call
     \ literal-expected inference-warning ;

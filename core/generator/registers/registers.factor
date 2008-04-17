@@ -65,9 +65,7 @@ M: float-regs move-spec drop float ;
 M: float-regs operand-class* drop float ;
 
 ! Temporary register for stack shuffling
-TUPLE: temp-reg reg-class>> ;
-
-: temp-reg T{ temp-reg f int-regs } ;
+SINGLETON: temp-reg
 
 M: temp-reg move-spec drop f ;
 
