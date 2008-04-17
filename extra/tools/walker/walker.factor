@@ -138,7 +138,6 @@ SYMBOL: +stopped+
     >n ndrop >c c>
     continue continue-with
     stop yield suspend sleep (spawn)
-    suspend
 } [
     dup [ execute break ] curry
     "step-into" set-word-prop
