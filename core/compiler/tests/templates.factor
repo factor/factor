@@ -3,7 +3,7 @@ USING: arrays compiler kernel kernel.private math
 hashtables.private math.private namespaces sequences
 sequences.private tools.test namespaces.private slots.private
 sequences.private byte-arrays alien alien.accessors layouts
-words definitions compiler.units io combinators ;
+words definitions compiler.units io combinators vectors ;
 IN: compiler.tests
 
 ! Oops!
@@ -246,3 +246,12 @@ TUPLE: my-tuple ;
     } cleave ;
 
 [ t ] [ \ float-spill-bug compiled? ] unit-test
+
+! Regression
+: dispatch-alignment-regression ( -- c )
+    { tuple vector } 3 slot { word } declare
+    dup 1 slot 0 fixnum-bitand { [ ] } dispatch ;
+
+[ t ] [ \ dispatch-alignment-regression compiled? ] unit-test
+
+[ vector ] [ dispatch-alignment-regression ] unit-test
