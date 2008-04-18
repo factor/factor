@@ -15,6 +15,8 @@ HOOK: compound-type db ( str n -- hash )
 
 TUPLE: sql-spec class slot-name column-name type modifiers primary-key ;
 
+TUPLE: literal-bind key value type ;
+
 SINGLETON: +native-id+
 SINGLETON: +assigned-id+
 SINGLETON: +random-id+

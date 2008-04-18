@@ -233,12 +233,43 @@ TUPLE: exam id name score ;
     [ ] [ T{ exam f f "Cartman" 41 } insert-tuple ] unit-test
 
     [
-        T{ exam f 3 "Kenny" 60 }
-        T{ exam f 4 "Cartman" 41 }
-    ] [ T{ exam f 4 f T{ interval f { 0 t } { 70 t } } } select-tuples ] unit-test
-    ;
+        {
+            T{ exam f 3 "Kenny" 60 }
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam f f f T{ interval f { 0 t } { 70 t } } } select-tuples
+    ] unit-test
 
-! [ test-ranges ] test-sqlite
+    [
+        { }
+    ] [
+        T{ exam f T{ interval f { 3 f } { 4 f } } f } select-tuples
+    ] unit-test
+    [
+        {
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam f T{ interval f { 3 f } { 4 t } } f } select-tuples
+    ] unit-test
+    [
+        {
+            T{ exam f 3 "Kenny" 60 }
+        }
+    ] [
+        T{ exam f T{ interval f { 3 t } { 4 f } } f } select-tuples
+    ] unit-test
+    [
+        {
+            T{ exam f 3 "Kenny" 60 }
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam f T{ interval f { 3 t } { 4 t } } f } select-tuples
+    ] unit-test ;
+
+[ test-ranges ] test-sqlite
 
 TUPLE: secret n message ;
 C: <secret> secret

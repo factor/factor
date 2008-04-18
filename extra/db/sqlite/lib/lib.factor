@@ -4,7 +4,7 @@ USING: alien.c-types arrays assocs kernel math math.parser
 namespaces sequences db.sqlite.ffi db combinators
 continuations db.types calendar.format serialize
 io.streams.byte-array byte-arrays io.encodings.binary
-tools.walker ;
+tools.walker io.backend ;
 IN: db.sqlite.lib
 
 : sqlite-error ( n -- * )
@@ -23,7 +23,8 @@ IN: db.sqlite.lib
         [ sqlite-error ]
     } cond ;
 
-: sqlite-open ( filename -- db )
+: sqlite-open ( path -- db )
+    normalize-path
     "void*" <c-object>
     [ sqlite3_open sqlite-check-result ] keep *void* ;
 

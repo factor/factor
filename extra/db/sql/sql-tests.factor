@@ -1,7 +1,7 @@
 USING: kernel namespaces db.sql sequences math ;
 IN: db.sql.tests
 
-TUPLE: person name age ;
+! TUPLE: person name age ;
 : insert-1
     { insert
         { table "person" }

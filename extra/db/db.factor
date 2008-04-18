@@ -11,7 +11,7 @@ TUPLE: db
     update-statements
     delete-statements ;
 
-: construct-db ( class -- obj )
+: new-db ( class -- obj )
     new
         H{ } clone >>insert-statements
         H{ } clone >>update-statements
@@ -20,7 +20,7 @@ TUPLE: db
 GENERIC: make-db* ( seq class -- db )
 
 : make-db ( seq class -- db )
-    construct-db make-db* ;
+    new-db make-db* ;
 
 GENERIC: db-open ( db -- db )
 HOOK: db-close db ( handle -- )

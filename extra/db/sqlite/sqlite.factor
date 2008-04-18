@@ -4,8 +4,9 @@ USING: alien arrays assocs classes compiler db
 hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings classes.tuple alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
-words combinators.lib db.types combinators
+words combinators.lib db.types combinators math.intervals
 io namespaces.lib accessors ;
+USE: tools.walker
 IN: db.sqlite
 
 TUPLE: sqlite-db < db path ;
@@ -54,16 +55,20 @@ M: sqlite-statement bind-statement* ( statement -- )
     [ statement-bind-params ] [ statement-handle ] bi
     sqlite-bind ;
 
+GENERIC: sqlite-bind-conversion ( tuple obj -- array )
+
+M: sql-spec sqlite-bind-conversion ( tuple spec -- array )
+    [ column-name>> ":" prepend ]
+    [ slot-name>> rot get-slot-named ]
+    [ type>> ] tri 3array ;
+
+M: literal-bind sqlite-bind-conversion ( tuple literal-bind -- array )
+    nip [ key>> ] [ value>> ] [ type>> ] tri 3array ;
+
 M: sqlite-statement bind-tuple ( tuple statement -- )
     [
-        in-params>>
-        [
-            [ column-name>> ":" prepend ]
-            [ slot-name>> rot get-slot-named ]
-            [ type>> ] tri 3array
-        ] with map
-    ] keep
-    bind-statement ;
+        in-params>> [ sqlite-bind-conversion ] with map
+    ] keep bind-statement ;
 
 : last-insert-id ( -- id )
     db get db-handle sqlite3_last_insert_rowid
@@ -129,13 +134,46 @@ M: sqlite-db <insert-native-statement> ( tuple -- statement )
 M: sqlite-db <insert-nonnative-statement> ( tuple -- statement )
     <insert-native-statement> ;
 
+M: sqlite-db bind% ( spec -- )
+    dup 1, column-name>> ":" prepend 0% ;
+
 : where-primary-key% ( specs -- )
     " where " 0%
     find-primary-key dup column-name>> 0% " = " 0% bind% ;
 
-: where-clause ( specs -- )
-    " where " 0%
-    [ " and " 0% ] [ dup column-name>> 0% " = " 0% bind% ] interleave ;
+! : where-object ( tuple specs -- )
+    ! [ dup column-name>> get-slot-named ] keep
+    ! dup column-name>> 0% " = " 0% bind% ;
+
+GENERIC: where-object ( specs obj -- )
+
+: interval-comparison ( ? str -- str )
+    "from" = " >" " <" ? swap [ "= " append ] when ;
+
+: where-interval ( spec val ? from/to -- )
+    roll [
+        column-name>>
+        [ 0% interval-comparison 0% ]
+        [ ":" spin 3append dup 0% ] 2bi
+        swap
+    ] [
+        type>>
+    ] bi literal-bind boa 1, ;
+
+M: interval where-object ( specs obj -- )
+    [ from>> first2 "from" where-interval " and " 0% ]
+    [ to>> first2 "to" where-interval ] 2bi ;
+
+M: object where-object ( specs obj -- )
+    drop
+    dup column-name>> 0% " = " 0% bind% ;
+
+: where-clause ( tuple specs -- )
+    " where " 0% [
+        " and " 0%
+    ] [
+        2dup slot-name>> swap get-slot-named where-object
+    ] interleave drop ;
 
 M: sqlite-db <update-tuple-statement> ( class -- statement )
     [
@@ -158,9 +196,6 @@ M: sqlite-db <delete-tuple-statement> ( specs table -- sql )
 ! : select-interval ( interval name -- ) ;
 ! : select-sequence ( seq name -- ) ;
 
-M: sqlite-db bind% ( spec -- )
-    dup 1, column-name>> ":" prepend 0% ;
-
 M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
     [
         "select " 0%
@@ -168,8 +203,9 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
         [ dup column-name>> 0% 2, ] interleave
 
         " from " 0% 0%
+        dupd
         [ slot-name>> swap get-slot-named ] with subset
-        dup empty? [ drop ] [ where-clause ] if ";" 0%
+        dup empty? [ 2drop ] [ where-clause ] if ";" 0%
     ] sqlite-make ;
 
 M: sqlite-db modifier-table ( -- hashtable )

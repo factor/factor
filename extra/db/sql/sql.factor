@@ -55,15 +55,18 @@ TUPLE: no-sql-match ;
         { [ dup number? ] [ number>string sql% ] }
         { [ dup symbol? ] [ unparse sql% ] }
         { [ dup word? ] [ unparse sql% ] }
+        { [ dup quotation? ] [ call ] }
         [ T{ no-sql-match } throw ]
     } cond ;
 
 : parse-sql ( obj -- sql in-spec out-spec in out )
     [
         unclip {
-            { insert [ "insert into" sql% ] }
-            { update [ "update" sql% ] }
-            { delete [ "delete" sql% ] }
-            { select [ "select" sql% ] }
+            { \ create [ "create table" sql% ] }
+            { \ drop [ "drop table" sql% ] }
+            { \ insert [ "insert into" sql% ] }
+            { \ update [ "update" sql% ] }
+            { \ delete [ "delete" sql% ] }
+            { \ select [ "select" sql% ] }
         } case [ sql% ] each
     ] { "" { } { } { } { } } nmake ;
