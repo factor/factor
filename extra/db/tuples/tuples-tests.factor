@@ -308,15 +308,13 @@ C: <secret> secret
     [ ] [ T{ secret } select-tuples ] unit-test
     ;
 
-
-
-! [ test-random-id ] test-sqlite
- [ native-person-schema test-tuples ] test-sqlite
- [ assigned-person-schema test-tuples ] test-sqlite
- [ assigned-person-schema test-repeated-insert ] test-sqlite
- [ native-person-schema test-tuples ] test-postgresql
- [ assigned-person-schema test-tuples ] test-postgresql
- [ assigned-person-schema test-repeated-insert ] test-postgresql
+[ test-random-id ] test-sqlite
+[ native-person-schema test-tuples ] test-sqlite
+[ assigned-person-schema test-tuples ] test-sqlite
+[ assigned-person-schema test-repeated-insert ] test-sqlite
+[ native-person-schema test-tuples ] test-postgresql
+[ assigned-person-schema test-tuples ] test-postgresql
+[ assigned-person-schema test-repeated-insert ] test-postgresql
 
 ! \ insert-tuple must-infer
 ! \ update-tuple must-infer

@@ -20,7 +20,7 @@ M: sqlite-db db-open ( db -- db )
 M: sqlite-db db-close ( handle -- ) sqlite-close ;
 M: sqlite-db dispose ( db -- ) dispose-db ;
 
-TUPLE: sqlite-statement < throwable-statement ;
+TUPLE: sqlite-statement < statement ;
 
 TUPLE: sqlite-result-set < result-set has-more? ;
 
@@ -105,7 +105,8 @@ M: sqlite-db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
 : sqlite-make ( class quot -- )
     >r sql-props r>
     [ 0 sql-counter rot with-variable ] { "" { } { } } nmake
-    <simple-statement> ; inline
+    <simple-statement>
+    dup handle-random-id ; inline
 
 M: sqlite-db create-sql-statement ( class -- statement )
     [
@@ -223,7 +224,6 @@ M: sqlite-db modifier-table ( -- hashtable )
         { +native-id+ "primary key" }
         { +assigned-id+ "primary key" }
         { +random-id+ "primary key" }
-        ! { +nonnative-id+ "primary key" }
         { +autoincrement+ "autoincrement" }
         { +unique+ "unique" }
         { +default+ "default" }
@@ -236,7 +236,7 @@ M: sqlite-db compound-modifier ( str obj -- str' ) compound-type ;
 M: sqlite-db compound-type ( str seq -- str' )
     over {
         { "default" [ first number>string join-space ] }
-        [ 2drop ] !  "no sqlite compound data type" 3array throw ]
+        [ 2drop ] 
     } case ;
 
 M: sqlite-db type-table ( -- assoc )

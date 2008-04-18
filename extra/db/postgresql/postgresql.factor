@@ -11,7 +11,7 @@ IN: db.postgresql
 TUPLE: postgresql-db < db
     host port pgopts pgtty db user pass ;
 
-TUPLE: postgresql-statement < throwable-statement ;
+TUPLE: postgresql-statement < statement ;
 
 TUPLE: postgresql-result-set < result-set ;
 

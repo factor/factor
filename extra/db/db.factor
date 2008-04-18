@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations kernel math
 namespaces sequences sequences.lib classes.tuple words strings
-tools.walker accessors ;
+tools.walker accessors combinators.lib ;
 IN: db
 
 TUPLE: db
@@ -36,18 +36,38 @@ HOOK: db-close db ( handle -- )
     ] with-variable ;
 
 ! TUPLE: sql sql in-params out-params ;
-TUPLE: statement handle sql in-params out-params bind-params bound? ;
+TUPLE: statement handle sql in-params out-params bind-params bound? type quot ;
 TUPLE: simple-statement < statement ;
 TUPLE: prepared-statement < statement ;
-TUPLE: nonthrowable-statement < statement ;
-TUPLE: throwable-statement < statement ;
+
+SINGLETON: throwable
+SINGLETON: nonthrowable
+SINGLETON: retryable
+
+: make-throwable ( obj -- obj' )
+    dup sequence? [
+        [ make-throwable ] map
+    ] [
+        throwable >>type
+    ] if ;
 
 : make-nonthrowable ( obj -- obj' )
     dup sequence? [
         [ make-nonthrowable ] map
     ] [
-        nonthrowable-statement construct-delegate
+        nonthrowable >>type
     ] if ;
+
+: make-retryable ( obj quot -- obj' )
+    over sequence? [
+        [ make-retryable ] curry map
+    ] [
+        >>quot
+        retryable >>type
+    ] if ;
+
+: handle-random-id ( statement -- )
+    drop ;
 
 TUPLE: result-set sql in-params out-params handle n max ;
 
@@ -55,7 +75,8 @@ TUPLE: result-set sql in-params out-params handle n max ;
     new
         swap >>out-params
         swap >>in-params
-        swap >>sql ;
+        swap >>sql
+        throwable >>type ;
 
 HOOK: <simple-statement> db ( str in out -- statement )
 HOOK: <prepared-statement> db ( str in out -- statement )
@@ -70,20 +91,25 @@ GENERIC# row-column-typed 1 ( result-set column -- sql )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 
-GENERIC: execute-statement ( statement -- )
+GENERIC: execute-statement* ( statement type -- )
 
-M: throwable-statement execute-statement ( statement -- )
-    dup sequence? [
-        [ execute-statement ] each
-    ] [
-        query-results dispose
-    ] if ;
+M: throwable execute-statement* ( statement type -- )
+    drop query-results dispose ;
 
-M: nonthrowable-statement execute-statement ( statement -- )
-    dup sequence? [
-        [ execute-statement ] each
-    ] [
+M: nonthrowable execute-statement* ( statement type -- )
+    drop [ query-results dispose ] [ 2drop ] recover ;
+
+M: retryable execute-statement* ( statement type -- )
+    [
+        dup dup quot>> call
         [ query-results dispose ] [ 2drop ] recover
+    ] curry 10 retry ;
+
+: execute-statement ( statement -- )
+    dup sequence? [
+        [ execute-statement ] each
+    ] [
+        dup type>> execute-statement*
     ] if ;
 
 : bind-statement ( obj statement -- )
