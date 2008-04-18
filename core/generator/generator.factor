@@ -16,7 +16,7 @@ SYMBOL: compiled
         { [ dup compiled get key? ] [ drop ] }
         { [ dup inlined-block? ] [ drop ] }
         { [ dup primitive? ] [ drop ] }
-        { [ t ] [ dup compile-queue get set-at ] }
+        [ dup compile-queue get set-at ]
     } cond ;
 
 : maybe-compile ( word -- )
@@ -131,14 +131,14 @@ M: #loop generate-node
 
 : generate-if ( node label -- next )
     <label> [
-        >r >r node-children first2 generate-branch
+        >r >r node-children first2 swap generate-branch
         r> r> end-false-branch resolve-label
         generate-branch
         init-templates
     ] keep resolve-label iterate-next ;
 
 M: #if generate-node
-    [ <label> dup %jump-t ]
+    [ <label> dup %jump-f ]
     H{ { +input+ { { f "flag" } } } }
     with-template
     generate-if ;
@@ -189,20 +189,20 @@ M: #dispatch generate-node
     "if-intrinsics" set-word-prop ;
 
 : if>boolean-intrinsic ( quot -- )
-    "true" define-label
+    "false" define-label
     "end" define-label
-    "true" get swap call
-    f "if-scratch" get load-literal
-    "end" get %jump-label
-    "true" resolve-label
+    "false" get swap call
     t "if-scratch" get load-literal
+    "end" get %jump-label
+    "false" resolve-label
+    f "if-scratch" get load-literal
     "end" resolve-label
     "if-scratch" get phantom-push ; inline
 
 : define-if>boolean-intrinsics ( word intrinsics -- )
     [
         >r [ if>boolean-intrinsic ] curry r>
-        { { f "if-scratch" } } +scratch+ associate union
+        { { f "if-scratch" } } +scratch+ associate assoc-union
     ] assoc-map "intrinsics" set-word-prop ;
 
 : define-if-intrinsics ( word intrinsics -- )

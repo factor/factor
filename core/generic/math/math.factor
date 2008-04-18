@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
-sequences.private classes classes.algebra definitions ;
+sequences.private classes classes.builtin classes.algebra
+definitions ;
 IN: generic.math
 
 PREDICATE: math-class < class
@@ -18,7 +19,7 @@ PREDICATE: math-class < class
     {
         { [ dup null class< ] [ drop { -1 -1 } ] }
         { [ dup math-class? ] [ class-types last/first ] }
-        { [ t ] [ drop { 100 100 } ] }
+        [ drop { 100 100 } ]
     } cond ;
     
 : math-class-max ( class class -- class )

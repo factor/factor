@@ -5,9 +5,10 @@ USING: alien arrays generic generic.standard assocs io kernel
 math namespaces sequences strings io.styles io.streams.string
 vectors words prettyprint.backend prettyprint.sections
 prettyprint.config sorting splitting math.parser vocabs
-definitions effects classes.tuple io.files classes continuations
-hashtables classes.mixin classes.union classes.predicate
-classes.singleton combinators quotations ;
+definitions effects classes.builtin classes.tuple io.files
+classes continuations hashtables classes.mixin classes.union
+classes.predicate classes.singleton combinators quotations
+sets ;
 
 : make-pprint ( obj quot -- block in use )
     [
@@ -107,7 +108,7 @@ SYMBOL: ->
                 { [ dup word? not ] [ , ] }
                 { [ dup "break?" word-prop ] [ drop ] }
                 { [ dup "step-into?" word-prop ] [ remove-step-into ] }
-                { [ t ] [ , ] }
+                [ , ]
             } cond
         ] each
     ] [ ] make ;

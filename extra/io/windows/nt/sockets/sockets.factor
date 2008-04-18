@@ -2,7 +2,7 @@ USING: alien alien.accessors alien.c-types byte-arrays
 continuations destructors io.nonblocking io.timeouts io.sockets
 io.sockets.impl io namespaces io.streams.duplex io.windows
 io.windows.nt.backend windows.winsock kernel libc math sequences
-threads classes.tuple.lib system ;
+threads classes.tuple.lib system accessors ;
 IN: io.windows.nt.sockets
 
 : malloc-int ( object -- object )
@@ -50,9 +50,9 @@ TUPLE: ConnectEx-args port
     2dup save-callback
     get-overlapped-result drop ;
 
-M: winnt (client) ( addrspec -- client-in client-out )
+M: winnt ((client)) ( addrspec -- client-in client-out )
     [
-        \ ConnectEx-args construct-empty
+        \ ConnectEx-args new
         over make-sockaddr/size pick init-connect
         over tcp-socket over set-ConnectEx-args-s*
         dup ConnectEx-args-s* add-completion
@@ -122,8 +122,8 @@ TUPLE: AcceptEx-args port
 M: winnt (accept) ( server -- addrspec handle )
     [
         [
-            dup check-server-port
-            \ AcceptEx-args construct-empty
+            check-server-port
+            \ AcceptEx-args new
             [ init-accept ] keep
             [ ((accept)) ] keep
             [ accept-continuation ] keep
@@ -159,7 +159,7 @@ TUPLE: WSARecvFrom-args port
 : init-WSARecvFrom ( datagram WSARecvFrom -- )
     [ set-WSARecvFrom-args-port ] 2keep
     [
-        >r delegate port-handle delegate win32-file-handle r>
+        >r handle>> handle>> r>
         set-WSARecvFrom-args-s*
     ] 2keep [
         >r datagram-port-addr sockaddr-type heap-size r>
@@ -192,8 +192,8 @@ TUPLE: WSARecvFrom-args port
 
 M: winnt receive ( datagram -- packet addrspec )
     [
-        dup check-datagram-port
-        \ WSARecvFrom-args construct-empty
+        check-datagram-port
+        \ WSARecvFrom-args new
         [ init-WSARecvFrom ] keep
         [ call-WSARecvFrom ] keep
         [ WSARecvFrom-continuation ] keep
@@ -244,8 +244,8 @@ USE: io.sockets
 
 M: winnt send ( packet addrspec datagram -- )
     [
-        3dup check-datagram-send
-        \ WSASendTo-args construct-empty
+        check-datagram-send
+        \ WSASendTo-args new
         [ init-WSASendTo ] keep
         [ call-WSASendTo ] keep
         [ WSASendTo-continuation ] keep

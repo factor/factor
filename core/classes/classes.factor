@@ -30,19 +30,10 @@ SYMBOL: update-map
 PREDICATE: class < word
     "class" word-prop ;
 
-SYMBOL: builtins
-
-PREDICATE: builtin-class < class
-    "metaclass" word-prop builtin-class eq? ;
-
 PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
 : classes ( -- seq ) all-words [ class? ] subset ;
-
-: type>class ( n -- class ) builtins get-global nth ;
-
-: bootstrap-type>class ( n -- class ) builtins get nth ;
 
 : predicate-word ( word -- predicate )
     [ word-name "?" append ] keep word-vocabulary create ;
@@ -98,7 +89,7 @@ M: word reset-class drop ;
     dup reset-class
     dup deferred? [ dup define-symbol ] when
     dup word-props
-    r> union over set-word-props
+    r> assoc-union over set-word-props
     dup predicate-word
     [ 1quotation "predicate" set-word-prop ]
     [ swap "predicating" set-word-prop ]
@@ -129,10 +120,6 @@ GENERIC: update-methods ( assoc -- )
     2tri ;
 
 GENERIC: class ( object -- class )
-
-M: hi-tag class hi-tag type>class ;
-
-M: object class tag type>class ;
 
 : instance? ( obj class -- ? )
     "predicate" word-prop call ;

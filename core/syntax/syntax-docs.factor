@@ -1,6 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes generic.standard classes.tuple generic.math
-arrays io.files vocabs.loader io sequences assocs ;
+generic.standard arrays io.files vocabs.loader io sequences
+assocs ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -332,8 +333,8 @@ HELP: C{
 { $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: T{
-{ $syntax "T{ class delegate slots... }" }
-{ $values { "class" "a tuple class word" } { "delegate" "a delegate" } { "slots" "list of objects" } }
+{ $syntax "T{ class slots... }" }
+{ $values { "class" "a tuple class word" } { "slots" "list of objects" } }
 { $description "Marks the beginning of a literal tuple. Literal tuples are terminated by " { $link POSTPONE: } } "."
 $nl
 "The class word must always be specified. If an insufficient number of values is given after the class word, the remaining slots of the tuple are set to " { $link f } ". If too many values are given, they are ignored." } ;
@@ -564,21 +565,29 @@ HELP: TUPLE:
 HELP: ERROR:
 { $syntax "ERROR: class slots... ;" }
 { $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class.  Defines a new word " { $snippet "class?" } " that boa-constructs this tuple and throws it." } ;
-
-{ POSTPONE: ERROR: POSTPONE: TUPLE: } related-words
+{ $description "Defines a new tuple class whose class word throws a new instance of the error." }
+{ $notes
+    "The following two snippets are equivalent:"
+    { $code
+        "ERROR: invalid-values x y ;"
+        ""
+        "TUPLE: invalid-values x y ;"
+        ": invalid-values ( x y -- * )"
+        "    \\ invalid-values boa throw ;"
+    }
+} ;
 
 HELP: C:
 { $syntax "C: constructor class" }
 { $values { "constructor" "a new word to define" } { "class" tuple-class } }
-{ $description "Define a constructor word for a tuple class which simply performs BOA (by order of arguments) construction using " { $link construct-boa } "." }
+{ $description "Define a constructor word for a tuple class which simply performs BOA (by order of arguments) construction using " { $link boa } "." }
 { $examples
     "Suppose the following tuple has been defined:"
     { $code "TUPLE: color red green blue ;" }
     "The following two lines are equivalent:"
     { $code
         "C: <color> color"
-        ": <color> color construct-boa ;"
+        ": <color> color boa ;"
     }
     "In both cases, a word " { $snippet "<color>" } " is defined, which reads three values from the stack and creates a " { $snippet "color" } " instance having these values in the " { $snippet "red" } ", " { $snippet "green" } " and " { $snippet "blue" } " slots, respectively."
 } ;
@@ -632,5 +641,19 @@ HELP: <<
 HELP: >>
 { $syntax ">>" }
 { $description "Marks the end of a parse time code block." } ;
+
+HELP: call-next-method
+{ $description "Calls the next applicable method. Only valid inside a method definition. The values at the top of the stack are passed on to the next method, and they must be compatible with that method's class specializer." }
+{ $notes "This is syntax sugar around " { $link (call-next-method) } ". The following two lines are equivalent:"
+    { $code
+        "M: my-class my-generic ... call-next-method ... ;"
+        "M: my-class my-generic ... \\ my-class \\ my-generic (call-next-method) ... ;"
+    }
+"In most cases, this word should be called with the original input values on the stack. Calling it with other values is usually a sign of poor design." }
+{ $errors
+    "Throws a " { $link no-next-method } " error if this is the least specific method, and throws an " { $link inconsistent-next-method } " error if the values at the top of the stack are not compatible with the current method's specializer."
+} ;
+
+{ POSTPONE: call-next-method (call-next-method) next-method } related-words
 
 { POSTPONE: << POSTPONE: >> } related-words

@@ -3,10 +3,10 @@
 USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes
-classes.tuple classes.tuple.private kernel.private vocabs
-vocabs.loader source-files definitions slots.deprecated
-classes.union compiler.units bootstrap.image.private io.files
-accessors combinators ;
+classes.builtin classes.tuple classes.tuple.private
+kernel.private vocabs vocabs.loader source-files definitions
+slots.deprecated classes.union compiler.units
+bootstrap.image.private io.files accessors combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -30,7 +30,7 @@ crossref off
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
-H{ } clone changed-words set
+H{ } clone changed-definitions set
 H{ } clone forgotten-definitions set
 H{ } clone root-cache set
 H{ } clone source-files set
@@ -390,7 +390,7 @@ define-builtin
 
 ! Create special tombstone values
 "tombstone" "hashtables.private" create
-"tuple" "kernel" lookup
+tuple
 { } define-tuple-class
 
 "((empty))" "hashtables.private" create
@@ -403,7 +403,7 @@ define-builtin
 
 ! Some tuple classes
 "hashtable" "hashtables" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "array-capacity" "sequences.private" }
@@ -424,7 +424,7 @@ define-builtin
 } define-tuple-class
 
 "sbuf" "sbufs" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "string" "strings" }
@@ -440,7 +440,7 @@ define-builtin
 } define-tuple-class
 
 "vector" "vectors" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "array" "arrays" }
@@ -456,7 +456,7 @@ define-builtin
 } define-tuple-class
 
 "byte-vector" "byte-vectors" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "byte-array" "byte-arrays" }
@@ -472,7 +472,7 @@ define-builtin
 } define-tuple-class
 
 "bit-vector" "bit-vectors" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "bit-array" "bit-arrays" }
@@ -488,7 +488,7 @@ define-builtin
 } define-tuple-class
 
 "float-vector" "float-vectors" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "float-array" "float-arrays" }
@@ -504,7 +504,7 @@ define-builtin
 } define-tuple-class
 
 "curry" "kernel" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "object" "kernel" }
@@ -525,7 +525,7 @@ define-builtin
 [ tuple-layout [ <tuple-boa> ] curry ] tri define
 
 "compose" "kernel" create
-"tuple" "kernel" lookup
+tuple
 {
     {
         { "object" "kernel" }
@@ -640,8 +640,7 @@ define-builtin
     { "setenv" "kernel.private" }
     { "(exists?)" "io.files.private" }
     { "(directory)" "io.files.private" }
-    { "data-gc" "memory" }
-    { "code-gc" "memory" }
+    { "gc" "memory" }
     { "gc-time" "memory" }
     { "save-image" "memory" }
     { "save-image-and-exit" "memory" }
@@ -733,11 +732,14 @@ define-builtin
     { "set-innermost-frame-quot" "kernel.private" }
     { "call-clear" "kernel" }
     { "(os-envs)" "system.private" }
+    { "set-os-env" "system" }
+    { "unset-os-env" "system" }
     { "(set-os-envs)" "system.private" }
     { "resize-byte-array" "byte-arrays" }
     { "resize-bit-array" "bit-arrays" }
     { "resize-float-array" "float-arrays" }
     { "dll-valid?" "alien" }
+    { "unimplemented" "kernel.private" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 

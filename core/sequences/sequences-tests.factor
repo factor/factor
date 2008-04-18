@@ -1,6 +1,6 @@
 USING: arrays kernel math namespaces sequences kernel.private
 sequences.private strings sbufs tools.test vectors bit-arrays
-generic ;
+generic vocabs.loader ;
 IN: sequences.tests
 
 [ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
@@ -100,6 +100,16 @@ unit-test
 [ [ ] ] [ [ 1 2 3 ] 3 tail ] unit-test
 [ [ 3 ] ] [ [ 1 2 3 ] 2 tail ] unit-test
 
+[ "blah" ] [ "blahxx" 2 head* ] unit-test
+
+[ "xx" ] [ "blahxx" 2 tail* ] unit-test
+
+[ t ] [ "xxfoo" 2 head-slice "xxbar" 2 head-slice = ] unit-test
+[ t ] [ "xxfoo" 2 head-slice "xxbar" 2 head-slice [ hashcode ] bi@ = ] unit-test
+
+[ t ] [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* = ] unit-test
+[ t ] [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* [ hashcode ] bi@ = ] unit-test
+
 [ t ] [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
 [ t ] [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test
 [ t ] [ { 1 2 3 } [ 1 2 3 ] sequence= ] unit-test
@@ -195,6 +205,12 @@ unit-test
 ! Pathological case
 [ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test
 
+[ t ] [ "hi" <reversed> SBUF" hi" <reversed> = ] unit-test
+
+[ t ] [ "hi" <reversed> SBUF" hi" <reversed> = ] unit-test
+
+[ t ] [ "hi" <reversed> SBUF" hi" <reversed> [ hashcode ] bi@ = ] unit-test
+
 [ -10 "hi" "bye" copy ] must-fail
 [ 10 "hi" "bye" copy ] must-fail
 
@@ -224,8 +240,8 @@ unit-test
 
 [ ?{ f t } ] [ 0 2 ?{ f t f } subseq ] unit-test
 
-[ V{ f f f } ] [ 3 V{ } new ] unit-test
-[ SBUF" \0\0\0" ] [ 3 SBUF" " new ] unit-test
+[ V{ f f f } ] [ 3 V{ } new-sequence ] unit-test
+[ SBUF" \0\0\0" ] [ 3 SBUF" " new-sequence ] unit-test
 
 [ 0 ] [ f length ] unit-test
 [ f first ] must-fail
@@ -244,3 +260,5 @@ unit-test
 [ "asdf " ] [ " asdf " [ CHAR: \s = ] left-trim ] unit-test
 [ " asdf" ] [ " asdf " [ CHAR: \s = ] right-trim ] unit-test
 
+! Hardcore
+[ ] [ "sequences" reload ] unit-test

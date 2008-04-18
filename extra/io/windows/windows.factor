@@ -5,7 +5,7 @@ io.buffers io.files io.nonblocking io.sockets io.binary
 io.sockets.impl windows.errors strings io.streams.duplex
 kernel math namespaces sequences windows windows.kernel32
 windows.shell32 windows.types windows.winsock splitting
-continuations math.bitfields system ;
+continuations math.bitfields system accessors ;
 IN: io.windows
 
 M: windows destruct-handle CloseHandle drop ;
@@ -32,7 +32,8 @@ M: windows normalize-directory ( string -- string )
 
 : default-security-attributes ( -- obj )
     "SECURITY_ATTRIBUTES" <c-object>
-    "SECURITY_ATTRIBUTES" heap-size over set-SECURITY_ATTRIBUTES-nLength ;
+    "SECURITY_ATTRIBUTES" heap-size
+    over set-SECURITY_ATTRIBUTES-nLength ;
 
 : security-attributes-inherit ( -- obj )
     default-security-attributes
@@ -47,8 +48,8 @@ M: win32-file close-handle ( handle -- )
 ! Clean up resources (open handle) if add-completion fails
 : open-file ( path access-mode create-mode flags -- handle )
     [
-        >r >r
-        share-mode security-attributes-inherit r> r> CreateFile-flags f CreateFile
+        >r >r share-mode security-attributes-inherit r> r>
+        CreateFile-flags f CreateFile
         dup invalid-handle? dup close-later
         dup add-completion
     ] with-destructors ;
@@ -91,19 +92,20 @@ M: win32-file close-handle ( handle -- )
     ] when drop ;
 
 : open-append ( path -- handle length )
-    [ dup file-info file-info-size ] [ drop 0 ] recover
+    [ dup file-info size>> ] [ drop 0 ] recover
     >r (open-append) r> 2dup set-file-pointer ;
 
 TUPLE: FileArgs
-    hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRet lpOverlapped ;
+    hFile lpBuffer nNumberOfBytesToRead
+    lpNumberOfBytesRet lpOverlapped ;
 
 C: <FileArgs> FileArgs
 
 : make-FileArgs ( port -- <FileArgs> )
     [ port-handle win32-file-handle ] keep
-    [ delegate ] keep
+    [ buffer>> ] keep
     [
-        buffer-length
+        buffer>> buffer-length
         "DWORD" <c-object>
     ] keep FileArgs-overlapped <FileArgs> ;
 
@@ -150,11 +152,10 @@ M: windows delete-directory ( path -- )
 
 HOOK: WSASocket-flags io-backend ( -- DWORD )
 
-TUPLE: win32-socket ;
+TUPLE: win32-socket < win32-file ;
 
 : <win32-socket> ( handle -- win32-socket )
-    f <win32-file>
-    \ win32-socket construct-delegate ;
+    f win32-file boa ;
 
 : open-socket ( family type -- socket )
     0 f 0 WSASocket-flags WSASocket dup socket-error ;
@@ -195,4 +196,3 @@ M: windows addrinfo-error ( n -- )
 
 : tcp-socket ( addrspec -- socket )
     protocol-family SOCK_STREAM open-socket ;
-

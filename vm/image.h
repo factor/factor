@@ -28,7 +28,7 @@ typedef struct {
 typedef struct {
 	const F_CHAR* image;
 	CELL ds_size, rs_size;
-	CELL gen_count, young_size, aging_size;
+	CELL gen_count, young_size, aging_size, tenured_size;
 	CELL code_size;
 	bool secure_gc;
 	bool fep;

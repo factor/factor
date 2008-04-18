@@ -37,11 +37,8 @@ HELP: instances
 { $description "Outputs a sequence of all objects in the heap which satisfy the quotation." }
 { $notes "This word relies on " { $link each-object } ", so in particular the garbage collector is switched off while it runs and the given quotation must not allocate too much memory." } ;
 
-HELP: data-gc ( -- )
+HELP: gc ( -- )
 { $description "Performs a full garbage collection." } ;
-
-HELP: code-gc ( -- )
-{ $description "Collects all generations up to and including tenured space, and also collects the code heap." } ;
 
 HELP: gc-time ( -- n )
 { $values { "n" "a timestamp in milliseconds" } }

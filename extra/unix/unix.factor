@@ -43,6 +43,9 @@ FUNCTION: int dup2 ( int oldd, int newd ) ;
 FUNCTION: int execv ( char* path, char** argv ) ;
 FUNCTION: int execvp ( char* path, char** argv ) ;
 FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
+: _exit ( status -- * )
+    #! We throw to give this a terminating stack effect.
+    "int" f "_exit" { "int" } alien-invoke "Exit failed" throw ;
 FUNCTION: int fchdir ( int fd ) ;
 FUNCTION: int fchown ( int fd, uid_t owner, gid_t group ) ;
 FUNCTION: int fcntl ( int fd, int cmd, int arg ) ;

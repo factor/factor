@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser generic kernel classes words slots assocs sequences arrays
-vectors definitions prettyprint combinators.lib math hashtables ;
+vectors definitions prettyprint combinators.lib math hashtables sets ;
 IN: delegate
 
 : protocol-words ( protocol -- words )
@@ -51,14 +51,14 @@ M: tuple-class group-words
     protocol-consult keys ;
 
 : lost-words ( protocol wordlist -- lost-words )
-    >r protocol-words r> seq-diff ;
+    >r protocol-words r> diff ;
 
 : forget-old-definitions ( protocol new-wordlist -- )
     values [ drop protocol-users ] [ lost-words ] 2bi
     forget-all-methods ;
 
 : added-words ( protocol wordlist -- added-words )
-    swap protocol-words seq-diff ;
+    swap protocol-words diff ;
 
 : add-new-definitions ( protocol wordlist -- )
      dupd added-words >r protocol-consult >alist r>

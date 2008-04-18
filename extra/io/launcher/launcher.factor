@@ -3,7 +3,7 @@
 USING: io io.backend io.timeouts system kernel namespaces
 strings hashtables sequences assocs combinators vocabs.loader
 init threads continuations math io.encodings io.streams.duplex
-io.nonblocking accessors ;
+io.nonblocking accessors concurrency.flags ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -41,7 +41,7 @@ SYMBOL: +highest-priority+
 SYMBOL: +realtime-priority+
 
 : <process> ( -- process )
-    process construct-empty
+    process new
     H{ } clone >>environment
     +append-environment+ >>environment-mode ;
 
@@ -56,14 +56,25 @@ SYMBOL: processes
 
 [ H{ } clone processes set-global ] "io.launcher" add-init-hook
 
-HOOK: register-process io-backend ( process -- )
+HOOK: wait-for-processes io-backend ( -- ? )
 
-M: object register-process drop ;
+SYMBOL: wait-flag
+
+: wait-loop ( -- )
+    processes get assoc-empty?
+    [ wait-flag get-global lower-flag ]
+    [ wait-for-processes [ 100 sleep ] when ] if ;
+
+: start-wait-thread ( -- )
+    <flag> wait-flag set-global
+    [ wait-loop t ] "Process wait" spawn-server drop ;
+
+[ start-wait-thread ] "io.launcher" add-init-hook
 
 : process-started ( process handle -- )
     >>handle
-    V{ } clone over processes get set-at
-    register-process ;
+    V{ } clone swap processes get set-at
+    wait-flag get-global raise-flag ;
 
 M: process hashcode* process-handle hashcode* ;
 
@@ -74,8 +85,8 @@ M: process hashcode* process-handle hashcode* ;
 : get-environment ( process -- env )
     dup environment>>
     swap environment-mode>> {
-        { +prepend-environment+ [ os-envs union ] }
-        { +append-environment+ [ os-envs swap union ] }
+        { +prepend-environment+ [ os-envs assoc-union ] }
+        { +append-environment+ [ os-envs swap assoc-union ] }
         { +replace-environment+ [ ] }
     } case ;
 
@@ -119,7 +130,7 @@ HOOK: run-process* io-backend ( process -- handle )
 TUPLE: process-failed code ;
 
 : process-failed ( code -- * )
-    \ process-failed construct-boa throw ;
+    \ process-failed boa throw ;
 
 : try-process ( desc -- )
     run-process wait-for-process dup zero?
@@ -139,18 +150,18 @@ M: process timed-out kill-process ;
 
 HOOK: (process-stream) io-backend ( process -- handle in out )
 
-TUPLE: process-stream process ;
+: <process-stream*> ( desc encoding -- stream process )
+    >r >process dup dup (process-stream) <reader&writer>
+    r> <encoder-duplex> -roll
+    process-started ;
 
 : <process-stream> ( desc encoding -- stream )
-    >r >process dup dup (process-stream)
-    >r >r process-started process-stream construct-boa
-    r> r> <reader&writer> r> <encoder-duplex>
-    over set-delegate ;
+    <process-stream*> drop ; inline
 
 : with-process-stream ( desc quot -- status )
-    swap <process-stream>
+    swap <process-stream*> >r
     [ swap with-stream ] keep
-    process>> wait-for-process ; inline
+    r> wait-for-process ; inline
 
 : notify-exit ( process status -- )
     >>status

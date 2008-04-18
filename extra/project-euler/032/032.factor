@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib hashtables kernel math math.combinatorics math.functions
-    math.parser math.ranges project-euler.common sequences ;
+    math.parser math.ranges project-euler.common sequences sets ;
 IN: project-euler.032
 
 ! http://projecteuler.net/index.php?section=problems&id=32

@@ -4,7 +4,7 @@ USING: inference.dataflow inference.state arrays generic io
 io.streams.string kernel math namespaces parser prettyprint
 sequences strings vectors words quotations effects classes
 continuations debugger assocs combinators compiler.errors
-generic.standard.engines.tuple ;
+generic.standard.engines.tuple accessors ;
 IN: inference.backend
 
 : recursive-label ( word -- label/f )
@@ -15,7 +15,7 @@ GENERIC: inline? ( word -- ? )
 M: method-body inline?
     "method-generic" word-prop inline? ;
 
-M: tuple-dispatch-engine-word inline?
+M: engine-word inline?
     "tuple-dispatch-generic" word-prop inline? ;
 
 M: word inline?
@@ -32,18 +32,16 @@ M: word inline?
 : recursive-quotation? ( quot -- ? )
     local-recursive-state [ first eq? ] with contains? ;
 
-TUPLE: inference-error rstate type ;
+TUPLE: inference-error error type rstate ;
 
-M: inference-error compiler-error-type
-    inference-error-type ;
+M: inference-error compiler-error-type type>> ;
+
+M: inference-error error-help error>> error-help ;
 
 : (inference-error) ( ... class type -- * )
-    >r construct-boa r>
-    recursive-state get {
-        set-delegate
-        set-inference-error-type
-        set-inference-error-rstate
-    } \ inference-error construct throw ; inline
+    >r boa r>
+    recursive-state get
+    \ inference-error boa throw ; inline
 
 : inference-error ( ... class -- * )
     +error+ (inference-error) ; inline
@@ -132,25 +130,27 @@ TUPLE: too-many->r ;
 
 TUPLE: too-many-r> ;
 
-: check-r> ( -- )
-    meta-r get empty?
+: check-r> ( n -- )
+    meta-r get length >
     [ \ too-many-r> inference-error ] when ;
 
-: infer->r ( -- )
-    1 ensure-values
+: infer->r ( n -- )
+    dup ensure-values
     #>r
-    1 0 pick node-inputs
-    pop-d push-r
-    0 1 pick node-outputs
-    node, ;
+    over 0 pick node-inputs
+    over [ drop pop-d ] map reverse [ push-r ] each
+    0 pick pick node-outputs
+    node,
+    drop ;
 
-: infer-r> ( -- )
-    check-r>
+: infer-r> ( n -- )
+    dup check-r>
     #r>
-    0 1 pick node-inputs
-    pop-r push-d
-    1 0 pick node-outputs
-    node, ;
+    0 pick pick node-inputs
+    over [ drop pop-r ] map reverse [ push-d ] each
+    over 0 pick node-outputs
+    node,
+    drop ;
 
 : undo-infer ( -- )
     recorded get [ f "inferred-effect" set-word-prop ] each ;
@@ -201,18 +201,18 @@ M: object constructor drop f ;
     dup infer-uncurry
     constructor [
         peek-d reify-curry
-        infer->r
+        1 infer->r
         peek-d reify-curry
-        infer-r>
+        1 infer-r>
         2 1 <effect> swap #call consume/produce
     ] when* ;
 
 : reify-curries ( n -- )
     meta-d get reverse [
         dup special? [
-            over [ infer->r ] times
+            over infer->r
             dup reify-curry
-            over [ infer-r> ] times
+            over infer-r>
         ] when 2drop
     ] 2each ;
 
@@ -253,7 +253,7 @@ TUPLE: cannot-unify-specials ;
         { [ dup [ curried? ] all? ] [ unify-curries ] }
         { [ dup [ composed? ] all? ] [ unify-composed ] }
         { [ dup [ special? ] contains? ] [ cannot-unify-specials ] }
-        { [ t ] [ drop <computed> ] }
+        [ drop <computed> ]
     } cond ;
 
 : unify-stacks ( seq -- stack )
@@ -363,7 +363,7 @@ TUPLE: effect-error word effect ;
     \ effect-error inference-error ;
 
 : check-effect ( word effect -- )
-    dup pick "declared-effect" word-prop effect<=
+    dup pick stack-effect effect<=
     [ 2drop ] [ effect-error ] if ;
 
 : finish-word ( word -- )
@@ -397,7 +397,7 @@ TUPLE: effect-error word effect ;
         { [ dup "infer" word-prop ] [ custom-infer ] }
         { [ dup "no-effect" word-prop ] [ no-effect ] }
         { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
-        { [ t ] [ dup infer-word make-call-node ] }
+        [ dup infer-word make-call-node ]
     } cond ;
 
 TUPLE: recursive-declare-error word ;

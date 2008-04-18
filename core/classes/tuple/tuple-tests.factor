@@ -7,7 +7,7 @@ calendar prettyprint io.streams.string splitting inspector ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
-: <rect> rect construct-boa ;
+: <rect> rect boa ;
 
 : move ( x rect -- rect )
     [ + ] change-x ;
@@ -15,25 +15,6 @@ TUPLE: rect x y w h ;
 [ f ] [ 10 20 30 40 <rect> dup clone 5 swap move = ] unit-test
 
 [ t ] [ 10 20 30 40 <rect> dup clone 0 swap move = ] unit-test
-
-GENERIC: delegation-test
-M: object delegation-test drop 3 ;
-TUPLE: quux-tuple ;
-: <quux-tuple> quux-tuple construct-empty ;
-M: quux-tuple delegation-test drop 4 ;
-TUPLE: quuux-tuple ;
-: <quuux-tuple> { set-delegate } quuux-tuple construct ;
-
-[ 3 ] [ <quux-tuple> <quuux-tuple> delegation-test ] unit-test
-
-GENERIC: delegation-test-2
-TUPLE: quux-tuple-2 ;
-: <quux-tuple-2> quux-tuple-2 construct-empty ;
-M: quux-tuple-2 delegation-test-2 drop 4 ;
-TUPLE: quuux-tuple-2 ;
-: <quuux-tuple-2> { set-delegate } quuux-tuple-2 construct ;
-
-[ 4 ] [ <quux-tuple-2> <quuux-tuple-2> delegation-test-2 ] unit-test
 
 ! Make sure we handle tuple class redefinition
 TUPLE: redefinition-test ;
@@ -101,11 +82,6 @@ TUPLE: empty ;
 C: <empty> empty
 
 [ t ] [ <empty> hashcode fixnum? ] unit-test
-
-TUPLE: delegate-clone ;
-
-[ T{ delegate-clone T{ empty f } } ]
-[ T{ delegate-clone T{ empty f } } clone ] unit-test
 
 ! Compiler regression
 [ t length ] [ object>> t eq? ] must-fail-with
@@ -222,8 +198,8 @@ SYMBOL: not-a-tuple-class
 ] unit-test
 
 ! Missing check
-[ not-a-tuple-class construct-boa ] must-fail
-[ not-a-tuple-class construct-empty ] must-fail
+[ not-a-tuple-class boa ] must-fail
+[ not-a-tuple-class new ] must-fail
 
 TUPLE: erg's-reshape-problem a b c d ;
 
@@ -231,8 +207,8 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 
 ! We want to make sure constructors are recompiled when
 ! tuples are reshaped
-: cons-test-1 \ erg's-reshape-problem construct-empty ;
-: cons-test-2 \ erg's-reshape-problem construct-boa ;
+: cons-test-1 \ erg's-reshape-problem new ;
+: cons-test-2 \ erg's-reshape-problem boa ;
 
 "IN: classes.tuple.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
 
@@ -242,7 +218,7 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 
 [
     "IN: classes.tuple.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
-] [ [ no-tuple-class? ] is? ] must-fail-with
+] [ error>> no-tuple-class? ] must-fail-with
 
 ! Inheritance
 TUPLE: computer cpu ram ;
@@ -512,7 +488,7 @@ USE: vocabs
     ] with-compilation-unit
 ] unit-test
 
-[ "USE: words T{ word }" eval ] [ [ no-method? ] is? ] must-fail-with
+[ "USE: words T{ word }" eval ] [ error>> no-method? ] must-fail-with
 
 ! Accessors not being forgotten...
 [ [ ] ] [
@@ -553,3 +529,15 @@ TUPLE: another-forget-accessors-test ;
 ] unit-test
 
 [ t ] [ \ another-forget-accessors-test class? ] unit-test
+
+! Shadowing test
+[ f ] [
+    t parser-notes? [
+        [
+            "IN: classes.tuple.tests TUPLE: shadow-1 a b ; TUPLE: shadow-2 < shadow-1 a b ;" eval
+        ] with-string-writer empty?
+    ] with-variable
+] unit-test
+
+! Missing error check
+[ "IN: tuples.test USE: words TUPLE: wrong-superclass < word ;" eval ] must-fail

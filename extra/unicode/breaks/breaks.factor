@@ -1,6 +1,6 @@
 USING: unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
-combinators.lib assocs.lib math.ranges unicode.normalize
+math.ranges unicode.normalize
 unicode.syntax unicode.data compiler.units alien.syntax io.encodings.ascii ;
 IN: unicode.breaks
 
@@ -21,13 +21,13 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
     } case ;
 
 : trim-blank ( str -- newstr )
-    dup [ blank? not ] find-last 1+* head ;
+    [ blank? ] right-trim ;
 
 : process-other-extend ( lines -- set )
     [ "#" split1 drop ";" split1 drop trim-blank ] map
     [ empty? not ] subset
     [ ".." split1 [ dup ] unless* [ hex> ] bi@ [a,b] ] map
-    concat >set ;
+    concat [ dup ] H{ } map>assoc ;
 
 : other-extend-lines ( -- lines )
     "extra/unicode/PropList.txt" resource-path ascii file-lines ;
@@ -36,14 +36,14 @@ VALUE: other-extend
 
 CATEGORY: (extend) Me Mn ;
 : extend? ( ch -- ? )
-    [ (extend)? ] [ other-extend key? ] either ;
+    dup (extend)? [ ] [ other-extend key? ] ?if ;
 
 : grapheme-class ( ch -- class )
     {
         { [ dup jamo? ] [ jamo-class ] }
         { [ dup grapheme-control? ] [ control-class ] }
         { [ extend? ] [ Extend ] }
-        { [ t ] [ Any ] }
+        [ Any ]
     } cond ;
 
 : init-grapheme-table ( -- table )
@@ -110,8 +110,7 @@ VALUE: grapheme-table
 
 : last-grapheme ( str -- i )
     unclip-last-slice grapheme-class swap
-    [ grapheme-class dup rot grapheme-break? ] find-last-index
-    nip -1 or 1+ ;
+    [ grapheme-class dup rot grapheme-break? ] find-last-index ?1+ nip ;
 
 [
     other-extend-lines process-other-extend \ other-extend set-value

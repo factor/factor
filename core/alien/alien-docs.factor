@@ -78,7 +78,7 @@ $nl
     "<< \"freetype\" {"
     "    { [ os macosx? ] [ \"libfreetype.6.dylib\" \"cdecl\" add-library ] }"
     "    { [ os windows? ] [ \"freetype6.dll\" \"cdecl\" add-library ] }"
-    "    { [ t ] [ drop ] }"
+    "    [ drop ]"
     "} cond >>"
 }
 "Note the parse time evaluation with " { $link POSTPONE: << } "." } ;
@@ -204,7 +204,7 @@ ARTICLE: "alien-callback-gc" "Callbacks and code GC"
 "A callback consits of two parts; the callback word, which pushes the address of the callback on the stack when executed, and the callback body itself. If the callback word is redefined, removed from the dictionary using " { $link forget } ", or recompiled, the callback body will not be reclaimed by the garbage collector, since potentially C code may be holding a reference to the callback body."
 $nl
 "This is the safest approach, however it can lead to code heap leaks when repeatedly reloading code which defines callbacks. If you are " { $emphasis "completely sure" } " that no running C code is holding a reference to any callbacks, you can blow them all away:"
-{ $code "USE: alien callbacks get clear-hash code-gc" }
+{ $code "USE: alien callbacks get clear-hash gc" }
 "This will reclaim all callback bodies which are otherwise unreachable from the dictionary (that is, their associated callback words have since been redefined, recompiled or forgotten)." ;
 
 ARTICLE: "alien-callback" "Calling Factor from C"

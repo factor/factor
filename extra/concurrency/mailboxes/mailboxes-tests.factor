@@ -1,6 +1,7 @@
 IN: concurrency.mailboxes.tests
-USING: concurrency.mailboxes vectors sequences threads
-tools.test math kernel strings ;
+USING: concurrency.mailboxes concurrency.count-downs vectors
+sequences threads tools.test math kernel strings namespaces
+continuations calendar ;
 
 [ V{ 1 2 3 } ] [
     0 <vector>
@@ -38,3 +39,37 @@ tools.test math kernel strings ;
     "junk2" over mailbox-put
     mailbox-get
 ] unit-test
+
+<mailbox> "m" set
+
+1 <count-down> "c" set
+1 <count-down> "d" set
+
+[
+    "c" get await
+    [ "m" get mailbox-get drop ]
+    [ drop "d" get count-down ] recover
+] "Mailbox close test" spawn drop
+
+[ ] [ "c" get count-down ] unit-test
+[ ] [ "m" get dispose ] unit-test
+[ ] [ "d" get 5 seconds await-timeout ] unit-test
+
+[ ] [ "m" get dispose ] unit-test
+
+<mailbox> "m" set
+
+1 <count-down> "c" set
+1 <count-down> "d" set
+
+[
+    "c" get await
+    "m" get wait-for-close
+    "d" get count-down
+] "Mailbox close test" spawn drop
+
+[ ] [ "c" get count-down ] unit-test
+[ ] [ "m" get dispose ] unit-test
+[ ] [ "d" get 5 seconds await-timeout ] unit-test
+
+[ ] [ "m" get dispose ] unit-test

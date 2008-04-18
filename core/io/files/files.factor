@@ -95,7 +95,7 @@ ERROR: no-parent-directory path ;
             1 tail left-trim-separators append-path-empty
         ] }
         { [ dup head..? ] [ drop no-parent-directory ] }
-        { [ t ] [ nip ] }
+        [ nip ]
     } cond ;
 
 PRIVATE>
@@ -105,7 +105,7 @@ PRIVATE>
         { [ dup "\\\\?\\" head? ] [ t ] }
         { [ dup length 2 < ] [ f ] }
         { [ dup second CHAR: : = ] [ t ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond ;
 
 : absolute-path? ( path -- ? )
@@ -114,7 +114,7 @@ PRIVATE>
         { [ dup "resource:" head? ] [ t ] }
         { [ os windows? ] [ windows-absolute-path? ] }
         { [ dup first path-separator? ] [ t ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond nip ;
 
 : append-path ( str1 str2 -- str )
@@ -130,10 +130,10 @@ PRIVATE>
         { [ over absolute-path? over first path-separator? and ] [
             >r 2 head r> append
         ] }
-        { [ t ] [
+        [
             >r right-trim-separators "/" r>
             left-trim-separators 3append
-        ] }
+        ]
     } cond ;
 
 : prepend-path ( str1 str2 -- str )
@@ -153,19 +153,19 @@ HOOK: file-info io-backend ( path -- info )
 ! Symlinks
 HOOK: link-info io-backend ( path -- info )
 
-HOOK: make-link io-backend ( path1 path2 -- )
+HOOK: make-link io-backend ( target symlink -- )
 
-HOOK: read-link io-backend ( path -- info )
+HOOK: read-link io-backend ( symlink -- path )
 
-: copy-link ( path1 path2 -- )
+: copy-link ( target symlink -- )
     >r read-link r> make-link ;
 
 SYMBOL: +regular-file+
 SYMBOL: +directory+
+SYMBOL: +symbolic-link+
 SYMBOL: +character-device+
 SYMBOL: +block-device+
 SYMBOL: +fifo+
-SYMBOL: +symbolic-link+
 SYMBOL: +socket+
 SYMBOL: +unknown+
 
@@ -205,12 +205,11 @@ SYMBOL: current-directory
 M: object normalize-path ( path -- path' )
     (normalize-path) ;
 
-: with-directory ( path quot -- )
-    >r (normalize-path) r>
-    current-directory swap with-variable ; inline
-
 : set-current-directory ( path -- )
-    normalize-path current-directory set ;
+    (normalize-path) current-directory set ;
+
+: with-directory ( path quot -- )
+    >r (normalize-path) current-directory r> with-variable ; inline
 
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )
@@ -221,10 +220,10 @@ HOOK: make-directory io-backend ( path -- )
         { [ dup root-directory? ] [ ] }
         { [ dup empty? ] [ ] }
         { [ dup exists? ] [ ] }
-        { [ t ] [
+        [
             dup parent-directory make-directories
             dup make-directory
-        ] }
+        ]
     } cond drop ;
 
 ! Directory listings
@@ -323,9 +322,10 @@ C: <pathname> pathname
 M: pathname <=> [ pathname-string ] compare ;
 
 ! Home directory
-: home ( -- dir )
-    {
-        { [ os winnt? ] [ "USERPROFILE" os-env ] }
-        { [ os wince? ] [ "" resource-path ] }
-        { [ os unix? ] [ "HOME" os-env ] }
-    } cond ;
+HOOK: home os ( -- dir )
+
+M: winnt home "USERPROFILE" os-env ;
+
+M: wince home "" resource-path ;
+
+M: unix home "HOME" os-env ;

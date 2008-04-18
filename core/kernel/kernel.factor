@@ -118,6 +118,8 @@ GENERIC: hashcode* ( depth obj -- code )
 
 M: object hashcode* 2drop 0 ;
 
+M: f hashcode* 2drop 31337 ;
+
 : hashcode ( obj -- code ) 3 swap hashcode* ; inline
 
 GENERIC: equal? ( obj1 obj2 -- ? )
@@ -140,10 +142,10 @@ M: object clone ;
 M: callstack clone (clone) ;
 
 ! Tuple construction
-: construct-empty ( class -- tuple )
+: new ( class -- tuple )
     tuple-layout <tuple> ;
 
-: construct-boa ( ... class -- tuple )
+: boa ( ... class -- tuple )
     tuple-layout <tuple-boa> ;
 
 ! Quotation building
@@ -194,18 +196,14 @@ M: callstack clone (clone) ;
 PRIVATE>
 
 ! Deprecated
-GENERIC: delegate ( obj -- delegate )
-
 M: object delegate drop f ;
-
-GENERIC: set-delegate ( delegate tuple -- )
 
 GENERIC# get-slots 1 ( tuple slots -- ... )
 
 GENERIC# set-slots 1 ( ... tuple slots -- )
 
 : construct ( ... slots class -- tuple )
-    construct-empty [ swap set-slots ] keep ; inline
+    new [ swap set-slots ] keep ; inline
 
 : construct-delegate ( delegate class -- tuple )
     >r { set-delegate } r> construct ; inline

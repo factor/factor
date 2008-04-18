@@ -18,7 +18,7 @@ C: <predicate-dispatch-engine> predicate-dispatch-engine
         { [ dup empty? ] [ drop [ "Unreachable" throw ] { } ] }
         { [ dup length 1 = ] [ first second { } ] }
         { [ dup keep-going? ] [ 1 tail-slice prune-redundant-predicates ] }
-        { [ t ] [ [ first second ] [ 1 tail-slice ] bi ] }
+        [ [ first second ] [ 1 tail-slice ] bi ]
     } cond ;
 
 : sort-methods ( assoc -- assoc' )

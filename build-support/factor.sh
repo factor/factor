@@ -190,6 +190,7 @@ find_architecture() {
        i386) ARCH=x86;;
        i686) ARCH=x86;;
        amd64) ARCH=x86;;
+       ppc64) ARCH=ppc;;
        *86) ARCH=x86;;
        *86_64) ARCH=x86;;
        "Power Macintosh") ARCH=ppc;;

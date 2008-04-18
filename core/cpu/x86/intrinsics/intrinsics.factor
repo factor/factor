@@ -212,11 +212,11 @@ IN: cpu.x86.intrinsics
     2array define-if-intrinsics ;
 
 {
-    { fixnum< JL }
-    { fixnum<= JLE }
-    { fixnum> JG }
-    { fixnum>= JGE }
-    { eq? JE }
+    { fixnum< JGE }
+    { fixnum<= JG }
+    { fixnum> JLE }
+    { fixnum>= JL }
+    { eq? JNE }
 } [
     first2 define-fixnum-jump
 ] each

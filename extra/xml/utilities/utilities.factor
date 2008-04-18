@@ -17,7 +17,7 @@ M: process-missing error.
 : run-process ( tag word -- )
     2dup "xtable" word-prop
     >r dup name-tag r> at* [ 2nip call ] [
-        drop \ process-missing construct-boa throw
+        drop \ process-missing boa throw
     ] if ;
 
 : PROCESS:

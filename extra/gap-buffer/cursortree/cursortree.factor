@@ -7,7 +7,7 @@ IN: gap-buffer.cursortree
 TUPLE: cursortree cursors ;
 
 : <cursortree> ( seq -- cursortree )
-    <gb> cursortree construct-empty tuck set-delegate <avl>
+    <gb> cursortree new tuck set-delegate <avl>
     over set-cursortree-cursors ;
 
 GENERIC: cursortree-gb ( cursortree -- gb )
@@ -38,16 +38,16 @@ M: left-cursor set-cursor-pos ( n cursor -- ) >r 1- r> [ cursor-tree position>in
 M: right-cursor set-cursor-pos ( n cursor -- ) [ cursor-tree position>index ] keep set-cursor-index ;
 
 : <cursor> ( cursortree -- cursor )
-    cursor construct-empty tuck set-cursor-tree ;
+    cursor new tuck set-cursor-tree ;
 
 : make-cursor ( cursortree pos cursor -- cursor )
     >r swap <cursor> r> tuck set-delegate tuck set-cursor-pos ;
 
 : <left-cursor> ( cursortree pos -- left-cursor )
-    left-cursor construct-empty make-cursor ;
+    left-cursor new make-cursor ;
 
 : <right-cursor> ( cursortree pos -- right-cursor )
-    right-cursor construct-empty make-cursor ;
+    right-cursor new make-cursor ;
 
 : cursors ( cursortree -- seq )
     cursortree-cursors values concat ;

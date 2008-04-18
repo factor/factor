@@ -217,9 +217,7 @@ $nl
 { $example "\\ f class ." "word" }
 "On the other hand, " { $link t } " is just a word, and there is no class which it is a unique instance of."
 { $example "t \\ t eq? ." "t" }
-"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "."
-$nl
-"A tuple cannot delegate to " { $link f } " at all, since a delegate of " { $link f } " actually denotes that no delegate is set. See " { $link set-delegate } "." ;
+"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
 
 ARTICLE: "conditionals" "Conditionals and logic"
 "The basic conditionals:"
@@ -276,9 +274,11 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "apply-combinators" }
 { $subsection "slip-keep-combinators" }
 { $subsection "conditionals" }
+{ $subsection "compositional-combinators" }
 { $subsection "combinators" }
 "Advanced topics:"
 { $subsection "implementing-combinators" }
+{ $subsection "errors" }
 { $subsection "continuations" } ;
 
 ABOUT: "dataflow"
@@ -341,6 +341,9 @@ HELP: set-callstack ( cs -- )
 HELP: clear
 { $description "Clears the data stack." } ;
 
+HELP: build
+{ $description "The current build number. Factor increments this number whenever a new boot image is created." } ;
+
 HELP: hashcode*
 { $values { "depth" integer } { "obj" object } { "code" fixnum } }
 { $contract "Outputs the hashcode of an object. The hashcode operation must satisfy the following properties:"
@@ -393,7 +396,7 @@ HELP: identity-tuple
 HELP: <=>
 { $values { "obj1" object } { "obj2" object } { "n" real } }
 { $contract
-    "Compares two objects using an intrinsic partial order, for example, the natural order for real numbers and lexicographic order for strings."
+    "Compares two objects using an intrinsic total order, for example, the natural order for real numbers and lexicographic order for strings."
     $nl
     "The output value is one of the following:"
     { $list
@@ -846,11 +849,15 @@ HELP: with
     { $example "USING: kernel math prettyprint sequences ;" "2 { 1 2 3 } [ - ] with map ." "{ 1 0 -1 }" }
 } ;
 
-HELP: compose
-{ $values { "quot1" callable } { "quot2" callable } { "curry" curry } }
+HELP: compose ( quot1 quot2 -- compose )
+{ $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } " followed by " { $snippet "quot2" } "." }
 { $notes
-    "The following two lines are equivalent:"
+    "The two quotations must leave the retain stack in the same state on exit as it was on entry, so the following code is not allowed:"
+    { $code
+        "[ 3 >r ] [ r> . ] compose"
+    }
+    "Except for this restriction, the following two lines are equivalent:"
     { $code
         "compose call"
         "append call"
@@ -862,7 +869,15 @@ HELP: 3compose
 { $values { "quot1" callable } { "quot2" callable } { "quot3" callable } { "curry" curry } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } ", " { $snippet "quot2" } " and then " { $snippet "quot3" } "." }
 { $notes
-    "The following two lines are equivalent:"
+    "The three quotations must leave the retain stack in the same state on exit as it was on entry, so for example, the following code is not allowed:"
+    { $code
+        "[ >r ] swap [ r> ] 3compose"
+    }
+    "The correct way to achieve the effect of the above is the following:"
+    { $code
+        "[ dip ] curry"
+    }
+    "Excepting the retain stack restriction, the following two lines are equivalent:"
     { $code
         "3compose call"
         "3append call"

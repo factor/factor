@@ -109,17 +109,17 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
         >r over r> hashcode* 2/ >r dupd hashcode* r> bitxor
     ] { } assoc>map hashcode* ;
 
-: intersect ( assoc1 assoc2 -- intersection )
+: assoc-intersect ( assoc1 assoc2 -- intersection )
     swap [ nip key? ] curry assoc-subset ;
 
 : update ( assoc1 assoc2 -- )
     swap [ swapd set-at ] curry assoc-each ;
 
-: union ( assoc1 assoc2 -- union )
+: assoc-union ( assoc1 assoc2 -- union )
     2dup [ assoc-size ] bi@ + pick new-assoc
     [ rot update ] keep [ swap update ] keep ;
 
-: diff ( assoc1 assoc2 -- diff )
+: assoc-diff ( assoc1 assoc2 -- diff )
     swap [ nip key? not ] curry assoc-subset ;
 
 : remove-all ( assoc seq -- subseq )
@@ -154,6 +154,9 @@ M: assoc >alist [ 2array ] { } assoc>map ;
 
 : value-at ( value assoc -- key/f )
     swap [ = nip ] curry assoc-find 2drop ;
+
+: zip ( keys values -- alist )
+    2array flip ; inline
 
 : search-alist ( key alist -- pair i )
     [ first = ] with find swap ; inline
@@ -204,7 +207,7 @@ M: enum set-at seq>> set-nth ;
 M: enum delete-at enum-seq delete-nth ;
 
 M: enum >alist ( enum -- alist )
-    seq>> [ length ] keep 2array flip ;
+    seq>> [ length ] keep zip ;
 
 M: enum assoc-size seq>> length ;
 

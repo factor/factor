@@ -1,1 +1,0 @@
-Stanford Bunny rendered with a cel-shading GLSL program

@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: inspector ui.tools.interactor ui.tools.inspector
 ui.tools.workspace help.markup io io.streams.duplex io.styles
@@ -7,7 +7,7 @@ ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
 prettyprint listener debugger threads boxes concurrency.flags
-math arrays ;
+math arrays generic accessors combinators ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;
@@ -28,7 +28,7 @@ TUPLE: input-scroller ;
 
 : <input-scroller> ( interactor -- scroller )
     <scroller>
-    input-scroller construct-empty
+    input-scroller new
     [ set-gadget-delegate ] keep ;
 
 M: input-scroller pref-dim*
@@ -101,16 +101,32 @@ M: listener-operation invoke-command ( target command -- )
 : clear-stack ( listener -- )
     [ clear ] swap (call-listener) ;
 
-: word-completion-string ( word listener -- string )
-    >r dup word-name swap word-vocabulary dup vocab-words r>
-    listener-gadget-input interactor-use memq?
-    [ drop ] [ [ "USE: " % % " " % % ] "" make ] if ;
+GENERIC: word-completion-string ( word -- string )
+
+M: word word-completion-string
+    word-name ;
+
+M: method-body word-completion-string
+    "method-generic" word-prop word-completion-string ;
+
+USE: generic.standard.engines.tuple
+
+M: engine-word word-completion-string
+    "engine-generic" word-prop word-completion-string ;
+
+: use-if-necessary ( word seq -- )
+    >r word-vocabulary vocab-words r>
+    {
+        { [ dup not ] [ 2drop ] }
+        { [ 2dup memq? ] [ 2drop ] }
+        [ push ]
+    } cond ;
 
 : insert-word ( word -- )
-    get-workspace
-    workspace-listener
-    [ word-completion-string ] keep
-    listener-gadget-input user-input ;
+    get-workspace workspace-listener input>>
+    [ >r word-completion-string r> user-input ]
+    [ interactor-use use-if-necessary ]
+    2bi ;
 
 : quot-action ( interactor -- lines )
     dup control-value
@@ -120,7 +136,7 @@ M: listener-operation invoke-command ( target command -- )
 TUPLE: stack-display ;
 
 : <stack-display> ( -- gadget )
-    stack-display construct-empty
+    stack-display new
     g workspace-listener swap [
         dup <toolbar> f track,
         listener-gadget-stack [ stack. ]
@@ -162,7 +178,7 @@ M: stack-display tool-scroller
     f <model> swap set-listener-gadget-stack ;
 
 : <listener-gadget> ( -- gadget )
-    listener-gadget construct-empty dup init-listener
+    listener-gadget new dup init-listener
     [ listener-output, listener-input, ] { 0 1 } build-track ;
 
 : listener-help "ui-listener" help-window ;

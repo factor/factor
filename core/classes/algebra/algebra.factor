@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel classes combinators accessors sequences arrays
-vectors assocs namespaces words sorting layouts math hashtables
-kernel.private ;
+USING: kernel classes classes.builtin combinators accessors
+sequences arrays vectors assocs namespaces words sorting layouts
+math hashtables kernel.private sets ;
 IN: classes.algebra
 
 : 2cache ( key1 key2 assoc quot -- value )
@@ -84,7 +84,7 @@ C: <anonymous-complement> anonymous-complement
         { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
         { [ dup members ] [ right-union-class< ] }
         { [ over superclass ] [ superclass< ] }
-        { [ t ] [ 2drop f ] }
+        [ 2drop f ]
     } cond ;
 
 : anonymous-union-intersect? ( first second -- ? )
@@ -103,15 +103,15 @@ C: <anonymous-complement> anonymous-complement
     {
         { [ over tuple eq? ] [ 2drop t ] }
         { [ over builtin-class? ] [ 2drop f ] }
-        { [ over tuple-class? ] [ [ class< ] 2keep swap class< or ] }
-        { [ t ] [ swap classes-intersect? ] }
+        { [ over tuple-class? ] [ [ class< ] [ swap class< ] 2bi or ] }
+        [ swap classes-intersect? ]
     } cond ;
 
 : builtin-class-intersect? ( first second -- ? )
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ over builtin-class? ] [ 2drop f ] }
-        { [ t ] [ swap classes-intersect? ] }
+        [ swap classes-intersect? ]
     } cond ;
 
 : (classes-intersect?) ( first second -- ? )
@@ -154,7 +154,7 @@ C: <anonymous-complement> anonymous-complement
         { [ over members ] [ left-union-and ] }
         { [ over anonymous-union? ] [ left-anonymous-union-and ] }
         { [ over anonymous-intersection? ] [ left-anonymous-intersection-and ] }
-        { [ t ] [ 2array <anonymous-intersection> ] }
+        [ 2array <anonymous-intersection> ]
     } cond ;
 
 : left-anonymous-union-or ( first second -- class )
@@ -169,7 +169,7 @@ C: <anonymous-complement> anonymous-complement
         { [ 2dup swap class< ] [ drop ] }
         { [ dup anonymous-union? ] [ right-anonymous-union-or ] }
         { [ over anonymous-union? ] [ left-anonymous-union-or ] }
-        { [ t ] [ 2array <anonymous-union> ] }
+        [ 2array <anonymous-union> ]
     } cond ;
 
 : (class-not) ( class -- complement )
@@ -177,7 +177,7 @@ C: <anonymous-complement> anonymous-complement
         { [ dup anonymous-complement? ] [ class>> ] }
         { [ dup object eq? ] [ drop null ] }
         { [ dup null eq? ] [ drop object ] }
-        { [ t ] [ <anonymous-complement> ] }
+        [ <anonymous-complement> ]
     } cond ;
 
 : largest-class ( seq -- n elt )
@@ -205,7 +205,7 @@ C: <anonymous-complement> anonymous-complement
         { [ dup builtin-class? ] [ dup set ] }
         { [ dup members ] [ members [ (flatten-class) ] each ] }
         { [ dup superclass ] [ superclass (flatten-class) ] }
-        { [ t ] [ drop ] }
+        [ drop ]
     } cond ;
 
 : flatten-class ( class -- assoc )

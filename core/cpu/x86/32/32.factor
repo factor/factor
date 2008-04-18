@@ -16,7 +16,6 @@ IN: cpu.x86.32
 M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
-M: x86.32 xt-reg ECX ;
 M: x86.32 stack-save-reg EDX ;
 
 M: temp-reg v>operand drop EBX ;
@@ -155,7 +154,7 @@ M: x86.32 %box ( n reg-class func -- )
     #! integer, push [ESP+n]:[ESP+n+4] on the stack; we are
     #! boxing a parameter being passed to a callback from C.
     [
-        T{ int-regs } box@
+        int-regs box@
         EDX over stack@ MOV
         EAX swap cell - stack@ MOV 
     ] when*
@@ -246,9 +245,8 @@ M: x86.32 %cleanup ( alien-node -- )
         } {
             [ dup return>> large-struct? ]
             [ drop EAX PUSH ]
-        } {
-            [ t ] [ drop ]
         }
+        [ drop ]
     } cond ;
 
 M: x86.32 %unwind ( n -- ) %epilogue-later RET ;
@@ -268,7 +266,7 @@ os windows? [
     EDX 26 SHR
     EDX 1 AND
     { EAX EBX ECX EDX } [ POP ] each
-    JNE
+    JE
 ] { } define-if-intrinsic
 
 "-no-sse2" cli-args member? [

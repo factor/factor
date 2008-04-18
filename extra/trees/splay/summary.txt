@@ -1,1 +1,1 @@
-Splay Trees
+Splay trees

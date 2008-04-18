@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic kernel kernel.private math memory
 namespaces sequences layouts system hashtables classes alien
-byte-arrays bit-arrays float-arrays combinators words ;
+byte-arrays bit-arrays float-arrays combinators words sets ;
 IN: cpu.architecture
 
 ! A pseudo-register class for parameters spilled on the stack
-TUPLE: stack-params ;
+SINGLETON: stack-params
 
 ! Return values of this class go here
 GENERIC: return-reg ( register-class -- reg )
@@ -56,7 +56,7 @@ HOOK: %call cpu ( word -- )
 HOOK: %jump-label cpu ( label -- )
 
 ! Test if vreg is 'f' or not
-HOOK: %jump-t cpu ( label -- )
+HOOK: %jump-f cpu ( label -- )
 
 HOOK: %dispatch cpu ( -- )
 

@@ -8,6 +8,15 @@ debugger io.streams.c io.streams.duplex io.files io.backend
 quotations io.launcher words.private tools.deploy.config
 bootstrap.image io.encodings.utf8 accessors ;
 IN: tools.deploy.backend
+    
+: copy-vm ( executable bundle-name extension -- vm )
+  [ prepend-path ] dip append vm over copy-file ;
+  
+: copy-fonts ( name dir -- )  
+  append-path "fonts/" resource-path swap copy-tree-into ;
+  
+: image-name ( vocab bundle-name -- str )  
+  prepend-path ".image" append ;
 
 : (copy-lines) ( stream -- )
     dup stream-readln dup
@@ -22,9 +31,8 @@ IN: tools.deploy.backend
         +stdout+ >>stderr
         +closed+ >>stdin
         +low-priority+ >>priority
-    utf8 <process-stream>
-    dup copy-lines
-    process>> wait-for-process zero? [
+    utf8 <process-stream*>
+    >r copy-lines r> wait-for-process zero? [
         "Deployment failed" throw
     ] unless ;
 

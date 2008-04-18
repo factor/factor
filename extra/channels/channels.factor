@@ -9,7 +9,7 @@ IN: channels
 TUPLE: channel receivers senders ;
 
 : <channel> ( -- channel )
-    V{ } clone V{ } clone channel construct-boa ;
+    V{ } clone V{ } clone channel boa ;
 
 GENERIC: to ( value channel -- )
 GENERIC: from ( channel -- value )

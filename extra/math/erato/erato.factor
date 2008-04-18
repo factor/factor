@@ -22,7 +22,7 @@ TUPLE: erato limit bits latest ;
   [ [ indices ] keep erato-bits [ f -rot set-nth ] curry each ] [ 2drop ] if ;
 
 : <erato> ( n -- erato )
-  dup ind 1+ <bit-array> 1 over set-bits erato construct-boa ;
+  dup ind 1+ <bit-array> 1 over set-bits erato boa ;
 
 : next-prime ( erato -- prime/f )
   [ erato-latest 2 + ] keep [ set-erato-latest ] 2keep

@@ -5,7 +5,7 @@ kernel.private math memory continuations kernel io.files
 io.backend system parser vocabs sequences prettyprint
 vocabs.loader combinators splitting source-files strings
 definitions assocs compiler.errors compiler.units
-math.parser generic ;
+math.parser generic sets ;
 IN: bootstrap.stage2
 
 SYMBOL: bootstrap-time
@@ -24,12 +24,8 @@ SYMBOL: bootstrap-time
 : load-components ( -- )
     "exclude" "include"
     [ get-global " " split [ empty? not ] subset ] bi@
-    seq-diff
+    diff
     [ "bootstrap." prepend require ] each ;
-
-: compile-remaining ( -- )
-    "Compiling remaining words..." print flush
-    vocabs [ words [ compiled? not ] subset compile ] each ;
 
 : count-words ( pred -- )
     all-words swap subset length number>string write ;
@@ -57,7 +53,7 @@ millis >r
 
 default-image-name "output-image" set-global
 
-"math help handbook compiler random tools ui ui.tools io" "include" set-global
+"math compiler help random tools ui ui.tools io handbook" "include" set-global
 "" "exclude" set-global
 
 parse-command-line
@@ -79,10 +75,6 @@ os winnt? [ "windows.nt" require ] when
     load-components
 
     run-bootstrap-init
-
-    "bootstrap.compiler" vocab [
-        compile-remaining
-    ] when
 ] with-compiler-errors
 :errors
 

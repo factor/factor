@@ -1,82 +1,54 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend kernel continuations namespaces sequences
-assocs hashtables sorting arrays threads boxes io.timeouts ;
+assocs hashtables sorting arrays threads boxes io.timeouts
+accessors concurrency.mailboxes ;
 IN: io.monitors
 
-<PRIVATE
+HOOK: init-monitors io-backend ( -- )
 
-TUPLE: monitor queue closed? ;
+M: object init-monitors ;
 
-: check-monitor ( monitor -- )
-    monitor-closed? [ "Monitor closed" throw ] when ;
+HOOK: dispose-monitors io-backend ( -- )
 
-: (monitor) ( delegate -- monitor )
-    H{ } clone {
-        set-delegate
-        set-monitor-queue
-    } monitor construct ;
+M: object dispose-monitors ;
 
-GENERIC: fill-queue ( monitor -- )
-
-: changed-file ( changed path -- )
-    namespace [ append ] change-at ;
-
-: dequeue-change ( assoc -- path changes )
-    delete-any prune natural-sort >array ;
-
-M: monitor dispose
-    dup check-monitor
-    t over set-monitor-closed?
-    delegate dispose ;
-
-! Simple monitor; used on Linux and Mac OS X. On Windows,
-! monitors are full-fledged ports.
-TUPLE: simple-monitor handle callback timeout ;
-
-M: simple-monitor timeout simple-monitor-timeout ;
-
-M: simple-monitor set-timeout set-simple-monitor-timeout ;
-
-: <simple-monitor> ( handle -- simple-monitor )
-    f (monitor) <box> {
-        set-simple-monitor-handle
-        set-delegate
-        set-simple-monitor-callback
-    } simple-monitor construct ;
-
-: construct-simple-monitor ( handle class -- simple-monitor )
-    >r <simple-monitor> r> construct-delegate ; inline
-
-: notify-callback ( simple-monitor -- )
-    simple-monitor-callback [ resume ] if-box? ;
-
-M: simple-monitor timed-out
-    notify-callback ;
-
-M: simple-monitor fill-queue ( monitor -- )
+: with-monitors ( quot -- )
     [
-        [ swap simple-monitor-callback >box ]
-        "monitor" suspend drop
-    ] with-timeout
-    check-monitor ;
+        init-monitors
+        [ dispose-monitors ] [ ] cleanup
+    ] with-scope ; inline
 
-M: simple-monitor dispose ( monitor -- )
-    dup delegate dispose notify-callback ;
+TUPLE: monitor < identity-tuple path queue timeout ;
 
-PRIVATE>
+M: monitor hashcode* path>> hashcode* ;
 
-HOOK: <monitor> io-backend ( path recursive? -- monitor )
+M: monitor timeout timeout>> ;
+
+M: monitor set-timeout (>>timeout) ;
+
+: new-monitor ( path mailbox class -- monitor )
+    new
+        swap >>queue
+        swap >>path ; inline
+
+: queue-change ( path changes monitor -- )
+    3dup and and
+    [ [ 3array ] keep queue>> mailbox-put ] [ 3drop ] if ;
+
+HOOK: (monitor) io-backend ( path recursive? mailbox -- monitor )
+
+: <monitor> ( path recursive? -- monitor )
+    <mailbox> (monitor) ;
 
 : next-change ( monitor -- path changed )
-    dup check-monitor
-    dup monitor-queue dup assoc-empty? [
-        drop dup fill-queue next-change
-    ] [ nip dequeue-change ] if ;
+    [ queue>> ] [ timeout ] bi mailbox-get-timeout first2 ;
 
 SYMBOL: +add-file+
 SYMBOL: +remove-file+
 SYMBOL: +modify-file+
+SYMBOL: +rename-file-old+
+SYMBOL: +rename-file-new+
 SYMBOL: +rename-file+
 
 : with-monitor ( path recursive? quot -- )

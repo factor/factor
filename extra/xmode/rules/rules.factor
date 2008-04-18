@@ -33,7 +33,7 @@ finalized?
     } set-slots ;
 
 : <rule-set> ( -- ruleset )
-    rule-set construct-empty dup init-rule-set ;
+    rule-set new dup init-rule-set ;
 
 MEMO: standard-rule-set ( id -- ruleset )
     <rule-set> [ set-rule-set-default ] keep ;
@@ -73,7 +73,7 @@ chars
 ;
 
 : construct-rule ( class -- rule )
-    >r rule construct-empty r> construct-delegate ; inline
+    >r rule new r> construct-delegate ; inline
 
 TUPLE: seq-rule ;
 

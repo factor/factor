@@ -1,8 +1,11 @@
-IN: generic.standard.engines.tuple
+! Copyright (c) 2008 Slava Pestov
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel classes.tuple.private hashtables assocs sorting
 accessors combinators sequences slots.private math.parser words
 effects namespaces generic generic.standard.engines
-classes.algebra math math.private quotations arrays ;
+classes.algebra math math.private kernel.private
+quotations arrays ;
+IN: generic.standard.engines.tuple
 
 TUPLE: echelon-dispatch-engine n methods ;
 
@@ -27,15 +30,8 @@ TUPLE: tuple-dispatch-engine echelons ;
 
 : <tuple-dispatch-engine> ( methods -- engine )
     echelon-sort
-    [
-        over zero? [
-            dup assoc-empty?
-            [ drop f ] [ values first ] if
-        ] [
-            dupd <echelon-dispatch-engine>
-        ] if
-    ] assoc-map [ nip ] assoc-subset
-    \ tuple-dispatch-engine construct-boa ;
+    [ dupd <echelon-dispatch-engine> ] assoc-map
+    \ tuple-dispatch-engine boa ;
 
 : convert-tuple-methods ( assoc -- assoc' )
     tuple bootstrap-word
@@ -48,52 +44,51 @@ M: trivial-tuple-dispatch-engine engine>quot
     >alist V{ } clone [ hashcode 1array ] distribute-buckets
     [ <trivial-tuple-dispatch-engine> ] map ;
 
+: word-hashcode% [ 1 slot ] % ;
+
 : class-hash-dispatch-quot ( methods -- quot )
-    #! 1 slot == word hashcode
     [
-        [ dup 1 slot ] %
+        \ dup ,
+        word-hashcode%
         hash-methods [ engine>quot ] map hash-dispatch-quot %
     ] [ ] make ;
 
-: tuple-dispatch-engine-word-name ( engine -- string )
-    [
-        generic get word-name %
-        "/tuple-dispatch-engine/" %
-        n>> #
-    ] "" make ;
+: engine-word-name ( -- string )
+    generic get word-name "/tuple-dispatch-engine" append ;
 
-PREDICATE: tuple-dispatch-engine-word < word
-    "tuple-dispatch-engine" word-prop ;
+PREDICATE: engine-word < word
+    "tuple-dispatch-generic" word-prop generic? ;
 
-M: tuple-dispatch-engine-word stack-effect
-    "tuple-dispatch-generic" word-prop stack-effect ;
+M: engine-word stack-effect
+    "tuple-dispatch-generic" word-prop
+    [ extra-values ] [ stack-effect ] bi
+    dup [ clone [ length + ] change-in ] [ 2drop f ] if ;
 
-M: tuple-dispatch-engine-word crossref?
+M: engine-word compiled-crossref?
     drop t ;
 
 : remember-engine ( word -- )
     generic get "engines" word-prop push ;
 
-: <tuple-dispatch-engine-word> ( engine -- word )
-    tuple-dispatch-engine-word-name f <word>
-    {
-        [ t "tuple-dispatch-engine" set-word-prop ]
-        [ generic get "tuple-dispatch-generic" set-word-prop ]
-        [ remember-engine ]
-        [ ]
-    } cleave ;
+: <engine-word> ( -- word )
+    engine-word-name f <word>
+    dup generic get "tuple-dispatch-generic" set-word-prop ;
 
-: define-tuple-dispatch-engine-word ( engine quot -- word )
-    >r <tuple-dispatch-engine-word> dup r> define ;
+: define-engine-word ( quot -- word )
+    >r <engine-word> dup r> define ;
+
+: array-nth% 2 + , [ slot { word } declare ] % ;
+
+: tuple-layout-superclasses ( obj -- array )
+    { tuple } declare
+    1 slot { tuple-layout } declare
+    4 slot { array } declare ; inline
 
 : tuple-dispatch-engine-body ( engine -- quot )
-    #! 1 slot == tuple-layout
-    #! 2 slot == 0 array-nth
-    #! 4 slot == layout-superclasses
     [
         picker %
-        [ 1 slot 4 slot ] %
-        [ n>> 2 + , [ slot ] % ]
+        [ tuple-layout-superclasses ] %
+        [ n>> array-nth% ]
         [
             methods>> [
                 <trivial-tuple-dispatch-engine> engine>quot
@@ -104,25 +99,54 @@ M: tuple-dispatch-engine-word crossref?
     ] [ ] make ;
 
 M: echelon-dispatch-engine engine>quot
-    dup tuple-dispatch-engine-body
-    define-tuple-dispatch-engine-word
-    1quotation ;
+    dup n>> zero? [
+        methods>> dup assoc-empty?
+        [ drop default get ] [ values first engine>quot ] if
+    ] [
+        [
+            picker %
+            [ tuple-layout-superclasses ] %
+            [ n>> array-nth% ]
+            [
+                methods>> [
+                    <trivial-tuple-dispatch-engine> engine>quot
+                ] [
+                    class-hash-dispatch-quot
+                ] if-small? %
+            ] bi
+        ] [ ] make
+    ] if ;
 
 : >=-case-quot ( alist -- quot )
     default get [ drop ] prepend swap
     [ >r [ dupd fixnum>= ] curry r> \ drop prefix ] assoc-map
     alist>quot ;
 
+: tuple-layout-echelon ( obj -- array )
+    { tuple } declare
+    1 slot { tuple-layout } declare
+    5 slot ; inline
+
+: unclip-last [ 1 head* ] [ peek ] bi ;
+
 M: tuple-dispatch-engine engine>quot
-    #! 1 slot == tuple-layout
-    #! 5 slot == layout-echelon
     [
         picker %
-        [ 1 slot 5 slot ] %
-        echelons>>
+        [ tuple-layout-echelon ] %
         [
             tuple assumed set
-            [ engine>quot dup default set ] assoc-map
+            echelons>> dup empty? [
+                unclip-last
+                [
+                    [
+                        engine>quot define-engine-word
+                        [ remember-engine ] [ 1quotation ] bi
+                        dup default set
+                    ] assoc-map
+                ]
+                [ first2 engine>quot 2array ] bi*
+                suffix
+            ] unless
         ] with-scope
         >=-case-quot %
     ] [ ] make ;

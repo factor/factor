@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces arrays sequences io inference.backend
-inference.state generator debugger math.parser prettyprint words
-compiler.units continuations vocabs assocs alien.compiler dlists
-optimizer definitions math compiler.errors threads graphs
-generic inference ;
+inference.state generator debugger words compiler.units
+continuations vocabs assocs alien.compiler dlists optimizer
+definitions math compiler.errors threads graphs generic
+inference ;
 IN: compiler
 
 : ripple-up ( word -- )
@@ -20,7 +20,7 @@ IN: compiler
 : finish-compile ( word effect dependencies -- )
     >r dupd save-effect r>
     over compiled-unxref
-    over crossref? [ compiled-xref ] [ 2drop ] if ;
+    over compiled-crossref? [ compiled-xref ] [ 2drop ] if ;
 
 : compile-succeeded ( word -- effect dependencies )
     [

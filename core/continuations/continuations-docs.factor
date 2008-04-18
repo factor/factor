@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private
 continuations.private parser vectors arrays namespaces
-assocs words quotations ;
+assocs words quotations io ;
 IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable errors"
@@ -17,6 +17,25 @@ ARTICLE: "errors-post-mortem" "Post-mortem error inspection"
 { $subsection error-continuation }
 "Developer tools for inspecting these values are found in " { $link "debugger" } "." ;
 
+ARTICLE: "errors-anti-examples" "Common error handling pitfalls"
+"When used correctly, exception handling can lead to more robust code with less duplication of error handling logic. However, there are some pitfalls to keep in mind."
+{ $heading "Anti-pattern #1: Ignoring errors" }
+"The " { $link ignore-errors } " word should almost never be used. Ignoring errors does not make code more robust and in fact makes it much harder to debug if an intermittent error does show up when the code is run under previously unforseen circumstances. Never ignore unexpected errors; always report them to the user."
+{ $heading "Anti-pattern #2: Catching errors too early" }
+"A less severe form of the previous anti-pattern is code that makes overly zealous use of " { $link recover } ". It is almost always a mistake to catch an error, log a message, and keep going. The only exception is network servers and other long-running processes that must remain running even if individual tasks fail. In these cases, place the " { $link recover } " as high up in the call stack as possible."
+$nl
+"In most other cases, " { $link cleanup } " should be used instead to handle an error and rethrow it automatically."
+{ $heading "Anti-pattern #3: Dropping and rethrowing" }
+"Do not use " { $link recover } " to handle an error by dropping it and throwing a new error. By losing the original error message, you signal to the user that something failed without leaving any indication of what actually went wrong. Either wrap the error in a new error containing additional information, or rethrow the original error. A more subtle form of this is using  " { $link throw } " instead of " { $link rethrow } ". The " { $link throw } " word should only be used when throwing new errors, and never when rethrowing errors that have been caught."
+{ $heading "Anti-pattern #4: Logging and rethrowing" }
+"If you are going to rethrow an error, do not log a message. If you do so, the user will see two log messages for the same error, which will clutter logs without adding any useful information."
+{ $heading "Anti-pattern #5: Leaking external resources" }
+"Words which create objects corresponding to external resources should always be used with " { $link with-disposal } ". The following code is wrong:"
+{ $code
+    "<external-resource> ... do stuff ... dispose"
+}
+"The reason being that if " { $snippet "do stuff" } " throws an error, the resource will not be disposed of. The most important case where this can occur is with I/O streams, and the correct solution is to always use " { $link with-stream } "; see " { $link "stdio" } " for details." ;
+
 ARTICLE: "errors" "Error handling"
 "Support for handling exceptional situations such as bad user input, implementation bugs, and input/output errors is provided by a set of words built using continuations."
 $nl
@@ -27,10 +46,13 @@ $nl
 { $subsection cleanup }
 { $subsection recover }
 { $subsection ignore-errors }
+"Syntax sugar for defining errors:"
+{ $subsection POSTPONE: ERROR: }
 "Unhandled errors are reported in the listener and can be debugged using various tools. See " { $link "debugger" } "."
 { $subsection "errors-restartable" }
 { $subsection "debugger" }
 { $subsection "errors-post-mortem" }
+{ $subsection "errors-anti-examples" }
 "When Factor encouters a critical error, it calls the following word:"
 { $subsection die } ;
 
@@ -61,15 +83,18 @@ $nl
 "Another two words resume continuations:"
 { $subsection continue }
 { $subsection continue-with }
-"Continuations serve as the building block for a number of higher-level abstractions."
-{ $subsection "errors" }
+"Continuations serve as the building block for a number of higher-level abstractions, such as " { $link "errors" } " and " { $link "threads" } "."
 { $subsection "continuations.private" } ;
 
 ABOUT: "continuations"
 
 HELP: dispose
 { $values { "object" "a disposable object" } }
-{ $contract "Releases operating system resources associated with a disposable object. No further operations can be performed on a disposable object after this call. Disposable objects include streams, memory mapped files, and so on." }
+{ $contract "Releases operating system resources associated with a disposable object. Disposable objects include streams, memory mapped files, and so on."
+$nl
+"No further operations can be performed on a disposable object after this call."
+$nl
+"Disposing an object which has already been disposed should have no effect, and in particular it should not fail with an error." }
 { $notes "You must close disposable objects after you are finished working with them, to avoid leaking operating system resources. A convenient way to automate this is by using the " { $link with-disposal } " word." } ;
 
 HELP: with-disposal

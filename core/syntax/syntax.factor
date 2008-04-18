@@ -61,7 +61,7 @@ IN: bootstrap.syntax
         scan {
             { [ dup length 1 = ] [ first ] }
             { [ "\\" ?head ] [ next-escape drop ] }
-            { [ t ] [ name>char-hook get call ] }
+            [ name>char-hook get call ]
         } cond parsed
     ] define-syntax
 
@@ -166,7 +166,7 @@ IN: bootstrap.syntax
     "C:" [
         CREATE-WORD
         scan-word dup check-tuple
-        [ construct-boa ] curry define-inline
+        [ boa ] curry define-inline
     ] define-syntax
 
     "ERROR:" [

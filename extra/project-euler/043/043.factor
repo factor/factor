@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib hashtables kernel math math.combinatorics math.parser
-    math.ranges project-euler.common sequences sequences.lib sorting ;
+    math.ranges project-euler.common sequences sequences.lib sorting sets ;
 IN: project-euler.043
 
 ! http://projecteuler.net/index.php?section=problems&id=43
@@ -79,7 +79,7 @@ PRIVATE>
     [ unclip 1 head prefix concat ] map [ all-unique? ] subset ;
 
 : add-missing-digit ( seq -- seq )
-    dup natural-sort 10 seq-diff first prefix ;
+    dup natural-sort 10 diff first prefix ;
 
 : interesting-pandigitals ( -- seq )
     17 candidates { 13 11 7 5 3 2 } [

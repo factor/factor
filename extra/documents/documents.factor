@@ -151,14 +151,14 @@ TUPLE: char-elt ;
     -rot {
         { [ over { 0 0 } = ] [ drop ] }
         { [ over second zero? ] [ >r first 1- r> line-end ] }
-        { [ t ] [ pick call ] }
+        [ pick call ]
     } cond nip ; inline
 
 : (next-char) ( loc document quot -- loc )
     -rot {
         { [ 2dup doc-end = ] [ drop ] }
         { [ 2dup line-end? ] [ drop first 1+ 0 2array ] }
-        { [ t ] [ pick call ] }
+        [ pick call ]
     } cond nip ; inline
 
 M: char-elt prev-elt
@@ -184,8 +184,7 @@ M: one-char-elt next-elt 2drop ;
     [ >r blank? r> xor ] curry ; inline
 
 : (prev-word) ( ? col str -- col )
-    rot break-detector find-last*
-    drop [ 1+ ] [ 0 ] if* ;
+    rot break-detector find-last* drop ?1+ ;
 
 : (next-word) ( ? col str -- col )
     [ rot break-detector find* drop ] keep

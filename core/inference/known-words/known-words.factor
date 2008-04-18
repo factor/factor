@@ -54,9 +54,9 @@ IN: inference.known-words
     { swap  T{ effect f 2 { 1 0         } } }
 } [ define-shuffle ] assoc-each
 
-\ >r [ infer->r ] "infer" set-word-prop
+\ >r [ 1 infer->r ] "infer" set-word-prop
 
-\ r> [ infer-r> ] "infer" set-word-prop
+\ r> [ 1 infer-r> ] "infer" set-word-prop
 
 \ declare [
     1 ensure-values
@@ -81,8 +81,8 @@ M: curried infer-call
 
 M: composed infer-call
     infer-uncurry
-    infer->r peek-d infer-call
-    terminated? get [ infer-r> peek-d infer-call ] unless ;
+    1 infer->r peek-d infer-call
+    terminated? get [ 1 infer-r> peek-d infer-call ] unless ;
 
 M: object infer-call
     \ literal-expected inference-warning ;
@@ -358,9 +358,7 @@ M: object infer-call
 
 \ (directory) { string } { array } <effect> set-primitive-effect
 
-\ data-gc { } { } <effect> set-primitive-effect
-
-\ code-gc { } { } <effect> set-primitive-effect
+\ gc { } { } <effect> set-primitive-effect
 
 \ gc-time { } { integer } <effect> set-primitive-effect
 
@@ -375,7 +373,7 @@ set-primitive-effect
 \ data-room { } { integer array } <effect> set-primitive-effect
 \ data-room make-flushable
 
-\ code-room { } { integer integer } <effect> set-primitive-effect
+\ code-room { } { integer integer integer integer } <effect> set-primitive-effect
 \ code-room  make-flushable
 
 \ os-env { string } { object } <effect> set-primitive-effect
@@ -589,6 +587,10 @@ set-primitive-effect
 
 \ (os-envs) { } { array } <effect> set-primitive-effect
 
+\ set-os-env { string string } { } <effect> set-primitive-effect
+
+\ unset-os-env { string } { } <effect> set-primitive-effect
+
 \ (set-os-envs) { array } { } <effect> set-primitive-effect
 
 \ do-primitive [ \ do-primitive no-effect ] "infer" set-word-prop
@@ -596,3 +598,5 @@ set-primitive-effect
 \ dll-valid? { object } { object } <effect> set-primitive-effect
 
 \ modify-code-heap { array object } { } <effect> set-primitive-effect
+
+\ unimplemented { } { } <effect> set-primitive-effect

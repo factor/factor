@@ -27,8 +27,6 @@ IN: io.windows.nt.files.tests
 [ f ] [ "." root-directory? ] unit-test
 [ f ] [ ".." root-directory? ] unit-test
 
-[ ] [ "" resource-path cd ] unit-test
-
 [ "\\foo\\bar" ] [ "/foo/bar" normalize-path ":" split1 nip ] unit-test
 
 [ "\\\\?\\C:\\builds\\factor\\log.txt" ] [

@@ -46,8 +46,8 @@ IN: continuations.tests
 ! Weird PowerPC bug.
 [ ] [
     [ "4" throw ] ignore-errors
-    data-gc
-    data-gc
+    gc
+    gc
 ] unit-test
 
 [ f ] [ { } kernel-error? ] unit-test

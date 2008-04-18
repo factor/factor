@@ -106,8 +106,8 @@ M: ppc %call ( label -- ) BL ;
 
 M: ppc %jump-label ( label -- ) B ;
 
-M: ppc %jump-t ( label -- )
-    0 "flag" operand f v>operand CMPI BNE ;
+M: ppc %jump-f ( label -- )
+    0 "flag" operand f v>operand CMPI BEQ ;
 
 M: ppc %dispatch ( -- )
     [
@@ -146,11 +146,19 @@ M: int-regs %save-param-reg drop 1 rot local@ STW ;
 
 M: int-regs %load-param-reg drop 1 rot local@ LWZ ;
 
-: STF float-regs-size 4 = [ STFS ] [ STFD ] if ;
+GENERIC: STF ( src dst off reg-class -- )
+
+M: single-float-regs STF drop STFS ;
+
+M: double-float-regs STF drop STFD ;
 
 M: float-regs %save-param-reg >r 1 rot local@ r> STF ;
 
-: LF float-regs-size 4 = [ LFS ] [ LFD ] if ;
+GENERIC: LF ( dst src off reg-class -- )
+
+M: single-float-regs LF drop LFS ;
+
+M: double-float-regs LF drop LFD ;
 
 M: float-regs %load-param-reg >r 1 rot local@ r> LF ;
 

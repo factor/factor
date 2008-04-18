@@ -27,11 +27,11 @@ IN: cpu.x86.sse2
     { { float "x" } { float "y" } } define-if-intrinsic ;
 
 {
-    { float< JB }
-    { float<= JBE }
-    { float> JA }
-    { float>= JAE }
-    { float= JE }
+    { float< JAE }
+    { float<= JA }
+    { float> JBE }
+    { float>= JB }
+    { float= JNE }
 } [
     first2 define-float-jump
 ] each

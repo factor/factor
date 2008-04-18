@@ -111,7 +111,7 @@ M: gadget children-on nip gadget-children ;
 : fast-children-on ( rect axis children -- from to )
     3dup
     >r >r dup rect-loc swap rect-dim v+
-    r> r> (fast-children-on) [ 1+ ] [ 0 ] if*
+    r> r> (fast-children-on) ?1+
     >r
     >r >r rect-loc
     r> r> (fast-children-on) 0 or
@@ -378,7 +378,7 @@ SYMBOL: in-layout?
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ dup not ] [ 2drop f ] }
-        { [ t ] [ gadget-parent child? ] }
+        [ gadget-parent child? ]
     } cond ;
 
 GENERIC: focusable-child* ( gadget -- child/t )
@@ -396,10 +396,10 @@ M: gadget request-focus-on gadget-parent request-focus-on ;
 M: f request-focus-on 2drop ;
 
 : request-focus ( gadget -- )
-    dup focusable-child swap request-focus-on ;
+    [ focusable-child ] keep request-focus-on ;
 
 : focus-path ( world -- seq )
-    [ gadget-parent ] follow ;
+    [ gadget-focus ] follow ;
 
 : make-gadget ( quot gadget -- gadget )
     [ \ make-gadget rot with-variable ] keep ; inline

@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.compiler arrays
 cpu.x86.assembler cpu.architecture kernel kernel.private math
@@ -9,7 +9,6 @@ IN: cpu.x86.architecture
 HOOK: ds-reg cpu
 HOOK: rs-reg cpu
 HOOK: stack-reg cpu
-HOOK: xt-reg cpu
 HOOK: stack-save-reg cpu
 
 : stack@ stack-reg swap [+] ;
@@ -22,7 +21,11 @@ M: rs-loc v>operand rs-loc-n rs-reg reg-stack ;
 M: int-regs %save-param-reg drop >r stack@ r> MOV ;
 M: int-regs %load-param-reg drop swap stack@ MOV ;
 
-: MOVSS/D float-regs-size 4 = [ MOVSS ] [ MOVSD ] if ;
+GENERIC: MOVSS/D ( dst src reg-class -- )
+
+M: single-float-regs MOVSS/D drop MOVSS ;
+
+M: double-float-regs MOVSS/D drop MOVSD ;
 
 M: float-regs %save-param-reg >r >r stack@ r> r> MOVSS/D ;
 M: float-regs %load-param-reg >r swap stack@ r> MOVSS/D ;
@@ -43,13 +46,13 @@ M: x86 stack-frame ( n -- i )
     3 cells + 16 align cell - ;
 
 M: x86 %save-word-xt ( -- )
-    xt-reg 0 MOV rc-absolute-cell rel-this ;
+    temp-reg v>operand 0 MOV rc-absolute-cell rel-this ;
 
 : factor-area-size 4 cells ;
 
 M: x86 %prologue ( n -- )
     dup cell + PUSH
-    xt-reg PUSH
+    temp-reg v>operand PUSH
     stack-reg swap 2 cells - SUB ;
 
 M: x86 %epilogue ( n -- )
@@ -72,8 +75,8 @@ M: x86 %call ( label -- ) CALL ;
 
 M: x86 %jump-label ( label -- ) JMP ;
 
-M: x86 %jump-t ( label -- )
-    "flag" operand f v>operand CMP JNE ;
+M: x86 %jump-f ( label -- )
+    "flag" operand f v>operand CMP JE ;
 
 : code-alignment ( -- n )
     building get length dup cell align swap - ;

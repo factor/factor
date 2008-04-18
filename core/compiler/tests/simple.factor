@@ -48,7 +48,7 @@ IN: compiler.tests
 [ 4 1 3 ] [ 0 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
 [ 3 1 3 ] [ 1 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
 
-[ 2 3 ] [ 1 [ { [ code-gc 1 ] [ code-gc 2 ] } dispatch 3 ] compile-call ] unit-test
+[ 2 3 ] [ 1 [ { [ gc 1 ] [ gc 2 ] } dispatch 3 ] compile-call ] unit-test
 
 ! Labels
 
@@ -187,7 +187,7 @@ DEFER: countdown-b
             { [ dup string? ] [ drop "string" ] }
             { [ dup float? ] [ drop "float" ] }
             { [ dup alien? ] [ drop "alien" ] }
-            { [ t ] [ drop "neither" ] }
+            [ drop "neither" ]
         } cond
     ] compile-call
 ] unit-test
@@ -196,7 +196,7 @@ DEFER: countdown-b
     [
         3 {
             { [ dup fixnum? ] [ ] }
-            { [ t ] [ drop t ] }
+            [ drop t ]
         } cond
     ] compile-call
 ] unit-test

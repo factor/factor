@@ -7,3 +7,4 @@ IN: tools.deploy
 
 os macosx? [ "tools.deploy.macosx" require ] when
 os winnt? [ "tools.deploy.windows" require ] when
+os unix? [ "tools.deploy.unix" require ] when

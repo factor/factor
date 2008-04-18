@@ -11,7 +11,6 @@ IN: cpu.x86.64
 M: x86.64 ds-reg R14 ;
 M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
-M: x86.64 xt-reg RCX ;
 M: x86.64 stack-save-reg RSI ;
 
 M: temp-reg v>operand drop RBX ;
@@ -65,7 +64,7 @@ M: x86.64 %unbox ( n reg-class func -- )
     over [ [ return-reg ] keep %save-param-reg ] [ 2drop ] if ;
 
 M: x86.64 %unbox-long-long ( n func -- )
-    T{ int-regs } swap %unbox ;
+    int-regs swap %unbox ;
 
 M: x86.64 %unbox-struct-1 ( -- )
     #! Alien must be in RDI.
@@ -103,7 +102,7 @@ M: x86.64 %box ( n reg-class func -- )
     f %alien-invoke ;
 
 M: x86.64 %box-long-long ( n func -- )
-    T{ int-regs } swap %box ;
+    int-regs swap %box ;
 
 M: x86.64 struct-small-enough? ( size -- ? ) 2 cells <= ;
 
@@ -170,7 +169,7 @@ USE: cpu.x86.intrinsics
 
 ! The ABI for passing structs by value is pretty messed up
 << "void*" c-type clone "__stack_value" define-primitive-type
-T{ stack-params } "__stack_value" c-type set-c-type-reg-class >>
+stack-params "__stack_value" c-type set-c-type-reg-class >>
 
 : struct-types&offset ( struct-type -- pairs )
     struct-type-fields [
@@ -192,7 +191,7 @@ M: struct-type flatten-value-type ( type -- seq )
     ] [
         struct-types&offset split-struct [
             [ c-type c-type-reg-class ] map
-            T{ int-regs } swap member?
+            int-regs swap member?
             "void*" "double" ? c-type ,
         ] each
     ] if ;

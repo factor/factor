@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
-     vectors arrays combinators.lib math.parser match
+     vectors arrays combinators.lib math.parser 
      unicode.categories sequences.deep peg peg.private 
      peg.search math.ranges words memoize ;
 IN: peg.parsers
@@ -20,7 +20,7 @@ M: just-parser (compile) ( parser -- quot )
   just-parser-p1 compiled-parser just-pattern curry ;
 
 MEMO: just ( parser -- parser )
-  just-parser construct-boa init-parser ;
+  just-parser boa init-parser ;
 
 : 1token ( ch -- parser ) 1string token ;
 

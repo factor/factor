@@ -54,7 +54,7 @@ SYMBOL: operations
     H{ { +keyboard+ f } { +primary+ f } { +secondary+ f } } ;
 
 : define-operation ( pred command flags -- )
-    default-flags swap union
+    default-flags swap assoc-union
     dupd define-command <operation>
     operations get push ;
 

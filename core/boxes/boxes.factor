@@ -5,7 +5,7 @@ IN: boxes
 
 TUPLE: box value full? ;
 
-: <box> ( -- box ) box construct-empty ;
+: <box> ( -- box ) box new ;
 
 : >box ( value box -- )
     dup box-full? [ "Box already has a value" throw ] when
