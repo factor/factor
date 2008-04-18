@@ -4,7 +4,7 @@ inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
 slots.private combinators definitions compiler.units
-system layouts vectors ;
+system layouts vectors optimizer.math.partial ;
 
 ! Make sure these compile even though this is invalid code
 [ ] [ [ 10 mod 3.0 /i ] dataflow optimize drop ] unit-test
@@ -17,6 +17,11 @@ system layouts vectors ;
     dup word? [ 1array ] when
     swap dataflow optimize
     [ node-param swap member? ] with node-exists? not ;
+
+[ f ] [
+    [ { integer } declare >fixnum ]
+    \ >fixnum inlined?
+] unit-test
 
 GENERIC: mynot ( x -- y )
 
@@ -110,12 +115,17 @@ M: object xyz ;
     [ { fixnum } declare [ ] times ] \ fixnum+ inlined?
 ] unit-test
 
-[ f ] [
+[ t ] [
     [ { integer fixnum } declare dupd < [ 1 + ] when ]
     \ + inlined?
 ] unit-test
 
-[ f ] [ [ dup 0 < [ neg ] when ] \ neg inlined? ] unit-test
+[ f ] [
+    [ { integer fixnum } declare dupd < [ 1 + ] when ]
+    \ +-integer-fixnum inlined?
+] unit-test
+
+[ f ] [ [ dup 0 < [ neg ] when ] \ - inlined? ] unit-test
 
 [ f ] [
     [
@@ -138,13 +148,13 @@ M: object xyz ;
 
 DEFER: blah
 
-[ t ] [
+[ ] [
     [
         \ blah
         [ dup V{ } eq? [ foo ] when ] dup second dup push define
     ] with-compilation-unit
 
-    \ blah compiled?
+    \ blah word-def dataflow optimize drop
 ] unit-test
 
 GENERIC: detect-fx ( n -- n )
@@ -159,14 +169,20 @@ M: fixnum detect-fx ;
     ] \ detect-fx inlined?
 ] unit-test
 
+[ t ] [
+    [
+        1000000000000000000000000000000000 [ ] times
+    ] \ + inlined?
+] unit-test
 [ f ] [
     [
         1000000000000000000000000000000000 [ ] times
-    ] \ 1+ inlined?
+    ] \ +-integer-fixnum inlined?
 ] unit-test
 
 [ f ] [
-    [ { bignum } declare [ ] times ] \ 1+ inlined?
+    [ { bignum } declare [ ] times ]
+    \ +-integer-fixnum inlined?
 ] unit-test
 
 
@@ -359,15 +375,6 @@ cell-bits 32 = [
     [ 1000 [ 1+ ] map ] { 1+ fixnum+ } inlined?
 ] unit-test
 
-[ t ] [
-    [
-        { integer } declare
-        dup 0 >= [
-            615949 * 797807 + 20 2^ mod dup 19 2^ -
-        ] [ dup ] if
-    ] { * + shift mod fixnum-mod fixnum* fixnum+ fixnum- } inlined?
-] unit-test
-
 : fib ( m -- n )
     dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ; inline
 
@@ -385,6 +392,106 @@ cell-bits 32 = [
 
 [ f ] [
     [ 27/2 fib ] { < - } inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum } declare 10 [ -1 shift ] times ] \ shift inlined?
+] unit-test
+
+[ f ] [
+    [ { integer } declare 10 [ -1 shift ] times ] \ shift inlined?
+] unit-test
+
+[ f ] [
+    [ { fixnum } declare 1048575 fixnum-bitand 524288 fixnum- ]
+    \ fixnum-bitand inlined?
+] unit-test
+
+[ t ] [
+    [ { integer } declare 127 bitand 3 + ]
+    { + +-integer-fixnum +-integer-fixnum-fast bitand } inlined?
+] unit-test
+
+[ f ] [
+    [ { integer } declare 127 bitand 3 + ]
+    { >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum } declare [ drop ] each-integer ]
+    { < <-integer-fixnum +-integer-fixnum + } inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum } declare length [ drop ] each-integer ]
+    { < <-integer-fixnum +-integer-fixnum + } inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum } declare [ drop ] each ]
+    { < <-integer-fixnum +-integer-fixnum + } inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum } declare 0 [ + ] reduce ]
+    { < <-integer-fixnum } inlined?
+] unit-test
+
+[ f ] [
+    [ { fixnum } declare 0 [ + ] reduce ]
+    \ +-integer-fixnum inlined?
+] unit-test
+
+[ t ] [
+    [
+        { integer } declare
+        dup 0 >= [
+            615949 * 797807 + 20 2^ mod dup 19 2^ -
+        ] [ dup ] if
+    ] { * + shift mod fixnum-mod fixnum* fixnum+ fixnum- } inlined?
+] unit-test
+
+[ t ] [
+    [
+        { fixnum } declare
+        615949 * 797807 + 20 2^ mod dup 19 2^ -
+    ] { >fixnum } inlined?
+] unit-test
+
+[ f ] [
+    [
+        { integer } declare [ ] map
+    ] \ >fixnum inlined?
+] unit-test
+
+[ f ] [
+    [
+        { integer } declare { } set-nth-unsafe
+    ] \ >fixnum inlined?
+] unit-test
+
+[ f ] [
+    [
+        { integer } declare 1 + { } set-nth-unsafe
+    ] \ >fixnum inlined?
+] unit-test
+
+[ t ] [
+    [
+        { integer } declare 0 swap
+        [
+            drop 615949 * 797807 + 20 2^ rem dup 19 2^ -
+        ] map
+    ] { * + shift rem mod fixnum-mod fixnum* fixnum+ fixnum- } inlined?
+] unit-test
+
+[ t ] [
+    [
+        { fixnum } declare 0 swap
+        [
+            drop 615949 * 797807 + 20 2^ rem dup 19 2^ -
+        ] map
+    ] { * + shift rem mod fixnum-mod fixnum* fixnum+ fixnum- >fixnum } inlined?
 ] unit-test
 
 ! Later

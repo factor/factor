@@ -83,21 +83,11 @@ sequences.private combinators ;
 ] "constraints" set-word-prop
 
 ! eq? on the same object is always t
-{ eq? bignum= float= number= = } {
+{ eq? = } {
     { { @ @ } [ 2drop t ] }
 } define-identities
 
 ! Specializers
-{ 1+ 1- sq neg recip sgn } [
-    { number } "specializer" set-word-prop
-] each
-
-\ 2/ { fixnum } "specializer" set-word-prop
-
-{ min max } [
-    { number number } "specializer" set-word-prop
-] each
-
 { first first2 first3 first4 }
 [ { array } "specializer" set-word-prop ] each
 

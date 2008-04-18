@@ -8,80 +8,91 @@ namespaces assocs quotations math.intervals sequences.private
 combinators splitting layouts math.parser classes
 classes.algebra generic.math optimizer.pattern-match
 optimizer.backend optimizer.def-use optimizer.inlining
-generic.standard system ;
+optimizer.math.partial generic.standard system ;
 
-{ + bignum+ float+ fixnum+ fixnum+fast } {
+: define-math-identities ( word identities -- )
+    >r all-derived-ops r> define-identities ;
+
+\ number= {
+    { { @ @ } [ 2drop t ] }
+} define-math-identities
+
+\ + {
     { { number 0 } [ drop ] }
     { { 0 number } [ nip ] }
-} define-identities
+} define-math-identities
 
-{ - fixnum- bignum- float- fixnum-fast } {
+\ - {
     { { number 0 } [ drop ] }
     { { @ @ } [ 2drop 0 ] }
-} define-identities
+} define-math-identities
 
-{ < fixnum< bignum< float< } {
+\ < {
     { { @ @ } [ 2drop f ] }
-} define-identities
+} define-math-identities
 
-{ <= fixnum<= bignum<= float<= } {
+\ <= {
     { { @ @ } [ 2drop t ] }
-} define-identities
+} define-math-identities
 
-{ > fixnum> bignum> float>= } {
+\ > {
     { { @ @ } [ 2drop f ] }
-} define-identities
+} define-math-identities
 
-{ >= fixnum>= bignum>= float>= } {
+\ >= {
     { { @ @ } [ 2drop t ] }
-} define-identities
+} define-math-identities
 
-{ * fixnum* fixnum*fast bignum* float* } {
+\ * {
     { { number 1 } [ drop ] }
     { { 1 number } [ nip ] }
     { { number 0 } [ nip ] }
     { { 0 number } [ drop ] }
     { { number -1 } [ drop 0 swap - ] }
     { { -1 number } [ nip 0 swap - ] }
-} define-identities
+} define-math-identities
 
-{ / fixnum/i bignum/i float/f } {
+\ / {
     { { number 1 } [ drop ] }
     { { number -1 } [ drop 0 swap - ] }
-} define-identities
+} define-math-identities
 
-{ fixnum-mod bignum-mod } {
-    { { number 1 } [ 2drop 0 ] }
-} define-identities
+\ mod {
+    { { integer 1 } [ 2drop 0 ] }
+} define-math-identities
 
-{ bitand fixnum-bitand bignum-bitand } {
+\ rem {
+    { { integer 1 } [ 2drop 0 ] }
+} define-math-identities
+
+\ bitand {
     { { number -1 } [ drop ] }
     { { -1 number } [ nip ] }
     { { @ @ } [ drop ] }
     { { number 0 } [ nip ] }
     { { 0 number } [ drop ] }
-} define-identities
+} define-math-identities
 
-{ bitor fixnum-bitor bignum-bitor } {
+\ bitor {
     { { number 0 } [ drop ] }
     { { 0 number } [ nip ] }
     { { @ @ } [ drop ] }
     { { number -1 } [ nip ] }
     { { -1 number } [ drop ] }
-} define-identities
+} define-math-identities
 
-{ bitxor fixnum-bitxor bignum-bitxor } {
+\ bitxor {
     { { number 0 } [ drop ] }
     { { 0 number } [ nip ] }
     { { number -1 } [ drop bitnot ] }
     { { -1 number } [ nip bitnot ] }
     { { @ @ } [ 2drop 0 ] }
-} define-identities
+} define-math-identities
 
-{ shift fixnum-shift fixnum-shift-fast bignum-shift } {
+\ shift {
     { { 0 number } [ drop ] }
     { { number 0 } [ drop ] }
-} define-identities
+} define-math-identities
 
 : math-closure ( class -- newclass )
     { fixnum bignum integer rational float real number }
@@ -126,15 +137,9 @@ generic.standard system ;
     r> post-process ; inline
 
 {
-    { 1+ integer interval-1+ }
-    { 1- integer interval-1- }
-    { neg integer interval-neg }
-    { shift integer interval-recip }
     { bitnot fixnum interval-bitnot }
     { fixnum-bitnot f interval-bitnot }
     { bignum-bitnot f interval-bitnot }
-    { 2/ fixnum interval-2/ }
-    { sq integer f }
 } [
     first3 [
         math-output-class/interval-1
@@ -164,35 +169,16 @@ generic.standard system ;
     { * integer interval* }
     { / rational interval/ }
     { /i integer interval/i }
-
-    { fixnum+ f interval+ }
-    { fixnum+fast f interval+ }
-    { fixnum- f interval- }
-    { fixnum-fast f interval- }
-    { fixnum* f interval* }
-    { fixnum*fast f interval* }
-    { fixnum/i f interval/i }
-
-    { bignum+ f interval+ }
-    { bignum- f interval- }
-    { bignum* f interval* }
-    { bignum/i f interval/i }
-    { bignum-shift f interval-shift-safe }
-
-    { float+ f interval+ }
-    { float- f interval- }
-    { float* f interval* }
-    { float/f f interval/ }
-
-    { min fixnum interval-min }
-    { max fixnum interval-max }
+    { shift f interval-shift-safe }
 } [
     first3 [
-        math-output-class/interval-2
-    ] 2curry "output-classes" set-word-prop
+        [
+            math-output-class/interval-2
+        ] 2curry "output-classes" set-word-prop
+    ] 2curry each-derived-op
 ] each
 
-{ fixnum-shift fixnum-shift-fast shift } [
+\ shift [
     [
         dup
         node-in-d second value-interval*
@@ -200,7 +186,7 @@ generic.standard system ;
         \ interval-shift-safe
         math-output-class/interval-2
     ] "output-classes" set-word-prop
-] each
+] each-derived-op
 
 : real-value? ( value -- n ? )
     dup value? [ value-literal dup real? ] [ drop f f ] if ;
@@ -231,21 +217,17 @@ generic.standard system ;
 
 {
     { mod fixnum mod-range }
-    { fixnum-mod f mod-range }
-    { bignum-mod f mod-range }
-    { float-mod f mod-range }
-
     { rem integer rem-range }
 
     { bitand fixnum bitand-range }
-    { fixnum-bitand f bitand-range }
-
     { bitor fixnum f }
     { bitxor fixnum f }
 } [
     first3 [
-        math-output-class/interval-special
-    ] 2curry "output-classes" set-word-prop
+        [
+            math-output-class/interval-special
+        ] 2curry "output-classes" set-word-prop
+    ] 2curry each-derived-op
 ] each
 
 : twiddle-interval ( i1 -- i2 )
@@ -275,26 +257,12 @@ generic.standard system ;
     { <= assume<= assume> }
     { > assume> assume<= }
     { >= assume>= assume< }
-
-    { fixnum< assume< assume>= }
-    { fixnum<= assume<= assume> }
-    { fixnum> assume> assume<= }
-    { fixnum>= assume>= assume< }
-
-    { bignum< assume< assume>= }
-    { bignum<= assume<= assume> }
-    { bignum> assume> assume<= }
-    { bignum>= assume>= assume< }
-
-    { float< assume< assume>= }
-    { float<= assume<= assume> }
-    { float> assume> assume<= }
-    { float>= assume>= assume< }
 } [
-    first3
-    [
-        [ comparison-constraints ] with-scope
-    ] 2curry "constraints" set-word-prop
+    first3 [
+        [
+            [ comparison-constraints ] with-scope
+        ] 2curry "constraints" set-word-prop
+    ] 2curry each-derived-op
 ] each
 
 {
@@ -347,20 +315,15 @@ most-negative-fixnum most-positive-fixnum [a,b]
 
 {
     { + [ fixnum+fast ] }
+    { +-integer-fixnum [ fixnum+fast ] }
     { - [ fixnum-fast ] }
     { * [ fixnum*fast ] }
+    { *-integer-fixnum [ fixnum*fast ] }
     { shift [ fixnum-shift-fast ] }
     { fixnum+ [ fixnum+fast ] }
     { fixnum- [ fixnum-fast ] }
     { fixnum* [ fixnum*fast ] }
     { fixnum-shift [ fixnum-shift-fast ] }
-    ! these are here as an optimization. if they weren't given
-    ! explicitly, the same would be inferred after an extra
-    ! optimization step (see optimistic-inline?)
-    { 1+ [ 1 fixnum+fast ] }
-    { 1- [ 1 fixnum-fast ] }
-    { 2/ [ -1 fixnum-shift-fast ] }
-    { neg [ 0 swap fixnum-fast ] }
 } [
     [
         [ dup remove-overflow-check? ] ,
@@ -394,26 +357,13 @@ most-negative-fixnum most-positive-fixnum [a,b]
     { <= interval<= }
     { > interval> }
     { >= interval>= }
-
-    { fixnum< interval< }
-    { fixnum<= interval<= }
-    { fixnum> interval> }
-    { fixnum>= interval>= }
-
-    { bignum< interval< }
-    { bignum<= interval<= }
-    { bignum> interval> }
-    { bignum>= interval>= }
-
-    { float< interval< }
-    { float<= interval<= }
-    { float> interval> }
-    { float>= interval>= }
 } [
     [
-        dup [ dupd foldable-comparison? ] curry ,
-        [ fold-comparison ] curry ,
-    ] { } make 1array define-optimizers
+        [
+            dup [ dupd foldable-comparison? ] curry ,
+            [ fold-comparison ] curry ,
+        ] { } make 1array define-optimizers
+    ] curry each-derived-op
 ] assoc-each
 
 ! The following words are handled in a similar way except if
@@ -428,20 +378,20 @@ most-negative-fixnum most-positive-fixnum [a,b]
     [ \ >fixnum consumed-by? ] [ drop f ] if ;
 
 {
-    { fixnum+ [ fixnum+fast ] }
-    { fixnum- [ fixnum-fast ] }
-    { fixnum* [ fixnum*fast ] }
-    { + [ >r >fixnum r> >fixnum fixnum+fast ] }
-    { - [ >r >fixnum r> >fixnum fixnum-fast ] }
-    { * [ >r >fixnum r> >fixnum fixnum*fast ] }
+    { + [ [ >fixnum ] bi@ fixnum+fast ] }
+    { - [ [ >fixnum ] bi@ fixnum-fast ] }
+    { * [ [ >fixnum ] bi@ fixnum*fast ] }
+    { shift [ [ >fixnum ] bi@ fixnum-shift-fast ] }
 } [
-    [
+    >r derived-ops r> [
         [
-            dup remove-overflow-check?
-            over coerced-to-fixnum? or
-        ] ,
-        [ f splice-quot ] curry ,
-    ] { } make 1array define-optimizers
+            [
+                dup remove-overflow-check?
+                over coerced-to-fixnum? or
+            ] ,
+            [ f splice-quot ] curry ,
+        ] { } make 1array define-optimizers
+    ] curry each
 ] assoc-each
 
 : convert-rem-to-and? ( #call -- ? )
@@ -461,14 +411,14 @@ most-negative-fixnum most-positive-fixnum [a,b]
     dup node-in-d second node-literal 1-
     [ nip bitand ] curry f splice-quot ;
 
-{ mod bignum-mod fixnum-mod } [
+\ mod [
     {
         {
             [ dup convert-mod-to-and? ]
             [ convert-mod-to-and ]
         }
     } define-optimizers
-] each
+] each-derived-op
 
 \ rem {
     {
@@ -481,7 +431,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
     dup node-in-d second node-interval fixnum fits? ;
 
 : fixnumify-bitand ( #call -- node )
-    [ >r >fixnum r> >fixnum fixnum-bitand ] f splice-quot ;
+    [ [ >fixnum ] bi@ fixnum-bitand ] f splice-quot ;
 
 \ bitand {
     {
