@@ -1,5 +1,5 @@
 USING: definitions io io.launcher kernel math math.parser
-namespaces parser prettyprint sequences editors ;
+namespaces parser prettyprint sequences editors accessors ;
 IN: editors.vim
 
 SYMBOL: vim-path
@@ -17,8 +17,9 @@ M: vim vim-command ( file line -- array )
 
 : vim-location ( file line -- )
     vim-command
-    vim-detach get-global
-    [ try-detached ] [ try-process ] if ;
+    <process> swap >>command
+    vim-detach get-global [ t >>detached ] when
+    try-process ;
 
 "vim" vim-path set-global
 [ vim-location ] edit-hook set-global
