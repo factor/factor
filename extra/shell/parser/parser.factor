@@ -14,6 +14,8 @@ TUPLE: double-quoted-expr expr ;
 TUPLE: back-quoted-expr   expr ;
 TUPLE: glob-expr          expr ;
 
+TUPLE: variable-expr expr ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : <single-quoted-expr> single-quoted-expr boa ;
@@ -45,6 +47,8 @@ bquote = "`"
 
 back-quoted = bquote (!(bquote) .)* bquote => [[ second >string <back-quoted-expr> ]]
 
+variable = "$" other => [[ second variable-expr boa ]]
+
 glob-char = ("*" | "?")
 
 non-glob-char = !(glob-char | white) .
@@ -57,7 +61,7 @@ glob = glob-beginning-string glob-char (glob-rest-string | glob-char)* => [[ fla
 
 other = (!(white | "&" | ">" | ">>" | "<") .)+ => [[ >string ]]
 
-element = (single-quoted | double-quoted | back-quoted | glob | other)
+element = (single-quoted | double-quoted | back-quoted | variable | glob | other)
 
 to-file = ">" whitespace other => [[ second ]]
 
