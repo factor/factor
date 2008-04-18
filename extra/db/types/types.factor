@@ -15,7 +15,8 @@ HOOK: compound-type db ( str n -- hash )
 
 TUPLE: sql-spec class slot-name column-name type modifiers primary-key ;
 
-TUPLE: literal-bind key value type ;
+TUPLE: literal-bind key type value ;
+C: <literal-bind> literal-bind
 
 SINGLETON: +native-id+
 SINGLETON: +assigned-id+
@@ -132,6 +133,7 @@ TUPLE: no-sql-modifier ;
     dup empty? [ " " prepend ] unless ;
 
 HOOK: bind% db ( spec -- )
+HOOK: bind# db ( spec obj -- )
 
 : offset-of-slot ( str obj -- n )
     class "slots" word-prop slot-named slot-spec-offset ;

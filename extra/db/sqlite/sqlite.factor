@@ -5,7 +5,7 @@ hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings classes.tuple alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators math.intervals
-io namespaces.lib accessors ;
+io namespaces.lib accessors vectors math.ranges ;
 USE: tools.walker
 IN: db.sqlite
 
@@ -104,7 +104,8 @@ M: sqlite-db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
 
 : sqlite-make ( class quot -- )
     >r sql-props r>
-    { "" { } { } } nmake <simple-statement> ; inline
+    [ 0 sql-counter rot with-variable ] { "" { } { } } nmake
+    <simple-statement> ; inline
 
 M: sqlite-db create-sql-statement ( class -- statement )
     [
@@ -134,6 +135,12 @@ M: sqlite-db <insert-native-statement> ( tuple -- statement )
 M: sqlite-db <insert-nonnative-statement> ( tuple -- statement )
     <insert-native-statement> ;
 
+M: sqlite-db bind# ( spec obj -- )
+    >r
+    [ column-name>> ":" swap next-sql-counter 3append dup 0% ]
+    [ type>> ] bi
+    r> <literal-bind> 1, ;
+
 M: sqlite-db bind% ( spec -- )
     dup 1, column-name>> ":" prepend 0% ;
 
@@ -141,38 +148,44 @@ M: sqlite-db bind% ( spec -- )
     " where " 0%
     find-primary-key dup column-name>> 0% " = " 0% bind% ;
 
-! : where-object ( tuple specs -- )
-    ! [ dup column-name>> get-slot-named ] keep
-    ! dup column-name>> 0% " = " 0% bind% ;
-
-GENERIC: where-object ( specs obj -- )
+GENERIC: where ( specs obj -- )
 
 : interval-comparison ( ? str -- str )
     "from" = " >" " <" ? swap [ "= " append ] when ;
 
-: where-interval ( spec val ? from/to -- )
-    roll [
-        column-name>>
-        [ 0% interval-comparison 0% ]
-        [ ":" spin 3append dup 0% ] 2bi
-        swap
-    ] [
-        type>>
-    ] bi literal-bind boa 1, ;
+: where-interval ( spec obj from/to -- )
+    pick column-name>> 0%
+    >r first2 r> interval-comparison 0%
+    bind# ;
 
-M: interval where-object ( specs obj -- )
-    [ from>> first2 "from" where-interval " and " 0% ]
-    [ to>> first2 "to" where-interval ] 2bi ;
+: in-parens ( quot -- )
+    "(" 0% call ")" 0% ; inline
 
-M: object where-object ( specs obj -- )
-    drop
-    dup column-name>> 0% " = " 0% bind% ;
+M: interval where ( spec obj -- )
+    [
+        [ from>> "from" where-interval " and " 0% ]
+        [ to>> "to" where-interval ] 2bi
+    ] in-parens ;
+
+M: sequence where ( spec obj -- )
+    [
+        [ " or " 0% ] [ dupd where ] interleave drop
+    ] in-parens ;
+
+: object-where ( spec obj -- )
+    over column-name>> 0% " = " 0% bind# ;
+
+M: object where ( spec obj -- ) object-where ;
+
+M: integer where ( spec obj -- ) object-where ;
+
+M: string where ( spec obj -- ) object-where ;
 
 : where-clause ( tuple specs -- )
     " where " 0% [
         " and " 0%
     ] [
-        2dup slot-name>> swap get-slot-named where-object
+        2dup slot-name>> swap get-slot-named where
     ] interleave drop ;
 
 M: sqlite-db <update-tuple-statement> ( class -- statement )
@@ -192,9 +205,6 @@ M: sqlite-db <delete-tuple-statement> ( specs table -- sql )
         find-primary-key
         dup column-name>> 0% " = " 0% bind%
     ] sqlite-make ;
-
-! : select-interval ( interval name -- ) ;
-! : select-sequence ( seq name -- ) ;
 
 M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
     [

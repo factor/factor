@@ -22,6 +22,9 @@ IN: db.tuples
         class db-columns find-primary-key sql-spec-slot-name
     ] keep set-slot-named ;
 
+SYMBOL: sql-counter
+: next-sql-counter sql-counter [ inc ] [ get ] bi number>string ;
+
 ! returns a sequence of prepared-statements
 HOOK: create-sql-statement db ( class -- obj )
 HOOK: drop-sql-statement db ( class -- obj )

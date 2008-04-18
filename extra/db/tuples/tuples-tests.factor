@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.tuples
-db.types continuations namespaces math
+db.types continuations namespaces math math.ranges
 prettyprint tools.walker db.sqlite calendar
 math.intervals db.postgresql ;
 IN: db.tuples.tests
@@ -217,7 +217,7 @@ TUPLE: serialize-me id data ;
 
 TUPLE: exam id name score ; 
 
-: test-ranges ( -- )
+: test-intervals ( -- )
     exam "EXAM"
     {
         { "id" "ID" +native-id+ }
@@ -267,9 +267,31 @@ TUPLE: exam id name score ;
         }
     ] [
         T{ exam f T{ interval f { 3 t } { 4 t } } f } select-tuples
+    ] unit-test
+
+    [
+        {
+            T{ exam f 1 "Kyle" 100 }
+            T{ exam f 2 "Stan" 80 }
+        }
+    ] [
+        T{ exam f f { "Stan" "Kyle" } } select-tuples
+    ] unit-test
+
+    [
+        {
+            T{ exam f 1 "Kyle" 100 }
+            T{ exam f 2 "Stan" 80 }
+            T{ exam f 3 "Kenny" 60 }
+        }
+    ] [
+        T{ exam f T{ range f 1 3 1 } } select-tuples
     ] unit-test ;
 
-[ test-ranges ] test-sqlite
+[ test-intervals ] test-sqlite
+
+: test-ranges
+    ;
 
 TUPLE: secret n message ;
 C: <secret> secret
