@@ -18,7 +18,7 @@ M: vim vim-command ( file line -- array )
 : vim-location ( file line -- )
     vim-command
     vim-detach get-global
-    [ run-detached ] [ run-process ] if drop ;
+    [ try-detached ] [ try-process ] if ;
 
 "vim" vim-path set-global
 [ vim-location ] edit-hook set-global
