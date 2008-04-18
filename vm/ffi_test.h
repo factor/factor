@@ -61,3 +61,5 @@ DLLEXPORT double ffi_test_35(struct test_struct_11 x, int y);
 struct test_struct_12 { int a; double x; };
 
 DLLEXPORT double ffi_test_36(struct test_struct_12 x);
+
+DLLEXPORT int ffi_test_37(int (*f)(int, int, int));
