@@ -1,6 +1,6 @@
 
 USING: kernel words continuations namespaces debugger sequences combinators
-       io io.files io.launcher
+       system io io.files io.launcher sequences.deep
        accessors multi-methods newfx shell.parser ;
 
 IN: shell
@@ -32,11 +32,20 @@ METHOD: expand { single-quoted-expr } expr>> ;
 
 METHOD: expand { double-quoted-expr } expr>> ;
 
+METHOD: expand { variable-expr } expr>> os-env ;
+
+METHOD: expand { glob-expr }
+  expr>>
+  dup "*" =
+    [ drop current-directory get directory [ first ] map ]
+    [ ]
+  if ;
+
 METHOD: expand { object } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: expansion ( command -- command ) [ expand ] map ;
+: expansion ( command -- command ) [ expand ] map flatten ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -53,10 +62,10 @@ METHOD: expand { object } ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : chant ( incantation -- )
-    dup command>> first swords member-of?
-      [ command>> unclip "shell" lookup execute ]
-      [ run-incantation ]
-    if ;
+  dup command>> first swords member-of?
+    [ command>> unclip "shell" lookup execute ]
+    [ run-incantation ]
+  if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -67,18 +76,25 @@ METHOD: expand { object } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+DEFER: shell
+
+: handle ( input -- )
+  {
+    { [ dup f = ]      [ drop ] }
+    { [ dup "exit" = ] [ drop ] }
+    { [ dup "" = ]     [ drop shell ] }
+    { [ dup expr ]     [ expr ast>> chant shell ] }
+    { [ t ]            [ drop "ix: ignoring input" print shell ] }
+  }
+    cond ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : shell ( -- )
   prompt
   readln
-    {
-      { [ dup f = ] [ drop ] }
-      { [ dup "exit" = ] [ drop ] }
-      { [ dup "" = ] [ drop shell ] }
-      { [ dup expr ] [ expr ast>> chant shell ] }
-      { [ t ]        [ drop shell ] }
-    }
-  cond ;
-
+  handle ;
+  
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : ix ( -- ) shell ;
