@@ -31,7 +31,7 @@ IN: project-euler.150
 : sums-triangle ( -- seq )
     0 1000 [ 1+ [ next ] generate partial-sums ] map nip ; 
 
-PRIVATE> USING: arrays kernel.private ;
+PRIVATE>
 
 :: (euler150) ( m -- n )
     [let | table [ sums-triangle ] |
