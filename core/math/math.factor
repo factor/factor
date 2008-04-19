@@ -55,26 +55,26 @@ GENERIC: zero? ( x -- ? ) foldable
 
 M: object zero? drop f ;
 
-: 1+ ( x -- y ) 1 + ; foldable
-: 1- ( x -- y ) 1 - ; foldable
-: 2/ ( x -- y ) -1 shift ; foldable
-: sq ( x -- y ) dup * ; foldable
-: neg ( x -- -x ) 0 swap - ; foldable
-: recip ( x -- y ) 1 swap / ; foldable
+: 1+ ( x -- y ) 1 + ; inline
+: 1- ( x -- y ) 1 - ; inline
+: 2/ ( x -- y ) -1 shift ; inline
+: sq ( x -- y ) dup * ; inline
+: neg ( x -- -x ) 0 swap - ; inline
+: recip ( x -- y ) 1 swap / ; inline
 
 : ?1+ [ 1+ ] [ 0 ] if* ; inline
 
 : /f  ( x y -- z ) >r >float r> >float float/f ; inline
 
-: max ( x y -- z ) [ > ] most ; foldable
-: min ( x y -- z ) [ < ] most ; foldable
+: max ( x y -- z ) [ > ] most ; inline
+: min ( x y -- z ) [ < ] most ; inline
 
 : between? ( x y z -- ? )
     pick >= [ >= ] [ 2drop f ] if ; inline
 
 : rem ( x y -- z ) tuck mod over + swap mod ; foldable
 
-: sgn ( x -- n ) dup 0 < -1 0 ? swap 0 > 1 0 ? bitor ; foldable
+: sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
 
 : [-] ( x y -- z ) - 0 max ; inline
 
@@ -121,7 +121,11 @@ M: float fp-nan?
 
 : next-power-of-2 ( m -- n ) 2 swap (next-power-of-2) ; foldable
 
-: align ( m w -- n ) 1- [ + ] keep bitnot bitand ; inline
+: power-of-2? ( n -- ? )
+    dup 0 <= [ drop f ] [ dup 1- bitand zero? ] if ; foldable
+
+: align ( m w -- n )
+    1- [ + ] keep bitnot bitand ; inline
 
 <PRIVATE
 

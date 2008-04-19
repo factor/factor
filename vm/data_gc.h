@@ -20,6 +20,7 @@ DECLARE_PRIMITIVE(next_object);
 DECLARE_PRIMITIVE(end_scan);
 
 void gc(void);
+DLLEXPORT void minor_gc(void);
 
 /* generational copying GC divides memory into zones */
 typedef struct {
@@ -125,7 +126,7 @@ void collect_cards(void);
 F_ZONE *newspace;
 
 /* new objects are allocated here */
-DLLEXPORT F_ZONE *nursery;
+DLLEXPORT F_ZONE nursery;
 
 INLINE bool in_zone(F_ZONE *z, CELL pointer)
 {
@@ -200,7 +201,7 @@ INLINE bool should_copy(CELL untagged)
 	else if(HAVE_AGING_P && collecting_gen == AGING)
 		return !in_zone(&data_heap->generations[TENURED],untagged);
 	else if(HAVE_NURSERY_P && collecting_gen == NURSERY)
-		return in_zone(&data_heap->generations[NURSERY],untagged);
+		return in_zone(&nursery,untagged);
 	else
 	{
 		critical_error("Bug in should_copy",untagged);
@@ -315,13 +316,15 @@ INLINE void* allot_object(CELL type, CELL a)
 {
 	CELL *object;
 
-	if(HAVE_NURSERY_P && nursery->size - ALLOT_BUFFER_ZONE > a)
+	if(HAVE_NURSERY_P && nursery.size - ALLOT_BUFFER_ZONE > a)
 	{
 		/* If there is insufficient room, collect the nursery */
-		if(nursery->here + ALLOT_BUFFER_ZONE + a > nursery->end)
+		if(nursery.here + ALLOT_BUFFER_ZONE + a > nursery.end)
 			garbage_collection(NURSERY,false,0);
 
-		object = allot_zone(nursery,a);
+		CELL h = nursery.here;
+		nursery.here = h + align8(a);
+		object = (void*)h;
 	}
 	/* If the object is bigger than the nursery, allocate it in
 	tenured space */
@@ -359,8 +362,6 @@ INLINE void* allot_object(CELL type, CELL a)
 }
 
 CELL collect_next(CELL scan);
-
-DLLEXPORT void simple_gc(void);
 
 DECLARE_PRIMITIVE(gc);
 DECLARE_PRIMITIVE(gc_time);

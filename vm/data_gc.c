@@ -122,7 +122,7 @@ void clear_cards(CELL from, CELL to)
 void set_data_heap(F_DATA_HEAP *data_heap_)
 {
 	data_heap = data_heap_;
-	nursery = &data_heap->generations[NURSERY];
+	nursery = data_heap->generations[NURSERY];
 	init_cards_offset();
 	clear_cards(NURSERY,TENURED);
 }
@@ -231,7 +231,7 @@ DEFINE_PRIMITIVE(data_room)
 
 	for(gen = 0; gen < data_heap->gen_count; gen++)
 	{
-		F_ZONE *z = &data_heap->generations[gen];
+		F_ZONE *z = (gen == NURSERY ? &nursery : &data_heap->generations[gen]);
 		set_array_nth(a,gen * 2,tag_fixnum((z->end - z->here) >> 10));
 		set_array_nth(a,gen * 2 + 1,tag_fixnum((z->size) >> 10));
 	}
@@ -583,7 +583,7 @@ CELL collect_next(CELL scan)
 
 INLINE void reset_generation(CELL i)
 {
-	F_ZONE *z = &data_heap->generations[i];
+	F_ZONE *z = (i == NURSERY ? &nursery : &data_heap->generations[i]);
 	z->here = z->start;
 	if(secure_gc)
 		memset((void*)z->start,69,z->size);
@@ -608,7 +608,7 @@ void begin_gc(CELL requested_bytes)
 
 		old_data_heap = data_heap;
 		set_data_heap(grow_data_heap(old_data_heap,requested_bytes));
-		newspace = &data_heap->generations[collecting_gen];
+		newspace = &data_heap->generations[TENURED];
 	}
 	else if(collecting_accumulation_gen_p())
 	{
@@ -783,6 +783,11 @@ void gc(void)
 	garbage_collection(TENURED,false,0);
 }
 
+void minor_gc(void)
+{
+	garbage_collection(NURSERY,false,0);
+}
+
 DEFINE_PRIMITIVE(gc)
 {
 	gc();
@@ -792,12 +797,6 @@ DEFINE_PRIMITIVE(gc)
 DEFINE_PRIMITIVE(gc_time)
 {
 	box_unsigned_8(gc_time);
-}
-
-void simple_gc(void)
-{
-	if(nursery->here + ALLOT_BUFFER_ZONE > nursery->end)
-		garbage_collection(NURSERY,false,0);
 }
 
 DEFINE_PRIMITIVE(become)

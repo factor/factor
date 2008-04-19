@@ -184,3 +184,10 @@ unit-test
 [ HEX: 988a259c3433f237 ] [
     B{ HEX: 37 HEX: f2 HEX: 33 HEX: 34 HEX: 9c HEX: 25 HEX: 8a HEX: 98 } byte-array>bignum
 ] unit-test
+
+[ t ] [ 256 power-of-2? ] unit-test
+[ f ] [ 123 power-of-2? ] unit-test
+
+[ f ] [ -128 power-of-2? ] unit-test
+[ f ] [ 0 power-of-2? ] unit-test
+[ t ] [ 1 power-of-2? ] unit-test

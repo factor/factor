@@ -34,6 +34,10 @@ GENERIC: push-return-reg ( reg-class -- )
 GENERIC: load-return-reg ( stack@ reg-class -- )
 GENERIC: store-return-reg ( stack@ reg-class -- )
 
+! Only used by inline allocation
+HOOK: temp-reg-1 cpu
+HOOK: temp-reg-2 cpu
+
 HOOK: address-operand cpu ( address -- operand )
 
 HOOK: fixnum>slot@ cpu

@@ -260,3 +260,10 @@ int ffi_test_37(int (*f)(int, int, int))
 	fflush(stdout);
 	return global_var;
 }
+
+unsigned long long ffi_test_38(unsigned long long x, unsigned long long y)
+{
+	return x * y;
+}
+
+

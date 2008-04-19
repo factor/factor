@@ -29,6 +29,9 @@ PREDICATE: method-spec < pair
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
 
+: specific-method ( class word -- class )
+    order min-class ;
+
 GENERIC: effective-method ( ... generic -- method )
 
 : next-method-class ( class generic -- class/f )
