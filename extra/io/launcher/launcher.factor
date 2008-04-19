@@ -127,10 +127,7 @@ HOOK: run-process* io-backend ( process -- handle )
     run-detached
     dup detached>> [ dup wait-for-process drop ] unless ;
 
-TUPLE: process-failed code ;
-
-: process-failed ( code -- * )
-    \ process-failed boa throw ;
+ERROR: process-failed code ;
 
 : try-process ( desc -- )
     run-process wait-for-process dup zero?
