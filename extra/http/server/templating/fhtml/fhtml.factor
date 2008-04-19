@@ -94,3 +94,5 @@ M: fhtml call-template ( filename -- )
     [ <fhtml> serve-template ]
     "application/x-factor-server-page"
     pick special>> set-at ;
+
+INSTANCE: fhtml template

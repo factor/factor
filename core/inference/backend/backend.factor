@@ -15,7 +15,7 @@ GENERIC: inline? ( word -- ? )
 M: method-body inline?
     "method-generic" word-prop inline? ;
 
-M: tuple-dispatch-engine-word inline?
+M: engine-word inline?
     "tuple-dispatch-generic" word-prop inline? ;
 
 M: word inline?
@@ -130,25 +130,27 @@ TUPLE: too-many->r ;
 
 TUPLE: too-many-r> ;
 
-: check-r> ( -- )
-    meta-r get empty?
+: check-r> ( n -- )
+    meta-r get length >
     [ \ too-many-r> inference-error ] when ;
 
-: infer->r ( -- )
-    1 ensure-values
+: infer->r ( n -- )
+    dup ensure-values
     #>r
-    1 0 pick node-inputs
-    pop-d push-r
-    0 1 pick node-outputs
-    node, ;
+    over 0 pick node-inputs
+    over [ drop pop-d ] map reverse [ push-r ] each
+    0 pick pick node-outputs
+    node,
+    drop ;
 
-: infer-r> ( -- )
-    check-r>
+: infer-r> ( n -- )
+    dup check-r>
     #r>
-    0 1 pick node-inputs
-    pop-r push-d
-    1 0 pick node-outputs
-    node, ;
+    0 pick pick node-inputs
+    over [ drop pop-r ] map reverse [ push-d ] each
+    over 0 pick node-outputs
+    node,
+    drop ;
 
 : undo-infer ( -- )
     recorded get [ f "inferred-effect" set-word-prop ] each ;
@@ -199,18 +201,18 @@ M: object constructor drop f ;
     dup infer-uncurry
     constructor [
         peek-d reify-curry
-        infer->r
+        1 infer->r
         peek-d reify-curry
-        infer-r>
+        1 infer-r>
         2 1 <effect> swap #call consume/produce
     ] when* ;
 
 : reify-curries ( n -- )
     meta-d get reverse [
         dup special? [
-            over [ infer->r ] times
+            over infer->r
             dup reify-curry
-            over [ infer-r> ] times
+            over infer-r>
         ] when 2drop
     ] 2each ;
 

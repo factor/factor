@@ -56,7 +56,7 @@ HOOK: %call cpu ( word -- )
 HOOK: %jump-label cpu ( label -- )
 
 ! Test if vreg is 'f' or not
-HOOK: %jump-t cpu ( label -- )
+HOOK: %jump-f cpu ( label -- )
 
 HOOK: %dispatch cpu ( -- )
 

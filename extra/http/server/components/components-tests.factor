@@ -1,11 +1,9 @@
 IN: http.server.components.tests
 USING: http.server.components http.server.forms
 http.server.validators namespaces tools.test kernel accessors
-tuple-syntax mirrors http.server.actions
-http.server.templating.fhtml
+tuple-syntax mirrors
+http http.server.actions http.server.templating.fhtml
 io.streams.string io.streams.null ;
-
-\ render-edit must-infer
 
 validation-failed? off
 
@@ -65,9 +63,9 @@ TUPLE: test-tuple text number more-text ;
             "hi" >>default
             add-field ;
 
-[ ] [ <test-tuple> <mirror> values set <test-form> view-form ] unit-test
+[ ] [ <test-tuple> <mirror> values set <test-form> view-form write-response-body drop ] unit-test
 
-[ ] [ <test-tuple> <mirror> values set <test-form> edit-form ] unit-test
+[ ] [ <test-tuple> <mirror> values set <test-form> edit-form write-response-body drop ] unit-test
 
 [ TUPLE{ test-tuple number: 123 more-text: "hi" } ] [
     <test-tuple> from-tuple

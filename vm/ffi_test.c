@@ -250,3 +250,13 @@ double ffi_test_36(struct test_struct_12 x)
 {
 	return x.x;
 }
+
+int ffi_test_37(int (*f)(int, int, int))
+{
+	static int global_var = 0;
+	printf("ffi_test_37\n");
+	global_var = f(global_var,global_var * 2,global_var * 3);
+	printf("global_var is %d\n",global_var);
+	fflush(stdout);
+	return global_var;
+}

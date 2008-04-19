@@ -1,4 +1,7 @@
+! Copyright (C) 2008 Slava Pestov
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors assocs namespaces io.files sequences fry
+http.server
 http.server.actions
 http.server.components
 http.server.validators
@@ -17,8 +20,11 @@ M: form init V{ } clone >>components ;
 : add-field ( form component -- form )
     dup id>> pick components>> set-at ;
 
+: set-components ( form -- )
+    components>> components set ;
+
 : with-form ( form quot -- )
-    >r components>> components r> with-variable ; inline
+    [ [ set-components ] [ call ] bi* ] with-scope ; inline
 
 : set-defaults ( form -- )
     [
@@ -29,14 +35,16 @@ M: form init V{ } clone >>components ;
         ] assoc-each
     ] with-form ;
 
-: view-form ( form -- )
-    dup view-template>> '[ , call-template ] with-form ;
+: <form-response> ( form template -- response )
+    [ components>> components set ]
+    [ "text/html" <content> swap >>body ]
+    bi* ;
 
-: edit-form ( form -- )
-    dup edit-template>> '[ , call-template ] with-form ;
+: view-form ( form -- response )
+    dup view-template>> <form-response> ;
 
-: summary-form ( form -- )
-    dup summary-template>> '[ , call-template ] with-form ;
+: edit-form ( form -- response )
+    dup edit-template>> <form-response> ;
 
 : validate-param ( id component -- )
     [ [ params get at ] [ validate ] bi* ]
@@ -52,19 +60,19 @@ M: form init V{ } clone >>components ;
 : validate-form ( form -- )
     (validate-form) [ validation-failed ] when ;
 
-! List components
-TUPLE: list-renderer form ;
+: render-form ( value form template -- )
+    [
+        [ from-tuple ]
+        [ set-components ]
+        [ call-template ]
+        tri*
+    ] with-scope ;
 
-C: <list-renderer> list-renderer
+M: form render-summary*
+    dup summary-template>> render-form ;
 
-M: list-renderer render-view*
-    form>> [
-        [ >r from-tuple r> summary-form ] with-scope
-    ] curry each ;
+M: form render-view*
+    dup view-template>> render-form ;
 
-TUPLE: list < component ;
-
-: <list> ( id form -- list )
-    list swap <list-renderer> new-component ;
-
-M: list component-string drop ;
+M: form render-edit*
+    dup edit-template>> render-form ;

@@ -226,3 +226,10 @@ IN: regexp-tests
 [ t ] [ "s@f" "[a-z.-]@[a-z]" f <regexp> matches? ] unit-test
 [ f ] [ "a" "[a-z.-]@[a-z]" f <regexp> matches? ] unit-test
 [ t ] [ ".o" "\\.[a-z]" f <regexp> matches? ] unit-test
+
+! Bug in parsing word
+[ t ] [
+    "a"
+    R' a'
+    matches?
+] unit-test
