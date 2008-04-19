@@ -113,6 +113,8 @@ HELP: try-process
 { $values { "desc" "a launch descriptor" } }
 { $description "Launches a process and waits for it to complete. If it exits with a non-zero status code, throws a " { $link process-failed } " error." } ;
 
+{ run-process try-process run-detached } related-words
+
 HELP: kill-process
 { $values { "process" process } }
 { $description "Kills a running process. Does nothing if the process has already exited." } ;
@@ -171,6 +173,7 @@ ARTICLE: "io.launcher.launch" "Launching processes"
 "Launching processes:"
 { $subsection run-process }
 { $subsection try-process }
+{ $subsection run-detached }
 "Redirecting standard input and output to a pipe:"
 { $subsection <process-stream> }
 { $subsection with-process-stream } ;
