@@ -125,7 +125,8 @@ optimizer.math.partial generic.standard system accessors ;
     ] if ; inline
 
 : math-output-class/interval-1 ( node word -- classes intervals )
-    [ drop { } math-output-class ] [ math-output-interval-1 ] 2bi ;
+    [ drop { } math-output-class 1array ]
+    [ math-output-interval-1 1array ] 2bi ;
 
 {
     { bitnot interval-bitnot }
@@ -362,7 +363,6 @@ most-negative-fixnum most-positive-fixnum [a,b]
     { + [ [ >fixnum ] bi@ fixnum+fast ] }
     { - [ [ >fixnum ] bi@ fixnum-fast ] }
     { * [ [ >fixnum ] bi@ fixnum*fast ] }
-    { shift [ [ >fixnum ] bi@ fixnum-shift-fast ] }
 } [
     >r derived-ops r> [
         [

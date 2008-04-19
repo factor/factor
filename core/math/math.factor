@@ -122,7 +122,7 @@ M: float fp-nan?
 : next-power-of-2 ( m -- n ) 2 swap (next-power-of-2) ; foldable
 
 : power-of-2? ( n -- ? )
-    dup 0 < [ drop f ] [ dup 1- bitand zero? ] if ; foldable
+    dup 0 <= [ drop f ] [ dup 1- bitand zero? ] if ; foldable
 
 : align ( m w -- n )
     1- [ + ] keep bitnot bitand ; inline

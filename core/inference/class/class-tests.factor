@@ -305,6 +305,11 @@ cell-bits 32 = [
     ] unit-test
 ] when
 
+[ f ] [
+    [ { integer } declare -63 shift 4095 bitand ]
+    \ shift inlined?
+] unit-test
+
 [ t ] [
     [ B{ 1 0 } *short 0 number= ]
     \ number= inlined?
@@ -555,6 +560,11 @@ M: integer detect-integer ;
             drop 615949 * 797807 + 20 2^ rem dup 19 2^ -
         ] map
     ] { * + shift rem mod fixnum-mod fixnum* fixnum+ fixnum- >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ { integer } declare bitnot detect-integer ]
+    \ detect-integer inlined?
 ] unit-test
 
 ! Later
