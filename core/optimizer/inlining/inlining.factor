@@ -71,6 +71,7 @@ DEFER: (flat-length)
 ! Partial dispatch of math-generic words
 : normalize-math-class ( class -- class' )
     {
+        null
         fixnum bignum integer
         ratio rational
         float real
@@ -192,7 +193,7 @@ DEFER: (flat-length)
     nip dup [ second ] when ;
 
 : apply-identities ( node -- node/f )
-    dup find-identity dup [ f splice-quot ] [ 2drop f ] if ;
+    dup find-identity f splice-quot ;
 
 : optimistic-inline? ( #call -- ? )
     dup node-param "specializer" word-prop dup [

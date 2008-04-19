@@ -4,7 +4,12 @@ inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
 slots.private combinators definitions compiler.units
-system layouts vectors optimizer.math.partial ;
+system layouts vectors optimizer.math.partial accessors
+optimizer.inlining ;
+
+[ t ] [ T{ literal-constraint f 1 2 } T{ literal-constraint f 1 2 } equal? ] unit-test
+
+[ f ] [ T{ literal-constraint f 1 3 } T{ literal-constraint f 1 2 } equal? ] unit-test
 
 ! Make sure these compile even though this is invalid code
 [ ] [ [ 10 mod 3.0 /i ] dataflow optimize drop ] unit-test
@@ -268,19 +273,24 @@ M: float detect-float ;
     [ 3 + = ] \ equal? inlined?
 ] unit-test
 
-[ t ] [
+[ f ] [
     [ { fixnum fixnum } declare 7 bitand neg shift ]
-    \ shift inlined?
+    \ fixnum-shift-fast inlined?
 ] unit-test
 
 [ t ] [
     [ { fixnum fixnum } declare 7 bitand neg shift ]
-    \ fixnum-shift inlined?
+    { shift fixnum-shift } inlined?
 ] unit-test
 
 [ t ] [
     [ { fixnum fixnum } declare 1 swap 7 bitand shift ]
-    \ fixnum-shift inlined?
+    { shift fixnum-shift } inlined?
+] unit-test
+
+[ f ] [
+    [ { fixnum fixnum } declare 1 swap 7 bitand shift ]
+    { fixnum-shift-fast } inlined?
 ] unit-test
 
 cell-bits 32 = [
@@ -375,23 +385,76 @@ cell-bits 32 = [
     [ 1000 [ 1+ ] map ] { 1+ fixnum+ } inlined?
 ] unit-test
 
+: rec ( a -- b )
+    dup 0 > [ 1 - rec ] when ; inline
+
+[ t ] [
+    [ { fixnum } declare rec 1 + ]
+    { > - + } inlined?
+] unit-test
+
 : fib ( m -- n )
     dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ; inline
 
 [ t ] [
-    [ 27.0 fib ] { < - } inlined?
+    [ 27.0 fib ] { < - + } inlined?
+] unit-test
+
+[ f ] [
+    [ 27.0 fib ] { +-integer-integer } inlined?
 ] unit-test
 
 [ t ] [
-    [ 27 fib ] { < - } inlined?
+    [ 27 fib ] { < - + } inlined?
 ] unit-test
 
 [ t ] [
-    [ 27 >bignum fib ] { < - } inlined?
+    [ 27 >bignum fib ] { < - + } inlined?
 ] unit-test
 
 [ f ] [
     [ 27/2 fib ] { < - } inlined?
+] unit-test
+
+: hang-regression ( m n -- x )
+    over 0 number= [
+        nip
+    ] [
+        dup [
+            drop 1 hang-regression
+        ] [
+            dupd hang-regression hang-regression
+        ] if
+    ] if ; inline
+
+[ t ] [
+    [ dup fixnum? [ 3 over hang-regression ] [ 3 over hang-regression ] if
+] { } inlined? ] unit-test
+
+: detect-null ( a -- b ) dup drop ;
+
+\ detect-null {
+    { [ dup dup in-d>> first node-class null eq? ] [ [ ] f splice-quot ] }
+} define-optimizers
+
+[ t ] [
+    [ { null } declare detect-null ] \ detect-null inlined?
+] unit-test
+
+[ t ] [
+    [ { null null } declare + detect-null ] \ detect-null inlined?
+] unit-test
+
+[ f ] [
+    [ { null fixnum } declare + detect-null ] \ detect-null inlined?
+] unit-test
+
+GENERIC: detect-integer ( a -- b )
+
+M: integer detect-integer ;
+
+[ t ] [
+    [ { null fixnum } declare + detect-integer ] \ detect-integer inlined?
 ] unit-test
 
 [ t ] [

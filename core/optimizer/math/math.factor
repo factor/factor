@@ -8,7 +8,7 @@ namespaces assocs quotations math.intervals sequences.private
 combinators splitting layouts math.parser classes
 classes.algebra generic.math optimizer.pattern-match
 optimizer.backend optimizer.def-use optimizer.inlining
-optimizer.math.partial generic.standard system ;
+optimizer.math.partial generic.standard system accessors ;
 
 : define-math-identities ( word identities -- )
     >r all-derived-ops r> define-identities ;
@@ -95,22 +95,17 @@ optimizer.math.partial generic.standard system ;
 } define-math-identities
 
 : math-closure ( class -- newclass )
-    { fixnum bignum integer rational float real number }
+    { null fixnum bignum integer rational float real number }
     [ class< ] with find nip number or ;
 
 : fits? ( interval class -- ? )
     "interval" word-prop dup
     [ interval-subset? ] [ 2drop t ] if ;
 
-: math-output-class ( node min -- newclass )
-    #! if min is f, it means we just want to use the declared
-    #! output class from the "infer-effect".
-    dup [
-        swap node-in-d
-        [ value-class* math-closure math-class-max ] each
-    ] [
-        2drop f
-    ] if ;
+: math-output-class ( node upgrades -- newclass )
+    >r
+    in-d>> null [ value-class* math-closure math-class-max ] reduce
+    dup r> at swap or ;
 
 : won't-overflow? ( interval node -- ? )
     node-in-d [ value-class* fixnum class< ] all?
@@ -129,22 +124,17 @@ optimizer.math.partial generic.standard system ;
         2drop f
     ] if ; inline
 
-: math-output-class/interval-1 ( node min word -- classes intervals )
-    pick >r
-    >r over r>
-    math-output-interval-1
-    >r math-output-class r>
-    r> post-process ; inline
+: math-output-class/interval-1 ( node word -- classes intervals )
+    [ drop { } math-output-class ] [ math-output-interval-1 ] 2bi ;
 
 {
-    { bitnot fixnum interval-bitnot }
-    { fixnum-bitnot f interval-bitnot }
-    { bignum-bitnot f interval-bitnot }
+    { bitnot interval-bitnot }
+    { fixnum-bitnot interval-bitnot }
+    { bignum-bitnot interval-bitnot }
 } [
-    first3 [
-        math-output-class/interval-1
-    ] 2curry "output-classes" set-word-prop
-] each
+    [ math-output-class/interval-1 ] curry
+    "output-classes" set-word-prop
+] assoc-each
 
 : intervals ( node -- i1 i2 )
     node-in-d first2 [ value-interval* ] bi@ ;
@@ -156,7 +146,7 @@ optimizer.math.partial generic.standard system ;
         2drop f
     ] if ; inline
 
-: math-output-class/interval-2 ( node min word -- classes intervals )
+: math-output-class/interval-2 ( node upgrades word -- classes intervals )
     pick >r
     >r over r>
     math-output-interval-2
@@ -164,12 +154,12 @@ optimizer.math.partial generic.standard system ;
     r> post-process ; inline
 
 {
-    { + integer interval+ }
-    { - integer interval- }
-    { * integer interval* }
-    { / rational interval/ }
-    { /i integer interval/i }
-    { shift f interval-shift-safe }
+    { + { { fixnum integer } } interval+ }
+    { - { { fixnum integer } } interval- }
+    { * { { fixnum integer } } interval* }
+    { / { { fixnum rational } { integer rational } } interval/ }
+    { /i { { fixnum integer } } interval/i }
+    { shift { { fixnum integer } } interval-shift-safe }
 } [
     first3 [
         [
@@ -177,16 +167,6 @@ optimizer.math.partial generic.standard system ;
         ] 2curry "output-classes" set-word-prop
     ] 2curry each-derived-op
 ] each
-
-\ shift [
-    [
-        dup
-        node-in-d second value-interval*
-        -1./0. 0 [a,b] interval-subset? fixnum integer ?
-        \ interval-shift-safe
-        math-output-class/interval-2
-    ] "output-classes" set-word-prop
-] each-derived-op
 
 : real-value? ( value -- n ? )
     dup value? [ value-literal dup real? ] [ drop f f ] if ;
@@ -216,12 +196,12 @@ optimizer.math.partial generic.standard system ;
     r> post-process ; inline
 
 {
-    { mod fixnum mod-range }
-    { rem integer rem-range }
+    { mod { } mod-range }
+    { rem { { fixnum integer } } rem-range }
 
-    { bitand fixnum bitand-range }
-    { bitor fixnum f }
-    { bitxor fixnum f }
+    { bitand { } bitand-range }
+    { bitor { } f }
+    { bitxor { } f }
 } [
     first3 [
         [
@@ -311,7 +291,8 @@ most-negative-fixnum most-positive-fixnum [a,b]
 
 ! Removing overflow checks
 : remove-overflow-check? ( #call -- ? )
-    dup node-out-d first node-class fixnum class< ;
+    dup out-d>> first node-class
+    [ fixnum class< ] [ null eq? not ] bi and ;
 
 {
     { + [ fixnum+fast ] }

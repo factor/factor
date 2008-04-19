@@ -14,40 +14,6 @@ IN: optimizer.tests
     H{ { 1 2 } { 3 4 } } H{ { 2 3 } } union*
 ] unit-test
 
-! Test method inlining
-[ f ] [ fixnum { } min-class ] unit-test
-
-[ string ] [
-    \ string
-    [ integer string array reversed sbuf
-    slice vector quotation ]
-    sort-classes min-class
-] unit-test
-
-[ fixnum ] [
-    \ fixnum
-    [ fixnum integer object ]
-    sort-classes min-class
-] unit-test
-
-[ integer ] [
-    \ fixnum
-    [ integer float object ]
-    sort-classes min-class
-] unit-test
-
-[ object ] [
-    \ word
-    [ integer float object ]
-    sort-classes min-class
-] unit-test
-
-[ reversed ] [
-    \ reversed
-    [ integer reversed slice ]
-    sort-classes min-class
-] unit-test
-
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 
@@ -374,3 +340,12 @@ HINTS: recursive-inline-hang-3 array ;
 USE: sequences.private
 
 [ ] [ { (3append) } compile ] unit-test
+
+! Wow
+: counter-example ( a b c d -- a' b' c' d' )
+    dup 0 > [ 1 - >r rot 2 * r> counter-example ] when ; inline
+
+: counter-example' ( -- a' b' c' d' )
+    1 2 3.0 3 counter-example ;
+
+[ 2 4 6.0 0 ] [ counter-example' ] unit-test

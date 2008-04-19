@@ -109,8 +109,9 @@ SYMBOL: potential-loops
         ] [ 2drop ] if
     ] assoc-each [ remove-non-loop-calls ] when ;
 
-: detect-loops ( nodes -- )
+: detect-loops ( node -- node )
     [
+        dup
         collect-label-info
         remove-non-tail-calls
         remove-non-loop-calls
