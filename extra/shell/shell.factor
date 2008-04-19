@@ -49,22 +49,44 @@ METHOD: expand { object } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run-incantation ( incantation -- )
+: run-sword ( basic-expr -- ) command>> unclip "shell" lookup execute ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: run-foreground ( process -- )
+  [ try-process ] [ print-error drop ] recover ;
+
+: run-background ( process -- ) run-detached drop ;
+
+: run-basic-expr ( basic-expr -- )
   <process>
     over command>> expansion >>command
     over stdin>>             >>stdin
     over stdout>>            >>stdout
   swap background>>
-    [ run-detached drop ]
-    [ [ try-process ] [ print-error drop ] recover ]
+    [ run-background ]
+    [ run-foreground ]
   if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: chant ( incantation -- )
+: basic-chant ( basic-expr -- )
   dup command>> first swords member-of?
-    [ command>> unclip "shell" lookup execute ]
-    [ run-incantation ]
+    [ run-sword ]
+    [ run-basic-expr ]
+  if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: pipeline-chant ( pipeline-chant -- )
+  drop "ix: pipelines not supported" print ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: chant ( obj -- )
+  dup basic-expr?
+    [ basic-chant    ]
+    [ pipeline-chant ]
   if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

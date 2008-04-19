@@ -1,27 +1,43 @@
 
-USING: kernel arrays strings sequences sequences.deep peg peg.ebnf ;
+USING: kernel arrays strings sequences sequences.deep accessors peg peg.ebnf
+       newfx ;
 
 IN: shell.parser
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: incantation command stdin stdout background ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+TUPLE: basic-expr         command  stdin stdout background ;
+TUPLE: pipeline-expr      commands stdin stdout background ;
 TUPLE: single-quoted-expr expr ;
 TUPLE: double-quoted-expr expr ;
 TUPLE: back-quoted-expr   expr ;
 TUPLE: glob-expr          expr ;
-
-TUPLE: variable-expr expr ;
+TUPLE: variable-expr      expr ;
+TUPLE: factor-expr        expr ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: <single-quoted-expr> single-quoted-expr boa ;
-: <double-quoted-expr> double-quoted-expr boa ;
-: <back-quoted-expr>   back-quoted-expr boa ;
-: <glob-expr>          glob-expr boa ;
+: ast>basic-expr ( ast -- obj ) first4 basic-expr boa ;
+
+: ast>pipeline-expr ( ast -- obj )
+  pipeline-expr new
+    over [ 1st ] [ 4th [ 1st ] map ] [ 5th ] tri suffix prefix-on >>commands
+    over 2nd >>stdin
+    over 5th   >>stdout
+    swap 6th   >>background ;
+
+: ast>single-quoted-expr ( ast -- obj )
+  2nd >string single-quoted-expr boa ;
+
+: ast>double-quoted-expr ( ast -- obj )
+  2nd >string double-quoted-expr boa ;
+
+: ast>back-quoted-expr ( ast -- obj )
+  2nd >string back-quoted-expr boa ;
+
+: ast>glob-expr ( ast -- obj ) flatten concat glob-expr boa ;
+
+: ast>variable-expr ( ast -- obj ) 2nd variable-expr boa ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -33,45 +49,43 @@ tab   = "\t"
 
 white = (space | tab)
 
-whitespace = (white)* => [[ drop ignore ]]
+_ = (white)* => [[ drop ignore ]]
 
-squote        = "'"
+sq = "'"
+dq = '"'
+bq = "`"
 
-single-quoted = squote (!(squote) .)* squote => [[ second >string <single-quoted-expr> ]]
+single-quoted = sq (!(sq) .)* sq => [[ ast>single-quoted-expr ]]
+double-quoted = dq (!(dq) .)* dq => [[ ast>double-quoted-expr ]]
+back-quoted   = bq (!(bq) .)* bq => [[ ast>back-quoted-expr   ]]
 
-dquote        = '"'
-
-double-quoted = dquote (!(dquote) .)* dquote => [[ second >string <double-quoted-expr> ]]
-
-bquote = "`"
-
-back-quoted = bquote (!(bquote) .)* bquote => [[ second >string <back-quoted-expr> ]]
-
-variable = "$" other => [[ second variable-expr boa ]]
+variable = "$" other => [[ ast>variable-expr ]]
 
 glob-char = ("*" | "?")
 
 non-glob-char = !(glob-char | white) .
 
-glob-beginning-string = (non-glob-char)* [[ >string ]]
+glob-beginning-string = (non-glob-char)* => [[ >string ]]
 
-glob-rest-string = (non-glob-char)+ [[ >string ]]
+glob-rest-string = (non-glob-char)+ => [[ >string ]]
 
-glob = glob-beginning-string glob-char (glob-rest-string | glob-char)* => [[ flatten concat <glob-expr> ]]
+glob = glob-beginning-string glob-char (glob-rest-string | glob-char)* => [[ ast>glob-expr ]]
 
-other = (!(white | "&" | ">" | ">>" | "<") .)+ => [[ >string ]]
+other = (!(white | "&" | ">" | ">>" | "<" | "|") .)+ => [[ >string ]]
 
 element = (single-quoted | double-quoted | back-quoted | variable | glob | other)
 
-to-file = ">" whitespace other => [[ second ]]
+command = (element _)+
 
-in-file = "<" whitespace other => [[ second ]]
+to-file = ">"  _ other => [[ second ]]
+in-file = "<"  _ other => [[ second ]]
+ap-file = ">>" _ other => [[ second ]]
 
-ap-file = ">>" whitespace other  => [[ second ]]
+basic = _ command _ (in-file)? _ (to-file | ap-file)? _ ("&")? => [[ ast>basic-expr ]]
 
-redirection = (in-file)? whitespace (to-file | ap-file)?
+pipeline = _ command _ (in-file)? _ "|" _ (command _ "|" _)* command _ (to-file | ap-file)? _ ("&")? => [[ ast>pipeline-expr ]]
 
-line = (element whitespace)+ (in-file)? whitespace (to-file | ap-file)? whitespace ("&")? => [[ first4 incantation boa ]]
+submission = (pipeline | basic)
 
 ;EBNF
 
