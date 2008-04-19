@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces optimizer.backend optimizer.def-use
 optimizer.known-words optimizer.math optimizer.control
-optimizer.inlining inference.class ;
+optimizer.collect optimizer.inlining inference.class ;
 IN: optimizer
 
 : optimize-1 ( node -- newnode ? )
@@ -10,10 +10,13 @@ IN: optimizer
         H{ } clone class-substitutions set
         H{ } clone literal-substitutions set
         H{ } clone value-substitutions set
-        dup compute-def-use
+
+        collect-label-infos
+        compute-def-use
         kill-values
-        dup detect-loops
-        dup infer-classes
+        detect-loops
+        infer-classes
+
         optimizer-changed off
         optimize-nodes
         optimizer-changed get

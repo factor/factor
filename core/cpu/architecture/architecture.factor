@@ -187,6 +187,9 @@ HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 
 HOOK: %box-alien cpu ( dst src -- )
 
+! GC check
+HOOK: %gc cpu
+
 : operand ( var -- op ) get v>operand ; inline
 
 : unique-operands ( operands quot -- )

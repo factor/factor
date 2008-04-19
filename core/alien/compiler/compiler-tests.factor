@@ -280,6 +280,10 @@ FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
 
 [ 1.23456 ] [ 1.23456 make-struct-12 ffi_test_36 ] unit-test
 
+FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
+
+[ t ] [ 31 2^ 32 2^ ffi_test_38 63 2^ = ] unit-test
+
 ! Test callbacks
 
 : callback-1 "void" { } "cdecl" [ ] alien-callback ;

@@ -7,6 +7,9 @@ ARTICLE: "integer-functions" "Integer functions"
 { $subsection gcd }
 { $subsection log2 }
 { $subsection next-power-of-2 }
+"Modular exponentiation:"
+{ $subsection ^mod }
+{ $subsection mod-inv }
 "Tests:"
 { $subsection power-of-2? }
 { $subsection even? }
@@ -33,7 +36,9 @@ ARTICLE: "arithmetic-functions" "Arithmetic functions"
 { $subsection ceiling }
 { $subsection floor }
 { $subsection truncate }
-{ $subsection round } ;
+{ $subsection round }
+"Inexact comparison:"
+{ $subsection ~ } ;
 
 ARTICLE: "power-functions" "Powers and logarithms"
 "Squares:"
@@ -106,10 +111,6 @@ HELP: rect>
 HELP: >rect
 { $values { "z" number } { "x" real } { "y" real } }
 { $description "Extracts the real and imaginary components of a complex number." } ;
-
-HELP: power-of-2?
-{ $values { "n" integer } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "n" } " is a power of 2." } ;
 
 HELP: align
 { $values { "m" integer } { "w" "a power of 2" } { "n" "an integer multiple of " { $snippet "w" } } }

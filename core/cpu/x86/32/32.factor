@@ -17,6 +17,8 @@ M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
 M: x86.32 stack-save-reg EDX ;
+M: x86.32 temp-reg-1 EAX ;
+M: x86.32 temp-reg-2 ECX ;
 
 M: temp-reg v>operand drop EBX ;
 

@@ -48,10 +48,6 @@ HELP: no-effect
 { $description "Throws a " { $link no-effect } " error." }
 { $error-description "Thrown when inference encounters a call to a word which is already known not to have a static stack effect, due to a prior inference attempt failing." } ;
 
-HELP: collect-recursion
-{ $values { "#label" "a " { $link #label } " node" } { "seq" "a new sequence" } }
-{ $description "Collect the input stacks of all child " { $link #call-label } " nodes that call the given label." } ;
-
 HELP: inline-word
 { $values { "word" word } }
 { $description "Called during inference to infer stack effects of inline words."

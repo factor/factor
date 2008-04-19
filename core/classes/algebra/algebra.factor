@@ -77,10 +77,10 @@ C: <anonymous-complement> anonymous-complement
         { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement< ] }
         { [ over anonymous-union? ] [ left-anonymous-union< ] }
         { [ over anonymous-intersection? ] [ left-anonymous-intersection< ] }
-        { [ over anonymous-complement? ] [ 2drop f ] }
         { [ over members ] [ left-union-class< ] }
         { [ dup anonymous-union? ] [ right-anonymous-union< ] }
         { [ dup anonymous-intersection? ] [ right-anonymous-intersection< ] }
+        { [ over anonymous-complement? ] [ 2drop f ] }
         { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
         { [ dup members ] [ right-union-class< ] }
         { [ over superclass ] [ superclass< ] }
@@ -193,9 +193,8 @@ C: <anonymous-complement> anonymous-complement
     [ ] unfold nip ;
 
 : min-class ( class seq -- class/f )
-    [ dupd classes-intersect? ] subset dup empty? [
-        2drop f
-    ] [
+    over [ classes-intersect? ] curry subset
+    dup empty? [ 2drop f ] [
         tuck [ class< ] with all? [ peek ] [ drop f ] if
     ] if ;
 

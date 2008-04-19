@@ -12,6 +12,8 @@ M: x86.64 ds-reg R14 ;
 M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
 M: x86.64 stack-save-reg RSI ;
+M: x86.64 temp-reg-1 RAX ;
+M: x86.64 temp-reg-2 RCX ;
 
 M: temp-reg v>operand drop RBX ;
 

@@ -468,11 +468,6 @@ M: loc lazy-store
 : finalize-contents ( -- )
     finalize-locs finalize-vregs reset-phantoms ;
 
-: %gc ( -- )
-    0 frame-required
-    %prepare-alien-invoke
-    "simple_gc" f %alien-invoke ;
-
 ! Loading stacks to vregs
 : free-vregs? ( int# float# -- ? )
     double-float-regs free-vregs length <=
