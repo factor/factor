@@ -39,6 +39,8 @@ TUPLE: factor-expr        expr ;
 
 : ast>variable-expr ( ast -- obj ) 2nd variable-expr boa ;
 
+: ast>factor-expr ( ast -- obj ) 2nd >string factor-expr boa ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 EBNF: expr
@@ -59,6 +61,8 @@ single-quoted = sq (!(sq) .)* sq => [[ ast>single-quoted-expr ]]
 double-quoted = dq (!(dq) .)* dq => [[ ast>double-quoted-expr ]]
 back-quoted   = bq (!(bq) .)* bq => [[ ast>back-quoted-expr   ]]
 
+factor = "$(" (!(")") .)* ")" => [[ ast>factor-expr ]]
+
 variable = "$" other => [[ ast>variable-expr ]]
 
 glob-char = ("*" | "?")
@@ -73,7 +77,7 @@ glob = glob-beginning-string glob-char (glob-rest-string | glob-char)* => [[ ast
 
 other = (!(white | "&" | ">" | ">>" | "<" | "|") .)+ => [[ >string ]]
 
-element = (single-quoted | double-quoted | back-quoted | variable | glob | other)
+element = (single-quoted | double-quoted | back-quoted | factor | variable | glob | other)
 
 command = (element _)+
 
@@ -88,4 +92,3 @@ pipeline = _ command _ (in-file)? _ "|" _ (command _ "|" _)* command _ (to-file 
 submission = (pipeline | basic)
 
 ;EBNF
-
