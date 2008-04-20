@@ -101,10 +101,9 @@ M: postgresql-db <simple-statement> ( sql in out -- statement )
 M: postgresql-db <prepared-statement> ( sql in out -- statement )
     <simple-statement> dup prepare-statement ;
 
-SYMBOL: postgresql-counter
 : bind-name% ( -- )
     CHAR: $ 0,
-    postgresql-counter [ inc ] [ get 0# ] bi ;
+    sql-counter [ inc ] [ get 0# ] bi ;
 
 M: postgresql-db bind% ( spec -- )
     bind-name% 1, ;
