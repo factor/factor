@@ -346,13 +346,15 @@ C: <secret> secret
     ] unit-test
 
     [ t ] [
-        T{ secret } select-tuples dup . length 3 =
+        T{ secret } select-tuples length 3 =
     ] unit-test ;
 
 [ test-random-id ] test-sqlite
 [ native-person-schema test-tuples ] test-sqlite
 [ assigned-person-schema test-tuples ] test-sqlite
 [ assigned-person-schema test-repeated-insert ] test-sqlite
+
+[ test-random-id ] test-postgresql
 [ native-person-schema test-tuples ] test-postgresql
 [ assigned-person-schema test-tuples ] test-postgresql
 [ assigned-person-schema test-repeated-insert ] test-postgresql

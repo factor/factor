@@ -110,8 +110,7 @@ ERROR: no-sql-type ;
     dup array? [
         first lookup-type*
     ] [
-        type-table at*
-        [ no-sql-type ] unless
+        type-table at* [ no-sql-type ] unless
     ] if ;
 
 : lookup-create-type ( obj -- str )

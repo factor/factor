@@ -5,7 +5,7 @@ kernel math math.parser namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
 db.tuples db.types tools.annotations math.ranges
 combinators sequences.lib classes locals words tools.walker
-namespaces.lib accessors ;
+namespaces.lib accessors random ;
 IN: db.postgresql
 
 TUPLE: postgresql-db < db
@@ -43,10 +43,9 @@ M: postgresql-statement bind-statement* ( statement -- )
     drop ;
 
 M: postgresql-statement bind-tuple ( tuple statement -- )
-    [
-        statement-in-params
-        [ sql-spec-slot-name swap get-slot-named ] with map
-    ] keep set-statement-bind-params ;
+    tuck in-params>>
+    [ slot-name>> swap get-slot-named ] with map
+    >>bind-params drop ;
 
 M: postgresql-result-set #rows ( result-set -- n )
     handle>> PQntuples ;
@@ -55,11 +54,11 @@ M: postgresql-result-set #columns ( result-set -- n )
     handle>> PQnfields ;
 
 M: postgresql-result-set row-column ( result-set column -- obj )
-    >r dup result-set-handle swap result-set-n r> pq-get-string ;
+    >r [ handle>> ] [ n>> ] bi r> pq-get-string ;
 
 M: postgresql-result-set row-column-typed ( result-set column -- obj )
     dup pick result-set-out-params nth sql-spec-type
-    >r >r [ result-set-handle ] [ result-set-n ] bi r> r> postgresql-column-typed ;
+    >r >r [ handle>> ] [ result-set-n ] bi r> r> postgresql-column-typed ;
 
 M: postgresql-statement query-results ( query -- result-set )
     dup statement-bind-params [
@@ -82,7 +81,7 @@ M: postgresql-statement dispose ( query -- )
     f swap set-statement-handle ;
 
 M: postgresql-result-set dispose ( result-set -- )
-    dup result-set-handle PQclear
+    dup handle>> PQclear
     0 0 f roll {
         set-result-set-n set-result-set-max set-result-set-handle
     } set-slots ;
@@ -90,7 +89,7 @@ M: postgresql-result-set dispose ( result-set -- )
 M: postgresql-statement prepare-statement ( statement -- )
     [
         >r db get handle>> "" r>
-        dup statement-sql swap statement-in-params
+        [ sql>> ] [ in-params>> ] bi
         length f PQprepare postgresql-error
     ] keep set-statement-handle ;
 
@@ -115,7 +114,10 @@ SYMBOL: postgresql-counter
     postgresql-counter [ inc ] keep get 0# ;
 
 M: postgresql-db bind% ( spec -- )
-    1, bind-name% ;
+    bind-name% 1, ;
+
+M: postgresql-db bind# ( spec obj -- )
+    >r bind-name% f swap type>> r> <literal-bind> 1, ;
 
 : postgresql-make ( class quot -- )
     >r sql-props r>
@@ -125,11 +127,10 @@ M: postgresql-db bind% ( spec -- )
 : create-table-sql ( class -- statement )
     [
         "create table " 0% 0%
-        "(" 0%
-        [ ", " 0% ] [
-            dup sql-spec-column-name 0%
+        "(" 0% [ ", " 0% ] [
+            dup column-name>> 0%
             " " 0%
-            dup sql-spec-type t lookup-type 0%
+            dup type>> t lookup-type 0%
             modifiers 0%
         ] interleave ");" 0%
     ] postgresql-make ;
@@ -250,6 +251,7 @@ M: postgresql-db <select-by-slots-statement> ( tuple class -- statement )
 M: postgresql-db type-table ( -- hash )
     H{
         { +native-id+ "integer" }
+        { +random-id+ "bigint" }
         { TEXT "text" }
         { VARCHAR "varchar" }
         { INTEGER "integer" }
@@ -265,6 +267,7 @@ M: postgresql-db type-table ( -- hash )
 M: postgresql-db create-type-table ( -- hash )
     H{
         { +native-id+ "serial primary key" }
+        { +random-id+ "bigint primary key" }
     } ;
 
 : postgresql-compound ( str n -- newstr )
@@ -286,12 +289,16 @@ M: postgresql-db modifier-table ( -- hashtable )
     H{
         { +native-id+ "primary key" }
         { +assigned-id+ "primary key" }
+        { +random-id+ "primary key" }
         { +foreign-id+ "references" }
         { +autoincrement+ "autoincrement" }
         { +unique+ "unique" }
         { +default+ "default" }
         { +null+ "null" }
         { +not-null+ "not null" }
+        { system-random-generator "" }
+        { secure-random-generator "" }
+        { random-generator "" }
     } ;
 
 M: postgresql-db compound-type ( str n -- newstr )

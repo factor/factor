@@ -110,10 +110,16 @@ M: sqlite-db begin-transaction ( -- ) "BEGIN" sql-command ;
 M: sqlite-db commit-transaction ( -- ) "COMMIT" sql-command ;
 M: sqlite-db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
 
+
+: maybe-make-retryable ( statement -- statement )
+    dup in-params>> [ generator-bind? ] contains? [
+        make-retryable
+    ] when ;
+
 : sqlite-make ( class quot -- )
     >r sql-props r>
     [ 0 sql-counter rot with-variable ] { "" { } { } } nmake
-    <simple-statement> ;
+    <simple-statement> maybe-make-retryable ;
 
 M: sqlite-db create-sql-statement ( class -- statement )
     [
@@ -124,7 +130,7 @@ M: sqlite-db create-sql-statement ( class -- statement )
             dup type>> t lookup-type 0%
             modifiers 0%
         ] interleave ");" 0%
-    ] sqlite-make ;
+    ] sqlite-make dup sql>> . ;
 
 M: sqlite-db drop-sql-statement ( class -- statement )
     [ "drop table " 0% 0% ";" 0% drop ] sqlite-make ;
@@ -151,10 +157,7 @@ M: sqlite-db <insert-native-statement> ( tuple -- statement )
             ] if
         ] interleave
         ");" 0%
-    ] sqlite-make
-    dup in-params>> [ generator-bind? ] contains? [
-        make-retryable
-    ] when ;
+    ] sqlite-make ;
 
 M: sqlite-db <insert-nonnative-statement> ( tuple -- statement )
     <insert-native-statement> ;

@@ -5,7 +5,7 @@ quotations sequences db.postgresql.ffi alien alien.c-types
 db.types tools.walker ascii splitting math.parser combinators
 libc shuffle calendar.format byte-arrays destructors prettyprint
 accessors strings serialize io.encodings.binary
-io.streams.byte-array ;
+io.streams.byte-array inspector ;
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )
@@ -28,7 +28,13 @@ IN: db.postgresql.lib
 : postgresql-error ( res -- res )
     dup [ postgresql-error-message throw ] unless ;
 
-: postgresql-result-ok? ( n -- ? )
+ERROR: postgresql-result-null ;
+
+M: postgresql-result-null summary ( obj -- str )
+    drop "PQexec returned f." ;
+
+: postgresql-result-ok? ( res -- ? )
+    [ postgresql-result-null ] unless*
     PQresultStatus
     PGRES_COMMAND_OK PGRES_TUPLES_OK 2array member? ;
 
