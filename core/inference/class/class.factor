@@ -325,16 +325,15 @@ M: #call-label infer-classes-before ( #call-label -- )
     [ set-value-class* ] 2each ;
 
 M: #return infer-classes-around
+    dup call-next-method
     nested-labels get length 0 > [
         dup param>> nested-labels get peek param>> eq? [
             [ ] [ node-input-classes ] [ in-d>> [ value-class* ] map ] tri
-            classes= [
-                drop
-            ] [
+            classes= not [
                 fixed-point? off
                 [ in-d>> value-classes get extract-keys ] keep
                 set-node-classes
-            ] if
+            ] [ drop ] if
         ] [ drop ] if
     ] [ drop ] if ;
 
@@ -369,5 +368,5 @@ M: object infer-classes-around
 : infer-classes/node ( node existing -- )
     #! Infer classes, using the existing node's class info as a
     #! starting point.
-    [ node-classes ] [ node-literals ] [ node-intervals ] tri
+    [ classes>> ] [ literals>> ] [ intervals>> ] tri
     infer-classes-with ;
