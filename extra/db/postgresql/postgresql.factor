@@ -57,11 +57,11 @@ M: postgresql-result-set row-column ( result-set column -- obj )
     >r [ handle>> ] [ n>> ] bi r> pq-get-string ;
 
 M: postgresql-result-set row-column-typed ( result-set column -- obj )
-    dup pick result-set-out-params nth sql-spec-type
-    >r >r [ handle>> ] [ result-set-n ] bi r> r> postgresql-column-typed ;
+    dup pick out-params>> nth type>>
+    >r >r [ handle>> ] [ n>> ] bi r> r> postgresql-column-typed ;
 
 M: postgresql-statement query-results ( query -- result-set )
-    dup statement-bind-params [
+    dup bind-params>> [
         over [ bind-statement ] keep
         do-postgresql-bound-statement
     ] [
@@ -71,27 +71,29 @@ M: postgresql-statement query-results ( query -- result-set )
     dup init-result-set ;
 
 M: postgresql-result-set advance-row ( result-set -- )
-    dup result-set-n 1+ swap set-result-set-n ;
+    [ 1+ ] change-n drop ;
 
 M: postgresql-result-set more-rows? ( result-set -- ? )
-    dup result-set-n swap result-set-max < ;
+    [ n>> ] [ max>> ] bi < ;
 
 M: postgresql-statement dispose ( query -- )
-    dup statement-handle PQclear
-    f swap set-statement-handle ;
+    dup handle>> PQclear
+    f >>handle drop ;
 
 M: postgresql-result-set dispose ( result-set -- )
-    dup handle>> PQclear
-    0 0 f roll {
-        set-result-set-n set-result-set-max set-result-set-handle
-    } set-slots ;
+    [ handle>> PQclear ]
+    [
+        0 >>n
+        0 >>max
+        f >>handle drop
+    ] bi ;
 
 M: postgresql-statement prepare-statement ( statement -- )
-    [
-        >r db get handle>> "" r>
-        [ sql>> ] [ in-params>> ] bi
-        length f PQprepare postgresql-error
-    ] keep set-statement-handle ;
+    dup
+    >r db get handle>> "" r>
+    [ sql>> ] [ in-params>> ] bi
+    length f PQprepare postgresql-error
+    >>handle drop ;
 
 M: postgresql-db <simple-statement> ( sql in out -- statement )
     <postgresql-statement> ;
@@ -111,7 +113,7 @@ M: postgresql-db rollback-transaction ( -- )
 SYMBOL: postgresql-counter
 : bind-name% ( -- )
     CHAR: $ 0,
-    postgresql-counter [ inc ] keep get 0# ;
+    postgresql-counter [ inc ] [ get 0# ] bi ;
 
 M: postgresql-db bind% ( spec -- )
     bind-name% 1, ;
@@ -142,7 +144,7 @@ M: postgresql-db bind# ( spec obj -- )
         "(" 0%
         over [ "," 0% ]
         [
-            sql-spec-type f lookup-type 0%
+            type>> f lookup-type 0%
         ] interleave
         ")" 0%
         " returns bigint as '" 0%
@@ -150,7 +152,7 @@ M: postgresql-db bind# ( spec obj -- )
         "insert into " 0%
         dup 0%
         "(" 0%
-        over [ ", " 0% ] [ sql-spec-column-name 0% ] interleave
+        over [ ", " 0% ] [ column-name>> 0% ] interleave
         ") values(" 0%
         swap [ ", " 0% ] [ drop bind-name% ] interleave
         "); " 0%
@@ -169,7 +171,7 @@ M: postgresql-db create-sql-statement ( class -- seq )
         "drop function add_" 0% 0%
         "(" 0%
         remove-id
-        [ ", " 0% ] [ sql-spec-type f lookup-type 0% ] interleave
+        [ ", " 0% ] [ type>> f lookup-type 0% ] interleave
         ");" 0%
     ] postgresql-make ;
 
@@ -199,7 +201,7 @@ M: postgresql-db <insert-nonnative-statement> ( class -- statement )
     [
         "insert into " 0% 0%
         "(" 0%
-        dup [ ", " 0% ] [ sql-spec-column-name 0% ] interleave
+        dup [ ", " 0% ] [ column-name>> 0% ] interleave
         ")" 0%
 
         " values(" 0%
@@ -216,10 +218,10 @@ M: postgresql-db <update-tuple-statement> ( class -- statement )
         " set " 0%
         dup remove-id
         [ ", " 0% ]
-        [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
+        [ dup column-name>> 0% " = " 0% bind% ] interleave
         " where " 0%
         find-primary-key
-        dup sql-spec-column-name 0% " = " 0% bind%
+        dup column-name>> 0% " = " 0% bind%
     ] postgresql-make ;
 
 M: postgresql-db <delete-tuple-statement> ( class -- statement )
@@ -227,7 +229,7 @@ M: postgresql-db <delete-tuple-statement> ( class -- statement )
         "delete from " 0% 0%
         " where " 0%
         find-primary-key
-        dup sql-spec-column-name 0% " = " 0% bind%
+        dup column-name>> 0% " = " 0% bind%
     ] postgresql-make ;
 
 M: postgresql-db <select-by-slots-statement> ( tuple class -- statement )
@@ -235,16 +237,16 @@ M: postgresql-db <select-by-slots-statement> ( tuple class -- statement )
     ! tuple columns table
         "select " 0%
         over [ ", " 0% ]
-        [ dup sql-spec-column-name 0% 2, ] interleave
+        [ dup column-name>> 0% 2, ] interleave
 
         " from " 0% 0%
-        [ sql-spec-slot-name swap get-slot-named ] with subset
+        [ slot-name>> swap get-slot-named ] with subset
         dup empty? [
             drop
         ] [
             " where " 0%
             [ " and " 0% ]
-            [ dup sql-spec-column-name 0% " = " 0% bind% ] interleave
+            [ dup column-name>> 0% " = " 0% bind% ] interleave
         ] if ";" 0%
     ] postgresql-make ;
 
@@ -276,8 +278,8 @@ M: postgresql-db create-type-table ( -- hash )
         { "varchar" [ first number>string paren append ] }
         { "references" [
                 first2 >r [ unparse join-space ] keep db-columns r>
-                swap [ sql-spec-slot-name = ] with find nip
-                sql-spec-column-name paren append
+                swap [ slot-name>> = ] with find nip
+                column-name>> paren append
             ] }
         [ "no compound found" 3array throw ]
     } case ;

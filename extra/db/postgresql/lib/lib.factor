@@ -23,7 +23,7 @@ IN: db.postgresql.lib
     "\n" split [ [ blank? ] trim ] map "\n" join ;
 
 : postgresql-error-message ( -- str )
-    db get db-handle (postgresql-error-message) ;
+    db get handle>> (postgresql-error-message) ;
 
 : postgresql-error ( res -- res )
     dup [ postgresql-error-message throw ] unless ;
@@ -43,7 +43,7 @@ M: postgresql-result-null summary ( obj -- str )
     dup PQstatus zero? [ (postgresql-error-message) throw ] unless ;
 
 : do-postgresql-statement ( statement -- res )
-    db get db-handle swap statement-sql PQexec dup postgresql-result-ok? [
+    db get handle>> swap sql>> PQexec dup postgresql-result-ok? [
         dup postgresql-result-error-message swap PQclear throw
     ] unless ;
 
@@ -64,25 +64,19 @@ M: postgresql-result-null summary ( obj -- str )
     } case ;
 
 : param-types ( statement -- seq )
-    statement-in-params
-    [ sql-spec-type type>oid ] map
-    >c-uint-array ;
+    in-params>> [ type>> type>oid ] map >c-uint-array ;
 
 : malloc-byte-array/length
     [ malloc-byte-array dup free-always ] [ length ] bi ;
-    
 
 : param-values ( statement -- seq seq2 )
-    [ statement-bind-params ]
-    [ statement-in-params ] bi
+    [ bind-params>> ] [ in-params>> ] bi
     [
-        sql-spec-type {
+        type>> {
             { FACTOR-BLOB [
-                dup [
-                    object>bytes
-                    malloc-byte-array/length ] [ 0 ] if ] }
-            { BLOB [
-                dup [ malloc-byte-array/length ] [ 0 ] if ] }
+                dup [ object>bytes malloc-byte-array/length ] [ 0 ] if
+            ] }
+            { BLOB [ dup [ malloc-byte-array/length ] [ 0 ] if ] }
             [
                 drop number>string* dup [
                     malloc-char-string dup free-always
@@ -96,22 +90,20 @@ M: postgresql-result-null summary ( obj -- str )
     ] if ;
 
 : param-formats ( statement -- seq )
-    statement-in-params
-    [ sql-spec-type type>param-format ] map
-    >c-uint-array ;
+    in-params>> [ type>> type>param-format ] map >c-uint-array ;
 
 : do-postgresql-bound-statement ( statement -- res )
     [
-        >r db get db-handle r>
+        >r db get handle>> r>
         {
-            [ statement-sql ]
-            [ statement-bind-params length ]
+            [ sql>> ]
+            [ bind-params>> length ]
             [ param-types ]
             [ param-values ]
             [ param-formats ]
         } cleave
         0 PQexecParams dup postgresql-result-ok? [
-            dup postgresql-result-error-message swap PQclear throw
+            [ postgresql-result-error-message ] [ PQclear ] bi throw
         ] unless
     ] with-destructors ;
 
@@ -120,7 +112,7 @@ M: postgresql-result-null summary ( obj -- str )
 
 : pq-get-string ( handle row column -- obj )
     3dup PQgetvalue alien>char-string
-    dup "" = [ >r pq-get-is-null f r> ? ] [ 3nip ] if ;
+    dup empty? [ >r pq-get-is-null f r> ? ] [ 3nip ] if ;
 
 : pq-get-number ( handle row column -- obj )
     pq-get-string dup [ string>number ] when ;
