@@ -1,6 +1,6 @@
 USING: alien alien.c-types alien.syntax combinators
 kernel windows windows.user32 windows.ole32
-windows.com windows.com.syntax ;
+windows.com windows.com.syntax io.files ;
 IN: windows.shell32
 
 : CSIDL_DESKTOP HEX: 00 ; inline
@@ -83,7 +83,7 @@ FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFi
 : ShellExecute ShellExecuteW ; inline
 
 : open-in-explorer ( dir -- )
-    f "open" rot f f SW_SHOWNORMAL ShellExecute drop ;
+    f "open" rot (normalize-path) f f SW_SHOWNORMAL ShellExecute drop ;
 
 : shell32-error ( n -- )
     ole32-error ; inline

@@ -11,6 +11,8 @@ $nl
 "Creating bit vectors:"
 { $subsection >bit-vector }
 { $subsection <bit-vector> }
+"Literal syntax:"
+{ $subsection POSTPONE: ?V{ }
 "If you don't care about initial capacity, a more elegant way to create a new bit vector is to write:"
 { $code "?V{ } clone" } ;
 
@@ -31,3 +33,10 @@ HELP: bit-array>vector
 { $values { "bit-array" "an array" } { "length" "a non-negative integer" } { "bit-vector" bit-vector } }
 { $description "Creates a new bit vector using the array for underlying storage with the specified initial length." }
 { $warning "This word is in the " { $vocab-link "bit-vectors.private" } " vocabulary because it does not perform type or bounds checks. User code should call " { $link >bit-vector } " instead." } ;
+
+HELP: ?V{
+{ $syntax "?V{ elements... }" }
+{ $values { "elements" "a list of booleans" } }
+{ $description "Marks the beginning of a literal bit vector. Literal bit vectors are terminated by " { $link POSTPONE: } } "." } 
+{ $examples { $code "?V{ t f t }" } } ;
+
