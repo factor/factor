@@ -6,7 +6,7 @@ prettyprint sequences strings classes.tuple alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators math.intervals
 io namespaces.lib accessors vectors math.ranges random
-math.bitfields.lib ;
+math.bitfields.lib db.queries ;
 USE: tools.walker
 IN: db.sqlite
 
@@ -106,20 +106,6 @@ M: sqlite-statement query-results ( query -- result-set )
     dup handle>> sqlite-result-set construct-result-set
     dup advance-row ;
 
-M: sqlite-db begin-transaction ( -- ) "BEGIN" sql-command ;
-M: sqlite-db commit-transaction ( -- ) "COMMIT" sql-command ;
-M: sqlite-db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
-
-: maybe-make-retryable ( statement -- statement )
-    dup in-params>> [ generator-bind? ] contains? [
-        make-retryable
-    ] when ;
-
-: sqlite-make ( class quot -- )
-    >r sql-props r>
-    [ 0 sql-counter rot with-variable ] { "" { } { } } nmake
-    <simple-statement> maybe-make-retryable ;
-
 M: sqlite-db create-sql-statement ( class -- statement )
     [
         "create table " 0% 0%
@@ -129,10 +115,10 @@ M: sqlite-db create-sql-statement ( class -- statement )
             dup type>> lookup-create-type 0%
             modifiers 0%
         ] interleave ");" 0%
-    ] sqlite-make dup sql>> . ;
+    ] query-make dup sql>> . ;
 
 M: sqlite-db drop-sql-statement ( class -- statement )
-    [ "drop table " 0% 0% ";" 0% drop ] sqlite-make ;
+    [ "drop table " 0% 0% ";" 0% drop ] query-make ;
 
 M: sqlite-db <insert-native-statement> ( tuple -- statement )
     [
@@ -156,7 +142,7 @@ M: sqlite-db <insert-native-statement> ( tuple -- statement )
             ] if
         ] interleave
         ");" 0%
-    ] sqlite-make ;
+    ] query-make ;
 
 M: sqlite-db <insert-nonnative-statement> ( tuple -- statement )
     <insert-native-statement> ;
@@ -222,7 +208,7 @@ M: sqlite-db <update-tuple-statement> ( class -- statement )
         dup remove-id
         [ ", " 0% ] [ dup column-name>> 0% " = " 0% bind% ] interleave
         where-primary-key%
-    ] sqlite-make ;
+    ] query-make ;
 
 M: sqlite-db <delete-tuple-statement> ( specs table -- sql )
     [
@@ -230,7 +216,7 @@ M: sqlite-db <delete-tuple-statement> ( specs table -- sql )
         " where " 0%
         find-primary-key
         dup column-name>> 0% " = " 0% bind%
-    ] sqlite-make ;
+    ] query-make ;
 
 M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
     [
@@ -242,7 +228,7 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
         dupd
         [ slot-name>> swap get-slot-named ] with subset
         dup empty? [ 2drop ] [ where-clause ] if ";" 0%
-    ] sqlite-make ;
+    ] query-make ;
 
 M: sqlite-db random-id-quot ( -- quot )
     [ 64 [ 2^ random ] keep 1 - set-bit ] ;

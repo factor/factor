@@ -5,7 +5,7 @@ kernel math math.parser namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
 db.tuples db.types tools.annotations math.ranges
 combinators sequences.lib classes locals words tools.walker
-namespaces.lib accessors random ;
+namespaces.lib accessors random db.queries ;
 IN: db.postgresql
 
 TUPLE: postgresql-db < db
@@ -14,9 +14,6 @@ TUPLE: postgresql-db < db
 TUPLE: postgresql-statement < statement ;
 
 TUPLE: postgresql-result-set < result-set ;
-
-: <postgresql-statement> ( statement in out -- postgresql-statement )
-    postgresql-statement construct-statement ;
 
 M: postgresql-db make-db* ( seq tuple -- db )
     >r first4 r>
@@ -99,19 +96,10 @@ M: postgresql-statement prepare-statement ( statement -- )
     >>handle drop ;
 
 M: postgresql-db <simple-statement> ( sql in out -- statement )
-    <postgresql-statement> ;
+    postgresql-statement construct-statement ;
 
 M: postgresql-db <prepared-statement> ( sql in out -- statement )
-    <postgresql-statement> dup prepare-statement ;
-
-M: postgresql-db begin-transaction ( -- )
-    "BEGIN" sql-command ;
-
-M: postgresql-db commit-transaction ( -- )
-    "COMMIT" sql-command ;
-
-M: postgresql-db rollback-transaction ( -- )
-    "ROLLBACK" sql-command ;
+    <simple-statement> dup prepare-statement ;
 
 SYMBOL: postgresql-counter
 : bind-name% ( -- )
@@ -124,11 +112,6 @@ M: postgresql-db bind% ( spec -- )
 M: postgresql-db bind# ( spec obj -- )
     >r bind-name% f swap type>> r> <literal-bind> 1, ;
 
-: postgresql-make ( class quot -- )
-    >r sql-props r>
-    [ postgresql-counter off call ] { "" { } { } } nmake
-    <postgresql-statement> ; inline
-
 : create-table-sql ( class -- statement )
     [
         "create table " 0% 0%
@@ -138,7 +121,7 @@ M: postgresql-db bind# ( spec obj -- )
             dup type>> lookup-create-type 0%
             modifiers 0%
         ] interleave ");" 0%
-    ] postgresql-make ;
+    ] query-make ;
 
 : create-function-sql ( class -- statement )
     [
@@ -160,7 +143,7 @@ M: postgresql-db bind# ( spec obj -- )
         swap [ ", " 0% ] [ drop bind-name% ] interleave
         "); " 0%
         "select currval(''" 0% 0% "_id_seq'');' language sql;" 0%
-    ] postgresql-make ;
+    ] query-make ;
 
 M: postgresql-db create-sql-statement ( class -- seq )
     [
@@ -176,12 +159,12 @@ M: postgresql-db create-sql-statement ( class -- seq )
         remove-id
         [ ", " 0% ] [ type>> lookup-type 0% ] interleave
         ");" 0%
-    ] postgresql-make ;
+    ] query-make ;
 
 : drop-table-sql ( table -- statement )
     [
         "drop table " 0% 0% ";" 0% drop
-    ] postgresql-make ;
+    ] query-make ;
 
 M: postgresql-db drop-sql-statement ( class -- seq )
     [
@@ -198,7 +181,7 @@ M: postgresql-db <insert-native-statement> ( class -- statement )
         remove-id
         [ ", " 0% ] [ bind% ] interleave
         ");" 0%
-    ] postgresql-make ;
+    ] query-make ;
 
 M: postgresql-db <insert-nonnative-statement> ( class -- statement )
     [
@@ -210,7 +193,7 @@ M: postgresql-db <insert-nonnative-statement> ( class -- statement )
         " values(" 0%
         [ ", " 0% ] [ bind% ] interleave
         ");" 0%
-    ] postgresql-make ;
+    ] query-make ;
 
 M: postgresql-db insert-tuple* ( tuple statement -- )
     query-modify-tuple ;
@@ -225,7 +208,7 @@ M: postgresql-db <update-tuple-statement> ( class -- statement )
         " where " 0%
         find-primary-key
         dup column-name>> 0% " = " 0% bind%
-    ] postgresql-make ;
+    ] query-make ;
 
 M: postgresql-db <delete-tuple-statement> ( class -- statement )
     [
@@ -233,7 +216,7 @@ M: postgresql-db <delete-tuple-statement> ( class -- statement )
         " where " 0%
         find-primary-key
         dup column-name>> 0% " = " 0% bind%
-    ] postgresql-make ;
+    ] query-make ;
 
 M: postgresql-db <select-by-slots-statement> ( tuple class -- statement )
     [
@@ -250,7 +233,7 @@ M: postgresql-db <select-by-slots-statement> ( tuple class -- statement )
             [ " and " 0% ]
             [ dup column-name>> 0% " = " 0% bind% ] interleave
         ] if ";" 0%
-    ] postgresql-make ;
+    ] query-make ;
 
 M: postgresql-db persistent-table ( -- hashtable )
     H{
