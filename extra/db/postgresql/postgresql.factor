@@ -135,7 +135,7 @@ M: postgresql-db bind# ( spec obj -- )
         "(" 0% [ ", " 0% ] [
             dup column-name>> 0%
             " " 0%
-            dup type>> t lookup-type 0%
+            dup type>> lookup-create-type 0%
             modifiers 0%
         ] interleave ");" 0%
     ] postgresql-make ;
@@ -147,7 +147,7 @@ M: postgresql-db bind# ( spec obj -- )
         "(" 0%
         over [ "," 0% ]
         [
-            type>> f lookup-type 0%
+            type>> lookup-type 0%
         ] interleave
         ")" 0%
         " returns bigint as '" 0%
@@ -174,7 +174,7 @@ M: postgresql-db create-sql-statement ( class -- seq )
         "drop function add_" 0% 0%
         "(" 0%
         remove-id
-        [ ", " 0% ] [ type>> f lookup-type 0% ] interleave
+        [ ", " 0% ] [ type>> lookup-type 0% ] interleave
         ");" 0%
     ] postgresql-make ;
 
@@ -252,42 +252,33 @@ M: postgresql-db <select-by-slots-statement> ( tuple class -- statement )
         ] if ";" 0%
     ] postgresql-make ;
 
-M: postgresql-db type-table ( -- hash )
+M: postgresql-db persistent-table ( -- hashtable )
     H{
-        { +native-id+ "integer" }
-        { +random-id+ "bigint" }
-        { TEXT "text" }
-        { VARCHAR "varchar" }
-        { INTEGER "integer" }
-        { DOUBLE "real" }
-        { DATE "date" }
-        { TIME "time" }
-        { DATETIME "timestamp" }
-        { TIMESTAMP "timestamp" }
-        { BLOB "bytea" }
-        { FACTOR-BLOB "bytea" }
-    } ;
-
-M: postgresql-db create-type-table ( -- hash )
-    H{
-        { +native-id+ "serial primary key" }
-        { +random-id+ "bigint primary key" }
-    } ;
-
-M: postgresql-db modifier-table ( -- hashtable )
-    H{
-        { +native-id+ "primary key" }
-        { +assigned-id+ "primary key" }
-        { +random-id+ "primary key" }
-        { +foreign-id+ "references" }
-        { +autoincrement+ "autoincrement" }
-        { +unique+ "unique" }
-        { +default+ "default" }
-        { +null+ "null" }
-        { +not-null+ "not null" }
-        { system-random-generator "" }
-        { secure-random-generator "" }
-        { random-generator "" }
+        { +native-id+ { "integer" "serial primary key" f } }
+        { +assigned-id+ { f f "primary key" } }
+        { +random-id+ { "bigint" "bigint primary key" f } }
+        { TEXT { "text" f f } }
+        { VARCHAR { "varchar" "varchar" f } }
+        { INTEGER { "integer" "integer" f } }
+        { BIG-INTEGER { "bigint" "bigint" f } }
+        { UNSIGNED-BIG-INTEGER { "bigint" "bigint" f } }
+        { SIGNED-BIG-INTEGER { "bigint" "bigint" f } }
+        { DOUBLE { "real" "real" f } }
+        { DATE { "date" "date" f } }
+        { TIME { "time" "time" f } }
+        { DATETIME { "timestamp" "timestamp" f } }
+        { TIMESTAMP { "timestamp" "timestamp" f } }
+        { BLOB { "bytea" "bytea" f } }
+        { FACTOR-BLOB { "bytea" "bytea" f } }
+        { +foreign-id+ { f f "references" } }
+        { +autoincrement+ { f f "autoincrement" } }
+        { +unique+ { f f "unique" } }
+        { +default+ { f f "default" } }
+        { +null+ { f f "null" } }
+        { +not-null+ { f f "not null" } }
+        { system-random-generator { f f f } }
+        { secure-random-generator { f f f } }
+        { random-generator { f f f } }
     } ;
 
 M: postgresql-db compound ( str obj -- str' )
