@@ -212,9 +212,6 @@ TUPLE: serialize-me id data ;
         { T{ serialize-me f 1 H{ { 1 2 } } } }
     ] [ T{ serialize-me f 1 } select-tuples ] unit-test ;
 
-[ test-serialize ] test-sqlite
-! [ test-serialize ] test-postgresql
-
 TUPLE: exam id name score ; 
 
 : test-intervals ( -- )
@@ -288,8 +285,6 @@ TUPLE: exam id name score ;
         T{ exam f T{ range f 1 3 1 } } select-tuples
     ] unit-test ;
 
-[ test-intervals ] test-sqlite
-
 TUPLE: bignum-test id m n o ;
 : <bignum-test> ( m n o -- obj )
     bignum-test new
@@ -312,15 +307,6 @@ TUPLE: bignum-test id m n o ;
     [ T{ bignum-test f 1
         -9223372036854775808 9223372036854775808 -9223372036854775808 } ]
     [ T{ bignum-test f 1 } select-tuple ] unit-test ;
-
-[ test-bignum ] test-sqlite
-
-TUPLE: does-not-persist ;
-
-[
-    [ does-not-persist create-sql-statement ]
-    [ class \ not-persistent = ] must-fail-with
-] test-sqlite
 
 TUPLE: secret n message ;
 C: <secret> secret
@@ -349,15 +335,33 @@ C: <secret> secret
         T{ secret } select-tuples length 3 =
     ] unit-test ;
 
-[ test-random-id ] test-sqlite
 [ native-person-schema test-tuples ] test-sqlite
 [ assigned-person-schema test-tuples ] test-sqlite
 [ assigned-person-schema test-repeated-insert ] test-sqlite
+[ test-bignum ] test-sqlite
+[ test-serialize ] test-sqlite
+[ test-intervals ] test-sqlite
+[ test-random-id ] test-sqlite
 
-[ test-random-id ] test-postgresql
 [ native-person-schema test-tuples ] test-postgresql
 [ assigned-person-schema test-tuples ] test-postgresql
 [ assigned-person-schema test-repeated-insert ] test-postgresql
+[ test-bignum ] test-sqlite
+[ test-serialize ] test-postgresql
+! [ test-intervals ] test-postgresql
+! [ test-random-id ] test-postgresql
+
+TUPLE: does-not-persist ;
+
+[
+    [ does-not-persist create-sql-statement ]
+    [ class \ not-persistent = ] must-fail-with
+] test-sqlite
+
+[
+    [ does-not-persist create-sql-statement ]
+    [ class \ not-persistent = ] must-fail-with
+] test-postgresql
 
 ! \ insert-tuple must-infer
 ! \ update-tuple must-infer
