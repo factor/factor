@@ -1,6 +1,7 @@
-USING: alien alien.c-types assocs bit-arrays hashtables io io.files
-io.sockets kernel mirrors openssl.libcrypto openssl.libssl
-namespaces math math.parser openssl prettyprint sequences tools.test ;
+USING: alien alien.c-types alien.strings assocs bit-arrays
+hashtables io io.files io.encodings.ascii io.sockets kernel
+mirrors openssl.libcrypto openssl.libssl namespaces math
+math.parser openssl prettyprint sequences tools.test ;
 
 ! =========================================================
 ! Some crypto functions (still to be turned into words)

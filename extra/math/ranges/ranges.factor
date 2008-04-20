@@ -53,7 +53,7 @@ INSTANCE: range immutable-sequence
     dup range-decreasing? first-or-peek ;
 
 : clamp-to-range ( n range -- n )
-    [ min>> max ] [ max>> min ] bi ;
+    [ range-min max ] [ range-max min ] bi ;
 
 : sequence-index-range  ( seq -- range )
     length [0,b) ;

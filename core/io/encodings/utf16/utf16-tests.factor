@@ -1,6 +1,6 @@
 USING: kernel tools.test io.encodings.utf16 arrays sbufs
 io.streams.byte-array sequences io.encodings io unicode
-io.encodings.string alien.c-types accessors classes ;
+io.encodings.string alien.c-types alien.strings accessors classes ;
 IN: io.encodings.utf16.tests
 
 [ { CHAR: x } ] [ { 0 CHAR: x } utf16be decode >array ] unit-test
