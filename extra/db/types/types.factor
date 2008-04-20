@@ -8,10 +8,9 @@ classes.singleton accessors quotations random ;
 IN: db.types
 
 HOOK: modifier-table db ( -- hash )
-HOOK: compound-modifier db ( str seq -- hash )
+HOOK: compound db ( str obj -- hash )
 HOOK: type-table db ( -- hash )
 HOOK: create-type-table db ( -- hash )
-HOOK: compound-type db ( str n -- hash )
 HOOK: random-id-quot db ( -- quot )
 
 TUPLE: sql-spec class slot-name column-name type primary-key modifiers ;
@@ -100,7 +99,7 @@ ERROR: unknown-modifier ;
 
 : lookup-modifier ( obj -- str )
     {
-        { [ dup array? ] [ unclip lookup-modifier swap compound-modifier ] }
+        { [ dup array? ] [ unclip lookup-modifier swap compound ] }
         [ modifier-table at* [ unknown-modifier ] unless ]
     } cond ;
 
@@ -115,7 +114,7 @@ ERROR: no-sql-type ;
 
 : lookup-create-type ( obj -- str )
     dup array? [
-        unclip lookup-create-type swap compound-type
+        unclip lookup-create-type swap compound
     ] [
         dup create-type-table at*
         [ nip ] [ drop lookup-type* ] if

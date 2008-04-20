@@ -110,7 +110,6 @@ M: sqlite-db begin-transaction ( -- ) "BEGIN" sql-command ;
 M: sqlite-db commit-transaction ( -- ) "COMMIT" sql-command ;
 M: sqlite-db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
 
-
 : maybe-make-retryable ( statement -- statement )
     dup in-params>> [ generator-bind? ] contains? [
         make-retryable
@@ -263,14 +262,6 @@ M: sqlite-db modifier-table ( -- hashtable )
         { random-generator "" }
     } ;
 
-M: sqlite-db compound-modifier ( str obj -- str' ) compound-type ;
-
-M: sqlite-db compound-type ( str seq -- str' )
-    over {
-        { "default" [ first number>string join-space ] }
-        [ 2drop ] 
-    } case ;
-
 M: sqlite-db type-table ( -- assoc )
     H{
         { +native-id+ "integer primary key" }
@@ -291,3 +282,10 @@ M: sqlite-db type-table ( -- assoc )
     } ;
 
 M: sqlite-db create-type-table ( symbol -- str ) type-table ;
+
+M: sqlite-db compound ( str seq -- str' )
+    over {
+        { "default" [ first number>string join-space ] }
+        [ 2drop ] 
+    } case ;
+

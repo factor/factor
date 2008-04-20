@@ -93,7 +93,7 @@ M: postgresql-result-set dispose ( result-set -- )
 
 M: postgresql-statement prepare-statement ( statement -- )
     dup
-    >r db get handle>> "" r>
+    >r db get handle>> f r>
     [ sql>> ] [ in-params>> ] bi
     length f PQprepare postgresql-error
     >>handle drop ;
@@ -274,21 +274,6 @@ M: postgresql-db create-type-table ( -- hash )
         { +random-id+ "bigint primary key" }
     } ;
 
-: postgresql-compound ( str n -- newstr )
-    over {
-        { "default" [ first number>string join-space ] }
-        { "varchar" [ first number>string paren append ] }
-        { "references" [
-                first2 >r [ unparse join-space ] keep db-columns r>
-                swap [ slot-name>> = ] with find nip
-                column-name>> paren append
-            ] }
-        [ "no compound found" 3array throw ]
-    } case ;
-
-M: postgresql-db compound-modifier ( str seq -- newstr )
-    postgresql-compound ;
-    
 M: postgresql-db modifier-table ( -- hashtable )
     H{
         { +native-id+ "primary key" }
@@ -305,5 +290,14 @@ M: postgresql-db modifier-table ( -- hashtable )
         { random-generator "" }
     } ;
 
-M: postgresql-db compound-type ( str n -- newstr )
-    postgresql-compound ;
+M: postgresql-db compound ( str obj -- str' )
+    over {
+        { "default" [ first number>string join-space ] }
+        { "varchar" [ first number>string paren append ] }
+        { "references" [
+                first2 >r [ unparse join-space ] keep db-columns r>
+                swap [ slot-name>> = ] with find nip
+                column-name>> paren append
+            ] }
+        [ "no compound found" 3array throw ]
+    } case ;
