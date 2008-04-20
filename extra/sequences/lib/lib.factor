@@ -35,6 +35,10 @@ MACRO: firstn ( n -- )
     #! quot: ( elt index -- obj )
     prepare-index 2map ; inline
 
+: reduce-index ( seq identity quot -- )
+    #! quot: ( prev elt index -- next )
+    swapd each-index ; inline
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : each-percent ( seq quot -- )
