@@ -126,11 +126,11 @@ M: utf16 <encoder> ( stream utf16 -- encoder )
 
 ! Native-order UTF-16
 
-: native-utf16 ( -- descriptor )
-    little-endian? utf16le utf16be ? ;
+: utf16n ( -- descriptor )
+    little-endian? utf16le utf16be ? ; foldable
 
-M: utf16n <decoder> drop native-utf16 <decoder> ;
+M: utf16n <decoder> drop utf16n <decoder> ;
 
-M: utf16n <encoder> drop native-utf16 <encoder> ;
+M: utf16n <encoder> drop utf16n <encoder> ;
 
 PRIVATE>
