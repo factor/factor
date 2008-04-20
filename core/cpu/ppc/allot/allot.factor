@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel cpu.ppc.architecture cpu.ppc.assembler
 kernel.private namespaces math sequences generic arrays
@@ -7,7 +7,7 @@ cpu.architecture alien ;
 IN: cpu.ppc.allot
 
 : load-zone-ptr ( reg -- )
-    "nursery" f pick %load-dlsym ;
+    >r "nursery" f r> %load-dlsym ;
 
 : %allot ( header size -- )
     #! Store a pointer to 'size' bytes allocated from the
@@ -30,8 +30,8 @@ M: ppc %gc
     12 load-zone-ptr
     11 12 cell LWZ ! nursery.here -> r11
     12 12 3 cells LWZ ! nursery.end -> r12
-    11 12 1024 ADDI ! add ALLOT_BUFFER_ZONE to here
-    0 11 12 CMPI ! is here >= end?
+    11 11 1024 ADDI ! add ALLOT_BUFFER_ZONE to here
+    11 0 12 CMP ! is here >= end?
     "end" get BLE
     0 frame-required
     %prepare-alien-invoke

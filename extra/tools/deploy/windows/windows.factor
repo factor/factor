@@ -6,8 +6,7 @@ prettyprint windows.shell32 windows.user32 ;
 IN: tools.deploy.windows
 
 : copy-dlls ( bundle-name -- )
-    { "freetype6.dll" "zlib1.dll" "factor.dll" }
-    [ resource-path ] map
+    { "resource:freetype6.dll" "resource:zlib1.dll" "resource:factor.dll" }
     swap copy-files-into ;
 
 : create-exe-dir ( vocab bundle-name -- vm )
@@ -21,6 +20,6 @@ M: winnt deploy*
             [ deploy-name get create-exe-dir ] keep
             [ deploy-name get image-name ] keep
             [ namespace make-deploy-image ] keep
-            (normalize-path) open-in-explorer
+            open-in-explorer
         ] bind
     ] with-directory ;

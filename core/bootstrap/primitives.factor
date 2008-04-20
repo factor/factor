@@ -58,16 +58,13 @@ num-types get f <array> builtins set
     "alien.accessors"
     "arrays"
     "bit-arrays"
-    "bit-vectors"
     "byte-arrays"
-    "byte-vectors"
     "classes.private"
     "classes.tuple"
     "classes.tuple.private"
     "compiler.units"
     "continuations.private"
     "float-arrays"
-    "float-vectors"
     "generator"
     "growable"
     "hashtables"
@@ -444,54 +441,6 @@ tuple
 {
     {
         { "array" "arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
-"byte-vector" "byte-vectors" create
-tuple
-{
-    {
-        { "byte-array" "byte-arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
-"bit-vector" "bit-vectors" create
-tuple
-{
-    {
-        { "bit-array" "bit-arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
-"float-vector" "float-vectors" create
-tuple
-{
-    {
-        { "float-array" "float-arrays" }
         "underlying"
         { "underlying" "growable" }
         { "set-underlying" "growable" }

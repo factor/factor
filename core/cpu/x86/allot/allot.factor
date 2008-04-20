@@ -29,7 +29,7 @@ IN: cpu.x86.allot
     allot-reg POP
     allot-reg cell [+] swap 8 align ADD ;
 
-M: x86.32 %gc ( -- )
+M: x86 %gc ( -- )
     "end" define-label
     temp-reg-1 load-zone-ptr
     temp-reg-2 temp-reg-1 cell [+] MOV

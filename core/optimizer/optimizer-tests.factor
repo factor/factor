@@ -291,7 +291,6 @@ TUPLE: silly-tuple a b ;
 
 [ 1 2 3 ] [ lift-loop-tail-test-2 ] unit-test
 
-! Make sure we don't lose
 GENERIC: generic-inline-test ( x -- y )
 M: integer generic-inline-test ;
 
@@ -308,6 +307,7 @@ M: integer generic-inline-test ;
     generic-inline-test
     generic-inline-test ;
 
+! Inlining all of the above should only take two passes
 [ { t f } ] [
     \ generic-inline-test-1 word-def dataflow
     [ optimize-1 , optimize-1 , drop ] { } make

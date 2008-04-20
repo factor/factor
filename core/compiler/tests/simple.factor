@@ -1,6 +1,6 @@
 USING: compiler.units tools.test kernel kernel.private
 sequences.private math.private math combinators strings
-alien arrays memory ;
+alien arrays memory vocabs parser ;
 IN: compiler.tests
 
 ! Test empty word
@@ -230,3 +230,11 @@ M: f single-combination-test-2 single-combination-test-4 ;
 
 ! Regression
 [ 100 ] [ [ 100 [ [ ] times ] keep ] compile-call ] unit-test
+
+! Regression
+10 [
+    [ "compiler.tests.foo" forget-vocab ] with-compilation-unit
+    [ t ] [
+        "USING: prettyprint words ; IN: compiler.tests.foo : (recursive) (  -- ) (recursive) (recursive) ; inline : recursive ( -- ) (recursive) ; \\ (recursive) compiled?" eval
+    ] unit-test
+] times
