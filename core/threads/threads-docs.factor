@@ -26,7 +26,7 @@ ARTICLE: "threads-yield" "Yielding and suspending threads"
 { $subsection resume }
 { $subsection resume-with } ;
 
-ARTICLE: "thread-state" "Thread-local state"
+ARTICLE: "thread-state" "Thread-local state and variables"
 "Threads form a class of objects:"
 { $subsection thread }
 "The current thread:"
@@ -36,6 +36,8 @@ ARTICLE: "thread-state" "Thread-local state"
 { $subsection tget }
 { $subsection tset }
 { $subsection tchange }
+"Each thread has its own independent set of thread-local variables and newly-spawned threads begin with an empty set."
+$nl
 "Global hashtable of all threads, keyed by " { $link thread-id } ":"
 { $subsection threads }
 "Threads have an identity independent of continuations. If a continuation is refied in one thread and then resumed in another thread, the code running in that continuation will observe a change in the value output by " { $link self } "." ;

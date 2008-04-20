@@ -145,9 +145,9 @@ ARTICLE: "collections" "Collections"
 { $subsection "vectors" }
 "Resizable specialized sequences:"
 { $subsection "sbufs" }
-{ $subsection "bit-vectors" }
-{ $subsection "byte-vectors" }
-{ $subsection "float-vectors" }
+{ $vocab-subsection "Bit vectors" "bit-vectors" }
+{ $vocab-subsection "Byte vectors" "byte-vectors" }
+{ $vocab-subsection "Float vectors" "float-vectors" }
 { $heading "Associative mappings" }
 { $subsection "assocs" }
 { $subsection "namespaces" }

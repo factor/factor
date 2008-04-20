@@ -15,7 +15,7 @@ GENERIC: inline? ( word -- ? )
 M: method-body inline?
     "method-generic" word-prop inline? ;
 
-M: tuple-dispatch-engine-word inline?
+M: engine-word inline?
     "tuple-dispatch-generic" word-prop inline? ;
 
 M: word inline?
@@ -130,25 +130,27 @@ TUPLE: too-many->r ;
 
 TUPLE: too-many-r> ;
 
-: check-r> ( -- )
-    meta-r get empty?
+: check-r> ( n -- )
+    meta-r get length >
     [ \ too-many-r> inference-error ] when ;
 
-: infer->r ( -- )
-    1 ensure-values
+: infer->r ( n -- )
+    dup ensure-values
     #>r
-    1 0 pick node-inputs
-    pop-d push-r
-    0 1 pick node-outputs
-    node, ;
+    over 0 pick node-inputs
+    over [ drop pop-d ] map reverse [ push-r ] each
+    0 pick pick node-outputs
+    node,
+    drop ;
 
-: infer-r> ( -- )
-    check-r>
+: infer-r> ( n -- )
+    dup check-r>
     #r>
-    0 1 pick node-inputs
-    pop-r push-d
-    1 0 pick node-outputs
-    node, ;
+    0 pick pick node-inputs
+    over [ drop pop-r ] map reverse [ push-d ] each
+    over 0 pick node-outputs
+    node,
+    drop ;
 
 : undo-infer ( -- )
     recorded get [ f "inferred-effect" set-word-prop ] each ;
@@ -199,18 +201,18 @@ M: object constructor drop f ;
     dup infer-uncurry
     constructor [
         peek-d reify-curry
-        infer->r
+        1 infer->r
         peek-d reify-curry
-        infer-r>
+        1 infer-r>
         2 1 <effect> swap #call consume/produce
     ] when* ;
 
 : reify-curries ( n -- )
     meta-d get reverse [
         dup special? [
-            over [ infer->r ] times
+            over infer->r
             dup reify-curry
-            over [ infer-r> ] times
+            over infer-r>
         ] when 2drop
     ] 2each ;
 
@@ -407,6 +409,25 @@ TUPLE: recursive-declare-error word ;
         \ recursive-declare-error inference-error
     ] if* ;
 
+GENERIC: collect-label-info* ( label node -- )
+
+M: node collect-label-info* 2drop ;
+
+: (collect-label-info) ( label node vector -- )
+    >r tuck [ param>> ] bi@ eq? r> [ push ] curry [ drop ] if ;
+    inline
+
+M: #call-label collect-label-info*
+    over calls>> (collect-label-info) ;
+
+M: #return collect-label-info*
+    over returns>> (collect-label-info) ;
+
+: collect-label-info ( #label -- )
+    V{ } clone >>calls
+    V{ } clone >>returns
+    dup [ collect-label-info* ] with each-node ;
+
 : nest-node ( -- ) #entry node, ;
 
 : unnest-node ( new-node -- new-node )
@@ -417,27 +438,17 @@ TUPLE: recursive-declare-error word ;
 
 : <inlined-block> gensym dup t "inlined-block" set-word-prop ;
 
-: inline-block ( word -- node-block data )
+: inline-block ( word -- #label data )
     [
         copy-inference nest-node
         dup word-def swap <inlined-block>
         [ infer-quot-recursive ] 2keep
         #label unnest-node
+        dup collect-label-info
     ] H{ } make-assoc ;
 
-GENERIC: collect-recursion* ( label node -- )
-
-M: node collect-recursion* 2drop ;
-
-M: #call-label collect-recursion*
-    tuck node-param eq? [ , ] [ drop ] if ;
-
-: collect-recursion ( #label -- seq )
-    dup node-param
-    [ [ swap collect-recursion* ] curry each-node ] { } make ;
-
-: join-values ( node -- )
-    collect-recursion [ node-in-d ] map meta-d get suffix
+: join-values ( #label -- )
+    calls>> [ node-in-d ] map meta-d get suffix
     unify-lengths unify-stacks
     meta-d [ length tail* ] change ;
 
@@ -458,7 +469,7 @@ M: #call-label collect-recursion*
         drop join-values inline-block apply-infer
         r> over set-node-in-d
         dup node,
-        collect-recursion [
+        calls>> [
             [ flatten-curries ] modify-values
         ] each
     ] [

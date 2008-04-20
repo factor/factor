@@ -65,9 +65,7 @@ M: float-regs move-spec drop float ;
 M: float-regs operand-class* drop float ;
 
 ! Temporary register for stack shuffling
-TUPLE: temp-reg reg-class>> ;
-
-: temp-reg T{ temp-reg f int-regs } ;
+SINGLETON: temp-reg
 
 M: temp-reg move-spec drop f ;
 
@@ -469,11 +467,6 @@ M: loc lazy-store
 
 : finalize-contents ( -- )
     finalize-locs finalize-vregs reset-phantoms ;
-
-: %gc ( -- )
-    0 frame-required
-    %prepare-alien-invoke
-    "simple_gc" f %alien-invoke ;
 
 ! Loading stacks to vregs
 : free-vregs? ( int# float# -- ? )

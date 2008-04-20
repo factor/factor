@@ -11,6 +11,8 @@ $nl
 "Creating float vectors:"
 { $subsection >float-vector }
 { $subsection <float-vector> }
+"Literal syntax:"
+{ $subsection POSTPONE: FV{ }
 "If you don't care about initial capacity, a more elegant way to create a new float vector is to write:"
 { $code "FV{ } clone" } ;
 
@@ -32,3 +34,9 @@ HELP: float-array>vector
 { $values { "float-array" "an array" } { "length" "a non-negative integer" } { "float-vector" float-vector } }
 { $description "Creates a new float vector using the array for underlying storage with the specified initial length." }
 { $warning "This word is in the " { $vocab-link "float-vectors.private" } " vocabulary because it does not perform type or bounds checks. User code should call " { $link >float-vector } " instead." } ;
+
+HELP: FV{
+{ $syntax "FV{ elements... }" }
+{ $values { "elements" "a list of real numbers" } }
+{ $description "Marks the beginning of a literal float vector. Literal float vectors are terminated by " { $link POSTPONE: } } "." } 
+{ $examples { $code "FV{ 1.0 2.0 3.0 }" } } ;

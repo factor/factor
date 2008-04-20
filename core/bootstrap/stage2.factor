@@ -27,10 +27,6 @@ SYMBOL: bootstrap-time
     diff
     [ "bootstrap." prepend require ] each ;
 
-! : compile-remaining ( -- )
-!     "Compiling remaining words..." print flush
-!     vocabs [ words [ compiled? not ] subset compile ] each ;
-
 : count-words ( pred -- )
     all-words swap subset length number>string write ;
 

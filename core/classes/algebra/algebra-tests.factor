@@ -4,7 +4,7 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes classes.algebra
 classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units growable
-random inference effects kernel.private ;
+random inference effects kernel.private sbufs ;
 
 : class= [ class< ] 2keep swap class< and ;
 
@@ -143,6 +143,48 @@ UNION: z1 b1 c1 ;
 [ f ] [ object class-not object class= ] unit-test
 
 [ f ] [ null class-not null class= ] unit-test
+
+[ t ] [
+    fixnum class-not
+    fixnum fixnum class-not class-or
+    class<
+] unit-test
+
+! Test method inlining
+[ f ] [ fixnum { } min-class ] unit-test
+
+[ string ] [
+    \ string
+    [ integer string array reversed sbuf
+    slice vector quotation ]
+    sort-classes min-class
+] unit-test
+
+[ fixnum ] [
+    \ fixnum
+    [ fixnum integer object ]
+    sort-classes min-class
+] unit-test
+
+[ integer ] [
+    \ fixnum
+    [ integer float object ]
+    sort-classes min-class
+] unit-test
+
+[ object ] [
+    \ word
+    [ integer float object ]
+    sort-classes min-class
+] unit-test
+
+[ reversed ] [
+    \ reversed
+    [ integer reversed slice ]
+    sort-classes min-class
+] unit-test
+
+[ f ] [ null { number fixnum null } min-class ] unit-test
 
 ! Test for hangs?
 : random-class classes random ;

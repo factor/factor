@@ -9,7 +9,6 @@ IN: cpu.x86.architecture
 HOOK: ds-reg cpu
 HOOK: rs-reg cpu
 HOOK: stack-reg cpu
-HOOK: xt-reg cpu
 HOOK: stack-save-reg cpu
 
 : stack@ stack-reg swap [+] ;
@@ -35,6 +34,10 @@ GENERIC: push-return-reg ( reg-class -- )
 GENERIC: load-return-reg ( stack@ reg-class -- )
 GENERIC: store-return-reg ( stack@ reg-class -- )
 
+! Only used by inline allocation
+HOOK: temp-reg-1 cpu
+HOOK: temp-reg-2 cpu
+
 HOOK: address-operand cpu ( address -- operand )
 
 HOOK: fixnum>slot@ cpu
@@ -47,13 +50,13 @@ M: x86 stack-frame ( n -- i )
     3 cells + 16 align cell - ;
 
 M: x86 %save-word-xt ( -- )
-    xt-reg 0 MOV rc-absolute-cell rel-this ;
+    temp-reg v>operand 0 MOV rc-absolute-cell rel-this ;
 
 : factor-area-size 4 cells ;
 
 M: x86 %prologue ( n -- )
     dup cell + PUSH
-    xt-reg PUSH
+    temp-reg v>operand PUSH
     stack-reg swap 2 cells - SUB ;
 
 M: x86 %epilogue ( n -- )
@@ -76,8 +79,8 @@ M: x86 %call ( label -- ) CALL ;
 
 M: x86 %jump-label ( label -- ) JMP ;
 
-M: x86 %jump-t ( label -- )
-    "flag" operand f v>operand CMP JNE ;
+M: x86 %jump-f ( label -- )
+    "flag" operand f v>operand CMP JE ;
 
 : code-alignment ( -- n )
     building get length dup cell align swap - ;

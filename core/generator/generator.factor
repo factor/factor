@@ -40,16 +40,16 @@ SYMBOL: current-label-start
     compiled-stack-traces?
     compiling-word get f ?
     1vector literal-table set
-    f compiling-word get compiled get set-at ;
+    f compiling-label get compiled get set-at ;
 
-: finish-compiling ( literals relocation labels code -- )
+: save-machine-code ( literals relocation labels code -- )
     4array compiling-label get compiled get set-at ;
 
 : with-generator ( node word label quot -- )
     [
         >r begin-compiling r>
         { } make fixup
-        finish-compiling
+        save-machine-code
     ] with-scope ; inline
 
 GENERIC: generate-node ( node -- next )
@@ -131,14 +131,14 @@ M: #loop generate-node
 
 : generate-if ( node label -- next )
     <label> [
-        >r >r node-children first2 generate-branch
+        >r >r node-children first2 swap generate-branch
         r> r> end-false-branch resolve-label
         generate-branch
         init-templates
     ] keep resolve-label iterate-next ;
 
 M: #if generate-node
-    [ <label> dup %jump-t ]
+    [ <label> dup %jump-f ]
     H{ { +input+ { { f "flag" } } } }
     with-template
     generate-if ;
@@ -189,13 +189,13 @@ M: #dispatch generate-node
     "if-intrinsics" set-word-prop ;
 
 : if>boolean-intrinsic ( quot -- )
-    "true" define-label
+    "false" define-label
     "end" define-label
-    "true" get swap call
-    f "if-scratch" get load-literal
-    "end" get %jump-label
-    "true" resolve-label
+    "false" get swap call
     t "if-scratch" get load-literal
+    "end" get %jump-label
+    "false" resolve-label
+    f "if-scratch" get load-literal
     "end" resolve-label
     "if-scratch" get phantom-push ; inline
 
