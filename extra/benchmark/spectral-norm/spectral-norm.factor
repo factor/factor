@@ -19,7 +19,7 @@ IN: benchmark.spectral-norm
         pick 0.0 [
             swap >r >r 2dup r> (eval-A-times-u) r> +
         ] reduce nip
-    ] F{ } map-as 2nip ; inline
+    ] F{ } map-as { float-array } declare 2nip ; inline
 
 : (eval-At-times-u) ( u i j -- x )
     tuck swap eval-A >r swap nth-unsafe r> * ; inline
@@ -29,7 +29,7 @@ IN: benchmark.spectral-norm
         pick 0.0 [
             swap >r >r 2dup r> (eval-At-times-u) r> +
         ] reduce nip
-    ] F{ } map-as 2nip ; inline
+    ] F{ } map-as { float-array } declare 2nip ; inline
 
 : eval-AtA-times-u ( n u -- seq )
     dupd eval-A-times-u eval-At-times-u ; inline

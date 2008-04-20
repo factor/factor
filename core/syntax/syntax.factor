@@ -79,11 +79,8 @@ IN: bootstrap.syntax
     "{" [ \ } [ >array ] parse-literal ] define-syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-syntax
-    "BV{" [ \ } [ >byte-vector ] parse-literal ] define-syntax
     "?{" [ \ } [ >bit-array ] parse-literal ] define-syntax
-    "?V{" [ \ } [ >bit-vector ] parse-literal ] define-syntax
     "F{" [ \ } [ >float-array ] parse-literal ] define-syntax
-    "FV{" [ \ } [ >float-vector ] parse-literal ] define-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
     "T{" [ \ } [ >tuple ] parse-literal ] define-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax

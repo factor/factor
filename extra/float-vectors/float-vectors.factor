@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private math sequences
-sequences.private growable float-arrays ;
+sequences.private growable float-arrays prettyprint.backend
+parser ;
 IN: float-vectors
 
 <PRIVATE
@@ -31,3 +32,7 @@ M: float-vector equal?
 M: float-array new-resizable drop <float-vector> ;
 
 INSTANCE: float-vector growable
+
+: FV{ \ } [ >float-vector ] parse-literal ; parsing
+
+M: float-vector pprint-delims drop \ FV{ \ } ;
