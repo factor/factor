@@ -13,9 +13,16 @@ IN: db.tuples
     "db-columns" set-word-prop
     "db-relations" set-word-prop ;
 
-: db-table ( class -- obj ) "db-table" word-prop ;
-: db-columns ( class -- obj ) "db-columns" word-prop ;
-: db-relations ( class -- obj ) "db-relations" word-prop ;
+ERROR: not-persistent ;
+
+: db-table ( class -- obj )
+    "db-table" word-prop [ not-persistent ] unless* ;
+
+: db-columns ( class -- obj )
+    "db-columns" word-prop ;
+
+: db-relations ( class -- obj )
+    "db-relations" word-prop ;
 
 : set-primary-key ( key tuple -- )
     [
@@ -61,7 +68,7 @@ HOOK: insert-tuple* db ( tuple statement -- )
     ] curry 2each ;
 
 : sql-props ( class -- columns table )
-    dup db-columns swap db-table ;
+    [ db-columns ] [ db-table ] bi ;
 
 : with-disposals ( seq quot -- )
     over sequence? [
@@ -88,17 +95,13 @@ HOOK: insert-tuple* db ( tuple statement -- )
     [ bind-tuple ] 2keep insert-tuple* ;
 
 : insert-nonnative ( tuple -- )
-! TODO logic here for unique ids
     dup class
     db get db-insert-statements [ <insert-nonnative-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : insert-tuple ( tuple -- )
-    dup class db-columns find-primary-key nonnative-id? [
-        insert-nonnative
-    ] [
-        insert-native
-    ] if ;
+    dup class db-columns find-primary-key nonnative-id?
+    [ insert-nonnative ] [ insert-native ] if ;
 
 : update-tuple ( tuple -- )
     dup class

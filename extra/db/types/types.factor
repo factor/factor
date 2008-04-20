@@ -4,7 +4,7 @@ USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep sequences.lib
 words namespaces tools.walker slots slots.private classes
 mirrors classes.tuple combinators calendar.format symbols
-classes.singleton ;
+classes.singleton accessors quotations random ;
 IN: db.types
 
 HOOK: modifier-table db ( -- hash )
@@ -12,11 +12,15 @@ HOOK: compound-modifier db ( str seq -- hash )
 HOOK: type-table db ( -- hash )
 HOOK: create-type-table db ( -- hash )
 HOOK: compound-type db ( str n -- hash )
+HOOK: random-id-quot db ( -- quot )
 
-TUPLE: sql-spec class slot-name column-name type modifiers primary-key ;
+TUPLE: sql-spec class slot-name column-name type primary-key modifiers ;
 
 TUPLE: literal-bind key type value ;
 C: <literal-bind> literal-bind
+
+TUPLE: generator-bind key quot type retries ;
+C: <generator-bind> generator-bind
 
 SINGLETON: +native-id+
 SINGLETON: +assigned-id+
@@ -26,6 +30,15 @@ UNION: +nonnative-id+ +random-id+ +assigned-id+ ;
 
 SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 +foreign-id+ +has-many+ ;
+
+: find-random-generator ( seq -- obj )
+    [
+        {
+            random-generator
+            system-random-generator
+            secure-random-generator
+        } member?
+    ] find nip [ system-random-generator ] unless* ;
 
 : primary-key? ( spec -- ? )
     sql-spec-primary-key +primary-key+? ;
@@ -51,25 +64,26 @@ SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 
 : relation? ( spec -- ? ) [ +has-many+ = ] deep-find ;
 
-SYMBOLS: INTEGER BIG-INTEGER DOUBLE REAL BOOLEAN TEXT VARCHAR
-DATE TIME DATETIME TIMESTAMP BLOB FACTOR-BLOB NULL ;
+: handle-random-id ( statement -- )
+    dup in-params>> [ type>> +random-id+ = ] find drop >boolean [
+        retryable >>type
+        random-id-quot >>quot
+    ] when drop ;
+
+SYMBOLS: INTEGER BIG-INTEGER SIGNED-BIG-INTEGER UNSIGNED-BIG-INTEGER
+DOUBLE REAL BOOLEAN TEXT VARCHAR DATE TIME DATETIME TIMESTAMP BLOB
+FACTOR-BLOB NULL ;
 
 : spec>tuple ( class spec -- tuple )
-    [ ?first3 ] keep 3 ?tail*
-    {
-        set-sql-spec-class
-        set-sql-spec-slot-name
-        set-sql-spec-column-name
-        set-sql-spec-type
-        set-sql-spec-modifiers
-    } sql-spec construct
+    3 f pad-right
+    [ first3 ] keep 3 tail
+    sql-spec new
+        swap >>modifiers
+        swap >>type
+        swap >>column-name
+        swap >>slot-name
+        swap >>class
     dup normalize-spec ;
-
-TUPLE: no-sql-type ;
-: no-sql-type ( -- * ) T{ no-sql-type } throw ;
-
-TUPLE: no-sql-modifier ;
-: no-sql-modifier ( -- * ) T{ no-sql-modifier } throw ;
 
 : number>string* ( n/str -- str )
     dup number? [ number>string ] when ;
@@ -88,13 +102,15 @@ TUPLE: no-sql-modifier ;
 ! PostgreSQL Types:
 ! http://developer.postgresql.org/pgdocs/postgres/datatype.html
 
+ERROR: unknown-modifier ;
+
 : lookup-modifier ( obj -- str )
-    dup array? [
-        unclip lookup-modifier swap compound-modifier
-    ] [
-        modifier-table at*
-        [ "unknown modifier" throw ] unless
-    ] if ;
+    {
+        { [ dup array? ] [ unclip lookup-modifier swap compound-modifier ] }
+        [ modifier-table at* [ unknown-modifier ] unless ]
+    } cond ;
+
+ERROR: no-sql-type ;
 
 : lookup-type* ( obj -- str )
     dup array? [

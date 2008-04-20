@@ -5,7 +5,8 @@ hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings classes.tuple alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators math.intervals
-io namespaces.lib accessors vectors math.ranges ;
+io namespaces.lib accessors vectors math.ranges random
+math.bitfields.lib ;
 USE: tools.walker
 IN: db.sqlite
 
@@ -65,6 +66,9 @@ M: sql-spec sqlite-bind-conversion ( tuple spec -- array )
 M: literal-bind sqlite-bind-conversion ( tuple literal-bind -- array )
     nip [ key>> ] [ value>> ] [ type>> ] tri 3array ;
 
+M: generator-bind sqlite-bind-conversion ( tuple generate-bind -- array )
+    nip [ key>> ] [ quot>> call ] [ type>> ] tri 3array ;
+
 M: sqlite-statement bind-tuple ( tuple statement -- )
     [
         in-params>> [ sqlite-bind-conversion ] with map
@@ -105,8 +109,7 @@ M: sqlite-db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
 : sqlite-make ( class quot -- )
     >r sql-props r>
     [ 0 sql-counter rot with-variable ] { "" { } { } } nmake
-    <simple-statement>
-    dup handle-random-id ; inline
+    <simple-statement> ;
 
 M: sqlite-db create-sql-statement ( class -- statement )
     [
@@ -129,7 +132,21 @@ M: sqlite-db <insert-native-statement> ( tuple -- statement )
         maybe-remove-id
         dup [ ", " 0% ] [ column-name>> 0% ] interleave
         ") values(" 0%
-        [ ", " 0% ] [ bind% ] interleave
+        [ ", " 0% ] [
+            dup type>> +random-id+ = [
+break
+                dup modifiers>> find-random-generator
+                [
+                    [
+                        column-name>> ":" prepend
+                        dup 0% random-id-quot
+                    ] with-random
+                ] curry
+                [ type>> ] bi 10 <generator-bind> 1,
+            ] [
+                bind%
+            ] if
+        ] interleave
         ");" 0%
     ] sqlite-make ;
 
@@ -219,6 +236,9 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
         dup empty? [ 2drop ] [ where-clause ] if ";" 0%
     ] sqlite-make ;
 
+M: sqlite-db random-id-quot ( -- quot )
+    [ 64 [ 2^ random ] keep 1 - set-bit ] ;
+
 M: sqlite-db modifier-table ( -- hashtable )
     H{
         { +native-id+ "primary key" }
@@ -229,6 +249,9 @@ M: sqlite-db modifier-table ( -- hashtable )
         { +default+ "default" }
         { +null+ "null" }
         { +not-null+ "not null" }
+        { system-random-generator "" }
+        { secure-random-generator "" }
+        { random-generator "" }
     } ;
 
 M: sqlite-db compound-modifier ( str obj -- str' ) compound-type ;
@@ -244,6 +267,9 @@ M: sqlite-db type-table ( -- assoc )
         { +native-id+ "integer primary key" }
         { +random-id+ "integer primary key" }
         { INTEGER "integer" }
+        { BIG-INTEGER "bigint" }
+        { SIGNED-BIG-INTEGER "bigint" }
+        { UNSIGNED-BIG-INTEGER "bigint" }
         { TEXT "text" }
         { VARCHAR "text" }
         { DATE "date" }

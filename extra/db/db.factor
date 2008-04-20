@@ -36,7 +36,7 @@ HOOK: db-close db ( handle -- )
     ] with-variable ;
 
 ! TUPLE: sql sql in-params out-params ;
-TUPLE: statement handle sql in-params out-params bind-params bound? type quot ;
+TUPLE: statement handle sql in-params out-params bind-params bound? type ;
 TUPLE: simple-statement < statement ;
 TUPLE: prepared-statement < statement ;
 
@@ -62,12 +62,8 @@ SINGLETON: retryable
     over sequence? [
         [ make-retryable ] curry map
     ] [
-        >>quot
         retryable >>type
     ] if ;
-
-: handle-random-id ( statement -- )
-    drop ;
 
 TUPLE: result-set sql in-params out-params handle n max ;
 

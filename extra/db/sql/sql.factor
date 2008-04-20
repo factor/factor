@@ -38,7 +38,7 @@ DEFER: sql%
         { \ select [ "(select" sql% sql% ")" sql% ] }
         { \ table [ sql% ] }
         { \ set [ "set" "," sql-interleave ] }
-        { \ values [ break "values(" sql% "," (sql-interleave) ")" sql% ] }
+        { \ values [ "values(" sql% "," (sql-interleave) ")" sql% ] }
         { \ count [ "count" sql-function, ] }
         { \ sum [ "sum" sql-function, ] }
         { \ avg [ "avg" sql-function, ] }
@@ -47,7 +47,7 @@ DEFER: sql%
         [ sql% [ sql% ] each ]
     } case ;
 
-TUPLE: no-sql-match ;
+ERROR: no-sql-match ;
 : sql% ( obj -- )
     {
         { [ dup string? ] [ " " 0% 0% ] }
@@ -56,7 +56,7 @@ TUPLE: no-sql-match ;
         { [ dup symbol? ] [ unparse sql% ] }
         { [ dup word? ] [ unparse sql% ] }
         { [ dup quotation? ] [ call ] }
-        [ T{ no-sql-match } throw ]
+        [ no-sql-match ]
     } cond ;
 
 : parse-sql ( obj -- sql in-spec out-spec in out )

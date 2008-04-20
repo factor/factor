@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files kernel tools.test db db.tuples
+USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
-prettyprint tools.walker db.sqlite calendar
-math.intervals db.postgresql ;
+prettyprint tools.walker db.sqlite calendar sequences
+math.intervals db.postgresql accessors random math.bitfields.lib ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -290,8 +290,37 @@ TUPLE: exam id name score ;
 
 [ test-intervals ] test-sqlite
 
-: test-ranges
-    ;
+TUPLE: bignum-test id m n o ;
+: <bignum-test> ( m n o -- obj )
+    bignum-test new
+        swap >>o
+        swap >>n
+        swap >>m ;
+
+: test-bignum
+    bignum-test "BIGNUM_TEST"
+    {
+        { "id" "ID" +native-id+ }
+        { "m" "M" BIG-INTEGER }
+        { "n" "N" UNSIGNED-BIG-INTEGER }
+        { "o" "O" SIGNED-BIG-INTEGER }
+    } define-persistent
+    [ bignum-test drop-table ] ignore-errors
+    [ ] [ bignum-test ensure-table ] unit-test
+    [ ] [ 63 2^ dup dup <bignum-test> insert-tuple ] unit-test
+
+    [ T{ bignum-test f 1
+        -9223372036854775808 9223372036854775808 -9223372036854775808 } ]
+    [ T{ bignum-test f 1 } select-tuple ] unit-test ;
+
+[ test-bignum ] test-sqlite
+
+TUPLE: does-not-persist ;
+
+[
+    [ does-not-persist create-sql-statement ]
+    [ class \ not-persistent = ] must-fail-with
+] test-sqlite
 
 TUPLE: secret n message ;
 C: <secret> secret
@@ -299,14 +328,26 @@ C: <secret> secret
 : test-random-id
     secret "SECRET"
     {
-        { "n" "ID" +random-id+ }
+        { "n" "ID" +random-id+ system-random-generator }
         { "message" "MESSAGE" TEXT }
     } define-persistent
 
     [ ] [ secret ensure-table ] unit-test
+
     [ ] [ f "kilroy was here" <secret> insert-tuple ] unit-test
-    [ ] [ T{ secret } select-tuples ] unit-test
-    ;
+
+    [ ] [ f "kilroy was here2" <secret> insert-tuple ] unit-test
+
+    [ ] [ f "kilroy was here3" <secret> insert-tuple ] unit-test
+
+    [ t ] [
+        T{ secret } select-tuples
+        first message>> "kilroy was here" head?
+    ] unit-test
+
+    [ t ] [
+        T{ secret } select-tuples length 3 =
+    ] unit-test ;
 
 [ test-random-id ] test-sqlite
 [ native-person-schema test-tuples ] test-sqlite
