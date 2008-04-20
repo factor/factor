@@ -7,7 +7,6 @@ continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators math.intervals
 io namespaces.lib accessors vectors math.ranges random
 math.bitfields.lib ;
-USE: tools.walker
 IN: db.sqlite
 
 TUPLE: sqlite-db < db path ;
@@ -134,7 +133,6 @@ M: sqlite-db <insert-native-statement> ( tuple -- statement )
         ") values(" 0%
         [ ", " 0% ] [
             dup type>> +random-id+ = [
-break
                 dup modifiers>> find-random-generator
                 [
                     [
