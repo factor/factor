@@ -1,5 +1,6 @@
 
-USING: kernel words continuations namespaces debugger sequences combinators
+USING: kernel parser words continuations namespaces debugger
+       sequences combinators prettyprint
        system io io.files io.launcher sequences.deep
        accessors multi-methods newfx shell.parser ;
 
@@ -41,6 +42,8 @@ METHOD: expand { glob-expr }
     [ ]
   if ;
 
+METHOD: expand { factor-expr } expr>> eval unparse ;
+
 METHOD: expand { object } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -49,7 +52,8 @@ METHOD: expand { object } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run-sword ( basic-expr -- ) command>> unclip "shell" lookup execute ;
+: run-sword ( basic-expr -- )
+  command>> expansion unclip "shell" lookup execute ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
