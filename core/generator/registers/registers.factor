@@ -13,13 +13,6 @@ SYMBOL: +scratch+
 SYMBOL: +clobber+
 SYMBOL: known-tag
 
-! Register classes
-SINGLETON: int-regs
-SINGLETON: single-float-regs
-SINGLETON: double-float-regs
-UNION: float-regs single-float-regs double-float-regs ;
-UNION: reg-class int-regs float-regs ;
-
 <PRIVATE
 
 ! Value protocol

@@ -31,7 +31,7 @@ namespaces math math.parser openssl prettyprint sequences tools.test ;
 ! TODO: debug 'Memory protection fault at address 6c'
 ! get-ctx 1024 "char" malloc-array 1024 0 f password-cb set-default-passwd
 
-[ ] [ get-ctx "password" string>char-alien set-default-passwd-userdata ] unit-test
+[ ] [ get-ctx "password" ascii string>alien set-default-passwd-userdata ] unit-test
 
 ! Enter PEM pass phrase: password
 [ ] [ get-ctx "extra/openssl/test/server.pem" resource-path

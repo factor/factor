@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs hashtables
 kernel kernel.private math namespaces sequences words
-quotations strings alien layouts system combinators
+quotations strings alien.strings layouts system combinators
 math.bitfields words.private cpu.architecture ;
 IN: generator.fixup
 
@@ -109,10 +109,6 @@ M: integer fixup* , ;
 SYMBOL: literal-table
 
 : add-literal ( obj -- n ) literal-table get push-new* ;
-
-: string>symbol ( str -- alien )
-    [ os wince? [ string>u16-alien ] [ string>char-alien ] if ]
-    over string? [ call ] [ map ] if ;
 
 : add-dlsym-literals ( symbol dll -- )
     >r string>symbol r> 2array literal-table get push-all ;

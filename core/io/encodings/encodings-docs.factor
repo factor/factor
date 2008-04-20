@@ -41,12 +41,13 @@ $low-level-note ;
 
 ARTICLE: "encodings-descriptors" "Encoding descriptors"
 "An encoding descriptor is something which can be used for input or output streams to encode or decode files. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
-{ $vocab-subsection "ASCII" "io.encodings.ascii" }
-{ $vocab-subsection "Binary" "io.encodings.binary" }
+{ $subsection "io.encodings.binary" }
+{ $subsection "io.encodings.utf8" }
+{ $subsection "io.encodings.utf16" }
 { $vocab-subsection "Strict encodings" "io.encodings.strict" }
+"Legacy encodings:"
 { $vocab-subsection "8-bit encodings" "io.encodings.8-bit" }
-{ $vocab-subsection "UTF-8" "io.encodings.utf8" }
-{ $vocab-subsection "UTF-16" "io.encodings.utf16" }
+{ $vocab-subsection "ASCII" "io.encodings.ascii" }
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "encodings-protocol" "Encoding protocol"

@@ -397,7 +397,7 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
 : (winsock-error-string) ( n -- str )
     ! #! WSAStartup returns the error code 'n' directly
     dup winsock-expected-error?
-    [ drop f ] [ error_message alien>u16-string ] if ;
+    [ drop f ] [ error_message utf16n alien>string ] if ;
 
 : winsock-error-string ( -- string/f )
     WSAGetLastError (winsock-error-string) ;

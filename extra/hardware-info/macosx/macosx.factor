@@ -1,6 +1,7 @@
-USING: alien alien.c-types alien.syntax byte-arrays kernel
-namespaces sequences unix hardware-info.backend system
-io.unix.backend ;
+USING: alien alien.c-types alien.strings alien.syntax
+byte-arrays kernel namespaces sequences unix
+hardware-info.backend system io.unix.backend io.encodings.ascii
+;
 IN: hardware-info.macosx
 
 ! See /usr/include/sys/sysctl.h for constants
@@ -19,7 +20,7 @@ FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, voi
     [ <byte-array> ] [ <uint> ] bi (sysctl-query) ;
 
 : sysctl-query-string ( seq -- n )
-    4096 sysctl-query alien>char-string ;
+    4096 sysctl-query ascii malloc-string ;
 
 : sysctl-query-uint ( seq -- n )
     4 sysctl-query *uint ;

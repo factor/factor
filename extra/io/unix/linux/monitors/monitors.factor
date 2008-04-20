@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io.backend io.monitors io.monitors.recursive
 io.files io.buffers io.monitors io.nonblocking io.timeouts
-io.unix.backend io.unix.select unix.linux.inotify assocs
-namespaces threads continuations init math math.bitfields sets
-alien.c-types alien vocabs.loader accessors system hashtables ;
+io.unix.backend io.unix.select io.encodings.utf8
+unix.linux.inotify assocs namespaces threads continuations init
+math math.bitfields sets alien.strings alien vocabs.loader
+accessors system hashtables ;
 IN: io.unix.linux.monitors
 
 TUPLE: linux-monitor < monitor wd ;
@@ -79,7 +80,7 @@ M: linux-monitor dispose ( monitor -- )
     dup inotify-event-mask ignore-flags? [
         drop f f
     ] [
-        [ inotify-event-name alien>char-string ]
+        [ inotify-event-name utf8 alien>string ]
         [ inotify-event-mask parse-action ] bi
     ] if ;
 

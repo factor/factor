@@ -137,8 +137,8 @@ M: world selection-notify-event
     } cond ;
 
 : encode-clipboard ( string type -- bytes )
-    XSelectionRequestEvent-target XA_UTF8_STRING =
-    [ utf8 encode ] [ string>char-alien ] if ;
+    XSelectionRequestEvent-target
+    XA_UTF8_STRING = utf8 ascii ? encode ;
 
 : set-selection-prop ( evt -- )
     dpy get swap

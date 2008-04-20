@@ -1,4 +1,5 @@
-USING: kernel layouts math namespaces sequences sequences.private ;
+USING: kernel layouts math namespaces sequences
+sequences.private accessors ;
 IN: math.ranges
 
 TUPLE: range from length step ;
@@ -9,10 +10,10 @@ TUPLE: range from length step ;
     range boa ;
 
 M: range length ( seq -- n )
-    range-length ;
+    length>> ;
 
 M: range nth-unsafe ( n range -- obj )
-    [ range-step * ] keep range-from + ;
+    [ step>> * ] keep from>> + ;
 
 INSTANCE: range immutable-sequence
 
@@ -37,10 +38,10 @@ INSTANCE: range immutable-sequence
 : [0,b) ( b -- range ) 0 swap [a,b) ;
 
 : range-increasing? ( range -- ? )
-    range-step 0 > ;
+    step>> 0 > ;
 
 : range-decreasing? ( range -- ? )
-    range-step 0 < ;
+    step>> 0 < ;
 
 : first-or-peek ( seq head? -- elt )
     [ first ] [ peek ] if ;
@@ -52,7 +53,7 @@ INSTANCE: range immutable-sequence
     dup range-decreasing? first-or-peek ;
 
 : clamp-to-range ( n range -- n )
-    tuck range-min max swap range-max min ;
+    [ min>> max ] [ max>> min ] bi ;
 
 : sequence-index-range  ( seq -- range )
     length [0,b) ;
