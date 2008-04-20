@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays bit-vectors byte-arrays
-byte-vectors definitions generic hashtables kernel math
+USING: alien arrays bit-arrays byte-arrays
+definitions generic hashtables kernel math
 namespaces parser sequences strings sbufs vectors words
 quotations io assocs splitting classes.tuple generic.standard
-generic.math classes io.files vocabs float-arrays float-vectors
+generic.math classes io.files vocabs float-arrays
 classes.union classes.mixin classes.predicate classes.singleton
 compiler.units combinators debugger ;
 IN: bootstrap.syntax

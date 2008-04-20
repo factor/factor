@@ -152,9 +152,6 @@ GENERIC: >pprint-sequence ( obj -- seq )
 M: object >pprint-sequence ;
 
 M: vector >pprint-sequence ;
-M: bit-vector >pprint-sequence ;
-M: byte-vector >pprint-sequence ;
-M: float-vector >pprint-sequence ;
 M: curry >pprint-sequence ;
 M: compose >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
