@@ -129,3 +129,5 @@ TUPLE: test-tuple text number more-text ;
 [ t ] [ "wake up sheeple" dup "n" <text> validate = ] unit-test
 
 [ ] [ "password" <password> "p" set ] unit-test
+
+[ ] [ "pub-date" <date> "d" set ] unit-test

@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: html.elements http.server.validators accessors namespaces
-kernel io math.parser assocs classes words classes.tuple arrays
-sequences splitting mirrors hashtables fry combinators
-continuations math ;
+USING: accessors namespaces kernel io math.parser assocs classes
+words classes.tuple arrays sequences splitting mirrors
+hashtables fry combinators continuations math
+calendar.format html.elements
+http.server.validators ;
 IN: http.server.components
 
 ! Renderer protocol
@@ -59,9 +60,14 @@ SYMBOL: values
 
 : values-tuple values get mirror-object ;
 
+: render-view-or-summary ( component -- value renderer )
+    [ id>> value ] [ component-string ] [ renderer>> ] tri ;
+
 : render-view ( component -- )
-    [ id>> value ] [ component-string ] [ renderer>> ] tri
-    render-view* ;
+    render-view-or-summary render-view* ;
+
+: render-summary ( component -- )
+    render-view-or-summary render-summary* ;
 
 <PRIVATE
 
@@ -147,6 +153,17 @@ TUPLE: email < string ;
 M: email validate*
     call-next-method dup empty? [ v-email ] unless ;
 
+! URL fields
+TUPLE: url < string ;
+
+: <url> ( id -- component )
+    url new-string
+        5 >>min-length
+        60 >>max-length ;
+
+M: url validate*
+    call-next-method dup empty? [ v-url ] unless ;
+
 ! Don't send passwords back to the user
 TUPLE: password-renderer < field ;
 
@@ -206,20 +223,20 @@ M: captcha validate*
     drop v-captcha ;
 
 ! Text areas
-TUPLE: textarea-renderer rows cols ;
+TUPLE: text-renderer rows cols ;
 
-: new-textarea-renderer ( class -- renderer )
+: new-text-renderer ( class -- renderer )
     new
         60 >>cols
         20 >>rows ;
 
-: <textarea-renderer> ( -- renderer )
-    textarea-renderer new-textarea-renderer ;
+: <text-renderer> ( -- renderer )
+    text-renderer new-text-renderer ;
 
-M: textarea-renderer render-view*
+M: text-renderer render-view*
     drop write ;
 
-M: textarea-renderer render-edit*
+M: text-renderer render-edit*
     <textarea
         [ rows>> [ number>string =rows ] when* ]
         [ cols>> [ number>string =cols ] when* ] bi
@@ -234,10 +251,34 @@ TUPLE: text < string ;
 : new-text ( id class -- component )
     new-string
         f >>one-line
-        <textarea-renderer> >>renderer ;
+        <text-renderer> >>renderer ;
 
 : <text> ( id -- component )
     text new-text ;
+
+! HTML text component
+TUPLE: html-text-renderer < text-renderer ;
+
+: <html-text-renderer> ( -- renderer )
+    html-text-renderer new-text-renderer ;
+
+M: html-text-renderer render-view*
+    drop write ;
+
+TUPLE: html-text < text ;
+
+: <html-text> ( id -- component )
+    html-text new-text
+        <html-text-renderer> >>renderer ;
+
+! Date component
+TUPLE: date < string ;
+
+: <date> ( id -- component )
+    date new-string ;
+
+M: date component-string
+    drop timestamp>string ;
 
 ! List components
 SYMBOL: +plain+
@@ -248,21 +289,27 @@ TUPLE: list-renderer component type ;
 
 C: <list-renderer> list-renderer
 
-: render-list ( value component -- )
-    [ render-summary* ] curry each ;
+: render-plain-list ( seq quot component -- )
+    swap '[ , @ ] each ; inline
 
-: render-ordered-list ( value component -- )
-    [ <li> render-summary* </li> ] curry each ;
+: render-ordered-list ( seq quot component -- )
+    swap <ol> '[ <li> , @ </li> ] each </ol> ; inline
 
-: render-unordered-list ( value component -- )
-    [ <li> render-summary* </li> ] curry each ;
+: render-unordered-list ( seq quot component -- )
+    swap <ul> '[ <li> , @ </li> ] each </ul> ; inline
+
+: render-list ( value renderer quot -- )
+    swap [ component>> ] [ type>> ] bi {
+        { +plain+     [ render-plain-list ] }
+        { +ordered+   [ render-ordered-list ] }
+        { +unordered+ [ render-unordered-list ] }
+    } case ; inline
 
 M: list-renderer render-view*
-    [ component>> ] [ type>> ] bi {
-        { +plain+ [ render-list ] }
-        { +ordered+ [ <ol> render-ordered-list </ol> ] }
-        { +unordered+ [ <ul> render-unordered-list </ul> ] }
-    } case ;
+    [ render-view* ] render-list ;
+
+M: list-renderer render-summary*
+    [ render-summary* ] render-list ;
 
 TUPLE: list < component ;
 

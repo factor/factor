@@ -21,3 +21,9 @@ accessors ;
 
 [ "slava@factorcodeorg" v-email ]
 [ "invalid e-mail" = ] must-fail-with
+
+[ "http://www.factorcode.org" ]
+[ "http://www.factorcode.org" v-url ] unit-test
+
+[ "http:/www.factorcode.org" v-url ]
+[ "invalid URL" = ] must-fail-with
