@@ -44,7 +44,7 @@ M: postgresql-result-null summary ( obj -- str )
 
 : do-postgresql-statement ( statement -- res )
     db get handle>> swap sql>> PQexec dup postgresql-result-ok? [
-        dup postgresql-result-error-message swap PQclear throw
+        [ postgresql-result-error-message ] [ PQclear ] bi throw
     ] unless ;
 
 : type>oid ( symbol -- n )
@@ -165,4 +165,3 @@ M: postgresql-malloc-destructor dispose ( obj -- )
             dup [ bytes>object ] when ] }
         [ no-sql-type ]
     } case ;
-    ! PQgetlength PQgetisnull

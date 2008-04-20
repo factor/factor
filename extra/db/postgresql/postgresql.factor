@@ -53,12 +53,15 @@ M: postgresql-result-set #rows ( result-set -- n )
 M: postgresql-result-set #columns ( result-set -- n )
     handle>> PQnfields ;
 
+: result-handle-n ( result-set -- handle n )
+    [ handle>> ] [ n>> ] bi ;
+
 M: postgresql-result-set row-column ( result-set column -- obj )
-    >r [ handle>> ] [ n>> ] bi r> pq-get-string ;
+    >r result-handle-n r> pq-get-string ;
 
 M: postgresql-result-set row-column-typed ( result-set column -- obj )
     dup pick out-params>> nth type>>
-    >r >r [ handle>> ] [ n>> ] bi r> r> postgresql-column-typed ;
+    >r >r result-handle-n r> r> postgresql-column-typed ;
 
 M: postgresql-statement query-results ( query -- result-set )
     dup bind-params>> [
@@ -234,7 +237,6 @@ M: postgresql-db <delete-tuple-statement> ( class -- statement )
 
 M: postgresql-db <select-by-slots-statement> ( tuple class -- statement )
     [
-    ! tuple columns table
         "select " 0%
         over [ ", " 0% ]
         [ dup column-name>> 0% 2, ] interleave
