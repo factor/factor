@@ -126,7 +126,7 @@ M: sqlite-db create-sql-statement ( class -- statement )
         "(" 0% [ ", " 0% ] [
             dup column-name>> 0%
             " " 0%
-            dup type>> t lookup-type 0%
+            dup type>> lookup-create-type 0%
             modifiers 0%
         ] interleave ");" 0%
     ] sqlite-make dup sql>> . ;
@@ -247,41 +247,33 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
 M: sqlite-db random-id-quot ( -- quot )
     [ 64 [ 2^ random ] keep 1 - set-bit ] ;
 
-M: sqlite-db modifier-table ( -- hashtable )
+M: sqlite-db persistent-table ( -- assoc )
     H{
-        { +native-id+ "primary key" }
-        { +assigned-id+ "primary key" }
-        { +random-id+ "primary key" }
-        { +autoincrement+ "autoincrement" }
-        { +unique+ "unique" }
-        { +default+ "default" }
-        { +null+ "null" }
-        { +not-null+ "not null" }
-        { system-random-generator "" }
-        { secure-random-generator "" }
-        { random-generator "" }
+        { +native-id+ { "integer primary key" "integer primary key" f } }
+        { +assigned-id+ { f f "primary key" } }
+        { +random-id+ { "integer primary key" "integer primary key" f } }
+        { INTEGER { "integer" "integer" "primary key" } }
+        { BIG-INTEGER { "bigint" "bigint" } }
+        { SIGNED-BIG-INTEGER { "bigint" "bigint" } }
+        { UNSIGNED-BIG-INTEGER { "bigint" "bigint" } }
+        { TEXT { "text" "text" } }
+        { VARCHAR { "text" "text" } }
+        { DATE { "date" "date" } }
+        { TIME { "time" "time" } }
+        { DATETIME { "datetime" "datetime" } }
+        { TIMESTAMP { "timestamp" "timestamp" } }
+        { DOUBLE { "real" "real" } }
+        { BLOB { "blob" "blob" } }
+        { FACTOR-BLOB { "blob" "blob" } }
+        { +autoincrement+ { f f "autoincrement" } }
+        { +unique+ { f f "unique" } }
+        { +default+ { f f "default" } }
+        { +null+ { f f "null" } }
+        { +not-null+ { f f "not null" } }
+        { system-random-generator { f f f } }
+        { secure-random-generator { f f f } }
+        { random-generator { f f f } }
     } ;
-
-M: sqlite-db type-table ( -- assoc )
-    H{
-        { +native-id+ "integer primary key" }
-        { +random-id+ "integer primary key" }
-        { INTEGER "integer" }
-        { BIG-INTEGER "bigint" }
-        { SIGNED-BIG-INTEGER "bigint" }
-        { UNSIGNED-BIG-INTEGER "bigint" }
-        { TEXT "text" }
-        { VARCHAR "text" }
-        { DATE "date" }
-        { TIME "time" }
-        { DATETIME "datetime" }
-        { TIMESTAMP "timestamp" }
-        { DOUBLE "real" }
-        { BLOB "blob" }
-        { FACTOR-BLOB "blob" }
-    } ;
-
-M: sqlite-db create-type-table ( symbol -- str ) type-table ;
 
 M: sqlite-db compound ( str seq -- str' )
     over {

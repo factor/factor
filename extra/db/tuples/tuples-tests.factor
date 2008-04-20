@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
-prettyprint tools.walker db.sqlite calendar sequences
+prettyprint tools.walker calendar sequences db.sqlite
 math.intervals db.postgresql accessors random math.bitfields.lib ;
 IN: db.tuples.tests
 
@@ -106,13 +106,6 @@ SYMBOL: person4
 
     [ ] [ person drop-table ] unit-test ;
 
-: make-native-person-table ( -- )
-    [ person drop-table ] [ drop ] recover
-    person create-table
-    T{ person f f "billy" 200 3.14 } insert-tuple
-    T{ person f f "johnny" 10 3.14 } insert-tuple
-    ;
-
 : native-person-schema ( -- )
     person "PERSON"
     {
@@ -192,7 +185,6 @@ TUPLE: annotation n paste-id summary author mode contents ;
 
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test
-    
     [ ] [ person1 get insert-tuple ] unit-test
     [ person1 get insert-tuple ] must-fail ;
 
@@ -302,11 +294,12 @@ TUPLE: bignum-test id m n o ;
     } define-persistent
     [ bignum-test drop-table ] ignore-errors
     [ ] [ bignum-test ensure-table ] unit-test
-    [ ] [ 63 2^ dup dup <bignum-test> insert-tuple ] unit-test
+    [ ] [ 63 2^ 1- dup dup <bignum-test> insert-tuple ] unit-test ;
 
-    [ T{ bignum-test f 1
-        -9223372036854775808 9223372036854775808 -9223372036854775808 } ]
-    [ T{ bignum-test f 1 } select-tuple ] unit-test ;
+    ! sqlite only
+    ! [ T{ bignum-test f 1
+        ! -9223372036854775808 9223372036854775808 -9223372036854775808 } ]
+    ! [ T{ bignum-test f 1 } select-tuple ] unit-test ;
 
 TUPLE: secret n message ;
 C: <secret> secret
@@ -346,17 +339,17 @@ C: <secret> secret
 [ native-person-schema test-tuples ] test-postgresql
 [ assigned-person-schema test-tuples ] test-postgresql
 [ assigned-person-schema test-repeated-insert ] test-postgresql
-[ test-bignum ] test-sqlite
+[ test-bignum ] test-postgresql
 [ test-serialize ] test-postgresql
 ! [ test-intervals ] test-postgresql
 ! [ test-random-id ] test-postgresql
 
 TUPLE: does-not-persist ;
 
-[
-    [ does-not-persist create-sql-statement ]
-    [ class \ not-persistent = ] must-fail-with
-] test-sqlite
+! [
+    ! [ does-not-persist create-sql-statement ]
+    ! [ class \ not-persistent = ] must-fail-with
+! ] test-sqlite
 
 [
     [ does-not-persist create-sql-statement ]
