@@ -28,7 +28,7 @@ M: f item-check drop 0 ;
 : stretch-tree ( max-depth -- )
     1 + 0 over bottom-up-tree item-check
     [ "stretch tree of depth " write pprint ]
-    [ "\t check: " write ] bi* ;
+    [ "\t check: " write . ] bi* ;
 
 :: long-lived-tree ( max-depth -- )
     0 max-depth bottom-up-tree
@@ -36,8 +36,8 @@ M: f item-check drop 0 ;
     min-depth max-depth 2 <range> [| depth |
         max-depth depth - min-depth + 2^ [
             [1,b] 0 [
-                [ depth ] [ depth neg ] bi
-                [ bottom-up-tree item-check + ] 2bi@
+                dup neg
+                [ depth bottom-up-tree item-check + ] bi@
             ] reduce
         ]
         [ 2 * ] bi
@@ -47,3 +47,9 @@ M: f item-check drop 0 ;
 
     "long lived tree of depth " write max-depth pprint
     "\t check: " write item-check . ;
+
+: binary-trees ( n -- )
+    min-depth 2 + max [ stretch-tree ] [ long-lived-tree ] bi ;
+
+: binary-trees-main ( -- )
+    16 binary-trees ;
