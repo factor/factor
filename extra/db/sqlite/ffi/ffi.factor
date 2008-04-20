@@ -108,7 +108,7 @@ LIBRARY: sqlite
 FUNCTION: int sqlite3_open ( char* filename, void* ppDb ) ;
 FUNCTION: int sqlite3_close ( sqlite3* pDb ) ;
 FUNCTION: char* sqlite3_errmsg ( sqlite3* pDb ) ;
-FUNCTION: int sqlite3_prepare ( sqlite3* pDb, char* zSql, int nBytes, void* ppStmt, void* pzTail ) ;
+FUNCTION: int sqlite3_prepare_v2 ( sqlite3* pDb, char* zSql, int nBytes, void* ppStmt, void* pzTail ) ;
 FUNCTION: int sqlite3_finalize ( sqlite3_stmt* pStmt ) ;
 FUNCTION: int sqlite3_reset ( sqlite3_stmt* pStmt ) ;
 FUNCTION: int sqlite3_step ( sqlite3_stmt* pStmt ) ;
@@ -123,6 +123,7 @@ FUNCTION: int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_int64
 FUNCTION: int sqlite3_bind_null ( sqlite3_stmt* pStmt, int n ) ;
 FUNCTION: int sqlite3_bind_text ( sqlite3_stmt* pStmt, int index, char* text, int len, int destructor ) ;
 FUNCTION: int sqlite3_bind_parameter_index ( sqlite3_stmt* pStmt, char* name ) ;
+FUNCTION: int sqlite3_clear_bindings ( sqlite3_stmt* pStmt ) ;
 FUNCTION: int sqlite3_column_count ( sqlite3_stmt* pStmt ) ;
 FUNCTION: void* sqlite3_column_blob ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: int sqlite3_column_bytes ( sqlite3_stmt* pStmt, int col ) ;

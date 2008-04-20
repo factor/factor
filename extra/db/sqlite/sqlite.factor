@@ -7,6 +7,7 @@ continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators math.intervals
 io namespaces.lib accessors vectors math.ranges random
 math.bitfields.lib ;
+USE: tools.walker
 IN: db.sqlite
 
 TUPLE: sqlite-db < db path ;
@@ -43,17 +44,21 @@ M: sqlite-statement dispose ( statement -- )
 M: sqlite-result-set dispose ( result-set -- )
     f >>handle drop ;
 
-: sqlite-bind ( triples handle -- )
-    swap [ first3 sqlite-bind-type ] with each ;
-
 : reset-statement ( statement -- )
     sqlite-maybe-prepare handle>> sqlite-reset ;
 
+: reset-bindings ( statement -- )
+    sqlite-maybe-prepare
+    handle>> [ sqlite3_reset drop ] [ sqlite3_clear_bindings drop ] bi ;
+
+M: sqlite-statement low-level-bind ( statement -- )
+    [ statement-bind-params ] [ statement-handle ] bi
+    swap [ first3 sqlite-bind-type ] with each ;
+
 M: sqlite-statement bind-statement* ( statement -- )
     sqlite-maybe-prepare
-    dup statement-bound? [ dup reset-statement ] when
-    [ statement-bind-params ] [ statement-handle ] bi
-    sqlite-bind ;
+    dup statement-bound? [ dup reset-bindings ] when
+    low-level-bind ;
 
 GENERIC: sqlite-bind-conversion ( tuple obj -- array )
 
@@ -140,13 +145,16 @@ M: sqlite-db <insert-native-statement> ( tuple -- statement )
                         dup 0% random-id-quot
                     ] with-random
                 ] curry
-                [ type>> ] bi 10 <generator-bind> 1,
+                [ type>> ] bi <generator-bind> 1,
             ] [
                 bind%
             ] if
         ] interleave
         ");" 0%
-    ] sqlite-make ;
+    ] sqlite-make
+    dup in-params>> [ generator-bind? ] contains? [
+        make-retryable
+    ] when ;
 
 M: sqlite-db <insert-nonnative-statement> ( tuple -- statement )
     <insert-native-statement> ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes db kernel namespaces
-classes.tuple words sequences slots math
+classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
 mirrors sequences.lib tools.walker combinators.lib ;
 IN: db.tuples
@@ -48,6 +48,40 @@ HOOK: <delete-tuples-statement> db ( class -- obj )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 
 HOOK: insert-tuple* db ( tuple statement -- )
+
+SINGLETON: retryable
+
+: make-retryable ( obj -- obj' )
+    dup sequence? [
+        [ make-retryable ] map
+    ] [
+        retryable >>type
+    ] if ;
+
+: regenerate-params ( statement -- statement )
+    dup
+    [ bind-params>> ] [ in-params>> ] bi
+    [
+        dup generator-bind? [
+            quot>> call over set-second
+        ] [
+            drop
+        ] if
+    ] 2map >>bind-params ;
+
+: handle-random-id ( statement -- )
+    dup in-params>> [ type>> +random-id+ = ] find drop >boolean [
+        retryable >>type
+        random-id-quot >>quot
+    ] when drop ;
+
+M: retryable execute-statement* ( statement type -- )
+    drop
+    [
+        [ query-results dispose t ]
+        [ ]
+        [ regenerate-params bind-statement* f ] cleanup
+    ] curry 10 retry drop ;
 
 : resulting-tuple ( row out-params -- tuple )
     dup first sql-spec-class new [

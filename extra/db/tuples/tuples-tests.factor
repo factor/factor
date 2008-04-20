@@ -346,7 +346,7 @@ C: <secret> secret
     ] unit-test
 
     [ t ] [
-        T{ secret } select-tuples length 3 =
+        T{ secret } select-tuples dup . length 3 =
     ] unit-test ;
 
 [ test-random-id ] test-sqlite

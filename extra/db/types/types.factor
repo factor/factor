@@ -19,7 +19,7 @@ TUPLE: sql-spec class slot-name column-name type primary-key modifiers ;
 TUPLE: literal-bind key type value ;
 C: <literal-bind> literal-bind
 
-TUPLE: generator-bind key quot type retries ;
+TUPLE: generator-bind key quot type ;
 C: <generator-bind> generator-bind
 
 SINGLETON: +native-id+
@@ -63,12 +63,6 @@ SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
     [ sql-spec-primary-key ] find nip ;
 
 : relation? ( spec -- ? ) [ +has-many+ = ] deep-find ;
-
-: handle-random-id ( statement -- )
-    dup in-params>> [ type>> +random-id+ = ] find drop >boolean [
-        retryable >>type
-        random-id-quot >>quot
-    ] when drop ;
 
 SYMBOLS: INTEGER BIG-INTEGER SIGNED-BIG-INTEGER UNSIGNED-BIG-INTEGER
 DOUBLE REAL BOOLEAN TEXT VARCHAR DATE TIME DATETIME TIMESTAMP BLOB

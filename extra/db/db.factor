@@ -42,7 +42,6 @@ TUPLE: prepared-statement < statement ;
 
 SINGLETON: throwable
 SINGLETON: nonthrowable
-SINGLETON: retryable
 
 : make-throwable ( obj -- obj' )
     dup sequence? [
@@ -58,13 +57,6 @@ SINGLETON: retryable
         nonthrowable >>type
     ] if ;
 
-: make-retryable ( obj quot -- obj' )
-    over sequence? [
-        [ make-retryable ] curry map
-    ] [
-        retryable >>type
-    ] if ;
-
 TUPLE: result-set sql in-params out-params handle n max ;
 
 : construct-statement ( sql in out class -- statement )
@@ -78,6 +70,7 @@ HOOK: <simple-statement> db ( str in out -- statement )
 HOOK: <prepared-statement> db ( str in out -- statement )
 GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( statement -- )
+GENERIC: low-level-bind ( statement -- )
 GENERIC: bind-tuple ( tuple statement -- )
 GENERIC: query-results ( query -- result-set )
 GENERIC: #rows ( result-set -- n )
@@ -94,12 +87,6 @@ M: throwable execute-statement* ( statement type -- )
 
 M: nonthrowable execute-statement* ( statement type -- )
     drop [ query-results dispose ] [ 2drop ] recover ;
-
-M: retryable execute-statement* ( statement type -- )
-    [
-        dup dup quot>> call
-        [ query-results dispose ] [ 2drop ] recover
-    ] curry 10 retry ;
 
 : execute-statement ( statement -- )
     dup sequence? [
