@@ -156,10 +156,6 @@ M: sqlite-db bind# ( spec obj -- )
 M: sqlite-db bind% ( spec -- )
     dup 1, column-name>> ":" prepend 0% ;
 
-: where-primary-key% ( specs -- )
-    " where " 0%
-    find-primary-key dup column-name>> 0% " = " 0% bind% ;
-
 GENERIC: where ( specs obj -- )
 
 : interval-comparison ( ? str -- str )
@@ -200,24 +196,6 @@ M: string where ( spec obj -- ) object-where ;
         2dup slot-name>> swap get-slot-named where
     ] interleave drop ;
 
-M: sqlite-db <update-tuple-statement> ( class -- statement )
-    [
-        "update " 0%
-        0%
-        " set " 0%
-        dup remove-id
-        [ ", " 0% ] [ dup column-name>> 0% " = " 0% bind% ] interleave
-        where-primary-key%
-    ] query-make ;
-
-M: sqlite-db <delete-tuple-statement> ( specs table -- sql )
-    [
-        "delete from " 0% 0%
-        " where " 0%
-        find-primary-key
-        dup column-name>> 0% " = " 0% bind%
-    ] query-make ;
-
 M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
     [
         "select " 0%
@@ -229,9 +207,6 @@ M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
         [ slot-name>> swap get-slot-named ] with subset
         dup empty? [ 2drop ] [ where-clause ] if ";" 0%
     ] query-make ;
-
-M: sqlite-db random-id-quot ( -- quot )
-    [ 64 [ 2^ random ] keep 1 - set-bit ] ;
 
 M: sqlite-db persistent-table ( -- assoc )
     H{

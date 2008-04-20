@@ -197,26 +197,6 @@ M: postgresql-db <insert-nonnative-statement> ( class -- statement )
 M: postgresql-db insert-tuple* ( tuple statement -- )
     query-modify-tuple ;
 
-M: postgresql-db <update-tuple-statement> ( class -- statement )
-    [
-        "update " 0% 0%
-        " set " 0%
-        dup remove-id
-        [ ", " 0% ]
-        [ dup column-name>> 0% " = " 0% bind% ] interleave
-        " where " 0%
-        find-primary-key
-        dup column-name>> 0% " = " 0% bind%
-    ] query-make ;
-
-M: postgresql-db <delete-tuple-statement> ( class -- statement )
-    [
-        "delete from " 0% 0%
-        " where " 0%
-        find-primary-key
-        dup column-name>> 0% " = " 0% bind%
-    ] query-make ;
-
 M: postgresql-db <select-by-slots-statement> ( tuple class -- statement )
     [
         "select " 0%
