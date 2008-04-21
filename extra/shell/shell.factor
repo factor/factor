@@ -1,7 +1,7 @@
 
 USING: kernel parser words continuations namespaces debugger
-       sequences combinators prettyprint
-       system io io.files io.launcher sequences.deep
+       sequences combinators splitting prettyprint
+       system io io.files io.launcher io.encodings.utf8 sequences.deep
        accessors multi-methods newfx shell.parser ;
 
 IN: shell
@@ -43,6 +43,19 @@ METHOD: expand { glob-expr }
   if ;
 
 METHOD: expand { factor-expr } expr>> eval unparse ;
+
+DEFER: expansion
+
+METHOD: expand { back-quoted-expr }
+  expr>>
+  expr
+  ast>>
+  command>>
+  expansion
+  utf8 <process-stream>
+  contents
+  " \n" split
+  "" remove ;
 
 METHOD: expand { object } ;
 
