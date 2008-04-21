@@ -4,16 +4,21 @@ USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep sequences.lib
 words namespaces tools.walker slots slots.private classes
 mirrors classes.tuple combinators calendar.format symbols
-classes.singleton ;
+classes.singleton accessors quotations random ;
 IN: db.types
 
-HOOK: modifier-table db ( -- hash )
-HOOK: compound-modifier db ( str seq -- hash )
-HOOK: type-table db ( -- hash )
-HOOK: create-type-table db ( -- hash )
-HOOK: compound-type db ( str n -- hash )
+HOOK: persistent-table db ( -- hash )
+HOOK: compound db ( str obj -- hash )
 
-TUPLE: sql-spec class slot-name column-name type modifiers primary-key ;
+HOOK: random-id-quot db ( -- quot )
+
+TUPLE: sql-spec class slot-name column-name type primary-key modifiers ;
+
+TUPLE: literal-bind key type value ;
+C: <literal-bind> literal-bind
+
+TUPLE: generator-bind key quot type ;
+C: <generator-bind> generator-bind
 
 SINGLETON: +native-id+
 SINGLETON: +assigned-id+
@@ -24,49 +29,53 @@ UNION: +nonnative-id+ +random-id+ +assigned-id+ ;
 SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 +foreign-id+ +has-many+ ;
 
+: find-random-generator ( seq -- obj )
+    [
+        {
+            random-generator
+            system-random-generator
+            secure-random-generator
+        } member?
+    ] find nip [ system-random-generator ] unless* ;
+
 : primary-key? ( spec -- ? )
-    sql-spec-primary-key +primary-key+? ;
+    primary-key>> +primary-key+? ;
 
 : native-id? ( spec -- ? )
-    sql-spec-primary-key +native-id+? ;
+    primary-key>> +native-id+? ;
 
 : nonnative-id? ( spec -- ? )
-    sql-spec-primary-key +nonnative-id+? ;
+    primary-key>> +nonnative-id+? ;
 
 : normalize-spec ( spec -- )
-    dup sql-spec-type dup +primary-key+? [
-        swap set-sql-spec-primary-key
+    dup type>> dup +primary-key+? [
+        >>primary-key drop
     ] [
-        drop dup sql-spec-modifiers [
+        drop dup modifiers>> [
             +primary-key+?
         ] deep-find
-        [ swap set-sql-spec-primary-key ] [ drop ] if*
+        [ >>primary-key drop ] [ drop ] if*
     ] if ;
 
 : find-primary-key ( specs -- obj )
-    [ sql-spec-primary-key ] find nip ;
+    [ primary-key>> ] find nip ;
 
 : relation? ( spec -- ? ) [ +has-many+ = ] deep-find ;
 
-SYMBOLS: INTEGER BIG-INTEGER DOUBLE REAL BOOLEAN TEXT VARCHAR
-DATE TIME DATETIME TIMESTAMP BLOB FACTOR-BLOB NULL ;
+SYMBOLS: INTEGER BIG-INTEGER SIGNED-BIG-INTEGER UNSIGNED-BIG-INTEGER
+DOUBLE REAL BOOLEAN TEXT VARCHAR DATE TIME DATETIME TIMESTAMP BLOB
+FACTOR-BLOB NULL ;
 
 : spec>tuple ( class spec -- tuple )
-    [ ?first3 ] keep 3 ?tail*
-    {
-        set-sql-spec-class
-        set-sql-spec-slot-name
-        set-sql-spec-column-name
-        set-sql-spec-type
-        set-sql-spec-modifiers
-    } sql-spec construct
+    3 f pad-right
+    [ first3 ] keep 3 tail
+    sql-spec new
+        swap >>modifiers
+        swap >>type
+        swap >>column-name
+        swap >>slot-name
+        swap >>class
     dup normalize-spec ;
-
-TUPLE: no-sql-type ;
-: no-sql-type ( -- * ) T{ no-sql-type } throw ;
-
-TUPLE: no-sql-modifier ;
-: no-sql-modifier ( -- * ) T{ no-sql-modifier } throw ;
 
 : number>string* ( n/str -- str )
     dup number? [ number>string ] when ;
@@ -78,39 +87,39 @@ TUPLE: no-sql-modifier ;
     [ relation? not ] subset ;
 
 : remove-id ( specs -- obj )
-    [ sql-spec-primary-key not ] subset ;
+    [ primary-key>> not ] subset ;
 
 ! SQLite Types: http://www.sqlite.org/datatype3.html
 ! NULL INTEGER REAL TEXT BLOB
 ! PostgreSQL Types:
 ! http://developer.postgresql.org/pgdocs/postgres/datatype.html
 
-: lookup-modifier ( obj -- str )
-    dup array? [
-        unclip lookup-modifier swap compound-modifier
-    ] [
-        modifier-table at*
-        [ "unknown modifier" throw ] unless
-    ] if ;
+ERROR: unknown-modifier ;
 
-: lookup-type* ( obj -- str )
+: lookup-modifier ( obj -- str )
+    {
+        { [ dup array? ] [ unclip lookup-modifier swap compound ] }
+        [ persistent-table at* [ unknown-modifier ] unless third ]
+    } cond ;
+
+ERROR: no-sql-type ;
+
+: (lookup-type) ( obj -- str )
+    persistent-table at* [ no-sql-type ] unless ;
+
+: lookup-type ( obj -- str )
     dup array? [
-        first lookup-type*
+        unclip (lookup-type) first nip
     ] [
-        type-table at*
-        [ no-sql-type ] unless
+        (lookup-type) first
     ] if ;
 
 : lookup-create-type ( obj -- str )
     dup array? [
-        unclip lookup-create-type swap compound-type
+        unclip (lookup-type) second swap compound
     ] [
-        dup create-type-table at*
-        [ nip ] [ drop lookup-type* ] if
+        (lookup-type) second
     ] if ;
-
-: lookup-type ( obj create? -- str )
-    [ lookup-create-type ] [ lookup-type* ] if ;
 
 : single-quote ( str -- newstr )
     "'" swap "'" 3append ;
@@ -125,11 +134,11 @@ TUPLE: no-sql-modifier ;
     " " swap 3append ;
 
 : modifiers ( spec -- str )
-    sql-spec-modifiers 
-    [ lookup-modifier ] map " " join
+    modifiers>> [ lookup-modifier ] map " " join
     dup empty? [ " " prepend ] unless ;
 
 HOOK: bind% db ( spec -- )
+HOOK: bind# db ( spec obj -- )
 
 : offset-of-slot ( str obj -- n )
     class "slots" word-prop slot-named slot-spec-offset ;
@@ -145,6 +154,6 @@ HOOK: bind% db ( spec -- )
 
 : tuple>params ( specs tuple -- obj )
     [
-        >r dup sql-spec-type swap sql-spec-slot-name r>
+        >r [ type>> ] [ slot-name>> ] bi r>
         get-slot-named swap
     ] curry { } map>assoc ;
