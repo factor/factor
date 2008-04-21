@@ -4,8 +4,8 @@ USING: kernel io.backend io.monitors io.monitors.recursive
 io.files io.buffers io.monitors io.nonblocking io.timeouts
 io.unix.backend io.unix.select io.encodings.utf8
 unix.linux.inotify assocs namespaces threads continuations init
-math math.bitfields sets alien.strings alien vocabs.loader
-accessors system hashtables ;
+math math.bitfields sets alien alien.strings alien.c-types
+vocabs.loader accessors system hashtables ;
 IN: io.unix.linux.monitors
 
 TUPLE: linux-monitor < monitor wd ;
