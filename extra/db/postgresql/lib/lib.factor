@@ -4,8 +4,8 @@ USING: arrays continuations db io kernel math namespaces
 quotations sequences db.postgresql.ffi alien alien.c-types
 db.types tools.walker ascii splitting math.parser combinators
 libc shuffle calendar.format byte-arrays destructors prettyprint
-accessors strings serialize io.encodings.binary
-io.streams.byte-array inspector ;
+accessors strings serialize io.encodings.binary io.encodings.utf8
+alien.strings io.streams.byte-array inspector ;
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )
@@ -79,7 +79,7 @@ M: postgresql-result-null summary ( obj -- str )
             { BLOB [ dup [ malloc-byte-array/length ] [ 0 ] if ] }
             [
                 drop number>string* dup [
-                    malloc-char-string dup free-always
+                    utf8 malloc-string dup free-always
                 ] when 0
             ]
         } case 2array
@@ -111,7 +111,7 @@ M: postgresql-result-null summary ( obj -- str )
     PQgetisnull 1 = ;
 
 : pq-get-string ( handle row column -- obj )
-    3dup PQgetvalue alien>char-string
+    3dup PQgetvalue utf8 alien>string
     dup empty? [ >r pq-get-is-null f r> ? ] [ 3nip ] if ;
 
 : pq-get-number ( handle row column -- obj )
