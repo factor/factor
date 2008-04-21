@@ -1,8 +1,9 @@
-! Copyright (C) 2007 Doug Coleman, Slava Pestov
+! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays io.backend io.binary io.sockets
-kernel math math.parser sequences splitting system
-alien.c-types combinators namespaces alien parser ;
+io.encodings.ascii kernel math math.parser sequences splitting
+system alien.c-types alien.strings alien combinators namespaces
+parser ;
 IN: io.sockets.impl
 
 << {
@@ -130,4 +131,4 @@ M: object resolve-host ( host serv passive? -- seq )
 M: object host-name ( -- name )
     256 <byte-array> dup dup length gethostname
     zero? [ "gethostname failed" throw ] unless
-    alien>char-string ;
+    ascii alien>string ;

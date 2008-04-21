@@ -15,7 +15,8 @@ components ;
 M: form init V{ } clone >>components ;
 
 : <form> ( id -- form )
-    form f new-component ;
+    form f new-component
+        dup >>renderer ;
 
 : add-field ( form component -- form )
     dup id>> pick components>> set-at ;
@@ -67,6 +68,8 @@ M: form init V{ } clone >>components ;
         [ call-template ]
         tri*
     ] with-scope ;
+
+M: form component-string drop ;
 
 M: form render-summary*
     dup summary-template>> render-form ;

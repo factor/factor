@@ -4,8 +4,9 @@
 ! Adapted from oci.h and ociap.h
 ! Tested with Oracle version - 10.1.0.3 Instant Client
 
-USING: alien alien.c-types combinators kernel math namespaces oracle.liboci
-prettyprint sequences ;
+USING: alien alien.c-types alien.strings combinators kernel math
+namespaces oracle.liboci prettyprint sequences
+io.encodings.ascii ;
 
 IN: oracle
 
@@ -31,7 +32,7 @@ C: <connection> connection
 : get-oci-error ( object -- * )
     1 f "uint*" <c-object> dup >r 512 "uchar" <c-array> dup >r
     512 OCI_HTYPE_ERROR OCIErrorGet r> r> *uint drop
-    alien>char-string throw ;
+    ascii alien>string throw ;
 
 : check-result ( result -- )
     {
@@ -101,9 +102,9 @@ C: <connection> connection
 
 : oci-log-on ( -- )
     env get err get svc get 
-    con get connection-username dup length swap malloc-char-string swap 
-    con get connection-password dup length swap malloc-char-string swap
-    con get connection-db dup length swap malloc-char-string swap
+    con get connection-username dup length swap ascii malloc-string swap 
+    con get connection-password dup length swap ascii malloc-string swap
+    con get connection-db dup length swap ascii malloc-string swap
     OCILogon check-result ;
 
 ! =========================================================
@@ -118,11 +119,11 @@ C: <connection> connection
     svc get OCI_HTYPE_SVCCTX srv get 0 OCI_ATTR_SERVER err get OCIAttrSet check-result ;
 
 : set-username-attribute ( -- )
-    ses get OCI_HTYPE_SESSION con get connection-username dup length swap malloc-char-string swap 
+    ses get OCI_HTYPE_SESSION con get connection-username dup length swap ascii malloc-string swap 
     OCI_ATTR_USERNAME err get OCIAttrSet check-result ;
 
 : set-password-attribute ( -- )
-    ses get OCI_HTYPE_SESSION con get connection-password dup length swap malloc-char-string swap 
+    ses get OCI_HTYPE_SESSION con get connection-password dup length swap ascii malloc-string swap 
     OCI_ATTR_PASSWORD err get OCIAttrSet check-result ;
 
 : set-attributes ( -- )
@@ -150,7 +151,7 @@ C: <connection> connection
     check-result *void* stm set ;
 
 : prepare-statement ( statement -- )
-    >r stm get err get r> dup length swap malloc-char-string swap
+    >r stm get err get r> dup length swap ascii malloc-string swap
     OCI_NTV_SYNTAX OCI_DEFAULT OCIStmtPrepare check-result ;
 
 : calculate-size ( type -- size )
@@ -222,7 +223,7 @@ C: <connection> connection
 
 : server-version ( -- )
     srv get err get 512 "uchar" malloc-array dup >r 512 OCI_HTYPE_SERVER
-    OCIServerVersion check-result r> alien>char-string . ;
+    OCIServerVersion check-result r> ascii alien>string . ;
 
 ! =========================================================
 ! Public routines
@@ -236,13 +237,13 @@ C: <connection> connection
 
 : fetch-each ( object -- object )
     fetch-statement [
-        buf get alien>char-string res get swap suffix res set
+        buf get ascii alien>string res get swap suffix res set
         fetch-each
     ] [ ] if ;
 
 : run-query ( object -- object )
     execute-statement [
-        buf get alien>char-string res get swap suffix res set
+        buf get ascii alien>string res get swap suffix res set
         fetch-each
     ] [ ] if ;
 

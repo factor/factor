@@ -4,8 +4,8 @@ math.constants math.private sequences strings tools.test words
 continuations sequences.private hashtables.private byte-arrays
 strings.private system random layouts vectors.private
 sbufs.private strings.private slots.private alien
-alien.accessors alien.c-types alien.syntax namespaces libc
-sequences.private ;
+alien.accessors alien.c-types alien.syntax alien.strings
+namespaces libc sequences.private io.encodings.ascii ;
 
 ! Make sure that intrinsic ops compile to correct code.
 [ ] [ 1 [ drop ] compile-call ] unit-test
@@ -361,11 +361,11 @@ cell 8 = [
     [ ] [ "b" get free ] unit-test
 ] when
 
-[ ] [ "hello world" malloc-char-string "s" set ] unit-test
+[ ] [ "hello world" ascii malloc-string "s" set ] unit-test
 
 "s" get [
-    [ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-call alien>char-string ] unit-test
-    [ "hello world" ] [ "s" get <void*> [ { c-ptr } declare *void* ] compile-call alien>char-string ] unit-test
+    [ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-call ascii alien>string ] unit-test
+    [ "hello world" ] [ "s" get <void*> [ { c-ptr } declare *void* ] compile-call ascii alien>string ] unit-test
 
     [ ] [ "s" get free ] unit-test
 ] when

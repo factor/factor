@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private math sequences
 sequences.private growable bit-arrays prettyprint.backend
-parser ;
+parser accessors ;
 IN: bit-vectors
 
 TUPLE: bit-vector underlying fill ;
@@ -44,7 +44,7 @@ M: bit-array new-resizable drop <bit-vector> ;
 
 INSTANCE: bit-vector growable
 
-: ?V \ } [ >bit-vector ] parse-literal ; parsing
+: ?V{ \ } [ >bit-vector ] parse-literal ; parsing
 
 M: bit-vector >pprint-sequence ;
 

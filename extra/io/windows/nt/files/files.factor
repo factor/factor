@@ -9,7 +9,7 @@ IN: io.windows.nt.files
 M: winnt cwd
     MAX_UNICODE_PATH dup "ushort" <c-array>
     [ GetCurrentDirectory win32-error=0/f ] keep
-    alien>u16-string ;
+    utf16n alien>string ;
 
 M: winnt cd
     SetCurrentDirectory win32-error=0/f ;
