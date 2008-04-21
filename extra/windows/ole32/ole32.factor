@@ -1,5 +1,5 @@
-USING: alien alien.syntax alien.c-types math kernel sequences
-windows windows.types combinators.lib ;
+USING: alien alien.syntax alien.c-types alien.strings math
+kernel sequences windows windows.types combinators.lib ;
 IN: windows.ole32
 
 LIBRARY: ole32
