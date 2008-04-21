@@ -8,15 +8,17 @@ math math.bitfields sets alien alien.strings alien.c-types
 vocabs.loader accessors system hashtables ;
 IN: io.unix.linux.monitors
 
-TUPLE: linux-monitor < monitor wd ;
-
-: <linux-monitor> ( wd path mailbox -- monitor )
-    linux-monitor new-monitor
-        swap >>wd ;
-
 SYMBOL: watches
 
 SYMBOL: inotify
+
+TUPLE: linux-monitor < monitor wd inotify watches ;
+
+: <linux-monitor> ( wd path mailbox -- monitor )
+    linux-monitor new-monitor
+        inotify get >>inotify
+        watches get >>watches
+        swap >>wd ;
 
 : wd>monitor ( wd -- monitor ) watches get at ;
 
@@ -53,8 +55,13 @@ M: linux (monitor) ( path recursive? mailbox -- monitor )
     ] if ;
 
 M: linux-monitor dispose ( monitor -- )
-    [ wd>> watches get delete-at ]
-    [ wd>> inotify-fd swap inotify_rm_watch io-error ] bi ;
+    dup inotify>> closed>> [ drop ] [
+        [ [ wd>> ] [ watches>> ] bi delete-at ]
+        [
+            [ inotify>> handle>> ] [ wd>> ] bi
+            inotify_rm_watch io-error
+        ] bi
+    ] if ;
 
 : ignore-flags? ( mask -- ? )
     {
