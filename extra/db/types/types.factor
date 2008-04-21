@@ -10,15 +10,17 @@ IN: db.types
 HOOK: persistent-table db ( -- hash )
 HOOK: compound db ( str obj -- hash )
 
-HOOK: random-id-quot db ( -- quot )
-
 TUPLE: sql-spec class slot-name column-name type primary-key modifiers ;
 
 TUPLE: literal-bind key type value ;
 C: <literal-bind> literal-bind
 
-TUPLE: generator-bind key quot type ;
+TUPLE: generator-bind key singleton type ;
 C: <generator-bind> generator-bind
+SINGLETON: random-id-generator
+
+TUPLE: low-level-binding value ;
+C: <low-level-binding> low-level-binding
 
 SINGLETON: +native-id+
 SINGLETON: +assigned-id+

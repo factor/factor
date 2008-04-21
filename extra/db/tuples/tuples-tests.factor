@@ -342,14 +342,14 @@ C: <secret> secret
 [ test-bignum ] test-postgresql
 [ test-serialize ] test-postgresql
 [ test-intervals ] test-postgresql
-! [ test-random-id ] test-postgresql
+[ test-random-id ] test-postgresql
 
 TUPLE: does-not-persist ;
 
-! [
-    ! [ does-not-persist create-sql-statement ]
-    ! [ class \ not-persistent = ] must-fail-with
-! ] test-sqlite
+[
+    [ does-not-persist create-sql-statement ]
+    [ class \ not-persistent = ] must-fail-with
+] test-sqlite
 
 [
     [ does-not-persist create-sql-statement ]

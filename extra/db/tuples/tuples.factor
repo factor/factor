@@ -3,7 +3,7 @@
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
-mirrors sequences.lib tools.walker combinators.lib ;
+mirrors sequences.lib tools.walker combinators.lib db.queries ;
 IN: db.tuples
 
 : define-persistent ( class table columns -- )
@@ -26,11 +26,12 @@ ERROR: not-persistent ;
 
 : set-primary-key ( key tuple -- )
     [
-        class db-columns find-primary-key sql-spec-slot-name
+        class db-columns find-primary-key slot-name>>
     ] keep set-slot-named ;
 
 SYMBOL: sql-counter
-: next-sql-counter sql-counter [ inc ] [ get ] bi number>string ;
+: next-sql-counter ( -- str )
+    sql-counter [ inc ] [ get ] bi number>string ;
 
 ! returns a sequence of prepared-statements
 HOOK: create-sql-statement db ( class -- obj )
@@ -63,17 +64,11 @@ SINGLETON: retryable
     [ bind-params>> ] [ in-params>> ] bi
     [
         dup generator-bind? [
-            quot>> call over set-second
+            singleton>> eval-generator >>value
         ] [
             drop
         ] if
     ] 2map >>bind-params ;
-
-: handle-random-id ( statement -- )
-    dup in-params>> [ type>> +random-id+ = ] find drop >boolean [
-        retryable >>type
-        random-id-quot >>quot
-    ] when drop ;
 
 M: retryable execute-statement* ( statement type -- )
     drop
@@ -84,21 +79,21 @@ M: retryable execute-statement* ( statement type -- )
     ] curry 10 retry drop ;
 
 : resulting-tuple ( row out-params -- tuple )
-    dup first sql-spec-class new [
+    dup first class>> new [
         [
-            >r sql-spec-slot-name r> set-slot-named
+            >r slot-name>> r> set-slot-named
         ] curry 2each
     ] keep ;
 
 : query-tuples ( statement -- seq )
-    [ statement-out-params ] keep query-results [
+    [ out-params>> ] keep query-results [
         [ sql-row-typed swap resulting-tuple ] with query-map
     ] with-disposal ;
  
 : query-modify-tuple ( tuple statement -- )
     [ query-results [ sql-row-typed ] with-disposal ] keep
-    statement-out-params rot [
-        >r sql-spec-slot-name r> set-slot-named
+    out-params>> rot [
+        >r slot-name>> r> set-slot-named
     ] curry 2each ;
 
 : sql-props ( class -- columns table )
