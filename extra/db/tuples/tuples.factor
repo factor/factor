@@ -3,7 +3,7 @@
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
-mirrors sequences.lib tools.walker combinators.lib db.queries ;
+mirrors sequences.lib tools.walker combinators.lib ;
 IN: db.tuples
 
 : define-persistent ( class table columns -- )
@@ -50,6 +50,7 @@ HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 
 HOOK: insert-tuple* db ( tuple statement -- )
 
+GENERIC: eval-generator ( singleton -- obj )
 SINGLETON: retryable
 
 : make-retryable ( obj -- obj' )

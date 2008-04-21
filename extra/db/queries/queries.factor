@@ -6,7 +6,6 @@ math.bitfields.lib namespaces.lib db db.tuples db.types
 math.intervals ;
 IN: db.queries
 
-GENERIC: eval-generator ( singleton -- obj )
 GENERIC: where ( specs obj -- )
 
 : maybe-make-retryable ( statement -- statement )
