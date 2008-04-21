@@ -163,9 +163,9 @@ M: sqlite-db bind% ( spec -- )
 
 M: sqlite-db persistent-table ( -- assoc )
     H{
-        { +native-id+ { "integer primary key" "integer primary key" f } }
+        { +native-id+ { "integer primary key" "integer primary key" "primary key" } }
         { +assigned-id+ { f f "primary key" } }
-        { +random-id+ { "integer primary key" "integer primary key" f } }
+        { +random-id+ { "integer primary key" "integer primary key" "primary key" } }
         { INTEGER { "integer" "integer" "primary key" } }
         { BIG-INTEGER { "bigint" "bigint" } }
         { SIGNED-BIG-INTEGER { "bigint" "bigint" } }
