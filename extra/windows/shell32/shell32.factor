@@ -1,4 +1,4 @@
-USING: alien alien.c-types alien.syntax combinators
+USING: alien alien.c-types alien.strings alien.syntax combinators
 kernel windows windows.user32 windows.ole32
 windows.com windows.com.syntax io.files ;
 IN: windows.shell32
