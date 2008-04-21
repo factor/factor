@@ -14,7 +14,7 @@ IN: db.queries
 : query-make ( class quot -- )
     >r sql-props r>
     [ 0 sql-counter rot with-variable ] { "" { } { } } nmake
-    <simple-statement> maybe-make-retryable ;
+    <simple-statement> maybe-make-retryable ; inline
 
 M: db begin-transaction ( -- ) "BEGIN" sql-command ;
 M: db commit-transaction ( -- ) "COMMIT" sql-command ;
