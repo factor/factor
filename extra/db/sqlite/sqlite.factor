@@ -53,7 +53,7 @@ M: sqlite-result-set dispose ( result-set -- )
 
 M: sqlite-statement low-level-bind ( statement -- )
     [ statement-bind-params ] [ statement-handle ] bi
-    swap [ first3 sqlite-bind-type ] with each ;
+    swap [ [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] with each ;
 
 M: sqlite-statement bind-statement* ( statement -- )
     sqlite-maybe-prepare
@@ -62,16 +62,25 @@ M: sqlite-statement bind-statement* ( statement -- )
 
 GENERIC: sqlite-bind-conversion ( tuple obj -- array )
 
+TUPLE: sqlite-low-level-binding < low-level-binding key type ;
+: <sqlite-low-level-binding> ( key value type -- obj )
+    sqlite-low-level-binding new
+        swap >>type
+        swap >>value
+        swap >>key ;
+
 M: sql-spec sqlite-bind-conversion ( tuple spec -- array )
     [ column-name>> ":" prepend ]
     [ slot-name>> rot get-slot-named ]
-    [ type>> ] tri 3array ;
+    [ type>> ] tri <sqlite-low-level-binding> ;
 
 M: literal-bind sqlite-bind-conversion ( tuple literal-bind -- array )
-    nip [ key>> ] [ value>> ] [ type>> ] tri 3array ;
+    nip [ key>> ] [ value>> ] [ type>> ] tri
+    <sqlite-low-level-binding> ;
 
 M: generator-bind sqlite-bind-conversion ( tuple generate-bind -- array )
-    nip [ key>> ] [ quot>> call ] [ type>> ] tri 3array ;
+    nip [ key>> ] [ singleton>> eval-generator ] [ type>> ] tri
+    <sqlite-low-level-binding> ;
 
 M: sqlite-statement bind-tuple ( tuple statement -- )
     [
@@ -129,14 +138,10 @@ M: sqlite-db <insert-native-statement> ( tuple -- statement )
         ") values(" 0%
         [ ", " 0% ] [
             dup type>> +random-id+ = [
-                dup modifiers>> find-random-generator
                 [
-                    [
-                        column-name>> ":" prepend
-                        dup 0% random-id-quot
-                    ] with-random
-                ] curry
-                [ type>> ] bi <generator-bind> 1,
+                    column-name>> ":" prepend dup 0%
+                    random-id-generator
+                ] [ type>> ] bi <generator-bind> 1,
             ] [
                 bind%
             ] if
@@ -158,9 +163,9 @@ M: sqlite-db bind% ( spec -- )
 
 M: sqlite-db persistent-table ( -- assoc )
     H{
-        { +native-id+ { "integer primary key" "integer primary key" f } }
+        { +native-id+ { "integer primary key" "integer primary key" "primary key" } }
         { +assigned-id+ { f f "primary key" } }
-        { +random-id+ { "integer primary key" "integer primary key" f } }
+        { +random-id+ { "integer primary key" "integer primary key" "primary key" } }
         { INTEGER { "integer" "integer" "primary key" } }
         { BIG-INTEGER { "bigint" "bigint" } }
         { SIGNED-BIG-INTEGER { "bigint" "bigint" } }

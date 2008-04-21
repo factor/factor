@@ -6,6 +6,8 @@ math.bitfields.lib namespaces.lib db db.tuples db.types
 math.intervals ;
 IN: db.queries
 
+GENERIC: where ( specs obj -- )
+
 : maybe-make-retryable ( statement -- statement )
     dup in-params>> [ generator-bind? ] contains? [
         make-retryable
@@ -41,10 +43,11 @@ M: db <delete-tuple-statement> ( specs table -- sql )
         dup column-name>> 0% " = " 0% bind%
     ] query-make ;
 
-M: db random-id-quot ( -- quot )
-    [ 63 [ 2^ random ] keep 1 - set-bit ] ;
-
-GENERIC: where ( specs obj -- )
+M: random-id-generator eval-generator ( singleton -- obj )
+    drop
+    system-random-generator get [
+        63 [ 2^ random ] keep 1 - set-bit
+    ] with-random ;
 
 : interval-comparison ( ? str -- str )
     "from" = " >" " <" ? swap [ "= " append ] when ;
@@ -95,4 +98,3 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         [ slot-name>> swap get-slot-named ] with subset
         dup empty? [ 2drop ] [ where-clause ] if ";" 0%
     ] query-make ;
-

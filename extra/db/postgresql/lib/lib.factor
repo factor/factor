@@ -72,7 +72,7 @@ M: postgresql-result-null summary ( obj -- str )
 : param-values ( statement -- seq seq2 )
     [ bind-params>> ] [ in-params>> ] bi
     [
-        type>> {
+        >r value>> r> type>> {
             { FACTOR-BLOB [
                 dup [ object>bytes malloc-byte-array/length ] [ 0 ] if
             ] }
@@ -150,6 +150,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
     dup array? [ first ] when
     {
         { +native-id+ [ pq-get-number ] }
+        { +random-id+ [ pq-get-number ] }
         { INTEGER [ pq-get-number ] }
         { BIG-INTEGER [ pq-get-number ] }
         { DOUBLE [ pq-get-number ] }

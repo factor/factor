@@ -39,16 +39,16 @@ M: postgresql-db dispose ( db -- )
 M: postgresql-statement bind-statement* ( statement -- )
     drop ;
 
-GENERIC: postgresql-bind-conversion
+GENERIC: postgresql-bind-conversion ( tuple obj -- low-level-binding )
 
-M: sql-spec postgresql-bind-conversion ( tuple spec -- array )
-    slot-name>> swap get-slot-named ;
+M: sql-spec postgresql-bind-conversion ( tuple spec -- obj )
+    slot-name>> swap get-slot-named <low-level-binding> ;
 
-M: literal-bind postgresql-bind-conversion ( tuple literal-bind -- array )
-    nip value>> ;
+M: literal-bind postgresql-bind-conversion ( tuple literal-bind -- obj )
+    nip value>> <low-level-binding> ;
 
-M: generator-bind postgresql-bind-conversion ( tuple generate-bind -- array )
-    nip quot>> call ;
+M: generator-bind postgresql-bind-conversion ( tuple generate-bind -- obj )
+    nip singleton>> eval-generator <low-level-binding> ;
 
 M: postgresql-statement bind-tuple ( tuple statement -- )
     tuck in-params>>
@@ -201,7 +201,16 @@ M: postgresql-db <insert-nonnative-statement> ( class -- statement )
         ")" 0%
 
         " values(" 0%
-        [ ", " 0% ] [ bind% ] interleave
+        [ ", " 0% ] [
+            dup type>> +random-id+ = [
+                [
+                    drop bind-name%
+                    f random-id-generator
+                ] [ type>> ] bi <generator-bind> 1,
+            ] [
+                bind%
+            ] if
+        ] interleave
         ");" 0%
     ] query-make ;
 
