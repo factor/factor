@@ -22,9 +22,7 @@ ERROR: invalid-c-string string ;
 
 GENERIC# string>alien 1 ( string encoding -- byte-array )
 
-M: alien string>alien drop ;
-
-M: byte-array string>alien drop ;
+M: c-ptr string>alien drop ;
 
 M: string string>alien
     over check-string
