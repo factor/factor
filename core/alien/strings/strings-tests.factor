@@ -1,5 +1,6 @@
 USING: alien.strings tools.test kernel libc
-io.encodings.8-bit io.encodings.utf16 io.encodings.ascii alien ;
+io.encodings.8-bit io.encodings.utf8 io.encodings.utf16
+io.encodings.ascii alien ;
 IN: alien.strings.tests
 
 [ "\u0000ff" ]
@@ -26,3 +27,4 @@ unit-test
     dup utf16n alien>string swap free
 ] unit-test
 
+[ f ] [ f utf8 alien>string ] unit-test

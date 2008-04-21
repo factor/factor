@@ -6,9 +6,14 @@ io.streams.byte-array io.streams.memory io.encodings.utf8
 io.encodings.utf16 system alien strings cpu.architecture ;
 IN: alien.strings
 
-: alien>string ( alien encoding -- string )
+GENERIC# alien>string 1 ( alien encoding -- string/f )
+
+M: c-ptr alien>string
     >r <memory-stream> r> <decoder>
     "\0" swap stream-read-until drop ;
+
+M: f alien>string
+    drop ;
 
 ERROR: invalid-c-string string ;
 
