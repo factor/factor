@@ -356,8 +356,10 @@ TUPLE: does-not-persist ;
     [ class \ not-persistent = ] must-fail-with
 ] test-postgresql
 
-! \ insert-tuple must-infer
-! \ update-tuple must-infer
-! \ delete-tuple must-infer
-! \ select-tuple must-infer
-! \ define-persistent must-infer
+! Don't comment these out. These words must infer
+\ bind-tuple must-infer
+\ insert-tuple must-infer
+\ update-tuple must-infer
+\ delete-tuple must-infer
+\ select-tuple must-infer
+\ define-persistent must-infer
