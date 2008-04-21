@@ -39,9 +39,20 @@ M: postgresql-db dispose ( db -- )
 M: postgresql-statement bind-statement* ( statement -- )
     drop ;
 
+GENERIC: postgresql-bind-conversion
+
+M: sql-spec postgresql-bind-conversion ( tuple spec -- array )
+    slot-name>> swap get-slot-named ;
+
+M: literal-bind postgresql-bind-conversion ( tuple literal-bind -- array )
+    nip value>> ;
+
+M: generator-bind postgresql-bind-conversion ( tuple generate-bind -- array )
+    nip quot>> call ;
+
 M: postgresql-statement bind-tuple ( tuple statement -- )
     tuck in-params>>
-    [ slot-name>> swap get-slot-named ] with map
+    [ postgresql-bind-conversion ] with map
     >>bind-params drop ;
 
 M: postgresql-result-set #rows ( result-set -- n )
@@ -197,29 +208,12 @@ M: postgresql-db <insert-nonnative-statement> ( class -- statement )
 M: postgresql-db insert-tuple* ( tuple statement -- )
     query-modify-tuple ;
 
-M: postgresql-db <select-by-slots-statement> ( tuple class -- statement )
-    [
-        "select " 0%
-        over [ ", " 0% ]
-        [ dup column-name>> 0% 2, ] interleave
-
-        " from " 0% 0%
-        [ slot-name>> swap get-slot-named ] with subset
-        dup empty? [
-            drop
-        ] [
-            " where " 0%
-            [ " and " 0% ]
-            [ dup column-name>> 0% " = " 0% bind% ] interleave
-        ] if ";" 0%
-    ] query-make ;
-
 M: postgresql-db persistent-table ( -- hashtable )
     H{
         { +native-id+ { "integer" "serial primary key" f } }
         { +assigned-id+ { f f "primary key" } }
         { +random-id+ { "bigint" "bigint primary key" f } }
-        { TEXT { "text" f f } }
+        { TEXT { "text" "text" f } }
         { VARCHAR { "varchar" "varchar" f } }
         { INTEGER { "integer" "integer" f } }
         { BIG-INTEGER { "bigint" "bigint" f } }

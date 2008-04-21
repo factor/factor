@@ -341,7 +341,7 @@ C: <secret> secret
 [ assigned-person-schema test-repeated-insert ] test-postgresql
 [ test-bignum ] test-postgresql
 [ test-serialize ] test-postgresql
-! [ test-intervals ] test-postgresql
+[ test-intervals ] test-postgresql
 ! [ test-random-id ] test-postgresql
 
 TUPLE: does-not-persist ;
