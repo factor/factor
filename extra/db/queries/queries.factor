@@ -99,4 +99,3 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         [ slot-name>> swap get-slot-named ] with subset
         dup empty? [ 2drop ] [ where-clause ] if ";" 0%
     ] query-make ;
-
