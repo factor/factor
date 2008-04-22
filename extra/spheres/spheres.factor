@@ -105,7 +105,7 @@ TUPLE: spheres-gadget
     reflection-texture ;
 
 : <spheres-gadget> ( -- gadget )
-    0.0 0.0 20.0 <demo-gadget>
+    20.0 10.0 20.0 <demo-gadget>
     { set-delegate } spheres-gadget construct ;
 
 M: spheres-gadget near-plane ( gadget -- z )
@@ -116,7 +116,7 @@ M: spheres-gadget distance-step ( gadget -- dz )
     drop 0.5 ;
 
 : (reflection-dim) ( -- w h )
-    1024 1024 ;
+    512 512 ;
 
 : (make-reflection-texture) ( -- texture )
     gen-texture [
@@ -268,10 +268,9 @@ M: spheres-gadget draw-gadget* ( gadget -- )
         [ (draw-reflection-texture) ]
         [ demo-gadget-set-matrices ]
         [ sphere-scene ]
+        [ reflection-texture>> GL_TEXTURE_CUBE_MAP GL_TEXTURE0 bind-texture-unit ]
         [
-            { texture-sphere-program>> reflection-texture>> } get-slots
-            GL_TEXTURE_CUBE_MAP GL_TEXTURE0 bind-texture-unit
-            dup {
+            texture-sphere-program>> dup {
                 { "surface_texture" [ 0 glUniform1i ] }
             } [
                 { 0.0 0.0 0.0 } 4.0 { 1.0 0.0 0.0 1.0 } (draw-sphere)
