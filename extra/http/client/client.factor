@@ -3,8 +3,16 @@
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
 splitting calendar continuations accessors vectors
-io.encodings.8-bit io.encodings.binary fry debugger ;
+io.encodings.8-bit io.encodings.binary fry debugger inspector ;
 IN: http.client
+
+: max-redirects 10 ;
+
+ERROR: too-many-redirects ;
+
+M: too-many-redirects summary
+    drop
+    [ "Redirection limit of " % max-redirects # " exceeded" % ] "" make ;
 
 DEFER: http-request
 
@@ -29,21 +37,25 @@ DEFER: http-request
 : relative-redirect ( path -- request )
     request get swap store-path ;
 
+SYMBOL: redirects
+
 : do-redirect ( response -- response stream )
     dup response-code 300 399 between? [
         stdio get dispose
-        header>> "location" swap at
-        dup "http://" head? [
-            absolute-redirect
+        redirects inc
+        redirects get max-redirects < [
+            header>> "location" swap at
+            dup "http://" head? [
+                absolute-redirect
+            ] [
+                relative-redirect
+            ] if "GET" >>method http-request
         ] [
-            relative-redirect
-        ] if "GET" >>method http-request
+            too-many-redirects
+        ] if
     ] [
         stdio get
     ] if ;
-
-: request-addr ( request -- addr )
-    dup host>> swap port>> <inet> ;
 
 : close-on-error ( stream quot -- )
     '[ , with-stream* ] [ ] pick '[ , dispose ] cleanup ; inline
