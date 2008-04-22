@@ -175,13 +175,17 @@ post-data
 post-data-type
 cookies ;
 
+: set-header ( request/response value key -- request/response )
+    pick header>> set-at ;
+
 : <request>
     request new
         "1.1" >>version
         http-port >>port
         H{ } clone >>header
         H{ } clone >>query
-        V{ } clone >>cookies ;
+        V{ } clone >>cookies
+        "close" "connection" set-header ;
 
 : query-param ( request key -- value )
     swap query>> at ;
@@ -330,9 +334,6 @@ SYMBOL: max-post-request
         tri
     ] with-string-writer ;
 
-: set-header ( request/response value key -- request/response )
-    pick header>> set-at ;
-
 GENERIC: write-response ( response -- )
 
 GENERIC: write-full-response ( request response -- )
@@ -347,11 +348,11 @@ body ;
 
 : <response>
     response new
-    "1.1" >>version
-    H{ } clone >>header
-    "close" "connection" set-header
-    now timestamp>http-string "date" set-header
-    V{ } clone >>cookies ;
+        "1.1" >>version
+        H{ } clone >>header
+        "close" "connection" set-header
+        now timestamp>http-string "date" set-header
+        V{ } clone >>cookies ;
 
 : read-response-version
     " \t" read-until
