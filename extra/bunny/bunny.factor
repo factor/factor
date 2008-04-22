@@ -13,7 +13,7 @@ TUPLE: bunny-gadget model geom draw-seq draw-n ;
     0.0 0.0 0.375 <demo-gadget>
     maybe-download read-model {
         set-delegate
-        set-bunny-gadget-model
+        (>>model)
     } bunny-gadget construct ;
 
 : bunny-gadget-draw ( gadget -- draw )
