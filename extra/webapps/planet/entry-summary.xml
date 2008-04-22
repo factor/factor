@@ -1,0 +1,10 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<p class="news">
+		<strong><t:view component="title" /></strong> <br/>
+		<t:a value="link" class="more">Read More...</t:a>
+	</p>
+
+</t:chloe>

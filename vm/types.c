@@ -608,10 +608,6 @@ DEFINE_PRIMITIVE(resize_string)
 	void box_##type##_string(const type *str) \
 	{ \
 		dpush(str ? tag_object(from_##type##_string(str)) : F); \
-	} \
-	DEFINE_PRIMITIVE(alien_to_##type##_string) \
-	{ \
-		drepl(tag_object(from_##type##_string(alien_offset(dpeek())))); \
 	}
 
 MEMORY_TO_STRING(char,u8)
@@ -671,14 +667,6 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 	type *unbox_##type##_string(void) \
 	{ \
 		return to_##type##_string(untag_string(dpop()),true); \
-	} \
-	DEFINE_PRIMITIVE(string_to_##type##_alien) \
-	{ \
-		CELL string, t; \
-		string = dpeek(); \
-		t = type_of(string); \
-		if(t != ALIEN_TYPE && t != BYTE_ARRAY_TYPE && t != F_TYPE) \
-			drepl(tag_object(string_to_##type##_alien(untag_string(string),true))); \
 	}
 
 STRING_TO_MEMORY(char);

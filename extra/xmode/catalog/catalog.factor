@@ -36,9 +36,13 @@ TAGS>
     f \ modes set-global ;
 
 MEMO: (load-mode) ( name -- rule-sets )
-    modes at mode-file
-    "extra/xmode/modes/" prepend
-    resource-path utf8 <file-reader> parse-mode ;
+    modes at [
+        mode-file
+        "extra/xmode/modes/" prepend
+        resource-path utf8 <file-reader> parse-mode
+    ] [
+        "text" (load-mode)
+    ] if* ;
 
 SYMBOL: rule-sets
 

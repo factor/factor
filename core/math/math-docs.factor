@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel sequences quotations
-math.private math.functions ;
+math.private ;
 IN: math
 
 ARTICLE: "division-by-zero" "Division by zero"
@@ -26,17 +26,13 @@ $nl
 { $subsection < }
 { $subsection <= }
 { $subsection > }
-{ $subsection >= }
-"Inexact comparison:"
-{ $subsection ~ } ;
+{ $subsection >= } ;
 
 ARTICLE: "modular-arithmetic" "Modular arithmetic"
 { $subsection mod }
 { $subsection rem }
 { $subsection /mod }
 { $subsection /i }
-{ $subsection mod-inv }
-{ $subsection ^mod }
 { $see-also "integer-functions" } ;
 
 ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
@@ -362,6 +358,10 @@ HELP: number
 HELP: next-power-of-2
 { $values { "m" "a non-negative integer" } { "n" "an integer" } }
 { $description "Outputs the smallest power of 2 greater than " { $snippet "m" } ". The output value is always at least 1." } ;
+
+HELP: power-of-2?
+{ $values { "n" integer } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "n" } " is a power of 2." } ;
 
 HELP: each-integer
 { $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- )" } } }

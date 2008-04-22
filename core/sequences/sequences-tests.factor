@@ -224,13 +224,6 @@ unit-test
 [ V{ 1 2 3 } ]
 [ 3 V{ 1 3 2 } clone [ push-new ] keep ] unit-test
 
-! Columns
-{ { 1 2 3 } { 4 5 6 } { 7 8 9 } } [ clone ] map "seq" set
-
-[ { 1 4 7 } ] [ "seq" get 0 <column> >array ] unit-test
-[ ] [ "seq" get 1 <column> [ sq ] change-each ] unit-test
-[ { 4 25 64 } ] [ "seq" get 1 <column> >array ] unit-test
-
 ! erg's random tester found this one
 [ SBUF" 12341234" ] [
     9 <sbuf> dup "1234" swap push-all dup dup swap push-all

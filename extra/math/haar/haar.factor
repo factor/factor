@@ -1,5 +1,5 @@
 ! Haar wavelet transform -- http://dmr.ath.cx/gfx/haar/
-USING: sequences math kernel splitting ;
+USING: sequences math kernel splitting columns ;
 IN: math.haar
 
 : averages ( seq -- seq )

@@ -1,15 +1,15 @@
 USING: continuations destructors io.buffers io.files io.backend
 io.timeouts io.nonblocking io.windows io.windows.nt.backend
 kernel libc math threads windows windows.kernel32 system
-alien.c-types alien.arrays sequences combinators combinators.lib
-sequences.lib ascii splitting alien strings assocs namespaces
-io.files.private accessors ;
+alien.c-types alien.arrays alien.strings sequences combinators
+combinators.lib sequences.lib ascii splitting alien strings
+assocs namespaces io.files.private accessors ;
 IN: io.windows.nt.files
 
 M: winnt cwd
     MAX_UNICODE_PATH dup "ushort" <c-array>
     [ GetCurrentDirectory win32-error=0/f ] keep
-    alien>u16-string ;
+    utf16n alien>string ;
 
 M: winnt cd
     SetCurrentDirectory win32-error=0/f ;

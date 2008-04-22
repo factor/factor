@@ -1,7 +1,7 @@
 ! Fast Fourier Transform, copyright (C) 2007 Hans Schmid
 ! http://dressguardmeister.blogspot.com/2007/01/fft.html
 USING: arrays sequences math math.vectors math.constants
-math.functions kernel splitting ;
+math.functions kernel splitting columns ;
 IN: math.fft
 
 : n^v ( n v -- w ) [ ^ ] with map ;

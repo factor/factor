@@ -3,7 +3,7 @@ USING: tools.test math math.functions math.constants
 generic.standard strings sequences arrays kernel accessors
 words float-arrays byte-arrays bit-arrays parser namespaces
 quotations inference vectors growable hashtables sbufs
-prettyprint ;
+prettyprint byte-vectors bit-vectors float-vectors ;
 
 GENERIC: lo-tag-test
 
@@ -250,6 +250,14 @@ M: string my-hook "a string" ;
 HOOK: my-tuple-hook my-var ( -- x )
 
 M: sequence my-tuple-hook my-hook ;
+
+TUPLE: m-t-h-a ;
+
+M: m-t-h-a my-tuple-hook "foo" ;
+
+TUPLE: m-t-h-b < m-t-h-a ;
+
+M: m-t-h-b my-tuple-hook "bar" ;
 
 [ f ] [
     \ my-tuple-hook [ "engines" word-prop ] keep prefix

@@ -1,30 +1,6 @@
 IN: alien.c-types.tests
 USING: alien alien.syntax alien.c-types kernel tools.test
-sequences system libc ;
-
-[ "\u0000ff" ]
-[ "\u0000ff" string>char-alien alien>char-string ]
-unit-test
-
-[ "hello world" ]
-[ "hello world" string>char-alien alien>char-string ]
-unit-test
-
-[ "hello\u00abcdworld" ]
-[ "hello\u00abcdworld" string>u16-alien alien>u16-string ]
-unit-test
-
-[ t ] [ f expired? ] unit-test
-
-[ "hello world" ] [
-    "hello world" malloc-char-string
-    dup alien>char-string swap free
-] unit-test
-
-[ "hello world" ] [
-    "hello world" malloc-u16-string
-    dup alien>u16-string swap free
-] unit-test
+sequences system libc alien.strings io.encodings.utf8 ;
 
 : foo ( -- n ) "fdafd" f dlsym [ 123 ] unless* ;
 
@@ -67,7 +43,7 @@ TYPEDEF: int* MyIntArray
 
 TYPEDEF: uchar* MyLPBYTE
 
-[ t ] [ "char*" c-type "MyLPBYTE" c-type eq? ] unit-test
+[ t ] [ { "char*" utf8 } c-type "MyLPBYTE" c-type = ] unit-test
 
 [
     0 B{ 1 2 3 4 } <displaced-alien> <void*>

@@ -1,6 +1,6 @@
 ! Based on http://www.ffconsultancy.com/ocaml/sudoku/index.html
 USING: sequences namespaces kernel math math.parser io
-io.styles combinators ;
+io.styles combinators columns ;
 IN: sudoku
 
 SYMBOL: solutions

@@ -1,13 +1,13 @@
-USING: alien alien.syntax alien.c-types math kernel sequences
-windows windows.kernel32 windows.types combinators.lib ;
+USING: alien alien.syntax alien.c-types alien.strings math
+kernel sequences windows windows.types combinators.lib ;
 IN: windows.ole32
 
 LIBRARY: ole32
 
 TYPEDEF: GUID* REFGUID
 TYPEDEF: void* LPUNKNOWN
-TYPEDEF: ushort* LPOLESTR
-TYPEDEF: ushort* LPCOLESTR
+TYPEDEF: wchar_t* LPOLESTR
+TYPEDEF: wchar_t* LPCOLESTR
 
 TYPEDEF: REFGUID REFIID
 TYPEDEF: REFGUID REFCLSID
@@ -128,8 +128,8 @@ FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
     "{01234567-89ab-cdef-0123-456789abcdef}" length ; inline
 
 : string>guid ( string -- guid )
-    string>u16-alien "GUID" <c-object> [ CLSIDFromString ole32-error ] keep ;
+    utf16n string>alien "GUID" <c-object> [ CLSIDFromString ole32-error ] keep ;
 : guid>string ( guid -- string )
     GUID-STRING-LENGTH 1+ [ "ushort" <c-array> ] keep
-    [ StringFromGUID2 drop ] { 2 } multikeep alien>u16-string ;
+    [ StringFromGUID2 drop ] { 2 } multikeep utf16n alien>string ;
 

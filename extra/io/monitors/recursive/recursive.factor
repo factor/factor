@@ -1,14 +1,15 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences assocs arrays continuations combinators kernel
-threads concurrency.messaging concurrency.mailboxes
-concurrency.promises
-io.files io.monitors ;
+threads concurrency.messaging concurrency.mailboxes concurrency.promises
+io.files io.monitors debugger ;
 IN: io.monitors.recursive
 
 ! Simulate recursive monitors on platforms that don't have them
 
 TUPLE: recursive-monitor < monitor children thread ready ;
+
+: notify? ( -- ? ) monitor tget ready>> promise-fulfilled? ;
 
 DEFER: add-child-monitor
 
@@ -17,25 +18,22 @@ DEFER: add-child-monitor
 
 : add-child-monitors ( path -- )
     #! We yield since this directory scan might take a while.
-    [
-        directory* [ first add-child-monitor yield ] each
-    ] curry ignore-errors ;
+    directory* [ first add-child-monitor ] each yield ;
 
 : add-child-monitor ( path -- )
+    notify? [ dup { +add-file+ } monitor tget queue-change ] when
     qualify-path dup link-info type>> +directory+ eq? [
         [ add-child-monitors ]
         [
-            [ f my-mailbox (monitor) ] keep
-            monitor tget children>> set-at
+            [
+                [ f my-mailbox (monitor) ] keep
+                monitor tget children>> set-at
+            ] curry ignore-errors
         ] bi
     ] [ drop ] if ;
 
-USE: io
-USE: prettyprint
-
 : remove-child-monitor ( monitor -- )
-    monitor tget children>> delete-at*
-    [ dispose ] [ drop ] if ;
+    monitor tget children>> delete-at* [ dispose ] [ drop ] if ;
 
 M: recursive-monitor dispose
     dup queue>> closed>> [

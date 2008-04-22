@@ -145,9 +145,9 @@ ARTICLE: "collections" "Collections"
 { $subsection "vectors" }
 "Resizable specialized sequences:"
 { $subsection "sbufs" }
-{ $subsection "bit-vectors" }
-{ $subsection "byte-vectors" }
-{ $subsection "float-vectors" }
+{ $vocab-subsection "Bit vectors" "bit-vectors" }
+{ $vocab-subsection "Byte vectors" "byte-vectors" }
+{ $vocab-subsection "Float vectors" "float-vectors" }
 { $heading "Associative mappings" }
 { $subsection "assocs" }
 { $subsection "namespaces" }
@@ -163,7 +163,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "buffers" } ;
 
 USING: io.sockets io.launcher io.mmap io.monitors
-io.encodings.utf8 io.encodings.binary io.encodings.ascii io.files ;
+io.encodings.utf8 io.encodings.utf16 io.encodings.binary io.encodings.ascii io.files ;
 
 ARTICLE: "encodings-introduction" "An introduction to encodings"
 "In order to express text in terms of binary, some sort of encoding has to be used. In a modern context, this is understood as a two-way mapping between Unicode code points (characters) and some amount of binary. Since English isn't the only language in the world, ASCII is not sufficient as a mapping from binary to Unicode; it can't even express em-dashes or curly quotes. Unicode was designed as a universal character set that could potentially represent everything." $nl

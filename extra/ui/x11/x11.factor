@@ -1,11 +1,12 @@
 ! Copyright (C) 2005, 2007 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays ui ui.gadgets ui.gestures
-ui.backend ui.clipboards ui.gadgets.worlds assocs kernel math
-namespaces opengl sequences strings x11.xlib x11.events x11.xim
-x11.glx x11.clipboard x11.constants x11.windows io.encodings.string
+ui.backend ui.clipboards ui.gadgets.worlds ui.render assocs
+kernel math namespaces opengl sequences strings x11.xlib
+x11.events x11.xim x11.glx x11.clipboard x11.constants
+x11.windows io.encodings.string io.encodings.ascii
 io.encodings.utf8 combinators debugger command-line qualified
-ui.render math.vectors classes.tuple opengl.gl threads ;
+math.vectors classes.tuple opengl.gl threads ;
 QUALIFIED: system
 IN: ui.x11
 
@@ -137,8 +138,8 @@ M: world selection-notify-event
     } cond ;
 
 : encode-clipboard ( string type -- bytes )
-    XSelectionRequestEvent-target XA_UTF8_STRING =
-    [ utf8 encode ] [ string>char-alien ] if ;
+    XSelectionRequestEvent-target
+    XA_UTF8_STRING = utf8 ascii ? encode ;
 
 : set-selection-prop ( evt -- )
     dpy get swap

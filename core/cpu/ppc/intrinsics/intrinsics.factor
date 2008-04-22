@@ -217,11 +217,11 @@ IN: cpu.ppc.intrinsics
     2array define-if-intrinsics ;
 
 {
-    { fixnum< BLT }
-    { fixnum<= BLE }
-    { fixnum> BGT }
-    { fixnum>= BGE }
-    { eq? BEQ }
+    { fixnum< BGE }
+    { fixnum<= BGT }
+    { fixnum> BLE }
+    { fixnum>= BLT }
+    { eq? BNE }
 } [
     first2 define-fixnum-jump
 ] each
@@ -356,11 +356,11 @@ IN: cpu.ppc.intrinsics
     { { float "x" } { float "y" } } define-if-intrinsic ;
 
 {
-    { float< BLT }
-    { float<= BLE }
-    { float> BGT }
-    { float>= BGE }
-    { float= BEQ }
+    { float< BGE }
+    { float<= BGT }
+    { float> BLE }
+    { float>= BLT }
+    { float= BNE }
 } [
     first2 define-float-jump
 ] each

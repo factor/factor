@@ -76,7 +76,7 @@ arc "arc"
     create-node-table create-arc-table create-bootstrap-nodes create-bootstrap-arcs ;
 
 : param ( value key type -- param )
-    swapd 3array ;
+    swapd <sqlite-low-level-binding> ;
 
 : single-int-results ( bindings sql -- array )
     f f <simple-statement> [ do-bound-query ] with-disposal

@@ -1,8 +1,19 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private math sequences
-sequences.private growable float-arrays ;
+sequences.private growable float-arrays prettyprint.backend
+parser accessors ;
 IN: float-vectors
+
+TUPLE: float-vector underlying fill ;
+
+M: float-vector underlying underlying>> { float-array } declare ;
+
+M: float-vector set-underlying (>>underlying) ;
+
+M: float-vector length fill>> { array-capacity } declare ;
+
+M: float-vector set-fill (>>fill) ;
 
 <PRIVATE
 
@@ -14,7 +25,8 @@ PRIVATE>
 : <float-vector> ( n -- float-vector )
     0.0 <float-array> 0 float-array>vector ; inline
 
-: >float-vector ( seq -- float-vector ) FV{ } clone-like ;
+: >float-vector ( seq -- float-vector )
+    T{ float-vector f F{ } 0 } clone-like ;
 
 M: float-vector like
     drop dup float-vector? [
@@ -31,3 +43,9 @@ M: float-vector equal?
 M: float-array new-resizable drop <float-vector> ;
 
 INSTANCE: float-vector growable
+
+: FV{ \ } [ >float-vector ] parse-literal ; parsing
+
+M: float-vector >pprint-sequence ;
+
+M: float-vector pprint-delims drop \ FV{ \ } ;

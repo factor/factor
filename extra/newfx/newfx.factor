@@ -155,6 +155,23 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: prefix-on ( elt seq -- seq ) swap prefix ;
+: suffix-on ( elt seq -- seq ) swap suffix ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: 1st 0 at ;
+: 2nd 1 at ;
+: 3rd 2 at ;
+: 4th 3 at ;
+: 5th 4 at ;
+: 6th 5 at ;
+: 7th 6 at ;
+: 8th 7 at ;
+: 9th 8 at ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 ! A note about the 'mutate' qualifier. Other words also technically mutate
 ! their primary object. However, the 'mutate' qualifier is supposed to
 ! indicate that this is the main objective of the word, as a side effect.

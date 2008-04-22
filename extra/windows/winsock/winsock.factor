@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
-USING: alien alien.c-types alien.syntax arrays byte-arrays
-kernel math sequences windows.types windows.kernel32
+USING: alien alien.c-types alien.strings alien.syntax arrays
+byte-arrays kernel math sequences windows.types windows.kernel32
 windows.errors structs windows math.bitfields ;
 IN: windows.winsock
 
@@ -397,7 +397,7 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
 : (winsock-error-string) ( n -- str )
     ! #! WSAStartup returns the error code 'n' directly
     dup winsock-expected-error?
-    [ drop f ] [ error_message alien>u16-string ] if ;
+    [ drop f ] [ error_message utf16n alien>string ] if ;
 
 : winsock-error-string ( -- string/f )
     WSAGetLastError (winsock-error-string) ;

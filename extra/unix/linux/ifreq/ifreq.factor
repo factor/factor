@@ -10,7 +10,7 @@ IN: unix.linux.ifreq
 
 : set-if-addr ( name addr -- )
   "struct-ifreq" <c-object>
-  rot  string>char-alien        over set-struct-ifreq-ifr-ifrn
+  rot  ascii string>alien       over set-struct-ifreq-ifr-ifrn
   swap 0 <inet4> make-sockaddr  over set-struct-ifreq-ifr-ifru
 
   AF_INET SOCK_DGRAM 0 socket SIOCSIFADDR rot ioctl drop ;
@@ -19,7 +19,7 @@ IN: unix.linux.ifreq
 
 : set-if-flags ( name flags -- )
   "struct-ifreq" <c-object>
-  rot  string>char-alien over set-struct-ifreq-ifr-ifrn
+  rot  ascii string>alien over set-struct-ifreq-ifr-ifrn
   swap <short>		 over set-struct-ifreq-ifr-ifru
 
   AF_INET SOCK_DGRAM 0 socket SIOCSIFFLAGS rot ioctl drop ;
@@ -28,7 +28,7 @@ IN: unix.linux.ifreq
 
 : set-if-dst-addr ( name addr -- )
   "struct-ifreq" <c-object>
-  rot  string>char-alien        over set-struct-ifreq-ifr-ifrn
+  rot  ascii string>alien       over set-struct-ifreq-ifr-ifrn
   swap 0 <inet4> make-sockaddr  over set-struct-ifreq-ifr-ifru
 
   AF_INET SOCK_DGRAM 0 socket SIOCSIFDSTADDR rot ioctl drop ;
@@ -37,7 +37,7 @@ IN: unix.linux.ifreq
 
 : set-if-brd-addr ( name addr -- )
   "struct-ifreq" <c-object>
-  rot  string>char-alien        over set-struct-ifreq-ifr-ifrn
+  rot  ascii string>alien       over set-struct-ifreq-ifr-ifrn
   swap 0 <inet4> make-sockaddr  over set-struct-ifreq-ifr-ifru
 
   AF_INET SOCK_DGRAM 0 socket SIOCSIFBRDADDR rot ioctl drop ;
@@ -46,7 +46,7 @@ IN: unix.linux.ifreq
 
 : set-if-netmask ( name addr -- )
   "struct-ifreq" <c-object>
-  rot  string>char-alien        over set-struct-ifreq-ifr-ifrn
+  rot  ascii string>alien       over set-struct-ifreq-ifr-ifrn
   swap 0 <inet4> make-sockaddr  over set-struct-ifreq-ifr-ifru
 
   AF_INET SOCK_DGRAM 0 socket SIOCSIFNETMASK rot ioctl drop ;
@@ -55,7 +55,7 @@ IN: unix.linux.ifreq
 
 : set-if-metric ( name metric -- )
   "struct-ifreq" <c-object>
-  rot string>char-alien over set-struct-ifreq-ifr-ifrn
+  rot ascii string>alien over set-struct-ifreq-ifr-ifrn
   swap <int>		over set-struct-ifreq-ifr-ifru
 
   AF_INET SOCK_DGRAM 0 socket SIOCSIFMETRIC rot ioctl drop ;

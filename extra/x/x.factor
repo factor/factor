@@ -1,7 +1,8 @@
 
-USING: kernel io alien alien.c-types namespaces threads
+USING: kernel io alien alien.c-types alien.strings namespaces threads
        arrays sequences assocs math vars combinators.lib
-       x11.constants x11.events x11.xlib mortar slot-accessors geom.rect ;
+       x11.constants x11.events x11.xlib mortar slot-accessors geom.rect
+       io.encodings.ascii ;
 
 IN: x
 
@@ -29,7 +30,7 @@ define-independent-class
 
 <display> "create" !( name <display> -- display ) [
   new-empty swap >>name
-  dup $name dup [ string>char-alien ] [ ] if XOpenDisplay
+  dup $name dup [ ascii string>alien ] [ ] if XOpenDisplay
   dup [ >>ptr ] [ "XOpenDisplay error" throw ] if
   dup $ptr XDefaultScreen >>default-screen
   dup $ptr XDefaultRootWindow dupd <window> new >>default-root
@@ -433,7 +434,7 @@ add-method
 
 <window> "fetch-name" !( window -- name-or-f )
   [ <- raw f <void*> dup >r   XFetchName drop   r>
-    dup *void* alien-address 0 = [ drop f ] [ *char* ] if ]
+    dup *void* [ drop f ] [ *void* ascii alien>string ] if ]
 add-method
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

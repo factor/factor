@@ -4,8 +4,10 @@ USING: alien arrays assocs classes compiler db
 hashtables io.files kernel math math.parser namespaces
 prettyprint sequences strings classes.tuple alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
-words combinators.lib db.types combinators
-io namespaces.lib accessors ;
+words combinators.lib db.types combinators math.intervals
+io namespaces.lib accessors vectors math.ranges random
+math.bitfields.lib db.queries ;
+USE: tools.walker
 IN: db.sqlite
 
 TUPLE: sqlite-db < db path ;
@@ -19,7 +21,7 @@ M: sqlite-db db-open ( db -- db )
 M: sqlite-db db-close ( handle -- ) sqlite-close ;
 M: sqlite-db dispose ( db -- ) dispose-db ;
 
-TUPLE: sqlite-statement < throwable-statement ;
+TUPLE: sqlite-statement < statement ;
 
 TUPLE: sqlite-result-set < result-set has-more? ;
 
@@ -42,28 +44,48 @@ M: sqlite-statement dispose ( statement -- )
 M: sqlite-result-set dispose ( result-set -- )
     f >>handle drop ;
 
-: sqlite-bind ( triples handle -- )
-    swap [ first3 sqlite-bind-type ] with each ;
-
 : reset-statement ( statement -- )
     sqlite-maybe-prepare handle>> sqlite-reset ;
 
+: reset-bindings ( statement -- )
+    sqlite-maybe-prepare
+    handle>> [ sqlite3_reset drop ] [ sqlite3_clear_bindings drop ] bi ;
+
+M: sqlite-statement low-level-bind ( statement -- )
+    [ statement-bind-params ] [ statement-handle ] bi
+    swap [ [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] with each ;
+
 M: sqlite-statement bind-statement* ( statement -- )
     sqlite-maybe-prepare
-    dup statement-bound? [ dup reset-statement ] when
-    [ statement-bind-params ] [ statement-handle ] bi
-    sqlite-bind ;
+    dup statement-bound? [ dup reset-bindings ] when
+    low-level-bind ;
+
+GENERIC: sqlite-bind-conversion ( tuple obj -- array )
+
+TUPLE: sqlite-low-level-binding < low-level-binding key type ;
+: <sqlite-low-level-binding> ( key value type -- obj )
+    sqlite-low-level-binding new
+        swap >>type
+        swap >>value
+        swap >>key ;
+
+M: sql-spec sqlite-bind-conversion ( tuple spec -- array )
+    [ column-name>> ":" prepend ]
+    [ slot-name>> rot get-slot-named ]
+    [ type>> ] tri <sqlite-low-level-binding> ;
+
+M: literal-bind sqlite-bind-conversion ( tuple literal-bind -- array )
+    nip [ key>> ] [ value>> ] [ type>> ] tri
+    <sqlite-low-level-binding> ;
+
+M: generator-bind sqlite-bind-conversion ( tuple generate-bind -- array )
+    nip [ key>> ] [ singleton>> eval-generator ] [ type>> ] tri
+    <sqlite-low-level-binding> ;
 
 M: sqlite-statement bind-tuple ( tuple statement -- )
     [
-        in-params>>
-        [
-            [ column-name>> ":" prepend ]
-            [ slot-name>> rot get-slot-named ]
-            [ type>> ] tri 3array
-        ] with map
-    ] keep
-    bind-statement ;
+        in-params>> [ sqlite-bind-conversion ] with map
+    ] keep bind-statement ;
 
 : last-insert-id ( -- id )
     db get db-handle sqlite3_last_insert_rowid
@@ -93,27 +115,19 @@ M: sqlite-statement query-results ( query -- result-set )
     dup handle>> sqlite-result-set construct-result-set
     dup advance-row ;
 
-M: sqlite-db begin-transaction ( -- ) "BEGIN" sql-command ;
-M: sqlite-db commit-transaction ( -- ) "COMMIT" sql-command ;
-M: sqlite-db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
-
-: sqlite-make ( class quot -- )
-    >r sql-props r>
-    { "" { } { } } nmake <simple-statement> ; inline
-
 M: sqlite-db create-sql-statement ( class -- statement )
     [
         "create table " 0% 0%
         "(" 0% [ ", " 0% ] [
             dup column-name>> 0%
             " " 0%
-            dup type>> t lookup-type 0%
+            dup type>> lookup-create-type 0%
             modifiers 0%
         ] interleave ");" 0%
-    ] sqlite-make ;
+    ] query-make dup sql>> . ;
 
 M: sqlite-db drop-sql-statement ( class -- statement )
-    [ "drop table " 0% 0% ";" 0% drop ] sqlite-make ;
+    [ "drop table " 0% 0% ";" 0% drop ] query-make ;
 
 M: sqlite-db <insert-native-statement> ( tuple -- statement )
     [
@@ -122,91 +136,62 @@ M: sqlite-db <insert-native-statement> ( tuple -- statement )
         maybe-remove-id
         dup [ ", " 0% ] [ column-name>> 0% ] interleave
         ") values(" 0%
-        [ ", " 0% ] [ bind% ] interleave
+        [ ", " 0% ] [
+            dup type>> +random-id+ = [
+                [
+                    column-name>> ":" prepend dup 0%
+                    random-id-generator
+                ] [ type>> ] bi <generator-bind> 1,
+            ] [
+                bind%
+            ] if
+        ] interleave
         ");" 0%
-    ] sqlite-make ;
+    ] query-make ;
 
 M: sqlite-db <insert-nonnative-statement> ( tuple -- statement )
     <insert-native-statement> ;
 
-: where-primary-key% ( specs -- )
-    " where " 0%
-    find-primary-key dup column-name>> 0% " = " 0% bind% ;
-
-: where-clause ( specs -- )
-    " where " 0%
-    [ " and " 0% ] [ dup column-name>> 0% " = " 0% bind% ] interleave ;
-
-M: sqlite-db <update-tuple-statement> ( class -- statement )
-    [
-        "update " 0%
-        0%
-        " set " 0%
-        dup remove-id
-        [ ", " 0% ] [ dup column-name>> 0% " = " 0% bind% ] interleave
-        where-primary-key%
-    ] sqlite-make ;
-
-M: sqlite-db <delete-tuple-statement> ( specs table -- sql )
-    [
-        "delete from " 0% 0%
-        " where " 0%
-        find-primary-key
-        dup column-name>> 0% " = " 0% bind%
-    ] sqlite-make ;
-
-! : select-interval ( interval name -- ) ;
-! : select-sequence ( seq name -- ) ;
+M: sqlite-db bind# ( spec obj -- )
+    >r
+    [ column-name>> ":" swap next-sql-counter 3append dup 0% ]
+    [ type>> ] bi
+    r> <literal-bind> 1, ;
 
 M: sqlite-db bind% ( spec -- )
     dup 1, column-name>> ":" prepend 0% ;
 
-M: sqlite-db <select-by-slots-statement> ( tuple class -- statement )
-    [
-        "select " 0%
-        over [ ", " 0% ]
-        [ dup column-name>> 0% 2, ] interleave
-
-        " from " 0% 0%
-        [ slot-name>> swap get-slot-named ] with subset
-        dup empty? [ drop ] [ where-clause ] if ";" 0%
-    ] sqlite-make ;
-
-M: sqlite-db modifier-table ( -- hashtable )
+M: sqlite-db persistent-table ( -- assoc )
     H{
-        { +native-id+ "primary key" }
-        { +assigned-id+ "primary key" }
-        { +random-id+ "primary key" }
-        ! { +nonnative-id+ "primary key" }
-        { +autoincrement+ "autoincrement" }
-        { +unique+ "unique" }
-        { +default+ "default" }
-        { +null+ "null" }
-        { +not-null+ "not null" }
+        { +native-id+ { "integer primary key" "integer primary key" "primary key" } }
+        { +assigned-id+ { f f "primary key" } }
+        { +random-id+ { "integer primary key" "integer primary key" "primary key" } }
+        { INTEGER { "integer" "integer" "primary key" } }
+        { BIG-INTEGER { "bigint" "bigint" } }
+        { SIGNED-BIG-INTEGER { "bigint" "bigint" } }
+        { UNSIGNED-BIG-INTEGER { "bigint" "bigint" } }
+        { TEXT { "text" "text" } }
+        { VARCHAR { "text" "text" } }
+        { DATE { "date" "date" } }
+        { TIME { "time" "time" } }
+        { DATETIME { "datetime" "datetime" } }
+        { TIMESTAMP { "timestamp" "timestamp" } }
+        { DOUBLE { "real" "real" } }
+        { BLOB { "blob" "blob" } }
+        { FACTOR-BLOB { "blob" "blob" } }
+        { +autoincrement+ { f f "autoincrement" } }
+        { +unique+ { f f "unique" } }
+        { +default+ { f f "default" } }
+        { +null+ { f f "null" } }
+        { +not-null+ { f f "not null" } }
+        { system-random-generator { f f f } }
+        { secure-random-generator { f f f } }
+        { random-generator { f f f } }
     } ;
 
-M: sqlite-db compound-modifier ( str obj -- str' ) compound-type ;
-
-M: sqlite-db compound-type ( str seq -- str' )
+M: sqlite-db compound ( str seq -- str' )
     over {
         { "default" [ first number>string join-space ] }
-        [ 2drop ] !  "no sqlite compound data type" 3array throw ]
+        [ 2drop ] 
     } case ;
 
-M: sqlite-db type-table ( -- assoc )
-    H{
-        { +native-id+ "integer primary key" }
-        { +random-id+ "integer primary key" }
-        { INTEGER "integer" }
-        { TEXT "text" }
-        { VARCHAR "text" }
-        { DATE "date" }
-        { TIME "time" }
-        { DATETIME "datetime" }
-        { TIMESTAMP "timestamp" }
-        { DOUBLE "real" }
-        { BLOB "blob" }
-        { FACTOR-BLOB "blob" }
-    } ;
-
-M: sqlite-db create-type-table ( symbol -- str ) type-table ;

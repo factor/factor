@@ -4,10 +4,10 @@ USING: splitting kernel io sequences farkup accessors
 http.server.components ;
 IN: http.server.components.farkup
 
-TUPLE: farkup-renderer < textarea-renderer ;
+TUPLE: farkup-renderer < text-renderer ;
 
-: <farkup-renderer>
-    farkup-renderer new-textarea-renderer ;
+: <farkup-renderer> ( -- renderer )
+    farkup-renderer new-text-renderer ;
 
 M: farkup-renderer render-view*
     drop string-lines "\n" join convert-farkup write ;
