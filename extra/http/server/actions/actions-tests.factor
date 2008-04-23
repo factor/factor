@@ -1,7 +1,7 @@
 IN: http.server.actions.tests
 USING: http.server.actions http.server.validators
 tools.test math math.parser multiline namespaces http
-io.streams.string http.server sequences accessors ;
+io.streams.string http.server sequences splitting accessors ;
 
 [
     "a" [ v-number ] { { "a" "123" } } validate-param
@@ -13,6 +13,8 @@ io.streams.string http.server sequences accessors ;
     { { "a" [ v-number ] } { "b" [ v-number ] } } >>get-params
 "action-1" set
 
+: lf>crlf "\n" split "\r\n" join ;
+
 STRING: action-request-test-1
 GET http://foo/bar?a=12&b=13 HTTP/1.1
 
@@ -20,7 +22,8 @@ blah
 ;
 
 [ 25 ] [
-    action-request-test-1 [ read-request ] with-string-reader
+    action-request-test-1 lf>crlf
+    [ read-request ] with-string-reader
     request set
     "/blah"
     "action-1" get call-responder
@@ -40,7 +43,8 @@ xxx=4
 ;
 
 [ "/blahXXXX" ] [
-    action-request-test-2 [ read-request ] with-string-reader
+    action-request-test-2 lf>crlf
+    [ read-request ] with-string-reader
     request set
     "/blah"
     "action-2" get call-responder

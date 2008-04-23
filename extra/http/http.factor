@@ -89,8 +89,7 @@ IN: http
 
 : read-crlf ( -- string )
     "\r" read-until
-    CHAR: \r assert=
-    read1 CHAR: \n assert= ;
+    [ CHAR: \r assert= read1 CHAR: \n assert= ] when* ;
 
 : read-header-line ( -- )
     read-crlf dup
