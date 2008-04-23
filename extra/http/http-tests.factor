@@ -143,6 +143,9 @@ io.encodings.ascii ;
             <dispatcher>
                 "extra/http/test" resource-path <static> >>default
             "nested" add-responder
+            <action>
+                [ "redirect-loop" f <permanent-redirect> ] >>display
+            "redirect-loop" add-responder
         main-responder set
 
         [ 1237 httpd ] "HTTPD test" spawn drop
@@ -160,9 +163,12 @@ io.encodings.ascii ;
         "GET nested HTTP/1.0\r\n" write flush
         "\r\n" write flush
         readln drop
-        read-header USE: prettyprint
-    ] with-stream dup . "location" swap at "/" head?
+        read-header
+    ] with-stream "location" swap at "/" head?
 ] unit-test
+
+[ "http://localhost:1237/redirect-loop" http-get ]
+[ too-many-redirects? ] must-fail-with
 
 [ "Goodbye" ] [
     "http://localhost:1237/quit" http-get

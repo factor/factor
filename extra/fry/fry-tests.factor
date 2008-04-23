@@ -44,3 +44,7 @@ sequences ;
 : funny-dip '[ @ _ ] call ; inline
 
 [ "hi" 3 ] [ "h" "i" 3 [ append ] funny-dip ] unit-test
+
+[ { 1 2 3 } ] [
+    3 1 '[ , [ , + ] map ] call
+] unit-test

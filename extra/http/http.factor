@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry hashtables io io.streams.string kernel math sets
 namespaces math.parser assocs sequences strings splitting ascii
-io.encodings.utf8 io.encodings.string namespaces unicode.case
-combinators vectors sorting accessors calendar
+io.encodings.utf8 io.encodings.string io.sockets namespaces
+unicode.case combinators vectors sorting accessors calendar
 calendar.format quotations arrays combinators.lib byte-arrays ;
 IN: http
 
@@ -175,13 +175,17 @@ post-data
 post-data-type
 cookies ;
 
+: set-header ( request/response value key -- request/response )
+    pick header>> set-at ;
+
 : <request>
     request new
         "1.1" >>version
         http-port >>port
         H{ } clone >>header
         H{ } clone >>query
-        V{ } clone >>cookies ;
+        V{ } clone >>cookies
+        "close" "connection" set-header ;
 
 : query-param ( request key -- value )
     swap query>> at ;
@@ -295,9 +299,15 @@ SYMBOL: max-post-request
         "application/x-www-form-urlencoded" >>post-data-type
     ] if ;
 
+: request-addr ( request -- addr )
+    [ host>> ] [ port>> ] bi <inet> ;
+
+: request-host ( request -- string )
+    [ host>> ] [ drop ":" ] [ port>> number>string ] tri 3append ;
+
 : write-request-header ( request -- request )
     dup header>> >hashtable
-    over host>> [ "host" pick set-at ] when*
+    over host>> [ over request-host "host" pick set-at ] when
     over post-data>> [ length "content-length" pick set-at ] when*
     over post-data-type>> [ "content-type" pick set-at ] when*
     over cookies>> f like [ unparse-cookies "cookie" pick set-at ] when*
@@ -330,9 +340,6 @@ SYMBOL: max-post-request
         tri
     ] with-string-writer ;
 
-: set-header ( request/response value key -- request/response )
-    pick header>> set-at ;
-
 GENERIC: write-response ( response -- )
 
 GENERIC: write-full-response ( request response -- )
@@ -347,11 +354,11 @@ body ;
 
 : <response>
     response new
-    "1.1" >>version
-    H{ } clone >>header
-    "close" "connection" set-header
-    now timestamp>http-string "date" set-header
-    V{ } clone >>cookies ;
+        "1.1" >>version
+        H{ } clone >>header
+        "close" "connection" set-header
+        now timestamp>http-string "date" set-header
+        V{ } clone >>cookies ;
 
 : read-response-version
     " \t" read-until

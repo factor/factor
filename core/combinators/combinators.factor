@@ -150,7 +150,7 @@ M: hashtable hashcode*
         drop
     ] [
         dup length 4 <=
-        over keys [ word? ] contains? or
+        over keys [ [ word? ] [ wrapper? ] bi or ] contains? or
         [
             linear-case-quot
         ] [
