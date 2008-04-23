@@ -33,7 +33,7 @@ IN: db.sqlite.lib
 
 : sqlite-prepare ( db sql -- handle )
     dup length "void*" <c-object> "void*" <c-object>
-    [ sqlite3_prepare_v2 sqlite-check-result ] 2keep
+    [ sqlite3_prepare sqlite-check-result ] 2keep
     drop *void* ;
 
 : sqlite-bind-parameter-index ( handle name -- index )
