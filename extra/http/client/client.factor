@@ -39,13 +39,16 @@ DEFER: http-request
 
 SYMBOL: redirects
 
+: absolute-url? ( url -- ? )
+    [ "http://" head? ] [ "https://" head? ] bi or ;
+
 : do-redirect ( response -- response stream )
     dup response-code 300 399 between? [
         stdio get dispose
         redirects inc
         redirects get max-redirects < [
             header>> "location" swap at
-            dup "http://" head? [
+            dup absolute-url? [
                 absolute-redirect
             ] [
                 relative-redirect
@@ -116,8 +119,12 @@ M: download-failed error.
 
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
-    swap http-get-stream swap check-response
-    [ swap latin1 <file-writer> stream-copy ] with-disposal ;
+    swap http-get-stream check-response
+    dup string? [
+        latin1 [ write ] with-file-writer
+    ] [
+        [ swap latin1 <file-writer> stream-copy ] with-disposal
+    ] if ;
 
 : download ( url -- )
     dup download-name download-to ;
