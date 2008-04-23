@@ -364,9 +364,9 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
         + + 1+
     ] alien-callback ;
 
-FUNCTION: void int_ffi_test_36_point_5 ( ) ;
+FUNCTION: void ffi_test_36_point_5 ( ) ;
 
-[ ] [ int_ffi_test_36_point_5 ] unit-test
+[ ] [ ffi_test_36_point_5 ] unit-test
 
 FUNCTION: int ffi_test_37 ( void* func ) ;
 

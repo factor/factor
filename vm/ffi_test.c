@@ -253,9 +253,9 @@ double ffi_test_36(struct test_struct_12 x)
 
 static int global_var;
 
-void int_ffi_test_36_point_5(void)
+void ffi_test_36_point_5(void)
 {
-	printf("int_ffi_test_36_point_5\n");
+	printf("ffi_test_36_point_5\n");
 	global_var = 0;
 }
 
