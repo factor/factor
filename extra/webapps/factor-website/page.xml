@@ -10,22 +10,16 @@
 		<head>
 			<t:write-title />
 
-			<t:write-atom />
-
 			<t:style>
+				body, button {
+					font:9pt "Lucida Grande", "Lucida Sans Unicode", verdana, geneva, sans-serif;
+					color:#444;
+				}
+
 				.link-button {
 					padding: 0px;
 					background: none;
 					border: none;
-				}
-
-				.inline {
-					display: inline;
-				}
-
-				body, button {
-					font:9pt "Lucida Grande", "Lucida Sans Unicode", verdana, geneva, sans-serif;
-					color:#444;
 				}
 
 				a, .link {
@@ -34,18 +28,24 @@
 					text-decoration:none;
 				}
 
-				h1 a {
-					border: none;
-				}
-
 				a:hover, .link:hover {
 					border-bottom:1px solid #66a;
 				}
 
 				.error { color: #a00; }
-				
+
 				.field-label {
 					text-align: right;
+				}
+
+				.inline {
+					display: inline;
+				}
+				
+				.navbar {
+					background-color: #eee;
+					padding: 5px;
+					border: 1px solid #ccc;
 				}
 			</t:style>
 
@@ -53,9 +53,6 @@
 		</head>
 
 		<body>
-
-			<h1><t:a href="planet"><t:write-title /></t:a></h1>
-
 			<t:call-next-template />
 		</body>
 

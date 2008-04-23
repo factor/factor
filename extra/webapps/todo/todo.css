@@ -10,22 +10,6 @@
 	color: #000000;
 }
 
-.link-button {
-	padding: 0px;
-	background: none;
-	border: none;
-}
-
-.navbar {
-	background-color: #eeeeee;
-	padding: 5px;
-	border: 1px solid #ccc;
-}
-
-.inline {
-	display: inline;
-}
-
 pre {
 	font-size: 75%;
 }
