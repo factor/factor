@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel math namespaces sequences strings
-io io.streams.string xml.data assocs wrap xml.entities
-unicode.categories ;
+assocs combinators io io.streams.string
+xml.data wrap xml.entities unicode.categories ;
 IN: xml.writer
 
 SYMBOL: xml-pprint?
@@ -61,6 +61,9 @@ M: string write-item
     ?indent CHAR: < write1
     dup print-name tag-attrs print-attrs ;
 
+: write-start-tag ( tag -- )
+    write-tag ">" write ;
+
 M: contained-tag write-item
     write-tag "/>" write ;
 
@@ -72,11 +75,14 @@ M: contained-tag write-item
     ?indent "</" write print-name CHAR: > write1 ;
 
 M: open-tag write-item
-    xml-pprint? [ [
-        over sensitive? not and xml-pprint? set
-        dup write-tag CHAR: > write1
-        dup write-children write-end-tag
-    ] keep ] change ;
+    xml-pprint? get >r
+    {
+        [ sensitive? not xml-pprint? get and xml-pprint? set ]
+        [ write-start-tag ]
+        [ write-children ]
+        [ write-end-tag ]
+    } cleave
+    r> xml-pprint? set ;
 
 M: comment write-item
     "<!--" write comment-text write "-->" write ;
@@ -97,10 +103,12 @@ M: instruction write-item
     [ write-item ] each ;
 
 : write-xml ( xml -- )
-    dup xml-prolog write-prolog
-    dup xml-before write-chunk
-    dup write-item
-    xml-after write-chunk ;
+    {
+        [ xml-prolog write-prolog ]
+        [ xml-before write-chunk ]
+        [ write-item ]
+        [ xml-after write-chunk ]
+    } cleave ;
 
 : print-xml ( xml -- )
     write-xml nl ;

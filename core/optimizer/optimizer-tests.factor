@@ -1,9 +1,9 @@
 USING: arrays compiler.units generic hashtables inference kernel
-kernel.private math optimizer prettyprint sequences sbufs
-strings tools.test vectors words sequences.private quotations
-optimizer.backend classes classes.algebra inference.dataflow
-classes.tuple.private continuations growable optimizer.inlining
-namespaces hints ;
+kernel.private math optimizer generator prettyprint sequences
+sbufs strings tools.test vectors words sequences.private
+quotations optimizer.backend classes classes.algebra
+inference.dataflow classes.tuple.private continuations growable
+optimizer.inlining namespaces hints ;
 IN: optimizer.tests
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
@@ -12,40 +12,6 @@ IN: optimizer.tests
 
 [ H{ { 1 4 } { 2 4 } { 3 4 } } ] [
     H{ { 1 2 } { 3 4 } } H{ { 2 3 } } union*
-] unit-test
-
-! Test method inlining
-[ f ] [ fixnum { } min-class ] unit-test
-
-[ string ] [
-    \ string
-    [ integer string array reversed sbuf
-    slice vector quotation ]
-    sort-classes min-class
-] unit-test
-
-[ fixnum ] [
-    \ fixnum
-    [ fixnum integer object ]
-    sort-classes min-class
-] unit-test
-
-[ integer ] [
-    \ fixnum
-    [ integer float object ]
-    sort-classes min-class
-] unit-test
-
-[ object ] [
-    \ word
-    [ integer float object ]
-    sort-classes min-class
-] unit-test
-
-[ reversed ] [
-    \ reversed
-    [ integer reversed slice ]
-    sort-classes min-class
 ] unit-test
 
 GENERIC: xyz ( obj -- obj )
@@ -325,7 +291,6 @@ TUPLE: silly-tuple a b ;
 
 [ 1 2 3 ] [ lift-loop-tail-test-2 ] unit-test
 
-! Make sure we don't lose
 GENERIC: generic-inline-test ( x -- y )
 M: integer generic-inline-test ;
 
@@ -342,6 +307,7 @@ M: integer generic-inline-test ;
     generic-inline-test
     generic-inline-test ;
 
+! Inlining all of the above should only take two passes
 [ { t f } ] [
     \ generic-inline-test-1 word-def dataflow
     [ optimize-1 , optimize-1 , drop ] { } make
@@ -374,3 +340,19 @@ HINTS: recursive-inline-hang-3 array ;
 USE: sequences.private
 
 [ ] [ { (3append) } compile ] unit-test
+
+! Wow
+: counter-example ( a b c d -- a' b' c' d' )
+    dup 0 > [ 1 - >r rot 2 * r> counter-example ] when ; inline
+
+: counter-example' ( -- a' b' c' d' )
+    1 2 3.0 3 counter-example ;
+
+[ 2 4 6.0 0 ] [ counter-example' ] unit-test
+
+: member-test { + - * / /i } member? ;
+
+\ member-test must-infer
+[ ] [ \ member-test word-dataflow optimize 2drop ] unit-test
+[ t ] [ \ + member-test ] unit-test
+[ f ] [ \ append member-test ] unit-test

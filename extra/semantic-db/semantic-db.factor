@@ -96,8 +96,6 @@ arc "arc"
     node create-table arc create-table
     create-bootstrap-nodes create-bootstrap-arcs ;
 
-: param ( value key type -- param ) swapd 3array ;
-
 ! db utilities
 : results ( bindings sql -- array )
     f f <simple-statement> [ do-bound-query ] with-disposal ;
@@ -110,6 +108,9 @@ arc "arc"
 
 : node-results ( results -- nodes )
     [ node-result ] map ;
+
+: param ( value key type -- param )
+    swapd <sqlite-low-level-binding> ;
 
 : subjects-with-cor ( content object relation -- sql-results )
     [ id>> ] bi@

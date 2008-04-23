@@ -33,7 +33,6 @@ os { winnt linux macosx } member? [
         [ ] [ "m" get dispose ] unit-test
     ] with-monitors
 
-    
     [
         [ "monitor-test" temp-file delete-tree ] ignore-errors
         
@@ -88,4 +87,7 @@ os { winnt linux macosx } member? [
 
         [ ] [ "m" get dispose ] unit-test
     ] with-monitors
+
+    ! Out-of-scope disposal should not fail
+    [ "" resource-path t <monitor> ] with-monitors dispose
 ] when

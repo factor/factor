@@ -11,8 +11,9 @@
 ! modify, just find the function or data structure in the manual
 ! and note the section.
 
-USING: kernel arrays alien alien.c-types alien.syntax
-math math.bitfields words sequences namespaces continuations ;
+USING: kernel arrays alien alien.c-types alien.strings
+alien.syntax math math.bitfields words sequences namespaces
+continuations io.encodings.ascii ;
 IN: x11.xlib
 
 LIBRARY: xlib
@@ -1372,7 +1373,7 @@ SYMBOL: root
 
 : initialize-x ( display-string -- )
     init-locale
-    dup [ string>char-alien ] when
+    dup [ ascii string>alien ] when
     XOpenDisplay check-display dpy set-global
     dpy get XDefaultScreen scr set-global
     dpy get scr get XRootWindow root set-global ;

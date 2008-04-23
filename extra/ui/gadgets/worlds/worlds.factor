@@ -48,9 +48,6 @@ M: world request-focus-on ( child gadget -- )
 
 M: world hashcode* drop world hashcode* ;
 
-M: world pref-dim*
-    delegate pref-dim* [ >fixnum ] map { 1024 768 } vmin ;
-
 M: world layout*
     dup delegate layout*
     dup world-glass [

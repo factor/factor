@@ -3,7 +3,7 @@ USING: alien alien.c-types alien.syntax compiler kernel
 namespaces namespaces tools.test sequences inference words
 arrays parser quotations continuations inference.backend effects
 namespaces.private io io.streams.string memory system threads
-tools.test ;
+tools.test math ;
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test
@@ -280,6 +280,10 @@ FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
 
 [ 1.23456 ] [ 1.23456 make-struct-12 ffi_test_36 ] unit-test
 
+FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
+
+[ t ] [ 31 2^ 32 2^ ffi_test_38 63 2^ = ] unit-test
+
 ! Test callbacks
 
 : callback-1 "void" { } "cdecl" [ ] alien-callback ;
@@ -354,3 +358,18 @@ FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
     ] alien-callback ;
 
 [ ] [ callback-8 callback_test_1 ] unit-test
+
+: callback-9
+    "int" { "int" "int" "int" } "cdecl" [
+        + + 1+
+    ] alien-callback ;
+
+FUNCTION: void ffi_test_36_point_5 ( ) ;
+
+[ ] [ ffi_test_36_point_5 ] unit-test
+
+FUNCTION: int ffi_test_37 ( void* func ) ;
+
+[ 1 ] [ callback-9 ffi_test_37 ] unit-test
+
+[ 7 ] [ callback-9 ffi_test_37 ] unit-test

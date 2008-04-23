@@ -28,12 +28,6 @@ M: f expired? drop t ;
 : <alien> ( address -- alien )
     f <displaced-alien> { simple-c-ptr } declare ; inline
 
-: alien>native-string ( alien -- string )
-    os windows? [ alien>u16-string ] [ alien>char-string ] if ;
-
-: dll-path ( dll -- string )
-    (dll-path) alien>native-string ;
-
 M: alien equal?
     over alien? [
         2dup [ expired? ] either? [

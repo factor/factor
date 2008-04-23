@@ -1,0 +1,23 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>View Item</t:title>
+
+	<table>
+		<tr><th class="field-label">Summary:    </th><td><t:view component="summary"     /></td></tr>
+		<tr><th class="field-label">Priority:   </th><td><t:view component="priority"    /></td></tr>
+	</table>
+
+	<div class="description">
+		<t:view component="description" />
+	</div>
+
+	<t:a href="edit" query="id">Edit</t:a>
+	|
+	<t:form action="delete" class="inline">
+		<t:edit component="id" />
+		<button class="link-button link">Delete</button>
+	</t:form>
+
+</t:chloe>

@@ -8,6 +8,8 @@ Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
 http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno%40clisp.org
 
 Modified for Factor by Slava Pestov and Daniel Ehrenberg */
+#include <ucontext.h>
+
 #define MACH_EXC_STATE_TYPE x86_exception_state64_t
 #define MACH_EXC_STATE_FLAVOR x86_EXCEPTION_STATE64
 #define MACH_EXC_STATE_COUNT x86_EXCEPTION_STATE64_COUNT

@@ -96,6 +96,8 @@ C: <interval> interval
 
 : interval-bitnot ( i1 -- i2 ) interval-neg interval-1- ;
 
+: interval-sq ( i1 -- i2 ) dup interval* ;
+
 : make-interval ( from to -- int )
     over first over first {
         { [ 2dup > ] [ 2drop 2drop f ] }

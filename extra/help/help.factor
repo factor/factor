@@ -38,7 +38,7 @@ M: predicate word-help* drop \ $predicate ;
     \ $error-description swap word-help elements empty? not ;
 
 : sort-articles ( seq -- newseq )
-    [ dup article-title ] { } map>assoc sort-values 0 <column> ;
+    [ dup article-title ] { } map>assoc sort-values keys ;
 
 : all-errors ( -- seq )
     all-words [ error? ] subset sort-articles ;

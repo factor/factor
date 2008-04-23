@@ -1,0 +1,31 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+<t:comment>
+	<t:atom title="Planet Factor - Atom" href="feed.xml" />
+</t:comment>
+	<t:style include="resource:extra/webapps/planet/planet.css" />
+
+	<div class="navbar">
+		  <t:a href="list">Front Page</t:a>
+		| <t:a href="feed.xml">Atom Feed</t:a>
+
+		| <t:a href="admin">Admin</t:a>
+
+		<t:comment>
+		<t:if code="http.server.auth.login:allow-edit-profile?">
+			| <t:a href="edit-profile">Edit Profile</t:a>
+		</t:if>
+
+		<t:form action="logout" class="inline">
+			| <button type="submit" class="link-button link">Logout</button>
+		</t:form>
+		</t:comment>
+	</div>
+
+	<h1><t:write-title /></h1>
+
+        <t:call-next-template />
+
+</t:chloe>

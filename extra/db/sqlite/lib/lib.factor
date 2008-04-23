@@ -4,7 +4,7 @@ USING: alien.c-types arrays assocs kernel math math.parser
 namespaces sequences db.sqlite.ffi db combinators
 continuations db.types calendar.format serialize
 io.streams.byte-array byte-arrays io.encodings.binary
-tools.walker ;
+tools.walker io.backend ;
 IN: db.sqlite.lib
 
 : sqlite-error ( n -- * )
@@ -23,7 +23,8 @@ IN: db.sqlite.lib
         [ sqlite-error ]
     } cond ;
 
-: sqlite-open ( filename -- db )
+: sqlite-open ( path -- db )
+    normalize-path
     "void*" <c-object>
     [ sqlite3_open sqlite-check-result ] keep *void* ;
 
@@ -51,6 +52,9 @@ IN: db.sqlite.lib
 : sqlite-bind-int64 ( handle i n -- )
     sqlite3_bind_int64 sqlite-check-result ;
 
+: sqlite-bind-uint64 ( handle i n -- )
+    sqlite3-bind-uint64 sqlite-check-result ;
+
 : sqlite-bind-double ( handle i x -- )
     sqlite3_bind_double sqlite-check-result ;
 
@@ -68,7 +72,10 @@ IN: db.sqlite.lib
     parameter-index sqlite-bind-int ;
 
 : sqlite-bind-int64-by-name ( handle name int64 -- )
-    parameter-index sqlite-bind-int ;
+    parameter-index sqlite-bind-int64 ;
+
+: sqlite-bind-uint64-by-name ( handle name int64 -- )
+    parameter-index sqlite-bind-uint64 ;
 
 : sqlite-bind-double-by-name ( handle name double -- )
     parameter-index sqlite-bind-double ;
@@ -85,6 +92,8 @@ IN: db.sqlite.lib
     {
         { INTEGER [ sqlite-bind-int-by-name ] }
         { BIG-INTEGER [ sqlite-bind-int64-by-name ] }
+        { SIGNED-BIG-INTEGER [ sqlite-bind-int64-by-name ] }
+        { UNSIGNED-BIG-INTEGER [ sqlite-bind-uint64-by-name ] }
         { TEXT [ sqlite-bind-text-by-name ] }
         { VARCHAR [ sqlite-bind-text-by-name ] }
         { DOUBLE [ sqlite-bind-double-by-name ] }
@@ -98,12 +107,15 @@ IN: db.sqlite.lib
             sqlite-bind-blob-by-name
         ] }
         { +native-id+ [ sqlite-bind-int-by-name ] }
+        { +random-id+ [ sqlite-bind-int64-by-name ] }
         { NULL [ sqlite-bind-null-by-name ] }
         [ no-sql-type ]
     } case ;
 
 : sqlite-finalize ( handle -- ) sqlite3_finalize sqlite-check-result ;
 : sqlite-reset ( handle -- ) sqlite3_reset sqlite-check-result ;
+: sqlite-clear-bindings ( handle -- )
+    sqlite3_clear_bindings sqlite-check-result ;
 : sqlite-#columns ( query -- int ) sqlite3_column_count ;
 : sqlite-column ( handle index -- string ) sqlite3_column_text ;
 : sqlite-column-name ( handle index -- string ) sqlite3_column_name ;
@@ -120,10 +132,12 @@ IN: db.sqlite.lib
 : sqlite-column-typed ( handle index type -- obj )
     dup array? [ first ] when
     {
-        { +native-id+ [ sqlite3_column_int64 ] }
-        { +random-id+ [ sqlite3_column_int64 ] }
+        { +native-id+ [ sqlite3_column_int64  ] }
+        { +random-id+ [ sqlite3-column-uint64 ] }
         { INTEGER [ sqlite3_column_int ] }
         { BIG-INTEGER [ sqlite3_column_int64 ] }
+        { SIGNED-BIG-INTEGER [ sqlite3_column_int64 ] }
+        { UNSIGNED-BIG-INTEGER [ sqlite3-column-uint64 ] }
         { DOUBLE [ sqlite3_column_double ] }
         { TEXT [ sqlite3_column_text ] }
         { VARCHAR [ sqlite3_column_text ] }

@@ -54,9 +54,9 @@ IN: inference.known-words
     { swap  T{ effect f 2 { 1 0         } } }
 } [ define-shuffle ] assoc-each
 
-\ >r [ infer->r ] "infer" set-word-prop
+\ >r [ 1 infer->r ] "infer" set-word-prop
 
-\ r> [ infer-r> ] "infer" set-word-prop
+\ r> [ 1 infer-r> ] "infer" set-word-prop
 
 \ declare [
     1 ensure-values
@@ -81,8 +81,8 @@ M: curried infer-call
 
 M: composed infer-call
     infer-uncurry
-    infer->r peek-d infer-call
-    terminated? get [ infer-r> peek-d infer-call ] unless ;
+    1 infer->r peek-d infer-call
+    terminated? get [ 1 infer-r> peek-d infer-call ] unless ;
 
 M: object infer-call
     \ literal-expected inference-warning ;
@@ -91,6 +91,8 @@ M: object infer-call
     1 ensure-values
     peek-d infer-call
 ] "infer" set-word-prop
+
+\ call t "no-compile" set-word-prop
 
 \ execute [
     1 ensure-values
@@ -470,18 +472,6 @@ set-primitive-effect
 \ alien-cell make-flushable
 
 \ set-alien-cell { c-ptr c-ptr integer } { } <effect> set-primitive-effect
-
-\ alien>char-string { c-ptr } { string } <effect> set-primitive-effect
-\ alien>char-string make-flushable
-
-\ string>char-alien { string } { byte-array } <effect> set-primitive-effect
-\ string>char-alien make-flushable
-
-\ alien>u16-string { c-ptr } { string } <effect> set-primitive-effect
-\ alien>u16-string make-flushable
-
-\ string>u16-alien { string } { byte-array } <effect> set-primitive-effect
-\ string>u16-alien make-flushable
 
 \ alien-address { alien } { integer } <effect> set-primitive-effect
 \ alien-address make-flushable

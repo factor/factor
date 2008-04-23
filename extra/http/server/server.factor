@@ -160,23 +160,30 @@ drop
 
 SYMBOL: development-mode
 
+: http-error. ( error -- )
+    "Internal server error" [
+        development-mode get [
+            [ print-error nl :c ] with-html-stream
+        ] [
+            500 "Internal server error"
+            trivial-response-body
+        ] if
+    ] simple-page ;
+
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
-    swap '[
-        , "Internal server error" [
-            development-mode get [
-                [ print-error nl :c ] with-html-stream
-            ] [
-                500 "Internal server error"
-                trivial-response-body
-            ] if
-        ] simple-page
-    ] >>body ;
+    swap '[ , http-error. ] >>body ;
 
 : do-response ( response -- )
     dup write-response
     request get method>> "HEAD" =
-    [ drop ] [ write-response-body ] if ;
+    [ drop ] [
+        '[
+            , write-response-body
+        ] [
+            http-error.
+        ] recover
+    ] if ;
 
 LOG: httpd-hit NOTICE
 

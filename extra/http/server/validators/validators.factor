@@ -11,14 +11,16 @@ TUPLE: validation-error value reason ;
 C: <validation-error> validation-error
 
 : with-validator ( value quot -- result )
-    [ validation-failed? on <validation-error> ] recover ;
-    inline
+    [ validation-failed? on <validation-error> ] recover ; inline
 
 : v-default ( str def -- str )
     over empty? spin ? ;
 
 : v-required ( str -- str )
     dup empty? [ "required" throw ] when ;
+
+: v-optional ( str quot -- str )
+    over empty? [ 2drop f ] [ call ] if ; inline
 
 : v-min-length ( str n -- str )
     over length over < [
@@ -63,7 +65,12 @@ C: <validation-error> validation-error
 : v-email ( str -- str )
     #! From http://www.regular-expressions.info/email.html
     "e-mail"
-    R/ [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i
+    R' [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}'i
+    v-regexp ;
+
+: v-url ( str -- str )
+    "URL"
+    R' (ftp|http|https)://(\w+:?\w*@)?(\S+)(:[0-9]+)?(/|/([\w#!:.?+=&%@!\-/]))?'
     v-regexp ;
 
 : v-captcha ( str -- str )

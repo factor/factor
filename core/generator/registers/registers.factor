@@ -13,13 +13,6 @@ SYMBOL: +scratch+
 SYMBOL: +clobber+
 SYMBOL: known-tag
 
-! Register classes
-SINGLETON: int-regs
-SINGLETON: single-float-regs
-SINGLETON: double-float-regs
-UNION: float-regs single-float-regs double-float-regs ;
-UNION: reg-class int-regs float-regs ;
-
 <PRIVATE
 
 ! Value protocol
@@ -65,9 +58,7 @@ M: float-regs move-spec drop float ;
 M: float-regs operand-class* drop float ;
 
 ! Temporary register for stack shuffling
-TUPLE: temp-reg reg-class>> ;
-
-: temp-reg T{ temp-reg f int-regs } ;
+SINGLETON: temp-reg
 
 M: temp-reg move-spec drop f ;
 
@@ -469,11 +460,6 @@ M: loc lazy-store
 
 : finalize-contents ( -- )
     finalize-locs finalize-vregs reset-phantoms ;
-
-: %gc ( -- )
-    0 frame-required
-    %prepare-alien-invoke
-    "simple_gc" f %alien-invoke ;
 
 ! Loading stacks to vregs
 : free-vregs? ( int# float# -- ? )

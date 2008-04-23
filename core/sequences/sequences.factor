@@ -215,18 +215,6 @@ M: slice length dup slice-to swap slice-from - ;
 
 INSTANCE: slice virtual-sequence
 
-! A column of a matrix
-TUPLE: column seq col ;
-
-C: <column> column
-
-M: column virtual-seq column-seq ;
-M: column virtual@
-    dup column-col -rot column-seq nth bounds-check ;
-M: column length column-seq length ;
-
-INSTANCE: column virtual-sequence
-
 ! One element repeated many times
 TUPLE: repetition len elt ;
 
@@ -703,5 +691,5 @@ PRIVATE>
 : flip ( matrix -- newmatrix )
     dup empty? [
         dup [ length ] map infimum
-        [ <column> dup like ] with map
+        swap [ [ nth-unsafe ] with { } map-as ] curry { } map-as
     ] unless ;

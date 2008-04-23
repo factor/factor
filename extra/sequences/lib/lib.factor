@@ -35,6 +35,10 @@ MACRO: firstn ( n -- )
     #! quot: ( elt index -- obj )
     prepare-index 2map ; inline
 
+: reduce-index ( seq identity quot -- )
+    #! quot: ( prev elt index -- next )
+    swapd each-index ; inline
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : each-percent ( seq quot -- )
@@ -48,7 +52,7 @@ MACRO: firstn ( n -- )
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : sigma ( seq quot -- n )
-    [ rot slip + ] curry 0 swap reduce ; inline
+    [ + ] compose 0 swap reduce ; inline
 
 : count ( seq quot -- n )
     [ 1 0 ? ] compose sigma ; inline
@@ -196,9 +200,6 @@ USE: continuations
 : ?subseq ( from to seq -- subseq )
     >r >r 0 max r> r>
     [ length tuck min >r min r> ] keep subseq ;
-
-: ?head* ( seq n -- seq/f ) (head) ?subseq ;
-: ?tail* ( seq n -- seq/f ) (tail) ?subseq ;
 
 : accumulator ( quot -- quot vec )
     V{ } clone [ [ push ] curry compose ] keep ; inline

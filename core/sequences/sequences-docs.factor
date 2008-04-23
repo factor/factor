@@ -76,10 +76,7 @@ ARTICLE: "sequences-reshape" "Reshaping sequences"
 { $subsection reversed }
 { $subsection <reversed> }
 "Transposing a matrix:"
-{ $subsection flip }
-"A " { $emphasis "column" } " presents a column of a matrix represented as a sequence of rows:"
-{ $subsection column }
-{ $subsection <column> } ;
+{ $subsection flip } ;
 
 ARTICLE: "sequences-appending" "Appending sequences"
 { $subsection append }
@@ -784,23 +781,6 @@ HELP: <slice>
 { $notes "Taking the slice of a slice outputs a slice of the underlying sequence of the original slice. Keep this in mind when writing code which depends on the values of " { $link slice-from } " and " { $link slice-to } " being equal to the inputs to this word. The " { $link <flat-slice> } " word might be helpful in such situations." } ;
 
 { <slice> subseq } related-words
-
-HELP: column
-{ $class-description "A virtual sequence which presents a fixed column of a matrix represented as a sequence of rows. New instances can be created by calling " { $link <column> } "." } ;
-
-HELP: <column> ( seq n -- column )
-{ $values { "seq" sequence } { "n" "a non-negative integer" } { "column" column } }
-{ $description "Outputs a new virtual sequence which presents a fixed column of a matrix represented as a sequence of rows." "The " { $snippet "i" } "th element of a column is the " { $snippet "n" } "th element of the " { $snippet "i" } "th element of" { $snippet "seq" } ". Every element of " { $snippet "seq" } " must be a sequence, and all sequences must have equal length." }
-{ $examples
-    { $example
-        "USING: arrays prettyprint sequences ;"
-        "{ { 1 2 3 } { 4 5 6 } { 7 8 9 } } 0 <column> >array ."
-        "{ 1 4 7 }"
-    }
-}
-{ $notes
-    "In the same sense that " { $link <reversed> } " is a virtual variant of " { $link reverse } ", " { $link <column> } " is a virtual variant of " { $snippet "swap [ nth ] curry map" } "."
-} ;
 
 HELP: repetition
 { $class-description "A virtual sequence consisting of " { $link repetition-elt } " repeated " { $link repetition-len } " times. Repetitions are created by calling " { $link <repetition> } "." } ;

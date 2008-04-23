@@ -1,10 +1,11 @@
-USING: rss io kernel io.files tools.test io.encodings.utf8 ;
+USING: rss io kernel io.files tools.test io.encodings.utf8
+calendar ;
 IN: rss.tests
 
 : load-news-file ( filename -- feed )
     #! Load an news syndication file and process it, returning
     #! it as an feed tuple.
-    utf8 <file-reader> read-feed ;
+    utf8 file-contents read-feed ;
 
 [ T{
     feed
@@ -35,7 +36,7 @@ IN: rss.tests
             "http://example.org/2005/04/02/atom"
             "\n         <div xmlns=\"http://www.w3.org/1999/xhtml\">\n           <p><i>[Update: The Atom draft is finished.]</i></p>\n         </div>\n       "
 
-            "2003-12-13T08:29:29-04:00"
+            T{ timestamp f 2003 12 13 8 29 29 T{ duration f 0 0 0 -4 0 0 } }
         }
     }
 } ] [ "extra/rss/atom.xml" resource-path load-news-file ] unit-test

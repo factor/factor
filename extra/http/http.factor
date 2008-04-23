@@ -1,10 +1,18 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry hashtables io io.streams.string kernel math sets
-namespaces math.parser assocs sequences strings splitting ascii
-io.encodings.utf8 io.encodings.string namespaces unicode.case
-combinators vectors sorting accessors calendar
-calendar.format quotations arrays combinators.lib byte-arrays ;
+USING: accessors kernel combinators math namespaces
+
+assocs sequences splitting sorting sets debugger
+strings vectors hashtables quotations arrays byte-arrays
+math.parser calendar calendar.format
+
+io io.streams.string io.encodings.utf8 io.encodings.string
+io.sockets
+
+unicode.case unicode.categories qualified ;
+
+EXCLUDE: fry => , ;
+
 IN: http
 
 : http-port 80 ; inline
@@ -13,11 +21,12 @@ IN: http
     #! In a URL, can this character be used without
     #! URL-encoding?
     {
-        [ dup letter? ]
-        [ dup LETTER? ]
-        [ dup digit? ]
-        [ dup "/_-.:" member? ]
-    } || nip ; foldable
+        { [ dup letter? ] [ t ] }
+        { [ dup LETTER? ] [ t ] }
+        { [ dup digit? ] [ t ] }
+        { [ dup "/_-.:" member? ] [ t ] }
+        [ f ]
+    } cond nip ; foldable
 
 : push-utf8 ( ch -- )
     1string utf8 encode
@@ -75,8 +84,15 @@ IN: http
         ] if
     ] if ;
 
+: read-lf ( -- string )
+    "\n" read-until CHAR: \n assert= ;
+
+: read-crlf ( -- string )
+    "\r" read-until
+    [ CHAR: \r assert= read1 CHAR: \n assert= ] when* ;
+
 : read-header-line ( -- )
-    readln dup
+    read-crlf dup
     empty? [ drop ] [ header-line read-header-line ] if ;
 
 : read-header ( -- assoc )
@@ -175,13 +191,17 @@ post-data
 post-data-type
 cookies ;
 
+: set-header ( request/response value key -- request/response )
+    pick header>> set-at ;
+
 : <request>
     request new
         "1.1" >>version
         http-port >>port
         H{ } clone >>header
         H{ } clone >>query
-        V{ } clone >>cookies ;
+        V{ } clone >>cookies
+        "close" "connection" set-header ;
 
 : query-param ( request key -- value )
     swap query>> at ;
@@ -220,7 +240,7 @@ cookies ;
     dup { "1.0" "1.1" } member? [ "Bad version" throw ] unless ;
 
 : read-request-version ( request -- request )
-    readln [ CHAR: \s = ] left-trim
+    read-crlf [ CHAR: \s = ] left-trim
     parse-version
     >>version ;
 
@@ -295,9 +315,15 @@ SYMBOL: max-post-request
         "application/x-www-form-urlencoded" >>post-data-type
     ] if ;
 
+: request-addr ( request -- addr )
+    [ host>> ] [ port>> ] bi <inet> ;
+
+: request-host ( request -- string )
+    [ host>> ] [ drop ":" ] [ port>> number>string ] tri 3append ;
+
 : write-request-header ( request -- request )
     dup header>> >hashtable
-    over host>> [ "host" pick set-at ] when*
+    over host>> [ over request-host "host" pick set-at ] when
     over post-data>> [ length "content-length" pick set-at ] when*
     over post-data-type>> [ "content-type" pick set-at ] when*
     over cookies>> f like [ unparse-cookies "cookie" pick set-at ] when*
@@ -330,9 +356,6 @@ SYMBOL: max-post-request
         tri
     ] with-string-writer ;
 
-: set-header ( request/response value key -- request/response )
-    pick header>> set-at ;
-
 GENERIC: write-response ( response -- )
 
 GENERIC: write-full-response ( request response -- )
@@ -347,11 +370,11 @@ body ;
 
 : <response>
     response new
-    "1.1" >>version
-    H{ } clone >>header
-    "close" "connection" set-header
-    now timestamp>http-string "date" set-header
-    V{ } clone >>cookies ;
+        "1.1" >>version
+        H{ } clone >>header
+        "close" "connection" set-header
+        now timestamp>http-string "date" set-header
+        V{ } clone >>cookies ;
 
 : read-response-version
     " \t" read-until
@@ -365,7 +388,7 @@ body ;
     >>code ;
 
 : read-response-message
-    readln >>message ;
+    read-crlf >>message ;
 
 : read-response-header
     read-header >>header
@@ -394,13 +417,18 @@ body ;
     [ unparse-cookies "set-cookie" pick set-at ] when*
     write-header ;
 
+GENERIC: write-response-body* ( body -- )
+
+M: f write-response-body* drop ;
+
+M: string write-response-body* write ;
+
+M: callable write-response-body* call ;
+
+M: object write-response-body* stdio get stream-copy ;
+
 : write-response-body ( response -- response )
-    dup body>> {
-        { [ dup not ] [ drop ] }
-        { [ dup string? ] [ write ] }
-        { [ dup callable? ] [ call ] }
-        [ stdio get stream-copy ]
-    } cond ;
+    dup body>> write-response-body* ;
 
 M: response write-response ( respose -- )
     write-response-version

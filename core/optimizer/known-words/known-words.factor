@@ -60,7 +60,8 @@ sequences.private combinators ;
     [ value-literal sequence? ] [ drop f ] if ;
 
 : member-quot ( seq -- newquot )
-    [ [ t ] ] { } map>assoc [ drop f ] suffix [ nip case ] curry ;
+    [ literalize [ t ] ] { } map>assoc
+    [ drop f ] suffix [ nip case ] curry ;
 
 : expand-member ( #call -- )
     dup node-in-d peek value-literal member-quot f splice-quot ;
@@ -83,21 +84,11 @@ sequences.private combinators ;
 ] "constraints" set-word-prop
 
 ! eq? on the same object is always t
-{ eq? bignum= float= number= = } {
+{ eq? = } {
     { { @ @ } [ 2drop t ] }
 } define-identities
 
 ! Specializers
-{ 1+ 1- sq neg recip sgn } [
-    { number } "specializer" set-word-prop
-] each
-
-\ 2/ { fixnum } "specializer" set-word-prop
-
-{ min max } [
-    { number number } "specializer" set-word-prop
-] each
-
 { first first2 first3 first4 }
 [ { array } "specializer" set-word-prop ] each
 

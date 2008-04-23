@@ -1,13 +1,15 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov. 
 ! See http://factorcode.org/license.txt for BSD license.
+USING: alien alien.c-types alien.strings generic kernel math
+namespaces threads sequences byte-arrays io.nonblocking
+io.binary io.unix.backend io.streams.duplex io.sockets.impl
+io.backend io.files io.files.private io.encodings.utf8
+math.parser continuations libc combinators system accessors
+qualified unix ;
 
-! We need to fiddle with the exact search order here, since
-! unix::accept shadows streams::accept.
-USING: alien alien.c-types generic io kernel math namespaces
-io.nonblocking parser threads unix sequences
-byte-arrays io.sockets io.binary io.unix.backend
-io.streams.duplex io.sockets.impl math.parser continuations libc
-combinators io.backend io.files io.files.private system accessors ;
+EXCLUDE: io => read write close ;
+EXCLUDE: io.sockets => accept ;
+
 IN: io.unix.sockets
 
 : pending-init-error ( port -- )
@@ -36,7 +38,7 @@ TUPLE: connect-task < output-task ;
     connect-task <io-task> ;
 
 M: connect-task do-io-task
-    io-task-port dup port-handle f 0 write
+    port>> dup handle>> f 0 write
     0 < [ defer-error ] [ drop t ] if ;
 
 : wait-to-connect ( port -- )
@@ -56,8 +58,6 @@ M: unix ((client)) ( addrspec -- client-in client-out )
     ] if ;
 
 ! Server sockets - TCP and Unix domain
-USE: unix
-
 : init-server-socket ( fd -- )
     SOL_SOCKET SO_REUSEADDR sockopt ;
 
@@ -82,8 +82,6 @@ M: accept-task do-io-task
 
 : wait-to-accept ( server -- )
     [ <accept-task> add-io-task ] with-port-continuation drop ;
-
-USE: io.sockets
 
 : server-fd ( addrspec type -- fd )
     >r dup protocol-family r>  socket-fd
@@ -187,12 +185,12 @@ M: local protocol-family drop PF_UNIX ;
 M: local sockaddr-type drop "sockaddr-un" c-type ;
 
 M: local make-sockaddr
-    local-path cwd prepend-path
+    path>> (normalize-path)
     dup length 1 + max-un-path > [ "Path too long" throw ] when
     "sockaddr-un" <c-object>
     AF_UNIX over set-sockaddr-un-family
-    dup sockaddr-un-path rot string>char-alien dup length memcpy ;
+    dup sockaddr-un-path rot utf8 string>alien dup length memcpy ;
 
 M: local parse-sockaddr
     drop
-    sockaddr-un-path alien>char-string <local> ;
+    sockaddr-un-path utf8 alien>string <local> ;

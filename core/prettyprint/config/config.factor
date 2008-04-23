@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint.config
-USING: alien arrays generic assocs io kernel math
+USING: arrays generic assocs io kernel math
 namespaces sequences strings io.styles vectors words
 continuations ;
 
