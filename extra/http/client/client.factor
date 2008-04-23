@@ -74,8 +74,8 @@ PRIVATE>
     ] with-variable ;
 
 : read-chunks ( -- )
-    readln ";" split1 drop hex>
-    dup { f 0 } member? [ drop ] [ read % read-chunks ] if ;
+    read-crlf ";" split1 drop hex> dup { f 0 } member?
+    [ drop ] [ read % read-crlf "" assert= read-chunks ] if ;
 
 : do-chunked-encoding ( response stream -- response stream/string )
     over "transfer-encoding" header "chunked" = [
