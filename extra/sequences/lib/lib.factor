@@ -131,6 +131,10 @@ MACRO: firstn ( n -- )
     [ find drop [ head-slice ] when* ] curry
     [ dup ] swap compose keep like ;
 
+: replicate ( seq quot -- newseq )
+    #! quot: ( -- obj )
+    [ drop ] swap compose map ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 <PRIVATE
