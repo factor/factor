@@ -6,6 +6,7 @@ http.server.components http.server.components.farkup
 http.server.forms http.server.templating.chloe
 http.server.boilerplate http.server.crud http.server.auth
 http.server.actions http.server.db
+http.server.auth.login
 http.server
 webapps.factor-website ;
 IN: webapps.todo
@@ -78,8 +79,6 @@ TUPLE: todo-responder < dispatcher ;
 : init-todo ( -- )
     test-db [
         init-todo-table
-        init-users-table
-        init-sessions-table
     ] with-db
 
     <dispatcher>
