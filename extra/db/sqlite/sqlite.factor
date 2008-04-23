@@ -124,7 +124,7 @@ M: sqlite-db create-sql-statement ( class -- statement )
             dup type>> lookup-create-type 0%
             modifiers 0%
         ] interleave ");" 0%
-    ] query-make dup sql>> . ;
+    ] query-make ;
 
 M: sqlite-db drop-sql-statement ( class -- statement )
     [ "drop table " 0% 0% ";" 0% drop ] query-make ;
