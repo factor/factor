@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel peg.ebnf peg.expr math.parser sequences arrays strings combinators.lib
-namespaces combinators math ;
+namespaces combinators math bake ;
 IN: lisp
 
 TUPLE: lisp-symbol name ;
@@ -30,14 +30,14 @@ DEFER: convert-form
   [ convert-form ] map [ ] [ compose ] reduce ; inline
   
 : convert-if ( lisp-form -- quot )
-  1 tail [ convert-form ] map reverse first3  [ % , , \ if , ] [ ] make ;
+  1 tail [ convert-form ] map reverse first3  [ % , , if ] bake ;
   
 : convert-general-form ( lisp-form -- quot )  
-  unclip swap convert-body [ % , ] [ ] make ;
+  unclip swap convert-body [ % , ] bake ;
 
 : convert-list-form ( lisp-form -- quot )  
 dup first
-  { { [ dup "if" <symbol> equal? ] [ convert-if ] }
+  { { [ dup "if" <symbol> equal? ] [ drop convert-if ] }
    [ drop convert-general-form ]
   } cond ;
   
