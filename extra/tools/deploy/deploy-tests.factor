@@ -1,7 +1,7 @@
 IN: tools.deploy.tests
 USING: tools.test system io.files kernel tools.deploy.config
 tools.deploy.backend math sequences io.launcher arrays
-namespaces continuations ;
+namespaces continuations layouts accessors ;
 
 : shake-and-bake ( vocab -- )
     [ "test.image" temp-file delete-file ] ignore-errors
@@ -12,18 +12,18 @@ namespaces continuations ;
     ] with-directory ;
 
 : small-enough? ( n -- ? )
-    >r "test.image" temp-file file-info file-info-size r> <= ;
+    >r "test.image" temp-file file-info size>> r> <= ;
 
 [ ] [ "hello-world" shake-and-bake ] unit-test
 
 [ t ] [
-    500000 small-enough?
+    cell 8 = 8 5 ? 100000 * small-enough?
 ] unit-test
 
 [ ] [ "sudoku" shake-and-bake ] unit-test
 
 [ t ] [
-    1500000 small-enough?
+    cell 8 = 30 15 ? 100000 * small-enough?
 ] unit-test
 
 [ ] [ "hello-ui" shake-and-bake ] unit-test
@@ -34,13 +34,13 @@ namespaces continuations ;
 ] unit-test
 
 [ t ] [
-    2000000 small-enough?
+    cell 8 = 40 20 ? 100000 * small-enough?
 ] unit-test
 
 [ ] [ "bunny" shake-and-bake ] unit-test
 
 [ t ] [
-    3000000 small-enough?
+    cell 8 = 50 30 ? 100000 * small-enough?
 ] unit-test
 
 [ ] [

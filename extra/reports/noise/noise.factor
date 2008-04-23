@@ -1,7 +1,7 @@
 USING: assocs math kernel shuffle combinators.lib
 words quotations arrays combinators sequences math.vectors
-io.styles combinators.cleave prettyprint vocabs sorting io
-generic locals.private math.statistics ;
+io.styles prettyprint vocabs sorting io generic locals.private
+math.statistics ;
 IN: reports.noise
 
 : badness ( word -- n )
@@ -9,7 +9,7 @@ IN: reports.noise
         { -nrot 5 }
         { -roll 4 }
         { -rot 3 }
-        { 2apply 1 }
+        { bi@ 1 }
         { 2curry 1 }
         { 2drop 1 }
         { 2dup 1 }
@@ -113,7 +113,7 @@ M: array noise [ noise ] map vsum ;
     noise first2 {
         { [ over 4 <= ] [ >r drop 0 r> ] }
         { [ over 15 >= ] [ >r 2 * r> ] }
-        { [ t ] [ ] }
+        [ ]
     } cond
     {
         ! short words are easier to read
@@ -123,7 +123,7 @@ M: array noise [ noise ] map vsum ;
         { [ dup 25 >= ] [ >r 2 * r> 20 max ] }
         { [ dup 20 >= ] [ >r 5/3 * r> ] }
         { [ dup 15 >= ] [ >r 3/2 * r> ] }
-        { [ t ] [ ] }
+        [ ]
     } cond noise-factor ;
 
 GENERIC: word-noise-factor ( word -- factor )
@@ -136,7 +136,7 @@ M: lambda-word word-noise-factor
 
 : flatten-generics ( words -- words' )
     [
-        dup generic? [ methods values ] [ 1array ] if
+        dup generic? [ "methods" word-prop values ] [ 1array ] if
     ] map concat ;
 
 : noisy-words ( -- alist )

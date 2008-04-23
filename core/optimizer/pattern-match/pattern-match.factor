@@ -19,7 +19,7 @@ SYMBOL: @
         { [ dup @ eq? ] [ drop match-@ ] }
         { [ dup class? ] [ match-class ] }
         { [ over value? not ] [ 2drop f ] }
-        { [ t ] [ swap value-literal = ] }
+        [ swap value-literal = ]
     } cond ;
 
 : node-match? ( node values pattern -- ? )

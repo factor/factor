@@ -1,5 +1,4 @@
-USING: sequences namespaces unicode.data kernel combinators.lib
-math arrays ;
+USING: sequences namespaces unicode.data kernel math arrays ;
 IN: unicode.normalize
 
 ! Conjoining Jamo behavior
@@ -19,7 +18,7 @@ IN: unicode.normalize
 
 ! These numbers come from UAX 29
 : initial? ( ch -- ? )
-    [ HEX: 1100 HEX: 1159 ?between? ] [ HEX: 115F = ] either ;
+    dup HEX: 1100 HEX: 1159 ?between? [ ] [ HEX: 115F = ] ?if ;
 : medial? ( ch -- ? ) HEX: 1160 HEX: 11A2 ?between? ;
 : final? ( ch -- ? ) HEX: 11A8 HEX: 11F9 ?between? ;
 
@@ -38,7 +37,7 @@ IN: unicode.normalize
 
 : (insert) ( seq n quot -- )
     over 0 = [ 3drop ] [
-        [ >r dup 1- rot [ nth ] curry 2apply r> 2apply > ] 3keep
+        [ >r dup 1- rot [ nth ] curry bi@ r> bi@ > ] 3keep
         roll [ 3drop ]
         [ >r [ dup 1- rot exchange ] 2keep 1- r> (insert) ] if
     ] if ; inline
@@ -68,7 +67,7 @@ IN: unicode.normalize
     0 reorder-loop ;
 
 : reorder-back ( string i -- )
-    over [ non-starter? not ] find-last* 1+* reorder-next 2drop ;
+    over [ non-starter? not ] find-last* drop ?1+ reorder-next 2drop ;
 
 : decompose ( string quot -- decomposed )
     ! When there are 8 and 32-bit strings, this'll be

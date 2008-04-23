@@ -21,12 +21,12 @@ HELP: graph
 
 HELP: add-vertex
 { $values { "vertex" object } { "edges" "a sequence" } { "graph" "an assoc mapping vertices to sequences of edges" } }
-{ $description "Adds a vertex to a directed graph, using the " { $snippet "edges" } " quotation to generate a sequence of edges leaving the vertex." }
+{ $description "Adds a vertex to a directed graph, with " { $snippet "edges" } "  as the outward edges from the vertex." }
 { $side-effects "graph" } ;
 
 HELP: remove-vertex
 { $values { "vertex" object } { "edges" "a sequence" } { "graph" "an assoc mapping vertices to sequences of edges" } }
-{ $description "Removes a vertex from a graph, using the quotation to generate a sequence of edges leaving the vertex." } 
+{ $description "Removes a vertex from a graph, using the given edges sequence." } 
 { $notes "The " { $snippet "edges" } " sequence must equal the value passed to " { $link add-vertex } ", otherwise some vertices of the graph may continue to refer to the removed vertex." }
 { $side-effects "graph" } ;
 

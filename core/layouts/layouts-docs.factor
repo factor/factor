@@ -1,6 +1,6 @@
 USING: generic help.markup help.syntax kernel math
 memory namespaces sequences kernel.private classes
-sequences.private ;
+classes.builtin sequences.private ;
 IN: layouts
 
 HELP: tag-bits
@@ -14,7 +14,7 @@ HELP: tag-mask
 { $var-description "Taking the bitwise and of a tagged pointer with this mask leaves the tag." } ;
 
 HELP: num-types
-{ $var-description "Number of distinct built-in types. This is one more than the maximum value from the " { $link type } " primitive." } ;
+{ $var-description "Number of distinct built-in types. This is one more than the maximum value from the " { $link hi-tag } " primitive." } ;
 
 HELP: tag-number
 { $values { "class" class } { "n" "an integer or " { $link f } } }
@@ -76,7 +76,7 @@ HELP: bootstrap-cell-bits
 
 ARTICLE: "layouts-types" "Type numbers"
 "Corresponding to every built-in class is a built-in type number. An object can be asked for its built-in type number:"
-{ $subsection type }
+{ $subsection hi-tag }
 "Built-in type numbers can be converted to classes, and vice versa:"
 { $subsection type>class }
 { $subsection type-number }

@@ -1,6 +1,6 @@
 
 USING: kernel namespaces arrays quotations sequences assocs combinators
-       mirrors math math.vectors random combinators.cleave macros bake ;
+       mirrors math math.vectors random macros bake ;
 
 IN: random-weighted
 

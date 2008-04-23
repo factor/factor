@@ -1,7 +1,7 @@
 IN: io.files.tests
-USING: tools.test io.files io threads kernel continuations
-io.encodings.ascii io.files.unique sequences strings accessors
-io.encodings.utf8 ;
+USING: tools.test io.files io.files.private io threads kernel
+continuations io.encodings.ascii io.files.unique sequences
+strings accessors io.encodings.utf8 ;
 
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test
@@ -117,7 +117,7 @@ io.encodings.utf8 ;
 
 [ ] [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
 
-[ ] [ "test-quux.txt" "quux-test.txt" [ temp-file ] 2apply move-file ] unit-test
+[ ] [ "test-quux.txt" "quux-test.txt" [ temp-file ] bi@ move-file ] unit-test
 [ t ] [ "quux-test.txt" temp-file exists? ] unit-test
 
 [ ] [ "quux-test.txt" temp-file delete-file ] unit-test
@@ -220,8 +220,6 @@ io.encodings.utf8 ;
 
 [ "/usr/lib" ] [ "/usr" "lib" append-path ] unit-test
 [ "/usr/lib" ] [ "/usr/" "lib" append-path ] unit-test
-[ "/lib" ] [ "/usr/" "/lib" append-path ] unit-test
-[ "/lib/" ] [ "/usr/" "/lib/" append-path ] unit-test
 [ "/usr/lib" ] [ "/usr" "./lib" append-path ] unit-test
 [ "/usr/lib/" ] [ "/usr" "./lib/" append-path ] unit-test
 [ "/lib" ] [ "/usr" "../lib" append-path ] unit-test
@@ -238,9 +236,6 @@ io.encodings.utf8 ;
 [ "" "../lib/" append-path ] must-fail
 [ "lib" ] [ "" "lib" append-path ] unit-test
 [ "lib" ] [ "" "./lib" append-path ] unit-test
-
-[ "/lib/bux" ] [ "/usr" "/lib/bux" append-path ] unit-test
-[ "/lib/bux/" ] [ "/usr" "/lib/bux/" append-path ] unit-test
 
 [ "foo/bar/." parent-directory ] must-fail
 [ "foo/bar/./" parent-directory ] must-fail
@@ -263,5 +258,4 @@ io.encodings.utf8 ;
 [ "bar/foo" ] [ "bar/baz" "./../././././././///foo" append-path ] unit-test
 
 [ t ] [ "resource:core" absolute-path? ] unit-test
-[ t ] [ "/foo" absolute-path? ] unit-test
 [ f ] [ "" absolute-path? ] unit-test

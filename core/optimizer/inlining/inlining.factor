@@ -3,10 +3,11 @@
 USING: arrays generic assocs inference inference.class
 inference.dataflow inference.backend inference.state io kernel
 math namespaces sequences vectors words quotations hashtables
-combinators classes classes.algebra generic.math continuations
-optimizer.def-use optimizer.backend generic.standard
-optimizer.specializers optimizer.def-use optimizer.pattern-match
-generic.standard optimizer.control kernel.private ;
+combinators classes classes.algebra generic.math
+optimizer.math.partial continuations optimizer.def-use
+optimizer.backend generic.standard optimizer.specializers
+optimizer.def-use optimizer.pattern-match generic.standard
+optimizer.control kernel.private ;
 IN: optimizer.inlining
 
 : remember-inlining ( node history -- )
@@ -36,7 +37,7 @@ DEFER: (flat-length)
         ! not inline
         { [ dup inline? not ] [ drop 1 ] }
         ! inline
-        { [ t ] [ dup dup set word-def (flat-length) ] }
+        [ dup dup set word-def (flat-length) ]
     } cond ;
 
 : (flat-length) ( seq -- n )
@@ -45,7 +46,7 @@ DEFER: (flat-length)
             { [ dup quotation? ] [ (flat-length) 1+ ] }
             { [ dup array? ] [ (flat-length) ] }
             { [ dup word? ] [ word-flat-length ] }
-            { [ t ] [ drop 1 ] }
+            [ drop 1 ]
         } cond
     ] map sum ;
 
@@ -53,8 +54,6 @@ DEFER: (flat-length)
     [ word-def (flat-length) ] with-scope ;
 
 ! Single dispatch method inlining optimization
-: specific-method ( class word -- class ) order min-class ;
-
 : node-class# ( node n -- class )
     over node-in-d <reversed> ?nth node-class ;
 
@@ -70,18 +69,42 @@ DEFER: (flat-length)
     ] if ;
 
 ! Partial dispatch of math-generic words
-: math-both-known? ( word left right -- ? )
-    math-class-max swap specific-method ;
+: normalize-math-class ( class -- class' )
+    {
+        null
+        fixnum bignum integer
+        ratio rational
+        float real
+        complex number
+        object
+    } [ class< ] with find nip ;
 
-: inline-math-method ( #call word -- node )
-    over node-input-classes first2 3dup math-both-known?
-    [ math-method f splice-quot ] [ 2drop 2drop t ] if ;
+: inlining-math-method ( #call word -- quot/f )
+    swap node-input-classes
+    [ first normalize-math-class ]
+    [ second normalize-math-class ] bi
+    3dup math-both-known? [ math-method* ] [ 3drop f ] if ;
+
+: inline-math-method ( #call word -- node/t )
+    [ drop ] [ inlining-math-method ] 2bi
+    dup [ f splice-quot ] [ 2drop t ] if ;
+
+: inline-math-partial ( #call word -- node/t )
+    [ drop ]
+    [
+        "derived-from" word-prop first
+        inlining-math-method dup
+    ]
+    [ nip 1quotation ] 2tri
+    [ = not ] [ drop ] 2bi and
+    [ f splice-quot ] [ 2drop t ] if ;
 
 : inline-method ( #call -- node )
     dup node-param {
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
-        { [ t ] [ 2drop t ] }
+        { [ dup math-partial? ] [ inline-math-partial ] }
+        [ 2drop t ]
     } cond ;
 
 ! Resolve type checks at compile time where possible
@@ -170,7 +193,7 @@ DEFER: (flat-length)
     nip dup [ second ] when ;
 
 : apply-identities ( node -- node/f )
-    dup find-identity dup [ f splice-quot ] [ 2drop f ] if ;
+    dup find-identity f splice-quot ;
 
 : optimistic-inline? ( #call -- ? )
     dup node-param "specializer" word-prop dup [
@@ -204,5 +227,5 @@ M: #call optimize-node*
         { [ dup optimize-predicate? ] [ optimize-predicate ] }
         { [ dup optimistic-inline? ] [ optimistic-inline ] }
         { [ dup method-body-inline? ] [ optimistic-inline ] }
-        { [ t ] [ inline-method ] }
+        [ inline-method ]
     } cond dup not ;

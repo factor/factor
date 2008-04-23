@@ -1,7 +1,9 @@
 IN: http.server.components.tests
-USING: http.server.components http.server.validators
-namespaces tools.test kernel accessors
-tuple-syntax mirrors http.server.actions ;
+USING: http.server.components http.server.forms
+http.server.validators namespaces tools.test kernel accessors
+tuple-syntax mirrors
+http http.server.actions http.server.templating.fhtml
+io.streams.string io.streams.null ;
 
 validation-failed? off
 
@@ -42,12 +44,12 @@ validation-failed? off
 
 TUPLE: test-tuple text number more-text ;
 
-: <test-tuple> test-tuple construct-empty ;
+: <test-tuple> test-tuple new ;
 
 : <test-form> ( -- form )
     "test" <form>
-        "resource:extra/http/server/components/test/form.fhtml" >>view-template
-        "resource:extra/http/server/components/test/form.fhtml" >>edit-template
+        "resource:extra/http/server/components/test/form.fhtml" <fhtml> >>view-template
+        "resource:extra/http/server/components/test/form.fhtml" <fhtml> >>edit-template
         "text" <string>
             t >>required
             add-field
@@ -61,9 +63,9 @@ TUPLE: test-tuple text number more-text ;
             "hi" >>default
             add-field ;
 
-[ ] [ <test-tuple> <mirror> values set <test-form> view-form ] unit-test
+[ ] [ <test-tuple> <mirror> values set <test-form> view-form write-response-body drop ] unit-test
 
-[ ] [ <test-tuple> <mirror> values set <test-form> edit-form ] unit-test
+[ ] [ <test-tuple> <mirror> values set <test-form> edit-form write-response-body drop ] unit-test
 
 [ TUPLE{ test-tuple number: 123 more-text: "hi" } ] [
     <test-tuple> from-tuple
@@ -99,11 +101,33 @@ TUPLE: test-tuple text number more-text ;
         "123" "n" get validate value>>
     ] unit-test
     
-    [ ] [ "n" get t >>integer drop ] unit-test
+    [ ] [ "i" <integer> "i" set ] unit-test
 
     [ 3 ] [
-        "3" "n" get validate
+        "3" "i" get validate
     ] unit-test
+    
+    [ t ] [
+        "3.9" "i" get validate validation-error?
+    ] unit-test
+
+    H{ } clone values set
+
+    [ ] [ 3 "i" set-value ] unit-test
+
+    [ "3" ] [ [ "i" get render-view ] with-string-writer ] unit-test
+
+    [ ] [ [ "i" get render-edit ] with-null-stream ] unit-test
+
+    [ ] [ "t" <text> "t" set ] unit-test
+
+    [ ] [ "hello world" "t" set-value ] unit-test
+
+    [ ] [ [ "t" get render-edit ] with-null-stream ] unit-test
 ] with-scope
 
 [ t ] [ "wake up sheeple" dup "n" <text> validate = ] unit-test
+
+[ ] [ "password" <password> "p" set ] unit-test
+
+[ ] [ "pub-date" <date> "d" set ] unit-test

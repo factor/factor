@@ -1,6 +1,4 @@
-#ifndef DEBUG
-    CFLAGS += -fomit-frame-pointer
-#endif
+CFLAGS += -fomit-frame-pointer
 
 EXE_SUFFIX =
 DLL_PREFIX = lib

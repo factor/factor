@@ -4,7 +4,7 @@ tools.test ;
 
 TUPLE: model-tester hit? ;
 
-: <model-tester> model-tester construct-empty ;
+: <model-tester> model-tester new ;
 
 M: model-tester model-changed nip t swap set-model-tester-hit? ;
 

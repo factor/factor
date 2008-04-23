@@ -4,7 +4,7 @@ USING: kernel concurrency.messaging inspector ui.tools.listener
 ui.tools.traceback ui.gadgets.buttons ui.gadgets.status-bar
 ui.gadgets.tracks ui.commands ui.gadgets models
 ui.tools.workspace ui.gestures ui.gadgets.labels ui threads
-namespaces tools.walker assocs combinators combinators.cleave ;
+namespaces tools.walker assocs combinators ;
 IN: ui.tools.walker
 
 TUPLE: walker-gadget
@@ -56,7 +56,7 @@ M: walker-gadget focusable-child*
     [ walker-state-string ] curry <filter> <label-control> ;
 
 : <walker-gadget> ( status continuation thread -- gadget )
-    over <traceback-gadget> f walker-gadget construct-boa [
+    over <traceback-gadget> f walker-gadget boa [
         toolbar,
         g walker-gadget-status self <thread-status> f track,
         g walker-gadget-traceback 1 track,
@@ -81,7 +81,7 @@ walker-gadget "toolbar" f {
     {
         { [ dup walker-gadget? not ] [ 2drop f ] }
         { [ dup walker-gadget-closing? ] [ 2drop f ] }
-        { [ t ] [ walker-gadget-thread eq? ] }
+        [ walker-gadget-thread eq? ]
     } cond ;
 
 : find-walker-window ( thread -- world/f )

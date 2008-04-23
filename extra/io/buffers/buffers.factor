@@ -3,12 +3,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.buffers
 USING: alien alien.accessors alien.c-types alien.syntax kernel
-kernel.private libc math sequences byte-arrays strings hints ;
+kernel.private libc math sequences byte-arrays strings hints
+accessors ;
 
 TUPLE: buffer size ptr fill pos ;
 
 : <buffer> ( n -- buffer )
-    dup malloc 0 0 buffer construct-boa ;
+    dup malloc 0 0 buffer boa ;
 
 : buffer-free ( buffer -- )
     dup buffer-ptr free  f swap set-buffer-ptr ;
@@ -37,46 +38,21 @@ TUPLE: buffer size ptr fill pos ;
 : buffer-pop ( buffer -- byte )
     dup buffer-peek 1 rot buffer-consume ;
 
-: (buffer>) ( n buffer -- byte-array )
-    [ dup buffer-fill swap buffer-pos - min ] keep
+: (buffer-read) ( n buffer -- byte-array )
+    [ [ fill>> ] [ pos>> ] bi - min ] keep
     buffer@ swap memory>byte-array ;
 
-: buffer> ( n buffer -- byte-array )
-    [ (buffer>) ] 2keep buffer-consume ;
-
-: (buffer>>) ( buffer -- byte-array )
-    dup buffer-pos over buffer-ptr <displaced-alien>
-    over buffer-fill rot buffer-pos - memory>byte-array ;
-
-: buffer>> ( buffer -- byte-array )
-    dup (buffer>>) 0 rot buffer-reset ;
-
-: search-buffer-until ( start end alien separators -- n )
-    [ >r swap alien-unsigned-1 r> memq? ] 2curry find* drop ;
-
-HINTS: search-buffer-until { fixnum fixnum simple-alien string } ;
-
-: finish-buffer-until ( buffer n -- byte-array separator )
-    [
-        over buffer-pos -
-        over buffer>
-        swap buffer-pop
-    ] [
-        buffer>> f
-    ] if* ;
-
-: buffer-until ( separators buffer -- byte-array separator )
-    tuck { buffer-pos buffer-fill buffer-ptr } get-slots roll
-    search-buffer-until finish-buffer-until ;
+: buffer-read ( n buffer -- byte-array )
+    [ (buffer-read) ] [ buffer-consume ] 2bi ;
 
 : buffer-length ( buffer -- n )
-    dup buffer-fill swap buffer-pos - ;
+    [ fill>> ] [ pos>> ] bi - ;
 
 : buffer-capacity ( buffer -- n )
-    dup buffer-size swap buffer-fill - ;
+    [ size>> ] [ fill>> ] bi - ;
 
 : buffer-empty? ( buffer -- ? )
-    buffer-fill zero? ;
+    fill>> zero? ;
 
 : extend-buffer ( n buffer -- )
     2dup buffer-ptr swap realloc
@@ -93,7 +69,7 @@ HINTS: search-buffer-until { fixnum fixnum simple-alien string } ;
 : byte>buffer ( byte buffer -- )
     1 over check-overflow
     [ buffer-end 0 set-alien-unsigned-1 ] keep
-    [ buffer-fill 1+ ] keep set-buffer-fill ;
+    [ 1+ ] change-fill drop ;
 
 : n>buffer ( n buffer -- )
     [ buffer-fill + ] keep 

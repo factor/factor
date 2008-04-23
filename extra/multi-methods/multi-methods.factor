@@ -3,13 +3,74 @@
 USING: kernel math sequences vectors classes classes.algebra
 combinators arrays words assocs parser namespaces definitions
 prettyprint prettyprint.backend quotations arrays.lib
-debugger io compiler.units kernel.private effects ;
+debugger io compiler.units kernel.private effects accessors
+hashtables sorting shuffle ;
 IN: multi-methods
 
-GENERIC: generic-prologue ( combination -- quot )
+! PART I: Converting hook specializers
+: canonicalize-specializer-0 ( specializer -- specializer' )
+    [ \ f or ] map ;
 
-GENERIC: method-prologue ( combination -- quot )
+SYMBOL: args
 
+SYMBOL: hooks
+
+SYMBOL: total
+
+: canonicalize-specializer-1 ( specializer -- specializer' )
+    [
+        [ class? ] subset
+        [ length <reversed> [ 1+ neg ] map ] keep zip
+        [ length args [ max ] change ] keep
+    ]
+    [
+        [ pair? ] subset
+        [ keys [ hooks get push-new ] each ] keep
+    ] bi append ;
+
+: canonicalize-specializer-2 ( specializer -- specializer' )
+    [
+        >r
+        {
+            { [ dup integer? ] [ ] }
+            { [ dup word? ] [ hooks get index ] }
+        } cond args get + r>
+    ] assoc-map ;
+
+: canonicalize-specializer-3 ( specializer -- specializer' )
+    >r total get object <array> dup <enum> r> update ;
+
+: canonicalize-specializers ( methods -- methods' hooks )
+    [
+        [ >r canonicalize-specializer-0 r> ] assoc-map
+
+        0 args set
+        V{ } clone hooks set
+
+        [ >r canonicalize-specializer-1 r> ] assoc-map
+
+        hooks [ natural-sort ] change
+
+        [ >r canonicalize-specializer-2 r> ] assoc-map
+
+        args get hooks get length + total set
+
+        [ >r canonicalize-specializer-3 r> ] assoc-map
+
+        hooks get
+    ] with-scope ;
+
+: drop-n-quot ( n -- quot ) \ drop <repetition> >quotation ;
+
+: prepare-method ( method n -- quot )
+    [ 1quotation ] [ drop-n-quot ] bi* prepend ;
+
+: prepare-methods ( methods -- methods' prologue )
+    canonicalize-specializers
+    [ length [ prepare-method ] curry assoc-map ] keep
+    [ [ get ] curry ] map concat [ ] like ;
+
+! Part II: Topologically sorting specializers
 : maximal-element ( seq quot -- n elt )
     dupd [
         swapd [ call 0 < ] 2curry subset empty?
@@ -28,10 +89,14 @@ GENERIC: method-prologue ( combination -- quot )
             { [ 2dup [ class< ] 2keep swap class< and ] [ 0 ] }
             { [ 2dup class< ] [ -1 ] }
             { [ 2dup swap class< ] [ 1 ] }
-            { [ t ] [ 0 ] }
+            [ 0 ]
         } cond 2nip
     ] 2map [ zero? not ] find nip 0 or ;
 
+: sort-methods ( alist -- alist' )
+    [ [ first ] bi@ classes< ] topological-sort ;
+
+! PART III: Creating dispatch quotation
 : picker ( n -- quot )
     {
         { 0 [ [ dup ] ] }
@@ -52,206 +117,164 @@ GENERIC: method-prologue ( combination -- quot )
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
     ] if ;
 
+: argument-count ( methods -- n )
+    keys 0 [ length max ] reduce ;
+
+ERROR: no-method arguments generic ;
+
+: make-default-method ( methods generic -- quot )
+    >r argument-count r> [ >r narray r> no-method ] 2curry ;
+
+: multi-dispatch-quot ( methods generic -- quot )
+    [ make-default-method ]
+    [ drop [ >r multi-predicate r> ] assoc-map reverse ]
+    2bi alist>quot ;
+
+! Generic words
+PREDICATE: generic < word
+    "multi-methods" word-prop >boolean ;
+
 : methods ( word -- alist )
     "multi-methods" word-prop >alist ;
 
-: make-method-def ( quot classes generic -- quot )
+: make-generic ( generic -- quot )
     [
-        swap [ declare ] curry %
-        "multi-combination" word-prop method-prologue %
-        %
+        [ methods prepare-methods % sort-methods ] keep
+        multi-dispatch-quot %
     ] [ ] make ;
 
-TUPLE: method word def classes generic loc ;
+: update-generic ( word -- )
+    dup make-generic define ;
 
+! Methods
 PREDICATE: method-body < word
-    "multi-method" word-prop >boolean ;
+    "multi-method-generic" word-prop >boolean ;
 
 M: method-body stack-effect
-    "multi-method" word-prop method-generic stack-effect ;
+    "multi-method-generic" word-prop stack-effect ;
 
-: method-word-name ( classes generic -- string )
+M: method-body crossref?
+    drop t ;
+
+: method-word-name ( specializer generic -- string )
+    [ word-name % "-" % unparse % ] "" make ;
+
+: method-word-props ( specializer generic -- assoc )
     [
-        word-name %
-        "-(" % [ "," % ] [ word-name % ] interleave ")" %
-    ] "" make ;
+        "multi-method-generic" set
+        "multi-method-specializer" set
+    ] H{ } make-assoc ;
 
-: <method-word> ( quot classes generic -- word )
-    #! We xref here because the "multi-method" word-prop isn't
-    #! set yet so crossref? yields f.
-    [ make-method-def ] 2keep
+: <method> ( specializer generic -- word )
+    [ method-word-props ] 2keep
     method-word-name f <word>
-    dup rot define
-    dup xref ;
+    [ set-word-props ] keep ;
 
-: <method> ( quot classes generic -- method )
-    [ <method-word> ] 3keep f \ method construct-boa
-    dup method-word over "multi-method" set-word-prop ;
+: with-methods ( word quot -- )
+    over >r >r "multi-methods" word-prop
+    r> call r> update-generic ; inline
 
-TUPLE: no-method arguments generic ;
+: reveal-method ( method classes generic -- )
+    [ set-at ] with-methods ;
 
-: no-method ( argument-count generic -- * )
-    >r narray r> \ no-method construct-boa throw ; inline
+: method ( classes word -- method )
+    "multi-methods" word-prop at ;
 
-: argument-count ( methods -- n )
-    dup assoc-empty? [ drop 0 ] [
-        keys [ length ] map supremum
+: create-method ( classes generic -- method )
+    2dup method dup [
+        2nip
+    ] [
+        drop [ <method> dup ] 2keep reveal-method
     ] if ;
-
-: multi-dispatch-quot ( methods generic -- quot )
-    >r [
-        [
-            >r multi-predicate r> method-word 1quotation
-        ] assoc-map
-    ] keep argument-count
-    r> [ no-method ] 2curry
-    swap reverse alist>quot ;
-
-: congruify-methods ( alist -- alist' )
-    dup argument-count [
-        swap >r object pad-left [ \ f or ] map r>
-    ] curry assoc-map ;
-
-: sorted-methods ( alist -- alist' )
-    [ [ first ] 2apply classes< ] topological-sort ;
 
 : niceify-method [ dup \ f eq? [ drop f ] when ] map ;
 
 M: no-method error.
     "Type check error" print
     nl
-    "Generic word " write dup no-method-generic pprint
+    "Generic word " write dup generic>> pprint
     " does not have a method applicable to inputs:" print
-    dup no-method-arguments short.
+    dup arguments>> short.
     nl
     "Inputs have signature:" print
-    dup no-method-arguments [ class ] map niceify-method .
+    dup arguments>> [ class ] map niceify-method .
     nl
-    "Defined methods in topological order: " print
-    no-method-generic
-    methods congruify-methods sorted-methods keys
-    [ niceify-method ] map stack. ;
+    "Available methods: " print
+    generic>> methods canonicalize-specializers drop sort-methods
+    keys [ niceify-method ] map stack. ;
 
-TUPLE: standard-combination ;
-
-M: standard-combination method-prologue drop [ ] ;
-
-M: standard-combination generic-prologue drop [ ] ;
-
-: make-generic ( generic -- quot )
-    dup "multi-combination" word-prop generic-prologue swap
-    [ methods congruify-methods sorted-methods ] keep
-    multi-dispatch-quot append ;
-
-TUPLE: hook-combination var ;
-
-M: hook-combination method-prologue
-    drop [ drop ] ;
-
-M: hook-combination generic-prologue
-    hook-combination-var [ get ] curry ;
-
-: update-generic ( word -- )
-    dup make-generic define ;
-
-: define-generic ( word combination -- )
-    over "multi-combination" word-prop over = [
-        2drop
-    ] [
-        dupd "multi-combination" set-word-prop
-        dup H{ } clone "multi-methods" set-word-prop
-        update-generic
-    ] if ;
-
-: define-standard-generic ( word -- )
-    T{ standard-combination } define-generic ;
-
-: GENERIC:
-    CREATE define-standard-generic ; parsing
-
-: define-hook-generic ( word var -- )
-    hook-combination construct-boa define-generic ;
-
-: HOOK:
-    CREATE scan-word define-hook-generic ; parsing
-
-: method ( classes word -- method )
-    "multi-methods" word-prop at ;
-
-: with-methods ( word quot -- )
-    over >r >r "multi-methods" word-prop
-    r> call r> update-generic ; inline
-
-: define-method ( quot classes generic -- )
-    >r [ bootstrap-word ] map r>
-    [ <method> ] 2keep
-    [ set-at ] with-methods ;
-
-: forget-method ( classes generic -- )
+: forget-method ( specializer generic -- )
     [ delete-at ] with-methods ;
 
 : method>spec ( method -- spec )
-    dup method-classes swap method-generic add* ;
+    [ "multi-method-specializer" word-prop ]
+    [ "multi-method-generic" word-prop ] bi prefix ;
+
+: define-generic ( word -- )
+    dup "multi-methods" word-prop [
+        drop
+    ] [
+        [ H{ } clone "multi-methods" set-word-prop ]
+        [ update-generic ]
+        bi
+    ] if ;
+
+! Syntax
+: GENERIC:
+    CREATE define-generic ; parsing
 
 : parse-method ( -- quot classes generic )
-    parse-definition dup 2 tail over second rot first ;
+    parse-definition [ 2 tail ] [ second ] [ first ] tri ;
 
-: METHOD:
-    location
-    >r parse-method [ define-method ] 2keep add* r>
-    remember-definition ; parsing
+: create-method-in ( specializer generic -- method )
+    create-method dup save-location f set-word ;
+
+: CREATE-METHOD
+    scan-word scan-object swap create-method-in ;
+
+: (METHOD:) CREATE-METHOD parse-definition ;
+
+: METHOD: (METHOD:) define ; parsing
 
 ! For compatibility
 : M:
-    scan-word 1array scan-word parse-definition
-    -rot define-method ; parsing
+    scan-word 1array scan-word create-method-in
+    parse-definition
+    define ; parsing
 
 ! Definition protocol. We qualify core generics here
 USE: qualified
 QUALIFIED: syntax
 
-PREDICATE: generic < word
-    "multi-combination" word-prop >boolean ;
+syntax:M: generic definer drop \ GENERIC: f ;
 
-PREDICATE: standard-generic < word
-    "multi-combination" word-prop standard-combination? ;
-
-PREDICATE: hook-generic < word
-    "multi-combination" word-prop hook-combination? ;
-
-syntax:M: standard-generic definer drop \ GENERIC: f ;
-
-syntax:M: standard-generic definition drop f ;
-
-syntax:M: hook-generic definer drop \ HOOK: f ;
-
-syntax:M: hook-generic definition drop f ;
-
-syntax:M: hook-generic synopsis*
-    dup definer.
-    dup seeing-word
-    dup pprint-word
-    dup "multi-combination" word-prop
-    hook-combination-var pprint-word stack-effect. ;
+syntax:M: generic definition drop f ;
 
 PREDICATE: method-spec < array
     unclip generic? >r [ class? ] all? r> and ;
 
 syntax:M: method-spec where
-    dup unclip method [ method-loc ] [ second where ] ?if ;
+    dup unclip method [ ] [ first ] ?if where ;
 
 syntax:M: method-spec set-where
-    unclip method set-method-loc ;
+    unclip method set-where ;
 
 syntax:M: method-spec definer
-    drop \ METHOD: \ ; ;
+    unclip method definer ;
 
 syntax:M: method-spec definition
-    unclip method dup [ method-def ] when ;
+    unclip method definition ;
 
 syntax:M: method-spec synopsis*
-    dup definer.
-    unclip pprint* pprint* ;
+    unclip method synopsis* ;
 
 syntax:M: method-spec forget*
-    unclip forget-method ;
+    unclip method forget* ;
+
+syntax:M: method-body definer
+    drop \ METHOD: \ ; ;
+
+syntax:M: method-body synopsis*
+    dup definer.
+    [ "multi-method-generic" word-prop pprint-word ]
+    [ "multi-method-specializer" word-prop pprint* ] bi ;

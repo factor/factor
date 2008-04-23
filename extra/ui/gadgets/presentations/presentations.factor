@@ -25,7 +25,7 @@ TUPLE: presentation object hook ;
     dup presentation-object over show-summary button-update ;
 
 : <presentation> ( label object -- button )
-    presentation construct-empty
+    presentation new
     [ drop ] over set-presentation-hook
     [ set-presentation-object ] keep
     swap [ invoke-primary ] <roll-button>

@@ -1,12 +1,12 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays bit-vectors byte-arrays
-byte-vectors definitions generic hashtables kernel math
+USING: alien arrays bit-arrays byte-arrays
+definitions generic hashtables kernel math
 namespaces parser sequences strings sbufs vectors words
-quotations io assocs splitting tuples generic.standard
-generic.math classes io.files vocabs float-arrays float-vectors
-classes.union classes.mixin classes.predicate compiler.units
-combinators debugger ;
+quotations io assocs splitting classes.tuple generic.standard
+generic.math classes io.files vocabs float-arrays
+classes.union classes.mixin classes.predicate classes.singleton
+compiler.units combinators debugger ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -55,13 +55,13 @@ IN: bootstrap.syntax
     "BIN:" [ 2 parse-base ] define-syntax
 
     "f" [ f parsed ] define-syntax
-    "t" "syntax" lookup define-symbol
+    "t" "syntax" lookup define-singleton-class
 
     "CHAR:" [
         scan {
             { [ dup length 1 = ] [ first ] }
             { [ "\\" ?head ] [ next-escape drop ] }
-            { [ t ] [ name>char-hook get call ] }
+            [ name>char-hook get call ]
         } cond parsed
     ] define-syntax
 
@@ -79,11 +79,8 @@ IN: bootstrap.syntax
     "{" [ \ } [ >array ] parse-literal ] define-syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-syntax
-    "BV{" [ \ } [ >byte-vector ] parse-literal ] define-syntax
     "?{" [ \ } [ >bit-array ] parse-literal ] define-syntax
-    "?V{" [ \ } [ >bit-vector ] parse-literal ] define-syntax
     "F{" [ \ } [ >float-array ] parse-literal ] define-syntax
-    "FV{" [ \ } [ >float-vector ] parse-literal ] define-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
     "T{" [ \ } [ >tuple ] parse-literal ] define-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
@@ -154,6 +151,11 @@ IN: bootstrap.syntax
         parse-definition define-predicate-class
     ] define-syntax
 
+    "SINGLETON:" [
+        scan create-class-in
+        dup save-location define-singleton-class
+    ] define-syntax
+
     "TUPLE:" [
         parse-tuple-definition define-tuple-class
     ] define-syntax
@@ -161,7 +163,7 @@ IN: bootstrap.syntax
     "C:" [
         CREATE-WORD
         scan-word dup check-tuple
-        [ construct-boa ] curry define-inline
+        [ boa ] curry define-inline
     ] define-syntax
 
     "ERROR:" [
@@ -171,9 +173,7 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "FORGET:" [
-        scan-word
-        dup parsing? [ V{ } clone swap execute first ] when
-        forget
+        scan-object forget
     ] define-syntax
 
     "(" [
@@ -186,5 +186,11 @@ IN: bootstrap.syntax
     "<<" [
         [ \ >> parse-until >quotation ] with-compilation-unit
         call
+    ] define-syntax
+
+    "call-next-method" [
+        current-class get literalize parsed
+        current-generic get literalize parsed
+        \ (call-next-method) parsed
     ] define-syntax
 ] with-compilation-unit

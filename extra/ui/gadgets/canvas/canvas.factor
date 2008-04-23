@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ui.backend ui.gadgets ui.gadgets.theme ui.gadgets.lib
 ui.gadgets.worlds ui.render opengl opengl.gl kernel namespaces
-tuples colors ;
+classes.tuple colors ;
 IN: ui.gadgets.canvas
 
 TUPLE: canvas dlist ;

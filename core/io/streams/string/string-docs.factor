@@ -13,7 +13,7 @@ ABOUT: "io.streams.string"
 
 HELP: <string-writer>
 { $values { "stream" "an output stream" } }
-{ $description "Creates an output stream that collects text into a delegate string buffer. The contents of the buffer can be recovered by executing " { $link >string } ", and indeed all other sequence operations are permitted by virtue of the delegation." } ;
+{ $description "Creates an output stream that collects text into a string buffer. The contents of the buffer can be obtained by executing " { $link >string } "." } ;
 
 HELP: with-string-writer
 { $values { "quot" quotation } { "str" string } }

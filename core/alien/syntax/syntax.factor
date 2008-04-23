@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien alien.c-types alien.structs alien.arrays
-kernel math namespaces parser sequences words quotations
-math.parser splitting effects prettyprint prettyprint.sections
-prettyprint.backend assocs combinators ;
+alien.strings kernel math namespaces parser sequences words
+quotations math.parser splitting effects prettyprint
+prettyprint.sections prettyprint.backend assocs combinators ;
 IN: alien.syntax
 
 <PRIVATE
@@ -68,7 +68,7 @@ M: alien pprint*
     {
         { [ dup expired? ] [ drop "( alien expired )" text ] }
         { [ dup pinned-c-ptr? not ] [ drop "( displaced alien )" text ] }
-        { [ t ] [ \ ALIEN: [ alien-address pprint* ] pprint-prefix ] }
+        [ \ ALIEN: [ alien-address pprint* ] pprint-prefix ]
     } cond ;
 
 M: dll pprint* dll-path dup "DLL\" " "\"" pprint-string ;

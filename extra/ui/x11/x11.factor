@@ -1,14 +1,16 @@
 ! Copyright (C) 2005, 2007 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays ui ui.gadgets ui.gestures
-ui.backend ui.clipboards ui.gadgets.worlds assocs kernel math
-namespaces opengl sequences strings x11.xlib x11.events x11.xim
-x11.glx x11.clipboard x11.constants x11.windows io.encodings.string
-io.encodings.utf8 combinators debugger system command-line
-ui.render math.vectors tuples opengl.gl threads ;
+ui.backend ui.clipboards ui.gadgets.worlds ui.render assocs
+kernel math namespaces opengl sequences strings x11.xlib
+x11.events x11.xim x11.glx x11.clipboard x11.constants
+x11.windows io.encodings.string io.encodings.ascii
+io.encodings.utf8 combinators debugger command-line qualified
+math.vectors classes.tuple opengl.gl threads ;
+QUALIFIED: system
 IN: ui.x11
 
-TUPLE: x11-ui-backend ;
+SINGLETON: x11-ui-backend
 
 : XA_NET_WM_NAME "_NET_WM_NAME" x-atom ;
 
@@ -132,12 +134,12 @@ M: world selection-notify-event
     {
         { [ dup XA_PRIMARY = ] [ drop selection get ] }
         { [ dup XA_CLIPBOARD = ] [ drop clipboard get ] }
-        { [ t ] [ drop <clipboard> ] }
+        [ drop <clipboard> ]
     } cond ;
 
 : encode-clipboard ( string type -- bytes )
-    XSelectionRequestEvent-target XA_UTF8_STRING =
-    [ utf8 encode ] [ string>char-alien ] if ;
+    XSelectionRequestEvent-target
+    XA_UTF8_STRING = utf8 ascii ? encode ;
 
 : set-selection-prop ( evt -- )
     dpy get swap
@@ -155,7 +157,7 @@ M: world selection-request-event
         { [ dup supported-type? ] [ drop dup set-selection-prop send-notify-success ] }
         { [ dup "TARGETS" x-atom = ] [ drop dup set-targets-prop send-notify-success ] }
         { [ dup "TIMESTAMP" x-atom = ] [ drop dup set-timestamp-prop send-notify-success ] }
-        { [ t ] [ drop send-notify-failure ] }
+        [ drop send-notify-failure ]
     } cond ;
 
 M: x11-ui-backend (close-window) ( handle -- )
@@ -259,7 +261,7 @@ M: x11-ui-backend ui ( -- )
         ] with-x
     ] ui-running ;
 
-T{ x11-ui-backend } ui-backend set-global
+x11-ui-backend ui-backend set-global
 
-[ "DISPLAY" os-env "ui" "listener" ? ]
+[ "DISPLAY" system:os-env "ui" "listener" ? ]
 main-vocab-hook set-global

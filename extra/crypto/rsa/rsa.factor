@@ -1,5 +1,5 @@
 USING: math.miller-rabin kernel math math.functions namespaces
-sequences ;
+sequences accessors ;
 IN: crypto.rsa
 
 ! The private key is the only secret.
@@ -24,7 +24,7 @@ C: <rsa> rsa
 : modulus-phi ( numbits -- n phi ) 
     #! Loop until phi is not divisible by the public key.
     dup rsa-primes [ * ] 2keep
-    [ 1- ] 2apply *
+    [ 1- ] bi@ *
     dup public-key gcd nip 1 = [
         rot drop
     ] [
@@ -39,7 +39,7 @@ PRIVATE>
     public-key <rsa> ;
 
 : rsa-encrypt ( message rsa -- encrypted )
-    [ rsa-public-key ] keep rsa-modulus ^mod ;
+    [ public-key>> ] [ modulus>> ] bi ^mod ;
 
 : rsa-decrypt ( encrypted rsa -- message )
-    [ rsa-private-key ] keep rsa-modulus ^mod ;
+    [ private-key>> ] [ modulus>> ] bi ^mod ;

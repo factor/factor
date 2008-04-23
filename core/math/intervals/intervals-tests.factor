@@ -169,7 +169,7 @@ IN: math.intervals.tests
 
 : random-interval ( -- interval )
     1000 random dup 2 1000 random + +
-    1 random zero? [ [ neg ] 2apply swap ] when
+    1 random zero? [ [ neg ] bi@ swap ] when
     4 random {
         { 0 [ [a,b] ] }
         { 1 [ [a,b) ] }
@@ -188,7 +188,7 @@ IN: math.intervals.tests
         { max interval-max }
     }
     "math.ratios.private" vocab [
-        { / interval/ } add
+        { / interval/ } suffix
     ] when
     random ;
 
@@ -197,7 +197,7 @@ IN: math.intervals.tests
     0 pick interval-contains? over first { / /i } member? and [
         3drop t
     ] [
-        [ >r [ random-element ] 2apply ! 2dup . .
+        [ >r [ random-element ] bi@ ! 2dup . .
         r> first execute ] 3keep
         second execute interval-contains?
     ] if ;
@@ -214,7 +214,7 @@ IN: math.intervals.tests
 
 : comparison-test
     random-interval random-interval random-comparison
-    [ >r [ random-element ] 2apply r> first execute ] 3keep
+    [ >r [ random-element ] bi@ r> first execute ] 3keep
     second execute dup incomparable eq? [
         2drop t
     ] [

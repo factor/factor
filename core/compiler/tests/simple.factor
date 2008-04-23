@@ -1,6 +1,6 @@
 USING: compiler.units tools.test kernel kernel.private
 sequences.private math.private math combinators strings
-alien arrays memory ;
+alien arrays memory vocabs parser ;
 IN: compiler.tests
 
 ! Test empty word
@@ -48,7 +48,7 @@ IN: compiler.tests
 [ 4 1 3 ] [ 0 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
 [ 3 1 3 ] [ 1 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
 
-[ 2 3 ] [ 1 [ { [ code-gc 1 ] [ code-gc 2 ] } dispatch 3 ] compile-call ] unit-test
+[ 2 3 ] [ 1 [ { [ gc 1 ] [ gc 2 ] } dispatch 3 ] compile-call ] unit-test
 
 ! Labels
 
@@ -187,7 +187,7 @@ DEFER: countdown-b
             { [ dup string? ] [ drop "string" ] }
             { [ dup float? ] [ drop "float" ] }
             { [ dup alien? ] [ drop "alien" ] }
-            { [ t ] [ drop "neither" ] }
+            [ drop "neither" ]
         } cond
     ] compile-call
 ] unit-test
@@ -196,7 +196,7 @@ DEFER: countdown-b
     [
         3 {
             { [ dup fixnum? ] [ ] }
-            { [ t ] [ drop t ] }
+            [ drop t ]
         } cond
     ] compile-call
 ] unit-test
@@ -230,3 +230,11 @@ M: f single-combination-test-2 single-combination-test-4 ;
 
 ! Regression
 [ 100 ] [ [ 100 [ [ ] times ] keep ] compile-call ] unit-test
+
+! Regression
+10 [
+    [ "compiler.tests.foo" forget-vocab ] with-compilation-unit
+    [ t ] [
+        "USING: prettyprint words ; IN: compiler.tests.foo : (recursive) (  -- ) (recursive) (recursive) ; inline : recursive ( -- ) (recursive) ; \\ (recursive) compiled?" eval
+    ] unit-test
+] times

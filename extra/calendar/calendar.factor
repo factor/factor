@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: arrays kernel math math.functions namespaces sequences
-strings tuples system vocabs.loader calendar.backend threads
-accessors combinators locals ;
+strings system vocabs.loader calendar.backend threads
+accessors combinators locals classes.tuple ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
@@ -84,10 +84,10 @@ PRIVATE>
     ] ;
 
 : >date< ( timestamp -- year month day )
-    { year>> month>> day>> } get-slots ;
+    [ year>> ] [ month>> ] [ day>> ] tri ;
 
 : >time< ( timestamp -- hour minute second )
-    { hour>> minute>> second>> } get-slots ;
+    [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
 : instant ( -- dt ) 0 0 0 0 0 0 <duration> ;
 : years ( n -- dt ) instant swap >>year ;
@@ -185,7 +185,7 @@ M: number +second ( timestamp n -- timestamp )
     [ month>>  +month  ] keep
     [ year>>   +year   ] keep ; inline
 
-: +slots [ 2apply + ] curry 2keep ; inline
+: +slots [ bi@ + ] curry 2keep ; inline
 
 PRIVATE>
 
@@ -211,12 +211,14 @@ M: duration time+
     #! Uses average month/year length since dt loses calendar
     #! data
     0 swap
-    [ year>> + ] keep
-    [ month>> months-per-year / + ] keep
-    [ day>> days-per-year / + ] keep
-    [ hour>> hours-per-year / + ] keep
-    [ minute>> minutes-per-year / + ] keep
-    second>> seconds-per-year / + ;
+    {
+        [ year>> + ]
+        [ month>> months-per-year / + ]
+        [ day>> days-per-year / + ]
+        [ hour>> hours-per-year / + ]
+        [ minute>> minutes-per-year / + ]
+        [ second>> seconds-per-year / + ]
+    } cleave ;
 
 M: duration <=> [ dt>years ] compare ;
 
@@ -244,22 +246,29 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
 
 : (time-) ( timestamp timestamp -- n )
-    [ >gmt ] 2apply
-    [ [ >date< julian-day-number ] 2apply - 86400 * ] 2keep
-    [ >time< >r >r 3600 * r> 60 * r> + + ] 2apply - + ;
+    [ >gmt ] bi@
+    [ [ >date< julian-day-number ] bi@ - 86400 * ] 2keep
+    [ >time< >r >r 3600 * r> 60 * r> + + ] bi@ - + ;
 
 M: timestamp time-
     #! Exact calendar-time difference
     (time-) seconds ;
 
+: time* ( obj1 obj2 -- obj3 )
+    dup real? [ swap ] when
+    dup real? [ * ] [
+        {
+            [   year>> * ]
+            [  month>> * ]
+            [    day>> * ]
+            [   hour>> * ]
+            [ minute>> * ]
+            [ second>> * ]
+        } 2cleave <duration>
+    ] if ;
+
 : before ( dt -- -dt )
-    [ year>>   neg ] keep
-    [ month>>  neg ] keep
-    [ day>>    neg ] keep
-    [ hour>>   neg ] keep
-    [ minute>> neg ] keep
-      second>> neg
-    <duration> ;
+    -1 time* ;
 
 M: duration time-
     before time+ ;
@@ -377,6 +386,6 @@ M: timestamp sleep-until timestamp>millis sleep-until ;
 M: duration sleep from-now sleep-until ;
 
 {
-    { [ unix? ] [ "calendar.unix" ] }
-    { [ windows? ] [ "calendar.windows" ] }
+    { [ os unix? ] [ "calendar.unix" ] }
+    { [ os windows? ] [ "calendar.windows" ] }
 } cond require

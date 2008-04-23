@@ -1,4 +1,4 @@
-USING: kernel parser quotations tuples words
+USING: kernel parser quotations classes.tuple words
 namespaces.lib namespaces sequences arrays combinators
 prettyprint strings math.parser sequences.lib math symbols ;
 USE: tools.walker
@@ -27,27 +27,27 @@ DEFER: sql%
 : sql-array% ( array -- )
     unclip
     {
-        { columns [ "," (sql-interleave) ] }
-        { from [ "from" "," sql-interleave ] }
-        { where [ "where" "and" sql-interleave ] }
-        { group-by [ "group by" "," sql-interleave ] }
-        { having [ "having" "," sql-interleave ] }
-        { order-by [ "order by" "," sql-interleave ] }
-        { offset [ "offset" sql% sql% ] }
-        { limit [ "limit" sql% sql% ] }
-        { select [ "(select" sql% sql% ")" sql% ] }
-        { table [ sql% ] }
-        { set [ "set" "," sql-interleave ] }
-        { values [ "values(" sql% "," (sql-interleave) ")" sql% ] }
-        { count [ "count" sql-function, ] }
-        { sum [ "sum" sql-function, ] }
-        { avg [ "avg" sql-function, ] }
-        { min [ "min" sql-function, ] }
-        { max [ "max" sql-function, ] }
+        { \ columns [ "," (sql-interleave) ] }
+        { \ from [ "from" "," sql-interleave ] }
+        { \ where [ "where" "and" sql-interleave ] }
+        { \ group-by [ "group by" "," sql-interleave ] }
+        { \ having [ "having" "," sql-interleave ] }
+        { \ order-by [ "order by" "," sql-interleave ] }
+        { \ offset [ "offset" sql% sql% ] }
+        { \ limit [ "limit" sql% sql% ] }
+        { \ select [ "(select" sql% sql% ")" sql% ] }
+        { \ table [ sql% ] }
+        { \ set [ "set" "," sql-interleave ] }
+        { \ values [ "values(" sql% "," (sql-interleave) ")" sql% ] }
+        { \ count [ "count" sql-function, ] }
+        { \ sum [ "sum" sql-function, ] }
+        { \ avg [ "avg" sql-function, ] }
+        { \ min [ "min" sql-function, ] }
+        { \ max [ "max" sql-function, ] }
         [ sql% [ sql% ] each ]
     } case ;
 
-TUPLE: no-sql-match ;
+ERROR: no-sql-match ;
 : sql% ( obj -- )
     {
         { [ dup string? ] [ " " 0% 0% ] }
@@ -55,15 +55,18 @@ TUPLE: no-sql-match ;
         { [ dup number? ] [ number>string sql% ] }
         { [ dup symbol? ] [ unparse sql% ] }
         { [ dup word? ] [ unparse sql% ] }
-        { [ t ] [ T{ no-sql-match } throw ] }
+        { [ dup quotation? ] [ call ] }
+        [ no-sql-match ]
     } cond ;
 
 : parse-sql ( obj -- sql in-spec out-spec in out )
     [
         unclip {
-            { insert [ "insert into" sql% ] }
-            { update [ "update" sql% ] }
-            { delete [ "delete" sql% ] }
-            { select [ "select" sql% ] }
+            { \ create [ "create table" sql% ] }
+            { \ drop [ "drop table" sql% ] }
+            { \ insert [ "insert into" sql% ] }
+            { \ update [ "update" sql% ] }
+            { \ delete [ "delete" sql% ] }
+            { \ select [ "select" sql% ] }
         } case [ sql% ] each
     ] { "" { } { } { } { } } nmake ;

@@ -1,5 +1,6 @@
-USING: continuations kernel math namespaces strings sbufs
-tools.test sequences vectors arrays ;
+USING: continuations kernel math namespaces strings
+strings.private sbufs tools.test sequences vectors arrays memory
+prettyprint io.streams.null ;
 IN: strings.tests
 
 [ CHAR: b ] [ 1 >bignum "abc" nth ] unit-test
@@ -89,4 +90,29 @@ unit-test
 [ "\udeadbe" ] [
     "\udeadbe" clone
     CHAR: \u123456 over clone set-first
+] unit-test
+
+! Regressions
+[ ] [
+    [
+        4 [
+            100 [ drop "obdurak" clone ] map
+            gc
+            dup [
+                1234 0 rot set-string-nth
+            ] each
+            1000 [
+                1000 f <array> drop
+            ] times
+            .
+        ] times
+    ] with-null-stream
+] unit-test
+
+[ t ] [
+    10000 [
+        drop
+        300 100 CHAR: \u123456
+        [ <string> clone resize-string first ] keep =
+    ] all?
 ] unit-test

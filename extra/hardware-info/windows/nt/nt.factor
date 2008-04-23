@@ -1,15 +1,12 @@
-USING: alien alien.c-types
+USING: alien alien.c-types alien.strings
 kernel libc math namespaces hardware-info.backend
-windows windows.advapi32 windows.kernel32 ;
+windows windows.advapi32 windows.kernel32 system ;
 IN: hardware-info.windows.nt
-
-TUPLE: winnt-os ;
-T{ winnt-os } os set-global
 
 : system-info ( -- SYSTEM_INFO )
     "SYSTEM_INFO" <c-object> [ GetSystemInfo ] keep ;
 
-M: winnt-os cpus ( -- n )
+M: winnt cpus ( -- n )
     system-info SYSTEM_INFO-dwNumberOfProcessors ;
 
 : memory-status ( -- MEMORYSTATUSEX )
@@ -17,33 +14,35 @@ M: winnt-os cpus ( -- n )
     "MEMORYSTATUSEX" heap-size over set-MEMORYSTATUSEX-dwLength
     [ GlobalMemoryStatusEx ] keep swap zero? [ win32-error ] when ;
 
-M: winnt-os memory-load ( -- n )
+M: winnt memory-load ( -- n )
     memory-status MEMORYSTATUSEX-dwMemoryLoad ;
 
-M: winnt-os physical-mem ( -- n )
+M: winnt physical-mem ( -- n )
     memory-status MEMORYSTATUSEX-ullTotalPhys ;
 
-M: winnt-os available-mem ( -- n )
+M: winnt available-mem ( -- n )
     memory-status MEMORYSTATUSEX-ullAvailPhys ;
 
-M: winnt-os total-page-file ( -- n )
+M: winnt total-page-file ( -- n )
     memory-status MEMORYSTATUSEX-ullTotalPageFile ;
 
-M: winnt-os available-page-file ( -- n )
+M: winnt available-page-file ( -- n )
     memory-status MEMORYSTATUSEX-ullAvailPageFile ;
 
-M: winnt-os total-virtual-mem ( -- n )
+M: winnt total-virtual-mem ( -- n )
     memory-status MEMORYSTATUSEX-ullTotalVirtual ;
 
-M: winnt-os available-virtual-mem ( -- n )
+M: winnt available-virtual-mem ( -- n )
     memory-status MEMORYSTATUSEX-ullAvailVirtual ;
+
+: pull-win32-string [ utf16n alien>string ] keep free ;
 
 : computer-name ( -- string )
     MAX_COMPUTERNAME_LENGTH 1+ [ malloc ] keep
     <int> dupd GetComputerName zero? [
         free win32-error f
     ] [
-        [ alien>u16-string ] keep free
+        pull-win32-string
     ] if ;
  
 : username ( -- string )
@@ -51,5 +50,5 @@ M: winnt-os available-virtual-mem ( -- n )
     <int> dupd GetUserName zero? [
         free win32-error f
     ] [
-        [ alien>u16-string ] keep free
+        pull-win32-string
     ] if ;

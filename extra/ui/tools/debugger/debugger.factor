@@ -21,7 +21,7 @@ TUPLE: debugger restarts ;
     ] make-filled-pile ;
 
 : <debugger> ( error restarts restart-hook -- gadget )
-    debugger construct-empty
+    debugger new
     [
         toolbar,
         <restart-list> g-> set-debugger-restarts

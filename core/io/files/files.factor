@@ -3,7 +3,7 @@
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
 system combinators splitting sbufs continuations io.encodings
-io.encodings.binary init ;
+io.encodings.binary init accessors ;
 IN: io.files
 
 HOOK: (file-reader) io-backend ( path -- stream )
@@ -13,13 +13,13 @@ HOOK: (file-writer) io-backend ( path -- stream )
 HOOK: (file-appender) io-backend ( path -- stream )
 
 : <file-reader> ( path encoding -- stream )
-    swap normalize-pathname (file-reader) swap <decoder> ;
+    swap normalize-path (file-reader) swap <decoder> ;
 
 : <file-writer> ( path encoding -- stream )
-    swap normalize-pathname (file-writer) swap <encoder> ;
+    swap normalize-path (file-writer) swap <encoder> ;
 
 : <file-appender> ( path encoding -- stream )
-    swap normalize-pathname (file-appender) swap <encoder> ;
+    swap normalize-path (file-appender) swap <encoder> ;
 
 : file-lines ( path encoding -- seq )
     <file-reader> lines ;
@@ -43,9 +43,9 @@ HOOK: (file-appender) io-backend ( path -- stream )
     >r <file-appender> r> with-stream ; inline
 
 ! Pathnames
-: path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
+: path-separator? ( ch -- ? ) os windows? "/\\" "/" ? member? ;
 
-: path-separator ( -- string ) windows? "\\" "/" ? ;
+: path-separator ( -- string ) os windows? "\\" "/" ? ;
 
 : right-trim-separators ( str -- newstr )
     [ path-separator? ] right-trim ;
@@ -95,25 +95,26 @@ ERROR: no-parent-directory path ;
             1 tail left-trim-separators append-path-empty
         ] }
         { [ dup head..? ] [ drop no-parent-directory ] }
-        { [ t ] [ nip ] }
+        [ nip ]
     } cond ;
 
 PRIVATE>
 
 : windows-absolute-path? ( path -- path ? )
     {
+        { [ dup "\\\\?\\" head? ] [ t ] }
         { [ dup length 2 < ] [ f ] }
         { [ dup second CHAR: : = ] [ t ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond ;
 
 : absolute-path? ( path -- ? )
     {
         { [ dup empty? ] [ f ] }
         { [ dup "resource:" head? ] [ t ] }
+        { [ os windows? ] [ windows-absolute-path? ] }
         { [ dup first path-separator? ] [ t ] }
-        { [ windows? ] [ windows-absolute-path? ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond nip ;
 
 : append-path ( str1 str2 -- str )
@@ -126,10 +127,13 @@ PRIVATE>
             2 tail left-trim-separators
             >r parent-directory r> append-path
         ] }
-        { [ t ] [
+        { [ over absolute-path? over first path-separator? and ] [
+            >r 2 head r> append
+        ] }
+        [
             >r right-trim-separators "/" r>
             left-trim-separators 3append
-        ] }
+        ]
     } cond ;
 
 : prepend-path ( str1 str2 -- str )
@@ -145,55 +149,81 @@ PRIVATE>
 TUPLE: file-info type size permissions modified ;
 
 HOOK: file-info io-backend ( path -- info )
+
+! Symlinks
 HOOK: link-info io-backend ( path -- info )
+
+HOOK: make-link io-backend ( target symlink -- )
+
+HOOK: read-link io-backend ( symlink -- path )
+
+: copy-link ( target symlink -- )
+    >r read-link r> make-link ;
 
 SYMBOL: +regular-file+
 SYMBOL: +directory+
+SYMBOL: +symbolic-link+
 SYMBOL: +character-device+
 SYMBOL: +block-device+
 SYMBOL: +fifo+
-SYMBOL: +symbolic-link+
 SYMBOL: +socket+
 SYMBOL: +unknown+
 
 ! File metadata
 : exists? ( path -- ? )
-    normalize-pathname (exists?) ;
+    normalize-path (exists?) ;
 
 : directory? ( path -- ? )
     file-info file-info-type +directory+ = ;
 
-! Current working directory
+<PRIVATE
+
 HOOK: cd io-backend ( path -- )
 
 HOOK: cwd io-backend ( -- path )
 
-SYMBOL: current-directory
-
 M: object cwd ( -- path ) "." ;
+
+PRIVATE>
+
+SYMBOL: current-directory
 
 [ cwd current-directory set-global ] "io.files" add-init-hook
 
-: with-directory ( path quot -- )
-    >r normalize-pathname r>
-    current-directory swap with-variable ; inline
+: resource-path ( path -- newpath )
+    "resource-path" get [ image parent-directory ] unless*
+    prepend-path ;
+
+: (normalize-path) ( path -- path' )
+    "resource:" ?head [
+        left-trim-separators resource-path
+        (normalize-path)
+    ] [
+        current-directory get prepend-path
+    ] if ;
+
+M: object normalize-path ( path -- path' )
+    (normalize-path) ;
 
 : set-current-directory ( path -- )
-    normalize-pathname current-directory set ;
+    (normalize-path) current-directory set ;
+
+: with-directory ( path quot -- )
+    >r (normalize-path) current-directory r> with-variable ; inline
 
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )
 
 : make-directories ( path -- )
-    normalize-pathname right-trim-separators {
+    normalize-path right-trim-separators {
         { [ dup "." = ] [ ] }
         { [ dup root-directory? ] [ ] }
         { [ dup empty? ] [ ] }
         { [ dup exists? ] [ ] }
-        { [ t ] [
+        [
             dup parent-directory make-directories
             dup make-directory
-        ] }
+        ]
     } cond drop ;
 
 ! Directory listings
@@ -218,14 +248,14 @@ HOOK: delete-file io-backend ( path -- )
 
 HOOK: delete-directory io-backend ( path -- )
 
-: (delete-tree) ( path dir? -- )
-    [
-        dup directory* [ (delete-tree) ] assoc-each
-        delete-directory
-    ] [ delete-file ] if ;
-
 : delete-tree ( path -- )
-    dup directory? (delete-tree) ;
+    dup link-info type>> +directory+ = [
+        dup directory over [
+            [ first delete-tree ] each
+        ] with-directory delete-directory
+    ] [
+        delete-file
+    ] if ;
 
 : to-directory over file-name append-path ;
 
@@ -258,13 +288,17 @@ M: object copy-file
 DEFER: copy-tree-into
 
 : copy-tree ( from to -- )
-    over directory? [
-        >r dup directory swap r> [
-            >r swap first append-path r> copy-tree-into
-        ] 2curry each
-    ] [
-        copy-file
-    ] if ;
+    normalize-path
+    over link-info type>>
+    {
+        { +symbolic-link+ [ copy-link ] }
+        { +directory+ [
+            >r dup directory r> rot [
+                [ >r first r> copy-tree-into ] curry each
+            ] with-directory
+        ] }
+        [ drop copy-file ]
+    } case ;
 
 : copy-tree-into ( from to -- )
     to-directory copy-tree ;
@@ -273,23 +307,12 @@ DEFER: copy-tree-into
     [ copy-tree-into ] curry each ;
 
 ! Special paths
-: resource-path ( path -- newpath )
-    "resource-path" get [ image parent-directory ] unless*
-    prepend-path ;
 
 : temp-directory ( -- path )
     "temp" resource-path dup make-directories ;
 
 : temp-file ( name -- path )
     temp-directory prepend-path ;
-
-M: object normalize-pathname ( path -- path' )
-    "resource:" ?head [
-        left-trim-separators resource-path
-        normalize-pathname
-    ] [
-        current-directory get prepend-path
-    ] if ;
 
 ! Pathname presentations
 TUPLE: pathname string ;
@@ -299,9 +322,10 @@ C: <pathname> pathname
 M: pathname <=> [ pathname-string ] compare ;
 
 ! Home directory
-: home ( -- dir )
-    {
-        { [ winnt? ] [ "USERPROFILE" os-env ] }
-        { [ wince? ] [ "" resource-path ] }
-        { [ unix? ] [ "HOME" os-env ] }
-    } cond ;
+HOOK: home os ( -- dir )
+
+M: winnt home "USERPROFILE" os-env ;
+
+M: wince home "" resource-path ;
+
+M: unix home "HOME" os-env ;

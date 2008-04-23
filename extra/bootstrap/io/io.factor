@@ -5,8 +5,8 @@ IN: bootstrap.io
 "bootstrap.compiler" vocab [
     "io." {
         { [ "io-backend" get ] [ "io-backend" get ] }
-        { [ unix? ] [ "unix" ] }
-        { [ winnt? ] [ "windows.nt" ] }
-        { [ wince? ] [ "windows.ce" ] }
+        { [ os unix? ] [ "unix" ] }
+        { [ os winnt? ] [ "windows.nt" ] }
+        { [ os wince? ] [ "windows.ce" ] }
     } cond append require
 ] when

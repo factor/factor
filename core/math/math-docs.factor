@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel sequences quotations
-math.private math.functions ;
+math.private ;
 IN: math
 
 ARTICLE: "division-by-zero" "Division by zero"
@@ -26,17 +26,13 @@ $nl
 { $subsection < }
 { $subsection <= }
 { $subsection > }
-{ $subsection >= }
-"Inexact comparison:"
-{ $subsection ~ } ;
+{ $subsection >= } ;
 
 ARTICLE: "modular-arithmetic" "Modular arithmetic"
 { $subsection mod }
 { $subsection rem }
 { $subsection /mod }
 { $subsection /i }
-{ $subsection mod-inv }
-{ $subsection ^mod }
 { $see-also "integer-functions" } ;
 
 ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
@@ -82,6 +78,29 @@ HELP: >
 HELP: >=
 { $values { "x" real } { "y" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is greater than or equal to " { $snippet "y" } "." } ;
+
+HELP: before?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes before " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+HELP: after?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes after " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+HELP: before=?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes before or equals " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+HELP: after=?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes after or equals " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+{ before? after? before=? after=? } related-words
+
 
 HELP: +
 { $values { "x" number } { "y" number } { "z" number } }
@@ -339,6 +358,10 @@ HELP: number
 HELP: next-power-of-2
 { $values { "m" "a non-negative integer" } { "n" "an integer" } }
 { $description "Outputs the smallest power of 2 greater than " { $snippet "m" } ". The output value is always at least 1." } ;
+
+HELP: power-of-2?
+{ $values { "n" integer } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "n" } " is a power of 2." } ;
 
 HELP: each-integer
 { $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- )" } } }

@@ -4,8 +4,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel combinators fry namespaces quotations hashtables
 sequences assocs arrays inference effects math math.ranges
-arrays.lib shuffle macros bake combinators.cleave
-continuations ;
+arrays.lib shuffle macros bake continuations ;
 
 IN: combinators.lib
 
@@ -138,7 +137,7 @@ MACRO: map-exec-with ( words -- )
     [ 1quotation ] map [ map-call-with ] curry ;
 
 MACRO: construct-slots ( assoc tuple-class -- tuple ) 
-    [ construct-empty ] curry swap [
+    [ new ] curry swap [
         [ dip ] curry swap 1quotation [ keep ] curry compose
     ] { } assoc>map concat compose ;
 

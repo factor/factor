@@ -104,7 +104,7 @@ M: indirect extended? indirect-base extended? ;
     canonicalize-ESP ;
 
 : <indirect> ( base index scale displacement -- indirect )
-    indirect construct-boa dup canonicalize ;
+    indirect boa dup canonicalize ;
 
 : reg-code "register" word-prop 7 bitand ;
 
@@ -189,7 +189,7 @@ UNION: operand register indirect ;
     {
         { [ dup register-128? ] [ drop operand-64? ] }
         { [ dup not ] [ drop operand-64? ] }
-        { [ t ] [ nip operand-64? ] }
+        [ nip operand-64? ]
     } cond and ;
 
 : rex.r
@@ -230,7 +230,7 @@ UNION: operand register indirect ;
 
 : opcode-or ( opcode mask -- opcode' )
     swap dup array?
-    [ 1 cut* first rot bitor add ] [ bitor ] if ;
+    [ 1 cut* first rot bitor suffix ] [ bitor ] if ;
 
 : 1-operand ( op reg rex.w opcode -- )
     #! The 'reg' is not really a register, but a value for the

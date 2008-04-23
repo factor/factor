@@ -66,7 +66,7 @@ M: word command-description ( word -- str )
     H{ { +nullary+ f } { +listener+ f } { +description+ f } } ;
 
 : define-command ( word hash -- )
-    default-flags swap union >r word-props r> update ;
+    [ word-props ] [ default-flags swap assoc-union ] bi* update ;
 
 : command-quot ( target command -- quot )
     dup 1quotation swap +nullary+ word-prop

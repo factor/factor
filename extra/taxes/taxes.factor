@@ -45,7 +45,7 @@ GENERIC: withholding ( salary w4 collector -- x )
 TUPLE: tax-table single married ;
 
 : <tax-table> ( single married class -- obj )
-    >r tax-table construct-boa r> construct-delegate ;
+    >r tax-table boa r> construct-delegate ;
 
 : tax-bracket-range dup second swap first - ;
 

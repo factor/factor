@@ -3,7 +3,9 @@ namespaces tools.test xml.writer sbufs sequences html.private ;
 IN: html.tests
 
 : make-html-string
-    [ with-html-stream ] with-string-writer ;
+    [ with-html-stream ] with-string-writer ; inline
+
+[ [ ] make-html-string ] must-infer
 
 [ ] [
     512 <sbuf> <html-stream> drop
@@ -32,7 +34,7 @@ M: funky browser-link-href
 
 [ "<a href='http://www.funky-town.com/austin'>&lt;</a>" ] [
     [
-        "<" "austin" funky construct-boa write-object
+        "<" "austin" funky boa write-object
     ] make-html-string
 ] unit-test
 

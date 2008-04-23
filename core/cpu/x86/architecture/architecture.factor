@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.compiler arrays
 cpu.x86.assembler cpu.architecture kernel kernel.private math
@@ -6,13 +6,10 @@ memory namespaces sequences words generator generator.registers
 generator.fixup system layouts combinators compiler.constants ;
 IN: cpu.x86.architecture
 
-TUPLE: x86-backend cell ;
-
-HOOK: ds-reg compiler-backend
-HOOK: rs-reg compiler-backend
-HOOK: stack-reg compiler-backend
-HOOK: xt-reg compiler-backend
-HOOK: stack-save-reg compiler-backend
+HOOK: ds-reg cpu
+HOOK: rs-reg cpu
+HOOK: stack-reg cpu
+HOOK: stack-save-reg cpu
 
 : stack@ stack-reg swap [+] ;
 
@@ -24,7 +21,11 @@ M: rs-loc v>operand rs-loc-n rs-reg reg-stack ;
 M: int-regs %save-param-reg drop >r stack@ r> MOV ;
 M: int-regs %load-param-reg drop swap stack@ MOV ;
 
-: MOVSS/D float-regs-size 4 = [ MOVSS ] [ MOVSD ] if ;
+GENERIC: MOVSS/D ( dst src reg-class -- )
+
+M: single-float-regs MOVSS/D drop MOVSS ;
+
+M: double-float-regs MOVSS/D drop MOVSD ;
 
 M: float-regs %save-param-reg >r >r stack@ r> r> MOVSS/D ;
 M: float-regs %load-param-reg >r swap stack@ r> MOVSS/D ;
@@ -33,34 +34,38 @@ GENERIC: push-return-reg ( reg-class -- )
 GENERIC: load-return-reg ( stack@ reg-class -- )
 GENERIC: store-return-reg ( stack@ reg-class -- )
 
-HOOK: address-operand compiler-backend ( address -- operand )
+! Only used by inline allocation
+HOOK: temp-reg-1 cpu
+HOOK: temp-reg-2 cpu
 
-HOOK: fixnum>slot@ compiler-backend
+HOOK: address-operand cpu ( address -- operand )
 
-HOOK: prepare-division compiler-backend
+HOOK: fixnum>slot@ cpu
+
+HOOK: prepare-division cpu
 
 M: immediate load-literal v>operand swap v>operand MOV ;
 
-M: x86-backend stack-frame ( n -- i )
+M: x86 stack-frame ( n -- i )
     3 cells + 16 align cell - ;
 
-M: x86-backend %save-word-xt ( -- )
-    xt-reg 0 MOV rc-absolute-cell rel-this ;
+M: x86 %save-word-xt ( -- )
+    temp-reg v>operand 0 MOV rc-absolute-cell rel-this ;
 
 : factor-area-size 4 cells ;
 
-M: x86-backend %prologue ( n -- )
+M: x86 %prologue ( n -- )
     dup cell + PUSH
-    xt-reg PUSH
+    temp-reg v>operand PUSH
     stack-reg swap 2 cells - SUB ;
 
-M: x86-backend %epilogue ( n -- )
+M: x86 %epilogue ( n -- )
     stack-reg swap ADD ;
 
 : %alien-global ( symbol dll register -- )
     [ 0 MOV rc-absolute-cell rel-dlsym ] keep dup [] MOV ;
 
-M: x86-backend %prepare-alien-invoke
+M: x86 %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
@@ -70,12 +75,12 @@ M: x86-backend %prepare-alien-invoke
     temp-reg v>operand 2 cells [+] ds-reg MOV
     temp-reg v>operand 3 cells [+] rs-reg MOV ;
 
-M: x86-backend %call ( label -- ) CALL ;
+M: x86 %call ( label -- ) CALL ;
 
-M: x86-backend %jump-label ( label -- ) JMP ;
+M: x86 %jump-label ( label -- ) JMP ;
 
-M: x86-backend %jump-t ( label -- )
-    "flag" operand f v>operand CMP JNE ;
+M: x86 %jump-f ( label -- )
+    "flag" operand f v>operand CMP JE ;
 
 : code-alignment ( -- n )
     building get length dup cell align swap - ;
@@ -83,7 +88,7 @@ M: x86-backend %jump-t ( label -- )
 : align-code ( n -- )
     0 <repetition> % ;
 
-M: x86-backend %dispatch ( -- )
+M: x86 %dispatch ( -- )
     [
         %epilogue-later
         ! Load jump table base. We use a temporary register
@@ -105,27 +110,27 @@ M: x86-backend %dispatch ( -- )
         { +clobber+ { "n" } }
     } with-template ;
 
-M: x86-backend %dispatch-label ( word -- )
+M: x86 %dispatch-label ( word -- )
     0 cell, rc-absolute-cell rel-word ;
 
-M: x86-backend %unbox-float ( dst src -- )
-    [ v>operand ] 2apply float-offset [+] MOVSD ;
+M: x86 %unbox-float ( dst src -- )
+    [ v>operand ] bi@ float-offset [+] MOVSD ;
 
-M: x86-backend %peek [ v>operand ] 2apply MOV ;
+M: x86 %peek [ v>operand ] bi@ MOV ;
 
-M: x86-backend %replace swap %peek ;
+M: x86 %replace swap %peek ;
 
 : (%inc) swap cells dup 0 > [ ADD ] [ neg SUB ] if ;
 
-M: x86-backend %inc-d ( n -- ) ds-reg (%inc) ;
+M: x86 %inc-d ( n -- ) ds-reg (%inc) ;
 
-M: x86-backend %inc-r ( n -- ) rs-reg (%inc) ;
+M: x86 %inc-r ( n -- ) rs-reg (%inc) ;
 
-M: x86-backend fp-shadows-int? ( -- ? ) f ;
+M: x86 fp-shadows-int? ( -- ? ) f ;
 
-M: x86-backend value-structs? t ;
+M: x86 value-structs? t ;
 
-M: x86-backend small-enough? ( n -- ? )
+M: x86 small-enough? ( n -- ? )
     HEX: -80000000 HEX: 7fffffff between? ;
 
 : %untag ( reg -- ) tag-mask get bitnot AND ;
@@ -143,34 +148,34 @@ M: x86-backend small-enough? ( n -- ? )
         \ stack-frame get swap -
     ] ?if ;
 
-HOOK: %unbox-struct-1 compiler-backend ( -- )
+HOOK: %unbox-struct-1 cpu ( -- )
 
-HOOK: %unbox-struct-2 compiler-backend ( -- )
+HOOK: %unbox-struct-2 cpu ( -- )
 
-M: x86-backend %unbox-small-struct ( size -- )
+M: x86 %unbox-small-struct ( size -- )
     #! Alien must be in EAX.
     cell align cell /i {
         { 1 [ %unbox-struct-1 ] }
         { 2 [ %unbox-struct-2 ] }
     } case ;
 
-M: x86-backend struct-small-enough? ( size -- ? )
+M: x86 struct-small-enough? ( size -- ? )
     { 1 2 4 8 } member?
-    os { "linux" "netbsd" "solaris" } member? not and ;
+    os { linux netbsd solaris } member? not and ;
 
-M: x86-backend %return ( -- ) 0 %unwind ;
+M: x86 %return ( -- ) 0 %unwind ;
 
 ! Alien intrinsics
-M: x86-backend %unbox-byte-array ( dst src -- )
-    [ v>operand ] 2apply byte-array-offset [+] LEA ;
+M: x86 %unbox-byte-array ( dst src -- )
+    [ v>operand ] bi@ byte-array-offset [+] LEA ;
 
-M: x86-backend %unbox-alien ( dst src -- )
-    [ v>operand ] 2apply alien-offset [+] MOV ;
+M: x86 %unbox-alien ( dst src -- )
+    [ v>operand ] bi@ alien-offset [+] MOV ;
 
-M: x86-backend %unbox-f ( dst src -- )
+M: x86 %unbox-f ( dst src -- )
     drop v>operand 0 MOV ;
 
-M: x86-backend %unbox-any-c-ptr ( dst src -- )
+M: x86 %unbox-any-c-ptr ( dst src -- )
     { "is-byte-array" "end" "start" } [ define-label ] each
     ! Address is computed in ds-reg
     ds-reg PUSH

@@ -24,16 +24,6 @@ IN: unix
 : F_SETFL 4 ; inline
 : O_NONBLOCK 4 ; inline
 
-C-STRUCT: addrinfo
-    { "int" "flags" }
-    { "int" "family" }
-    { "int" "socktype" }
-    { "int" "protocol" }
-    { "socklen_t" "addrlen" }
-    { "char*" "canonname" }
-    { "void*" "addr" }
-    { "addrinfo*" "next" } ;
-
 C-STRUCT: sockaddr-in
     { "uchar" "len" }
     { "uchar" "family" }
@@ -83,8 +73,8 @@ C-STRUCT: sockaddr-un
 : SEEK_END 2 ; inline
 
 os {
-    { "macosx"  [ "unix.bsd.macosx"  require ] }
-    { "freebsd" [ "unix.bsd.freebsd" require ] }
-    { "openbsd" [ "unix.bsd.openbsd" require ] }
-    { "netbsd"  [ "unix.bsd.netbsd"  require ] }
+    { macosx  [ "unix.bsd.macosx"  require ] }
+    { freebsd [ "unix.bsd.freebsd" require ] }
+    { openbsd [ "unix.bsd.openbsd" require ] }
+    { netbsd  [ "unix.bsd.netbsd"  require ] }
 } case

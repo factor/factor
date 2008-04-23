@@ -1,0 +1,12 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>My Todo List</t:title>
+
+	<table class="todo-list">
+		<tr><th>Summary</th><th>Priority</th><th>View</th><th>Edit</th></tr>
+		<t:summary component="list" />
+	</table>
+
+</t:chloe>

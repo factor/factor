@@ -8,7 +8,7 @@ TUPLE: semaphore count threads ;
 
 : <semaphore> ( n -- semaphore )
     dup 0 < [ "Cannot have semaphore with negative count" throw ] when
-    <dlist> semaphore construct-boa ;
+    <dlist> semaphore boa ;
 
 : wait-to-acquire ( semaphore timeout -- )
     >r semaphore-threads r> "semaphore" wait ;

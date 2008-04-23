@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs hashtables
 kernel kernel.private math namespaces sequences words
-quotations strings alien layouts system combinators
+quotations strings alien.strings layouts system combinators
 math.bitfields words.private cpu.architecture ;
 IN: generator.fixup
 
@@ -10,7 +10,7 @@ IN: generator.fixup
 
 TUPLE: frame-required n ;
 
-: frame-required ( n -- ) \ frame-required construct-boa , ;
+: frame-required ( n -- ) \ frame-required boa , ;
 
 : stack-frame-size ( code -- n )
     no-stack-frame [
@@ -25,7 +25,7 @@ GENERIC: fixup* ( frame-size obj -- frame-size )
 
 TUPLE: label offset ;
 
-: <label> ( -- label ) label construct-empty ;
+: <label> ( -- label ) label new ;
 
 M: label fixup*
     compiled-offset swap set-label-offset ;
@@ -40,8 +40,8 @@ M: label fixup*
 
 M: word fixup*
     {
-        { %prologue-later [ dup [ %prologue ] if-stack-frame ] }
-        { %epilogue-later [ dup [ %epilogue ] if-stack-frame ] }
+        { \ %prologue-later [ dup [ %prologue ] if-stack-frame ] }
+        { \ %epilogue-later [ dup [ %epilogue ] if-stack-frame ] }
     } case ;
 
 SYMBOL: relocation-table
@@ -74,7 +74,7 @@ SYMBOL: label-table
 
 TUPLE: label-fixup label class ;
 
-: label-fixup ( label class -- ) \ label-fixup construct-boa , ;
+: label-fixup ( label class -- ) \ label-fixup boa , ;
 
 M: label-fixup fixup*
     dup label-fixup-class rc-absolute?
@@ -84,7 +84,7 @@ M: label-fixup fixup*
 
 TUPLE: rel-fixup arg class type ;
 
-: rel-fixup ( arg class type -- ) \ rel-fixup construct-boa , ;
+: rel-fixup ( arg class type -- ) \ rel-fixup boa , ;
 
 : (rel-fixup) ( arg class type offset -- pair )
     pick rc-absolute-cell = cell 4 ? -
@@ -109,10 +109,6 @@ M: integer fixup* , ;
 SYMBOL: literal-table
 
 : add-literal ( obj -- n ) literal-table get push-new* ;
-
-: string>symbol ( str -- alien )
-    [ wince? [ string>u16-alien ] [ string>char-alien ] if ]
-    over string? [ call ] [ map ] if ;
 
 : add-dlsym-literals ( symbol dll -- )
     >r string>symbol r> 2array literal-table get push-all ;

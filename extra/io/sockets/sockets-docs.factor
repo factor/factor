@@ -17,8 +17,6 @@ ARTICLE: "network-connection" "Connection-oriented networking"
 "Connection-oriented network servers are implemented by first opening a server socket, then waiting for connections:"
 { $subsection <server> }
 { $subsection accept }
-"The stream returned by " { $link accept } " holds the address specifier of the remote client:"
-{ $subsection client-stream-addr }
 "Server sockets are closed by calling " { $link dispose } "."
 $nl
 "Address specifiers have the following interpretation with connection-oriented networking words:"
@@ -118,10 +116,8 @@ HELP: <server>
 { $errors "Throws an error if the address is already in use, or if it if the system forbids access." } ;
 
 HELP: accept
-{ $values { "server" "a handle" } { "client" "a bidirectional stream" } }
-{ $description "Waits for a connection to a server socket created by " { $link <server> } ", and outputs a bidirectional stream when the connection has been established. The encoding of this stream is the one that was passed to the server constructor."
-$nl
-"The returned client stream responds to the " { $link client-stream-addr } " word with the address of the incoming connection." }
+{ $values { "server" "a handle" } { "client" "a bidirectional stream" } { "addrspec" "an address specifier" } }
+{ $description "Waits for a connection to a server socket created by " { $link <server> } ", and outputs a bidirectional stream when the connection has been established. The encoding of this stream is the one that was passed to the server constructor." }
 { $errors "Throws an error if the server socket is closed or otherwise is unavailable." } ;
 
 HELP: <datagram>

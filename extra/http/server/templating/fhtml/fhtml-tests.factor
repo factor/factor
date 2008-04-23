@@ -1,13 +1,13 @@
 USING: io io.files io.streams.string io.encodings.utf8
-http.server.templating.fhtml kernel tools.test sequences
-parser ;
+http.server.templating http.server.templating.fhtml kernel
+tools.test sequences parser ;
 IN: http.server.templating.fhtml.tests
 
 : test-template ( path -- ? )
     "resource:extra/http/server/templating/fhtml/test/"
     prepend
     [
-        ".fhtml" append [ run-template ] with-string-writer
+        ".fhtml" append <fhtml> [ call-template ] with-string-writer
     ] keep
     ".html" append utf8 file-contents = ;
 

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel words sequences generic math namespaces
 quotations assocs combinators math.bitfields inference.backend
-inference.dataflow inference.state tuples.private effects
-inspector hashtables ;
+inference.dataflow inference.state classes.tuple.private effects
+inspector hashtables classes generic sets ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )
@@ -39,6 +39,14 @@ IN: inference.transforms
     ] if
 ] 1 define-transform
 
+\ cleave [ cleave>quot ] 1 define-transform
+
+\ 2cleave [ 2cleave>quot ] 1 define-transform
+
+\ 3cleave [ 3cleave>quot ] 1 define-transform
+
+\ spread [ spread>quot ] 1 define-transform
+
 ! Bitfields
 GENERIC: (bitfield-quot) ( spec -- quot )
 
@@ -50,7 +58,7 @@ M: pair (bitfield-quot) ( spec -- quot )
     [ shift bitor ] append 2curry ;
 
 : bitfield-quot ( spec -- quot )
-    [ (bitfield-quot) ] map [ 0 ] add* concat ;
+    [ (bitfield-quot) ] map [ 0 ] prefix concat ;
 
 \ bitfield [ bitfield-quot ] 1 define-transform
 
@@ -74,12 +82,12 @@ M: duplicated-slots-error summary
     [ <reversed> [get-slots] ] [ duplicated-slots-error ] if
 ] 1 define-transform
 
-\ construct-boa [
+\ boa [
     dup +inlined+ depends-on
     tuple-layout [ <tuple-boa> ] curry
 ] 1 define-transform
 
-\ construct-empty [
+\ new [
     1 ensure-values
     peek-d value? [
         pop-literal
@@ -87,6 +95,14 @@ M: duplicated-slots-error summary
         tuple-layout [ <tuple> ] curry
         swap infer-quot
     ] [
-        \ construct-empty 1 1 <effect> make-call-node
+        \ new 1 1 <effect> make-call-node
     ] if
 ] "infer" set-word-prop
+
+\ instance? [
+    [ +inlined+ depends-on ] [ "predicate" word-prop ] bi
+] 1 define-transform
+
+\ (call-next-method) [
+    [ [ +inlined+ depends-on ] bi@ ] [ next-method-quot ] 2bi
+] 2 define-transform

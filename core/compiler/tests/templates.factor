@@ -3,7 +3,7 @@ USING: arrays compiler kernel kernel.private math
 hashtables.private math.private namespaces sequences
 sequences.private tools.test namespaces.private slots.private
 sequences.private byte-arrays alien alien.accessors layouts
-words definitions compiler.units io combinators ;
+words definitions compiler.units io combinators vectors ;
 IN: compiler.tests
 
 ! Oops!
@@ -24,10 +24,6 @@ IN: compiler.tests
 
 [ { 1 2 3 } { 1 4 3 } 3 3 ]
 [ { 1 2 3 } { 1 4 3 } [ over tag over tag ] compile-call ]
-unit-test
-
-[ { 1 2 3 } { 1 4 3 } 8 8 ]
-[ { 1 2 3 } { 1 4 3 } [ over type over type ] compile-call ]
 unit-test
 
 ! Test literals in either side of a shuffle
@@ -72,13 +68,13 @@ unit-test
 ] unit-test
 
 [ 12 13 ] [
-    -12 -13 [ [ 0 swap fixnum-fast ] 2apply ] compile-call
+    -12 -13 [ [ 0 swap fixnum-fast ] bi@ ] compile-call
 ] unit-test
 
 [ -1 2 ] [ 1 2 [ >r 0 swap fixnum- r> ] compile-call ] unit-test
 
 [ 12 13 ] [
-    -12 -13 [ [ 0 swap fixnum- ] 2apply ] compile-call
+    -12 -13 [ [ 0 swap fixnum- ] bi@ ] compile-call
 ] unit-test
 
 [ 1 ] [
@@ -176,14 +172,14 @@ TUPLE: my-tuple ;
 [ 1 t ] [
     B{ 1 2 3 4 } [
         { c-ptr } declare
-        [ 0 alien-unsigned-1 ] keep type
+        [ 0 alien-unsigned-1 ] keep hi-tag
     ] compile-call byte-array type-number =
 ] unit-test
 
 [ t ] [
     B{ 1 2 3 4 } [
         { c-ptr } declare
-        0 alien-cell type
+        0 alien-cell hi-tag
     ] compile-call alien type-number =
 ] unit-test
 
@@ -206,3 +202,56 @@ TUPLE: my-tuple ;
         ] [ 2drop no-case ] if
     ] compile-call
 ] unit-test
+
+: float-spill-bug
+    {
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+        [ dup float+ ]
+    } cleave ;
+
+[ t ] [ \ float-spill-bug compiled? ] unit-test
+
+! Regression
+: dispatch-alignment-regression ( -- c )
+    { tuple vector } 3 slot { word } declare
+    dup 1 slot 0 fixnum-bitand { [ ] } dispatch ;
+
+[ t ] [ \ dispatch-alignment-regression compiled? ] unit-test
+
+[ vector ] [ dispatch-alignment-regression ] unit-test

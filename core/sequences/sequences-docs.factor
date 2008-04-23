@@ -33,7 +33,7 @@ ARTICLE: "sequence-protocol" "Sequence protocol"
 "An optional generic word for creating sequences of the same class as a given sequence:"
 { $subsection like }
 "Optional generic words for optimization purposes:"
-{ $subsection new }
+{ $subsection new-sequence }
 { $subsection new-resizable }
 { $see-also "sequences-unsafe" } ;
 
@@ -61,11 +61,10 @@ ARTICLE: "sequences-access" "Accessing sequence elements"
 
 ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 "Adding elements:"
-{ $subsection add }
-{ $subsection add* }
+{ $subsection prefix }
+{ $subsection suffix }
 "Removing elements:"
-{ $subsection remove }
-{ $subsection seq-diff } ;
+{ $subsection remove } ;
 
 ARTICLE: "sequences-reshape" "Reshaping sequences"
 "A " { $emphasis "repetition" } " is a virtual sequence consisting of a single element repeated multiple times:"
@@ -77,10 +76,7 @@ ARTICLE: "sequences-reshape" "Reshaping sequences"
 { $subsection reversed }
 { $subsection <reversed> }
 "Transposing a matrix:"
-{ $subsection flip }
-"A " { $emphasis "column" } " presents a column of a matrix represented as a sequence of rows:"
-{ $subsection column }
-{ $subsection <column> } ;
+{ $subsection flip } ;
 
 ARTICLE: "sequences-appending" "Appending sequences"
 { $subsection append }
@@ -233,6 +229,8 @@ $nl
 { $subsection "sequences-split" }
 { $subsection "sequences-destructive" }
 { $subsection "sequences-stacks" }
+{ $subsection "sequences-sorting" }
+{ $subsection "sets" }
 "For inner loops:"
 { $subsection "sequences-unsafe" } ;
 
@@ -280,7 +278,7 @@ HELP: immutable
 { $description "Throws an " { $link immutable } " error." }
 { $error-description "Thrown if an attempt is made to modify an immutable sequence." } ;
 
-HELP: new
+HELP: new-sequence
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a mutable sequence" } }
 { $contract "Outputs a mutable sequence of length " { $snippet "n" } " which can hold the elements of " { $snippet "seq" } "." } ;
 
@@ -527,12 +525,7 @@ HELP: contains?
 
 HELP: all?
 { $values { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "?" "a boolean" } }
-{ $description "Tests if all elements in the sequence satisfy the predicate by checking each element in turn. Given an empty sequence, vacuously outputs " { $link t } "." }
-{ $notes
-    "The implementation makes use of a well-known logical identity:" 
-    $nl
-    { $snippet "P[x] for all x <==> not ((not P[x]) for some x)" }
-} ;
+{ $description "Tests if all elements in the sequence satisfy the predicate by checking each element in turn. Given an empty sequence, vacuously outputs " { $link t } "." } ;
 
 HELP: push-if
 { $values { "elt" object } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "accum" "a resizable mutable sequence" } }
@@ -641,27 +634,23 @@ HELP: push-new
 }
 { $side-effects "seq" } ;
 
-{ push push-new add add* } related-words
+{ push push-new prefix suffix } related-words
 
-HELP: add
+HELP: suffix
 { $values { "seq" sequence } { "elt" object } { "newseq" sequence } }
 { $description "Outputs a new sequence obtained by adding " { $snippet "elt" } " at the end of " { $snippet "seq" } "." }
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." }
 { $examples
-    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } 4 add ." "{ 1 2 3 4 }" }
+    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } 4 suffix ." "{ 1 2 3 4 }" }
 } ;
 
-HELP: add*
+HELP: prefix
 { $values { "seq" sequence } { "elt" object } { "newseq" sequence } }
 { $description "Outputs a new sequence obtained by adding " { $snippet "elt" } " at the beginning of " { $snippet "seq" } "." }
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." } 
 { $examples
-{ $example "USING: prettyprint sequences ;" "{ 1 2 3 } 0 add* ." "{ 0 1 2 3 }" }
+{ $example "USING: prettyprint sequences ;" "{ 1 2 3 } 0 prefix ." "{ 0 1 2 3 }" }
 } ;
-
-HELP: seq-diff
-{ $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
-{ $description "Outputs a sequence consisting of elements present in " { $snippet "seq2" } " but not " { $snippet "seq1" } ", comparing elements for equality." } ;
 
 HELP: sum-lengths
 { $values { "seq" "a sequence of sequences" } { "n" integer } }
@@ -793,23 +782,6 @@ HELP: <slice>
 
 { <slice> subseq } related-words
 
-HELP: column
-{ $class-description "A virtual sequence which presents a fixed column of a matrix represented as a sequence of rows. New instances can be created by calling " { $link <column> } "." } ;
-
-HELP: <column> ( seq n -- column )
-{ $values { "seq" sequence } { "n" "a non-negative integer" } { "column" column } }
-{ $description "Outputs a new virtual sequence which presents a fixed column of a matrix represented as a sequence of rows." "The " { $snippet "i" } "th element of a column is the " { $snippet "n" } "th element of the " { $snippet "i" } "th element of" { $snippet "seq" } ". Every element of " { $snippet "seq" } " must be a sequence, and all sequences must have equal length." }
-{ $examples
-    { $example
-        "USING: arrays prettyprint sequences ;"
-        "{ { 1 2 3 } { 4 5 6 } { 7 8 9 } } 0 <column> >array ."
-        "{ 1 4 7 }"
-    }
-}
-{ $notes
-    "In the same sense that " { $link <reversed> } " is a virtual variant of " { $link reverse } ", " { $link <column> } " is a virtual variant of " { $snippet "swap [ nth ] curry map" } "."
-} ;
-
 HELP: repetition
 { $class-description "A virtual sequence consisting of " { $link repetition-elt } " repeated " { $link repetition-len } " times. Repetitions are created by calling " { $link <repetition> } "." } ;
 
@@ -940,7 +912,7 @@ HELP: unclip
 { $values { "seq" sequence } { "rest" sequence } { "first" object } }
 { $description "Outputs a tail sequence and the first element of " { $snippet "seq" } "; the tail sequence consists of all elements of " { $snippet "seq" } " but the first." }
 { $examples
-    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } unclip add ." "{ 2 3 1 }" }
+    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } unclip suffix ." "{ 2 3 1 }" }
 } ;
 
 HELP: unclip-slice

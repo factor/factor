@@ -32,7 +32,7 @@ DEFER: sort
     ] if ; inline
 
 : merge ( sorted1 sorted2 quot -- result )
-    >r [ [ <iterator> ] 2apply ] 2keep r>
+    >r [ [ <iterator> ] bi@ ] 2keep r>
     rot length rot length + <vector>
     [ (merge) ] keep underlying ; inline
 

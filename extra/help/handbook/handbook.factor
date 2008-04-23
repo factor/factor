@@ -2,7 +2,8 @@ USING: help help.markup help.syntax help.definitions help.topics
 namespaces words sequences classes assocs vocabs kernel arrays
 prettyprint.backend kernel.private io generic math system
 strings sbufs vectors byte-arrays bit-arrays float-arrays
-quotations io.streams.byte-array io.encodings.string ;
+quotations io.streams.byte-array io.encodings.string
+classes.builtin parser ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -24,6 +25,7 @@ $nl
     { { $snippet { $emphasis "foo" } "?" } "outputs a boolean" { { $link empty? } } }
     { { $snippet "?" { $emphasis "foo" } } { "conditionally performs " { $snippet { $emphasis "foo" } } } { { $links ?nth } } }
     { { $snippet "<" { $emphasis "foo" } ">" } { "creates a new " { $snippet "foo" } } { { $link <array> } } }
+    { { $snippet "new-" { $emphasis "foo" } } { "creates a new " { $snippet "foo" } ", taking some kind of parameter from the stack which determines the type of the object to be created" } { { $link new-sequence } ", " { $link new-lexer } ", " { $link new } } }
     { { $snippet { $emphasis "foo" } "*" } { "alternative form of " { $snippet "foo" } ", or a generic word called by " { $snippet "foo" } } { { $links at* pprint* } } }
     { { $snippet "(" { $emphasis "foo" } ")" } { "implementation detail word used by " { $snippet "foo" } } { { $link (clone) } } }
     { { $snippet "set-" { $emphasis "foo" } } { "sets " { $snippet "foo" } " to a new value" } { $links set-length } }
@@ -67,17 +69,6 @@ ARTICLE: "evaluator" "Evaluation semantics"
 }
 "If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $snippet "tail-recursion" } " and allows iterative algorithms to execute without incurring unbounded call stack usage."
 { $see-also "compiler" } ;
-
-ARTICLE: "dataflow" "Data and control flow"
-{ $subsection "evaluator" }
-{ $subsection "words" }
-{ $subsection "effects" }
-{ $subsection "shuffle-words" }
-{ $subsection "booleans" }
-{ $subsection "conditionals" }
-{ $subsection "basic-combinators" }
-{ $subsection "combinators" }
-{ $subsection "continuations" } ;
 
 USING: concurrency.combinators
 concurrency.messaging
@@ -154,15 +145,16 @@ ARTICLE: "collections" "Collections"
 { $subsection "vectors" }
 "Resizable specialized sequences:"
 { $subsection "sbufs" }
-{ $subsection "bit-vectors" }
-{ $subsection "byte-vectors" }
-{ $subsection "float-vectors" }
+{ $vocab-subsection "Bit vectors" "bit-vectors" }
+{ $vocab-subsection "Byte vectors" "byte-vectors" }
+{ $vocab-subsection "Float vectors" "float-vectors" }
 { $heading "Associative mappings" }
 { $subsection "assocs" }
 { $subsection "namespaces" }
 "Implementations:"
 { $subsection "hashtables" }
 { $subsection "alists" }
+{ $subsection "enums" }
 { $heading "Other collections" }
 { $subsection "boxes" }
 { $subsection "dlists" }
@@ -171,7 +163,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "buffers" } ;
 
 USING: io.sockets io.launcher io.mmap io.monitors
-io.encodings.utf8 io.encodings.binary io.encodings.ascii io.files ;
+io.encodings.utf8 io.encodings.utf16 io.encodings.binary io.encodings.ascii io.files ;
 
 ARTICLE: "encodings-introduction" "An introduction to encodings"
 "In order to express text in terms of binary, some sort of encoding has to be used. In a modern context, this is understood as a two-way mapping between Unicode code points (characters) and some amount of binary. Since English isn't the only language in the world, ASCII is not sufficient as a mapping from binary to Unicode; it can't even express em-dashes or curly quotes. Unicode was designed as a universal character set that could potentially represent everything." $nl
@@ -217,6 +209,7 @@ ARTICLE: "tools" "Developer tools"
 { $subsection "tools.vocabs" }
 "Exploratory tools:"
 { $subsection "editor" }
+{ $subsection "listener" }
 { $subsection "tools.crossref" }
 { $subsection "inspector" }
 "Debugging tools:"
@@ -271,7 +264,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "collections" }
 { $subsection "io" }
 { $subsection "concurrency" }
-{ $subsection "os" }
+{ $subsection "system" }
 { $subsection "alien" }
 { $heading "Environment reference" }
 { $subsection "cli" }

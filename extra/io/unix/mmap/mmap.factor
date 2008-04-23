@@ -10,12 +10,12 @@ IN: io.unix.mmap
     >r f -roll r> open-r/w [ 0 mmap ] keep
     over MAP_FAILED = [ close (io-error) ] when ;
 
-M: unix-io <mapped-file> ( path length -- obj )
+M: unix <mapped-file> ( path length -- obj )
     swap >r
     dup PROT_READ PROT_WRITE bitor MAP_FILE MAP_SHARED bitor
-    r> mmap-open f mapped-file construct-boa ;
+    r> mmap-open f mapped-file boa ;
 
-M: unix-io close-mapped-file ( mmap -- )
+M: unix close-mapped-file ( mmap -- )
     [ mapped-file-address ] keep
     [ mapped-file-length munmap ] keep
     mapped-file-handle close

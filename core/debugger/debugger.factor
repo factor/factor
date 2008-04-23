@@ -3,10 +3,10 @@
 USING: arrays definitions generic hashtables inspector io kernel
 math namespaces prettyprint sequences assocs sequences.private
 strings io.styles vectors words system splitting math.parser
-tuples continuations continuations.private combinators
-generic.math io.streams.duplex classes compiler.units
-generic.standard vocabs threads threads.private init
-kernel.private libc io.encodings ;
+classes.tuple continuations continuations.private combinators
+generic.math io.streams.duplex classes.builtin classes
+compiler.units generic.standard vocabs threads threads.private
+init kernel.private libc io.encodings accessors ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -82,7 +82,7 @@ ERROR: assert got expect ;
 : depth ( -- n ) datastack length ;
 
 : trim-datastacks ( seq1 seq2 -- seq1' seq2' )
-    2dup [ length ] 2apply min tuck tail >r tail r> ;
+    2dup [ length ] bi@ min tuck tail >r tail r> ;
 
 ERROR: relative-underflow stack ;
 
@@ -160,7 +160,7 @@ PREDICATE: kernel-error < array
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }
-        { [ t ] [ second 0 15 between? ] }
+        [ second 0 15 between? ]
     } cond ;
 
 : kernel-errors
@@ -202,6 +202,12 @@ M: no-method error.
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
 
+M: no-next-method summary
+    drop "Executing call-next-method from least-specific method" ;
+
+M: inconsistent-next-method summary
+    drop "Executing call-next-method with inconsistent parameters" ;
+
 M: stream-closed-twice summary
     drop "Attempt to perform I/O on closed stream" ;
 
@@ -209,7 +215,10 @@ M: check-method summary
     drop "Invalid parameters for create-method" ;
 
 M: no-tuple-class summary
-    drop "Invalid class for define-constructor" ;
+    drop "BOA constructors can only be defined for tuple classes" ;
+
+M: bad-superclass summary
+    drop "Tuple classes can only inherit from other tuple classes" ;
 
 M: no-cond summary
     drop "Fall-through in cond" ;
@@ -223,9 +232,11 @@ M: slice-error error.
 
 M: bounds-error summary drop "Sequence index out of bounds" ;
 
-M: condition error. delegate error. ;
+M: condition error. error>> error. ;
 
-M: condition error-help drop f ;
+M: condition summary error>> summary ;
+
+M: condition error-help error>> error-help ;
 
 M: assert summary drop "Assertion failed" ;
 

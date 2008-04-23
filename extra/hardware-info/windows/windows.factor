@@ -36,7 +36,7 @@ IN: hardware-info.windows
     os-version OSVERSIONINFO-dwPlatformId ;
 
 : windows-service-pack ( -- string )
-    os-version OSVERSIONINFO-szCSDVersion alien>u16-string ;
+    os-version OSVERSIONINFO-szCSDVersion utf16n alien>string ;
 
 : feature-present? ( n -- ? )
     IsProcessorFeaturePresent zero? not ;
@@ -52,7 +52,7 @@ IN: hardware-info.windows
 
 : get-directory ( word -- str )
     >r MAX_UNICODE_PATH [ <u16-string-object> ] keep dupd r>
-    execute win32-error=0/f alien>u16-string ; inline
+    execute win32-error=0/f utf16n alien>string ; inline
 
 : windows-directory ( -- str )
     \ GetWindowsDirectory get-directory ;
@@ -65,6 +65,6 @@ IN: hardware-info.windows
 
 <<
 {
-    { [ wince? ] [ "hardware-info.windows.ce" ] }
-    { [ winnt? ] [ "hardware-info.windows.nt" ] }
+    { [ os wince? ] [ "hardware-info.windows.ce" ] }
+    { [ os winnt? ] [ "hardware-info.windows.nt" ] }
 } cond [ require ] when* >>

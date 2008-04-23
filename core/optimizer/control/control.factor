@@ -109,8 +109,9 @@ SYMBOL: potential-loops
         ] [ 2drop ] if
     ] assoc-each [ remove-non-loop-calls ] when ;
 
-: detect-loops ( nodes -- )
+: detect-loops ( node -- node )
     [
+        dup
         collect-label-info
         remove-non-tail-calls
         remove-non-loop-calls
@@ -154,9 +155,9 @@ SYMBOL: potential-loops
     ] [
         node-class {
             { [ dup null class< ] [ drop f f ] }
-            { [ dup general-t class< ] [ drop t t ] }
+            { [ dup \ f class-not class< ] [ drop t t ] }
             { [ dup \ f class< ] [ drop f t ] }
-            { [ t ] [ drop f f ] }
+            [ drop f f ]
         } cond
     ] if ;
 

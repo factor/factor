@@ -18,9 +18,7 @@ $nl
 "Reading from the buffer:"
 { $subsection buffer-peek }
 { $subsection buffer-pop }
-{ $subsection buffer> }
-{ $subsection buffer>> }
-{ $subsection buffer-until }
+{ $subsection buffer-read }
 "Writing to the buffer:"
 { $subsection extend-buffer }
 { $subsection byte>buffer }
@@ -47,10 +45,6 @@ HELP: buffer-free
 { $description "De-allocates a buffer's underlying storage. The buffer may not be used after being freed." }
 { $warning "You " { $emphasis "must" } " free a buffer using this word, before letting the GC collect the buffer tuple instance." } ;
 
-HELP: (buffer>>)
-{ $values { "buffer" buffer } { "byte-array" byte-array } }
-{ $description "Collects the entire contents of the buffer into a string." } ;
-
 HELP: buffer-reset
 { $values { "n" "a non-negative integer" } { "buffer" buffer } }
 { $description "Resets the fill pointer to 0 and the position to " { $snippet "count" } "." } ;
@@ -67,17 +61,13 @@ HELP: buffer-end
 { $values { "buffer" buffer } { "alien" alien } }
 { $description "Outputs the memory address of the current fill-pointer." } ;
 
-HELP: (buffer>)
+HELP: (buffer-read)
 { $values { "n" "a non-negative integer" } { "buffer" buffer } { "byte-array" byte-array } }
-{ $description "Outputs a string of the first " { $snippet "n" } " characters at the buffer's current position. If there are less than " { $snippet "n" } " characters available, the output is truncated." } ;
+{ $description "Outputs a byte array of the first " { $snippet "n" } " bytes at the buffer's current position. If there are less than " { $snippet "n" } " bytes available, the output is truncated." } ;
 
-HELP: buffer>
+HELP: buffer-read
 { $values { "n" "a non-negative integer" } { "buffer" buffer } { "byte-array" byte-array } }
-{ $description "Collects a string of " { $snippet "n" } " characters starting from the buffer's current position, and advances the position accordingly. If there are less than " { $snippet "n" } " characters available, the output is truncated." } ;
-
-HELP: buffer>>
-{ $values { "buffer" buffer } { "byte-array" byte-array } }
-{ $description "Collects the contents of the buffer into a string, and resets the position and fill pointer to 0." } ;
+{ $description "Collects a byte array of " { $snippet "n" } " bytes starting from the buffer's current position, and advances the position accordingly. If there are less than " { $snippet "n" } " bytes available, the output is truncated." } ;
 
 HELP: buffer-length
 { $values { "buffer" buffer } { "n" "a non-negative integer" } }
@@ -103,7 +93,7 @@ HELP: check-overflow
 
 HELP: >buffer
 { $values { "byte-array" byte-array } { "buffer" buffer } }
-{ $description "Copies a string to the buffer's fill pointer, and advances it accordingly." } ;
+{ $description "Copies a byte array to the buffer's fill pointer, and advances it accordingly." } ;
 
 HELP: byte>buffer
 { $values { "byte" "a byte" } { "buffer" buffer } }
@@ -121,7 +111,3 @@ HELP: buffer-peek
 HELP: buffer-pop
 { $values { "buffer" buffer } { "byte" "a byte" } }
 { $description "Outputs the byte at the buffer position and advances the position." } ;
-
-HELP: buffer-until
-{ $values { "separators" "a sequence of bytes" } { "buffer" buffer } { "byte-array" byte-array } { "separator" "a byte or " { $link f } } }
-{ $description "Searches the buffer for a byte appearing in " { $snippet "separators" } ", starting from " { $link buffer-pos } ". If a separator is found, all data up to but not including the separator is output, together with the separator itself; otherwise the remainder of the buffer's contents are output together with " { $link f } "." } ;

@@ -4,8 +4,8 @@ math.constants math.private sequences strings tools.test words
 continuations sequences.private hashtables.private byte-arrays
 strings.private system random layouts vectors.private
 sbufs.private strings.private slots.private alien
-alien.accessors alien.c-types alien.syntax namespaces libc
-sequences.private ;
+alien.accessors alien.c-types alien.syntax alien.strings
+namespaces libc sequences.private io.encodings.ascii ;
 
 ! Make sure that intrinsic ops compile to correct code.
 [ ] [ 1 [ drop ] compile-call ] unit-test
@@ -174,11 +174,6 @@ sequences.private ;
 [ -6 ] [ 2 [ -3 fixnum* ] compile-call ] unit-test
 [ -6 ] [ [ 2 -3 fixnum* ] compile-call ] unit-test
 
-[ t ] [ 3 type 3 [ type ] compile-call eq? ] unit-test
-[ t ] [ 3 >bignum type 3 >bignum [ type ] compile-call eq? ] unit-test
-[ t ] [ "hey" type "hey" [ type ] compile-call eq? ] unit-test
-[ t ] [ f type f [ type ] compile-call eq? ] unit-test
-
 [ 5 ] [ 1 2 [ eq? [ 3 ] [ 5 ] if ] compile-call ] unit-test
 [ 3 ] [ 2 2 [ eq? [ 3 ] [ 5 ] if ] compile-call ] unit-test
 [ 3 ] [ 1 2 [ fixnum< [ 3 ] [ 5 ] if ] compile-call ] unit-test
@@ -222,9 +217,6 @@ sequences.private ;
 [ 268435456 0 ] [ -268435456 >fixnum -1 [ fixnum/mod ] compile-call ] unit-test
 
 [ t ] [ f [ f eq? ] compile-call ] unit-test
-
-! regression
-[ t ] [ { 1 2 3 } { 1 2 3 } [ over type over type eq? ] compile-call 2nip ] unit-test
 
 ! regression
 [ 3 ] [
@@ -369,11 +361,11 @@ cell 8 = [
     [ ] [ "b" get free ] unit-test
 ] when
 
-[ ] [ "hello world" malloc-char-string "s" set ] unit-test
+[ ] [ "hello world" ascii malloc-string "s" set ] unit-test
 
 "s" get [
-    [ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-call alien>char-string ] unit-test
-    [ "hello world" ] [ "s" get <void*> [ { c-ptr } declare *void* ] compile-call alien>char-string ] unit-test
+    [ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-call ascii alien>string ] unit-test
+    [ "hello world" ] [ "s" get <void*> [ { c-ptr } declare *void* ] compile-call ascii alien>string ] unit-test
 
     [ ] [ "s" get free ] unit-test
 ] when

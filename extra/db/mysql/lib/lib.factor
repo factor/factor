@@ -18,16 +18,16 @@ TUPLE: mysql-result-set ;
 : mysql-error ( mysql -- )
     [ mysql_error throw ] when* ;
 
-: mysql-connect ( mysql-connection -- )
-    new-mysql over set-mysql-db-handle
-    dup {
-        mysql-db-handle
-        mysql-db-host
-        mysql-db-user
-        mysql-db-password
-        mysql-db-db
-        mysql-db-port
-    } get-slots f 0 mysql_real_connect mysql-error ;
+! : mysql-connect ( mysql-connection -- )
+    ! new-mysql over set-mysql-db-handle
+    ! dup {
+        ! mysql-db-handle
+        ! mysql-db-host
+        ! mysql-db-user
+        ! mysql-db-password
+        ! mysql-db-db
+        ! mysql-db-port
+    ! } get-slots f 0 mysql_real_connect mysql-error ;
 
 ! =========================================================
 ! Low level mysql utility definitions

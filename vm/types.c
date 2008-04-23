@@ -42,7 +42,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	UNREGISTER_ROOT(name);
 	UNREGISTER_ROOT(vocab);
 
-	word->hashcode = tag_fixnum(rand());
+	word->hashcode = tag_fixnum((rand() << 16) ^ rand());
 	word->vocabulary = vocab;
 	word->name = name;
 	word->def = userenv[UNDEFINED_ENV];
@@ -50,6 +50,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->counter = tag_fixnum(0);
 	word->compiledp = F;
 	word->profiling = NULL;
+	word->code = NULL;
 
 	REGISTER_UNTAGGED(word);
 	default_word_code(word,true);
@@ -108,8 +109,11 @@ F_ARRAY *allot_array(CELL type, CELL capacity, CELL fill)
 		memset((void*)AREF(array,0),'\0',capacity * CELLS);
 	else
 	{
+		/* No need for write barrier here. Either the object is in
+		the nursery, or it was allocated directly in tenured space
+		and the write barrier is already hit for us in that case. */
 		for(i = 0; i < capacity; i++)
-			set_array_nth(array,i,fill);
+			put(AREF(array,i),fill);
 	}
 	return array;
 }
@@ -181,7 +185,7 @@ F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill)
 	memcpy(new_array + 1,array + 1,to_copy * CELLS);
 
 	for(i = to_copy; i < capacity; i++)
-		set_array_nth(new_array,i,fill);
+		put(AREF(new_array,i),fill);
 
 	return new_array;
 }
@@ -221,6 +225,8 @@ F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
 		result = reallot_array(result,new_size * 2,F);
 
 	UNREGISTER_UNTAGGED(elts);
+
+	write_barrier((CELL)result);
 
 	memcpy((void*)AREF(result,*result_count),(void*)AREF(elts,0),elts_size * CELLS);
 
@@ -467,6 +473,8 @@ void set_string_nth(F_STRING* string, CELL index, CELL value)
 				untag_fixnum_fast(string->length)
 				* sizeof(u16));
 			UNREGISTER_UNTAGGED(string);
+
+			write_barrier((CELL)string);
 			string->aux = tag_object(aux);
 		}
 	}
@@ -549,9 +557,10 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
 		REGISTER_UNTAGGED(string);
 		REGISTER_UNTAGGED(new_string);
 		F_BYTE_ARRAY *new_aux = allot_byte_array(capacity * sizeof(u16));
-		new_string->aux = tag_object(new_aux);
 		UNREGISTER_UNTAGGED(new_string);
 		UNREGISTER_UNTAGGED(string);
+
+		new_string->aux = tag_object(new_aux);
 
 		F_BYTE_ARRAY *aux = untag_object(string->aux);
 		memcpy(new_aux + 1,aux + 1,to_copy * sizeof(u16));
@@ -599,10 +608,6 @@ DEFINE_PRIMITIVE(resize_string)
 	void box_##type##_string(const type *str) \
 	{ \
 		dpush(str ? tag_object(from_##type##_string(str)) : F); \
-	} \
-	DEFINE_PRIMITIVE(alien_to_##type##_string) \
-	{ \
-		drepl(tag_object(from_##type##_string(alien_offset(dpeek())))); \
 	}
 
 MEMORY_TO_STRING(char,u8)
@@ -662,14 +667,6 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 	type *unbox_##type##_string(void) \
 	{ \
 		return to_##type##_string(untag_string(dpop()),true); \
-	} \
-	DEFINE_PRIMITIVE(string_to_##type##_alien) \
-	{ \
-		CELL string, t; \
-		string = dpeek(); \
-		t = type_of(string); \
-		if(t != ALIEN_TYPE && t != BYTE_ARRAY_TYPE && t != F_TYPE) \
-			drepl(tag_object(string_to_##type##_alien(untag_string(string),true))); \
 	}
 
 STRING_TO_MEMORY(char);

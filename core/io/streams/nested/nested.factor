@@ -1,30 +1,59 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: io.streams.nested
 USING: arrays generic assocs kernel namespaces strings
-quotations io continuations ;
+quotations io continuations accessors sequences ;
+IN: io.streams.nested
 
-TUPLE: ignore-close-stream ;
+TUPLE: filter-writer stream ;
 
-: <ignore-close-stream> ignore-close-stream construct-delegate ;
+M: filter-writer stream-format
+    stream>> stream-format ;
+
+M: filter-writer stream-write
+    stream>> stream-write ;
+
+M: filter-writer stream-write1
+    stream>> stream-write1 ;
+
+M: filter-writer make-span-stream
+    stream>> make-span-stream ;
+
+M: filter-writer make-block-stream
+    stream>> make-block-stream ;
+
+M: filter-writer make-cell-stream
+    stream>> make-cell-stream ;
+
+M: filter-writer stream-flush
+    stream>> stream-flush ;
+
+M: filter-writer stream-nl
+    stream>> stream-nl ;
+
+M: filter-writer stream-write-table
+    stream>> stream-write-table ;
+
+M: filter-writer dispose
+    stream>> dispose ;
+
+TUPLE: ignore-close-stream < filter-writer ;
 
 M: ignore-close-stream dispose drop ;
 
-TUPLE: style-stream style ;
+C: <ignore-close-stream> ignore-close-stream
 
-: do-nested-style ( style stream -- style delegate )
-    [ style-stream-style swap union ] keep
-    delegate ; inline
+TUPLE: style-stream < filter-writer style ;
 
-: <style-stream> ( style delegate -- stream )
-    { set-style-stream-style set-delegate }
-    style-stream construct ;
+: do-nested-style ( style style-stream -- style stream )
+    [ style>> swap assoc-union ] [ stream>> ] bi ; inline
+
+C: <style-stream> style-stream
 
 M: style-stream stream-format
     do-nested-style stream-format ;
 
 M: style-stream stream-write
-    dup style-stream-style swap delegate stream-format ;
+    [ style>> ] [ stream>> ] bi stream-format ;
 
 M: style-stream stream-write1
     >r 1string r> stream-write ;
@@ -33,15 +62,13 @@ M: style-stream make-span-stream
     do-nested-style make-span-stream ;
 
 M: style-stream make-block-stream
-    [ do-nested-style make-block-stream ] keep
-    style-stream-style swap <style-stream> ;
+    [ do-nested-style make-block-stream ] [ style>> ] bi
+    <style-stream> ;
 
 M: style-stream make-cell-stream
-    [ do-nested-style make-cell-stream ] keep
-    style-stream-style swap <style-stream> ;
+    [ do-nested-style make-cell-stream ] [ style>> ] bi
+    <style-stream> ;
 
-TUPLE: block-stream ;
-
-: <block-stream> block-stream construct-delegate ;
-
-M: block-stream dispose drop ;
+M: style-stream stream-write-table
+    [ [ [ stream>> ] map ] map ] [ ] [ stream>> ] tri*
+    stream-write-table ;

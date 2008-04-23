@@ -3,9 +3,9 @@
 USING: kernel namespaces sequences sequences.private assocs math
 inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
-definitions prettyprint hashtables combinators.lib
-prettyprint.sections sequences.private effects generic
-compiler.units combinators.cleave accessors ;
+definitions prettyprint hashtables prettyprint.sections sets
+sequences.private effects generic compiler.units accessors
+locals.backend ;
 IN: locals
 
 ! Inspired by
@@ -57,95 +57,80 @@ TUPLE: quote local ;
 
 C: <quote> quote
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! read-local
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : local-index ( obj args -- n )
     [ dup quote? [ quote-local ] when eq? ] with find drop ;
 
-: read-local ( obj args -- quot )
-    local-index 1+
-    dup [ r> ] <repetition> concat [ dup ] append
-    swap [ swap >r ] <repetition> concat append ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! localize
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: read-local-quot ( obj args -- quot )
+    local-index 1+ [ get-local ] curry ;
 
 : localize-writer ( obj args -- quot )
-  >r "local-reader" word-prop r> read-local [ 0 swap set-array-nth ] append ;
+  >r "local-reader" word-prop r>
+  read-local-quot [ set-local-value ] append ;
 
 : localize ( obj args -- quot )
     {
-        { [ over local? ]        [ read-local ] }
-        { [ over quote? ]        [ >r quote-local r> read-local ] }
-        { [ over local-word? ]   [ read-local [ call ] append ] }
-        { [ over local-reader? ] [ read-local [ 0 swap array-nth ] append ] }
+        { [ over local? ]        [ read-local-quot ] }
+        { [ over quote? ]        [ >r quote-local r> read-local-quot ] }
+        { [ over local-word? ]   [ read-local-quot [ call ] append ] }
+        { [ over local-reader? ] [ read-local-quot [ local-value ] append ] }
         { [ over local-writer? ] [ localize-writer ] }
         { [ over \ lambda eq? ]  [ 2drop [ ] ] }
         { [ t ]                  [ drop 1quotation ] }
     } cond ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! point-free
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 UNION: special local quote local-word local-reader local-writer ;
 
-: load-local ( arg -- quot ) 
-    local-reader? [ 1array >r ] [ >r ] ? ;
+: load-locals-quot ( args -- quot )
+    dup [ local-reader? ] contains? [
+        <reversed> [
+            local-reader? [ 1array >r ] [ >r ] ?
+        ] map concat
+    ] [
+        length [ load-locals ] curry >quotation
+    ] if ;
 
-: load-locals ( quot args -- quot )
-    nip <reversed> [ load-local ] map concat ;
-
-: drop-locals ( args -- args quot )
-    dup length [ r> drop ] <repetition> concat ;
+: drop-locals-quot ( args -- quot )
+    length [ drop-locals ] curry ;
 
 : point-free-body ( quot args -- newquot )
     >r 1 head-slice* r> [ localize ] curry map concat ;
 
 : point-free-end ( quot args -- newquot )
     over peek special?
-    [ drop-locals >r >r peek r> localize r> append ]
-    [ drop-locals nip swap peek add ]
+    [ dup drop-locals-quot >r >r peek r> localize r> append ]
+    [ dup drop-locals-quot nip swap peek suffix ]
     if ;
 
 : (point-free) ( quot args -- newquot )
-    [ load-locals ] [ point-free-body ] [ point-free-end ]
+    [ nip load-locals-quot ]
+    [ point-free-body ]
+    [ point-free-end ]
     2tri 3append >quotation ;
 
 : point-free ( quot args -- newquot )
     over empty? [ drop ] [ (point-free) ] if ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! free-vars
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 UNION: lexical local local-reader local-writer local-word ;
 
-GENERIC: free-vars ( form -- vars )
+GENERIC: free-vars* ( form -- )
 
-: add-if-free ( vars object -- vars )
+: free-vars ( form -- vars )
+    [ free-vars* ] { } make prune ;
+
+: add-if-free ( object -- )
   {
-      { [ dup local-writer? ] [ "local-reader" word-prop add ] }
-      { [ dup lexical? ]      [ add ] }
-      { [ dup quote? ]        [ quote-local add ] }
-      { [ t ]                 [ free-vars append ] }
+      { [ dup local-writer? ] [ "local-reader" word-prop , ] }
+      { [ dup lexical? ]      [ , ] }
+      { [ dup quote? ]        [ local>> , ] }
+      { [ t ]                 [ free-vars* ] }
   } cond ;
 
-M: object free-vars drop { } ;
+M: object free-vars* drop ;
 
-M: quotation free-vars { } [ add-if-free ] reduce ;
+M: quotation free-vars* [ add-if-free ] each ;
 
-M: lambda free-vars
-    dup vars>> swap body>> free-vars seq-diff ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! lambda-rewrite
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+M: lambda free-vars*
+    [ vars>> ] [ body>> ] bi free-vars diff % ;
 
 GENERIC: lambda-rewrite* ( obj -- )
 
@@ -173,8 +158,8 @@ M: lambda block-vars vars>> ;
 M: lambda block-body body>> ;
 
 M: lambda local-rewrite*
-    dup vars>> swap body>>
-    [ local-rewrite* \ call , ] [ ] make <lambda> , ;
+    [ vars>> ] [ body>> ] bi
+    [ [ local-rewrite* ] each ] [ ] make <lambda> , ;
 
 M: block lambda-rewrite*
     #! Turn free variables into bound variables, curry them
@@ -188,8 +173,6 @@ M: block lambda-rewrite*
 M: object lambda-rewrite* , ;
 
 M: object local-rewrite* , ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : make-local ( name -- word )
     "!" ?tail [
@@ -266,13 +249,13 @@ M: object local-rewrite* , ;
     ] assoc-each local-rewrite* \ call , ;
 
 M: let local-rewrite*
-    { body>> bindings>> } get-slots let-rewrite ;
+    [ body>> ] [ bindings>> ] bi let-rewrite ;
 
 M: let* local-rewrite*
-    { body>> bindings>> } get-slots let-rewrite ;
+    [ body>> ] [ bindings>> ] bi let-rewrite ;
 
 M: wlet local-rewrite*
-    { body>> bindings>> } get-slots
+    [ body>> ] [ bindings>> ] bi
     [ [ ] curry ] assoc-map
     let-rewrite ;
 
@@ -340,7 +323,7 @@ M: lambda pprint*
 
 : pprint-let ( let word -- )
     pprint-word
-    { body>> bindings>> } get-slots
+    [ body>> ] [ bindings>> ] bi
     \ | pprint-word
     t <inset
     <block

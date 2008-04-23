@@ -6,7 +6,7 @@ IN: http.server.auth.providers
 
 TUPLE: user username realname password email ticket profile ;
 
-: <user> user construct-empty H{ } clone >>profile ;
+: <user> user new H{ } clone >>profile ;
 
 GENERIC: get-user ( username provider -- user/f )
 
@@ -16,8 +16,6 @@ GENERIC: new-user ( user provider -- user/f )
 
 : check-login ( password username provider -- user/f )
     get-user dup [ [ password>> = ] keep and ] [ 2drop f ] if ;
-
-: set-password ( user password -- user ) >>password ;
 
 ! Password recovery support
 

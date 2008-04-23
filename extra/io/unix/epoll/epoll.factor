@@ -5,7 +5,7 @@ bit-arrays sequences assocs unix unix.linux.epoll math
 namespaces structs ;
 IN: io.unix.epoll
 
-TUPLE: epoll-mx events ;
+TUPLE: epoll-mx < mx events ;
 
 : max-events ( -- n )
     #! We read up to 256 events at a time. This is an arbitrary
@@ -13,7 +13,7 @@ TUPLE: epoll-mx events ;
     256 ; inline
 
 : <epoll-mx> ( -- mx )
-    epoll-mx construct-mx
+    epoll-mx new-mx
     max-events epoll_create dup io-error over set-mx-fd
     max-events "epoll-event" <c-array> over set-epoll-mx-events ;
 
@@ -33,12 +33,10 @@ M: output-task io-task-events drop EPOLLOUT ;
     epoll_ctl io-error ;
 
 M: epoll-mx register-io-task ( task mx -- )
-    2dup EPOLL_CTL_ADD do-epoll-ctl 
-    delegate register-io-task ;
+    [ EPOLL_CTL_ADD do-epoll-ctl ] [ call-next-method ] 2bi ;
 
 M: epoll-mx unregister-io-task ( task mx -- )
-    2dup delegate unregister-io-task
-    EPOLL_CTL_DEL do-epoll-ctl ;
+    [ call-next-method ] [ EPOLL_CTL_DEL do-epoll-ctl ] 2bi ;
 
 : wait-event ( mx timeout -- n )
     >r { mx-fd epoll-mx-events } get-slots max-events

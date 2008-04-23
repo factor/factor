@@ -1,7 +1,8 @@
 USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
-sorting tuples compiler.units debugger vocabs vocabs.loader ;
+sorting classes.tuple compiler.units debugger vocabs
+vocabs.loader accessors ;
 IN: parser.tests
 
 [
@@ -296,12 +297,12 @@ IN: parser.tests
     [
         "IN: parser.tests TUPLE: another-pred-test ; GENERIC: another-pred-test?"
         <string-reader> "removing-the-predicate" parse-stream
-    ] [ [ redefine-error? ] is? ] must-fail-with
+    ] [ error>> error>> redefine-error? ] must-fail-with
 
     [
         "IN: parser.tests TUPLE: class-redef-test ; TUPLE: class-redef-test ;"
         <string-reader> "redefining-a-class-1" parse-stream
-    ] [ [ redefine-error? ] is? ] must-fail-with
+    ] [ error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test"
@@ -311,7 +312,7 @@ IN: parser.tests
     [
         "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test : class-redef-test ;"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ [ redefine-error? ] is? ] must-fail-with
+    ] [ error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-fwd-test ;"
@@ -321,7 +322,7 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ [ no-word? ] is? ] must-fail-with
+    ] [ error>> error>> no-word-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
@@ -331,12 +332,12 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ [ no-word? ] is? ] must-fail-with
+    ] [ error>> error>> no-word-error? ] must-fail-with
 
     [
         "IN: parser.tests : foo ; TUPLE: foo ;"
         <string-reader> "redefining-a-class-4" parse-stream drop
-    ] [ [ redefine-error? ] is? ] must-fail-with
+    ] [ error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests : foo ( x y -- z ) 1 2 ; : bar ( a -- b ) ;" eval
@@ -346,47 +347,6 @@ IN: parser.tests
         "IN: parser.tests : foo ( x y -- z) 1 2 ; : bar ( a -- b ) ;" eval
     ] must-fail
 ] with-file-vocabs
-
-[
-    << file get parsed >> file set
-
-    : ~a ;
-
-    DEFER: ~b
-
-    "IN: parser.tests : ~b ~a ;" <string-reader>
-    "smudgy" parse-stream drop
-
-    : ~c ;
-    : ~d ;
-
-    { H{ { ~a ~a } { ~b ~b } { ~c ~c } { ~d ~d } } H{ } } old-definitions set
-    
-    { H{ { ~b ~b } { ~d ~d } } H{ } } new-definitions set
-    
-    [ V{ ~b } { ~a } { ~a ~c } ] [
-        smudged-usage
-        natural-sort
-    ] unit-test
-] with-scope
-
-[
-    << file get parsed >> file set
-
-    GENERIC: ~e
-
-    : ~f ~e ;
-
-    : ~g ;
-
-    { H{ { ~e ~e } { ~f ~f } { ~g ~g } } H{ } } old-definitions set
-    
-    { H{ { ~g ~g } } H{ } } new-definitions set
-
-    [ V{ } { } { ~e ~f } ]
-    [ smudged-usage natural-sort ]
-    unit-test
-] with-scope
 
 [ ] [
     "IN: parser.tests USE: kernel PREDICATE: foo < object ( x -- y ) ;" eval

@@ -1,6 +1,6 @@
 
 USING: kernel combinators sequences arrays math math.vectors
-       combinators.cleave shuffle vars ;
+       shuffle vars ;
 
 IN: springies
 
@@ -235,7 +235,7 @@ C: <spring> spring
   6 nrot 6 nrot 2array
   5 nrot 5 nrot 2array
   0 0 2array <node>
-  nodes> swap add >nodes ;
+  nodes> swap suffix >nodes ;
 
 : spng ( id id-a id-b k damp rest-length -- )
   6 nrot drop
@@ -243,4 +243,4 @@ C: <spring> spring
   5 nrot node-id
   5 nrot node-id
   <spring>
-  springs> swap add >springs ;
+  springs> swap suffix >springs ;

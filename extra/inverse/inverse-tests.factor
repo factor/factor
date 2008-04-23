@@ -1,5 +1,5 @@
 USING: inverse tools.test arrays math kernel sequences
-math.functions math.constants ;
+math.functions math.constants continuations ;
 IN: inverse-tests
 
 [ 2 ] [ { 3 2 } [ 3 swap 2array ] undo ] unit-test
@@ -51,7 +51,7 @@ C: <nil> nil
     {
         { [ <cons> ] [ list-sum + ] }
         { [ <nil> ] [ 0 ] }
-        { [ ] [ "Malformed list" throw ] }
+        [ "Malformed list" throw ]
     } switch ;
 
 [ 10 ] [ 1 2 3 4 <nil> <cons> <cons> <cons> <cons> list-sum ] unit-test
@@ -59,8 +59,9 @@ C: <nil> nil
 [ 1 2 ] [ 1 2 <cons> [ <cons> ] undo ] unit-test
 [ t ] [ 1 2 <cons> [ <cons> ] matches? ] unit-test
 [ f ] [ 1 2 <cons> [ <foo> ] matches? ] unit-test
+[ "Malformed list" ] [ [ f list-sum ] [ ] recover ] unit-test
 
-: empty-cons ( -- cons ) cons construct-empty ;
+: empty-cons ( -- cons ) cons new ;
 : cons* ( cdr car -- cons ) { set-cons-cdr set-cons-car } cons construct ;
 
 [ ] [ T{ cons f f f } [ empty-cons ] undo ] unit-test
@@ -68,3 +69,4 @@ C: <nil> nil
 
 [ t ] [ pi [ pi ] matches? ] unit-test
 [ 0.0 ] [ 0.0 pi + [ pi + ] undo ] unit-test
+[ ] [ 3 [ _ ] undo ] unit-test

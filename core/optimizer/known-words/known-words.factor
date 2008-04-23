@@ -6,7 +6,7 @@ inference.class kernel assocs math math.private kernel.private
 sequences words parser vectors strings sbufs io namespaces
 assocs quotations sequences.private io.binary io.crc32
 io.streams.string layouts splitting math.intervals
-math.floats.private tuples tuples.private classes
+math.floats.private classes.tuple classes.tuple.private classes
 classes.algebra optimizer.def-use optimizer.backend
 optimizer.pattern-match optimizer.inlining float-arrays
 sequences.private combinators ;
@@ -19,7 +19,7 @@ sequences.private combinators ;
     ] "output-classes" set-word-prop
 ] each
 
-\ construct-empty [
+\ new [
     dup node-in-d peek node-literal
     dup class? [ drop tuple ] unless 1array f
 ] "output-classes" set-word-prop
@@ -60,7 +60,8 @@ sequences.private combinators ;
     [ value-literal sequence? ] [ drop f ] if ;
 
 : member-quot ( seq -- newquot )
-    [ [ t ] ] { } map>assoc [ drop f ] add [ nip case ] curry ;
+    [ literalize [ t ] ] { } map>assoc
+    [ drop f ] suffix [ nip case ] curry ;
 
 : expand-member ( #call -- )
     dup node-in-d peek value-literal member-quot f splice-quot ;
@@ -75,7 +76,7 @@ sequences.private combinators ;
     dup node-in-d second dup value? [
         swap [
             value-literal 0 `input literal,
-            general-t 0 `output class,
+            \ f class-not 0 `output class,
         ] set-constraints
     ] [
         2drop
@@ -83,44 +84,11 @@ sequences.private combinators ;
 ] "constraints" set-word-prop
 
 ! eq? on the same object is always t
-{ eq? bignum= float= number= = } {
+{ eq? = } {
     { { @ @ } [ 2drop t ] }
 } define-identities
 
-! type applied to an object of a known type can be folded
-: known-type? ( node -- ? )
-    node-class-first class-types length 1 number= ;
-
-: fold-known-type ( node -- node )
-    dup node-class-first class-types inline-literals ;
-
-\ type [
-    { [ dup known-type? ] [ fold-known-type ] }
-] define-optimizers
-
-! if the result of type is n, then the object has type n
-{ tag type } [
-    [
-        num-types get swap [
-            [
-                [ type>class object or 0 `input class, ] keep
-                0 `output literal,
-            ] set-constraints
-        ] curry each
-    ] "constraints" set-word-prop
-] each
-
 ! Specializers
-{ 1+ 1- sq neg recip sgn } [
-    { number } "specializer" set-word-prop
-] each
-
-\ 2/ { fixnum } "specializer" set-word-prop
-
-{ min max } [
-    { number number } "specializer" set-word-prop
-] each
-
 { first first2 first3 first4 }
 [ { array } "specializer" set-word-prop ] each
 

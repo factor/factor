@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax system sequences vocabs.loader ;
+USING: alien.syntax system sequences vocabs.loader words ;
 IN: unix.kqueue
 
-<< "unix.kqueue." os append require >>
+<< "unix.kqueue." os word-name append require >>
 
 FUNCTION: int kqueue ( ) ;
 

@@ -6,12 +6,10 @@ IN: vocabs
 
 SYMBOL: dictionary
 
-TUPLE: vocab
+TUPLE: vocab < identity-tuple
 name words
 main help
 source-loaded? docs-loaded? ;
-
-M: vocab equal? 2drop f ;
 
 : <vocab> ( name -- vocab )
     H{ } clone
@@ -82,7 +80,7 @@ SYMBOL: load-vocab-hook ! ( name -- )
 
 : child-vocab? ( prefix name -- ? )
     2dup = pick empty? or
-    [ 2drop t ] [ swap CHAR: . add head? ] if ;
+    [ 2drop t ] [ swap CHAR: . suffix head? ] if ;
 
 : child-vocabs ( vocab -- seq )
     vocab-name vocabs [ child-vocab? ] with subset ;
@@ -90,11 +88,7 @@ SYMBOL: load-vocab-hook ! ( name -- )
 TUPLE: vocab-link name ;
 
 : <vocab-link> ( name -- vocab-link )
-    vocab-link construct-boa ;
-
-M: vocab-link equal?
-    over vocab-link?
-    [ [ vocab-link-name ] 2apply = ] [ 2drop f ] if ;
+    vocab-link boa ;
 
 M: vocab-link hashcode*
     vocab-link-name hashcode* ;

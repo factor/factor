@@ -1,27 +1,36 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel math namespaces sequences
-io.backend ;
+io.backend io.binary combinators system vocabs.loader
+inspector ;
 IN: random
 
+SYMBOL: system-random-generator
+SYMBOL: secure-random-generator
 SYMBOL: random-generator
 
-HOOK: os-crypto-random-bytes io-backend ( n -- byte-array )
-HOOK: os-random-bytes io-backend ( n -- byte-array )
-HOOK: os-crypto-random-32 io-backend ( -- r )
-HOOK: os-random-32 io-backend ( -- r )
-
 GENERIC: seed-random ( tuple seed -- )
-GENERIC: random-32 ( tuple -- r )
-GENERIC: random-bytes* ( tuple n -- bytes )
+GENERIC: random-32* ( tuple -- r )
+GENERIC: random-bytes* ( n tuple -- byte-array )
 
-M: object random-bytes* ( tuple n -- byte-array )
-    [ drop random-32 ] with map >c-uint-array ;
+M: object random-bytes* ( n tuple -- byte-array )
+    swap [ drop random-32* ] with map >c-uint-array ;
 
-: random-bytes ( n -- r )
+M: object random-32* ( tuple -- r ) 4 random-bytes* le> ;
+
+ERROR: no-random-number-generator ;
+
+M: no-random-number-generator summary
+    drop "Random number generator is not defined." ;
+
+M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
+
+M: f random-32* ( obj -- * ) no-random-number-generator ;
+
+: random-bytes ( n -- byte-array )
     [
-        4 /mod zero? [ 1+ ] unless
-        random-generator get swap random-bytes*
+        dup 4 rem zero? [ 1+ ] unless
+        random-generator get random-bytes*
     ] keep head ;
 
 : random ( seq -- elt )
@@ -38,3 +47,9 @@ M: object random-bytes* ( tuple n -- byte-array )
 
 : with-random ( tuple quot -- )
     random-generator swap with-variable ; inline
+
+: with-system-random ( quot -- )
+    system-random-generator get swap with-random ; inline
+
+: with-secure-random ( quot -- )
+    secure-random-generator get swap with-random ; inline

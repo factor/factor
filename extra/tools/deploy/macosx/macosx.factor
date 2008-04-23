@@ -3,7 +3,8 @@
 USING: io io.files kernel namespaces sequences
 system tools.deploy.backend tools.deploy.config assocs
 hashtables prettyprint io.unix.backend cocoa io.encodings.utf8
-cocoa.application cocoa.classes cocoa.plists qualified ;
+io.backend cocoa.application cocoa.classes cocoa.plists
+qualified ;
 IN: tools.deploy.macosx
 
 : bundle-dir ( -- dir )
@@ -13,36 +14,31 @@ IN: tools.deploy.macosx
     bundle-dir over append-path -rot
     "Contents" prepend-path append-path copy-tree ;
 
-: copy-vm ( executable bundle-name -- vm )
-    "Contents/MacOS/" append-path prepend-path vm over copy-file ;
-
-: copy-fonts ( name -- )
-    "fonts/" resource-path
-    swap "Contents/Resources/" append-path copy-tree-into ;
-
-: app-plist ( executable bundle-name -- string )
+: app-plist ( executable bundle-name -- assoc )
     [
-        namespace {
-            { "CFBundleInfoDictionaryVersion" "6.0" }
-            { "CFBundlePackageType" "APPL" }
-        } update
+        "6.0" "CFBundleInfoDictionaryVersion" set
+        "APPL" "CFBundlePackageType" set
 
         file-name "CFBundleName" set
 
-        dup "CFBundleExecutable" set
-        "org.factor." prepend "CFBundleIdentifier" set
-    ] H{ } make-assoc plist>string ;
+        [ "CFBundleExecutable" set ]
+        [ "org.factor." prepend "CFBundleIdentifier" set ] bi
+    ] H{ } make-assoc ;
 
-: create-app-plist ( vocab bundle-name -- )
+: create-app-plist ( executable bundle-name -- )
     [ app-plist ] keep
     "Contents/Info.plist" append-path
-    utf8 set-file-contents ;
+    write-plist ;
 
 : create-app-dir ( vocab bundle-name -- vm )
-    dup "Frameworks" copy-bundle-dir
-    dup "Resources/English.lproj/MiniFactor.nib" copy-bundle-dir
-    dup copy-fonts
-    2dup create-app-plist copy-vm ;
+    [
+        nip
+        [ "Frameworks" copy-bundle-dir ]
+        [ "Resources/English.lproj/MiniFactor.nib" copy-bundle-dir ]
+        [ "Contents/Resources/" copy-fonts ] tri
+    ]
+    [ create-app-plist ]
+    [ "Contents/MacOS/" append-path "" copy-vm ] 2tri ;
 
 : deploy.app-image ( vocab bundle-name -- str )
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;
@@ -50,17 +46,12 @@ IN: tools.deploy.macosx
 : bundle-name ( -- string )
     deploy-name get ".app" append ;
 
-TUPLE: macosx-deploy-implementation ;
-
-T{ macosx-deploy-implementation } deploy-implementation set-global
-
 : show-in-finder ( path -- )
-    NSWorkspace
-    -> sharedWorkspace
-    over <NSString> rot parent-directory <NSString>
+    [ NSWorkspace -> sharedWorkspace ]
+    [ normalize-path [ <NSString> ] [ parent-directory <NSString> ] bi ] bi*
     -> selectFile:inFileViewerRootedAtPath: drop ;
 
-M: macosx-deploy-implementation deploy* ( vocab -- )
+M: macosx deploy* ( vocab -- )
     ".app deploy tool" assert.app
     "resource:" [
         dup deploy-config [

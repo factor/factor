@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math namespaces sequences system
-kernel.private tuples bit-arrays byte-arrays float-arrays 
-arrays ;
+kernel.private bit-arrays byte-arrays float-arrays arrays ;
 IN: alien
 
 ! Some predicate classes used by the compiler for optimization
@@ -29,18 +28,12 @@ M: f expired? drop t ;
 : <alien> ( address -- alien )
     f <displaced-alien> { simple-c-ptr } declare ; inline
 
-: alien>native-string ( alien -- string )
-    windows? [ alien>u16-string ] [ alien>char-string ] if ;
-
-: dll-path ( dll -- string )
-    (dll-path) alien>native-string ;
-
 M: alien equal?
     over alien? [
         2dup [ expired? ] either? [
             [ expired? ] both?
         ] [
-            [ alien-address ] 2apply =
+            [ alien-address ] bi@ =
         ] if
     ] [
         2drop f
@@ -55,7 +48,7 @@ TUPLE: library path abi dll ;
 : library ( name -- library ) libraries get at ;
 
 : <library> ( path abi -- library )
-    over dup [ dlopen ] when \ library construct-boa ;
+    over dup [ dlopen ] when \ library boa ;
 
 : load-library ( name -- dll )
     library dup [ library-dll ] when ;
@@ -63,21 +56,15 @@ TUPLE: library path abi dll ;
 : add-library ( name path abi -- )
     <library> swap libraries get set-at ;
 
-TUPLE: alien-callback return parameters abi quot xt ;
-
 ERROR: alien-callback-error ;
 
 : alien-callback ( return parameters abi quot -- alien )
     alien-callback-error ;
 
-TUPLE: alien-indirect return parameters abi ;
-
 ERROR: alien-indirect-error ;
 
 : alien-indirect ( ... funcptr return parameters abi -- )
     alien-indirect-error ;
-
-TUPLE: alien-invoke library function return parameters abi ;
 
 ERROR: alien-invoke-error library symbol ;
 

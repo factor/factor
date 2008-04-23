@@ -69,7 +69,7 @@ $nl
     { { $link curry } { $snippet ": curry '[ , @ ] ;" } }
     { { $link with } { $snippet ": with swapd '[ , _ @ ] ;" } }
     { { $link compose } { $snippet ": compose '[ @ @ ] ;" } }
-    { { $link 2apply } { $snippet ": 2apply tuck '[ , @ , @ ] call ;" } }
+    { { $link bi@ } { $snippet ": bi@ tuck '[ , @ , @ ] call ;" } }
 } ;
 
 ARTICLE: "fry.philosophy" "Fried quotation philosophy"

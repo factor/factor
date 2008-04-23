@@ -27,7 +27,6 @@
 	#include "os-unix.h"
 
 	#ifdef __APPLE__
-		#include "os-unix-ucontext.h"
 		#include "os-macosx.h"
 		#include "mach_signal.h"
 		
@@ -84,7 +83,6 @@
 			#if defined(FACTOR_X86)
 				#include "os-linux-x86.32.h"
 			#elif defined(FACTOR_PPC)
-				#include "os-unix-ucontext.h"
 				#include "os-linux-ppc.h"
 			#elif defined(FACTOR_ARM)
 				#include "os-linux-arm.h"
@@ -95,8 +93,16 @@
 			#endif
 		#elif defined(__SVR4) && defined(sun)
 			#define FACTOR_OS_STRING "solaris"
+
+			#if defined(FACTOR_X86)
+				#include "os-solaris-x86.32.h"
+			#elif defined(FACTOR_AMD64)
+				#incluide "os-solaris-x86.64.h"
+			#else
+				#error "Unsupported Solaris flavor"
+			#endif
+
 			#include "os-solaris.h"
-			#include "os-unix-ucontext.h"
 		#else
 			#error "Unsupported OS"
 		#endif

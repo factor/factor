@@ -1,14 +1,12 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl.gl alien.c-types continuations namespaces
-assocs alien libc opengl math sequences combinators.lib 
-combinators.cleave macros arrays ;
+assocs alien alien.strings libc opengl math sequences combinators
+combinators.lib macros arrays io.encodings.ascii ;
 IN: opengl.shaders
 
 : with-gl-shader-source-ptr ( string quot -- )
-    swap string>char-alien malloc-byte-array [
-        <void*> swap call
-    ] keep free ; inline
+    swap ascii malloc-string [ <void*> swap call ] keep free ; inline
 
 : <gl-shader> ( source kind -- shader )
     glCreateShader dup rot
@@ -47,7 +45,7 @@ IN: opengl.shaders
 : gl-shader-info-log ( shader -- log )
     dup gl-shader-info-log-length dup [
         [ 0 <int> swap glGetShaderInfoLog ] keep
-        alien>char-string
+        ascii alien>string
     ] with-malloc ;
 
 : check-gl-shader ( shader -- shader )
@@ -82,7 +80,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 : gl-program-info-log ( program -- log )
     dup gl-program-info-log-length dup [
         [ 0 <int> swap glGetProgramInfoLog ] keep
-        alien>char-string
+        ascii alien>string
     ] with-malloc ;
 
 : check-gl-program ( program -- program )

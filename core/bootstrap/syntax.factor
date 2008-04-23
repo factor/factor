@@ -14,16 +14,13 @@ IN: bootstrap.syntax
     ";"
     "<PRIVATE"
     "?{"
-    "?V{"
     "BIN:"
     "B{"
-    "BV{"
     "C:"
     "CHAR:"
     "DEFER:"
     "ERROR:"
     "F{"
-    "FV{"
     "FORGET:"
     "GENERIC#"
     "GENERIC:"
@@ -43,6 +40,7 @@ IN: bootstrap.syntax
     "PRIMITIVE:"
     "PRIVATE>"
     "SBUF\""
+    "SINGLETON:"
     "SYMBOL:"
     "TUPLE:"
     "T{"
@@ -66,6 +64,7 @@ IN: bootstrap.syntax
     "CS{"
     "<<"
     ">>"
+    "call-next-method"
 } [ "syntax" create drop ] each
 
 "t" "syntax" lookup define-symbol

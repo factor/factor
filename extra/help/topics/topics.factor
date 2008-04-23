@@ -14,7 +14,7 @@ INSTANCE: word topic
 GENERIC: >link ( obj -- obj )
 M: link >link ;
 M: vocab-spec >link ;
-M: object >link link construct-boa ;
+M: object >link link boa ;
 
 PREDICATE: word-link < link link-name word? ;
 
@@ -40,13 +40,13 @@ GENERIC: set-article-parent ( parent topic -- )
 TUPLE: article title content loc ;
 
 : <article> ( title content -- article )
-    f \ article construct-boa ;
+    f \ article boa ;
 
 M: article article-name article-title ;
 
 TUPLE: no-article name ;
 
-: no-article ( name -- * ) \ no-article construct-boa throw ;
+: no-article ( name -- * ) \ no-article boa throw ;
 
 M: no-article summary
     drop "Help article does not exist" ;

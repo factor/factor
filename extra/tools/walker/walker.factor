@@ -3,7 +3,8 @@
 USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
-sequences.private assocs models combinators.cleave ;
+sequences.private assocs models arrays accessors
+generic generic.standard ;
 IN: tools.walker
 
 SYMBOL: show-walker-hook ! ( status continuation thread -- )
@@ -49,10 +50,17 @@ DEFER: start-walker-thread
 \ break t "break?" set-word-prop
 
 : walk ( quot -- quot' )
-    \ break add* [ break rethrow ] recover ;
+    \ break prefix [ break rethrow ] recover ;
 
-: add-breakpoint ( quot -- quot' )
-    dup [ break ] head? [ \ break add* ] unless ;
+GENERIC: add-breakpoint ( quot -- quot' )
+
+M: callable add-breakpoint
+    dup [ break ] head? [ \ break prefix ] unless ;
+
+M: array add-breakpoint
+    [ add-breakpoint ] map ;
+
+M: object add-breakpoint ;
 
 : (step-into-quot) ( quot -- ) add-breakpoint call ;
 
@@ -61,20 +69,18 @@ DEFER: start-walker-thread
 : (step-into-dispatch) nth (step-into-quot) ;
 
 : (step-into-execute) ( word -- )
-    dup "step-into" word-prop [
-        call
-    ] [
-        dup primitive? [
-            execute break
-        ] [
-            word-def (step-into-quot)
-        ] if
-    ] ?if ;
+    {
+        { [ dup "step-into" word-prop ] [ "step-into" word-prop call ] }
+        { [ dup standard-generic? ] [ effective-method (step-into-execute) ] }
+        { [ dup hook-generic? ] [ effective-method (step-into-execute) ] }
+        { [ dup primitive? ] [ execute break ] }
+        [ word-def (step-into-quot) ]
+    } cond ;
 
 \ (step-into-execute) t "step-into?" set-word-prop
 
 : (step-into-continuation)
-    continuation callstack over set-continuation-call break ;
+    continuation callstack >>call break ;
 
 ! Messages sent to walker thread
 SYMBOL: step
@@ -94,15 +100,18 @@ SYMBOL: +stopped+
 : change-frame ( continuation quot -- continuation' )
     #! Applies quot to innermost call frame of the
     #! continuation.
-    >r clone r>
-    over continuation-call clone
-    [
-        dup innermost-frame-scan 1+
-        swap innermost-frame-quot
-        rot call
-    ] keep
-    [ set-innermost-frame-quot ] keep
-    over set-continuation-call ; inline
+    >r clone r> [
+        >r clone r>
+        [
+            >r
+            [ innermost-frame-scan 1+ ]
+            [ innermost-frame-quot ] bi
+            r> call
+        ]
+        [ drop set-innermost-frame-quot ]
+        [ drop ]
+        2tri
+    ] curry change-call ; inline
 
 : step-msg ( continuation -- continuation' )
     [
@@ -114,7 +123,7 @@ SYMBOL: +stopped+
     ] change-frame ;
 
 : step-out-msg ( continuation -- continuation' )
-    [ nip \ break add ] change-frame ;
+    [ nip \ break suffix ] change-frame ;
 
 {
     { call [ (step-into-quot) ] }
@@ -129,7 +138,6 @@ SYMBOL: +stopped+
     >n ndrop >c c>
     continue continue-with
     stop yield suspend sleep (spawn)
-    suspend
 } [
     dup [ execute break ] curry
     "step-into" set-word-prop
@@ -143,8 +151,9 @@ SYMBOL: +stopped+
             swap % unclip {
                 { [ dup \ break eq? ] [ , ] }
                 { [ dup quotation? ] [ add-breakpoint , \ break , ] }
+                { [ dup array? ] [ add-breakpoint , \ break , ] }
                 { [ dup word? ] [ literalize , \ (step-into-execute) , ] }
-                { [ t ] [ , \ break , ] }
+                [ , \ break , ]
             } cond %
         ] [ ] make
     ] change-frame ;
@@ -177,16 +186,17 @@ SYMBOL: +stopped+
                 { step-back [ f ] }
                 { f [ +stopped+ set-status f ] }
                 [
-                    dup walker-continuation tget set-model
-                    step-into-msg
+                    [ walker-continuation tget set-model ]
+                    [ step-into-msg ] bi
                 ]
             } case
         ] handle-synchronous
     ] [ ] while ;
 
 : step-back-msg ( continuation -- continuation' )
-    walker-history tget dup pop*
-    empty? [ drop walker-history tget pop ] unless ;
+    walker-history tget
+    [ pop* ]
+    [ dup empty? [ drop ] [ nip pop ] if ] bi ;
 
 : walker-suspended ( continuation -- continuation' )
     +suspended+ set-status

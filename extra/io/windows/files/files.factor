@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.backend io.files io.windows kernel
-math windows windows.kernel32 combinators.cleave
-windows.time calendar combinators math.functions
-sequences namespaces words symbols ;
+USING: alien.c-types io.backend io.files io.windows kernel math
+windows windows.kernel32 windows.time calendar combinators
+math.functions sequences namespaces words symbols system
+combinators.lib io.nonblocking destructors math.bitfields.lib ;
 IN: io.windows.files
 
 SYMBOLS: +read-only+ +hidden+ +system+
@@ -48,7 +48,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
         [ WIN32_FIND_DATA-ftLastWriteTime FILETIME>timestamp ]
         ! [ WIN32_FIND_DATA-ftLastAccessTime FILETIME>timestamp ]
     } cleave
-    \ file-info construct-boa ;
+    \ file-info boa ;
 
 : find-first-file-stat ( path -- WIN32_FIND_DATA )
     "WIN32_FIND_DATA" <c-object> [
@@ -69,7 +69,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
         [ BY_HANDLE_FILE_INFORMATION-ftLastWriteTime FILETIME>timestamp ]
         ! [ BY_HANDLE_FILE_INFORMATION-ftLastAccessTime FILETIME>timestamp ]
     } cleave
-    \ file-info construct-boa ;
+    \ file-info boa ;
 
 : get-file-information ( handle -- BY_HANDLE_FILE_INFORMATION )
     [
@@ -88,8 +88,46 @@ SYMBOLS: +read-only+ +hidden+ +system+
         get-file-information BY_HANDLE_FILE_INFORMATION>file-info
     ] if ;
 
-M: windows-nt-io file-info ( path -- info )
-    normalize-pathname get-file-information-stat ;
+M: winnt file-info ( path -- info )
+    normalize-path get-file-information-stat ;
 
-M: windows-nt-io link-info ( path -- info )
+M: winnt link-info ( path -- info )
     file-info ;
+
+: file-times ( path -- timestamp timestamp timestamp )
+    [
+        normalize-path open-existing dup close-always
+        "FILETIME" <c-object>
+        "FILETIME" <c-object>
+        "FILETIME" <c-object>
+        [ GetFileTime win32-error=0/f ] 3keep
+        [ FILETIME>timestamp >local-time ] 3apply
+    ] with-destructors ;
+
+: (set-file-times) ( handle timestamp/f timestamp/f timestamp/f -- )
+    [ timestamp>FILETIME ] 3apply
+    SetFileTime win32-error=0/f ;
+
+: set-file-times ( path timestamp/f timestamp/f timestamp/f -- )
+    #! timestamp order: creation access write
+    [
+        >r >r >r
+            normalize-path open-existing dup close-always
+        r> r> r> (set-file-times)
+    ] with-destructors ;
+
+: set-file-create-time ( path timestamp -- )
+    f f set-file-times ;
+
+: set-file-access-time ( path timestamp -- )
+    >r f r> f set-file-times ;
+
+: set-file-write-time ( path timestamp -- )
+    >r f f r> set-file-times ;
+
+M: winnt touch-file ( path -- )
+    [
+        normalize-path
+        maybe-create-file over close-always
+        [ drop ] [ f now dup (set-file-times) ] if
+    ] with-destructors ;

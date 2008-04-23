@@ -4,13 +4,14 @@ USING: arrays ui.gadgets.buttons ui.gadgets.borders
 ui.gadgets.labels ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gadgets.theme ui.gadgets.frames
 ui.gadgets.grids io kernel math models namespaces prettyprint
-sequences sequences words tuples ui.gadgets ui.render colors ;
+sequences sequences words classes.tuple ui.gadgets ui.render
+colors ;
 IN: ui.gadgets.labelled
 
 TUPLE: labelled-gadget content ;
 
 : <labelled-gadget> ( gadget title -- newgadget )
-    labelled-gadget construct-empty
+    labelled-gadget new
     [
         <label> dup reverse-video-theme f track,
         g-> set-labelled-gadget-content 1 track,
@@ -49,7 +50,7 @@ TUPLE: closable-gadget content ;
     [ [ closable-gadget? ] is? ] find-parent ;
 
 : <closable-gadget> ( gadget title quot -- gadget )
-    closable-gadget construct-empty
+    closable-gadget new
     [
         <title-bar> @top frame,
         g-> set-closable-gadget-content @center frame,

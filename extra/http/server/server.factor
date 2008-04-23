@@ -4,7 +4,7 @@ USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http sequences prettyprint io.server logging calendar
 html.elements accessors math.parser combinators.lib
 tools.vocabs debugger html continuations random combinators
-destructors io.encodings.8-bit fry combinators.cleave ;
+destructors io.encodings.8-bit fry ;
 IN: http.server
 
 GENERIC: call-responder ( path responder -- response )
@@ -89,7 +89,7 @@ SYMBOL: form-hook
     {
         { [ over "http://" head? ] [ link>string ] }
         { [ over "/" head? ] [ absolute-redirect ] }
-        { [ t ] [ relative-redirect ] }
+        [ relative-redirect ]
     } cond ;
 
 : <redirect> ( to query code message -- response )
@@ -105,8 +105,13 @@ SYMBOL: form-hook
 
 TUPLE: dispatcher default responders ;
 
+: new-dispatcher ( class -- dispatcher )
+    new
+        404-responder get >>default
+        H{ } clone >>responders ; inline
+
 : <dispatcher> ( -- dispatcher )
-    404-responder get H{ } clone dispatcher construct-boa ;
+    dispatcher new-dispatcher ;
 
 : split-path ( path -- rest first )
     [ CHAR: / = ] left-trim "/" split1 swap ;
@@ -125,13 +130,10 @@ M: dispatcher call-responder ( path dispatcher -- response )
         2drop redirect-with-/
     ] if ;
 
-: <webapp> ( class -- dispatcher )
-    <dispatcher> swap construct-delegate ; inline
-
 TUPLE: vhost-dispatcher default responders ;
 
 : <vhost-dispatcher> ( -- dispatcher )
-    404-responder get H{ } clone vhost-dispatcher construct-boa ;
+    404-responder get H{ } clone vhost-dispatcher boa ;
 
 : find-vhost ( dispatcher -- responder )
     request get host>> over responders>> at*
@@ -158,23 +160,30 @@ drop
 
 SYMBOL: development-mode
 
+: http-error. ( error -- )
+    "Internal server error" [
+        development-mode get [
+            [ print-error nl :c ] with-html-stream
+        ] [
+            500 "Internal server error"
+            trivial-response-body
+        ] if
+    ] simple-page ;
+
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
-    swap '[
-        , "Internal server error" [
-            development-mode get [
-                [ print-error nl :c ] with-html-stream
-            ] [
-                500 "Internal server error"
-                trivial-response-body
-            ] if
-        ] simple-page
-    ] >>body ;
+    swap '[ , http-error. ] >>body ;
 
 : do-response ( response -- )
     dup write-response
     request get method>> "HEAD" =
-    [ drop ] [ write-response-body ] if ;
+    [ drop ] [
+        '[
+            , write-response-body
+        ] [
+            http-error.
+        ] recover
+    ] if ;
 
 LOG: httpd-hit NOTICE
 

@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files kernel tools.test db db.tuples
-db.types continuations namespaces math
-prettyprint tools.walker db.sqlite calendar
-math.intervals db.postgresql ;
+USING: io.files kernel tools.test db db.tuples classes
+db.types continuations namespaces math math.ranges
+prettyprint tools.walker calendar sequences db.sqlite
+math.intervals db.postgresql accessors random math.bitfields.lib ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -80,9 +80,9 @@ SYMBOL: person4
             "teddy"
             10
             3.14
-            T{ timestamp f 2008 3 5 16 24 11 0 }
-            T{ timestamp f 2008 11 22 f f f f }
-            T{ timestamp f f f f 12 34 56 f }
+            T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f 2008 11 22 f f f T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
             B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
         }
     ] [ T{ person f 3 } select-tuple ] unit-test
@@ -96,22 +96,15 @@ SYMBOL: person4
             "eddie"
             10
             3.14
-            T{ timestamp f 2008 3 5 16 24 11 0 }
-            T{ timestamp f 2008 11 22 f f f f }
-            T{ timestamp f f f f 12 34 56 f }
+            T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f 2008 11 22 f f f T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
             f
             H{ { 1 2 } { 3 4 } { 5 "lol" } }
         }
     ] [ T{ person f 4 } select-tuple ] unit-test
 
     [ ] [ person drop-table ] unit-test ;
-
-: make-native-person-table ( -- )
-    [ person drop-table ] [ drop ] recover
-    person create-table
-    T{ person f f "billy" 200 3.14 } insert-tuple
-    T{ person f f "johnny" 10 3.14 } insert-tuple
-    ;
 
 : native-person-schema ( -- )
     person "PERSON"
@@ -192,7 +185,6 @@ TUPLE: annotation n paste-id summary author mode contents ;
 
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test
-    
     [ ] [ person1 get insert-tuple ] unit-test
     [ person1 get insert-tuple ] must-fail ;
 
@@ -212,12 +204,9 @@ TUPLE: serialize-me id data ;
         { T{ serialize-me f 1 H{ { 1 2 } } } }
     ] [ T{ serialize-me f 1 } select-tuples ] unit-test ;
 
-[ test-serialize ] test-sqlite
-! [ test-serialize ] test-postgresql
-
 TUPLE: exam id name score ; 
 
-: test-ranges ( -- )
+: test-intervals ( -- )
     exam "EXAM"
     {
         { "id" "ID" +native-id+ }
@@ -233,12 +222,84 @@ TUPLE: exam id name score ;
     [ ] [ T{ exam f f "Cartman" 41 } insert-tuple ] unit-test
 
     [
-        T{ exam f 3 "Kenny" 60 }
-        T{ exam f 4 "Cartman" 41 }
-    ] [ T{ exam f 4 f T{ interval f { 0 t } { 70 t } } } select-tuples ] unit-test
-    ;
+        {
+            T{ exam f 3 "Kenny" 60 }
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam f f f T{ interval f { 0 t } { 70 t } } } select-tuples
+    ] unit-test
 
-! [ test-ranges ] test-sqlite
+    [
+        { }
+    ] [
+        T{ exam f T{ interval f { 3 f } { 4 f } } f } select-tuples
+    ] unit-test
+    [
+        {
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam f T{ interval f { 3 f } { 4 t } } f } select-tuples
+    ] unit-test
+    [
+        {
+            T{ exam f 3 "Kenny" 60 }
+        }
+    ] [
+        T{ exam f T{ interval f { 3 t } { 4 f } } f } select-tuples
+    ] unit-test
+    [
+        {
+            T{ exam f 3 "Kenny" 60 }
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam f T{ interval f { 3 t } { 4 t } } f } select-tuples
+    ] unit-test
+
+    [
+        {
+            T{ exam f 1 "Kyle" 100 }
+            T{ exam f 2 "Stan" 80 }
+        }
+    ] [
+        T{ exam f f { "Stan" "Kyle" } } select-tuples
+    ] unit-test
+
+    [
+        {
+            T{ exam f 1 "Kyle" 100 }
+            T{ exam f 2 "Stan" 80 }
+            T{ exam f 3 "Kenny" 60 }
+        }
+    ] [
+        T{ exam f T{ range f 1 3 1 } } select-tuples
+    ] unit-test ;
+
+TUPLE: bignum-test id m n o ;
+: <bignum-test> ( m n o -- obj )
+    bignum-test new
+        swap >>o
+        swap >>n
+        swap >>m ;
+
+: test-bignum
+    bignum-test "BIGNUM_TEST"
+    {
+        { "id" "ID" +native-id+ }
+        { "m" "M" BIG-INTEGER }
+        { "n" "N" UNSIGNED-BIG-INTEGER }
+        { "o" "O" SIGNED-BIG-INTEGER }
+    } define-persistent
+    [ bignum-test drop-table ] ignore-errors
+    [ ] [ bignum-test ensure-table ] unit-test
+    [ ] [ 63 2^ 1- dup dup <bignum-test> insert-tuple ] unit-test ;
+
+    ! sqlite only
+    ! [ T{ bignum-test f 1
+        ! -9223372036854775808 9223372036854775808 -9223372036854775808 } ]
+    ! [ T{ bignum-test f 1 } select-tuple ] unit-test ;
 
 TUPLE: secret n message ;
 C: <secret> secret
@@ -246,27 +307,59 @@ C: <secret> secret
 : test-random-id
     secret "SECRET"
     {
-        { "n" "ID" +random-id+ }
+        { "n" "ID" +random-id+ system-random-generator }
         { "message" "MESSAGE" TEXT }
     } define-persistent
 
     [ ] [ secret ensure-table ] unit-test
+
     [ ] [ f "kilroy was here" <secret> insert-tuple ] unit-test
-    [ ] [ T{ secret } select-tuples ] unit-test
-    ;
 
+    [ ] [ f "kilroy was here2" <secret> insert-tuple ] unit-test
 
+    [ ] [ f "kilroy was here3" <secret> insert-tuple ] unit-test
 
-! [ test-random-id ] test-sqlite
- [ native-person-schema test-tuples ] test-sqlite
- [ assigned-person-schema test-tuples ] test-sqlite
-! [ assigned-person-schema test-repeated-insert ] test-sqlite
-! [ native-person-schema test-tuples ] test-postgresql
-! [ assigned-person-schema test-tuples ] test-postgresql
-! [ assigned-person-schema test-repeated-insert ] test-postgresql
+    [ t ] [
+        T{ secret } select-tuples
+        first message>> "kilroy was here" head?
+    ] unit-test
 
-! \ insert-tuple must-infer
-! \ update-tuple must-infer
-! \ delete-tuple must-infer
-! \ select-tuple must-infer
-! \ define-persistent must-infer
+    [ t ] [
+        T{ secret } select-tuples length 3 =
+    ] unit-test ;
+
+[ native-person-schema test-tuples ] test-sqlite
+[ assigned-person-schema test-tuples ] test-sqlite
+[ assigned-person-schema test-repeated-insert ] test-sqlite
+[ test-bignum ] test-sqlite
+[ test-serialize ] test-sqlite
+[ test-intervals ] test-sqlite
+[ test-random-id ] test-sqlite
+
+[ native-person-schema test-tuples ] test-postgresql
+[ assigned-person-schema test-tuples ] test-postgresql
+[ assigned-person-schema test-repeated-insert ] test-postgresql
+[ test-bignum ] test-postgresql
+[ test-serialize ] test-postgresql
+[ test-intervals ] test-postgresql
+[ test-random-id ] test-postgresql
+
+TUPLE: does-not-persist ;
+
+[
+    [ does-not-persist create-sql-statement ]
+    [ class \ not-persistent = ] must-fail-with
+] test-sqlite
+
+[
+    [ does-not-persist create-sql-statement ]
+    [ class \ not-persistent = ] must-fail-with
+] test-postgresql
+
+! Don't comment these out. These words must infer
+\ bind-tuple must-infer
+\ insert-tuple must-infer
+\ update-tuple must-infer
+\ delete-tuple must-infer
+\ select-tuple must-infer
+\ define-persistent must-infer

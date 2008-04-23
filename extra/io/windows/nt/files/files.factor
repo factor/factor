@@ -1,23 +1,23 @@
 USING: continuations destructors io.buffers io.files io.backend
 io.timeouts io.nonblocking io.windows io.windows.nt.backend
-kernel libc math threads windows windows.kernel32
-alien.c-types alien.arrays sequences combinators combinators.lib
-sequences.lib ascii splitting alien strings assocs
-combinators.cleave namespaces ;
+kernel libc math threads windows windows.kernel32 system
+alien.c-types alien.arrays alien.strings sequences combinators
+combinators.lib sequences.lib ascii splitting alien strings
+assocs namespaces io.files.private accessors ;
 IN: io.windows.nt.files
 
-M: windows-nt-io cwd
+M: winnt cwd
     MAX_UNICODE_PATH dup "ushort" <c-array>
     [ GetCurrentDirectory win32-error=0/f ] keep
-    alien>u16-string ;
+    utf16n alien>string ;
 
-M: windows-nt-io cd
+M: winnt cd
     SetCurrentDirectory win32-error=0/f ;
 
 : unicode-prefix ( -- seq )
     "\\\\?\\" ; inline
 
-M: windows-nt-io root-directory? ( path -- ? )
+M: winnt root-directory? ( path -- ? )
     {
         { [ dup empty? ] [ f ] }
         { [ dup [ path-separator? ] all? ] [ t ] }
@@ -25,7 +25,7 @@ M: windows-nt-io root-directory? ( path -- ? )
           { [ dup length 2 = ] [ dup second CHAR: : = ] } && nip ] [
             t
         ] }
-        { [ t ] [ f ] }
+        [ f ]
     } cond nip ;
 
 ERROR: not-absolute-path ;
@@ -37,33 +37,19 @@ ERROR: not-absolute-path ;
     } && [ 2 head ] [ not-absolute-path ] if ;
 
 : prepend-prefix ( string -- string' )
-    unicode-prefix prepend ;
+    dup unicode-prefix head? [
+        unicode-prefix prepend
+    ] unless ;
 
-ERROR: nonstring-pathname ;
-ERROR: empty-pathname ;
+M: winnt normalize-path ( string -- string' )
+    (normalize-path)
+    { { CHAR: / CHAR: \\ } } substitute
+    prepend-prefix ;
 
-M: windows-nt-io normalize-pathname ( string -- string )
-    "resource:" ?head [
-        left-trim-separators resource-path
-        normalize-pathname
-    ] [
-        dup empty? [ empty-pathname ] when
-        current-directory get prepend-path
-        dup unicode-prefix head? [
-            dup first path-separator? [
-                left-trim-separators
-                current-directory get 2 head
-                prepend-path
-            ] when
-            unicode-prefix prepend
-        ] unless
-        { { CHAR: / CHAR: \\ } } substitute ! necessary
-    ] if ;
-
-M: windows-nt-io CreateFile-flags ( DWORD -- DWORD )
+M: winnt CreateFile-flags ( DWORD -- DWORD )
     FILE_FLAG_OVERLAPPED bitor ;
 
-M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
+M: winnt FileArgs-overlapped ( port -- overlapped )
     make-overlapped ;
 
 : update-file-ptr ( n port -- )
@@ -78,7 +64,7 @@ M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
     dup pending-error
     tuck get-overlapped-result
     dup pick update-file-ptr
-    swap buffer-consume ;
+    swap buffer>> buffer-consume ;
 
 : (flush-output) ( port -- )
     dup make-FileArgs
@@ -87,7 +73,7 @@ M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
         >r FileArgs-lpOverlapped r>
         [ save-callback ] 2keep
         [ finish-flush ] keep
-        dup buffer-empty? [ drop ] [ (flush-output) ] if
+        dup buffer>> buffer-empty? [ drop ] [ (flush-output) ] if
     ] [
         2drop
     ] if ;
@@ -96,14 +82,14 @@ M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
     [ [ (flush-output) ] with-timeout ] with-destructors ;
 
 M: port port-flush
-    dup buffer-empty? [ dup flush-output ] unless drop ;
+    dup buffer>> buffer-empty? [ dup flush-output ] unless drop ;
 
 : finish-read ( overlapped port -- )
     dup pending-error
     tuck get-overlapped-result dup zero? [
-        drop t swap set-port-eof?
+        drop t >>eof drop
     ] [
-        dup pick n>buffer
+        dup pick buffer>> n>buffer
         swap update-file-ptr
     ] if ;
 

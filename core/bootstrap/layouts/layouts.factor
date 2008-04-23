@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math words kernel alien byte-arrays
 hashtables vectors strings sbufs arrays bit-arrays
-float-arrays quotations assocs layouts tuples tuples.private ;
+float-arrays quotations assocs layouts classes.tuple.private
+kernel.private ;
 
 BIN: 111 tag-mask set
 8 num-tags set
@@ -15,6 +16,7 @@ H{
     { bignum      BIN: 001 }
     { tuple       BIN: 010 }
     { object      BIN: 011 }
+    { hi-tag      BIN: 011 }
     { ratio       BIN: 100 }
     { float       BIN: 101 }
     { complex     BIN: 110 }
@@ -34,4 +36,4 @@ tag-numbers get H{
     { word 17 }
     { byte-array 18 }
     { tuple-layout 19 }
-} union type-numbers set
+} assoc-union type-numbers set

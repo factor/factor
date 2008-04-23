@@ -10,23 +10,13 @@ IN: unix.stat
 
 : S_IFMT   OCT: 170000 ; ! These bits determine file type.
 
-: S_IFDIR  OCT:  40000 ;    ! Directory.
-: S_IFCHR  OCT:  20000 ;    ! Character device.
-: S_IFBLK  OCT:  60000 ;    ! Block device.
-: S_IFREG  OCT: 100000 ;    ! Regular file.
-: S_IFIFO  OCT: 010000 ;    ! FIFO.
-: S_IFLNK  OCT: 120000 ;    ! Symbolic link.
-: S_IFSOCK OCT: 140000 ;    ! Socket.
-
-: S_ISTYPE ( mode mask -- val ) >r S_IFMT bitand r> = ;
-
-: S_ISREG  ( mode -- value ) S_IFREG S_ISTYPE ;
-: S_ISDIR  ( mode -- value ) S_IFDIR S_ISTYPE ;
-: S_ISCHR  ( mode -- value ) S_IFCHR S_ISTYPE ;
-: S_ISBLK  ( mode -- value ) S_IFBLK S_ISTYPE ;
-: S_ISFIFO ( mode -- value ) S_IFIFO S_ISTYPE ;
-: S_ISLNK  ( mode -- value ) S_IFLNK S_ISTYPE ;
-: S_ISSOCK ( mode -- value ) S_IFSOCK S_ISTYPE ;
+: S_IFDIR  OCT:  40000 ; inline   ! Directory.
+: S_IFCHR  OCT:  20000 ; inline   ! Character device.
+: S_IFBLK  OCT:  60000 ; inline   ! Block device.
+: S_IFREG  OCT: 100000 ; inline   ! Regular file.
+: S_IFIFO  OCT: 010000 ; inline   ! FIFO.
+: S_IFLNK  OCT: 120000 ; inline   ! Symbolic link.
+: S_IFSOCK OCT: 140000 ; inline   ! Socket.
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! File Access Permissions
@@ -60,11 +50,11 @@ FUNCTION: int mkdir ( char* path, mode_t mode ) ;
 <<
   os
   {
-    { "linux"   [ "unix.stat.linux"   require ] }
-    { "macosx"  [ "unix.stat.macosx"  require ] }
-    { "freebsd" [ "unix.stat.freebsd" require ] }
-    { "netbsd"  [ "unix.stat.netbsd" require ] }
-    { "openbsd" [ "unix.stat.openbsd" require ] }
+    { linux   [ "unix.stat.linux"   require ] }
+    { macosx  [ "unix.stat.macosx"  require ] }
+    { freebsd [ "unix.stat.freebsd" require ] }
+    { netbsd  [ "unix.stat.netbsd"  require ] }
+    { openbsd [ "unix.stat.openbsd" require ] }
   }
   case
 >>

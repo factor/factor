@@ -1,8 +1,6 @@
-USING: alien alien.c-types kernel windows.ole32
-combinators.lib parser splitting sequences.lib
-sequences namespaces combinators.cleave
-assocs quotations shuffle accessors words macros
-alien.syntax fry ;
+USING: alien alien.c-types kernel windows.ole32 combinators.lib
+parser splitting sequences.lib sequences namespaces assocs
+quotations shuffle accessors words macros alien.syntax fry ;
 IN: windows.com.syntax
 
 <PRIVATE
@@ -42,7 +40,7 @@ unless
 : (parse-com-function) ( tokens -- definition )
     [ second ]
     [ first ]
-    [ 3 tail 2 group [ first ] map "void*" add* ]
+    [ 3 tail 2 group [ first ] map "void*" prefix ]
     tri
     <com-function-definition> ;
 

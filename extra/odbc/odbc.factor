@@ -1,10 +1,11 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel alien alien.syntax combinators alien.c-types
-       strings sequences namespaces words math threads ;
+USING: kernel alien alien.strings alien.syntax combinators
+alien.c-types strings sequences namespaces words math threads
+io.encodings.ascii ;
 IN: odbc
 
-"odbc" "odbc32.dll" "stdcall" add-library
+<< "odbc" "odbc32.dll" "stdcall" add-library >>
 
 LIBRARY: odbc
 
@@ -88,42 +89,42 @@ SYMBOL: SQL-TYPE-UNKNOWN
 
 : convert-sql-type ( number -- symbol )
   {
-    { [ dup 1 = ] [ drop SQL-CHAR ] }
-    { [ dup 12 = ] [ drop SQL-VARCHAR ] }
-    { [ dup -1 = ] [ drop SQL-LONGVARCHAR ] }
-    { [ dup -8 = ] [ drop SQL-WCHAR ] }
-    { [ dup -9 = ] [ drop SQL-WCHARVAR ] }
-    { [ dup -10 = ] [ drop SQL-WLONGCHARVAR ] }
-    { [ dup 3 = ] [ drop SQL-DECIMAL ] }
-    { [ dup 5 = ] [ drop SQL-SMALLINT ] }
-    { [ dup 2 = ] [ drop SQL-NUMERIC ] }
-    { [ dup 4 = ] [ drop SQL-INTEGER ] }
-    { [ dup 7 = ] [ drop SQL-REAL ] }
-    { [ dup 6 = ] [ drop SQL-FLOAT ] }
-    { [ dup 8 = ] [ drop SQL-DOUBLE ] }
-    { [ dup -7 = ] [ drop SQL-BIT ] }
-    { [ dup -6 = ] [ drop SQL-TINYINT ] }
-    { [ dup -5 = ] [ drop SQL-BIGINT ] }
-    { [ dup -2 = ] [ drop SQL-BINARY ] }
-    { [ dup -3 = ] [ drop SQL-VARBINARY ] }   
-    { [ dup -4 = ] [ drop SQL-LONGVARBINARY ] }
-    { [ dup 91 = ] [ drop SQL-TYPE-DATE ] }
-    { [ dup 92 = ] [ drop SQL-TYPE-TIME ] }
-    { [ dup 93 = ] [ drop SQL-TYPE-TIMESTAMP ] }
-    { [ t ] [ drop SQL-TYPE-UNKNOWN ] }
-  } cond ;
+    { 1 [ SQL-CHAR ] }
+    { 12  [ SQL-VARCHAR ] }
+    { -1  [ SQL-LONGVARCHAR ] }
+    { -8  [ SQL-WCHAR ] }
+    { -9  [ SQL-WCHARVAR ] }
+    { -10 [ SQL-WLONGCHARVAR ] }
+    { 3 [ SQL-DECIMAL ] }
+    { 5 [ SQL-SMALLINT ] }
+    { 2 [ SQL-NUMERIC ] }
+    { 4 [ SQL-INTEGER ] }
+    { 7 [ SQL-REAL ] }
+    { 6 [ SQL-FLOAT ] }
+    { 8 [ SQL-DOUBLE ] }
+    { -7 [ SQL-BIT ] }
+    { -6 [ SQL-TINYINT ] }
+    { -5 [ SQL-BIGINT ] }
+    { -2 [ SQL-BINARY ] }
+    { -3 [ SQL-VARBINARY ] }
+    { -4 [ SQL-LONGVARBINARY ] }
+    { 91 [ SQL-TYPE-DATE ] }
+    { 92 [ SQL-TYPE-TIME ] }
+    { 93 [ SQL-TYPE-TIMESTAMP ] }
+    [ drop SQL-TYPE-UNKNOWN ]
+  } case ;
 
 : succeeded? ( n -- bool )
   #! Did the call succeed (SQL-SUCCESS or SQL-SUCCESS-WITH-INFO)
   {
-    { [ dup SQL-SUCCESS = ] [ drop t ] }
-    { [ dup SQL-SUCCESS-WITH-INFO = ] [ drop t ] }
-    { [ t ] [ drop f ] }
-  } cond ;  
+    { SQL-SUCCESS [ t ] }
+    { SQL-SUCCESS-WITH-INFO [ t ] }
+    [ drop f ]
+  } case ;
 
 FUNCTION: SQLRETURN SQLAllocHandle ( SQLSMALLINT handleType, SQLHANDLE inputHandle, SQLHANDLE* outputHandlePtr ) ;
 FUNCTION: SQLRETURN SQLSetEnvAttr ( SQLHENV environmentHandle, SQLINTEGER attribute, SQLPOINTER valuePtr, SQLINTEGER stringLength ) ;
-FUNCTION: SQLRETURN SQLDriverConnect ( SQLHDBC connectionHandle, SQLHWND windowHandle, SQLCHAR* inConnectionString, SQLSMALLINT stringLength, SQLCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLength2Ptr, SQLUSMALLINT driverCompletion ) ; 
+FUNCTION: SQLRETURN SQLDriverConnect ( SQLHDBC connectionHandle, SQLHWND windowHandle, SQLCHAR* inConnectionString, SQLSMALLINT stringLength, SQLCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLength2Ptr, SQLUSMALLINT driverCompletion ) ;
 FUNCTION: SQLRETURN SQLDisconnect ( SQLHDBC connectionHandle ) ;
 FUNCTION: SQLRETURN SQLPrepare ( SQLHSTMT statementHandle, SQLCHAR* statementText, SQLINTEGER length ) ;
 FUNCTION: SQLRETURN SQLExecute ( SQLHSTMT statementHandle ) ;
@@ -150,22 +151,22 @@ FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNu
   SQL-HANDLE-STMT swap alloc-handle ;
 
 : temp-string ( length -- byte-array length )
-  [ CHAR: \space  <string> string>char-alien ] keep ;
+  [ CHAR: \space  <string> ascii string>alien ] keep ;
 
 : odbc-init ( -- env )
   alloc-env-handle
-  [ 
-    SQL-ATTR-ODBC-VERSION SQL-OV-ODBC3 0 SQLSetEnvAttr 
+  [
+    SQL-ATTR-ODBC-VERSION SQL-OV-ODBC3 0 SQLSetEnvAttr
     succeeded? [ "odbc-init failed" throw ] unless
   ] keep ;
 
 : odbc-connect ( env dsn -- dbc )
-   >r alloc-dbc-handle dup r> 
-   f swap dup length 1024 temp-string 0 <short> SQL-DRIVER-NOPROMPT 
+   >r alloc-dbc-handle dup r>
+   f swap dup length 1024 temp-string 0 <short> SQL-DRIVER-NOPROMPT
    SQLDriverConnect succeeded? [ "odbc-connect failed" throw ] unless ;
 
 : odbc-disconnect ( dbc -- )
-  SQLDisconnect succeeded? [ "odbc-disconnect failed" throw ] unless ;     
+  SQLDisconnect succeeded? [ "odbc-disconnect failed" throw ] unless ;
 
 : odbc-prepare ( dbc string -- statement )
   >r alloc-stmt-handle dup r> dup length SQLPrepare succeeded? [ "odbc-prepare failed" throw ] unless ;
@@ -192,20 +193,20 @@ C: <column> column
 
 : odbc-describe-column ( statement n -- column )
   dup >r
-  1024 CHAR: \space <string> string>char-alien dup >r
-  1024 
+  1024 CHAR: \space <string> ascii string>alien dup >r
+  1024
   0 <short>
   0 <short> dup >r
   0 <uint> dup >r
   0 <short> dup >r
   0 <short> dup >r
   SQLDescribeCol succeeded? [
-    r> *short 
-    r> *short 
-    r> *uint 
-    r> *short convert-sql-type 
-    r> alien>char-string 
-    r> <column> 
+    r> *short
+    r> *short
+    r> *uint
+    r> *short convert-sql-type
+    r> ascii alien>string
+    r> <column>
   ] [
     r> drop r> drop r> drop r> drop r> drop r> drop
     "odbc-describe-column failed" throw
@@ -213,21 +214,21 @@ C: <column> column
 
 : dereference-type-pointer ( byte-array column -- object )
   column-type {
-    { [ dup SQL-CHAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-VARCHAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-LONGVARCHAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-WCHAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-WCHARVAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-WLONGCHARVAR = ] [ drop alien>char-string ] }
-    { [ dup SQL-SMALLINT = ] [ drop *short ] }
-    { [ dup SQL-INTEGER = ] [ drop *long ] }
-    { [ dup SQL-REAL = ] [ drop *float ] }
-    { [ dup SQL-FLOAT = ] [ drop *double ] }
-    { [ dup SQL-DOUBLE = ] [ drop *double ] }
-    { [ dup SQL-TINYINT = ] [ drop *char  ] }
-    { [ dup SQL-BIGINT = ] [ drop *longlong ] }
-    { [ t ] [ nip [ "Unknown SQL Type: " % word-name % ] "" make ] }    
-  } cond ;
+    { SQL-CHAR [ ascii alien>string ] }
+    { SQL-VARCHAR [ ascii alien>string ] }
+    { SQL-LONGVARCHAR [ ascii alien>string ] }
+    { SQL-WCHAR [ ascii alien>string ] }
+    { SQL-WCHARVAR [ ascii alien>string ] }
+    { SQL-WLONGCHARVAR [ ascii alien>string ] }
+    { SQL-SMALLINT [ *short ] }
+    { SQL-INTEGER [ *long ] }
+    { SQL-REAL [ *float ] }
+    { SQL-FLOAT [ *double ] }
+    { SQL-DOUBLE [ *double ] }
+    { SQL-TINYINT [ *char  ] }
+    { SQL-BIGINT [ *longlong ] }
+    [ nip [ "Unknown SQL Type: " % word-name % ] "" make ]
+  } case ;
 
 TUPLE: field value column ;
 
@@ -236,14 +237,14 @@ C: <field> field
 : odbc-get-field ( statement column -- field )
   dup column? [ dupd odbc-describe-column ] unless dup >r column-number
   SQL-C-DEFAULT
-  8192 CHAR: \space <string> string>char-alien dup >r
-  8192 
+  8192 CHAR: \space <string> ascii string>alien dup >r
+  8192
   f SQLGetData succeeded? [
     r> r> [ dereference-type-pointer ] keep <field>
   ] [
-    r> drop r> [ 
-      "SQLGetData Failed for Column: " % 
-      dup column-name % 
+    r> drop r> [
+      "SQLGetData Failed for Column: " %
+      dup column-name %
       " of type: " % dup column-type word-name %
     ] "" make swap <field>
   ] if ;
@@ -252,15 +253,15 @@ C: <field> field
   [
     dup odbc-number-of-columns [
       1+ odbc-get-field field-value ,
-    ] with each 
+    ] with each
   ] { } make ;
 
 : (odbc-get-all-rows) ( statement -- )
-  dup odbc-next-row [ dup odbc-get-row-fields , yield (odbc-get-all-rows) ] [ drop ] if ; 
-    
+  dup odbc-next-row [ dup odbc-get-row-fields , yield (odbc-get-all-rows) ] [ drop ] if ;
+
 : odbc-get-all-rows ( statement -- seq )
   [ (odbc-get-all-rows) ] { } make ;
-  
+
 : odbc-query ( string dsn -- result )
   odbc-init swap odbc-connect [
     swap odbc-prepare

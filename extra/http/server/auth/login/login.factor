@@ -1,20 +1,31 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors quotations assocs kernel splitting
-base64 html.elements io combinators http.server
-http.server.auth.providers http.server.auth.providers.null
-http.server.actions http.server.components http.server.sessions
-http.server.templating.fhtml http.server.validators
-http.server.auth http sequences io.files namespaces hashtables
-fry io.sockets combinators.cleave arrays threads locals
-qualified continuations destructors ;
+base64 io combinators sequences io.files namespaces hashtables
+fry io.sockets arrays threads locals qualified continuations
+destructors
+
+html.elements
+http
+http.server
+http.server.auth
+http.server.auth.providers
+http.server.auth.providers.null
+http.server.actions
+http.server.components
+http.server.forms
+http.server.sessions
+http.server.boilerplate
+http.server.templating
+http.server.templating.chloe
+http.server.validators ;
 IN: http.server.auth.login
 QUALIFIED: smtp
 
 SYMBOL: post-login-url
 SYMBOL: login-failed?
 
-TUPLE: login users ;
+TUPLE: login < dispatcher users ;
 
 : users login get users>> ;
 
@@ -31,11 +42,15 @@ M: user-saver dispose
 : save-user-after ( user -- )
     <user-saver> add-always-destructor ;
 
+: login-template ( name -- template )
+    "resource:extra/http/server/auth/login/" swap ".xml"
+    3append <chloe> ;
+
 ! ! ! Login
 
 : <login-form>
     "login" <form>
-        "resource:extra/http/server/auth/login/login.fhtml" >>edit-template
+        "login" login-template >>edit-template
         "username" <username>
             t >>required
             add-field
@@ -53,10 +68,7 @@ M: user-saver dispose
         <action>
             [ blank-values ] >>init
 
-            [
-                "text/html" <content>
-                [ form edit-form ] >>body
-            ] >>display
+            [ form edit-form ] >>display
 
             [
                 blank-values
@@ -77,7 +89,7 @@ M: user-saver dispose
 
 : <register-form> ( -- form )
     "register" <form>
-        "resource:extra/http/server/auth/login/register.fhtml" >>edit-template
+        "register" login-template >>edit-template
         "username" <username>
             t >>required
             add-field
@@ -105,10 +117,7 @@ SYMBOL: user-exists?
         <action>
             [ blank-values ] >>init
 
-            [
-                "text/html" <content>
-                [ form edit-form ] >>body
-            ] >>display
+            [ form edit-form ] >>display
 
             [
                 blank-values
@@ -130,7 +139,7 @@ SYMBOL: user-exists?
 
                 successful-login
 
-                login get responder>> init-user-profile
+                login get default>> responder>> init-user-profile
             ] >>submit
     ] ;
 
@@ -138,7 +147,7 @@ SYMBOL: user-exists?
 
 : <edit-profile-form> ( -- form )
     "edit-profile" <form>
-        "resource:extra/http/server/auth/login/edit-profile.fhtml" >>edit-template
+        "edit-profile" login-template >>edit-template
         "username" <username> add-field
         "realname" <string> add-field
         "password" <password> add-field
@@ -159,10 +168,7 @@ SYMBOL: previous-page
                 dup email>> "email" set-value
             ] >>init
 
-            [
-                "text/html" <content>
-                [ form edit-form ] >>body
-            ] >>display
+            [ form edit-form ] >>display
 
             [
                 blank-values
@@ -178,7 +184,7 @@ SYMBOL: previous-page
                     "password" value uid users check-login
                     [ login-failed? on validation-failed ] unless
 
-                    "new-password" value set-password
+                    "new-password" value >>password
                 ] unless
 
                 "realname" value >>realname
@@ -233,7 +239,7 @@ SYMBOL: lost-password-from
 
 : <recover-form-1> ( -- form )
     "register" <form>
-        "resource:extra/http/server/auth/login/recover-1.fhtml" >>edit-template
+        "recover-1" login-template >>edit-template
         "username" <username>
             t >>required
             add-field
@@ -247,10 +253,7 @@ SYMBOL: lost-password-from
         <action>
             [ blank-values ] >>init
 
-            [
-                "text/html" <content>
-                [ form edit-form ] >>body
-            ] >>display
+            [ form edit-form ] >>display
 
             [
                 blank-values
@@ -262,14 +265,15 @@ SYMBOL: lost-password-from
                     send-password-email
                 ] when*
 
-                "resource:extra/http/server/auth/login/recover-2.fhtml" serve-template
+                "recover-2" login-template serve-template
             ] >>submit
     ] ;
 
 : <recover-form-3>
     "new-password" <form>
-        "resource:extra/http/server/auth/login/recover-3.fhtml" >>edit-template
-        "username" <username> <hidden>
+        "recover-3" login-template >>edit-template
+        "username" <username>
+            hidden >>renderer
             t >>required
             add-field
         "new-password" <password>
@@ -278,7 +282,8 @@ SYMBOL: lost-password-from
         "verify-password" <password>
             t >>required
             add-field
-        "ticket" <string> <hidden>
+        "ticket" <string>
+            hidden >>renderer
             t >>required
             add-field ;
 
@@ -297,10 +302,7 @@ SYMBOL: lost-password-from
                 ] H{ } make-assoc values set
             ] >>init
 
-            [
-                "text/html" <content>
-                [ <recover-form-3> edit-form ] >>body
-            ] >>display
+            [ <recover-form-3> edit-form ] >>display
 
             [
                 blank-values
@@ -315,8 +317,7 @@ SYMBOL: lost-password-from
                     "new-password" value >>password
                     users update-user
 
-                    "resource:extra/http/server/auth/login/recover-4.fhtml"
-                    serve-template
+                    "recover-4" login-template serve-template
                 ] [
                     <400>
                 ] if*
@@ -342,38 +343,46 @@ C: <protected> protected
     "login" f <permanent-redirect> ;
 
 M: protected call-responder ( path responder -- response )
-    logged-in-user sget [
-        dup save-user-after
+    logged-in-user sget dup [
+        save-user-after
         request get request-url previous-page sset
         responder>> call-responder
     ] [
-        2drop
+        3drop
         request get method>> { "GET" "HEAD" } member?
         [ show-login-page ] [ <400> ] if
     ] if ;
 
 M: login call-responder ( path responder -- response )
     dup login set
-    delegate call-responder ;
+    call-next-method ;
+
+: <login-boilerplate> ( responder -- responder' )
+    <boilerplate>
+        "boilerplate" login-template >>template ;
 
 : <login> ( responder -- auth )
-    login <webapp>
-        swap <protected> >>default
-        <login-action> "login" add-responder
-        <logout-action> "logout" add-responder
+    login new-dispatcher
+        swap >>default
+        <login-action> <login-boilerplate> "login" add-responder
+        <logout-action> <login-boilerplate> "logout" add-responder
         no-users >>users ;
 
 ! ! ! Configuration
 
 : allow-edit-profile ( login -- login )
-    <edit-profile-action> <protected> "edit-profile" add-responder ;
+    <edit-profile-action> <protected> <login-boilerplate>
+        "edit-profile" add-responder ;
 
 : allow-registration ( login -- login )
-    <register-action> "register" add-responder ;
+    <register-action> <login-boilerplate>
+        "register" add-responder ;
 
 : allow-password-recovery ( login -- login )
-    <recover-action-1> "recover-password" add-responder
-    <recover-action-3> "new-password" add-responder ;
+    <recover-action-1> <login-boilerplate>
+        "recover-password" add-responder
+    <recover-action-3> <login-boilerplate>
+        "new-password" add-responder ;
 
 : allow-edit-profile? ( -- ? )
     login get responders>> "edit-profile" swap key? ;
