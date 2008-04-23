@@ -1,10 +1,18 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry hashtables io io.streams.string kernel math sets
-namespaces math.parser assocs sequences strings splitting ascii
-io.encodings.utf8 io.encodings.string io.sockets namespaces
-unicode.case combinators vectors sorting accessors calendar
-calendar.format quotations arrays combinators.lib byte-arrays ;
+USING: accessors kernel combinators math namespaces
+
+assocs sequences splitting sorting sets debugger
+strings vectors hashtables quotations arrays byte-arrays
+math.parser calendar calendar.format
+
+io io.streams.string io.encodings.utf8 io.encodings.string
+io.sockets
+
+unicode.case unicode.categories qualified ;
+
+EXCLUDE: fry => , ;
+
 IN: http
 
 : http-port 80 ; inline
@@ -13,11 +21,12 @@ IN: http
     #! In a URL, can this character be used without
     #! URL-encoding?
     {
-        [ dup letter? ]
-        [ dup LETTER? ]
-        [ dup digit? ]
-        [ dup "/_-.:" member? ]
-    } || nip ; foldable
+        { [ dup letter? ] [ t ] }
+        { [ dup LETTER? ] [ t ] }
+        { [ dup digit? ] [ t ] }
+        { [ dup "/_-.:" member? ] [ t ] }
+        [ f ]
+    } cond nip ; foldable
 
 : push-utf8 ( ch -- )
     1string utf8 encode
@@ -75,8 +84,15 @@ IN: http
         ] if
     ] if ;
 
+: read-lf ( -- string )
+    "\n" read-until CHAR: \n assert= ;
+
+: read-crlf ( -- string )
+    "\r" read-until
+    [ CHAR: \r assert= read1 CHAR: \n assert= ] when* ;
+
 : read-header-line ( -- )
-    readln dup
+    read-crlf dup
     empty? [ drop ] [ header-line read-header-line ] if ;
 
 : read-header ( -- assoc )
@@ -224,7 +240,7 @@ cookies ;
     dup { "1.0" "1.1" } member? [ "Bad version" throw ] unless ;
 
 : read-request-version ( request -- request )
-    readln [ CHAR: \s = ] left-trim
+    read-crlf [ CHAR: \s = ] left-trim
     parse-version
     >>version ;
 
@@ -372,7 +388,7 @@ body ;
     >>code ;
 
 : read-response-message
-    readln >>message ;
+    read-crlf >>message ;
 
 : read-response-header
     read-header >>header

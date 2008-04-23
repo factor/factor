@@ -126,6 +126,13 @@ CLASS: {
     { +name+ "FactorView" }
     { +protocols+ { "NSTextInput" } }
 }
+
+! Rendering
+! Rendering
+{ "drawRect:" "void" { "id" "SEL" "id" "NSRect" }
+    [ 3drop window relayout-1 ]
+}
+
 ! Events
 { "acceptsFirstMouse:" "bool" { "id" "SEL" "id" }
     [ 3drop 1 ]

@@ -14,7 +14,7 @@ HELP: <column> ( seq n -- column )
 { $description "Outputs a new virtual sequence which presents a fixed column of a matrix represented as a sequence of rows." "The " { $snippet "i" } "th element of a column is the " { $snippet "n" } "th element of the " { $snippet "i" } "th element of" { $snippet "seq" } ". Every element of " { $snippet "seq" } " must be a sequence, and all sequences must have equal length." }
 { $examples
     { $example
-        "USING: arrays prettyprint sequences ;"
+        "USING: arrays prettyprint columns ;"
         "{ { 1 2 3 } { 4 5 6 } { 7 8 9 } } 0 <column> >array ."
         "{ 1 4 7 }"
     }

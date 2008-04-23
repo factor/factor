@@ -2,36 +2,30 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:title>Planet Factor</t:title>
-
+<t:comment>
 	<t:atom title="Planet Factor - Atom" href="feed.xml" />
-
+</t:comment>
 	<t:style include="resource:extra/webapps/planet/planet.css" />
 
-	<table width="100%" cellpadding="10">
-		<tr>
-			<td> <t:view component="postings" /> </td>
+	<div class="navbar">
+		  <t:a href="list">Front Page</t:a>
+		| <t:a href="feed.xml">Atom Feed</t:a>
 
-			<td valign="top" width="25%" class="infobox">
-				<p>
-					<strong>planet-factor</strong> is an Atom feed aggregator that collects the
-					contents of <a href="http://factorcode.org/">Factor</a>-related blogs. It was inspired by
-					<a href="http://planet.lisp.org">Planet Lisp</a>.
-				</p>
-				<p>
-					<img src="http://planet.lisp.org/feed-icon-14x14.png" />
-					<a href="feed.xml"> Syndicate </a>
-				</p>
+		| <t:a href="admin">Admin</t:a>
 
-				<h2>Blogroll</h2>
+		<t:comment>
+		<t:if code="http.server.auth.login:allow-edit-profile?">
+			| <t:a href="edit-profile">Edit Profile</t:a>
+		</t:if>
 
-				<t:summary component="blogroll" />
+		<t:form action="logout" class="inline">
+			| <button type="submit" class="link-button link">Logout</button>
+		</t:form>
+		</t:comment>
+	</div>
 
-				Admin: <t:a href="edit-blog">Add Blog</t:a>
-				|
-				<t:a href="update">Update</t:a>
-			</td>
-		</tr>
-	</table>
+	<h1><t:write-title /></h1>
+
+        <t:call-next-template />
 
 </t:chloe>

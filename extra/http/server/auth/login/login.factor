@@ -363,7 +363,7 @@ M: login call-responder ( path responder -- response )
 
 : <login> ( responder -- auth )
     login new-dispatcher
-        swap <protected> >>default
+        swap >>default
         <login-action> <login-boilerplate> "login" add-responder
         <logout-action> <login-boilerplate> "logout" add-responder
         no-users >>users ;

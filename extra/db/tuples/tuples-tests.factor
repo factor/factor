@@ -80,9 +80,9 @@ SYMBOL: person4
             "teddy"
             10
             3.14
-            T{ timestamp f 2008 3 5 16 24 11 0 }
-            T{ timestamp f 2008 11 22 f f f f }
-            T{ timestamp f f f f 12 34 56 f }
+            T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f 2008 11 22 f f f T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
             B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
         }
     ] [ T{ person f 3 } select-tuple ] unit-test
@@ -96,9 +96,9 @@ SYMBOL: person4
             "eddie"
             10
             3.14
-            T{ timestamp f 2008 3 5 16 24 11 0 }
-            T{ timestamp f 2008 11 22 f f f f }
-            T{ timestamp f f f f 12 34 56 f }
+            T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f 2008 11 22 f f f T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
             f
             H{ { 1 2 } { 3 4 } { 5 "lol" } }
         }

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting locals math
-calendar alarms logging concurrency.combinators
+calendar alarms logging concurrency.combinators namespaces
 db.types db.tuples db
 rss xml.writer
 http.server
@@ -10,10 +10,21 @@ http.server.forms
 http.server.actions
 http.server.boilerplate
 http.server.templating.chloe
-http.server.components ;
+http.server.components
+http.server.auth.login
+webapps.factor-website ;
 IN: webapps.planet
 
+TUPLE: planet-factor < dispatcher postings ;
+
+: planet-template ( name -- template )
+    "resource:extra/webapps/planet/" swap ".xml" 3append <chloe> ;
+
 TUPLE: blog id name www-url atom-url ;
+
+M: blog link-title name>> ;
+
+M: blog link-href www-url>> ;
 
 blog "BLOGS"
 {
@@ -29,8 +40,8 @@ blog "BLOGS"
     blog new
         swap >>id ;
 
-: planet-template ( name -- template )
-    "resource:extra/webapps/planet/" swap ".xml" 3append <chloe> ;
+: blogroll ( -- seq )
+    f <blog> select-tuples [ [ name>> ] compare ] sort ;
 
 : <entry-form> ( -- form )
     "entry" <form>
@@ -44,7 +55,7 @@ blog "BLOGS"
     "blog" <form>
         "edit-blog" planet-template >>edit-template
         "view-blog" planet-template >>view-template
-        "blog-summary" planet-template >>summary-template
+        "blog-admin-link" planet-template >>summary-template
         "id" <integer>
             hidden >>renderer
             add-field
@@ -60,15 +71,27 @@ blog "BLOGS"
 
 : <planet-factor-form> ( -- form )
     "planet-factor" <form>
-        "planet" planet-template >>view-template
-        "mini-planet" planet-template >>summary-template
+        "postings" planet-template >>view-template
+        "postings-summary" planet-template >>summary-template
         "postings" <entry-form> +plain+ <list> add-field
+        "blogroll" "blog" <link> +unordered+ <list> add-field ;
+
+: <admin-form> ( -- form )
+    "admin" <form>
+        "admin" planet-template >>view-template
         "blogroll" <blog-form> +unordered+ <list> add-field ;
 
-: blogroll ( -- seq )
-    f <blog> select-tuples [ [ name>> ] compare ] sort ;
+:: <edit-blogroll-action> ( planet -- action )
+    [let | form [ <admin-form> ] |
+        <action>
+            [
+                blank-values
 
-TUPLE: planet-factor < dispatcher postings ;
+                blogroll "blogroll" set-value
+
+                form view-form
+            ] >>display
+    ] ;
 
 :: <planet-action> ( planet -- action )
     [let | form [ <planet-factor-form> ] |
@@ -90,7 +113,7 @@ TUPLE: planet-factor < dispatcher postings ;
     feed new
         "[ planet-factor ]" >>title
         "http://planet.factorcode.org" >>link
-        planet postings>> 30 safe-head >>entries ;
+        planet postings>> 16 safe-head >>entries ;
 
 :: <feed-action> ( planet -- action )
     <action>
@@ -117,7 +140,8 @@ TUPLE: planet-factor < dispatcher postings ;
 
 : update-cached-postings ( planet -- )
     "webapps.planet" [
-        blogroll fetch-blogroll sort-entries >>postings drop
+        blogroll fetch-blogroll sort-entries 8 safe-head
+        >>postings drop
     ] with-logging ;
 
 :: <update-action> ( planet -- action )
@@ -127,16 +151,11 @@ TUPLE: planet-factor < dispatcher postings ;
             "" f <temporary-redirect>
         ] >>display ;
 
-: start-update-task ( planet -- )
-    [ update-cached-postings ] curry 10 minutes every drop ;
-
-:: <planet-factor> ( -- responder )
+:: <planet-factor-admin> ( planet-factor -- responder )
     [let | blog-form [ <blog-form> ]
            blog-ctor [ [ <blog> ] ] |
-        planet-factor new-dispatcher
-            dup <planet-action> >>default
-            dup <feed-action> "feed.xml" add-responder
-            dup <update-action> "update" add-responder
+        <dispatcher>
+            planet-factor <edit-blogroll-action> >>default
 
             ! Administrative CRUD
                       blog-ctor ""          <delete-action> "delete-blog" add-responder
@@ -144,30 +163,25 @@ TUPLE: planet-factor < dispatcher postings ;
             blog-form blog-ctor "view-blog" <edit-action>   "edit-blog"   add-responder
     ] ;
 
-USING: namespaces io.files io.sockets
-db.sqlite smtp
-http.server.db
-http.server.sessions
-http.server.auth.login
-http.server.auth.providers.db
-http.server.sessions.storage.db ;
-
-: test-db "planet.db" resource-path sqlite-db ;
-
-: <planet-app> ( -- responder )
-    <planet-factor>
+: <planet-factor> ( -- responder )
+    planet-factor new-dispatcher
+        dup <planet-action> >>default
+        dup <feed-action> "feed.xml" add-responder
+        dup <update-action> "update" add-responder
+        dup <planet-factor-admin> <protected> "admin" add-responder
     <boilerplate>
-        "page" planet-template >>template
-    ! <url-sessions>
-    !     sessions-in-db >>sessions
-    test-db <db-persistence> ;
+        "planet" planet-template >>template ;
+ 
+: <planet-app> ( -- responder )
+    <planet-factor> <factor-boilerplate> ;
+
+: start-update-task ( planet -- )
+    [ update-cached-postings ] curry 10 minutes every drop ;
 
 : init-planet ( -- )
-    ! test-db [
-    !     init-blog-table
-        ! init-users-table
-        ! init-sessions-table
-    ! ] with-db
+    test-db [
+        init-blog-table
+    ] with-db
 
     <dispatcher>
         <planet-app> "planet" add-responder
