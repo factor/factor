@@ -105,7 +105,7 @@ M: retryable execute-statement* ( statement type -- )
         [ with-disposal ] curry each
     ] [
         with-disposal
-    ] if ;
+    ] if ; inline
 
 : create-table ( class -- )
     create-sql-statement [ execute-statement ] with-disposals ;
