@@ -14,10 +14,7 @@ C: <slot-spec> slot-spec
     >r create-method r> define ;
 
 : define-slot-word ( class slot word quot -- )
-    rot >fixnum add* define-typecheck ;
-
-: reader-effect ( class spec -- effect )
-    >r ?word-name 1array r> slot-spec-name 1array <effect> ;
+    rot >fixnum prefix define-typecheck ;
 
 : reader-quot ( decl -- quot )
     [
@@ -26,91 +23,62 @@ C: <slot-spec> slot-spec
         [ drop ] [ 1array , \ declare , ] if
     ] [ ] make ;
 
-PREDICATE: word slot-reader "reading" word-prop >boolean ;
+: create-accessor ( name effect -- word )
+    >r "accessors" create dup r>
+    "declared-effect" set-word-prop ;
 
-: set-reader-props ( class spec -- )
-    2dup reader-effect
-    over slot-spec-reader
-    swap "declared-effect" set-word-prop
-    slot-spec-reader swap "reading" set-word-prop ;
+: reader-effect T{ effect f { "object" } { "value" } } ; inline
 
-: define-reader ( class spec -- )
-    dup slot-spec-reader [
-        [ set-reader-props ] 2keep
-        dup slot-spec-offset
-        over slot-spec-reader
-        rot slot-spec-type reader-quot
-        define-slot-word
-    ] [
-        2drop
-    ] if ;
+: reader-word ( name -- word )
+    ">>" append reader-effect create-accessor ;
 
-: writer-effect ( class spec -- effect )
-    slot-spec-name swap ?word-name 2array 0 <effect> ;
+: define-reader ( class slot name -- )
+    reader-word object reader-quot define-slot-word ;
 
-PREDICATE: word slot-writer "writing" word-prop >boolean ;
+: writer-effect T{ effect f { "value" "object" } { } } ; inline
 
-: set-writer-props ( class spec -- )
-    2dup writer-effect
-    over slot-spec-writer
-    swap "declared-effect" set-word-prop
-    slot-spec-writer swap "writing" set-word-prop ;
+: writer-word ( name -- word )
+    "(>>" swap ")" 3append writer-effect create-accessor ;
 
-: define-writer ( class spec -- )
-    dup slot-spec-writer [
-        [ set-writer-props ] 2keep
-        dup slot-spec-offset
-        swap slot-spec-writer
-        [ set-slot ]
-        define-slot-word
-    ] [
-        2drop
-    ] if ;
+: define-writer ( class slot name -- )
+    writer-word [ set-slot ] define-slot-word ;
 
-: define-slot ( class spec -- )
-    2dup define-reader define-writer ;
+: setter-effect T{ effect f { "object" "value" } { "object" } } ; inline
 
-: define-slots ( class specs -- )
-    [ define-slot ] with each ;
+: setter-word ( name -- word )
+    ">>" prepend setter-effect create-accessor ;
 
-: reader-word ( class name vocab -- word )
-    >r >r "-" r> 3append r> create ;
+: define-setter ( name -- )
+    dup setter-word dup deferred? [
+        [ \ over , swap writer-word , ] [ ] make define-inline
+    ] [ 2drop ] if ;
 
-: writer-word ( class name vocab -- word )
-    >r [ swap "set-" % % "-" % % ] "" make r> create ;
+: changer-effect T{ effect f { "object" "quot" } { "object" } } ; inline
 
-: (simple-slot-word) ( class name -- class name vocab )
-    over word-vocabulary >r >r word-name r> r> ;
+: changer-word ( name -- word )
+    "change-" prepend changer-effect create-accessor ;
 
-: simple-reader-word ( class name -- word )
-    (simple-slot-word) reader-word ;
+: define-changer ( name -- )
+    dup changer-word dup deferred? [
+        [
+            [ over >r >r ] %
+            over reader-word ,
+            [ r> call r> swap ] %
+            swap setter-word ,
+        ] [ ] make define-inline
+    ] [ 2drop ] if ;
 
-: simple-writer-word ( class name -- word )
-    (simple-slot-word) writer-word ;
+: define-slot-methods ( class slot name -- )
+    dup define-changer
+    dup define-setter
+    3dup define-reader
+    define-writer ;
 
-: short-slot ( class name # -- spec )
-    >r object bootstrap-word over r> f f <slot-spec>
-    2over simple-reader-word over set-slot-spec-reader
-    -rot simple-writer-word over set-slot-spec-writer ;
+: define-accessors ( class specs -- )
+    [
+        dup slot-spec-offset swap slot-spec-name
+        define-slot-methods
+    ] with each ;
 
-: long-slot ( spec # -- spec )
-    >r [ dup array? [ first2 create ] when ] map first4 r>
-    -rot <slot-spec> ;
-
-: simple-slots ( class slots base -- specs )
-    over length [ + ] with map [
-        {
-            { [ over not ] [ 2drop f ] }
-            { [ over string? ] [ >r dupd r> short-slot ] }
-            { [ over array? ] [ long-slot ] }
-        } cond
-    ] 2map [ ] subset nip ;
-
-: slot-of-reader ( reader specs -- spec/f )
-    [ slot-spec-reader eq? ] with find nip ;
-
-: slot-of-writer ( writer specs -- spec/f )
-    [ slot-spec-writer eq? ] with find nip ;
-
-: slot-named ( string specs -- spec/f )
+: slot-named ( name specs -- spec/f )
     [ slot-spec-name = ] with find nip ;

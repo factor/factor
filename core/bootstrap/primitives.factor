@@ -1,12 +1,13 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: bootstrap.primitives
 USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
-strings vectors words quotations assocs layouts classes tuples
+strings vectors words quotations assocs layouts classes
+classes.builtin classes.tuple classes.tuple.private
 kernel.private vocabs vocabs.loader source-files definitions
-slots classes.union compiler.units bootstrap.image.private
-io.files ;
+slots.deprecated classes.union compiler.units
+bootstrap.image.private io.files accessors combinators ;
+IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
 
@@ -29,7 +30,15 @@ crossref off
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
-H{ } clone changed-words set
+H{ } clone changed-definitions set
+H{ } clone forgotten-definitions set
+H{ } clone root-cache set
+H{ } clone source-files set
+H{ } clone update-map set
+init-caches
+
+! Vocabulary for slot accessors
+"accessors" create-vocab drop
 
 ! Trivial recompile hook. We don't want to touch the code heap
 ! during stage1 bootstrap, it would just waste time.
@@ -39,6 +48,9 @@ call
 call
 call
 
+! After we execute bootstrap/layouts
+num-types get f <array> builtins set
+
 ! Create some empty vocabs where the below primitives and
 ! classes will go
 {
@@ -46,14 +58,13 @@ call
     "alien.accessors"
     "arrays"
     "bit-arrays"
-    "bit-vectors"
     "byte-arrays"
-    "byte-vectors"
     "classes.private"
+    "classes.tuple"
+    "classes.tuple.private"
     "compiler.units"
     "continuations.private"
     "float-arrays"
-    "float-vectors"
     "generator"
     "growable"
     "hashtables"
@@ -81,66 +92,94 @@ call
     "system.private"
     "threads.private"
     "tools.profiler.private"
-    "tuples"
-    "tuples.private"
     "words"
     "words.private"
     "vectors"
     "vectors.private"
 } [ create-vocab drop ] each
 
-H{ } clone source-files set
-H{ } clone class<map set
-H{ } clone update-map set
-
 ! Builtin classes
-: builtin-predicate-quot ( class -- quot )
+: lo-tag-eq-quot ( n -- quot )
+    [ \ tag , , \ eq? , ] [ ] make ;
+
+: hi-tag-eq-quot ( n -- quot )
     [
-        "type" word-prop dup
-        \ tag-mask get < \ tag \ type ? , , \ eq? ,
+        [ dup tag ] % \ hi-tag tag-number , \ eq? ,
+        [ [ hi-tag ] % , \ eq? , ] [ ] make ,
+        [ drop f ] ,
+        \ if ,
     ] [ ] make ;
 
+: builtin-predicate-quot ( class -- quot )
+    "type" word-prop
+    dup tag-mask get <
+    [ lo-tag-eq-quot ] [ hi-tag-eq-quot ] if ;
+
 : define-builtin-predicate ( class -- )
-    dup
-    dup builtin-predicate-quot define-predicate
-    predicate-word make-inline ;
+    dup builtin-predicate-quot define-predicate ;
 
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
 
 : register-builtin ( class -- )
-    dup
-    dup lookup-type-number "type" set-word-prop
-    dup "type" word-prop builtins get set-nth ;
+    [ dup lookup-type-number "type" set-word-prop ]
+    [ dup "type" word-prop builtins get set-nth ]
+    [ f f builtin-class define-class ]
+    tri ;
 
 : define-builtin-slots ( symbol slotspec -- )
-    dupd 1 simple-slots
-    2dup "slots" set-word-prop
-    define-slots ;
+    [ drop ] [ 1 simple-slots ] 2bi
+    [ "slots" set-word-prop ] [ define-slots ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
-    >r
-    dup register-builtin
-    dup f f builtin-class define-class
-    dup define-builtin-predicate
+    >r [ define-builtin-predicate ] keep
     r> define-builtin-slots ;
 
-H{ } clone typemap set
-num-types get f <array> builtins set
+"fixnum" "math" create register-builtin
+"bignum" "math" create register-builtin
+"tuple" "kernel" create register-builtin
+"ratio" "math" create register-builtin
+"float" "math" create register-builtin
+"complex" "math" create register-builtin
+"f" "syntax" lookup register-builtin
+"array" "arrays" create register-builtin
+"wrapper" "kernel" create register-builtin
+"float-array" "float-arrays" create register-builtin
+"callstack" "kernel" create register-builtin
+"string" "strings" create register-builtin
+"bit-array" "bit-arrays" create register-builtin
+"quotation" "quotations" create register-builtin
+"dll" "alien" create register-builtin
+"alien" "alien" create register-builtin
+"word" "words" create register-builtin
+"byte-array" "byte-arrays" create register-builtin
+"tuple-layout" "classes.tuple.private" create register-builtin
 
-! Forward definitions
-"object" "kernel" create t "class" set-word-prop
-"object" "kernel" create union-class "metaclass" set-word-prop
+! Catch-all class for providing a default method.
+"object" "kernel" create
+[ f builtins get [ ] subset union-class define-class ]
+[ [ drop t ] "predicate" set-word-prop ]
+bi
 
-"null" "kernel" create drop
+"object?" "kernel" vocab-words delete-at
+
+! Class of objects with object tag
+"hi-tag" "kernel.private" create
+builtins get num-tags get tail define-union-class
+
+! Empty class with no instances
+"null" "kernel" create
+[ f { } union-class define-class ]
+[ [ drop f ] "predicate" set-word-prop ]
+bi
+
+"null?" "kernel" vocab-words delete-at
 
 "fixnum" "math" create { } define-builtin
 "fixnum" "math" create ">fixnum" "math" create 1quotation "coercer" set-word-prop
 
 "bignum" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
-
-"tuple" "kernel" create { } define-builtin
 
 "ratio" "math" create {
     {
@@ -176,8 +215,6 @@ num-types get f <array> builtins set
 } define-builtin
 
 "f" "syntax" lookup { } define-builtin
-
-! do not word...
 
 "array" "arrays" create { } define-builtin
 
@@ -292,32 +329,66 @@ define-builtin
 
 "callstack" "kernel" create { } define-builtin
 
-! Define general-t type, which is any object that is not f.
-"general-t" "kernel" create
-"f" "syntax" lookup builtins get remove [ ] subset f union-class
-define-class
+"tuple-layout" "classes.tuple.private" create {
+    {
+        { "fixnum" "math" }
+        "hashcode"
+        { "layout-hashcode" "classes.tuple.private" }
+        f
+    }
+    {
+        { "word" "words" }
+        "class"
+        { "layout-class" "classes.tuple.private" }
+        f
+    }
+    {
+        { "fixnum" "math" }
+        "size"
+        { "layout-size" "classes.tuple.private" }
+        f
+    }
+    {
+        { "array" "arrays" }
+        "superclasses"
+        { "layout-superclasses" "classes.tuple.private" }
+        f
+    }
+    {
+        { "fixnum" "math" }
+        "echelon"
+        { "layout-echelon" "classes.tuple.private" }
+        f
+    }
+} define-builtin
+
+"tuple" "kernel" create {
+    [ { } define-builtin ]
+    [ { "delegate" } "slot-names" set-word-prop ]
+    [ define-tuple-layout ]
+    [
+        {
+            {
+                { "object" "kernel" }
+                "delegate"
+                { "delegate" "kernel" }
+                { "set-delegate" "kernel" }
+            }
+        }
+        [ drop ] [ generate-tuple-slots ] 2bi
+        [ "slots" set-word-prop ]
+        [ define-slots ]
+        2bi
+    ]
+} cleave
 
 "f" "syntax" create [ not ] "predicate" set-word-prop
-"f?" "syntax" create "syntax" vocab-words delete-at
-
-"general-t" "kernel" create [ ] "predicate" set-word-prop
-"general-t?" "kernel" create "syntax" vocab-words delete-at
-
-! Catch-all class for providing a default method.
-"object" "kernel" create [ drop t ] "predicate" set-word-prop
-"object" "kernel" create
-builtins get [ ] subset f union-class define-class
-
-! Class of objects with object tag
-"hi-tag" "classes.private" create
-builtins get num-tags get tail f union-class define-class
-
-! Null class with no instances.
-"null" "kernel" create [ drop f ] "predicate" set-word-prop
-"null" "kernel" create { } f union-class define-class
+"f?" "syntax" vocab-words delete-at
 
 ! Create special tombstone values
-"tombstone" "hashtables.private" create { } define-tuple-class
+"tombstone" "hashtables.private" create
+tuple
+{ } define-tuple-class
 
 "((empty))" "hashtables.private" create
 "tombstone" "hashtables.private" lookup f
@@ -329,6 +400,7 @@ builtins get num-tags get tail f union-class define-class
 
 ! Some tuple classes
 "hashtable" "hashtables" create
+tuple
 {
     {
         { "array-capacity" "sequences.private" }
@@ -349,6 +421,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "sbuf" "sbufs" create
+tuple
 {
     {
         { "string" "strings" }
@@ -364,6 +437,7 @@ builtins get num-tags get tail f union-class define-class
 } define-tuple-class
 
 "vector" "vectors" create
+tuple
 {
     {
         { "array" "arrays" }
@@ -378,52 +452,8 @@ builtins get num-tags get tail f union-class define-class
     }
 } define-tuple-class
 
-"byte-vector" "byte-vectors" create
-{
-    {
-        { "byte-array" "byte-arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
-"bit-vector" "bit-vectors" create
-{
-    {
-        { "bit-array" "bit-arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
-"float-vector" "float-vectors" create
-{
-    {
-        { "float-array" "float-arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
 "curry" "kernel" create
+tuple
 {
     {
         { "object" "kernel" }
@@ -438,7 +468,13 @@ builtins get num-tags get tail f union-class define-class
     }
 } define-tuple-class
 
+"curry" "kernel" lookup
+[ f "inline" set-word-prop ]
+[ ]
+[ tuple-layout [ <tuple-boa> ] curry ] tri define
+
 "compose" "kernel" create
+tuple
 {
     {
         { "object" "kernel" }
@@ -452,6 +488,11 @@ builtins get num-tags get tail f union-class define-class
         f
     }
 } define-tuple-class
+
+"compose" "kernel" lookup
+[ f "inline" set-word-prop ]
+[ ]
+[ tuple-layout [ <tuple-boa> ] curry ] tri define
 
 ! Primitive words
 : make-primitive ( word vocab n -- )
@@ -546,10 +587,9 @@ builtins get num-tags get tail f union-class define-class
     { "eq?" "kernel" }
     { "getenv" "kernel.private" }
     { "setenv" "kernel.private" }
-    { "(stat)" "io.files.private" }
+    { "(exists?)" "io.files.private" }
     { "(directory)" "io.files.private" }
-    { "data-gc" "memory" }
-    { "code-gc" "memory" }
+    { "gc" "memory" }
     { "gc-time" "memory" }
     { "save-image" "memory" }
     { "save-image-and-exit" "memory" }
@@ -564,7 +604,6 @@ builtins get num-tags get tail f union-class define-class
     { "code-room" "memory" }
     { "os-env" "system" }
     { "millis" "system" }
-    { "type" "kernel.private" }
     { "tag" "kernel.private" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
@@ -599,10 +638,6 @@ builtins get num-tags get tail f union-class define-class
     { "set-alien-double" "alien.accessors" }
     { "alien-cell" "alien.accessors" }
     { "set-alien-cell" "alien.accessors" }
-    { "alien>char-string" "alien" }
-    { "string>char-alien" "alien" }
-    { "alien>u16-string" "alien" }
-    { "string>u16-alien" "alien" }
     { "(throw)" "kernel.private" }
     { "alien-address" "alien" }
     { "slot" "slots.private" }
@@ -627,28 +662,29 @@ builtins get num-tags get tail f union-class define-class
     { "<wrapper>" "kernel" }
     { "(clone)" "kernel" }
     { "<string>" "strings" }
-    { "(>tuple)" "tuples.private" }
     { "array>quotation" "quotations.private" }
     { "quotation-xt" "quotations" }
-    { "<tuple>" "tuples.private" }
-    { "tuple>array" "tuples" }
+    { "<tuple>" "classes.tuple.private" }
+    { "<tuple-layout>" "classes.tuple.private" }
     { "profiling" "tools.profiler.private" }
     { "become" "kernel.private" }
     { "(sleep)" "threads.private" }
     { "<float-array>" "float-arrays" }
-    { "<tuple-boa>" "tuples.private" }
-    { "class-hash" "kernel.private" }
+    { "<tuple-boa>" "classes.tuple.private" }
     { "callstack>array" "kernel" }
     { "innermost-frame-quot" "kernel.private" }
     { "innermost-frame-scan" "kernel.private" }
     { "set-innermost-frame-quot" "kernel.private" }
     { "call-clear" "kernel" }
     { "(os-envs)" "system.private" }
+    { "set-os-env" "system" }
+    { "unset-os-env" "system" }
     { "(set-os-envs)" "system.private" }
     { "resize-byte-array" "byte-arrays" }
     { "resize-bit-array" "bit-arrays" }
     { "resize-float-array" "float-arrays" }
     { "dll-valid?" "alien" }
+    { "unimplemented" "kernel.private" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 

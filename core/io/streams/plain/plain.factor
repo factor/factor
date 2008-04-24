@@ -12,7 +12,7 @@ M: plain-writer stream-format
     nip stream-write ;
 
 M: plain-writer make-span-stream
-    <style-stream> <ignore-close-stream> ;
+    swap <style-stream> <ignore-close-stream> ;
 
 M: plain-writer make-block-stream
     nip <ignore-close-stream> ;

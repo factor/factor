@@ -1,7 +1,6 @@
-USING: kernel alien.c-types sequences math unix
-combinators.cleave vectors kernel namespaces continuations
-threads assocs vectors io.unix.backend ;
-
+USING: kernel alien.c-types alien.strings sequences math unix
+vectors kernel namespaces continuations threads assocs vectors
+io.unix.backend io.encodings.utf8 ;
 IN: unix.process
 
 ! Low-level Unix process launching utilities. These are used
@@ -9,16 +8,16 @@ IN: unix.process
 ! io.launcher instead.
 
 : >argv ( seq -- alien )
-    [ malloc-char-string ] map f add >c-void*-array ;
+    [ utf8 malloc-string ] map f suffix >c-void*-array ;
 
 : exec ( pathname argv -- int )
-    [ malloc-char-string ] [ >argv ] bi* execv ;
+    [ utf8 malloc-string ] [ >argv ] bi* execv ;
 
 : exec-with-path ( filename argv -- int )
-    [ malloc-char-string ] [ >argv ] bi* execvp ;
+    [ utf8 malloc-string ] [ >argv ] bi* execvp ;
 
 : exec-with-env ( filename argv envp -- int )
-    [ malloc-char-string ] [ >argv ] [ >argv ] tri* execve ;
+    [ utf8 malloc-string ] [ >argv ] [ >argv ] tri* execve ;
 
 : exec-args ( seq -- int )
     [ first ] [ ] bi exec ;
@@ -34,3 +33,6 @@ IN: unix.process
 
 : wait-for-pid ( pid -- status )
     0 <int> [ 0 waitpid drop ] keep *int WEXITSTATUS ;
+
+: set-priority ( n -- )
+    0 0 rot setpriority io-error ;

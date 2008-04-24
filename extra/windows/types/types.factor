@@ -66,9 +66,8 @@ TYPEDEF: LARGE_INTEGER* PLARGE_INTEGER
 
 TYPEDEF: WCHAR       TCHAR
 TYPEDEF: TCHAR       TBYTE
-! TYPEDEF: uchar*  LPCSTR
-TYPEDEF: ushort*  LPCSTR
-TYPEDEF: ushort*  LPWSTR
+TYPEDEF: wchar_t*  LPCSTR
+TYPEDEF: wchar_t*  LPWSTR
 
 
 
@@ -113,6 +112,7 @@ TYPEDEF: HANDLE              HSZ
 TYPEDEF: HANDLE              WINSTA   ! MS docs say  typedef HANDLE WINSTA ;
 TYPEDEF: HANDLE              HWINSTA  ! typo??
 TYPEDEF: HANDLE              HWND
+TYPEDEF: HANDLE              HCRYPTPROV
 TYPEDEF: WORD                LANGID
 TYPEDEF: DWORD               LCID
 TYPEDEF: DWORD               LCTYPE
@@ -125,10 +125,10 @@ TYPEDEF: WCHAR*              LPCWSTR
 ! TYPEDEF: WCHAR*              LPWSTR
 
 TYPEDEF: WCHAR*               LPSTR
-TYPEDEF: ushort* LPCTSTR
-TYPEDEF: ushort* LPWTSTR
+TYPEDEF: wchar_t* LPCTSTR
+TYPEDEF: wchar_t* LPWTSTR
 
-TYPEDEF: ushort*       LPTSTR
+TYPEDEF: wchar_t*       LPTSTR
 TYPEDEF: LPCSTR      PCTSTR
 TYPEDEF: LPSTR       PTSTR
 

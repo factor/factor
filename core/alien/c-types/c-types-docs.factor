@@ -62,28 +62,6 @@ HELP: <c-object>
 
 { <c-object> malloc-object } related-words
 
-HELP: string>char-alien ( string -- array )
-{ $values { "string" string } { "array" byte-array } }
-{ $description "Copies the string to a new byte array, converting it to 8-bit ASCII and adding a trailing null byte." }
-{ $errors "Throws an error if the string contains null characters, or characters beyond the 8-bit range." } ;
-
-{ string>char-alien alien>char-string malloc-char-string } related-words
-
-HELP: alien>char-string ( c-ptr -- string )
-{ $values { "c-ptr" c-ptr } { "string" string } }
-{ $description "Reads a null-terminated 8-bit C string from the specified address." } ;
-
-HELP: string>u16-alien ( string -- array )
-{ $values { "string" string } { "array" byte-array } }
-{ $description "Copies the string to a new byte array in UCS-2 format with a trailing null byte." }
-{ $errors "Throws an error if the string contains null characters." } ;
-
-{ string>u16-alien alien>u16-string malloc-u16-string } related-words
-
-HELP: alien>u16-string ( c-ptr -- string )
-{ $values { "c-ptr" c-ptr } { "string" string } }
-{ $description "Reads a null-terminated UCS-2 string from the specified address." } ;
-
 HELP: memory>byte-array
 { $values { "alien" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new byte array." } ;
@@ -108,18 +86,6 @@ HELP: malloc-object
 HELP: malloc-byte-array
 { $values { "byte-array" byte-array } { "alien" alien } }
 { $description "Allocates an unmanaged memory block of the same size as the byte array, and copies the contents of the byte array there." }
-{ $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
-{ $errors "Throws an error if memory allocation fails." } ;
-
-HELP: malloc-char-string
-{ $values { "string" string } { "alien" c-ptr } }
-{ $description "Allocates an unmanaged memory block, and stores a string in 8-bit ASCII encoding with a trailing null byte to the block." }
-{ $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
-{ $errors "Throws an error if memory allocation fails." } ;
-
-HELP: malloc-u16-string
-{ $values { "string" string } { "alien" c-ptr } }
-{ $description "Allocates an unmanaged memory block, and stores a string in UCS2 encoding with a trailing null character to the block." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if memory allocation fails." } ;
 
@@ -158,6 +124,19 @@ HELP: define-out
 { $description "Defines a word " { $snippet "<" { $emphasis "name" } ">" } " with stack effect " { $snippet "( value -- array )" } ". This word allocates a byte array large enough to hold a value with C type " { $snippet "name" } ", and writes the value at the top of the stack to the array." }
 { $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
 
+ARTICLE: "byte-arrays-gc" "Byte arrays and the garbage collector"
+"The Factor garbage collector can move byte arrays around, and it is only safe to pass byte arrays to C functions if the garbage collector will not run while C code still has a reference to the data."
+$nl
+"In particular, a byte array can only be passed as a parameter if the the C function does not use the parameter after one of the following occurs:"
+{ $list
+    "the C function returns"
+    "the C function calls Factor code via a callback"
+}
+"Returning from C to Factor, as well as invoking Factor code via a callback, may trigger garbage collection, and if the function had stored a pointer to the byte array somewhere, this pointer may cease to be valid."
+$nl
+"If this condition is not satisfied, " { $link "malloc" } " must be used instead."
+{ $warning "Failure to comply with these requirements can lead to crashes, data corruption, and security exploits." } ;
+
 ARTICLE: "c-out-params" "Output parameters in C"
 "A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
 $nl
@@ -189,8 +168,6 @@ $nl
 { $subsection *float }
 { $subsection *double }
 { $subsection *void* }
-{ $subsection *char* }
-{ $subsection *ushort* }
 "Note that while structure and union types do not get these words defined for them, there is no loss of generality since " { $link <void*> } " and " { $link *void* } " may be used." ;
 
 ARTICLE: "c-types-specs" "C type specifiers"
@@ -229,13 +206,11 @@ $nl
 { $subsection <c-object> }
 { $subsection <c-array> }
 { $warning
-"The Factor garbage collector can move byte arrays around, and it is only safe to pass byte arrays to C functions if the function does not store a pointer to the byte array in some global structure, or retain it in any way after returning."
-$nl
-"Long-lived data for use by C libraries can be allocated manually, just as when programming in C. See " { $link "malloc" } "." }
+"The Factor garbage collector can move byte arrays around, and code passing byte arrays to C must obey important guidelines. See " { $link "byte-arrays-gc" } "." }
 { $see-also "c-arrays" } ;
 
 ARTICLE: "malloc" "Manual memory management"
-"Sometimes data passed to C functions must be allocated at a fixed address, and so garbage collector managed byte arrays cannot be used. See the warning at the bottom of " { $link "c-byte-arrays" } " for a description of when this is the case."
+"Sometimes data passed to C functions must be allocated at a fixed address. See " { $link "byte-arrays-gc" } " for an explanation of when this is the case."
 $nl
 "Allocating a C datum with a fixed address:"
 { $subsection malloc-object }
@@ -245,8 +220,6 @@ $nl
 { $subsection malloc }
 { $subsection calloc }
 { $subsection realloc }
-"The return value of the above three words must always be checked for a memory allocation failure:"
-{ $subsection check-ptr }
 "You must always free pointers returned by any of the above words when the block of memory is no longer in use:"
 { $subsection free }
 "You can unsafely copy a range of bytes from one memory location to another:"
@@ -258,33 +231,18 @@ $nl
 "A wrapper for temporarily allocating a block of memory:"
 { $subsection with-malloc } ;
 
-ARTICLE: "c-strings" "C strings"
-"The C library interface defines two types of C strings:"
-{ $table
-    { "C type" "Notes" }
-    { { $snippet "char*" } "8-bit per character null-terminated ASCII" }
-    { { $snippet "ushort*" } "16-bit per character null-terminated UCS-2" }
-}
-"Passing a Factor string to a C function expecting a C string allocates a " { $link byte-array } " in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function. If the conversion fails, for example if the string contains null bytes or characters with values higher than 255, a " { $link c-string-error. } " is thrown."
-"Sometimes a C function has a parameter type of " { $snippet "void*" } ", and various data types, among them strings, can be passed in. In this case, strings are not automatically converted to aliens, and instead you must call one of these words:"
-{ $subsection string>char-alien }
-{ $subsection string>u16-alien }
-{ $subsection malloc-char-string }
-{ $subsection malloc-u16-string }
-"The first two allocate " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } "."
-$nl
-"Finally, a set of words can be used to read and write " { $snippet "char*" } " and " { $snippet "ushort*" } " strings at arbitrary addresses:"
-{ $subsection alien>char-string }
-{ $subsection alien>u16-string } ;
-
 ARTICLE: "c-data" "Passing data between Factor and C"
-"Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers. Also Factor's garbage collector can move objects in memory, which means that special support has to be provided for passing blocks of memory to C code."
+"Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers."
+$nl
+"Furthermore, Factor's garbage collector can move objects in memory; for a discussion of the consequences, see " { $link "byte-arrays-gc" } "."
 { $subsection "c-types-specs" }
 { $subsection "c-byte-arrays" }
 { $subsection "malloc" }
 { $subsection "c-strings" }
 { $subsection "c-arrays" }
 { $subsection "c-out-params" }
+"Important guidelines for passing data in byte arrays:"
+{ $subsection "byte-arrays-gc" }
 "C-style enumerated types are supported:"
 { $subsection POSTPONE: C-ENUM: }
 "C types can be aliased for convenience and consitency with native library documentation:"

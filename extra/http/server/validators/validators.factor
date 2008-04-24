@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel continuations sequences math namespaces
-math.parser assocs new-slots regexp fry unicode.categories
-combinators.cleave sequences ;
+USING: kernel continuations sequences math namespaces sets
+math.parser assocs regexp fry unicode.categories sequences ;
 IN: http.server.validators
 
 SYMBOL: validation-failed?
@@ -12,14 +11,16 @@ TUPLE: validation-error value reason ;
 C: <validation-error> validation-error
 
 : with-validator ( value quot -- result )
-    [ validation-failed? on <validation-error> ] recover ;
-    inline
+    [ validation-failed? on <validation-error> ] recover ; inline
 
 : v-default ( str def -- str )
     over empty? spin ? ;
 
 : v-required ( str -- str )
     dup empty? [ "required" throw ] when ;
+
+: v-optional ( str quot -- str )
+    over empty? [ 2drop f ] [ call ] if ; inline
 
 : v-min-length ( str n -- str )
     over length over < [
@@ -59,19 +60,24 @@ C: <validation-error> validation-error
 
 : v-regexp ( str what regexp -- str )
     >r over r> matches?
-    [ drop ] [ "invalid " swap append throw ] if ;
+    [ drop ] [ "invalid " prepend throw ] if ;
 
 : v-email ( str -- str )
     #! From http://www.regular-expressions.info/email.html
     "e-mail"
-    R/ [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i
+    R' [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}'i
+    v-regexp ;
+
+: v-url ( str -- str )
+    "URL"
+    R' (ftp|http|https)://(\w+:?\w*@)?(\S+)(:[0-9]+)?(/|/([\w#!:.?+=&%@!\-/]))?'
     v-regexp ;
 
 : v-captcha ( str -- str )
     dup empty? [ "must remain blank" throw ] unless ;
 
 : v-one-line ( str -- str )
-    dup "\r\n" seq-intersect empty?
+    dup "\r\n" intersect empty?
     [ "must be a single line" throw ] unless ;
 
 : v-one-word ( str -- str )

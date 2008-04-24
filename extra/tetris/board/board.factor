@@ -9,7 +9,7 @@ TUPLE: board width height rows ;
     [ drop f <array> ] with map ;
 
 : <board> ( width height -- board )
-    2dup make-rows board construct-boa ;
+    2dup make-rows board boa ;
 
 #! A block is simply an array of form { x y } where { 0 0 } is the top-left of
 #! the tetris board, and { 9 19 } is the bottom right on a 10x20 board.
@@ -37,7 +37,7 @@ TUPLE: board width height rows ;
 
 : add-row ( board -- )
     dup board-rows over board-width f <array>
-    add* swap set-board-rows ;
+    prefix swap set-board-rows ;
 
 : top-up-rows ( board -- )
     dup board-height over board-rows length = [

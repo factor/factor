@@ -87,14 +87,6 @@ const F_CHAR *vm_executable_path(void)
 	return safe_strdup(full_path);
 }
 
-void stat_not_found(void)
-{
-	dpush(F);
-	dpush(F);
-	dpush(F);
-	dpush(F);
-}
-
 void find_file_stat(F_CHAR *path)
 {
 	// FindFirstFile is the only call that can stat c:\pagefile.sys
@@ -102,56 +94,45 @@ void find_file_stat(F_CHAR *path)
 	HANDLE h;
 
 	if(INVALID_HANDLE_VALUE == (h = FindFirstFile(path, &st)))
-		stat_not_found();
+		dpush(F);
 	else
 	{
-		box_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
-		dpush(tag_fixnum(0));
-		box_unsigned_8(
-			(u64)st.nFileSizeLow | (u64)st.nFileSizeHigh << 32);
-
-		u64 lo = st.ftLastWriteTime.dwLowDateTime;
-		u64 hi = st.ftLastWriteTime.dwHighDateTime;
-		u64 modTime = (hi << 32) + lo;
-
-		box_unsigned_8((modTime - EPOCH_OFFSET) / 10000000);
 		FindClose(h);
+		dpush(T);
 	}
 }
 
-DEFINE_PRIMITIVE(stat)
+DEFINE_PRIMITIVE(existsp)
 {
-	HANDLE h;
 	BY_HANDLE_FILE_INFORMATION bhfi;
 
 	F_CHAR *path = unbox_u16_string();
 	//wprintf(L"path = %s\n", path);
-	h = CreateFileW(path,
-					GENERIC_READ,
-					FILE_SHARE_READ,
-					NULL,
-					OPEN_EXISTING,
-					FILE_FLAG_BACKUP_SEMANTICS,
-					NULL);
+	HANDLE h = CreateFileW(path,
+			GENERIC_READ,
+			FILE_SHARE_READ,
+			NULL,
+			OPEN_EXISTING,
+			FILE_FLAG_BACKUP_SEMANTICS,
+			NULL);
+
 	if(h == INVALID_HANDLE_VALUE)
 	{
-		find_file_stat(path);
+		// FindFirstFile is the only call that can stat c:\pagefile.sys
+		WIN32_FIND_DATA st;
+		HANDLE h;
+
+		if(INVALID_HANDLE_VALUE == (h = FindFirstFile(path, &st)))
+			dpush(F);
+		else
+		{
+			FindClose(h);
+			dpush(T);
+		}
 		return;
 	}
 
-	if(!GetFileInformationByHandle(h, &bhfi))
-		stat_not_found();
-	else {
-		box_boolean(bhfi.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
-		dpush(tag_fixnum(0));
-		box_unsigned_8(
-			(u64)bhfi.nFileSizeLow | (u64)bhfi.nFileSizeHigh << 32);
-		u64 lo = bhfi.ftLastWriteTime.dwLowDateTime;
-		u64 hi = bhfi.ftLastWriteTime.dwHighDateTime;
-		u64 modTime = (hi << 32) + lo;
-
-		box_unsigned_8((modTime - EPOCH_OFFSET) / 10000000);
-	}
+	box_boolean(GetFileInformationByHandle(h, &bhfi));
 	CloseHandle(h);
 }
 
@@ -234,7 +215,37 @@ void sleep_millis(DWORD msec)
 	Sleep(msec);
 }
 
-DECLARE_PRIMITIVE(set_os_envs)
+DEFINE_PRIMITIVE(os_env)
+{
+	F_CHAR *key = unbox_u16_string();
+	F_CHAR *value = safe_malloc(MAX_UNICODE_PATH * 2);
+	int ret;
+	ret = GetEnvironmentVariable(key, value, MAX_UNICODE_PATH * 2);
+	if(ret == 0)
+		dpush(F);
+	else
+		dpush(tag_object(from_u16_string(value)));
+	free(value);
+}
+
+DEFINE_PRIMITIVE(set_os_env)
+{
+	F_CHAR *key = unbox_u16_string();
+	REGISTER_C_STRING(key);
+	F_CHAR *value = unbox_u16_string();
+	UNREGISTER_C_STRING(key);
+	if(!SetEnvironmentVariable(key, value))
+		general_error(ERROR_IO, tag_object(get_error_message()), F, NULL);
+}
+
+DEFINE_PRIMITIVE(unset_os_env)
+{
+	if(!SetEnvironmentVariable(unbox_u16_string(), NULL)
+		&& GetLastError() != ERROR_ENVVAR_NOT_FOUND)
+		general_error(ERROR_IO, tag_object(get_error_message()), F, NULL);
+}
+
+DEFINE_PRIMITIVE(set_os_envs)
 {
 	not_implemented_error();
 }

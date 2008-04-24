@@ -1,14 +1,12 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl.gl alien.c-types continuations namespaces
-assocs alien libc opengl math sequences combinators.lib 
-combinators.cleave macros arrays ;
+assocs alien alien.strings libc opengl math sequences combinators
+combinators.lib macros arrays io.encodings.ascii ;
 IN: opengl.shaders
 
 : with-gl-shader-source-ptr ( string quot -- )
-    swap string>char-alien malloc-byte-array [
-        <void*> swap call
-    ] keep free ; inline
+    swap ascii malloc-string [ <void*> swap call ] keep free ; inline
 
 : <gl-shader> ( source kind -- shader )
     glCreateShader dup rot
@@ -47,7 +45,7 @@ IN: opengl.shaders
 : gl-shader-info-log ( shader -- log )
     dup gl-shader-info-log-length dup [
         [ 0 <int> swap glGetShaderInfoLog ] keep
-        alien>char-string
+        ascii alien>string
     ] with-malloc ;
 
 : check-gl-shader ( shader -- shader )
@@ -55,9 +53,9 @@ IN: opengl.shaders
 
 : delete-gl-shader ( shader -- ) glDeleteShader ; inline
 
-PREDICATE: integer gl-shader (gl-shader?) ;
-PREDICATE: gl-shader vertex-shader (vertex-shader?) ;
-PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
+PREDICATE: gl-shader < integer (gl-shader?) ;
+PREDICATE: vertex-shader < gl-shader (vertex-shader?) ;
+PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 
 ! Programs
 
@@ -82,7 +80,7 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
 : gl-program-info-log ( program -- log )
     dup gl-program-info-log-length dup [
         [ 0 <int> swap glGetProgramInfoLog ] keep
-        alien>char-string
+        ascii alien>string
     ] with-malloc ;
 
 : check-gl-program ( program -- program )
@@ -126,7 +124,7 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
 MACRO: with-gl-program ( uniforms quot -- )
     (make-with-gl-program) ;
 
-PREDICATE: integer gl-program (gl-program?) ;
+PREDICATE: gl-program < integer (gl-program?) ;
 
 : <simple-gl-program> ( vertex-shader-source fragment-shader-source -- program )
     >r <vertex-shader> check-gl-shader

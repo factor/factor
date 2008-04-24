@@ -1,5 +1,5 @@
 USING: byte-arrays byte-vectors kernel io.encodings io.streams.string
-sequences io namespaces ;
+sequences io namespaces io.encodings.private ;
 IN: io.streams.byte-array
 
 : <byte-writer> ( encoding -- stream )
@@ -7,7 +7,7 @@ IN: io.streams.byte-array
 
 : with-byte-writer ( encoding quot -- byte-array )
     >r <byte-writer> r> [ stdio get ] compose with-stream*
-    >byte-array ; inline
+    dup encoder? [ encoder-stream ] when >byte-array ; inline
 
 : <byte-reader> ( byte-array encoding -- stream )
     >r >byte-vector dup reverse-here r> <decoder> ;

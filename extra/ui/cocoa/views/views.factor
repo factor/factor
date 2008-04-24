@@ -1,10 +1,10 @@
-! Copyright (C) 2006, 2007 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays assocs cocoa kernel math cocoa.messages
 cocoa.subclassing cocoa.classes cocoa.views cocoa.application
 cocoa.pasteboard cocoa.types cocoa.windows sequences ui
 ui.gadgets ui.gadgets.worlds ui.gestures core-foundation
-threads ;
+threads combinators ;
 IN: ui.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -126,6 +126,13 @@ CLASS: {
     { +name+ "FactorView" }
     { +protocols+ { "NSTextInput" } }
 }
+
+! Rendering
+! Rendering
+{ "drawRect:" "void" { "id" "SEL" "id" "NSRect" }
+    [ 3drop window relayout-1 ]
+}
+
 ! Events
 { "acceptsFirstMouse:" "bool" { "id" "SEL" "id" }
     [ 3drop 1 ]
@@ -210,6 +217,40 @@ CLASS: {
 { "selectAll:" "id" { "id" "SEL" "id" }
     [ [ nip T{ select-all-action } send-action$ ] ui-try ]
 }
+
+! Multi-touch gestures: this is undocumented.
+! http://cocoadex.com/2008/02/nsevent-modifications-swipe-ro.html
+{ "magnifyWithEvent:" "void" { "id" "SEL" "id" }
+    [
+        nip
+        dup -> deltaZ sgn {
+            {  1 [ T{ zoom-in-action } send-action$ ] }
+            { -1 [ T{ zoom-out-action } send-action$ ] }
+            {  0 [ 2drop ] }
+        } case
+    ]
+}
+
+{ "swipeWithEvent:" "void" { "id" "SEL" "id" }
+    [
+        nip
+        dup -> deltaX sgn {
+            {  1 [ T{ left-action } send-action$ ] }
+            { -1 [ T{ right-action } send-action$ ] }
+            {  0
+                [
+                    dup -> deltaY sgn {
+                        {  1 [ T{ up-action } send-action$ ] }
+                        { -1 [ T{ down-action } send-action$ ] }
+                        {  0 [ 2drop ] }
+                    } case
+                ]
+            }
+        } case
+    ]
+}
+
+! "rotateWithEvent:" "void" { "id" "SEL" "id" }}
 
 { "acceptsFirstResponder" "bool" { "id" "SEL" }
     [ 2drop 1 ]
@@ -313,6 +354,7 @@ CLASS: {
 { "dealloc" "void" { "id" "SEL" }
     [
         drop
+        dup unregister-window
         dup remove-observer
         SUPER-> dealloc
     ]
@@ -349,7 +391,13 @@ CLASS: {
 
 { "windowShouldClose:" "bool" { "id" "SEL" "id" }
     [
-        2nip -> contentView window ungraft t
+        3drop t
+    ]
+}
+
+{ "windowWillClose:" "void" { "id" "SEL" "id" }
+    [
+        2nip -> object -> contentView window ungraft
     ]
 } ;
 

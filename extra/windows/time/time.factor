@@ -8,7 +8,7 @@ IN: windows.time
     32 shift bitor ;
 
 : windows-1601 ( -- timestamp )
-    1601 1 1 0 0 0 0 <timestamp> ;
+    1601 1 1 0 0 0 instant <timestamp> ;
 
 : FILETIME>windows-time ( FILETIME -- n )
     [ FILETIME-dwLowDateTime ] keep

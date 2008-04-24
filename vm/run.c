@@ -22,8 +22,11 @@ void fix_stacks(void)
 be stored in registers, so callbacks must save and restore the correct values */
 void save_stacks(void)
 {
-	stack_chain->datastack = ds;
-	stack_chain->retainstack = rs;
+	if(stack_chain)
+	{
+		stack_chain->datastack = ds;
+		stack_chain->retainstack = rs;
+	}
 }
 
 /* called on entry into a compiled callback */
@@ -277,16 +280,6 @@ DEFINE_PRIMITIVE(exit)
 	exit(to_fixnum(dpop()));
 }
 
-DEFINE_PRIMITIVE(os_env)
-{
-	char *name = unbox_char_string();
-	char *value = getenv(name);
-	if(value == NULL)
-		dpush(F);
-	else
-		box_char_string(value);
-}
-
 DEFINE_PRIMITIVE(eq)
 {
 	CELL lhs = dpop();
@@ -304,29 +297,9 @@ DEFINE_PRIMITIVE(sleep)
 	sleep_millis(to_cell(dpop()));
 }
 
-DEFINE_PRIMITIVE(type)
-{
-	drepl(tag_fixnum(type_of(dpeek())));
-}
-
 DEFINE_PRIMITIVE(tag)
 {
 	drepl(tag_fixnum(TAG(dpeek())));
-}
-
-DEFINE_PRIMITIVE(class_hash)
-{
-	CELL obj = dpeek();
-	CELL tag = TAG(obj);
-	if(tag == TUPLE_TYPE)
-	{
-		F_WORD *class = untag_object(get(SLOT(obj,2)));
-		drepl(class->hashcode);
-	}
-	else if(tag == OBJECT_TYPE)
-		drepl(get(UNTAG(obj)));
-	else
-		drepl(tag_fixnum(tag));
 }
 
 DEFINE_PRIMITIVE(slot)

@@ -5,7 +5,7 @@ namespaces opengl sequences io combinators math.vectors
 ui.gadgets ui.gestures ui.render ui.backend inspector ;
 IN: ui.gadgets.worlds
 
-TUPLE: world
+TUPLE: world < identity-tuple
 active? focused?
 glass
 title status
@@ -46,12 +46,7 @@ M: world request-focus-on ( child gadget -- )
     t over set-gadget-root?
     dup request-focus ;
 
-M: world equal? 2drop f ;
-
 M: world hashcode* drop world hashcode* ;
-
-M: world pref-dim*
-    delegate pref-dim* [ >fixnum ] map { 1024 768 } vmin ;
 
 M: world layout*
     dup delegate layout*

@@ -16,18 +16,31 @@ IN: cpu.x86.allot
 
 : object@ ( n -- operand ) cells (object@) ;
 
-: load-zone-ptr ( -- )
+: load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array
-    "nursery" f allot-reg %alien-global ;
+    0 MOV "nursery" f rc-absolute-cell rel-dlsym ;
 
 : load-allot-ptr ( -- )
-    load-zone-ptr
+    allot-reg load-zone-ptr
     allot-reg PUSH
     allot-reg dup cell [+] MOV ;
 
 : inc-allot-ptr ( n -- )
     allot-reg POP
     allot-reg cell [+] swap 8 align ADD ;
+
+M: x86 %gc ( -- )
+    "end" define-label
+    temp-reg-1 load-zone-ptr
+    temp-reg-2 temp-reg-1 cell [+] MOV
+    temp-reg-2 1024 ADD
+    temp-reg-1 temp-reg-1 3 cells [+] MOV
+    temp-reg-2 temp-reg-1 CMP
+    "end" get JLE
+    0 frame-required
+    %prepare-alien-invoke
+    "minor_gc" f %alien-invoke
+    "end" resolve-label ;
 
 : store-header ( header -- )
     0 object@ swap type-number tag-fixnum MOV ;
@@ -46,7 +59,7 @@ IN: cpu.x86.allot
     allot-reg swap tag-number OR
     allot-reg MOV ;
 
-M: x86-backend %box-float ( dst src -- )
+M: x86 %box-float ( dst src -- )
     #! Only called by pentium4 backend, uses SSE2 instruction
     #! dest is a loc or a vreg
     float 16 [
@@ -86,7 +99,7 @@ M: x86-backend %box-float ( dst src -- )
         "end" resolve-label
     ] with-scope ;
 
-M: x86-backend %box-alien ( dst src -- )
+M: x86 %box-alien ( dst src -- )
     [
         { "end" "f" } [ define-label ] each
         dup v>operand 0 CMP
@@ -101,6 +114,6 @@ M: x86-backend %box-alien ( dst src -- )
         ] %allot
         "end" get JMP
         "f" resolve-label
-        f [ v>operand ] 2apply MOV
+        f [ v>operand ] bi@ MOV
         "end" resolve-label
     ] with-scope ;

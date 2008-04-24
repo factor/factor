@@ -1,0 +1,1 @@
+Definitions of 8-bit encodings like ISO 8859 and Windows 1252

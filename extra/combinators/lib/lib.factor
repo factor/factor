@@ -1,19 +1,12 @@
-! Copyright (C) 2007 Slava Pestov, Chris Double, Doug Coleman,
-!                    Eduardo Cavazos, Daniel Ehrenberg.
+! Copyright (C) 2007, 2008 Slava Pestov, Chris Double,
+!                          Doug Coleman, Eduardo Cavazos,
+!                          Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel combinators namespaces quotations hashtables
+USING: kernel combinators fry namespaces quotations hashtables
 sequences assocs arrays inference effects math math.ranges
-arrays.lib shuffle macros bake combinators.cleave
-continuations ;
+arrays.lib shuffle macros bake continuations ;
 
 IN: combinators.lib
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: generate ( generator predicate -- obj )
-    #! Call 'generator' until the result satisfies 'predicate'.
-    [ slip over slip ] 2keep
-    roll [ 2drop ] [ rot drop generate ] if ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Generalized versions of core combinators
@@ -41,9 +34,8 @@ MACRO: nwith ( quot n -- )
 
 MACRO: napply ( n -- )
   2 [a,b]
-  [ [ ] [ 1- ] bi
-    [ , ntuck , nslip ]
-    bake ]
+  [ [ 1- ] [ ] bi
+    '[ , ntuck , nslip ] ]
   map concat >quotation [ call ] append ;
 
 : 3apply ( obj obj obj quot -- ) 3 napply ; inline
@@ -82,11 +74,11 @@ MACRO: && ( quots -- ? )
     [ [ not ] append [ f ] ] t short-circuit ;
 
 MACRO: <-&& ( quots -- )
-    [ [ dup ] swap append [ not ] append [ f ] ] t short-circuit
+    [ [ dup ] prepend [ not ] append [ f ] ] t short-circuit
     [ nip ] append ;
 
 MACRO: <--&& ( quots -- )
-    [ [ 2dup ] swap append [ not ] append [ f ] ] t short-circuit
+    [ [ 2dup ] prepend [ not ] append [ f ] ] t short-circuit
     [ 2nip ] append ;
 
 MACRO: || ( quots -- ? ) [ [ t ] ] f short-circuit ;
@@ -95,26 +87,21 @@ MACRO: || ( quots -- ? ) [ [ t ] ] f short-circuit ;
 ! ifte
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+MACRO: preserving ( predicate -- quot )
+    dup infer effect-in
+    dup 1+
+    '[ , , nkeep , nrot ] ;
+
 MACRO: ifte ( quot quot quot -- )
-    pick infer effect-in
-    dup 1+ swap
-    [ >r >r , nkeep , nrot r> r> if ]
-    bake ;
+    '[ , preserving , , if ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! switch
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: preserving ( predicate -- quot )
-    dup infer effect-in
-    dup 1+ spin
-    [ , , nkeep , nrot ]
-    bake ;
-
 MACRO: switch ( quot -- )
-    [ [ preserving ] [ ] bi* ] assoc-map
-    [ , cond ]
-    bake ;
+    [ [ [ preserving ] curry ] dip ] assoc-map
+    [ cond ] curry ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -137,12 +124,12 @@ MACRO: map-call-with ( quots -- )
     [ (make-call-with) ] keep length [ narray ] curry compose ;
 
 : (make-call-with2) ( quots -- quot )
-    [ [ 2dup >r >r ] swap append [ r> r> ] append ] map concat
+    [ [ 2dup >r >r ] prepend [ r> r> ] append ] map concat
     [ 2drop ] append ;
 
 MACRO: map-call-with2 ( quots -- )
     [
-        [ [ 2dup >r >r ] swap append [ r> r> ] append ] map concat
+        [ [ 2dup >r >r ] prepend [ r> r> ] append ] map concat
         [ 2drop ] append    
     ] keep length [ narray ] curry append ;
 
@@ -150,7 +137,7 @@ MACRO: map-exec-with ( words -- )
     [ 1quotation ] map [ map-call-with ] curry ;
 
 MACRO: construct-slots ( assoc tuple-class -- tuple ) 
-    [ construct-empty ] curry swap [
+    [ new ] curry swap [
         [ dip ] curry swap 1quotation [ keep ] curry compose
     ] { } assoc>map concat compose ;
 
@@ -175,3 +162,10 @@ MACRO: multikeep ( word out-indexes -- ... )
 
 : retry ( quot n -- )
     [ drop ] rot compose attempt-all ; inline
+
+: do-while ( pred body tail -- )
+    >r tuck 2slip r> while ;
+
+: generate ( generator predicate -- obj )
+    [ dup ] swap [ dup [ nip ] unless not ] 3compose
+    swap [ ] do-while ;

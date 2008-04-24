@@ -33,7 +33,7 @@ finalized?
     } set-slots ;
 
 : <rule-set> ( -- ruleset )
-    rule-set construct-empty dup init-rule-set ;
+    rule-set new dup init-rule-set ;
 
 MEMO: standard-rule-set ( id -- ruleset )
     <rule-set> [ set-rule-set-default ] keep ;
@@ -73,7 +73,7 @@ chars
 ;
 
 : construct-rule ( class -- rule )
-    >r rule construct-empty r> construct-delegate ; inline
+    >r rule new r> construct-delegate ; inline
 
 TUPLE: seq-rule ;
 
@@ -113,7 +113,7 @@ M: regexp text-hash-char drop f ;
 : rule-chars* ( rule -- string )
     dup rule-chars
     swap rule-start matcher-text
-    text-hash-char [ add ] when* ;
+    text-hash-char [ suffix ] when* ;
 
 : add-rule ( rule ruleset -- )
     >r dup rule-chars* >upper swap

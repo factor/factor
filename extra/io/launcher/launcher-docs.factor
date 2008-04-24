@@ -33,6 +33,17 @@ $nl
     { "a file stream or a socket - the stream is connected to the given Factor stream, which cannot be used again from within Factor and must be closed after the process has been started" }
 } ;
 
+ARTICLE: "io.launcher.priority" "Setting process priority"
+"The priority of the child process can be set by storing one of the below symbols in the " { $snippet "priority" } " slot of a " { $link process } " tuple:"
+{ $list
+    { $link +lowest-priority+ }
+    { $link +low-priority+ }
+    { $link +normal-priority+ }
+    { $link +high-priority+ }
+    { $link +highest-priority+ }
+}
+"The default value is " { $link f } ", which denotes that the child process should inherit the current process priority." ;
+
 HELP: +closed+
 { $description "Possible value for the " { $snippet "stdin" } ", " { $snippet "stdout" } ", and " { $snippet "stderr" } " slots of a " { $link process } "." } ;
 
@@ -102,6 +113,8 @@ HELP: try-process
 { $values { "desc" "a launch descriptor" } }
 { $description "Launches a process and waits for it to complete. If it exits with a non-zero status code, throws a " { $link process-failed } " error." } ;
 
+{ run-process try-process run-detached } related-words
+
 HELP: kill-process
 { $values { "process" process } }
 { $description "Kills a running process. Does nothing if the process has already exited." } ;
@@ -118,9 +131,6 @@ HELP: <process>
 { $values { "process" process } }
 { $description "Creates a new, empty process. It must be filled in before being passed to " { $link run-process } "." } ;
 
-HELP: process-stream
-{ $class-description "A bidirectional stream for interacting with a running process. Instances are created by calling " { $link <process-stream> } ". The " { $link process-stream-process } " slot holds a " { $link process } " instance." } ;
-
 HELP: <process-stream>
 { $values
   { "desc" "a launch descriptor" }
@@ -133,7 +143,7 @@ HELP: with-process-stream
   { "desc" "a launch descriptor" }
   { "quot" quotation }
   { "status" "an exit code" } }
-{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a " { $link process-stream } ". After the quotation returns, waits for the process to end and outputs the exit code." } ;
+{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a process stream. After the quotation returns, waits for the process to end and outputs the exit code." } ;
 
 HELP: wait-for-process
 { $values { "process" process } { "status" integer } }
@@ -163,6 +173,7 @@ ARTICLE: "io.launcher.launch" "Launching processes"
 "Launching processes:"
 { $subsection run-process }
 { $subsection try-process }
+{ $subsection run-detached }
 "Redirecting standard input and output to a pipe:"
 { $subsection <process-stream> }
 { $subsection with-process-stream } ;
@@ -216,6 +227,7 @@ ARTICLE: "io.launcher" "Operating system processes"
 { $subsection "io.launcher.detached" }
 { $subsection "io.launcher.environment" }
 { $subsection "io.launcher.redirection" }
+{ $subsection "io.launcher.priority" }
 { $subsection "io.launcher.timeouts" } ;
 
 ABOUT: "io.launcher"

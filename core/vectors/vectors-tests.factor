@@ -77,7 +77,7 @@ IN: vectors.tests
 
 [ f ] [
     V{ 1 2 3 4 } dup clone
-    [ underlying ] 2apply eq?
+    [ underlying ] bi@ eq?
 ] unit-test
 
 [ 0 ] [
@@ -94,6 +94,6 @@ IN: vectors.tests
     100 >array dup >vector <reversed> >array >r reverse r> =
 ] unit-test
 
-[ fixnum ] [ 1 >bignum V{ } new length class ] unit-test
+[ fixnum ] [ 1 >bignum V{ } new-sequence length class ] unit-test
 
 [ fixnum ] [ 1 >bignum [ ] V{ } map-as length class ] unit-test

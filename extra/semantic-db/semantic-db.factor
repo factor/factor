@@ -1,14 +1,14 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays continuations db db.tuples db.types db.sqlite kernel math math.parser new-slots sequences ;
+USING: accessors arrays continuations db db.tuples db.types db.sqlite kernel math math.parser sequences ;
 IN: semantic-db
 
 TUPLE: node id content ;
 : <node> ( content -- node )
-    node construct-empty swap >>content ;
+    node new swap >>content ;
 
 : <id-node> ( id -- node )
-    node construct-empty swap >>id ;
+    node new swap >>id ;
 
 node "node"
 {
@@ -34,10 +34,10 @@ node "node"
 TUPLE: arc id relation subject object ;
 
 : <arc> ( relation subject object -- arc )
-    arc construct-empty swap >>object swap >>subject swap >>relation ;
+    arc new swap >>object swap >>subject swap >>relation ;
 
 : <id-arc> ( id -- arc )
-    arc construct-empty swap >>id ;
+    arc new swap >>id ;
 
 : insert-arc ( arc -- )
     f <node> dup insert-tuple id>> >>id insert-tuple ;
@@ -76,7 +76,7 @@ arc "arc"
     create-node-table create-arc-table create-bootstrap-nodes create-bootstrap-arcs ;
 
 : param ( value key type -- param )
-    swapd 3array ;
+    swapd <sqlite-low-level-binding> ;
 
 : single-int-results ( bindings sql -- array )
     f f <simple-statement> [ do-bound-query ] with-disposal

@@ -14,7 +14,7 @@ IN: help.markup
 
 ! Element types are words whose name begins with $.
 
-PREDICATE: array simple-element
+PREDICATE: simple-element < array
     dup empty? [ drop t ] [ first word? not ] if ;
 
 SYMBOL: last-element
@@ -79,7 +79,7 @@ M: f print-element drop ;
     [ strong-style get print-element* ] ($heading) ;
 
 : ($code-style) ( presentation -- hash )
-    presented associate code-style get union ;
+    presented associate code-style get assoc-union ;
 
 : ($code) ( presentation quot -- )
     [
@@ -138,8 +138,7 @@ M: f print-element drop ;
     link-style get [ write-object ] with-style ;
 
 : ($link) ( article -- )
-    dup article-name swap >link write-link
-    span last-element set ;
+    [ dup article-name swap >link write-link ] ($span) ;
 
 : $link ( element -- )
     first ($link) ;
@@ -159,7 +158,7 @@ M: f print-element drop ;
     [ first ($long-link) ] ($subsection) ;
 
 : ($vocab-link) ( text vocab -- )
-    dup vocab-root >vocab-link write-link ;
+    >vocab-link write-link ;
 
 : $vocab-subsection ( element -- )
     [
@@ -235,7 +234,7 @@ M: string ($instance)
 
 : values-row ( seq -- seq )
     unclip \ $snippet swap ?word-name 2array
-    swap dup first word? [ \ $instance add* ] when 2array ;
+    swap dup first word? [ \ $instance prefix ] when 2array ;
 
 : $values ( element -- )
     "Inputs and outputs" $heading
@@ -295,63 +294,6 @@ M: string ($instance)
         "This word should only be called from inside the "
         { $link with-pprint } " combinator."
     } $notes ;
-
-: ($spec-reader-values) ( slot-spec class -- element )
-    dup ?word-name swap 2array
-    over slot-spec-name
-    rot slot-spec-type 2array 2array
-    [ { $instance } swap add ] assoc-map ;
-
-: $spec-reader-values ( slot-spec class -- )
-    ($spec-reader-values) $values ;
-
-: $spec-reader-description ( slot-spec class -- )
-    [
-        "Outputs the value stored in the " ,
-        { $snippet } rot slot-spec-name add ,
-        " slot of " ,
-        { $instance } swap add ,
-        " instance." ,
-    ] { } make $description ;
-
-: $spec-reader ( reader slot-specs class -- )
-    >r slot-of-reader r>
-    over [
-        2dup $spec-reader-values
-        2dup $spec-reader-description
-    ] when 2drop ;
-
-GENERIC: slot-specs ( help-type -- specs )
-
-M: word slot-specs "slots" word-prop ;
-
-: $slot-reader ( reader -- )
-    first dup "reading" word-prop [ slot-specs ] keep
-    $spec-reader ;
-
-: $spec-writer-values ( slot-spec class -- )
-    ($spec-reader-values) reverse $values ;
-
-: $spec-writer-description ( slot-spec class -- )
-    [
-        "Stores a new value to the " ,
-        { $snippet } rot slot-spec-name add ,
-        " slot of " ,
-        { $instance } swap add ,
-        " instance." ,
-    ] { } make $description ;
-
-: $spec-writer ( writer slot-specs class -- )
-    >r slot-of-writer r>
-    over [
-        2dup $spec-writer-values
-        2dup $spec-writer-description
-        dup ?word-name 1array $side-effects
-    ] when 2drop ;
-
-: $slot-writer ( reader -- )
-    first dup "writing" word-prop [ slot-specs ] keep
-    $spec-writer ;
 
 GENERIC: elements* ( elt-type element -- )
 

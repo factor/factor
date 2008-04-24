@@ -1,13 +1,15 @@
 USING: alien alien.syntax combinators kernel parser sequences
-system words namespaces hashtables init math arrays assocs 
-sequences.lib continuations ;
-<< {
-    { [ windows? ] [ "opengl.gl.windows" ] }
-    { [ macosx? ]  [ "opengl.gl.macosx" ] }
-    { [ unix? ] [ "opengl.gl.unix" ] }
-    { [ t ] [ "Unknown OpenGL platform" throw ] }
-} cond use+ >>
+system words namespaces hashtables init math arrays assocs
+continuations ;
 IN: opengl.gl.extensions
+
+ERROR: unknown-gl-platform ;
+<< {
+    { [ os windows? ] [ "opengl.gl.windows" ] }
+    { [ os macosx? ]  [ "opengl.gl.macosx" ] }
+    { [ os unix? ] [ "opengl.gl.unix" ] }
+    [ unknown-gl-platform ]
+} cond use+ >>
 
 SYMBOL: +gl-function-number-counter+
 SYMBOL: +gl-function-pointers+
@@ -28,7 +30,7 @@ reset-gl-function-number-counter
 : gl-function-pointer ( names n -- funptr )
     gl-function-context 2array dup +gl-function-pointers+ get-global at
     [ 2nip ] [
-        >r [ gl-function-address ] attempt-each 
+        >r [ gl-function-address ] map [ ] find nip
         dup [ "OpenGL function not available" throw ] unless
         dup r>
         +gl-function-pointers+ get-global set-at
@@ -38,7 +40,7 @@ reset-gl-function-number-counter
     gl-function-calling-convention
     scan
     scan dup
-    scan drop "}" parse-tokens swap add*
+    scan drop "}" parse-tokens swap prefix
     gl-function-number
     [ gl-function-pointer ] 2curry swap
     ";" parse-tokens [ "()" subseq? not ] subset

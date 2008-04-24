@@ -1,68 +1,75 @@
 USING: help.markup help.syntax ;
 IN: io.encodings
 
-ABOUT: "encodings"
+ABOUT: "io.encodings"
 
 ARTICLE: "io.encodings" "I/O encodings"
-"Many streams deal with bytes, rather than Unicode code points, at some level. The translation between these two things is specified by an encoding. To abstract this away from the programmer, Factor provides a system where these streams are associated with an encoding which is always used when the stream is read from or written to. For most purposes, an encoding descriptor consisting of a symbol is all that is needed when initializing a stream."
+"Bytes can't be understood in isolation as text. They must be interpreted under a certain encoding. Factor provides utilities for dealing with encoded text by declaring that a stream has a particular encoding, and utilities to encode and decode strings."
 { $subsection "encodings-constructors" }
 { $subsection "encodings-descriptors" }
 { $subsection "encodings-protocol" } ;
 
-ARTICLE: "encodings-constructors" "Constructing an encoded stream"
+ARTICLE: "encodings-constructors" "Manually constructing an encoded stream"
+"The following words can be used to construct encoded streams. Note that they are usually not used directly, but rather by the stream constructors themselves. Most stream constructors take an encoding descriptor as a parameter and internally call these constructors."
 { $subsection <encoder> }
 { $subsection <decoder> }
 { $subsection <encoder-duplex> } ;
 
-HELP: <encoder> ( stream encoding -- newstream )
+HELP: <encoder>
 { $values { "stream" "an output stream" }
     { "encoding" "an encoding descriptor" }
     { "newstream" "an encoded output stream" } }
-{ $description "Wraps the given stream in a new stream using the given encoding for all output. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." } ;
+{ $description "Wraps the given stream in a new stream using the given encoding for all output. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." }
+$low-level-note ;
 
-HELP: <decoder> ( stream encoding -- newstream )
+HELP: <decoder>
 { $values { "stream" "an input stream" }
     { "encoding" "an encoding descriptor" }
     { "newstream" "an encoded output stream" } }
-{ $description "Wraps the given stream in a new stream using the given encoding for all input. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." } ;
+{ $description "Wraps the given stream in a new stream using the given encoding for all input. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." }
+$low-level-note ;
 
-HELP: <encoder-duplex> ( stream-in stream-out encoding -- duplex )
+HELP: <encoder-duplex>
 { $values { "stream-in" "an input stream" }
     { "stream-out" "an output stream" }
     { "encoding" "an encoding descriptor" }
     { "duplex" "an encoded duplex stream" } }
-{ $description "Wraps the given streams in an encoder or decoder stream, and puts them together in a duplex stream for input and output. If either input stream is already encoded, that encoding is stripped off before it is reencoded. The encoding descriptor must conform to the " { $link "encodings-protocol" } "." } ;
+{ $description "Wraps the given streams in an encoder or decoder stream, and puts them together in a duplex stream for input and output. If either input stream is already encoded, that encoding is stripped off before it is reencoded. The encoding descriptor must conform to the " { $link "encodings-protocol" } "." }
+$low-level-note ;
 
 { <encoder> <decoder> <encoder-duplex> } related-words
 
 ARTICLE: "encodings-descriptors" "Encoding descriptors"
 "An encoding descriptor is something which can be used for input or output streams to encode or decode files. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
-$nl { $vocab-link "io.encodings.utf8" }
-$nl { $vocab-link "io.encodings.ascii" }
-$nl { $vocab-link "io.encodings.binary" }
-$nl { $vocab-link "io.encodings.utf16" } ;
+{ $subsection "io.encodings.binary" }
+{ $subsection "io.encodings.utf8" }
+{ $subsection "io.encodings.utf16" }
+{ $vocab-subsection "Strict encodings" "io.encodings.strict" }
+"Legacy encodings:"
+{ $vocab-subsection "8-bit encodings" "io.encodings.8-bit" }
+{ $vocab-subsection "ASCII" "io.encodings.ascii" }
+{ $see-also "encodings-introduction" } ;
 
 ARTICLE: "encodings-protocol" "Encoding protocol"
-"An encoding descriptor must implement the following methods. The methods are implemented on tuple classes by instantiating the class and calling the method again."
-{ $subsection decode-step }
-{ $subsection init-decoder }
-{ $subsection stream-write-encoded } ;
+"There are two parts to implementing a new encoding. First, methods for creating an encoded or decoded stream must be provided. These have defaults, however, which wrap a stream in an encoder or decoder wrapper with the given encoding descriptor."
+{ $subsection <encoder> }
+{ $subsection <decoder> }
+"If an encoding might be contained in the code slot of an encoder or decoder tuple, then the following methods must be implemented to read or write one code point from a stream:"
+{ $subsection decode-char }
+{ $subsection encode-char }
+{ $see-also "encodings-introduction" } ;
 
-HELP: decode-step ( buf char encoding -- )
-{ $values { "buf" "A string buffer which characters can be pushed to" }
-    { "char" "An octet which is read from a stream" }
-    { "encoding" "An encoding descriptor tuple" } }
-{ $description "A single step in the decoding process must be defined for the decoding descriptor. When each octet is read, this word is called, and depending on the decoder's internal state, something may be pushed to the buffer or the state may change. This should not be used directly." } ;
+HELP: decode-char
+{ $values { "stream" "an underlying input stream" }
+    { "encoding" "An encoding descriptor tuple" } { "char/f" "a code point or " { $link f } } }
+{ $contract "Reads a single code point from the underlying stream, interpreting it by the encoding." }
+$low-level-note ;
 
-HELP: stream-write-encoded ( string stream encoding -- )
-{ $values { "string" "a string" }
-    { "stream" "an output stream" }
+HELP: encode-char
+{ $values { "char" "a character" }
+    { "stream" "an underlying output stream" }
     { "encoding" "an encoding descriptor" } }
-{ $description "Encodes the string with the given encoding descriptor, outputing the result to the given stream. This should not be used directly." } ;
+{ $contract "Writes the code point in the encoding to the underlying stream given." }
+$low-level-note ;
 
-HELP: init-decoder ( stream encoding -- encoding )
-{ $values { "stream" "an input stream" }
-    { "encoding" "an encoding descriptor" } }
-{ $description "Initializes the decoder tuple's state. The stream is exposed so that it can be read, eg for a BOM. This should not be used directly." } ;
-
-{ init-decoder decode-step stream-write-encoded } related-words
+{ encode-char decode-char } related-words

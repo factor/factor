@@ -12,7 +12,7 @@ IN: documents
 
 : =line ( n loc -- newloc ) second 2array ;
 
-: lines-equal? ( loc1 loc2 -- ? ) [ first ] 2apply number= ;
+: lines-equal? ( loc1 loc2 -- ? ) [ first ] bi@ number= ;
 
 TUPLE: document locs ;
 
@@ -46,7 +46,7 @@ TUPLE: document locs ;
     2over = [
         3drop
     ] [
-        >r [ first ] 2apply 1+ dup <slice> r> each
+        >r [ first ] bi@ 1+ dup <slice> r> each
     ] if ; inline
 
 : start/end-on-line ( from to line# -- n1 n2 )
@@ -74,7 +74,7 @@ TUPLE: document locs ;
     0 swap [ append ] change-nth ;
 
 : append-last ( str seq -- )
-    [ length 1- ] keep [ swap append ] change-nth ;
+    [ length 1- ] keep [ prepend ] change-nth ;
 
 : loc-col/str ( loc document -- str col )
     >r first2 swap r> nth swap ;
@@ -85,7 +85,7 @@ TUPLE: document locs ;
 
 : (set-doc-range) ( newlines from to lines -- )
     [ prepare-insert ] 3keep
-    >r [ first ] 2apply 1+ r>
+    >r [ first ] bi@ 1+ r>
     replace-slice ;
 
 : set-doc-range ( string from to document -- )
@@ -151,14 +151,14 @@ TUPLE: char-elt ;
     -rot {
         { [ over { 0 0 } = ] [ drop ] }
         { [ over second zero? ] [ >r first 1- r> line-end ] }
-        { [ t ] [ pick call ] }
+        [ pick call ]
     } cond nip ; inline
 
 : (next-char) ( loc document quot -- loc )
     -rot {
         { [ 2dup doc-end = ] [ drop ] }
         { [ 2dup line-end? ] [ drop first 1+ 0 2array ] }
-        { [ t ] [ pick call ] }
+        [ pick call ]
     } cond nip ; inline
 
 M: char-elt prev-elt
@@ -184,8 +184,7 @@ M: one-char-elt next-elt 2drop ;
     [ >r blank? r> xor ] curry ; inline
 
 : (prev-word) ( ? col str -- col )
-    rot break-detector find-last*
-    drop [ 1+ ] [ 0 ] if* ;
+    rot break-detector find-last* drop ?1+ ;
 
 : (next-word) ( ? col str -- col )
     [ rot break-detector find* drop ] keep

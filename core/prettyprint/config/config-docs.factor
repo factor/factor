@@ -4,12 +4,6 @@ IN: prettyprint.config
 
 ABOUT: "prettyprint-variables"
 
-HELP: indent
-{ $var-description "The prettyprinter's current indent level." } ;
-
-HELP: pprinter-stack
-{ $var-description "A stack of " { $link block } " objects currently being constructed by the prettyprinter." } ;
-
 HELP: tab-size
 { $var-description "Prettyprinter tab size. Indent nesting is always a multiple of the tab size." } ;
 

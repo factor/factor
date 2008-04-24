@@ -6,8 +6,8 @@ kernel.private math math.private namespaces quotations sequences
 words generic byte-arrays hashtables hashtables.private
 generator generator.registers generator.fixup sequences.private
 sbufs sbufs.private vectors vectors.private layouts system
-tuples.private strings.private slots.private compiler.constants
-;
+classes.tuple.private strings.private slots.private
+compiler.constants ;
 IN: cpu.x86.intrinsics
 
 ! Type checks
@@ -17,58 +17,6 @@ IN: cpu.x86.intrinsics
 ] H{
     { +input+ { { f "in" } } }
     { +output+ { "in" } }
-} define-intrinsic
-
-\ type [
-    "end" define-label
-    ! Make a copy
-    "x" operand "obj" operand MOV
-    ! Get the tag
-    "x" operand tag-mask get AND
-    ! Tag the tag
-    "x" operand %tag-fixnum
-    ! Compare with object tag number (3).
-    "x" operand object tag-number tag-fixnum CMP
-    "end" get JNE
-    ! If we have equality, load type from header
-    "x" operand "obj" operand -3 [+] MOV
-    "end" resolve-label
-] H{
-    { +input+ { { f "obj" } } }
-    { +scratch+ { { f "x" } } }
-    { +output+ { "x" } }
-} define-intrinsic
-
-\ class-hash [
-    "end" define-label
-    "tuple" define-label
-    "object" define-label
-    ! Make a copy
-    "x" operand "obj" operand MOV
-    ! Get the tag
-    "x" operand tag-mask get AND
-    ! Tag the tag
-    "x" operand %tag-fixnum
-    ! Compare with tuple tag number (2).
-    "x" operand tuple tag-number tag-fixnum CMP
-    "tuple" get JE
-    ! Compare with object tag number (3).
-    "x" operand object tag-number tag-fixnum CMP
-    "object" get JE
-    "end" get JMP
-    "object" get resolve-label
-    ! Load header type
-    "x" operand "obj" operand header-offset [+] MOV
-    "end" get JMP
-    "tuple" get resolve-label
-    ! Load class hash
-    "x" operand "obj" operand tuple-class-offset [+] MOV
-    "x" operand dup class-hash-offset [+] MOV
-    "end" resolve-label
-] H{
-    { +input+ { { f "obj" } } }
-    { +scratch+ { { f "x" } } }
-    { +output+ { "x" } }
 } define-intrinsic
 
 ! Slots
@@ -156,7 +104,7 @@ IN: cpu.x86.intrinsics
 
 ! Fixnums
 : fixnum-op ( op hash -- pair )
-    >r [ "x" operand "y" operand ] swap add r> 2array ;
+    >r [ "x" operand "y" operand ] swap suffix r> 2array ;
 
 : fixnum-value-op ( op -- pair )
     H{
@@ -251,7 +199,7 @@ IN: cpu.x86.intrinsics
 \ fixnum- \ SUB overflow-template
 
 : fixnum-jump ( op inputs -- pair )
-    >r [ "x" operand "y" operand CMP ] swap add r> 2array ;
+    >r [ "x" operand "y" operand CMP ] swap suffix r> 2array ;
 
 : fixnum-value-jump ( op -- pair )
     { { f "x" } { [ small-tagged? ] "y" } } fixnum-jump ;
@@ -264,11 +212,11 @@ IN: cpu.x86.intrinsics
     2array define-if-intrinsics ;
 
 {
-    { fixnum< JL }
-    { fixnum<= JLE }
-    { fixnum> JG }
-    { fixnum>= JGE }
-    { eq? JE }
+    { fixnum< JGE }
+    { fixnum<= JG }
+    { fixnum> JLE }
+    { fixnum>= JL }
+    { eq? JNE }
 } [
     first2 define-fixnum-jump
 ] each
@@ -336,19 +284,20 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 \ <tuple> [
-    tuple "n" get 2 + cells [
-        ! Store length
-        1 object@ "n" operand MOV
-        ! Store class
-        2 object@ "class" operand MOV
+    tuple "layout" get layout-size 2 + cells [
+        ! Store layout
+        "layout" get "scratch" get load-literal
+        1 object@ "scratch" operand MOV
         ! Zero out the rest of the tuple
-        "n" operand 1- [ 3 + object@ f v>operand MOV ] each
+        "layout" get layout-size [
+            2 + object@ f v>operand MOV
+        ] each
         ! Store tagged ptr in reg
         "tuple" get tuple %store-tagged
     ] %allot
 ] H{
-    { +input+ { { f "class" } { [ inline-array? ] "n" } } }
-    { +scratch+ { { f "tuple" } } }
+    { +input+ { { [ tuple-layout? ] "layout" } } }
+    { +scratch+ { { f "tuple" } { f "scratch" } } }
     { +output+ { "tuple" } }
 } define-intrinsic
 

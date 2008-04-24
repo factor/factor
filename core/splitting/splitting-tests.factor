@@ -1,4 +1,4 @@
-USING: splitting tools.test ;
+USING: splitting tools.test kernel sequences arrays ;
 IN: splitting.tests
 
 [ { 1 2 3 } 0 group ] must-fail
@@ -56,3 +56,9 @@ unit-test
 [ { "hello" "hi" } ] [ "hello\nhi" string-lines ] unit-test
 [ { "hello" "hi" } ] [ "hello\rhi" string-lines ] unit-test
 [ { "hello" "hi" } ] [ "hello\r\nhi" string-lines ] unit-test
+
+[ { V{ "a" "b" } V{ f f } } ] [
+    V{ "a" "b" } clone 2 <groups>
+    2 over set-length
+    >array
+] unit-test

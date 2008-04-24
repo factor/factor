@@ -1,7 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax kernel math sequences
-namespaces assocs init continuations core-foundation ;
+USING: alien alien.c-types alien.strings alien.syntax kernel
+math sequences namespaces assocs init accessors continuations
+combinators core-foundation core-foundation.run-loop
+io.encodings.utf8 ;
 IN: core-foundation.fsevents
 
 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
@@ -151,11 +153,8 @@ SYMBOL: event-stream-callbacks
 
 [
     event-stream-callbacks global
-    [ [ drop expired? not ] assoc-subset ] change-at
-    1 \ event-stream-counter set-global
+    [ [ drop expired? not ] assoc-subset H{ } assoc-like ] change-at
 ] "core-foundation" add-init-hook
-
-event-stream-callbacks global [ H{ } assoc-like ] change-at
 
 : add-event-source-callback ( quot -- id )
     event-stream-counter <alien>
@@ -167,7 +166,7 @@ event-stream-callbacks global [ H{ } assoc-like ] change-at
 : >event-triple ( n eventPaths eventFlags eventIds -- triple )
     [
         >r >r >r dup dup
-        r> char*-nth ,
+        r> void*-nth utf8 alien>string ,
         r> int-nth ,
         r> longlong-nth ,
     ] { } make ;
@@ -184,11 +183,11 @@ event-stream-callbacks global [ H{ } assoc-like ] change-at
     }
     "cdecl" [
         [ >event-triple ] 3curry map
-        swap event-stream-callbacks get at call
-        drop
+        swap event-stream-callbacks get at
+        dup [ call drop ] [ 3drop ] if
     ] alien-callback ;
 
-TUPLE: event-stream info handle ;
+TUPLE: event-stream info handle closed ;
 
 : <event-stream> ( quot paths latency flags -- event-stream )
     >r >r >r
@@ -196,9 +195,15 @@ TUPLE: event-stream info handle ;
     >r master-event-source-callback r>
     r> r> r> <FSEventStream>
     dup enable-event-stream
-    event-stream construct-boa ;
+    f event-stream boa ;
 
 M: event-stream dispose
-    dup event-stream-info remove-event-source-callback
-    event-stream-handle dup disable-event-stream
-    FSEventStreamRelease ;
+    dup closed>> [ drop ] [
+        t >>closed
+        {
+            [ info>> remove-event-source-callback ]
+            [ handle>> disable-event-stream ]
+            [ handle>> FSEventStreamInvalidate ]
+            [ handle>> FSEventStreamRelease ]
+        } cleave
+    ] if ;

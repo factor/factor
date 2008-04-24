@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math namespaces strings arrays vectors sequences ;
+USING: kernel math namespaces strings arrays vectors sequences
+sets ;
 IN: splitting
 
 TUPLE: groups seq n sliced? ;
@@ -8,7 +9,7 @@ TUPLE: groups seq n sliced? ;
 : check-groups 0 <= [ "Invalid group count" throw ] when ;
 
 : <groups> ( seq n -- groups )
-    dup check-groups f groups construct-boa ; inline
+    dup check-groups f groups boa ; inline
 
 : <sliced-groups> ( seq n -- groups )
     <groups> t over set-groups-sliced? ;
@@ -17,7 +18,7 @@ M: groups length
     dup groups-seq length swap groups-n [ + 1- ] keep /i ;
 
 M: groups set-length
-    [ groups-n * ] keep delegate set-length ;
+    [ groups-n * ] keep groups-seq set-length ;
 
 : group@ ( n groups -- from to seq )
     [ groups-n [ * dup ] keep + ] keep
@@ -56,7 +57,7 @@ INSTANCE: groups sequence
     ] if ;
 
 : last-split1 ( seq subseq -- before after )
-    [ <reversed> ] 2apply split1 [ reverse ] 2apply
+    [ <reversed> ] bi@ split1 [ reverse ] bi@
     dup [ swap ] when ;
 
 : (split) ( separators n seq -- )
@@ -69,12 +70,12 @@ INSTANCE: groups sequence
 : split ( seq separators -- pieces ) [ split, ] { } make ;
 
 : string-lines ( str -- seq )
-    dup "\r\n" seq-intersect empty? [
+    dup "\r\n" intersect empty? [
         1array
     ] [
         "\n" split [
             1 head-slice* [
                 "\r" ?tail drop "\r" split
             ] map
-        ] keep peek "\r" split add concat
+        ] keep peek "\r" split suffix concat
     ] if ;

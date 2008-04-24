@@ -2,6 +2,7 @@
 _darcs
 *.obj
 *.o
+*.s
 *.exe
 Factor/factor
 *.a
@@ -18,4 +19,4 @@ factor
 temp
 logs
 work
-misc/wordsize
+build-support/wordsize

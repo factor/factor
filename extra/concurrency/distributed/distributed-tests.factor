@@ -1,13 +1,15 @@
 IN: concurrency.distributed.tests
 USING: tools.test concurrency.distributed kernel io.files
 arrays io.sockets system combinators threads math sequences
-concurrency.messaging ;
+concurrency.messaging continuations ;
 
 : test-node
     {
-        { [ unix? ] [ "distributed-concurrency-test" temp-file <local> ] }
-        { [ windows? ] [ "127.0.0.1" 1238 <inet4> ] }
+        { [ os unix? ] [ "distributed-concurrency-test" temp-file <local> ] }
+        { [ os windows? ] [ "127.0.0.1" 1238 <inet4> ] }
     } cond ;
+
+[ ] [ [ "distributed-concurrency-test" temp-file delete-file ] ignore-errors ] unit-test
 
 [ ] [ test-node dup 1array swap (start-node) ] unit-test
 

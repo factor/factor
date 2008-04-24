@@ -3,10 +3,14 @@
 IN: definitions
 USING: kernel sequences namespaces assocs graphs ;
 
-TUPLE: no-compilation-unit definition ;
+ERROR: no-compilation-unit definition ;
 
-: no-compilation-unit ( definition -- * )
-    \ no-compilation-unit construct-boa throw ;
+SYMBOL: changed-definitions
+
+: changed-definition ( defspec -- )
+    dup changed-definitions get
+    [ no-compilation-unit ] unless*
+    set-at ;
 
 GENERIC: where ( defspec -- loc )
 
@@ -44,13 +48,6 @@ M: object uses drop f ;
 : xref ( defspec -- ) dup uses crossref get add-vertex ;
 
 : usage ( defspec -- seq ) \ f or crossref get at keys ;
-
-GENERIC: redefined* ( defspec -- )
-
-M: object redefined* drop ;
-
-: redefined ( defspec -- )
-    [ crossref get at ] closure [ drop redefined* ] assoc-each ;
 
 : unxref ( defspec -- )
     dup uses crossref get remove-vertex ;

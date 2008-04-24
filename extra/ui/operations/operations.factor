@@ -19,7 +19,7 @@ TUPLE: operation predicate command translator hook listener? ;
         set-operation-hook
     } operation construct ;
 
-PREDICATE: operation listener-operation
+PREDICATE: listener-operation < operation
     dup operation-command listener-command?
     swap operation-listener? or ;
 
@@ -54,7 +54,7 @@ SYMBOL: operations
     H{ { +keyboard+ f } { +primary+ f } { +secondary+ f } } ;
 
 : define-operation ( pred command flags -- )
-    default-flags swap union
+    default-flags swap assoc-union
     dupd define-command <operation>
     operations get push ;
 

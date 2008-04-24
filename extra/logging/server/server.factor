@@ -11,10 +11,10 @@ IN: logging.server
     \ log-root get "logs" resource-path or ;
 
 : log-path ( service -- path )
-    log-root swap path+ ;
+    log-root prepend-path ;
 
 : log# ( path n -- path' )
-    number>string ".log" append path+ ;
+    number>string ".log" append append-path ;
 
 SYMBOL: log-files
 
@@ -40,10 +40,10 @@ SYMBOL: log-files
     rot [ empty? not ] subset {
         { [ dup empty? ] [ 3drop ] }
         { [ dup length 1 = ] [ first -rot f (write-message) ] }
-        { [ t ] [
+        [
             [ first -rot f (write-message) ] 3keep
             1 tail -rot [ t (write-message) ] 2curry each
-        ] }
+        ]
     } cond ;
 
 : (log-message) ( msg -- )

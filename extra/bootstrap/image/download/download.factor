@@ -18,7 +18,7 @@ bootstrap.image sequences io ;
 : download-image ( arch -- )
     boot-image-name dup need-new-image? [
         "Downloading " write dup write "..." print
-        url swap append download
+        url prepend download
     ] [
         "Boot image up to date" print
         drop

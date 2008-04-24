@@ -25,7 +25,7 @@ $with-locals-note ;
 
 HELP: [let
 { $syntax "[let | binding1 [ value1... ]\n       binding2 [ value2... ]\n       ... |\n    body... ]" }
-{ $description "Introduces a set of lexical bindings and evaluates the body. The values are evaluated in parallel, and may not refer to other bindings within the same " { $link POSTPONE: [let } " form; for Lisp programmers, this means that Factor's " { $link POSTPONE: [let } " is equivalent to the Lisp " { $snippet "let" } ", not " { $snippet "let*" } "." }
+{ $description "Introduces a set of lexical bindings and evaluates the body. The values are evaluated in parallel, and may not refer to other bindings within the same " { $link POSTPONE: [let } " form; for Lisp programmers, this means that " { $link POSTPONE: [let } " is equivalent to the Lisp " { $snippet "let" } ", not " { $snippet "let*" } "." }
 { $examples
     { $example
         "USING: kernel locals math math.functions prettyprint sequences ;"
@@ -37,6 +37,24 @@ HELP: [let
     }
 }
 $with-locals-note ;
+
+HELP: [let*
+{ $syntax "[let* | binding1 [ value1... ]\n       binding2 [ value2... ]\n       ... |\n    body... ]" }
+{ $description "Introduces a set of lexical bindings and evaluates the body. The values are evaluated sequentially, and may refer to previous bindings from the same " { $link POSTPONE: [let* } " form; for Lisp programmers, this means that " { $link POSTPONE: [let* } " is equivalent to the Lisp " { $snippet "let*" } ", not " { $snippet "let" } "." }
+{ $examples
+    { $example
+        "USING: kernel locals math math.functions prettyprint sequences ;"
+        ":: frobnicate ( n seq -- newseq )"
+        "    [let* | a [ n 3 + ]"
+        "            b [ a 4 * ] |"
+        "        seq [ b / ] map ] ;"
+        "1 { 32 48 } frobnicate ."
+        "{ 2 3 }"
+    }
+}
+$with-locals-note ;
+
+{ POSTPONE: [let POSTPONE: [let* } related-words
 
 HELP: [wlet
 { $syntax "[wlet | binding1 [ body1... ]\n        binding2 [ body2... ]\n        ... |\n     body... ]" }
@@ -106,6 +124,7 @@ $nl
 { $subsection with-locals }
 "Lexical binding forms:"
 { $subsection POSTPONE: [let }
+{ $subsection POSTPONE: [let* }
 { $subsection POSTPONE: [wlet }
 "Lambda abstractions:"
 { $subsection POSTPONE: [| }

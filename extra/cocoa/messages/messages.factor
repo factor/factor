@@ -1,10 +1,10 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.compiler
+USING: alien alien.c-types alien.strings alien.compiler
 arrays assocs combinators compiler inference.transforms kernel
 math namespaces parser prettyprint prettyprint.sections
 quotations sequences strings words cocoa.runtime io macros
-memoize debugger ;
+memoize debugger io.encodings.ascii ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -43,7 +43,7 @@ super-message-senders global [ H{ } assoc-like ] change-at
 
 TUPLE: selector name object ;
 
-MEMO: <selector> ( name -- sel ) f \ selector construct-boa ;
+MEMO: <selector> ( name -- sel ) f \ selector boa ;
 
 : selector ( selector -- alien )
     dup selector-object expired? [
@@ -59,7 +59,7 @@ objc-methods global [ H{ } assoc-like ] change-at
 
 : lookup-method ( selector -- method )
     dup objc-methods get at
-    [ ] [ "No such method: " swap append throw ] ?if ;
+    [ ] [ "No such method: " prepend throw ] ?if ;
 
 : make-dip ( quot n -- quot' )
     dup
@@ -90,7 +90,7 @@ MACRO: (send) ( selector super? -- quot )
 ! Runtime introspection
 : (objc-class) ( string word -- class )
     dupd execute
-    [ ] [ "No such class: " swap append throw ] ?if ; inline
+    [ ] [ "No such class: " prepend throw ] ?if ; inline
 
 : objc-class ( string -- class )
     \ objc_getClass (objc-class) ;
@@ -104,7 +104,7 @@ MACRO: (send) ( selector super? -- quot )
 : method-arg-type ( method i -- type )
     f <void*> 0 <int> over
     >r method_getArgumentInfo drop
-    r> *char* ;
+    r> *void* ascii alien>string ;
 
 SYMBOL: objc>alien-types
 
@@ -139,7 +139,7 @@ H{
     { "NSRect" "{_NSRect=ffff}" }
     { "NSSize" "{_NSSize=ff}" }
     { "NSRange" "{_NSRange=II}" }
-} union alien>objc-types set-global
+} assoc-union alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
     2dup CHAR: = -rot index* swap subseq
@@ -154,7 +154,7 @@ H{
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
         { [ dup CHAR: [ = ] [ 3drop "void*" ] }
-        { [ t ] [ 2nip 1string objc>alien-types get at ] }
+        [ 2nip 1string objc>alien-types get at ]
     } cond ;
 
 : parse-objc-type ( string -- ctype ) 0 swap (parse-objc-type) ;

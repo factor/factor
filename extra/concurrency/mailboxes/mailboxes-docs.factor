@@ -49,15 +49,15 @@ HELP: while-mailbox-empty
 { $description "Repeatedly call the quotation while there are no items in the mailbox." } ;
 
 HELP: mailbox-get?
-{ $values { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } }
-          { "mailbox" mailbox } 
+{ $values { "mailbox" mailbox } 
+          { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } }
           { "obj" object }
 }
 { $description "Get the first item in the mailbox which satisfies the predicate. 'pred' will be called repeatedly for each item in the mailbox. When 'pred' returns true that item will be returned. If nothing in the mailbox satisfies the predicate then the thread will block until something does." } ;
 
 
 ARTICLE: "concurrency.mailboxes" "Mailboxes"
-"A " { $emphasis "mailbox" } " is a first-in-first-out queue where the operation of removing an element blocks if the queue is empty, instead of throwing an error."
+"A " { $emphasis "mailbox" } " is a first-in-first-out queue where the operation of removing an element blocks if the queue is empty, instead of throwing an error. Mailboxes are implemented in the " { $vocab-link "concurrency.mailboxes" } " vocabulary."
 { $subsection mailbox }
 { $subsection <mailbox> }
 "Removing the first element:"
@@ -73,3 +73,5 @@ ARTICLE: "concurrency.mailboxes" "Mailboxes"
 "Testing if a mailbox is empty:"
 { $subsection mailbox-empty? }
 { $subsection while-mailbox-empty } ;
+
+ABOUT: "concurrency.mailboxes"

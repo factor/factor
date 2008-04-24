@@ -284,7 +284,7 @@ HELP: <word>
 
 HELP: gensym
 { $values { "word" word } }
-{ $description "Creates an uninterned word that is not equal to any other word in the system. Gensyms have an automatically-generated name based on a prefix and an incrementing counter." }
+{ $description "Creates an uninterned word that is not equal to any other word in the system." }
 { $examples { $unchecked-example "gensym ." "G:260561" } }
 { $notes "Gensyms are often used as placeholder values that have no meaning of their own but must be unique. For example, the compiler uses gensyms to label sections of code." } ;
 
@@ -324,11 +324,7 @@ HELP: constructor-word
 { $description "Creates a new word, surrounding " { $snippet "name" } " in angle brackets." }
 { $examples { $example "USING: prettyprint words ;" "\"salmon\" \"scratchpad\" constructor-word ." "<salmon>" } } ;
 
-HELP: forget-word
-{ $values { "word" word } }
-{ $description "Removes a word from its vocabulary. User code should call " { $link forget } " instead, since it also does the right thing when forgetting class words." } ;
-
-{ POSTPONE: FORGET: forget forget-word forget-vocab } related-words
+{ POSTPONE: FORGET: forget forget* forget-vocab } related-words
 
 HELP: target-word
 { $values { "word" word } { "target" word } }

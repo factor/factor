@@ -7,7 +7,7 @@ IN: ui.gadgets.borders
 TUPLE: border size fill ;
 
 : <border> ( child gap -- border )
-    dup 2array { 0 0 } border construct-boa
+    dup 2array { 0 0 } border boa
     <gadget> over set-delegate
     tuck add-gadget ;
 
@@ -24,7 +24,7 @@ M: border pref-dim*
     <rect> ;
 
 : scale-rect ( rect vec -- loc dim )
-    [ v* ] curry >r rect-bounds r> 2apply ;
+    [ v* ] curry >r rect-bounds r> bi@ ;
 
 : average-rects ( rect1 rect2 weight -- rect )
     tuck >r >r scale-rect r> r> { 1 1 } swap v- scale-rect

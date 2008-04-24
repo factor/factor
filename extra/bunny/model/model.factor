@@ -1,8 +1,8 @@
-USING: alien alien.c-types arrays sequences math math.vectors math.matrices
-    math.parser io io.files kernel opengl opengl.gl opengl.glu io.encodings.ascii
-    opengl.capabilities shuffle http.client vectors splitting tools.time system
-    combinators combinators.cleave float-arrays continuations namespaces
-    sequences.lib ;
+USING: alien alien.c-types arrays sequences math math.vectors
+math.matrices math.parser io io.files kernel opengl opengl.gl
+opengl.glu io.encodings.ascii opengl.capabilities shuffle
+http.client vectors splitting tools.time system combinators
+float-arrays continuations namespaces sequences.lib ;
 IN: bunny.model
 
 : numbers ( str -- seq )
@@ -13,7 +13,7 @@ IN: bunny.model
         numbers {
             { [ dup length 5 = ] [ 3 head pick push ] }
             { [ dup first 3 = ] [ 1 tail over push ] }
-            { [ t ] [ drop ] }
+            [ drop ]
         } cond (parse-model)
     ] when* ;
 
@@ -61,19 +61,22 @@ TUPLE: bunny-buffers array element-array nv ni ;
 
 : <bunny-dlist> ( model -- geom )
     GL_COMPILE [ first3 draw-triangles ] make-dlist
-    bunny-dlist construct-boa ;
+    bunny-dlist boa ;
 
 : <bunny-buffers> ( model -- geom )
-    [
-        [ first concat ] [ second concat ] bi
-        append >float-array
-        GL_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
-    ] [
-        third concat >c-uint-array
-        GL_ELEMENT_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
-    ]
-    [ first length 3 * ] [ third length 3 * ] tetra
-    bunny-buffers construct-boa ;
+    {
+        [
+            [ first concat ] [ second concat ] bi
+            append >float-array
+            GL_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
+        ]
+        [
+            third concat >c-uint-array
+            GL_ELEMENT_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
+        ]
+        [ first length 3 * ]
+        [ third length 3 * ]
+    } cleave bunny-buffers boa ;
 
 GENERIC: bunny-geom ( geom -- )
 GENERIC: draw-bunny ( geom draw -- )

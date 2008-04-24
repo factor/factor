@@ -4,7 +4,7 @@ USING: arrays definitions generic assocs kernel math namespaces
 prettyprint sequences strings vectors words quotations inspector
 io.styles io combinators sorting splitting math.parser effects
 continuations debugger io.files io.crc32 vocabs hashtables
-graphs compiler.units io.encodings.utf8 ;
+graphs compiler.units io.encodings.utf8 accessors ;
 IN: source-files
 
 SYMBOL: source-files
@@ -48,7 +48,7 @@ uses definitions ;
 
 : reset-checksums ( -- )
     source-files get [
-        swap ?resource-path dup exists? [
+        swap dup exists? [
             utf8 file-lines swap record-checksum
         ] [ 2drop ] if
     ] assoc-each ;
@@ -56,16 +56,20 @@ uses definitions ;
 M: pathname where pathname-string 1 2array ;
 
 : forget-source ( path -- )
-    dup source-file
-    dup unxref-source
-    source-file-definitions [ keys forget-all ] each
-    source-files get delete-at ;
+    [
+        source-file
+        [ unxref-source ]
+        [ definitions>> [ keys forget-all ] each ]
+        bi
+    ]
+    [ source-files get delete-at ]
+    bi ;
 
 M: pathname forget*
     pathname-string forget-source ;
 
 : rollback-source-file ( file -- )
-    dup source-file-definitions new-definitions get [ union ] 2map
+    dup source-file-definitions new-definitions get [ assoc-union ] 2map
     swap set-source-file-definitions ;
 
 SYMBOL: file
@@ -78,9 +82,3 @@ SYMBOL: file
         source-file-definitions old-definitions set
         [ ] [ file get rollback-source-file ] cleanup
     ] with-scope ; inline
-
-: outside-usages ( seq -- usages )
-    dup [
-        over usage
-        [ dup pathname? not swap where and ] subset seq-diff
-    ] curry { } map>assoc ;

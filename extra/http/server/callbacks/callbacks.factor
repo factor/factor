@@ -2,9 +2,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: html http http.server io kernel math namespaces
-continuations calendar sequences assocs new-slots hashtables
-accessors arrays alarms quotations combinators
-combinators.cleave fry assocs.lib ;
+continuations calendar sequences assocs hashtables
+accessors arrays alarms quotations combinators fry assocs.lib ;
 IN: http.server.callbacks
 
 SYMBOL: responder
@@ -15,7 +14,7 @@ TUPLE: callback-responder responder callbacks ;
     #! A continuation responder is a special type of session
     #! manager. However it works entirely differently from
     #! the URL and cookie session managers.
-    H{ } clone callback-responder construct-boa ;
+    H{ } clone callback-responder boa ;
 
 TUPLE: callback cont quot expires alarm responder ;
 
@@ -33,7 +32,7 @@ TUPLE: callback cont quot expires alarm responder ;
     ] when drop ;
 
 : <callback> ( cont quot expires? -- callback )
-    f callback-responder get callback construct-boa
+    f callback-responder get callback boa
     dup touch-callback ;
 
 : invoke-callback ( callback -- response )

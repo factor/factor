@@ -62,7 +62,7 @@ M: attrs set-at
     ] if* ;
 
 M: attrs assoc-size attrs-alist length ;
-M: attrs new-assoc drop V{ } new <attrs> ;
+M: attrs new-assoc drop V{ } new-sequence <attrs> ;
 M: attrs >alist attrs-alist ;
 
 : >attrs ( assoc -- attrs )
@@ -139,5 +139,5 @@ M: xml like
 : <contained-tag> ( name attrs -- tag )
     f <tag> ;
 
-PREDICATE: tag contained-tag tag-children not ;
-PREDICATE: tag open-tag tag-children ;
+PREDICATE: contained-tag < tag tag-children not ;
+PREDICATE: open-tag < tag tag-children ;

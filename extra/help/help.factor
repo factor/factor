@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io kernel namespaces parser prettyprint sequences
 words assocs definitions generic quotations effects slots
-continuations tuples debugger combinators vocabs help.stylesheet
-help.topics help.crossref help.markup sorting classes
-vocabs.loader ;
+continuations classes.tuple debugger combinators vocabs
+help.stylesheet help.topics help.crossref help.markup sorting
+classes vocabs.loader ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -25,10 +25,6 @@ GENERIC: word-help* ( word -- content )
 
 M: word word-help* drop f ;
 
-M: slot-reader word-help* drop \ $slot-reader ;
-
-M: slot-writer word-help* drop \ $slot-writer ;
-
 M: predicate word-help* drop \ $predicate ;
 
 : all-articles ( -- seq )
@@ -42,7 +38,7 @@ M: predicate word-help* drop \ $predicate ;
     \ $error-description swap word-help elements empty? not ;
 
 : sort-articles ( seq -- newseq )
-    [ dup article-title ] { } map>assoc sort-values 0 <column> ;
+    [ dup article-title ] { } map>assoc sort-values keys ;
 
 : all-errors ( -- seq )
     all-words [ error? ] subset sort-articles ;
@@ -98,7 +94,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 : about ( vocab -- )
     dup require
     dup vocab [ ] [
-        "No such vocabulary: " swap append throw
+        "No such vocabulary: " prepend throw
     ] ?if
     dup vocab-help [
         help
@@ -143,7 +139,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     {
         { [ dup empty? ] [ (:help-none) ] }
         { [ dup length 1 = ] [ first help ] }
-        { [ t ] [ (:help-multi) ] }
+        [ (:help-multi) ]
     } cond (:help-debugger) ;
 
 : remove-article ( name -- )

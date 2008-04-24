@@ -1,7 +1,7 @@
 USING: combinators io io.files io.streams.duplex
 io.streams.string kernel math math.parser continuations
 namespaces pack prettyprint sequences strings system
-hexdump io.encodings.binary ;
+hexdump io.encodings.binary inspector accessors ;
 IN: tar
 
 : zero-checksum 256 ;
@@ -9,7 +9,7 @@ IN: tar
 TUPLE: tar-header name mode uid gid size mtime checksum typeflag
 linkname magic version uname gname devmajor devminor prefix ;
 
-: <tar-header> ( -- obj ) tar-header construct-empty ;
+: <tar-header> ( -- obj ) tar-header new ;
 
 : tar-trim ( seq -- newseq )
     [ "\0 " member? ] trim ;
@@ -35,7 +35,7 @@ linkname magic version uname gname devmajor devminor prefix ;
 
 : header-checksum ( seq -- x )
     148 cut-slice 8 tail-slice
-    [ sum ] 2apply + 256 + ;
+    [ sum ] bi@ + 256 + ;
 
 TUPLE: checksum-error ;
 TUPLE: malformed-block-error ;
@@ -68,125 +68,100 @@ SYMBOL: filename
 : parse-tar-header ( seq -- obj )
     [ header-checksum ] keep over zero-checksum = [
         2drop
-        \ tar-header construct-empty
+        \ tar-header new
         0 over set-tar-header-size
         0 over set-tar-header-checksum
     ] [
         [ read-tar-header ] with-string-reader
         [ tar-header-checksum = [
-                \ checksum-error construct-empty throw
+                \ checksum-error new throw
             ] unless
         ] keep
     ] if ;
 
-TUPLE: unknown-typeflag str ;
-: <unknown-typeflag> ( ch -- obj )
-    1string \ unknown-typeflag construct-boa ;
+ERROR: unknown-typeflag ch ;
+M: unknown-typeflag summary ( obj -- str )
+    ch>> 1string
+    "Unknown typeflag: " prepend ;
 
-TUPLE: unimplemented-typeflag header ;
-: <unimplemented-typeflag> ( header -- obj )
-    global [ "Unimplemented typeflag: " print dup . flush ] bind
-    tar-header-typeflag
-    1string \ unimplemented-typeflag construct-boa ;
-
-: tar-path+ ( path -- newpath )
-    base-dir get swap path+ ;
+: tar-append-path ( path -- newpath )
+    base-dir get prepend-path ;
 
 ! Normal file
 : typeflag-0
-  tar-header-name tar-path+ binary <file-writer>
+  name>> tar-append-path binary <file-writer>
   [ read-data-blocks ] keep dispose ;
 
 ! Hard link
-: typeflag-1 ( header -- )
-   <unimplemented-typeflag> throw ;
+: typeflag-1 ( header -- ) unknown-typeflag ;
 
 ! Symlink
-: typeflag-2 ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-2 ( header -- ) unknown-typeflag ;
 
 ! character special
-: typeflag-3 ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-3 ( header -- ) unknown-typeflag ;
 
 ! Block special
-: typeflag-4 ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-4 ( header -- ) unknown-typeflag ;
 
 ! Directory
 : typeflag-5 ( header -- )
-    tar-header-name tar-path+ make-directories ;
+    tar-header-name tar-append-path make-directories ;
 
 ! FIFO
-: typeflag-6 ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-6 ( header -- ) unknown-typeflag ;
 
 ! Contiguous file
-: typeflag-7 ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-7 ( header -- ) unknown-typeflag ;
 
 ! Global extended header
-: typeflag-8 ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-8 ( header -- ) unknown-typeflag ;
 
 ! Extended header
-: typeflag-9 ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-9 ( header -- ) unknown-typeflag ;
 
 ! Global POSIX header
-: typeflag-g ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-g ( header -- ) unknown-typeflag ;
 
 ! Extended POSIX header
-: typeflag-x ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-x ( header -- ) unknown-typeflag ;
 
 ! Solaris access control list
-: typeflag-A ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-A ( header -- ) unknown-typeflag ;
 
 ! GNU dumpdir
-: typeflag-D ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-D ( header -- ) unknown-typeflag ;
 
 ! Solaris extended attribute file
-: typeflag-E ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-E ( header -- ) unknown-typeflag ;
 
 ! Inode metadata
-: typeflag-I ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-I ( header -- ) unknown-typeflag ;
 
 ! Long link name
-: typeflag-K ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-K ( header -- ) unknown-typeflag ;
 
 ! Long file name
 : typeflag-L ( header -- )
     <string-writer> [ read-data-blocks ] keep
     >string [ zero? ] right-trim filename set
     global [ "long filename: " write filename get . flush ] bind
-    filename get tar-path+ make-directories ;
+    filename get tar-append-path make-directories ;
 
 ! Multi volume continuation entry
-: typeflag-M ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-M ( header -- ) unknown-typeflag ;
 
 ! GNU long file name
-: typeflag-N ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-N ( header -- ) unknown-typeflag ;
 
 ! Sparse file
-: typeflag-S ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-S ( header -- ) unknown-typeflag ;
 
 ! Volume header
-: typeflag-V ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-V ( header -- ) unknown-typeflag ;
 
 ! Vendor extended header type
-: typeflag-X ( header -- )
-    <unimplemented-typeflag> throw ;
+: typeflag-X ( header -- ) unknown-typeflag ;
 
 : (parse-tar) ( -- )
     512 read 
@@ -218,7 +193,7 @@ TUPLE: unimplemented-typeflag header ;
             { CHAR: S [ typeflag-S ] }
             { CHAR: V [ typeflag-V ] }
             { CHAR: X [ typeflag-X ] }
-            [ <unknown-typeflag> throw ]
+            [ unknown-typeflag ]
         } case
         ! dup tar-header-size zero? [
             ! out-stream get [ dispose ] when
@@ -226,7 +201,7 @@ TUPLE: unimplemented-typeflag header ;
             ! drop
         ! ] [
             ! dup tar-header-name
-            ! dup parent-dir base-dir swap path+
+            ! dup parent-dir base-dir prepend-path
             ! global [ dup [ . flush ] when* ] bind 
             ! make-directories <file-writer>
             ! out-stream set
@@ -237,7 +212,7 @@ TUPLE: unimplemented-typeflag header ;
 
 : parse-tar ( path -- obj )
     binary [
-        "tar-test" resource-path base-dir set
+        "resource:tar-test" base-dir set
         global [ nl nl nl "Starting to parse .tar..." print flush ] bind
         global [ "Expanding to: " write base-dir get . flush ] bind
         (parse-tar)

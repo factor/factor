@@ -3,12 +3,12 @@ USING: inference inference.dataflow optimizer optimizer.def-use
 namespaces assocs kernel sequences math tools.test words ;
 
 [ 3 { 1 1 1 } ] [
-    [ 1 2 3 ] dataflow compute-def-use
+    [ 1 2 3 ] dataflow compute-def-use drop
     def-use get values dup length swap [ length ] map
 ] unit-test
 
 : kill-set ( quot -- seq )
-    dataflow compute-def-use compute-dead-literals keys
+    dataflow compute-def-use drop compute-dead-literals keys
     [ value-literal ] map ;
 
 : subset? [ member? ] curry all? ;
@@ -99,7 +99,7 @@ namespaces assocs kernel sequences math tools.test words ;
 ] unit-test
 
 : regression-2 ( x y -- x.y )
-    [ p1 ] 2apply [
+    [ p1 ] bi@ [
         [
             rot
             [ 2swap [ swapd * -rot p2 +@ ] 2keep ]

@@ -52,7 +52,7 @@ M: cons nil? ( cons -- bool )
 TUPLE: lazy-cons car cdr ;
 
 : lazy-cons ( car cdr -- promise )
-    [ promise ] 2apply \ lazy-cons construct-boa
+    [ promise ] bi@ \ lazy-cons boa
     T{ promise f f t f } clone
     [ set-promise-value ] keep ;
 
@@ -78,7 +78,7 @@ M: lazy-cons nil? ( lazy-cons -- bool )
   swap [ cdr ] times car ;
 
 : (llength) ( list acc -- n )
-  over nil? [ nip ] [ >r cdr r> 1+ (llength) ] if ;
+  over nil? [ nip ] [ [ cdr ] dip 1+ (llength) ] if ;
 
 : llength ( list -- n )
   0 (llength) ;
@@ -103,7 +103,7 @@ TUPLE: memoized-cons original car cdr nil? ;
 
 : <memoized-cons> ( cons -- memoized-cons )
   not-memoized not-memoized not-memoized
-  memoized-cons construct-boa ;
+  memoized-cons boa ;
 
 M: memoized-cons car ( memoized-cons -- car )
   dup memoized-cons-car not-memoized? [
@@ -273,7 +273,7 @@ M: lazy-from-by car ( lazy-from-by -- car )
 
 M: lazy-from-by cdr ( lazy-from-by -- cdr )
   [ lazy-from-by-n ] keep
-  lazy-from-by-quot dup >r call r> lfrom-by ;
+  lazy-from-by-quot dup slip lfrom-by ;
 
 M: lazy-from-by nil? ( lazy-from-by -- bool )
   drop f ;
@@ -321,7 +321,7 @@ M: sequence-cons nil? ( sequence-cons -- bool )
   {
     { [ dup sequence? ] [ 0 swap seq>list ] }
     { [ dup list?     ] [ ] }
-    { [ t ] [ "Could not convert object to a list" throw ] }
+    [ "Could not convert object to a list" throw ]
   } cond ;
 
 TUPLE: lazy-concat car cdr ;
@@ -365,15 +365,15 @@ M: lazy-concat nil? ( lazy-concat -- bool )
     drop nil
   ] [
     [ car ] keep cdr [ car lcartesian-product ] keep cdr list>array swap [
-      swap [ swap [ add ] lmap-with ] lmap-with lconcat
+      swap [ swap [ suffix ] lmap-with ] lmap-with lconcat
     ] reduce
   ] if ;
 
 : lcomp ( list quot -- result )
-  >r lcartesian-product* r> lmap ;
+  [ lcartesian-product* ] dip lmap ;
 
 : lcomp* ( list guards quot -- result )
-  >r >r lcartesian-product* r> [ lsubset ] each r> lmap ;
+  [ [ lcartesian-product* ] dip [ lsubset ] each ] dip lmap ;
 
 DEFER: lmerge
 
@@ -382,7 +382,7 @@ DEFER: lmerge
   [
     dup [ car ] curry -rot
     [
-      >r cdr r> cdr lmerge
+      [ cdr ] bi@ lmerge
     ] 2curry lazy-cons
   ] 2curry lazy-cons ;
 
@@ -419,7 +419,7 @@ M: lazy-io cdr ( lazy-io -- cdr )
     [ lazy-io-stream ] keep
     [ lazy-io-quot ] keep
     car [
-      >r f f r> <lazy-io> [ swap set-lazy-io-cdr ] keep
+      [ f f ] dip <lazy-io> [ swap set-lazy-io-cdr ] keep
     ] [
       3drop nil
     ] if

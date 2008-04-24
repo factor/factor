@@ -48,7 +48,7 @@ ARTICLE: "prettyprint-limitations" "Prettyprinter limitations"
 "On a final note, the " { $link short. } " and " { $link pprint-short } " words restrict the length and nesting of printed sequences, their output will very likely not be valid syntax. They are only intended for interactive use." ;
 
 ARTICLE: "prettyprint-section-protocol" "Prettyprinter section protocol"
-"Prettyprinter sections must delegate to an instance of " { $link section } ", and they must also obey a protocol."
+"Prettyprinter sections must subclass " { $link section } ", and they must also obey a protocol."
 $nl
 "Layout queries:"
 { $subsection section-fits? }
@@ -60,8 +60,8 @@ $nl
 { $subsection short-section }
 { $subsection long-section }
 "Utilities to use when implementing sections:"
-{ $subsection <section> }
-{ $subsection delegate>block }
+{ $subsection new-section }
+{ $subsection new-block }
 { $subsection add-section } ;
 
 ARTICLE: "prettyprint-sections" "Prettyprinter sections"

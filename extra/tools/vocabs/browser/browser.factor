@@ -10,7 +10,7 @@ IN: tools.vocabs.browser
     {
         { [ dup not ] [ drop "" ] }
         { [ dup vocab-main ] [ drop "[Runnable]" ] }
-        { [ t ] [ drop "[Loaded]" ] }
+        [ drop "[Loaded]" ]
     } cond ;
 
 : write-status ( vocab -- )
@@ -31,7 +31,7 @@ IN: tools.vocabs.browser
     ] with-row ;
 
 : root-heading. ( root -- )
-    [ "Children from " swap append ] [ "Children" ] if*
+    [ "Children from " prepend ] [ "Children" ] if*
     $heading ;
 
 : vocabs. ( assoc -- )
@@ -79,7 +79,7 @@ C: <vocab-author> vocab-author
 
 : describe-help ( vocab -- )
     vocab-help [
-        "Documentation" $heading nl ($link)
+        "Documentation" $heading ($link)
     ] when* ;
 
 : describe-children ( vocab -- )
@@ -127,7 +127,7 @@ C: <vocab-author> vocab-author
 : $describe-vocab ( element -- )
     first
     dup describe-children
-    dup vocab-root over vocab-dir? [
+    dup find-vocab-root [
         dup describe-summary
         dup describe-tags
         dup describe-authors
@@ -195,7 +195,7 @@ M: vocab-tag summary article-title ;
 M: vocab-author >link ;
 
 M: vocab-author article-title
-    vocab-author-name "Vocabularies by " swap append ;
+    vocab-author-name "Vocabularies by " prepend ;
 
 M: vocab-author article-name vocab-author-name ;
 

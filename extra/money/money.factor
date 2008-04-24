@@ -23,9 +23,9 @@ TUPLE: not-a-decimal ;
 : parse-decimal ( str -- ratio )
     "." split1
     >r dup "-" head? [ drop t "0" ] [ f swap ] if r>
-    [ dup empty? [ drop "0" ] when ] 2apply
+    [ dup empty? [ drop "0" ] when ] bi@
     dup length
-    >r [ string>number dup [ not-a-decimal ] unless ] 2apply r>
+    >r [ string>number dup [ not-a-decimal ] unless ] bi@ r>
     10 swap ^ / + swap [ neg ] when ;
 
 : DECIMAL:

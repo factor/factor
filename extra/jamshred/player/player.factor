@@ -7,7 +7,7 @@ IN: jamshred.player
 TUPLE: player name tunnel nearest-segment ;
 
 : <player> ( name -- player )
-    f f player construct-boa
+    f f player boa
     F{ 0 0 5 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } <oint> over set-delegate ;
 
 : turn-player ( player x-radians y-radians -- )

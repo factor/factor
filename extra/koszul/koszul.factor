@@ -3,7 +3,7 @@
 USING: arrays assocs hashtables assocs io kernel math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
-splitting sorting shuffle symbols ;
+splitting sorting shuffle symbols sets ;
 IN: koszul
 
 ! Utilities
@@ -15,7 +15,7 @@ IN: koszul
         { [ dup number? ] [ { } associate ] }
         { [ dup array? ] [ 1 swap associate ] }
         { [ dup hashtable? ] [ ] }
-        { [ t ] [ 1array >alt ] }
+        [ 1array >alt ]
     } cond ;
 
 : canonicalize
@@ -31,10 +31,10 @@ SYMBOL: terms
 ! Printing elements
 : num-alt. ( n -- str )
     {
-        { [ dup 1 = ] [ drop " + " ] }
-        { [ dup -1 = ] [ drop " - " ] }
-        { [ t ] [ number>string " + " swap append ] }
-    } cond ;
+        { 1 [ " + " ] }
+        { -1 [ " - " ] }
+        [ number>string " + " prepend ]
+    } case ;
 
 : (alt.) ( basis n -- str )
     over empty? [
@@ -57,7 +57,7 @@ SYMBOL: terms
     terms get [ [ swap +@ ] assoc-each ] bind ;
 
 : alt+ ( x y -- x+y )
-    [ >alt ] 2apply [ (alt+) (alt+) ] with-terms ;
+    [ >alt ] bi@ [ (alt+) (alt+) ] with-terms ;
 
 ! Multiplication
 : alt*n ( vec n -- vec )
@@ -79,7 +79,7 @@ SYMBOL: terms
     ] curry each ;
 
 : duplicates? ( seq -- ? )
-    dup prune [ length ] 2apply > ;
+    dup prune [ length ] bi@ > ;
 
 : (wedge) ( n basis1 basis2 -- n basis )
     append dup duplicates? [
@@ -90,7 +90,7 @@ SYMBOL: terms
     ] if ;
 
 : wedge ( x y -- x.y )
-    [ >alt ] 2apply [
+    [ >alt ] bi@ [
         swap [
             [
                 2swap [
@@ -155,7 +155,7 @@ DEFER: (d)
 
 : (tensor) ( seq1 seq2 -- seq )
     [
-        [ swap append natural-sort ] curry map
+        [ prepend natural-sort ] curry map
     ] with map concat ;
 
 : tensor ( graded-basis1 graded-basis2 -- bigraded-basis )
@@ -184,7 +184,7 @@ DEFER: (d)
     [ length ] keep [ (graded-ker/im-d) ] curry map ;
 
 : graded-betti ( generators -- seq )
-    basis graded graded-ker/im-d flip first2 1 head* 0 add* v- ;
+    basis graded graded-ker/im-d flip first2 1 head* 0 prefix v- ;
 
 ! Bi-graded for two-step complexes
 : (bigraded-ker/im-d) ( u-deg z-deg bigraded-basis -- null/rank )
@@ -200,10 +200,10 @@ DEFER: (d)
     ] with map ;
 
 : bigraded-betti ( u-generators z-generators -- seq )
-    [ basis graded ] 2apply tensor bigraded-ker/im-d
+    [ basis graded ] bi@ tensor bigraded-ker/im-d
     [ [ [ first ] map ] map ] keep
-    [ [ second ] map 2 head* { 0 0 } swap append ] map
-    1 tail dup first length 0 <array> add
+    [ [ second ] map 2 head* { 0 0 } prepend ] map
+    1 tail dup first length 0 <array> suffix
     [ v- ] 2map ;
 
 ! Laplacian
@@ -278,7 +278,7 @@ DEFER: (d)
     ] with map ;
 
 : bigraded-laplacian ( u-generators z-generators quot -- seq )
-    >r [ basis graded ] 2apply tensor bigraded-triples r>
+    >r [ basis graded ] bi@ tensor bigraded-triples r>
     [ [ first3 ] swap compose map ] curry map ; inline
 
 : bigraded-laplacian-betti ( u-generators z-generators -- seq )

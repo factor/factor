@@ -19,6 +19,6 @@ IN: sbufs.tests
 
 [ SBUF" x" ] [ 1 <sbuf> CHAR: x >bignum over push ] unit-test
 
-[ fixnum ] [ 1 >bignum SBUF" " new length class ] unit-test
+[ fixnum ] [ 1 >bignum SBUF" " new-sequence length class ] unit-test
 
 [ fixnum ] [ 1 >bignum [ ] SBUF" " map-as length class ] unit-test

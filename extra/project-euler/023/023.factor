@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel math math.ranges project-euler.common sequences
-    sorting ;
+    sorting sets ;
 IN: project-euler.023
 
 ! http://projecteuler.net/index.php?section=problems&id=23
@@ -51,7 +51,7 @@ IN: project-euler.023
 PRIVATE>
 
 : euler023 ( -- answer )
-    20161 abundants-upto possible-sums source-023 seq-diff sum ;
+    20161 abundants-upto possible-sums source-023 diff sum ;
 
 ! TODO: solution is still too slow, although it takes under 1 minute
 

@@ -19,7 +19,7 @@ M: comment pprint*
     swap comment-node present-text ;
 
 : comment, ( ? node text -- )
-    rot [ \ comment construct-boa , ] [ 2drop ] if ;
+    rot [ \ comment boa , ] [ 2drop ] if ;
 
 : values% ( prefix values -- )
     swap [
@@ -65,7 +65,7 @@ MATCH-VARS: ?a ?b ?c ;
 M: #shuffle node>quot
     dup node-in-d over node-out-d pretty-shuffle
     [ , ] [ >r drop t r> ] if*
-    dup effect-str "#shuffle: " swap append comment, ;
+    dup effect-str "#shuffle: " prepend comment, ;
 
 : pushed-literals node-out-d [ value-literal literalize ] map ;
 
@@ -149,7 +149,7 @@ SYMBOL: node-count
                     { [ dup "intrinsics" word-prop over "if-intrinsics" word-prop or ] [ intrinsics-called ] }
                     { [ dup generic? ] [ generics-called ] }
                     { [ dup method-body? ] [ methods-called ] }
-                    { [ t ] [ words-called ] }
+                    [ words-called ]
                 } cond 1 -rot get at+
             ] [
                 drop

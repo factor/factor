@@ -2,6 +2,193 @@ USING: alien.syntax kernel math windows.types math.bitfields ;
 IN: windows.advapi32
 LIBRARY: advapi32
 
+: PROV_RSA_FULL       1 ; inline
+: PROV_RSA_SIG        2 ; inline
+: PROV_DSS            3 ; inline
+: PROV_FORTEZZA       4 ; inline
+: PROV_MS_EXCHANGE    5 ; inline
+: PROV_SSL            6 ; inline
+: PROV_RSA_SCHANNEL  12 ; inline
+: PROV_DSS_DH        13 ; inline
+: PROV_EC_ECDSA_SIG  14 ; inline
+: PROV_EC_ECNRA_SIG  15 ; inline
+: PROV_EC_ECDSA_FULL 16 ; inline
+: PROV_EC_ECNRA_FULL 17 ; inline
+: PROV_DH_SCHANNEL   18 ; inline
+: PROV_SPYRUS_LYNKS  20 ; inline
+: PROV_RNG           21 ; inline
+: PROV_INTEL_SEC     22 ; inline
+: PROV_REPLACE_OWF   23 ; inline
+: PROV_RSA_AES       24 ; inline
+
+: MS_DEF_DH_SCHANNEL_PROV
+    "Microsoft DH Schannel Cryptographic Provider" ; inline
+
+: MS_DEF_DSS_DH_PROV
+    "Microsoft Base DSS and Diffie-Hellman Cryptographic Provider" ; inline
+
+: MS_DEF_DSS_PROV
+    "Microsoft Base DSS Cryptographic Provider" ; inline
+
+: MS_DEF_PROV
+    "Microsoft Base Cryptographic Provider v1.0" ; inline
+
+: MS_DEF_RSA_SCHANNEL_PROV
+    "Microsoft RSA Schannel Cryptographic Provider" ; inline
+
+! Unsupported (!)
+: MS_DEF_RSA_SIG_PROV
+    "Microsoft RSA Signature Cryptographic Provider" ; inline
+
+: MS_ENH_DSS_DH_PROV
+    "Microsoft Enhanced DSS and Diffie-Hellman Cryptographic Provider" ; inline
+
+: MS_ENH_RSA_AES_PROV
+    "Microsoft Enhanced RSA and AES Cryptographic Provider" ; inline
+
+: MS_ENHANCED_PROV
+    "Microsoft Enhanced Cryptographic Provider v1.0" ; inline
+
+: MS_SCARD_PROV
+    "Microsoft Base Smart Card Crypto Provider" ; inline
+
+: MS_STRONG_PROV
+    "Microsoft Strong Cryptographic Provider" ; inline
+
+: CRYPT_VERIFYCONTEXT  HEX: F0000000 ; inline
+: CRYPT_NEWKEYSET      HEX: 8 ; inline
+: CRYPT_DELETEKEYSET   HEX: 10 ; inline
+: CRYPT_MACHINE_KEYSET HEX: 20 ; inline
+: CRYPT_SILENT         HEX: 40 ; inline
+
+C-STRUCT: ACL
+    { "BYTE" "AclRevision" }
+    { "BYTE" "Sbz1" }
+    { "WORD" "AclSize" }
+    { "WORD" "AceCount" }
+    { "WORD" "Sbz2" } ;
+
+TYPEDEF: ACL* PACL
+
+: ACCESS_ALLOWED_ACE_TYPE 0 ; inline
+: ACCESS_DENIED_ACE_TYPE 1 ; inline
+: SYSTEM_AUDIT_ACE_TYPE 2 ; inline
+: SYSTEM_ALARM_ACE_TYPE 3 ; inline
+
+: OBJECT_INHERIT_ACE HEX: 1 ; inline
+: CONTAINER_INHERIT_ACE HEX: 2 ; inline
+: NO_PROPAGATE_INHERIT_ACE HEX: 4 ; inline
+: INHERIT_ONLY_ACE HEX: 8 ; inline
+: VALID_INHERIT_FLAGS HEX: f ; inline
+
+C-STRUCT: ACE_HEADER
+    { "BYTE" "AceType" }
+    { "BYTE" "AceFlags" }
+    { "WORD" "AceSize" } ;
+
+TYPEDEF: ACE_HEADER* PACE_HEADER
+
+C-STRUCT: ACCESS_ALLOWED_ACE
+    { "ACE_HEADER" "Header" }
+    { "DWORD" "Mask" }
+    { "DWORD" "SidStart" } ;
+
+TYPEDEF: ACCESS_ALLOWED_ACE* PACCESS_ALLOWED_ACE
+
+C-STRUCT: ACCESS_DENIED_ACE
+    { "ACE_HEADER" "Header" }
+    { "DWORD" "Mask" }
+    { "DWORD" "SidStart" } ;
+TYPEDEF: ACCESS_DENIED_ACE* PACCESS_DENIED_ACE
+
+
+C-STRUCT: SYSTEM_AUDIT_ACE
+    { "ACE_HEADER" "Header" }
+    { "DWORD" "Mask" }
+    { "DWORD" "SidStart" } ;
+
+TYPEDEF: SYSTEM_AUDIT_ACE* PSYSTEM_AUDIT_ACE
+
+C-STRUCT: SYSTEM_ALARM_ACE
+    { "ACE_HEADER" "Header" }
+    { "DWORD" "Mask" }
+    { "DWORD" "SidStart" } ;
+
+TYPEDEF: SYSTEM_ALARM_ACE* PSYSTEM_ALARM_ACE
+
+C-STRUCT: ACCESS_ALLOWED_CALLBACK_ACE
+    { "ACE_HEADER" "Header" }
+    { "DWORD" "Mask" }
+    { "DWORD" "SidStart" } ;
+
+TYPEDEF: ACCESS_ALLOWED_CALLBACK_ACE* PACCESS_ALLOWED_CALLBACK_ACE
+
+
+! typedef enum _TOKEN_INFORMATION_CLASS {
+: TokenUser 1 ; inline
+: TokenGroups 2 ; inline
+: TokenPrivileges 3 ; inline
+: TokenOwner 4 ; inline
+: TokenPrimaryGroup 5 ; inline
+: TokenDefaultDacl 6 ; inline
+: TokenSource 7 ; inline
+: TokenType 8 ; inline
+: TokenImpersonationLevel 9 ; inline
+: TokenStatistics 10 ; inline
+: TokenRestrictedSids 11 ; inline
+: TokenSessionId 12 ; inline
+: TokenGroupsAndPrivileges 13 ; inline
+: TokenSessionReference 14 ; inline
+: TokenSandBoxInert 15 ; inline
+! } TOKEN_INFORMATION_CLASS;
+
+: DELETE                     HEX: 00010000 ; inline
+: READ_CONTROL               HEX: 00020000 ; inline
+: WRITE_DAC                  HEX: 00040000 ; inline
+: WRITE_OWNER                HEX: 00080000 ; inline
+: SYNCHRONIZE                HEX: 00100000 ; inline
+: STANDARD_RIGHTS_REQUIRED   HEX: 000f0000 ; inline
+
+: STANDARD_RIGHTS_READ       READ_CONTROL ; inline
+: STANDARD_RIGHTS_WRITE      READ_CONTROL ; inline
+: STANDARD_RIGHTS_EXECUTE    READ_CONTROL ; inline
+
+: TOKEN_TOKEN_ADJUST_DEFAULT   HEX: 0080 ; inline
+: TOKEN_ADJUST_GROUPS          HEX: 0040 ; inline
+: TOKEN_ADJUST_PRIVILEGES      HEX: 0020 ; inline
+: TOKEN_ADJUST_SESSIONID       HEX: 0100 ; inline
+: TOKEN_ASSIGN_PRIMARY         HEX: 0001 ; inline
+: TOKEN_DUPLICATE              HEX: 0002 ; inline
+: TOKEN_EXECUTE                STANDARD_RIGHTS_EXECUTE ; inline
+: TOKEN_IMPERSONATE            HEX: 0004 ; inline
+: TOKEN_QUERY                  HEX: 0008 ; inline
+: TOKEN_QUERY_SOURCE           HEX: 0010 ; inline
+: TOKEN_ADJUST_DEFAULT         HEX: 0080 ; inline
+: TOKEN_READ STANDARD_RIGHTS_READ TOKEN_QUERY bitor ;
+
+: TOKEN_WRITE
+    {
+        STANDARD_RIGHTS_WRITE
+        TOKEN_ADJUST_PRIVILEGES
+        TOKEN_ADJUST_GROUPS
+        TOKEN_ADJUST_DEFAULT
+    } flags ; foldable
+
+: TOKEN_ALL_ACCESS
+    {
+        STANDARD_RIGHTS_REQUIRED
+        TOKEN_ASSIGN_PRIMARY
+        TOKEN_DUPLICATE
+        TOKEN_IMPERSONATE
+        TOKEN_QUERY
+        TOKEN_QUERY_SOURCE
+        TOKEN_ADJUST_PRIVILEGES
+        TOKEN_ADJUST_GROUPS
+        TOKEN_ADJUST_SESSIONID
+        TOKEN_ADJUST_DEFAULT
+    } flags ; foldable
+
+
 ! : I_ScGetCurrentGroupStateW ;
 ! : A_SHAFinal ;
 ! : A_SHAInit ;
@@ -25,7 +212,7 @@ LIBRARY: advapi32
 ! : AddAccessDeniedAce ;
 ! : AddAccessDeniedAceEx ;
 ! : AddAccessDeniedObjectAce ;
-! : AddAce ;
+FUNCTION: BOOL AddAce ( PACL pAcl, DWORD dwAceRevision, DWORD dwStartingAceIndex, LPVOID pAceList, DWORD nAceListLength ) ;
 ! : AddAuditAccessAce ;
 ! : AddAuditAccessAceEx ;
 ! : AddAuditAccessObjectAce ;
@@ -143,7 +330,13 @@ FUNCTION: BOOL AdjustTokenPrivileges ( HANDLE TokenHandle,
 ! : CredpDecodeCredential ;
 ! : CredpEncodeCredential ;
 ! : CryptAcquireContextA ;
-! : CryptAcquireContextW ;
+FUNCTION: BOOL CryptAcquireContextW ( HCRYPTPROV* phProv,
+                                      LPCTSTR pszContainer,
+                                      LPCTSTR pszProvider,
+                                      DWORD dwProvType,
+                                      DWORD dwFlags ) ;
+
+: CryptAcquireContext CryptAcquireContextW ;
 ! : CryptContextAddRef ;
 ! : CryptCreateHash ;
 ! : CryptDecrypt ;
@@ -159,7 +352,7 @@ FUNCTION: BOOL AdjustTokenPrivileges ( HANDLE TokenHandle,
 ! : CryptEnumProvidersW ;
 ! : CryptExportKey ;
 ! : CryptGenKey ;
-! : CryptGenRandom ;
+FUNCTION: BOOL CryptGenRandom ( HCRYPTPROV hProv, DWORD dwLen, BYTE* pbBuffer ) ;
 ! : CryptGetDefaultProviderA ;
 ! : CryptGetDefaultProviderW ;
 ! : CryptGetHashParam ;
@@ -169,7 +362,7 @@ FUNCTION: BOOL AdjustTokenPrivileges ( HANDLE TokenHandle,
 ! : CryptHashData ;
 ! : CryptHashSessionKey ;
 ! : CryptImportKey ;
-! : CryptReleaseContext ;
+FUNCTION: BOOL CryptReleaseContext ( HCRYPTPROV hProv, DWORD dwFlags ) ;
 ! : CryptSetHashParam ;
 ! : CryptSetKeyParam ;
 ! : CryptSetProvParam ;
@@ -316,7 +509,7 @@ FUNCTION: BOOL GetUserNameW ( LPCTSTR lpBuffer, LPDWORD lpnSize ) ;
 ! : ImpersonateLoggedOnUser ;
 ! : ImpersonateNamedPipeClient ;
 ! : ImpersonateSelf ;
-! : InitializeAcl ;
+FUNCTION: BOOL InitializeAcl ( PACL pAcl, DWORD nAclLength, DWORD dwAclRevision ) ;
 ! : InitializeSecurityDescriptor ;
 ! : InitializeSid ;
 ! : InitiateSystemShutdownA ;
@@ -441,70 +634,6 @@ FUNCTION: BOOL LookupPrivilegeValueW ( LPCTSTR lpSystemName,
 ! : OpenEncryptedFileRawW ;
 ! : OpenEventLogA ;
 ! : OpenEventLogW ;
-
-! typedef enum _TOKEN_INFORMATION_CLASS {
-: TokenUser 1 ;
-: TokenGroups 2 ;
-: TokenPrivileges 3 ;
-: TokenOwner 4 ;
-: TokenPrimaryGroup 5 ;
-: TokenDefaultDacl 6 ;
-: TokenSource 7 ;
-: TokenType 8 ;
-: TokenImpersonationLevel 9 ;
-: TokenStatistics 10 ;
-: TokenRestrictedSids 11 ;
-: TokenSessionId 12 ;
-: TokenGroupsAndPrivileges 13 ;
-: TokenSessionReference 14 ;
-: TokenSandBoxInert 15 ;
-! } TOKEN_INFORMATION_CLASS;
-
-: DELETE                     HEX: 00010000 ; inline
-: READ_CONTROL               HEX: 00020000 ; inline
-: WRITE_DAC                  HEX: 00040000 ; inline
-: WRITE_OWNER                HEX: 00080000 ; inline
-: SYNCHRONIZE                HEX: 00100000 ; inline
-: STANDARD_RIGHTS_REQUIRED   HEX: 000f0000 ; inline
-
-: STANDARD_RIGHTS_READ       READ_CONTROL ; inline
-: STANDARD_RIGHTS_WRITE      READ_CONTROL ; inline
-: STANDARD_RIGHTS_EXECUTE    READ_CONTROL ; inline
-
-: TOKEN_TOKEN_ADJUST_DEFAULT   HEX: 0080 ; inline
-: TOKEN_ADJUST_GROUPS          HEX: 0040 ; inline
-: TOKEN_ADJUST_PRIVILEGES      HEX: 0020 ; inline
-: TOKEN_ADJUST_SESSIONID       HEX: 0100 ; inline
-: TOKEN_ASSIGN_PRIMARY         HEX: 0001 ; inline
-: TOKEN_DUPLICATE              HEX: 0002 ; inline
-: TOKEN_EXECUTE                STANDARD_RIGHTS_EXECUTE ; inline
-: TOKEN_IMPERSONATE            HEX: 0004 ; inline
-: TOKEN_QUERY                  HEX: 0008 ; inline
-: TOKEN_QUERY_SOURCE           HEX: 0010 ; inline
-: TOKEN_ADJUST_DEFAULT         HEX: 0080 ; inline
-: TOKEN_READ STANDARD_RIGHTS_READ TOKEN_QUERY bitor ;
-
-: TOKEN_WRITE
-    {
-        STANDARD_RIGHTS_WRITE
-        TOKEN_ADJUST_PRIVILEGES
-        TOKEN_ADJUST_GROUPS
-        TOKEN_ADJUST_DEFAULT
-    } flags ; foldable
-
-: TOKEN_ALL_ACCESS
-    {
-        STANDARD_RIGHTS_REQUIRED
-        TOKEN_ASSIGN_PRIMARY
-        TOKEN_DUPLICATE
-        TOKEN_IMPERSONATE
-        TOKEN_QUERY
-        TOKEN_QUERY_SOURCE
-        TOKEN_ADJUST_PRIVILEGES
-        TOKEN_ADJUST_GROUPS
-        TOKEN_ADJUST_SESSIONID
-        TOKEN_ADJUST_DEFAULT
-    } flags ; foldable
 
 FUNCTION: BOOL OpenProcessToken ( HANDLE ProcessHandle,
                                   DWORD DesiredAccess,

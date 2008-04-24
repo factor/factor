@@ -96,7 +96,7 @@ void memory_protection_error(CELL addr, F_STACK_FRAME *native_stack)
 		general_error(ERROR_RS_UNDERFLOW,F,F,native_stack);
 	else if(in_page(addr, rs_bot, rs_size, 0))
 		general_error(ERROR_RS_OVERFLOW,F,F,native_stack);
-	else if(in_page(addr, nursery->end, 0, 0))
+	else if(in_page(addr, nursery.end, 0, 0))
 		critical_error("allot_object() missed GC check",0);
 	else if(in_page(addr, gc_locals_region->start, 0, -1))
 		critical_error("gc locals underflow",0);
@@ -144,4 +144,10 @@ DEFINE_PRIMITIVE(throw)
 DEFINE_PRIMITIVE(call_clear)
 {
 	throw_impl(dpop(),stack_chain->callstack_bottom);
+}
+
+/* For testing purposes */
+DEFINE_PRIMITIVE(unimplemented)
+{
+	not_implemented_error();
 }

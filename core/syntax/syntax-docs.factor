@@ -1,6 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
-effects classes generic.standard tuples generic.math arrays
-io.files vocabs.loader io sequences assocs ;
+effects classes generic.standard classes.tuple generic.math
+generic.standard arrays io.files vocabs.loader io sequences
+assocs ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -149,18 +150,6 @@ ARTICLE: "syntax-byte-arrays" "Byte array syntax"
 { $subsection POSTPONE: B{ }
 "Byte arrays are documented in " { $link "byte-arrays" } "." ;
 
-ARTICLE: "syntax-bit-vectors" "Bit vector syntax"
-{ $subsection POSTPONE: ?V{ }
-"Bit vectors are documented in " { $link "bit-vectors" } "." ;
-
-ARTICLE: "syntax-float-vectors" "Float vector syntax"
-{ $subsection POSTPONE: FV{ }
-"Float vectors are documented in " { $link "float-vectors" } "." ;
-
-ARTICLE: "syntax-byte-vectors" "Byte vector syntax"
-{ $subsection POSTPONE: BV{ }
-"Byte vectors are documented in " { $link "byte-vectors" } "." ;
-
 ARTICLE: "syntax-pathnames" "Pathname syntax"
 { $subsection POSTPONE: P" }
 "Pathnames are documented in " { $link "pathnames" } "." ;
@@ -181,9 +170,6 @@ $nl
 { $subsection "syntax-float-arrays" }
 { $subsection "syntax-vectors" }
 { $subsection "syntax-sbufs" }
-{ $subsection "syntax-bit-vectors" }
-{ $subsection "syntax-byte-vectors" }
-{ $subsection "syntax-float-vectors" }
 { $subsection "syntax-hashtables" }
 { $subsection "syntax-tuples" }
 { $subsection "syntax-pathnames" } ;
@@ -227,6 +213,9 @@ HELP: foldable
     }
     "The last restriction ensures that words such as " { $link clone } " do not satisfy the foldable word contract. Indeed, " { $link clone } " will output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since doing so would give incorrect semantics for code that clones mutable objects and proceeds to mutate them."
 }
+{ $notes
+    "Folding optimizations are not applied if the call site of a word is in the same source file as the word. This is a side-effect of the compilation unit system; see " { $link "compilation-units" } "."
+}
 { $examples "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable." } ;
 
 HELP: flushable
@@ -240,7 +229,7 @@ HELP: flushable
 HELP: t
 { $syntax "t" }
 { $values { "t" "the canonical truth value" } }
-{ $description "The canonical instance of " { $link general-t } ". It is just a symbol." } ;
+{ $class-description "The canonical truth value, which is an instance of itself." } ;
 
 HELP: f
 { $syntax "f" }
@@ -287,29 +276,11 @@ HELP: B{
 { $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "B{ 1 2 3 }" } } ;
 
-HELP: BV{
-{ $syntax "BV{ elements... }" }
-{ $values { "elements" "a list of bytes" } }
-{ $description "Marks the beginning of a literal byte vector. Literal byte vectors are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "BV{ 1 2 3 12 }" } } ;
-
 HELP: ?{
 { $syntax "?{ elements... }" }
 { $values { "elements" "a list of booleans" } }
 { $description "Marks the beginning of a literal bit array. Literal bit arrays are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "?{ t f t }" } } ;
-
-HELP: ?V{
-{ $syntax "?V{ elements... }" }
-{ $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit vector. Literal bit vectors are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "?V{ t f t }" } } ;
-
-HELP: FV{
-{ $syntax "FV{ elements... }" }
-{ $values { "elements" "a list of real numbers" } }
-{ $description "Marks the beginning of a literal float vector. Literal float vectors are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "FV{ 1.0 2.0 3.0 }" } } ;
 
 HELP: F{
 { $syntax "F{ elements... }" }
@@ -329,8 +300,8 @@ HELP: C{
 { $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: T{
-{ $syntax "T{ class delegate slots... }" }
-{ $values { "class" "a tuple class word" } { "delegate" "a delegate" } { "slots" "list of objects" } }
+{ $syntax "T{ class slots... }" }
+{ $values { "class" "a tuple class word" } { "slots" "list of objects" } }
 { $description "Marks the beginning of a literal tuple. Literal tuples are terminated by " { $link POSTPONE: } } "."
 $nl
 "The class word must always be specified. If an insufficient number of values is given after the class word, the remaining slots of the tuple are set to " { $link f } ". If too many values are given, they are ignored." } ;
@@ -540,8 +511,8 @@ HELP: INSTANCE:
 { $description "Makes " { $snippet "instance" } " an instance of " { $snippet "mixin" } "." } ;
 
 HELP: PREDICATE:
-{ $syntax "PREDICATE: superclass class predicate... ;" }
-{ $values { "superclass" "an existing class word" } { "class" "a new class word to define" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
+{ $syntax "PREDICATE: class < superclass predicate... ;" }
+{ $values { "class" "a new class word to define" } { "superclass" "an existing class word" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
 { $description
     "Defines a predicate class deriving from " { $snippet "superclass" } "."
     $nl
@@ -554,23 +525,36 @@ HELP: PREDICATE:
 } ;
 
 HELP: TUPLE:
-{ $syntax "TUPLE: class slots... ;" }
+{ $syntax "TUPLE: class slots... ;" "TUPLE: class < superclass slots ... ;" }
 { $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class with membership predicate " { $snippet "name?" } "."
-$nl
-"Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." } ;
+{ $description "Defines a new tuple class. The superclass is optional; if left unspecified, it defaults to " { $link tuple } "." } ;
+
+HELP: ERROR:
+{ $syntax "ERROR: class slots... ;" }
+{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
+{ $description "Defines a new tuple class whose class word throws a new instance of the error." }
+{ $notes
+    "The following two snippets are equivalent:"
+    { $code
+        "ERROR: invalid-values x y ;"
+        ""
+        "TUPLE: invalid-values x y ;"
+        ": invalid-values ( x y -- * )"
+        "    \\ invalid-values boa throw ;"
+    }
+} ;
 
 HELP: C:
 { $syntax "C: constructor class" }
 { $values { "constructor" "a new word to define" } { "class" tuple-class } }
-{ $description "Define a constructor word for a tuple class which simply performs BOA (by order of arguments) construction using " { $link construct-boa } "." }
+{ $description "Define a constructor word for a tuple class which simply performs BOA (by order of arguments) construction using " { $link boa } "." }
 { $examples
     "Suppose the following tuple has been defined:"
     { $code "TUPLE: color red green blue ;" }
     "The following two lines are equivalent:"
     { $code
         "C: <color> color"
-        ": <color> color construct-boa ;"
+        ": <color> color boa ;"
     }
     "In both cases, a word " { $snippet "<color>" } " is defined, which reads three values from the stack and creates a " { $snippet "color" } " instance having these values in the " { $snippet "red" } ", " { $snippet "green" } " and " { $snippet "blue" } " slots, respectively."
 } ;
@@ -624,5 +608,19 @@ HELP: <<
 HELP: >>
 { $syntax ">>" }
 { $description "Marks the end of a parse time code block." } ;
+
+HELP: call-next-method
+{ $description "Calls the next applicable method. Only valid inside a method definition. The values at the top of the stack are passed on to the next method, and they must be compatible with that method's class specializer." }
+{ $notes "This is syntax sugar around " { $link (call-next-method) } ". The following two lines are equivalent:"
+    { $code
+        "M: my-class my-generic ... call-next-method ... ;"
+        "M: my-class my-generic ... \\ my-class \\ my-generic (call-next-method) ... ;"
+    }
+"In most cases, this word should be called with the original input values on the stack. Calling it with other values is usually a sign of poor design." }
+{ $errors
+    "Throws a " { $link no-next-method } " error if this is the least specific method, and throws an " { $link inconsistent-next-method } " error if the values at the top of the stack are not compatible with the current method's specializer."
+} ;
+
+{ POSTPONE: call-next-method (call-next-method) next-method } related-words
 
 { POSTPONE: << POSTPONE: >> } related-words

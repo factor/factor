@@ -9,9 +9,9 @@ kernel.private math math.private memory namespaces
 namespaces.private parser prettyprint quotations
 quotations.private sbufs sbufs.private sequences
 sequences.private slots.private strings strings.private system
-threads.private tuples tuples.private vectors vectors.private
-words words.private assocs inspector compiler.units
-system.private ;
+threads.private classes.tuple classes.tuple.private vectors
+vectors.private words words.private assocs inspector
+compiler.units system.private ;
 IN: inference.known-words
 
 ! Shuffle words
@@ -54,9 +54,9 @@ IN: inference.known-words
     { swap  T{ effect f 2 { 1 0         } } }
 } [ define-shuffle ] assoc-each
 
-\ >r [ infer->r ] "infer" set-word-prop
+\ >r [ 1 infer->r ] "infer" set-word-prop
 
-\ r> [ infer-r> ] "infer" set-word-prop
+\ r> [ 1 infer-r> ] "infer" set-word-prop
 
 \ declare [
     1 ensure-values
@@ -81,8 +81,8 @@ M: curried infer-call
 
 M: composed infer-call
     infer-uncurry
-    infer->r peek-d infer-call
-    terminated? get [ infer-r> peek-d infer-call ] unless ;
+    1 infer->r peek-d infer-call
+    terminated? get [ 1 infer-r> peek-d infer-call ] unless ;
 
 M: object infer-call
     \ literal-expected inference-warning ;
@@ -91,6 +91,8 @@ M: object infer-call
     1 ensure-values
     peek-d infer-call
 ] "infer" set-word-prop
+
+\ call t "no-compile" set-word-prop
 
 \ execute [
     1 ensure-values
@@ -135,7 +137,7 @@ M: object infer-call
 ! Variadic tuple constructor
 \ <tuple-boa> [
     \ <tuple-boa>
-    peek-d value-literal { tuple } <effect>
+    peek-d value-literal layout-size { tuple } <effect>
     make-call-node
 ] "infer" set-word-prop
 
@@ -354,13 +356,11 @@ M: object infer-call
 
 \ setenv { object fixnum } { } <effect> set-primitive-effect
 
-\ (stat) { string } { object object object object } <effect> set-primitive-effect
+\ exists? { string } { object } <effect> set-primitive-effect
 
 \ (directory) { string } { array } <effect> set-primitive-effect
 
-\ data-gc { } { } <effect> set-primitive-effect
-
-\ code-gc { } { } <effect> set-primitive-effect
+\ gc { } { } <effect> set-primitive-effect
 
 \ gc-time { } { integer } <effect> set-primitive-effect
 
@@ -375,7 +375,7 @@ set-primitive-effect
 \ data-room { } { integer array } <effect> set-primitive-effect
 \ data-room make-flushable
 
-\ code-room { } { integer integer } <effect> set-primitive-effect
+\ code-room { } { integer integer integer integer } <effect> set-primitive-effect
 \ code-room  make-flushable
 
 \ os-env { string } { object } <effect> set-primitive-effect
@@ -383,14 +383,8 @@ set-primitive-effect
 \ millis { } { integer } <effect> set-primitive-effect
 \ millis make-flushable
 
-\ type { object } { fixnum } <effect> set-primitive-effect
-\ type make-foldable
-
 \ tag { object } { fixnum } <effect> set-primitive-effect
 \ tag make-foldable
-
-\ class-hash { object } { fixnum } <effect> set-primitive-effect
-\ class-hash make-foldable
 
 \ cwd { } { string } <effect> set-primitive-effect
 
@@ -479,18 +473,6 @@ set-primitive-effect
 
 \ set-alien-cell { c-ptr c-ptr integer } { } <effect> set-primitive-effect
 
-\ alien>char-string { c-ptr } { string } <effect> set-primitive-effect
-\ alien>char-string make-flushable
-
-\ string>char-alien { string } { byte-array } <effect> set-primitive-effect
-\ string>char-alien make-flushable
-
-\ alien>u16-string { c-ptr } { string } <effect> set-primitive-effect
-\ alien>u16-string make-flushable
-
-\ string>u16-alien { string } { byte-array } <effect> set-primitive-effect
-\ string>u16-alien make-flushable
-
 \ alien-address { alien } { integer } <effect> set-primitive-effect
 \ alien-address make-flushable
 
@@ -565,14 +547,11 @@ set-primitive-effect
 \ quotation-xt { quotation } { integer } <effect> set-primitive-effect
 \ quotation-xt make-flushable
 
-\ <tuple> { word integer } { quotation } <effect> set-primitive-effect
+\ <tuple> { tuple-layout } { tuple } <effect> set-primitive-effect
 \ <tuple> make-flushable
 
-\ (>tuple) { array } { tuple } <effect> set-primitive-effect
-\ (>tuple) make-flushable
-
-\ tuple>array { tuple } { array } <effect> set-primitive-effect
-\ tuple>array make-flushable
+\ <tuple-layout> { word fixnum array fixnum } { tuple-layout } <effect> set-primitive-effect
+\ <tuple-layout> make-foldable
 
 \ datastack { } { array } <effect> set-primitive-effect
 \ datastack make-flushable
@@ -598,6 +577,10 @@ set-primitive-effect
 
 \ (os-envs) { } { array } <effect> set-primitive-effect
 
+\ set-os-env { string string } { } <effect> set-primitive-effect
+
+\ unset-os-env { string } { } <effect> set-primitive-effect
+
 \ (set-os-envs) { array } { } <effect> set-primitive-effect
 
 \ do-primitive [ \ do-primitive no-effect ] "infer" set-word-prop
@@ -605,3 +588,5 @@ set-primitive-effect
 \ dll-valid? { object } { object } <effect> set-primitive-effect
 
 \ modify-code-heap { array object } { } <effect> set-primitive-effect
+
+\ unimplemented { } { } <effect> set-primitive-effect

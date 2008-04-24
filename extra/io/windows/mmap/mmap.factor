@@ -1,7 +1,7 @@
 USING: alien alien.c-types alien.syntax arrays continuations
 destructors generic io.mmap io.nonblocking io.windows
 kernel libc math namespaces quotations sequences windows
-windows.advapi32 windows.kernel32 io.backend ;
+windows.advapi32 windows.kernel32 io.backend system ;
 IN: io.windows.mmap
 
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
@@ -53,11 +53,11 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 
 HOOK: with-privileges io-backend ( seq quot -- ) inline
 
-M: windows-nt-io with-privileges
+M: winnt with-privileges
     over [ [ t set-privilege ] each ] curry compose
     swap [ [ f set-privilege ] each ] curry [ ] cleanup ;
 
-M: windows-ce-io with-privileges
+M: wince with-privileges
     nip call ;
 
 : mmap-open ( path access-mode create-mode flProtect access -- handle handle address )
@@ -70,7 +70,7 @@ M: windows-ce-io with-privileges
         dup close-later
     ] with-privileges ;
     
-M: windows-io <mapped-file> ( path length -- mmap )
+M: windows <mapped-file> ( path length -- mmap )
     [
         swap
         GENERIC_WRITE GENERIC_READ bitor
@@ -78,10 +78,10 @@ M: windows-io <mapped-file> ( path length -- mmap )
         PAGE_READWRITE SEC_COMMIT bitor
         FILE_MAP_ALL_ACCESS mmap-open
         -rot 2array
-        f \ mapped-file construct-boa
+        f \ mapped-file boa
     ] with-destructors ;
 
-M: windows-io close-mapped-file ( mapped-file -- )
+M: windows close-mapped-file ( mapped-file -- )
     [
         dup mapped-file-handle [ close-always ] each
         mapped-file-address UnmapViewOfFile win32-error=0/f

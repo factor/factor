@@ -1,23 +1,13 @@
 USING: generic help.markup help.syntax kernel math memory
-namespaces sequences kernel.private strings ;
+namespaces sequences kernel.private strings classes.singleton ;
 IN: system
 
-ARTICLE: "os" "System interface"
-"Operating system detection:"
-{ $subsection os }
-{ $subsection unix? }
-{ $subsection macosx? }
-{ $subsection solaris? }
-{ $subsection windows? }
-{ $subsection winnt? }
-{ $subsection win32? }
-{ $subsection win64? }
-{ $subsection wince? }
-"Processor detection:"
-{ $subsection cpu }
-"Reading environment variables:"
-{ $subsection os-env }
-{ $subsection os-envs }
+ABOUT: "system"
+
+ARTICLE: "system" "System interface"
+{ $subsection "cpu" }
+{ $subsection "os" }
+{ $subsection "environment-variables" }
 "Getting the path to the Factor VM and image:"
 { $subsection vm }
 { $subsection image }
@@ -27,62 +17,59 @@ ARTICLE: "os" "System interface"
 { $subsection exit }
 { $see-also "io.files" "io.mmap" "io.monitors" "network-streams" "io.launcher" } ;
 
-ABOUT: "os"
+ARTICLE: "environment-variables" "Environment variables"
+"Reading environment variables:"
+{ $subsection os-env }
+{ $subsection os-envs }
+"Writing environment variables:"
+{ $subsection set-os-env }
+{ $subsection unset-os-env }
+{ $subsection set-os-envs } ;
+
+ARTICLE: "cpu" "Processor detection"
+"Processor detection:"
+{ $subsection cpu }
+"Supported processors:"
+{ $subsection x86.32 }
+{ $subsection x86.64 }
+{ $subsection ppc }
+{ $subsection arm }
+"Processor families:"
+{ $subsection x86 } ;
+
+ARTICLE: "os" "Operating system detection"
+"Operating system detection:"
+{ $subsection os }
+"Supported operating systems:"
+{ $subsection freebsd }
+{ $subsection linux }
+{ $subsection macosx }
+{ $subsection openbsd }
+{ $subsection netbsd }
+{ $subsection solaris }
+{ $subsection wince }
+{ $subsection winnt }
+"Operating system families:"
+{ $subsection bsd }
+{ $subsection unix }
+{ $subsection windows } ;
+
 
 HELP: cpu
-{ $values { "cpu" string } }
+{ $values { "class" singleton-class } }
 { $description
-    "Outputs a string descriptor of the current CPU architecture. Currently, this set of descriptors is:"
-    { $code "x86.32" "x86.64" "ppc" "arm" }
+    "Outputs a singleton class with the name of the current CPU architecture."
 } ;
 
 HELP: os
-{ $values { "os" string } }
+{ $values { "class" singleton-class } }
 { $description
-    "Outputs a string descriptor of the current operating system family. Currently, this set of descriptors is:"
-    { $code
-        "freebsd"
-        "linux"
-        "macosx"
-        "openbsd"
-        "netbsd"
-        "solaris"
-        "wince"
-        "winnt"
-    }
+    "Outputs a singleton class with the name of the current operating system family."
 } ;
 
 HELP: embedded?
 { $values { "?" "a boolean" } }
 { $description "Tests if this Factor instance is embedded in another application." } ;
-
-HELP: windows?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Windows." } ;
-
-HELP: winnt?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Windows XP or Vista." } ;
-
-HELP: wince?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Windows CE." } ;
-
-HELP: macosx?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Mac OS X." } ;
-
-HELP: linux?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Linux." } ;
-
-HELP: solaris?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on Solaris." } ;
-
-HELP: bsd?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on FreeBSD/OpenBSD/NetBSD." } ;
 
 HELP: exit ( n -- )
 { $values { "n" "an integer exit code" } }
@@ -114,19 +101,27 @@ HELP: set-os-envs
 { $values { "assoc" "an association mapping strings to strings" } }
 { $description "Replaces the current set of environment variables." }
 { $notes
+    "Names and values of environment variables are operating system-specific. Windows NT allows values up to 32766 characters in length."
+}
+{ $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
+
+HELP: set-os-env ( value key -- )
+{ $values { "value" string } { "key" string } }
+{ $description "Set an environment variable." }
+{ $notes
     "Names and values of environment variables are operating system-specific."
 }
 { $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
 
-{ os-env os-envs set-os-envs } related-words
+HELP: unset-os-env ( key -- )
+{ $values { "key" string } }
+{ $description "Unset an environment variable." }
+{ $notes
+    "Names and values of environment variables are operating system-specific."
+}
+{ $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
 
-HELP: win32?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on 32-bit Windows." } ;
-
-HELP: win64?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on 64-bit Windows." } ;
+{ os-env os-envs set-os-env unset-os-env set-os-envs } related-words
 
 HELP: image
 { $values { "path" "a pathname string" } }
@@ -135,7 +130,3 @@ HELP: image
 HELP: vm
 { $values { "path" "a pathname string" } }
 { $description "Outputs the pathname of the currently running Factor VM." } ;
-
-HELP: unix?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if Factor is running on a Unix-like system. While this is a rather vague notion, one can use it to make certain assumptions about system calls and file structure which are not valid on Windows." } ;

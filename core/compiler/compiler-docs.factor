@@ -2,13 +2,21 @@ USING: generator help.markup help.syntax words io parser
 assocs words.private sequences compiler.units ;
 IN: compiler
 
+HELP: enable-compiler
+{ $description "Enables the optimizing compiler." } ;
+
+HELP: disable-compiler
+{ $description "Enables the optimizing compiler." } ;
+
 ARTICLE: "compiler-usage" "Calling the optimizing compiler"
-"Normally, new word definitions are recompiled automatically, however in some circumstances the optimizing compiler may need to be called directly."
-$nl
-"The main entry point to the optimizing compiler:"
+"Normally, new word definitions are recompiled automatically. This can be changed:"
+{ $subsection disable-compiler }
+{ $subsection enable-compiler }
+"The optimizing compiler can be called directly, although this should not be necessary under normal circumstances:"
 { $subsection optimized-recompile-hook }
 "Removing a word's optimized definition:"
-{ $subsection decompile } ;
+{ $subsection decompile }
+"Higher-level words can be found in " { $link "compilation-units" } "." ;
 
 ARTICLE: "compiler" "Optimizing compiler"
 "Factor is a fully compiled language implementation with two distinct compilers:"

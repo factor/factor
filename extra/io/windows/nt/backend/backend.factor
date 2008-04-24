@@ -1,9 +1,9 @@
 USING: alien alien.c-types arrays assocs combinators
 continuations destructors io io.backend io.nonblocking
 io.windows libc kernel math namespaces sequences
-threads tuples.lib windows windows.errors
+threads classes.tuple.lib windows windows.errors
 windows.kernel32 strings splitting io.files qualified ascii
-combinators.lib ;
+combinators.lib system accessors ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
 
@@ -28,7 +28,7 @@ SYMBOL: master-completion-port
 : <master-completion-port> ( -- handle )
     INVALID_HANDLE_VALUE f <completion-port> ;
 
-M: windows-nt-io add-completion ( handle -- )
+M: winnt add-completion ( handle -- )
     master-completion-port get-global <completion-port> drop ;
 
 : eof? ( error -- ? )
@@ -38,15 +38,15 @@ M: windows-nt-io add-completion ( handle -- )
     zero? [
         GetLastError {
             { [ dup expected-io-error? ] [ 2drop t ] }
-            { [ dup eof? ] [ drop t swap set-port-eof? f ] }
-            { [ t ] [ (win32-error-string) throw ] }
+            { [ dup eof? ] [ drop t >>eof drop f ] }
+            [ (win32-error-string) throw ]
         } cond
     ] [
         drop t
     ] if ;
 
 : get-overlapped-result ( overlapped port -- bytes-transferred )
-    dup port-handle win32-file-handle rot 0 <uint>
+    dup handle>> handle>> rot 0 <uint>
     [ 0 GetOverlappedResult overlapped-error? drop ] keep *uint ;
 
 : save-callback ( overlapped port -- )
@@ -75,11 +75,11 @@ M: windows-nt-io add-completion ( handle -- )
         ] [
             dup eof? [
                 drop lookup-callback
-                dup io-callback-port t swap set-port-eof?
+                dup port>> t >>eof drop
             ] [
                 (win32-error-string) swap lookup-callback
-                [ io-callback-port set-port-error ] keep
-            ] if io-callback-thread resume f
+                [ port>> set-port-error ] keep
+            ] if thread>> resume f
         ] if
     ] [
         lookup-callback
@@ -89,13 +89,13 @@ M: windows-nt-io add-completion ( handle -- )
 : drain-overlapped ( timeout -- )
     handle-overlapped [ 0 drain-overlapped ] unless ;
 
-M: windows-nt-io cancel-io
-    port-handle win32-file-handle CancelIo drop ;
+M: winnt cancel-io
+    handle>> handle>> CancelIo drop ;
 
-M: windows-nt-io io-multiplex ( ms -- )
+M: winnt io-multiplex ( ms -- )
     drain-overlapped ;
 
-M: windows-nt-io init-io ( -- )
+M: winnt init-io ( -- )
     <master-completion-port> master-completion-port set-global
     H{ } clone io-hash set-global
     windows.winsock:init-winsock ;

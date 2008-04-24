@@ -3,9 +3,9 @@
 USING: kernel namespaces sequences sequences.private assocs math
 inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
-definitions prettyprint hashtables combinators.lib
-prettyprint.sections sequences.private effects generic
-compiler.units combinators.cleave ;
+definitions prettyprint hashtables prettyprint.sections sets
+sequences.private effects generic compiler.units accessors
+locals.backend ;
 IN: locals
 
 ! Inspired by
@@ -17,31 +17,35 @@ TUPLE: lambda vars body ;
 
 C: <lambda> lambda
 
-TUPLE: let bindings vars body ;
+TUPLE: let bindings body ;
 
 C: <let> let
 
-TUPLE: wlet bindings vars body ;
+TUPLE: let* bindings body ;
+
+C: <let*> let*
+
+TUPLE: wlet bindings body ;
 
 C: <wlet> wlet
 
-PREDICATE: word local "local?" word-prop ;
+PREDICATE: local < word "local?" word-prop ;
 
 : <local> ( name -- word )
     #! Create a local variable identifier
     f <word> dup t "local?" set-word-prop ;
 
-PREDICATE: word local-word "local-word?" word-prop ;
+PREDICATE: local-word < word "local-word?" word-prop ;
 
 : <local-word> ( name -- word )
     f <word> dup t "local-word?" set-word-prop ;
 
-PREDICATE: word local-reader "local-reader?" word-prop ;
+PREDICATE: local-reader < word "local-reader?" word-prop ;
 
 : <local-reader> ( name -- word )
     f <word> dup t "local-reader?" set-word-prop ;
 
-PREDICATE: word local-writer "local-writer?" word-prop ;
+PREDICATE: local-writer < word "local-writer?" word-prop ;
 
 : <local-writer> ( reader -- word )
     dup word-name "!" append f <word>
@@ -53,95 +57,80 @@ TUPLE: quote local ;
 
 C: <quote> quote
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! read-local
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : local-index ( obj args -- n )
     [ dup quote? [ quote-local ] when eq? ] with find drop ;
 
-: read-local ( obj args -- quot )
-    local-index 1+
-    dup [ r> ] <repetition> concat [ dup ] append
-    swap [ swap >r ] <repetition> concat append ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! localize
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: read-local-quot ( obj args -- quot )
+    local-index 1+ [ get-local ] curry ;
 
 : localize-writer ( obj args -- quot )
-  >r "local-reader" word-prop r> read-local [ 0 swap set-array-nth ] append ;
+  >r "local-reader" word-prop r>
+  read-local-quot [ set-local-value ] append ;
 
 : localize ( obj args -- quot )
     {
-        { [ over local? ]        [ read-local ] }
-        { [ over quote? ]        [ >r quote-local r> read-local ] }
-        { [ over local-word? ]   [ read-local [ call ] append ] }
-        { [ over local-reader? ] [ read-local [ 0 swap array-nth ] append ] }
+        { [ over local? ]        [ read-local-quot ] }
+        { [ over quote? ]        [ >r quote-local r> read-local-quot ] }
+        { [ over local-word? ]   [ read-local-quot [ call ] append ] }
+        { [ over local-reader? ] [ read-local-quot [ local-value ] append ] }
         { [ over local-writer? ] [ localize-writer ] }
         { [ over \ lambda eq? ]  [ 2drop [ ] ] }
         { [ t ]                  [ drop 1quotation ] }
     } cond ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! point-free
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 UNION: special local quote local-word local-reader local-writer ;
 
-: load-local ( arg -- quot ) 
-    local-reader? [ 1array >r ] [ >r ] ? ;
+: load-locals-quot ( args -- quot )
+    dup [ local-reader? ] contains? [
+        <reversed> [
+            local-reader? [ 1array >r ] [ >r ] ?
+        ] map concat
+    ] [
+        length [ load-locals ] curry >quotation
+    ] if ;
 
-: load-locals ( quot args -- quot )
-    nip <reversed> [ load-local ] map concat ;
-
-: drop-locals ( args -- args quot )
-    dup length [ r> drop ] <repetition> concat ;
+: drop-locals-quot ( args -- quot )
+    length [ drop-locals ] curry ;
 
 : point-free-body ( quot args -- newquot )
     >r 1 head-slice* r> [ localize ] curry map concat ;
 
 : point-free-end ( quot args -- newquot )
     over peek special?
-    [ drop-locals >r >r peek r> localize r> append ]
-    [ drop-locals nip swap peek add ]
+    [ dup drop-locals-quot >r >r peek r> localize r> append ]
+    [ dup drop-locals-quot nip swap peek suffix ]
     if ;
 
 : (point-free) ( quot args -- newquot )
-    [ load-locals ] [ point-free-body ] [ point-free-end ]
+    [ nip load-locals-quot ]
+    [ point-free-body ]
+    [ point-free-end ]
     2tri 3append >quotation ;
 
 : point-free ( quot args -- newquot )
     over empty? [ drop ] [ (point-free) ] if ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! free-vars
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 UNION: lexical local local-reader local-writer local-word ;
 
-GENERIC: free-vars ( form -- vars )
+GENERIC: free-vars* ( form -- )
 
-: add-if-free ( vars object -- vars )
+: free-vars ( form -- vars )
+    [ free-vars* ] { } make prune ;
+
+: add-if-free ( object -- )
   {
-      { [ dup local-writer? ] [ "local-reader" word-prop add ] }
-      { [ dup lexical? ]      [ add ] }
-      { [ dup quote? ]        [ quote-local add ] }
-      { [ t ]                 [ free-vars append ] }
+      { [ dup local-writer? ] [ "local-reader" word-prop , ] }
+      { [ dup lexical? ]      [ , ] }
+      { [ dup quote? ]        [ local>> , ] }
+      { [ t ]                 [ free-vars* ] }
   } cond ;
 
-M: object free-vars drop { } ;
+M: object free-vars* drop ;
 
-M: quotation free-vars { } [ add-if-free ] reduce ;
+M: quotation free-vars* [ add-if-free ] each ;
 
-M: lambda free-vars
-    dup lambda-vars swap lambda-body free-vars seq-diff ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! lambda-rewrite
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+M: lambda free-vars*
+    [ vars>> ] [ body>> ] bi free-vars diff % ;
 
 GENERIC: lambda-rewrite* ( obj -- )
 
@@ -164,19 +153,19 @@ M: callable block-body ;
 M: callable local-rewrite*
     [ [ local-rewrite* ] each ] [ ] make , ;
 
-M: lambda block-vars lambda-vars ;
+M: lambda block-vars vars>> ;
 
-M: lambda block-body lambda-body ;
+M: lambda block-body body>> ;
 
 M: lambda local-rewrite*
-    dup lambda-vars swap lambda-body
-    [ local-rewrite* \ call , ] [ ] make <lambda> , ;
+    [ vars>> ] [ body>> ] bi
+    [ [ local-rewrite* ] each ] [ ] make <lambda> , ;
 
 M: block lambda-rewrite*
     #! Turn free variables into bound variables, curry them
     #! onto the body
     dup free-vars [ <quote> ] map dup % [
-        over block-vars swap append
+        over block-vars prepend
         swap block-body [ [ lambda-rewrite* ] each ] [ ] make
         swap point-free ,
     ] keep length \ curry <repetition> % ;
@@ -185,26 +174,18 @@ M: object lambda-rewrite* , ;
 
 M: object local-rewrite* , ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: make-local ( name -- word )
+    "!" ?tail [
+        <local-reader>
+        dup <local-writer> dup word-name set
+    ] [ <local> ] if
+    dup dup word-name set ;
 
 : make-locals ( seq -- words assoc )
-    [
-        "!" ?tail [ <local-reader> ] [ <local> ] if
-    ] map dup [
-        dup
-        [ dup word-name set ] each
-        [
-            dup local-reader? [
-                <local-writer> dup word-name set
-            ] [
-                drop
-            ] if
-        ] each
-    ] H{ } make-assoc ;
+    [ [ make-local ] map ] H{ } make-assoc ;
 
-: make-local-words ( seq -- words assoc )
-    [ dup <local-word> ] { } map>assoc
-    dup values swap ;
+: make-local-word ( name -- word )
+    <local-word> dup dup word-name set ;
 
 : push-locals ( assoc -- )
     use get push ;
@@ -213,41 +194,75 @@ M: object local-rewrite* , ;
     use get delete ;
 
 : (parse-lambda) ( assoc end -- quot )
-    over push-locals parse-until >quotation swap pop-locals ;
+    parse-until >quotation swap pop-locals ;
 
 : parse-lambda ( -- lambda )
-    "|" parse-tokens make-locals \ ] (parse-lambda) <lambda> ;
+    "|" parse-tokens make-locals dup push-locals
+    \ ] (parse-lambda) <lambda> ;
 
-: (parse-bindings) ( -- )
+: parse-binding ( -- pair/f )
     scan dup "|" = [
-        drop
+        drop f
     ] [
         scan {
             { "[" [ \ ] parse-until >quotation ] }
             { "[|" [ parse-lambda ] }
-        } case 2array ,
-        (parse-bindings)
+        } case 2array
     ] if ;
 
-: parse-bindings ( -- alist )
-    scan "|" assert= [ (parse-bindings) ] { } make dup keys ;
+: (parse-bindings) ( -- )
+    parse-binding [
+        first2 >r make-local r> 2array ,
+        (parse-bindings)
+    ] when* ;
+
+: parse-bindings ( -- bindings vars )
+    [
+        [ (parse-bindings) ] H{ } make-assoc
+        dup push-locals
+    ] { } make swap ;
+
+: parse-bindings* ( -- words assoc )
+    [
+        [
+            namespace push-locals
+
+            (parse-bindings)
+        ] { } make-assoc
+    ] { } make swap ;
+
+: (parse-wbindings) ( -- )
+    parse-binding [
+        first2 >r make-local-word r> 2array ,
+        (parse-wbindings)
+    ] when* ;
+
+: parse-wbindings ( -- bindings vars )
+    [
+        [ (parse-wbindings) ] H{ } make-assoc
+        dup push-locals
+    ] { } make swap ;
+
+: let-rewrite ( body bindings -- )
+    <reversed> [
+        >r 1array r> spin <lambda> [ call ] curry compose
+    ] assoc-each local-rewrite* \ call , ;
 
 M: let local-rewrite*
-    { let-bindings let-vars let-body } get-slots -rot
-    [ <reversed> ] 2apply
-    [
-        1array -rot second -rot <lambda>
-        [ call ] curry compose
-    ] 2each local-rewrite* \ call , ;
+    [ body>> ] [ bindings>> ] bi let-rewrite ;
+
+M: let* local-rewrite*
+    [ body>> ] [ bindings>> ] bi let-rewrite ;
 
 M: wlet local-rewrite*
-    dup wlet-bindings values over wlet-vars rot wlet-body
-    <lambda> [ call ] curry compose local-rewrite* \ call , ;
+    [ body>> ] [ bindings>> ] bi
+    [ [ ] curry ] assoc-map
+    let-rewrite ;
 
-: parse-locals
+: parse-locals ( -- vars assoc )
     parse-effect
     word [ over "declared-effect" set-word-prop ] when*
-    effect-in make-locals ;
+    effect-in make-locals dup push-locals ;
 
 : parse-locals-definition ( word -- word quot )
     scan "(" assert= parse-locals \ ; (parse-lambda) <lambda>
@@ -263,14 +278,17 @@ PRIVATE>
 : [| parse-lambda parsed ; parsing
 
 : [let
-    parse-bindings
-    make-locals \ ] (parse-lambda)
-    <let> parsed ; parsing
+    scan "|" assert= parse-bindings
+\ ] (parse-lambda) <let> parsed ; parsing
+
+: [let*
+    scan "|" assert= parse-bindings*
+    >r \ ] parse-until >quotation <let*> parsed r> pop-locals ;
+    parsing
 
 : [wlet
-    parse-bindings
-    make-local-words \ ] (parse-lambda)
-    <wlet> parsed ; parsing
+    scan "|" assert= parse-wbindings
+    \ ] (parse-lambda) <wlet> parsed ; parsing
 
 MACRO: with-locals ( form -- quot ) lambda-rewrite ;
 
@@ -297,39 +315,38 @@ SYMBOL: |
 M: lambda pprint*
     <flow
     \ [| pprint-word
-    dup lambda-vars pprint-vars
+    dup vars>> pprint-vars
     \ | pprint-word
-    f <inset lambda-body pprint-elements block>
+    f <inset body>> pprint-elements block>
     \ ] pprint-word
     block> ;
 
-: pprint-let ( body vars bindings -- )
+: pprint-let ( let word -- )
+    pprint-word
+    [ body>> ] [ bindings>> ] bi
     \ | pprint-word
     t <inset
     <block
-    values [ <block >r pprint-var r> pprint* block> ] 2each
+    [ <block >r pprint-var r> pprint* block> ] assoc-each
     block>
     \ | pprint-word
     <block pprint-elements block>
-    block> ;
-
-M: let pprint*
-    \ [let pprint-word
-    { let-body let-vars let-bindings } get-slots pprint-let
+    block>
     \ ] pprint-word ;
 
-M: wlet pprint*
-    \ [wlet pprint-word
-    { wlet-body wlet-vars wlet-bindings } get-slots pprint-let
-    \ ] pprint-word ;
+M: let pprint* \ [let pprint-let ;
 
-PREDICATE: word lambda-word
+M: wlet pprint* \ [wlet pprint-let ;
+
+M: let* pprint* \ [let* pprint-let ;
+
+PREDICATE: lambda-word < word
     "lambda" word-prop >boolean ;
 
 M: lambda-word definer drop \ :: \ ; ;
 
 M: lambda-word definition
-    "lambda" word-prop lambda-body ;
+    "lambda" word-prop body>> ;
 
 : lambda-word-synopsis ( word -- )
     dup definer.
@@ -339,26 +356,26 @@ M: lambda-word definition
 
 M: lambda-word synopsis* lambda-word-synopsis ;
 
-PREDICATE: macro lambda-macro
+PREDICATE: lambda-macro < macro
     "lambda" word-prop >boolean ;
 
 M: lambda-macro definer drop \ MACRO:: \ ; ;
 
 M: lambda-macro definition
-    "lambda" word-prop lambda-body ;
+    "lambda" word-prop body>> ;
 
 M: lambda-macro synopsis* lambda-word-synopsis ;
 
-PREDICATE: method-body lambda-method
+PREDICATE: lambda-method < method-body
     "lambda" word-prop >boolean ;
 
 M: lambda-method definer drop \ M:: \ ; ;
 
 M: lambda-method definition
-    "lambda" word-prop lambda-body ;
+    "lambda" word-prop body>> ;
 
 : method-stack-effect ( method -- effect )
-    dup "lambda" word-prop lambda-vars
+    dup "lambda" word-prop vars>>
     swap "method-generic" word-prop stack-effect
     dup [ effect-out ] when
     <effect> ;

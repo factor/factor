@@ -3,7 +3,7 @@
 USING: arrays hashtables io kernel math math.parser memory
 namespaces parser sequences strings io.styles
 io.streams.duplex vectors words generic system combinators
-tuples continuations debugger definitions compiler.units ;
+continuations debugger definitions compiler.units accessors ;
 IN: listener
 
 SYMBOL: quit-flag
@@ -19,7 +19,7 @@ GENERIC: stream-read-quot ( stream -- quot/f )
 
 : read-quot-step ( lines -- quot/f )
     [ parse-lines-interactive ] [
-        dup delegate unexpected-eof?
+        dup error>> unexpected-eof?
         [ 2drop f ] [ rethrow ] if
     ] recover ;
 

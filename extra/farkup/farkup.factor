@@ -1,10 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io kernel memoize namespaces peg sequences strings
-html.elements xml.entities xmode.code2html splitting
-io.streams.string html peg.parsers html.elements sequences.deep
-unicode.categories ;
+USING: arrays io io.styles kernel memoize namespaces peg
+sequences strings html.elements xml.entities xmode.code2html
+splitting io.streams.string html peg.parsers html.elements
+sequences.deep unicode.categories ;
 IN: farkup
+
+<PRIVATE
 
 : delimiters ( -- string )
     "*_^~%[-=|\\\n" ; inline
@@ -53,7 +55,13 @@ MEMO: eq ( -- parser )
 
 : render-code ( string mode -- string' )
     >r string-lines r>
-    [ [ htmlize-lines ] with-html-stream ] with-string-writer ;
+    [
+        [
+            H{ { wrap-margin f } } [
+                htmlize-lines
+            ] with-nesting
+        ] with-html-stream
+    ] with-string-writer ;
 
 : escape-link ( href text -- href-esc text-esc )
     >r escape-quoted-string r> escape-string ;
@@ -143,6 +151,8 @@ MEMO: paragraph ( -- parser )
         dup [ dup string? not swap [ blank? ] all? or ] deep-all?
         [ "<p>" swap "</p>" 3array ] unless
     ] action ;
+
+PRIVATE>
 
 PEG: parse-farkup ( -- parser )
     [

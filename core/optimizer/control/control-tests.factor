@@ -9,40 +9,40 @@ optimizer ;
             { [ over #label? not ] [ 2drop f ] }
             { [ over #label-word over eq? not ] [ 2drop f ] }
             { [ over #label-loop? not ] [ 2drop f ] }
-            { [ t ] [ 2drop t ] }
+            [ 2drop t ]
         } cond
     ] curry node-exists? ;
 
 : label-is-not-loop? ( node word -- ? )
     [
         {
-            { [ over #label? not ] [ 2drop f ] }
-            { [ over #label-word over eq? not ] [ 2drop f ] }
-            { [ over #label-loop? ] [ 2drop f ] }
-            { [ t ] [ 2drop t ] }
-        } cond
+            { [ over #label? not ] [ f ] }
+            { [ over #label-word over eq? not ] [ f ] }
+            { [ over #label-loop? ] [ f ] }
+            [ t ]
+        } cond 2nip
     ] curry node-exists? ;
 
 : loop-test-1 ( a -- )
     dup [ 1+ loop-test-1 ] [ drop ] if ; inline
-
+                          
 [ t ] [
-    [ loop-test-1 ] dataflow dup detect-loops
+    [ loop-test-1 ] dataflow detect-loops
     \ loop-test-1 label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ loop-test-1 1 2 3 ] dataflow dup detect-loops
+    [ loop-test-1 1 2 3 ] dataflow detect-loops
     \ loop-test-1 label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ [ loop-test-1 ] each ] dataflow dup detect-loops
+    [ [ loop-test-1 ] each ] dataflow detect-loops
     \ loop-test-1 label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ [ loop-test-1 ] each ] dataflow dup detect-loops
+    [ [ loop-test-1 ] each ] dataflow detect-loops
     \ (each-integer) label-is-loop?
 ] unit-test
 
@@ -50,7 +50,7 @@ optimizer ;
     dup [ 1+ loop-test-2 1- ] [ drop ] if ; inline
 
 [ t ] [
-    [ loop-test-2 ] dataflow dup detect-loops
+    [ loop-test-2 ] dataflow detect-loops
     \ loop-test-2 label-is-not-loop?
 ] unit-test
 
@@ -58,7 +58,7 @@ optimizer ;
     dup [ [ loop-test-3 ] each ] [ drop ] if ; inline
 
 [ t ] [
-    [ loop-test-3 ] dataflow dup detect-loops
+    [ loop-test-3 ] dataflow detect-loops
     \ loop-test-3 label-is-not-loop?
 ] unit-test
 
@@ -73,7 +73,7 @@ optimizer ;
     dup #label? [ node-successor find-label ] unless ;
 
 : test-loop-exits
-    dataflow dup detect-loops find-label
+    dataflow detect-loops find-label
     dup node-param swap
     [ node-child find-tail find-loop-exits [ class ] map ] keep
     #label-loop? ;
@@ -113,7 +113,7 @@ optimizer ;
 ] unit-test
 
 [ f ] [
-    [ [ [ ] map ] map ] dataflow dup detect-loops
+    [ [ [ ] map ] map ] dataflow detect-loops
     [ dup #label? swap #loop? not and ] node-exists?
 ] unit-test
 
@@ -128,22 +128,22 @@ DEFER: a
     blah [ b ] [ a ] if ; inline
 
 [ t ] [
-    [ a ] dataflow dup detect-loops
+    [ a ] dataflow detect-loops
     \ a label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ a ] dataflow dup detect-loops
+    [ a ] dataflow detect-loops
     \ b label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ b ] dataflow dup detect-loops
+    [ b ] dataflow detect-loops
     \ a label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ a ] dataflow dup detect-loops
+    [ a ] dataflow detect-loops
     \ b label-is-loop?
 ] unit-test
 
@@ -156,12 +156,12 @@ DEFER: a'
     blah [ b' ] [ a' ] if ; inline
 
 [ f ] [
-    [ a' ] dataflow dup detect-loops
+    [ a' ] dataflow detect-loops
     \ a' label-is-loop?
 ] unit-test
 
 [ f ] [
-    [ b' ] dataflow dup detect-loops
+    [ b' ] dataflow detect-loops
     \ b' label-is-loop?
 ] unit-test
 
@@ -171,11 +171,11 @@ DEFER: a'
 ! a standard iterative dataflow problem after all -- so I'm
 ! tempted to believe the computer here
 [ t ] [
-    [ b' ] dataflow dup detect-loops
+    [ b' ] dataflow detect-loops
     \ a' label-is-loop?
 ] unit-test
 
 [ f ] [
-    [ a' ] dataflow dup detect-loops
+    [ a' ] dataflow detect-loops
     \ b' label-is-loop?
 ] unit-test

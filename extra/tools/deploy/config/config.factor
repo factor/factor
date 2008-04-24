@@ -10,6 +10,7 @@ SYMBOL: deploy-name
 SYMBOL: deploy-ui?
 SYMBOL: deploy-compiler?
 SYMBOL: deploy-math?
+SYMBOL: deploy-random?
 SYMBOL: deploy-threads?
 
 SYMBOL: deploy-io
@@ -57,21 +58,22 @@ SYMBOL: deploy-image
         { deploy-reflection         1 }
         { deploy-compiler?          t }
         { deploy-threads?           t }
+        { deploy-random?            t }
         { deploy-math?              t }
         { deploy-word-props?        f }
         { deploy-word-defs?         f }
         { deploy-c-types?           f }
         ! default value for deploy.macosx
         { "stop-after-last-window?" t }
-    } union ;
+    } assoc-union ;
 
 : deploy-config-path ( vocab -- string )
-    vocab-dir "deploy.factor" path+ ;
+    vocab-dir "deploy.factor" append-path ;
 
 : deploy-config ( vocab -- assoc )
     dup default-config swap
     dup deploy-config-path vocab-file-contents
-    parse-fresh dup empty? [ drop ] [ first union ] if ;
+    parse-fresh dup empty? [ drop ] [ first assoc-union ] if ;
 
 : set-deploy-config ( assoc vocab -- )
     >r unparse-use string-lines r>

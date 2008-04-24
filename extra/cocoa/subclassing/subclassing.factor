@@ -1,14 +1,15 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays assocs combinators compiler
-hashtables kernel libc math namespaces parser sequences words
-cocoa.messages cocoa.runtime compiler.units ;
+USING: alien alien.c-types alien.strings arrays assocs
+combinators compiler hashtables kernel libc math namespaces
+parser sequences words cocoa.messages cocoa.runtime
+compiler.units io.encodings.ascii ;
 IN: cocoa.subclassing
 
 : init-method ( method alien -- )
     >r first3 r>
     [ >r execute r> set-objc-method-imp ] keep
-    [ >r malloc-char-string r> set-objc-method-types ] keep
+    [ >r ascii malloc-string r> set-objc-method-types ] keep
     >r sel_registerName r> set-objc-method-name ;
 
 : <empty-method-list> ( n -- alien )
@@ -26,7 +27,7 @@ IN: cocoa.subclassing
 : <objc-class> ( name info -- class )
     "objc-class" malloc-object
     [ set-objc-class-info ] keep
-    [ >r malloc-char-string r> set-objc-class-name ] keep ;
+    [ >r ascii malloc-string r> set-objc-class-name ] keep ;
 
 : <protocol-list> ( name -- protocol-list )
     "objc-protocol-list" malloc-object
@@ -76,7 +77,7 @@ IN: cocoa.subclassing
     r> <method-list> class_addMethods ;
 
 : encode-types ( return types -- encoding )
-    swap add* [
+    swap prefix [
         alien>objc-types get at "0" append
     ] map concat ;
 

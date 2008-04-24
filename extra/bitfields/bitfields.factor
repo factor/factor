@@ -24,7 +24,7 @@ TUPLE: check< number bound ;
 M: check< summary drop "Number exceeds upper bound" ;
 
 : check< ( num cmp -- num )
-    2dup < [ drop ] [ \ check< construct-boa throw ] if ;
+    2dup < [ drop ] [ \ check< boa throw ] if ;
 
 : ?check ( length -- )
     safe-bitfields? get [ 2^ , \ check< , ] [ drop ] if ;
@@ -63,7 +63,7 @@ M: check< summary drop "Number exceeds upper bound" ;
     [ range>accessor ] map ;
 
 : clear-range ( range -- num )
-    first2 dupd + [ 2^ 1- ] 2apply bitnot bitor ;
+    first2 dupd + [ 2^ 1- ] bi@ bitnot bitor ;
 
 : range>setter ( range -- quot )
     [
@@ -88,7 +88,7 @@ M: check< summary drop "Number exceeds upper bound" ;
     >r keys r> define-slots ;
 
 : define-setters ( classname slots -- )
-    >r "with-" swap append r>
+    >r "with-" prepend r>
     dup values [setters]
     >r keys r> define-slots ;
 

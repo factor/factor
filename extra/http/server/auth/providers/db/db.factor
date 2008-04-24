@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: db db.tuples db.types new-slots accessors
+USING: db db.tuples db.types accessors
 http.server.auth.providers kernel continuations
-singleton ;
+classes.singleton ;
 IN: http.server.auth.providers.db
 
 user "USERS"

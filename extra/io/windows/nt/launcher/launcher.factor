@@ -4,8 +4,8 @@ USING: alien alien.c-types arrays continuations destructors io
 io.windows libc io.nonblocking io.streams.duplex windows.types
 math windows.kernel32 windows namespaces io.launcher kernel
 sequences windows.errors assocs splitting system strings
-io.windows.launcher io.windows.nt.pipes io.backend
-combinators shuffle accessors locals ;
+io.windows.launcher io.windows.nt.pipes io.backend io.files
+io.files.private combinators shuffle accessors locals ;
 IN: io.windows.nt.launcher
 
 : duplicate-handle ( handle -- handle' )
@@ -32,14 +32,14 @@ IN: io.windows.nt.launcher
     drop 2nip null-pipe ;
 
 :: redirect-file ( default path access-mode create-mode -- handle )
-    path normalize-pathname
+    path normalize-path
     access-mode
     share-mode
     security-attributes-inherit
     create-mode
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
-    CreateFile dup invalid-handle? dup close-later ;
+    CreateFile dup invalid-handle? dup close-always ;
 
 : set-inherit ( handle ? -- )
     >r HANDLE_FLAG_INHERIT r> >BOOLEAN SetHandleInformation win32-error=0/f ;
@@ -55,7 +55,7 @@ IN: io.windows.nt.launcher
         { [ pick +inherit+ eq? ] [ redirect-inherit ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
         { [ pick string? ] [ redirect-file ] }
-        { [ t ] [ redirect-stream ] }
+        [ redirect-stream ]
     } cond ;
 
 : default-stdout ( args -- handle )
@@ -112,14 +112,16 @@ IN: io.windows.nt.launcher
     dup pipe-out f set-inherit
     >>stdin-pipe ;
 
-M: windows-nt-io fill-redirection ( process args -- )
+M: winnt fill-redirection ( process args -- )
     [ 2dup redirect-stdout ] keep lpStartupInfo>> set-STARTUPINFO-hStdOutput
     [ 2dup redirect-stderr ] keep lpStartupInfo>> set-STARTUPINFO-hStdError
     [ 2dup redirect-stdin  ] keep lpStartupInfo>> set-STARTUPINFO-hStdInput
     2drop ;
 
-M: windows-nt-io (process-stream)
+M: winnt (process-stream)
     [
+        current-directory get (normalize-path) cd
+
         dup make-CreateProcess-args
 
         fill-stdout-pipe

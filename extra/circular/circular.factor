@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2006 Alex Chapman, Daniel Ehrenberg
 ! See http;//factorcode.org/license.txt for BSD license
-USING: kernel sequences math sequences.private strings ;
+USING: kernel sequences math sequences.private strings
+accessors ;
 IN: circular
 
 ! a circular sequence wraps another sequence, but begins at an
@@ -8,30 +9,30 @@ IN: circular
 TUPLE: circular seq start ;
 
 : <circular> ( seq -- circular )
-    0 circular construct-boa ;
+    0 circular boa ;
 
 : circular-wrap ( n circular -- n circular )
-    [ circular-start + ] keep
-    [ circular-seq length rem ] keep ; inline
+    [ start>> + ] keep
+    [ seq>> length rem ] keep ; inline
 
-M: circular length circular-seq length ;
+M: circular length seq>> length ;
 
-M: circular virtual@ circular-wrap circular-seq ;
+M: circular virtual@ circular-wrap seq>> ;
 
-M: circular nth bounds-check virtual@ nth ;
+M: circular nth virtual@ nth ;
 
-M: circular set-nth bounds-check virtual@ set-nth ;
+M: circular set-nth virtual@ set-nth ;
+
+M: circular virtual-seq seq>> ;
 
 : change-circular-start ( n circular -- )
     #! change start to (start + n) mod length
-    circular-wrap set-circular-start ;
+    circular-wrap (>>start) ;
 
 : push-circular ( elt circular -- )
-    [ set-first ] keep 1 swap change-circular-start ;
+    [ set-first ] [ 1 swap change-circular-start ] bi ;
 
 : <circular-string> ( n -- circular )
     0 <string> <circular> ;
-
-M: circular virtual-seq circular-seq ;
 
 INSTANCE: circular virtual-sequence

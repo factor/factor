@@ -1,18 +1,18 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors new-slots sequences kernel assocs combinators
+USING: accessors sequences kernel assocs combinators
 http.server http.server.validators http hashtables namespaces
-combinators.cleave fry continuations locals ;
+fry continuations locals ;
 IN: http.server.actions
 
-SYMBOL: +path+
+SYMBOL: +append-path
 
 SYMBOL: params
 
 TUPLE: action init display submit get-params post-params ;
 
 : <action>
-    action construct-empty
+    action new
         [ ] >>init
         [ <400> ] >>display
         [ <400> ] >>submit ;
@@ -40,7 +40,7 @@ TUPLE: action init display submit get-params post-params ;
 M: action call-responder ( path action -- response )
     '[
         , ,
-        [ +path+ associate request-params union params set ]
+        [ +append-path associate request-params assoc-union params set ]
         [ action set ] bi*
         request get method>> {
             { "GET" [ handle-get ] }

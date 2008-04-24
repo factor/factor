@@ -2,8 +2,8 @@
 IN: vocabs.loader.tests
 USING: vocabs.loader tools.test continuations vocabs math
 kernel arrays sequences namespaces io.streams.string
-parser source-files words assocs tuples definitions
-debugger compiler.units tools.vocabs ;
+parser source-files words assocs classes.tuple definitions
+debugger compiler.units tools.vocabs accessors ;
 
 ! This vocab should not exist, but just in case...
 [ ] [
@@ -13,15 +13,15 @@ debugger compiler.units tools.vocabs ;
 ] unit-test
 
 [ T{ vocab-link f "vocabs.loader.test" } ]
-[ "vocabs.loader.test" f >vocab-link ] unit-test
+[ "vocabs.loader.test" >vocab-link ] unit-test
 
 [ t ]
-[ "kernel" f >vocab-link "kernel" vocab = ] unit-test
+[ "kernel" >vocab-link "kernel" vocab = ] unit-test
 
 [ t ] [
     "kernel" vocab-files
     "kernel" vocab vocab-files
-    "kernel" f <vocab-link> vocab-files
+    "kernel" <vocab-link> vocab-files
     3array all-equal?
 ] unit-test
 
@@ -36,7 +36,7 @@ IN: vocabs.loader.tests
 [ { 3 3 3 } ] [
     "vocabs.loader.test.2" run
     "vocabs.loader.test.2" vocab run
-    "vocabs.loader.test.2" f <vocab-link> run
+    "vocabs.loader.test.2" <vocab-link> run
     3array
 ] unit-test
 
@@ -68,7 +68,7 @@ IN: vocabs.loader.tests
     <string-reader>
     "resource:core/vocabs/loader/test/a/a.factor"
     parse-stream
-] [ [ no-word? ] is? ] must-fail-with
+] [ error>> error>> no-word-error? ] must-fail-with
 
 0 "count-me" set-global
 
@@ -110,12 +110,14 @@ IN: vocabs.loader.tests
     ] with-compilation-unit
 ] unit-test
 
+[ ] [ "vocabs.loader.test.b" changed-vocab ] unit-test
+
 [ ] [ "vocabs.loader.test.b" refresh ] unit-test
 
 [ 3 ] [ "count-me" get-global ] unit-test
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
-[ "kernel" f <vocab-link> where ] unit-test
+[ "kernel" <vocab-link> where ] unit-test
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
 [ "kernel" vocab where ] unit-test
@@ -136,7 +138,7 @@ IN: vocabs.loader.tests
     [
         { "2" "a" "b" "d" "e" "f" }
         [
-            "vocabs.loader.test." swap append forget-vocab
+            "vocabs.loader.test." prepend forget-vocab
         ] each
     ] with-compilation-unit ;
 

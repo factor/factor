@@ -46,7 +46,7 @@ dup >rule-number rule-values rule-keys [ rule> set-at ] 2each ;
 
 : pattern>state ( {_a_b_c_} -- state ) rule> at ;
 
-: cap-line ( line -- 0-line-0 ) { 0 } swap append { 0 } append ;
+: cap-line ( line -- 0-line-0 ) { 0 } prepend { 0 } append ;
 
 : wrap-line ( a-line-z -- za-line-za )
 dup peek 1array swap dup first 1array append append ;

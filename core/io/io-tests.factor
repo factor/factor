@@ -1,10 +1,10 @@
 USING: arrays io io.files kernel math parser strings system
-tools.test words namespaces io.encodings.latin1
+tools.test words namespaces io.encodings.8-bit
 io.encodings.binary ;
 IN: io.tests
 
 [ f ] [
-    "resource:/core/io/test/no-trailing-eol.factor" run-file
+    "resource:core/io/test/no-trailing-eol.factor" run-file
     "foo" "io.tests" lookup
 ] unit-test
 
@@ -14,28 +14,19 @@ IN: io.tests
 [
     "This is a line.\rThis is another line.\r"
 ] [
-    "/core/io/test/mac-os-eol.txt" <resource-reader>
+    "core/io/test/mac-os-eol.txt" <resource-reader>
     [ 500 read ] with-stream
 ] unit-test
 
 [
     255
 ] [
-    "/core/io/test/binary.txt" <resource-reader>
+    "core/io/test/binary.txt" <resource-reader>
     [ read1 ] with-stream >fixnum
 ] unit-test
 
 ! Make sure we use correct to_c_string form when writing
 [ ] [ "\0" write ] unit-test
-
-[ "" ] [ 0 read ] unit-test
-
-! [ ] [ "123" write 9000 CHAR: x <string> write flush ] unit-test
-
-[
-    "/core/io/test/binary.txt" <resource-reader>
-    [ 0.2 read ] with-stream
-] must-fail
 
 [
     {
@@ -45,7 +36,7 @@ IN: io.tests
     }
 ] [
     [
-        "/core/io/test/separator-test.txt" <resource-reader> [
+        "core/io/test/separator-test.txt" <resource-reader> [
             "J" read-until 2array ,
             "i" read-until 2array ,
             "X" read-until 2array ,
@@ -58,3 +49,12 @@ IN: io.tests
         10 [ 65536 read drop ] times
     ] with-file-reader
 ] unit-test
+
+! [ "" ] [ 0 read ] unit-test
+
+! [ ] [ "123" write 9000 CHAR: x <string> write flush ] unit-test
+
+! [
+!     "/core/io/test/binary.txt" <resource-reader>
+!     [ 0.2 read ] with-stream
+! ] must-fail

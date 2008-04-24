@@ -3,41 +3,50 @@
 IN: concurrency.mailboxes
 USING: dlists threads sequences continuations
 namespaces random math quotations words kernel arrays assocs
-init system concurrency.conditions ;
+init system concurrency.conditions accessors ;
 
-TUPLE: mailbox threads data ;
+TUPLE: mailbox threads data closed ;
+
+: check-closed ( mailbox -- )
+    closed>> [ "Mailbox closed" throw ] when ; inline
+
+M: mailbox dispose
+    t >>closed threads>> notify-all ;
 
 : <mailbox> ( -- mailbox )
-    <dlist> <dlist> mailbox construct-boa ;
+    <dlist> <dlist> f mailbox boa ;
 
 : mailbox-empty? ( mailbox -- bool )
-    mailbox-data dlist-empty? ;
+    data>> dlist-empty? ;
 
 : mailbox-put ( obj mailbox -- )
-    [ mailbox-data push-front ] keep
-    mailbox-threads notify-all yield ;
+    [ data>> push-front ]
+    [ threads>> notify-all ] bi yield ;
 
-: block-unless-pred ( pred mailbox timeout -- )
-    2over mailbox-data dlist-contains? [
+: wait-for-mailbox ( mailbox timeout -- )
+    >r threads>> r> "mailbox" wait ;
+
+: block-unless-pred ( mailbox timeout pred -- )
+    pick check-closed
+    pick data>> over dlist-contains? [
         3drop
     ] [
-        2dup >r mailbox-threads r> "mailbox" wait
-        block-unless-pred
+        >r 2dup wait-for-mailbox r> block-unless-pred
     ] if ; inline
 
 : block-if-empty ( mailbox timeout -- mailbox )
+    over check-closed
     over mailbox-empty? [
-        2dup >r mailbox-threads r> "mailbox" wait
-        block-if-empty
+        2dup wait-for-mailbox block-if-empty
     ] [
         drop
     ] if ;
 
 : mailbox-peek ( mailbox -- obj )
-    mailbox-data peek-back ;
+    data>> peek-back ;
 
 : mailbox-get-timeout ( mailbox timeout -- obj )
-    block-if-empty mailbox-data pop-back ;
+    block-if-empty data>> pop-back ;
 
 : mailbox-get ( mailbox -- obj )
     f mailbox-get-timeout ;
@@ -45,7 +54,7 @@ TUPLE: mailbox threads data ;
 : mailbox-get-all-timeout ( mailbox timeout -- array )
     block-if-empty
     [ dup mailbox-empty? ]
-    [ dup mailbox-data pop-back ]
+    [ dup data>> pop-back ]
     [ ] unfold nip ;
 
 : mailbox-get-all ( mailbox -- array )
@@ -58,30 +67,33 @@ TUPLE: mailbox threads data ;
         2drop
     ] if ; inline
 
-: mailbox-get-timeout? ( pred mailbox timeout -- obj )
-    [ block-unless-pred ] 3keep drop
-    mailbox-data delete-node-if ; inline
+: mailbox-get-timeout? ( mailbox timeout pred -- obj )
+    3dup block-unless-pred
+    nip >r data>> r> delete-node-if ; inline
 
-: mailbox-get? ( pred mailbox -- obj )
-    f mailbox-get-timeout? ; inline
+: mailbox-get? ( mailbox pred -- obj )
+    f swap mailbox-get-timeout? ; inline
 
-TUPLE: linked-error thread ;
+: wait-for-close-timeout ( mailbox timeout -- )
+    over closed>>
+    [ 2drop ] [ 2dup wait-for-mailbox wait-for-close-timeout ] if ;
 
-: <linked-error> ( error thread -- linked )
-    { set-delegate set-linked-error-thread }
-    linked-error construct ;
+: wait-for-close ( mailbox -- )
+    f wait-for-close-timeout ;
+
+TUPLE: linked-error error thread ;
+
+C: <linked-error> linked-error
 
 : ?linked dup linked-error? [ rethrow ] when ;
 
-TUPLE: linked-thread supervisor ;
+TUPLE: linked-thread < thread supervisor ;
 
 M: linked-thread error-in-thread
-    [ <linked-error> ] keep
-    linked-thread-supervisor mailbox-put ;
+    [ <linked-error> ] [ supervisor>> ] bi mailbox-put ;
 
 : <linked-thread> ( quot name mailbox -- thread' )
-    >r <thread> linked-thread construct-delegate r>
-    over set-linked-thread-supervisor ;
+    >r linked-thread new-thread r> >>supervisor ;
 
 : spawn-linked-to ( quot name mailbox -- thread )
     <linked-thread> [ (spawn) ] keep ;

@@ -8,14 +8,12 @@ layouts alien alien.accessors alien.compiler alien.structs slots
 splitting assocs ;
 IN: cpu.x86.64
 
-PREDICATE: x86-backend amd64-backend
-    x86-backend-cell 8 = ;
-
-M: amd64-backend ds-reg R14 ;
-M: amd64-backend rs-reg R15 ;
-M: amd64-backend stack-reg RSP ;
-M: amd64-backend xt-reg RCX ;
-M: amd64-backend stack-save-reg RSI ;
+M: x86.64 ds-reg R14 ;
+M: x86.64 rs-reg R15 ;
+M: x86.64 stack-reg RSP ;
+M: x86.64 stack-save-reg RSI ;
+M: x86.64 temp-reg-1 RAX ;
+M: x86.64 temp-reg-2 RCX ;
 
 M: temp-reg v>operand drop RBX ;
 
@@ -34,18 +32,18 @@ M: float-regs vregs
 M: float-regs param-regs
     drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
-M: amd64-backend address-operand ( address -- operand )
+M: x86.64 address-operand ( address -- operand )
     #! On AMD64, we have to load 64-bit addresses into a
     #! scratch register first. The usage of R11 here is a hack.
     #! This word can only be called right before a subroutine
     #! call, where all vregs have been flushed anyway.
     temp-reg v>operand [ swap MOV ] keep ;
 
-M: amd64-backend fixnum>slot@ drop ;
+M: x86.64 fixnum>slot@ drop ;
 
-M: amd64-backend prepare-division CQO ;
+M: x86.64 prepare-division CQO ;
 
-M: amd64-backend load-indirect ( literal reg -- )
+M: x86.64 load-indirect ( literal reg -- )
     0 [] MOV rc-relative rel-literal ;
 
 M: stack-params %load-param-reg
@@ -56,27 +54,27 @@ M: stack-params %load-param-reg
 M: stack-params %save-param-reg
     >r stack-frame* + cell + swap r> %load-param-reg ;
 
-M: amd64-backend %prepare-unbox ( -- )
+M: x86.64 %prepare-unbox ( -- )
     ! First parameter is top of stack
     RDI R14 [] MOV
     R14 cell SUB ;
 
-M: amd64-backend %unbox ( n reg-class func -- )
+M: x86.64 %unbox ( n reg-class func -- )
     ! Call the unboxer
     f %alien-invoke
     ! Store the return value on the C stack
     over [ [ return-reg ] keep %save-param-reg ] [ 2drop ] if ;
 
-M: amd64-backend %unbox-long-long ( n func -- )
-    T{ int-regs } swap %unbox ;
+M: x86.64 %unbox-long-long ( n func -- )
+    int-regs swap %unbox ;
 
-M: amd64-backend %unbox-struct-1 ( -- )
+M: x86.64 %unbox-struct-1 ( -- )
     #! Alien must be in RDI.
     "alien_offset" f %alien-invoke
     ! Load first cell
     RAX RAX [] MOV ;
 
-M: amd64-backend %unbox-struct-2 ( -- )
+M: x86.64 %unbox-struct-2 ( -- )
     #! Alien must be in RDI.
     "alien_offset" f %alien-invoke
     ! Load second cell
@@ -84,7 +82,7 @@ M: amd64-backend %unbox-struct-2 ( -- )
     ! Load first cell
     RAX RAX [] MOV ;
 
-M: amd64-backend %unbox-large-struct ( n size -- )
+M: x86.64 %unbox-large-struct ( n size -- )
     ! Source is in RDI
     ! Load destination address
     RSI RSP roll [+] LEA
@@ -97,7 +95,7 @@ M: amd64-backend %unbox-large-struct ( n size -- )
     0 over param-reg swap return-reg
     2dup eq? [ 2drop ] [ MOV ] if ;
 
-M: amd64-backend %box ( n reg-class func -- )
+M: x86.64 %box ( n reg-class func -- )
     rot [
         rot [ 0 swap param-reg ] keep %load-param-reg
     ] [
@@ -105,19 +103,19 @@ M: amd64-backend %box ( n reg-class func -- )
     ] if*
     f %alien-invoke ;
 
-M: amd64-backend %box-long-long ( n func -- )
-    T{ int-regs } swap %box ;
+M: x86.64 %box-long-long ( n func -- )
+    int-regs swap %box ;
 
-M: amd64-backend struct-small-enough? ( size -- ? ) 2 cells <= ;
+M: x86.64 struct-small-enough? ( size -- ? ) 2 cells <= ;
 
-M: amd64-backend %box-small-struct ( size -- )
+M: x86.64 %box-small-struct ( size -- )
     #! Box a <= 16-byte struct returned in RAX:RDX.
     RDI RAX MOV
     RSI RDX MOV
     RDX swap MOV
     "box_small_struct" f %alien-invoke ;
 
-M: amd64-backend %box-large-struct ( n size -- )
+M: x86.64 %box-large-struct ( n size -- )
     ! Struct size is parameter 2
     RSI over MOV
     ! Compute destination address
@@ -125,27 +123,27 @@ M: amd64-backend %box-large-struct ( n size -- )
     ! Copy the struct from the C stack
     "box_value_struct" f %alien-invoke ;
 
-M: amd64-backend %prepare-box-struct ( size -- )
+M: x86.64 %prepare-box-struct ( size -- )
     ! Compute target address for value struct return
     RAX RSP rot f struct-return@ [+] LEA
     RSP 0 [+] RAX MOV ;
 
-M: amd64-backend %prepare-var-args RAX RAX XOR ;
+M: x86.64 %prepare-var-args RAX RAX XOR ;
 
-M: amd64-backend %alien-invoke ( symbol dll -- )
+M: x86.64 %alien-invoke ( symbol dll -- )
     0 address-operand >r rc-absolute-cell rel-dlsym r> CALL ;
 
-M: amd64-backend %prepare-alien-indirect ( -- )
+M: x86.64 %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
     cell temp@ RAX MOV ;
 
-M: amd64-backend %alien-indirect ( -- )
+M: x86.64 %alien-indirect ( -- )
     cell temp@ CALL ;
 
-M: amd64-backend %alien-callback ( quot -- )
+M: x86.64 %alien-callback ( quot -- )
     RDI load-indirect "c_to_factor" f %alien-invoke ;
 
-M: amd64-backend %callback-value ( ctype -- )
+M: x86.64 %callback-value ( ctype -- )
     ! Save top of data stack
     %prepare-unbox
     ! Put former top of data stack in RDI
@@ -157,9 +155,9 @@ M: amd64-backend %callback-value ( ctype -- )
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
-M: amd64-backend %cleanup ( alien-node -- ) drop ;
+M: x86.64 %cleanup ( alien-node -- ) drop ;
 
-M: amd64-backend %unwind ( n -- ) drop %epilogue-later 0 RET ;
+M: x86.64 %unwind ( n -- ) drop %epilogue-later 0 RET ;
 
 USE: cpu.x86.intrinsics
 
@@ -171,11 +169,9 @@ USE: cpu.x86.intrinsics
 \ alien-signed-4 small-reg-32 define-signed-getter
 \ set-alien-signed-4 small-reg-32 define-setter
 
-T{ x86-backend f 8 } compiler-backend set-global
-
 ! The ABI for passing structs by value is pretty messed up
 << "void*" c-type clone "__stack_value" define-primitive-type
-T{ stack-params } "__stack_value" c-type set-c-type-reg-class >>
+stack-params "__stack_value" c-type set-c-type-reg-class >>
 
 : struct-types&offset ( struct-type -- pairs )
     struct-type-fields [
@@ -197,7 +193,7 @@ M: struct-type flatten-value-type ( type -- seq )
     ] [
         struct-types&offset split-struct [
             [ c-type c-type-reg-class ] map
-            T{ int-regs } swap member?
+            int-regs swap member?
             "void*" "double" ? c-type ,
         ] each
     ] if ;

@@ -1,9 +1,8 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: serialize sequences concurrency.messaging
-threads io io.server qualified arrays
-namespaces kernel io.encodings.binary combinators.cleave
-new-slots accessors ;
+USING: serialize sequences concurrency.messaging threads io
+io.server qualified arrays namespaces kernel io.encodings.binary
+accessors ;
 QUALIFIED: io.sockets
 IN: concurrency.distributed
 

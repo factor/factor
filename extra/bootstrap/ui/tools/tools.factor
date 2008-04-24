@@ -1,7 +1,7 @@
 USING: kernel vocabs vocabs.loader sequences system ;
 
 { "ui" "help" "tools" }
-[ "bootstrap." swap append vocab ] all? [
+[ "bootstrap." prepend vocab ] all? [
     "ui.tools" require
 
     "ui.cocoa" vocab [

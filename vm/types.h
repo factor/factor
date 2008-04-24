@@ -96,9 +96,32 @@ DEFINE_UNTAG(F_QUOTATION,QUOTATION_TYPE,quotation)
 
 DEFINE_UNTAG(F_WORD,WORD_TYPE,word)
 
-INLINE CELL tag_tuple(F_ARRAY *tuple)
+INLINE CELL tag_tuple(F_TUPLE *tuple)
 {
 	return RETAG(tuple,TUPLE_TYPE);
+}
+
+INLINE F_TUPLE *untag_tuple(CELL object)
+{
+	type_check(TUPLE_TYPE,object);
+	return untag_object(object);
+}
+
+INLINE CELL tuple_size(F_TUPLE_LAYOUT *layout)
+{
+	CELL size = untag_fixnum_fast(layout->size);
+	return sizeof(F_TUPLE) + size * CELLS;
+}
+
+INLINE CELL tuple_nth(F_TUPLE *tuple, CELL slot)
+{
+	return get(AREF(tuple,slot));
+}
+
+INLINE void set_tuple_nth(F_TUPLE *tuple, CELL slot, CELL value)
+{
+	put(AREF(tuple,slot),value);
+	write_barrier((CELL)tuple);
 }
 
 /* Prototypes */
@@ -116,12 +139,11 @@ CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 DECLARE_PRIMITIVE(array);
 DECLARE_PRIMITIVE(tuple);
 DECLARE_PRIMITIVE(tuple_boa);
+DECLARE_PRIMITIVE(tuple_layout);
 DECLARE_PRIMITIVE(byte_array);
 DECLARE_PRIMITIVE(bit_array);
 DECLARE_PRIMITIVE(float_array);
 DECLARE_PRIMITIVE(clone);
-DECLARE_PRIMITIVE(tuple_to_array);
-DECLARE_PRIMITIVE(to_tuple);
 
 F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill);
 DECLARE_PRIMITIVE(resize_array);
@@ -138,24 +160,20 @@ DECLARE_PRIMITIVE(resize_string);
 F_STRING *memory_to_char_string(const char *string, CELL length);
 F_STRING *from_char_string(const char *c_string);
 DLLEXPORT void box_char_string(const char *c_string);
-DECLARE_PRIMITIVE(alien_to_char_string);
 
 F_STRING *memory_to_u16_string(const u16 *string, CELL length);
 F_STRING *from_u16_string(const u16 *c_string);
 DLLEXPORT void box_u16_string(const u16 *c_string);
-DECLARE_PRIMITIVE(alien_to_u16_string);
 
 void char_string_to_memory(F_STRING *s, char *string);
 F_BYTE_ARRAY *string_to_char_alien(F_STRING *s, bool check);
 char* to_char_string(F_STRING *s, bool check);
 DLLEXPORT char *unbox_char_string(void);
-DECLARE_PRIMITIVE(string_to_char_alien);
 
 void u16_string_to_memory(F_STRING *s, u16 *string);
 F_BYTE_ARRAY *string_to_u16_alien(F_STRING *s, bool check);
 u16* to_u16_string(F_STRING *s, bool check);
 DLLEXPORT u16 *unbox_u16_string(void);
-DECLARE_PRIMITIVE(string_to_u16_alien);
 
 /* String getters and setters */
 CELL string_nth(F_STRING* string, CELL index);

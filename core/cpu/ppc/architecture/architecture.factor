@@ -7,8 +7,6 @@ layouts classes words.private alien combinators
 compiler.constants ;
 IN: cpu.ppc.architecture
 
-TUPLE: ppc-backend ;
-
 ! PowerPC register assignments
 ! r3-r10, r16-r31: integer vregs
 ! f0-f13: float vregs
@@ -21,14 +19,14 @@ TUPLE: ppc-backend ;
 
 : reserved-area-size
     os {
-        { "linux" [ 2 ] }
-        { "macosx" [ 6 ] }
+        { linux [ 2 ] }
+        { macosx [ 6 ] }
     } case cells ; foldable
 
 : lr-save
     os {
-        { "linux" [ 1 ] }
-        { "macosx" [ 2 ] }
+        { linux [ 1 ] }
+        { macosx [ 2 ] }
     } case cells ; foldable
 
 : param@ ( n -- x ) reserved-area-size + ; inline
@@ -44,7 +42,7 @@ TUPLE: ppc-backend ;
 
 : xt-save ( n -- i ) 2 cells - ;
 
-M: ppc-backend stack-frame ( n -- i )
+M: ppc stack-frame ( n -- i )
     local@ factor-area-size + 4 cells align ;
 
 M: temp-reg v>operand drop 11 ;
@@ -60,8 +58,8 @@ M: int-regs vregs
 M: float-regs return-reg drop 1 ;
 M: float-regs param-regs 
     drop os H{
-        { "macosx" { 1 2 3 4 5 6 7 8 9 10 11 12 13 } }
-        { "linux" { 1 2 3 4 5 6 7 8 } }
+        { macosx { 1 2 3 4 5 6 7 8 9 10 11 12 13 } }
+        { linux { 1 2 3 4 5 6 7 8 } }
     } at ;
 M: float-regs vregs drop { 0 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
 
@@ -71,16 +69,16 @@ M: ds-loc loc>operand ds-loc-n cells neg ds-reg swap ;
 M: rs-loc loc>operand rs-loc-n cells neg rs-reg swap ;
 
 M: immediate load-literal
-    [ v>operand ] 2apply LOAD ;
+    [ v>operand ] bi@ LOAD ;
 
-M: ppc-backend load-indirect ( obj reg -- )
+M: ppc load-indirect ( obj reg -- )
     [ 0 swap LOAD32 rc-absolute-ppc-2/2 rel-literal ] keep
     dup 0 LWZ ;
 
-M: ppc-backend %save-word-xt ( -- )
+M: ppc %save-word-xt ( -- )
     0 11 LOAD32 rc-absolute-ppc-2/2 rel-this ;
 
-M: ppc-backend %prologue ( n -- )
+M: ppc %prologue ( n -- )
     0 MFLR
     1 1 pick neg ADDI
     11 1 pick xt-save STW
@@ -88,7 +86,7 @@ M: ppc-backend %prologue ( n -- )
     11 1 pick next-save STW
     0 1 rot lr-save + STW ;
 
-M: ppc-backend %epilogue ( n -- )
+M: ppc %epilogue ( n -- )
     #! At the end of each word that calls a subroutine, we store
     #! the previous link register value in r0 by popping it off
     #! the stack, set the link register to the contents of r0,
@@ -104,14 +102,14 @@ M: ppc-backend %epilogue ( n -- )
 : %load-dlsym ( symbol dll register -- )
     0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
 
-M: ppc-backend %call ( label -- ) BL ;
+M: ppc %call ( label -- ) BL ;
 
-M: ppc-backend %jump-label ( label -- ) B ;
+M: ppc %jump-label ( label -- ) B ;
 
-M: ppc-backend %jump-t ( label -- )
-    0 "flag" operand f v>operand CMPI BNE ;
+M: ppc %jump-f ( label -- )
+    0 "flag" operand f v>operand CMPI BEQ ;
 
-M: ppc-backend %dispatch ( -- )
+M: ppc %dispatch ( -- )
     [
         %epilogue-later
         0 11 LOAD32 rc-absolute-ppc-2/2 rel-here
@@ -124,35 +122,43 @@ M: ppc-backend %dispatch ( -- )
         { +scratch+ { { f "offset" } } }
     } with-template ;
 
-M: ppc-backend %dispatch-label ( word -- )
+M: ppc %dispatch-label ( word -- )
     0 , rc-absolute-cell rel-word ;
 
-M: ppc-backend %return ( -- ) %epilogue-later BLR ;
+M: ppc %return ( -- ) %epilogue-later BLR ;
 
-M: ppc-backend %unwind drop %return ;
+M: ppc %unwind drop %return ;
 
-M: ppc-backend %peek ( vreg loc -- )
+M: ppc %peek ( vreg loc -- )
     >r v>operand r> loc>operand LWZ ;
 
-M: ppc-backend %replace
+M: ppc %replace
     >r v>operand r> loc>operand STW ;
 
-M: ppc-backend %unbox-float ( dst src -- )
-    [ v>operand ] 2apply float-offset LFD ;
+M: ppc %unbox-float ( dst src -- )
+    [ v>operand ] bi@ float-offset LFD ;
 
-M: ppc-backend %inc-d ( n -- ) ds-reg dup rot cells ADDI ;
+M: ppc %inc-d ( n -- ) ds-reg dup rot cells ADDI ;
 
-M: ppc-backend %inc-r ( n -- ) rs-reg dup rot cells ADDI ;
+M: ppc %inc-r ( n -- ) rs-reg dup rot cells ADDI ;
 
 M: int-regs %save-param-reg drop 1 rot local@ STW ;
 
 M: int-regs %load-param-reg drop 1 rot local@ LWZ ;
 
-: STF float-regs-size 4 = [ STFS ] [ STFD ] if ;
+GENERIC: STF ( src dst off reg-class -- )
+
+M: single-float-regs STF drop STFS ;
+
+M: double-float-regs STF drop STFD ;
 
 M: float-regs %save-param-reg >r 1 rot local@ r> STF ;
 
-: LF float-regs-size 4 = [ LFS ] [ LFD ] if ;
+GENERIC: LF ( dst src off reg-class -- )
+
+M: single-float-regs LF drop LFS ;
+
+M: double-float-regs LF drop LFD ;
 
 M: float-regs %load-param-reg >r 1 rot local@ r> LF ;
 
@@ -166,19 +172,19 @@ M: stack-params %save-param-reg ( stack reg reg-class -- )
     0 1 rot param@ stack-frame* + LWZ
     0 1 rot local@ STW ;
 
-M: ppc-backend %prepare-unbox ( -- )
+M: ppc %prepare-unbox ( -- )
     ! First parameter is top of stack
     3 ds-reg 0 LWZ
     ds-reg dup cell SUBI ;
 
-M: ppc-backend %unbox ( n reg-class func -- )
+M: ppc %unbox ( n reg-class func -- )
     ! Value must be in r3
     ! Call the unboxer
     f %alien-invoke
     ! Store the return value on the C stack
     over [ [ return-reg ] keep %save-param-reg ] [ 2drop ] if ;
 
-M: ppc-backend %unbox-long-long ( n func -- )
+M: ppc %unbox-long-long ( n func -- )
     ! Value must be in r3:r4
     ! Call the unboxer
     f %alien-invoke
@@ -188,7 +194,7 @@ M: ppc-backend %unbox-long-long ( n func -- )
         4 1 rot cell + local@ STW
     ] when* ;
 
-M: ppc-backend %unbox-large-struct ( n size -- )
+M: ppc %unbox-large-struct ( n size -- )
     ! Value must be in r3
     ! Compute destination address
     4 1 roll local@ ADDI
@@ -197,7 +203,7 @@ M: ppc-backend %unbox-large-struct ( n size -- )
     ! Call the function
     "to_value_struct" f %alien-invoke ;
 
-M: ppc-backend %box ( n reg-class func -- )
+M: ppc %box ( n reg-class func -- )
     ! If the source is a stack location, load it into freg #0.
     ! If the source is f, then we assume the value is already in
     ! freg #0.
@@ -205,7 +211,7 @@ M: ppc-backend %box ( n reg-class func -- )
     over [ 0 over param-reg swap %load-param-reg ] [ 2drop ] if
     r> f %alien-invoke ;
 
-M: ppc-backend %box-long-long ( n func -- )
+M: ppc %box-long-long ( n func -- )
     >r [
         3 1 pick local@ LWZ
         4 1 rot cell + local@ LWZ
@@ -215,12 +221,12 @@ M: ppc-backend %box-long-long ( n func -- )
 
 : struct-return@ ( size n -- n ) [ local@ ] [ temp@ ] ?if ;
 
-M: ppc-backend %prepare-box-struct ( size -- )
+M: ppc %prepare-box-struct ( size -- )
     #! Compute target address for value struct return
     3 1 rot f struct-return@ ADDI
     3 1 0 local@ STW ;
 
-M: ppc-backend %box-large-struct ( n size -- )
+M: ppc %box-large-struct ( n size -- )
     #! If n = f, then we're boxing a returned struct
     [ swap struct-return@ ] keep
     ! Compute destination address
@@ -230,7 +236,7 @@ M: ppc-backend %box-large-struct ( n size -- )
     ! Call the function
     "box_value_struct" f %alien-invoke ;
 
-M: ppc-backend %prepare-alien-invoke
+M: ppc %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
@@ -240,20 +246,20 @@ M: ppc-backend %prepare-alien-invoke
     ds-reg 11 8 STW
     rs-reg 11 12 STW ;
 
-M: ppc-backend %alien-invoke ( symbol dll -- )
+M: ppc %alien-invoke ( symbol dll -- )
     11 %load-dlsym (%call) ;
 
-M: ppc-backend %alien-callback ( quot -- )
+M: ppc %alien-callback ( quot -- )
     3 load-indirect "c_to_factor" f %alien-invoke ;
 
-M: ppc-backend %prepare-alien-indirect ( -- )
+M: ppc %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
     3 1 cell temp@ STW ;
 
-M: ppc-backend %alien-indirect ( -- )
+M: ppc %alien-indirect ( -- )
     11 1 cell temp@ LWZ (%call) ;
 
-M: ppc-backend %callback-value ( ctype -- )
+M: ppc %callback-value ( ctype -- )
      ! Save top of data stack
      3 ds-reg 0 LWZ
      3 1 0 local@ STW
@@ -264,7 +270,7 @@ M: ppc-backend %callback-value ( ctype -- )
      ! Unbox former top of data stack to return registers
      unbox-return ;
 
-M: ppc-backend %cleanup ( alien-node -- ) drop ;
+M: ppc %cleanup ( alien-node -- ) drop ;
 
 : %untag ( src dest -- ) 0 0 31 tag-bits get - RLWINM ;
 
@@ -272,34 +278,34 @@ M: ppc-backend %cleanup ( alien-node -- ) drop ;
 
 : %untag-fixnum ( dest src -- ) tag-bits get SRAWI ;
 
-M: ppc-backend value-structs?
+M: ppc value-structs?
     #! On Linux/PPC, value structs are passed in the same way
     #! as reference structs, we just have to make a copy first.
-    linux? not ;
+    os linux? not ;
 
-M: ppc-backend fp-shadows-int? ( -- ? ) macosx? ;
+M: ppc fp-shadows-int? ( -- ? ) os macosx? ;
 
-M: ppc-backend small-enough? ( n -- ? ) -32768 32767 between? ;
+M: ppc small-enough? ( n -- ? ) -32768 32767 between? ;
 
-M: ppc-backend struct-small-enough? ( size -- ? ) drop f ;
+M: ppc struct-small-enough? ( size -- ? ) drop f ;
 
-M: ppc-backend %box-small-struct
+M: ppc %box-small-struct
     drop "No small structs" throw ;
 
-M: ppc-backend %unbox-small-struct
+M: ppc %unbox-small-struct
     drop "No small structs" throw ;
 
 ! Alien intrinsics
-M: ppc-backend %unbox-byte-array ( dst src -- )
-    [ v>operand ] 2apply byte-array-offset ADDI ;
+M: ppc %unbox-byte-array ( dst src -- )
+    [ v>operand ] bi@ byte-array-offset ADDI ;
 
-M: ppc-backend %unbox-alien ( dst src -- )
-    [ v>operand ] 2apply alien-offset LWZ ;
+M: ppc %unbox-alien ( dst src -- )
+    [ v>operand ] bi@ alien-offset LWZ ;
 
-M: ppc-backend %unbox-f ( dst src -- )
+M: ppc %unbox-f ( dst src -- )
     drop 0 swap v>operand LI ;
 
-M: ppc-backend %unbox-any-c-ptr ( dst src -- )
+M: ppc %unbox-any-c-ptr ( dst src -- )
     { "is-byte-array" "end" "start" } [ define-label ] each
     ! Address is computed in R12
     0 12 LI

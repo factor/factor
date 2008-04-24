@@ -11,7 +11,18 @@ HELP: parse
 }
 { $description 
     "Given the input string, parse it using the given parser. The result is a <parse-result> object if "
-    "the parse was successful, otherwise it is f." } ;
+    "the parse was successful, otherwise it is f." } 
+{ $see-also compile } ;
+
+HELP: compile
+{ $values 
+  { "parser" "a parser" } 
+  { "word" "a word" } 
+}
+{ $description 
+    "Compile the parser to a word. The word will have stack effect ( -- result )."
+} 
+{ $see-also parse } ;
 
 HELP: token
 { $values 
@@ -84,6 +95,19 @@ HELP: optional
     "Returns a parser that parses 0 or 1 instances of the 'p1' parser. The AST produced is "
     "'f' if 0 instances are parsed the AST produced is 'f', otherwise it is the AST produced by 'p1'." } ;
 
+HELP: semantic
+{ $values 
+  { "parser" "a parser" } 
+  { "quot" "a quotation with stack effect ( object -- bool )" } 
+}
+{ $description 
+    "Returns a parser that succeeds if the 'p1' parser succeeds and the quotation called with "
+    "the AST produced by 'p1' on the stack returns true." }
+{ $examples 
+  { $example "USING: kernel math peg prettyprint ;" "\"A\" [ drop t ] satisfy [ 66 > ] semantic parse ." "f" } 
+  { $example "USING: kernel math peg prettyprint ;" "\"C\" [ drop t ] satisfy [ 66 > ] semantic parse parse-result-ast ." "67" } 
+} ;
+
 HELP: ensure
 { $values 
   { "parser" "a parser" } 
@@ -113,7 +137,7 @@ HELP: action
     "Returns a parser that calls the 'p1' parser and applies the quotation to the AST resulting "
     "from that parse. The result of the quotation is then used as the final AST. This can be used "
     "for manipulating the parse tree to produce a AST better suited for the task at hand rather than "
-    "the default AST." }
+    "the default AST. If the quotation returns " { $link fail } " then the parser fails." }
 { $code "CHAR: 0 CHAR: 9 range [ to-digit ] action" } ;
 
 HELP: sp
@@ -141,4 +165,17 @@ HELP: delay
 { $description 
     "Delays the construction of a parser until it is actually required to parse. This " 
     "allows for calling a parser that results in a recursive call to itself. The quotation "
-    "should return the constructed parser." } ;
+    "should return the constructed parser and is called the first time the parser is run."
+    "The compiled result is memoized for future runs. See " { $link box } " for a word "
+    "that calls the quotation at compile time." } ;
+
+HELP: box
+{ $values 
+  { "quot" "a quotation" } 
+  { "parser" "a parser" } 
+}
+{ $description 
+    "Delays the construction of a parser until the parser is compiled. The quotation "
+    "should return the constructed parser and is called when the parser is compiled."
+    "The compiled result is memoized for future runs. See " { $link delay } " for a word "
+    "that calls the quotation at runtime." } ;

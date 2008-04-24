@@ -48,7 +48,7 @@ SYMBOL: elements
 
 TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 
-: <element> element construct-empty ;
+: <element> element new ;
 
 : set-id ( -- boolean )
     read1 dup elements get set-element-id ;
@@ -135,18 +135,18 @@ SYMBOL: end
 GENERIC: >ber ( obj -- byte-array )
 M: fixnum >ber ( n -- byte-array )
     >128-ber dup length 2 swap 2array
-    "cc" pack-native swap append ;
+    "cc" pack-native prepend ;
 
 : >ber-enumerated ( n -- byte-array )
     >128-ber >byte-array dup length 10 swap 2array
-    "CC" pack-native swap append ;
+    "CC" pack-native prepend ;
 
 : >ber-length-encoding ( n -- byte-array )
     dup 127 <= [
         1array "C" pack-be
     ] [
         1array "I" pack-be 0 swap remove dup length
-        HEX: 80 + 1array "C" pack-be swap append
+        HEX: 80 + 1array "C" pack-be prepend
     ] if ;
 
 ! =========================================================
@@ -158,7 +158,7 @@ M: bignum >ber ( n -- byte-array )
     dup 126 > [
         "range error in bignum" throw
     ] [
-        2 swap 2array "CC" pack-native swap append
+        2 swap 2array "CC" pack-native prepend
     ] if ;
 
 ! =========================================================
@@ -172,7 +172,7 @@ SYMBOL: tagnum
 
 TUPLE: tag value ;
 
-: <tag> ( -- <tag> ) 4 tag construct-boa ;
+: <tag> ( -- <tag> ) 4 tag boa ;
 
 : with-ber ( quot -- )
     [

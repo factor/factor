@@ -425,7 +425,7 @@ M: cpu reset ( cpu -- )
   [ HEX: 10 swap set-cpu-last-interrupt ] keep
   0 swap set-cpu-cycles ;
 
-: <cpu> ( -- cpu ) cpu construct-empty dup reset ;
+: <cpu> ( -- cpu ) cpu new dup reset ;
 
 : (load-rom) ( n ram -- )
   read1 [ ! n ram ch
@@ -446,7 +446,7 @@ M: cpu reset ( cpu -- )
 SYMBOL: rom-root
 
 : rom-dir ( -- string )
-  rom-root get [ home "roms" path+ dup exists? [ drop f ] unless ] unless* ;
+  rom-root get [ home "roms" append-path dup exists? [ drop f ] unless ] unless* ;
 
 : load-rom* ( seq cpu -- )
   #! 'seq' is an array of arrays. Each array contains
@@ -455,7 +455,7 @@ SYMBOL: rom-root
   #! file path shoul dbe relative to the '/roms' resource path.
   rom-dir [
     cpu-ram [
-      swap first2 rom-dir swap path+ binary [      
+      swap first2 rom-dir prepend-path binary [      
         swap (load-rom)
       ] with-file-reader
     ] curry each 
@@ -1027,14 +1027,14 @@ SYMBOL: $4
   8-bit-registers sp <&>
   "," token <& 
   8-bit-registers <&>
-  just [ first2 swap first2 swap >r swap append r> curry ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
 : ADC-R,(RR)-instruction ( -- parser )
   "ADC-R,(RR)" "ADC" complex-instruction
   8-bit-registers sp <&>
   "," token <& 
   16-bit-registers indirect <&>
-  just [ first2 swap first2 swap >r swap append r> curry ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
 : SBC-R,N-instruction ( -- parser )
   "SBC-R,N" "SBC" complex-instruction
@@ -1047,14 +1047,14 @@ SYMBOL: $4
   8-bit-registers sp <&>
   "," token <& 
   8-bit-registers <&>
-  just [ first2 swap first2 swap >r swap append r> curry  ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry  ] <@ ;  
 
 : SBC-R,(RR)-instruction ( -- parser )
   "SBC-R,(RR)" "SBC" complex-instruction
   8-bit-registers sp <&>
   "," token <& 
   16-bit-registers indirect  <&>
-  just [ first2 swap first2 swap >r swap append r> curry  ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry  ] <@ ;  
 
 : SUB-R-instruction ( -- parser )
   "SUB-R" "SUB" complex-instruction
@@ -1082,21 +1082,21 @@ SYMBOL: $4
   8-bit-registers sp <&>
   "," token <& 
   8-bit-registers <&>
-  just [ first2 swap first2 swap >r swap append r> curry ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
 : ADD-RR,RR-instruction ( -- parser )
   "ADD-RR,RR" "ADD" complex-instruction
   16-bit-registers sp <&>
   "," token <& 
   16-bit-registers <&>
-  just [ first2 swap first2 swap >r swap append r> curry ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
 : ADD-R,(RR)-instruction ( -- parser )
   "ADD-R,(RR)" "ADD" complex-instruction
   8-bit-registers sp <&>
   "," token <& 
   16-bit-registers indirect <&>
-  just [ first2 swap first2 swap >r swap append r> curry ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
   
 : LD-RR,NN-instruction
   #! LD BC,nn
@@ -1124,28 +1124,28 @@ SYMBOL: $4
   16-bit-registers indirect sp <&> 
   "," token <&
   8-bit-registers <&>
-  just [ first2 swap first2 swap >r swap append r> curry ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
 : LD-R,R-instruction
   "LD-R,R" "LD" complex-instruction
   8-bit-registers sp <&> 
   "," token <&
   8-bit-registers <&>
-  just [ first2 swap first2 swap >r swap append r> curry ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
 : LD-RR,RR-instruction
   "LD-RR,RR" "LD" complex-instruction
   16-bit-registers sp <&> 
   "," token <&
   16-bit-registers <&>
-  just [ first2 swap first2 swap >r swap append r> curry ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
 : LD-R,(RR)-instruction
   "LD-R,(RR)" "LD" complex-instruction
   8-bit-registers sp <&> 
   "," token <&
   16-bit-registers indirect <&>
-  just [ first2 swap first2 swap >r swap append r> curry ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
 : LD-(NN),RR-instruction
   "LD-(NN),RR" "LD" complex-instruction
@@ -1194,14 +1194,14 @@ SYMBOL: $4
   16-bit-registers indirect sp <&> 
   "," token <&
   16-bit-registers <&>
-  just [ first2 swap first2 swap >r swap append r> curry ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
 : EX-RR,RR-instruction
   "EX-RR,RR" "EX" complex-instruction
   16-bit-registers sp <&> 
   "," token <&
   16-bit-registers <&>
-  just [ first2 swap first2 swap >r swap append r> curry ] <@ ;  
+  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
 : 8080-generator-parser
   NOP-instruction 

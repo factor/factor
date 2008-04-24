@@ -42,7 +42,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	UNREGISTER_ROOT(name);
 	UNREGISTER_ROOT(vocab);
 
-	word->hashcode = tag_fixnum(rand());
+	word->hashcode = tag_fixnum((rand() << 16) ^ rand());
 	word->vocabulary = vocab;
 	word->name = name;
 	word->def = userenv[UNDEFINED_ENV];
@@ -50,6 +50,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->counter = tag_fixnum(0);
 	word->compiledp = F;
 	word->profiling = NULL;
+	word->code = NULL;
 
 	REGISTER_UNTAGGED(word);
 	default_word_code(word,true);
@@ -108,8 +109,11 @@ F_ARRAY *allot_array(CELL type, CELL capacity, CELL fill)
 		memset((void*)AREF(array,0),'\0',capacity * CELLS);
 	else
 	{
+		/* No need for write barrier here. Either the object is in
+		the nursery, or it was allocated directly in tenured space
+		and the write barrier is already hit for us in that case. */
 		for(i = 0; i < capacity; i++)
-			set_array_nth(array,i,fill);
+			put(AREF(array,i),fill);
 	}
 	return array;
 }
@@ -181,7 +185,7 @@ F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill)
 	memcpy(new_array + 1,array + 1,to_copy * CELLS);
 
 	for(i = to_copy; i < capacity; i++)
-		set_array_nth(new_array,i,fill);
+		put(AREF(new_array,i),fill);
 
 	return new_array;
 }
@@ -221,6 +225,8 @@ F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
 		result = reallot_array(result,new_size * 2,F);
 
 	UNREGISTER_UNTAGGED(elts);
+
+	write_barrier((CELL)result);
 
 	memcpy((void*)AREF(result,*result_count),(void*)AREF(elts,0),elts_size * CELLS);
 
@@ -379,45 +385,61 @@ DEFINE_PRIMITIVE(resize_float_array)
 	dpush(tag_object(reallot_float_array(array,capacity)));
 }
 
+/* Tuple layouts */
+DEFINE_PRIMITIVE(tuple_layout)
+{
+	F_TUPLE_LAYOUT *layout = allot_object(TUPLE_LAYOUT_TYPE,sizeof(F_TUPLE_LAYOUT));
+	layout->echelon = dpop();
+	layout->superclasses = dpop();
+	layout->size = dpop();
+	layout->class = dpop();
+	layout->hashcode = untag_word(layout->class)->hashcode;
+	dpush(tag_object(layout));
+}
+
 /* Tuples */
 
 /* push a new tuple on the stack */
+F_TUPLE *allot_tuple(F_TUPLE_LAYOUT *layout)
+{
+	REGISTER_UNTAGGED(layout);
+	F_TUPLE *tuple = allot_object(TUPLE_TYPE,tuple_size(layout));
+	UNREGISTER_UNTAGGED(layout);
+	tuple->layout = tag_object(layout);
+	return tuple;
+}
+
 DEFINE_PRIMITIVE(tuple)
 {
-	CELL size = unbox_array_size();
-	F_ARRAY *array = allot_array(TUPLE_TYPE,size,F);
-	set_array_nth(array,0,dpop());
-	dpush(tag_tuple(array));
+	F_TUPLE_LAYOUT *layout = untag_object(dpop());
+	F_FIXNUM size = to_fixnum(layout->size);
+
+	F_TUPLE *tuple = allot_tuple(layout);
+	F_FIXNUM i;
+	for(i = size - 1; i >= 0; i--)
+		put(AREF(tuple,i),F);
+
+	dpush(tag_tuple(tuple));
 }
 
 /* push a new tuple on the stack, filling its slots from the stack */
 DEFINE_PRIMITIVE(tuple_boa)
 {
-	CELL size = unbox_array_size();
-	F_ARRAY *array = allot_array(TUPLE_TYPE,size,F);
-	set_array_nth(array,0,dpop());
+	F_TUPLE_LAYOUT *layout = untag_object(dpop());
+	F_FIXNUM size = to_fixnum(layout->size);
 
-	CELL i;
-	for(i = size - 1; i >= 2; i--)
-		set_array_nth(array,i,dpop());
+	REGISTER_UNTAGGED(layout);
+	F_TUPLE *tuple = allot_tuple(layout);
+	UNREGISTER_UNTAGGED(layout);
 
-	dpush(tag_tuple(array));
-}
+	/* set delegate slot */
+	put(AREF(tuple,0),F);
 
-DEFINE_PRIMITIVE(tuple_to_array)
-{
-	CELL object = dpeek();
-	type_check(TUPLE_TYPE,object);
-	object = RETAG(clone(object),OBJECT_TYPE);
-	set_slot(object,0,tag_header(ARRAY_TYPE));
-	drepl(object);
-}
+	F_FIXNUM i;
+	for(i = size - 1; i >= 1; i--)
+		put(AREF(tuple,i),dpop());
 
-DEFINE_PRIMITIVE(to_tuple)
-{
-	CELL object = RETAG(clone(dpeek()),TUPLE_TYPE);
-	set_slot(object,0,tag_header(TUPLE_TYPE));
-	drepl(object);
+	dpush(tag_tuple(tuple));
 }
 
 /* Strings */
@@ -451,6 +473,8 @@ void set_string_nth(F_STRING* string, CELL index, CELL value)
 				untag_fixnum_fast(string->length)
 				* sizeof(u16));
 			UNREGISTER_UNTAGGED(string);
+
+			write_barrier((CELL)string);
 			string->aux = tag_object(aux);
 		}
 	}
@@ -533,9 +557,10 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
 		REGISTER_UNTAGGED(string);
 		REGISTER_UNTAGGED(new_string);
 		F_BYTE_ARRAY *new_aux = allot_byte_array(capacity * sizeof(u16));
-		new_string->aux = tag_object(new_aux);
 		UNREGISTER_UNTAGGED(new_string);
 		UNREGISTER_UNTAGGED(string);
+
+		new_string->aux = tag_object(new_aux);
 
 		F_BYTE_ARRAY *aux = untag_object(string->aux);
 		memcpy(new_aux + 1,aux + 1,to_copy * sizeof(u16));
@@ -583,10 +608,6 @@ DEFINE_PRIMITIVE(resize_string)
 	void box_##type##_string(const type *str) \
 	{ \
 		dpush(str ? tag_object(from_##type##_string(str)) : F); \
-	} \
-	DEFINE_PRIMITIVE(alien_to_##type##_string) \
-	{ \
-		drepl(tag_object(from_##type##_string(alien_offset(dpeek())))); \
 	}
 
 MEMORY_TO_STRING(char,u8)
@@ -646,14 +667,6 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 	type *unbox_##type##_string(void) \
 	{ \
 		return to_##type##_string(untag_string(dpop()),true); \
-	} \
-	DEFINE_PRIMITIVE(string_to_##type##_alien) \
-	{ \
-		CELL string, t; \
-		string = dpeek(); \
-		t = type_of(string); \
-		if(t != ALIEN_TYPE && t != BYTE_ARRAY_TYPE && t != F_TYPE) \
-			drepl(tag_object(string_to_##type##_alien(untag_string(string),true))); \
 	}
 
 STRING_TO_MEMORY(char);

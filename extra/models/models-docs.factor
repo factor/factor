@@ -1,4 +1,4 @@
-USING: help.syntax help.markup kernel math classes tuples
+USING: help.syntax help.markup kernel math classes classes.tuple
 calendar ;
 IN: models
 

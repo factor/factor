@@ -1,3 +1,8 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: io.encodings.binary SYMBOL: binary
+USING: io.encodings kernel ;
+IN: io.encodings.binary
+
+TUPLE: binary ;
+M: binary <encoder> drop ;
+M: binary <decoder> drop ;

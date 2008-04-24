@@ -1,16 +1,16 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel new-slots sequences vectors ;
+USING: accessors assocs kernel sequences vectors ;
 IN: digraphs
 
 TUPLE: digraph ;
 TUPLE: vertex value edges ;
 
 : <digraph> ( -- digraph )
-    digraph construct-empty H{ } clone over set-delegate ;
+    digraph new H{ } clone over set-delegate ;
 
 : <vertex> ( value -- vertex )
-    V{ } clone vertex construct-boa ;
+    V{ } clone vertex boa ;
 
 : add-vertex ( key value digraph -- )
     >r <vertex> swap r> set-at ;

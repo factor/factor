@@ -5,7 +5,7 @@ words strings classes tools.vocabs namespaces io
 io.streams.string prettyprint definitions arrays vectors
 combinators splitting debugger hashtables sorting effects vocabs
 vocabs.loader assocs editors continuations classes.predicate
-macros combinators.lib sequences.lib math ;
+macros combinators.lib sequences.lib math sets ;
 IN: help.lint
 
 : check-example ( element -- )
@@ -39,8 +39,6 @@ IN: help.lint
     {
         $shuffle
         $values-x/y
-        $slot-reader
-        $slot-writer
         $predicate
         $class-description
         $error-description
@@ -61,7 +59,7 @@ IN: help.lint
 
 : check-see-also ( word element -- )
     nip \ $see-also swap elements [
-        1 tail dup prune [ length ] 2apply assert=
+        1 tail dup prune [ length ] bi@ assert=
     ] each ;
 
 : vocab-exists? ( name -- ? )

@@ -52,13 +52,23 @@ GENERIC: extended? ( op -- ? )
 
 M: object extended? drop f ;
 
-PREDICATE: word register "register" word-prop ;
+PREDICATE: register < word
+    "register" word-prop ;
 
-PREDICATE: register register-8 "register-size" word-prop 8 = ;
-PREDICATE: register register-16 "register-size" word-prop 16 = ;
-PREDICATE: register register-32 "register-size" word-prop 32 = ;
-PREDICATE: register register-64 "register-size" word-prop 64 = ;
-PREDICATE: register register-128 "register-size" word-prop 128 = ;
+PREDICATE: register-8 < register
+    "register-size" word-prop 8 = ;
+
+PREDICATE: register-16 < register
+    "register-size" word-prop 16 = ;
+
+PREDICATE: register-32 < register
+    "register-size" word-prop 32 = ;
+
+PREDICATE: register-64 < register
+    "register-size" word-prop 64 = ;
+
+PREDICATE: register-128 < register
+    "register-size" word-prop 128 = ;
 
 M: register extended? "register" word-prop 7 > ;
 
@@ -94,7 +104,7 @@ M: indirect extended? indirect-base extended? ;
     canonicalize-ESP ;
 
 : <indirect> ( base index scale displacement -- indirect )
-    indirect construct-boa dup canonicalize ;
+    indirect boa dup canonicalize ;
 
 : reg-code "register" word-prop 7 bitand ;
 
@@ -179,7 +189,7 @@ UNION: operand register indirect ;
     {
         { [ dup register-128? ] [ drop operand-64? ] }
         { [ dup not ] [ drop operand-64? ] }
-        { [ t ] [ nip operand-64? ] }
+        [ nip operand-64? ]
     } cond and ;
 
 : rex.r
@@ -220,7 +230,7 @@ UNION: operand register indirect ;
 
 : opcode-or ( opcode mask -- opcode' )
     swap dup array?
-    [ 1 cut* first rot bitor add ] [ bitor ] if ;
+    [ 1 cut* first rot bitor suffix ] [ bitor ] if ;
 
 : 1-operand ( op reg rex.w opcode -- )
     #! The 'reg' is not really a register, but a value for the
@@ -285,7 +295,7 @@ GENERIC: (MOV-I) ( src dst -- )
 M: register (MOV-I) t HEX: b8 short-operand cell, ;
 M: operand (MOV-I) BIN: 000 t HEX: c7 1-operand 4, ;
 
-PREDICATE: word callable register? not ;
+PREDICATE: callable < word register? not ;
 
 GENERIC: MOV ( dst src -- )
 M: integer MOV swap (MOV-I) ;

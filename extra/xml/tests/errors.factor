@@ -16,7 +16,7 @@ T{ extra-attrs T{ parsing-error f 1 32 } V{ T{ name f "" "foo" f } }
 T{ bad-version T{ parsing-error f 1 28 } "5 million" } "<?xml version='5 million'?><x/>" xml-error-test
 T{ notags f } "" xml-error-test
 T{ multitags f } "<x/><y/>" xml-error-test
-T{ bad-prolog T{ parsing-error f 1 26 } T{ prolog f "1.0" "iso-8859-1" f }
+T{ bad-prolog T{ parsing-error f 1 26 } T{ prolog f "1.0" "UTF-8" f }
 } "<x/><?xml version='1.0'?>" xml-error-test
 T{ capitalized-prolog T{ parsing-error f 1 6 } "XmL" } "<?XmL version='1.0'?><x/>"
 xml-error-test

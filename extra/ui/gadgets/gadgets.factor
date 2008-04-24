@@ -22,7 +22,7 @@ M: array rect-dim drop { 0 0 } ;
 : rect-extent ( rect -- loc ext ) rect-bounds over v+ ;
 
 : 2rect-extent ( rect rect -- loc1 loc2 ext1 ext2 )
-    [ rect-extent ] 2apply swapd ;
+    [ rect-extent ] bi@ swapd ;
 
 : <extent-rect> ( loc ext -- rect ) over [v-] <rect> ;
 
@@ -44,13 +44,11 @@ M: array rect-dim drop { 0 0 } ;
 : rect-union ( rect1 rect2 -- newrect )
     (rect-union) <extent-rect> ;
 
-TUPLE: gadget
+TUPLE: gadget < identity-tuple
 pref-dim parent children orientation focus
-visible? root? clipped? layout-state graft-state
+visible? root? clipped? layout-state graft-state graft-node
 interior boundary
 model ;
-
-M: gadget equal? 2drop f ;
 
 M: gadget hashcode* drop gadget hashcode* ;
 
@@ -113,7 +111,7 @@ M: gadget children-on nip gadget-children ;
 : fast-children-on ( rect axis children -- from to )
     3dup
     >r >r dup rect-loc swap rect-dim v+
-    r> r> (fast-children-on) [ 1+ ] [ 0 ] if*
+    r> r> (fast-children-on) ?1+
     >r
     >r >r rect-loc
     r> r> (fast-children-on) 0 or
@@ -254,17 +252,20 @@ M: gadget layout* drop ;
 : graft-queue \ graft-queue get ;
 
 : unqueue-graft ( gadget -- )
-    dup graft-queue dlist-delete [ "Not queued" throw ] unless
+    graft-queue over gadget-graft-node delete-node
     dup gadget-graft-state first { t t } { f f } ?
     swap set-gadget-graft-state ;
 
+: (queue-graft) ( gadget flags -- )
+    over set-gadget-graft-state
+    dup graft-queue push-front* swap set-gadget-graft-node
+    notify-ui-thread ;
+
 : queue-graft ( gadget -- )
-    { f t } over set-gadget-graft-state
-    graft-queue push-front notify-ui-thread ;
+    { f t } (queue-graft) ;
 
 : queue-ungraft ( gadget -- )
-    { t f } over set-gadget-graft-state
-    graft-queue push-front notify-ui-thread ;
+    { t f } (queue-graft) ;
 
 : graft-later ( gadget -- )
     dup gadget-graft-state {
@@ -351,7 +352,7 @@ SYMBOL: in-layout?
     swap [ over (add-gadget) ] each relayout ;
 
 : parents ( gadget -- seq )
-    [ dup ] [ [ gadget-parent ] keep ] [ ] unfold nip ;
+    [ gadget-parent ] follow ;
 
 : each-parent ( gadget quot -- ? )
     >r parents r> all? ; inline
@@ -377,7 +378,7 @@ SYMBOL: in-layout?
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ dup not ] [ 2drop f ] }
-        { [ t ] [ gadget-parent child? ] }
+        [ gadget-parent child? ]
     } cond ;
 
 GENERIC: focusable-child* ( gadget -- child/t )
@@ -395,10 +396,10 @@ M: gadget request-focus-on gadget-parent request-focus-on ;
 M: f request-focus-on 2drop ;
 
 : request-focus ( gadget -- )
-    dup focusable-child swap request-focus-on ;
+    [ focusable-child ] keep request-focus-on ;
 
 : focus-path ( world -- seq )
-    [ dup ] [ [ gadget-focus ] keep ] [ ] unfold nip ;
+    [ gadget-focus ] follow ;
 
 : make-gadget ( quot gadget -- gadget )
     [ \ make-gadget rot with-variable ] keep ; inline

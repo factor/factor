@@ -14,7 +14,7 @@ TUPLE: inspector-gadget object pane ;
     ] with-pane ;
 
 : <inspector-gadget> ( -- gadget )
-    inspector-gadget construct-empty
+    inspector-gadget new
     [
         toolbar,
         <pane> g-> set-inspector-gadget-pane <scroller> 1 track,
@@ -41,6 +41,10 @@ inspector-gadget "toolbar" f {
     { f &back }
     { f globals }
     { T{ key-down f f "F1" } inspector-help }
+} define-command-map
+
+inspector-gadget "multi-touch" f {
+    { T{ left-action } &back }
 } define-command-map
 
 M: inspector-gadget tool-scroller

@@ -1,7 +1,7 @@
 USING: help.markup help.syntax kernel sequences words
 math strings vectors quotations generic effects classes
 vocabs.loader definitions io vocabs source-files
-quotations namespaces compiler.units ;
+quotations namespaces compiler.units assocs ;
 IN: parser
 
 ARTICLE: "vocabulary-search-shadow" "Shadowing word names"
@@ -153,6 +153,8 @@ ARTICLE: "parser-files" "Parsing source files"
 { $subsection parse-file }
 { $subsection bootstrap-file }
 "The parser cross-references source files and definitions. This allows it to keep track of removed definitions, and prevent forward references and accidental redefinitions."
+$nl
+"While the above words are useful for one-off experiments, real programs should be written to use the vocabulary system instead; see " { $link "vocabs.loader" } "."
 { $see-also "source-files" } ;
 
 ARTICLE: "parser-usage" "Reflective parser usage"
@@ -161,6 +163,13 @@ ARTICLE: "parser-usage" "Reflective parser usage"
 "The parser can also parse from a stream:"
 { $subsection parse-stream } ;
 
+ARTICLE: "top-level-forms" "Top level forms"
+"Any code outside of a definition is known as a " { $emphasis "top-level form" } "; top-level forms are run after the entire source file has been parsed, regardless of their position in the file."
+$nl
+"Top-level forms do not have access to the " { $link in } " and " { $link use } " variables that were set at parse time, nor do they run inside " { $link with-compilation-unit } "; so meta-programming might require extra work in a top-level form compared with a parsing word."
+$nl
+"Also, top-level forms run in a new dynamic scope, so using " { $link set } " to store values is almost always wrong, since the values will be lost after the top-level form completes. To save values computed by a top-level form, either use " { $link set-global } " or define a new word with the value." ;
+
 ARTICLE: "parser" "The parser"
 "This parser is a general facility for reading textual representations of objects and definitions. The parser is implemented in the " { $vocab-link "parser" } " and " { $vocab-link "syntax" } " vocabularies."
 $nl
@@ -168,6 +177,7 @@ $nl
 { $subsection "vocabulary-search" }
 { $subsection "parser-files" }
 { $subsection "parser-usage" }
+{ $subsection "top-level-forms" }
 "The parser can be extended."
 { $subsection "parsing-words" }
 { $subsection "parser-lexer" }
@@ -224,7 +234,7 @@ HELP: skip
 { $values { "i" "a starting index" } { "seq" sequence } { "?" "a boolean" } { "n" integer } }
 { $description "Skips to the first space character (if " { $snippet "boolean" } " is " { $link f } ") or the first non-space character (otherwise)." } ;
 
-HELP: change-column
+HELP: change-lexer-column
 { $values { "lexer" lexer } { "quot" "a quotation with stack effect " { $snippet "( col line -- newcol )" } } }
 { $description "Applies a quotation to the current column and line text to produce a new column, and moves the lexer position." } ;
 
@@ -284,10 +294,6 @@ HELP: use
 HELP: in
 { $var-description "A variable holding the name of the current vocabulary for new definitions." } ;
 
-HELP: shadow-warnings
-{ $values { "vocab" "an assoc mapping strings to words" } { "vocabs" "a sequence of assocs" } }
-{ $description "Tests if any keys in " { $snippet "vocab" } " shadow keys in the elements of " { $snippet "vocabs" } ", and if so, prints a warning message. These warning messages can be disabled by setting " { $link parser-notes } " to " { $link f } "." } ;
-
 HELP: (use+)
 { $values { "vocab" "an assoc mapping strings to words" } }
 { $description "Adds an assoc at the front of the search path." }
@@ -333,11 +339,13 @@ HELP: CREATE
 { $errors "Throws an error if the end of the line is reached." }
 $parsing-note ;
 
-HELP: no-word
-{ $values { "name" string } { "newword" word } }
-{ $description "Throws a " { $link no-word } " error." }
+HELP: no-word-error
 { $error-description "Thrown if the parser encounters a token which does not name a word in the current vocabulary search path. If any words with this name exist in vocabularies not part of the search path, a number of restarts will offer to add those vocabularies to the search path and use the chosen word." }
 { $notes "Apart from a missing " { $link POSTPONE: USE: } ", this error can also indicate an ordering issue. In Factor, words must be defined before they can be called. Mutual recursion can be implemented via " { $link POSTPONE: DEFER: } "." } ;
+
+HELP: no-word
+{ $values { "name" string } { "newword" word } }
+{ $description "Throws a " { $link no-word-error } "." } ;
 
 HELP: search
 { $values { "str" string } { "word/f" "a word or " { $link f } } }
@@ -349,6 +357,18 @@ HELP: scan-word
 { $description "Reads the next token from parser input. If the token is a valid number literal, it is converted to a number, otherwise the dictionary is searched for a word named by the token. Outputs " { $link f } " if the end of the input has been reached." }
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 $parsing-note ;
+
+HELP: invalid-slot-name
+{ $values { "name" string } }
+{ $description "Throws an " { $link invalid-slot-name } " error." }
+{ $error-description "Thrown by " { $link POSTPONE: TUPLE: } " and " { $link POSTPONE: ERROR: } " if a suspect token appears as a slot name." }
+{ $notes "The suspect tokens are chosen so that the following code raises this parse error, instead of silently greating a tuple with garbage slots:"
+    { $code
+        "TUPLE: my-mistaken-tuple slot-a slot-b"
+        ""
+        ": some-word ( a b c -- ) ... ;"
+    }
+} ;
 
 HELP: unexpected
 { $values { "want" "a " { $link word } " or " { $link f } } { "got" word } }
@@ -443,17 +463,9 @@ HELP: eval
 { $description "Parses Factor source code from a string, and calls the resulting quotation." }
 { $errors "Throws an error if the input is malformed, or if the evaluation itself throws an error." } ;
 
-HELP: outside-usages
-{ $values { "seq" "a sequence of definitions" } { "usages" "an association list mapping definitions to sequences of definitions" } }
-{ $description "Outputs an association list mapping elements of " { $snippet "seq" } " to lists of usages which exclude the definitions in " { $snippet "seq" } " themselves." } ;
-
 HELP: filter-moved
-{ $values { "assoc" "an assoc where the keys are definitions" } { "newassoc" "an assoc where the keys are definitions" } }
-{ $description "Removes all definitions from the assoc which are no longer present in the current " { $link file } "." } ;
-
-HELP: smudged-usage
-{ $values { "usages" "a sequence of definitions which reference removed definitions" } { "referenced" "a sequence of definitions removed from this source file which are still referenced elsewhere" } { "removed" "a sequence of definitions removed from this source file" } }
-{ $description "Collects information about changed word definitioins after parsing." } ;
+{ $values { "assoc1" assoc } { "assoc2" assoc } { "seq" "an seqence of definitions" } }
+{ $description "Removes all definitions from " { $snippet "assoc2" } " which are in " { $snippet "assoc1" } " or are are no longer present in the current " { $link file } "." } ;
 
 HELP: forget-smudged
 { $description "Forgets removed definitions and prints a warning message if any of them are still referenced from other source files." } ;

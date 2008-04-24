@@ -26,11 +26,13 @@ M: pair make-disassemble-cmd
 M: method-spec make-disassemble-cmd
     first2 method make-disassemble-cmd ;
 
+: gdb-binary ( -- string ) "gdb" ;
+
 : run-gdb ( -- lines )
     <process>
         +closed+ >>stdin
         out-file >>stdout
-        [ "gdb" , "-x" , in-file , "-batch" , ] { } make >>command
+        [ gdb-binary , "-x" , in-file , "-batch" , ] { } make >>command
     try-process
     out-file ascii file-lines ;
 

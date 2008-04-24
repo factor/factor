@@ -22,7 +22,7 @@ SYMBOL: visited
 : random-neighbour ( cell -- newcell ) choices random ;
 
 : vertex ( pair -- )
-    first2 [ 0.5 + line-width * ] 2apply glVertex2d ;
+    first2 [ 0.5 + line-width * ] bi@ glVertex2d ;
 
 : (draw-maze) ( cell -- )
     dup vertex
