@@ -37,10 +37,6 @@ HELP: <mirror>
     }
 } ;
 
-HELP: >mirror<
-{ $values { "mirror" mirror } { "obj" object } { "slots" "a sequence of " { $link slot-spec } " instances" } }
-{ $description "Pushes the object being viewed in the mirror together with its slots." } ;
-
 HELP: make-mirror
 { $values { "obj" object } { "assoc" assoc } }
 { $description "Creates an assoc which reflects the internal structure of the object." } ;
