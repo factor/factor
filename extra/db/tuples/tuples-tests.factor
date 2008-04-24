@@ -121,8 +121,16 @@ SYMBOL: person4
     } define-persistent
     "billy" 10 3.14 f f f f f <person> person1 set
     "johnny" 10 3.14 f f f f f <person> person2 set
-    "teddy" 10 3.14 "2008-03-05 16:24:11" "2008-11-22" "12:34:56" B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f <person> person3 set
-    "eddie" 10 3.14 "2008-03-05 16:24:11" "2008-11-22" "12:34:56" f H{ { 1 2 } { 3 4 } { 5 "lol" } } <person> person4 set ;
+    "teddy" 10 3.14
+        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+        B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f <person> person3 set
+    "eddie" 10 3.14
+        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+        f H{ { 1 2 } { 3 4 } { 5 "lol" } } <person> person4 set ;
 
 : assigned-person-schema ( -- )
     person "PERSON"
@@ -139,8 +147,17 @@ SYMBOL: person4
     } define-persistent
     1 "billy" 10 3.14 f f f f f <assigned-person> person1 set
     2 "johnny" 10 3.14 f f f f f <assigned-person> person2 set
-    3 "teddy" 10 3.14 "2008-03-05 16:24:11" "2008-11-22" "12:34:56" B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f <assigned-person> person3 set
-    4 "eddie" 10 3.14 "2008-03-05 16:24:11" "2008-11-22" "12:34:56" f H{ { 1 2 } { 3 4 } { 5 "lol" } } <assigned-person> person4 set ;
+    3 "teddy" 10 3.14
+        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+        B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
+        f <assigned-person> person3 set
+    4 "eddie" 10 3.14
+        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+        f H{ { 1 2 } { 3 4 } { 5 "lol" } } <assigned-person> person4 set ;
 
 TUPLE: paste n summary author channel mode contents timestamp annotations ;
 TUPLE: annotation n paste-id summary author mode contents ;
