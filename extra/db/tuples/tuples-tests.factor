@@ -40,7 +40,7 @@ SYMBOL: person4
 
     [ 1 ] [ person1 get person-the-id ] unit-test
 
-    200 person1 get set-person-the-number
+    [ ] [ 200 person1 get set-person-the-number ] unit-test
 
     [ ] [ person1 get update-tuple ] unit-test
 
@@ -363,3 +363,6 @@ TUPLE: does-not-persist ;
 \ delete-tuple must-infer
 \ select-tuple must-infer
 \ define-persistent must-infer
+\ ensure-table must-infer
+\ create-table must-infer
+\ drop-table must-infer
