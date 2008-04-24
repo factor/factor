@@ -236,3 +236,6 @@ PRIVATE>
 
 : remove-nth ( seq n -- seq' )
     cut-slice 1 tail-slice append ;
+
+: short ( seq n -- seq n' )
+    over length min ; inline
