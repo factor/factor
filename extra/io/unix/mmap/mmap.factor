@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien io io.files kernel math system unix io.unix.backend
-io.mmap ;
+io.mmap io.backend ;
 IN: io.unix.mmap
 
 : open-r/w ( path -- fd ) O_RDWR file-mode open dup io-error ;
@@ -11,7 +11,7 @@ IN: io.unix.mmap
     over MAP_FAILED = [ close (io-error) ] when ;
 
 M: unix <mapped-file> ( path length -- obj )
-    swap >r
+    swap normalize-path >r
     dup PROT_READ PROT_WRITE bitor MAP_FILE MAP_SHARED bitor
     r> mmap-open f mapped-file boa ;
 

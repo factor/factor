@@ -39,7 +39,7 @@ M: monitor set-timeout (>>timeout) ;
 HOOK: (monitor) io-backend ( path recursive? mailbox -- monitor )
 
 : <monitor> ( path recursive? -- monitor )
-    <mailbox> (monitor) ;
+    >r normalize-path r> <mailbox> (monitor) ;
 
 : next-change ( monitor -- path changed )
     [ queue>> ] [ timeout ] bi mailbox-get-timeout first2 ;

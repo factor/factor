@@ -61,6 +61,7 @@ M: wince with-privileges
     nip call ;
 
 : mmap-open ( path access-mode create-mode flProtect access -- handle handle address )
+    >r >r >r >r normalize-path r> r> r> r>
     { "SeCreateGlobalPrivilege" "SeLockMemoryPrivilege" } [
         >r >r 0 open-file dup f r> 0 0 f
         CreateFileMapping [ win32-error=0/f ] keep
