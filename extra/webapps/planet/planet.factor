@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting locals math
 calendar alarms logging concurrency.combinators namespaces
-db.types db.tuples db
+sequences.lib db.types db.tuples db
 rss xml.writer
 http.server
 http.server.crud
@@ -11,8 +11,7 @@ http.server.actions
 http.server.boilerplate
 http.server.templating.chloe
 http.server.components
-http.server.auth.login
-webapps.factor-website ;
+http.server.auth.login ;
 IN: webapps.planet
 
 TUPLE: planet-factor < dispatcher postings ;
@@ -20,7 +19,7 @@ TUPLE: planet-factor < dispatcher postings ;
 : planet-template ( name -- template )
     "resource:extra/webapps/planet/" swap ".xml" 3append <chloe> ;
 
-TUPLE: blog id name www-url atom-url ;
+TUPLE: blog id name www-url feed-url ;
 
 M: blog link-title name>> ;
 
@@ -31,7 +30,7 @@ blog "BLOGS"
     { "id" "ID" INTEGER +native-id+ }
     { "name" "NAME" { VARCHAR 256 } +not-null+ }
     { "www-url" "WWWURL" { VARCHAR 256 } +not-null+ }
-    { "atom-url" "ATOMURL" { VARCHAR 256 } +not-null+ }
+    { "feed-url" "FEEDURL" { VARCHAR 256 } +not-null+ }
 } define-persistent
 
 : init-blog-table blog ensure-table ;
@@ -54,7 +53,6 @@ blog "BLOGS"
 : <blog-form> ( -- form )
     "blog" <form>
         "edit-blog" planet-template >>edit-template
-        "view-blog" planet-template >>view-template
         "blog-admin-link" planet-template >>summary-template
         "id" <integer>
             hidden >>renderer
@@ -65,7 +63,7 @@ blog "BLOGS"
         "www-url" <url>
             t >>required
             add-field
-        "atom-url" <url>
+        "feed-url" <url>
             t >>required
             add-field ;
 
@@ -106,14 +104,11 @@ blog "BLOGS"
             ] >>display
     ] ;
 
-: safe-head ( seq n -- seq' )
-    over length min head ;
-
 :: planet-feed ( planet -- feed )
     feed new
-        "[ planet-factor ]" >>title
+        "Planet Factor" >>title
         "http://planet.factorcode.org" >>link
-        planet postings>> 16 safe-head >>entries ;
+        planet postings>> 16 short head >>entries ;
 
 :: <feed-action> ( planet -- action )
     <action>
@@ -132,7 +127,7 @@ blog "BLOGS"
 
 : fetch-blogroll ( blogroll -- entries )
     dup
-    [ atom-url>> fetch-feed ] parallel-map
+    [ feed-url>> fetch-feed ] parallel-map
     [ >r name>> r> [ <posting> ] with map ] 2map concat ;
 
 : sort-entries ( entries -- entries' )
@@ -140,7 +135,7 @@ blog "BLOGS"
 
 : update-cached-postings ( planet -- )
     "webapps.planet" [
-        blogroll fetch-blogroll sort-entries 8 safe-head
+        blogroll fetch-blogroll sort-entries 8 short head
         >>postings drop
     ] with-logging ;
 
@@ -157,32 +152,20 @@ blog "BLOGS"
         <dispatcher>
             planet-factor <edit-blogroll-action> >>default
 
+            planet-factor <update-action> "update" add-responder
+
             ! Administrative CRUD
-                      blog-ctor ""          <delete-action> "delete-blog" add-responder
-            blog-form blog-ctor             <view-action>   "view-blog"   add-responder
-            blog-form blog-ctor "view-blog" <edit-action>   "edit-blog"   add-responder
+                      blog-ctor "$planet-factor/admin"          <delete-action> "delete-blog" add-responder
+            blog-form blog-ctor "$planet-factor/admin" <edit-action>   "edit-blog"   add-responder
     ] ;
 
 : <planet-factor> ( -- responder )
     planet-factor new-dispatcher
-        dup <planet-action> >>default
+        dup <planet-action> "list" add-main-responder
         dup <feed-action> "feed.xml" add-responder
-        dup <update-action> "update" add-responder
         dup <planet-factor-admin> <protected> "admin" add-responder
     <boilerplate>
         "planet" planet-template >>template ;
- 
-: <planet-app> ( -- responder )
-    <planet-factor> <factor-boilerplate> ;
 
 : start-update-task ( planet -- )
     [ update-cached-postings ] curry 10 minutes every drop ;
-
-: init-planet ( -- )
-    test-db [
-        init-blog-table
-    ] with-db
-
-    <dispatcher>
-        <planet-app> "planet" add-responder
-    main-responder set-global ;

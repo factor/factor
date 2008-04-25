@@ -2,12 +2,16 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:style include="resource:extra/webapps/todo/todo.css" />
+	<t:atom title="Pastebin - Atom" href="$pastebin/feed.xml" />
+
+	<t:style include="resource:extra/webapps/pastebin/pastebin.css" />
 
 	<div class="navbar">
-		  <t:a href="$todo-list/list">List Items</t:a>
-		| <t:a href="$todo-list/edit">Add Item</t:a>
+		  <t:a href="$pastebin/list">Pastes</t:a>
+		| <t:a href="$pastebin/new-paste">New Paste</t:a>
+		| <t:a href="$pastebin/feed.xml">Atom Feed</t:a>
 
+		<t:comment>
 		<t:if code="http.server.auth.login:allow-edit-profile?">
 			| <t:a href="$login/edit-profile">Edit Profile</t:a>
 		</t:if>
@@ -15,10 +19,11 @@
 		<t:form action="$login/logout" class="inline">
 			| <button type="submit" class="link-button link">Logout</button>
 		</t:form>
+		</t:comment>
 	</div>
 
 	<h1><t:write-title /></h1>
 
-	<t:call-next-template />
+        <t:call-next-template />
 
 </t:chloe>

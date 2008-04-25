@@ -61,7 +61,7 @@ M: foo call-responder
     <request>
         "GET" >>method
     request set
-    "/etc" "manager" get call-responder
+    { "etc" } "manager" get call-responder
     response set
 ] unit-test
 
@@ -76,7 +76,7 @@ M: foo call-responder
             "id" get session-id-key set-query-param
             "/" >>path
         request set
-        "/" "manager" get call-responder
+        { } "manager" get call-responder
         [ write-response-body drop ] with-string-writer
     ] with-destructors ;
 
@@ -96,7 +96,7 @@ M: foo call-responder
     "GET" >>method
     "/" >>path
     request set
-    "/etc" "manager" get call-responder response set
+    { "etc" } "manager" get call-responder response set
     [ "1" ] [ [ response get write-response-body drop ] with-string-writer ] unit-test
     response get
 ] with-destructors
@@ -111,7 +111,7 @@ response set
             "cookies" get >>cookies
             "/" >>path
         request set
-        "/" "manager" get call-responder
+        { } "manager" get call-responder
         [ write-response-body drop ] with-string-writer
     ] with-destructors ;
 
@@ -134,7 +134,7 @@ response set
         request set
 
         [
-            "/" <exiting-action> <cookie-sessions>
+            { } <exiting-action> <cookie-sessions>
             call-responder
         ] with-destructors response set
     ] unit-test

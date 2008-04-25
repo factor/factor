@@ -7,7 +7,8 @@
 	<t:summary component="blogroll" />
 
 	<p>
-		<t:a href="edit-blog">Add Blog</t:a> | <t:a href="update">Update</t:a>
+		<t:a href="$planet-factor/admin/edit-blog">Add Blog</t:a>
+		| <t:a href="$planet-factor/admin/update">Update</t:a>
 	</p>
 
 </t:chloe>

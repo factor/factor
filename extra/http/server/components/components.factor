@@ -336,3 +336,26 @@ TUPLE: list < component ;
     <list-renderer> list swap new-component ;
 
 M: list component-string drop ;
+
+! Choice
+TUPLE: choice-renderer choices ;
+
+C: <choice-renderer> choice-renderer
+
+M: choice-renderer render-view*
+    drop write ;
+
+M: choice-renderer render-edit*
+    <select swap =name select>
+        choices>> [
+            <option [ = [ "true" =selected ] when ] keep option>
+                write
+            </option>
+        ] with each
+    </select> ;
+
+TUPLE: choice < string ;
+
+: <choice> ( id choices -- component )
+    swap choice new-string
+        swap <choice-renderer> >>renderer ;

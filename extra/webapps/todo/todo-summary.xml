@@ -10,10 +10,10 @@
 			<t:view component="priority" />
 		</td>
 		<td>
-			<t:a href="view" query="id">View</t:a>
+			<t:a href="$todo-list/view" query="id">View</t:a>
 		</td>
 		<td>
-			<t:a href="edit" query="id">Edit</t:a>
+			<t:a href="$todo-list/edit" query="id">Edit</t:a>
 		</td>
 	</tr>
 

@@ -13,9 +13,9 @@
 		<t:view component="description" />
 	</div>
 
-	<t:a href="edit" query="id">Edit</t:a>
+	<t:a href="$todo-list/edit" query="id">Edit</t:a>
 	|
-	<t:form action="delete" class="inline">
+	<t:form action="$todo-list/delete" class="inline">
 		<t:edit component="id" />
 		<button class="link-button link">Delete</button>
 	</t:form>

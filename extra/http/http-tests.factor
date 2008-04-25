@@ -133,16 +133,20 @@ read-response-test-1' 1array [
 ] unit-test
 
 ! Live-fire exercise
-USING: http.server http.server.static http.server.actions
-http.client io.server io.files io accessors namespaces threads
+USING: http.server http.server.static http.server.sessions
+http.server.actions http.server.auth.login http.client
+io.server io.files io accessors namespaces threads
 io.encodings.ascii ;
+
+: add-quit-action
+    <action>
+        [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>display
+    "quit" add-responder ;
 
 [ ] [
     [
         <dispatcher>
-            <action>
-                [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>display
-            "quit" add-responder
+            add-quit-action
             <dispatcher>
                 "extra/http/test" resource-path <static> >>default
             "nested" add-responder
@@ -176,3 +180,51 @@ io.encodings.ascii ;
 [ "Goodbye" ] [
     "http://localhost:1237/quit" http-get
 ] unit-test
+
+! Dispatcher bugs
+[ ] [
+    [
+        <dispatcher>
+            <action> <protected>
+            <login>
+            <url-sessions> "" add-responder
+            add-quit-action
+            <dispatcher>
+                <action> "a" add-main-responder
+            "d" add-responder
+        main-responder set
+
+        [ 1237 httpd ] "HTTPD test" spawn drop
+    ] with-scope
+] unit-test
+
+[ ] [ 1000 sleep ] unit-test
+
+: 404? [ download-failed? ] [ response>> code>> 404 = ] bi and ;
+
+! This should give a 404 not an infinite redirect loop
+[ "http://localhost:1237/d/blah" http-get ] [ 404? ] must-fail-with
+
+! This should give a 404 not an infinite redirect loop
+[ "http://localhost:1237/blah/" http-get ] [ 404? ] must-fail-with
+
+[ "Goodbye" ] [ "http://localhost:1237/quit" http-get ] unit-test
+
+[ ] [
+    [
+        <dispatcher>
+            <action> [ "text/plain" <content> [ "Hi" write ] >>body ] >>display
+            <login> <url-sessions>
+            "" add-responder
+            add-quit-action
+        main-responder set
+
+        [ 1237 httpd ] "HTTPD test" spawn drop
+    ] with-scope
+] unit-test
+
+[ ] [ 1000 sleep ] unit-test
+
+[ "Hi" ] [ "http://localhost:1237/" http-get ] unit-test
+
+[ "Goodbye" ] [ "http://localhost:1237/quit" http-get ] unit-test

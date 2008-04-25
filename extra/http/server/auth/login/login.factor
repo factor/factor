@@ -60,7 +60,7 @@ M: user-saver dispose
 
 : successful-login ( user -- response )
     logged-in-user sset
-    post-login-url sget "" or f <permanent-redirect>
+    post-login-url sget "$login" or f <permanent-redirect>
     f post-login-url sset ;
 
 :: <login-action> ( -- action )
@@ -162,10 +162,12 @@ SYMBOL: previous-page
         <action>
             [
                 blank-values
+
                 logged-in-user sget
-                dup username>> "username" set-value
-                dup realname>> "realname" set-value
-                dup email>> "email" set-value
+                [ username>> "username" set-value ]
+                [ realname>> "realname" set-value ]
+                [ email>> "email" set-value ]
+                tri
             ] >>init
 
             [ form edit-form ] >>display
@@ -189,6 +191,8 @@ SYMBOL: previous-page
 
                 "realname" value >>realname
                 "email" value >>email
+
+                drop
 
                 user-profile-changed? on
 
@@ -329,7 +333,7 @@ SYMBOL: lost-password-from
     <action>
         [
             f logged-in-user sset
-            "login" f <permanent-redirect>
+            "$login/login" f <permanent-redirect>
         ] >>submit ;
 
 ! ! ! Authentication logic
@@ -340,7 +344,7 @@ C: <protected> protected
 
 : show-login-page ( -- response )
     request get request-url post-login-url sset
-    "login" f <permanent-redirect> ;
+    "$login/login" f <temporary-redirect> ;
 
 M: protected call-responder ( path responder -- response )
     logged-in-user sget dup [
