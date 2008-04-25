@@ -133,7 +133,7 @@ MACRO: firstn ( n -- )
 
 : replicate ( seq quot -- newseq )
     #! quot: ( -- obj )
-    [ drop ] swap compose map ;
+    [ drop ] swap compose map ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
