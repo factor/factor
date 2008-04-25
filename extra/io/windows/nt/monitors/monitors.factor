@@ -98,7 +98,7 @@ TUPLE: win32-monitor < monitor port ;
 
 M:: winnt (monitor) ( path recursive? mailbox -- monitor )
     [
-        path mailbox win32-monitor new-monitor
+        path normalize-path mailbox win32-monitor new-monitor
             path open-directory \ win32-monitor-port <buffered-port>
                 recursive? >>recursive
             >>port
