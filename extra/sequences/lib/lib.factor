@@ -131,6 +131,10 @@ MACRO: firstn ( n -- )
     [ find drop [ head-slice ] when* ] curry
     [ dup ] swap compose keep like ;
 
+: replicate ( seq quot -- newseq )
+    #! quot: ( -- obj )
+    [ drop ] swap compose map ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 <PRIVATE
@@ -236,3 +240,6 @@ PRIVATE>
 
 : remove-nth ( seq n -- seq' )
     cut-slice 1 tail-slice append ;
+
+: short ( seq n -- seq n' )
+    over length min ; inline
