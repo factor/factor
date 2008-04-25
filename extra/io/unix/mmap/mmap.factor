@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien io io.files kernel math system unix io.unix.backend
-io.mmap io.backend ;
+io.mmap ;
 IN: io.unix.mmap
 
 : open-r/w ( path -- fd ) O_RDWR file-mode open dup io-error ;
