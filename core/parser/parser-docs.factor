@@ -51,9 +51,11 @@ ARTICLE: "vocabulary-search-errors" "Word lookup errors"
 ARTICLE: "vocabulary-search" "Vocabulary search path"
 "When the parser reads a token, it attempts to look up a word named by that token. The lookup is performed by searching each vocabulary in the search path, in order."
 $nl
-"For a source file the vocabulary search path starts off with two vocabularies:"
-{ $code "syntax\nscratchpad" }
-"The " { $vocab-link "syntax" } " vocabulary consists of a set of parsing words for reading Factor data and defining new words. The " { $vocab-link "scratchpad" } " vocabulary is the default vocabulary for new word definitions."
+"For a source file the vocabulary search path starts off with one vocabulary:"
+{ $code "syntax" }
+"The " { $vocab-link "syntax" } " vocabulary consists of a set of parsing words for reading Factor data and defining new words."
+$nl
+"In the listener, the " { $vocab-link "scratchpad" } " is the default vocabulary for new word definitions. However, when loading source files, there is no default vocabulary. Defining words before declaring a vocabulary with " { $link POSTPONE: IN: } " results in an error."
 $nl
 "At the interactive listener, the default search path contains many more vocabularies. Details on the default search path and parser invocation are found in " { $link "parser" } "."
 $nl
@@ -294,6 +296,10 @@ HELP: use
 HELP: in
 { $var-description "A variable holding the name of the current vocabulary for new definitions." } ;
 
+HELP: current-vocab
+{ $values { "str" "a vocabulary" } }
+{ $description "Returns the vocabulary stored in the " { $link in } " symbol. Throws an error if the current vocabulary is " { $link f } "." } ;
+
 HELP: (use+)
 { $values { "vocab" "an assoc mapping strings to words" } }
 { $description "Adds an assoc at the front of the search path." }
@@ -323,7 +329,7 @@ HELP: set-in
 $parsing-note ;
 
 HELP: create-in
-{ $values { "string" "a word name" } { "word" "a new word" } }
+{ $values { "str" "a word name" } { "word" "a new word" } }
 { $description "Creates a word in the current vocabulary. Until re-defined, the word throws an error when invoked." }
 $parsing-note ;
 
@@ -451,7 +457,7 @@ HELP: bootstrap-syntax
 
 HELP: with-file-vocabs
 { $values { "quot" quotation } }
-{ $description "Calls the quotation in a scope with the initial the vocabulary search path for parsing a file. This consists of the " { $snippet "syntax" } " vocabulary together with the " { $snippet "scratchpad" } " vocabulary." } ;
+{ $description "Calls the quotation in a scope with the initial the vocabulary search path for parsing a file. This consists of just the " { $snippet "syntax" } " vocabulary." } ;
 
 HELP: parse-fresh
 { $values { "lines" "a sequence of strings" } { "quot" quotation } }

@@ -21,7 +21,10 @@ M: mapped-file set-nth-unsafe
 
 INSTANCE: mapped-file sequence
 
-HOOK: <mapped-file> io-backend ( path length -- mmap )
+HOOK: (mapped-file) io-backend ( path length -- mmap )
+
+: <mapped-file> ( path length -- mmap )
+    >r normalize-path r> (mapped-file) ;
 
 HOOK: close-mapped-file io-backend ( mmap -- )
 

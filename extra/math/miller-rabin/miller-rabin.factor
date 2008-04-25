@@ -1,4 +1,4 @@
-USING: combinators combinators.lib io locals kernel math
+eSING: combinators combinators.lib io locals kernel math
 math.functions math.ranges namespaces random sequences
 hashtables sets ;
 IN: math.miller-rabin
@@ -76,7 +76,9 @@ TUPLE: miller-rabin-bounds ;
 : find-relative-prime ( n -- p )
     dup random find-relative-prime* ;
 
+ERROR: too-few-primes ;
+
 : unique-primes ( numbits n -- seq )
     #! generate two primes
-    over 5 < [ "not enough primes below 5 bits" throw ] when
+    over 5 < [ too-few-primes ] when
     [ [ drop random-prime ] with map ] [ all-unique? ] generate ;
