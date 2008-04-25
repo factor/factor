@@ -293,6 +293,8 @@ M: no-such-slot summary drop "No such slot" ;
 
 M: immutable-slot summary drop "Slot is immutable" ;
 
+M: bad-create summary drop "Bad parameters to create" ;
+
 <PRIVATE
 
 : init-debugger ( -- )
