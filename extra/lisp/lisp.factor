@@ -61,15 +61,15 @@ PRIVATE>
   [ swap localize-body convert-body ] dipd pop-locals swap <lambda> ;
   
 : convert-list-form ( lisp-form -- quot )  
-dup first
-  { { [ dup "if" <lisp-symbol> equal? ] [ drop convert-if ] }
-    { [ dup "begin" <lisp-symbol> equal? ] [ drop convert-begin ] }
-    { [ dup "cond" <lisp-symbol> equal? ] [ drop convert-cond ] }
-    { [ dup "lambda" <lisp-symbol> equal? ] [ drop convert-lambda ] }
+dup first dup lisp-symbol? [ name>>
+  { { "lambda" [ convert-lambda ] }
+    { "if" [ convert-if ] }
+    { "begin" [ convert-begin ] }
+    { "cond" [ convert-cond ] }
    [ drop convert-general-form ]
-  } cond ;
+  } case ] [ drop convert-general-form ] if ;
   
 : convert-form ( lisp-form -- quot )
-  { { [ dup [ sequence? ] [ number? not ] bi and ] [ convert-list-form ] }
+  { { [ dup vector? ] [ convert-list-form ] }
    [ [ , ] [ ] make ]
   } cond ;
