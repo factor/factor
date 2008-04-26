@@ -1,9 +1,9 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: alien arrays byte-arrays combinators
-graphics.viewer io io.binary io.files kernel libc math
-math.functions namespaces opengl opengl.gl prettyprint
+USING: alien arrays byte-arrays combinators inspector
+io.backend graphics.viewer io io.binary io.files kernel libc
+math math.functions namespaces opengl opengl.gl prettyprint
 sequences strings ui ui.gadgets.panes io.encodings.binary ;
 IN: graphics.bitmap
 
@@ -32,7 +32,7 @@ M: bitmap-magic summary
 
 : parse-file-header ( bitmap -- )
     2 read >string dup "BM" = [ bitmap-magic ] unless
-        [ over set-bitmap-magic ] keep
+        over set-bitmap-magic
     4 read le> over set-bitmap-size
     4 read le> over set-bitmap-reserved
     4 read le> swap set-bitmap-offset ;
@@ -63,7 +63,7 @@ M: bitmap-magic summary
     dup color-index-length read swap set-bitmap-color-index ;
 
 : load-bitmap ( path -- bitmap )
-    binary [
+    normalize-path binary [
         T{ bitmap } clone
         dup parse-file-header
         dup parse-bitmap-header
@@ -121,16 +121,14 @@ M: bitmap height ( bitmap -- ) bitmap-height ;
     load-bitmap [ <graphics-gadget> "bitmap" open-window ] keep ;
 
 : test-bitmap24 ( -- )
-    "extra/graphics/bitmap/test-data/thiswayup24.bmp" resource-path bitmap. ;
+    "resource:extra/graphics/bitmap/test-images/thiswayup24.bmp" bitmap. ;
 
 : test-bitmap8 ( -- )
-    "extra/graphics/bitmap/test-data/rgb8bit.bmp" resource-path bitmap. ;
+    "resource:extra/graphics/bitmap/test-images/rgb8bit.bmp" bitmap. ;
 
 : test-bitmap4 ( -- )
-    "extra/graphics/bitmap/test-data/rgb4bit.bmp" resource-path
-    load-bitmap ;
-    ! bitmap. ;
+    "resource:extra/graphics/bitmap/test-images/rgb4bit.bmp" bitmap. ;
 
 : test-bitmap1 ( -- )
-    "extra/graphics/bitmap/test-data/1bit.bmp" resource-path bitmap. ;
+    "resource:extra/graphics/bitmap/test-images/1bit.bmp" bitmap. ;
 
