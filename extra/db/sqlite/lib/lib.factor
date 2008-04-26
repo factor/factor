@@ -97,10 +97,10 @@ IN: db.sqlite.lib
         { TEXT [ sqlite-bind-text-by-name ] }
         { VARCHAR [ sqlite-bind-text-by-name ] }
         { DOUBLE [ sqlite-bind-double-by-name ] }
-        { DATE [ sqlite-bind-text-by-name ] }
-        { TIME [ sqlite-bind-text-by-name ] }
-        { DATETIME [ sqlite-bind-text-by-name ] }
-        { TIMESTAMP [ sqlite-bind-text-by-name ] }
+        { DATE [ timestamp>ymd sqlite-bind-text-by-name ] }
+        { TIME [ timestamp>hms sqlite-bind-text-by-name ] }
+        { DATETIME [ timestamp>ymdhms sqlite-bind-text-by-name ] }
+        { TIMESTAMP [ timestamp>ymdhms sqlite-bind-text-by-name ] }
         { BLOB [ sqlite-bind-blob-by-name ] }
         { FACTOR-BLOB [
             object>bytes

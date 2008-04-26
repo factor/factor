@@ -9,41 +9,54 @@ IN: fry
 : @ "Only valid inside a fry" throw ;
 : _ "Only valid inside a fry" throw ;
 
-DEFER: (fry)
+DEFER: (shallow-fry)
 
-: ((fry)) ( accum quot adder -- result )
-    >r [ ] swap (fry) r>
+: ((shallow-fry)) ( accum quot adder -- result )
+    >r [ ] swap (shallow-fry) r>
     append swap dup empty? [ drop ] [
         [ swap compose ] curry append
     ] if ; inline
 
-: (fry) ( accum quot -- result )
+: (shallow-fry) ( accum quot -- result )
     dup empty? [
         drop 1quotation
     ] [
         unclip {
-            { \ , [ [ curry ] ((fry)) ] }
-            { \ @ [ [ compose ] ((fry)) ] }
+            { \ , [ [ curry ] ((shallow-fry)) ] }
+            { \ @ [ [ compose ] ((shallow-fry)) ] }
 
             ! to avoid confusion, remove if fry goes core
-            { \ namespaces:, [ [ curry ] ((fry)) ] }
+            { \ namespaces:, [ [ curry ] ((shallow-fry)) ] }
 
-            [ swap >r suffix r> (fry) ]
+            [ swap >r suffix r> (shallow-fry) ]
         } case
     ] if ;
 
-: trivial-fry ( quot -- quot' ) [ ] swap (fry) ;
+: shallow-fry ( quot -- quot' ) [ ] swap (shallow-fry) ;
 
-: fry ( quot -- quot' )
+: deep-fry ( quot -- quot' )
     { _ } last-split1 [
         [
-            trivial-fry %
+            shallow-fry %
             [ >r ] %
-            fry %
+            deep-fry %
             [ [ dip ] curry r> compose ] %
         ] [ ] make
     ] [
-        trivial-fry
+        shallow-fry
     ] if* ;
+
+: fry ( quot -- quot' )
+    [
+        [
+            dup callable? [
+                [
+                    [ { , namespaces:, @ } member? ] subset length
+                    \ , <repetition> %
+                ]
+                [ deep-fry % ] bi
+            ] [ namespaces:, ] if
+        ] each
+    ] [ ] make deep-fry ;
 
 : '[ \ ] parse-until fry over push-all ; parsing

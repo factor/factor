@@ -8,7 +8,7 @@ splitting kernel hashtables continuations ;
         <request> "GET" >>method request set
         [
             exit-continuation set
-            "xxx"
+            { }
             <action> [ [ "hello" print 123 ] show-final ] >>display
             <callback-responder>
             call-responder
@@ -31,7 +31,7 @@ splitting kernel hashtables continuations ;
         [
             exit-continuation set
             <request> "GET" >>method request set
-            "" "r" get call-responder
+            { } "r" get call-responder
         ] callcc1
 
         body>> first
@@ -44,7 +44,7 @@ splitting kernel hashtables continuations ;
 
         [
             exit-continuation set
-            "/"
+            { }
             "r" get call-responder
         ] callcc1
 
@@ -57,7 +57,7 @@ splitting kernel hashtables continuations ;
 
         [
             exit-continuation set
-            "/"
+            { }
             "r" get call-responder
         ] callcc1
     ] unit-test

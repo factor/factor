@@ -52,7 +52,7 @@ MACRO: firstn ( n -- )
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : sigma ( seq quot -- n )
-    [ rot slip + ] curry 0 swap reduce ; inline
+    [ + ] compose 0 swap reduce ; inline
 
 : count ( seq quot -- n )
     [ 1 0 ? ] compose sigma ; inline
@@ -130,6 +130,10 @@ MACRO: firstn ( n -- )
     [ not ] compose
     [ find drop [ head-slice ] when* ] curry
     [ dup ] swap compose keep like ;
+
+: replicate ( seq quot -- newseq )
+    #! quot: ( -- obj )
+    [ drop ] swap compose map ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -236,3 +240,6 @@ PRIVATE>
 
 : remove-nth ( seq n -- seq' )
     cut-slice 1 tail-slice append ;
+
+: short ( seq n -- seq n' )
+    over length min ; inline

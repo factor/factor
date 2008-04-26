@@ -78,4 +78,4 @@ M: form render-view*
     dup view-template>> render-form ;
 
 M: form render-edit*
-    dup edit-template>> render-form ;
+    nip dup edit-template>> render-form ;

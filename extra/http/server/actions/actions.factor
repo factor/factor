@@ -5,7 +5,7 @@ http.server http.server.validators http hashtables namespaces
 fry continuations locals ;
 IN: http.server.actions
 
-SYMBOL: +append-path
+SYMBOL: +path+
 
 SYMBOL: params
 
@@ -39,12 +39,15 @@ TUPLE: action init display submit get-params post-params ;
 
 M: action call-responder ( path action -- response )
     '[
-        , ,
-        [ +append-path associate request-params assoc-union params set ]
-        [ action set ] bi*
-        request get method>> {
-            { "GET" [ handle-get ] }
-            { "HEAD" [ handle-get ] }
-            { "POST" [ handle-post ] }
-        } case
+        , [ CHAR: / = ] right-trim empty? [
+            , action set
+            request-params params set
+            request get method>> {
+                { "GET" [ handle-get ] }
+                { "HEAD" [ handle-get ] }
+                { "POST" [ handle-post ] }
+            } case
+        ] [
+            <404>
+        ] if
     ] with-exit-continuation ;

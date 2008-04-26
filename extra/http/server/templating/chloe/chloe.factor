@@ -104,7 +104,8 @@ SYMBOL: tags
 : form-start-tag ( tag -- )
     <form
     "POST" =method
-    tag-attrs print-attrs
+    [ "action" required-attr resolve-base-path =action ]
+    [ tag-attrs [ drop name-tag "action" = not ] assoc-subset print-attrs ] bi
     form>
     hidden-form-field ;
 
@@ -153,6 +154,7 @@ SYMBOL: tags
         { "form" [ form-tag ] }
         { "error" [ error-tag ] }
         { "if" [ if-tag ] }
+        { "comment" [ drop ] }
         { "call-next-template" [ drop call-next-template ] }
         [ "Unknown chloe tag: " swap append throw ]
     } case ;
@@ -189,7 +191,7 @@ SYMBOL: tags
         ] if
     ] with-scope ;
 
-M: chloe call-template
+M: chloe call-template*
     path>> utf8 <file-reader> read-xml process-chloe ;
 
 INSTANCE: chloe template

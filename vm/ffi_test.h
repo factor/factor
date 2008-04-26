@@ -62,7 +62,7 @@ struct test_struct_12 { int a; double x; };
 
 DLLEXPORT double ffi_test_36(struct test_struct_12 x);
 
-DLLEXPORT void int_ffi_test_36_point_5(void);
+DLLEXPORT void ffi_test_36_point_5(void);
 
 DLLEXPORT int ffi_test_37(int (*f)(int, int, int));
 

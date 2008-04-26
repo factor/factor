@@ -4,7 +4,7 @@
 
 	<t:title>Edit Blog</t:title>
 
-	<t:form action="edit-blog">
+	<t:form action="$planet-factor/admin/edit-blog">
 
 		<t:edit component="id" />
 
@@ -21,8 +21,8 @@
 			</tr>
 
 			<tr>
-				<th class="field-label">Atom feed:</th>
-				<td><t:edit component="atom-url" /></td>
+				<th class="field-label">Feed:</th>
+				<td><t:edit component="feed-url" /></td>
 			</tr>
 
 		</table>
@@ -31,9 +31,7 @@
 
 	</t:form>
 
-	<t:a href="view" query="id">View</t:a>
-	|
-	<t:form action="delete-blog" class="inline">
+	<t:form action="$planet-factor/admin/delete-blog" class="inline">
 		<t:edit component="id" />
 		<button type="submit" class="link-button link">Delete</button>
 	</t:form>

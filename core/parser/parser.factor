@@ -233,8 +233,16 @@ PREDICATE: unexpected-eof < unexpected
 : parse-tokens ( end -- seq )
     100 <vector> swap (parse-tokens) >array ;
 
-: create-in ( string -- word )
-    in get create dup set-word dup save-location ;
+ERROR: no-current-vocab ;
+
+M: no-current-vocab summary ( obj -- )
+    drop "Current vocabulary is f, use IN:" ;
+
+: current-vocab ( -- str )
+    in get [ no-current-vocab ] unless* ;
+
+: create-in ( str -- word )
+    current-vocab create dup set-word dup save-location ;
 
 : CREATE ( -- word ) scan create-in ;
 
@@ -243,7 +251,7 @@ PREDICATE: unexpected-eof < unexpected
 : CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 
 : create-class-in ( word -- word )
-    in get create
+    current-vocab create
     dup save-class-location
     dup predicate-word dup set-word save-location ;
 
@@ -440,8 +448,7 @@ SYMBOL: bootstrap-syntax
 
 : with-file-vocabs ( quot -- )
     [
-        "scratchpad" in set
-        { "syntax" "scratchpad" } set-use
+        f in set { "syntax" } set-use
         bootstrap-syntax get [ use get push ] when*
         call
     ] with-scope ; inline

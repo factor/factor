@@ -69,6 +69,11 @@ M: postgresql-result-null summary ( obj -- str )
 : malloc-byte-array/length
     [ malloc-byte-array dup free-always ] [ length ] bi ;
 
+: default-param-value
+    number>string* dup [
+        utf8 malloc-string dup free-always
+    ] when 0 ;
+
 : param-values ( statement -- seq seq2 )
     [ bind-params>> ] [ in-params>> ] bi
     [
@@ -77,11 +82,11 @@ M: postgresql-result-null summary ( obj -- str )
                 dup [ object>bytes malloc-byte-array/length ] [ 0 ] if
             ] }
             { BLOB [ dup [ malloc-byte-array/length ] [ 0 ] if ] }
-            [
-                drop number>string* dup [
-                    utf8 malloc-string dup free-always
-                ] when 0
-            ]
+            { DATE [ dup [ timestamp>ymd ] when default-param-value ] }
+            { TIME [ dup [ timestamp>hms ] when default-param-value ] }
+            { DATETIME [ dup [ timestamp>ymdhms ] when default-param-value ] }
+            { TIMESTAMP [ dup [ timestamp>ymdhms ] when default-param-value ] }
+            [ drop default-param-value ]
         } case 2array
     ] 2map flip dup empty? [
         drop f f

@@ -4,8 +4,10 @@ USING: assocs kernel namespaces io io.timeouts strings splitting
 threads http sequences prettyprint io.server logging calendar
 html.elements accessors math.parser combinators.lib
 tools.vocabs debugger html continuations random combinators
-destructors io.encodings.8-bit fry ;
+destructors io.encodings.8-bit fry classes words ;
 IN: http.server
+
+! path is a sequence of path component strings
 
 GENERIC: call-responder ( path responder -- response )
 
@@ -52,13 +54,39 @@ SYMBOL: 404-responder
 
 [ <404> ] <trivial-responder> 404-responder set-global
 
+SYMBOL: base-paths
+
+: invert-slice ( slice -- slice' )
+    dup slice? [
+        [ seq>> ] [ from>> ] bi head-slice
+    ] [
+        drop { }
+    ] if ;
+
+: add-base-path ( path dispatcher -- )
+    [ invert-slice ] [ class word-name ] bi*
+    base-paths get set-at ;
+
 SYMBOL: link-hook
 
 : modify-query ( query -- query )
     link-hook get [ ] or call ;
 
+: base-path ( string -- path )
+    dup base-paths get at
+    [ ] [ "No such responder: " swap append throw ] ?if ;
+
+: resolve-base-path ( string -- string' )
+    "$" ?head [
+        [
+            "/" split1 >r
+            base-path [ "/" % % ] each "/" %
+            r> %
+        ] "" make
+    ] when ;
+
 : link>string ( url query -- url' )
-    modify-query (link>string) ;
+    [ resolve-base-path ] [ modify-query ] bi* (link>string) ;
 
 : write-link ( url query -- )
     link>string write ;
@@ -71,8 +99,9 @@ SYMBOL: form-hook
 : absolute-redirect ( to query -- url )
     #! Same host.
     request get clone
-        swap [ >>query ] when*
-        swap url-encode >>path
+    swap [ >>query ] when*
+    swap url-encode >>path
+    [ modify-query ] change-query
     request-url ;
 
 : replace-last-component ( path with -- path' )
@@ -82,13 +111,14 @@ SYMBOL: form-hook
     request get clone
     swap [ >>query ] when*
     swap [ '[ , replace-last-component ] change-path ] when*
-    dup query>> modify-query >>query
+    [ modify-query ] change-query
     request-url ;
 
 : derive-url ( to query -- url )
     {
         { [ over "http://" head? ] [ link>string ] }
         { [ over "/" head? ] [ absolute-redirect ] }
+        { [ over "$" head? ] [ >r resolve-base-path r> derive-url ] }
         [ relative-redirect ]
     } cond ;
 
@@ -113,22 +143,17 @@ TUPLE: dispatcher default responders ;
 : <dispatcher> ( -- dispatcher )
     dispatcher new-dispatcher ;
 
-: split-path ( path -- rest first )
-    [ CHAR: / = ] left-trim "/" split1 swap ;
-
 : find-responder ( path dispatcher -- path responder )
-    over split-path pick responders>> at*
-    [ >r >r 2drop r> r> ] [ 2drop default>> ] if ;
-
-: redirect-with-/ ( -- response )
-    request get path>> "/" append f <permanent-redirect> ;
+    over empty? [
+        "" over responders>> at*
+        [ nip ] [ drop default>> ] if
+    ] [
+        over first over responders>> at*
+        [ >r drop 1 tail-slice r> ] [ drop default>> ] if
+    ] if ;
 
 M: dispatcher call-responder ( path dispatcher -- response )
-    over [
-        find-responder call-responder
-    ] [
-        2drop redirect-with-/
-    ] if ;
+    [ add-base-path ] [ find-responder call-responder ] 2bi ;
 
 TUPLE: vhost-dispatcher default responders ;
 
@@ -142,15 +167,13 @@ TUPLE: vhost-dispatcher default responders ;
 M: vhost-dispatcher call-responder ( path dispatcher -- response )
     find-vhost call-responder ;
 
-: set-main ( dispatcher name -- dispatcher )
-    '[ , f <permanent-redirect> ] <trivial-responder>
-    >>default ;
-
 : add-responder ( dispatcher responder path -- dispatcher )
     pick responders>> set-at ;
 
 : add-main-responder ( dispatcher responder path -- dispatcher )
-    [ add-responder ] keep set-main ;
+    [ add-responder drop ]
+    [ drop "" add-responder drop ]
+    [ 2drop ] 3tri ;
 
 SYMBOL: main-responder
 
@@ -160,23 +183,30 @@ drop
 
 SYMBOL: development-mode
 
+: http-error. ( error -- )
+    "Internal server error" [
+        development-mode get [
+            [ print-error nl :c ] with-html-stream
+        ] [
+            500 "Internal server error"
+            trivial-response-body
+        ] if
+    ] simple-page ;
+
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
-    swap '[
-        , "Internal server error" [
-            development-mode get [
-                [ print-error nl :c ] with-html-stream
-            ] [
-                500 "Internal server error"
-                trivial-response-body
-            ] if
-        ] simple-page
-    ] >>body ;
+    swap '[ , http-error. ] >>body ;
 
 : do-response ( response -- )
     dup write-response
     request get method>> "HEAD" =
-    [ drop ] [ write-response-body ] if ;
+    [ drop ] [
+        '[
+            , write-response-body
+        ] [
+            http-error.
+        ] recover
+    ] if ;
 
 LOG: httpd-hit NOTICE
 
@@ -190,11 +220,15 @@ SYMBOL: exit-continuation
 : with-exit-continuation ( quot -- )
     '[ exit-continuation set @ ] callcc1 exit-continuation off ;
 
+: split-path ( string -- path )
+    "/" split [ empty? not ] subset ;
+
 : do-request ( request -- response )
     [
+        H{ } clone base-paths set
         [ log-request ]
         [ request set ]
-        [ path>> main-responder get call-responder ] tri
+        [ path>> split-path main-responder get call-responder ] tri
         [ <404> ] unless*
     ] [
         [ \ do-request log-error ]

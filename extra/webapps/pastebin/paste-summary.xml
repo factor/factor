@@ -1,0 +1,11 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<tr>
+		<td><t:a href="view-paste" query="id"><t:view component="summary" /></t:a></td>
+		<td><t:view component="author" /></td>
+		<td><t:view component="date" /></td>
+	</tr>
+
+</t:chloe>
