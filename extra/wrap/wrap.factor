@@ -8,7 +8,7 @@ IN: wrap
 SYMBOL: width
 
 : line-chunks ( string -- words-lines )
-    "\n" split [ " \t" split [ empty? not ] subset ] map ;
+    "\n" split [ " \t" split [ empty? not ] filter ] map ;
 
 : (split-chunk) ( words -- )
     -1 over [ length + 1+ dup width get > ] find drop nip

@@ -72,7 +72,7 @@ M: closer process
     reset-prolog init-xml-stack init-ns-stack ;
 
 : assert-blanks ( seq pre? -- )
-    swap [ string? ] subset
+    swap [ string? ] filter
     [
         dup [ blank? ] all?
         [ drop ] [ swap <pre/post-content> throw ] if

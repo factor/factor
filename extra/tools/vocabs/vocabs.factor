@@ -15,7 +15,7 @@ IN: tools.vocabs
     dup vocab-dir "tests" append-path vocab-append-path dup [
         dup exists? [
             dup directory keys
-            [ ".factor" tail? ] subset
+            [ ".factor" tail? ] filter
             [ append-path ] with map
         ] [ drop f ] if
     ] [ drop f ] if ;
@@ -90,7 +90,7 @@ SYMBOL: changed-vocabs
     changed-vocabs get dup [ key? ] [ 2drop t ] if ;
 
 : filter-changed ( vocabs -- vocabs' )
-    [ changed-vocab? ] subset ;
+    [ changed-vocab? ] filter ;
 
 SYMBOL: modified-sources
 SYMBOL: modified-docs
@@ -208,7 +208,7 @@ M: vocab-link summary vocab-summary ;
     dup vocab-authors-path set-vocab-file-contents ;
 
 : subdirs ( dir -- dirs )
-    directory [ second ] subset keys natural-sort ;
+    directory [ second ] filter keys natural-sort ;
 
 : (all-child-vocabs) ( root name -- vocabs )
     [ vocab-dir append-path subdirs ] keep
@@ -260,7 +260,7 @@ MEMO: all-vocabs-seq ( -- seq )
     } cond nip ;
 
 : filter-dangerous ( seq -- seq' )
-    [ vocab-name dangerous? not ] subset ;
+    [ vocab-name dangerous? not ] filter ;
 
 : try-everything ( -- failures )
     all-vocabs-seq
@@ -273,10 +273,10 @@ MEMO: all-vocabs-seq ( -- seq )
 : unrooted-child-vocabs ( prefix -- seq )
     dup empty? [ CHAR: . suffix ] unless
     vocabs
-    [ find-vocab-root not ] subset
+    [ find-vocab-root not ] filter
     [
         vocab-name swap ?head CHAR: . rot member? not and
-    ] with subset
+    ] with filter
     [ vocab ] map ;
 
 : all-child-vocabs ( prefix -- assoc )
@@ -288,7 +288,7 @@ MEMO: all-vocabs-seq ( -- seq )
 : all-child-vocabs-seq ( prefix -- assoc )
     vocab-roots get swap [
         dupd (all-child-vocabs)
-        [ vocab-dir? ] with subset
+        [ vocab-dir? ] with filter
     ] curry map concat ;
 
 : map>set ( seq quot -- )

@@ -4,7 +4,7 @@
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions mirrors
 arrays math.parser math.private sorting strings ascii macros
-assocs.lib quotations hashtables ;
+assocs.lib quotations hashtables math.order ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -45,7 +45,7 @@ MACRO: firstn ( n -- )
   >r
   dup length
   dup [ / ] curry
-  [ 1+ ] swap compose
+  [ 1+ ] prepose
   r> compose
   2each ;                       inline
 
@@ -129,11 +129,11 @@ MACRO: firstn ( n -- )
 : take-while ( seq quot -- newseq )
     [ not ] compose
     [ find drop [ head-slice ] when* ] curry
-    [ dup ] swap compose keep like ;
+    [ dup ] prepose keep like ;
 
 : replicate ( seq quot -- newseq )
     #! quot: ( -- obj )
-    [ drop ] swap compose map ; inline
+    [ drop ] prepose map ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -159,7 +159,7 @@ PRIVATE>
 
 : switches ( seq1 seq -- subseq )
     ! seq1 is a sequence of ones and zeroes
-    >r [ length ] keep [ nth 1 = ] curry subset r>
+    >r [ length ] keep [ nth 1 = ] curry filter r>
     [ nth ] curry { } map-as ;
 
 : power-set ( seq -- subsets )
@@ -216,7 +216,7 @@ USE: continuations
   >r dup length swap r>
   [ = [ ] [ drop f ] if ] curry
   2map
-  [ ] subset ;
+  [ ] filter ;
 
 <PRIVATE
 : (attempt-each-integer) ( i n quot -- result )

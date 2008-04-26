@@ -1,6 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel memoize tools.test parser ;
+IN: memoize.tests
 
 MEMO: fib ( m -- n )
     dup 1 <= [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ;

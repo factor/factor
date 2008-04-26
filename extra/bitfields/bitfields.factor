@@ -93,7 +93,7 @@ M: check< summary drop "Number exceeds upper bound" ;
     >r keys r> define-slots ;
 
 : filter-pad ( slots -- slots )
-    [ drop padding-name? not ] assoc-subset ;
+    [ drop padding-name? not ] assoc-filter ;
 
 : define-bitfield ( classname slots -- ) 
     [

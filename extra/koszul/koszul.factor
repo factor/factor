@@ -19,7 +19,7 @@ IN: koszul
     } cond ;
 
 : canonicalize
-    [ nip zero? not ] assoc-subset ;
+    [ nip zero? not ] assoc-filter ;
 
 SYMBOL: terms
 
@@ -71,7 +71,7 @@ SYMBOL: terms
     [ natural-sort ] keep [ index ] curry map ;
 
 : (inversions) ( n seq -- n )
-    [ > ] with subset length ;
+    [ > ] with filter length ;
 
 : inversions ( seq -- n )
     0 swap [ length ] keep [
@@ -148,7 +148,7 @@ DEFER: (d)
 : nth-basis-elt ( generators n -- elt )
     over length [
         3dup bit? [ nth ] [ 2drop f ] if
-    ] map [ ] subset 2nip ;
+    ] map [ ] filter 2nip ;
 
 : basis ( generators -- seq )
     natural-sort dup length 2^ [ nth-basis-elt ] with map ;
@@ -279,7 +279,7 @@ DEFER: (d)
 
 : bigraded-laplacian ( u-generators z-generators quot -- seq )
     >r [ basis graded ] bi@ tensor bigraded-triples r>
-    [ [ first3 ] swap compose map ] curry map ; inline
+    [ [ first3 ] prepose map ] curry map ; inline
 
 : bigraded-laplacian-betti ( u-generators z-generators -- seq )
     [ laplacian-betti ] bigraded-laplacian ;

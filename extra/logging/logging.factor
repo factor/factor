@@ -72,7 +72,7 @@ PRIVATE>
     >r >r dup r> r> 2curry annotate ;
 
 : call-logging-quot ( quot word level -- quot' )
-    "called" -rot [ log-message ] 3curry swap compose ;
+    "called" -rot [ log-message ] 3curry prepose ;
 
 : add-logging ( word level -- )
     [ call-logging-quot ] (define-logging) ;
@@ -88,7 +88,7 @@ PRIVATE>
 : input# stack-effect effect-in length ;
 
 : input-logging-quot ( quot word level -- quot' )
-    over input# -rot [ log-stack ] 3curry swap compose ;
+    over input# -rot [ log-stack ] 3curry prepose ;
 
 : add-input-logging ( word level -- )
     [ input-logging-quot ] (define-logging) ;

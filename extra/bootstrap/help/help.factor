@@ -11,7 +11,7 @@ IN: bootstrap.help
 
     [ drop ] load-vocab-hook [
         vocabs
-        [ vocab-docs-loaded? not ] subset
+        [ vocab-docs-loaded? not ] filter
         [ load-docs ] each
     ] with-variable ;
 

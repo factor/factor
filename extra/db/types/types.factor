@@ -83,13 +83,13 @@ FACTOR-BLOB NULL ;
     dup number? [ number>string ] when ;
 
 : maybe-remove-id ( specs -- obj )
-    [ +native-id+? not ] subset ;
+    [ +native-id+? not ] filter ;
 
 : remove-relations ( specs -- newcolumns )
-    [ relation? not ] subset ;
+    [ relation? not ] filter ;
 
 : remove-id ( specs -- obj )
-    [ primary-key>> not ] subset ;
+    [ primary-key>> not ] filter ;
 
 ! SQLite Types: http://www.sqlite.org/datatype3.html
 ! NULL INTEGER REAL TEXT BLOB
@@ -152,7 +152,7 @@ HOOK: bind# db ( spec obj -- )
     tuck offset-of-slot set-slot ;
 
 : tuple>filled-slots ( tuple -- alist )
-    <mirror> [ nip ] assoc-subset ;
+    <mirror> [ nip ] assoc-filter ;
 
 : tuple>params ( specs tuple -- obj )
     [

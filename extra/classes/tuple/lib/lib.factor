@@ -11,7 +11,7 @@ MACRO: >tuple< ( class -- )
 
 MACRO: >tuple*< ( class -- )
     all-slots
-    [ slot-spec-name "*" tail? ] subset
+    [ slot-spec-name "*" tail? ] filter
     reader-slots ;
 
 

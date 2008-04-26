@@ -200,7 +200,7 @@ M: just-parser parse ( input parser -- result )
     #! from the results anything where the remaining
     #! input to be parsed is not empty. So ensures a
     #! fully parsed input string.
-    just-parser-p1 parse [ parse-result-unparsed empty? ] lsubset ;
+    just-parser-p1 parse [ parse-result-unparsed empty? ] lfilter ;
 
 TUPLE: apply-parser p1 quot ;
 

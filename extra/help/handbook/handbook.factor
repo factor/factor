@@ -228,13 +228,13 @@ ARTICLE: "article-index" "Article index"
 { $index [ articles get keys ] } ;
 
 ARTICLE: "primitive-index" "Primitive index"
-{ $index [ all-words [ primitive? ] subset ] } ;
+{ $index [ all-words [ primitive? ] filter ] } ;
 
 ARTICLE: "error-index" "Error index"
 { $index [ all-errors ] } ;
 
 ARTICLE: "type-index" "Type index"
-{ $index [ builtins get [ ] subset ] } ;
+{ $index [ builtins get [ ] filter ] } ;
 
 ARTICLE: "class-index" "Class index"
 { $index [ classes ] } ;

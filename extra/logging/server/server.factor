@@ -37,7 +37,7 @@ SYMBOL: log-files
     write bl write ": " write print ;
 
 : write-message ( msg word-name level -- )
-    rot [ empty? not ] subset {
+    rot [ empty? not ] filter {
         { [ dup empty? ] [ 3drop ] }
         { [ dup length 1 = ] [ first -rot f (write-message) ] }
         [

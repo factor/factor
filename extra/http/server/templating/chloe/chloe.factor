@@ -105,7 +105,7 @@ SYMBOL: tags
     <form
     "POST" =method
     [ "action" required-attr resolve-base-path =action ]
-    [ tag-attrs [ drop name-tag "action" = not ] assoc-subset print-attrs ] bi
+    [ tag-attrs [ drop name-tag "action" = not ] assoc-filter print-attrs ] bi
     form>
     hidden-form-field ;
 

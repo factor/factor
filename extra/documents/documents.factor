@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io kernel math models namespaces sequences strings
-splitting combinators unicode.categories ;
+splitting combinators unicode.categories math.order ;
 IN: documents
 
 : +col ( loc n -- newloc ) >r first2 r> + 2array ;
@@ -184,10 +184,10 @@ M: one-char-elt next-elt 2drop ;
     [ >r blank? r> xor ] curry ; inline
 
 : (prev-word) ( ? col str -- col )
-    rot break-detector find-last* drop ?1+ ;
+    rot break-detector find-last-from drop ?1+ ;
 
 : (next-word) ( ? col str -- col )
-    [ rot break-detector find* drop ] keep
+    [ rot break-detector find-from drop ] keep
     over not [ nip length ] [ drop ] if ;
 
 TUPLE: one-word-elt ;

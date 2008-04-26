@@ -1,5 +1,5 @@
-USING: kernel math math.constants math.functions math.private
-math.libm tools.test ;
+USING: kernel math math.constants math.functions math.order
+math.private math.libm tools.test ;
 IN: math.functions.tests
 
 [ t ] [ 4 4 .00000001 ~ ] unit-test

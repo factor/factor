@@ -221,7 +221,7 @@ SYMBOL: exit-continuation
     '[ exit-continuation set @ ] callcc1 exit-continuation off ;
 
 : split-path ( string -- path )
-    "/" split [ empty? not ] subset ;
+    "/" split [ empty? not ] filter ;
 
 : do-request ( request -- response )
     [

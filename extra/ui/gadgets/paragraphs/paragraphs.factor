@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gadgets ui.gadgets.labels ui.render kernel math
-namespaces sequences ;
+namespaces sequences math.order ;
 IN: ui.gadgets.paragraphs
 
 ! A word break gadget

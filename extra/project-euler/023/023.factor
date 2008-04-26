@@ -40,7 +40,7 @@ IN: project-euler.023
     46 [1,b] 47 20161 2 <range> append ;
 
 : abundants-upto ( n -- seq )
-    [1,b] [ abundant? ] subset ;
+    [1,b] [ abundant? ] filter ;
 
 : possible-sums ( seq -- seq )
     dup { } -rot [

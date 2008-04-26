@@ -37,7 +37,7 @@ GENERIC: command-word ( command -- word )
 : command-gestures ( class -- hash )
     commands values [
         [
-            [ first ] subset
+            [ first ] filter
             [ [ invoke-command ] curry swap set ] assoc-each
         ] each
     ] H{ } make-assoc ;

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel math
+USING: help.markup help.syntax kernel math math.order
 sequences quotations math.functions.private ;
 IN: math.functions
 

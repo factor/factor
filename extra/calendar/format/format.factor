@@ -1,5 +1,5 @@
 USING: math math.parser kernel sequences io calendar
-accessors arrays io.streams.string splitting
+accessors arrays io.streams.string splitting math.order
 combinators accessors debugger ;
 IN: calendar.format
 

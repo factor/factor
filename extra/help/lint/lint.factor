@@ -75,7 +75,7 @@ IN: help.lint
     [ help ] with-string-writer drop ;
 
 : all-word-help ( words -- seq )
-    [ word-help ] subset ;
+    [ word-help ] filter ;
 
 TUPLE: help-error topic ;
 
@@ -131,7 +131,7 @@ M: help-error error.
         articles get keys "group-articles" set
         child-vocabs
         [ dup check-vocab ] { } map>assoc
-        [ nip empty? not ] assoc-subset
+        [ nip empty? not ] assoc-filter
     ] with-scope ;
 
 : typos. ( assoc -- )
@@ -150,12 +150,12 @@ M: help-error error.
 : help-lint-all ( -- ) "" help-lint ;
 
 : unlinked-words ( words -- seq )
-    all-word-help [ article-parent not ] subset ;
+    all-word-help [ article-parent not ] filter ;
 
 : linked-undocumented-words ( -- seq )
     all-words
-    [ word-help not ] subset
-    [ article-parent ] subset
-    [ "predicating" word-prop not ] subset ;
+    [ word-help not ] filter
+    [ article-parent ] filter
+    [ "predicating" word-prop not ] filter ;
 
 MAIN: help-lint

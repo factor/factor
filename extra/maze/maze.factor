@@ -17,7 +17,7 @@ SYMBOL: visited
 : choices ( cell -- seq )
     { { -1 0 } { 1 0 } { 0 -1 } { 0 1 } }
     [ v+ ] with map
-    [ unvisited? ] subset ;
+    [ unvisited? ] filter ;
 
 : random-neighbour ( cell -- newcell ) choices random ;
 

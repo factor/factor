@@ -17,7 +17,7 @@ IN: project-euler.150
     0 0 rot [ (partial-sum-infimum) ] each drop ; inline
 
 : generate ( n quot -- seq )
-    [ drop ] swap compose map ; inline
+    [ drop ] prepose map ; inline
 
 : map-infimum ( seq quot -- min )
     [ min ] compose 0 swap reduce ; inline

@@ -16,7 +16,7 @@ TUPLE: q/a question answer ;
 C: <q/a> q/a
 
 : li>q/a ( li -- q/a )
-    [ "br" tag-named*? not ] subset
+    [ "br" tag-named*? not ] filter
     [ "strong" tag-named*? ] find-after
     >r tag-children r> <q/a> ;
 
@@ -39,7 +39,7 @@ C: <question-list> question-list
 
 : xml>question-list ( list -- question-list )
     [ "title" swap at ] keep
-    tag-children [ tag? ] subset [ xml>q/a ] map
+    tag-children [ tag? ] filter [ xml>q/a ] map
     <question-list> ;
 
 : question-list>xml ( question-list -- list )
