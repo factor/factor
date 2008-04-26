@@ -1,5 +1,5 @@
 USING: arrays kernel sequences vectors math math.vectors namespaces
-shuffle splitting sequences.lib ;
+shuffle splitting sequences.lib math.order ;
 IN: math.polynomials
 
 ! Polynomials are vectors with the highest powers on the right:

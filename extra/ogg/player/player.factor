@@ -15,7 +15,7 @@ USING: kernel alien ogg ogg.vorbis ogg.theora io byte-arrays
        namespaces threads shuffle opengl arrays ui.gadgets.worlds
        combinators math.parser ui.gadgets ui.render opengl.gl ui
        continuations io.files hints combinators.lib sequences.lib
-       io.encodings.binary debugger ;
+       io.encodings.binary debugger math.order ;
 
 IN: ogg.player
 

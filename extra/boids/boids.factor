@@ -3,6 +3,7 @@ USING: kernel namespaces
        math
        math.constants
        math.functions
+       math.order
        math.vectors
        math.trig
        combinators arrays sequences random vars

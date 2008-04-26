@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Eric Mertens
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences sequences.private locals hints ;
+USING: kernel math math.order sequences sequences.private
+locals hints ;
 IN: project-euler.150
 
 <PRIVATE

@@ -1,7 +1,7 @@
-IN: optimizer.report
 USING: assocs words sequences arrays compiler tools.time
 io.styles io prettyprint vocabs kernel sorting generator
-optimizer math ;
+optimizer math math.order ;
+IN: optimizer.report
 
 : count-optimization-passes ( nodes n -- n )
     >r optimize-1

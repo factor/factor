@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Eric Mertens
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators kernel math sequences math.ranges locals ;
+USING: arrays assocs combinators kernel math sequences
+math.order math.ranges locals ;
 IN: project-euler.076
 
 ! http://projecteuler.net/index.php?section=problems&id=76

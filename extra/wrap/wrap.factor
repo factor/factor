@@ -1,4 +1,4 @@
-USING: sequences kernel namespaces splitting math ;
+USING: sequences kernel namespaces splitting math math.order ;
 IN: wrap
 
 ! Very stupid word wrapping/line breaking
