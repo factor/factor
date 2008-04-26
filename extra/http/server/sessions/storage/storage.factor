@@ -5,10 +5,10 @@ IN: http.server.sessions.storage
 
 : timeout 20 minutes ;
 
-GENERIC: get-session ( id storage -- namespace )
+GENERIC: get-session ( id storage -- session )
 
-GENERIC: update-session ( namespace id storage -- )
+GENERIC: update-session ( session storage -- )
 
 GENERIC: delete-session ( id storage -- )
 
-GENERIC: new-session ( namespace storage -- id )
+GENERIC: new-session ( session storage -- )

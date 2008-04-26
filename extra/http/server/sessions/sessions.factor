@@ -1,15 +1,24 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs calendar kernel math.parser namespaces random
-accessors http http.server
-http.server.sessions.storage http.server.sessions.storage.assoc
-quotations hashtables sequences fry html.elements symbols
-continuations destructors ;
+USING: assocs kernel math.parser namespaces random
+accessors quotations hashtables sequences continuations
+fry calendar destructors
+http
+http.server
+http.server.sessions.storage
+http.server.sessions.storage.null
+html.elements ;
 IN: http.server.sessions
 
 ! ! ! ! ! !
 ! WARNING: this session manager is vulnerable to XSRF attacks
 ! ! ! ! ! !
+
+TUPLE: session id user-agent client-addr namespace ;
+
+: <session> ( id -- session )
+    session new
+        swap >>id ;
 
 GENERIC: init-session* ( responder -- )
 
@@ -19,59 +28,65 @@ TUPLE: session-manager responder sessions ;
 
 : new-session-manager ( responder class -- responder' )
     new
-        <sessions-in-memory> >>sessions
+        null-sessions >>sessions
         swap >>responder ; inline
 
-SYMBOLS: session session-id session-changed? ;
+SYMBOL: session-changed?
 
 : sget ( key -- value )
-    session get at ;
+    session get namespace>> at ;
 
 : sset ( value key -- )
-    session get set-at
+    session get namespace>> set-at
     session-changed? on ;
 
 : schange ( key quot -- )
-    session get swap change-at
+    session get namespace>> swap change-at
     session-changed? on ; inline
 
 : sessions session-manager get sessions>> ;
 
 : managed-responder session-manager get responder>> ;
 
-: init-session ( managed -- session )
-    H{ } clone [ session [ init-session* ] with-variable ] keep ;
+: init-session ( session managed -- )
+    >r session r> '[ , init-session* ] with-variable ;
 
-: begin-session ( responder -- id session )
-    [ responder>> init-session ] [ sessions>> ] bi
-    [ new-session ] [ drop ] 2bi ;
+: empty-session ( -- session )
+    f <session>
+        "" >>user-agent
+        "" >>client-addr
+        H{ } clone >>namespace ;
+
+: begin-session ( responder -- session )
+    >r empty-session r>
+    [ responder>> init-session ]
+    [ sessions>> new-session ]
+    [ drop ]
+    2tri ;
 
 ! Destructor
-TUPLE: session-saver id session ;
+TUPLE: session-saver session ;
 
 C: <session-saver> session-saver
 
 M: session-saver dispose
-    session-changed? get [
-        [ session>> ] [ id>> ] bi
-        sessions update-session
-    ] [ drop ] if ;
+    session-changed? get
+    [ session>> sessions update-session ] [ drop ] if ;
 
-: save-session-after ( id session -- )
+: save-session-after ( session -- )
     <session-saver> add-always-destructor ;
 
-: call-responder/session ( path responder id session -- response )
-    [ save-session-after ]
-    [ [ session-id set ] [ session set ] bi* ] 2bi
+: call-responder/session ( path responder session -- response )
+    [ save-session-after ] [ session set ] bi
     [ session-manager set ] [ responder>> call-responder ] bi ;
 
 TUPLE: null-sessions < session-manager ;
 
-: <null-sessions>
+: <null-sessions> ( responder -- manager )
     null-sessions new-session-manager ;
 
 M: null-sessions call-responder ( path responder -- response )
-    H{ } clone f call-responder/session ;
+    <session> call-responder/session ;
 
 TUPLE: url-sessions < session-manager ;
 
@@ -80,42 +95,43 @@ TUPLE: url-sessions < session-manager ;
 
 : session-id-key "factorsessid" ;
 
-: current-url-session ( responder -- id/f session/f )
-    [ request-params session-id-key swap at ] [ sessions>> ] bi*
-    [ drop ] [ get-session ] 2bi ;
+: current-url-session ( responder -- session/f )
+    >r request-params session-id-key swap at string>number
+    r> sessions>> get-session ;
 
 : add-session-id ( query -- query' )
-    session-id get [ session-id-key associate assoc-union ] when* ;
+    session get [ id>> session-id-key associate assoc-union ] when* ;
 
 : session-form-field ( -- )
     <input
         "hidden" =type
         session-id-key =id
         session-id-key =name
-        session-id get =value
+        session get id>> =value
     input/> ;
 
-: new-url-session ( responder -- response )
-    [ f ] [ begin-session drop session-id-key associate ] bi*
+: new-url-session ( path responder -- response )
+    [ drop f ] [ begin-session id>> session-id-key associate ] bi*
     <temporary-redirect> ;
 
 M: url-sessions call-responder ( path responder -- response )
     [ add-session-id ] link-hook set
     [ session-form-field ] form-hook set
-    dup current-url-session dup [
+    dup current-url-session [
         call-responder/session
     ] [
-        2drop nip new-url-session
-    ] if ;
+        new-url-session
+    ] if* ;
 
 TUPLE: cookie-sessions < session-manager ;
 
 : <cookie-sessions> ( responder -- responder' )
     cookie-sessions new-session-manager ;
 
-: current-cookie-session ( responder -- id namespace/f )
+: current-cookie-session ( responder -- session/f )
     request get session-id-key get-cookie dup
-    [ value>> dup rot sessions>> get-session ] [ 2drop f f ] if ;
+    [ value>> string>number swap sessions>> get-session ]
+    [ 2drop f ] if ;
 
 : <session-cookie> ( id -- cookie )
     session-id-key <cookie> ;
@@ -123,12 +139,12 @@ TUPLE: cookie-sessions < session-manager ;
 : call-responder/new-session ( path responder -- response )
     dup begin-session
     [ call-responder/session ]
-    [ drop <session-cookie> ] 2bi
+    [ id>> number>string <session-cookie> ] bi
     put-cookie ;
 
 M: cookie-sessions call-responder ( path responder -- response )
-    dup current-cookie-session dup [
+    dup current-cookie-session [
         call-responder/session
     ] [
-        2drop call-responder/new-session
-    ] if ;
+        call-responder/new-session
+    ] if* ;
