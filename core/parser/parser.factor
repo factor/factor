@@ -345,6 +345,11 @@ M: invalid-slot-name summary
         [ >r tuple parse-tuple-slots r> prefix ]
     } case 3dup check-slot-shadowing ;
 
+ERROR: not-in-a-method-error ;
+
+M: not-in-a-method-error summary
+    drop "call-next-method can only be called in a method definition" ;
+
 ERROR: staging-violation word ;
 
 M: staging-violation summary
