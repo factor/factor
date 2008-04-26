@@ -1,5 +1,5 @@
 USING: arrays calendar kernel math sequences tools.test
-continuations system math.order ;
+continuations system math.order threads ;
 IN: calendar.tests
 
 \ time+ must-infer
@@ -163,3 +163,7 @@ IN: calendar.tests
 [ t ] [ 5 months checktime+ ] unit-test
 
 [ t ] [ 5 years checktime+ ] unit-test
+
+[ t ] [ now 50 milliseconds sleep now before? ] unit-test
+[ t ] [ now 50 milliseconds sleep now swap after? ] unit-test
+[ t ] [ now 50 milliseconds sleep now 50 milliseconds sleep now swapd between? ] unit-test
