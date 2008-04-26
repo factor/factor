@@ -8,4 +8,4 @@ MEMO: fib ( m -- n )
 
 [ 89 ] [ 10 fib ] unit-test
 
-[ "USING: kernel math memoize ; MEMO: x ( a b c d e -- f g h i j ) >r >r >r >r 1+ r> r> r> r> ;" eval ] must-fail
+[ "USING: kernel math memoize ; IN: memoize.tests MEMO: x ( a b c d e -- f g h i j ) >r >r >r >r 1+ r> r> r> r> ;" eval ] must-fail

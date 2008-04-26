@@ -85,7 +85,7 @@ C: <faq> faq
 : toc, ( faq -- )
     "div" { { "style" "background-color: #eee; margin-left: 30%; margin-right: 30%; width: auto; padding: 5px; margin-top: 1em; margin-bottom: 1em" } } [
         "strong" [ "The big questions" , ] tag, br,
-        faq-lists 1 tail dup length [ toc-link, ] 2each
+        faq-lists rest dup length [ toc-link, ] 2each
     ] tag*, ;
 
 : faq-sections, ( question-lists -- )

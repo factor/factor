@@ -111,7 +111,7 @@ M: tuple (serialize) ( obj -- )
         CHAR: T write1
         [ class (serialize) ]
         [ add-object ]
-        [ tuple>array 1 tail (serialize) ]
+        [ tuple>array rest (serialize) ]
         tri
     ] serialize-shared ;
 

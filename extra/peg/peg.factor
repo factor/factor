@@ -448,7 +448,7 @@ M: action-parser (compile) ( parser -- quot )
   #! Return a new string without any leading whitespace
   #! from the original string.
   dup empty? [
-    dup first blank? [ 1 tail-slice left-trim-slice ] when
+    dup first blank? [ rest-slice left-trim-slice ] when
   ] unless ;
 
 TUPLE: sp-parser p1 ;

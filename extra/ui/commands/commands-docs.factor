@@ -47,6 +47,7 @@ HELP: command-name
 { $examples
     { $example
         "USING: io ui.commands ;"
+        "IN: scratchpad"
         ": com-my-command ;"
         "\\ com-my-command command-name write"
         "My Command"
@@ -105,6 +106,7 @@ HELP: command-string
 { $examples
     { $example
         "USING: io ui.commands ui.gestures ;"
+        "IN: scratchpad"
         ": com-my-command ;"
         "T{ key-down f { C+ } \"s\" } \\ com-my-command command-string write"
         "My Command (C+s)"

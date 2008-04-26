@@ -9,7 +9,7 @@ macros combinators.lib sequences.lib math sets ;
 IN: help.lint
 
 : check-example ( element -- )
-    1 tail [
+    rest [
         1 head* "\n" join 1vector
         [
             use [ clone ] change
@@ -23,7 +23,7 @@ IN: help.lint
 
 : extract-values ( element -- seq )
     \ $values swap elements dup empty? [
-        first 1 tail [ first ] map prune natural-sort
+        first rest [ first ] map prune natural-sort
     ] unless ;
 
 : effect-values ( word -- seq )
@@ -59,7 +59,7 @@ IN: help.lint
 
 : check-see-also ( word element -- )
     nip \ $see-also swap elements [
-        1 tail dup prune [ length ] bi@ assert=
+        rest dup prune [ length ] bi@ assert=
     ] each ;
 
 : vocab-exists? ( name -- ? )

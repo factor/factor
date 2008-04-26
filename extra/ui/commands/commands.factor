@@ -56,7 +56,7 @@ GENERIC: command-word ( command -- word )
 M: word command-name ( word -- str )
     word-name
     "com-" ?head drop
-    dup first Letter? [ 1 tail ] unless
+    dup first Letter? [ rest ] unless
     (command-name) ;
 
 M: word command-description ( word -- str )

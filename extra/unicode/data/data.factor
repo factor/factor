@@ -59,7 +59,7 @@ IN: unicode.data
 
 : process-compat ( data -- hash )
     (process-decomposed)
-    [ dup first* [ first2 1 tail 2array ] unless ] map
+    [ dup first* [ first2 rest 2array ] unless ] map
     >hashtable chain-decomposed ;
 
 : process-combining ( data -- hash )

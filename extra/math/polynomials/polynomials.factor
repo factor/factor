@@ -58,7 +58,7 @@ PRIVATE>
     2dup /-last
     2dup , n*p swapd
     p- >vector
-    dup pop* swap 1 tail-slice ;
+    dup pop* swap rest-slice ;
 
 PRIVATE>
 

@@ -42,7 +42,7 @@ SYMBOL: log-files
         { [ dup length 1 = ] [ first -rot f (write-message) ] }
         [
             [ first -rot f (write-message) ] 3keep
-            1 tail -rot [ t (write-message) ] 2curry each
+            rest -rot [ t (write-message) ] 2curry each
         ]
     } cond ;
 

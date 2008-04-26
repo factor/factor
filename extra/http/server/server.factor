@@ -149,7 +149,7 @@ TUPLE: dispatcher default responders ;
         [ nip ] [ drop default>> ] if
     ] [
         over first over responders>> at*
-        [ >r drop 1 tail-slice r> ] [ drop default>> ] if
+        [ >r drop rest-slice r> ] [ drop default>> ] if
     ] if ;
 
 M: dispatcher call-responder ( path dispatcher -- response )

@@ -203,7 +203,7 @@ DEFER: (d)
     [ basis graded ] bi@ tensor bigraded-ker/im-d
     [ [ [ first ] map ] map ] keep
     [ [ second ] map 2 head* { 0 0 } prepend ] map
-    1 tail dup first length 0 <array> suffix
+    rest dup first length 0 <array> suffix
     [ v- ] 2map ;
 
 ! Laplacian

@@ -45,13 +45,14 @@ IN: project-euler.023
 : possible-sums ( seq -- seq )
     dup { } -rot [
         dupd [ + ] curry map
-        rot append prune swap 1 tail
+        rot append prune swap rest
     ] each drop natural-sort ;
 
 PRIVATE>
 
 : euler023 ( -- answer )
-    20161 abundants-upto possible-sums source-023 diff sum ;
+    source-023
+    20161 abundants-upto possible-sums diff sum ;
 
 ! TODO: solution is still too slow, although it takes under 1 minute
 

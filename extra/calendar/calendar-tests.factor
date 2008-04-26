@@ -1,5 +1,5 @@
 USING: arrays calendar kernel math sequences tools.test
-continuations system ;
+continuations system math.order ;
 IN: calendar.tests
 
 \ time+ must-infer

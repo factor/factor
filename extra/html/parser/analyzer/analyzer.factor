@@ -99,7 +99,7 @@ IN: html.parser.analyzer
     
 : find-between ( i/f tag/f vector -- vector )
     find-between* dup length 3 >= [
-        [ 1 tail-slice 1 head-slice* ] keep like
+        [ rest-slice 1 head-slice* ] keep like
     ] when ;
 
 : find-between-first ( string vector -- vector' )

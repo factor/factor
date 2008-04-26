@@ -117,7 +117,7 @@ MACRO: firstn ( n -- )
 
 : split-around ( seq quot -- before elem after )
     dupd find over [ "Element not found" throw ] unless
-    >r cut 1 tail r> swap ; inline
+    >r cut rest r> swap ; inline
 
 : (map-until) ( quot pred -- quot )
     [ dup ] swap 3compose
@@ -239,7 +239,7 @@ PRIVATE>
     zip >hashtable substitute ;
 
 : remove-nth ( seq n -- seq' )
-    cut-slice 1 tail-slice append ;
+    cut-slice rest-slice append ;
 
 : short ( seq n -- seq n' )
     over length min ; inline

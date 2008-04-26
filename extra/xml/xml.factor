@@ -12,7 +12,7 @@ IN: xml
 SYMBOL: xml-stack
 
 : <unclosed> ( -- unclosed )
-    xml-stack get 1 tail-slice [ first opener-name ] map
+    xml-stack get rest-slice [ first opener-name ] map
     { set-unclosed-tags } unclosed construct ;
 
 : add-child ( object -- )
@@ -93,7 +93,7 @@ M: closer process
 
 : make-xml-doc ( prolog seq -- xml-doc )
     dup [ tag? ] find
-    >r assure-tags cut 1 tail
+    >r assure-tags cut rest
     no-pre/post no-post-tags
     r> swap <xml> ;
 

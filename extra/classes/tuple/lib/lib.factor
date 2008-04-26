@@ -7,7 +7,7 @@ IN: classes.tuple.lib
     [ slot-spec-reader ] map [ get-slots ] curry ;
 
 MACRO: >tuple< ( class -- )
-    all-slots 1 tail-slice reader-slots ;
+    all-slots rest-slice reader-slots ;
 
 MACRO: >tuple*< ( class -- )
     all-slots

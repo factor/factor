@@ -130,7 +130,7 @@ M: object free-vars* drop ;
 M: quotation free-vars* [ add-if-free ] each ;
 
 M: lambda free-vars*
-    [ vars>> ] [ body>> ] bi free-vars diff % ;
+    [ vars>> ] [ body>> ] bi free-vars swap diff % ;
 
 GENERIC: lambda-rewrite* ( obj -- )
 
