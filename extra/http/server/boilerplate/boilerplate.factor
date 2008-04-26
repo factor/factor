@@ -5,12 +5,15 @@ io io.streams.string arrays
 html.elements
 http
 http.server
+http.server.sessions
 http.server.templating ;
 IN: http.server.boilerplate
 
 TUPLE: boilerplate responder template ;
 
 : <boilerplate> f boilerplate boa ;
+
+M: boilerplate init-session* responder>> init-session* ;
 
 SYMBOL: title
 

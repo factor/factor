@@ -230,6 +230,7 @@ SYMBOL: deserialized
 : deserialize-word ( -- word )
     (deserialize) (deserialize) 2dup lookup
     dup [ 2nip ] [
+        drop
         "Unknown word: " -rot
         2array unparse append throw
     ] if ;

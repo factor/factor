@@ -13,6 +13,7 @@ http.server.auth.providers
 http.server.auth.providers.null
 http.server.actions
 http.server.components
+http.server.flows
 http.server.forms
 http.server.sessions
 http.server.boilerplate
@@ -22,7 +23,6 @@ http.server.validators ;
 IN: http.server.auth.login
 QUALIFIED: smtp
 
-SYMBOL: post-login-url
 SYMBOL: login-failed?
 
 TUPLE: login < dispatcher users ;
@@ -60,8 +60,7 @@ M: user-saver dispose
 
 : successful-login ( user -- response )
     logged-in-user sset
-    post-login-url sget "$login" or f <permanent-redirect>
-    f post-login-url sset ;
+    "$login" end-flow ;
 
 :: <login-action> ( -- action )
     [let | form [ <login-form> ] |
@@ -155,8 +154,6 @@ SYMBOL: user-exists?
         "verify-password" <password> add-field
         "email" <email> add-field ;
 
-SYMBOL: previous-page
-
 :: <edit-profile-action> ( -- action )
     [let | form [ <edit-profile-form> ] |
         <action>
@@ -196,7 +193,7 @@ SYMBOL: previous-page
 
                 user-profile-changed? on
 
-                previous-page sget f <permanent-redirect>
+                "$login" end-flow
             ] >>submit
     ] ;
 
@@ -342,14 +339,15 @@ TUPLE: protected responder ;
 
 C: <protected> protected
 
+M: protected init-session* responder>> init-session* ;
+
 : show-login-page ( -- response )
-    request get request-url post-login-url sset
+    begin-flow
     "$login/login" f <temporary-redirect> ;
 
 M: protected call-responder ( path responder -- response )
     logged-in-user sget dup [
         save-user-after
-        request get request-url previous-page sset
         responder>> call-responder
     ] [
         3drop

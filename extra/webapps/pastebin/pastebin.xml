@@ -13,7 +13,7 @@
 
 		<t:comment>
 		<t:if code="http.server.auth.login:allow-edit-profile?">
-			| <t:a href="$login/edit-profile">Edit Profile</t:a>
+			| <t:a href="$login/edit-profile" flow="begin">Edit Profile</t:a>
 		</t:if>
 
 		<t:form action="$login/logout" class="inline">
