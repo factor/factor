@@ -4,6 +4,7 @@ USING: accessors kernel sequences assocs io.files io.sockets
 namespaces db db.sqlite smtp
 http.server
 http.server.db
+http.server.flows
 http.server.sessions
 http.server.auth.login
 http.server.auth.providers.db
@@ -20,27 +21,6 @@ IN: webapps.factor-website
 : factor-template ( path -- template )
     "resource:extra/webapps/factor-website/" swap ".xml" 3append <chloe> ;
 
-: <factor-boilerplate> ( responder -- responder' )
-    <login>
-        users-in-db >>users
-        allow-registration
-        allow-password-recovery
-        allow-edit-profile
-    <boilerplate>
-        "page" factor-template >>template
-    <url-sessions>
-        sessions-in-db >>sessions
-    test-db <db-persistence> ;
-
-: <pastebin-app> ( -- responder )
-    <pastebin> <factor-boilerplate> ;
-
-: <planet-app> ( -- responder )
-    <planet-factor> <factor-boilerplate> ;
-
-: <todo-app> ( -- responder )
-    <todo-list> <protected> <factor-boilerplate> ;
-
 : init-factor-db ( -- )
     test-db [
         init-users-table
@@ -56,9 +36,20 @@ IN: webapps.factor-website
 
 : <factor-website> ( -- responder )
     <dispatcher>
-        <todo-app> "todo" add-responder
-        <pastebin-app> "pastebin" add-responder
-        <planet-app> "planet" add-responder ;
+        <todo-list> "todo" add-responder
+        <pastebin> "pastebin" add-responder
+        <planet-factor> "planet" add-responder
+    <login>
+        users-in-db >>users
+        allow-registration
+        allow-password-recovery
+        allow-edit-profile
+    <boilerplate>
+        "page" factor-template >>template
+    <flows>
+    <url-sessions>
+        sessions-in-db >>sessions
+    test-db <db-persistence> ;
 
 : init-factor-website ( -- )
     "factorcode.org" 25 <inet> smtp-server set-global
@@ -66,6 +57,9 @@ IN: webapps.factor-website
 
     init-factor-db
 
-    <factor-website> main-responder set-global
+    <factor-website> main-responder set-global ;
 
-    "planet" main-responder get responders>> at start-update-task ;
+: start-factor-website
+    test-db start-expiring-sessions
+    "planet" main-responder get responders>> at test-db start-update-task
+    8812 httpd ;

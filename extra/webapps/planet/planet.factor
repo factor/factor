@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting locals math
 calendar alarms logging concurrency.combinators namespaces
-sequences.lib db.types db.tuples db
+sequences.lib db.types db.tuples db fry
 rss xml.writer
 http.server
 http.server.crud
@@ -167,5 +167,7 @@ blog "BLOGS"
     <boilerplate>
         "planet" planet-template >>template ;
 
-: start-update-task ( planet -- )
-    [ update-cached-postings ] curry 10 minutes every drop ;
+: start-update-task ( planet db seq -- )
+    '[
+        , , , [ update-cached-postings ] with-db
+    ] 10 minutes every drop ;

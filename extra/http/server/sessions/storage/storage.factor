@@ -3,8 +3,6 @@
 USING: calendar ;
 IN: http.server.sessions.storage
 
-: timeout 20 minutes ;
-
 GENERIC: get-session ( id storage -- session )
 
 GENERIC: update-session ( session storage -- )

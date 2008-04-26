@@ -10,11 +10,7 @@ http.server.sessions.storage.null
 html.elements ;
 IN: http.server.sessions
 
-! ! ! ! ! !
-! WARNING: this session manager is vulnerable to XSRF attacks
-! ! ! ! ! !
-
-TUPLE: session id user-agent client-addr namespace ;
+TUPLE: session id expiry namespace changed? ;
 
 : <session> ( id -- session )
     session new
@@ -24,6 +20,8 @@ GENERIC: init-session* ( responder -- )
 
 M: object init-session* drop ;
 
+M: dispatcher init-session* default>> init-session* ;
+
 TUPLE: session-manager responder sessions ;
 
 : new-session-manager ( responder class -- responder' )
@@ -31,18 +29,23 @@ TUPLE: session-manager responder sessions ;
         null-sessions >>sessions
         swap >>responder ; inline
 
-SYMBOL: session-changed?
+: (session-changed) ( session -- )
+    t >>changed? drop ;
+
+: session-changed ( -- )
+    session get (session-changed) ;
 
 : sget ( key -- value )
     session get namespace>> at ;
 
 : sset ( value key -- )
-    session get namespace>> set-at
-    session-changed? on ;
+    session get
+    [ namespace>> set-at ] [ (session-changed) ] bi ;
 
 : schange ( key quot -- )
-    session get namespace>> swap change-at
-    session-changed? on ; inline
+    session get
+    [ namespace>> swap change-at ] keep
+    (session-changed) ; inline
 
 : sessions session-manager get sessions>> ;
 
@@ -51,11 +54,18 @@ SYMBOL: session-changed?
 : init-session ( session managed -- )
     >r session r> '[ , init-session* ] with-variable ;
 
+: timeout 20 minutes ;
+
+: cutoff-time ( -- time )
+    now timeout time+ timestamp>millis ;
+
+: touch-session ( session -- )
+    cutoff-time >>expiry drop ;
+
 : empty-session ( -- session )
     f <session>
-        "" >>user-agent
-        "" >>client-addr
-        H{ } clone >>namespace ;
+        H{ } clone >>namespace
+        dup touch-session ;
 
 : begin-session ( responder -- session )
     >r empty-session r>
@@ -70,8 +80,9 @@ TUPLE: session-saver session ;
 C: <session-saver> session-saver
 
 M: session-saver dispose
-    session-changed? get
-    [ session>> sessions update-session ] [ drop ] if ;
+    session>> dup changed?>> [
+        [ touch-session ] [ sessions update-session ] bi
+    ] [ drop ] if ;
 
 : save-session-after ( session -- )
     <session-saver> add-always-destructor ;
@@ -79,14 +90,6 @@ M: session-saver dispose
 : call-responder/session ( path responder session -- response )
     [ save-session-after ] [ session set ] bi
     [ session-manager set ] [ responder>> call-responder ] bi ;
-
-TUPLE: null-sessions < session-manager ;
-
-: <null-sessions> ( responder -- manager )
-    null-sessions new-session-manager ;
-
-M: null-sessions call-responder ( path responder -- response )
-    <session> call-responder/session ;
 
 TUPLE: url-sessions < session-manager ;
 
@@ -105,9 +108,8 @@ TUPLE: url-sessions < session-manager ;
 : session-form-field ( -- )
     <input
         "hidden" =type
-        session-id-key =id
         session-id-key =name
-        session get id>> =value
+        session get id>> number>string =value
     input/> ;
 
 : new-url-session ( path responder -- response )
@@ -115,8 +117,8 @@ TUPLE: url-sessions < session-manager ;
     <temporary-redirect> ;
 
 M: url-sessions call-responder ( path responder -- response )
-    [ add-session-id ] link-hook set
-    [ session-form-field ] form-hook set
+    [ add-session-id ] add-link-hook
+    [ session-form-field ] add-form-hook
     dup current-url-session [
         call-responder/session
     ] [

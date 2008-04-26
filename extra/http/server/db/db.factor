@@ -1,10 +1,12 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: db http.server kernel accessors
+USING: db http.server http.server.sessions kernel accessors
 continuations namespaces destructors ;
 IN: http.server.db
 
 TUPLE: db-persistence responder db params ;
+
+M: db-persistence init-session* responder>> init-session* ;
 
 C: <db-persistence> db-persistence
 

@@ -4,6 +4,7 @@ io io.files io.encodings.utf8 html.elements unicode.case
 tuple-syntax xml xml.data xml.writer xml.utilities
 http.server
 http.server.auth
+http.server.flows
 http.server.components
 http.server.sessions
 http.server.templating
@@ -83,14 +84,33 @@ SYMBOL: tags
     dup empty?
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
 
+: a-flow-attr ( tag -- )
+    "flow" optional-attr {
+        { "none" [ flow-id off ] }
+        { "begin" [ begin-flow ] }
+        { "current" [ ] }
+        { f [ ] }
+    } case ;
+
+: a-session-attr ( tag -- )
+    "session" optional-attr {
+        { "none" [ session off flow-id off ] }
+        { "current" [ ] }
+        { f [ ] }
+    } case ;
+
 : a-start-tag ( tag -- )
-    <a
-    dup "value" optional-attr [ value f ] [
-        [ "href" required-attr ]
-        [ "query" optional-attr parse-query-attr ]
-        bi
-    ] ?if link>string =href
-    a> ;
+    [
+        <a
+        dup a-flow-attr
+        dup a-session-attr
+        dup "value" optional-attr [ value f ] [
+            [ "href" required-attr ]
+            [ "query" optional-attr parse-query-attr ]
+            bi
+        ] ?if link>string =href
+        a>
+    ] with-scope ;
 
 : process-tag-children ( tag -- )
     [ process-template ] each ;

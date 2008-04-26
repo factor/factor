@@ -4,7 +4,7 @@
 
 	<p class="news">
 		<strong><t:view component="title" /></strong> <br/>
-		<t:a value="link" class="more">Read More...</t:a>
+		<t:a value="link" session="none" class="more">Read More...</t:a>
 	</p>
 
 </t:chloe>

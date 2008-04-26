@@ -3,7 +3,7 @@ USING: tools.test http http.server.sessions
 http.server.sessions.storage http.server.sessions.storage.db
 http.server.actions http.server math namespaces kernel accessors
 prettyprint io.streams.string io.files splitting destructors
-sequences db db.sqlite ;
+sequences db db.sqlite continuations ;
 
 : with-session
     [
@@ -49,7 +49,11 @@ M: foo call-responder
             "text/plain" <content> exit-with
         ] >>display ;
 
+[ "auth-test.db" temp-file sqlite-db delete-file ] ignore-errors
+
 "auth-test.db" temp-file sqlite-db [
+
+    init-sessions-table
 
     [
         empty-session

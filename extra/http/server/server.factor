@@ -69,8 +69,11 @@ SYMBOL: base-paths
 
 SYMBOL: link-hook
 
+: add-link-hook ( quot -- )
+    link-hook [ compose ] change ; inline
+
 : modify-query ( query -- query )
-    link-hook get [ ] or call ;
+    link-hook get call ;
 
 : base-path ( string -- path )
     dup base-paths get at
@@ -93,8 +96,11 @@ SYMBOL: link-hook
 
 SYMBOL: form-hook
 
+: add-form-hook ( quot -- )
+    form-hook [ compose ] change ;
+
 : hidden-form-field ( -- )
-    form-hook get [ ] or call ;
+    form-hook get call ;
 
 : absolute-redirect ( to query -- url )
     #! Same host.
@@ -226,6 +232,9 @@ SYMBOL: exit-continuation
 : do-request ( request -- response )
     [
         H{ } clone base-paths set
+        [ ] link-hook set
+        [ ] form-hook set
+
         [ log-request ]
         [ request set ]
         [ path>> split-path main-responder get call-responder ] tri
