@@ -132,7 +132,7 @@ name>char-hook global [
     "{" ?head-slice [
         CHAR: } over index cut-slice
         >r >string name>char-hook get call r>
-        1 tail-slice
+        rest-slice
     ] [
         6 cut-slice >r hex> r>
     ] if ;
@@ -146,7 +146,7 @@ name>char-hook global [
 
 : (parse-string) ( str -- m )
     dup [ "\"\\" member? ] find dup [
-        >r cut-slice >r % r> 1 tail-slice r>
+        >r cut-slice >r % r> rest-slice r>
         dup CHAR: " = [
             drop slice-from
         ] [
@@ -513,7 +513,7 @@ SYMBOL: interactive-vocabs
     ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
-    assoc-diff [
+    swap assoc-diff [
         drop where dup [ first ] when
         file get source-file-path =
     ] assoc-filter keys ;

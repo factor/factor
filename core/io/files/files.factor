@@ -92,7 +92,7 @@ ERROR: no-parent-directory path ;
 : append-path-empty ( path1 path2 -- path' )
     {
         { [ dup head.? ] [
-            1 tail left-trim-separators append-path-empty
+            rest left-trim-separators append-path-empty
         ] }
         { [ dup head..? ] [ drop no-parent-directory ] }
         [ nip ]
@@ -122,7 +122,7 @@ PRIVATE>
         { [ over empty? ] [ append-path-empty ] }
         { [ dup empty? ] [ drop ] }
         { [ dup absolute-path? ] [ nip ] }
-        { [ dup head.? ] [ 1 tail left-trim-separators append-path ] }
+        { [ dup head.? ] [ rest left-trim-separators append-path ] }
         { [ dup head..? ] [
             2 tail left-trim-separators
             >r parent-directory r> append-path

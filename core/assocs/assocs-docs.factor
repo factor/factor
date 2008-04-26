@@ -281,7 +281,7 @@ HELP: assoc-union
 
 HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
-{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc2" } " whose key is not contained in " { $snippet "assoc1" } "." } 
+{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." } 
 ;
 HELP: remove-all
 { $values { "assoc" assoc } { "seq" "a sequence" } { "subseq" "a new sequence" } }

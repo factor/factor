@@ -1,4 +1,4 @@
-USING: continuations kernel math namespaces strings
+USING: continuations kernel math math.order namespaces strings
 strings.private sbufs tools.test sequences vectors arrays memory
 prettyprint io.streams.null ;
 IN: strings.tests

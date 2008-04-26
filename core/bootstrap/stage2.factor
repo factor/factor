@@ -22,7 +22,7 @@ SYMBOL: bootstrap-time
     xref-sources ;
 
 : load-components ( -- )
-    "exclude" "include"
+    "include" "exclude"
     [ get-global " " split [ empty? not ] filter ] bi@
     diff
     [ "bootstrap." prepend require ] each ;

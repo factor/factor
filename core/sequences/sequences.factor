@@ -257,7 +257,7 @@ PRIVATE>
 
 : tail ( seq n -- tailseq ) (tail) subseq ;
 
-: rest ( seq -- seq' ) 1 tail ;
+: rest ( seq -- tailseq ) 1 tail ;
 
 : head* ( seq n -- headseq ) from-end head ;
 

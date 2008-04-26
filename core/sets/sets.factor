@@ -25,7 +25,7 @@ IN: sets
     unique [ key? ] curry filter ;
 
 : diff ( seq1 seq2 -- newseq )
-    swap unique [ key? not ] curry filter ;
+    unique [ key? not ] curry filter ;
 
 : union ( seq1 seq2 -- newseq )
     append prune ;

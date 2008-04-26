@@ -197,7 +197,7 @@ HELP: execute ( word -- )
 { $values { "word" word } }
 { $description "Executes a word." }
 { $examples
-    { $example "USING: kernel io words ;" ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
+    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
 
 HELP: word-props ( word -- props )

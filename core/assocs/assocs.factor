@@ -120,7 +120,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ rot update ] keep [ swap update ] keep ;
 
 : assoc-diff ( assoc1 assoc2 -- diff )
-    swap [ nip key? not ] curry assoc-filter ;
+    [ nip key? not ] curry assoc-filter ;
 
 : remove-all ( assoc seq -- subseq )
     swap [ key? not ] curry filter ;
