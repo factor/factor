@@ -9,11 +9,9 @@ http.server.sessions
 http.server.templating ;
 IN: http.server.boilerplate
 
-TUPLE: boilerplate responder template ;
+TUPLE: boilerplate < filter-responder template ;
 
 : <boilerplate> f boilerplate boa ;
-
-M: boilerplate init-session* responder>> init-session* ;
 
 SYMBOL: title
 
@@ -71,7 +69,7 @@ M: f call-template* drop call-next-template ;
     ] with-scope ; inline
 
 M: boilerplate call-responder
-    tuck responder>> call-responder
+    tuck call-next-method
     dup "content-type" header "text/html" = [
         clone swap template>>
         [ [ with-boilerplate ] 2curry ] curry change-body

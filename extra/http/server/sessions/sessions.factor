@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math.parser namespaces random
 accessors quotations hashtables sequences continuations
-fry calendar destructors
+fry calendar combinators destructors
 http
 http.server
 http.server.sessions.storage
@@ -22,12 +22,12 @@ M: object init-session* drop ;
 
 M: dispatcher init-session* default>> init-session* ;
 
-TUPLE: session-manager responder sessions ;
+M: filter-responder init-session* responder>> init-session* ;
 
-: new-session-manager ( responder class -- responder' )
-    new
-        null-sessions >>sessions
-        swap >>responder ; inline
+TUPLE: session-manager < filter-responder sessions ;
+
+: <session-manager> ( responder -- responder' )
+    null-sessions session-manager boa ;
 
 : (session-changed) ( session -- )
     t >>changed? drop ;
@@ -49,8 +49,6 @@ TUPLE: session-manager responder sessions ;
 
 : sessions session-manager get sessions>> ;
 
-: managed-responder session-manager get responder>> ;
-
 : init-session ( session managed -- )
     >r session r> '[ , init-session* ] with-variable ;
 
@@ -69,7 +67,7 @@ TUPLE: session-manager responder sessions ;
 
 : begin-session ( responder -- session )
     >r empty-session r>
-    [ responder>> init-session ]
+    [ init-session ]
     [ sessions>> new-session ]
     [ drop ]
     2tri ;
@@ -87,23 +85,37 @@ M: session-saver dispose
 : save-session-after ( session -- )
     <session-saver> add-always-destructor ;
 
-: call-responder/session ( path responder session -- response )
-    [ save-session-after ] [ session set ] bi
+: existing-session ( path responder session -- response )
+    [ session set ] [ save-session-after ] bi
     [ session-manager set ] [ responder>> call-responder ] bi ;
-
-TUPLE: url-sessions < session-manager ;
-
-: <url-sessions> ( responder -- responder' )
-    url-sessions new-session-manager ;
 
 : session-id-key "factorsessid" ;
 
-: current-url-session ( responder -- session/f )
-    >r request-params session-id-key swap at string>number
-    r> sessions>> get-session ;
+: cookie-session-id ( -- id/f )
+    request get session-id-key get-cookie
+    dup [ value>> string>number ] when ;
 
-: add-session-id ( query -- query' )
-    session get [ id>> session-id-key associate assoc-union ] when* ;
+: post-session-id ( -- id/f )
+    session-id-key request get post-data>> at string>number ;
+
+: request-session-id ( -- id/f )
+    request get method>> {
+        { "GET" [ cookie-session-id ] }
+        { "HEAD" [ cookie-session-id ] }
+        { "POST" [ post-session-id ] }
+    } case ;
+
+: request-session ( responder -- session/f )
+    >r request-session-id r> sessions>> get-session ;
+
+: <session-cookie> ( id -- cookie )
+    session-id-key <cookie> ;
+
+: new-session ( path responder -- response )
+    dup begin-session
+    [ existing-session ]
+    [ id>> number>string <session-cookie> ] bi
+    put-cookie ;
 
 : session-form-field ( -- )
     <input
@@ -112,41 +124,6 @@ TUPLE: url-sessions < session-manager ;
         session get id>> number>string =value
     input/> ;
 
-: new-url-session ( path responder -- response )
-    [ drop f ] [ begin-session id>> session-id-key associate ] bi*
-    <temporary-redirect> ;
-
-M: url-sessions call-responder ( path responder -- response )
-    [ add-session-id ] add-link-hook
+M: session-manager call-responder ( path responder -- response )
     [ session-form-field ] add-form-hook
-    dup current-url-session [
-        call-responder/session
-    ] [
-        new-url-session
-    ] if* ;
-
-TUPLE: cookie-sessions < session-manager ;
-
-: <cookie-sessions> ( responder -- responder' )
-    cookie-sessions new-session-manager ;
-
-: current-cookie-session ( responder -- session/f )
-    request get session-id-key get-cookie dup
-    [ value>> string>number swap sessions>> get-session ]
-    [ 2drop f ] if ;
-
-: <session-cookie> ( id -- cookie )
-    session-id-key <cookie> ;
-
-: call-responder/new-session ( path responder -- response )
-    dup begin-session
-    [ call-responder/session ]
-    [ id>> number>string <session-cookie> ] bi
-    put-cookie ;
-
-M: cookie-sessions call-responder ( path responder -- response )
-    dup current-cookie-session [
-        call-responder/session
-    ] [
-        call-responder/new-session
-    ] if* ;
+    dup request-session [ existing-session ] [ new-session ] if* ;

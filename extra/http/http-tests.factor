@@ -194,7 +194,7 @@ test-db [
         <dispatcher>
             <action> <protected>
             <login>
-            <url-sessions>
+            <session-manager>
                 sessions-in-db >>sessions
             "" add-responder
             add-quit-action
@@ -225,7 +225,7 @@ test-db [
         <dispatcher>
             <action> [ "text/plain" <content> [ "Hi" write ] >>body ] >>display
             <login>
-            <url-sessions>
+            <session-manager>
                 sessions-in-db >>sessions
             "" add-responder
             add-quit-action

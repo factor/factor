@@ -32,7 +32,7 @@ M: foo call-responder
         [ write-response-body drop ] with-string-writer
     ] with-destructors ;
 
-: cookie-responder-mock-test
+: session-manager-mock-test
     [
         <request>
             "GET" >>method
@@ -58,9 +58,6 @@ M: foo call-responder
     [
         empty-session
             123 >>id session set
-        session-changed? off
-
-        [ H{ { "factorsessid" 123 } } ] [ H{ } add-session-id ] unit-test
 
         [ ] [ 3 "x" sset ] unit-test
 
@@ -70,14 +67,11 @@ M: foo call-responder
 
         [ 4 ] [ "x" sget sq ] unit-test
 
-        [ t ] [ session-changed? get ] unit-test
+        [ t ] [ session get changed?>> ] unit-test
     ] with-scope
 
-    [ t ] [ f <url-sessions> url-sessions? ] unit-test
-    [ t ] [ f <cookie-sessions> cookie-sessions? ] unit-test
-
     [ ] [
-        <foo> <url-sessions>
+        <foo> <session-manager>
             sessions-in-db >>sessions
         session-manager set
     ] unit-test
@@ -113,26 +107,7 @@ M: foo call-responder
     ] unit-test
 
     [ ] [
-        [
-            <request>
-            "GET" >>method
-            request set
-            { "etc" } session-manager get call-responder
-        ] with-destructors
-        response set
-    ] unit-test
-
-    [ 307 ] [ response get code>> ] unit-test
-
-    [ ] [ response get "location" header "=" split1 nip "id" set ] unit-test
-
-    [ "1" ] [ url-responder-mock-test ] unit-test
-    [ "2" ] [ url-responder-mock-test ] unit-test
-    [ "3" ] [ url-responder-mock-test ] unit-test
-    [ "4" ] [ url-responder-mock-test ] unit-test
-
-    [ ] [
-        <foo> <cookie-sessions>
+        <foo> <session-manager>
             sessions-in-db >>sessions
         session-manager set
     ] unit-test
@@ -150,9 +125,9 @@ M: foo call-responder
 
     [ ] [ response get cookies>> "cookies" set ] unit-test
 
-    [ "2" ] [ cookie-responder-mock-test ] unit-test
-    [ "3" ] [ cookie-responder-mock-test ] unit-test
-    [ "4" ] [ cookie-responder-mock-test ] unit-test
+    [ "2" ] [ session-manager-mock-test ] unit-test
+    [ "3" ] [ session-manager-mock-test ] unit-test
+    [ "4" ] [ session-manager-mock-test ] unit-test
 
     [
         [ ] [
@@ -163,7 +138,7 @@ M: foo call-responder
             request set
 
             [
-                { } <exiting-action> <cookie-sessions>
+                { } <exiting-action> <session-manager>
                     sessions-in-db >>sessions
                 call-responder
             ] with-destructors response set

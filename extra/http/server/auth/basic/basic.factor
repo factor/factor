@@ -6,7 +6,7 @@ http.server.auth.providers http.server.auth.providers.null
 http sequences ;
 IN: http.server.auth.basic
 
-TUPLE: basic-auth responder realm provider ;
+TUPLE: basic-auth < filter-responder realm provider ;
 
 C: <basic-auth> basic-auth
 
@@ -38,4 +38,4 @@ C: <basic-auth> basic-auth
 
 M: basic-auth call-responder ( request path responder -- response )
     pick over logged-in?
-    [ responder>> call-responder ] [ 2nip realm>> <401> ] if ;
+    [ call-next-method ] [ 2nip realm>> <401> ] if ;

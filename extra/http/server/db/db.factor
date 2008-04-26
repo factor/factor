@@ -4,9 +4,7 @@ USING: db http.server http.server.sessions kernel accessors
 continuations namespaces destructors ;
 IN: http.server.db
 
-TUPLE: db-persistence responder db params ;
-
-M: db-persistence init-session* responder>> init-session* ;
+TUPLE: db-persistence < filter-responder db params ;
 
 C: <db-persistence> db-persistence
 
@@ -15,4 +13,4 @@ C: <db-persistence> db-persistence
     [ db set ] [ add-always-destructor ] bi ;
 
 M: db-persistence call-responder
-    [ connect-db ] [ responder>> call-responder ] bi ;
+    [ connect-db ] [ call-next-method ] bi ;

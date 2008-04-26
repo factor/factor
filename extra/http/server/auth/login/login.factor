@@ -138,7 +138,7 @@ SYMBOL: user-exists?
 
                 successful-login
 
-                login get default>> responder>> init-user-profile
+                login get init-user-profile
             ] >>submit
     ] ;
 
@@ -177,7 +177,8 @@ SYMBOL: user-exists?
 
                 logged-in-user sget
 
-                "password" value empty? [
+                { "password" "new-password" "verify-password" }
+                [ value empty? ] all? [
                     same-password-twice
 
                     "password" value uid users check-login
@@ -335,11 +336,9 @@ SYMBOL: lost-password-from
 
 ! ! ! Authentication logic
 
-TUPLE: protected responder ;
+TUPLE: protected < filter-responder ;
 
 C: <protected> protected
-
-M: protected init-session* responder>> init-session* ;
 
 : show-login-page ( -- response )
     begin-flow
@@ -348,7 +347,7 @@ M: protected init-session* responder>> init-session* ;
 M: protected call-responder ( path responder -- response )
     logged-in-user sget dup [
         save-user-after
-        responder>> call-responder
+        call-next-method
     ] [
         3drop
         request get method>> { "GET" "HEAD" } member?

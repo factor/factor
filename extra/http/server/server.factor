@@ -181,6 +181,11 @@ M: vhost-dispatcher call-responder ( path dispatcher -- response )
     [ drop "" add-responder drop ]
     [ 2drop ] 3tri ;
 
+TUPLE: filter-responder responder ;
+
+M: filter-responder call-responder
+    responder>> call-responder ;
+
 SYMBOL: main-responder
 
 main-responder global

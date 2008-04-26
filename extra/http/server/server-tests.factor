@@ -11,6 +11,8 @@ IN: http.server.tests
     { { "a" "b" } } >>query
     request set
 
+    [ ] link-hook set
+
     [ "http://www.apple.com:80/xxx/bar?a=b" ] [ f f derive-url ] unit-test
     [ "http://www.apple.com:80/xxx/baz?a=b" ] [ "baz" f derive-url ] unit-test
     [ "http://www.apple.com:80/xxx/baz?c=d" ] [ "baz" { { "c" "d" } } derive-url ] unit-test

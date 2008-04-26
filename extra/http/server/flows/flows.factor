@@ -5,7 +5,7 @@ assocs assocs.lib hashtables math.parser
 html.elements http http.server http.server.sessions ;
 IN: http.server.flows
 
-TUPLE: flows responder ;
+TUPLE: flows < filter-responder ;
 
 C: <flows> flows
 
@@ -43,8 +43,8 @@ M: flows call-responder
     [ add-flow-id ] add-link-hook
     [ flow-form-field ] add-form-hook
     flow-id-key request-params at flow-id set
-    responder>> call-responder ;
+    call-next-method ;
 
 M: flows init-session*
     H{ } clone flows sset
-    responder>> init-session* ;
+    call-next-method ;
