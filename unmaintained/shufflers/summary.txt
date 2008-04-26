@@ -1,0 +1,1 @@
+Arbitrary stack shuffling operators of the form abc-cbab
