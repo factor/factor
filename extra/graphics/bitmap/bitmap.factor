@@ -117,8 +117,8 @@ M: bitmap height ( bitmap -- ) bitmap-height ;
 : bitmap. ( path -- )
     load-bitmap <graphics-gadget> gadget. ;
 
-: bitmap-window ( path -- )
-    load-bitmap [ <graphics-gadget> "bitmap" open-window ] keep ;
+: bitmap-window ( path -- gadget )
+    load-bitmap <graphics-gadget> [ "bitmap" open-window ] keep ;
 
 : test-bitmap24 ( -- )
     "resource:extra/graphics/bitmap/test-images/thiswayup24.bmp" bitmap. ;
