@@ -25,10 +25,14 @@ TUPLE: bitmap magic size reserved offset header-length width
         { 1 [ "1bit" throw ] }
     } case ;
 
+ERROR: bitmap-magic ;
+
+M: bitmap-magic summary
+    drop "First two bytes of bitmap stream must be 'BM'" ;
+
 : parse-file-header ( bitmap -- )
-    2 read [ over set-bitmap-magic ] keep "BM" = [
-        "BITMAPFILEHEADER: First two bytes must be BM" throw
-    ] unless
+    2 read >string dup "BM" = [ bitmap-magic ] unless
+        [ over set-bitmap-magic ] keep
     4 read le> over set-bitmap-size
     4 read le> over set-bitmap-reserved
     4 read le> swap set-bitmap-offset ;
