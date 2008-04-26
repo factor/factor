@@ -31,8 +31,8 @@ IN: strings.tests
 
 [ t ] [ "abc" "abd" before? ] unit-test
 [ t ] [ "z" "abd" after? ] unit-test
-[ t ] [ "abc" "abd" min ] unit-test
-[ t ] [ "z" "abd" max ] unit-test
+[ "abc" ] [ "abc" "abd" min ] unit-test
+[ "z" ] [ "z" "abd" max ] unit-test
 
 [ 0 10 "hello" subseq ] must-fail
 
