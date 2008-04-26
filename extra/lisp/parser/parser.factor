@@ -6,9 +6,6 @@ IN: lisp.parser
 TUPLE: lisp-symbol name ;
 C: <lisp-symbol> lisp-symbol
 
-TUPLE: s-exp body ;
-C: <s-exp> s-exp
-
 EBNF: lisp-expr
 _            = (" " | "\t" | "\n")*
 LPAREN       = "("
@@ -32,5 +29,5 @@ atom         = number
               | identifier
               | string
 list-item    = _ (atom|s-expression) _                        => [[ second ]]
-s-expression = LPAREN (list-item)* RPAREN             => [[ second <s-exp> ]]
+s-expression = LPAREN (list-item)* RPAREN             => [[ second ]]
 ;EBNF
