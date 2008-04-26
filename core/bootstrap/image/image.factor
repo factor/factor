@@ -8,7 +8,7 @@ splitting growable classes classes.builtin classes.tuple
 classes.tuple.private words.private io.binary io.files vocabs
 vocabs.loader source-files definitions debugger float-arrays
 quotations.private sequences.private combinators
-io.encodings.binary ;
+io.encodings.binary math.order ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )

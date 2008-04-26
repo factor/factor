@@ -63,7 +63,7 @@ t parser-notes set-global
 
 : skip ( i seq ? -- n )
     over >r
-    [ swap CHAR: \s eq? xor ] curry find* drop
+    [ swap CHAR: \s eq? xor ] curry find-from drop
     [ r> drop ] [ r> length ] if* ;
 
 : change-lexer-column ( lexer quot -- )
@@ -207,7 +207,7 @@ SYMBOL: in
 : add-use ( seq -- ) [ use+ ] each ;
 
 : set-use ( seq -- )
-    [ vocab-words ] map [ ] subset >vector use set ;
+    [ vocab-words ] map [ ] filter >vector use set ;
 
 : check-vocab-string ( name -- name )
     dup string?
@@ -270,7 +270,7 @@ M: no-word-error summary
 
 : no-word ( name -- newword )
     dup no-word-error boa
-    swap words-named [ forward-reference? not ] subset
+    swap words-named [ forward-reference? not ] filter
     word-restarts throw-restarts
     dup word-vocabulary (use+) ;
 
@@ -278,7 +278,7 @@ M: no-word-error summary
     dup forward-reference? [
         drop
         use get
-        [ at ] with map [ ] subset
+        [ at ] with map [ ] filter
         [ forward-reference? not ] find nip
     ] [
         nip
@@ -516,7 +516,7 @@ SYMBOL: interactive-vocabs
     assoc-diff [
         drop where dup [ first ] when
         file get source-file-path =
-    ] assoc-subset keys ;
+    ] assoc-filter keys ;
 
 : removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions
@@ -531,7 +531,7 @@ SYMBOL: interactive-vocabs
 
 : reset-removed-classes ( -- )
     removed-classes
-    filter-moved [ class? ] subset [ reset-class ] each ;
+    filter-moved [ class? ] filter [ reset-class ] each ;
 
 : fix-class-words ( -- )
     #! If a class word had a compound definition which was

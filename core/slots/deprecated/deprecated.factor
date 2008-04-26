@@ -86,7 +86,7 @@ PREDICATE: slot-writer < word "writing" word-prop >boolean ;
             { [ over string? ] [ >r dupd r> short-slot ] }
             { [ over array? ] [ long-slot ] }
         } cond
-    ] 2map [ ] subset nip ;
+    ] 2map [ ] filter nip ;
 
 : slot-of-reader ( reader specs -- spec/f )
     [ slot-spec-reader eq? ] with find nip ;

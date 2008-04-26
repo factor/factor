@@ -96,7 +96,7 @@ $nl
 { $subsection assoc-each }
 { $subsection assoc-map }
 { $subsection assoc-push-if }
-{ $subsection assoc-subset }
+{ $subsection assoc-filter }
 { $subsection assoc-contains? }
 { $subsection assoc-all? }
 "Three additional combinators:"
@@ -203,7 +203,7 @@ HELP: assoc-push-if
 { $values { "accum" "a resizable mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "key" object } { "value" object } }
 { $description "If the quotation yields true when applied to the key/value pair, adds the key/value pair at the end of " { $snippet "accum" } "." } ;
 
-HELP: assoc-subset
+HELP: assoc-filter
 { $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "subassoc" "a new assoc" } }
 { $description "Outputs an assoc of the same type as " { $snippet "assoc" } " consisting of all entries for which the predicate quotation yields true." } ;
 

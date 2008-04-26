@@ -50,7 +50,7 @@ M: assoc assoc-find
 : assoc-pusher ( quot -- quot' accum )
     V{ } clone [ [ assoc-push-if ] 2curry ] keep ; inline
 
-: assoc-subset ( assoc quot -- subassoc )
+: assoc-filter ( assoc quot -- subassoc )
     over >r assoc-pusher >r assoc-each r> r> assoc-like ; inline
 
 : assoc-contains? ( assoc quot -- ? )
@@ -110,7 +110,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     ] { } assoc>map hashcode* ;
 
 : assoc-intersect ( assoc1 assoc2 -- intersection )
-    swap [ nip key? ] curry assoc-subset ;
+    swap [ nip key? ] curry assoc-filter ;
 
 : update ( assoc1 assoc2 -- )
     swap [ swapd set-at ] curry assoc-each ;
@@ -120,10 +120,10 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ rot update ] keep [ swap update ] keep ;
 
 : assoc-diff ( assoc1 assoc2 -- diff )
-    swap [ nip key? not ] curry assoc-subset ;
+    swap [ nip key? not ] curry assoc-filter ;
 
 : remove-all ( assoc seq -- subseq )
-    swap [ key? not ] curry subset ;
+    swap [ key? not ] curry filter ;
 
 : (substitute)
     [ dupd at* [ nip ] [ drop ] if ] curry ; inline

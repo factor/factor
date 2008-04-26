@@ -4,7 +4,7 @@ USING: arrays assocs classes classes.private classes.algebra
 combinators cpu.architecture generator.fixup hashtables kernel
 layouts math namespaces quotations sequences system vectors
 words effects alien byte-arrays bit-arrays float-arrays
-accessors sets ;
+accessors sets math.order ;
 IN: generator.registers
 
 SYMBOL: +input+
@@ -314,7 +314,7 @@ M: phantom-retainstack finalize-height
 : (live-locs) ( phantom -- seq )
     #! Discard locs which haven't moved
     [ phantom-locs* ] [ stack>> ] bi zip
-    [ live-loc? ] assoc-subset
+    [ live-loc? ] assoc-filter
     values ;
 
 : live-locs ( -- seq )
@@ -484,7 +484,7 @@ M: loc lazy-store
 
 : substitute-vregs ( values vregs -- )
     [ vreg-substitution ] 2map
-    [ substitute-vreg? ] assoc-subset >hashtable
+    [ substitute-vreg? ] assoc-filter >hashtable
     [ >r stack>> r> substitute-here ] curry each-phantom ;
 
 : set-operand ( value var -- )

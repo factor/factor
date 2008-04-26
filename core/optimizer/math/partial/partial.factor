@@ -85,7 +85,7 @@ PREDICATE: math-partial < word
 : define-math-ops ( op -- )
     { fixnum bignum float }
     [ [ dup 3array ] [ swap method ] 2bi ] with { } map>assoc
-    [ nip ] assoc-subset
+    [ nip ] assoc-filter
     [ word-def peek ] assoc-map % ;
 
 SYMBOL: math-ops
@@ -155,7 +155,7 @@ SYMBOL: fast-math-ops
     [ drop math-class-max swap specific-method >boolean ] if ;
 
 : (derived-ops) ( word assoc -- words )
-    swap [ rot first eq? nip ] curry assoc-subset values ;
+    swap [ rot first eq? nip ] curry assoc-filter values ;
 
 : derived-ops ( word -- words )
     [ 1array ]

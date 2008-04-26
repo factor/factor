@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math sequences vectors
+USING: arrays kernel math sequences vectors math.order
 sequences sequences.private growable ;
 IN: sorting
 

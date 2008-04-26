@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: combinators
 USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
-hashtables sorting words sets ;
+hashtables sorting words sets math.order ;
+IN: combinators
 
 : cleave ( x seq -- )
     [ call ] with each ;

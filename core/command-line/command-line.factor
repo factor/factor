@@ -54,7 +54,7 @@ SYMBOL: main-vocab-hook
     "none" "run" set-global ;
 
 : parse-command-line ( -- )
-    cli-args [ cli-arg ] subset
+    cli-args [ cli-arg ] filter
     "script" get [ script-mode ] when
     ignore-cli-args? [ drop ] [ [ run-file ] each ] if
     "e" get [ eval ] when* ;

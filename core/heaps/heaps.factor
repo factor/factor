@@ -2,7 +2,7 @@
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences arrays assocs sequences.private
-growable accessors ;
+growable accessors math.order ;
 IN: heaps
 
 MIXIN: priority-queue

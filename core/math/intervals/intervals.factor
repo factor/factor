@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
-USING: kernel sequences arrays math combinators ;
+USING: kernel sequences arrays math combinators math.order ;
 IN: math.intervals
 
 TUPLE: interval from to ;

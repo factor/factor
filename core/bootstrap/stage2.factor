@@ -23,12 +23,12 @@ SYMBOL: bootstrap-time
 
 : load-components ( -- )
     "exclude" "include"
-    [ get-global " " split [ empty? not ] subset ] bi@
+    [ get-global " " split [ empty? not ] filter ] bi@
     diff
     [ "bootstrap." prepend require ] each ;
 
 : count-words ( pred -- )
-    all-words swap subset length number>string write ;
+    all-words swap filter length number>string write ;
 
 : print-report ( time -- )
     1000 /i

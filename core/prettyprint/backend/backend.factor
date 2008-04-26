@@ -3,7 +3,7 @@
 USING: arrays byte-arrays bit-arrays generic hashtables io
 assocs kernel math namespaces sequences strings sbufs io.styles
 vectors words prettyprint.config prettyprint.sections quotations
-io io.files math.parser effects classes.tuple
+io io.files math.parser effects classes.tuple math.order
 classes.tuple.private classes float-arrays ;
 IN: prettyprint.backend
 

@@ -3,7 +3,7 @@
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
 system combinators splitting sbufs continuations io.encodings
-io.encodings.binary init accessors ;
+io.encodings.binary init accessors math.order ;
 IN: io.files
 
 HOOK: (file-reader) io-backend ( path -- stream )
@@ -54,7 +54,7 @@ HOOK: (file-appender) io-backend ( path -- stream )
     [ path-separator? ] left-trim ;
 
 : last-path-separator ( path -- n ? )
-    [ length 1- ] keep [ path-separator? ] find-last* ;
+    [ length 1- ] keep [ path-separator? ] find-last-from ;
 
 HOOK: root-directory? io-backend ( path -- ? )
 
@@ -232,7 +232,7 @@ HOOK: make-directory io-backend ( path -- )
         dup string?
         [ tuck append-path directory? 2array ] [ nip ] if
     ] with map
-    [ first { "." ".." } member? not ] subset ;
+    [ first { "." ".." } member? not ] filter ;
 
 : directory ( path -- seq )
     normalize-directory dup (directory) fixup-directory ;
