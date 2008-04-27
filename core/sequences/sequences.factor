@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: kernel kernel.private slots.private math math.private
+math.order ;
 IN: sequences
-USING: kernel kernel.private slots.private math math.private ;
 
 MIXIN: sequence
 
@@ -36,7 +37,7 @@ M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
 : set-third ( third seq -- ) 2 swap set-nth ; inline
 : set-fourth  ( fourth seq -- ) 3 swap set-nth ; inline
 
-: push ( elt seq -- ) dup length swap set-nth ;
+: push ( elt seq -- ) [ length ] [ set-nth ] bi ;
 
 : bounds-check? ( n seq -- ? )
     length 1- 0 swap between? ; inline
@@ -100,13 +101,13 @@ M: integer nth-unsafe drop ;
 INSTANCE: integer immutable-sequence
 
 : first2-unsafe
-    [ 0 swap nth-unsafe ] keep 1 swap nth-unsafe ; inline
+    [ 0 swap nth-unsafe 1 ] [ nth-unsafe ] bi ; inline
 
 : first3-unsafe
-    [ first2-unsafe ] keep 2 swap nth-unsafe ; inline
+    [ first2-unsafe 2 ] [ nth-unsafe ] bi ; inline
 
 : first4-unsafe
-    [ first3-unsafe ] keep 3 swap nth-unsafe ; inline
+    [ first3-unsafe 3 ] [ nth-unsafe ] bi ; inline
 
 : exchange-unsafe ( m n seq -- )
     [ tuck nth-unsafe >r nth-unsafe r> ] 3keep tuck
@@ -179,7 +180,7 @@ M: reversed length reversed-seq length ;
 
 INSTANCE: reversed virtual-sequence
 
-: reverse ( seq -- newseq ) [ <reversed> ] keep like ;
+: reverse ( seq -- newseq ) [ <reversed> ] [ like ] bi ;
 
 ! A slice of another sequence.
 TUPLE: slice from to seq ;
@@ -201,13 +202,15 @@ ERROR: slice-error reason ;
 
 M: slice virtual-seq slice-seq ;
 
-M: slice virtual@ [ slice-from + ] keep slice-seq ;
+M: slice virtual@ [ slice-from + ] [ slice-seq ] bi ;
 
 M: slice length dup slice-to swap slice-from - ;
 
 : head-slice ( seq n -- slice ) (head) <slice> ;
 
 : tail-slice ( seq n -- slice ) (tail) <slice> ;
+
+: rest-slice ( seq -- slice ) 1 tail-slice ;
 
 : head-slice* ( seq n -- slice ) from-end head-slice ;
 
@@ -248,11 +251,13 @@ INSTANCE: repetition immutable-sequence
 PRIVATE>
 
 : subseq ( from to seq -- subseq )
-    [ check-slice prepare-subseq (copy) ] keep like ;
+    [ check-slice prepare-subseq (copy) ] [ like ] bi ;
 
 : head ( seq n -- headseq ) (head) subseq ;
 
 : tail ( seq n -- tailseq ) (tail) subseq ;
+
+: rest ( seq -- tailseq ) 1 tail ;
 
 : head* ( seq n -- headseq ) from-end head ;
 
@@ -267,11 +272,12 @@ M: sequence clone-like
 
 M: immutable-sequence clone-like like ;
 
-: push-all ( src dest -- ) [ length ] keep copy ;
+: push-all ( src dest -- ) [ length ] [ copy ] bi ;
 
 : ((append)) ( seq1 seq2 accum -- accum )
-    [ >r over length r> copy ] keep
-    [ 0 swap copy ] keep ; inline
+    [ >r over length r> copy ]
+    [ 0 swap copy ] 
+    [ ] tri ; inline
 
 : (append) ( seq1 seq2 exemplar -- newseq )
     >r over length over length + r>
@@ -279,8 +285,8 @@ M: immutable-sequence clone-like like ;
 
 : (3append) ( seq1 seq2 seq3 exemplar -- newseq )
     >r pick length pick length pick length + + r> [
-        [ >r pick length pick length + r> copy ] keep
-        ((append))
+        [ >r pick length pick length + r> copy ]
+        [ ((append)) ] bi
     ] new-like ; inline
 
 : append ( seq1 seq2 -- newseq ) over (append) ;
@@ -323,7 +329,7 @@ M: immutable-sequence clone-like like ;
 : (find) ( seq quot quot' -- i elt )
     pick >r >r (each) r> call r> finish-find ; inline
 
-: (find*) ( n seq quot quot' -- i elt )
+: (find-from) ( n seq quot quot' -- i elt )
     >r >r 2dup bounds-check? [
         r> r> (find)
     ] [
@@ -332,7 +338,7 @@ M: immutable-sequence clone-like like ;
 
 : (monotonic) ( seq quot -- ? )
     [ 2dup nth-unsafe rot 1+ rot nth-unsafe ]
-    swap compose curry ; inline
+    prepose curry ; inline
 
 : (interleave) ( n elt between quot -- )
     roll zero? [ nip ] [ swapd 2slip ] if call ; inline
@@ -373,14 +379,14 @@ PRIVATE>
 : 2all? ( seq1 seq2 quot -- ? )
     (2each) all-integers? ; inline
 
-: find* ( n seq quot -- i elt )
-    [ (find-integer) ] (find*) ; inline
+: find-from ( n seq quot -- i elt )
+    [ (find-integer) ] (find-from) ; inline
 
 : find ( seq quot -- i elt )
     [ find-integer ] (find) ; inline
 
-: find-last* ( n seq quot -- i elt )
-    [ nip find-last-integer ] (find*) ; inline
+: find-last-from ( n seq quot -- i elt )
+    [ nip find-last-integer ] (find-from) ; inline
 
 : find-last ( seq quot -- i elt )
     [ >r 1- r> find-last-integer ] (find) ; inline
@@ -394,7 +400,7 @@ PRIVATE>
 : pusher ( quot -- quot accum )
     V{ } clone [ [ push-if ] 2curry ] keep ; inline
 
-: subset ( seq quot -- subseq )
+: filter ( seq quot -- subseq )
     over >r pusher >r each r> r> like ; inline
 
 : monotonic? ( seq quot -- ? )
@@ -414,14 +420,14 @@ PRIVATE>
 : index ( obj seq -- n )
     [ = ] with find drop ;
 
-: index* ( obj i seq -- n )
-    rot [ = ] curry find* drop ;
+: index-from ( obj i seq -- n )
+    rot [ = ] curry find-from drop ;
 
 : last-index ( obj seq -- n )
     [ = ] with find-last drop ;
 
-: last-index* ( obj i seq -- n )
-    rot [ = ] curry find-last* drop ;
+: last-index-from ( obj i seq -- n )
+    rot [ = ] curry find-last-from drop ;
 
 : contains? ( seq quot -- ? )
     find drop >boolean ; inline
@@ -433,7 +439,7 @@ PRIVATE>
     [ eq? ] with contains? ;
 
 : remove ( obj seq -- newseq )
-    [ = not ] with subset ;
+    [ = not ] with filter ;
 
 : cache-nth ( i seq quot -- elt )
     2over ?nth dup [
@@ -472,7 +478,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 : move ( to from seq -- )
     2over number=
-    [ 3drop ] [ [ nth swap ] keep set-nth ] if ; inline
+    [ 3drop ] [ [ nth swap ] [ set-nth ] bi ] if ; inline
 
 : (delete) ( elt store scan seq -- elt store scan seq )
     2dup length < [
@@ -497,9 +503,9 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
         [ 0 swap copy ] keep
     ] new-like ;
 
-: peek ( seq -- elt ) dup length 1- swap nth ;
+: peek ( seq -- elt ) [ length 1- ] [ nth ] bi ;
 
-: pop* ( seq -- ) dup length 1- swap set-length ;
+: pop* ( seq -- ) [ length 1- ] [ set-length ] bi ;
 
 : move-backward ( shift from to seq -- )
     2over number= [
@@ -519,7 +525,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 : (open-slice) ( shift from to seq ? -- )
     [
-        >r >r 1- r> 1- r> move-forward
+        >r [ 1- ] bi@ r> move-forward
     ] [
         >r >r over - r> r> move-backward
     ] if ;
@@ -544,7 +550,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
     copy ;
 
 : pop ( seq -- elt )
-    dup length 1- swap [ nth ] 2keep set-length ;
+    [ length 1- ] [ [ nth ] [ set-length ] 2bi ] bi ;
 
 : all-equal? ( seq -- ? ) [ = ] monotonic? ;
 
@@ -609,7 +615,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
     ] if ;
 
 : cut-slice ( seq n -- before after )
-    [ head-slice ] 2keep tail-slice ;
+    [ head-slice ] [ tail-slice ] 2bi ;
 
 : midpoint@ ( seq -- n ) length 2/ ; inline
 
@@ -634,10 +640,10 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
     ] if ; inline
 
 : cut ( seq n -- before after )
-    [ head ] 2keep tail ;
+    [ head ] [ tail ] 2bi ;
 
 : cut* ( seq n -- before after )
-    [ head* ] 2keep tail* ;
+    [ head* ] [ tail* ] 2bi ;
 
 <PRIVATE
 
@@ -650,7 +656,7 @@ PRIVATE>
 
 : start* ( subseq seq n -- i )
     pick length pick length swap - 1+
-    [ (start) ] find*
+    [ (start) ] find-from
     swap >r 3drop r> ;
 
 : start ( subseq seq -- i ) 0 start* ; inline
@@ -662,10 +668,10 @@ PRIVATE>
     tuck tail-slice >r tail-slice r> ;
 
 : unclip ( seq -- rest first )
-    dup 1 tail swap first ;
+    [ rest ] [ first ] bi ;
 
 : unclip-slice ( seq -- rest first )
-    dup 1 tail-slice swap first ;
+    [ rest-slice ] [ first ] bi ;
 
 : <flat-slice> ( seq -- slice )
     dup slice? [ { } like ] when 0 over length rot <slice> ;
@@ -680,7 +686,7 @@ PRIVATE>
     [ 1+ head ] [ 0 head ] if* ; inline
 
 : trim ( seq quot -- newseq )
-    [ left-trim ] keep right-trim ; inline
+    [ left-trim ] [ right-trim ] bi ; inline
 
 : sum ( seq -- n ) 0 [ + ] binary-reduce ;
 : product ( seq -- n ) 1 [ * ] binary-reduce ;

@@ -1,4 +1,4 @@
-eSING: combinators combinators.lib io locals kernel math
+USING: combinators combinators.lib io locals kernel math
 math.functions math.ranges namespaces random sequences
 hashtables sets ;
 IN: math.miller-rabin

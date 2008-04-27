@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays hashtables io kernel math namespaces opengl
 opengl.gl opengl.glu sequences strings io.styles vectors
-combinators math.vectors ui.gadgets colors ;
+combinators math.vectors ui.gadgets colors math.order ;
 IN: ui.render
 
 SYMBOL: clip

@@ -87,7 +87,7 @@ HELP: +@
 { $description "Adds " { $snippet "n" } " to the value of the variable. A variable value of " { $link f } " is interpreted as being zero." }
 { $side-effects "variable" }
 { $examples
-    { $example "USING: namespaces prettyprint ;" "SYMBOL: foo\n1 foo +@\n10 foo +@\nfoo get ." "11" }
+    { $example "USING: namespaces prettyprint ;" "IN: scratchpad" "SYMBOL: foo\n1 foo +@\n10 foo +@\nfoo get ." "11" }
 } ;
 
 HELP: inc

@@ -1,9 +1,9 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: command-line
 USING: init continuations debugger hashtables io kernel
 kernel.private namespaces parser sequences strings system
 splitting io.files ;
+IN: command-line
 
 : run-bootstrap-init ( -- )
     "user-init" get [
@@ -54,7 +54,7 @@ SYMBOL: main-vocab-hook
     "none" "run" set-global ;
 
 : parse-command-line ( -- )
-    cli-args [ cli-arg ] subset
+    cli-args [ cli-arg ] filter
     "script" get [ script-mode ] when
     ignore-cli-args? [ drop ] [ [ run-file ] each ] if
     "e" get [ eval ] when* ;

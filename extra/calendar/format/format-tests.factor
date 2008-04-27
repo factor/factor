@@ -1,5 +1,5 @@
 USING: calendar.format calendar kernel math tools.test
-io.streams.string accessors io ;
+io.streams.string accessors io math.order ;
 IN: calendar.format.tests
 
 [ 0 ] [

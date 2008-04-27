@@ -34,7 +34,7 @@ SYMBOL: indenter
 : ?filter-children ( children -- no-whitespace )
     xml-pprint? get [
         [ dup string? [ trim-whitespace ] when ] map
-        [ dup empty? swap string? and not ] subset
+        [ dup empty? swap string? and not ] filter
     ] when ;
 
 : print-name ( name -- )

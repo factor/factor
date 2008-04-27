@@ -162,7 +162,7 @@ TUPLE: dispatcher default responders ;
         [ nip ] [ drop default>> ] if
     ] [
         over first over responders>> at*
-        [ >r drop 1 tail-slice r> ] [ drop default>> ] if
+        [ >r drop rest-slice r> ] [ drop default>> ] if
     ] if ;
 
 M: dispatcher call-responder* ( path dispatcher -- response )
@@ -239,7 +239,7 @@ SYMBOL: exit-continuation
     '[ exit-continuation set @ ] callcc1 exit-continuation off ;
 
 : split-path ( string -- path )
-    "/" split [ empty? not ] subset ;
+    "/" split [ empty? not ] filter ;
 
 : init-request ( -- )
     H{ } clone base-paths set

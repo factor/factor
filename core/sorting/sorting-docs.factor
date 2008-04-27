@@ -1,5 +1,6 @@
-USING: sorting help.markup help.syntax kernel words math
-sequences ;
+USING: help.markup help.syntax kernel words math
+sequences math.order ;
+IN: sorting
 
 ARTICLE: "sequences-sorting" "Sorting and binary search"
 "Sorting and binary search combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- n )" } " that order the two given elements and output a value whose sign denotes the result:"

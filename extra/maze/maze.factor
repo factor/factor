@@ -1,6 +1,7 @@
 ! From http://www.ffconsultancy.com/ocaml/maze/index.html
 USING: sequences namespaces math math.vectors opengl opengl.gl
-arrays kernel random ui ui.gadgets ui.gadgets.canvas ui.render ;
+arrays kernel random ui ui.gadgets ui.gadgets.canvas ui.render
+math.order ;
 IN: maze
 
 : line-width 8 ;
@@ -17,7 +18,7 @@ SYMBOL: visited
 : choices ( cell -- seq )
     { { -1 0 } { 1 0 } { 0 -1 } { 0 1 } }
     [ v+ ] with map
-    [ unvisited? ] subset ;
+    [ unvisited? ] filter ;
 
 : random-neighbour ( cell -- newcell ) choices random ;
 

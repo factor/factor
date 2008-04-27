@@ -1,7 +1,7 @@
 USING: assocs math kernel shuffle combinators.lib
 words quotations arrays combinators sequences math.vectors
 io.styles prettyprint vocabs sorting io generic locals.private
-math.statistics ;
+math.statistics math.order ;
 IN: reports.noise
 
 : badness ( word -- n )

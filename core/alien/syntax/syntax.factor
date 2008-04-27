@@ -40,7 +40,7 @@ PRIVATE>
 
 : FUNCTION:
     scan "c-library" get scan ";" parse-tokens
-    [ "()" subseq? not ] subset
+    [ "()" subseq? not ] filter
     define-function ; parsing
 
 : TYPEDEF:

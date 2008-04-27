@@ -1,4 +1,4 @@
-USING: math math.parser kernel sequences io
+USING: math math.order math.parser kernel sequences io
 accessors arrays io.streams.string splitting
 combinators accessors debugger
 calendar calendar.format.macros ;

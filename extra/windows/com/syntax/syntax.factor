@@ -46,7 +46,7 @@ unless
 
 : parse-com-functions ( -- functions )
     ";" parse-tokens { ")" } split
-    [ empty? not ] subset
+    [ empty? not ] filter
     [ (parse-com-function) ] map ;
 
 : (iid-word) ( definition -- word )

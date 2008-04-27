@@ -1,6 +1,6 @@
 USING: arrays combinators kernel lazy-lists math math.parser
 namespaces parser parser-combinators parser-combinators.simple
-promises quotations sequences combinators.lib strings
+promises quotations sequences combinators.lib strings math.order
 assocs prettyprint.backend memoize unicode.case unicode.categories ;
 USE: io
 IN: regexp
@@ -291,7 +291,7 @@ TUPLE: regexp source parser ignore-case? ;
 
 : parse-regexp ( accum end -- accum )
     lexer get dup skip-blank
-    [ [ index* dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
+    [ [ index-from dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
     lexer get dup still-parsing-line?
     [ (parse-token) parse-options ] [ drop f ] if
     <regexp> parsed ;

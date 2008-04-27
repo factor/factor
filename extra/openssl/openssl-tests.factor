@@ -84,7 +84,7 @@ verify-load-locations ] unit-test
 ! SYMBOL: ssl
 ! 
 ! : is-set ( seq -- newseq )
-!     <enum> >alist [ nip ] assoc-subset >hashtable keys ;
+!     <enum> >alist [ nip ] assoc-filter >hashtable keys ;
 ! 
 ! ! 1234 server-socket sock set
 ! "127.0.0.1" 1234 <inet4> SOCK_STREAM server-fd sock set

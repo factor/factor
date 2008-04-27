@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences sorting locals math
+USING: kernel accessors sequences sorting locals math math.order
 calendar alarms logging concurrency.combinators namespaces
 sequences.lib db.types db.tuples db fry
 rss xml.writer

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: cpu.ppc.assembler
 USING: generator.fixup generic kernel math memory namespaces
-words math.bitfields io.binary ;
+words math.bitfields math.order io.binary ;
+IN: cpu.ppc.assembler
 
 ! See the Motorola or IBM documentation for details. The opcode
 ! names are standard, and the operand order is the same as in

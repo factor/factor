@@ -30,7 +30,7 @@ must-fail-with
 ] unit-test
 
 : run-template
-    with-string-writer [ "\r\n\t" member? not ] subset
+    with-string-writer [ "\r\n\t" member? not ] filter
     "?>" split1 nip ; inline
 
 : test-template ( name -- template )

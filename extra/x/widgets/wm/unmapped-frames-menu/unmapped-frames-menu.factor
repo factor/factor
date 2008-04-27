@@ -24,7 +24,7 @@ VAR: unmapped-frames-menu
 
 : unmapped-frames ( -- seq )
 dpy get $window-table values
-[ <wm-frame> is? ] subset [ <- mapped? not ] subset ;
+[ <wm-frame> is? ] filter [ <- mapped? not ] filter ;
 
 <unmapped-frames-menu> {
 

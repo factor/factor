@@ -17,6 +17,7 @@ HELP: [|
 { $examples
     { $example
         "USING: kernel locals math prettyprint ;"
+        "IN: scratchpad"
         ":: adder ( n -- quot ) [| m | m n + ] ;"
         "3 5 adder call ."
         "8"
@@ -30,6 +31,7 @@ HELP: [let
 { $examples
     { $example
         "USING: kernel locals math math.functions prettyprint sequences ;"
+        "IN: scratchpad"
         ":: frobnicate ( n seq -- newseq )"
         "    [let | n' [ n 6 * ] |"
         "        seq [ n' gcd nip ] map ] ;"
@@ -45,6 +47,7 @@ HELP: [let*
 { $examples
     { $example
         "USING: kernel locals math math.functions prettyprint sequences ;"
+        "IN: scratchpad"
         ":: frobnicate ( n seq -- newseq )"
         "    [let* | a [ n 3 + ]"
         "            b [ a 4 * ] |"
@@ -63,6 +66,7 @@ HELP: [wlet
 { $examples
     { $example
         "USING: locals math prettyprint sequences ;"
+        "IN: scratchpad"
         ":: quuxify ( n seq -- newseq )"
         "    [wlet | add-n [| m | m n + ] |"
         "        seq [ add-n ] map ] ;"

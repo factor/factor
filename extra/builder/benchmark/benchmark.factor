@@ -5,9 +5,9 @@ USING: kernel continuations arrays assocs sequences sorting math
 IN: builder.benchmark
 
 ! : passing-benchmarks ( table -- table )
-!   [ second first2 number? swap number? and ] subset ;
+!   [ second first2 number? swap number? and ] filter ;
 
-: passing-benchmarks ( table -- table ) [ second number? ] subset ;
+: passing-benchmarks ( table -- table ) [ second number? ] filter ;
 
 ! : simplify-table ( table -- table ) [ first2 second 2array ] map ;
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ui.commands ui.gestures ui.render ui.gadgets
 ui.gadgets.labels ui.gadgets.scrollers
-kernel sequences models opengl math namespaces
+kernel sequences models opengl math math.order namespaces
 ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs
 math.vectors classes.tuple ;
 IN: ui.gadgets.lists

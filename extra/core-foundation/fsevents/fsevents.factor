@@ -153,7 +153,7 @@ SYMBOL: event-stream-callbacks
 
 [
     event-stream-callbacks global
-    [ [ drop expired? not ] assoc-subset H{ } assoc-like ] change-at
+    [ [ drop expired? not ] assoc-filter H{ } assoc-like ] change-at
 ] "core-foundation" add-init-hook
 
 : add-event-source-callback ( quot -- id )

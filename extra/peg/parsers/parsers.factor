@@ -107,7 +107,7 @@ MEMO: pack ( begin body end -- parser )
   #! range of characters from the first to the second,
   #! inclusive.
   dup first CHAR: ^ = [
-    1 tail (range-pattern) [ member? not ] curry satisfy 
+    rest (range-pattern) [ member? not ] curry satisfy 
   ] [
     (range-pattern) [ member? ] curry satisfy
   ] if ;
