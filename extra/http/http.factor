@@ -149,7 +149,7 @@ TUPLE: cookie name value path domain expires max-age http-only ;
         ";" split [
             [ blank? ] trim "=" split1 swap >lower {
                 { "expires" [ cookie-string>timestamp >>expires ] }
-                { "max-age" [ string>number seconds ] }
+                { "max-age" [ string>number seconds >>max-age ] }
                 { "domain" [ >>domain ] }
                 { "path" [ >>path ] }
                 { "httponly" [ drop t >>http-only ] }

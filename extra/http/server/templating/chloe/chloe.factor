@@ -22,7 +22,7 @@ DEFER: process-template
 : chloe-ns "http://factorcode.org/chloe/1.0" ; inline
 
 : filter-chloe-attrs ( assoc -- assoc' )
-    [ drop name-url chloe-ns = not ] assoc-subset ;
+    [ drop name-url chloe-ns = not ] assoc-filter ;
 
 : chloe-tag? ( tag -- ? )
     {
