@@ -5,7 +5,7 @@ inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
 definitions prettyprint hashtables prettyprint.sections sets
 sequences.private effects generic compiler.units accessors
-locals.backend ;
+locals.backend memoize ;
 IN: locals
 
 ! Inspired by
@@ -297,6 +297,8 @@ MACRO: with-locals ( form -- quot ) lambda-rewrite ;
 : M:: (M::) define ; parsing
 
 : MACRO:: (::) define-macro ; parsing
+
+: MEMO:: (::) define-memoized ; parsing
 
 <PRIVATE
 
