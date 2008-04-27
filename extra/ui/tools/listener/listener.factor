@@ -16,13 +16,11 @@ TUPLE: listener-gadget input output stack ;
     <scrolling-pane> g-> set-listener-gadget-output
     <scroller> "Output" <labelled-gadget> 1 track, ;
 
-: listener-stream ( listener -- stream )
-    dup listener-gadget-input
-    swap listener-gadget-output <pane-stream>
-    <duplex-stream> ;
+: <listener-stream> ( listener -- stream )
+    [ input>> ] [ output>> <pane-stream> ] bi <duplex-stream> ;
 
 : <listener-input> ( listener -- gadget )
-    listener-gadget-output <pane-stream> <interactor> ;
+    output>> <pane-stream> <interactor> ;
 
 : listener-input, ( -- )
     g <listener-input> g-> set-listener-gadget-input
@@ -34,31 +32,29 @@ TUPLE: listener-gadget input output stack ;
    "cookbook" ($link) "." print nl ;
 
 M: listener-gadget focusable-child*
-    listener-gadget-input ;
+    input>> ;
 
 M: listener-gadget call-tool* ( input listener -- )
-    >r input-string r> listener-gadget-input set-editor-string ;
+    >r string>> r> input>> set-editor-string ;
 
 M: listener-gadget tool-scroller
-    listener-gadget-output find-scroller ;
+    output>> find-scroller ;
 
 : wait-for-listener ( listener -- )
     #! Wait for the listener to start.
-    listener-gadget-input interactor-flag wait-for-flag ;
+    input>> flag>> wait-for-flag ;
 
 : workspace-busy? ( workspace -- ? )
-    workspace-listener listener-gadget-input interactor-busy? ;
+    listener>> input>> interactor-busy? ;
 
 : listener-input ( string -- )
-    get-workspace
-    workspace-listener
-    listener-gadget-input set-editor-string ;
+    get-workspace listener>> input>> set-editor-string ;
 
 : (call-listener) ( quot listener -- )
-    listener-gadget-input interactor-call ;
+    input>> interactor-call ;
 
 : call-listener ( quot -- )
-    [ workspace-busy? not ] get-workspace* workspace-listener
+    [ workspace-busy? not ] get-workspace* listener>>
     [ dup wait-for-listener (call-listener) ] 2curry
     "Listener call" spawn drop ;
 
@@ -70,8 +66,7 @@ M: listener-operation invoke-command ( target command -- )
 
 : eval-listener ( string -- )
     get-workspace
-    workspace-listener
-    listener-gadget-input [ set-editor-string ] keep
+    listener>> input>> [ set-editor-string ] keep
     evaluate-input ;
 
 : listener-run-files ( seq -- )
@@ -82,10 +77,10 @@ M: listener-operation invoke-command ( target command -- )
     ] if ;
 
 : com-end ( listener -- )
-    listener-gadget-input interactor-eof ;
+    input>> interactor-eof ;
 
 : clear-output ( listener -- )
-    listener-gadget-output pane-clear ;
+    output>> pane-clear ;
 
 \ clear-output H{ { +listener+ t } } define-command
 
@@ -148,22 +143,27 @@ M: stack-display tool-scroller
     swap show-tool inspect-object ;
 
 : listener-thread ( listener -- )
-    dup listener-stream [
-        dup [ ui-listener-hook ] curry listener-hook set
-        dup [ ui-error-hook ] curry error-hook set
-        [ ui-inspector-hook ] curry inspector-hook set
+    dup <listener-stream> [
+        [ [  ui-listener-hook ] curry  listener-hook set ]
+        [ [     ui-error-hook ] curry     error-hook set ]
+        [ [ ui-inspector-hook ] curry inspector-hook set ] tri
         welcome.
         listener
     ] with-stream* ;
 
 : start-listener-thread ( listener -- )
-    [ listener-thread ] curry "Listener" spawn drop ;
+    [
+        [ input>> register-self ] [ listener-thread ] bi
+    ] curry "Listener" spawn drop ;
 
 : restart-listener ( listener -- )
     #! Returns when listener is ready to receive input.
-    dup com-end dup clear-output
-    dup start-listener-thread
-    wait-for-listener ;
+    {
+        [ com-end ]
+        [ clear-output ]
+        [ start-listener-thread ]
+        [ wait-for-listener ]
+    } cleave ;
 
 : init-listener ( listener -- )
     f <model> swap set-listener-gadget-stack ;
@@ -189,10 +189,7 @@ M: listener-gadget handle-gesture* ( gadget gesture delegate -- ? )
     [ default-gesture-handler ] [ 3drop f ] if ;
 
 M: listener-gadget graft*
-    dup delegate graft*
-    dup listener-gadget-input interactor-thread ?box 2drop
-    restart-listener ;
+    [ delegate graft* ] [ restart-listener ] bi ;
 
 M: listener-gadget ungraft*
-    dup com-end
-    delegate ungraft* ;
+    [ com-end ] [ delegate ungraft* ] bi ;

@@ -90,6 +90,8 @@ PRIVATE>
         [ sleep-queue heap-peek nip millis [-] ]
     } cond ;
 
+DEFER: stop
+
 <PRIVATE
 
 : schedule-sleep ( thread ms -- )
@@ -110,36 +112,54 @@ PRIVATE>
     [ ] while
     drop ;
 
+: start ( namestack thread -- )
+    [
+        set-self
+        set-namestack
+        V{ } set-catchstack
+        { } set-retainstack
+        { } set-datastack
+        self quot>> [ call stop ] call-clear
+    ] 2 (throw) ;
+
+DEFER: next
+
+: no-runnable-threads ( -- * )
+    ! We should never be in a state where the only threads
+    ! are sleeping; the I/O wait thread is always runnable.
+    ! However, if it dies, we handle this case
+    ! semi-gracefully.
+    !
+    ! And if sleep-time outputs f, there are no sleeping
+    ! threads either... so WTF.
+    sleep-time [ die 0 ] unless* (sleep) next ;
+
+: (next) ( arg thread -- * )
+    f >>state
+    dup set-self
+    dup continuation>> ?box
+    [ nip continue-with ] [ drop start ] if ;
+
 : next ( -- * )
     expire-sleep-loop
     run-queue dup dlist-empty? [
-        ! We should never be in a state where the only threads
-        ! are sleeping; the I/O wait thread is always runnable.
-        ! However, if it dies, we handle this case
-        ! semi-gracefully.
-        !
-        ! And if sleep-time outputs f, there are no sleeping
-        ! threads either... so WTF.
-        drop sleep-time [ die 0 ] unless* (sleep) next
+        drop no-runnable-threads
     ] [
-        pop-back
-        dup array? [ first2 ] [ f swap ] if dup set-self
-        f >>state
-        continuation>> box>
-        continue-with
+        pop-back dup array? [ first2 ] [ f swap ] if (next)
     ] if ;
 
 PRIVATE>
 
 : stop ( -- )
-    self dup exit-handler>> call
-    unregister-thread next ;
+    self [ exit-handler>> call ] [ unregister-thread ] bi next ;
 
 : suspend ( quot state -- obj )
     [
-        self continuation>> >box
-        self (>>state)
-        self swap call next
+        >r
+        >r self swap call
+        r> self (>>state)
+        r> self continuation>> >box
+        next
     ] callcc1 2nip ; inline
 
 : yield ( -- ) [ resume ] f suspend drop ;
@@ -165,16 +185,7 @@ M: real sleep
     ] when drop ;
 
 : (spawn) ( thread -- )
-    [
-        resume-now [
-            dup set-self
-            dup register-thread
-            V{ } set-catchstack
-            { } set-retainstack
-            >r { } set-datastack r>
-            quot>> [ call stop ] call-clear
-        ] 1 (throw)
-    ] "spawn" suspend 2drop ;
+    [ register-thread ] [ namestack swap resume-with ] bi ;
 
 : spawn ( quot name -- thread )
     <thread> [ (spawn) ] keep ;
@@ -183,8 +194,8 @@ M: real sleep
     >r [ [ ] [ ] while ] curry r> spawn ;
 
 : in-thread ( quot -- )
-    >r datastack namestack r>
-    [ >r set-namestack set-datastack r> call ] 3curry
+    >r datastack r>
+    [ >r set-datastack r> call ] 2curry
     "Thread" spawn drop ;
 
 GENERIC: error-in-thread ( error thread -- )
