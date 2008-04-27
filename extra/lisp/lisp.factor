@@ -7,7 +7,7 @@ IN: lisp
 DEFER: convert-form
 
 : convert-body ( s-exp -- quot )
-  [ convert-form ] map [ ] [ compose ] reduce ; inline
+  [ convert-form ] map reverse [ ] [ compose ] reduce ; inline
   
 : convert-if ( s-exp -- quot )
   1 tail [ convert-form ] map reverse first3  [ % , , if ] bake ;
@@ -18,17 +18,17 @@ DEFER: convert-form
 : convert-cond ( s-exp -- quot )  
   1 tail [ [ convert-body map ] map ] [ % cond ] bake ;
   
-: convert-general-form ( s-exp -- quot )  
+: convert-general-form ( s-exp -- quot )
   unclip swap convert-body [ % , ] bake ;
   
 <PRIVATE  
 : localize-body ( vars body -- newbody )  
   [ dup lisp-symbol? [ tuck name>> swap member? [ name>> make-local ] [ ] if ]
-                     [ dup vector? [ localize-body ] [ nip ] if ] if ] with map ; inline
+                     [ dup s-exp? [ body>> localize-body <s-exp> ] [ nip ] if ] if ] with map ;
 PRIVATE>                     
   
 : convert-lambda ( s-exp -- quot )  
-  1 tail unclip reverse [ name>> ] map dup make-locals dup push-locals
+  first3 -rot nip [ body>> ] bi@ reverse [ name>> ] map dup make-locals dup push-locals
   [ swap localize-body convert-body ] dipd pop-locals swap <lambda> ;
   
 : convert-list-form ( s-exp -- quot )  
@@ -41,7 +41,7 @@ PRIVATE>
      } case ] [ drop convert-general-form ] if ;
   
 : convert-form ( lisp-form -- quot )
-  { { [ dup vector? ] [ convert-list-form ] }
+  { { [ dup s-exp? ] [ body>> convert-list-form ] }
    [ [ , ] [ ] make ]
   } cond ;
   
