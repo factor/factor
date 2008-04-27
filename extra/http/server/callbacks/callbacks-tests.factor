@@ -5,6 +5,8 @@ splitting kernel hashtables continuations ;
 
 [ 123 ] [
     [
+        init-request
+
         <request> "GET" >>method request set
         [
             exit-continuation set
@@ -17,6 +19,8 @@ splitting kernel hashtables continuations ;
 ] unit-test
 
 [
+    init-request
+
     <action> [
         [
             "hello" print
