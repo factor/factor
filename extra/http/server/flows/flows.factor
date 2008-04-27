@@ -10,12 +10,25 @@ TUPLE: flows < filter-responder ;
 C: <flows> flows
 
 : begin-flow* ( -- id )
-    request get [ path>> ] [ query>> ] bi 2array
+    request get
+    [ path>> ] [ request-params ] [ method>> ] tri 3array
     flows sget set-at-unique
     session-changed ;
 
+: end-flow-post ( path params -- response )
+    request [
+        clone
+            "POST" >>method
+            swap >>post-data
+            swap >>path
+    ] change
+    request get path>> split-path
+    flows get responder>> call-responder ;
+
 : end-flow* ( default id -- response )
-    flows sget at [ first2 ] [ f ] ?if <permanent-redirect> ;
+    flows sget at
+    [ first3 "POST" = [ end-flow-post ] [ <standard-redirect> ] if ]
+    [ f <standard-redirect> ] ?if ;
 
 SYMBOL: flow-id
 
@@ -39,10 +52,11 @@ SYMBOL: flow-id
         input/>
     ] when* ;
 
-M: flows call-responder
+M: flows call-responder*
+    dup flows set
     [ add-flow-id ] add-link-hook
     [ flow-form-field ] add-form-hook
-    flow-id-key request-params at flow-id set
+    flow-id-key request get request-params at flow-id set
     call-next-method ;
 
 M: flows init-session*

@@ -3,15 +3,15 @@
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
 	<h2 class="posting-title">
-		<t:a value="link" session="none"><t:view component="title" /></t:a>
+		<t:a t:value="link" t:session="none"><t:view t:component="title" /></t:a>
 	</h2>
 
 	<p class="posting-body">
-		<t:view component="description" />
+		<t:view t:component="description" />
 	</p>
 
 	<p class="posting-date">
-		<t:a value="link" session="none"><t:view component="pub-date" /></t:a>
+		<t:a t:value="link" t:session="none"><t:view t:component="pub-date" /></t:a>
 	</p>
 
 </t:chloe>

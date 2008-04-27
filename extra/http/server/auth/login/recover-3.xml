@@ -6,21 +6,21 @@
 
 	<p>Choose a new password for your account.</p>
 
-	<t:form action="new-password">
+	<t:form t:action="new-password">
 
 		<table>
 
-			<t:edit component="username" />
-			<t:edit component="ticket" />
+			<t:edit t:component="username" />
+			<t:edit t:component="ticket" />
 
 			<tr>
 			<th class="field-label">Password:</th>
-			<td><t:edit component="new-password" /></td>
+			<td><t:edit t:component="new-password" /></td>
 			</tr>
 
 			<tr>
 			<th class="field-label">Verify password:</th>
-			<td><t:edit component="verify-password" /></td>
+			<td><t:edit t:component="verify-password" /></td>
 			</tr>
 
 			<tr>
@@ -33,7 +33,7 @@
 		<p>
 			<input type="submit" value="Set password" />
 
-			<t:if var="http.server.auth.login:password-mismatch?">
+			<t:if t:var="http.server.auth.login:password-mismatch?">
 				<t:error>passwords do not match</t:error>
 			</t:if>
 		</p>

@@ -43,3 +43,10 @@ IN: calendar.format.tests
 ] unit-test
 
 [ t ] [ now dup timestamp>rfc822 rfc822>timestamp time- 1 seconds before? ] unit-test
+
+[ t ] [ now dup timestamp>cookie-string cookie-string>timestamp time- 1 seconds before? ] unit-test
+
+[ "Sun, 4 May 2008 07:00:00" ] [
+    "Sun May 04 07:00:00 2008 GMT" cookie-string>timestamp
+    timestamp>string
+] unit-test

@@ -1,5 +1,5 @@
 USING: accessors kernel sequences combinators kernel namespaces
-classes.tuple assocs splitting words arrays
+classes.tuple assocs splitting words arrays memoize
 io io.files io.encodings.utf8 html.elements unicode.case
 tuple-syntax xml xml.data xml.writer xml.utilities
 http.server
@@ -19,23 +19,31 @@ C: <chloe> chloe
 
 DEFER: process-template
 
-: chloe-ns TUPLE{ name url: "http://factorcode.org/chloe/1.0" } ;
+: chloe-ns "http://factorcode.org/chloe/1.0" ; inline
+
+: filter-chloe-attrs ( assoc -- assoc' )
+    [ drop name-url chloe-ns = not ] assoc-subset ;
 
 : chloe-tag? ( tag -- ? )
     {
         { [ dup tag? not ] [ f ] }
-        { [ dup chloe-ns names-match? not ] [ f ] }
+        { [ dup url>> chloe-ns = not ] [ f ] }
         [ t ]
     } cond nip ;
 
 SYMBOL: tags
 
+MEMO: chloe-name ( string -- name )
+    name new
+        swap >>tag
+        chloe-ns >>url ;
+
 : required-attr ( tag name -- value )
-    dup rot at*
+    dup chloe-name rot at*
     [ nip ] [ drop " attribute is required" append throw ] if ;
 
 : optional-attr ( tag name -- value )
-    swap at ;
+    chloe-name swap at ;
 
 : write-title-tag ( tag -- )
     drop
@@ -84,7 +92,7 @@ SYMBOL: tags
     dup empty?
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
 
-: a-flow-attr ( tag -- )
+: flow-attr ( tag -- )
     "flow" optional-attr {
         { "none" [ flow-id off ] }
         { "begin" [ begin-flow ] }
@@ -92,7 +100,7 @@ SYMBOL: tags
         { f [ ] }
     } case ;
 
-: a-session-attr ( tag -- )
+: session-attr ( tag -- )
     "session" optional-attr {
         { "none" [ session off flow-id off ] }
         { "current" [ ] }
@@ -102,8 +110,8 @@ SYMBOL: tags
 : a-start-tag ( tag -- )
     [
         <a
-        dup a-flow-attr
-        dup a-session-attr
+        dup flow-attr
+        dup session-attr
         dup "value" optional-attr [ value f ] [
             [ "href" required-attr ]
             [ "query" optional-attr parse-query-attr ]
@@ -122,12 +130,18 @@ SYMBOL: tags
     tri ;
 
 : form-start-tag ( tag -- )
-    <form
-    "POST" =method
-    [ "action" required-attr resolve-base-path =action ]
-    [ tag-attrs [ drop name-tag "action" = not ] assoc-subset print-attrs ] bi
-    form>
-    hidden-form-field ;
+    [
+        <form
+        "POST" =method
+        {
+            [ flow-attr ]
+            [ session-attr ]
+            [ "action" required-attr resolve-base-path =action ]
+            [ tag-attrs filter-chloe-attrs print-attrs ]
+        } cleave
+        form>
+        hidden-form-field
+    ] with-scope ;
 
 : form-tag ( tag -- )
     [ form-start-tag ]

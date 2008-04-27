@@ -12,5 +12,5 @@ C: <db-persistence> db-persistence
     [ db>> ] [ params>> ] bi make-db db-open
     [ db set ] [ add-always-destructor ] bi ;
 
-M: db-persistence call-responder
+M: db-persistence call-responder*
     [ connect-db ] [ call-next-method ] bi ;

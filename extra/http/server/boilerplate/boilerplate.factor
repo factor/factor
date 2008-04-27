@@ -68,7 +68,7 @@ M: f call-template* drop call-next-template ;
         bi*
     ] with-scope ; inline
 
-M: boilerplate call-responder
+M: boilerplate call-responder*
     tuck call-next-method
     dup "content-type" header "text/html" = [
         clone swap template>>

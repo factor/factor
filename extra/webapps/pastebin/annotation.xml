@@ -2,21 +2,21 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<h2>Annotation: <t:view component="summary" /></h2>
+	<h2>Annotation: <t:view t:component="summary" /></h2>
 
 	<table>
-		<tr><th class="field-label">Author:  </th><td><t:view component="author"  /></td></tr>
-		<tr><th class="field-label">Mode:    </th><td><t:view component="mode"    /></td></tr>
-		<tr><th class="field-label">Date:    </th><td><t:view component="date"    /></td></tr>
+		<tr><th class="field-label">Author:  </th><td><t:view t:component="author"  /></td></tr>
+		<tr><th class="field-label">Mode:    </th><td><t:view t:component="mode"    /></td></tr>
+		<tr><th class="field-label">Date:    </th><td><t:view t:component="date"    /></td></tr>
 	</table>
 
 	<div class="description">
-		<t:view component="contents" />
+		<t:view t:component="contents" />
 	</div>
 
-	<t:form action="$pastebin/delete-annotation" class="inline">
-		<t:edit component="id" />
-		<t:edit component="aid" />
+	<t:form t:action="$pastebin/delete-annotation" class="inline">
+		<t:edit t:component="id" />
+		<t:edit t:component="aid" />
 		<button class="link-button link">Delete Annotation</button>
 	</t:form>
 

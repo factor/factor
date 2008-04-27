@@ -158,7 +158,7 @@ test-db [
                 "extra/http/test" resource-path <static> >>default
             "nested" add-responder
             <action>
-                [ "redirect-loop" f <permanent-redirect> ] >>display
+                [ "redirect-loop" f <standard-redirect> ] >>display
             "redirect-loop" add-responder
         main-responder set
 

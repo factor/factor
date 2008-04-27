@@ -4,25 +4,25 @@
 
 	<t:title>Edit Blog</t:title>
 
-	<t:form action="$planet-factor/admin/edit-blog">
+	<t:form t:action="$planet-factor/admin/edit-blog">
 
-		<t:edit component="id" />
+		<t:edit t:component="id" />
 
 		<table>
 
 			<tr>
 				<th class="field-label">Blog name:</th>
-				<td><t:edit component="name" /></td>
+				<td><t:edit t:component="name" /></td>
 			</tr>
 
 			<tr>
 				<th class="field-label">Home page:</th>
-				<td><t:edit component="www-url" /></td>
+				<td><t:edit t:component="www-url" /></td>
 			</tr>
 
 			<tr>
 				<th class="field-label">Feed:</th>
-				<td><t:edit component="feed-url" /></td>
+				<td><t:edit t:component="feed-url" /></td>
 			</tr>
 
 		</table>
@@ -31,8 +31,8 @@
 
 	</t:form>
 
-	<t:form action="$planet-factor/admin/delete-blog" class="inline">
-		<t:edit component="id" />
+	<t:form t:action="$planet-factor/admin/delete-blog" class="inline">
+		<t:edit t:component="id" />
 		<button type="submit" class="link-button link">Delete</button>
 	</t:form>
 </t:chloe>

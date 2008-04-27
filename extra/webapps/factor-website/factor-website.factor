@@ -47,7 +47,7 @@ IN: webapps.factor-website
     <boilerplate>
         "page" factor-template >>template
     <flows>
-    <url-sessions>
+    <session-manager>
         sessions-in-db >>sessions
     test-db <db-persistence> ;
 

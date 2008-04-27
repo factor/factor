@@ -10,7 +10,7 @@
 		<head>
 			<t:write-title />
 
-			<t:style include="resource:extra/xmode/code2html/stylesheet.css" />
+			<t:style t:include="resource:extra/xmode/code2html/stylesheet.css" />
 
 			<t:style>
 				body, button {

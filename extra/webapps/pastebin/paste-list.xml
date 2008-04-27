@@ -9,7 +9,7 @@
 		<th align="left" width="100">Paste by:</th>
 		<th align="left" width="200">Date:</th>
 
-		<t:summary component="pastes" />
+		<t:summary t:component="pastes" />
 	</table>
 
 </t:chloe>

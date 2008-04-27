@@ -96,7 +96,7 @@ SYMBOL: current-show
 : resuming-callback ( responder request -- id )
     cont-id query-param swap callbacks>> at ;
 
-M: callback-responder call-responder ( path responder -- response )
+M: callback-responder call-responder* ( path responder -- response )
     '[
         , ,
 

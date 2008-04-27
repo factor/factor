@@ -16,7 +16,7 @@ C: <foo> foo
 
 M: foo init-session* drop 0 "x" sset ;
 
-M: foo call-responder
+M: foo call-responder*
     2drop
     "x" [ 1+ ] schange
     "text/html" <content> [ "x" sget pprint ] >>body ;
@@ -53,7 +53,14 @@ M: foo call-responder
 
 "auth-test.db" temp-file sqlite-db [
 
+    init-request
     init-sessions-table
+
+    [ ] [
+        <foo> <session-manager>
+            sessions-in-db >>sessions
+        session-manager set
+    ] unit-test
 
     [
         empty-session
@@ -69,12 +76,6 @@ M: foo call-responder
 
         [ t ] [ session get changed?>> ] unit-test
     ] with-scope
-
-    [ ] [
-        <foo> <session-manager>
-            sessions-in-db >>sessions
-        session-manager set
-    ] unit-test
 
     [ t ] [
         session-manager get begin-session id>>

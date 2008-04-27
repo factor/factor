@@ -3,8 +3,8 @@
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
 	<p class="news">
-		<strong><t:view component="title" /></strong> <br/>
-		<t:a value="link" session="none" class="more">Read More...</t:a>
+		<strong><t:view t:component="title" /></strong> <br/>
+		<t:a value="link" t:session="none" class="more">Read More...</t:a>
 	</p>
 
 </t:chloe>

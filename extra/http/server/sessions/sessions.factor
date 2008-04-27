@@ -10,7 +10,7 @@ http.server.sessions.storage.null
 html.elements ;
 IN: http.server.sessions
 
-TUPLE: session id expiry namespace changed? ;
+TUPLE: session id expires namespace changed? ;
 
 : <session> ( id -- session )
     session new
@@ -24,10 +24,13 @@ M: dispatcher init-session* default>> init-session* ;
 
 M: filter-responder init-session* responder>> init-session* ;
 
-TUPLE: session-manager < filter-responder sessions ;
+TUPLE: session-manager < filter-responder sessions timeout domain ;
 
 : <session-manager> ( responder -- responder' )
-    null-sessions session-manager boa ;
+    session-manager new
+        swap >>responder
+        null-sessions >>sessions
+        20 minutes >>timeout ;
 
 : (session-changed) ( session -- )
     t >>changed? drop ;
@@ -47,18 +50,14 @@ TUPLE: session-manager < filter-responder sessions ;
     [ namespace>> swap change-at ] keep
     (session-changed) ; inline
 
-: sessions session-manager get sessions>> ;
-
 : init-session ( session managed -- )
     >r session r> '[ , init-session* ] with-variable ;
 
-: timeout 20 minutes ;
-
 : cutoff-time ( -- time )
-    now timeout time+ timestamp>millis ;
+    session-manager get timeout>> from-now timestamp>millis ;
 
 : touch-session ( session -- )
-    cutoff-time >>expiry drop ;
+    cutoff-time >>expires drop ;
 
 : empty-session ( -- session )
     f <session>
@@ -73,21 +72,24 @@ TUPLE: session-manager < filter-responder sessions ;
     2tri ;
 
 ! Destructor
-TUPLE: session-saver session ;
+TUPLE: session-saver manager session ;
 
 C: <session-saver> session-saver
 
 M: session-saver dispose
-    session>> dup changed?>> [
-        [ touch-session ] [ sessions update-session ] bi
-    ] [ drop ] if ;
+    [ session>> ] [ manager>> sessions>> ] bi
+    over changed?>> [
+        [ drop touch-session ] [ update-session ] 2bi
+    ] [ 2drop ] if ;
 
-: save-session-after ( session -- )
+: save-session-after ( manager session -- )
     <session-saver> add-always-destructor ;
 
-: existing-session ( path responder session -- response )
-    [ session set ] [ save-session-after ] bi
-    [ session-manager set ] [ responder>> call-responder ] bi ;
+: existing-session ( path manager session -- response )
+    [ nip session set ]
+    [ save-session-after ]
+    [ drop responder>> ] 2tri
+    call-responder ;
 
 : session-id-key "factorsessid" ;
 
@@ -109,13 +111,13 @@ M: session-saver dispose
     >r request-session-id r> sessions>> get-session ;
 
 : <session-cookie> ( id -- cookie )
-    session-id-key <cookie> ;
+    session-id-key <cookie>
+        "$session-manager" resolve-base-path >>path
+        session-manager get timeout>> from-now >>expires
+        session-manager get domain>> >>domain ;
 
-: new-session ( path responder -- response )
-    dup begin-session
-    [ existing-session ]
-    [ id>> number>string <session-cookie> ] bi
-    put-cookie ;
+: put-session-cookie ( response -- response' )
+    session get id>> number>string <session-cookie> put-cookie ;
 
 : session-form-field ( -- )
     <input
@@ -124,6 +126,8 @@ M: session-saver dispose
         session get id>> number>string =value
     input/> ;
 
-M: session-manager call-responder ( path responder -- response )
+M: session-manager call-responder* ( path responder -- response )
     [ session-form-field ] add-form-hook
-    dup request-session [ existing-session ] [ new-session ] if* ;
+    dup session-manager set
+    dup request-session [ dup begin-session ] unless*
+    existing-session put-session-cookie ;

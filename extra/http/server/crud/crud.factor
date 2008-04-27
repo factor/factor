@@ -18,7 +18,7 @@ IN: http.server.crud
         [ form view-form ] >>display ;
 
 : <id-redirect> ( id next -- response )
-    swap number>string "id" associate <permanent-redirect> ;
+    swap number>string "id" associate <standard-redirect> ;
 
 :: <edit-action> ( form ctor next -- action )
     <action>
@@ -53,7 +53,7 @@ IN: http.server.crud
         [
             "id" get ctor call delete-tuple
 
-            next f <permanent-redirect>
+            next f <standard-redirect>
         ] >>submit ;
 
 :: <list-action> ( form ctor -- action )

@@ -331,7 +331,7 @@ SYMBOL: lost-password-from
     <action>
         [
             f logged-in-user sset
-            "$login/login" f <permanent-redirect>
+            "$login/login" end-flow
         ] >>submit ;
 
 ! ! ! Authentication logic
@@ -342,19 +342,17 @@ C: <protected> protected
 
 : show-login-page ( -- response )
     begin-flow
-    "$login/login" f <temporary-redirect> ;
+    "$login/login" f <standard-redirect> ;
 
-M: protected call-responder ( path responder -- response )
+M: protected call-responder* ( path responder -- response )
     logged-in-user sget dup [
         save-user-after
         call-next-method
     ] [
-        3drop
-        request get method>> { "GET" "HEAD" } member?
-        [ show-login-page ] [ <400> ] if
+        3drop show-login-page
     ] if ;
 
-M: login call-responder ( path responder -- response )
+M: login call-responder* ( path responder -- response )
     dup login set
     call-next-method ;
 

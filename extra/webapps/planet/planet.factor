@@ -169,5 +169,8 @@ blog "BLOGS"
 
 : start-update-task ( planet db seq -- )
     '[
-        , , , [ update-cached-postings ] with-db
+        , , , [
+            dup filter-responder? [ responder>> ] when
+            update-cached-postings
+        ] with-db
     ] 10 minutes every drop ;

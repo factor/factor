@@ -11,7 +11,7 @@ session "SESSIONS"
 {
     ! { "id" "ID" +random-id+ system-random-generator }
     { "id" "ID" INTEGER +native-id+ }
-    { "expiry" "EXPIRY" BIG-INTEGER +not-null+ }
+    { "expires" "EXPIRES" BIG-INTEGER +not-null+ }
     { "namespace" "NAMESPACE" FACTOR-BLOB }
 } define-persistent
 
@@ -31,7 +31,7 @@ M: sessions-in-db new-session ( session storage -- )
 
 : expired-sessions ( -- session )
     f <session>
-    USE: math now timestamp>millis [ 60 60 * 1000 * - ] keep [a,b] >>expiry
+    USE: math now timestamp>millis [ 60 60 * 1000 * - ] keep [a,b] >>expires
     select-tuples ;
 
 : start-expiring-sessions ( db seq -- )

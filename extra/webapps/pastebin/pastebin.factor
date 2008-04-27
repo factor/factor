@@ -242,7 +242,7 @@ TUPLE: pastebin < dispatcher ;
         <feed-action> "feed.xml" add-responder
         <paste-form> [ <paste> ] <view-paste-action> "view-paste" add-responder
                    [ <paste> ] "$pastebin/list" <delete-paste-action> <protected> "delete-paste" add-responder
-                   [ <annotation> ] "$pastebin/view-paste" <protected> <delete-annotation-action> "delete-annotation" add-responder
+                   [ <annotation> ] "$pastebin/view-paste" <delete-annotation-action> <protected> "delete-annotation" add-responder
         <paste-form> [ <paste> ]    <view-paste-action>     "$pastebin/view-paste"   add-responder
         <new-paste-form> [ <paste> now >>date ] "$pastebin/view-paste" <new-paste-action>     "new-paste"    add-responder
         <new-annotation-form> [ <annotation> now >>date ] "$pastebin/view-paste" <annotate-action> "annotate" add-responder

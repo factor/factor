@@ -36,6 +36,6 @@ C: <basic-auth> basic-auth
 : logged-in? ( request responder -- ? )
     provider>> swap "authorization" header authorization-ok? ;
 
-M: basic-auth call-responder ( request path responder -- response )
+M: basic-auth call-responder* ( request path responder -- response )
     pick over logged-in?
     [ call-next-method ] [ 2nip realm>> <401> ] if ;

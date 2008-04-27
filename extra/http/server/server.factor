@@ -9,10 +9,10 @@ IN: http.server
 
 ! path is a sequence of path component strings
 
-GENERIC: call-responder ( path responder -- response )
+GENERIC: call-responder* ( path responder -- response )
 
-: request-params ( -- assoc )
-    request get dup method>> {
+: request-params ( request -- assoc )
+    dup method>> {
         { "GET" [ query>> ] }
         { "HEAD" [ query>> ] }
         { "POST" [ post-data>> ] }
@@ -28,7 +28,7 @@ TUPLE: trivial-responder response ;
 
 C: <trivial-responder> trivial-responder
 
-M: trivial-responder call-responder nip response>> call ;
+M: trivial-responder call-responder* nip response>> call ;
 
 : trivial-response-body ( code message -- )
     <html>
@@ -66,6 +66,9 @@ SYMBOL: base-paths
 : add-base-path ( path dispatcher -- )
     [ invert-slice ] [ class word-name ] bi*
     base-paths get set-at ;
+
+: call-responder ( path responder -- response )
+    [ add-base-path ] [ call-responder* ] 2bi ;
 
 SYMBOL: link-hook
 
@@ -139,6 +142,10 @@ SYMBOL: form-hook
 : <temporary-redirect> ( to query -- response )
     307 "Temporary Redirect" <redirect> ;
 
+: <standard-redirect> ( to query -- response )
+    request get method>> "POST" =
+    [ <permanent-redirect> ] [ <temporary-redirect> ] if ;
+
 TUPLE: dispatcher default responders ;
 
 : new-dispatcher ( class -- dispatcher )
@@ -158,8 +165,8 @@ TUPLE: dispatcher default responders ;
         [ >r drop 1 tail-slice r> ] [ drop default>> ] if
     ] if ;
 
-M: dispatcher call-responder ( path dispatcher -- response )
-    [ add-base-path ] [ find-responder call-responder ] 2bi ;
+M: dispatcher call-responder* ( path dispatcher -- response )
+    find-responder call-responder ;
 
 TUPLE: vhost-dispatcher default responders ;
 
@@ -170,7 +177,7 @@ TUPLE: vhost-dispatcher default responders ;
     request get host>> over responders>> at*
     [ nip ] [ drop default>> ] if ;
 
-M: vhost-dispatcher call-responder ( path dispatcher -- response )
+M: vhost-dispatcher call-responder* ( path dispatcher -- response )
     find-vhost call-responder ;
 
 : add-responder ( dispatcher responder path -- dispatcher )
@@ -183,7 +190,7 @@ M: vhost-dispatcher call-responder ( path dispatcher -- response )
 
 TUPLE: filter-responder responder ;
 
-M: filter-responder call-responder
+M: filter-responder call-responder*
     responder>> call-responder ;
 
 SYMBOL: main-responder
@@ -234,14 +241,16 @@ SYMBOL: exit-continuation
 : split-path ( string -- path )
     "/" split [ empty? not ] subset ;
 
+: init-request ( -- )
+    H{ } clone base-paths set
+    [ ] link-hook set
+    [ ] form-hook set ;
+
 : do-request ( request -- response )
     [
-        H{ } clone base-paths set
-        [ ] link-hook set
-        [ ] form-hook set
-
-        [ log-request ]
+        init-request
         [ request set ]
+        [ log-request ]
         [ path>> split-path main-responder get call-responder ] tri
         [ <404> ] unless*
     ] [
