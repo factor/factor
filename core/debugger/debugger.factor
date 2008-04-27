@@ -6,7 +6,8 @@ strings io.styles vectors words system splitting math.parser
 classes.tuple continuations continuations.private combinators
 generic.math io.streams.duplex classes.builtin classes
 compiler.units generic.standard vocabs threads threads.private
-init kernel.private libc io.encodings accessors ;
+init kernel.private libc io.encodings mirrors accessors
+math.order ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -288,6 +289,12 @@ M: thread error-in-thread ( error thread -- )
 M: encode-error summary drop "Character encoding error" ;
 
 M: decode-error summary drop "Character decoding error" ;
+
+M: no-such-slot summary drop "No such slot" ;
+
+M: immutable-slot summary drop "Slot is immutable" ;
+
+M: bad-create summary drop "Bad parameters to create" ;
 
 <PRIVATE
 

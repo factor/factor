@@ -76,7 +76,9 @@ TUPLE: miller-rabin-bounds ;
 : find-relative-prime ( n -- p )
     dup random find-relative-prime* ;
 
+ERROR: too-few-primes ;
+
 : unique-primes ( numbits n -- seq )
     #! generate two primes
-    over 5 < [ "not enough primes below 5 bits" throw ] when
+    over 5 < [ too-few-primes ] when
     [ [ drop random-prime ] with map ] [ all-unique? ] generate ;

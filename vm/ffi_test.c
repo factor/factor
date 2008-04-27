@@ -255,7 +255,7 @@ static int global_var;
 
 void ffi_test_36_point_5(void)
 {
-	printf("int_ffi_test_36_point_5\n");
+	printf("ffi_test_36_point_5\n");
 	global_var = 0;
 }
 

@@ -33,7 +33,7 @@ M: bunny-gadget graft* ( gadget -- )
         [ <bunny-fixed-pipeline> ]
         [ <bunny-cel-shaded> ]
         [ <bunny-outlined> ]
-    } map-call-with [ ] subset
+    } map-call-with [ ] filter
     0
     roll {
         set-bunny-gadget-geom

@@ -1,9 +1,10 @@
 USING: accessors kernel sequences combinators kernel namespaces
-classes.tuple assocs splitting words arrays
+classes.tuple assocs splitting words arrays memoize
 io io.files io.encodings.utf8 html.elements unicode.case
 tuple-syntax xml xml.data xml.writer xml.utilities
 http.server
 http.server.auth
+http.server.flows
 http.server.components
 http.server.sessions
 http.server.templating
@@ -18,23 +19,31 @@ C: <chloe> chloe
 
 DEFER: process-template
 
-: chloe-ns TUPLE{ name url: "http://factorcode.org/chloe/1.0" } ;
+: chloe-ns "http://factorcode.org/chloe/1.0" ; inline
+
+: filter-chloe-attrs ( assoc -- assoc' )
+    [ drop name-url chloe-ns = not ] assoc-filter ;
 
 : chloe-tag? ( tag -- ? )
     {
         { [ dup tag? not ] [ f ] }
-        { [ dup chloe-ns names-match? not ] [ f ] }
+        { [ dup url>> chloe-ns = not ] [ f ] }
         [ t ]
     } cond nip ;
 
 SYMBOL: tags
 
+MEMO: chloe-name ( string -- name )
+    name new
+        swap >>tag
+        chloe-ns >>url ;
+
 : required-attr ( tag name -- value )
-    dup rot at*
+    dup chloe-name rot at*
     [ nip ] [ drop " attribute is required" append throw ] if ;
 
 : optional-attr ( tag name -- value )
-    swap at ;
+    chloe-name swap at ;
 
 : write-title-tag ( tag -- )
     drop
@@ -83,14 +92,33 @@ SYMBOL: tags
     dup empty?
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
 
+: flow-attr ( tag -- )
+    "flow" optional-attr {
+        { "none" [ flow-id off ] }
+        { "begin" [ begin-flow ] }
+        { "current" [ ] }
+        { f [ ] }
+    } case ;
+
+: session-attr ( tag -- )
+    "session" optional-attr {
+        { "none" [ session off flow-id off ] }
+        { "current" [ ] }
+        { f [ ] }
+    } case ;
+
 : a-start-tag ( tag -- )
-    <a
-    dup "value" optional-attr [ value f ] [
-        [ "href" required-attr ]
-        [ "query" optional-attr parse-query-attr ]
-        bi
-    ] ?if link>string =href
-    a> ;
+    [
+        <a
+        dup flow-attr
+        dup session-attr
+        dup "value" optional-attr [ value f ] [
+            [ "href" required-attr ]
+            [ "query" optional-attr parse-query-attr ]
+            bi
+        ] ?if link>string =href
+        a>
+    ] with-scope ;
 
 : process-tag-children ( tag -- )
     [ process-template ] each ;
@@ -102,11 +130,18 @@ SYMBOL: tags
     tri ;
 
 : form-start-tag ( tag -- )
-    <form
-    "POST" =method
-    tag-attrs print-attrs
-    form>
-    hidden-form-field ;
+    [
+        <form
+        "POST" =method
+        {
+            [ flow-attr ]
+            [ session-attr ]
+            [ "action" required-attr resolve-base-path =action ]
+            [ tag-attrs filter-chloe-attrs print-attrs ]
+        } cleave
+        form>
+        hidden-form-field
+    ] with-scope ;
 
 : form-tag ( tag -- )
     [ form-start-tag ]

@@ -1,5 +1,5 @@
 
-USING: kernel arrays sequences math qualified
+USING: kernel arrays sequences math math.order qualified
        sequences.lib circular processing ui newfx ;
 
 IN: processing.gallery.trails

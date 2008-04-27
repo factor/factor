@@ -95,6 +95,6 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
 
         " from " 0% 0%
         dupd
-        [ slot-name>> swap get-slot-named ] with subset
+        [ slot-name>> swap get-slot-named ] with filter
         dup empty? [ 2drop ] [ where-clause ] if ";" 0%
     ] query-make ;

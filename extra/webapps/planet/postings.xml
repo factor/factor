@@ -6,12 +6,12 @@
 
 	<table width="100%" cellpadding="10">
                 <tr>
-                        <td> <t:view component="postings" /> </td>
+                        <td> <t:view t:component="postings" /> </td>
   
                         <td valign="top" width="25%" class="infobox">
                                 <h2>Blogroll</h2>
   
-                                <t:summary component="blogroll" />
+                                <t:summary t:component="blogroll" />
                         </td>
                 </tr>
         </table>

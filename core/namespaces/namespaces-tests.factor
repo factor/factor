@@ -1,5 +1,5 @@
-IN: namespaces.tests
 USING: kernel namespaces tools.test words ;
+IN: namespaces.tests
 
 H{ } clone "test-namespace" set
 

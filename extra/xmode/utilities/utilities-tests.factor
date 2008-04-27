@@ -35,7 +35,7 @@ TAGS>
         { { "type" >upper set-company-type } }
         init-from-tag dup
     ] keep
-    tag-children [ tag? ] subset
+    tag-children [ tag? ] filter
     [ parse-employee-tag ] with each ;
 
 [

@@ -4,7 +4,7 @@ IN: xmode.utilities
 
 : implies >r not r> or ; inline
 
-: child-tags ( tag -- seq ) tag-children [ tag? ] subset ;
+: child-tags ( tag -- seq ) tag-children [ tag? ] filter ;
 
 : map-find ( seq quot -- result elt )
     f -rot
@@ -13,7 +13,7 @@ IN: xmode.utilities
 
 : tag-init-form ( spec -- quot )
     {
-        { [ dup quotation? ] [ [ object get tag get ] swap compose ] }
+        { [ dup quotation? ] [ [ object get tag get ] prepose ] }
         { [ dup length 2 = ] [
             first2 [
                 >r >r tag get children>string
@@ -29,7 +29,7 @@ IN: xmode.utilities
     } cond ;
 
 : with-tag-initializer ( tag obj quot -- )
-    [ object set tag set ] swap compose with-scope ; inline
+    [ object set tag set ] prepose with-scope ; inline
 
 MACRO: (init-from-tag) ( specs -- )
     [ tag-init-form ] map concat [ ] like

@@ -10,6 +10,8 @@
 		<head>
 			<t:write-title />
 
+			<t:style t:include="resource:extra/xmode/code2html/stylesheet.css" />
+
 			<t:style>
 				body, button {
 					font:9pt "Lucida Grande", "Lucida Sans Unicode", verdana, geneva, sans-serif;
@@ -46,6 +48,18 @@
 					background-color: #eee;
 					padding: 5px;
 					border: 1px solid #ccc;
+				}
+
+				.big-field-label {
+					vertical-align: top;
+				}
+				
+				.description {
+					border: 1px dashed #ccc;
+					background-color: #f5f5f5;
+					padding: 5px;
+					font-size: 150%;
+					color: #000000;
 				}
 			</t:style>
 

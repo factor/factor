@@ -3,7 +3,7 @@
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
 sequences.private classes classes.builtin classes.algebra
-definitions ;
+definitions math.order ;
 IN: generic.math
 
 PREDICATE: math-class < class

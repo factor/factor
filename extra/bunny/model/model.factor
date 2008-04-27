@@ -6,13 +6,13 @@ float-arrays continuations namespaces sequences.lib ;
 IN: bunny.model
 
 : numbers ( str -- seq )
-    " " split [ string>number ] map [ ] subset ;
+    " " split [ string>number ] map [ ] filter ;
 
 : (parse-model) ( vs is -- vs is )
     readln [
         numbers {
             { [ dup length 5 = ] [ 3 head pick push ] }
-            { [ dup first 3 = ] [ 1 tail over push ] }
+            { [ dup first 3 = ] [ rest over push ] }
             [ drop ]
         } cond (parse-model)
     ] when* ;

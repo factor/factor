@@ -153,7 +153,7 @@ M: pair constraint-satisfied?
     first constraint-satisfied? ;
 
 : extract-keys ( seq assoc -- newassoc )
-    [ dupd at ] curry H{ } map>assoc [ nip ] assoc-subset f assoc-like ;
+    [ dupd at ] curry H{ } map>assoc [ nip ] assoc-filter f assoc-like ;
 
 : annotate-node ( node -- )
     #! Annotate the node with the currently-inferred set of

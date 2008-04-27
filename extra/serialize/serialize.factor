@@ -111,7 +111,7 @@ M: tuple (serialize) ( obj -- )
         CHAR: T write1
         [ class (serialize) ]
         [ add-object ]
-        [ tuple>array 1 tail (serialize) ]
+        [ tuple>array rest (serialize) ]
         tri
     ] serialize-shared ;
 
@@ -230,6 +230,7 @@ SYMBOL: deserialized
 : deserialize-word ( -- word )
     (deserialize) (deserialize) 2dup lookup
     dup [ 2nip ] [
+        drop
         "Unknown word: " -rot
         2array unparse append throw
     ] if ;

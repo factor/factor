@@ -4,16 +4,16 @@
 
 	<tr>
 		<td>
-			<t:view component="summary" />
+			<t:view t:component="summary" />
 		</td>
 		<td>
-			<t:view component="priority" />
+			<t:view t:component="priority" />
 		</td>
 		<td>
-			<t:a href="view" query="id">View</t:a>
+			<t:a t:href="$todo-list/view" t:query="id">View</t:a>
 		</td>
 		<td>
-			<t:a href="edit" query="id">Edit</t:a>
+			<t:a t:href="$todo-list/edit" t:query="id">Edit</t:a>
 		</td>
 	</tr>
 

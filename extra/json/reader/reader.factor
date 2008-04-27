@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel parser-combinators namespaces sequences promises strings 
-       assocs math math.parser math.vectors math.functions
+       assocs math math.parser math.vectors math.functions math.order
        lazy-lists hashtables ascii ;
 IN: json.reader
 

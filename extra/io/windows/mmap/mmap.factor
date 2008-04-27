@@ -70,7 +70,7 @@ M: wince with-privileges
         dup close-later
     ] with-privileges ;
     
-M: windows <mapped-file> ( path length -- mmap )
+M: windows (mapped-file) ( path length -- mmap )
     [
         swap
         GENERIC_WRITE GENERIC_READ bitor

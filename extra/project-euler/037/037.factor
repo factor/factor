@@ -44,7 +44,7 @@ IN: project-euler.037
 PRIVATE>
 
 : euler037 ( -- answer )
-    23 1000000 primes-between [ r-trunc? ] subset [ l-trunc? ] subset sum ;
+    23 1000000 primes-between [ r-trunc? ] filter [ l-trunc? ] filter sum ;
 
 ! [ euler037 ] 100 ave-time
 ! 768 ms run / 9 ms GC ave time - 100 trials

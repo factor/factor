@@ -4,7 +4,7 @@ USING: kernel math sequences vectors classes classes.algebra
 combinators arrays words assocs parser namespaces definitions
 prettyprint prettyprint.backend quotations arrays.lib
 debugger io compiler.units kernel.private effects accessors
-hashtables sorting shuffle ;
+hashtables sorting shuffle math.order ;
 IN: multi-methods
 
 ! PART I: Converting hook specializers
@@ -19,12 +19,12 @@ SYMBOL: total
 
 : canonicalize-specializer-1 ( specializer -- specializer' )
     [
-        [ class? ] subset
+        [ class? ] filter
         [ length <reversed> [ 1+ neg ] map ] keep zip
         [ length args [ max ] change ] keep
     ]
     [
-        [ pair? ] subset
+        [ pair? ] filter
         [ keys [ hooks get push-new ] each ] keep
     ] bi append ;
 
@@ -73,7 +73,7 @@ SYMBOL: total
 ! Part II: Topologically sorting specializers
 : maximal-element ( seq quot -- n elt )
     dupd [
-        swapd [ call 0 < ] 2curry subset empty?
+        swapd [ call 0 < ] 2curry filter empty?
     ] 2curry find [ "Topological sort failed" throw ] unless* ;
     inline
 
@@ -111,7 +111,7 @@ SYMBOL: total
 : multi-predicate ( classes -- quot )
     dup length <reversed>
     [ picker 2array ] 2map
-    [ drop object eq? not ] assoc-subset
+    [ drop object eq? not ] assoc-filter
     dup empty? [ drop [ t ] ] [
         [ (multi-predicate) ] { } assoc>map
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce

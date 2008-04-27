@@ -1,10 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: threads
 USING: arrays hashtables heaps kernel kernel.private math
 namespaces sequences vectors continuations continuations.private
-dlists assocs system combinators init boxes accessors ;
+dlists assocs system combinators init boxes accessors
+math.order ;
+IN: threads
 
 SYMBOL: initial-thread
 

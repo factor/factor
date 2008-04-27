@@ -1,0 +1,25 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Pastebin</t:title>
+
+	<h2>Paste: <t:view t:component="summary" /></h2>
+
+	<table>
+		<tr><th class="field-label">Author:  </th><td><t:view t:component="author"  /></td></tr>
+		<tr><th class="field-label">Mode:    </th><td><t:view t:component="mode"    /></td></tr>
+		<tr><th class="field-label">Date:    </th><td><t:view t:component="date"    /></td></tr>
+	</table>
+
+	<pre class="description"><t:view t:component="contents" /></pre>
+
+	<t:form t:action="$pastebin/delete-paste" class="inline">
+		<t:edit t:component="id" />
+		<button class="link-button link">Delete Paste</button>
+	</t:form>
+	|
+	<t:a t:href="$pastebin/annotate" t:query="id">Annotate</t:a>
+
+	<t:view t:component="annotations" />
+</t:chloe>

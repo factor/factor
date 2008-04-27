@@ -11,15 +11,15 @@ HELP: parallel-each
 { $description "Spawns a new thread for applying " { $snippet "quot" } " to every element of " { $snippet "seq" } ", blocking until all quotations complete." }
 { $errors "Throws an error if one of the iterations throws an error." } ;
 
-HELP: parallel-subset
+HELP: parallel-filter
 { $values { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "newseq" sequence } }
 { $description "Spawns a new thread for applying " { $snippet "quot" } " to every element of " { $snippet "seq" } ", collecting the elements for which the quotation yielded a true value." }
 { $errors "Throws an error if one of the iterations throws an error." } ;
 
 ARTICLE: "concurrency.combinators" "Concurrent combinators"
-"The " { $vocab-link "concurrency.combinators" } " vocabulary provides concurrent variants of " { $link each } ", " { $link map } " and " { $link subset } ":"
+"The " { $vocab-link "concurrency.combinators" } " vocabulary provides concurrent variants of " { $link each } ", " { $link map } " and " { $link filter } ":"
 { $subsection parallel-each }
 { $subsection parallel-map }
-{ $subsection parallel-subset } ;
+{ $subsection parallel-filter } ;
 
 ABOUT: "concurrency.combinators"

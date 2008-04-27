@@ -4,10 +4,11 @@
 
 	<t:title>Planet Factor Administration</t:title>
 
-	<t:summary component="blogroll" />
+	<t:summary t:component="blogroll" />
 
 	<p>
-		<t:a href="edit-blog">Add Blog</t:a> | <t:a href="update">Update</t:a>
+		<t:a t:href="$planet-factor/admin/edit-blog">Add Blog</t:a>
+		| <t:a t:href="$planet-factor/admin/update">Update</t:a>
 	</p>
 
 </t:chloe>
