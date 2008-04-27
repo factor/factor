@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generator.fixup generic kernel math memory namespaces
-words math.bitfields math.order io.binary ;
+USING: generator.fixup generic kernel math math.order memory
+namespaces words math.bitfields math.order io.binary ;
 IN: cpu.ppc.assembler
 
 ! See the Motorola or IBM documentation for details. The opcode
