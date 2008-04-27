@@ -7,7 +7,10 @@ sequences db db.sqlite continuations ;
 
 : with-session
     [
-        >r [ save-session-after ] [ \ session set ] bi r> call
+        >r
+        [ session-manager get swap save-session-after ]
+        [ \ session set ] bi
+        r> call
     ] with-destructors ; inline
 
 TUPLE: foo ;
