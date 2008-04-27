@@ -56,7 +56,7 @@ UNION: #killable
 : purge-invariants ( stacks -- seq )
     #! Output a sequence of values which are not present in the
     #! same position in each sequence of the stacks sequence.
-    unify-lengths flip [ all-eq? not ] subset concat ;
+    unify-lengths flip [ all-eq? not ] filter concat ;
 
 M: #label node-def-use
     [
@@ -75,7 +75,7 @@ M: #branch node-def-use
     dup branch-def-use (node-def-use) ;
 
 : compute-dead-literals ( -- values )
-    def-use get [ >r value? r> empty? and ] assoc-subset ;
+    def-use get [ >r value? r> empty? and ] assoc-filter ;
 
 DEFER: kill-nodes
 SYMBOL: dead-literals

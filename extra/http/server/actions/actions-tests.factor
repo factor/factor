@@ -22,6 +22,7 @@ blah
 ;
 
 [ 25 ] [
+    init-request
     action-request-test-1 lf>crlf
     [ read-request ] with-string-reader
     request set

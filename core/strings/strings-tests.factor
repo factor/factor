@@ -1,4 +1,4 @@
-USING: continuations kernel math namespaces strings
+USING: continuations kernel math math.order namespaces strings
 strings.private sbufs tools.test sequences vectors arrays memory
 prettyprint io.streams.null ;
 IN: strings.tests
@@ -31,6 +31,8 @@ IN: strings.tests
 
 [ t ] [ "abc" "abd" before? ] unit-test
 [ t ] [ "z" "abd" after? ] unit-test
+[ "abc" ] [ "abc" "abd" min ] unit-test
+[ "z" ] [ "z" "abd" max ] unit-test
 
 [ 0 10 "hello" subseq ] must-fail
 

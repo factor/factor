@@ -26,7 +26,7 @@ M: keyword-map clear-assoc
 M: keyword-map >alist delegate >alist ;
 
 : (keyword-map-no-word-sep)
-    keys concat [ alpha? not ] subset prune natural-sort ;
+    keys concat [ alpha? not ] filter prune natural-sort ;
 
 : keyword-map-no-word-sep* ( keyword-map -- str )
     dup keyword-map-no-word-sep [ ] [

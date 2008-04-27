@@ -135,13 +135,13 @@ strings accessors io.encodings.utf8 ;
 
 [ { { "kernel" t } } ] [
     "core" resource-path [
-        "." directory [ first "kernel" = ] subset
+        "." directory [ first "kernel" = ] filter
     ] with-directory
 ] unit-test
 
 [ { { "kernel" t } } ] [
     "resource:core" [
-        "." directory [ first "kernel" = ] subset
+        "." directory [ first "kernel" = ] filter
     ] with-directory
 ] unit-test
 

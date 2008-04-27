@@ -5,7 +5,7 @@ sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
 slots.private combinators definitions compiler.units
 system layouts vectors optimizer.math.partial accessors
-optimizer.inlining ;
+optimizer.inlining math.order ;
 
 [ t ] [ T{ literal-constraint f 1 2 } T{ literal-constraint f 1 2 } equal? ] unit-test
 

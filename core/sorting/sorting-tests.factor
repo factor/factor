@@ -1,5 +1,5 @@
-USING: sorting sequences kernel math random tools.test
-vectors ;
+USING: sorting sequences kernel math math.order random
+tools.test vectors ;
 IN: sorting.tests
 
 [ [ ] ] [ [ ] natural-sort ] unit-test

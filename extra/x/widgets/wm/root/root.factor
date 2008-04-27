@@ -37,7 +37,7 @@ dup >r $id   dpy get $window-table   at r> or ;
 
 : circulate-focus ( -- )
 dpy get $default-root <- children
-[ find-in-table ] map [ <- mapped? ] subset   dup length 1 >
+[ find-in-table ] map [ <- mapped? ] filter   dup length 1 >
 [ reverse dup first <- lower drop
   second <- raise
   dup <wm-frame> is? [ $child ] [ ] if
@@ -48,7 +48,7 @@ if ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : managed? ( id -- ? )
-dpy get $window-table values [ <wm-child> is? ] subset [ $id ] map member? ;
+dpy get $window-table values [ <wm-child> is? ] filter [ $id ] map member? ;
 
 : event>keyname ( event -- keyname ) lookup-keysym keysym>name ;
 

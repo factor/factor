@@ -21,7 +21,7 @@ SYMBOL: matrix
 : cols ( -- n ) 0 nth-row length ;
 
 : skip ( i seq quot -- n )
-    over >r find* drop r> length or ; inline
+    over >r find-from drop r> length or ; inline
 
 : first-col ( row# -- n )
     #! First non-zero column
@@ -69,7 +69,7 @@ SYMBOL: matrix
 : echelon ( matrix -- matrix' )
     [ 0 0 (echelon) ] with-matrix ;
 
-: nonzero-rows [ [ zero? ] all? not ] subset ;
+: nonzero-rows [ [ zero? ] all? not ] filter ;
 
 : null/rank ( matrix -- null rank )
     echelon dup length swap nonzero-rows length [ - ] keep ;

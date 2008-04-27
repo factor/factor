@@ -13,6 +13,7 @@ http.server.auth.providers
 http.server.auth.providers.null
 http.server.actions
 http.server.components
+http.server.flows
 http.server.forms
 http.server.sessions
 http.server.boilerplate
@@ -22,7 +23,6 @@ http.server.validators ;
 IN: http.server.auth.login
 QUALIFIED: smtp
 
-SYMBOL: post-login-url
 SYMBOL: login-failed?
 
 TUPLE: login < dispatcher users ;
@@ -60,8 +60,7 @@ M: user-saver dispose
 
 : successful-login ( user -- response )
     logged-in-user sset
-    post-login-url sget "$login" or f <permanent-redirect>
-    f post-login-url sset ;
+    "$login" end-flow ;
 
 :: <login-action> ( -- action )
     [let | form [ <login-form> ] |
@@ -139,7 +138,7 @@ SYMBOL: user-exists?
 
                 successful-login
 
-                login get default>> responder>> init-user-profile
+                login get init-user-profile
             ] >>submit
     ] ;
 
@@ -154,8 +153,6 @@ SYMBOL: user-exists?
         "new-password" <password> add-field
         "verify-password" <password> add-field
         "email" <email> add-field ;
-
-SYMBOL: previous-page
 
 :: <edit-profile-action> ( -- action )
     [let | form [ <edit-profile-form> ] |
@@ -180,7 +177,8 @@ SYMBOL: previous-page
 
                 logged-in-user sget
 
-                "password" value empty? [
+                { "password" "new-password" "verify-password" }
+                [ value empty? ] all? [
                     same-password-twice
 
                     "password" value uid users check-login
@@ -196,7 +194,7 @@ SYMBOL: previous-page
 
                 user-profile-changed? on
 
-                previous-page sget f <permanent-redirect>
+                "$login" end-flow
             ] >>submit
     ] ;
 
@@ -333,31 +331,28 @@ SYMBOL: lost-password-from
     <action>
         [
             f logged-in-user sset
-            "$login/login" f <permanent-redirect>
+            "$login/login" end-flow
         ] >>submit ;
 
 ! ! ! Authentication logic
 
-TUPLE: protected responder ;
+TUPLE: protected < filter-responder ;
 
 C: <protected> protected
 
 : show-login-page ( -- response )
-    request get request-url post-login-url sset
-    "$login/login" f <temporary-redirect> ;
+    begin-flow
+    "$login/login" f <standard-redirect> ;
 
-M: protected call-responder ( path responder -- response )
+M: protected call-responder* ( path responder -- response )
     logged-in-user sget dup [
         save-user-after
-        request get request-url previous-page sset
-        responder>> call-responder
+        call-next-method
     ] [
-        3drop
-        request get method>> { "GET" "HEAD" } member?
-        [ show-login-page ] [ <400> ] if
+        3drop show-login-page
     ] if ;
 
-M: login call-responder ( path responder -- response )
+M: login call-responder* ( path responder -- response )
     dup login set
     call-next-method ;
 

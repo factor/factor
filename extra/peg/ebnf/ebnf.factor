@@ -285,7 +285,7 @@ M: ebnf-optional (transform) ( ast -- parser )
 GENERIC: build-locals ( code ast -- code )
 
 M: ebnf-sequence build-locals ( code ast -- code )
-  elements>> dup [ ebnf-var? ] subset empty? [
+  elements>> dup [ ebnf-var? ] filter empty? [
     drop 
   ] [ 
     [

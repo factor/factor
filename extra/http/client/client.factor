@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
-splitting calendar continuations accessors vectors
+splitting calendar continuations accessors vectors math.order
 io.encodings.8-bit io.encodings.binary fry debugger inspector ;
 IN: http.client
 

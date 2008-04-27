@@ -4,7 +4,7 @@ USING: alien.c-types cpu.ppc.assembler cpu.architecture generic
 kernel kernel.private math memory namespaces sequences words
 assocs generator generator.registers generator.fixup system
 layouts classes words.private alien combinators
-compiler.constants ;
+compiler.constants math.order ;
 IN: cpu.ppc.architecture
 
 ! PowerPC register assignments

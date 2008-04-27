@@ -242,8 +242,16 @@ HELP: definer
 { $values { "defspec" "a definition specifier" } { "start" word } { "end" "a word or " { $link f } } }
 { $contract "Outputs the parsing words which delimit the definition." }
 { $examples
-    { $example "USING: definitions prettyprint ;" ": foo ; \\ foo definer . ." ";\nPOSTPONE: :" }
-    { $example "USING: definitions prettyprint ;" "SYMBOL: foo \\ foo definer . ." "f\nPOSTPONE: SYMBOL:" }
+    { $example "USING: definitions prettyprint ;"
+               "IN: scratchpad"
+               ": foo ; \\ foo definer . ."
+               ";\nPOSTPONE: :"
+    }
+    { $example "USING: definitions prettyprint ;"
+               "IN: scratchpad"
+               "SYMBOL: foo \\ foo definer . ."
+               "f\nPOSTPONE: SYMBOL:"
+    }
 }
 { $notes "This word is used in the implementation of " { $link see } "." } ;
 

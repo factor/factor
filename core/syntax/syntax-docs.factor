@@ -190,7 +190,7 @@ HELP: delimiter
 HELP: parsing
 { $syntax ": foo ... ; parsing" }
 { $description "Declares the most recently defined word as a parsing word." }
-{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
 
 HELP: inline
 { $syntax ": foo ... ; inline" }
@@ -338,7 +338,7 @@ HELP: SYMBOL:
 { $syntax "SYMBOL: word" }
 { $values { "word" "a new word to define" } }
 { $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
-{ $examples { $example "USE: prettyprint" "SYMBOL: foo\nfoo ." "foo" } } ;
+{ $examples { $example "USE: prettyprint" "IN: scratchpad" "SYMBOL: foo\nfoo ." "foo" } } ;
 
 { define-symbol POSTPONE: SYMBOL: } related-words
 
@@ -472,6 +472,7 @@ HELP: HOOK:
 { $examples
     { $example
         "USING: io namespaces ;"
+        "IN: scratchpad"
         "SYMBOL: transport"
         "TUPLE: land-transport ;"
         "TUPLE: air-transport ;"

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences math math.functions hints
-float-arrays ;
+float-arrays math.order ;
 IN: math.vectors
 
 : vneg ( u -- v ) [ neg ] map ;

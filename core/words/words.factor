@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions graphs assocs kernel kernel.private
 slots.private math namespaces sequences strings vectors sbufs
-quotations assocs hashtables sorting words.private vocabs ;
+quotations assocs hashtables sorting words.private vocabs
+math.order ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
@@ -101,7 +102,7 @@ SYMBOL: compiled-crossref
 compiled-crossref global [ H{ } assoc-like ] change-at
 
 : compiled-xref ( word dependencies -- )
-    [ drop compiled-crossref? ] assoc-subset
+    [ drop compiled-crossref? ] assoc-filter
     2dup "compiled-uses" set-word-prop
     compiled-crossref get add-vertex* ;
 
@@ -121,7 +122,7 @@ SYMBOL: +called+
 
 : compiled-usages ( words -- seq )
     [ [ dup ] H{ } map>assoc dup ] keep [
-        compiled-usage [ nip +inlined+ eq? ] assoc-subset update
+        compiled-usage [ nip +inlined+ eq? ] assoc-filter update
     ] with each keys ;
 
 <PRIVATE
@@ -135,9 +136,9 @@ SYMBOL: visited
         [ reset-on-redefine reset-props ]
         [ dup visited get set-at ]
         [
-            crossref get at keys [ word? ] subset [
+            crossref get at keys [ word? ] filter [
                 reset-on-redefine [ word-prop ] with contains?
-            ] subset
+            ] filter
             [ (redefined) ] each
         ] tri
     ] if ;

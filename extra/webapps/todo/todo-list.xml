@@ -6,7 +6,7 @@
 
 	<table class="todo-list">
 		<tr><th>Summary</th><th>Priority</th><th>View</th><th>Edit</th></tr>
-		<t:summary component="list" />
+		<t:summary t:component="list" />
 	</table>
 
 </t:chloe>

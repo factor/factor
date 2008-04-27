@@ -183,7 +183,7 @@ C: <anonymous-complement> anonymous-complement
 : largest-class ( seq -- n elt )
     dup [
         [ 2dup class< >r swap class< not r> and ]
-        with subset empty?
+        with filter empty?
     ] curry find [ "Topological sort failed" throw ] unless* ;
 
 : sort-classes ( seq -- newseq )
@@ -193,7 +193,7 @@ C: <anonymous-complement> anonymous-complement
     [ ] unfold nip ;
 
 : min-class ( class seq -- class/f )
-    over [ classes-intersect? ] curry subset
+    over [ classes-intersect? ] curry filter
     dup empty? [ 2drop f ] [
         tuck [ class< ] with all? [ peek ] [ drop f ] if
     ] if ;

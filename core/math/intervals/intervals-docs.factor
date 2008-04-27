@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math ;
+USING: help.markup help.syntax math math.order ;
 IN: math.intervals
 
 ARTICLE: "math-intervals-new" "Creating intervals"

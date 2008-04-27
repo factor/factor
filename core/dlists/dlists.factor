@@ -153,7 +153,7 @@ PRIVATE>
     drop ;
 
 : dlist-each ( dlist quot -- )
-    [ obj>> ] swap compose dlist-each-node ; inline
+    [ obj>> ] prepose dlist-each-node ; inline
 
 : dlist-slurp ( dlist quot -- )
     over dlist-empty?

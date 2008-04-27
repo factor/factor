@@ -573,7 +573,7 @@ SYMBOL: $4
   #! $1, $2, etc with the relevant item from the 
   #! given index.
   dup quotation? over [ ] = not and [ ! vector tree
-    dup first swap 1 tail ! vector car cdr
+    dup first swap rest ! vector car cdr
     >r dupd replace-patterns ! vector v R: cdr
     swap r> replace-patterns >r 1quotation r> append
   ] [ ! vector value

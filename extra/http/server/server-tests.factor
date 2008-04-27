@@ -11,6 +11,8 @@ IN: http.server.tests
     { { "a" "b" } } >>query
     request set
 
+    [ ] link-hook set
+
     [ "http://www.apple.com:80/xxx/bar?a=b" ] [ f f derive-url ] unit-test
     [ "http://www.apple.com:80/xxx/baz?a=b" ] [ "baz" f derive-url ] unit-test
     [ "http://www.apple.com:80/xxx/baz?c=d" ] [ "baz" { { "c" "d" } } derive-url ] unit-test
@@ -25,7 +27,7 @@ TUPLE: mock-responder path ;
 
 C: <mock-responder> mock-responder
 
-M: mock-responder call-responder
+M: mock-responder call-responder*
     nip
     path>> on
     "text/plain" <content> ;
@@ -79,7 +81,7 @@ TUPLE: path-check-responder ;
 
 C: <path-check-responder> path-check-responder
 
-M: path-check-responder call-responder
+M: path-check-responder call-responder*
     drop
     "text/plain" <content> swap >array >>body ;
 
@@ -119,7 +121,7 @@ TUPLE: base-path-check-responder ;
 
 C: <base-path-check-responder> base-path-check-responder
 
-M: base-path-check-responder call-responder
+M: base-path-check-responder call-responder*
     2drop
     "$funny-dispatcher" resolve-base-path
     "text/plain" <content> swap >>body ;

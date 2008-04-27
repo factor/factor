@@ -197,7 +197,7 @@ HELP: execute ( word -- )
 { $values { "word" word } }
 { $description "Executes a word." }
 { $examples
-    { $example "USING: kernel io words ;" ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
+    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
 
 HELP: word-props ( word -- props )
@@ -278,7 +278,7 @@ HELP: reset-generic
 $low-level-note
 { $side-effects "word" } ;
 
-HELP: <word>
+HELP: <word> ( name vocab -- word )
 { $values { "name" string } { "vocab" string } { "word" word } }
 { $description "Allocates an uninterned word with the specified name and vocabulary, and a blank word property hashtable. User code should call " { $link gensym } " to create uninterned words and " { $link create } " to create interned words." } ;
 
@@ -300,7 +300,7 @@ HELP: word
 
 HELP: set-word
 { $values { "word" word } }
-{ $description "Sets the recently defined word. Usually you would call " { $link save-location } " on a newly-defined word instead, which will in turn call this word." } ;
+{ $description "Sets the recently defined word." } ;
 
 HELP: lookup
 { $values { "name" string } { "vocab" string } { "word" "a word or " { $link f } } }

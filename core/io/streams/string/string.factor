@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io kernel math namespaces sequences sbufs strings
 generic splitting growable continuations io.streams.plain
-io.encodings io.encodings.private ;
+io.encodings io.encodings.private math.order ;
 IN: io.streams.string
 
 M: growable dispose drop ;

@@ -62,5 +62,5 @@ io.files io.encodings.utf8 ;
     "extra/porter-stemmer/test/voc.txt" resource-lines
     [ stem ] map
     "extra/porter-stemmer/test/output.txt" resource-lines
-    [ 2array ] 2map [ first2 = not ] subset
+    [ 2array ] 2map [ first2 = not ] filter
 ] unit-test

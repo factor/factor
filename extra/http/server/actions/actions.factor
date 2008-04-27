@@ -37,16 +37,19 @@ TUPLE: action init display submit get-params post-params ;
 : validation-failed ( -- * )
     action get display>> call exit-with ;
 
-M: action call-responder ( path action -- response )
+M: action call-responder* ( path action -- response )
     '[
         , [ CHAR: / = ] right-trim empty? [
             , action set
-            request-params params set
-            request get method>> {
-                { "GET" [ handle-get ] }
-                { "HEAD" [ handle-get ] }
-                { "POST" [ handle-post ] }
-            } case
+            request get
+            [ request-params params set ]
+            [
+                method>> {
+                    { "GET" [ handle-get ] }
+                    { "HEAD" [ handle-get ] }
+                    { "POST" [ handle-post ] }
+                } case
+            ] bi
         ] [
             <404>
         ] if

@@ -1,5 +1,5 @@
-USING: math.intervals kernel sequences words math arrays
-prettyprint tools.test random vocabs combinators ;
+USING: math.intervals kernel sequences words math math.order
+arrays prettyprint tools.test random vocabs combinators ;
 IN: math.intervals.tests
 
 [ T{ interval f { 1 t } { 2 t } } ] [ 1 2 [a,b] ] unit-test

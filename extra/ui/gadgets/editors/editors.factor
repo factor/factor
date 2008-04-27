@@ -4,7 +4,8 @@ USING: arrays documents ui.clipboards ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
 ui.gadgets.scrollers ui.gadgets.theme ui.render ui.gestures io
 kernel math models namespaces opengl opengl.gl sequences strings
-io.styles math.vectors sorting colors combinators assocs ;
+io.styles math.vectors sorting colors combinators assocs
+math.order ;
 IN: ui.gadgets.editors
 
 TUPLE: editor

@@ -87,7 +87,7 @@ M: node optimize-node* drop t f ;
 
 : compute-value-substitutions ( #call/#merge #return/#values -- assoc )
     [ out-d>> ] [ in-d>> ] bi* 2array unify-lengths flip
-    [ = not ] assoc-subset >hashtable ;
+    [ = not ] assoc-filter >hashtable ;
 
 : cleanup-inlining ( #return/#values -- newnode changed? )
     dup node-successor [

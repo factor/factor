@@ -8,6 +8,7 @@ http.server.actions
 http.server.components
 http.server.components.code
 http.server.templating.chloe
+http.server.auth.login
 http.server.boilerplate
 http.server.validators
 http.server.forms ;
@@ -240,8 +241,8 @@ TUPLE: pastebin < dispatcher ;
         <paste-list-action> "list" add-main-responder
         <feed-action> "feed.xml" add-responder
         <paste-form> [ <paste> ] <view-paste-action> "view-paste" add-responder
-                   [ <paste> ] "$pastebin/list" <delete-paste-action> "delete-paste" add-responder
-                   [ <annotation> ] "$pastebin/view-paste" <delete-annotation-action> "delete-annotation" add-responder
+                   [ <paste> ] "$pastebin/list" <delete-paste-action> <protected> "delete-paste" add-responder
+                   [ <annotation> ] "$pastebin/view-paste" <delete-annotation-action> <protected> "delete-annotation" add-responder
         <paste-form> [ <paste> ]    <view-paste-action>     "$pastebin/view-paste"   add-responder
         <new-paste-form> [ <paste> now >>date ] "$pastebin/view-paste" <new-paste-action>     "new-paste"    add-responder
         <new-annotation-form> [ <annotation> now >>date ] "$pastebin/view-paste" <annotate-action> "annotate" add-responder

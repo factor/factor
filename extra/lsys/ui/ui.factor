@@ -1,5 +1,6 @@
 
-USING: kernel namespaces threads math math.vectors quotations sequences
+USING: kernel namespaces threads math math.order math.vectors
+       quotations sequences
        opengl
        opengl.gl
        colors

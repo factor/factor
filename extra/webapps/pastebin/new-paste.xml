@@ -4,14 +4,14 @@
 
 	<t:title>New Paste</t:title>
 
-	<t:form action="$pastebin/new-paste">
+	<t:form t:action="$pastebin/new-paste">
 
 		<table>
-			<tr><th class="field-label">Summary: </th><td><t:edit component="summary" /></td></tr>
-			<tr><th class="field-label">Author: </th><td><t:edit component="author" /></td></tr>
-			<tr><th class="field-label">Mode: </th><td><t:edit component="mode" /></td></tr>
-			<tr><th class="field-label big-field-label">Description: </th><td><t:edit component="contents" /></td></tr>
-			<tr><th class="field-label">Captcha: </th><td><t:edit component="captcha" /></td></tr>
+			<tr><th class="field-label">Summary: </th><td><t:edit t:component="summary" /></td></tr>
+			<tr><th class="field-label">Author: </th><td><t:edit t:component="author" /></td></tr>
+			<tr><th class="field-label">Mode: </th><td><t:edit t:component="mode" /></td></tr>
+			<tr><th class="field-label big-field-label">Description: </th><td><t:edit t:component="contents" /></td></tr>
+			<tr><th class="field-label">Captcha: </th><td><t:edit t:component="captcha" /></td></tr>
 			<tr>
 			<td></td>
 			<td>Leave the captcha blank. Spam-bots will fill it indiscriminantly, so their attempts to register will be blocked.</td>
