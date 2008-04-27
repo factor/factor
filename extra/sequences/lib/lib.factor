@@ -66,9 +66,9 @@ MACRO: firstn ( n -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: higher ( a b quot -- c ) [ compare 0 > ] curry most ; inline
+: higher ( a b quot -- c ) [ compare +gt+ eq? ] curry most ; inline
 
-: lower  ( a b quot -- c ) [ compare 0 < ] curry most ; inline
+: lower  ( a b quot -- c ) [ compare +lt+ eq? ] curry most ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

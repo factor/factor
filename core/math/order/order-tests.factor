@@ -1,6 +1,9 @@
 USING: kernel math.order tools.test ;
 IN: math.order.tests
 
-[ -1 ] [ "ab" "abc" <=> ] unit-test
-[ 1 ] [ "abc" "ab" <=> ] unit-test
+[ +lt+ ] [ "ab" "abc" <=> ] unit-test
+[ +gt+ ] [ "abc" "ab" <=> ] unit-test
+[ +lt+ ] [ 3 4 <=> ] unit-test
+[ +eq+ ] [ 4 4 <=> ] unit-test
+[ +gt+ ] [ 4 3 <=> ] unit-test
 

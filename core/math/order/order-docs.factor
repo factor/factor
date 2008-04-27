@@ -9,17 +9,26 @@ HELP: <=>
     $nl
     "The output value is one of the following:"
     { $list
-        { "positive - indicating that " { $snippet "obj1" } " follows " { $snippet "obj2" } }
-        { "zero - indicating that " { $snippet "obj1" } " is equal to " { $snippet "obj2" } }
-        { "negative - indicating that " { $snippet "obj1" } " precedes " { $snippet "obj2" } }
+        { { $link +lt+ } " - indicating that " { $snippet "obj1" } " precedes " { $snippet "obj2" } }
+        { { $link +eq+ } " - indicating that " { $snippet "obj1" } " is equal to " { $snippet "obj2" } }
+        { { $link +gt+ } " - indicating that " { $snippet "obj1" } " follows " { $snippet "obj2" } }
     }
     "The default implementation treats the two objects as sequences, and recursively compares their elements. So no extra work is required to compare sequences lexicographically."
 } ;
 
+HELP: +lt+
+{ $description "Returned by " { $link <=> } " when the first object is strictly less than the second object." } ;
+
+HELP: +eq+
+{ $description "Returned by " { $link <=> } " when the first object is equal to the second object." } ;
+
+HELP: +gt+
+{ $description "Returned by " { $link <=> } " when the first object is strictly greater than the second object." } ;
+
 HELP: compare
-{ $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "n" integer } }
+{ $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "symbol" "a comparison symbol, +lt+, +eq+, or +gt+" } }
 { $description "Compares the results of applying the quotation to both objects via " { $link <=> } "." }
-{ $examples { $example "USING: kernel math.order prettyprint sequences ;" "\"hello\" \"hi\" [ length ] compare ." "3" }
+{ $examples { $example "USING: kernel math.order prettyprint sequences ;" "\"hello\" \"hi\" [ length ] compare ." "+gt+" }
 } ;
 
 HELP: max

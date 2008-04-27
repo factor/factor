@@ -60,7 +60,7 @@ M: object value-literal \ literal-expected inference-warning ;
 : value-vector ( n -- vector ) [ drop <computed> ] V{ } map-as ;
 
 : add-inputs ( seq stack -- n stack )
-    tuck [ length ] compare dup 0 >
+    tuck [ length ] bi@ - dup 0 >
     [ dup value-vector [ swapd push-all ] keep ]
     [ drop 0 swap ] if ;
 
