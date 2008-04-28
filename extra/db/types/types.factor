@@ -15,18 +15,17 @@ TUPLE: sql-spec class slot-name column-name type primary-key modifiers ;
 TUPLE: literal-bind key type value ;
 C: <literal-bind> literal-bind
 
-TUPLE: generator-bind key singleton type ;
+TUPLE: generator-bind key generator-singleton type ;
 C: <generator-bind> generator-bind
 SINGLETON: random-id-generator
 
 TUPLE: low-level-binding value ;
 C: <low-level-binding> low-level-binding
 
-SINGLETON: +native-id+
-SINGLETON: +assigned-id+
+SINGLETON: +db-assigned-id+
+SINGLETON: +user-assigned-id+
 SINGLETON: +random-id+
-UNION: +primary-key+ +native-id+ +assigned-id+ +random-id+ ;
-UNION: +nonnative-id+ +random-id+ +assigned-id+ ;
+UNION: +primary-key+ +db-assigned-id+ +user-assigned-id+ +random-id+ ;
 
 SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 +foreign-id+ +has-many+ ;
@@ -43,11 +42,11 @@ SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 : primary-key? ( spec -- ? )
     primary-key>> +primary-key+? ;
 
-: native-id? ( spec -- ? )
-    primary-key>> +native-id+? ;
+: db-assigned-id-spec? ( spec -- ? )
+    primary-key>> +db-assigned-id+? ;
 
-: nonnative-id? ( spec -- ? )
-    primary-key>> +nonnative-id+? ;
+: assigned-id-spec? ( spec -- ? )
+    primary-key>> +user-assigned-id+? ;
 
 : normalize-spec ( spec -- )
     dup type>> dup +primary-key+? [
@@ -82,8 +81,8 @@ FACTOR-BLOB NULL ;
 : number>string* ( n/str -- str )
     dup number? [ number>string ] when ;
 
-: maybe-remove-id ( specs -- obj )
-    [ +native-id+? not ] filter ;
+: remove-db-assigned-id ( specs -- obj )
+    [ +db-assigned-id+? not ] filter ;
 
 : remove-relations ( specs -- newcolumns )
     [ relation? not ] filter ;

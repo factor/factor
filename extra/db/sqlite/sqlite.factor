@@ -79,7 +79,7 @@ M: literal-bind sqlite-bind-conversion ( tuple literal-bind -- array )
     <sqlite-low-level-binding> ;
 
 M: generator-bind sqlite-bind-conversion ( tuple generate-bind -- array )
-    nip [ key>> ] [ singleton>> eval-generator ] [ type>> ] tri
+    nip [ key>> ] [ generator-singleton>> eval-generator ] [ type>> ] tri
     <sqlite-low-level-binding> ;
 
 M: sqlite-statement bind-tuple ( tuple statement -- )
@@ -129,11 +129,11 @@ M: sqlite-db create-sql-statement ( class -- statement )
 M: sqlite-db drop-sql-statement ( class -- statement )
     [ "drop table " 0% 0% ";" 0% drop ] query-make ;
 
-M: sqlite-db <insert-native-statement> ( tuple -- statement )
+M: sqlite-db <insert-db-assigned-statement> ( tuple -- statement )
     [
         "insert into " 0% 0%
         "(" 0%
-        maybe-remove-id
+        remove-db-assigned-id
         dup [ ", " 0% ] [ column-name>> 0% ] interleave
         ") values(" 0%
         [ ", " 0% ] [
@@ -149,8 +149,8 @@ M: sqlite-db <insert-native-statement> ( tuple -- statement )
         ");" 0%
     ] query-make ;
 
-M: sqlite-db <insert-nonnative-statement> ( tuple -- statement )
-    <insert-native-statement> ;
+M: sqlite-db <insert-user-assigned-statement> ( tuple -- statement )
+    <insert-db-assigned-statement> ;
 
 M: sqlite-db bind# ( spec obj -- )
     >r
@@ -163,8 +163,8 @@ M: sqlite-db bind% ( spec -- )
 
 M: sqlite-db persistent-table ( -- assoc )
     H{
-        { +native-id+ { "integer primary key" "integer primary key" "primary key" } }
-        { +assigned-id+ { f f "primary key" } }
+        { +db-assigned-id+ { "integer primary key" "integer primary key" "primary key" } }
+        { +user-assigned-id+ { f f "primary key" } }
         { +random-id+ { "integer primary key" "integer primary key" "primary key" } }
         { INTEGER { "integer" "integer" "primary key" } }
         { BIG-INTEGER { "bigint" "bigint" } }

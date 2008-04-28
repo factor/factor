@@ -154,7 +154,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
 : postgresql-column-typed ( handle row column type -- obj )
     dup array? [ first ] when
     {
-        { +native-id+ [ pq-get-number ] }
+        { +db-assigned-id+ [ pq-get-number ] }
         { +random-id+ [ pq-get-number ] }
         { INTEGER [ pq-get-number ] }
         { BIG-INTEGER [ pq-get-number ] }

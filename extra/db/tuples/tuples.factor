@@ -37,8 +37,8 @@ SYMBOL: sql-counter
 HOOK: create-sql-statement db ( class -- obj )
 HOOK: drop-sql-statement db ( class -- obj )
 
-HOOK: <insert-native-statement> db ( class -- obj )
-HOOK: <insert-nonnative-statement> db ( class -- obj )
+HOOK: <insert-db-assigned-statement> db ( class -- obj )
+HOOK: <insert-user-assigned-statement> db ( class -- obj )
 
 HOOK: <update-tuple-statement> db ( class -- obj )
 HOOK: <update-tuples-statement> db ( class -- obj )
@@ -65,7 +65,7 @@ SINGLETON: retryable
     [ bind-params>> ] [ in-params>> ] bi
     [
         dup generator-bind? [
-            singleton>> eval-generator >>value
+            generator-singleton>> eval-generator >>value
         ] [
             drop
         ] if
@@ -119,19 +119,19 @@ M: retryable execute-statement* ( statement type -- )
         [ execute-statement ] with-disposals
     ] [ create-table ] bi ;
 
-: insert-native ( tuple -- )
+: insert-db-assigned-statement ( tuple -- )
     dup class
-    db get db-insert-statements [ <insert-native-statement> ] cache
+    db get db-insert-statements [ <insert-db-assigned-statement> ] cache
     [ bind-tuple ] 2keep insert-tuple* ;
 
-: insert-nonnative ( tuple -- )
+: insert-user-assigned-statement ( tuple -- )
     dup class
-    db get db-insert-statements [ <insert-nonnative-statement> ] cache
+    db get db-insert-statements [ <insert-user-assigned-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : insert-tuple ( tuple -- )
-    dup class db-columns find-primary-key nonnative-id?
-    [ insert-nonnative ] [ insert-native ] if ;
+    dup class db-columns find-primary-key db-assigned-id-spec?
+    [ insert-db-assigned-statement ] [ insert-user-assigned-statement ] if ;
 
 : update-tuple ( tuple -- )
     dup class
