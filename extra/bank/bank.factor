@@ -1,10 +1,10 @@
-USING: accessors calendar kernel math money sequences ;
+USING: accessors calendar kernel math math.order money sequences ;
 IN: bank
 
 TUPLE: account name interest-rate interest-payment-day opening-date transactions unpaid-interest interest-last-paid ;
 
 : <account> ( name interest-rate interest-payment-day opening-date -- account )
-    V{ } clone 0 pick account construct-boa ;
+    V{ } clone 0 pick account boa ;
 
 TUPLE: transaction date amount description ;
 C: <transaction> transaction
@@ -29,7 +29,7 @@ C: <transaction> transaction
 : before? ( date date -- ? ) <=> 0 < ;
 
 : transactions-on-date ( account date -- transactions )
-    [ before? ] curry subset ;
+    [ before? ] curry filter ;
 
 : balance-on-date ( account date -- balance )
     transactions-on-date total ;
