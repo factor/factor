@@ -76,7 +76,7 @@
     (modify-syntax-entry ?\" "\"    " factor-mode-syntax-table)))
 
 (defvar factor-mode-map (make-sparse-keymap))
-    
+
 (defcustom factor-mode-hook nil
   "Hook run when entering Factor mode."
   :type 'hook
@@ -211,7 +211,7 @@
 (defun factor-clear ()
   (interactive)
   (factor-send-string "clear"))
-  
+
 (defun factor-comment-line ()
   (interactive)
   (beginning-of-line)
@@ -241,19 +241,35 @@
           (setq cur-indent 0)
         (save-excursion
           (while not-indented
-            (forward-line -1)
-            ;; Check that we are after the end of previous word
-            (if (looking-at ".*;[ \t]*$")
+            ;; Check that we are inside open brackets
+            (if (> (factor-brackets-depth) 0)
                 (progn
-                  (setq cur-indent (- (current-indentation) default-tab-width))
-                  (setq not-indented nil))
-              (if (looking-at "^\\(\\|:\\): ")
+                  (let ((cur-depth (factor-brackets-depth)))
+                    (forward-line -1)
+                    (setq cur-indent (+ (current-indentation)
+                                        (* default-tab-width
+                                           (- cur-depth (factor-brackets-depth)))))
+                    (setq not-indented nil)))
+              (forward-line -1)
+              ;; Check that we are after the end of previous word
+              (if (looking-at ".*;[ \t]*$")
                   (progn
-                    (setq cur-indent (+ (current-indentation) default-tab-width))
+                    (setq cur-indent (- (current-indentation) default-tab-width))
                     (setq not-indented nil))
-                (if (bobp)
-                    (setq not-indented nil))))))))
-        cur-indent))
+                ;; Check that we are after the start of word
+                (if (looking-at "^\\(\\|:\\): ")
+                    (progn
+                      (setq cur-indent (+ (current-indentation) default-tab-width))
+                      (setq not-indented nil))
+                  (if (bobp)
+                      (setq not-indented nil)))))))))
+    cur-indent))
+
+(defun factor-brackets-depth ()
+  "Returns number of brackets, not closed on previous lines."
+  (syntax-ppss-depth
+   (save-excursion
+     (syntax-ppss (line-beginning-position)))))
 
 (defun factor-indent-line ()
   "Indent current line as Factor code"
