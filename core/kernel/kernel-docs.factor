@@ -1,5 +1,5 @@
 USING: generic help.markup help.syntax math memory
-namespaces sequences kernel.private layouts sorting classes
+namespaces sequences kernel.private layouts classes
 kernel.private vectors combinators quotations strings words
 assocs arrays math.order ;
 IN: kernel
@@ -241,7 +241,7 @@ ARTICLE: "conditionals" "Conditionals and logic"
 "See " { $link "combinators" } " for forms which abstract away common patterns involving multiple nested branches."
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
-ARTICLE: "equality" "Equality and comparison testing"
+ARTICLE: "equality" "Equality"
 "There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object (" { $emphasis "identity comparison" } "), or you can test if two objects are equal in a domain-specific sense, usually by being instances of the same class, and having equal slot values (" { $emphasis "value comparison" } "). Both notions of equality are equality relations in the mathematical sense."
 $nl
 "Identity comparison:"
@@ -250,16 +250,8 @@ $nl
 { $subsection = }
 "Custom value comparison methods:"
 { $subsection equal? }
+"Utility class:"
 { $subsection identity-tuple }
-"Some types of objects also have an intrinsic order allowing sorting using " { $link natural-sort } ":"
-{ $subsection <=> }
-{ $subsection compare }
-{ $subsection invert-comparison }
-"Utilities for comparing objects:"
-{ $subsection after? }
-{ $subsection before? }
-{ $subsection after=? }
-{ $subsection before=? }
 "An object can be cloned; the clone has distinct identity but equal value:"
 { $subsection clone } ;
 
@@ -393,8 +385,6 @@ HELP: identity-tuple
     { $unchecked-example "T{ foo } dup = ." "t" }
     { $unchecked-example "T{ foo } dup clone = ." "f" }
 } ;
-
-{ <=> compare natural-sort sort-keys sort-values } related-words
 
 HELP: clone
 { $values { "obj" object } { "cloned" "a new object" } }
