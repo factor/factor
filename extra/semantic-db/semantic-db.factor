@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.cleave combinators.lib
-continuations db db.tuples db.types db.sqlite hashtables kernel math
-math.parser namespaces parser sequences sequences.deep
+continuations db db.tuples db.types db.sqlite kernel math
+math.parser namespaces parser sets sequences sequences.deep
 sequences.lib strings words ;
 IN: semantic-db
 
@@ -28,7 +28,7 @@ node "node"
 TUPLE: arc id subject object relation ;
 
 : <arc> ( subject object relation -- arc )
-    arc construct-empty swap >>relation swap >>object swap >>subject ;
+    arc new swap >>relation swap >>object swap >>subject ;
 
 : <id-arc> ( id -- arc )
     arc new swap >>id ;

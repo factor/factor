@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs db db.sqlite db.postgresql http.server io kernel namespaces semantic-db sequences strings ;
+USING: accessors assocs db db.sqlite db.postgresql http.server http.server.actions io kernel namespaces semantic-db sequences strings ;
 IN: tangle
 
 GENERIC: render* ( content templater -- output )
@@ -20,7 +20,7 @@ TUPLE: sqlite-tangle ;
 TUPLE: postgres-tangle ;
 
 : make-tangle ( db templater type -- tangle )
-    construct-empty [ <tangle> ] dip tuck set-delegate ;
+    new [ <tangle> ] dip tuck set-delegate ;
 
 : <sqlite-tangle> ( db templater -- tangle ) sqlite-tangle make-tangle ;
 : <postgres-tangle> ( db templater -- tangle ) postgres-tangle make-tangle ;
@@ -40,8 +40,8 @@ M: postgres-tangle new-db ( tangle args -- tangle )
 TUPLE: node-responder tangle ;
 C: <node-responder> node-responder
 
-M: node-responder call-responder ( path responder -- response )
-    "text/plain" <content> nip request-params
+M: node-responder call-responder* ( path responder -- response )
+    "text/plain" <content> nip params get
     [ "node-id" swap at* [ >>body ] [ drop ] if ] when* nip ;
 
 : test-tangle ( -- )

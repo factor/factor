@@ -7,11 +7,11 @@ TUPLE: element attributes ;
 
 TUPLE: ulist < element items ;
 : <ulist> ( items -- element )
-    H{ } clone swap ulist construct-boa ;
+    H{ } clone swap ulist boa ;
 
 TUPLE: link < element href text ;
 : <link> ( href text -- element )
-    H{ } clone -rot link construct-boa ;
+    H{ } clone -rot link boa ;
 
 GENERIC: >html ( element -- str )
 
