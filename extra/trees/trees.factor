@@ -25,7 +25,17 @@ TUPLE: node key value left right ;
 
 SYMBOL: current-side
 
-: go-left? ( -- ? ) current-side get +lt+ eq? ;
+: left ( -- symbol ) -1 ; inline
+: right ( -- symbol ) 1 ; inline
+
+: key-side ( k1 k2 -- n )
+    <=> {
+        { +lt+ [ -1 ] }
+        { +eq+ [ 0 ] }
+        { +gt+ [ 1 ] }
+    } case ;
+
+: go-left? ( -- ? ) current-side get left eq? ;
 
 : inc-count ( tree -- ) [ 1+ ] change-count drop ;
 
@@ -43,9 +53,9 @@ SYMBOL: current-side
 
 : with-side ( side quot -- ) [ swap current-side set call ] with-scope ; inline
 : with-other-side ( quot -- )
-    current-side get invert-comparison swap with-side ; inline
-: go-left ( quot -- ) +lt+ swap with-side ; inline
-: go-right ( quot -- ) +gt+ swap with-side ; inline
+    current-side get neg swap with-side ; inline
+: go-left ( quot -- ) left swap with-side ; inline
+: go-right ( quot -- ) right swap with-side ; inline
 
 : change-root ( tree quot -- )
     swap [ root>> swap call ] keep set-tree-root ; inline
@@ -53,10 +63,10 @@ SYMBOL: current-side
 : leaf? ( node -- ? )
     [ left>> ] [ right>> ] bi or not ;
 
-: random-side ( -- side ) +lt+ +gt+ 2array random ;
+: random-side ( -- side ) left right 2array random ;
 
 : choose-branch ( key node -- key node-left/right )
-    2dup node-key <=> [ node-link ] with-side ;
+    2dup node-key key-side [ node-link ] with-side ;
 
 : node-at* ( key node -- value ? )
     [
@@ -71,7 +81,7 @@ M: tree at* ( key tree -- value ? )
     root>> node-at* ;
 
 : node-set ( value key node -- node )
-    2dup key>> <=> dup +eq+ eq? [
+    2dup key>> key-side dup 0 eq? [
         drop nip swap >>value
     ] [
         [
@@ -165,7 +175,7 @@ DEFER: delete-node
     ] if ;
 
 : delete-bst-node ( key node -- node )
-    2dup node-key <=> dup +eq+ eq? [
+    2dup node-key key-side dup 0 eq? [
         drop nip delete-node
     ] [
         [ tuck node-link delete-bst-node over set-node-link ] with-side
