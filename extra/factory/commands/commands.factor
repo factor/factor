@@ -35,7 +35,7 @@ pointer-window up-till-frame dup <wm-frame> is? [ ] [ drop f ] if ;
 
 wm-root>
   <- children
-  [ <- mapped? ] subset
+  [ <- mapped? ] filter
   [ check-window-table ] map
   reverse
 
@@ -64,7 +64,7 @@ drop
 
 ! wm-root>
 !   <- children
-!   [ <- mapped? ] subset
+!   [ <- mapped? ] filter
 !   [ check-window-table ] map
 !   reverse
 

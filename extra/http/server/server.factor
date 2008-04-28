@@ -9,10 +9,10 @@ IN: http.server
 
 ! path is a sequence of path component strings
 
-GENERIC: call-responder ( path responder -- response )
+GENERIC: call-responder* ( path responder -- response )
 
-: request-params ( -- assoc )
-    request get dup method>> {
+: request-params ( request -- assoc )
+    dup method>> {
         { "GET" [ query>> ] }
         { "HEAD" [ query>> ] }
         { "POST" [ post-data>> ] }
@@ -28,7 +28,7 @@ TUPLE: trivial-responder response ;
 
 C: <trivial-responder> trivial-responder
 
-M: trivial-responder call-responder nip response>> call ;
+M: trivial-responder call-responder* nip response>> call ;
 
 : trivial-response-body ( code message -- )
     <html>
@@ -67,10 +67,16 @@ SYMBOL: base-paths
     [ invert-slice ] [ class word-name ] bi*
     base-paths get set-at ;
 
+: call-responder ( path responder -- response )
+    [ add-base-path ] [ call-responder* ] 2bi ;
+
 SYMBOL: link-hook
 
+: add-link-hook ( quot -- )
+    link-hook [ compose ] change ; inline
+
 : modify-query ( query -- query )
-    link-hook get [ ] or call ;
+    link-hook get call ;
 
 : base-path ( string -- path )
     dup base-paths get at
@@ -93,8 +99,11 @@ SYMBOL: link-hook
 
 SYMBOL: form-hook
 
+: add-form-hook ( quot -- )
+    form-hook [ compose ] change ;
+
 : hidden-form-field ( -- )
-    form-hook get [ ] or call ;
+    form-hook get call ;
 
 : absolute-redirect ( to query -- url )
     #! Same host.
@@ -133,6 +142,10 @@ SYMBOL: form-hook
 : <temporary-redirect> ( to query -- response )
     307 "Temporary Redirect" <redirect> ;
 
+: <standard-redirect> ( to query -- response )
+    request get method>> "POST" =
+    [ <permanent-redirect> ] [ <temporary-redirect> ] if ;
+
 TUPLE: dispatcher default responders ;
 
 : new-dispatcher ( class -- dispatcher )
@@ -149,11 +162,11 @@ TUPLE: dispatcher default responders ;
         [ nip ] [ drop default>> ] if
     ] [
         over first over responders>> at*
-        [ >r drop 1 tail-slice r> ] [ drop default>> ] if
+        [ >r drop rest-slice r> ] [ drop default>> ] if
     ] if ;
 
-M: dispatcher call-responder ( path dispatcher -- response )
-    [ add-base-path ] [ find-responder call-responder ] 2bi ;
+M: dispatcher call-responder* ( path dispatcher -- response )
+    find-responder call-responder ;
 
 TUPLE: vhost-dispatcher default responders ;
 
@@ -164,7 +177,7 @@ TUPLE: vhost-dispatcher default responders ;
     request get host>> over responders>> at*
     [ nip ] [ drop default>> ] if ;
 
-M: vhost-dispatcher call-responder ( path dispatcher -- response )
+M: vhost-dispatcher call-responder* ( path dispatcher -- response )
     find-vhost call-responder ;
 
 : add-responder ( dispatcher responder path -- dispatcher )
@@ -174,6 +187,11 @@ M: vhost-dispatcher call-responder ( path dispatcher -- response )
     [ add-responder drop ]
     [ drop "" add-responder drop ]
     [ 2drop ] 3tri ;
+
+TUPLE: filter-responder responder ;
+
+M: filter-responder call-responder*
+    responder>> call-responder ;
 
 SYMBOL: main-responder
 
@@ -221,13 +239,18 @@ SYMBOL: exit-continuation
     '[ exit-continuation set @ ] callcc1 exit-continuation off ;
 
 : split-path ( string -- path )
-    "/" split [ empty? not ] subset ;
+    "/" split [ empty? not ] filter ;
+
+: init-request ( -- )
+    H{ } clone base-paths set
+    [ ] link-hook set
+    [ ] form-hook set ;
 
 : do-request ( request -- response )
     [
-        H{ } clone base-paths set
-        [ log-request ]
+        init-request
         [ request set ]
+        [ log-request ]
         [ path>> split-path main-responder get call-responder ] tri
         [ <404> ] unless*
     ] [

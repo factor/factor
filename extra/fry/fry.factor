@@ -14,7 +14,7 @@ DEFER: (shallow-fry)
 : ((shallow-fry)) ( accum quot adder -- result )
     >r [ ] swap (shallow-fry) r>
     append swap dup empty? [ drop ] [
-        [ swap compose ] curry append
+        [ prepose ] curry append
     ] if ; inline
 
 : (shallow-fry) ( accum quot -- result )
@@ -51,7 +51,7 @@ DEFER: (shallow-fry)
         [
             dup callable? [
                 [
-                    [ { , namespaces:, @ } member? ] subset length
+                    [ { , namespaces:, @ } member? ] filter length
                     \ , <repetition> %
                 ]
                 [ deep-fry % ] bi

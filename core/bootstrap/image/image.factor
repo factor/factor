@@ -8,7 +8,7 @@ splitting growable classes classes.builtin classes.tuple
 classes.tuple.private words.private io.binary io.files vocabs
 vocabs.loader source-files definitions debugger float-arrays
 quotations.private sequences.private combinators
-io.encodings.binary ;
+io.encodings.binary math.order ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
@@ -305,7 +305,7 @@ M: float-array ' float-array emit-dummy-array ;
 
 ! Tuples
 : (emit-tuple) ( tuple -- pointer )
-    [ tuple>array 1 tail-slice ]
+    [ tuple>array rest-slice ]
     [ class transfer-word tuple-layout ] bi prefix [ ' ] map
     tuple type-number dup [ emit-seq ] emit-object ;
 

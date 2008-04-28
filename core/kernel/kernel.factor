@@ -133,8 +133,6 @@ M: identity-tuple equal? 2drop f ;
 : = ( obj1 obj2 -- ? )
     2dup eq? [ 2drop t ] [ equal? ] if ; inline
 
-GENERIC: <=> ( obj1 obj2 -- n )
-
 GENERIC: clone ( obj -- cloned )
 
 M: object clone ;
@@ -158,6 +156,9 @@ M: callstack clone (clone) ;
 : with ( param obj quot -- obj curry )
     swapd [ swapd call ] 2curry ; inline
 
+: prepose ( quot1 quot2 -- curry )
+    swap compose ; inline
+
 : 3compose ( quot1 quot2 quot3 -- curry )
     compose compose ; inline
 
@@ -175,8 +176,6 @@ M: callstack clone (clone) ;
 : both? ( x y quot -- ? ) bi@ and ; inline
 
 : either? ( x y quot -- ? ) bi@ or ; inline
-
-: compare ( obj1 obj2 quot -- n ) bi@ <=> ; inline
 
 : most ( x y quot -- z )
     >r 2dup r> call [ drop ] [ nip ] if ; inline

@@ -1,6 +1,6 @@
 USING: http tools.test multiline tuple-syntax
 io.streams.string kernel arrays splitting sequences
-assocs io.sockets ;
+assocs io.sockets db db.sqlite ;
 IN: http.tests
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test
@@ -134,14 +134,21 @@ read-response-test-1' 1array [
 
 ! Live-fire exercise
 USING: http.server http.server.static http.server.sessions
-http.server.actions http.server.auth.login http.client
-io.server io.files io accessors namespaces threads
-io.encodings.ascii ;
+http.server.sessions.storage.db http.server.actions
+http.server.auth.login http.server.db http.client
+io.server io.files io io.encodings.ascii
+accessors namespaces threads ;
 
 : add-quit-action
     <action>
         [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>display
     "quit" add-responder ;
+
+: test-db "test.db" temp-file sqlite-db ;
+
+test-db [
+    init-sessions-table
+] with-db
 
 [ ] [
     [
@@ -151,7 +158,7 @@ io.encodings.ascii ;
                 "extra/http/test" resource-path <static> >>default
             "nested" add-responder
             <action>
-                [ "redirect-loop" f <permanent-redirect> ] >>display
+                [ "redirect-loop" f <standard-redirect> ] >>display
             "redirect-loop" add-responder
         main-responder set
 
@@ -187,11 +194,14 @@ io.encodings.ascii ;
         <dispatcher>
             <action> <protected>
             <login>
-            <url-sessions> "" add-responder
+            <session-manager>
+                sessions-in-db >>sessions
+            "" add-responder
             add-quit-action
             <dispatcher>
                 <action> "a" add-main-responder
             "d" add-responder
+        test-db <db-persistence>
         main-responder set
 
         [ 1237 httpd ] "HTTPD test" spawn drop
@@ -214,9 +224,12 @@ io.encodings.ascii ;
     [
         <dispatcher>
             <action> [ "text/plain" <content> [ "Hi" write ] >>body ] >>display
-            <login> <url-sessions>
+            <login>
+            <session-manager>
+                sessions-in-db >>sessions
             "" add-responder
             add-quit-action
+        test-db <db-persistence>
         main-responder set
 
         [ 1237 httpd ] "HTTPD test" spawn drop

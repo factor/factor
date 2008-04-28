@@ -10,13 +10,13 @@
 	</table>
 
 	<div class="description">
-		<t:view component="description" />
+		<t:view t:component="description" />
 	</div>
 
-	<t:a href="$todo-list/edit" query="id">Edit</t:a>
+	<t:a t:href="$todo-list/edit" t:query="id">Edit</t:a>
 	|
-	<t:form action="$todo-list/delete" class="inline">
-		<t:edit component="id" />
+	<t:form t:action="$todo-list/delete" class="inline">
+		<t:edit t:component="id" />
 		<button class="link-button link">Delete</button>
 	</t:form>
 

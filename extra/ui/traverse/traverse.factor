@@ -60,7 +60,7 @@ DEFER: (gadget-subtree)
 
 : traverse-child ( frompath topath gadget -- )
     dup -roll [
-        >r >r 1 tail-slice r> r> traverse-step (gadget-subtree)
+        >r >r rest-slice r> r> traverse-step (gadget-subtree)
     ] make-node ;
 
 : (gadget-subtree) ( frompath topath gadget -- )

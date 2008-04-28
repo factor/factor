@@ -4,7 +4,7 @@ USING: inference.dataflow inference.state arrays generic io
 io.streams.string kernel math namespaces parser prettyprint
 sequences strings vectors words quotations effects classes
 continuations debugger assocs combinators compiler.errors
-generic.standard.engines.tuple accessors ;
+generic.standard.engines.tuple accessors math.order ;
 IN: inference.backend
 
 : recursive-label ( word -- label/f )
@@ -60,7 +60,7 @@ M: object value-literal \ literal-expected inference-warning ;
 : value-vector ( n -- vector ) [ drop <computed> ] V{ } map-as ;
 
 : add-inputs ( seq stack -- n stack )
-    tuck [ length ] compare dup 0 >
+    tuck [ length ] bi@ - dup 0 >
     [ dup value-vector [ swapd push-all ] keep ]
     [ drop 0 swap ] if ;
 
@@ -261,7 +261,7 @@ TUPLE: cannot-unify-specials ;
 
 : balanced? ( in out -- ? )
     [ dup [ length - ] [ 2drop f ] if ] 2map
-    [ ] subset all-equal? ;
+    [ ] filter all-equal? ;
 
 TUPLE: unbalanced-branches-error quots in out ;
 
@@ -281,7 +281,7 @@ TUPLE: unbalanced-branches-error quots in out ;
     2dup balanced? [
         over supremum -rot
         [ >r dupd r> unify-inputs ] 2map
-        [ ] subset unify-stacks
+        [ ] filter unify-stacks
         rot drop
     ] [
         unbalanced-branches-error

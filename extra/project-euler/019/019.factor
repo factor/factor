@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar combinators kernel math math.ranges namespaces sequences
-    sequences.lib ;
+    sequences.lib math.order ;
 IN: project-euler.019
 
 ! http://projecteuler.net/index.php?section=problems&id=19

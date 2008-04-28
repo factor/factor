@@ -1,46 +1,40 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs accessors http.server.sessions.storage
-alarms kernel http.server db.tuples db.types math.parser
-classes.singleton ;
+USING: assocs accessors kernel http.server.sessions.storage
+http.server.sessions http.server db db.tuples db.types math.parser
+math.intervals fry random calendar sequences alarms ;
 IN: http.server.sessions.storage.db
 
 SINGLETON: sessions-in-db
 
-TUPLE: session id namespace ;
-
 session "SESSIONS"
 {
+    ! { "id" "ID" +random-id+ system-random-generator }
     { "id" "ID" INTEGER +native-id+ }
+    { "expires" "EXPIRES" BIG-INTEGER +not-null+ }
     { "namespace" "NAMESPACE" FACTOR-BLOB }
 } define-persistent
 
 : init-sessions-table session ensure-table ;
 
-: <session> ( id -- session )
-    session new
-        swap dup [ string>number ] when >>id ;
+M: sessions-in-db get-session ( id storage -- session/f )
+    drop dup [ <session> select-tuple ] when ;
 
-M: sessions-in-db get-session ( id storage -- namespace/f )
-    drop
-    dup [
-        <session>
-        select-tuple dup [ namespace>> ] when
-    ] when ;
-
-M: sessions-in-db update-session ( namespace id storage -- )
-    drop
-    <session>
-        swap >>namespace
-    update-tuple ;
+M: sessions-in-db update-session ( session storage -- )
+    drop update-tuple ;
 
 M: sessions-in-db delete-session ( id storage -- )
-    drop
-    <session>
-    delete-tuple ;
+    drop <session> delete-tuple ;
 
-M: sessions-in-db new-session ( namespace storage -- id )
-    drop
+M: sessions-in-db new-session ( session storage -- )
+    drop insert-tuple ;
+
+: expired-sessions ( -- session )
     f <session>
-        swap >>namespace
-    [ insert-tuple ] [ id>> number>string ] bi ;
+    USE: math now timestamp>millis [ 60 60 * 1000 * - ] keep [a,b] >>expires
+    select-tuples ;
+
+: start-expiring-sessions ( db seq -- )
+    '[
+        , , [ expired-sessions [ delete-tuple ] each ] with-db
+    ] 5 minutes every drop ;

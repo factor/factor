@@ -130,7 +130,7 @@ M: nonthrowable execute-statement* ( statement type -- )
 
 : with-db ( db seq quot -- )
     >r make-db db-open db r>
-    [ db get swap [ drop ] swap compose with-disposal ] curry with-variable ;
+    [ db get swap [ drop ] prepose with-disposal ] curry with-variable ;
     inline
 
 : default-query ( query -- result-set )

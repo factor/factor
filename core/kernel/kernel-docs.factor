@@ -1,7 +1,7 @@
 USING: generic help.markup help.syntax math memory
 namespaces sequences kernel.private layouts sorting classes
 kernel.private vectors combinators quotations strings words
-assocs arrays ;
+assocs arrays math.order ;
 IN: kernel
 
 ARTICLE: "shuffle-words" "Shuffle words"
@@ -393,28 +393,7 @@ HELP: identity-tuple
     { $unchecked-example "T{ foo } dup clone = ." "f" }
 } ;
 
-HELP: <=>
-{ $values { "obj1" object } { "obj2" object } { "n" real } }
-{ $contract
-    "Compares two objects using an intrinsic total order, for example, the natural order for real numbers and lexicographic order for strings."
-    $nl
-    "The output value is one of the following:"
-    { $list
-        { "positive - indicating that " { $snippet "obj1" } " follows " { $snippet "obj2" } }
-        { "zero - indicating that " { $snippet "obj1" } " is equal to " { $snippet "obj2" } }
-        { "negative - indicating that " { $snippet "obj1" } " precedes " { $snippet "obj2" } }
-    }
-    "The default implementation treats the two objects as sequences, and recursively compares their elements. So no extra work is required to compare sequences lexicographically."
-} ;
-
 { <=> compare natural-sort sort-keys sort-values } related-words
-
-HELP: compare
-{ $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "n" integer } }
-{ $description "Compares the results of applying the quotation to both objects via " { $link <=> } "." }
-{ $examples
-    { $example "USING: kernel prettyprint sequences ;" "\"hello\" \"hi\" [ length ] compare ." "3" }
-} ;
 
 HELP: clone
 { $values { "obj" object } { "cloned" "a new object" } }

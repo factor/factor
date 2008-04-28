@@ -172,7 +172,7 @@ SYMBOL: drag-timer
     ] if ;
 
 : modifier ( mod modifiers -- seq )
-    [ second swap bitand 0 > ] with subset
+    [ second swap bitand 0 > ] with filter
     0 <column> prune dup empty? [ drop f ] [ >array ] if ;
 
 : drag-loc ( -- loc )

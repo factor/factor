@@ -37,7 +37,7 @@ PRIVATE>
 
 : euler044 ( -- answer )
     2500 [1,b] [ nth-pentagonal ] map dup cartesian-product
-    [ first2 sum-and-diff? ] subset [ first2 - abs ] map infimum ;
+    [ first2 sum-and-diff? ] filter [ first2 - abs ] map infimum ;
 
 ! [ euler044 ] 10 ave-time
 ! 8924 ms run / 2872 ms GC ave time - 10 trials

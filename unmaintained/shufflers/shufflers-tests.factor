@@ -1,4 +1,5 @@
 USING: shufflers tools.test ;
+IN: shufflers.tests
 
 SHUFFLE: abcd 4
 [ ] [ 1 2 3 4 abcd- ] unit-test

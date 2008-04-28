@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel math.constants math.private
-math.libm combinators ;
+math.libm combinators math.order ;
 IN: math.functions
 
 <PRIVATE

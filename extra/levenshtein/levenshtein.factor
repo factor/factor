@@ -1,6 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays help io kernel math namespaces sequences ;
+USING: arrays help io kernel math namespaces sequences
+math.order ;
 IN: levenshtein
 
 : <matrix> ( m n -- matrix )

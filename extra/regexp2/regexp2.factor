@@ -1,6 +1,6 @@
 USING: assocs combinators.lib kernel math math.parser
 namespaces peg unicode.case sequences unicode.categories
-memoize peg.parsers ;
+memoize peg.parsers math.order ;
 USE: io
 USE: tools.walker
 IN: regexp2

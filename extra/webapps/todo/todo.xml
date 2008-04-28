@@ -5,14 +5,14 @@
 	<t:style include="resource:extra/webapps/todo/todo.css" />
 
 	<div class="navbar">
-		  <t:a href="$todo-list/list">List Items</t:a>
-		| <t:a href="$todo-list/edit">Add Item</t:a>
+		  <t:a t:href="$todo-list/list">List Items</t:a>
+		| <t:a t:href="$todo-list/edit">Add Item</t:a>
 
-		<t:if code="http.server.auth.login:allow-edit-profile?">
-			| <t:a href="$login/edit-profile">Edit Profile</t:a>
+		<t:if t:code="http.server.auth.login:allow-edit-profile?">
+			| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>
 		</t:if>
 
-		<t:form action="$login/logout" class="inline">
+		<t:form t:action="$login/logout" t:flow="begin" class="inline">
 			| <button type="submit" class="link-button link">Logout</button>
 		</t:form>
 	</div>

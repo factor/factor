@@ -14,7 +14,7 @@ SYMBOL: message-histogram
     dup second CRITICAL eq? [ dup errors get push ] when
     1 over third word-histogram get at+
     dup third word-names get member? [
-        1 over 1 tail message-histogram get at+
+        1 over rest message-histogram get at+
     ] when
     drop ;
 

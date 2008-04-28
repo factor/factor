@@ -18,7 +18,7 @@ VAR: current-workspace
 : add-workspace ( -- ) { } clone <workspace> workspaces> push ;
 
 : mapped-windows ( -- seq )
-dpy get $default-root <- children [ <- mapped? ] subset ;
+dpy get $default-root <- children [ <- mapped? ] filter ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

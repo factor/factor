@@ -77,7 +77,7 @@ TUPLE: file-responder root hook special ;
         find-index [ serve-file ] [ list-directory ] ?if
     ] [
         drop
-        request get path>> "/" append f <permanent-redirect>
+        request get path>> "/" append f <standard-redirect>
     ] if ;
 
 : serve-object ( filename -- response )
@@ -86,7 +86,7 @@ TUPLE: file-responder root hook special ;
     [ drop <404> ]
     if ;
 
-M: file-responder call-responder ( path responder -- response )
+M: file-responder call-responder* ( path responder -- response )
     file-responder set
     ".." over member?
     [ drop <400> ] [ "/" join serve-object ] if ;

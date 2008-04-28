@@ -36,7 +36,7 @@ SYMBOL: xml-file
 ] unit-test
 [ "abcd" ] [
     "<main>a<sub>bc</sub>d<nothing/></main>" string>xml
-    [ string? ] deep-subset concat
+    [ string? ] deep-filter concat
 ] unit-test
 [ "foo" ] [
     "<a><b id='c'>foo</b><d id='e'/></a>" string>xml

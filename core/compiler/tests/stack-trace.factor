@@ -13,11 +13,11 @@ words splitting sorting ;
 [ baz ] [ 3 = ] must-fail-with
 [ t ] [
     symbolic-stack-trace
-    [ word? ] subset
+    [ word? ] filter
     { baz bar foo throw } tail?
 ] unit-test
 
-: bleh [ 3 + ] map [ 0 > ] subset ;
+: bleh [ 3 + ] map [ 0 > ] filter ;
 
 : stack-trace-contains? symbolic-stack-trace memq? ;
 

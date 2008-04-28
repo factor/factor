@@ -70,4 +70,5 @@ TUPLE: todo-list < dispatcher ;
                       ctor "$todo-list/list" <delete-action> "delete" add-responder
         <boilerplate>
             "todo" todo-template >>template
+        <protected>
     ] ;

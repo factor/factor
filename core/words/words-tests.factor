@@ -68,7 +68,7 @@ FORGET: another-forgotten
 : foe fee ;
 : fie foe ;
 
-[ t ] [ \ fee usage [ word? ] subset empty? ] unit-test
+[ t ] [ \ fee usage [ word? ] filter empty? ] unit-test
 [ t ] [ \ foe usage empty? ] unit-test
 [ f ] [ \ foe crossref get key? ] unit-test
 
@@ -80,7 +80,7 @@ FORGET: foe
 ] unit-test
 
 [ t ] [
-    \ * usage [ word? ] subset [ crossref? ] all?
+    \ * usage [ word? ] filter [ crossref? ] all?
 ] unit-test
 
 DEFER: calls-a-gensym

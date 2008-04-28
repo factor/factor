@@ -63,7 +63,7 @@ t parser-notes set-global
 
 : skip ( i seq ? -- n )
     over >r
-    [ swap CHAR: \s eq? xor ] curry find* drop
+    [ swap CHAR: \s eq? xor ] curry find-from drop
     [ r> drop ] [ r> length ] if* ;
 
 : change-lexer-column ( lexer quot -- )
@@ -132,7 +132,7 @@ name>char-hook global [
     "{" ?head-slice [
         CHAR: } over index cut-slice
         >r >string name>char-hook get call r>
-        1 tail-slice
+        rest-slice
     ] [
         6 cut-slice >r hex> r>
     ] if ;
@@ -146,7 +146,7 @@ name>char-hook global [
 
 : (parse-string) ( str -- m )
     dup [ "\"\\" member? ] find dup [
-        >r cut-slice >r % r> 1 tail-slice r>
+        >r cut-slice >r % r> rest-slice r>
         dup CHAR: " = [
             drop slice-from
         ] [
@@ -207,7 +207,7 @@ SYMBOL: in
 : add-use ( seq -- ) [ use+ ] each ;
 
 : set-use ( seq -- )
-    [ vocab-words ] map [ ] subset >vector use set ;
+    [ vocab-words ] map [ ] filter >vector use set ;
 
 : check-vocab-string ( name -- name )
     dup string?
@@ -270,7 +270,7 @@ M: no-word-error summary
 
 : no-word ( name -- newword )
     dup no-word-error boa
-    swap words-named [ forward-reference? not ] subset
+    swap words-named [ forward-reference? not ] filter
     word-restarts throw-restarts
     dup word-vocabulary (use+) ;
 
@@ -278,7 +278,7 @@ M: no-word-error summary
     dup forward-reference? [
         drop
         use get
-        [ at ] with map [ ] subset
+        [ at ] with map [ ] filter
         [ forward-reference? not ] find nip
     ] [
         nip
@@ -344,6 +344,11 @@ M: invalid-slot-name summary
         { "<" [ scan-word parse-tuple-slots ] }
         [ >r tuple parse-tuple-slots r> prefix ]
     } case 3dup check-slot-shadowing ;
+
+ERROR: not-in-a-method-error ;
+
+M: not-in-a-method-error summary
+    drop "call-next-method can only be called in a method definition" ;
 
 ERROR: staging-violation word ;
 
@@ -513,10 +518,10 @@ SYMBOL: interactive-vocabs
     ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
-    assoc-diff [
+    swap assoc-diff [
         drop where dup [ first ] when
         file get source-file-path =
-    ] assoc-subset keys ;
+    ] assoc-filter keys ;
 
 : removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions
@@ -531,7 +536,7 @@ SYMBOL: interactive-vocabs
 
 : reset-removed-classes ( -- )
     removed-classes
-    filter-moved [ class? ] subset [ reset-class ] each ;
+    filter-moved [ class? ] filter [ reset-class ] each ;
 
 : fix-class-words ( -- )
     #! If a class word had a compound definition which was

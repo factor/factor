@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math splitting sequences ;
+USING: kernel math math.order splitting sequences ;
 
 IN: project-euler.117
 

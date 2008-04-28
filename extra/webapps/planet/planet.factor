@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences sorting locals math
+USING: kernel accessors sequences sorting locals math math.order
 calendar alarms logging concurrency.combinators namespaces
-sequences.lib db.types db.tuples db
+sequences.lib db.types db.tuples db fry
 rss xml.writer
 http.server
 http.server.crud
@@ -167,5 +167,10 @@ blog "BLOGS"
     <boilerplate>
         "planet" planet-template >>template ;
 
-: start-update-task ( planet -- )
-    [ update-cached-postings ] curry 10 minutes every drop ;
+: start-update-task ( planet db seq -- )
+    '[
+        , , , [
+            dup filter-responder? [ responder>> ] when
+            update-cached-postings
+        ] with-db
+    ] 10 minutes every drop ;

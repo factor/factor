@@ -13,5 +13,5 @@ IN: concurrency.combinators
     [ [ >r curry r> spawn-stage ] 2curry each ] keep await ;
     inline
 
-: parallel-subset ( seq quot -- newseq )
+: parallel-filter ( seq quot -- newseq )
     over >r pusher >r each r> r> like ; inline

@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences math kernel ;
+USING: kernel math math.order sequences ;
 IN: ascii
 
 : blank? ( ch -- ? ) " \t\n\r" member? ; inline

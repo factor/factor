@@ -135,11 +135,12 @@ IN: http
     ] { } assoc>map
     "&" join ;
 
-TUPLE: cookie name value path domain expires http-only ;
+TUPLE: cookie name value path domain expires max-age http-only ;
 
 : <cookie> ( value name -- cookie )
     cookie new
-    swap >>name swap >>value ;
+        swap >>name
+        swap >>value ;
 
 : parse-cookies ( string -- seq )
     [
@@ -147,7 +148,8 @@ TUPLE: cookie name value path domain expires http-only ;
 
         ";" split [
             [ blank? ] trim "=" split1 swap >lower {
-                { "expires" [ >>expires ] }
+                { "expires" [ cookie-string>timestamp >>expires ] }
+                { "max-age" [ string>number seconds >>max-age ] }
                 { "domain" [ >>domain ] }
                 { "path" [ >>path ] }
                 { "httponly" [ drop t >>http-only ] }
@@ -163,7 +165,14 @@ TUPLE: cookie name value path domain expires http-only ;
     {
         { f [ drop ] }
         { t [ , ] }
-        [ "=" swap 3append , ]
+        [
+            {
+                { [ dup timestamp? ] [ timestamp>cookie-string ] }
+                { [ dup duration? ] [ dt>seconds number>string ] }
+                [ ]
+            } cond
+            "=" swap 3append ,
+        ]
     } case ;
 
 : unparse-cookie ( cookie -- strings )
@@ -172,6 +181,7 @@ TUPLE: cookie name value path domain expires http-only ;
         "path" over path>> (unparse-cookie)
         "domain" over domain>> (unparse-cookie)
         "expires" over expires>> (unparse-cookie)
+        "max-age" over max-age>> (unparse-cookie)
         "httponly" over http-only>> (unparse-cookie)
         drop
     ] { } make ;

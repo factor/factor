@@ -6,7 +6,8 @@ strings io.styles vectors words system splitting math.parser
 classes.tuple continuations continuations.private combinators
 generic.math io.streams.duplex classes.builtin classes
 compiler.units generic.standard vocabs threads threads.private
-init kernel.private libc io.encodings mirrors accessors ;
+init kernel.private libc io.encodings mirrors accessors
+math.order ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -96,10 +97,10 @@ M: relative-overflow summary
 
 : assert-depth ( quot -- )
     >r datastack r> swap slip >r datastack r>
-    2dup [ length ] compare sgn {
-        { -1 [ trim-datastacks nip relative-underflow ] }
-        { 0 [ 2drop ] }
-        { 1 [ trim-datastacks drop relative-overflow ] }
+    2dup [ length ] compare {
+        { +lt+ [ trim-datastacks nip relative-underflow ] }
+        { +eq+ [ 2drop ] }
+        { +gt+ [ trim-datastacks drop relative-overflow ] }
     } case ; inline
 
 : expired-error. ( obj -- )

@@ -189,8 +189,12 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "call-next-method" [
-        current-class get literalize parsed
-        current-generic get literalize parsed
-        \ (call-next-method) parsed
+        current-class get current-generic get
+        2dup [ word? ] both? [
+            [ literalize parsed ] bi@
+            \ (call-next-method) parsed
+        ] [
+            not-in-a-method-error
+        ] if
     ] define-syntax
 ] with-compilation-unit
