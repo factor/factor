@@ -35,14 +35,6 @@ M: db <update-tuple-statement> ( class -- statement )
         where-primary-key%
     ] query-make ;
 
-M: db <delete-tuple-statement> ( specs table -- sql )
-    [
-        "delete from " 0% 0%
-        " where " 0%
-        find-primary-key
-        dup column-name>> 0% " = " 0% bind%
-    ] query-make ;
-
 M: random-id-generator eval-generator ( singleton -- obj )
     drop
     system-random-generator get [
@@ -86,6 +78,14 @@ M: string where ( spec obj -- ) object-where ;
     ] [
         2dup slot-name>> swap get-slot-named where
     ] interleave drop ;
+
+M: db <delete-tuple-statement> ( tuple table -- sql )
+    [
+        "delete from " 0% 0%
+        dupd
+        [ slot-name>> swap get-slot-named ] with filter
+        dup empty? [ 2drop ] [ where-clause ] if ";" 0%
+    ] query-make ;
 
 M: db <select-by-slots-statement> ( tuple class -- statement )
     [

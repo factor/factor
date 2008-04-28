@@ -39,13 +39,8 @@ HOOK: drop-sql-statement db ( class -- obj )
 
 HOOK: <insert-db-assigned-statement> db ( class -- obj )
 HOOK: <insert-user-assigned-statement> db ( class -- obj )
-
 HOOK: <update-tuple-statement> db ( class -- obj )
-HOOK: <update-tuples-statement> db ( class -- obj )
-
-HOOK: <delete-tuple-statement> db ( class -- obj )
-HOOK: <delete-tuples-statement> db ( class -- obj )
-
+HOOK: <delete-tuple-statement> db ( tuple class -- obj )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 
 HOOK: insert-tuple* db ( tuple statement -- )
@@ -139,9 +134,9 @@ M: retryable execute-statement* ( statement type -- )
     [ bind-tuple ] keep execute-statement ;
 
 : delete-tuple ( tuple -- )
-    dup class
-    db get db-delete-statements [ <delete-tuple-statement> ] cache
-    [ bind-tuple ] keep execute-statement ;
+    dup dup class <delete-tuple-statement> [
+        [ bind-tuple ] keep execute-statement
+    ] with-disposal ;
 
 : select-tuples ( tuple -- tuples )
     dup dup class <select-by-slots-statement> [
