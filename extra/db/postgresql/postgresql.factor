@@ -49,7 +49,8 @@ M: literal-bind postgresql-bind-conversion ( tuple literal-bind -- obj )
     nip value>> <low-level-binding> ;
 
 M: generator-bind postgresql-bind-conversion ( tuple generate-bind -- obj )
-    nip generator-singleton>> eval-generator <low-level-binding> ;
+    dup generator-singleton>> eval-generator
+    [ swap slot-name>> rot set-slot-named ] [ <low-level-binding> ] bi ;
 
 M: postgresql-statement bind-tuple ( tuple statement -- )
     tuck in-params>>
@@ -205,8 +206,10 @@ M: postgresql-db <insert-user-assigned-statement> ( class -- statement )
         [ ", " 0% ] [
             dup type>> +random-id+ = [
                 [
-                    drop bind-name%
-                    f random-id-generator
+                    bind-name%
+                    slot-name>>
+                    f
+                    random-id-generator
                 ] [ type>> ] bi <generator-bind> 1,
             ] [
                 bind%

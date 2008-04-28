@@ -330,7 +330,7 @@ C: <secret> secret
 
     [ ] [ secret ensure-table ] unit-test
 
-    [ ] [ f "kilroy was here" <secret> insert-tuple ] unit-test
+    [ t ] [ f "kilroy was here" <secret> [ insert-tuple ] keep n>> integer? ] unit-test
 
     [ ] [ f "kilroy was here2" <secret> insert-tuple ] unit-test
 
@@ -342,7 +342,7 @@ C: <secret> secret
     ] unit-test
 
     [ t ] [
-        T{ secret } select-tuples length 3 =
+        T{ secret } select-tuples dup . length 3 =
     ] unit-test ;
 
 [ db-assigned-person-schema test-tuples ] test-sqlite

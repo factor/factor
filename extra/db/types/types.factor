@@ -15,7 +15,7 @@ TUPLE: sql-spec class slot-name column-name type primary-key modifiers ;
 TUPLE: literal-bind key type value ;
 C: <literal-bind> literal-bind
 
-TUPLE: generator-bind key generator-singleton type ;
+TUPLE: generator-bind slot-name key generator-singleton type ;
 C: <generator-bind> generator-bind
 SINGLETON: random-id-generator
 

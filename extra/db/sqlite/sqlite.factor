@@ -79,8 +79,10 @@ M: literal-bind sqlite-bind-conversion ( tuple literal-bind -- array )
     <sqlite-low-level-binding> ;
 
 M: generator-bind sqlite-bind-conversion ( tuple generate-bind -- array )
-    nip [ key>> ] [ generator-singleton>> eval-generator ] [ type>> ] tri
-    <sqlite-low-level-binding> ;
+    tuck
+    [ generator-singleton>> eval-generator tuck ] [ slot-name>> ] bi
+    rot set-slot-named
+    >r [ key>> ] [ type>> ] bi r> swap <sqlite-low-level-binding> ;
 
 M: sqlite-statement bind-tuple ( tuple statement -- )
     [
@@ -138,10 +140,11 @@ M: sqlite-db <insert-db-assigned-statement> ( tuple -- statement )
         ") values(" 0%
         [ ", " 0% ] [
             dup type>> +random-id+ = [
+                [ slot-name>> ]
                 [
                     column-name>> ":" prepend dup 0%
                     random-id-generator
-                ] [ type>> ] bi <generator-bind> 1,
+                ] [ type>> ] tri <generator-bind> 1,
             ] [
                 bind%
             ] if
