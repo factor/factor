@@ -1,4 +1,5 @@
-[ [ T{ lisp-symbol f "foo" } [ 2 T{ lisp-symbol f "bar" } ] [ 3 4 T{ lisp-symbol f "baz" } ] if ] ]
-  [ "(if foo (bar 2) (baz 3 4))" lisp-expr parse-result-ast convert-if ] unit-test
-  
-  
+! Copyright (C) 2008 James Cash
+! See http://factorcode.org/license.txt for BSD license.
+USING: lisp tools.test ;
+
+IN: lisp.tests
