@@ -26,4 +26,4 @@ HELP: morse>
 
 HELP: play-as-morse
 { $values { "str" "A string of ascii characters which can be translated into morse code" } { "unit-length" "The length of a dot" } }
-{ $description "Plays a string as morse code" }
+{ $description "Plays a string as morse code" } ;
