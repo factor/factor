@@ -57,7 +57,7 @@ unless
 
 : family-tree ( definition -- definitions )
     dup parent>> [ family-tree ] [ { } ] if*
-    swap add ;
+    swap suffix ;
 
 : family-tree-functions ( definition -- functions )
     dup parent>> [ family-tree-functions ] [ { } ] if*
