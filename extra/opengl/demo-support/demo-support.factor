@@ -1,6 +1,6 @@
 USING: arrays combinators.lib kernel math math.functions
 math.order math.vectors namespaces opengl opengl.gl sequences ui
-ui.gadgets ui.gestures ui.render ;
+ui.gadgets ui.gestures ui.render accessors ;
 IN: opengl.demo-support
 
 : FOV 2.0 sqrt 1+ ; inline
