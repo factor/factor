@@ -30,13 +30,13 @@ INSTANCE: splay tree-mixin
     drop dup node-right swapd r> swap ;
 
 : cmp ( key node -- obj node -1/0/1 )
-    2dup node-key <=> ;
+    2dup node-key key-side ;
 
 : lcmp ( key node -- obj node -1/0/1 ) 
-    2dup node-left node-key <=> ;
+    2dup node-left node-key key-side ;
 
 : rcmp ( key node -- obj node -1/0/1 ) 
-    2dup node-right node-key <=> ;
+    2dup node-right node-key key-side ;
 
 DEFER: (splay)
 

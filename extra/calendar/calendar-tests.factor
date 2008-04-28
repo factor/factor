@@ -131,16 +131,16 @@ IN: calendar.tests
 [ t ] [ 2004 1 1 23 0 0 9+1/2 hours <timestamp> >gmt
         2004 1 1 13 30 0 instant <timestamp> = ] unit-test
 
-[ 0 ] [ 2004 1 1 13 30 0 instant <timestamp>
+[ +eq+ ] [ 2004 1 1 13 30 0 instant <timestamp>
         2004 1 1 12 30 0 -1 hours <timestamp> <=> ] unit-test
 
-[ 1 ] [ 2004 1 1 13 30 0 instant <timestamp>
+[ +gt+ ] [ 2004 1 1 13 30 0 instant <timestamp>
         2004 1 1 12 30 0 instant <timestamp> <=> ] unit-test
 
-[ -1 ] [ 2004 1 1 12 30 0 instant <timestamp>
+[ +lt+ ] [ 2004 1 1 12 30 0 instant <timestamp>
         2004 1 1 13 30 0 instant <timestamp> <=> ] unit-test
 
-[ 1 ] [ 2005 1 1 12 30 0 instant <timestamp>
+[ +gt+ ] [ 2005 1 1 12 30 0 instant <timestamp>
         2004 1 1 13 30 0 instant <timestamp> <=> ] unit-test
 
 [ t ] [ now timestamp>millis millis - 1000 < ] unit-test

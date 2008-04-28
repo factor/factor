@@ -6,14 +6,14 @@ IN: multi-methods.tests
     { 6 4 5 1 3 2 } [ <=> ] topological-sort
 ] unit-test
 
-[ -1 ] [
+[ +lt+ ] [
     { fixnum array } { number sequence } classes<
 ] unit-test
 
-[ 0 ] [
+[ +eq+ ] [
     { number sequence } { number sequence } classes<
 ] unit-test
 
-[ 1 ] [
+[ +gt+ ] [
     { object object } { number sequence } classes<
 ] unit-test

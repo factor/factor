@@ -87,10 +87,10 @@ M: timestamp year. ( timestamp -- )
     [ hh ] [ mm ] bi ;
 
 : write-gmt-offset ( gmt-offset -- )
-    dup instant <=> sgn {
-        {  0 [ drop "GMT" write ] }
-        { -1 [ "-" write before (write-gmt-offset) ] }
-        {  1 [ "+" write (write-gmt-offset) ] }
+    dup instant <=> {
+        { +eq+ [ drop "GMT" write ] }
+        { +lt+ [ "-" write before (write-gmt-offset) ] }
+        { +gt+ [ "+" write (write-gmt-offset) ] }
     } case ;
 
 : timestamp>rfc822 ( timestamp -- str )
@@ -118,10 +118,10 @@ M: timestamp year. ( timestamp -- )
     [ hh ":" write ] [ mm ] bi ;
 
 : write-rfc3339-gmt-offset ( duration -- )
-    dup instant <=> sgn {
-        {  0 [ drop "Z" write ] }
-        { -1 [ "-" write before (write-rfc3339-gmt-offset) ] }
-        {  1 [ "+" write (write-rfc3339-gmt-offset) ] }
+    dup instant <=> {
+        { +eq+ [ drop "Z" write ] }
+        { +lt+ [ "-" write before (write-rfc3339-gmt-offset) ] }
+        { +gt+ [ "+" write (write-rfc3339-gmt-offset) ] }
     } case ;
     
 : (timestamp>rfc3339) ( timestamp -- )

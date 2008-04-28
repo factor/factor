@@ -1,9 +1,9 @@
-USING: help.markup help.syntax kernel math sequences quotations
-math.private ;
+USING: help.markup help.syntax kernel math quotations
+math.private words ;
 IN: math.order
 
 HELP: <=>
-{ $values { "obj1" object } { "obj2" object } { "n" real } }
+{ $values { "obj1" object } { "obj2" object } { "symbol" symbol } }
 { $contract
     "Compares two objects using an intrinsic total order, for example, the natural order for real numbers and lexicographic order for strings."
     $nl
@@ -13,7 +13,6 @@ HELP: <=>
         { { $link +eq+ } " - indicating that " { $snippet "obj1" } " is equal to " { $snippet "obj2" } }
         { { $link +gt+ } " - indicating that " { $snippet "obj1" } " follows " { $snippet "obj2" } }
     }
-    "The default implementation treats the two objects as sequences, and recursively compares their elements. So no extra work is required to compare sequences lexicographically."
 } ;
 
 HELP: +lt+
@@ -24,6 +23,13 @@ HELP: +eq+
 
 HELP: +gt+
 { $description "Returned by " { $link <=> } " when the first object is strictly greater than the second object." } ;
+
+HELP: invert-comparison
+{ $values { "symbol" "a comparison symbol, +lt+, +eq+, or +gt+" }
+          { "new-symbol" "a comparison symbol, +lt+, +eq+, or +gt+" } }
+{ $description "Invert the comparison symbol returned by " { $link <=> } ". The output for the symbol " { $snippet "+eq+" } " is itself." }
+{ $examples
+    { $example "USING: math.order prettyprint ;" "+lt+ invert-comparison ." "+gt+" } } ;
 
 HELP: compare
 { $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "symbol" "a comparison symbol, +lt+, +eq+, or +gt+" } }
@@ -70,3 +76,19 @@ HELP: [-]
 { $values { "x" real } { "y" real } { "z" real } }
 { $description "Subtracts " { $snippet "y" } " from " { $snippet "x" } ". If the result is less than zero, outputs zero." } ;
 
+ARTICLE: "math.order" "Ordered objects"
+"Some classes have an intrinsic order amongst instances:"
+{ $subsection <=> }
+{ $subsection compare }
+{ $subsection invert-comparison }
+"The above words return one of the following symbols:"
+{ $subsection +lt+ }
+{ $subsection +eq+ }
+{ $subsection +gt+ }
+"Utilities for comparing objects:"
+{ $subsection after? }
+{ $subsection before? }
+{ $subsection after=? }
+{ $subsection before=? } ;
+
+ABOUT: "math.order"
