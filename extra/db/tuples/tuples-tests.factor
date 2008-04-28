@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
-prettyprint tools.walker calendar sequences db.sqlite
-math.intervals db.postgresql accessors random math.bitfields.lib ;
+prettyprint calendar sequences db.sqlite math.intervals
+db.postgresql accessors random math.bitfields.lib ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -328,7 +328,7 @@ C: <secret> secret
         { "message" "MESSAGE" TEXT }
     } define-persistent
 
-    [ ] [ secret ensure-table ] unit-test
+    [ ] [ secret recreate-table ] unit-test
 
     [ t ] [ f "kilroy was here" <secret> [ insert-tuple ] keep n>> integer? ] unit-test
 
@@ -342,7 +342,7 @@ C: <secret> secret
     ] unit-test
 
     [ t ] [
-        T{ secret } select-tuples dup . length 3 =
+        T{ secret } select-tuples length 3 =
     ] unit-test ;
 
 [ db-assigned-person-schema test-tuples ] test-sqlite
