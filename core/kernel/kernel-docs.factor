@@ -254,7 +254,6 @@ $nl
 "Some types of objects also have an intrinsic order allowing sorting using " { $link natural-sort } ":"
 { $subsection <=> }
 { $subsection compare }
-{ $subsection invert-comparison }
 "Utilities for comparing objects:"
 { $subsection after? }
 { $subsection before? }
