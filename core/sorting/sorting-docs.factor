@@ -62,3 +62,5 @@ HELP: binsearch*
 { $description "Variant of " { $link binsearch } " which outputs the found element rather than its index in the sequence."
 $nl
 "Outputs " { $link f } " if the sequence is empty. If the sequence has at least one element, this word always outputs a sequence element." } ;
+
+{ <=> compare natural-sort sort-keys sort-values } related-words

@@ -1,18 +1,11 @@
 USING: arrays combinators.lib kernel math math.functions
 math.order math.vectors namespaces opengl opengl.gl sequences ui
-ui.gadgets ui.gestures ui.render ;
+ui.gadgets ui.gestures ui.render accessors ;
 IN: opengl.demo-support
 
-: NEAR-PLANE 1.0 64.0 / ; inline
-: FAR-PLANE 4.0 ; inline
 : FOV 2.0 sqrt 1+ ; inline
 : MOUSE-MOTION-SCALE 0.5 ; inline
-: MOUSE-DISTANCE-SCALE 1.0 64.0 / ; inline
 : KEY-ROTATE-STEP 1.0 ; inline
-: KEY-DISTANCE-STEP 1.0 64.0 / ; inline
-: DIMS { 640 480 } ; inline
-
-: FOV-RATIO ( -- fov ) DIMS dup first2 min v/n ;
 
 SYMBOL: last-drag-loc
 
@@ -20,7 +13,20 @@ TUPLE: demo-gadget yaw pitch distance ;
 
 : <demo-gadget> ( yaw pitch distance -- gadget )
     demo-gadget construct-gadget 
-    [ { set-demo-gadget-yaw set-demo-gadget-pitch set-demo-gadget-distance } set-slots ] keep ;
+    [ { (>>yaw) (>>pitch) (>>distance) } set-slots ] keep ;
+
+GENERIC: far-plane ( gadget -- z )
+GENERIC: near-plane ( gadget -- z )
+GENERIC: distance-step ( gadget -- dz )
+
+M: demo-gadget far-plane ( gadget -- z )
+    drop 4.0 ;
+M: demo-gadget near-plane ( gadget -- z )
+    drop 1.0 64.0 / ;
+M: demo-gadget distance-step ( gadget -- dz )
+    drop 1.0 64.0 / ;
+
+: fov-ratio ( gadget -- fov ) dim>> dup first2 min v/n ;
 
 : yaw-demo-gadget ( yaw gadget -- )
     [ [ demo-gadget-yaw + ] keep set-demo-gadget-yaw ] keep relayout-1 ;
@@ -32,26 +38,31 @@ TUPLE: demo-gadget yaw pitch distance ;
     [ [ demo-gadget-distance + ] keep set-demo-gadget-distance ] keep relayout-1 ;
 
 M: demo-gadget pref-dim* ( gadget -- dim )
-    drop DIMS ;
+    drop { 640 480 } ;
 
 : -+ ( x -- -x x )
     dup neg swap ;
 
-: demo-gadget-frustum ( -- -x x -y y near far )
-    FOV-RATIO NEAR-PLANE FOV / v*n
-    first2 [ -+ ] bi@ NEAR-PLANE FAR-PLANE ;
+: demo-gadget-frustum ( gadget -- -x x -y y near far )
+    [ near-plane ] [ far-plane ] [ fov-ratio ] tri [
+        nip swap FOV / v*n
+        first2 [ -+ ] bi@
+    ] 3keep drop ;
 
 : demo-gadget-set-matrices ( gadget -- )
-    GL_PROJECTION glMatrixMode
-    glLoadIdentity
-    demo-gadget-frustum glFrustum
     GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
-    GL_MODELVIEW glMatrixMode
-    glLoadIdentity
-    [ >r 0.0 0.0 r> demo-gadget-distance neg glTranslatef ]
-    [ demo-gadget-pitch 1.0 0.0 0.0 glRotatef ]
-    [ demo-gadget-yaw   0.0 1.0 0.0 glRotatef ]
-    tri ;
+    [
+        GL_PROJECTION glMatrixMode
+        glLoadIdentity
+        demo-gadget-frustum glFrustum
+    ] [
+        GL_MODELVIEW glMatrixMode
+        glLoadIdentity
+        [ >r 0.0 0.0 r> distance>> neg glTranslatef ]
+        [ pitch>> 1.0 0.0 0.0 glRotatef ]
+        [ yaw>>   0.0 1.0 0.0 glRotatef ]
+        tri
+    ] bi ;
 
 : reset-last-drag-rel ( -- )
     { 0 0 } last-drag-loc set-global ;
@@ -66,11 +77,11 @@ demo-gadget H{
     { T{ key-down f f "RIGHT" } [ KEY-ROTATE-STEP     swap yaw-demo-gadget ] }
     { T{ key-down f f "DOWN"  } [ KEY-ROTATE-STEP neg swap pitch-demo-gadget ] }
     { T{ key-down f f "UP"    } [ KEY-ROTATE-STEP     swap pitch-demo-gadget ] }
-    { T{ key-down f f "="     } [ KEY-DISTANCE-STEP neg swap zoom-demo-gadget ] }
-    { T{ key-down f f "-"     } [ KEY-DISTANCE-STEP     swap zoom-demo-gadget ] }
+    { T{ key-down f f "="     } [ dup distance-step neg swap zoom-demo-gadget ] }
+    { T{ key-down f f "-"     } [ dup distance-step     swap zoom-demo-gadget ] }
     
     { T{ button-down f f 1 }    [ drop reset-last-drag-rel ] }
     { T{ drag f 1 }             [ drag-yaw-pitch rot [ pitch-demo-gadget ] keep yaw-demo-gadget ] }
-    { T{ mouse-scroll }         [ scroll-direction get second MOUSE-DISTANCE-SCALE * swap zoom-demo-gadget ] }
+    { T{ mouse-scroll }         [ scroll-direction get second over distance-step * swap zoom-demo-gadget ] }
 } set-gestures
 
