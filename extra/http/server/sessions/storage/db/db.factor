@@ -10,7 +10,7 @@ SINGLETON: sessions-in-db
 session "SESSIONS"
 {
     ! { "id" "ID" +random-id+ system-random-generator }
-    { "id" "ID" INTEGER +native-id+ }
+    { "id" "ID" INTEGER +db-assigned-id+ }
     { "expires" "EXPIRES" BIG-INTEGER +not-null+ }
     { "namespace" "NAMESPACE" FACTOR-BLOB }
 } define-persistent

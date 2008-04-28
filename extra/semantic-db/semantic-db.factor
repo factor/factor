@@ -12,7 +12,7 @@ TUPLE: node id content ;
 
 node "node"
 {
-    { "id" "id" +native-id+ +autoincrement+ }
+    { "id" "id" +db-assigned-id+ +autoincrement+ }
     { "content" "content" TEXT }
 } define-persistent
 
