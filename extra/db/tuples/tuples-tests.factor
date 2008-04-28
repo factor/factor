@@ -30,6 +30,7 @@ SYMBOL: person3
 SYMBOL: person4
 
 : test-tuples ( -- )
+    [ ] [ person recreate-table ] unit-test
     [ ] [ person ensure-table ] unit-test
     [ ] [ person drop-table ] unit-test
     [ ] [ person create-table ] unit-test
