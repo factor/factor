@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic math sequences arrays io namespaces
 prettyprint.private kernel.private assocs random combinators
-parser prettyprint.backend ;
+parser prettyprint.backend math.order ;
 IN: trees
 
 MIXIN: tree-mixin

@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math sequences vectors
+USING: arrays kernel math sequences vectors math.order
 sequences sequences.private growable ;
 IN: sorting
 
@@ -17,7 +17,7 @@ DEFER: sort
     dup slice-from 1+ swap set-slice-from ; inline
 
 : smallest ( iter1 iter2 quot -- elt )
-    >r over this over this r> call 0 <
+    >r over this over this r> call +lt+ eq?
     -rot ? [ this ] keep next ; inline
 
 : (merge) ( iter1 iter2 quot accum -- )

@@ -33,7 +33,7 @@ PREDICATE: class < word
 PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
-: classes ( -- seq ) all-words [ class? ] subset ;
+: classes ( -- seq ) all-words [ class? ] filter ;
 
 : predicate-word ( word -- predicate )
     [ word-name "?" append ] keep word-vocabulary create ;

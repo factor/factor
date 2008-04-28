@@ -82,7 +82,7 @@ HELP: uncons
 { $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
 { $description "Put the head and tail of the list on the stack." } ;
 
-{ leach lreduce lmap lmap-with ltake lsubset lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lreduce lwhile luntil } related-words
+{ leach lreduce lmap lmap-with ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lreduce lwhile luntil } related-words
 
 HELP: leach
 { $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- )" } }
@@ -104,9 +104,9 @@ HELP: ltake
 { $values { "n" "a non negative integer" } { "list" "a cons object" } { "result" "resulting cons object" } }
 { $description "Outputs a lazy list containing the first n items in the list. This is done a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-take> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
-HELP: lsubset
+HELP: lfilter
 { $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( -- X )" } { "result" "resulting cons object" } }
-{ $description "Perform a similar functionality to that of the " { $link subset } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-subset> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
+{ $description "Perform a similar functionality to that of the " { $link filter } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-filter> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: lwhile
 { $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( X -- bool )" } { "result" "resulting cons object" } }

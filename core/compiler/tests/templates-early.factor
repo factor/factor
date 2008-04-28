@@ -2,7 +2,8 @@
 IN: compiler.tests
 USING: compiler generator generator.registers
 generator.registers.private tools.test namespaces sequences
-words kernel math effects definitions compiler.units accessors ;
+words kernel math effects definitions compiler.units accessors
+cpu.architecture ;
 
 : <int-vreg> ( n -- vreg ) int-regs <vreg> ;
 

@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien alien.c-types alien.structs alien.arrays
-kernel math namespaces parser sequences words quotations
-math.parser splitting effects prettyprint prettyprint.sections
-prettyprint.backend assocs combinators ;
+alien.strings kernel math namespaces parser sequences words
+quotations math.parser splitting effects prettyprint
+prettyprint.sections prettyprint.backend assocs combinators ;
 IN: alien.syntax
 
 <PRIVATE
@@ -40,7 +40,7 @@ PRIVATE>
 
 : FUNCTION:
     scan "c-library" get scan ";" parse-tokens
-    [ "()" subseq? not ] subset
+    [ "()" subseq? not ] filter
     define-function ; parsing
 
 : TYPEDEF:

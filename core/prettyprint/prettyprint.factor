@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint
-USING: alien arrays generic generic.standard assocs io kernel
+USING: arrays generic generic.standard assocs io kernel
 math namespaces sequences strings io.styles io.streams.string
 vectors words prettyprint.backend prettyprint.sections
 prettyprint.config sorting splitting math.parser vocabs
@@ -45,7 +45,7 @@ sets ;
     ] if ;
 
 : vocabs. ( in use -- )
-    dupd remove [ { "syntax" "scratchpad" } member? not ] subset
+    dupd remove [ { "syntax" "scratchpad" } member? not ] filter
     use. in. ;
 
 : with-use ( obj quot -- )

@@ -79,28 +79,6 @@ HELP: >=
 { $values { "x" real } { "y" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is greater than or equal to " { $snippet "y" } "." } ;
 
-HELP: before?
-{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "obj1" } " comes before " { $snippet "obj2" } " using an intrinsic total order." }
-{ $notes "Implemented using " { $link <=> } "." } ;
-
-HELP: after?
-{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "obj1" } " comes after " { $snippet "obj2" } " using an intrinsic total order." }
-{ $notes "Implemented using " { $link <=> } "." } ;
-
-HELP: before=?
-{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "obj1" } " comes before or equals " { $snippet "obj2" } " using an intrinsic total order." }
-{ $notes "Implemented using " { $link <=> } "." } ;
-
-HELP: after=?
-{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "obj1" } " comes after or equals " { $snippet "obj2" } " using an intrinsic total order." }
-{ $notes "Implemented using " { $link <=> } "." } ;
-
-{ before? after? before=? after=? } related-words
-
 
 HELP: +
 { $values { "x" number } { "y" number } { "z" number } }
@@ -275,19 +253,6 @@ HELP: recip
 { $description "Computes a number's multiplicative inverse." }
 { $errors "Throws an error if " { $snippet "x" } " is the integer 0." } ;
 
-HELP: max
-{ $values { "x" real } { "y" real } { "z" real } }
-{ $description "Outputs the greatest of two real numbers." } ;
-
-HELP: min
-{ $values { "x" real } { "y" real } { "z" real } }
-{ $description "Outputs the smallest of two real numbers." } ;
-
-HELP: between?
-{ $values { "x" real } { "y" real } { "z" real } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "x" } " is in the interval " { $snippet "[y,z]" } "." }
-{ $notes "As per the closed interval notation, the end-points are included in the interval." } ;
-
 HELP: rem
 { $values { "x" integer } { "y" integer } { "z" integer } }
 { $description
@@ -332,10 +297,6 @@ HELP: times
 { $values { "n" integer } { "quot" quotation } }
 { $description "Calls the quotation " { $snippet "n" } " times." }
 { $notes "If you need to pass the current index to the quotation, use " { $link each } "." } ;
-
-HELP: [-]
-{ $values { "x" real } { "y" real } { "z" real } }
-{ $description "Subtracts " { $snippet "y" } " from " { $snippet "x" } ". If the result is less than zero, outputs zero." } ;
 
 HELP: fp-nan?
 { $values { "x" real } { "?" "a boolean" } }

@@ -1,9 +1,9 @@
 USING: arrays compiler.units generic hashtables inference kernel
-kernel.private math optimizer prettyprint sequences sbufs
-strings tools.test vectors words sequences.private quotations
-optimizer.backend classes classes.algebra inference.dataflow
-classes.tuple.private continuations growable optimizer.inlining
-namespaces hints ;
+kernel.private math optimizer generator prettyprint sequences
+sbufs strings tools.test vectors words sequences.private
+quotations optimizer.backend classes classes.algebra
+inference.dataflow classes.tuple.private continuations growable
+optimizer.inlining namespaces hints ;
 IN: optimizer.tests
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
@@ -349,3 +349,10 @@ USE: sequences.private
     1 2 3.0 3 counter-example ;
 
 [ 2 4 6.0 0 ] [ counter-example' ] unit-test
+
+: member-test { + - * / /i } member? ;
+
+\ member-test must-infer
+[ ] [ \ member-test word-dataflow optimize 2drop ] unit-test
+[ t ] [ \ + member-test ] unit-test
+[ f ] [ \ append member-test ] unit-test

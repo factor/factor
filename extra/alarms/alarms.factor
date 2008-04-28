@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays calendar combinators generic init kernel math
 namespaces sequences heaps boxes threads debugger quotations
-assocs ;
+assocs math.order ;
 IN: alarms
 
 TUPLE: alarm quot time interval entry ;

@@ -157,7 +157,7 @@ num-types get f <array> builtins set
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create
-[ f builtins get [ ] subset union-class define-class ]
+[ f builtins get [ ] filter union-class define-class ]
 [ [ drop t ] "predicate" set-word-prop ]
 bi
 
@@ -638,10 +638,6 @@ tuple
     { "set-alien-double" "alien.accessors" }
     { "alien-cell" "alien.accessors" }
     { "set-alien-cell" "alien.accessors" }
-    { "alien>char-string" "alien" }
-    { "string>char-alien" "alien" }
-    { "alien>u16-string" "alien" }
-    { "string>u16-alien" "alien" }
     { "(throw)" "kernel.private" }
     { "alien-address" "alien" }
     { "slot" "slots.private" }

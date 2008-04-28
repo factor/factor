@@ -39,8 +39,7 @@ IN: memoize
     over H{ } clone "memoize" set-word-prop
     over make-memoizer define ;
 
-: MEMO:
-    CREATE-WORD parse-definition define-memoized ; parsing
+: MEMO: (:) define-memoized ; parsing
 
 PREDICATE: memoized < word "memoize" word-prop ;
 

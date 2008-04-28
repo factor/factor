@@ -5,7 +5,7 @@ namespaces parser kernel kernel.private classes classes.private
 arrays hashtables vectors classes.tuple sbufs inference.dataflow
 hashtables.private sequences.private math classes.tuple.private
 growable namespaces.private assocs words generator command-line
-vocabs io prettyprint libc compiler.units ;
+vocabs io prettyprint libc compiler.units math.order ;
 IN: bootstrap.compiler
 
 ! Don't bring this in when deploying, since it will store a
@@ -74,6 +74,6 @@ nl
     malloc calloc free memcpy
 } compile
 
-vocabs [ words [ compiled? not ] subset compile "." write flush ] each
+vocabs [ words [ compiled? not ] filter compile "." write flush ] each
 
 " done" print flush

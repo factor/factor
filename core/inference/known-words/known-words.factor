@@ -92,6 +92,8 @@ M: object infer-call
     peek-d infer-call
 ] "infer" set-word-prop
 
+\ call t "no-compile" set-word-prop
+
 \ execute [
     1 ensure-values
     pop-literal nip
@@ -470,18 +472,6 @@ set-primitive-effect
 \ alien-cell make-flushable
 
 \ set-alien-cell { c-ptr c-ptr integer } { } <effect> set-primitive-effect
-
-\ alien>char-string { c-ptr } { string } <effect> set-primitive-effect
-\ alien>char-string make-flushable
-
-\ string>char-alien { string } { byte-array } <effect> set-primitive-effect
-\ string>char-alien make-flushable
-
-\ alien>u16-string { c-ptr } { string } <effect> set-primitive-effect
-\ alien>u16-string make-flushable
-
-\ string>u16-alien { string } { byte-array } <effect> set-primitive-effect
-\ string>u16-alien make-flushable
 
 \ alien-address { alien } { integer } <effect> set-primitive-effect
 \ alien-address make-flushable

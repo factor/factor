@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel sequences generic words
 arrays classes slots slots.private classes.tuple math vectors
-quotations sorting prettyprint ;
+quotations sorting prettyprint accessors ;
 IN: mirrors
 
 : all-slots ( class -- slots )
@@ -16,33 +16,32 @@ TUPLE: mirror object slots ;
 : <mirror> ( object -- mirror )
     dup object-slots mirror boa ;
 
-: >mirror< ( mirror -- obj slots )
-    dup mirror-object swap mirror-slots ;
+ERROR: no-such-slot object name ;
 
-: mirror@ ( slot-name mirror -- obj slot-spec )
-    >mirror< swapd slot-named ;
+ERROR: immutable-slot object name ;
 
 M: mirror at*
-    mirror@ dup [ slot-spec-offset slot t ] [ 2drop f f ] if ;
+    [ nip object>> ] [ slots>> slot-named ] 2bi
+    dup [ offset>> slot t ] [ 2drop f f ] if ;
 
 M: mirror set-at ( val key mirror -- )
-    mirror@ dup [
-        dup slot-spec-writer [
-            slot-spec-offset set-slot
+    [ nip object>> ] [ drop ] [ slots>> slot-named ] 2tri dup [
+        dup writer>> [
+            nip offset>> set-slot
         ] [
-            "Immutable slot" throw
+            drop immutable-slot
         ] if
     ] [
-        "No such slot" throw
+        drop no-such-slot
     ] if ;
 
 M: mirror delete-at ( key mirror -- )
     f -rot set-at ;
 
 M: mirror >alist ( mirror -- alist )
-    >mirror<
-    [ [ slot-spec-offset slot ] with map ] keep
-    [ slot-spec-name ] map swap zip ;
+    [ slots>> [ name>> ] map ]
+    [ [ object>> ] [ slots>> ] bi [ offset>> slot ] with map ] bi
+    zip ;
 
 M: mirror assoc-size mirror-slots length ;
 
@@ -50,7 +49,7 @@ INSTANCE: mirror assoc
 
 : sort-assoc ( assoc -- alist )
     >alist
-    [ dup first unparse-short swap ] { } map>assoc
+    [ [ first unparse-short ] keep ] { } map>assoc
     sort-keys values ;
 
 GENERIC: make-mirror ( obj -- assoc )

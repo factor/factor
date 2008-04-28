@@ -1,5 +1,6 @@
+USING: kernel multi-methods tools.test math arrays sequences
+math.order ;
 IN: multi-methods.tests
-USING: kernel multi-methods tools.test math arrays sequences ;
 
 [ { 1 2 3 4 5 6 } ] [
     { 6 4 5 1 3 2 } [ <=> ] topological-sort

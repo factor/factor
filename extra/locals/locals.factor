@@ -5,7 +5,7 @@ inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
 definitions prettyprint hashtables prettyprint.sections sets
 sequences.private effects generic compiler.units accessors
-locals.backend ;
+locals.backend memoize ;
 IN: locals
 
 ! Inspired by
@@ -130,7 +130,7 @@ M: object free-vars* drop ;
 M: quotation free-vars* [ add-if-free ] each ;
 
 M: lambda free-vars*
-    [ vars>> ] [ body>> ] bi free-vars diff % ;
+    [ vars>> ] [ body>> ] bi free-vars swap diff % ;
 
 GENERIC: lambda-rewrite* ( obj -- )
 
@@ -297,6 +297,8 @@ MACRO: with-locals ( form -- quot ) lambda-rewrite ;
 : M:: (M::) define ; parsing
 
 : MACRO:: (::) define-macro ; parsing
+
+: MEMO:: (::) define-memoized ; parsing
 
 <PRIVATE
 

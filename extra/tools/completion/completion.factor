@@ -1,12 +1,12 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: tools.completion
 USING: kernel arrays sequences math namespaces strings io
 vectors words assocs combinators sorting unicode.case
-unicode.categories ;
+unicode.categories math.order ;
+IN: tools.completion
 
 : (fuzzy) ( accum ch i full -- accum i ? )
-    index* 
+    index-from 
     [
         [ swap push ] 2keep 1+ t
     ] [
@@ -52,7 +52,7 @@ unicode.categories ;
 : rank-completions ( results -- newresults )
     sort-keys <reversed>
     [ 0 [ first max ] reduce 3 /f ] keep
-    [ first < ] with subset
+    [ first < ] with filter
     [ second ] map ;
 
 : complete ( full short -- score )

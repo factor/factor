@@ -201,37 +201,37 @@ M: lazy-while cdr ( lazy-while -- cdr )
 M: lazy-while nil? ( lazy-while -- bool )
    [ car ] keep lazy-while-quot call not ;
 
-TUPLE: lazy-subset cons quot ;
+TUPLE: lazy-filter cons quot ;
 
-C: <lazy-subset> lazy-subset
+C: <lazy-filter> lazy-filter
 
-: lsubset ( list quot -- result )
-    over nil? [ 2drop nil ] [ <lazy-subset> <memoized-cons> ] if ;
+: lfilter ( list quot -- result )
+    over nil? [ 2drop nil ] [ <lazy-filter> <memoized-cons> ] if ;
 
-: car-subset?  ( lazy-subset -- ? )
-  [ lazy-subset-cons car ] keep
-  lazy-subset-quot call ;
+: car-filter?  ( lazy-filter -- ? )
+  [ lazy-filter-cons car ] keep
+  lazy-filter-quot call ;
 
-: skip ( lazy-subset -- )
-  [ lazy-subset-cons cdr ] keep
-  set-lazy-subset-cons ;
+: skip ( lazy-filter -- )
+  [ lazy-filter-cons cdr ] keep
+  set-lazy-filter-cons ;
 
-M: lazy-subset car ( lazy-subset -- car )
-  dup car-subset? [ lazy-subset-cons ] [ dup skip ] if car ;
+M: lazy-filter car ( lazy-filter -- car )
+  dup car-filter? [ lazy-filter-cons ] [ dup skip ] if car ;
 
-M: lazy-subset cdr ( lazy-subset -- cdr )
-  dup car-subset? [
-    [ lazy-subset-cons cdr ] keep
-    lazy-subset-quot lsubset
+M: lazy-filter cdr ( lazy-filter -- cdr )
+  dup car-filter? [
+    [ lazy-filter-cons cdr ] keep
+    lazy-filter-quot lfilter
   ] [
     dup skip cdr
   ] if ;
 
-M: lazy-subset nil? ( lazy-subset -- bool )
-  dup lazy-subset-cons nil? [
+M: lazy-filter nil? ( lazy-filter -- bool )
+  dup lazy-filter-cons nil? [
     drop t
   ] [
-    dup car-subset? [
+    dup car-filter? [
       drop f
     ] [
       dup skip nil?
@@ -373,7 +373,7 @@ M: lazy-concat nil? ( lazy-concat -- bool )
   [ lcartesian-product* ] dip lmap ;
 
 : lcomp* ( list guards quot -- result )
-  [ [ lcartesian-product* ] dip [ lsubset ] each ] dip lmap ;
+  [ [ lcartesian-product* ] dip [ lfilter ] each ] dip lmap ;
 
 DEFER: lmerge
 
@@ -442,4 +442,4 @@ INSTANCE: lazy-from-by list
 INSTANCE: lazy-zip list
 INSTANCE: lazy-while list
 INSTANCE: lazy-until list
-INSTANCE: lazy-subset list
+INSTANCE: lazy-filter list

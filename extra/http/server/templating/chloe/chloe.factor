@@ -1,9 +1,10 @@
 USING: accessors kernel sequences combinators kernel namespaces
-classes.tuple assocs splitting words arrays
-io.files io.encodings.utf8 html.elements unicode.case
+classes.tuple assocs splitting words arrays memoize
+io io.files io.encodings.utf8 html.elements unicode.case
 tuple-syntax xml xml.data xml.writer xml.utilities
 http.server
 http.server.auth
+http.server.flows
 http.server.components
 http.server.sessions
 http.server.templating
@@ -18,23 +19,31 @@ C: <chloe> chloe
 
 DEFER: process-template
 
-: chloe-ns TUPLE{ name url: "http://factorcode.org/chloe/1.0" } ;
+: chloe-ns "http://factorcode.org/chloe/1.0" ; inline
+
+: filter-chloe-attrs ( assoc -- assoc' )
+    [ drop name-url chloe-ns = not ] assoc-filter ;
 
 : chloe-tag? ( tag -- ? )
     {
         { [ dup tag? not ] [ f ] }
-        { [ dup chloe-ns names-match? not ] [ f ] }
+        { [ dup url>> chloe-ns = not ] [ f ] }
         [ t ]
     } cond nip ;
 
 SYMBOL: tags
 
+MEMO: chloe-name ( string -- name )
+    name new
+        swap >>tag
+        chloe-ns >>url ;
+
 : required-attr ( tag name -- value )
-    dup rot at*
+    dup chloe-name rot at*
     [ nip ] [ drop " attribute is required" append throw ] if ;
 
 : optional-attr ( tag name -- value )
-    swap at ;
+    chloe-name swap at ;
 
 : write-title-tag ( tag -- )
     drop
@@ -54,6 +63,19 @@ SYMBOL: tags
 : write-style-tag ( tag -- )
     drop <style> write-style </style> ;
 
+: atom-tag ( tag -- )
+    [ "title" required-attr ]
+    [ "href" required-attr ]
+    bi set-atom-feed ;
+
+: write-atom-tag ( tag -- )
+    drop
+    "head" tags get member? [
+        write-atom-feed
+    ] [
+        atom-feed get value>> second write
+    ] if ;
+
 : component-attr ( tag -- name )
     "component" required-attr ;
 
@@ -63,16 +85,40 @@ SYMBOL: tags
 : edit-tag ( tag -- )
     component-attr component render-edit ;
 
+: summary-tag ( tag -- )
+    component-attr component render-summary ;
+
 : parse-query-attr ( string -- assoc )
     dup empty?
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
 
+: flow-attr ( tag -- )
+    "flow" optional-attr {
+        { "none" [ flow-id off ] }
+        { "begin" [ begin-flow ] }
+        { "current" [ ] }
+        { f [ ] }
+    } case ;
+
+: session-attr ( tag -- )
+    "session" optional-attr {
+        { "none" [ session off flow-id off ] }
+        { "current" [ ] }
+        { f [ ] }
+    } case ;
+
 : a-start-tag ( tag -- )
-    <a
-    [ "href" required-attr ]
-    [ "query" optional-attr parse-query-attr ]
-    bi link>string =href
-    a> ;
+    [
+        <a
+        dup flow-attr
+        dup session-attr
+        dup "value" optional-attr [ value f ] [
+            [ "href" required-attr ]
+            [ "query" optional-attr parse-query-attr ]
+            bi
+        ] ?if link>string =href
+        a>
+    ] with-scope ;
 
 : process-tag-children ( tag -- )
     [ process-template ] each ;
@@ -84,11 +130,18 @@ SYMBOL: tags
     tri ;
 
 : form-start-tag ( tag -- )
-    <form
-    "POST" =method
-    tag-attrs print-attrs
-    form>
-    hidden-form-field ;
+    [
+        <form
+        "POST" =method
+        {
+            [ flow-attr ]
+            [ session-attr ]
+            [ "action" required-attr resolve-base-path =action ]
+            [ tag-attrs filter-chloe-attrs print-attrs ]
+        } cleave
+        form>
+        hidden-form-field
+    ] with-scope ;
 
 : form-tag ( tag -- )
     [ form-start-tag ]
@@ -126,12 +179,16 @@ SYMBOL: tags
         { "write-title" [ write-title-tag ] }
         { "style" [ style-tag ] }
         { "write-style" [ write-style-tag ] }
+        { "atom" [ atom-tag ] }
+        { "write-atom" [ write-atom-tag ] }
         { "view" [ view-tag ] }
         { "edit" [ edit-tag ] }
+        { "summary" [ summary-tag ] }
         { "a" [ a-tag ] }
         { "form" [ form-tag ] }
         { "error" [ error-tag ] }
         { "if" [ if-tag ] }
+        { "comment" [ drop ] }
         { "call-next-template" [ drop call-next-template ] }
         [ "Unknown chloe tag: " swap append throw ]
     } case ;
@@ -168,7 +225,7 @@ SYMBOL: tags
         ] if
     ] with-scope ;
 
-M: chloe call-template
+M: chloe call-template*
     path>> utf8 <file-reader> read-xml process-chloe ;
 
 INSTANCE: chloe template

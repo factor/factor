@@ -38,7 +38,7 @@ IN: project-euler.030
 PRIVATE>
 
 : euler030 ( -- answer )
-    325537 [ dup sum-fifth-powers = ] subset sum 1- ;
+    325537 [ dup sum-fifth-powers = ] filter sum 1- ;
 
 ! [ euler030 ] 100 ave-time
 ! 2537 ms run / 125 ms GC ave time - 100 trials

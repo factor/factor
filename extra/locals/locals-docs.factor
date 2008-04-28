@@ -1,4 +1,5 @@
-USING: help.syntax help.markup kernel macros prettyprint ;
+USING: help.syntax help.markup kernel macros prettyprint
+memoize ;
 IN: locals
 
 <PRIVATE
@@ -16,6 +17,7 @@ HELP: [|
 { $examples
     { $example
         "USING: kernel locals math prettyprint ;"
+        "IN: scratchpad"
         ":: adder ( n -- quot ) [| m | m n + ] ;"
         "3 5 adder call ."
         "8"
@@ -29,6 +31,7 @@ HELP: [let
 { $examples
     { $example
         "USING: kernel locals math math.functions prettyprint sequences ;"
+        "IN: scratchpad"
         ":: frobnicate ( n seq -- newseq )"
         "    [let | n' [ n 6 * ] |"
         "        seq [ n' gcd nip ] map ] ;"
@@ -44,6 +47,7 @@ HELP: [let*
 { $examples
     { $example
         "USING: kernel locals math math.functions prettyprint sequences ;"
+        "IN: scratchpad"
         ":: frobnicate ( n seq -- newseq )"
         "    [let* | a [ n 3 + ]"
         "            b [ a 4 * ] |"
@@ -62,6 +66,7 @@ HELP: [wlet
 { $examples
     { $example
         "USING: locals math prettyprint sequences ;"
+        "IN: scratchpad"
         ":: quuxify ( n seq -- newseq )"
         "    [wlet | add-n [| m | m n + ] |"
         "        seq [ add-n ] map ] ;"
@@ -80,12 +85,20 @@ HELP: ::
 { $notes "The output names do not affect the word's behavior, however the compiler attempts to check the stack effect as with other definitions." }
 { $examples "See " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " and " { $link POSTPONE: [wlet } "." } ;
 
+{ POSTPONE: : POSTPONE: :: } related-words
+
 HELP: MACRO::
 { $syntax "MACRO:: word ( bindings... -- outputs... ) body... ;" }
-{ $description "Defines a macro with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope. Any " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " or " { $link POSTPONE: [wlet } " forms used in the body of the word definition are automatically closure-converted." }
+{ $description "Defines a macro with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope." }
 { $notes "The output names do not affect the word's behavior, however the compiler attempts to check the stack effect as with other definitions." } ;
 
 { POSTPONE: MACRO: POSTPONE: MACRO:: } related-words
+
+HELP: MEMO::
+{ $syntax "MEMO:: word ( bindings... -- outputs... ) body... ;" }
+{ $description "Defines a memoized word with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope." } ;
+
+{ POSTPONE: MEMO: POSTPONE: MEMO:: } related-words
 
 ARTICLE: "locals-mutable" "Mutable locals"
 "In the list of bindings supplied to " { $link POSTPONE: :: } ", " { $link POSTPONE: [let } " or " { $link POSTPONE: [| } ", a mutable binding may be introduced by suffixing its named with " { $snippet "!" } ". Mutable bindings are read by giving their name as usual; the suffix is not part of the binding's name. To write to a mutable binding, use the binding's with the " { $snippet "!" } " suffix."
@@ -119,6 +132,7 @@ $nl
 $nl
 "Applicative word definitions where the inputs are named local variables:"
 { $subsection POSTPONE: :: }
+{ $subsection POSTPONE: MEMO:: }
 { $subsection POSTPONE: MACRO:: }
 "Explicit closure conversion outside of applicative word definitions:"
 { $subsection with-locals }

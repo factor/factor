@@ -302,13 +302,13 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 
 : callback-3 "void" { } "cdecl" [ 5 "x" set ] alien-callback ;
 
-[ t ] [ 
+[ t ] [
     namestack*
     3 "x" set callback-3 callback_test_1
     namestack* eq?
 ] unit-test
 
-[ 5 ] [ 
+[ 5 ] [
     [
         3 "x" set callback-3 callback_test_1 "x" get
     ] with-scope
@@ -318,7 +318,7 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
     "void" { } "cdecl" [ "Hello world" write ] alien-callback
     gc ;
 
-[ "Hello world" ] [ 
+[ "Hello world" ] [
     [ callback-4 callback_test_1 ] with-string-writer
 ] unit-test
 
@@ -363,6 +363,10 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
     "int" { "int" "int" "int" } "cdecl" [
         + + 1+
     ] alien-callback ;
+
+FUNCTION: void ffi_test_36_point_5 ( ) ;
+
+[ ] [ ffi_test_36_point_5 ] unit-test
 
 FUNCTION: int ffi_test_37 ( void* func ) ;
 

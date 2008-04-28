@@ -1,5 +1,6 @@
-USING: unicode.data kernel math sequences parser bit-arrays namespaces 
-sequences.private arrays quotations classes.predicate assocs ;
+USING: unicode.data kernel math sequences parser bit-arrays
+namespaces sequences.private arrays quotations assocs
+classes.predicate math.order ;
 IN: unicode.syntax
 
 ! Character classes (categories)
@@ -27,8 +28,8 @@ IN: unicode.syntax
 
 : [category] ( categories -- quot )
     [
-        [ [ categories member? not ] subset as-string ] keep 
-        [ categories member? ] subset >category-array
+        [ [ categories member? not ] filter as-string ] keep 
+        [ categories member? ] filter >category-array
         [ dup category# ] % , [ nth-unsafe [ drop t ] ] %
         \ member? 2array >quotation ,
         \ if ,
@@ -41,7 +42,7 @@ IN: unicode.syntax
     CREATE ";" parse-tokens define-category ; parsing
 
 : seq-minus ( seq1 seq2 -- diff )
-    [ member? not ] curry subset ;
+    [ member? not ] curry filter ;
 
 : CATEGORY-NOT:
     CREATE ";" parse-tokens

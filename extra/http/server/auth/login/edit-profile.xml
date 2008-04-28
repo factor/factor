@@ -4,18 +4,18 @@
 
 	<t:title>Edit Profile</t:title>
 
-	<t:form action="edit-profile">
+	<t:form t:action="edit-profile">
 
 	<table>
 	
 	<tr>
 		<th class="field-label">User name:</th>
-		<td><t:view component="username" /></td>
+		<td><t:view t:component="username" /></td>
 	</tr>
 	
 	<tr>
 		<th class="field-label">Real name:</th>
-		<td><t:edit component="realname" /></td>
+		<td><t:edit t:component="realname" /></td>
 	</tr>
 	
 	<tr>
@@ -25,7 +25,7 @@
 	
 	<tr>
 		<th class="field-label">Current password:</th>
-		<td><t:edit component="password" /></td>
+		<td><t:edit t:component="password" /></td>
 	</tr>
 	
 	<tr>
@@ -35,12 +35,12 @@
 	
 	<tr>
 		<th class="field-label">New password:</th>
-		<td><t:edit component="new-password" /></td>
+		<td><t:edit t:component="new-password" /></td>
 	</tr>
 	
 	<tr>
 		<th class="field-label">Verify:</th>
-		<td><t:edit component="verify-password" /></td>
+		<td><t:edit t:component="verify-password" /></td>
 	</tr>
 	
 	<tr>
@@ -50,7 +50,7 @@
 	
 	<tr>
 		<th class="field-label">E-mail:</th>
-		<td><t:edit component="email" /></td>
+		<td><t:edit t:component="email" /></td>
 	</tr>
 	
 	<tr>
@@ -63,11 +63,11 @@
 	<p>
 		<input type="submit" value="Update" />
 
-		<t:if var="http.server.auth.login:login-failed?">
+		<t:if t:var="http.server.auth.login:login-failed?">
 			<t:error>invalid password</t:error>
 		</t:if>
 		
-		<t:if var="http.server.auth.login:password-mismatch?">
+		<t:if t:var="http.server.auth.login:password-mismatch?">
 			<t:error>passwords do not match</t:error>
 		</t:if>
 	</p>

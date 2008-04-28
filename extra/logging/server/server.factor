@@ -37,12 +37,12 @@ SYMBOL: log-files
     write bl write ": " write print ;
 
 : write-message ( msg word-name level -- )
-    rot [ empty? not ] subset {
+    rot [ empty? not ] filter {
         { [ dup empty? ] [ 3drop ] }
         { [ dup length 1 = ] [ first -rot f (write-message) ] }
         [
             [ first -rot f (write-message) ] 3keep
-            1 tail -rot [ t (write-message) ] 2curry each
+            rest -rot [ t (write-message) ] 2curry each
         ]
     } cond ;
 

@@ -39,9 +39,9 @@ HELP: all-unique?
 
 HELP: diff
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
-{ $description "Outputs a sequence consisting of elements present in " { $snippet "seq2" } " but not " { $snippet "seq1" } ", comparing elements for equality." 
+{ $description "Outputs a sequence consisting of elements present in " { $snippet "seq1" } " but not " { $snippet "seq2" } ", comparing elements for equality." 
 } { $examples
-    { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } diff ." "{ 4 }" }
+    { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } diff ." "{ 1 }" }
 } ;
 
 HELP: intersect

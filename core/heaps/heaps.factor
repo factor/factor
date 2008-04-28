@@ -2,7 +2,7 @@
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences arrays assocs sequences.private
-growable accessors ;
+growable accessors math.order ;
 IN: heaps
 
 MIXIN: priority-queue
@@ -92,11 +92,11 @@ M: priority-queue heap-size ( heap -- n )
 
 GENERIC: heap-compare ( pair1 pair2 heap -- ? )
 
-: (heap-compare) drop [ entry-key ] compare 0 ; inline
+: (heap-compare) drop [ entry-key ] compare ; inline
 
-M: min-heap heap-compare (heap-compare) > ;
+M: min-heap heap-compare (heap-compare) +gt+ eq? ;
 
-M: max-heap heap-compare (heap-compare) < ;
+M: max-heap heap-compare (heap-compare) +lt+ eq? ;
 
 : heap-bounds-check? ( m heap -- ? )
     heap-size >= ; inline

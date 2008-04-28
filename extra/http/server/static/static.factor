@@ -69,32 +69,24 @@ TUPLE: file-responder root hook special ;
     swap '[ , directory. ] >>body ;
 
 : find-index ( filename -- path )
-    { "index.html" "index.fhtml" } [ append-path ] with map
-    [ exists? ] find nip ;
+    "index.html" append-path dup exists? [ drop f ] unless ;
 
 : serve-directory ( filename -- response )
-    dup "/" tail? [
-        dup find-index
-        [ serve-file ] [ list-directory ] ?if
+    request get path>> "/" tail? [
+        dup
+        find-index [ serve-file ] [ list-directory ] ?if
     ] [
-        drop request get redirect-with-/
+        drop
+        request get path>> "/" append f <standard-redirect>
     ] if ;
 
 : serve-object ( filename -- response )
-    serving-path dup exists? [
-        dup directory? [ serve-directory ] [ serve-file ] if
-    ] [
-        drop <404>
-    ] if ;
+    serving-path dup exists?
+    [ dup directory? [ serve-directory ] [ serve-file ] if ]
+    [ drop <404> ]
+    if ;
 
-M: file-responder call-responder ( path responder -- response )
+M: file-responder call-responder* ( path responder -- response )
     file-responder set
-    dup [
-        ".." over subseq? [
-            drop <400>
-        ] [
-            serve-object
-        ] if
-    ] [
-        drop redirect-with-/
-    ] if ;
+    ".." over member?
+    [ drop <400> ] [ "/" join serve-object ] if ;

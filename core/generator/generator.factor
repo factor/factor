@@ -73,6 +73,7 @@ GENERIC: generate-node ( node -- next )
 : word-dataflow ( word -- effect dataflow )
     [
         dup "no-effect" word-prop [ no-effect ] when
+        dup "no-compile" word-prop [ no-effect ] when
         dup specialized-def over dup 2array 1array infer-quot
         finish-word
     ] with-infer ;

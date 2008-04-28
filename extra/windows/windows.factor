@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax alien.c-types arrays combinators
-kernel math namespaces parser prettyprint sequences
+USING: alien alien.syntax alien.c-types alien.strings arrays
+combinators kernel math namespaces parser prettyprint sequences
 windows.errors windows.types windows.kernel32 words ;
 IN: windows
 
@@ -14,7 +14,7 @@ FUNCTION: void* error_message ( DWORD id ) ;
 
 : (win32-error-string) ( n -- string )
     error_message
-    dup alien>u16-string
+    dup utf16n alien>string
     swap LocalFree drop ;
 
 : win32-error-string ( -- str )
@@ -30,10 +30,10 @@ FUNCTION: void* error_message ( DWORD id ) ;
 : win32-error ( -- )
     GetLastError (win32-error) ;
 
-: win32-error=0/f { 0 f } member? [ win32-error ] when ;
-: win32-error>0 0 > [ win32-error ] when ;
-: win32-error<0 0 < [ win32-error ] when ;
-: win32-error<>0 zero? [ win32-error ] unless ;
+: win32-error=0/f ( n -- ) { 0 f } member? [ win32-error ] when ;
+: win32-error>0 ( n -- ) 0 > [ win32-error ] when ;
+: win32-error<0 ( n -- ) 0 < [ win32-error ] when ;
+: win32-error<>0 ( n -- ) zero? [ win32-error ] unless ;
 
 : invalid-handle? ( handle -- )
     INVALID_HANDLE_VALUE = [

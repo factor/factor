@@ -1,6 +1,6 @@
 USING: http tools.test multiline tuple-syntax
 io.streams.string kernel arrays splitting sequences
-assocs io.sockets ;
+assocs io.sockets db db.sqlite ;
 IN: http.tests
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test
@@ -24,6 +24,8 @@ IN: http.tests
 [ "/bar" ] [ "http://foo.com/bar" url>path ] unit-test
 [ "/bar" ] [ "/bar" url>path ] unit-test
 
+: lf>crlf "\n" split "\r\n" join ;
+
 STRING: read-request-test-1
 GET http://foo/bar HTTP/1.1
 Some-Header: 1
@@ -45,7 +47,7 @@ blah
         cookies: V{ }
     }
 ] [
-    read-request-test-1 [
+    read-request-test-1 lf>crlf [
         read-request
     ] with-string-reader
 ] unit-test
@@ -59,7 +61,7 @@ blah
 ;
 
 read-request-test-1' 1array [
-    read-request-test-1
+    read-request-test-1 lf>crlf
     [ read-request ] with-string-reader
     [ write-request ] with-string-writer
     ! normalize crlf
@@ -69,6 +71,7 @@ read-request-test-1' 1array [
 STRING: read-request-test-2
 HEAD  http://foo/bar   HTTP/1.1
 Host: www.sex.com
+
 ;
 
 [
@@ -83,7 +86,7 @@ Host: www.sex.com
         cookies: V{ }
     }
 ] [
-    read-request-test-2 [
+    read-request-test-2 lf>crlf [
         read-request
     ] with-string-reader
 ] unit-test
@@ -104,7 +107,7 @@ blah
         cookies: V{ }
     }
 ] [
-    read-response-test-1
+    read-response-test-1 lf>crlf
     [ read-response ] with-string-reader
 ] unit-test
 
@@ -117,7 +120,7 @@ content-type: text/html
 ;
 
 read-response-test-1' 1array [
-    read-response-test-1
+    read-response-test-1 lf>crlf
     [ read-response ] with-string-reader
     [ write-response ] with-string-writer
     ! normalize crlf
@@ -130,19 +133,33 @@ read-response-test-1' 1array [
 ] unit-test
 
 ! Live-fire exercise
-USING: http.server http.server.static http.server.actions
-http.client io.server io.files io accessors namespaces threads
-io.encodings.ascii ;
+USING: http.server http.server.static http.server.sessions
+http.server.sessions.storage.db http.server.actions
+http.server.auth.login http.server.db http.client
+io.server io.files io io.encodings.ascii
+accessors namespaces threads ;
+
+: add-quit-action
+    <action>
+        [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>display
+    "quit" add-responder ;
+
+: test-db "test.db" temp-file sqlite-db ;
+
+test-db [
+    init-sessions-table
+] with-db
 
 [ ] [
     [
         <dispatcher>
-            <action>
-                [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>display
-            "quit" add-responder
+            add-quit-action
             <dispatcher>
                 "extra/http/test" resource-path <static> >>default
             "nested" add-responder
+            <action>
+                [ "redirect-loop" f <standard-redirect> ] >>display
+            "redirect-loop" add-responder
         main-responder set
 
         [ 1237 httpd ] "HTTPD test" spawn drop
@@ -159,11 +176,68 @@ io.encodings.ascii ;
     "localhost" 1237 <inet> ascii <client> [
         "GET nested HTTP/1.0\r\n" write flush
         "\r\n" write flush
-        readln drop
-        read-header USE: prettyprint
-    ] with-stream dup . "location" swap at "/" head?
+        read-crlf drop
+        read-header
+    ] with-stream "location" swap at "/" head?
 ] unit-test
+
+[ "http://localhost:1237/redirect-loop" http-get ]
+[ too-many-redirects? ] must-fail-with
 
 [ "Goodbye" ] [
     "http://localhost:1237/quit" http-get
 ] unit-test
+
+! Dispatcher bugs
+[ ] [
+    [
+        <dispatcher>
+            <action> <protected>
+            <login>
+            <session-manager>
+                sessions-in-db >>sessions
+            "" add-responder
+            add-quit-action
+            <dispatcher>
+                <action> "a" add-main-responder
+            "d" add-responder
+        test-db <db-persistence>
+        main-responder set
+
+        [ 1237 httpd ] "HTTPD test" spawn drop
+    ] with-scope
+] unit-test
+
+[ ] [ 1000 sleep ] unit-test
+
+: 404? [ download-failed? ] [ response>> code>> 404 = ] bi and ;
+
+! This should give a 404 not an infinite redirect loop
+[ "http://localhost:1237/d/blah" http-get ] [ 404? ] must-fail-with
+
+! This should give a 404 not an infinite redirect loop
+[ "http://localhost:1237/blah/" http-get ] [ 404? ] must-fail-with
+
+[ "Goodbye" ] [ "http://localhost:1237/quit" http-get ] unit-test
+
+[ ] [
+    [
+        <dispatcher>
+            <action> [ "text/plain" <content> [ "Hi" write ] >>body ] >>display
+            <login>
+            <session-manager>
+                sessions-in-db >>sessions
+            "" add-responder
+            add-quit-action
+        test-db <db-persistence>
+        main-responder set
+
+        [ 1237 httpd ] "HTTPD test" spawn drop
+    ] with-scope
+] unit-test
+
+[ ] [ 1000 sleep ] unit-test
+
+[ "Hi" ] [ "http://localhost:1237/" http-get ] unit-test
+
+[ "Goodbye" ] [ "http://localhost:1237/quit" http-get ] unit-test

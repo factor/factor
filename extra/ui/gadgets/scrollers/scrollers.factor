@@ -1,10 +1,9 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ui.gadgets
-ui.gadgets.viewports ui.gadgets.frames ui.gadgets.grids
-ui.gadgets.theme ui.gadgets.sliders ui.gestures kernel math
-namespaces sequences models combinators math.vectors
-classes.tuple ;
+USING: accessors arrays ui.gadgets ui.gadgets.viewports
+ui.gadgets.frames ui.gadgets.grids ui.gadgets.theme
+ui.gadgets.sliders ui.gestures kernel math namespaces sequences
+models combinators math.vectors classes.tuple ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller viewport x y follows ;
@@ -133,3 +132,13 @@ M: scroller focusable-child*
 
 M: scroller model-changed
     nip f swap set-scroller-follows ;
+
+TUPLE: limited-scroller dim ;
+
+: <limited-scroller> ( gadget -- scroller )
+    <scroller>
+    limited-scroller new
+    [ set-gadget-delegate ] keep ;
+
+M: limited-scroller pref-dim*
+    dim>> ;

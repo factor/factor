@@ -4,7 +4,7 @@ concurrency.mailboxes threads sequences accessors ;
 
 [ [ drop ] parallel-each ] must-infer
 [ [ ] parallel-map ] must-infer
-[ [ ] parallel-subset ] must-infer
+[ [ ] parallel-filter ] must-infer
 
 [ { 1 4 9 } ] [ { 1 2 3 } [ sq ] parallel-map ] unit-test
 
@@ -14,7 +14,7 @@ concurrency.mailboxes threads sequences accessors ;
 [ error>> "Even" = ] must-fail-with
 
 [ V{ 0 3 6 9 } ]
-[ 10 [ 3 mod zero? ] parallel-subset ] unit-test
+[ 10 [ 3 mod zero? ] parallel-filter ] unit-test
 
 [ 10 ]
 [

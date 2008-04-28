@@ -34,7 +34,7 @@ IN: multiline
     [
         lexer get lexer-column swap (parse-multiline-string)
         lexer get set-lexer-column
-    ] "" make 1 tail 1 head* ;
+    ] "" make rest 1 head* ;
 
 : <"
     "\">" parse-multiline-string parsed ; parsing

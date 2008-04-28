@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays generic hashtables io kernel math assocs
+USING: arrays generic hashtables io kernel math assocs
 namespaces sequences strings io.styles vectors words
 prettyprint.config splitting classes continuations
 io.streams.nested accessors ;
@@ -171,7 +171,7 @@ M: block section-fits? ( section -- ? )
     line-limit? [ drop t ] [ call-next-method ] if ;
 
 : pprint-sections ( block advancer -- )
-    swap sections>> [ line-break? not ] subset
+    swap sections>> [ line-break? not ] filter
     unclip pprint-section [
         dup rot call pprint-section
     ] with each ; inline
@@ -310,7 +310,7 @@ M: f section-end-group? drop f ;
             2dup 1+ swap ?nth next set
             swap nth dup split-before dup , split-after
         ] with each
-    ] { } make { t } split [ empty? not ] subset ;
+    ] { } make { t } split [ empty? not ] filter ;
 
 : break-group? ( seq -- ? )
     [ first section-fits? ] [ peek section-fits? not ] bi and ;

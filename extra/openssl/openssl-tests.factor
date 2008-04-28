@@ -1,6 +1,7 @@
-USING: alien alien.c-types assocs bit-arrays hashtables io io.files
-io.sockets kernel mirrors openssl.libcrypto openssl.libssl
-namespaces math math.parser openssl prettyprint sequences tools.test ;
+USING: alien alien.c-types alien.strings assocs bit-arrays
+hashtables io io.files io.encodings.ascii io.sockets kernel
+mirrors openssl.libcrypto openssl.libssl namespaces math
+math.parser openssl prettyprint sequences tools.test ;
 
 ! =========================================================
 ! Some crypto functions (still to be turned into words)
@@ -31,7 +32,7 @@ namespaces math math.parser openssl prettyprint sequences tools.test ;
 ! TODO: debug 'Memory protection fault at address 6c'
 ! get-ctx 1024 "char" malloc-array 1024 0 f password-cb set-default-passwd
 
-[ ] [ get-ctx "password" string>char-alien set-default-passwd-userdata ] unit-test
+[ ] [ get-ctx "password" ascii string>alien set-default-passwd-userdata ] unit-test
 
 ! Enter PEM pass phrase: password
 [ ] [ get-ctx "extra/openssl/test/server.pem" resource-path
@@ -83,7 +84,7 @@ verify-load-locations ] unit-test
 ! SYMBOL: ssl
 ! 
 ! : is-set ( seq -- newseq )
-!     <enum> >alist [ nip ] assoc-subset >hashtable keys ;
+!     <enum> >alist [ nip ] assoc-filter >hashtable keys ;
 ! 
 ! ! 1234 server-socket sock set
 ! "127.0.0.1" 1234 <inet4> SOCK_STREAM server-fd sock set

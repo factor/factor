@@ -1,10 +1,10 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.compiler
+USING: alien alien.c-types alien.strings alien.compiler
 arrays assocs combinators compiler inference.transforms kernel
 math namespaces parser prettyprint prettyprint.sections
 quotations sequences strings words cocoa.runtime io macros
-memoize debugger ;
+memoize debugger io.encodings.ascii ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -104,7 +104,7 @@ MACRO: (send) ( selector super? -- quot )
 : method-arg-type ( method i -- type )
     f <void*> 0 <int> over
     >r method_getArgumentInfo drop
-    r> *char* ;
+    r> *void* ascii alien>string ;
 
 SYMBOL: objc>alien-types
 
@@ -142,7 +142,7 @@ H{
 } assoc-union alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
-    2dup CHAR: = -rot index* swap subseq
+    2dup CHAR: = -rot index-from swap subseq
     dup c-types get key? [
         "Warning: no such C type: " write dup print
         drop "void*"

@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax kernel math sequences
-namespaces assocs init accessors continuations combinators
-core-foundation core-foundation.run-loop ;
+USING: alien alien.c-types alien.strings alien.syntax kernel
+math sequences namespaces assocs init accessors continuations
+combinators core-foundation core-foundation.run-loop
+io.encodings.utf8 ;
 IN: core-foundation.fsevents
 
 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
@@ -152,7 +153,7 @@ SYMBOL: event-stream-callbacks
 
 [
     event-stream-callbacks global
-    [ [ drop expired? not ] assoc-subset H{ } assoc-like ] change-at
+    [ [ drop expired? not ] assoc-filter H{ } assoc-like ] change-at
 ] "core-foundation" add-init-hook
 
 : add-event-source-callback ( quot -- id )
@@ -165,7 +166,7 @@ SYMBOL: event-stream-callbacks
 : >event-triple ( n eventPaths eventFlags eventIds -- triple )
     [
         >r >r >r dup dup
-        r> char*-nth ,
+        r> void*-nth utf8 alien>string ,
         r> int-nth ,
         r> longlong-nth ,
     ] { } make ;

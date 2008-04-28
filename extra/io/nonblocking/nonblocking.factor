@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel io sequences io.buffers io.timeouts generic
-byte-vectors system io.streams.duplex io.encodings
+byte-vectors system io.streams.duplex io.encodings math.order
 io.backend continuations debugger classes byte-arrays namespaces
 splitting dlists assocs io.encodings.binary inspector accessors ;
 IN: io.nonblocking

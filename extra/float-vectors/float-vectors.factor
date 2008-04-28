@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private math sequences
 sequences.private growable float-arrays prettyprint.backend
-parser ;
+parser accessors ;
 IN: float-vectors
 
 TUPLE: float-vector underlying fill ;
