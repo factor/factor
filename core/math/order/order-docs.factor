@@ -25,6 +25,13 @@ HELP: +eq+
 HELP: +gt+
 { $description "Returned by " { $link <=> } " when the first object is strictly greater than the second object." } ;
 
+HELP: invert-comparison
+{ $values { "symbol" "a comparison symbol, +lt+, +eq+, or +gt+" }
+          { "new-symbol" "a comparison symbol, +lt+, +eq+, or +gt+" } }
+{ $description "Invert the comparison symbol returned by " { $link <=> } ". The output for the symbol " { $snippet "+eq+" } " is itself." }
+{ $examples
+    { $example "USING: math.order prettyprint ;" "+lt+ invert-comparison ." "+gt+" } } ;
+
 HELP: compare
 { $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "symbol" "a comparison symbol, +lt+, +eq+, or +gt+" } }
 { $description "Compares the results of applying the quotation to both objects via " { $link <=> } "." }

@@ -11,6 +11,9 @@ GENERIC: <=> ( obj1 obj2 -- n )
 
 : (<=>) - dup 0 < [ drop +lt+ ] [ zero? +eq+ +gt+ ? ] if ;
 
+: invert-comparison ( symbol -- new-symbol )
+    dup +lt+ eq? [ drop +gt+ ] [ +eq+ eq? +eq+ +lt+ ? ] if ;
+
 M: real <=> (<=>) ;
 M: integer <=> (<=>) ;
 

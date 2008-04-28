@@ -73,7 +73,7 @@ SYMBOL: total
 ! Part II: Topologically sorting specializers
 : maximal-element ( seq quot -- n elt )
     dupd [
-        swapd [ call 0 < ] 2curry filter empty?
+        swapd [ call +lt+ = ] 2curry filter empty?
     ] 2curry find [ "Topological sort failed" throw ] unless* ;
     inline
 
@@ -82,16 +82,16 @@ SYMBOL: total
     [ dupd maximal-element >r over delete-nth r> ] curry
     [ ] unfold nip ; inline
 
-: classes< ( seq1 seq2 -- -1/0/1 )
+: classes< ( seq1 seq2 -- lt/eq/gt )
     [
         {
-            { [ 2dup eq? ] [ 0 ] }
-            { [ 2dup [ class< ] 2keep swap class< and ] [ 0 ] }
-            { [ 2dup class< ] [ -1 ] }
-            { [ 2dup swap class< ] [ 1 ] }
-            [ 0 ]
+            { [ 2dup eq? ] [ +eq+ ] }
+            { [ 2dup [ class< ] 2keep swap class< and ] [ +eq+ ] }
+            { [ 2dup class< ] [ +lt+ ] }
+            { [ 2dup swap class< ] [ +gt+ ] }
+            [ +eq+ ]
         } cond 2nip
-    ] 2map [ zero? not ] find nip 0 or ;
+    ] 2map [ zero? not ] find nip +eq+ or ;
 
 : sort-methods ( alist -- alist' )
     [ [ first ] bi@ classes< ] topological-sort ;
