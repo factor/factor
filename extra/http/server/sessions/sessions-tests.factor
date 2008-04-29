@@ -1,16 +1,12 @@
 IN: http.server.sessions.tests
 USING: tools.test http http.server.sessions
-http.server.sessions.storage http.server.sessions.storage.db
 http.server.actions http.server math namespaces kernel accessors
 prettyprint io.streams.string io.files splitting destructors
 sequences db db.sqlite continuations ;
 
 : with-session
     [
-        >r
-        [ session-manager get swap save-session-after ]
-        [ \ session set ] bi
-        r> call
+        >r [ save-session-after ] [ session set ] bi r> call
     ] with-destructors ; inline
 
 TUPLE: foo ;
@@ -31,18 +27,18 @@ M: foo call-responder*
             "id" get session-id-key set-query-param
             "/" >>path
         request set
-        { } session-manager get call-responder
+        { } sessions get call-responder
         [ write-response-body drop ] with-string-writer
     ] with-destructors ;
 
-: session-manager-mock-test
+: sessions-mock-test
     [
         <request>
             "GET" >>method
             "cookies" get >>cookies
             "/" >>path
         request set
-        { } session-manager get call-responder
+        { } sessions get call-responder
         [ write-response-body drop ] with-string-writer
     ] with-destructors ;
 
@@ -60,14 +56,15 @@ M: foo call-responder*
     init-sessions-table
 
     [ ] [
-        <foo> <session-manager>
-            sessions-in-db >>sessions
-        session-manager set
+        <foo> <sessions>
+        sessions set
     ] unit-test
 
     [
-        empty-session
-            123 >>id session set
+        [ ] [
+            empty-session
+                123 >>id session set
+        ] unit-test
 
         [ ] [ 3 "x" sset ] unit-test
 
@@ -81,39 +78,38 @@ M: foo call-responder*
     ] with-scope
 
     [ t ] [
-        session-manager get begin-session id>>
-        session-manager get sessions>> get-session session?
+        begin-session id>>
+        get-session session?
     ] unit-test
 
     [ { 5 0 } ] [
         [
-            session-manager get begin-session
+            begin-session
             dup [ 5 "a" sset ] with-session
             dup [ "a" sget , ] with-session
             dup [ "x" sget , ] with-session
-            id>> session-manager get sessions>> delete-session
+            drop
         ] { } make
     ] unit-test
 
     [ 0 ] [
-        session-manager get begin-session id>>
-        session-manager get sessions>> get-session [ "x" sget ] with-session
+        begin-session id>>
+        get-session [ "x" sget ] with-session
     ] unit-test
 
     [ { 5 0 } ] [
         [
-            session-manager get begin-session id>>
-            dup session-manager get sessions>> get-session [ 5 "a" sset ] with-session
-            dup session-manager get sessions>> get-session [ "a" sget , ] with-session
-            dup session-manager get sessions>> get-session [ "x" sget , ] with-session
-            session-manager get sessions>> delete-session
+            begin-session id>>
+            dup get-session [ 5 "a" sset ] with-session
+            dup get-session [ "a" sget , ] with-session
+            dup get-session [ "x" sget , ] with-session
+            drop
         ] { } make
     ] unit-test
 
     [ ] [
-        <foo> <session-manager>
-            sessions-in-db >>sessions
-        session-manager set
+        <foo> <sessions>
+        sessions set
     ] unit-test
 
     [
@@ -121,7 +117,7 @@ M: foo call-responder*
         "GET" >>method
         "/" >>path
         request set
-        { "etc" } session-manager get call-responder response set
+        { "etc" } sessions get call-responder response set
         [ "1" ] [ [ response get write-response-body drop ] with-string-writer ] unit-test
         response get
     ] with-destructors
@@ -129,9 +125,9 @@ M: foo call-responder*
 
     [ ] [ response get cookies>> "cookies" set ] unit-test
 
-    [ "2" ] [ session-manager-mock-test ] unit-test
-    [ "3" ] [ session-manager-mock-test ] unit-test
-    [ "4" ] [ session-manager-mock-test ] unit-test
+    [ "2" ] [ sessions-mock-test ] unit-test
+    [ "3" ] [ sessions-mock-test ] unit-test
+    [ "4" ] [ sessions-mock-test ] unit-test
 
     [
         [ ] [
@@ -142,8 +138,7 @@ M: foo call-responder*
             request set
 
             [
-                { } <exiting-action> <session-manager>
-                    sessions-in-db >>sessions
+                { } <exiting-action> <sessions>
                 call-responder
             ] with-destructors response set
         ] unit-test
