@@ -6,8 +6,6 @@ math.bitfields.lib namespaces.lib db db.tuples db.types
 math.intervals ;
 IN: db.queries
 
-TUPLE: query tuple order group having ;
-
 GENERIC: where ( specs obj -- )
 
 : maybe-make-retryable ( statement -- statement )
@@ -17,7 +15,7 @@ GENERIC: where ( specs obj -- )
 
 : query-make ( class quot -- )
     >r sql-props r>
-    [ 0 sql-counter rot with-variable ] { "" { } { } } nmake
+    [ 0 sql-counter rot with-variable ";" 0% ] { "" { } { } } nmake
     <simple-statement> maybe-make-retryable ; inline
 
 M: db begin-transaction ( -- ) "BEGIN" sql-command ;
@@ -53,6 +51,16 @@ M: random-id-generator eval-generator ( singleton -- obj )
         drop f
     ] if ;
 
+: (infinite-interval?) ( interval -- ?1 ?2 )
+    [ from>> ] [ to>> ] bi
+    [ first fp-infinity? ] bi@ ;
+
+: double-infinite-interval? ( obj -- ? )
+    dup interval? [ (infinite-interval?) and ] [ drop f ] if ;
+
+: infinite-interval? ( obj -- ? )
+    dup interval? [ (infinite-interval?) or ] [ drop f ] if ;
+
 : where-interval ( spec obj from/to -- )
     over first fp-infinity? [
         3drop
@@ -66,18 +74,11 @@ M: random-id-generator eval-generator ( singleton -- obj )
     "(" 0% call ")" 0% ; inline
 
 M: interval where ( spec obj -- )
-    dup [ from>> ] [ to>> ] bi
-    [ first fp-infinity? ] bi@ and [
-        2drop
-        " 1 = 1 " 0% ! dummy
-    ] [
-        [
-            [ from>> "from" where-interval ] [
-                nip [ from>> ] [ to>> ] bi
-                [ first fp-infinity? ] bi@ or [ " and " 0% ] unless
-            ] [ to>> "to" where-interval ] 2tri
-        ] in-parens
-    ] if ;
+    [
+        [ from>> "from" where-interval ] [
+            nip infinite-interval? [ " and " 0% ] unless
+        ] [ to>> "to" where-interval ] 2tri
+    ] in-parens ;
 
 M: sequence where ( spec obj -- )
     [
@@ -93,19 +94,28 @@ M: integer where ( spec obj -- ) object-where ;
 
 M: string where ( spec obj -- ) object-where ;
 
+: filter-slots ( tuple specs -- specs' )
+    [
+        slot-name>> swap get-slot-named
+        dup double-infinite-interval? [ drop f ] when
+    ] with filter ;
+
 : where-clause ( tuple specs -- )
-    " where " 0% [
-        " and " 0%
+    dupd filter-slots
+    dup empty? [
+        2drop
     ] [
-        2dup slot-name>> swap get-slot-named where
-    ] interleave drop ;
+        " where " 0% [
+            " and " 0%
+        ] [
+            2dup slot-name>> swap get-slot-named where
+        ] interleave drop
+    ] if ;
 
 M: db <delete-tuple-statement> ( tuple table -- sql )
     [
         "delete from " 0% 0%
-        dupd
-        [ slot-name>> swap get-slot-named ] with filter
-        dup empty? [ 2drop ] [ where-clause ] if ";" 0%
+        where-clause
     ] query-make ;
 
 M: db <select-by-slots-statement> ( tuple class -- statement )
@@ -115,7 +125,5 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         [ dup column-name>> 0% 2, ] interleave
 
         " from " 0% 0%
-        dupd
-        [ slot-name>> swap get-slot-named ] with filter
-        dup empty? [ 2drop ] [ where-clause ] if ";" 0%
+        where-clause
     ] query-make ;
