@@ -22,7 +22,8 @@ IN: update
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : remote-clean-image ( -- url )
-  "http://factorcode.org/images/clean/" my-boot-image-name append ;
+  { "http://factorcode.org/images/clean/" platform "/" my-boot-image-name }
+  to-string ;
 
 : download-clean-image ( -- ) remote-clean-image download ;
 
