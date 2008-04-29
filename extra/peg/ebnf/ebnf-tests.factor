@@ -51,13 +51,15 @@ IN: peg.ebnf.tests
   T{ ebnf-sequence f
      V{ 
        T{ ebnf-non-terminal f "one" }
-       T{ ebnf-choice f
-          V{ T{ ebnf-non-terminal f "two" } T{ ebnf-non-terminal f "three" } }
+       T{ ebnf-whitespace f
+         T{ ebnf-choice f
+            V{ T{ ebnf-non-terminal f "two" } T{ ebnf-non-terminal f "three" } }
+         }
        }
      }
   } 
 } [
-  "one (two | three)" 'choice' parse parse-result-ast
+  "one {two | three}" 'choice' parse parse-result-ast
 ] unit-test
 
 {
@@ -302,8 +304,32 @@ main = Primary
   "abc" [EBNF a="a" "b" foo=(a "c") EBNF] call parse-result-ast
 ] unit-test
 
+{ V{ V{ "a" "b" } "c" } } [
+  "abc" [EBNF a="a" "b" foo={a "c"} EBNF] call parse-result-ast
+] unit-test
+
+{ V{ V{ "a" "b" } "c" } } [
+  "abc" [EBNF a="a" "b" foo=a "c" EBNF] call parse-result-ast
+] unit-test
+
 { f } [
   "a bc" [EBNF a="a" "b" foo=(a "c") EBNF] call 
+] unit-test
+
+{ f } [
+  "a bc" [EBNF a="a" "b" foo=a "c" EBNF] call 
+] unit-test
+
+{ f } [
+  "a bc" [EBNF a="a" "b" foo={a "c"} EBNF] call
+] unit-test
+
+{ f } [
+  "ab c" [EBNF a="a" "b" foo=a "c" EBNF] call 
+] unit-test
+
+{ V{ V{ "a" "b" } "c" } } [
+  "ab c" [EBNF a="a" "b" foo={a "c"} EBNF] call parse-result-ast
 ] unit-test
 
 { f } [
@@ -311,17 +337,30 @@ main = Primary
 ] unit-test
 
 { f } [
-  "a b c" [EBNF a="a" "b" foo=(a "c") EBNF] call 
-] unit-test
-
-{ V{ V{ "a" "b" } "c" } } [
-  "abc" [EBNF a="a" "b" foo=(a "c")~ EBNF] call parse-result-ast
-] unit-test
-
-{ V{ V{ "a" "b" } "c" } } [
-  "ab c" [EBNF a="a" "b" foo=(a "c")~ EBNF] call parse-result-ast
+  "a b c" [EBNF a="a" "b" foo=a "c" EBNF] call 
 ] unit-test
 
 { f } [
-  "a bc" [EBNF a="a" "b" foo=(a "c")~ EBNF] call
+  "a b c" [EBNF a="a" "b" foo=(a "c") EBNF] call 
 ] unit-test
+
+{ f } [
+  "a b c" [EBNF a="a" "b" foo={a "c"} EBNF] call 
+] unit-test
+
+{ V{ V{ V{ "a" "b" } "c" } V{ V{ "a" "b" } "c" } } } [
+  "ab cab c" [EBNF a="a" "b" foo={a "c"}* EBNF] call parse-result-ast
+] unit-test
+
+{ V{ } } [
+  "ab cab c" [EBNF a="a" "b" foo=(a "c")* EBNF] call parse-result-ast
+] unit-test
+
+{ V{ V{ V{ "a" "b" } "c" } V{ V{ "a" "b" } "c" } } } [
+  "ab c ab c" [EBNF a="a" "b" foo={a "c"}* EBNF] call parse-result-ast
+] unit-test
+
+{ V{ } } [
+  "ab c ab c" [EBNF a="a" "b" foo=(a "c")* EBNF] call parse-result-ast
+] unit-test
+

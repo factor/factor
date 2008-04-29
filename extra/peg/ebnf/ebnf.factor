@@ -137,9 +137,15 @@ DEFER: 'choice'
   #! Parse a group of choices, with a suffix indicating
   #! the type of group (repeat0, repeat1, etc) and
   #! an quot that is the action that produces the AST.
-  "(" [ 'choice' sp ] delay ")" syntax-pack 
-  swap 2seq  
-  [ first ] rot compose action ;
+  2dup
+  [
+    "(" [ 'choice' sp ] delay ")" syntax-pack 
+    swap 2seq  
+    [ first ] rot compose action ,
+    "{" [ 'choice' sp ] delay "}" syntax-pack 
+    swap 2seq  
+    [ first <ebnf-whitespace> ] rot compose action ,
+  ] choice* ;
   
 : 'group' ( -- parser )
   #! A grouping with no suffix. Used for precedence.
@@ -147,7 +153,6 @@ DEFER: 'choice'
     "*" token sp ensure-not ,
     "+" token sp ensure-not ,
     "?" token sp ensure-not ,
-    "~" token sp ensure-not ,
   ] seq* hide grouped ; 
 
 : 'repeat0' ( -- parser )
@@ -158,9 +163,6 @@ DEFER: 'choice'
 
 : 'optional' ( -- parser )
   [ <ebnf-optional> ] "?" syntax grouped ;
-
-: 'whitespace' ( -- parser )
-  [ <ebnf-whitespace> ] "~" syntax grouped ;
 
 : 'factor-code' ( -- parser )
   [
@@ -198,7 +200,6 @@ DEFER: 'choice'
     'repeat0' sp ,
     'repeat1' sp ,
     'optional' sp , 
-    'whitespace' sp , 
   ] choice* ;
 
 : 'action' ( -- parser )
