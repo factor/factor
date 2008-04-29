@@ -1,5 +1,5 @@
-USING: kernel math namespaces prettyprint
-math.private continuations tools.test sequences ;
+USING: kernel math math.functions namespaces prettyprint
+math.private continuations tools.test sequences random ;
 IN: math.integers.tests
 
 [ "-8" ] [ -8 unparse ] unit-test
@@ -191,3 +191,31 @@ unit-test
 [ f ] [ -128 power-of-2? ] unit-test
 [ f ] [ 0 power-of-2? ] unit-test
 [ t ] [ 1 power-of-2? ] unit-test
+
+: ratio>float [ >bignum ] bi@ /f ;
+
+[ 5. ] [ 5 1 ratio>float ] unit-test
+[ 4. ] [ 4 1 ratio>float ] unit-test
+[ 2. ] [ 2 1 ratio>float ] unit-test
+[ .5 ] [ 1 2 ratio>float ] unit-test
+[ .75 ] [ 3 4 ratio>float ] unit-test
+[ 1. ] [ 2000 2^ 2000 2^ 1+ ratio>float ] unit-test
+[ -1. ] [ 2000 2^ neg 2000 2^ 1+ ratio>float ] unit-test
+[ 0.4 ] [ 6 15 ratio>float ] unit-test
+
+[ HEX: 3fe553522d230931 ]
+[ 61967020039 92984792073 ratio>float double>bits ] unit-test
+
+: random-integer
+    32 random-bits
+    1 random zero? [ neg ] when
+    1 random zero? [ >bignum ] when ;
+
+[ t ] [
+    1000 [
+        drop
+        random-integer
+        random-integer
+        [ >float / ] [ /f ] 2bi 0.1 ~
+    ] all?
+] unit-test

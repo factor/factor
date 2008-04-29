@@ -42,4 +42,4 @@ M: real after=? ( obj1 obj2 -- ? ) >= ;
 
 : [-] ( x y -- z ) - 0 max ; inline
 
-: compare ( obj1 obj2 quot -- n ) bi@ <=> ; inline
+: compare ( obj1 obj2 quot -- symbol ) bi@ <=> ; inline

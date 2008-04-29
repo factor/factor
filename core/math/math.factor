@@ -21,6 +21,7 @@ MATH: +   ( x y -- z ) foldable
 MATH: -   ( x y -- z ) foldable
 MATH: *   ( x y -- z ) foldable
 MATH: /   ( x y -- z ) foldable
+MATH: /f  ( x y -- z ) foldable
 MATH: /i  ( x y -- z ) foldable
 MATH: mod ( x y -- z ) foldable
 
@@ -32,6 +33,8 @@ MATH: bitxor ( x y -- z ) foldable
 GENERIC# shift 1 ( x n -- y ) foldable
 GENERIC: bitnot ( x -- y ) foldable
 GENERIC# bit? 1 ( x n -- ? ) foldable
+
+GENERIC: abs ( x -- y ) foldable
 
 <PRIVATE
 
@@ -46,10 +49,7 @@ PRIVATE>
         (log2)
     ] if ; foldable
 
-GENERIC: zero? ( x -- ? ) foldable
-
-M: object zero? drop f ;
-
+: zero? ( x -- ? ) 0 number= ; inline
 : 1+ ( x -- y ) 1 + ; inline
 : 1- ( x -- y ) 1 - ; inline
 : 2/ ( x -- y ) -1 shift ; inline
@@ -59,8 +59,6 @@ M: object zero? drop f ;
 : sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
 
 : ?1+ [ 1+ ] [ 0 ] if* ; inline
-
-: /f  ( x y -- z ) >r >float r> >float float/f ; inline
 
 : rem ( x y -- z ) tuck mod over + swap mod ; foldable
 

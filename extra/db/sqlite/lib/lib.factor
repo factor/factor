@@ -4,7 +4,7 @@ USING: alien.c-types arrays assocs kernel math math.parser
 namespaces sequences db.sqlite.ffi db combinators
 continuations db.types calendar.format serialize
 io.streams.byte-array byte-arrays io.encodings.binary
-tools.walker io.backend ;
+io.backend ;
 IN: db.sqlite.lib
 
 : sqlite-error ( n -- * )
@@ -106,7 +106,7 @@ IN: db.sqlite.lib
             object>bytes
             sqlite-bind-blob-by-name
         ] }
-        { +native-id+ [ sqlite-bind-int-by-name ] }
+        { +db-assigned-id+ [ sqlite-bind-int-by-name ] }
         { +random-id+ [ sqlite-bind-int64-by-name ] }
         { NULL [ sqlite-bind-null-by-name ] }
         [ no-sql-type ]
@@ -132,7 +132,7 @@ IN: db.sqlite.lib
 : sqlite-column-typed ( handle index type -- obj )
     dup array? [ first ] when
     {
-        { +native-id+ [ sqlite3_column_int64  ] }
+        { +db-assigned-id+ [ sqlite3_column_int64  ] }
         { +random-id+ [ sqlite3-column-uint64 ] }
         { INTEGER [ sqlite3_column_int ] }
         { BIG-INTEGER [ sqlite3_column_int64 ] }

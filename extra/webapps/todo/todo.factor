@@ -15,7 +15,7 @@ TUPLE: todo uid id priority summary description ;
 todo "TODO"
 {
     { "uid" "UID" { VARCHAR 256 } +not-null+ }
-    { "id" "ID" +native-id+ }
+    { "id" "ID" +db-assigned-id+ }
     { "priority" "PRIORITY" INTEGER +not-null+ }
     { "summary" "SUMMARY" { VARCHAR 256 } +not-null+ }
     { "description" "DESCRIPTION" { VARCHAR 256 } }

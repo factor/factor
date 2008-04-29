@@ -12,7 +12,7 @@ TUPLE: node id content ;
 
 node "node"
 {
-    { "id" "id" +native-id+ +autoincrement+ }
+    { "id" "id" +db-assigned-id+ +autoincrement+ }
     { "content" "content" TEXT }
 } define-persistent
 
@@ -53,7 +53,7 @@ TUPLE: arc id relation subject object ;
 
 arc "arc"
 {
-    { "id" "id" INTEGER +assigned-id+ } ! foreign key to node table?
+    { "id" "id" INTEGER +user-assigned-id+ } ! foreign key to node table?
     { "relation" "relation" INTEGER +not-null+ }
     { "subject" "subject" INTEGER +not-null+ }
     { "object" "object" INTEGER +not-null+ }

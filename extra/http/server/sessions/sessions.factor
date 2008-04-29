@@ -1,13 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel math.parser namespaces random
-accessors quotations hashtables sequences continuations
-fry calendar combinators destructors
-http
-http.server
-http.server.sessions.storage
-http.server.sessions.storage.null
-html.elements ;
+USING: assocs kernel math.intervals math.parser namespaces
+random accessors quotations hashtables sequences continuations
+fry calendar combinators destructors alarms
+db db.tuples db.types
+http http.server html.elements ;
 IN: http.server.sessions
 
 TUPLE: session id expires namespace changed? ;
@@ -15,6 +12,28 @@ TUPLE: session id expires namespace changed? ;
 : <session> ( id -- session )
     session new
         swap >>id ;
+
+session "SESSIONS"
+{
+    { "id" "ID" +random-id+ system-random-generator }
+    { "expires" "EXPIRES" BIG-INTEGER +not-null+ }
+    { "namespace" "NAMESPACE" FACTOR-BLOB }
+} define-persistent
+
+: get-session ( id -- session )
+    dup [ <session> select-tuple ] when ;
+
+: init-sessions-table session ensure-table ;
+
+: expired-sessions ( -- session )
+    f <session>
+        -1.0/0.0 now timestamp>millis [a,b] >>expires
+    select-tuples ;
+
+: start-expiring-sessions ( db seq -- )
+    '[
+        , , [ expired-sessions [ delete-tuple ] each ] with-db
+    ] 5 minutes every drop ;
 
 GENERIC: init-session* ( responder -- )
 
@@ -24,12 +43,11 @@ M: dispatcher init-session* default>> init-session* ;
 
 M: filter-responder init-session* responder>> init-session* ;
 
-TUPLE: session-manager < filter-responder sessions timeout domain ;
+TUPLE: sessions < filter-responder timeout domain ;
 
-: <session-manager> ( responder -- responder' )
-    session-manager new
+: <sessions> ( responder -- responder' )
+    sessions new
         swap >>responder
-        null-sessions >>sessions
         20 minutes >>timeout ;
 
 : (session-changed) ( session -- )
@@ -50,11 +68,11 @@ TUPLE: session-manager < filter-responder sessions timeout domain ;
     [ namespace>> swap change-at ] keep
     (session-changed) ; inline
 
-: init-session ( session managed -- )
-    >r session r> '[ , init-session* ] with-variable ;
+: init-session ( session -- )
+    session [ sessions get init-session* ] with-variable ;
 
 : cutoff-time ( -- time )
-    session-manager get timeout>> from-now timestamp>millis ;
+    sessions get timeout>> from-now timestamp>millis ;
 
 : touch-session ( session -- )
     cutoff-time >>expires drop ;
@@ -64,57 +82,50 @@ TUPLE: session-manager < filter-responder sessions timeout domain ;
         H{ } clone >>namespace
         dup touch-session ;
 
-: begin-session ( responder -- session )
-    >r empty-session r>
-    [ init-session ]
-    [ sessions>> new-session ]
-    [ drop ]
-    2tri ;
+: begin-session ( -- session )
+    empty-session [ init-session ] [ insert-tuple ] [ ] tri ;
 
 ! Destructor
-TUPLE: session-saver manager session ;
+TUPLE: session-saver session ;
 
 C: <session-saver> session-saver
 
 M: session-saver dispose
-    [ session>> ] [ manager>> sessions>> ] bi
-    over changed?>> [
-        [ drop touch-session ] [ update-session ] 2bi
-    ] [ 2drop ] if ;
+    session>> dup changed?>> [
+        [ touch-session ] [ update-tuple ] bi
+    ] [ drop ] if ;
 
-: save-session-after ( manager session -- )
+: save-session-after ( session -- )
     <session-saver> add-always-destructor ;
 
-: existing-session ( path manager session -- response )
-    [ nip session set ]
-    [ save-session-after ]
-    [ drop responder>> ] 2tri
-    call-responder ;
+: existing-session ( path session -- response )
+    [ session set ] [ save-session-after ] bi
+    sessions get responder>> call-responder ;
 
 : session-id-key "factorsessid" ;
 
-: cookie-session-id ( -- id/f )
-    request get session-id-key get-cookie
+: cookie-session-id ( request -- id/f )
+    session-id-key get-cookie
     dup [ value>> string>number ] when ;
 
-: post-session-id ( -- id/f )
-    session-id-key request get post-data>> at string>number ;
+: post-session-id ( request -- id/f )
+    session-id-key swap post-data>> at string>number ;
 
 : request-session-id ( -- id/f )
-    request get method>> {
+    request get dup method>> {
         { "GET" [ cookie-session-id ] }
         { "HEAD" [ cookie-session-id ] }
         { "POST" [ post-session-id ] }
     } case ;
 
-: request-session ( responder -- session/f )
-    >r request-session-id r> sessions>> get-session ;
+: request-session ( -- session/f )
+    request-session-id get-session ;
 
 : <session-cookie> ( id -- cookie )
     session-id-key <cookie>
-        "$session-manager" resolve-base-path >>path
-        session-manager get timeout>> from-now >>expires
-        session-manager get domain>> >>domain ;
+        "$sessions" resolve-base-path >>path
+        sessions get timeout>> from-now >>expires
+        sessions get domain>> >>domain ;
 
 : put-session-cookie ( response -- response' )
     session get id>> number>string <session-cookie> put-cookie ;
@@ -126,8 +137,8 @@ M: session-saver dispose
         session get id>> number>string =value
     input/> ;
 
-M: session-manager call-responder* ( path responder -- response )
+M: sessions call-responder* ( path responder -- response )
     [ session-form-field ] add-form-hook
-    dup session-manager set
-    dup request-session [ dup begin-session ] unless*
+    sessions set
+    request-session [ begin-session ] unless*
     existing-session put-session-cookie ;

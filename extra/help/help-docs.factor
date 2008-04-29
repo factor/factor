@@ -113,7 +113,7 @@ ARTICLE: "help" "Help system"
 "The help system maintains documentation written in a simple markup language, along with cross-referencing and search. Documentation can either exist as free-standing " { $emphasis "articles" } " or be associated with words."
 { $subsection "browsing-help" }
 { $subsection "writing-help" }
-{ $subsection "help.lint" }
+{ $vocab-subsection "Help lint tool" "help.lint" }
 { $subsection "help-impl" } ;
 
 IN: help

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables kernel models math namespaces sequences
 quotations math.vectors combinators sorting vectors dlists
-models threads concurrency.flags ;
+models threads concurrency.flags math.order ;
 IN: ui.gadgets
 
 SYMBOL: ui-notify-flag
@@ -106,7 +106,7 @@ GENERIC: children-on ( rect/point gadget -- seq )
 M: gadget children-on nip gadget-children ;
 
 : (fast-children-on) ( dim axis gadgets -- i )
-    swapd [ rect-loc v- over v. ] binsearch nip ;
+    swapd [ rect-loc v- over v. 0 <=> ] binsearch nip ;
 
 : fast-children-on ( rect axis children -- from to )
     3dup

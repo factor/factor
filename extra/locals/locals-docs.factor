@@ -120,9 +120,11 @@ $nl
 "Another limitation is that closure conversion does not descend into arrays, hashtables or other types of literals. For example, the following does not work:"
 { $code
     ":: bad-cond-usage ( a -- ... )"
-    "    { [ a 0 < ] [ ... ] }"
-    "    { [ a 0 > ] [ ... ] }"
-    "    { [ a 0 = ] [ ... ] } ;"
+    "    {"
+    "        { [ a 0 < ] [ ... ] }"
+    "        { [ a 0 > ] [ ... ] }"
+    "        { [ a 0 = ] [ ... ] }"
+    "    } cond ;"
 } ;
 
 ARTICLE: "locals" "Local variables and lexical closures"

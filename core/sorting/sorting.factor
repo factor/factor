@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math sequences vectors math.order
-sequences sequences.private growable ;
+sequences sequences.private growable math.order ;
 IN: sorting
 
 DEFER: sort
@@ -58,13 +58,13 @@ PRIVATE>
     [ midpoint@ ] keep nth-unsafe ; inline
 
 : partition ( seq n -- slice )
-    1 < swap halves ? ; inline
+    +gt+ eq? not swap halves ? ; inline
 
 : (binsearch) ( elt quot seq -- i )
     dup length 1 <= [
         slice-from 2nip
     ] [
-        [ midpoint swap call ] 3keep roll dup zero?
+        [ midpoint swap call ] 3keep roll dup +eq+ eq?
         [ drop dup slice-from swap midpoint@ + 2nip ]
         [ partition (binsearch) ] if
     ] if ; inline
