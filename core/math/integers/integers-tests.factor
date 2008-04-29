@@ -192,6 +192,8 @@ unit-test
 [ f ] [ 0 power-of-2? ] unit-test
 [ t ] [ 1 power-of-2? ] unit-test
 
+: ratio>float [ >bignum ] bi@ /f ;
+
 [ 5. ] [ 5 1 ratio>float ] unit-test
 [ 4. ] [ 4 1 ratio>float ] unit-test
 [ 2. ] [ 2 1 ratio>float ] unit-test
@@ -214,6 +216,6 @@ unit-test
         drop
         random-integer
         random-integer
-        [ >float / ] [ ratio>float ] 2bi 0.1 ~
+        [ >float / ] [ /f ] 2bi 0.1 ~
     ] all?
 ] unit-test
