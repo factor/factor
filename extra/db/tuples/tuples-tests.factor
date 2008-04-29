@@ -322,6 +322,17 @@ TUPLE: exam id name score ;
         }
     ] [
         T{ exam f T{ interval f { -1.0/0.0 t } { 1/0. f } } } select-tuples
+    ] unit-test
+    
+    [
+        {
+            T{ exam f 1 "Kyle" 100 }
+            T{ exam f 2 "Stan" 80 }
+            T{ exam f 3 "Kenny" 60 }
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam } select-tuples
     ] unit-test ;
 
 TUPLE: bignum-test id m n o ;
