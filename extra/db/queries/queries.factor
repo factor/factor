@@ -44,19 +44,38 @@ M: random-id-generator eval-generator ( singleton -- obj )
 : interval-comparison ( ? str -- str )
     "from" = " >" " <" ? swap [ "= " append ] when ;
 
+: fp-infinity? ( float -- ? )
+    dup float? [
+        double>bits -52 shift 11 2^ 1- [ bitand ] keep =
+    ] [
+        drop f
+    ] if ;
+
 : where-interval ( spec obj from/to -- )
-    pick column-name>> 0%
-    >r first2 r> interval-comparison 0%
-    bind# ;
+    over first fp-infinity? [
+        3drop
+    ] [
+        pick column-name>> 0%
+        >r first2 r> interval-comparison 0%
+        bind#
+    ] if ;
 
 : in-parens ( quot -- )
     "(" 0% call ")" 0% ; inline
 
 M: interval where ( spec obj -- )
-    [
-        [ from>> "from" where-interval " and " 0% ]
-        [ to>> "to" where-interval ] 2bi
-    ] in-parens ;
+    dup [ from>> ] [ to>> ] bi
+    [ first fp-infinity? ] bi@ and [
+        2drop
+        " 1 = 1 " 0% ! dummy
+    ] [
+        [
+            [ from>> "from" where-interval ] [
+                nip [ from>> ] [ to>> ] bi
+                [ first fp-infinity? ] bi@ or [ " and " 0% ] unless
+            ] [ to>> "to" where-interval ] 2tri
+        ] in-parens
+    ] if ;
 
 M: sequence where ( spec obj -- )
     [
