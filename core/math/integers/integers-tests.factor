@@ -1,5 +1,5 @@
-USING: kernel math namespaces prettyprint
-math.private continuations tools.test sequences ;
+USING: kernel math math.functions namespaces prettyprint
+math.private continuations tools.test sequences random ;
 IN: math.integers.tests
 
 [ "-8" ] [ -8 unparse ] unit-test
